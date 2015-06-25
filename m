@@ -1,76 +1,31 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: akcipher use
-Date: Thu, 25 Jun 2015 12:19:32 -0700
-Message-ID: <558C5444.4000105@intel.com>
-References: <1708764.x5PFhLSanv@tauon.atsec.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH] crypto: aesni - fix failing setkey for rfc4106-gcm-aesni
+Date: Thu, 25 Jun 2015 16:37:48 -0700
+Message-ID: <CA+55aFwZBfRGJY3NQtEWyWFBA+Vkh0QDtyYj-Cf4-vt4Wt_eXg@mail.gmail.com>
+References: <20150624141421.30466.28034.stgit@tstruk-mobl1>
+	<20150625142525.GA10550@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset=UTF-8
+Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:58546 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751728AbbFYTTp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Jun 2015 15:19:45 -0400
-In-Reply-To: <1708764.x5PFhLSanv@tauon.atsec.com>
+Received: from mail-ig0-f182.google.com ([209.85.213.182]:38714 "EHLO
+	mail-ig0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751495AbbFYXht (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 25 Jun 2015 19:37:49 -0400
+Received: by igin14 with SMTP id n14so2911634igi.1
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Jun 2015 16:37:48 -0700 (PDT)
+In-Reply-To: <20150625142525.GA10550@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 06/25/2015 04:58 AM, Stephan Mueller wrote:
-> Hi Tadeusz,
-> 
-> I do have a few questions around the akcipher API.
-> 
-> The API offers access to the raw asym encryption and decryption operations.
-> 
-> The "normal" use of asym ciphers is the hybrid mode. That opens the following 
-> questions:
-> 
-> - how would a hardware implementation offering only a hybrid asym cipher 
-> implementation (i.e. a full signature mechanism or bulk data encryption 
-> mechanism) be usable via that API?
+On Thu, Jun 25, 2015 at 7:25 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> Linus, could you confirm that you have AESNI built into the kernel
+> and not as a module?
 
-Usually the HW offers acceleration for encryption primitives.
-To support the encryption schemes we can introduce templates for instance
-pkcs1_v15(rsa) or oaep(rsa) as it was proposed by Horia Geanta.
+Yes, confirmed.
 
-> 
-> - currently I only see one user in the kernel for asym ciphers: the module 
-> signing mechanism. Do you expect more to come? Or am I missing others?
-> 
-> - If no, then it sounds like that the akcipher API is a means to make asym 
-> ciphers implemented in hardware and only accessible from supervisor state 
-> available. I would assume that the majority of the users that may be 
-> interested in that kind of support resides in user space. Is the intention to 
-> develop an AF_ALG interface (note, I personally already thought about that 
-> subject for some time now)?
-
-Yes, that's the main use case for this. We want to be able to accelerate SSL
-handshakes.
-
-> 
-> - If user space shall also be able to use akcipher, how do you think that 
-> should be handled in general? Should user space simply have access to the raw 
-> asym ciphers and use that together with the hashes/sym ciphers to implement 
-> the hybrid system? Or shall the kernel interface extend the skcipher/hash 
-> interface with an akcipher wrapper for the hybrid system? I am currently not 
-> sure which is better considering:
-> 
-> 	- raw asym interface: pro: lean, most flexible; con: user land must 
-> know of sym key (i.e. it is located in two places), potentially more round 
-> trips between kernel/user land
-> 
-> 	- hybrid cipher interface: just take the opposite of the raw asym 
-> interface
-> 
-> - If the hybrid system is intended to be implemented in the kernel, would then 
-> the ton of different padding schemes need to be implemented in the kernel side 
-> or should user space do the padding? I would think they could stay in user 
-> land (provided that there is no kernel space user).
-
-Ideally or the padding and hashing should be done by user space and only the expensive
-operations like modular exponentiation should be offloaded to HW via PF_ALG and akcipher.
-
-regards,
-T
+                 Linus
