@@ -1,26 +1,25 @@
 From: Alexander Kuleshov <kuleshovmail@gmail.com>
 Subject: [PATCH] crypto: add .gitignore for crypto/*.-asn1.[ch] files
-Date: Thu, 25 Jun 2015 16:03:28 +0600
-Message-ID: <1435226608-12358-1-git-send-email-kuleshovmail@gmail.com>
+Date: Thu, 25 Jun 2015 16:18:03 +0600
+Message-ID: <1435227483-15604-1-git-send-email-kuleshovmail@gmail.com>
 Cc: linux-crypto@vger.kernel.org,
 	Tadeusz Struk <tadeusz.struk@intel.com>,
 	linux-kernel@vger.kernel.org,
-	Alexander Kuleshov <kuleshovmal@gmail.com>,
 	Alexander Kuleshov <kuleshovmail@gmail.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-la0-f45.google.com ([209.85.215.45]:34206 "EHLO
-	mail-la0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752919AbbFYKEZ (ORCPT
+Received: from mail-lb0-f171.google.com ([209.85.217.171]:35062 "EHLO
+	mail-lb0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752483AbbFYKSJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Jun 2015 06:04:25 -0400
+	Thu, 25 Jun 2015 06:18:09 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 There are two generated files: crypto/rsakey-asn1.c and crypto/raskey-asn1.h,
 after the cfc2bb32b31371d6bffc6bf2da3548f20ad48c83 commit. Let's add
-.gitignore for it.
+.gitignore to ignore *-asn1.[ch] files.
 
 Signed-off-by: Alexander Kuleshov <kuleshovmail@gmail.com>
 ---
