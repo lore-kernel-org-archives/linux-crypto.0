@@ -1,62 +1,71 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: jitterentropy - avoid compiler warnings
-Date: Thu, 25 Jun 2015 23:37:50 +0800
-Message-ID: <20150625153750.GF11592@gondor.apana.org.au>
-References: <CAMuHMdXLDeqSU3WcVEh=jcGdS4z2YMejU_nZ2gDObDVjsm7vvw@mail.gmail.com>
- <33380936.3jDOACMRCz@tachyon.chronox.de>
- <CAMuHMdUw9FJE3kWEQf+TNTaLB9gMjdHEGt27bnD--qoGX22H7Q@mail.gmail.com>
- <1446731.BXdYRBoPhr@tachyon.chronox.de>
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Subject: Re: [PATCH] crypto: mv_cesa - fix up for of_get_named_gen_pool() rename
+Date: Thu, 25 Jun 2015 11:41:26 -0400
+Message-ID: <CAP=VYLrgVjuymafdBZXAzPmBFEdGn71cfJA29n6=nd2ie0mPyw@mail.gmail.com>
+References: <CABxcv=m4juAMHaMYSB+8O8cEX+YZCJ0cArS2wN-YGpTBgWe-CA@mail.gmail.com>
+ <1435221470-5382-1-git-send-email-simon.guinot@sequanux.org> <20150625153006.GA11513@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Peter Zijlstra
-	<public-peterz-wegcikhe2lqwvfeawa7xhq@plane.gmane.org>,
-	Andy Shevchenko <andy.shevchenko@gmail.com>,
-	Jim Davis <jim.epost@gmail.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Linux-Next <linux-next@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Waiman Long <waiman.long@hp.com>,
-	Ingo Molnar <mingo@kernel.org>, x86 <x86@kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset=UTF-8
+Cc: Simon Guinot <simon.guinot@sequanux.org>,
+	Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Lior Amsalem <alior@marvell.com>, Andrew Lunn <andrew@lunn.ch>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Russell King - ARM Linux <linux@arm.linux.org.uk>,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	"linux-next@vger.kernel.org" <linux-next@vger.kernel.org>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	devicetree@vger.kernel.org, Jason Cooper <jason@lakedaemon.net>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Gregory CLEMENT <gregory.clement@free-electrons.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Thomas P
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44736 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752537AbbFYPiN (ORCPT
+Received: from mail-wg0-f45.google.com ([74.125.82.45]:36514 "EHLO
+	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751379AbbFYPl5 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Jun 2015 11:38:13 -0400
-Content-Disposition: inline
-In-Reply-To: <1446731.BXdYRBoPhr@tachyon.chronox.de>
+	Thu, 25 Jun 2015 11:41:57 -0400
+In-Reply-To: <20150625153006.GA11513@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 23, 2015 at 04:18:54PM +0200, Stephan Mueller wrote:
-> Hi Geert, Guenter,
-> 
-> may I ask that you check that the following patch compiles without errors or warnings on your systems?
-> 
-> Though, when I test that patch with the AVR32 cross compiler, I get a warning about the code being not relaxable.
-> 
-> Thank you very much.
-> 
-> ---8<---
-> The core of the Jitter RNG is intended to be compiled with -O0. To
-> ensure that the Jitter RNG can be compiled on all architectures,
-> separate out the RNG core into a stand-alone C file that can be compiled
-> with -O0 which does not depend on any kernel include file.
-> 
-> As no kernel includes can be used in the C file implementing the core
-> RNG, any dependencies on kernel code must be extracted.
-> 
-> A second file provides the link to the kernel and the kernel crypto API
-> that can be compiled with the regular compile options of the kernel.
-> 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+On Thu, Jun 25, 2015 at 11:30 AM, Herbert Xu
+<herbert@gondor.apana.org.au> wrote:
+> On Thu, Jun 25, 2015 at 10:37:50AM +0200, Simon Guinot wrote:
+>> This patch fixes the following build error:
+>>
+>> drivers/crypto/mv_cesa.c: In function 'mv_cesa_get_sram':
+>> drivers/crypto/mv_cesa.c:1037: error: implicit declaration of function 'of_get_named_gen_pool'
+>> drivers/crypto/mv_cesa.c:1038: warning: assignment makes pointer from integer without a cast
+>> scripts/Makefile.build:258: recipe for target 'drivers/crypto/mv_cesa.o' failed
+>>
+>> Signed-off-by: Simon Guinot <simon.guinot@sequanux.org>
+>
+> This patch doesn't compile.
 
-Applied.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+As sfr pointed out, this is an interaction with a rename patch in
+the akpm tree; sfr added a fixup patch here last night:
+
+https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit/?h=akpm
+
+"crypto: marvell/cesa - another fix up for of_get_named_gen_pool() rename"
+
+Paul.
+--
+
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-next" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
