@@ -1,85 +1,80 @@
-From: Guenter Roeck <linux@roeck-us.net>
-Subject: [PATCH] keys: Use non-conflicting variable name
-Date: Wed, 24 Jun 2015 15:27:01 -0700
-Message-ID: <1435184821-7688-1-git-send-email-linux@roeck-us.net>
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Subject: Re: [PATCH v7 00/14] crypto: add a new driver for Marvell's CESA
+Date: Wed, 24 Jun 2015 20:00:38 -0400
+Message-ID: <20150625000037.GK31584@windriver.com>
+References: <1434635190-27733-1-git-send-email-boris.brezillon@free-electrons.com>
+ <20150619142444.GA15234@gondor.apana.org.au>
+ <CAP=VYLqQynCNRTpm4JnOxeO6DH_739fO2QNcDMxaXqCKCHiTtQ@mail.gmail.com>
+ <CAP=VYLpSrTvXRovWo4G7AXWv1OKFQRpQR255hS5z+=h4+XOLhg@mail.gmail.com>
+ <20150621102418.2ea74910@bbrezillon>
+ <20150621082717.GA29128@gondor.apana.org.au>
+ <20150622092336.5949e258@bbrezillon>
+ <20150622075910.GA7659@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Guenter Roeck <linux@roeck-us.net>,
-	"Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Lior Amsalem <alior@marvell.com>, Andrew Lunn <andrew@lunn.ch>,
+ Nadav Haklai <nadavh@marvell.com>, Mark Rutland <mark.rutland@arm.com>,
+ Boris Brezillon <boris.brezillon@free-electrons.com>,
+ Russell King - ARM Linux <linux@arm.linux.org.uk>,
+ Tawfik Bayouk <tawfik@marvell.com>, Eran Ben-Avi <benavi@marvell.com>,
+ Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+ "linux-next@vger.kernel.org" <linux-next@vger.kernel.org>,
+ Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+ devicetree@vger.kernel.org, Jason Cooper <jason@lakedaemon.net>,
+ Pawel Moll <pawel.moll@arm.com>, Ian Campbell <ijc+devicetree@hellion.org.uk>,
+ Arnaud Ebalard <arno@natisbad.org>, Rob Herring <robh+dt@kernel.org>,
+ Gregory CLEMENT <gregory.clement@free-electrons.com>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bh-25.webhostbox.net ([208.91.199.152]:40721 "EHLO
-	bh-25.webhostbox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750903AbbFXW1M (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 24 Jun 2015 18:27:12 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20150622075910.GA7659@gondor.apana.org.au>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-arm64:allmodconfig fails to build as follows.
+[Re: [PATCH v7 00/14] crypto: add a new driver for Marvell's CESA] On 22/06/2015 (Mon 15:59) Herbert Xu wrote:
 
-In file included from include/acpi/platform/aclinux.h:74:0,
-                 from include/acpi/platform/acenv.h:173,
-                 from include/acpi/acpi.h:56,
-                 from include/linux/acpi.h:37,
-                 from ./arch/arm64/include/asm/dma-mapping.h:21,
-                 from include/linux/dma-mapping.h:86,
-                 from include/linux/skbuff.h:34,
-                 from include/crypto/algapi.h:18,
-                 from crypto/asymmetric_keys/rsa.c:16:
-include/linux/ctype.h:15:12: error: expected =E2=80=98;=E2=80=99, =E2=80=
-=98,=E2=80=99 or =E2=80=98)=E2=80=99
-		before numeric constant
- #define _X 0x40 /* hex digit */
-            ^
-crypto/asymmetric_keys/rsa.c:123:47: note: in expansion of macro =E2=80=
-=98_X=E2=80=99
- static int RSA_I2OSP(MPI x, size_t xLen, u8 **_X)
-                                               ^
-crypto/asymmetric_keys/rsa.c: In function =E2=80=98RSA_verify_signature=
-=E2=80=99:
-crypto/asymmetric_keys/rsa.c:256:2: error:
-		implicit declaration of function =E2=80=98RSA_I2OSP=E2=80=99
+> On Mon, Jun 22, 2015 at 09:23:36AM +0200, Boris Brezillon wrote:
+> > Hi Herbert,
+> > 
+> > On Sun, 21 Jun 2015 16:27:17 +0800
+> > Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > 
+> > > On Sun, Jun 21, 2015 at 10:24:18AM +0200, Boris Brezillon wrote:
+> > > > 
+> > > > Indeed. Here is a patch fixing that.
+> > > 
+> > > I think you should just kill COMPILE_TEST instead of adding ARM.
+> > 
+> > The following patch is killing the COMPILE_TEST dependency.
+> 
+> Patch applied.
 
-The problem is caused by an unrelated include file change, resulting in
-the inclusion of ctype.h on arm64. This in turn causes the local variab=
-le
-_X to conflict with macro _X used in ctype.h.
+Just a heads up, this driver is still killing a couple of linux-next
+builds today and for the past few days.
 
-=46ixes: b6197b93fa4b ("arm64 : Introduce support for ACPI _CCA object"=
-)
-Cc: Suthikulpanit, Suravee <Suravee.Suthikulpanit@amd.com>
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
- crypto/asymmetric_keys/rsa.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+drivers/crypto/mv_cesa.c:1037:2: error: implicit declaration of function
+'of_get_named_gen_pool' [-Werror=implicit-function-declaration]
 
-diff --git a/crypto/asymmetric_keys/rsa.c b/crypto/asymmetric_keys/rsa.=
-c
-index 459cf97a75e2..508b57b77474 100644
---- a/crypto/asymmetric_keys/rsa.c
-+++ b/crypto/asymmetric_keys/rsa.c
-@@ -120,7 +120,7 @@ static int RSAVP1(const struct public_key *key, MPI=
- s, MPI *_m)
- /*
-  * Integer to Octet String conversion [RFC3447 sec 4.1]
-  */
--static int RSA_I2OSP(MPI x, size_t xLen, u8 **_X)
-+static int RSA_I2OSP(MPI x, size_t xLen, u8 **pX)
- {
- 	unsigned X_size, x_size;
- 	int X_sign;
-@@ -147,7 +147,7 @@ static int RSA_I2OSP(MPI x, size_t xLen, u8 **_X)
- 		return -EBADMSG;
- 	}
-=20
--	*_X =3D X;
-+	*pX =3D X;
- 	return 0;
- }
-=20
---=20
-2.1.0
+http://kisskb.ellerman.id.au/kisskb/buildresult/12448851/
+http://kisskb.ellerman.id.au/kisskb/buildresult/12448776/
+
+Missing dependency on CONFIG_OF_<blah> presumably.
+
+Paul.
+--
+
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
