@@ -1,78 +1,53 @@
-From: Simon Guinot <simon.guinot@sequanux.org>
-Subject: Re: [PATCH] crypto: mv_cesa - fix up for of_get_named_gen_pool()
- rename
-Date: Thu, 25 Jun 2015 17:56:05 +0200
-Message-ID: <20150625155605.GI4853@kw.sim.vm.gnt>
-References: <CABxcv=m4juAMHaMYSB+8O8cEX+YZCJ0cArS2wN-YGpTBgWe-CA@mail.gmail.com>
- <1435221470-5382-1-git-send-email-simon.guinot@sequanux.org>
- <20150625153006.GA11513@gondor.apana.org.au>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH] crypto: aesni - fix failing setkey for rfc4106-gcm-aesni
+Date: Thu, 25 Jun 2015 11:59:04 -0700
+Message-ID: <558C4F78.8020806@intel.com>
+References: <20150624141421.30466.28034.stgit@tstruk-mobl1> <20150625142525.GA10550@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ixNtouB4hv1hrEz3"
-Cc: Lior Amsalem <alior@marvell.com>, Andrew Lunn <andrew@lunn.ch>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Russell King - ARM Linux <linux@arm.linux.org.uk>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	linux-next@vger.kernel.org,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	devicetree@vger.kernel.org, Jason Cooper <jason@lakedaemon.net>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-next-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20150625153006.GA11513@gondor.apana.org.au>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:24485 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751019AbbFYS7R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 25 Jun 2015 14:59:17 -0400
+In-Reply-To: <20150625142525.GA10550@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+On 06/25/2015 07:25 AM, Herbert Xu wrote:
+> On Wed, Jun 24, 2015 at 07:14:21AM -0700, Tadeusz Struk wrote:
+>> rfc4106(gcm(aes)) uses cbc(aes) to generate hash key. cbc(aes) needs
+>> chainiv, but the chainiv gets initialized after aesni_intel when both
+>> are statically linked so the setkey fails.
+>> This patch forces aesni_intel to be initialized after chainiv.
+>>
+>> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> 
+> Aha, this could indeed the explain the setkey error that Linus
+> saw.  Once the AEAD conversion is complete this would actually
+> become unnecessary because seqiv for blkcipher would disappear.
 
---ixNtouB4hv1hrEz3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, after the conversion is finished we can revert this patch.
 
-On Thu, Jun 25, 2015 at 11:30:06PM +0800, Herbert Xu wrote:
-> On Thu, Jun 25, 2015 at 10:37:50AM +0200, Simon Guinot wrote:
-> > This patch fixes the following build error:
-> >=20
-> > drivers/crypto/mv_cesa.c: In function 'mv_cesa_get_sram':
-> > drivers/crypto/mv_cesa.c:1037: error: implicit declaration of function =
-'of_get_named_gen_pool'
-> > drivers/crypto/mv_cesa.c:1038: warning: assignment makes pointer from i=
-nteger without a cast
-> > scripts/Makefile.build:258: recipe for target 'drivers/crypto/mv_cesa.o=
-' failed
-> >=20
-> > Signed-off-by: Simon Guinot <simon.guinot@sequanux.org>
->=20
-> This patch doesn't compile.
+> 
+> Linus, could you confirm that you have AESNI built into the kernel
+> and not as a module?
+> 
+> However, this is still brittle because you have the same ordering
+> issue with ctr.  IOW aesni may be registered before ctr.  In fact
+> you don't actually need ctr here.  You could just replace it with
+> plain aes plus a xor.
 
-It does compile. How it could not ?
-But since the issue has already been fixed, it doesn't really matter.
+So this will fix it for ctr too.
 
-Simon
+> 
+> That should be more robust as you can then just use aesni for the
+> aes and you wouldn't depend on anything external to aesni.
+> 
+> Could you make a patch for that Tadeusz?
 
---ixNtouB4hv1hrEz3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iEYEARECAAYFAlWMJJUACgkQgtp0PDeOcDrrIgCeIK8ognMIibnhMwkgTykdiHGF
-tZoAoKE1jmRtSe/rQopXtJfvoo9JANre
-=vl6b
------END PGP SIGNATURE-----
-
---ixNtouB4hv1hrEz3--
+I can start working on this after my vacation
