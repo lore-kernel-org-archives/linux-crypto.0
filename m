@@ -1,31 +1,70 @@
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH] crypto: aesni - fix failing setkey for rfc4106-gcm-aesni
-Date: Thu, 25 Jun 2015 16:37:48 -0700
-Message-ID: <CA+55aFwZBfRGJY3NQtEWyWFBA+Vkh0QDtyYj-Cf4-vt4Wt_eXg@mail.gmail.com>
-References: <20150624141421.30466.28034.stgit@tstruk-mobl1>
-	<20150625142525.GA10550@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: mv_cesa - fix up for of_get_named_gen_pool()
+ rename
+Date: Fri, 26 Jun 2015 17:32:54 +0900
+Message-ID: <20150626083254.GA18367@gondor.apana.org.au>
+References: <CABxcv=m4juAMHaMYSB+8O8cEX+YZCJ0cArS2wN-YGpTBgWe-CA@mail.gmail.com>
+ <1435221470-5382-1-git-send-email-simon.guinot@sequanux.org>
+ <20150625153006.GA11513@gondor.apana.org.au>
+ <20150625155605.GI4853@kw.sim.vm.gnt>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Lior Amsalem <alior@marvell.com>, Andrew Lunn <andrew@lunn.ch>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Russell King - ARM Linux <linux@arm.linux.org.uk>,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	linux-next@vger.kernel.org,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	devicetree@vger.kernel.org, Jason Cooper <jason@lakedaemon.net>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Gregory CLEMENT <gregory.clement@free-electrons.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+To: Simon Guinot <simon.guinot@sequanux.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f182.google.com ([209.85.213.182]:38714 "EHLO
-	mail-ig0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751495AbbFYXht (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:53386 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752262AbbFZIdt (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Jun 2015 19:37:49 -0400
-Received: by igin14 with SMTP id n14so2911634igi.1
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Jun 2015 16:37:48 -0700 (PDT)
-In-Reply-To: <20150625142525.GA10550@gondor.apana.org.au>
+	Fri, 26 Jun 2015 04:33:49 -0400
+Content-Disposition: inline
+In-Reply-To: <20150625155605.GI4853@kw.sim.vm.gnt>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 25, 2015 at 7:25 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> Linus, could you confirm that you have AESNI built into the kernel
-> and not as a module?
+On Thu, Jun 25, 2015 at 05:56:05PM +0200, Simon Guinot wrote:
+> On Thu, Jun 25, 2015 at 11:30:06PM +0800, Herbert Xu wrote:
+> > On Thu, Jun 25, 2015 at 10:37:50AM +0200, Simon Guinot wrote:
+> > > This patch fixes the following build error:
+> > > 
+> > > drivers/crypto/mv_cesa.c: In function 'mv_cesa_get_sram':
+> > > drivers/crypto/mv_cesa.c:1037: error: implicit declaration of function 'of_get_named_gen_pool'
+> > > drivers/crypto/mv_cesa.c:1038: warning: assignment makes pointer from integer without a cast
+> > > scripts/Makefile.build:258: recipe for target 'drivers/crypto/mv_cesa.o' failed
+> > > 
+> > > Signed-off-by: Simon Guinot <simon.guinot@sequanux.org>
+> > 
+> > This patch doesn't compile.
+> 
+> It does compile. How it could not ?
+> But since the issue has already been fixed, it doesn't really matter.
 
-Yes, confirmed.
+It breaks the build of mv_cesa in the crypto tree as well as the
+cryptodev tree while without your patch the mv_cesa builds just
+fine.  If your patch isn't meant for these trees then you should
+clearly say so.
 
-                 Linus
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
