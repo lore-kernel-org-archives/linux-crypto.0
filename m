@@ -1,70 +1,90 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: mv_cesa - fix up for of_get_named_gen_pool()
- rename
-Date: Fri, 26 Jun 2015 17:32:54 +0900
-Message-ID: <20150626083254.GA18367@gondor.apana.org.au>
-References: <CABxcv=m4juAMHaMYSB+8O8cEX+YZCJ0cArS2wN-YGpTBgWe-CA@mail.gmail.com>
- <1435221470-5382-1-git-send-email-simon.guinot@sequanux.org>
- <20150625153006.GA11513@gondor.apana.org.au>
- <20150625155605.GI4853@kw.sim.vm.gnt>
+From: Will Deacon <will.deacon@arm.com>
+Subject: arm64 allmodconfig failure in =?utf-8?Q?ex?=
+ =?utf-8?B?cGFuc2lvbiBvZiBtYWNybyDigJhfWOKAmQ==?=
+Date: Fri, 26 Jun 2015 11:08:05 +0100
+Message-ID: <20150626100805.GC1568@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Lior Amsalem <alior@marvell.com>, Andrew Lunn <andrew@lunn.ch>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Russell King - ARM Linux <linux@arm.linux.org.uk>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	linux-next@vger.kernel.org,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	devicetree@vger.kernel.org, Jason Cooper <jason@lakedaemon.net>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-To: Simon Guinot <simon.guinot@sequanux.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:53386 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752262AbbFZIdt (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 26 Jun 2015 04:33:49 -0400
+Received: from foss.arm.com ([217.140.101.70]:59617 "EHLO foss.arm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751617AbbFZKIJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 26 Jun 2015 06:08:09 -0400
 Content-Disposition: inline
-In-Reply-To: <20150625155605.GI4853@kw.sim.vm.gnt>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 25, 2015 at 05:56:05PM +0200, Simon Guinot wrote:
-> On Thu, Jun 25, 2015 at 11:30:06PM +0800, Herbert Xu wrote:
-> > On Thu, Jun 25, 2015 at 10:37:50AM +0200, Simon Guinot wrote:
-> > > This patch fixes the following build error:
-> > > 
-> > > drivers/crypto/mv_cesa.c: In function 'mv_cesa_get_sram':
-> > > drivers/crypto/mv_cesa.c:1037: error: implicit declaration of function 'of_get_named_gen_pool'
-> > > drivers/crypto/mv_cesa.c:1038: warning: assignment makes pointer from integer without a cast
-> > > scripts/Makefile.build:258: recipe for target 'drivers/crypto/mv_cesa.o' failed
-> > > 
-> > > Signed-off-by: Simon Guinot <simon.guinot@sequanux.org>
-> > 
-> > This patch doesn't compile.
-> 
-> It does compile. How it could not ?
-> But since the issue has already been fixed, it doesn't really matter.
+Hi all,
 
-It breaks the build of mv_cesa in the crypto tree as well as the
-cryptodev tree while without your patch the mv_cesa builds just
-fine.  If your patch isn't meant for these trees then you should
-clearly say so.
+arm64 allmodconfig fails to build with mainline due to the following:
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+  In file included from include/acpi/platform/aclinux.h:74:0,
+                   from include/acpi/platform/acenv.h:173,
+                   from include/acpi/acpi.h:56,
+                   from include/linux/acpi.h:37,
+                   from ./arch/arm64/include/asm/dma-mapping.h:21,
+                   from include/linux/dma-mapping.h:86,
+                   from include/linux/skbuff.h:34,
+                   from include/crypto/algapi.h:18,
+                   from crypto/asymmetric_keys/rsa.c:16:
+  include/linux/ctype.h:15:12: error: expected =E2=80=98;=E2=80=99, =E2=
+=80=98,=E2=80=99 or =E2=80=98)=E2=80=99 before numeric constant
+   #define _X 0x40 /* hex digit */
+              ^
+  crypto/asymmetric_keys/rsa.c:123:47: note: in expansion of macro =E2=80=
+=98_X=E2=80=99
+   static int RSA_I2OSP(MPI x, size_t xLen, u8 **_X)
+                                                 ^
+  crypto/asymmetric_keys/rsa.c: In function =E2=80=98RSA_verify_signatu=
+re=E2=80=99:
+  crypto/asymmetric_keys/rsa.c:256:2: error: implicit declaration of fu=
+nction =E2=80=98RSA_I2OSP=E2=80=99 [-Werror=3Dimplicit-function-declara=
+tion]
+    ret =3D RSA_I2OSP(m, k, &EM);
+
+
+This is thanks to the following function type:
+
+  static int RSA_I2OSP(MPI x, size_t xLen, u8 **__X)
+
+conflicting with the _X #define in linux/ctype.h:
+
+  #define _X      0x40    /* hex digit */
+
+Simple patch below, but solving this problem with more underscores feel=
+s
+slightly inhumane.
+
+Will
+
+--->8
+
+diff --git a/crypto/asymmetric_keys/rsa.c b/crypto/asymmetric_keys/rsa.=
+c
+index 459cf97a75e2..a4e53239448b 100644
+--- a/crypto/asymmetric_keys/rsa.c
++++ b/crypto/asymmetric_keys/rsa.c
+@@ -120,7 +120,7 @@ static int RSAVP1(const struct public_key *key, MPI=
+ s, MPI *_m)
+ /*
+  * Integer to Octet String conversion [RFC3447 sec 4.1]
+  */
+-static int RSA_I2OSP(MPI x, size_t xLen, u8 **_X)
++static int RSA_I2OSP(MPI x, size_t xLen, u8 **__X)
+ {
+ 	unsigned X_size, x_size;
+ 	int X_sign;
+@@ -147,7 +147,7 @@ static int RSA_I2OSP(MPI x, size_t xLen, u8 **_X)
+ 		return -EBADMSG;
+ 	}
+=20
+-	*_X =3D X;
++	*__X =3D X;
+ 	return 0;
+ }
+=20
