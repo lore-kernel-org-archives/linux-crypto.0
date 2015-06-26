@@ -1,64 +1,69 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: [PATCH] QAT: Fix uninitialized variable in qat driver
-Date: Fri, 26 Jun 2015 13:56:48 -0400
-Message-ID: <1435341408-21649-1-git-send-email-nhorman@tuxdriver.com>
-Cc: Neil Horman <nhorman@tuxdriver.com>,
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Subject: [PATCH] crypto-qat: Deletion of unnecessary checks before two function
+ calls
+Date: Fri, 26 Jun 2015 20:45:28 +0200
+Message-ID: <558D9DC8.2000603@users.sourceforge.net>
+References: <5307CAA2.8060406@users.sourceforge.net> <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6> <530A086E.8010901@users.sourceforge.net> <alpine.DEB.2.02.1402231635510.1985@localhost6.localdomain6> <530A72AA.3000601@users.sourceforge.net> <alpine.DEB.2.02.1402240658210.2090@localhost6.localdomain6> <530B5FB6.6010207@users.sourceforge.net> <alpine.DEB.2.10.1402241710370.2074@hadrien> <530C5E18.1020800@users.sourceforge.net> <alpine.DEB.2.10.1402251014170.2080@hadrien> <530CD2C4.4050903@users.sourceforge.net> <alpine.DEB.2.10.1402251840450.7035@hadrien> <530CF8FF.8080600@users.sourceforge.net> <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6> <530DD06F.4090703@users.sourceforge.net> <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6> <5317A59D.4@users.so
+ urceforge.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	kernel-janitors@vger.kernel.org,
+	Julia Lawall <julia.lawall@lip6.fr>
+To: "David S. Miller" <davem@davemloft.net>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	qat-linux@intel.com (open list:QAT DRIVER)
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:42903 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751585AbbFZR5L (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 26 Jun 2015 13:57:11 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	Tadeusz Struk <tadeusz.struk@intel.com>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+In-Reply-To: <5317A59D.4@users.sourceforge.net>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hit a warning when building QAT, indicating that sz_out might be uninitalized
-before use.  Looks like if you hit an error path and jump to err: you might find
-yourself trying to unmap an arbirarily long dma region.  Its safe on intel since
-intel defines the invalid dma address as zero, but other arches don't, and if
-qat makes its way to one of those, that can cause all sorts of corruption.
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Fri, 26 Jun 2015 20:30:11 +0200
 
-Fix is pretty easy, just init sz_out to zero, and gate the unmapping on sz_out
-being non-zero
+The functions kfree() and release_firmware() test whether their argument
+is NULL and then return immediately.
+Thus the test around the calls is not needed.
 
-Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "David S. Miller" <davem@davemloft.net>
-CC: Tadeusz Struk <tadeusz.struk@intel.com>
-CC: qat-linux@intel.com (open list:QAT DRIVER)
+This issue was detected by using the Coccinelle software.
+
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 ---
- drivers/crypto/qat/qat_common/qat_algs.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/crypto/qat/qat_common/adf_accel_engine.c | 5 +----
+ drivers/crypto/qat/qat_common/adf_transport.c    | 2 +-
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-index 067402c..35ab752 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -667,8 +667,9 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
- 	dma_addr_t blp;
- 	dma_addr_t bloutp = 0;
- 	struct scatterlist *sg;
--	size_t sz_out, sz = sizeof(struct qat_alg_buf_list) +
--			((1 + n + assoc_n) * sizeof(struct qat_alg_buf));
-+	size_t sz_out = 0;
-+	size_t sz = sizeof(struct qat_alg_buf_list) +
-+			  ((1 + n + assoc_n) * sizeof(struct qat_alg_buf));
+diff --git a/drivers/crypto/qat/qat_common/adf_accel_engine.c b/drivers/crypto/qat/qat_common/adf_accel_engine.c
+index 7f8b66c..fdda8e7 100644
+--- a/drivers/crypto/qat/qat_common/adf_accel_engine.c
++++ b/drivers/crypto/qat/qat_common/adf_accel_engine.c
+@@ -88,10 +88,7 @@ void adf_ae_fw_release(struct adf_accel_dev *accel_dev)
  
- 	if (unlikely(!n))
- 		return -EINVAL;
-@@ -793,7 +794,7 @@ err:
- 				dma_unmap_single(dev, buflout->bufers[i].addr,
- 						 buflout->bufers[i].len,
- 						 DMA_BIDIRECTIONAL);
--		if (!dma_mapping_error(dev, bloutp))
-+		if (sz_out && !dma_mapping_error(dev, bloutp))
- 			dma_unmap_single(dev, bloutp, sz_out, DMA_TO_DEVICE);
- 		kfree(buflout);
+ 	qat_uclo_del_uof_obj(loader_data->fw_loader);
+ 	qat_hal_deinit(loader_data->fw_loader);
+-
+-	if (loader_data->uof_fw)
+-		release_firmware(loader_data->uof_fw);
+-
++	release_firmware(loader_data->uof_fw);
+ 	loader_data->uof_fw = NULL;
+ 	loader_data->fw_loader = NULL;
+ }
+diff --git a/drivers/crypto/qat/qat_common/adf_transport.c b/drivers/crypto/qat/qat_common/adf_transport.c
+index ccec3274..db2926b 100644
+--- a/drivers/crypto/qat/qat_common/adf_transport.c
++++ b/drivers/crypto/qat/qat_common/adf_transport.c
+@@ -449,7 +449,7 @@ static int adf_init_bank(struct adf_accel_dev *accel_dev,
+ err:
+ 	for (i = 0; i < ADF_ETR_MAX_RINGS_PER_BANK; i++) {
+ 		ring = &bank->rings[i];
+-		if (hw_data->tx_rings_mask & (1 << i) && ring->inflights)
++		if (hw_data->tx_rings_mask & (1 << i))
+ 			kfree(ring->inflights);
  	}
+ 	return -ENOMEM;
 -- 
-2.1.0
+2.4.4
+
