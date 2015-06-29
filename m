@@ -1,57 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 4.2
-Date: Mon, 29 Jun 2015 16:32:28 +0900
-Message-ID: <20150629073228.GA11020@gondor.apana.org.au>
-References: <20140401100001.GA12386@gondor.apana.org.au>
- <20140605062336.GA14440@gondor.apana.org.au>
- <20140804130339.GA1178@gondor.apana.org.au>
- <20141007131826.GA29688@gondor.apana.org.au>
- <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150626102234.GA19393@gondor.apana.org.au>
- <CA+55aFwvyJkQXxTLzgtwv4wMmvwVtKdPMsNa05CgaKop9vQ1NQ@mail.gmail.com>
- <20150627065638.GA29497@gondor.apana.org.au>
- <CA+55aFzLESDmcCEO+N93y8=eF5t7Y0xA0+JnCPvpctXm4hvgGQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto-qat: Deletion of unnecessary checks before two
+ function calls
+Date: Mon, 29 Jun 2015 17:18:04 +0900
+Message-ID: <20150629081804.GB12005@gondor.apana.org.au>
+References: <530C5E18.1020800@users.sourceforge.net>
+ <alpine.DEB.2.10.1402251014170.2080@hadrien>
+ <530CD2C4.4050903@users.sourceforge.net>
+ <alpine.DEB.2.10.1402251840450.7035@hadrien>
+ <530CF8FF.8080600@users.sourceforge.net>
+ <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
+ <530DD06F.4090703@users.sourceforge.net>
+ <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
+ <5317A59D.4@users.sourceforge.net>
+ <558D9DC8.2000603@users.sourceforge.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60418 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751240AbbF2Hc7 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 29 Jun 2015 03:32:59 -0400
+	Tadeusz Struk <tadeusz.struk@intel.com>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	kernel-janitors@vger.kernel.org,
+	Julia Lawall <julia.lawall@lip6.fr>
+To: SF Markus Elfring <elfring@users.sourceforge.net>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CA+55aFzLESDmcCEO+N93y8=eF5t7Y0xA0+JnCPvpctXm4hvgGQ@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <558D9DC8.2000603@users.sourceforge.net>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Jun 27, 2015 at 09:40:24AM -0700, Linus Torvalds wrote:
-> On Fri, Jun 26, 2015 at 11:56 PM, Herbert Xu
-> <herbert@gondor.apana.org.au> wrote:
-> >
-> > So I think Tadeusz's patch is the simplest fix for 4.2.  Could you
-> > please test it to see if it makes your warning go away?
+On Fri, Jun 26, 2015 at 08:45:28PM +0200, SF Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Fri, 26 Jun 2015 20:30:11 +0200
 > 
-> Seems to silence it here.
+> The functions kfree() and release_firmware() test whether their argument
+> is NULL and then return immediately.
+> Thus the test around the calls is not needed.
+> 
+> This issue was detected by using the Coccinelle software.
+> 
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 
-OK I'll apply this patch for 4.2.
-
-> I get the feeling that the patch is still wrong - why are not the
-> *tests* run at late time when everything is properly set up, rather
-> than forcing ordering at the code init level - but at least I don't
-> see the annoying error, so it's certainly better than it was before.
-
-That's what I was exploring but I think it'll take a while so
-it's best to postpone it to 4.3 or later.  The two alternatives
-I was toying with are 1) delay the testing until the first time
-the given algorithm is used; 2) perform testing for all built-in
-algorithms at late_initcall.
-
-Cheers,
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
