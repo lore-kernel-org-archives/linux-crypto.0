@@ -1,44 +1,35 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH] crypto: ccp - Provide support to autoload CCP driver
-Date: Tue, 30 Jun 2015 12:57:14 -0500
-Message-ID: <20150630175714.17231.11110.stgit@tlendack-t1.amdoffice.net>
+From: Sasnett_Karen <sasnett_karen@asdk12.org>
+Subject: (unknown)
+Date: Wed, 1 Jul 2015 11:53:31 +0000
+Message-ID: <B3EEA09B9C66584198B6765D1492AEF27A4787B7__17506.6959149719$1435752572$gmane$org@ITEXCH01.asdk12.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: David Miller <davem@davemloft.net>, <linux-kernel@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: undisclosed-recipients:;
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn1on0114.outbound.protection.outlook.com ([157.56.110.114]:61982
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753225AbbGAMIs convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 1 Jul 2015 08:08:48 -0400
+Subject: 
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Add the necessary module device tables to the platform support to allow
-for autoloading of the CCP driver. This will allow for the CCP's hwrng
-support to be available without having to manually load the driver. The
-module device table entry for the pci support is already present.
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
----
- drivers/crypto/ccp/ccp-platform.c |    2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/crypto/ccp/ccp-platform.c b/drivers/crypto/ccp/ccp-platform.c
-index f2e6de3..bb241c3 100644
---- a/drivers/crypto/ccp/ccp-platform.c
-+++ b/drivers/crypto/ccp/ccp-platform.c
-@@ -216,6 +216,7 @@ static const struct acpi_device_id ccp_acpi_match[] = {
- 	{ "AMDI0C00", 0 },
- 	{ },
- };
-+MODULE_DEVICE_TABLE(acpi, ccp_acpi_match);
- #endif
- 
- #ifdef CONFIG_OF
-@@ -223,6 +224,7 @@ static const struct of_device_id ccp_of_match[] = {
- 	{ .compatible = "amd,ccp-seattle-v1a" },
- 	{ },
- };
-+MODULE_DEVICE_TABLE(of, ccp_of_match);
- #endif
- 
- static struct platform_driver ccp_platform_driver = {
+
+Haben Sie einen Investor brauchen?
+
+Haben Sie gesch=E4ftliche oder pers=F6nliche Darlehen ben=F6tigen?
+
+Wir geben Darlehen an eine nat=FCrliche Person und Unternehmen bei 3% Z=
+insen j=E4hrlich. Weitere Informationen Kontaktieren Sie uns per E-Mail=
+: omfcreditspa@hotmail.com<mailto:omfcreditspa@hotmail.com>
+
+
+
+HINWEIS: Leiten Sie Ihre Antwort nur an diese E-Mail: omfcreditspa@hotm=
+ail.com<mailto:omfcreditspa@hotmail.com>
