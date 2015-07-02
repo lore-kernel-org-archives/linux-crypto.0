@@ -1,7 +1,7 @@
 From: Lokesh Vutla <lokeshvutla@ti.com>
-Subject: [PATCH 01/10] crypto: omap-aes: Add support for lengths not aligned with AES_BLOCK_SIZE
-Date: Thu, 2 Jul 2015 10:48:31 +0530
-Message-ID: <1435814320-30347-2-git-send-email-lokeshvutla@ti.com>
+Subject: [PATCH 10/10] crypto: tcrypt: Added speed tests for Async AEAD crypto alogrithms
+Date: Thu, 2 Jul 2015 10:48:40 +0530
+Message-ID: <1435814320-30347-11-git-send-email-lokeshvutla@ti.com>
 References: <1435814320-30347-1-git-send-email-lokeshvutla@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -9,126 +9,287 @@ Cc: <linux-omap@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<t-kristo@ti.com>, <nsekhar@ti.com>, <lokeshvutla@ti.com>
 To: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
 	<davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from devils.ext.ti.com ([198.47.26.153]:35936 "EHLO
+	devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752956AbbGBFWM (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jul 2015 01:22:12 -0400
 In-Reply-To: <1435814320-30347-1-git-send-email-lokeshvutla@ti.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-OMAP AES driver returns an error if the data is not aligned with
-AES_BLOCK_SIZE bytes.
-But OMAP AES hw allows data input upto 1 byte aligned, but still
-zeros are to be appended and complete AES_BLOCK_SIZE has to be written.
-And correct length has to be passed in LENGTH field.
-Adding support for inputs not aligned with AES_BLOCK_SIZE.
+Adding simple speed tests for a range of block sizes for Async AEAD crypto
+algorithms.
 
 Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
 ---
- drivers/crypto/omap-aes.c |   33 ++++++++++++++++-----------------
- 1 file changed, 16 insertions(+), 17 deletions(-)
+ crypto/tcrypt.c |  233 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/tcrypt.h |    1 +
+ 2 files changed, 234 insertions(+)
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 9a28b7e..a923101 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -558,6 +558,9 @@ static int omap_aes_check_aligned(struct scatterlist *sg, int total)
- {
- 	int len = 0;
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 1a28001..b37f3f4 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -992,6 +992,234 @@ out:
+ 	crypto_free_ahash(tfm);
+ }
  
-+	if (!IS_ALIGNED(total, AES_BLOCK_SIZE))
-+		return -1;
++static inline int do_one_aead_op(struct aead_request *req, int ret)
++{
++	if (ret == -EINPROGRESS || ret == -EBUSY) {
++		struct tcrypt_result *tr = req->base.data;
 +
- 	while (sg) {
- 		if (!IS_ALIGNED(sg->offset, 4))
- 			return -1;
-@@ -577,9 +580,10 @@ static int omap_aes_check_aligned(struct scatterlist *sg, int total)
- static int omap_aes_copy_sgs(struct omap_aes_dev *dd)
++		ret = wait_for_completion_interruptible(&tr->completion);
++		if (!ret)
++			ret = tr->err;
++		reinit_completion(&tr->completion);
++	}
++
++	return ret;
++}
++
++static int test_aaead_jiffies(struct aead_request *req, int enc,
++			      int blen, int sec)
++{
++	unsigned long start, end;
++	int bcount;
++	int ret;
++
++	for (start = jiffies, end = start + sec * HZ, bcount = 0;
++	     time_before(jiffies, end); bcount++) {
++		if (enc)
++			ret = do_one_aead_op(req, crypto_aead_encrypt(req));
++		else
++			ret = do_one_aead_op(req, crypto_aead_decrypt(req));
++
++		if (ret)
++			return ret;
++	}
++
++	pr_cont("%d operations in %d seconds (%ld bytes)\n",
++		bcount, sec, (long)bcount * blen);
++	return 0;
++}
++
++static int test_aaead_cycles(struct aead_request *req, int enc, int blen)
++{
++	unsigned long cycles = 0;
++	int ret = 0;
++	int i;
++
++	/* Warm-up run. */
++	for (i = 0; i < 4; i++) {
++		if (enc)
++			ret = do_one_aead_op(req, crypto_aead_encrypt(req));
++		else
++			ret = do_one_aead_op(req, crypto_aead_decrypt(req));
++
++		if (ret)
++			goto out;
++	}
++
++	/* The real thing. */
++	for (i = 0; i < 8; i++) {
++		cycles_t start, end;
++
++		start = get_cycles();
++		if (enc)
++			ret = do_one_aead_op(req, crypto_aead_encrypt(req));
++		else
++			ret = do_one_aead_op(req, crypto_aead_decrypt(req));
++
++		end = get_cycles();
++
++		if (ret)
++			goto out;
++
++		cycles += end - start;
++	}
++
++out:
++	if (ret == 0)
++		pr_cont("1 operation in %lu cycles (%d bytes)\n",
++			(cycles + 4) / 8, blen);
++
++	return ret;
++}
++
++static void test_aaead_speed(const char *algo, int enc, unsigned int sec,
++			     struct aead_speed_template *template,
++			     unsigned int tcount, u8 authsize,
++			     unsigned int aad_size, u8 *keysize)
++{
++	unsigned int i, j;
++	struct crypto_aead *tfm;
++	int ret = -ENOMEM;
++	const char *key;
++	struct aead_request *req;
++	struct scatterlist *sg;
++	struct scatterlist *asg;
++	struct scatterlist *sgout;
++	const char *e;
++	void *assoc;
++	char iv[MAX_IVLEN];
++	char *xbuf[XBUFSIZE];
++	char *xoutbuf[XBUFSIZE];
++	char *axbuf[XBUFSIZE];
++	unsigned int *b_size;
++	unsigned int iv_len;
++	struct tcrypt_result result;
++
++	if (enc == ENCRYPT)
++		e = "encryption";
++	else
++		e = "decryption";
++
++	if (testmgr_alloc_buf(xbuf))
++		goto out_noxbuf;
++	if (testmgr_alloc_buf(axbuf))
++		goto out_noaxbuf;
++	if (testmgr_alloc_buf(xoutbuf))
++		goto out_nooutbuf;
++
++	sg = kmalloc(sizeof(*sg) * 8 * 3, GFP_KERNEL);
++	if (!sg)
++		goto out_nosg;
++	asg = &sg[8];
++	sgout = &asg[8];
++
++	init_completion(&result.completion);
++	pr_info("\ntesting speed of %s %s\n", algo, e);
++
++	tfm = crypto_alloc_aead(algo, 0, 0);
++
++	if (IS_ERR(tfm)) {
++		pr_err("alg: aead: Failed to load transform for %s: %ld\n",
++		       algo, PTR_ERR(tfm));
++		return;
++	}
++
++	req = aead_request_alloc(tfm, GFP_KERNEL);
++	if (!req) {
++		pr_err("alg: aead: Failed to allocate request for %s\n",
++		       algo);
++		goto out;
++	}
++
++	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				  tcrypt_complete, &result);
++
++	i = 0;
++	do {
++		b_size = aead_sizes;
++		do {
++			assoc = axbuf[0];
++
++			if (aad_size < PAGE_SIZE) {
++				memset(assoc, 0xff, aad_size);
++			} else {
++				pr_err("associate data length (%u) too big\n",
++				       aad_size);
++				goto out_nosg;
++			}
++			sg_init_one(&asg[0], assoc, aad_size);
++
++			if ((*keysize + *b_size) > TVMEMSIZE * PAGE_SIZE) {
++				pr_err("template (%u) too big for tvmem (%lu)\n",
++				       *keysize + *b_size,
++					TVMEMSIZE * PAGE_SIZE);
++				goto out;
++			}
++
++			key = tvmem[0];
++			for (j = 0; j < tcount; j++) {
++				if (template[j].klen == *keysize) {
++					key = template[j].key;
++					break;
++				}
++			}
++			ret = crypto_aead_setkey(tfm, key, *keysize);
++			ret = crypto_aead_setauthsize(tfm, authsize);
++
++			iv_len = crypto_aead_ivsize(tfm);
++			if (iv_len)
++				memset(&iv, 0xff, iv_len);
++
++			crypto_aead_clear_flags(tfm, ~0);
++			pr_info("test %u (%d bit key, %d byte blocks): ",
++				i, *keysize * 8, *b_size);
++
++			memset(tvmem[0], 0xff, PAGE_SIZE);
++
++			if (ret) {
++				pr_err("setkey() failed flags=%x\n",
++				       crypto_aead_get_flags(tfm));
++				goto out;
++			}
++
++			sg_init_aead(&sg[0], xbuf,
++				     *b_size + (enc ? authsize : 0));
++
++			sg_init_aead(&sgout[0], xoutbuf,
++				     *b_size + (enc ? authsize : 0));
++
++			aead_request_set_crypt(req, sg, sgout, *b_size, iv);
++			aead_request_set_assoc(req, asg, aad_size);
++
++			if (sec)
++				ret = test_aaead_jiffies(req, enc, *b_size,
++							 sec);
++			else
++				ret = test_aaead_cycles(req, enc, *b_size);
++
++			if (ret) {
++				pr_err("%s() failed return code=%d\n", e, ret);
++				break;
++			}
++			b_size++;
++			i++;
++		} while (*b_size);
++		keysize++;
++	} while (*keysize);
++
++out:
++	crypto_free_aead(tfm);
++	kfree(sg);
++out_nosg:
++	testmgr_free_buf(xoutbuf);
++out_nooutbuf:
++	testmgr_free_buf(axbuf);
++out_noaxbuf:
++	testmgr_free_buf(xbuf);
++out_noxbuf:
++	return;
++}
++
+ static inline int do_one_acipher_op(struct ablkcipher_request *req, int ret)
  {
- 	void *buf_in, *buf_out;
--	int pages;
-+	int pages, total;
+ 	if (ret == -EINPROGRESS || ret == -EBUSY) {
+@@ -2139,6 +2367,11 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
+ 				   speed_template_8_32);
+ 		break;
  
--	pages = get_order(dd->total);
-+	total = ALIGN(dd->total, AES_BLOCK_SIZE);
-+	pages = get_order(total);
++	case 510:
++		test_aaead_speed("gcm(aes)", ENCRYPT, sec, NULL, 0, 16, 8,
++				 aead_speed_template_16_24_32);
++		break;
++
+ 	case 1000:
+ 		test_available();
+ 		break;
+diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
+index 6c7e21a..9810edd 100644
+--- a/crypto/tcrypt.h
++++ b/crypto/tcrypt.h
+@@ -66,6 +66,7 @@ static u8 speed_template_32_64[] = {32, 64, 0};
+  * AEAD speed tests
+  */
+ static u8 aead_speed_template_20[] = {20, 0};
++static u8 aead_speed_template_16_24_32[] = {16, 24, 32, 0};
  
- 	buf_in = (void *)__get_free_pages(GFP_ATOMIC, pages);
- 	buf_out = (void *)__get_free_pages(GFP_ATOMIC, pages);
-@@ -594,11 +598,11 @@ static int omap_aes_copy_sgs(struct omap_aes_dev *dd)
- 	sg_copy_buf(buf_in, dd->in_sg, 0, dd->total, 0);
- 
- 	sg_init_table(&dd->in_sgl, 1);
--	sg_set_buf(&dd->in_sgl, buf_in, dd->total);
-+	sg_set_buf(&dd->in_sgl, buf_in, total);
- 	dd->in_sg = &dd->in_sgl;
- 
- 	sg_init_table(&dd->out_sgl, 1);
--	sg_set_buf(&dd->out_sgl, buf_out, dd->total);
-+	sg_set_buf(&dd->out_sgl, buf_out, total);
- 	dd->out_sg = &dd->out_sgl;
- 
- 	return 0;
-@@ -611,7 +615,7 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
- 	struct omap_aes_ctx *ctx;
- 	struct omap_aes_reqctx *rctx;
- 	unsigned long flags;
--	int err, ret = 0;
-+	int err, ret = 0, len;
- 
- 	spin_lock_irqsave(&dd->lock, flags);
- 	if (req)
-@@ -650,8 +654,9 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
- 		dd->sgs_copied = 0;
- 	}
- 
--	dd->in_sg_len = scatterwalk_bytes_sglen(dd->in_sg, dd->total);
--	dd->out_sg_len = scatterwalk_bytes_sglen(dd->out_sg, dd->total);
-+	len = ALIGN(dd->total, AES_BLOCK_SIZE);
-+	dd->in_sg_len = scatterwalk_bytes_sglen(dd->in_sg, len);
-+	dd->out_sg_len = scatterwalk_bytes_sglen(dd->out_sg, len);
- 	BUG_ON(dd->in_sg_len < 0 || dd->out_sg_len < 0);
- 
- 	rctx = ablkcipher_request_ctx(req);
-@@ -678,7 +683,7 @@ static void omap_aes_done_task(unsigned long data)
- {
- 	struct omap_aes_dev *dd = (struct omap_aes_dev *)data;
- 	void *buf_in, *buf_out;
--	int pages;
-+	int pages, len;
- 
- 	pr_debug("enter done_task\n");
- 
-@@ -697,7 +702,8 @@ static void omap_aes_done_task(unsigned long data)
- 
- 		sg_copy_buf(buf_out, dd->orig_out, 0, dd->total_save, 1);
- 
--		pages = get_order(dd->total_save);
-+		len = ALIGN(dd->total_save, AES_BLOCK_SIZE);
-+		pages = get_order(len);
- 		free_pages((unsigned long)buf_in, pages);
- 		free_pages((unsigned long)buf_out, pages);
- 	}
-@@ -726,11 +732,6 @@ static int omap_aes_crypt(struct ablkcipher_request *req, unsigned long mode)
- 		  !!(mode & FLAGS_ENCRYPT),
- 		  !!(mode & FLAGS_CBC));
- 
--	if (!IS_ALIGNED(req->nbytes, AES_BLOCK_SIZE)) {
--		pr_err("request size is not exact amount of AES blocks\n");
--		return -EINVAL;
--	}
--
- 	dd = omap_aes_find_dev(ctx);
- 	if (!dd)
- 		return -ENODEV;
-@@ -1046,9 +1047,7 @@ static irqreturn_t omap_aes_irq(int irq, void *dev_id)
- 			}
- 		}
- 
--		dd->total -= AES_BLOCK_SIZE;
--
--		BUG_ON(dd->total < 0);
-+		dd->total -= min_t(size_t, AES_BLOCK_SIZE, dd->total);
- 
- 		/* Clear IRQ status */
- 		status &= ~AES_REG_IRQ_DATA_OUT;
+ /*
+  * Digest speed tests
 -- 
 1.7.9.5
