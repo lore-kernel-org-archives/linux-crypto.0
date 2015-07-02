@@ -1,64 +1,52 @@
-From: Felipe Balbi <balbi@ti.com>
-Subject: Re: [PATCH 09/10] crypto: omap-aes: gcm: Add support for PIO mode
-Date: Thu, 2 Jul 2015 03:06:36 -0500
-Message-ID: <20150702080636.GH4033@saruman.tx.rr.com>
-References: <1435814320-30347-1-git-send-email-lokeshvutla@ti.com>
- <1435814320-30347-10-git-send-email-lokeshvutla@ti.com>
-Reply-To: <balbi@ti.com>
+From: Lokesh Vutla <lokeshvutla@ti.com>
+Subject: Re: [PATCH 01/10] crypto: omap-aes: Add support for lengths not aligned
+ with AES_BLOCK_SIZE
+Date: Thu, 2 Jul 2015 14:56:24 +0530
+Message-ID: <559503C0.2020200@ti.com>
+References: <1435814320-30347-1-git-send-email-lokeshvutla@ti.com> <1435814320-30347-2-git-send-email-lokeshvutla@ti.com> <20150702075341.GA4033@saruman.tx.rr.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="nOM8ykUjac0mNN89"
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 Cc: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
 	<davem@davemloft.net>, <linux-omap@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <t-kristo@ti.com>, <nsekhar@ti.com>
-To: Lokesh Vutla <lokeshvutla@ti.com>
+To: <balbi@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from devils.ext.ti.com ([198.47.26.153]:42409 "EHLO
-	devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751602AbbGBIGk (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Jul 2015 04:06:40 -0400
-Content-Disposition: inline
-In-Reply-To: <1435814320-30347-10-git-send-email-lokeshvutla@ti.com>
+Received: from arroyo.ext.ti.com ([192.94.94.40]:42412 "EHLO arroyo.ext.ti.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753159AbbGBJ0h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jul 2015 05:26:37 -0400
+In-Reply-To: <20150702075341.GA4033@saruman.tx.rr.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
---nOM8ykUjac0mNN89
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Thursday 02 July 2015 01:23 PM, Felipe Balbi wrote:
+> On Thu, Jul 02, 2015 at 10:48:31AM +0530, Lokesh Vutla wrote:
+>> OMAP AES driver returns an error if the data is not aligned with
+>> AES_BLOCK_SIZE bytes.
+>> But OMAP AES hw allows data input upto 1 byte aligned, but still
+>> zeros are to be appended and complete AES_BLOCK_SIZE has to be written.
+>> And correct length has to be passed in LENGTH field.
+>> Adding support for inputs not aligned with AES_BLOCK_SIZE.
+>>
+>> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+>> ---
+>>  drivers/crypto/omap-aes.c |   33 ++++++++++++++++-----------------
+>>  1 file changed, 16 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+>> index 9a28b7e..a923101 100644
+>> --- a/drivers/crypto/omap-aes.c
+>> +++ b/drivers/crypto/omap-aes.c
+>> @@ -558,6 +558,9 @@ static int omap_aes_check_aligned(struct scatterlist *sg, int total)
+>>  {
+>>  	int len = 0;
+>>  
+>> +	if (!IS_ALIGNED(total, AES_BLOCK_SIZE))
+>> +		return -1;
+> 
+> -EINVAL?
+Okay, will update it.
 
-On Thu, Jul 02, 2015 at 10:48:39AM +0530, Lokesh Vutla wrote:
-> Add support for PIO mode for GCM mode.
->=20
-> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
-
-why do you require PIO ? Is there any situation where DMA can't be
-used? What would that case be ?
-
---=20
-balbi
-
---nOM8ykUjac0mNN89
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJVlPEMAAoJEIaOsuA1yqREPKEP/RA2r0b8X0PuX4fKsLm3f8b+
-P/bTT0/3X88zBoX/8uWOFEwapmquX7GIM5FNv28JK15E3HIB15XqrOnNxfNEQTPd
-baFFioKUNZBsmXgximP9xeX3DHP7AbIgeSHYDspCwSZiW1sSVRObDehZnt0asbsG
-OYtbOIIl9jCrocdYAygdUNe7zLCycK+KT2v4BQpQbJeui8AcY0UgUUAVrxreLJyC
-6IVwML9OzckWqkMYCDUFchlVyrkTNtmILUNM8OKqilJvLL3cyMA8NyOB7GHOQTmK
-M/K+FzHwJqPlRgObT8lwiJdOF7M6OA6s6j/PLjDhbe5pquCDj74P8xbS8wuB7xiG
-kX1daJJ0eOHV1y51DMnAatIcZEf2HpMHqEEDJOicbDTe0+eLg5SjnRWK+qwEAOl6
-LwPV8oIEsoVvLLf2WhTdMe4kIqi+swLW3HVc5Mv6KOnYmBsyY4x45OLkU++wVqRQ
-damJGIJr9RmZlZES/TMrvVhHZtFhsTa6WgYk0CH7S+VRfU1N7Ndh9IwdGgvJPON2
-ZXJONoR1a4zntmmnbyVV+/fT4sg7QPqJOZbeWzaKQqd30DqJKDhFlnBlymbCuYeh
-cc5NKdkHN4nsG/Ue8XUpT3bPWq1yKMyOKhrMwyWm0opHoMTc00ZUHxllIaz7WX/j
-7O6TiOsdAvROWB76dpxg
-=KDhV
------END PGP SIGNATURE-----
-
---nOM8ykUjac0mNN89--
+Thanks and regards,
+Lokesh
