@@ -1,36 +1,65 @@
 From: Lokesh Vutla <lokeshvutla@ti.com>
-Subject: Re: [PATCH 09/10] crypto: omap-aes: gcm: Add support for PIO mode
-Date: Thu, 2 Jul 2015 15:47:59 +0530
-Message-ID: <55950FD7.8080803@ti.com>
-References: <1435814320-30347-1-git-send-email-lokeshvutla@ti.com> <1435814320-30347-10-git-send-email-lokeshvutla@ti.com> <20150702080636.GH4033@saruman.tx.rr.com>
+Subject: [PATCH] crypto: omap-des: Fix unmapping of dma channels
+Date: Thu, 2 Jul 2015 18:33:28 +0530
+Message-ID: <1435842208-31382-1-git-send-email-lokeshvutla@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-	<davem@davemloft.net>, <linux-omap@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <t-kristo@ti.com>, <nsekhar@ti.com>
-To: <balbi@ti.com>
+Content-Type: text/plain
+Cc: <linux-omap@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<t-kristo@ti.com>, <nsekhar@ti.com>, <lokeshvutla@ti.com>
+To: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+	<davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:46266 "EHLO comal.ext.ti.com"
+Received: from comal.ext.ti.com ([198.47.26.152]:51833 "EHLO comal.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753709AbbGBKSJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Jul 2015 06:18:09 -0400
-In-Reply-To: <20150702080636.GH4033@saruman.tx.rr.com>
+	id S1751260AbbGBNGU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jul 2015 09:06:20 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thursday 02 July 2015 01:36 PM, Felipe Balbi wrote:
-> On Thu, Jul 02, 2015 at 10:48:39AM +0530, Lokesh Vutla wrote:
->> Add support for PIO mode for GCM mode.
->>
->> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
-> 
-> why do you require PIO ? Is there any situation where DMA can't be
-> used? What would that case be ?
+dma_unmap_sg() is being called twice after completing the
+task. Looks like this is a copy paste error when creating
+des driver.
+With this the following warn appears during boot:
 
-Cannot think of any case where DMA can't be used.
-But the current driver already supports PIO for all other AES modes.
-I do not want to break it, so added support for PIO  for GCM :)
+[    4.210457] ------------[ cut here ]------------
+[    4.215114] WARNING: CPU: 0 PID: 0 at lib/dma-debug.c:1080 check_unmap+0x710/0x9a0()
+[    4.222899] omap-des 480a5000.des: DMA-API: device driver tries to free DMA memory it has not allocated [device address=0x00000000ab2ce000] [size=8 bytes]
+[    4.236785] Modules linked in:
+[    4.239860] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 3.14.39-02999-g1bc045a-dirty #182
+[    4.247918] [<c001678c>] (unwind_backtrace) from [<c0012574>] (show_stack+0x10/0x14)
+[    4.255710] [<c0012574>] (show_stack) from [<c05a37e8>] (dump_stack+0x84/0xb8)
+[    4.262977] [<c05a37e8>] (dump_stack) from [<c0046464>] (warn_slowpath_common+0x68/0x8c)
+[    4.271107] [<c0046464>] (warn_slowpath_common) from [<c004651c>] (warn_slowpath_fmt+0x30/0x40)
+[    4.279854] [<c004651c>] (warn_slowpath_fmt) from [<c02d50a4>] (check_unmap+0x710/0x9a0)
+[    4.287991] [<c02d50a4>] (check_unmap) from [<c02d5478>] (debug_dma_unmap_sg+0x90/0x19c)
+[    4.296128] [<c02d5478>] (debug_dma_unmap_sg) from [<c04a77d8>] (omap_des_done_task+0x1cc/0x3e4)
+[    4.304963] [<c04a77d8>] (omap_des_done_task) from [<c004a090>] (tasklet_action+0x84/0x124)
+[    4.313370] [<c004a090>] (tasklet_action) from [<c004a4ac>] (__do_softirq+0xf0/0x20c)
+[    4.321235] [<c004a4ac>] (__do_softirq) from [<c004a840>] (irq_exit+0x98/0xec)
+[    4.328500] [<c004a840>] (irq_exit) from [<c000f9ac>] (handle_IRQ+0x50/0xb0)
+[    4.335589] [<c000f9ac>] (handle_IRQ) from [<c0008688>] (gic_handle_irq+0x28/0x5c)
 
-Thanks and regards,
-Lokesh
+Removing the duplicate call to dma_unmap_sg().
+
+Reported-by: Tomi Valkeinen <tomi.valkeinen@ti.com>
+Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+---
+ drivers/crypto/omap-des.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index 4630709..0a70e46 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -536,9 +536,6 @@ static int omap_des_crypt_dma_stop(struct omap_des_dev *dd)
+ 	dmaengine_terminate_all(dd->dma_lch_in);
+ 	dmaengine_terminate_all(dd->dma_lch_out);
+ 
+-	dma_unmap_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
+-	dma_unmap_sg(dd->dev, dd->out_sg, dd->out_sg_len, DMA_FROM_DEVICE);
+-
+ 	return err;
+ }
+ 
+-- 
+1.9.1
