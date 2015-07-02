@@ -1,50 +1,88 @@
-From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
-Subject: using 3des with ipsec transport mode
-Date: Thu, 2 Jul 2015 15:53:00 +0200
-Message-ID: <20150702135300.GG22958@oracle.com>
+From: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
+Subject: [PATCH 0/6] drivers/nx-842: reduce verbosity of logging
+Date: Thu, 2 Jul 2015 15:38:00 -0700
+Message-ID: <20150702223800.GA1712@linux.vnet.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: linux-crypto@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	gustavold@linux.vnet.ibm.com
+To: Dan Streetman <ddstreet@us.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:35310 "EHLO
-	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750943AbbGBNxH (ORCPT
+Received: from e35.co.us.ibm.com ([32.97.110.153]:55539 "EHLO
+	e35.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754128AbbGBWiF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Jul 2015 09:53:07 -0400
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-	by userp1040.oracle.com (Sentrion-MTA-4.3.2/Sentrion-MTA-4.3.2) with ESMTP id t62Dr6Ek017942
-	(version=TLSv1 cipher=DHE-RSA-AES256-SHA bits=256 verify=OK)
-	for <linux-crypto@vger.kernel.org>; Thu, 2 Jul 2015 13:53:07 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-	by userv0021.oracle.com (8.13.8/8.13.8) with ESMTP id t62Dr6K8022107
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=FAIL)
-	for <linux-crypto@vger.kernel.org>; Thu, 2 Jul 2015 13:53:06 GMT
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-	by aserv0122.oracle.com (8.13.8/8.13.8) with ESMTP id t62Dr6xA004517
-	for <linux-crypto@vger.kernel.org>; Thu, 2 Jul 2015 13:53:06 GMT
+	Thu, 2 Jul 2015 18:38:05 -0400
+Received: from /spool/local
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <nacc@linux.vnet.ibm.com>;
+	Thu, 2 Jul 2015 16:38:14 -0600
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+	by d03dlp01.boulder.ibm.com (Postfix) with ESMTP id 103DF1FF0045
+	for <linux-crypto@vger.kernel.org>; Thu,  2 Jul 2015 16:29:13 -0600 (MDT)
+Received: from d03av02.boulder.ibm.com (d03av02.boulder.ibm.com [9.17.195.168])
+	by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id t62MbMfJ40566822
+	for <linux-crypto@vger.kernel.org>; Thu, 2 Jul 2015 15:37:22 -0700
+Received: from d03av02.boulder.ibm.com (localhost [127.0.0.1])
+	by d03av02.boulder.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id t62Mc1CP008234
+	for <linux-crypto@vger.kernel.org>; Thu, 2 Jul 2015 16:38:02 -0600
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Currently, on a LPAR with the nx-842 device disabled, the following
+messages are emitted:
 
-I was trying to follow the example for IPsec transport mode at 
-http://www.ipsec-howto.org/x304.html with a 4.1 kernel,
-and I find that using 3des_cbc does not work - packets get dropped
-at the receiver after decryption: e.g., for a ping, the decrypted 
-packet has a mangled icmp header, and is dropped for a bad checksum
-in icmp_rcv.
+nx_compress: no nx842 driver found. [1]
+Registering IBM Power 842 compression driver
+nx_compress_pseries ibm,compression-v1: nx842_OF_upd_status: status 'disabled' is not 'okay'
+nx_compress_pseries ibm,compression-v1: nx842_OF_upd: max_sync_size new:4096 old:0 [2]
+nx_compress_pseries ibm,compression-v1: nx842_OF_upd: max_sync_sg new:510 old:0
+nx_compress_pseries ibm,compression-v1: nx842_OF_upd: max_sg_len new:4080 old:0
+nx_compress_powernv: loading [3]
+nx_compress_powernv: no coprocessors found
+alg: No test for 842 (842-nx) [4]
 
-Odd thing here is that the icmp payload was never mangled
-on my watch, and esp_input does correctly figure out the ULP of
-the payload after decrypt, so there is some pattern to this.
+[1] is the result of an ordering issue when the CONFIG_ options are set =y. [2]
+is the result of nx842_OF_upd_status() not returning the correct error code.
+[3] is the result of attempting to load the PowerNV platform driver on a
+non-PowerNV platform. [4] is the result of there simply not being any test for
+842 in the crypto test manager.
 
-Using blowfish instead of 3des works on 4.1, so I suspect the bug
-is specific to the encrypt/decrypt method.
+After the changes in the series, the same system as above emits:
 
-FWIW I tried the 3des instructions from ipsec-howto.org with 
-2.6.39 kernels, and it still fails (but so did blowfish, so 
-something got better along the way).
+Registering IBM Power 842 compression driver
+nx_compress_pseries ibm,compression-v1: nx842_OF_upd: device disabled
 
-Has anyone else noticed this behavior for 3des?
+which seems to me, at least, to be far clearer.
 
---Sowmini
+Dan, I think there is still a issue in the code. If CONFIG_DEV_NX_COMPRESS=y
+and CONFIG_DEV_NX_COMPRESS_PSERIES=m/CONFIG_DEV_NX_COMPRESS_POWERNV=m, it seems
+like the request_module() is not working properly and we simply get a "
+nx_compress: no nx842 driver found." at boot (even if I ensure the platform
+drivers are in the initrd). If I make CONFIG_DEV_NX_COMPRESS=m, though, the
+module(s) load successfully. Does it make sense/is it possible to have these
+three symbols always be the same (either all =y or all =m)?
+
+[1/6] crypto/nx-842-pseries: nx842_OF_upd_status should return ENODEV if device is not 'okay'
+ drivers/crypto/nx/nx-842-pseries.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+[2/6] nx-842-pseries: rename nx842_{init,exit} to nx842_pseries_{init,exit}
+ drivers/crypto/nx/nx-842-pseries.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+[3/6] nx-842-pseries: do not emit extra output if status is disabled
+ drivers/crypto/nx/nx-842-pseries.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+[4/6] crypto/nx-842-{powerpc,pseries}: only load on the appropriate machine type
+ drivers/crypto/nx/nx-842-powernv.c | 6 ++++++
+ drivers/crypto/nx/nx-842-pseries.c | 6 ++++++
+ drivers/crypto/nx/nx-842.h         | 1 +
+ 3 files changed, 13 insertions(+)
+[5/6] crypto/testmgr: add null test for 842 algorithm
+ crypto/testmgr.c | 3 +++
+ 1 file changed, 3 insertions(+)
+[6/6] nx-842-platform: if NX842 platform drivers are not modules, don't try to load them
+ drivers/crypto/nx/nx-842-platform.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
