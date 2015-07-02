@@ -1,8 +1,8 @@
 From: Lokesh Vutla <lokeshvutla@ti.com>
-Subject: Re: [PATCH 02/10] crypto: omap-aes: Fix configuring of AES mode
-Date: Thu, 2 Jul 2015 15:13:22 +0530
-Message-ID: <559507BA.8090700@ti.com>
-References: <1435814320-30347-1-git-send-email-lokeshvutla@ti.com> <1435814320-30347-3-git-send-email-lokeshvutla@ti.com> <20150702075732.GB4033@saruman.tx.rr.com>
+Subject: Re: [PATCH 03/10] crypto: aead: Add aead_request_cast() api
+Date: Thu, 2 Jul 2015 15:16:51 +0530
+Message-ID: <5595088B.30500@ti.com>
+References: <1435814320-30347-1-git-send-email-lokeshvutla@ti.com> <1435814320-30347-4-git-send-email-lokeshvutla@ti.com> <20150702075807.GC4033@saruman.tx.rr.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
@@ -10,45 +10,43 @@ Cc: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
 	<davem@davemloft.net>, <linux-omap@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <t-kristo@ti.com>, <nsekhar@ti.com>
 To: <balbi@ti.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150702075732.GB4033@saruman.tx.rr.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from devils.ext.ti.com ([198.47.26.153]:46283 "EHLO
+	devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753146AbbGBJrB (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jul 2015 05:47:01 -0400
+In-Reply-To: <20150702075807.GC4033@saruman.tx.rr.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thursday 02 July 2015 01:27 PM, Felipe Balbi wrote:
-> On Thu, Jul 02, 2015 at 10:48:32AM +0530, Lokesh Vutla wrote:
->> AES_CTRL_REG is used to configure AES mode. Before configuring
->> any mode we need to make sure all other modes are reset or else
->> driver will misbehave. So mask all modes before configuring
->> any AES mode.
+On Thursday 02 July 2015 01:28 PM, Felipe Balbi wrote:
+> On Thu, Jul 02, 2015 at 10:48:33AM +0530, Lokesh Vutla wrote:
+>> Add aead_request_cast() api to get pointer to aead_request
+>> from cryto_async_request.
 >>
 >> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
 >> ---
->>  drivers/crypto/omap-aes.c |   13 +++++--------
->>  1 file changed, 5 insertions(+), 8 deletions(-)
+>>  include/linux/crypto.h |    6 ++++++
+>>  1 file changed, 6 insertions(+)
 >>
->> diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
->> index a923101..96fc7f7 100644
->> --- a/drivers/crypto/omap-aes.c
->> +++ b/drivers/crypto/omap-aes.c
->> @@ -63,6 +63,7 @@
->>  #define AES_REG_CTRL_DIRECTION		(1 << 2)
->>  #define AES_REG_CTRL_INPUT_READY	(1 << 1)
->>  #define AES_REG_CTRL_OUTPUT_READY	(1 << 0)
->> +#define AES_REG_CTRL_MASK		FLD_MASK(24, 2)
+>> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+>> index 10df5d2..20fac3d 100644
+>> --- a/include/linux/crypto.h
+>> +++ b/include/linux/crypto.h
+>> @@ -1460,6 +1460,12 @@ static inline void aead_request_set_tfm(struct aead_request *req,
+>>  	req->base.tfm = crypto_aead_tfm(crypto_aead_crt(tfm)->base);
+>>  }
+>>  
+>> +static inline struct aead_request *aead_request_cast(
+>> +					struct crypto_async_request *req)
+>> +{
+>> +	return container_of(req, struct aead_request, base);
 > 
-> you end up masking bits which aren't even defined in this driver. What
-> are those bits ? Perhaps add macros for them and define
-> AES_REG_CTRL_MASK by explicitly ORing those macros ? That would, at
-> least, be clearer
-Hardware supports ECB, CBC, CTR, CFB, F8, CBC_MAC, F9, GCM, CCM, XTS modes.
-But current driver has only ECB, CBC, CTR modes support.
-That is why the other fields are not yet defined.
-So, defining these is fine, but ORing all these will be very big and looks a bit ugly.
-So I kept it as mask of all these bits.
-Ill move it to GEN_MASK here only.
+> container_of() ensures type safety, this can be a macro just fine.
+There are many similar definitions for ablkcipher.. etc,in
+crypto library. So I tried to make it uniform for the entire library.
 
 Thanks and regards,
-Lokesh
-
+Lokesh 
 > 
