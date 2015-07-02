@@ -1,83 +1,82 @@
 From: Felipe Balbi <balbi@ti.com>
-Subject: Re: [PATCH 01/10] crypto: omap-aes: Add support for lengths not
- aligned with AES_BLOCK_SIZE
-Date: Thu, 2 Jul 2015 02:53:41 -0500
-Message-ID: <20150702075341.GA4033@saruman.tx.rr.com>
+Subject: Re: [PATCH 02/10] crypto: omap-aes: Fix configuring of AES mode
+Date: Thu, 2 Jul 2015 02:57:32 -0500
+Message-ID: <20150702075732.GB4033@saruman.tx.rr.com>
 References: <1435814320-30347-1-git-send-email-lokeshvutla@ti.com>
- <1435814320-30347-2-git-send-email-lokeshvutla@ti.com>
+ <1435814320-30347-3-git-send-email-lokeshvutla@ti.com>
 Reply-To: <balbi@ti.com>
 Mime-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="liOOAslEiF7prFVr"
+	protocol="application/pgp-signature"; boundary="bCsyhTFzCvuiizWE"
 Cc: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
 	<davem@davemloft.net>, <linux-omap@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <t-kristo@ti.com>, <nsekhar@ti.com>
 To: Lokesh Vutla <lokeshvutla@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from arroyo.ext.ti.com ([192.94.94.40]:39206 "EHLO arroyo.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751262AbbGBHxq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Jul 2015 03:53:46 -0400
+Received: from devils.ext.ti.com ([198.47.26.153]:42019 "EHLO
+	devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751362AbbGBH5h (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jul 2015 03:57:37 -0400
 Content-Disposition: inline
-In-Reply-To: <1435814320-30347-2-git-send-email-lokeshvutla@ti.com>
+In-Reply-To: <1435814320-30347-3-git-send-email-lokeshvutla@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
---liOOAslEiF7prFVr
+--bCsyhTFzCvuiizWE
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 02, 2015 at 10:48:31AM +0530, Lokesh Vutla wrote:
-> OMAP AES driver returns an error if the data is not aligned with
-> AES_BLOCK_SIZE bytes.
-> But OMAP AES hw allows data input upto 1 byte aligned, but still
-> zeros are to be appended and complete AES_BLOCK_SIZE has to be written.
-> And correct length has to be passed in LENGTH field.
-> Adding support for inputs not aligned with AES_BLOCK_SIZE.
+On Thu, Jul 02, 2015 at 10:48:32AM +0530, Lokesh Vutla wrote:
+> AES_CTRL_REG is used to configure AES mode. Before configuring
+> any mode we need to make sure all other modes are reset or else
+> driver will misbehave. So mask all modes before configuring
+> any AES mode.
 >=20
 > Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
 > ---
->  drivers/crypto/omap-aes.c |   33 ++++++++++++++++-----------------
->  1 file changed, 16 insertions(+), 17 deletions(-)
+>  drivers/crypto/omap-aes.c |   13 +++++--------
+>  1 file changed, 5 insertions(+), 8 deletions(-)
 >=20
 > diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-> index 9a28b7e..a923101 100644
+> index a923101..96fc7f7 100644
 > --- a/drivers/crypto/omap-aes.c
 > +++ b/drivers/crypto/omap-aes.c
-> @@ -558,6 +558,9 @@ static int omap_aes_check_aligned(struct scatterlist =
-*sg, int total)
->  {
->  	int len =3D 0;
-> =20
-> +	if (!IS_ALIGNED(total, AES_BLOCK_SIZE))
-> +		return -1;
+> @@ -63,6 +63,7 @@
+>  #define AES_REG_CTRL_DIRECTION		(1 << 2)
+>  #define AES_REG_CTRL_INPUT_READY	(1 << 1)
+>  #define AES_REG_CTRL_OUTPUT_READY	(1 << 0)
+> +#define AES_REG_CTRL_MASK		FLD_MASK(24, 2)
 
--EINVAL?
+you end up masking bits which aren't even defined in this driver. What
+are those bits ? Perhaps add macros for them and define
+AES_REG_CTRL_MASK by explicitly ORing those macros ? That would, at
+least, be clearer
 
 --=20
 balbi
 
---liOOAslEiF7prFVr
+--bCsyhTFzCvuiizWE
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: Digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBAgAGBQJVlO4FAAoJEIaOsuA1yqREkPAP/A1r1Zl0TJUXgjetXKt/QTD4
-UvdFIOWBIsr/cOifa0i0VBti4JobZgoukkCCEoaxAOLoqlHOToekJmoVEFhHHAyt
-Lsjgz5zsyYtJkxhBY8C0Ui/uxYIW6xqtFVqdCu9Ka29xaTkE85pSfndZCiKmBnLc
-dE8trqJOcJwwAnrZPni9Kpewle0/a025VzbBto3gyo42oH5f4ov5J0seW8lF+c6S
-UIVFOptH4dmG0ZGMBP1VMKucV6s0JVLtOU1aHzqVXoDflQqOHdXYvHgP+fziUErL
-0CkZ6Gd6gXsZZTol9AMkx/iJnXpdUAvUm/1Eb/31NnJF5+fTcSiepaWjgbT7Ew0d
-ylJ9MxPYklHee6zFEZYRhhJ21uJYFY7Yeem+rPvS6lrPsZ5LV6//XyL/j69Q1L1o
-/B20ewNmnlkMylT/oE3OvPRquVUJvG2/s2ekqNJwOFHqzt69R9lw08NL79OCPikt
-iey/Do88mv6H4spyXV3r1D7lM4uA6BgqUKbwsVXUVdDQxPPVq3aX4MEt2w3JlZxl
-4hYTgN/iYrCifx+9Fy3Tc8sJ3Yt1jhHKn2AkoHu2YIJ0p2NaJJVtPdEqTJrtEod+
-0Xfz6/YITk/Ngv5LeR1cQHT7y1YWqfuE7KznC/ylwcOolsZjfHWyXHdLkp7+Tdiu
-RfFRIoAW5cw9ZlXuvkVw
-=x5/1
+iQIcBAEBAgAGBQJVlO7sAAoJEIaOsuA1yqREKF4P/AyPweTy6A0mZMGG2FMOqm5l
+YN3qsnR+R0dnil+fP4W1LbZpZhXJWhZkFql5RbKtFzhhIEW809yhQGy/F+Dt/JNw
+dHsSYMU23a7cgZIORNZ6TU/0tOmuQ+xpys01mcvFG2SXc/Bjvn7+g6uNMsaky8Gn
+dxvSkd98+rztw1nBI+fRNt6Jq3fey76Cia5drndDCd9YSl5Y3NB+B6PWx9485rj6
+SPR0YO/4FO/LuL7VxwsQmGvazK8v9/kHC6hD+5O5rPaYhkoOpGahlAtYDtZj18Y8
+GnFBrYgazPGGxWKRZA7ftFuQ5Q4/U411Hm1FdbvN5cOljUF39xMn51cY7OImohzE
+NL+bXAHi5ay9sxYftk59tuf8wB//xgU7/PycJwkl8UXZ00LmPHBM/Y7qgli7ekiE
+8u76pWKoh1jY2Knlu5DJ/O2Ez/g0PGd75zjbd4rzXYCByXERmrNdG/SuQOu5StX3
+UakXN28rumVIjONdjTpycNXXNz/wn+WPXtf1KAteEm8Ee6YwsAK26qt8bZiqMP9f
+AjPFfhuwE0jsxHTBfkKgA6b5bJDaCV2yeA85jlU1gsPr0BXZd+g7oztMArICYSZg
+smagzzgRIueg8vii2UCqim3KrjE3FDhBNcjSuU278QOxA+/NngOj37Pke94Kfb03
+EfhIFYYuHE33wh9Tm25x
+=PBGq
 -----END PGP SIGNATURE-----
 
---liOOAslEiF7prFVr--
+--bCsyhTFzCvuiizWE--
