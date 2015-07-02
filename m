@@ -1,65 +1,50 @@
-From: Lokesh Vutla <lokeshvutla@ti.com>
-Subject: [PATCH] crypto: omap-des: Fix unmapping of dma channels
-Date: Thu, 2 Jul 2015 18:33:28 +0530
-Message-ID: <1435842208-31382-1-git-send-email-lokeshvutla@ti.com>
+From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Subject: using 3des with ipsec transport mode
+Date: Thu, 2 Jul 2015 15:53:00 +0200
+Message-ID: <20150702135300.GG22958@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-omap@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<t-kristo@ti.com>, <nsekhar@ti.com>, <lokeshvutla@ti.com>
-To: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-	<davem@davemloft.net>
+Content-Type: text/plain; charset=us-ascii
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:51833 "EHLO comal.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751260AbbGBNGU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Jul 2015 09:06:20 -0400
+Received: from userp1040.oracle.com ([156.151.31.81]:35310 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750943AbbGBNxH (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jul 2015 09:53:07 -0400
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+	by userp1040.oracle.com (Sentrion-MTA-4.3.2/Sentrion-MTA-4.3.2) with ESMTP id t62Dr6Ek017942
+	(version=TLSv1 cipher=DHE-RSA-AES256-SHA bits=256 verify=OK)
+	for <linux-crypto@vger.kernel.org>; Thu, 2 Jul 2015 13:53:07 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+	by userv0021.oracle.com (8.13.8/8.13.8) with ESMTP id t62Dr6K8022107
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=FAIL)
+	for <linux-crypto@vger.kernel.org>; Thu, 2 Jul 2015 13:53:06 GMT
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+	by aserv0122.oracle.com (8.13.8/8.13.8) with ESMTP id t62Dr6xA004517
+	for <linux-crypto@vger.kernel.org>; Thu, 2 Jul 2015 13:53:06 GMT
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-dma_unmap_sg() is being called twice after completing the
-task. Looks like this is a copy paste error when creating
-des driver.
-With this the following warn appears during boot:
 
-[    4.210457] ------------[ cut here ]------------
-[    4.215114] WARNING: CPU: 0 PID: 0 at lib/dma-debug.c:1080 check_unmap+0x710/0x9a0()
-[    4.222899] omap-des 480a5000.des: DMA-API: device driver tries to free DMA memory it has not allocated [device address=0x00000000ab2ce000] [size=8 bytes]
-[    4.236785] Modules linked in:
-[    4.239860] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 3.14.39-02999-g1bc045a-dirty #182
-[    4.247918] [<c001678c>] (unwind_backtrace) from [<c0012574>] (show_stack+0x10/0x14)
-[    4.255710] [<c0012574>] (show_stack) from [<c05a37e8>] (dump_stack+0x84/0xb8)
-[    4.262977] [<c05a37e8>] (dump_stack) from [<c0046464>] (warn_slowpath_common+0x68/0x8c)
-[    4.271107] [<c0046464>] (warn_slowpath_common) from [<c004651c>] (warn_slowpath_fmt+0x30/0x40)
-[    4.279854] [<c004651c>] (warn_slowpath_fmt) from [<c02d50a4>] (check_unmap+0x710/0x9a0)
-[    4.287991] [<c02d50a4>] (check_unmap) from [<c02d5478>] (debug_dma_unmap_sg+0x90/0x19c)
-[    4.296128] [<c02d5478>] (debug_dma_unmap_sg) from [<c04a77d8>] (omap_des_done_task+0x1cc/0x3e4)
-[    4.304963] [<c04a77d8>] (omap_des_done_task) from [<c004a090>] (tasklet_action+0x84/0x124)
-[    4.313370] [<c004a090>] (tasklet_action) from [<c004a4ac>] (__do_softirq+0xf0/0x20c)
-[    4.321235] [<c004a4ac>] (__do_softirq) from [<c004a840>] (irq_exit+0x98/0xec)
-[    4.328500] [<c004a840>] (irq_exit) from [<c000f9ac>] (handle_IRQ+0x50/0xb0)
-[    4.335589] [<c000f9ac>] (handle_IRQ) from [<c0008688>] (gic_handle_irq+0x28/0x5c)
+I was trying to follow the example for IPsec transport mode at 
+http://www.ipsec-howto.org/x304.html with a 4.1 kernel,
+and I find that using 3des_cbc does not work - packets get dropped
+at the receiver after decryption: e.g., for a ping, the decrypted 
+packet has a mangled icmp header, and is dropped for a bad checksum
+in icmp_rcv.
 
-Removing the duplicate call to dma_unmap_sg().
+Odd thing here is that the icmp payload was never mangled
+on my watch, and esp_input does correctly figure out the ULP of
+the payload after decrypt, so there is some pattern to this.
 
-Reported-by: Tomi Valkeinen <tomi.valkeinen@ti.com>
-Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
----
- drivers/crypto/omap-des.c | 3 ---
- 1 file changed, 3 deletions(-)
+Using blowfish instead of 3des works on 4.1, so I suspect the bug
+is specific to the encrypt/decrypt method.
 
-diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
-index 4630709..0a70e46 100644
---- a/drivers/crypto/omap-des.c
-+++ b/drivers/crypto/omap-des.c
-@@ -536,9 +536,6 @@ static int omap_des_crypt_dma_stop(struct omap_des_dev *dd)
- 	dmaengine_terminate_all(dd->dma_lch_in);
- 	dmaengine_terminate_all(dd->dma_lch_out);
- 
--	dma_unmap_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
--	dma_unmap_sg(dd->dev, dd->out_sg, dd->out_sg_len, DMA_FROM_DEVICE);
--
- 	return err;
- }
- 
--- 
-1.9.1
+FWIW I tried the 3des instructions from ipsec-howto.org with 
+2.6.39 kernels, and it still fails (but so did blowfish, so 
+something got better along the way).
+
+Has anyone else noticed this behavior for 3des?
+
+--Sowmini
