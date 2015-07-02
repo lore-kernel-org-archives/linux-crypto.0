@@ -1,35 +1,50 @@
-From: Sasnett_Karen <sasnett_karen@asdk12.org>
-Subject: (unknown)
-Date: Wed, 1 Jul 2015 11:53:31 +0000
-Message-ID: <B3EEA09B9C66584198B6765D1492AEF27A4787B7__17506.6959149719$1435752572$gmane$org@ITEXCH01.asdk12.org>
+From: Lokesh Vutla <lokeshvutla@ti.com>
+Subject: [PATCH 00/10] crypto: omap-aes: Add support for GCM mode
+Date: Thu, 2 Jul 2015 10:48:30 +0530
+Message-ID: <1435814320-30347-1-git-send-email-lokeshvutla@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: undisclosed-recipients:;
+Content-Type: text/plain
+Cc: <linux-omap@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<t-kristo@ti.com>, <nsekhar@ti.com>, <lokeshvutla@ti.com>
+To: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+	<davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1on0114.outbound.protection.outlook.com ([157.56.110.114]:61982
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753225AbbGAMIs convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 1 Jul 2015 08:08:48 -0400
-Subject: 
-Content-Language: en-US
+Received: from comal.ext.ti.com ([198.47.26.152]:35613 "EHLO comal.ext.ti.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751087AbbGBFVr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jul 2015 01:21:47 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+This series does some basic cleanup and adds support for
+AES GCM mode for omap aes driver.
+Also adds a test case for async aead algos.
 
+Tested on BeagelBoneBlack: http://pastebin.ubuntu.com/11808341/
 
+Lokesh Vutla (10):
+  crypto: omap-aes: Add support for lengths not aligned with
+    AES_BLOCK_SIZE
+  crypto: omap-aes: Fix configuring of AES mode
+  crypto: aead: Add aead_request_cast() api
+  crypto: omap-aes: Use BIT() macro
+  crypto: omap-aes: Add support for GCM mode
+  crypto: omap-aes: gcm: Handle inputs properly
+  crypto: omap-aes: gcm: Add support for unaligned lengths
+  crypto: omap-aes: gmc: Add algo info
+  crypto: omap-aes: gcm: Add support for PIO mode
+  crypto: tcrypt: Added speed tests for Async AEAD crypto alogrithms
 
-Haben Sie einen Investor brauchen?
+ crypto/tcrypt.c               |  233 +++++++++++++++++++++++++
+ crypto/tcrypt.h               |    1 +
+ drivers/crypto/Makefile       |    3 +-
+ drivers/crypto/omap-aes-gcm.c |  386 +++++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/omap-aes.c     |  322 +++++++++++++---------------------
+ drivers/crypto/omap-aes.h     |  206 ++++++++++++++++++++++
+ include/linux/crypto.h        |    6 +
+ 7 files changed, 955 insertions(+), 202 deletions(-)
+ create mode 100644 drivers/crypto/omap-aes-gcm.c
+ create mode 100644 drivers/crypto/omap-aes.h
 
-Haben Sie gesch=E4ftliche oder pers=F6nliche Darlehen ben=F6tigen?
-
-Wir geben Darlehen an eine nat=FCrliche Person und Unternehmen bei 3% Z=
-insen j=E4hrlich. Weitere Informationen Kontaktieren Sie uns per E-Mail=
-: omfcreditspa@hotmail.com<mailto:omfcreditspa@hotmail.com>
-
-
-
-HINWEIS: Leiten Sie Ihre Antwort nur an diese E-Mail: omfcreditspa@hotm=
-ail.com<mailto:omfcreditspa@hotmail.com>
+-- 
+1.7.9.5
