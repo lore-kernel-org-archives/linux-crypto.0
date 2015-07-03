@@ -1,10 +1,10 @@
 From: Boris Brezillon <boris.brezillon@free-electrons.com>
 Subject: Re: crypto: marvell/CESA: Issues with non cache-line aligned
  buffers
-Date: Fri, 3 Jul 2015 16:19:10 +0200
-Message-ID: <20150703161910.5089bcb2@bbrezillon>
+Date: Fri, 3 Jul 2015 16:23:22 +0200
+Message-ID: <20150703162322.1c02453a@bbrezillon>
 References: <20150703114305.15611807@bbrezillon>
-	<20150703131059.GX7557@n2100.arm.linux.org.uk>
+	<20150703095807.GS7557@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -18,70 +18,63 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	<linux-arm-kernel@lists.infradead.org>
 To: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:37507 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:37603 "EHLO
 	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932082AbbGCOTQ (ORCPT
+	with ESMTP id S1755456AbbGCOXb (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Jul 2015 10:19:16 -0400
-In-Reply-To: <20150703131059.GX7557@n2100.arm.linux.org.uk>
+	Fri, 3 Jul 2015 10:23:31 -0400
+In-Reply-To: <20150703095807.GS7557@n2100.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Russel,
-
-On Fri, 3 Jul 2015 14:10:59 +0100
+On Fri, 3 Jul 2015 10:58:07 +0100
 Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
 
-> BTW, off-topic for this thread... but I notice from Mark Brown's builder
-> that mv_cesa is causing build errors in mainline now:
+> On Fri, Jul 03, 2015 at 11:43:05AM +0200, Boris Brezillon wrote:
+> > Which led us to think that this could be related to a non cache-line
+> > aligned buffer problem: if we share the cache line with someone
+> > modifying its data during the DMA transfer, we could experience data
+> > loss when the cpu decide to flush the data from this cache line to the
+> > memory.
 > 
->         arm-allmodconfig
-> ../drivers/crypto/mv_cesa.c:1037:2: error: implicit declaration of function 'of_get_named_gen_pool' [-Werror=implicit-function-declaration]
+> There's really only two options when you have an overlapping cache line
+> and the cache line contains CPU-dirty data, but the memory contains
+> DMA-dirty data.  One of those dirty data has to win out, and the other
+> has to be destroyed.  (Either you invalidate the CPU cache line, loosing
+> the CPU-dirty data, or you write-back the cache line, overwriting the DMA-
+> dirty data.)
 > 
->         arm-multi_v5_defconfig
-> ../drivers/crypto/mv_cesa.c:1037:2: error: implicit declaration of function 'of_get_named_gen_pool' [-Werror=implicit-function-declaration]
+> What that means is that it's a _bug_ to end up in this situation, nothing
+> more, nothing less.  There's nothing that arch code can do about it, it's
+> a DMA-API user bug.
 > 
-> It seems it was fine on July 2nd, but the above was introduced today.
-
-It has been fixed by Stephen in linux-next (see [1]).
-
+> What you'll find is that this is well documented.  See
+> Documentation/DMA-API.txt, part Id (Streaming DMA mappings):
 > 
-> A few other things I notice when looking at this code:
+>   Warnings:  Memory coherency operates at a granularity called the cache
+>   line width.  In order for memory mapped by this API to operate
+>   correctly, the mapped region must begin exactly on a cache line
+>   boundary and end exactly on one (to prevent two separately mapped
+>   regions from sharing a single cache line).  Since the cache line size
+>   may not be known at compile time, the API will not enforce this
+>   requirement.  Therefore, it is recommended that driver writers who
+>   don't take special care to determine the cache line size at run time
+>   only map virtual regions that begin and end on page boundaries (which
+>   are guaranteed also to be cache line boundaries).
 > 
->         /* Not all platforms can gate the clock, so it is not
->            an error if the clock does not exists. */
->         cp->clk = clk_get(&pdev->dev, NULL);
->         if (!IS_ERR(cp->clk))
->                 clk_prepare_enable(cp->clk);
+> The behaviour you're seeing here is not ARM specific - any CPU which
+> uses cache lines and doesn't have hardware coherency will suffer from
+> this problem.
 > 
-> So, if clk_get() returns PTR_ERR(-EPROBE_DEFER) we treat that clock as
-> missing?  Is that really the behaviour you want there?
 
-Nope, I'll fix that.
+That's pretty much the answer I was expecting :-).
+I'll wait for Herbert's feedback to know how this should be fixed (I
+guess using the <alg>_walk_xxx functions is the right this to do, but
+I'd like to be sure).
 
-> 
->         ret = request_irq(irq, crypto_int, 0, dev_name(&pdev->dev),
->                         cp);
-> 
-> What happens if crypto_int() is called when request_irq() unlocks its
-> spinlock, before the clock has been found?  Eg, because we're booting
-> from a kexec'd kernel.
-
-I don't know, and I agree that we should either request the clock
-before registering the irq, or disable the IRQ using the
-SEC_ACCEL_INT_MASK before calling request_irq. Ideally we should do
-both.
-
-Note that none of my patches changed the clk_get(), request_irq() calls
-order, or the clk_get() error path ;-).
-
-Anyway, I'll propose a patch fixing the problem.
-
-Thanks for the feedback,
+Thanks,
 
 Boris
-
-[1]https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit/drivers/crypto/mv_cesa.c?id=7e6ce3db5329a32c83da9753bae162eb3f22dfca
 
 -- 
 Boris Brezillon, Free Electrons
