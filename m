@@ -1,72 +1,66 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: crypto: marvell/CESA: Issues with non cache-line aligned buffers
-Date: Fri, 3 Jul 2015 11:43:05 +0200
-Message-ID: <20150703114305.15611807@bbrezillon>
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Subject: Re: crypto: marvell/CESA: Issues with non cache-line aligned buffers
+Date: Fri, 3 Jul 2015 10:58:07 +0100
+Message-ID: <20150703095807.GS7557@n2100.arm.linux.org.uk>
+References: <20150703114305.15611807@bbrezillon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Will Deacon <will.deacon@arm.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
 	Gregory CLEMENT <gregory.clement@free-electrons.com>,
 	Arnaud Ebalard <arno@natisbad.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
 	"linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Russell King - ARM Linux <linux@arm.linux.org.uk>,
-	Will Deacon <will.deacon@arm.com>
+To: Boris Brezillon <boris.brezillon@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:59716 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753858AbbGCJnJ (ORCPT
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45186 "EHLO
+	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754384AbbGCJ6Z (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Jul 2015 05:43:09 -0400
+	Fri, 3 Jul 2015 05:58:25 -0400
+Content-Disposition: inline
+In-Reply-To: <20150703114305.15611807@bbrezillon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello, 
+On Fri, Jul 03, 2015 at 11:43:05AM +0200, Boris Brezillon wrote:
+> Which led us to think that this could be related to a non cache-line
+> aligned buffer problem: if we share the cache line with someone
+> modifying its data during the DMA transfer, we could experience data
+> loss when the cpu decide to flush the data from this cache line to the
+> memory.
 
-We've been facing a bug with the new CESA driver on armada 370 for a
-couple of days.
+There's really only two options when you have an overlapping cache line
+and the cache line contains CPU-dirty data, but the memory contains
+DMA-dirty data.  One of those dirty data has to win out, and the other
+has to be destroyed.  (Either you invalidate the CPU cache line, loosing
+the CPU-dirty data, or you write-back the cache line, overwriting the DMA-
+dirty data.)
 
-Arnaud found out that this bug appeared when we fixed the
-req->src == req->dst case (by passing DMA_BIDIRECTIONAL when mapping the
-sg list instead of mapping the same sg list twice, once with the
-TO_DEVICE option and the second time with the FROM_DEVICE option).
+What that means is that it's a _bug_ to end up in this situation, nothing
+more, nothing less.  There's nothing that arch code can do about it, it's
+a DMA-API user bug.
 
-After further investigations, we found out that invalidating the cache
-(in addition to the clean operation already done when mapping the
-region for DMA with the BIDIR option) was somehow fixing the problem.
+What you'll find is that this is well documented.  See
+Documentation/DMA-API.txt, part Id (Streaming DMA mappings):
 
-Which led us to think that this could be related to a non cache-line
-aligned buffer problem: if we share the cache line with someone
-modifying its data during the DMA transfer, we could experience data
-loss when the cpu decide to flush the data from this cache line to the
-memory.
-Russel, Will, could you confirm this is an issue that could happen ?
+  Warnings:  Memory coherency operates at a granularity called the cache
+  line width.  In order for memory mapped by this API to operate
+  correctly, the mapped region must begin exactly on a cache line
+  boundary and end exactly on one (to prevent two separately mapped
+  regions from sharing a single cache line).  Since the cache line size
+  may not be known at compile time, the API will not enforce this
+  requirement.  Therefore, it is recommended that driver writers who
+  don't take special care to determine the cache line size at run time
+  only map virtual regions that begin and end on page boundaries (which
+  are guaranteed also to be cache line boundaries).
 
-To validate this assumption we decided to test the alignment of the
-src and dst sg list entries passed by the crypto framework, and most of
-them are indeed not aligned on ARCH_DMA_MINALIGN. We made a dirty hack
-to copy the content of non aligned sg lists into a new ones containing a
-single aligned buffer (allocated with kmalloc) and it seems to solve
-the problem.
-
-We also noticed that the cra_alignmask fields were all set to 0 in the
-CESA driver, but modifying them (setting them to ARCH_DMA_MINALIGN - 1)
-does not seem to guarantee any alignment.
-ITOH, the xxx_walk_xxx API seem to check these misalignment issues and
-allocate new buffers to prevent such cases, but AFAICT, this is not
-automatically done by the crypto framework, and it's the
-responsibility of each driver to ensure the correct alignment.
-Herbert, could you confirm that ?
-
-Do you see anything else we should check ?
-
-Best Regards,
-
-Boris
+The behaviour you're seeing here is not ARM specific - any CPU which
+uses cache lines and doesn't have hardware coherency will suffer from
+this problem.
 
 -- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+FTTC broadband for 0.8mile line: currently at 10.5Mbps down 400kbps up
+according to speedtest.net.
