@@ -1,7 +1,7 @@
 From: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Subject: Re: crypto: marvell/CESA: Issues with non cache-line aligned buffers
-Date: Fri, 3 Jul 2015 10:58:07 +0100
-Message-ID: <20150703095807.GS7557@n2100.arm.linux.org.uk>
+Date: Fri, 3 Jul 2015 14:10:59 +0100
+Message-ID: <20150703131059.GX7557@n2100.arm.linux.org.uk>
 References: <20150703114305.15611807@bbrezillon>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -15,51 +15,44 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	<linux-arm-kernel@lists.infradead.org>
 To: Boris Brezillon <boris.brezillon@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45186 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45586 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754384AbbGCJ6Z (ORCPT
+	with ESMTP id S1755148AbbGCNLT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Jul 2015 05:58:25 -0400
+	Fri, 3 Jul 2015 09:11:19 -0400
 Content-Disposition: inline
 In-Reply-To: <20150703114305.15611807@bbrezillon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 03, 2015 at 11:43:05AM +0200, Boris Brezillon wrote:
-> Which led us to think that this could be related to a non cache-line
-> aligned buffer problem: if we share the cache line with someone
-> modifying its data during the DMA transfer, we could experience data
-> loss when the cpu decide to flush the data from this cache line to the
-> memory.
+BTW, off-topic for this thread... but I notice from Mark Brown's builder
+that mv_cesa is causing build errors in mainline now:
 
-There's really only two options when you have an overlapping cache line
-and the cache line contains CPU-dirty data, but the memory contains
-DMA-dirty data.  One of those dirty data has to win out, and the other
-has to be destroyed.  (Either you invalidate the CPU cache line, loosing
-the CPU-dirty data, or you write-back the cache line, overwriting the DMA-
-dirty data.)
+        arm-allmodconfig
+../drivers/crypto/mv_cesa.c:1037:2: error: implicit declaration of function 'of_get_named_gen_pool' [-Werror=implicit-function-declaration]
 
-What that means is that it's a _bug_ to end up in this situation, nothing
-more, nothing less.  There's nothing that arch code can do about it, it's
-a DMA-API user bug.
+        arm-multi_v5_defconfig
+../drivers/crypto/mv_cesa.c:1037:2: error: implicit declaration of function 'of_get_named_gen_pool' [-Werror=implicit-function-declaration]
 
-What you'll find is that this is well documented.  See
-Documentation/DMA-API.txt, part Id (Streaming DMA mappings):
+It seems it was fine on July 2nd, but the above was introduced today.
 
-  Warnings:  Memory coherency operates at a granularity called the cache
-  line width.  In order for memory mapped by this API to operate
-  correctly, the mapped region must begin exactly on a cache line
-  boundary and end exactly on one (to prevent two separately mapped
-  regions from sharing a single cache line).  Since the cache line size
-  may not be known at compile time, the API will not enforce this
-  requirement.  Therefore, it is recommended that driver writers who
-  don't take special care to determine the cache line size at run time
-  only map virtual regions that begin and end on page boundaries (which
-  are guaranteed also to be cache line boundaries).
+A few other things I notice when looking at this code:
 
-The behaviour you're seeing here is not ARM specific - any CPU which
-uses cache lines and doesn't have hardware coherency will suffer from
-this problem.
+        /* Not all platforms can gate the clock, so it is not
+           an error if the clock does not exists. */
+        cp->clk = clk_get(&pdev->dev, NULL);
+        if (!IS_ERR(cp->clk))
+                clk_prepare_enable(cp->clk);
+
+So, if clk_get() returns PTR_ERR(-EPROBE_DEFER) we treat that clock as
+missing?  Is that really the behaviour you want there?
+
+        ret = request_irq(irq, crypto_int, 0, dev_name(&pdev->dev),
+                        cp);
+
+What happens if crypto_int() is called when request_irq() unlocks its
+spinlock, before the clock has been found?  Eg, because we're booting
+from a kexec'd kernel.
 
 -- 
 FTTC broadband for 0.8mile line: currently at 10.5Mbps down 400kbps up
