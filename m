@@ -1,52 +1,42 @@
-From: Andrew Lunn <andrew@lunn.ch>
-Subject: Re: crypto: marvell/CESA: Issues with non cache-line aligned buffers
-Date: Fri, 3 Jul 2015 16:41:16 +0200
-Message-ID: <20150703144116.GK13481@lunn.ch>
-References: <20150703114305.15611807@bbrezillon>
- <20150703131059.GX7557@n2100.arm.linux.org.uk>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 5/6] [RFC] crypto/testmgr: add null test for 842 algorithm
+Date: Sat, 4 Jul 2015 15:24:53 +0800
+Message-ID: <20150704072453.GC6153@gondor.apana.org.au>
+References: <20150702223800.GA1712@linux.vnet.ibm.com>
+ <20150702224119.GF1712@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Will Deacon <will.deacon@arm.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vps0.lunn.ch ([178.209.37.122]:33675 "EHLO vps0.lunn.ch"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932206AbbGCOrc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Jul 2015 10:47:32 -0400
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: linux-crypto@vger.kernel.org, gustavold@linux.vnet.ibm.com,
+ linuxppc-dev@lists.ozlabs.org, Dan Streetman <ddstreet@us.ibm.com>,
+ "David S. Miller" <davem@davemloft.net>
+To: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 Content-Disposition: inline
-In-Reply-To: <20150703131059.GX7557@n2100.arm.linux.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20150702224119.GF1712@linux.vnet.ibm.com>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-> A few other things I notice when looking at this code:
-> 
->         /* Not all platforms can gate the clock, so it is not
->            an error if the clock does not exists. */
->         cp->clk = clk_get(&pdev->dev, NULL);
->         if (!IS_ERR(cp->clk))
->                 clk_prepare_enable(cp->clk);
-> 
-> So, if clk_get() returns PTR_ERR(-EPROBE_DEFER) we treat that clock as
-> missing?  Is that really the behaviour you want there?
-
-Hi Russell
-
-I probably added that to the older driver and it got copied into the
-newer one.
-
-The clock it is using is added to the system using CLK_OF_DECLARE()
-This results in an entry in the __clk_of_table table. That table is
-walked in of_clk_init(), which is called by time_init() in
-arch/arc/kernel/time.c, early in the boot.
-
-If we get -EPROBE_DEFER, something is seriously wrong.
-
-   Andrew
+T24gVGh1LCBKdWwgMDIsIDIwMTUgYXQgMDM6NDE6MTlQTSAtMDcwMCwgTmlzaGFudGggQXJhdmFt
+dWRhbiB3cm90ZToKPiBDdXJyZW50bHksIHdoZW4gdGhlIG54LTg0Mi1wc2VyaWVzIGRyaXZlciBs
+b2FkcywgdGhlIGZvbGxvd2luZyBtZXNzYWdlCj4gaXMgZW1pdHRlZDoKPiAKPiBhbGc6IE5vIHRl
+c3QgZm9yIDg0MiAoODQyLW54KQo+IAo+IEl0IHNlZW1zIGxpa2UgdGhlIHNpbXBsZXN0IHdheSB0
+byBmaXggdGhpcyBtZXNzYWdlIChvdGhlciB0aGFuIGFkZGluZyBhCj4gcHJvcGVyIHRlc3QpIGlz
+IHRvIGp1c3QgaW5zZXJ0IHRoZSBudWxsIHRlc3QgaW50byB0aGUgbGlzdCBpbiB0aGUKPiB0ZXN0
+bWdyLgo+IAo+IFNpZ25lZC1vZmYtYnk6IE5pc2hhbnRoIEFyYXZhbXVkYW4gPG5hY2NAbGludXgu
+dm5ldC5pYm0uY29tPgoKUGxlYXNlIGFkZCBzb21lIHJlYWwgdGVzdCB2ZWN0b3JzIGluc3RlYWQu
+CgpUaGFua3MsCi0tIApFbWFpbDogSGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3Jn
+LmF1PgpIb21lIFBhZ2U6IGh0dHA6Ly9nb25kb3IuYXBhbmEub3JnLmF1L35oZXJiZXJ0LwpQR1Ag
+S2V5OiBodHRwOi8vZ29uZG9yLmFwYW5hLm9yZy5hdS9+aGVyYmVydC9wdWJrZXkudHh0Cl9fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4cHBjLWRldiBt
+YWlsaW5nIGxpc3QKTGludXhwcGMtZGV2QGxpc3RzLm96bGFicy5vcmcKaHR0cHM6Ly9saXN0cy5v
+emxhYnMub3JnL2xpc3RpbmZvL2xpbnV4cHBjLWRldg==
