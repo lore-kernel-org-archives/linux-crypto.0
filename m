@@ -1,81 +1,73 @@
-From: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
-Subject: Re: [PATCH 6/6] nx-842-platform: if NX842 platform drivers are not
- modules, don't try to load them
-Date: Mon, 6 Jul 2015 10:07:40 -0700
-Message-ID: <20150706170740.GB3578@linux.vnet.ibm.com>
-References: <20150702223800.GA1712@linux.vnet.ibm.com>
- <20150702224225.GG1712@linux.vnet.ibm.com>
- <20150706081307.GA20616@gondor.apana.org.au>
+From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH v10 1/5] ARM: sun4i: dt: Add Security System to
+ A10 SoC DTS
+Date: Mon,  6 Jul 2015 21:10:44 +0200
+Message-ID: <1436209848-16530-2-git-send-email-clabbe.montjoie@gmail.com>
+References: <1436209848-16530-1-git-send-email-clabbe.montjoie@gmail.com>
+Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Dan Streetman <ddstreet@us.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	gustavold@linux.vnet.ibm.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e19.ny.us.ibm.com ([129.33.205.209]:43672 "EHLO
-	e19.ny.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750936AbbGFRHp (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 6 Jul 2015 13:07:45 -0400
-Received: from /spool/local
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <nacc@linux.vnet.ibm.com>;
-	Mon, 6 Jul 2015 13:07:44 -0400
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-	by d01dlp01.pok.ibm.com (Postfix) with ESMTP id 5E4AF38C8056
-	for <linux-crypto@vger.kernel.org>; Mon,  6 Jul 2015 13:07:42 -0400 (EDT)
-Received: from d01av01.pok.ibm.com (d01av01.pok.ibm.com [9.56.224.215])
-	by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id t66H7gGg58458206
-	for <linux-crypto@vger.kernel.org>; Mon, 6 Jul 2015 17:07:42 GMT
-Received: from d01av01.pok.ibm.com (localhost [127.0.0.1])
-	by d01av01.pok.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id t66H7f7b025900
-	for <linux-crypto@vger.kernel.org>; Mon, 6 Jul 2015 13:07:42 -0400
-Content-Disposition: inline
-In-Reply-To: <20150706081307.GA20616@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
+	LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	pawel.moll-5wv7dgnIgG8@public.gmane.org,
+	mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
+	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
+	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
+	arnd-r2nGTMty4D4@public.gmane.org,
+	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBQFF5OWAKGQEM4QENJY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+In-Reply-To: <1436209848-16530-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-On 06.07.2015 [16:13:07 +0800], Herbert Xu wrote:
-> On Thu, Jul 02, 2015 at 03:42:26PM -0700, Nishanth Aravamudan wrote:
-> > Based off the CONFIG_SPU_FS_MODULE code, only attempt to load platform
-> > modules if the nx-842 pseries/powernv drivers are built as modules.
-> > 
-> > Otherwise, if CONFIG_DEV_NX_COMPRESS=y,
-> > CONFIG_DEV_NX_COMPRESS_PSERIES=y, CONFIG_DEV_NX_POWERNV=y, the following
-> > message is emitted at boot:
-> > 
-> > nx_compress: no nx842 driver found.
-> > 
-> > even though the drivers successfully loads.
-> > 
-> > This is because in the =y case, the module_init() calls get converted to
-> > initcalls and the nx842_init() runs before the platform driver
-> > nx842_pseries_init() or nx842_powernv_init() functions, which are what
-> > normally set the static platform driver.
-> > 
-> > Signed-off-by: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
-> > Cc: Dan Streetman <ddstreet@us.ibm.com>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: linux-crypto@vger.kernel.org
-> > Cc: linuxppc-dev@lists.ozlabs.org
-> 
-> Ugh, I think this whole thing is redundant.  The whole point of
-> the crypto API is to allow the coexistence of multiple underlying
-> implementations.
+The Security System is a hardware cryptographic accelerator that support
+AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+It could be found on many Allwinner SoC.
 
-Sure, that makes sense -- sorry, I was picking this up while Dan was on
-vacation. Will provide a better v2.
+This patch enable the Security System on the Allwinner A10 SoC Device-tree.
 
-> Please get rid of nx-842-platform.c completely and move the crypto
-> registration into the individual platform drivers.  That is, powernv
-> and pseries should each register their own crypto driver.  They can of
-> course share a common set of crypto code which can live in its own
-> module.  There should be no need for mucking with module reference
-> counts at all.
+Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ arch/arm/boot/dts/sun4i-a10.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Will do, thanks!
-
--Nish
+diff --git a/arch/arm/boot/dts/sun4i-a10.dtsi b/arch/arm/boot/dts/sun4i-a10.dtsi
+index 61c03d1..551e3d1 100644
+--- a/arch/arm/boot/dts/sun4i-a10.dtsi
++++ b/arch/arm/boot/dts/sun4i-a10.dtsi
+@@ -643,6 +643,14 @@
+ 			status = "disabled";
+ 		};
+ 
++		crypto: crypto-engine@01c15000 {
++			compatible = "allwinner,sun4i-a10-crypto";
++			reg = <0x01c15000 0x1000>;
++			interrupts = <86>;
++			clocks = <&ahb_gates 5>, <&ss_clk>;
++			clock-names = "ahb", "mod";
++		};
++
+ 		spi2: spi@01c17000 {
+ 			compatible = "allwinner,sun4i-a10-spi";
+ 			reg = <0x01c17000 0x1000>;
+-- 
+2.3.6
