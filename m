@@ -1,35 +1,36 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: arm: ignore generated SHA2 assembly files
-Date: Mon, 6 Jul 2015 16:34:31 +0800
-Message-ID: <20150706083431.GC20800@gondor.apana.org.au>
-References: <e9fad4b90e8d3aac883e2a5ac99b330653bcc354.1436155417.git.baruch@tkos.co.il>
+From: Lokesh Vutla <lokeshvutla@ti.com>
+Subject: Re: [PATCH 10/10] crypto: tcrypt: Added speed tests for Async AEAD
+ crypto alogrithms
+Date: Mon, 6 Jul 2015 14:15:06 +0530
+Message-ID: <559A4012.8070407@ti.com>
+References: <1435814320-30347-1-git-send-email-lokeshvutla@ti.com> <1435814320-30347-11-git-send-email-lokeshvutla@ti.com> <20150706074403.GE20192@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: Baruch Siach <baruch@tkos.co.il>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52784 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752715AbbGFIeq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 6 Jul 2015 04:34:46 -0400
-Content-Disposition: inline
-In-Reply-To: <e9fad4b90e8d3aac883e2a5ac99b330653bcc354.1436155417.git.baruch@tkos.co.il>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>, <davem@davemloft.net>,
+	<linux-omap@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<t-kristo@ti.com>, <nsekhar@ti.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20150706074403.GE20192@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jul 06, 2015 at 07:03:37AM +0300, Baruch Siach wrote:
-> These files are generated since commits f2f770d74a8d (crypto: arm/sha256 - Add
-> optimized SHA-256/224, 2015-04-03) and c80ae7ca3726 (crypto: arm/sha512 -
-> accelerated SHA-512 using ARM generic ASM and NEON, 2015-05-08).
+Hi,
+On Monday 06 July 2015 01:14 PM, Herbert Xu wrote:
+> On Thu, Jul 02, 2015 at 10:48:40AM +0530, Lokesh Vutla wrote:
+>> Adding simple speed tests for a range of block sizes for Async AEAD crypto
+>> algorithms.
+>>
+>> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
 > 
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Signed-off-by: Baruch Siach <baruch@tkos.co.il>
+> What's wrong with the existing AEAD speed tests?
+> 
+The existing AEAD test case does not do a wait_for_completion(), when
+the return value is EINPROGRESS or EBUSY like it is done for acipher_speed tests.
 
-Applied.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Can I be updating the same test case for handling this?
+Correct me if I am wrong.
+
+Thanks and regards,
+Lokesh
