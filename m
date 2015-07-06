@@ -1,75 +1,50 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: cryptd - Fix AEAD request context corruption
-Date: Mon, 6 Jul 2015 19:11:03 +0800
-Message-ID: <20150706111103.GA21776@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: [PATCH] crypto: testmgr - add a chunking test for cbc(aes)
+Date: Mon,  6 Jul 2015 13:37:33 +0200
+Message-ID: <1436182653-32683-1-git-send-email-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	LABBE Corentin <clabbe.montjoie@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:46060 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753482AbbGFLLI (ORCPT
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:38581 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752725AbbGFLhr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 6 Jul 2015 07:11:08 -0400
-Content-Disposition: inline
+	Mon, 6 Jul 2015 07:37:47 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The AEAD version of cryptd uses the same context for its own state
-as well as that of the child.  In doing so it did not maintain the
-proper ordering, thus resulting in potential state corruption where
-the child will overwrite the state stored by cryptd.
+All tests for cbc(aes) use only blocks of data with a multiple of 4.
+This test adds a test with some odd SG size.
 
-This patch fixes and also sets the request size properly.
+Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+---
+ crypto/testmgr.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index 22ba81f..2f833dc 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -688,16 +688,18 @@ static void cryptd_aead_crypt(struct aead_request *req,
- 			int (*crypt)(struct aead_request *req))
- {
- 	struct cryptd_aead_request_ctx *rctx;
-+	crypto_completion_t compl;
-+
- 	rctx = aead_request_ctx(req);
-+	compl = rctx->complete;
- 
- 	if (unlikely(err == -EINPROGRESS))
- 		goto out;
- 	aead_request_set_tfm(req, child);
- 	err = crypt( req );
--	req->base.complete = rctx->complete;
- out:
- 	local_bh_disable();
--	rctx->complete(&req->base, err);
-+	compl(&req->base, err);
- 	local_bh_enable();
- }
- 
-@@ -756,7 +758,9 @@ static int cryptd_aead_init_tfm(struct crypto_aead *tfm)
- 		return PTR_ERR(cipher);
- 
- 	ctx->child = cipher;
--	crypto_aead_set_reqsize(tfm, sizeof(struct cryptd_aead_request_ctx));
-+	crypto_aead_set_reqsize(
-+		tfm, max((unsigned)sizeof(struct cryptd_aead_request_ctx),
-+			 crypto_aead_reqsize(cipher)));
- 	return 0;
- }
- 
-@@ -775,7 +779,7 @@ static int cryptd_create_aead(struct crypto_template *tmpl,
- 	struct aead_alg *alg;
- 	const char *name;
- 	u32 type = 0;
--	u32 mask = 0;
-+	u32 mask = CRYPTO_ALG_ASYNC;
- 	int err;
- 
- 	cryptd_check_internal(tb, &type, &mask);
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 868edf1..b052555 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -14504,6 +14504,9 @@ static struct cipher_testvec aes_cbc_enc_tv_template[] = {
+ 		.result = "\xe3\x53\x77\x9c\x10\x79\xae\xb8"
+ 			  "\x27\x08\x94\x2d\xbe\x77\x18\x1a",
+ 		.rlen   = 16,
++		.also_non_np = 1,
++		.np	= 8,
++		.tap	= { 3, 2, 3, 2, 3, 1, 1, 1 },
+ 	}, {
+ 		.key    = "\xc2\x86\x69\x6d\x88\x7c\x9a\xa0"
+ 			  "\x61\x1b\xbb\x3e\x20\x25\xa4\x5a",
+@@ -14723,6 +14726,9 @@ static struct cipher_testvec aes_cbc_dec_tv_template[] = {
+ 		.ilen   = 16,
+ 		.result = "Single block msg",
+ 		.rlen   = 16,
++		.also_non_np = 1,
++		.np	= 8,
++		.tap	= { 3, 2, 3, 2, 3, 1, 1, 1 },
+ 	}, {
+ 		.key    = "\xc2\x86\x69\x6d\x88\x7c\x9a\xa0"
+ 			  "\x61\x1b\xbb\x3e\x20\x25\xa4\x5a",
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.3.6
