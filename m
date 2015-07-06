@@ -1,10 +1,9 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 01/10] crypto: omap-aes: Add support for lengths not
- aligned with AES_BLOCK_SIZE
-Date: Mon, 6 Jul 2015 15:38:33 +0800
-Message-ID: <20150706073833.GB20192@gondor.apana.org.au>
+Subject: Re: [PATCH 03/10] crypto: aead: Add aead_request_cast() api
+Date: Mon, 6 Jul 2015 15:41:45 +0800
+Message-ID: <20150706074145.GC20192@gondor.apana.org.au>
 References: <1435814320-30347-1-git-send-email-lokeshvutla@ti.com>
- <1435814320-30347-2-git-send-email-lokeshvutla@ti.com>
+ <1435814320-30347-4-git-send-email-lokeshvutla@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
@@ -12,32 +11,43 @@ Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
 	t-kristo@ti.com, nsekhar@ti.com
 To: Lokesh Vutla <lokeshvutla@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41940 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:49135 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753555AbbGFHig (ORCPT
+	with ESMTP id S1752855AbbGFHlv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 6 Jul 2015 03:38:36 -0400
+	Mon, 6 Jul 2015 03:41:51 -0400
 Content-Disposition: inline
-In-Reply-To: <1435814320-30347-2-git-send-email-lokeshvutla@ti.com>
+In-Reply-To: <1435814320-30347-4-git-send-email-lokeshvutla@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 02, 2015 at 10:48:31AM +0530, Lokesh Vutla wrote:
-> OMAP AES driver returns an error if the data is not aligned with
-> AES_BLOCK_SIZE bytes.
-> But OMAP AES hw allows data input upto 1 byte aligned, but still
-> zeros are to be appended and complete AES_BLOCK_SIZE has to be written.
-> And correct length has to be passed in LENGTH field.
-> Adding support for inputs not aligned with AES_BLOCK_SIZE.
+On Thu, Jul 02, 2015 at 10:48:33AM +0530, Lokesh Vutla wrote:
+> Add aead_request_cast() api to get pointer to aead_request
+> from cryto_async_request.
 > 
 > Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+> ---
+>  include/linux/crypto.h |    6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+> index 10df5d2..20fac3d 100644
+> --- a/include/linux/crypto.h
+> +++ b/include/linux/crypto.h
+> @@ -1460,6 +1460,12 @@ static inline void aead_request_set_tfm(struct aead_request *req,
+>  	req->base.tfm = crypto_aead_tfm(crypto_aead_crt(tfm)->base);
+>  }
+>  
+> +static inline struct aead_request *aead_request_cast(
+> +					struct crypto_async_request *req)
+> +{
+> +	return container_of(req, struct aead_request, base);
+> +}
+> +
 
-Please explain the purpose of this patch.  As it stands your change
-log makes no sense.  If you're relaxing the check for GCM support
-then you should state that explicitly.  Because partial blocks make
-no sense otherwise.
+This should go into include/crypto/internal/aead.h.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
