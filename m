@@ -1,44 +1,37 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: marvell/CESA: Issues with non cache-line aligned buffers
-Date: Sat, 4 Jul 2015 15:37:17 +0800
-Message-ID: <20150704073717.GA6539@gondor.apana.org.au>
-References: <20150703114305.15611807@bbrezillon>
- <20150704073355.GA6451@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
- Russell King - ARM Linux <linux@arm.linux.org.uk>,
- Arnaud Ebalard <arno@natisbad.org>, Will Deacon <will.deacon@arm.com>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- Gregory CLEMENT <gregory.clement@free-electrons.com>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-To: Boris Brezillon <boris.brezillon@free-electrons.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20150704073355.GA6451@gondor.apana.org.au>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+From: Baruch Siach <baruch@tkos.co.il>
+Subject: [PATCH] crypto: arm: ignore generated SHA2 assembly files
+Date: Mon,  6 Jul 2015 07:03:37 +0300
+Message-ID: <e9fad4b90e8d3aac883e2a5ac99b330653bcc354.1436155417.git.baruch@tkos.co.il>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Baruch Siach <baruch@tkos.co.il>,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from guitar.tcltek.co.il ([192.115.133.116]:58180 "EHLO
+	mx.tkos.co.il" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751224AbbGFEFB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 6 Jul 2015 00:05:01 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Jul 04, 2015 at 03:33:55PM +0800, Herbert Xu wrote:
-> Note that I don't think we have a suitable helper for DMA-aligned
-> processing of SG lists.  The ablkcipher_walk_* interface is mostly
-> identical to the blkcipher_walk_* interface.
+These files are generated since commits f2f770d74a8d (crypto: arm/sha256 - Add
+optimized SHA-256/224, 2015-04-03) and c80ae7ca3726 (crypto: arm/sha512 -
+accelerated SHA-512 using ARM generic ASM and NEON, 2015-05-08).
 
-Actually I take that back.  The ablkcipher_walk_* should work
-even if may be a bit unwieldy.  Patches to improve it are of
-course welcome :)
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Baruch Siach <baruch@tkos.co.il>
+---
+ arch/arm/crypto/.gitignore | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Cheers,
+diff --git a/arch/arm/crypto/.gitignore b/arch/arm/crypto/.gitignore
+index 6231d36b3635..31e1f538df7d 100644
+--- a/arch/arm/crypto/.gitignore
++++ b/arch/arm/crypto/.gitignore
+@@ -1 +1,3 @@
+ aesbs-core.S
++sha256-core.S
++sha512-core.S
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.1.4
