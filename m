@@ -1,28 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp - Provide support to autoload CCP driver
-Date: Mon, 6 Jul 2015 16:33:51 +0800
-Message-ID: <20150706083351.GA20800@gondor.apana.org.au>
-References: <20150630175714.17231.11110.stgit@tlendack-t1.amdoffice.net>
+Subject: Re: [PATCH 0/6] drivers/nx-842: reduce verbosity of logging
+Date: Mon, 6 Jul 2015 16:34:11 +0800
+Message-ID: <20150706083411.GB20800@gondor.apana.org.au>
+References: <20150702223800.GA1712@linux.vnet.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, David Miller <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: Dan Streetman <ddstreet@us.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	gustavold@linux.vnet.ibm.com
+To: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:35112 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752938AbbGFIeR (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 6 Jul 2015 04:34:17 -0400
 Content-Disposition: inline
-In-Reply-To: <20150630175714.17231.11110.stgit@tlendack-t1.amdoffice.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20150702223800.GA1712@linux.vnet.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 30, 2015 at 12:57:14PM -0500, Tom Lendacky wrote:
-> Add the necessary module device tables to the platform support to allow
-> for autoloading of the CCP driver. This will allow for the CCP's hwrng
-> support to be available without having to manually load the driver. The
-> module device table entry for the pci support is already present.
-> 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+On Thu, Jul 02, 2015 at 03:38:00PM -0700, Nishanth Aravamudan wrote:
+> Currently, on a LPAR with the nx-842 device disabled, the following
+> messages are emitted:
 
-Applied.
+Patches 1-3 applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
