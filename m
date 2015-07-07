@@ -1,65 +1,559 @@
-From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v10 5/5] MAINTAINERS: Add myself as maintainer
- of Allwinner Security System
-Date: Mon,  6 Jul 2015 21:10:48 +0200
-Message-ID: <1436209848-16530-6-git-send-email-clabbe.montjoie@gmail.com>
-References: <1436209848-16530-1-git-send-email-clabbe.montjoie@gmail.com>
-Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: crypto: nx - Fix reentrancy bugs
+Date: Tue, 7 Jul 2015 17:30:25 +0800
+Message-ID: <20150707093025.GA31368@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
-	LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-	pawel.moll-5wv7dgnIgG8@public.gmane.org,
-	mark.rutland-5wv7dgnIgG8@public.gmane.org,
-	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
-	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
-	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
-	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
-	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
-	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
-	arnd-r2nGTMty4D4@public.gmane.org,
-	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBSNF5OWAKGQEXDBZTDQ-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-In-Reply-To: <1436209848-16530-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <http://groups.google.com/group/linux-sunxi
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <http://groups.google.com/group/linux-sunxi/subscribe>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	"Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+	Fionnuala Gunter <fin@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:57300 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756676AbbGGJad (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 7 Jul 2015 05:30:33 -0400
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+This patch fixes a host of reentrancy bugs in the nx driver.  The
+following algorithms are affected:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index bbb6aeb..33851b2 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -556,6 +556,12 @@ S:	Maintained
- F:	Documentation/i2c/busses/i2c-ali1563
- F:	drivers/i2c/busses/i2c-ali1563.c
+* CCM
+* GCM
+* CTR
+* XCBC
+* SHA256
+* SHA512
+
+The crypto API allows a single transform to be used by multiple
+threads simultaneously.  For example, IPsec will use a single tfm
+to process packets for a given SA.  As packets may arrive on
+multiple CPUs that tfm must be reentrant.
+
+The nx driver does try to deal with this by using a spin lock.
+Unfortunately only the basic AES/CBC/ECB algorithms do this in
+the correct way.
+
+The symptom of these bugs may range from the generation of incorrect
+output to memory corruption.
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/drivers/crypto/nx/nx-aes-ccm.c b/drivers/crypto/nx/nx-aes-ccm.c
+index 67f8081..e4311ce 100644
+--- a/drivers/crypto/nx/nx-aes-ccm.c
++++ b/drivers/crypto/nx/nx-aes-ccm.c
+@@ -494,8 +494,9 @@ out:
+ static int ccm4309_aes_nx_encrypt(struct aead_request *req)
+ {
+ 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(req->base.tfm);
++	struct nx_gcm_rctx *rctx = aead_request_ctx(req);
+ 	struct blkcipher_desc desc;
+-	u8 *iv = nx_ctx->priv.ccm.iv;
++	u8 *iv = rctx->iv;
  
-+ALLWINNER SECURITY SYSTEM
-+M:	Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-+L:	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-+S:	Maintained
-+F:	drivers/crypto/sunxi-ss/
+ 	iv[0] = 3;
+ 	memcpy(iv + 1, nx_ctx->priv.ccm.nonce, 3);
+@@ -525,8 +526,9 @@ static int ccm_aes_nx_encrypt(struct aead_request *req)
+ static int ccm4309_aes_nx_decrypt(struct aead_request *req)
+ {
+ 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(req->base.tfm);
++	struct nx_gcm_rctx *rctx = aead_request_ctx(req);
+ 	struct blkcipher_desc desc;
+-	u8 *iv = nx_ctx->priv.ccm.iv;
++	u8 *iv = rctx->iv;
+ 
+ 	iv[0] = 3;
+ 	memcpy(iv + 1, nx_ctx->priv.ccm.nonce, 3);
+diff --git a/drivers/crypto/nx/nx-aes-ctr.c b/drivers/crypto/nx/nx-aes-ctr.c
+index 2617cd4..dd7e9f3 100644
+--- a/drivers/crypto/nx/nx-aes-ctr.c
++++ b/drivers/crypto/nx/nx-aes-ctr.c
+@@ -72,7 +72,7 @@ static int ctr3686_aes_nx_set_key(struct crypto_tfm *tfm,
+ 	if (key_len < CTR_RFC3686_NONCE_SIZE)
+ 		return -EINVAL;
+ 
+-	memcpy(nx_ctx->priv.ctr.iv,
++	memcpy(nx_ctx->priv.ctr.nonce,
+ 	       in_key + key_len - CTR_RFC3686_NONCE_SIZE,
+ 	       CTR_RFC3686_NONCE_SIZE);
+ 
+@@ -131,14 +131,15 @@ static int ctr3686_aes_nx_crypt(struct blkcipher_desc *desc,
+ 				unsigned int           nbytes)
+ {
+ 	struct nx_crypto_ctx *nx_ctx = crypto_blkcipher_ctx(desc->tfm);
+-	u8 *iv = nx_ctx->priv.ctr.iv;
++	u8 iv[16];
+ 
++	memcpy(iv, nx_ctx->priv.ctr.nonce, CTR_RFC3686_IV_SIZE);
+ 	memcpy(iv + CTR_RFC3686_NONCE_SIZE,
+ 	       desc->info, CTR_RFC3686_IV_SIZE);
+ 	iv[12] = iv[13] = iv[14] = 0;
+ 	iv[15] = 1;
+ 
+-	desc->info = nx_ctx->priv.ctr.iv;
++	desc->info = iv;
+ 
+ 	return ctr_aes_nx_crypt(desc, dst, src, nbytes);
+ }
+diff --git a/drivers/crypto/nx/nx-aes-gcm.c b/drivers/crypto/nx/nx-aes-gcm.c
+index 08ac6d4..92c993f 100644
+--- a/drivers/crypto/nx/nx-aes-gcm.c
++++ b/drivers/crypto/nx/nx-aes-gcm.c
+@@ -317,6 +317,7 @@ out:
+ static int gcm_aes_nx_crypt(struct aead_request *req, int enc)
+ {
+ 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(req->base.tfm);
++	struct nx_gcm_rctx *rctx = aead_request_ctx(req);
+ 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
+ 	struct blkcipher_desc desc;
+ 	unsigned int nbytes = req->cryptlen;
+@@ -326,7 +327,7 @@ static int gcm_aes_nx_crypt(struct aead_request *req, int enc)
+ 
+ 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
+ 
+-	desc.info = nx_ctx->priv.gcm.iv;
++	desc.info = rctx->iv;
+ 	/* initialize the counter */
+ 	*(u32 *)(desc.info + NX_GCM_CTR_OFFSET) = 1;
+ 
+@@ -424,8 +425,8 @@ out:
+ 
+ static int gcm_aes_nx_encrypt(struct aead_request *req)
+ {
+-	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(req->base.tfm);
+-	char *iv = nx_ctx->priv.gcm.iv;
++	struct nx_gcm_rctx *rctx = aead_request_ctx(req);
++	char *iv = rctx->iv;
+ 
+ 	memcpy(iv, req->iv, 12);
+ 
+@@ -434,8 +435,8 @@ static int gcm_aes_nx_encrypt(struct aead_request *req)
+ 
+ static int gcm_aes_nx_decrypt(struct aead_request *req)
+ {
+-	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(req->base.tfm);
+-	char *iv = nx_ctx->priv.gcm.iv;
++	struct nx_gcm_rctx *rctx = aead_request_ctx(req);
++	char *iv = rctx->iv;
+ 
+ 	memcpy(iv, req->iv, 12);
+ 
+@@ -445,7 +446,8 @@ static int gcm_aes_nx_decrypt(struct aead_request *req)
+ static int gcm4106_aes_nx_encrypt(struct aead_request *req)
+ {
+ 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(req->base.tfm);
+-	char *iv = nx_ctx->priv.gcm.iv;
++	struct nx_gcm_rctx *rctx = aead_request_ctx(req);
++	char *iv = rctx->iv;
+ 	char *nonce = nx_ctx->priv.gcm.nonce;
+ 
+ 	memcpy(iv, nonce, NX_GCM4106_NONCE_LEN);
+@@ -457,7 +459,8 @@ static int gcm4106_aes_nx_encrypt(struct aead_request *req)
+ static int gcm4106_aes_nx_decrypt(struct aead_request *req)
+ {
+ 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(req->base.tfm);
+-	char *iv = nx_ctx->priv.gcm.iv;
++	struct nx_gcm_rctx *rctx = aead_request_ctx(req);
++	char *iv = rctx->iv;
+ 	char *nonce = nx_ctx->priv.gcm.nonce;
+ 
+ 	memcpy(iv, nonce, NX_GCM4106_NONCE_LEN);
+diff --git a/drivers/crypto/nx/nx-aes-xcbc.c b/drivers/crypto/nx/nx-aes-xcbc.c
+index 8c2faff..c2f7d4b 100644
+--- a/drivers/crypto/nx/nx-aes-xcbc.c
++++ b/drivers/crypto/nx/nx-aes-xcbc.c
+@@ -42,6 +42,7 @@ static int nx_xcbc_set_key(struct crypto_shash *desc,
+ 			   unsigned int         key_len)
+ {
+ 	struct nx_crypto_ctx *nx_ctx = crypto_shash_ctx(desc);
++	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
+ 
+ 	switch (key_len) {
+ 	case AES_KEYSIZE_128:
+@@ -51,7 +52,7 @@ static int nx_xcbc_set_key(struct crypto_shash *desc,
+ 		return -EINVAL;
+ 	}
+ 
+-	memcpy(nx_ctx->priv.xcbc.key, in_key, key_len);
++	memcpy(csbcpb->cpb.aes_xcbc.key, in_key, key_len);
+ 
+ 	return 0;
+ }
+@@ -148,32 +149,29 @@ out:
+ 	return rc;
+ }
+ 
+-static int nx_xcbc_init(struct shash_desc *desc)
++static int nx_crypto_ctx_aes_xcbc_init2(struct crypto_tfm *tfm)
+ {
+-	struct xcbc_state *sctx = shash_desc_ctx(desc);
+-	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
++	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
+ 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
+-	struct nx_sg *out_sg;
+-	int len;
++	int err;
+ 
+-	nx_ctx_init(nx_ctx, HCOP_FC_AES);
++	err = nx_crypto_ctx_aes_xcbc_init(tfm);
++	if (err)
++		return err;
+ 
+-	memset(sctx, 0, sizeof *sctx);
++	nx_ctx_init(nx_ctx, HCOP_FC_AES);
+ 
+ 	NX_CPB_SET_KEY_SIZE(csbcpb, NX_KS_AES_128);
+ 	csbcpb->cpb.hdr.mode = NX_MODE_AES_XCBC_MAC;
+ 
+-	memcpy(csbcpb->cpb.aes_xcbc.key, nx_ctx->priv.xcbc.key, AES_BLOCK_SIZE);
+-	memset(nx_ctx->priv.xcbc.key, 0, sizeof *nx_ctx->priv.xcbc.key);
+-
+-	len = AES_BLOCK_SIZE;
+-	out_sg = nx_build_sg_list(nx_ctx->out_sg, (u8 *)sctx->state,
+-				  &len, nx_ctx->ap->sglen);
++	return 0;
++}
+ 
+-	if (len != AES_BLOCK_SIZE)
+-		return -EINVAL;
++static int nx_xcbc_init(struct shash_desc *desc)
++{
++	struct xcbc_state *sctx = shash_desc_ctx(desc);
+ 
+-	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
++	memset(sctx, 0, sizeof *sctx);
+ 
+ 	return 0;
+ }
+@@ -186,6 +184,7 @@ static int nx_xcbc_update(struct shash_desc *desc,
+ 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
+ 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
+ 	struct nx_sg *in_sg;
++	struct nx_sg *out_sg;
+ 	u32 to_process = 0, leftover, total;
+ 	unsigned int max_sg_len;
+ 	unsigned long irq_flags;
+@@ -213,6 +212,17 @@ static int nx_xcbc_update(struct shash_desc *desc,
+ 	max_sg_len = min_t(u64, max_sg_len,
+ 				nx_ctx->ap->databytelen/NX_PAGE_SIZE);
+ 
++	data_len = AES_BLOCK_SIZE;
++	out_sg = nx_build_sg_list(nx_ctx->out_sg, (u8 *)sctx->state,
++				  &len, nx_ctx->ap->sglen);
 +
- ALPHA PORT
- M:	Richard Henderson <rth-hL46jP5Bxq7R7s880joybQ@public.gmane.org>
- M:	Ivan Kokshaysky <ink-biIs/Y0ymYJMZLIVYojuPNP0rXTJTi09@public.gmane.org>
++	if (data_len != AES_BLOCK_SIZE) {
++		rc = -EINVAL;
++		goto out;
++	}
++
++	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
++
+ 	do {
+ 		to_process = total - to_process;
+ 		to_process = to_process & ~(AES_BLOCK_SIZE - 1);
+@@ -235,8 +245,10 @@ static int nx_xcbc_update(struct shash_desc *desc,
+ 						(u8 *) sctx->buffer,
+ 						&data_len,
+ 						max_sg_len);
+-			if (data_len != sctx->count)
+-				return -EINVAL;
++			if (data_len != sctx->count) {
++				rc = -EINVAL;
++				goto out;
++			}
+ 		}
+ 
+ 		data_len = to_process - sctx->count;
+@@ -245,8 +257,10 @@ static int nx_xcbc_update(struct shash_desc *desc,
+ 					&data_len,
+ 					max_sg_len);
+ 
+-		if (data_len != to_process - sctx->count)
+-			return -EINVAL;
++		if (data_len != to_process - sctx->count) {
++			rc = -EINVAL;
++			goto out;
++		}
+ 
+ 		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) *
+ 					sizeof(struct nx_sg);
+@@ -325,15 +339,19 @@ static int nx_xcbc_final(struct shash_desc *desc, u8 *out)
+ 	in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *)sctx->buffer,
+ 				 &len, nx_ctx->ap->sglen);
+ 
+-	if (len != sctx->count)
+-		return -EINVAL;
++	if (len != sctx->count) {
++		rc = -EINVAL;
++		goto out;
++	}
+ 
+ 	len = AES_BLOCK_SIZE;
+ 	out_sg = nx_build_sg_list(nx_ctx->out_sg, out, &len,
+ 				  nx_ctx->ap->sglen);
+ 
+-	if (len != AES_BLOCK_SIZE)
+-		return -EINVAL;
++	if (len != AES_BLOCK_SIZE) {
++		rc = -EINVAL;
++		goto out;
++	}
+ 
+ 	nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) * sizeof(struct nx_sg);
+ 	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
+@@ -372,7 +390,7 @@ struct shash_alg nx_shash_aes_xcbc_alg = {
+ 		.cra_blocksize   = AES_BLOCK_SIZE,
+ 		.cra_module      = THIS_MODULE,
+ 		.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
+-		.cra_init        = nx_crypto_ctx_aes_xcbc_init,
++		.cra_init        = nx_crypto_ctx_aes_xcbc_init2,
+ 		.cra_exit        = nx_crypto_ctx_exit,
+ 	}
+ };
+diff --git a/drivers/crypto/nx/nx-sha256.c b/drivers/crypto/nx/nx-sha256.c
+index 4e91bdb..08f8d5c 100644
+--- a/drivers/crypto/nx/nx-sha256.c
++++ b/drivers/crypto/nx/nx-sha256.c
+@@ -29,34 +29,28 @@
+ #include "nx.h"
+ 
+ 
+-static int nx_sha256_init(struct shash_desc *desc)
++static int nx_crypto_ctx_sha256_init(struct crypto_tfm *tfm)
+ {
+-	struct sha256_state *sctx = shash_desc_ctx(desc);
+-	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
+-	struct nx_sg *out_sg;
+-	int len;
+-	u32 max_sg_len;
++	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
++	int err;
+ 
+-	nx_ctx_init(nx_ctx, HCOP_FC_SHA);
++	err = nx_crypto_ctx_sha_init(tfm);
++	if (err)
++		return err;
+ 
+-	memset(sctx, 0, sizeof *sctx);
++	nx_ctx_init(nx_ctx, HCOP_FC_SHA);
+ 
+ 	nx_ctx->ap = &nx_ctx->props[NX_PROPS_SHA256];
+ 
+ 	NX_CPB_SET_DIGEST_SIZE(nx_ctx->csbcpb, NX_DS_SHA256);
+ 
+-	max_sg_len = min_t(u64, nx_ctx->ap->sglen,
+-			nx_driver.of.max_sg_len/sizeof(struct nx_sg));
+-	max_sg_len = min_t(u64, max_sg_len,
+-			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
++	return 0;
++}
+ 
+-	len = SHA256_DIGEST_SIZE;
+-	out_sg = nx_build_sg_list(nx_ctx->out_sg, (u8 *)sctx->state,
+-				  &len, max_sg_len);
+-	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
++static int nx_sha256_init(struct shash_desc *desc) {
++	struct sha256_state *sctx = shash_desc_ctx(desc);
+ 
+-	if (len != SHA256_DIGEST_SIZE)
+-		return -EINVAL;
++	memset(sctx, 0, sizeof *sctx);
+ 
+ 	sctx->state[0] = __cpu_to_be32(SHA256_H0);
+ 	sctx->state[1] = __cpu_to_be32(SHA256_H1);
+@@ -78,6 +72,7 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
+ 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
+ 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
+ 	struct nx_sg *in_sg;
++	struct nx_sg *out_sg;
+ 	u64 to_process = 0, leftover, total;
+ 	unsigned long irq_flags;
+ 	int rc = 0;
+@@ -108,6 +103,16 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
+ 	max_sg_len = min_t(u64, max_sg_len,
+ 			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
+ 
++	data_len = SHA256_DIGEST_SIZE;
++	out_sg = nx_build_sg_list(nx_ctx->out_sg, (u8 *)sctx->state,
++				  &data_len, max_sg_len);
++	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
++
++	if (data_len != SHA256_DIGEST_SIZE) {
++		rc = -EINVAL;
++		goto out;
++	}
++
+ 	do {
+ 		/*
+ 		 * to_process: the SHA256_BLOCK_SIZE data chunk to process in
+@@ -282,7 +287,7 @@ struct shash_alg nx_shash_sha256_alg = {
+ 		.cra_blocksize   = SHA256_BLOCK_SIZE,
+ 		.cra_module      = THIS_MODULE,
+ 		.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
+-		.cra_init        = nx_crypto_ctx_sha_init,
++		.cra_init        = nx_crypto_ctx_sha256_init,
+ 		.cra_exit        = nx_crypto_ctx_exit,
+ 	}
+ };
+diff --git a/drivers/crypto/nx/nx-sha512.c b/drivers/crypto/nx/nx-sha512.c
+index e6a58d2..aff0fe5 100644
+--- a/drivers/crypto/nx/nx-sha512.c
++++ b/drivers/crypto/nx/nx-sha512.c
+@@ -28,34 +28,29 @@
+ #include "nx.h"
+ 
+ 
+-static int nx_sha512_init(struct shash_desc *desc)
++static int nx_crypto_ctx_sha512_init(struct crypto_tfm *tfm)
+ {
+-	struct sha512_state *sctx = shash_desc_ctx(desc);
+-	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
+-	struct nx_sg *out_sg;
+-	int len;
+-	u32 max_sg_len;
++	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
++	int err;
+ 
+-	nx_ctx_init(nx_ctx, HCOP_FC_SHA);
++	err = nx_crypto_ctx_sha_init(tfm);
++	if (err)
++		return err;
+ 
+-	memset(sctx, 0, sizeof *sctx);
++	nx_ctx_init(nx_ctx, HCOP_FC_SHA);
+ 
+ 	nx_ctx->ap = &nx_ctx->props[NX_PROPS_SHA512];
+ 
+ 	NX_CPB_SET_DIGEST_SIZE(nx_ctx->csbcpb, NX_DS_SHA512);
+ 
+-	max_sg_len = min_t(u64, nx_ctx->ap->sglen,
+-			nx_driver.of.max_sg_len/sizeof(struct nx_sg));
+-	max_sg_len = min_t(u64, max_sg_len,
+-			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
++	return 0;
++}
+ 
+-	len = SHA512_DIGEST_SIZE;
+-	out_sg = nx_build_sg_list(nx_ctx->out_sg, (u8 *)sctx->state,
+-				  &len, max_sg_len);
+-	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
++static int nx_sha512_init(struct shash_desc *desc)
++{
++	struct sha512_state *sctx = shash_desc_ctx(desc);
+ 
+-	if (len != SHA512_DIGEST_SIZE)
+-		return -EINVAL;
++	memset(sctx, 0, sizeof *sctx);
+ 
+ 	sctx->state[0] = __cpu_to_be64(SHA512_H0);
+ 	sctx->state[1] = __cpu_to_be64(SHA512_H1);
+@@ -77,6 +72,7 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
+ 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
+ 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
+ 	struct nx_sg *in_sg;
++	struct nx_sg *out_sg;
+ 	u64 to_process, leftover = 0, total;
+ 	unsigned long irq_flags;
+ 	int rc = 0;
+@@ -107,6 +103,16 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
+ 	max_sg_len = min_t(u64, max_sg_len,
+ 			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
+ 
++	data_len = SHA512_DIGEST_SIZE;
++	out_sg = nx_build_sg_list(nx_ctx->out_sg, (u8 *)sctx->state,
++				  &data_len, max_sg_len);
++	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
++
++	if (data_len != SHA512_DIGEST_SIZE) {
++		rc = -EINVAL;
++		goto out;
++	}
++
+ 	do {
+ 		/*
+ 		 * to_process: the SHA512_BLOCK_SIZE data chunk to process in
+@@ -288,7 +294,7 @@ struct shash_alg nx_shash_sha512_alg = {
+ 		.cra_blocksize   = SHA512_BLOCK_SIZE,
+ 		.cra_module      = THIS_MODULE,
+ 		.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
+-		.cra_init        = nx_crypto_ctx_sha_init,
++		.cra_init        = nx_crypto_ctx_sha512_init,
+ 		.cra_exit        = nx_crypto_ctx_exit,
+ 	}
+ };
+diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
+index f6198f2..4369713 100644
+--- a/drivers/crypto/nx/nx.c
++++ b/drivers/crypto/nx/nx.c
+@@ -713,12 +713,15 @@ static int nx_crypto_ctx_init(struct nx_crypto_ctx *nx_ctx, u32 fc, u32 mode)
+ /* entry points from the crypto tfm initializers */
+ int nx_crypto_ctx_aes_ccm_init(struct crypto_tfm *tfm)
+ {
++	crypto_aead_set_reqsize(__crypto_aead_cast(tfm),
++				sizeof(struct nx_ccm_rctx));
+ 	return nx_crypto_ctx_init(crypto_tfm_ctx(tfm), NX_FC_AES,
+ 				  NX_MODE_AES_CCM);
+ }
+ 
+ int nx_crypto_ctx_aes_gcm_init(struct crypto_aead *tfm)
+ {
++	crypto_aead_set_reqsize(tfm, sizeof(struct nx_gcm_rctx));
+ 	return nx_crypto_ctx_init(crypto_aead_ctx(tfm), NX_FC_AES,
+ 				  NX_MODE_AES_GCM);
+ }
+diff --git a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
+index de3ea87..cdff03a 100644
+--- a/drivers/crypto/nx/nx.h
++++ b/drivers/crypto/nx/nx.h
+@@ -2,6 +2,8 @@
+ #ifndef __NX_H__
+ #define __NX_H__
+ 
++#include <crypto/ctr.h>
++
+ #define NX_NAME		"nx-crypto"
+ #define NX_STRING	"IBM Power7+ Nest Accelerator Crypto Driver"
+ #define NX_VERSION	"1.0"
+@@ -91,8 +93,11 @@ struct nx_crypto_driver {
+ 
+ #define NX_GCM4106_NONCE_LEN		(4)
+ #define NX_GCM_CTR_OFFSET		(12)
+-struct nx_gcm_priv {
++struct nx_gcm_rctx {
+ 	u8 iv[16];
++};
++
++struct nx_gcm_priv {
+ 	u8 iauth_tag[16];
+ 	u8 nonce[NX_GCM4106_NONCE_LEN];
+ };
+@@ -100,8 +105,11 @@ struct nx_gcm_priv {
+ #define NX_CCM_AES_KEY_LEN		(16)
+ #define NX_CCM4309_AES_KEY_LEN		(19)
+ #define NX_CCM4309_NONCE_LEN		(3)
+-struct nx_ccm_priv {
++struct nx_ccm_rctx {
+ 	u8 iv[16];
++};
++
++struct nx_ccm_priv {
+ 	u8 b0[16];
+ 	u8 iauth_tag[16];
+ 	u8 oauth_tag[16];
+@@ -113,7 +121,7 @@ struct nx_xcbc_priv {
+ };
+ 
+ struct nx_ctr_priv {
+-	u8 iv[16];
++	u8 nonce[CTR_RFC3686_NONCE_SIZE];
+ };
+ 
+ struct nx_crypto_ctx {
 -- 
-2.3.6
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
