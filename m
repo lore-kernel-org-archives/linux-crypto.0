@@ -1,29 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: testmgr - add a chunking test for cbc(aes)
-Date: Tue, 7 Jul 2015 22:00:41 +0800
-Message-ID: <20150707140041.GA3302@gondor.apana.org.au>
-References: <1436182653-32683-1-git-send-email-clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH v2] crypto/nx-842-{powerpc,pseries}: reduce chattiness of
+ platform drivers
+Date: Tue, 7 Jul 2015 22:01:37 +0800
+Message-ID: <20150707140137.GA3351@gondor.apana.org.au>
+References: <20150702223800.GA1712@linux.vnet.ibm.com>
+ <20150702224049.GE1712@linux.vnet.ibm.com>
+ <1435887032.3665.1.camel@ellerman.id.au>
+ <20150706170621.GA3578@linux.vnet.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Cc: Michael Ellerman <mpe@ellerman.id.au>,
+	Dan Streetman <ddstreet@us.ibm.com>,
+	linux-crypto@vger.kernel.org, gustavold@linux.vnet.ibm.com,
+	linuxppc-dev@lists.ozlabs.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:56853 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:52989 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757297AbbGGOAp (ORCPT
+	with ESMTP id S1756852AbbGGOBr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Jul 2015 10:00:45 -0400
+	Tue, 7 Jul 2015 10:01:47 -0400
 Content-Disposition: inline
-In-Reply-To: <1436182653-32683-1-git-send-email-clabbe.montjoie@gmail.com>
+In-Reply-To: <20150706170621.GA3578@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 06, 2015 at 01:37:33PM +0200, LABBE Corentin wrote:
-> All tests for cbc(aes) use only blocks of data with a multiple of 4.
-> This test adds a test with some odd SG size.
-> 
-> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+On Mon, Jul 06, 2015 at 10:06:21AM -0700, Nishanth Aravamudan wrote:
+>
+> v2:
+>   Rather than not loading, just reduce the verbosity
 
 Applied.
 -- 
