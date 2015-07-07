@@ -1,64 +1,92 @@
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH v2] crypto/nx-842-{powerpc,pseries}: reduce chattiness
- of platform drivers
-Date: Tue, 07 Jul 2015 19:36:21 +1000
-Message-ID: <1436261781.15289.2.camel@ellerman.id.au>
-References: <20150702223800.GA1712@linux.vnet.ibm.com>
-	 <20150702224049.GE1712@linux.vnet.ibm.com>
-	 <1435887032.3665.1.camel@ellerman.id.au>
-	 <20150706170621.GA3578@linux.vnet.ibm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v10 4/5] crypto: Add Allwinner Security System crypto
+ accelerator
+Date: Tue, 7 Jul 2015 21:49:36 +0800
+Message-ID: <20150707134936.GA2958@gondor.apana.org.au>
+References: <1436209848-16530-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1436209848-16530-5-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Dan Streetman <ddstreet@us.ibm.com>, linux-crypto@vger.kernel.org,
-	gustavold@linux.vnet.ibm.com, linuxppc-dev@lists.ozlabs.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:52796 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756672AbbGGJg3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Jul 2015 05:36:29 -0400
-In-Reply-To: <20150706170621.GA3578@linux.vnet.ibm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: robh+dt@kernel.org, pawel.moll@arm.com, mark.rutland@arm.com,
+	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
+	maxime.ripard@free-electrons.com, linux@arm.linux.org.uk,
+	davem@davemloft.net, akpm@linux-foundation.org,
+	gregkh@linuxfoundation.org, mchehab@osg.samsung.com, arnd@arndb.de,
+	joe@perches.com, devicetree@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-sunxi@googlegroups.com
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Return-path: <linux-doc-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1436209848-16530-5-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, 2015-07-06 at 10:06 -0700, Nishanth Aravamudan wrote:
-> On 03.07.2015 [11:30:32 +1000], Michael Ellerman wrote:
-> > On Thu, 2015-07-02 at 15:40 -0700, Nishanth Aravamudan wrote:
-> > > While we never would successfully load on the wrong machine type, there
-> > > is extra output by default regardless of machine type.
-> > > 
-> 
-> Thanks Michael!
+On Mon, Jul 06, 2015 at 09:10:47PM +0200, LABBE Corentin wrote:
+>
+> +int sun4i_hash_init(struct ahash_request *areq)
+> +{
+> +	const char *hash_type;
+> +	struct sun4i_req_ctx *op = ahash_request_ctx(areq);
+> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+> +	struct ahash_alg *alg = __crypto_ahash_alg(tfm->base.__crt_alg);
+> +	struct sun4i_ss_alg_template *algt;
+> +	struct sun4i_ss_ctx *ss;
+> +
+> +	memset(op, 0, sizeof(struct sun4i_req_ctx));
+> +
+> +	algt = container_of(alg, struct sun4i_ss_alg_template, alg.hash);
+> +	ss = algt->ss;
+> +	op->ss = algt->ss;
+> +
+> +	hash_type = crypto_tfm_alg_name(areq->base.tfm);
+> +
+> +	if (strcmp(hash_type, "sha1") == 0)
+> +		op->mode = SS_OP_SHA1;
+> +	else if (strcmp(hash_type, "md5") == 0)
+> +		op->mode = SS_OP_MD5;
 
-Thanks for cleaning it up.
+Please store these modes in algt and then you wouldn't need to do
+the strcmp.
 
+> +int sun4i_hash_import_md5(struct ahash_request *areq, const void *in)
+> +{
+> +	struct sun4i_req_ctx *op = ahash_request_ctx(areq);
+> +	const struct md5_state *ictx = in;
+> +	int i;
 
-> While we never would successfully load on the wrong machine type, there
-> is extra output by default regardless of machine type.
-> 
-> For instance, on a PowerVM LPAR, we see the following:
-> 
-> nx_compress_powernv: loading
-> nx_compress_powernv: no coprocessors found
-> 
-> even though those coprocessors could never be found.
-> 
-> Signed-off-by: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
-> Cc: Dan Streetman <ddstreet@us.ibm.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linuxppc-dev@lists.ozlabs.org
-> 
-> ---
-> v2:
->   Rather than not loading, just reduce the verbosity
+You need to initialise op->ss here.  Ditto for SHA.
 
-Acked-by: Michael Ellerman <mpe@ellerman.id.au>
+> +	/* get the partial hash only if something was written */
+> +	if (op->mode == SS_OP_SHA1) {
+> +		for (i = 0; i < 5; i++)
+> +			op->hash[i] = readl(ss->base + SS_MD0 + i * 4);
+> +	} else {
+> +		for (i = 0; i < 4; i++)
+> +			op->hash[i] = readl(ss->base + SS_MD0 + i * 4);
+> +	}
 
-I'm assuming Herbert will take this.
+You can avoid the op->mode check by storing the hash size in algt.
 
-cheers
+> +int sun4i_hash_finup(struct ahash_request *areq)
+> +{
+> +	int err;
+> +
+> +	err = sun4i_hash_update(areq);
+> +	if (err != 0)
+> +		return err;
+> +
+> +	return sun4i_hash_final(areq);
+
+You can drop finup since the API provides a default finup that's
+exactly the same as this.  You only need to provide finup if it
+can optimise on this.
+
+Ditto for digest.
+ 
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
