@@ -1,50 +1,167 @@
-From: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
-Subject: Re: crypto: nx - Fix reentrancy bugs
-Date: Tue, 7 Jul 2015 15:48:37 -0300
-Message-ID: <20150707184837.GA9341@bluepex.com>
-References: <20150707093025.GA31368@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Fionnuala Gunter <fin@linux.vnet.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Martin Willi <martin@strongswan.org>
+Subject: [PATCH 02/10] crypto: chacha20 - Export common ChaCha20 helpers
+Date: Tue,  7 Jul 2015 21:36:48 +0200
+Message-ID: <1436297816-16414-3-git-send-email-martin@strongswan.org>
+References: <1436297816-16414-1-git-send-email-martin@strongswan.org>
+Cc: x86@kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp01.br.ibm.com ([32.104.18.85]:37284 "EHLO
-	e24smtp01.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S934263AbbGGSso (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Jul 2015 14:48:44 -0400
-Received: from /spool/local
-	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
-	Tue, 7 Jul 2015 15:48:42 -0300
-Received: from d24relay03.br.ibm.com (d24relay03.br.ibm.com [9.13.184.25])
-	by d24dlp02.br.ibm.com (Postfix) with ESMTP id 7E8B01DC0057
-	for <linux-crypto@vger.kernel.org>; Tue,  7 Jul 2015 14:47:38 -0400 (EDT)
-Received: from d24av01.br.ibm.com (d24av01.br.ibm.com [9.8.31.91])
-	by d24relay03.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id t67IlLPw57671824
-	for <linux-crypto@vger.kernel.org>; Tue, 7 Jul 2015 15:47:21 -0300
-Received: from d24av01.br.ibm.com (localhost [127.0.0.1])
-	by d24av01.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id t67ImbVB000618
-	for <linux-crypto@vger.kernel.org>; Tue, 7 Jul 2015 15:48:38 -0300
-Content-Disposition: inline
-In-Reply-To: <20150707093025.GA31368@gondor.apana.org.au>
+Received: from revosec.ch ([5.148.177.19]:44662 "EHLO revosec.ch"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933244AbbGGThU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 7 Jul 2015 15:37:20 -0400
+In-Reply-To: <1436297816-16414-1-git-send-email-martin@strongswan.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 07, 2015 at 05:30:25PM +0800, Herbert Xu wrote:
-> The crypto API allows a single transform to be used by multiple
-> threads simultaneously.  For example, IPsec will use a single tfm
-> to process packets for a given SA.  As packets may arrive on
-> multiple CPUs that tfm must be reentrant.
-> 
-> The nx driver does try to deal with this by using a spin lock.
-> Unfortunately only the basic AES/CBC/ECB algorithms do this in
-> the correct way.
-> 
-> The symptom of these bugs may range from the generation of incorrect
-> output to memory corruption.
+As architecture specific drivers need a software fallback, export a
+ChaCha20 en-/decryption function together with some helpers in a header
+file.
 
-Is this related with the issue in CTR ouput test#4 too?
+Signed-off-by: Martin Willi <martin@strongswan.org>
+---
+ crypto/chacha20_generic.c | 28 ++++++++++++----------------
+ crypto/chacha20poly1305.c |  3 +--
+ include/crypto/chacha20.h | 25 +++++++++++++++++++++++++
+ 3 files changed, 38 insertions(+), 18 deletions(-)
+ create mode 100644 include/crypto/chacha20.h
 
-Thanks!
+diff --git a/crypto/chacha20_generic.c b/crypto/chacha20_generic.c
+index fa42e70..da9c899 100644
+--- a/crypto/chacha20_generic.c
++++ b/crypto/chacha20_generic.c
+@@ -13,14 +13,7 @@
+ #include <linux/crypto.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+-
+-#define CHACHA20_NONCE_SIZE 16
+-#define CHACHA20_KEY_SIZE   32
+-#define CHACHA20_BLOCK_SIZE 64
+-
+-struct chacha20_ctx {
+-	u32 key[8];
+-};
++#include <crypto/chacha20.h>
+ 
+ static inline u32 rotl32(u32 v, u8 n)
+ {
+@@ -108,7 +101,7 @@ static void chacha20_docrypt(u32 *state, u8 *dst, const u8 *src,
+ 	}
+ }
+ 
+-static void chacha20_init(u32 *state, struct chacha20_ctx *ctx, u8 *iv)
++void crypto_chacha20_init(u32 *state, struct chacha20_ctx *ctx, u8 *iv)
+ {
+ 	static const char constant[16] = "expand 32-byte k";
+ 
+@@ -129,8 +122,9 @@ static void chacha20_init(u32 *state, struct chacha20_ctx *ctx, u8 *iv)
+ 	state[14] = le32_to_cpuvp(iv +  8);
+ 	state[15] = le32_to_cpuvp(iv + 12);
+ }
++EXPORT_SYMBOL_GPL(crypto_chacha20_init);
+ 
+-static int chacha20_setkey(struct crypto_tfm *tfm, const u8 *key,
++int crypto_chacha20_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 			   unsigned int keysize)
+ {
+ 	struct chacha20_ctx *ctx = crypto_tfm_ctx(tfm);
+@@ -144,8 +138,9 @@ static int chacha20_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(crypto_chacha20_setkey);
+ 
+-static int chacha20_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++int crypto_chacha20_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
+ 			  struct scatterlist *src, unsigned int nbytes)
+ {
+ 	struct blkcipher_walk walk;
+@@ -155,7 +150,7 @@ static int chacha20_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
+ 	blkcipher_walk_init(&walk, dst, src, nbytes);
+ 	err = blkcipher_walk_virt_block(desc, &walk, CHACHA20_BLOCK_SIZE);
+ 
+-	chacha20_init(state, crypto_blkcipher_ctx(desc->tfm), walk.iv);
++	crypto_chacha20_init(state, crypto_blkcipher_ctx(desc->tfm), walk.iv);
+ 
+ 	while (walk.nbytes >= CHACHA20_BLOCK_SIZE) {
+ 		chacha20_docrypt(state, walk.dst.virt.addr, walk.src.virt.addr,
+@@ -172,6 +167,7 @@ static int chacha20_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
+ 
+ 	return err;
+ }
++EXPORT_SYMBOL_GPL(crypto_chacha20_crypt);
+ 
+ static struct crypto_alg alg = {
+ 	.cra_name		= "chacha20",
+@@ -187,11 +183,11 @@ static struct crypto_alg alg = {
+ 		.blkcipher = {
+ 			.min_keysize	= CHACHA20_KEY_SIZE,
+ 			.max_keysize	= CHACHA20_KEY_SIZE,
+-			.ivsize		= CHACHA20_NONCE_SIZE,
++			.ivsize		= CHACHA20_IV_SIZE,
+ 			.geniv		= "seqiv",
+-			.setkey		= chacha20_setkey,
+-			.encrypt	= chacha20_crypt,
+-			.decrypt	= chacha20_crypt,
++			.setkey		= crypto_chacha20_setkey,
++			.encrypt	= crypto_chacha20_crypt,
++			.decrypt	= crypto_chacha20_crypt,
+ 		},
+ 	},
+ };
+diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
+index 7b46ed7..c9a36a9 100644
+--- a/crypto/chacha20poly1305.c
++++ b/crypto/chacha20poly1305.c
+@@ -13,6 +13,7 @@
+ #include <crypto/internal/hash.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
++#include <crypto/chacha20.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+@@ -23,8 +24,6 @@
+ #define POLY1305_BLOCK_SIZE	16
+ #define POLY1305_DIGEST_SIZE	16
+ #define POLY1305_KEY_SIZE	32
+-#define CHACHA20_KEY_SIZE	32
+-#define CHACHA20_IV_SIZE	16
+ #define CHACHAPOLY_IV_SIZE	12
+ 
+ struct chachapoly_instance_ctx {
+diff --git a/include/crypto/chacha20.h b/include/crypto/chacha20.h
+new file mode 100644
+index 0000000..274bbae
+--- /dev/null
++++ b/include/crypto/chacha20.h
+@@ -0,0 +1,25 @@
++/*
++ * Common values for the ChaCha20 algorithm
++ */
++
++#ifndef _CRYPTO_CHACHA20_H
++#define _CRYPTO_CHACHA20_H
++
++#include <linux/types.h>
++#include <linux/crypto.h>
++
++#define CHACHA20_IV_SIZE	16
++#define CHACHA20_KEY_SIZE	32
++#define CHACHA20_BLOCK_SIZE	64
++
++struct chacha20_ctx {
++	u32 key[8];
++};
++
++void crypto_chacha20_init(u32 *state, struct chacha20_ctx *ctx, u8 *iv);
++int crypto_chacha20_setkey(struct crypto_tfm *tfm, const u8 *key,
++			   unsigned int keysize);
++int crypto_chacha20_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++			  struct scatterlist *src, unsigned int nbytes);
++
++#endif
+-- 
+1.9.1
