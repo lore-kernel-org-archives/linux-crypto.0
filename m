@@ -1,70 +1,69 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: akcipher: continuous memory for input/output
-Date: Wed, 08 Jul 2015 17:54:35 +0200
-Message-ID: <3241575.xDOc5hzFrC@tauon.atsec.com>
-References: <4018710.nx8zEmrfD4@tauon.atsec.com> <20150708152932.GA23750@gondor.apana.org.au>
+From: Martin Willi <martin@strongswan.org>
+Subject: Re: [PATCH 00/10] crypto: x86_64 - Add SSE/AVX2 ChaCha20/Poly1305
+ ciphers
+Date: Wed, 08 Jul 2015 22:36:23 +0200
+Message-ID: <1436387783.2879.11.camel@martin>
+References: <1436297816-16414-1-git-send-email-martin@strongswan.org>
+	 <20150707221301.GB7655@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
-	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, x86@kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47924 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932574AbbGHPym (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Jul 2015 11:54:42 -0400
-In-Reply-To: <20150708152932.GA23750@gondor.apana.org.au>
+Received: from sitav-80046.hsr.ch ([152.96.80.46]:33473 "EHLO
+	mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S934094AbbGHUg0 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 Jul 2015 16:36:26 -0400
+In-Reply-To: <20150707221301.GB7655@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 8. Juli 2015, 23:29:32 schrieb Herbert Xu:
+Herbert,
 
-Hi Herbert,
+> Running the speed test with sec=1 makes no sense because it's
+> too short.  Please use sec=0 and count cycles instead.
 
->On Wed, Jul 08, 2015 at 05:27:15PM +0200, Stephan Mueller wrote:
->> But according to Tadeusz it may be viable to register hybrid asym ciphers
->> with the akcipher API. If there is a full blown hybrid asym cipher we have
->> to handle potentially large chunks of data. I am now wondering whether a
->> flat buffer still makes sense or whether the akcipher should be converted
->> to scatter lists as all the other cipher types.
->> 
->> If it shall stay as is, how would we be handling larger buffers?
->
->What is a hybrid cipher and why would we want to have it in the
->kernel?
+I get less constant numbers between different runs when using sec=0,
+hence I've used sec=1. Below are the numbers of "average" runs for the
+AEAD measuring cycles; I'll use cycles in the individual patch notes in
+a v2.
 
-Please consider the thread from June 25 between Tadeusz and me. With hybrid 
-cipher, I am referring to the asym + sym cipher combo to implement a "real" 
-complete asymmetric encryption/decryption. Or I am referring to the asym + 
-hash combo to implement a "real" signature generation/verification.
+Kind regards
+Martin
 
-Tadeusz' rsa.c implements the raw RSA modular exponentiation operation. But 
-that does not make a usable encryption or signature operation. For example, 
-the kernel module signature verification illustrates that very nicely:
+--
 
-mod_verify_sig():
-...
-	/* hash the code */
-        pks = mod_make_digest(ms.hash, mod, modlen);
-...
-	/* RSA verify the hash */
-	ret = verify_signature(key, pks);
+generic:
+testing speed of rfc7539esp(chacha20,poly1305) (rfc7539esp(chacha20-generic,poly1305-generic)) encryption
+test 0 (288 bit key, 16 byte blocks): 1 operation in 9444 cycles (16 bytes)
+test 1 (288 bit key, 64 byte blocks): 1 operation in 10692 cycles (64 bytes)
+test 2 (288 bit key, 256 byte blocks): 1 operation in 18299 cycles (256 bytes)
+test 3 (288 bit key, 512 byte blocks): 1 operation in 26952 cycles (512 bytes)
+test 4 (288 bit key, 1024 byte blocks): 1 operation in 48493 cycles (1024 bytes)
+test 5 (288 bit key, 2048 byte blocks): 1 operation in 83766 cycles (2048 bytes)
+test 6 (288 bit key, 4096 byte blocks): 1 operation in 150899 cycles (4096 bytes)
+test 7 (288 bit key, 8192 byte blocks): 1 operation in 296779 cycles (8192 bytes)
 
-What I am wondering is that whether such hybrid operation (hash+asym or 
-sym+asym) may be entirely implemented in hardware. If you tell me that this 
-will never be the case, I will stop asking and would be happy with the plain 
-buffer. :-)
+SSE2/SSSE3:
+testing speed of rfc7539esp(chacha20,poly1305) (rfc7539esp(chacha20-simd,poly1305-simd)) encryption
+test 0 (288 bit key, 16 byte blocks): 1 operation in 9814 cycles (16 bytes)
+test 1 (288 bit key, 64 byte blocks): 1 operation in 9998 cycles (64 bytes)
+test 2 (288 bit key, 256 byte blocks): 1 operation in 12442 cycles (256 bytes)
+test 3 (288 bit key, 512 byte blocks): 1 operation in 20321 cycles (512 bytes)
+test 4 (288 bit key, 1024 byte blocks): 1 operation in 21098 cycles (1024 bytes)
+test 5 (288 bit key, 2048 byte blocks): 1 operation in 33423 cycles (2048 bytes)
+test 6 (288 bit key, 4096 byte blocks): 1 operation in 55183 cycles (4096 bytes)
+test 7 (288 bit key, 8192 byte blocks): 1 operation in 102514 cycles (8192 bytes)
 
-But IIRC, there are systems out there which perform a full hybrid asym 
-operation. Without having checked in detail, I believe this is true for IBM 
-cryptoexpress or Cavium cards.
-
-
-The reason for having it in the kernel is what Tadeusz describes: the kernel 
-does not need asym operations. But the hardware is only accessible from kernel 
-space. With this, the kernel crypto API together with a yet to be written 
-AF_ALG akcipher would make the asym hardware available to user space.
-
-Ciao
-Stephan
+AVX2:
+testing speed of rfc7539esp(chacha20,poly1305) (rfc7539esp(chacha20-simd,poly1305-simd)) encryption
+test 0 (288 bit key, 16 byte blocks): 1 operation in 9883 cycles (16 bytes)
+test 1 (288 bit key, 64 byte blocks): 1 operation in 10891 cycles (64 bytes)
+test 2 (288 bit key, 256 byte blocks): 1 operation in 12467 cycles (256 bytes)
+test 3 (288 bit key, 512 byte blocks): 1 operation in 13538 cycles (512 bytes)
+test 4 (288 bit key, 1024 byte blocks): 1 operation in 16783 cycles (1024 bytes)
+test 5 (288 bit key, 2048 byte blocks): 1 operation in 23161 cycles (2048 bytes)
+test 6 (288 bit key, 4096 byte blocks): 1 operation in 37359 cycles (4096 bytes)
+test 7 (288 bit key, 8192 byte blocks): 1 operation in 64670 cycles (8192 bytes)
