@@ -1,130 +1,152 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 6/14] crypto: seqiv - Replace seqniv with seqiv
-Date: Thu, 09 Jul 2015 07:17:22 +0800
-Message-ID: <E1ZCyag-0007Yp-Cl@gondolin.me.apana.org.au>
+Subject: [PATCH 10/14] crypto: aesni - Use new IV convention
+Date: Thu, 09 Jul 2015 07:17:28 +0800
+Message-ID: <E1ZCyam-0007Zw-BA@gondolin.me.apana.org.au>
 References: <20150708231330.GA28797@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60478 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:42777 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752479AbbGHXR0 (ORCPT
+	with ESMTP id S1752890AbbGHXRc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Jul 2015 19:17:26 -0400
+	Wed, 8 Jul 2015 19:17:32 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1ZCyah-0005EX-4f
-	for <linux-crypto@vger.kernel.org>; Thu, 09 Jul 2015 09:17:23 +1000
+	id 1ZCyan-0005GM-C8
+	for <linux-crypto@vger.kernel.org>; Thu, 09 Jul 2015 09:17:29 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch replaces the seqniv generator with seqiv when the
-underlying algorithm understands the new calling convention.
-
-This not only makes more sense as now seqiv is solely responsible
-for IV generation rather than also determining how the IV is going
-to be used, it also allows for optimisations in the underlying
-implementation.  For example, the space for the IV could be used
-to add padding for authentication.
-
-This patch also removes the unnecessary copying of IV to dst
-during seqiv decryption as the IV is part of the AD and not cipher
-text.
+This patch converts rfc4106 to the new calling convention where
+the IV is now in the AD and needs to be skipped.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/seqiv.c |   34 +++++++++++++++++++---------------
- 1 file changed, 19 insertions(+), 15 deletions(-)
+ arch/x86/crypto/aesni-intel_glue.c |   56 +++++++++++++------------------------
+ 1 file changed, 20 insertions(+), 36 deletions(-)
 
-diff --git a/crypto/seqiv.c b/crypto/seqiv.c
-index 122c56e..45d0563 100644
---- a/crypto/seqiv.c
-+++ b/crypto/seqiv.c
-@@ -467,9 +467,6 @@ static int seqiv_aead_decrypt(struct aead_request *req)
- 	aead_request_set_ad(subreq, req->assoclen + ivsize);
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index dccad38..2347ef0 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -803,10 +803,7 @@ static int rfc4106_init(struct crypto_aead *aead)
+ 		return PTR_ERR(cryptd_tfm);
  
- 	scatterwalk_map_and_copy(req->iv, req->src, req->assoclen, ivsize, 0);
--	if (req->src != req->dst)
--		scatterwalk_map_and_copy(req->iv, req->dst,
--					 req->assoclen, ivsize, 1);
- 
- 	return crypto_aead_decrypt(subreq);
- }
-@@ -516,9 +513,9 @@ static int seqiv_old_aead_init(struct crypto_tfm *tfm)
- 	return err ?: aead_geniv_init(tfm);
+ 	*ctx = cryptd_tfm;
+-	crypto_aead_set_reqsize(
+-		aead,
+-		sizeof(struct aead_request) +
+-		crypto_aead_reqsize(&cryptd_tfm->base));
++	crypto_aead_set_reqsize(aead, crypto_aead_reqsize(&cryptd_tfm->base));
+ 	return 0;
  }
  
--static int seqiv_aead_init_common(struct crypto_tfm *tfm, unsigned int reqsize)
-+static int seqiv_aead_init_common(struct crypto_aead *geniv,
-+				  unsigned int reqsize)
- {
--	struct crypto_aead *geniv = __crypto_aead_cast(tfm);
- 	struct seqiv_aead_ctx *ctx = crypto_aead_ctx(geniv);
- 	int err;
+@@ -955,8 +952,8 @@ static int helper_rfc4106_encrypt(struct aead_request *req)
  
-@@ -541,7 +538,7 @@ static int seqiv_aead_init_common(struct crypto_tfm *tfm, unsigned int reqsize)
- 	if (IS_ERR(ctx->null))
- 		goto out;
+ 	/* Assuming we are supporting rfc4106 64-bit extended */
+ 	/* sequence numbers We need to have the AAD length equal */
+-	/* to 8 or 12 bytes */
+-	if (unlikely(req->assoclen != 8 && req->assoclen != 12))
++	/* to 16 or 20 bytes */
++	if (unlikely(req->assoclen != 16 && req->assoclen != 20))
+ 		return -EINVAL;
  
--	err = aead_geniv_init(tfm);
-+	err = aead_geniv_init(crypto_aead_tfm(geniv));
- 	if (err)
- 		goto drop_null;
+ 	/* IV below built */
+@@ -992,9 +989,9 @@ static int helper_rfc4106_encrypt(struct aead_request *req)
+ 	}
  
-@@ -556,19 +553,19 @@ drop_null:
- 	goto out;
+ 	kernel_fpu_begin();
+-	aesni_gcm_enc_tfm(aes_ctx, dst, src, (unsigned long)req->cryptlen, iv,
+-		ctx->hash_subkey, assoc, (unsigned long)req->assoclen, dst
+-		+ ((unsigned long)req->cryptlen), auth_tag_len);
++	aesni_gcm_enc_tfm(aes_ctx, dst, src, req->cryptlen, iv,
++			  ctx->hash_subkey, assoc, req->assoclen - 8,
++			  dst + req->cryptlen, auth_tag_len);
+ 	kernel_fpu_end();
+ 
+ 	/* The authTag (aka the Integrity Check Value) needs to be written
+@@ -1033,12 +1030,12 @@ static int helper_rfc4106_decrypt(struct aead_request *req)
+ 	struct scatter_walk dst_sg_walk;
+ 	unsigned int i;
+ 
+-	if (unlikely(req->assoclen != 8 && req->assoclen != 12))
++	if (unlikely(req->assoclen != 16 && req->assoclen != 20))
+ 		return -EINVAL;
+ 
+ 	/* Assuming we are supporting rfc4106 64-bit extended */
+ 	/* sequence numbers We need to have the AAD length */
+-	/* equal to 8 or 12 bytes */
++	/* equal to 16 or 20 bytes */
+ 
+ 	tempCipherLen = (unsigned long)(req->cryptlen - auth_tag_len);
+ 	/* IV below built */
+@@ -1075,8 +1072,8 @@ static int helper_rfc4106_decrypt(struct aead_request *req)
+ 
+ 	kernel_fpu_begin();
+ 	aesni_gcm_dec_tfm(aes_ctx, dst, src, tempCipherLen, iv,
+-		ctx->hash_subkey, assoc, (unsigned long)req->assoclen,
+-		authTag, auth_tag_len);
++			  ctx->hash_subkey, assoc, req->assoclen - 8,
++			  authTag, auth_tag_len);
+ 	kernel_fpu_end();
+ 
+ 	/* Compare generated tag with passed in tag. */
+@@ -1105,19 +1102,12 @@ static int rfc4106_encrypt(struct aead_request *req)
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	struct cryptd_aead **ctx = crypto_aead_ctx(tfm);
+ 	struct cryptd_aead *cryptd_tfm = *ctx;
+-	struct aead_request *subreq = aead_request_ctx(req);
+ 
+-	aead_request_set_tfm(subreq, irq_fpu_usable() ?
+-				     cryptd_aead_child(cryptd_tfm) :
+-				     &cryptd_tfm->base);
++	aead_request_set_tfm(req, irq_fpu_usable() ?
++				  cryptd_aead_child(cryptd_tfm) :
++				  &cryptd_tfm->base);
+ 
+-	aead_request_set_callback(subreq, req->base.flags,
+-				  req->base.complete, req->base.data);
+-	aead_request_set_crypt(subreq, req->src, req->dst,
+-			       req->cryptlen, req->iv);
+-	aead_request_set_ad(subreq, req->assoclen);
+-
+-	return crypto_aead_encrypt(subreq);
++	return crypto_aead_encrypt(req);
  }
  
--static int seqiv_aead_init(struct crypto_tfm *tfm)
-+static int seqiv_aead_init(struct crypto_aead *tfm)
- {
- 	return seqiv_aead_init_common(tfm, sizeof(struct aead_request));
+ static int rfc4106_decrypt(struct aead_request *req)
+@@ -1125,19 +1115,12 @@ static int rfc4106_decrypt(struct aead_request *req)
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	struct cryptd_aead **ctx = crypto_aead_ctx(tfm);
+ 	struct cryptd_aead *cryptd_tfm = *ctx;
+-	struct aead_request *subreq = aead_request_ctx(req);
+-
+-	aead_request_set_tfm(subreq, irq_fpu_usable() ?
+-				     cryptd_aead_child(cryptd_tfm) :
+-				     &cryptd_tfm->base);
+ 
+-	aead_request_set_callback(subreq, req->base.flags,
+-				  req->base.complete, req->base.data);
+-	aead_request_set_crypt(subreq, req->src, req->dst,
+-			       req->cryptlen, req->iv);
+-	aead_request_set_ad(subreq, req->assoclen);
++	aead_request_set_tfm(req, irq_fpu_usable() ?
++				  cryptd_aead_child(cryptd_tfm) :
++				  &cryptd_tfm->base);
+ 
+-	return crypto_aead_decrypt(subreq);
++	return crypto_aead_decrypt(req);
  }
+ #endif
  
--static int seqniv_aead_init(struct crypto_tfm *tfm)
-+static int seqniv_aead_init(struct crypto_aead *tfm)
- {
- 	return seqiv_aead_init_common(tfm, sizeof(struct seqniv_request_ctx));
- }
- 
--static void seqiv_aead_exit(struct crypto_tfm *tfm)
-+static void seqiv_aead_exit(struct crypto_aead *tfm)
- {
--	struct seqiv_aead_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct seqiv_aead_ctx *ctx = crypto_aead_ctx(tfm);
- 
- 	crypto_free_aead(ctx->geniv.child);
- 	crypto_put_default_null_skcipher();
-@@ -666,11 +663,11 @@ static int seqiv_aead_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.encrypt = seqiv_aead_encrypt;
- 	inst->alg.decrypt = seqiv_aead_decrypt;
- 
--	inst->alg.base.cra_init = seqiv_aead_init;
--	inst->alg.base.cra_exit = seqiv_aead_exit;
-+	inst->alg.init = seqiv_aead_init;
-+	inst->alg.exit = seqiv_aead_exit;
- 
- 	inst->alg.base.cra_ctxsize = sizeof(struct seqiv_aead_ctx);
--	inst->alg.base.cra_ctxsize += inst->alg.base.cra_aead.ivsize;
-+	inst->alg.base.cra_ctxsize += inst->alg.ivsize;
- 
- done:
- 	err = aead_register_instance(tmpl, inst);
-@@ -727,8 +724,15 @@ static int seqniv_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.encrypt = seqniv_aead_encrypt;
- 	inst->alg.decrypt = seqniv_aead_decrypt;
- 
--	inst->alg.base.cra_init = seqniv_aead_init;
--	inst->alg.base.cra_exit = seqiv_aead_exit;
-+	inst->alg.init = seqniv_aead_init;
-+	inst->alg.exit = seqiv_aead_exit;
-+
-+	if ((alg->base.cra_flags & CRYPTO_ALG_AEAD_NEW)) {
-+		inst->alg.encrypt = seqiv_aead_encrypt;
-+		inst->alg.decrypt = seqiv_aead_decrypt;
-+
-+		inst->alg.init = seqiv_aead_init;
-+	}
- 
- 	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
- 	inst->alg.base.cra_ctxsize = sizeof(struct seqiv_aead_ctx);
+@@ -1454,7 +1437,8 @@ static struct aead_alg aesni_aead_algs[] = { {
+ 		.cra_name		= "rfc4106(gcm(aes))",
+ 		.cra_driver_name	= "rfc4106-gcm-aesni",
+ 		.cra_priority		= 400,
+-		.cra_flags		= CRYPTO_ALG_ASYNC,
++		.cra_flags		= CRYPTO_ALG_ASYNC |
++					  CRYPTO_ALG_AEAD_NEW,
+ 		.cra_blocksize		= 1,
+ 		.cra_ctxsize		= sizeof(struct cryptd_aead *),
+ 		.cra_module		= THIS_MODULE,
