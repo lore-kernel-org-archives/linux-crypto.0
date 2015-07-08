@@ -1,8 +1,8 @@
 From: Lokesh Vutla <lokeshvutla@ti.com>
-Subject: Re: [PATCH v2 5/7] crypto: aead: Add aead_request_cast() api
-Date: Wed, 8 Jul 2015 12:13:25 +0530
-Message-ID: <559CC68D.9080800@ti.com>
-References: <1436283109-13318-1-git-send-email-lokeshvutla@ti.com> <1436283109-13318-6-git-send-email-lokeshvutla@ti.com> <20150708035652.GC12627@gondor.apana.org.au>
+Subject: Re: [PATCH v2 6/7] crypto: omap-aes: Add support for GCM mode
+Date: Wed, 8 Jul 2015 12:29:47 +0530
+Message-ID: <559CCA63.4080609@ti.com>
+References: <1436283109-13318-1-git-send-email-lokeshvutla@ti.com> <1436283109-13318-7-git-send-email-lokeshvutla@ti.com> <20150708041838.GA12744@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
@@ -11,43 +11,117 @@ Cc: <linux-crypto@vger.kernel.org>, <davem@davemloft.net>,
 	<t-kristo@ti.com>, <nsekhar@ti.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bear.ext.ti.com ([192.94.94.41]:57823 "EHLO bear.ext.ti.com"
+Received: from arroyo.ext.ti.com ([192.94.94.40]:47173 "EHLO arroyo.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932577AbbGHGq1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Jul 2015 02:46:27 -0400
-In-Reply-To: <20150708035652.GC12627@gondor.apana.org.au>
+	id S1754091AbbGHHCn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 Jul 2015 03:02:43 -0400
+In-Reply-To: <20150708041838.GA12744@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday 08 July 2015 09:26 AM, Herbert Xu wrote:
-> On Tue, Jul 07, 2015 at 09:01:47PM +0530, Lokesh Vutla wrote:
->> Add aead_request_cast() api to get pointer to aead_request
->> from cryto_async_request.
+On Wednesday 08 July 2015 09:48 AM, Herbert Xu wrote:
+> On Tue, Jul 07, 2015 at 09:01:48PM +0530, Lokesh Vutla wrote:
 >>
->> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
->> ---
->>  include/crypto/internal/aead.h | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/include/crypto/internal/aead.h b/include/crypto/internal/aead.h
->> index 4b25471..0423fa5 100644
->> --- a/include/crypto/internal/aead.h
->> +++ b/include/crypto/internal/aead.h
->> @@ -157,6 +157,12 @@ static inline unsigned int crypto_aead_maxauthsize(struct crypto_aead *aead)
->>  	return crypto_aead_alg_maxauthsize(crypto_aead_alg(aead));
->>  }
->>  
->> +static inline struct aead_request *aead_request_cast(
->> +					struct crypto_async_request *req)
+>> +static int omap_aes_gcm_copy_buffers(struct omap_aes_dev *dd,
+>> +				     struct aead_request *req)
 >> +{
->> +	return container_of(req, struct aead_request, base);
->> +}
+>> +	void *buf_in;
+>> +	int pages, alen, clen, cryptlen, nsg;
+>> +	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+>> +	unsigned int authlen = crypto_aead_authsize(aead);
+>> +	u32 dec = !(dd->flags & FLAGS_ENCRYPT);
+>> +	struct scatterlist *input, *assoc, tmp[2];
+>> +
+>> +	alen = ALIGN(req->assoclen, AES_BLOCK_SIZE);
+>> +	cryptlen = req->cryptlen - (dec * authlen);
+>> +	clen = ALIGN(cryptlen, AES_BLOCK_SIZE);
+>> +
+>> +	dd->sgs_copied = 0;
+>> +
+>> +	nsg = !!(req->assoclen && req->cryptlen);
+>> +
+>> +	assoc = &req->src[0];
+>> +	sg_init_table(dd->in_sgl, nsg + 1);
+>> +	if (req->assoclen) {
+>> +		if (omap_aes_check_aligned(assoc, req->assoclen)) {
+>> +			dd->sgs_copied |= AES_ASSOC_DATA_COPIED;
+>> +			pages = get_order(alen);
+>> +			buf_in = (void *)__get_free_pages(GFP_ATOMIC, pages);
+>> +			if (!buf_in) {
+>> +				pr_err("Couldn't allocate for unaligncases.\n");
+>> +				return -1;
+>> +			}
+>> +
+>> +			scatterwalk_map_and_copy(buf_in, assoc, 0,
+>> +						 req->assoclen, 0);
+>> +			memset(buf_in + req->assoclen, 0, alen - req->assoclen);
+>> +		} else {
+>> +			buf_in = sg_virt(req->assoc);
 > 
-> Please drop this and use the aead_queue interface I just posted.
-Okay will update in next version
+> req->assoc is now obsolete. Did you test this code?
+Sorry, I missed it. Ill update.
+
+> 
+>> +static int do_encrypt_iv(struct aead_request *req, u32 *tag)
+>> +{
+>> +	struct scatterlist iv_sg;
+>> +	struct ablkcipher_request *ablk_req;
+>> +	struct crypto_ablkcipher *tfm;
+>> +	struct tcrypt_result result;
+>> +	struct omap_aes_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+>> +	int ret = 0;
+>> +
+>> +	tfm = crypto_alloc_ablkcipher("ctr(aes)", 0, 0);
+> 
+> Ugh, you cannot allocate crypto transforms in the data path.  You
+> should allocate it in init instead.  Also using ctr(aes) is overkill.
+> Just use aes and do the xor by hand.
+Ill take care of this.
+> 
+>> +static int omap_aes_gcm_crypt(struct aead_request *req, unsigned long mode)
+>> +{
+>> +	struct omap_aes_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+>> +	struct omap_aes_reqctx *rctx = aead_request_ctx(req);
+>> +	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+>> +	unsigned int authlen = crypto_aead_authsize(aead);
+>> +	struct omap_aes_dev *dd;
+>> +	__be32 counter = cpu_to_be32(1);
+>> +	int err;
+>> +
+>> +	memset(ctx->auth_tag, 0, sizeof(ctx->auth_tag));
+> 
+> The ctx is shared memory and you must not write to it as multiple
+> requests can be called on the same tfm.  Use rctx instead.
+> 
+>> +	memcpy(req->iv + 12, &counter, 4);
+> 
+> The IV is only 12 bytes long so you're corrupting memory here.
+> You should use rctx here too.
+Ok, Ill use rctx. Thanks for pointing.
+
+> 
+>> +	if (req->assoclen + req->cryptlen == 0) {
+>> +		scatterwalk_map_and_copy(ctx->auth_tag, req->dst, 0, authlen,
+>> +					 1);
+>> +		return 0;
+>> +	}
+> 
+> How can this be right? Did you enable the selftest?
+Why not? Self tests are passed for this case.
+
+As per the equation given in GCM spec[1], we can see that
+if assoclen and cryptlen is 0, then output of GCM  is just E(K, Y0)
+where Y0 = IV||(0^31)1
+I have E(K, Y0) calculated in previous step. And copying it
+to destination if assoclen and cryptlen is 0.
+
+Correct me if I am wrong.
 
 Thanks and regards,
 Lokesh
+
+[1] http://csrc.nist.gov/groups/ST/toolkit/BCM/documents/proposedmodes/gcm/gcm-revised-spec.pdf
+
 > 
-> Thanks,
+> Cheers,
 > 
