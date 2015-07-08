@@ -1,84 +1,110 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH v2] crypto: aead - Add aead_queue interface
-Date: Wed, 8 Jul 2015 12:15:14 +0800
-Message-ID: <20150708041514.GA12840@gondor.apana.org.au>
-References: <20150708035621.GB12627@gondor.apana.org.au>
+Subject: Re: [PATCH v2 6/7] crypto: omap-aes: Add support for GCM mode
+Date: Wed, 8 Jul 2015 12:18:38 +0800
+Message-ID: <20150708041838.GA12744@gondor.apana.org.au>
+References: <1436283109-13318-1-git-send-email-lokeshvutla@ti.com>
+ <1436283109-13318-7-git-send-email-lokeshvutla@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Lokesh Vutla <lokeshvutla@ti.com>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
+	linux-omap@vger.kernel.org, linux-kernel@vger.kernel.org,
+	t-kristo@ti.com, nsekhar@ti.com
+To: Lokesh Vutla <lokeshvutla@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60666 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:40035 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752910AbbGHEPS (ORCPT
+	with ESMTP id S1750817AbbGHESl (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Jul 2015 00:15:18 -0400
+	Wed, 8 Jul 2015 00:18:41 -0400
 Content-Disposition: inline
-In-Reply-To: <20150708035621.GB12627@gondor.apana.org.au>
+In-Reply-To: <1436283109-13318-7-git-send-email-lokeshvutla@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This version adds aead_get_backlog.
+On Tue, Jul 07, 2015 at 09:01:48PM +0530, Lokesh Vutla wrote:
+>
+> +static int omap_aes_gcm_copy_buffers(struct omap_aes_dev *dd,
+> +				     struct aead_request *req)
+> +{
+> +	void *buf_in;
+> +	int pages, alen, clen, cryptlen, nsg;
+> +	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+> +	unsigned int authlen = crypto_aead_authsize(aead);
+> +	u32 dec = !(dd->flags & FLAGS_ENCRYPT);
+> +	struct scatterlist *input, *assoc, tmp[2];
+> +
+> +	alen = ALIGN(req->assoclen, AES_BLOCK_SIZE);
+> +	cryptlen = req->cryptlen - (dec * authlen);
+> +	clen = ALIGN(cryptlen, AES_BLOCK_SIZE);
+> +
+> +	dd->sgs_copied = 0;
+> +
+> +	nsg = !!(req->assoclen && req->cryptlen);
+> +
+> +	assoc = &req->src[0];
+> +	sg_init_table(dd->in_sgl, nsg + 1);
+> +	if (req->assoclen) {
+> +		if (omap_aes_check_aligned(assoc, req->assoclen)) {
+> +			dd->sgs_copied |= AES_ASSOC_DATA_COPIED;
+> +			pages = get_order(alen);
+> +			buf_in = (void *)__get_free_pages(GFP_ATOMIC, pages);
+> +			if (!buf_in) {
+> +				pr_err("Couldn't allocate for unaligncases.\n");
+> +				return -1;
+> +			}
+> +
+> +			scatterwalk_map_and_copy(buf_in, assoc, 0,
+> +						 req->assoclen, 0);
+> +			memset(buf_in + req->assoclen, 0, alen - req->assoclen);
+> +		} else {
+> +			buf_in = sg_virt(req->assoc);
 
----8<---
+req->assoc is now obsolete. Did you test this code?
 
-This patch adds a type-safe queueing interface for AEAD.
+> +static int do_encrypt_iv(struct aead_request *req, u32 *tag)
+> +{
+> +	struct scatterlist iv_sg;
+> +	struct ablkcipher_request *ablk_req;
+> +	struct crypto_ablkcipher *tfm;
+> +	struct tcrypt_result result;
+> +	struct omap_aes_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+> +	int ret = 0;
+> +
+> +	tfm = crypto_alloc_ablkcipher("ctr(aes)", 0, 0);
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Ugh, you cannot allocate crypto transforms in the data path.  You
+should allocate it in init instead.  Also using ctr(aes) is overkill.
+Just use aes and do the xor by hand.
 
-diff --git a/include/crypto/internal/aead.h b/include/crypto/internal/aead.h
-index 4b25471..c3942f4 100644
---- a/include/crypto/internal/aead.h
-+++ b/include/crypto/internal/aead.h
-@@ -34,6 +34,10 @@ struct crypto_aead_spawn {
- 	struct crypto_spawn base;
- };
- 
-+struct aead_queue {
-+	struct crypto_queue base;
-+};
-+
- extern const struct crypto_type crypto_aead_type;
- extern const struct crypto_type crypto_nivaead_type;
- 
-@@ -157,6 +161,37 @@ static inline unsigned int crypto_aead_maxauthsize(struct crypto_aead *aead)
- 	return crypto_aead_alg_maxauthsize(crypto_aead_alg(aead));
- }
- 
-+static inline void aead_init_queue(struct aead_queue *queue,
-+				   unsigned int max_qlen)
-+{
-+	crypto_init_queue(&queue->base, max_qlen);
-+}
-+
-+static inline int aead_enqueue_request(struct aead_queue *queue,
-+				       struct aead_request *request)
-+{
-+	return crypto_enqueue_request(&queue->base, &request->base);
-+}
-+
-+static inline struct aead_request *aead_dequeue_request(
-+	struct aead_queue *queue)
-+{
-+	struct crypto_async_request *req;
-+
-+	req = crypto_dequeue_request(&queue->base);
-+
-+	return req ? container_of(req, struct aead_request, base) : NULL;
-+}
-+
-+static inline struct aead_request *aead_get_backlog(struct aead_queue *queue)
-+{
-+	struct crypto_async_request *req;
-+
-+	req = crypto_get_backlog(&queue->base);
-+
-+	return req ? container_of(req, struct aead_request, base) : NULL;
-+}
-+
- int crypto_register_aead(struct aead_alg *alg);
- void crypto_unregister_aead(struct aead_alg *alg);
- int crypto_register_aeads(struct aead_alg *algs, int count);
+> +static int omap_aes_gcm_crypt(struct aead_request *req, unsigned long mode)
+> +{
+> +	struct omap_aes_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+> +	struct omap_aes_reqctx *rctx = aead_request_ctx(req);
+> +	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+> +	unsigned int authlen = crypto_aead_authsize(aead);
+> +	struct omap_aes_dev *dd;
+> +	__be32 counter = cpu_to_be32(1);
+> +	int err;
+> +
+> +	memset(ctx->auth_tag, 0, sizeof(ctx->auth_tag));
+
+The ctx is shared memory and you must not write to it as multiple
+requests can be called on the same tfm.  Use rctx instead.
+
+> +	memcpy(req->iv + 12, &counter, 4);
+
+The IV is only 12 bytes long so you're corrupting memory here.
+You should use rctx here too.
+
+> +	if (req->assoclen + req->cryptlen == 0) {
+> +		scatterwalk_map_and_copy(ctx->auth_tag, req->dst, 0, authlen,
+> +					 1);
+> +		return 0;
+> +	}
+
+How can this be right? Did you enable the selftest?
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
