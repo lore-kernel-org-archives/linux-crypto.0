@@ -1,44 +1,38 @@
-From: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
-Subject: Re: crypto: nx - Fix reentrancy bugs
-Date: Wed, 8 Jul 2015 10:46:31 -0300
-Message-ID: <20150708134630.GA7214@bluepex.com>
-References: <20150707093025.GA31368@gondor.apana.org.au>
- <20150707184837.GA9341@bluepex.com>
- <20150707221047.GA7655@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: akcipher: continuous memory for input/output
+Date: Wed, 08 Jul 2015 17:27:15 +0200
+Message-ID: <4018710.nx8zEmrfD4@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Fionnuala Gunter <fin@linux.vnet.ibm.com>,
-	pfsmorigo@linux.vnet.ibm.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp04.br.ibm.com ([32.104.18.25]:38055 "EHLO
-	e24smtp04.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933378AbbGHNqi (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Jul 2015 09:46:38 -0400
-Received: from /spool/local
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
-	Wed, 8 Jul 2015 10:46:36 -0300
-Received: from d24relay02.br.ibm.com (d24relay02.br.ibm.com [9.13.184.26])
-	by d24dlp01.br.ibm.com (Postfix) with ESMTP id 05BB93520064
-	for <linux-crypto@vger.kernel.org>; Wed,  8 Jul 2015 09:45:30 -0400 (EDT)
-Received: from d24av03.br.ibm.com (d24av03.br.ibm.com [9.8.31.95])
-	by d24relay02.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id t68Dj65o54132770
-	for <linux-crypto@vger.kernel.org>; Wed, 8 Jul 2015 10:45:07 -0300
-Received: from d24av03.br.ibm.com (localhost [127.0.0.1])
-	by d24av03.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id t68DkXBR016481
-	for <linux-crypto@vger.kernel.org>; Wed, 8 Jul 2015 10:46:33 -0300
-Content-Disposition: inline
-In-Reply-To: <20150707221047.GA7655@gondor.apana.org.au>
+Received: from mail.eperm.de ([89.247.134.16]:47921 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933653AbbGHP1V (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 Jul 2015 11:27:21 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> PS it would appear that you can make this completely reentrant
-> by moving all the data from the tfm into the reqeust.  Could you
-> work on this and remove the spinlock completely?
+Hi Herbert, Tadeusz,
 
-Yes.
+I looked a bit further into the akcipher code to see how we can add an AF_ALG 
+there.
 
-Thank you!
+What currently wonders me is the akcipher_request_set_crypt function: the 
+memory for input/output buffers is *no* scatter list but a plain buffer. I 
+think I can understand that for raw RSA operations as the input/output is not 
+overly large.
+
+But according to Tadeusz it may be viable to register hybrid asym ciphers with 
+the akcipher API. If there is a full blown hybrid asym cipher we have to 
+handle potentially large chunks of data. I am now wondering whether a flat 
+buffer still makes sense or whether the akcipher should be converted to 
+scatter lists as all the other cipher types.
+
+If it shall stay as is, how would we be handling larger buffers?
+
+Thanks
+Stephan
