@@ -1,47 +1,39 @@
-From: Stephan Mueller <smueller@chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 12/14] crypto: nx - Use new IV convention
-Date: Thu, 09 Jul 2015 09:07:51 +0200
-Message-ID: <1909056.vXiC6IPPsr@tauon.atsec.com>
-References: <20150708231330.GA28797@gondor.apana.org.au> <2029636.zIROss5U0I@tauon.atsec.com> <20150709065615.GB32698@gondor.apana.org.au>
+Date: Thu, 9 Jul 2015 15:11:19 +0800
+Message-ID: <20150709071119.GB430@gondor.apana.org.au>
+References: <20150708231330.GA28797@gondor.apana.org.au>
+ <2029636.zIROss5U0I@tauon.atsec.com>
+ <20150709065615.GB32698@gondor.apana.org.au>
+ <1909056.vXiC6IPPsr@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=us-ascii
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	"Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
 	Fionnuala Gunter <fin@linux.vnet.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47932 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752594AbbGIHH6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Jul 2015 03:07:58 -0400
-In-Reply-To: <20150709065615.GB32698@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:60028 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750833AbbGIHLW (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 9 Jul 2015 03:11:22 -0400
+Content-Disposition: inline
+In-Reply-To: <1909056.vXiC6IPPsr@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 9. Juli 2015, 14:56:15 schrieb Herbert Xu:
-
-Hi Herbert,
-
->On Thu, Jul 09, 2015 at 08:19:45AM +0200, Stephan Mueller wrote:
->> Am Donnerstag, 9. Juli 2015, 07:17:31 schrieb Herbert Xu:
->> 
->> Hi Herbert,
->> 
->> >This patch converts rfc4106 to the new calling convention where
->> >the IV is now part of the AD and needs to be skipped.  This patch
->> >also makes use of type-safe AEAD functions where possible.
->> >
->> >Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->> 
->> This patch fails to apply on your current kernel tree.
+On Thu, Jul 09, 2015 at 09:07:51AM +0200, Stephan Mueller wrote:
 >
->You need to pull in the crypto-2.6 tree to apply it.
+> Ok, will try. When is which tree used?
 
-Ok, will try. When is which tree used?
->
->Cheers,
+The crypto tree goes into the current mainline kernel so it's
+for serious bug fixes/regressions only.
 
+I will merge it into cryptodev when necessary.
 
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
