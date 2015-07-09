@@ -1,73 +1,47 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [linux-sunxi] Re: [PATCH v10 4/5] crypto: Add Allwinner Security
- System crypto accelerator
-Date: Thu, 9 Jul 2015 14:59:56 +0800
-Message-ID: <20150709065955.GC32698@gondor.apana.org.au>
-References: <1436209848-16530-1-git-send-email-clabbe.montjoie@gmail.com>
- <1436209848-16530-5-git-send-email-clabbe.montjoie@gmail.com>
- <20150707134936.GA2958@gondor.apana.org.au>
- <20150709064150.GA4028@Red>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 12/14] crypto: nx - Use new IV convention
+Date: Thu, 09 Jul 2015 09:07:51 +0200
+Message-ID: <1909056.vXiC6IPPsr@tauon.atsec.com>
+References: <20150708231330.GA28797@gondor.apana.org.au> <2029636.zIROss5U0I@tauon.atsec.com> <20150709065615.GB32698@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: robh+dt@kernel.org, pawel.moll@arm.com, mark.rutland@arm.com,
-	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
-	maxime.ripard@free-electrons.com, linux@arm.linux.org.uk,
-	davem@davemloft.net, akpm@linux-foundation.org,
-	gregkh@linuxfoundation.org, mchehab@osg.samsung.com, arnd@arndb.de,
-	joe@perches.com, devicetree@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-sunxi@googlegroups.com
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-doc-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20150709064150.GA4028@Red>
-Sender: linux-doc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	"Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+	Fionnuala Gunter <fin@linux.vnet.ibm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:47932 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752594AbbGIHH6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 9 Jul 2015 03:07:58 -0400
+In-Reply-To: <20150709065615.GB32698@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 09, 2015 at 08:41:50AM +0200, LABBE Corentin wrote:
+Am Donnerstag, 9. Juli 2015, 14:56:15 schrieb Herbert Xu:
+
+Hi Herbert,
+
+>On Thu, Jul 09, 2015 at 08:19:45AM +0200, Stephan Mueller wrote:
+>> Am Donnerstag, 9. Juli 2015, 07:17:31 schrieb Herbert Xu:
+>> 
+>> Hi Herbert,
+>> 
+>> >This patch converts rfc4106 to the new calling convention where
+>> >the IV is now part of the AD and needs to be skipped.  This patch
+>> >also makes use of type-safe AEAD functions where possible.
+>> >
+>> >Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>> 
+>> This patch fails to apply on your current kernel tree.
 >
-> > > +	/* get the partial hash only if something was written */
-> > > +	if (op->mode == SS_OP_SHA1) {
-> > > +		for (i = 0; i < 5; i++)
-> > > +			op->hash[i] = readl(ss->base + SS_MD0 + i * 4);
-> > > +	} else {
-> > > +		for (i = 0; i < 4; i++)
-> > > +			op->hash[i] = readl(ss->base + SS_MD0 + i * 4);
-> > > +	}
-> > 
-> > You can avoid the op->mode check by storing the hash size in algt.
-> > 
-> 
-> It seems that I can use crypto_ahash_digestsize() that do the same thing.
+>You need to pull in the crypto-2.6 tree to apply it.
 
-I don't think so because the partial hash size is not the same
-as the final digest size.
+Ok, will try. When is which tree used?
+>
+>Cheers,
 
-> > > +int sun4i_hash_finup(struct ahash_request *areq)
-> > > +{
-> > > +	int err;
-> > > +
-> > > +	err = sun4i_hash_update(areq);
-> > > +	if (err != 0)
-> > > +		return err;
-> > > +
-> > > +	return sun4i_hash_final(areq);
-> > 
-> > You can drop finup since the API provides a default finup that's
-> > exactly the same as this.  You only need to provide finup if it
-> > can optimise on this.
-> > 
-> > Ditto for digest.
-> 
-> If I remove digest(), loading the driver crash the kernel with:
 
-You're right.  We don't provide a default digest function for ahash,
-we only do it for shash.  So I guess you'll have to keep digest
-around for now.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
