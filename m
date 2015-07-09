@@ -1,39 +1,33 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 12/14] crypto: nx - Use new IV convention
-Date: Thu, 9 Jul 2015 15:11:19 +0800
-Message-ID: <20150709071119.GB430@gondor.apana.org.au>
-References: <20150708231330.GA28797@gondor.apana.org.au>
- <2029636.zIROss5U0I@tauon.atsec.com>
- <20150709065615.GB32698@gondor.apana.org.au>
- <1909056.vXiC6IPPsr@tauon.atsec.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 9/14] crypto: tcrypt - Add support for new IV convention
+Date: Thu, 09 Jul 2015 09:59:01 +0200
+Message-ID: <2007103.oHXJK7Kc2I@tauon.atsec.com>
+References: <20150708231330.GA28797@gondor.apana.org.au> <E1ZCyak-0007Zf-No@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	"Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
-	Fionnuala Gunter <fin@linux.vnet.ibm.com>
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60028 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750833AbbGIHLW (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Jul 2015 03:11:22 -0400
-Content-Disposition: inline
-In-Reply-To: <1909056.vXiC6IPPsr@tauon.atsec.com>
+Received: from mail.eperm.de ([89.247.134.16]:47936 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752056AbbGIH7H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 9 Jul 2015 03:59:07 -0400
+In-Reply-To: <E1ZCyak-0007Zf-No@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 09, 2015 at 09:07:51AM +0200, Stephan Mueller wrote:
+Am Donnerstag, 9. Juli 2015, 07:17:26 schrieb Herbert Xu:
+
+Hi Herbert,
+
+>This patch allows the AEAD speed tests to cope with the new seqiv
+>calling convention as well as the old one.
 >
-> Ok, will try. When is which tree used?
+>Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-The crypto tree goes into the current mainline kernel so it's
-for serious bug fixes/regressions only.
+Using your crypto-2.6 tree, this patch fails to apply (and others have hunks 
+e.g. patch 8).
 
-I will merge it into cryptodev when necessary.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
