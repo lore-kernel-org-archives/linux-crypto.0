@@ -1,61 +1,38 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH] crypto: Drop owner assignment from platform_driver
-Date: Fri, 10 Jul 2015 08:30:34 +0200
-Message-ID: <20150710083034.0429f147@bbrezillon>
-References: <1436507176-27632-1-git-send-email-k.kozlowski@samsung.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: akcipher: continuous memory for input/output
+Date: Fri, 10 Jul 2015 21:36:34 +0800
+Message-ID: <20150710133634.GA17850@gondor.apana.org.au>
+References: <4018710.nx8zEmrfD4@tauon.atsec.com>
+ <20150708152932.GA23750@gondor.apana.org.au>
+ <3241575.xDOc5hzFrC@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
+	linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:38289 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752393AbbGJGai (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:51199 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754616AbbGJNgp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 10 Jul 2015 02:30:38 -0400
-In-Reply-To: <1436507176-27632-1-git-send-email-k.kozlowski@samsung.com>
+	Fri, 10 Jul 2015 09:36:45 -0400
+Content-Disposition: inline
+In-Reply-To: <3241575.xDOc5hzFrC@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 10 Jul 2015 14:46:16 +0900
-Krzysztof Kozlowski <k.kozlowski@samsung.com> wrote:
+On Wed, Jul 08, 2015 at 05:54:35PM +0200, Stephan Mueller wrote:
+>
+> But IIRC, there are systems out there which perform a full hybrid asym 
+> operation. Without having checked in detail, I believe this is true for IBM 
+> cryptoexpress or Cavium cards.
 
-> platform_driver does not need to set an owner because
-> platform_driver_register() will set it.
-> 
-> Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Such systems won't be using the akcipher interface even if we
+decided to support them.  As akcipher is only meant to support
+the underlying cipher, not the whole system.
 
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-> 
-> ---
-> 
-> The coccinelle script which generated the patch was sent here:
-> http://www.spinics.net/lists/kernel/msg2029903.html
-> ---
->  drivers/crypto/marvell/cesa.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-> index 1c6f98dd88f4..0643e3366e33 100644
-> --- a/drivers/crypto/marvell/cesa.c
-> +++ b/drivers/crypto/marvell/cesa.c
-> @@ -533,7 +533,6 @@ static struct platform_driver marvell_cesa = {
->  	.probe		= mv_cesa_probe,
->  	.remove		= mv_cesa_remove,
->  	.driver		= {
-> -		.owner	= THIS_MODULE,
->  		.name	= "marvell-cesa",
->  		.of_match_table = mv_cesa_of_match_table,
->  	},
-
-
-
+Cheers,
 -- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
