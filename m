@@ -1,70 +1,47 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 0/14] crypto: aead - Phase oute seqniv
-Date: Thu, 09 Jul 2015 13:38:07 +0200
-Message-ID: <2219094.SOh4kNKiQk@tachyon.chronox.de>
-References: <20150708231330.GA28797@gondor.apana.org.au> <2012703.RafZhkfDBX@tauon.atsec.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Subject: [PATCH] crypto: Drop owner assignment from platform_driver
+Date: Fri, 10 Jul 2015 14:46:16 +0900
+Message-ID: <1436507176-27632-1-git-send-email-k.kozlowski@samsung.com>
+Cc: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Boris BREZILLON <boris.brezillon@free-electrons.com>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47940 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751884AbbGILiO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Jul 2015 07:38:14 -0400
-In-Reply-To: <2012703.RafZhkfDBX@tauon.atsec.com>
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:8227 "EHLO
+	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751891AbbGJFqU (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 10 Jul 2015 01:46:20 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 9. Juli 2015, 12:19:53 schrieb Stephan Mueller:
+platform_driver does not need to set an owner because
+platform_driver_register() will set it.
 
-Hi,
+Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
 
-> Am Donnerstag, 9. Juli 2015, 07:13:30 schrieb Herbert Xu:
-> 
-> Hi Herbert,
-> 
-> >Hi:
-> >
-> >This series attempts to phase out the recently introduced seqniv
-> >generator.  The reason is that the logic of seqniv should not be
-> >implemented at the IV generator layer.  Having the IV skipping
-> >logic in seqniv means that you cannot perform encryption without
-> >doing IV generation.
-> >
-> >In fact moving the IV skipping logic out of seqniv and into the
-> >underlying rfcXXXX (e.g., rfc4106) template allows optimisations
-> >to be made as the underlying code can often skip the IV in a more
-> >efficient manner.
-> >
-> >Unfortunately we've already begun the conversion process so this
-> >series adds a new flag CRYPTO_ALG_AEAD_NEW to indicate whether
-> >a given algorithm has been converted to the new interface where
-> >IV skipping is done outside of the IV generator.  This flag can
-> >be removed once the conversion is complete.
-> 
-> All GCM implementations available on recent Intel systems successfully
-> tested (i.e NX and CAAM not tested).
-> 
-> Just to clarify: from a caller's perspective, using
-> seqniv(rfc4106(gcm(aes))) is still the right invocation? Or shall I now use
-> seqiv?
+---
 
-Actually, I found a problem that I have overlooked initally: rfc4106-gcm-aesni 
-causes a problem. For encryption/decryption with the same tests for other 
-rfc4106 implementations, I get an EINVAL.
-> 
-> >Cheers,
-> 
-> Ciao
-> Stephan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+The coccinelle script which generated the patch was sent here:
+http://www.spinics.net/lists/kernel/msg2029903.html
+---
+ drivers/crypto/marvell/cesa.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-
+diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
+index 1c6f98dd88f4..0643e3366e33 100644
+--- a/drivers/crypto/marvell/cesa.c
++++ b/drivers/crypto/marvell/cesa.c
+@@ -533,7 +533,6 @@ static struct platform_driver marvell_cesa = {
+ 	.probe		= mv_cesa_probe,
+ 	.remove		= mv_cesa_remove,
+ 	.driver		= {
+-		.owner	= THIS_MODULE,
+ 		.name	= "marvell-cesa",
+ 		.of_match_table = mv_cesa_of_match_table,
+ 	},
 -- 
-Ciao
-Stephan
+1.9.1
