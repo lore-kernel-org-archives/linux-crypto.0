@@ -1,52 +1,47 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 0/14] crypto: aead - Phase oute seqniv
-Date: Mon, 13 Jul 2015 13:29:36 +0200
-Message-ID: <1641075.kxsDtBLPCP@tauon.atsec.com>
-References: <20150708231330.GA28797@gondor.apana.org.au> <4183187.0RpMVHFSDO@tauon.atsec.com> <20150713091349.GA9579@gondor.apana.org.au>
+From: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
+Subject: [PATCH 0/2] Uncomment VSX enable routine for instructions access
+Date: Mon, 13 Jul 2015 13:50:14 -0300
+Message-ID: <20150713165011.GA3356@bluepex.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8
+Cc: linuxppc-dev@lists.ozlabs.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	pfsmorigo@linux.vnet.ibm.com, Michael Ellerman <mpe@ellerman.id.au>
+To: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47959 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752503AbbGML3j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Jul 2015 07:29:39 -0400
-In-Reply-To: <20150713091349.GA9579@gondor.apana.org.au>
+Received: from e24smtp04.br.ibm.com ([32.104.18.25]:37106 "EHLO
+	e24smtp04.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750919AbbGMQuW (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 13 Jul 2015 12:50:22 -0400
+Received: from /spool/local
+	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
+	Mon, 13 Jul 2015 13:50:18 -0300
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 13. Juli 2015, 17:13:49 schrieb Herbert Xu:
+enable_kernel_vsx() was commented since anything was using
+it. It changes with vmx_crypto driver that call VSX instructions
+and need kernel_vsx enabled in order to do it properly. Without
+a way to enable VSX instruction vmx_crypto fails into an exception.
 
-Hi Herbert,
+These patches uncomment enable_kernel_vsx() rountine and put it
+available for use. Also adds it in vmx_crypto in order to
+enable kernel_vsx before use VSX instructions.
 
->On Mon, Jul 13, 2015 at 11:09:34AM +0200, Stephan Mueller wrote:
->> That code now works with rfc4106(gcm(aes)). But using that code now fails
->> with the "regular" GCM implementation as well as CCM. The regular GCM
->> implementation works when not providing the IV as part of the SGL/set_ad.
->> Is
->> that difference between "regular" AEAD and RFC4106 AEAD intended?
->
->Yes of course.  As RFC4106 specifies that the IV should not be part
->of the AD.
->
->> Apart from the GCM vs RFC4106 invocation, the code seemingly requires to
->> provide the IV twice -- once with the buffer/set_ad and once with the
->> set_crypt call. Is that intended? Providing the IV twice is visible in the
->> testmgr.h patch where .assoc now includes the previous .assoc plus the IV
->> data which is also set in .iv.
->
->Yes it is intended.  I played with not requiring req->iv at all
->and just getting it from the AD but the code turned out to be more
->complicated because you have to jump through hoops to access the IV
->which you need to to construct the full 16-byte IV.
->
->Since the primary user IPsec easily provides us with both I think
->that is the better setup.
+Leonidas S. Barbosa (2):
+  Uncomment and make enable_kernel_vsx() routine available
+  Adding enable_kernel_vsx() to access VSX instructions
 
-Thank you very much. Now, all cipher permutations testable with CAVS show a 
-clean test run with this patch set.
+ arch/powerpc/include/asm/switch_to.h | 1 +
+ arch/powerpc/kernel/process.c        | 3 ---
+ drivers/crypto/vmx/aes.c             | 3 +++
+ drivers/crypto/vmx/aes_cbc.c         | 3 +++
+ drivers/crypto/vmx/aes_ctr.c         | 3 +++
+ drivers/crypto/vmx/ghash.c           | 4 ++++
+ 6 files changed, 14 insertions(+), 3 deletions(-)
 
-Ciao
-Stephan
+-- 
+2.1.0
