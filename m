@@ -1,43 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/3] crypto: qat - Add support for RSA algorithm
-Date: Tue, 14 Jul 2015 14:46:31 +0800
-Message-ID: <20150714064631.GA20343@gondor.apana.org.au>
-References: <20150710170616.4483.44445.stgit@tstruk-mobl1>
- <20150710170632.4483.9019.stgit@tstruk-mobl1>
+Subject: Re: [PATCH] crypto: Drop owner assignment from platform_driver
+Date: Tue, 14 Jul 2015 15:01:40 +0800
+Message-ID: <20150714070140.GA20728@gondor.apana.org.au>
+References: <1436507176-27632-1-git-send-email-k.kozlowski@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	pingchao.yang@intel.com, davem@davemloft.net
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Boris BREZILLON <boris.brezillon@free-electrons.com>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Krzysztof Kozlowski <k.kozlowski@samsung.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55508 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:45004 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751561AbbGNGqh (ORCPT
+	with ESMTP id S1752451AbbGNHB5 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Jul 2015 02:46:37 -0400
+	Tue, 14 Jul 2015 03:01:57 -0400
 Content-Disposition: inline
-In-Reply-To: <20150710170632.4483.9019.stgit@tstruk-mobl1>
+In-Reply-To: <1436507176-27632-1-git-send-email-k.kozlowski@samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 10, 2015 at 10:06:32AM -0700, Tadeusz Struk wrote:
->
-> +	ctx->key_sz = mpi_get_size(pkey->n);
-> +	if (!qat_rsa_enc_fn_id(ctx->key_sz)) {
-> +		/* invalid key size provided */
-> +		rsa_free_key(pkey);
-> +		ctx->key_sz = 0;
-> +		return -EINVAL;
-> +	}
+On Fri, Jul 10, 2015 at 02:46:16PM +0900, Krzysztof Kozlowski wrote:
+> platform_driver does not need to set an owner because
+> platform_driver_register() will set it.
+> 
+> Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
 
-As we discussed a while ago, the hardware implementation must not
-support a smaller feature set than the software implementation.
-
-So please either add a software fallback for unsupported key sizes,
-or ensure that the software implementation also rejects these key
-sizes.
-
-Thanks,
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
