@@ -1,174 +1,31 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 3/5] crypto: aes-ce-ccm - Convert to new AEAD interface
-Date: Tue, 14 Jul 2015 11:11:57 +0200
-Message-ID: <CAKv+Gu-zZknb=ofGokyJcv=pEkj8eMeqyfBc3iZfMMEMLa5Apw@mail.gmail.com>
-References: <20150714084547.GA21551@gondor.apana.org.au>
-	<E1ZEvxn-0005dR-S1@gondolin.me.apana.org.au>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH 3/3] crypto: qat - Add support for RSA algorithm
+Date: Tue, 14 Jul 2015 09:16:48 -0700
+Message-ID: <55A535F0.5060700@intel.com>
+References: <20150710170616.4483.44445.stgit@tstruk-mobl1> <20150710170632.4483.9019.stgit@tstruk-mobl1> <20150714064631.GA20343@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	pingchao.yang@intel.com, davem@davemloft.net
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f171.google.com ([209.85.213.171]:33777 "EHLO
-	mail-ig0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751694AbbGNJL6 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Jul 2015 05:11:58 -0400
-Received: by iggp10 with SMTP id p10so94049269igg.0
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Jul 2015 02:11:57 -0700 (PDT)
-In-Reply-To: <E1ZEvxn-0005dR-S1@gondolin.me.apana.org.au>
+Received: from mga11.intel.com ([192.55.52.93]:38386 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752639AbbGNQRP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 14 Jul 2015 12:17:15 -0400
+In-Reply-To: <20150714064631.GA20343@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 14 July 2015 at 10:53, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> This patch converts the ARM64 aes-ce-ccm implementation to the
-> new AEAD interface.
->
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On 07/13/2015 11:46 PM, Herbert Xu wrote:
+> As we discussed a while ago, the hardware implementation must not
+> support a smaller feature set than the software implementation.
+> 
+> So please either add a software fallback for unsupported key sizes,
+> or ensure that the software implementation also rejects these key
+> sizes.
 
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-
-> ---
->
->  arch/arm64/crypto/aes-ce-ccm-glue.c |   69 ++++++++++++++++++++++--------------
->  1 file changed, 43 insertions(+), 26 deletions(-)
->
-> diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
-> index 3303e8a..f3690fa 100644
-> --- a/arch/arm64/crypto/aes-ce-ccm-glue.c
-> +++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
-> @@ -124,7 +124,7 @@ static void ccm_calculate_auth_mac(struct aead_request *req, u8 mac[])
->
->         ce_aes_ccm_auth_data(mac, (u8 *)&ltag, ltag.len, &macp, ctx->key_enc,
->                              num_rounds(ctx));
-> -       scatterwalk_start(&walk, req->assoc);
-> +       scatterwalk_start(&walk, req->src);
->
->         do {
->                 u32 n = scatterwalk_clamp(&walk, len);
-> @@ -151,6 +151,10 @@ static int ccm_encrypt(struct aead_request *req)
->         struct crypto_aes_ctx *ctx = crypto_aead_ctx(aead);
->         struct blkcipher_desc desc = { .info = req->iv };
->         struct blkcipher_walk walk;
-> +       struct scatterlist srcbuf[2];
-> +       struct scatterlist dstbuf[2];
-> +       struct scatterlist *src;
-> +       struct scatterlist *dst;
->         u8 __aligned(8) mac[AES_BLOCK_SIZE];
->         u8 buf[AES_BLOCK_SIZE];
->         u32 len = req->cryptlen;
-> @@ -168,7 +172,12 @@ static int ccm_encrypt(struct aead_request *req)
->         /* preserve the original iv for the final round */
->         memcpy(buf, req->iv, AES_BLOCK_SIZE);
->
-> -       blkcipher_walk_init(&walk, req->dst, req->src, len);
-> +       src = scatterwalk_ffwd(srcbuf, req->src, req->assoclen);
-> +       dst = src;
-> +       if (req->src != req->dst)
-> +               dst = scatterwalk_ffwd(dstbuf, req->dst, req->assoclen);
-> +
-> +       blkcipher_walk_init(&walk, dst, src, len);
->         err = blkcipher_aead_walk_virt_block(&desc, &walk, aead,
->                                              AES_BLOCK_SIZE);
->
-> @@ -194,7 +203,7 @@ static int ccm_encrypt(struct aead_request *req)
->                 return err;
->
->         /* copy authtag to end of dst */
-> -       scatterwalk_map_and_copy(mac, req->dst, req->cryptlen,
-> +       scatterwalk_map_and_copy(mac, dst, req->cryptlen,
->                                  crypto_aead_authsize(aead), 1);
->
->         return 0;
-> @@ -207,6 +216,10 @@ static int ccm_decrypt(struct aead_request *req)
->         unsigned int authsize = crypto_aead_authsize(aead);
->         struct blkcipher_desc desc = { .info = req->iv };
->         struct blkcipher_walk walk;
-> +       struct scatterlist srcbuf[2];
-> +       struct scatterlist dstbuf[2];
-> +       struct scatterlist *src;
-> +       struct scatterlist *dst;
->         u8 __aligned(8) mac[AES_BLOCK_SIZE];
->         u8 buf[AES_BLOCK_SIZE];
->         u32 len = req->cryptlen - authsize;
-> @@ -224,7 +237,12 @@ static int ccm_decrypt(struct aead_request *req)
->         /* preserve the original iv for the final round */
->         memcpy(buf, req->iv, AES_BLOCK_SIZE);
->
-> -       blkcipher_walk_init(&walk, req->dst, req->src, len);
-> +       src = scatterwalk_ffwd(srcbuf, req->src, req->assoclen);
-> +       dst = src;
-> +       if (req->src != req->dst)
-> +               dst = scatterwalk_ffwd(dstbuf, req->dst, req->assoclen);
-> +
-> +       blkcipher_walk_init(&walk, dst, src, len);
->         err = blkcipher_aead_walk_virt_block(&desc, &walk, aead,
->                                              AES_BLOCK_SIZE);
->
-> @@ -250,44 +268,43 @@ static int ccm_decrypt(struct aead_request *req)
->                 return err;
->
->         /* compare calculated auth tag with the stored one */
-> -       scatterwalk_map_and_copy(buf, req->src, req->cryptlen - authsize,
-> +       scatterwalk_map_and_copy(buf, src, req->cryptlen - authsize,
->                                  authsize, 0);
->
-> -       if (memcmp(mac, buf, authsize))
-> +       if (crypto_memneq(mac, buf, authsize))
->                 return -EBADMSG;
->         return 0;
->  }
->
-> -static struct crypto_alg ccm_aes_alg = {
-> -       .cra_name               = "ccm(aes)",
-> -       .cra_driver_name        = "ccm-aes-ce",
-> -       .cra_priority           = 300,
-> -       .cra_flags              = CRYPTO_ALG_TYPE_AEAD,
-> -       .cra_blocksize          = 1,
-> -       .cra_ctxsize            = sizeof(struct crypto_aes_ctx),
-> -       .cra_alignmask          = 7,
-> -       .cra_type               = &crypto_aead_type,
-> -       .cra_module             = THIS_MODULE,
-> -       .cra_aead = {
-> -               .ivsize         = AES_BLOCK_SIZE,
-> -               .maxauthsize    = AES_BLOCK_SIZE,
-> -               .setkey         = ccm_setkey,
-> -               .setauthsize    = ccm_setauthsize,
-> -               .encrypt        = ccm_encrypt,
-> -               .decrypt        = ccm_decrypt,
-> -       }
-> +static struct aead_alg ccm_aes_alg = {
-> +       .base = {
-> +               .cra_name               = "ccm(aes)",
-> +               .cra_driver_name        = "ccm-aes-ce",
-> +               .cra_flags              = CRYPTO_ALG_AEAD_NEW,
-> +               .cra_priority           = 300,
-> +               .cra_blocksize          = 1,
-> +               .cra_ctxsize            = sizeof(struct crypto_aes_ctx),
-> +               .cra_alignmask          = 7,
-> +               .cra_module             = THIS_MODULE,
-> +       },
-> +       .ivsize         = AES_BLOCK_SIZE,
-> +       .maxauthsize    = AES_BLOCK_SIZE,
-> +       .setkey         = ccm_setkey,
-> +       .setauthsize    = ccm_setauthsize,
-> +       .encrypt        = ccm_encrypt,
-> +       .decrypt        = ccm_decrypt,
->  };
->
->  static int __init aes_mod_init(void)
->  {
->         if (!(elf_hwcap & HWCAP_AES))
->                 return -ENODEV;
-> -       return crypto_register_alg(&ccm_aes_alg);
-> +       return crypto_register_aead(&ccm_aes_alg);
->  }
->
->  static void __exit aes_mod_exit(void)
->  {
-> -       crypto_unregister_alg(&ccm_aes_alg);
-> +       crypto_unregister_aead(&ccm_aes_alg);
->  }
->
->  module_init(aes_mod_init);
+Ok, I'll add a software fallback in v2.
+Thanks,
+T
