@@ -1,34 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Drop owner assignment from platform_driver
-Date: Tue, 14 Jul 2015 15:01:40 +0800
-Message-ID: <20150714070140.GA20728@gondor.apana.org.au>
-References: <1436507176-27632-1-git-send-email-k.kozlowski@samsung.com>
+Subject: Re: [PATCH 0/2] Uncomment VSX enable routine for instructions access
+Date: Tue, 14 Jul 2015 15:02:31 +0800
+Message-ID: <20150714070231.GA20792@gondor.apana.org.au>
+References: <20150713165011.GA3356@bluepex.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Boris BREZILLON <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, pfsmorigo@linux.vnet.ibm.com,
+	mpe@ellerman.id.au
+To: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:45004 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:42543 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752451AbbGNHB5 (ORCPT
+	with ESMTP id S1751746AbbGNHCg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Jul 2015 03:01:57 -0400
+	Tue, 14 Jul 2015 03:02:36 -0400
 Content-Disposition: inline
-In-Reply-To: <1436507176-27632-1-git-send-email-k.kozlowski@samsung.com>
+In-Reply-To: <20150713165011.GA3356@bluepex.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 10, 2015 at 02:46:16PM +0900, Krzysztof Kozlowski wrote:
-> platform_driver does not need to set an owner because
-> platform_driver_register() will set it.
+Leonidas S. Barbosa <leosilva@linux.vnet.ibm.com> wrote:
+> enable_kernel_vsx() was commented since anything was using
+> it. It changes with vmx_crypto driver that call VSX instructions
+> and need kernel_vsx enabled in order to do it properly. Without
+> a way to enable VSX instruction vmx_crypto fails into an exception.
 > 
-> Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+> These patches uncomment enable_kernel_vsx() rountine and put it
+> available for use. Also adds it in vmx_crypto in order to
+> enable kernel_vsx before use VSX instructions.
+> 
+> Leonidas S. Barbosa (2):
+>  Uncomment and make enable_kernel_vsx() routine available
+>  Adding enable_kernel_vsx() to access VSX instructions
 
-Applied.
+All applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
