@@ -1,69 +1,64 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH  v2 3/3] crypto: qat - Add support for RSA algorithm
-Date: Wed, 15 Jul 2015 21:03:33 +0800
-Message-ID: <20150715130333.GA2006@gondor.apana.org.au>
-References: <20150714183243.18949.93255.stgit@tstruk-mobl1>
- <20150714183259.18949.581.stgit@tstruk-mobl1>
+From: Dan Streetman <ddstreet@us.ibm.com>
+Subject: Re: [PATCH 5/6] [RFC] crypto/testmgr: add null test for 842 algorithm
+Date: Wed, 15 Jul 2015 10:25:04 -0400
+Message-ID: <CALZtONDqrO=Sq56efLtvMMtgwBY54FDp4mq9=XZ5JWFD26XSbw@mail.gmail.com>
+References: <20150702223800.GA1712@linux.vnet.ibm.com> <20150702224119.GF1712@linux.vnet.ibm.com>
+ <20150704072453.GC6153@gondor.apana.org.au> <20150714000536.GA38815@linux.vnet.ibm.com>
+ <20150714000558.GB38815@linux.vnet.ibm.com>
+Reply-To: ddstreet@ieee.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	pingchao.yang@intel.com, davem@davemloft.net
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	gustavold@linux.vnet.ibm.com
+To: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:43169 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753067AbbGONDj (ORCPT
+Received: from mail-ig0-f179.google.com ([209.85.213.179]:34447 "EHLO
+	mail-ig0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751732AbbGOOZY (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Jul 2015 09:03:39 -0400
-Content-Disposition: inline
-In-Reply-To: <20150714183259.18949.581.stgit@tstruk-mobl1>
+	Wed, 15 Jul 2015 10:25:24 -0400
+Received: by igvi1 with SMTP id i1so78296419igv.1
+        for <linux-crypto@vger.kernel.org>; Wed, 15 Jul 2015 07:25:24 -0700 (PDT)
+In-Reply-To: <20150714000558.GB38815@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 14, 2015 at 11:33:00AM -0700, Tadeusz Struk wrote:
+On Mon, Jul 13, 2015 at 8:05 PM, Nishanth Aravamudan
+<nacc@linux.vnet.ibm.com> wrote:
+> On 13.07.2015 [17:05:36 -0700], Nishanth Aravamudan wrote:
+>> On 04.07.2015 [15:24:53 +0800], Herbert Xu wrote:
+>> > On Thu, Jul 02, 2015 at 03:41:19PM -0700, Nishanth Aravamudan wrote:
+>> > > Currently, when the nx-842-pseries driver loads, the following message
+>> > > is emitted:
+>> > >
+>> > > alg: No test for 842 (842-nx)
+>> > >
+>> > > It seems like the simplest way to fix this message (other than adding a
+>> > > proper test) is to just insert the null test into the list in the
+>> > > testmgr.
+>> > >
+>> > > Signed-off-by: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
+>> >
+>> > Please add some real test vectors instead.
 >
-> +static void qat_rsa_cb(struct icp_qat_fw_pke_resp *resp)
-> +{
-> +	struct akcipher_request *areq = (void *)(__force long)resp->opaque;
-> +	struct qat_rsa_request *req = PTR_ALIGN(akcipher_request_ctx(areq), 64);
+> Apologies, hit send too fast. I'll work with Dan on this when he gets
+> back from vacation.
 
-You need to include the extra alignment space in reqsize.
+Back from vacation! :-)
 
-> +	ctx->key_sz = mpi_get_size(pkey->n);
-> +	if (!qat_rsa_enc_fn_id(ctx->key_sz)) {
-> +		/* invalid key size provided falling back to sw */
-> +		rsa_free_key(pkey);
-> +		ctx->key_sz = 0;
-> +		ctx->n = NULL;
-> +		ctx->e = NULL;
-> +		ctx->d = NULL;
-> +
-> +		pr_info("QAT: RSA key size not supported by hardware.\n");
-> +		pr_info("Falling back to software");
+I originally didn't add any test vector for NX 842 because the main
+driver was loading before the "platform" (pseries/powernv) drivers,
+and the test couldn't run as the platform driver hadn't loaded yet.
+That's now fixed so we should be able to add a real test for NX 842
+now, I can work on that patch.
 
-That's way too verbose for something that could in future be
-triggered from user-space.  Either remove them or use dev_debug.
-
-> +		ctx->fallback = crypto_alloc_akcipher("rsa-generic", 0, 0);
-
-You need to set CRYPTO_ALG_NEED_FALLBACK in the mask here.  You
-should also set it in your cra_flags.  Then you can have rsa here
-instead of rsa-generic.
-
-There is also an issue with reqsize since your fallback's reqsize
-may be bigger than yours.  You'll need to change akcipher first
-to move the reqsize field into crypto_akcipher.  Then you can
-set the reqsize here.
-
-> +	ret = mpi_read_buffer(pkey->n, ctx->n, ctx->key_sz, &len, NULL);
-> +	if (ret)
-> +		goto free_d;
-
-Huh? Why are you converting in and out of MPI? If the hardware wants
-raw integers, then you should just give the raw numbers to it.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>
+> -Nish
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
