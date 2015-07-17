@@ -1,9 +1,8 @@
 From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v11 1/5] ARM: sun4i: dt: Add Security System to
- A10 SoC DTS
-Date: Fri, 17 Jul 2015 16:39:38 +0200
-Message-ID: <1437143983-4479-2-git-send-email-clabbe.montjoie@gmail.com>
-References: <1437143983-4479-1-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH v11] crypto: Add Allwinner Security System
+ crypto accelerator
+Date: Fri, 17 Jul 2015 16:39:37 +0200
+Message-ID: <1437143983-4479-1-git-send-email-clabbe.montjoie@gmail.com>
 Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -12,8 +11,7 @@ Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
 	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
-	LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
 	pawel.moll-5wv7dgnIgG8@public.gmane.org,
 	mark.rutland-5wv7dgnIgG8@public.gmane.org,
@@ -28,8 +26,7 @@ To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
 	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
 	arnd-r2nGTMty4D4@public.gmane.org,
 	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBQVHUSWQKGQE4GGCSTA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-In-Reply-To: <1437143983-4479-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBQFHUSWQKGQEDOV6CCI-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Archive: <http://groups.google.com/group/linux-sunxi
@@ -39,35 +36,106 @@ List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39
  <http://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
-The Security System is a hardware cryptographic accelerator that support
-AES/MD5/SHA1/DES/3DES/PRNG algorithms.
-It could be found on many Allwinner SoC.
+Hello
 
-This patch enable the Security System on the Allwinner A10 SoC Device-tree.
+This is the driver for the Security System included in Allwinner SoC A20.
+The Security System (SS for short) is a hardware cryptographic accelerator that
+support AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+It could be found on others Allwinner SoC: 
+- A10, A10s, A13, A31 and A33 manual give the same datasheet for SS than A20
+- A23 speak about a security system but without precisions
+- A80 and A83T datasheet speak about a security system with more functions
+  (SHA224/SHA256/RSA/CRC), they will be supported in a separate driver.
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- arch/arm/boot/dts/sun4i-a10.dtsi | 8 ++++++++
- 1 file changed, 8 insertions(+)
+This driver currently supports:
+- MD5 and SHA1 hash algorithms
+- AES block cipher in CBC/ECB mode with 128/196/256bits keys.
+- DES and 3DES block cipher in CBC/ECB mode
+The driver exposes all those algorithms through the kernel cryptographic API.
 
-diff --git a/arch/arm/boot/dts/sun4i-a10.dtsi b/arch/arm/boot/dts/sun4i-a10.dtsi
-index 61c03d1..551e3d1 100644
---- a/arch/arm/boot/dts/sun4i-a10.dtsi
-+++ b/arch/arm/boot/dts/sun4i-a10.dtsi
-@@ -643,6 +643,14 @@
- 			status = "disabled";
- 		};
- 
-+		crypto: crypto-engine@01c15000 {
-+			compatible = "allwinner,sun4i-a10-crypto";
-+			reg = <0x01c15000 0x1000>;
-+			interrupts = <86>;
-+			clocks = <&ahb_gates 5>, <&ss_clk>;
-+			clock-names = "ahb", "mod";
-+		};
-+
- 		spi2: spi@01c17000 {
- 			compatible = "allwinner,sun4i-a10-spi";
- 			reg = <0x01c17000 0x1000>;
--- 
-2.3.6
+The driver support only CPU driven (aka poll mode) transfer mode,
+since the DMA engine of the A20 does not have a mainline driver yet.
+
+For the moment the driver is fully synchronous.
+A patch exists for making the driver asynchronous at the costs of badly decreasing performance.
+It will be re-introduced later when DMA will be supported.
+
+Changes since v10
+- fix checkpatch --strict issues (except for BIT where it is volontary)
+- lots of spelling fix
+- add mode to algt
+- import/export now initialize correctly op
+- replace some dev_err with dev_err_ratelimited
+
+Changes since v9
+- use spin_lock_bh instead of spin_lock_irqx
+- use sg_miter always with SG_MITER_ATOMIC flag
+- rework the hash update functions
+- the DES/3DES/AES now uses two functions one for all case and one for SG with
+ size not multiple of 4 and so remove the fallback for DES/3DES
+- add A10 support, tested by Matthieu CERDA
+- fix export/import functions
+- do not use any _relaxed read/write
+- write IV at end of cipher functions
+
+Changes since v8
+- use sg_miter in cipher functions, this clean all kmap stuff (thanks to bbrezillon)
+- use GIC in dt interupts
+- rename all references (files/dtcompatible) from sunxi to sun4i in prevision of futur A80/A83 driver
+
+Changes since v7
+- Add ECB block mode
+- split the sunxi_ss_cipher_init in two
+- remove sunxi_ss_cipher_encrypt/sunxi_ss_cipher_decrypt
+- use now sunxi_ss_block_method_encrypt and sunxi_ss_block_method_decrypt
+- Add weak DES key test needed by ECB tests
+
+Changes since v6:
+- Use alphabetic ordering for new sections in MAINTAINERS
+- Clean remaining PRNG driver header
+
+Changes since v5:
+- Hash functions now keep partial hash states in sunxi_ss structures
+- Use of spinlock instead of mutex
+- Remove the static sunxi_ss structures by using container of
+- Add export/import functions
+- replace lots of writel by writesl
+- replace lots of readl by readsl
+
+Changes since v4:
+- Rework all mutex path
+- Use ahash_request_ctx() in hash functions
+- Major rework of hash functions for solving mutex problems
+- Split sunxi_req_ctx in two since ciphers now use struct sunxi_tfm_ctx
+- Hash functions now test FIFO space register
+
+Changes since v3:
+- Remove all algorithms options from Kconfig, so now only one module is used
+- Add the sunxi_ss_cipher function to unify mode calculation
+- Remove the sunxi_cipher_exit empty function
+- Add some missing mutex_unlock()
+- Drop PRNG support, I wait for more comment on its results before re-enabling it.
+
+Changes since v2:
+- Fix Makefile and Kconfig for static kernel.
+
+Changes since v1:
+- annotate ss->base as __iomem
+- regroup all mutex in the ss_ctx structure
+- splited driver in 7 modules (core md5 sha1 aes des 3des prng) in sunxi-ss directory
+- use dev_exit_p() for .remove
+- added missing CRYPTO_BLKCIPHER dep in Kconfig
+- use ahash instead of shash
+- use ablkcipher instead of blkcipher
+- use crypto_rng_ctx instead of crypto_tfm_ctx
+- set seed as an u32
+- drop useless comment decoration
+- drop useless debug
+- ss_ctx is now a static pointer and whole structure being allocated
+- fix the platform_get_resource/devm_ioremap_resource pattern
+- invert getting die id and configuring clock
+- set clock value as a const unsigned long
+- add MODULE_ALIAS
+- use define names more consistency (SS_xxx)
+- fix PRNG errors
+- respell SS to Security System in DT documentation
