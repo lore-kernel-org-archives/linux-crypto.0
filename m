@@ -1,53 +1,73 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@freescale.com>
-Subject: [PATCH 4/4] crypto: caam - fix warning in APPEND_MATH_IMM_u64
-Date: Fri, 17 Jul 2015 16:54:54 +0300
-Message-ID: <1437141294-15678-4-git-send-email-horia.geanta@freescale.com>
-References: <1437141294-15678-1-git-send-email-horia.geanta@freescale.com>
+From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH v11 1/5] ARM: sun4i: dt: Add Security System to
+ A10 SoC DTS
+Date: Fri, 17 Jul 2015 16:39:38 +0200
+Message-ID: <1437143983-4479-2-git-send-email-clabbe.montjoie@gmail.com>
+References: <1437143983-4479-1-git-send-email-clabbe.montjoie@gmail.com>
+Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <linux-crypto@vger.kernel.org>,
-	Tudor Ambarus <tudor.ambarus@freescale.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0140.outbound.protection.outlook.com ([65.55.169.140]:41758
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751305AbbGQN4h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Jul 2015 09:56:37 -0400
-In-Reply-To: <1437141294-15678-1-git-send-email-horia.geanta@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
+	LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	pawel.moll-5wv7dgnIgG8@public.gmane.org,
+	mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
+	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
+	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
+	arnd-r2nGTMty4D4@public.gmane.org,
+	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBQVHUSWQKGQE4GGCSTA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+In-Reply-To: <1437143983-4479-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-=46rom: Tudor Ambarus <tudor.ambarus@freescale.com>
+The Security System is a hardware cryptographic accelerator that support
+AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+It could be found on many Allwinner SoC.
 
-An implicit truncation is done when using a variable of 64 bits
-in MATH command:
+This patch enable the Security System on the Allwinner A10 SoC Device-tree.
 
-warning: large integer implicitly truncated to unsigned type [-Woverflo=
-w]
-
-Silence the compiler by feeding it with an explicit truncated value.
-
-Signed-off-by: Tudor Ambarus <tudor.ambarus@freescale.com>
-Signed-off-by: Horia Geant=C4=83 <horia.geanta@freescale.com>
+Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- drivers/crypto/caam/desc_constr.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/boot/dts/sun4i-a10.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/de=
-sc_constr.h
-index 9f79fd7bd4d7..98d07de24fc4 100644
---- a/drivers/crypto/caam/desc_constr.h
-+++ b/drivers/crypto/caam/desc_constr.h
-@@ -367,7 +367,7 @@ do { \
- 	if (upper) \
- 		append_u64(desc, data); \
- 	else \
--		append_u32(desc, data); \
-+		append_u32(desc, lower_32_bits(data)); \
- } while (0)
-=20
- #define append_math_add_imm_u64(desc, dest, src0, src1, data) \
---=20
-2.4.4
+diff --git a/arch/arm/boot/dts/sun4i-a10.dtsi b/arch/arm/boot/dts/sun4i-a10.dtsi
+index 61c03d1..551e3d1 100644
+--- a/arch/arm/boot/dts/sun4i-a10.dtsi
++++ b/arch/arm/boot/dts/sun4i-a10.dtsi
+@@ -643,6 +643,14 @@
+ 			status = "disabled";
+ 		};
+ 
++		crypto: crypto-engine@01c15000 {
++			compatible = "allwinner,sun4i-a10-crypto";
++			reg = <0x01c15000 0x1000>;
++			interrupts = <86>;
++			clocks = <&ahb_gates 5>, <&ss_clk>;
++			clock-names = "ahb", "mod";
++		};
++
+ 		spi2: spi@01c17000 {
+ 			compatible = "allwinner,sun4i-a10-spi";
+ 			reg = <0x01c17000 0x1000>;
+-- 
+2.3.6
