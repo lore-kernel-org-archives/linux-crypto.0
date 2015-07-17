@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@freescale.com>
-Subject: [PATCH 3/4] crypto: caam - fix RNG init descriptor ret. code checking
-Date: Fri, 17 Jul 2015 16:54:53 +0300
-Message-ID: <1437141294-15678-3-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH 2/4] crypto: caam - fix snooping for write transactions
+Date: Fri, 17 Jul 2015 16:54:52 +0300
+Message-ID: <1437141294-15678-2-git-send-email-horia.geanta@freescale.com>
 References: <1437141294-15678-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -9,48 +9,68 @@ Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0140.outbound.protection.outlook.com ([157.56.111.140]:50720
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+Received: from mail-bl2on0124.outbound.protection.outlook.com ([65.55.169.124]:5578
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751305AbbGQN4e (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Jul 2015 09:56:34 -0400
+	id S1751305AbbGQN4c (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 17 Jul 2015 09:56:32 -0400
 In-Reply-To: <1437141294-15678-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When successful, the descriptor that performs RNG initialization
-is allowed to return a status code of 7000_0000h, since last command
-in the descriptor is a JUMP HALT.
+HW coherency won't work properly for CAAM write transactions
+if AWCACHE is left to default (POR) value - 4'b0001.
+It has to be programmed to 4'b0010, i.e. AXI3 Cacheable bit set.
+
+=46or platforms that have HW coherency support:
+-PPC-based: the update has no effect; CAAM coherency already works
+due to the IOMMU (PAMU) driver setting the correct memory coherency
+attributes
+-ARM-based: the update fixes cache coherency issues,
+since IOMMU (SMMU) driver is not programmed to behave similar to PAMU
 
 Signed-off-by: Horia Geant=C4=83 <horia.geanta@freescale.com>
 ---
  drivers/crypto/caam/ctrl.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/crypto/caam/regs.h | 6 ++++++
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index b924477c0d83..189180976167 100644
+index 598823746a3b..b924477c0d83 100644
 --- a/drivers/crypto/caam/ctrl.c
 +++ b/drivers/crypto/caam/ctrl.c
-@@ -175,7 +175,7 @@ static int instantiate_rng(struct device *ctrldev, =
-int state_handle_mask,
- {
- 	struct caam_drv_private *ctrlpriv =3D dev_get_drvdata(ctrldev);
- 	struct caam_ctrl __iomem *ctrl;
--	u32 *desc, status, rdsta_val;
-+	u32 *desc, status =3D 0, rdsta_val;
- 	int ret =3D 0, sh_idx;
+@@ -444,8 +444,9 @@ static int caam_probe(struct platform_device *pdev)
+ 	 * Enable DECO watchdogs and, if this is a PHYS_ADDR_T_64BIT kernel,
+ 	 * long pointers in master configuration register
+ 	 */
+-	setbits32(&ctrl->mcr, MCFGR_WDENABLE |
+-		  (sizeof(dma_addr_t) =3D=3D sizeof(u64) ? MCFGR_LONG_PTR : 0));
++	clrsetbits_be32(&ctrl->mcr, MCFGR_AWCACHE_MASK, MCFGR_AWCACHE_CACH |
++			MCFGR_WDENABLE | (sizeof(dma_addr_t) =3D=3D sizeof(u64) ?
++					 MCFGR_LONG_PTR : 0));
 =20
- 	ctrl =3D (struct caam_ctrl __iomem *)ctrlpriv->ctrl;
-@@ -207,7 +207,8 @@ static int instantiate_rng(struct device *ctrldev, =
-int state_handle_mask,
- 		 * CAAM eras), then try again.
- 		 */
- 		rdsta_val =3D rd_reg32(&ctrl->r4tst[0].rdsta) & RDSTA_IFMASK;
--		if (status || !(rdsta_val & (1 << sh_idx)))
-+		if ((status && status !=3D JRSTA_SSRC_JUMP_HALT_CC) ||
-+		    !(rdsta_val & (1 << sh_idx)))
- 			ret =3D -EAGAIN;
- 		if (ret)
- 			break;
+ 	/*
+ 	 *  Read the Compile Time paramters and SCFGR to determine
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 672c97489505..5e643523de15 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -395,10 +395,16 @@ struct caam_ctrl {
+ /* AXI read cache control */
+ #define MCFGR_ARCACHE_SHIFT	12
+ #define MCFGR_ARCACHE_MASK	(0xf << MCFGR_ARCACHE_SHIFT)
++#define MCFGR_ARCACHE_BUFF	(0x1 << MCFGR_ARCACHE_SHIFT)
++#define MCFGR_ARCACHE_CACH	(0x2 << MCFGR_ARCACHE_SHIFT)
++#define MCFGR_ARCACHE_RALL	(0x4 << MCFGR_ARCACHE_SHIFT)
+=20
+ /* AXI write cache control */
+ #define MCFGR_AWCACHE_SHIFT	8
+ #define MCFGR_AWCACHE_MASK	(0xf << MCFGR_AWCACHE_SHIFT)
++#define MCFGR_AWCACHE_BUFF	(0x1 << MCFGR_AWCACHE_SHIFT)
++#define MCFGR_AWCACHE_CACH	(0x2 << MCFGR_AWCACHE_SHIFT)
++#define MCFGR_AWCACHE_WALL	(0x8 << MCFGR_AWCACHE_SHIFT)
+=20
+ /* AXI pipeline depth */
+ #define MCFGR_AXIPIPE_SHIFT	4
 --=20
 2.4.4
