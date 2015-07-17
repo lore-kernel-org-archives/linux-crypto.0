@@ -1,8 +1,8 @@
 From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v11 3/5] ARM: sun4i: dt: Add DT bindings
- documentation for SUN4I Security System
-Date: Fri, 17 Jul 2015 16:39:40 +0200
-Message-ID: <1437143983-4479-4-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH v11 5/5] MAINTAINERS: Add myself as maintainer
+ of Allwinner Security System
+Date: Fri, 17 Jul 2015 16:39:42 +0200
+Message-ID: <1437143983-4479-6-git-send-email-clabbe.montjoie@gmail.com>
 References: <1437143983-4479-1-git-send-email-clabbe.montjoie@gmail.com>
 Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
@@ -28,7 +28,7 @@ To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
 	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
 	arnd-r2nGTMty4D4@public.gmane.org,
 	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBR5HUSWQKGQEMXRALMQ-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBTFHUSWQKGQEKI7I36I-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 In-Reply-To: <1437143983-4479-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
@@ -39,39 +39,27 @@ List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39
  <http://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds documentation for Device-Tree bindings for the
-Security System cryptographic accelerator driver.
-
 Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- Documentation/devicetree/bindings/crypto/sun4i-ss.txt | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/sun4i-ss.txt
+ MAINTAINERS | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/sun4i-ss.txt b/Documentation/devicetree/bindings/crypto/sun4i-ss.txt
-new file mode 100644
-index 0000000..1e02d17
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/sun4i-ss.txt
-@@ -0,0 +1,19 @@
-+* Allwinner Security System found on A20 SoC
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2d3d55c..308da53 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -556,6 +556,12 @@ S:	Maintained
+ F:	Documentation/i2c/busses/i2c-ali1563
+ F:	drivers/i2c/busses/i2c-ali1563.c
+ 
++ALLWINNER SECURITY SYSTEM
++M:	Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
++L:	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
++S:	Maintained
++F:	drivers/crypto/sunxi-ss/
 +
-+Required properties:
-+- compatible : Should be "allwinner,sun4i-a10-crypto".
-+- reg: Should contain the Security System register location and length.
-+- interrupts: Should contain the IRQ line for the Security System.
-+- clocks : List of clock specifiers, corresponding to ahb and ss.
-+- clock-names : Name of the functional clock, should be
-+	* "ahb" : AHB gating clock
-+	* "mod" : SS controller clock
-+
-+Example:
-+	crypto: crypto-engine@01c15000 {
-+		compatible = "allwinner,sun4i-a10-crypto";
-+		reg = <0x01c15000 0x1000>;
-+		interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
-+		clocks = <&ahb_gates 5>, <&ss_clk>;
-+		clock-names = "ahb", "mod";
-+	};
+ ALPHA PORT
+ M:	Richard Henderson <rth-hL46jP5Bxq7R7s880joybQ@public.gmane.org>
+ M:	Ivan Kokshaysky <ink-biIs/Y0ymYJMZLIVYojuPNP0rXTJTi09@public.gmane.org>
 -- 
 2.3.6
