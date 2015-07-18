@@ -1,73 +1,56 @@
-From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v11 2/5] ARM: sun7i: dt: Add Security System to
- A20 SoC DTS
-Date: Fri, 17 Jul 2015 16:39:39 +0200
-Message-ID: <1437143983-4479-3-git-send-email-clabbe.montjoie@gmail.com>
-References: <1437143983-4479-1-git-send-email-clabbe.montjoie@gmail.com>
-Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Scott Wood <scottwood-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
+Subject: [RFC PATCH 03/17] crypto: caam: Blacklist CAAM when kexec is enabled
+Date: Sat, 18 Jul 2015 15:08:40 -0500
+Message-ID: <1437250134-307-4-git-send-email-scottwood@freescale.com>
+References: <1437250134-307-1-git-send-email-scottwood@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
-	LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-	pawel.moll-5wv7dgnIgG8@public.gmane.org,
-	mark.rutland-5wv7dgnIgG8@public.gmane.org,
-	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
-	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
-	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
-	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
-	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
-	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
-	arnd-r2nGTMty4D4@public.gmane.org,
-	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBRNHUSWQKGQETS7TUIA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-In-Reply-To: <1437143983-4479-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <http://groups.google.com/group/linux-sunxi
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <http://groups.google.com/group/linux-sunxi/subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+ Cristian Stoica <cristian.stoica-KZfg59tc24xl57MIdRCFDg@public.gmane.org>, kexec-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+ linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Scott
+ Wood <scottwood-KZfg59tc24xl57MIdRCFDg@public.gmane.org>, Tiejun Chen <tiejun.chen-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+ Horia Geanta <horia.geanta-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
+To: <linuxppc-dev-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org>
+Return-path: <kexec-bounces+glkk-kexec=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+In-Reply-To: <1437250134-307-1-git-send-email-scottwood-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/kexec>,
+ <mailto:kexec-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/kexec/>
+List-Post: <mailto:kexec-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Help: <mailto:kexec-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/kexec>,
+ <mailto:kexec-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
+Sender: "kexec" <kexec-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Errors-To: kexec-bounces+glkk-kexec=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-The Security System is a hardware cryptographic accelerator that support
-AES/MD5/SHA1/DES/3DES/PRNG algorithms.
-It could be found on many Allwinner SoC.
+This driver hangs the kernel on boot when loaded via kexec.
 
-This patch enable the Security System on the Allwinner A20 SoC Device-tree.
+To make this driver kexec-safe, add a suspend or freeze hook, and when
+probing, don't make any assumptions about the existing hardware state
+(e.g. don't request_irq before quiescing the device).
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Scott Wood <scottwood-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
+Cc: Cristian Stoica <cristian.stoica-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
+Cc: Horia Geanta <horia.geanta-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 ---
- arch/arm/boot/dts/sun7i-a20.dtsi | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/crypto/caam/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm/boot/dts/sun7i-a20.dtsi b/arch/arm/boot/dts/sun7i-a20.dtsi
-index 6a63f30..ba049d3 100644
---- a/arch/arm/boot/dts/sun7i-a20.dtsi
-+++ b/arch/arm/boot/dts/sun7i-a20.dtsi
-@@ -731,6 +731,14 @@
- 			status = "disabled";
- 		};
- 
-+		crypto: crypto-engine@01c15000 {
-+			compatible = "allwinner,sun4i-a10-crypto";
-+			reg = <0x01c15000 0x1000>;
-+			interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&ahb_gates 5>, <&ss_clk>;
-+			clock-names = "ahb", "mod";
-+		};
-+
- 		spi2: spi@01c17000 {
- 			compatible = "allwinner,sun4i-a10-spi";
- 			reg = <0x01c17000 0x1000>;
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index e286e28..310e9e0 100644
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -1,6 +1,6 @@
+ config CRYPTO_DEV_FSL_CAAM
+ 	tristate "Freescale CAAM-Multicore driver backend"
+-	depends on FSL_SOC
++	depends on FSL_SOC && !KEXEC
+ 	help
+ 	  Enables the driver module for Freescale's Cryptographic Accelerator
+ 	  and Assurance Module (CAAM), also known as the SEC version 4 (SEC4).
 -- 
-2.3.6
+2.1.4
