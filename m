@@ -1,56 +1,36 @@
-From: Scott Wood <scottwood-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
-Subject: [RFC PATCH 03/17] crypto: caam: Blacklist CAAM when kexec is enabled
-Date: Sat, 18 Jul 2015 15:08:40 -0500
-Message-ID: <1437250134-307-4-git-send-email-scottwood@freescale.com>
-References: <1437250134-307-1-git-send-email-scottwood@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/4] crypto: caam - fix ERA property reading
+Date: Mon, 20 Jul 2015 16:10:25 +0800
+Message-ID: <20150720081025.GA12908@gondor.apana.org.au>
+References: <1437141294-15678-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
- Cristian Stoica <cristian.stoica-KZfg59tc24xl57MIdRCFDg@public.gmane.org>, kexec-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
- linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Scott
- Wood <scottwood-KZfg59tc24xl57MIdRCFDg@public.gmane.org>, Tiejun Chen <tiejun.chen-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
- Horia Geanta <horia.geanta-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
-To: <linuxppc-dev-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org>
-Return-path: <kexec-bounces+glkk-kexec=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-In-Reply-To: <1437250134-307-1-git-send-email-scottwood-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/kexec>,
- <mailto:kexec-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/kexec/>
-List-Post: <mailto:kexec-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Help: <mailto:kexec-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/kexec>,
- <mailto:kexec-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
-Sender: "kexec" <kexec-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-Errors-To: kexec-bounces+glkk-kexec=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org,
+	Alex Porosanu <alexandru.porosanu@freescale.com>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:51709 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932591AbbGTIKa (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 20 Jul 2015 04:10:30 -0400
+Content-Disposition: inline
+In-Reply-To: <1437141294-15678-1-git-send-email-horia.geanta@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This driver hangs the kernel on boot when loaded via kexec.
+On Fri, Jul 17, 2015 at 04:54:51PM +0300, Horia Geant=C4=83 wrote:
+> From: Alex Porosanu <alexandru.porosanu@freescale.com>
+>=20
+> In order to ensure that the ERA property is properly read from DT
+> on all platforms, of_property_read* function needs to be used.
+>=20
+> Signed-off-by: Alex Porosanu <alexandru.porosanu@freescale.com>
+> Signed-off-by: Horia Geant=C4=83 <horia.geanta@freescale.com>
 
-To make this driver kexec-safe, add a suspend or freeze hook, and when
-probing, don't make any assumptions about the existing hardware state
-(e.g. don't request_irq before quiescing the device).
-
-Signed-off-by: Scott Wood <scottwood-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
-Cc: Cristian Stoica <cristian.stoica-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
-Cc: Horia Geanta <horia.geanta-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
----
- drivers/crypto/caam/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index e286e28..310e9e0 100644
---- a/drivers/crypto/caam/Kconfig
-+++ b/drivers/crypto/caam/Kconfig
-@@ -1,6 +1,6 @@
- config CRYPTO_DEV_FSL_CAAM
- 	tristate "Freescale CAAM-Multicore driver backend"
--	depends on FSL_SOC
-+	depends on FSL_SOC && !KEXEC
- 	help
- 	  Enables the driver module for Freescale's Cryptographic Accelerator
- 	  and Assurance Module (CAAM), also known as the SEC version 4 (SEC4).
--- 
-2.1.4
+All applied.
+--=20
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
