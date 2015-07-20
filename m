@@ -1,36 +1,48 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/4] crypto: caam - fix ERA property reading
-Date: Mon, 20 Jul 2015 16:10:25 +0800
-Message-ID: <20150720081025.GA12908@gondor.apana.org.au>
-References: <1437141294-15678-1-git-send-email-horia.geanta@freescale.com>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v11] crypto: Add Allwinner Security System
+ crypto accelerator
+Date: Mon, 20 Jul 2015 16:10:50 +0800
+Message-ID: <20150720081050.GB12908@gondor.apana.org.au>
+References: <1437143983-4479-1-git-send-email-clabbe.montjoie@gmail.com>
+Reply-To: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org,
-	Alex Porosanu <alexandru.porosanu@freescale.com>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51709 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932591AbbGTIKa (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Jul 2015 04:10:30 -0400
+Content-Type: text/plain; charset=UTF-8
+Cc: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org, mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org,
+	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-sunxi+bncBDTY5EWUQMEBBTO2WKWQKGQEF7XLTZI-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1437141294-15678-1-git-send-email-horia.geanta@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1437143983-4479-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jul 17, 2015 at 04:54:51PM +0300, Horia Geant=C4=83 wrote:
-> From: Alex Porosanu <alexandru.porosanu@freescale.com>
->=20
-> In order to ensure that the ERA property is properly read from DT
-> on all platforms, of_property_read* function needs to be used.
->=20
-> Signed-off-by: Alex Porosanu <alexandru.porosanu@freescale.com>
-> Signed-off-by: Horia Geant=C4=83 <horia.geanta@freescale.com>
+On Fri, Jul 17, 2015 at 04:39:37PM +0200, LABBE Corentin wrote:
+> Hello
+> 
+> This is the driver for the Security System included in Allwinner SoC A20.
+> The Security System (SS for short) is a hardware cryptographic accelerator that
+> support AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+> It could be found on others Allwinner SoC: 
+> - A10, A10s, A13, A31 and A33 manual give the same datasheet for SS than A20
+> - A23 speak about a security system but without precisions
+> - A80 and A83T datasheet speak about a security system with more functions
+>   (SHA224/SHA256/RSA/CRC), they will be supported in a separate driver.
 
-All applied.
---=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
+All applied.  Thanks a lot!
+-- 
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
