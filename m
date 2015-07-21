@@ -1,33 +1,71 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: qat - fix invalid check for RSA keylen in fips
- mode
-Date: Tue, 21 Jul 2015 20:26:12 +0800
-Message-ID: <20150721122611.GB25104@gondor.apana.org.au>
-References: <20150721001827.24523.30789.stgit@tstruk-mobl1>
+From: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Subject: Re: [PATCH v11] crypto: Add Allwinner Security System
+ crypto accelerator
+Date: Tue, 21 Jul 2015 14:38:47 +0200
+Message-ID: <20150721123847.GD2373@lukather>
+References: <1437143983-4479-1-git-send-email-clabbe.montjoie@gmail.com>
+ <20150720081050.GB12908@gondor.apana.org.au>
+ <20150720081836.GT28632@lukather>
+ <20150720082057.GA13098@gondor.apana.org.au>
+Reply-To: maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, dan.carpenter@oracle.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:33192 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751415AbbGUM0g (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 21 Jul 2015 08:26:36 -0400
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="LTeJQqWS0MN7I/qa"
+Cc: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
+	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org, joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
+	devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-sunxi+bncBD2ZNBF5VYJRBI73XCWQKGQED4SO2RI-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20150721001827.24523.30789.stgit@tstruk-mobl1>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20150720082057.GA13098-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jul 20, 2015 at 05:18:27PM -0700, Tadeusz Struk wrote:
-> The condition checking allowed key length was invalid.
-> 
-> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+--LTeJQqWS0MN7I/qa
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
 
-Applied.
+On Mon, Jul 20, 2015 at 04:20:57PM +0800, Herbert Xu wrote:
+> On Mon, Jul 20, 2015 at 10:18:36AM +0200, Maxime Ripard wrote:
+> > On Mon, Jul 20, 2015 at 04:10:50PM +0800, Herbert Xu wrote:
+> > > On Fri, Jul 17, 2015 at 04:39:37PM +0200, LABBE Corentin wrote:
+> > > > Hello
+> > > > 
+> > > > This is the driver for the Security System included in Allwinner SoC A20.
+> > > > The Security System (SS for short) is a hardware cryptographic accelerator that
+> > > > support AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+> > > > It could be found on others Allwinner SoC: 
+> > > > - A10, A10s, A13, A31 and A33 manual give the same datasheet for SS than A20
+> > > > - A23 speak about a security system but without precisions
+> > > > - A80 and A83T datasheet speak about a security system with more functions
+> > > >   (SHA224/SHA256/RSA/CRC), they will be supported in a separate driver.
+> > > 
+> > > All applied.  Thanks a lot!
+> > 
+> > All applied, DT bits included?
+> 
+> Yes.
+
+I thought you needed at least my Acked-by for that, but
+whatever... How are we supposed to handle subsequent DT patches that
+should be merged through arm-soc then?
+
+Maxime
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Maxime Ripard, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
+--LTeJQqWS0MN7I/qa--
