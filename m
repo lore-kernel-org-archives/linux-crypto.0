@@ -1,42 +1,63 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v11] crypto: Add Allwinner Security System crypto
- accelerator
-Date: Tue, 21 Jul 2015 20:50:14 +0800
-Message-ID: <20150721125014.GA25272@gondor.apana.org.au>
-References: <1437143983-4479-1-git-send-email-clabbe.montjoie@gmail.com>
- <20150720081050.GB12908@gondor.apana.org.au>
- <20150720081836.GT28632@lukather>
- <20150720082057.GA13098@gondor.apana.org.au>
- <20150721123847.GD2373@lukather>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 3/3] crypto: algif_akcipher - enable compilation
+Date: Wed, 22 Jul 2015 00:13:39 +0200
+Message-ID: <13692732.LcDMk6zc2n@tachyon.chronox.de>
+References: <3908391.JkjAozYBaW@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: LABBE Corentin <clabbe.montjoie@gmail.com>, robh+dt@kernel.org,
-	pawel.moll@arm.com, mark.rutland@arm.com,
-	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
-	linux@arm.linux.org.uk, davem@davemloft.net,
-	akpm@linux-foundation.org, gregkh@linuxfoundation.org,
-	mchehab@osg.samsung.com, arnd@arndb.de, joe@perches.com,
-	devicetree@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-sunxi@googlegroups.com
-To: Maxime Ripard <maxime.ripard@free-electrons.com>
-Return-path: <linux-doc-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20150721123847.GD2373@lukather>
-Sender: linux-doc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: tadeusz.struk@intel.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:47974 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756100AbbGUWOf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 21 Jul 2015 18:14:35 -0400
+In-Reply-To: <3908391.JkjAozYBaW@tachyon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 21, 2015 at 02:38:47PM +0200, Maxime Ripard wrote:
-> I thought you needed at least my Acked-by for that, but
-> whatever... How are we supposed to handle subsequent DT patches that
-> should be merged through arm-soc then?
+Add the Makefile and Kconfig updates to allow algif_akcipher to be
+compiled.
 
-What subsequent patches are you referring to? The changes in
-this series are fairly self-contained so it should be unlikely
-to cause serious merge conflicts.
+CC: Tadeusz Struk <tadeusz.struk@intel.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/Kconfig  | 9 +++++++++
+ crypto/Makefile | 1 +
+ 2 files changed, 10 insertions(+)
 
-Cheers,
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 354bb69..d12ecc5 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1623,6 +1623,15 @@ config CRYPTO_USER_API_AEAD
+ 	  This option enables the user-spaces interface for AEAD
+ 	  cipher algorithms.
+ 
++config CRYPTO_USER_API_AKCIPHER
++	tristate "User-space interface for asymmetric key cipher algorithms"
++	depends on NET
++	select CRYPTO_AKCIPHER2
++	select CRYPTO_USER_API
++	help
++	  This option enables the user-spaces interface for asymmetric
++	  key cipher algorithms.
++
+ config CRYPTO_HASH_INFO
+ 	bool
+ 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index a16a7e7..64823ab 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -116,6 +116,7 @@ obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
+ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+ obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
+ obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
++obj-$(CONFIG_CRYPTO_USER_API_AKCIPHER) += algif_akcipher.o
+ 
+ #
+ # generic algorithms and the async_tx api
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.4.3
