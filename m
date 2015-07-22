@@ -1,100 +1,76 @@
-From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH 3/8] crypto: nx - move kzalloc() out of spinlock
-Date: Wed, 22 Jul 2015 14:26:33 -0400
-Message-ID: <1437589598-23917-4-git-send-email-ddstreet@ieee.org>
-References: <1437589598-23917-1-git-send-email-ddstreet@ieee.org>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Dan Streetman <ddstreet@ieee.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1437589598-23917-1-git-send-email-ddstreet@ieee.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 2/3] crypto: algif_akcipher user space interface
+Date: Wed, 22 Jul 2015 20:55:18 +0200
+Message-ID: <7336837.Ud0PiFKhfA@tachyon.chronox.de>
+References: <3908391.JkjAozYBaW@tachyon.chronox.de> <1537904.OY6iC43nQX@tachyon.chronox.de> <55AFBE4B.8080805@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:47989 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751600AbbGVSz2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Jul 2015 14:55:28 -0400
+In-Reply-To: <55AFBE4B.8080805@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Move the kzalloc() calls in nx842_probe() and nx842_OF_upd() to the top
-of the functions, before taking the devdata spinlock.
+Am Mittwoch, 22. Juli 2015, 09:01:15 schrieb Tadeusz Struk:
 
-Since kzalloc() without GFP_ATOMIC can sleep, it can't be called while
-holding a spinlock.  Move the calls to before taking the lock.
+Hi Tadeusz,
 
-Signed-off-by: Dan Streetman <ddstreet@ieee.org>
----
- drivers/crypto/nx/nx-842-pseries.c | 38 ++++++++++++++++----------------------
- 1 file changed, 16 insertions(+), 22 deletions(-)
+> On 07/21/2015 03:13 PM, Stephan Mueller wrote:
+> > +static ssize_t akcipher_sendpage(struct socket *sock, struct page *page,
+> > +				 int offset, size_t size, int flags)
+> > +{
+> > +	struct sock *sk = sock->sk;
+> > +	struct alg_sock *ask = alg_sk(sk);
+> > +	struct akcipher_ctx *ctx = ask->private;
+> > +	int err = -EINVAL;
+> > +
+> > +	if (flags & MSG_SENDPAGE_NOTLAST)
+> > +		flags |= MSG_MORE;
+> > +
+> > +	lock_sock(sk);
+> > +
+> > +	/*
+> > +	 * We do not allow mixing of sendmsg and sendpage calls as this would
+> > +	 * require a hairy memory management.
+> > +	 *
+> > +	 * This check also guards against double call of sendpage.
+> > +	 * We require that the output buffer size must be provided with one
+> > +	 * sendpage request as otherwise we cannot have a linear buffer 
+required
+> > +	 * by the akcipher API.
+> > +	 */
+> > +	if (ctx->req_data_ptr)
+> > +		goto unlock;
+> 
+> Shouldn't we be more flexible and copy the data if it comes in chunks here
+> too. The user doesn't really have control over this and it would look bad
+> if splice would randomly fail for a valid buffer.
 
-diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
-index b375877..74c53a1 100644
---- a/drivers/crypto/nx/nx-842-pseries.c
-+++ b/drivers/crypto/nx/nx-842-pseries.c
-@@ -724,6 +724,10 @@ static int nx842_OF_upd(struct property *new_prop)
- 	int ret = 0;
- 	unsigned long flags;
- 
-+	new_devdata = kzalloc(sizeof(*new_devdata), GFP_NOFS);
-+	if (!new_devdata)
-+		return -ENOMEM;
-+
- 	spin_lock_irqsave(&devdata_mutex, flags);
- 	old_devdata = rcu_dereference_check(devdata,
- 			lockdep_is_held(&devdata_mutex));
-@@ -733,16 +737,10 @@ static int nx842_OF_upd(struct property *new_prop)
- 	if (!old_devdata || !of_node) {
- 		pr_err("%s: device is not available\n", __func__);
- 		spin_unlock_irqrestore(&devdata_mutex, flags);
-+		kfree(new_devdata);
- 		return -ENODEV;
- 	}
- 
--	new_devdata = kzalloc(sizeof(*new_devdata), GFP_NOFS);
--	if (!new_devdata) {
--		dev_err(old_devdata->dev, "%s: Could not allocate memory for device data\n", __func__);
--		ret = -ENOMEM;
--		goto error_out;
--	}
--
- 	memcpy(new_devdata, old_devdata, sizeof(*old_devdata));
- 	new_devdata->counters = old_devdata->counters;
- 
-@@ -966,6 +964,17 @@ static int nx842_probe(struct vio_dev *viodev,
- 	unsigned long flags;
- 	int ret = 0;
- 
-+	new_devdata = kzalloc(sizeof(*new_devdata), GFP_NOFS);
-+	if (!new_devdata)
-+		return -ENOMEM;
-+
-+	new_devdata->counters = kzalloc(sizeof(*new_devdata->counters),
-+			GFP_NOFS);
-+	if (!new_devdata->counters) {
-+		kfree(new_devdata);
-+		return -ENOMEM;
-+	}
-+
- 	spin_lock_irqsave(&devdata_mutex, flags);
- 	old_devdata = rcu_dereference_check(devdata,
- 			lockdep_is_held(&devdata_mutex));
-@@ -978,21 +987,6 @@ static int nx842_probe(struct vio_dev *viodev,
- 
- 	dev_set_drvdata(&viodev->dev, NULL);
- 
--	new_devdata = kzalloc(sizeof(*new_devdata), GFP_NOFS);
--	if (!new_devdata) {
--		dev_err(&viodev->dev, "%s: Could not allocate memory for device data\n", __func__);
--		ret = -ENOMEM;
--		goto error_unlock;
--	}
--
--	new_devdata->counters = kzalloc(sizeof(*new_devdata->counters),
--			GFP_NOFS);
--	if (!new_devdata->counters) {
--		dev_err(&viodev->dev, "%s: Could not allocate memory for performance counters\n", __func__);
--		ret = -ENOMEM;
--		goto error_unlock;
--	}
--
- 	new_devdata->vdev = viodev;
- 	new_devdata->dev = &viodev->dev;
- 	nx842_OF_set_defaults(new_devdata);
+I concur with you. But we have only two options:
+
+- either use SGLs which the current akcipher API does not do
+
+- or do a memcpy of the sendpage data into the internal buffer
+
+As the sendpage already has a speed penalty, I did not like the latter one. 
+Based on my measurements for AEAD, Hash and skicpher, sendpage starts to 
+become faster than sendmsg with input buffers > 8 to 16 kBytes (sendpage as at 
+least 4 syscalls where sendmsg uses only two).
+
+As our current akcipher API does not reach the mentioned limit, I opted to 
+require one sendpage call.
+
+But if we change the akcipher API to SGLs, I will lift that limit.
+
+Thanks
+
+
 -- 
-2.1.0
+Ciao
+Stephan
