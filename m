@@ -1,56 +1,60 @@
 From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH 0/8] remove 'platform' shared NX driver
-Date: Wed, 22 Jul 2015 14:26:30 -0400
-Message-ID: <1437589598-23917-1-git-send-email-ddstreet@ieee.org>
+Subject: [PATCH 1/8] crypto: nx - remove __init/__exit from VIO functions
+Date: Wed, 22 Jul 2015 14:26:31 -0400
+Message-ID: <1437589598-23917-2-git-send-email-ddstreet@ieee.org>
+References: <1437589598-23917-1-git-send-email-ddstreet@ieee.org>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	Dan Streetman <ddstreet@ieee.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pd0-f179.google.com ([209.85.192.179]:35081 "EHLO
-	mail-pd0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750803AbbGVS05 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jul 2015 14:26:57 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1437589598-23917-1-git-send-email-ddstreet@ieee.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The shared 'platform' driver module isn't needed, the platform drivers
-can directly register with crypto instead.  It only adds unneeded
-complexity and problems.
+Remove the __init and __exit modifiers from the VIO driver probe and
+remove functions.
 
-The first 4 patches are minor updates/bugfixes to the pSeries driver.
+The driver functions should not be marked __init/__exit because they
+can/will be called during runtime, not only at module init and exit.
 
-The 5th patch is a minor update to the NX crypto driver.
+Signed-off-by: Dan Streetman <ddstreet@ieee.org>
+---
+ drivers/crypto/nx/nx-842-pseries.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-The last 3 patches merge the crypto and common code driver, and move
-the crypto compression driver registration into the platform (pSeries
-and PowerNV) drivers.  Both platform drivers use the same alg name and
-driver name when registering, but since only one (at most) will register
-on a system, depending on the platform, their registration will not
-conflict.
-
-Dan Streetman (8):
-  crypto: nx - remove __init/__exit from VIO functions
-  crypto: nx - remove pSeries NX 'status' field
-  crypto: nx - move kzalloc() out of spinlock
-  crypto: nx - don't register pSeries driver if ENODEV
-  crypto: nx - use common code for both NX decompress success cases
-  crypto: nx - merge nx-compress and nx-compress-crypto
-  crypto: nx - rename nx-842-crypto.c to nx-842.c
-  crypto: nx - make platform drivers directly register with crypto
-
- drivers/crypto/nx/Kconfig           |  17 +-
- drivers/crypto/nx/Makefile          |   8 +-
- drivers/crypto/nx/nx-842-crypto.c   | 602 ------------------------------------
- drivers/crypto/nx/nx-842-platform.c |  84 -----
- drivers/crypto/nx/nx-842-powernv.c  |  29 +-
- drivers/crypto/nx/nx-842-pseries.c  | 126 ++++----
- drivers/crypto/nx/nx-842.c          | 554 +++++++++++++++++++++++++++++----
- drivers/crypto/nx/nx-842.h          |  65 +++-
- 8 files changed, 638 insertions(+), 847 deletions(-)
- delete mode 100644 drivers/crypto/nx/nx-842-crypto.c
- delete mode 100644 drivers/crypto/nx/nx-842-platform.c
-
+diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
+index d44524d..fc59520 100644
+--- a/drivers/crypto/nx/nx-842-pseries.c
++++ b/drivers/crypto/nx/nx-842-pseries.c
+@@ -977,8 +977,8 @@ static struct nx842_driver nx842_pseries_driver = {
+ 	.decompress =	nx842_pseries_decompress,
+ };
+ 
+-static int __init nx842_probe(struct vio_dev *viodev,
+-				  const struct vio_device_id *id)
++static int nx842_probe(struct vio_dev *viodev,
++		       const struct vio_device_id *id)
+ {
+ 	struct nx842_devdata *old_devdata, *new_devdata = NULL;
+ 	unsigned long flags;
+@@ -1050,7 +1050,7 @@ error:
+ 	return ret;
+ }
+ 
+-static int __exit nx842_remove(struct vio_dev *viodev)
++static int nx842_remove(struct vio_dev *viodev)
+ {
+ 	struct nx842_devdata *old_devdata;
+ 	unsigned long flags;
+@@ -1081,7 +1081,7 @@ static struct vio_device_id nx842_vio_driver_ids[] = {
+ static struct vio_driver nx842_vio_driver = {
+ 	.name = KBUILD_MODNAME,
+ 	.probe = nx842_probe,
+-	.remove = __exit_p(nx842_remove),
++	.remove = nx842_remove,
+ 	.get_desired_dma = nx842_get_desired_dma,
+ 	.id_table = nx842_vio_driver_ids,
+ };
 -- 
 2.1.0
