@@ -1,7 +1,7 @@
 From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH 4/8] crypto: nx - don't register pSeries driver if ENODEV
-Date: Wed, 22 Jul 2015 14:26:34 -0400
-Message-ID: <1437589598-23917-5-git-send-email-ddstreet@ieee.org>
+Subject: [PATCH 5/8] crypto: nx - use common code for both NX decompress success cases
+Date: Wed, 22 Jul 2015 14:26:35 -0400
+Message-ID: <1437589598-23917-6-git-send-email-ddstreet@ieee.org>
 References: <1437589598-23917-1-git-send-email-ddstreet@ieee.org>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	Dan Streetman <ddstreet@ieee.org>
@@ -12,37 +12,41 @@ In-Reply-To: <1437589598-23917-1-git-send-email-ddstreet@ieee.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Don't register the pSeries driver when parsing the device tree returns
-ENODEV.
+Replace the duplicated finishing code (set destination buffer length and
+set return code to 0) in the case of decompressing a buffer with no header
+with a goto to the success case of decompressing a buffer with a header.
 
-The nx842_probe() function in the pSeries driver returns error instead
-of registering as a crypto compression driver, when it receives an
-error return value from the nx842_OF_upd() function that probes the
-device tree nodes, except when ENODEV is returned.  However ENODEV
-should not be a special case and the driver should not register when
-there is no hw device, or the hw device is disabled.
+This is a trivial change that allows both success cases to use common code,
+and includes the pr_debug() msg in both cases as well.
 
 Signed-off-by: Dan Streetman <ddstreet@ieee.org>
 ---
- drivers/crypto/nx/nx-842-pseries.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ drivers/crypto/nx/nx-842-crypto.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
-index 74c53a1..4b7bd8f 100644
---- a/drivers/crypto/nx/nx-842-pseries.c
-+++ b/drivers/crypto/nx/nx-842-pseries.c
-@@ -999,11 +999,8 @@ static int nx842_probe(struct vio_dev *viodev,
- 	of_reconfig_notifier_register(&nx842_of_nb);
+diff --git a/drivers/crypto/nx/nx-842-crypto.c b/drivers/crypto/nx/nx-842-crypto.c
+index 3288a70..51ca168 100644
+--- a/drivers/crypto/nx/nx-842-crypto.c
++++ b/drivers/crypto/nx/nx-842-crypto.c
+@@ -520,10 +520,7 @@ static int nx842_crypto_decompress(struct crypto_tfm *tfm,
+ 		if (ret)
+ 			goto unlock;
  
- 	ret = nx842_OF_upd(NULL);
--	if (ret && ret != -ENODEV) {
--		dev_err(&viodev->dev, "could not parse device tree. %d\n", ret);
--		ret = -1;
-+	if (ret)
- 		goto error;
--	}
+-		*dlen = p.ototal;
+-
+-		ret = 0;
+-		goto unlock;
++		goto success;
+ 	}
  
- 	rcu_read_lock();
- 	dev_set_drvdata(&viodev->dev, rcu_dereference(devdata));
+ 	if (!hdr->groups) {
+@@ -557,6 +554,7 @@ static int nx842_crypto_decompress(struct crypto_tfm *tfm,
+ 			goto unlock;
+ 	}
+ 
++success:
+ 	*dlen = p.ototal;
+ 
+ 	pr_debug("decompress total slen %x dlen %x\n", slen, *dlen);
 -- 
 2.1.0
