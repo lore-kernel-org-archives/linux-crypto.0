@@ -1,40 +1,49 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: ixp4xx - Remove bogus BUG_ON on scattered dst buffer
-Date: Wed, 22 Jul 2015 18:05:35 +0800
-Message-ID: <20150722100535.GA2871@gondor.apana.org.au>
+From: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH 0/3] AF_ALG interface for akcipher
+Date: Wed, 22 Jul 2015 14:58:18 +0300
+Message-ID: <55AF855A.9000202@freescale.com>
+References: <3908391.JkjAozYBaW@tachyon.chronox.de>
+ <20150722013241.GA31240@gondor.apana.org.au> <55AF19D0.5040700@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Christian Hohnstaedt <chohnstaedt@innominate.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>,
+	=?UTF-8?B?VHVkb3IgQW1ixINydciZ?= <tudor.ambarus@freescale.com>
+To: Tadeusz Struk <tadeusz.struk@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38670 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933303AbbGVKFl (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jul 2015 06:05:41 -0400
-Content-Disposition: inline
+Received: from mail-by2on0129.outbound.protection.outlook.com ([207.46.100.129]:45024
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S964802AbbGVMcS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Jul 2015 08:32:18 -0400
+In-Reply-To: <55AF19D0.5040700@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch removes a bogus BUG_ON in the ablkcipher path that
-triggers when the destination buffer is different from the source
-buffer and is scattered.
+On 7/22/2015 7:19 AM, Tadeusz Struk wrote:
+> On 07/21/2015 06:32 PM, Herbert Xu wrote:
+>> I think we should finish the conversion of the only in-kernel
+>> user of RSA before we add the user-space interface.  Otherwise
+>> this unnecessarily ties our hands to the current API.
+>>
+>> For example, do we want an SG interface for the input and output?
+>> As it stands even if a hardware device came with SG support we
+>> would not be able to use it.
+>>
+>> Tadeusz, can you confirm again that qat does not support SG with
+>> respect to RSA input and output?
+> 
+> No, it doesn't. Even if we would add SG support on the API it will
+> need to be copied into contiguous buffers before it is sent to the HW.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+OTOH, caam has SG support for all PK operations, including rsa-encrypt,
+rsa-decrypt primitives.
+We are working at upstreaming - aligning our internal caam-pkc with
+akcipher.
 
-diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index 7ba495f..402631a 100644
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -905,7 +905,6 @@ static int ablk_perform(struct ablkcipher_request *req, int encrypt)
- 		crypt->mode |= NPE_OP_NOT_IN_PLACE;
- 		/* This was never tested by Intel
- 		 * for more than one dst buffer, I think. */
--		BUG_ON(req->dst->length < nbytes);
- 		req_ctx->dst = NULL;
- 		if (!chainup_buffers(dev, req->dst, nbytes, &dst_hook,
- 					flags, DMA_FROM_DEVICE))
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Please consider designing a flexible AF_ALG interface, as Stephan suggested.
+
+Thanks,
+Horia
