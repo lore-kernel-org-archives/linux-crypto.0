@@ -1,85 +1,63 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH] crypto: qat - Fix invalid synchronization between
- register/unregister sym algs
-Date: Tue, 21 Jul 2015 22:07:47 -0700
-Message-ID: <20150722050747.29130.79115.stgit@tstruk-mobl1>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 0/3] AF_ALG interface for akcipher
+Date: Wed, 22 Jul 2015 09:14:51 +0200
+Message-ID: <1819774.HTm7Ulf2x1@tachyon.chronox.de>
+References: <3908391.JkjAozYBaW@tachyon.chronox.de> <20150722013241.GA31240@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: qat-linux@intel.com, tadeusz.struk@intel.com, davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: tadeusz.struk@intel.com, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:10114 "EHLO mga09.intel.com"
+Received: from mail.eperm.de ([89.247.134.16]:47986 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754481AbbGVFIX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jul 2015 01:08:23 -0400
+	id S932256AbbGVHPA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Jul 2015 03:15:00 -0400
+In-Reply-To: <20150722013241.GA31240@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The synchronization method used atomic was bogus.
-Use a proper synchronization with mutex.
+Am Mittwoch, 22. Juli 2015, 09:32:41 schrieb Herbert Xu:
 
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
- drivers/crypto/qat/qat_common/qat_algs.c |   24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+Hi Herbert,
 
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-index 31abfd0..9b25ab1 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -73,7 +73,8 @@
- 				       ICP_QAT_HW_CIPHER_KEY_CONVERT, \
- 				       ICP_QAT_HW_CIPHER_DECRYPT)
- 
--static atomic_t active_dev;
-+static DEFINE_MUTEX(algs_lock);
-+static unsigned int active_devs;
- 
- struct qat_alg_buf {
- 	uint32_t len;
-@@ -1275,7 +1276,10 @@ static struct crypto_alg qat_algs[] = { {
- 
- int qat_algs_register(void)
- {
--	if (atomic_add_return(1, &active_dev) == 1) {
-+	int ret = 0;
-+
-+	mutex_lock(&algs_lock);
-+	if (++active_devs == 1) {
- 		int i;
- 
- 		for (i = 0; i < ARRAY_SIZE(qat_algs); i++)
-@@ -1284,21 +1288,25 @@ int qat_algs_register(void)
- 				CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC :
- 				CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC;
- 
--		return crypto_register_algs(qat_algs, ARRAY_SIZE(qat_algs));
-+		ret = crypto_register_algs(qat_algs, ARRAY_SIZE(qat_algs));
- 	}
--	return 0;
-+	mutex_unlock(&algs_lock);
-+	return ret;
- }
- 
- int qat_algs_unregister(void)
- {
--	if (atomic_sub_return(1, &active_dev) == 0)
--		return crypto_unregister_algs(qat_algs, ARRAY_SIZE(qat_algs));
--	return 0;
-+	int ret = 0;
-+
-+	mutex_lock(&algs_lock);
-+	if (--active_devs == 0)
-+		ret = crypto_unregister_algs(qat_algs, ARRAY_SIZE(qat_algs));
-+	mutex_unlock(&algs_lock);
-+	return ret;
- }
- 
- int qat_algs_init(void)
- {
--	atomic_set(&active_dev, 0);
- 	crypto_get_default_rng();
- 	return 0;
- }
+> 
+> I think we should finish the conversion of the only in-kernel
+> user of RSA before we add the user-space interface.  Otherwise
+> this unnecessarily ties our hands to the current API.
+
+Agreed.
+
+After my question around the SGL vs linear buffers I was under the impression 
+that it was decided.
+
+So I will wait until the discussion is completed.
+
+> 
+> For example, do we want an SG interface for the input and output?
+
+The question is whether the SGL overhead is still acceptable for the small 
+buffer size we have to consider when talking about raw asymmetric ciphers. For 
+RSA, it seems that the max size 4096 bits for the generic implementation. For 
+other implementations, I would not expect much larger sizes. Thus, we talk 
+about 512 bytes or one 1kbytes maximum operation size.
+
+When ECC comes into picture, the sizes are even significanly smaller.
+
+If I understood correctly, we do not want to support full hybrid asymmetric 
+operations (like PKCS1, OAEP and the like) where large buffers are to be 
+handled.
+
+On the other hand, what about using struct scatterlist as the API input 
+parameter. In addition, we allow cipher implementations to traverse only one 
+SG entry which implies a linear buffer operation. But the API is open for full 
+SG operation if needed in the future. To inform the caller about the minimum 
+size of an SG entry, we may use another integer value similar to alignmask. 
+So, if Tadeusz's hardware wants one linear buffer, the integer is 256 or 512 
+where the caller must create the buffers of at least this size. As all input 
+data would fit into that one buffer, there the caller only needs to allocate 
+one SG.
+
+-- 
+Ciao
+Stephan
