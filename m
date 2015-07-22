@@ -1,63 +1,40 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 0/3] AF_ALG interface for akcipher
-Date: Wed, 22 Jul 2015 09:14:51 +0200
-Message-ID: <1819774.HTm7Ulf2x1@tachyon.chronox.de>
-References: <3908391.JkjAozYBaW@tachyon.chronox.de> <20150722013241.GA31240@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: crypto: ixp4xx - Remove bogus BUG_ON on scattered dst buffer
+Date: Wed, 22 Jul 2015 18:05:35 +0800
+Message-ID: <20150722100535.GA2871@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: tadeusz.struk@intel.com, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Christian Hohnstaedt <chohnstaedt@innominate.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47986 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932256AbbGVHPA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jul 2015 03:15:00 -0400
-In-Reply-To: <20150722013241.GA31240@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:38670 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933303AbbGVKFl (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Jul 2015 06:05:41 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 22. Juli 2015, 09:32:41 schrieb Herbert Xu:
+This patch removes a bogus BUG_ON in the ablkcipher path that
+triggers when the destination buffer is different from the source
+buffer and is scattered.
 
-Hi Herbert,
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-> 
-> I think we should finish the conversion of the only in-kernel
-> user of RSA before we add the user-space interface.  Otherwise
-> this unnecessarily ties our hands to the current API.
-
-Agreed.
-
-After my question around the SGL vs linear buffers I was under the impression 
-that it was decided.
-
-So I will wait until the discussion is completed.
-
-> 
-> For example, do we want an SG interface for the input and output?
-
-The question is whether the SGL overhead is still acceptable for the small 
-buffer size we have to consider when talking about raw asymmetric ciphers. For 
-RSA, it seems that the max size 4096 bits for the generic implementation. For 
-other implementations, I would not expect much larger sizes. Thus, we talk 
-about 512 bytes or one 1kbytes maximum operation size.
-
-When ECC comes into picture, the sizes are even significanly smaller.
-
-If I understood correctly, we do not want to support full hybrid asymmetric 
-operations (like PKCS1, OAEP and the like) where large buffers are to be 
-handled.
-
-On the other hand, what about using struct scatterlist as the API input 
-parameter. In addition, we allow cipher implementations to traverse only one 
-SG entry which implies a linear buffer operation. But the API is open for full 
-SG operation if needed in the future. To inform the caller about the minimum 
-size of an SG entry, we may use another integer value similar to alignmask. 
-So, if Tadeusz's hardware wants one linear buffer, the integer is 256 or 512 
-where the caller must create the buffers of at least this size. As all input 
-data would fit into that one buffer, there the caller only needs to allocate 
-one SG.
-
+diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
+index 7ba495f..402631a 100644
+--- a/drivers/crypto/ixp4xx_crypto.c
++++ b/drivers/crypto/ixp4xx_crypto.c
+@@ -905,7 +905,6 @@ static int ablk_perform(struct ablkcipher_request *req, int encrypt)
+ 		crypt->mode |= NPE_OP_NOT_IN_PLACE;
+ 		/* This was never tested by Intel
+ 		 * for more than one dst buffer, I think. */
+-		BUG_ON(req->dst->length < nbytes);
+ 		req_ctx->dst = NULL;
+ 		if (!chainup_buffers(dev, req->dst, nbytes, &dst_hook,
+ 					flags, DMA_FROM_DEVICE))
 -- 
-Ciao
-Stephan
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
