@@ -1,45 +1,42 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 0/3] AF_ALG interface for akcipher
-Date: Wed, 22 Jul 2015 22:14:30 -0700
-Message-ID: <55B07836.5050307@intel.com>
-References: <3908391.JkjAozYBaW@tachyon.chronox.de> <20150722013241.GA31240@gondor.apana.org.au> <55AF19D0.5040700@intel.com> <55AF855A.9000202@freescale.com> <20150723015303.GA9777@gondor.apana.org.au>
+Date: Thu, 23 Jul 2015 13:19:09 +0800
+Message-ID: <20150723051909.GA11146@gondor.apana.org.au>
+References: <3908391.JkjAozYBaW@tachyon.chronox.de>
+ <20150722013241.GA31240@gondor.apana.org.au>
+ <55AF19D0.5040700@intel.com>
+ <55AF855A.9000202@freescale.com>
+ <20150723015303.GA9777@gondor.apana.org.au>
+ <55B07836.5050307@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Stephan Mueller <smueller@chronox.de>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@freescale.com>,
+	Stephan Mueller <smueller@chronox.de>,
 	linux-crypto@vger.kernel.org,
-	=?UTF-8?B?VHVkb3IgQW1ixINydciZ?= <tudor.ambarus@freescale.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	=?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+	Tudor =?utf-8?B?QW1ixINydciZ?= <tudor.ambarus@freescale.com>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:3819 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750976AbbGWFPG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Jul 2015 01:15:06 -0400
-In-Reply-To: <20150723015303.GA9777@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:39213 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750930AbbGWFTR (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 23 Jul 2015 01:19:17 -0400
+Content-Disposition: inline
+In-Reply-To: <55B07836.5050307@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 07/22/2015 06:53 PM, Herbert Xu wrote:
-> On Wed, Jul 22, 2015 at 02:58:18PM +0300, Horia Geant=C4=83 wrote:
->>
->> OTOH, caam has SG support for all PK operations, including rsa-encry=
-pt,
->> rsa-decrypt primitives.
->> We are working at upstreaming - aligning our internal caam-pkc with
->> akcipher.
->=20
-> OK.  Then we should tweak our interface to allow SGs.  Tadeusz?
->=20
+On Wed, Jul 22, 2015 at 10:14:30PM -0700, Tadeusz Struk wrote:
+>
+> We can add a flag to akcipher_request to say if src/dst are SGs or buffers, but
+> is this really necessary?
 
-We can add a flag to akcipher_request to say if src/dst are SGs or buff=
-ers, but
-is this really necessary?
-What we have now is two implementations that don't support SGs.
-In terms of users we have one in kernel i.e module verifier which doesn=
-'t need SGs
-and proposed user space interface, which is going to copy data from/to =
-user because
-the buffers are so small that it is cheaper to copy than to use the spl=
-ice/vmsplice
-calls. To be honest I don't see any benefit in adding SG support.
+No it shouldn't be done as a flag.  If we are going to do SGs then
+it needs to be part of the API.  That means replacing src/dst
+pointers with SG lists.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
