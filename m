@@ -1,42 +1,59 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/8] remove 'platform' shared NX driver
-Date: Thu, 23 Jul 2015 18:20:02 +0800
-Message-ID: <20150723102002.GC13181@gondor.apana.org.au>
-References: <1437589598-23917-1-git-send-email-ddstreet@ieee.org>
+From: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Subject: Re: [PATCH v11] crypto: Add Allwinner Security System
+ crypto accelerator
+Date: Fri, 24 Jul 2015 10:27:51 +0200
+Message-ID: <20150724082751.GC2564@lukather>
+References: <1437143983-4479-1-git-send-email-clabbe.montjoie@gmail.com>
+ <20150720081050.GB12908@gondor.apana.org.au>
+ <20150720081836.GT28632@lukather>
+ <20150720082057.GA13098@gondor.apana.org.au>
+ <20150721123847.GD2373@lukather>
+ <20150721125014.GA25272@gondor.apana.org.au>
+Reply-To: maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Dan Streetman <ddstreet@ieee.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48407 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751916AbbGWKUL (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Jul 2015 06:20:11 -0400
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="raC6veAxrt5nqIoY"
+Cc: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
+	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org, joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
+	devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-sunxi+bncBD2ZNBF5VYJRBC7PY6WQKGQECLAI5GQ-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1437589598-23917-1-git-send-email-ddstreet@ieee.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20150721125014.GA25272-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jul 22, 2015 at 02:26:30PM -0400, Dan Streetman wrote:
-> The shared 'platform' driver module isn't needed, the platform drivers
-> can directly register with crypto instead.  It only adds unneeded
-> complexity and problems.
-> 
-> The first 4 patches are minor updates/bugfixes to the pSeries driver.
-> 
-> The 5th patch is a minor update to the NX crypto driver.
-> 
-> The last 3 patches merge the crypto and common code driver, and move
-> the crypto compression driver registration into the platform (pSeries
-> and PowerNV) drivers.  Both platform drivers use the same alg name and
-> driver name when registering, but since only one (at most) will register
-> on a system, depending on the platform, their registration will not
-> conflict.
+--raC6veAxrt5nqIoY
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
 
-All applied.  Thanks!
+On Tue, Jul 21, 2015 at 08:50:14PM +0800, Herbert Xu wrote:
+> On Tue, Jul 21, 2015 at 02:38:47PM +0200, Maxime Ripard wrote:
+> > I thought you needed at least my Acked-by for that, but
+> > whatever... How are we supposed to handle subsequent DT patches that
+> > should be merged through arm-soc then?
+> 
+> What subsequent patches are you referring to? The changes in
+> this series are fairly self-contained so it should be unlikely
+> to cause serious merge conflicts.
+
+Enabling it in other boards / SoCs, and/or any change that might
+conflict with this one.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Maxime Ripard, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
+--raC6veAxrt5nqIoY--
