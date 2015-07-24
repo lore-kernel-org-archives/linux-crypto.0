@@ -1,59 +1,55 @@
-From: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Subject: Re: [PATCH v11] crypto: Add Allwinner Security System
- crypto accelerator
-Date: Fri, 24 Jul 2015 10:27:51 +0200
-Message-ID: <20150724082751.GC2564@lukather>
-References: <1437143983-4479-1-git-send-email-clabbe.montjoie@gmail.com>
- <20150720081050.GB12908@gondor.apana.org.au>
- <20150720081836.GT28632@lukather>
- <20150720082057.GA13098@gondor.apana.org.au>
- <20150721123847.GD2373@lukather>
- <20150721125014.GA25272@gondor.apana.org.au>
-Reply-To: maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="raC6veAxrt5nqIoY"
-Cc: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-	pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
-	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
-	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
-	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org, joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
-	devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-sunxi+bncBD2ZNBF5VYJRBC7PY6WQKGQECLAI5GQ-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20150721125014.GA25272-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <http://groups.google.com/group/linux-sunxi
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <http://groups.google.com/group/linux-sunxi/subscribe>
-List-Id: linux-crypto.vger.kernel.org
+From: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Subject: [PATCH] hwrng: correct error check of kthread_run call
+Date: Fri, 24 Jul 2015 13:13:30 +0200
+Message-ID: <1437736410-39227-1-git-send-email-schwidefsky@de.ibm.com>
+Cc: Martin Schwidefsky <schwidefsky@de.ibm.com>
+To: Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e06smtp13.uk.ibm.com ([195.75.94.109]:51151 "EHLO
+	e06smtp13.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753006AbbGXLNm (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 24 Jul 2015 07:13:42 -0400
+Received: from /spool/local
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <schwidefsky@de.ibm.com>;
+	Fri, 24 Jul 2015 12:13:41 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+	by d06dlp01.portsmouth.uk.ibm.com (Postfix) with ESMTP id C02EA17D805F
+	for <linux-crypto@vger.kernel.org>; Fri, 24 Jul 2015 12:15:02 +0100 (BST)
+Received: from d06av03.portsmouth.uk.ibm.com (d06av03.portsmouth.uk.ibm.com [9.149.37.213])
+	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id t6OBDdM033554526
+	for <linux-crypto@vger.kernel.org>; Fri, 24 Jul 2015 11:13:39 GMT
+Received: from d06av03.portsmouth.uk.ibm.com (localhost [127.0.0.1])
+	by d06av03.portsmouth.uk.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id t6OBDb0L013668
+	for <linux-crypto@vger.kernel.org>; Fri, 24 Jul 2015 05:13:38 -0600
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
---raC6veAxrt5nqIoY
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
+The kthread_run() function can return two different error values
+but the hwrng core only checks for -ENOMEM. If the other error
+value -EINTR is returned it is assigned to hwrng_fill and later
+used on a kthread_stop() call which naturally crashes.
 
-On Tue, Jul 21, 2015 at 08:50:14PM +0800, Herbert Xu wrote:
-> On Tue, Jul 21, 2015 at 02:38:47PM +0200, Maxime Ripard wrote:
-> > I thought you needed at least my Acked-by for that, but
-> > whatever... How are we supposed to handle subsequent DT patches that
-> > should be merged through arm-soc then?
-> 
-> What subsequent patches are you referring to? The changes in
-> this series are fairly self-contained so it should be unlikely
-> to cause serious merge conflicts.
+Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+---
+ drivers/char/hw_random/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Enabling it in other boards / SoCs, and/or any change that might
-conflict with this one.
-
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index da8faf7..5643b65 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -429,7 +429,7 @@ static int hwrng_fillfn(void *unused)
+ static void start_khwrngd(void)
+ {
+ 	hwrng_fill = kthread_run(hwrng_fillfn, NULL, "hwrng");
+-	if (hwrng_fill == ERR_PTR(-ENOMEM)) {
++	if (IS_ERR(hwrng_fill)) {
+ 		pr_err("hwrng_fill thread creation failed");
+ 		hwrng_fill = NULL;
+ 	}
 -- 
-Maxime Ripard, Free Electrons
-Embedded Linux, Kernel and Android engineering
-http://free-electrons.com
---raC6veAxrt5nqIoY--
+2.3.8
