@@ -1,34 +1,56 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] cleanups for crypto/wp512.c
-Date: Sat, 25 Jul 2015 09:58:05 +0800
-Message-ID: <20150725015805.GC29321@gondor.apana.org.au>
-References: <1437756615.27636.2.camel@My-Computer>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] jent: use safe format string parameters
+Date: Sat, 25 Jul 2015 12:14:27 +0200
+Message-ID: <1837679.rRPrBYE39B@tauon.atsec.com>
+References: <20150724224127.GA29924@www.outflux.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Ahmed Mohamed Abd EL Mawgood <ahmedsoliman0x666@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48860 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753145AbbGYB6J (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 24 Jul 2015 21:58:09 -0400
-Content-Disposition: inline
-In-Reply-To: <1437756615.27636.2.camel@My-Computer>
+Received: from mail.eperm.de ([89.247.134.16]:48009 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752458AbbGYKOa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 25 Jul 2015 06:14:30 -0400
+In-Reply-To: <20150724224127.GA29924@www.outflux.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 24, 2015 at 06:50:15PM +0200, Ahmed Mohamed Abd EL Mawgood wrote:
-> 
-> fixing all errors and warning of checkpatch.pl for
-> crypto/wp512.c
-> Signed-off-by: Ahmed Mohamed <ahmedsoliman0x666@gmail.com>
+Am Freitag, 24. Juli 2015, 15:41:27 schrieb Kees Cook:
 
-Nack.  Please do not generate patches purely based on checkpatch.
+Hi Kees,
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>Since the API for jent_panic() does not include format string parameters,
+>adjust the call to panic() to use a literal string to avoid any future
+>callers from leaking format strings into the panic message.
+>
+>Signed-off-by: Kees Cook <keescook@chromium.org>
+
+Thanks.
+
+Acked-by: Stephan Mueller <smueller@chronox.de>
+>---
+> crypto/jitterentropy-kcapi.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+>index b32d834144cd..ceea83d13168 100644
+>--- a/crypto/jitterentropy-kcapi.c
+>+++ b/crypto/jitterentropy-kcapi.c
+>@@ -79,7 +79,7 @@ int jent_fips_enabled(void)
+>
+> void jent_panic(char *s)
+> {
+>-	panic(s);
+>+	panic("%s", s);
+> }
+>
+> void jent_memcpy(void *dest, const void *src, unsigned int n)
+
+
+Ciao
+Stephan
