@@ -1,56 +1,62 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] jent: use safe format string parameters
-Date: Sat, 25 Jul 2015 12:14:27 +0200
-Message-ID: <1837679.rRPrBYE39B@tauon.atsec.com>
-References: <20150724224127.GA29924@www.outflux.net>
+From: Gregory CLEMENT <gregory.clement@free-electrons.com>
+Subject: Re: [PATCH v7 00/14] crypto: add a new driver for Marvell's CESA
+Date: Sat, 25 Jul 2015 16:51:51 +0200
+Message-ID: <55B3A287.50706@free-electrons.com>
+References: <1434635190-27733-1-git-send-email-boris.brezillon@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Kees Cook <keescook@chromium.org>
+	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	Imre Kaloz <kaloz@openwrt.org>,
+	Russell King - ARM Linux <linux@arm.linux.org
+To: Boris Brezillon <boris.brezillon@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:48009 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752458AbbGYKOa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 25 Jul 2015 06:14:30 -0400
-In-Reply-To: <20150724224127.GA29924@www.outflux.net>
+Received: from down.free-electrons.com ([37.187.137.238]:50693 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753629AbbGYOvz (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 25 Jul 2015 10:51:55 -0400
+In-Reply-To: <1434635190-27733-1-git-send-email-boris.brezillon@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 24. Juli 2015, 15:41:27 schrieb Kees Cook:
+Hi Boris,
 
-Hi Kees,
+[...]
 
->Since the API for jent_panic() does not include format string parameters,
->adjust the call to panic() to use a literal string to avoid any future
->callers from leaking format strings into the panic message.
 >
->Signed-off-by: Kees Cook <keescook@chromium.org>
+> In this version I dropped the DT changes, but you'll find them in my
+> cesa-v7 branch [1]. In this branch you'll find everything you need to
+> test on all Marvell platforms (including the old ones).
+> I'll post a series updating all the DTs once this driver has been merged.
 
-Thanks.
-
-Acked-by: Stephan Mueller <smueller@chronox.de>
->---
-> crypto/jitterentropy-kcapi.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
->index b32d834144cd..ceea83d13168 100644
->--- a/crypto/jitterentropy-kcapi.c
->+++ b/crypto/jitterentropy-kcapi.c
->@@ -79,7 +79,7 @@ int jent_fips_enabled(void)
->
-> void jent_panic(char *s)
-> {
->-	panic(s);
->+	panic("%s", s);
-> }
->
-> void jent_memcpy(void *dest, const void *src, unsigned int n)
+Now that the driver has been merged do you plan submitting the DT support
+soon?
 
 
-Ciao
-Stephan
+Thanks,
+
+Gregory
+
+
+-- 
+Gregory Clement, Free Electrons
+Kernel, drivers, real-time and embedded Linux
+development, consulting, training and support.
+http://free-electrons.com
