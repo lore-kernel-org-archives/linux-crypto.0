@@ -1,35 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: qat - remove unnecessary list iteration
-Date: Tue, 28 Jul 2015 15:07:23 +0800
-Message-ID: <20150728070723.GG25287@gondor.apana.org.au>
-References: <20150727195832.30021.94483.stgit@tstruk-mobl1>
+From: Brice Adams <abbala202@gmail.com>
+Subject: Please can I trust you?
+Date: Tue, 28 Jul 2015 16:57:36 +0000
+Message-ID: <CAOCEB2PdRF_mFVdE1tYaWUwdsXoNoGYCj9mavir0o+Cpw_x8AA__29015.4937575155$1438102691$gmane$org@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, bruce.w.allan@intel.com,
-	qat-linux@intel.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain; charset=UTF-8
+To: undisclosed-recipients:;
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54560 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751865AbbG1HH0 (ORCPT
+Received: from mail-lb0-f195.google.com ([209.85.217.195]:35516 "EHLO
+	mail-lb0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752596AbbG1Q5i (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Jul 2015 03:07:26 -0400
-Content-Disposition: inline
-In-Reply-To: <20150727195832.30021.94483.stgit@tstruk-mobl1>
+	Tue, 28 Jul 2015 12:57:38 -0400
+Received: by lbvb1 with SMTP id b1so5654177lbv.2
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Jul 2015 09:57:36 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 27, 2015 at 12:58:32PM -0700, Tadeusz Struk wrote:
-> From: Bruce Allan <bruce.w.allan@intel.com>
-> 
-> There's no need to iterate through the list for instances in the
-> accel_table since the number of devices is already known in this file.
-> 
-> Signed-off-by: Bruce Allan <bruce.w.allan@intel.com>
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+My Dear Friend,
 
-Applied.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I am Mr. Brice Adams, staff and auditor of a Bank in Lome, Togo
+Republic. I am the Account Officer to (Late Mr. Daniel I. Glade) whose
+account is presently dormant, I advise you to keep this as a "top
+secret" as I am still in service and intend to retire from service
+after I conclude this deal with you. I have an important
+Message/discussion with you about his death and his funds, the sum of
+(6.5 Million Euros) left without a heir. If you can be of an
+assistance to me, I will be pleased to offer to you 25% of the total
+fund. Please I got your email contact through internet email directory
+when I was searching for a trust worthy partner. If you are willing to
+help me, I need the following information below from you;
+
+Your full name.............
+Nationality................
+Telephone number..............
+Profession.................
+Age.........
+
+I will be humbly waiting your soonest response. Please contact direct
+to my email address (brice2adams@yahoo.fr) for more information.
+
+With Respect,
+Mr. Brice Adams.
