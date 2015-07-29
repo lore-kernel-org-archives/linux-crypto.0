@@ -1,49 +1,51 @@
-From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH 2/2] ath9k: export HW random number generator
-Date: Wed, 29 Jul 2015 08:33:24 +0200
-Message-ID: <2021681.UA65q8VJfQ@tauon.atsec.com>
-References: <1436946847-10909-1-git-send-email-miaoqing@qca.qualcomm.com> <3945775.m5HblJPgiO@tauon.atsec.com> <CACXcFmnUcf66+X967JQL9mGrpa6ZYOqz99oK6JV8nFzABn=NZA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Oleksij Rempel <linux-YEK0n+YFykbzxQdaRaTXBw@public.gmane.org>,
-	"Pan, Miaoqing" <miaoqing-Rm6X0d1/PG5y9aJCnZT0Uw@public.gmane.org>,
-	"linville-2XuSBdqkA4R54TAoqtyWWQ@public.gmane.org" <linville-2XuSBdqkA4R54TAoqtyWWQ@public.gmane.org>,
-	"linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	nhorman-2XuSBdqkA4R54TAoqtyWWQ@public.gmane.org
-To: Sandy Harris <sandyinchina-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CACXcFmnUcf66+X967JQL9mGrpa6ZYOqz99oK6JV8nFzABn=NZA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Dan Streetman <ddstreet@ieee.org>
+Subject: [PATCH] crypto: nx - don't err if compressed output > input
+Date: Wed, 29 Jul 2015 19:42:09 -0400
+Message-ID: <1438213329-6884-1-git-send-email-ddstreet@ieee.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Dan Streetman <ddstreet@ieee.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f43.google.com ([209.85.220.43]:34752 "EHLO
+	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753819AbbG2XnG (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 29 Jul 2015 19:43:06 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 28. Juli 2015, 13:41:57 schrieb Sandy Harris:
+Return success instead of error if compression succeeds but the output is
+larger than the input.
 
-Hi Sandy,
->
->> However, the hwrandom framework does not provide any conditioning logic.
->
->At first sight, this sounds like a blunder to me, but I have not
->looked at hwrandom at all. Is there a rationale?
+It's unlikely that the caller will use the compressed data since it's
+larger than the original uncompressed data, but there was no error and
+returning an error code is incorrect.  Further, for testing small input
+buffers, the output is likely to be larger than the input and success
+needs to be returned to verify the test.
 
-I think hwrandom is solely a framework to hook up RNG devices to user space. 
-There is no massaging of data coming from the HW RNGs. Usually those HW RNGs 
-all have their own conditioner and there is no need to do a conditioning 
-again.
->
->For example, not building conditioning into that driver would make
->perfect sense if the output were just being fed into the random(4)
->which does plenty of mixing. The only problem then would be to make
->sure of giving random(4) reasonable entropy estimates.
+Signed-off-by: Dan Streetman <ddstreet@ieee.org>
+---
+ drivers/crypto/nx/nx-842-pseries.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-hwrandom *may* be used to feed into the entropy pools. But there is no 
-technical guarantee for that. Furthermore, I have seen use cases where the 
-output of hwrandom is used for other purposes.
-
-Ciao
-Stephan
---
-To unsubscribe from this list: send the line "unsubscribe linux-wireless" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
+index b6a26907..f4cbde0 100644
+--- a/drivers/crypto/nx/nx-842-pseries.c
++++ b/drivers/crypto/nx/nx-842-pseries.c
+@@ -226,9 +226,12 @@ static int nx842_validate_result(struct device *dev,
+ 	switch (csb->completion_code) {
+ 	case 0:	/* Completed without error */
+ 		break;
+-	case 64: /* Target bytes > Source bytes during compression */
++	case 64: /* Compression ok, but output larger than input */
++		dev_dbg(dev, "%s: output size larger than input size\n",
++					__func__);
++		break;
+ 	case 13: /* Output buffer too small */
+-		dev_dbg(dev, "%s: Compression output larger than input\n",
++		dev_dbg(dev, "%s: Out of space in output buffer\n",
+ 					__func__);
+ 		return -ENOSPC;
+ 	case 66: /* Input data contains an illegal template field */
+-- 
+2.1.0
