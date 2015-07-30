@@ -1,7 +1,7 @@
 From: Victoria Milhoan <vicki.milhoan@freescale.com>
-Subject: [PATCH 11/12] crypto: caam - Enable MXC devices to select CAAM driver in Kconfig
-Date: Wed, 29 Jul 2015 20:58:28 -0700
-Message-ID: <1438228709-27650-12-git-send-email-vicki.milhoan@freescale.com>
+Subject: [PATCH 02/12] crypto: caam - Add setbits32/clrbits32/clrsetbits primitives for ARM compatibility
+Date: Wed, 29 Jul 2015 20:58:19 -0700
+Message-ID: <1438228709-27650-3-git-send-email-vicki.milhoan@freescale.com>
 References: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,37 +10,84 @@ Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
 	<kernel@pengutronix.de>, <linux@arm.linux.org.uk>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0123.outbound.protection.outlook.com ([65.55.169.123]:18709
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+Received: from mail-bn1on0144.outbound.protection.outlook.com ([157.56.110.144]:1252
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752856AbbG3D6k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Jul 2015 23:58:40 -0400
+	id S1752505AbbG3D6g (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 29 Jul 2015 23:58:36 -0400
 In-Reply-To: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Steve Cornelius <steve.cornelius@freescale.com>
+Add set/clear 32-bit primitives for compatibility with ARM devices since
+the primitives were previously only defined for the Power architecture.
 
-Allow CAAM to be selected in the kernel for Freescale i.MX devices if
-ARCH_MXC is enabled.
-
-Signed-off-by: Steve Cornelius <steve.cornelius@freescale.com>
 Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
 ---
- drivers/crypto/caam/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/caam/ctrl.c |  6 +++---
+ drivers/crypto/caam/regs.h | 23 +++++++++++++++++++++++
+ 2 files changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index e286e28..66ef0c0 100644
---- a/drivers/crypto/caam/Kconfig
-+++ b/drivers/crypto/caam/Kconfig
-@@ -1,6 +1,6 @@
- config CRYPTO_DEV_FSL_CAAM
- 	tristate "Freescale CAAM-Multicore driver backend"
--	depends on FSL_SOC
-+	depends on FSL_SOC || ARCH_MXC
- 	help
- 	  Enables the driver module for Freescale's Cryptographic Accelerator
- 	  and Assurance Module (CAAM), also known as the SEC version 4 (SEC4).
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 1891809..660cc3e 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -445,9 +445,9 @@ static int caam_probe(struct platform_device *pdev)
+ 	 * Enable DECO watchdogs and, if this is a PHYS_ADDR_T_64BIT kernel,
+ 	 * long pointers in master configuration register
+ 	 */
+-	clrsetbits_be32(&ctrl->mcr, MCFGR_AWCACHE_MASK, MCFGR_AWCACHE_CACH |
+-			MCFGR_WDENABLE | (sizeof(dma_addr_t) == sizeof(u64) ?
+-					 MCFGR_LONG_PTR : 0));
++	clrsetbits_32(&ctrl->mcr, MCFGR_AWCACHE_MASK, MCFGR_AWCACHE_CACH |
++		      MCFGR_WDENABLE | (sizeof(dma_addr_t) == sizeof(u64) ?
++					MCFGR_LONG_PTR : 0));
+ 
+ 	/*
+ 	 *  Read the Compile Time paramters and SCFGR to determine
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 5e64352..3a2a788 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -65,9 +65,31 @@
+  *
+  */
+ 
++#ifdef CONFIG_ARM
++/* These are common macros for Power, put here for ARM */
++#define setbits32(_addr, _v) writel((readl(_addr) | (_v)), (_addr))
++#define clrbits32(_addr, _v) writel((readl(_addr) & ~(_v)), (_addr))
++
++#define out_arch(type, endian, a, v)	__raw_write##type(cpu_to_##endian(v), a)
++#define in_arch(type, endian, a)	endian##_to_cpu(__raw_read##type(a))
++
++#define out_le32(a, v)	out_arch(l, le32, a, v)
++#define in_le32(a)	in_arch(l, le32, a)
++
++#define out_be32(a, v)	out_arch(l, be32, a, v)
++#define in_be32(a)	in_arch(l, be32, a)
++
++#define clrsetbits(type, addr, clear, set) \
++	out_##type((addr), (in_##type(addr) & ~(clear)) | (set))
++
++#define clrsetbits_be32(addr, clear, set) clrsetbits(be32, addr, clear, set)
++#define clrsetbits_le32(addr, clear, set) clrsetbits(le32, addr, clear, set)
++#endif
++
+ #ifdef __BIG_ENDIAN
+ #define wr_reg32(reg, data) out_be32(reg, data)
+ #define rd_reg32(reg) in_be32(reg)
++#define clrsetbits_32(addr, clear, set) clrsetbits_be32(addr, clear, set)
+ #ifdef CONFIG_64BIT
+ #define wr_reg64(reg, data) out_be64(reg, data)
+ #define rd_reg64(reg) in_be64(reg)
+@@ -76,6 +98,7 @@
+ #ifdef __LITTLE_ENDIAN
+ #define wr_reg32(reg, data) __raw_writel(data, reg)
+ #define rd_reg32(reg) __raw_readl(reg)
++#define clrsetbits_32(addr, clear, set) clrsetbits_le32(addr, clear, set)
+ #ifdef CONFIG_64BIT
+ #define wr_reg64(reg, data) __raw_writeq(data, reg)
+ #define rd_reg64(reg) __raw_readq(reg)
 -- 
 2.1.4
