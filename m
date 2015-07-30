@@ -1,7 +1,7 @@
 From: Victoria Milhoan <vicki.milhoan@freescale.com>
-Subject: [PATCH 05/12] crypto: caam - Change kmalloc to kzalloc to avoid residual data
-Date: Wed, 29 Jul 2015 20:58:22 -0700
-Message-ID: <1438228709-27650-6-git-send-email-vicki.milhoan@freescale.com>
+Subject: [PATCH 10/12] ARM: dts: mx6sx: Add CAAM device node
+Date: Wed, 29 Jul 2015 20:58:27 -0700
+Message-ID: <1438228709-27650-11-git-send-email-vicki.milhoan@freescale.com>
 References: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,171 +10,61 @@ Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
 	<kernel@pengutronix.de>, <linux@arm.linux.org.uk>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0111.outbound.protection.outlook.com ([65.55.169.111]:9600
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+Received: from mail-bn1bon0142.outbound.protection.outlook.com ([157.56.111.142]:38631
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751074AbbG3EOR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Jul 2015 00:14:17 -0400
+	id S1750799AbbG3EOl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 30 Jul 2015 00:14:41 -0400
 In-Reply-To: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Since fields must be ORed in to operate correctly using any order of
-operations, changed allocations of the combination of extended
-descriptor structs + hardware scatterlists to use kzalloc() instead
-of kmalloc(), so as to ensure that residue data would not be ORed in
-with the correct data.
+Add CAAM device node to the i.MX6SX device tree.
 
-Signed-off-by: Steve Cornelius <steve.cornelius@freescale.com>
 Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
 ---
- drivers/crypto/caam/caamalg.c  | 20 ++++++++++----------
- drivers/crypto/caam/caamhash.c | 25 ++++++++++++-------------
- 2 files changed, 22 insertions(+), 23 deletions(-)
+ arch/arm/boot/dts/imx6sx.dtsi | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 3c50a50..33b6861 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -2482,8 +2482,8 @@ static struct aead_edesc *old_aead_edesc_alloc(struct aead_request *req,
- 	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
+diff --git a/arch/arm/boot/dts/imx6sx.dtsi b/arch/arm/boot/dts/imx6sx.dtsi
+index 708175d..c73cee4 100644
+--- a/arch/arm/boot/dts/imx6sx.dtsi
++++ b/arch/arm/boot/dts/imx6sx.dtsi
+@@ -738,6 +738,35 @@
+ 			reg = <0x02100000 0x100000>;
+ 			ranges;
  
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = kmalloc(sizeof(struct aead_edesc) + desc_bytes +
--			sec4_sg_bytes, GFP_DMA | flags);
-+	edesc = kzalloc(sizeof(*edesc) + desc_bytes + sec4_sg_bytes,
-+			GFP_DMA | flags);
- 	if (!edesc) {
- 		dev_err(jrdev, "could not allocate extended descriptor\n");
- 		return ERR_PTR(-ENOMEM);
-@@ -2585,8 +2585,8 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
- 	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = kzalloc(sizeof(struct aead_edesc) + desc_bytes +
--			sec4_sg_bytes, GFP_DMA | flags);
-+	edesc = kzalloc(sizeof(*edesc) + desc_bytes + sec4_sg_bytes,
-+			GFP_DMA | flags);
- 	if (!edesc) {
- 		dev_err(jrdev, "could not allocate extended descriptor\n");
- 		return ERR_PTR(-ENOMEM);
-@@ -2921,8 +2921,8 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
- 	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = kmalloc(sizeof(struct aead_edesc) + desc_bytes +
--			sec4_sg_bytes, GFP_DMA | flags);
-+	edesc = kzalloc(sizeof(*edesc) + desc_bytes + sec4_sg_bytes,
-+			GFP_DMA | flags);
- 	if (!edesc) {
- 		dev_err(jrdev, "could not allocate extended descriptor\n");
- 		return ERR_PTR(-ENOMEM);
-@@ -3094,8 +3094,8 @@ static struct ablkcipher_edesc *ablkcipher_edesc_alloc(struct ablkcipher_request
- 			sizeof(struct sec4_sg_entry);
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = kmalloc(sizeof(struct ablkcipher_edesc) + desc_bytes +
--			sec4_sg_bytes, GFP_DMA | flags);
-+	edesc = kzalloc(sizeof(*edesc) + desc_bytes + sec4_sg_bytes,
-+			GFP_DMA | flags);
- 	if (!edesc) {
- 		dev_err(jrdev, "could not allocate extended descriptor\n");
- 		return ERR_PTR(-ENOMEM);
-@@ -3273,8 +3273,8 @@ static struct ablkcipher_edesc *ablkcipher_giv_edesc_alloc(
- 			sizeof(struct sec4_sg_entry);
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = kmalloc(sizeof(*edesc) + desc_bytes +
--			sec4_sg_bytes, GFP_DMA | flags);
-+	edesc = kzalloc(sizeof(*edesc) + desc_bytes + sec4_sg_bytes,
-+			GFP_DMA | flags);
- 	if (!edesc) {
- 		dev_err(jrdev, "could not allocate extended descriptor\n");
- 		return ERR_PTR(-ENOMEM);
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 9622a81..2361beb 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -807,7 +807,7 @@ static int ahash_update_ctx(struct ahash_request *req)
- 		 * allocate space for base edesc and hw desc commands,
- 		 * link tables
- 		 */
--		edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
-+		edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN +
- 				sec4_sg_bytes, GFP_DMA | flags);
- 		if (!edesc) {
- 			dev_err(jrdev,
-@@ -918,8 +918,8 @@ static int ahash_final_ctx(struct ahash_request *req)
- 	sec4_sg_bytes = (1 + (buflen ? 1 : 0)) * sizeof(struct sec4_sg_entry);
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
--			sec4_sg_bytes, GFP_DMA | flags);
-+	edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN + sec4_sg_bytes,
-+			GFP_DMA | flags);
- 	if (!edesc) {
- 		dev_err(jrdev, "could not allocate extended descriptor\n");
- 		return -ENOMEM;
-@@ -1005,8 +1005,8 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 			 sizeof(struct sec4_sg_entry);
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
--			sec4_sg_bytes, GFP_DMA | flags);
-+	edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN + sec4_sg_bytes,
-+			GFP_DMA | flags);
- 	if (!edesc) {
- 		dev_err(jrdev, "could not allocate extended descriptor\n");
- 		return -ENOMEM;
-@@ -1091,8 +1091,8 @@ static int ahash_digest(struct ahash_request *req)
- 	sec4_sg_bytes = src_nents * sizeof(struct sec4_sg_entry);
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = kmalloc(sizeof(struct ahash_edesc) + sec4_sg_bytes +
--			DESC_JOB_IO_LEN, GFP_DMA | flags);
-+	edesc = kzalloc(sizeof(*edesc) + sec4_sg_bytes + DESC_JOB_IO_LEN,
-+			GFP_DMA | flags);
- 	if (!edesc) {
- 		dev_err(jrdev, "could not allocate extended descriptor\n");
- 		return -ENOMEM;
-@@ -1165,8 +1165,7 @@ static int ahash_final_no_ctx(struct ahash_request *req)
- 	int sh_len;
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN,
--			GFP_DMA | flags);
-+	edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN, GFP_DMA | flags);
- 	if (!edesc) {
- 		dev_err(jrdev, "could not allocate extended descriptor\n");
- 		return -ENOMEM;
-@@ -1245,7 +1244,7 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 		 * allocate space for base edesc and hw desc commands,
- 		 * link tables
- 		 */
--		edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
-+		edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN +
- 				sec4_sg_bytes, GFP_DMA | flags);
- 		if (!edesc) {
- 			dev_err(jrdev,
-@@ -1353,8 +1352,8 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 			 sizeof(struct sec4_sg_entry);
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
--			sec4_sg_bytes, GFP_DMA | flags);
-+	edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN + sec4_sg_bytes,
-+			GFP_DMA | flags);
- 	if (!edesc) {
- 		dev_err(jrdev, "could not allocate extended descriptor\n");
- 		return -ENOMEM;
-@@ -1448,7 +1447,7 @@ static int ahash_update_first(struct ahash_request *req)
- 		 * allocate space for base edesc and hw desc commands,
- 		 * link tables
- 		 */
--		edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
-+		edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN +
- 				sec4_sg_bytes, GFP_DMA | flags);
- 		if (!edesc) {
- 			dev_err(jrdev,
++			crypto: caam@2100000 {
++				compatible = "fsl,sec-v4.0";
++				fsl,sec-era = <4>;
++				#address-cells = <1>;
++				#size-cells = <1>;
++				reg = <0x2100000 0x10000>;
++				ranges = <0 0x2100000 0x10000>;
++				interrupt-parent = <&intc>;
++				clocks = <&clks IMX6SX_CLK_CAAM_MEM>,
++					 <&clks IMX6SX_CLK_CAAM_ACLK>,
++					 <&clks IMX6SX_CLK_CAAM_IPG>,
++					 <&clks IMX6SX_CLK_EIM_SLOW>;
++				clock-names = "caam_mem", "caam_aclk",
++					      "caam_ipg", "caam_emi_slow";
++
++				sec_jr0: jr0@1000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x1000 0x1000>;
++					interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
++				};
++
++				sec_jr1: jr1@2000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x2000 0x1000>;
++					interrupts = <0 106 0x4>;
++					interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
++				};
++			};
++
+ 			usbotg1: usb@02184000 {
+ 				compatible = "fsl,imx6sx-usb", "fsl,imx27-usb";
+ 				reg = <0x02184000 0x200>;
 -- 
 2.1.4
