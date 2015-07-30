@@ -1,62 +1,93 @@
-From: Rameshwar Sahu <rsahu@apm.com>
-Subject: Re: [PATCH v1 0/4] Crypto: tcrypt: Add test case for APM X-Gene SoC
- CRC32C algo
-Date: Thu, 30 Jul 2015 17:50:58 +0530
-Message-ID: <CAFd313wpsfYtK=fZ4Qin1y8vtX7-tgAEPPBtVDqAW8wxtisgAw@mail.gmail.com>
-References: <1438258268-3099-1-git-send-email-rsahu@apm.com>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@freescale.com>
+Subject: [PATCH] crypto: caam - fix rfc4106 encap shared descriptor
+Date: Thu, 30 Jul 2015 16:39:26 +0300
+Message-ID: <1438263566-22222-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	jcm@redhat.com, patches@apm.com,
-	Rameshwar Prasad Sahu <rsahu@apm.com>
-To: Vinod Koul <vinod.koul@intel.com>, dan.j.williams@intel.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <linux-crypto@vger.kernel.org>,
+	Tudor Ambarus <tudor.ambarus@freescale.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f181.google.com ([209.85.213.181]:35305 "EHLO
-	mail-ig0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752062AbbG3MU7 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Jul 2015 08:20:59 -0400
-Received: by igr7 with SMTP id 7so165586508igr.0
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Jul 2015 05:20:59 -0700 (PDT)
-In-Reply-To: <1438258268-3099-1-git-send-email-rsahu@apm.com>
+Received: from mail-by2on0110.outbound.protection.outlook.com ([207.46.100.110]:30421
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1750910AbbG3Nj4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 30 Jul 2015 09:39:56 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi All,
+The encap shared descriptor was changed to use the new IV convention.
+In the process some commands were shifted, making the output length
+zero, caam effectively writing garbage in dst.
 
-On Thu, Jul 30, 2015 at 5:41 PM, Rameshwar Prasad Sahu <rsahu@apm.com> wrote:
-> This patch adds test case for APM X-Gene SoC CRC32C algorithm.
+While here, update the decap descriptor to execute the "write" commands
+before the "read"s (as it previously was).
+This makes sure the input fifo is drained before becoming full.
 
-Please discard this patch description and subject line in this cover
-letter, I have resent it again.
+=46ixes: 46218750d523 ("crypto: caam - Use new IV convention")
+Signed-off-by: Horia Geant=C4=83 <horia.geanta@freescale.com>
+Signed-off-by: Tudor Ambarus <tudor.ambarus@freescale.com>
+---
+ drivers/crypto/caam/caamalg.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-Thanks,
-Ram
-
->
-> Signed-off-by: Rameshwar Prasad Sahu <rsahu@apm.com>
-> ---
->
-> Rameshwar Prasad Sahu (4):
->   dmaengine: Add support for new feature CRC32C
->   dmaengine: xgene-dma: Add support for CRC32C calculation via DMA
->     engine
->   Crypto: Add support for APM X-Gene SoC CRC32C h/w accelerator driver
->   Crypto: tcrypt: Add test case for APM X-Gene SoC CRC32C algo
->
->  crypto/tcrypt.c               |   4 +
->  crypto/testmgr.c              |   9 ++
->  drivers/crypto/Kconfig        |   8 ++
->  drivers/crypto/Makefile       |   1 +
->  drivers/crypto/xgene-crc32c.c | 244 ++++++++++++++++++++++++++++++++
->  drivers/dma/dmaengine.c       |   2 +
->  drivers/dma/xgene-dma.c       | 317 ++++++++++++++++++++++++++++++++++++++++--
->  include/linux/dmaengine.h     |   5 +
->  8 files changed, 575 insertions(+), 15 deletions(-)
->  create mode 100755 drivers/crypto/xgene-crc32c.c
->
-> --
-> 1.8.2.1
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamal=
+g.c
+index 3c50a5082127..b08ae6983d1f 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -989,19 +989,19 @@ static int rfc4106_set_sh_desc(struct crypto_aead=
+ *aead)
+ 	/* Will read cryptlen bytes */
+ 	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
+=20
+-	/* Read payload data */
+-	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
+-			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_LAST1);
+-
+ 	/* Skip assoc data */
+ 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
+=20
+ 	/* cryptlen =3D seqoutlen - assoclen */
+-	append_math_sub(desc, VARSEQOUTLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
++	append_math_sub(desc, VARSEQOUTLEN, VARSEQINLEN, REG0, CAAM_CMD_SZ);
+=20
+ 	/* Write encrypted data */
+ 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VL=
+=46);
+=20
++	/* Read payload data */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
++			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_LAST1);
++
+ 	/* Write ICV */
+ 	append_seq_store(desc, ctx->authsize, LDST_CLASS_1_CCB |
+ 			 LDST_SRCDST_BYTE_CONTEXT);
+@@ -1060,10 +1060,6 @@ static int rfc4106_set_sh_desc(struct crypto_aea=
+d *aead)
+ 	/* Will read cryptlen bytes */
+ 	append_math_sub(desc, VARSEQINLEN, SEQOUTLEN, REG3, CAAM_CMD_SZ);
+=20
+-	/* Read encrypted data */
+-	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
+-			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_FLUSH1);
+-
+ 	/* Skip assoc data */
+ 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
+=20
+@@ -1073,6 +1069,10 @@ static int rfc4106_set_sh_desc(struct crypto_aea=
+d *aead)
+ 	/* Store payload data */
+ 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VL=
+=46);
+=20
++	/* Read encrypted data */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
++			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_FLUSH1);
++
+ 	/* Read ICV */
+ 	append_seq_fifo_load(desc, ctx->authsize, FIFOLD_CLASS_CLASS1 |
+ 			     FIFOLD_TYPE_ICV | FIFOLD_TYPE_LAST1);
+--=20
+2.4.4
