@@ -1,7 +1,7 @@
 From: Victoria Milhoan <vicki.milhoan@freescale.com>
-Subject: [PATCH 06/12] crypto: caam - Correct DMA unmap size in ahash_update_ctx()
-Date: Wed, 29 Jul 2015 20:58:23 -0700
-Message-ID: <1438228709-27650-7-git-send-email-vicki.milhoan@freescale.com>
+Subject: [PATCH 09/12] ARM: dts: mx6qdl: Add CAAM device node
+Date: Wed, 29 Jul 2015 20:58:26 -0700
+Message-ID: <1438228709-27650-10-git-send-email-vicki.milhoan@freescale.com>
 References: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,57 +10,62 @@ Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
 	<kernel@pengutronix.de>, <linux@arm.linux.org.uk>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0111.outbound.protection.outlook.com ([65.55.169.111]:13152
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+Received: from mail-by2on0111.outbound.protection.outlook.com ([207.46.100.111]:46984
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752727AbbG3D6i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Jul 2015 23:58:38 -0400
+	id S1751074AbbG3EOK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 30 Jul 2015 00:14:10 -0400
 In-Reply-To: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This change fixes:
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 456 at lib/dma-debug.c:1103 check_unmap+0x438/0x958()
-caam_jr 2101000.jr0: DMA-API: device driver frees DMA memory with different size [device address=0x000000003a241080] [map ]
-Modules linked in: tcrypt(+)
-CPU: 0 PID: 456 Comm: insmod Not tainted 4.1.0-248766-gf823586-dirty #82
-Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
-[<80015e0c>] (unwind_backtrace) from [<80012764>] (show_stack+0x10/0x14)
-[<80012764>] (show_stack) from [<806df8e8>] (dump_stack+0x84/0xc4)
-[<806df8e8>] (dump_stack) from [<800266fc>] (warn_slowpath_common+0x84/0xb4)
-[<800266fc>] (warn_slowpath_common) from [<8002675c>] (warn_slowpath_fmt+0x30/0x40)
-[<8002675c>] (warn_slowpath_fmt) from [<802c7db8>] (check_unmap+0x438/0x958)
-[<802c7db8>] (check_unmap) from [<802c835c>] (debug_dma_unmap_page+0x84/0x8c)
-[<802c835c>] (debug_dma_unmap_page) from [<804d3b94>] (ahash_update_ctx+0xb08/0xec4)
-[<804d3b94>] (ahash_update_ctx) from [<7f002984>] (test_ahash_pnum.isra.9.constprop.19+0x2b8/0x514 [tcrypt])
-[<7f002984>] (test_ahash_pnum.isra.9.constprop.19 [tcrypt]) from [<7f005998>] (do_test+0x2db8/0x37cc [tcrypt])
-[<7f005998>] (do_test [tcrypt]) from [<7f00b050>] (tcrypt_mod_init+0x50/0x9c [tcrypt])
-[<7f00b050>] (tcrypt_mod_init [tcrypt]) from [<80009730>] (do_one_initcall+0x8c/0x1d4)
-[<80009730>] (do_one_initcall) from [<806dda4c>] (do_init_module+0x5c/0x1a8)
-[<806dda4c>] (do_init_module) from [<80085308>] (load_module+0x17e0/0x1da0)
-[<80085308>] (load_module) from [<80085998>] (SyS_init_module+0xd0/0x120)
-[<80085998>] (SyS_init_module) from [<8000f4c0>] (ret_fast_syscall+0x0/0x3c)
----[ end trace 60807cfb6521c79f ]---
+Add CAAM device node to the i.MX6 device tree.
 
 Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
 ---
- drivers/crypto/caam/caamhash.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/boot/dts/imx6qdl.dtsi | 30 ++++++++++++++++++++++++++----
+ 1 file changed, 26 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 2361beb..16c03f8 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -829,7 +829,7 @@ static int ahash_update_ctx(struct ahash_request *req)
- 		state->buf_dma = try_buf_map_to_sec4_sg(jrdev,
- 							edesc->sec4_sg + 1,
- 							buf, state->buf_dma,
--							*buflen, last_buflen);
-+							*next_buflen, *buflen);
+diff --git a/arch/arm/boot/dts/imx6qdl.dtsi b/arch/arm/boot/dts/imx6qdl.dtsi
+index e6d1359..4df9f1e 100644
+--- a/arch/arm/boot/dts/imx6qdl.dtsi
++++ b/arch/arm/boot/dts/imx6qdl.dtsi
+@@ -836,10 +836,32 @@
+ 			reg = <0x02100000 0x100000>;
+ 			ranges;
  
- 		if (src_nents) {
- 			src_map_to_sec4_sg(jrdev, req->src, src_nents,
+-			caam@02100000 {
+-				reg = <0x02100000 0x40000>;
+-				interrupts = <0 105 IRQ_TYPE_LEVEL_HIGH>,
+-					     <0 106 IRQ_TYPE_LEVEL_HIGH>;
++			crypto: caam@2100000 {
++				compatible = "fsl,sec-v4.0";
++				fsl,sec-era = <4>;
++				#address-cells = <1>;
++				#size-cells = <1>;
++				reg = <0x2100000 0x10000>;
++				ranges = <0 0x2100000 0x10000>;
++				interrupt-parent = <&intc>;
++				clocks = <&clks IMX6QDL_CAAM_MEM>,
++					 <&clks IMX6QDL_CAAM_ACLK>,
++					 <&clks IMX6QDL_CAAM_IPG>,
++					 <&clks IMX6QDL_CLK_EIM_SLOW>;
++				clock-names = "caam_mem", "caam_aclk",
++					      "caam_ipg", "caam_emi_slow";
++
++				sec_jr0: jr0@1000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x1000 0x1000>;
++					interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
++				};
++
++				sec_jr1: jr1@2000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x2000 0x1000>;
++					interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
++				};
+ 			};
+ 
+ 			aipstz@0217c000 { /* AIPSTZ2 */
 -- 
 2.1.4
