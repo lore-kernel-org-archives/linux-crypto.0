@@ -1,1001 +1,3224 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 5/8] crypto: picoxcell - Convert to new AEAD interface
-Date: Thu, 30 Jul 2015 17:53:19 +0800
-Message-ID: <E1ZKkWd-0004Bp-Fy@gondolin.me.apana.org.au>
+Subject: [PATCH 3/8] crypto: caam - Convert authenc to new AEAD interface
+Date: Thu, 30 Jul 2015 17:53:17 +0800
+Message-ID: <E1ZKkWb-0004BH-7g@gondolin.me.apana.org.au>
 References: <20150730094138.GA15941@gondor.apana.org.au>
-Cc: Jamie Iles <jamie@jamieiles.com>
+Cc: horia.geanta@freescale.com, ruchika.gupta@freescale.com,
+	cristian.stoica@freescale.com, NiteshNarayanLal@freescale.com,
+	jinyanjiang@gmail.com, Kim Phillips <kim.phillips@freescale.com>,
+	Tudor Ambarus <tudor.ambarus@freescale.com>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47516 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:60696 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754745AbbG3JxZ (ORCPT
+	with ESMTP id S1751405AbbG3JxX (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Jul 2015 05:53:25 -0400
+	Thu, 30 Jul 2015 05:53:23 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch converts picoxcell to the new AEAD interface.  IV
-generation has been removed since it's equivalent to a software
-implementation.
-
-As picoxcell cannot handle SG lists longer than 16 elements,
-this patch has made the software fallback mandatory.  If an SG
-list comes in that exceeds the limit, we will simply use the
-fallback.
+This patch converts the authenc implementations in caam to the
+new AEAD interface.  The biggest change is that seqiv no longer
+generates a random IV.  Instead the IPsec sequence number is used
+as the IV.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- drivers/crypto/picoxcell_crypto.c |  678 +++++++++++++++++---------------------
- 1 file changed, 311 insertions(+), 367 deletions(-)
+ drivers/crypto/caam/caamalg.c | 2603 +++++++++++++++++++++---------------------
+ 1 file changed, 1337 insertions(+), 1266 deletions(-)
 
-diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
-index 4f56f36..e0f0c34 100644
---- a/drivers/crypto/picoxcell_crypto.c
-+++ b/drivers/crypto/picoxcell_crypto.c
-@@ -99,11 +99,16 @@ struct spacc_req {
- 	dma_addr_t			src_addr, dst_addr;
- 	struct spacc_ddt		*src_ddt, *dst_ddt;
- 	void				(*complete)(struct spacc_req *req);
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 3c50a50..26f34ef 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -68,19 +68,21 @@
+ #define AEAD_DESC_JOB_IO_LEN		(DESC_JOB_IO_LEN + CAAM_CMD_SZ * 2)
+ #define GCM_DESC_JOB_IO_LEN		(AEAD_DESC_JOB_IO_LEN + \
+ 					 CAAM_CMD_SZ * 4)
++#define AUTHENC_DESC_JOB_IO_LEN		(AEAD_DESC_JOB_IO_LEN + \
++					 CAAM_CMD_SZ * 5)
+ 
+ /* length of descriptors text */
+ #define DESC_AEAD_BASE			(4 * CAAM_CMD_SZ)
+-#define DESC_AEAD_ENC_LEN		(DESC_AEAD_BASE + 15 * CAAM_CMD_SZ)
+-#define DESC_AEAD_DEC_LEN		(DESC_AEAD_BASE + 18 * CAAM_CMD_SZ)
+-#define DESC_AEAD_GIVENC_LEN		(DESC_AEAD_ENC_LEN + 7 * CAAM_CMD_SZ)
++#define DESC_AEAD_ENC_LEN		(DESC_AEAD_BASE + 11 * CAAM_CMD_SZ)
++#define DESC_AEAD_DEC_LEN		(DESC_AEAD_BASE + 15 * CAAM_CMD_SZ)
++#define DESC_AEAD_GIVENC_LEN		(DESC_AEAD_ENC_LEN + 9 * CAAM_CMD_SZ)
+ 
+ /* Note: Nonce is counted in enckeylen */
+-#define DESC_AEAD_CTR_RFC3686_LEN	(6 * CAAM_CMD_SZ)
++#define DESC_AEAD_CTR_RFC3686_LEN	(4 * CAAM_CMD_SZ)
+ 
+ #define DESC_AEAD_NULL_BASE		(3 * CAAM_CMD_SZ)
+-#define DESC_AEAD_NULL_ENC_LEN		(DESC_AEAD_NULL_BASE + 14 * CAAM_CMD_SZ)
+-#define DESC_AEAD_NULL_DEC_LEN		(DESC_AEAD_NULL_BASE + 17 * CAAM_CMD_SZ)
++#define DESC_AEAD_NULL_ENC_LEN		(DESC_AEAD_NULL_BASE + 11 * CAAM_CMD_SZ)
++#define DESC_AEAD_NULL_DEC_LEN		(DESC_AEAD_NULL_BASE + 13 * CAAM_CMD_SZ)
+ 
+ #define DESC_GCM_BASE			(3 * CAAM_CMD_SZ)
+ #define DESC_GCM_ENC_LEN		(DESC_GCM_BASE + 16 * CAAM_CMD_SZ)
+@@ -111,6 +113,20 @@
+ #endif
+ static struct list_head alg_list;
+ 
++struct caam_alg_entry {
++	int class1_alg_type;
++	int class2_alg_type;
++	int alg_op;
++	bool rfc3686;
++	bool geniv;
 +};
- 
--	/* AEAD specific bits. */
--	u8				*giv;
--	size_t				giv_len;
--	dma_addr_t			giv_pa;
-+struct spacc_aead {
-+	unsigned long			ctrl_default;
-+	unsigned long			type;
-+	struct aead_alg			alg;
-+	struct spacc_engine		*engine;
-+	struct list_head		entry;
-+	int				key_offs;
-+	int				iv_offs;
- };
- 
- struct spacc_engine {
-@@ -121,6 +126,9 @@ struct spacc_engine {
- 	struct spacc_alg		*algs;
- 	unsigned			num_algs;
- 	struct list_head		registered_algs;
-+	struct spacc_aead		*aeads;
-+	unsigned			num_aeads;
-+	struct list_head		registered_aeads;
- 	size_t				cipher_pg_sz;
- 	size_t				hash_pg_sz;
- 	const char			*name;
-@@ -174,8 +182,6 @@ struct spacc_aead_ctx {
- 	u8				cipher_key_len;
- 	u8				hash_key_len;
- 	struct crypto_aead		*sw_cipher;
--	size_t				auth_size;
--	u8				salt[AES_BLOCK_SIZE];
- };
- 
- static int spacc_ablk_submit(struct spacc_req *req);
-@@ -185,6 +191,11 @@ static inline struct spacc_alg *to_spacc_alg(struct crypto_alg *alg)
- 	return alg ? container_of(alg, struct spacc_alg, alg) : NULL;
++
++struct caam_aead_alg {
++	struct aead_alg aead;
++	struct caam_alg_entry caam;
++	bool registered;
++};
++
+ /* Set DK bit in class 1 operation if shared */
+ static inline void append_dec_op1(u32 *desc, u32 type)
+ {
+@@ -145,18 +161,6 @@ static inline void aead_append_src_dst(u32 *desc, u32 msg_type)
  }
  
-+static inline struct spacc_aead *to_spacc_aead(struct aead_alg *alg)
-+{
-+	return container_of(alg, struct spacc_aead, alg);
-+}
-+
- static inline int spacc_fifo_cmd_full(struct spacc_engine *engine)
- {
- 	u32 fifo_stat = readl(engine->regs + SPA_FIFO_STAT_REG_OFFSET);
-@@ -310,120 +321,117 @@ out:
- 	return NULL;
+ /*
+- * For aead encrypt and decrypt, read iv for both classes
+- */
+-static inline void aead_append_ld_iv(u32 *desc, int ivsize, int ivoffset)
+-{
+-	append_seq_load(desc, ivsize, LDST_CLASS_1_CCB |
+-			LDST_SRCDST_BYTE_CONTEXT |
+-			(ivoffset << LDST_OFFSET_SHIFT));
+-	append_move(desc, MOVE_SRC_CLASS1CTX | MOVE_DEST_CLASS2INFIFO |
+-		    (ivoffset << MOVE_OFFSET_SHIFT) | ivsize);
+-}
+-
+-/*
+  * For ablkcipher encrypt and decrypt, read from req->src and
+  * write to req->dst
+  */
+@@ -170,13 +174,6 @@ static inline void ablkcipher_append_src_dst(u32 *desc)
  }
  
--static int spacc_aead_make_ddts(struct spacc_req *req, u8 *giv)
-+static int spacc_aead_make_ddts(struct aead_request *areq)
+ /*
+- * If all data, including src (with assoc and iv) or dst (with iv only) are
+- * contiguous
+- */
+-#define GIV_SRC_CONTIG		1
+-#define GIV_DST_CONTIG		(1 << 1)
+-
+-/*
+  * per-session context
+  */
+ struct caam_ctx {
+@@ -259,7 +256,6 @@ static void init_sh_desc_key_aead(u32 *desc, struct caam_ctx *ctx,
+ 
+ static int aead_null_set_sh_desc(struct crypto_aead *aead)
  {
--	struct aead_request *areq = container_of(req->req, struct aead_request,
--						 base);
-+	struct crypto_aead *aead = crypto_aead_reqtfm(areq);
-+	struct spacc_req *req = aead_request_ctx(areq);
- 	struct spacc_engine *engine = req->engine;
- 	struct spacc_ddt *src_ddt, *dst_ddt;
--	unsigned ivsize = crypto_aead_ivsize(crypto_aead_reqtfm(areq));
--	unsigned nents = sg_count(areq->src, areq->cryptlen);
- 	unsigned total;
--	dma_addr_t iv_addr;
-+	unsigned int src_nents, dst_nents;
- 	struct scatterlist *cur;
--	int i, dst_ents, src_ents, assoc_ents;
--	u8 *iv = giv ? giv : areq->iv;
-+	int i, dst_ents, src_ents;
-+
-+	total = areq->assoclen + areq->cryptlen;
-+	if (req->is_encrypt)
-+		total += crypto_aead_authsize(aead);
-+
-+	src_nents = sg_count(areq->src, total);
-+	if (src_nents + 1 > MAX_DDT_LEN)
-+		return -E2BIG;
-+
-+	dst_nents = 0;
-+	if (areq->src != areq->dst) {
-+		dst_nents = sg_count(areq->dst, total);
-+		if (src_nents + 1 > MAX_DDT_LEN)
-+			return -E2BIG;
-+	}
- 
- 	src_ddt = dma_pool_alloc(engine->req_pool, GFP_ATOMIC, &req->src_addr);
- 	if (!src_ddt)
--		return -ENOMEM;
-+		goto err;
- 
- 	dst_ddt = dma_pool_alloc(engine->req_pool, GFP_ATOMIC, &req->dst_addr);
--	if (!dst_ddt) {
--		dma_pool_free(engine->req_pool, src_ddt, req->src_addr);
--		return -ENOMEM;
--	}
-+	if (!dst_ddt)
-+		goto err_free_src;
- 
- 	req->src_ddt = src_ddt;
- 	req->dst_ddt = dst_ddt;
- 
--	assoc_ents = dma_map_sg(engine->dev, areq->assoc,
--		sg_count(areq->assoc, areq->assoclen), DMA_TO_DEVICE);
--	if (areq->src != areq->dst) {
--		src_ents = dma_map_sg(engine->dev, areq->src, nents,
-+	if (dst_nents) {
-+		src_ents = dma_map_sg(engine->dev, areq->src, src_nents,
- 				      DMA_TO_DEVICE);
--		dst_ents = dma_map_sg(engine->dev, areq->dst, nents,
-+		if (!src_ents)
-+			goto err_free_dst;
-+
-+		dst_ents = dma_map_sg(engine->dev, areq->dst, dst_nents,
- 				      DMA_FROM_DEVICE);
-+
-+		if (!dst_ents) {
-+			dma_unmap_sg(engine->dev, areq->src, src_nents,
-+				     DMA_TO_DEVICE);
-+			goto err_free_dst;
-+		}
- 	} else {
--		src_ents = dma_map_sg(engine->dev, areq->src, nents,
-+		src_ents = dma_map_sg(engine->dev, areq->src, src_nents,
- 				      DMA_BIDIRECTIONAL);
--		dst_ents = 0;
-+		if (!src_ents)
-+			goto err_free_dst;
-+		dst_ents = src_ents;
- 	}
- 
- 	/*
--	 * Map the IV/GIV. For the GIV it needs to be bidirectional as it is
--	 * formed by the crypto block and sent as the ESP IV for IPSEC.
-+	 * Now map in the payload for the source and destination and terminate
-+	 * with the NULL pointers.
+-	unsigned int ivsize = crypto_aead_ivsize(aead);
+ 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+ 	struct device *jrdev = ctx->jrdev;
+ 	bool keys_fit_inline = false;
+@@ -270,11 +266,11 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
+ 	 * Job Descriptor and Shared Descriptors
+ 	 * must all fit into the 64-word Descriptor h/w Buffer
  	 */
--	iv_addr = dma_map_single(engine->dev, iv, ivsize,
--				 giv ? DMA_BIDIRECTIONAL : DMA_TO_DEVICE);
--	req->giv_pa = iv_addr;
-+	for_each_sg(areq->src, cur, src_ents, i)
-+		ddt_set(src_ddt++, sg_dma_address(cur), sg_dma_len(cur));
+-	if (DESC_AEAD_NULL_ENC_LEN + DESC_JOB_IO_LEN +
++	if (DESC_AEAD_NULL_ENC_LEN + AEAD_DESC_JOB_IO_LEN +
+ 	    ctx->split_key_pad_len <= CAAM_DESC_BYTES_MAX)
+ 		keys_fit_inline = true;
  
--	/*
--	 * Map the associated data. For decryption we don't copy the
--	 * associated data.
--	 */
--	total = areq->assoclen;
--	for_each_sg(areq->assoc, cur, assoc_ents, i) {
-+	/* For decryption we need to skip the associated data. */
-+	total = req->is_encrypt ? 0 : areq->assoclen;
-+	for_each_sg(areq->dst, cur, dst_ents, i) {
- 		unsigned len = sg_dma_len(cur);
+-	/* old_aead_encrypt shared descriptor */
++	/* aead_encrypt shared descriptor */
+ 	desc = ctx->sh_desc_enc;
  
--		if (len > total)
--			len = total;
--
--		total -= len;
-+		if (len <= total) {
-+			total -= len;
-+			continue;
-+		}
+ 	init_sh_desc(desc, HDR_SHARE_SERIAL);
+@@ -291,20 +287,10 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
+ 			   KEY_DEST_MDHA_SPLIT | KEY_ENC);
+ 	set_jump_tgt_here(desc, key_jump_cmd);
  
--		ddt_set(src_ddt++, sg_dma_address(cur), len);
--		if (req->is_encrypt)
--			ddt_set(dst_ddt++, sg_dma_address(cur), len);
-+		ddt_set(dst_ddt++, sg_dma_address(cur) + total, len - total);
- 	}
--	ddt_set(src_ddt++, iv_addr, ivsize);
--
--	if (giv || req->is_encrypt)
--		ddt_set(dst_ddt++, iv_addr, ivsize);
+-	/* cryptlen = seqoutlen - authsize */
+-	append_math_sub_imm_u32(desc, REG3, SEQOUTLEN, IMM, ctx->authsize);
 -
 -	/*
--	 * Now map in the payload for the source and destination and terminate
--	 * with the NULL pointers.
+-	 * NULL encryption; IV is zero
+-	 * assoclen = (assoclen + cryptlen) - cryptlen
 -	 */
--	for_each_sg(areq->src, cur, src_ents, i) {
--		ddt_set(src_ddt++, sg_dma_address(cur), sg_dma_len(cur));
--		if (areq->src == areq->dst)
--			ddt_set(dst_ddt++, sg_dma_address(cur),
--				sg_dma_len(cur));
+-	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG3, CAAM_CMD_SZ);
+-
+-	/* read assoc before reading payload */
+-	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_MSG |
+-			     KEY_VLF);
++	/* assoclen + cryptlen = seqinlen */
++	append_math_sub(desc, REG3, SEQINLEN, REG0, CAAM_CMD_SZ);
+ 
+-	/* Prepare to read and write cryptlen bytes */
++	/* Prepare to read and write cryptlen + assoclen bytes */
+ 	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
+ 	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
+ 
+@@ -363,7 +349,7 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
+ 
+ 	desc = ctx->sh_desc_dec;
+ 
+-	/* old_aead_decrypt shared descriptor */
++	/* aead_decrypt shared descriptor */
+ 	init_sh_desc(desc, HDR_SHARE_SERIAL);
+ 
+ 	/* Skip if already shared */
+@@ -382,18 +368,10 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
+ 	append_operation(desc, ctx->class2_alg_type |
+ 			 OP_ALG_AS_INITFINAL | OP_ALG_DECRYPT | OP_ALG_ICV_ON);
+ 
+-	/* assoclen + cryptlen = seqinlen - ivsize - authsize */
+-	append_math_sub_imm_u32(desc, REG3, SEQINLEN, IMM,
+-				ctx->authsize + ivsize);
+-	/* assoclen = (assoclen + cryptlen) - cryptlen */
++	/* assoclen + cryptlen = seqoutlen */
+ 	append_math_sub(desc, REG2, SEQOUTLEN, REG0, CAAM_CMD_SZ);
+-	append_math_sub(desc, VARSEQINLEN, REG3, REG2, CAAM_CMD_SZ);
+ 
+-	/* read assoc before reading payload */
+-	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_MSG |
+-			     KEY_VLF);
+-
+-	/* Prepare to read and write cryptlen bytes */
++	/* Prepare to read and write cryptlen + assoclen bytes */
+ 	append_math_add(desc, VARSEQINLEN, ZERO, REG2, CAAM_CMD_SZ);
+ 	append_math_add(desc, VARSEQOUTLEN, ZERO, REG2, CAAM_CMD_SZ);
+ 
+@@ -450,10 +428,10 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
+ 
+ static int aead_set_sh_desc(struct crypto_aead *aead)
+ {
++	struct caam_aead_alg *alg = container_of(crypto_aead_alg(aead),
++						 struct caam_aead_alg, aead);
+ 	unsigned int ivsize = crypto_aead_ivsize(aead);
+ 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+-	struct crypto_tfm *ctfm = crypto_aead_tfm(aead);
+-	const char *alg_name = crypto_tfm_alg_name(ctfm);
+ 	struct device *jrdev = ctx->jrdev;
+ 	bool keys_fit_inline;
+ 	u32 geniv, moveiv;
+@@ -461,11 +439,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 	u32 *desc;
+ 	const bool ctr_mode = ((ctx->class1_alg_type & OP_ALG_AAI_MASK) ==
+ 			       OP_ALG_AAI_CTR_MOD128);
+-	const bool is_rfc3686 = (ctr_mode &&
+-				 (strstr(alg_name, "rfc3686") != NULL));
+-
+-	if (!ctx->authsize)
+-		return 0;
++	const bool is_rfc3686 = alg->caam.rfc3686;
+ 
+ 	/* NULL encryption / decryption */
+ 	if (!ctx->enckeylen)
+@@ -486,18 +460,21 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 	if (is_rfc3686)
+ 		ctx1_iv_off = 16 + CTR_RFC3686_NONCE_SIZE;
+ 
++	if (alg->caam.geniv)
++		goto skip_enc;
++
+ 	/*
+ 	 * Job Descriptor and Shared Descriptors
+ 	 * must all fit into the 64-word Descriptor h/w Buffer
+ 	 */
+ 	keys_fit_inline = false;
+-	if (DESC_AEAD_ENC_LEN + DESC_JOB_IO_LEN +
++	if (DESC_AEAD_ENC_LEN + AUTHENC_DESC_JOB_IO_LEN +
+ 	    ctx->split_key_pad_len + ctx->enckeylen +
+ 	    (is_rfc3686 ? DESC_AEAD_CTR_RFC3686_LEN : 0) <=
+ 	    CAAM_DESC_BYTES_MAX)
+ 		keys_fit_inline = true;
+ 
+-	/* old_aead_encrypt shared descriptor */
++	/* aead_encrypt shared descriptor */
+ 	desc = ctx->sh_desc_enc;
+ 
+ 	/* Note: Context registers are saved. */
+@@ -507,19 +484,16 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 	append_operation(desc, ctx->class2_alg_type |
+ 			 OP_ALG_AS_INITFINAL | OP_ALG_ENCRYPT);
+ 
+-	/* cryptlen = seqoutlen - authsize */
+-	append_math_sub_imm_u32(desc, REG3, SEQOUTLEN, IMM, ctx->authsize);
+-
+-	/* assoclen + cryptlen = seqinlen - ivsize */
+-	append_math_sub_imm_u32(desc, REG2, SEQINLEN, IMM, ivsize);
++	/* Read and write assoclen bytes */
++	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
++	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
+ 
+-	/* assoclen = (assoclen + cryptlen) - cryptlen */
+-	append_math_sub(desc, VARSEQINLEN, REG2, REG3, CAAM_CMD_SZ);
++	/* Skip assoc data */
++	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
+ 
+ 	/* read assoc before reading payload */
+ 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_MSG |
+-			     KEY_VLF);
+-	aead_append_ld_iv(desc, ivsize, ctx1_iv_off);
++				      FIFOLDST_VLF);
+ 
+ 	/* Load Counter into CONTEXT1 reg */
+ 	if (is_rfc3686)
+@@ -534,8 +508,8 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 			 OP_ALG_AS_INITFINAL | OP_ALG_ENCRYPT);
+ 
+ 	/* Read and write cryptlen bytes */
+-	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
+-	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
++	append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
++	append_math_add(desc, VARSEQOUTLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
+ 	aead_append_src_dst(desc, FIFOLD_TYPE_MSG1OUT2);
+ 
+ 	/* Write ICV */
+@@ -555,18 +529,19 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 		       desc_bytes(desc), 1);
+ #endif
+ 
++skip_enc:
+ 	/*
+ 	 * Job Descriptor and Shared Descriptors
+ 	 * must all fit into the 64-word Descriptor h/w Buffer
+ 	 */
+ 	keys_fit_inline = false;
+-	if (DESC_AEAD_DEC_LEN + DESC_JOB_IO_LEN +
++	if (DESC_AEAD_DEC_LEN + AUTHENC_DESC_JOB_IO_LEN +
+ 	    ctx->split_key_pad_len + ctx->enckeylen +
+ 	    (is_rfc3686 ? DESC_AEAD_CTR_RFC3686_LEN : 0) <=
+ 	    CAAM_DESC_BYTES_MAX)
+ 		keys_fit_inline = true;
+ 
+-	/* old_aead_decrypt shared descriptor */
++	/* aead_decrypt shared descriptor */
+ 	desc = ctx->sh_desc_dec;
+ 
+ 	/* Note: Context registers are saved. */
+@@ -576,19 +551,17 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 	append_operation(desc, ctx->class2_alg_type |
+ 			 OP_ALG_AS_INITFINAL | OP_ALG_DECRYPT | OP_ALG_ICV_ON);
+ 
+-	/* assoclen + cryptlen = seqinlen - ivsize - authsize */
+-	append_math_sub_imm_u32(desc, REG3, SEQINLEN, IMM,
+-				ctx->authsize + ivsize);
+-	/* assoclen = (assoclen + cryptlen) - cryptlen */
+-	append_math_sub(desc, REG2, SEQOUTLEN, REG0, CAAM_CMD_SZ);
+-	append_math_sub(desc, VARSEQINLEN, REG3, REG2, CAAM_CMD_SZ);
++	/* Read and write assoclen bytes */
++	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
++	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
++
++	/* Skip assoc data */
++	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
+ 
+ 	/* read assoc before reading payload */
+ 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_MSG |
+ 			     KEY_VLF);
+ 
+-	aead_append_ld_iv(desc, ivsize, ctx1_iv_off);
+-
+ 	/* Load Counter into CONTEXT1 reg */
+ 	if (is_rfc3686)
+ 		append_load_imm_u32(desc, be32_to_cpu(1), LDST_IMM |
+@@ -605,8 +578,8 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 		append_dec_op1(desc, ctx->class1_alg_type);
+ 
+ 	/* Read and write cryptlen bytes */
+-	append_math_add(desc, VARSEQINLEN, ZERO, REG2, CAAM_CMD_SZ);
+-	append_math_add(desc, VARSEQOUTLEN, ZERO, REG2, CAAM_CMD_SZ);
++	append_math_add(desc, VARSEQINLEN, SEQOUTLEN, REG0, CAAM_CMD_SZ);
++	append_math_add(desc, VARSEQOUTLEN, SEQOUTLEN, REG0, CAAM_CMD_SZ);
+ 	aead_append_src_dst(desc, FIFOLD_TYPE_MSG);
+ 
+ 	/* Load ICV */
+@@ -626,12 +599,15 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 		       desc_bytes(desc), 1);
+ #endif
+ 
++	if (!alg->caam.geniv)
++		goto skip_givenc;
++
+ 	/*
+ 	 * Job Descriptor and Shared Descriptors
+ 	 * must all fit into the 64-word Descriptor h/w Buffer
+ 	 */
+ 	keys_fit_inline = false;
+-	if (DESC_AEAD_GIVENC_LEN + DESC_JOB_IO_LEN +
++	if (DESC_AEAD_GIVENC_LEN + AUTHENC_DESC_JOB_IO_LEN +
+ 	    ctx->split_key_pad_len + ctx->enckeylen +
+ 	    (is_rfc3686 ? DESC_AEAD_CTR_RFC3686_LEN : 0) <=
+ 	    CAAM_DESC_BYTES_MAX)
+@@ -643,6 +619,9 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 	/* Note: Context registers are saved. */
+ 	init_sh_desc_key_aead(desc, ctx, keys_fit_inline, is_rfc3686);
+ 
++	if (is_rfc3686)
++		goto copy_iv;
++
+ 	/* Generate IV */
+ 	geniv = NFIFOENTRY_STYPE_PAD | NFIFOENTRY_DEST_DECO |
+ 		NFIFOENTRY_DTYPE_MSG | NFIFOENTRY_LC1 |
+@@ -656,6 +635,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 		    (ivsize << MOVE_LEN_SHIFT));
+ 	append_cmd(desc, CMD_LOAD | ENABLE_AUTO_INFO_FIFO);
+ 
++copy_iv:
+ 	/* Copy IV to class 1 context */
+ 	append_move(desc, MOVE_SRC_CLASS1CTX | MOVE_DEST_OUTFIFO |
+ 		    (ctx1_iv_off << MOVE_OFFSET_SHIFT) |
+@@ -668,8 +648,12 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 	/* ivsize + cryptlen = seqoutlen - authsize */
+ 	append_math_sub_imm_u32(desc, REG3, SEQOUTLEN, IMM, ctx->authsize);
+ 
+-	/* assoclen = seqinlen - (ivsize + cryptlen) */
+-	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG3, CAAM_CMD_SZ);
++	/* Read and write assoclen bytes */
++	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
++	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
++
++	/* Skip assoc data */
++	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
+ 
+ 	/* read assoc before reading payload */
+ 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_MSG |
+@@ -710,9 +694,9 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 	append_seq_store(desc, ctx->authsize, LDST_CLASS_2_CCB |
+ 			 LDST_SRCDST_BYTE_CONTEXT);
+ 
+-	ctx->sh_desc_givenc_dma = dma_map_single(jrdev, desc,
+-						 desc_bytes(desc),
+-						 DMA_TO_DEVICE);
++	ctx->sh_desc_enc_dma = dma_map_single(jrdev, desc,
++					      desc_bytes(desc),
++					      DMA_TO_DEVICE);
+ 	if (dma_mapping_error(jrdev, ctx->sh_desc_givenc_dma)) {
+ 		dev_err(jrdev, "unable to map shared descriptor\n");
+ 		return -ENOMEM;
+@@ -723,6 +707,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 		       desc_bytes(desc), 1);
+ #endif
+ 
++skip_givenc:
+ 	return 0;
+ }
+ 
+@@ -1799,22 +1784,6 @@ static void aead_unmap(struct device *dev,
+ 		   edesc->sec4_sg_dma, edesc->sec4_sg_bytes);
+ }
+ 
+-static void old_aead_unmap(struct device *dev,
+-			   struct aead_edesc *edesc,
+-			   struct aead_request *req)
+-{
+-	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+-	int ivsize = crypto_aead_ivsize(aead);
+-
+-	dma_unmap_sg_chained(dev, req->assoc, edesc->assoc_nents,
+-			     DMA_TO_DEVICE, edesc->assoc_chained);
+-
+-	caam_unmap(dev, req->src, req->dst,
+-		   edesc->src_nents, edesc->src_chained, edesc->dst_nents,
+-		   edesc->dst_chained, edesc->iv_dma, ivsize,
+-		   edesc->sec4_sg_dma, edesc->sec4_sg_bytes);
+-}
+-
+ static void ablkcipher_unmap(struct device *dev,
+ 			     struct ablkcipher_edesc *edesc,
+ 			     struct ablkcipher_request *req)
+@@ -1850,45 +1819,6 @@ static void aead_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	aead_request_complete(req, err);
+ }
+ 
+-static void old_aead_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+-				  void *context)
+-{
+-	struct aead_request *req = context;
+-	struct aead_edesc *edesc;
+-#ifdef DEBUG
+-	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+-	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+-	int ivsize = crypto_aead_ivsize(aead);
+-
+-	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
+-#endif
+-
+-	edesc = (struct aead_edesc *)((char *)desc -
+-		 offsetof(struct aead_edesc, hw_desc));
+-
+-	if (err)
+-		caam_jr_strstatus(jrdev, err);
+-
+-	old_aead_unmap(jrdev, edesc, req);
+-
+-#ifdef DEBUG
+-	print_hex_dump(KERN_ERR, "assoc  @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->assoc),
+-		       req->assoclen , 1);
+-	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src) - ivsize,
+-		       edesc->src_nents ? 100 : ivsize, 1);
+-	print_hex_dump(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-		       edesc->src_nents ? 100 : req->cryptlen +
+-		       ctx->authsize + 4, 1);
+-#endif
+-
+-	kfree(edesc);
+-
+-	aead_request_complete(req, err);
+-}
+-
+ static void aead_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 				   void *context)
+ {
+@@ -1917,62 +1847,6 @@ static void aead_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	aead_request_complete(req, err);
+ }
+ 
+-static void old_aead_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+-				  void *context)
+-{
+-	struct aead_request *req = context;
+-	struct aead_edesc *edesc;
+-#ifdef DEBUG
+-	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+-	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+-	int ivsize = crypto_aead_ivsize(aead);
+-
+-	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
+-#endif
+-
+-	edesc = (struct aead_edesc *)((char *)desc -
+-		 offsetof(struct aead_edesc, hw_desc));
+-
+-#ifdef DEBUG
+-	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, req->iv,
+-		       ivsize, 1);
+-	print_hex_dump(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->dst),
+-		       req->cryptlen - ctx->authsize, 1);
+-#endif
+-
+-	if (err)
+-		caam_jr_strstatus(jrdev, err);
+-
+-	old_aead_unmap(jrdev, edesc, req);
+-
+-	/*
+-	 * verify hw auth check passed else return -EBADMSG
+-	 */
+-	if ((err & JRSTA_CCBERR_ERRID_MASK) == JRSTA_CCBERR_ERRID_ICVCHK)
+-		err = -EBADMSG;
+-
+-#ifdef DEBUG
+-	print_hex_dump(KERN_ERR, "iphdrout@"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4,
+-		       ((char *)sg_virt(req->assoc) - sizeof(struct iphdr)),
+-		       sizeof(struct iphdr) + req->assoclen +
+-		       ((req->cryptlen > 1500) ? 1500 : req->cryptlen) +
+-		       ctx->authsize + 36, 1);
+-	if (!err && edesc->sec4_sg_bytes) {
+-		struct scatterlist *sg = sg_last(req->src, edesc->src_nents);
+-		print_hex_dump(KERN_ERR, "sglastout@"__stringify(__LINE__)": ",
+-			       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(sg),
+-			sg->length + ctx->authsize + 16, 1);
+-	}
+-#endif
+-
+-	kfree(edesc);
+-
+-	aead_request_complete(req, err);
+-}
+-
+ static void ablkcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 				   void *context)
+ {
+@@ -2041,91 +1915,6 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ /*
+  * Fill in aead job descriptor
+  */
+-static void old_init_aead_job(u32 *sh_desc, dma_addr_t ptr,
+-			      struct aead_edesc *edesc,
+-			      struct aead_request *req,
+-			      bool all_contig, bool encrypt)
+-{
+-	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+-	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+-	int ivsize = crypto_aead_ivsize(aead);
+-	int authsize = ctx->authsize;
+-	u32 *desc = edesc->hw_desc;
+-	u32 out_options = 0, in_options;
+-	dma_addr_t dst_dma, src_dma;
+-	int len, sec4_sg_index = 0;
+-	bool is_gcm = false;
+-
+-#ifdef DEBUG
+-	debug("assoclen %d cryptlen %d authsize %d\n",
+-	      req->assoclen, req->cryptlen, authsize);
+-	print_hex_dump(KERN_ERR, "assoc  @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->assoc),
+-		       req->assoclen , 1);
+-	print_hex_dump(KERN_ERR, "presciv@"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, req->iv,
+-		       edesc->src_nents ? 100 : ivsize, 1);
+-	print_hex_dump(KERN_ERR, "src    @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-			edesc->src_nents ? 100 : req->cryptlen, 1);
+-	print_hex_dump(KERN_ERR, "shrdesc@"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sh_desc,
+-		       desc_bytes(sh_desc), 1);
+-#endif
+-
+-	if (((ctx->class1_alg_type & OP_ALG_ALGSEL_MASK) ==
+-	      OP_ALG_ALGSEL_AES) &&
+-	    ((ctx->class1_alg_type & OP_ALG_AAI_MASK) == OP_ALG_AAI_GCM))
+-		is_gcm = true;
+-
+-	len = desc_len(sh_desc);
+-	init_job_desc_shared(desc, ptr, len, HDR_SHARE_DEFER | HDR_REVERSE);
+-
+-	if (all_contig) {
+-		if (is_gcm)
+-			src_dma = edesc->iv_dma;
+-		else
+-			src_dma = sg_dma_address(req->assoc);
+-		in_options = 0;
+-	} else {
+-		src_dma = edesc->sec4_sg_dma;
+-		sec4_sg_index += (edesc->assoc_nents ? : 1) + 1 +
+-				 (edesc->src_nents ? : 1);
+-		in_options = LDST_SGF;
 -	}
 -
--	for_each_sg(areq->dst, cur, dst_ents, i)
--		ddt_set(dst_ddt++, sg_dma_address(cur),
--			sg_dma_len(cur));
- 
- 	ddt_set(src_ddt, 0, 0);
- 	ddt_set(dst_ddt, 0, 0);
- 
- 	return 0;
-+
-+err_free_dst:
-+	dma_pool_free(engine->req_pool, dst_ddt, req->dst_addr);
-+err_free_src:
-+	dma_pool_free(engine->req_pool, src_ddt, req->src_addr);
-+err:
-+	return -ENOMEM;
- }
- 
- static void spacc_aead_free_ddts(struct spacc_req *req)
- {
- 	struct aead_request *areq = container_of(req->req, struct aead_request,
- 						 base);
--	struct spacc_alg *alg = to_spacc_alg(req->req->tfm->__crt_alg);
--	struct spacc_ablk_ctx *aead_ctx = crypto_tfm_ctx(req->req->tfm);
-+	struct crypto_aead *aead = crypto_aead_reqtfm(areq);
-+	unsigned total = areq->assoclen + areq->cryptlen +
-+			 (req->is_encrypt ? crypto_aead_authsize(aead) : 0);
-+	struct spacc_aead_ctx *aead_ctx = crypto_aead_ctx(aead);
- 	struct spacc_engine *engine = aead_ctx->generic.engine;
--	unsigned ivsize = alg->alg.cra_aead.ivsize;
--	unsigned nents = sg_count(areq->src, areq->cryptlen);
-+	unsigned nents = sg_count(areq->src, total);
- 
- 	if (areq->src != areq->dst) {
- 		dma_unmap_sg(engine->dev, areq->src, nents, DMA_TO_DEVICE);
- 		dma_unmap_sg(engine->dev, areq->dst,
--			     sg_count(areq->dst, areq->cryptlen),
-+			     sg_count(areq->dst, total),
- 			     DMA_FROM_DEVICE);
- 	} else
- 		dma_unmap_sg(engine->dev, areq->src, nents, DMA_BIDIRECTIONAL);
- 
--	dma_unmap_sg(engine->dev, areq->assoc,
--		     sg_count(areq->assoc, areq->assoclen), DMA_TO_DEVICE);
+-	append_seq_in_ptr(desc, src_dma, req->assoclen + ivsize + req->cryptlen,
+-			  in_options);
 -
--	dma_unmap_single(engine->dev, req->giv_pa, ivsize, DMA_BIDIRECTIONAL);
+-	if (likely(req->src == req->dst)) {
+-		if (all_contig) {
+-			dst_dma = sg_dma_address(req->src);
+-		} else {
+-			dst_dma = src_dma + sizeof(struct sec4_sg_entry) *
+-				  ((edesc->assoc_nents ? : 1) + 1);
+-			out_options = LDST_SGF;
+-		}
+-	} else {
+-		if (!edesc->dst_nents) {
+-			dst_dma = sg_dma_address(req->dst);
+-		} else {
+-			dst_dma = edesc->sec4_sg_dma +
+-				  sec4_sg_index *
+-				  sizeof(struct sec4_sg_entry);
+-			out_options = LDST_SGF;
+-		}
+-	}
+-	if (encrypt)
+-		append_seq_out_ptr(desc, dst_dma, req->cryptlen + authsize,
+-				   out_options);
+-	else
+-		append_seq_out_ptr(desc, dst_dma, req->cryptlen - authsize,
+-				   out_options);
+-}
 -
- 	dma_pool_free(engine->req_pool, req->src_ddt, req->src_addr);
- 	dma_pool_free(engine->req_pool, req->dst_ddt, req->dst_addr);
- }
-@@ -438,65 +446,22 @@ static void spacc_free_ddt(struct spacc_req *req, struct spacc_ddt *ddt,
- 	dma_pool_free(req->engine->req_pool, ddt, ddt_addr);
+-/*
+- * Fill in aead job descriptor
+- */
+ static void init_aead_job(struct aead_request *req,
+ 			  struct aead_edesc *edesc,
+ 			  bool all_contig, bool encrypt)
+@@ -2214,80 +2003,43 @@ static void init_gcm_job(struct aead_request *req,
+ 	/* End of blank commands */
  }
  
 -/*
-- * Set key for a DES operation in an AEAD cipher. This also performs weak key
-- * checking if required.
+- * Fill in aead givencrypt job descriptor
 - */
--static int spacc_aead_des_setkey(struct crypto_aead *aead, const u8 *key,
--				 unsigned int len)
--{
--	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
--	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(tfm);
--	u32 tmp[DES_EXPKEY_WORDS];
+-static void init_aead_giv_job(u32 *sh_desc, dma_addr_t ptr,
+-			      struct aead_edesc *edesc,
+-			      struct aead_request *req,
+-			      int contig)
++static void init_authenc_job(struct aead_request *req,
++			     struct aead_edesc *edesc,
++			     bool all_contig, bool encrypt)
+ {
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
++	struct caam_aead_alg *alg = container_of(crypto_aead_alg(aead),
++						 struct caam_aead_alg, aead);
++	unsigned int ivsize = crypto_aead_ivsize(aead);
+ 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+-	int ivsize = crypto_aead_ivsize(aead);
+-	int authsize = ctx->authsize;
++	const bool ctr_mode = ((ctx->class1_alg_type & OP_ALG_AAI_MASK) ==
++			       OP_ALG_AAI_CTR_MOD128);
++	const bool is_rfc3686 = alg->caam.rfc3686;
+ 	u32 *desc = edesc->hw_desc;
+-	u32 out_options = 0, in_options;
+-	dma_addr_t dst_dma, src_dma;
+-	int len, sec4_sg_index = 0;
+-	bool is_gcm = false;
++	u32 ivoffset = 0;
+ 
+-#ifdef DEBUG
+-	debug("assoclen %d cryptlen %d authsize %d\n",
+-	      req->assoclen, req->cryptlen, authsize);
+-	print_hex_dump(KERN_ERR, "assoc  @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->assoc),
+-		       req->assoclen , 1);
+-	print_hex_dump(KERN_ERR, "presciv@"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, req->iv, ivsize, 1);
+-	print_hex_dump(KERN_ERR, "src    @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-			edesc->src_nents > 1 ? 100 : req->cryptlen, 1);
+-	print_hex_dump(KERN_ERR, "shrdesc@"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sh_desc,
+-		       desc_bytes(sh_desc), 1);
+-#endif
 -
--	if (unlikely(!des_ekey(tmp, key)) &&
--	    (crypto_aead_get_flags(aead)) & CRYPTO_TFM_REQ_WEAK_KEY) {
--		tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
--		return -EINVAL;
+-	if (((ctx->class1_alg_type & OP_ALG_ALGSEL_MASK) ==
+-	      OP_ALG_ALGSEL_AES) &&
+-	    ((ctx->class1_alg_type & OP_ALG_AAI_MASK) == OP_ALG_AAI_GCM))
+-		is_gcm = true;
+-
+-	len = desc_len(sh_desc);
+-	init_job_desc_shared(desc, ptr, len, HDR_SHARE_DEFER | HDR_REVERSE);
++	/*
++	 * AES-CTR needs to load IV in CONTEXT1 reg
++	 * at an offset of 128bits (16bytes)
++	 * CONTEXT1[255:128] = IV
++	 */
++	if (ctr_mode)
++		ivoffset = 16;
+ 
+-	if (contig & GIV_SRC_CONTIG) {
+-		if (is_gcm)
+-			src_dma = edesc->iv_dma;
+-		else
+-			src_dma = sg_dma_address(req->assoc);
+-		in_options = 0;
+-	} else {
+-		src_dma = edesc->sec4_sg_dma;
+-		sec4_sg_index += edesc->assoc_nents + 1 + edesc->src_nents;
+-		in_options = LDST_SGF;
+-	}
+-	append_seq_in_ptr(desc, src_dma, req->assoclen + ivsize + req->cryptlen,
+-			  in_options);
++	/*
++	 * RFC3686 specific:
++	 *	CONTEXT1[255:128] = {NONCE, IV, COUNTER}
++	 */
++	if (is_rfc3686)
++		ivoffset = 16 + CTR_RFC3686_NONCE_SIZE;
+ 
+-	if (contig & GIV_DST_CONTIG) {
+-		dst_dma = edesc->iv_dma;
+-	} else {
+-		if (likely(req->src == req->dst)) {
+-			dst_dma = src_dma + sizeof(struct sec4_sg_entry) *
+-				  (edesc->assoc_nents +
+-				   (is_gcm ? 1 + edesc->src_nents : 0));
+-			out_options = LDST_SGF;
+-		} else {
+-			dst_dma = edesc->sec4_sg_dma +
+-				  sec4_sg_index *
+-				  sizeof(struct sec4_sg_entry);
+-			out_options = LDST_SGF;
+-		}
+-	}
++	init_aead_job(req, edesc, all_contig, encrypt);
+ 
+-	append_seq_out_ptr(desc, dst_dma, ivsize + req->cryptlen + authsize,
+-			   out_options);
++	if (ivsize && (is_rfc3686 || !(alg->caam.geniv && encrypt)))
++		append_load_as_imm(desc, req->iv, ivsize,
++				   LDST_CLASS_1_CCB |
++				   LDST_SRCDST_BYTE_CONTEXT |
++				   (ivoffset << LDST_OFFSET_SHIFT));
+ }
+ 
+ /*
+@@ -2398,177 +2150,33 @@ static void init_ablkcipher_giv_job(u32 *sh_desc, dma_addr_t ptr,
+ /*
+  * allocate and map the aead extended descriptor
+  */
+-static struct aead_edesc *old_aead_edesc_alloc(struct aead_request *req,
+-					       int desc_bytes,
+-					       bool *all_contig_ptr,
+-					       bool encrypt)
++static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
++					   int desc_bytes, bool *all_contig_ptr,
++					   bool encrypt)
+ {
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+ 	struct device *jrdev = ctx->jrdev;
+ 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
+-	int assoc_nents, src_nents, dst_nents = 0;
++	int src_nents, dst_nents = 0;
+ 	struct aead_edesc *edesc;
+-	dma_addr_t iv_dma = 0;
+ 	int sgc;
+ 	bool all_contig = true;
+-	bool assoc_chained = false, src_chained = false, dst_chained = false;
+-	int ivsize = crypto_aead_ivsize(aead);
++	bool src_chained = false, dst_chained = false;
+ 	int sec4_sg_index, sec4_sg_len = 0, sec4_sg_bytes;
+ 	unsigned int authsize = ctx->authsize;
+-	bool is_gcm = false;
+-
+-	assoc_nents = sg_count(req->assoc, req->assoclen, &assoc_chained);
+ 
+ 	if (unlikely(req->dst != req->src)) {
+-		src_nents = sg_count(req->src, req->cryptlen, &src_chained);
++		src_nents = sg_count(req->src, req->assoclen + req->cryptlen,
++				     &src_chained);
+ 		dst_nents = sg_count(req->dst,
+-				     req->cryptlen +
++				     req->assoclen + req->cryptlen +
+ 					(encrypt ? authsize : (-authsize)),
+ 				     &dst_chained);
+ 	} else {
+ 		src_nents = sg_count(req->src,
+-				     req->cryptlen +
+-					(encrypt ? authsize : 0),
+-				     &src_chained);
 -	}
 -
--	memcpy(ctx->cipher_key, key, len);
--	ctx->cipher_key_len = len;
+-	sgc = dma_map_sg_chained(jrdev, req->assoc, assoc_nents ? : 1,
+-				 DMA_TO_DEVICE, assoc_chained);
+-	if (likely(req->src == req->dst)) {
+-		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
+-					 DMA_BIDIRECTIONAL, src_chained);
+-	} else {
+-		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
+-					 DMA_TO_DEVICE, src_chained);
+-		sgc = dma_map_sg_chained(jrdev, req->dst, dst_nents ? : 1,
+-					 DMA_FROM_DEVICE, dst_chained);
+-	}
 -
--	return 0;
--}
+-	iv_dma = dma_map_single(jrdev, req->iv, ivsize, DMA_TO_DEVICE);
+-	if (dma_mapping_error(jrdev, iv_dma)) {
+-		dev_err(jrdev, "unable to map IV\n");
+-		return ERR_PTR(-ENOMEM);
+-	}
 -
--/* Set the key for the AES block cipher component of the AEAD transform. */
--static int spacc_aead_aes_setkey(struct crypto_aead *aead, const u8 *key,
--				 unsigned int len)
--{
--	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
--	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(tfm);
+-	if (((ctx->class1_alg_type & OP_ALG_ALGSEL_MASK) ==
+-	      OP_ALG_ALGSEL_AES) &&
+-	    ((ctx->class1_alg_type & OP_ALG_AAI_MASK) == OP_ALG_AAI_GCM))
+-		is_gcm = true;
 -
 -	/*
--	 * IPSec engine only supports 128 and 256 bit AES keys. If we get a
--	 * request for any other size (192 bits) then we need to do a software
--	 * fallback.
+-	 * Check if data are contiguous.
+-	 * GCM expected input sequence: IV, AAD, text
+-	 * All other - expected input sequence: AAD, IV, text
 -	 */
--	if (len != AES_KEYSIZE_128 && len != AES_KEYSIZE_256) {
--		/*
--		 * Set the fallback transform to use the same request flags as
--		 * the hardware transform.
--		 */
--		ctx->sw_cipher->base.crt_flags &= ~CRYPTO_TFM_REQ_MASK;
--		ctx->sw_cipher->base.crt_flags |=
--			tfm->crt_flags & CRYPTO_TFM_REQ_MASK;
--		return crypto_aead_setkey(ctx->sw_cipher, key, len);
--	}
--
--	memcpy(ctx->cipher_key, key, len);
--	ctx->cipher_key_len = len;
--
--	return 0;
--}
--
- static int spacc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
- 			     unsigned int keylen)
- {
- 	struct spacc_aead_ctx *ctx = crypto_aead_ctx(tfm);
--	struct spacc_alg *alg = to_spacc_alg(tfm->base.__crt_alg);
- 	struct crypto_authenc_keys keys;
--	int err = -EINVAL;
-+	int err;
-+
-+	crypto_aead_clear_flags(ctx->sw_cipher, CRYPTO_TFM_REQ_MASK);
-+	crypto_aead_set_flags(ctx->sw_cipher, crypto_aead_get_flags(tfm) &
-+					      CRYPTO_TFM_REQ_MASK);
-+	err = crypto_aead_setkey(ctx->sw_cipher, key, keylen);
-+	crypto_aead_clear_flags(tfm, CRYPTO_TFM_RES_MASK);
-+	crypto_aead_set_flags(tfm, crypto_aead_get_flags(ctx->sw_cipher) &
-+				   CRYPTO_TFM_RES_MASK);
-+	if (err)
-+		return err;
- 
- 	if (crypto_authenc_extractkeys(&keys, key, keylen) != 0)
- 		goto badkey;
-@@ -507,14 +472,8 @@ static int spacc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
- 	if (keys.authkeylen > sizeof(ctx->hash_ctx))
- 		goto badkey;
- 
--	if ((alg->ctrl_default & SPACC_CRYPTO_ALG_MASK) ==
--	    SPA_CTRL_CIPH_ALG_AES)
--		err = spacc_aead_aes_setkey(tfm, keys.enckey, keys.enckeylen);
+-	if (is_gcm)
+-		all_contig = (!assoc_nents &&
+-			      iv_dma + ivsize == sg_dma_address(req->assoc) &&
+-			      !src_nents && sg_dma_address(req->assoc) +
+-			      req->assoclen == sg_dma_address(req->src));
 -	else
--		err = spacc_aead_des_setkey(tfm, keys.enckey, keys.enckeylen);
+-		all_contig = (!assoc_nents && sg_dma_address(req->assoc) +
+-			      req->assoclen == iv_dma && !src_nents &&
+-			      iv_dma + ivsize == sg_dma_address(req->src));
+-	if (!all_contig) {
+-		assoc_nents = assoc_nents ? : 1;
+-		src_nents = src_nents ? : 1;
+-		sec4_sg_len = assoc_nents + 1 + src_nents;
+-	}
 -
--	if (err)
--		goto badkey;
-+	memcpy(ctx->cipher_key, keys.enckey, keys.enckeylen);
-+	ctx->cipher_key_len = keys.enckeylen;
- 
- 	memcpy(ctx->hash_ctx, keys.authkey, keys.authkeylen);
- 	ctx->hash_key_len = keys.authkeylen;
-@@ -531,9 +490,7 @@ static int spacc_aead_setauthsize(struct crypto_aead *tfm,
- {
- 	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(crypto_aead_tfm(tfm));
- 
--	ctx->auth_size = authsize;
+-	sec4_sg_len += dst_nents;
 -
--	return 0;
-+	return crypto_aead_setauthsize(ctx->sw_cipher, authsize);
- }
- 
- /*
-@@ -541,15 +498,13 @@ static int spacc_aead_setauthsize(struct crypto_aead *tfm,
-  * be completed in hardware because the hardware may not support certain key
-  * sizes. In these cases we need to complete the request in software.
-  */
--static int spacc_aead_need_fallback(struct spacc_req *req)
-+static int spacc_aead_need_fallback(struct aead_request *aead_req)
- {
--	struct aead_request *aead_req;
--	struct crypto_tfm *tfm = req->req->tfm;
--	struct crypto_alg *alg = req->req->tfm->__crt_alg;
--	struct spacc_alg *spacc_alg = to_spacc_alg(alg);
--	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_aead *aead = crypto_aead_reqtfm(aead_req);
-+	struct aead_alg *alg = crypto_aead_alg(aead);
-+	struct spacc_aead *spacc_alg = to_spacc_aead(alg);
-+	struct spacc_aead_ctx *ctx = crypto_aead_ctx(aead);
- 
--	aead_req = container_of(req->req, struct aead_request, base);
- 	/*
- 	 * If we have a non-supported key-length, then we need to do a
- 	 * software fallback.
-@@ -568,22 +523,17 @@ static int spacc_aead_do_fallback(struct aead_request *req, unsigned alg_type,
- {
- 	struct crypto_tfm *old_tfm = crypto_aead_tfm(crypto_aead_reqtfm(req));
- 	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(old_tfm);
--	int err;
-+	struct aead_request *subreq = aead_request_ctx(req);
- 
--	if (ctx->sw_cipher) {
--		/*
--		 * Change the request to use the software fallback transform,
--		 * and once the ciphering has completed, put the old transform
--		 * back into the request.
--		 */
--		aead_request_set_tfm(req, ctx->sw_cipher);
--		err = is_encrypt ? crypto_aead_encrypt(req) :
--		    crypto_aead_decrypt(req);
--		aead_request_set_tfm(req, __crypto_aead_cast(old_tfm));
--	} else
--		err = -EINVAL;
-+	aead_request_set_tfm(subreq, ctx->sw_cipher);
-+	aead_request_set_callback(subreq, req->base.flags,
-+				  req->base.complete, req->base.data);
-+	aead_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
-+			       req->iv);
-+	aead_request_set_ad(subreq, req->assoclen);
- 
--	return err;
-+	return is_encrypt ? crypto_aead_encrypt(subreq) :
-+			    crypto_aead_decrypt(subreq);
- }
- 
- static void spacc_aead_complete(struct spacc_req *req)
-@@ -594,18 +544,19 @@ static void spacc_aead_complete(struct spacc_req *req)
- 
- static int spacc_aead_submit(struct spacc_req *req)
- {
--	struct crypto_tfm *tfm = req->req->tfm;
--	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct crypto_alg *alg = req->req->tfm->__crt_alg;
--	struct spacc_alg *spacc_alg = to_spacc_alg(alg);
--	struct spacc_engine *engine = ctx->generic.engine;
--	u32 ctrl, proc_len, assoc_len;
- 	struct aead_request *aead_req =
- 		container_of(req->req, struct aead_request, base);
-+	struct crypto_aead *aead = crypto_aead_reqtfm(aead_req);
-+	unsigned int authsize = crypto_aead_authsize(aead);
-+	struct spacc_aead_ctx *ctx = crypto_aead_ctx(aead);
-+	struct aead_alg *alg = crypto_aead_alg(aead);
-+	struct spacc_aead *spacc_alg = to_spacc_aead(alg);
-+	struct spacc_engine *engine = ctx->generic.engine;
-+	u32 ctrl, proc_len, assoc_len;
- 
- 	req->result = -EINPROGRESS;
- 	req->ctx_id = spacc_load_ctx(&ctx->generic, ctx->cipher_key,
--		ctx->cipher_key_len, aead_req->iv, alg->cra_aead.ivsize,
-+		ctx->cipher_key_len, aead_req->iv, crypto_aead_ivsize(aead),
- 		ctx->hash_ctx, ctx->hash_key_len);
- 
- 	/* Set the source and destination DDT pointers. */
-@@ -617,25 +568,15 @@ static int spacc_aead_submit(struct spacc_req *req)
- 	proc_len = aead_req->cryptlen + assoc_len;
- 
- 	/*
--	 * If we aren't generating an IV, then we need to include the IV in the
--	 * associated data so that it is included in the hash.
--	 */
--	if (!req->giv) {
--		assoc_len += crypto_aead_ivsize(crypto_aead_reqtfm(aead_req));
--		proc_len += crypto_aead_ivsize(crypto_aead_reqtfm(aead_req));
--	} else
--		proc_len += req->giv_len;
+-	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
 -
--	/*
- 	 * If we are decrypting, we need to take the length of the ICV out of
- 	 * the processing length.
- 	 */
- 	if (!req->is_encrypt)
--		proc_len -= ctx->auth_size;
-+		proc_len -= authsize;
- 
- 	writel(proc_len, engine->regs + SPA_PROC_LEN_REG_OFFSET);
- 	writel(assoc_len, engine->regs + SPA_AAD_LEN_REG_OFFSET);
--	writel(ctx->auth_size, engine->regs + SPA_ICV_LEN_REG_OFFSET);
-+	writel(authsize, engine->regs + SPA_ICV_LEN_REG_OFFSET);
- 	writel(0, engine->regs + SPA_ICV_OFFSET_REG_OFFSET);
- 	writel(0, engine->regs + SPA_AUX_INFO_REG_OFFSET);
- 
-@@ -674,32 +615,29 @@ static void spacc_push(struct spacc_engine *engine)
- /*
-  * Setup an AEAD request for processing. This will configure the engine, load
-  * the context and then start the packet processing.
-- *
-- * @giv Pointer to destination address for a generated IV. If the
-- *	request does not need to generate an IV then this should be set to NULL.
-  */
--static int spacc_aead_setup(struct aead_request *req, u8 *giv,
-+static int spacc_aead_setup(struct aead_request *req,
- 			    unsigned alg_type, bool is_encrypt)
- {
--	struct crypto_alg *alg = req->base.tfm->__crt_alg;
--	struct spacc_engine *engine = to_spacc_alg(alg)->engine;
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct aead_alg *alg = crypto_aead_alg(aead);
-+	struct spacc_engine *engine = to_spacc_aead(alg)->engine;
- 	struct spacc_req *dev_req = aead_request_ctx(req);
--	int err = -EINPROGRESS;
-+	int err;
- 	unsigned long flags;
--	unsigned ivsize = crypto_aead_ivsize(crypto_aead_reqtfm(req));
- 
--	dev_req->giv		= giv;
--	dev_req->giv_len	= ivsize;
- 	dev_req->req		= &req->base;
- 	dev_req->is_encrypt	= is_encrypt;
- 	dev_req->result		= -EBUSY;
- 	dev_req->engine		= engine;
- 	dev_req->complete	= spacc_aead_complete;
- 
--	if (unlikely(spacc_aead_need_fallback(dev_req)))
-+	if (unlikely(spacc_aead_need_fallback(req) ||
-+		     ((err = spacc_aead_make_ddts(req)) == -E2BIG)))
- 		return spacc_aead_do_fallback(req, alg_type, is_encrypt);
- 
--	spacc_aead_make_ddts(dev_req, dev_req->giv);
-+	if (err)
-+		goto out;
- 
- 	err = -EINPROGRESS;
- 	spin_lock_irqsave(&engine->hw_lock, flags);
-@@ -728,70 +666,44 @@ out:
- static int spacc_aead_encrypt(struct aead_request *req)
- {
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
--	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
--	struct spacc_alg *alg = to_spacc_alg(tfm->__crt_alg);
-+	struct spacc_aead *alg = to_spacc_aead(crypto_aead_alg(aead));
- 
--	return spacc_aead_setup(req, NULL, alg->type, 1);
+-	/* allocate space for base edesc and hw desc commands, link tables */
+-	edesc = kmalloc(sizeof(struct aead_edesc) + desc_bytes +
+-			sec4_sg_bytes, GFP_DMA | flags);
+-	if (!edesc) {
+-		dev_err(jrdev, "could not allocate extended descriptor\n");
+-		return ERR_PTR(-ENOMEM);
+-	}
+-
+-	edesc->assoc_nents = assoc_nents;
+-	edesc->assoc_chained = assoc_chained;
+-	edesc->src_nents = src_nents;
+-	edesc->src_chained = src_chained;
+-	edesc->dst_nents = dst_nents;
+-	edesc->dst_chained = dst_chained;
+-	edesc->iv_dma = iv_dma;
+-	edesc->sec4_sg_bytes = sec4_sg_bytes;
+-	edesc->sec4_sg = (void *)edesc + sizeof(struct aead_edesc) +
+-			 desc_bytes;
+-	*all_contig_ptr = all_contig;
+-
+-	sec4_sg_index = 0;
+-	if (!all_contig) {
+-		if (!is_gcm) {
+-			sg_to_sec4_sg_len(req->assoc, req->assoclen,
+-					  edesc->sec4_sg + sec4_sg_index);
+-			sec4_sg_index += assoc_nents;
+-		}
+-
+-		dma_to_sec4_sg_one(edesc->sec4_sg + sec4_sg_index,
+-				   iv_dma, ivsize, 0);
+-		sec4_sg_index += 1;
+-
+-		if (is_gcm) {
+-			sg_to_sec4_sg_len(req->assoc, req->assoclen,
+-					  edesc->sec4_sg + sec4_sg_index);
+-			sec4_sg_index += assoc_nents;
+-		}
+-
+-		sg_to_sec4_sg_last(req->src,
+-				   src_nents,
+-				   edesc->sec4_sg +
+-				   sec4_sg_index, 0);
+-		sec4_sg_index += src_nents;
+-	}
+-	if (dst_nents) {
+-		sg_to_sec4_sg_last(req->dst, dst_nents,
+-				   edesc->sec4_sg + sec4_sg_index, 0);
+-	}
+-	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+-					    sec4_sg_bytes, DMA_TO_DEVICE);
+-	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
+-		dev_err(jrdev, "unable to map S/G table\n");
+-		return ERR_PTR(-ENOMEM);
+-	}
+-
+-	return edesc;
 -}
 -
--static int spacc_aead_givencrypt(struct aead_givcrypt_request *req)
+-/*
+- * allocate and map the aead extended descriptor
+- */
+-static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+-					   int desc_bytes, bool *all_contig_ptr,
+-					   bool encrypt)
 -{
--	struct crypto_aead *tfm = aead_givcrypt_reqtfm(req);
--	struct spacc_aead_ctx *ctx = crypto_aead_ctx(tfm);
--	size_t ivsize = crypto_aead_ivsize(tfm);
--	struct spacc_alg *alg = to_spacc_alg(tfm->base.__crt_alg);
--	unsigned len;
--	__be64 seq;
+-	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+-	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+-	struct device *jrdev = ctx->jrdev;
+-	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+-		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
+-	int src_nents, dst_nents = 0;
+-	struct aead_edesc *edesc;
+-	int sgc;
+-	bool all_contig = true;
+-	bool src_chained = false, dst_chained = false;
+-	int sec4_sg_index, sec4_sg_len = 0, sec4_sg_bytes;
+-	unsigned int authsize = ctx->authsize;
 -
--	memcpy(req->areq.iv, ctx->salt, ivsize);
--	len = ivsize;
--	if (ivsize > sizeof(u64)) {
--		memset(req->giv, 0, ivsize - sizeof(u64));
--		len = sizeof(u64);
--	}
--	seq = cpu_to_be64(req->seq);
--	memcpy(req->giv + ivsize - len, &seq, len);
--
--	return spacc_aead_setup(&req->areq, req->giv, alg->type, 1);
-+	return spacc_aead_setup(req, alg->type, 1);
+-	if (unlikely(req->dst != req->src)) {
+-		src_nents = sg_count(req->src, req->assoclen + req->cryptlen,
+-				     &src_chained);
+-		dst_nents = sg_count(req->dst,
+-				     req->assoclen + req->cryptlen +
+-					(encrypt ? authsize : (-authsize)),
+-				     &dst_chained);
+-	} else {
+-		src_nents = sg_count(req->src,
+-				     req->assoclen + req->cryptlen +
++				     req->assoclen + req->cryptlen +
+ 					(encrypt ? authsize : 0),
+ 				     &src_chained);
+ 	}
+@@ -2699,7 +2307,7 @@ static int ipsec_gcm_encrypt(struct aead_request *req)
+ 	return gcm_encrypt(req);
  }
  
- static int spacc_aead_decrypt(struct aead_request *req)
+-static int old_aead_encrypt(struct aead_request *req)
++static int aead_encrypt(struct aead_request *req)
  {
+ 	struct aead_edesc *edesc;
  	struct crypto_aead *aead = crypto_aead_reqtfm(req);
--	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
--	struct spacc_alg *alg = to_spacc_alg(tfm->__crt_alg);
-+	struct spacc_aead  *alg = to_spacc_aead(crypto_aead_alg(aead));
+@@ -2710,14 +2318,13 @@ static int old_aead_encrypt(struct aead_request *req)
+ 	int ret = 0;
  
--	return spacc_aead_setup(req, NULL, alg->type, 0);
-+	return spacc_aead_setup(req, alg->type, 0);
+ 	/* allocate extended descriptor */
+-	edesc = old_aead_edesc_alloc(req, DESC_JOB_IO_LEN *
+-				     CAAM_CMD_SZ, &all_contig, true);
++	edesc = aead_edesc_alloc(req, AUTHENC_DESC_JOB_IO_LEN,
++				 &all_contig, true);
+ 	if (IS_ERR(edesc))
+ 		return PTR_ERR(edesc);
+ 
+ 	/* Create and submit job descriptor */
+-	old_init_aead_job(ctx->sh_desc_enc, ctx->sh_desc_enc_dma, edesc, req,
+-			  all_contig, true);
++	init_authenc_job(req, edesc, all_contig, true);
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_ERR, "aead jobdesc@"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, edesc->hw_desc,
+@@ -2725,11 +2332,11 @@ static int old_aead_encrypt(struct aead_request *req)
+ #endif
+ 
+ 	desc = edesc->hw_desc;
+-	ret = caam_jr_enqueue(jrdev, desc, old_aead_encrypt_done, req);
++	ret = caam_jr_enqueue(jrdev, desc, aead_encrypt_done, req);
+ 	if (!ret) {
+ 		ret = -EINPROGRESS;
+ 	} else {
+-		old_aead_unmap(jrdev, edesc, req);
++		aead_unmap(jrdev, edesc, req);
+ 		kfree(edesc);
+ 	}
+ 
+@@ -2779,7 +2386,7 @@ static int ipsec_gcm_decrypt(struct aead_request *req)
+ 	return gcm_decrypt(req);
  }
  
- /*
-  * Initialise a new AEAD context. This is responsible for allocating the
-  * fallback cipher and initialising the context.
-  */
--static int spacc_aead_cra_init(struct crypto_tfm *tfm)
-+static int spacc_aead_cra_init(struct crypto_aead *tfm)
+-static int old_aead_decrypt(struct aead_request *req)
++static int aead_decrypt(struct aead_request *req)
  {
--	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct crypto_alg *alg = tfm->__crt_alg;
--	struct spacc_alg *spacc_alg = to_spacc_alg(alg);
-+	struct spacc_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct aead_alg *alg = crypto_aead_alg(tfm);
-+	struct spacc_aead *spacc_alg = to_spacc_aead(alg);
- 	struct spacc_engine *engine = spacc_alg->engine;
+ 	struct aead_edesc *edesc;
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+@@ -2790,20 +2397,19 @@ static int old_aead_decrypt(struct aead_request *req)
+ 	int ret = 0;
  
- 	ctx->generic.flags = spacc_alg->type;
- 	ctx->generic.engine = engine;
--	ctx->sw_cipher = crypto_alloc_aead(alg->cra_name, 0,
--					   CRYPTO_ALG_ASYNC |
-+	ctx->sw_cipher = crypto_alloc_aead(alg->base.cra_name, 0,
- 					   CRYPTO_ALG_NEED_FALLBACK);
--	if (IS_ERR(ctx->sw_cipher)) {
--		dev_warn(engine->dev, "failed to allocate fallback for %s\n",
--			 alg->cra_name);
--		ctx->sw_cipher = NULL;
--	}
-+	if (IS_ERR(ctx->sw_cipher))
-+		return PTR_ERR(ctx->sw_cipher);
- 	ctx->generic.key_offs = spacc_alg->key_offs;
- 	ctx->generic.iv_offs = spacc_alg->iv_offs;
+ 	/* allocate extended descriptor */
+-	edesc = old_aead_edesc_alloc(req, DESC_JOB_IO_LEN *
+-				     CAAM_CMD_SZ, &all_contig, false);
++	edesc = aead_edesc_alloc(req, AUTHENC_DESC_JOB_IO_LEN,
++				 &all_contig, false);
+ 	if (IS_ERR(edesc))
+ 		return PTR_ERR(edesc);
  
--	get_random_bytes(ctx->salt, sizeof(ctx->salt));
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_ERR, "dec src@"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-		       req->cryptlen, 1);
++		       req->assoclen + req->cryptlen, 1);
+ #endif
+ 
+ 	/* Create and submit job descriptor*/
+-	old_init_aead_job(ctx->sh_desc_dec,
+-			  ctx->sh_desc_dec_dma, edesc, req, all_contig, false);
++	init_authenc_job(req, edesc, all_contig, false);
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_ERR, "aead jobdesc@"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, edesc->hw_desc,
+@@ -2811,232 +2417,29 @@ static int old_aead_decrypt(struct aead_request *req)
+ #endif
+ 
+ 	desc = edesc->hw_desc;
+-	ret = caam_jr_enqueue(jrdev, desc, old_aead_decrypt_done, req);
++	ret = caam_jr_enqueue(jrdev, desc, aead_decrypt_done, req);
+ 	if (!ret) {
+ 		ret = -EINPROGRESS;
+ 	} else {
+-		old_aead_unmap(jrdev, edesc, req);
++		aead_unmap(jrdev, edesc, req);
+ 		kfree(edesc);
+ 	}
+ 
+ 	return ret;
+ }
+ 
+-/*
+- * allocate and map the aead extended descriptor for aead givencrypt
+- */
+-static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
+-					       *greq, int desc_bytes,
+-					       u32 *contig_ptr)
+-{
+-	struct aead_request *req = &greq->areq;
+-	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+-	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+-	struct device *jrdev = ctx->jrdev;
+-	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+-		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
+-	int assoc_nents, src_nents, dst_nents = 0;
+-	struct aead_edesc *edesc;
+-	dma_addr_t iv_dma = 0;
+-	int sgc;
+-	u32 contig = GIV_SRC_CONTIG | GIV_DST_CONTIG;
+-	int ivsize = crypto_aead_ivsize(aead);
+-	bool assoc_chained = false, src_chained = false, dst_chained = false;
+-	int sec4_sg_index, sec4_sg_len = 0, sec4_sg_bytes;
+-	bool is_gcm = false;
 -
--	crypto_aead_set_reqsize(__crypto_aead_cast(tfm),
--				sizeof(struct spacc_req));
-+	crypto_aead_set_reqsize(
-+		tfm,
-+		max(sizeof(struct spacc_req),
-+		    sizeof(struct aead_request) +
-+		    crypto_aead_reqsize(ctx->sw_cipher)));
- 
- 	return 0;
- }
-@@ -800,13 +712,11 @@ static int spacc_aead_cra_init(struct crypto_tfm *tfm)
-  * Destructor for an AEAD context. This is called when the transform is freed
-  * and must free the fallback cipher.
-  */
--static void spacc_aead_cra_exit(struct crypto_tfm *tfm)
-+static void spacc_aead_cra_exit(struct crypto_aead *tfm)
+-	assoc_nents = sg_count(req->assoc, req->assoclen, &assoc_chained);
+-	src_nents = sg_count(req->src, req->cryptlen, &src_chained);
+-
+-	if (unlikely(req->dst != req->src))
+-		dst_nents = sg_count(req->dst, req->cryptlen + ctx->authsize,
+-				     &dst_chained);
+-
+-	sgc = dma_map_sg_chained(jrdev, req->assoc, assoc_nents ? : 1,
+-				 DMA_TO_DEVICE, assoc_chained);
+-	if (likely(req->src == req->dst)) {
+-		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
+-					 DMA_BIDIRECTIONAL, src_chained);
+-	} else {
+-		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
+-					 DMA_TO_DEVICE, src_chained);
+-		sgc = dma_map_sg_chained(jrdev, req->dst, dst_nents ? : 1,
+-					 DMA_FROM_DEVICE, dst_chained);
+-	}
+-
+-	iv_dma = dma_map_single(jrdev, greq->giv, ivsize, DMA_TO_DEVICE);
+-	if (dma_mapping_error(jrdev, iv_dma)) {
+-		dev_err(jrdev, "unable to map IV\n");
+-		return ERR_PTR(-ENOMEM);
+-	}
+-
+-	if (((ctx->class1_alg_type & OP_ALG_ALGSEL_MASK) ==
+-	      OP_ALG_ALGSEL_AES) &&
+-	    ((ctx->class1_alg_type & OP_ALG_AAI_MASK) == OP_ALG_AAI_GCM))
+-		is_gcm = true;
+-
+-	/*
+-	 * Check if data are contiguous.
+-	 * GCM expected input sequence: IV, AAD, text
+-	 * All other - expected input sequence: AAD, IV, text
+-	 */
+-
+-	if (is_gcm) {
+-		if (assoc_nents || iv_dma + ivsize !=
+-		    sg_dma_address(req->assoc) || src_nents ||
+-		    sg_dma_address(req->assoc) + req->assoclen !=
+-		    sg_dma_address(req->src))
+-			contig &= ~GIV_SRC_CONTIG;
+-	} else {
+-		if (assoc_nents ||
+-		    sg_dma_address(req->assoc) + req->assoclen != iv_dma ||
+-		    src_nents || iv_dma + ivsize != sg_dma_address(req->src))
+-			contig &= ~GIV_SRC_CONTIG;
+-	}
+-
+-	if (dst_nents || iv_dma + ivsize != sg_dma_address(req->dst))
+-		contig &= ~GIV_DST_CONTIG;
+-
+-	if (!(contig & GIV_SRC_CONTIG)) {
+-		assoc_nents = assoc_nents ? : 1;
+-		src_nents = src_nents ? : 1;
+-		sec4_sg_len += assoc_nents + 1 + src_nents;
+-		if (req->src == req->dst &&
+-		    (src_nents || iv_dma + ivsize != sg_dma_address(req->src)))
+-			contig &= ~GIV_DST_CONTIG;
+-	}
+-
+-	/*
+-	 * Add new sg entries for GCM output sequence.
+-	 * Expected output sequence: IV, encrypted text.
+-	 */
+-	if (is_gcm && req->src == req->dst && !(contig & GIV_DST_CONTIG))
+-		sec4_sg_len += 1 + src_nents;
+-
+-	if (unlikely(req->src != req->dst)) {
+-		dst_nents = dst_nents ? : 1;
+-		sec4_sg_len += 1 + dst_nents;
+-	}
+-
+-	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
+-
+-	/* allocate space for base edesc and hw desc commands, link tables */
+-	edesc = kmalloc(sizeof(struct aead_edesc) + desc_bytes +
+-			sec4_sg_bytes, GFP_DMA | flags);
+-	if (!edesc) {
+-		dev_err(jrdev, "could not allocate extended descriptor\n");
+-		return ERR_PTR(-ENOMEM);
+-	}
+-
+-	edesc->assoc_nents = assoc_nents;
+-	edesc->assoc_chained = assoc_chained;
+-	edesc->src_nents = src_nents;
+-	edesc->src_chained = src_chained;
+-	edesc->dst_nents = dst_nents;
+-	edesc->dst_chained = dst_chained;
+-	edesc->iv_dma = iv_dma;
+-	edesc->sec4_sg_bytes = sec4_sg_bytes;
+-	edesc->sec4_sg = (void *)edesc + sizeof(struct aead_edesc) +
+-			 desc_bytes;
+-	*contig_ptr = contig;
+-
+-	sec4_sg_index = 0;
+-	if (!(contig & GIV_SRC_CONTIG)) {
+-		if (!is_gcm) {
+-			sg_to_sec4_sg_len(req->assoc, req->assoclen,
+-					  edesc->sec4_sg + sec4_sg_index);
+-			sec4_sg_index += assoc_nents;
+-		}
+-
+-		dma_to_sec4_sg_one(edesc->sec4_sg + sec4_sg_index,
+-				   iv_dma, ivsize, 0);
+-		sec4_sg_index += 1;
+-
+-		if (is_gcm) {
+-			sg_to_sec4_sg_len(req->assoc, req->assoclen,
+-					  edesc->sec4_sg + sec4_sg_index);
+-			sec4_sg_index += assoc_nents;
+-		}
+-
+-		sg_to_sec4_sg_last(req->src, src_nents,
+-				   edesc->sec4_sg +
+-				   sec4_sg_index, 0);
+-		sec4_sg_index += src_nents;
+-	}
+-
+-	if (is_gcm && req->src == req->dst && !(contig & GIV_DST_CONTIG)) {
+-		dma_to_sec4_sg_one(edesc->sec4_sg + sec4_sg_index,
+-				   iv_dma, ivsize, 0);
+-		sec4_sg_index += 1;
+-		sg_to_sec4_sg_last(req->src, src_nents,
+-				   edesc->sec4_sg + sec4_sg_index, 0);
+-	}
+-
+-	if (unlikely(req->src != req->dst && !(contig & GIV_DST_CONTIG))) {
+-		dma_to_sec4_sg_one(edesc->sec4_sg + sec4_sg_index,
+-				   iv_dma, ivsize, 0);
+-		sec4_sg_index += 1;
+-		sg_to_sec4_sg_last(req->dst, dst_nents,
+-				   edesc->sec4_sg + sec4_sg_index, 0);
+-	}
+-	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+-					    sec4_sg_bytes, DMA_TO_DEVICE);
+-	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
+-		dev_err(jrdev, "unable to map S/G table\n");
+-		return ERR_PTR(-ENOMEM);
+-	}
+-
+-	return edesc;
+-}
+-
+-static int old_aead_givencrypt(struct aead_givcrypt_request *areq)
++static int aead_givdecrypt(struct aead_request *req)
  {
--	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct spacc_aead_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct aead_request *req = &areq->areq;
+-	struct aead_edesc *edesc;
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+-	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+-	struct device *jrdev = ctx->jrdev;
+-	u32 contig;
+-	u32 *desc;
+-	int ret = 0;
+-
+-	/* allocate extended descriptor */
+-	edesc = aead_giv_edesc_alloc(areq, DESC_JOB_IO_LEN *
+-				     CAAM_CMD_SZ, &contig);
+-
+-	if (IS_ERR(edesc))
+-		return PTR_ERR(edesc);
+-
+-#ifdef DEBUG
+-	print_hex_dump(KERN_ERR, "giv src@"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-		       req->cryptlen, 1);
+-#endif
+-
+-	/* Create and submit job descriptor*/
+-	init_aead_giv_job(ctx->sh_desc_givenc,
+-			  ctx->sh_desc_givenc_dma, edesc, req, contig);
+-#ifdef DEBUG
+-	print_hex_dump(KERN_ERR, "aead jobdesc@"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, edesc->hw_desc,
+-		       desc_bytes(edesc->hw_desc), 1);
+-#endif
++	unsigned int ivsize = crypto_aead_ivsize(aead);
  
--	if (ctx->sw_cipher)
--		crypto_free_aead(ctx->sw_cipher);
--	ctx->sw_cipher = NULL;
-+	crypto_free_aead(ctx->sw_cipher);
+-	desc = edesc->hw_desc;
+-	ret = caam_jr_enqueue(jrdev, desc, old_aead_encrypt_done, req);
+-	if (!ret) {
+-		ret = -EINPROGRESS;
+-	} else {
+-		old_aead_unmap(jrdev, edesc, req);
+-		kfree(edesc);
+-	}
++	if (req->cryptlen < ivsize)
++		return -EINVAL;
+ 
+-	return ret;
+-}
++	req->cryptlen -= ivsize;
++	req->assoclen += ivsize;
+ 
+-static int aead_null_givencrypt(struct aead_givcrypt_request *areq)
+-{
+-	return old_aead_encrypt(&areq->areq);
++	return aead_decrypt(req);
  }
  
  /*
-@@ -1458,180 +1368,188 @@ static struct spacc_alg ipsec_engine_algs[] = {
- 			.cra_exit = spacc_ablk_cra_exit,
- 		},
- 	},
+@@ -3369,7 +2772,6 @@ struct caam_alg_template {
+ 	u32 type;
+ 	union {
+ 		struct ablkcipher_alg ablkcipher;
+-		struct old_aead_alg aead;
+ 	} template_u;
+ 	u32 class1_alg_type;
+ 	u32 class2_alg_type;
+@@ -3377,753 +2779,1426 @@ struct caam_alg_template {
+ };
+ 
+ static struct caam_alg_template driver_algs[] = {
+-	/* single-pass ipsec_esp descriptor */
+-	{
+-		.name = "authenc(hmac(md5),ecb(cipher_null))",
+-		.driver_name = "authenc-hmac-md5-ecb-cipher_null-caam",
+-		.blocksize = NULL_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
+-			.setkey = aead_setkey,
+-			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = aead_null_givencrypt,
+-			.geniv = "<built-in>",
+-			.ivsize = NULL_IV_SIZE,
+-			.maxauthsize = MD5_DIGEST_SIZE,
+-			},
+-		.class1_alg_type = 0,
+-		.class2_alg_type = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
+-	},
++	/* ablkcipher descriptor */
+ 	{
+-		.name = "authenc(hmac(sha1),ecb(cipher_null))",
+-		.driver_name = "authenc-hmac-sha1-ecb-cipher_null-caam",
+-		.blocksize = NULL_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
+-			.setkey = aead_setkey,
+-			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = aead_null_givencrypt,
++		.name = "cbc(aes)",
++		.driver_name = "cbc-aes-caam",
++		.blocksize = AES_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_GIVCIPHER,
++		.template_ablkcipher = {
++			.setkey = ablkcipher_setkey,
++			.encrypt = ablkcipher_encrypt,
++			.decrypt = ablkcipher_decrypt,
++			.givencrypt = ablkcipher_givencrypt,
++			.geniv = "<built-in>",
++			.min_keysize = AES_MIN_KEY_SIZE,
++			.max_keysize = AES_MAX_KEY_SIZE,
++			.ivsize = AES_BLOCK_SIZE,
++			},
++		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++	},
++	{
++		.name = "cbc(des3_ede)",
++		.driver_name = "cbc-3des-caam",
++		.blocksize = DES3_EDE_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_GIVCIPHER,
++		.template_ablkcipher = {
++			.setkey = ablkcipher_setkey,
++			.encrypt = ablkcipher_encrypt,
++			.decrypt = ablkcipher_decrypt,
++			.givencrypt = ablkcipher_givencrypt,
++			.geniv = "<built-in>",
++			.min_keysize = DES3_EDE_KEY_SIZE,
++			.max_keysize = DES3_EDE_KEY_SIZE,
++			.ivsize = DES3_EDE_BLOCK_SIZE,
++			},
++		.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++	},
++	{
++		.name = "cbc(des)",
++		.driver_name = "cbc-des-caam",
++		.blocksize = DES_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_GIVCIPHER,
++		.template_ablkcipher = {
++			.setkey = ablkcipher_setkey,
++			.encrypt = ablkcipher_encrypt,
++			.decrypt = ablkcipher_decrypt,
++			.givencrypt = ablkcipher_givencrypt,
++			.geniv = "<built-in>",
++			.min_keysize = DES_KEY_SIZE,
++			.max_keysize = DES_KEY_SIZE,
++			.ivsize = DES_BLOCK_SIZE,
++			},
++		.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++	},
++	{
++		.name = "ctr(aes)",
++		.driver_name = "ctr-aes-caam",
++		.blocksize = 1,
++		.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
++		.template_ablkcipher = {
++			.setkey = ablkcipher_setkey,
++			.encrypt = ablkcipher_encrypt,
++			.decrypt = ablkcipher_decrypt,
++			.geniv = "chainiv",
++			.min_keysize = AES_MIN_KEY_SIZE,
++			.max_keysize = AES_MAX_KEY_SIZE,
++			.ivsize = AES_BLOCK_SIZE,
++			},
++		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CTR_MOD128,
++	},
++	{
++		.name = "rfc3686(ctr(aes))",
++		.driver_name = "rfc3686-ctr-aes-caam",
++		.blocksize = 1,
++		.type = CRYPTO_ALG_TYPE_GIVCIPHER,
++		.template_ablkcipher = {
++			.setkey = ablkcipher_setkey,
++			.encrypt = ablkcipher_encrypt,
++			.decrypt = ablkcipher_decrypt,
++			.givencrypt = ablkcipher_givencrypt,
+ 			.geniv = "<built-in>",
++			.min_keysize = AES_MIN_KEY_SIZE +
++				       CTR_RFC3686_NONCE_SIZE,
++			.max_keysize = AES_MAX_KEY_SIZE +
++				       CTR_RFC3686_NONCE_SIZE,
++			.ivsize = CTR_RFC3686_IV_SIZE,
++			},
++		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CTR_MOD128,
++	}
 +};
 +
-+static struct spacc_aead ipsec_engine_aeads[] = {
- 	{
--		.ctrl_default = SPA_CTRL_CIPH_ALG_AES | SPA_CTRL_CIPH_MODE_CBC |
--				SPA_CTRL_HASH_ALG_SHA | SPA_CTRL_HASH_MODE_HMAC,
-+		.ctrl_default = SPA_CTRL_CIPH_ALG_AES |
-+				SPA_CTRL_CIPH_MODE_CBC |
-+				SPA_CTRL_HASH_ALG_SHA |
-+				SPA_CTRL_HASH_MODE_HMAC,
- 		.key_offs = 0,
- 		.iv_offs = AES_MAX_KEY_SIZE,
- 		.alg = {
--			.cra_name = "authenc(hmac(sha1),cbc(aes))",
--			.cra_driver_name = "authenc-hmac-sha1-cbc-aes-picoxcell",
--			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
--			.cra_flags = CRYPTO_ALG_TYPE_AEAD |
--					CRYPTO_ALG_ASYNC |
--					CRYPTO_ALG_KERN_DRIVER_ONLY,
--			.cra_blocksize = AES_BLOCK_SIZE,
--			.cra_ctxsize = sizeof(struct spacc_aead_ctx),
--			.cra_type = &crypto_aead_type,
--			.cra_module = THIS_MODULE,
--			.cra_aead = {
--				.setkey = spacc_aead_setkey,
--				.setauthsize = spacc_aead_setauthsize,
--				.encrypt = spacc_aead_encrypt,
--				.decrypt = spacc_aead_decrypt,
--				.givencrypt = spacc_aead_givencrypt,
--				.ivsize = AES_BLOCK_SIZE,
--				.maxauthsize = SHA1_DIGEST_SIZE,
++static struct caam_aead_alg driver_aeads[] = {
++	{
++		.aead = {
 +			.base = {
-+				.cra_name = "authenc(hmac(sha1),cbc(aes))",
++				.cra_name = "rfc4106(gcm(aes))",
++				.cra_driver_name = "rfc4106-gcm-aes-caam",
++				.cra_blocksize = 1,
++			},
++			.setkey = rfc4106_setkey,
++			.setauthsize = rfc4106_setauthsize,
++			.encrypt = ipsec_gcm_encrypt,
++			.decrypt = ipsec_gcm_decrypt,
++			.ivsize = 8,
++			.maxauthsize = AES_BLOCK_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "rfc4543(gcm(aes))",
++				.cra_driver_name = "rfc4543-gcm-aes-caam",
++				.cra_blocksize = 1,
++			},
++			.setkey = rfc4543_setkey,
++			.setauthsize = rfc4543_setauthsize,
++			.encrypt = ipsec_gcm_encrypt,
++			.decrypt = ipsec_gcm_decrypt,
++			.ivsize = 8,
++			.maxauthsize = AES_BLOCK_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
++		},
++	},
++	/* Galois Counter Mode */
++	{
++		.aead = {
++			.base = {
++				.cra_name = "gcm(aes)",
++				.cra_driver_name = "gcm-aes-caam",
++				.cra_blocksize = 1,
++			},
++			.setkey = gcm_setkey,
++			.setauthsize = gcm_setauthsize,
++			.encrypt = gcm_encrypt,
++			.decrypt = gcm_decrypt,
++			.ivsize = 12,
++			.maxauthsize = AES_BLOCK_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
++		},
++	},
++	/* single-pass ipsec_esp descriptor */
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(md5),"
++					    "ecb(cipher_null))",
++				.cra_driver_name = "authenc-hmac-md5-"
++						   "ecb-cipher_null-caam",
++				.cra_blocksize = NULL_BLOCK_SIZE,
++			},
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
+ 			.ivsize = NULL_IV_SIZE,
+-			.maxauthsize = SHA1_DIGEST_SIZE,
++			.maxauthsize = MD5_DIGEST_SIZE,
++		},
++		.caam = {
++			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha1),"
++					    "ecb(cipher_null))",
 +				.cra_driver_name = "authenc-hmac-sha1-"
-+						   "cbc-aes-picoxcell",
-+				.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
-+				.cra_flags = CRYPTO_ALG_ASYNC |
-+					     CRYPTO_ALG_NEED_FALLBACK |
-+					     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+				.cra_blocksize = AES_BLOCK_SIZE,
-+				.cra_ctxsize = sizeof(struct spacc_aead_ctx),
-+				.cra_module = THIS_MODULE,
++						   "ecb-cipher_null-caam",
++				.cra_blocksize = NULL_BLOCK_SIZE,
  			},
--			.cra_init = spacc_aead_cra_init,
--			.cra_exit = spacc_aead_cra_exit,
-+			.setkey = spacc_aead_setkey,
-+			.setauthsize = spacc_aead_setauthsize,
-+			.encrypt = spacc_aead_encrypt,
-+			.decrypt = spacc_aead_decrypt,
-+			.ivsize = AES_BLOCK_SIZE,
+-		.class1_alg_type = 0,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = NULL_IV_SIZE,
 +			.maxauthsize = SHA1_DIGEST_SIZE,
-+			.init = spacc_aead_cra_init,
-+			.exit = spacc_aead_cra_exit,
- 		},
++		},
++		.caam = {
++			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++		},
  	},
  	{
--		.ctrl_default = SPA_CTRL_CIPH_ALG_AES | SPA_CTRL_CIPH_MODE_CBC |
-+		.ctrl_default = SPA_CTRL_CIPH_ALG_AES |
-+				SPA_CTRL_CIPH_MODE_CBC |
- 				SPA_CTRL_HASH_ALG_SHA256 |
- 				SPA_CTRL_HASH_MODE_HMAC,
- 		.key_offs = 0,
- 		.iv_offs = AES_MAX_KEY_SIZE,
- 		.alg = {
--			.cra_name = "authenc(hmac(sha256),cbc(aes))",
--			.cra_driver_name = "authenc-hmac-sha256-cbc-aes-picoxcell",
--			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
--			.cra_flags = CRYPTO_ALG_TYPE_AEAD |
--					CRYPTO_ALG_ASYNC |
--					CRYPTO_ALG_KERN_DRIVER_ONLY,
--			.cra_blocksize = AES_BLOCK_SIZE,
--			.cra_ctxsize = sizeof(struct spacc_aead_ctx),
--			.cra_type = &crypto_aead_type,
--			.cra_module = THIS_MODULE,
--			.cra_aead = {
--				.setkey = spacc_aead_setkey,
--				.setauthsize = spacc_aead_setauthsize,
--				.encrypt = spacc_aead_encrypt,
--				.decrypt = spacc_aead_decrypt,
--				.givencrypt = spacc_aead_givencrypt,
--				.ivsize = AES_BLOCK_SIZE,
--				.maxauthsize = SHA256_DIGEST_SIZE,
+-		.name = "authenc(hmac(sha224),ecb(cipher_null))",
+-		.driver_name = "authenc-hmac-sha224-ecb-cipher_null-caam",
+-		.blocksize = NULL_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
 +			.base = {
-+				.cra_name = "authenc(hmac(sha256),cbc(aes))",
-+				.cra_driver_name = "authenc-hmac-sha256-"
-+						   "cbc-aes-picoxcell",
-+				.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
-+				.cra_flags = CRYPTO_ALG_ASYNC |
-+					     CRYPTO_ALG_NEED_FALLBACK |
-+					     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+				.cra_blocksize = AES_BLOCK_SIZE,
-+				.cra_ctxsize = sizeof(struct spacc_aead_ctx),
-+				.cra_module = THIS_MODULE,
- 			},
--			.cra_init = spacc_aead_cra_init,
--			.cra_exit = spacc_aead_cra_exit,
-+			.setkey = spacc_aead_setkey,
-+			.setauthsize = spacc_aead_setauthsize,
-+			.encrypt = spacc_aead_encrypt,
-+			.decrypt = spacc_aead_decrypt,
-+			.ivsize = AES_BLOCK_SIZE,
-+			.maxauthsize = SHA256_DIGEST_SIZE,
-+			.init = spacc_aead_cra_init,
-+			.exit = spacc_aead_cra_exit,
- 		},
++				.cra_name = "authenc(hmac(sha224),"
++					    "ecb(cipher_null))",
++				.cra_driver_name = "authenc-hmac-sha224-"
++						   "ecb-cipher_null-caam",
++				.cra_blocksize = NULL_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = aead_null_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
+ 			.ivsize = NULL_IV_SIZE,
+ 			.maxauthsize = SHA224_DIGEST_SIZE,
+-			},
+-		.class1_alg_type = 0,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++		},
++		.caam = {
++			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++		},
  	},
  	{
- 		.key_offs = 0,
- 		.iv_offs = AES_MAX_KEY_SIZE,
--		.ctrl_default = SPA_CTRL_CIPH_ALG_AES | SPA_CTRL_CIPH_MODE_CBC |
--				SPA_CTRL_HASH_ALG_MD5 | SPA_CTRL_HASH_MODE_HMAC,
-+		.ctrl_default = SPA_CTRL_CIPH_ALG_AES |
-+				SPA_CTRL_CIPH_MODE_CBC |
-+				SPA_CTRL_HASH_ALG_MD5 |
-+				SPA_CTRL_HASH_MODE_HMAC,
- 		.alg = {
--			.cra_name = "authenc(hmac(md5),cbc(aes))",
--			.cra_driver_name = "authenc-hmac-md5-cbc-aes-picoxcell",
--			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
--			.cra_flags = CRYPTO_ALG_TYPE_AEAD |
--					CRYPTO_ALG_ASYNC |
--					CRYPTO_ALG_KERN_DRIVER_ONLY,
--			.cra_blocksize = AES_BLOCK_SIZE,
--			.cra_ctxsize = sizeof(struct spacc_aead_ctx),
--			.cra_type = &crypto_aead_type,
--			.cra_module = THIS_MODULE,
--			.cra_aead = {
--				.setkey = spacc_aead_setkey,
--				.setauthsize = spacc_aead_setauthsize,
--				.encrypt = spacc_aead_encrypt,
--				.decrypt = spacc_aead_decrypt,
--				.givencrypt = spacc_aead_givencrypt,
--				.ivsize = AES_BLOCK_SIZE,
--				.maxauthsize = MD5_DIGEST_SIZE,
+-		.name = "authenc(hmac(sha256),ecb(cipher_null))",
+-		.driver_name = "authenc-hmac-sha256-ecb-cipher_null-caam",
+-		.blocksize = NULL_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha256),"
++					    "ecb(cipher_null))",
++				.cra_driver_name = "authenc-hmac-sha256-"
++						   "ecb-cipher_null-caam",
++				.cra_blocksize = NULL_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = aead_null_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
+ 			.ivsize = NULL_IV_SIZE,
+ 			.maxauthsize = SHA256_DIGEST_SIZE,
+-			},
+-		.class1_alg_type = 0,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++		},
++		.caam = {
++			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha384),ecb(cipher_null))",
+-		.driver_name = "authenc-hmac-sha384-ecb-cipher_null-caam",
+-		.blocksize = NULL_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha384),"
++					    "ecb(cipher_null))",
++				.cra_driver_name = "authenc-hmac-sha384-"
++						   "ecb-cipher_null-caam",
++				.cra_blocksize = NULL_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = aead_null_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
+ 			.ivsize = NULL_IV_SIZE,
+ 			.maxauthsize = SHA384_DIGEST_SIZE,
+-			},
+-		.class1_alg_type = 0,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++		},
++		.caam = {
++			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha512),ecb(cipher_null))",
+-		.driver_name = "authenc-hmac-sha512-ecb-cipher_null-caam",
+-		.blocksize = NULL_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha512),"
++					    "ecb(cipher_null))",
++				.cra_driver_name = "authenc-hmac-sha512-"
++						   "ecb-cipher_null-caam",
++				.cra_blocksize = NULL_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = aead_null_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
+ 			.ivsize = NULL_IV_SIZE,
+ 			.maxauthsize = SHA512_DIGEST_SIZE,
++		},
++		.caam = {
++			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++		},
++	},
++	{
++		.aead = {
 +			.base = {
 +				.cra_name = "authenc(hmac(md5),cbc(aes))",
 +				.cra_driver_name = "authenc-hmac-md5-"
-+						   "cbc-aes-picoxcell",
-+				.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
-+				.cra_flags = CRYPTO_ALG_ASYNC |
-+					     CRYPTO_ALG_NEED_FALLBACK |
-+					     CRYPTO_ALG_KERN_DRIVER_ONLY,
++						   "cbc-aes-caam",
 +				.cra_blocksize = AES_BLOCK_SIZE,
-+				.cra_ctxsize = sizeof(struct spacc_aead_ctx),
-+				.cra_module = THIS_MODULE,
  			},
--			.cra_init = spacc_aead_cra_init,
--			.cra_exit = spacc_aead_cra_exit,
-+			.setkey = spacc_aead_setkey,
-+			.setauthsize = spacc_aead_setauthsize,
-+			.encrypt = spacc_aead_encrypt,
-+			.decrypt = spacc_aead_decrypt,
+-		.class1_alg_type = 0,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
 +			.ivsize = AES_BLOCK_SIZE,
 +			.maxauthsize = MD5_DIGEST_SIZE,
-+			.init = spacc_aead_cra_init,
-+			.exit = spacc_aead_cra_exit,
- 		},
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
++		},
  	},
  	{
- 		.key_offs = DES_BLOCK_SIZE,
- 		.iv_offs = 0,
--		.ctrl_default = SPA_CTRL_CIPH_ALG_DES | SPA_CTRL_CIPH_MODE_CBC |
--				SPA_CTRL_HASH_ALG_SHA | SPA_CTRL_HASH_MODE_HMAC,
-+		.ctrl_default = SPA_CTRL_CIPH_ALG_DES |
-+				SPA_CTRL_CIPH_MODE_CBC |
-+				SPA_CTRL_HASH_ALG_SHA |
-+				SPA_CTRL_HASH_MODE_HMAC,
- 		.alg = {
--			.cra_name = "authenc(hmac(sha1),cbc(des3_ede))",
--			.cra_driver_name = "authenc-hmac-sha1-cbc-3des-picoxcell",
--			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
--			.cra_flags = CRYPTO_ALG_TYPE_AEAD |
--					CRYPTO_ALG_ASYNC |
--					CRYPTO_ALG_KERN_DRIVER_ONLY,
--			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
--			.cra_ctxsize = sizeof(struct spacc_aead_ctx),
--			.cra_type = &crypto_aead_type,
--			.cra_module = THIS_MODULE,
--			.cra_aead = {
--				.setkey = spacc_aead_setkey,
--				.setauthsize = spacc_aead_setauthsize,
--				.encrypt = spacc_aead_encrypt,
--				.decrypt = spacc_aead_decrypt,
--				.givencrypt = spacc_aead_givencrypt,
--				.ivsize = DES3_EDE_BLOCK_SIZE,
--				.maxauthsize = SHA1_DIGEST_SIZE,
+-		.name = "authenc(hmac(md5),cbc(aes))",
+-		.driver_name = "authenc-hmac-md5-cbc-aes-caam",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
 +			.base = {
-+				.cra_name = "authenc(hmac(sha1),cbc(des3_ede))",
++				.cra_name = "echainiv(authenc(hmac(md5),"
++					    "cbc(aes)))",
++				.cra_driver_name = "echainiv-authenc-hmac-md5-"
++						   "cbc-aes-caam",
++				.cra_blocksize = AES_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = MD5_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha1),cbc(aes))",
 +				.cra_driver_name = "authenc-hmac-sha1-"
-+						   "cbc-3des-picoxcell",
-+				.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
-+				.cra_flags = CRYPTO_ALG_ASYNC |
-+					     CRYPTO_ALG_NEED_FALLBACK |
-+					     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-+				.cra_ctxsize = sizeof(struct spacc_aead_ctx),
-+				.cra_module = THIS_MODULE,
++						   "cbc-aes-caam",
++				.cra_blocksize = AES_BLOCK_SIZE,
  			},
--			.cra_init = spacc_aead_cra_init,
--			.cra_exit = spacc_aead_cra_exit,
-+			.setkey = spacc_aead_setkey,
-+			.setauthsize = spacc_aead_setauthsize,
-+			.encrypt = spacc_aead_encrypt,
-+			.decrypt = spacc_aead_decrypt,
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = AES_BLOCK_SIZE,
++			.maxauthsize = SHA1_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha1),cbc(aes))",
+-		.driver_name = "authenc-hmac-sha1-cbc-aes-caam",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha1),"
++					    "cbc(aes)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha1-cbc-aes-caam",
++				.cra_blocksize = AES_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = SHA1_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha224),cbc(aes))",
++				.cra_driver_name = "authenc-hmac-sha224-"
++						   "cbc-aes-caam",
++				.cra_blocksize = AES_BLOCK_SIZE,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = AES_BLOCK_SIZE,
++			.maxauthsize = SHA224_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha224),cbc(aes))",
+-		.driver_name = "authenc-hmac-sha224-cbc-aes-caam",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha224),"
++					    "cbc(aes)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha224-cbc-aes-caam",
++				.cra_blocksize = AES_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = SHA224_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha256),cbc(aes))",
++				.cra_driver_name = "authenc-hmac-sha256-"
++						   "cbc-aes-caam",
++				.cra_blocksize = AES_BLOCK_SIZE,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = AES_BLOCK_SIZE,
++			.maxauthsize = SHA256_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha256),cbc(aes))",
+-		.driver_name = "authenc-hmac-sha256-cbc-aes-caam",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha256),"
++					    "cbc(aes)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha256-cbc-aes-caam",
++				.cra_blocksize = AES_BLOCK_SIZE,
++			},
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
++			.ivsize = AES_BLOCK_SIZE,
++			.maxauthsize = SHA256_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha384),cbc(aes))",
++				.cra_driver_name = "authenc-hmac-sha384-"
++						   "cbc-aes-caam",
++				.cra_blocksize = AES_BLOCK_SIZE,
++			},
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = AES_BLOCK_SIZE,
++			.maxauthsize = SHA384_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha384),"
++					    "cbc(aes)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha384-cbc-aes-caam",
++				.cra_blocksize = AES_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = AES_BLOCK_SIZE,
+-			.maxauthsize = SHA256_DIGEST_SIZE,
+-			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++			.maxauthsize = SHA384_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha384),cbc(aes))",
+-		.driver_name = "authenc-hmac-sha384-cbc-aes-caam",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha512),cbc(aes))",
++				.cra_driver_name = "authenc-hmac-sha512-"
++						   "cbc-aes-caam",
++				.cra_blocksize = AES_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
+ 			.ivsize = AES_BLOCK_SIZE,
+-			.maxauthsize = SHA384_DIGEST_SIZE,
+-			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++			.maxauthsize = SHA512_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+-
+ 	{
+-		.name = "authenc(hmac(sha512),cbc(aes))",
+-		.driver_name = "authenc-hmac-sha512-cbc-aes-caam",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha512),"
++					    "cbc(aes)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha512-cbc-aes-caam",
++				.cra_blocksize = AES_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = SHA512_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(md5),cbc(des3_ede))",
++				.cra_driver_name = "authenc-hmac-md5-"
++						   "cbc-des3_ede-caam",
++				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = DES3_EDE_BLOCK_SIZE,
++			.maxauthsize = MD5_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
++		}
+ 	},
+ 	{
+-		.name = "authenc(hmac(md5),cbc(des3_ede))",
+-		.driver_name = "authenc-hmac-md5-cbc-des3_ede-caam",
+-		.blocksize = DES3_EDE_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(md5),"
++					    "cbc(des3_ede)))",
++				.cra_driver_name = "echainiv-authenc-hmac-md5-"
++						   "cbc-des3_ede-caam",
++				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = MD5_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		}
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha1),"
++					    "cbc(des3_ede))",
++				.cra_driver_name = "authenc-hmac-sha1-"
++						   "cbc-des3_ede-caam",
++				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
 +			.ivsize = DES3_EDE_BLOCK_SIZE,
 +			.maxauthsize = SHA1_DIGEST_SIZE,
-+			.init = spacc_aead_cra_init,
-+			.exit = spacc_aead_cra_exit,
- 		},
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++		},
  	},
  	{
- 		.key_offs = DES_BLOCK_SIZE,
- 		.iv_offs = 0,
--		.ctrl_default = SPA_CTRL_CIPH_ALG_AES | SPA_CTRL_CIPH_MODE_CBC |
-+		.ctrl_default = SPA_CTRL_CIPH_ALG_AES |
-+				SPA_CTRL_CIPH_MODE_CBC |
- 				SPA_CTRL_HASH_ALG_SHA256 |
- 				SPA_CTRL_HASH_MODE_HMAC,
- 		.alg = {
--			.cra_name = "authenc(hmac(sha256),cbc(des3_ede))",
--			.cra_driver_name = "authenc-hmac-sha256-cbc-3des-picoxcell",
--			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
--			.cra_flags = CRYPTO_ALG_TYPE_AEAD |
--					CRYPTO_ALG_ASYNC |
--					CRYPTO_ALG_KERN_DRIVER_ONLY,
--			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
--			.cra_ctxsize = sizeof(struct spacc_aead_ctx),
--			.cra_type = &crypto_aead_type,
--			.cra_module = THIS_MODULE,
--			.cra_aead = {
--				.setkey = spacc_aead_setkey,
--				.setauthsize = spacc_aead_setauthsize,
--				.encrypt = spacc_aead_encrypt,
--				.decrypt = spacc_aead_decrypt,
--				.givencrypt = spacc_aead_givencrypt,
--				.ivsize = DES3_EDE_BLOCK_SIZE,
--				.maxauthsize = SHA256_DIGEST_SIZE,
+-		.name = "authenc(hmac(sha1),cbc(des3_ede))",
+-		.driver_name = "authenc-hmac-sha1-cbc-des3_ede-caam",
+-		.blocksize = DES3_EDE_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha1),"
++					    "cbc(des3_ede)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha1-"
++						   "cbc-des3_ede-caam",
++				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = SHA1_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha224),"
++					    "cbc(des3_ede))",
++				.cra_driver_name = "authenc-hmac-sha224-"
++						   "cbc-des3_ede-caam",
++				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = DES3_EDE_BLOCK_SIZE,
++			.maxauthsize = SHA224_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha224),cbc(des3_ede))",
+-		.driver_name = "authenc-hmac-sha224-cbc-des3_ede-caam",
+-		.blocksize = DES3_EDE_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha224),"
++					    "cbc(des3_ede)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha224-"
++						   "cbc-des3_ede-caam",
++				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = SHA224_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
 +			.base = {
 +				.cra_name = "authenc(hmac(sha256),"
 +					    "cbc(des3_ede))",
 +				.cra_driver_name = "authenc-hmac-sha256-"
-+						   "cbc-3des-picoxcell",
-+				.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
-+				.cra_flags = CRYPTO_ALG_ASYNC |
-+					     CRYPTO_ALG_NEED_FALLBACK |
-+					     CRYPTO_ALG_KERN_DRIVER_ONLY,
++						   "cbc-des3_ede-caam",
 +				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-+				.cra_ctxsize = sizeof(struct spacc_aead_ctx),
-+				.cra_module = THIS_MODULE,
  			},
--			.cra_init = spacc_aead_cra_init,
--			.cra_exit = spacc_aead_cra_exit,
-+			.setkey = spacc_aead_setkey,
-+			.setauthsize = spacc_aead_setauthsize,
-+			.encrypt = spacc_aead_encrypt,
-+			.decrypt = spacc_aead_decrypt,
+-		.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
 +			.ivsize = DES3_EDE_BLOCK_SIZE,
 +			.maxauthsize = SHA256_DIGEST_SIZE,
-+			.init = spacc_aead_cra_init,
-+			.exit = spacc_aead_cra_exit,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha256),cbc(des3_ede))",
+-		.driver_name = "authenc-hmac-sha256-cbc-des3_ede-caam",
+-		.blocksize = DES3_EDE_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha256),"
++					    "cbc(des3_ede)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha256-"
++						   "cbc-des3_ede-caam",
++				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = SHA256_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha384),"
++					    "cbc(des3_ede))",
++				.cra_driver_name = "authenc-hmac-sha384-"
++						   "cbc-des3_ede-caam",
++				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = DES3_EDE_BLOCK_SIZE,
++			.maxauthsize = SHA384_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha384),cbc(des3_ede))",
+-		.driver_name = "authenc-hmac-sha384-cbc-des3_ede-caam",
+-		.blocksize = DES3_EDE_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha384),"
++					    "cbc(des3_ede)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha384-"
++						   "cbc-des3_ede-caam",
++				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = SHA384_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha512),"
++					    "cbc(des3_ede))",
++				.cra_driver_name = "authenc-hmac-sha512-"
++						   "cbc-des3_ede-caam",
++				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = DES3_EDE_BLOCK_SIZE,
++			.maxauthsize = SHA512_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha512),cbc(des3_ede))",
+-		.driver_name = "authenc-hmac-sha512-cbc-des3_ede-caam",
+-		.blocksize = DES3_EDE_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha512),"
++					    "cbc(des3_ede)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha512-"
++						   "cbc-des3_ede-caam",
++				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = SHA512_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(md5),cbc(des))",
++				.cra_driver_name = "authenc-hmac-md5-"
++						   "cbc-des-caam",
++				.cra_blocksize = DES_BLOCK_SIZE,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = DES_BLOCK_SIZE,
++			.maxauthsize = MD5_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(md5),cbc(des))",
+-		.driver_name = "authenc-hmac-md5-cbc-des-caam",
+-		.blocksize = DES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(md5),"
++					    "cbc(des)))",
++				.cra_driver_name = "echainiv-authenc-hmac-md5-"
++						   "cbc-des-caam",
++				.cra_blocksize = DES_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = DES_BLOCK_SIZE,
+ 			.maxauthsize = MD5_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha1),cbc(des))",
++				.cra_driver_name = "authenc-hmac-sha1-"
++						   "cbc-des-caam",
++				.cra_blocksize = DES_BLOCK_SIZE,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = DES_BLOCK_SIZE,
++			.maxauthsize = SHA1_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha1),cbc(des))",
+-		.driver_name = "authenc-hmac-sha1-cbc-des-caam",
+-		.blocksize = DES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha1),"
++					    "cbc(des)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha1-cbc-des-caam",
++				.cra_blocksize = DES_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = DES_BLOCK_SIZE,
+ 			.maxauthsize = SHA1_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha224),cbc(des))",
++				.cra_driver_name = "authenc-hmac-sha224-"
++						   "cbc-des-caam",
++				.cra_blocksize = DES_BLOCK_SIZE,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = DES_BLOCK_SIZE,
++			.maxauthsize = SHA224_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha224),cbc(des))",
+-		.driver_name = "authenc-hmac-sha224-cbc-des-caam",
+-		.blocksize = DES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha224),"
++					    "cbc(des)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha224-cbc-des-caam",
++				.cra_blocksize = DES_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = DES_BLOCK_SIZE,
+ 			.maxauthsize = SHA224_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha256),cbc(des))",
++				.cra_driver_name = "authenc-hmac-sha256-"
++						   "cbc-des-caam",
++				.cra_blocksize = DES_BLOCK_SIZE,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = DES_BLOCK_SIZE,
++			.maxauthsize = SHA256_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha256),cbc(des))",
+-		.driver_name = "authenc-hmac-sha256-cbc-des-caam",
+-		.blocksize = DES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha256),"
++					    "cbc(des)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha256-cbc-des-caam",
++				.cra_blocksize = DES_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = DES_BLOCK_SIZE,
+ 			.maxauthsize = SHA256_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha384),cbc(des))",
++				.cra_driver_name = "authenc-hmac-sha384-"
++						   "cbc-des-caam",
++				.cra_blocksize = DES_BLOCK_SIZE,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = DES_BLOCK_SIZE,
++			.maxauthsize = SHA384_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha384),cbc(des))",
+-		.driver_name = "authenc-hmac-sha384-cbc-des-caam",
+-		.blocksize = DES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha384),"
++					    "cbc(des)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha384-cbc-des-caam",
++				.cra_blocksize = DES_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = DES_BLOCK_SIZE,
+ 			.maxauthsize = SHA384_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha512),cbc(des))",
++				.cra_driver_name = "authenc-hmac-sha512-"
++						   "cbc-des-caam",
++				.cra_blocksize = DES_BLOCK_SIZE,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = DES_BLOCK_SIZE,
++			.maxauthsize = SHA512_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha512),cbc(des))",
+-		.driver_name = "authenc-hmac-sha512-cbc-des-caam",
+-		.blocksize = DES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "echainiv(authenc(hmac(sha512),"
++					    "cbc(des)))",
++				.cra_driver_name = "echainiv-authenc-"
++						   "hmac-sha512-cbc-des-caam",
++				.cra_blocksize = DES_BLOCK_SIZE,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = DES_BLOCK_SIZE,
+ 			.maxauthsize = SHA512_DIGEST_SIZE,
+-			},
+-		.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++			.geniv = true,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(md5),rfc3686(ctr(aes)))",
+-		.driver_name = "authenc-hmac-md5-rfc3686-ctr-aes-caam",
+-		.blocksize = 1,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(md5),"
++					    "rfc3686(ctr(aes)))",
++				.cra_driver_name = "authenc-hmac-md5-"
++						   "rfc3686-ctr-aes-caam",
++				.cra_blocksize = 1,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
+ 			.ivsize = CTR_RFC3686_IV_SIZE,
+ 			.maxauthsize = MD5_DIGEST_SIZE,
+-			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CTR_MOD128,
+-		.class2_alg_type = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES |
++					   OP_ALG_AAI_CTR_MOD128,
++			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
++			.rfc3686 = true,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha1),rfc3686(ctr(aes)))",
+-		.driver_name = "authenc-hmac-sha1-rfc3686-ctr-aes-caam",
+-		.blocksize = 1,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "seqiv(authenc("
++					    "hmac(md5),rfc3686(ctr(aes))))",
++				.cra_driver_name = "seqiv-authenc-hmac-md5-"
++						   "rfc3686-ctr-aes-caam",
++				.cra_blocksize = 1,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = CTR_RFC3686_IV_SIZE,
+-			.maxauthsize = SHA1_DIGEST_SIZE,
+-			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CTR_MOD128,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++			.maxauthsize = MD5_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES |
++					   OP_ALG_AAI_CTR_MOD128,
++			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
++			.rfc3686 = true,
++			.geniv = true,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha224),rfc3686(ctr(aes)))",
+-		.driver_name = "authenc-hmac-sha224-rfc3686-ctr-aes-caam",
+-		.blocksize = 1,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha1),"
++					    "rfc3686(ctr(aes)))",
++				.cra_driver_name = "authenc-hmac-sha1-"
++						   "rfc3686-ctr-aes-caam",
++				.cra_blocksize = 1,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
+ 			.ivsize = CTR_RFC3686_IV_SIZE,
+-			.maxauthsize = SHA224_DIGEST_SIZE,
+-			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CTR_MOD128,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++			.maxauthsize = SHA1_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES |
++					   OP_ALG_AAI_CTR_MOD128,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++			.rfc3686 = true,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha256),rfc3686(ctr(aes)))",
+-		.driver_name = "authenc-hmac-sha256-rfc3686-ctr-aes-caam",
+-		.blocksize = 1,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "seqiv(authenc("
++					    "hmac(sha1),rfc3686(ctr(aes))))",
++				.cra_driver_name = "seqiv-authenc-hmac-sha1-"
++						   "rfc3686-ctr-aes-caam",
++				.cra_blocksize = 1,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = CTR_RFC3686_IV_SIZE,
+-			.maxauthsize = SHA256_DIGEST_SIZE,
+-			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CTR_MOD128,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++			.maxauthsize = SHA1_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES |
++					   OP_ALG_AAI_CTR_MOD128,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
++			.rfc3686 = true,
++			.geniv = true,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha384),rfc3686(ctr(aes)))",
+-		.driver_name = "authenc-hmac-sha384-rfc3686-ctr-aes-caam",
+-		.blocksize = 1,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha224),"
++					    "rfc3686(ctr(aes)))",
++				.cra_driver_name = "authenc-hmac-sha224-"
++						   "rfc3686-ctr-aes-caam",
++				.cra_blocksize = 1,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
+ 			.ivsize = CTR_RFC3686_IV_SIZE,
+-			.maxauthsize = SHA384_DIGEST_SIZE,
+-			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CTR_MOD128,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++			.maxauthsize = SHA224_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES |
++					   OP_ALG_AAI_CTR_MOD128,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++			.rfc3686 = true,
++		},
+ 	},
+ 	{
+-		.name = "authenc(hmac(sha512),rfc3686(ctr(aes)))",
+-		.driver_name = "authenc-hmac-sha512-rfc3686-ctr-aes-caam",
+-		.blocksize = 1,
+-		.type = CRYPTO_ALG_TYPE_AEAD,
+-		.template_aead = {
++		.aead = {
++			.base = {
++				.cra_name = "seqiv(authenc("
++					    "hmac(sha224),rfc3686(ctr(aes))))",
++				.cra_driver_name = "seqiv-authenc-hmac-sha224-"
++						   "rfc3686-ctr-aes-caam",
++				.cra_blocksize = 1,
++			},
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-			.encrypt = old_aead_encrypt,
+-			.decrypt = old_aead_decrypt,
+-			.givencrypt = old_aead_givencrypt,
+-			.geniv = "<built-in>",
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
+ 			.ivsize = CTR_RFC3686_IV_SIZE,
+-			.maxauthsize = SHA512_DIGEST_SIZE,
+-			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CTR_MOD128,
+-		.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
+-				   OP_ALG_AAI_HMAC_PRECOMP,
+-		.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
+-	},
+-	/* ablkcipher descriptor */
+-	{
+-		.name = "cbc(aes)",
+-		.driver_name = "cbc-aes-caam",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_GIVCIPHER,
+-		.template_ablkcipher = {
+-			.setkey = ablkcipher_setkey,
+-			.encrypt = ablkcipher_encrypt,
+-			.decrypt = ablkcipher_decrypt,
+-			.givencrypt = ablkcipher_givencrypt,
+-			.geniv = "<built-in>",
+-			.min_keysize = AES_MIN_KEY_SIZE,
+-			.max_keysize = AES_MAX_KEY_SIZE,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.maxauthsize = SHA224_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES |
++					   OP_ALG_AAI_CTR_MOD128,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
++			.rfc3686 = true,
++			.geniv = true,
++		},
+ 	},
+ 	{
+-		.name = "cbc(des3_ede)",
+-		.driver_name = "cbc-3des-caam",
+-		.blocksize = DES3_EDE_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_GIVCIPHER,
+-		.template_ablkcipher = {
+-			.setkey = ablkcipher_setkey,
+-			.encrypt = ablkcipher_encrypt,
+-			.decrypt = ablkcipher_decrypt,
+-			.givencrypt = ablkcipher_givencrypt,
+-			.geniv = "<built-in>",
+-			.min_keysize = DES3_EDE_KEY_SIZE,
+-			.max_keysize = DES3_EDE_KEY_SIZE,
+-			.ivsize = DES3_EDE_BLOCK_SIZE,
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha256),"
++					    "rfc3686(ctr(aes)))",
++				.cra_driver_name = "authenc-hmac-sha256-"
++						   "rfc3686-ctr-aes-caam",
++				.cra_blocksize = 1,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = CTR_RFC3686_IV_SIZE,
++			.maxauthsize = SHA256_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES |
++					   OP_ALG_AAI_CTR_MOD128,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++			.rfc3686 = true,
++		},
+ 	},
+ 	{
+-		.name = "cbc(des)",
+-		.driver_name = "cbc-des-caam",
+-		.blocksize = DES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_GIVCIPHER,
+-		.template_ablkcipher = {
+-			.setkey = ablkcipher_setkey,
+-			.encrypt = ablkcipher_encrypt,
+-			.decrypt = ablkcipher_decrypt,
+-			.givencrypt = ablkcipher_givencrypt,
+-			.geniv = "<built-in>",
+-			.min_keysize = DES_KEY_SIZE,
+-			.max_keysize = DES_KEY_SIZE,
+-			.ivsize = DES_BLOCK_SIZE,
++		.aead = {
++			.base = {
++				.cra_name = "seqiv(authenc(hmac(sha256),"
++					    "rfc3686(ctr(aes))))",
++				.cra_driver_name = "seqiv-authenc-hmac-sha256-"
++						   "rfc3686-ctr-aes-caam",
++				.cra_blocksize = 1,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
++			.ivsize = CTR_RFC3686_IV_SIZE,
++			.maxauthsize = SHA256_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES |
++					   OP_ALG_AAI_CTR_MOD128,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++			.rfc3686 = true,
++			.geniv = true,
++		},
+ 	},
+ 	{
+-		.name = "ctr(aes)",
+-		.driver_name = "ctr-aes-caam",
+-		.blocksize = 1,
+-		.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
+-		.template_ablkcipher = {
+-			.setkey = ablkcipher_setkey,
+-			.encrypt = ablkcipher_encrypt,
+-			.decrypt = ablkcipher_decrypt,
+-			.geniv = "chainiv",
+-			.min_keysize = AES_MIN_KEY_SIZE,
+-			.max_keysize = AES_MAX_KEY_SIZE,
+-			.ivsize = AES_BLOCK_SIZE,
++		.aead = {
++			.base = {
++				.cra_name = "authenc(hmac(sha384),"
++					    "rfc3686(ctr(aes)))",
++				.cra_driver_name = "authenc-hmac-sha384-"
++						   "rfc3686-ctr-aes-caam",
++				.cra_blocksize = 1,
+ 			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CTR_MOD128,
+-	},
+-	{
+-		.name = "rfc3686(ctr(aes))",
+-		.driver_name = "rfc3686-ctr-aes-caam",
+-		.blocksize = 1,
+-		.type = CRYPTO_ALG_TYPE_GIVCIPHER,
+-		.template_ablkcipher = {
+-			.setkey = ablkcipher_setkey,
+-			.encrypt = ablkcipher_encrypt,
+-			.decrypt = ablkcipher_decrypt,
+-			.givencrypt = ablkcipher_givencrypt,
+-			.geniv = "<built-in>",
+-			.min_keysize = AES_MIN_KEY_SIZE +
+-				       CTR_RFC3686_NONCE_SIZE,
+-			.max_keysize = AES_MAX_KEY_SIZE +
+-				       CTR_RFC3686_NONCE_SIZE,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
+ 			.ivsize = CTR_RFC3686_IV_SIZE,
+-			},
+-		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CTR_MOD128,
+-	}
+-};
+-
+-struct caam_alg_entry {
+-	int class1_alg_type;
+-	int class2_alg_type;
+-	int alg_op;
+-};
+-
+-struct caam_aead_alg {
+-	struct aead_alg aead;
+-	struct caam_alg_entry caam;
+-	bool registered;
+-};
+-
+-static struct caam_aead_alg driver_aeads[] = {
++			.maxauthsize = SHA384_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES |
++					   OP_ALG_AAI_CTR_MOD128,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++			.rfc3686 = true,
++		},
++	},
+ 	{
+ 		.aead = {
+ 			.base = {
+-				.cra_name = "rfc4106(gcm(aes))",
+-				.cra_driver_name = "rfc4106-gcm-aes-caam",
++				.cra_name = "seqiv(authenc(hmac(sha384),"
++					    "rfc3686(ctr(aes))))",
++				.cra_driver_name = "seqiv-authenc-hmac-sha384-"
++						   "rfc3686-ctr-aes-caam",
+ 				.cra_blocksize = 1,
+ 			},
+-			.setkey = rfc4106_setkey,
+-			.setauthsize = rfc4106_setauthsize,
+-			.encrypt = ipsec_gcm_encrypt,
+-			.decrypt = ipsec_gcm_decrypt,
+-			.ivsize = 8,
+-			.maxauthsize = AES_BLOCK_SIZE,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
++			.ivsize = CTR_RFC3686_IV_SIZE,
++			.maxauthsize = SHA384_DIGEST_SIZE,
+ 		},
+ 		.caam = {
+-			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
++			.class1_alg_type = OP_ALG_ALGSEL_AES |
++					   OP_ALG_AAI_CTR_MOD128,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++			.rfc3686 = true,
++			.geniv = true,
  		},
  	},
  	{
- 		.key_offs = DES_BLOCK_SIZE,
- 		.iv_offs = 0,
--		.ctrl_default = SPA_CTRL_CIPH_ALG_DES | SPA_CTRL_CIPH_MODE_CBC |
--				SPA_CTRL_HASH_ALG_MD5 | SPA_CTRL_HASH_MODE_HMAC,
-+		.ctrl_default = SPA_CTRL_CIPH_ALG_DES |
-+				SPA_CTRL_CIPH_MODE_CBC |
-+				SPA_CTRL_HASH_ALG_MD5 |
-+				SPA_CTRL_HASH_MODE_HMAC,
- 		.alg = {
--			.cra_name = "authenc(hmac(md5),cbc(des3_ede))",
--			.cra_driver_name = "authenc-hmac-md5-cbc-3des-picoxcell",
--			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
--			.cra_flags = CRYPTO_ALG_TYPE_AEAD |
--					CRYPTO_ALG_ASYNC |
--					CRYPTO_ALG_KERN_DRIVER_ONLY,
--			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
--			.cra_ctxsize = sizeof(struct spacc_aead_ctx),
--			.cra_type = &crypto_aead_type,
--			.cra_module = THIS_MODULE,
--			.cra_aead = {
--				.setkey = spacc_aead_setkey,
--				.setauthsize = spacc_aead_setauthsize,
--				.encrypt = spacc_aead_encrypt,
--				.decrypt = spacc_aead_decrypt,
--				.givencrypt = spacc_aead_givencrypt,
--				.ivsize = DES3_EDE_BLOCK_SIZE,
--				.maxauthsize = MD5_DIGEST_SIZE,
-+			.base = {
-+				.cra_name = "authenc(hmac(md5),cbc(des3_ede))",
-+				.cra_driver_name = "authenc-hmac-md5-"
-+						   "cbc-3des-picoxcell",
-+				.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
-+				.cra_flags = CRYPTO_ALG_ASYNC |
-+					     CRYPTO_ALG_NEED_FALLBACK |
-+					     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-+				.cra_ctxsize = sizeof(struct spacc_aead_ctx),
-+				.cra_module = THIS_MODULE,
+ 		.aead = {
+ 			.base = {
+-				.cra_name = "rfc4543(gcm(aes))",
+-				.cra_driver_name = "rfc4543-gcm-aes-caam",
++				.cra_name = "authenc(hmac(sha512),"
++					    "rfc3686(ctr(aes)))",
++				.cra_driver_name = "authenc-hmac-sha512-"
++						   "rfc3686-ctr-aes-caam",
+ 				.cra_blocksize = 1,
  			},
--			.cra_init = spacc_aead_cra_init,
--			.cra_exit = spacc_aead_cra_exit,
-+			.setkey = spacc_aead_setkey,
-+			.setauthsize = spacc_aead_setauthsize,
-+			.encrypt = spacc_aead_encrypt,
-+			.decrypt = spacc_aead_decrypt,
-+			.ivsize = DES3_EDE_BLOCK_SIZE,
-+			.maxauthsize = MD5_DIGEST_SIZE,
-+			.init = spacc_aead_cra_init,
-+			.exit = spacc_aead_cra_exit,
+-			.setkey = rfc4543_setkey,
+-			.setauthsize = rfc4543_setauthsize,
+-			.encrypt = ipsec_gcm_encrypt,
+-			.decrypt = ipsec_gcm_decrypt,
+-			.ivsize = 8,
+-			.maxauthsize = AES_BLOCK_SIZE,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = CTR_RFC3686_IV_SIZE,
++			.maxauthsize = SHA512_DIGEST_SIZE,
+ 		},
+ 		.caam = {
+-			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
++			.class1_alg_type = OP_ALG_ALGSEL_AES |
++					   OP_ALG_AAI_CTR_MOD128,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++			.rfc3686 = true,
+ 		},
+ 	},
+-	/* Galois Counter Mode */
+ 	{
+ 		.aead = {
+ 			.base = {
+-				.cra_name = "gcm(aes)",
+-				.cra_driver_name = "gcm-aes-caam",
++				.cra_name = "seqiv(authenc(hmac(sha512),"
++					    "rfc3686(ctr(aes))))",
++				.cra_driver_name = "seqiv-authenc-hmac-sha512-"
++						   "rfc3686-ctr-aes-caam",
+ 				.cra_blocksize = 1,
+ 			},
+-			.setkey = gcm_setkey,
+-			.setauthsize = gcm_setauthsize,
+-			.encrypt = gcm_encrypt,
+-			.decrypt = gcm_decrypt,
+-			.ivsize = 12,
+-			.maxauthsize = AES_BLOCK_SIZE,
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_givdecrypt,
++			.ivsize = CTR_RFC3686_IV_SIZE,
++			.maxauthsize = SHA512_DIGEST_SIZE,
+ 		},
+ 		.caam = {
+-			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
++			.class1_alg_type = OP_ALG_ALGSEL_AES |
++					   OP_ALG_AAI_CTR_MOD128,
++			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++			.rfc3686 = true,
++			.geniv = true,
  		},
  	},
  };
-@@ -1707,6 +1625,8 @@ static int spacc_probe(struct platform_device *pdev)
- 		engine->fifo_sz		= SPACC_CRYPTO_IPSEC_FIFO_SZ;
- 		engine->algs		= ipsec_engine_algs;
- 		engine->num_algs	= ARRAY_SIZE(ipsec_engine_algs);
-+		engine->aeads		= ipsec_engine_aeads;
-+		engine->num_aeads	= ARRAY_SIZE(ipsec_engine_aeads);
- 	} else if (spacc_is_compatible(pdev, "picochip,spacc-l2")) {
- 		engine->max_ctxs	= SPACC_CRYPTO_L2_MAX_CTXS;
- 		engine->cipher_pg_sz	= SPACC_CRYPTO_L2_CIPHER_PG_SZ;
-@@ -1815,17 +1735,41 @@ static int spacc_probe(struct platform_device *pdev)
- 				engine->algs[i].alg.cra_name);
+@@ -4262,10 +4337,6 @@ static struct caam_crypto_alg *caam_alg_alloc(struct caam_alg_template
+ 		alg->cra_type = &crypto_ablkcipher_type;
+ 		alg->cra_ablkcipher = template->template_ablkcipher;
+ 		break;
+-	case CRYPTO_ALG_TYPE_AEAD:
+-		alg->cra_type = &crypto_aead_type;
+-		alg->cra_aead = template->template_aead;
+-		break;
  	}
  
-+	INIT_LIST_HEAD(&engine->registered_aeads);
-+	for (i = 0; i < engine->num_aeads; ++i) {
-+		engine->aeads[i].engine = engine;
-+		engine->aeads[i].alg.base.cra_flags |= CRYPTO_ALG_AEAD_NEW;
-+		err = crypto_register_aead(&engine->aeads[i].alg);
-+		if (!err) {
-+			list_add_tail(&engine->aeads[i].entry,
-+				      &engine->registered_aeads);
-+			ret = 0;
-+		}
-+		if (err)
-+			dev_err(engine->dev, "failed to register alg \"%s\"\n",
-+				engine->aeads[i].alg.base.cra_name);
-+		else
-+			dev_dbg(engine->dev, "registered alg \"%s\"\n",
-+				engine->aeads[i].alg.base.cra_name);
-+	}
-+
- 	return ret;
- }
- 
- static int spacc_remove(struct platform_device *pdev)
- {
-+	struct spacc_aead *aead, *an;
- 	struct spacc_alg *alg, *next;
- 	struct spacc_engine *engine = platform_get_drvdata(pdev);
- 
- 	del_timer_sync(&engine->packet_timeout);
- 	device_remove_file(&pdev->dev, &dev_attr_stat_irq_thresh);
- 
-+	list_for_each_entry_safe(aead, an, &engine->registered_aeads, entry) {
-+		list_del(&aead->entry);
-+		crypto_unregister_aead(&aead->alg);
-+	}
-+
- 	list_for_each_entry_safe(alg, next, &engine->registered_algs, entry) {
- 		list_del(&alg->entry);
- 		crypto_unregister_alg(&alg->alg);
+ 	t_alg->caam.class1_alg_type = template->class1_alg_type;
