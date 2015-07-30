@@ -1,7 +1,7 @@
 From: Victoria Milhoan <vicki.milhoan@freescale.com>
-Subject: [PATCH 07/12] crypto: caam - Use local sg pointers to walk the scatterlist
-Date: Wed, 29 Jul 2015 20:58:24 -0700
-Message-ID: <1438228709-27650-8-git-send-email-vicki.milhoan@freescale.com>
+Subject: [PATCH 05/12] crypto: caam - Change kmalloc to kzalloc to avoid residual data
+Date: Wed, 29 Jul 2015 20:58:22 -0700
+Message-ID: <1438228709-27650-6-git-send-email-vicki.milhoan@freescale.com>
 References: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,73 +10,171 @@ Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
 	<kernel@pengutronix.de>, <linux@arm.linux.org.uk>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0122.outbound.protection.outlook.com ([65.55.169.122]:2656
+Received: from mail-bl2on0111.outbound.protection.outlook.com ([65.55.169.111]:9600
 	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751074AbbG3EOG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Jul 2015 00:14:06 -0400
+	id S1751074AbbG3EOR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 30 Jul 2015 00:14:17 -0400
 In-Reply-To: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Avoid moving the head of the scatterlist entry by using temporary
-pointers to walk the scatterlist.
+Since fields must be ORed in to operate correctly using any order of
+operations, changed allocations of the combination of extended
+descriptor structs + hardware scatterlists to use kzalloc() instead
+of kmalloc(), so as to ensure that residue data would not be ORed in
+with the correct data.
 
+Signed-off-by: Steve Cornelius <steve.cornelius@freescale.com>
 Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
 ---
- drivers/crypto/caam/sg_sw_sec4.h | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+ drivers/crypto/caam/caamalg.c  | 20 ++++++++++----------
+ drivers/crypto/caam/caamhash.c | 25 ++++++++++++-------------
+ 2 files changed, 22 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
-index 711bb39..18cd6d1 100644
---- a/drivers/crypto/caam/sg_sw_sec4.h
-+++ b/drivers/crypto/caam/sg_sw_sec4.h
-@@ -105,9 +105,15 @@ static inline void dma_unmap_sg_chained(
- {
- 	if (unlikely(chained)) {
- 		int i;
-+		struct scatterlist *tsg = sg;
-+
-+		/*
-+		 * Use a local copy of the sg pointer to avoid moving the
-+		 * head of the list pointed to by sg as we walk the list.
-+		 */
- 		for (i = 0; i < nents; i++) {
--			dma_unmap_sg(dev, sg, 1, dir);
--			sg = sg_next(sg);
-+			dma_unmap_sg(dev, tsg, 1, dir);
-+			tsg = sg_next(tsg);
- 		}
- 	} else if (nents) {
- 		dma_unmap_sg(dev, sg, nents, dir);
-@@ -118,19 +124,23 @@ static inline int dma_map_sg_chained(
- 	struct device *dev, struct scatterlist *sg, unsigned int nents,
- 	enum dma_data_direction dir, bool chained)
- {
--	struct scatterlist *first = sg;
--
- 	if (unlikely(chained)) {
- 		int i;
-+		struct scatterlist *tsg = sg;
-+
-+		/*
-+		 * Use a local copy of the sg pointer to avoid moving the
-+		 * head of the list pointed to by sg as we walk the list.
-+		 */
- 		for (i = 0; i < nents; i++) {
--			if (!dma_map_sg(dev, sg, 1, dir)) {
--				dma_unmap_sg_chained(dev, first, i, dir,
-+			if (!dma_map_sg(dev, tsg, 1, dir)) {
-+				dma_unmap_sg_chained(dev, sg, i, dir,
- 						     chained);
- 				nents = 0;
- 				break;
- 			}
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 3c50a50..33b6861 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -2482,8 +2482,8 @@ static struct aead_edesc *old_aead_edesc_alloc(struct aead_request *req,
+ 	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
  
--			sg = sg_next(sg);
-+			tsg = sg_next(tsg);
- 		}
- 	} else
- 		nents = dma_map_sg(dev, sg, nents, dir);
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+-	edesc = kmalloc(sizeof(struct aead_edesc) + desc_bytes +
+-			sec4_sg_bytes, GFP_DMA | flags);
++	edesc = kzalloc(sizeof(*edesc) + desc_bytes + sec4_sg_bytes,
++			GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(jrdev, "could not allocate extended descriptor\n");
+ 		return ERR_PTR(-ENOMEM);
+@@ -2585,8 +2585,8 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+ 	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+-	edesc = kzalloc(sizeof(struct aead_edesc) + desc_bytes +
+-			sec4_sg_bytes, GFP_DMA | flags);
++	edesc = kzalloc(sizeof(*edesc) + desc_bytes + sec4_sg_bytes,
++			GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(jrdev, "could not allocate extended descriptor\n");
+ 		return ERR_PTR(-ENOMEM);
+@@ -2921,8 +2921,8 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
+ 	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+-	edesc = kmalloc(sizeof(struct aead_edesc) + desc_bytes +
+-			sec4_sg_bytes, GFP_DMA | flags);
++	edesc = kzalloc(sizeof(*edesc) + desc_bytes + sec4_sg_bytes,
++			GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(jrdev, "could not allocate extended descriptor\n");
+ 		return ERR_PTR(-ENOMEM);
+@@ -3094,8 +3094,8 @@ static struct ablkcipher_edesc *ablkcipher_edesc_alloc(struct ablkcipher_request
+ 			sizeof(struct sec4_sg_entry);
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+-	edesc = kmalloc(sizeof(struct ablkcipher_edesc) + desc_bytes +
+-			sec4_sg_bytes, GFP_DMA | flags);
++	edesc = kzalloc(sizeof(*edesc) + desc_bytes + sec4_sg_bytes,
++			GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(jrdev, "could not allocate extended descriptor\n");
+ 		return ERR_PTR(-ENOMEM);
+@@ -3273,8 +3273,8 @@ static struct ablkcipher_edesc *ablkcipher_giv_edesc_alloc(
+ 			sizeof(struct sec4_sg_entry);
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+-	edesc = kmalloc(sizeof(*edesc) + desc_bytes +
+-			sec4_sg_bytes, GFP_DMA | flags);
++	edesc = kzalloc(sizeof(*edesc) + desc_bytes + sec4_sg_bytes,
++			GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(jrdev, "could not allocate extended descriptor\n");
+ 		return ERR_PTR(-ENOMEM);
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 9622a81..2361beb 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -807,7 +807,7 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 		 * allocate space for base edesc and hw desc commands,
+ 		 * link tables
+ 		 */
+-		edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
++		edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN +
+ 				sec4_sg_bytes, GFP_DMA | flags);
+ 		if (!edesc) {
+ 			dev_err(jrdev,
+@@ -918,8 +918,8 @@ static int ahash_final_ctx(struct ahash_request *req)
+ 	sec4_sg_bytes = (1 + (buflen ? 1 : 0)) * sizeof(struct sec4_sg_entry);
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+-	edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
+-			sec4_sg_bytes, GFP_DMA | flags);
++	edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN + sec4_sg_bytes,
++			GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(jrdev, "could not allocate extended descriptor\n");
+ 		return -ENOMEM;
+@@ -1005,8 +1005,8 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 			 sizeof(struct sec4_sg_entry);
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+-	edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
+-			sec4_sg_bytes, GFP_DMA | flags);
++	edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN + sec4_sg_bytes,
++			GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(jrdev, "could not allocate extended descriptor\n");
+ 		return -ENOMEM;
+@@ -1091,8 +1091,8 @@ static int ahash_digest(struct ahash_request *req)
+ 	sec4_sg_bytes = src_nents * sizeof(struct sec4_sg_entry);
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+-	edesc = kmalloc(sizeof(struct ahash_edesc) + sec4_sg_bytes +
+-			DESC_JOB_IO_LEN, GFP_DMA | flags);
++	edesc = kzalloc(sizeof(*edesc) + sec4_sg_bytes + DESC_JOB_IO_LEN,
++			GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(jrdev, "could not allocate extended descriptor\n");
+ 		return -ENOMEM;
+@@ -1165,8 +1165,7 @@ static int ahash_final_no_ctx(struct ahash_request *req)
+ 	int sh_len;
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+-	edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN,
+-			GFP_DMA | flags);
++	edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN, GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(jrdev, "could not allocate extended descriptor\n");
+ 		return -ENOMEM;
+@@ -1245,7 +1244,7 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 		 * allocate space for base edesc and hw desc commands,
+ 		 * link tables
+ 		 */
+-		edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
++		edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN +
+ 				sec4_sg_bytes, GFP_DMA | flags);
+ 		if (!edesc) {
+ 			dev_err(jrdev,
+@@ -1353,8 +1352,8 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 			 sizeof(struct sec4_sg_entry);
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+-	edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
+-			sec4_sg_bytes, GFP_DMA | flags);
++	edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN + sec4_sg_bytes,
++			GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(jrdev, "could not allocate extended descriptor\n");
+ 		return -ENOMEM;
+@@ -1448,7 +1447,7 @@ static int ahash_update_first(struct ahash_request *req)
+ 		 * allocate space for base edesc and hw desc commands,
+ 		 * link tables
+ 		 */
+-		edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
++		edesc = kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN +
+ 				sec4_sg_bytes, GFP_DMA | flags);
+ 		if (!edesc) {
+ 			dev_err(jrdev,
 -- 
 2.1.4
