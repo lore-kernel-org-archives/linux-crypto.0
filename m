@@ -1,7 +1,7 @@
 From: Victoria Milhoan <vicki.milhoan@freescale.com>
-Subject: [PATCH 01/12] crypto: caam - Add cache coherency support
-Date: Wed, 29 Jul 2015 20:58:18 -0700
-Message-ID: <1438228709-27650-2-git-send-email-vicki.milhoan@freescale.com>
+Subject: [PATCH 11/12] crypto: caam - Enable MXC devices to select CAAM driver in Kconfig
+Date: Wed, 29 Jul 2015 20:58:28 -0700
+Message-ID: <1438228709-27650-12-git-send-email-vicki.milhoan@freescale.com>
 References: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,94 +10,37 @@ Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
 	<kernel@pengutronix.de>, <linux@arm.linux.org.uk>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0130.outbound.protection.outlook.com ([65.55.169.130]:47648
+Received: from mail-bl2on0123.outbound.protection.outlook.com ([65.55.169.123]:18709
 	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752703AbbG3D6g (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Jul 2015 23:58:36 -0400
+	id S1752856AbbG3D6k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 29 Jul 2015 23:58:40 -0400
 In-Reply-To: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Freescale i.MX6 ARM platforms do not support hardware cache coherency.
-This patch adds cache coherency support to the CAAM driver.
+From: Steve Cornelius <steve.cornelius@freescale.com>
 
+Allow CAAM to be selected in the kernel for Freescale i.MX devices if
+ARCH_MXC is enabled.
+
+Signed-off-by: Steve Cornelius <steve.cornelius@freescale.com>
 Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
 ---
- drivers/crypto/caam/caamhash.c |  2 +-
- drivers/crypto/caam/caamrng.c  |  4 ++++
- drivers/crypto/caam/jr.c       | 18 ++++++++++++++++++
- 3 files changed, 23 insertions(+), 1 deletion(-)
+ drivers/crypto/caam/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index dae1e80..9622a81 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -127,7 +127,7 @@ struct caam_hash_state {
- 	int buflen_0;
- 	u8 buf_1[CAAM_MAX_HASH_BLOCK_SIZE] ____cacheline_aligned;
- 	int buflen_1;
--	u8 caam_ctx[MAX_CTX_LEN];
-+	u8 caam_ctx[MAX_CTX_LEN] ____cacheline_aligned;
- 	int (*update)(struct ahash_request *req);
- 	int (*final)(struct ahash_request *req);
- 	int (*finup)(struct ahash_request *req);
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index 5095337..a1d21d5 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -108,6 +108,10 @@ static void rng_done(struct device *jrdev, u32 *desc, u32 err, void *context)
- 
- 	atomic_set(&bd->empty, BUF_NOT_EMPTY);
- 	complete(&bd->filled);
-+
-+	/* Buffer refilled, invalidate cache */
-+	dma_sync_single_for_cpu(jrdev, bd->addr, RN_BUF_SIZE, DMA_FROM_DEVICE);
-+
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "rng refreshed buf@: ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, bd->buf, RN_BUF_SIZE, 1);
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index b8b5d47..b7ec1ad 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -202,6 +202,13 @@ static void caam_jr_dequeue(unsigned long devarg)
- 		userdesc = jrp->entinfo[sw_idx].desc_addr_virt;
- 		userstatus = jrp->outring[hw_idx].jrstatus;
- 
-+		/*
-+		 * Make sure all information from the job has been obtained
-+		 * before telling CAAM that the job has been removed from the
-+		 * output ring.
-+		 */
-+		mb();
-+
- 		/* set done */
- 		wr_reg32(&jrp->rregs->outring_rmvd, 1);
- 
-@@ -351,12 +358,23 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
- 
- 	jrp->inpring[jrp->inp_ring_write_index] = desc_dma;
- 
-+	/*
-+	 * Guarantee that the descriptor's DMA address has been written to
-+	 * the next slot in the ring before the write index is updated, since
-+	 * other cores may update this index independently.
-+	 */
- 	smp_wmb();
- 
- 	jrp->inp_ring_write_index = (jrp->inp_ring_write_index + 1) &
- 				    (JOBR_DEPTH - 1);
- 	jrp->head = (head + 1) & (JOBR_DEPTH - 1);
- 
-+	/*
-+	 * Ensure that all job information has been written before
-+	 * notifying CAAM that a new job was added to the input ring.
-+	 */
-+	wmb();
-+
- 	wr_reg32(&jrp->rregs->inpring_jobadd, 1);
- 
- 	spin_unlock_bh(&jrp->inplock);
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index e286e28..66ef0c0 100644
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -1,6 +1,6 @@
+ config CRYPTO_DEV_FSL_CAAM
+ 	tristate "Freescale CAAM-Multicore driver backend"
+-	depends on FSL_SOC
++	depends on FSL_SOC || ARCH_MXC
+ 	help
+ 	  Enables the driver module for Freescale's Cryptographic Accelerator
+ 	  and Assurance Module (CAAM), also known as the SEC version 4 (SEC4).
 -- 
 2.1.4
