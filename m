@@ -1,112 +1,330 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@freescale.com>
-Subject: [PATCH v2] crypto: caam - fix rfc4106 encap shared descriptor
-Date: Thu, 30 Jul 2015 22:11:18 +0300
-Message-ID: <1438283478-32198-1-git-send-email-horia.geanta@freescale.com>
-References: <55BA435C.1000803@freescale.com>
+From: Victoria Milhoan <vicki.milhoan@freescale.com>
+Subject: Re: [PATCH 03/12] crypto: caam - Enable and disable clocks on
+ Freescale i.MX platforms
+Date: Thu, 30 Jul 2015 23:32:44 -0700
+Message-ID: <20150730233244.f00f40cca35944bbb21b807f@freescale.com>
+References: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
+	<1438228709-27650-4-git-send-email-vicki.milhoan@freescale.com>
+	<20150730060214.GI18700@pengutronix.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <linux-crypto@vger.kernel.org>,
-	Tudor Ambarus <tudor.ambarus@freescale.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>, <linux@arm.linux.org.uk>,
+	<herbert@gondor.apana.org.au>, <ruchika.gupta@freescale.com>,
+	<kernel@pengutronix.de>, <shawnguo@kernel.org>,
+	<horia.geanta@freescale.com>
+To: Sascha Hauer <s.hauer@pengutronix.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0132.outbound.protection.outlook.com ([157.56.111.132]:26848
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+Received: from mail-by2on0145.outbound.protection.outlook.com ([207.46.100.145]:7040
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752057AbbG3TZl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Jul 2015 15:25:41 -0400
-In-Reply-To: <55BA435C.1000803@freescale.com>
+	id S1751256AbbGaGc5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 31 Jul 2015 02:32:57 -0400
+In-Reply-To: <20150730060214.GI18700@pengutronix.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The encap shared descriptor was changed to use the new IV convention.
-In the process some commands were shifted, making the output length
-zero, caam effectively writing garbage in dst.
+Hi Sascha,
 
-While here, update the decap descriptor to execute the "write" commands
-before the "read"s (as it previously was).
-This makes sure the input fifo is drained before becoming full.
+Thank you for the responses. Comments inline. Changes will be 
+in the next version of the patch set.
 
-=46ixes: 46218750d523 ("crypto: caam - Use new IV convention")
-Signed-off-by: Horia Geant=C4=83 <horia.geanta@freescale.com>
-Signed-off-by: Tudor Ambarus <tudor.ambarus@freescale.com>
----
+-Victoria
 
-v2 - added erratum workaround
+On Thu, 30 Jul 2015 08:02:14 +0200
+Sascha Hauer <s.hauer@pengutronix.de> wrote:
 
- drivers/crypto/caam/caamalg.c | 24 +++++++++++++++---------
- 1 file changed, 15 insertions(+), 9 deletions(-)
+> Hi Victoria,
+> 
+> comments inline.
+> 
+> On Wed, Jul 29, 2015 at 08:58:20PM -0700, Victoria Milhoan wrote:
+> > ARM-based systems may disable clocking to the CAAM device on the
+> > Freescale i.MX platform for power management purposes.  This patch
+> > enables the required clocks when the CAAM module is initialized and
+> > disables the required clocks when the CAAM module is shut down.
+> > 
+> > Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
+> > ---
+> >  drivers/crypto/caam/compat.h |   1 +
+> >  drivers/crypto/caam/ctrl.c   | 191 +++++++++++++++++++++++++++++++++++++++++++
+> >  drivers/crypto/caam/intern.h |   5 ++
+> >  3 files changed, 197 insertions(+)
+> > 
+> > diff --git a/drivers/crypto/caam/compat.h b/drivers/crypto/caam/compat.h
+> > index f57f395..b6955ec 100644
+> > --- a/drivers/crypto/caam/compat.h
+> > +++ b/drivers/crypto/caam/compat.h
+> > @@ -23,6 +23,7 @@
+> >  #include <linux/types.h>
+> >  #include <linux/debugfs.h>
+> >  #include <linux/circ_buf.h>
+> > +#include <linux/clk.h>
+> >  #include <net/xfrm.h>
+> >  
+> >  #include <crypto/algapi.h>
+> > diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+> > index 660cc3e..cfd8c9e 100644
+> > --- a/drivers/crypto/caam/ctrl.c
+> > +++ b/drivers/crypto/caam/ctrl.c
+> > @@ -16,6 +16,121 @@
+> >  #include "error.h"
+> >  
+> >  /*
+> > + * ARM targets tend to have clock control subsystems that can
+> > + * enable/disable clocking to our device. Support clocking
+> > + * with the following functions.
+> > + */
+> > +#ifdef CONFIG_ARM
+> > +static inline struct clk *caam_drv_get_clk_ipg(struct caam_drv_private *drv)
+> > +{
+> > +	return drv->caam_ipg;
+> > +}
+> 
+> You return drv->caam_ipg on ARM and NULL on powerpc. drv->caam_ipg is
+> NULL on powerpc anyway which makes this different implementations for
+> ARM and powerpc unnecessary. Just access drv->caam_ipg directly where
+> needed.
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamal=
-g.c
-index 3c50a5082127..e49373409582 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -87,8 +87,8 @@
- #define DESC_GCM_DEC_LEN		(DESC_GCM_BASE + 12 * CAAM_CMD_SZ)
-=20
- #define DESC_RFC4106_BASE		(3 * CAAM_CMD_SZ)
--#define DESC_RFC4106_ENC_LEN		(DESC_RFC4106_BASE + 12 * CAAM_CMD_SZ)
--#define DESC_RFC4106_DEC_LEN		(DESC_RFC4106_BASE + 12 * CAAM_CMD_SZ)
-+#define DESC_RFC4106_ENC_LEN		(DESC_RFC4106_BASE + 13 * CAAM_CMD_SZ)
-+#define DESC_RFC4106_DEC_LEN		(DESC_RFC4106_BASE + 13 * CAAM_CMD_SZ)
-=20
- #define DESC_RFC4543_BASE		(3 * CAAM_CMD_SZ)
- #define DESC_RFC4543_ENC_LEN		(DESC_RFC4543_BASE + 11 * CAAM_CMD_SZ)
-@@ -989,19 +989,22 @@ static int rfc4106_set_sh_desc(struct crypto_aead=
- *aead)
- 	/* Will read cryptlen bytes */
- 	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
-=20
--	/* Read payload data */
--	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
--			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_LAST1);
-+	/* Workaround for erratum A-005473 (simultaneous SEQ FIFO skips) */
-+	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLD_TYPE_MSG);
-=20
- 	/* Skip assoc data */
- 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
-=20
- 	/* cryptlen =3D seqoutlen - assoclen */
--	append_math_sub(desc, VARSEQOUTLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
-+	append_math_sub(desc, VARSEQOUTLEN, VARSEQINLEN, REG0, CAAM_CMD_SZ);
-=20
- 	/* Write encrypted data */
- 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VL=
-=46);
-=20
-+	/* Read payload data */
-+	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
-+			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_LAST1);
-+
- 	/* Write ICV */
- 	append_seq_store(desc, ctx->authsize, LDST_CLASS_1_CCB |
- 			 LDST_SRCDST_BYTE_CONTEXT);
-@@ -1060,9 +1063,8 @@ static int rfc4106_set_sh_desc(struct crypto_aead=
- *aead)
- 	/* Will read cryptlen bytes */
- 	append_math_sub(desc, VARSEQINLEN, SEQOUTLEN, REG3, CAAM_CMD_SZ);
-=20
--	/* Read encrypted data */
--	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
--			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_FLUSH1);
-+	/* Workaround for erratum A-005473 (simultaneous SEQ FIFO skips) */
-+	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLD_TYPE_MSG);
-=20
- 	/* Skip assoc data */
- 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
-@@ -1073,6 +1075,10 @@ static int rfc4106_set_sh_desc(struct crypto_aea=
-d *aead)
- 	/* Store payload data */
- 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VL=
-=46);
-=20
-+	/* Read encrypted data */
-+	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
-+			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_FLUSH1);
-+
- 	/* Read ICV */
- 	append_seq_fifo_load(desc, ctx->authsize, FIFOLD_CLASS_CLASS1 |
- 			     FIFOLD_TYPE_ICV | FIFOLD_TYPE_LAST1);
---=20
-2.4.4
+Agreed. I've reworked the patch to use direct references to the clocks.
+
+> 
+> > +
+> > +static inline struct clk *caam_drv_get_clk_mem(struct caam_drv_private *drv)
+> > +{
+> > +	return drv->caam_mem;
+> > +}
+> > +
+> > +static inline struct clk *caam_drv_get_clk_aclk(struct caam_drv_private *drv)
+> > +{
+> > +	return drv->caam_aclk;
+> > +}
+> > +
+> > +static inline struct clk *caam_drv_get_clk_emislow(struct caam_drv_private *drv)
+> > +{
+> > +	return drv->caam_emi_slow;
+> > +}
+> > +
+> > +static inline void caam_drv_set_clk_ipg(struct caam_drv_private *drv,
+> > +					struct clk *clk)
+> > +{
+> > +	drv->caam_ipg = clk;
+> > +}
+> 
+> Ditto, just access drv->caam_ipg when needed.
+> 
+> > +
+> > +static inline void caam_drv_set_clk_mem(struct caam_drv_private *drv,
+> > +					struct clk *clk)
+> > +{
+> > +	drv->caam_mem = clk;
+> > +}
+> > +
+> > +static inline void caam_drv_set_clk_aclk(struct caam_drv_private *drv,
+> > +					 struct clk *clk)
+> > +{
+> > +	drv->caam_aclk = clk;
+> > +}
+> > +
+> > +static inline void caam_drv_set_clk_emislow(struct caam_drv_private *drv,
+> > +					    struct clk *clk)
+> > +{
+> > +	drv->caam_emi_slow = clk;
+> > +}
+> > +
+> > +static inline struct clk *caam_drv_identify_clk(struct device *dev,
+> > +						char *clk_name)
+> > +{
+> > +	return devm_clk_get(dev, clk_name);
+> > +}
+> 
+> devm_clk_get() returns NULL when the architecture does not have clk
+> support, so it also seems unnecessary to have architecture specific
+> implementations for this.
+> 
+
+Some of the QorIQ architectures have clock support enabled but do not
+support clocking to CAAM. This causes devm_clk_get() to return an error
+for these clocks instead of NULL. So, the only architecture-specific code
+left in the reworked patch is caam_drv_identify_clk().
+
+> > +
+> > +static inline void caam_drv_show_clk(struct device *dev, struct clk *clk,
+> > +				     char *clk_name)
+> > +{
+> > +	dev_info(dev, "%s clock:%d\n", clk_name, (int)clk_get_rate(clk));
+> > +}
+> 
+> The correct format specifier for unsigned long is "%lu", no need to cast
+> it to int. Besides, this information is not generally interesting, you
+> can drop this.
+> 
+
+I removed this code.
+
+> > +
+> > +#else
+> > +static inline struct clk *caam_drv_get_clk_ipg(struct caam_drv_private *drv)
+> > +{
+> > +	return NULL;
+> > +}
+> > +
+> > +static inline struct clk *caam_drv_get_clk_mem(struct caam_drv_private *drv)
+> > +{
+> > +	return NULL;
+> > +}
+> > +
+> > +static inline struct clk *caam_drv_get_clk_aclk(struct caam_drv_private *drv)
+> > +{
+> > +	return NULL;
+> > +}
+> > +
+> > +static inline struct clk *caam_drv_get_clk_emislow(struct caam_drv_private *drv)
+> > +{
+> > +	return NULL;
+> > +}
+> > +
+> > +static inline void caam_drv_set_clk_ipg(struct caam_drv_private *drv,
+> > +					struct clk *clk)
+> > +{
+> > +}
+> > +
+> > +static inline void caam_drv_set_clk_mem(struct caam_drv_private *drv,
+> > +					struct clk *clk)
+> > +{
+> > +}
+> > +
+> > +static inline void caam_drv_set_clk_aclk(struct caam_drv_private *drv,
+> > +					 struct clk *clk)
+> > +{
+> > +}
+> > +
+> > +static inline void caam_drv_set_clk_emislow(struct caam_drv_private *drv,
+> > +					    struct clk *clk)
+> > +{
+> > +}
+> > +
+> > +static inline struct clk *caam_drv_identify_clk(struct device *dev,
+> > +						char *clk_name)
+> > +{
+> > +	return 0;
+> > +}
+> > +
+> > +static inline void caam_drv_show_clk(struct device *dev, struct clk *clk,
+> > +				     char *clk_name)
+> > +{
+> > +}
+> > +#endif
+> > +
+> > +/*
+> >   * Descriptor to instantiate RNG State Handle 0 in normal mode and
+> >   * load the JDKEK, TDKEK and TDSK registers
+> >   */
+> > @@ -304,6 +419,12 @@ static int caam_remove(struct platform_device *pdev)
+> >  	/* Unmap controller region */
+> >  	iounmap(ctrl);
+> >  
+> > +	/* shut clocks off before finalizing shutdown */
+> > +	clk_disable_unprepare(caam_drv_get_clk_ipg(ctrlpriv));
+> > +	clk_disable_unprepare(caam_drv_get_clk_mem(ctrlpriv));
+> > +	clk_disable_unprepare(caam_drv_get_clk_aclk(ctrlpriv));
+> > +	clk_disable_unprepare(caam_drv_get_clk_emislow(ctrlpriv));
+> > +
+> >  	return ret;
+> >  }
+> >  
+> > @@ -391,6 +512,7 @@ static int caam_probe(struct platform_device *pdev)
+> >  	struct device_node *nprop, *np;
+> >  	struct caam_ctrl __iomem *ctrl;
+> >  	struct caam_drv_private *ctrlpriv;
+> > +	struct clk *clk;
+> >  #ifdef CONFIG_DEBUG_FS
+> >  	struct caam_perfmon *perfmon;
+> >  #endif
+> > @@ -409,6 +531,75 @@ static int caam_probe(struct platform_device *pdev)
+> >  	ctrlpriv->pdev = pdev;
+> >  	nprop = pdev->dev.of_node;
+> >  
+> > +	/* Enable clocking */
+> > +	clk = caam_drv_identify_clk(&pdev->dev, "caam_ipg");
+> > +	if (IS_ERR(clk)) {
+> > +		ret = PTR_ERR(clk);
+> > +		dev_err(&pdev->dev,
+> > +			"can't identify CAAM ipg clk: %d\n", ret);
+> > +		return -ENODEV;
+> > +	}
+> > +	caam_drv_set_clk_ipg(ctrlpriv, clk);
+> > +
+> > +	clk = caam_drv_identify_clk(&pdev->dev, "caam_mem");
+> > +	if (IS_ERR(clk)) {
+> > +		ret = PTR_ERR(clk);
+> > +		dev_err(&pdev->dev,
+> > +			"can't identify CAAM mem clk: %d\n", ret);
+> > +		return -ENODEV;
+> > +	}
+> > +	caam_drv_set_clk_mem(ctrlpriv, clk);
+> > +
+> > +	clk = caam_drv_identify_clk(&pdev->dev, "caam_aclk");
+> > +	if (IS_ERR(clk)) {
+> > +		ret = PTR_ERR(clk);
+> > +		dev_err(&pdev->dev,
+> > +			"can't identify CAAM aclk clk: %d\n", ret);
+> > +		return -ENODEV;
+> > +	}
+> > +	caam_drv_set_clk_aclk(ctrlpriv, clk);
+> > +
+> > +	clk = caam_drv_identify_clk(&pdev->dev, "caam_emi_slow");
+> > +	if (IS_ERR(clk)) {
+> > +		ret = PTR_ERR(clk);
+> > +		dev_err(&pdev->dev,
+> > +			"can't identify CAAM emi_slow clk: %d\n", ret);
+> > +		return -ENODEV;
+> > +	}
+> > +	caam_drv_set_clk_emislow(ctrlpriv, clk);
+> > +
+> > +	ret = clk_prepare_enable(caam_drv_get_clk_ipg(ctrlpriv));
+> > +	if (ret < 0) {
+> > +		dev_err(&pdev->dev, "can't enable CAAM ipg clock: %d\n", ret);
+> > +		return -ENODEV;
+> > +	}
+> > +
+> > +	ret = clk_prepare_enable(caam_drv_get_clk_mem(ctrlpriv));
+> > +	if (ret < 0) {
+> > +		dev_err(&pdev->dev, "can't enable CAAM secure mem clock: %d\n",
+> > +			ret);
+> > +		return -ENODEV;
+> > +	}
+> > +
+> > +	ret = clk_prepare_enable(caam_drv_get_clk_aclk(ctrlpriv));
+> > +	if (ret < 0) {
+> > +		dev_err(&pdev->dev, "can't enable CAAM aclk clock: %d\n", ret);
+> > +		return -ENODEV;
+> > +	}
+> > +
+> > +	ret = clk_prepare_enable(caam_drv_get_clk_emislow(ctrlpriv));
+> > +	if (ret < 0) {
+> > +		dev_err(&pdev->dev, "can't enable CAAM emi slow clock: %d\n",
+> > +			ret);
+> > +		return -ENODEV;
+> > +	}
+> > +
+> > +	caam_drv_show_clk(dev, caam_drv_get_clk_ipg(ctrlpriv), "caam_ipg");
+> 
+> No. Each clk_get takes a reference to the clk and must be balanced with
+> clk_put. You can't just take a new reference each time you need that
+> clk.
+
+This is no longer an issue in the modified code.
+
+> 
+> Sascha
+> 
+> -- 
+> Pengutronix e.K.                           |                             |
+> Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+> Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
+> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
