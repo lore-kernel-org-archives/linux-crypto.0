@@ -1,46 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 6/8] crypto: qat - Convert to new AEAD interface
-Date: Sun, 2 Aug 2015 09:23:54 +0800
-Message-ID: <20150802012354.GB10055@gondor.apana.org.au>
-References: <20150730094138.GA15941@gondor.apana.org.au>
- <E1ZKkWe-0004C6-SN@gondolin.me.apana.org.au>
- <55BBDD1F.4020208@intel.com>
+Subject: Re: [PATCH] crypto: talitos: Init zero_entry more compatibly
+Date: Sun, 2 Aug 2015 09:22:33 +0800
+Message-ID: <20150802012233.GA10055@gondor.apana.org.au>
+References: <767312390.183043.1438296525267.JavaMail.zimbra@xes-inc.com>
+ <985540634.83104.1438363661992.JavaMail.zimbra@xes-inc.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Christophe Leroy <christophe.leroy@c-s.fr>
+To: Aaron Sierra <asierra@xes-inc.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36312 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:38308 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751593AbbHBCAd (ORCPT
+	with ESMTP id S1751593AbbHBCAb (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 1 Aug 2015 22:00:33 -0400
+	Sat, 1 Aug 2015 22:00:31 -0400
 Content-Disposition: inline
-In-Reply-To: <55BBDD1F.4020208@intel.com>
+In-Reply-To: <985540634.83104.1438363661992.JavaMail.zimbra@xes-inc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 31, 2015 at 01:39:59PM -0700, Tadeusz Struk wrote:
-> On 07/30/2015 02:53 AM, Herbert Xu wrote:
-> > -}, {
-> > +	.init = qat_alg_aead_sha512_init,
-> > +	.exit = qat_alg_aead_exit,
-> > +	.setkey = qat_alg_aead_setkey,
-> > +	.decrypt = qat_alg_aead_dec,
-> > +	.encrypt = qat_alg_aead_enc,
-> > +	.ivsize = AES_BLOCK_SIZE,
-> > +	.maxauthsize = SHA512_DIGEST_SIZE,
-> 
-> Hi Herbert,
-> crypto_aead_encrypt() and crypto_aead_decrypt() work fine, but crypto_aead_givencrypt(),
-> which is still supported on the API causes a crash. Should we also disable all the
-> crypto_aead_giv* calls? I use it in my internal tests.
+On Fri, Jul 31, 2015 at 12:27:41PM -0500, Aaron Sierra wrote:
+>
+> -static const struct talitos_ptr zero_entry = {
+> -	.len = 0,
+> -	.j_extent = 0,
+> -	.eptr = 0,
+> -	.ptr = 0
+> -};
+> +static const struct talitos_ptr zero_entry = {{{ 0 }}};
 
-givencrypt will be removed once all drivers are converted across.
-So it must not be used.
-
-> Other that that looks ok:
-> Tested-by: Tadeusz Struk <tadeusz.struk@intel.com>
+Please get rid of the initialiser completely.
 
 Thanks,
 -- 
