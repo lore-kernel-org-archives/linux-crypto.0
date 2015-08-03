@@ -1,84 +1,108 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: documentation - AEAD API conversion
-Date: Mon, 03 Aug 2015 09:08:05 +0200
-Message-ID: <1757399.eaVjudjyCK@myon.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+From: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: Limited usefulness of RSA set key function
+Date: Mon, 3 Aug 2015 00:14:28 -0700
+Message-ID: <6876D9AA-A51A-4D79-9127-3B3ED58784CA@holtmann.org>
+References: <BC087D1C-7D4D-4F6D-9644-B2043C3E39D3@holtmann.org> <3848823.PNN01JLIZu@tauon.atsec.com>
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
+	linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:48070 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751397AbbHCHIK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Aug 2015 03:08:10 -0400
+Received: from senator.holtmann.net ([87.106.208.187]:54169 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752304AbbHCHOf convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 3 Aug 2015 03:14:35 -0400
+In-Reply-To: <3848823.PNN01JLIZu@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The AEAD API changes are now reflected in the crypto API doc book.
+Hi Stephan,
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- Documentation/DocBook/crypto-API.tmpl |  4 ++--
- include/crypto/aead.h                 | 24 ++++++++++++++++++++++++
- 2 files changed, 26 insertions(+), 2 deletions(-)
+>> I have been working with the AF_ALG patches for akcipher lately and I find
+>> the RSA set key function way too limited. Especially the fact that it uses a
+>> format that I can not find a single reference / standard for worries me.
+>> 
+>> RsaKey ::= SEQUENCE {
+>>       n INTEGER ({ rsa_get_n }),
+>>       e INTEGER ({ rsa_get_e }),
+>>       d INTEGER ({ rsa_get_d })
+>> }
+> 
+> Note, the kernel uses BER encoding.
 
-diff --git a/Documentation/DocBook/crypto-API.tmpl b/Documentation/DocBook/crypto-API.tmpl
-index 0992531..8e17a41 100644
---- a/Documentation/DocBook/crypto-API.tmpl
-+++ b/Documentation/DocBook/crypto-API.tmpl
-@@ -585,7 +585,7 @@ kernel crypto API                                |   IPSEC Layer
- +-----------+                                    |
- |           |            (1)
- |   aead    | <-----------------------------------  esp_output
--| (seqniv)  | ---+
-+|  (seqiv)  | ---+
- +-----------+    |
-                  | (2)
- +-----------+    |
-@@ -1687,7 +1687,7 @@ read(opfd, out, outlen);
- !Pinclude/linux/crypto.h Block Cipher Algorithm Definitions
- !Finclude/linux/crypto.h crypto_alg
- !Finclude/linux/crypto.h ablkcipher_alg
--!Finclude/linux/crypto.h aead_alg
-+!Finclude/crypto/aead.h aead_alg
- !Finclude/linux/crypto.h blkcipher_alg
- !Finclude/linux/crypto.h cipher_alg
- !Finclude/crypto/rng.h rng_alg
-diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-index 7169ad0..14e35364 100644
---- a/include/crypto/aead.h
-+++ b/include/crypto/aead.h
-@@ -45,6 +45,30 @@
-  * a breach in the integrity of the message. In essence, that -EBADMSG error
-  * code is the key bonus an AEAD cipher has over "standard" block chaining
-  * modes.
-+ *
-+ * Memory Structure:
-+ *
-+ * To support the needs of the most prominent user of AEAD ciphers, namely
-+ * IPSEC, the AEAD ciphers have a special memory layout the caller must adhere
-+ * to.
-+ *
-+ * The scatter list pointing to the input data must contain:
-+ *
-+ * * for RFC4106 ciphers, the concatenation of
-+ * associated authentication data || IV || plaintext or ciphertext. Note, the
-+ * same IV (buffer) is also set with the aead_request_set_crypt call. Note,
-+ * the API call of aead_request_set_ad must provide the length of the AAD and
-+ * the IV. The API call of aead_request_set_crypt only points to the size of
-+ * the input plaintext or ciphertext.
-+ *
-+ * * for "normal" AEAD ciphers, the concatenation of
-+ * associated authentication data || plaintext or ciphertext.
-+ *
-+ * It is important to note that if multiple scatter gather list entries form
-+ * the input data mentioned above, the first entry must not point to a NULL
-+ * buffer. If there is any potential where the AAD buffer can be NULL, the
-+ * calling code must contain a precaution to ensure that this does not result
-+ * in the first scatter gather list entry pointing to a NULL buffer.
-  */
- 
- /**
--- 
-2.1.0
+so what? DER is still valid BER.
+
+>> So where is this format coming from? I can find the RSA Public Key format
+>> which is a sequence of n and e. If you have a DER encoded RSA public key,
+>> then you can use it to encrypt and verify. So that is okay.
+>> 
+>> However if you have a standard Public Key that OpenSSL would create by
+>> default, then things do not work since that is actually a more complicated
+>> DER encoded format. However in the end, I would expect that we could also
+>> load such a key here. The RSA set key function should auto detect it and
+>> extract the right information if it is marked as rsaEncryption type.
+> 
+> Do you propose to add a DER parser to the kernel? I feel that the BER parser 
+> is complex enough. If somebody has a DER key, user space should have the code 
+> to convert it to BER.
+
+Why would you do that? DER is still valid BER.
+
+>> My biggest concern however is that this does not reassemble the RSA Private
+>> Key at all. That key format is a sequence of 9 integers starting with a
+>> version. So logically I would expect that I can just set a RSA Private Key
+>> and then utilize the encrypt and decrypt features of the RSA cipher.
+> 
+> Why do you think this is not possible? testmgr.h seems to exactly do that.
+
+It does not. The RSA Private Key has a different format.
+
+      RSAPrivateKey ::= SEQUENCE {
+          version           Version,
+          modulus           INTEGER,  -- n
+          publicExponent    INTEGER,  -- e
+          privateExponent   INTEGER,  -- d
+          prime1            INTEGER,  -- p
+          prime2            INTEGER,  -- q
+          exponent1         INTEGER,  -- d mod (p-1)
+          exponent2         INTEGER,  -- d mod (q-1)
+          coefficient       INTEGER,  -- (inverse of q) mod p
+      }
+
+And honestly that the RSA Public Key magically matches seems more luck then clear intention.
+
+      RSAPublicKey ::= SEQUENCE {
+          modulus           INTEGER,  -- n
+          publicExponent    INTEGER   -- e
+      }
+
+So what you have in testmgr.h is neither RSA Private Key nor RSA Public Key. It is a brand new format that is sadly Linux specific.
+
+>> When it comes to exposing RSA via AF_ALG and akcipher, I really want standard
+>> format for the set key operation. Asking userspace to construct this Linux
+>> kernel only key format is not helpful. You want to be able to just load the
+>> RSA Private Key in DER format and be done with it.
+> 
+> I am all for it. BER is a standard, is it not? Yes, I have not yet seen a 
+> converter for DER to BER (and I have not searched for one either). But I feel 
+> DER should be left to user space.
+
+DER is valid BER. However just saying the key is BER has no meaning whatsoever. It does not define an actual key format.
+
+What I would like to see is support for RSA Private Key (DER encoded) and RSA Public Key (DER encoded) when using the RSA cipher. That makes sense to me. Everything else is just insanity since we force the user to convert well known formats into new ones for no apparent reason.
+
+>> Any ideas on how we can fix this to allow a sensible userspace API?
+> 
+> I actually planned to add a BER encoder to my libkcapi. I feel that should be 
+> right place to provide that code, including a potential DER to BER converter.
+
+No idea what DER to BER would give you since DER is always valid BER. I see no need for BER or DER encoders if the keys and also certificates are already available in DER format your system (or can be easily converted from PEM to DER with standard tools).
+
+Seriously, I want to take the RSA Private Key that comes out of OpenSSL and use it. I want to be able to extract the RSA Public Key out of a certificate and use it. Plain and simple. No other gimmicks, conversions or tricks to play. Using existing key format standards is really the key here.
+
+Regards
+
+Marcel
