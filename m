@@ -1,108 +1,124 @@
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: Limited usefulness of RSA set key function
-Date: Mon, 3 Aug 2015 00:14:28 -0700
-Message-ID: <6876D9AA-A51A-4D79-9127-3B3ED58784CA@holtmann.org>
-References: <BC087D1C-7D4D-4F6D-9644-B2043C3E39D3@holtmann.org> <3848823.PNN01JLIZu@tauon.atsec.com>
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: Proposal for adding setpubkey callback to akcipher_alg
+Date: Mon, 03 Aug 2015 09:15:12 +0200
+Message-ID: <14682477.78a1L9JDin@myon.chronox.de>
+References: <905E1812-AD9B-4188-A668-3CD8985EA1BF@holtmann.org> <1704807.Rn4DsddD6R@tauon.atsec.com> <70C201C0-233D-4912-9856-C8C0E7A6A0FA@holtmann.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Howells <dhowells@redhat.com>,
 	linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+To: Marcel Holtmann <marcel@holtmann.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:54169 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752304AbbHCHOf convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Aug 2015 03:14:35 -0400
-In-Reply-To: <3848823.PNN01JLIZu@tauon.atsec.com>
+Received: from mail.eperm.de ([89.247.134.16]:48072 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751789AbbHCHPQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 3 Aug 2015 03:15:16 -0400
+In-Reply-To: <70C201C0-233D-4912-9856-C8C0E7A6A0FA@holtmann.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Stephan,
+Am Montag, 3. August 2015, 00:03:03 schrieb Marcel Holtmann:
 
->> I have been working with the AF_ALG patches for akcipher lately and I find
->> the RSA set key function way too limited. Especially the fact that it uses a
->> format that I can not find a single reference / standard for worries me.
->> 
->> RsaKey ::= SEQUENCE {
->>       n INTEGER ({ rsa_get_n }),
->>       e INTEGER ({ rsa_get_e }),
->>       d INTEGER ({ rsa_get_d })
->> }
+Hi Marcel,
+
+> Hi Stephan,
 > 
-> Note, the kernel uses BER encoding.
-
-so what? DER is still valid BER.
-
->> So where is this format coming from? I can find the RSA Public Key format
->> which is a sequence of n and e. If you have a DER encoded RSA public key,
->> then you can use it to encrypt and verify. So that is okay.
->> 
->> However if you have a standard Public Key that OpenSSL would create by
->> default, then things do not work since that is actually a more complicated
->> DER encoded format. However in the end, I would expect that we could also
->> load such a key here. The RSA set key function should auto detect it and
->> extract the right information if it is marked as rsaEncryption type.
+> >> I think we need to split the akcipher_alg setkey callback into a setkey
+> >> and
+> >> setpubkey.
+> >> 
+> >> diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
+> >> index 69d163e39101..ca93952b6d19 100644
+> >> --- a/include/crypto/akcipher.h
+> >> +++ b/include/crypto/akcipher.h
+> >> @@ -91,6 +91,8 @@ struct akcipher_alg {
+> >> 
+> >>       int (*decrypt)(struct akcipher_request *req);
+> >>       int (*setkey)(struct crypto_akcipher *tfm, const void *key,
+> >>       
+> >>                     unsigned int keylen);
+> >> 
+> >> +       int (*setpubkey)(struct crypto_akcipher *tfm, const void *key,
+> >> +                        unsigned int keylen);
+> >> 
+> >>       int (*init)(struct crypto_akcipher *tfm);
+> >>       void (*exit)(struct crypto_akcipher *tfm);
+> >> 
+> >> If the cipher actually uses two different formats for the public +
+> >> private
+> > 
+> > The public key is n + e.
+> > 
+> > The private key is n + d.
 > 
-> Do you propose to add a DER parser to the kernel? I feel that the BER parser 
-> is complex enough. If somebody has a DER key, user space should have the code 
-> to convert it to BER.
-
-Why would you do that? DER is still valid BER.
-
->> My biggest concern however is that this does not reassemble the RSA Private
->> Key at all. That key format is a sequence of 9 integers starting with a
->> version. So logically I would expect that I can just set a RSA Private Key
->> and then utilize the encrypt and decrypt features of the RSA cipher.
+> for RSA Public Key it is just n and e. However for RSA Private Key it is n
+> and e and d and also version, primes etc. So the RSA Public Key contains a
+> sequence of 2 integers and the RSA Private Key contains a sequence of 9
+> integers.
+> > Both are encoded in the BER structure the current API requires. It is
+> > perfectly valid to provide only n + e when you do public key operations.
 > 
-> Why do you think this is not possible? testmgr.h seems to exactly do that.
-
-It does not. The RSA Private Key has a different format.
-
-      RSAPrivateKey ::= SEQUENCE {
-          version           Version,
-          modulus           INTEGER,  -- n
-          publicExponent    INTEGER,  -- e
-          privateExponent   INTEGER,  -- d
-          prime1            INTEGER,  -- p
-          prime2            INTEGER,  -- q
-          exponent1         INTEGER,  -- d mod (p-1)
-          exponent2         INTEGER,  -- d mod (q-1)
-          coefficient       INTEGER,  -- (inverse of q) mod p
-      }
-
-And honestly that the RSA Public Key magically matches seems more luck then clear intention.
-
-      RSAPublicKey ::= SEQUENCE {
-          modulus           INTEGER,  -- n
-          publicExponent    INTEGER   -- e
-      }
-
-So what you have in testmgr.h is neither RSA Private Key nor RSA Public Key. It is a brand new format that is sadly Linux specific.
-
->> When it comes to exposing RSA via AF_ALG and akcipher, I really want standard
->> format for the set key operation. Asking userspace to construct this Linux
->> kernel only key format is not helpful. You want to be able to just load the
->> RSA Private Key in DER format and be done with it.
+> And from an API perspective that is fully wrong from my point of view. We
+> just invented another format that is not in any standard. The two standard
+> key formats for RSA are RSA Private Key and RSA Public Key. These are the
+> ones we should support.
 > 
-> I am all for it. BER is a standard, is it not? Yes, I have not yet seen a 
-> converter for DER to BER (and I have not searched for one either). But I feel 
-> DER should be left to user space.
-
-DER is valid BER. However just saying the key is BER has no meaning whatsoever. It does not define an actual key format.
-
-What I would like to see is support for RSA Private Key (DER encoded) and RSA Public Key (DER encoded) when using the RSA cipher. That makes sense to me. Everything else is just insanity since we force the user to convert well known formats into new ones for no apparent reason.
-
->> Any ideas on how we can fix this to allow a sensible userspace API?
+> The format with n plus e and optionally d is total Linux invention as far as
+> I can tell. And I do not want this exposed to userspace.
 > 
-> I actually planned to add a BER encoder to my libkcapi. I feel that should be 
-> right place to provide that code, including a potential DER to BER converter.
+> For a clean separation I think splitting this into setkey for the RSA
+> Private Key and setpubkey for the RSA Public Key is pretty obvious choice.
 
-No idea what DER to BER would give you since DER is always valid BER. I see no need for BER or DER encoders if the keys and also certificates are already available in DER format your system (or can be easily converted from PEM to DER with standard tools).
+Please define exactly what your pubkey and your privkey contains. Even when I 
+think of the DER keys from OpenSSL, we once have n+e and once n+e+d (see 
+asn1dump), no?
 
-Seriously, I want to take the RSA Private Key that comes out of OpenSSL and use it. I want to be able to extract the RSA Public Key out of a certificate and use it. Plain and simple. No other gimmicks, conversions or tricks to play. Using existing key format standards is really the key here.
 
-Regards
+> > Please see in the testmgr.h for the 2048 bit key test vector (i.e. the one
+> > with public_key_vec = true). The BER structure has nice comments from
+> > Tadeusz to indicate it only contains n and e without d.
+> 
+> And it is totally made up format. Why would you force conversion of a RSA
 
-Marcel
+BER is a made up implementation? I do not think so: 
+https://en.wikipedia.org/wiki/Basic_Encoding_Rules
+
+Or do you say that the kernel's implementation of BER is broken?
+
+> Public Key or RSA Private Key in DER format into this format. This Linux
+> only input format makes it just complicated for no reason. It is also not
+> documented anywhere as I can tell. I had to dig this out of the code and
+> rsakey.asn1.
+> 
+> As mentioned above, splitting this into two functions makes this simpler.
+> For all intense and purposes this is akcipher so we always either have
+> public/private key pair or we just have the public key. And at least with
+> RSA they are defined as two independent formats.
+
+I can see that user space (e.g. libkcapi) has such two functions. But 
+currently I do not see such distinction necessary in the kernel as mentioned 
+above.
+> 
+> Since the parsing of the key data is not a generic handling, I do not see a
+> good enough reason to invent new formats. Use the format the cipher you
+> implement already has defined.
+> > Thus, I do not currently understand your request. May I ask you to give
+> > more explanation why the use of BER is insufficient?
+> 
+> Tell me how you create this Linux specific BER encoded key. I would like
+> someone to provide the magic OpenSSL conversion command line to get this.
+
+Again: there is no DER to BER converter that I am aware of. Agreed, that 
+should be there. But currently I do not see that the kernel should do that.
+
+> Hand crafting such keys when there is a standard format for RSA Private Key
+> and RSA Public Key makes no sense whatsoever.
+
+Fully agreed. Thus, a BER encoder is on my agenda for libkcapi.
+
+-- 
+Ciao
+Stephan
