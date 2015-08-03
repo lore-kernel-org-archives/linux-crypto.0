@@ -1,42 +1,56 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: Limited usefulness of RSA set key function
-Date: Mon, 03 Aug 2015 11:32:41 -0700
-Message-ID: <55BFB3C9.7060407@intel.com>
-References: <BC087D1C-7D4D-4F6D-9644-B2043C3E39D3@holtmann.org> <3848823.PNN01JLIZu@tauon.atsec.com> <6876D9AA-A51A-4D79-9127-3B3ED58784CA@holtmann.org> <1580424.u6GEQiXd8T@myon.chronox.de> <2726A091-A7A2-451F-BB11-A19A73DA3C36@holtmann.org> <55BFA0B5.6070107@intel.com> <6C3A9837-2B02-4133-B916-40F0F1BAF51B@holtmann.org> <55BFAA5C.6010101@intel.com> <C0C27417-4970-48AF-A115-0C83DC000EBE@holtmann.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: talitos: Remove zero_entry static initializer
+Date: Tue, 4 Aug 2015 07:31:20 +0800
+Message-ID: <20150803233120.GA26617@gondor.apana.org.au>
+References: <985540634.83104.1438363661992.JavaMail.zimbra@xes-inc.com>
+ <926902712.309275.1438618477197.JavaMail.zimbra@xes-inc.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: David Howells <dhowells@redhat.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	linux-crypto@vger.kernel.org
-To: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Christophe Leroy <christophe.leroy@c-s.fr>
+To: Aaron Sierra <asierra@xes-inc.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:36870 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753826AbbHCSdu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Aug 2015 14:33:50 -0400
-In-Reply-To: <C0C27417-4970-48AF-A115-0C83DC000EBE@holtmann.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:47573 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754224AbbHCXba (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 3 Aug 2015 19:31:30 -0400
+Content-Disposition: inline
+In-Reply-To: <926902712.309275.1438618477197.JavaMail.zimbra@xes-inc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/03/2015 11:20 AM, Marcel Holtmann wrote:
-> actually I think this reasoning needs to be revisited. When I look at this, this makes no sense whatsoever. The end result is that we have keys in multiple formats in the kernel and have to convert between them or parse them again.
+On Mon, Aug 03, 2015 at 11:14:37AM -0500, Aaron Sierra wrote:
+> Compiling the talitos driver with my GCC 4.3.1 e500v2 cross-compiler
+> resulted in a failed build due to the anonymous union/structures
+> introduced in this commit:
 > 
-> If you do not want to use struct public_key, then lets go for struct key as I proposed in my other response. That should in the end be able to represent hardware keys as well. There is really no good reason to move things around and parse them again or create new formats out of it.
+>   crypto: talitos - enhanced talitos_desc struct for SEC1
 > 
-> My take is that we want to store a key once in a single location and single location only. Storing the same key in different formats in different locations is just a plain bad idea. Keep it secure and locked in one place.
+> The build error was:
 > 
+>   drivers/crypto/talitos.h:56: error: unknown field 'len' specified in initializer
+>   drivers/crypto/talitos.h:56: warning: missing braces around initializer
+>   drivers/crypto/talitos.h:56: warning: (near initialization for 'zero_entry.<anonymous>')
+>   drivers/crypto/talitos.h:57: error: unknown field 'j_extent' specified in initializer
+>   drivers/crypto/talitos.h:58: error: unknown field 'eptr' specified in initializer
+>   drivers/crypto/talitos.h:58: warning: excess elements in struct initializer
+>   drivers/crypto/talitos.h:58: warning: (near initialization for 'zero_entry')
+>   make[2]: *** [drivers/crypto/talitos.o] Error 1
+>   make[1]: *** [drivers/crypto] Error 2
+>   make: *** [drivers] Error 2
+> 
+> This patch eliminates the errors by moving the static constant
+> zero_entry to the talitos_private structure. As a member of that
+> structure, zero_entry gets initialized for free (and compatibly) by
+> the kzalloc() during device probe.
 
-The approach was not to use any of the existing public key stuff.
-To be consistent with all the other crypto API tfm needs to "own" the key.
-The existing struct key is not controlled by the tfm and the key can be gone without tfm knowing.
-We can change this approach, but this is not my call, but Herbert's.
-Herbert, any comments?
+Why? A static variable is always zeroed.  Please just get rid
+of the initialisation and it will work.
 
-> I hope someone is looking at lib/digsig.c as well and gets this all cleaned up into a single implementation. However for this to happen, we really need to get this key stuff figured out. Right now this looks to me like the left hand does not know what the right hand is doing.
-
-Yes, your are right, but crypto/public_key/rsa.c and lib/digsig.c have been added long before akcipher.
-Now we are trying to get all this fixed, but we need to have stable API before any of it will be converted.
-Thanks,
-T
- 
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
