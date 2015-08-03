@@ -1,124 +1,66 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: Proposal for adding setpubkey callback to akcipher_alg
-Date: Mon, 03 Aug 2015 09:15:12 +0200
-Message-ID: <14682477.78a1L9JDin@myon.chronox.de>
-References: <905E1812-AD9B-4188-A668-3CD8985EA1BF@holtmann.org> <1704807.Rn4DsddD6R@tauon.atsec.com> <70C201C0-233D-4912-9856-C8C0E7A6A0FA@holtmann.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.2
+Date: Mon, 3 Aug 2015 15:16:36 +0800
+Message-ID: <20150803071636.GA19444@gondor.apana.org.au>
+References: <20140123115319.GA20602@gondor.apana.org.au>
+ <20140401100001.GA12386@gondor.apana.org.au>
+ <20140605062336.GA14440@gondor.apana.org.au>
+ <20140804130339.GA1178@gondor.apana.org.au>
+ <20141007131826.GA29688@gondor.apana.org.au>
+ <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150626102234.GA19393@gondor.apana.org.au>
+ <20150630135135.GA24621@gondor.apana.org.au>
+ <20150713040858.GA7160@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Howells <dhowells@redhat.com>,
-	linux-crypto@vger.kernel.org
-To: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:48072 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751789AbbHCHPQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Aug 2015 03:15:16 -0400
-In-Reply-To: <70C201C0-233D-4912-9856-C8C0E7A6A0FA@holtmann.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:34952 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751884AbbHCHQp (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 3 Aug 2015 03:16:45 -0400
+Content-Disposition: inline
+In-Reply-To: <20150713040858.GA7160@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 3. August 2015, 00:03:03 schrieb Marcel Holtmann:
+Hi Linus:
 
-Hi Marcel,
+This push fixes the following issues:
 
-> Hi Stephan,
-> 
-> >> I think we need to split the akcipher_alg setkey callback into a setkey
-> >> and
-> >> setpubkey.
-> >> 
-> >> diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
-> >> index 69d163e39101..ca93952b6d19 100644
-> >> --- a/include/crypto/akcipher.h
-> >> +++ b/include/crypto/akcipher.h
-> >> @@ -91,6 +91,8 @@ struct akcipher_alg {
-> >> 
-> >>       int (*decrypt)(struct akcipher_request *req);
-> >>       int (*setkey)(struct crypto_akcipher *tfm, const void *key,
-> >>       
-> >>                     unsigned int keylen);
-> >> 
-> >> +       int (*setpubkey)(struct crypto_akcipher *tfm, const void *key,
-> >> +                        unsigned int keylen);
-> >> 
-> >>       int (*init)(struct crypto_akcipher *tfm);
-> >>       void (*exit)(struct crypto_akcipher *tfm);
-> >> 
-> >> If the cipher actually uses two different formats for the public +
-> >> private
-> > 
-> > The public key is n + e.
-> > 
-> > The private key is n + d.
-> 
-> for RSA Public Key it is just n and e. However for RSA Private Key it is n
-> and e and d and also version, primes etc. So the RSA Public Key contains a
-> sequence of 2 integers and the RSA Private Key contains a sequence of 9
-> integers.
-> > Both are encoded in the BER structure the current API requires. It is
-> > perfectly valid to provide only n + e when you do public key operations.
-> 
-> And from an API perspective that is fully wrong from my point of view. We
-> just invented another format that is not in any standard. The two standard
-> key formats for RSA are RSA Private Key and RSA Public Key. These are the
-> ones we should support.
-> 
-> The format with n plus e and optionally d is total Linux invention as far as
-> I can tell. And I do not want this exposed to userspace.
-> 
-> For a clean separation I think splitting this into setkey for the RSA
-> Private Key and setpubkey for the RSA Public Key is pretty obvious choice.
-
-Please define exactly what your pubkey and your privkey contains. Even when I 
-think of the DER keys from OpenSSL, we once have n+e and once n+e+d (see 
-asn1dump), no?
+* A bogus BUG_ON in ixp4xx that can be triggered by a dst buffer
+  that is an SG list.
+* The error handling in hwrngd may cause a crash in case of an error.
+* Fix a race condition in qat registration when multiple devices are
+  present.
 
 
-> > Please see in the testmgr.h for the 2048 bit key test vector (i.e. the one
-> > with public_key_vec = true). The BER structure has nice comments from
-> > Tadeusz to indicate it only contains n and e without d.
-> 
-> And it is totally made up format. Why would you force conversion of a RSA
+Please pull from
 
-BER is a made up implementation? I do not think so: 
-https://en.wikipedia.org/wiki/Basic_Encoding_Rules
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-Or do you say that the kernel's implementation of BER is broken?
 
-> Public Key or RSA Private Key in DER format into this format. This Linux
-> only input format makes it just complicated for no reason. It is also not
-> documented anywhere as I can tell. I had to dig this out of the code and
-> rsakey.asn1.
-> 
-> As mentioned above, splitting this into two functions makes this simpler.
-> For all intense and purposes this is akcipher so we always either have
-> public/private key pair or we just have the public key. And at least with
-> RSA they are defined as two independent formats.
+Herbert Xu (1):
+      crypto: ixp4xx - Remove bogus BUG_ON on scattered dst buffer
 
-I can see that user space (e.g. libkcapi) has such two functions. But 
-currently I do not see such distinction necessary in the kernel as mentioned 
-above.
-> 
-> Since the parsing of the key data is not a generic handling, I do not see a
-> good enough reason to invent new formats. Use the format the cipher you
-> implement already has defined.
-> > Thus, I do not currently understand your request. May I ask you to give
-> > more explanation why the use of BER is insufficient?
-> 
-> Tell me how you create this Linux specific BER encoded key. I would like
-> someone to provide the magic OpenSSL conversion command line to get this.
+Martin Schwidefsky (1):
+      hwrng: core - correct error check of kthread_run call
 
-Again: there is no DER to BER converter that I am aware of. Agreed, that 
-should be there. But currently I do not see that the kernel should do that.
+Tadeusz Struk (1):
+      crypto: qat - Fix invalid synchronization between register/unregister sym algs
 
-> Hand crafting such keys when there is a standard format for RSA Private Key
-> and RSA Public Key makes no sense whatsoever.
+ drivers/char/hw_random/core.c            |    2 +-
+ drivers/crypto/ixp4xx_crypto.c           |    1 -
+ drivers/crypto/qat/qat_common/qat_algs.c |   24 ++++++++++++++++--------
+ 3 files changed, 17 insertions(+), 10 deletions(-)
 
-Fully agreed. Thus, a BER encoder is on my agenda for libkcapi.
-
+Thanks,
 -- 
-Ciao
-Stephan
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
