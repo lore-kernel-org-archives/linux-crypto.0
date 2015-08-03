@@ -1,41 +1,50 @@
 From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Limited usefulness of RSA set key function
-Date: Sun, 2 Aug 2015 21:16:47 -0700
-Message-ID: <BC087D1C-7D4D-4F6D-9644-B2043C3E39D3@holtmann.org>
+Subject: Proposal for adding setpubkey callback to akcipher_alg
+Date: Sun, 2 Aug 2015 22:28:33 -0700
+Message-ID: <905E1812-AD9B-4188-A668-3CD8985EA1BF@holtmann.org>
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 8BIT
 Cc: linux-crypto@vger.kernel.org
 To: Tadeusz Struk <tadeusz.struk@intel.com>,
-	Stephan Mueller <smueller@chronox.de>
+	Stephan Mueller <smueller@chronox.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:34397 "EHLO
+Received: from senator.holtmann.net ([87.106.208.187]:46420 "EHLO
 	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751567AbbHCEQy convert rfc822-to-8bit (ORCPT
+	with ESMTP id S1752587AbbHCF2o convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Aug 2015 00:16:54 -0400
+	Mon, 3 Aug 2015 01:28:44 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Hi Tadeusz,
 
-I have been working with the AF_ALG patches for akcipher lately and I find the RSA set key function way too limited. Especially the fact that it uses a format that I can not find a single reference / standard for worries me.
+I think we need to split the akcipher_alg setkey callback into a setkey and setpubkey.
 
-RsaKey ::= SEQUENCE {
-        n INTEGER ({ rsa_get_n }),
-        e INTEGER ({ rsa_get_e }),
-        d INTEGER ({ rsa_get_d })
-}
+diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
+index 69d163e39101..ca93952b6d19 100644
+--- a/include/crypto/akcipher.h
++++ b/include/crypto/akcipher.h
+@@ -91,6 +91,8 @@ struct akcipher_alg {
+        int (*decrypt)(struct akcipher_request *req);
+        int (*setkey)(struct crypto_akcipher *tfm, const void *key,
+                      unsigned int keylen);
++       int (*setpubkey)(struct crypto_akcipher *tfm, const void *key,
++                        unsigned int keylen);
+        int (*init)(struct crypto_akcipher *tfm);
+        void (*exit)(struct crypto_akcipher *tfm);
+ 
+If the cipher actually uses two different formats for the public + private key data compared to just the public key data, then it is useful to have these independent. That way we can use standard formats for the keys and do not have to have a Linux kernel specific key format.
 
-So where is this format coming from? I can find the RSA Public Key format which is a sequence of n and e. If you have a DER encoded RSA public key, then you can use it to encrypt and verify. So that is okay.
+My definition would be that setkey sets the private and public key. And the setpubkey only sets the public key. So depending on which format of keys you have, you call the proper function and it will do the rest for you. At least for RSA this solves the problem that I described in my previous email and we could use RSA standard ASN.1 formats for each of the key files.
 
-However if you have a standard Public Key that OpenSSL would create by default, then things do not work since that is actually a more complicated DER encoded format. However in the end, I would expect that we could also load such a key here. The RSA set key function should auto detect it and extract the right information if it is marked as rsaEncryption type.
+For obvious reasons, when you only call setpubkey, then only encrypt and verify will work. However if you call setkey, then you can sign, verify, encrypt and decrypt.
 
-My biggest concern however is that this does not reassemble the RSA Private Key at all. That key format is a sequence of 9 integers starting with a version. So logically I would expect that I can just set a RSA Private Key and then utilize the encrypt and decrypt features of the RSA cipher.
+When exposing akcipher via AF_ALG, I would also propose to add a ALG_SET_PUBKEY so that userspace can clearly tell the kernel which part of the keys it has. This would map nicely and we then know which ASN.1 decoder to call instead of having to guess what format userspace provided. In case of RSA, the user already selected RSA as cipher. So it either has RSA Public Key and would use ALG_SET_PUBKEY or it has RSA Private Key and would use ALG_SET_KEY. Since the key formats do not describe themselves, I think this is the cleaner solution from an API point of view.
 
-When it comes to exposing RSA via AF_ALG and akcipher, I really want standard format for the set key operation. Asking userspace to construct this Linux kernel only key format is not helpful. You want to be able to just load the RSA Private Key in DER format and be done with it.
-
-Any ideas on how we can fix this to allow a sensible userspace API?
+On a side note, that the ASN.1 decoder accepts a key with two integers even while the format describes three integers seems like a bug in the decoder and not a feature. If the third integer is not marked as optional, the decoder should just fail the parsing.
 
 Regards
 
