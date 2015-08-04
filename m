@@ -1,62 +1,47 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: authenc - Add Kconfig dependency on CRYPTO_NULL
-Date: Tue, 4 Aug 2015 21:23:14 +0800
-Message-ID: <20150804132314.GA30001@gondor.apana.org.au>
-References: <201508042101.3gC1H0dE%fengguang.wu@intel.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH 6/8] crypto: qat - Convert to new AEAD interface
+Date: Tue, 04 Aug 2015 06:26:58 -0700
+Message-ID: <55C0BDA2.2030302@intel.com>
+References: <20150730094138.GA15941@gondor.apana.org.au> <E1ZKkWe-0004C6-SN@gondolin.me.apana.org.au> <55BBDD1F.4020208@intel.com> <20150802012354.GB10055@gondor.apana.org.au> <55BF9E4E.6020006@intel.com> <20150804095909.GA28167@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org
-To: kbuild test robot <fengguang.wu@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:43747 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933244AbbHDNXX (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 4 Aug 2015 09:23:23 -0400
-Content-Disposition: inline
-In-Reply-To: <201508042101.3gC1H0dE%fengguang.wu@intel.com>
+Received: from mga02.intel.com ([134.134.136.20]:48923 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933244AbbHDN1u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 4 Aug 2015 09:27:50 -0400
+In-Reply-To: <20150804095909.GA28167@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 04, 2015 at 09:20:03PM +0800, kbuild test robot wrote:
-> tree:   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> head:   a4198fd4b487afc60810f5a12b994721df220022
-> commit: 92d95ba91772279b6ef9c6e09661f67abcf27259 [91/97] crypto: authenc - Convert to new AEAD interface
-> config: i386-randconfig-i0-201531 (attached as .config)
-> reproduce:
->   git checkout 92d95ba91772279b6ef9c6e09661f67abcf27259
->   # save the attached .config to linux build tree
->   make ARCH=i386 
+On 08/04/2015 02:59 AM, Herbert Xu wrote:
+> Good catch.  However it's not as simple as that.  We have a bigger
+> problem here.
 > 
-> All error/warnings (new ones prefixed by >>):
+> For software implementations it's really easy because we use the
+> module reference count to prevent unregisters from happening while
+> there are tfms using it.
 > 
->    crypto/built-in.o: In function `crypto_authenc_exit_tfm':
-> >> authenc.c:(.text+0x19141): undefined reference to `crypto_put_default_null_skcipher'
->    crypto/built-in.o: In function `crypto_authenc_init_tfm':
-> >> authenc.c:(.text+0x19198): undefined reference to `crypto_get_default_null_skcipher'
+> However for hardware devices this breaks down because you can remove
+> the device at any time.  So we'll have to come up with a way of
+> handling this without causing live tfms to explode.
+> 
+> FWIW the current qat code (and possibly other drivers) is buggy
+> because if you call unregister while there are still tfms using
+> it, it will BUG in the unregister call.
 
-Thanks!
+The way we handle it in qat is as follows - when tfm allocates a
+crypto "instance" on a qat dev it then calls qat_crypto_put_instance(),
+which calls also adf_dev_put() on the appropriate qat device.
+This then calls module_put() on accel_dev->owner.
+This way, when any tfm is allocated on a device the attempts to rmmod
+or ioctl shutdown returns -EBUSY. See adf_ctl_is_device_in_use()
+One can only successfully shut down a device or rmmod qat_dh895 when
+all tfms are freed.
 
----8<---
-CRYPTO_AUTHENC needs to depend on CRYPTO_NULL as authenc uses
-null for copying.
-
-Reported-by: Reported-by: Fengguang Wu <fengguang.wu@intel.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 354bb69..ac7cc62 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -200,6 +200,7 @@ config CRYPTO_AUTHENC
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_MANAGER
- 	select CRYPTO_HASH
-+	select CRYPTO_NULL
- 	help
- 	  Authenc: Combined mode wrapper for IPsec.
- 	  This is required for IPSec.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+The only possibility when we may try to restart a device when tfms are
+allocated is when we handle HW uncorrectable errors, which in theory
+should never happen :)
