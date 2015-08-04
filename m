@@ -1,76 +1,112 @@
-From: Aaron Sierra <asierra@xes-inc.com>
-Subject: Re: [PATCH] crypto: talitos: Prevent panic in probe error path
-Date: Tue, 4 Aug 2015 09:43:50 -0500 (CDT)
-Message-ID: <1540044765.55441.1438699430229.JavaMail.zimbra@xes-inc.com>
-References: <985540634.83104.1438363661992.JavaMail.zimbra@xes-inc.com> <296998949.155413.1438375938630.JavaMail.zimbra@xes-inc.com> <20150804071805.GA29697@gondor.apana.org.au>
+From: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@freescale.com>
+Subject: Re: [BUG?] crypto: caam: little/big endianness on ARM vs PPC
+Date: Tue, 4 Aug 2015 20:55:50 +0300
+Message-ID: <55C0FCA6.6070806@freescale.com>
+References: <20150615155907.GC7947@pengutronix.de>
+ <CALHpu34FHKTHr-2TZ-6Tmctev3WjBVTKfDbr6TYOJiOt+yDvfQ@mail.gmail.com>
+ <20150615171848.GP7557@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Christophe Leroy <christophe.leroy@c-s.fr>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	<linux-kernel@vger.kernel.org>,
+	Ruchika Gupta <ruchika.gupta@freescale.com>,
+	<linux-crypto@vger.kernel.org>,
+	Sascha Hauer <kernel@pengutronix.de>,
+	<linux-arm-kernel@lists.infradead.org>,
+	Scott Wood <scottwood@freescale.com>
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>,
+	Jon Nettleton <jon.nettleton@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from xes-mad.com ([216.165.139.218]:19070 "EHLO xes-mad.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752074AbbHDOpB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 4 Aug 2015 10:45:01 -0400
-In-Reply-To: <20150804071805.GA29697@gondor.apana.org.au>
+Received: from mail-bn1on0145.outbound.protection.outlook.com ([157.56.110.145]:46528
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753915AbbHDR4C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 4 Aug 2015 13:56:02 -0400
+In-Reply-To: <20150615171848.GP7557@n2100.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
------ Original Message -----
-> From: "Herbert Xu" <herbert@gondor.apana.org.au>
-> Sent: Tuesday, August 4, 2015 2:18:05 AM
+On 6/15/2015 8:18 PM, Russell King - ARM Linux wrote:
+> On Mon, Jun 15, 2015 at 06:33:17PM +0200, Jon Nettleton wrote:
+>> Funny enough I tackled this problem over the weekend as well.  My
+>> approach was to switch the driver over to use the *_relaxed() io
+>> functions and then special case the bits missing from the various
+>> ARCHs.  Basically adding setbits32 and clrbits32 for !PPC
+>> architectures and letting PPC and ARM share a writeq/readq set of
+>> functions.  I left the existing LITTLE_ENDIAN special case until I
+>> could verify if it was needed, or had been tested.
 > 
-> On Fri, Jul 31, 2015 at 03:52:18PM -0500, Aaron Sierra wrote:
-> >
-> > @@ -2905,8 +2919,7 @@ static int talitos_probe(struct platform_device
-> > *ofdev)
-> >  	priv->reg = of_iomap(np, 0);
-> >  	if (!priv->reg) {
-> >  		dev_err(dev, "failed to of_iomap\n");
-> > -		err = -ENOMEM;
-> > -		goto err_out;
-> > +		return -ENOMEM;
-> >  	}
+> I'll follow up here with what I've mentioned elsewhere, and some further
+> thoughts.
 > 
-> This is the only bit that seems remotely related to your change
-> description.  Please ensure that your patch actually corresponds
-> to your changelog and do not include unrelated changes without
-> documenting them.
+> I think this shows the dangers of using struct { } to define register
+> offsets.  Let's start here:
 > 
-> And even this bit is wrong because you're leaking priv.
+> /*
+>  * caam_job_ring - direct job ring setup
+>  * 1-4 possible per instantiation, base + 1000/2000/3000/4000
+>  * Padded out to 0x1000
+>  */
+> struct caam_job_ring {
+>         /* Input ring */
+>         u64 inpring_base;       /* IRBAx -  Input desc ring baseaddr */
+>         u32 rsvd1;
+> 
+> Apparently, this is a CPU-endian 64-bit value (it's not defined using
+> le64 or be64 which would "fix" it's endian.)
 
-Herbert,
+The IP in question (CAAM) has different endianness, depending on the
+integration on the SoC. Would it be ok to #define a sec64 type which
+would translate either to be64 or le64?
 
-You are correct about the leak and I regret introducing that (I am
-also leaking priv->rng), but I disagree with your dismissal of the
-rest of the changes as unrelated to the changelog.
+> 
+> The second question, which comes up in light of the breakage that's
+> being reported is: is this really a 64-bit register, or is it a pair
+> of 32-bit registers side-by-side?
+> 
+> The documentation I'm looking at doesn't document the register at
+> base + 0x1000, but documents the one at base + 0x1004, and the one
+> at 0x1004 is given the name "IRBAR0_LS", which presumably stands
+> for "input ring base address register 0, least significant".
+> 
+> As the code originally stood for PPC, IRBAR0_LS is also at 0x1004,
+> but appears to be big endian.
+> 
+> On ARM, IRBAR0_LS appears at the same address, but is little endian.
 
-The probe error path for this driver, for all intents and purposes,
-is the talitos_remove() function due to the common "goto err_out".
+In some cases, CAAM endianness does not match CPU endianness (for e.g.
+i.MX). We're talking about default endianness here, both for CAAM and
+for CPU - no CONFIG_CPU_{BIG,LITTLE}_ENDIAN.
+ARCH	CPU	CAAM	SoC
+PPC	BIG	BIG	P4080, T4240 etc.
+ARM	LITTLE	LITTLE	LS1021A, LS2085A etc.
+ARM	LITTLE	BIG	i.MX6, i.MX7, LS1043A
 
-Without my patch applied, talitos_remove() will panic under the
-two conditions that I outlined in the changelog:
+> This is *not* a 64-bit register at all, but is a pair of 32-bit
+> registers side by side.  Moreover, readq() should not be used - no
+> amount of arch mangling could ever produce a sane readq() which
+> coped with this.
+> 
+> So, the CAAM code is buggy in this regard: using readq() here when
+> endian-portability is required is wrong.  It's got to be two 32-bit
+> reads or two 32-bit writes in the appropriate endian.
+> 
+> Also, note that there's a big difference between __raw_readl() and
+> readl_relaxed().  readl_relaxed() is always little-endian.  __raw_readl()
+> is god-knows-what-the-archtecture-decides endian.  Switching PPC
+> drivers from __raw_readl() to readl_relaxed() is really not a good
+> idea unless someone from the PPC camp reviews and tests the code.
+> 
+> So, what I'd suggest is just fixing rd_reg64() and wr_reg64() to do
+> the right thing: keeping the two 32-bit words in the same order
+> irrespective of the endian-ness, and staying with the __raw_*
+> accessors until PPC people can look at this.
 
-1. If the RNG device hasn't been registered via
-   talitos_register_rng() prior to entry into talitos_remove(),
-   then the attempt to unregister the RNG "device" will cause a panic.
+Agree that the I/O accessors need to be revisited.
+Unfortunately, the proposed change does not work for LE CAAM (LS1021A).
+I'll send a fix.
 
-2. If the priv->chan array has not been allocated prior to entry
-   into talitos_remove(), then the per-channel FIFO cleanup will panic
-   because of the dereference of that NULL "array".
-
-Both of the above scenarios occur if talitos_probe_irq() fails.
-
-The patch that I submitted resolves issue #1 by changing priv->rng
-to a struct hwrng pointer, which allows talitos_unregister_rng() to
-know whether an RNG device has been registered (or at least prepared
-for registration). As an alternative, I considered introducing a
-boolean to serve the same purpose.
-
-It resolves issue #2 by checking that priv->chan is not NULL in the
-per-channel FIFO cleanup for loop.
-
--Aaron
+Thanks,
+Horia
