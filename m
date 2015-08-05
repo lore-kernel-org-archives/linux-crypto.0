@@ -1,64 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: talitos: Prevent panic in probe error path
-Date: Wed, 5 Aug 2015 08:08:13 +0800
-Message-ID: <20150805000813.GA2725@gondor.apana.org.au>
-References: <985540634.83104.1438363661992.JavaMail.zimbra@xes-inc.com>
- <296998949.155413.1438375938630.JavaMail.zimbra@xes-inc.com>
- <20150804071805.GA29697@gondor.apana.org.au>
- <1540044765.55441.1438699430229.JavaMail.zimbra@xes-inc.com>
+Subject: Re: Proposal for adding setpubkey callback to akcipher_alg
+Date: Wed, 5 Aug 2015 10:46:00 +0800
+Message-ID: <20150805024600.GA3878@gondor.apana.org.au>
+References: <905E1812-AD9B-4188-A668-3CD8985EA1BF@holtmann.org>
+ <1704807.Rn4DsddD6R@tauon.atsec.com>
+ <70C201C0-233D-4912-9856-C8C0E7A6A0FA@holtmann.org>
+ <14682477.78a1L9JDin@myon.chronox.de>
+ <3743CED6-E3E0-416E-9B82-F1677628E35E@holtmann.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Christophe Leroy <christophe.leroy@c-s.fr>
-To: Aaron Sierra <asierra@xes-inc.com>
+Cc: Stephan Mueller <smueller@chronox.de>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	David Howells <dhowells@redhat.com>,
+	linux-crypto@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47456 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:51143 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751740AbbHEAIW (ORCPT
+	with ESMTP id S1751852AbbHECqP (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 4 Aug 2015 20:08:22 -0400
+	Tue, 4 Aug 2015 22:46:15 -0400
 Content-Disposition: inline
-In-Reply-To: <1540044765.55441.1438699430229.JavaMail.zimbra@xes-inc.com>
+In-Reply-To: <3743CED6-E3E0-416E-9B82-F1677628E35E@holtmann.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 04, 2015 at 09:43:50AM -0500, Aaron Sierra wrote:
+On Mon, Aug 03, 2015 at 12:25:31AM -0700, Marcel Holtmann wrote:
 > 
-> You are correct about the leak and I regret introducing that (I am
-> also leaking priv->rng), but I disagree with your dismissal of the
-> rest of the changes as unrelated to the changelog.
+> RSA Private Key is n + e + d (including 6 other fields). RSA Public Key is n + e (no other fields).
+> 
+> So for RSA you would make setkey to take RSA Private Key and setpubkey to take RSA Public Key. Meaning you only have to use one of them since if you have the private key, you always have the public key.
+> 
+> This real difference here is that you can provide the key in two different key formats. As explained RSA uses two different format.
 
-I understand the problem, but your change description is way
-too vague and does not correspond to the change, especially the
-bit where you're replacing the static variable with kzalloc.  You
-should have included the following text in your description.
+I don't have a problem with a setpubkey/setprivkey split interface.
 
-> The probe error path for this driver, for all intents and purposes,
-> is the talitos_remove() function due to the common "goto err_out".
-> 
-> Without my patch applied, talitos_remove() will panic under the
-> two conditions that I outlined in the changelog:
-> 
-> 1. If the RNG device hasn't been registered via
->    talitos_register_rng() prior to entry into talitos_remove(),
->    then the attempt to unregister the RNG "device" will cause a panic.
-> 
-> 2. If the priv->chan array has not been allocated prior to entry
->    into talitos_remove(), then the per-channel FIFO cleanup will panic
->    because of the dereference of that NULL "array".
-> 
-> Both of the above scenarios occur if talitos_probe_irq() fails.
-> 
-> The patch that I submitted resolves issue #1 by changing priv->rng
-> to a struct hwrng pointer, which allows talitos_unregister_rng() to
-> know whether an RNG device has been registered (or at least prepared
-> for registration). As an alternative, I considered introducing a
-> boolean to serve the same purpose.
+However, I'm totally against importing MPI keys which is just silly.
+The BER-encoded keys are just raw integers.  Most of the hardware
+out there take raw integers.  So it makes no sense to have our
+interface take MPIs instead of raw integers, as this would mean
+converting into MPIs and then straight back into raw integers
+for hardware devices.
 
-I would prefer a boolean as that means less churn.
-
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
