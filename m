@@ -1,7 +1,7 @@
 From: Victoria Milhoan <vicki.milhoan@freescale.com>
-Subject: [PATCH v2 04/14] crypto: caam - Modify Freescale CAAM driver Scatter Gather entry definition
-Date: Wed, 5 Aug 2015 11:28:38 -0700
-Message-ID: <1438799328-10757-5-git-send-email-vicki.milhoan@freescale.com>
+Subject: [PATCH v2 02/14] crypto: caam - Add setbits32/clrbits32/clrsetbits primitives for ARM compatibility
+Date: Wed, 5 Aug 2015 11:28:36 -0700
+Message-ID: <1438799328-10757-3-git-send-email-vicki.milhoan@freescale.com>
 References: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
  <1438799328-10757-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
@@ -12,73 +12,84 @@ Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
 	<robh+dt@kernel.org>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0121.outbound.protection.outlook.com ([65.55.169.121]:60096
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+Received: from mail-by2on0114.outbound.protection.outlook.com ([207.46.100.114]:28832
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752570AbbHES2x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 Aug 2015 14:28:53 -0400
+	id S1753199AbbHES2y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 5 Aug 2015 14:28:54 -0400
 In-Reply-To: <1438799328-10757-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Modify the Scatter-Gather entry definitions for the Freescale
-CAAM driver to include support for both 64- and 32-bit DMA pointers.
+Add set/clear 32-bit primitives for compatibility with ARM devices since
+the primitives were previously only defined for the Power architecture.
 
 Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
 ---
- drivers/crypto/caam/desc.h       | 25 +++++++++++++++++++++----
- drivers/crypto/caam/sg_sw_sec4.h |  1 -
- 2 files changed, 21 insertions(+), 5 deletions(-)
+ drivers/crypto/caam/ctrl.c |  6 +++---
+ drivers/crypto/caam/regs.h | 23 +++++++++++++++++++++++
+ 2 files changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
-index d397ff9..405acbf 100644
---- a/drivers/crypto/caam/desc.h
-+++ b/drivers/crypto/caam/desc.h
-@@ -8,12 +8,29 @@
- #ifndef DESC_H
- #define DESC_H
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 1891809..660cc3e 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -445,9 +445,9 @@ static int caam_probe(struct platform_device *pdev)
+ 	 * Enable DECO watchdogs and, if this is a PHYS_ADDR_T_64BIT kernel,
+ 	 * long pointers in master configuration register
+ 	 */
+-	clrsetbits_be32(&ctrl->mcr, MCFGR_AWCACHE_MASK, MCFGR_AWCACHE_CACH |
+-			MCFGR_WDENABLE | (sizeof(dma_addr_t) == sizeof(u64) ?
+-					 MCFGR_LONG_PTR : 0));
++	clrsetbits_32(&ctrl->mcr, MCFGR_AWCACHE_MASK, MCFGR_AWCACHE_CACH |
++		      MCFGR_WDENABLE | (sizeof(dma_addr_t) == sizeof(u64) ?
++					MCFGR_LONG_PTR : 0));
  
-+/*
-+ * 16-byte hardware scatter/gather table
-+ * An 8-byte table exists in the hardware spec, but has never been
-+ * implemented to date. The 8/16 option is selected at RTL-compile-time.
-+ * and this selection is visible in the Compile Time Parameters Register
-+ */
+ 	/*
+ 	 *  Read the Compile Time paramters and SCFGR to determine
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 5e64352..3a2a788 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -65,9 +65,31 @@
+  *
+  */
+ 
++#ifdef CONFIG_ARM
++/* These are common macros for Power, put here for ARM */
++#define setbits32(_addr, _v) writel((readl(_addr) | (_v)), (_addr))
++#define clrbits32(_addr, _v) writel((readl(_addr) & ~(_v)), (_addr))
 +
-+#define SEC4_SG_LEN_EXT		0x80000000	/* Entry points to table */
-+#define SEC4_SG_LEN_FIN		0x40000000	/* Last ent in table */
-+#define SEC4_SG_BPID_MASK	0x000000ff
-+#define SEC4_SG_BPID_SHIFT	16
-+#define SEC4_SG_LEN_MASK	0x3fffffff	/* Excludes EXT and FINAL */
-+#define SEC4_SG_OFFS_MASK	0x00001fff
++#define out_arch(type, endian, a, v)	__raw_write##type(cpu_to_##endian(v), a)
++#define in_arch(type, endian, a)	endian##_to_cpu(__raw_read##type(a))
 +
- struct sec4_sg_entry {
--	u64 ptr;
--#define SEC4_SG_LEN_FIN 0x40000000
--#define SEC4_SG_LEN_EXT 0x80000000
-+#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-+	dma_addr_t ptr;
-+#else
-+	u32 rsvd1;
-+	dma_addr_t ptr;
++#define out_le32(a, v)	out_arch(l, le32, a, v)
++#define in_le32(a)	in_arch(l, le32, a)
++
++#define out_be32(a, v)	out_arch(l, be32, a, v)
++#define in_be32(a)	in_arch(l, be32, a)
++
++#define clrsetbits(type, addr, clear, set) \
++	out_##type((addr), (in_##type(addr) & ~(clear)) | (set))
++
++#define clrsetbits_be32(addr, clear, set) clrsetbits(be32, addr, clear, set)
++#define clrsetbits_le32(addr, clear, set) clrsetbits(le32, addr, clear, set)
 +#endif
- 	u32 len;
--	u8 reserved;
-+	u8 rsvd2;
- 	u8 buf_pool_id;
- 	u16 offset;
- };
-diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
-index b68b74c..711bb39 100644
---- a/drivers/crypto/caam/sg_sw_sec4.h
-+++ b/drivers/crypto/caam/sg_sw_sec4.h
-@@ -15,7 +15,6 @@ static inline void dma_to_sec4_sg_one(struct sec4_sg_entry *sec4_sg_ptr,
- {
- 	sec4_sg_ptr->ptr = dma;
- 	sec4_sg_ptr->len = len;
--	sec4_sg_ptr->reserved = 0;
- 	sec4_sg_ptr->buf_pool_id = 0;
- 	sec4_sg_ptr->offset = offset;
- #ifdef DEBUG
++
+ #ifdef __BIG_ENDIAN
+ #define wr_reg32(reg, data) out_be32(reg, data)
+ #define rd_reg32(reg) in_be32(reg)
++#define clrsetbits_32(addr, clear, set) clrsetbits_be32(addr, clear, set)
+ #ifdef CONFIG_64BIT
+ #define wr_reg64(reg, data) out_be64(reg, data)
+ #define rd_reg64(reg) in_be64(reg)
+@@ -76,6 +98,7 @@
+ #ifdef __LITTLE_ENDIAN
+ #define wr_reg32(reg, data) __raw_writel(data, reg)
+ #define rd_reg32(reg) __raw_readl(reg)
++#define clrsetbits_32(addr, clear, set) clrsetbits_le32(addr, clear, set)
+ #ifdef CONFIG_64BIT
+ #define wr_reg64(reg, data) __raw_writeq(data, reg)
+ #define rd_reg64(reg) __raw_readq(reg)
 -- 
 2.1.4
