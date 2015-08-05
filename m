@@ -1,7 +1,7 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 3/4] ASN.1: Fix non-match detection failure on data overrun
-Date: Wed, 05 Aug 2015 14:18:32 +0100
-Message-ID: <20150805131832.8933.55883.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 4/4] ASN.1: Handle 'ANY OPTIONAL' in grammar
+Date: Wed, 05 Aug 2015 14:18:42 +0100
+Message-ID: <20150805131842.8933.6659.stgit@warthog.procyon.org.uk>
 References: <20150805131810.8933.59566.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -16,121 +16,136 @@ In-Reply-To: <20150805131810.8933.59566.stgit@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-If the ASN.1 decoder is asked to parse a sequence of objects, non-optional
-matches get skipped if there's no more data to be had rather than a
-data-overrun error being reported.
+An ANY object in an ASN.1 grammar that is marked OPTIONAL should be skipped
+if there is no more data to be had.
 
-This is due to the code segment that decides whether to skip optional
-matches (ie. matches that could get ignored because an element is marked
-OPTIONAL in the grammar) due to a lack of data also skips non-optional
-elements if the data pointer has reached the end of the buffer.
+This can be tested by editing X.509 certificates or PKCS#7 messages to
+remove the NULL from subobjects that look like the following:
 
-This can be tested with the data decoder for the new RSA akcipher algorithm
-that takes three non-optional integers.  Currently, it skips the last
-integer if there is insufficient data.
+	SEQUENCE {
+	  OBJECT(2a864886f70d01010b);
+	  NULL();
+	}
 
-Without the fix, #defining DEBUG in asn1_decoder.c will show something
-like:
+This is an algorithm identifier plus an optional parameter.
 
-	next_op: pc=0/13 dp=0/270 C=0 J=0
-	- match? 30 30 00
-	- TAG: 30 266 CONS
-	next_op: pc=2/13 dp=4/270 C=1 J=0
-	- match? 02 02 00
-	- TAG: 02 257
-	- LEAF: 257
-	next_op: pc=5/13 dp=265/270 C=1 J=0
-	- match? 02 02 00
-	- TAG: 02 3
-	- LEAF: 3
-	next_op: pc=8/13 dp=270/270 C=1 J=0
-	next_op: pc=11/13 dp=270/270 C=1 J=0
-	- end cons t=4 dp=270 l=270/270
+The modified DER can be passed to one of:
 
-The next_op line for pc=8/13 should be followed by a match line.
+	keyctl padd asymmetric "" @s </tmp/modified.x509
+	keyctl padd pkcs7_test foo @s </tmp/modified.pkcs7
 
-This is not exploitable for X.509 certificates by means of shortening the
-message and fixing up the ASN.1 CONS tags because:
+It should work okay with the patch and produce EBADMSG without.
 
- (1) The relevant records being built up are cleared before use.
-
- (2) If the message is shortened sufficiently to remove the public key, the
-     ASN.1 parse of the RSA key will fail quickly due to a lack of data.
-
- (3) Extracted signature data is either turned into MPIs (which cope with a
-     0 length) or is simpler integers specifying algoritms and suchlike
-     (which can validly be 0); and
-
- (4) The AKID and SKID extensions are optional and their removal is handled
-     without risking passing a NULL to asymmetric_key_generate_id().
-
- (5) If the certificate is truncated sufficiently to remove the subject,
-     issuer or serialNumber then the ASN.1 decoder will fail with a 'Cons
-     stack underflow' return.
-
-This is not exploitable for PKCS#7 messages by means of removal of elements
-from such a message from the tail end of a sequence:
-
- (1) Any shortened X.509 certs embedded in the PKCS#7 message are survivable
-     as detailed above.
-
- (2) The message digest content isn't used if it shows a NULL pointer,
-     similarly, the authattrs aren't used if that shows a NULL pointer.
-
- (3) A missing signature results in a NULL MPI - which the MPI routines deal
-     with.
-
- (4) If data is NULL, it is expected that the message has detached content and
-     that is handled appropriately.
-
- (5) If the serialNumber is excised, the unconditional action associated
-     with it will pick up the containing SEQUENCE instead, so no NULL
-     pointer will be seen here.
-
-     If both the issuer and the serialNumber are excised, the ASN.1 decode
-     will fail with an 'Unexpected tag' return.
-
-     In either case, there's no way to get to asymmetric_key_generate_id()
-     with a NULL pointer.
-
- (6) Other fields are decoded to simple integers.  Shortening the message
-     to omit an algorithm ID field will cause checks on this to fail early
-     in the verification process.
-
-
-This can also be tested by snipping objects off of the end of the ASN.1 stream
-such that mandatory tags are removed - or even from the end of internal
-SEQUENCEs.  If any mandatory tag is missing, the error EBADMSG *should* be
-produced.  Without this patch ERANGE or ENOPKG might be produced or the parse
-may apparently succeed, perhaps with ENOKEY or EKEYREJECTED being produced
-later, depending on what gets snipped.
-
-Just snipping off the final BIT_STRING or OCTET_STRING from either sample
-should be a start since both are mandatory and neither will cause an EBADMSG
-without the patches
-
-Reported-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: David Howells <dhowells@redhat.com>
 Tested-by: Marcel Holtmann <marcel@holtmann.org>
 Reviewed-by: David Woodhouse <David.Woodhouse@intel.com>
 ---
 
- lib/asn1_decoder.c |    5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ include/linux/asn1_ber_bytecode.h |   17 +++++++++++------
+ lib/asn1_decoder.c                |    8 ++++++++
+ scripts/asn1_compiler.c           |    3 ++-
+ 3 files changed, 21 insertions(+), 7 deletions(-)
 
+diff --git a/include/linux/asn1_ber_bytecode.h b/include/linux/asn1_ber_bytecode.h
+index 27f35780aecf..ab3a6c002f7b 100644
+--- a/include/linux/asn1_ber_bytecode.h
++++ b/include/linux/asn1_ber_bytecode.h
+@@ -45,24 +45,27 @@ enum asn1_opcode {
+ 	ASN1_OP_MATCH_JUMP		= 0x04,
+ 	ASN1_OP_MATCH_JUMP_OR_SKIP	= 0x05,
+ 	ASN1_OP_MATCH_ANY		= 0x08,
++	ASN1_OP_MATCH_ANY_OR_SKIP	= 0x09,
+ 	ASN1_OP_MATCH_ANY_ACT		= 0x0a,
++	ASN1_OP_MATCH_ANY_ACT_OR_SKIP	= 0x0b,
+ 	/* Everything before here matches unconditionally */
+ 
+ 	ASN1_OP_COND_MATCH_OR_SKIP	= 0x11,
+ 	ASN1_OP_COND_MATCH_ACT_OR_SKIP	= 0x13,
+ 	ASN1_OP_COND_MATCH_JUMP_OR_SKIP	= 0x15,
+ 	ASN1_OP_COND_MATCH_ANY		= 0x18,
++	ASN1_OP_COND_MATCH_ANY_OR_SKIP	= 0x19,
+ 	ASN1_OP_COND_MATCH_ANY_ACT	= 0x1a,
++	ASN1_OP_COND_MATCH_ANY_ACT_OR_SKIP = 0x1b,
+ 
+ 	/* Everything before here will want a tag from the data */
+-#define ASN1_OP__MATCHES_TAG ASN1_OP_COND_MATCH_ANY_ACT
++#define ASN1_OP__MATCHES_TAG ASN1_OP_COND_MATCH_ANY_ACT_OR_SKIP
+ 
+ 	/* These are here to help fill up space */
+-	ASN1_OP_COND_FAIL		= 0x1b,
+-	ASN1_OP_COMPLETE		= 0x1c,
+-	ASN1_OP_ACT			= 0x1d,
+-	ASN1_OP_MAYBE_ACT		= 0x1e,
+-	ASN1_OP_RETURN			= 0x1f,
++	ASN1_OP_COND_FAIL		= 0x1c,
++	ASN1_OP_COMPLETE		= 0x1d,
++	ASN1_OP_ACT			= 0x1e,
++	ASN1_OP_MAYBE_ACT		= 0x1f,
+ 
+ 	/* The following eight have bit 0 -> SET, 1 -> OF, 2 -> ACT */
+ 	ASN1_OP_END_SEQ			= 0x20,
+@@ -77,6 +80,8 @@ enum asn1_opcode {
+ #define ASN1_OP_END__OF			  0x02
+ #define ASN1_OP_END__ACT		  0x04
+ 
++	ASN1_OP_RETURN			= 0x28,
++
+ 	ASN1_OP__NR
+ };
+ 
 diff --git a/lib/asn1_decoder.c b/lib/asn1_decoder.c
-index 55980d7e1ac0..3f74dd3e2910 100644
+index 3f74dd3e2910..2b3f46c049d4 100644
 --- a/lib/asn1_decoder.c
 +++ b/lib/asn1_decoder.c
-@@ -210,9 +210,8 @@ next_op:
- 		unsigned char tmp;
- 
- 		/* Skip conditional matches if possible */
--		if ((op & ASN1_OP_MATCH__COND &&
--		     flags & FLAG_MATCHED) ||
--		    dp == datalen) {
-+		if ((op & ASN1_OP_MATCH__COND && flags & FLAG_MATCHED) ||
-+		    (op & ASN1_OP_MATCH__SKIP && dp == datalen)) {
- 			flags &= ~FLAG_LAST_MATCHED;
- 			pc += asn1_op_lengths[op];
- 			goto next_op;
+@@ -24,12 +24,16 @@ static const unsigned char asn1_op_lengths[ASN1_OP__NR] = {
+ 	[ASN1_OP_MATCH_JUMP]			= 1 + 1 + 1,
+ 	[ASN1_OP_MATCH_JUMP_OR_SKIP]		= 1 + 1 + 1,
+ 	[ASN1_OP_MATCH_ANY]			= 1,
++	[ASN1_OP_MATCH_ANY_OR_SKIP]		= 1,
+ 	[ASN1_OP_MATCH_ANY_ACT]			= 1         + 1,
++	[ASN1_OP_MATCH_ANY_ACT_OR_SKIP]		= 1         + 1,
+ 	[ASN1_OP_COND_MATCH_OR_SKIP]		= 1 + 1,
+ 	[ASN1_OP_COND_MATCH_ACT_OR_SKIP]	= 1 + 1     + 1,
+ 	[ASN1_OP_COND_MATCH_JUMP_OR_SKIP]	= 1 + 1 + 1,
+ 	[ASN1_OP_COND_MATCH_ANY]		= 1,
++	[ASN1_OP_COND_MATCH_ANY_OR_SKIP]	= 1,
+ 	[ASN1_OP_COND_MATCH_ANY_ACT]		= 1         + 1,
++	[ASN1_OP_COND_MATCH_ANY_ACT_OR_SKIP]	= 1         + 1,
+ 	[ASN1_OP_COND_FAIL]			= 1,
+ 	[ASN1_OP_COMPLETE]			= 1,
+ 	[ASN1_OP_ACT]				= 1         + 1,
+@@ -304,7 +308,9 @@ next_op:
+ 	/* Decide how to handle the operation */
+ 	switch (op) {
+ 	case ASN1_OP_MATCH_ANY_ACT:
++	case ASN1_OP_MATCH_ANY_ACT_OR_SKIP:
+ 	case ASN1_OP_COND_MATCH_ANY_ACT:
++	case ASN1_OP_COND_MATCH_ANY_ACT_OR_SKIP:
+ 		ret = actions[machine[pc + 1]](context, hdr, tag, data + dp, len);
+ 		if (ret < 0)
+ 			return ret;
+@@ -321,8 +327,10 @@ next_op:
+ 	case ASN1_OP_MATCH:
+ 	case ASN1_OP_MATCH_OR_SKIP:
+ 	case ASN1_OP_MATCH_ANY:
++	case ASN1_OP_MATCH_ANY_OR_SKIP:
+ 	case ASN1_OP_COND_MATCH_OR_SKIP:
+ 	case ASN1_OP_COND_MATCH_ANY:
++	case ASN1_OP_COND_MATCH_ANY_OR_SKIP:
+ 	skip_data:
+ 		if (!(flags & FLAG_CONS)) {
+ 			if (flags & FLAG_INDEFINITE_LENGTH) {
+diff --git a/scripts/asn1_compiler.c b/scripts/asn1_compiler.c
+index 0515bced929a..1c75e22b6385 100644
+--- a/scripts/asn1_compiler.c
++++ b/scripts/asn1_compiler.c
+@@ -1401,7 +1401,8 @@ static void render_element(FILE *out, struct element *e, struct element *tag)
+ 	act = e->action ? "_ACT" : "";
+ 	switch (e->compound) {
+ 	case ANY:
+-		render_opcode(out, "ASN1_OP_%sMATCH_ANY%s,", cond, act);
++		render_opcode(out, "ASN1_OP_%sMATCH_ANY%s%s,",
++			      cond, act, skippable ? "_OR_SKIP" : "");
+ 		if (e->name)
+ 			render_more(out, "\t\t// %*.*s",
+ 				    (int)e->name->size, (int)e->name->size,
