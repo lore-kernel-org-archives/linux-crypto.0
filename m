@@ -1,7 +1,7 @@
 From: Victoria Milhoan <vicki.milhoan@freescale.com>
-Subject: [PATCH v2 11/14] ARM: dts: mx6sx: Add CAAM device node
-Date: Wed, 5 Aug 2015 11:28:45 -0700
-Message-ID: <1438799328-10757-12-git-send-email-vicki.milhoan@freescale.com>
+Subject: [PATCH v2 13/14] ARM: imx_v6_v7_defconfig: Select CAAM
+Date: Wed, 5 Aug 2015 11:28:47 -0700
+Message-ID: <1438799328-10757-14-git-send-email-vicki.milhoan@freescale.com>
 References: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
  <1438799328-10757-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
@@ -12,60 +12,35 @@ Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
 	<robh+dt@kernel.org>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0138.outbound.protection.outlook.com ([65.55.169.138]:15711
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+Received: from mail-by2on0139.outbound.protection.outlook.com ([207.46.100.139]:7899
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753128AbbHES2x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 Aug 2015 14:28:53 -0400
+	id S1753237AbbHES2y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 5 Aug 2015 14:28:54 -0400
 In-Reply-To: <1438799328-10757-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add CAAM device node to the i.MX6SX device tree.
+Select CAAM for i.MX6 devices.
 
 Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
 ---
- arch/arm/boot/dts/imx6sx.dtsi | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ arch/arm/configs/imx_v6_v7_defconfig | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/arm/boot/dts/imx6sx.dtsi b/arch/arm/boot/dts/imx6sx.dtsi
-index 708175d..20851cb 100644
---- a/arch/arm/boot/dts/imx6sx.dtsi
-+++ b/arch/arm/boot/dts/imx6sx.dtsi
-@@ -738,6 +738,34 @@
- 			reg = <0x02100000 0x100000>;
- 			ranges;
- 
-+			crypto: caam@2100000 {
-+				compatible = "fsl,sec-v4.0";
-+				fsl,sec-era = <4>;
-+				#address-cells = <1>;
-+				#size-cells = <1>;
-+				reg = <0x2100000 0x10000>;
-+				ranges = <0 0x2100000 0x10000>;
-+				interrupt-parent = <&intc>;
-+				clocks = <&clks IMX6SX_CLK_CAAM_MEM>,
-+					 <&clks IMX6SX_CLK_CAAM_ACLK>,
-+					 <&clks IMX6SX_CLK_CAAM_IPG>,
-+					 <&clks IMX6SX_CLK_EIM_SLOW>;
-+				clock-names = "mem", "aclk", "ipg", "emi_slow";
-+
-+				sec_jr0: jr0@1000 {
-+					compatible = "fsl,sec-v4.0-job-ring";
-+					reg = <0x1000 0x1000>;
-+					interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
-+				};
-+
-+				sec_jr1: jr1@2000 {
-+					compatible = "fsl,sec-v4.0-job-ring";
-+					reg = <0x2000 0x1000>;
-+					interrupts = <0 106 0x4>;
-+					interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
-+				};
-+			};
-+
- 			usbotg1: usb@02184000 {
- 				compatible = "fsl,imx6sx-usb", "fsl,imx27-usb";
- 				reg = <0x02184000 0x200>;
+diff --git a/arch/arm/configs/imx_v6_v7_defconfig b/arch/arm/configs/imx_v6_v7_defconfig
+index b47863d..7569b39 100644
+--- a/arch/arm/configs/imx_v6_v7_defconfig
++++ b/arch/arm/configs/imx_v6_v7_defconfig
+@@ -354,8 +354,7 @@ CONFIG_PROVE_LOCKING=y
+ # CONFIG_FTRACE is not set
+ # CONFIG_ARM_UNWIND is not set
+ CONFIG_SECURITYFS=y
+-# CONFIG_CRYPTO_ANSI_CPRNG is not set
+-# CONFIG_CRYPTO_HW is not set
++CONFIG_CRYPTO_DEV_FSL_CAAM=y
+ CONFIG_CRC_CCITT=m
+ CONFIG_CRC_T10DIF=y
+ CONFIG_CRC7=m
 -- 
 2.1.4
