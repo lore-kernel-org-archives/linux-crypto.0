@@ -1,7 +1,7 @@
 From: Victoria Milhoan <vicki.milhoan@freescale.com>
-Subject: [PATCH v2 13/14] ARM: imx_v6_v7_defconfig: Select CAAM
-Date: Wed, 5 Aug 2015 11:28:47 -0700
-Message-ID: <1438799328-10757-14-git-send-email-vicki.milhoan@freescale.com>
+Subject: [PATCH v2 14/14] crypto: caam - Detect hardware features during algorithm registration
+Date: Wed, 5 Aug 2015 11:28:48 -0700
+Message-ID: <1438799328-10757-15-git-send-email-vicki.milhoan@freescale.com>
 References: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
  <1438799328-10757-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
@@ -12,35 +12,259 @@ Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
 	<robh+dt@kernel.org>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0139.outbound.protection.outlook.com ([207.46.100.139]:7899
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+Received: from mail-bl2on0127.outbound.protection.outlook.com ([65.55.169.127]:7824
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753237AbbHES2y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 Aug 2015 14:28:54 -0400
+	id S1753532AbbHES24 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 5 Aug 2015 14:28:56 -0400
 In-Reply-To: <1438799328-10757-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Select CAAM for i.MX6 devices.
+Register only algorithms supported by CAAM hardware, using the CHA
+version and instantiation registers to identify hardware capabilities.
 
 Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
 ---
- arch/arm/configs/imx_v6_v7_defconfig | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/crypto/caam/caamalg.c  | 68 ++++++++++++++++++++++++++++++++++++++----
+ drivers/crypto/caam/caamhash.c | 38 ++++++++++++++++++-----
+ drivers/crypto/caam/caamrng.c  |  6 +++-
+ drivers/crypto/caam/regs.h     | 16 ++++++++--
+ 4 files changed, 110 insertions(+), 18 deletions(-)
 
-diff --git a/arch/arm/configs/imx_v6_v7_defconfig b/arch/arm/configs/imx_v6_v7_defconfig
-index b47863d..7569b39 100644
---- a/arch/arm/configs/imx_v6_v7_defconfig
-+++ b/arch/arm/configs/imx_v6_v7_defconfig
-@@ -354,8 +354,7 @@ CONFIG_PROVE_LOCKING=y
- # CONFIG_FTRACE is not set
- # CONFIG_ARM_UNWIND is not set
- CONFIG_SECURITYFS=y
--# CONFIG_CRYPTO_ANSI_CPRNG is not set
--# CONFIG_CRYPTO_HW is not set
-+CONFIG_CRYPTO_DEV_FSL_CAAM=y
- CONFIG_CRC_CCITT=m
- CONFIG_CRC_T10DIF=y
- CONFIG_CRC7=m
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 3d1ca08..3361259 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -4371,8 +4371,10 @@ static int __init caam_algapi_init(void)
+ 	struct device_node *dev_node;
+ 	struct platform_device *pdev;
+ 	struct device *ctrldev;
+-	void *priv;
++	struct caam_drv_private *priv;
+ 	int i = 0, err = 0;
++	u32 cha_vid, cha_inst, des_inst, aes_inst, md_inst;
++	unsigned int md_limit = SHA512_DIGEST_SIZE;
+ 	bool registered = false;
+ 
+ 	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
+@@ -4402,16 +4404,39 @@ static int __init caam_algapi_init(void)
+ 
+ 	INIT_LIST_HEAD(&alg_list);
+ 
+-	/* register crypto algorithms the device supports */
++	/*
++	 * Register crypto algorithms the device supports.
++	 * First, detect presence and attributes of DES, AES, and MD blocks.
++	 */
++	cha_vid = rd_reg32(&priv->ctrl->perfmon.cha_id_ls);
++	cha_inst = rd_reg32(&priv->ctrl->perfmon.cha_num_ls);
++	des_inst = (cha_inst & CHA_ID_LS_DES_MASK) >> CHA_ID_LS_DES_SHIFT;
++	aes_inst = (cha_inst & CHA_ID_LS_AES_MASK) >> CHA_ID_LS_AES_SHIFT;
++	md_inst = (cha_inst & CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT;
++
++	/* If MD is present, limit digest size based on LP256 */
++	if (md_inst && ((cha_vid & CHA_ID_LS_MD_MASK) == CHA_ID_LS_MD_LP256))
++		md_limit = SHA256_DIGEST_SIZE;
++
+ 	for (i = 0; i < ARRAY_SIZE(driver_algs); i++) {
+-		/* TODO: check if h/w supports alg */
+ 		struct caam_crypto_alg *t_alg;
++		struct caam_alg_template *alg = driver_algs + i;
++		u32 alg_sel = alg->class1_alg_type & OP_ALG_ALGSEL_MASK;
++
++		/* Skip DES algorithms if not supported by device */
++		if (!des_inst &&
++		    ((alg_sel == OP_ALG_ALGSEL_3DES) ||
++		     (alg_sel == OP_ALG_ALGSEL_DES)))
++				continue;
++
++		/* Skip AES algorithms if not supported by device */
++		if (!aes_inst && (alg_sel == OP_ALG_ALGSEL_AES))
++				continue;
+ 
+-		t_alg = caam_alg_alloc(&driver_algs[i]);
++		t_alg = caam_alg_alloc(alg);
+ 		if (IS_ERR(t_alg)) {
+ 			err = PTR_ERR(t_alg);
+-			pr_warn("%s alg allocation failed\n",
+-				driver_algs[i].driver_name);
++			pr_warn("%s alg allocation failed\n", alg->driver_name);
+ 			continue;
+ 		}
+ 
+@@ -4429,6 +4454,37 @@ static int __init caam_algapi_init(void)
+ 
+ 	for (i = 0; i < ARRAY_SIZE(driver_aeads); i++) {
+ 		struct caam_aead_alg *t_alg = driver_aeads + i;
++		u32 c1_alg_sel = t_alg->caam.class1_alg_type &
++				 OP_ALG_ALGSEL_MASK;
++		u32 c2_alg_sel = t_alg->caam.class2_alg_type &
++				 OP_ALG_ALGSEL_MASK;
++		u32 alg_aai = t_alg->caam.class1_alg_type & OP_ALG_AAI_MASK;
++
++		/* Skip DES algorithms if not supported by device */
++		if (!des_inst &&
++		    ((c1_alg_sel == OP_ALG_ALGSEL_3DES) ||
++		     (c1_alg_sel == OP_ALG_ALGSEL_DES)))
++				continue;
++
++		/* Skip AES algorithms if not supported by device */
++		if (!aes_inst && (c1_alg_sel == OP_ALG_ALGSEL_AES))
++				continue;
++
++		/*
++		 * Check support for AES algorithms not available
++		 * on LP devices.
++		 */
++		if ((cha_vid & CHA_ID_LS_AES_MASK) == CHA_ID_LS_AES_LP)
++			if (alg_aai == OP_ALG_AAI_GCM)
++				continue;
++
++		/*
++		 * Skip algorithms requiring message digests
++		 * if MD or MD size is not supported by device.
++		 */
++		if (c2_alg_sel &&
++		    (!md_inst || (t_alg->aead.maxauthsize > md_limit)))
++				continue;
+ 
+ 		caam_aead_alg_init(t_alg);
+ 
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 16c03f8..bb0935a 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1883,8 +1883,10 @@ static int __init caam_algapi_hash_init(void)
+ 	struct device_node *dev_node;
+ 	struct platform_device *pdev;
+ 	struct device *ctrldev;
+-	void *priv;
+ 	int i = 0, err = 0;
++	struct caam_drv_private *priv;
++	unsigned int md_limit = SHA512_DIGEST_SIZE;
++	u32 cha_inst, cha_vid;
+ 
+ 	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
+ 	if (!dev_node) {
+@@ -1910,19 +1912,40 @@ static int __init caam_algapi_hash_init(void)
+ 	if (!priv)
+ 		return -ENODEV;
+ 
++	/*
++	 * Register crypto algorithms the device supports.  First, identify
++	 * presence and attributes of MD block.
++	 */
++	cha_vid = rd_reg32(&priv->ctrl->perfmon.cha_id_ls);
++	cha_inst = rd_reg32(&priv->ctrl->perfmon.cha_num_ls);
++
++	/*
++	 * Skip registration of any hashing algorithms if MD block
++	 * is not present.
++	 */
++	if (!((cha_inst & CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT))
++		return -ENODEV;
++
++	/* Limit digest size based on LP256 */
++	if ((cha_vid & CHA_ID_LS_MD_MASK) == CHA_ID_LS_MD_LP256)
++		md_limit = SHA256_DIGEST_SIZE;
++
+ 	INIT_LIST_HEAD(&hash_list);
+ 
+ 	/* register crypto algorithms the device supports */
+ 	for (i = 0; i < ARRAY_SIZE(driver_hash); i++) {
+-		/* TODO: check if h/w supports alg */
+ 		struct caam_hash_alg *t_alg;
++		struct caam_hash_template *alg = driver_hash + i;
++
++		/* If MD size is not supported by device, skip registration */
++		if (alg->template_ahash.halg.digestsize > md_limit)
++			continue;
+ 
+ 		/* register hmac version */
+-		t_alg = caam_hash_alloc(&driver_hash[i], true);
++		t_alg = caam_hash_alloc(alg, true);
+ 		if (IS_ERR(t_alg)) {
+ 			err = PTR_ERR(t_alg);
+-			pr_warn("%s alg allocation failed\n",
+-				driver_hash[i].driver_name);
++			pr_warn("%s alg allocation failed\n", alg->driver_name);
+ 			continue;
+ 		}
+ 
+@@ -1935,11 +1958,10 @@ static int __init caam_algapi_hash_init(void)
+ 			list_add_tail(&t_alg->entry, &hash_list);
+ 
+ 		/* register unkeyed version */
+-		t_alg = caam_hash_alloc(&driver_hash[i], false);
++		t_alg = caam_hash_alloc(alg, false);
+ 		if (IS_ERR(t_alg)) {
+ 			err = PTR_ERR(t_alg);
+-			pr_warn("%s alg allocation failed\n",
+-				driver_hash[i].driver_name);
++			pr_warn("%s alg allocation failed\n", alg->driver_name);
+ 			continue;
+ 		}
+ 
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+index a1d21d5..345024c 100644
+--- a/drivers/crypto/caam/caamrng.c
++++ b/drivers/crypto/caam/caamrng.c
+@@ -315,7 +315,7 @@ static int __init caam_rng_init(void)
+ 	struct device_node *dev_node;
+ 	struct platform_device *pdev;
+ 	struct device *ctrldev;
+-	void *priv;
++	struct caam_drv_private *priv;
+ 	int err;
+ 
+ 	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
+@@ -342,6 +342,10 @@ static int __init caam_rng_init(void)
+ 	if (!priv)
+ 		return -ENODEV;
+ 
++	/* Check for an instantiated RNG before registration */
++	if (!(rd_reg32(&priv->ctrl->perfmon.cha_num_ls) & CHA_ID_LS_RNG_MASK))
++		return -ENODEV;
++
+ 	dev = caam_jr_alloc();
+ 	if (IS_ERR(dev)) {
+ 		pr_err("Job Ring Device allocation for transform failed\n");
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 3a2a788..d7c3579 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -156,18 +156,28 @@ struct jr_outentry {
+ #define CHA_NUM_MS_DECONUM_SHIFT	24
+ #define CHA_NUM_MS_DECONUM_MASK	(0xfull << CHA_NUM_MS_DECONUM_SHIFT)
+ 
+-/* CHA Version IDs */
++/*
++ * CHA version IDs / instantiation bitfields
++ * Defined for use with the cha_id fields in perfmon, but the same shift/mask
++ * selectors can be used to pull out the number of instantiated blocks within
++ * cha_num fields in perfmon because the locations are the same.
++ */
+ #define CHA_ID_LS_AES_SHIFT	0
+-#define CHA_ID_LS_AES_MASK		(0xfull << CHA_ID_LS_AES_SHIFT)
++#define CHA_ID_LS_AES_MASK	(0xfull << CHA_ID_LS_AES_SHIFT)
++#define CHA_ID_LS_AES_LP	(0x3ull << CHA_ID_LS_AES_SHIFT)
++#define CHA_ID_LS_AES_HP	(0x4ull << CHA_ID_LS_AES_SHIFT)
+ 
+ #define CHA_ID_LS_DES_SHIFT	4
+-#define CHA_ID_LS_DES_MASK		(0xfull << CHA_ID_LS_DES_SHIFT)
++#define CHA_ID_LS_DES_MASK	(0xfull << CHA_ID_LS_DES_SHIFT)
+ 
+ #define CHA_ID_LS_ARC4_SHIFT	8
+ #define CHA_ID_LS_ARC4_MASK	(0xfull << CHA_ID_LS_ARC4_SHIFT)
+ 
+ #define CHA_ID_LS_MD_SHIFT	12
+ #define CHA_ID_LS_MD_MASK	(0xfull << CHA_ID_LS_MD_SHIFT)
++#define CHA_ID_LS_MD_LP256	(0x0ull << CHA_ID_LS_MD_SHIFT)
++#define CHA_ID_LS_MD_LP512	(0x1ull << CHA_ID_LS_MD_SHIFT)
++#define CHA_ID_LS_MD_HP		(0x2ull << CHA_ID_LS_MD_SHIFT)
+ 
+ #define CHA_ID_LS_RNG_SHIFT	16
+ #define CHA_ID_LS_RNG_MASK	(0xfull << CHA_ID_LS_RNG_SHIFT)
 -- 
 2.1.4
