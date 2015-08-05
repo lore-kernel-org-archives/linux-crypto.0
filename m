@@ -1,8 +1,9 @@
 From: Victoria Milhoan <vicki.milhoan@freescale.com>
-Subject: [PATCH v2 00/14] crypto: caam - Add i.MX6 support to the Freescale CAAM driver
-Date: Wed, 5 Aug 2015 11:28:34 -0700
-Message-ID: <1438799328-10757-1-git-send-email-vicki.milhoan@freescale.com>
+Subject: [PATCH v2 11/14] ARM: dts: mx6sx: Add CAAM device node
+Date: Wed, 5 Aug 2015 11:28:45 -0700
+Message-ID: <1438799328-10757-12-git-send-email-vicki.milhoan@freescale.com>
 References: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
+ <1438799328-10757-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
@@ -11,60 +12,60 @@ Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
 	<robh+dt@kernel.org>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0146.outbound.protection.outlook.com ([65.55.169.146]:23808
+Received: from mail-bl2on0138.outbound.protection.outlook.com ([65.55.169.138]:15711
 	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752803AbbHES2x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	id S1753128AbbHES2x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
 	Wed, 5 Aug 2015 14:28:53 -0400
-In-Reply-To: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
+In-Reply-To: <1438799328-10757-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch series adds i.MX6 support to the Freescale CAAM driver.
+Add CAAM device node to the i.MX6SX device tree.
 
-Modifications include:
+Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
+---
+ arch/arm/boot/dts/imx6sx.dtsi | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-- explicit cache coherency support in the driver
-- register I/O primitive support
-- scatter/gather entry modifications
-- clocking support
-- i.MX6 device tree support for CAAM
-- DMA fixes
-- algorithm registration based on hardware capabilities
-
-These patches have been tested on the i.MX6 and regression tested
-on QorIQ platforms.
-
-Changes in v2:
-  - Clocking support:
-    - Minimized architecture differences
-    - Balanced clk_get and clk_put calls
-    - Removed display of clock values
-    - Renamed clock definitions to explicitly show "CLK"
-    - Removed unnecessary "caam_" prefixes to clock-names property in DTS files
-    - Added clocks and clock-names property descriptions to SEC 4.0
-      device tree bindings document
-  - Added check of hardware capabilities before algorithm registration
-  - Modified patches based on AEAD changes in caamalg.c
-
- .../devicetree/bindings/crypto/fsl-sec4.txt        | 17 ++++
- arch/arm/boot/dts/imx6qdl.dtsi                     | 29 ++++++-
- arch/arm/boot/dts/imx6sx.dtsi                      | 28 +++++++
- arch/arm/configs/imx_v6_v7_defconfig               |  3 +-
- drivers/clk/imx/clk-imx6q.c                        |  3 +
- drivers/crypto/caam/Kconfig                        |  2 +-
- drivers/crypto/caam/caamalg.c                      | 80 +++++++++++++++---
- drivers/crypto/caam/caamhash.c                     | 67 +++++++++------
- drivers/crypto/caam/caamrng.c                      | 10 ++-
- drivers/crypto/caam/compat.h                       |  1 +
- drivers/crypto/caam/ctrl.c                         | 94 +++++++++++++++++++++-
- drivers/crypto/caam/desc.h                         | 25 +++++-
- drivers/crypto/caam/intern.h                       |  5 ++
- drivers/crypto/caam/jr.c                           | 18 +++++
- drivers/crypto/caam/regs.h                         | 39 ++++++++-
- drivers/crypto/caam/sg_sw_sec4.h                   | 25 ++++--
- include/dt-bindings/clock/imx6qdl-clock.h          |  5 +-
- 17 files changed, 389 insertions(+), 62 deletions(-)
-
+diff --git a/arch/arm/boot/dts/imx6sx.dtsi b/arch/arm/boot/dts/imx6sx.dtsi
+index 708175d..20851cb 100644
+--- a/arch/arm/boot/dts/imx6sx.dtsi
++++ b/arch/arm/boot/dts/imx6sx.dtsi
+@@ -738,6 +738,34 @@
+ 			reg = <0x02100000 0x100000>;
+ 			ranges;
+ 
++			crypto: caam@2100000 {
++				compatible = "fsl,sec-v4.0";
++				fsl,sec-era = <4>;
++				#address-cells = <1>;
++				#size-cells = <1>;
++				reg = <0x2100000 0x10000>;
++				ranges = <0 0x2100000 0x10000>;
++				interrupt-parent = <&intc>;
++				clocks = <&clks IMX6SX_CLK_CAAM_MEM>,
++					 <&clks IMX6SX_CLK_CAAM_ACLK>,
++					 <&clks IMX6SX_CLK_CAAM_IPG>,
++					 <&clks IMX6SX_CLK_EIM_SLOW>;
++				clock-names = "mem", "aclk", "ipg", "emi_slow";
++
++				sec_jr0: jr0@1000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x1000 0x1000>;
++					interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
++				};
++
++				sec_jr1: jr1@2000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x2000 0x1000>;
++					interrupts = <0 106 0x4>;
++					interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
++				};
++			};
++
+ 			usbotg1: usb@02184000 {
+ 				compatible = "fsl,imx6sx-usb", "fsl,imx27-usb";
+ 				reg = <0x02184000 0x200>;
 -- 
 2.1.4
