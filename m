@@ -1,66 +1,84 @@
-From: Aaron Sierra <asierra@xes-inc.com>
-Subject: Re: [PATCH] crypto: talitos: Prevent panic in probe error path
-Date: Wed, 5 Aug 2015 09:24:06 -0500 (CDT)
-Message-ID: <281319751.208400.1438784646381.JavaMail.zimbra@xes-inc.com>
-References: <985540634.83104.1438363661992.JavaMail.zimbra@xes-inc.com> <296998949.155413.1438375938630.JavaMail.zimbra@xes-inc.com> <20150804071805.GA29697@gondor.apana.org.au> <1540044765.55441.1438699430229.JavaMail.zimbra@xes-inc.com> <20150805000813.GA2725@gondor.apana.org.au>
+From: Victoria Milhoan <vicki.milhoan@freescale.com>
+Subject: [PATCH v2 04/14] crypto: caam - Modify Freescale CAAM driver Scatter Gather entry definition
+Date: Wed, 5 Aug 2015 11:28:38 -0700
+Message-ID: <1438799328-10757-5-git-send-email-vicki.milhoan@freescale.com>
+References: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
+ <1438799328-10757-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Christophe Leroy <christophe.leroy@c-s.fr>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain
+Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
+	<ruchika.gupta@freescale.com>, <shawnguo@kernel.org>,
+	<kernel@pengutronix.de>, <linux@arm.linux.org.uk>,
+	<robh+dt@kernel.org>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from xes-mad.com ([216.165.139.218]:31581 "EHLO xes-mad.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751940AbbHEOZO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 Aug 2015 10:25:14 -0400
-In-Reply-To: <20150805000813.GA2725@gondor.apana.org.au>
+Received: from mail-bl2on0121.outbound.protection.outlook.com ([65.55.169.121]:60096
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752570AbbHES2x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 5 Aug 2015 14:28:53 -0400
+In-Reply-To: <1438799328-10757-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
------ Original Message -----
-> From: "Herbert Xu" <herbert@gondor.apana.org.au>
-> Sent: Tuesday, August 4, 2015 7:08:13 PM
-> 
-> On Tue, Aug 04, 2015 at 09:43:50AM -0500, Aaron Sierra wrote:
-> > 
-> > You are correct about the leak and I regret introducing that (I am
-> > also leaking priv->rng), but I disagree with your dismissal of the
-> > rest of the changes as unrelated to the changelog.
-> 
-> I understand the problem, but your change description is way
-> too vague and does not correspond to the change, especially the
-> bit where you're replacing the static variable with kzalloc.  You
-> should have included the following text in your description.
-> 
-> > The probe error path for this driver, for all intents and purposes,
-> > is the talitos_remove() function due to the common "goto err_out".
-> > 
-> > Without my patch applied, talitos_remove() will panic under the
-> > two conditions that I outlined in the changelog:
-> > 
-> > 1. If the RNG device hasn't been registered via
-> >    talitos_register_rng() prior to entry into talitos_remove(),
-> >    then the attempt to unregister the RNG "device" will cause a panic.
-> > 
-> > 2. If the priv->chan array has not been allocated prior to entry
-> >    into talitos_remove(), then the per-channel FIFO cleanup will panic
-> >    because of the dereference of that NULL "array".
-> > 
-> > Both of the above scenarios occur if talitos_probe_irq() fails.
-> > 
-> > The patch that I submitted resolves issue #1 by changing priv->rng
-> > to a struct hwrng pointer, which allows talitos_unregister_rng() to
-> > know whether an RNG device has been registered (or at least prepared
-> > for registration). As an alternative, I considered introducing a
-> > boolean to serve the same purpose.
-> 
-> I would prefer a boolean as that means less churn.
-> 
+Modify the Scatter-Gather entry definitions for the Freescale
+CAAM driver to include support for both 64- and 32-bit DMA pointers.
 
-Herbert,
-Thanks for the feedback. I'll address your concerns in the next
-version.
+Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
+---
+ drivers/crypto/caam/desc.h       | 25 +++++++++++++++++++++----
+ drivers/crypto/caam/sg_sw_sec4.h |  1 -
+ 2 files changed, 21 insertions(+), 5 deletions(-)
 
--Aaron
+diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
+index d397ff9..405acbf 100644
+--- a/drivers/crypto/caam/desc.h
++++ b/drivers/crypto/caam/desc.h
+@@ -8,12 +8,29 @@
+ #ifndef DESC_H
+ #define DESC_H
+ 
++/*
++ * 16-byte hardware scatter/gather table
++ * An 8-byte table exists in the hardware spec, but has never been
++ * implemented to date. The 8/16 option is selected at RTL-compile-time.
++ * and this selection is visible in the Compile Time Parameters Register
++ */
++
++#define SEC4_SG_LEN_EXT		0x80000000	/* Entry points to table */
++#define SEC4_SG_LEN_FIN		0x40000000	/* Last ent in table */
++#define SEC4_SG_BPID_MASK	0x000000ff
++#define SEC4_SG_BPID_SHIFT	16
++#define SEC4_SG_LEN_MASK	0x3fffffff	/* Excludes EXT and FINAL */
++#define SEC4_SG_OFFS_MASK	0x00001fff
++
+ struct sec4_sg_entry {
+-	u64 ptr;
+-#define SEC4_SG_LEN_FIN 0x40000000
+-#define SEC4_SG_LEN_EXT 0x80000000
++#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
++	dma_addr_t ptr;
++#else
++	u32 rsvd1;
++	dma_addr_t ptr;
++#endif
+ 	u32 len;
+-	u8 reserved;
++	u8 rsvd2;
+ 	u8 buf_pool_id;
+ 	u16 offset;
+ };
+diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
+index b68b74c..711bb39 100644
+--- a/drivers/crypto/caam/sg_sw_sec4.h
++++ b/drivers/crypto/caam/sg_sw_sec4.h
+@@ -15,7 +15,6 @@ static inline void dma_to_sec4_sg_one(struct sec4_sg_entry *sec4_sg_ptr,
+ {
+ 	sec4_sg_ptr->ptr = dma;
+ 	sec4_sg_ptr->len = len;
+-	sec4_sg_ptr->reserved = 0;
+ 	sec4_sg_ptr->buf_pool_id = 0;
+ 	sec4_sg_ptr->offset = offset;
+ #ifdef DEBUG
+-- 
+2.1.4
