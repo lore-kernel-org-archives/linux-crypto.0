@@ -1,31 +1,70 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH 1/4] ASN.1: Fix handling of CHOICE in ASN.1 compiler
-Date: Thu, 06 Aug 2015 06:33:36 +0100
-Message-ID: <8166.1438839216@warthog.procyon.org.uk>
-References: <alpine.LRH.2.20.1508061142580.11873@namei.org> <20150805131810.8933.59566.stgit@warthog.procyon.org.uk>
+From: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH v2 11/14] ARM: dts: mx6sx: Add CAAM device node
+Date: Thu, 6 Aug 2015 11:59:34 +0300
+Message-ID: <55C321F6.1040801@freescale.com>
+References: <1438228709-27650-1-git-send-email-vicki.milhoan@freescale.com>
+ <1438799328-10757-1-git-send-email-vicki.milhoan@freescale.com>
+ <1438799328-10757-12-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, keyrings@linux-nfs.org, marcel@holtmann.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, dwmw2@infradead.org
-To: James Morris <jmorris@namei.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <herbert@gondor.apana.org.au>, <ruchika.gupta@freescale.com>,
+	<shawnguo@kernel.org>, <kernel@pengutronix.de>,
+	<linux@arm.linux.org.uk>, <robh+dt@kernel.org>
+To: Victoria Milhoan <vicki.milhoan@freescale.com>,
+	<linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:56657 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752794AbbHFFdn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Aug 2015 01:33:43 -0400
-In-Reply-To: <alpine.LRH.2.20.1508061142580.11873@namei.org>
-Content-ID: <8165.1438839216.1@warthog.procyon.org.uk>
+Received: from mail-by2on0105.outbound.protection.outlook.com ([207.46.100.105]:41476
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1755022AbbHFI7n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 6 Aug 2015 04:59:43 -0400
+In-Reply-To: <1438799328-10757-12-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-James Morris <jmorris@namei.org> wrote:
+On 8/5/2015 9:28 PM, Victoria Milhoan wrote:
+> Add CAAM device node to the i.MX6SX device tree.
+> 
+> Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
+> ---
+>  arch/arm/boot/dts/imx6sx.dtsi | 28 ++++++++++++++++++++++++++++
+>  1 file changed, 28 insertions(+)
+> 
+> diff --git a/arch/arm/boot/dts/imx6sx.dtsi b/arch/arm/boot/dts/imx6sx.dtsi
+> index 708175d..20851cb 100644
+> --- a/arch/arm/boot/dts/imx6sx.dtsi
+> +++ b/arch/arm/boot/dts/imx6sx.dtsi
+> @@ -738,6 +738,34 @@
+>  			reg = <0x02100000 0x100000>;
+>  			ranges;
+>  
+> +			crypto: caam@2100000 {
+> +				compatible = "fsl,sec-v4.0";
+> +				fsl,sec-era = <4>;
+> +				#address-cells = <1>;
+> +				#size-cells = <1>;
+> +				reg = <0x2100000 0x10000>;
+> +				ranges = <0 0x2100000 0x10000>;
+> +				interrupt-parent = <&intc>;
+> +				clocks = <&clks IMX6SX_CLK_CAAM_MEM>,
+> +					 <&clks IMX6SX_CLK_CAAM_ACLK>,
+> +					 <&clks IMX6SX_CLK_CAAM_IPG>,
+> +					 <&clks IMX6SX_CLK_EIM_SLOW>;
+> +				clock-names = "mem", "aclk", "ipg", "emi_slow";
+> +
+> +				sec_jr0: jr0@1000 {
+> +					compatible = "fsl,sec-v4.0-job-ring";
+> +					reg = <0x1000 0x1000>;
+> +					interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
+> +				};
+> +
+> +				sec_jr1: jr1@2000 {
+> +					compatible = "fsl,sec-v4.0-job-ring";
+> +					reg = <0x2000 0x1000>;
+> +					interrupts = <0 106 0x4>;
+> +					interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
 
-> What are the security implications of these bugs?
+Typo - duplicate property. Remove the first one.
 
-I've fed them various bits of butchered ASN.1 and observed the effects as well
-as checking what happens in the code.  I don't think there are any security
-implications.  I've outlined my reasoning in each  patch description.
-
-David
+Horia
