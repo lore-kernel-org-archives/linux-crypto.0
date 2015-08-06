@@ -1,69 +1,49 @@
-From: Victoria Milhoan <vicki.milhoan@freescale.com>
-Subject: [PATCH v3 11/14] ARM: dts: mx6sx: Add CAAM device node
-Date: Thu, 6 Aug 2015 11:42:37 -0700
-Message-ID: <1438886557-28431-1-git-send-email-vicki.milhoan@freescale.com>
-References: <55C321F6.1040801@freescale.com>
+From: Aaron Sierra <asierra@xes-inc.com>
+Subject: Re: [PATCH v2] crypto: talitos: Prevent panic in probe error path
+Date: Thu, 6 Aug 2015 13:45:42 -0500 (CDT)
+Message-ID: <1959818441.276958.1438886742548.JavaMail.zimbra@xes-inc.com>
+References: <355366700.773095.1438811528320.JavaMail.zimbra@xes-inc.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
-	<ruchika.gupta@freescale.com>, <shawnguo@kernel.org>,
-	<kernel@pengutronix.de>, <linux@arm.linux.org.uk>,
-	<robh+dt@kernel.org>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
+	Christophe Leroy <christophe.leroy@c-s.fr>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0117.outbound.protection.outlook.com ([65.55.169.117]:14215
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1755669AbbHFSmm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Aug 2015 14:42:42 -0400
-In-Reply-To: <55C321F6.1040801@freescale.com>
+Received: from xes-mad.com ([216.165.139.218]:6960 "EHLO xes-mad.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756016AbbHFSqu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 6 Aug 2015 14:46:50 -0400
+In-Reply-To: <355366700.773095.1438811528320.JavaMail.zimbra@xes-inc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add CAAM device node to the i.MX6SX device tree.
+> For completeness, this patch also sets device drvdata to NULL after
+> the private structure is freed in talitos_remove().
 
-Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
----
- arch/arm/boot/dts/imx6sx.dtsi | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+[snip]
 
-diff --git a/arch/arm/boot/dts/imx6sx.dtsi b/arch/arm/boot/dts/imx6sx.dtsi
-index 708175d..e6223d8 100644
---- a/arch/arm/boot/dts/imx6sx.dtsi
-+++ b/arch/arm/boot/dts/imx6sx.dtsi
-@@ -738,6 +738,33 @@
- 			reg = <0x02100000 0x100000>;
- 			ranges;
- 
-+			crypto: caam@2100000 {
-+				compatible = "fsl,sec-v4.0";
-+				fsl,sec-era = <4>;
-+				#address-cells = <1>;
-+				#size-cells = <1>;
-+				reg = <0x2100000 0x10000>;
-+				ranges = <0 0x2100000 0x10000>;
-+				interrupt-parent = <&intc>;
-+				clocks = <&clks IMX6SX_CLK_CAAM_MEM>,
-+					 <&clks IMX6SX_CLK_CAAM_ACLK>,
-+					 <&clks IMX6SX_CLK_CAAM_IPG>,
-+					 <&clks IMX6SX_CLK_EIM_SLOW>;
-+				clock-names = "mem", "aclk", "ipg", "emi_slow";
-+
-+				sec_jr0: jr0@1000 {
-+					compatible = "fsl,sec-v4.0-job-ring";
-+					reg = <0x1000 0x1000>;
-+					interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
-+				};
-+
-+				sec_jr1: jr1@2000 {
-+					compatible = "fsl,sec-v4.0-job-ring";
-+					reg = <0x2000 0x1000>;
-+					interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
-+				};
-+			};
-+
- 			usbotg1: usb@02184000 {
- 				compatible = "fsl,imx6sx-usb", "fsl,imx27-usb";
- 				reg = <0x02184000 0x200>;
--- 
-2.1.4
+> @@ -2745,6 +2754,7 @@ static int talitos_remove(struct platform_device
+> *ofdev)
+>  	iounmap(priv->reg);
+>  
+>  	kfree(priv);
+> +	dev_set_drvdata(dev, NULL);
+>  
+>  	return 0;
+>  }
+
+I just found this drvdata cleanup hasn't been required for a few years,
+due to the following commit:
+
+    commit 0998d0631001288a5974afc0b2a5f568bcdecb4d
+    Author: Hans de Goede <hdegoede@redhat.com>
+    Date:   Wed May 23 00:09:34 2012 +0200
+
+        device-core: Ensure drvdata = NULL when no driver is bound
+
+Should I submit a v3 patch without this cleanup, assuming there aren't
+other changes requested?
+
+-Aaron
