@@ -1,11 +1,12 @@
 From: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 4/6] scatterlist: remove open coded sg_unmark_end instances
-Date: Fri,  7 Aug 2015 18:15:14 +0200
-Message-ID: <1438964116-24321-5-git-send-email-hch@lst.de>
+Subject: [PATCH 6/6] scatterlist: use sg_phys()
+Date: Fri,  7 Aug 2015 18:15:16 +0200
+Message-ID: <1438964116-24321-7-git-send-email-hch@lst.de>
 References: <1438964116-24321-1-git-send-email-hch@lst.de>
 Cc: Dan Williams <dan.j.williams@intel.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Julia Lawall <Julia.Lawall@lip6.fr>
 To: Jens Axboe <axboe@kernel.dk>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1438964116-24321-1-git-send-email-hch@lst.de>
@@ -14,48 +15,123 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Dan Williams <dan.j.williams@intel.com>
 
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
-[hch: split from a larger patch by Dan]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-merge.c        | 2 +-
- drivers/mmc/card/queue.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Coccinelle cleanup to replace open coded sg to physical address
+translations.  This is in preparation for introducing scatterlists that
+reference __pfn_t.
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 30a0d9f..f4a3e87 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -266,7 +266,7 @@ int blk_rq_map_sg(struct request_queue *q, struct request *rq,
- 		if (rq->cmd_flags & REQ_WRITE)
- 			memset(q->dma_drain_buffer, 0, q->dma_drain_size);
+// sg_phys.cocci: convert usage page_to_phys(sg_page(sg)) to sg_phys(sg)
+// usage: make coccicheck COCCI=sg_phys.cocci MODE=patch
+
+virtual patch
+virtual report
+virtual org
+
+@@
+struct scatterlist *sg;
+@@
+
+- page_to_phys(sg_page(sg)) + sg->offset
++ sg_phys(sg)
+
+@@
+struct scatterlist *sg;
+@@
+
+- page_to_phys(sg_page(sg))
++ sg_phys(sg) - sg->offset
+
+Cc: Julia Lawall <Julia.Lawall@lip6.fr>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+---
+ arch/arm/mm/dma-mapping.c                    | 2 +-
+ arch/microblaze/kernel/dma.c                 | 2 +-
+ drivers/iommu/intel-iommu.c                  | 4 ++--
+ drivers/iommu/iommu.c                        | 2 +-
+ drivers/staging/android/ion/ion_chunk_heap.c | 4 ++--
+ 5 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm/mm/dma-mapping.c b/arch/arm/mm/dma-mapping.c
+index cba12f3..58774b9 100644
+--- a/arch/arm/mm/dma-mapping.c
++++ b/arch/arm/mm/dma-mapping.c
+@@ -1520,7 +1520,7 @@ static int __map_sg_chunk(struct device *dev, struct scatterlist *sg,
+ 		return -ENOMEM;
  
--		sg->page_link &= ~0x02;
-+		sg_unmark_end(sg);
+ 	for (count = 0, s = sg; count < (size >> PAGE_SHIFT); s = sg_next(s)) {
+-		phys_addr_t phys = page_to_phys(sg_page(s));
++		phys_addr_t phys = sg_phys(s) - s->offset;
+ 		unsigned int len = PAGE_ALIGN(s->offset + s->length);
+ 
+ 		if (!is_coherent &&
+diff --git a/arch/microblaze/kernel/dma.c b/arch/microblaze/kernel/dma.c
+index bf4dec2..9c8e8f4 100644
+--- a/arch/microblaze/kernel/dma.c
++++ b/arch/microblaze/kernel/dma.c
+@@ -61,7 +61,7 @@ static int dma_direct_map_sg(struct device *dev, struct scatterlist *sgl,
+ 	/* FIXME this part of code is untested */
+ 	for_each_sg(sgl, sg, nents, i) {
+ 		sg->dma_address = sg_phys(sg);
+-		__dma_sync(page_to_phys(sg_page(sg)) + sg->offset,
++		__dma_sync(sg_phys(sg),
+ 							sg->length, direction);
+ 	}
+ 
+diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
+index 5852df8..e0faecc 100644
+--- a/drivers/iommu/intel-iommu.c
++++ b/drivers/iommu/intel-iommu.c
+@@ -2098,7 +2098,7 @@ static int __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
+ 			sg_res = aligned_nrpages(sg->offset, sg->length);
+ 			sg->dma_address = ((dma_addr_t)iov_pfn << VTD_PAGE_SHIFT) + sg->offset;
+ 			sg->dma_length = sg->length;
+-			pteval = page_to_phys(sg_page(sg)) | prot;
++			pteval = (sg_phys(sg) - sg->offset) | prot;
+ 			phys_pfn = pteval >> VTD_PAGE_SHIFT;
+ 		}
+ 
+@@ -3625,7 +3625,7 @@ static int intel_nontranslate_map_sg(struct device *hddev,
+ 
+ 	for_each_sg(sglist, sg, nelems, i) {
+ 		BUG_ON(!sg_page(sg));
+-		sg->dma_address = page_to_phys(sg_page(sg)) + sg->offset;
++		sg->dma_address = sg_phys(sg);
+ 		sg->dma_length = sg->length;
+ 	}
+ 	return nelems;
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index f286090..049df49 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -1408,7 +1408,7 @@ size_t default_iommu_map_sg(struct iommu_domain *domain, unsigned long iova,
+ 	min_pagesz = 1 << __ffs(domain->ops->pgsize_bitmap);
+ 
+ 	for_each_sg(sg, s, nents, i) {
+-		phys_addr_t phys = page_to_phys(sg_page(s)) + s->offset;
++		phys_addr_t phys = sg_phys(s);
+ 
+ 		/*
+ 		 * We are mapping on IOMMU page boundaries, so offset within
+diff --git a/drivers/staging/android/ion/ion_chunk_heap.c b/drivers/staging/android/ion/ion_chunk_heap.c
+index 5474615..c422006 100644
+--- a/drivers/staging/android/ion/ion_chunk_heap.c
++++ b/drivers/staging/android/ion/ion_chunk_heap.c
+@@ -81,7 +81,7 @@ static int ion_chunk_heap_allocate(struct ion_heap *heap,
+ err:
+ 	sg = table->sgl;
+ 	for (i -= 1; i >= 0; i--) {
+-		gen_pool_free(chunk_heap->pool, page_to_phys(sg_page(sg)),
++		gen_pool_free(chunk_heap->pool, sg_phys(sg) - sg->offset,
+ 			      sg->length);
  		sg = sg_next(sg);
- 		sg_set_page(sg, virt_to_page(q->dma_drain_buffer),
- 			    q->dma_drain_size,
-diff --git a/drivers/mmc/card/queue.c b/drivers/mmc/card/queue.c
-index b5a2b14..9b214da 100644
---- a/drivers/mmc/card/queue.c
-+++ b/drivers/mmc/card/queue.c
-@@ -467,7 +467,7 @@ static unsigned int mmc_queue_packed_map_sg(struct mmc_queue *mq,
- 			sg_set_buf(__sg, buf + offset, len);
- 			offset += len;
- 			remain -= len;
--			(__sg++)->page_link &= ~0x02;
-+			sg_unmark_end(__sg++);
- 			sg_len++;
- 		} while (remain);
  	}
-@@ -475,7 +475,7 @@ static unsigned int mmc_queue_packed_map_sg(struct mmc_queue *mq,
- 	list_for_each_entry(req, &packed->list, queuelist) {
- 		sg_len += blk_rq_map_sg(mq->queue, req, __sg);
- 		__sg = sg + (sg_len - 1);
--		(__sg++)->page_link &= ~0x02;
-+		sg_unmark_end(__sg++);
+@@ -109,7 +109,7 @@ static void ion_chunk_heap_free(struct ion_buffer *buffer)
+ 							DMA_BIDIRECTIONAL);
+ 
+ 	for_each_sg(table->sgl, sg, table->nents, i) {
+-		gen_pool_free(chunk_heap->pool, page_to_phys(sg_page(sg)),
++		gen_pool_free(chunk_heap->pool, sg_phys(sg) - sg->offset,
+ 			      sg->length);
  	}
- 	sg_mark_end(sg + (sg_len - 1));
- 	return sg_len;
+ 	chunk_heap->allocated -= allocated_size;
 -- 
 1.9.1
