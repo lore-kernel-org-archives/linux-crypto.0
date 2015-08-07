@@ -1,8 +1,7 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH 1/5] crypto: qat - Move adf admin and adf hw arbitrer to
- common code
-Date: Fri, 07 Aug 2015 11:34:20 -0700
-Message-ID: <20150807183419.630.42078.stgit@tstruk-mobl1>
+Subject: [PATCH 3/5] crypto: qat - Add qat dh895xcc VF driver
+Date: Fri, 07 Aug 2015 11:34:31 -0700
+Message-ID: <20150807183431.630.84165.stgit@tstruk-mobl1>
 References: <20150807183414.630.25889.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -11,88 +10,85 @@ Cc: linux-crypto@vger.kernel.org, bhelgaas@google.com,
 	linux-pci@vger.kernel.org, qat-linux@intel.com,
 	tadeusz.struk@intel.com
 To: herbert@gondor.apana.org.au
-Return-path: <linux-pci-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:37857 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1946203AbbHGSft (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 7 Aug 2015 14:35:49 -0400
 In-Reply-To: <20150807183414.630.25889.stgit@tstruk-mobl1>
-Sender: linux-pci-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Adf admin and HW arbiter function can be used by dh895xcc specific code
-well as the new dh895xccvf and future devices so moving them to
-qat_common so that they can be shared.
+Add code specific for the dh895xcc virtual function.
 
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- drivers/crypto/qat/qat_common/Makefile             |    2 
- drivers/crypto/qat/qat_common/adf_accel_devices.h  |    5 -
- drivers/crypto/qat/qat_common/adf_admin.c          |  185 ++++++++++++++++++++
- drivers/crypto/qat/qat_common/adf_common_drv.h     |    7 +
- drivers/crypto/qat/qat_common/adf_hw_arbiter.c     |  168 ++++++++++++++++++
- drivers/crypto/qat/qat_common/adf_init.c           |   84 +--------
- drivers/crypto/qat/qat_common/adf_transport.c      |    7 -
- drivers/crypto/qat/qat_common/qat_crypto.c         |    3 
- drivers/crypto/qat/qat_dh895xcc/Makefile           |    5 -
- drivers/crypto/qat/qat_dh895xcc/adf_admin.c        |  145 ----------------
- .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c |    6 -
- .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |    5 -
- drivers/crypto/qat/qat_dh895xcc/adf_drv.c          |    3 
- drivers/crypto/qat/qat_dh895xcc/adf_drv.h          |    9 -
- drivers/crypto/qat/qat_dh895xcc/adf_hw_arbiter.c   |  159 -----------------
- drivers/crypto/qat/qat_dh895xcc/qat_admin.c        |  107 ------------
- 16 files changed, 378 insertions(+), 522 deletions(-)
- create mode 100644 drivers/crypto/qat/qat_common/adf_admin.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_hw_arbiter.c
- delete mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_admin.c
- delete mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_hw_arbiter.c
- delete mode 100644 drivers/crypto/qat/qat_dh895xcc/qat_admin.c
+ drivers/crypto/qat/Kconfig                         |   11 +
+ drivers/crypto/qat/Makefile                        |    1 
+ drivers/crypto/qat/qat_dh895xccvf/Makefile         |    5 
+ .../qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c    |  172 +++++++++
+ .../qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.h    |   68 +++
+ drivers/crypto/qat/qat_dh895xccvf/adf_drv.c        |  393 ++++++++++++++++++++
+ drivers/crypto/qat/qat_dh895xccvf/adf_drv.h        |   57 +++
+ drivers/crypto/qat/qat_dh895xccvf/adf_isr.c        |  258 +++++++++++++
+ 8 files changed, 965 insertions(+)
+ create mode 100644 drivers/crypto/qat/qat_dh895xccvf/Makefile
+ create mode 100644 drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
+ create mode 100644 drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.h
+ create mode 100644 drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
+ create mode 100644 drivers/crypto/qat/qat_dh895xccvf/adf_drv.h
+ create mode 100644 drivers/crypto/qat/qat_dh895xccvf/adf_isr.c
 
-diff --git a/drivers/crypto/qat/qat_common/Makefile b/drivers/crypto/qat/qat_common/Makefile
-index 184605f..e5fe4e7 100644
---- a/drivers/crypto/qat/qat_common/Makefile
-+++ b/drivers/crypto/qat/qat_common/Makefile
-@@ -9,6 +9,8 @@ intel_qat-objs := adf_cfg.o \
- 	adf_accel_engine.o \
- 	adf_aer.o \
- 	adf_transport.o \
-+	adf_admin.o \
-+	adf_hw_arbiter.o \
- 	qat_crypto.o \
- 	qat_algs.o \
- 	qat_rsakey-asn1.o \
-diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-index 99cbce6..a7d3d11 100644
---- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-@@ -141,15 +141,16 @@ struct adf_hw_device_data {
- 	uint32_t (*get_num_aes)(struct adf_hw_device_data *self);
- 	uint32_t (*get_num_accels)(struct adf_hw_device_data *self);
- 	enum dev_sku_info (*get_sku)(struct adf_hw_device_data *self);
--	void (*hw_arb_ring_enable)(struct adf_etr_ring_data *ring);
--	void (*hw_arb_ring_disable)(struct adf_etr_ring_data *ring);
- 	int (*alloc_irq)(struct adf_accel_dev *accel_dev);
- 	void (*free_irq)(struct adf_accel_dev *accel_dev);
- 	void (*enable_error_correction)(struct adf_accel_dev *accel_dev);
- 	int (*init_admin_comms)(struct adf_accel_dev *accel_dev);
- 	void (*exit_admin_comms)(struct adf_accel_dev *accel_dev);
-+	int (*send_admin_init)(struct adf_accel_dev *accel_dev);
- 	int (*init_arb)(struct adf_accel_dev *accel_dev);
- 	void (*exit_arb)(struct adf_accel_dev *accel_dev);
-+	void (*get_arb_mapping)(struct adf_accel_dev *accel_dev,
-+				const uint32_t **cfg);
- 	void (*enable_ints)(struct adf_accel_dev *accel_dev);
- 	const char *fw_name;
- 	const char *fw_mmp_name;
-diff --git a/drivers/crypto/qat/qat_common/adf_admin.c b/drivers/crypto/qat/qat_common/adf_admin.c
+diff --git a/drivers/crypto/qat/Kconfig b/drivers/crypto/qat/Kconfig
+index d8c3d59..95a9566 100644
+--- a/drivers/crypto/qat/Kconfig
++++ b/drivers/crypto/qat/Kconfig
+@@ -21,3 +21,14 @@ config CRYPTO_DEV_QAT_DH895xCC
+ 
+ 	  To compile this as a module, choose M here: the module
+ 	  will be called qat_dh895xcc.
++
++config CRYPTO_DEV_QAT_DH895xCCVF
++	tristate "Support for Intel(R) DH895xCC Virtual Function"
++	select PCI_IOV
++
++	help
++	  Support for Intel(R) DH895xcc with Intel(R) QuickAssist Technology
++	  Virtual Function for accelerating crypto and compression workloads.
++
++	  To compile this as a module, choose M here: the module
++	  will be called qat_dh895xccvf.
+diff --git a/drivers/crypto/qat/Makefile b/drivers/crypto/qat/Makefile
+index d11481b..a3ce0b7 100644
+--- a/drivers/crypto/qat/Makefile
++++ b/drivers/crypto/qat/Makefile
+@@ -1,2 +1,3 @@
+ obj-$(CONFIG_CRYPTO_DEV_QAT) += qat_common/
+ obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCC) += qat_dh895xcc/
++obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCCVF) += qat_dh895xccvf/
+diff --git a/drivers/crypto/qat/qat_dh895xccvf/Makefile b/drivers/crypto/qat/qat_dh895xccvf/Makefile
 new file mode 100644
-index 0000000..0a76168
+index 0000000..85399fc
 --- /dev/null
-+++ b/drivers/crypto/qat/qat_common/adf_admin.c
-@@ -0,0 +1,185 @@
++++ b/drivers/crypto/qat/qat_dh895xccvf/Makefile
+@@ -0,0 +1,5 @@
++ccflags-y := -I$(src)/../qat_common
++obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCCVF) += qat_dh895xccvf.o
++qat_dh895xccvf-objs := adf_drv.o \
++		adf_isr.o \
++		adf_dh895xccvf_hw_data.o
+diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c b/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
+new file mode 100644
+index 0000000..7bbf846
+--- /dev/null
++++ b/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
+@@ -0,0 +1,172 @@
 +/*
 +  This file is provided under a dual BSD/GPLv2 license.  When using or
 +  redistributing this file, you may do so under either license.
 +
 +  GPL LICENSE SUMMARY
-+  Copyright(c) 2014 Intel Corporation.
++  Copyright(c) 2015 Intel Corporation.
 +  This program is free software; you can redistribute it and/or modify
 +  it under the terms of version 2 of the GNU General Public License as
 +  published by the Free Software Foundation.
@@ -106,7 +102,7 @@ index 0000000..0a76168
 +  qat-linux@intel.com
 +
 +  BSD LICENSE
-+  Copyright(c) 2014 Intel Corporation.
++  Copyright(c) 2015 Intel Corporation.
 +  Redistribution and use in source and binary forms, with or without
 +  modification, are permitted provided that the following conditions
 +  are met:
@@ -133,176 +129,212 @@ index 0000000..0a76168
 +  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 +  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 +*/
-+#include <linux/types.h>
-+#include <linux/mutex.h>
-+#include <linux/slab.h>
-+#include <linux/delay.h>
-+#include <linux/pci.h>
-+#include <linux/dma-mapping.h>
-+#include "adf_accel_devices.h"
-+#include "icp_qat_fw_init_admin.h"
++#include <adf_accel_devices.h>
++#include <adf_pf2vf_msg.h>
++#include <adf_common_drv.h>
++#include "adf_dh895xccvf_hw_data.h"
++#include "adf_drv.h"
 +
-+/* Admin Messages Registers */
-+#define ADF_DH895XCC_ADMINMSGUR_OFFSET (0x3A000 + 0x574)
-+#define ADF_DH895XCC_ADMINMSGLR_OFFSET (0x3A000 + 0x578)
-+#define ADF_DH895XCC_MAILBOX_BASE_OFFSET 0x20970
-+#define ADF_DH895XCC_MAILBOX_STRIDE 0x1000
-+#define ADF_ADMINMSG_LEN 32
-+
-+struct adf_admin_comms {
-+	dma_addr_t phy_addr;
-+	void *virt_addr;
-+	void __iomem *mailbox_addr;
-+	struct mutex lock;	/* protects adf_admin_comms struct */
++static struct adf_hw_device_class dh895xcciov_class = {
++	.name = ADF_DH895XCCVF_DEVICE_NAME,
++	.type = DEV_DH895XCCVF,
++	.instances = 0
 +};
 +
-+static int adf_put_admin_msg_sync(struct adf_accel_dev *accel_dev, u32 ae,
-+				  void *in, void *out)
++static u32 get_accel_mask(u32 fuse)
 +{
-+	struct adf_admin_comms *admin = accel_dev->admin;
-+	int offset = ae * ADF_ADMINMSG_LEN * 2;
-+	void __iomem *mailbox = admin->mailbox_addr;
-+	int mb_offset = ae * ADF_DH895XCC_MAILBOX_STRIDE;
-+	int times, received;
++	return ADF_DH895XCCIOV_ACCELERATORS_MASK;
++}
 +
-+	mutex_lock(&admin->lock);
++static u32 get_ae_mask(u32 fuse)
++{
++	return ADF_DH895XCCIOV_ACCELENGINES_MASK;
++}
 +
-+	if (ADF_CSR_RD(mailbox, mb_offset) == 1) {
-+		mutex_unlock(&admin->lock);
-+		return -EAGAIN;
-+	}
++static u32 get_num_accels(struct adf_hw_device_data *self)
++{
++	return ADF_DH895XCCIOV_MAX_ACCELERATORS;
++}
 +
-+	memcpy(admin->virt_addr + offset, in, ADF_ADMINMSG_LEN);
-+	ADF_CSR_WR(mailbox, mb_offset, 1);
-+	received = 0;
-+	for (times = 0; times < 50; times++) {
-+		msleep(20);
-+		if (ADF_CSR_RD(mailbox, mb_offset) == 0) {
-+			received = 1;
-+			break;
-+		}
-+	}
-+	if (received)
-+		memcpy(out, admin->virt_addr + offset +
-+		       ADF_ADMINMSG_LEN, ADF_ADMINMSG_LEN);
-+	else
++static u32 get_num_aes(struct adf_hw_device_data *self)
++{
++	return ADF_DH895XCCIOV_MAX_ACCELENGINES;
++}
++
++static u32 get_misc_bar_id(struct adf_hw_device_data *self)
++{
++	return ADF_DH895XCCIOV_PMISC_BAR;
++}
++
++static u32 get_etr_bar_id(struct adf_hw_device_data *self)
++{
++	return ADF_DH895XCCIOV_ETR_BAR;
++}
++
++static enum dev_sku_info get_sku(struct adf_hw_device_data *self)
++{
++	return DEV_SKU_VF;
++}
++
++static u32 get_pf2vf_offset(u32 i)
++{
++	return ADF_DH895XCCIOV_PF2VF_OFFSET;
++}
++
++static u32 get_vintmsk_offset(u32 i)
++{
++	return ADF_DH895XCCIOV_VINTMSK_OFFSET;
++}
++
++static int adf_vf_int_noop(struct adf_accel_dev *accel_dev)
++{
++	return 0;
++}
++
++static void adf_vf_void_noop(struct adf_accel_dev *accel_dev)
++{
++}
++
++static int adf_vf2pf_init(struct adf_accel_dev *accel_dev)
++{
++	u32 msg = (ADF_VF2PF_MSGORIGIN_SYSTEM |
++		(ADF_VF2PF_MSGTYPE_INIT << ADF_VF2PF_MSGTYPE_SHIFT));
++
++	if (adf_iov_putmsg(accel_dev, msg, 0)) {
 +		dev_err(&GET_DEV(accel_dev),
-+			"Failed to send admin msg to accelerator\n");
-+
-+	mutex_unlock(&admin->lock);
-+	return received ? 0 : -EFAULT;
-+}
-+
-+static int adf_send_admin_cmd(struct adf_accel_dev *accel_dev, int cmd)
-+{
-+	struct adf_hw_device_data *hw_device = accel_dev->hw_device;
-+	struct icp_qat_fw_init_admin_req req;
-+	struct icp_qat_fw_init_admin_resp resp;
-+	int i;
-+
-+	memset(&req, 0, sizeof(struct icp_qat_fw_init_admin_req));
-+	req.init_admin_cmd_id = cmd;
-+	for (i = 0; i < hw_device->get_num_aes(hw_device); i++) {
-+		memset(&resp, 0, sizeof(struct icp_qat_fw_init_admin_resp));
-+		if (adf_put_admin_msg_sync(accel_dev, i, &req, &resp) ||
-+		    resp.init_resp_hdr.status)
-+			return -EFAULT;
++			"Failed to send Init event to PF\n");
++		return -EFAULT;
 +	}
 +	return 0;
 +}
 +
-+/**
-+ * adf_send_admin_init() - Function sends init message to FW
-+ * @accel_dev: Pointer to acceleration device.
-+ *
-+ * Function sends admin init message to the FW
-+ *
-+ * Return: 0 on success, error code otherwise.
-+ */
-+int adf_send_admin_init(struct adf_accel_dev *accel_dev)
++static void adf_vf2pf_shutdown(struct adf_accel_dev *accel_dev)
 +{
-+	return adf_send_admin_cmd(accel_dev, ICP_QAT_FW_INIT_ME);
-+}
-+EXPORT_SYMBOL_GPL(adf_send_admin_init);
++	u32 msg = (ADF_VF2PF_MSGORIGIN_SYSTEM |
++	    (ADF_VF2PF_MSGTYPE_SHUTDOWN << ADF_VF2PF_MSGTYPE_SHIFT));
 +
-+int adf_init_admin_comms(struct adf_accel_dev *accel_dev)
++	if (adf_iov_putmsg(accel_dev, msg, 0))
++		dev_err(&GET_DEV(accel_dev),
++			"Failed to send Shutdown event to PF\n");
++}
++
++void adf_init_hw_data_dh895xcciov(struct adf_hw_device_data *hw_data)
 +{
-+	struct adf_admin_comms *admin;
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+	struct adf_bar *pmisc =
-+		&GET_BARS(accel_dev)[hw_data->get_misc_bar_id(hw_data)];
-+	void __iomem *csr = pmisc->virt_addr;
-+	void __iomem *mailbox = csr + ADF_DH895XCC_MAILBOX_BASE_OFFSET;
-+	u64 reg_val;
-+
-+	admin = kzalloc_node(sizeof(*accel_dev->admin), GFP_KERNEL,
-+			     dev_to_node(&GET_DEV(accel_dev)));
-+	if (!admin)
-+		return -ENOMEM;
-+	admin->virt_addr = dma_zalloc_coherent(&GET_DEV(accel_dev), PAGE_SIZE,
-+					       &admin->phy_addr, GFP_KERNEL);
-+	if (!admin->virt_addr) {
-+		dev_err(&GET_DEV(accel_dev), "Failed to allocate dma buff\n");
-+		kfree(admin);
-+		return -ENOMEM;
-+	}
-+	reg_val = (u64)admin->phy_addr;
-+	ADF_CSR_WR(csr, ADF_DH895XCC_ADMINMSGUR_OFFSET, reg_val >> 32);
-+	ADF_CSR_WR(csr, ADF_DH895XCC_ADMINMSGLR_OFFSET, reg_val);
-+	mutex_init(&admin->lock);
-+	admin->mailbox_addr = mailbox;
-+	accel_dev->admin = admin;
-+	return 0;
++	hw_data->dev_class = &dh895xcciov_class;
++	hw_data->instance_id = dh895xcciov_class.instances++;
++	hw_data->num_banks = ADF_DH895XCCIOV_ETR_MAX_BANKS;
++	hw_data->num_accel = ADF_DH895XCCIOV_MAX_ACCELERATORS;
++	hw_data->num_logical_accel = 1;
++	hw_data->num_engines = ADF_DH895XCCIOV_MAX_ACCELENGINES;
++	hw_data->tx_rx_gap = ADF_DH895XCCIOV_RX_RINGS_OFFSET;
++	hw_data->tx_rings_mask = ADF_DH895XCCIOV_TX_RINGS_MASK;
++	hw_data->alloc_irq = adf_isr_resource_alloc;
++	hw_data->free_irq = adf_isr_resource_free;
++	hw_data->enable_error_correction = adf_vf_void_noop;
++	hw_data->init_admin_comms = adf_vf_int_noop;
++	hw_data->exit_admin_comms = adf_vf_void_noop;
++	hw_data->send_admin_init = adf_vf2pf_init;
++	hw_data->init_arb = adf_vf_int_noop;
++	hw_data->exit_arb = adf_vf_void_noop;
++	hw_data->disable_iov = adf_vf2pf_shutdown;
++	hw_data->get_accel_mask = get_accel_mask;
++	hw_data->get_ae_mask = get_ae_mask;
++	hw_data->get_num_accels = get_num_accels;
++	hw_data->get_num_aes = get_num_aes;
++	hw_data->get_etr_bar_id = get_etr_bar_id;
++	hw_data->get_misc_bar_id = get_misc_bar_id;
++	hw_data->get_pf2vf_offset = get_pf2vf_offset;
++	hw_data->get_vintmsk_offset = get_vintmsk_offset;
++	hw_data->get_sku = get_sku;
++	hw_data->enable_ints = adf_vf_void_noop;
++	hw_data->enable_vf2pf_comms = adf_enable_vf2pf_comms;
++	hw_data->min_iov_compat_ver = ADF_PFVF_COMPATIBILITY_VERSION;
 +}
-+EXPORT_SYMBOL_GPL(adf_init_admin_comms);
 +
-+void adf_exit_admin_comms(struct adf_accel_dev *accel_dev)
++void adf_clean_hw_data_dh895xcciov(struct adf_hw_device_data *hw_data)
 +{
-+	struct adf_admin_comms *admin = accel_dev->admin;
-+
-+	if (!admin)
-+		return;
-+
-+	if (admin->virt_addr)
-+		dma_free_coherent(&GET_DEV(accel_dev), PAGE_SIZE,
-+				  admin->virt_addr, admin->phy_addr);
-+
-+	mutex_destroy(&admin->lock);
-+	kfree(admin);
-+	accel_dev->admin = NULL;
++	hw_data->dev_class->instances--;
 +}
-+EXPORT_SYMBOL_GPL(adf_exit_admin_comms);
-diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
-index 3c33fee..7935a38 100644
---- a/drivers/crypto/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
-@@ -91,7 +91,6 @@ struct service_hndl {
- 	unsigned long start_status;
- 	char *name;
- 	struct list_head list;
--	int admin;
- };
- 
- static inline int get_current_node(void)
-@@ -135,6 +134,12 @@ int adf_enable_aer(struct adf_accel_dev *accel_dev, struct pci_driver *adf);
- void adf_disable_aer(struct adf_accel_dev *accel_dev);
- int adf_init_aer(void);
- void adf_exit_aer(void);
-+int adf_init_admin_comms(struct adf_accel_dev *accel_dev);
-+void adf_exit_admin_comms(struct adf_accel_dev *accel_dev);
-+int adf_send_admin_init(struct adf_accel_dev *accel_dev);
-+int adf_init_arb(struct adf_accel_dev *accel_dev);
-+void adf_exit_arb(struct adf_accel_dev *accel_dev);
-+void adf_update_ring_arb(struct adf_etr_ring_data *ring);
- 
- int adf_dev_get(struct adf_accel_dev *accel_dev);
- void adf_dev_put(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/qat/qat_common/adf_hw_arbiter.c b/drivers/crypto/qat/qat_common/adf_hw_arbiter.c
+diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.h b/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.h
 new file mode 100644
-index 0000000..6849422
+index 0000000..8f6babf
 --- /dev/null
-+++ b/drivers/crypto/qat/qat_common/adf_hw_arbiter.c
-@@ -0,0 +1,168 @@
++++ b/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.h
+@@ -0,0 +1,68 @@
++/*
++  This file is provided under a dual BSD/GPLv2 license.  When using or
++  redistributing this file, you may do so under either license.
++
++  GPL LICENSE SUMMARY
++  Copyright(c) 2015 Intel Corporation.
++  This program is free software; you can redistribute it and/or modify
++  it under the terms of version 2 of the GNU General Public License as
++  published by the Free Software Foundation.
++
++  This program is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++  General Public License for more details.
++
++  Contact Information:
++  qat-linux@intel.com
++
++  BSD LICENSE
++  Copyright(c) 2015 Intel Corporation.
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions
++  are met:
++
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above copyright
++      notice, this list of conditions and the following disclaimer in
++      the documentation and/or other materials provided with the
++      distribution.
++    * Neither the name of Intel Corporation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++#ifndef ADF_DH895XVF_HW_DATA_H_
++#define ADF_DH895XVF_HW_DATA_H_
++
++#define ADF_DH895XCCIOV_PMISC_BAR 1
++#define ADF_DH895XCCIOV_ACCELERATORS_MASK 0x1
++#define ADF_DH895XCCIOV_ACCELENGINES_MASK 0x1
++#define ADF_DH895XCCIOV_MAX_ACCELERATORS 1
++#define ADF_DH895XCCIOV_MAX_ACCELENGINES 1
++#define ADF_DH895XCCIOV_RX_RINGS_OFFSET 8
++#define ADF_DH895XCCIOV_TX_RINGS_MASK 0xFF
++#define ADF_DH895XCCIOV_ETR_BAR 0
++#define ADF_DH895XCCIOV_ETR_MAX_BANKS 1
++
++#define ADF_DH895XCCIOV_PF2VF_OFFSET	0x200
++#define ADF_DH895XCC_PF2VF_PF2VFINT	BIT(0)
++
++#define ADF_DH895XCCIOV_VINTSOU_OFFSET	0x204
++#define ADF_DH895XCC_VINTSOU_BUN	BIT(0)
++#define ADF_DH895XCC_VINTSOU_PF2VF	BIT(1)
++
++#define ADF_DH895XCCIOV_VINTMSK_OFFSET	0x208
++#endif
+diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
+new file mode 100644
+index 0000000..789426f
+--- /dev/null
++++ b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
+@@ -0,0 +1,393 @@
 +/*
 +  This file is provided under a dual BSD/GPLv2 license.  When using or
 +  redistributing this file, you may do so under either license.
@@ -349,865 +381,677 @@ index 0000000..6849422
 +  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 +  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 +*/
-+#include "adf_accel_devices.h"
-+#include "adf_transport_internal.h"
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/pci.h>
++#include <linux/init.h>
++#include <linux/types.h>
++#include <linux/fs.h>
++#include <linux/slab.h>
++#include <linux/errno.h>
++#include <linux/device.h>
++#include <linux/dma-mapping.h>
++#include <linux/platform_device.h>
++#include <linux/workqueue.h>
++#include <linux/io.h>
++#include <adf_accel_devices.h>
++#include <adf_common_drv.h>
++#include <adf_cfg.h>
++#include <adf_transport_access_macros.h>
++#include "adf_dh895xccvf_hw_data.h"
++#include "adf_drv.h"
 +
-+#define ADF_ARB_NUM 4
-+#define ADF_ARB_REQ_RING_NUM 8
-+#define ADF_ARB_REG_SIZE 0x4
-+#define ADF_ARB_WTR_SIZE 0x20
-+#define ADF_ARB_OFFSET 0x30000
-+#define ADF_ARB_REG_SLOT 0x1000
-+#define ADF_ARB_WTR_OFFSET 0x010
-+#define ADF_ARB_RO_EN_OFFSET 0x090
-+#define ADF_ARB_WQCFG_OFFSET 0x100
-+#define ADF_ARB_WRK_2_SER_MAP_OFFSET 0x180
-+#define ADF_ARB_RINGSRVARBEN_OFFSET 0x19C
++static const char adf_driver_name[] = ADF_DH895XCCVF_DEVICE_NAME;
 +
-+#define WRITE_CSR_ARB_RINGSRVARBEN(csr_addr, index, value) \
-+	ADF_CSR_WR(csr_addr, ADF_ARB_RINGSRVARBEN_OFFSET + \
-+	(ADF_ARB_REG_SLOT * index), value)
++#define ADF_SYSTEM_DEVICE(device_id) \
++	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
 +
-+#define WRITE_CSR_ARB_RESPORDERING(csr_addr, index, value) \
-+	ADF_CSR_WR(csr_addr, (ADF_ARB_OFFSET + \
-+	ADF_ARB_RO_EN_OFFSET) + (ADF_ARB_REG_SIZE * index), value)
++static const struct pci_device_id adf_pci_tbl[] = {
++	ADF_SYSTEM_DEVICE(ADF_DH895XCCIOV_PCI_DEVICE_ID),
++	{0,}
++};
++MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
 +
-+#define WRITE_CSR_ARB_WEIGHT(csr_addr, arb, index, value) \
-+	ADF_CSR_WR(csr_addr, (ADF_ARB_OFFSET + \
-+	ADF_ARB_WTR_OFFSET) + (ADF_ARB_WTR_SIZE * arb) + \
-+	(ADF_ARB_REG_SIZE * index), value)
++static int adf_probe(struct pci_dev *dev, const struct pci_device_id *ent);
++static void adf_remove(struct pci_dev *dev);
 +
-+#define WRITE_CSR_ARB_SARCONFIG(csr_addr, index, value) \
-+	ADF_CSR_WR(csr_addr, ADF_ARB_OFFSET + \
-+	(ADF_ARB_REG_SIZE * index), value)
++static struct pci_driver adf_driver = {
++	.id_table = adf_pci_tbl,
++	.name = adf_driver_name,
++	.probe = adf_probe,
++	.remove = adf_remove,
++};
 +
-+#define WRITE_CSR_ARB_WRK_2_SER_MAP(csr_addr, index, value) \
-+	ADF_CSR_WR(csr_addr, (ADF_ARB_OFFSET + \
-+	ADF_ARB_WRK_2_SER_MAP_OFFSET) + \
-+	(ADF_ARB_REG_SIZE * index), value)
-+
-+#define WRITE_CSR_ARB_WQCFG(csr_addr, index, value) \
-+	ADF_CSR_WR(csr_addr, (ADF_ARB_OFFSET + \
-+	ADF_ARB_WQCFG_OFFSET) + (ADF_ARB_REG_SIZE * index), value)
-+
-+int adf_init_arb(struct adf_accel_dev *accel_dev)
++static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
 +{
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+	void __iomem *csr = accel_dev->transport->banks[0].csr_addr;
-+	u32 arb_cfg = 0x1 << 31 | 0x4 << 4 | 0x1;
-+	u32 arb, i;
-+	const u32 *thd_2_arb_cfg;
++	pci_release_regions(accel_dev->accel_pci_dev.pci_dev);
++	pci_disable_device(accel_dev->accel_pci_dev.pci_dev);
++}
 +
-+	/* Service arb configured for 32 bytes responses and
-+	 * ring flow control check enabled. */
-+	for (arb = 0; arb < ADF_ARB_NUM; arb++)
-+		WRITE_CSR_ARB_SARCONFIG(csr, arb, arb_cfg);
++static void adf_cleanup_accel(struct adf_accel_dev *accel_dev)
++{
++	struct adf_accel_pci *accel_pci_dev = &accel_dev->accel_pci_dev;
++	struct adf_accel_dev *pf;
++	int i;
 +
-+	/* Setup service weighting */
-+	for (arb = 0; arb < ADF_ARB_NUM; arb++)
-+		for (i = 0; i < ADF_ARB_REQ_RING_NUM; i++)
-+			WRITE_CSR_ARB_WEIGHT(csr, arb, i, 0xFFFFFFFF);
++	for (i = 0; i < ADF_PCI_MAX_BARS; i++) {
++		struct adf_bar *bar = &accel_pci_dev->pci_bars[i];
 +
-+	/* Setup ring response ordering */
-+	for (i = 0; i < ADF_ARB_REQ_RING_NUM; i++)
-+		WRITE_CSR_ARB_RESPORDERING(csr, i, 0xFFFFFFFF);
++		if (bar->virt_addr)
++			pci_iounmap(accel_pci_dev->pci_dev, bar->virt_addr);
++	}
 +
-+	/* Setup worker queue registers */
-+	for (i = 0; i < hw_data->num_engines; i++)
-+		WRITE_CSR_ARB_WQCFG(csr, i, i);
++	if (accel_dev->hw_device) {
++		switch (accel_pci_dev->pci_dev->device) {
++		case ADF_DH895XCCIOV_PCI_DEVICE_ID:
++			adf_clean_hw_data_dh895xcciov(accel_dev->hw_device);
++			break;
++		default:
++			break;
++		}
++		kfree(accel_dev->hw_device);
++		accel_dev->hw_device = NULL;
++	}
++	adf_cfg_dev_remove(accel_dev);
++	debugfs_remove(accel_dev->debugfs_dir);
++	pf = adf_devmgr_pci_to_accel_dev(accel_pci_dev->pci_dev->physfn);
++	adf_devmgr_rm_dev(accel_dev, pf);
++}
 +
-+	/* Map worker threads to service arbiters */
-+	hw_data->get_arb_mapping(accel_dev, &thd_2_arb_cfg);
++static int adf_dev_configure(struct adf_accel_dev *accel_dev)
++{
++	char key[ADF_CFG_MAX_KEY_LEN_IN_BYTES];
++	unsigned long val, bank = 0;
 +
-+	if (!thd_2_arb_cfg)
++	if (adf_cfg_section_add(accel_dev, ADF_KERNEL_SEC))
++		goto err;
++	if (adf_cfg_section_add(accel_dev, "Accelerator0"))
++		goto err;
++
++	snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_BANK_NUM, 0);
++	if (adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC, key,
++					(void *)&bank, ADF_DEC))
++		goto err;
++
++	val = bank;
++	snprintf(key, sizeof(key), ADF_CY "%d" ADF_ETRMGR_CORE_AFFINITY, 0);
++	if (adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC, key,
++					(void *)&val, ADF_DEC))
++		goto err;
++
++	snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_ASYM_SIZE, 0);
++
++	val = 128;
++	if (adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC, key,
++					(void *)&val, ADF_DEC))
++		goto err;
++
++	val = 512;
++	snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_SYM_SIZE, 0);
++	if (adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC,
++					key, (void *)&val, ADF_DEC))
++		goto err;
++
++	val = 0;
++	snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_ASYM_TX, 0);
++	if (adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC,
++					key, (void *)&val, ADF_DEC))
++		goto err;
++
++	val = 2;
++	snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_SYM_TX, 0);
++	if (adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC,
++					key, (void *)&val, ADF_DEC))
++		goto err;
++
++	val = 8;
++	snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_ASYM_RX, 0);
++	if (adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC,
++					key, (void *)&val, ADF_DEC))
++		goto err;
++
++	val = 10;
++	snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_SYM_RX, 0);
++	if (adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC,
++					key, (void *)&val, ADF_DEC))
++			goto err;
++
++	val = ADF_COALESCING_DEF_TIME;
++	snprintf(key, sizeof(key), ADF_ETRMGR_COALESCE_TIMER_FORMAT,
++		 (int)bank);
++	if (adf_cfg_add_key_value_param(accel_dev, "Accelerator0",
++					key, (void *)&val, ADF_DEC))
++		goto err;
++
++	val = 1;
++	if (adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC,
++					ADF_NUM_CY, (void *)&val, ADF_DEC))
++		goto err;
++
++	set_bit(ADF_STATUS_CONFIGURED, &accel_dev->status);
++	return 0;
++err:
++	dev_err(&GET_DEV(accel_dev), "Failed to configure QAT accel dev\n");
++	return -EINVAL;
++}
++
++static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
++{
++	struct adf_accel_dev *accel_dev;
++	struct adf_accel_dev *pf;
++	struct adf_accel_pci *accel_pci_dev;
++	struct adf_hw_device_data *hw_data;
++	char name[ADF_DEVICE_NAME_LENGTH];
++	unsigned int i, bar_nr;
++	int ret, bar_mask;
++
++	switch (ent->device) {
++	case ADF_DH895XCCIOV_PCI_DEVICE_ID:
++		break;
++	default:
++		dev_err(&pdev->dev, "Invalid device 0x%x.\n", ent->device);
++		return -ENODEV;
++	}
++
++	accel_dev = kzalloc_node(sizeof(*accel_dev), GFP_KERNEL,
++				 dev_to_node(&pdev->dev));
++	if (!accel_dev)
++		return -ENOMEM;
++
++	accel_dev->is_vf = true;
++	pf = adf_devmgr_pci_to_accel_dev(pdev->physfn);
++	accel_pci_dev = &accel_dev->accel_pci_dev;
++	accel_pci_dev->pci_dev = pdev;
++
++	/* Add accel device to accel table */
++	if (adf_devmgr_add_dev(accel_dev, pf)) {
++		dev_err(&pdev->dev, "Failed to add new accelerator device.\n");
++		kfree(accel_dev);
 +		return -EFAULT;
++	}
++	INIT_LIST_HEAD(&accel_dev->crypto_list);
 +
-+	for (i = 0; i < hw_data->num_engines; i++)
-+		WRITE_CSR_ARB_WRK_2_SER_MAP(csr, i, *(thd_2_arb_cfg + i));
++	accel_dev->owner = THIS_MODULE;
++	/* Allocate and configure device configuration structure */
++	hw_data = kzalloc_node(sizeof(*hw_data), GFP_KERNEL,
++			       dev_to_node(&pdev->dev));
++	if (!hw_data) {
++		ret = -ENOMEM;
++		goto out_err;
++	}
++	accel_dev->hw_device = hw_data;
++	switch (ent->device) {
++	case ADF_DH895XCCIOV_PCI_DEVICE_ID:
++		adf_init_hw_data_dh895xcciov(accel_dev->hw_device);
++		break;
++	default:
++		ret = -ENODEV;
++		goto out_err;
++	}
 +
++	/* Get Accelerators and Accelerators Engines masks */
++	hw_data->accel_mask = hw_data->get_accel_mask(hw_data->fuses);
++	hw_data->ae_mask = hw_data->get_ae_mask(hw_data->fuses);
++	accel_pci_dev->sku = hw_data->get_sku(hw_data);
++
++	/* Create dev top level debugfs entry */
++	snprintf(name, sizeof(name), "%s%s_%02x:%02d.%02d",
++		 ADF_DEVICE_NAME_PREFIX, hw_data->dev_class->name,
++		 pdev->bus->number, PCI_SLOT(pdev->devfn),
++		 PCI_FUNC(pdev->devfn));
++
++	accel_dev->debugfs_dir = debugfs_create_dir(name, NULL);
++	if (!accel_dev->debugfs_dir) {
++		dev_err(&pdev->dev, "Could not create debugfs dir %s\n", name);
++		ret = -EINVAL;
++		goto out_err;
++	}
++
++	/* Create device configuration table */
++	ret = adf_cfg_dev_add(accel_dev);
++	if (ret)
++		goto out_err;
++
++	/* enable PCI device */
++	if (pci_enable_device(pdev)) {
++		ret = -EFAULT;
++		goto out_err;
++	}
++
++	/* set dma identifier */
++	if (pci_set_dma_mask(pdev, DMA_BIT_MASK(64))) {
++		if ((pci_set_dma_mask(pdev, DMA_BIT_MASK(32)))) {
++			dev_err(&pdev->dev, "No usable DMA configuration\n");
++			ret = -EFAULT;
++			goto out_err_disable;
++		} else {
++			pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(32));
++		}
++
++	} else {
++		pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
++	}
++
++	if (pci_request_regions(pdev, adf_driver_name)) {
++		ret = -EFAULT;
++		goto out_err_disable;
++	}
++
++	/* Find and map all the device's BARS */
++	i = 0;
++	bar_mask = pci_select_bars(pdev, IORESOURCE_MEM);
++	for_each_set_bit(bar_nr, (const unsigned long *)&bar_mask,
++			 ADF_PCI_MAX_BARS * 2) {
++		struct adf_bar *bar = &accel_pci_dev->pci_bars[i++];
++
++		bar->base_addr = pci_resource_start(pdev, bar_nr);
++		if (!bar->base_addr)
++			break;
++		bar->size = pci_resource_len(pdev, bar_nr);
++		bar->virt_addr = pci_iomap(accel_pci_dev->pci_dev, bar_nr, 0);
++		if (!bar->virt_addr) {
++			dev_err(&pdev->dev, "Failed to map BAR %d\n", bar_nr);
++			ret = -EFAULT;
++			goto out_err_free_reg;
++		}
++	}
++	pci_set_master(pdev);
++	/* Completion for VF2PF request/response message exchange */
++	init_completion(&accel_dev->vf.iov_msg_completion);
++
++	ret = adf_dev_configure(accel_dev);
++	if (ret)
++		goto out_err_free_reg;
++
++	ret = adf_dev_init(accel_dev);
++	if (ret)
++		goto out_err_dev_shutdown;
++
++	ret = adf_dev_start(accel_dev);
++	if (ret)
++		goto out_err_dev_stop;
++
++	return ret;
++
++out_err_dev_stop:
++	adf_dev_stop(accel_dev);
++out_err_dev_shutdown:
++	adf_dev_shutdown(accel_dev);
++out_err_free_reg:
++	pci_release_regions(accel_pci_dev->pci_dev);
++out_err_disable:
++	pci_disable_device(accel_pci_dev->pci_dev);
++out_err:
++	adf_cleanup_accel(accel_dev);
++	kfree(accel_dev);
++	return ret;
++}
++
++static void adf_remove(struct pci_dev *pdev)
++{
++	struct adf_accel_dev *accel_dev = adf_devmgr_pci_to_accel_dev(pdev);
++
++	if (!accel_dev) {
++		pr_err("QAT: Driver removal failed\n");
++		return;
++	}
++	if (adf_dev_stop(accel_dev))
++		dev_err(&GET_DEV(accel_dev), "Failed to stop QAT accel dev\n");
++
++	adf_dev_shutdown(accel_dev);
++	adf_cleanup_accel(accel_dev);
++	adf_cleanup_pci_dev(accel_dev);
++	kfree(accel_dev);
++}
++
++static int __init adfdrv_init(void)
++{
++	request_module("intel_qat");
++
++	if (pci_register_driver(&adf_driver)) {
++		pr_err("QAT: Driver initialization failed\n");
++		return -EFAULT;
++	}
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(adf_init_arb);
 +
-+/**
-+ * adf_update_ring_arb() - update ring arbitration rgister
-+ * @accel_dev:  Pointer to ring data.
-+ *
-+ * Function enables or disables rings for/from arbitration.
-+ */
-+void adf_update_ring_arb(struct adf_etr_ring_data *ring)
++static void __exit adfdrv_release(void)
 +{
-+	WRITE_CSR_ARB_RINGSRVARBEN(ring->bank->csr_addr,
-+				   ring->bank->bank_number,
-+				   ring->bank->ring_mask & 0xFF);
++	pci_unregister_driver(&adf_driver);
++	adf_clean_vf_map(true);
 +}
-+EXPORT_SYMBOL_GPL(adf_update_ring_arb);
 +
-+void adf_exit_arb(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+	void __iomem *csr;
-+	unsigned int i;
++module_init(adfdrv_init);
++module_exit(adfdrv_release);
 +
-+	if (!accel_dev->transport)
-+		return;
++MODULE_LICENSE("Dual BSD/GPL");
++MODULE_AUTHOR("Intel");
++MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
++MODULE_VERSION(ADF_DRV_VERSION);
+diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.h b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.h
+new file mode 100644
+index 0000000..041d2a0
+--- /dev/null
++++ b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.h
+@@ -0,0 +1,57 @@
++/*
++  This file is provided under a dual BSD/GPLv2 license.  When using or
++  redistributing this file, you may do so under either license.
 +
-+	csr = accel_dev->transport->banks[0].csr_addr;
++  GPL LICENSE SUMMARY
++  Copyright(c) 2014 Intel Corporation.
++  This program is free software; you can redistribute it and/or modify
++  it under the terms of version 2 of the GNU General Public License as
++  published by the Free Software Foundation.
 +
-+	/* Reset arbiter configuration */
-+	for (i = 0; i < ADF_ARB_NUM; i++)
-+		WRITE_CSR_ARB_SARCONFIG(csr, i, 0);
++  This program is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++  General Public License for more details.
 +
-+	/* Shutdown work queue */
-+	for (i = 0; i < hw_data->num_engines; i++)
-+		WRITE_CSR_ARB_WQCFG(csr, i, 0);
++  Contact Information:
++  qat-linux@intel.com
 +
-+	/* Unmap worker threads to service arbiters */
-+	for (i = 0; i < hw_data->num_engines; i++)
-+		WRITE_CSR_ARB_WRK_2_SER_MAP(csr, i, 0);
++  BSD LICENSE
++  Copyright(c) 2014 Intel Corporation.
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions
++  are met:
 +
-+	/* Disable arbitration on all rings */
-+	for (i = 0; i < GET_MAX_BANKS(accel_dev); i++)
-+		WRITE_CSR_ARB_RINGSRVARBEN(csr, i, 0);
-+}
-+EXPORT_SYMBOL_GPL(adf_exit_arb);
-diff --git a/drivers/crypto/qat/qat_common/adf_init.c b/drivers/crypto/qat/qat_common/adf_init.c
-index 9a90b28..1aaa5fd 100644
---- a/drivers/crypto/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/qat/qat_common/adf_init.c
-@@ -177,20 +177,6 @@ int adf_dev_init(struct adf_accel_dev *accel_dev)
- 	 */
- 	list_for_each(list_itr, &service_table) {
- 		service = list_entry(list_itr, struct service_hndl, list);
--		if (!service->admin)
--			continue;
--		if (service->event_hld(accel_dev, ADF_EVENT_INIT)) {
--			dev_err(&GET_DEV(accel_dev),
--				"Failed to initialise service %s\n",
--				service->name);
--			return -EFAULT;
--		}
--		set_bit(accel_dev->accel_id, &service->init_status);
--	}
--	list_for_each(list_itr, &service_table) {
--		service = list_entry(list_itr, struct service_hndl, list);
--		if (service->admin)
--			continue;
- 		if (service->event_hld(accel_dev, ADF_EVENT_INIT)) {
- 			dev_err(&GET_DEV(accel_dev),
- 				"Failed to initialise service %s\n",
-@@ -218,6 +204,7 @@ EXPORT_SYMBOL_GPL(adf_dev_init);
-  */
- int adf_dev_start(struct adf_accel_dev *accel_dev)
- {
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
- 	struct service_hndl *service;
- 	struct list_head *list_itr;
- 
-@@ -229,22 +216,13 @@ int adf_dev_start(struct adf_accel_dev *accel_dev)
- 	}
- 	set_bit(ADF_STATUS_AE_STARTED, &accel_dev->status);
- 
--	list_for_each(list_itr, &service_table) {
--		service = list_entry(list_itr, struct service_hndl, list);
--		if (!service->admin)
--			continue;
--		if (service->event_hld(accel_dev, ADF_EVENT_START)) {
--			dev_err(&GET_DEV(accel_dev),
--				"Failed to start service %s\n",
--				service->name);
--			return -EFAULT;
--		}
--		set_bit(accel_dev->accel_id, &service->start_status);
-+	if (hw_data->send_admin_init(accel_dev)) {
-+		dev_err(&GET_DEV(accel_dev), "Failed to send init message\n");
-+		return -EFAULT;
- 	}
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above copyright
++      notice, this list of conditions and the following disclaimer in
++      the documentation and/or other materials provided with the
++      distribution.
++    * Neither the name of Intel Corporation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
 +
- 	list_for_each(list_itr, &service_table) {
- 		service = list_entry(list_itr, struct service_hndl, list);
--		if (service->admin)
--			continue;
- 		if (service->event_hld(accel_dev, ADF_EVENT_START)) {
- 			dev_err(&GET_DEV(accel_dev),
- 				"Failed to start service %s\n",
-@@ -300,8 +278,6 @@ int adf_dev_stop(struct adf_accel_dev *accel_dev)
- 
- 	list_for_each(list_itr, &service_table) {
- 		service = list_entry(list_itr, struct service_hndl, list);
--		if (service->admin)
--			continue;
- 		if (!test_bit(accel_dev->accel_id, &service->start_status))
- 			continue;
- 		ret = service->event_hld(accel_dev, ADF_EVENT_STOP);
-@@ -312,19 +288,6 @@ int adf_dev_stop(struct adf_accel_dev *accel_dev)
- 			clear_bit(accel_dev->accel_id, &service->start_status);
- 		}
- 	}
--	list_for_each(list_itr, &service_table) {
--		service = list_entry(list_itr, struct service_hndl, list);
--		if (!service->admin)
--			continue;
--		if (!test_bit(accel_dev->accel_id, &service->start_status))
--			continue;
--		if (service->event_hld(accel_dev, ADF_EVENT_STOP))
--			dev_err(&GET_DEV(accel_dev),
--				"Failed to shutdown service %s\n",
--				service->name);
--		else
--			clear_bit(accel_dev->accel_id, &service->start_status);
--	}
- 
- 	if (wait)
- 		msleep(100);
-@@ -375,21 +338,6 @@ void adf_dev_shutdown(struct adf_accel_dev *accel_dev)
- 
- 	list_for_each(list_itr, &service_table) {
- 		service = list_entry(list_itr, struct service_hndl, list);
--		if (service->admin)
--			continue;
--		if (!test_bit(accel_dev->accel_id, &service->init_status))
--			continue;
--		if (service->event_hld(accel_dev, ADF_EVENT_SHUTDOWN))
--			dev_err(&GET_DEV(accel_dev),
--				"Failed to shutdown service %s\n",
--				service->name);
--		else
--			clear_bit(accel_dev->accel_id, &service->init_status);
--	}
--	list_for_each(list_itr, &service_table) {
--		service = list_entry(list_itr, struct service_hndl, list);
--		if (!service->admin)
--			continue;
- 		if (!test_bit(accel_dev->accel_id, &service->init_status))
- 			continue;
- 		if (service->event_hld(accel_dev, ADF_EVENT_SHUTDOWN))
-@@ -426,17 +374,6 @@ int adf_dev_restarting_notify(struct adf_accel_dev *accel_dev)
- 
- 	list_for_each(list_itr, &service_table) {
- 		service = list_entry(list_itr, struct service_hndl, list);
--		if (service->admin)
--			continue;
--		if (service->event_hld(accel_dev, ADF_EVENT_RESTARTING))
--			dev_err(&GET_DEV(accel_dev),
--				"Failed to restart service %s.\n",
--				service->name);
--	}
--	list_for_each(list_itr, &service_table) {
--		service = list_entry(list_itr, struct service_hndl, list);
--		if (!service->admin)
--			continue;
- 		if (service->event_hld(accel_dev, ADF_EVENT_RESTARTING))
- 			dev_err(&GET_DEV(accel_dev),
- 				"Failed to restart service %s.\n",
-@@ -452,17 +389,6 @@ int adf_dev_restarted_notify(struct adf_accel_dev *accel_dev)
- 
- 	list_for_each(list_itr, &service_table) {
- 		service = list_entry(list_itr, struct service_hndl, list);
--		if (service->admin)
--			continue;
--		if (service->event_hld(accel_dev, ADF_EVENT_RESTARTED))
--			dev_err(&GET_DEV(accel_dev),
--				"Failed to restart service %s.\n",
--				service->name);
--	}
--	list_for_each(list_itr, &service_table) {
--		service = list_entry(list_itr, struct service_hndl, list);
--		if (!service->admin)
--			continue;
- 		if (service->event_hld(accel_dev, ADF_EVENT_RESTARTED))
- 			dev_err(&GET_DEV(accel_dev),
- 				"Failed to restart service %s.\n",
-diff --git a/drivers/crypto/qat/qat_common/adf_transport.c b/drivers/crypto/qat/qat_common/adf_transport.c
-index df0331d..d5d8198 100644
---- a/drivers/crypto/qat/qat_common/adf_transport.c
-+++ b/drivers/crypto/qat/qat_common/adf_transport.c
-@@ -285,7 +285,7 @@ int adf_create_ring(struct adf_accel_dev *accel_dev, const char *section,
- 		goto err;
- 
- 	/* Enable HW arbitration for the given ring */
--	accel_dev->hw_device->hw_arb_ring_enable(ring);
-+	adf_update_ring_arb(ring);
- 
- 	if (adf_ring_debugfs_add(ring, ring_name)) {
- 		dev_err(&GET_DEV(accel_dev),
-@@ -302,14 +302,13 @@ int adf_create_ring(struct adf_accel_dev *accel_dev, const char *section,
- err:
- 	adf_cleanup_ring(ring);
- 	adf_unreserve_ring(bank, ring_num);
--	accel_dev->hw_device->hw_arb_ring_disable(ring);
-+	adf_update_ring_arb(ring);
- 	return ret;
- }
- 
- void adf_remove_ring(struct adf_etr_ring_data *ring)
- {
- 	struct adf_etr_bank_data *bank = ring->bank;
--	struct adf_accel_dev *accel_dev = bank->accel_dev;
- 
- 	/* Disable interrupts for the given ring */
- 	adf_disable_ring_irq(bank, ring->ring_number);
-@@ -322,7 +321,7 @@ void adf_remove_ring(struct adf_etr_ring_data *ring)
- 	adf_ring_debugfs_rm(ring);
- 	adf_unreserve_ring(bank, ring->ring_number);
- 	/* Disable HW arbitration for the given ring */
--	accel_dev->hw_device->hw_arb_ring_disable(ring);
-+	adf_update_ring_arb(ring);
- 	adf_cleanup_ring(ring);
- }
- 
-diff --git a/drivers/crypto/qat/qat_common/qat_crypto.c b/drivers/crypto/qat/qat_common/qat_crypto.c
-index e23ce6f..359ae94 100644
---- a/drivers/crypto/qat/qat_common/qat_crypto.c
-+++ b/drivers/crypto/qat/qat_common/qat_crypto.c
-@@ -152,7 +152,6 @@ static int qat_crypto_create_instances(struct adf_accel_dev *accel_dev)
- 
- 	INIT_LIST_HEAD(&accel_dev->crypto_list);
- 	strlcpy(key, ADF_NUM_CY, sizeof(key));
--
- 	if (adf_cfg_get_param_value(accel_dev, SEC, key, val))
- 		return -EFAULT;
- 
-@@ -181,7 +180,9 @@ static int qat_crypto_create_instances(struct adf_accel_dev *accel_dev)
- 
- 		if (kstrtoul(val, 10, &num_msg_sym))
- 			goto err;
++  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++#ifndef ADF_DH895xVF_DRV_H_
++#define ADF_DH895xVF_DRV_H_
++#include <adf_accel_devices.h>
++#include <adf_transport.h>
 +
- 		num_msg_sym = num_msg_sym >> 1;
++void adf_init_hw_data_dh895xcciov(struct adf_hw_device_data *hw_data);
++void adf_clean_hw_data_dh895xcciov(struct adf_hw_device_data *hw_data);
++int adf_isr_resource_alloc(struct adf_accel_dev *accel_dev);
++void adf_isr_resource_free(struct adf_accel_dev *accel_dev);
++void adf_update_ring_arb_enable(struct adf_etr_ring_data *ring);
++#endif
+diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_isr.c b/drivers/crypto/qat/qat_dh895xccvf/adf_isr.c
+new file mode 100644
+index 0000000..7fdc84a
+--- /dev/null
++++ b/drivers/crypto/qat/qat_dh895xccvf/adf_isr.c
+@@ -0,0 +1,258 @@
++/*
++  This file is provided under a dual BSD/GPLv2 license.  When using or
++  redistributing this file, you may do so under either license.
 +
- 		snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_ASYM_SIZE, i);
- 		if (adf_cfg_get_param_value(accel_dev, SEC, key, val))
- 			goto err;
-diff --git a/drivers/crypto/qat/qat_dh895xcc/Makefile b/drivers/crypto/qat/qat_dh895xcc/Makefile
-index 25171c5..8c79c54 100644
---- a/drivers/crypto/qat/qat_dh895xcc/Makefile
-+++ b/drivers/crypto/qat/qat_dh895xcc/Makefile
-@@ -2,7 +2,4 @@ ccflags-y := -I$(src)/../qat_common
- obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCC) += qat_dh895xcc.o
- qat_dh895xcc-objs := adf_drv.o \
- 		adf_isr.o \
--		adf_dh895xcc_hw_data.o \
--		adf_hw_arbiter.o \
--		qat_admin.o \
--		adf_admin.o
-+		adf_dh895xcc_hw_data.o
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_admin.c b/drivers/crypto/qat/qat_dh895xcc/adf_admin.c
-deleted file mode 100644
-index e466606..0000000
---- a/drivers/crypto/qat/qat_dh895xcc/adf_admin.c
-+++ /dev/null
-@@ -1,145 +0,0 @@
--/*
--  This file is provided under a dual BSD/GPLv2 license.  When using or
--  redistributing this file, you may do so under either license.
--
--  GPL LICENSE SUMMARY
--  Copyright(c) 2014 Intel Corporation.
--  This program is free software; you can redistribute it and/or modify
--  it under the terms of version 2 of the GNU General Public License as
--  published by the Free Software Foundation.
--
--  This program is distributed in the hope that it will be useful, but
--  WITHOUT ANY WARRANTY; without even the implied warranty of
--  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
--  General Public License for more details.
--
--  Contact Information:
--  qat-linux@intel.com
--
--  BSD LICENSE
--  Copyright(c) 2014 Intel Corporation.
--  Redistribution and use in source and binary forms, with or without
--  modification, are permitted provided that the following conditions
--  are met:
--
--    * Redistributions of source code must retain the above copyright
--      notice, this list of conditions and the following disclaimer.
--    * Redistributions in binary form must reproduce the above copyright
--      notice, this list of conditions and the following disclaimer in
--      the documentation and/or other materials provided with the
--      distribution.
--    * Neither the name of Intel Corporation nor the names of its
--      contributors may be used to endorse or promote products derived
--      from this software without specific prior written permission.
--
--  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
--  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
--  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
--  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
--  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
--  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
--  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
--  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
--  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
--  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
--  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
--*/
--#include <linux/types.h>
--#include <linux/mutex.h>
--#include <linux/slab.h>
--#include <linux/delay.h>
--#include <linux/pci.h>
--#include <linux/dma-mapping.h>
--#include <adf_accel_devices.h>
--#include "adf_drv.h"
--#include "adf_dh895xcc_hw_data.h"
--
--#define ADF_ADMINMSG_LEN 32
--
--struct adf_admin_comms {
--	dma_addr_t phy_addr;
--	void *virt_addr;
--	void __iomem *mailbox_addr;
--	struct mutex lock;	/* protects adf_admin_comms struct */
--};
--
--int adf_put_admin_msg_sync(struct adf_accel_dev *accel_dev,
--			   uint32_t ae, void *in, void *out)
--{
--	struct adf_admin_comms *admin = accel_dev->admin;
--	int offset = ae * ADF_ADMINMSG_LEN * 2;
--	void __iomem *mailbox = admin->mailbox_addr;
--	int mb_offset = ae * ADF_DH895XCC_MAILBOX_STRIDE;
--	int times, received;
--
--	mutex_lock(&admin->lock);
--
--	if (ADF_CSR_RD(mailbox, mb_offset) == 1) {
--		mutex_unlock(&admin->lock);
--		return -EAGAIN;
--	}
--
--	memcpy(admin->virt_addr + offset, in, ADF_ADMINMSG_LEN);
--	ADF_CSR_WR(mailbox, mb_offset, 1);
--	received = 0;
--	for (times = 0; times < 50; times++) {
--		msleep(20);
--		if (ADF_CSR_RD(mailbox, mb_offset) == 0) {
--			received = 1;
--			break;
--		}
--	}
--	if (received)
--		memcpy(out, admin->virt_addr + offset +
--		       ADF_ADMINMSG_LEN, ADF_ADMINMSG_LEN);
--	else
--		dev_err(&GET_DEV(accel_dev),
--			"Failed to send admin msg to accelerator\n");
--
--	mutex_unlock(&admin->lock);
--	return received ? 0 : -EFAULT;
--}
--
--int adf_init_admin_comms(struct adf_accel_dev *accel_dev)
--{
--	struct adf_admin_comms *admin;
--	struct adf_bar *pmisc = &GET_BARS(accel_dev)[ADF_DH895XCC_PMISC_BAR];
--	void __iomem *csr = pmisc->virt_addr;
--	void __iomem *mailbox = csr + ADF_DH895XCC_MAILBOX_BASE_OFFSET;
--	uint64_t reg_val;
--
--	admin = kzalloc_node(sizeof(*accel_dev->admin), GFP_KERNEL,
--			     dev_to_node(&GET_DEV(accel_dev)));
--	if (!admin)
--		return -ENOMEM;
--	admin->virt_addr = dma_zalloc_coherent(&GET_DEV(accel_dev), PAGE_SIZE,
--					       &admin->phy_addr, GFP_KERNEL);
--	if (!admin->virt_addr) {
--		dev_err(&GET_DEV(accel_dev), "Failed to allocate dma buff\n");
--		kfree(admin);
--		return -ENOMEM;
--	}
--	reg_val = (uint64_t)admin->phy_addr;
--	ADF_CSR_WR(csr, ADF_DH895XCC_ADMINMSGUR_OFFSET, reg_val >> 32);
--	ADF_CSR_WR(csr, ADF_DH895XCC_ADMINMSGLR_OFFSET, reg_val);
--	mutex_init(&admin->lock);
--	admin->mailbox_addr = mailbox;
--	accel_dev->admin = admin;
--	return 0;
--}
--
--void adf_exit_admin_comms(struct adf_accel_dev *accel_dev)
--{
--	struct adf_admin_comms *admin = accel_dev->admin;
--
--	if (!admin)
--		return;
--
--	if (admin->virt_addr)
--		dma_free_coherent(&GET_DEV(accel_dev), PAGE_SIZE,
--				  admin->virt_addr, admin->phy_addr);
--
--	mutex_destroy(&admin->lock);
--	kfree(admin);
--	accel_dev->admin = NULL;
--}
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-index 155ace9..a3b1be8 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-@@ -45,8 +45,8 @@
-   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
- #include <adf_accel_devices.h>
++  GPL LICENSE SUMMARY
++  Copyright(c) 2014 Intel Corporation.
++  This program is free software; you can redistribute it and/or modify
++  it under the terms of version 2 of the GNU General Public License as
++  published by the Free Software Foundation.
++
++  This program is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++  General Public License for more details.
++
++  Contact Information:
++  qat-linux@intel.com
++
++  BSD LICENSE
++  Copyright(c) 2014 Intel Corporation.
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions
++  are met:
++
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above copyright
++      notice, this list of conditions and the following disclaimer in
++      the documentation and/or other materials provided with the
++      distribution.
++    * Neither the name of Intel Corporation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/types.h>
++#include <linux/pci.h>
++#include <linux/slab.h>
++#include <linux/errno.h>
++#include <linux/interrupt.h>
++#include <adf_accel_devices.h>
 +#include <adf_common_drv.h>
- #include "adf_dh895xcc_hw_data.h"
--#include "adf_common_drv.h"
- #include "adf_drv.h"
- 
- /* Worker thread to service arbiter mappings based on dev SKUs */
-@@ -215,8 +215,6 @@ void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data)
- 	hw_data->alloc_irq = adf_isr_resource_alloc;
- 	hw_data->free_irq = adf_isr_resource_free;
- 	hw_data->enable_error_correction = adf_enable_error_correction;
--	hw_data->hw_arb_ring_enable = adf_update_ring_arb_enable;
--	hw_data->hw_arb_ring_disable = adf_update_ring_arb_enable;
- 	hw_data->get_accel_mask = get_accel_mask;
- 	hw_data->get_ae_mask = get_ae_mask;
- 	hw_data->get_num_accels = get_num_accels;
-@@ -229,8 +227,10 @@ void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data)
- 	hw_data->fw_mmp_name = ADF_DH895XCC_MMP;
- 	hw_data->init_admin_comms = adf_init_admin_comms;
- 	hw_data->exit_admin_comms = adf_exit_admin_comms;
-+	hw_data->send_admin_init = adf_send_admin_init;
- 	hw_data->init_arb = adf_init_arb;
- 	hw_data->exit_arb = adf_exit_arb;
-+	hw_data->get_arb_mapping = adf_get_arbiter_mapping;
- 	hw_data->enable_ints = adf_enable_ints;
- }
- 
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
-index a4963a9..d410afb 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
-@@ -80,11 +80,6 @@
- #define ADF_DH895XCC_CERRSSMSH(i) (i * 0x4000 + 0x10)
- #define ADF_DH895XCC_ERRSSMSH_EN BIT(3)
- 
--/* Admin Messages Registers */
--#define ADF_DH895XCC_ADMINMSGUR_OFFSET (0x3A000 + 0x574)
--#define ADF_DH895XCC_ADMINMSGLR_OFFSET (0x3A000 + 0x578)
--#define ADF_DH895XCC_MAILBOX_BASE_OFFSET 0x20970
--#define ADF_DH895XCC_MAILBOX_STRIDE 0x1000
- /* FW names */
- #define ADF_DH895XCC_FW "qat_895xcc.bin"
- #define ADF_DH895XCC_MMP "qat_mmp.bin"
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-index 4abeca1..1837c32 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-@@ -386,8 +386,6 @@ static void adf_remove(struct pci_dev *pdev)
- static int __init adfdrv_init(void)
- {
- 	request_module("intel_qat");
--	if (qat_admin_register())
--		return -EFAULT;
- 
- 	if (pci_register_driver(&adf_driver)) {
- 		pr_err("QAT: Driver initialization failed\n");
-@@ -399,7 +397,6 @@ static int __init adfdrv_init(void)
- static void __exit adfdrv_release(void)
- {
- 	pci_unregister_driver(&adf_driver);
--	qat_admin_unregister();
- }
- 
- module_init(adfdrv_init);
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.h b/drivers/crypto/qat/qat_dh895xcc/adf_drv.h
-index a2fbb6c..85ff245 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.h
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.h
-@@ -53,15 +53,6 @@ void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data);
- void adf_clean_hw_data_dh895xcc(struct adf_hw_device_data *hw_data);
- int adf_isr_resource_alloc(struct adf_accel_dev *accel_dev);
- void adf_isr_resource_free(struct adf_accel_dev *accel_dev);
--void adf_update_ring_arb_enable(struct adf_etr_ring_data *ring);
- void adf_get_arbiter_mapping(struct adf_accel_dev *accel_dev,
- 			     uint32_t const **arb_map_config);
--int adf_init_admin_comms(struct adf_accel_dev *accel_dev);
--void adf_exit_admin_comms(struct adf_accel_dev *accel_dev);
--int adf_put_admin_msg_sync(struct adf_accel_dev *accel_dev,
--			   uint32_t ae, void *in, void *out);
--int qat_admin_register(void);
--int qat_admin_unregister(void);
--int adf_init_arb(struct adf_accel_dev *accel_dev);
--void adf_exit_arb(struct adf_accel_dev *accel_dev);
- #endif
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_hw_arbiter.c b/drivers/crypto/qat/qat_dh895xcc/adf_hw_arbiter.c
-deleted file mode 100644
-index 1864bdb..0000000
---- a/drivers/crypto/qat/qat_dh895xcc/adf_hw_arbiter.c
-+++ /dev/null
-@@ -1,159 +0,0 @@
--/*
--  This file is provided under a dual BSD/GPLv2 license.  When using or
--  redistributing this file, you may do so under either license.
--
--  GPL LICENSE SUMMARY
--  Copyright(c) 2014 Intel Corporation.
--  This program is free software; you can redistribute it and/or modify
--  it under the terms of version 2 of the GNU General Public License as
--  published by the Free Software Foundation.
--
--  This program is distributed in the hope that it will be useful, but
--  WITHOUT ANY WARRANTY; without even the implied warranty of
--  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
--  General Public License for more details.
--
--  Contact Information:
--  qat-linux@intel.com
--
--  BSD LICENSE
--  Copyright(c) 2014 Intel Corporation.
--  Redistribution and use in source and binary forms, with or without
--  modification, are permitted provided that the following conditions
--  are met:
--
--    * Redistributions of source code must retain the above copyright
--      notice, this list of conditions and the following disclaimer.
--    * Redistributions in binary form must reproduce the above copyright
--      notice, this list of conditions and the following disclaimer in
--      the documentation and/or other materials provided with the
--      distribution.
--    * Neither the name of Intel Corporation nor the names of its
--      contributors may be used to endorse or promote products derived
--      from this software without specific prior written permission.
--
--  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
--  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
--  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
--  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
--  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
--  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
--  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
--  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
--  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
--  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
--  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
--*/
--#include <adf_accel_devices.h>
--#include <adf_transport_internal.h>
--#include "adf_drv.h"
--
--#define ADF_ARB_NUM 4
--#define ADF_ARB_REQ_RING_NUM 8
--#define ADF_ARB_REG_SIZE 0x4
--#define ADF_ARB_WTR_SIZE 0x20
--#define ADF_ARB_OFFSET 0x30000
--#define ADF_ARB_REG_SLOT 0x1000
--#define ADF_ARB_WTR_OFFSET 0x010
--#define ADF_ARB_RO_EN_OFFSET 0x090
--#define ADF_ARB_WQCFG_OFFSET 0x100
--#define ADF_ARB_WRK_2_SER_MAP_OFFSET 0x180
--#define ADF_ARB_WRK_2_SER_MAP 10
--#define ADF_ARB_RINGSRVARBEN_OFFSET 0x19C
--
--#define WRITE_CSR_ARB_RINGSRVARBEN(csr_addr, index, value) \
--	ADF_CSR_WR(csr_addr, ADF_ARB_RINGSRVARBEN_OFFSET + \
--	(ADF_ARB_REG_SLOT * index), value)
--
--#define WRITE_CSR_ARB_RESPORDERING(csr_addr, index, value) \
--	ADF_CSR_WR(csr_addr, (ADF_ARB_OFFSET + \
--	ADF_ARB_RO_EN_OFFSET) + (ADF_ARB_REG_SIZE * index), value)
--
--#define WRITE_CSR_ARB_WEIGHT(csr_addr, arb, index, value) \
--	ADF_CSR_WR(csr_addr, (ADF_ARB_OFFSET + \
--	ADF_ARB_WTR_OFFSET) + (ADF_ARB_WTR_SIZE * arb) + \
--	(ADF_ARB_REG_SIZE * index), value)
--
--#define WRITE_CSR_ARB_SARCONFIG(csr_addr, index, value) \
--	ADF_CSR_WR(csr_addr, ADF_ARB_OFFSET + \
--	(ADF_ARB_REG_SIZE * index), value)
--
--#define WRITE_CSR_ARB_WRK_2_SER_MAP(csr_addr, index, value) \
--	ADF_CSR_WR(csr_addr, (ADF_ARB_OFFSET + \
--	ADF_ARB_WRK_2_SER_MAP_OFFSET) + \
--	(ADF_ARB_REG_SIZE * index), value)
--
--#define WRITE_CSR_ARB_WQCFG(csr_addr, index, value) \
--	ADF_CSR_WR(csr_addr, (ADF_ARB_OFFSET + \
--	ADF_ARB_WQCFG_OFFSET) + (ADF_ARB_REG_SIZE * index), value)
--
--int adf_init_arb(struct adf_accel_dev *accel_dev)
--{
--	void __iomem *csr = accel_dev->transport->banks[0].csr_addr;
--	uint32_t arb_cfg = 0x1 << 31 | 0x4 << 4 | 0x1;
--	uint32_t arb, i;
--	const uint32_t *thd_2_arb_cfg;
--
--	/* Service arb configured for 32 bytes responses and
--	 * ring flow control check enabled. */
--	for (arb = 0; arb < ADF_ARB_NUM; arb++)
--		WRITE_CSR_ARB_SARCONFIG(csr, arb, arb_cfg);
--
--	/* Setup service weighting */
--	for (arb = 0; arb < ADF_ARB_NUM; arb++)
--		for (i = 0; i < ADF_ARB_REQ_RING_NUM; i++)
--			WRITE_CSR_ARB_WEIGHT(csr, arb, i, 0xFFFFFFFF);
--
--	/* Setup ring response ordering */
--	for (i = 0; i < ADF_ARB_REQ_RING_NUM; i++)
--		WRITE_CSR_ARB_RESPORDERING(csr, i, 0xFFFFFFFF);
--
--	/* Setup worker queue registers */
--	for (i = 0; i < ADF_ARB_WRK_2_SER_MAP; i++)
--		WRITE_CSR_ARB_WQCFG(csr, i, i);
--
--	/* Map worker threads to service arbiters */
--	adf_get_arbiter_mapping(accel_dev, &thd_2_arb_cfg);
--
--	if (!thd_2_arb_cfg)
--		return -EFAULT;
--
--	for (i = 0; i < ADF_ARB_WRK_2_SER_MAP; i++)
--		WRITE_CSR_ARB_WRK_2_SER_MAP(csr, i, *(thd_2_arb_cfg + i));
--
--	return 0;
--}
--
--void adf_update_ring_arb_enable(struct adf_etr_ring_data *ring)
--{
--	WRITE_CSR_ARB_RINGSRVARBEN(ring->bank->csr_addr,
--				   ring->bank->bank_number,
--				   ring->bank->ring_mask & 0xFF);
--}
--
--void adf_exit_arb(struct adf_accel_dev *accel_dev)
--{
--	void __iomem *csr;
--	unsigned int i;
--
--	if (!accel_dev->transport)
--		return;
--
--	csr = accel_dev->transport->banks[0].csr_addr;
--
--	/* Reset arbiter configuration */
--	for (i = 0; i < ADF_ARB_NUM; i++)
--		WRITE_CSR_ARB_SARCONFIG(csr, i, 0);
--
--	/* Shutdown work queue */
--	for (i = 0; i < ADF_ARB_WRK_2_SER_MAP; i++)
--		WRITE_CSR_ARB_WQCFG(csr, i, 0);
--
--	/* Unmap worker threads to service arbiters */
--	for (i = 0; i < ADF_ARB_WRK_2_SER_MAP; i++)
--		WRITE_CSR_ARB_WRK_2_SER_MAP(csr, i, 0);
--
--	/* Disable arbitration on all rings */
--	for (i = 0; i < GET_MAX_BANKS(accel_dev); i++)
--		WRITE_CSR_ARB_RINGSRVARBEN(csr, i, 0);
--}
-diff --git a/drivers/crypto/qat/qat_dh895xcc/qat_admin.c b/drivers/crypto/qat/qat_dh895xcc/qat_admin.c
-deleted file mode 100644
-index 55b7a8e..0000000
---- a/drivers/crypto/qat/qat_dh895xcc/qat_admin.c
-+++ /dev/null
-@@ -1,107 +0,0 @@
--/*
--  This file is provided under a dual BSD/GPLv2 license.  When using or
--  redistributing this file, you may do so under either license.
--
--  GPL LICENSE SUMMARY
--  Copyright(c) 2014 Intel Corporation.
--  This program is free software; you can redistribute it and/or modify
--  it under the terms of version 2 of the GNU General Public License as
--  published by the Free Software Foundation.
--
--  This program is distributed in the hope that it will be useful, but
--  WITHOUT ANY WARRANTY; without even the implied warranty of
--  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
--  General Public License for more details.
--
--  Contact Information:
--  qat-linux@intel.com
--
--  BSD LICENSE
--  Copyright(c) 2014 Intel Corporation.
--  Redistribution and use in source and binary forms, with or without
--  modification, are permitted provided that the following conditions
--  are met:
--
--    * Redistributions of source code must retain the above copyright
--      notice, this list of conditions and the following disclaimer.
--    * Redistributions in binary form must reproduce the above copyright
--      notice, this list of conditions and the following disclaimer in
--      the documentation and/or other materials provided with the
--      distribution.
--    * Neither the name of Intel Corporation nor the names of its
--      contributors may be used to endorse or promote products derived
--      from this software without specific prior written permission.
--
--  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
--  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
--  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
--  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
--  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
--  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
--  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
--  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
--  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
--  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
--  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
--*/
--#include <icp_qat_fw_init_admin.h>
--#include <adf_accel_devices.h>
--#include <adf_common_drv.h>
--#include "adf_drv.h"
--
--static struct service_hndl qat_admin;
--
--static int qat_send_admin_cmd(struct adf_accel_dev *accel_dev, int cmd)
--{
--	struct adf_hw_device_data *hw_device = accel_dev->hw_device;
--	struct icp_qat_fw_init_admin_req req;
--	struct icp_qat_fw_init_admin_resp resp;
--	int i;
--
--	memset(&req, 0, sizeof(struct icp_qat_fw_init_admin_req));
--	req.init_admin_cmd_id = cmd;
--	for (i = 0; i < hw_device->get_num_aes(hw_device); i++) {
--		memset(&resp, 0, sizeof(struct icp_qat_fw_init_admin_resp));
--		if (adf_put_admin_msg_sync(accel_dev, i, &req, &resp) ||
--		    resp.init_resp_hdr.status)
--			return -EFAULT;
--	}
--	return 0;
--}
--
--static int qat_admin_start(struct adf_accel_dev *accel_dev)
--{
--	return qat_send_admin_cmd(accel_dev, ICP_QAT_FW_INIT_ME);
--}
--
--static int qat_admin_event_handler(struct adf_accel_dev *accel_dev,
--				   enum adf_event event)
--{
--	int ret;
--
--	switch (event) {
--	case ADF_EVENT_START:
--		ret = qat_admin_start(accel_dev);
--		break;
--	case ADF_EVENT_STOP:
--	case ADF_EVENT_INIT:
--	case ADF_EVENT_SHUTDOWN:
--	default:
--		ret = 0;
--	}
--	return ret;
--}
--
--int qat_admin_register(void)
--{
--	memset(&qat_admin, 0, sizeof(struct service_hndl));
--	qat_admin.event_hld = qat_admin_event_handler;
--	qat_admin.name = "qat_admin";
--	qat_admin.admin = 1;
--	return adf_service_register(&qat_admin);
--}
--
--int qat_admin_unregister(void)
--{
--	return adf_service_unregister(&qat_admin);
--}
++#include <adf_cfg.h>
++#include <adf_cfg_strings.h>
++#include <adf_cfg_common.h>
++#include <adf_transport_access_macros.h>
++#include <adf_transport_internal.h>
++#include <adf_pf2vf_msg.h>
++#include "adf_drv.h"
++#include "adf_dh895xccvf_hw_data.h"
++
++static int adf_enable_msi(struct adf_accel_dev *accel_dev)
++{
++	struct adf_accel_pci *pci_dev_info = &accel_dev->accel_pci_dev;
++	int stat = pci_enable_msi(pci_dev_info->pci_dev);
++
++	if (stat) {
++		dev_err(&GET_DEV(accel_dev),
++			"Failed to enable MSI interrupts\n");
++		return stat;
++	}
++
++	accel_dev->vf.irq_name = kzalloc(ADF_MAX_MSIX_VECTOR_NAME, GFP_KERNEL);
++	if (!accel_dev->vf.irq_name)
++		return -ENOMEM;
++
++	return stat;
++}
++
++static void adf_disable_msi(struct adf_accel_dev *accel_dev)
++{
++	struct pci_dev *pdev = accel_to_pci_dev(accel_dev);
++
++	kfree(accel_dev->vf.irq_name);
++	pci_disable_msi(pdev);
++}
++
++static void adf_pf2vf_bh_handler(void *data)
++{
++	struct adf_accel_dev *accel_dev = data;
++	void __iomem *pmisc_bar_addr =
++		(&GET_BARS(accel_dev)[ADF_DH895XCCIOV_PMISC_BAR])->virt_addr;
++	u32 msg;
++
++	/* Read the message from PF */
++	msg = ADF_CSR_RD(pmisc_bar_addr, ADF_DH895XCCIOV_PF2VF_OFFSET);
++
++	if (!(msg & ADF_PF2VF_MSGORIGIN_SYSTEM))
++		/* Ignore legacy non-system (non-kernel) PF2VF messages */
++		goto err;
++
++	switch ((msg & ADF_PF2VF_MSGTYPE_MASK) >> ADF_PF2VF_MSGTYPE_SHIFT) {
++	case ADF_PF2VF_MSGTYPE_RESTARTING:
++		dev_dbg(&GET_DEV(accel_dev),
++			"Restarting msg received from PF 0x%x\n", msg);
++		adf_dev_stop(accel_dev);
++		break;
++	case ADF_PF2VF_MSGTYPE_VERSION_RESP:
++		dev_dbg(&GET_DEV(accel_dev),
++			"Version resp received from PF 0x%x\n", msg);
++		accel_dev->vf.pf_version =
++			(msg & ADF_PF2VF_VERSION_RESP_VERS_MASK) >>
++			ADF_PF2VF_VERSION_RESP_VERS_SHIFT;
++		accel_dev->vf.compatible =
++			(msg & ADF_PF2VF_VERSION_RESP_RESULT_MASK) >>
++			ADF_PF2VF_VERSION_RESP_RESULT_SHIFT;
++		complete(&accel_dev->vf.iov_msg_completion);
++		break;
++	default:
++		goto err;
++	}
++
++	/* To ack, clear the PF2VFINT bit */
++	msg &= ~ADF_DH895XCC_PF2VF_PF2VFINT;
++	ADF_CSR_WR(pmisc_bar_addr, ADF_DH895XCCIOV_PF2VF_OFFSET, msg);
++
++	/* Re-enable PF2VF interrupts */
++	adf_enable_pf2vf_interrupts(accel_dev);
++	return;
++err:
++	dev_err(&GET_DEV(accel_dev),
++		"Unknown message from PF (0x%x); leaving PF2VF ints disabled\n",
++		msg);
++}
++
++static int adf_setup_pf2vf_bh(struct adf_accel_dev *accel_dev)
++{
++	tasklet_init(&accel_dev->vf.pf2vf_bh_tasklet,
++		     (void *)adf_pf2vf_bh_handler, (unsigned long)accel_dev);
++
++	mutex_init(&accel_dev->vf.vf2pf_lock);
++	return 0;
++}
++
++static void adf_cleanup_pf2vf_bh(struct adf_accel_dev *accel_dev)
++{
++	tasklet_disable(&accel_dev->vf.pf2vf_bh_tasklet);
++	tasklet_kill(&accel_dev->vf.pf2vf_bh_tasklet);
++	mutex_destroy(&accel_dev->vf.vf2pf_lock);
++}
++
++static irqreturn_t adf_isr(int irq, void *privdata)
++{
++	struct adf_accel_dev *accel_dev = privdata;
++	void __iomem *pmisc_bar_addr =
++		(&GET_BARS(accel_dev)[ADF_DH895XCCIOV_PMISC_BAR])->virt_addr;
++	u32 v_int;
++
++	/* Read VF INT source CSR to determine the source of VF interrupt */
++	v_int = ADF_CSR_RD(pmisc_bar_addr, ADF_DH895XCCIOV_VINTSOU_OFFSET);
++
++	/* Check for PF2VF interrupt */
++	if (v_int & ADF_DH895XCC_VINTSOU_PF2VF) {
++		/* Disable PF to VF interrupt */
++		adf_disable_pf2vf_interrupts(accel_dev);
++
++		/* Schedule tasklet to handle interrupt BH */
++		tasklet_hi_schedule(&accel_dev->vf.pf2vf_bh_tasklet);
++		return IRQ_HANDLED;
++	}
++
++	/* Check bundle interrupt */
++	if (v_int & ADF_DH895XCC_VINTSOU_BUN) {
++		struct adf_etr_data *etr_data = accel_dev->transport;
++		struct adf_etr_bank_data *bank = &etr_data->banks[0];
++
++		/* Disable Flag and Coalesce Ring Interrupts */
++		WRITE_CSR_INT_FLAG_AND_COL(bank->csr_addr, bank->bank_number,
++					   0);
++		tasklet_hi_schedule(&bank->resp_handler);
++		return IRQ_HANDLED;
++	}
++
++	return IRQ_NONE;
++}
++
++static int adf_request_msi_irq(struct adf_accel_dev *accel_dev)
++{
++	struct pci_dev *pdev = accel_to_pci_dev(accel_dev);
++	unsigned int cpu;
++	int ret;
++
++	snprintf(accel_dev->vf.irq_name, ADF_MAX_MSIX_VECTOR_NAME,
++		 "qat_%02x:%02d.%02d", pdev->bus->number, PCI_SLOT(pdev->devfn),
++		 PCI_FUNC(pdev->devfn));
++	ret = request_irq(pdev->irq, adf_isr, 0, accel_dev->vf.irq_name,
++			  (void *)accel_dev);
++	if (ret) {
++		dev_err(&GET_DEV(accel_dev), "failed to enable irq for %s\n",
++			accel_dev->vf.irq_name);
++		return ret;
++	}
++	cpu = accel_dev->accel_id % num_online_cpus();
++	irq_set_affinity_hint(pdev->irq, get_cpu_mask(cpu));
++
++	return ret;
++}
++
++static int adf_setup_bh(struct adf_accel_dev *accel_dev)
++{
++	struct adf_etr_data *priv_data = accel_dev->transport;
++
++	tasklet_init(&priv_data->banks[0].resp_handler, adf_response_handler,
++		     (unsigned long)priv_data->banks);
++	return 0;
++}
++
++static void adf_cleanup_bh(struct adf_accel_dev *accel_dev)
++{
++	struct adf_etr_data *priv_data = accel_dev->transport;
++
++	tasklet_disable(&priv_data->banks[0].resp_handler);
++	tasklet_kill(&priv_data->banks[0].resp_handler);
++}
++
++void adf_isr_resource_free(struct adf_accel_dev *accel_dev)
++{
++	struct pci_dev *pdev = accel_to_pci_dev(accel_dev);
++
++	irq_set_affinity_hint(pdev->irq, NULL);
++	free_irq(pdev->irq, (void *)accel_dev);
++	adf_cleanup_bh(accel_dev);
++	adf_cleanup_pf2vf_bh(accel_dev);
++	adf_disable_msi(accel_dev);
++}
++
++int adf_isr_resource_alloc(struct adf_accel_dev *accel_dev)
++{
++	if (adf_enable_msi(accel_dev))
++		goto err_out;
++
++	if (adf_setup_pf2vf_bh(accel_dev))
++		goto err_out;
++
++	if (adf_setup_bh(accel_dev))
++		goto err_out;
++
++	if (adf_request_msi_irq(accel_dev))
++		goto err_out;
++
++	return 0;
++err_out:
++	adf_isr_resource_free(accel_dev);
++	return -EFAULT;
++}
