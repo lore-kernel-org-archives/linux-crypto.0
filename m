@@ -1,72 +1,61 @@
 From: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 1/6] scatterlist: allow limited chaining without ARCH_HAS_SG_CHAIN
-Date: Fri,  7 Aug 2015 18:15:11 +0200
-Message-ID: <1438964116-24321-2-git-send-email-hch@lst.de>
+Subject: [PATCH 4/6] scatterlist: remove open coded sg_unmark_end instances
+Date: Fri,  7 Aug 2015 18:15:14 +0200
+Message-ID: <1438964116-24321-5-git-send-email-hch@lst.de>
 References: <1438964116-24321-1-git-send-email-hch@lst.de>
 Cc: Dan Williams <dan.j.williams@intel.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Jens Axboe <axboe@kernel.dk>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:39239 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753659AbbHGQST (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 7 Aug 2015 12:18:19 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1438964116-24321-1-git-send-email-hch@lst.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-There are a couple of uses of struct scatterlist that never go to
-the dma_map_sg() helper and thus don't care about ARCH_HAS_SG_CHAIN
-which indicates that we can map chained S/G list.
+From: Dan Williams <dan.j.williams@intel.com>
 
-The most important one is the crypto code, which currently has
-to open code a few helpers to always allow chaining.  This patch
-removes a few #ifdef ARCH_HAS_SG_CHAIN statements so that we can
-switch the crypto code to these common helpers.
-
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+[hch: split from a larger patch by Dan]
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/scatterlist.h | 4 ----
- lib/scatterlist.c           | 4 ----
- 2 files changed, 8 deletions(-)
+ block/blk-merge.c        | 2 +-
+ drivers/mmc/card/queue.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-index 9b1ef0c..698e906 100644
---- a/include/linux/scatterlist.h
-+++ b/include/linux/scatterlist.h
-@@ -161,10 +161,6 @@ static inline void sg_set_buf(struct scatterlist *sg, const void *buf,
- static inline void sg_chain(struct scatterlist *prv, unsigned int prv_nents,
- 			    struct scatterlist *sgl)
- {
--#ifndef CONFIG_ARCH_HAS_SG_CHAIN
--	BUG();
--#endif
--
- 	/*
- 	 * offset and length are unused for chain entry.  Clear them.
- 	 */
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index d105a9f..bafa993 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -105,16 +105,12 @@ EXPORT_SYMBOL(sg_nents_for_len);
-  **/
- struct scatterlist *sg_last(struct scatterlist *sgl, unsigned int nents)
- {
--#ifndef CONFIG_ARCH_HAS_SG_CHAIN
--	struct scatterlist *ret = &sgl[nents - 1];
--#else
- 	struct scatterlist *sg, *ret = NULL;
- 	unsigned int i;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 30a0d9f..f4a3e87 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -266,7 +266,7 @@ int blk_rq_map_sg(struct request_queue *q, struct request *rq,
+ 		if (rq->cmd_flags & REQ_WRITE)
+ 			memset(q->dma_drain_buffer, 0, q->dma_drain_size);
  
- 	for_each_sg(sgl, sg, nents, i)
- 		ret = sg;
- 
--#endif
- #ifdef CONFIG_DEBUG_SG
- 	BUG_ON(sgl[0].sg_magic != SG_MAGIC);
- 	BUG_ON(!sg_is_last(ret));
+-		sg->page_link &= ~0x02;
++		sg_unmark_end(sg);
+ 		sg = sg_next(sg);
+ 		sg_set_page(sg, virt_to_page(q->dma_drain_buffer),
+ 			    q->dma_drain_size,
+diff --git a/drivers/mmc/card/queue.c b/drivers/mmc/card/queue.c
+index b5a2b14..9b214da 100644
+--- a/drivers/mmc/card/queue.c
++++ b/drivers/mmc/card/queue.c
+@@ -467,7 +467,7 @@ static unsigned int mmc_queue_packed_map_sg(struct mmc_queue *mq,
+ 			sg_set_buf(__sg, buf + offset, len);
+ 			offset += len;
+ 			remain -= len;
+-			(__sg++)->page_link &= ~0x02;
++			sg_unmark_end(__sg++);
+ 			sg_len++;
+ 		} while (remain);
+ 	}
+@@ -475,7 +475,7 @@ static unsigned int mmc_queue_packed_map_sg(struct mmc_queue *mq,
+ 	list_for_each_entry(req, &packed->list, queuelist) {
+ 		sg_len += blk_rq_map_sg(mq->queue, req, __sg);
+ 		__sg = sg + (sg_len - 1);
+-		(__sg++)->page_link &= ~0x02;
++		sg_unmark_end(__sg++);
+ 	}
+ 	sg_mark_end(sg + (sg_len - 1));
+ 	return sg_len;
 -- 
 1.9.1
