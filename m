@@ -1,126 +1,75 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH 5/5] PCI: Add quirk for Intel DH895xCC VF PCI config erratum
-Date: Fri, 07 Aug 2015 11:34:42 -0700
-Message-ID: <20150807183441.630.50653.stgit@tstruk-mobl1>
-References: <20150807183414.630.25889.stgit@tstruk-mobl1>
+From: Dan Williams <dan.j.williams@intel.com>
+Subject: Re: [PATCH 6/6] scatterlist: use sg_phys()
+Date: Fri, 7 Aug 2015 18:15:49 -0700
+Message-ID: <CAPcyv4gkZZH5FCeZgOcsXJaE0Ug5F3x0VxhX0PqkoNZwLeEbyQ@mail.gmail.com>
+References: <1438964116-24321-1-git-send-email-hch@lst.de>
+	<1438964116-24321-7-git-send-email-hch@lst.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, bhelgaas@google.com,
-	linux-pci@vger.kernel.org, qat-linux@intel.com,
-	tadeusz.struk@intel.com
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=UTF-8
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Julia Lawall <Julia.Lawall@lip6.fr>,
+	Joerg Roedel <joro@8bytes.org>
+To: Christoph Hellwig <hch@lst.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:28135 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1946070AbbHGSgB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 7 Aug 2015 14:36:01 -0400
-In-Reply-To: <20150807183414.630.25889.stgit@tstruk-mobl1>
+Received: from mail-wi0-f182.google.com ([209.85.212.182]:33585 "EHLO
+	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1946491AbbHHBPu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 7 Aug 2015 21:15:50 -0400
+Received: by wijp15 with SMTP id p15so77475116wij.0
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Aug 2015 18:15:49 -0700 (PDT)
+In-Reply-To: <1438964116-24321-7-git-send-email-hch@lst.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The PCI capabilities list for Intel DH895xCC VFs (device id 0x0443) with
-QuickAssist Technology is prematurely terminated in hardware.
-Workaround the issue by hard-coding the known expected next capability
-pointer and saving the PCIE cap into internal buffer.
+On Fri, Aug 7, 2015 at 9:15 AM, Christoph Hellwig <hch@lst.de> wrote:
+> From: Dan Williams <dan.j.williams@intel.com>
+>
+> Coccinelle cleanup to replace open coded sg to physical address
+> translations.  This is in preparation for introducing scatterlists that
+> reference __pfn_t.
+>
+> // sg_phys.cocci: convert usage page_to_phys(sg_page(sg)) to sg_phys(sg)
+> // usage: make coccicheck COCCI=sg_phys.cocci MODE=patch
+>
+> virtual patch
+> virtual report
+> virtual org
+>
+> @@
+> struct scatterlist *sg;
+> @@
+>
+> - page_to_phys(sg_page(sg)) + sg->offset
+> + sg_phys(sg)
+>
+> @@
+> struct scatterlist *sg;
+> @@
+>
+> - page_to_phys(sg_page(sg))
+> + sg_phys(sg) - sg->offset
 
-Patch generated against cryptodev-2.6
+So this ends up being an awkward conversion, a better one is:
 
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
- drivers/pci/quirks.c |   85 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 85 insertions(+)
+- page_to_phys(sg_page(sg))
++ sg_phys(sg) & PAGE_MASK
 
-diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
-index e9fd0e9..6a80f5a 100644
---- a/drivers/pci/quirks.c
-+++ b/drivers/pci/quirks.c
-@@ -4008,3 +4008,88 @@ void pci_dev_specific_enable_acs(struct pci_dev *dev)
- 		}
- 	}
- }
-+
-+/*
-+ * The PCI capabilities list for Intel DH895xCC VFs (device id 0x0443) with
-+ * QuickAssist Technology (QAT) is prematurely terminated in hardware.  The
-+ * Next Capability pointer in the MSI Capability Structure should point to
-+ * the PCIe Capability Structure but is incorrectly hardwired as 0 terminating
-+ * the list.
-+ */
-+static void quirk_intel_qat_vf_cap(struct pci_dev *pdev)
-+{
-+	int pos, i = 0;
-+	u8 next_cap;
-+	u16 reg16, *cap;
-+	struct pci_cap_saved_state *state;
-+
-+	/* Bail if the hardware bug is fixed */
-+	if (pdev->pcie_cap || pci_find_capability(pdev, PCI_CAP_ID_EXP))
-+		return;
-+
-+	/* Bail if MSI Capability Structure is not found for some reason */
-+	pos = pci_find_capability(pdev, PCI_CAP_ID_MSI);
-+	if (!pos)
-+		return;
-+
-+	/*
-+	 * Bail if Next Capability pointer in the MSI Capability Structure
-+	 * is not the expected incorrect 0x00.
-+	 */
-+	pci_read_config_byte(pdev, pos + 1, &next_cap);
-+	if (next_cap)
-+		return;
-+
-+	/*
-+	 * PCIe Capability Structure is expected to be at 0x50 and should
-+	 * terminate the list (Next Capability pointer is 0x00).  Verify
-+	 * Capability Id and Next Capability pointer is as expected.
-+	 * Open-code some of set_pcie_port_type() and pci_cfg_space_size_ext()
-+	 * to correctly set kernel data structures which have already been
-+	 * set incorrectly due to the hardware bug.
-+	 */
-+	pos = 0x50;
-+	pci_read_config_word(pdev, pos, &reg16);
-+	if (reg16 == (0x0000 | PCI_CAP_ID_EXP)) {
-+		u32 status;
-+#ifndef PCI_EXP_SAVE_REGS
-+#define PCI_EXP_SAVE_REGS     7
-+#endif
-+		int size = PCI_EXP_SAVE_REGS * sizeof(u16);
-+
-+		pdev->pcie_cap = pos;
-+		pci_read_config_word(pdev, pos + PCI_EXP_FLAGS, &reg16);
-+		pdev->pcie_flags_reg = reg16;
-+		pci_read_config_word(pdev, pos + PCI_EXP_DEVCAP, &reg16);
-+		pdev->pcie_mpss = reg16 & PCI_EXP_DEVCAP_PAYLOAD;
-+
-+		pdev->cfg_size = PCI_CFG_SPACE_EXP_SIZE;
-+		if (pci_read_config_dword(pdev, PCI_CFG_SPACE_SIZE, &status) !=
-+		    PCIBIOS_SUCCESSFUL || (status == 0xffffffff))
-+			pdev->cfg_size = PCI_CFG_SPACE_SIZE;
-+
-+		if (pci_find_saved_cap(pdev, PCI_CAP_ID_EXP))
-+			return;
-+
-+		/*
-+		 * Save PCIE cap
-+		 */
-+		state = kzalloc(sizeof(*state) + size, GFP_KERNEL);
-+		if (!state)
-+			return;
-+
-+		state->cap.cap_nr = PCI_CAP_ID_EXP;
-+		state->cap.cap_extended = 0;
-+		state->cap.size = size;
-+		cap = (u16 *)&state->cap.data[0];
-+		pcie_capability_read_word(pdev, PCI_EXP_DEVCTL, &cap[i++]);
-+		pcie_capability_read_word(pdev, PCI_EXP_LNKCTL, &cap[i++]);
-+		pcie_capability_read_word(pdev, PCI_EXP_SLTCTL, &cap[i++]);
-+		pcie_capability_read_word(pdev, PCI_EXP_RTCTL,  &cap[i++]);
-+		pcie_capability_read_word(pdev, PCI_EXP_DEVCTL2, &cap[i++]);
-+		pcie_capability_read_word(pdev, PCI_EXP_LNKCTL2, &cap[i++]);
-+		pcie_capability_read_word(pdev, PCI_EXP_SLTCTL2, &cap[i++]);
-+		hlist_add_head(&state->next, &pdev->saved_cap_space);
-+	}
-+}
-+DECLARE_PCI_FIXUP_EARLY(PCI_VENDOR_ID_INTEL, 0x443, quirk_intel_qat_vf_cap);
+[..]
+> diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
+> index 5852df8..e0faecc 100644
+> --- a/drivers/iommu/intel-iommu.c
+> +++ b/drivers/iommu/intel-iommu.c
+> @@ -2098,7 +2098,7 @@ static int __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
+>                         sg_res = aligned_nrpages(sg->offset, sg->length);
+>                         sg->dma_address = ((dma_addr_t)iov_pfn << VTD_PAGE_SHIFT) + sg->offset;
+>                         sg->dma_length = sg->length;
+> -                       pteval = page_to_phys(sg_page(sg)) | prot;
+> +                       pteval = (sg_phys(sg) - sg->offset) | prot;
+
+For example here, as Joerg pointed out.
+
+[1]: https://lkml.org/lkml/2015/6/10/230
