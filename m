@@ -1,195 +1,110 @@
-From: Jan Stancek <jstancek@redhat.com>
-Subject: [PATCH] crypto: nx-sha256/512: respect sg limit bounds when building sg lists
-Date: Sat,  8 Aug 2015 08:47:28 +0200
-Message-ID: <58cb150c5cef7194cb3fa8e6117ce3d79c603a58.1439016075.git.jstancek@redhat.com>
-Cc: linux-kernel@vger.kernel.org, leosilva@linux.vnet.ibm.com,
-	mhcerri@linux.vnet.ibm.com, fin@linux.vnet.ibm.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	jstancek@redhat.com
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH 6/6] scatterlist: use sg_phys()
+Date: Sat, 8 Aug 2015 13:23:58 +0000
+Message-ID: <1439040234.26522.4.camel@intel.com>
+References: <1438964116-24321-1-git-send-email-hch@lst.de>
+	 <1438964116-24321-7-git-send-email-hch@lst.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"joro@8bytes.org" <joro@8bytes.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"Julia.Lawall@lip6.fr" <Julia.Lawall@lip6.fr>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+To: "hch@lst.de" <hch@lst.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:49718 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932740AbbHHNYA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 8 Aug 2015 09:24:00 -0400
+In-Reply-To: <1438964116-24321-7-git-send-email-hch@lst.de>
+Content-Language: en-US
+Content-ID: <4A9D4072986C724C9BF4C729A93B832C@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Commit 000851119e80 changed sha256/512 update functions to
-pass more data to nx_build_sg_list(), which ends with
-sg list overflows and usually with update functions failing
-for data larger than max_sg_len * NX_PAGE_SIZE.
-
-This happens because:
-- both "total" and "to_process" are updated, which leads to
-  "to_process" getting overflowed for some data lengths
-  For example:
-    In first iteration "total" is 50, and let's assume "to_process"
-    is 30 due to sg limits. At the end of first iteration "total" is
-    set to 20. At start of 2nd iteration "to_process" overflows on:
-      to_process = total - to_process;
-- "in_sg" is not reset to nx_ctx->in_sg after each iteration
-- nx_build_sg_list() is hitting overflow because the amount of data
-  passed to it would require more than sgmax elements
-- as consequence of previous item, data stored in overflowed sg list
-  may no longer be aligned to SHA*_BLOCK_SIZE
-
-This patch changes sha256/512 update functions so that "to_process"
-respects sg limits and never tries to pass more data to
-nx_build_sg_list() to avoid overflows. "to_process" is calculated
-as minimum of "total" and sg limits at start of every iteration.
-
-Fixes: 000851119e80 ("crypto: nx - Fix SHA concurrence issue and sg
-                      limit bounds")
-
-Signed-off-by: Jan Stancek <jstancek@redhat.com>
-Cc: Leonidas Da Silva Barbosa <leosilva@linux.vnet.ibm.com>
-Cc: Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>
-Cc: Fionnuala Gunter <fin@linux.vnet.ibm.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
----
- drivers/crypto/nx/nx-sha256.c | 27 ++++++++++++++++-----------
- drivers/crypto/nx/nx-sha512.c | 28 ++++++++++++++++------------
- 2 files changed, 32 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/crypto/nx/nx-sha256.c b/drivers/crypto/nx/nx-sha256.c
-index 08f8d5cd6334..becb738c897b 100644
---- a/drivers/crypto/nx/nx-sha256.c
-+++ b/drivers/crypto/nx/nx-sha256.c
-@@ -71,7 +71,6 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
- 	struct sha256_state *sctx = shash_desc_ctx(desc);
- 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
- 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
--	struct nx_sg *in_sg;
- 	struct nx_sg *out_sg;
- 	u64 to_process = 0, leftover, total;
- 	unsigned long irq_flags;
-@@ -97,7 +96,6 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
- 	NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
- 	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
- 
--	in_sg = nx_ctx->in_sg;
- 	max_sg_len = min_t(u64, nx_ctx->ap->sglen,
- 			nx_driver.of.max_sg_len/sizeof(struct nx_sg));
- 	max_sg_len = min_t(u64, max_sg_len,
-@@ -114,17 +112,12 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
- 	}
- 
- 	do {
--		/*
--		 * to_process: the SHA256_BLOCK_SIZE data chunk to process in
--		 * this update. This value is also restricted by the sg list
--		 * limits.
--		 */
--		to_process = total - to_process;
--		to_process = to_process & ~(SHA256_BLOCK_SIZE - 1);
-+		int used_sgs = 0;
-+		struct nx_sg *in_sg = nx_ctx->in_sg;
- 
- 		if (buf_len) {
- 			data_len = buf_len;
--			in_sg = nx_build_sg_list(nx_ctx->in_sg,
-+			in_sg = nx_build_sg_list(in_sg,
- 						 (u8 *) sctx->buf,
- 						 &data_len,
- 						 max_sg_len);
-@@ -133,15 +126,27 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
- 				rc = -EINVAL;
- 				goto out;
- 			}
-+			used_sgs = in_sg - nx_ctx->in_sg;
- 		}
- 
-+		/* to_process: SHA256_BLOCK_SIZE aligned chunk to be
-+		 * processed in this iteration. This value is restricted
-+		 * by sg list limits and number of sgs we already used
-+		 * for leftover data. (see above)
-+		 * In ideal case, we could allow NX_PAGE_SIZE * max_sg_len,
-+		 * but because data may not be aligned, we need to account
-+		 * for that too. */
-+		to_process = min_t(u64, total,
-+			(max_sg_len - 1 - used_sgs) * NX_PAGE_SIZE);
-+		to_process = to_process & ~(SHA256_BLOCK_SIZE - 1);
-+
- 		data_len = to_process - buf_len;
- 		in_sg = nx_build_sg_list(in_sg, (u8 *) data,
- 					 &data_len, max_sg_len);
- 
- 		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) * sizeof(struct nx_sg);
- 
--		to_process = (data_len + buf_len);
-+		to_process = data_len + buf_len;
- 		leftover = total - to_process;
- 
- 		/*
-diff --git a/drivers/crypto/nx/nx-sha512.c b/drivers/crypto/nx/nx-sha512.c
-index aff0fe58eac0..b6e183d58d73 100644
---- a/drivers/crypto/nx/nx-sha512.c
-+++ b/drivers/crypto/nx/nx-sha512.c
-@@ -71,7 +71,6 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
- 	struct sha512_state *sctx = shash_desc_ctx(desc);
- 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
- 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
--	struct nx_sg *in_sg;
- 	struct nx_sg *out_sg;
- 	u64 to_process, leftover = 0, total;
- 	unsigned long irq_flags;
-@@ -97,7 +96,6 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
- 	NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
- 	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
- 
--	in_sg = nx_ctx->in_sg;
- 	max_sg_len = min_t(u64, nx_ctx->ap->sglen,
- 			nx_driver.of.max_sg_len/sizeof(struct nx_sg));
- 	max_sg_len = min_t(u64, max_sg_len,
-@@ -114,18 +112,12 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
- 	}
- 
- 	do {
--		/*
--		 * to_process: the SHA512_BLOCK_SIZE data chunk to process in
--		 * this update. This value is also restricted by the sg list
--		 * limits.
--		 */
--		to_process = total - leftover;
--		to_process = to_process & ~(SHA512_BLOCK_SIZE - 1);
--		leftover = total - to_process;
-+		int used_sgs = 0;
-+		struct nx_sg *in_sg = nx_ctx->in_sg;
- 
- 		if (buf_len) {
- 			data_len = buf_len;
--			in_sg = nx_build_sg_list(nx_ctx->in_sg,
-+			in_sg = nx_build_sg_list(in_sg,
- 						 (u8 *) sctx->buf,
- 						 &data_len, max_sg_len);
- 
-@@ -133,8 +125,20 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
- 				rc = -EINVAL;
- 				goto out;
- 			}
-+			used_sgs = in_sg - nx_ctx->in_sg;
- 		}
- 
-+		/* to_process: SHA512_BLOCK_SIZE aligned chunk to be
-+		 * processed in this iteration. This value is restricted
-+		 * by sg list limits and number of sgs we already used
-+		 * for leftover data. (see above)
-+		 * In ideal case, we could allow NX_PAGE_SIZE * max_sg_len,
-+		 * but because data may not be aligned, we need to account
-+		 * for that too. */
-+		to_process = min_t(u64, total,
-+			(max_sg_len - 1 - used_sgs) * NX_PAGE_SIZE);
-+		to_process = to_process & ~(SHA512_BLOCK_SIZE - 1);
-+
- 		data_len = to_process - buf_len;
- 		in_sg = nx_build_sg_list(in_sg, (u8 *) data,
- 					 &data_len, max_sg_len);
-@@ -146,7 +150,7 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
- 			goto out;
- 		}
- 
--		to_process = (data_len + buf_len);
-+		to_process = data_len + buf_len;
- 		leftover = total - to_process;
- 
- 		/*
--- 
-1.8.3.1
+T24gRnJpLCAyMDE1LTA4LTA3IGF0IDE4OjE1ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNClsuLl0NCj4gLSBwYWdlX3RvX3BoeXMoc2dfcGFnZShzZykpDQo+ICsgc2dfcGh5cyhzZykg
+LSBzZy0+b2Zmc2V0DQoNCkhlcmUncyBhIHJlcGxhY2VtZW50IHVzaW5nIFBBR0VfTUFTSyBpbnN0
+ZWFkIG9mIHN1YnRyYWN0aW5nIHNnLT5vZmZzZXQNCmFuZCBhIGZpeHVwIGZvciB0aGUgYXdrd2Fy
+ZCB3aGl0ZXNwYWNlIGluIGRtYV9kaXJlY3RfbWFwX3NnKCkuDQoNCjg8LS0tLS0NClN1YmplY3Q6
+IHNjYXR0ZXJsaXN0OiB1c2Ugc2dfcGh5cygpDQoNCkZyb206IERhbiBXaWxsaWFtcyA8ZGFuLmou
+d2lsbGlhbXNAaW50ZWwuY29tPg0KDQpDb2NjaW5lbGxlIGNsZWFudXAgdG8gcmVwbGFjZSBvcGVu
+IGNvZGVkIHNnIHRvIHBoeXNpY2FsIGFkZHJlc3MNCnRyYW5zbGF0aW9ucy4gIFRoaXMgaXMgaW4g
+cHJlcGFyYXRpb24gZm9yIGludHJvZHVjaW5nIHNjYXR0ZXJsaXN0cyB0aGF0DQpyZWZlcmVuY2Ug
+X19wZm5fdC4NCg0KLy8gc2dfcGh5cy5jb2NjaTogY29udmVydCB1c2FnZSBwYWdlX3RvX3BoeXMo
+c2dfcGFnZShzZykpIHRvIHNnX3BoeXMoc2cpDQovLyB1c2FnZTogbWFrZSBjb2NjaWNoZWNrIENP
+Q0NJPXNnX3BoeXMuY29jY2kgTU9ERT1wYXRjaA0KDQp2aXJ0dWFsIHBhdGNoDQoNCkBADQpzdHJ1
+Y3Qgc2NhdHRlcmxpc3QgKnNnOw0KQEANCg0KLSBwYWdlX3RvX3BoeXMoc2dfcGFnZShzZykpICsg
+c2ctPm9mZnNldA0KKyBzZ19waHlzKHNnKQ0KDQpAQA0Kc3RydWN0IHNjYXR0ZXJsaXN0ICpzZzsN
+CkBADQoNCi0gcGFnZV90b19waHlzKHNnX3BhZ2Uoc2cpKQ0KKyBzZ19waHlzKHNnKSAmIFBBR0Vf
+TUFTSw0KDQpTaWduZWQtb2ZmLWJ5OiBEYW4gV2lsbGlhbXMgPGRhbi5qLndpbGxpYW1zQGludGVs
+LmNvbT4NCi0tLQ0KIGFyY2gvYXJtL21tL2RtYS1tYXBwaW5nLmMgICAgICAgICAgICAgICAgICAg
+IHwgICAgMiArLQ0KIGFyY2gvbWljcm9ibGF6ZS9rZXJuZWwvZG1hLmMgICAgICAgICAgICAgICAg
+IHwgICAgMyArLS0NCiBkcml2ZXJzL2lvbW11L2ludGVsLWlvbW11LmMgICAgICAgICAgICAgICAg
+ICB8ICAgIDQgKystLQ0KIGRyaXZlcnMvaW9tbXUvaW9tbXUuYyAgICAgICAgICAgICAgICAgICAg
+ICAgIHwgICAgMiArLQ0KIGRyaXZlcnMvc3RhZ2luZy9hbmRyb2lkL2lvbi9pb25fY2h1bmtfaGVh
+cC5jIHwgICAgNCArKy0tDQogNSBmaWxlcyBjaGFuZ2VkLCA3IGluc2VydGlvbnMoKyksIDggZGVs
+ZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9hcmNoL2FybS9tbS9kbWEtbWFwcGluZy5jIGIvYXJj
+aC9hcm0vbW0vZG1hLW1hcHBpbmcuYw0KaW5kZXggY2JhMTJmMzRmZjc3Li4zZDNkNmFhNjBjODcg
+MTAwNjQ0DQotLS0gYS9hcmNoL2FybS9tbS9kbWEtbWFwcGluZy5jDQorKysgYi9hcmNoL2FybS9t
+bS9kbWEtbWFwcGluZy5jDQpAQCAtMTUyMCw3ICsxNTIwLDcgQEAgc3RhdGljIGludCBfX21hcF9z
+Z19jaHVuayhzdHJ1Y3QgZGV2aWNlICpkZXYsIHN0cnVjdCBzY2F0dGVybGlzdCAqc2csDQogCQly
+ZXR1cm4gLUVOT01FTTsNCiANCiAJZm9yIChjb3VudCA9IDAsIHMgPSBzZzsgY291bnQgPCAoc2l6
+ZSA+PiBQQUdFX1NISUZUKTsgcyA9IHNnX25leHQocykpIHsNCi0JCXBoeXNfYWRkcl90IHBoeXMg
+PSBwYWdlX3RvX3BoeXMoc2dfcGFnZShzKSk7DQorCQlwaHlzX2FkZHJfdCBwaHlzID0gc2dfcGh5
+cyhzKSAmIFBBR0VfTUFTSzsNCiAJCXVuc2lnbmVkIGludCBsZW4gPSBQQUdFX0FMSUdOKHMtPm9m
+ZnNldCArIHMtPmxlbmd0aCk7DQogDQogCQlpZiAoIWlzX2NvaGVyZW50ICYmDQpkaWZmIC0tZ2l0
+IGEvYXJjaC9taWNyb2JsYXplL2tlcm5lbC9kbWEuYyBiL2FyY2gvbWljcm9ibGF6ZS9rZXJuZWwv
+ZG1hLmMNCmluZGV4IGJmNGRlYzIyOTQzNy4uYzg5ZGE2MzEyOTU0IDEwMDY0NA0KLS0tIGEvYXJj
+aC9taWNyb2JsYXplL2tlcm5lbC9kbWEuYw0KKysrIGIvYXJjaC9taWNyb2JsYXplL2tlcm5lbC9k
+bWEuYw0KQEAgLTYxLDggKzYxLDcgQEAgc3RhdGljIGludCBkbWFfZGlyZWN0X21hcF9zZyhzdHJ1
+Y3QgZGV2aWNlICpkZXYsIHN0cnVjdCBzY2F0dGVybGlzdCAqc2dsLA0KIAkvKiBGSVhNRSB0aGlz
+IHBhcnQgb2YgY29kZSBpcyB1bnRlc3RlZCAqLw0KIAlmb3JfZWFjaF9zZyhzZ2wsIHNnLCBuZW50
+cywgaSkgew0KIAkJc2ctPmRtYV9hZGRyZXNzID0gc2dfcGh5cyhzZyk7DQotCQlfX2RtYV9zeW5j
+KHBhZ2VfdG9fcGh5cyhzZ19wYWdlKHNnKSkgKyBzZy0+b2Zmc2V0LA0KLQkJCQkJCQlzZy0+bGVu
+Z3RoLCBkaXJlY3Rpb24pOw0KKwkJX19kbWFfc3luYyhzZ19waHlzKHNnKSwgc2ctPmxlbmd0aCwg
+ZGlyZWN0aW9uKTsNCiAJfQ0KIA0KIAlyZXR1cm4gbmVudHM7DQpkaWZmIC0tZ2l0IGEvZHJpdmVy
+cy9pb21tdS9pbnRlbC1pb21tdS5jIGIvZHJpdmVycy9pb21tdS9pbnRlbC1pb21tdS5jDQppbmRl
+eCA1ODUyZGY4Y2M1MGYuLjdiNmM1YjYzZWNlNyAxMDA2NDQNCi0tLSBhL2RyaXZlcnMvaW9tbXUv
+aW50ZWwtaW9tbXUuYw0KKysrIGIvZHJpdmVycy9pb21tdS9pbnRlbC1pb21tdS5jDQpAQCAtMjA5
+OCw3ICsyMDk4LDcgQEAgc3RhdGljIGludCBfX2RvbWFpbl9tYXBwaW5nKHN0cnVjdCBkbWFyX2Rv
+bWFpbiAqZG9tYWluLCB1bnNpZ25lZCBsb25nIGlvdl9wZm4sDQogCQkJc2dfcmVzID0gYWxpZ25l
+ZF9ucnBhZ2VzKHNnLT5vZmZzZXQsIHNnLT5sZW5ndGgpOw0KIAkJCXNnLT5kbWFfYWRkcmVzcyA9
+ICgoZG1hX2FkZHJfdClpb3ZfcGZuIDw8IFZURF9QQUdFX1NISUZUKSArIHNnLT5vZmZzZXQ7DQog
+CQkJc2ctPmRtYV9sZW5ndGggPSBzZy0+bGVuZ3RoOw0KLQkJCXB0ZXZhbCA9IHBhZ2VfdG9fcGh5
+cyhzZ19wYWdlKHNnKSkgfCBwcm90Ow0KKwkJCXB0ZXZhbCA9IChzZ19waHlzKHNnKSAmIFBBR0Vf
+TUFTSykgfCBwcm90Ow0KIAkJCXBoeXNfcGZuID0gcHRldmFsID4+IFZURF9QQUdFX1NISUZUOw0K
+IAkJfQ0KIA0KQEAgLTM2MjUsNyArMzYyNSw3IEBAIHN0YXRpYyBpbnQgaW50ZWxfbm9udHJhbnNs
+YXRlX21hcF9zZyhzdHJ1Y3QgZGV2aWNlICpoZGRldiwNCiANCiAJZm9yX2VhY2hfc2coc2dsaXN0
+LCBzZywgbmVsZW1zLCBpKSB7DQogCQlCVUdfT04oIXNnX3BhZ2Uoc2cpKTsNCi0JCXNnLT5kbWFf
+YWRkcmVzcyA9IHBhZ2VfdG9fcGh5cyhzZ19wYWdlKHNnKSkgKyBzZy0+b2Zmc2V0Ow0KKwkJc2ct
+PmRtYV9hZGRyZXNzID0gc2dfcGh5cyhzZyk7DQogCQlzZy0+ZG1hX2xlbmd0aCA9IHNnLT5sZW5n
+dGg7DQogCX0NCiAJcmV0dXJuIG5lbGVtczsNCmRpZmYgLS1naXQgYS9kcml2ZXJzL2lvbW11L2lv
+bW11LmMgYi9kcml2ZXJzL2lvbW11L2lvbW11LmMNCmluZGV4IGYyODYwOTA5MzFjYy4uMDQ5ZGY0
+OTVjMjc0IDEwMDY0NA0KLS0tIGEvZHJpdmVycy9pb21tdS9pb21tdS5jDQorKysgYi9kcml2ZXJz
+L2lvbW11L2lvbW11LmMNCkBAIC0xNDA4LDcgKzE0MDgsNyBAQCBzaXplX3QgZGVmYXVsdF9pb21t
+dV9tYXBfc2coc3RydWN0IGlvbW11X2RvbWFpbiAqZG9tYWluLCB1bnNpZ25lZCBsb25nIGlvdmEs
+DQogCW1pbl9wYWdlc3ogPSAxIDw8IF9fZmZzKGRvbWFpbi0+b3BzLT5wZ3NpemVfYml0bWFwKTsN
+CiANCiAJZm9yX2VhY2hfc2coc2csIHMsIG5lbnRzLCBpKSB7DQotCQlwaHlzX2FkZHJfdCBwaHlz
+ID0gcGFnZV90b19waHlzKHNnX3BhZ2UocykpICsgcy0+b2Zmc2V0Ow0KKwkJcGh5c19hZGRyX3Qg
+cGh5cyA9IHNnX3BoeXMocyk7DQogDQogCQkvKg0KIAkJICogV2UgYXJlIG1hcHBpbmcgb24gSU9N
+TVUgcGFnZSBib3VuZGFyaWVzLCBzbyBvZmZzZXQgd2l0aGluDQpkaWZmIC0tZ2l0IGEvZHJpdmVy
+cy9zdGFnaW5nL2FuZHJvaWQvaW9uL2lvbl9jaHVua19oZWFwLmMgYi9kcml2ZXJzL3N0YWdpbmcv
+YW5kcm9pZC9pb24vaW9uX2NodW5rX2hlYXAuYw0KaW5kZXggNTQ3NDYxNTdkNzk5Li5mN2I2ZWY5
+OTFjZDAgMTAwNjQ0DQotLS0gYS9kcml2ZXJzL3N0YWdpbmcvYW5kcm9pZC9pb24vaW9uX2NodW5r
+X2hlYXAuYw0KKysrIGIvZHJpdmVycy9zdGFnaW5nL2FuZHJvaWQvaW9uL2lvbl9jaHVua19oZWFw
+LmMNCkBAIC04MSw3ICs4MSw3IEBAIHN0YXRpYyBpbnQgaW9uX2NodW5rX2hlYXBfYWxsb2NhdGUo
+c3RydWN0IGlvbl9oZWFwICpoZWFwLA0KIGVycjoNCiAJc2cgPSB0YWJsZS0+c2dsOw0KIAlmb3Ig
+KGkgLT0gMTsgaSA+PSAwOyBpLS0pIHsNCi0JCWdlbl9wb29sX2ZyZWUoY2h1bmtfaGVhcC0+cG9v
+bCwgcGFnZV90b19waHlzKHNnX3BhZ2Uoc2cpKSwNCisJCWdlbl9wb29sX2ZyZWUoY2h1bmtfaGVh
+cC0+cG9vbCwgc2dfcGh5cyhzZykgJiBQQUdFX01BU0ssDQogCQkJICAgICAgc2ctPmxlbmd0aCk7
+DQogCQlzZyA9IHNnX25leHQoc2cpOw0KIAl9DQpAQCAtMTA5LDcgKzEwOSw3IEBAIHN0YXRpYyB2
+b2lkIGlvbl9jaHVua19oZWFwX2ZyZWUoc3RydWN0IGlvbl9idWZmZXIgKmJ1ZmZlcikNCiAJCQkJ
+CQkJRE1BX0JJRElSRUNUSU9OQUwpOw0KIA0KIAlmb3JfZWFjaF9zZyh0YWJsZS0+c2dsLCBzZywg
+dGFibGUtPm5lbnRzLCBpKSB7DQotCQlnZW5fcG9vbF9mcmVlKGNodW5rX2hlYXAtPnBvb2wsIHBh
+Z2VfdG9fcGh5cyhzZ19wYWdlKHNnKSksDQorCQlnZW5fcG9vbF9mcmVlKGNodW5rX2hlYXAtPnBv
+b2wsIHNnX3BoeXMoc2cpICYgUEFHRV9NQVNLLA0KIAkJCSAgICAgIHNnLT5sZW5ndGgpOw0KIAl9
+DQogCWNodW5rX2hlYXAtPmFsbG9jYXRlZCAtPSBhbGxvY2F0ZWRfc2l6ZTsNCg0K
