@@ -1,75 +1,195 @@
-From: Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [PATCH 6/6] scatterlist: use sg_phys()
-Date: Fri, 7 Aug 2015 18:15:49 -0700
-Message-ID: <CAPcyv4gkZZH5FCeZgOcsXJaE0Ug5F3x0VxhX0PqkoNZwLeEbyQ@mail.gmail.com>
-References: <1438964116-24321-1-git-send-email-hch@lst.de>
-	<1438964116-24321-7-git-send-email-hch@lst.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Julia Lawall <Julia.Lawall@lip6.fr>,
-	Joerg Roedel <joro@8bytes.org>
-To: Christoph Hellwig <hch@lst.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:33585 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1946491AbbHHBPu (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 7 Aug 2015 21:15:50 -0400
-Received: by wijp15 with SMTP id p15so77475116wij.0
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Aug 2015 18:15:49 -0700 (PDT)
-In-Reply-To: <1438964116-24321-7-git-send-email-hch@lst.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Jan Stancek <jstancek@redhat.com>
+Subject: [PATCH] crypto: nx-sha256/512: respect sg limit bounds when building sg lists
+Date: Sat,  8 Aug 2015 08:47:28 +0200
+Message-ID: <58cb150c5cef7194cb3fa8e6117ce3d79c603a58.1439016075.git.jstancek@redhat.com>
+Cc: linux-kernel@vger.kernel.org, leosilva@linux.vnet.ibm.com,
+	mhcerri@linux.vnet.ibm.com, fin@linux.vnet.ibm.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	jstancek@redhat.com
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 7, 2015 at 9:15 AM, Christoph Hellwig <hch@lst.de> wrote:
-> From: Dan Williams <dan.j.williams@intel.com>
->
-> Coccinelle cleanup to replace open coded sg to physical address
-> translations.  This is in preparation for introducing scatterlists that
-> reference __pfn_t.
->
-> // sg_phys.cocci: convert usage page_to_phys(sg_page(sg)) to sg_phys(sg)
-> // usage: make coccicheck COCCI=sg_phys.cocci MODE=patch
->
-> virtual patch
-> virtual report
-> virtual org
->
-> @@
-> struct scatterlist *sg;
-> @@
->
-> - page_to_phys(sg_page(sg)) + sg->offset
-> + sg_phys(sg)
->
-> @@
-> struct scatterlist *sg;
-> @@
->
-> - page_to_phys(sg_page(sg))
-> + sg_phys(sg) - sg->offset
+Commit 000851119e80 changed sha256/512 update functions to
+pass more data to nx_build_sg_list(), which ends with
+sg list overflows and usually with update functions failing
+for data larger than max_sg_len * NX_PAGE_SIZE.
 
-So this ends up being an awkward conversion, a better one is:
+This happens because:
+- both "total" and "to_process" are updated, which leads to
+  "to_process" getting overflowed for some data lengths
+  For example:
+    In first iteration "total" is 50, and let's assume "to_process"
+    is 30 due to sg limits. At the end of first iteration "total" is
+    set to 20. At start of 2nd iteration "to_process" overflows on:
+      to_process = total - to_process;
+- "in_sg" is not reset to nx_ctx->in_sg after each iteration
+- nx_build_sg_list() is hitting overflow because the amount of data
+  passed to it would require more than sgmax elements
+- as consequence of previous item, data stored in overflowed sg list
+  may no longer be aligned to SHA*_BLOCK_SIZE
 
-- page_to_phys(sg_page(sg))
-+ sg_phys(sg) & PAGE_MASK
+This patch changes sha256/512 update functions so that "to_process"
+respects sg limits and never tries to pass more data to
+nx_build_sg_list() to avoid overflows. "to_process" is calculated
+as minimum of "total" and sg limits at start of every iteration.
 
-[..]
-> diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
-> index 5852df8..e0faecc 100644
-> --- a/drivers/iommu/intel-iommu.c
-> +++ b/drivers/iommu/intel-iommu.c
-> @@ -2098,7 +2098,7 @@ static int __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
->                         sg_res = aligned_nrpages(sg->offset, sg->length);
->                         sg->dma_address = ((dma_addr_t)iov_pfn << VTD_PAGE_SHIFT) + sg->offset;
->                         sg->dma_length = sg->length;
-> -                       pteval = page_to_phys(sg_page(sg)) | prot;
-> +                       pteval = (sg_phys(sg) - sg->offset) | prot;
+Fixes: 000851119e80 ("crypto: nx - Fix SHA concurrence issue and sg
+                      limit bounds")
 
-For example here, as Joerg pointed out.
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Cc: Leonidas Da Silva Barbosa <leosilva@linux.vnet.ibm.com>
+Cc: Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>
+Cc: Fionnuala Gunter <fin@linux.vnet.ibm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+---
+ drivers/crypto/nx/nx-sha256.c | 27 ++++++++++++++++-----------
+ drivers/crypto/nx/nx-sha512.c | 28 ++++++++++++++++------------
+ 2 files changed, 32 insertions(+), 23 deletions(-)
 
-[1]: https://lkml.org/lkml/2015/6/10/230
+diff --git a/drivers/crypto/nx/nx-sha256.c b/drivers/crypto/nx/nx-sha256.c
+index 08f8d5cd6334..becb738c897b 100644
+--- a/drivers/crypto/nx/nx-sha256.c
++++ b/drivers/crypto/nx/nx-sha256.c
+@@ -71,7 +71,6 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
+ 	struct sha256_state *sctx = shash_desc_ctx(desc);
+ 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
+ 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
+-	struct nx_sg *in_sg;
+ 	struct nx_sg *out_sg;
+ 	u64 to_process = 0, leftover, total;
+ 	unsigned long irq_flags;
+@@ -97,7 +96,6 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
+ 	NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
+ 	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
+ 
+-	in_sg = nx_ctx->in_sg;
+ 	max_sg_len = min_t(u64, nx_ctx->ap->sglen,
+ 			nx_driver.of.max_sg_len/sizeof(struct nx_sg));
+ 	max_sg_len = min_t(u64, max_sg_len,
+@@ -114,17 +112,12 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
+ 	}
+ 
+ 	do {
+-		/*
+-		 * to_process: the SHA256_BLOCK_SIZE data chunk to process in
+-		 * this update. This value is also restricted by the sg list
+-		 * limits.
+-		 */
+-		to_process = total - to_process;
+-		to_process = to_process & ~(SHA256_BLOCK_SIZE - 1);
++		int used_sgs = 0;
++		struct nx_sg *in_sg = nx_ctx->in_sg;
+ 
+ 		if (buf_len) {
+ 			data_len = buf_len;
+-			in_sg = nx_build_sg_list(nx_ctx->in_sg,
++			in_sg = nx_build_sg_list(in_sg,
+ 						 (u8 *) sctx->buf,
+ 						 &data_len,
+ 						 max_sg_len);
+@@ -133,15 +126,27 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
+ 				rc = -EINVAL;
+ 				goto out;
+ 			}
++			used_sgs = in_sg - nx_ctx->in_sg;
+ 		}
+ 
++		/* to_process: SHA256_BLOCK_SIZE aligned chunk to be
++		 * processed in this iteration. This value is restricted
++		 * by sg list limits and number of sgs we already used
++		 * for leftover data. (see above)
++		 * In ideal case, we could allow NX_PAGE_SIZE * max_sg_len,
++		 * but because data may not be aligned, we need to account
++		 * for that too. */
++		to_process = min_t(u64, total,
++			(max_sg_len - 1 - used_sgs) * NX_PAGE_SIZE);
++		to_process = to_process & ~(SHA256_BLOCK_SIZE - 1);
++
+ 		data_len = to_process - buf_len;
+ 		in_sg = nx_build_sg_list(in_sg, (u8 *) data,
+ 					 &data_len, max_sg_len);
+ 
+ 		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) * sizeof(struct nx_sg);
+ 
+-		to_process = (data_len + buf_len);
++		to_process = data_len + buf_len;
+ 		leftover = total - to_process;
+ 
+ 		/*
+diff --git a/drivers/crypto/nx/nx-sha512.c b/drivers/crypto/nx/nx-sha512.c
+index aff0fe58eac0..b6e183d58d73 100644
+--- a/drivers/crypto/nx/nx-sha512.c
++++ b/drivers/crypto/nx/nx-sha512.c
+@@ -71,7 +71,6 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
+ 	struct sha512_state *sctx = shash_desc_ctx(desc);
+ 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
+ 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
+-	struct nx_sg *in_sg;
+ 	struct nx_sg *out_sg;
+ 	u64 to_process, leftover = 0, total;
+ 	unsigned long irq_flags;
+@@ -97,7 +96,6 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
+ 	NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
+ 	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
+ 
+-	in_sg = nx_ctx->in_sg;
+ 	max_sg_len = min_t(u64, nx_ctx->ap->sglen,
+ 			nx_driver.of.max_sg_len/sizeof(struct nx_sg));
+ 	max_sg_len = min_t(u64, max_sg_len,
+@@ -114,18 +112,12 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
+ 	}
+ 
+ 	do {
+-		/*
+-		 * to_process: the SHA512_BLOCK_SIZE data chunk to process in
+-		 * this update. This value is also restricted by the sg list
+-		 * limits.
+-		 */
+-		to_process = total - leftover;
+-		to_process = to_process & ~(SHA512_BLOCK_SIZE - 1);
+-		leftover = total - to_process;
++		int used_sgs = 0;
++		struct nx_sg *in_sg = nx_ctx->in_sg;
+ 
+ 		if (buf_len) {
+ 			data_len = buf_len;
+-			in_sg = nx_build_sg_list(nx_ctx->in_sg,
++			in_sg = nx_build_sg_list(in_sg,
+ 						 (u8 *) sctx->buf,
+ 						 &data_len, max_sg_len);
+ 
+@@ -133,8 +125,20 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
+ 				rc = -EINVAL;
+ 				goto out;
+ 			}
++			used_sgs = in_sg - nx_ctx->in_sg;
+ 		}
+ 
++		/* to_process: SHA512_BLOCK_SIZE aligned chunk to be
++		 * processed in this iteration. This value is restricted
++		 * by sg list limits and number of sgs we already used
++		 * for leftover data. (see above)
++		 * In ideal case, we could allow NX_PAGE_SIZE * max_sg_len,
++		 * but because data may not be aligned, we need to account
++		 * for that too. */
++		to_process = min_t(u64, total,
++			(max_sg_len - 1 - used_sgs) * NX_PAGE_SIZE);
++		to_process = to_process & ~(SHA512_BLOCK_SIZE - 1);
++
+ 		data_len = to_process - buf_len;
+ 		in_sg = nx_build_sg_list(in_sg, (u8 *) data,
+ 					 &data_len, max_sg_len);
+@@ -146,7 +150,7 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
+ 			goto out;
+ 		}
+ 
+-		to_process = (data_len + buf_len);
++		to_process = data_len + buf_len;
+ 		leftover = total - to_process;
+ 
+ 		/*
+-- 
+1.8.3.1
