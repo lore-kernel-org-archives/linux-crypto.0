@@ -1,39 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: sahara - Fix misuse of IS_ENABLED
-Date: Mon, 10 Aug 2015 15:32:34 +0800
-Message-ID: <20150810073234.GC16990@gondor.apana.org.au>
-References: <1439191116.22743.1.camel@ingics.com>
+Subject: Re: [PATCH 3/6] crypto: replace scatterwalk_sg_chain with sg_chain
+Date: Mon, 10 Aug 2015 15:34:21 +0800
+Message-ID: <20150810073421.GA17338@gondor.apana.org.au>
+References: <1438964116-24321-1-git-send-email-hch@lst.de>
+ <1438964116-24321-4-git-send-email-hch@lst.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Javier Martin <javier.martin@vista-silicon.com>,
-	Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-	linux-crypto@vger.kernel.org
-To: Axel Lin <axel.lin@ingics.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Dan Williams <dan.j.williams@intel.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Christoph Hellwig <hch@lst.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:40508 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:40497 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752756AbbHJHct (ORCPT
+	with ESMTP id S1751755AbbHJHee (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Aug 2015 03:32:49 -0400
+	Mon, 10 Aug 2015 03:34:34 -0400
 Content-Disposition: inline
-In-Reply-To: <1439191116.22743.1.camel@ingics.com>
+In-Reply-To: <1438964116-24321-4-git-send-email-hch@lst.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 10, 2015 at 03:18:36PM +0800, Axel Lin wrote:
-> IS_ENABLED should only be used for CONFIG_* symbols.
-> So use #ifdef DEBUG instead.
+On Fri, Aug 07, 2015 at 06:15:13PM +0200, Christoph Hellwig wrote:
+> From: Dan Williams <dan.j.williams@intel.com>
 > 
-> Signed-off-by: Axel Lin <axel.lin@ingics.com>
+> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+> [hch: split from a larger patch by Dan]
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Nack.  While the abuse is certainly wrong you're removing compiler
-coverage over code which is worse.
-
-PLease find a way to remove the IS_ENABLED abuse without causing
-the code in question to lose compiler coverage.
-
-Thanks,
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
