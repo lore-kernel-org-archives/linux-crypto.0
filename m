@@ -1,54 +1,48 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [cryptodev:master 119/123] include/linux/pci.h:389:12: error:
- 'struct pci_dev' has no member named 'physfn'
-Date: Mon, 10 Aug 2015 12:06:56 -0700
-Message-ID: <55C8F650.707@intel.com>
-References: <201508110230.YCHwvKep%fengguang.wu@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: kbuild-all@01.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-To: kbuild test robot <fengguang.wu@intel.com>
+From: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+Subject: [PATCH] Fix email address mistypo for NX/VMX crypto driver maintainers
+Date: Mon, 10 Aug 2015 16:14:17 -0300
+Message-ID: <1439234057-24206-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
+Cc: leosilva@linux.vnet.ibm.com, linux-kernel@vger.kernel.org,
+	Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:17856 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932531AbbHJTIA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Aug 2015 15:08:00 -0400
-In-Reply-To: <201508110230.YCHwvKep%fengguang.wu@intel.com>
+Received: from e24smtp04.br.ibm.com ([32.104.18.25]:59415 "EHLO
+	e24smtp04.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754360AbbHJTOv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 10 Aug 2015 15:14:51 -0400
+Received: from /spool/local
+	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <pfsmorigo@linux.vnet.ibm.com>;
+	Mon, 10 Aug 2015 16:14:49 -0300
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/10/2015 11:47 AM, kbuild test robot wrote:
-> tree:   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> head:   9cfaf082b8775e9f99fa5f2e8b2ae0ca8baff785
-> commit: dd0f368398ea100e34259bf812bc482e15c81991 [119/123] crypto: qat - Add qat dh895xcc VF driver
-> config: sh-allyesconfig (attached as .config)
-> reproduce:
->   wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
->   chmod +x ~/bin/make.cross
->   git checkout dd0f368398ea100e34259bf812bc482e15c81991
->   # save the attached .config to linux build tree
->   make.cross ARCH=sh 
-> 
-> All error/warnings (new ones prefixed by >>):
-> 
->    In file included from drivers/media/common/b2c2/flexcop-common.h:10:0,
->                     from drivers/media/usb/b2c2/flexcop-usb.c:8:
->    include/linux/pci.h: In function 'pci_physfn':
->>> >> include/linux/pci.h:389:12: error: 'struct pci_dev' has no member named 'physfn'
-> vim +389 include/linux/pci.h
-> 
-> ^1da177e Linus Torvalds 2005-04-16  383  };
-> ^1da177e Linus Torvalds 2005-04-16  384  
-> dda56549 Yinghai        2010-04-09  385  static inline struct pci_dev *pci_physfn(struct pci_dev *dev)
-> dda56549 Yinghai        2010-04-09  386  {
-> dda56549 Yinghai        2010-04-09  387  #ifdef CONFIG_PCI_IOV
-> dda56549 Yinghai        2010-04-09  388  	if (dev->is_virtfn)
-> dda56549 Yinghai        2010-04-09 @389  		dev = dev->physfn;
-> dda56549 Yinghai        2010-04-09  390  #endif
-> dda56549 Yinghai        2010-04-09  391  	return dev;
-> dda56549 Yinghai        2010-04-09  392  }
+---
+ MAINTAINERS | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Sorry, but what commit dd0f368398ea100e34259bf812bc482e15c81991 crypto: qat - Add qat dh895xcc VF driver
-has to do with drivers/media/usb/b2c2/flexcop-usb.c?
+diff --git a/MAINTAINERS b/MAINTAINERS
+index aa748b0..97e7822 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -5061,7 +5061,7 @@ F:	arch/ia64/
+ 
+ IBM Power VMX Cryptographic instructions
+ M:	Leonidas S. Barbosa <leosilva@linux.vnet.ibm.com>
+-M: 	Paulo Flabiano Smorigo <pfsmorigo.vnet.ibm.com>
++M:	Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Supported
+ F:	drivers/crypto/vmx/Makefile
+@@ -5073,7 +5073,7 @@ F:	drivers/crypto/vmx/ppc-xlate.pl
+ 
+ IBM Power in-Nest Crypto Acceleration
+ M:	Leonidas S. Barbosa <leosilva@linux.vnet.ibm.com>
+-M:	Paulo Flabiano Smorigo <pfsmorigo.vnet.ibm.com>
++M:	Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Supported
+ F:	drivers/crypto/nx/Makefile
+-- 
+2.1.0
