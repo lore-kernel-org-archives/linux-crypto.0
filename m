@@ -1,65 +1,54 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@freescale.com>
-Subject: [PATCH] crypto: caam - fix memory corruption in ahash_final_ctx
-Date: Tue, 11 Aug 2015 20:19:20 +0300
-Message-ID: <1439313560-14347-1-git-send-email-horia.geanta@freescale.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [cryptodev:master 119/123] warning: (CRYPTO_DEV_QAT_DH895xCCVF)
+ selects PCI_IOV which has unmet direct dependencies (PCI)
+Date: Tue, 11 Aug 2015 11:05:37 -0700
+Message-ID: <55CA3971.5070008@intel.com>
+References: <201508110049.yV4f3Yls%fengguang.wu@intel.com> <55C8E2E9.8000509@intel.com> <20150811135738.GA30846@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <linux-crypto@vger.kernel.org>, <stable@vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild-all@01.org,
+	linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bn0103.outbound.protection.outlook.com ([157.56.110.103]:29514
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751672AbbHKRdu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Aug 2015 13:33:50 -0400
+Received: from mga02.intel.com ([134.134.136.20]:9592 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932120AbbHKSG7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 11 Aug 2015 14:06:59 -0400
+In-Reply-To: <20150811135738.GA30846@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When doing pointer operation for accessing the HW S/G table,
-a value representing number of entries (and not number of bytes)
-must be used.
+On 08/11/2015 06:57 AM, Herbert Xu wrote:
+> On Mon, Aug 10, 2015 at 10:44:09AM -0700, Tadeusz Struk wrote:
+>> >
+>> >  config CRYPTO_DEV_QAT_DH895xCCVF
+>> >  	tristate "Support for Intel(R) DH895xCC Virtual Function"
+>> > +	select PCI
+>> >  	select PCI_IOV
+> Wouldn't a dependency on PCI make more sense? Or does this not
+> work?
 
-Cc: <stable@vger.kernel.org> # 3.6+
-=46ixes: 045e36780f115 ("crypto: caam - ahash hmac support")
-Signed-off-by: Horia Geant=C4=83 <horia.geanta@freescale.com>
----
- drivers/crypto/caam/caamhash.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Yes, you are right. This is how it is in the PF config.
+It also needs to select the qat common code.
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamh=
-ash.c
-index bb0935a3817c..6c142617f8cc 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -909,13 +909,14 @@ static int ahash_final_ctx(struct ahash_request *=
-req)
- 			  state->buflen_1;
- 	u32 *sh_desc =3D ctx->sh_desc_fin, *desc;
- 	dma_addr_t ptr =3D ctx->sh_desc_fin_dma;
--	int sec4_sg_bytes;
-+	int sec4_sg_bytes, sec4_sg_src_index;
- 	int digestsize =3D crypto_ahash_digestsize(ahash);
- 	struct ahash_edesc *edesc;
- 	int ret =3D 0;
- 	int sh_len;
-=20
--	sec4_sg_bytes =3D (1 + (buflen ? 1 : 0)) * sizeof(struct sec4_sg_entr=
-y);
-+	sec4_sg_src_index =3D 1 + (buflen ? 1 : 0);
-+	sec4_sg_bytes =3D sec4_sg_src_index * sizeof(struct sec4_sg_entry);
-=20
- 	/* allocate space for base edesc and hw desc commands, link tables */
- 	edesc =3D kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN + sec4_sg_bytes,
-@@ -942,7 +943,7 @@ static int ahash_final_ctx(struct ahash_request *re=
-q)
- 	state->buf_dma =3D try_buf_map_to_sec4_sg(jrdev, edesc->sec4_sg + 1,
- 						buf, state->buf_dma, buflen,
- 						last_buflen);
--	(edesc->sec4_sg + sec4_sg_bytes - 1)->len |=3D SEC4_SG_LEN_FIN;
-+	(edesc->sec4_sg + sec4_sg_src_index - 1)->len |=3D SEC4_SG_LEN_FIN;
-=20
- 	edesc->sec4_sg_dma =3D dma_map_single(jrdev, edesc->sec4_sg,
- 					    sec4_sg_bytes, DMA_TO_DEVICE);
---=20
-2.4.4
+---8<---
+Fix unmet direct dependencies for QAT_DH895xCCVF
+
+Reported-by: Fengguang Wu <fengguang.wu@intel.com>
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+
+diff --git a/drivers/crypto/qat/Kconfig b/drivers/crypto/qat/Kconfig
+index 95a9566..eefccf7 100644
+--- a/drivers/crypto/qat/Kconfig
++++ b/drivers/crypto/qat/Kconfig
+@@ -24,7 +24,9 @@ config CRYPTO_DEV_QAT_DH895xCC
+ 
+ config CRYPTO_DEV_QAT_DH895xCCVF
+ 	tristate "Support for Intel(R) DH895xCC Virtual Function"
++	depends on X86 && PCI
+ 	select PCI_IOV
++	select CRYPTO_DEV_QAT
+ 
+ 	help
+ 	  Support for Intel(R) DH895xcc with Intel(R) QuickAssist Technology
