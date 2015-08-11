@@ -1,56 +1,65 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [cryptodev:master 119/123] (.text+0x7a3): multiple definition of
- `adf_isr_resource_free'
-Date: Tue, 11 Aug 2015 22:10:55 +0800
-Message-ID: <20150811141055.GC30943@gondor.apana.org.au>
-References: <201508110327.99r9RzJb%fengguang.wu@intel.com>
- <55C902C2.5040809@intel.com>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@freescale.com>
+Subject: [PATCH] crypto: caam - fix memory corruption in ahash_final_ctx
+Date: Tue, 11 Aug 2015 20:19:20 +0300
+Message-ID: <1439313560-14347-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild-all@01.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <linux-crypto@vger.kernel.org>, <stable@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48561 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S964890AbbHKOLB (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Aug 2015 10:11:01 -0400
-Content-Disposition: inline
-In-Reply-To: <55C902C2.5040809@intel.com>
+Received: from mail-bn1bn0103.outbound.protection.outlook.com ([157.56.110.103]:29514
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751672AbbHKRdu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 11 Aug 2015 13:33:50 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 10, 2015 at 01:00:02PM -0700, Tadeusz Struk wrote:
-> On 08/10/2015 12:36 PM, kbuild test robot wrote:
-> > tree:   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> > head:   9cfaf082b8775e9f99fa5f2e8b2ae0ca8baff785
-> > commit: dd0f368398ea100e34259bf812bc482e15c81991 [119/123] crypto: qat - Add qat dh895xcc VF driver
-> > config: i386-allyesconfig (attached as .config)
-> > reproduce:
-> >   git checkout dd0f368398ea100e34259bf812bc482e15c81991
-> >   # save the attached .config to linux build tree
-> >   make ARCH=i386 
-> > 
-> > All error/warnings (new ones prefixed by >>):
-> > 
-> >    drivers/crypto/qat/qat_dh895xccvf/built-in.o: In function `adf_isr_resource_free':
-> >>> >> (.text+0x7a3): multiple definition of `adf_isr_resource_free'
-> >    drivers/crypto/qat/qat_dh895xcc/built-in.o:(.text+0x5f9): first defined here
-> >    drivers/crypto/qat/qat_dh895xccvf/built-in.o: In function `adf_isr_resource_alloc':
-> >>> >> (.text+0x818): multiple definition of `adf_isr_resource_alloc'
-> >    drivers/crypto/qat/qat_dh895xcc/built-in.o:(.text+0x6d7): first defined here
-> 
-> ---8<---
-> 
-> When both PF and VF drivers are build in linker complains about multiple
-> definition of adf_isr_resource_[alloc/free] functions.
-> 
-> Reported-by: Fengguang Wu <fengguang.wu@intel.com>
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+When doing pointer operation for accessing the HW S/G table,
+a value representing number of entries (and not number of bytes)
+must be used.
 
-Applied.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Cc: <stable@vger.kernel.org> # 3.6+
+=46ixes: 045e36780f115 ("crypto: caam - ahash hmac support")
+Signed-off-by: Horia Geant=C4=83 <horia.geanta@freescale.com>
+---
+ drivers/crypto/caam/caamhash.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamh=
+ash.c
+index bb0935a3817c..6c142617f8cc 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -909,13 +909,14 @@ static int ahash_final_ctx(struct ahash_request *=
+req)
+ 			  state->buflen_1;
+ 	u32 *sh_desc =3D ctx->sh_desc_fin, *desc;
+ 	dma_addr_t ptr =3D ctx->sh_desc_fin_dma;
+-	int sec4_sg_bytes;
++	int sec4_sg_bytes, sec4_sg_src_index;
+ 	int digestsize =3D crypto_ahash_digestsize(ahash);
+ 	struct ahash_edesc *edesc;
+ 	int ret =3D 0;
+ 	int sh_len;
+=20
+-	sec4_sg_bytes =3D (1 + (buflen ? 1 : 0)) * sizeof(struct sec4_sg_entr=
+y);
++	sec4_sg_src_index =3D 1 + (buflen ? 1 : 0);
++	sec4_sg_bytes =3D sec4_sg_src_index * sizeof(struct sec4_sg_entry);
+=20
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+ 	edesc =3D kzalloc(sizeof(*edesc) + DESC_JOB_IO_LEN + sec4_sg_bytes,
+@@ -942,7 +943,7 @@ static int ahash_final_ctx(struct ahash_request *re=
+q)
+ 	state->buf_dma =3D try_buf_map_to_sec4_sg(jrdev, edesc->sec4_sg + 1,
+ 						buf, state->buf_dma, buflen,
+ 						last_buflen);
+-	(edesc->sec4_sg + sec4_sg_bytes - 1)->len |=3D SEC4_SG_LEN_FIN;
++	(edesc->sec4_sg + sec4_sg_src_index - 1)->len |=3D SEC4_SG_LEN_FIN;
+=20
+ 	edesc->sec4_sg_dma =3D dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
+--=20
+2.4.4
