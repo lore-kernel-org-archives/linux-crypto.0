@@ -1,7 +1,7 @@
 From: Chen-Yu Tsai <wens-jdAy2FN1RRM@public.gmane.org>
-Subject: [PATCH 2/3] crypto: sunxi-ss: Add optional reset control support
-Date: Tue, 11 Aug 2015 13:32:56 +0800
-Message-ID: <1439271177-26523-3-git-send-email-wens@csie.org>
+Subject: [PATCH 3/3] ARM: dts: sun6i: Add security system crypto engine clock and device nodes
+Date: Tue, 11 Aug 2015 13:32:57 +0800
+Message-ID: <1439271177-26523-4-git-send-email-wens@csie.org>
 References: <1439271177-26523-1-git-send-email-wens@csie.org>
 Cc: Chen-Yu Tsai <wens-jdAy2FN1RRM@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
@@ -19,96 +19,50 @@ In-Reply-To: <1439271177-26523-1-git-send-email-wens-jdAy2FN1RRM@public.gmane.or
 Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On sun6i and later platforms, the reset control is split out of the
-clock gates. Add support for an optional reset control.
+A31/A31s have the same "Security System" crypto engine as A10/A20,
+but with a separate reset control.
 
 Signed-off-by: Chen-Yu Tsai <wens-jdAy2FN1RRM@public.gmane.org>
 ---
- drivers/crypto/sunxi-ss/sun4i-ss-core.c | 22 ++++++++++++++++++++++
- drivers/crypto/sunxi-ss/sun4i-ss.h      |  2 ++
- 2 files changed, 24 insertions(+)
+ arch/arm/boot/dts/sun6i-a31.dtsi | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-core.c b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-index 0b79b58c913b..eab6fe227fa0 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-@@ -22,6 +22,7 @@
- #include <linux/scatterlist.h>
- #include <linux/interrupt.h>
- #include <linux/delay.h>
-+#include <linux/reset.h>
+diff --git a/arch/arm/boot/dts/sun6i-a31.dtsi b/arch/arm/boot/dts/sun6i-a31.dtsi
+index 39953e76bbfc..7afb80f07dad 100644
+--- a/arch/arm/boot/dts/sun6i-a31.dtsi
++++ b/arch/arm/boot/dts/sun6i-a31.dtsi
+@@ -346,6 +346,14 @@
+ 					     "mmc3_sample";
+ 		};
  
- #include "sun4i-ss.h"
- 
-@@ -253,6 +254,14 @@ static int sun4i_ss_probe(struct platform_device *pdev)
- 	}
- 	dev_dbg(&pdev->dev, "clock ahb_ss acquired\n");
- 
-+	ss->reset = devm_reset_control_get_optional(&pdev->dev, "ahb");
-+	if (IS_ERR(ss->reset)) {
-+		if (PTR_ERR(ss->reset) == -EPROBE_DEFER)
-+			return PTR_ERR(ss->reset);
-+		dev_info(&pdev->dev, "no reset control found\n");
-+		ss->reset = NULL;
-+	}
++		ss_clk: clk@01c2009c {
++			#clock-cells = <0>;
++			compatible = "allwinner,sun4i-a10-mod0-clk";
++			reg = <0x01c2009c 0x4>;
++			clocks = <&osc24M>, <&pll6 0>;
++			clock-output-names = "ss";
++		};
 +
- 	/* Enable both clocks */
- 	err = clk_prepare_enable(ss->busclk);
- 	if (err != 0) {
-@@ -275,6 +284,15 @@ static int sun4i_ss_probe(struct platform_device *pdev)
- 		goto error_clk;
- 	}
+ 		spi0_clk: clk@01c200a0 {
+ 			#clock-cells = <0>;
+ 			compatible = "allwinner,sun4i-a10-mod0-clk";
+@@ -882,6 +890,16 @@
+ 			#size-cells = <0>;
+ 		};
  
-+	/* Deassert reset if we have a reset control */
-+	if (ss->reset) {
-+		err = reset_control_deassert(ss->reset);
-+		if (err) {
-+			dev_err(&pdev->dev, "Cannot deassert reset control\n");
-+			goto error_clk;
-+		}
-+	}
++		crypto: crypto-engine@01c15000 {
++			compatible = "allwinner,sun4i-a10-crypto";
++			reg = <0x01c15000 0x1000>;
++			interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&ahb1_gates 5>, <&ss_clk>;
++			clock-names = "ahb", "mod";
++			resets = <&ahb1_rst 5>;
++			reset-names = "ahb";
++		};
 +
- 	/*
- 	 * The only impact on clocks below requirement are bad performance,
- 	 * so do not print "errors"
-@@ -352,6 +370,8 @@ error_alg:
- 			break;
- 		}
- 	}
-+	if (ss->reset)
-+		reset_control_assert(ss->reset);
- error_clk:
- 	clk_disable_unprepare(ss->ssclk);
- error_ssclk:
-@@ -376,6 +396,8 @@ static int sun4i_ss_remove(struct platform_device *pdev)
- 	}
- 
- 	writel(0, ss->base + SS_CTL);
-+	if (ss->reset)
-+		reset_control_assert(ss->reset);
- 	clk_disable_unprepare(ss->busclk);
- 	clk_disable_unprepare(ss->ssclk);
- 	return 0;
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss.h b/drivers/crypto/sunxi-ss/sun4i-ss.h
-index db18b2554e6f..8e9c05f6e4d4 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss.h
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss.h
-@@ -18,6 +18,7 @@
- #include <linux/module.h>
- #include <linux/of.h>
- #include <linux/platform_device.h>
-+#include <linux/reset.h>
- #include <crypto/scatterwalk.h>
- #include <linux/scatterlist.h>
- #include <linux/interrupt.h>
-@@ -129,6 +130,7 @@ struct sun4i_ss_ctx {
- 	int irq;
- 	struct clk *busclk;
- 	struct clk *ssclk;
-+	struct reset_control *reset;
- 	struct device *dev;
- 	struct resource *res;
- 	spinlock_t slock; /* control the use of the device */
+ 		timer@01c60000 {
+ 			compatible = "allwinner,sun6i-a31-hstimer",
+ 				     "allwinner,sun7i-a20-hstimer";
 -- 
 2.5.0
 
