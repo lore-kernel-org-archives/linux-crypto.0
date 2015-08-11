@@ -1,47 +1,38 @@
-From: Chen-Yu Tsai <wens@csie.org>
-Subject: [PATCH 1/3] crypto: sunxi-ss: Document optional reset control bindings
-Date: Tue, 11 Aug 2015 13:32:55 +0800
-Message-ID: <1439271177-26523-2-git-send-email-wens@csie.org>
-References: <1439271177-26523-1-git-send-email-wens@csie.org>
-Cc: Chen-Yu Tsai <wens@csie.org>, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Maxime Ripard <maxime.ripard@free-electrons.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1439271177-26523-1-git-send-email-wens@csie.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [cryptodev:master 119/123] warning: (CRYPTO_DEV_QAT_DH895xCCVF)
+ selects PCI_IOV which has unmet direct dependencies (PCI)
+Date: Tue, 11 Aug 2015 21:57:38 +0800
+Message-ID: <20150811135738.GA30846@gondor.apana.org.au>
+References: <201508110049.yV4f3Yls%fengguang.wu@intel.com>
+ <55C8E2E9.8000509@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild-all@01.org,
+	linux-crypto@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:42589 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S964936AbbHKN5r (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 11 Aug 2015 09:57:47 -0400
+Content-Disposition: inline
+In-Reply-To: <55C8E2E9.8000509@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Later Allwinner SoCs split out the reset controls for individual modules
-out of the clock gate controls. The "Security System" crypto engine is
-no different.
+On Mon, Aug 10, 2015 at 10:44:09AM -0700, Tadeusz Struk wrote:
+>
+>  config CRYPTO_DEV_QAT_DH895xCCVF
+>  	tristate "Support for Intel(R) DH895xCC Virtual Function"
+> +	select PCI
+>  	select PCI_IOV
 
-Signed-off-by: Chen-Yu Tsai <wens@csie.org>
----
- Documentation/devicetree/bindings/crypto/sun4i-ss.txt | 4 ++++
- 1 file changed, 4 insertions(+)
+Wouldn't a dependency on PCI make more sense? Or does this not
+work?
 
-diff --git a/Documentation/devicetree/bindings/crypto/sun4i-ss.txt b/Documentation/devicetree/bindings/crypto/sun4i-ss.txt
-index 1e02d177fea6..5d38e9b7033f 100644
---- a/Documentation/devicetree/bindings/crypto/sun4i-ss.txt
-+++ b/Documentation/devicetree/bindings/crypto/sun4i-ss.txt
-@@ -9,6 +9,10 @@ Required properties:
- 	* "ahb" : AHB gating clock
- 	* "mod" : SS controller clock
- 
-+Optional properties:
-+ - resets : phandle + reset specifier pair
-+ - reset-names : must contain "ahb"
-+
- Example:
- 	crypto: crypto-engine@01c15000 {
- 		compatible = "allwinner,sun4i-a10-crypto";
+Thanks,
 -- 
-2.5.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
