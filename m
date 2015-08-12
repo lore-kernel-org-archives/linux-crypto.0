@@ -1,54 +1,34 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [cryptodev:master 119/123] warning: (CRYPTO_DEV_QAT_DH895xCCVF)
- selects PCI_IOV which has unmet direct dependencies (PCI)
-Date: Tue, 11 Aug 2015 11:05:37 -0700
-Message-ID: <55CA3971.5070008@intel.com>
-References: <201508110049.yV4f3Yls%fengguang.wu@intel.com> <55C8E2E9.8000509@intel.com> <20150811135738.GA30846@gondor.apana.org.au>
+From: kbuild test robot <fengguang.wu@intel.com>
+Subject: [cryptodev:master 118/125]
+ drivers/crypto/qat/qat_common/adf_sriov.c:258:1-4: WARNING: end returns can
+ be simpified and declaration on line 212 can be dropped
+Date: Wed, 12 Aug 2015 12:50:17 +0800
+Message-ID: <201508121211.ta8z9Ugl%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild-all@01.org,
+Content-Type: text/plain; charset=us-ascii
+Cc: kbuild-all@01.org, Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:9592 "EHLO mga02.intel.com"
+Received: from mga14.intel.com ([192.55.52.115]:39960 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932120AbbHKSG7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Aug 2015 14:06:59 -0400
-In-Reply-To: <20150811135738.GA30846@gondor.apana.org.au>
+	id S1751631AbbHLEuZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 12 Aug 2015 00:50:25 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/11/2015 06:57 AM, Herbert Xu wrote:
-> On Mon, Aug 10, 2015 at 10:44:09AM -0700, Tadeusz Struk wrote:
->> >
->> >  config CRYPTO_DEV_QAT_DH895xCCVF
->> >  	tristate "Support for Intel(R) DH895xCC Virtual Function"
->> > +	select PCI
->> >  	select PCI_IOV
-> Wouldn't a dependency on PCI make more sense? Or does this not
-> work?
+tree:   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+head:   d5cf4023ebcbae13e14e3ab3c55cb744321b352e
+commit: ed8ccaef52fa03fb03cff45b380f72c9f869f273 [118/125] crypto: qat - Add support for SRIOV
 
-Yes, you are right. This is how it is in the PF config.
-It also needs to select the qat common code.
 
----8<---
-Fix unmet direct dependencies for QAT_DH895xCCVF
+coccinelle warnings: (new ones prefixed by >>)
 
-Reported-by: Fengguang Wu <fengguang.wu@intel.com>
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+>> drivers/crypto/qat/qat_common/adf_sriov.c:258:1-4: WARNING: end returns can be simpified and declaration on line 212 can be dropped
 
-diff --git a/drivers/crypto/qat/Kconfig b/drivers/crypto/qat/Kconfig
-index 95a9566..eefccf7 100644
---- a/drivers/crypto/qat/Kconfig
-+++ b/drivers/crypto/qat/Kconfig
-@@ -24,7 +24,9 @@ config CRYPTO_DEV_QAT_DH895xCC
- 
- config CRYPTO_DEV_QAT_DH895xCCVF
- 	tristate "Support for Intel(R) DH895xCC Virtual Function"
-+	depends on X86 && PCI
- 	select PCI_IOV
-+	select CRYPTO_DEV_QAT
- 
- 	help
- 	  Support for Intel(R) DH895xcc with Intel(R) QuickAssist Technology
+Please review and possibly fold the followup patch.
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
