@@ -1,51 +1,26 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/13] crypto: algboss - Remove reference to nivaead
-Date: Thu, 13 Aug 2015 17:28:49 +0800
-Message-ID: <E1ZPoob-0005oV-J5@gondolin.me.apana.org.au>
-References: <20150813092520.GA22268@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49045 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751884AbbHMJ2w (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Aug 2015 05:28:52 -0400
-Received: from gondolin.me.apana.org.au ([192.168.0.6])
-	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1ZPoob-00035N-UM
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2015 19:28:50 +1000
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH 0/2] crypto: KEYS: convert public key to the akcipher API
+Date: Thu, 13 Aug 2015 14:56:37 +0100
+Message-ID: <10314.1439474197@warthog.procyon.org.uk>
+References: <20150813035433.25108.3065.stgit@tstruk-mobl1>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: dhowells@redhat.com, herbert@gondor.apana.org.au,
+	keescook@chromium.org, jwboyer@redhat.com, smueller@chronox.de,
+	richard@nod.at, steved@redhat.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
+	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
+	vgoyal@redhat.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20150813035433.25108.3065.stgit@tstruk-mobl1>
+Content-ID: <10313.1439474197.1@warthog.procyon.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch removes a legacy reference to nivaead which is no longer
-used.
+Can you rebase this on top of:
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+    http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=modsign-pkcs7
 
- crypto/algboss.c |   12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/crypto/algboss.c b/crypto/algboss.c
-index 76fc0b2..6e39d9c 100644
---- a/crypto/algboss.c
-+++ b/crypto/algboss.c
-@@ -248,13 +248,11 @@ static int cryptomgr_schedule_test(struct crypto_alg *alg)
- 	type = alg->cra_flags;
- 
- 	/* This piece of crap needs to disappear into per-type test hooks. */
--	if ((!((type ^ CRYPTO_ALG_TYPE_BLKCIPHER) &
--	       CRYPTO_ALG_TYPE_BLKCIPHER_MASK) && !(type & CRYPTO_ALG_GENIV) &&
--	     ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
--	      CRYPTO_ALG_TYPE_BLKCIPHER ? alg->cra_blkcipher.ivsize :
--					  alg->cra_ablkcipher.ivsize)) ||
--	    (!((type ^ CRYPTO_ALG_TYPE_AEAD) & CRYPTO_ALG_TYPE_MASK) &&
--	     alg->cra_type == &crypto_nivaead_type && alg->cra_aead.ivsize))
-+	if (!((type ^ CRYPTO_ALG_TYPE_BLKCIPHER) &
-+	      CRYPTO_ALG_TYPE_BLKCIPHER_MASK) && !(type & CRYPTO_ALG_GENIV) &&
-+	    ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-+	     CRYPTO_ALG_TYPE_BLKCIPHER ? alg->cra_blkcipher.ivsize :
-+					 alg->cra_ablkcipher.ivsize))
- 		type |= CRYPTO_ALG_TESTED;
- 
- 	param->type = type;
+David
