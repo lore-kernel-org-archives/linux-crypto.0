@@ -1,160 +1,493 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 9/13] crypto: echainiv - Use generic geniv init/exit helpers
-Date: Thu, 13 Aug 2015 17:29:01 +0800
-Message-ID: <E1ZPoon-0005qj-0q@gondolin.me.apana.org.au>
+Subject: [PATCH 13/13] crypto: aead - Remove CRYPTO_ALG_AEAD_NEW flag
+Date: Thu, 13 Aug 2015 17:29:06 +0800
+Message-ID: <E1ZPoos-0005rq-M3@gondolin.me.apana.org.au>
 References: <20150813092520.GA22268@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:46000 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:34196 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752540AbbHMJ3F (ORCPT
+	with ESMTP id S1752537AbbHMJ3K (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Aug 2015 05:29:05 -0400
+	Thu, 13 Aug 2015 05:29:10 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1ZPoon-00036n-T9
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2015 19:29:02 +1000
+	id 1ZPoot-00037n-20
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2015 19:29:07 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch replaces the echainiv init/exit handlers with the generic
-geniv helpers.
+This patch removes the CRYPTO_ALG_AEAD_NEW flag now that everyone
+has been converted.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/echainiv.c |   70 +++++-------------------------------------------------
- 1 file changed, 7 insertions(+), 63 deletions(-)
+ arch/arm64/crypto/aes-ce-ccm-glue.c      |    1 -
+ arch/x86/crypto/aesni-intel_glue.c       |    3 +--
+ crypto/aead.c                            |    6 ++----
+ crypto/algif_aead.c                      |    3 +--
+ crypto/authenc.c                         |    4 +---
+ crypto/authencesn.c                      |    4 +---
+ crypto/ccm.c                             |    8 ++------
+ crypto/chacha20poly1305.c                |    4 +---
+ crypto/cryptd.c                          |    8 +++-----
+ crypto/gcm.c                             |   12 +++---------
+ crypto/pcrypt.c                          |    5 +----
+ crypto/tcrypt.c                          |    7 +------
+ drivers/crypto/caam/caamalg.c            |    3 +--
+ drivers/crypto/ixp4xx_crypto.c           |    1 -
+ drivers/crypto/nx/nx-aes-ccm.c           |    6 ++----
+ drivers/crypto/nx/nx-aes-gcm.c           |    2 --
+ drivers/crypto/picoxcell_crypto.c        |    1 -
+ drivers/crypto/qat/qat_common/qat_algs.c |    8 ++++----
+ drivers/crypto/talitos.c                 |    1 -
+ include/linux/crypto.h                   |    6 ------
+ 20 files changed, 24 insertions(+), 69 deletions(-)
 
-diff --git a/crypto/echainiv.c b/crypto/echainiv.c
-index 806ebe7..b96a8456 100644
---- a/crypto/echainiv.c
-+++ b/crypto/echainiv.c
-@@ -19,8 +19,6 @@
-  */
+diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
+index f3690fa..f4bf2f2 100644
+--- a/arch/arm64/crypto/aes-ce-ccm-glue.c
++++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
+@@ -280,7 +280,6 @@ static struct aead_alg ccm_aes_alg = {
+ 	.base = {
+ 		.cra_name		= "ccm(aes)",
+ 		.cra_driver_name	= "ccm-aes-ce",
+-		.cra_flags		= CRYPTO_ALG_AEAD_NEW,
+ 		.cra_priority		= 300,
+ 		.cra_blocksize		= 1,
+ 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 2347ef0..3633ad6 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -1437,8 +1437,7 @@ static struct aead_alg aesni_aead_algs[] = { {
+ 		.cra_name		= "rfc4106(gcm(aes))",
+ 		.cra_driver_name	= "rfc4106-gcm-aesni",
+ 		.cra_priority		= 400,
+-		.cra_flags		= CRYPTO_ALG_ASYNC |
+-					  CRYPTO_ALG_AEAD_NEW,
++		.cra_flags		= CRYPTO_ALG_ASYNC,
+ 		.cra_blocksize		= 1,
+ 		.cra_ctxsize		= sizeof(struct cryptd_aead *),
+ 		.cra_module		= THIS_MODULE,
+diff --git a/crypto/aead.c b/crypto/aead.c
+index c40df2c..9b18a1e 100644
+--- a/crypto/aead.c
++++ b/crypto/aead.c
+@@ -204,8 +204,7 @@ struct aead_instance *aead_geniv_alloc(struct crypto_template *tmpl,
+ 	if (IS_ERR(algt))
+ 		return ERR_CAST(algt);
  
- #include <crypto/internal/geniv.h>
--#include <crypto/null.h>
--#include <crypto/rng.h>
- #include <crypto/scatterwalk.h>
- #include <linux/err.h>
- #include <linux/init.h>
-@@ -33,13 +31,6 @@
+-	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) &
+-	    algt->mask & ~CRYPTO_ALG_AEAD_NEW)
++	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
+ 		return ERR_PTR(-EINVAL);
  
- #define MAX_IV_SIZE 16
+ 	name = crypto_attr_alg_name(tb[1]);
+@@ -245,8 +244,7 @@ struct aead_instance *aead_geniv_alloc(struct crypto_template *tmpl,
+ 	    CRYPTO_MAX_ALG_NAME)
+ 		goto err_drop_alg;
  
--struct echainiv_ctx {
--	/* aead_geniv_ctx must be first the element */
--	struct aead_geniv_ctx geniv;
--	struct crypto_blkcipher *null;
--	u8 salt[] __attribute__ ((aligned(__alignof__(u32))));
--};
--
- static DEFINE_PER_CPU(u32 [MAX_IV_SIZE / sizeof(u32)], echainiv_iv);
+-	inst->alg.base.cra_flags = alg->base.cra_flags &
+-				   (CRYPTO_ALG_ASYNC | CRYPTO_ALG_AEAD_NEW);
++	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
+ 	inst->alg.base.cra_priority = alg->base.cra_priority;
+ 	inst->alg.base.cra_blocksize = alg->base.cra_blocksize;
+ 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index e0408a4..38a6cab 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -514,8 +514,7 @@ static struct proto_ops algif_aead_ops = {
  
- /* We don't care if we get preempted and read/write IVs from the next CPU. */
-@@ -103,7 +94,7 @@ static void echainiv_encrypt_complete(struct crypto_async_request *base,
- static int echainiv_encrypt(struct aead_request *req)
+ static void *aead_bind(const char *name, u32 type, u32 mask)
  {
- 	struct crypto_aead *geniv = crypto_aead_reqtfm(req);
--	struct echainiv_ctx *ctx = crypto_aead_ctx(geniv);
-+	struct aead_geniv_ctx *ctx = crypto_aead_ctx(geniv);
- 	struct aead_request *subreq = aead_request_ctx(req);
- 	crypto_completion_t compl;
- 	void *data;
-@@ -114,7 +105,7 @@ static int echainiv_encrypt(struct aead_request *req)
- 	if (req->cryptlen < ivsize)
- 		return -EINVAL;
- 
--	aead_request_set_tfm(subreq, ctx->geniv.child);
-+	aead_request_set_tfm(subreq, ctx->child);
- 
- 	compl = echainiv_encrypt_complete;
- 	data = req;
-@@ -160,7 +151,7 @@ static int echainiv_encrypt(struct aead_request *req)
- static int echainiv_decrypt(struct aead_request *req)
- {
- 	struct crypto_aead *geniv = crypto_aead_reqtfm(req);
--	struct echainiv_ctx *ctx = crypto_aead_ctx(geniv);
-+	struct aead_geniv_ctx *ctx = crypto_aead_ctx(geniv);
- 	struct aead_request *subreq = aead_request_ctx(req);
- 	crypto_completion_t compl;
- 	void *data;
-@@ -169,7 +160,7 @@ static int echainiv_decrypt(struct aead_request *req)
- 	if (req->cryptlen < ivsize)
- 		return -EINVAL;
- 
--	aead_request_set_tfm(subreq, ctx->geniv.child);
-+	aead_request_set_tfm(subreq, ctx->child);
- 
- 	compl = req->base.complete;
- 	data = req->base.data;
-@@ -184,53 +175,6 @@ static int echainiv_decrypt(struct aead_request *req)
- 	return crypto_aead_decrypt(subreq);
+-	return crypto_alloc_aead(name, type | CRYPTO_ALG_AEAD_NEW,
+-				 mask | CRYPTO_ALG_AEAD_NEW);
++	return crypto_alloc_aead(name, type, mask);
  }
  
--static int echainiv_init(struct crypto_aead *geniv)
--{
--	struct echainiv_ctx *ctx = crypto_aead_ctx(geniv);
--	int err;
--
--	spin_lock_init(&ctx->geniv.lock);
--
--	crypto_aead_set_reqsize(geniv, sizeof(struct aead_request));
--
--	err = crypto_get_default_rng();
--	if (err)
--		goto out;
--
--	err = crypto_rng_get_bytes(crypto_default_rng, ctx->salt,
--				   crypto_aead_ivsize(geniv));
--	crypto_put_default_rng();
--	if (err)
--		goto out;
--
--	ctx->null = crypto_get_default_null_skcipher();
--	err = PTR_ERR(ctx->null);
--	if (IS_ERR(ctx->null))
--		goto out;
--
--	err = aead_geniv_init(crypto_aead_tfm(geniv));
--	if (err)
--		goto drop_null;
--
--	ctx->geniv.child = geniv->child;
--	geniv->child = geniv;
--
--out:
--	return err;
--
--drop_null:
--	crypto_put_default_null_skcipher();
--	goto out;
--}
--
--static void echainiv_exit(struct crypto_aead *tfm)
--{
--	struct echainiv_ctx *ctx = crypto_aead_ctx(tfm);
--
--	crypto_free_aead(ctx->geniv.child);
--	crypto_put_default_null_skcipher();
--}
--
- static int echainiv_aead_create(struct crypto_template *tmpl,
- 				struct rtattr **tb)
- {
-@@ -255,11 +199,11 @@ static int echainiv_aead_create(struct crypto_template *tmpl,
- 	inst->alg.encrypt = echainiv_encrypt;
- 	inst->alg.decrypt = echainiv_decrypt;
+ static void aead_release(void *private)
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index bca3835..55a354d 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -393,8 +393,7 @@ static int crypto_authenc_create(struct crypto_template *tmpl,
+ 	if (IS_ERR(algt))
+ 		return PTR_ERR(algt);
  
--	inst->alg.init = echainiv_init;
--	inst->alg.exit = echainiv_exit;
-+	inst->alg.init = aead_init_geniv;
-+	inst->alg.exit = aead_exit_geniv;
+-	if ((algt->type ^ (CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_AEAD_NEW)) &
+-	    algt->mask)
++	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
+ 		return -EINVAL;
  
- 	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
--	inst->alg.base.cra_ctxsize = sizeof(struct echainiv_ctx);
-+	inst->alg.base.cra_ctxsize = sizeof(struct aead_geniv_ctx);
- 	inst->alg.base.cra_ctxsize += inst->alg.ivsize;
+ 	auth = ahash_attr_alg(tb[1], CRYPTO_ALG_TYPE_HASH,
+@@ -445,7 +444,6 @@ static int crypto_authenc_create(struct crypto_template *tmpl,
+ 		goto err_drop_enc;
  
- 	inst->free = aead_geniv_free;
+ 	inst->alg.base.cra_flags = enc->cra_flags & CRYPTO_ALG_ASYNC;
+-	inst->alg.base.cra_flags |= CRYPTO_ALG_AEAD_NEW;
+ 	inst->alg.base.cra_priority = enc->cra_priority * 10 +
+ 				      auth_base->cra_priority;
+ 	inst->alg.base.cra_blocksize = enc->cra_blocksize;
+diff --git a/crypto/authencesn.c b/crypto/authencesn.c
+index c30393e..0c04688 100644
+--- a/crypto/authencesn.c
++++ b/crypto/authencesn.c
+@@ -409,8 +409,7 @@ static int crypto_authenc_esn_create(struct crypto_template *tmpl,
+ 	if (IS_ERR(algt))
+ 		return PTR_ERR(algt);
+ 
+-	if ((algt->type ^ (CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_AEAD_NEW)) &
+-	    algt->mask)
++	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
+ 		return -EINVAL;
+ 
+ 	auth = ahash_attr_alg(tb[1], CRYPTO_ALG_TYPE_HASH,
+@@ -458,7 +457,6 @@ static int crypto_authenc_esn_create(struct crypto_template *tmpl,
+ 		goto err_drop_enc;
+ 
+ 	inst->alg.base.cra_flags = enc->cra_flags & CRYPTO_ALG_ASYNC;
+-	inst->alg.base.cra_flags |= CRYPTO_ALG_AEAD_NEW;
+ 	inst->alg.base.cra_priority = enc->cra_priority * 10 +
+ 				      auth_base->cra_priority;
+ 	inst->alg.base.cra_blocksize = enc->cra_blocksize;
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index b63f96a..cc31ea4 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -518,8 +518,7 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
+ 	if (IS_ERR(algt))
+ 		return PTR_ERR(algt);
+ 
+-	if ((algt->type ^ (CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_AEAD_NEW)) &
+-	    algt->mask)
++	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
+ 		return -EINVAL;
+ 
+ 	cipher = crypto_alg_mod_lookup(cipher_name,  CRYPTO_ALG_TYPE_CIPHER,
+@@ -571,7 +570,6 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
+ 	memcpy(inst->alg.base.cra_name, full_name, CRYPTO_MAX_ALG_NAME);
+ 
+ 	inst->alg.base.cra_flags = ctr->cra_flags & CRYPTO_ALG_ASYNC;
+-	inst->alg.base.cra_flags |= CRYPTO_ALG_AEAD_NEW;
+ 	inst->alg.base.cra_priority = (cipher->cra_priority +
+ 				       ctr->cra_priority) / 2;
+ 	inst->alg.base.cra_blocksize = 1;
+@@ -820,8 +818,7 @@ static int crypto_rfc4309_create(struct crypto_template *tmpl,
+ 	if (IS_ERR(algt))
+ 		return PTR_ERR(algt);
+ 
+-	if ((algt->type ^ (CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_AEAD_NEW)) &
+-	    algt->mask)
++	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
+ 		return -EINVAL;
+ 
+ 	ccm_name = crypto_attr_alg_name(tb[1]);
+@@ -861,7 +858,6 @@ static int crypto_rfc4309_create(struct crypto_template *tmpl,
+ 		goto out_drop_alg;
+ 
+ 	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
+-	inst->alg.base.cra_flags |= CRYPTO_ALG_AEAD_NEW;
+ 	inst->alg.base.cra_priority = alg->base.cra_priority;
+ 	inst->alg.base.cra_blocksize = 1;
+ 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
+diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
+index b71445f..99c3cce 100644
+--- a/crypto/chacha20poly1305.c
++++ b/crypto/chacha20poly1305.c
+@@ -585,8 +585,7 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
+ 	if (IS_ERR(algt))
+ 		return PTR_ERR(algt);
+ 
+-	if ((algt->type ^ (CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_AEAD_NEW)) &
+-	    algt->mask)
++	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
+ 		return -EINVAL;
+ 
+ 	chacha_name = crypto_attr_alg_name(tb[1]);
+@@ -644,7 +643,6 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
+ 
+ 	inst->alg.base.cra_flags = (chacha->cra_flags | poly->cra_flags) &
+ 				   CRYPTO_ALG_ASYNC;
+-	inst->alg.base.cra_flags |= CRYPTO_ALG_AEAD_NEW;
+ 	inst->alg.base.cra_priority = (chacha->cra_priority +
+ 				       poly->cra_priority) / 2;
+ 	inst->alg.base.cra_blocksize = 1;
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index e5076f8..c81861b 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -177,8 +177,8 @@ static inline void cryptd_check_internal(struct rtattr **tb, u32 *type,
+ 	if (IS_ERR(algt))
+ 		return;
+ 
+-	*type |= algt->type & (CRYPTO_ALG_INTERNAL | CRYPTO_ALG_AEAD_NEW);
+-	*mask |= algt->mask & (CRYPTO_ALG_INTERNAL | CRYPTO_ALG_AEAD_NEW);
++	*type |= algt->type & CRYPTO_ALG_INTERNAL;
++	*mask |= algt->mask & CRYPTO_ALG_INTERNAL;
+ }
+ 
+ static int cryptd_blkcipher_setkey(struct crypto_ablkcipher *parent,
+@@ -805,9 +805,7 @@ static int cryptd_create_aead(struct crypto_template *tmpl,
+ 		goto out_drop_aead;
+ 
+ 	inst->alg.base.cra_flags = CRYPTO_ALG_ASYNC |
+-				   (alg->base.cra_flags &
+-				    (CRYPTO_ALG_INTERNAL |
+-				     CRYPTO_ALG_AEAD_NEW));
++				   (alg->base.cra_flags & CRYPTO_ALG_INTERNAL);
+ 	inst->alg.base.cra_ctxsize = sizeof(struct cryptd_aead_ctx);
+ 
+ 	inst->alg.ivsize = crypto_aead_alg_ivsize(alg);
+diff --git a/crypto/gcm.c b/crypto/gcm.c
+index 0c9e33b..ddb4f29 100644
+--- a/crypto/gcm.c
++++ b/crypto/gcm.c
+@@ -634,8 +634,7 @@ static int crypto_gcm_create_common(struct crypto_template *tmpl,
+ 	if (IS_ERR(algt))
+ 		return PTR_ERR(algt);
+ 
+-	if ((algt->type ^ (CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_AEAD_NEW)) &
+-	    algt->mask)
++	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
+ 		return -EINVAL;
+ 
+ 	ghash_alg = crypto_find_alg(ghash_name, &crypto_ahash_type,
+@@ -690,7 +689,6 @@ static int crypto_gcm_create_common(struct crypto_template *tmpl,
+ 
+ 	inst->alg.base.cra_flags = (ghash->base.cra_flags | ctr->cra_flags) &
+ 				   CRYPTO_ALG_ASYNC;
+-	inst->alg.base.cra_flags |= CRYPTO_ALG_AEAD_NEW;
+ 	inst->alg.base.cra_priority = (ghash->base.cra_priority +
+ 				       ctr->cra_priority) / 2;
+ 	inst->alg.base.cra_blocksize = 1;
+@@ -935,8 +933,7 @@ static int crypto_rfc4106_create(struct crypto_template *tmpl,
+ 	if (IS_ERR(algt))
+ 		return PTR_ERR(algt);
+ 
+-	if ((algt->type ^ (CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_AEAD_NEW)) &
+-	    algt->mask)
++	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
+ 		return -EINVAL;
+ 
+ 	ccm_name = crypto_attr_alg_name(tb[1]);
+@@ -976,7 +973,6 @@ static int crypto_rfc4106_create(struct crypto_template *tmpl,
+ 		goto out_drop_alg;
+ 
+ 	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
+-	inst->alg.base.cra_flags |= CRYPTO_ALG_AEAD_NEW;
+ 	inst->alg.base.cra_priority = alg->base.cra_priority;
+ 	inst->alg.base.cra_blocksize = 1;
+ 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
+@@ -1175,8 +1171,7 @@ static int crypto_rfc4543_create(struct crypto_template *tmpl,
+ 	if (IS_ERR(algt))
+ 		return PTR_ERR(algt);
+ 
+-	if ((algt->type ^ (CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_AEAD_NEW)) &
+-	    algt->mask)
++	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
+ 		return -EINVAL;
+ 
+ 	ccm_name = crypto_attr_alg_name(tb[1]);
+@@ -1217,7 +1212,6 @@ static int crypto_rfc4543_create(struct crypto_template *tmpl,
+ 		goto out_drop_alg;
+ 
+ 	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
+-	inst->alg.base.cra_flags |= CRYPTO_ALG_AEAD_NEW;
+ 	inst->alg.base.cra_priority = alg->base.cra_priority;
+ 	inst->alg.base.cra_blocksize = 1;
+ 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index 001a3a3..ee9cfb9 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -295,9 +295,7 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
+ 	ctx = aead_instance_ctx(inst);
+ 	crypto_set_aead_spawn(&ctx->spawn, aead_crypto_instance(inst));
+ 
+-	err = crypto_grab_aead(&ctx->spawn, name,
+-			       algt->type & CRYPTO_ALG_AEAD_NEW,
+-			       algt->mask & CRYPTO_ALG_AEAD_NEW);
++	err = crypto_grab_aead(&ctx->spawn, name, 0, 0);
+ 	if (err)
+ 		goto out_free_inst;
+ 
+@@ -307,7 +305,6 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
+ 		goto out_drop_aead;
+ 
+ 	inst->alg.base.cra_flags = CRYPTO_ALG_ASYNC;
+-	inst->alg.base.cra_flags |= alg->base.cra_flags & CRYPTO_ALG_AEAD_NEW;
+ 
+ 	inst->alg.ivsize = crypto_aead_alg_ivsize(alg);
+ 	inst->alg.maxauthsize = crypto_aead_alg_maxauthsize(alg);
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index e9a05ba..2b00b61 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -344,12 +344,7 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
+ 		goto out_nosg;
+ 	sgout = &sg[9];
+ 
+-	tfm = crypto_alloc_aead(algo, CRYPTO_ALG_AEAD_NEW,
+-				CRYPTO_ALG_AEAD_NEW);
+-	if (PTR_ERR(tfm) == -ENOENT) {
+-		aad_size -= 8;
+-		tfm = crypto_alloc_aead(algo, 0, CRYPTO_ALG_AEAD_NEW);
+-	}
++	tfm = crypto_alloc_aead(algo, 0, 0);
+ 
+ 	if (IS_ERR(tfm)) {
+ 		pr_err("alg: aead: Failed to load transform for %s: %ld\n", algo,
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 3361259..83d2306 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -4359,8 +4359,7 @@ static void caam_aead_alg_init(struct caam_aead_alg *t_alg)
+ 	alg->base.cra_module = THIS_MODULE;
+ 	alg->base.cra_priority = CAAM_CRA_PRIORITY;
+ 	alg->base.cra_ctxsize = sizeof(struct caam_ctx);
+-	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY |
+-			      CRYPTO_ALG_AEAD_NEW;
++	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY;
+ 
+ 	alg->init = caam_aead_init;
+ 	alg->exit = caam_aead_exit;
+diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
+index 411de261..8f27903 100644
+--- a/drivers/crypto/ixp4xx_crypto.c
++++ b/drivers/crypto/ixp4xx_crypto.c
+@@ -1451,7 +1451,6 @@ static int __init ixp_module_init(void)
+ 
+ 		/* authenc */
+ 		cra->base.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY |
+-				      CRYPTO_ALG_AEAD_NEW |
+ 				      CRYPTO_ALG_ASYNC;
+ 		cra->setkey = aead_setkey;
+ 		cra->setauthsize = aead_setauthsize;
+diff --git a/drivers/crypto/nx/nx-aes-ccm.c b/drivers/crypto/nx/nx-aes-ccm.c
+index 195c920..73ef499 100644
+--- a/drivers/crypto/nx/nx-aes-ccm.c
++++ b/drivers/crypto/nx/nx-aes-ccm.c
+@@ -559,8 +559,7 @@ struct aead_alg nx_ccm_aes_alg = {
+ 		.cra_name        = "ccm(aes)",
+ 		.cra_driver_name = "ccm-aes-nx",
+ 		.cra_priority    = 300,
+-		.cra_flags       = CRYPTO_ALG_NEED_FALLBACK |
+-				   CRYPTO_ALG_AEAD_NEW,
++		.cra_flags       = CRYPTO_ALG_NEED_FALLBACK,
+ 		.cra_blocksize   = 1,
+ 		.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
+ 		.cra_module      = THIS_MODULE,
+@@ -580,8 +579,7 @@ struct aead_alg nx_ccm4309_aes_alg = {
+ 		.cra_name        = "rfc4309(ccm(aes))",
+ 		.cra_driver_name = "rfc4309-ccm-aes-nx",
+ 		.cra_priority    = 300,
+-		.cra_flags       = CRYPTO_ALG_NEED_FALLBACK |
+-				   CRYPTO_ALG_AEAD_NEW,
++		.cra_flags       = CRYPTO_ALG_NEED_FALLBACK,
+ 		.cra_blocksize   = 1,
+ 		.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
+ 		.cra_module      = THIS_MODULE,
+diff --git a/drivers/crypto/nx/nx-aes-gcm.c b/drivers/crypto/nx/nx-aes-gcm.c
+index 5719638..eee624f 100644
+--- a/drivers/crypto/nx/nx-aes-gcm.c
++++ b/drivers/crypto/nx/nx-aes-gcm.c
+@@ -490,7 +490,6 @@ struct aead_alg nx_gcm_aes_alg = {
+ 	.base = {
+ 		.cra_name        = "gcm(aes)",
+ 		.cra_driver_name = "gcm-aes-nx",
+-		.cra_flags	 = CRYPTO_ALG_AEAD_NEW,
+ 		.cra_priority    = 300,
+ 		.cra_blocksize   = 1,
+ 		.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
+@@ -509,7 +508,6 @@ struct aead_alg nx_gcm4106_aes_alg = {
+ 	.base = {
+ 		.cra_name        = "rfc4106(gcm(aes))",
+ 		.cra_driver_name = "rfc4106-gcm-aes-nx",
+-		.cra_flags	 = CRYPTO_ALG_AEAD_NEW,
+ 		.cra_priority    = 300,
+ 		.cra_blocksize   = 1,
+ 		.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
+diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
+index e0f0c34..da36de2 100644
+--- a/drivers/crypto/picoxcell_crypto.c
++++ b/drivers/crypto/picoxcell_crypto.c
+@@ -1738,7 +1738,6 @@ static int spacc_probe(struct platform_device *pdev)
+ 	INIT_LIST_HEAD(&engine->registered_aeads);
+ 	for (i = 0; i < engine->num_aeads; ++i) {
+ 		engine->aeads[i].engine = engine;
+-		engine->aeads[i].alg.base.cra_flags |= CRYPTO_ALG_AEAD_NEW;
+ 		err = crypto_register_aead(&engine->aeads[i].alg);
+ 		if (!err) {
+ 			list_add_tail(&engine->aeads[i].entry,
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index b7099f2..2bd913a 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -1109,7 +1109,7 @@ static struct aead_alg qat_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha1),cbc(aes))",
+ 		.cra_driver_name = "qat_aes_cbc_hmac_sha1",
+ 		.cra_priority = 4001,
+-		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_AEAD_NEW,
++		.cra_flags = CRYPTO_ALG_ASYNC,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
+ 		.cra_module = THIS_MODULE,
+@@ -1126,7 +1126,7 @@ static struct aead_alg qat_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha256),cbc(aes))",
+ 		.cra_driver_name = "qat_aes_cbc_hmac_sha256",
+ 		.cra_priority = 4001,
+-		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_AEAD_NEW,
++		.cra_flags = CRYPTO_ALG_ASYNC,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
+ 		.cra_module = THIS_MODULE,
+@@ -1143,7 +1143,7 @@ static struct aead_alg qat_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha512),cbc(aes))",
+ 		.cra_driver_name = "qat_aes_cbc_hmac_sha512",
+ 		.cra_priority = 4001,
+-		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_AEAD_NEW,
++		.cra_flags = CRYPTO_ALG_ASYNC,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
+ 		.cra_module = THIS_MODULE,
+@@ -1197,7 +1197,7 @@ int qat_algs_register(void)
+ 		goto unlock;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(qat_aeads); i++)
+-		qat_aeads[i].base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_AEAD_NEW;
++		qat_aeads[i].base.cra_flags = CRYPTO_ALG_ASYNC;
+ 
+ 	ret = crypto_register_aeads(qat_aeads, ARRAY_SIZE(qat_aeads));
+ 	if (ret)
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 1bc8dd9..cd77453 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -2730,7 +2730,6 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
+ 		break;
+ 	case CRYPTO_ALG_TYPE_AEAD:
+ 		alg = &t_alg->algt.alg.aead.base;
+-		alg->cra_flags |= CRYPTO_ALG_AEAD_NEW;
+ 		t_alg->algt.alg.aead.init = talitos_cra_init_aead;
+ 		t_alg->algt.alg.aead.setkey = aead_setkey;
+ 		t_alg->algt.alg.aead.encrypt = aead_encrypt;
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 81ef938..964e573 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -102,12 +102,6 @@
+ #define CRYPTO_ALG_INTERNAL		0x00002000
+ 
+ /*
+- * Temporary flag used to prevent legacy AEAD implementations from
+- * being used by user-space.
+- */
+-#define CRYPTO_ALG_AEAD_NEW		0x00004000
+-
+-/*
+  * Transform masks and values (for crt_flags).
+  */
+ #define CRYPTO_TFM_REQ_MASK		0x000fff00
