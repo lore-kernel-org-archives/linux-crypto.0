@@ -1,35 +1,25 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] zram: use crypto API to compress the page
-Date: Thu, 13 Aug 2015 15:32:33 +0800
-Message-ID: <20150813073233.GA21492@gondor.apana.org.au>
-References: <1439432654-23322-1-git-send-email-iamjoonsoo.kim@lge.com>
- <1439432654-23322-2-git-send-email-iamjoonsoo.kim@lge.com>
- <20150813035113.GB17958@swordfish>
- <20150813071941.GB13352@js1304-P5Q-DELUXE>
+Subject: [PATCH 0/13] crypto: aead - Complete AEAD conversion
+Date: Thu, 13 Aug 2015 17:25:20 +0800
+Message-ID: <20150813092520.GA22268@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Minchan Kim <minchan@kernel.org>,
-	Nitin Gupta <ngupta@vflare.org>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>
-To: Joonsoo Kim <iamjoonsoo.kim@lge.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:45572 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751934AbbHMJZY (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 13 Aug 2015 05:25:24 -0400
 Content-Disposition: inline
-In-Reply-To: <20150813071941.GB13352@js1304-P5Q-DELUXE>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 13, 2015 at 04:19:41PM +0900, Joonsoo Kim wrote:
-> 
-> If that optimization is really needed for the case that doesn't need
-> tfm except fetching function pointer, we can implement sharable tfm
-> in crypto subsystem.
+Hi:
 
-I'm happy to consider changes to the crypto compression interface
-as long as it continues to support the existing algorithms and users.
+This series completes the AEAD type conversion by updating some
+small leftovers and then ripping out the old AEAD interface as
+well as the temporary CRYPTO_ALG_AEAD_NEW flag.
 
 Cheers,
 -- 
