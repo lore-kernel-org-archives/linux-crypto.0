@@ -1,11 +1,12 @@
-From: Joonsoo Kim <iamjoonsoo.kim@lge.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 1/2] crypto: export crypto_alg_list and rwsem
-Date: Thu, 13 Aug 2015 16:30:31 +0900
-Message-ID: <20150813073031.GC13352@js1304-P5Q-DELUXE>
+Date: Thu, 13 Aug 2015 15:29:18 +0800
+Message-ID: <20150813072917.GA21449@gondor.apana.org.au>
 References: <1439432654-23322-1-git-send-email-iamjoonsoo.kim@lge.com>
  <20150813031954.GA19481@gondor.apana.org.au>
  <20150813063755.GA13352@js1304-P5Q-DELUXE>
  <20150813063823.GA20830@gondor.apana.org.au>
+ <20150813073031.GC13352@js1304-P5Q-DELUXE>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Andrew Morton <akpm@linux-foundation.org>,
@@ -15,40 +16,28 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
 	Stephan Mueller <smueller@chronox.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from LGEMRELSE7Q.lge.com ([156.147.1.151]:34750 "EHLO
-	lgemrelse7q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751381AbbHMHYv (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Aug 2015 03:24:51 -0400
+To: Joonsoo Kim <iamjoonsoo.kim@lge.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150813063823.GA20830@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20150813073031.GC13352@js1304-P5Q-DELUXE>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Aug 13, 2015 at 02:38:23PM +0800, Herbert Xu wrote:
-> On Thu, Aug 13, 2015 at 03:37:55PM +0900, Joonsoo Kim wrote:
-> >
-> > Is there any way to access netlink interface and get the output from
-> > kernel-side? I'd like to show information through
-> > "/sys/block/zramX/comp_algorithm", because some user program can be
-> > broken if we change output of userspace exposed interface.
-> 
-> You could simply deprecate that interface but keep it for existing
-> algorithms.  Any new algorithms can then be queried through the
-> crypto_user interface.
-> 
-> The other option is to have a defined list of algorithms which is
-> independent of the crypto API.  For example, have a look at what
-> IPsec does in net/xfrm/xfrm_algo.c.  IPsec needs its own list
-> because they come with annotations.
+On Thu, Aug 13, 2015 at 04:30:31PM +0900, Joonsoo Kim wrote:
+>
+> How about introducing new functions to search supported algorithm in
+> kernel-side? As crypto API is used in more places, this interface
+> would be requested more. Defined list weaken the advantage of strong
+> point of generic crypto API.
 
-Hmm... they looks suboptimal.
+You're only getting the list so you can immediately reexport
+it to user-space, with no added value whatsoever.  As I said
+we already have an interface for that so you should use it.
 
-How about introducing new functions to search supported algorithm in
-kernel-side? As crypto API is used in more places, this interface
-would be requested more. Defined list weaken the advantage of strong
-point of generic crypto API.
+If more genuine uses come up then I will reconsider.
 
-Thanks.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
