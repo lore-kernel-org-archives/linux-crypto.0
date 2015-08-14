@@ -1,40 +1,26 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] crypto: qat - Don't move data inside output buffer
-Date: Fri, 14 Aug 2015 14:26:36 +0800
-Message-ID: <20150814062636.GA2799@gondor.apana.org.au>
-References: <20150813035433.25108.3065.stgit@tstruk-mobl1>
- <20150813035445.25108.76927.stgit@tstruk-mobl1>
- <20150814051410.GA2370@gondor.apana.org.au>
- <55CD8733.2000904@intel.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH 3/13] ipsec: Replace seqniv with seqiv
+Date: Fri, 14 Aug 2015 09:28:21 +0200
+Message-ID: <20150814072821.GF25499@secunet.com>
+References: <20150813092520.GA22268@gondor.apana.org.au>
+ <E1ZPooe-0005p5-1O@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: keescook@chromium.org, jwboyer@redhat.com, smueller@chronox.de,
-	richard@nod.at, steved@redhat.com, linux-kernel@vger.kernel.org,
-	dhowells@redhat.com, linux-crypto@vger.kernel.org,
-	james.l.morris@oracle.com, jkosina@suse.cz,
-	zohar@linux.vnet.ibm.com, davem@davemloft.net, vgoyal@redhat.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48458 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751255AbbHNG0v (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Aug 2015 02:26:51 -0400
+Received: from a.mx.secunet.com ([195.81.216.161]:49146 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751255AbbHNH2Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 14 Aug 2015 03:28:25 -0400
 Content-Disposition: inline
-In-Reply-To: <55CD8733.2000904@intel.com>
+In-Reply-To: <E1ZPooe-0005p5-1O@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 13, 2015 at 11:14:11PM -0700, Tadeusz Struk wrote:
+On Thu, Aug 13, 2015 at 05:28:52PM +0800, Herbert Xu wrote:
+> Now that seqniv is identical with seqiv we no longer need it.
 > 
-> Right, but we don't need that anymore.
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Why not? If you reduce the size without moving the buffer wouldn't
-it begin with a bunch of zeroes and wouldn't you lose the real bytes
-at the end?
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
