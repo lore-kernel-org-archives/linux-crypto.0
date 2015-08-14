@@ -1,58 +1,85 @@
-From: Leonidas S Barbosa <leosilva@linux.vnet.ibm.com>
-Subject: [PATCH 2/2] Fixing vmx-crypto GHASH Key issue on little endian
-Date: Fri, 14 Aug 2015 10:14:16 -0300
-Message-ID: <20150814131413.GA12564@bluepex.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH 2/2] crypto: qat - Don't move data inside output buffer
+Date: Fri, 14 Aug 2015 07:21:29 -0700
+Message-ID: <55CDF969.6070704@intel.com>
+References: <20150813035433.25108.3065.stgit@tstruk-mobl1> <20150813035445.25108.76927.stgit@tstruk-mobl1> <20150814051410.GA2370@gondor.apana.org.au> <55CD8733.2000904@intel.com> <20150814062636.GA2799@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Paulo Smorigo <pfsmorigo@linux.vnet.ibm.com>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: keescook@chromium.org, jwboyer@redhat.com, smueller@chronox.de,
+	richard@nod.at, steved@redhat.com, linux-kernel@vger.kernel.org,
+	dhowells@redhat.com, linux-crypto@vger.kernel.org,
+	james.l.morris@oracle.com, jkosina@suse.cz,
+	zohar@linux.vnet.ibm.com, davem@davemloft.net, vgoyal@redhat.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp05.br.ibm.com ([32.104.18.26]:55353 "EHLO
-	e24smtp05.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753903AbbHNNOX (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Aug 2015 09:14:23 -0400
-Received: from /spool/local
-	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
-	Fri, 14 Aug 2015 10:14:21 -0300
-Content-Disposition: inline
+Received: from mga01.intel.com ([192.55.52.88]:62993 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753428AbbHNOYk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 14 Aug 2015 10:24:40 -0400
+In-Reply-To: <20150814062636.GA2799@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-GHASH table algorithm is using a big endian key.
-In little endian machines key will be LE ordered.
-After a lxvd2x instruction key is loaded as it is,
-LE/BE order, in first case it'll generate a wrong
-table resulting in wrong hashes from the algorithm.
+Hi Herbert,
+On 08/13/2015 11:26 PM, Herbert Xu wrote:
+> On Thu, Aug 13, 2015 at 11:14:11PM -0700, Tadeusz Struk wrote:
+>>
+>> Right, but we don't need that anymore.
+> 
+> Why not? If you reduce the size without moving the buffer wouldn't
+> it begin with a bunch of zeroes and wouldn't you lose the real bytes
+> at the end?
 
-Bug affects only LE machines.
-In order to fix it we do a swap for loaded key.
+Yes, that was wrong, sorry. The reason I wanted to change it is that
+the SW implementation can return a number with leading zeros.
+This is because mpi_read_buffer() returns the whole thing.
 
-Signed-off-by: Leonidas S Barbosa <leosilva@linux.vnet.ibm.com>
----
- drivers/crypto/vmx/ghashp8-ppc.pl | 6 ++++++
- 1 file changed, 6 insertions(+)
+Because the format of the module signature starts with 0x00, 0x01
+the two implementations return a different thing.
+For instance SW returned a 512 bytes number starting with 0x00, 0x01
+and HW returned 511 bytes number without the 0x00 at the beginning.
+Technically both are correct, but then the rsa_signture_verify()
+needs to check for both cases, which is not ideal.
+To make it return the same thing as SW we can do something like this:
 
-diff --git a/drivers/crypto/vmx/ghashp8-ppc.pl b/drivers/crypto/vmx/ghashp8-ppc.pl
-index 0a6f899..d8429cb 100644
---- a/drivers/crypto/vmx/ghashp8-ppc.pl
-+++ b/drivers/crypto/vmx/ghashp8-ppc.pl
-@@ -61,6 +61,12 @@ $code=<<___;
- 	mtspr		256,r0
- 	li		r10,0x30
- 	lvx_u		$H,0,r4			# load H
-+	le?xor		r7,r7,r7
-+	le?addi		r7,r7,0x8		# need a vperm start with 08
-+	le?lvsr		5,0,r7
-+	le?vspltisb	6,0x0f
-+	le?vxor		5,5,6			# set a b-endian mask
-+	le?vperm	$H,$H,$H,5
+---8<---
+
+Allow for leading zeros in output to make it exactly the same as the
+SW implementation.
+Change memcpy to memmove because the copy is done within the same buffer.
+
+diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+index fe352a6..cc450fa 100644
+--- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+@@ -118,7 +118,13 @@ static void qat_rsa_cb(struct icp_qat_fw_pke_resp *resp)
+ 	struct device *dev = &GET_DEV(req->ctx->inst->accel_dev);
+ 	int err = ICP_QAT_FW_PKE_RESP_PKE_STAT_GET(
+ 				resp->pke_resp_hdr.comn_resp_flags);
+-	char *ptr = areq->dst;
++#if BYTES_PER_MPI_LIMB == 4
++	u32 *ptr = areq->dst;
++#elif BYTES_PER_MPI_LIMB == 8
++	u64 *ptr = areq->dst;
++#else
++#error please implement for this limb size.
++#endif
  
- 	vspltisb	$xC2,-16		# 0xf0
- 	vspltisb	$t0,1			# one
--- 
-2.1.0
+ 	err = (err == ICP_QAT_FW_COMN_STATUS_FLAG_OK) ? 0 : -EINVAL;
+ 
+@@ -140,12 +146,12 @@ static void qat_rsa_cb(struct icp_qat_fw_pke_resp *resp)
+ 	areq->dst_len = req->ctx->key_sz;
+ 	/* Need to set the corect length of the output */
+ 	while (!(*ptr) && areq->dst_len) {
+-		areq->dst_len--;
++		areq->dst_len -= sizeof(*ptr);
+ 		ptr++;
+ 	}
+ 
+ 	if (areq->dst_len != req->ctx->key_sz)
+-		memcpy(areq->dst, ptr, areq->dst_len);
++		memmove(areq->dst, ptr, areq->dst_len);
+ 
+ 	akcipher_request_complete(areq, err);
+ }
