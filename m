@@ -1,47 +1,60 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: [PATCH v2] crypto: amcc: Do a NULL check for pointer
-Date: Fri, 14 Aug 2015 00:09:29 -0300
-Message-ID: <1439521769-17380-1-git-send-email-festevam@gmail.com>
-Cc: linux-crypto@vger.kernel.org,
-	Fabio Estevam <fabio.estevam@freescale.com>
-To: herbert@gondor.apana.org.au
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/2] crypto: qat - Don't move data inside output buffer
+Date: Fri, 14 Aug 2015 13:14:10 +0800
+Message-ID: <20150814051410.GA2370@gondor.apana.org.au>
+References: <20150813035433.25108.3065.stgit@tstruk-mobl1>
+ <20150813035445.25108.76927.stgit@tstruk-mobl1>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: keescook@chromium.org, jwboyer@redhat.com, smueller@chronox.de,
+	richard@nod.at, steved@redhat.com, linux-kernel@vger.kernel.org,
+	dhowells@redhat.com, linux-crypto@vger.kernel.org,
+	james.l.morris@oracle.com, jkosina@suse.cz,
+	zohar@linux.vnet.ibm.com, davem@davemloft.net, vgoyal@redhat.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yk0-f179.google.com ([209.85.160.179]:35738 "EHLO
-	mail-yk0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753079AbbHNDJt (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:44779 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750940AbbHNFOc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Aug 2015 23:09:49 -0400
-Received: by ykek5 with SMTP id k5so6722695yke.2
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2015 20:09:48 -0700 (PDT)
+	Fri, 14 Aug 2015 01:14:32 -0400
+Content-Disposition: inline
+In-Reply-To: <20150813035445.25108.76927.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Fabio Estevam <fabio.estevam@freescale.com>
+On Wed, Aug 12, 2015 at 08:54:45PM -0700, Tadeusz Struk wrote:
+> Don't need to move data inside of the output buffer
+> because SW doen't need to do this anymore sice the new MPI
+> mpi_read_buf() has been added. Just set the correct output len.
+> 
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> ---
+>  drivers/crypto/qat/qat_common/qat_asym_algs.c |    3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> index fe352a6..6ddb13c 100644
+> --- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> +++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> @@ -144,9 +144,6 @@ static void qat_rsa_cb(struct icp_qat_fw_pke_resp *resp)
+>  		ptr++;
+>  	}
+>  
+> -	if (areq->dst_len != req->ctx->key_sz)
+> -		memcpy(areq->dst, ptr, areq->dst_len);
+> -
 
-Compare pointer-typed values to NULL rather than 0.
+This looks wrong.  It appears to be trying to remove leading
+zeroes so you can't just change the length because then you end
+up removing the trailing digits equal to the number of leading
+zeroes.
 
-The semantic patch that makes this change is available
-in scripts/coccinelle/null/badzero.cocci
+The existing code is also wrong as you should be using memmove
+instead of memcpy.
 
-Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
----
-Changes since v1:
-- Use !core_dev->dev->ce_base
- drivers/crypto/amcc/crypto4xx_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 3b28e8c..47c4b08 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -1113,7 +1113,7 @@ static irqreturn_t crypto4xx_ce_interrupt_handler(int irq, void *data)
- 	struct device *dev = (struct device *)data;
- 	struct crypto4xx_core_device *core_dev = dev_get_drvdata(dev);
- 
--	if (core_dev->dev->ce_base == 0)
-+	if (!core_dev->dev->ce_base)
- 		return 0;
- 
- 	writel(PPC4XX_INTERRUPT_CLR,
+Cheers,
 -- 
-1.9.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
