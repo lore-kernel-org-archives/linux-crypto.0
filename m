@@ -1,49 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: KEYS: convert public key to the akcipher API
-Date: Fri, 14 Aug 2015 09:09:16 +0800
-Message-ID: <20150814010916.GA333@gondor.apana.org.au>
-References: <20150813035439.25108.62457.stgit@tstruk-mobl1>
- <20150813035433.25108.3065.stgit@tstruk-mobl1>
- <10795.1439475796@warthog.procyon.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>, keescook@chromium.org,
-	jwboyer@redhat.com, smueller@chronox.de, richard@nod.at,
-	steved@redhat.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
-	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	vgoyal@redhat.com
-To: David Howells <dhowells@redhat.com>
+From: Fabio Estevam <festevam@gmail.com>
+Subject: [PATCH] crypto: amcc: Do a NULL check for pointer
+Date: Fri, 14 Aug 2015 00:05:58 -0300
+Message-ID: <1439521558-17214-1-git-send-email-festevam@gmail.com>
+Cc: linux-crypto@vger.kernel.org,
+	Fabio Estevam <fabio.estevam@freescale.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55823 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751996AbbHNBJi (ORCPT
+Received: from mail-yk0-f180.google.com ([209.85.160.180]:35074 "EHLO
+	mail-yk0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751993AbbHNDGU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Aug 2015 21:09:38 -0400
-Content-Disposition: inline
-In-Reply-To: <10795.1439475796@warthog.procyon.org.uk>
+	Thu, 13 Aug 2015 23:06:20 -0400
+Received: by ykek5 with SMTP id k5so6674515yke.2
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2015 20:06:20 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 13, 2015 at 03:23:16PM +0100, David Howells wrote:
-> 
-> > -	/* Decode the public key */
-> > -	ret = asn1_ber_decoder(&x509_rsakey_decoder, ctx,
-> > -			       ctx->key, ctx->key_size);
-> > -	if (ret < 0)
-> > +	cert->pub->key = kmemdup(ctx->key, ctx->key_size, GFP_KERNEL);
-> > +	if (!cert->pub->key)
-> >  		goto error_decode;
-> 
-> The generic public key code should *not* see the container wrappings (ASN.1
-> from an X.509 cert in this case).  The public key could be supplied by OpenPGP
-> instead, for example, or directly by a driver.
+From: Fabio Estevam <fabio.estevam@freescale.com>
 
-No in this case it's fine because the format of our key input
-specification just happens to coincide with the input here.
+Compare pointer-typed values to NULL rather than 0.
 
-Cheers,
+The semantic patch that makes this change is available
+in scripts/coccinelle/null/badzero.cocci
+
+Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
+---
+ drivers/crypto/amcc/crypto4xx_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index 3b28e8c..47c4b08 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -1113,7 +1113,7 @@ static irqreturn_t crypto4xx_ce_interrupt_handler(int irq, void *data)
+ 	struct device *dev = (struct device *)data;
+ 	struct crypto4xx_core_device *core_dev = dev_get_drvdata(dev);
+ 
+-	if (core_dev->dev->ce_base == 0)
++	if (core_dev->dev->ce_base == NULL)
+ 		return 0;
+ 
+ 	writel(PPC4XX_INTERRUPT_CLR,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
