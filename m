@@ -1,185 +1,52 @@
-From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 3/3] modsign: Handle signing key in source tree
-Date: Fri, 14 Aug 2015 16:57:19 +0100
-Message-ID: <20150814155719.23941.53193.stgit@warthog.procyon.org.uk>
-References: <20150814155650.23941.76513.stgit@warthog.procyon.org.uk>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Issues with HW RNG on Exynos 5422
+Date: Sat, 15 Aug 2015 13:19:03 +0200
+Message-ID: <55CF2027.2050707@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: dhowells@redhat.com, linux-security-module@vger.kernel.org,
-	dwmw2@infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: keyrings@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150814155650.23941.76513.stgit@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: "Naveen Krishna Chatradhi <ch.naveen@samsung.com; Jonghwa Lee"
+	<jonghwa3.lee@samsung.com>
+To: linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:36027 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750753AbbHOLTd (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 15 Aug 2015 07:19:33 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: David Woodhouse <David.Woodhouse@intel.com>
+I'm having issues making the hardware RNG work on a Samsung Exynos 5422 (Odroid XU4) with kernel 4.2rc6.
+No random number generation is started if I write the appropriate value (0x18) to the hash control register.
 
-Since commit 1329e8cc69 ("modsign: Extract signing cert from
-CONFIG_MODULE_SIG_KEY if needed"), the build system has carefully coped
-with the signing key being specified as a relative path in either the
-source or or the build trees.
+What I did so far:
+Splitted the sss DT node in exynos5420.dtsi into one for the s5p-sss driver and one for the exynos-rng driver.
+(s5p-sss doesn't seem to need the hash registers from offset 0x400)
 
-However, the actual signing of modules has not worked if the filename
-is relative to the source tree.
+sss: sss@10830000 {
+	icompatible = "samsung,exynos4210-secss";
+	reg = <0x10830000 0x400>;
+	interrupts = <0 112 0>;
+	clocks = <&clock CLK_SSS>;
+	clock-names = "secss";
+};
 
-Fix that by moving the config_filename helper into scripts/Kbuild.include
-so that it can be used from elsewhere, and then using it in the top-level
-Makefile to find the signing key file.
+rng: rng@10830400 {
+	compatible = "samsung,exynosrng-secss";
+	reg = <0x10830400 0x300>;
+	clocks = <&clock CLK_SSS>;
+	clock-names = "secss";
+};
 
-Kill the intermediate $(MODPUBKEY) and $(MODSECKEY) variables too, while
-we're at it. There's no need for them.
+The DT binding is just for testing and after adding some DT glue logic (of_device_id table) to the exynos-rng driver
+it binds to the rng platform device.
+The clock also seems to be ok with a rate of 266 MHz.
+As is the driver hangs in a loop because the PRNG_DONE in the status register bit never gets set.
 
-Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
----
+I traced it back to the hash control register not accepting value 0x8 (or 0x18 incl. the start bit) for the PRNG.
+Writing a value and reading it back works for values from 0 to 5 only.
+As I have no SSS datasheet my only other reference is drivers/crypto/ace_sha.h in the uboot source code
+which also uses the HW RNG.
 
- Makefile               |    7 +++---
- certs/Makefile         |   54 ------------------------------------------------
- scripts/Kbuild.include |   51 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 54 insertions(+), 58 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 2341942feb85..7c90dda898f6 100644
---- a/Makefile
-+++ b/Makefile
-@@ -870,10 +870,9 @@ INITRD_COMPRESS-$(CONFIG_RD_LZ4)   := lz4
- # export INITRD_COMPRESS := $(INITRD_COMPRESS-y)
- 
- ifdef CONFIG_MODULE_SIG_ALL
--MODSECKEY = $(CONFIG_MODULE_SIG_KEY)
--MODPUBKEY = certs/signing_key.x509
--export MODPUBKEY
--mod_sign_cmd = scripts/sign-file $(CONFIG_MODULE_SIG_HASH) $(MODSECKEY) $(MODPUBKEY)
-+$(eval $(call config_filename,MODULE_SIG_KEY))
-+
-+mod_sign_cmd = scripts/sign-file $(CONFIG_MODULE_SIG_HASH) $(MODULE_SIG_KEY_SRCPREFIX)$(CONFIG_MODULE_SIG_KEY) certs/signing_key.x509
- else
- mod_sign_cmd = true
- endif
-diff --git a/certs/Makefile b/certs/Makefile
-index 3c782d025c36..28ac694dd11a 100644
---- a/certs/Makefile
-+++ b/certs/Makefile
-@@ -4,60 +4,6 @@
- 
- obj-$(CONFIG_SYSTEM_TRUSTED_KEYRING) += system_keyring.o system_certificates.o
- 
--###############################################################################
--#
--# When a Kconfig string contains a filename, it is suitable for
--# passing to shell commands. It is surrounded by double-quotes, and
--# any double-quotes or backslashes within it are escaped by
--# backslashes.
--#
--# This is no use for dependencies or $(wildcard). We need to strip the
--# surrounding quotes and the escaping from quotes and backslashes, and
--# we *do* need to escape any spaces in the string. So, for example:
--#
--# Usage: $(eval $(call config_filename,FOO))
--#
--# Defines FOO_FILENAME based on the contents of the CONFIG_FOO option,
--# transformed as described above to be suitable for use within the
--# makefile.
--#
--# Also, if the filename is a relative filename and exists in the source
--# tree but not the build tree, define FOO_SRCPREFIX as $(srctree)/ to
--# be prefixed to *both* command invocation and dependencies.
--#
--# Note: We also print the filenames in the quiet_cmd_foo text, and
--# perhaps ought to have a version specially escaped for that purpose.
--# But it's only cosmetic, and $(patsubst "%",%,$(CONFIG_FOO)) is good
--# enough.  It'll strip the quotes in the common case where there's no
--# space and it's a simple filename, and it'll retain the quotes when
--# there's a space. There are some esoteric cases in which it'll print
--# the wrong thing, but we don't really care. The actual dependencies
--# and commands *do* get it right, with various combinations of single
--# and double quotes, backslashes and spaces in the filenames.
--#
--###############################################################################
--#
--quote := $(firstword " ")
--space :=
--space +=
--space_escape := %%%SPACE%%%
--#
--define config_filename
--ifneq ($$(CONFIG_$(1)),"")
--$(1)_FILENAME := $$(subst \\,\,$$(subst \$$(quote),$$(quote),$$(subst $$(space_escape),\$$(space),$$(patsubst "%",%,$$(subst $$(space),$$(space_escape),$$(CONFIG_$(1)))))))
--ifneq ($$(patsubst /%,%,$$(firstword $$($(1)_FILENAME))),$$(firstword $$($(1)_FILENAME)))
--else
--ifeq ($$(wildcard $$($(1)_FILENAME)),)
--ifneq ($$(wildcard $$(srctree)/$$($(1)_FILENAME)),)
--$(1)_SRCPREFIX := $(srctree)/
--endif
--endif
--endif
--endif
--endef
--#
--###############################################################################
--
- ifeq ($(CONFIG_SYSTEM_TRUSTED_KEYRING),y)
- 
- $(eval $(call config_filename,SYSTEM_TRUSTED_KEYS))
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index d3437b82ac25..608ac65c61e3 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -303,3 +303,54 @@ why =                                                                        \
- 
- echo-why = $(call escsq, $(strip $(why)))
- endif
-+
-+###############################################################################
-+#
-+# When a Kconfig string contains a filename, it is suitable for
-+# passing to shell commands. It is surrounded by double-quotes, and
-+# any double-quotes or backslashes within it are escaped by
-+# backslashes.
-+#
-+# This is no use for dependencies or $(wildcard). We need to strip the
-+# surrounding quotes and the escaping from quotes and backslashes, and
-+# we *do* need to escape any spaces in the string. So, for example:
-+#
-+# Usage: $(eval $(call config_filename,FOO))
-+#
-+# Defines FOO_FILENAME based on the contents of the CONFIG_FOO option,
-+# transformed as described above to be suitable for use within the
-+# makefile.
-+#
-+# Also, if the filename is a relative filename and exists in the source
-+# tree but not the build tree, define FOO_SRCPREFIX as $(srctree)/ to
-+# be prefixed to *both* command invocation and dependencies.
-+#
-+# Note: We also print the filenames in the quiet_cmd_foo text, and
-+# perhaps ought to have a version specially escaped for that purpose.
-+# But it's only cosmetic, and $(patsubst "%",%,$(CONFIG_FOO)) is good
-+# enough.  It'll strip the quotes in the common case where there's no
-+# space and it's a simple filename, and it'll retain the quotes when
-+# there's a space. There are some esoteric cases in which it'll print
-+# the wrong thing, but we don't really care. The actual dependencies
-+# and commands *do* get it right, with various combinations of single
-+# and double quotes, backslashes and spaces in the filenames.
-+#
-+###############################################################################
-+#
-+space_escape := %%%SPACE%%%
-+#
-+define config_filename
-+ifneq ($$(CONFIG_$(1)),"")
-+$(1)_FILENAME := $$(subst \\,\,$$(subst \$$(quote),$$(quote),$$(subst $$(space_escape),\$$(space),$$(patsubst "%",%,$$(subst $$(space),$$(space_escape),$$(CONFIG_$(1)))))))
-+ifneq ($$(patsubst /%,%,$$(firstword $$($(1)_FILENAME))),$$(firstword $$($(1)_FILENAME)))
-+else
-+ifeq ($$(wildcard $$($(1)_FILENAME)),)
-+ifneq ($$(wildcard $$(srctree)/$$($(1)_FILENAME)),)
-+$(1)_SRCPREFIX := $(srctree)/
-+endif
-+endif
-+endif
-+endif
-+endef
-+#
-+###############################################################################
+Any hint would be appreciated.
