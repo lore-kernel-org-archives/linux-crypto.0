@@ -1,111 +1,72 @@
-From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
-Subject: Re: Issues with HW RNG / SSS on Exynos 5422
-Date: Mon, 17 Aug 2015 15:30:40 +0900
-Message-ID: <55D17F90.80304@samsung.com>
-References: <55CF2027.2050707@gmail.com> <55D0717B.1060706@gmail.com>
- <CAJKOXPdVh2jFYURjO9Bubti-4wd6nJNGoR+B4Re0LQUtnn2xMA@mail.gmail.com>
- <55D17AEF.9030706@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.2
+Date: Mon, 17 Aug 2015 16:27:15 +0800
+Message-ID: <20150817082715.GA28272@gondor.apana.org.au>
+References: <20140401100001.GA12386@gondor.apana.org.au>
+ <20140605062336.GA14440@gondor.apana.org.au>
+ <20140804130339.GA1178@gondor.apana.org.au>
+ <20141007131826.GA29688@gondor.apana.org.au>
+ <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150626102234.GA19393@gondor.apana.org.au>
+ <20150630135135.GA24621@gondor.apana.org.au>
+ <20150713040858.GA7160@gondor.apana.org.au>
+ <20150803071636.GA19444@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Jonghwa Lee <jonghwa3.lee@samsung.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:27047 "EHLO
-	mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750770AbbHQGaq (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:34527 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750985AbbHQI11 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 17 Aug 2015 02:30:46 -0400
-In-reply-to: <55D17AEF.9030706@gmail.com>
+	Mon, 17 Aug 2015 04:27:27 -0400
+Content-Disposition: inline
+In-Reply-To: <20150803071636.GA19444@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 17.08.2015 15:10, Heiner Kallweit wrote:
-> Am 17.08.2015 um 02:19 schrieb Krzysztof Kozlowski:
->> 2015-08-16 20:18 GMT+09:00 Heiner Kallweit <hkallweit1@gmail.com>:
->>> Am 15.08.2015 um 13:19 schrieb Heiner Kallweit:
->>>> I'm having issues making the hardware RNG work on a Samsung Exynos 5422 (Odroid XU4) with kernel 4.2rc6.
->>>> No random number generation is started if I write the appropriate value (0x18) to the hash control register.
->>>>
->>>> What I did so far:
->>>> Splitted the sss DT node in exynos5420.dtsi into one for the s5p-sss driver and one for the exynos-rng driver.
->>>> (s5p-sss doesn't seem to need the hash registers from offset 0x400)
->>>>
->>>> sss: sss@10830000 {
->>>>       icompatible = "samsung,exynos4210-secss";
->>>>       reg = <0x10830000 0x400>;
->>>>       interrupts = <0 112 0>;
->>>>       clocks = <&clock CLK_SSS>;
->>>>       clock-names = "secss";
->>>> };
->>>>
->>>> rng: rng@10830400 {
->>>>       compatible = "samsung,exynosrng-secss";
->>>>       reg = <0x10830400 0x300>;
->>>>       clocks = <&clock CLK_SSS>;
->>>>       clock-names = "secss";
->>>> };
->>>>
->>>> The DT binding is just for testing and after adding some DT glue logic (of_device_id table) to the exynos-rng driver
->>>> it binds to the rng platform device.
->>>> The clock also seems to be ok with a rate of 266 MHz.
->>>> As is the driver hangs in a loop because the PRNG_DONE in the status register bit never gets set.
->>>>
->>>> I traced it back to the hash control register not accepting value 0x8 (or 0x18 incl. the start bit) for the PRNG.
->>>> Writing a value and reading it back works for values from 0 to 5 only.
->>>> As I have no SSS datasheet my only other reference is drivers/crypto/ace_sha.h in the uboot source code
->>>> which also uses the HW RNG.
->>>>
->>>> Any hint would be appreciated.
->>>>
->>> After some more testing it seems like SSS in general has problems on Exynos 5422.
->>> Also the AES implementation in s5p-sss doesn't work. dmesg output:
->>>
->>> [    7.116739] alg: skcipher: encryption failed on chunk test 1 for ecb-aes-s5p: ret=22
->>> [    7.123673] s5p-sss driver registered
->>
->> Have you tried or looked at vendor code for Samsung mobile devices?
->> The code can be downloaded from opensource.samsung.com. I think the
->> model with Exynos5422 is SM-G900H.
->>
->> I don't have any other hints...
->>
->> Best regards,
->> Krzysztof
->> .
->>
-> Thanks for your feedback.
-> 
-> I now took a look at the kernel code Odroid provides, especially the ACE crypto driver.
-> It's a 3.10.82 kernel with a lot of Samsung code which is not (yet) upstreamed.
-> 
-> There seem to be different revisions of SSS (ACE driver mentions v.4, v.5, v.6, and Slim SSS).
-> The vendor kernel uses Slim SSS and the HW AES encryption works.
-> The code there looks like Exynos 5422 should support also v.5, but it's disabled.
-> 
-> I didn't test all SSS registers but for the ones I tested I can change the value.
-> Having said that access to SSS registers is not forbidden.
-> 
-> Then I changed the memory mapped region to 0x10900000, offset 0x800. According to the
-> vendor kernel code there should be the registers for hash functions under Slim SSS.
-> 
-> Not much luck either .. Maybe because Slim SSS uses another clock.
-> The Slim SSS clock is defined in include/dt-bindings/clock/exynos5420.h already.
-> I added a clock definition based on the one in the vendor kernel and changed the DT node to use it.
-> 
->         GATE(CLK_SSS, "sss", "aclk266_g2d", GATE_IP_G2D, 2, 0, 0),
-> +       GATE(CLK_SLIM_SSS, "slimsss", "aclk266_g2d", GATE_IP_G2D, 12, 0, 0),
-> 
-> But this didn't do the trick yet.
+Hi Linus:
 
-Try booting with "clk_ignore_unused" in command line to reduce the
-chance that wrong clock-hierarchy causes some important clocks to be gated.
+This push fixes the following issues:
 
-The clock hierarchy for SSS in mainline is not fully implemented. Beside
-multiple SSS clocks in GATE_IP_G2D and other places, there are also SSS
-bus clocks in GATE_BUS_G2D. By default (after reset) they are not gated
-but who knows what bootloader does with them?
+* A regression caused by the conversion of IPsec ESP to the new
+  AEAD interface: ESN with authencesn no longer works because it
+  relied on the AD input SG list having a specific layout which
+  is no longer the case.  In linux-next authencesn is fixed properly
+  and no longer assumes anything about the SG list format.  While
+  for this release a minimal fix is applied to authencesn so that
+  it works with the new linear layout.
+* Fix memory corruption caused by bogus index in the caam hash code.
+* Fix powerpc nx SHA hashing which could cause module load failures
+  if module signature verification is enabled.
 
-Best regards,
-Krzysztof
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Herbert Xu (1):
+      crypto: authencesn - Fix breakage with new ESP code
+
+Horia Geant? (1):
+      crypto: caam - fix memory corruption in ahash_final_ctx
+
+Jan Stancek (1):
+      crypto: nx - respect sg limit bounds when building sg lists for SHA
+
+ crypto/authencesn.c            |   44 +++++++++++-----------------------------
+ drivers/crypto/caam/caamhash.c |    7 ++++---
+ drivers/crypto/nx/nx-sha256.c  |   27 ++++++++++++++----------
+ drivers/crypto/nx/nx-sha512.c  |   28 ++++++++++++++-----------
+ 4 files changed, 48 insertions(+), 58 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
