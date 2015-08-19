@@ -1,49 +1,34 @@
-From: Michal Suchanek <hramrach@gmail.com>
-Subject: un4i-ss-cipher.c warning
-Date: Wed, 19 Aug 2015 16:35:36 +0200
-Message-ID: <CAOMqctShdb9xEkBmuaQKfB1cwGupbfH5TS5ZB_P85Hwpn+4zAA@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: sahara: Use dmam_alloc_coherent
+Date: Wed, 19 Aug 2015 23:11:32 +0800
+Message-ID: <20150819151132.GA20201@gondor.apana.org.au>
+References: <20150818060605.GA29208@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Corentin Labbe <clabbe.montjoie@gmail.com>,
-	Maxime Ripard <maxime.ripard@free-electrons.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Vaishali Thakkar <vthakkar1994@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:55239 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752656AbbHSPLg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 19 Aug 2015 11:11:36 -0400
+Content-Disposition: inline
+In-Reply-To: <20150818060605.GA29208@localhost>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+On Tue, Aug 18, 2015 at 11:36:05AM +0530, Vaishali Thakkar wrote:
+> This patch moves the data allocated using dma_alloc_coherent to the
+> corresponding managed interface. To be compatible with the change,
+> various gotos are replaced with direct returns and unneeded labels
+> are dropped.
+> 
+> Signed-off-by: Vaishali Thakkar <vthakkar1994@gmail.com>
 
-when building a kernel with sunxi crypto driver as merged into the
-sinxi-wip branch I get a compiler warning.
-
-I am not sure this is the latest version of the driver. It does not
-seem to be in mainline yet.
-
-Thanks
-
-Michal
-
-In file included from /scratch/build/linux/include/linux/printk.h:277:0=
-,
-                 from /scratch/build/linux/include/linux/kernel.h:13,
-                 from /scratch/build/linux/include/linux/clk.h:16,
-                 from
-/scratch/build/linux/drivers/crypto/sunxi-ss/sun4i-ss.h:15,
-                 from
-/scratch/build/linux/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c:17:
-/scratch/build/linux/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c: In
-function =E2=80=98sun4i_ss_cipher_poll=E2=80=99:
-/scratch/build/linux/include/linux/dynamic_debug.h:86:3: warning:
-=E2=80=98todo=E2=80=99 may be used uninitialized in this function
-[-Wmaybe-uninitialized]
-   __dynamic_dev_dbg(&descriptor, dev, fmt, \
-   ^
-/scratch/build/linux/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c:144:15:
-note: =E2=80=98todo=E2=80=99 was declared here
-  unsigned int todo;
+Applied.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
