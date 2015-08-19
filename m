@@ -1,72 +1,49 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: cbc(aes-aesni) a givcipher?
-Date: Wed, 19 Aug 2015 20:47:39 +0800
-Message-ID: <20150819124739.GB18321@gondor.apana.org.au>
-References: <3211314.vIIIpsQc2S@myon.chronox.de>
- <1889024.x7b0Yn2QbV@myon.chronox.de>
+From: Michal Suchanek <hramrach@gmail.com>
+Subject: un4i-ss-cipher.c warning
+Date: Wed, 19 Aug 2015 16:35:36 +0200
+Message-ID: <CAOMqctShdb9xEkBmuaQKfB1cwGupbfH5TS5ZB_P85Hwpn+4zAA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38326 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753884AbbHSMrm (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Aug 2015 08:47:42 -0400
-Content-Disposition: inline
-In-Reply-To: <1889024.x7b0Yn2QbV@myon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Corentin Labbe <clabbe.montjoie@gmail.com>,
+	Maxime Ripard <maxime.ripard@free-electrons.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Aug 19, 2015 at 12:31:13PM +0200, Stephan Mueller wrote:
-> > 
-> > with the latest cryptodev-2.6 tree I find the following:
-> > 
-> > name         : cbc(aes)
-> > driver       : cbc(aes-aesni)
-> > module       : kernel
-> > priority     : 300
-> > refcnt       : 1
-> > selftest     : passed
-> > internal     : no
-> > type         : givcipher
-> > async        : no
-> > blocksize    : 16
-> > min keysize  : 16
-> > max keysize  : 32
-> > ivsize       : 16
-> > geniv        : eseqiv
-> > 
-> > name         : cbc(aes)
-> > driver       : cbc(aes-aesni)
-> > module       : cbc
-> > priority     : 300
-> > refcnt       : 1
-> > selftest     : passed
-> > internal     : no
-> > type         : blkcipher
-> > blocksize    : 16
-> > min keysize  : 16
-> > max keysize  : 32
-> > ivsize       : 16
-> > geniv        : <default>
+Hello,
 
-This is how it's supposed to look like as ablkcipher also has
-implicit IV generators like AEAD used to have.  I'm working on
-a patch set to get rid of them just like what we did to AEAD.
+when building a kernel with sunxi crypto driver as merged into the
+sinxi-wip branch I get a compiler warning.
 
-> > Note the type of the ciphers. With this, an allocation of cbc(aes-aesni)
-> > does not work (ENOENT).
->  
-> Just a followup: I think I see how I triggered it; I used cbc(aes-aesni) with 
-> crypto_alloc_aead due to an accident.
+I am not sure this is the latest version of the driver. It does not
+seem to be in mainline yet.
 
-So are you saying that crypto_alloc_blkcipher is failing? If it's
-only crypto_alloc_aead failing then I don't see the problem.
+Thanks
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Michal
+
+In file included from /scratch/build/linux/include/linux/printk.h:277:0=
+,
+                 from /scratch/build/linux/include/linux/kernel.h:13,
+                 from /scratch/build/linux/include/linux/clk.h:16,
+                 from
+/scratch/build/linux/drivers/crypto/sunxi-ss/sun4i-ss.h:15,
+                 from
+/scratch/build/linux/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c:17:
+/scratch/build/linux/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c: In
+function =E2=80=98sun4i_ss_cipher_poll=E2=80=99:
+/scratch/build/linux/include/linux/dynamic_debug.h:86:3: warning:
+=E2=80=98todo=E2=80=99 may be used uninitialized in this function
+[-Wmaybe-uninitialized]
+   __dynamic_dev_dbg(&descriptor, dev, fmt, \
+   ^
+/scratch/build/linux/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c:144:15:
+note: =E2=80=98todo=E2=80=99 was declared here
+  unsigned int todo;
