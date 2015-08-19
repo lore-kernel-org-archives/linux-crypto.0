@@ -1,47 +1,55 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: cmac - allow usage in FIPS mode
-Date: Wed, 19 Aug 2015 08:42:07 +0200
-Message-ID: <2773400.HYW9KrTIf6@myon.chronox.de>
+From: Valentin Rothberg <valentinrothberg@gmail.com>
+Subject: crypto: broken Kconfig option CRYPTO_NULL2
+Date: Wed, 19 Aug 2015 09:49:37 +0200
+Message-ID: <CAD3Xx4+R3f1H1vpRRcMEMfwMF-b7jggYhbk=V7JFg_=ujr-E+A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=UTF-8
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Paul Bolle <pebolle@tiscali.nl>,
+	Andreas Ruprecht <andreas.ruprecht@fau.de>,
+	hengelein Stefan <stefan.hengelein@fau.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:48130 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751580AbbHSGmL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Aug 2015 02:42:11 -0400
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:34269 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752629AbbHSHuI (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 19 Aug 2015 03:50:08 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-CMAC is an approved cipher in FIPS 140-2. The patch allows the use
-of CMAC with TDES and AES in FIPS mode.
+Hi Herbert,
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/testmgr.c | 2 ++
- 1 file changed, 2 insertions(+)
+your commit 149a39717dcc ("crypto: aead - Add type-safe geniv
+init/exit helpers") has shown up in Linux next (i.e., next-20150818)
+adding the following lines of code to crypto/Kconfig:
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index d0a42bd..a865ea9 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -2476,6 +2476,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		}
- 	}, {
- 		.alg = "cmac(aes)",
-+		.fips_allowed = 1,
- 		.test = alg_test_hash,
- 		.suite = {
- 			.hash = {
-@@ -2485,6 +2486,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		}
- 	}, {
- 		.alg = "cmac(des3_ede)",
-+		.fips_allowed = 1,
- 		.test = alg_test_hash,
- 		.suite = {
- 			.hash = {
--- 
-2.1.0
+@@ -150,12 +152,15 @@ config CRYPTO_GF128MUL
+[...]
+
++config CRYPTO_NULL2
++       select CRYPTO_ALGAPI2
++       select CRYPTO_BLKCIPHER2
++       select CRYPTO_HASH2
++
+
+There are two problems with the option above: (1) It does not have a
+type, (2) it selects other options without being a tristate/boolean,
+see below:
+
+scripts/kconfig/mconf  Kconfig
+crypto/Kconfig:159:warning: config symbol defined without type
+crypto/Kconfig:160:warning: config symbol 'CRYPTO_NULL2' uses select,
+but is not boolean or tristate
+crypto/Kconfig:161:warning: config symbol 'CRYPTO_NULL2' uses select,
+but is not boolean or tristate
+crypto/Kconfig:162:warning: config symbol 'CRYPTO_NULL2' uses select,
+but is not boolean or tristate
+
+
+If you want to, I can send a trivial patch making it a boolean without prompt.
+
+I detected this issue with undertaker-checkpatch (undertaker.cs.fau.de).
+
+Kind regards,
+ Valentin
