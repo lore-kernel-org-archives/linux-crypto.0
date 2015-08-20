@@ -1,46 +1,106 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH] crypto: hash - Add AHASH_REQUEST_ON_STACK
-Date: Thu, 20 Aug 2015 17:02:40 +0800
-Message-ID: <20150820090240.GA27976@gondor.apana.org.au>
+From: Corentin LABBE <clabbe.montjoie@gmail.com>
+Subject: Re: un4i-ss-cipher.c warning
+Date: Thu, 20 Aug 2015 15:56:39 +0200
+Message-ID: <55D5DC97.1040209@gmail.com>
+References: <CAOMqctShdb9xEkBmuaQKfB1cwGupbfH5TS5ZB_P85Hwpn+4zAA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:43442 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752458AbbHTJCo (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 20 Aug 2015 05:02:44 -0400
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: Michal Suchanek <hramrach@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Maxime Ripard <maxime.ripard@free-electrons.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAOMqctShdb9xEkBmuaQKfB1cwGupbfH5TS5ZB_P85Hwpn+4zAA@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch adds the helper AHASH_REQUEST_ON_STACK for those users
-of ahash that are synchronous only.
+On 19/08/2015 16:35, Michal Suchanek wrote:
+> Hello,
+>
+> when building a kernel with sunxi crypto driver as merged into the
+> sinxi-wip branch I get a compiler warning.
+>
+> I am not sure this is the latest version of the driver. It does not
+> seem to be in mainline yet.
+>
+> Thanks
+>
+> Michal
+>
+> In file included from /scratch/build/linux/include/linux/printk.h:277=
+:0,
+>                   from /scratch/build/linux/include/linux/kernel.h:13=
+,
+>                   from /scratch/build/linux/include/linux/clk.h:16,
+>                   from
+> /scratch/build/linux/drivers/crypto/sunxi-ss/sun4i-ss.h:15,
+>                   from
+> /scratch/build/linux/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c:17:
+> /scratch/build/linux/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c: In
+> function =E2=80=98sun4i_ss_cipher_poll=E2=80=99:
+> /scratch/build/linux/include/linux/dynamic_debug.h:86:3: warning:
+> =E2=80=98todo=E2=80=99 may be used uninitialized in this function
+> [-Wmaybe-uninitialized]
+>     __dynamic_dev_dbg(&descriptor, dev, fmt, \
+>     ^
+> /scratch/build/linux/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c:144:15=
+:
+> note: =E2=80=98todo=E2=80=99 was declared here
+>    unsigned int todo;
+>
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Hello
+
+Thanks for the report, strange that I do not have that warning.
+todo is always initialized, since oleft and ileft are always > 0 at sta=
+rt.
+But setting todo to 0 is a simple fix.
+The following patch will suppress the warning.
+
+Regards
+
+-- >8 --
+ From 67f2d0749041b08c4c4ad671ab710b3b83f6dfd3 Mon Sep 17 00:00:00 2001
+=46rom: LABBE Corentin <clabbe.montjoie@gmail.com>
+Date: Thu, 20 Aug 2015 12:18:46 +0200
+Subject: [PATCH] crypto: sun4i-ss: suppress the todo uninitialized warn=
+ing
+
+Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 ---
+  drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 4 ++--
+  1 file changed, 2 insertions(+), 2 deletions(-)
 
- include/crypto/hash.h |    5 +++++
- 1 file changed, 5 insertions(+)
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto=
+/sunxi-ss/sun4i-ss-cipher.c
+index e070c31..9299914 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+@@ -32,7 +32,7 @@ static int sun4i_ss_opti_poll(struct ablkcipher_reque=
+st *areq)
+  	int i, err =3D 0;
+  	unsigned int ileft =3D areq->nbytes;
+  	unsigned int oleft =3D areq->nbytes;
+-	unsigned int todo;
++	unsigned int todo =3D 0;
+  	struct sg_mapping_iter mi, mo;
+  	unsigned int oi, oo; /* offset for in and out */
 
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 57c8a6e..8e920b4 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -63,6 +63,11 @@ struct ahash_request {
- 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
- };
- 
-+#define AHASH_REQUEST_ON_STACK(name, ahash) \
-+	char __##name##_desc[sizeof(struct ahash_request) + \
-+		crypto_ahash_reqsize(ahash)] CRYPTO_MINALIGN_ATTR; \
-+	struct ahash_request *name = (void *)__##name##_desc
-+
- /**
-  * struct ahash_alg - asynchronous message digest definition
-  * @init: Initialize the transformation context. Intended only to initialize the
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+@@ -141,7 +141,7 @@ static int sun4i_ss_cipher_poll(struct ablkcipher_r=
+equest *areq)
+  	int i, err =3D 0;
+  	unsigned int ileft =3D areq->nbytes;
+  	unsigned int oleft =3D areq->nbytes;
+-	unsigned int todo;
++	unsigned int todo =3D 0;
+  	struct sg_mapping_iter mi, mo;
+  	unsigned int oi, oo;	/* offset for in and out */
+  	char buf[4 * SS_RX_MAX];/* buffer for linearize SG src */
+--=20
+2.4.6
