@@ -1,7 +1,7 @@
 From: Joonsoo Kim <js1304@gmail.com>
-Subject: [PATCH v2 6/8] zram: change zcomp_compress interface
-Date: Thu, 20 Aug 2015 15:35:02 +0900
-Message-ID: <1440052504-15442-7-git-send-email-iamjoonsoo.kim@lge.com>
+Subject: [PATCH v2 8/8] zram: use decompress_noctx
+Date: Thu, 20 Aug 2015 15:35:04 +0900
+Message-ID: <1440052504-15442-9-git-send-email-iamjoonsoo.kim@lge.com>
 References: <1440052504-15442-1-git-send-email-iamjoonsoo.kim@lge.com>
 Cc: Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
 	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
@@ -16,60 +16,178 @@ In-Reply-To: <1440052504-15442-1-git-send-email-iamjoonsoo.kim@lge.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-zram regards zstrm's buffer as compression destination buffer, but,
-it is not intuitive and there is no document about it. Providing
-destination buffer to zcomp_compress() directly seems more intuitive
-interface to me so this patch changes zcomp_compress interface.
+Crypto subsystem supports noctx API which doesn't require tfm.
+To get tfm in zram, we need zstrm and it is limited resource.
+If we uses noctx API, we don't need to get zstrm so that
+we get much better performance when zstrm is insufficient.
+
+This patch restores zram's performance to the time that zram
+doesn't use crypto subsystem.
+
+Following is zram's read performance number.
+
+* iozone -t 4 -R -r 16K -s 60M -I +Z -i 0 -i 1
+* max_stream is set to 1
+* Output is in Kbytes/sec
+
+zram-base vs zram-crypto vs zram-crypto-noctx
+
+Read		10411701.88	6426911.62	9423894.38
+Re-read		10017386.62	6428218.88	11000063.50
 
 Signed-off-by: Joonsoo Kim <iamjoonsoo.kim@lge.com>
 ---
- drivers/block/zram/zcomp.c    | 5 ++---
- drivers/block/zram/zcomp.h    | 2 +-
- drivers/block/zram/zram_drv.c | 2 +-
- 3 files changed, 4 insertions(+), 5 deletions(-)
+ drivers/block/zram/zcomp.c    | 28 +++++++++++++++++++++++++++-
+ drivers/block/zram/zcomp.h    |  9 ++++++++-
+ drivers/block/zram/zram_drv.c |  9 +++++----
+ 3 files changed, 40 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 965d1af..2ad504b 100644
+index d2734f2..86b0c9b 100644
 --- a/drivers/block/zram/zcomp.c
 +++ b/drivers/block/zram/zcomp.c
-@@ -307,10 +307,9 @@ void zcomp_strm_release(struct zcomp *comp, struct zcomp_strm *zstrm)
+@@ -291,8 +291,12 @@ bool zcomp_set_max_streams(struct zcomp *comp, int num_strm)
+ 	return comp->set_max_streams(comp, num_strm);
  }
  
- int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
--		const unsigned char *src, size_t *dst_len)
-+		const unsigned char *src, unsigned char *dst, size_t *dst_len)
+-struct zcomp_strm *zcomp_strm_find(struct zcomp *comp)
++struct zcomp_strm *zcomp_strm_find(struct zcomp *comp, bool decomp)
  {
--	return comp->backend->compress(src, zstrm->buffer, dst_len,
--			zstrm->private);
-+	return comp->backend->compress(src, dst, dst_len, zstrm->private);
++	/* We don't need decompression context so zstrm neither */
++	if (decomp && test_bit(ZCOMP_DECOMPRESS_NOCTX, &comp->flags))
++		return NULL;
++
+ 	return comp->strm_find(comp);
  }
  
- int zcomp_decompress(struct zcomp *comp, const unsigned char *src,
+@@ -307,6 +311,11 @@ int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
+ {
+ 	*dst_len = PAGE_SIZE << 1;
+ 
++	if (!zstrm) {
++		return crypto_comp_compress_noctx(comp->alg, src, PAGE_SIZE,
++							dst, dst_len);
++	}
++
+ 	return crypto_comp_compress(zstrm->tfm, src, PAGE_SIZE, dst, dst_len);
+ }
+ 
+@@ -316,12 +325,18 @@ int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
+ {
+ 	unsigned int size = PAGE_SIZE;
+ 
++	if (!zstrm) {
++		return crypto_comp_decompress_noctx(comp->alg, src, src_len,
++							dst, &size);
++	}
++
+ 	return crypto_comp_decompress(zstrm->tfm, src, src_len,	dst, &size);
+ }
+ 
+ void zcomp_destroy(struct zcomp *comp)
+ {
+ 	comp->destroy(comp);
++	crypto_put_comp(comp->alg);
+ 	kfree(comp);
+ }
+ 
+@@ -344,12 +359,23 @@ struct zcomp *zcomp_create(const char *compress, int max_strm)
+ 		return ERR_PTR(-ENOMEM);
+ 
+ 	comp->name = compress;
++	comp->alg = crypto_get_comp(compress, 0, 0);
++	if (!comp->alg) {
++		kfree(comp);
++		return ERR_PTR(-EINVAL);
++	}
++
++	if (crypto_has_compress_noctx(comp->alg))
++		set_bit(ZCOMP_COMPRESS_NOCTX, &comp->flags);
++	if (crypto_has_decompress_noctx(comp->alg))
++		set_bit(ZCOMP_DECOMPRESS_NOCTX, &comp->flags);
+ 
+ 	if (max_strm > 1)
+ 		zcomp_strm_multi_create(comp, max_strm);
+ 	else
+ 		zcomp_strm_single_create(comp);
+ 	if (!comp->stream) {
++		crypto_put_comp(comp->alg);
+ 		kfree(comp);
+ 		return ERR_PTR(-ENOMEM);
+ 	}
 diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
-index 46e2b9f..b2388e0 100644
+index c47db4d..6c137c8 100644
 --- a/drivers/block/zram/zcomp.h
 +++ b/drivers/block/zram/zcomp.h
-@@ -60,7 +60,7 @@ struct zcomp_strm *zcomp_strm_find(struct zcomp *comp);
+@@ -13,6 +13,11 @@
+ #include <linux/crypto.h>
+ #include <linux/mutex.h>
+ 
++enum {
++	ZCOMP_COMPRESS_NOCTX,
++	ZCOMP_DECOMPRESS_NOCTX,
++};
++
+ struct zcomp_strm {
+ 	struct crypto_comp *tfm;
+ 
+@@ -27,6 +32,8 @@ struct zcomp_strm {
+ struct zcomp {
+ 	void *stream;
+ 	const char *name;
++	struct crypto_alg *alg;
++	unsigned long flags;
+ 
+ 	struct zcomp_strm *(*strm_find)(struct zcomp *comp);
+ 	void (*strm_release)(struct zcomp *comp, struct zcomp_strm *zstrm);
+@@ -39,7 +46,7 @@ ssize_t zcomp_available_show(const char *comp, char *buf);
+ struct zcomp *zcomp_create(const char *comp, int max_strm);
+ void zcomp_destroy(struct zcomp *comp);
+ 
+-struct zcomp_strm *zcomp_strm_find(struct zcomp *comp);
++struct zcomp_strm *zcomp_strm_find(struct zcomp *comp, bool decomp);
  void zcomp_strm_release(struct zcomp *comp, struct zcomp_strm *zstrm);
  
  int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
--		const unsigned char *src, size_t *dst_len);
-+		const unsigned char *src, unsigned char *dst, size_t *dst_len);
- 
- int zcomp_decompress(struct zcomp *comp, const unsigned char *src,
- 		size_t src_len, unsigned char *dst);
 diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index b088ca9..4801e4d 100644
+index b3044d3..8283bd3 100644
 --- a/drivers/block/zram/zram_drv.c
 +++ b/drivers/block/zram/zram_drv.c
-@@ -701,7 +701,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
- 		goto out;
+@@ -623,7 +623,7 @@ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
+ 		/* Use  a temporary buffer to decompress the page */
+ 		uncmem = kmalloc(PAGE_SIZE, GFP_NOIO);
+ 
+-	zstrm = zcomp_strm_find(zram->comp);
++	zstrm = zcomp_strm_find(zram->comp, true);
+ 	user_mem = kmap_atomic(page);
+ 	if (!is_partial_io(bvec))
+ 		uncmem = user_mem;
+@@ -647,7 +647,8 @@ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
+ 	ret = 0;
+ out_cleanup:
+ 	kunmap_atomic(user_mem);
+-	zcomp_strm_release(zram->comp, zstrm);
++	if (zstrm)
++		zcomp_strm_release(zram->comp, zstrm);
+ 	if (is_partial_io(bvec))
+ 		kfree(uncmem);
+ 	return ret;
+@@ -676,14 +677,14 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
+ 			ret = -ENOMEM;
+ 			goto out;
+ 		}
+-		zstrm = zcomp_strm_find(zram->comp);
++		zstrm = zcomp_strm_find(zram->comp, true);
+ 		ret = zram_decompress_page(zram, zstrm, uncmem, index);
+ 		if (ret)
+ 			goto out;
  	}
  
--	ret = zcomp_compress(zram->comp, zstrm, uncmem, &clen);
-+	ret = zcomp_compress(zram->comp, zstrm, uncmem, zstrm->buffer, &clen);
- 	if (!is_partial_io(bvec)) {
- 		kunmap_atomic(user_mem);
- 		user_mem = NULL;
+ 	if (!zstrm)
+-		zstrm = zcomp_strm_find(zram->comp);
++		zstrm = zcomp_strm_find(zram->comp, false);
+ 	user_mem = kmap_atomic(page);
+ 
+ 	if (is_partial_io(bvec)) {
 -- 
 1.9.1
