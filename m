@@ -1,61 +1,46 @@
-From: Joonsoo Kim <iamjoonsoo.kim@lge.com>
-Subject: Re: [PATCH v2 1/8] crypto: support (de)compression API that doesn't
- require tfm object
-Date: Thu, 20 Aug 2015 17:05:48 +0900
-Message-ID: <20150820080547.GB30260@js1304-P5Q-DELUXE>
-References: <1440052504-15442-1-git-send-email-iamjoonsoo.kim@lge.com>
- <1440052504-15442-2-git-send-email-iamjoonsoo.kim@lge.com>
- <20150820064728.GA26840@gondor.apana.org.au>
- <20150820075217.GA30260@js1304-P5Q-DELUXE>
- <20150820075035.GA27535@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH] crypto: hash - Add AHASH_REQUEST_ON_STACK
+Date: Thu, 20 Aug 2015 17:02:40 +0800
+Message-ID: <20150820090240.GA27976@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Minchan Kim <minchan@kernel.org>,
-	Nitin Gupta <ngupta@vflare.org>,
-	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lgeamrelo02.lge.com ([156.147.1.126]:39859 "EHLO
-	lgeamrelo02.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751279AbbHTH7m (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:43442 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752458AbbHTJCo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 20 Aug 2015 03:59:42 -0400
+	Thu, 20 Aug 2015 05:02:44 -0400
 Content-Disposition: inline
-In-Reply-To: <20150820075035.GA27535@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 20, 2015 at 03:50:35PM +0800, Herbert Xu wrote:
-> On Thu, Aug 20, 2015 at 04:52:17PM +0900, Joonsoo Kim wrote:
-> > 
-> > Hmm... I guess there is no problem. crypto_alg object fetched by
-> > crypto_get_comp() introduced in this patch could be hardware device
-> > algorithm which is same one that we can eventually fetch from tfm object.
-> > So, this approach would correctly track the crypto_alg regardless
-> > it is a hardware one or not. If there is some dependency between
-> > algorithm and tfm, it can't support _noctx API. Am I missing
-> > something?
-> 
-> Your approach limits what hardware devices we can support in
-> future.  It is fairly common for hardware drivers to only allocate
-> resources when a tfm is created.  With your tfmless interface,
-> the driver would have to unconditionally allocate resources.
+This patch adds the helper AHASH_REQUEST_ON_STACK for those users
+of ahash that are synchronous only.
 
-Ah...Okay. thanks for clarifying.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-> 
-> It is essentially a global tfm without the tfm.
-> 
-> > Yes, I thought this way before, but, current way is much simpler so
-> > I try it first. If it is not acceptable, I will implement this
-> > approach.
-> 
-> Please go with a global tfm.
+ include/crypto/hash.h |    5 +++++
+ 1 file changed, 5 insertions(+)
 
-Okay. Will do that in next spin.
-
-Thanks.
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 57c8a6e..8e920b4 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -63,6 +63,11 @@ struct ahash_request {
+ 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+ };
+ 
++#define AHASH_REQUEST_ON_STACK(name, ahash) \
++	char __##name##_desc[sizeof(struct ahash_request) + \
++		crypto_ahash_reqsize(ahash)] CRYPTO_MINALIGN_ATTR; \
++	struct ahash_request *name = (void *)__##name##_desc
++
+ /**
+  * struct ahash_alg - asynchronous message digest definition
+  * @init: Initialize the transformation context. Intended only to initialize the
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
