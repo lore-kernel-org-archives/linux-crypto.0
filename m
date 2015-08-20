@@ -1,41 +1,42 @@
-From: Vinod Koul <vinod.koul@intel.com>
-Subject: Re: [PATCH v1 3/4] Crypto: Add support for APM X-Gene SoC CRC32C h/w
- accelerator driver
-Date: Thu, 20 Aug 2015 12:40:28 +0530
-Message-ID: <20150820071028.GH13546@localhost>
-References: <1438258268-3099-1-git-send-email-rsahu@apm.com>
- <1438258268-3099-4-git-send-email-rsahu@apm.com>
- <20150820054828.GY13546@localhost>
- <CAFd313xG2_4NGHspuJwThY=jUSPiBm3egvXVvhv8XxKctgMv1A@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 0/2] crypto: skcipher - Introduce new skcipher interface
+Date: Thu, 20 Aug 2015 15:20:55 +0800
+Message-ID: <20150820072055.GA27176@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: dan.j.williams@intel.com, Herbert Xu <herbert@gondor.apana.org.au>,
-	davem@davemloft.net, linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, jcm@redhat.com,
-	patches@apm.com
-To: Rameshwar Sahu <rsahu@apm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:45628 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752655AbbHTHU7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 20 Aug 2015 03:20:59 -0400
 Content-Disposition: inline
-In-Reply-To: <CAFd313xG2_4NGHspuJwThY=jUSPiBm3egvXVvhv8XxKctgMv1A@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 20, 2015 at 12:31:44PM +0530, Rameshwar Sahu wrote:
-> Hi Vinod,
-> 
-> On Thu, Aug 20, 2015 at 11:18 AM, Vinod Koul <vinod.koul@intel.com> wrote:
-> > On Thu, Jul 30, 2015 at 05:41:07PM +0530, Rameshwar Prasad Sahu wrote:
-> >> +     nents = sg_nents(req->src);
-> >> +     sg_count = dma_map_sg(dev, req->src, nents, DMA_TO_DEVICE);
-> >> +     if (!sg_count) {
-> >> +             dev_err(dev, "Failed to map src sg");
-> >> +             return -ENOMEM;
-> > mapping error shouldn't be no mem error
-> Okay, I guess then -EIO will be fine here??
+Hi:
 
-yes better
+These two patches introduce a new skcipher interface that aims
+to replace the existing blkcipher and ablkcipher interfaces.  A
+bit of history, the blkcipher interface was originally split from
+the cipher interface in order to differentiate the underly block
+cipher algorithm from the modes such as ECB/CBC.  Later ablkcipher
+was added in order to support hardware devices.
 
+Unlike the shash/ahash split, both blkcipher and ablkcipher operate
+on SG lists.  Therefore there is really no need to maintain them
+as separate interfaces.
+
+The new skcipher interface is essentially identical to ablkcipher
+but without the implicit IV generators that have been rendered
+obsolete by the new AEAD interface.
+
+The next step in the process is to convert existing users over
+to skcipher.
+
+Cheers,
 -- 
-~Vinod
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
