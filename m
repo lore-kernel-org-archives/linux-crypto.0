@@ -1,31 +1,29 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: cmac - allow usage in FIPS mode
-Date: Wed, 19 Aug 2015 23:11:43 +0800
-Message-ID: <20150819151143.GB20201@gondor.apana.org.au>
-References: <2773400.HYW9KrTIf6@myon.chronox.de>
+From: Vinod Koul <vinod.koul@intel.com>
+Subject: Re: [PATCH v1 1/4] dmaengine: Add support for new feature CRC32C
+Date: Thu, 20 Aug 2015 10:56:31 +0530
+Message-ID: <20150820052631.GW13546@localhost>
+References: <1438258268-3099-1-git-send-email-rsahu@apm.com>
+ <1438258268-3099-2-git-send-email-rsahu@apm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:39342 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754001AbbHSPLr (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Aug 2015 11:11:47 -0400
+Cc: dan.j.williams@intel.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org, arnd@arndb.de,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, jcm@redhat.com,
+	patches@apm.com
+To: Rameshwar Prasad Sahu <rsahu@apm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <2773400.HYW9KrTIf6@myon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1438258268-3099-2-git-send-email-rsahu@apm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Aug 19, 2015 at 08:42:07AM +0200, Stephan Mueller wrote:
-> CMAC is an approved cipher in FIPS 140-2. The patch allows the use
-> of CMAC with TDES and AES in FIPS mode.
-> 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+On Thu, Jul 30, 2015 at 05:41:05PM +0530, Rameshwar Prasad Sahu wrote:
+> This patch adds support for new feature CRC32C calculation in
+> dmaengine framework.
 
-Applied.
+Looks okay can you please update Documentation also
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+~Vinod
