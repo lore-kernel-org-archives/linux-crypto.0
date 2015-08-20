@@ -1,42 +1,99 @@
-From: Rameshwar Sahu <rsahu@apm.com>
-Subject: Re: [PATCH v1 1/4] dmaengine: Add support for new feature CRC32C
-Date: Thu, 20 Aug 2015 11:59:07 +0530
-Message-ID: <CAFd313x+MD5C2stJ-YdKrt6Ywzt4_2GmK3pJTFjfwrhPnCdopQ@mail.gmail.com>
-References: <1438258268-3099-1-git-send-email-rsahu@apm.com>
-	<1438258268-3099-2-git-send-email-rsahu@apm.com>
-	<20150820052631.GW13546@localhost>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: dan.j.williams@intel.com, Herbert Xu <herbert@gondor.apana.org.au>,
-	davem@davemloft.net, linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, jcm@redhat.com,
-	patches@apm.com
-To: Vinod Koul <vinod.koul@intel.com>
+From: Joonsoo Kim <js1304@gmail.com>
+Subject: [PATCH v2 0/8] zram: introduce crypto compress noctx API and use it on zram
+Date: Thu, 20 Aug 2015 15:34:56 +0900
+Message-ID: <1440052504-15442-1-git-send-email-iamjoonsoo.kim@lge.com>
+Cc: Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
+	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Stephan Mueller <smueller@chronox.de>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>
+To: Andrew Morton <akpm@linux-foundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f182.google.com ([209.85.213.182]:37422 "EHLO
-	mail-ig0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752255AbbHTG3H (ORCPT
+Received: from mail-pa0-f43.google.com ([209.85.220.43]:33701 "EHLO
+	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751156AbbHTGfS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 20 Aug 2015 02:29:07 -0400
-Received: by igui7 with SMTP id i7so23586289igu.0
-        for <linux-crypto@vger.kernel.org>; Wed, 19 Aug 2015 23:29:07 -0700 (PDT)
-In-Reply-To: <20150820052631.GW13546@localhost>
+	Thu, 20 Aug 2015 02:35:18 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Vinod,
+This patchset makes zram to use crypto API in order to support
+more compression algorithm.
 
-On Thu, Aug 20, 2015 at 10:56 AM, Vinod Koul <vinod.koul@intel.com> wrote:
-> On Thu, Jul 30, 2015 at 05:41:05PM +0530, Rameshwar Prasad Sahu wrote:
->> This patch adds support for new feature CRC32C calculation in
->> dmaengine framework.
->
-> Looks okay can you please update Documentation also
+The reason we need to support vairous compression algorithms is that
+zram's performance is highly depend on workload and compression algorithm
+and architecture. Every compression algorithm has it's own strong point.
+For example, zlib is the best for compression ratio, but, it's
+(de)compression speed is rather slow. Against my expectation, in my kernel
+build test with zram swap, in low-memory condition on x86, zlib shows best
+performance than others. In this case, I guess that compression ratio is
+the most important factor. Unlike this situation, on ARM, maybe fast
+(de)compression speed is the most important because it's computation speed
+is slower than x86.
 
-Thanks, I will update Documentation.
->
-> --
-> ~Vinod
->
+Anyway, there is a concern from Sergey to use crypto API in zram. Current
+crypto API has a limitation that always require tfm object to (de)compress
+something because some of (de)compression function requires scratch buffer
+embedded on tfm even if some of (de)compression function doesn't
+require it. Due to above reason, using crypto API rather than calling
+compression library directly causes more memory footprint and this is
+why zram doesn't use crypto API before.
+
+In this patchset, crypto compress noctx API is introduced to reduce memory
+footprint caused by maintaining multiple tfm and zram uses it. Before
+noctx API, zram's performace is down-graded if tfm is insufficient. But,
+after applying noctx API, performace is restored.
+
+This addresses Sergey's concern perfectly and provides possibility to use
+various compression algorithm in zram.
+
+Following is zram's read performance number.
+
+* iozone -t 4 -R -r 16K -s 60M -I +Z -i 0 -i 1
+* max_stream is set to 1
+* Output is in Kbytes/sec
+
+zram-base vs zram-crypto vs zram-crypto-noctx
+
+Read		10411701.88	6426911.62	9423894.38 
+Re-read		10017386.62	6428218.88	11000063.50 
+
+Thanks.
+
+Joonsoo Kim (8):
+  crypto: support (de)compression API that doesn't require tfm object
+  crypto/lzo: support decompress_noctx
+  crypyo/lz4: support decompress_noctx
+  crypto/lz4hc: support decompress_noctx
+  crypto/842: support decompress_noctx
+  zram: change zcomp_compress interface
+  zram: use crypto API for compression
+  zram: use decompress_noctx
+
+ crypto/842.c                   |  10 +++-
+ crypto/compress.c              |  20 ++++++++
+ crypto/crypto_null.c           |   4 +-
+ crypto/deflate.c               |   4 +-
+ crypto/lz4.c                   |  19 ++++++-
+ crypto/lz4hc.c                 |  19 ++++++-
+ crypto/lzo.c                   |  20 +++++++-
+ drivers/block/zram/Kconfig     |  13 +----
+ drivers/block/zram/Makefile    |   4 +-
+ drivers/block/zram/zcomp.c     | 113 +++++++++++++++++++++++++----------------
+ drivers/block/zram/zcomp.h     |  44 +++++++---------
+ drivers/block/zram/zcomp_lz4.c |  47 -----------------
+ drivers/block/zram/zcomp_lz4.h |  17 -------
+ drivers/block/zram/zcomp_lzo.c |  47 -----------------
+ drivers/block/zram/zcomp_lzo.h |  17 -------
+ drivers/block/zram/zram_drv.c  |  29 +++++++----
+ include/linux/crypto.h         |  31 +++++++++++
+ 17 files changed, 229 insertions(+), 229 deletions(-)
+ delete mode 100644 drivers/block/zram/zcomp_lz4.c
+ delete mode 100644 drivers/block/zram/zcomp_lz4.h
+ delete mode 100644 drivers/block/zram/zcomp_lzo.c
+ delete mode 100644 drivers/block/zram/zcomp_lzo.h
+
+-- 
+1.9.1
