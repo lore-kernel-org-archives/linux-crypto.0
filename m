@@ -1,56 +1,42 @@
-From: Vinod Koul <vinod.koul@intel.com>
-Subject: Re: [PATCH v1 3/4] Crypto: Add support for APM X-Gene SoC CRC32C h/w
- accelerator driver
-Date: Thu, 20 Aug 2015 11:18:28 +0530
-Message-ID: <20150820054828.GY13546@localhost>
+From: Rameshwar Sahu <rsahu@apm.com>
+Subject: Re: [PATCH v1 1/4] dmaengine: Add support for new feature CRC32C
+Date: Thu, 20 Aug 2015 11:59:07 +0530
+Message-ID: <CAFd313x+MD5C2stJ-YdKrt6Ywzt4_2GmK3pJTFjfwrhPnCdopQ@mail.gmail.com>
 References: <1438258268-3099-1-git-send-email-rsahu@apm.com>
- <1438258268-3099-4-git-send-email-rsahu@apm.com>
+	<1438258268-3099-2-git-send-email-rsahu@apm.com>
+	<20150820052631.GW13546@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: dan.j.williams@intel.com, herbert@gondor.apana.org.au,
+Content-Type: text/plain; charset=UTF-8
+Cc: dan.j.williams@intel.com, Herbert Xu <herbert@gondor.apana.org.au>,
 	davem@davemloft.net, linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org, arnd@arndb.de,
+	dmaengine@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
 	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, jcm@redhat.com,
 	patches@apm.com
-To: Rameshwar Prasad Sahu <rsahu@apm.com>
+To: Vinod Koul <vinod.koul@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:46008 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751158AbbHTFqX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 20 Aug 2015 01:46:23 -0400
-Content-Disposition: inline
-In-Reply-To: <1438258268-3099-4-git-send-email-rsahu@apm.com>
+Received: from mail-ig0-f182.google.com ([209.85.213.182]:37422 "EHLO
+	mail-ig0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752255AbbHTG3H (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 20 Aug 2015 02:29:07 -0400
+Received: by igui7 with SMTP id i7so23586289igu.0
+        for <linux-crypto@vger.kernel.org>; Wed, 19 Aug 2015 23:29:07 -0700 (PDT)
+In-Reply-To: <20150820052631.GW13546@localhost>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 30, 2015 at 05:41:07PM +0530, Rameshwar Prasad Sahu wrote:
-> +	nents = sg_nents(req->src);
-> +	sg_count = dma_map_sg(dev, req->src, nents, DMA_TO_DEVICE);
-> +	if (!sg_count) {
-> +		dev_err(dev, "Failed to map src sg");
-> +		return -ENOMEM;
-mapping error shouldn't be no mem error
+Hi Vinod,
 
-> +	}
-> +
-> +	if (sg_count > XGENE_DMA_MAX_FLYBY_SRC_CNT) {
-> +		dev_err(dev, "Unsupported src sg len\n");
-would be worth printing length
+On Thu, Aug 20, 2015 at 10:56 AM, Vinod Koul <vinod.koul@intel.com> wrote:
+> On Thu, Jul 30, 2015 at 05:41:05PM +0530, Rameshwar Prasad Sahu wrote:
+>> This patch adds support for new feature CRC32C calculation in
+>> dmaengine framework.
+>
+> Looks okay can you please update Documentation also
 
-> +		goto err;
-> +	}
-> +
-> +	flags = DMA_CTRL_ACK;
-why ACK?
-
-> +
-> +	tx = dchan->device->device_prep_dma_crc32c(dchan, req->src,
-> +						   req->nbytes,
-> +						   reqctx->seed,
-> +						   req->result,
-> +						   flags);
-We should add helper for this
-
--- 
-~Vinod
+Thanks, I will update Documentation.
+>
+> --
+> ~Vinod
+>
