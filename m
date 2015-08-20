@@ -1,11 +1,11 @@
 From: Rameshwar Sahu <rsahu@apm.com>
-Subject: Re: [PATCH v1 2/4] dmaengine: xgene-dma: Add support for CRC32C
- calculation via DMA engine
-Date: Thu, 20 Aug 2015 12:23:50 +0530
-Message-ID: <CAFd313y3vTCzaGKY7ZVyFGDiSx+KuxQHyBwqKyB+xWfR5dtVSA@mail.gmail.com>
+Subject: Re: [PATCH v1 3/4] Crypto: Add support for APM X-Gene SoC CRC32C h/w
+ accelerator driver
+Date: Thu, 20 Aug 2015 12:31:44 +0530
+Message-ID: <CAFd313xG2_4NGHspuJwThY=jUSPiBm3egvXVvhv8XxKctgMv1A@mail.gmail.com>
 References: <1438258268-3099-1-git-send-email-rsahu@apm.com>
-	<1438258268-3099-3-git-send-email-rsahu@apm.com>
-	<20150820054034.GX13546@localhost>
+	<1438258268-3099-4-git-send-email-rsahu@apm.com>
+	<20150820054828.GY13546@localhost>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: dan.j.williams@intel.com, Herbert Xu <herbert@gondor.apana.org.au>,
@@ -15,55 +15,58 @@ Cc: dan.j.williams@intel.com, Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-arm-kernel@lists.infradead.org, jcm@redhat.com,
 	patches@apm.com
 To: Vinod Koul <vinod.koul@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150820054034.GX13546@localhost>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ig0-f181.google.com ([209.85.213.181]:33014 "EHLO
+	mail-ig0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751161AbbHTHBp (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 20 Aug 2015 03:01:45 -0400
+Received: by igfj19 with SMTP id j19so7556664igf.0
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Aug 2015 00:01:44 -0700 (PDT)
+In-Reply-To: <20150820054828.GY13546@localhost>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 Hi Vinod,
 
-On Thu, Aug 20, 2015 at 11:10 AM, Vinod Koul <vinod.koul@intel.com> wrote:
-> On Thu, Jul 30, 2015 at 05:41:06PM +0530, Rameshwar Prasad Sahu wrote:
->> +     /* Invalidate unused source address field */
->> +     for (; i < 4; i++)
->> +             xgene_dma_invalidate_buffer(xgene_dma_lookup_ext8(desc2, i));
->> +
->> +     /* Check whether requested buffer processed */
->> +     if (nbytes) {
->> +             chan_err(chan, "Src count crossed maximum limit\n");
->> +             return -EINVAL;
-> no cleanup ?
-Here not required, cleanup I am doing in parent function from where
-this function is getting called in case of failure.
+On Thu, Aug 20, 2015 at 11:18 AM, Vinod Koul <vinod.koul@intel.com> wrote:
+> On Thu, Jul 30, 2015 at 05:41:07PM +0530, Rameshwar Prasad Sahu wrote:
+>> +     nents = sg_nents(req->src);
+>> +     sg_count = dma_map_sg(dev, req->src, nents, DMA_TO_DEVICE);
+>> +     if (!sg_count) {
+>> +             dev_err(dev, "Failed to map src sg");
+>> +             return -ENOMEM;
+> mapping error shouldn't be no mem error
+Okay, I guess then -EIO will be fine here??
 >
->> +struct dma_async_tx_descriptor *xgene_dma_prep_flyby(
->> +     struct xgene_dma_chan *chan, struct scatterlist *src_sg,
->> +     size_t len, u32 seed, u8 *result, unsigned long flags, u8 opcode)
-> please fix style here
+>> +     }
+>> +
+>> +     if (sg_count > XGENE_DMA_MAX_FLYBY_SRC_CNT) {
+>> +             dev_err(dev, "Unsupported src sg len\n");
+> would be worth printing length
+Okay,
+>
+>> +             goto err;
+>> +     }
+>> +
+>> +     flags = DMA_CTRL_ACK;
+> why ACK?
+My understanding about DMA_CTRL_ACK is dma engine driver can
+re-use/free this descriptor once operation completed in cleanup path.
+Am I correct ??
+But yes, I need to look on this because recently you have added one
+more descriptor flag.
 
-Could you explain me What kind of coding style you would like here ??
 >
->> +struct dma_async_tx_descriptor *xgene_dma_prep_crc32c(
->> +     struct dma_chan *dchan, struct scatterlist *src_sg,
->> +     size_t len, u32 seed, u8 *result, unsigned long flags)
-> here too
->
->> @@ -1309,8 +1512,13 @@ static void xgene_dma_setup_ring(struct xgene_dma_ring *ring)
->>                 ring->pdma->csr_ring + XGENE_DMA_RING_ID);
->>
->>       /* Set DMA ring buffer */
->> -     iowrite32(XGENE_DMA_RING_ID_BUF_SETUP(ring->num),
->> -               ring->pdma->csr_ring + XGENE_DMA_RING_ID_BUF);
->> +     ring_id_buf = XGENE_DMA_RING_ID_BUF_SETUP(ring->num);
 >> +
->> +     if (ring->is_bufpool)
->> +             ring_id_buf |= XGENE_DMA_RING_IS_BUFPOOL;
->> +
->> +     iowrite32(ring_id_buf, ring->pdma->csr_ring +
->> +               XGENE_DMA_RING_ID_BUF);
-> pls fix style here
-I didn't see any alignment issue here, just follow checkpatch that
-argument should start just after "function(" in next line also.
+>> +     tx = dchan->device->device_prep_dma_crc32c(dchan, req->src,
+>> +                                                req->nbytes,
+>> +                                                reqctx->seed,
+>> +                                                req->result,
+>> +                                                flags);
+> We should add helper for this
+Okay
 >
 > --
 > ~Vinod
+>
