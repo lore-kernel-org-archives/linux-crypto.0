@@ -1,47 +1,48 @@
-From: Stephan Mueller <smueller@chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 1/2] crypto: skcipher - Add top-level skcipher interface
-Date: Fri, 21 Aug 2015 11:24:08 +0200
-Message-ID: <3197252.zpooAnFuUp@tauon.atsec.com>
-References: <20150820072055.GA27176@gondor.apana.org.au> <E1ZSKAT-00075n-MI@gondolin.me.apana.org.au>
+Date: Fri, 21 Aug 2015 17:27:54 +0800
+Message-ID: <20150821092754.GA6854@gondor.apana.org.au>
+References: <20150820072055.GA27176@gondor.apana.org.au>
+ <E1ZSKAT-00075n-MI@gondolin.me.apana.org.au>
+ <3197252.zpooAnFuUp@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=us-ascii
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:48139 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752256AbbHUJYS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Aug 2015 05:24:18 -0400
-In-Reply-To: <E1ZSKAT-00075n-MI@gondolin.me.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:51133 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753375AbbHUJ16 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 21 Aug 2015 05:27:58 -0400
+Content-Disposition: inline
+In-Reply-To: <3197252.zpooAnFuUp@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 20. August 2015, 15:21:45 schrieb Herbert Xu:
+On Fri, Aug 21, 2015 at 11:24:08AM +0200, Stephan Mueller wrote:
+> 
+> If I understand the patch set correctly, a caller uses the skcipher API and 
+> the API sets up the synchronous or asynchronous callbacks depending on the 
+> chosen cipher implementation.
+> 
+> Now, does a caller always need to create an skcipher_request and always need 
+> the async logic of providing a callback function and the like, even though a 
+> synchronous cipher is chosen? I.e. the caller has no means to use a 
+> synchronous cipher operation any more.
+> 
+> It looks to me like that, but I would like to confirm.
 
-Hi Herbert,
+No you can still use it synchronously.  When allocating it you
+should do this:
 
->This patch introduces the crypto skcipher interface which aims
->to replace both blkcipher and ablkcipher.
->
->It's very similar to the existing ablkcipher interface.  The
->main difference is the removal of the givcrypt interface.  In
->order to make the transition easier for blkcipher users, there
->is a helper SKCIPHER_REQUEST_ON_STACK which can be used to place
->a request on the stack for synchronous transforms.
+	crypto_alloc_skcipher(name, 0, CRYPTO_ALG_ASYNC)
 
-If I understand the patch set correctly, a caller uses the skcipher API and 
-the API sets up the synchronous or asynchronous callbacks depending on the 
-chosen cipher implementation.
+When setting up the request just leave the callback and data as
+NULL.
 
-Now, does a caller always need to create an skcipher_request and always need 
-the async logic of providing a callback function and the like, even though a 
-synchronous cipher is chosen? I.e. the caller has no means to use a 
-synchronous cipher operation any more.
-
-It looks to me like that, but I would like to confirm.
-
-Thank you.
-
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
