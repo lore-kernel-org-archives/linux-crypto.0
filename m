@@ -1,48 +1,54 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: skcipher - Add top-level skcipher interface
-Date: Fri, 21 Aug 2015 17:27:54 +0800
-Message-ID: <20150821092754.GA6854@gondor.apana.org.au>
-References: <20150820072055.GA27176@gondor.apana.org.au>
- <E1ZSKAT-00075n-MI@gondolin.me.apana.org.au>
- <3197252.zpooAnFuUp@tauon.atsec.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
+From: Fabio Estevam <festevam@gmail.com>
+Subject: [PATCH 4/4] crypto: caam: ctrl: Use devm_kcalloc()
+Date: Fri, 21 Aug 2015 11:49:30 -0300
+Message-ID: <1440168570-13635-4-git-send-email-festevam@gmail.com>
+References: <1440168570-13635-1-git-send-email-festevam@gmail.com>
+Cc: vicki.milhoan@freescale.com, horia.geanta@freescale.com,
+	linux-crypto@vger.kernel.org,
+	Fabio Estevam <fabio.estevam@freescale.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51133 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753375AbbHUJ16 (ORCPT
+Received: from mail-yk0-f177.google.com ([209.85.160.177]:33416 "EHLO
+	mail-yk0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752261AbbHUOuF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Aug 2015 05:27:58 -0400
-Content-Disposition: inline
-In-Reply-To: <3197252.zpooAnFuUp@tauon.atsec.com>
+	Fri, 21 Aug 2015 10:50:05 -0400
+Received: by ykll84 with SMTP id l84so72374926ykl.0
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Aug 2015 07:50:04 -0700 (PDT)
+In-Reply-To: <1440168570-13635-1-git-send-email-festevam@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 21, 2015 at 11:24:08AM +0200, Stephan Mueller wrote:
-> 
-> If I understand the patch set correctly, a caller uses the skcipher API and 
-> the API sets up the synchronous or asynchronous callbacks depending on the 
-> chosen cipher implementation.
-> 
-> Now, does a caller always need to create an skcipher_request and always need 
-> the async logic of providing a callback function and the like, even though a 
-> synchronous cipher is chosen? I.e. the caller has no means to use a 
-> synchronous cipher operation any more.
-> 
-> It looks to me like that, but I would like to confirm.
+From: Fabio Estevam <fabio.estevam@freescale.com>
 
-No you can still use it synchronously.  When allocating it you
-should do this:
+>From Documentation/CodingStyle:
 
-	crypto_alloc_skcipher(name, 0, CRYPTO_ALG_ASYNC)
+"The preferred form for allocating a zeroed array is the following:
 
-When setting up the request just leave the callback and data as
-NULL.
+	p = kcalloc(n, sizeof(...), ...); "
 
-Cheers,
+, so do as suggested.
+
+Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
+---
+ drivers/crypto/caam/ctrl.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index aab8b2a..c9c5892 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -581,9 +581,8 @@ static int caam_probe(struct platform_device *pdev)
+ 		    of_device_is_compatible(np, "fsl,sec4.0-job-ring"))
+ 			rspec++;
+ 
+-	ctrlpriv->jrpdev = devm_kzalloc(&pdev->dev,
+-					sizeof(struct platform_device *) * rspec,
+-					GFP_KERNEL);
++	ctrlpriv->jrpdev = devm_kcalloc(&pdev->dev, rspec,
++					sizeof(*ctrlpriv->jrpdev), GFP_KERNEL);
+ 	if (ctrlpriv->jrpdev == NULL) {
+ 		ret = -ENOMEM;
+ 		goto iounmap_ctrl;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
