@@ -1,50 +1,58 @@
-From: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH 4/4] crypto: caam: ctrl: Use devm_kcalloc()
-Date: Fri, 21 Aug 2015 18:42:53 +0300
-Message-ID: <55D746FD.8090200@freescale.com>
-References: <1440168570-13635-1-git-send-email-festevam@gmail.com>
- <1440168570-13635-4-git-send-email-festevam@gmail.com>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@freescale.com>
+Subject: [PATCH] crypto: caam - fix writing to JQCR_MS when using service interface
+Date: Fri, 21 Aug 2015 18:53:20 +0300
+Message-ID: <1440172400-3333-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <vicki.milhoan@freescale.com>, <linux-crypto@vger.kernel.org>,
-	"Fabio Estevam" <fabio.estevam@freescale.com>
-To: Fabio Estevam <festevam@gmail.com>, <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1on0118.outbound.protection.outlook.com ([157.56.110.118]:17488
+Received: from mail-bn1bon0140.outbound.protection.outlook.com ([157.56.111.140]:48032
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752177AbbHUPnK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Aug 2015 11:43:10 -0400
-In-Reply-To: <1440168570-13635-4-git-send-email-festevam@gmail.com>
+	id S1751848AbbHUPxn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 21 Aug 2015 11:53:43 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 8/21/2015 5:49 PM, Fabio Estevam wrote:
-> From: Fabio Estevam <fabio.estevam@freescale.com>
-> 
->>From Documentation/CodingStyle:
-> 
-> "The preferred form for allocating a zeroed array is the following:
-> 
-> 	p = kcalloc(n, sizeof(...), ...); "
-> 
-> , so do as suggested.
-> 
-> Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
+Most significant part of JQCR (Job Queue Control Register) contains
+bits that control endianness: ILE - Immediate Little Endian,
+DWS - Double Word Swap.
+The bits are automatically set by the Job Queue Controller HW.
 
-While here, you could also address the following:
-drivers/crypto/caam/caamalg.c:4317
-drivers/crypto/caam/caamhash.c:1844
-drivers/crypto/caam/caamrng.c:354
-drivers/crypto/caam/jr.c:413
-drivers/crypto/caam/jr.c:418
-drivers/crypto/caam/jr.c:423
-drivers/crypto/caam/jr.c:482
-(and any other place that I might've missed).
+Unfortunately these bits are cleared in SW when submitting descriptors
+via the register-based service interface.
+=46rom LS1021A:
+JQCR_MS =3D 08080100 - before writing: ILE | DWS | SRC (JR0)
+JQCR_MS =3D 30000100 - after writing: WHL | FOUR | SRC (JR0)
 
-Since related, I guess the changes (3/4, 4/4 and above) could live in a
-single patch.
+This would cause problems on little endian caam for descriptors
+containing immediata data or double-word pointers.
+Currently there is no problem since the only descriptors ran through
+this interface are the ones that (un)instantiate RNG.
 
-Thanks,
-Horia
+Signed-off-by: Horia Geant=C4=83 <horia.geanta@freescale.com>
+---
+
+It does not affect current driver, thus not Cc-ing stable.
+
+ drivers/crypto/caam/ctrl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 81b552d1ad91..09c16f5ea97d 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -139,7 +139,7 @@ static inline int run_descriptor_deco0(struct devic=
+e *ctrldev, u32 *desc,
+ 		flags |=3D DECO_JQCR_FOUR;
+=20
+ 	/* Instruct the DECO to execute it */
+-	wr_reg32(&deco->jr_ctl_hi, flags);
++	setbits32(&deco->jr_ctl_hi, flags);
+=20
+ 	timeout =3D 10000000;
+ 	do {
+--=20
+2.4.4
