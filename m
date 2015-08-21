@@ -1,132 +1,35 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: [PATCH v2 1/3] crypto: caam: ctrl: Fix the error handling
-Date: Fri, 21 Aug 2015 13:16:42 -0300
-Message-ID: <1440173804-26780-1-git-send-email-festevam@gmail.com>
-Cc: vicki.milhoan@freescale.com, horia.geanta@freescale.com,
-	linux-crypto@vger.kernel.org,
-	Fabio Estevam <fabio.estevam@freescale.com>
-To: herbert@gondor.apana.org.au
+From: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH v2 1/3] crypto: caam: ctrl: Fix the error handling
+Date: Fri, 21 Aug 2015 19:37:58 +0300
+Message-ID: <55D753E6.6060103@freescale.com>
+References: <1440173804-26780-1-git-send-email-festevam@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <vicki.milhoan@freescale.com>, <linux-crypto@vger.kernel.org>,
+	"Fabio Estevam" <fabio.estevam@freescale.com>
+To: Fabio Estevam <festevam@gmail.com>, <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yk0-f175.google.com ([209.85.160.175]:35727 "EHLO
-	mail-yk0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751302AbbHUQRI (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Aug 2015 12:17:08 -0400
-Received: by ykbi184 with SMTP id i184so75139314ykb.2
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Aug 2015 09:17:07 -0700 (PDT)
+Received: from mail-bn1bn0105.outbound.protection.outlook.com ([157.56.110.105]:6496
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751602AbbHUQiS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 21 Aug 2015 12:38:18 -0400
+In-Reply-To: <1440173804-26780-1-git-send-email-festevam@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Fabio Estevam <fabio.estevam@freescale.com>
+On 8/21/2015 7:16 PM, Fabio Estevam wrote:
+> From: Fabio Estevam <fabio.estevam@freescale.com>
+>=20
+> In the error path we should disable the resources that were previousl=
+y
+> acquired, so fix the error handling accordingly.
+>=20
+> Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
 
-In the error path we should disable the resources that were previously
-acquired, so fix the error handling accordingly.
+=46or the series:
+Reviewed-by: Horia Geant=C4=83 <horia.geanta@freescale.com>
 
-Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
----
-Changes since v1:
-- None
-
- drivers/crypto/caam/ctrl.c | 35 ++++++++++++++++++++++++-----------
- 1 file changed, 24 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 81b552d..9c5ca46 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -474,27 +474,27 @@ static int caam_probe(struct platform_device *pdev)
- 	ret = clk_prepare_enable(ctrlpriv->caam_ipg);
- 	if (ret < 0) {
- 		dev_err(&pdev->dev, "can't enable CAAM ipg clock: %d\n", ret);
--		return -ENODEV;
-+		return ret;
- 	}
- 
- 	ret = clk_prepare_enable(ctrlpriv->caam_mem);
- 	if (ret < 0) {
- 		dev_err(&pdev->dev, "can't enable CAAM secure mem clock: %d\n",
- 			ret);
--		return -ENODEV;
-+		goto disable_caam_ipg;
- 	}
- 
- 	ret = clk_prepare_enable(ctrlpriv->caam_aclk);
- 	if (ret < 0) {
- 		dev_err(&pdev->dev, "can't enable CAAM aclk clock: %d\n", ret);
--		return -ENODEV;
-+		goto disable_caam_mem;
- 	}
- 
- 	ret = clk_prepare_enable(ctrlpriv->caam_emi_slow);
- 	if (ret < 0) {
- 		dev_err(&pdev->dev, "can't enable CAAM emi slow clock: %d\n",
- 			ret);
--		return -ENODEV;
-+		goto disable_caam_aclk;
- 	}
- 
- 	/* Get configuration properties from device tree */
-@@ -502,7 +502,7 @@ static int caam_probe(struct platform_device *pdev)
- 	ctrl = of_iomap(nprop, 0);
- 	if (ctrl == NULL) {
- 		dev_err(dev, "caam: of_iomap() failed\n");
--		return -ENOMEM;
-+		goto disable_caam_emi_slow;
- 	}
- 	/* Finding the page size for using the CTPR_MS register */
- 	comp_params = rd_reg32(&ctrl->perfmon.comp_parms_ms);
-@@ -586,8 +586,8 @@ static int caam_probe(struct platform_device *pdev)
- 					sizeof(struct platform_device *) * rspec,
- 					GFP_KERNEL);
- 	if (ctrlpriv->jrpdev == NULL) {
--		iounmap(ctrl);
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto iounmap_ctrl;
- 	}
- 
- 	ring = 0;
-@@ -627,8 +627,8 @@ static int caam_probe(struct platform_device *pdev)
- 	/* If no QI and no rings specified, quit and go home */
- 	if ((!ctrlpriv->qi_present) && (!ctrlpriv->total_jobrs)) {
- 		dev_err(dev, "no queues configured, terminating\n");
--		caam_remove(pdev);
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto caam_remove;
- 	}
- 
- 	cha_vid_ls = rd_reg32(&ctrl->perfmon.cha_id_ls);
-@@ -685,8 +685,7 @@ static int caam_probe(struct platform_device *pdev)
- 		} while ((ret == -EAGAIN) && (ent_delay < RTSDCTL_ENT_DLY_MAX));
- 		if (ret) {
- 			dev_err(dev, "failed to instantiate RNG");
--			caam_remove(pdev);
--			return ret;
-+			goto caam_remove;
- 		}
- 		/*
- 		 * Set handles init'ed by this module as the complement of the
-@@ -790,6 +789,20 @@ static int caam_probe(struct platform_device *pdev)
- 						 &ctrlpriv->ctl_tdsk_wrap);
- #endif
- 	return 0;
-+
-+caam_remove:
-+	caam_remove(pdev);
-+iounmap_ctrl:
-+	iounmap(ctrl);
-+disable_caam_emi_slow:
-+	clk_disable_unprepare(ctrlpriv->caam_emi_slow);
-+disable_caam_aclk:
-+	clk_disable_unprepare(ctrlpriv->caam_aclk);
-+disable_caam_mem:
-+	clk_disable_unprepare(ctrlpriv->caam_mem);
-+disable_caam_ipg:
-+	clk_disable_unprepare(ctrlpriv->caam_ipg);
-+	return ret;
- }
- 
- static struct of_device_id caam_match[] = {
--- 
-1.9.1
+Thanks!
+Horia
