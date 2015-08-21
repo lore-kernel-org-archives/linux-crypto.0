@@ -1,41 +1,47 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [patch] crypto: qat - silence a static checker warning
-Date: Fri, 21 Aug 2015 11:47:45 +0300
-Message-ID: <20150821084745.GB25369@mwanda>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 1/2] crypto: skcipher - Add top-level skcipher interface
+Date: Fri, 21 Aug 2015 11:24:08 +0200
+Message-ID: <3197252.zpooAnFuUp@tauon.atsec.com>
+References: <20150820072055.GA27176@gondor.apana.org.au> <E1ZSKAT-00075n-MI@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Allan, Bruce W" <bruce.w.allan@intel.com>,
-	Ahsan Atta <ahsan.atta@intel.com>, qat-linux@intel.com,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Content-Disposition: inline
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:48139 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752256AbbHUJYS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 21 Aug 2015 05:24:18 -0400
+In-Reply-To: <E1ZSKAT-00075n-MI@gondolin.me.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-My static checker assumes that if we are getting numbers as a string
-using kstrotoint() then that means they come from outside the kernel and
-are untrustworthy.
+Am Donnerstag, 20. August 2015, 15:21:45 schrieb Herbert Xu:
 
-This may or may not be true in this case, but it seems harmless to add
-a range check here.
+Hi Herbert,
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+>This patch introduces the crypto skcipher interface which aims
+>to replace both blkcipher and ablkcipher.
+>
+>It's very similar to the existing ablkcipher interface.  The
+>main difference is the removal of the givcrypt interface.  In
+>order to make the transition easier for blkcipher users, there
+>is a helper SKCIPHER_REQUEST_ON_STACK which can be used to place
+>a request on the stack for synchronous transforms.
 
-diff --git a/drivers/crypto/qat/qat_common/adf_transport.c b/drivers/crypto/qat/qat_common/adf_transport.c
-index d5d8198..ec3abf9 100644
---- a/drivers/crypto/qat/qat_common/adf_transport.c
-+++ b/drivers/crypto/qat/qat_common/adf_transport.c
-@@ -264,6 +264,10 @@ int adf_create_ring(struct adf_accel_dev *accel_dev, const char *section,
- 		dev_err(&GET_DEV(accel_dev), "Can't get ring number\n");
- 		return -EFAULT;
- 	}
-+	if (ring_num >= ARRAY_SIZE(bank->rings)) {
-+		dev_err(&GET_DEV(accel_dev), "Invalid ring number\n");
-+		return -EFAULT;
-+	}
- 
- 	bank = &transport_data->banks[bank_num];
- 	if (adf_reserve_ring(bank, ring_num)) {
+If I understand the patch set correctly, a caller uses the skcipher API and 
+the API sets up the synchronous or asynchronous callbacks depending on the 
+chosen cipher implementation.
+
+Now, does a caller always need to create an skcipher_request and always need 
+the async logic of providing a callback function and the like, even though a 
+synchronous cipher is chosen? I.e. the caller has no means to use a 
+synchronous cipher operation any more.
+
+It looks to me like that, but I would like to confirm.
+
+Thank you.
+
+Ciao
+Stephan
