@@ -1,54 +1,129 @@
 From: Fabio Estevam <festevam@gmail.com>
-Subject: [PATCH 4/4] crypto: caam: ctrl: Use devm_kcalloc()
-Date: Fri, 21 Aug 2015 11:49:30 -0300
-Message-ID: <1440168570-13635-4-git-send-email-festevam@gmail.com>
-References: <1440168570-13635-1-git-send-email-festevam@gmail.com>
+Subject: [PATCH 1/4] crypto: caam: ctrl: Fix the error handling
+Date: Fri, 21 Aug 2015 11:49:27 -0300
+Message-ID: <1440168570-13635-1-git-send-email-festevam@gmail.com>
 Cc: vicki.milhoan@freescale.com, horia.geanta@freescale.com,
 	linux-crypto@vger.kernel.org,
 	Fabio Estevam <fabio.estevam@freescale.com>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yk0-f177.google.com ([209.85.160.177]:33416 "EHLO
-	mail-yk0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752261AbbHUOuF (ORCPT
+Received: from mail-yk0-f175.google.com ([209.85.160.175]:34725 "EHLO
+	mail-yk0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751955AbbHUOt7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Aug 2015 10:50:05 -0400
-Received: by ykll84 with SMTP id l84so72374926ykl.0
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Aug 2015 07:50:04 -0700 (PDT)
-In-Reply-To: <1440168570-13635-1-git-send-email-festevam@gmail.com>
+	Fri, 21 Aug 2015 10:49:59 -0400
+Received: by ykdt205 with SMTP id t205so72727088ykd.1
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Aug 2015 07:49:58 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Fabio Estevam <fabio.estevam@freescale.com>
 
->From Documentation/CodingStyle:
-
-"The preferred form for allocating a zeroed array is the following:
-
-	p = kcalloc(n, sizeof(...), ...); "
-
-, so do as suggested.
+In the error path we should disable the resources that were previously
+acquired, so fix the error handling accordingly.
 
 Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
 ---
- drivers/crypto/caam/ctrl.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/crypto/caam/ctrl.c | 35 ++++++++++++++++++++++++-----------
+ 1 file changed, 24 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index aab8b2a..c9c5892 100644
+index 81b552d..9c5ca46 100644
 --- a/drivers/crypto/caam/ctrl.c
 +++ b/drivers/crypto/caam/ctrl.c
-@@ -581,9 +581,8 @@ static int caam_probe(struct platform_device *pdev)
- 		    of_device_is_compatible(np, "fsl,sec4.0-job-ring"))
- 			rspec++;
+@@ -474,27 +474,27 @@ static int caam_probe(struct platform_device *pdev)
+ 	ret = clk_prepare_enable(ctrlpriv->caam_ipg);
+ 	if (ret < 0) {
+ 		dev_err(&pdev->dev, "can't enable CAAM ipg clock: %d\n", ret);
+-		return -ENODEV;
++		return ret;
+ 	}
  
--	ctrlpriv->jrpdev = devm_kzalloc(&pdev->dev,
--					sizeof(struct platform_device *) * rspec,
--					GFP_KERNEL);
-+	ctrlpriv->jrpdev = devm_kcalloc(&pdev->dev, rspec,
-+					sizeof(*ctrlpriv->jrpdev), GFP_KERNEL);
+ 	ret = clk_prepare_enable(ctrlpriv->caam_mem);
+ 	if (ret < 0) {
+ 		dev_err(&pdev->dev, "can't enable CAAM secure mem clock: %d\n",
+ 			ret);
+-		return -ENODEV;
++		goto disable_caam_ipg;
+ 	}
+ 
+ 	ret = clk_prepare_enable(ctrlpriv->caam_aclk);
+ 	if (ret < 0) {
+ 		dev_err(&pdev->dev, "can't enable CAAM aclk clock: %d\n", ret);
+-		return -ENODEV;
++		goto disable_caam_mem;
+ 	}
+ 
+ 	ret = clk_prepare_enable(ctrlpriv->caam_emi_slow);
+ 	if (ret < 0) {
+ 		dev_err(&pdev->dev, "can't enable CAAM emi slow clock: %d\n",
+ 			ret);
+-		return -ENODEV;
++		goto disable_caam_aclk;
+ 	}
+ 
+ 	/* Get configuration properties from device tree */
+@@ -502,7 +502,7 @@ static int caam_probe(struct platform_device *pdev)
+ 	ctrl = of_iomap(nprop, 0);
+ 	if (ctrl == NULL) {
+ 		dev_err(dev, "caam: of_iomap() failed\n");
+-		return -ENOMEM;
++		goto disable_caam_emi_slow;
+ 	}
+ 	/* Finding the page size for using the CTPR_MS register */
+ 	comp_params = rd_reg32(&ctrl->perfmon.comp_parms_ms);
+@@ -586,8 +586,8 @@ static int caam_probe(struct platform_device *pdev)
+ 					sizeof(struct platform_device *) * rspec,
+ 					GFP_KERNEL);
  	if (ctrlpriv->jrpdev == NULL) {
- 		ret = -ENOMEM;
- 		goto iounmap_ctrl;
+-		iounmap(ctrl);
+-		return -ENOMEM;
++		ret = -ENOMEM;
++		goto iounmap_ctrl;
+ 	}
+ 
+ 	ring = 0;
+@@ -627,8 +627,8 @@ static int caam_probe(struct platform_device *pdev)
+ 	/* If no QI and no rings specified, quit and go home */
+ 	if ((!ctrlpriv->qi_present) && (!ctrlpriv->total_jobrs)) {
+ 		dev_err(dev, "no queues configured, terminating\n");
+-		caam_remove(pdev);
+-		return -ENOMEM;
++		ret = -ENOMEM;
++		goto caam_remove;
+ 	}
+ 
+ 	cha_vid_ls = rd_reg32(&ctrl->perfmon.cha_id_ls);
+@@ -685,8 +685,7 @@ static int caam_probe(struct platform_device *pdev)
+ 		} while ((ret == -EAGAIN) && (ent_delay < RTSDCTL_ENT_DLY_MAX));
+ 		if (ret) {
+ 			dev_err(dev, "failed to instantiate RNG");
+-			caam_remove(pdev);
+-			return ret;
++			goto caam_remove;
+ 		}
+ 		/*
+ 		 * Set handles init'ed by this module as the complement of the
+@@ -790,6 +789,20 @@ static int caam_probe(struct platform_device *pdev)
+ 						 &ctrlpriv->ctl_tdsk_wrap);
+ #endif
+ 	return 0;
++
++caam_remove:
++	caam_remove(pdev);
++iounmap_ctrl:
++	iounmap(ctrl);
++disable_caam_emi_slow:
++	clk_disable_unprepare(ctrlpriv->caam_emi_slow);
++disable_caam_aclk:
++	clk_disable_unprepare(ctrlpriv->caam_aclk);
++disable_caam_mem:
++	clk_disable_unprepare(ctrlpriv->caam_mem);
++disable_caam_ipg:
++	clk_disable_unprepare(ctrlpriv->caam_ipg);
++	return ret;
+ }
+ 
+ static struct of_device_id caam_match[] = {
 -- 
 1.9.1
