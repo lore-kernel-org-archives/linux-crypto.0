@@ -1,39 +1,43 @@
 From: Leonidas S Barbosa <leosilva@linux.vnet.ibm.com>
-Subject: Re: [PATCH 1/2] Fixing vmx-crypto AES-CTR counter bug
-Date: Fri, 21 Aug 2015 17:15:24 -0300
-Message-ID: <20150821201522.GA18207@bluepex.com>
-References: <20150814131218.GA11746@bluepex.com>
- <CAP=VYLr59L+1fi0UDjQPVmEOUbT-KnmpLY562mACHxsRqHEk3A@mail.gmail.com>
+Subject: [PATCH] Fixing opcode issue on vmx-crypto
+Date: Fri, 21 Aug 2015 17:27:43 -0300
+Message-ID: <20150821202740.GA25407@bluepex.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Cc: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	LKML <linux-kernel@vger.kernel.org>,
+Cc: LKML <linux-kernel@vger.kernel.org>,
 	Paulo Smorigo <pfsmorigo@linux.vnet.ibm.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	"linux-next@vger.kernel.org" <linux-next@vger.kernel.org>
-To: Paul Gortmaker <paul.gortmaker@windriver.com>
+	linux-next@vger.kernel.org,
+	Paul Gortmaker <paul.gortmaker@windriver.com>
+To: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAP=VYLr59L+1fi0UDjQPVmEOUbT-KnmpLY562mACHxsRqHEk3A@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 21, 2015 at 03:19:18PM -0400, Paul Gortmaker wrote:
-> On Fri, Aug 14, 2015 at 9:12 AM, Leonidas S Barbosa
-> <leosilva@linux.vnet.ibm.com> wrote:
-> > AES-CTR is using a counter 8bytes-8bytes what miss match with
-> > kernel specs.
-> >
-> > In the previous code a vadduwm was done to increment counter.
-> > Replacing this for a vadduqm now considering both cases counter
-> > 8-8 bytes and full 16bytes.
-> 
-> Seems this breaks ppc allmodconfig:
-> 
-> drivers/crypto/vmx/aesp8-ppc.S:1545: Error: Unrecognized opcode: `vadduqm'
 
-Thanks for report,
+In build time vadduqm opcode  is not being mapped
+correctly.
 
-I could not reproduce this issue, but I believe it's a opcode map error
-on ppc-xlate.pl. Sending a patch followed by this email you CCed.
+Adding a new map in ppc-xlate to do this.
+
+Signed-off-by: Leonidas S Barbosa <leosilva@linux.vnet.ibm.com>
+---
+ drivers/crypto/vmx/ppc-xlate.pl | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/crypto/vmx/ppc-xlate.pl b/drivers/crypto/vmx/ppc-xlate.pl
+index a591884..b999733 100644
+--- a/drivers/crypto/vmx/ppc-xlate.pl
++++ b/drivers/crypto/vmx/ppc-xlate.pl
+@@ -169,6 +169,7 @@ my $vpmsumd	= sub { vcrypto_op(@_, 1224); };
+ my $vpmsubh	= sub { vcrypto_op(@_, 1096); };
+ my $vpmsumw	= sub { vcrypto_op(@_, 1160); };
+ my $vaddudm	= sub { vcrypto_op(@_, 192);  };
++my $vadduqm	= sub { vcrypto_op(@_, 256);  };
+
+ my $mtsle	= sub {
+     my ($f, $arg) = @_;
+--
+2.1.0
