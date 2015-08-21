@@ -1,43 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: un4i-ss-cipher.c warning
-Date: Fri, 21 Aug 2015 06:08:18 +0800
-Message-ID: <20150820220818.GA2850@gondor.apana.org.au>
-References: <CAOMqctShdb9xEkBmuaQKfB1cwGupbfH5TS5ZB_P85Hwpn+4zAA@mail.gmail.com>
- <55D5DC97.1040209@gmail.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [patch] crypto: qat - silence a static checker warning
+Date: Fri, 21 Aug 2015 11:47:45 +0300
+Message-ID: <20150821084745.GB25369@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Michal Suchanek <hramrach@gmail.com>,
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Maxime Ripard <maxime.ripard@free-electrons.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
-To: Corentin LABBE <clabbe.montjoie@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54364 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752107AbbHTWI3 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 20 Aug 2015 18:08:29 -0400
+	"Allan, Bruce W" <bruce.w.allan@intel.com>,
+	Ahsan Atta <ahsan.atta@intel.com>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <55D5DC97.1040209@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Aug 20, 2015 at 03:56:39PM +0200, Corentin LABBE wrote:
-> 
-> Thanks for the report, strange that I do not have that warning.
-> todo is always initialized, since oleft and ileft are always > 0 at start.
-> But setting todo to 0 is a simple fix.
-> The following patch will suppress the warning.
+My static checker assumes that if we are getting numbers as a string
+using kstrotoint() then that means they come from outside the kernel and
+are untrustworthy.
 
-Nack.  Please do not fix spurious uninitialised warnings in this
-way.  Not only is this pointless but if someone introduced a real
-uninitialised bug later on we'd never catch it because of this.
+This may or may not be true in this case, but it seems harmless to add
+a range check here.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+
+diff --git a/drivers/crypto/qat/qat_common/adf_transport.c b/drivers/crypto/qat/qat_common/adf_transport.c
+index d5d8198..ec3abf9 100644
+--- a/drivers/crypto/qat/qat_common/adf_transport.c
++++ b/drivers/crypto/qat/qat_common/adf_transport.c
+@@ -264,6 +264,10 @@ int adf_create_ring(struct adf_accel_dev *accel_dev, const char *section,
+ 		dev_err(&GET_DEV(accel_dev), "Can't get ring number\n");
+ 		return -EFAULT;
+ 	}
++	if (ring_num >= ARRAY_SIZE(bank->rings)) {
++		dev_err(&GET_DEV(accel_dev), "Invalid ring number\n");
++		return -EFAULT;
++	}
+ 
+ 	bank = &transport_data->banks[bank_num];
+ 	if (adf_reserve_ring(bank, ring_num)) {
