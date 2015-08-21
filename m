@@ -1,52 +1,50 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: [PATCH 3/4] crypto: caam: ctrl: Use the preferred method for devm_kzalloc()
-Date: Fri, 21 Aug 2015 11:49:29 -0300
-Message-ID: <1440168570-13635-3-git-send-email-festevam@gmail.com>
+From: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH 4/4] crypto: caam: ctrl: Use devm_kcalloc()
+Date: Fri, 21 Aug 2015 18:42:53 +0300
+Message-ID: <55D746FD.8090200@freescale.com>
 References: <1440168570-13635-1-git-send-email-festevam@gmail.com>
-Cc: vicki.milhoan@freescale.com, horia.geanta@freescale.com,
-	linux-crypto@vger.kernel.org,
-	Fabio Estevam <fabio.estevam@freescale.com>
-To: herbert@gondor.apana.org.au
+ <1440168570-13635-4-git-send-email-festevam@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <vicki.milhoan@freescale.com>, <linux-crypto@vger.kernel.org>,
+	"Fabio Estevam" <fabio.estevam@freescale.com>
+To: Fabio Estevam <festevam@gmail.com>, <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yk0-f181.google.com ([209.85.160.181]:35647 "EHLO
-	mail-yk0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752261AbbHUOuD (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Aug 2015 10:50:03 -0400
-Received: by ykbi184 with SMTP id i184so72362628ykb.2
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Aug 2015 07:50:02 -0700 (PDT)
-In-Reply-To: <1440168570-13635-1-git-send-email-festevam@gmail.com>
+Received: from mail-bn1on0118.outbound.protection.outlook.com ([157.56.110.118]:17488
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752177AbbHUPnK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 21 Aug 2015 11:43:10 -0400
+In-Reply-To: <1440168570-13635-4-git-send-email-festevam@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Fabio Estevam <fabio.estevam@freescale.com>
+On 8/21/2015 5:49 PM, Fabio Estevam wrote:
+> From: Fabio Estevam <fabio.estevam@freescale.com>
+> 
+>>From Documentation/CodingStyle:
+> 
+> "The preferred form for allocating a zeroed array is the following:
+> 
+> 	p = kcalloc(n, sizeof(...), ...); "
+> 
+> , so do as suggested.
+> 
+> Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
 
->From Documentation/CodingStyle:
+While here, you could also address the following:
+drivers/crypto/caam/caamalg.c:4317
+drivers/crypto/caam/caamhash.c:1844
+drivers/crypto/caam/caamrng.c:354
+drivers/crypto/caam/jr.c:413
+drivers/crypto/caam/jr.c:418
+drivers/crypto/caam/jr.c:423
+drivers/crypto/caam/jr.c:482
+(and any other place that I might've missed).
 
-"The preferred form for passing a size of a struct is the following:
+Since related, I guess the changes (3/4, 4/4 and above) could live in a
+single patch.
 
-	p = kmalloc(sizeof(*p), ...);"
-
-, so do as suggested.
-
-Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
----
- drivers/crypto/caam/ctrl.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 1153417..aab8b2a 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -424,8 +424,7 @@ static int caam_probe(struct platform_device *pdev)
- 	int pg_size;
- 	int BLOCK_OFFSET = 0;
- 
--	ctrlpriv = devm_kzalloc(&pdev->dev, sizeof(struct caam_drv_private),
--				GFP_KERNEL);
-+	ctrlpriv = devm_kzalloc(&pdev->dev, sizeof(*ctrlpriv), GFP_KERNEL);
- 	if (!ctrlpriv)
- 		return -ENOMEM;
- 
--- 
-1.9.1
+Thanks,
+Horia
