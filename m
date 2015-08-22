@@ -1,43 +1,20 @@
-From: Leonidas S Barbosa <leosilva@linux.vnet.ibm.com>
-Subject: [PATCH] Fixing opcode issue on vmx-crypto
-Date: Fri, 21 Aug 2015 17:27:43 -0300
-Message-ID: <20150821202740.GA25407@bluepex.com>
+From: barr lewis <projectfiles003@gmail.com>
+Subject: halo
+Date: Sat, 22 Aug 2015 11:38:20 +0000
+Message-ID: <CAJ9wv6uMLOeF8fDvkOK3oxaRDgeSfcQ914JLthOo-+gQ+SYgSw__9715.07025319642$1440243519$gmane$org@mail.gmail.com>
+Reply-To: product.file@voila.fr
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Paulo Smorigo <pfsmorigo@linux.vnet.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-next@vger.kernel.org,
-	Paul Gortmaker <paul.gortmaker@windriver.com>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+To: undisclosed-recipients:;
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-lb0-f194.google.com ([209.85.217.194]:33778 "EHLO
+	mail-lb0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753580AbbHVLiY (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 22 Aug 2015 07:38:24 -0400
+Received: by lbcue2 with SMTP id ue2so4501660lbc.0
+        for <linux-crypto@vger.kernel.org>; Sat, 22 Aug 2015 04:38:22 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-
-In build time vadduqm opcode  is not being mapped
-correctly.
-
-Adding a new map in ppc-xlate to do this.
-
-Signed-off-by: Leonidas S Barbosa <leosilva@linux.vnet.ibm.com>
----
- drivers/crypto/vmx/ppc-xlate.pl | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/crypto/vmx/ppc-xlate.pl b/drivers/crypto/vmx/ppc-xlate.pl
-index a591884..b999733 100644
---- a/drivers/crypto/vmx/ppc-xlate.pl
-+++ b/drivers/crypto/vmx/ppc-xlate.pl
-@@ -169,6 +169,7 @@ my $vpmsumd	= sub { vcrypto_op(@_, 1224); };
- my $vpmsubh	= sub { vcrypto_op(@_, 1096); };
- my $vpmsumw	= sub { vcrypto_op(@_, 1160); };
- my $vaddudm	= sub { vcrypto_op(@_, 192);  };
-+my $vadduqm	= sub { vcrypto_op(@_, 256);  };
-
- my $mtsle	= sub {
-     my ($f, $arg) = @_;
---
-2.1.0
+let us talk
