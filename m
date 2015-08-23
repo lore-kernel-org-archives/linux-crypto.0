@@ -1,51 +1,50 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 1/2] crypto: skcipher - Add top-level skcipher interface
-Date: Sun, 23 Aug 2015 20:16:45 +0200
-Message-ID: <2086835.vbcqvJ9BvG@tachyon.chronox.de>
-References: <20150820072055.GA27176@gondor.apana.org.au> <3197252.zpooAnFuUp@tauon.atsec.com> <20150821092754.GA6854@gondor.apana.org.au>
+From: Jonathan Corbet <corbet@lwn.net>
+Subject: [PATCH] doc: crypto: warning cleanup
+Date: Sun, 23 Aug 2015 13:51:01 -0600
+Message-ID: <20150823135101.270c6630@xps.lwn.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:48144 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752759AbbHWSQw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 23 Aug 2015 14:16:52 -0400
-In-Reply-To: <20150821092754.GA6854@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-doc-owner@vger.kernel.org>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 21. August 2015, 17:27:54 schrieb Herbert Xu:
+Fix up a missing field description and a misdirected doc inclusion to make
+a couple of warnings go away.
 
-Hi Herbert,
+Signed-off-by: Jonathan Corbet <corbet@lwn.net>
+---
+ Documentation/DocBook/crypto-API.tmpl | 2 +-
+ include/crypto/aead.h                 | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-> On Fri, Aug 21, 2015 at 11:24:08AM +0200, Stephan Mueller wrote:
-> > If I understand the patch set correctly, a caller uses the skcipher API
-> > and
-> > the API sets up the synchronous or asynchronous callbacks depending on the
-> > chosen cipher implementation.
-> > 
-> > Now, does a caller always need to create an skcipher_request and always
-> > need the async logic of providing a callback function and the like, even
-> > though a synchronous cipher is chosen? I.e. the caller has no means to
-> > use a synchronous cipher operation any more.
-> > 
-> > It looks to me like that, but I would like to confirm.
-> 
-> No you can still use it synchronously.  When allocating it you
-> should do this:
-> 
-> 	crypto_alloc_skcipher(name, 0, CRYPTO_ALG_ASYNC)
-> 
-> When setting up the request just leave the callback and data as
-> NULL.
-
-Thank you. The sync and async skcipher API:
-
-Tested-by: Stephan Mueller <smueller@chronox.de>
-
+diff --git a/Documentation/DocBook/crypto-API.tmpl b/Documentation/DocBook/crypto-API.tmpl
+index 0992531ffefb..980bcc994913 100644
+--- a/Documentation/DocBook/crypto-API.tmpl
++++ b/Documentation/DocBook/crypto-API.tmpl
+@@ -1687,7 +1687,7 @@ read(opfd, out, outlen);
+ !Pinclude/linux/crypto.h Block Cipher Algorithm Definitions
+ !Finclude/linux/crypto.h crypto_alg
+ !Finclude/linux/crypto.h ablkcipher_alg
+-!Finclude/linux/crypto.h aead_alg
++!Finclude/crypto/aead.h aead_alg
+ !Finclude/linux/crypto.h blkcipher_alg
+ !Finclude/linux/crypto.h cipher_alg
+ !Finclude/crypto/rng.h rng_alg
+diff --git a/include/crypto/aead.h b/include/crypto/aead.h
+index 7169ad04acc0..88c6cdf3a886 100644
+--- a/include/crypto/aead.h
++++ b/include/crypto/aead.h
+@@ -120,6 +120,7 @@ struct aead_givcrypt_request {
+  * @exit: Deinitialize the cryptographic transformation object. This is a
+  *	  counterpart to @init, used to remove various changes set in
+  *	  @init.
++ * @base: Common crypto API algorithm data structure
+  *
+  * All fields except @ivsize is mandatory and must be filled.
+  */
 -- 
-Ciao
-Stephan
+2.4.3
+
