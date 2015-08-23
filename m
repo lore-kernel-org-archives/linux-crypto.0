@@ -1,35 +1,51 @@
-From: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH v3 1/3] crypto: caam: ctrl: Fix the error handling
-Date: Sun, 23 Aug 2015 16:27:20 +0300
-Message-ID: <55D9CA38.2060307@freescale.com>
-References: <1440175920-30884-1-git-send-email-festevam@gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 1/2] crypto: skcipher - Add top-level skcipher interface
+Date: Sun, 23 Aug 2015 20:16:45 +0200
+Message-ID: <2086835.vbcqvJ9BvG@tachyon.chronox.de>
+References: <20150820072055.GA27176@gondor.apana.org.au> <3197252.zpooAnFuUp@tauon.atsec.com> <20150821092754.GA6854@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <vicki.milhoan@freescale.com>, <linux-crypto@vger.kernel.org>,
-	"Fabio Estevam" <fabio.estevam@freescale.com>
-To: Fabio Estevam <festevam@gmail.com>, <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0143.outbound.protection.outlook.com ([207.46.100.143]:28592
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752415AbbHWOCH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 23 Aug 2015 10:02:07 -0400
-In-Reply-To: <1440175920-30884-1-git-send-email-festevam@gmail.com>
+Received: from mail.eperm.de ([89.247.134.16]:48144 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752759AbbHWSQw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 23 Aug 2015 14:16:52 -0400
+In-Reply-To: <20150821092754.GA6854@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 8/21/2015 7:51 PM, Fabio Estevam wrote:
-> From: Fabio Estevam <fabio.estevam@freescale.com>
->=20
-> In the error path we should disable the resources that were previousl=
-y
-> acquired, so fix the error handling accordingly.
->=20
-> Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
+Am Freitag, 21. August 2015, 17:27:54 schrieb Herbert Xu:
 
-=46or v3 series
-Reviewed-by: Horia Geant=C4=83 <horia.geanta@freescale.com>
+Hi Herbert,
 
-Thanks,
-Horia
+> On Fri, Aug 21, 2015 at 11:24:08AM +0200, Stephan Mueller wrote:
+> > If I understand the patch set correctly, a caller uses the skcipher API
+> > and
+> > the API sets up the synchronous or asynchronous callbacks depending on the
+> > chosen cipher implementation.
+> > 
+> > Now, does a caller always need to create an skcipher_request and always
+> > need the async logic of providing a callback function and the like, even
+> > though a synchronous cipher is chosen? I.e. the caller has no means to
+> > use a synchronous cipher operation any more.
+> > 
+> > It looks to me like that, but I would like to confirm.
+> 
+> No you can still use it synchronously.  When allocating it you
+> should do this:
+> 
+> 	crypto_alloc_skcipher(name, 0, CRYPTO_ALG_ASYNC)
+> 
+> When setting up the request just leave the callback and data as
+> NULL.
+
+Thank you. The sync and async skcipher API:
+
+Tested-by: Stephan Mueller <smueller@chronox.de>
+
+-- 
+Ciao
+Stephan
