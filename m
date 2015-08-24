@@ -1,50 +1,59 @@
-From: Jonathan Corbet <corbet@lwn.net>
-Subject: [PATCH] doc: crypto: warning cleanup
-Date: Sun, 23 Aug 2015 13:51:01 -0600
-Message-ID: <20150823135101.270c6630@xps.lwn.net>
+From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Subject: Re: Issues with HW RNG / SSS on Exynos 5422
+Date: Mon, 24 Aug 2015 09:33:09 +0900
+Message-ID: <CAJKOXPfBwSau-6c=4+V4OHOc9SbFneGnMNOD=XrJ8=66rNGhLQ@mail.gmail.com>
+References: <55CF2027.2050707@gmail.com>
+	<55D0717B.1060706@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-doc-owner@vger.kernel.org>
-Sender: linux-doc-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+	"Naveen Krishna Chatradhi <ch.naveen@samsung.com>, Jonghwa Lee"
+	<jonghwa3.lee@samsung.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-Reply-To: <55D0717B.1060706@gmail.com>
+Sender: linux-samsung-soc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Fix up a missing field description and a misdirected doc inclusion to make
-a couple of warnings go away.
+2015-08-16 20:18 GMT+09:00 Heiner Kallweit <hkallweit1@gmail.com>:
+> Am 15.08.2015 um 13:19 schrieb Heiner Kallweit:
+>> I'm having issues making the hardware RNG work on a Samsung Exynos 5422 (Odroid XU4) with kernel 4.2rc6.
+>> No random number generation is started if I write the appropriate value (0x18) to the hash control register.
+>>
+>> What I did so far:
+>> Splitted the sss DT node in exynos5420.dtsi into one for the s5p-sss driver and one for the exynos-rng driver.
+>> (s5p-sss doesn't seem to need the hash registers from offset 0x400)
+>>
+>> sss: sss@10830000 {
+>>       icompatible = "samsung,exynos4210-secss";
+>>       reg = <0x10830000 0x400>;
+>>       interrupts = <0 112 0>;
+>>       clocks = <&clock CLK_SSS>;
+>>       clock-names = "secss";
+>> };
+>>
+>> rng: rng@10830400 {
+>>       compatible = "samsung,exynosrng-secss";
+>>       reg = <0x10830400 0x300>;
+>>       clocks = <&clock CLK_SSS>;
+>>       clock-names = "secss";
+>> };
+>>
+>> The DT binding is just for testing and after adding some DT glue logic (of_device_id table) to the exynos-rng driver
+>> it binds to the rng platform device.
+>> The clock also seems to be ok with a rate of 266 MHz.
+>> As is the driver hangs in a loop because the PRNG_DONE in the status register bit never gets set.
 
-Signed-off-by: Jonathan Corbet <corbet@lwn.net>
----
- Documentation/DocBook/crypto-API.tmpl | 2 +-
- include/crypto/aead.h                 | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+Indeed... Status has value 0x3 which means that buffer is not full,
+seed setup is done and PRNG engine is idle. I tried this also on
+Trats2 board (Exynos 4412) with exactly the same result. No idea.
 
-diff --git a/Documentation/DocBook/crypto-API.tmpl b/Documentation/DocBook/crypto-API.tmpl
-index 0992531ffefb..980bcc994913 100644
---- a/Documentation/DocBook/crypto-API.tmpl
-+++ b/Documentation/DocBook/crypto-API.tmpl
-@@ -1687,7 +1687,7 @@ read(opfd, out, outlen);
- !Pinclude/linux/crypto.h Block Cipher Algorithm Definitions
- !Finclude/linux/crypto.h crypto_alg
- !Finclude/linux/crypto.h ablkcipher_alg
--!Finclude/linux/crypto.h aead_alg
-+!Finclude/crypto/aead.h aead_alg
- !Finclude/linux/crypto.h blkcipher_alg
- !Finclude/linux/crypto.h cipher_alg
- !Finclude/crypto/rng.h rng_alg
-diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-index 7169ad04acc0..88c6cdf3a886 100644
---- a/include/crypto/aead.h
-+++ b/include/crypto/aead.h
-@@ -120,6 +120,7 @@ struct aead_givcrypt_request {
-  * @exit: Deinitialize the cryptographic transformation object. This is a
-  *	  counterpart to @init, used to remove various changes set in
-  *	  @init.
-+ * @base: Common crypto API algorithm data structure
-  *
-  * All fields except @ivsize is mandatory and must be filled.
-  */
--- 
-2.4.3
+>>
+>> I traced it back to the hash control register not accepting value 0x8 (or 0x18 incl. the start bit) for the PRNG.
+>> Writing a value and reading it back works for values from 0 to 5 only.
 
+It's okay. Accepted values for engine are only from 0 to 5. The bit no
+4 (start init bit) is automatically cleared by hardware.
+
+Best regards,
+Krzysztof
