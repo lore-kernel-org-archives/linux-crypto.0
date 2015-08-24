@@ -1,104 +1,60 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH] MPI: Fix mpi_read_buffer
-Date: Mon, 24 Aug 2015 07:52:14 -0700
-Message-ID: <20150824145214.26239.98271.stgit@tstruk-mobl1>
+Subject: Re: [PATCH 1/2] crypto: KEYS: convert public key to the akcipher API
+Date: Mon, 24 Aug 2015 10:45:05 -0700
+Message-ID: <55DB5821.50807@intel.com>
+References: <20150813035433.25108.3065.stgit@tstruk-mobl1>
+ <20150813035439.25108.62457.stgit@tstruk-mobl1>
+ <3295616.oBrs36mNlq@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
-	tadeusz.struk@intel.com
-To: herbert@gondor.apana.org.au
+Cc: herbert@gondor.apana.org.au, keescook@chromium.org,
+	jwboyer@redhat.com, richard@nod.at, steved@redhat.com,
+	linux-kernel@vger.kernel.org, dhowells@redhat.com,
+	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
+	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
+	vgoyal@redhat.com
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:56587 "EHLO mga09.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:41725 "EHLO mga03.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755053AbbHXOxc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Aug 2015 10:53:32 -0400
+	id S1751734AbbHXRqX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 24 Aug 2015 13:46:23 -0400
+In-Reply-To: <3295616.oBrs36mNlq@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Change mpi_read_buffer to return a number without leading zeros
-so that mpi_read_buffer and mpi_get_buffer return the same thing.
+Hi Stephan,
 
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
- lib/mpi/mpicoder.c |   38 +++++++++++++++++++++++++-------------
- 1 file changed, 25 insertions(+), 13 deletions(-)
+On 08/15/2015 11:08 AM, Stephan Mueller wrote:
+> Am Mittwoch, 12. August 2015, 20:54:39 schrieb Tadeusz Struk:
+> 
+> Hi Tadeusz,
+> 
+>> @@ -41,7 +41,7 @@ struct pkcs7_parse_context {
+>> static void pkcs7_free_signed_info(struct pkcs7_signed_info *sinfo)
+>> {
+>> 	if (sinfo) {
+>> -		mpi_free(sinfo->sig.mpi[0]);
+>> +		kfree(sinfo->sig.s);
+> 
+> kzfree?
+> 
+>> 		kfree(sinfo->sig.digest);
+> 
+> kzfree?
+> 
+>> 		kfree(sinfo->signing_cert_id);
+>> 		kfree(sinfo);
+> 
+> kzfree (due to ->msdigest)?
+> 
 
-diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index bc0a1da..95c52a9 100644
---- a/lib/mpi/mpicoder.c
-+++ b/lib/mpi/mpicoder.c
-@@ -146,18 +146,25 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
- 	uint8_t *p;
- 	mpi_limb_t alimb;
- 	unsigned int n = mpi_get_size(a);
--	int i;
-+	int i, lzeros = 0;
- 
--	if (buf_len < n || !buf)
-+	if (buf_len < n || !buf || !nbytes)
- 		return -EINVAL;
- 
- 	if (sign)
- 		*sign = a->sign;
- 
--	if (nbytes)
--		*nbytes = n;
-+	p = (void *)&a->d[a->nlimbs] - 1;
-+
-+	for (i = a->nlimbs * sizeof(alimb) - 1; i >= 0; i--, p--) {
-+		if (!*p)
-+			lzeros++;
-+		else
-+			break;
-+	}
- 
- 	p = buf;
-+	*nbytes = n - lzeros;
- 
- 	for (i = a->nlimbs - 1; i >= 0; i--) {
- 		alimb = a->d[i];
-@@ -178,6 +185,19 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
- #else
- #error please implement for this limb size.
- #endif
-+
-+		if (lzeros > 0) {
-+			if (lzeros >= sizeof(alimb)) {
-+				p -= sizeof(alimb);
-+			} else {
-+				mpi_limb_t *limb1 = (void *)p - sizeof(alimb);
-+				mpi_limb_t *limb2 = (void *)p - sizeof(alimb)
-+							+ lzeros;
-+				*limb1 = *limb2;
-+				p -= lzeros;
-+			}
-+			lzeros -= sizeof(alimb);
-+		}
- 	}
- 	return 0;
- }
-@@ -197,7 +217,7 @@ EXPORT_SYMBOL_GPL(mpi_read_buffer);
-  */
- void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign)
- {
--	uint8_t *buf, *p;
-+	uint8_t *buf;
- 	unsigned int n;
- 	int ret;
- 
-@@ -220,14 +240,6 @@ void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign)
- 		kfree(buf);
- 		return NULL;
- 	}
--
--	/* this is sub-optimal but we need to do the shift operation
--	 * because the caller has to free the returned buffer */
--	for (p = buf; !*p && *nbytes; p++, --*nbytes)
--		;
--	if (p != buf)
--		memmove(buf, p, *nbytes);
--
- 	return buf;
- }
- EXPORT_SYMBOL_GPL(mpi_get_buffer);
+Sorry for late response. I was on vacation.
+All these above are module signatures, which are not sensitive,
+so no need to zero the buffers on free.
+The only thing that is sensitive is the private key,
+which is only used for signing modules on make modules_install
+and never included in the kernel.
+Thanks,
+T
