@@ -1,32 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] Fixing opcode issue on vmx-crypto
-Date: Mon, 24 Aug 2015 22:14:05 +0800
-Message-ID: <20150824141405.GA31146@gondor.apana.org.au>
-References: <20150821202740.GA25407@bluepex.com>
+Subject: Re: [PATCH v3 1/3] crypto: caam: ctrl: Fix the error handling
+Date: Mon, 24 Aug 2015 22:17:17 +0800
+Message-ID: <20150824141717.GB31146@gondor.apana.org.au>
+References: <1440175920-30884-1-git-send-email-festevam@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Paulo Smorigo <pfsmorigo@linux.vnet.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-next@vger.kernel.org,
-	Paul Gortmaker <paul.gortmaker@windriver.com>
-To: Leonidas S Barbosa <leosilva@linux.vnet.ibm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: vicki.milhoan@freescale.com, horia.geanta@freescale.com,
+	linux-crypto@vger.kernel.org,
+	Fabio Estevam <fabio.estevam@freescale.com>
+To: Fabio Estevam <festevam@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:34256 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754299AbbHXORc (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 24 Aug 2015 10:17:32 -0400
 Content-Disposition: inline
-In-Reply-To: <20150821202740.GA25407@bluepex.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1440175920-30884-1-git-send-email-festevam@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 21, 2015 at 05:27:43PM -0300, Leonidas S Barbosa wrote:
+On Fri, Aug 21, 2015 at 01:51:58PM -0300, Fabio Estevam wrote:
+> From: Fabio Estevam <fabio.estevam@freescale.com>
 > 
-> In build time vadduqm opcode  is not being mapped
-> correctly.
+> In the error path we should disable the resources that were previously
+> acquired, so fix the error handling accordingly.
 > 
-> Adding a new map in ppc-xlate to do this.
-> 
-> Signed-off-by: Leonidas S Barbosa <leosilva@linux.vnet.ibm.com>
+> Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
 
-Applied.
+All applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
