@@ -1,42 +1,24 @@
-From: James Morris <jmorris@namei.org>
-Subject: Re: [GIT PULL] Move cert handling to certs/ directory
-Date: Wed, 26 Aug 2015 08:26:38 +1000 (AEST)
-Message-ID: <alpine.LRH.2.20.1508260826180.7800@namei.org>
-References: <29947.1440420712@warthog.procyon.org.uk>
+From: Excel capital <dynamischeexcelhauptstadt001@gmail.com>
+Subject: REPLY BACK IF YOU REALLY NEED A LOAN
+Date: Tue, 25 Aug 2015 16:27:57 -0700
+Message-ID: <CAOMb+hMAwMUBfv7kr=DDJcFrfbyoowqtm1u8wxKQuTDk7X4_oA@mail.gmail.com>
+Reply-To: elizabethmorganhelpss@hotmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Cc: linux-security-module@vger.kernel.org, dwmw2@infradead.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+To: undisclosed-recipients:;
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tundra.namei.org ([65.99.196.166]:34761 "EHLO namei.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756061AbbHYW1P (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Aug 2015 18:27:15 -0400
-In-Reply-To: <29947.1440420712@warthog.procyon.org.uk>
+Received: from mail-ob0-f193.google.com ([209.85.214.193]:35594 "EHLO
+	mail-ob0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755865AbbHYX16 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 Aug 2015 19:27:58 -0400
+Received: by obbfr1 with SMTP id fr1so12535372obb.2
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Aug 2015 16:27:57 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 24 Aug 2015, David Howells wrote:
-
-> Hi James,
-> 
-> Sorry for the late request, but can you pull this please?  It's a set of
-> commits that puts a bit of polish on the previous module signing patches.
-> It moves the certificate handling to its own directory rather than sharing
-> in the kernel/ directory.  It then moves key generation into the certs/
-> directory rather than doing it in the root.
-> 
-> This allows us to simplify the kernel/Makefile and slightly simplify the
-> new certs/Makefile.  It also keeps the various generated files in the same
-> place to make them easier to find and clean up.
-> 
-
-Pulled to my next branch, thanks.
-
-
-- James
 -- 
-James Morris
-<jmorris@namei.org>
+We offer loans to individuals / companies @ 3% loans. $
+5,000.00, pounds and euros to 500,000,000.00.
+elizabethmorganhelpss@hotmail.com: if you are interested, contact
+please apply via email
