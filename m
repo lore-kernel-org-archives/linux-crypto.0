@@ -1,31 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: aead - fix for multiple operations on AF_ALG
- sockets
-Date: Tue, 25 Aug 2015 21:16:22 +0800
-Message-ID: <20150825131622.GA13824@gondor.apana.org.au>
-References: <1440496755-15105-1-git-send-email-larper@axis.com>
+Subject: Re: [PATCH] crypto: qat - enable legacy VFs
+Date: Tue, 25 Aug 2015 21:16:35 +0800
+Message-ID: <20150825131635.GB13824@gondor.apana.org.au>
+References: <20150824185602.30820.25788.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Lars Persson <larper@axis.com>
-To: Lars Persson <lars.persson@axis.com>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36416 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:47311 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751978AbbHYNQ3 (ORCPT
+	with ESMTP id S1751978AbbHYNQj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Aug 2015 09:16:29 -0400
+	Tue, 25 Aug 2015 09:16:39 -0400
 Content-Disposition: inline
-In-Reply-To: <1440496755-15105-1-git-send-email-larper@axis.com>
+In-Reply-To: <20150824185602.30820.25788.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 25, 2015 at 11:59:15AM +0200, Lars Persson wrote:
-> The tsgl scatterlist must be re-initialized after each
-> operation. Otherwise the sticky bits in the page_link will corrupt the
-> list with pre-mature termination or false chaining.
+On Mon, Aug 24, 2015 at 11:56:02AM -0700, Tadeusz Struk wrote:
+> We need to support legacy VFs as well as VFs running on different OSes.
+> To do so the compatibility check need needs to be relaxed.
+> This patch moves the logic responsible for VF to PF version and
+> compatibility checking from adfsriov.c to adf_pf2vf_msg.c,
+> where it belongs, and changes the logic enable legacy VFs.
 > 
-> Signed-off-by: Lars Persson <larper@axis.com>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 
 Applied.
 -- 
