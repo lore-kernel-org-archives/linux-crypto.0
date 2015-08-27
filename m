@@ -1,9 +1,9 @@
 From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Subject: Re: [PATCH v2 4/8] crypto/lz4hc: support decompress_noctx
-Date: Thu, 27 Aug 2015 10:57:30 +0900
-Message-ID: <20150827015730.GC1545@swordfish>
+Subject: Re: [PATCH v2 6/8] zram: change zcomp_compress interface
+Date: Thu, 27 Aug 2015 11:14:36 +0900
+Message-ID: <20150827021436.GD1545@swordfish>
 References: <1440052504-15442-1-git-send-email-iamjoonsoo.kim@lge.com>
- <1440052504-15442-5-git-send-email-iamjoonsoo.kim@lge.com>
+ <1440052504-15442-7-git-send-email-iamjoonsoo.kim@lge.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Andrew Morton <akpm@linux-foundation.org>,
@@ -16,71 +16,76 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Stephan Mueller <smueller@chronox.de>,
 	Joonsoo Kim <iamjoonsoo.kim@lge.com>
 To: Joonsoo Kim <js1304@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f54.google.com ([209.85.220.54]:33305 "EHLO
+	mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751644AbbH0CN4 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 26 Aug 2015 22:13:56 -0400
 Content-Disposition: inline
-In-Reply-To: <1440052504-15442-5-git-send-email-iamjoonsoo.kim@lge.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1440052504-15442-7-git-send-email-iamjoonsoo.kim@lge.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 On (08/20/15 15:35), Joonsoo Kim wrote:
-> 
-> lz4hc's decompression doesn't requires any scratch buffer so
-> it doesn't need tfm context. Hence, it can support
-> crypto compression noctx API and this patch implements it.
+> zram regards zstrm's buffer as compression destination buffer, but,
+> it is not intuitive and there is no document about it. Providing
+> destination buffer to zcomp_compress() directly seems more intuitive
+> interface to me so this patch changes zcomp_compress interface.
 > 
 > Signed-off-by: Joonsoo Kim <iamjoonsoo.kim@lge.com>
 > ---
->  crypto/lz4hc.c | 17 ++++++++++++++++-
->  1 file changed, 16 insertions(+), 1 deletion(-)
+>  drivers/block/zram/zcomp.c    | 5 ++---
+>  drivers/block/zram/zcomp.h    | 2 +-
+>  drivers/block/zram/zram_drv.c | 2 +-
+>  3 files changed, 4 insertions(+), 5 deletions(-)
 > 
-> diff --git a/crypto/lz4hc.c b/crypto/lz4hc.c
-> index bcf0baa..a529620 100644
-> --- a/crypto/lz4hc.c
-> +++ b/crypto/lz4hc.c
-> @@ -76,6 +76,21 @@ static int lz4hc_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
->  	return err;
+> diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
+> index 965d1af..2ad504b 100644
+> --- a/drivers/block/zram/zcomp.c
+> +++ b/drivers/block/zram/zcomp.c
+> @@ -307,10 +307,9 @@ void zcomp_strm_release(struct zcomp *comp, struct zcomp_strm *zstrm)
 >  }
 >  
-> +static int lz4hc_decompress_noctx(const u8 *src, unsigned int slen,
-> +				  u8 *dst, unsigned int *dlen)
-> +{
-> +	int err;
-> +	size_t tmp_len = *dlen;
-> +	size_t __slen = slen;
-> +
-> +	err = lz4_decompress_unknownoutputsize(src, __slen, dst, &tmp_len);
-> +	if (err < 0)
-> +		return -EINVAL;
-> +
-> +	*dlen = tmp_len;
-> +	return err;
-> +}
-> +
+>  int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
+> -		const unsigned char *src, size_t *dst_len)
+> +		const unsigned char *src, unsigned char *dst, size_t *dst_len)
+>  {
+> -	return comp->backend->compress(src, zstrm->buffer, dst_len,
+> -			zstrm->private);
+> +	return comp->backend->compress(src, dst, dst_len, zstrm->private);
+>  }
+>  
+>  int zcomp_decompress(struct zcomp *comp, const unsigned char *src,
+> diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
+> index 46e2b9f..b2388e0 100644
+> --- a/drivers/block/zram/zcomp.h
+> +++ b/drivers/block/zram/zcomp.h
+> @@ -60,7 +60,7 @@ struct zcomp_strm *zcomp_strm_find(struct zcomp *comp);
+>  void zcomp_strm_release(struct zcomp *comp, struct zcomp_strm *zstrm);
+>  
+>  int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
+> -		const unsigned char *src, size_t *dst_len);
+> +		const unsigned char *src, unsigned char *dst, size_t *dst_len);
+>  
+>  int zcomp_decompress(struct zcomp *comp, const unsigned char *src,
+>  		size_t src_len, unsigned char *dst);
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index b088ca9..4801e4d 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -701,7 +701,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
+>  		goto out;
+>  	}
+>  
+> -	ret = zcomp_compress(zram->comp, zstrm, uncmem, &clen);
+> +	ret = zcomp_compress(zram->comp, zstrm, uncmem, zstrm->buffer, &clen);
 
-same,
-
-static int lz4hc_decompress_noctx(const u8 *src, unsigned int slen,
-				u8 *dst, unsigned int *dlen)
-{
-	return lz4hc_decompress_crypto(NULL, ....);
-}
-
-?
+No, this change is unreasonable. zcomp might want to do with zstrm
+anything it wants to, because zstrm belongs there. Besides, you change
+zcomp_decompress() to require `struct zcomp_strm *zstrm', so let's
+stick with this -- pass `struct zcomp_strm *zstrm' to both compress and
+decompress functions. It's up to zcomp to ignore passed zstrm or do
+something sane; not up to zram_drv.
 
 	-ss
-
->  static struct crypto_alg alg_lz4hc = {
->  	.cra_name		= "lz4hc",
->  	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
-> @@ -88,7 +103,7 @@ static struct crypto_alg alg_lz4hc = {
->  	.coa_compress		= lz4hc_compress_crypto,
->  	.coa_decompress		= lz4hc_decompress_crypto,
->  	.coa_compress_noctx	= NULL,
-> -	.coa_decompress_noctx	= NULL } }
-> +	.coa_decompress_noctx	= lz4hc_decompress_noctx } }
->  };
->  
->  static int __init lz4hc_mod_init(void)
-> -- 
-> 1.9.1
-> 
