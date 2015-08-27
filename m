@@ -1,198 +1,153 @@
-From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Subject: Re: [PATCH v2 8/8] zram: use decompress_noctx
-Date: Thu, 27 Aug 2015 14:47:14 +0900
-Message-ID: <20150827054714.GA30236@swordfish>
-References: <1440052504-15442-1-git-send-email-iamjoonsoo.kim@lge.com>
- <1440052504-15442-9-git-send-email-iamjoonsoo.kim@lge.com>
- <20150827040712.GF1545@swordfish>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@freescale.com>
+Subject: [PATCH] crypto: tcrypt - avoid mapping from module image addresses
+Date: Thu, 27 Aug 2015 18:38:36 +0300
+Message-ID: <1440689916-4135-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Joonsoo Kim <js1304@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Minchan Kim <minchan@kernel.org>,
-	Nitin Gupta <ngupta@vflare.org>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>
-To: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20150827040712.GF1545@swordfish>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn1bon0136.outbound.protection.outlook.com ([157.56.111.136]:51456
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752696AbbH0Piv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 27 Aug 2015 11:38:51 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On (08/27/15 13:07), Sergey Senozhatsky wrote:
-[..]
-> > -struct zcomp_strm *zcomp_strm_find(struct zcomp *comp)
-> > +struct zcomp_strm *zcomp_strm_find(struct zcomp *comp, bool decomp)
-> >
+The output buffer in test_ahash_speed will point to an address located
+within the tcrypt module image.
+This causes problems when trying to DMA map the buffer.
+=46or e.g. on ARM-based LS1021A, a page fault occurs within the
+DMA API when trying to access the struct page returned by
+virt_to_page(output):
 
-I think we can hide zcomp_strm_find()/_release (make them static),
-and instead introduce:
+insmod tcrypt.ko mode=3D403
 
-a) zcomp_decompress_begin()/zcomp_decompress_end()
+testing speed of async sha1 (sha1-caam)
+test  0 (   16 byte blocks,   16 bytes per update,   1 updates):
+Unable to handle kernel paging request at virtual address f07e9080
+pgd =3D e58d0e00
+[f07e9080] *pgd=3D80000080007003, *pmd=3D00000000
+Internal error: Oops: 206 [#1] SMP THUMB2
+Modules linked in: tcrypt(+)
+CPU: 1 PID: 1119 Comm: insmod Not tainted 4.2.0-rc1-256134-gbf433416e67=
+5 #1
+Hardware name: Freescale LS1021A
+task: ea063900 ti: e5a34000 task.ti: e5a34000
+PC is at dma_cache_maint_page+0x38/0xd0
+LR is at __dma_page_cpu_to_dev+0x15/0x64
+pc : [<800155a0>]    lr : [<8001564d>]    psr: 000f0033
+sp : e5a35ca0  ip : 8063df00  fp : f07e9080
+r10: 00000cd0  r9 : 8063df00  r8 : 805a2f04
+r7 : 0017f804  r6 : 00000002  r5 : ee7f9000  r4 : 00000014
+r3 : 80612d40  r2 : 01ff0080  r1 : 00000380  r0 : ee7f9000
+=46lags: nzcv  IRQs on  FIQs on  Mode SVC_32  ISA Thumb  Segment user
+Control: 70c5387d  Table: e58d0e00  DAC: 9b7ede70
+Process insmod (pid: 1119, stack limit =3D 0xe5a34210)
+Stack: (0xe5a35ca0 to 0xe5a36000)
+[...]
+[<800155a0>] (dma_cache_maint_page) from [<8001564d>] (__dma_page_cpu_t=
+o_dev+0x15/0x64)
+[<8001564d>] (__dma_page_cpu_to_dev) from [<800156eb>] (arm_dma_map_pag=
+e+0x1f/0x44)
+[<800156eb>] (arm_dma_map_page) from [<802935e3>] (ahash_digest+0x35f/0=
+x510)
+[<802935e3>] (ahash_digest) from [<7f800d03>] (test_ahash_speed.constpr=
+op.6+0x24a/0x4e4 [tcrypt])
+[<7f800d03>] (test_ahash_speed.constprop.6 [tcrypt]) from [<7f802fd5>] =
+(do_test+0x1898/0x2058 [tcrypt])
+[<7f802fd5>] (do_test [tcrypt]) from [<7f80802f>] (tcrypt_mod_init+0x2e=
+/0x63 [tcrypt])
+[<7f80802f>] (tcrypt_mod_init [tcrypt]) from [<80009517>] (do_one_initc=
+all+0xb3/0x134)
+[<80009517>] (do_one_initcall) from [<80351ec7>] (do_init_module+0x3b/0=
+x13c)
+[<80351ec7>] (do_init_module) from [<8005cc3f>] (load_module+0x97b/0x9d=
+c)
+[<8005cc3f>] (load_module) from [<8005cd8d>] (SyS_finit_module+0x35/0x3=
+e)
+[<8005cd8d>] (SyS_finit_module) from [<8000d101>] (ret_fast_syscall+0x1=
+/0x4c)
+Code: 1aba 0152 eb00 0b02 (5882) 0f92
 
-	calls zcomp_strm_find()/zcomp_strm_release() for tfms that
-require context for decompression; may return NULL, may sleep.
+addr2line -f -i -e vmlinux 800155a0
+page_zonenum
+include/linux/mm.h:728
+page_zone
+include/linux/mm.h:881
+dma_cache_maint_page
+arch/arm/mm/dma-mapping.c:822
 
-b) zcomp_compress_begin()/zcomp_compress_end()
-	always calls zcomp_strm_find()/zcomp_strm_release();
-	never return NULL; may sleep.
+Signed-off-by: Horia Geant=C4=83 <horia.geanta@freescale.com>
+---
 
-	-ss
+Only reproduced on ARM-based platforms (LS1021A, i.MX6).
+=46or some unknown reason, PPC-based ones do not exhibit the problem.
 
-> >  {
-> > +	/* We don't need decompression context so zstrm neither */
-> > +	if (decomp && test_bit(ZCOMP_DECOMPRESS_NOCTX, &comp->flags))
-> > +		return NULL;
-> > +
-> >  	return comp->strm_find(comp);
-> >  }
-> 
-> No. zcomp_strm_find() should never return NULL. And no, I don't like
-> "if (decomp)" change.
-> 
-> 
-> >  
-> > @@ -307,6 +311,11 @@ int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
-> >  {
-> >  	*dst_len = PAGE_SIZE << 1;
-> >  
-> > +	if (!zstrm) {
-> > +		return crypto_comp_compress_noctx(comp->alg, src, PAGE_SIZE,
-> > +							dst, dst_len);
-> > +	}
-> > +
-> >  	return crypto_comp_compress(zstrm->tfm, src, PAGE_SIZE, dst, dst_len);
-> >  }
-> >  
-> > @@ -316,12 +325,18 @@ int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
-> >  {
-> >  	unsigned int size = PAGE_SIZE;
-> >  
-> > +	if (!zstrm) {
-> > +		return crypto_comp_decompress_noctx(comp->alg, src, src_len,
-> > +							dst, &size);
-> > +	}
-> > +
-> >  	return crypto_comp_decompress(zstrm->tfm, src, src_len,	dst, &size);
-> >  }
-> >  
-> >  void zcomp_destroy(struct zcomp *comp)
-> >  {
-> >  	comp->destroy(comp);
-> > +	crypto_put_comp(comp->alg);
-> >  	kfree(comp);
-> >  }
-> >  
-> > @@ -344,12 +359,23 @@ struct zcomp *zcomp_create(const char *compress, int max_strm)
-> >  		return ERR_PTR(-ENOMEM);
-> >  
-> >  	comp->name = compress;
-> > +	comp->alg = crypto_get_comp(compress, 0, 0);
-> > +	if (!comp->alg) {
-> > +		kfree(comp);
-> > +		return ERR_PTR(-EINVAL);
-> > +	}
-> > +
-> > +	if (crypto_has_compress_noctx(comp->alg))
-> > +		set_bit(ZCOMP_COMPRESS_NOCTX, &comp->flags);
-> 
-> do you use ZCOMP_COMPRESS_NOCTX algs in this patch set?
-> 
-> 
-> > +	if (crypto_has_decompress_noctx(comp->alg))
-> > +		set_bit(ZCOMP_DECOMPRESS_NOCTX, &comp->flags);
-> >  
-> >  	if (max_strm > 1)
-> >  		zcomp_strm_multi_create(comp, max_strm);
-> >  	else
-> >  		zcomp_strm_single_create(comp);
-> >  	if (!comp->stream) {
-> > +		crypto_put_comp(comp->alg);
-> >  		kfree(comp);
-> >  		return ERR_PTR(-ENOMEM);
-> >  	}
-> > diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
-> > index c47db4d..6c137c8 100644
-> > --- a/drivers/block/zram/zcomp.h
-> > +++ b/drivers/block/zram/zcomp.h
-> > @@ -13,6 +13,11 @@
-> >  #include <linux/crypto.h>
-> >  #include <linux/mutex.h>
-> >  
-> > +enum {
-> > +	ZCOMP_COMPRESS_NOCTX,
-> > +	ZCOMP_DECOMPRESS_NOCTX,
-> > +};
-> 
-> Can it be handled via crypto api? check if ->foo_noctx() is !NULL ?
-> 
-> >  struct zcomp_strm {
-> >  	struct crypto_comp *tfm;
-> >  
-> > @@ -27,6 +32,8 @@ struct zcomp_strm {
-> >  struct zcomp {
-> >  	void *stream;
-> >  	const char *name;
-> > +	struct crypto_alg *alg;
-> > +	unsigned long flags;
-> >  
-> >  	struct zcomp_strm *(*strm_find)(struct zcomp *comp);
-> >  	void (*strm_release)(struct zcomp *comp, struct zcomp_strm *zstrm);
-> > @@ -39,7 +46,7 @@ ssize_t zcomp_available_show(const char *comp, char *buf);
-> >  struct zcomp *zcomp_create(const char *comp, int max_strm);
-> >  void zcomp_destroy(struct zcomp *comp);
-> >  
-> > -struct zcomp_strm *zcomp_strm_find(struct zcomp *comp);
-> > +struct zcomp_strm *zcomp_strm_find(struct zcomp *comp, bool decomp);
-> >  void zcomp_strm_release(struct zcomp *comp, struct zcomp_strm *zstrm);
-> >  
-> >  int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
-> > diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> > index b3044d3..8283bd3 100644
-> > --- a/drivers/block/zram/zram_drv.c
-> > +++ b/drivers/block/zram/zram_drv.c
-> > @@ -623,7 +623,7 @@ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
-> >  		/* Use  a temporary buffer to decompress the page */
-> >  		uncmem = kmalloc(PAGE_SIZE, GFP_NOIO);
-> >  
-> > -	zstrm = zcomp_strm_find(zram->comp);
-> > +	zstrm = zcomp_strm_find(zram->comp, true);
-> 
-> No, I don't like this.
-> 
-> >  	user_mem = kmap_atomic(page);
-> >  	if (!is_partial_io(bvec))
-> >  		uncmem = user_mem;
-> > @@ -647,7 +647,8 @@ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
-> >  	ret = 0;
-> >  out_cleanup:
-> >  	kunmap_atomic(user_mem);
-> > -	zcomp_strm_release(zram->comp, zstrm);
-> > +	if (zstrm)
-> > +		zcomp_strm_release(zram->comp, zstrm);
-> >  	if (is_partial_io(bvec))
-> >  		kfree(uncmem);
-> >  	return ret;
-> > @@ -676,14 +677,14 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
-> >  			ret = -ENOMEM;
-> >  			goto out;
-> >  		}
-> > -		zstrm = zcomp_strm_find(zram->comp);
-> > +		zstrm = zcomp_strm_find(zram->comp, true);
-> >  		ret = zram_decompress_page(zram, zstrm, uncmem, index);
-> >  		if (ret)
-> >  			goto out;
-> >  	}
-> >  
-> >  	if (!zstrm)
-> > -		zstrm = zcomp_strm_find(zram->comp);
-> > +		zstrm = zcomp_strm_find(zram->comp, false);
-> 
-> No. I don't like this.
-> 
-> 	-ss
-> 
+ crypto/tcrypt.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 2b00b617daab..46a4a757d478 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -48,6 +48,8 @@
+ #define ENCRYPT 1
+ #define DECRYPT 0
+=20
++#define MAX_DIGEST_SIZE		64
++
+ /*
+  * return a string with the driver name
+  */
+@@ -950,7 +952,7 @@ static void test_ahash_speed(const char *algo, unsi=
+gned int secs,
+ 	struct tcrypt_result tresult;
+ 	struct ahash_request *req;
+ 	struct crypto_ahash *tfm;
+-	static char output[1024];
++	char *output;
+ 	int i, ret;
+=20
+ 	tfm =3D crypto_alloc_ahash(algo, 0, 0);
+@@ -963,9 +965,9 @@ static void test_ahash_speed(const char *algo, unsi=
+gned int secs,
+ 	printk(KERN_INFO "\ntesting speed of async %s (%s)\n", algo,
+ 			get_driver_name(crypto_ahash, tfm));
+=20
+-	if (crypto_ahash_digestsize(tfm) > sizeof(output)) {
+-		pr_err("digestsize(%u) > outputbuffer(%zu)\n",
+-		       crypto_ahash_digestsize(tfm), sizeof(output));
++	if (crypto_ahash_digestsize(tfm) > MAX_DIGEST_SIZE) {
++		pr_err("digestsize(%u) > %d\n", crypto_ahash_digestsize(tfm),
++		       MAX_DIGEST_SIZE);
+ 		goto out;
+ 	}
+=20
+@@ -980,6 +982,10 @@ static void test_ahash_speed(const char *algo, uns=
+igned int secs,
+ 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+ 				   tcrypt_complete, &tresult);
+=20
++	output =3D kmalloc(MAX_DIGEST_SIZE, GFP_KERNEL);
++	if (!output)
++		goto out_nomem;
++
+ 	for (i =3D 0; speed[i].blen !=3D 0; i++) {
+ 		if (speed[i].blen > TVMEMSIZE * PAGE_SIZE) {
+ 			pr_err("template (%u) too big for tvmem (%lu)\n",
+@@ -1006,6 +1012,9 @@ static void test_ahash_speed(const char *algo, un=
+signed int secs,
+ 		}
+ 	}
+=20
++	kfree(output);
++
++out_nomem:
+ 	ahash_request_free(req);
+=20
+ out:
+--=20
+2.4.4
