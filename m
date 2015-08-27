@@ -1,153 +1,23 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@freescale.com>
-Subject: [PATCH] crypto: tcrypt - avoid mapping from module image addresses
-Date: Thu, 27 Aug 2015 18:38:36 +0300
-Message-ID: <1440689916-4135-1-git-send-email-horia.geanta@freescale.com>
+From: Unknown <unknown@unknown.invalid>
+Subject: LOAN OFFER OF ALL TYPES
+Date: Fri, 28 Aug 2015 03:04:54 +0530
+Message-ID: <TY1PR0201MB0927A1DBA857606EFDBB7ECBB86F0@TY1PR0201MB0927.apcprd02.prod.outlook.com>
+Reply-To: <paulfredrickfinanceservice@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: Recipients@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0136.outbound.protection.outlook.com ([157.56.111.136]:51456
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+Received: from mail-hk2apc01hn0218.outbound.protection.outlook.com ([104.47.124.218]:58242
+	"EHLO APC01-HK2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752696AbbH0Piv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Aug 2015 11:38:51 -0400
+	id S1752199AbbH0Vfz convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 27 Aug 2015 17:35:55 -0400
+Content-Description: Mail message body
+From: <>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The output buffer in test_ahash_speed will point to an address located
-within the tcrypt module image.
-This causes problems when trying to DMA map the buffer.
-=46or e.g. on ARM-based LS1021A, a page fault occurs within the
-DMA API when trying to access the struct page returned by
-virt_to_page(output):
-
-insmod tcrypt.ko mode=3D403
-
-testing speed of async sha1 (sha1-caam)
-test  0 (   16 byte blocks,   16 bytes per update,   1 updates):
-Unable to handle kernel paging request at virtual address f07e9080
-pgd =3D e58d0e00
-[f07e9080] *pgd=3D80000080007003, *pmd=3D00000000
-Internal error: Oops: 206 [#1] SMP THUMB2
-Modules linked in: tcrypt(+)
-CPU: 1 PID: 1119 Comm: insmod Not tainted 4.2.0-rc1-256134-gbf433416e67=
-5 #1
-Hardware name: Freescale LS1021A
-task: ea063900 ti: e5a34000 task.ti: e5a34000
-PC is at dma_cache_maint_page+0x38/0xd0
-LR is at __dma_page_cpu_to_dev+0x15/0x64
-pc : [<800155a0>]    lr : [<8001564d>]    psr: 000f0033
-sp : e5a35ca0  ip : 8063df00  fp : f07e9080
-r10: 00000cd0  r9 : 8063df00  r8 : 805a2f04
-r7 : 0017f804  r6 : 00000002  r5 : ee7f9000  r4 : 00000014
-r3 : 80612d40  r2 : 01ff0080  r1 : 00000380  r0 : ee7f9000
-=46lags: nzcv  IRQs on  FIQs on  Mode SVC_32  ISA Thumb  Segment user
-Control: 70c5387d  Table: e58d0e00  DAC: 9b7ede70
-Process insmod (pid: 1119, stack limit =3D 0xe5a34210)
-Stack: (0xe5a35ca0 to 0xe5a36000)
-[...]
-[<800155a0>] (dma_cache_maint_page) from [<8001564d>] (__dma_page_cpu_t=
-o_dev+0x15/0x64)
-[<8001564d>] (__dma_page_cpu_to_dev) from [<800156eb>] (arm_dma_map_pag=
-e+0x1f/0x44)
-[<800156eb>] (arm_dma_map_page) from [<802935e3>] (ahash_digest+0x35f/0=
-x510)
-[<802935e3>] (ahash_digest) from [<7f800d03>] (test_ahash_speed.constpr=
-op.6+0x24a/0x4e4 [tcrypt])
-[<7f800d03>] (test_ahash_speed.constprop.6 [tcrypt]) from [<7f802fd5>] =
-(do_test+0x1898/0x2058 [tcrypt])
-[<7f802fd5>] (do_test [tcrypt]) from [<7f80802f>] (tcrypt_mod_init+0x2e=
-/0x63 [tcrypt])
-[<7f80802f>] (tcrypt_mod_init [tcrypt]) from [<80009517>] (do_one_initc=
-all+0xb3/0x134)
-[<80009517>] (do_one_initcall) from [<80351ec7>] (do_init_module+0x3b/0=
-x13c)
-[<80351ec7>] (do_init_module) from [<8005cc3f>] (load_module+0x97b/0x9d=
-c)
-[<8005cc3f>] (load_module) from [<8005cd8d>] (SyS_finit_module+0x35/0x3=
-e)
-[<8005cd8d>] (SyS_finit_module) from [<8000d101>] (ret_fast_syscall+0x1=
-/0x4c)
-Code: 1aba 0152 eb00 0b02 (5882) 0f92
-
-addr2line -f -i -e vmlinux 800155a0
-page_zonenum
-include/linux/mm.h:728
-page_zone
-include/linux/mm.h:881
-dma_cache_maint_page
-arch/arm/mm/dma-mapping.c:822
-
-Signed-off-by: Horia Geant=C4=83 <horia.geanta@freescale.com>
----
-
-Only reproduced on ARM-based platforms (LS1021A, i.MX6).
-=46or some unknown reason, PPC-based ones do not exhibit the problem.
-
- crypto/tcrypt.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 2b00b617daab..46a4a757d478 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -48,6 +48,8 @@
- #define ENCRYPT 1
- #define DECRYPT 0
-=20
-+#define MAX_DIGEST_SIZE		64
-+
- /*
-  * return a string with the driver name
-  */
-@@ -950,7 +952,7 @@ static void test_ahash_speed(const char *algo, unsi=
-gned int secs,
- 	struct tcrypt_result tresult;
- 	struct ahash_request *req;
- 	struct crypto_ahash *tfm;
--	static char output[1024];
-+	char *output;
- 	int i, ret;
-=20
- 	tfm =3D crypto_alloc_ahash(algo, 0, 0);
-@@ -963,9 +965,9 @@ static void test_ahash_speed(const char *algo, unsi=
-gned int secs,
- 	printk(KERN_INFO "\ntesting speed of async %s (%s)\n", algo,
- 			get_driver_name(crypto_ahash, tfm));
-=20
--	if (crypto_ahash_digestsize(tfm) > sizeof(output)) {
--		pr_err("digestsize(%u) > outputbuffer(%zu)\n",
--		       crypto_ahash_digestsize(tfm), sizeof(output));
-+	if (crypto_ahash_digestsize(tfm) > MAX_DIGEST_SIZE) {
-+		pr_err("digestsize(%u) > %d\n", crypto_ahash_digestsize(tfm),
-+		       MAX_DIGEST_SIZE);
- 		goto out;
- 	}
-=20
-@@ -980,6 +982,10 @@ static void test_ahash_speed(const char *algo, uns=
-igned int secs,
- 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
- 				   tcrypt_complete, &tresult);
-=20
-+	output =3D kmalloc(MAX_DIGEST_SIZE, GFP_KERNEL);
-+	if (!output)
-+		goto out_nomem;
-+
- 	for (i =3D 0; speed[i].blen !=3D 0; i++) {
- 		if (speed[i].blen > TVMEMSIZE * PAGE_SIZE) {
- 			pr_err("template (%u) too big for tvmem (%lu)\n",
-@@ -1006,6 +1012,9 @@ static void test_ahash_speed(const char *algo, un=
-signed int secs,
- 		}
- 	}
-=20
-+	kfree(output);
-+
-+out_nomem:
- 	ahash_request_free(req);
-=20
- out:
---=20
-2.4.4
+Good day, PAUL FREDRICK FINANCE offer loans at 2% annual rate. Apply with amount needed, loan duration and phone number Via: 
+:paulfredrickfinanceservice@gmail.com 
