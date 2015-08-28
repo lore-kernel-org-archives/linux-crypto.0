@@ -1,65 +1,46 @@
-From: Luis de Bethencourt <luis@debethencourt.com>
-Subject: [PATCH 3/3] crypto: ux500: Fix module autoload for OF platform
- drivers
-Date: Fri, 28 Aug 2015 18:44:49 +0200
-Message-ID: <20150828164449.GA5134@goodgumbo.baconseed.org>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH] crypto: Fix ASN.1 key handling for RSA akcipher
+Date: Fri, 28 Aug 2015 16:15:21 -0700
+Message-ID: <55E0EB89.6050800@intel.com>
+References: <1440739738-19587-1-git-send-email-marcel@holtmann.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Wolfram Sang <wsa@the-dreams.de>,
-	Vinod Koul <vinod.koul@intel.com>,
-	Asaf Vertz <asaf.vertz@tandemg.com>,
-	Cristian Stoica <cristian.stoica@freescale.com>,
-	Kees Cook <keescook@chromium.org>,
-	Maxime Ripard <maxime.ripard@free-electrons.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	linux-crypto@vger.kernel.org,
-	Javier Martinez Canillas <javier@osg.samsung.com>
-To: linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+To: Marcel Holtmann <marcel@holtmann.org>, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f169.google.com ([209.85.212.169]:36769 "EHLO
-	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751693AbbH1Qov (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 28 Aug 2015 12:44:51 -0400
-Content-Disposition: inline
+Received: from mga02.intel.com ([134.134.136.20]:25470 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752725AbbH1XQn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 28 Aug 2015 19:16:43 -0400
+In-Reply-To: <1440739738-19587-1-git-send-email-marcel@holtmann.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-These platform drivers have a OF device ID table but the OF module
-alias information is not created so module autoloading won't work.
+Hi Marcel,
+On 08/27/2015 10:28 PM, Marcel Holtmann wrote:
+> +++ b/crypto/rsaprivatekey.asn1
+> @@ -0,0 +1,13 @@
+> +RSAPrivateKey ::= SEQUENCE {
+> +	version		Version,
+> +	modulus		INTEGER ({ rsa_get_n }),	-- n
+> +	publicExponent	INTEGER ({ rsa_get_e }),	-- e
+> +	privateExponent	INTEGER ({ rsa_get_d }),	-- d
+> +	prime1		INTEGER,			-- p
+> +	prime2		INTEGER,			-- q
+> +	exponent1	INTEGER,			-- d mod (p-1)
+> +	exponent2	INTEGER,			-- d mod (q-1)
+> +	coefficient	INTEGER				-- (inverse of q) mod p
+> +}
+> +
+> +Version ::= INTEGER
 
-Signed-off-by: Luis de Bethencourt <luis@debethencourt.com>
----
- drivers/crypto/ux500/cryp/cryp_core.c | 1 +
- drivers/crypto/ux500/hash/hash_core.c | 1 +
- 2 files changed, 2 insertions(+)
+If you want to do this you should also update the existing RSA test vectors, because
+they are failing after this patch is applied.
+The reason is that there is no version in the private keys in crypto/testmgr.h
+And the QAT RSA implementation should also be updated so they are consistent.
 
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index fded0a5..00f97d9 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -1777,6 +1777,7 @@ static const struct of_device_id ux500_cryp_match[] = {
- 	{ .compatible = "stericsson,ux500-cryp" },
- 	{ },
- };
-+MODULE_DEVICE_TABLE(of, ux500_cryp_match);
- 
- static struct platform_driver cryp_driver = {
- 	.probe  = ux500_cryp_probe,
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 5f5f360..e02bd00 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -1958,6 +1958,7 @@ static const struct of_device_id ux500_hash_match[] = {
- 	{ .compatible = "stericsson,ux500-hash" },
- 	{ },
- };
-+MODULE_DEVICE_TABLE(of, ux500_hash_match);
- 
- static struct platform_driver hash_driver = {
- 	.probe  = ux500_hash_probe,
--- 
-2.4.6
+I have already started to do the changes proposed for the akcipher api to add SGLs
+support and to split the set_key for set_publickey and set_privatekey so I will
+take care of this.
+Thanks,
+T
