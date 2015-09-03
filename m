@@ -1,37 +1,54 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: testmgr: templates not tested
-Date: Thu, 03 Sep 2015 12:21:37 +0200
-Message-ID: <1503977.HnUv4rvHWj@myon.chronox.de>
-References: <2425525.lUG5gvxoc6@myon.chronox.de> <20150903074539.GA28992@gondor.apana.org.au>
+From: Andrey Ryabinin <aryabinin@odin.com>
+Subject: [PATCH] crypto/testmgr: don't copy from source IV too much
+Date: Thu, 3 Sep 2015 14:32:00 +0300
+Message-ID: <1441279921-26838-1-git-send-email-aryabinin@odin.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain
+Cc: Andrey Ryabinin <aryabinin@odin.com>,
+	<linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:33778 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752491AbbICKVn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Sep 2015 06:21:43 -0400
-In-Reply-To: <20150903074539.GA28992@gondor.apana.org.au>
+Received: from mx2.parallels.com ([199.115.105.18]:55785 "EHLO
+	mx2.parallels.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751914AbbICLcc (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 Sep 2015 07:32:32 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 3. September 2015, 15:45:39 schrieb Herbert Xu:
+While the destination buffer 'iv' is MAX_IVLEN size,
+the source 'template[i].iv' could be smaller. Thus
+copying it via memcpy() leads to invalid memory access.
+Use strlcpy() instead.
 
-Hi Herbert,
+Signed-off-by: Andrey Ryabinin <aryabinin@odin.com>
+---
+ crypto/testmgr.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> It's the same bug as gcm.  cbc should use the underlying cra_name
-> in its cra_name.
-
-I see. But then it seems to be a pervasive bug as xts suffers from the same 
-issue too.
-
-Would you please be so kind and give me a hint what exactly would need to be 
-done with the cra_name? I continued working on the keywrap template and have 
-it now complete. The only lingering issue is the testmgr where the test for 
-keywrap is not invoked.
-
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index d0a42bd..d85221c 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -974,7 +974,7 @@ static int __test_skcipher(struct crypto_ablkcipher *tfm, int enc,
+ 			continue;
+ 
+ 		if (template[i].iv)
+-			memcpy(iv, template[i].iv, MAX_IVLEN);
++			strlcpy(iv, template[i].iv, MAX_IVLEN);
+ 		else
+ 			memset(iv, 0, MAX_IVLEN);
+ 
+@@ -1049,7 +1049,7 @@ static int __test_skcipher(struct crypto_ablkcipher *tfm, int enc,
+ 			continue;
+ 
+ 		if (template[i].iv)
+-			memcpy(iv, template[i].iv, MAX_IVLEN);
++			strlcpy(iv, template[i].iv, MAX_IVLEN);
+ 		else
+ 			memset(iv, 0, MAX_IVLEN);
+ 
 -- 
-Ciao
-Stephan
+2.4.6
