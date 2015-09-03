@@ -1,29 +1,55 @@
-From: Jari Ruusu <jariruusu@users.sourceforge.net>
-Subject: Announce loop-AES-v3.7e file/swap crypto package
-Date: Thu, 3 Sep 2015 19:27:25 +0300
-Message-ID: <CACMCwJKAWeTtDyveogp-BY0aY7yD0+kg7KOFyKtoRHO2=dzMeg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-kernel@vger.kernel.org
-To: linux-crypto@vger.kernel.org
+From: Fabio Estevam <festevam@gmail.com>
+Subject: [PATCH] caam: desc: Remove unused JUMP_TYPE_MASK definition
+Date: Thu,  3 Sep 2015 15:21:29 -0300
+Message-ID: <1441304489-21738-1-git-send-email-festevam@gmail.com>
+Cc: horia.geanta@freescale.com, vicki.milhoan@freescale.com,
+	linux-crypto@vger.kernel.org,
+	Fabio Estevam <fabio.estevam@freescale.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f169.google.com ([209.85.212.169]:35692 "EHLO
-	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750779AbbICQ11 (ORCPT
+Received: from mail-yk0-f172.google.com ([209.85.160.172]:34005 "EHLO
+	mail-yk0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932473AbbICSVp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Sep 2015 12:27:27 -0400
+	Thu, 3 Sep 2015 14:21:45 -0400
+Received: by ykdg206 with SMTP id g206so52140881ykd.1
+        for <linux-crypto@vger.kernel.org>; Thu, 03 Sep 2015 11:21:45 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-loop-AES changes since previous release:
-- Worked around block layer interface changes on 4.2 kernels.
+From: Fabio Estevam <fabio.estevam@freescale.com>
 
-bzip2 compressed tarball is here:
+JUMP_TYPE_MASK is defined in desc.h and it is never used, so we can
+safely remove it to avoid the following build warning:
 
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7e.tar.bz2
-    md5sum 209fd5f3e658d6527bc1607f8726acda
+In file included from drivers/crypto/caam/desc_constr.h:7:0,
+                 from drivers/crypto/caam/ctrl.c:15:
+drivers/crypto/caam/desc.h:1495:0: warning: "JUMP_TYPE_MASK" redefined
+ #define JUMP_TYPE_MASK  (0x03 << JUMP_TYPE_SHIFT)
+ ^
+In file included from include/linux/module.h:19:0,
+                 from drivers/crypto/caam/compat.h:9,
+                 from drivers/crypto/caam/ctrl.c:11:
+include/linux/jump_label.h:131:0: note: this is the location of the previous definition
+ #define JUMP_TYPE_MASK 1UL
 
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7e.tar.bz2.sign
+Reported-by: Olof's autobuilder <build@lixom.net>
+Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
+---
+ drivers/crypto/caam/desc.h | 1 -
+ 1 file changed, 1 deletion(-)
 
+diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
+index 983d663..1e93c6a 100644
+--- a/drivers/crypto/caam/desc.h
++++ b/drivers/crypto/caam/desc.h
+@@ -1492,7 +1492,6 @@ struct sec4_sg_entry {
+ #define JUMP_JSL		(1 << JUMP_JSL_SHIFT)
+ 
+ #define JUMP_TYPE_SHIFT		22
+-#define JUMP_TYPE_MASK		(0x03 << JUMP_TYPE_SHIFT)
+ #define JUMP_TYPE_LOCAL		(0x00 << JUMP_TYPE_SHIFT)
+ #define JUMP_TYPE_NONLOCAL	(0x01 << JUMP_TYPE_SHIFT)
+ #define JUMP_TYPE_HALT		(0x02 << JUMP_TYPE_SHIFT)
 -- 
-Jari Ruusu  4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD  ACDF F073 3C80 8132 F189
+1.9.1
