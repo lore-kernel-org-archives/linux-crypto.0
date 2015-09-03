@@ -1,38 +1,29 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto/testmgr: don't copy from source IV too much
-Date: Thu, 3 Sep 2015 21:20:57 +0800
-Message-ID: <20150903132057.GA31317@gondor.apana.org.au>
-References: <1441279921-26838-1-git-send-email-aryabinin@odin.com>
+From: Jari Ruusu <jariruusu@users.sourceforge.net>
+Subject: Announce loop-AES-v3.7e file/swap crypto package
+Date: Thu, 3 Sep 2015 19:27:25 +0300
+Message-ID: <CACMCwJKAWeTtDyveogp-BY0aY7yD0+kg7KOFyKtoRHO2=dzMeg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Andrey Ryabinin <aryabinin@odin.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:40023 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752491AbbICNVG (ORCPT
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:35692 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750779AbbICQ11 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Sep 2015 09:21:06 -0400
-Content-Disposition: inline
-In-Reply-To: <1441279921-26838-1-git-send-email-aryabinin@odin.com>
+	Thu, 3 Sep 2015 12:27:27 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 03, 2015 at 02:32:00PM +0300, Andrey Ryabinin wrote:
-> While the destination buffer 'iv' is MAX_IVLEN size,
-> the source 'template[i].iv' could be smaller. Thus
-> copying it via memcpy() leads to invalid memory access.
-> Use strlcpy() instead.
-> 
-> Signed-off-by: Andrey Ryabinin <aryabinin@odin.com>
+loop-AES changes since previous release:
+- Worked around block layer interface changes on 4.2 kernels.
 
-Thanks for the patch.  Unfortunately it's broken because the IV
-is not a string and can contain NULs.  So either fix it by using
-the real ivsize, or change template[i].iv to a char array.
+bzip2 compressed tarball is here:
 
-Cheers,
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7e.tar.bz2
+    md5sum 209fd5f3e658d6527bc1607f8726acda
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7e.tar.bz2.sign
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jari Ruusu  4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD  ACDF F073 3C80 8132 F189
