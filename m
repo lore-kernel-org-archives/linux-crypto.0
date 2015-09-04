@@ -1,39 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] x86/crypto/ghash-intel: specify context size for ghash
- async algorithm
-Date: Fri, 4 Sep 2015 23:24:17 +0800
-Message-ID: <20150904152417.GA10022@gondor.apana.org.au>
+From: Andrey Ryabinin <aryabinin@odin.com>
+Subject: Re: [PATCH] crypto/testmgr: don't copy from source IV too much
+Date: Fri, 4 Sep 2015 19:42:26 +0300
+Message-ID: <55E9C9F2.5060402@odin.com>
 References: <1441279921-26838-1-git-send-email-aryabinin@odin.com>
- <1441279921-26838-2-git-send-email-aryabinin@odin.com>
+ <20150903132057.GA31317@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
 Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-	linux-kernel@vger.kernel.org
-To: Andrey Ryabinin <aryabinin@odin.com>
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:40549 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755979AbbIDPZD (ORCPT
+Received: from mx2.parallels.com ([199.115.105.18]:34681 "EHLO
+	mx2.parallels.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759073AbbIDQm3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Sep 2015 11:25:03 -0400
-Content-Disposition: inline
-In-Reply-To: <1441279921-26838-2-git-send-email-aryabinin@odin.com>
+	Fri, 4 Sep 2015 12:42:29 -0400
+In-Reply-To: <20150903132057.GA31317@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 03, 2015 at 02:32:01PM +0300, Andrey Ryabinin wrote:
-> Currently context size (cra_ctxsize) doesn't specified for
-> ghash_async_alg. Which means it's zero. Thus crypto_create_tfm()
-> doesn't allocate needed space for ghash_async_ctx, so any
-> read/write to ctx (e.g. in ghash_async_init_tfm()) is not valid.
+On 09/03/2015 04:20 PM, Herbert Xu wrote:
+> On Thu, Sep 03, 2015 at 02:32:00PM +0300, Andrey Ryabinin wrote:
+>> While the destination buffer 'iv' is MAX_IVLEN size,
+>> the source 'template[i].iv' could be smaller. Thus
+>> copying it via memcpy() leads to invalid memory access.
+>> Use strlcpy() instead.
+>>
+>> Signed-off-by: Andrey Ryabinin <aryabinin@odin.com>
 > 
-> Signed-off-by: Andrey Ryabinin <aryabinin@odin.com>
+> Thanks for the patch.  Unfortunately it's broken because the IV
+> is not a string and can contain NULs.  So either fix it by using
+> the real ivsize,
 
-Patch applied.  Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+So I've tried to use crypto_ablkcipher_ivsize(tfm) for that.
+
+But noticed that some algs don't set ivsize (which makes it zero).
+E.g. "ecb-cast6-avx" doesn't set it, but test vectors (cast6_enc_tv_template[], cast6_dec_tv_template[])
+have .iv of 16bytes.
+
+So I'm not sure what part is wrong here.
+Is it wrong to use crypto_ablkcipher_ivsize(tfm) to get ivsize here?
+Is it bug in 'ecb-cast6-avx'?
+Or maybe something else?
+
+
+> or change template[i].iv to a char array.
+> 
+> Cheers,
+> 
