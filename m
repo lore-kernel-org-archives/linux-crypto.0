@@ -1,55 +1,39 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: [PATCH] caam: desc: Remove unused JUMP_TYPE_MASK definition
-Date: Thu,  3 Sep 2015 15:21:29 -0300
-Message-ID: <1441304489-21738-1-git-send-email-festevam@gmail.com>
-Cc: horia.geanta@freescale.com, vicki.milhoan@freescale.com,
-	linux-crypto@vger.kernel.org,
-	Fabio Estevam <fabio.estevam@freescale.com>
-To: herbert@gondor.apana.org.au
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] x86/crypto/ghash-intel: specify context size for ghash
+ async algorithm
+Date: Fri, 4 Sep 2015 23:24:17 +0800
+Message-ID: <20150904152417.GA10022@gondor.apana.org.au>
+References: <1441279921-26838-1-git-send-email-aryabinin@odin.com>
+ <1441279921-26838-2-git-send-email-aryabinin@odin.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+	linux-kernel@vger.kernel.org
+To: Andrey Ryabinin <aryabinin@odin.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yk0-f172.google.com ([209.85.160.172]:34005 "EHLO
-	mail-yk0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932473AbbICSVp (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:40549 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755979AbbIDPZD (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Sep 2015 14:21:45 -0400
-Received: by ykdg206 with SMTP id g206so52140881ykd.1
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Sep 2015 11:21:45 -0700 (PDT)
+	Fri, 4 Sep 2015 11:25:03 -0400
+Content-Disposition: inline
+In-Reply-To: <1441279921-26838-2-git-send-email-aryabinin@odin.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Fabio Estevam <fabio.estevam@freescale.com>
+On Thu, Sep 03, 2015 at 02:32:01PM +0300, Andrey Ryabinin wrote:
+> Currently context size (cra_ctxsize) doesn't specified for
+> ghash_async_alg. Which means it's zero. Thus crypto_create_tfm()
+> doesn't allocate needed space for ghash_async_ctx, so any
+> read/write to ctx (e.g. in ghash_async_init_tfm()) is not valid.
+> 
+> Signed-off-by: Andrey Ryabinin <aryabinin@odin.com>
 
-JUMP_TYPE_MASK is defined in desc.h and it is never used, so we can
-safely remove it to avoid the following build warning:
-
-In file included from drivers/crypto/caam/desc_constr.h:7:0,
-                 from drivers/crypto/caam/ctrl.c:15:
-drivers/crypto/caam/desc.h:1495:0: warning: "JUMP_TYPE_MASK" redefined
- #define JUMP_TYPE_MASK  (0x03 << JUMP_TYPE_SHIFT)
- ^
-In file included from include/linux/module.h:19:0,
-                 from drivers/crypto/caam/compat.h:9,
-                 from drivers/crypto/caam/ctrl.c:11:
-include/linux/jump_label.h:131:0: note: this is the location of the previous definition
- #define JUMP_TYPE_MASK 1UL
-
-Reported-by: Olof's autobuilder <build@lixom.net>
-Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
----
- drivers/crypto/caam/desc.h | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
-index 983d663..1e93c6a 100644
---- a/drivers/crypto/caam/desc.h
-+++ b/drivers/crypto/caam/desc.h
-@@ -1492,7 +1492,6 @@ struct sec4_sg_entry {
- #define JUMP_JSL		(1 << JUMP_JSL_SHIFT)
- 
- #define JUMP_TYPE_SHIFT		22
--#define JUMP_TYPE_MASK		(0x03 << JUMP_TYPE_SHIFT)
- #define JUMP_TYPE_LOCAL		(0x00 << JUMP_TYPE_SHIFT)
- #define JUMP_TYPE_NONLOCAL	(0x01 << JUMP_TYPE_SHIFT)
- #define JUMP_TYPE_HALT		(0x02 << JUMP_TYPE_SHIFT)
+Patch applied.  Thanks!
 -- 
-1.9.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
