@@ -1,53 +1,64 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
+From: Andrzej Zaborowski <andrew.zaborowski@intel.com>
 Subject: Re: [RFC PATCH] crypto: RSA padding transform
-Date: Mon, 7 Sep 2015 07:31:56 -0700
-Message-ID: <55ED9FDC.60602@intel.com>
+Date: Mon, 7 Sep 2015 16:38:50 +0200
+Message-ID: <CAOq732LKEfbVOWqiBzB7RpGY5ofpEYN-NTf_yyT9Ncq7=CPsvw@mail.gmail.com>
 References: <1441494029-6765-1-git-send-email-andrew.zaborowski@intel.com>
- <35165141.6IIWPIRvUD@myon.chronox.de>
- <CAOq732JmhBh7kqDH1mMhUz1MXz9zJSx1jaqdBMjgDVvtraSrrQ@mail.gmail.com>
+	<55ED99DE.2000004@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
 Cc: linux-crypto@vger.kernel.org
-To: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
-	Stephan Mueller <smueller@chronox.de>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:4316 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753431AbbIGOde (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Sep 2015 10:33:34 -0400
-In-Reply-To: <CAOq732JmhBh7kqDH1mMhUz1MXz9zJSx1jaqdBMjgDVvtraSrrQ@mail.gmail.com>
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:38297 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752460AbbIGOiv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 7 Sep 2015 10:38:51 -0400
+Received: by wiclk2 with SMTP id lk2so86346481wic.1
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Sep 2015 07:38:50 -0700 (PDT)
+In-Reply-To: <55ED99DE.2000004@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 09/06/2015 07:33 AM, Andrzej Zaborowski wrote:
-> Probably yes, I also read about the decision to use iov buffers, this
-> will have a bigger effect on code.
+Hi Tadeusz,
 
-The more I think about the sgl support the more it looks to me like it wasn't
-a good idea. It will be copied into a flat buffer somewhere along the way anyway.
-Like in the example below.
+On 7 September 2015 at 16:06, Tadeusz Struk <tadeusz.struk@intel.com> wrote:
+> Hi Andrew,
+> On 09/05/2015 04:00 PM, Andrew Zaborowski wrote:
+>> +static int crypto_akcipher_init(struct crypto_tfm *tfm, u32 type, u32 mask)
+>> +{
+>> +     return 0;
+>> +}
+>> +
+>
+> This is not needed I think.
 
-I have that conversion already done, and for SW it looks like the data is copied 4 times
-for a single operation:
-1 - from sgl to flat buffer, because MPI doesn't take sgls, (if the src has more ents)
-2 - from buff to MPI, then, after operation
-3 - export from MPI to a buff and
-4 - from buff to sgl (if is the output sg it also fragmented).
+To create the padding transform I needed to use crypto_spawn_tfm which
+then calls -> __crypto_alloc_tfm -> crypto_init_ops resulting in a
+call to crypto_akcipher_type.init().
 
-I can see now that with all these padding schemes there will be more buffer copied
-on top of this, so I wonder if it still make sense.
-Herbert?
+>
+>>
+>> +static int pkcs1pad_decrypt_complete(struct akcipher_request *req, int err)
+>> +{
+>> +     struct akcipher_request *child_req = akcipher_request_ctx(req);
+>> +     int pos;
+>> +     uint8_t *dst = child_req->dst;
+>> +
+>> +     BUG_ON(err == -EOVERFLOW);
+>> +
+>> +     if (err)
+>> +             goto done;
+>> +
+>> +     if (dst[0] != 0x00) {
+>> +             err = -EINVAL;
+>> +             goto done;
+>> +     }
+>
+> This won't work I'm afraid, because MPI strips all leading zeors.
 
-> 
-> +     src = kmalloc(ctx->key_size,
->>> +                     (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
->>> +                     GFP_KERNEL : GFP_ATOMIC);
->>> +     if (!src)
->>> +             return -ENOMEM;
->>> +
->>> +     /* Reuse output buffer, add padding in the input */
->>> +     child_req->src = src;
->>> +     child_req->src_len = ctx->key_size;
->>> +     child_req->dst = req->dst;
->>> +     child_req->dst_len = req->dst_len;
+Good point, I have been testing against a version from before your
+change to mpi_read_buffer which strips the leading zeros.  I'll retest
+and update the patch after your other akcipher work is submitted.
+
+Best regards
