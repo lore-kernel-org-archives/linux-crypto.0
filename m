@@ -1,50 +1,53 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
 Subject: Re: [RFC PATCH] crypto: RSA padding transform
-Date: Mon, 7 Sep 2015 07:11:24 -0700
-Message-ID: <55ED9B0C.3020905@intel.com>
+Date: Mon, 7 Sep 2015 07:31:56 -0700
+Message-ID: <55ED9FDC.60602@intel.com>
 References: <1441494029-6765-1-git-send-email-andrew.zaborowski@intel.com>
  <35165141.6IIWPIRvUD@myon.chronox.de>
+ <CAOq732JmhBh7kqDH1mMhUz1MXz9zJSx1jaqdBMjgDVvtraSrrQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>,
-	Andrew Zaborowski <andrew.zaborowski@intel.com>
+To: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
+	Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:29888 "EHLO mga01.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:4316 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752008AbbIGOND (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Sep 2015 10:13:03 -0400
-In-Reply-To: <35165141.6IIWPIRvUD@myon.chronox.de>
+	id S1753431AbbIGOde (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 7 Sep 2015 10:33:34 -0400
+In-Reply-To: <CAOq732JmhBh7kqDH1mMhUz1MXz9zJSx1jaqdBMjgDVvtraSrrQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 09/06/2015 01:34 AM, Stephan Mueller wrote:
->> +static int pkcs1pad_setkey(struct crypto_akcipher *tfm, const void *key,
->> > +		unsigned int keylen)
-> Albeit I have nothing to say against the code, but shouldn't we first get the 
-> split of the setkey function implemented? The conversion work will increase 
-> more and more we merge code that uses that API that was decided to be 
-> revamped.
-> 
-> Tadeusz, what do you think?
+On 09/06/2015 07:33 AM, Andrzej Zaborowski wrote:
+> Probably yes, I also read about the decision to use iov buffers, this
+> will have a bigger effect on code.
 
-It would make it easier for me if this could wait until the split is done.
+The more I think about the sgl support the more it looks to me like it wasn't
+a good idea. It will be copied into a flat buffer somewhere along the way anyway.
+Like in the example below.
 
->> +		akcipher_request_set_crypt(req, NULL, NULL, 0, 0);
->> > +		if (crypto_akcipher_encrypt(req) != -EOVERFLOW)
->> > +			err = -EINVAL;
-> I had a chat with Tadesusz already on this code which I need for the 
-> algif_akcipher code too (and there I need this check more often as user space 
-> may simply change the key under my feet). I feel that it is a waste of CPU 
-> cycles to set up a fake encryption request just to get the data length which 
-> is based on the used key.
-> 
-> The value we obtain here is simply a check of the key length. Thus, I would 
-> think that we should have a separate akcipher API call for this instead of 
-> requiring the caller to allocate a fake request context.
-> 
-> Tadeusz, are you working on that code or shall I have a look?
+I have that conversion already done, and for SW it looks like the data is copied 4 times
+for a single operation:
+1 - from sgl to flat buffer, because MPI doesn't take sgls, (if the src has more ents)
+2 - from buff to MPI, then, after operation
+3 - export from MPI to a buff and
+4 - from buff to sgl (if is the output sg it also fragmented).
 
-I wasn't planning to add this, but yes, I think it's a good idea.
-I'll add it.
+I can see now that with all these padding schemes there will be more buffer copied
+on top of this, so I wonder if it still make sense.
+Herbert?
+
+> 
+> +     src = kmalloc(ctx->key_size,
+>>> +                     (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+>>> +                     GFP_KERNEL : GFP_ATOMIC);
+>>> +     if (!src)
+>>> +             return -ENOMEM;
+>>> +
+>>> +     /* Reuse output buffer, add padding in the input */
+>>> +     child_req->src = src;
+>>> +     child_req->src_len = ctx->key_size;
+>>> +     child_req->dst = req->dst;
+>>> +     child_req->dst_len = req->dst_len;
