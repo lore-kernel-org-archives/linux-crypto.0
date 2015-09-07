@@ -1,76 +1,53 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [RFC PATCH] crypto: RSA padding transform
-Date: Mon, 07 Sep 2015 19:54:09 +0200
-Message-ID: <1807044.IVByMVeBDE@tauon.atsec.com>
-References: <1441494029-6765-1-git-send-email-andrew.zaborowski@intel.com> <CAOq732JmhBh7kqDH1mMhUz1MXz9zJSx1jaqdBMjgDVvtraSrrQ@mail.gmail.com> <55ED9FDC.60602@intel.com>
+From: Mike Mestnik <cheako@mikemestnik.net>
+Subject: Re: USB HID devices not linked to RNG
+Date: Mon, 7 Sep 2015 15:07:47 -0500
+Message-ID: <CAF8px55WFMO54uJT2kME4OauXAUCfsv2K2W1EA0ufuaVjFtXfg@mail.gmail.com>
+References: <1735492.1FWVU9y0M8@myon.chronox.de>
+	<1461912.H1d3XDk5sm@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
-	linux-crypto@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-crypto@vger.kernel.org, linux-input@vger.kernel.org,
+	tytso@mit.edu
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:33795 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750873AbbIGRyV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Sep 2015 13:54:21 -0400
-In-Reply-To: <55ED9FDC.60602@intel.com>
+Received: from mail-lb0-f174.google.com ([209.85.217.174]:35960 "EHLO
+	mail-lb0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751072AbbIGUHt (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 7 Sep 2015 16:07:49 -0400
+Received: by lbcao8 with SMTP id ao8so43219112lbc.3
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Sep 2015 13:07:47 -0700 (PDT)
+In-Reply-To: <1461912.H1d3XDk5sm@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 7. September 2015, 07:31:56 schrieb Tadeusz Struk:
+This is just an off the wall guess.  Wouldn't such entropy already be
+collected at a lower level, like raw usb traffic?
 
-Hi Tadeusz,
-
->On 09/06/2015 07:33 AM, Andrzej Zaborowski wrote:
->> Probably yes, I also read about the decision to use iov buffers, this
->> will have a bigger effect on code.
+On Sun, Sep 6, 2015 at 7:12 PM, Stephan Mueller <smueller@chronox.de> wrote:
+> Am Montag, 7. September 2015, 02:10:16 schrieb Stephan Mueller:
 >
->The more I think about the sgl support the more it looks to me like it wasn't
->a good idea. It will be copied into a flat buffer somewhere along the way
->anyway. Like in the example below.
+> Hi Stephan,
 >
->I have that conversion already done, and for SW it looks like the data is
->copied 4 times for a single operation:
->1 - from sgl to flat buffer, because MPI doesn't take sgls, (if the src has
->more ents) 2 - from buff to MPI, then, after operation
->3 - export from MPI to a buff and
->4 - from buff to sgl (if is the output sg it also fragmented).
+>> Hi,
+>>
+>> While analyzing the entropy sources for the random number generator in
+>> drivers/char/random.c, I saw that a USB mouse and a USB keyboard does
+>> trigger the add_input_randomness function to be triggered.
 >
->I can see now that with all these padding schemes there will be more buffer
->copied on top of this, so I wonder if it still make sense.
->Herbert?
-
-When the padding stuff comes into play, I think the SGL approach avoids 
-memcpy() invocations.
-
-For example, Andrzej's approach currently is to copy the *entire* source data 
-into a buffer where the padding is added.
-
-With SGLs, Andrzej only needs a buffer with the padding (which I would think 
-could even reside on the stack, provided some bounds checks are done), and 
-modify the SGL by preprending the padding buffer to the SGL with the source 
-data.
-
+> I need to reread what I write :-)
 >
->> +     src = kmalloc(ctx->key_size,
->> 
->>>> +                     (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
->>>> +                     GFP_KERNEL : GFP_ATOMIC);
->>>> +     if (!src)
->>>> +             return -ENOMEM;
->>>> +
->>>> +     /* Reuse output buffer, add padding in the input */
->>>> +     child_req->src = src;
->>>> +     child_req->src_len = ctx->key_size;
->>>> +     child_req->dst = req->dst;
->>>> +     child_req->dst_len = req->dst_len;
+> I mean that the USB mouse and USB keyboard does *not* trigger the
+> add_input_randomness function.
 >
->--
->To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
->the body of a message to majordomo@vger.kernel.org
->More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Ciao
-Stephan
+>>
+>> Is that intended?
+>
+>
+> --
+> Ciao
+> Stephan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-input" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
