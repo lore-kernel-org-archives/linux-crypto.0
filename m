@@ -1,46 +1,70 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH] crypto: Fix ASN.1 key handling for RSA akcipher
-Date: Mon, 07 Sep 2015 10:38:39 +0100
-Message-ID: <30536.1441618719@warthog.procyon.org.uk>
-References: <20150829065552.GA18342@gondor.apana.org.au>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [RFC PATCH] crypto: RSA padding transform
+Date: Mon, 7 Sep 2015 07:06:22 -0700
+Message-ID: <55ED99DE.2000004@intel.com>
+References: <1441494029-6765-1-git-send-email-andrew.zaborowski@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, Marcel Holtmann <marcel@holtmann.org>,
-	tadeusz.struk@intel.com, linux-crypto@vger.kernel.org,
-	dwmw2@infradead.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+To: Andrew Zaborowski <andrew.zaborowski@intel.com>,
+	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44378 "EHLO mx1.redhat.com"
+Received: from mga14.intel.com ([192.55.52.115]:16958 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752063AbbIGJip (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Sep 2015 05:38:45 -0400
-In-Reply-To: <20150829065552.GA18342@gondor.apana.org.au>
-Content-ID: <30535.1441618719.1@warthog.procyon.org.uk>
+	id S1751251AbbIGOIA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 7 Sep 2015 10:08:00 -0400
+In-Reply-To: <1441494029-6765-1-git-send-email-andrew.zaborowski@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+Hi Andrew,
+On 09/05/2015 04:00 PM, Andrew Zaborowski wrote:
+> +static int crypto_akcipher_init(struct crypto_tfm *tfm, u32 type, u32 mask)
+> +{
+> +	return 0;
+> +}
+> +
 
-> > I am not in favor of just hacking in this split until the semantics are
-> > actually understood. As said, the right solution from my point of view is
-> > to remove setkey from akcipher and replace it with setkeyid instead.
+This is not needed I think.
+
 > 
-> It's the keys system that should not be decoding the keys since
-> it doesn't know what to do with them.  The keys system should not
-> have any algorithm-specific knowledge in it.  You need to have
-> algorithm-specific knowledge to parse the keys, so that's why
-> the parsing should happen in the crypto API and not in the key
-> storage system.
+> +static int pkcs1pad_decrypt_complete(struct akcipher_request *req, int err)
+> +{
+> +	struct akcipher_request *child_req = akcipher_request_ctx(req);
+> +	int pos;
+> +	uint8_t *dst = child_req->dst;
+> +
+> +	BUG_ON(err == -EOVERFLOW);
+> +
+> +	if (err)
+> +		goto done;
+> +
+> +	if (dst[0] != 0x00) {
+> +		err = -EINVAL;
+> +		goto done;
+> +	}
 
-You're right and wrong, I think.
+This won't work I'm afraid, because MPI strips all leading zeors. 
 
-The asymmetric key type should be calling akcipher to do the algorithmic
-stuff, yes, *but* the key must also be parsed on loading to check that the
-bits we require for a particular algorithm are there.
+> +	if (dst[1] != 0x02) {
+> +		err = -EINVAL;
+> +		goto done;
+> +	}
+> 
+> +static int pkcs1pad_verify_complete(struct akcipher_request *req, int err)
+> +{
+> +	struct akcipher_request *child_req = akcipher_request_ctx(req);
+> +	int pos;
+> +	uint8_t *dst = child_req->dst;
+> +
+> +	BUG_ON(err == -EOVERFLOW);
+> +
+> +	if (err)
+> +		goto done;
+> +
+> +	if (dst[0] != 0x00) {
+> +		err = -EINVAL;
+> +		goto done;
+> +	}
 
-Now this could be done by starting up an akcipher blob and loading the key
-data into it to see if it croaks on initialisation (which will presumably
-check the contents of the data blob), but we wouldn't necessarily be able to
-actually *use* the key at this point.
-
-David
+same here the zero will be stripped off.
