@@ -1,56 +1,91 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH] crypto: RSA padding transform
-Date: Tue, 8 Sep 2015 09:07:00 +0800
-Message-ID: <20150908010700.GA4927@gondor.apana.org.au>
-References: <55ED9FDC.60602@intel.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 1/2] crypto: testmgr: test IV value after a cipher operation
+Date: Tue, 08 Sep 2015 05:23:59 +0200
+Message-ID: <43689867.jVbFUkvrcd@tauon.atsec.com>
+References: <1434448007-9537-1-git-send-email-boris.brezillon@free-electrons.com> <1434448007-9537-2-git-send-email-boris.brezillon@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: andrew.zaborowski@intel.com, smueller@chronox.de,
-	linux-crypto@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:37125 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751222AbbIHBHK (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Sep 2015 21:07:10 -0400
-Content-Disposition: inline
-In-Reply-To: <55ED9FDC.60602@intel.com>
+Received: from mail.eperm.de ([89.247.134.16]:33803 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751564AbbIHDYF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 7 Sep 2015 23:24:05 -0400
+In-Reply-To: <1434448007-9537-2-git-send-email-boris.brezillon@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Tadeusz Struk <tadeusz.struk@intel.com> wrote:
+Am Dienstag, 16. Juni 2015, 11:46:46 schrieb Boris Brezillon:
+
+Hi Herbert,
+
+>The crypto drivers are supposed to update the IV passed to the crypto
+>request before calling the completion callback.
+>Test for the IV value before considering the test as successful.
+
+May I ask whether there is anything wrong with this patch?
+
+I am asking because the keywrapping template I would like to release would 
+need the test manager to check the generated IV.
+
+Thanks a lot.
+
 >
-> The more I think about the sgl support the more it looks to me like it wasn't
-> a good idea. It will be copied into a flat buffer somewhere along the way anyway.
-> Like in the example below.
-> 
-> I have that conversion already done, and for SW it looks like the data is copied 4 times
-> for a single operation:
-> 1 - from sgl to flat buffer, because MPI doesn't take sgls, (if the src has more ents)
-> 2 - from buff to MPI, then, after operation
-> 3 - export from MPI to a buff and
-> 4 - from buff to sgl (if is the output sg it also fragmented).
-> 
-> I can see now that with all these padding schemes there will be more buffer copied
-> on top of this, so I wonder if it still make sense.
-> Herbert?
+>Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+>---
+> crypto/testmgr.c | 12 +++++++++++-
+> crypto/testmgr.h |  1 +
+> 2 files changed, 12 insertions(+), 1 deletion(-)
+>
+>diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+>index f9bce3d..e6b5f24 100644
+>--- a/crypto/testmgr.c
+>+++ b/crypto/testmgr.c
+>@@ -1013,12 +1013,22 @@ static int __test_skcipher(struct crypto_ablkcipher
+>*tfm, int enc,
+>
+> 		q = data;
+> 		if (memcmp(q, template[i].result, template[i].rlen)) {
+>-			pr_err("alg: skcipher%s: Test %d failed on %s for 
+%s\n",
+>+			pr_err("alg: skcipher%s: Test %d failed (invalid 
+result) on %s for %s\n",
+>d, j, e, algo);
+> 			hexdump(q, template[i].rlen);
+> 			ret = -EINVAL;
+> 			goto out;
+> 		}
+>+
+>+		if (template[i].iv_out &&
+>+		    memcmp(iv, template[i].iv_out,
+>+			   crypto_ablkcipher_ivsize(tfm))) {
+>+			pr_err("alg: skcipher%s: Test %d failed (invalid 
+output IV) on %s for
+>%s\n", +			       d, j, e, algo);
+>+			hexdump(iv, crypto_ablkcipher_ivsize(tfm));
+>+			ret = -EINVAL;
+>+			goto out;
+>+		}
+> 	}
+>
+> 	j = 0;
+>diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+>index 62e2485..03320f9 100644
+>--- a/crypto/testmgr.h
+>+++ b/crypto/testmgr.h
+>@@ -49,6 +49,7 @@ struct hash_testvec {
+> struct cipher_testvec {
+> 	char *key;
+> 	char *iv;
+>+	char *iv_out;
+> 	char *input;
+> 	char *result;
+> 	unsigned short tap[MAX_TAP];
 
-I think it makes sense.  Because to implement algif_akcipher
-someone will need to do the linearisation anyway.  Moreover there
-is hardware out there that handles this transparently and we should
-not cripple them.
 
-We should add MPI helpers to read/write SG lists which can then
-be used by those implementations that need the capability.  For
-the sake of simplicity you can simply start with a copy but later
-we can optimise it to be smarter.
-
-You can always have a fast-path for the case where the SG list is
-a single entry.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
