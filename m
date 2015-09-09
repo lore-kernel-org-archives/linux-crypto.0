@@ -1,7 +1,9 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH 0/8] crypto: Updates to akcipher API
-Date: Wed, 09 Sep 2015 09:14:54 -0700
-Message-ID: <20150909161454.2828.70445.stgit@tstruk-mobl1>
+Subject: [PATCH 1/8] crypto: akcipher - return status from
+ crypto_unregister_alg
+Date: Wed, 09 Sep 2015 09:15:01 -0700
+Message-ID: <20150909161501.2828.78012.stgit@tstruk-mobl1>
+References: <20150909161454.2828.70445.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -9,62 +11,49 @@ Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
 	tadeusz.struk@intel.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:64559 "EHLO mga09.intel.com"
+Received: from mga14.intel.com ([192.55.52.115]:9754 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752283AbbIIQQ7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Sep 2015 12:16:59 -0400
+	id S1751957AbbIIQQ6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 9 Sep 2015 12:16:58 -0400
+In-Reply-To: <20150909161454.2828.70445.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This series introduce updates to the akcipher API.
-setkey function has been split into set_pub_key and
-set_priv_key.
-Input and output buffers are now sgl instread of void *
-It also includes some minor updates like status check
-from crypto_unregister_akcipher which was not checked
-before.
+Return status from crypto_unregister_alg to the caller.
 
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
+ crypto/akcipher.c                  |    4 ++--
+ include/crypto/internal/akcipher.h |    4 +++-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-Tadeusz Struk (8):
-      crypto: akcipher - return status from crypto_unregister_alg
-      crypto: rsa - check status returned from crypto_unregister_akcipher
-      crypto: qat - check status returned from crypto_unregister_akcipher
-      crypto: akcipher - Changes to asymmetric key API
-      lib/scatterlist: Add sg_len helper
-      crypto: rsa - update accoring to akcipher API changes
-      crypto: qat - update accoring to akcipher API changes
-      crypto: testmgr - update test mgr
-
-
- crypto/Makefile                                   |    9 +
- crypto/akcipher.c                                 |    4 
- crypto/rsa.c                                      |  191 ++++++++++++++---
- crypto/rsa_helper.c                               |   42 +++-
- crypto/rsakey.asn1                                |    5 
- crypto/rsaprivkey.asn1                            |   11 +
- crypto/rsapubkey.asn1                             |    4 
- crypto/testmgr.c                                  |   40 ++--
- crypto/testmgr.h                                  |   36 ++-
- drivers/crypto/qat/qat_common/Makefile            |   12 +
- drivers/crypto/qat/qat_common/adf_common_drv.h    |    2 
- drivers/crypto/qat/qat_common/adf_init.c          |    6 -
- drivers/crypto/qat/qat_common/qat_asym_algs.c     |  232 +++++++++++++++------
- drivers/crypto/qat/qat_common/qat_rsakey.asn1     |    5 
- drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1 |   11 +
- drivers/crypto/qat/qat_common/qat_rsapubkey.asn1  |    4 
- include/crypto/akcipher.h                         |   99 ++++++---
- include/crypto/internal/akcipher.h                |    4 
- include/crypto/internal/rsa.h                     |    7 -
- include/linux/scatterlist.h                       |    1 
- lib/scatterlist.c                                 |   17 ++
- 21 files changed, 552 insertions(+), 190 deletions(-)
- delete mode 100644 crypto/rsakey.asn1
- create mode 100644 crypto/rsaprivkey.asn1
- create mode 100644 crypto/rsapubkey.asn1
- delete mode 100644 drivers/crypto/qat/qat_common/qat_rsakey.asn1
- create mode 100644 drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1
- create mode 100644 drivers/crypto/qat/qat_common/qat_rsapubkey.asn1
-
---
-Signature
+diff --git a/crypto/akcipher.c b/crypto/akcipher.c
+index 528ae6a..9cd84f7 100644
+--- a/crypto/akcipher.c
++++ b/crypto/akcipher.c
+@@ -107,9 +107,9 @@ int crypto_register_akcipher(struct akcipher_alg *alg)
+ }
+ EXPORT_SYMBOL_GPL(crypto_register_akcipher);
+ 
+-void crypto_unregister_akcipher(struct akcipher_alg *alg)
++int crypto_unregister_akcipher(struct akcipher_alg *alg)
+ {
+-	crypto_unregister_alg(&alg->base);
++	return crypto_unregister_alg(&alg->base);
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_akcipher);
+ 
+diff --git a/include/crypto/internal/akcipher.h b/include/crypto/internal/akcipher.h
+index 9a2bda1..9ea7bc9 100644
+--- a/include/crypto/internal/akcipher.h
++++ b/include/crypto/internal/akcipher.h
+@@ -55,6 +55,8 @@ int crypto_register_akcipher(struct akcipher_alg *alg);
+  * Function unregisters an implementation of a public key verify algorithm
+  *
+  * @alg:	algorithm definition
++ *
++ * Return: zero on success; error code in case of error
+  */
+-void crypto_unregister_akcipher(struct akcipher_alg *alg);
++int crypto_unregister_akcipher(struct akcipher_alg *alg);
+ #endif
