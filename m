@@ -1,56 +1,44 @@
-From: Andrzej Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [RFC PATCH] crypto: RSA padding transform
-Date: Tue, 8 Sep 2015 18:09:53 +0200
-Message-ID: <CAOq732LoTvUzDTM7vRHU3QCHeuL0vD4Bh24kqB0R8i0yCQdsJw@mail.gmail.com>
-References: <1441494029-6765-1-git-send-email-andrew.zaborowski@intel.com>
-	<CAOq732JmhBh7kqDH1mMhUz1MXz9zJSx1jaqdBMjgDVvtraSrrQ@mail.gmail.com>
-	<55ED9FDC.60602@intel.com>
-	<1807044.IVByMVeBDE@tauon.atsec.com>
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Subject: Re: USB HID devices not linked to RNG
+Date: Tue, 8 Sep 2015 22:40:07 -0700
+Message-ID: <CAKdAkRRYKi+P9NTaKuDm+OeXh6YoP4Atf3V1NR3miioFHAchhQ@mail.gmail.com>
+References: <1735492.1FWVU9y0M8@myon.chronox.de>
+	<1461912.H1d3XDk5sm@myon.chronox.de>
+	<CAF8px55WFMO54uJT2kME4OauXAUCfsv2K2W1EA0ufuaVjFtXfg@mail.gmail.com>
+	<2343086.CRIplH0oLU@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
-	linux-crypto@vger.kernel.org
+Cc: Mike Mestnik <cheako@mikemestnik.net>,
+	linux-crypto@vger.kernel.org,
+	"linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
+	"Theodore Ts'o" <tytso@mit.edu>
 To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f169.google.com ([209.85.212.169]:35868 "EHLO
-	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754521AbbIHQJz (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Sep 2015 12:09:55 -0400
-Received: by wicgb1 with SMTP id gb1so84375497wic.1
-        for <linux-crypto@vger.kernel.org>; Tue, 08 Sep 2015 09:09:54 -0700 (PDT)
-In-Reply-To: <1807044.IVByMVeBDE@tauon.atsec.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-input-owner@vger.kernel.org>
+In-Reply-To: <2343086.CRIplH0oLU@tauon.atsec.com>
+Sender: linux-input-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Stephan,
-
-On 7 September 2015 at 19:54, Stephan Mueller <smueller@chronox.de> wrote:
-> Am Montag, 7. September 2015, 07:31:56 schrieb Tadeusz Struk:
->>I can see now that with all these padding schemes there will be more buffer
->>copied on top of this, so I wonder if it still make sense.
->>Herbert?
+On Mon, Sep 7, 2015 at 2:09 PM, Stephan Mueller <smueller@chronox.de> wrote:
+> Am Montag, 7. September 2015, 15:07:47 schrieb Mike Mestnik:
 >
-> When the padding stuff comes into play, I think the SGL approach avoids
-> memcpy() invocations.
+> Hi Mike,
 >
-> For example, Andrzej's approach currently is to copy the *entire* source data
-> into a buffer where the padding is added.
+>>This is just an off the wall guess.  Wouldn't such entropy already be
+>>collected at a lower level, like raw usb traffic?
 >
-> With SGLs, Andrzej only needs a buffer with the padding (which I would think
-> could even reside on the stack, provided some bounds checks are done), and
-> modify the SGL by preprending the padding buffer to the SGL with the source
-> data.
+> The RNG collects data from interrupts (that also covers normal PS/2 mice and
+> keyboards), block devices and HID (it hooks itself into the input layer).
+>
+> So, raw USB traffic is not a source of entropy other than for the interrupts
+> the base PCI traffic would generate.
+>
+> What I am wondering: isn't the USB mouse/keyboard support hooking into the
+> kernel's input layer?
 
-Yes, in the case of the padding schemes, using sgl's would actually
-save a memcpy both on encrypt/sign and decrypt/verify.  Whether it'd
-actually help I'm not sure -- the number of pointers you need to
-touch, etc. may add up to around 128/256 bytes of memory access
-anyway.
+All input devices add randomness, however I think for mouse
+add_input_randomness() will drop majority of events since they are
+likely have the same value (well, depends on which direction you are
+moving the mouse)...
 
-You couldn't use buffers on stack though unless you only support
-synchronous underlying RSA implementations.  What you could do, for
-example in sign(), is use a static buffer pre-filled with the pad
-bytes of specific length.
-
-Best regards
+-- 
+Dmitry
