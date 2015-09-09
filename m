@@ -1,55 +1,44 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: USB HID devices not linked to RNG
-Date: Wed, 09 Sep 2015 14:24:54 +0200
-Message-ID: <2407745.gnJxkiQhnm@tauon.atsec.com>
-References: <1735492.1FWVU9y0M8@myon.chronox.de> <2343086.CRIplH0oLU@tauon.atsec.com> <CAKdAkRRYKi+P9NTaKuDm+OeXh6YoP4Atf3V1NR3miioFHAchhQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Mike Mestnik <cheako@mikemestnik.net>,
-	linux-crypto@vger.kernel.org,
-	"linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
-	Theodore Ts'o <tytso@mit.edu>
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Return-path: <linux-input-owner@vger.kernel.org>
-In-Reply-To: <CAKdAkRRYKi+P9NTaKuDm+OeXh6YoP4Atf3V1NR3miioFHAchhQ@mail.gmail.com>
-Sender: linux-input-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: [PATCH] crypto: sun4i-ss Fix a possible driver hang with ciphers
+Date: Wed,  9 Sep 2015 14:27:07 +0200
+Message-ID: <1441801627-31820-1-git-send-email-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	maxime.ripard@free-electrons.com,
+	linux-arm-kernel@lists.infradead.org,
+	LABBE Corentin <clabbe.montjoie@gmail.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:33544 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751650AbbIIM1h (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 9 Sep 2015 08:27:37 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 8. September 2015, 22:40:07 schrieb Dmitry Torokhov:
+The sun4i_ss_opti_poll function cipher data until the output miter have
+a length of 0.
+If the crypto API client, give more SGs than necessary this could result
+in an infinite loop.
+Fix it by checking for remaining bytes, just like sun4i_ss_cipher_poll().
 
-Hi Dmitry,
+Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+---
+ drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->
->All input devices add randomness, however I think for mouse
->add_input_randomness() will drop majority of events since they are
->likely have the same value (well, depends on which direction you are
->moving the mouse)...
-
-I agree that such mechanism is present, but it is implemented by 
-add_input_randomness:
-
-        /* ignore autorepeat and the like */
-        if (value == last_value)
-                return;
-
-So, when we install a probe at the entry into add_input_randomness, we should 
-see invocations.
-
-The problem now is that add_input_randomness is not called at all.
-
-Simply use the following code as a systemtap script, load it and move a USB 
-mouse or type on a USB keyboard:
-
-probe kernel.function("add_input_randomness") {
-	printf("add_input_randomness triggered\n");
-}
-
-Expected behavior: tons of printouts should be received (as it is the case 
-with PS/2 mice and keyboards).
-
-Actual behavior: no printout when moving USB HID.
-
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+index e070c31..a19ee12 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+@@ -104,7 +104,7 @@ static int sun4i_ss_opti_poll(struct ablkcipher_request *areq)
+ 			sg_miter_next(&mo);
+ 			oo = 0;
+ 		}
+-	} while (mo.length > 0);
++	} while (oleft > 0);
+ 
+ 	if (areq->info) {
+ 		for (i = 0; i < 4 && i < ivsize / 4; i++) {
+-- 
+2.4.6
