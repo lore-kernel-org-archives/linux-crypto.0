@@ -1,7 +1,7 @@
 From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH 6/7] crypto: qce replace qce_countsg with sg_nents_for_len2
-Date: Thu, 10 Sep 2015 15:21:41 +0200
-Message-ID: <1441891302-12014-7-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH 1/7] crypto: bfin: replace sg_count by sg_nents
+Date: Thu, 10 Sep 2015 15:21:36 +0200
+Message-ID: <1441891302-12014-2-git-send-email-clabbe.montjoie@gmail.com>
 References: <1441891302-12014-1-git-send-email-clabbe.montjoie@gmail.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	LABBE Corentin <clabbe.montjoie@gmail.com>
@@ -11,85 +11,63 @@ In-Reply-To: <1441891302-12014-1-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+The sg_count function in bfin_crc.c is the same function as sg_nents.
+Remove the duplicate code and use sg_nents() instead.
+
 Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/qce/ablkcipher.c |  4 ++--
- drivers/crypto/qce/dma.c        | 19 -------------------
- drivers/crypto/qce/dma.h        |  1 -
- drivers/crypto/qce/sha.c        |  2 +-
- 4 files changed, 3 insertions(+), 23 deletions(-)
+ drivers/crypto/bfin_crc.c | 25 +++----------------------
+ 1 file changed, 3 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/crypto/qce/ablkcipher.c b/drivers/crypto/qce/ablkcipher.c
-index ad592de..0c589e7 100644
---- a/drivers/crypto/qce/ablkcipher.c
-+++ b/drivers/crypto/qce/ablkcipher.c
-@@ -80,10 +80,10 @@ qce_ablkcipher_async_req_handle(struct crypto_async_request *async_req)
- 	dir_src = diff_dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL;
- 	dir_dst = diff_dst ? DMA_FROM_DEVICE : DMA_BIDIRECTIONAL;
+diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
+index 2f0b333..95b7396 100644
+--- a/drivers/crypto/bfin_crc.c
++++ b/drivers/crypto/bfin_crc.c
+@@ -96,26 +96,6 @@ struct bfin_crypto_crc_ctx {
+ 	u32			key;
+ };
  
--	rctx->src_nents = qce_countsg(req->src, req->nbytes,
-+	rctx->src_nents = sg_nents_for_len2(req->src, req->nbytes,
- 				      &rctx->src_chained);
- 	if (diff_dst) {
--		rctx->dst_nents = qce_countsg(req->dst, req->nbytes,
-+		rctx->dst_nents = sg_nents_for_len2(req->dst, req->nbytes,
- 					      &rctx->dst_chained);
- 	} else {
- 		rctx->dst_nents = rctx->src_nents;
-diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
-index 378cb76..c18aaca 100644
---- a/drivers/crypto/qce/dma.c
-+++ b/drivers/crypto/qce/dma.c
-@@ -87,25 +87,6 @@ void qce_unmapsg(struct device *dev, struct scatterlist *sg, int nents,
- 		dma_unmap_sg(dev, sg, nents, dir);
- }
- 
--int qce_countsg(struct scatterlist *sglist, int nbytes, bool *chained)
+-
+-/*
+- * derive number of elements in scatterlist
+- */
+-static int sg_count(struct scatterlist *sg_list)
 -{
--	struct scatterlist *sg = sglist;
--	int nents = 0;
+-	struct scatterlist *sg = sg_list;
+-	int sg_nents = 1;
 -
--	if (chained)
--		*chained = false;
+-	if (sg_list == NULL)
+-		return 0;
 -
--	while (nbytes > 0 && sg) {
--		nents++;
--		nbytes -= sg->length;
--		if (!sg_is_last(sg) && (sg + 1)->length == 0 && chained)
--			*chained = true;
+-	while (!sg_is_last(sg)) {
+-		sg_nents++;
 -		sg = sg_next(sg);
 -	}
 -
--	return nents;
+-	return sg_nents;
 -}
 -
- struct scatterlist *
- qce_sgtable_add(struct sg_table *sgt, struct scatterlist *new_sgl)
- {
-diff --git a/drivers/crypto/qce/dma.h b/drivers/crypto/qce/dma.h
-index 65bedb8..4653e2d8 100644
---- a/drivers/crypto/qce/dma.h
-+++ b/drivers/crypto/qce/dma.h
-@@ -49,7 +49,6 @@ int qce_dma_prep_sgs(struct qce_dma_data *dma, struct scatterlist *sg_in,
- 		     dma_async_tx_callback cb, void *cb_param);
- void qce_dma_issue_pending(struct qce_dma_data *dma);
- int qce_dma_terminate_all(struct qce_dma_data *dma);
--int qce_countsg(struct scatterlist *sg_list, int nbytes, bool *chained);
- void qce_unmapsg(struct device *dev, struct scatterlist *sg, int nents,
- 		 enum dma_data_direction dir, bool chained);
- int qce_mapsg(struct device *dev, struct scatterlist *sg, int nents,
-diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-index be2f504..86fae62 100644
---- a/drivers/crypto/qce/sha.c
-+++ b/drivers/crypto/qce/sha.c
-@@ -92,7 +92,7 @@ static int qce_ahash_async_req_handle(struct crypto_async_request *async_req)
- 		rctx->authklen = AES_KEYSIZE_128;
+ /*
+  * get element in scatter list by given index
+  */
+@@ -160,7 +140,7 @@ static int bfin_crypto_crc_init(struct ahash_request *req)
  	}
+ 	spin_unlock_bh(&crc_list.lock);
  
--	rctx->src_nents = qce_countsg(req->src, req->nbytes,
-+	rctx->src_nents = sg_nents_for_len2(req->src, req->nbytes,
- 				      &rctx->src_chained);
- 	ret = qce_mapsg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE,
- 			rctx->src_chained);
+-	if (sg_count(req->src) > CRC_MAX_DMA_DESC) {
++	if (sg_nents(req->src) > CRC_MAX_DMA_DESC) {
+ 		dev_dbg(ctx->crc->dev, "init: requested sg list is too big > %d\n",
+ 			CRC_MAX_DMA_DESC);
+ 		return -EINVAL;
+@@ -376,7 +356,8 @@ static int bfin_crypto_crc_handle_queue(struct bfin_crypto_crc *crc,
+ 			ctx->sg = req->src;
+ 
+ 		/* Chop crc buffer size to multiple of 32 bit */
+-		nsg = ctx->sg_nents = sg_count(ctx->sg);
++		nsg = sg_nents(ctx->sg);
++		ctx->sg_nents = nsg;
+ 		ctx->sg_buflen = ctx->buflast_len + req->nbytes;
+ 		ctx->bufnext_len = ctx->sg_buflen % 4;
+ 		ctx->sg_buflen &= ~0x3;
 -- 
 2.4.6
