@@ -1,7 +1,7 @@
 From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH 7/7] crypto: caam replace __sg_count with sg_nents_for_len2
-Date: Thu, 10 Sep 2015 15:21:42 +0200
-Message-ID: <1441891302-12014-8-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH 6/7] crypto: qce replace qce_countsg with sg_nents_for_len2
+Date: Thu, 10 Sep 2015 15:21:41 +0200
+Message-ID: <1441891302-12014-7-git-send-email-clabbe.montjoie@gmail.com>
 References: <1441891302-12014-1-git-send-email-clabbe.montjoie@gmail.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	LABBE Corentin <clabbe.montjoie@gmail.com>
@@ -13,90 +13,83 @@ List-Id: linux-crypto.vger.kernel.org
 
 Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/caam/caamhash.c   | 14 ++++++++------
- drivers/crypto/caam/sg_sw_sec4.h | 20 +-------------------
- 2 files changed, 9 insertions(+), 25 deletions(-)
+ drivers/crypto/qce/ablkcipher.c |  4 ++--
+ drivers/crypto/qce/dma.c        | 19 -------------------
+ drivers/crypto/qce/dma.h        |  1 -
+ drivers/crypto/qce/sha.c        |  2 +-
+ 4 files changed, 3 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 94433b9..b429595 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -797,8 +797,9 @@ static int ahash_update_ctx(struct ahash_request *req)
- 	to_hash = in_len - *next_buflen;
+diff --git a/drivers/crypto/qce/ablkcipher.c b/drivers/crypto/qce/ablkcipher.c
+index ad592de..0c589e7 100644
+--- a/drivers/crypto/qce/ablkcipher.c
++++ b/drivers/crypto/qce/ablkcipher.c
+@@ -80,10 +80,10 @@ qce_ablkcipher_async_req_handle(struct crypto_async_request *async_req)
+ 	dir_src = diff_dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL;
+ 	dir_dst = diff_dst ? DMA_FROM_DEVICE : DMA_BIDIRECTIONAL;
  
- 	if (to_hash) {
--		src_nents = __sg_count(req->src, req->nbytes - (*next_buflen),
--				       &chained);
-+		src_nents = sg_nents_for_len2(req->src,
-+					      req->nbytes - (*next_buflen),
-+					      &chained);
- 		sec4_sg_src_index = 1 + (*buflen ? 1 : 0);
- 		sec4_sg_bytes = (sec4_sg_src_index + src_nents) *
- 				 sizeof(struct sec4_sg_entry);
-@@ -1000,7 +1001,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 	int ret = 0;
- 	int sh_len;
- 
--	src_nents = __sg_count(req->src, req->nbytes, &chained);
-+	src_nents = sg_nents_for_len2(req->src, req->nbytes, &chained);
- 	sec4_sg_src_index = 1 + (buflen ? 1 : 0);
- 	sec4_sg_bytes = (sec4_sg_src_index + src_nents) *
- 			 sizeof(struct sec4_sg_entry);
-@@ -1236,8 +1237,9 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 	to_hash = in_len - *next_buflen;
- 
- 	if (to_hash) {
--		src_nents = __sg_count(req->src, req->nbytes - (*next_buflen),
--				       &chained);
-+		src_nents = sg_nents_for_len2(req->src,
-+					      req->nbytes - (*next_buflen),
-+					      &chained);
- 		sec4_sg_bytes = (1 + src_nents) *
- 				sizeof(struct sec4_sg_entry);
- 
-@@ -1347,7 +1349,7 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 	int sh_len;
- 	int ret = 0;
- 
--	src_nents = __sg_count(req->src, req->nbytes, &chained);
-+	src_nents = sg_nents_for_len2(req->src, req->nbytes, &chained);
- 	sec4_sg_src_index = 2;
- 	sec4_sg_bytes = (sec4_sg_src_index + src_nents) *
- 			 sizeof(struct sec4_sg_entry);
-diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
-index 18cd6d1..a486efc 100644
---- a/drivers/crypto/caam/sg_sw_sec4.h
-+++ b/drivers/crypto/caam/sg_sw_sec4.h
-@@ -69,29 +69,11 @@ static inline struct sec4_sg_entry *sg_to_sec4_sg_len(
- 	return sec4_sg_ptr - 1;
+-	rctx->src_nents = qce_countsg(req->src, req->nbytes,
++	rctx->src_nents = sg_nents_for_len2(req->src, req->nbytes,
+ 				      &rctx->src_chained);
+ 	if (diff_dst) {
+-		rctx->dst_nents = qce_countsg(req->dst, req->nbytes,
++		rctx->dst_nents = sg_nents_for_len2(req->dst, req->nbytes,
+ 					      &rctx->dst_chained);
+ 	} else {
+ 		rctx->dst_nents = rctx->src_nents;
+diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
+index 378cb76..c18aaca 100644
+--- a/drivers/crypto/qce/dma.c
++++ b/drivers/crypto/qce/dma.c
+@@ -87,25 +87,6 @@ void qce_unmapsg(struct device *dev, struct scatterlist *sg, int nents,
+ 		dma_unmap_sg(dev, sg, nents, dir);
  }
  
--/* count number of elements in scatterlist */
--static inline int __sg_count(struct scatterlist *sg_list, int nbytes,
--			     bool *chained)
+-int qce_countsg(struct scatterlist *sglist, int nbytes, bool *chained)
 -{
--	struct scatterlist *sg = sg_list;
--	int sg_nents = 0;
+-	struct scatterlist *sg = sglist;
+-	int nents = 0;
 -
--	while (nbytes > 0) {
--		sg_nents++;
+-	if (chained)
+-		*chained = false;
+-
+-	while (nbytes > 0 && sg) {
+-		nents++;
 -		nbytes -= sg->length;
--		if (!sg_is_last(sg) && (sg + 1)->length == 0)
+-		if (!sg_is_last(sg) && (sg + 1)->length == 0 && chained)
 -			*chained = true;
 -		sg = sg_next(sg);
 -	}
 -
--	return sg_nents;
+-	return nents;
 -}
 -
- /* derive number of elements in scatterlist, but return 0 for 1 */
- static inline int sg_count(struct scatterlist *sg_list, int nbytes,
- 			     bool *chained)
+ struct scatterlist *
+ qce_sgtable_add(struct sg_table *sgt, struct scatterlist *new_sgl)
  {
--	int sg_nents = __sg_count(sg_list, nbytes, chained);
-+	int sg_nents = sg_nents_for_len2(sg_list, nbytes, chained);
+diff --git a/drivers/crypto/qce/dma.h b/drivers/crypto/qce/dma.h
+index 65bedb8..4653e2d8 100644
+--- a/drivers/crypto/qce/dma.h
++++ b/drivers/crypto/qce/dma.h
+@@ -49,7 +49,6 @@ int qce_dma_prep_sgs(struct qce_dma_data *dma, struct scatterlist *sg_in,
+ 		     dma_async_tx_callback cb, void *cb_param);
+ void qce_dma_issue_pending(struct qce_dma_data *dma);
+ int qce_dma_terminate_all(struct qce_dma_data *dma);
+-int qce_countsg(struct scatterlist *sg_list, int nbytes, bool *chained);
+ void qce_unmapsg(struct device *dev, struct scatterlist *sg, int nents,
+ 		 enum dma_data_direction dir, bool chained);
+ int qce_mapsg(struct device *dev, struct scatterlist *sg, int nents,
+diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
+index be2f504..86fae62 100644
+--- a/drivers/crypto/qce/sha.c
++++ b/drivers/crypto/qce/sha.c
+@@ -92,7 +92,7 @@ static int qce_ahash_async_req_handle(struct crypto_async_request *async_req)
+ 		rctx->authklen = AES_KEYSIZE_128;
+ 	}
  
- 	if (likely(sg_nents == 1))
- 		return 0;
+-	rctx->src_nents = qce_countsg(req->src, req->nbytes,
++	rctx->src_nents = sg_nents_for_len2(req->src, req->nbytes,
+ 				      &rctx->src_chained);
+ 	ret = qce_mapsg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE,
+ 			rctx->src_chained);
 -- 
 2.4.6
