@@ -1,63 +1,44 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH 2/7] crypto: amcc replace get_sg_count by sg_nents_for_len
-Date: Thu, 10 Sep 2015 15:21:37 +0200
-Message-ID: <1441891302-12014-3-git-send-email-clabbe.montjoie@gmail.com>
-References: <1441891302-12014-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	LABBE Corentin <clabbe.montjoie@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1441891302-12014-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] crypto: qat - don't check for iommu
+Date: Thu, 10 Sep 2015 11:36:57 -0700
+Message-ID: <20150910183657.26171.65960.stgit@tstruk-mobl1>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, john.griffin@intel.com,
+	qat-linux@intel.com, tadeusz.struk@intel.com
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:59515 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751981AbbIJSil (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 10 Sep 2015 14:38:41 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The get_sg_count function of amcc is the same as sg_nents_for_len from
-lib/scatterlist.c
+From: John Griffin <john.griffin@intel.com>
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+In some cases we don't want iommu to be enabled but still we want enable VFs.
+
+Signed-off-by: John Griffin <john.griffin@intel.com>
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- drivers/crypto/amcc/crypto4xx_core.c | 22 +---------------------
- 1 file changed, 1 insertion(+), 21 deletions(-)
+ drivers/crypto/qat/qat_common/adf_sriov.c |    5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 192a8fa..27288fc 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -740,26 +740,6 @@ void crypto4xx_return_pd(struct crypto4xx_device *dev,
- 	pd_uinfo->state = PD_ENTRY_FREE;
- }
+diff --git a/drivers/crypto/qat/qat_common/adf_sriov.c b/drivers/crypto/qat/qat_common/adf_sriov.c
+index 2f77a4a..fb5a53d 100644
+--- a/drivers/crypto/qat/qat_common/adf_sriov.c
++++ b/drivers/crypto/qat/qat_common/adf_sriov.c
+@@ -245,9 +245,8 @@ int adf_sriov_configure(struct pci_dev *pdev, int numvfs)
+ 	}
  
--/*
-- * derive number of elements in scatterlist
-- * Shamlessly copy from talitos.c
-- */
--static int get_sg_count(struct scatterlist *sg_list, int nbytes)
--{
--	struct scatterlist *sg = sg_list;
--	int sg_nents = 0;
--
--	while (nbytes) {
--		sg_nents++;
--		if (sg->length > nbytes)
--			break;
--		nbytes -= sg->length;
--		sg = sg_next(sg);
--	}
--
--	return sg_nents;
--}
--
- static u32 get_next_gd(u32 current)
- {
- 	if (current != PPC4XX_LAST_GD)
-@@ -800,7 +780,7 @@ u32 crypto4xx_build_pd(struct crypto_async_request *req,
- 	u32 gd_idx = 0;
+ 	if (!iommu_present(&pci_bus_type)) {
+-		dev_err(&pdev->dev,
+-			"IOMMU must be enabled for SR-IOV to work\n");
+-		return -EINVAL;
++		dev_warn(&pdev->dev,
++			"IOMMU should be enabled for SR-IOV to work correctly\n");
+ 	}
  
- 	/* figure how many gd is needed */
--	num_gd = get_sg_count(src, datalen);
-+	num_gd = sg_nents_for_len(src, datalen);
- 	if (num_gd == 1)
- 		num_gd = 0;
- 
--- 
-2.4.6
+ 	if (accel_dev->pf.vf_info) {
