@@ -1,8 +1,9 @@
 From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: [PATCH 0/4] crypto: [sha] x86 SHA extension optimization of SHA1
- and SHA256
-Date: Thu, 10 Sep 2015 15:26:52 -0700
-Message-ID: <1441924012.4322.0.camel@schen9-desk2.jf.intel.com>
+Subject: [PATCH 1/4] crypto: [sha] Intel SHA Extensions optimized SHA1
+ transform function
+Date: Thu, 10 Sep 2015 15:26:59 -0700
+Message-ID: <1441924019.4322.1.camel@schen9-desk2.jf.intel.com>
+References: <cover.1441929717.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
@@ -17,50 +18,331 @@ Cc: Sean Gulley <sean.m.gulley@intel.com>,
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"H. Peter Anvin" <hpa@zytor.com>,
 	"David S.Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:43010 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751018AbbIJW0x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 Sep 2015 18:26:53 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <cover.1441929717.git.tim.c.chen@linux.intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 
-The new x86 SHA extensions provide new hardware accelerated instructions
-for computing SHA1 and SHA256 hashes. This patch series provide the
-assembly routines for SHA1 and SHA256 computation using these new
-instructions to the kernel crypto library.  For 4K data blocks, we've
-seen up to 3.6x speedup over existing SSSE3 enhanced routines in the
-kernel crypto library on Broxton platform.
+This patch includes the Intel SHA Extensions optimized implementation
+of SHA-1 update function. This function has been tested on Broxton
+platform and measured a speed up of 3.6x over the SSSE3 implementiation
+for 4K blocks.
 
-Refer to SHA extension programming guide in chapter 8.2 of the
-Intel Architecture Instruction Set Extensions Programming reference.
-https://software.intel.com/sites/default/files/managed/07/b7/319433-023.pdf
-
-Pre-req patches:
-[1] [PATCH] sha: Enable cpuid check for Intel SHA extensions implementations
-http://marc.info/?l=linux-kernel&m=144019424304089&w=2
-[2] [Patch] x86/insn: perf tools: Add new SHA instructions
-http://marc.info/?l=linux-kernel&m=144119645000679&w=2
-
-Tim Chen (4):
-  crypto: [sha] Intel SHA Extensions optimized SHA1 transform function
-  crypto: [sha] Intel SHA Extensions optimized SHA256 transform function
-  crypto: [sha] glue code for Intel SHA extensions optimized SHA1 &
-    SHA256
-  crypto: [sha] Add build support for Intel SHA Extensions optimized
-    SHA1 and SHA256
-
- arch/x86/Makefile                   |   6 +-
- arch/x86/crypto/Makefile            |   8 +
- arch/x86/crypto/sha1_ni_asm.S       | 302 ++++++++++++++++++++++++++++++
- arch/x86/crypto/sha1_ssse3_glue.c   |  12 +-
- arch/x86/crypto/sha256_ni_asm.S     | 353 ++++++++++++++++++++++++++++++++++++
- arch/x86/crypto/sha256_ssse3_glue.c |  38 ++--
- crypto/Kconfig                      |  10 +-
- 7 files changed, 707 insertions(+), 22 deletions(-)
+Originally-by: Chandramouli Narayanan <mouli_7982@yahoo.com>
+Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+---
+ arch/x86/crypto/sha1_ni_asm.S | 302 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 302 insertions(+)
  create mode 100644 arch/x86/crypto/sha1_ni_asm.S
- create mode 100644 arch/x86/crypto/sha256_ni_asm.S
 
+diff --git a/arch/x86/crypto/sha1_ni_asm.S b/arch/x86/crypto/sha1_ni_asm.S
+new file mode 100644
+index 0000000..874a651
+--- /dev/null
++++ b/arch/x86/crypto/sha1_ni_asm.S
+@@ -0,0 +1,302 @@
++/*
++ * Intel SHA Extensions optimized implementation of a SHA-1 update function
++ *
++ * This file is provided under a dual BSD/GPLv2 license.  When using or
++ * redistributing this file, you may do so under either license.
++ *
++ * GPL LICENSE SUMMARY
++ *
++ * Copyright(c) 2015 Intel Corporation.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of version 2 of the GNU General Public License as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * Contact Information:
++ * 	Sean Gulley <sean.m.gulley@intel.com>
++ * 	Tim Chen <tim.c.chen@linux.intel.com>
++ *
++ * BSD LICENSE
++ *
++ * Copyright(c) 2015 Intel Corporation.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 	* Redistributions of source code must retain the above copyright
++ * 	  notice, this list of conditions and the following disclaimer.
++ * 	* Redistributions in binary form must reproduce the above copyright
++ * 	  notice, this list of conditions and the following disclaimer in
++ * 	  the documentation and/or other materials provided with the
++ * 	  distribution.
++ * 	* Neither the name of Intel Corporation nor the names of its
++ * 	  contributors may be used to endorse or promote products derived
++ * 	  from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ */
++
++#include <linux/linkage.h>
++
++#define DIGEST_PTR	%rdi	/* 1st arg */
++#define DATA_PTR	%rsi	/* 2nd arg */
++#define NUM_BLKS	%rdx	/* 3rd arg */
++
++#define RSPSAVE		%rax
++
++/* gcc conversion */
++#define FRAME_SIZE	32	/* space for 2x16 bytes */
++
++#define ABCD		%xmm0
++#define E0		%xmm1	/* Need two E's b/c they ping pong */
++#define E1		%xmm2
++#define MSG0		%xmm3
++#define MSG1		%xmm4
++#define MSG2		%xmm5
++#define MSG3		%xmm6
++#define SHUF_MASK	%xmm7
++
++
++/*
++ * Intel SHA Extensions optimized implementation of a SHA-1 update function
++ *
++ * The function takes a pointer to the current hash values, a pointer to the
++ * input data, and a number of 64 byte blocks to process.  Once all blocks have
++ * been processed, the digest pointer is  updated with the resulting hash value.
++ * The function only processes complete blocks, there is no functionality to
++ * store partial blocks. All message padding and hash value initialization must
++ * be done outside the update function.
++ *
++ * The indented lines in the loop are instructions related to rounds processing.
++ * The non-indented lines are instructions related to the message schedule.
++ *
++ * void sha1_ni_transform(uint32_t *digest, const void *data,
++		uint32_t numBlocks)
++ * digest : pointer to digest
++ * data: pointer to input data
++ * numBlocks: Number of blocks to process
++ */
++.text
++.align 32
++ENTRY(sha1_ni_transform)
++	mov		%rsp, RSPSAVE
++	sub		$FRAME_SIZE, %rsp
++	and		$~0xF, %rsp
++
++	shl		$6, NUM_BLKS		/* convert to bytes */
++	jz		.Ldone_hash
++	add		DATA_PTR, NUM_BLKS	/* pointer to end of data */
++
++	/* load initial hash values */
++	pinsrd		$3, 1*16(DIGEST_PTR), E0
++	movdqu		0*16(DIGEST_PTR), ABCD
++	pand		UPPER_WORD_MASK(%rip), E0
++	pshufd		$0x1B, ABCD, ABCD
++
++	movdqa		PSHUFFLE_BYTE_FLIP_MASK(%rip), SHUF_MASK
++
++.Lloop0:
++	/* Save hash values for addition after rounds */
++	movdqa		E0, (0*16)(%rsp)
++	movdqa		ABCD, (1*16)(%rsp)
++
++	/* Rounds 0-3 */
++	movdqu		0*16(DATA_PTR), MSG0
++	pshufb		SHUF_MASK, MSG0
++		paddd		MSG0, E0
++		movdqa		ABCD, E1
++		sha1rnds4	$0, E0, ABCD
++
++	/* Rounds 4-7 */
++	movdqu		1*16(DATA_PTR), MSG1
++	pshufb		SHUF_MASK, MSG1
++		sha1nexte	MSG1, E1
++		movdqa		ABCD, E0
++		sha1rnds4	$0, E1, ABCD
++	sha1msg1	MSG1, MSG0
++
++	/* Rounds 8-11 */
++	movdqu		2*16(DATA_PTR), MSG2
++	pshufb		SHUF_MASK, MSG2
++		sha1nexte	MSG2, E0
++		movdqa		ABCD, E1
++		sha1rnds4	$0, E0, ABCD
++	sha1msg1	MSG2, MSG1
++	pxor		MSG2, MSG0
++
++	/* Rounds 12-15 */
++	movdqu		3*16(DATA_PTR), MSG3
++	pshufb		SHUF_MASK, MSG3
++		sha1nexte	MSG3, E1
++		movdqa		ABCD, E0
++	sha1msg2	MSG3, MSG0
++		sha1rnds4	$0, E1, ABCD
++	sha1msg1	MSG3, MSG2
++	pxor		MSG3, MSG1
++
++	/* Rounds 16-19 */
++		sha1nexte	MSG0, E0
++		movdqa		ABCD, E1
++	sha1msg2	MSG0, MSG1
++		sha1rnds4	$0, E0, ABCD
++	sha1msg1	MSG0, MSG3
++	pxor		MSG0, MSG2
++
++	/* Rounds 20-23 */
++		sha1nexte	MSG1, E1
++		movdqa		ABCD, E0
++	sha1msg2	MSG1, MSG2
++		sha1rnds4	$1, E1, ABCD
++	sha1msg1	MSG1, MSG0
++	pxor		MSG1, MSG3
++
++	/* Rounds 24-27 */
++		sha1nexte	MSG2, E0
++		movdqa		ABCD, E1
++	sha1msg2	MSG2, MSG3
++		sha1rnds4	$1, E0, ABCD
++	sha1msg1	MSG2, MSG1
++	pxor		MSG2, MSG0
++
++	/* Rounds 28-31 */
++		sha1nexte	MSG3, E1
++		movdqa		ABCD, E0
++	sha1msg2	MSG3, MSG0
++		sha1rnds4	$1, E1, ABCD
++	sha1msg1	MSG3, MSG2
++	pxor		MSG3, MSG1
++
++	/* Rounds 32-35 */
++		sha1nexte	MSG0, E0
++		movdqa		ABCD, E1
++	sha1msg2	MSG0, MSG1
++		sha1rnds4	$1, E0, ABCD
++	sha1msg1	MSG0, MSG3
++	pxor		MSG0, MSG2
++
++	/* Rounds 36-39 */
++		sha1nexte	MSG1, E1
++		movdqa		ABCD, E0
++	sha1msg2	MSG1, MSG2
++		sha1rnds4	$1, E1, ABCD
++	sha1msg1	MSG1, MSG0
++	pxor		MSG1, MSG3
++
++	/* Rounds 40-43 */
++		sha1nexte	MSG2, E0
++		movdqa		ABCD, E1
++	sha1msg2	MSG2, MSG3
++		sha1rnds4	$2, E0, ABCD
++	sha1msg1	MSG2, MSG1
++	pxor		MSG2, MSG0
++
++	/* Rounds 44-47 */
++		sha1nexte	MSG3, E1
++		movdqa		ABCD, E0
++	sha1msg2	MSG3, MSG0
++		sha1rnds4	$2, E1, ABCD
++	sha1msg1	MSG3, MSG2
++	pxor		MSG3, MSG1
++
++	/* Rounds 48-51 */
++		sha1nexte	MSG0, E0
++		movdqa		ABCD, E1
++	sha1msg2	MSG0, MSG1
++		sha1rnds4	$2, E0, ABCD
++	sha1msg1	MSG0, MSG3
++	pxor		MSG0, MSG2
++
++	/* Rounds 52-55 */
++		sha1nexte	MSG1, E1
++		movdqa		ABCD, E0
++	sha1msg2	MSG1, MSG2
++		sha1rnds4	$2, E1, ABCD
++	sha1msg1	MSG1, MSG0
++	pxor		MSG1, MSG3
++
++	/* Rounds 56-59 */
++		sha1nexte	MSG2, E0
++		movdqa		ABCD, E1
++	sha1msg2	MSG2, MSG3
++		sha1rnds4	$2, E0, ABCD
++	sha1msg1	MSG2, MSG1
++	pxor		MSG2, MSG0
++
++	/* Rounds 60-63 */
++		sha1nexte	MSG3, E1
++		movdqa		ABCD, E0
++	sha1msg2	MSG3, MSG0
++		sha1rnds4	$3, E1, ABCD
++	sha1msg1	MSG3, MSG2
++	pxor		MSG3, MSG1
++
++	/* Rounds 64-67 */
++		sha1nexte	MSG0, E0
++		movdqa		ABCD, E1
++	sha1msg2	MSG0, MSG1
++		sha1rnds4	$3, E0, ABCD
++	sha1msg1	MSG0, MSG3
++	pxor		MSG0, MSG2
++
++	/* Rounds 68-71 */
++		sha1nexte	MSG1, E1
++		movdqa		ABCD, E0
++	sha1msg2	MSG1, MSG2
++		sha1rnds4	$3, E1, ABCD
++	pxor		MSG1, MSG3
++
++	/* Rounds 72-75 */
++		sha1nexte	MSG2, E0
++		movdqa		ABCD, E1
++	sha1msg2	MSG2, MSG3
++		sha1rnds4	$3, E0, ABCD
++
++	/* Rounds 76-79 */
++		sha1nexte	MSG3, E1
++		movdqa		ABCD, E0
++		sha1rnds4	$3, E1, ABCD
++
++	/* Add current hash values with previously saved */
++	sha1nexte	(0*16)(%rsp), E0
++	paddd		(1*16)(%rsp), ABCD
++
++	/* Increment data pointer and loop if more to process */
++	add		$64, DATA_PTR
++	cmp		NUM_BLKS, DATA_PTR
++	jne		.Lloop0
++
++	/* Write hash values back in the correct order */
++	pshufd		$0x1B, ABCD, ABCD
++	movdqu		ABCD, 0*16(DIGEST_PTR)
++	pextrd		$3, E0, 1*16(DIGEST_PTR)
++
++.Ldone_hash:
++	mov		RSPSAVE, %rsp
++
++	ret
++ENDPROC(sha1_ni_transform)
++
++.data
++
++.align 64
++PSHUFFLE_BYTE_FLIP_MASK:
++	.octa 0x000102030405060708090a0b0c0d0e0f
++UPPER_WORD_MASK:
++	.octa 0xFFFFFFFF000000000000000000000000
 -- 
 2.4.2
