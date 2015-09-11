@@ -1,8 +1,7 @@
 From: Lee Jones <lee.jones@linaro.org>
-Subject: [PATCH 3/6] hwrng: st: Provide DT bindings for ST's Random Number
- Generator
-Date: Fri, 11 Sep 2015 21:08:27 +0100
-Message-ID: <1442002110-28733-4-git-send-email-lee.jones@linaro.org>
+Subject: [PATCH 2/6] hwrng: core: Simplify RNG switching from sysfs
+Date: Fri, 11 Sep 2015 21:08:26 +0100
+Message-ID: <1442002110-28733-3-git-send-email-lee.jones@linaro.org>
 References: <1442002110-28733-1-git-send-email-lee.jones@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -25,32 +24,43 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
+If we attempt to use sysfs to change the current RNG in the usual
+way i.e. issuing something like:
+
+`echo 8a8a000.rng > /sys/devices/virtual/misc/hw_random/rng_current`
+
+... it will fail because the code doesn't currently take the '\n'
+into consideration.  Well, now it does.
+
 Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- Documentation/devicetree/bindings/rng/st,rng.txt | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/rng/st,rng.txt
+ drivers/char/hw_random/core.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/rng/st,rng.txt b/Documentation/devicetree/bindings/rng/st,rng.txt
-new file mode 100644
-index 0000000..dbc64e6
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/st,rng.txt
-@@ -0,0 +1,15 @@
-+STMicroelectronics HW Random Number Generator
-+----------------------------------------------
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index da8faf7..14dc984 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -316,6 +316,7 @@ static ssize_t hwrng_attr_current_store(struct device *dev,
+ 					const char *buf, size_t len)
+ {
+ 	int err;
++	int snip = 0;
+ 	struct hwrng *rng;
+ 
+ 	err = mutex_lock_interruptible(&rng_mutex);
+@@ -323,7 +324,11 @@ static ssize_t hwrng_attr_current_store(struct device *dev,
+ 		return -ERESTARTSYS;
+ 	err = -ENODEV;
+ 	list_for_each_entry(rng, &rng_list, list) {
+-		if (strcmp(rng->name, buf) == 0) {
 +
-+Required parameters:
-+compatible	: Should be "st,rng"
-+reg		: Base address and size of IP's register map.
-+clocks		: Phandle to device's clock (See: ../clocks/clock-bindings.txt)
++		if (buf[len-1] == '\n')
++			snip = 1; /* Snip one character */
 +
-+Example:
-+
-+rng@0xfee80000 {
-+	compatible      = "st,rng";
-+	reg		= <0xfee80000 0x1000>;
-+	clocks          = <&clk_sysin>;
-+}
++		if (strncmp(rng->name, buf, len - snip) == 0) {
+ 			err = 0;
+ 			if (rng != current_rng)
+ 				err = set_current_rng(rng);
 -- 
 1.9.1
