@@ -1,73 +1,43 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH 3/4] crypto: [sha] glue code for Intel SHA extensions
- optimized SHA1 & SHA256
-Date: Thu, 10 Sep 2015 17:04:31 -0700
-Message-ID: <1441929871.4322.15.camel@schen9-desk2.jf.intel.com>
-References: <cover.1441929717.git.tim.c.chen@linux.intel.com>
-	 <1441924040.4322.3.camel@schen9-desk2.jf.intel.com>
-	 <4887557.26yiVA9gU0@tauon.atsec.com>
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH v2] crypto: vmx - VMX crypto should depend on CONFIG_VSX
+Date: Fri, 11 Sep 2015 10:47:07 +1000
+Message-ID: <1441932427.23806.2.camel@ellerman.id.au>
+References: <1441786955-6249-1-git-send-email-mpe@ellerman.id.au>
+	 <20150910092642.GA28753@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Sean Gulley <sean.m.gulley@intel.com>,
-	Chandramouli Narayanan <mouli_7982@yahoo.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Cc: linuxppc-dev@ozlabs.org, leosilva@linux.vnet.ibm.com,
+	Paul Mackerras <paulus@samba.org>, tim.gardner@canonical.com,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:8774 "EHLO mga14.intel.com"
+Received: from ozlabs.org ([103.22.144.67]:60454 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750786AbbIKAEc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 Sep 2015 20:04:32 -0400
-In-Reply-To: <4887557.26yiVA9gU0@tauon.atsec.com>
+	id S1750779AbbIKArK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 10 Sep 2015 20:47:10 -0400
+In-Reply-To: <20150910092642.GA28753@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 2015-09-11 at 00:52 +0200, Stephan Mueller wrote:
-> Am Donnerstag, 10. September 2015, 15:27:20 schrieb Tim Chen:
+On Thu, 2015-09-10 at 17:26 +0800, Herbert Xu wrote:
+> On Wed, Sep 09, 2015 at 06:22:35PM +1000, Michael Ellerman wrote:
+> > This code uses FP (floating point), Altivec and VSX (Vector-Scalar
+> > Extension). It can just depend on CONFIG_VSX though, because that
+> > already depends on FP and Altivec.
+> > 
+> > Otherwise we get lots of link errors such as:
+> > 
+> >   drivers/built-in.o: In function `.p8_aes_setkey':
+> >   aes.c:(.text+0x2d325c): undefined reference to `.enable_kernel_altivec'
+> >   aes.c:(.text+0x2d326c): undefined reference to `.enable_kernel_vsx'
+> > 
+> > Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
 > 
-> Hi Tim,
-> 
-> >This patch adds the glue code to detect and utilize the Intel SHA
-> >extensions optimized SHA1 and SHA256 update transforms when available.
-> >
-> >This code has been tested on Broxton for functionality.
-> 
-> A general comment on this file: shouldn't this file be cleaned and use the 
-> standard mechanisms of the kernel crypto API?
-> 
-> This glue implements its own selection of which SHA implementation to use. But 
-> the kernel crypto API implements that logic already. The issue with the 
-> current implementation in this file is that you have no clue which particular 
-> implementation of SHA is in use in one particular case.
-> 
-> So, may I suggest a restructuring to define independent instances of SHA, such 
-> as
-> 
-> - cra_name == "sha1", cra_driver_name="sha1_ssse3", cra_priority=300
-> - cra_name == "sha1", cra_driver_name="sha1_avx", cra_priority=400
-> - cra_name == "sha1", cra_driver_name="sha1_avx2", cra_priority=500
-> - cra_name == "sha1", cra_driver_name="sha1_shavx", cra_priority=600
-> 
-> Similarly for the other SHAs?
-> 
-> In all the register functions for the ciphers, you can bail out if the 
-> hardware does not support an implementation.
+> Applied.
 
-Stephen,
+Thanks.
 
-Is there a scenario you can think of 
-when a lower performing sha1 transform needs to
-be exposed as a separate driver?  
+Is that targeted for 4.3 ?
 
-Otherwise the glue code logic will only expose the
-best performing one for a cpu and hide the others, which was intentional
-on our part to prevent a lower performing sha from getting used.
-
-Tim
+cheers
