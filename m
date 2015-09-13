@@ -1,59 +1,63 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: [PATCH 1/4] hwrng: mxc-rnga - Remove unneeded goto label
-Date: Sat, 12 Sep 2015 20:19:50 -0300
-Message-ID: <1442099993-29449-1-git-send-email-festevam@gmail.com>
-Cc: linux-crypto@vger.kernel.org,
-	Fabio Estevam <fabio.estevam@freescale.com>
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yk0-f180.google.com ([209.85.160.180]:35414 "EHLO
-	mail-yk0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754642AbbILXUZ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 12 Sep 2015 19:20:25 -0400
-Received: by ykdu9 with SMTP id u9so124138319ykd.2
-        for <linux-crypto@vger.kernel.org>; Sat, 12 Sep 2015 16:20:24 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Peter Korsgaard <peter-+2lRwdCCLRT2eFz/2MeuCQ@public.gmane.org>
+Subject: Re: [PATCH 2/6] hwrng: core: Simplify RNG switching from sysfs
+Date: Sun, 13 Sep 2015 16:24:13 +0200
+Message-ID: <87a8sq4ctu.fsf@dell.be.48ers.dk>
+References: <1442002110-28733-1-git-send-email-lee.jones@linaro.org>
+	<1442002110-28733-3-git-send-email-lee.jones@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org, kernel-F5mvAk5X5gdBDgjK7y7TUQ@public.gmane.org
+To: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1442002110-28733-3-git-send-email-lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> (Lee
+	Jones's message of "Fri, 11 Sep 2015 21:08:26 +0100")
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Fabio Estevam <fabio.estevam@freescale.com>
+>>>>> "Lee" == Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> writes:
 
-We can simplify the code by returning the error code immediately
-instead of jumping to a goto label.
+ > If we attempt to use sysfs to change the current RNG in the usual
+ > way i.e. issuing something like:
 
-Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
----
- drivers/char/hw_random/mxc-rnga.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ > `echo 8a8a000.rng > /sys/devices/virtual/misc/hw_random/rng_current`
 
-diff --git a/drivers/char/hw_random/mxc-rnga.c b/drivers/char/hw_random/mxc-rnga.c
-index 6cbb72e..8803126 100644
---- a/drivers/char/hw_random/mxc-rnga.c
-+++ b/drivers/char/hw_random/mxc-rnga.c
-@@ -160,13 +160,12 @@ static int __init mxc_rnga_probe(struct platform_device *pdev)
- 	mxc_rng->clk = devm_clk_get(&pdev->dev, NULL);
- 	if (IS_ERR(mxc_rng->clk)) {
- 		dev_err(&pdev->dev, "Could not get rng_clk!\n");
--		err = PTR_ERR(mxc_rng->clk);
--		goto out;
-+		return PTR_ERR(mxc_rng->clk);
- 	}
+ > ... it will fail because the code doesn't currently take the '\n'
+ > into consideration.  Well, now it does.
+
+ > Signed-off-by: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+ > ---
+ >  drivers/char/hw_random/core.c | 7 ++++++-
+ >  1 file changed, 6 insertions(+), 1 deletion(-)
+
+ > diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+ > index da8faf7..14dc984 100644
+ > --- a/drivers/char/hw_random/core.c
+ > +++ b/drivers/char/hw_random/core.c
+ > @@ -316,6 +316,7 @@ static ssize_t hwrng_attr_current_store(struct device *dev,
+ >  					const char *buf, size_t len)
+ >  {
+ >  	int err;
+ > +	int snip = 0;
+ >  	struct hwrng *rng;
  
- 	err = clk_prepare_enable(mxc_rng->clk);
- 	if (err)
--		goto out;
-+		return err;
- 
- 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	mxc_rng->mem = devm_ioremap_resource(&pdev->dev, res);
-@@ -187,8 +186,6 @@ static int __init mxc_rnga_probe(struct platform_device *pdev)
- 
- err_ioremap:
- 	clk_disable_unprepare(mxc_rng->clk);
--
--out:
- 	return err;
- }
- 
+ >  	err = mutex_lock_interruptible(&rng_mutex);
+ > @@ -323,7 +324,11 @@ static ssize_t hwrng_attr_current_store(struct device *dev,
+ >  		return -ERESTARTSYS;
+ >  	err = -ENODEV;
+ >  	list_for_each_entry(rng, &rng_list, list) {
+ > -		if (strcmp(rng->name, buf) == 0) {
+ > +
+ > +		if (buf[len-1] == '\n')
+ > +			snip = 1; /* Snip one character */
+ > +
+
+How about using sysfs_streq() instead, which is what is done elsewhere?
+
 -- 
-1.9.1
+Bye, Peter Korsgaard
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
