@@ -1,165 +1,71 @@
-From: Lee Jones <lee.jones@linaro.org>
-Subject: Re: [PATCH 4/6] hwrng: st: Add support for ST's HW Random Number
- Generator
-Date: Mon, 14 Sep 2015 09:04:51 +0100
-Message-ID: <20150914080451.GD27591@x1>
-References: <1442002110-28733-1-git-send-email-lee.jones@linaro.org>
- <1442002110-28733-5-git-send-email-lee.jones@linaro.org>
- <CAB3z_Rpz6-mjfsvi55HOrePSVDEn7u-MR_N3e9wL6hT=wfLLYg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
- linux-kernel@vger.kernel.org, Pankaj Dev <pankaj.dev@st.com>,
- linux-crypto@vger.kernel.org, mpm@selenic.com,
- linux-arm-kernel@lists.infradead.org, kernel@stlinux.com
-To: Kieran Bingham <kieranbingham@gmail.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <CAB3z_Rpz6-mjfsvi55HOrePSVDEn7u-MR_N3e9wL6hT=wfLLYg@mail.gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+From: Andy Whitcroft <apw@canonical.com>
+Subject: [PATCH 1/1] x509: only prefix strip raw serial numbers
+Date: Mon, 14 Sep 2015 09:13:37 +0100
+Message-ID: <1442218417-24897-1-git-send-email-apw@canonical.com>
+Cc: David Howells <dhowells@redhat.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gU2F0LCAxMiBTZXAgMjAxNSwgS2llcmFuIEJpbmdoYW0gd3JvdGU6Cj4gT24gMTEgU2VwdGVt
-YmVyIDIwMTUgYXQgMjE6MDgsIExlZSBKb25lcyA8bGVlLmpvbmVzQGxpbmFyby5vcmc+IHdyb3Rl
-Ogo+ID4gU2lnbmVkLW9mZi1ieTogUGFua2FqIERldiA8cGFua2FqLmRldkBzdC5jb20+Cj4gPiBT
-aWduZWQtb2ZmLWJ5OiBMZWUgSm9uZXMgPGxlZS5qb25lc0BsaW5hcm8ub3JnPgo+ID4gLS0tCj4g
-PiAgZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9LY29uZmlnICB8ICAxMCArKysKPiA+ICBkcml2ZXJz
-L2NoYXIvaHdfcmFuZG9tL01ha2VmaWxlIHwgICAxICsKPiA+ICBkcml2ZXJzL2NoYXIvaHdfcmFu
-ZG9tL3N0LXJuZy5jIHwgMTQyICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysKPiA+ICAzIGZpbGVzIGNoYW5nZWQsIDE1MyBpbnNlcnRpb25zKCspCj4gPiAgY3JlYXRlIG1v
-ZGUgMTAwNjQ0IGRyaXZlcnMvY2hhci9od19yYW5kb20vc3Qtcm5nLmMKPiA+Cj4gPiBkaWZmIC0t
-Z2l0IGEvZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9LY29uZmlnIGIvZHJpdmVycy9jaGFyL2h3X3Jh
-bmRvbS9LY29uZmlnCj4gPiBpbmRleCBmNDhjZjExLi5iYjZjYjc3IDEwMDY0NAo+ID4gLS0tIGEv
-ZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9LY29uZmlnCj4gPiArKysgYi9kcml2ZXJzL2NoYXIvaHdf
-cmFuZG9tL0tjb25maWcKPiA+IEBAIC0zNDYsNiArMzQ2LDE2IEBAIGNvbmZpZyBIV19SQU5ET01f
-TVNNCj4gPgo+ID4gICAgICAgICAgIElmIHVuc3VyZSwgc2F5IFkuCj4gPgo+ID4gK2NvbmZpZyBI
-V19SQU5ET01fU1QKPiA+ICsgICAgICAgdHJpc3RhdGUgIlNUIE1pY3JvZWxlY3Ryb25pY3MgSFcg
-UmFuZG9tIE51bWJlciBHZW5lcmF0b3Igc3VwcG9ydCIKPiA+ICsgICAgICAgZGVwZW5kcyBvbiBI
-V19SQU5ET00gJiYgQVJDSF9TVEkKPiA+ICsgICAgICAgLS0taGVscC0tLQo+ID4gKyAgICAgICAg
-IFRoaXMgZHJpdmVyIHByb3ZpZGVzIGtlcm5lbC1zaWRlIHN1cHBvcnQgZm9yIHRoZSBSYW5kb20g
-TnVtYmVyCj4gPiArICAgICAgICAgR2VuZXJhdG9yIGhhcmR3YXJlIGZvdW5kIG9uIFNUaSBzZXJp
-ZXMgb2YgU29Dcy4KPiA+ICsKPiA+ICsgICAgICAgICBUbyBjb21waWxlIHRoaXMgZHJpdmVyIGFz
-IGEgbW9kdWxlLCBjaG9vc2UgTSBoZXJlOiB0aGUKPiA+ICsgICAgICAgICBtb2R1bGUgd2lsbCBi
-ZSBjYWxsZWQgc3Qtcm5nLgo+ID4gKwo+ID4gIGNvbmZpZyBIV19SQU5ET01fWEdFTkUKPiA+ICAg
-ICAgICAgdHJpc3RhdGUgIkFQTSBYLUdlbmUgVHJ1ZSBSYW5kb20gTnVtYmVyIEdlbmVyYXRvciAo
-VFJORykgc3VwcG9ydCIKPiA+ICAgICAgICAgZGVwZW5kcyBvbiBIV19SQU5ET00gJiYgQVJDSF9Y
-R0VORQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvY2hhci9od19yYW5kb20vTWFrZWZpbGUgYi9k
-cml2ZXJzL2NoYXIvaHdfcmFuZG9tL01ha2VmaWxlCj4gPiBpbmRleCAwNTViYjAxLi44YmNmYjQ1
-IDEwMDY0NAo+ID4gLS0tIGEvZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9NYWtlZmlsZQo+ID4gKysr
-IGIvZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9NYWtlZmlsZQo+ID4gQEAgLTMwLDQgKzMwLDUgQEAg
-b2JqLSQoQ09ORklHX0hXX1JBTkRPTV9UUE0pICs9IHRwbS1ybmcubwo+ID4gIG9iai0kKENPTkZJ
-R19IV19SQU5ET01fQkNNMjgzNSkgKz0gYmNtMjgzNS1ybmcubwo+ID4gIG9iai0kKENPTkZJR19I
-V19SQU5ET01fSVBST0NfUk5HMjAwKSArPSBpcHJvYy1ybmcyMDAubwo+ID4gIG9iai0kKENPTkZJ
-R19IV19SQU5ET01fTVNNKSArPSBtc20tcm5nLm8KPiA+ICtvYmotJChDT05GSUdfSFdfUkFORE9N
-X1NUKSArPSBzdC1ybmcubwo+ID4gIG9iai0kKENPTkZJR19IV19SQU5ET01fWEdFTkUpICs9IHhn
-ZW5lLXJuZy5vCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9zdC1ybmcu
-YyBiL2RyaXZlcnMvY2hhci9od19yYW5kb20vc3Qtcm5nLmMKPiA+IG5ldyBmaWxlIG1vZGUgMTAw
-NjQ0Cj4gPiBpbmRleCAwMDAwMDAwLi43MTdhODMxCj4gPiAtLS0gL2Rldi9udWxsCj4gPiArKysg
-Yi9kcml2ZXJzL2NoYXIvaHdfcmFuZG9tL3N0LXJuZy5jCj4gPiBAQCAtMCwwICsxLDE0MiBAQAo+
-ID4gKy8qCj4gPiArICogU1QgUmFuZG9tIE51bWJlciBHZW5lcmF0b3IgRHJpdmVyIFNUJ3MgUGxh
-dGZvcm1zCj4gPiArICoKPiA+ICsgKiBBdXRob3I6IFBhbmthaiBEZXY6IDxwYW5rYWouZGV2QHN0
-LmNvbT4KPiA+ICsgKiAgICAgICAgIExlZSBKb25lcyA8bGVlLmpvbmVzQGxpbmFyby5vcmc+Cj4g
-PiArICoKPiA+ICsgKiBDb3B5cmlnaHQgKEMpIDIwMTUgU1RNaWNyb2VsZWN0cm9uaWNzIChSJkQp
-IExpbWl0ZWQKPiA+ICsgKgo+ID4gKyAqIFRoaXMgcHJvZ3JhbSBpcyBmcmVlIHNvZnR3YXJlOyB5
-b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3IgbW9kaWZ5Cj4gPiArICogaXQgdW5kZXIgdGhl
-IHRlcm1zIG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSB2ZXJzaW9uIDIgYXMKPiA+
-ICsgKiBwdWJsaXNoZWQgYnkgdGhlIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbi4KPiA+ICsgKi8K
-PiA+ICsKPiA+ICsjaW5jbHVkZSA8bGludXgvY2xrLmg+Cj4gPiArI2luY2x1ZGUgPGxpbnV4L2Rl
-bGF5Lmg+Cj4gPiArI2luY2x1ZGUgPGxpbnV4L2h3X3JhbmRvbS5oPgo+ID4gKyNpbmNsdWRlIDxs
-aW51eC9pby5oPgo+ID4gKyNpbmNsdWRlIDxsaW51eC9tb2R1bGUuaD4KPiA+ICsjaW5jbHVkZSA8
-bGludXgvb2YuaD4KPiA+ICsjaW5jbHVkZSA8bGludXgvcGxhdGZvcm1fZGV2aWNlLmg+Cj4gPiAr
-I2luY2x1ZGUgPGxpbnV4L3NsYWIuaD4KPiA+ICsKPiA+ICsvKiBSZWdpc3RlcnMgKi8KPiA+ICsj
-ZGVmaW5lIFNUX1JOR19TVEFUVVNfUkVHICAgICAgICAgICAgICAweDIwCj4gPiArI2RlZmluZSBT
-VF9STkdfREFUQV9SRUcgICAgICAgICAgICAgICAgICAgICAgICAweDI0Cj4gPiArCj4gPiArLyog
-UmVnaXN0ZXJzIGZpZWxkcyAqLwo+ID4gKyNkZWZpbmUgU1RfUk5HX1NUQVRVU19CQURfU0VRVUVO
-Q0UgICAgIEJJVCgwKQo+ID4gKyNkZWZpbmUgU1RfUk5HX1NUQVRVU19CQURfQUxURVJOQU5DRSAg
-IEJJVCgxKQo+ID4gKyNkZWZpbmUgU1RfUk5HX1NUQVRVU19GSUZPX0ZVTEwgICAgICAgICAgICAg
-ICAgQklUKDUpCj4gPiArCj4gPiArI2RlZmluZSBTVF9STkdfRklGT19TSVpFICAgICAgICAgICAg
-ICAgOAo+ID4gKyNkZWZpbmUgU1RfUk5HX1NBTVBMRV9TSVpFICAgICAgICAgICAgIDIgLyogMiBC
-eXRlICgxNmJpdCkgc2FtcGxlcyAqLwo+ID4gKwo+ID4gKy8qIFNhbXBsZXMgYXJlIGF2YWlsYWJs
-ZSBldmVyeSAwLjY2N3VzLCB3aGljaCB3ZSByb3VuZCB0byAxdXMgKi8KPiA+ICsjZGVmaW5lIFNU
-X1JOR19GSUxMX0ZJRk9fVElNRU9VVCAgICgxICogKFNUX1JOR19GSUZPX1NJWkUgLyBTVF9STkdf
-U0FNUExFX1NJWkUpKQo+ID4gKwo+ID4gK3N0cnVjdCBzdF9ybmdfZGF0YSB7Cj4gPiArICAgICAg
-IHZvaWQgX19pb21lbSAgICAqYmFzZTsKPiA+ICsgICAgICAgc3RydWN0IGNsayAgICAgICpjbGs7
-Cj4gPiArICAgICAgIHN0cnVjdCBod3JuZyAgICBvcHM7Cj4gPiArfTsKPiA+ICsKPiA+ICtzdGF0
-aWMgaW50IHN0X3JuZ19yZWFkKHN0cnVjdCBod3JuZyAqcm5nLCB2b2lkICpkYXRhLCBzaXplX3Qg
-bWF4LCBib29sIHdhaXQpCj4gPiArewo+ID4gKyAgICAgICBzdHJ1Y3Qgc3Rfcm5nX2RhdGEgKmRk
-YXRhID0gKHN0cnVjdCBzdF9ybmdfZGF0YSAqKXJuZy0+cHJpdjsKPiA+ICsgICAgICAgdTMyIHN0
-YXR1czsKPiA+ICsgICAgICAgaW50IGk7Cj4gPiArCj4gPiArICAgICAgIGlmIChtYXggPCBzaXpl
-b2YodTE2KSkKPiA+ICsgICAgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsKPiA+ICsKPiA+ICsg
-ICAgICAgLyogV2FpdCB1bnRpbCBGSUZPIGlzIGZ1bGwgLSBtYXggNHVTKi8KPiA+ICsgICAgICAg
-Zm9yIChpID0gMDsgaSA8IFNUX1JOR19GSUxMX0ZJRk9fVElNRU9VVDsgaSsrKSB7Cj4gPiArICAg
-ICAgICAgICAgICAgc3RhdHVzID0gcmVhZGxfcmVsYXhlZChkZGF0YS0+YmFzZSArIFNUX1JOR19T
-VEFUVVNfUkVHKTsKPiA+ICsgICAgICAgICAgICAgICBpZiAoc3RhdHVzICYgU1RfUk5HX1NUQVRV
-U19GSUZPX0ZVTEwpCj4gPiArICAgICAgICAgICAgICAgICAgICAgICBicmVhazsKPiA+ICsgICAg
-ICAgICAgICAgICB1ZGVsYXkoMSk7Cj4gPiArICAgICAgIH0KPiA+ICsKPiA+ICsgICAgICAgaWYg
-KGkgPT0gU1RfUk5HX0ZJTExfRklGT19USU1FT1VUKQo+ID4gKyAgICAgICAgICAgICAgIHJldHVy
-biAwOwo+ID4gKwo+ID4gKyAgICAgICBmb3IgKGkgPSAwOyBpIDwgU1RfUk5HX0ZJRk9fU0laRSAm
-JiBpIDwgbWF4OyBpICs9IDIpCj4gPiArICAgICAgICAgICAgICAgKih1MTYgKikoZGF0YSArIGkp
-ID0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIHJlYWRsX3JlbGF4ZWQoZGRhdGEtPmJhc2Ug
-KyBTVF9STkdfREFUQV9SRUcpOwo+IAo+IFdpbGwgdGhpcyBjb2RlIGFsd2F5cyBiZSBjYWxsZWQg
-d2l0aCBtYXggJSAyID09IDA/IC4uLgo+ICBJLmUuIHdpbGwKPiAgICAgc3Rfcm5nX3JlYWQocm5n
-LCBkYXRhWzVdLCA1LCB3YWl0ZmxnKQo+ICBvdmVyZmxvdyBhbiBhcnJheT8KCi5yZWFkKCkgY2Fu
-IGJlIGNhbGxlZCB3aXRoIGVpdGhlciAxNiwgMzIgb3IgdGhlIHNpemUgb2YgdGhlIGNhY2hlLAp3
-aGljaCBpcyB1bmxpa2VseSB0byBiZSBhbnl0aGluZyAhKE5eMikgKGl0J3MgNjQgaW4gb3VyIGNh
-c2UpLgoKPiA+ICsKPiA+ICsgICAgICAgcmV0dXJuIGkgLSAyOyAgIC8qIE5vIG9mIGJ5dGVzIHJl
-YWQgKi8KPiAKPiAgIFJlYWxseT8gRG9lc24ndCB0aGlzIHJldHVybiAwIG9uIHN0X3JuZ19yZWFk
-KHJuZywgZGF0YVsyXSwgMiwgd2FpdGZsZyk7CgpIbW0uLi4gSSBhc3N1bWVkIHRoZSBPQSdzIG1h
-dGggd2FzIGdvb2QgaGVyZS4KCkdvb2Qgc3BvdC4gIEkgd2lsbCBydW4gc29tZSB0ZXN0cyB0byBj
-b25maXJtLgoKPiA+ICt9Cj4gPiArCj4gPiArc3RhdGljIGludCBzdF9ybmdfcHJvYmUoc3RydWN0
-IHBsYXRmb3JtX2RldmljZSAqcGRldikKPiA+ICt7Cj4gPiArICAgICAgIHN0cnVjdCBzdF9ybmdf
-ZGF0YSAqZGRhdGE7Cj4gPiArICAgICAgIHN0cnVjdCByZXNvdXJjZSAqcmVzOwo+ID4gKyAgICAg
-ICBzdHJ1Y3QgY2xrICpjbGs7Cj4gPiArICAgICAgIHZvaWQgX19pb21lbSAqYmFzZTsKPiA+ICsg
-ICAgICAgaW50IHJldDsKPiA+ICsKPiA+ICsgICAgICAgZGRhdGEgPSBkZXZtX2t6YWxsb2MoJnBk
-ZXYtPmRldiwgc2l6ZW9mKCpkZGF0YSksIEdGUF9LRVJORUwpOwo+ID4gKyAgICAgICBpZiAoIWRk
-YXRhKQo+ID4gKyAgICAgICAgICAgICAgIHJldHVybiAtRU5PTUVNOwo+ID4gKwo+ID4gKyAgICAg
-ICByZXMgPSBwbGF0Zm9ybV9nZXRfcmVzb3VyY2UocGRldiwgSU9SRVNPVVJDRV9NRU0sIDApOwo+
-ID4gKyAgICAgICBiYXNlID0gZGV2bV9pb3JlbWFwX3Jlc291cmNlKCZwZGV2LT5kZXYsIHJlcyk7
-Cj4gPiArICAgICAgIGlmIChJU19FUlIoYmFzZSkpCj4gCj4gQXJlIHdlIGxlYWtpbmcgZGRhdGEg
-aGVyZSA/IEkuZS4gYmVmb3JlIGl0cyBhdHRhY2hlZCB3aXRoIHNldF9kcnZkYXRhPwoKSXQgd29u
-J3QgbGVhay4gIFRoYXQncyB0aGUgcG9pbnQgb2YgZGV2bV8qLgoKUGxlYXNlIHNlZTogRG9jdW1l
-bnRhdGlvbi9kcml2ZXItbW9kZWwvZGV2cmVzLnR4dAoKPiA+ICsgICAgICAgICAgICAgICByZXR1
-cm4gUFRSX0VSUihiYXNlKTsKPiA+ICsKPiA+ICsgICAgICAgY2xrID0gZGV2bV9jbGtfZ2V0KCZw
-ZGV2LT5kZXYsIE5VTEwpOwo+ID4gKyAgICAgICBpZiAoIWNsaykKPiAKPiBBbmQgaGVyZSAuLi4K
-Ck5vcGUuCgo+ID4gKyAgICAgICAgICAgICAgIHJldHVybiAtRUlOVkFMOwo+ID4gKwo+ID4gKyAg
-ICAgICBjbGtfcHJlcGFyZV9lbmFibGUoY2xrKTsKPiA+ICsKPiA+ICsgICAgICAgZGRhdGEtPm9w
-cy5wcml2ID0gKHVuc2lnbmVkIGxvbmcpZGRhdGE7Cj4gPiArICAgICAgIGRkYXRhLT5vcHMucmVh
-ZCA9IHN0X3JuZ19yZWFkOwo+ID4gKyAgICAgICBkZGF0YS0+b3BzLm5hbWUgPSBwZGV2LT5uYW1l
-Owo+ID4gKyAgICAgICBkZGF0YS0+YmFzZSAgICAgPSBiYXNlOwo+ID4gKyAgICAgICBkZGF0YS0+
-Y2xrICAgICAgPSBjbGs7Cj4gPiArCj4gPiArICAgICAgIGRldl9zZXRfZHJ2ZGF0YSgmcGRldi0+
-ZGV2LCBkZGF0YSk7Cj4gPiArCj4gPiArICAgICAgIHJldCA9IGh3cm5nX3JlZ2lzdGVyKCZkZGF0
-YS0+b3BzKTsKPiA+ICsgICAgICAgaWYgKHJldCkgewo+ID4gKyAgICAgICAgICAgICAgIGRldl9l
-cnIoJnBkZXYtPmRldiwgIkZhaWxlZCB0byByZWdpc3RlciBIVyBSTkdcbiIpOwo+ID4gKyAgICAg
-ICAgICAgICAgIHJldHVybiByZXQ7Cj4gPiArICAgICAgIH0KPiA+ICsKPiA+ICsgICAgICAgZGV2
-X2luZm8oJnBkZXYtPmRldiwgIlN1Y2Nlc3NmdWxseSByZWdpc3RlcmVkIEhXIFJOR1xuIik7Cj4g
-PiArCj4gPiArICAgICAgIHJldHVybiAwOwo+ID4gK30KPiA+ICsKPiA+ICtzdGF0aWMgaW50IHN0
-X3JuZ19yZW1vdmUoc3RydWN0IHBsYXRmb3JtX2RldmljZSAqcGRldikKPiA+ICt7Cj4gPiArICAg
-ICAgIHN0cnVjdCBzdF9ybmdfZGF0YSAqZGRhdGEgPSBkZXZfZ2V0X2RydmRhdGEoJnBkZXYtPmRl
-dik7Cj4gPiArCj4gPiArICAgICAgIGh3cm5nX3VucmVnaXN0ZXIoJmRkYXRhLT5vcHMpOwo+ID4g
-Kwo+ID4gKyAgICAgICBjbGtfZGlzYWJsZV91bnByZXBhcmUoZGRhdGEtPmNsayk7Cj4gPiArCj4g
-PiArICAgICAgIHJldHVybiAwOwo+ID4gK30KPiA+ICsKPiA+ICtzdGF0aWMgY29uc3Qgc3RydWN0
-IG9mX2RldmljZV9pZCBzdF9ybmdfbWF0Y2hbXSA9IHsKPiA+ICsgICAgICAgeyAuY29tcGF0aWJs
-ZSA9ICJzdCxybmciIH0sCj4gPiArICAgICAgIHt9LAo+ID4gK307Cj4gPiArTU9EVUxFX0RFVklD
-RV9UQUJMRShvZiwgc3Rfcm5nX21hdGNoKTsKPiA+ICsKPiA+ICtzdGF0aWMgc3RydWN0IHBsYXRm
-b3JtX2RyaXZlciBzdF9ybmdfZHJpdmVyID0gewo+ID4gKyAgICAgICAuZHJpdmVyID0gewo+ID4g
-KyAgICAgICAgICAgICAgIC5uYW1lID0gInN0LWh3cmFuZG9tIiwKPiA+ICsgICAgICAgICAgICAg
-ICAub2ZfbWF0Y2hfdGFibGUgPSBvZl9tYXRjaF9wdHIoc3Rfcm5nX21hdGNoKSwKPiA+ICsgICAg
-ICAgfSwKPiA+ICsgICAgICAgLnByb2JlID0gc3Rfcm5nX3Byb2JlLAo+ID4gKyAgICAgICAucmVt
-b3ZlID0gc3Rfcm5nX3JlbW92ZQo+ID4gK307Cj4gPiArCj4gPiArbW9kdWxlX3BsYXRmb3JtX2Ry
-aXZlcihzdF9ybmdfZHJpdmVyKTsKPiA+ICsKPiA+ICtNT0RVTEVfQVVUSE9SKCJQYW5rYWogRGV2
-IDxwYW5rYWouZGV2QHN0LmNvbT4iKTsKPiA+ICtNT0RVTEVfTElDRU5TRSgiR1BMIHYyIik7Cj4g
-Pgo+IAo+IAoKLS0gCkxlZSBKb25lcwpMaW5hcm8gU1RNaWNyb2VsZWN0cm9uaWNzIExhbmRpbmcg
-VGVhbSBMZWFkCkxpbmFyby5vcmcg4pSCIE9wZW4gc291cmNlIHNvZnR3YXJlIGZvciBBUk0gU29D
-cwpGb2xsb3cgTGluYXJvOiBGYWNlYm9vayB8IFR3aXR0ZXIgfCBCbG9nCgpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1hcm0ta2VybmVsIG1haWxp
-bmcgbGlzdApsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3Rz
-LmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0ta2VybmVsCg==
+In the commit below we added support for use of the subKeyId rather than
+the raw serial number when forming the in kernel ID:
+
+  commit dd2f6c4481debfa389c1f2b2b1d5bd6449c42611
+  Author: David Howells <dhowells@redhat.com>
+  Date:   Fri Oct 3 16:17:02 2014 +0100
+
+    X.509: If available, use the raw subjKeyId to form the key description
+
+However as part of this we subject the subjKeyId to the below prefix strip:
+
+    if (srlen > 1 && *q == 0) {
+	    srlen--;
+	    q++;
+    }
+
+This leads us to truncate the id for kernel module signing keys and to
+fail to recognise our own modules:
+
+  [    1.572423] Loaded X.509 cert 'Build time autogenerated kernel
+    key: 62a7c3d2da278be024da4af8652c071f3fea33'
+  [    1.646153] Request for unknown module key 'Build time autogenerated
+    kernel key: 0062a7c3d2da278be024da4af8652c071f3fea33' err -11
+
+Only apply the prefix strip to raw serial number.
+
+Signed-off-by: Andy Whitcroft <apw@canonical.com>
+---
+ crypto/asymmetric_keys/x509_public_key.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+	While we are here the prefix strip seems pretty odd, only removing
+	just one 0 byte.  Is this meant to strip them all (as a while),
+	or was the intent to strip leading 0s from the hex form?  Do we
+	have any background to this change?
+
+	-apw
+
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 24f17e6..0e16d5e 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -306,10 +306,10 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ 	} else {
+ 		srlen = cert->raw_serial_size;
+ 		q = cert->raw_serial;
+-	}
+-	if (srlen > 1 && *q == 0) {
+-		srlen--;
+-		q++;
++		if (srlen > 1 && *q == 0) {
++			srlen--;
++			q++;
++		}
+ 	}
+ 
+ 	ret = -ENOMEM;
+-- 
+2.5.0
