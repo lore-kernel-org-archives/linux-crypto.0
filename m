@@ -1,77 +1,89 @@
 From: Lee Jones <lee.jones@linaro.org>
-Subject: Re: [PATCH 2/6] hwrng: core: Simplify RNG switching from sysfs
-Date: Mon, 14 Sep 2015 08:27:01 +0100
-Message-ID: <20150914072701.GB27591@x1>
+Subject: Re: [PATCH 4/6] hwrng: st: Add support for ST's HW Random Number
+ Generator
+Date: Mon, 14 Sep 2015 08:42:34 +0100
+Message-ID: <20150914074234.GC27591@x1>
 References: <1442002110-28733-1-git-send-email-lee.jones@linaro.org>
- <1442002110-28733-3-git-send-email-lee.jones@linaro.org>
- <87a8sq4ctu.fsf@dell.be.48ers.dk>
+ <1442002110-28733-5-git-send-email-lee.jones@linaro.org>
+ <CAOMZO5CWywFHd1HE2=G-KEvQZpu_rJibmJL4fL5yCWRsnpi05Q@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org, mpm@selenic.com, kernel@stlinux.com
-To: Peter Korsgaard <peter@korsgaard.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f170.google.com ([209.85.212.170]:37163 "EHLO
-	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752153AbbINH1G (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 14 Sep 2015 03:27:06 -0400
-Received: by wicfx3 with SMTP id fx3so120201674wic.0
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Sep 2015 00:27:04 -0700 (PDT)
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Pankaj Dev <pankaj.dev@st.com>, linux-crypto@vger.kernel.org,
+	Matt Mackall <mpm@selenic.com>, kernel@stlinux.com
+To: Fabio Estevam <festevam@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <87a8sq4ctu.fsf@dell.be.48ers.dk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <CAOMZO5CWywFHd1HE2=G-KEvQZpu_rJibmJL4fL5yCWRsnpi05Q@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, 13 Sep 2015, Peter Korsgaard wrote:
+On Sat, 12 Sep 2015, Fabio Estevam wrote:
 
-> >>>>> "Lee" =3D=3D Lee Jones <lee.jones@linaro.org> writes:
+> On Fri, Sep 11, 2015 at 5:08 PM, Lee Jones <lee.jones@linaro.org> wro=
+te:
 >=20
->  > If we attempt to use sysfs to change the current RNG in the usual
->  > way i.e. issuing something like:
+> > +       res =3D platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> > +       base =3D devm_ioremap_resource(&pdev->dev, res);
+> > +       if (IS_ERR(base))
+> > +               return PTR_ERR(base);
+> > +
+> > +       clk =3D devm_clk_get(&pdev->dev, NULL);
+> > +       if (!clk)
+> > +               return -EINVAL;
 >=20
->  > `echo 8a8a000.rng > /sys/devices/virtual/misc/hw_random/rng_curren=
-t`
+> This should be:
 >=20
->  > ... it will fail because the code doesn't currently take the '\n'
->  > into consideration.  Well, now it does.
->=20
->  > Signed-off-by: Lee Jones <lee.jones@linaro.org>
->  > ---
->  >  drivers/char/hw_random/core.c | 7 ++++++-
->  >  1 file changed, 6 insertions(+), 1 deletion(-)
->=20
->  > diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_rando=
-m/core.c
->  > index da8faf7..14dc984 100644
->  > --- a/drivers/char/hw_random/core.c
->  > +++ b/drivers/char/hw_random/core.c
->  > @@ -316,6 +316,7 @@ static ssize_t hwrng_attr_current_store(struct=
- device *dev,
->  >  					const char *buf, size_t len)
->  >  {
->  >  	int err;
->  > +	int snip =3D 0;
->  >  	struct hwrng *rng;
-> =20
->  >  	err =3D mutex_lock_interruptible(&rng_mutex);
->  > @@ -323,7 +324,11 @@ static ssize_t hwrng_attr_current_store(struc=
-t device *dev,
->  >  		return -ERESTARTSYS;
->  >  	err =3D -ENODEV;
->  >  	list_for_each_entry(rng, &rng_list, list) {
->  > -		if (strcmp(rng->name, buf) =3D=3D 0) {
->  > +
->  > +		if (buf[len-1] =3D=3D '\n')
->  > +			snip =3D 1; /* Snip one character */
->  > +
->=20
-> How about using sysfs_streq() instead, which is what is done elsewher=
-e?
+>     if (IS_ERR(clk))
+>         return PTR_ERR(clk);
 
-Perfect.  This is exactly what I'm trying to do, thanks.
+You're right.  Will fix.
+
+> > +
+> > +       clk_prepare_enable(clk);
+>=20
+> This may fail, so better check its return value and propagate it on e=
+rror.
+
+Looks like the jury is out on this one.
+
+$ git grep clk_prepare_enable | grep '=3D clk\|if (' | wc -l
+659
+$ git grep clk_prepare_enable | grep -v '=3D clk\|if (' | wc -l
+569
+
+=2E.. but it's not a problem to fix up.  Will do.
+
+> > +       ddata->ops.priv =3D (unsigned long)ddata;
+> > +       ddata->ops.read =3D st_rng_read;
+> > +       ddata->ops.name =3D pdev->name;
+> > +       ddata->base     =3D base;
+> > +       ddata->clk      =3D clk;
+> > +
+> > +       dev_set_drvdata(&pdev->dev, ddata);
+> > +
+> > +       ret =3D hwrng_register(&ddata->ops);
+> > +       if (ret) {
+> > +               dev_err(&pdev->dev, "Failed to register HW RNG\n");
+> > +               return ret;
+> > +       }
+> > +
+> > +       dev_info(&pdev->dev, "Successfully registered HW RNG\n");
+>=20
+> No need to put this info.
+
+Ah, you caught me!
+
+I know these types of prints are usually deemed not useful; however,
+unless there is a failure both this driver and the core driver are
+silent, so the user doesn't know that 1 or more of these devices are
+available.  I personally like to see an entry in the bootlog for this
+kind of functionality.
 
 --=20
 Lee Jones
