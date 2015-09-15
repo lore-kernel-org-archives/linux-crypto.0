@@ -1,33 +1,46 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH] MPI: Fix mpi_read_buffer
-Date: Tue, 15 Sep 2015 08:56:09 -0700
-Message-ID: <55F83F99.60904@intel.com>
-References: <20150824145214.26239.98271.stgit@tstruk-mobl1>
- <12302.1442308196@warthog.procyon.org.uk>
- <20150915122424.GA3743@gondor.apana.org.au>
+From: Luis de Bethencourt <luis@debethencourt.com>
+Subject: [PATCH 0/2] Fix module autoload for OF platform drivers
+Date: Tue, 15 Sep 2015 18:40:38 +0200
+Message-ID: <20150915164038.GA5536@goodgumbo.baconseed.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Olof Johansson <olof@lixom.net>, Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Wolfram Sang <wsa@the-dreams.de>,
+	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+	Corey Minyard <minyard@acm.org>,
+	openipmi-developer@lists.sourceforge.net
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:55552 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752334AbbIOP55 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Sep 2015 11:57:57 -0400
-In-Reply-To: <20150915122424.GA3743@gondor.apana.org.au>
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:36352 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751477AbbIOQkl (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 15 Sep 2015 12:40:41 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 09/15/2015 05:24 AM, Herbert Xu wrote:
->>> Change mpi_read_buffer to return a number without leading zeros
->>> > > so that mpi_read_buffer and mpi_get_buffer return the same thing.
->> > 
->> > Hmmm...  This would appear to have the undesirable side effect of causing 1
->> > out of 256 module signing keys to be unusable (ie. those that begin with 00).
-> I thought Tadeusz was just restoring the original behaviour, no?
+Hello,
 
-That was the intention.
-David, I can ran some more test if you have the key that was failing and
-be willing to share it.
+These patches add the missing MODULE_DEVICE_TABLE() for OF to export
+the information so modules have the correct aliases built-in and
+autoloading works correctly.
+
+A longer explanation by Javier Canillas can be found here:
+https://lkml.org/lkml/2015/7/30/519
+
+Thanks,
+Luis
+
+Luis de Bethencourt (2):
+  char: hw_random: Fix module autoload for OF platform drivers
+  char: ipmi: Fix module autoload for OF platform driver
+
+ drivers/char/hw_random/pasemi-rng.c | 1 +
+ drivers/char/hw_random/ppc4xx-rng.c | 1 +
+ drivers/char/ipmi/ipmi_si_intf.c    | 1 +
+ 3 files changed, 3 insertions(+)
+
+-- 
+2.4.6
