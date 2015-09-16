@@ -1,745 +1,452 @@
-From: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH] crypto/caam: add backlogging support
-Date: Wed, 16 Sep 2015 17:17:09 +0300
-Message-ID: <55F979E5.5070909@freescale.com>
+From: Porosanu Alexandru <alexandru.porosanu@freescale.com>
+Subject: RE: [PATCH] crypto/caam: add backlogging support
+Date: Wed, 16 Sep 2015 19:18:49 +0000
+Message-ID: <BY1PR03MB1404492A48AD87718394489F805B0@BY1PR03MB1404.namprd03.prod.outlook.com>
 References: <1441781824-57338-1-git-send-email-alexandru.porosanu@freescale.com>
+ <55F979E5.5070909@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <herbert@gondor.apana.org.au>, <mircea.pop@freescale.com>
-To: Alex Porosanu <alexandru.porosanu@freescale.com>,
-	<linux-crypto@vger.kernel.org>
+Content-Transfer-Encoding: base64
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	Pop Mircea <mircea.pop@freescale.com>
+To: Geanta Neag Horia <Horia.Geanta@freescale.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0140.outbound.protection.outlook.com ([157.56.111.140]:37466
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+Received: from mail-bl2on0128.outbound.protection.outlook.com ([65.55.169.128]:28928
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752610AbbIPOuO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 16 Sep 2015 10:50:14 -0400
-In-Reply-To: <1441781824-57338-1-git-send-email-alexandru.porosanu@freescale.com>
+	id S1751921AbbIPTSy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 16 Sep 2015 15:18:54 -0400
+In-Reply-To: <55F979E5.5070909@freescale.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 9/9/2015 9:57 AM, Alex Porosanu wrote:
-> caam_jr_enqueue() function returns -EBUSY once there are no
-> more slots available in the JR, but it doesn't actually save
-> the current request. This breaks the functionality of users
-> that expect that even if there is no more space for the request,
-> it is at least queued for later execution. In other words, all
-> crypto transformations that request backlogging
-> (i.e. have CRYPTO_TFM_REQ_MAY_BACKLOG set), will hang. Such an
-> example is dm-crypt.
-> The current patch solves this issue by setting a threshold after
-> which caam_jr_enqueue() returns -EBUSY, but since the HW job ring
-> isn't actually full, the job is enqueued.
-
-You should mention the reason of not using the functions and mechanism
-available in the Crypto API, i.e. having a 0-length crypto_queue used
-only for backlogging.
-
-> Caveat: if the users of the driver don't obey the API contract which
-> states that once -EBUSY is received, no more requests are to be
-> sent, eventually the driver will reject the enqueues.
-> 
-> Signed-off-by: Alex Porosanu <alexandru.porosanu@freescale.com>
-> ---
->  drivers/crypto/caam/caamalg.c | 233 ++++++++++++++++++++++++++++++++++--------
->  drivers/crypto/caam/intern.h  |   7 ++
->  drivers/crypto/caam/jr.c      | 190 +++++++++++++++++++++++++++-------
->  drivers/crypto/caam/jr.h      |   5 +
->  4 files changed, 352 insertions(+), 83 deletions(-)
-
-The patch updates only caamalg.c. What about the others (caamhash.c etc.)?
-
-> 
-> diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-> index ba79d63..c281483 100644
-> --- a/drivers/crypto/caam/caamalg.c
-> +++ b/drivers/crypto/caam/caamalg.c
-> @@ -1815,9 +1815,14 @@ static void aead_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
->  
->  	edesc = container_of(desc, struct aead_edesc, hw_desc[0]);
->  
-> -	if (err)
-> +	if (err && (err != -EINPROGRESS))
->  		caam_jr_strstatus(jrdev, err);
->  
-> +	if (err == -EINPROGRESS) {
-> +		aead_request_complete(req, err);
-> +		return;
-> +	}
-
-Logic can be simplified by reversing the conditions:
-
-if (err == -EINPROGRESS)
-	goto out;
-
-if (err)
-	caam_jr_strstatus(jrdev, err);
-
-[...]
-out:
-	aead_request_complete(req, err);
-
-Same for the other places.
-
-> +
->  	aead_unmap(jrdev, edesc, req);
->  
->  	kfree(edesc);
-> @@ -1837,9 +1842,14 @@ static void aead_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
->  
->  	edesc = container_of(desc, struct aead_edesc, hw_desc[0]);
->  
-> -	if (err)
-> +	if (err && (err != -EINPROGRESS))
->  		caam_jr_strstatus(jrdev, err);
->  
-> +	if (err == -EINPROGRESS) {
-> +		aead_request_complete(req, err);
-> +		return;
-> +	}
-> +
->  	aead_unmap(jrdev, edesc, req);
->  
->  	/*
-> @@ -1864,13 +1874,17 @@ static void ablkcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
->  
->  	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
->  #endif
-> -
->  	edesc = (struct ablkcipher_edesc *)((char *)desc -
->  		 offsetof(struct ablkcipher_edesc, hw_desc));
->  
-> -	if (err)
-> +	if (err && (err != -EINPROGRESS))
->  		caam_jr_strstatus(jrdev, err);
->  
-> +	if (err == -EINPROGRESS) {
-> +		ablkcipher_request_complete(req, err);
-> +		return;
-> +	}
-> +
->  #ifdef DEBUG
->  	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
->  		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
-> @@ -1900,9 +1914,14 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
->  
->  	edesc = (struct ablkcipher_edesc *)((char *)desc -
->  		 offsetof(struct ablkcipher_edesc, hw_desc));
-> -	if (err)
-> +	if (err && (err != -EINPROGRESS))
->  		caam_jr_strstatus(jrdev, err);
->  
-> +	if (err == -EINPROGRESS) {
-> +		ablkcipher_request_complete(req, err);
-> +		return;
-> +	}
-> +
->  #ifdef DEBUG
->  	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
->  		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
-> @@ -2294,12 +2313,30 @@ static int gcm_encrypt(struct aead_request *req)
->  #endif
->  
->  	desc = edesc->hw_desc;
-> -	ret = caam_jr_enqueue(jrdev, desc, aead_encrypt_done, req);
-> -	if (!ret) {
-> -		ret = -EINPROGRESS;
-> +	if (req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG) {
-> +		ret = caam_jr_enqueue_bklog(jrdev, desc, aead_encrypt_done,
-> +					    req);
-> +		switch (ret) {
-> +		case 0:
-> +			ret = -EINPROGRESS;
-> +			break;
-> +
-> +		case -EBUSY:
-> +			break;
-> +
-> +		default:
-> +			aead_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +			break;
-> +		}
->  	} else {
-> -		aead_unmap(jrdev, edesc, req);
-> -		kfree(edesc);
-> +		ret = caam_jr_enqueue(jrdev, desc, aead_encrypt_done, req);
-> +		if (!ret) {
-> +			ret = -EINPROGRESS;
-> +		} else {
-> +			aead_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +		}
->  	}
-
-Again, this should be simplified:
-
-if (req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG) {
-	ret = caam_jr_enqueue_bklog(jrdev, desc, aead_encrypt_done,
-				    req);
-	if (ret == -EBUSY)
-		return ret;
-} else {
-	ret = caam_jr_enqueue(jrdev, desc, aead_encrypt_done, req);
-
-}
-
-if (!ret) {
-	ret = -EINPROGRESS;
-} else {
-	aead_unmap(jrdev, edesc, req);
-	kfree(edesc);
-}
-
->  
->  	return ret;
-> @@ -2338,12 +2375,30 @@ static int aead_encrypt(struct aead_request *req)
->  #endif
->  
->  	desc = edesc->hw_desc;
-> -	ret = caam_jr_enqueue(jrdev, desc, aead_encrypt_done, req);
-> -	if (!ret) {
-> -		ret = -EINPROGRESS;
-> +	if (req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG) {
-> +		ret = caam_jr_enqueue_bklog(jrdev, desc, aead_encrypt_done,
-> +					    req);
-> +		switch (ret) {
-> +		case 0:
-> +			ret = -EINPROGRESS;
-> +			break;
-> +
-> +		case -EBUSY:
-> +			break;
-> +
-> +		default:
-> +			aead_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +			break;
-> +		}
->  	} else {
-> -		aead_unmap(jrdev, edesc, req);
-> -		kfree(edesc);
-> +		ret = caam_jr_enqueue(jrdev, desc, aead_encrypt_done, req);
-> +		if (!ret) {
-> +			ret = -EINPROGRESS;
-> +		} else {
-> +			aead_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +		}
->  	}
->  
->  	return ret;
-> @@ -2373,12 +2428,30 @@ static int gcm_decrypt(struct aead_request *req)
->  #endif
->  
->  	desc = edesc->hw_desc;
-> -	ret = caam_jr_enqueue(jrdev, desc, aead_decrypt_done, req);
-> -	if (!ret) {
-> -		ret = -EINPROGRESS;
-> +	if (req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG) {
-> +		ret = caam_jr_enqueue_bklog(jrdev, desc, aead_decrypt_done,
-> +					    req);
-> +		switch (ret) {
-> +		case 0:
-> +			ret = -EINPROGRESS;
-> +			break;
-> +
-> +		case -EBUSY:
-> +			break;
-> +
-> +		default:
-> +			aead_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +			break;
-> +		}
->  	} else {
-> -		aead_unmap(jrdev, edesc, req);
-> -		kfree(edesc);
-> +		ret = caam_jr_enqueue(jrdev, desc, aead_decrypt_done, req);
-> +		if (!ret) {
-> +			ret = -EINPROGRESS;
-> +		} else {
-> +			aead_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +		}
->  	}
->  
->  	return ret;
-> @@ -2423,12 +2496,30 @@ static int aead_decrypt(struct aead_request *req)
->  #endif
->  
->  	desc = edesc->hw_desc;
-> -	ret = caam_jr_enqueue(jrdev, desc, aead_decrypt_done, req);
-> -	if (!ret) {
-> -		ret = -EINPROGRESS;
-> +	if (req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG) {
-> +		ret = caam_jr_enqueue_bklog(jrdev, desc, aead_decrypt_done,
-> +					    req);
-> +		switch (ret) {
-> +		case 0:
-> +			ret = -EINPROGRESS;
-> +			break;
-> +
-> +		case -EBUSY:
-> +			break;
-> +
-> +		default:
-> +			aead_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +			break;
-> +		}
->  	} else {
-> -		aead_unmap(jrdev, edesc, req);
-> -		kfree(edesc);
-> +		ret = caam_jr_enqueue(jrdev, desc, aead_decrypt_done, req);
-> +		if (!ret) {
-> +			ret = -EINPROGRESS;
-> +		} else {
-> +			aead_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +		}
->  	}
->  
->  	return ret;
-> @@ -2575,13 +2666,31 @@ static int ablkcipher_encrypt(struct ablkcipher_request *req)
->  		       desc_bytes(edesc->hw_desc), 1);
->  #endif
->  	desc = edesc->hw_desc;
-> -	ret = caam_jr_enqueue(jrdev, desc, ablkcipher_encrypt_done, req);
-> -
-> -	if (!ret) {
-> -		ret = -EINPROGRESS;
-> +	if (req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG) {
-> +		ret = caam_jr_enqueue_bklog(jrdev, desc,
-> +					    ablkcipher_encrypt_done, req);
-> +		switch (ret) {
-> +		case 0:
-> +			ret = -EINPROGRESS;
-> +			break;
-> +
-> +		case -EBUSY:
-> +			break;
-> +
-> +		default:
-> +			ablkcipher_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +			break;
-> +		}
->  	} else {
-> -		ablkcipher_unmap(jrdev, edesc, req);
-> -		kfree(edesc);
-> +		ret = caam_jr_enqueue(jrdev, desc, ablkcipher_encrypt_done,
-> +				      req);
-> +		if (!ret) {
-> +			ret = -EINPROGRESS;
-> +		} else {
-> +			ablkcipher_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +		}
->  	}
->  
->  	return ret;
-> @@ -2612,15 +2721,32 @@ static int ablkcipher_decrypt(struct ablkcipher_request *req)
->  		       DUMP_PREFIX_ADDRESS, 16, 4, edesc->hw_desc,
->  		       desc_bytes(edesc->hw_desc), 1);
->  #endif
-> -
-> -	ret = caam_jr_enqueue(jrdev, desc, ablkcipher_decrypt_done, req);
-> -	if (!ret) {
-> -		ret = -EINPROGRESS;
-> +	if (req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG) {
-> +		ret = caam_jr_enqueue_bklog(jrdev, desc,
-> +					    ablkcipher_decrypt_done, req);
-> +		switch (ret) {
-> +		case 0:
-> +			ret = -EINPROGRESS;
-> +			break;
-> +
-> +		case -EBUSY:
-> +			break;
-> +
-> +		default:
-> +			ablkcipher_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +			break;
-> +		}
->  	} else {
-> -		ablkcipher_unmap(jrdev, edesc, req);
-> -		kfree(edesc);
-> +		ret = caam_jr_enqueue_bklog(jrdev, desc,
-> +					    ablkcipher_decrypt_done, req);
-
-Typo, s/caam_jr_enqueue_bklog/caam_jr_enqueue.
-What testing has been performed?
-
-> +		if (!ret) {
-> +			ret = -EINPROGRESS;
-> +		} else {
-> +			ablkcipher_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +		}
->  	}
-> -
->  	return ret;
->  }
->  
-> @@ -2757,13 +2883,32 @@ static int ablkcipher_givencrypt(struct skcipher_givcrypt_request *creq)
->  		       desc_bytes(edesc->hw_desc), 1);
->  #endif
->  	desc = edesc->hw_desc;
-> -	ret = caam_jr_enqueue(jrdev, desc, ablkcipher_encrypt_done, req);
-> -
-> -	if (!ret) {
-> -		ret = -EINPROGRESS;
-> +	if (req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG) {
-> +		ret = caam_jr_enqueue_bklog(jrdev, desc,
-> +					    ablkcipher_encrypt_done, req);
-> +		switch (ret) {
-> +		case 0:
-> +			ret = -EINPROGRESS;
-> +			break;
-> +
-> +		case -EBUSY:
-> +			break;
-> +
-> +		default:
-> +			ablkcipher_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +			break;
-> +		}
->  	} else {
-> -		ablkcipher_unmap(jrdev, edesc, req);
-> -		kfree(edesc);
-> +		ret = caam_jr_enqueue(jrdev, desc, ablkcipher_encrypt_done,
-> +				      req);
-> +
-> +		if (!ret) {
-> +			ret = -EINPROGRESS;
-> +		} else {
-> +			ablkcipher_unmap(jrdev, edesc, req);
-> +			kfree(edesc);
-> +		}
->  	}
->  
->  	return ret;
-> diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-> index e2bcacc..13e63ef 100644
-> --- a/drivers/crypto/caam/intern.h
-> +++ b/drivers/crypto/caam/intern.h
-> @@ -11,6 +11,12 @@
->  
->  /* Currently comes from Kconfig param as a ^2 (driver-required) */
->  #define JOBR_DEPTH (1 << CONFIG_CRYPTO_DEV_FSL_CAAM_RINGSIZE)
-> +/*
-> + * If the user tries to enqueue a job and the number of slots available
-> + * is less than this value, then the job will be backlogged (if the user
-> + * allows for it) or it will be dropped.
-> + */
-> +#define JOBR_THRESH 16
-
-Why 16?
-What happens when user configures CONFIG_CRYPTO_DEV_FSL_CAAM_RINGSIZE to
-{2, 3, 4}?
-Threshold should depend on JOBR_DEPTH.
-
->  
->  /* Kconfig params for interrupt coalescing if selected (else zero) */
->  #ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_INTC
-> @@ -33,6 +39,7 @@ struct caam_jrentry_info {
->  	u32 *desc_addr_virt;	/* Stored virt addr for postprocessing */
->  	dma_addr_t desc_addr_dma;	/* Stored bus addr for done matching */
->  	u32 desc_size;	/* Stored size for postprocessing, header derived */
-> +	bool is_backlogged; /* True if the request has been backlogged */
->  };
->  
->  /* Private sub-storage for a single JobR */
-> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-> index f7e0d8d..916288d 100644
-> --- a/drivers/crypto/caam/jr.c
-> +++ b/drivers/crypto/caam/jr.c
-> @@ -168,6 +168,7 @@ static void caam_jr_dequeue(unsigned long devarg)
->  	void (*usercall)(struct device *dev, u32 *desc, u32 status, void *arg);
->  	u32 *userdesc, userstatus;
->  	void *userarg;
-> +	bool is_backlogged;
->  
->  	while (rd_reg32(&jrp->rregs->outring_used)) {
->  
-> @@ -201,6 +202,7 @@ static void caam_jr_dequeue(unsigned long devarg)
->  		userarg = jrp->entinfo[sw_idx].cbkarg;
->  		userdesc = jrp->entinfo[sw_idx].desc_addr_virt;
->  		userstatus = jrp->outring[hw_idx].jrstatus;
-> +		is_backlogged = jrp->entinfo[sw_idx].is_backlogged;
->  
->  		/*
->  		 * Make sure all information from the job has been obtained
-> @@ -231,6 +233,20 @@ static void caam_jr_dequeue(unsigned long devarg)
->  
->  		spin_unlock(&jrp->outlock);
->  
-> +		if (is_backlogged)
-> +			/*
-> +			 * For backlogged requests, the user callback needs to
-> +			 * be called twice: once when starting to process it
-> +			 * (with a status of -EINPROGRESS and once when it's
-> +			 * done. Since SEC cheats by enqueuing the request in
-> +			 * its HW ring but returning -EBUSY, the time when the
-> +			 * request's processing has started is not known.
-> +			 * Thus notify here the user. The second call is on the
-> +			 * normal path (i.e. the one that is called even for
-> +			 * non-backlogged requests.
-						  ^ missing parenthesis
-
-> +			 */
-> +			usercall(dev, userdesc, -EINPROGRESS, userarg);
-> +
->  		/* Finally, execute user's callback */
->  		usercall(dev, userdesc, userstatus, userarg);
->  	}
-> @@ -292,6 +308,84 @@ void caam_jr_free(struct device *rdev)
->  }
->  EXPORT_SYMBOL(caam_jr_free);
->  
-> +static inline int __caam_jr_enqueue(struct caam_drv_private_jr *jrp, u32 *desc,
-> +				    int desc_size, dma_addr_t desc_dma,
-> +				    void (*cbk)(struct device *dev, u32 *desc,
-> +						u32 status, void *areq),
-> +				    void *areq,
-> +				    bool can_be_backlogged)
-> +{
-> +	int head, tail;
-> +	struct caam_jrentry_info *head_entry;
-> +	int ret = 0, hw_slots, sw_slots;
-> +
-> +	spin_lock_bh(&jrp->inplock);
-> +
-> +	head = jrp->head;
-> +	tail = ACCESS_ONCE(jrp->tail);
-> +
-> +	head_entry = &jrp->entinfo[head];
-> +
-> +	/* Reset backlogging status here */
-> +	head_entry->is_backlogged = false;
-> +
-> +	hw_slots = rd_reg32(&jrp->rregs->inpring_avail);
-> +	sw_slots = CIRC_SPACE(head, tail, JOBR_DEPTH);
-> +
-> +	if (hw_slots <= JOBR_THRESH || sw_slots <= JOBR_THRESH) {
-> +		/*
-> +		 * The state below can be reached in three cases:
-> +		 * 1) A badly behaved backlogging user doesn't back off when
-> +		 *    told so by the -EBUSY return code
-> +		 * 2) More than JOBR_THRESH backlogging users requests
-> +		 * 3) Due to the high system load, the entries reserved for the
-> +		 *    backlogging users are being filled (slowly) in between
-> +		 *    the successive calls to the user callback (the first one
-> +		 *    with -EINPROGRESS and the 2nd one with the real result.
-> +		 * The code below is a last-resort measure which will DROP
-> +		 * any request if there is physically no more space. This will
-> +		 * lead to data-loss for disk-related users.
-> +		 */
-> +		if (!hw_slots || sw_slots <= 0) {
-
-sw_slots cannot be negative.
-
-> +			spin_unlock_bh(&jrp->inplock);
-> +			return -EIO;
-
-Or:
-ret = -EIO;
-goto out_unlock;
-
-> +		}
-> +
-> +		if (can_be_backlogged) {
-> +			head_entry->is_backlogged = true;
-> +			ret = -EBUSY;
-> +		} else {
-> +			spin_unlock_bh(&jrp->inplock);
-> +			return -EBUSY;
-> +		}
-
-Or:
-ret = -EBUSY;
-if (!can_be_backlogged)
-	goto out_unlock;
-head_entry->is_backlogged = true;
-
-> +	}
-> +
-> +	head_entry->desc_addr_virt = desc;
-> +	head_entry->desc_size = desc_size;
-> +	head_entry->callbk = (void *)cbk;
-> +	head_entry->cbkarg = areq;
-> +	head_entry->desc_addr_dma = desc_dma;
-> +
-> +	jrp->inpring[jrp->inp_ring_write_index] = desc_dma;
-> +
-> +	/*
-> +	 * Guarantee that the descriptor's DMA address has been written to
-> +	 * the next slot in the ring before the write index is updated, since
-> +	 * other cores may update this index independently.
-> +	 */
-> +	smp_wmb();
-> +
-> +	jrp->inp_ring_write_index = (jrp->inp_ring_write_index + 1) &
-> +				    (JOBR_DEPTH - 1);
-> +	jrp->head = (head + 1) & (JOBR_DEPTH - 1);
-> +
-> +	wr_reg32(&jrp->rregs->inpring_jobadd, 1);
-> +
-
-out_unlock:
-
-> +	spin_unlock_bh(&jrp->inplock);
-> +
-> +	return ret;
-> +}
-> +
->  /**
->   * caam_jr_enqueue() - Enqueue a job descriptor head. Returns 0 if OK,
->   * -EBUSY if the queue is full, -EIO if it cannot map the caller's
-> @@ -326,8 +420,7 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
->  		    void *areq)
->  {
->  	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
-> -	struct caam_jrentry_info *head_entry;
-> -	int head, tail, desc_size;
-> +	int desc_size, ret;
->  	dma_addr_t desc_dma;
->  
->  	desc_size = (*desc & HDR_JD_LENGTH_MASK) * sizeof(u32);
-> @@ -337,51 +430,70 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
->  		return -EIO;
->  	}
->  
-> -	spin_lock_bh(&jrp->inplock);
-> -
-> -	head = jrp->head;
-> -	tail = ACCESS_ONCE(jrp->tail);
-> -
-> -	if (!rd_reg32(&jrp->rregs->inpring_avail) ||
-> -	    CIRC_SPACE(head, tail, JOBR_DEPTH) <= 0) {
-> -		spin_unlock_bh(&jrp->inplock);
-> +	ret = __caam_jr_enqueue(jrp, desc, desc_size, desc_dma, cbk, areq,
-> +				false);
-> +	if (unlikely(ret))
->  		dma_unmap_single(dev, desc_dma, desc_size, DMA_TO_DEVICE);
-> -		return -EBUSY;
-> -	}
->  
-> -	head_entry = &jrp->entinfo[head];
-> -	head_entry->desc_addr_virt = desc;
-> -	head_entry->desc_size = desc_size;
-> -	head_entry->callbk = (void *)cbk;
-> -	head_entry->cbkarg = areq;
-> -	head_entry->desc_addr_dma = desc_dma;
-> -
-> -	jrp->inpring[jrp->inp_ring_write_index] = desc_dma;
-> -
-> -	/*
-> -	 * Guarantee that the descriptor's DMA address has been written to
-> -	 * the next slot in the ring before the write index is updated, since
-> -	 * other cores may update this index independently.
-> -	 */
-> -	smp_wmb();
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(caam_jr_enqueue);
->  
-> -	jrp->inp_ring_write_index = (jrp->inp_ring_write_index + 1) &
-> -				    (JOBR_DEPTH - 1);
-> -	jrp->head = (head + 1) & (JOBR_DEPTH - 1);
-> +/**
-> + * caam_jr_enqueue_bklog() - Enqueue a job descriptor head, returns 0 if OK, or
-> + * -EINPROGRESS if the number of available entries in the Job Ring is less
-
-The function actually returns -EBUSY, not -EINPROGRESS.
-
-> + * than the threshold configured through CONFIG_CRYPTO_DEV_FSL_CAAM_BKLOG_SIZE,
-
-Leftover, threshold is not configurable.
-
-> + * and -EIO if it cannot map the caller's descriptor or if the threshold has
-> + * been exceeded.
-> + * @dev:  device of the job ring to be used. This device should have
-> + *        been assigned prior by caam_jr_register().
-> + * @desc: points to a job descriptor that execute our request. All
-> + *        descriptors (and all referenced data) must be in a DMAable
-> + *        region, and all data references must be physical addresses
-> + *        accessible to CAAM (i.e. within a PAMU window granted
-> + *        to it).
-> + * @cbk:  pointer to a callback function to be invoked upon completion
-> + *        of this request. This has the form:
-> + *        callback(struct device *dev, u32 *desc, u32 stat, void *arg)
-> + *        where:
-> + *        @dev:    contains the job ring device that processed this
-> + *                 response.
-> + *        @desc:   descriptor that initiated the request, same as
-> + *                 "desc" being argued to caam_jr_enqueue().
-> + *        @status: untranslated status received from CAAM. See the
-> + *                 reference manual for a detailed description of
-> + *                 error meaning, or see the JRSTA definitions in the
-> + *                 register header file
-> + *        @areq:   optional pointer to an argument passed with the
-> + *                 original request
-
-Though I haven't checked, I am pretty sure that kernel-doc is not smart
-enough to handle the description of function/callback parameters.
-
-> + * @areq: optional pointer to a user argument for use at callback
-> + *        time.
-> + **/
-> +int caam_jr_enqueue_bklog(struct device *dev, u32 *desc,
-> +			  void (*cbk)(struct device *dev, u32 *desc,
-> +				      u32 status, void *areq),
-> +			  void *areq)
-> +{
-> +	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
-> +	int desc_size, ret;
-> +	dma_addr_t desc_dma;
->  
-> -	/*
-> -	 * Ensure that all job information has been written before
-> -	 * notifying CAAM that a new job was added to the input ring.
-> -	 */
-> -	wmb();
-> +	desc_size = (*desc & HDR_JD_LENGTH_MASK) * sizeof(u32);
-> +	desc_dma = dma_map_single(dev, desc, desc_size, DMA_TO_DEVICE);
-> +	if (dma_mapping_error(dev, desc_dma)) {
-> +		dev_err(dev, "caam_jr_enqueue(): can't map jobdesc\n");
-> +		return -EIO;
-> +	}
->  
-> -	wr_reg32(&jrp->rregs->inpring_jobadd, 1);
-> +	ret = __caam_jr_enqueue(jrp, desc, desc_size, desc_dma, cbk, areq,
-> +				true);
-> +	if (unlikely(ret && (ret != -EBUSY)))
-> +		dma_unmap_single(dev, desc_dma, desc_size, DMA_TO_DEVICE);
->  
-> -	spin_unlock_bh(&jrp->inplock);
-> +	return ret;
->  
-> -	return 0;
->  }
-> -EXPORT_SYMBOL(caam_jr_enqueue);
-> +EXPORT_SYMBOL(caam_jr_enqueue_bklog);
->  
->  /*
->   * Init JobR independent of platform property detection
-> diff --git a/drivers/crypto/caam/jr.h b/drivers/crypto/caam/jr.h
-> index 97113a6..21558df 100644
-> --- a/drivers/crypto/caam/jr.h
-> +++ b/drivers/crypto/caam/jr.h
-> @@ -15,4 +15,9 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
->  				void *areq),
->  		    void *areq);
->  
-> +int caam_jr_enqueue_bklog(struct device *dev, u32 *desc,
-> +			  void (*cbk)(struct device *dev, u32 *desc, u32 status,
-> +				      void *areq),
-> +			  void *areq);
-> +
->  #endif /* JR_H */
-> 
+SGVsbG8gSG9yaWEsDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBIb3JpYSBH
+ZWFudMSDIFttYWlsdG86aG9yaWEuZ2VhbnRhQGZyZWVzY2FsZS5jb21dIA0KU2VudDogV2VkbmVz
+ZGF5LCBTZXB0ZW1iZXIgMTYsIDIwMTUgNToxNyBQTQ0KVG86IFBvcm9zYW51IEFsZXhhbmRydS1C
+MDY4MzAgPGFsZXhhbmRydS5wb3Jvc2FudUBmcmVlc2NhbGUuY29tPjsgbGludXgtY3J5cHRvQHZn
+ZXIua2VybmVsLm9yZw0KQ2M6IGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdTsgUG9wIE1pcmNl
+YS1SMTk0MzkgPG1pcmNlYS5wb3BAZnJlZXNjYWxlLmNvbT4NClN1YmplY3Q6IFJlOiBbUEFUQ0hd
+IGNyeXB0by9jYWFtOiBhZGQgYmFja2xvZ2dpbmcgc3VwcG9ydA0KDQpPbiA5LzkvMjAxNSA5OjU3
+IEFNLCBBbGV4IFBvcm9zYW51IHdyb3RlOg0KPiBjYWFtX2pyX2VucXVldWUoKSBmdW5jdGlvbiBy
+ZXR1cm5zIC1FQlVTWSBvbmNlIHRoZXJlIGFyZSBubyBtb3JlIHNsb3RzIA0KPiBhdmFpbGFibGUg
+aW4gdGhlIEpSLCBidXQgaXQgZG9lc24ndCBhY3R1YWxseSBzYXZlIHRoZSBjdXJyZW50IHJlcXVl
+c3QuIA0KPiBUaGlzIGJyZWFrcyB0aGUgZnVuY3Rpb25hbGl0eSBvZiB1c2VycyB0aGF0IGV4cGVj
+dCB0aGF0IGV2ZW4gaWYgdGhlcmUgDQo+IGlzIG5vIG1vcmUgc3BhY2UgZm9yIHRoZSByZXF1ZXN0
+LCBpdCBpcyBhdCBsZWFzdCBxdWV1ZWQgZm9yIGxhdGVyIA0KPiBleGVjdXRpb24uIEluIG90aGVy
+IHdvcmRzLCBhbGwgY3J5cHRvIHRyYW5zZm9ybWF0aW9ucyB0aGF0IHJlcXVlc3QgDQo+IGJhY2ts
+b2dnaW5nIChpLmUuIGhhdmUgQ1JZUFRPX1RGTV9SRVFfTUFZX0JBQ0tMT0cgc2V0KSwgd2lsbCBo
+YW5nLiANCj4gU3VjaCBhbiBleGFtcGxlIGlzIGRtLWNyeXB0Lg0KPiBUaGUgY3VycmVudCBwYXRj
+aCBzb2x2ZXMgdGhpcyBpc3N1ZSBieSBzZXR0aW5nIGEgdGhyZXNob2xkIGFmdGVyIHdoaWNoIA0K
+PiBjYWFtX2pyX2VucXVldWUoKSByZXR1cm5zIC1FQlVTWSwgYnV0IHNpbmNlIHRoZSBIVyBqb2Ig
+cmluZyBpc24ndCANCj4gYWN0dWFsbHkgZnVsbCwgdGhlIGpvYiBpcyBlbnF1ZXVlZC4NCg0KWW91
+IHNob3VsZCBtZW50aW9uIHRoZSByZWFzb24gb2Ygbm90IHVzaW5nIHRoZSBmdW5jdGlvbnMgYW5k
+IG1lY2hhbmlzbSBhdmFpbGFibGUgaW4gdGhlIENyeXB0byBBUEksIGkuZS4gaGF2aW5nIGEgMC1s
+ZW5ndGggY3J5cHRvX3F1ZXVlIHVzZWQgb25seSBmb3IgYmFja2xvZ2dpbmcuDQpbQVBdIFRoZSBz
+b2Z0d2FyZSBvdmVyaGVhZCBhc3NvY2lhdGVkIHdpdGggdGhlIGNyeXB0b19xdWV1ZSwgY291cGxl
+ZCB3aXRoIHRoZSByZWxhdGl2ZWx5IGxvbmcgSFcgcXVldWUgb2YgdGhlIFNFQyA0LnggKGFzIG9w
+cG9zZWQgdG8gdGhlIGYuaS4gVGFsaXRvcyAncXVldWUnKSBsZWFkIG1lIHRvIHRoaXMgbWVjaGFu
+aXNtJ3MgaW1wbGVtZW50YXRpb24uIEFsc28sIHRoZSByZXN1bHRzIG9idGFpbmVkIHdpdGggdGhp
+cyBpbXBsZW1lbnRhdGlvbiBjb21wYXJlZCB3aXRoIGEgY3J5cHRvX3F1ZXVlIGJhc2VkIGltcGxl
+bWVudGF0aW9uIGxlYW4gdG93YXJkcyBmYXZvcmluZyB0aGUgSFctYmFzZWQgcXVldWVpbmcgbWVj
+aGFuaXNtDQoNCj4gQ2F2ZWF0OiBpZiB0aGUgdXNlcnMgb2YgdGhlIGRyaXZlciBkb24ndCBvYmV5
+IHRoZSBBUEkgY29udHJhY3Qgd2hpY2ggDQo+IHN0YXRlcyB0aGF0IG9uY2UgLUVCVVNZIGlzIHJl
+Y2VpdmVkLCBubyBtb3JlIHJlcXVlc3RzIGFyZSB0byBiZSBzZW50LCANCj4gZXZlbnR1YWxseSB0
+aGUgZHJpdmVyIHdpbGwgcmVqZWN0IHRoZSBlbnF1ZXVlcy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6
+IEFsZXggUG9yb3NhbnUgPGFsZXhhbmRydS5wb3Jvc2FudUBmcmVlc2NhbGUuY29tPg0KPiAtLS0N
+Cj4gIGRyaXZlcnMvY3J5cHRvL2NhYW0vY2FhbWFsZy5jIHwgMjMzICsrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKystLS0tLS0tLQ0KPiAgZHJpdmVycy9jcnlwdG8vY2FhbS9pbnRlcm4u
+aCAgfCAgIDcgKysNCj4gIGRyaXZlcnMvY3J5cHRvL2NhYW0vanIuYyAgICAgIHwgMTkwICsrKysr
+KysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0NCj4gIGRyaXZlcnMvY3J5cHRvL2NhYW0vanIu
+aCAgICAgIHwgICA1ICsNCj4gIDQgZmlsZXMgY2hhbmdlZCwgMzUyIGluc2VydGlvbnMoKyksIDgz
+IGRlbGV0aW9ucygtKQ0KDQpUaGUgcGF0Y2ggdXBkYXRlcyBvbmx5IGNhYW1hbGcuYy4gV2hhdCBh
+Ym91dCB0aGUgb3RoZXJzIChjYWFtaGFzaC5jIGV0Yy4pPw0KW0FQXSBJIGhhdmUgY29uc2lkZXJl
+ZCB0aGUgaGFzaCB1c2VycyB0byBiZSBub24tYmFja2xvZ2dhYmxlLiBJTU8gdGhlIGJsb2NrLWNp
+cGhlcnMgc2hvdWxkIGJlIHRoZSBvbmx5IGJhY2tsb2dnYWJsZSByZXF1ZXN0cywgYnV0IEkndmUg
+YWxzbyBpbXBsZW1lbnRlZCB0aGUgYmFja2xvZ2dpbmcgd3JhcHBlcnMgZm9yIEFFQUQgZXRjLiBG
+b3IgdjIgb2YgdGhpcyBwYXRjaCwgSSBzaGFsbCBhZGQgdGhlIGJhY2tsb2dnaW5nIHdhcHBlcnMg
+dG8gdGhlIGhhc2ggaW1wbGVtZW50YXRpb25zLg0KDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVy
+cy9jcnlwdG8vY2FhbS9jYWFtYWxnLmMgDQo+IGIvZHJpdmVycy9jcnlwdG8vY2FhbS9jYWFtYWxn
+LmMgaW5kZXggYmE3OWQ2My4uYzI4MTQ4MyAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9jcnlwdG8v
+Y2FhbS9jYWFtYWxnLmMNCj4gKysrIGIvZHJpdmVycy9jcnlwdG8vY2FhbS9jYWFtYWxnLmMNCj4g
+QEAgLTE4MTUsOSArMTgxNSwxNCBAQCBzdGF0aWMgdm9pZCBhZWFkX2VuY3J5cHRfZG9uZShzdHJ1
+Y3QgZGV2aWNlIA0KPiAqanJkZXYsIHUzMiAqZGVzYywgdTMyIGVyciwNCj4gIA0KPiAgCWVkZXNj
+ID0gY29udGFpbmVyX29mKGRlc2MsIHN0cnVjdCBhZWFkX2VkZXNjLCBod19kZXNjWzBdKTsNCj4g
+IA0KPiAtCWlmIChlcnIpDQo+ICsJaWYgKGVyciAmJiAoZXJyICE9IC1FSU5QUk9HUkVTUykpDQo+
+ICAJCWNhYW1fanJfc3Ryc3RhdHVzKGpyZGV2LCBlcnIpOw0KPiAgDQo+ICsJaWYgKGVyciA9PSAt
+RUlOUFJPR1JFU1MpIHsNCj4gKwkJYWVhZF9yZXF1ZXN0X2NvbXBsZXRlKHJlcSwgZXJyKTsNCj4g
+KwkJcmV0dXJuOw0KPiArCX0NCg0KTG9naWMgY2FuIGJlIHNpbXBsaWZpZWQgYnkgcmV2ZXJzaW5n
+IHRoZSBjb25kaXRpb25zOg0KDQppZiAoZXJyID09IC1FSU5QUk9HUkVTUykNCglnb3RvIG91dDsN
+Cg0KaWYgKGVycikNCgljYWFtX2pyX3N0cnN0YXR1cyhqcmRldiwgZXJyKTsNCg0KWy4uLl0NCm91
+dDoNCglhZWFkX3JlcXVlc3RfY29tcGxldGUocmVxLCBlcnIpOw0KDQpTYW1lIGZvciB0aGUgb3Ro
+ZXIgcGxhY2VzLg0KDQpbQVBdIERvbmUgZm9yIHYyLg0KDQo+ICsNCj4gIAlhZWFkX3VubWFwKGpy
+ZGV2LCBlZGVzYywgcmVxKTsNCj4gIA0KPiAgCWtmcmVlKGVkZXNjKTsNCj4gQEAgLTE4MzcsOSAr
+MTg0MiwxNCBAQCBzdGF0aWMgdm9pZCBhZWFkX2RlY3J5cHRfZG9uZShzdHJ1Y3QgZGV2aWNlIA0K
+PiAqanJkZXYsIHUzMiAqZGVzYywgdTMyIGVyciwNCj4gIA0KPiAgCWVkZXNjID0gY29udGFpbmVy
+X29mKGRlc2MsIHN0cnVjdCBhZWFkX2VkZXNjLCBod19kZXNjWzBdKTsNCj4gIA0KPiAtCWlmIChl
+cnIpDQo+ICsJaWYgKGVyciAmJiAoZXJyICE9IC1FSU5QUk9HUkVTUykpDQo+ICAJCWNhYW1fanJf
+c3Ryc3RhdHVzKGpyZGV2LCBlcnIpOw0KPiAgDQo+ICsJaWYgKGVyciA9PSAtRUlOUFJPR1JFU1Mp
+IHsNCj4gKwkJYWVhZF9yZXF1ZXN0X2NvbXBsZXRlKHJlcSwgZXJyKTsNCj4gKwkJcmV0dXJuOw0K
+PiArCX0NCj4gKw0KPiAgCWFlYWRfdW5tYXAoanJkZXYsIGVkZXNjLCByZXEpOw0KPiAgDQo+ICAJ
+LyoNCj4gQEAgLTE4NjQsMTMgKzE4NzQsMTcgQEAgc3RhdGljIHZvaWQgYWJsa2NpcGhlcl9lbmNy
+eXB0X2RvbmUoc3RydWN0IA0KPiBkZXZpY2UgKmpyZGV2LCB1MzIgKmRlc2MsIHUzMiBlcnIsDQo+
+ICANCj4gIAlkZXZfZXJyKGpyZGV2LCAiJXMgJWQ6IGVyciAweCV4XG4iLCBfX2Z1bmNfXywgX19M
+SU5FX18sIGVycik7ICANCj4gI2VuZGlmDQo+IC0NCj4gIAllZGVzYyA9IChzdHJ1Y3QgYWJsa2Np
+cGhlcl9lZGVzYyAqKSgoY2hhciAqKWRlc2MgLQ0KPiAgCQkgb2Zmc2V0b2Yoc3RydWN0IGFibGtj
+aXBoZXJfZWRlc2MsIGh3X2Rlc2MpKTsNCj4gIA0KPiAtCWlmIChlcnIpDQo+ICsJaWYgKGVyciAm
+JiAoZXJyICE9IC1FSU5QUk9HUkVTUykpDQo+ICAJCWNhYW1fanJfc3Ryc3RhdHVzKGpyZGV2LCBl
+cnIpOw0KPiAgDQo+ICsJaWYgKGVyciA9PSAtRUlOUFJPR1JFU1MpIHsNCj4gKwkJYWJsa2NpcGhl
+cl9yZXF1ZXN0X2NvbXBsZXRlKHJlcSwgZXJyKTsNCj4gKwkJcmV0dXJuOw0KPiArCX0NCj4gKw0K
+PiAgI2lmZGVmIERFQlVHDQo+ICAJcHJpbnRfaGV4X2R1bXAoS0VSTl9FUlIsICJkc3RpdiAgQCJf
+X3N0cmluZ2lmeShfX0xJTkVfXykiOiAiLA0KPiAgCQkgICAgICAgRFVNUF9QUkVGSVhfQUREUkVT
+UywgMTYsIDQsIHJlcS0+aW5mbywgQEAgLTE5MDAsOSArMTkxNCwxNCANCj4gQEAgc3RhdGljIHZv
+aWQgYWJsa2NpcGhlcl9kZWNyeXB0X2RvbmUoc3RydWN0IGRldmljZSAqanJkZXYsIHUzMiANCj4g
+KmRlc2MsIHUzMiBlcnIsDQo+ICANCj4gIAllZGVzYyA9IChzdHJ1Y3QgYWJsa2NpcGhlcl9lZGVz
+YyAqKSgoY2hhciAqKWRlc2MgLQ0KPiAgCQkgb2Zmc2V0b2Yoc3RydWN0IGFibGtjaXBoZXJfZWRl
+c2MsIGh3X2Rlc2MpKTsNCj4gLQlpZiAoZXJyKQ0KPiArCWlmIChlcnIgJiYgKGVyciAhPSAtRUlO
+UFJPR1JFU1MpKQ0KPiAgCQljYWFtX2pyX3N0cnN0YXR1cyhqcmRldiwgZXJyKTsNCj4gIA0KPiAr
+CWlmIChlcnIgPT0gLUVJTlBST0dSRVNTKSB7DQo+ICsJCWFibGtjaXBoZXJfcmVxdWVzdF9jb21w
+bGV0ZShyZXEsIGVycik7DQo+ICsJCXJldHVybjsNCj4gKwl9DQo+ICsNCj4gICNpZmRlZiBERUJV
+Rw0KPiAgCXByaW50X2hleF9kdW1wKEtFUk5fRVJSLCAiZHN0aXYgIEAiX19zdHJpbmdpZnkoX19M
+SU5FX18pIjogIiwNCj4gIAkJICAgICAgIERVTVBfUFJFRklYX0FERFJFU1MsIDE2LCA0LCByZXEt
+PmluZm8sIEBAIC0yMjk0LDEyICsyMzEzLDMwIA0KPiBAQCBzdGF0aWMgaW50IGdjbV9lbmNyeXB0
+KHN0cnVjdCBhZWFkX3JlcXVlc3QgKnJlcSkgICNlbmRpZg0KPiAgDQo+ICAJZGVzYyA9IGVkZXNj
+LT5od19kZXNjOw0KPiAtCXJldCA9IGNhYW1fanJfZW5xdWV1ZShqcmRldiwgZGVzYywgYWVhZF9l
+bmNyeXB0X2RvbmUsIHJlcSk7DQo+IC0JaWYgKCFyZXQpIHsNCj4gLQkJcmV0ID0gLUVJTlBST0dS
+RVNTOw0KPiArCWlmIChyZXEtPmJhc2UuZmxhZ3MgJiBDUllQVE9fVEZNX1JFUV9NQVlfQkFDS0xP
+Rykgew0KPiArCQlyZXQgPSBjYWFtX2pyX2VucXVldWVfYmtsb2coanJkZXYsIGRlc2MsIGFlYWRf
+ZW5jcnlwdF9kb25lLA0KPiArCQkJCQkgICAgcmVxKTsNCj4gKwkJc3dpdGNoIChyZXQpIHsNCj4g
+KwkJY2FzZSAwOg0KPiArCQkJcmV0ID0gLUVJTlBST0dSRVNTOw0KPiArCQkJYnJlYWs7DQo+ICsN
+Cj4gKwkJY2FzZSAtRUJVU1k6DQo+ICsJCQlicmVhazsNCj4gKw0KPiArCQlkZWZhdWx0Og0KPiAr
+CQkJYWVhZF91bm1hcChqcmRldiwgZWRlc2MsIHJlcSk7DQo+ICsJCQlrZnJlZShlZGVzYyk7DQo+
+ICsJCQlicmVhazsNCj4gKwkJfQ0KPiAgCX0gZWxzZSB7DQo+IC0JCWFlYWRfdW5tYXAoanJkZXYs
+IGVkZXNjLCByZXEpOw0KPiAtCQlrZnJlZShlZGVzYyk7DQo+ICsJCXJldCA9IGNhYW1fanJfZW5x
+dWV1ZShqcmRldiwgZGVzYywgYWVhZF9lbmNyeXB0X2RvbmUsIHJlcSk7DQo+ICsJCWlmICghcmV0
+KSB7DQo+ICsJCQlyZXQgPSAtRUlOUFJPR1JFU1M7DQo+ICsJCX0gZWxzZSB7DQo+ICsJCQlhZWFk
+X3VubWFwKGpyZGV2LCBlZGVzYywgcmVxKTsNCj4gKwkJCWtmcmVlKGVkZXNjKTsNCj4gKwkJfQ0K
+PiAgCX0NCg0KQWdhaW4sIHRoaXMgc2hvdWxkIGJlIHNpbXBsaWZpZWQ6DQoNCmlmIChyZXEtPmJh
+c2UuZmxhZ3MgJiBDUllQVE9fVEZNX1JFUV9NQVlfQkFDS0xPRykgew0KCXJldCA9IGNhYW1fanJf
+ZW5xdWV1ZV9ia2xvZyhqcmRldiwgZGVzYywgYWVhZF9lbmNyeXB0X2RvbmUsDQoJCQkJICAgIHJl
+cSk7DQoJaWYgKHJldCA9PSAtRUJVU1kpDQoJCXJldHVybiByZXQ7DQp9IGVsc2Ugew0KCXJldCA9
+IGNhYW1fanJfZW5xdWV1ZShqcmRldiwgZGVzYywgYWVhZF9lbmNyeXB0X2RvbmUsIHJlcSk7DQoN
+Cn0NCg0KaWYgKCFyZXQpIHsNCglyZXQgPSAtRUlOUFJPR1JFU1M7DQp9IGVsc2Ugew0KCWFlYWRf
+dW5tYXAoanJkZXYsIGVkZXNjLCByZXEpOw0KCWtmcmVlKGVkZXNjKTsNCn0NCg0KW0FQXSBEb25l
+IGZvciB2Mi4NCj4gIA0KPiAgCXJldHVybiByZXQ7DQo+IEBAIC0yMzM4LDEyICsyMzc1LDMwIEBA
+IHN0YXRpYyBpbnQgYWVhZF9lbmNyeXB0KHN0cnVjdCBhZWFkX3JlcXVlc3QgDQo+ICpyZXEpICAj
+ZW5kaWYNCj4gIA0KPiAgCWRlc2MgPSBlZGVzYy0+aHdfZGVzYzsNCj4gLQlyZXQgPSBjYWFtX2py
+X2VucXVldWUoanJkZXYsIGRlc2MsIGFlYWRfZW5jcnlwdF9kb25lLCByZXEpOw0KPiAtCWlmICgh
+cmV0KSB7DQo+IC0JCXJldCA9IC1FSU5QUk9HUkVTUzsNCj4gKwlpZiAocmVxLT5iYXNlLmZsYWdz
+ICYgQ1JZUFRPX1RGTV9SRVFfTUFZX0JBQ0tMT0cpIHsNCj4gKwkJcmV0ID0gY2FhbV9qcl9lbnF1
+ZXVlX2JrbG9nKGpyZGV2LCBkZXNjLCBhZWFkX2VuY3J5cHRfZG9uZSwNCj4gKwkJCQkJICAgIHJl
+cSk7DQo+ICsJCXN3aXRjaCAocmV0KSB7DQo+ICsJCWNhc2UgMDoNCj4gKwkJCXJldCA9IC1FSU5Q
+Uk9HUkVTUzsNCj4gKwkJCWJyZWFrOw0KPiArDQo+ICsJCWNhc2UgLUVCVVNZOg0KPiArCQkJYnJl
+YWs7DQo+ICsNCj4gKwkJZGVmYXVsdDoNCj4gKwkJCWFlYWRfdW5tYXAoanJkZXYsIGVkZXNjLCBy
+ZXEpOw0KPiArCQkJa2ZyZWUoZWRlc2MpOw0KPiArCQkJYnJlYWs7DQo+ICsJCX0NCj4gIAl9IGVs
+c2Ugew0KPiAtCQlhZWFkX3VubWFwKGpyZGV2LCBlZGVzYywgcmVxKTsNCj4gLQkJa2ZyZWUoZWRl
+c2MpOw0KPiArCQlyZXQgPSBjYWFtX2pyX2VucXVldWUoanJkZXYsIGRlc2MsIGFlYWRfZW5jcnlw
+dF9kb25lLCByZXEpOw0KPiArCQlpZiAoIXJldCkgew0KPiArCQkJcmV0ID0gLUVJTlBST0dSRVNT
+Ow0KPiArCQl9IGVsc2Ugew0KPiArCQkJYWVhZF91bm1hcChqcmRldiwgZWRlc2MsIHJlcSk7DQo+
+ICsJCQlrZnJlZShlZGVzYyk7DQo+ICsJCX0NCj4gIAl9DQo+ICANCj4gIAlyZXR1cm4gcmV0Ow0K
+PiBAQCAtMjM3MywxMiArMjQyOCwzMCBAQCBzdGF0aWMgaW50IGdjbV9kZWNyeXB0KHN0cnVjdCBh
+ZWFkX3JlcXVlc3QgDQo+ICpyZXEpICAjZW5kaWYNCj4gIA0KPiAgCWRlc2MgPSBlZGVzYy0+aHdf
+ZGVzYzsNCj4gLQlyZXQgPSBjYWFtX2pyX2VucXVldWUoanJkZXYsIGRlc2MsIGFlYWRfZGVjcnlw
+dF9kb25lLCByZXEpOw0KPiAtCWlmICghcmV0KSB7DQo+IC0JCXJldCA9IC1FSU5QUk9HUkVTUzsN
+Cj4gKwlpZiAocmVxLT5iYXNlLmZsYWdzICYgQ1JZUFRPX1RGTV9SRVFfTUFZX0JBQ0tMT0cpIHsN
+Cj4gKwkJcmV0ID0gY2FhbV9qcl9lbnF1ZXVlX2JrbG9nKGpyZGV2LCBkZXNjLCBhZWFkX2RlY3J5
+cHRfZG9uZSwNCj4gKwkJCQkJICAgIHJlcSk7DQo+ICsJCXN3aXRjaCAocmV0KSB7DQo+ICsJCWNh
+c2UgMDoNCj4gKwkJCXJldCA9IC1FSU5QUk9HUkVTUzsNCj4gKwkJCWJyZWFrOw0KPiArDQo+ICsJ
+CWNhc2UgLUVCVVNZOg0KPiArCQkJYnJlYWs7DQo+ICsNCj4gKwkJZGVmYXVsdDoNCj4gKwkJCWFl
+YWRfdW5tYXAoanJkZXYsIGVkZXNjLCByZXEpOw0KPiArCQkJa2ZyZWUoZWRlc2MpOw0KPiArCQkJ
+YnJlYWs7DQo+ICsJCX0NCj4gIAl9IGVsc2Ugew0KPiAtCQlhZWFkX3VubWFwKGpyZGV2LCBlZGVz
+YywgcmVxKTsNCj4gLQkJa2ZyZWUoZWRlc2MpOw0KPiArCQlyZXQgPSBjYWFtX2pyX2VucXVldWUo
+anJkZXYsIGRlc2MsIGFlYWRfZGVjcnlwdF9kb25lLCByZXEpOw0KPiArCQlpZiAoIXJldCkgew0K
+PiArCQkJcmV0ID0gLUVJTlBST0dSRVNTOw0KPiArCQl9IGVsc2Ugew0KPiArCQkJYWVhZF91bm1h
+cChqcmRldiwgZWRlc2MsIHJlcSk7DQo+ICsJCQlrZnJlZShlZGVzYyk7DQo+ICsJCX0NCj4gIAl9
+DQo+ICANCj4gIAlyZXR1cm4gcmV0Ow0KPiBAQCAtMjQyMywxMiArMjQ5NiwzMCBAQCBzdGF0aWMg
+aW50IGFlYWRfZGVjcnlwdChzdHJ1Y3QgYWVhZF9yZXF1ZXN0IA0KPiAqcmVxKSAgI2VuZGlmDQo+
+ICANCj4gIAlkZXNjID0gZWRlc2MtPmh3X2Rlc2M7DQo+IC0JcmV0ID0gY2FhbV9qcl9lbnF1ZXVl
+KGpyZGV2LCBkZXNjLCBhZWFkX2RlY3J5cHRfZG9uZSwgcmVxKTsNCj4gLQlpZiAoIXJldCkgew0K
+PiAtCQlyZXQgPSAtRUlOUFJPR1JFU1M7DQo+ICsJaWYgKHJlcS0+YmFzZS5mbGFncyAmIENSWVBU
+T19URk1fUkVRX01BWV9CQUNLTE9HKSB7DQo+ICsJCXJldCA9IGNhYW1fanJfZW5xdWV1ZV9ia2xv
+ZyhqcmRldiwgZGVzYywgYWVhZF9kZWNyeXB0X2RvbmUsDQo+ICsJCQkJCSAgICByZXEpOw0KPiAr
+CQlzd2l0Y2ggKHJldCkgew0KPiArCQljYXNlIDA6DQo+ICsJCQlyZXQgPSAtRUlOUFJPR1JFU1M7
+DQo+ICsJCQlicmVhazsNCj4gKw0KPiArCQljYXNlIC1FQlVTWToNCj4gKwkJCWJyZWFrOw0KPiAr
+DQo+ICsJCWRlZmF1bHQ6DQo+ICsJCQlhZWFkX3VubWFwKGpyZGV2LCBlZGVzYywgcmVxKTsNCj4g
+KwkJCWtmcmVlKGVkZXNjKTsNCj4gKwkJCWJyZWFrOw0KPiArCQl9DQo+ICAJfSBlbHNlIHsNCj4g
+LQkJYWVhZF91bm1hcChqcmRldiwgZWRlc2MsIHJlcSk7DQo+IC0JCWtmcmVlKGVkZXNjKTsNCj4g
+KwkJcmV0ID0gY2FhbV9qcl9lbnF1ZXVlKGpyZGV2LCBkZXNjLCBhZWFkX2RlY3J5cHRfZG9uZSwg
+cmVxKTsNCj4gKwkJaWYgKCFyZXQpIHsNCj4gKwkJCXJldCA9IC1FSU5QUk9HUkVTUzsNCj4gKwkJ
+fSBlbHNlIHsNCj4gKwkJCWFlYWRfdW5tYXAoanJkZXYsIGVkZXNjLCByZXEpOw0KPiArCQkJa2Zy
+ZWUoZWRlc2MpOw0KPiArCQl9DQo+ICAJfQ0KPiAgDQo+ICAJcmV0dXJuIHJldDsNCj4gQEAgLTI1
+NzUsMTMgKzI2NjYsMzEgQEAgc3RhdGljIGludCBhYmxrY2lwaGVyX2VuY3J5cHQoc3RydWN0IGFi
+bGtjaXBoZXJfcmVxdWVzdCAqcmVxKQ0KPiAgCQkgICAgICAgZGVzY19ieXRlcyhlZGVzYy0+aHdf
+ZGVzYyksIDEpOyAgI2VuZGlmDQo+ICAJZGVzYyA9IGVkZXNjLT5od19kZXNjOw0KPiAtCXJldCA9
+IGNhYW1fanJfZW5xdWV1ZShqcmRldiwgZGVzYywgYWJsa2NpcGhlcl9lbmNyeXB0X2RvbmUsIHJl
+cSk7DQo+IC0NCj4gLQlpZiAoIXJldCkgew0KPiAtCQlyZXQgPSAtRUlOUFJPR1JFU1M7DQo+ICsJ
+aWYgKHJlcS0+YmFzZS5mbGFncyAmIENSWVBUT19URk1fUkVRX01BWV9CQUNLTE9HKSB7DQo+ICsJ
+CXJldCA9IGNhYW1fanJfZW5xdWV1ZV9ia2xvZyhqcmRldiwgZGVzYywNCj4gKwkJCQkJICAgIGFi
+bGtjaXBoZXJfZW5jcnlwdF9kb25lLCByZXEpOw0KPiArCQlzd2l0Y2ggKHJldCkgew0KPiArCQlj
+YXNlIDA6DQo+ICsJCQlyZXQgPSAtRUlOUFJPR1JFU1M7DQo+ICsJCQlicmVhazsNCj4gKw0KPiAr
+CQljYXNlIC1FQlVTWToNCj4gKwkJCWJyZWFrOw0KPiArDQo+ICsJCWRlZmF1bHQ6DQo+ICsJCQlh
+YmxrY2lwaGVyX3VubWFwKGpyZGV2LCBlZGVzYywgcmVxKTsNCj4gKwkJCWtmcmVlKGVkZXNjKTsN
+Cj4gKwkJCWJyZWFrOw0KPiArCQl9DQo+ICAJfSBlbHNlIHsNCj4gLQkJYWJsa2NpcGhlcl91bm1h
+cChqcmRldiwgZWRlc2MsIHJlcSk7DQo+IC0JCWtmcmVlKGVkZXNjKTsNCj4gKwkJcmV0ID0gY2Fh
+bV9qcl9lbnF1ZXVlKGpyZGV2LCBkZXNjLCBhYmxrY2lwaGVyX2VuY3J5cHRfZG9uZSwNCj4gKwkJ
+CQkgICAgICByZXEpOw0KPiArCQlpZiAoIXJldCkgew0KPiArCQkJcmV0ID0gLUVJTlBST0dSRVNT
+Ow0KPiArCQl9IGVsc2Ugew0KPiArCQkJYWJsa2NpcGhlcl91bm1hcChqcmRldiwgZWRlc2MsIHJl
+cSk7DQo+ICsJCQlrZnJlZShlZGVzYyk7DQo+ICsJCX0NCj4gIAl9DQo+ICANCj4gIAlyZXR1cm4g
+cmV0Ow0KPiBAQCAtMjYxMiwxNSArMjcyMSwzMiBAQCBzdGF0aWMgaW50IGFibGtjaXBoZXJfZGVj
+cnlwdChzdHJ1Y3QgYWJsa2NpcGhlcl9yZXF1ZXN0ICpyZXEpDQo+ICAJCSAgICAgICBEVU1QX1BS
+RUZJWF9BRERSRVNTLCAxNiwgNCwgZWRlc2MtPmh3X2Rlc2MsDQo+ICAJCSAgICAgICBkZXNjX2J5
+dGVzKGVkZXNjLT5od19kZXNjKSwgMSk7ICAjZW5kaWYNCj4gLQ0KPiAtCXJldCA9IGNhYW1fanJf
+ZW5xdWV1ZShqcmRldiwgZGVzYywgYWJsa2NpcGhlcl9kZWNyeXB0X2RvbmUsIHJlcSk7DQo+IC0J
+aWYgKCFyZXQpIHsNCj4gLQkJcmV0ID0gLUVJTlBST0dSRVNTOw0KPiArCWlmIChyZXEtPmJhc2Uu
+ZmxhZ3MgJiBDUllQVE9fVEZNX1JFUV9NQVlfQkFDS0xPRykgew0KPiArCQlyZXQgPSBjYWFtX2py
+X2VucXVldWVfYmtsb2coanJkZXYsIGRlc2MsDQo+ICsJCQkJCSAgICBhYmxrY2lwaGVyX2RlY3J5
+cHRfZG9uZSwgcmVxKTsNCj4gKwkJc3dpdGNoIChyZXQpIHsNCj4gKwkJY2FzZSAwOg0KPiArCQkJ
+cmV0ID0gLUVJTlBST0dSRVNTOw0KPiArCQkJYnJlYWs7DQo+ICsNCj4gKwkJY2FzZSAtRUJVU1k6
+DQo+ICsJCQlicmVhazsNCj4gKw0KPiArCQlkZWZhdWx0Og0KPiArCQkJYWJsa2NpcGhlcl91bm1h
+cChqcmRldiwgZWRlc2MsIHJlcSk7DQo+ICsJCQlrZnJlZShlZGVzYyk7DQo+ICsJCQlicmVhazsN
+Cj4gKwkJfQ0KPiAgCX0gZWxzZSB7DQo+IC0JCWFibGtjaXBoZXJfdW5tYXAoanJkZXYsIGVkZXNj
+LCByZXEpOw0KPiAtCQlrZnJlZShlZGVzYyk7DQo+ICsJCXJldCA9IGNhYW1fanJfZW5xdWV1ZV9i
+a2xvZyhqcmRldiwgZGVzYywNCj4gKwkJCQkJICAgIGFibGtjaXBoZXJfZGVjcnlwdF9kb25lLCBy
+ZXEpOw0KDQpUeXBvLCBzL2NhYW1fanJfZW5xdWV1ZV9ia2xvZy9jYWFtX2pyX2VucXVldWUuDQpX
+aGF0IHRlc3RpbmcgaGFzIGJlZW4gcGVyZm9ybWVkPw0KW0FQXSBOaWNlIGNhdGNoLCB0aGFua3Mu
+IEkndmUgY29ycmVjdGVkIHRoaXMgZm9yIHYyLiBJJ3ZlIHRlc3RlZCB0aGlzIGltcGxlbWVudGF0
+aW9uIHdpdGggZG0tY3J5cHQgJiBhZXMtMTI4LWNiYyBhbmQgSVBTZWMgd2l0aCBBRVMtMTI4LUNC
+Qy9TSEEtMSBpbiBwYXJhbGxlbC4gQWxzbywgSSd2ZSBlbmFibGVkIHRoZSB0ZXN0aW5nIG1vZHVs
+ZS4NCg0KPiArCQlpZiAoIXJldCkgew0KPiArCQkJcmV0ID0gLUVJTlBST0dSRVNTOw0KPiArCQl9
+IGVsc2Ugew0KPiArCQkJYWJsa2NpcGhlcl91bm1hcChqcmRldiwgZWRlc2MsIHJlcSk7DQo+ICsJ
+CQlrZnJlZShlZGVzYyk7DQo+ICsJCX0NCj4gIAl9DQo+IC0NCj4gIAlyZXR1cm4gcmV0Ow0KPiAg
+fQ0KPiAgDQo+IEBAIC0yNzU3LDEzICsyODgzLDMyIEBAIHN0YXRpYyBpbnQgYWJsa2NpcGhlcl9n
+aXZlbmNyeXB0KHN0cnVjdCBza2NpcGhlcl9naXZjcnlwdF9yZXF1ZXN0ICpjcmVxKQ0KPiAgCQkg
+ICAgICAgZGVzY19ieXRlcyhlZGVzYy0+aHdfZGVzYyksIDEpOyAgI2VuZGlmDQo+ICAJZGVzYyA9
+IGVkZXNjLT5od19kZXNjOw0KPiAtCXJldCA9IGNhYW1fanJfZW5xdWV1ZShqcmRldiwgZGVzYywg
+YWJsa2NpcGhlcl9lbmNyeXB0X2RvbmUsIHJlcSk7DQo+IC0NCj4gLQlpZiAoIXJldCkgew0KPiAt
+CQlyZXQgPSAtRUlOUFJPR1JFU1M7DQo+ICsJaWYgKHJlcS0+YmFzZS5mbGFncyAmIENSWVBUT19U
+Rk1fUkVRX01BWV9CQUNLTE9HKSB7DQo+ICsJCXJldCA9IGNhYW1fanJfZW5xdWV1ZV9ia2xvZyhq
+cmRldiwgZGVzYywNCj4gKwkJCQkJICAgIGFibGtjaXBoZXJfZW5jcnlwdF9kb25lLCByZXEpOw0K
+PiArCQlzd2l0Y2ggKHJldCkgew0KPiArCQljYXNlIDA6DQo+ICsJCQlyZXQgPSAtRUlOUFJPR1JF
+U1M7DQo+ICsJCQlicmVhazsNCj4gKw0KPiArCQljYXNlIC1FQlVTWToNCj4gKwkJCWJyZWFrOw0K
+PiArDQo+ICsJCWRlZmF1bHQ6DQo+ICsJCQlhYmxrY2lwaGVyX3VubWFwKGpyZGV2LCBlZGVzYywg
+cmVxKTsNCj4gKwkJCWtmcmVlKGVkZXNjKTsNCj4gKwkJCWJyZWFrOw0KPiArCQl9DQo+ICAJfSBl
+bHNlIHsNCj4gLQkJYWJsa2NpcGhlcl91bm1hcChqcmRldiwgZWRlc2MsIHJlcSk7DQo+IC0JCWtm
+cmVlKGVkZXNjKTsNCj4gKwkJcmV0ID0gY2FhbV9qcl9lbnF1ZXVlKGpyZGV2LCBkZXNjLCBhYmxr
+Y2lwaGVyX2VuY3J5cHRfZG9uZSwNCj4gKwkJCQkgICAgICByZXEpOw0KPiArDQo+ICsJCWlmICgh
+cmV0KSB7DQo+ICsJCQlyZXQgPSAtRUlOUFJPR1JFU1M7DQo+ICsJCX0gZWxzZSB7DQo+ICsJCQlh
+YmxrY2lwaGVyX3VubWFwKGpyZGV2LCBlZGVzYywgcmVxKTsNCj4gKwkJCWtmcmVlKGVkZXNjKTsN
+Cj4gKwkJfQ0KPiAgCX0NCj4gIA0KPiAgCXJldHVybiByZXQ7DQo+IGRpZmYgLS1naXQgYS9kcml2
+ZXJzL2NyeXB0by9jYWFtL2ludGVybi5oIA0KPiBiL2RyaXZlcnMvY3J5cHRvL2NhYW0vaW50ZXJu
+LmggaW5kZXggZTJiY2FjYy4uMTNlNjNlZiAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9jcnlwdG8v
+Y2FhbS9pbnRlcm4uaA0KPiArKysgYi9kcml2ZXJzL2NyeXB0by9jYWFtL2ludGVybi5oDQo+IEBA
+IC0xMSw2ICsxMSwxMiBAQA0KPiAgDQo+ICAvKiBDdXJyZW50bHkgY29tZXMgZnJvbSBLY29uZmln
+IHBhcmFtIGFzIGEgXjIgKGRyaXZlci1yZXF1aXJlZCkgKi8gIA0KPiAjZGVmaW5lIEpPQlJfREVQ
+VEggKDEgPDwgQ09ORklHX0NSWVBUT19ERVZfRlNMX0NBQU1fUklOR1NJWkUpDQo+ICsvKg0KPiAr
+ICogSWYgdGhlIHVzZXIgdHJpZXMgdG8gZW5xdWV1ZSBhIGpvYiBhbmQgdGhlIG51bWJlciBvZiBz
+bG90cyANCj4gK2F2YWlsYWJsZQ0KPiArICogaXMgbGVzcyB0aGFuIHRoaXMgdmFsdWUsIHRoZW4g
+dGhlIGpvYiB3aWxsIGJlIGJhY2tsb2dnZWQgKGlmIHRoZSANCj4gK3VzZXINCj4gKyAqIGFsbG93
+cyBmb3IgaXQpIG9yIGl0IHdpbGwgYmUgZHJvcHBlZC4NCj4gKyAqLw0KPiArI2RlZmluZSBKT0JS
+X1RIUkVTSCAxNg0KDQpXaHkgMTY/DQpXaGF0IGhhcHBlbnMgd2hlbiB1c2VyIGNvbmZpZ3VyZXMg
+Q09ORklHX0NSWVBUT19ERVZfRlNMX0NBQU1fUklOR1NJWkUgdG8gezIsIDMsIDR9Pw0KVGhyZXNo
+b2xkIHNob3VsZCBkZXBlbmQgb24gSk9CUl9ERVBUSC4NCltBUF0gVGhyb3VnaCBleHBlcmltZW50
+YXRpb24sIHRoaXMgc2VlbXMgdG8gYmUgdGhlIHJlYXNvbmFibGUgdmFsdWUgdG8gdXNlIGFzICdy
+ZXNlcnZlZCcgc2xvdHMgZm9yIGJhY2tsb2dnaW5nLiBJJ3ZlIHVwZGF0ZWQgZm9yIHYyIHRoZSBj
+YWxjdWxhdGlvbiBzbyB0aGF0IGl0IHRha2VzIHRoZSBKb2IgUmluZyBsZW5ndGggaW50byBjb25z
+aWRlcmF0aW9uLg0KDQo+ICANCj4gIC8qIEtjb25maWcgcGFyYW1zIGZvciBpbnRlcnJ1cHQgY29h
+bGVzY2luZyBpZiBzZWxlY3RlZCAoZWxzZSB6ZXJvKSAqLyAgDQo+ICNpZmRlZiBDT05GSUdfQ1JZ
+UFRPX0RFVl9GU0xfQ0FBTV9JTlRDIEBAIC0zMyw2ICszOSw3IEBAIHN0cnVjdCANCj4gY2FhbV9q
+cmVudHJ5X2luZm8gew0KPiAgCXUzMiAqZGVzY19hZGRyX3ZpcnQ7CS8qIFN0b3JlZCB2aXJ0IGFk
+ZHIgZm9yIHBvc3Rwcm9jZXNzaW5nICovDQo+ICAJZG1hX2FkZHJfdCBkZXNjX2FkZHJfZG1hOwkv
+KiBTdG9yZWQgYnVzIGFkZHIgZm9yIGRvbmUgbWF0Y2hpbmcgKi8NCj4gIAl1MzIgZGVzY19zaXpl
+OwkvKiBTdG9yZWQgc2l6ZSBmb3IgcG9zdHByb2Nlc3NpbmcsIGhlYWRlciBkZXJpdmVkICovDQo+
+ICsJYm9vbCBpc19iYWNrbG9nZ2VkOyAvKiBUcnVlIGlmIHRoZSByZXF1ZXN0IGhhcyBiZWVuIGJh
+Y2tsb2dnZWQgKi8NCj4gIH07DQo+ICANCj4gIC8qIFByaXZhdGUgc3ViLXN0b3JhZ2UgZm9yIGEg
+c2luZ2xlIEpvYlIgKi8gZGlmZiAtLWdpdCANCj4gYS9kcml2ZXJzL2NyeXB0by9jYWFtL2pyLmMg
+Yi9kcml2ZXJzL2NyeXB0by9jYWFtL2pyLmMgaW5kZXggDQo+IGY3ZTBkOGQuLjkxNjI4OGQgMTAw
+NjQ0DQo+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2NhYW0vanIuYw0KPiArKysgYi9kcml2ZXJzL2Ny
+eXB0by9jYWFtL2pyLmMNCj4gQEAgLTE2OCw2ICsxNjgsNyBAQCBzdGF0aWMgdm9pZCBjYWFtX2py
+X2RlcXVldWUodW5zaWduZWQgbG9uZyBkZXZhcmcpDQo+ICAJdm9pZCAoKnVzZXJjYWxsKShzdHJ1
+Y3QgZGV2aWNlICpkZXYsIHUzMiAqZGVzYywgdTMyIHN0YXR1cywgdm9pZCAqYXJnKTsNCj4gIAl1
+MzIgKnVzZXJkZXNjLCB1c2Vyc3RhdHVzOw0KPiAgCXZvaWQgKnVzZXJhcmc7DQo+ICsJYm9vbCBp
+c19iYWNrbG9nZ2VkOw0KPiAgDQo+ICAJd2hpbGUgKHJkX3JlZzMyKCZqcnAtPnJyZWdzLT5vdXRy
+aW5nX3VzZWQpKSB7DQo+ICANCj4gQEAgLTIwMSw2ICsyMDIsNyBAQCBzdGF0aWMgdm9pZCBjYWFt
+X2pyX2RlcXVldWUodW5zaWduZWQgbG9uZyBkZXZhcmcpDQo+ICAJCXVzZXJhcmcgPSBqcnAtPmVu
+dGluZm9bc3dfaWR4XS5jYmthcmc7DQo+ICAJCXVzZXJkZXNjID0ganJwLT5lbnRpbmZvW3N3X2lk
+eF0uZGVzY19hZGRyX3ZpcnQ7DQo+ICAJCXVzZXJzdGF0dXMgPSBqcnAtPm91dHJpbmdbaHdfaWR4
+XS5qcnN0YXR1czsNCj4gKwkJaXNfYmFja2xvZ2dlZCA9IGpycC0+ZW50aW5mb1tzd19pZHhdLmlz
+X2JhY2tsb2dnZWQ7DQo+ICANCj4gIAkJLyoNCj4gIAkJICogTWFrZSBzdXJlIGFsbCBpbmZvcm1h
+dGlvbiBmcm9tIHRoZSBqb2IgaGFzIGJlZW4gb2J0YWluZWQgQEAgDQo+IC0yMzEsNiArMjMzLDIw
+IEBAIHN0YXRpYyB2b2lkIGNhYW1fanJfZGVxdWV1ZSh1bnNpZ25lZCBsb25nIGRldmFyZykNCj4g
+IA0KPiAgCQlzcGluX3VubG9jaygmanJwLT5vdXRsb2NrKTsNCj4gIA0KPiArCQlpZiAoaXNfYmFj
+a2xvZ2dlZCkNCj4gKwkJCS8qDQo+ICsJCQkgKiBGb3IgYmFja2xvZ2dlZCByZXF1ZXN0cywgdGhl
+IHVzZXIgY2FsbGJhY2sgbmVlZHMgdG8NCj4gKwkJCSAqIGJlIGNhbGxlZCB0d2ljZTogb25jZSB3
+aGVuIHN0YXJ0aW5nIHRvIHByb2Nlc3MgaXQNCj4gKwkJCSAqICh3aXRoIGEgc3RhdHVzIG9mIC1F
+SU5QUk9HUkVTUyBhbmQgb25jZSB3aGVuIGl0J3MNCj4gKwkJCSAqIGRvbmUuIFNpbmNlIFNFQyBj
+aGVhdHMgYnkgZW5xdWV1aW5nIHRoZSByZXF1ZXN0IGluDQo+ICsJCQkgKiBpdHMgSFcgcmluZyBi
+dXQgcmV0dXJuaW5nIC1FQlVTWSwgdGhlIHRpbWUgd2hlbiB0aGUNCj4gKwkJCSAqIHJlcXVlc3Qn
+cyBwcm9jZXNzaW5nIGhhcyBzdGFydGVkIGlzIG5vdCBrbm93bi4NCj4gKwkJCSAqIFRodXMgbm90
+aWZ5IGhlcmUgdGhlIHVzZXIuIFRoZSBzZWNvbmQgY2FsbCBpcyBvbiB0aGUNCj4gKwkJCSAqIG5v
+cm1hbCBwYXRoIChpLmUuIHRoZSBvbmUgdGhhdCBpcyBjYWxsZWQgZXZlbiBmb3INCj4gKwkJCSAq
+IG5vbi1iYWNrbG9nZ2VkIHJlcXVlc3RzLg0KCQkJCQkJICBeIG1pc3NpbmcgcGFyZW50aGVzaXMN
+CltBUF0gTmljZSBjYXRjaCwgdGhhbmsgeW91LiBDb3JyZWN0ZWQgaW4gdjIuDQoNCj4gKwkJCSAq
+Lw0KPiArCQkJdXNlcmNhbGwoZGV2LCB1c2VyZGVzYywgLUVJTlBST0dSRVNTLCB1c2VyYXJnKTsN
+Cj4gKw0KPiAgCQkvKiBGaW5hbGx5LCBleGVjdXRlIHVzZXIncyBjYWxsYmFjayAqLw0KPiAgCQl1
+c2VyY2FsbChkZXYsIHVzZXJkZXNjLCB1c2Vyc3RhdHVzLCB1c2VyYXJnKTsNCj4gIAl9DQo+IEBA
+IC0yOTIsNiArMzA4LDg0IEBAIHZvaWQgY2FhbV9qcl9mcmVlKHN0cnVjdCBkZXZpY2UgKnJkZXYp
+ICB9ICANCj4gRVhQT1JUX1NZTUJPTChjYWFtX2pyX2ZyZWUpOw0KPiAgDQo+ICtzdGF0aWMgaW5s
+aW5lIGludCBfX2NhYW1fanJfZW5xdWV1ZShzdHJ1Y3QgY2FhbV9kcnZfcHJpdmF0ZV9qciAqanJw
+LCB1MzIgKmRlc2MsDQo+ICsJCQkJICAgIGludCBkZXNjX3NpemUsIGRtYV9hZGRyX3QgZGVzY19k
+bWEsDQo+ICsJCQkJICAgIHZvaWQgKCpjYmspKHN0cnVjdCBkZXZpY2UgKmRldiwgdTMyICpkZXNj
+LA0KPiArCQkJCQkJdTMyIHN0YXR1cywgdm9pZCAqYXJlcSksDQo+ICsJCQkJICAgIHZvaWQgKmFy
+ZXEsDQo+ICsJCQkJICAgIGJvb2wgY2FuX2JlX2JhY2tsb2dnZWQpDQo+ICt7DQo+ICsJaW50IGhl
+YWQsIHRhaWw7DQo+ICsJc3RydWN0IGNhYW1fanJlbnRyeV9pbmZvICpoZWFkX2VudHJ5Ow0KPiAr
+CWludCByZXQgPSAwLCBod19zbG90cywgc3dfc2xvdHM7DQo+ICsNCj4gKwlzcGluX2xvY2tfYmgo
+JmpycC0+aW5wbG9jayk7DQo+ICsNCj4gKwloZWFkID0ganJwLT5oZWFkOw0KPiArCXRhaWwgPSBB
+Q0NFU1NfT05DRShqcnAtPnRhaWwpOw0KPiArDQo+ICsJaGVhZF9lbnRyeSA9ICZqcnAtPmVudGlu
+Zm9baGVhZF07DQo+ICsNCj4gKwkvKiBSZXNldCBiYWNrbG9nZ2luZyBzdGF0dXMgaGVyZSAqLw0K
+PiArCWhlYWRfZW50cnktPmlzX2JhY2tsb2dnZWQgPSBmYWxzZTsNCj4gKw0KPiArCWh3X3Nsb3Rz
+ID0gcmRfcmVnMzIoJmpycC0+cnJlZ3MtPmlucHJpbmdfYXZhaWwpOw0KPiArCXN3X3Nsb3RzID0g
+Q0lSQ19TUEFDRShoZWFkLCB0YWlsLCBKT0JSX0RFUFRIKTsNCj4gKw0KPiArCWlmIChod19zbG90
+cyA8PSBKT0JSX1RIUkVTSCB8fCBzd19zbG90cyA8PSBKT0JSX1RIUkVTSCkgew0KPiArCQkvKg0K
+PiArCQkgKiBUaGUgc3RhdGUgYmVsb3cgY2FuIGJlIHJlYWNoZWQgaW4gdGhyZWUgY2FzZXM6DQo+
+ICsJCSAqIDEpIEEgYmFkbHkgYmVoYXZlZCBiYWNrbG9nZ2luZyB1c2VyIGRvZXNuJ3QgYmFjayBv
+ZmYgd2hlbg0KPiArCQkgKiAgICB0b2xkIHNvIGJ5IHRoZSAtRUJVU1kgcmV0dXJuIGNvZGUNCj4g
+KwkJICogMikgTW9yZSB0aGFuIEpPQlJfVEhSRVNIIGJhY2tsb2dnaW5nIHVzZXJzIHJlcXVlc3Rz
+DQo+ICsJCSAqIDMpIER1ZSB0byB0aGUgaGlnaCBzeXN0ZW0gbG9hZCwgdGhlIGVudHJpZXMgcmVz
+ZXJ2ZWQgZm9yIHRoZQ0KPiArCQkgKiAgICBiYWNrbG9nZ2luZyB1c2VycyBhcmUgYmVpbmcgZmls
+bGVkIChzbG93bHkpIGluIGJldHdlZW4NCj4gKwkJICogICAgdGhlIHN1Y2Nlc3NpdmUgY2FsbHMg
+dG8gdGhlIHVzZXIgY2FsbGJhY2sgKHRoZSBmaXJzdCBvbmUNCj4gKwkJICogICAgd2l0aCAtRUlO
+UFJPR1JFU1MgYW5kIHRoZSAybmQgb25lIHdpdGggdGhlIHJlYWwgcmVzdWx0Lg0KPiArCQkgKiBU
+aGUgY29kZSBiZWxvdyBpcyBhIGxhc3QtcmVzb3J0IG1lYXN1cmUgd2hpY2ggd2lsbCBEUk9QDQo+
+ICsJCSAqIGFueSByZXF1ZXN0IGlmIHRoZXJlIGlzIHBoeXNpY2FsbHkgbm8gbW9yZSBzcGFjZS4g
+VGhpcyB3aWxsDQo+ICsJCSAqIGxlYWQgdG8gZGF0YS1sb3NzIGZvciBkaXNrLXJlbGF0ZWQgdXNl
+cnMuDQo+ICsJCSAqLw0KPiArCQlpZiAoIWh3X3Nsb3RzIHx8IHN3X3Nsb3RzIDw9IDApIHsNCg0K
+c3dfc2xvdHMgY2Fubm90IGJlIG5lZ2F0aXZlLg0KW0FQXSBJIGFncmVlLiBUaGUgb3JpZ2luYWwg
+Y29kZSB3YXMgDQoNCjMzOCAgICAgICAgIGlmICghcmRfcmVnMzIoJmpycC0+cnJlZ3MtPmlucHJp
+bmdfYXZhaWwpIHx8DQozMzkgICAgICAgICAgICAgQ0lSQ19TUEFDRShoZWFkLCB0YWlsLCBKT0JS
+X0RFUFRIKSA8PSAwKSB7DQoNCglJJ3ZlIGV4dHJhY3RlZCB0aGlzIGluIHR3byBzZXBhcmF0ZSB2
+YXJpYWJsZXMgYW5kIG1haW50YWluZWQgdGhlIGNvZGUgdGhlIHNhbWUuIEknbGwgY2hhbmdlIHRo
+aXMgZm9yIHYyLg0KDQo+ICsJCQlzcGluX3VubG9ja19iaCgmanJwLT5pbnBsb2NrKTsNCj4gKwkJ
+CXJldHVybiAtRUlPOw0KDQpPcjoNCnJldCA9IC1FSU87DQpnb3RvIG91dF91bmxvY2s7DQpbQVBd
+IENvcnJlY3RlZCBpbiB2Mi4NCg0KPiArCQl9DQo+ICsNCj4gKwkJaWYgKGNhbl9iZV9iYWNrbG9n
+Z2VkKSB7DQo+ICsJCQloZWFkX2VudHJ5LT5pc19iYWNrbG9nZ2VkID0gdHJ1ZTsNCj4gKwkJCXJl
+dCA9IC1FQlVTWTsNCj4gKwkJfSBlbHNlIHsNCj4gKwkJCXNwaW5fdW5sb2NrX2JoKCZqcnAtPmlu
+cGxvY2spOw0KPiArCQkJcmV0dXJuIC1FQlVTWTsNCj4gKwkJfQ0KDQpPcjoNCnJldCA9IC1FQlVT
+WTsNCmlmICghY2FuX2JlX2JhY2tsb2dnZWQpDQoJZ290byBvdXRfdW5sb2NrOw0KaGVhZF9lbnRy
+eS0+aXNfYmFja2xvZ2dlZCA9IHRydWU7DQoNCltBUF0gQ29ycmVjdGVkIGluIHYyLg0KPiArCX0N
+Cj4gKw0KPiArCWhlYWRfZW50cnktPmRlc2NfYWRkcl92aXJ0ID0gZGVzYzsNCj4gKwloZWFkX2Vu
+dHJ5LT5kZXNjX3NpemUgPSBkZXNjX3NpemU7DQo+ICsJaGVhZF9lbnRyeS0+Y2FsbGJrID0gKHZv
+aWQgKiljYms7DQo+ICsJaGVhZF9lbnRyeS0+Y2JrYXJnID0gYXJlcTsNCj4gKwloZWFkX2VudHJ5
+LT5kZXNjX2FkZHJfZG1hID0gZGVzY19kbWE7DQo+ICsNCj4gKwlqcnAtPmlucHJpbmdbanJwLT5p
+bnBfcmluZ193cml0ZV9pbmRleF0gPSBkZXNjX2RtYTsNCj4gKw0KPiArCS8qDQo+ICsJICogR3Vh
+cmFudGVlIHRoYXQgdGhlIGRlc2NyaXB0b3IncyBETUEgYWRkcmVzcyBoYXMgYmVlbiB3cml0dGVu
+IHRvDQo+ICsJICogdGhlIG5leHQgc2xvdCBpbiB0aGUgcmluZyBiZWZvcmUgdGhlIHdyaXRlIGlu
+ZGV4IGlzIHVwZGF0ZWQsIHNpbmNlDQo+ICsJICogb3RoZXIgY29yZXMgbWF5IHVwZGF0ZSB0aGlz
+IGluZGV4IGluZGVwZW5kZW50bHkuDQo+ICsJICovDQo+ICsJc21wX3dtYigpOw0KPiArDQo+ICsJ
+anJwLT5pbnBfcmluZ193cml0ZV9pbmRleCA9IChqcnAtPmlucF9yaW5nX3dyaXRlX2luZGV4ICsg
+MSkgJg0KPiArCQkJCSAgICAoSk9CUl9ERVBUSCAtIDEpOw0KPiArCWpycC0+aGVhZCA9IChoZWFk
+ICsgMSkgJiAoSk9CUl9ERVBUSCAtIDEpOw0KPiArDQo+ICsJd3JfcmVnMzIoJmpycC0+cnJlZ3Mt
+PmlucHJpbmdfam9iYWRkLCAxKTsNCj4gKw0KDQpvdXRfdW5sb2NrOg0KDQo+ICsJc3Bpbl91bmxv
+Y2tfYmgoJmpycC0+aW5wbG9jayk7DQo+ICsNCj4gKwlyZXR1cm4gcmV0Ow0KPiArfQ0KPiArDQo+
+ICAvKioNCj4gICAqIGNhYW1fanJfZW5xdWV1ZSgpIC0gRW5xdWV1ZSBhIGpvYiBkZXNjcmlwdG9y
+IGhlYWQuIFJldHVybnMgMCBpZiBPSywNCj4gICAqIC1FQlVTWSBpZiB0aGUgcXVldWUgaXMgZnVs
+bCwgLUVJTyBpZiBpdCBjYW5ub3QgbWFwIHRoZSBjYWxsZXIncyBAQCANCj4gLTMyNiw4ICs0MjAs
+NyBAQCBpbnQgY2FhbV9qcl9lbnF1ZXVlKHN0cnVjdCBkZXZpY2UgKmRldiwgdTMyICpkZXNjLA0K
+PiAgCQkgICAgdm9pZCAqYXJlcSkNCj4gIHsNCj4gIAlzdHJ1Y3QgY2FhbV9kcnZfcHJpdmF0ZV9q
+ciAqanJwID0gZGV2X2dldF9kcnZkYXRhKGRldik7DQo+IC0Jc3RydWN0IGNhYW1fanJlbnRyeV9p
+bmZvICpoZWFkX2VudHJ5Ow0KPiAtCWludCBoZWFkLCB0YWlsLCBkZXNjX3NpemU7DQo+ICsJaW50
+IGRlc2Nfc2l6ZSwgcmV0Ow0KPiAgCWRtYV9hZGRyX3QgZGVzY19kbWE7DQo+ICANCj4gIAlkZXNj
+X3NpemUgPSAoKmRlc2MgJiBIRFJfSkRfTEVOR1RIX01BU0spICogc2l6ZW9mKHUzMik7IEBAIC0z
+MzcsNTEgDQo+ICs0MzAsNzAgQEAgaW50IGNhYW1fanJfZW5xdWV1ZShzdHJ1Y3QgZGV2aWNlICpk
+ZXYsIHUzMiAqZGVzYywNCj4gIAkJcmV0dXJuIC1FSU87DQo+ICAJfQ0KPiAgDQo+IC0Jc3Bpbl9s
+b2NrX2JoKCZqcnAtPmlucGxvY2spOw0KPiAtDQo+IC0JaGVhZCA9IGpycC0+aGVhZDsNCj4gLQl0
+YWlsID0gQUNDRVNTX09OQ0UoanJwLT50YWlsKTsNCj4gLQ0KPiAtCWlmICghcmRfcmVnMzIoJmpy
+cC0+cnJlZ3MtPmlucHJpbmdfYXZhaWwpIHx8DQo+IC0JICAgIENJUkNfU1BBQ0UoaGVhZCwgdGFp
+bCwgSk9CUl9ERVBUSCkgPD0gMCkgew0KPiAtCQlzcGluX3VubG9ja19iaCgmanJwLT5pbnBsb2Nr
+KTsNCj4gKwlyZXQgPSBfX2NhYW1fanJfZW5xdWV1ZShqcnAsIGRlc2MsIGRlc2Nfc2l6ZSwgZGVz
+Y19kbWEsIGNiaywgYXJlcSwNCj4gKwkJCQlmYWxzZSk7DQo+ICsJaWYgKHVubGlrZWx5KHJldCkp
+DQo+ICAJCWRtYV91bm1hcF9zaW5nbGUoZGV2LCBkZXNjX2RtYSwgZGVzY19zaXplLCBETUFfVE9f
+REVWSUNFKTsNCj4gLQkJcmV0dXJuIC1FQlVTWTsNCj4gLQl9DQo+ICANCj4gLQloZWFkX2VudHJ5
+ID0gJmpycC0+ZW50aW5mb1toZWFkXTsNCj4gLQloZWFkX2VudHJ5LT5kZXNjX2FkZHJfdmlydCA9
+IGRlc2M7DQo+IC0JaGVhZF9lbnRyeS0+ZGVzY19zaXplID0gZGVzY19zaXplOw0KPiAtCWhlYWRf
+ZW50cnktPmNhbGxiayA9ICh2b2lkICopY2JrOw0KPiAtCWhlYWRfZW50cnktPmNia2FyZyA9IGFy
+ZXE7DQo+IC0JaGVhZF9lbnRyeS0+ZGVzY19hZGRyX2RtYSA9IGRlc2NfZG1hOw0KPiAtDQo+IC0J
+anJwLT5pbnByaW5nW2pycC0+aW5wX3Jpbmdfd3JpdGVfaW5kZXhdID0gZGVzY19kbWE7DQo+IC0N
+Cj4gLQkvKg0KPiAtCSAqIEd1YXJhbnRlZSB0aGF0IHRoZSBkZXNjcmlwdG9yJ3MgRE1BIGFkZHJl
+c3MgaGFzIGJlZW4gd3JpdHRlbiB0bw0KPiAtCSAqIHRoZSBuZXh0IHNsb3QgaW4gdGhlIHJpbmcg
+YmVmb3JlIHRoZSB3cml0ZSBpbmRleCBpcyB1cGRhdGVkLCBzaW5jZQ0KPiAtCSAqIG90aGVyIGNv
+cmVzIG1heSB1cGRhdGUgdGhpcyBpbmRleCBpbmRlcGVuZGVudGx5Lg0KPiAtCSAqLw0KPiAtCXNt
+cF93bWIoKTsNCj4gKwlyZXR1cm4gcmV0Ow0KPiArfQ0KPiArRVhQT1JUX1NZTUJPTChjYWFtX2py
+X2VucXVldWUpOw0KPiAgDQo+IC0JanJwLT5pbnBfcmluZ193cml0ZV9pbmRleCA9IChqcnAtPmlu
+cF9yaW5nX3dyaXRlX2luZGV4ICsgMSkgJg0KPiAtCQkJCSAgICAoSk9CUl9ERVBUSCAtIDEpOw0K
+PiAtCWpycC0+aGVhZCA9IChoZWFkICsgMSkgJiAoSk9CUl9ERVBUSCAtIDEpOw0KPiArLyoqDQo+
+ICsgKiBjYWFtX2pyX2VucXVldWVfYmtsb2coKSAtIEVucXVldWUgYSBqb2IgZGVzY3JpcHRvciBo
+ZWFkLCByZXR1cm5zIDAgDQo+ICtpZiBPSywgb3INCj4gKyAqIC1FSU5QUk9HUkVTUyBpZiB0aGUg
+bnVtYmVyIG9mIGF2YWlsYWJsZSBlbnRyaWVzIGluIHRoZSBKb2IgUmluZyBpcyANCj4gK2xlc3MN
+Cg0KVGhlIGZ1bmN0aW9uIGFjdHVhbGx5IHJldHVybnMgLUVCVVNZLCBub3QgLUVJTlBST0dSRVNT
+Lg0KDQpbQVBdIENvcnJlY3RlZCBpbiB2Mi4NCj4gKyAqIHRoYW4gdGhlIHRocmVzaG9sZCBjb25m
+aWd1cmVkIHRocm91Z2ggDQo+ICsgQ09ORklHX0NSWVBUT19ERVZfRlNMX0NBQU1fQktMT0dfU0la
+RSwNCg0KTGVmdG92ZXIsIHRocmVzaG9sZCBpcyBub3QgY29uZmlndXJhYmxlLg0KDQpbQVBdIFJl
+bmFtZWQgaW4gdjIuDQo+ICsgKiBhbmQgLUVJTyBpZiBpdCBjYW5ub3QgbWFwIHRoZSBjYWxsZXIn
+cyBkZXNjcmlwdG9yIG9yIGlmIHRoZSANCj4gKyB0aHJlc2hvbGQgaGFzDQo+ICsgKiBiZWVuIGV4
+Y2VlZGVkLg0KPiArICogQGRldjogIGRldmljZSBvZiB0aGUgam9iIHJpbmcgdG8gYmUgdXNlZC4g
+VGhpcyBkZXZpY2Ugc2hvdWxkIGhhdmUNCj4gKyAqICAgICAgICBiZWVuIGFzc2lnbmVkIHByaW9y
+IGJ5IGNhYW1fanJfcmVnaXN0ZXIoKS4NCj4gKyAqIEBkZXNjOiBwb2ludHMgdG8gYSBqb2IgZGVz
+Y3JpcHRvciB0aGF0IGV4ZWN1dGUgb3VyIHJlcXVlc3QuIEFsbA0KPiArICogICAgICAgIGRlc2Ny
+aXB0b3JzIChhbmQgYWxsIHJlZmVyZW5jZWQgZGF0YSkgbXVzdCBiZSBpbiBhIERNQWFibGUNCj4g
+KyAqICAgICAgICByZWdpb24sIGFuZCBhbGwgZGF0YSByZWZlcmVuY2VzIG11c3QgYmUgcGh5c2lj
+YWwgYWRkcmVzc2VzDQo+ICsgKiAgICAgICAgYWNjZXNzaWJsZSB0byBDQUFNIChpLmUuIHdpdGhp
+biBhIFBBTVUgd2luZG93IGdyYW50ZWQNCj4gKyAqICAgICAgICB0byBpdCkuDQo+ICsgKiBAY2Jr
+OiAgcG9pbnRlciB0byBhIGNhbGxiYWNrIGZ1bmN0aW9uIHRvIGJlIGludm9rZWQgdXBvbiBjb21w
+bGV0aW9uDQo+ICsgKiAgICAgICAgb2YgdGhpcyByZXF1ZXN0LiBUaGlzIGhhcyB0aGUgZm9ybToN
+Cj4gKyAqICAgICAgICBjYWxsYmFjayhzdHJ1Y3QgZGV2aWNlICpkZXYsIHUzMiAqZGVzYywgdTMy
+IHN0YXQsIHZvaWQgKmFyZykNCj4gKyAqICAgICAgICB3aGVyZToNCj4gKyAqICAgICAgICBAZGV2
+OiAgICBjb250YWlucyB0aGUgam9iIHJpbmcgZGV2aWNlIHRoYXQgcHJvY2Vzc2VkIHRoaXMNCj4g
+KyAqICAgICAgICAgICAgICAgICByZXNwb25zZS4NCj4gKyAqICAgICAgICBAZGVzYzogICBkZXNj
+cmlwdG9yIHRoYXQgaW5pdGlhdGVkIHRoZSByZXF1ZXN0LCBzYW1lIGFzDQo+ICsgKiAgICAgICAg
+ICAgICAgICAgImRlc2MiIGJlaW5nIGFyZ3VlZCB0byBjYWFtX2pyX2VucXVldWUoKS4NCj4gKyAq
+ICAgICAgICBAc3RhdHVzOiB1bnRyYW5zbGF0ZWQgc3RhdHVzIHJlY2VpdmVkIGZyb20gQ0FBTS4g
+U2VlIHRoZQ0KPiArICogICAgICAgICAgICAgICAgIHJlZmVyZW5jZSBtYW51YWwgZm9yIGEgZGV0
+YWlsZWQgZGVzY3JpcHRpb24gb2YNCj4gKyAqICAgICAgICAgICAgICAgICBlcnJvciBtZWFuaW5n
+LCBvciBzZWUgdGhlIEpSU1RBIGRlZmluaXRpb25zIGluIHRoZQ0KPiArICogICAgICAgICAgICAg
+ICAgIHJlZ2lzdGVyIGhlYWRlciBmaWxlDQo+ICsgKiAgICAgICAgQGFyZXE6ICAgb3B0aW9uYWwg
+cG9pbnRlciB0byBhbiBhcmd1bWVudCBwYXNzZWQgd2l0aCB0aGUNCj4gKyAqICAgICAgICAgICAg
+ICAgICBvcmlnaW5hbCByZXF1ZXN0DQoNClRob3VnaCBJIGhhdmVuJ3QgY2hlY2tlZCwgSSBhbSBw
+cmV0dHkgc3VyZSB0aGF0IGtlcm5lbC1kb2MgaXMgbm90IHNtYXJ0IGVub3VnaCB0byBoYW5kbGUg
+dGhlIGRlc2NyaXB0aW9uIG9mIGZ1bmN0aW9uL2NhbGxiYWNrIHBhcmFtZXRlcnMuDQoNCltBUF0g
+VGhhdCdzIHRoZSB3YXkgdGhlIGZ1bmN0aW9uIHdhcyBjb21tZW50ZWQgaW4gdGhlIG9yaWdpbmFs
+IGNvZGUuIEkgd291bGRuJ3QgYWRkIHVucmVsYXRlZCBjaGFuZ2VzIHRvIHRoaXMgcGF0Y2gsIHdl
+IGNhbiBjbGVhbiB0aGUgZmlsZSB1cCBsYXRlci4NCg0KPiArICogQGFyZXE6IG9wdGlvbmFsIHBv
+aW50ZXIgdG8gYSB1c2VyIGFyZ3VtZW50IGZvciB1c2UgYXQgY2FsbGJhY2sNCj4gKyAqICAgICAg
+ICB0aW1lLg0KPiArICoqLw0KPiAraW50IGNhYW1fanJfZW5xdWV1ZV9ia2xvZyhzdHJ1Y3QgZGV2
+aWNlICpkZXYsIHUzMiAqZGVzYywNCj4gKwkJCSAgdm9pZCAoKmNiaykoc3RydWN0IGRldmljZSAq
+ZGV2LCB1MzIgKmRlc2MsDQo+ICsJCQkJICAgICAgdTMyIHN0YXR1cywgdm9pZCAqYXJlcSksDQo+
+ICsJCQkgIHZvaWQgKmFyZXEpDQo+ICt7DQo+ICsJc3RydWN0IGNhYW1fZHJ2X3ByaXZhdGVfanIg
+KmpycCA9IGRldl9nZXRfZHJ2ZGF0YShkZXYpOw0KPiArCWludCBkZXNjX3NpemUsIHJldDsNCj4g
+KwlkbWFfYWRkcl90IGRlc2NfZG1hOw0KPiAgDQo+IC0JLyoNCj4gLQkgKiBFbnN1cmUgdGhhdCBh
+bGwgam9iIGluZm9ybWF0aW9uIGhhcyBiZWVuIHdyaXR0ZW4gYmVmb3JlDQo+IC0JICogbm90aWZ5
+aW5nIENBQU0gdGhhdCBhIG5ldyBqb2Igd2FzIGFkZGVkIHRvIHRoZSBpbnB1dCByaW5nLg0KPiAt
+CSAqLw0KPiAtCXdtYigpOw0KPiArCWRlc2Nfc2l6ZSA9ICgqZGVzYyAmIEhEUl9KRF9MRU5HVEhf
+TUFTSykgKiBzaXplb2YodTMyKTsNCj4gKwlkZXNjX2RtYSA9IGRtYV9tYXBfc2luZ2xlKGRldiwg
+ZGVzYywgZGVzY19zaXplLCBETUFfVE9fREVWSUNFKTsNCj4gKwlpZiAoZG1hX21hcHBpbmdfZXJy
+b3IoZGV2LCBkZXNjX2RtYSkpIHsNCj4gKwkJZGV2X2VycihkZXYsICJjYWFtX2pyX2VucXVldWUo
+KTogY2FuJ3QgbWFwIGpvYmRlc2NcbiIpOw0KPiArCQlyZXR1cm4gLUVJTzsNCj4gKwl9DQo+ICAN
+Cj4gLQl3cl9yZWczMigmanJwLT5ycmVncy0+aW5wcmluZ19qb2JhZGQsIDEpOw0KPiArCXJldCA9
+IF9fY2FhbV9qcl9lbnF1ZXVlKGpycCwgZGVzYywgZGVzY19zaXplLCBkZXNjX2RtYSwgY2JrLCBh
+cmVxLA0KPiArCQkJCXRydWUpOw0KPiArCWlmICh1bmxpa2VseShyZXQgJiYgKHJldCAhPSAtRUJV
+U1kpKSkNCj4gKwkJZG1hX3VubWFwX3NpbmdsZShkZXYsIGRlc2NfZG1hLCBkZXNjX3NpemUsIERN
+QV9UT19ERVZJQ0UpOw0KPiAgDQo+IC0Jc3Bpbl91bmxvY2tfYmgoJmpycC0+aW5wbG9jayk7DQo+
+ICsJcmV0dXJuIHJldDsNCj4gIA0KPiAtCXJldHVybiAwOw0KPiAgfQ0KPiAtRVhQT1JUX1NZTUJP
+TChjYWFtX2pyX2VucXVldWUpOw0KPiArRVhQT1JUX1NZTUJPTChjYWFtX2pyX2VucXVldWVfYmts
+b2cpOw0KPiAgDQo+ICAvKg0KPiAgICogSW5pdCBKb2JSIGluZGVwZW5kZW50IG9mIHBsYXRmb3Jt
+IHByb3BlcnR5IGRldGVjdGlvbiBkaWZmIC0tZ2l0IA0KPiBhL2RyaXZlcnMvY3J5cHRvL2NhYW0v
+anIuaCBiL2RyaXZlcnMvY3J5cHRvL2NhYW0vanIuaCBpbmRleCANCj4gOTcxMTNhNi4uMjE1NThk
+ZiAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9jcnlwdG8vY2FhbS9qci5oDQo+ICsrKyBiL2RyaXZl
+cnMvY3J5cHRvL2NhYW0vanIuaA0KPiBAQCAtMTUsNCArMTUsOSBAQCBpbnQgY2FhbV9qcl9lbnF1
+ZXVlKHN0cnVjdCBkZXZpY2UgKmRldiwgdTMyICpkZXNjLA0KPiAgCQkJCXZvaWQgKmFyZXEpLA0K
+PiAgCQkgICAgdm9pZCAqYXJlcSk7DQo+ICANCj4gK2ludCBjYWFtX2pyX2VucXVldWVfYmtsb2co
+c3RydWN0IGRldmljZSAqZGV2LCB1MzIgKmRlc2MsDQo+ICsJCQkgIHZvaWQgKCpjYmspKHN0cnVj
+dCBkZXZpY2UgKmRldiwgdTMyICpkZXNjLCB1MzIgc3RhdHVzLA0KPiArCQkJCSAgICAgIHZvaWQg
+KmFyZXEpLA0KPiArCQkJICB2b2lkICphcmVxKTsNCj4gKw0KPiAgI2VuZGlmIC8qIEpSX0ggKi8N
+Cj4gDQoNCg0K
