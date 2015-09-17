@@ -1,54 +1,57 @@
-From: Lee Jones <lee.jones@linaro.org>
-Subject: [PATCH v2 3/7] hwrng: core: Simplify RNG switching from sysfs
-Date: Thu, 17 Sep 2015 14:45:53 +0100
-Message-ID: <1442497557-9271-4-git-send-email-lee.jones@linaro.org>
+From: Peter Korsgaard <peter@korsgaard.com>
+Subject: Re: [PATCH v2 3/7] hwrng: core: Simplify RNG switching from sysfs
+Date: Thu, 17 Sep 2015 16:08:38 +0200
+Message-ID: <87fv2dt9y1.fsf@dell.be.48ers.dk>
 References: <1442497557-9271-1-git-send-email-lee.jones@linaro.org>
+	<1442497557-9271-4-git-send-email-lee.jones@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Lee Jones <lee.jones@linaro.org>, kernel@stlinux.com
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
- linux-crypto@vger.kernel.org, peter@korsgaard.com, festevam@gmail.com,
- kieranbingham@gmail.com
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1442497557-9271-1-git-send-email-lee.jones@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org, festevam@gmail.com,
+	kieranbingham@gmail.com, kernel@stlinux.com
+To: Lee Jones <lee.jones@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:34020 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751104AbbIQOIm (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 17 Sep 2015 10:08:42 -0400
+In-Reply-To: <1442497557-9271-4-git-send-email-lee.jones@linaro.org> (Lee
+	Jones's message of "Thu, 17 Sep 2015 14:45:53 +0100")
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-If we attempt to use sysfs to change the current RNG in the usual
-way i.e. issuing something like:
+>>>>> "Lee" == Lee Jones <lee.jones@linaro.org> writes:
 
-`echo 8a8a000.rng > /sys/devices/virtual/misc/hw_random/rng_current`
+ > If we attempt to use sysfs to change the current RNG in the usual
+ > way i.e. issuing something like:
 
-... it will fail because the code doesn't currently take the '\n'
-into consideration.  Well, now it does.
+ > `echo 8a8a000.rng > /sys/devices/virtual/misc/hw_random/rng_current`
 
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
----
- drivers/char/hw_random/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ > ... it will fail because the code doesn't currently take the '\n'
+ > into consideration.  Well, now it does.
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index da8faf7..2d4a969 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -323,7 +323,7 @@ static ssize_t hwrng_attr_current_store(struct device *dev,
- 		return -ERESTARTSYS;
- 	err = -ENODEV;
- 	list_for_each_entry(rng, &rng_list, list) {
--		if (strcmp(rng->name, buf) == 0) {
-+		if (sysfs_streq(rng->name, buf)) {
- 			err = 0;
- 			if (rng != current_rng)
- 				err = set_current_rng(rng);
+ > Signed-off-by: Lee Jones <lee.jones@linaro.org>
+ > ---
+ >  drivers/char/hw_random/core.c | 2 +-
+ >  1 file changed, 1 insertion(+), 1 deletion(-)
+
+ > diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+ > index da8faf7..2d4a969 100644
+ > --- a/drivers/char/hw_random/core.c
+ > +++ b/drivers/char/hw_random/core.c
+ > @@ -323,7 +323,7 @@ static ssize_t hwrng_attr_current_store(struct device *dev,
+ >  		return -ERESTARTSYS;
+ >  	err = -ENODEV;
+ >  	list_for_each_entry(rng, &rng_list, list) {
+ > -		if (strcmp(rng->name, buf) == 0) {
+ > +		if (sysfs_streq(rng->name, buf)) {
+
+Looks good.
+
+Acked-by: Peter Korsgaard <peter@korsgaard.com>
+
 -- 
-1.9.1
+Venlig hilsen,
+Peter Korsgaard 
