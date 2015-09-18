@@ -1,46 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/7] hwrng: Add support for STMicroelectronics' RNG IP
-Date: Fri, 18 Sep 2015 23:11:38 +0800
-Message-ID: <20150918151137.GA10763@gondor.apana.org.au>
-References: <1442497557-9271-1-git-send-email-lee.jones@linaro.org>
- <20150918140756.GK9249@gondor.apana.org.au>
- <CAF2Aj3h7Jy=tpYdZTdbxAJwa=147_hAu3reOFrbEh=JdrMFWLQ@mail.gmail.com>
+Subject: Re: [cryptodev:master 10/29]
+ arch/x86/crypto/sha256_ssse3_glue.c:172:19: error: 'X86_FEATURE_SHA_NI'
+ undeclared
+Date: Fri, 18 Sep 2015 23:17:57 +0800
+Message-ID: <20150918151757.GA10835@gondor.apana.org.au>
+References: <201509182205.JCClhKfv%fengguang.wu@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	Peter Korsgaard <peter@korsgaard.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Kieran Bingham <kieranbingham@gmail.com>,
-	"kernel@stlinux.com" <kernel@stlinux.com>
-To: Lee Jones <lee.jones@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: tim <tim.c.chen@linux.intel.com>, kbuild-all@01.org,
+	linux-crypto@vger.kernel.org
+To: kbuild test robot <fengguang.wu@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:53143 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754744AbbIRPSH (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 18 Sep 2015 11:18:07 -0400
 Content-Disposition: inline
-In-Reply-To: <CAF2Aj3h7Jy=tpYdZTdbxAJwa=147_hAu3reOFrbEh=JdrMFWLQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <201509182205.JCClhKfv%fengguang.wu@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 18, 2015 at 03:53:50PM +0100, Lee Jones wrote:
-> On 18 September 2015 at 15:07, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > On Thu, Sep 17, 2015 at 02:45:50PM +0100, Lee Jones wrote:
-> >> v1 => v2:
-> >>  - New patch: Also fixing /dev/hw_random => /dev/hwrng in Kconfig
-> >>  - Fix 2099 => 2009 typo in commit log
-> >>  - Fix 'number of random numbers sourced' return value
-> >>  - Treat devm_clk_get()'s return value correctly
-> >>  - Check return value of clk_prepare_enable()
-> >>  - Use sysfs_streq() instead of manually stripping '\n' from sysfs
-> >
-> > All applied.  Thanks.
-> 
-> Just to be clear.  Which patches have you applied?
+On Fri, Sep 18, 2015 at 10:36:07PM +0800, kbuild test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> head:   dcde21287f931b6cee61825306db6a5665566f66
+> commit: a3476db1b524f2e2d869b001c56ba9ce353d860e [10/29] crypto: x86/sha - Add build support for Intel SHA Extensions optimized SHA1 and SHA256
+> config: x86_64-randconfig-x015-09141022 (attached as .config)
+> reproduce:
+>   git checkout a3476db1b524f2e2d869b001c56ba9ce353d860e
+>   # save the attached .config to linux build tree
+>   make ARCH=x86_64 
 
-All of your patches.
+Tim, I've rolled back all your patches as they depend on a patch
+that has not yet been merged.
 
-Cheers,
+Please resubmit them when the prerequisite is ready.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
