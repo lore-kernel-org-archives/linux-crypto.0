@@ -1,77 +1,104 @@
-From: Porosanu Alexandru <alexandru.porosanu@freescale.com>
-Subject: RE: [PATCH v2] crypto/caam: add backlogging support
-Date: Fri, 18 Sep 2015 14:27:12 +0000
-Message-ID: <BY1PR03MB1404D7BD44164F6E91FFBAD680590@BY1PR03MB1404.namprd03.prod.outlook.com>
-References: <1442434361-15123-1-git-send-email-alexandru.porosanu@freescale.com>
- <20150918132443.GG7638@gondor.apana.org.au>
- <BY1PR03MB1404D04ADBCBBFA586860EB280590@BY1PR03MB1404.namprd03.prod.outlook.com>
- <20150918135017.GA9152@gondor.apana.org.au>
- <BY1PR03MB14043FC6F0E0575E5A3841B880590@BY1PR03MB1404.namprd03.prod.outlook.com>
- <20150918141040.GL9249@gondor.apana.org.au>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v2 5/8] lib: introduce sg_nents_len_chained
+Date: Fri, 18 Sep 2015 09:01:29 -0500
+Message-ID: <55FC1939.7080407@amd.com>
+References: <1442581036-23789-1-git-send-email-clabbe.montjoie@gmail.com> <1442581036-23789-6-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"Geanta Neag Horia" <Horia.Geanta@freescale.com>,
-	Pop Mircea <mircea.pop@freescale.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0138.outbound.protection.outlook.com ([207.46.100.138]:37568
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751984AbbIRO1P convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Sep 2015 10:27:15 -0400
-In-Reply-To: <20150918141040.GL9249@gondor.apana.org.au>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+To: LABBE Corentin <clabbe.montjoie@gmail.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<akpm@linux-foundation.org>, <arnd@arndb.de>, <axboe@fb.com>,
+	<david.s.gordon@intel.com>, <martin.petersen@oracle.com>,
+	<robert.jarzmik@free.fr>, <tonyb@cybernetics.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1442581036-23789-6-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+On 09/18/2015 07:57 AM, LABBE Corentin wrote:
+> Some driver use a modified version of sg_nents_for_len with an
+> additional parameter bool *chained for knowing if the scatterlist is
+> chained or not.
+>
+> So, for removing duplicate code, add sg_nents_len_chained in
+> lib/scatterlist.c
+>
+> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+> ---
+>   include/linux/scatterlist.h |  1 +
+>   lib/scatterlist.c           | 40 ++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 41 insertions(+)
+>
+> diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+> index 556ec1e..594cdb0 100644
+> --- a/include/linux/scatterlist.h
+> +++ b/include/linux/scatterlist.h
+> @@ -243,6 +243,7 @@ static inline void *sg_virt(struct scatterlist *sg)
+>
+>   int sg_nents(struct scatterlist *sg);
+>   int sg_nents_for_len(struct scatterlist *sg, u64 len);
+> +int sg_nents_len_chained(struct scatterlist *sg, u64 len, bool *chained);
+>   struct scatterlist *sg_next(struct scatterlist *);
+>   struct scatterlist *sg_last(struct scatterlist *s, unsigned int);
+>   void sg_init_table(struct scatterlist *, unsigned int);
+> diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+> index bafa993..070e396 100644
+> --- a/lib/scatterlist.c
+> +++ b/lib/scatterlist.c
+> @@ -90,6 +90,46 @@ int sg_nents_for_len(struct scatterlist *sg, u64 len)
+>   EXPORT_SYMBOL(sg_nents_for_len);
+>
+>   /**
+> + * sg_nents_len_chained - return total count of entries in scatterlist
+> + *                        needed to satisfy the supplied length
+> + * @sg:		The scatterlist
+> + * @len:	The total required length
+> + * @chained	A pointer where to store if SG is chained or not
+> + *
+> + * Description:
+> + * Determines the number of entries in sg that are required to meet
+> + * the supplied length, taking into account chaining as well
+> + * If the scatterlist is chained, set *chained to true.
+> + *
+> + * Returns:
+> + *   the number of sg entries needed, negative error on failure
+> + *
+> + **/
+> +int sg_nents_len_chained(struct scatterlist *sg, u64 len, bool *chained)
+> +{
+> +	int nents;
+> +	u64 total;
+> +
+> +	if (chained)
+> +		*chained = false;
+> +
+> +	if (!len)
+> +		return 0;
+> +
+> +	for (nents = 0, total = 0; sg; sg = sg_next(sg)) {
+> +		nents++;
+> +		total += sg->length;
+> +		if (!sg_is_last(sg) && (sg + 1)->length == 0 && chained)
 
-> -----Original Message-----
-> From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-
-> owner@vger.kernel.org] On Behalf Of Herbert Xu
-> Sent: Friday, September 18, 2015 5:11 PM
-> To: Porosanu Alexandru-B06830 <alexandru.porosanu@freescale.com>
-> Cc: linux-crypto@vger.kernel.org; Geanta Neag Horia Ioan-B05471
-> <Horia.Geanta@freescale.com>; Pop Mircea-R19439
-> <mircea.pop@freescale.com>
-> Subject: Re: [PATCH v2] crypto/caam: add backlogging support
-> 
-> On Fri, Sep 18, 2015 at 02:07:38PM +0000, Porosanu Alexandru wrote:
-> >
-> > MAY_BACKLOG requests will fail once you run out of memory (f.i.
-> > backlogging using crypto_queue) Now, for this patch requests will be
-> dropped if there are no more "backlogging" slots available.
-> > Would limiting the # of tfms w/MAY_BACKLOG associated with the driver
-> to the # of backlogging slots be OK?
-> 
-> Sure running out of memory is obviously a good reason to fail a request.  But
-> if you still have memory MAY_BACKLOG must not fail.
-
-Well, the HW has less than the whole RAM for backlogging requests, it has the # of available backlogging requests slots.
-Then it will start dropping, just like in the out-of-mem case.
-
-> 
-> Each tfm must be able to submit at least one MAY_BACKLOG request, that's
-> the whole point of this flag.  It's used for disk encryption where failing is not
-> an option.
-
-But dm-crypt is behaving properly: once -EBUSY is returned, it will sleep. And CAAM will wake it up once it has processed
-the backlog request. dm-crypt was the driving factor for fixing this long-standing issue....
-
-> 
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
-> http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in the
-> body of a message to majordomo@vger.kernel.org More majordomo info at
-> http://vger.kernel.org/majordomo-info.html
+Wouldn't it be better to use the sg_is_chain macro to determine if the
+the entry is chained instead of checking the length?
 
 Thanks,
+Tom
 
-Alex P.
+> +			*chained = true;
+> +		if (total >= len)
+> +			return nents;
+> +	}
+> +
+> +	return -EINVAL;
+> +}
+> +EXPORT_SYMBOL(sg_nents_len_chained);
+> +
+> +/**
+>    * sg_last - return the last scatterlist entry in a list
+>    * @sgl:	First entry in the scatterlist
+>    * @nents:	Number of entries in the scatterlist
+>
