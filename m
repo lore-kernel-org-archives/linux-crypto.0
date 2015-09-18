@@ -1,105 +1,56 @@
-From: Tony Battersby <tonyb@cybernetics.com>
-Subject: Re: [PATCH v2 5/8] lib: introduce sg_nents_len_chained
-Date: Fri, 18 Sep 2015 12:19:33 -0400
-Message-ID: <55FC3995.8050600@cybernetics.com>
-References: <1442581036-23789-1-git-send-email-clabbe.montjoie@gmail.com>
- <1442581036-23789-6-git-send-email-clabbe.montjoie@gmail.com>
+From: Stephen Boyd <sboyd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Subject: Re: [PATCH v2 4/7] hwrng: st: Provide DT bindings for ST's Random
+ Number Generator
+Date: Fri, 18 Sep 2015 09:21:37 -0700
+Message-ID: <55FC3A11.6080209@codeaurora.org>
+References: <1442497557-9271-1-git-send-email-lee.jones@linaro.org>
+ <1442497557-9271-5-git-send-email-lee.jones@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	lee.nipper@gmail.com, yuan.j.kang@gmail.com
-To: LABBE Corentin <clabbe.montjoie@gmail.com>,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	akpm@linux-foundation.org, arnd@arndb.de, axboe@fb.com,
-	david.s.gordon@intel.com, martin.petersen@oracle.com,
-	robert.jarzmik@free.fr, thomas.lendacky@amd.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1442581036-23789-6-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: kernel-F5mvAk5X5gdBDgjK7y7TUQ@public.gmane.org
+To: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, peter-+2lRwdCCLRT2eFz/2MeuCQ@public.gmane.org,
+	festevam-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, kieranbingham-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1442497557-9271-5-git-send-email-lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 09/18/2015 08:57 AM, LABBE Corentin wrote:
-> +	for (nents = 0, total = 0; sg; sg = sg_next(sg)) {
-> +		nents++;
-> +		total += sg->length;
-> +		if (!sg_is_last(sg) && (sg + 1)->length == 0 && chained)
-> +			*chained = true;
-> +		if (total >= len)
-> +			return nents;
-> +	}
-> +
+On 09/17/2015 06:45 AM, Lee Jones wrote:
+> Signed-off-by: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+> ---
+>  Documentation/devicetree/bindings/rng/st,rng.txt | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rng/st,rng.txt
 >
+> diff --git a/Documentation/devicetree/bindings/rng/st,rng.txt b/Documentation/devicetree/bindings/rng/st,rng.txt
+> new file mode 100644
+> index 0000000..dbc64e6
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/rng/st,rng.txt
+> @@ -0,0 +1,15 @@
+> +STMicroelectronics HW Random Number Generator
+> +----------------------------------------------
+> +
+> +Required parameters:
+> +compatible	: Should be "st,rng"
+> +reg		: Base address and size of IP's register map.
+> +clocks		: Phandle to device's clock (See: ../clocks/clock-bindings.txt)
+> +
+> +Example:
+> +
+> +rng@0xfee80000 {
 
-(resending with fixed formatting; Thunderbird seems braindamaged lately)
+Drop the 0x part please.
 
-It seems to me like the check for total >= len should be above the check
-for chaining.  The way the code is now, it will return chained = true if
-the first "unneeded" sg vector is a chain, which does not make intuitive
-sense.
+-- 
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
+a Linux Foundation Collaborative Project
 
-But why do drivers even need this at all?  Here is a typical usage:
-
-int qce_mapsg(struct device *dev, struct scatterlist *sg, int nents,
-          enum dma_data_direction dir, bool chained)
-{
-    int err;
-
-    if (chained) {
-        while (sg) {
-            err = dma_map_sg(dev, sg, 1, dir);
-            if (!err)
-                return -EFAULT;
-            sg = sg_next(sg);
-        }
-    } else {
-        err = dma_map_sg(dev, sg, nents, dir);
-        if (!err)
-            return -EFAULT;
-    }
-
-    return nents;
-}
-
-Here is another:
-
-static int talitos_map_sg(struct device *dev, struct scatterlist *sg,
-              unsigned int nents, enum dma_data_direction dir,
-              bool chained)
-{
-    if (unlikely(chained))
-        while (sg) {
-            dma_map_sg(dev, sg, 1, dir);
-            sg = sg_next(sg);
-        }
-    else
-        dma_map_sg(dev, sg, nents, dir);
-    return nents;
-}
-
-Can anyone clarify why you can't just use dma_map_sg(dev, sg, nents,
-dir) always?  It should be able to handle chained scatterlists just fine.
-
-If the check for chaining is a just workaround for some problem in
-dma_map_sg(), maybe it would be better to fix dma_map_sg() instead,
-which would eliminate the need for sg_nents_len_chained() and all these
-buggy workarounds (e.g. if chained is true, qce_mapsg() can leave the
-DMA list partially mapped when it returns -EFAULT, and talitos_map_sg()
-doesn't even check for errors).
-
-One problem that I see is that sg_last() in scatterlist.c has a
-"BUG_ON(!sg_is_last(ret));" if CONFIG_DEBUG_SG is enabled, and using a
-smaller-than-original nents (as returned by sg_nents_len_chained()) with
-the same scatterlist will trigger that bug.  But that should be true
-regardless of whether chaining is used or not.  For example, talitos.c
-calls sg_last() in a way that can trigger that bug.
-
-For anyone willing to dig further, these are the first two commits that
-introduce code like this:
-
-4de9d0b547b9 "crypto: talitos - Add ablkcipher algorithms" (2009)
-643b39b031f5 "crypto: caam - chaining support" (2012)
-(CC'ing the original authors)
-
-Tony Battersby
-Cybernetics
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
