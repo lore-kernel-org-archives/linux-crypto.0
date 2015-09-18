@@ -1,43 +1,174 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [cryptodev:master 10/29]
- arch/x86/crypto/sha256_ssse3_glue.c:172:19: error: 'X86_FEATURE_SHA_NI'
- undeclared
-Date: Fri, 18 Sep 2015 23:17:57 +0800
-Message-ID: <20150918151757.GA10835@gondor.apana.org.au>
-References: <201509182205.JCClhKfv%fengguang.wu@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: tim <tim.c.chen@linux.intel.com>, kbuild-all@01.org,
-	linux-crypto@vger.kernel.org
-To: kbuild test robot <fengguang.wu@intel.com>
+From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Subject: [PATCH] crypto: marvell: properly handle CRYPTO_TFM_REQ_MAY_BACKLOG-flagged requests
+Date: Fri, 18 Sep 2015 17:25:36 +0200
+Message-ID: <1442589936-18042-1-git-send-email-thomas.petazzoni@free-electrons.com>
+Cc: linux-crypto@vger.kernel.org,
+	Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Jason Cooper <jason@lakedaemon.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Gregory Clement <gregory.clement@free-electrons.com>,
+	Vincent Donnefort <vdonnefort@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	<stable@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:53143 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754744AbbIRPSH (ORCPT
+Received: from down.free-electrons.com ([37.187.137.238]:57710 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754428AbbIRPcT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Sep 2015 11:18:07 -0400
-Content-Disposition: inline
-In-Reply-To: <201509182205.JCClhKfv%fengguang.wu@intel.com>
+	Fri, 18 Sep 2015 11:32:19 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 18, 2015 at 10:36:07PM +0800, kbuild test robot wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> head:   dcde21287f931b6cee61825306db6a5665566f66
-> commit: a3476db1b524f2e2d869b001c56ba9ce353d860e [10/29] crypto: x86/sha - Add build support for Intel SHA Extensions optimized SHA1 and SHA256
-> config: x86_64-randconfig-x015-09141022 (attached as .config)
-> reproduce:
->   git checkout a3476db1b524f2e2d869b001c56ba9ce353d860e
->   # save the attached .config to linux build tree
->   make ARCH=x86_64 
+The mv_cesa_queue_req() function calls crypto_enqueue_request() to
+enqueue a request. In the normal case (i.e the queue isn't full), this
+function returns -EINPROGRESS. The current Marvell CESA crypto driver
+takes this into account and cleans up the request only if an error
+occured, i.e if the return value is not -EINPROGRESS.
 
-Tim, I've rolled back all your patches as they depend on a patch
-that has not yet been merged.
+Unfortunately this causes problems with
+CRYPTO_TFM_REQ_MAY_BACKLOG-flagged requests. When such a request is
+passed to crypto_enqueue_request() and the queue is full,
+crypto_enqueue_request() will return -EBUSY, but will keep the request
+enqueued nonetheless. This situation was not properly handled by the
+Marvell CESA driver, which was anyway cleaning up the request in such
+a situation. When later on the request was taken out of the backlog
+and actually processed, a kernel crash occured due to the internal
+driver data structures for this structure having been cleaned up.
 
-Please resubmit them when the prerequisite is ready.
+To avoid this situation, this commit adds a
+mv_cesa_req_needs_cleanup() helper function which indicates if the
+request needs to be cleaned up or not after a call to
+crypto_enqueue_request(). This helper allows to do the cleanup only in
+the appropriate cases, and all call sites of mv_cesa_queue_req() are
+fixed to use this new helper function.
 
-Thanks,
+Reported-by: Vincent Donnefort <vdonnefort@gmail.com>
+Fixes: db509a45339fd ("crypto: marvell/cesa - add TDMA support")
+Cc: <stable@vger.kernel.org> # v4.2+
+Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+---
+ drivers/crypto/marvell/cesa.h   | 27 +++++++++++++++++++++++++++
+ drivers/crypto/marvell/cipher.c |  7 +++----
+ drivers/crypto/marvell/hash.c   |  8 +++-----
+ 3 files changed, 33 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
+index b60698b..bc2a55b 100644
+--- a/drivers/crypto/marvell/cesa.h
++++ b/drivers/crypto/marvell/cesa.h
+@@ -687,6 +687,33 @@ static inline u32 mv_cesa_get_int_mask(struct mv_cesa_engine *engine)
+ 
+ int mv_cesa_queue_req(struct crypto_async_request *req);
+ 
++/*
++ * Helper function that indicates whether a crypto request needs to be
++ * cleaned up or not after being enqueued using mv_cesa_queue_req().
++ */
++static inline int mv_cesa_req_needs_cleanup(struct crypto_async_request *req,
++					    int ret)
++{
++	/*
++	 * The queue still had some space, the request was queued
++	 * normally, so there's no need to clean it up.
++	 */
++	if (ret == -EINPROGRESS)
++		return false;
++
++	/*
++	 * The queue had not space left, but since the request is
++	 * flagged with CRYPTO_TFM_REQ_MAY_BACKLOG, it was added to
++	 * the backlog and will be processed later. There's no need to
++	 * clean it up.
++	 */
++	if (ret == -EBUSY && req->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)
++		return false;
++
++	/* Request wasn't queued, we need to clean it up */
++	return true;
++}
++
+ /* TDMA functions */
+ 
+ static inline void mv_cesa_req_dma_iter_init(struct mv_cesa_dma_iter *iter,
+diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
+index 0745cf3..3df2f4e 100644
+--- a/drivers/crypto/marvell/cipher.c
++++ b/drivers/crypto/marvell/cipher.c
+@@ -189,7 +189,6 @@ static inline void mv_cesa_ablkcipher_prepare(struct crypto_async_request *req,
+ {
+ 	struct ablkcipher_request *ablkreq = ablkcipher_request_cast(req);
+ 	struct mv_cesa_ablkcipher_req *creq = ablkcipher_request_ctx(ablkreq);
+-
+ 	creq->req.base.engine = engine;
+ 
+ 	if (creq->req.base.type == CESA_DMA_REQ)
+@@ -431,7 +430,7 @@ static int mv_cesa_des_op(struct ablkcipher_request *req,
+ 		return ret;
+ 
+ 	ret = mv_cesa_queue_req(&req->base);
+-	if (ret && ret != -EINPROGRESS)
++	if (mv_cesa_req_needs_cleanup(&req->base, ret))
+ 		mv_cesa_ablkcipher_cleanup(req);
+ 
+ 	return ret;
+@@ -551,7 +550,7 @@ static int mv_cesa_des3_op(struct ablkcipher_request *req,
+ 		return ret;
+ 
+ 	ret = mv_cesa_queue_req(&req->base);
+-	if (ret && ret != -EINPROGRESS)
++	if (mv_cesa_req_needs_cleanup(&req->base, ret))
+ 		mv_cesa_ablkcipher_cleanup(req);
+ 
+ 	return ret;
+@@ -693,7 +692,7 @@ static int mv_cesa_aes_op(struct ablkcipher_request *req,
+ 		return ret;
+ 
+ 	ret = mv_cesa_queue_req(&req->base);
+-	if (ret && ret != -EINPROGRESS)
++	if (mv_cesa_req_needs_cleanup(&req->base, ret))
+ 		mv_cesa_ablkcipher_cleanup(req);
+ 
+ 	return ret;
+diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
+index ae9272e..e8d0d71 100644
+--- a/drivers/crypto/marvell/hash.c
++++ b/drivers/crypto/marvell/hash.c
+@@ -739,10 +739,8 @@ static int mv_cesa_ahash_update(struct ahash_request *req)
+ 		return 0;
+ 
+ 	ret = mv_cesa_queue_req(&req->base);
+-	if (ret && ret != -EINPROGRESS) {
++	if (mv_cesa_req_needs_cleanup(&req->base, ret))
+ 		mv_cesa_ahash_cleanup(req);
+-		return ret;
+-	}
+ 
+ 	return ret;
+ }
+@@ -766,7 +764,7 @@ static int mv_cesa_ahash_final(struct ahash_request *req)
+ 		return 0;
+ 
+ 	ret = mv_cesa_queue_req(&req->base);
+-	if (ret && ret != -EINPROGRESS)
++	if (mv_cesa_req_needs_cleanup(&req->base, ret))
+ 		mv_cesa_ahash_cleanup(req);
+ 
+ 	return ret;
+@@ -791,7 +789,7 @@ static int mv_cesa_ahash_finup(struct ahash_request *req)
+ 		return 0;
+ 
+ 	ret = mv_cesa_queue_req(&req->base);
+-	if (ret && ret != -EINPROGRESS)
++	if (mv_cesa_req_needs_cleanup(&req->base, ret))
+ 		mv_cesa_ahash_cleanup(req);
+ 
+ 	return ret;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.5.2
