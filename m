@@ -1,36 +1,45 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v2 0/7] hwrng: Add support for STMicroelectronics' RNG IP
-Date: Fri, 18 Sep 2015 22:07:56 +0800
-Message-ID: <20150918140756.GK9249@gondor.apana.org.au>
-References: <1442497557-9271-1-git-send-email-lee.jones@linaro.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto/caam: add backlogging support
+Date: Fri, 18 Sep 2015 22:10:40 +0800
+Message-ID: <20150918141040.GL9249@gondor.apana.org.au>
+References: <1442434361-15123-1-git-send-email-alexandru.porosanu@freescale.com>
+ <20150918132443.GG7638@gondor.apana.org.au>
+ <BY1PR03MB1404D04ADBCBBFA586860EB280590@BY1PR03MB1404.namprd03.prod.outlook.com>
+ <20150918135017.GA9152@gondor.apana.org.au>
+ <BY1PR03MB14043FC6F0E0575E5A3841B880590@BY1PR03MB1404.namprd03.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	peter-+2lRwdCCLRT2eFz/2MeuCQ@public.gmane.org, festevam-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, kieranbingham-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	kernel-F5mvAk5X5gdBDgjK7y7TUQ@public.gmane.org
-To: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Geanta Neag Horia <Horia.Geanta@freescale.com>,
+	Pop Mircea <mircea.pop@freescale.com>
+To: Porosanu Alexandru <alexandru.porosanu@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:43759 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752810AbbIROKn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 18 Sep 2015 10:10:43 -0400
 Content-Disposition: inline
-In-Reply-To: <1442497557-9271-1-git-send-email-lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <BY1PR03MB14043FC6F0E0575E5A3841B880590@BY1PR03MB1404.namprd03.prod.outlook.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 17, 2015 at 02:45:50PM +0100, Lee Jones wrote:
-> v1 => v2:
->  - New patch: Also fixing /dev/hw_random => /dev/hwrng in Kconfig
->  - Fix 2099 => 2009 typo in commit log
->  - Fix 'number of random numbers sourced' return value
->  - Treat devm_clk_get()'s return value correctly
->  - Check return value of clk_prepare_enable()
->  - Use sysfs_streq() instead of manually stripping '\n' from sysfs
+On Fri, Sep 18, 2015 at 02:07:38PM +0000, Porosanu Alexandru wrote:
+> 
+> MAY_BACKLOG requests will fail once you run out of memory (f.i. backlogging using crypto_queue)
+> Now, for this patch requests will be dropped if there are no more "backlogging" slots available.
+> Would limiting the # of tfms w/MAY_BACKLOG associated with the driver to the # of backlogging slots be OK?
 
-All applied.  Thanks.
+Sure running out of memory is obviously a good reason to fail
+a request.  But if you still have memory MAY_BACKLOG must not
+fail.
+
+Each tfm must be able to submit at least one MAY_BACKLOG request,
+that's the whole point of this flag.  It's used for disk encryption
+where failing is not an option.
+
+Cheers,
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
