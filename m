@@ -1,73 +1,84 @@
-From: Lee Jones <lee.jones@linaro.org>
-Subject: Re: [PATCH v2 4/7] hwrng: st: Provide DT bindings for ST's Random
- Number Generator
-Date: Fri, 18 Sep 2015 17:23:41 +0100
-Message-ID: <CAF2Aj3gBn=PLB=4NvnZwbdtzkYT6QcPPrk3NCNz1+Cx9ZBWr1w@mail.gmail.com>
-References: <1442497557-9271-1-git-send-email-lee.jones@linaro.org>
-	<1442497557-9271-5-git-send-email-lee.jones@linaro.org>
-	<55FC3A11.6080209@codeaurora.org>
+From: Tony Battersby <tonyb@cybernetics.com>
+Subject: Re: [PATCH v2 5/8] lib: introduce sg_nents_len_chained
+Date: Fri, 18 Sep 2015 17:25:47 -0400
+Message-ID: <55FC815B.8020206@cybernetics.com>
+References: <1442581036-23789-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1442581036-23789-6-git-send-email-clabbe.montjoie@gmail.com>
+ <55FC3995.8050600@cybernetics.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	Peter Korsgaard <peter@korsgaard.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Kieran Bingham <kieranbingham@gmail.com>,
-	"kernel@stlinux.com" <kernel@stlinux.com>
-To: Stephen Boyd <sboyd@codeaurora.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f41.google.com ([209.85.213.41]:35277 "EHLO
-	mail-vk0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751653AbbIRQXm convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Sep 2015 12:23:42 -0400
-Received: by vkao3 with SMTP id o3so32943788vka.2
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Sep 2015 09:23:41 -0700 (PDT)
-In-Reply-To: <55FC3A11.6080209@codeaurora.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	lee.nipper@gmail.com, yuan.j.kang@gmail.com
+To: LABBE Corentin <clabbe.montjoie@gmail.com>,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	akpm@linux-foundation.org, arnd@arndb.de, axboe@fb.com,
+	david.s.gordon@intel.com, martin.petersen@oracle.com,
+	robert.jarzmik@free.fr, thomas.lendacky@amd.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <55FC3995.8050600@cybernetics.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 18 September 2015 at 17:21, Stephen Boyd <sboyd@codeaurora.org> wrot=
-e:
-> On 09/17/2015 06:45 AM, Lee Jones wrote:
->> Signed-off-by: Lee Jones <lee.jones@linaro.org>
->> ---
->>  Documentation/devicetree/bindings/rng/st,rng.txt | 15 +++++++++++++=
-++
->>  1 file changed, 15 insertions(+)
->>  create mode 100644 Documentation/devicetree/bindings/rng/st,rng.txt
->>
->> diff --git a/Documentation/devicetree/bindings/rng/st,rng.txt b/Docu=
-mentation/devicetree/bindings/rng/st,rng.txt
->> new file mode 100644
->> index 0000000..dbc64e6
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/rng/st,rng.txt
->> @@ -0,0 +1,15 @@
->> +STMicroelectronics HW Random Number Generator
->> +----------------------------------------------
->> +
->> +Required parameters:
->> +compatible   : Should be "st,rng"
->> +reg          : Base address and size of IP's register map.
->> +clocks               : Phandle to device's clock (See: ../clocks/cl=
-ock-bindings.txt)
->> +
->> +Example:
->> +
->> +rng@0xfee80000 {
+On 09/18/2015 12:19 PM, Tony Battersby wrote:
+> But why do drivers even need this at all?  Here is a typical usage:
 >
-> Drop the 0x part please.
+> int qce_mapsg(struct device *dev, struct scatterlist *sg, int nents,
+>           enum dma_data_direction dir, bool chained)
+> {
+>     int err;
+>
+>     if (chained) {
+>         while (sg) {
+>             err = dma_map_sg(dev, sg, 1, dir);
+>             if (!err)
+>                 return -EFAULT;
+>             sg = sg_next(sg);
+>         }
+>     } else {
+>         err = dma_map_sg(dev, sg, nents, dir);
+>         if (!err)
+>             return -EFAULT;
+>     }
+>
+>     return nents;
+> }
+>
+> Here is another:
+>
+> static int talitos_map_sg(struct device *dev, struct scatterlist *sg,
+>               unsigned int nents, enum dma_data_direction dir,
+>               bool chained)
+> {
+>     if (unlikely(chained))
+>         while (sg) {
+>             dma_map_sg(dev, sg, 1, dir);
+>             sg = sg_next(sg);
+>         }
+>     else
+>         dma_map_sg(dev, sg, nents, dir);
+>     return nents;
+> }
+>
+> Can anyone clarify why you can't just use dma_map_sg(dev, sg, nents,
+> dir) always?  It should be able to handle chained scatterlists just fine.
 
-Good spot.  Will fix as a subsequent patch.
+After further investigation, it looks like this was a remnant of
+scatterwalk_sg_next() which was removed by commit 5be4d4c94b1f ("crypto:
+replace scatterwalk_sg_next with sg_next").  Apparently crypto
+scatterlists used to be chained differently than normal scatterlists, so
+functions like dma_map_sg() would not work on a chained crypto
+scatterlist, but that is no longer the case.
 
---=20
-Lee Jones
-Linaro ST Landing Team Lead
-Linaro.org =E2=94=82 Open source software for ARM SoCs
-=46ollow Linaro: Facebook | Twitter | Blog
+So instead of adding a new function sg_nents_len_chained(), a better
+cleanup would be:
+1) replace the driver-specific functions with calls to sg_nents_for_len()
+2) get rid of the "chained" variables
+3) always call dma_map_sg()/dma_unmap_sg() for the entire scatterlist
+regardless of whether or not the scatterlist is chained
+
+Would someone more familiar with the crypto API please confirm that my
+suggestions are correct?
+
+Tony Battersby
+Cybernetics
