@@ -1,7 +1,7 @@
 From: Joonsoo Kim <js1304@gmail.com>
-Subject: [PATCH v3 4/9] crypto/lz4hc: support decompress_noctx
-Date: Fri, 18 Sep 2015 14:19:19 +0900
-Message-ID: <1442553564-3476-5-git-send-email-iamjoonsoo.kim@lge.com>
+Subject: [PATCH v3 6/9] zram: make stream find and release functions static
+Date: Fri, 18 Sep 2015 14:19:21 +0900
+Message-ID: <1442553564-3476-7-git-send-email-iamjoonsoo.kim@lge.com>
 References: <1442553564-3476-1-git-send-email-iamjoonsoo.kim@lge.com>
 Cc: Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
 	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
@@ -9,52 +9,138 @@ Cc: Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Stephan Mueller <smueller@chronox.de>,
+	Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
 	Joonsoo Kim <iamjoonsoo.kim@lge.com>
 To: Andrew Morton <akpm@linux-foundation.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f47.google.com ([209.85.220.47]:34084 "EHLO
-	mail-pa0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752288AbbIRFUA (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Sep 2015 01:20:00 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1442553564-3476-1-git-send-email-iamjoonsoo.kim@lge.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-lz4hc's decompression doesn't requires any scratch buffer so
-it doesn't need tfm context. Hence, it can support
-crypto compression noctx API and this patch implements it.
+From: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
 
+Hide (make static) zstrm find and release function and introduce
+zcomp_compress_begin()/zcomp_compress_end(). We will have begin
+and end functions around compression (this patch) and decompression
+(next patch). So the work flow is evolving to:
+
+	zstrm = foo_begin();
+	foo(zstrm);
+	foo_end(zstrm);
+
+where foo is compress or decompress zcomp functions.
+
+This patch is a preparation to make crypto API-powered zcomp
+possible. The reasoning is that some crypto compression backends
+require zstrm for decompression.
+
+Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
 Signed-off-by: Joonsoo Kim <iamjoonsoo.kim@lge.com>
 ---
- crypto/lz4hc.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/block/zram/zcomp.c    | 27 +++++++++++++++++++++++++--
+ drivers/block/zram/zcomp.h    |  8 ++++++--
+ drivers/block/zram/zram_drv.c |  6 +++---
+ 3 files changed, 34 insertions(+), 7 deletions(-)
 
-diff --git a/crypto/lz4hc.c b/crypto/lz4hc.c
-index 0cb38a7..0797065 100644
---- a/crypto/lz4hc.c
-+++ b/crypto/lz4hc.c
-@@ -76,6 +76,12 @@ static int lz4hc_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
- 	return err;
+diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
+index 965d1af..fc13bf2 100644
+--- a/drivers/block/zram/zcomp.c
++++ b/drivers/block/zram/zcomp.c
+@@ -296,16 +296,39 @@ bool zcomp_set_max_streams(struct zcomp *comp, int num_strm)
+ 	return comp->set_max_streams(comp, num_strm);
  }
  
-+static int lz4hc_decompress_noctx(const u8 *src, unsigned int slen,
-+				  u8 *dst, unsigned int *dlen)
+-struct zcomp_strm *zcomp_strm_find(struct zcomp *comp)
++static struct zcomp_strm *zcomp_strm_find(struct zcomp *comp)
+ {
+ 	return comp->strm_find(comp);
+ }
+ 
+-void zcomp_strm_release(struct zcomp *comp, struct zcomp_strm *zstrm)
++static void zcomp_strm_release(struct zcomp *comp, struct zcomp_strm *zstrm)
+ {
+ 	comp->strm_release(comp, zstrm);
+ }
+ 
++/* Never return NULL, may sleep */
++struct zcomp_strm *zcomp_compress_begin(struct zcomp *comp)
 +{
-+	return lz4hc_decompress_crypto(NULL, src, slen, dst, dlen);
++	return zcomp_strm_find(comp);
 +}
 +
- static struct crypto_alg alg_lz4hc = {
- 	.cra_name		= "lz4hc",
- 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
-@@ -87,7 +93,7 @@ static struct crypto_alg alg_lz4hc = {
- 	.cra_u			= { .compress = {
- 	.coa_compress		= lz4hc_compress_crypto,
- 	.coa_decompress		= lz4hc_decompress_crypto,
--	.coa_decompress_noctx	= NULL } }
-+	.coa_decompress_noctx	= lz4hc_decompress_noctx } }
- };
++void zcomp_compress_end(struct zcomp *comp, struct zcomp_strm *zstrm)
++{
++	zcomp_strm_release(comp, zstrm);
++}
++
++/* May return NULL, may sleep */
++struct zcomp_strm *zcomp_decompress_begin(struct zcomp *comp)
++{
++	return NULL;
++}
++
++void zcomp_decompress_end(struct zcomp *comp, struct zcomp_strm *zstrm)
++{
++	if (zstrm)
++		zcomp_strm_release(comp, zstrm);
++}
++
+ int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
+ 		const unsigned char *src, size_t *dst_len)
+ {
+diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
+index 46e2b9f..616e013 100644
+--- a/drivers/block/zram/zcomp.h
++++ b/drivers/block/zram/zcomp.h
+@@ -56,12 +56,16 @@ bool zcomp_available_algorithm(const char *comp);
+ struct zcomp *zcomp_create(const char *comp, int max_strm);
+ void zcomp_destroy(struct zcomp *comp);
  
- static int __init lz4hc_mod_init(void)
+-struct zcomp_strm *zcomp_strm_find(struct zcomp *comp);
+-void zcomp_strm_release(struct zcomp *comp, struct zcomp_strm *zstrm);
++
++struct zcomp_strm *zcomp_compress_begin(struct zcomp *comp);
++void zcomp_compress_end(struct zcomp *comp, struct zcomp_strm *zstrm);
+ 
+ int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
+ 		const unsigned char *src, size_t *dst_len);
+ 
++struct zcomp_strm *zcomp_decompress_begin(struct zcomp *comp);
++void zcomp_decompress_end(struct zcomp *comp, struct zcomp_strm *zstrm);
++
+ int zcomp_decompress(struct zcomp *comp, const unsigned char *src,
+ 		size_t src_len, unsigned char *dst);
+ 
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 9fa15bb..20c41ed 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -673,7 +673,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
+ 			goto out;
+ 	}
+ 
+-	zstrm = zcomp_strm_find(zram->comp);
++	zstrm = zcomp_compress_begin(zram->comp);
+ 	user_mem = kmap_atomic(page);
+ 
+ 	if (is_partial_io(bvec)) {
+@@ -744,7 +744,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
+ 		memcpy(cmem, src, clen);
+ 	}
+ 
+-	zcomp_strm_release(zram->comp, zstrm);
++	zcomp_compress_end(zram->comp, zstrm);
+ 	zstrm = NULL;
+ 	zs_unmap_object(meta->mem_pool, handle);
+ 
+@@ -764,7 +764,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
+ 	atomic64_inc(&zram->stats.pages_stored);
+ out:
+ 	if (zstrm)
+-		zcomp_strm_release(zram->comp, zstrm);
++		zcomp_compress_end(zram->comp, zstrm);
+ 	if (is_partial_io(bvec))
+ 		kfree(uncmem);
+ 	return ret;
 -- 
 1.9.1
