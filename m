@@ -1,34 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/3] crypto: Fix module autoload for OF platform drivers
-Date: Fri, 18 Sep 2015 21:56:29 +0800
-Message-ID: <20150918135629.GA9249@gondor.apana.org.au>
-References: <20150828164245.GA5023@goodgumbo.baconseed.org>
+Subject: Re: [PATCH] crypto: Kconfig: Allow MXS_DCP to be used on MX6SL
+Date: Fri, 18 Sep 2015 21:56:49 +0800
+Message-ID: <20150918135649.GB9249@gondor.apana.org.au>
+References: <1441206318-27717-1-git-send-email-festevam@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
+Cc: marex@denx.de, horia.geanta@freescale.com,
 	linux-crypto@vger.kernel.org,
-	Javier Martinez Canillas <javier@osg.samsung.com>
-To: Luis de Bethencourt <luis@debethencourt.com>
+	Fabio Estevam <fabio.estevam@freescale.com>
+To: Fabio Estevam <festevam@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:33189 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:46384 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752057AbbIRN4i (ORCPT
+	with ESMTP id S1753790AbbIRN4z (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Sep 2015 09:56:38 -0400
+	Fri, 18 Sep 2015 09:56:55 -0400
 Content-Disposition: inline
-In-Reply-To: <20150828164245.GA5023@goodgumbo.baconseed.org>
+In-Reply-To: <1441206318-27717-1-git-send-email-festevam@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 28, 2015 at 06:42:45PM +0200, Luis de Bethencourt wrote:
-> Hello,
+On Wed, Sep 02, 2015 at 12:05:18PM -0300, Fabio Estevam wrote:
+> From: Fabio Estevam <fabio.estevam@freescale.com>
 > 
-> This series add the missing MODULE_DEVICE_TABLE() for OF to eport
-> that information so modules have the correct aliases built-in
-> and autoloading works correctly.
+> MX6SL has the same DCP crypto block as in MX23/MX28, so allow it to be
+> built for ARCH_MXC.
+> 
+> Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
