@@ -1,48 +1,49 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH] crypto: qat - VF should never trigger SBR on PH
-Date: Fri, 18 Sep 2015 09:01:59 -0700
-Message-ID: <55FC3577.40802@intel.com>
-References: <20150918155947.24663.97648.stgit@tstruk-mobl1>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [cryptodev:master 10/29]
+ arch/x86/crypto/sha256_ssse3_glue.c:172:19: error: 'X86_FEATURE_SHA_NI'
+ undeclared
+Date: Fri, 18 Sep 2015 09:12:01 -0700
+Message-ID: <1442592721.6240.15.camel@schen9-desk2.jf.intel.com>
+References: <201509182205.JCClhKfv%fengguang.wu@intel.com>
+	 <20150918151757.GA10835@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	conor.mcloughlin@intel.com
-To: herbert@gondor.apana.org.au
+Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild-all@01.org,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:2498 "EHLO mga01.intel.com"
+Received: from mga14.intel.com ([192.55.52.115]:1649 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754201AbbIRQFA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Sep 2015 12:05:00 -0400
-In-Reply-To: <20150918155947.24663.97648.stgit@tstruk-mobl1>
+	id S1751009AbbIRQMD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 18 Sep 2015 12:12:03 -0400
+In-Reply-To: <20150918151757.GA10835@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
-On 09/18/2015 08:59 AM, Tadeusz Struk wrote:
-> From: Conor McLoughlin <conor.mcloughlin@intel.com>
+On Fri, 2015-09-18 at 23:17 +0800, Herbert Xu wrote:
+> On Fri, Sep 18, 2015 at 10:36:07PM +0800, kbuild test robot wrote:
+> > tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> > head:   dcde21287f931b6cee61825306db6a5665566f66
+> > commit: a3476db1b524f2e2d869b001c56ba9ce353d860e [10/29] crypto: x86/sha - Add build support for Intel SHA Extensions optimized SHA1 and SHA256
+> > config: x86_64-randconfig-x015-09141022 (attached as .config)
+> > reproduce:
+> >   git checkout a3476db1b524f2e2d869b001c56ba9ce353d860e
+> >   # save the attached .config to linux build tree
+> >   make ARCH=x86_64 
 > 
-> Don't allow to trigger SBR from a VF running in VMM context.
+> Tim, I've rolled back all your patches as they depend on a patch
+> that has not yet been merged.
 > 
-> Signed-off-by: Conor McLoughlin <conor.mcloughlin@intel.com>
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
-> ---
->  drivers/crypto/qat/qat_common/adf_aer.c |    3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/crypto/qat/qat_common/adf_aer.c b/drivers/crypto/qat/qat_common/adf_aer.c
-> index a57b419..0a5ca0b 100644
-> --- a/drivers/crypto/qat/qat_common/adf_aer.c
-> +++ b/drivers/crypto/qat/qat_common/adf_aer.c
-> @@ -88,6 +88,9 @@ static void adf_dev_restore(struct adf_accel_dev *accel_dev)
->  	struct pci_dev *parent = pdev->bus->self;
->  	uint16_t bridge_ctl = 0;
->  
-> +	if (accel_dev->is_vf)
-> +		return;
-> +
->  	dev_info(&GET_DEV(accel_dev), "Resetting device qat_dev%d\n",
->  		 accel_dev->accel_id);
+> Please resubmit them when the prerequisite is ready.
 
-This should also go to 4.2 stable.
-Thanks
+Herbert,
+
+It seems like Thomas has already merged the cpu id patch upstream.
+http://git.kernel.org/cgit/linux/kernel/git/tip/tip.git/commit/?id=488ca7d72d974e3c00ae73ed9f947590680bdf00
+
+Can you merge that patch into cryptodev and re-apply?
+
+Thanks.
+
+Tim
