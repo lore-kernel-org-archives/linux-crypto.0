@@ -1,111 +1,83 @@
 From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH v2 8/8] crypto: caam: replace __sg_count with sg_nents_len_chained
-Date: Fri, 18 Sep 2015 14:57:16 +0200
-Message-ID: <1442581036-23789-9-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH v2 3/8] crypto: sahara: replace sahara_sg_length with sg_nents_for_len
+Date: Fri, 18 Sep 2015 14:57:11 +0200
+Message-ID: <1442581036-23789-4-git-send-email-clabbe.montjoie@gmail.com>
 References: <1442581036-23789-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-	clabbe.montjoie@gmail.com, cristian.stoica@freescale.com,
-	fabio.estevam@freescale.com, horia.geanta@freescale.com,
-	steve.cornelius@freescale.com, vicki.milhoan@freescale.com,
-	yanjiang.jin@windriver.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	LABBE Corentin <clabbe.montjoie@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:35456 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753705AbbIRM6A (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 18 Sep 2015 08:58:00 -0400
 In-Reply-To: <1442581036-23789-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The caam driver use a modified version of sg_nents_for_len
-called __sg_count.
-This function is now availlable in lib/scatterlist.c
-
-Replace __sg_count by sg_nents_len_chained
+The sahara_sg_length function of the sahara driver is the same
+as sg_nents_for_len from lib/scatterlist.c
 
 Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/caam/caamhash.c   | 14 ++++++++------
- drivers/crypto/caam/sg_sw_sec4.h | 20 +-------------------
- 2 files changed, 9 insertions(+), 25 deletions(-)
+ drivers/crypto/sahara.c | 30 +++---------------------------
+ 1 file changed, 3 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 94433b9..116af3e 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -797,8 +797,9 @@ static int ahash_update_ctx(struct ahash_request *req)
- 	to_hash = in_len - *next_buflen;
- 
- 	if (to_hash) {
--		src_nents = __sg_count(req->src, req->nbytes - (*next_buflen),
--				       &chained);
-+		src_nents = sg_nents_len_chained(req->src,
-+						 req->nbytes - (*next_buflen),
-+						 &chained);
- 		sec4_sg_src_index = 1 + (*buflen ? 1 : 0);
- 		sec4_sg_bytes = (sec4_sg_src_index + src_nents) *
- 				 sizeof(struct sec4_sg_entry);
-@@ -1000,7 +1001,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 	int ret = 0;
- 	int sh_len;
- 
--	src_nents = __sg_count(req->src, req->nbytes, &chained);
-+	src_nents = sg_nents_len_chained(req->src, req->nbytes, &chained);
- 	sec4_sg_src_index = 1 + (buflen ? 1 : 0);
- 	sec4_sg_bytes = (sec4_sg_src_index + src_nents) *
- 			 sizeof(struct sec4_sg_entry);
-@@ -1236,8 +1237,9 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 	to_hash = in_len - *next_buflen;
- 
- 	if (to_hash) {
--		src_nents = __sg_count(req->src, req->nbytes - (*next_buflen),
--				       &chained);
-+		src_nents = sg_nents_len_chained(req->src,
-+						 req->nbytes - (*next_buflen),
-+						 &chained);
- 		sec4_sg_bytes = (1 + src_nents) *
- 				sizeof(struct sec4_sg_entry);
- 
-@@ -1347,7 +1349,7 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 	int sh_len;
- 	int ret = 0;
- 
--	src_nents = __sg_count(req->src, req->nbytes, &chained);
-+	src_nents = sg_nents_len_chained(req->src, req->nbytes, &chained);
- 	sec4_sg_src_index = 2;
- 	sec4_sg_bytes = (sec4_sg_src_index + src_nents) *
- 			 sizeof(struct sec4_sg_entry);
-diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
-index 18cd6d1..0575a8e 100644
---- a/drivers/crypto/caam/sg_sw_sec4.h
-+++ b/drivers/crypto/caam/sg_sw_sec4.h
-@@ -69,29 +69,11 @@ static inline struct sec4_sg_entry *sg_to_sec4_sg_len(
- 	return sec4_sg_ptr - 1;
+diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
+index 820dc3a..cea2411 100644
+--- a/drivers/crypto/sahara.c
++++ b/drivers/crypto/sahara.c
+@@ -274,30 +274,6 @@ static u32 sahara_aes_data_link_hdr(struct sahara_dev *dev)
+ 			SAHARA_HDR_CHA_SKHA | SAHARA_HDR_PARITY_BIT;
  }
  
--/* count number of elements in scatterlist */
--static inline int __sg_count(struct scatterlist *sg_list, int nbytes,
--			     bool *chained)
+-static int sahara_sg_length(struct scatterlist *sg,
+-			    unsigned int total)
 -{
--	struct scatterlist *sg = sg_list;
--	int sg_nents = 0;
+-	int sg_nb;
+-	unsigned int len;
+-	struct scatterlist *sg_list;
 -
--	while (nbytes > 0) {
--		sg_nents++;
--		nbytes -= sg->length;
--		if (!sg_is_last(sg) && (sg + 1)->length == 0)
--			*chained = true;
--		sg = sg_next(sg);
+-	sg_nb = 0;
+-	sg_list = sg;
+-
+-	while (total) {
+-		len = min(sg_list->length, total);
+-
+-		sg_nb++;
+-		total -= len;
+-
+-		sg_list = sg_next(sg_list);
+-		if (!sg_list)
+-			total = 0;
 -	}
 -
--	return sg_nents;
+-	return sg_nb;
 -}
 -
- /* derive number of elements in scatterlist, but return 0 for 1 */
- static inline int sg_count(struct scatterlist *sg_list, int nbytes,
- 			     bool *chained)
- {
--	int sg_nents = __sg_count(sg_list, nbytes, chained);
-+	int sg_nents = sg_nents_len_chained(sg_list, nbytes, chained);
+ static char *sahara_err_src[16] = {
+ 	"No error",
+ 	"Header error",
+@@ -502,8 +478,8 @@ static int sahara_hw_descriptor_create(struct sahara_dev *dev)
+ 		idx++;
+ 	}
  
- 	if (likely(sg_nents == 1))
- 		return 0;
+-	dev->nb_in_sg = sahara_sg_length(dev->in_sg, dev->total);
+-	dev->nb_out_sg = sahara_sg_length(dev->out_sg, dev->total);
++	dev->nb_in_sg = sg_nents_for_len(dev->in_sg, dev->total);
++	dev->nb_out_sg = sg_nents_for_len(dev->out_sg, dev->total);
+ 	if ((dev->nb_in_sg + dev->nb_out_sg) > SAHARA_MAX_HW_LINK) {
+ 		dev_err(dev->device, "not enough hw links (%d)\n",
+ 			dev->nb_in_sg + dev->nb_out_sg);
+@@ -818,7 +794,7 @@ static int sahara_sha_hw_links_create(struct sahara_dev *dev,
+ 
+ 	dev->in_sg = rctx->in_sg;
+ 
+-	dev->nb_in_sg = sahara_sg_length(dev->in_sg, rctx->total);
++	dev->nb_in_sg = sg_nents_for_len(dev->in_sg, rctx->total);
+ 	if ((dev->nb_in_sg) > SAHARA_MAX_HW_LINK) {
+ 		dev_err(dev->device, "not enough hw links (%d)\n",
+ 			dev->nb_in_sg + dev->nb_out_sg);
 -- 
 2.4.6
