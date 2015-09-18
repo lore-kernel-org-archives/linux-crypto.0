@@ -1,104 +1,94 @@
 From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH v2 6/8] crypto: talitos: replace sg_count with sg_nents_len_chained
-Date: Fri, 18 Sep 2015 14:57:14 +0200
-Message-ID: <1442581036-23789-7-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH v2 5/8] lib: introduce sg_nents_len_chained
+Date: Fri, 18 Sep 2015 14:57:13 +0200
+Message-ID: <1442581036-23789-6-git-send-email-clabbe.montjoie@gmail.com>
 References: <1442581036-23789-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	LABBE Corentin <clabbe.montjoie@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	akpm@linux-foundation.org, arnd@arndb.de, axboe@fb.com,
+	clabbe.montjoie@gmail.com, david.s.gordon@intel.com,
+	martin.petersen@oracle.com, robert.jarzmik@free.fr,
+	thomas.lendacky@amd.com, tonyb@cybernetics.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1442581036-23789-1-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The talitos driver use a modified version of sg_nents_for_len
-called sg_count.
-This function is now availlable in lib/scatterlist.c
+Some driver use a modified version of sg_nents_for_len with an
+additional parameter bool *chained for knowing if the scatterlist is
+chained or not.
 
-Replace sg_count by sg_nents_len_chained
+So, for removing duplicate code, add sg_nents_len_chained in
+lib/scatterlist.c
 
 Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/talitos.c | 42 ++++++++++++------------------------------
- 1 file changed, 12 insertions(+), 30 deletions(-)
+ include/linux/scatterlist.h |  1 +
+ lib/scatterlist.c           | 40 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 3b20a1b..9156272 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -1234,26 +1234,6 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- }
+diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+index 556ec1e..594cdb0 100644
+--- a/include/linux/scatterlist.h
++++ b/include/linux/scatterlist.h
+@@ -243,6 +243,7 @@ static inline void *sg_virt(struct scatterlist *sg)
  
- /*
-- * derive number of elements in scatterlist
-- */
--static int sg_count(struct scatterlist *sg_list, int nbytes, bool *chained)
--{
--	struct scatterlist *sg = sg_list;
--	int sg_nents = 0;
--
--	*chained = false;
--	while (nbytes > 0 && sg) {
--		sg_nents++;
--		nbytes -= sg->length;
--		if (!sg_is_last(sg) && (sg + 1)->length == 0)
--			*chained = true;
--		sg = sg_next(sg);
--	}
--
--	return sg_nents;
--}
--
--/*
-  * allocate and map the extended descriptor
-  */
- static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
-@@ -1287,18 +1267,19 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 		iv_dma = dma_map_single(dev, iv, ivsize, DMA_TO_DEVICE);
+ int sg_nents(struct scatterlist *sg);
+ int sg_nents_for_len(struct scatterlist *sg, u64 len);
++int sg_nents_len_chained(struct scatterlist *sg, u64 len, bool *chained);
+ struct scatterlist *sg_next(struct scatterlist *);
+ struct scatterlist *sg_last(struct scatterlist *s, unsigned int);
+ void sg_init_table(struct scatterlist *, unsigned int);
+diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+index bafa993..070e396 100644
+--- a/lib/scatterlist.c
++++ b/lib/scatterlist.c
+@@ -90,6 +90,46 @@ int sg_nents_for_len(struct scatterlist *sg, u64 len)
+ EXPORT_SYMBOL(sg_nents_for_len);
  
- 	if (!dst || dst == src) {
--		src_nents = sg_count(src, assoclen + cryptlen + authsize,
--				     &src_chained);
-+		src_nents = sg_nents_len_chained(src,
-+						 assoclen + cryptlen + authsize,
-+						 &src_chained);
- 		src_nents = (src_nents == 1) ? 0 : src_nents;
- 		dst_nents = dst ? src_nents : 0;
- 	} else { /* dst && dst != src*/
--		src_nents = sg_count(src, assoclen + cryptlen +
--					  (encrypt ? 0 : authsize),
--				     &src_chained);
-+		src_nents = sg_nents_len_chained(src, assoclen + cryptlen +
-+						 (encrypt ? 0 : authsize),
-+						 &src_chained);
- 		src_nents = (src_nents == 1) ? 0 : src_nents;
--		dst_nents = sg_count(dst, assoclen + cryptlen +
--					  (encrypt ? authsize : 0),
--				     &dst_chained);
-+		dst_nents = sg_nents_len_chained(dst, assoclen + cryptlen +
-+						 (encrypt ? authsize : 0),
-+						 &dst_chained);
- 		dst_nents = (dst_nents == 1) ? 0 : dst_nents;
- 	}
- 
-@@ -1902,7 +1883,8 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
- 	if (!req_ctx->last && (nbytes + req_ctx->nbuf <= blocksize)) {
- 		/* Buffer up to one whole block */
- 		sg_copy_to_buffer(areq->src,
--				  sg_count(areq->src, nbytes, &chained),
-+				  sg_nents_len_chained(areq->src,
-+						       nbytes, &chained),
- 				  req_ctx->buf + req_ctx->nbuf, nbytes);
- 		req_ctx->nbuf += nbytes;
- 		return 0;
-@@ -1935,7 +1917,7 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
- 		req_ctx->psrc = areq->src;
- 
- 	if (to_hash_later) {
--		int nents = sg_count(areq->src, nbytes, &chained);
-+		int nents = sg_nents_len_chained(areq->src, nbytes, &chained);
- 		sg_pcopy_to_buffer(areq->src, nents,
- 				      req_ctx->bufnext,
- 				      to_hash_later,
+ /**
++ * sg_nents_len_chained - return total count of entries in scatterlist
++ *                        needed to satisfy the supplied length
++ * @sg:		The scatterlist
++ * @len:	The total required length
++ * @chained	A pointer where to store if SG is chained or not
++ *
++ * Description:
++ * Determines the number of entries in sg that are required to meet
++ * the supplied length, taking into account chaining as well
++ * If the scatterlist is chained, set *chained to true.
++ *
++ * Returns:
++ *   the number of sg entries needed, negative error on failure
++ *
++ **/
++int sg_nents_len_chained(struct scatterlist *sg, u64 len, bool *chained)
++{
++	int nents;
++	u64 total;
++
++	if (chained)
++		*chained = false;
++
++	if (!len)
++		return 0;
++
++	for (nents = 0, total = 0; sg; sg = sg_next(sg)) {
++		nents++;
++		total += sg->length;
++		if (!sg_is_last(sg) && (sg + 1)->length == 0 && chained)
++			*chained = true;
++		if (total >= len)
++			return nents;
++	}
++
++	return -EINVAL;
++}
++EXPORT_SYMBOL(sg_nents_len_chained);
++
++/**
+  * sg_last - return the last scatterlist entry in a list
+  * @sgl:	First entry in the scatterlist
+  * @nents:	Number of entries in the scatterlist
 -- 
 2.4.6
