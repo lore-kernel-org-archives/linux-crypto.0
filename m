@@ -1,44 +1,38 @@
-From: Matthijs van Duin <matthijsvanduin@gmail.com>
-Subject: Re: [PATCH v3] crypto: omap-aes: Add support for GCM mode
-Date: Sun, 20 Sep 2015 12:38:44 +0200
-Message-ID: <CAALWOA_=hs+Xa2f+3=s=QaxA9HfVfHJnW0dzK6toRcFFiOvdTA@mail.gmail.com>
-References: <1436283109-13318-7-git-send-email-lokeshvutla@ti.com> <1442323681-6538-1-git-send-email-lokeshvutla@ti.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	davem@davemloft.net,
-	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
-	lkml <linux-kernel@vger.kernel.org>,
-	Tero Kristo <t-kristo@ti.com>, nsekhar@ti.com
-To: Lokesh Vutla <lokeshvutla@ti.com>
+From: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+Subject: [PATCH] crypto: crc32c-pclmul: use .rodata instead of .rotata
+Date: Sun, 20 Sep 2015 16:42:36 +0200
+Message-ID: <1442760156-2501-1-git-send-email-nicolas.iooss_linux@m4x.org>
+Cc: linux-kernel@vger.kernel.org,
+	Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1442323681-6538-1-git-send-email-lokeshvutla@ti.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 15 September 2015 at 15:28, Lokesh Vutla <lokeshvutla@ti.com> wrote:
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -293,6 +293,7 @@ config CRYPTO_DEV_OMAP_AES
->         depends on ARCH_OMAP2 || ARCH_OMAP3 || ARCH_OMAP2PLUS
->         select CRYPTO_AES
->         select CRYPTO_BLKCIPHER
-> +       select CRYPTO_AEAD
+Module crc32c-intel uses a special read-only data section named .rotata.
+This section is defined for K_table, and its name seems to be a spelling
+mistake for .rodata.
 
-Is it appropriate that this also selects CRYPTO_AEAD on omap2/omap3,
-even though they do not support GCM?
+Fixes: 473946e674eb ("crypto: crc32c-pclmul - Shrink K_table to 32-bit words")
+Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+---
+ arch/x86/crypto/crc32c-pcl-intel-asm_64.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-
-> +#define AES_REG_CTRL_GCM               GENMASK(17, 16)
-
-Instead of adding these definitions one bit at a time, can't we get
-the whole list over with at once? This thing supports:
-
-ECB, CBC, and CFB-128 encryption
-CTR and F8 encryption with 16/32/64/96/128-bit counter
-XEX (disk encryption)
-CBC-MAC authentication including the CMAC/OMAC/PMAC subflavors
-F9 authentication
-GCM and CCM aead
-(and raw GHASH, if you happen to have a use for it)
+diff --git a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
+index 225be06edc80..4fe27e074194 100644
+--- a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
++++ b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
+@@ -330,7 +330,7 @@ ENDPROC(crc_pcl)
+ 	## PCLMULQDQ tables
+ 	## Table is 128 entries x 2 words (8 bytes) each
+ 	################################################################
+-.section	.rotata, "a", %progbits
++.section	.rodata, "a", %progbits
+ .align 8
+ K_table:
+ 	.long 0x493c7d27, 0x00000001
+-- 
+2.5.2
