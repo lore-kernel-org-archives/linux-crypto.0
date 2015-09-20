@@ -1,38 +1,51 @@
-From: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
-Subject: [PATCH] crypto: crc32c-pclmul: use .rodata instead of .rotata
-Date: Sun, 20 Sep 2015 16:42:36 +0200
-Message-ID: <1442760156-2501-1-git-send-email-nicolas.iooss_linux@m4x.org>
-Cc: linux-kernel@vger.kernel.org,
-	Nicolas Iooss <nicolas.iooss_linux@m4x.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
+From: Minchan Kim <minchan@kernel.org>
+Subject: Re: [PATCH v3 6/9] zram: make stream find and release functions
+ static
+Date: Mon, 21 Sep 2015 08:39:17 +0900
+Message-ID: <20150920233854.GA27729@bbox>
+References: <1442553564-3476-1-git-send-email-iamjoonsoo.kim@lge.com>
+ <1442553564-3476-7-git-send-email-iamjoonsoo.kim@lge.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Nitin Gupta <ngupta@vflare.org>,
+	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Stephan Mueller <smueller@chronox.de>,
+	Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>
+To: Joonsoo Kim <js1304@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f54.google.com ([209.85.220.54]:33606 "EHLO
+	mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755445AbbITXhy (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 20 Sep 2015 19:37:54 -0400
+Content-Disposition: inline
+In-Reply-To: <1442553564-3476-7-git-send-email-iamjoonsoo.kim@lge.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Module crc32c-intel uses a special read-only data section named .rotata.
-This section is defined for K_table, and its name seems to be a spelling
-mistake for .rodata.
-
-Fixes: 473946e674eb ("crypto: crc32c-pclmul - Shrink K_table to 32-bit words")
-Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
----
- arch/x86/crypto/crc32c-pcl-intel-asm_64.S | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
-index 225be06edc80..4fe27e074194 100644
---- a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
-+++ b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
-@@ -330,7 +330,7 @@ ENDPROC(crc_pcl)
- 	## PCLMULQDQ tables
- 	## Table is 128 entries x 2 words (8 bytes) each
- 	################################################################
--.section	.rotata, "a", %progbits
-+.section	.rodata, "a", %progbits
- .align 8
- K_table:
- 	.long 0x493c7d27, 0x00000001
--- 
-2.5.2
+On Fri, Sep 18, 2015 at 02:19:21PM +0900, Joonsoo Kim wrote:
+> From: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+> 
+> Hide (make static) zstrm find and release function and introduce
+> zcomp_compress_begin()/zcomp_compress_end(). We will have begin
+> and end functions around compression (this patch) and decompression
+> (next patch). So the work flow is evolving to:
+> 
+> 	zstrm = foo_begin();
+> 	foo(zstrm);
+> 	foo_end(zstrm);
+> 
+> where foo is compress or decompress zcomp functions.
+> 
+> This patch is a preparation to make crypto API-powered zcomp
+> possible. The reasoning is that some crypto compression backends
+> require zstrm for decompression.
+> 
+> Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+> Signed-off-by: Joonsoo Kim <iamjoonsoo.kim@lge.com>
+Acked-by: Minchan Kim <minchan@kernel.org>
