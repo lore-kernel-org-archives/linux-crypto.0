@@ -1,105 +1,59 @@
-From: Haren Myneni <haren@linux.vnet.ibm.com>
-Subject: [PATCH] drivers/crypto/nx: Add CRC and validation support for nx842
-Date: Sat, 19 Sep 2015 17:02:42 -0700
-Message-ID: <1442707362.6178.11.camel@hbabu-laptop>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 0/7] hwrng: Add support for STMicroelectronics' RNG IP
+Date: Sun, 20 Sep 2015 09:23:48 +0800
+Message-ID: <20150920012347.GA21913@gondor.apana.org.au>
+References: <1442497557-9271-1-git-send-email-lee.jones@linaro.org>
+ <20150918140756.GK9249@gondor.apana.org.au>
+ <CAF2Aj3h7Jy=tpYdZTdbxAJwa=147_hAu3reOFrbEh=JdrMFWLQ@mail.gmail.com>
+ <20150918151137.GA10763@gondor.apana.org.au>
+ <20150918155112.GE3218@x1>
+ <20150918231213.GA14278@gondor.apana.org.au>
+ <20150919092145.GG3218@x1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	hbabu@us.ibm.com
-To: herbert@gondor.apana.org.au, davem@davemloft.net, ddstreet@ieee.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	Peter Korsgaard <peter@korsgaard.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Kieran Bingham <kieranbingham@gmail.com>,
+	"kernel@stlinux.com" <kernel@stlinux.com>
+To: Lee Jones <lee.jones@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e17.ny.us.ibm.com ([129.33.205.207]:53224 "EHLO
-	e17.ny.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752550AbbITADh (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:54299 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752962AbbITBYE (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 19 Sep 2015 20:03:37 -0400
-Received: from /spool/local
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <haren@linux.vnet.ibm.com>;
-	Sat, 19 Sep 2015 20:03:36 -0400
+	Sat, 19 Sep 2015 21:24:04 -0400
+Content-Disposition: inline
+In-Reply-To: <20150919092145.GG3218@x1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi, 
+On Sat, Sep 19, 2015 at 10:21:45AM +0100, Lee Jones wrote:
+>
+> That's not how it works.  It's helpful, more often than not, to submit
+> the entire set to each maintainer concerned so they can keep up with
+> the general conversation.  By only sending specific patches to
+> maintainers you essentially blinker them to the bigger picture.
+> 
+> As a maintainer you should _know_ that you can't apply patches from
+> other subsystems without appropriate Acks.  I'm sure you'd take
+> exception to another maintainer who started accepting patches for
+> subsystems you are responsible for.  This works both ways.
 
-This patch allows nx842 coprocessor to add CRC for compression and
-check the computed CRC value for uncompression. Please let me know 
-if you have any comments.
+No you are mistaken.  You should only put patches which have
+dependencies on each other in a series.  If the patches can be
+applied independently of each other there is no need to have
+them in a single series.
 
-Thanks
-Haren
+Obviously if they can go into different trees then they cannot
+have dependencies.
 
-commit d0b34d2e3ed41e7ec2afdbd654f0dd7716e4d4c0
-Author: Haren Myneni <haren@us.ibm.com>
-Date:   Sat Sep 12 01:20:51 2015 -0700
-
-    crypto/nx842: Add CRC and validation support
-    
-    This patch adds CRC generation and validation support for nx-842. 
-    Add CRC flag so that nx842 coprocessor includes CRC during 
-    compression and validates during uncompression. 
-    
-    Signed-off-by: Haren Myneni <haren@us.ibm.com>
-
-diff --git a/drivers/crypto/nx/nx-842-powernv.c
-b/drivers/crypto/nx/nx-842-powernv.c
-index 3750e13..9ef51fa 100644
---- a/drivers/crypto/nx/nx-842-powernv.c
-+++ b/drivers/crypto/nx/nx-842-powernv.c
-@@ -491,7 +491,7 @@ static int nx842_powernv_compress(const unsigned
-char *in, unsigned int inlen,
- 				  void *wmem)
- {
- 	return nx842_powernv_function(in, inlen, out, outlenp,
--				      wmem, CCW_FC_842_COMP_NOCRC);
-+				      wmem, CCW_FC_842_COMP_CRC);
- }
- 
- /**
-@@ -519,7 +519,7 @@ static int nx842_powernv_decompress(const unsigned
-char *in, unsigned int inlen,
- 				    void *wmem)
- {
- 	return nx842_powernv_function(in, inlen, out, outlenp,
--				      wmem, CCW_FC_842_DECOMP_NOCRC);
-+				      wmem, CCW_FC_842_DECOMP_CRC);
- }
- 
- static int __init nx842_powernv_probe(struct device_node *dn)
-diff --git a/drivers/crypto/nx/nx-842-pseries.c
-b/drivers/crypto/nx/nx-842-pseries.c
-index f4cbde0..5532dab 100644
---- a/drivers/crypto/nx/nx-842-pseries.c
-+++ b/drivers/crypto/nx/nx-842-pseries.c
-@@ -234,6 +234,9 @@ static int nx842_validate_result(struct device *dev,
- 		dev_dbg(dev, "%s: Out of space in output buffer\n",
- 					__func__);
- 		return -ENOSPC;
-+	case 65: /* Calculated CRC doesn't match the passed value */
-+		dev_dbg(dev, "%s: CRC mismatch for decompression\n", __func__);
-+		return -EINVAL;
- 	case 66: /* Input data contains an illegal template field */
- 	case 67: /* Template indicates data past the end of the input stream
-*/
- 		dev_dbg(dev, "%s: Bad data for decompression (code:%d)\n",
-@@ -324,7 +327,7 @@ static int nx842_pseries_compress(const unsigned
-char *in, unsigned int inlen,
- 	slout.entries = (struct nx842_slentry *)workmem->slout;
- 
- 	/* Init operation */
--	op.flags = NX842_OP_COMPRESS;
-+	op.flags = NX842_OP_COMPRESS_CRC;
- 	csbcpb = &workmem->csbcpb;
- 	memset(csbcpb, 0, sizeof(*csbcpb));
- 	op.csbcpb = nx842_get_pa(csbcpb);
-@@ -457,7 +460,7 @@ static int nx842_pseries_decompress(const unsigned
-char *in, unsigned int inlen,
- 	slout.entries = (struct nx842_slentry *)workmem->slout;
- 
- 	/* Init operation */
--	op.flags = NX842_OP_DECOMPRESS;
-+	op.flags = NX842_OP_DECOMPRESS_CRC;
- 	csbcpb = &workmem->csbcpb;
- 	memset(csbcpb, 0, sizeof(*csbcpb));
- 	op.csbcpb = nx842_get_pa(csbcpb);
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
