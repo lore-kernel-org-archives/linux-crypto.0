@@ -1,9 +1,9 @@
 From: Minchan Kim <minchan@kernel.org>
-Subject: Re: [PATCH v3 9/9] zram: use crypto decompress_noctx API
-Date: Mon, 21 Sep 2015 12:51:28 +0900
-Message-ID: <20150921035128.GD27729@bbox>
+Subject: Re: [PATCH v3 0/9] zram: introduce crypto decompress noctx API and
+ use it on zram
+Date: Mon, 21 Sep 2015 12:58:12 +0900
+Message-ID: <20150921035812.GE27729@bbox>
 References: <1442553564-3476-1-git-send-email-iamjoonsoo.kim@lge.com>
- <1442553564-3476-10-git-send-email-iamjoonsoo.kim@lge.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Andrew Morton <akpm@linux-foundation.org>,
@@ -16,30 +16,59 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Joonsoo Kim <iamjoonsoo.kim@lge.com>
 To: Joonsoo Kim <js1304@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f47.google.com ([209.85.220.47]:33643 "EHLO
-	mail-pa0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753481AbbIUDuB (ORCPT
+Received: from mail-pa0-f45.google.com ([209.85.220.45]:35743 "EHLO
+	mail-pa0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753931AbbIUD4q (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 20 Sep 2015 23:50:01 -0400
+	Sun, 20 Sep 2015 23:56:46 -0400
 Content-Disposition: inline
-In-Reply-To: <1442553564-3476-10-git-send-email-iamjoonsoo.kim@lge.com>
+In-Reply-To: <1442553564-3476-1-git-send-email-iamjoonsoo.kim@lge.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 18, 2015 at 02:19:24PM +0900, Joonsoo Kim wrote:
-> Crypto subsystem now supports decompress_noctx API that requires
-> special tfm_noctx. This tfm can be shared by multiple concurrent
-> decompress user because this API doesn't rely on this tfm object
-> except to fetch decompress function pointer.
+On Fri, Sep 18, 2015 at 02:19:15PM +0900, Joonsoo Kim wrote:
+> This patchset makes zram to use crypto API in order to support
+> more compression algorithm.
 > 
-> Until changing to use crypto API, zram doesn't require any zstrm
-> on decompress so decompress is parallelized unlimitedly. But, previous
-> patch make zram to use crypto API and this requires one zstrm on every
-> decompress users so, in some zstrm contended situations, zram's
-> performance would be degraded.
+> The reason we need to support vairous compression algorithms is that
+> zram's performance is highly depend on workload and compression algorithm
+> and architecture. Every compression algorithm has it's own strong point.
+> For example, zlib is the best for compression ratio, but, it's
+> (de)compression speed is rather slow. Against my expectation, in my kernel
+> build test with zram swap, in low-memory condition on x86, zlib shows best
+> performance than others. In this case, I guess that compression ratio is
+> the most important factor. Unlike this situation, on ARM, maybe fast
+> (de)compression speed is the most important because it's computation speed
+> is slower than x86.
+
+Fair enough. lzo and lz4 cannot cover all of workloads so surely, there are
+workloads other compressor algorithm can win. As well, we could support
+H/W compressor with crypto support so I think crypto is a way to go.
+
+One thing I have a concern is I don't want to bind some of compressor
+algorithm to zram statically. User can see what kinds of crypto compressor
+support in his system via /proc/crypto and use it dynamically.
+I hope zram supports it.
+
 > 
-> This patch makes zram use decompress_noctx API and restore zram's
-> performance as the time that zram doesn't use crypto API.
+> Anyway, there is a concern from Sergey to use crypto API in zram. Current
+> crypto API has a limitation that always require tfm object to (de)compress
+> something because some of (de)compression function requires scratch buffer
+> embedded on tfm even if some of (de)compression function doesn't
+> require it. Due to above reason, using crypto API rather than calling
+
+Nice catch from Sergey!
+
+> compression library directly causes more memory footprint and this is
+> why zram doesn't use crypto API before.
+> 
+> In this patchset, crypto compress noctx API is introduced to reduce memory
+> footprint caused by maintaining multiple tfm and zram uses it. Before
+> noctx API, zram's performace is down-graded if tfm is insufficient. But,
+> after applying noctx API, performace is restored.
+> 
+> This addresses Sergey's concern perfectly and provides possibility to use
+> various compression algorithm in zram.
 > 
 > Following is zram's read performance number.
 > 
@@ -49,78 +78,52 @@ On Fri, Sep 18, 2015 at 02:19:24PM +0900, Joonsoo Kim wrote:
 > 
 > zram-base vs zram-crypto vs zram-crypto-noctx
 > 
-> Read		10411701.88	6426911.62	9423894.38
-> Re-read		10017386.62	6428218.88	11000063.50
+> Read		10411701.88	6426911.62	9423894.38 
+> Re-read		10017386.62	6428218.88	11000063.50 
+
+Another patch and number we need to merge this patchset is zlib support
+patchset and number you had experiement.
+
 > 
-> Signed-off-by: Joonsoo Kim <iamjoonsoo.kim@lge.com>
-> ---
->  drivers/block/zram/zcomp.c | 24 +++++++++++++++++++++++-
->  drivers/block/zram/zcomp.h |  1 +
->  2 files changed, 24 insertions(+), 1 deletion(-)
+> Thanks.
 > 
-> diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-> index c2ed7c8..a020200 100644
-> --- a/drivers/block/zram/zcomp.c
-> +++ b/drivers/block/zram/zcomp.c
-> @@ -319,9 +319,12 @@ void zcomp_compress_end(struct zcomp *comp, struct zcomp_strm *zstrm)
->  	zcomp_strm_release(comp, zstrm);
->  }
->  
-> -/* Never return NULL, may sleep */
-> +/* May return NULL, may sleep */
->  struct zcomp_strm *zcomp_decompress_begin(struct zcomp *comp)
->  {
-> +	if (comp->tfm_noctx)
-> +		return NULL;
-
-Hmm,, I understand why returns NULL but it seems to be awkward to use NULL
-to express meaningful semantic and following functions relies on.
-If I have a time, I will think over.
-
-> +
->  	return zcomp_strm_find(comp);
->  }
->  
-> @@ -346,11 +349,18 @@ int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
->  {
->  	unsigned int size = PAGE_SIZE;
->  
-> +	if (!zstrm) {
-> +		return crypto_comp_decompress_noctx(comp->tfm_noctx,
-> +						src, src_len, dst, &size);
-> +	}
-> +
->  	return crypto_comp_decompress(zstrm->tfm, src, src_len,	dst, &size);
->  }
->  
->  void zcomp_destroy(struct zcomp *comp)
->  {
-> +	if (comp->tfm_noctx)
-> +		crypto_free_comp_noctx(comp->tfm_noctx);
->  	comp->destroy(comp);
->  	kfree(comp);
->  }
-> @@ -366,6 +376,7 @@ struct zcomp *zcomp_create(const char *compress, int max_strm)
->  {
->  	struct zcomp *comp;
->  	const char *backend;
-> +	struct crypto_comp *tfm;
->  
->  	backend = find_backend(compress);
->  	if (!backend)
-> @@ -384,5 +395,16 @@ struct zcomp *zcomp_create(const char *compress, int max_strm)
->  		kfree(comp);
->  		return ERR_PTR(-ENOMEM);
->  	}
-> +
-> +	/*
-> +	 * Prepare to use crypto decompress_noctx API. One tfm is required
-> +	 * to initialize crypto algorithm properly and fetch corresponding
-> +	 * function pointer. But, it is sharable for multiple concurrent
-> +	 * decompress users.
-> +	 */
-
-Please comment out that this API will return NULL if the compressor doesn't
-support noctx mode.
-
-Thanks.
+> Joonsoo Kim (7):
+>   crypto: introduce decompression API that can be called via sharable
+>     tfm object
+>   crypto/lzo: support decompress_noctx
+>   crypyo/lz4: support decompress_noctx
+>   crypto/lz4hc: support decompress_noctx
+>   crypto/842: support decompress_noctx
+>   zram: use crypto API for compression
+>   zram: use crypto decompress_noctx API
+> 
+> Sergey Senozhatsky (2):
+>   zram: make stream find and release functions static
+>   zram: pass zstrm down to decompression path
+> 
+>  crypto/842.c                   |   9 +++-
+>  crypto/compress.c              |  36 +++++++++++++++
+>  crypto/crypto_null.c           |   3 +-
+>  crypto/deflate.c               |   3 +-
+>  crypto/lz4.c                   |   9 +++-
+>  crypto/lz4hc.c                 |   9 +++-
+>  crypto/lzo.c                   |   9 +++-
+>  drivers/block/zram/Kconfig     |   8 ++--
+>  drivers/block/zram/Makefile    |   4 +-
+>  drivers/block/zram/zcomp.c     | 102 +++++++++++++++++++++++++++++++----------
+>  drivers/block/zram/zcomp.h     |  42 +++++++----------
+>  drivers/block/zram/zcomp_lz4.c |  47 -------------------
+>  drivers/block/zram/zcomp_lz4.h |  17 -------
+>  drivers/block/zram/zcomp_lzo.c |  47 -------------------
+>  drivers/block/zram/zcomp_lzo.h |  17 -------
+>  drivers/block/zram/zram_drv.c  |  32 +++++++++----
+>  include/linux/crypto.h         |  20 ++++++++
+>  17 files changed, 211 insertions(+), 203 deletions(-)
+>  delete mode 100644 drivers/block/zram/zcomp_lz4.c
+>  delete mode 100644 drivers/block/zram/zcomp_lz4.h
+>  delete mode 100644 drivers/block/zram/zcomp_lzo.c
+>  delete mode 100644 drivers/block/zram/zcomp_lzo.h
+> 
+> -- 
+> 1.9.1
+> 
