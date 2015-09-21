@@ -1,143 +1,493 @@
-From: Andrzej Hajda <a.hajda@samsung.com>
-Subject: [PATCH 00/38] Fixes related to incorrect usage of
-	unsigned types
-Date: Mon, 21 Sep 2015 15:33:32 +0200
-Message-ID: <1442842450-29769-1-git-send-email-a.hajda@samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-mips@linux-mips.org, linux-sh@vger.kernel.org,
- Will Deacon <will.deacon@arm.com>, dri-devel@lists.freedesktop.org,
- linux-clk@vger.kernel.org, Marek Szyprowski <m.szyprowski@samsung.com>,
- Jianwei Wang <jianwei.wang.chn@gmail.com>, Pravin Shelar <pshelar@nicira.com>,
- linux-cachefs@redhat.com, Alan Stern <stern@rowland.harvard.edu>,
- Jiri Slaby <jslaby@suse.com>, Arend van Spriel <arend@broadcom.com>,
- Oleg Drokin <oleg.drokin@intel.com>, Matt Mackall <mpm@selenic.com>,
- Thomas Gleixner <tglx@linutronix.de>, linux-omap@vger.kernel.org,
- Karsten Keil <isdn@linux-pingi.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
- linux-wireless@vger.kernel.org, Ralf Baechle <ralf@linux-mips.org>,
- linux-crypto@vger.kernel.org, Alex Deucher <alexander.deucher@amd.com>,
- Andrew Morton <akpm@linux-foundation.org>, Ivan Mikhaylov <ivan@ru.ibm.com>,
- Mark Rutland
-To: linux-kernel@vger.kernel.org
-Return-path: <intel-gfx-bounces@lists.freedesktop.org>
-List-Unsubscribe: <http://lists.freedesktop.org/mailman/options/intel-gfx>,
- <mailto:intel-gfx-request@lists.freedesktop.org?subject=unsubscribe>
-List-Archive: <http://lists.freedesktop.org/archives/intel-gfx>
-List-Post: <mailto:intel-gfx@lists.freedesktop.org>
-List-Help: <mailto:intel-gfx-request@lists.freedesktop.org?subject=help>
-List-Subscribe: <http://lists.freedesktop.org/mailman/listinfo/intel-gfx>,
- <mailto:intel-gfx-request@lists.freedesktop.org?subject=subscribe>
-Errors-To: intel-gfx-bounces@lists.freedesktop.org
-Sender: "Intel-gfx" <intel-gfx-bounces@lists.freedesktop.org>
+From: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+Subject: [RFC][PATCH 8/9] zram: use crypto API for compression
+Date: Mon, 21 Sep 2015 22:40:29 +0900
+Message-ID: <1442842829-15087-1-git-send-email-sergey.senozhatsky@gmail.com>
+References: <1442841229-8122-1-git-send-email-sergey.senozhatsky@gmail.com>
+Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Minchan Kim <minchan@kernel.org>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>
+To: Joonsoo Kim <js1304@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1442841229-8122-1-git-send-email-sergey.senozhatsky@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-SGksCgpUaGlzIGlzIHNldCBvZiBpbmRlcGVuZGVudCBwYXRjaGVzLiBUaGUgb25seSBjb25uZWN0
-aW9uIGJldHdlZW4KdGhlbSBpcyB0aGF0IHRoZXkgdHJ5IHRvIGFkZHJlc3MgcHJvYmxlbXMgc3Bv
-dHRlZCBieSBwcm9wb3NlZApjb2NjaW5lbGxlIHNlbWFudGljIHBhdGNoIHVuc2lnbmVkX2xlc3Nl
-cl90aGFuX3plcm8uY29jY2lbMV0uCgpTZW1hbnRpYyBwYXRjaCBmaW5kcyBjb21wYXJpc29ucyBv
-ZiB0eXBlczoKICAgIHVuc2lnbmVkIDwgMAogICAgdW5zaWduZWQgPj0gMApUaGUgZm9ybWVyIGlz
-IGFsd2F5cyBmYWxzZSwgdGhlIGxhdHRlciBpcyBhbHdheXMgdHJ1ZS4KU3VjaCBjb21wYXJpc29u
-cyBhcmUgdXNlbGVzcywgc28gdGhlb3JldGljYWxseSB0aGV5IGNvdWxkIGJlCnNhZmVseSByZW1v
-dmVkLCBidXQgdGhlaXIgcHJlc2VuY2UgcXVpdGUgb2Z0ZW4gaW5kaWNhdGVzIGJ1Z3MuCgpUaGlz
-IHBhdGNoc2V0IGNvbnRhaW5zIG1haW5seSByZWFsIGJ1ZyBmaXhlcyhwYXRjaGVzIDAxLTI1KSwK
-dXN1YWxseSB0eXBlIGZpeGVzLgoKUGF0Y2hlcyAyNi0zNyByZW1vdmVzIHVubmVjZXNzYXJ5IGNo
-ZWNrcy4gU2VtYW50aWMgcGF0Y2ggZm91bmQKbXVjaCBtb3JlIHN1Y2ggcGxhY2VzIChtb3JlIHRo
-YW4gODApLCBidXQgc2luY2UgZXZlcnkgY2FzZSBuZWVkcwpzb21lIGFuYWx5c2lzIEkgaGF2ZSBk
-ZWNpZGVkIHRvIGxlYXZlIHRoZW0gZm9yIGFudG9oZXIgcGF0Y2hzZXQuCgpUaGUgbGFzdCBwYXRj
-aCBzaG91bGQgYmUgcHJvYmFibHkgcmVwbGFjZWQgd2l0aCBzb21ldGhpbmcgYmV0dGVyLApJIGd1
-ZXNzIGl0IHNob3VsZCBiZSB0cmVhdGVkIHJhdGhlciBhcyBidWcgcmVwb3J0LgoKVGhlIHBhdGNo
-ZXMgYXJlIGJhc2VkIG9uIGxpbnV4LW5leHQgKDIwMTUwOTE4KS4KClBhdGNoZXMgd2VyZSBvbmx5
-IGNvbXBpbGUgdGVzdGVkLCBzbyBwbGVhc2UgbG9vayBhdCB0aGVtIGNhcmVmdWxseS4KCkkgaGF2
-ZSBzZW50IGFsbCBwYXRjaGVzIHRvIGxpbnV4LWtlcm5lbCBtYWlsaW5nIGxpc3QuIEluZGl2aWR1
-YWwKcGF0Y2hlcyArIGNvdmVyIGxldHRlciB3ZW50IGFsc28gdG8gYXByb3ByaWF0ZSBhZGRyZXNz
-ZXMsCmFjY29yZGluZyB0byBnZXRfbWFpbnRhaW5lcnMucGwgc2NyaXB0LgoKT25lIG1vcmUgdGhp
-bmcuIFRvIGZ1bGxmaWxsIGRpZmZlcmVudCBtYWludGFuZXIvc3Vic3lzdGVtIHJlcXVpcmVtZW50
-cwpJIGhhdmUgZGVjaWRlZCB0byBwcmVmaXggcGF0Y2ggc3ViamVjdHMgd2l0aCBwcmVmaXhlcyBw
-cmVzZW50IGluCmxhc3QgMTAgY29tbWl0cyBmb3IgYWZmZWN0ZWQgZmlsZXMuIEkgYW0gbm90IHN1
-cmUgaWYgdGhpcyBpcyB0aGUKYmVzdCBzb2x1dGlvbiwgaWYgdGhlcmUgYXJlIGFueSBiZXR0ZXIg
-c29sdXRpb25zIHBsZWFzZSBsZXQgbWUga25vdyA6KQoKWzFdOiBodHRwOi8vcGVybWFsaW5rLmdt
-YW5lLm9yZy9nbWFuZS5saW51eC5rZXJuZWwvMjAzODU3NgoKUmVnYXJkcwpBbmRyemVqCgoKQW5k
-cnplaiBIYWpkYSAoMzgpOgogIGFybS1jY2k6IGZpeCBoYW5kbGluZyBjcHVtYXNrX2FueV9idXQg
-cmV0dXJuIHZhbHVlCiAgYnVzOiBhcm0tY2NuOiBmaXggaGFuZGxpbmcgY3B1bWFza19hbnlfYnV0
-IHJldHVybiB2YWx1ZQogIGRybS9pOTE1OiBmaXggaGFuZGxpbmcgZ2VuOF9lbWl0X2ZsdXNoX2Nv
-aGVyZW50bDNfd2EgcmVzdWx0CiAgSUIvZWhjYTogZml4IGhhbmRsaW5nIGlkcl9hbGxvYyByZXN1
-bHQKICBzdGFnaW5nOiBsdXN0cmU6IGZpeCBoYW5kbGluZyBsdXN0cmVfcG9zaXhfYWNsX3hhdHRy
-X2ZpbHRlciByZXN1bHQKICB0dHk6IHNlcmlhbDogbHBjMzJ4eF9oczogZml4IGhhbmRsaW5nIHBs
-YXRmb3JtX2dldF9pcnEgcmVzdWx0CiAgdXNiOiBob3N0OiBlaGNpLW1zbTogZml4IGhhbmRsaW5n
-IHBsYXRmb3JtX2dldF9pcnEgcmVzdWx0CiAgb3BlbnZzd2l0Y2g6IGZpeCBoYW5kbGluZyByZXN1
-bHQgb2YgaXB2Nl9za2lwX2V4dGhkcgogIHNlbGZ0ZXN0cy90aW1lcnM6IGZpeCB3cml0ZSByZXR1
-cm4gdmFsdWUgaGFuZGxuZwogIGh3cm5nOiBmaXggaGFuZGxpbmcgcGxhdGZvcm1fZ2V0X2lycQog
-IEhTSTogb21hcF9zc2k6IGZpeCBoYW5kbGluZyBpZGFfc2ltcGxlX2dldCByZXN1bHQKICBIU0k6
-IG9tYXBfc3NpX3BvcnQ6IGZpeCBoYW5kbGluZyBvZl9nZXRfbmFtZWRfZ3BpbyByZXN1bHQKICBB
-Uk06IHNobW9iaWxlOiBhcG11OiBjb3JyZWN0IHR5cGUgb2YgQ1BVIGlkCiAgY2xrOiB2dDg1MDA6
-IGZpeCBzaWduIG9mIHBvc3NpYmxlIFBMTCB2YWx1ZXMKICBkcm0vbGF5ZXJzY2FwZTogZml4IGhh
-bmRsaW5nIGZzbF9kY3VfZHJtX3BsYW5lX2luZGV4IHJlc3VsdAogIGdwdTogaXB1LXYzOiBmaXgg
-ZGl2X3JhdGlvIHR5cGUKICBpc2RuOiBoaXNheDogZml4IGZyYW1lIGNhbGN1bGF0aW9uCiAgbmV0
-L2libS9lbWFjOiBmaXggdHlwZSBvZiBwaHlfbW9kZQogIG5ldDogc3RtbWFjOiBmaXggdHlwZSBv
-ZiBlbnRyeSB2YXJpYWJsZQogIG5ldDogYnJjbTgwMjExOiBmaXggcmFuZ2UgY2hlY2sKICBtd2lm
-aWV4OiBmaXggY29tcGFyaXNvbiBleHByZXNzaW9uCiAgb3Jpbm9jbzogZml4IGNoZWNraW5nIGZv
-ciBkZWZhdWx0IHZhbHVlCiAgcm5kaXNfd2xhbjogZml4IGNoZWNraW5nIGZvciBkZWZhdWx0IHZh
-bHVlCiAgcnRjOiBvcGFsOiBmaXggdHlwZSBvZiB0b2tlbgogIHN0YWdpbmc6IG1lZGlhOiBkYXZp
-bmNpX3ZwZmU6IGZpeCBpcGlwZV9tb2RlIHR5cGUKICBzdGFnaW5nOiBsdXN0cmU6IHJlbW92ZSBp
-bnZhbGlkIGNoZWNrCiAgdXNibmV0OiByZW1vdmUgaW52YWxpZCBjaGVjawogIHZpZGVvL29tYXA6
-IHJlbW92ZSBpbnZhbGlkIGNoZWNrCiAgSW5wdXQ6IHRvdWNoc2NyZWVuOiBhdG1lbDogcmVtb3Zl
-IGludmFsaWQgY2hlY2sKICBsZWRzOiBmbGFzaDogcmVtb3ZlIGludmFsaWQgY2hlY2sKICBsZWRz
-OiB0Y2E2NTA3OiByZW1vdmUgaW52YWxpZCBjaGVjawogIGZzL2NhY2hlZmlsZXM6IHJlbW92ZSBp
-bnZhbGlkIGNoZWNrcwogIG1tL21lbWJsb2NrLmM6IHJlbW92ZSBpbnZhbGlkIGNoZWNrCiAgcGVy
-ZjogcmVtb3ZlIGludmFsaWQgY2hlY2sKICBwdHJhY2U6IHJlbW92ZSBpbnZhbGlkIGNoZWNrCiAg
-TUlQUzogcmVtb3ZlIGludmFsaWQgY2hlY2sKICB6bGliX2RlZmxhdGUvZGVmdHJlZTogY2hhbmdl
-IGFsd2F5cyB0cnVlIGNvbmRpdGlvbiB0byAxCiAgZHJtL3JhZGVvbjogc2ltcGxpZnkgYm9vdCBs
-ZXZlbCBjYWxjdWxhdGlvbgoKIGFyY2gvYXJtL21hY2gtc2htb2JpbGUvcGxhdHNtcC1hcG11LmMg
-ICAgICAgICAgICAgICB8ICAyICstCiBhcmNoL21pcHMvbW0vc2MtbWlwcy5jICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgfCAgNCArKy0tCiBhcmNoL3NoL2tlcm5lbC9wdHJhY2VfMzIuYyAg
-ICAgICAgICAgICAgICAgICAgICAgICAgfCAgMyArLS0KIGFyY2gvc2gva2VybmVsL3B0cmFjZV82
-NC5jICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA0ICsrLS0KIGRyaXZlcnMvYnVzL2FybS1j
-Y2kuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCiBkcml2ZXJzL2J1cy9h
-cm0tY2NuLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMiArLQogZHJpdmVycy9j
-aGFyL2h3X3JhbmRvbS94Z2VuZS1ybmcuYyAgICAgICAgICAgICAgICAgIHwgIDcgKysrKy0tLQog
-ZHJpdmVycy9jbGsvY2xrLXZ0ODUwMC5jICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDYg
-KysrLS0tCiBkcml2ZXJzL2dwdS9kcm0vYW1kL2FtZGdwdS9rdl9kcG0uYyAgICAgICAgICAgICAg
-ICAgfCAxMSArLS0tLS0tLS0tLQogZHJpdmVycy9ncHUvZHJtL2ZzbC1kY3UvZnNsX2RjdV9kcm1f
-cGxhbmUuYyAgICAgICAgIHwgIDMgKystCiBkcml2ZXJzL2dwdS9kcm0vaTkxNS9pbnRlbF9scmMu
-YyAgICAgICAgICAgICAgICAgICAgfCAgNyArKysrLS0tCiBkcml2ZXJzL2dwdS9kcm0vcmFkZW9u
-L2t2X2RwbS5jICAgICAgICAgICAgICAgICAgICAgfCAxMSArLS0tLS0tLS0tLQogZHJpdmVycy9n
-cHUvaXB1LXYzL2lwdS1jc2kuYyAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KIGRyaXZl
-cnMvaHNpL2NvbnRyb2xsZXJzL29tYXBfc3NpLmMgICAgICAgICAgICAgICAgICB8ICA3ICsrKy0t
-LS0KIGRyaXZlcnMvaHNpL2NvbnRyb2xsZXJzL29tYXBfc3NpX3BvcnQuYyAgICAgICAgICAgICB8
-ICA4ICsrKystLS0tCiBkcml2ZXJzL2lucHV0L3RvdWNoc2NyZWVuL2F0bWVsX214dF90cy5jICAg
-ICAgICAgICAgfCAgMiArLQogZHJpdmVycy9pc2RuL2hpc2F4L2hmYzRzOHNfbDEuYyAgICAgICAg
-ICAgICAgICAgICAgIHwgMTAgKysrKystLS0tLQogZHJpdmVycy9sZWRzL2xlZC1jbGFzcy1mbGFz
-aC5jICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KIGRyaXZlcnMvbGVkcy9sZWRzLXRjYTY1
-MDcuYyAgICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCiBkcml2ZXJzL25ldC9ldGhlcm5l
-dC9pYm0vZW1hYy9jb3JlLmggICAgICAgICAgICAgICAgfCAgMiArLQogZHJpdmVycy9uZXQvZXRo
-ZXJuZXQvc3RtaWNyby9zdG1tYWMvc3RtbWFjX21haW4uYyAgIHwgIDIgKy0KIGRyaXZlcnMvbmV0
-L3VzYi9sYW43OHh4LmMgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA1IC0tLS0tCiBkcml2
-ZXJzL25ldC91c2Ivc21zYzc1eHguYyAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNSAtLS0t
-LQogZHJpdmVycy9uZXQvdXNiL3Ntc2M5NXh4LmMgICAgICAgICAgICAgICAgICAgICAgICAgIHwg
-IDUgLS0tLS0KIGRyaXZlcnMvbmV0L3dpcmVsZXNzL2JyY204MDIxMS9icmNtc21hYy9tYWluLmMg
-ICAgICB8ICAyICstCiBkcml2ZXJzL25ldC93aXJlbGVzcy9td2lmaWV4LzExbl9yeHJlb3JkZXIu
-YyAgICAgICAgfCAgNCArKy0tCiBkcml2ZXJzL25ldC93aXJlbGVzcy9vcmlub2NvL2NmZy5jICAg
-ICAgICAgICAgICAgICAgfCAgNiArKystLS0KIGRyaXZlcnMvbmV0L3dpcmVsZXNzL3JuZGlzX3ds
-YW4uYyAgICAgICAgICAgICAgICAgICB8ICAyICstCiBkcml2ZXJzL3J0Yy9ydGMtb3BhbC5jICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNCArKy0tCiBkcml2ZXJzL3N0YWdpbmcvbHVz
-dHJlL2x1c3RyZS9sbGl0ZS94YXR0ci5jICAgICAgICAgfCAgNyArKysrLS0tCiBkcml2ZXJzL3N0
-YWdpbmcvbHVzdHJlL2x1c3RyZS9vc2MvbHByb2Nfb3NjLmMgICAgICAgfCAgMyAtLS0KIGRyaXZl
-cnMvc3RhZ2luZy9tZWRpYS9kYXZpbmNpX3ZwZmUvZG0zNjVfaXBpcGVfaHcuYyB8ICAyICstCiBk
-cml2ZXJzL3N0YWdpbmcvcmRtYS9laGNhL2VoY2FfY3EuYyAgICAgICAgICAgICAgICAgfCAxMyAr
-KysrKysrLS0tLS0tCiBkcml2ZXJzL3R0eS9zZXJpYWwvbHBjMzJ4eF9ocy5jICAgICAgICAgICAg
-ICAgICAgICAgfCAgNyArKysrLS0tCiBkcml2ZXJzL3VzYi9ob3N0L2VoY2ktbXNtLmMgICAgICAg
-ICAgICAgICAgICAgICAgICAgfCAgNiArKystLS0KIGRyaXZlcnMvdmlkZW8vZmJkZXYvb21hcC9v
-bWFwZmJfbWFpbi5jICAgICAgICAgICAgICB8ICA1IC0tLS0tCiBmcy9jYWNoZWZpbGVzL2JpbmQu
-YyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgOSArKystLS0tLS0KIGZzL2NhY2hl
-ZmlsZXMvZGFlbW9uLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA2ICsrKy0tLQog
-bGliL3psaWJfZGVmbGF0ZS9kZWZ0cmVlLmMgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIg
-Ky0KIG1tL21lbWJsb2NrLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8
-ICAyICstCiBuZXQvb3BlbnZzd2l0Y2gvY29ubnRyYWNrLmMgICAgICAgICAgICAgICAgICAgICAg
-ICAgfCAgMiArLQogdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvdGltZXJzL2Nsb2Nrc291cmNlLXN3
-aXRjaC5jIHwgIDIgKy0KIDQyIGZpbGVzIGNoYW5nZWQsIDc5IGluc2VydGlvbnMoKyksIDExOSBk
-ZWxldGlvbnMoLSkKCi0tIAoxLjkuMQoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18KSW50ZWwtZ2Z4IG1haWxpbmcgbGlzdApJbnRlbC1nZnhAbGlzdHMuZnJl
-ZWRlc2t0b3Aub3JnCmh0dHA6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1hbi9saXN0aW5m
-by9pbnRlbC1nZngK
+Until now, zram uses compression algorithm through direct call
+to core algorithm function, but, it has drawback that we need to add
+compression algorithm manually to zram if needed. Without this work,
+we cannot utilize various compression algorithms in the system.
+Moreover, to add new compression algorithm, we need to know how to use it
+and this is somewhat time-consuming.
+
+When I tested new algorithms such as zlib, these problems make me hard
+to test them. To prevent these problem in the future, I think that
+using crypto API for compression is better approach and this patch
+implements it.
+
+The reason we need to support vairous compression algorithms is that
+zram's performance is highly depend on workload and compression algorithm
+and architecture. Every compression algorithm has it's own strong point.
+For example, zlib is the best for compression ratio, but, it's
+(de)compression speed is rather slow. Against my expectation, in my kernel
+build test with zram swap, in low-memory condition on x86, zlib shows best
+performance than others. In this case, I guess that compression ratio is
+the most important factor. Unlike this situation, on ARM, maybe fast
+(de)compression speed is the most important because it's computation speed
+is slower than x86.
+
+We can't expect what algorithm is the best fit for one's system, because
+it needs too complex calculation. We need to test it in case by case and
+easy to use new compression algorithm by this patch will help
+that situation.
+
+There is one problem that crypto API requires tfm object to (de)compress
+something and zram abstract it on zstrm which is very limited resource.
+If number of zstrm is set to low and is contended, zram's performace could
+be down-graded due to this change. But, following patch support to use
+crypto decompress_noctx API and would restore the performance as is.
+
+Signed-off-by: Joonsoo Kim <iamjoonsoo.kim@lge.com>
+---
+ drivers/block/zram/Kconfig     |  8 +++----
+ drivers/block/zram/Makefile    |  4 +---
+ drivers/block/zram/zcomp.c     | 54 +++++++++++++++++++++++-------------------
+ drivers/block/zram/zcomp.h     | 30 ++++++-----------------
+ drivers/block/zram/zcomp_lz4.c | 47 ------------------------------------
+ drivers/block/zram/zcomp_lz4.h | 17 -------------
+ drivers/block/zram/zcomp_lzo.c | 47 ------------------------------------
+ drivers/block/zram/zcomp_lzo.h | 17 -------------
+ drivers/block/zram/zram_drv.c  |  6 ++---
+ 9 files changed, 44 insertions(+), 186 deletions(-)
+ delete mode 100644 drivers/block/zram/zcomp_lz4.c
+ delete mode 100644 drivers/block/zram/zcomp_lz4.h
+ delete mode 100644 drivers/block/zram/zcomp_lzo.c
+ delete mode 100644 drivers/block/zram/zcomp_lzo.h
+
+diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
+index 386ba3d..7619bed 100644
+--- a/drivers/block/zram/Kconfig
++++ b/drivers/block/zram/Kconfig
+@@ -1,8 +1,7 @@
+ config ZRAM
+ 	tristate "Compressed RAM block device support"
+ 	depends on BLOCK && SYSFS && ZSMALLOC
+-	select LZO_COMPRESS
+-	select LZO_DECOMPRESS
++	select CRYPTO_LZO
+ 	default n
+ 	help
+ 	  Creates virtual block devices called /dev/zramX (X = 0, 1, ...).
+@@ -18,9 +17,8 @@ config ZRAM
+ config ZRAM_LZ4_COMPRESS
+ 	bool "Enable LZ4 algorithm support"
+ 	depends on ZRAM
+-	select LZ4_COMPRESS
+-	select LZ4_DECOMPRESS
++	select CRYPTO_LZ4
+ 	default n
+ 	help
+ 	  This option enables LZ4 compression algorithm support. Compression
+-	  algorithm can be changed using `comp_algorithm' device attribute.
+\ No newline at end of file
++	  algorithm can be changed using `comp_algorithm' device attribute.
+diff --git a/drivers/block/zram/Makefile b/drivers/block/zram/Makefile
+index be0763f..9e2b79e 100644
+--- a/drivers/block/zram/Makefile
++++ b/drivers/block/zram/Makefile
+@@ -1,5 +1,3 @@
+-zram-y	:=	zcomp_lzo.o zcomp.o zram_drv.o
+-
+-zram-$(CONFIG_ZRAM_LZ4_COMPRESS) += zcomp_lz4.o
++zram-y	:=	zcomp.o zram_drv.o
+ 
+ obj-$(CONFIG_ZRAM)	+=	zram.o
+diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
+index e3016da..6219d4d 100644
+--- a/drivers/block/zram/zcomp.c
++++ b/drivers/block/zram/zcomp.c
+@@ -15,10 +15,6 @@
+ #include <linux/sched.h>
+ 
+ #include "zcomp.h"
+-#include "zcomp_lzo.h"
+-#ifdef CONFIG_ZRAM_LZ4_COMPRESS
+-#include "zcomp_lz4.h"
+-#endif
+ 
+ /*
+  * single zcomp_strm backend
+@@ -43,19 +39,20 @@ struct zcomp_strm_multi {
+ 	wait_queue_head_t strm_wait;
+ };
+ 
+-static struct zcomp_backend *backends[] = {
+-	&zcomp_lzo,
++static const char * const backends[] = {
++	"lzo",
+ #ifdef CONFIG_ZRAM_LZ4_COMPRESS
+-	&zcomp_lz4,
++	"lz4",
+ #endif
+ 	NULL
+ };
+ 
+-static struct zcomp_backend *find_backend(const char *compress)
++static const char *find_backend(const char *compress)
+ {
+ 	int i = 0;
+ 	while (backends[i]) {
+-		if (sysfs_streq(compress, backends[i]->name))
++		if (sysfs_streq(compress, backends[i]) &&
++			crypto_has_comp(compress, 0, 0))
+ 			break;
+ 		i++;
+ 	}
+@@ -64,8 +61,8 @@ static struct zcomp_backend *find_backend(const char *compress)
+ 
+ static void zcomp_strm_free(struct zcomp *comp, struct zcomp_strm *zstrm)
+ {
+-	if (zstrm->private)
+-		comp->backend->destroy(zstrm->private);
++	if (zstrm->tfm)
++		crypto_free_comp(zstrm->tfm);
+ 	free_pages((unsigned long)zstrm->buffer, 1);
+ 	kfree(zstrm);
+ }
+@@ -80,13 +77,18 @@ static struct zcomp_strm *zcomp_strm_alloc(struct zcomp *comp)
+ 	if (!zstrm)
+ 		return NULL;
+ 
+-	zstrm->private = comp->backend->create();
++	zstrm->tfm = crypto_alloc_comp(comp->backend, 0, 0);
++	if (IS_ERR(zstrm->tfm)) {
++		kfree(zstrm);
++		return NULL;
++	}
++
+ 	/*
+ 	 * allocate 2 pages. 1 for compressed data, plus 1 extra for the
+ 	 * case when compressed size is larger than the original one
+ 	 */
+ 	zstrm->buffer = (void *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, 1);
+-	if (!zstrm->private || !zstrm->buffer) {
++	if (!zstrm->buffer) {
+ 		zcomp_strm_free(comp, zstrm);
+ 		zstrm = NULL;
+ 	}
+@@ -274,12 +276,12 @@ ssize_t zcomp_available_show(const char *comp, char *buf)
+ 	int i = 0;
+ 
+ 	while (backends[i]) {
+-		if (!strcmp(comp, backends[i]->name))
++		if (!strcmp(comp, backends[i]))
+ 			sz += scnprintf(buf + sz, PAGE_SIZE - sz - 2,
+-					"[%s] ", backends[i]->name);
++					"[%s] ", backends[i]);
+ 		else
+ 			sz += scnprintf(buf + sz, PAGE_SIZE - sz - 2,
+-					"%s ", backends[i]->name);
++					"%s ", backends[i]);
+ 		i++;
+ 	}
+ 	sz += scnprintf(buf + sz, PAGE_SIZE - sz, "\n");
+@@ -317,10 +319,10 @@ void zcomp_compress_end(struct zcomp *comp, struct zcomp_strm *zstrm)
+ 	zcomp_strm_release(comp, zstrm);
+ }
+ 
+-/* May return NULL, may sleep */
++/* Never return NULL, may sleep */
+ struct zcomp_strm *zcomp_decompress_begin(struct zcomp *comp)
+ {
+-	return NULL;
++	return zcomp_strm_find(comp);
+ }
+ 
+ void zcomp_decompress_end(struct zcomp *comp, struct zcomp_strm *zstrm)
+@@ -330,17 +332,21 @@ void zcomp_decompress_end(struct zcomp *comp, struct zcomp_strm *zstrm)
+ }
+ 
+ int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
+-		const unsigned char *src, size_t *dst_len)
++		const unsigned char *src, unsigned int *dst_len)
+ {
+-	return comp->backend->compress(src, zstrm->buffer, dst_len,
+-			zstrm->private);
++	*dst_len = PAGE_SIZE << 1;
++
++	return crypto_comp_compress(zstrm->tfm, src, PAGE_SIZE,
++					zstrm->buffer, dst_len);
+ }
+ 
+ int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
+ 		const unsigned char *src,
+-		size_t src_len, unsigned char *dst)
++		unsigned int src_len, unsigned char *dst)
+ {
+-	return comp->backend->decompress(src, src_len, dst);
++	unsigned int size = PAGE_SIZE;
++
++	return crypto_comp_decompress(zstrm->tfm, src, src_len,	dst, &size);
+ }
+ 
+ void zcomp_destroy(struct zcomp *comp)
+@@ -360,7 +366,7 @@ void zcomp_destroy(struct zcomp *comp)
+ struct zcomp *zcomp_create(const char *compress, int max_strm)
+ {
+ 	struct zcomp *comp;
+-	struct zcomp_backend *backend;
++	const char *backend;
+ 	int error;
+ 
+ 	backend = find_backend(compress);
+diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
+index 4c09c01..4f9df8e 100644
+--- a/drivers/block/zram/zcomp.h
++++ b/drivers/block/zram/zcomp.h
+@@ -11,38 +11,22 @@
+ #define _ZCOMP_H_
+ 
+ #include <linux/mutex.h>
++#include <linux/crypto.h>
+ 
+ struct zcomp_strm {
++	struct crypto_comp *tfm;
++
+ 	/* compression/decompression buffer */
+ 	void *buffer;
+-	/*
+-	 * The private data of the compression stream, only compression
+-	 * stream backend can touch this (e.g. compression algorithm
+-	 * working memory)
+-	 */
+-	void *private;
++
+ 	/* used in multi stream backend, protected by backend strm_lock */
+ 	struct list_head list;
+ };
+ 
+-/* static compression backend */
+-struct zcomp_backend {
+-	int (*compress)(const unsigned char *src, unsigned char *dst,
+-			size_t *dst_len, void *private);
+-
+-	int (*decompress)(const unsigned char *src, size_t src_len,
+-			unsigned char *dst);
+-
+-	void *(*create)(void);
+-	void (*destroy)(void *private);
+-
+-	const char *name;
+-};
+-
+ /* dynamic per-device compression frontend */
+ struct zcomp {
+ 	void *stream;
+-	struct zcomp_backend *backend;
++	const char *backend;
+ 
+ 	struct zcomp_strm *(*strm_find)(struct zcomp *comp);
+ 	void (*strm_release)(struct zcomp *comp, struct zcomp_strm *zstrm);
+@@ -61,14 +45,14 @@ struct zcomp_strm *zcomp_compress_begin(struct zcomp *comp);
+ void zcomp_compress_end(struct zcomp *comp, struct zcomp_strm *zstrm);
+ 
+ int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
+-		const unsigned char *src, size_t *dst_len);
++		const unsigned char *src, unsigned int *dst_len);
+ 
+ struct zcomp_strm *zcomp_decompress_begin(struct zcomp *comp);
+ void zcomp_decompress_end(struct zcomp *comp, struct zcomp_strm *zstrm);
+ 
+ int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
+ 		const unsigned char *src,
+-		size_t src_len, unsigned char *dst);
++		unsigned int src_len, unsigned char *dst);
+ 
+ bool zcomp_set_max_streams(struct zcomp *comp, int num_strm);
+ #endif /* _ZCOMP_H_ */
+diff --git a/drivers/block/zram/zcomp_lz4.c b/drivers/block/zram/zcomp_lz4.c
+deleted file mode 100644
+index f2afb7e..0000000
+--- a/drivers/block/zram/zcomp_lz4.c
++++ /dev/null
+@@ -1,47 +0,0 @@
+-/*
+- * Copyright (C) 2014 Sergey Senozhatsky.
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License
+- * as published by the Free Software Foundation; either version
+- * 2 of the License, or (at your option) any later version.
+- */
+-
+-#include <linux/kernel.h>
+-#include <linux/slab.h>
+-#include <linux/lz4.h>
+-
+-#include "zcomp_lz4.h"
+-
+-static void *zcomp_lz4_create(void)
+-{
+-	return kzalloc(LZ4_MEM_COMPRESS, GFP_KERNEL);
+-}
+-
+-static void zcomp_lz4_destroy(void *private)
+-{
+-	kfree(private);
+-}
+-
+-static int zcomp_lz4_compress(const unsigned char *src, unsigned char *dst,
+-		size_t *dst_len, void *private)
+-{
+-	/* return  : Success if return 0 */
+-	return lz4_compress(src, PAGE_SIZE, dst, dst_len, private);
+-}
+-
+-static int zcomp_lz4_decompress(const unsigned char *src, size_t src_len,
+-		unsigned char *dst)
+-{
+-	size_t dst_len = PAGE_SIZE;
+-	/* return  : Success if return 0 */
+-	return lz4_decompress_unknownoutputsize(src, src_len, dst, &dst_len);
+-}
+-
+-struct zcomp_backend zcomp_lz4 = {
+-	.compress = zcomp_lz4_compress,
+-	.decompress = zcomp_lz4_decompress,
+-	.create = zcomp_lz4_create,
+-	.destroy = zcomp_lz4_destroy,
+-	.name = "lz4",
+-};
+diff --git a/drivers/block/zram/zcomp_lz4.h b/drivers/block/zram/zcomp_lz4.h
+deleted file mode 100644
+index 60613fb..0000000
+--- a/drivers/block/zram/zcomp_lz4.h
++++ /dev/null
+@@ -1,17 +0,0 @@
+-/*
+- * Copyright (C) 2014 Sergey Senozhatsky.
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License
+- * as published by the Free Software Foundation; either version
+- * 2 of the License, or (at your option) any later version.
+- */
+-
+-#ifndef _ZCOMP_LZ4_H_
+-#define _ZCOMP_LZ4_H_
+-
+-#include "zcomp.h"
+-
+-extern struct zcomp_backend zcomp_lz4;
+-
+-#endif /* _ZCOMP_LZ4_H_ */
+diff --git a/drivers/block/zram/zcomp_lzo.c b/drivers/block/zram/zcomp_lzo.c
+deleted file mode 100644
+index da1bc47..0000000
+--- a/drivers/block/zram/zcomp_lzo.c
++++ /dev/null
+@@ -1,47 +0,0 @@
+-/*
+- * Copyright (C) 2014 Sergey Senozhatsky.
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License
+- * as published by the Free Software Foundation; either version
+- * 2 of the License, or (at your option) any later version.
+- */
+-
+-#include <linux/kernel.h>
+-#include <linux/slab.h>
+-#include <linux/lzo.h>
+-
+-#include "zcomp_lzo.h"
+-
+-static void *lzo_create(void)
+-{
+-	return kzalloc(LZO1X_MEM_COMPRESS, GFP_KERNEL);
+-}
+-
+-static void lzo_destroy(void *private)
+-{
+-	kfree(private);
+-}
+-
+-static int lzo_compress(const unsigned char *src, unsigned char *dst,
+-		size_t *dst_len, void *private)
+-{
+-	int ret = lzo1x_1_compress(src, PAGE_SIZE, dst, dst_len, private);
+-	return ret == LZO_E_OK ? 0 : ret;
+-}
+-
+-static int lzo_decompress(const unsigned char *src, size_t src_len,
+-		unsigned char *dst)
+-{
+-	size_t dst_len = PAGE_SIZE;
+-	int ret = lzo1x_decompress_safe(src, src_len, dst, &dst_len);
+-	return ret == LZO_E_OK ? 0 : ret;
+-}
+-
+-struct zcomp_backend zcomp_lzo = {
+-	.compress = lzo_compress,
+-	.decompress = lzo_decompress,
+-	.create = lzo_create,
+-	.destroy = lzo_destroy,
+-	.name = "lzo",
+-};
+diff --git a/drivers/block/zram/zcomp_lzo.h b/drivers/block/zram/zcomp_lzo.h
+deleted file mode 100644
+index 128c580..0000000
+--- a/drivers/block/zram/zcomp_lzo.h
++++ /dev/null
+@@ -1,17 +0,0 @@
+-/*
+- * Copyright (C) 2014 Sergey Senozhatsky.
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License
+- * as published by the Free Software Foundation; either version
+- * 2 of the License, or (at your option) any later version.
+- */
+-
+-#ifndef _ZCOMP_LZO_H_
+-#define _ZCOMP_LZO_H_
+-
+-#include "zcomp.h"
+-
+-extern struct zcomp_backend zcomp_lzo;
+-
+-#endif /* _ZCOMP_LZO_H_ */
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 74cbb81..cb478ca 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -567,7 +567,7 @@ static int zram_decompress_page(struct zram *zram, struct zcomp_strm *zstrm,
+ 	unsigned char *cmem;
+ 	struct zram_meta *meta = zram->meta;
+ 	unsigned long handle;
+-	size_t size;
++	unsigned int size;
+ 
+ 	bit_spin_lock(ZRAM_ACCESS, &meta->table[index].value);
+ 	handle = meta->table[index].handle;
+@@ -656,7 +656,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
+ 			   int offset)
+ {
+ 	int ret = 0;
+-	size_t clen;
++	unsigned int clen;
+ 	unsigned long handle;
+ 	struct page *page;
+ 	unsigned char *user_mem, *cmem, *src, *uncmem = NULL;
+@@ -731,7 +731,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
+ 
+ 	handle = zs_malloc(meta->mem_pool, clen);
+ 	if (!handle) {
+-		pr_err("Error allocating memory for compressed page: %u, size=%zu\n",
++		pr_err("Error allocating memory for compressed page: %u, size=%u\n",
+ 			index, clen);
+ 		ret = -ENOMEM;
+ 		goto out;
+-- 
+2.5.3
