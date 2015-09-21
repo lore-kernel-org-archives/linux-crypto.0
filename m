@@ -1,137 +1,143 @@
-From: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
-Subject: [RFC][PATCH 9/9] zram: use crypto CRYPTO_ALG_TFM_MAY_SHARE API
-Date: Mon, 21 Sep 2015 22:25:53 +0900
-Message-ID: <1442841953-11588-1-git-send-email-sergey.senozhatsky@gmail.com>
-References: <1442841229-8122-1-git-send-email-sergey.senozhatsky@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Minchan Kim <minchan@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-	Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Joonsoo Kim <js1304@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f46.google.com ([209.85.220.46]:35528 "EHLO
-	mail-pa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756490AbbIUN1G (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Sep 2015 09:27:06 -0400
-In-Reply-To: <1442841229-8122-1-git-send-email-sergey.senozhatsky@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Andrzej Hajda <a.hajda@samsung.com>
+Subject: [PATCH 00/38] Fixes related to incorrect usage of
+	unsigned types
+Date: Mon, 21 Sep 2015 15:33:32 +0200
+Message-ID: <1442842450-29769-1-git-send-email-a.hajda@samsung.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: linux-mips@linux-mips.org, linux-sh@vger.kernel.org,
+ Will Deacon <will.deacon@arm.com>, dri-devel@lists.freedesktop.org,
+ linux-clk@vger.kernel.org, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Jianwei Wang <jianwei.wang.chn@gmail.com>, Pravin Shelar <pshelar@nicira.com>,
+ linux-cachefs@redhat.com, Alan Stern <stern@rowland.harvard.edu>,
+ Jiri Slaby <jslaby@suse.com>, Arend van Spriel <arend@broadcom.com>,
+ Oleg Drokin <oleg.drokin@intel.com>, Matt Mackall <mpm@selenic.com>,
+ Thomas Gleixner <tglx@linutronix.de>, linux-omap@vger.kernel.org,
+ Karsten Keil <isdn@linux-pingi.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
+ linux-wireless@vger.kernel.org, Ralf Baechle <ralf@linux-mips.org>,
+ linux-crypto@vger.kernel.org, Alex Deucher <alexander.deucher@amd.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Ivan Mikhaylov <ivan@ru.ibm.com>,
+ Mark Rutland
+To: linux-kernel@vger.kernel.org
+Return-path: <intel-gfx-bounces@lists.freedesktop.org>
+List-Unsubscribe: <http://lists.freedesktop.org/mailman/options/intel-gfx>,
+ <mailto:intel-gfx-request@lists.freedesktop.org?subject=unsubscribe>
+List-Archive: <http://lists.freedesktop.org/archives/intel-gfx>
+List-Post: <mailto:intel-gfx@lists.freedesktop.org>
+List-Help: <mailto:intel-gfx-request@lists.freedesktop.org?subject=help>
+List-Subscribe: <http://lists.freedesktop.org/mailman/listinfo/intel-gfx>,
+ <mailto:intel-gfx-request@lists.freedesktop.org?subject=subscribe>
+Errors-To: intel-gfx-bounces@lists.freedesktop.org
+Sender: "Intel-gfx" <intel-gfx-bounces@lists.freedesktop.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Crypto subsystem now supports CRYPTO_ALG_TFM_MAY_SHARE API that
-requires special tfm_noctx. This tfm can be shared by multiple
-concurrent decompress user because this API doesn't rely on this
-tfm object except to fetch decompress function pointer.
-
-Until changing to use crypto API, zram doesn't require any zstrm
-on decompress so decompress is parallelized unlimitedly. But, previous
-patch make zram to use crypto API and this requires one zstrm on every
-decompress users so, in some zstrm contended situations, zram's
-performance would be degraded.
-
-This patch makes zram use CRYPTO_ALG_TFM_MAY_SHARE API and
-restore zram's performance as the time that zram doesn't use
-crypto API.
-
-Following is zram's read performance number.
-
-* iozone -t 4 -R -r 16K -s 60M -I +Z -i 0 -i 1
-* max_stream is set to 1
-* Output is in Kbytes/sec
-
-zram-base vs zram-crypto vs zram-crypto-CRYPTO_ALG_TFM_MAY_SHARE
-
-Read		10411701.88	6426911.62	9423894.38
-Re-read		10017386.62	6428218.88	11000063.50
-
-Signed-off-by: Joonsoo Kim <iamjoonsoo.kim@lge.com>
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
----
- drivers/block/zram/zcomp.c | 27 +++++++++++++++++++++++++--
- drivers/block/zram/zcomp.h |  1 +
- 2 files changed, 26 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 6219d4d..b768dc9 100644
---- a/drivers/block/zram/zcomp.c
-+++ b/drivers/block/zram/zcomp.c
-@@ -319,9 +319,14 @@ void zcomp_compress_end(struct zcomp *comp, struct zcomp_strm *zstrm)
- 	zcomp_strm_release(comp, zstrm);
- }
- 
--/* Never return NULL, may sleep */
-+/* May return NULL, may sleep */
- struct zcomp_strm *zcomp_decompress_begin(struct zcomp *comp)
- {
-+	struct crypto_comp *tfm = comp->tfm_noctx;
-+
-+	if (tfm && crypto_tfm_may_share(crypto_comp_tfm(tfm)))
-+		return NULL;
-+
- 	return zcomp_strm_find(comp);
- }
- 
-@@ -345,12 +350,18 @@ int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
- 		unsigned int src_len, unsigned char *dst)
- {
- 	unsigned int size = PAGE_SIZE;
-+	struct crypto_comp *tfm = comp->tfm_noctx;
-+
-+	if (tfm && crypto_tfm_may_share(crypto_comp_tfm(tfm)))
-+		return crypto_comp_decompress(tfm, src, src_len, dst, &size);
- 
--	return crypto_comp_decompress(zstrm->tfm, src, src_len,	dst, &size);
-+	return crypto_comp_decompress(zstrm->tfm, src, src_len, dst, &size);
- }
- 
- void zcomp_destroy(struct zcomp *comp)
- {
-+	if (comp->tfm_noctx)
-+		crypto_free_comp(comp->tfm_noctx);
- 	comp->destroy(comp);
- 	kfree(comp);
- }
-@@ -367,6 +378,7 @@ struct zcomp *zcomp_create(const char *compress, int max_strm)
- {
- 	struct zcomp *comp;
- 	const char *backend;
-+	struct crypto_comp *tfm;
- 	int error;
- 
- 	backend = find_backend(compress);
-@@ -386,5 +398,16 @@ struct zcomp *zcomp_create(const char *compress, int max_strm)
- 		kfree(comp);
- 		return ERR_PTR(error);
- 	}
-+
-+	/*
-+	 * Prepare to use crypto decompress_noctx API. One tfm is required
-+	 * to initialize crypto algorithm properly and fetch corresponding
-+	 * function pointer. But, it is sharable for multiple concurrent
-+	 * decompress users.
-+	 */
-+	tfm = crypto_alloc_comp(compress, 0, 0);
-+	if (!IS_ERR(tfm))
-+		comp->tfm_noctx = tfm;
-+
- 	return comp;
- }
-diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
-index 4f9df8e..c76d8e4 100644
---- a/drivers/block/zram/zcomp.h
-+++ b/drivers/block/zram/zcomp.h
-@@ -26,6 +26,7 @@ struct zcomp_strm {
- /* dynamic per-device compression frontend */
- struct zcomp {
- 	void *stream;
-+	struct crypto_comp *tfm_noctx;
- 	const char *backend;
- 
- 	struct zcomp_strm *(*strm_find)(struct zcomp *comp);
--- 
-2.5.3
+SGksCgpUaGlzIGlzIHNldCBvZiBpbmRlcGVuZGVudCBwYXRjaGVzLiBUaGUgb25seSBjb25uZWN0
+aW9uIGJldHdlZW4KdGhlbSBpcyB0aGF0IHRoZXkgdHJ5IHRvIGFkZHJlc3MgcHJvYmxlbXMgc3Bv
+dHRlZCBieSBwcm9wb3NlZApjb2NjaW5lbGxlIHNlbWFudGljIHBhdGNoIHVuc2lnbmVkX2xlc3Nl
+cl90aGFuX3plcm8uY29jY2lbMV0uCgpTZW1hbnRpYyBwYXRjaCBmaW5kcyBjb21wYXJpc29ucyBv
+ZiB0eXBlczoKICAgIHVuc2lnbmVkIDwgMAogICAgdW5zaWduZWQgPj0gMApUaGUgZm9ybWVyIGlz
+IGFsd2F5cyBmYWxzZSwgdGhlIGxhdHRlciBpcyBhbHdheXMgdHJ1ZS4KU3VjaCBjb21wYXJpc29u
+cyBhcmUgdXNlbGVzcywgc28gdGhlb3JldGljYWxseSB0aGV5IGNvdWxkIGJlCnNhZmVseSByZW1v
+dmVkLCBidXQgdGhlaXIgcHJlc2VuY2UgcXVpdGUgb2Z0ZW4gaW5kaWNhdGVzIGJ1Z3MuCgpUaGlz
+IHBhdGNoc2V0IGNvbnRhaW5zIG1haW5seSByZWFsIGJ1ZyBmaXhlcyhwYXRjaGVzIDAxLTI1KSwK
+dXN1YWxseSB0eXBlIGZpeGVzLgoKUGF0Y2hlcyAyNi0zNyByZW1vdmVzIHVubmVjZXNzYXJ5IGNo
+ZWNrcy4gU2VtYW50aWMgcGF0Y2ggZm91bmQKbXVjaCBtb3JlIHN1Y2ggcGxhY2VzIChtb3JlIHRo
+YW4gODApLCBidXQgc2luY2UgZXZlcnkgY2FzZSBuZWVkcwpzb21lIGFuYWx5c2lzIEkgaGF2ZSBk
+ZWNpZGVkIHRvIGxlYXZlIHRoZW0gZm9yIGFudG9oZXIgcGF0Y2hzZXQuCgpUaGUgbGFzdCBwYXRj
+aCBzaG91bGQgYmUgcHJvYmFibHkgcmVwbGFjZWQgd2l0aCBzb21ldGhpbmcgYmV0dGVyLApJIGd1
+ZXNzIGl0IHNob3VsZCBiZSB0cmVhdGVkIHJhdGhlciBhcyBidWcgcmVwb3J0LgoKVGhlIHBhdGNo
+ZXMgYXJlIGJhc2VkIG9uIGxpbnV4LW5leHQgKDIwMTUwOTE4KS4KClBhdGNoZXMgd2VyZSBvbmx5
+IGNvbXBpbGUgdGVzdGVkLCBzbyBwbGVhc2UgbG9vayBhdCB0aGVtIGNhcmVmdWxseS4KCkkgaGF2
+ZSBzZW50IGFsbCBwYXRjaGVzIHRvIGxpbnV4LWtlcm5lbCBtYWlsaW5nIGxpc3QuIEluZGl2aWR1
+YWwKcGF0Y2hlcyArIGNvdmVyIGxldHRlciB3ZW50IGFsc28gdG8gYXByb3ByaWF0ZSBhZGRyZXNz
+ZXMsCmFjY29yZGluZyB0byBnZXRfbWFpbnRhaW5lcnMucGwgc2NyaXB0LgoKT25lIG1vcmUgdGhp
+bmcuIFRvIGZ1bGxmaWxsIGRpZmZlcmVudCBtYWludGFuZXIvc3Vic3lzdGVtIHJlcXVpcmVtZW50
+cwpJIGhhdmUgZGVjaWRlZCB0byBwcmVmaXggcGF0Y2ggc3ViamVjdHMgd2l0aCBwcmVmaXhlcyBw
+cmVzZW50IGluCmxhc3QgMTAgY29tbWl0cyBmb3IgYWZmZWN0ZWQgZmlsZXMuIEkgYW0gbm90IHN1
+cmUgaWYgdGhpcyBpcyB0aGUKYmVzdCBzb2x1dGlvbiwgaWYgdGhlcmUgYXJlIGFueSBiZXR0ZXIg
+c29sdXRpb25zIHBsZWFzZSBsZXQgbWUga25vdyA6KQoKWzFdOiBodHRwOi8vcGVybWFsaW5rLmdt
+YW5lLm9yZy9nbWFuZS5saW51eC5rZXJuZWwvMjAzODU3NgoKUmVnYXJkcwpBbmRyemVqCgoKQW5k
+cnplaiBIYWpkYSAoMzgpOgogIGFybS1jY2k6IGZpeCBoYW5kbGluZyBjcHVtYXNrX2FueV9idXQg
+cmV0dXJuIHZhbHVlCiAgYnVzOiBhcm0tY2NuOiBmaXggaGFuZGxpbmcgY3B1bWFza19hbnlfYnV0
+IHJldHVybiB2YWx1ZQogIGRybS9pOTE1OiBmaXggaGFuZGxpbmcgZ2VuOF9lbWl0X2ZsdXNoX2Nv
+aGVyZW50bDNfd2EgcmVzdWx0CiAgSUIvZWhjYTogZml4IGhhbmRsaW5nIGlkcl9hbGxvYyByZXN1
+bHQKICBzdGFnaW5nOiBsdXN0cmU6IGZpeCBoYW5kbGluZyBsdXN0cmVfcG9zaXhfYWNsX3hhdHRy
+X2ZpbHRlciByZXN1bHQKICB0dHk6IHNlcmlhbDogbHBjMzJ4eF9oczogZml4IGhhbmRsaW5nIHBs
+YXRmb3JtX2dldF9pcnEgcmVzdWx0CiAgdXNiOiBob3N0OiBlaGNpLW1zbTogZml4IGhhbmRsaW5n
+IHBsYXRmb3JtX2dldF9pcnEgcmVzdWx0CiAgb3BlbnZzd2l0Y2g6IGZpeCBoYW5kbGluZyByZXN1
+bHQgb2YgaXB2Nl9za2lwX2V4dGhkcgogIHNlbGZ0ZXN0cy90aW1lcnM6IGZpeCB3cml0ZSByZXR1
+cm4gdmFsdWUgaGFuZGxuZwogIGh3cm5nOiBmaXggaGFuZGxpbmcgcGxhdGZvcm1fZ2V0X2lycQog
+IEhTSTogb21hcF9zc2k6IGZpeCBoYW5kbGluZyBpZGFfc2ltcGxlX2dldCByZXN1bHQKICBIU0k6
+IG9tYXBfc3NpX3BvcnQ6IGZpeCBoYW5kbGluZyBvZl9nZXRfbmFtZWRfZ3BpbyByZXN1bHQKICBB
+Uk06IHNobW9iaWxlOiBhcG11OiBjb3JyZWN0IHR5cGUgb2YgQ1BVIGlkCiAgY2xrOiB2dDg1MDA6
+IGZpeCBzaWduIG9mIHBvc3NpYmxlIFBMTCB2YWx1ZXMKICBkcm0vbGF5ZXJzY2FwZTogZml4IGhh
+bmRsaW5nIGZzbF9kY3VfZHJtX3BsYW5lX2luZGV4IHJlc3VsdAogIGdwdTogaXB1LXYzOiBmaXgg
+ZGl2X3JhdGlvIHR5cGUKICBpc2RuOiBoaXNheDogZml4IGZyYW1lIGNhbGN1bGF0aW9uCiAgbmV0
+L2libS9lbWFjOiBmaXggdHlwZSBvZiBwaHlfbW9kZQogIG5ldDogc3RtbWFjOiBmaXggdHlwZSBv
+ZiBlbnRyeSB2YXJpYWJsZQogIG5ldDogYnJjbTgwMjExOiBmaXggcmFuZ2UgY2hlY2sKICBtd2lm
+aWV4OiBmaXggY29tcGFyaXNvbiBleHByZXNzaW9uCiAgb3Jpbm9jbzogZml4IGNoZWNraW5nIGZv
+ciBkZWZhdWx0IHZhbHVlCiAgcm5kaXNfd2xhbjogZml4IGNoZWNraW5nIGZvciBkZWZhdWx0IHZh
+bHVlCiAgcnRjOiBvcGFsOiBmaXggdHlwZSBvZiB0b2tlbgogIHN0YWdpbmc6IG1lZGlhOiBkYXZp
+bmNpX3ZwZmU6IGZpeCBpcGlwZV9tb2RlIHR5cGUKICBzdGFnaW5nOiBsdXN0cmU6IHJlbW92ZSBp
+bnZhbGlkIGNoZWNrCiAgdXNibmV0OiByZW1vdmUgaW52YWxpZCBjaGVjawogIHZpZGVvL29tYXA6
+IHJlbW92ZSBpbnZhbGlkIGNoZWNrCiAgSW5wdXQ6IHRvdWNoc2NyZWVuOiBhdG1lbDogcmVtb3Zl
+IGludmFsaWQgY2hlY2sKICBsZWRzOiBmbGFzaDogcmVtb3ZlIGludmFsaWQgY2hlY2sKICBsZWRz
+OiB0Y2E2NTA3OiByZW1vdmUgaW52YWxpZCBjaGVjawogIGZzL2NhY2hlZmlsZXM6IHJlbW92ZSBp
+bnZhbGlkIGNoZWNrcwogIG1tL21lbWJsb2NrLmM6IHJlbW92ZSBpbnZhbGlkIGNoZWNrCiAgcGVy
+ZjogcmVtb3ZlIGludmFsaWQgY2hlY2sKICBwdHJhY2U6IHJlbW92ZSBpbnZhbGlkIGNoZWNrCiAg
+TUlQUzogcmVtb3ZlIGludmFsaWQgY2hlY2sKICB6bGliX2RlZmxhdGUvZGVmdHJlZTogY2hhbmdl
+IGFsd2F5cyB0cnVlIGNvbmRpdGlvbiB0byAxCiAgZHJtL3JhZGVvbjogc2ltcGxpZnkgYm9vdCBs
+ZXZlbCBjYWxjdWxhdGlvbgoKIGFyY2gvYXJtL21hY2gtc2htb2JpbGUvcGxhdHNtcC1hcG11LmMg
+ICAgICAgICAgICAgICB8ICAyICstCiBhcmNoL21pcHMvbW0vc2MtbWlwcy5jICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgfCAgNCArKy0tCiBhcmNoL3NoL2tlcm5lbC9wdHJhY2VfMzIuYyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgfCAgMyArLS0KIGFyY2gvc2gva2VybmVsL3B0cmFjZV82
+NC5jICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA0ICsrLS0KIGRyaXZlcnMvYnVzL2FybS1j
+Y2kuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCiBkcml2ZXJzL2J1cy9h
+cm0tY2NuLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMiArLQogZHJpdmVycy9j
+aGFyL2h3X3JhbmRvbS94Z2VuZS1ybmcuYyAgICAgICAgICAgICAgICAgIHwgIDcgKysrKy0tLQog
+ZHJpdmVycy9jbGsvY2xrLXZ0ODUwMC5jICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDYg
+KysrLS0tCiBkcml2ZXJzL2dwdS9kcm0vYW1kL2FtZGdwdS9rdl9kcG0uYyAgICAgICAgICAgICAg
+ICAgfCAxMSArLS0tLS0tLS0tLQogZHJpdmVycy9ncHUvZHJtL2ZzbC1kY3UvZnNsX2RjdV9kcm1f
+cGxhbmUuYyAgICAgICAgIHwgIDMgKystCiBkcml2ZXJzL2dwdS9kcm0vaTkxNS9pbnRlbF9scmMu
+YyAgICAgICAgICAgICAgICAgICAgfCAgNyArKysrLS0tCiBkcml2ZXJzL2dwdS9kcm0vcmFkZW9u
+L2t2X2RwbS5jICAgICAgICAgICAgICAgICAgICAgfCAxMSArLS0tLS0tLS0tLQogZHJpdmVycy9n
+cHUvaXB1LXYzL2lwdS1jc2kuYyAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KIGRyaXZl
+cnMvaHNpL2NvbnRyb2xsZXJzL29tYXBfc3NpLmMgICAgICAgICAgICAgICAgICB8ICA3ICsrKy0t
+LS0KIGRyaXZlcnMvaHNpL2NvbnRyb2xsZXJzL29tYXBfc3NpX3BvcnQuYyAgICAgICAgICAgICB8
+ICA4ICsrKystLS0tCiBkcml2ZXJzL2lucHV0L3RvdWNoc2NyZWVuL2F0bWVsX214dF90cy5jICAg
+ICAgICAgICAgfCAgMiArLQogZHJpdmVycy9pc2RuL2hpc2F4L2hmYzRzOHNfbDEuYyAgICAgICAg
+ICAgICAgICAgICAgIHwgMTAgKysrKystLS0tLQogZHJpdmVycy9sZWRzL2xlZC1jbGFzcy1mbGFz
+aC5jICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KIGRyaXZlcnMvbGVkcy9sZWRzLXRjYTY1
+MDcuYyAgICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCiBkcml2ZXJzL25ldC9ldGhlcm5l
+dC9pYm0vZW1hYy9jb3JlLmggICAgICAgICAgICAgICAgfCAgMiArLQogZHJpdmVycy9uZXQvZXRo
+ZXJuZXQvc3RtaWNyby9zdG1tYWMvc3RtbWFjX21haW4uYyAgIHwgIDIgKy0KIGRyaXZlcnMvbmV0
+L3VzYi9sYW43OHh4LmMgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA1IC0tLS0tCiBkcml2
+ZXJzL25ldC91c2Ivc21zYzc1eHguYyAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNSAtLS0t
+LQogZHJpdmVycy9uZXQvdXNiL3Ntc2M5NXh4LmMgICAgICAgICAgICAgICAgICAgICAgICAgIHwg
+IDUgLS0tLS0KIGRyaXZlcnMvbmV0L3dpcmVsZXNzL2JyY204MDIxMS9icmNtc21hYy9tYWluLmMg
+ICAgICB8ICAyICstCiBkcml2ZXJzL25ldC93aXJlbGVzcy9td2lmaWV4LzExbl9yeHJlb3JkZXIu
+YyAgICAgICAgfCAgNCArKy0tCiBkcml2ZXJzL25ldC93aXJlbGVzcy9vcmlub2NvL2NmZy5jICAg
+ICAgICAgICAgICAgICAgfCAgNiArKystLS0KIGRyaXZlcnMvbmV0L3dpcmVsZXNzL3JuZGlzX3ds
+YW4uYyAgICAgICAgICAgICAgICAgICB8ICAyICstCiBkcml2ZXJzL3J0Yy9ydGMtb3BhbC5jICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNCArKy0tCiBkcml2ZXJzL3N0YWdpbmcvbHVz
+dHJlL2x1c3RyZS9sbGl0ZS94YXR0ci5jICAgICAgICAgfCAgNyArKysrLS0tCiBkcml2ZXJzL3N0
+YWdpbmcvbHVzdHJlL2x1c3RyZS9vc2MvbHByb2Nfb3NjLmMgICAgICAgfCAgMyAtLS0KIGRyaXZl
+cnMvc3RhZ2luZy9tZWRpYS9kYXZpbmNpX3ZwZmUvZG0zNjVfaXBpcGVfaHcuYyB8ICAyICstCiBk
+cml2ZXJzL3N0YWdpbmcvcmRtYS9laGNhL2VoY2FfY3EuYyAgICAgICAgICAgICAgICAgfCAxMyAr
+KysrKysrLS0tLS0tCiBkcml2ZXJzL3R0eS9zZXJpYWwvbHBjMzJ4eF9ocy5jICAgICAgICAgICAg
+ICAgICAgICAgfCAgNyArKysrLS0tCiBkcml2ZXJzL3VzYi9ob3N0L2VoY2ktbXNtLmMgICAgICAg
+ICAgICAgICAgICAgICAgICAgfCAgNiArKystLS0KIGRyaXZlcnMvdmlkZW8vZmJkZXYvb21hcC9v
+bWFwZmJfbWFpbi5jICAgICAgICAgICAgICB8ICA1IC0tLS0tCiBmcy9jYWNoZWZpbGVzL2JpbmQu
+YyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgOSArKystLS0tLS0KIGZzL2NhY2hl
+ZmlsZXMvZGFlbW9uLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA2ICsrKy0tLQog
+bGliL3psaWJfZGVmbGF0ZS9kZWZ0cmVlLmMgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIg
+Ky0KIG1tL21lbWJsb2NrLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8
+ICAyICstCiBuZXQvb3BlbnZzd2l0Y2gvY29ubnRyYWNrLmMgICAgICAgICAgICAgICAgICAgICAg
+ICAgfCAgMiArLQogdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvdGltZXJzL2Nsb2Nrc291cmNlLXN3
+aXRjaC5jIHwgIDIgKy0KIDQyIGZpbGVzIGNoYW5nZWQsIDc5IGluc2VydGlvbnMoKyksIDExOSBk
+ZWxldGlvbnMoLSkKCi0tIAoxLjkuMQoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX18KSW50ZWwtZ2Z4IG1haWxpbmcgbGlzdApJbnRlbC1nZnhAbGlzdHMuZnJl
+ZWRlc2t0b3Aub3JnCmh0dHA6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1hbi9saXN0aW5m
+by9pbnRlbC1nZngK
