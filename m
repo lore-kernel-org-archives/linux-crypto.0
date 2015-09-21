@@ -1,33 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 10/38] hwrng: fix handling platform_get_irq
-Date: Mon, 21 Sep 2015 23:05:25 +0800
-Message-ID: <20150921150524.GC2703@gondor.apana.org.au>
-References: <1442842450-29769-1-git-send-email-a.hajda@samsung.com>
- <1442842450-29769-11-git-send-email-a.hajda@samsung.com>
+Subject: Re: [PATCH v2] crypto: Remove duplicate code of SG helpers functions
+Date: Mon, 21 Sep 2015 23:09:15 +0800
+Message-ID: <20150921150914.GA2836@gondor.apana.org.au>
+References: <1442581036-23789-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org
-To: Andrzej Hajda <a.hajda@samsung.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:45897 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755799AbbIUPJS (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 21 Sep 2015 11:09:18 -0400
 Content-Disposition: inline
-In-Reply-To: <1442842450-29769-11-git-send-email-a.hajda@samsung.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1442581036-23789-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Sep 21, 2015 at 03:33:42PM +0200, Andrzej Hajda wrote:
-> The function can return negative value.
+On Fri, Sep 18, 2015 at 02:57:08PM +0200, LABBE Corentin wrote:
+> Hello
 > 
-> The problem has been detected using proposed semantic patch
-> scripts/coccinelle/tests/unsigned_lesser_than_zero.cocci [1].
-> 
-> [1]: http://permalink.gmane.org/gmane.linux.kernel/2038576
-> 
-> Signed-off-by: Andrzej Hajda <a.hajda@samsung.com>
+> This patch series try to remove some duplicate code of some SG helpers functions.
+> The first four patch replace custom functions by already in-tree helper functions.
 
-Applied to crypto.
+Patches 1-3 applied.  Patch 4 should go through the s390 tree.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
