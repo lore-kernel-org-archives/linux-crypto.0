@@ -1,33 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: Remove duplicate code of SG helpers functions
-Date: Mon, 21 Sep 2015 23:09:15 +0800
-Message-ID: <20150921150914.GA2836@gondor.apana.org.au>
-References: <1442581036-23789-1-git-send-email-clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH] crypto: crc32c-pclmul: use .rodata instead of .rotata
+Date: Mon, 21 Sep 2015 23:10:01 +0800
+Message-ID: <20150921151000.GB2836@gondor.apana.org.au>
+References: <1442760156-2501-1-git-send-email-nicolas.iooss_linux@m4x.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:45897 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755799AbbIUPJS (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Sep 2015 11:09:18 -0400
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1442581036-23789-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1442760156-2501-1-git-send-email-nicolas.iooss_linux@m4x.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Sep 18, 2015 at 02:57:08PM +0200, LABBE Corentin wrote:
-> Hello
+On Sun, Sep 20, 2015 at 04:42:36PM +0200, Nicolas Iooss wrote:
+> Module crc32c-intel uses a special read-only data section named .rotata.
+> This section is defined for K_table, and its name seems to be a spelling
+> mistake for .rodata.
 > 
-> This patch series try to remove some duplicate code of some SG helpers functions.
-> The first four patch replace custom functions by already in-tree helper functions.
+> Fixes: 473946e674eb ("crypto: crc32c-pclmul - Shrink K_table to 32-bit words")
+> Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
 
-Patches 1-3 applied.  Patch 4 should go through the s390 tree.
-
-Thanks,
+Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
