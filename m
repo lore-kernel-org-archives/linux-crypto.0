@@ -1,9 +1,9 @@
 From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Subject: Re: [PATCH v3 8/9] zram: use crypto API for compression
-Date: Mon, 21 Sep 2015 14:19:03 +0900
-Message-ID: <20150921051903.GB863@swordfish>
+Subject: Re: [PATCH v3 9/9] zram: use crypto decompress_noctx API
+Date: Mon, 21 Sep 2015 14:29:18 +0900
+Message-ID: <20150921052918.GA5313@swordfish>
 References: <1442553564-3476-1-git-send-email-iamjoonsoo.kim@lge.com>
- <1442553564-3476-9-git-send-email-iamjoonsoo.kim@lge.com>
+ <1442553564-3476-10-git-send-email-iamjoonsoo.kim@lge.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Andrew Morton <akpm@linux-foundation.org>,
@@ -16,123 +16,37 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Stephan Mueller <smueller@chronox.de>,
 	Joonsoo Kim <iamjoonsoo.kim@lge.com>
 To: Joonsoo Kim <js1304@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f54.google.com ([209.85.220.54]:35797 "EHLO
+	mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751894AbbIUF2d (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 21 Sep 2015 01:28:33 -0400
 Content-Disposition: inline
-In-Reply-To: <1442553564-3476-9-git-send-email-iamjoonsoo.kim@lge.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1442553564-3476-10-git-send-email-iamjoonsoo.kim@lge.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 On (09/18/15 14:19), Joonsoo Kim wrote:
-[..]
-> -static struct zcomp_backend *find_backend(const char *compress)
-> +static const char *find_backend(const char *compress)
+> -/* Never return NULL, may sleep */
+> +/* May return NULL, may sleep */
+>  struct zcomp_strm *zcomp_decompress_begin(struct zcomp *comp)
 >  {
->  	int i = 0;
->  	while (backends[i]) {
-> -		if (sysfs_streq(compress, backends[i]->name))
-> +		if (sysfs_streq(compress, backends[i]) &&
-> +			crypto_has_comp(compress, 0, 0))
-
-ok, just for note. zcomp does sysfs_streq(), because sysfs data
-usually contain a trailing new line, crypto_has_comp() does strcmp().
-
-
->  int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
-> -		const unsigned char *src, size_t *dst_len)
-> +		const unsigned char *src, unsigned int *dst_len)
->  {
-> -	return comp->backend->compress(src, zstrm->buffer, dst_len,
-> -			zstrm->private);
-> +	*dst_len = PAGE_SIZE << 1;
+> +	if (comp->tfm_noctx)
+> +		return NULL;
 > +
-
-hm... wouldn't it be better to say crypto api that we have a PAGE_SIZE
-buffer instead of PAGE_SIZE << 1, so in case of buffer overrun (or
-whatever is the correct term here) it will stop compression earlier
-(well, possibly)? zram will drop compressed data larger than PAGE_SIZE
-anyway, so if passing a smaller buffer size can save us CPU time then
-let's do it.
-
-
-> +	return crypto_comp_compress(zstrm->tfm, src, PAGE_SIZE,
-> +					zstrm->buffer, dst_len);
+>  	return zcomp_strm_find(comp);
 >  }
 >  
->  int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
->  		const unsigned char *src,
-> -		size_t src_len, unsigned char *dst)
-> +		unsigned int src_len, unsigned char *dst)
+> @@ -346,11 +349,18 @@ int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
 >  {
-> -	return comp->backend->decompress(src, src_len, dst);
-> +	unsigned int size = PAGE_SIZE;
-> +
-> +	return crypto_comp_decompress(zstrm->tfm, src, src_len,	dst, &size);
-
-							^^^^^^^^ tab?
-
->  }
+>  	unsigned int size = PAGE_SIZE;
 >  
->  void zcomp_destroy(struct zcomp *comp)
-> @@ -359,7 +365,7 @@ void zcomp_destroy(struct zcomp *comp)
->  struct zcomp *zcomp_create(const char *compress, int max_strm)
->  {
->  	struct zcomp *comp;
-> -	struct zcomp_backend *backend;
-> +	const char *backend;
+> +	if (!zstrm) {
+> +		return crypto_comp_decompress_noctx(comp->tfm_noctx,
+> +						src, src_len, dst, &size);
+> +	}
 
-rebase against the current linux-next. this and the next patch do not
-apply cleanly. the function was touched recently: '+int error'.
-
-
->  
->  	backend = find_backend(compress);
->  	if (!backend)
-> diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
-> index 4c09c01..4f9df8e 100644
-> --- a/drivers/block/zram/zcomp.h
-> +++ b/drivers/block/zram/zcomp.h
-> @@ -11,38 +11,22 @@
->  #define _ZCOMP_H_
->  
->  #include <linux/mutex.h>
-> +#include <linux/crypto.h>
->  
->  struct zcomp_strm {
-> +	struct crypto_comp *tfm;
-> +
->  	/* compression/decompression buffer */
->  	void *buffer;
-> -	/*
-> -	 * The private data of the compression stream, only compression
-> -	 * stream backend can touch this (e.g. compression algorithm
-> -	 * working memory)
-> -	 */
-> -	void *private;
-> +
->  	/* used in multi stream backend, protected by backend strm_lock */
->  	struct list_head list;
->  };
->  
-> -/* static compression backend */
-> -struct zcomp_backend {
-> -	int (*compress)(const unsigned char *src, unsigned char *dst,
-> -			size_t *dst_len, void *private);
-> -
-> -	int (*decompress)(const unsigned char *src, size_t src_len,
-> -			unsigned char *dst);
-> -
-> -	void *(*create)(void);
-> -	void (*destroy)(void *private);
-> -
-> -	const char *name;
-> -};
-> -
->  /* dynamic per-device compression frontend */
->  struct zcomp {
->  	void *stream;
-> -	struct zcomp_backend *backend;
-> +	const char *backend;
-
-	^^ what for?
+unneeded braces.
 
 	-ss
