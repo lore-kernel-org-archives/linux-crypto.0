@@ -1,51 +1,40 @@
-From: Andrzej Hajda <a.hajda@samsung.com>
-Subject: [PATCH 10/38] hwrng: fix handling platform_get_irq
-Date: Mon, 21 Sep 2015 15:33:42 +0200
-Message-ID: <1442842450-29769-11-git-send-email-a.hajda@samsung.com>
-References: <1442842450-29769-1-git-send-email-a.hajda@samsung.com>
-Cc: Andrzej Hajda <a.hajda@samsung.com>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [cryptodev:master 10/29]
+ arch/x86/crypto/sha256_ssse3_glue.c:172:19: error: 'X86_FEATURE_SHA_NI'
+ undeclared
+Date: Mon, 21 Sep 2015 22:02:54 +0800
+Message-ID: <20150921140254.GA2141@gondor.apana.org.au>
+References: <201509182205.JCClhKfv%fengguang.wu@intel.com>
+ <20150918151757.GA10835@gondor.apana.org.au>
+ <1442592721.6240.15.camel@schen9-desk2.jf.intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild-all@01.org,
 	linux-crypto@vger.kernel.org
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <1442842450-29769-1-git-send-email-a.hajda@samsung.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:36367 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755276AbbIUODC (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 21 Sep 2015 10:03:02 -0400
+Content-Disposition: inline
+In-Reply-To: <1442592721.6240.15.camel@schen9-desk2.jf.intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The function can return negative value.
+Hi Tim:
 
-The problem has been detected using proposed semantic patch
-scripts/coccinelle/tests/unsigned_lesser_than_zero.cocci [1].
+On Fri, Sep 18, 2015 at 09:12:01AM -0700, Tim Chen wrote:
+>
+> It seems like Thomas has already merged the cpu id patch upstream.
+> http://git.kernel.org/cgit/linux/kernel/git/tip/tip.git/commit/?id=488ca7d72d974e3c00ae73ed9f947590680bdf00
+> 
+> Can you merge that patch into cryptodev and re-apply?
 
-[1]: http://permalink.gmane.org/gmane.linux.kernel/2038576
-
-Signed-off-by: Andrzej Hajda <a.hajda@samsung.com>
----
- drivers/char/hw_random/xgene-rng.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/char/hw_random/xgene-rng.c b/drivers/char/hw_random/xgene-rng.c
-index c37cf75..3c77645 100644
---- a/drivers/char/hw_random/xgene-rng.c
-+++ b/drivers/char/hw_random/xgene-rng.c
-@@ -344,11 +344,12 @@ static int xgene_rng_probe(struct platform_device *pdev)
- 	if (IS_ERR(ctx->csr_base))
- 		return PTR_ERR(ctx->csr_base);
- 
--	ctx->irq = platform_get_irq(pdev, 0);
--	if (ctx->irq < 0) {
-+	rc = platform_get_irq(pdev, 0);
-+	if (rc < 0) {
- 		dev_err(&pdev->dev, "No IRQ resource\n");
--		return ctx->irq;
-+		return rc;
- 	}
-+	ctx->irq = rc;
- 
- 	dev_dbg(&pdev->dev, "APM X-Gene RNG BASE %p ALARM IRQ %d",
- 		ctx->csr_base, ctx->irq);
+Thanks for the heads up.  I have rebased on rc2 and reapplied your
+seven patches.
 -- 
-1.9.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
