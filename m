@@ -1,8 +1,8 @@
 From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
 Subject: Re: [PATCH v3 1/9] crypto: introduce decompression API that can be
  called via sharable tfm object
-Date: Mon, 21 Sep 2015 14:38:59 +0900
-Message-ID: <20150921053859.GB5313@swordfish>
+Date: Mon, 21 Sep 2015 15:18:17 +0900
+Message-ID: <20150921061817.GC5313@swordfish>
 References: <1442553564-3476-1-git-send-email-iamjoonsoo.kim@lge.com>
  <1442553564-3476-2-git-send-email-iamjoonsoo.kim@lge.com>
 Mime-Version: 1.0
@@ -18,11 +18,11 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Joonsoo Kim <iamjoonsoo.kim@lge.com>
 To: Joonsoo Kim <js1304@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f41.google.com ([209.85.220.41]:34108 "EHLO
-	mail-pa0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755844AbbIUFiN (ORCPT
+Received: from mail-pa0-f42.google.com ([209.85.220.42]:34866 "EHLO
+	mail-pa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752501AbbIUGRb (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Sep 2015 01:38:13 -0400
+	Mon, 21 Sep 2015 02:17:31 -0400
 Content-Disposition: inline
 In-Reply-To: <1442553564-3476-2-git-send-email-iamjoonsoo.kim@lge.com>
 Sender: linux-crypto-owner@vger.kernel.org
@@ -30,61 +30,38 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 On (09/18/15 14:19), Joonsoo Kim wrote:
 [..]
-> @@ -61,7 +61,8 @@ static struct crypto_alg alg = {
->  	.cra_module		= THIS_MODULE,
->  	.cra_u			= { .compress = {
->  	.coa_compress		= crypto842_compress,
-> -	.coa_decompress		= crypto842_decompress } }
-> +	.coa_decompress		= crypto842_decompress,
-> +	.coa_decompress_noctx	= NULL } }
+>  static int __init lzo_mod_init(void)
+> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+> index e71cb70..31152b1 100644
+> --- a/include/linux/crypto.h
+> +++ b/include/linux/crypto.h
+> @@ -355,6 +355,8 @@ struct compress_alg {
+>  			    unsigned int slen, u8 *dst, unsigned int *dlen);
+>  	int (*coa_decompress)(struct crypto_tfm *tfm, const u8 *src,
+>  			      unsigned int slen, u8 *dst, unsigned int *dlen);
+> +	int (*coa_decompress_noctx)(const u8 *src, unsigned int slen,
+> +				    u8 *dst, unsigned int *dlen);
 >  };
 >  
->  static int __init crypto842_mod_init(void)
-> diff --git a/crypto/compress.c b/crypto/compress.c
-> index c33f076..abb36a8 100644
-> --- a/crypto/compress.c
-> +++ b/crypto/compress.c
-> @@ -33,12 +33,21 @@ static int crypto_decompress(struct crypto_tfm *tfm,
->  	                                                   dlen);
+>  
+> @@ -538,6 +540,9 @@ struct compress_tfm {
+>  	int (*cot_decompress)(struct crypto_tfm *tfm,
+>  	                      const u8 *src, unsigned int slen,
+>  	                      u8 *dst, unsigned int *dlen);
+> +	int (*cot_decompress_noctx)(struct crypto_tfm *tfm,
+> +				const u8 *src, unsigned int slen,
+> +				u8 *dst, unsigned int *dlen);
+>  };
+>  
+>  #define crt_ablkcipher	crt_u.ablkcipher
+> @@ -1836,6 +1841,14 @@ static inline void crypto_free_comp(struct crypto_comp *tfm)
+>  	crypto_free_tfm(crypto_comp_tfm(tfm));
 >  }
 >  
-> +static int crypto_decompress_noctx(struct crypto_tfm *tfm,
-> +				const u8 *src, unsigned int slen,
-> +				u8 *dst, unsigned int *dlen)
-> +{
-> +	return tfm->__crt_alg->cra_compress.coa_decompress_noctx(src, slen,
-> +								dst, dlen);
-> +}
-
-
-hm... well... sorry, if irrelevant.
-if the algorithm can have a _noctx() decompression function, does it
-automatically guarantee that this algorithm never dereferences a passed
-`struct crypto_tfm *tfm' pointer in its decompress function? in other words,
-can we simply pass that `shared tfm pointer' to the existing decompress
-function instead of defining new symbols, new callbacks, etc.?
-
-	cot_decompress_noctx()  ==  cot_decompress(shared_ftm) ?
-
-just a thought.
-
-[..]
 > +struct crypto_comp *crypto_alloc_comp_noctx(const char *alg_name,
-> +					u32 type, u32 mask)
-> +{
-> +	struct crypto_comp *comp;
-> +	struct crypto_tfm *tfm;
-> +	struct compress_tfm *ops;
+> +					u32 type, u32 mask);
 > +
-> +	comp = crypto_alloc_comp(alg_name, type, mask);
-> +	if (IS_ERR(comp))
-> +		return comp;
-> +
-> +	tfm = crypto_comp_tfm(comp);
-> +	if (!tfm->__crt_alg->cra_compress.coa_decompress_noctx) {
-> +		crypto_free_comp(comp);
-> +		return ERR_PTR(-EINVAL);
 
-	-ENOMEM?
+this should be EXPORT_SYMBOL_GPL().
 
 	-ss
