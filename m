@@ -1,84 +1,74 @@
-From: Jacek Anaszewski <j.anaszewski@samsung.com>
-Subject: Re: [PATCH 00/38] Fixes related to incorrect usage of unsigned types
-Date: Tue, 22 Sep 2015 11:46:58 +0200
-Message-ID: <56012392.7020807@samsung.com>
-References: <1442842450-29769-1-git-send-email-a.hajda@samsung.com>
- <17571.1442842945@warthog.procyon.org.uk> <56011BB9.5030004@samsung.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] drivers/crypto/nx: Add CRC and validation support for
+ nx842
+Date: Tue, 22 Sep 2015 20:21:17 +0800
+Message-ID: <20150922122117.GA11522@gondor.apana.org.au>
+References: <1442707362.6178.11.camel@hbabu-laptop>
+ <20150921142607.GA2405@gondor.apana.org.au>
+ <CALZtONDbOxorPmy2A9FkD7rpY2HsOMaEs9Vvqg2kHh1qtM0GqA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: David Howells <dhowells@redhat.com>,
- Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, linux-kernel@vger.kernel.org,
- brcm80211-dev-list@broadcom.com, devel@driverdev.osuosl.org,
- dev@openvswitch.org, dri-devel@lists.freedesktop.org,
- intel-gfx@lists.freedesktop.org, linux-api@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-cachefs@redhat.com,
- linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-fbdev@vger.kernel.org, linux-input@vger.kernel.org,
- linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mips@linux-mips.org, linux-mm@kvack.org, linux-omap@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-sh@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-wireless@vger.kernel.org, lustre-devel@lists.lustre.org,
- netdev@vger.kernel.org, rtc-linux@googlegroups.com
-To: Andrzej Hajda <a.hajda@samsung.com>
-Return-path: <owner-linux-mm@kvack.org>
-In-reply-to: <56011BB9.5030004@samsung.com>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Haren Myneni <haren@linux.vnet.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Haren Myneni <hbabu@us.ibm.com>
+To: Dan Streetman <ddstreet@ieee.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:46284 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932149AbbIVMVe (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 22 Sep 2015 08:21:34 -0400
+Content-Disposition: inline
+In-Reply-To: <CALZtONDbOxorPmy2A9FkD7rpY2HsOMaEs9Vvqg2kHh1qtM0GqA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 09/22/2015 11:13 AM, Andrzej Hajda wrote:
-> On 09/21/2015 03:42 PM, David Howells wrote:
->> Andrzej Hajda <a.hajda-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org> wrote:
->>
->>> Semantic patch finds comparisons of types:
->>>      unsigned < 0
->>>      unsigned >= 0
->>> The former is always false, the latter is always true.
->>> Such comparisons are useless, so theoretically they could be
->>> safely removed, but their presence quite often indicates bugs.
->>
->> Or someone has left them in because they don't matter and there's the
->> possibility that the type being tested might be or become signed under some
->> circumstances.  If the comparison is useless, I'd expect the compiler to just
->> discard it - for such cases your patch is pointless.
->>
->> If I have, for example:
->>
->> 	unsigned x;
->>
->> 	if (x == 0 || x > 27)
->> 		give_a_range_error();
->>
->> I will write this as:
->>
->> 	unsigned x;
->>
->> 	if (x <= 0 || x > 27)
->> 		give_a_range_error();
->>
->> because it that gives a way to handle x being changed to signed at some point
->> in the future for no cost.  In which case, your changing the <= to an ==
->> "because the < part of the case is useless" is arguably wrong.
->
-> This is why I have not checked for such cases - I have skipped checks of type
-> 	unsigned <= 0
-> exactly for the reasons above.
->
-> However I have left two other checks as they seems to me more suspicious - they
-> are always true or false. But as Dmitry and Andrew pointed out Linus have quite
-> strong opinion against removing range checks in such cases as he finds it
-> clearer. I think it applies to patches 29-36. I am not sure about patches 26-28,37.
+On Mon, Sep 21, 2015 at 11:21:14AM -0400, Dan Streetman wrote:
+> 
+> As far as the hw and sw drivers producing the exact same output, I
+> don't think that's possible with the current hw and sw drivers,
+> because the hw driver may have to add a header to the actual byte
+> stream that the hw creates, depending on buffer alignment and size
+> (the hw has specific restrictions).  Currently, the sw driver doesn't
+> understand that header that the 842 hw driver creates, although that
+> could be added to the sw driver.  And, the hw driver skips adding the
+> header if the buffers are correctly aligned/sized, which would result
+> in a test vector failure if it doesn't align the buffer the same way
+> each time.
 
-Dropped 30/38 and 31/38 from LED tree then.
+I guess they don't have to be exactly the same.  As long as each
+can take the output of the other and compress/decompress them it
+should be fine.
 
+> Also, it might be a good time to add what we talked about a while ago,
+> to push the alignment/size restrictions into the crypto compression
+> layer, by adding cra_alignmask and cra_blocksize support to
+> crypto/compress.c.  Since the 842 hw has requirements not only for
+> specific alignment and min/max sizes, but also a requirement for
+> specific length multiple (i.e. must be !(len % 8)) it might be
+> worthwhile to also add a cra_sizemodulo or something like that.
+> However, if the common crypto alignment/size handling code allows any
+> alignment/size buffers (instead of just returning error for mis-sized
+> buffers), I think a common crypto header would need to be added in
+> cases of mis-sizing, which may not be appropriate for common code.
+> Alternately, the common crypto code could just return error for
+> mis-sized buffers; users of the crypto comp api would just have to
+> check crypto_tfm_alg_blocksize() before calling.
+
+I'd like to see another hardware implementation before we start
+moving this into the API.
+
+> In case I haven't said it before, I really hate how the 842 hw
+> requires specific alignment and sizing.  How hard is it to add support
+> for any alignment/size in the hw?!?
+
+Another option is to use a software fallback for the cases that
+the hardware can't handle.
+
+Cheers,
 -- 
-Best Regards,
-Jacek Anaszewski
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
