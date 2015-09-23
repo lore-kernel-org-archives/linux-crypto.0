@@ -1,246 +1,266 @@
 From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH 1/4] crypto: talitos: dma_map_sg can handle chained SG
-Date: Wed, 23 Sep 2015 13:55:25 +0200
-Message-ID: <1443009328-12478-2-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH 2/4] crypto: qce: dma_map_sg can handle chained SG
+Date: Wed, 23 Sep 2015 13:55:26 +0200
+Message-ID: <1443009328-12478-3-git-send-email-clabbe.montjoie@gmail.com>
 References: <1443009328-12478-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	LABBE Corentin <clabbe.montjoie@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net, axboe@fb.com,
+	clabbe.montjoie@gmail.com, cristian.stoica@freescale.com,
+	dan.j.williams@intel.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f182.google.com ([209.85.212.182]:33462 "EHLO
+	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753922AbbIWL41 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 23 Sep 2015 07:56:27 -0400
 In-Reply-To: <1443009328-12478-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The talitos driver use two dma_map_sg path
-according to SG are chained or not.
+The qce driver use two dma_map_sg path according to SG are chained
+or not.
 Since dma_map_sg can handle both case, clean the code with all
 references to sg chained.
 
-Thus removing talitos_map_sg, talitos_unmap_sg_chain
-and sg_count functions.
+Thus removing qce_mapsg, qce_unmapsg and qce_countsg functions.
 
 Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/talitos.c | 104 ++++++++---------------------------------------
- 1 file changed, 18 insertions(+), 86 deletions(-)
+ drivers/crypto/qce/ablkcipher.c | 30 ++++++++----------------
+ drivers/crypto/qce/cipher.h     |  4 ----
+ drivers/crypto/qce/dma.c        | 52 -----------------------------------------
+ drivers/crypto/qce/dma.h        |  5 ----
+ drivers/crypto/qce/sha.c        | 14 ++++-------
+ drivers/crypto/qce/sha.h        |  2 --
+ 6 files changed, 15 insertions(+), 92 deletions(-)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 3b20a1b..46f531e 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -857,8 +857,6 @@ badkey:
-  * talitos_edesc - s/w-extended descriptor
-  * @src_nents: number of segments in input scatterlist
-  * @dst_nents: number of segments in output scatterlist
-- * @src_chained: whether src is chained or not
-- * @dst_chained: whether dst is chained or not
-  * @icv_ool: whether ICV is out-of-line
-  * @iv_dma: dma address of iv for checking continuity and link table
-  * @dma_len: length of dma mapped link_tbl space
-@@ -874,8 +872,6 @@ badkey:
- struct talitos_edesc {
+diff --git a/drivers/crypto/qce/ablkcipher.c b/drivers/crypto/qce/ablkcipher.c
+index ad592de..2c0d63d 100644
+--- a/drivers/crypto/qce/ablkcipher.c
++++ b/drivers/crypto/qce/ablkcipher.c
+@@ -44,10 +44,8 @@ static void qce_ablkcipher_done(void *data)
+ 			error);
+ 
+ 	if (diff_dst)
+-		qce_unmapsg(qce->dev, rctx->src_sg, rctx->src_nents, dir_src,
+-			    rctx->dst_chained);
+-	qce_unmapsg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst,
+-		    rctx->dst_chained);
++		dma_unmap_sg(qce->dev, rctx->src_sg, rctx->src_nents, dir_src);
++	dma_unmap_sg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst);
+ 
+ 	sg_free_table(&rctx->dst_tbl);
+ 
+@@ -80,15 +78,11 @@ qce_ablkcipher_async_req_handle(struct crypto_async_request *async_req)
+ 	dir_src = diff_dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL;
+ 	dir_dst = diff_dst ? DMA_FROM_DEVICE : DMA_BIDIRECTIONAL;
+ 
+-	rctx->src_nents = qce_countsg(req->src, req->nbytes,
+-				      &rctx->src_chained);
+-	if (diff_dst) {
+-		rctx->dst_nents = qce_countsg(req->dst, req->nbytes,
+-					      &rctx->dst_chained);
+-	} else {
++	rctx->src_nents = sg_nents_for_len(req->src, req->nbytes);
++	if (diff_dst)
++		rctx->dst_nents = sg_nents_for_len(req->dst, req->nbytes);
++	else
+ 		rctx->dst_nents = rctx->src_nents;
+-		rctx->dst_chained = rctx->src_chained;
+-	}
+ 
+ 	rctx->dst_nents += 1;
+ 
+@@ -116,14 +110,12 @@ qce_ablkcipher_async_req_handle(struct crypto_async_request *async_req)
+ 	sg_mark_end(sg);
+ 	rctx->dst_sg = rctx->dst_tbl.sgl;
+ 
+-	ret = qce_mapsg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst,
+-			rctx->dst_chained);
++	ret = dma_map_sg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst);
+ 	if (ret < 0)
+ 		goto error_free;
+ 
+ 	if (diff_dst) {
+-		ret = qce_mapsg(qce->dev, req->src, rctx->src_nents, dir_src,
+-				rctx->src_chained);
++		ret = dma_map_sg(qce->dev, req->src, rctx->src_nents, dir_src);
+ 		if (ret < 0)
+ 			goto error_unmap_dst;
+ 		rctx->src_sg = req->src;
+@@ -149,11 +141,9 @@ error_terminate:
+ 	qce_dma_terminate_all(&qce->dma);
+ error_unmap_src:
+ 	if (diff_dst)
+-		qce_unmapsg(qce->dev, req->src, rctx->src_nents, dir_src,
+-			    rctx->src_chained);
++		dma_unmap_sg(qce->dev, req->src, rctx->src_nents, dir_src);
+ error_unmap_dst:
+-	qce_unmapsg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst,
+-		    rctx->dst_chained);
++	dma_unmap_sg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst);
+ error_free:
+ 	sg_free_table(&rctx->dst_tbl);
+ 	return ret;
+diff --git a/drivers/crypto/qce/cipher.h b/drivers/crypto/qce/cipher.h
+index d5757cf..5c6a5f8 100644
+--- a/drivers/crypto/qce/cipher.h
++++ b/drivers/crypto/qce/cipher.h
+@@ -32,8 +32,6 @@ struct qce_cipher_ctx {
+  * @ivsize: IV size
+  * @src_nents: source entries
+  * @dst_nents: destination entries
+- * @src_chained: is source chained
+- * @dst_chained: is destination chained
+  * @result_sg: scatterlist used for result buffer
+  * @dst_tbl: destination sg table
+  * @dst_sg: destination sg pointer table beginning
+@@ -47,8 +45,6 @@ struct qce_cipher_reqctx {
+ 	unsigned int ivsize;
  	int src_nents;
  	int dst_nents;
 -	bool src_chained;
 -	bool dst_chained;
- 	bool icv_ool;
- 	dma_addr_t iv_dma;
- 	int dma_len;
-@@ -887,29 +883,6 @@ struct talitos_edesc {
- 	};
- };
+ 	struct scatterlist result_sg;
+ 	struct sg_table dst_tbl;
+ 	struct scatterlist *dst_sg;
+diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
+index 378cb76..4797e79 100644
+--- a/drivers/crypto/qce/dma.c
++++ b/drivers/crypto/qce/dma.c
+@@ -54,58 +54,6 @@ void qce_dma_release(struct qce_dma_data *dma)
+ 	kfree(dma->result_buf);
+ }
  
--static int talitos_map_sg(struct device *dev, struct scatterlist *sg,
--			  unsigned int nents, enum dma_data_direction dir,
--			  bool chained)
+-int qce_mapsg(struct device *dev, struct scatterlist *sg, int nents,
+-	      enum dma_data_direction dir, bool chained)
 -{
--	if (unlikely(chained))
+-	int err;
+-
+-	if (chained) {
 -		while (sg) {
--			dma_map_sg(dev, sg, 1, dir);
+-			err = dma_map_sg(dev, sg, 1, dir);
+-			if (!err)
+-				return -EFAULT;
 -			sg = sg_next(sg);
 -		}
--	else
--		dma_map_sg(dev, sg, nents, dir);
+-	} else {
+-		err = dma_map_sg(dev, sg, nents, dir);
+-		if (!err)
+-			return -EFAULT;
+-	}
+-
 -	return nents;
 -}
 -
--static void talitos_unmap_sg_chain(struct device *dev, struct scatterlist *sg,
--				   enum dma_data_direction dir)
+-void qce_unmapsg(struct device *dev, struct scatterlist *sg, int nents,
+-		 enum dma_data_direction dir, bool chained)
 -{
--	while (sg) {
--		dma_unmap_sg(dev, sg, 1, dir);
--		sg = sg_next(sg);
--	}
+-	if (chained)
+-		while (sg) {
+-			dma_unmap_sg(dev, sg, 1, dir);
+-			sg = sg_next(sg);
+-		}
+-	else
+-		dma_unmap_sg(dev, sg, nents, dir);
 -}
 -
- static void talitos_sg_unmap(struct device *dev,
- 			     struct talitos_edesc *edesc,
- 			     struct scatterlist *src,
-@@ -919,24 +892,13 @@ static void talitos_sg_unmap(struct device *dev,
- 	unsigned int dst_nents = edesc->dst_nents ? : 1;
- 
- 	if (src != dst) {
--		if (edesc->src_chained)
--			talitos_unmap_sg_chain(dev, src, DMA_TO_DEVICE);
--		else
--			dma_unmap_sg(dev, src, src_nents, DMA_TO_DEVICE);
-+		dma_unmap_sg(dev, src, src_nents, DMA_TO_DEVICE);
- 
- 		if (dst) {
--			if (edesc->dst_chained)
--				talitos_unmap_sg_chain(dev, dst,
--						       DMA_FROM_DEVICE);
--			else
--				dma_unmap_sg(dev, dst, dst_nents,
--					     DMA_FROM_DEVICE);
-+			dma_unmap_sg(dev, dst, dst_nents, DMA_FROM_DEVICE);
- 		}
- 	} else
--		if (edesc->src_chained)
--			talitos_unmap_sg_chain(dev, src, DMA_BIDIRECTIONAL);
--		else
--			dma_unmap_sg(dev, src, src_nents, DMA_BIDIRECTIONAL);
-+		dma_unmap_sg(dev, src, src_nents, DMA_BIDIRECTIONAL);
- }
- 
- static void ipsec_esp_unmap(struct device *dev,
-@@ -1118,10 +1080,9 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 	map_single_talitos_ptr(dev, &desc->ptr[0], ctx->authkeylen, &ctx->key,
- 			       DMA_TO_DEVICE);
- 
--	sg_count = talitos_map_sg(dev, areq->src, edesc->src_nents ?: 1,
--				  (areq->src == areq->dst) ? DMA_BIDIRECTIONAL
--							   : DMA_TO_DEVICE,
--				  edesc->src_chained);
-+	sg_count = dma_map_sg(dev, areq->src, edesc->src_nents ?: 1,
-+			      (areq->src == areq->dst) ? DMA_BIDIRECTIONAL
-+							   : DMA_TO_DEVICE);
- 
- 	/* hmac data */
- 	desc->ptr[1].len = cpu_to_be16(areq->assoclen);
-@@ -1185,9 +1146,8 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 	desc->ptr[5].j_extent = authsize;
- 
- 	if (areq->src != areq->dst)
--		sg_count = talitos_map_sg(dev, areq->dst,
--					  edesc->dst_nents ? : 1,
--					  DMA_FROM_DEVICE, edesc->dst_chained);
-+		sg_count = dma_map_sg(dev, areq->dst, edesc->dst_nents ? : 1,
-+				      DMA_FROM_DEVICE);
- 
- 	edesc->icv_ool = false;
- 
-@@ -1234,26 +1194,6 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- }
- 
- /*
-- * derive number of elements in scatterlist
-- */
--static int sg_count(struct scatterlist *sg_list, int nbytes, bool *chained)
+-int qce_countsg(struct scatterlist *sglist, int nbytes, bool *chained)
 -{
--	struct scatterlist *sg = sg_list;
--	int sg_nents = 0;
+-	struct scatterlist *sg = sglist;
+-	int nents = 0;
 -
--	*chained = false;
+-	if (chained)
+-		*chained = false;
+-
 -	while (nbytes > 0 && sg) {
--		sg_nents++;
+-		nents++;
 -		nbytes -= sg->length;
--		if (!sg_is_last(sg) && (sg + 1)->length == 0)
+-		if (!sg_is_last(sg) && (sg + 1)->length == 0 && chained)
 -			*chained = true;
 -		sg = sg_next(sg);
 -	}
 -
--	return sg_nents;
+-	return nents;
 -}
 -
--/*
-  * allocate and map the extended descriptor
-  */
- static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
-@@ -1270,7 +1210,6 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
+ struct scatterlist *
+ qce_sgtable_add(struct sg_table *sgt, struct scatterlist *new_sgl)
  {
- 	struct talitos_edesc *edesc;
- 	int src_nents, dst_nents, alloc_len, dma_len;
--	bool src_chained = false, dst_chained = false;
- 	dma_addr_t iv_dma = 0;
- 	gfp_t flags = cryptoflags & CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL :
- 		      GFP_ATOMIC;
-@@ -1287,18 +1226,16 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 		iv_dma = dma_map_single(dev, iv, ivsize, DMA_TO_DEVICE);
+diff --git a/drivers/crypto/qce/dma.h b/drivers/crypto/qce/dma.h
+index 65bedb8..130235d 100644
+--- a/drivers/crypto/qce/dma.h
++++ b/drivers/crypto/qce/dma.h
+@@ -49,11 +49,6 @@ int qce_dma_prep_sgs(struct qce_dma_data *dma, struct scatterlist *sg_in,
+ 		     dma_async_tx_callback cb, void *cb_param);
+ void qce_dma_issue_pending(struct qce_dma_data *dma);
+ int qce_dma_terminate_all(struct qce_dma_data *dma);
+-int qce_countsg(struct scatterlist *sg_list, int nbytes, bool *chained);
+-void qce_unmapsg(struct device *dev, struct scatterlist *sg, int nents,
+-		 enum dma_data_direction dir, bool chained);
+-int qce_mapsg(struct device *dev, struct scatterlist *sg, int nents,
+-	      enum dma_data_direction dir, bool chained);
+ struct scatterlist *
+ qce_sgtable_add(struct sg_table *sgt, struct scatterlist *sg_add);
  
- 	if (!dst || dst == src) {
--		src_nents = sg_count(src, assoclen + cryptlen + authsize,
--				     &src_chained);
-+		src_nents = sg_nents_for_len(src,
-+					     assoclen + cryptlen + authsize);
- 		src_nents = (src_nents == 1) ? 0 : src_nents;
- 		dst_nents = dst ? src_nents : 0;
- 	} else { /* dst && dst != src*/
--		src_nents = sg_count(src, assoclen + cryptlen +
--					  (encrypt ? 0 : authsize),
--				     &src_chained);
-+		src_nents = sg_nents_for_len(src, assoclen + cryptlen +
-+						 (encrypt ? 0 : authsize));
- 		src_nents = (src_nents == 1) ? 0 : src_nents;
--		dst_nents = sg_count(dst, assoclen + cryptlen +
--					  (encrypt ? authsize : 0),
--				     &dst_chained);
-+		dst_nents = sg_nents_for_len(dst, assoclen + cryptlen +
-+						 (encrypt ? authsize : 0));
- 		dst_nents = (dst_nents == 1) ? 0 : dst_nents;
+diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
+index be2f504..bcde9a0 100644
+--- a/drivers/crypto/qce/sha.c
++++ b/drivers/crypto/qce/sha.c
+@@ -51,9 +51,8 @@ static void qce_ahash_done(void *data)
+ 	if (error)
+ 		dev_dbg(qce->dev, "ahash dma termination error (%d)\n", error);
+ 
+-	qce_unmapsg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE,
+-		    rctx->src_chained);
+-	qce_unmapsg(qce->dev, &rctx->result_sg, 1, DMA_FROM_DEVICE, 0);
++	dma_unmap_sg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE);
++	dma_unmap_sg(qce->dev, &rctx->result_sg, 1, DMA_FROM_DEVICE);
+ 
+ 	memcpy(rctx->digest, result->auth_iv, digestsize);
+ 	if (req->result)
+@@ -92,10 +91,8 @@ static int qce_ahash_async_req_handle(struct crypto_async_request *async_req)
+ 		rctx->authklen = AES_KEYSIZE_128;
  	}
  
-@@ -1332,8 +1269,6 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
+-	rctx->src_nents = qce_countsg(req->src, req->nbytes,
+-				      &rctx->src_chained);
+-	ret = qce_mapsg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE,
+-			rctx->src_chained);
++	rctx->src_nents = sg_nents_for_len(req->src, req->nbytes);
++	ret = dma_map_sg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE);
+ 	if (ret < 0)
+ 		return ret;
  
- 	edesc->src_nents = src_nents;
- 	edesc->dst_nents = dst_nents;
--	edesc->src_chained = src_chained;
--	edesc->dst_chained = dst_chained;
- 	edesc->iv_dma = iv_dma;
- 	edesc->dma_len = dma_len;
- 	if (dma_len)
-@@ -1518,8 +1453,7 @@ int map_sg_in_talitos_ptr(struct device *dev, struct scatterlist *src,
- 	} else {
- 		to_talitos_ptr_extent_clear(ptr, is_sec1);
+@@ -123,8 +120,7 @@ error_terminate:
+ error_unmap_dst:
+ 	qce_unmapsg(qce->dev, &rctx->result_sg, 1, DMA_FROM_DEVICE, 0);
+ error_unmap_src:
+-	qce_unmapsg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE,
+-		    rctx->src_chained);
++	dma_unmap_sg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE);
+ 	return ret;
+ }
  
--		sg_count = talitos_map_sg(dev, src, edesc->src_nents ? : 1, dir,
--					  edesc->src_chained);
-+		sg_count = dma_map_sg(dev, src, edesc->src_nents ? : 1, dir);
- 
- 		if (sg_count == 1) {
- 			to_talitos_ptr(ptr, sg_dma_address(src), is_sec1);
-@@ -1552,8 +1486,7 @@ void map_sg_out_talitos_ptr(struct device *dev, struct scatterlist *dst,
- 	bool is_sec1 = has_ftr_sec1(priv);
- 
- 	if (dir != DMA_NONE)
--		sg_count = talitos_map_sg(dev, dst, edesc->dst_nents ? : 1,
--					  dir, edesc->dst_chained);
-+		sg_count = dma_map_sg(dev, dst, edesc->dst_nents ? : 1, dir);
- 
- 	to_talitos_ptr_len(ptr, len, is_sec1);
- 
-@@ -1897,12 +1830,11 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
- 	unsigned int nbytes_to_hash;
- 	unsigned int to_hash_later;
- 	unsigned int nsg;
--	bool chained;
- 
- 	if (!req_ctx->last && (nbytes + req_ctx->nbuf <= blocksize)) {
- 		/* Buffer up to one whole block */
- 		sg_copy_to_buffer(areq->src,
--				  sg_count(areq->src, nbytes, &chained),
-+				  sg_nents_for_len(areq->src, nbytes),
- 				  req_ctx->buf + req_ctx->nbuf, nbytes);
- 		req_ctx->nbuf += nbytes;
- 		return 0;
-@@ -1935,7 +1867,7 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
- 		req_ctx->psrc = areq->src;
- 
- 	if (to_hash_later) {
--		int nents = sg_count(areq->src, nbytes, &chained);
-+		int nents = sg_nents_for_len(areq->src, nbytes);
- 		sg_pcopy_to_buffer(areq->src, nents,
- 				      req_ctx->bufnext,
- 				      to_hash_later,
+diff --git a/drivers/crypto/qce/sha.h b/drivers/crypto/qce/sha.h
+index 286f0d5..236bb5e9 100644
+--- a/drivers/crypto/qce/sha.h
++++ b/drivers/crypto/qce/sha.h
+@@ -36,7 +36,6 @@ struct qce_sha_ctx {
+  * @flags: operation flags
+  * @src_orig: original request sg list
+  * @nbytes_orig: original request number of bytes
+- * @src_chained: is source scatterlist chained
+  * @src_nents: source number of entries
+  * @byte_count: byte count
+  * @count: save count in states during update, import and export
+@@ -55,7 +54,6 @@ struct qce_sha_reqctx {
+ 	unsigned long flags;
+ 	struct scatterlist *src_orig;
+ 	unsigned int nbytes_orig;
+-	bool src_chained;
+ 	int src_nents;
+ 	__be32 byte_count[2];
+ 	u64 count;
 -- 
 2.4.9
