@@ -1,22 +1,28 @@
-From: <jerryfunds247777@Jerryloan.onmicrosoft.com>
-Subject: (unknown)
-Date: Wed, 23 Sep 2015 16:18:08 +0530
-Message-ID: <PS1PR06MB10656EED286295D1246C7F98B8440@PS1PR06MB1065.apcprd06.prod.outlook.com>
-Reply-To: <jerrysmith@inbox.lv>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: Recipients@vger.kernel.org
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: [PATCH] crypto: dma_map_sg can handle chained SG
+Date: Wed, 23 Sep 2015 13:55:24 +0200
+Message-ID: <1443009328-12478-1-git-send-email-clabbe.montjoie@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pu1apc01hn0240.outbound.protection.outlook.com ([104.47.126.240]:55424
-	"EHLO APC01-PU1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751887AbbIWKsu convert rfc822-to-8bit (ORCPT
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:35810 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753217AbbIWLzg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Sep 2015 06:48:50 -0400
-Content-Description: Mail message body
-Subject: 
+	Wed, 23 Sep 2015 07:55:36 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-We Give Out Loans For 3% Interest Rate And We Offer Loans From $5,000 To $50,000,000.00, Are You Looking To Buy A House Car Or Company Or Start Up A Truck Company or Buy A Truck Or Personal Loans, Email Us At jerrysmith@inbox.lv  With Amount Needed And Phone Number.
+
+Hello
+
+Some drivers use two dma_map_sg path according to SG are chained or not.
+Since dma_map_sg can handle both case, this patch series clean all code
+with references to sg chained.
+
+Note that I could only compile test sahara and caam patch.
+And none could be tested due to lack oh hardware.
+
+Regards
+
+LABBE Corentin
