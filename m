@@ -1,44 +1,45 @@
-From: Stanimir Varbanov <svarbanov@mm-sol.com>
-Subject: Re: [PATCH 2/4] crypto: qce: dma_map_sg can handle chained SG
-Date: Wed, 23 Sep 2015 22:47:49 +0300
-Message-ID: <560301E5.6080402@mm-sol.com>
-References: <1443009328-12478-1-git-send-email-clabbe.montjoie@gmail.com> <1443009328-12478-3-git-send-email-clabbe.montjoie@gmail.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH 0/2] crytpo: rsa - use mpi sgl helpers
+Date: Wed, 23 Sep 2015 15:48:53 -0700
+Message-ID: <20150923224853.23780.95440.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>,
-	herbert@gondor.apana.org.au, davem@davemloft.net, axboe@fb.com,
-	cristian.stoica@freescale.com, dan.j.williams@intel.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1443009328-12478-3-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, tadeusz.struk@intel.com
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga01.intel.com ([192.55.52.88]:54719 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754359AbbIWWus (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 23 Sep 2015 18:50:48 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+This series introduces new mpi helpers to read from and
+write to an sgl without a need of using an intermediate
+flat buffer.
 
-On 09/23/2015 02:55 PM, LABBE Corentin wrote:
-> The qce driver use two dma_map_sg path according to SG are chained
-> or not.
-> Since dma_map_sg can handle both case, clean the code with all
-> references to sg chained.
-> 
-> Thus removing qce_mapsg, qce_unmapsg and qce_countsg functions.
-> 
-> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-> ---
->  drivers/crypto/qce/ablkcipher.c | 30 ++++++++----------------
->  drivers/crypto/qce/cipher.h     |  4 ----
->  drivers/crypto/qce/dma.c        | 52 -----------------------------------------
->  drivers/crypto/qce/dma.h        |  5 ----
->  drivers/crypto/qce/sha.c        | 14 ++++-------
->  drivers/crypto/qce/sha.h        |  2 --
->  6 files changed, 15 insertions(+), 92 deletions(-)
+First patch adds helpers to mpi library.
+Second patch changes rsa implementation to use the new
+functions.
 
-Thanks for the patch, very nice diffstat.
+This is an incremental patch series on top of these two:
+https://patchwork.kernel.org/patch/7241041/
+https://patchwork.kernel.org/patch/7241051/
 
-I will take care to test the patch next week.
+A simple test for the new helpers can be found here:
+https://github.com/tstruk/mpi_sgl_test/blob/master/test.c
+
+---
+
+Tadeusz Struk (2):
+      lib/mpi: Add mpi sgl helpers
+      crytpo: rsa - use mpi slg helpers to import and export data
 
 
-regards,
-Stan
+ crypto/rsa.c        |  110 ++----------------------------
+ include/linux/mpi.h |    4 +
+ lib/mpi/mpicoder.c  |  186 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 198 insertions(+), 102 deletions(-)
+
+--
