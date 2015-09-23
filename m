@@ -1,266 +1,599 @@
 From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH 2/4] crypto: qce: dma_map_sg can handle chained SG
-Date: Wed, 23 Sep 2015 13:55:26 +0200
-Message-ID: <1443009328-12478-3-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH 3/4] crypto: caam: dma_map_sg can handle chained SG
+Date: Wed, 23 Sep 2015 13:55:27 +0200
+Message-ID: <1443009328-12478-4-git-send-email-clabbe.montjoie@gmail.com>
 References: <1443009328-12478-1-git-send-email-clabbe.montjoie@gmail.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net, axboe@fb.com,
-	clabbe.montjoie@gmail.com, cristian.stoica@freescale.com,
-	dan.j.williams@intel.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:33462 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753922AbbIWL41 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Sep 2015 07:56:27 -0400
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	catalin.vasile@freescale.com, clabbe.montjoie@gmail.com,
+	cristian.stoica@freescale.com, fabio.estevam@freescale.com,
+	horia.geanta@freescale.com, steve.cornelius@freescale.com,
+	tudor.ambarus@freescale.com, vicki.milhoan@freescale.com,
+	yanjiang.jin@windriver.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1443009328-12478-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The qce driver use two dma_map_sg path according to SG are chained
+The caam driver use two dma_map_sg path according to SG are chained
 or not.
 Since dma_map_sg can handle both case, clean the code with all
 references to sg chained.
 
-Thus removing qce_mapsg, qce_unmapsg and qce_countsg functions.
+Thus removing dma_map_sg_chained, dma_unmap_sg_chained
+and __sg_count functions.
 
 Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/qce/ablkcipher.c | 30 ++++++++----------------
- drivers/crypto/qce/cipher.h     |  4 ----
- drivers/crypto/qce/dma.c        | 52 -----------------------------------------
- drivers/crypto/qce/dma.h        |  5 ----
- drivers/crypto/qce/sha.c        | 14 ++++-------
- drivers/crypto/qce/sha.h        |  2 --
- 6 files changed, 15 insertions(+), 92 deletions(-)
+ drivers/crypto/caam/caamalg.c    | 94 +++++++++++++++-------------------------
+ drivers/crypto/caam/caamhash.c   | 55 ++++++++---------------
+ drivers/crypto/caam/sg_sw_sec4.h | 72 +-----------------------------
+ 3 files changed, 53 insertions(+), 168 deletions(-)
 
-diff --git a/drivers/crypto/qce/ablkcipher.c b/drivers/crypto/qce/ablkcipher.c
-index ad592de..2c0d63d 100644
---- a/drivers/crypto/qce/ablkcipher.c
-+++ b/drivers/crypto/qce/ablkcipher.c
-@@ -44,10 +44,8 @@ static void qce_ablkcipher_done(void *data)
- 			error);
- 
- 	if (diff_dst)
--		qce_unmapsg(qce->dev, rctx->src_sg, rctx->src_nents, dir_src,
--			    rctx->dst_chained);
--	qce_unmapsg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst,
--		    rctx->dst_chained);
-+		dma_unmap_sg(qce->dev, rctx->src_sg, rctx->src_nents, dir_src);
-+	dma_unmap_sg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst);
- 
- 	sg_free_table(&rctx->dst_tbl);
- 
-@@ -80,15 +78,11 @@ qce_ablkcipher_async_req_handle(struct crypto_async_request *async_req)
- 	dir_src = diff_dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL;
- 	dir_dst = diff_dst ? DMA_FROM_DEVICE : DMA_BIDIRECTIONAL;
- 
--	rctx->src_nents = qce_countsg(req->src, req->nbytes,
--				      &rctx->src_chained);
--	if (diff_dst) {
--		rctx->dst_nents = qce_countsg(req->dst, req->nbytes,
--					      &rctx->dst_chained);
--	} else {
-+	rctx->src_nents = sg_nents_for_len(req->src, req->nbytes);
-+	if (diff_dst)
-+		rctx->dst_nents = sg_nents_for_len(req->dst, req->nbytes);
-+	else
- 		rctx->dst_nents = rctx->src_nents;
--		rctx->dst_chained = rctx->src_chained;
--	}
- 
- 	rctx->dst_nents += 1;
- 
-@@ -116,14 +110,12 @@ qce_ablkcipher_async_req_handle(struct crypto_async_request *async_req)
- 	sg_mark_end(sg);
- 	rctx->dst_sg = rctx->dst_tbl.sgl;
- 
--	ret = qce_mapsg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst,
--			rctx->dst_chained);
-+	ret = dma_map_sg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst);
- 	if (ret < 0)
- 		goto error_free;
- 
- 	if (diff_dst) {
--		ret = qce_mapsg(qce->dev, req->src, rctx->src_nents, dir_src,
--				rctx->src_chained);
-+		ret = dma_map_sg(qce->dev, req->src, rctx->src_nents, dir_src);
- 		if (ret < 0)
- 			goto error_unmap_dst;
- 		rctx->src_sg = req->src;
-@@ -149,11 +141,9 @@ error_terminate:
- 	qce_dma_terminate_all(&qce->dma);
- error_unmap_src:
- 	if (diff_dst)
--		qce_unmapsg(qce->dev, req->src, rctx->src_nents, dir_src,
--			    rctx->src_chained);
-+		dma_unmap_sg(qce->dev, req->src, rctx->src_nents, dir_src);
- error_unmap_dst:
--	qce_unmapsg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst,
--		    rctx->dst_chained);
-+	dma_unmap_sg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst);
- error_free:
- 	sg_free_table(&rctx->dst_tbl);
- 	return ret;
-diff --git a/drivers/crypto/qce/cipher.h b/drivers/crypto/qce/cipher.h
-index d5757cf..5c6a5f8 100644
---- a/drivers/crypto/qce/cipher.h
-+++ b/drivers/crypto/qce/cipher.h
-@@ -32,8 +32,6 @@ struct qce_cipher_ctx {
-  * @ivsize: IV size
-  * @src_nents: source entries
-  * @dst_nents: destination entries
-- * @src_chained: is source chained
-- * @dst_chained: is destination chained
-  * @result_sg: scatterlist used for result buffer
-  * @dst_tbl: destination sg table
-  * @dst_sg: destination sg pointer table beginning
-@@ -47,8 +45,6 @@ struct qce_cipher_reqctx {
- 	unsigned int ivsize;
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index ba79d63..ad0d1ec 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -1708,11 +1708,8 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
+ /*
+  * aead_edesc - s/w-extended aead descriptor
+  * @assoc_nents: number of segments in associated data (SPI+Seq) scatterlist
+- * @assoc_chained: if source is chained
+  * @src_nents: number of segments in input scatterlist
+- * @src_chained: if source is chained
+  * @dst_nents: number of segments in output scatterlist
+- * @dst_chained: if destination is chained
+  * @iv_dma: dma address of iv for checking continuity and link table
+  * @desc: h/w descriptor (variable length; must not exceed MAX_CAAM_DESCSIZE)
+  * @sec4_sg_bytes: length of dma mapped sec4_sg space
+@@ -1721,11 +1718,8 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
+  */
+ struct aead_edesc {
+ 	int assoc_nents;
+-	bool assoc_chained;
  	int src_nents;
- 	int dst_nents;
 -	bool src_chained;
+ 	int dst_nents;
 -	bool dst_chained;
- 	struct scatterlist result_sg;
- 	struct sg_table dst_tbl;
- 	struct scatterlist *dst_sg;
-diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
-index 378cb76..4797e79 100644
---- a/drivers/crypto/qce/dma.c
-+++ b/drivers/crypto/qce/dma.c
-@@ -54,58 +54,6 @@ void qce_dma_release(struct qce_dma_data *dma)
- 	kfree(dma->result_buf);
+ 	dma_addr_t iv_dma;
+ 	int sec4_sg_bytes;
+ 	dma_addr_t sec4_sg_dma;
+@@ -1736,9 +1730,7 @@ struct aead_edesc {
+ /*
+  * ablkcipher_edesc - s/w-extended ablkcipher descriptor
+  * @src_nents: number of segments in input scatterlist
+- * @src_chained: if source is chained
+  * @dst_nents: number of segments in output scatterlist
+- * @dst_chained: if destination is chained
+  * @iv_dma: dma address of iv for checking continuity and link table
+  * @desc: h/w descriptor (variable length; must not exceed MAX_CAAM_DESCSIZE)
+  * @sec4_sg_bytes: length of dma mapped sec4_sg space
+@@ -1747,9 +1739,7 @@ struct aead_edesc {
+  */
+ struct ablkcipher_edesc {
+ 	int src_nents;
+-	bool src_chained;
+ 	int dst_nents;
+-	bool dst_chained;
+ 	dma_addr_t iv_dma;
+ 	int sec4_sg_bytes;
+ 	dma_addr_t sec4_sg_dma;
+@@ -1759,18 +1749,15 @@ struct ablkcipher_edesc {
+ 
+ static void caam_unmap(struct device *dev, struct scatterlist *src,
+ 		       struct scatterlist *dst, int src_nents,
+-		       bool src_chained, int dst_nents, bool dst_chained,
++		       int dst_nents,
+ 		       dma_addr_t iv_dma, int ivsize, dma_addr_t sec4_sg_dma,
+ 		       int sec4_sg_bytes)
+ {
+ 	if (dst != src) {
+-		dma_unmap_sg_chained(dev, src, src_nents ? : 1, DMA_TO_DEVICE,
+-				     src_chained);
+-		dma_unmap_sg_chained(dev, dst, dst_nents ? : 1, DMA_FROM_DEVICE,
+-				     dst_chained);
++		dma_unmap_sg(dev, src, src_nents ? : 1, DMA_TO_DEVICE);
++		dma_unmap_sg(dev, dst, dst_nents ? : 1, DMA_FROM_DEVICE);
+ 	} else {
+-		dma_unmap_sg_chained(dev, src, src_nents ? : 1,
+-				     DMA_BIDIRECTIONAL, src_chained);
++		dma_unmap_sg(dev, src, src_nents ? : 1, DMA_BIDIRECTIONAL);
+ 	}
+ 
+ 	if (iv_dma)
+@@ -1785,8 +1772,7 @@ static void aead_unmap(struct device *dev,
+ 		       struct aead_request *req)
+ {
+ 	caam_unmap(dev, req->src, req->dst,
+-		   edesc->src_nents, edesc->src_chained, edesc->dst_nents,
+-		   edesc->dst_chained, 0, 0,
++		   edesc->src_nents, edesc->dst_nents, 0, 0,
+ 		   edesc->sec4_sg_dma, edesc->sec4_sg_bytes);
  }
  
--int qce_mapsg(struct device *dev, struct scatterlist *sg, int nents,
--	      enum dma_data_direction dir, bool chained)
+@@ -1798,8 +1784,8 @@ static void ablkcipher_unmap(struct device *dev,
+ 	int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
+ 
+ 	caam_unmap(dev, req->src, req->dst,
+-		   edesc->src_nents, edesc->src_chained, edesc->dst_nents,
+-		   edesc->dst_chained, edesc->iv_dma, ivsize,
++		   edesc->src_nents, edesc->dst_nents,
++		   edesc->iv_dma, ivsize,
+ 		   edesc->sec4_sg_dma, edesc->sec4_sg_bytes);
+ }
+ 
+@@ -2169,22 +2155,18 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+ 	struct aead_edesc *edesc;
+ 	int sgc;
+ 	bool all_contig = true;
+-	bool src_chained = false, dst_chained = false;
+ 	int sec4_sg_index, sec4_sg_len = 0, sec4_sg_bytes;
+ 	unsigned int authsize = ctx->authsize;
+ 
+ 	if (unlikely(req->dst != req->src)) {
+-		src_nents = sg_count(req->src, req->assoclen + req->cryptlen,
+-				     &src_chained);
++		src_nents = sg_count(req->src, req->assoclen + req->cryptlen);
+ 		dst_nents = sg_count(req->dst,
+ 				     req->assoclen + req->cryptlen +
+-					(encrypt ? authsize : (-authsize)),
+-				     &dst_chained);
++					(encrypt ? authsize : (-authsize)));
+ 	} else {
+ 		src_nents = sg_count(req->src,
+ 				     req->assoclen + req->cryptlen +
+-					(encrypt ? authsize : 0),
+-				     &src_chained);
++					(encrypt ? authsize : 0));
+ 	}
+ 
+ 	/* Check if data are contiguous. */
+@@ -2207,37 +2189,35 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+ 	}
+ 
+ 	if (likely(req->src == req->dst)) {
+-		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
+-					 DMA_BIDIRECTIONAL, src_chained);
++		sgc = dma_map_sg(jrdev, req->src, src_nents ? : 1,
++				 DMA_BIDIRECTIONAL);
+ 		if (unlikely(!sgc)) {
+ 			dev_err(jrdev, "unable to map source\n");
+ 			kfree(edesc);
+ 			return ERR_PTR(-ENOMEM);
+ 		}
+ 	} else {
+-		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
+-					 DMA_TO_DEVICE, src_chained);
++		sgc = dma_map_sg(jrdev, req->src, src_nents ? : 1,
++				 DMA_TO_DEVICE);
+ 		if (unlikely(!sgc)) {
+ 			dev_err(jrdev, "unable to map source\n");
+ 			kfree(edesc);
+ 			return ERR_PTR(-ENOMEM);
+ 		}
+ 
+-		sgc = dma_map_sg_chained(jrdev, req->dst, dst_nents ? : 1,
+-					 DMA_FROM_DEVICE, dst_chained);
++		sgc = dma_map_sg(jrdev, req->dst, dst_nents ? : 1,
++				 DMA_FROM_DEVICE);
+ 		if (unlikely(!sgc)) {
+ 			dev_err(jrdev, "unable to map destination\n");
+-			dma_unmap_sg_chained(jrdev, req->src, src_nents ? : 1,
+-					     DMA_TO_DEVICE, src_chained);
++			dma_unmap_sg(jrdev, req->src, src_nents ? : 1,
++				     DMA_TO_DEVICE);
+ 			kfree(edesc);
+ 			return ERR_PTR(-ENOMEM);
+ 		}
+ 	}
+ 
+ 	edesc->src_nents = src_nents;
+-	edesc->src_chained = src_chained;
+ 	edesc->dst_nents = dst_nents;
+-	edesc->dst_chained = dst_chained;
+ 	edesc->sec4_sg = (void *)edesc + sizeof(struct aead_edesc) +
+ 			 desc_bytes;
+ 	*all_contig_ptr = all_contig;
+@@ -2467,22 +2447,21 @@ static struct ablkcipher_edesc *ablkcipher_edesc_alloc(struct ablkcipher_request
+ 	bool iv_contig = false;
+ 	int sgc;
+ 	int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
+-	bool src_chained = false, dst_chained = false;
+ 	int sec4_sg_index;
+ 
+-	src_nents = sg_count(req->src, req->nbytes, &src_chained);
++	src_nents = sg_count(req->src, req->nbytes);
+ 
+ 	if (req->dst != req->src)
+-		dst_nents = sg_count(req->dst, req->nbytes, &dst_chained);
++		dst_nents = sg_count(req->dst, req->nbytes);
+ 
+ 	if (likely(req->src == req->dst)) {
+-		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
+-					 DMA_BIDIRECTIONAL, src_chained);
++		sgc = dma_map_sg(jrdev, req->src, src_nents ? : 1,
++				 DMA_BIDIRECTIONAL);
+ 	} else {
+-		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
+-					 DMA_TO_DEVICE, src_chained);
+-		sgc = dma_map_sg_chained(jrdev, req->dst, dst_nents ? : 1,
+-					 DMA_FROM_DEVICE, dst_chained);
++		sgc = dma_map_sg(jrdev, req->src, src_nents ? : 1,
++				 DMA_TO_DEVICE);
++		sgc = dma_map_sg(jrdev, req->dst, dst_nents ? : 1,
++				 DMA_FROM_DEVICE);
+ 	}
+ 
+ 	iv_dma = dma_map_single(jrdev, req->info, ivsize, DMA_TO_DEVICE);
+@@ -2511,9 +2490,7 @@ static struct ablkcipher_edesc *ablkcipher_edesc_alloc(struct ablkcipher_request
+ 	}
+ 
+ 	edesc->src_nents = src_nents;
+-	edesc->src_chained = src_chained;
+ 	edesc->dst_nents = dst_nents;
+-	edesc->dst_chained = dst_chained;
+ 	edesc->sec4_sg_bytes = sec4_sg_bytes;
+ 	edesc->sec4_sg = (void *)edesc + sizeof(struct ablkcipher_edesc) +
+ 			 desc_bytes;
+@@ -2646,22 +2623,21 @@ static struct ablkcipher_edesc *ablkcipher_giv_edesc_alloc(
+ 	bool iv_contig = false;
+ 	int sgc;
+ 	int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
+-	bool src_chained = false, dst_chained = false;
+ 	int sec4_sg_index;
+ 
+-	src_nents = sg_count(req->src, req->nbytes, &src_chained);
++	src_nents = sg_count(req->src, req->nbytes);
+ 
+ 	if (unlikely(req->dst != req->src))
+-		dst_nents = sg_count(req->dst, req->nbytes, &dst_chained);
++		dst_nents = sg_count(req->dst, req->nbytes);
+ 
+ 	if (likely(req->src == req->dst)) {
+-		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
+-					 DMA_BIDIRECTIONAL, src_chained);
++		sgc = dma_map_sg(jrdev, req->src, src_nents ? : 1,
++				 DMA_BIDIRECTIONAL);
+ 	} else {
+-		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
+-					 DMA_TO_DEVICE, src_chained);
+-		sgc = dma_map_sg_chained(jrdev, req->dst, dst_nents ? : 1,
+-					 DMA_FROM_DEVICE, dst_chained);
++		sgc = dma_map_sg(jrdev, req->src, src_nents ? : 1,
++				 DMA_TO_DEVICE);
++		sgc = dma_map_sg(jrdev, req->dst, dst_nents ? : 1,
++				 DMA_FROM_DEVICE);
+ 	}
+ 
+ 	/*
+@@ -2690,9 +2666,7 @@ static struct ablkcipher_edesc *ablkcipher_giv_edesc_alloc(
+ 	}
+ 
+ 	edesc->src_nents = src_nents;
+-	edesc->src_chained = src_chained;
+ 	edesc->dst_nents = dst_nents;
+-	edesc->dst_chained = dst_chained;
+ 	edesc->sec4_sg_bytes = sec4_sg_bytes;
+ 	edesc->sec4_sg = (void *)edesc + sizeof(struct ablkcipher_edesc) +
+ 			 desc_bytes;
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 94433b9..9609f66 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -181,10 +181,9 @@ static inline dma_addr_t buf_map_to_sec4_sg(struct device *jrdev,
+ /* Map req->src and put it in link table */
+ static inline void src_map_to_sec4_sg(struct device *jrdev,
+ 				      struct scatterlist *src, int src_nents,
+-				      struct sec4_sg_entry *sec4_sg,
+-				      bool chained)
++				      struct sec4_sg_entry *sec4_sg)
+ {
+-	dma_map_sg_chained(jrdev, src, src_nents, DMA_TO_DEVICE, chained);
++	dma_map_sg(jrdev, src, src_nents, DMA_TO_DEVICE);
+ 	sg_to_sec4_sg_last(src, src_nents, sec4_sg, 0);
+ }
+ 
+@@ -585,7 +584,6 @@ badkey:
+  * ahash_edesc - s/w-extended ahash descriptor
+  * @dst_dma: physical mapped address of req->result
+  * @sec4_sg_dma: physical mapped address of h/w link table
+- * @chained: if source is chained
+  * @src_nents: number of segments in input scatterlist
+  * @sec4_sg_bytes: length of dma mapped sec4_sg space
+  * @sec4_sg: pointer to h/w link table
+@@ -594,7 +592,6 @@ badkey:
+ struct ahash_edesc {
+ 	dma_addr_t dst_dma;
+ 	dma_addr_t sec4_sg_dma;
+-	bool chained;
+ 	int src_nents;
+ 	int sec4_sg_bytes;
+ 	struct sec4_sg_entry *sec4_sg;
+@@ -606,8 +603,7 @@ static inline void ahash_unmap(struct device *dev,
+ 			struct ahash_request *req, int dst_len)
+ {
+ 	if (edesc->src_nents)
+-		dma_unmap_sg_chained(dev, req->src, edesc->src_nents,
+-				     DMA_TO_DEVICE, edesc->chained);
++		dma_unmap_sg(dev, req->src, edesc->src_nents, DMA_TO_DEVICE);
+ 	if (edesc->dst_dma)
+ 		dma_unmap_single(dev, edesc->dst_dma, dst_len, DMA_FROM_DEVICE);
+ 
+@@ -788,7 +784,6 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 	dma_addr_t ptr = ctx->sh_desc_update_dma;
+ 	int src_nents, sec4_sg_bytes, sec4_sg_src_index;
+ 	struct ahash_edesc *edesc;
+-	bool chained = false;
+ 	int ret = 0;
+ 	int sh_len;
+ 
+@@ -797,8 +792,8 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 	to_hash = in_len - *next_buflen;
+ 
+ 	if (to_hash) {
+-		src_nents = __sg_count(req->src, req->nbytes - (*next_buflen),
+-				       &chained);
++		src_nents = sg_nents_for_len(req->src,
++					     req->nbytes - (*next_buflen));
+ 		sec4_sg_src_index = 1 + (*buflen ? 1 : 0);
+ 		sec4_sg_bytes = (sec4_sg_src_index + src_nents) *
+ 				 sizeof(struct sec4_sg_entry);
+@@ -816,7 +811,6 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 		}
+ 
+ 		edesc->src_nents = src_nents;
+-		edesc->chained = chained;
+ 		edesc->sec4_sg_bytes = sec4_sg_bytes;
+ 		edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
+ 				 DESC_JOB_IO_LEN;
+@@ -833,8 +827,7 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 
+ 		if (src_nents) {
+ 			src_map_to_sec4_sg(jrdev, req->src, src_nents,
+-					   edesc->sec4_sg + sec4_sg_src_index,
+-					   chained);
++					   edesc->sec4_sg + sec4_sg_src_index);
+ 			if (*next_buflen)
+ 				scatterwalk_map_and_copy(next_buf, req->src,
+ 							 to_hash - *buflen,
+@@ -996,11 +989,10 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 	int src_nents;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct ahash_edesc *edesc;
+-	bool chained = false;
+ 	int ret = 0;
+ 	int sh_len;
+ 
+-	src_nents = __sg_count(req->src, req->nbytes, &chained);
++	src_nents = sg_nents_for_len(req->src, req->nbytes);
+ 	sec4_sg_src_index = 1 + (buflen ? 1 : 0);
+ 	sec4_sg_bytes = (sec4_sg_src_index + src_nents) *
+ 			 sizeof(struct sec4_sg_entry);
+@@ -1018,7 +1010,6 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 	init_job_desc_shared(desc, ptr, sh_len, HDR_SHARE_DEFER | HDR_REVERSE);
+ 
+ 	edesc->src_nents = src_nents;
+-	edesc->chained = chained;
+ 	edesc->sec4_sg_bytes = sec4_sg_bytes;
+ 	edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
+ 			 DESC_JOB_IO_LEN;
+@@ -1033,7 +1024,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 						last_buflen);
+ 
+ 	src_map_to_sec4_sg(jrdev, req->src, src_nents, edesc->sec4_sg +
+-			   sec4_sg_src_index, chained);
++			   sec4_sg_src_index);
+ 
+ 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
+@@ -1081,14 +1072,12 @@ static int ahash_digest(struct ahash_request *req)
+ 	int src_nents, sec4_sg_bytes;
+ 	dma_addr_t src_dma;
+ 	struct ahash_edesc *edesc;
+-	bool chained = false;
+ 	int ret = 0;
+ 	u32 options;
+ 	int sh_len;
+ 
+-	src_nents = sg_count(req->src, req->nbytes, &chained);
+-	dma_map_sg_chained(jrdev, req->src, src_nents ? : 1, DMA_TO_DEVICE,
+-			   chained);
++	src_nents = sg_count(req->src, req->nbytes);
++	dma_map_sg(jrdev, req->src, src_nents ? : 1, DMA_TO_DEVICE);
+ 	sec4_sg_bytes = src_nents * sizeof(struct sec4_sg_entry);
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+@@ -1102,7 +1091,6 @@ static int ahash_digest(struct ahash_request *req)
+ 			  DESC_JOB_IO_LEN;
+ 	edesc->sec4_sg_bytes = sec4_sg_bytes;
+ 	edesc->src_nents = src_nents;
+-	edesc->chained = chained;
+ 
+ 	sh_len = desc_len(sh_desc);
+ 	desc = edesc->hw_desc;
+@@ -1228,7 +1216,6 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 	struct ahash_edesc *edesc;
+ 	u32 *desc, *sh_desc = ctx->sh_desc_update_first;
+ 	dma_addr_t ptr = ctx->sh_desc_update_first_dma;
+-	bool chained = false;
+ 	int ret = 0;
+ 	int sh_len;
+ 
+@@ -1236,8 +1223,8 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 	to_hash = in_len - *next_buflen;
+ 
+ 	if (to_hash) {
+-		src_nents = __sg_count(req->src, req->nbytes - (*next_buflen),
+-				       &chained);
++		src_nents = sg_nents_for_len(req->src,
++					     req->nbytes - (*next_buflen));
+ 		sec4_sg_bytes = (1 + src_nents) *
+ 				sizeof(struct sec4_sg_entry);
+ 
+@@ -1254,7 +1241,6 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 		}
+ 
+ 		edesc->src_nents = src_nents;
+-		edesc->chained = chained;
+ 		edesc->sec4_sg_bytes = sec4_sg_bytes;
+ 		edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
+ 				 DESC_JOB_IO_LEN;
+@@ -1263,7 +1249,7 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 		state->buf_dma = buf_map_to_sec4_sg(jrdev, edesc->sec4_sg,
+ 						    buf, *buflen);
+ 		src_map_to_sec4_sg(jrdev, req->src, src_nents,
+-				   edesc->sec4_sg + 1, chained);
++				   edesc->sec4_sg + 1);
+ 		if (*next_buflen) {
+ 			scatterwalk_map_and_copy(next_buf, req->src,
+ 						 to_hash - *buflen,
+@@ -1343,11 +1329,10 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 	int sec4_sg_bytes, sec4_sg_src_index, src_nents;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct ahash_edesc *edesc;
+-	bool chained = false;
+ 	int sh_len;
+ 	int ret = 0;
+ 
+-	src_nents = __sg_count(req->src, req->nbytes, &chained);
++	src_nents = sg_nents_for_len(req->src, req->nbytes);
+ 	sec4_sg_src_index = 2;
+ 	sec4_sg_bytes = (sec4_sg_src_index + src_nents) *
+ 			 sizeof(struct sec4_sg_entry);
+@@ -1365,7 +1350,6 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 	init_job_desc_shared(desc, ptr, sh_len, HDR_SHARE_DEFER | HDR_REVERSE);
+ 
+ 	edesc->src_nents = src_nents;
+-	edesc->chained = chained;
+ 	edesc->sec4_sg_bytes = sec4_sg_bytes;
+ 	edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
+ 			 DESC_JOB_IO_LEN;
+@@ -1374,8 +1358,7 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 						state->buf_dma, buflen,
+ 						last_buflen);
+ 
+-	src_map_to_sec4_sg(jrdev, req->src, src_nents, edesc->sec4_sg + 1,
+-			   chained);
++	src_map_to_sec4_sg(jrdev, req->src, src_nents, edesc->sec4_sg + 1);
+ 
+ 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
+@@ -1429,7 +1412,6 @@ static int ahash_update_first(struct ahash_request *req)
+ 	dma_addr_t src_dma;
+ 	u32 options;
+ 	struct ahash_edesc *edesc;
+-	bool chained = false;
+ 	int ret = 0;
+ 	int sh_len;
+ 
+@@ -1438,10 +1420,8 @@ static int ahash_update_first(struct ahash_request *req)
+ 	to_hash = req->nbytes - *next_buflen;
+ 
+ 	if (to_hash) {
+-		src_nents = sg_count(req->src, req->nbytes - (*next_buflen),
+-				     &chained);
+-		dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
+-				   DMA_TO_DEVICE, chained);
++		src_nents = sg_count(req->src, req->nbytes - (*next_buflen));
++		dma_map_sg(jrdev, req->src, src_nents ? : 1, DMA_TO_DEVICE);
+ 		sec4_sg_bytes = src_nents * sizeof(struct sec4_sg_entry);
+ 
+ 		/*
+@@ -1457,7 +1437,6 @@ static int ahash_update_first(struct ahash_request *req)
+ 		}
+ 
+ 		edesc->src_nents = src_nents;
+-		edesc->chained = chained;
+ 		edesc->sec4_sg_bytes = sec4_sg_bytes;
+ 		edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
+ 				 DESC_JOB_IO_LEN;
+diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
+index 18cd6d1..12ec661 100644
+--- a/drivers/crypto/caam/sg_sw_sec4.h
++++ b/drivers/crypto/caam/sg_sw_sec4.h
+@@ -69,81 +69,13 @@ static inline struct sec4_sg_entry *sg_to_sec4_sg_len(
+ 	return sec4_sg_ptr - 1;
+ }
+ 
+-/* count number of elements in scatterlist */
+-static inline int __sg_count(struct scatterlist *sg_list, int nbytes,
+-			     bool *chained)
 -{
--	int err;
+-	struct scatterlist *sg = sg_list;
+-	int sg_nents = 0;
 -
--	if (chained) {
--		while (sg) {
--			err = dma_map_sg(dev, sg, 1, dir);
--			if (!err)
--				return -EFAULT;
--			sg = sg_next(sg);
--		}
--	} else {
--		err = dma_map_sg(dev, sg, nents, dir);
--		if (!err)
--			return -EFAULT;
--	}
--
--	return nents;
--}
--
--void qce_unmapsg(struct device *dev, struct scatterlist *sg, int nents,
--		 enum dma_data_direction dir, bool chained)
--{
--	if (chained)
--		while (sg) {
--			dma_unmap_sg(dev, sg, 1, dir);
--			sg = sg_next(sg);
--		}
--	else
--		dma_unmap_sg(dev, sg, nents, dir);
--}
--
--int qce_countsg(struct scatterlist *sglist, int nbytes, bool *chained)
--{
--	struct scatterlist *sg = sglist;
--	int nents = 0;
--
--	if (chained)
--		*chained = false;
--
--	while (nbytes > 0 && sg) {
--		nents++;
+-	while (nbytes > 0) {
+-		sg_nents++;
 -		nbytes -= sg->length;
--		if (!sg_is_last(sg) && (sg + 1)->length == 0 && chained)
+-		if (!sg_is_last(sg) && (sg + 1)->length == 0)
 -			*chained = true;
 -		sg = sg_next(sg);
 -	}
 -
--	return nents;
+-	return sg_nents;
 -}
 -
- struct scatterlist *
- qce_sgtable_add(struct sg_table *sgt, struct scatterlist *new_sgl)
+ /* derive number of elements in scatterlist, but return 0 for 1 */
+-static inline int sg_count(struct scatterlist *sg_list, int nbytes,
+-			     bool *chained)
++static inline int sg_count(struct scatterlist *sg_list, int nbytes)
  {
-diff --git a/drivers/crypto/qce/dma.h b/drivers/crypto/qce/dma.h
-index 65bedb8..130235d 100644
---- a/drivers/crypto/qce/dma.h
-+++ b/drivers/crypto/qce/dma.h
-@@ -49,11 +49,6 @@ int qce_dma_prep_sgs(struct qce_dma_data *dma, struct scatterlist *sg_in,
- 		     dma_async_tx_callback cb, void *cb_param);
- void qce_dma_issue_pending(struct qce_dma_data *dma);
- int qce_dma_terminate_all(struct qce_dma_data *dma);
--int qce_countsg(struct scatterlist *sg_list, int nbytes, bool *chained);
--void qce_unmapsg(struct device *dev, struct scatterlist *sg, int nents,
--		 enum dma_data_direction dir, bool chained);
--int qce_mapsg(struct device *dev, struct scatterlist *sg, int nents,
--	      enum dma_data_direction dir, bool chained);
- struct scatterlist *
- qce_sgtable_add(struct sg_table *sgt, struct scatterlist *sg_add);
+-	int sg_nents = __sg_count(sg_list, nbytes, chained);
++	int sg_nents = sg_nents_for_len(sg_list, nbytes);
  
-diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-index be2f504..bcde9a0 100644
---- a/drivers/crypto/qce/sha.c
-+++ b/drivers/crypto/qce/sha.c
-@@ -51,9 +51,8 @@ static void qce_ahash_done(void *data)
- 	if (error)
- 		dev_dbg(qce->dev, "ahash dma termination error (%d)\n", error);
+ 	if (likely(sg_nents == 1))
+ 		return 0;
  
--	qce_unmapsg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE,
--		    rctx->src_chained);
--	qce_unmapsg(qce->dev, &rctx->result_sg, 1, DMA_FROM_DEVICE, 0);
-+	dma_unmap_sg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE);
-+	dma_unmap_sg(qce->dev, &rctx->result_sg, 1, DMA_FROM_DEVICE);
- 
- 	memcpy(rctx->digest, result->auth_iv, digestsize);
- 	if (req->result)
-@@ -92,10 +91,8 @@ static int qce_ahash_async_req_handle(struct crypto_async_request *async_req)
- 		rctx->authklen = AES_KEYSIZE_128;
- 	}
- 
--	rctx->src_nents = qce_countsg(req->src, req->nbytes,
--				      &rctx->src_chained);
--	ret = qce_mapsg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE,
--			rctx->src_chained);
-+	rctx->src_nents = sg_nents_for_len(req->src, req->nbytes);
-+	ret = dma_map_sg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -123,8 +120,7 @@ error_terminate:
- error_unmap_dst:
- 	qce_unmapsg(qce->dev, &rctx->result_sg, 1, DMA_FROM_DEVICE, 0);
- error_unmap_src:
--	qce_unmapsg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE,
--		    rctx->src_chained);
-+	dma_unmap_sg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE);
- 	return ret;
+ 	return sg_nents;
  }
- 
-diff --git a/drivers/crypto/qce/sha.h b/drivers/crypto/qce/sha.h
-index 286f0d5..236bb5e9 100644
---- a/drivers/crypto/qce/sha.h
-+++ b/drivers/crypto/qce/sha.h
-@@ -36,7 +36,6 @@ struct qce_sha_ctx {
-  * @flags: operation flags
-  * @src_orig: original request sg list
-  * @nbytes_orig: original request number of bytes
-- * @src_chained: is source scatterlist chained
-  * @src_nents: source number of entries
-  * @byte_count: byte count
-  * @count: save count in states during update, import and export
-@@ -55,7 +54,6 @@ struct qce_sha_reqctx {
- 	unsigned long flags;
- 	struct scatterlist *src_orig;
- 	unsigned int nbytes_orig;
--	bool src_chained;
- 	int src_nents;
- 	__be32 byte_count[2];
- 	u64 count;
+-
+-static inline void dma_unmap_sg_chained(
+-	struct device *dev, struct scatterlist *sg, unsigned int nents,
+-	enum dma_data_direction dir, bool chained)
+-{
+-	if (unlikely(chained)) {
+-		int i;
+-		struct scatterlist *tsg = sg;
+-
+-		/*
+-		 * Use a local copy of the sg pointer to avoid moving the
+-		 * head of the list pointed to by sg as we walk the list.
+-		 */
+-		for (i = 0; i < nents; i++) {
+-			dma_unmap_sg(dev, tsg, 1, dir);
+-			tsg = sg_next(tsg);
+-		}
+-	} else if (nents) {
+-		dma_unmap_sg(dev, sg, nents, dir);
+-	}
+-}
+-
+-static inline int dma_map_sg_chained(
+-	struct device *dev, struct scatterlist *sg, unsigned int nents,
+-	enum dma_data_direction dir, bool chained)
+-{
+-	if (unlikely(chained)) {
+-		int i;
+-		struct scatterlist *tsg = sg;
+-
+-		/*
+-		 * Use a local copy of the sg pointer to avoid moving the
+-		 * head of the list pointed to by sg as we walk the list.
+-		 */
+-		for (i = 0; i < nents; i++) {
+-			if (!dma_map_sg(dev, tsg, 1, dir)) {
+-				dma_unmap_sg_chained(dev, sg, i, dir,
+-						     chained);
+-				nents = 0;
+-				break;
+-			}
+-
+-			tsg = sg_next(tsg);
+-		}
+-	} else
+-		nents = dma_map_sg(dev, sg, nents, dir);
+-
+-	return nents;
+-}
 -- 
 2.4.9
