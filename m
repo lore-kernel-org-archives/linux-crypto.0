@@ -1,34 +1,54 @@
-From: pavi1729 <pavitra1729@gmail.com>
-Subject: crypto_cbc_encrypt query
-Date: Thu, 24 Sep 2015 20:06:34 +0530
-Message-ID: <CAMf7+Lhk9E-PKtpA5TyrU9hGz1RviLQ062y5gFmnTD15LAyQdg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+From: John Haxby <john.haxby@oracle.com>
+Subject: [PATCH 0/1] fips-allowed tests fail with non-FIPS ciphers
+Date: Thu, 24 Sep 2015 17:02:02 +0100
+Message-ID: <1443110523-23473-1-git-send-email-john.haxby@oracle.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	John Haxby <john.haxby@oracle.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f173.google.com ([209.85.223.173]:33717 "EHLO
-	mail-io0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750921AbbIXOgf (ORCPT
+Received: from ukc1-proxy-mwg04-o.oracle.com ([144.24.20.229]:44520 "EHLO
+	sheep.uk.oracle.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757189AbbIXQT3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 24 Sep 2015 10:36:35 -0400
-Received: by iofh134 with SMTP id h134so78507886iof.0
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Sep 2015 07:36:35 -0700 (PDT)
+	Thu, 24 Sep 2015 12:19:29 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
-  Shouldn't "walk" be memset ?
+Hello All,
 
-FILE:            crypto/cbc.c
-FUNCTION:  crypto_cbc_encrypt
+"Make fips=1 work on 4.1", they said, wittily, "it'll be easy."
 
-"walk" is local variable and its uninitialized in
-"crypto_cbc_encrypt". The same is passed to
-"blkcipher_walk_virt" which does below
+I suppose it wasn't that complicated, although I seem to be unearthing
+other problems as I go along.  The first problem was dracut (and I owe
+an upstream patch for that) and the second problem was tcrypt.
 
-walk->flags &= ~BLKCIPHER_WALK_PHYS;
+The tcrypt module was failing on authenc ciphers that wrap non-FIPS
+ciphers and hashes.  These ones in fact:
 
-So neither 'walk' nor 'walk->flags' is memset or init to a proper value.
+    authenc(hmac(md5),ecb(cipher_null))
+    authenc(hmac(sha1),cbc(des))
+    authenc(hmac(sha1),ecb(cipher_null))
+    authenc(hmac(sha224),cbc(des))
+    authenc(hmac(sha256),cbc(des))
+    authenc(hmac(sha384),cbc(des))
+    authenc(hmac(sha512),cbc(des))
 
-Thanks,
-Pavi
+I'm fairly sure that wrapping des, cipher_null and md5 in authenc
+shouldn't make them fips-allowed so the following patch simply removes
+that.
+
+Interestingly, some of these just failed outright and others just sat
+there chewing CPU time.  I think that's just a curiousity though,
+rather than a problem.
+
+jch
+
+John Haxby (1):
+  Disable fips-allowed for non-FIPS authenc ciphers
+
+ crypto/testmgr.c | 7 -------
+ 1 file changed, 7 deletions(-)
+
+-- 
+2.4.3
