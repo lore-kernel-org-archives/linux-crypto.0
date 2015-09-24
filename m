@@ -1,50 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto/caam: add backlogging support
-Date: Thu, 24 Sep 2015 10:47:18 +0800
-Message-ID: <20150924024718.GA27355@gondor.apana.org.au>
-References: <1442434361-15123-1-git-send-email-alexandru.porosanu@freescale.com>
- <20150918132443.GG7638@gondor.apana.org.au>
- <BY1PR03MB1404D04ADBCBBFA586860EB280590@BY1PR03MB1404.namprd03.prod.outlook.com>
- <20150918135017.GA9152@gondor.apana.org.au>
- <BY1PR03MB14043FC6F0E0575E5A3841B880590@BY1PR03MB1404.namprd03.prod.outlook.com>
- <20150918141040.GL9249@gondor.apana.org.au>
- <BY1PR03MB1404D7BD44164F6E91FFBAD680590@BY1PR03MB1404.namprd03.prod.outlook.com>
- <20150923120200.GA21368@gondor.apana.org.au>
- <BY1PR03MB1404567DB10A5990A864FD8580440@BY1PR03MB1404.namprd03.prod.outlook.com>
+From: Dan Streetman <ddstreet@ieee.org>
+Subject: Re: [PATCH] drivers/crypto/nx: Add CRC and validation support for nx842
+Date: Thu, 24 Sep 2015 08:32:52 -0400
+Message-ID: <CALZtONDtmumecqDehV2LXODme5JTTgAD9Gt48F-abGwKYP67fQ@mail.gmail.com>
+References: <1442707362.6178.11.camel@hbabu-laptop> <20150921142607.GA2405@gondor.apana.org.au>
+ <CALZtONDbOxorPmy2A9FkD7rpY2HsOMaEs9Vvqg2kHh1qtM0GqA@mail.gmail.com>
+ <20150922122117.GA11522@gondor.apana.org.au> <CALZtONBYYTnRE6FyQKVL8kyAAb8BuXJzyGA5mYNHiXtSNcDv9Q@mail.gmail.com>
+ <20150922144219.GA12943@gondor.apana.org.au> <CALZtONCaauoG3CBnbGWfUXTU2_QXD_F0rVxzgO24VmMTLxV0og@mail.gmail.com>
+ <20150923095401.GA20580@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Geanta Neag Horia <Horia.Geanta@freescale.com>,
-	Pop Mircea <mircea.pop@freescale.com>
-To: Porosanu Alexandru <alexandru.porosanu@freescale.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: Haren Myneni <haren@linux.vnet.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Haren Myneni <hbabu@us.ibm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55239 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756427AbbIXCrV (ORCPT
+Received: from mail-io0-f182.google.com ([209.85.223.182]:36414 "EHLO
+	mail-io0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754243AbbIXMdc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Sep 2015 22:47:21 -0400
-Content-Disposition: inline
-In-Reply-To: <BY1PR03MB1404567DB10A5990A864FD8580440@BY1PR03MB1404.namprd03.prod.outlook.com>
+	Thu, 24 Sep 2015 08:33:32 -0400
+In-Reply-To: <20150923095401.GA20580@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 23, 2015 at 02:40:32PM +0000, Porosanu Alexandru wrote:
-> 
-> Yes, you are absolutely right. In this case, I have some reasons why I wouldn't like to use a crypto_queue based approach:
-> 
-> 1) we've prototyped a crypto_queue implementation which did not reach the performance expectations due to CPU overhead;
+On Wed, Sep 23, 2015 at 5:54 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Tue, Sep 22, 2015 at 11:08:22AM -0400, Dan Streetman wrote:
+>>
+>> you think we should just strip out the 842-nx alignment/sizing code
+>> and change it to fallback to the sw driver?
+>
+> Right, if the only intended user can provide aligned input then
+> by all means make the unaligned case use the software fallback as
+> there is no point in investing any effort in making it fast.
 
-I'm not saying that you should always use a software queue.  The
-queue is only needed when your hardware queue is full.  You can
-make it zero-length for requests that are not MAY_BACKLOG, i.e.,
-only MAY_BACKLOG requests need to be queued, everything else can
-just be dropped when the hw queue is full.
+ok sounds good.  thanks!
 
-If you do that I don't see why the performance should be any
-different.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
