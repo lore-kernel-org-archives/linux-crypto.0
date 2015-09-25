@@ -1,162 +1,65 @@
-From: John Haxby <john.haxby@oracle.com>
-Subject: [PATCHv2 1/1] Disable fips-allowed for authenc() and des() ciphers
-Date: Thu, 24 Sep 2015 18:24:35 +0100
-Message-ID: <1443115475-27398-2-git-send-email-john.haxby@oracle.com>
-References: <1443115475-27398-1-git-send-email-john.haxby@oracle.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+From: Joonsoo Kim <iamjoonsoo.kim@lge.com>
+Subject: Re: [PATCH v3 1/9] crypto: introduce decompression API that can be
+ called via sharable tfm object
+Date: Fri, 25 Sep 2015 14:26:17 +0900
+Message-ID: <20150925052617.GB7158@js1304-P5Q-DELUXE>
+References: <1442553564-3476-1-git-send-email-iamjoonsoo.kim@lge.com>
+ <1442553564-3476-2-git-send-email-iamjoonsoo.kim@lge.com>
+ <20150921061817.GC5313@swordfish>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Minchan Kim <minchan@kernel.org>,
+	Nitin Gupta <ngupta@vflare.org>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	John Haxby <john.haxby@oracle.com>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ukc1-proxy-mwg04-o.oracle.com ([144.24.20.229]:18650 "EHLO
-	sheep.uk.oracle.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754904AbbIXRZT (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 24 Sep 2015 13:25:19 -0400
-In-Reply-To: <1443115475-27398-1-git-send-email-john.haxby@oracle.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	Stephan Mueller <smueller@chronox.de>
+To: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20150921061817.GC5313@swordfish>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-No authenc() ciphers are FIPS approved, nor is ecb(des).
-After the end of 2015, ansi_cprng will also be non-approved.
+On Mon, Sep 21, 2015 at 03:18:17PM +0900, Sergey Senozhatsky wrote:
+> On (09/18/15 14:19), Joonsoo Kim wrote:
+> [..]
+> >  static int __init lzo_mod_init(void)
+> > diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+> > index e71cb70..31152b1 100644
+> > --- a/include/linux/crypto.h
+> > +++ b/include/linux/crypto.h
+> > @@ -355,6 +355,8 @@ struct compress_alg {
+> >  			    unsigned int slen, u8 *dst, unsigned int *dlen);
+> >  	int (*coa_decompress)(struct crypto_tfm *tfm, const u8 *src,
+> >  			      unsigned int slen, u8 *dst, unsigned int *dlen);
+> > +	int (*coa_decompress_noctx)(const u8 *src, unsigned int slen,
+> > +				    u8 *dst, unsigned int *dlen);
+> >  };
+> >  
+> >  
+> > @@ -538,6 +540,9 @@ struct compress_tfm {
+> >  	int (*cot_decompress)(struct crypto_tfm *tfm,
+> >  	                      const u8 *src, unsigned int slen,
+> >  	                      u8 *dst, unsigned int *dlen);
+> > +	int (*cot_decompress_noctx)(struct crypto_tfm *tfm,
+> > +				const u8 *src, unsigned int slen,
+> > +				u8 *dst, unsigned int *dlen);
+> >  };
+> >  
+> >  #define crt_ablkcipher	crt_u.ablkcipher
+> > @@ -1836,6 +1841,14 @@ static inline void crypto_free_comp(struct crypto_comp *tfm)
+> >  	crypto_free_tfm(crypto_comp_tfm(tfm));
+> >  }
+> >  
+> > +struct crypto_comp *crypto_alloc_comp_noctx(const char *alg_name,
+> > +					u32 type, u32 mask);
+> > +
+> 
+> this should be EXPORT_SYMBOL_GPL().
+> 
 
-Signed-off-by: John Haxby <john.haxby@oracle.com>
----
- crypto/testmgr.c | 16 ----------------
- 1 file changed, 16 deletions(-)
+Will do in next version.
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index fa18753..523c9b9 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -2080,7 +2080,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(md5),ecb(cipher_null))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2096,7 +2095,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha1),cbc(aes))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2110,7 +2108,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha1),cbc(des))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2124,7 +2121,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha1),cbc(des3_ede))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2138,7 +2134,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha1),ecb(cipher_null))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2158,7 +2153,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha224),cbc(des))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2172,7 +2166,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha224),cbc(des3_ede))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2186,7 +2179,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha256),cbc(aes))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2200,7 +2192,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha256),cbc(des))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2214,7 +2205,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha256),cbc(des3_ede))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2228,7 +2218,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha384),cbc(des))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2242,7 +2231,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha384),cbc(des3_ede))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2256,7 +2244,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha512),cbc(aes))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2270,7 +2257,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha512),cbc(des))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -2284,7 +2270,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "authenc(hmac(sha512),cbc(des3_ede))",
- 		.test = alg_test_aead,
--		.fips_allowed = 1,
- 		.suite = {
- 			.aead = {
- 				.enc = {
-@@ -3011,7 +2996,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "ecb(des)",
- 		.test = alg_test_skcipher,
--		.fips_allowed = 1,
- 		.suite = {
- 			.cipher = {
- 				.enc = {
--- 
-2.4.3
+Thanks.
