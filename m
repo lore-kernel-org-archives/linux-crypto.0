@@ -1,35 +1,47 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCHv2 1/1] Disable fips-allowed for authenc() and des() ciphers
-Date: Fri, 25 Sep 2015 07:58:10 +0200
-Message-ID: <1970269.pETRl5cENR@tauon.atsec.com>
-References: <1443115475-27398-1-git-send-email-john.haxby@oracle.com> <1443115475-27398-2-git-send-email-john.haxby@oracle.com>
+From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+Subject: Re: [PATCH v3 8/9] zram: use crypto API for compression
+Date: Fri, 25 Sep 2015 16:50:15 +0900
+Message-ID: <20150925075015.GB865@swordfish>
+References: <1442553564-3476-1-git-send-email-iamjoonsoo.kim@lge.com>
+ <1442553564-3476-9-git-send-email-iamjoonsoo.kim@lge.com>
+ <20150921051903.GB863@swordfish>
+ <20150925054326.GE7158@js1304-P5Q-DELUXE>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org,
+Content-Type: text/plain; charset=us-ascii
+Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Minchan Kim <minchan@kernel.org>,
+	Nitin Gupta <ngupta@vflare.org>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: John Haxby <john.haxby@oracle.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Stephan Mueller <smueller@chronox.de>
+To: Joonsoo Kim <iamjoonsoo.kim@lge.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34319 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754439AbbIYF6N (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 Sep 2015 01:58:13 -0400
-In-Reply-To: <1443115475-27398-2-git-send-email-john.haxby@oracle.com>
+Received: from mail-pa0-f49.google.com ([209.85.220.49]:36142 "EHLO
+	mail-pa0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752305AbbIYHta (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 Sep 2015 03:49:30 -0400
+Content-Disposition: inline
+In-Reply-To: <20150925054326.GE7158@js1304-P5Q-DELUXE>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 24. September 2015, 18:24:35 schrieb John Haxby:
+On (09/25/15 14:43), Joonsoo Kim wrote:
+[..]
+> > >  /* dynamic per-device compression frontend */
+> > >  struct zcomp {
+> > >  	void *stream;
+> > > -	struct zcomp_backend *backend;
+> > > +	const char *backend;
+> > 
+> > 	^^ what for?
+> 
+> Will remove.
 
-Hi John,
 
->No authenc() ciphers are FIPS approved, nor is ecb(des).
->After the end of 2015, ansi_cprng will also be non-approved.
->
->Signed-off-by: John Haxby <john.haxby@oracle.com>
+I think that was my mistake, I realized why do you keep it
+later -- to allocate new zstreams. let's keep it.
 
-Acked-by: Stephan Mueller <smueller@chronox.de>
-
-
-Ciao
-Stephan
+	-ss
