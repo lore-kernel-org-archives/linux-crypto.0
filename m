@@ -1,105 +1,91 @@
 From: Joonsoo Kim <iamjoonsoo.kim@lge.com>
 Subject: Re: [PATCH v3 1/9] crypto: introduce decompression API that can be
  called via sharable tfm object
-Date: Fri, 25 Sep 2015 14:25:31 +0900
-Message-ID: <20150925052531.GA7158@js1304-P5Q-DELUXE>
+Date: Fri, 25 Sep 2015 14:29:39 +0900
+Message-ID: <20150925052939.GC7158@js1304-P5Q-DELUXE>
 References: <1442553564-3476-1-git-send-email-iamjoonsoo.kim@lge.com>
  <1442553564-3476-2-git-send-email-iamjoonsoo.kim@lge.com>
- <20150922124346.GA11658@gondor.apana.org.au>
+ <20150921053859.GB5313@swordfish>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Minchan Kim <minchan@kernel.org>,
-	Nitin Gupta <ngupta@vflare.org>,
-	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Nitin Gupta <ngupta@vflare.org>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Stephan Mueller <smueller@chronox.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150922124346.GA11658@gondor.apana.org.au>
+In-Reply-To: <20150921053859.GB5313@swordfish>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Sep 22, 2015 at 08:43:46PM +0800, Herbert Xu wrote:
-> On Fri, Sep 18, 2015 at 02:19:16PM +0900, Joonsoo Kim wrote:
-> > Until now, tfm object embeds (de)compression context in it and
-> > (de)compression in crypto API requires tfm object to use
-> > this context. But, there are some algorithms that doesn't need
-> > such context to operate. Therefore, this patch introduce new crypto
-> > decompression API that calls decompression function via sharable tfm
-> > object. Concurrent calls to decompress_noctx function through sharable
-> > tfm object will be okay because caller don't need any context in tfm and
-> > tfm is only used for fetching function pointer to decompress_noctx
-> > function. This can reduce overhead of maintaining multiple tfm
-> > if decompression doesn't require any context to operate.
-> > 
-> > Signed-off-by: Joonsoo Kim <iamjoonsoo.kim@lge.com>
+On Mon, Sep 21, 2015 at 02:38:59PM +0900, Sergey Senozhatsky wrote:
+> On (09/18/15 14:19), Joonsoo Kim wrote:
+> [..]
+> > @@ -61,7 +61,8 @@ static struct crypto_alg alg = {
+> >  	.cra_module		= THIS_MODULE,
+> >  	.cra_u			= { .compress = {
+> >  	.coa_compress		= crypto842_compress,
+> > -	.coa_decompress		= crypto842_decompress } }
+> > +	.coa_decompress		= crypto842_decompress,
+> > +	.coa_decompress_noctx	= NULL } }
+> >  };
+> >  
+> >  static int __init crypto842_mod_init(void)
+> > diff --git a/crypto/compress.c b/crypto/compress.c
+> > index c33f076..abb36a8 100644
+> > --- a/crypto/compress.c
+> > +++ b/crypto/compress.c
+> > @@ -33,12 +33,21 @@ static int crypto_decompress(struct crypto_tfm *tfm,
+> >  	                                                   dlen);
+> >  }
+> >  
+> > +static int crypto_decompress_noctx(struct crypto_tfm *tfm,
+> > +				const u8 *src, unsigned int slen,
+> > +				u8 *dst, unsigned int *dlen)
+> > +{
+> > +	return tfm->__crt_alg->cra_compress.coa_decompress_noctx(src, slen,
+> > +								dst, dlen);
+> > +}
 > 
-> Have you looked into include/crypto/compress.h?
+> 
+> hm... well... sorry, if irrelevant.
+> if the algorithm can have a _noctx() decompression function, does it
+> automatically guarantee that this algorithm never dereferences a passed
+> `struct crypto_tfm *tfm' pointer in its decompress function? in other words,
+> can we simply pass that `shared tfm pointer' to the existing decompress
+> function instead of defining new symbols, new callbacks, etc.?
+> 
+> 	cot_decompress_noctx()  ==  cot_decompress(shared_ftm) ?
+> 
+> just a thought.
 
-Okay. Now, I have looked it.
+Will think it if I implement next version in this way. Due to Herbert
+comment, interface will be changed so much in next version.
 
 > 
-> The compress type itself is obsolete and should be replaced with
-> the pcomp interface.
+> [..]
+> > +struct crypto_comp *crypto_alloc_comp_noctx(const char *alg_name,
+> > +					u32 type, u32 mask)
+> > +{
+> > +	struct crypto_comp *comp;
+> > +	struct crypto_tfm *tfm;
+> > +	struct compress_tfm *ops;
+> > +
+> > +	comp = crypto_alloc_comp(alg_name, type, mask);
+> > +	if (IS_ERR(comp))
+> > +		return comp;
+> > +
+> > +	tfm = crypto_comp_tfm(comp);
+> > +	if (!tfm->__crt_alg->cra_compress.coa_decompress_noctx) {
+> > +		crypto_free_comp(comp);
+> > +		return ERR_PTR(-EINVAL);
 > 
-> However, we made some mistakes with the pcomp interface.  First
-> of all it doesn't have a non-partial interface like the digest
-> function for crypto_shash.
-> 
-> But the biggest problem is that it should be completely stateless
-> but is not.  IOW we should not store anything in the tfm that
-> is per-request.  That should all go into the request structure.
+> 	-ENOMEM?
 
-I'm not a expert on this area but I have different opinion.
-IIUC, what partial compression aims at is to support partial data
-compression. It isn't for stateless compression and they are
-different. Current implementation would work well for it's own
-purpose.
-
-And, making it stateless looks not good to me. If we make it
-stateless, we should include algorithm's state in request object.
-It enforces much memory to request object and, unlike crypto_shash
-which can be allocated in stack, user needs to manage life time of
-request objects and it requires additional complexity to
-compression user.
-
-Moreover, to use sharable tfm concurrently from my original intend,
-many request objects would be needed and if it cannot be allocated
-in the stack, it requires much memory. It's not suitable
-for my purpose.
-
-If compression is obsolete, what I think the best is leaving pcomp
-as is and implementing sharable tfm in pcomp, And then, make lzo
-and others support pcomp interface and sharable tfm.
-
-Maybe, I'm wrong so please correct me.
+No, it's failure isn't related to NOMEM. Just not support it.
 
 Thanks.
-
-> Fortunately it seems that pcomp doesn't actually have any users
-> so we can just rip it out and start from scratch and redo it
-> properly.
-> 
-> So to recap, please abandon any efforts on the crypto_compress
-> interface as it is old and obsolete.  Instead reshape crypto_pcomp
-> into a proper stateless interface which should then give you what
-> you want.
-> 
-> When you do so, just keep in mind that we need to find a way to
-> support IPComp.  That means the ability to allocate requests in
-> thread context and then use them to compress/decompress in IRQ
-> context.
-> 
-> Cheers,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
