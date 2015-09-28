@@ -1,55 +1,46 @@
-From: Geliang Tang <geliangtang@163.com>
-Subject: [PATCH] crypto: blkcipher and ablkcipher should it be static
-Date: Sun, 27 Sep 2015 22:47:05 +0800
-Message-ID: <d1ae7b48c3c85404ceec994ab2762e947554e9eb.1443365135.git.geliangtang@163.com>
-Cc: Geliang Tang <geliangtang@163.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH 1/4] crypto: talitos: dma_map_sg can handle chained SG
+Date: Mon, 28 Sep 2015 11:43:34 +0200
+Message-ID: <20150928094334.GA15502@Red>
+References: <1443009328-12478-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1443009328-12478-2-git-send-email-clabbe.montjoie@gmail.com>
+ <560295FA.7070005@c-s.fr>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Christophe Leroy <christophe.leroy@c-s.fr>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from m50-135.163.com ([123.125.50.135]:42791 "EHLO m50-135.163.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755837AbbI0OxQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 27 Sep 2015 10:53:16 -0400
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:34842 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757058AbbI1Jnt (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 28 Sep 2015 05:43:49 -0400
+Content-Disposition: inline
+In-Reply-To: <560295FA.7070005@c-s.fr>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fixes the following sparse warnings:
+On Wed, Sep 23, 2015 at 02:07:22PM +0200, Christophe Leroy wrote:
+>=20
+> Le 23/09/2015 13:55, LABBE Corentin a =E9crit :
+> > The talitos driver use two dma_map_sg path
+> > according to SG are chained or not.
+> > Since dma_map_sg can handle both case, clean the code with all
+> > references to sg chained.
+> >
+> > Thus removing talitos_map_sg, talitos_unmap_sg_chain
+> > and sg_count functions.
+> >
+> >
+> Shouldn't the replacement of sg_count()  by sg_nents_for_len() be par=
+t=20
+> of second patch ?
+>=20
 
- crypto/skcipher.c:94:5:
- warning: symbol 'crypto_init_skcipher_ops_blkcipher'
- was not declared. Should it be static?
+No because I remove also the chained argument of sg_count, so splitting=
+ this patch
+with a dedicated patch for removing sg_count is not good.
 
- crypto/skcipher.c:185:5:
- warning: symbol 'crypto_init_skcipher_ops_ablkcipher'
- was not declared. Should it be static?
-
-Signed-off-by: Geliang Tang <geliangtang@163.com>
----
- crypto/skcipher.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index dd5fc1b..7591928 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -91,7 +91,7 @@ static void crypto_exit_skcipher_ops_blkcipher(struct crypto_tfm *tfm)
- 	crypto_free_blkcipher(*ctx);
- }
- 
--int crypto_init_skcipher_ops_blkcipher(struct crypto_tfm *tfm)
-+static int crypto_init_skcipher_ops_blkcipher(struct crypto_tfm *tfm)
- {
- 	struct crypto_alg *calg = tfm->__crt_alg;
- 	struct crypto_skcipher *skcipher = __crypto_skcipher_cast(tfm);
-@@ -182,7 +182,7 @@ static void crypto_exit_skcipher_ops_ablkcipher(struct crypto_tfm *tfm)
- 	crypto_free_ablkcipher(*ctx);
- }
- 
--int crypto_init_skcipher_ops_ablkcipher(struct crypto_tfm *tfm)
-+static int crypto_init_skcipher_ops_ablkcipher(struct crypto_tfm *tfm)
- {
- 	struct crypto_alg *calg = tfm->__crt_alg;
- 	struct crypto_skcipher *skcipher = __crypto_skcipher_cast(tfm);
--- 
-2.5.0
+Regards
