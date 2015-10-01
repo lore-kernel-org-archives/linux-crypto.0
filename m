@@ -1,7 +1,8 @@
 From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v1 2/4] crypto: ccp - Remove use ACPI field
-Date: Thu, 1 Oct 2015 16:32:38 -0500
-Message-ID: <20151001213238.4286.87015.stgit@tlendack-t1.amdoffice.net>
+Subject: [PATCH v1 3/4] crypto: ccp - Change references to accelerator to
+ offload
+Date: Thu, 1 Oct 2015 16:32:44 -0500
+Message-ID: <20151001213244.4286.64872.stgit@tlendack-t1.amdoffice.net>
 References: <20151001213225.4286.44278.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,49 +11,65 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	David Miller <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0058.outbound.protection.outlook.com ([207.46.100.58]:65376
+Received: from mail-by2on0066.outbound.protection.outlook.com ([207.46.100.66]:12752
 	"EHLO na01-by2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750745AbbJAVcn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 1 Oct 2015 17:32:43 -0400
+	id S1750866AbbJAVct (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 1 Oct 2015 17:32:49 -0400
 In-Reply-To: <20151001213225.4286.44278.stgit@tlendack-t1.amdoffice.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-With the creation of the device_dma_is_coherent API the "use_acpi" field
-is no longer needed, so remove it.
+The CCP is meant to be more of an offload engine than an accelerator
+engine. To avoid any confusion, change references to accelerator to
+offload.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- drivers/crypto/ccp/ccp-platform.c |    4 ----
- 1 file changed, 4 deletions(-)
+ drivers/crypto/Kconfig     |    2 +-
+ drivers/crypto/ccp/Kconfig |   13 ++++++-------
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/ccp/ccp-platform.c b/drivers/crypto/ccp/ccp-platform.c
-index bb241c3..4bc73d4 100644
---- a/drivers/crypto/ccp/ccp-platform.c
-+++ b/drivers/crypto/ccp/ccp-platform.c
-@@ -29,7 +29,6 @@
- #include "ccp-dev.h"
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index e7f24a8..ab7e3b6 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -420,7 +420,7 @@ config CRYPTO_DEV_CCP
+ 	bool "Support for AMD Cryptographic Coprocessor"
+ 	depends on ((X86 && PCI) || (ARM64 && (OF_ADDRESS || ACPI))) && HAS_IOMEM
+ 	help
+-	  The AMD Cryptographic Coprocessor provides hardware support
++	  The AMD Cryptographic Coprocessor provides hardware offload support
+ 	  for encryption, hashing and related operations.
  
- struct ccp_platform {
--	int use_acpi;
- 	int coherent;
- };
+ if CRYPTO_DEV_CCP
+diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
+index ae38f6b..3cd8481 100644
+--- a/drivers/crypto/ccp/Kconfig
++++ b/drivers/crypto/ccp/Kconfig
+@@ -5,12 +5,12 @@ config CRYPTO_DEV_CCP_DD
+ 	select HW_RANDOM
+ 	help
+ 	  Provides the interface to use the AMD Cryptographic Coprocessor
+-	  which can be used to accelerate or offload encryption operations
+-	  such as SHA, AES and more. If you choose 'M' here, this module
+-	  will be called ccp.
++	  which can be used to offload encryption operations such as SHA,
++	  AES and more. If you choose 'M' here, this module will be called
++	  ccp.
  
-@@ -95,7 +94,6 @@ static int ccp_platform_probe(struct platform_device *pdev)
- 	struct ccp_device *ccp;
- 	struct ccp_platform *ccp_platform;
- 	struct device *dev = &pdev->dev;
--	struct acpi_device *adev = ACPI_COMPANION(dev);
- 	struct resource *ior;
- 	int ret;
- 
-@@ -112,8 +110,6 @@ static int ccp_platform_probe(struct platform_device *pdev)
- 	ccp->get_irq = ccp_get_irqs;
- 	ccp->free_irq = ccp_free_irqs;
- 
--	ccp_platform->use_acpi = (!adev || acpi_disabled) ? 0 : 1;
--
- 	ior = ccp_find_mmio_area(ccp);
- 	ccp->io_map = devm_ioremap_resource(dev, ior);
- 	if (IS_ERR(ccp->io_map)) {
+ config CRYPTO_DEV_CCP_CRYPTO
+-	tristate "Encryption and hashing acceleration support"
++	tristate "Encryption and hashing offload support"
+ 	depends on CRYPTO_DEV_CCP_DD
+ 	default m
+ 	select CRYPTO_HASH
+@@ -18,6 +18,5 @@ config CRYPTO_DEV_CCP_CRYPTO
+ 	select CRYPTO_AUTHENC
+ 	help
+ 	  Support for using the cryptographic API with the AMD Cryptographic
+-	  Coprocessor. This module supports acceleration and offload of SHA
+-	  and AES algorithms.  If you choose 'M' here, this module will be
+-	  called ccp_crypto.
++	  Coprocessor. This module supports offload of SHA and AES algorithms.
++	  If you choose 'M' here, this module will be called ccp_crypto.
