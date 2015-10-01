@@ -1,59 +1,41 @@
-From: Maxime Coquelin <maxime.coquelin@st.com>
-Subject: Re: [STLinux Kernel] [PATCH v2 6/7] ARM: STi: STiH407: Enable the 2
- HW Random Number Generators for STiH4{07, 10}
-Date: Thu, 1 Oct 2015 12:57:27 +0200
-Message-ID: <560D1197.2000606@st.com>
-References: <1442497557-9271-1-git-send-email-lee.jones@linaro.org>
- <1442497557-9271-7-git-send-email-lee.jones@linaro.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH  v3 2/2] crypto: akcipher - Changes to asymmetric key API
+Date: Thu, 1 Oct 2015 21:45:36 +0800
+Message-ID: <20151001134536.GA27555@gondor.apana.org.au>
+References: <20150922163352.18101.85685.stgit@tstruk-mobl1>
+ <20150922163403.18101.92452.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <kernel@stlinux.com>
-To: Lee Jones <lee.jones@linaro.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-	<peter@korsgaard.com>, <festevam@gmail.com>,
-	<kieranbingham@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1442497557-9271-7-git-send-email-lee.jones@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:49707 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933013AbbJANpl (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 1 Oct 2015 09:45:41 -0400
+Content-Disposition: inline
+In-Reply-To: <20150922163403.18101.92452.stgit@tstruk-mobl1>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Lee, Herbert,
-
-On 09/17/2015 03:45 PM, Lee Jones wrote:
-> Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> ---
->   arch/arm/boot/dts/stih407-family.dtsi | 14 ++++++++++++++
->   1 file changed, 14 insertions(+)
+On Tue, Sep 22, 2015 at 09:34:03AM -0700, Tadeusz Struk wrote:
 >
-> diff --git a/arch/arm/boot/dts/stih407-family.dtsi b/arch/arm/boot/dts/stih407-family.dtsi
-> index 838b812..9452b42 100644
-> --- a/arch/arm/boot/dts/stih407-family.dtsi
-> +++ b/arch/arm/boot/dts/stih407-family.dtsi
-> @@ -565,5 +565,19 @@
->   						  <&phy_port2 PHY_TYPE_USB3>;
->   			};
->   		};
-> +
-> +		rng10: rng@08a89000 {
-> +			compatible      = "st,rng";
-> +			reg		= <0x08a89000 0x1000>;
-> +			clocks          = <&clk_sysin>;
-> +			status		= "okay";
-> +		};
-> +
-> +		rng11: rng@08a8a000 {
-> +			compatible      = "st,rng";
-> +			reg		= <0x08a8a000 0x1000>;
-> +			clocks          = <&clk_sysin>;
-> +			status		= "okay";
-> +		};
->   	};
->   };
+>  struct akcipher_request {
+>  	struct crypto_async_request base;
+> -	void *src;
+> -	void *dst;
+> -	unsigned int src_len;
+> -	unsigned int dst_len;
+> +	struct scatterlist *src;
+> +	struct scatterlist *dst;
+> +	unsigned int out_len;
 
-Patch applied to STi tree (sti-dt-for-v4.4).
+I think src_len/dst_len should be kept as the SG list may contain
+more entries than the ones that you need to process.
 
-Thanks,
-Maxime
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
