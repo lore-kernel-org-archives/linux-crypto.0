@@ -1,50 +1,77 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH v3 2/2] crypto: akcipher - Changes to asymmetric key API
-Date: Thu, 1 Oct 2015 08:17:49 -0700
-Message-ID: <560D4E9D.1060502@intel.com>
-References: <20150922163352.18101.85685.stgit@tstruk-mobl1>
- <20150922163403.18101.92452.stgit@tstruk-mobl1>
- <20151001134536.GA27555@gondor.apana.org.au> <560D48B0.8090502@intel.com>
- <20151001151519.GA28373@gondor.apana.org.au>
+Subject: [PATCH v4 0/3] crypto: akcipher - Changes to asymmetric key API
+Date: Thu, 01 Oct 2015 13:28:45 -0700
+Message-ID: <20151001202845.7193.51602.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	tadeusz.struk@intel.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:4863 "EHLO mga11.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:16760 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756403AbbJAPUC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 1 Oct 2015 11:20:02 -0400
-In-Reply-To: <20151001151519.GA28373@gondor.apana.org.au>
+	id S1753419AbbJAUav (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 1 Oct 2015 16:30:51 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/01/2015 08:15 AM, Herbert Xu wrote:
-> On Thu, Oct 01, 2015 at 07:52:32AM -0700, Tadeusz Struk wrote:
->> On 10/01/2015 06:45 AM, Herbert Xu wrote:
->>> On Tue, Sep 22, 2015 at 09:34:03AM -0700, Tadeusz Struk wrote:
->>>>
->>>>  struct akcipher_request {
->>>>  	struct crypto_async_request base;
->>>> -	void *src;
->>>> -	void *dst;
->>>> -	unsigned int src_len;
->>>> -	unsigned int dst_len;
->>>> +	struct scatterlist *src;
->>>> +	struct scatterlist *dst;
->>>> +	unsigned int out_len;
->>>
->>> I think src_len/dst_len should be kept as the SG list may contain
->>> more entries than the ones that you need to process.
->>>
->> Herbert,
->> Could you still apply it and the "Add mpi sgl helpers" on top
->> and I'll add the src_len/dst_len in an incremental patch?
->> It will make it easier for me.
-> 
-> Well I don't think we need out_len with dst_len being there so
-> this would be adding and then removing out_len for no good reason.
-> 
+This series updates the asymmetric key API.
+The changes include
+ - setkey function has been split into set_priv_key and set_pub_key.
+ - akcipher requests takes sgl for src and dst instead of void *.
+Users of the API i.e. two existing RSA implementation and
+test mgr code have been updated accordingly.
 
-Technically it would be renaming instead of adding and then removing :)
+First patch adds sg_len helper that returns the full length
+of an sgl.
+Second patch adds sgl helpers to mpi library.
+Third patch implements the API changes in rsa-generic and rsa-qat
+
+Changes in v4:
+- add back src_len and dst_len
+- add sgl helpers to mpi library
+- change rsa-generic implementation to use the new mpi helpers
+
+Changes in v3:
+- changed type returned from sg_len from int to unsigned int
+
+Changes in v2:
+- dropped patches that checked value returned by crypto_unregister_alg
+- flatten patches 4 and 6-8 from v1 into one patch.  
+---
+
+Tadeusz Struk (3):
+      lib/scatterlist: Add sg_len helper
+      lib/mpi: Add mpi sgl helpers
+      crypto: akcipher - Changes to asymmetric key API
+
+
+ crypto/Makefile                                   |    9 +
+ crypto/rsa.c                                      |  112 ++++++----
+ crypto/rsa_helper.c                               |   42 +++-
+ crypto/rsakey.asn1                                |    5 
+ crypto/rsaprivkey.asn1                            |   11 +
+ crypto/rsapubkey.asn1                             |    4 
+ crypto/testmgr.c                                  |   38 ++--
+ crypto/testmgr.h                                  |   36 ++-
+ drivers/crypto/qat/qat_common/Makefile            |   12 +
+ drivers/crypto/qat/qat_common/qat_asym_algs.c     |  227 +++++++++++++++------
+ drivers/crypto/qat/qat_common/qat_rsakey.asn1     |    5 
+ drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1 |   11 +
+ drivers/crypto/qat/qat_common/qat_rsapubkey.asn1  |    4 
+ include/crypto/akcipher.h                         |   94 ++++++---
+ include/crypto/internal/rsa.h                     |    7 -
+ include/linux/mpi.h                               |    4 
+ include/linux/scatterlist.h                       |    1 
+ lib/mpi/mpicoder.c                                |  194 ++++++++++++++++++
+ lib/scatterlist.c                                 |   20 ++
+ 19 files changed, 655 insertions(+), 181 deletions(-)
+ delete mode 100644 crypto/rsakey.asn1
+ create mode 100644 crypto/rsaprivkey.asn1
+ create mode 100644 crypto/rsapubkey.asn1
+ delete mode 100644 drivers/crypto/qat/qat_common/qat_rsakey.asn1
+ create mode 100644 drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1
+ create mode 100644 drivers/crypto/qat/qat_common/qat_rsapubkey.asn1
+
+--
