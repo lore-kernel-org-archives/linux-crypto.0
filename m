@@ -1,32 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: dma_map_sg can handle chained SG
-Date: Thu, 1 Oct 2015 22:01:06 +0800
-Message-ID: <20151001140106.GC27726@gondor.apana.org.au>
-References: <1443009328-12478-1-git-send-email-clabbe.montjoie@gmail.com>
+Subject: Re: [PATCHv2 1/1] Disable fips-allowed for authenc() and des()
+ ciphers
+Date: Thu, 1 Oct 2015 22:01:34 +0800
+Message-ID: <20151001140134.GD27726@gondor.apana.org.au>
+References: <1443115475-27398-1-git-send-email-john.haxby@oracle.com>
+ <1443115475-27398-2-git-send-email-john.haxby@oracle.com>
+ <1970269.pETRl5cENR@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: John Haxby <john.haxby@oracle.com>, linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:52719 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756154AbbJAOBo (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 1 Oct 2015 10:01:44 -0400
 Content-Disposition: inline
-In-Reply-To: <1443009328-12478-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1970269.pETRl5cENR@tauon.atsec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 23, 2015 at 01:55:24PM +0200, LABBE Corentin wrote:
+On Fri, Sep 25, 2015 at 07:58:10AM +0200, Stephan Mueller wrote:
+> Am Donnerstag, 24. September 2015, 18:24:35 schrieb John Haxby:
 > 
-> Hello
+> Hi John,
 > 
-> Some drivers use two dma_map_sg path according to SG are chained or not.
-> Since dma_map_sg can handle both case, this patch series clean all code
-> with references to sg chained.
+> >No authenc() ciphers are FIPS approved, nor is ecb(des).
+> >After the end of 2015, ansi_cprng will also be non-approved.
+> >
+> >Signed-off-by: John Haxby <john.haxby@oracle.com>
 > 
-> Note that I could only compile test sahara and caam patch.
-> And none could be tested due to lack oh hardware.
+> Acked-by: Stephan Mueller <smueller@chronox.de>
 
-Patches 1,3-4 applied.  Please resubmit patch 2 once you've completed
-it.  Thanks!
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
