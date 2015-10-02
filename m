@@ -1,41 +1,75 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4 0/3] crypto: akcipher - Changes to asymmetric key API
-Date: Fri, 2 Oct 2015 12:14:36 +0800
-Message-ID: <20151002041436.GA671@gondor.apana.org.au>
-References: <20151001202845.7193.51602.stgit@tstruk-mobl1>
- <20151002032000.GA32754@gondor.apana.org.au>
- <560DFCAA.2040609@intel.com>
- <20151002040409.GA557@gondor.apana.org.au>
- <560E0392.4020005@intel.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH v5 0/2] crypto: akcipher - Changes to asymmetric key API
+Date: Thu, 01 Oct 2015 22:10:32 -0700
+Message-ID: <20151002051032.27263.21150.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	tadeusz.struk@intel.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41874 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750725AbbJBEOk (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 2 Oct 2015 00:14:40 -0400
-Content-Disposition: inline
-In-Reply-To: <560E0392.4020005@intel.com>
+Received: from mga02.intel.com ([134.134.136.20]:45395 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751170AbbJBFMi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 2 Oct 2015 01:12:38 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 01, 2015 at 09:09:54PM -0700, Tadeusz Struk wrote:
->
-> This is used not only in rsa, but also in the new mpi sgl helpers.
-> Should I drop all the params checking?
+This series updates the asymmetric key API.
+The changes include
+ - setkey function has been split into set_priv_key and set_pub_key.
+ - akcipher requests takes sgl for src and dst instead of void *.
+Users of the API i.e. two existing RSA implementation and
+test mgr code have been updated accordingly.
 
-For a start the MPI helpers shouldn't be using sg_len as the length
-that they are allowed to read or write.  The length should be
-explicitly passed in by the caller because it may be smaller than
-the length of the entire SG list.
+First patch adds sgl helpers to mpi library.
+Second patch implements the API changes in rsa-generic and rsa-qat
 
-So no I don't see why you need to use sg_len in the MPI helpers.
+Changes in v5:
+- droped the sg_len patch as it was not needed
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Changes in v4:
+- add back src_len and dst_len
+- add sgl helpers to mpi library
+- change rsa-generic implementation to use the new mpi helpers
+
+Changes in v3:
+- changed type returned from sg_len from int to unsigned int
+
+Changes in v2:
+- dropped patches that checked value returned by crypto_unregister_alg
+- flatten patches 4 and 6-8 from v1 into one patch.  
+---
+
+Tadeusz Struk (2):
+      lib/mpi: Add mpi sgl helpers
+      crypto: akcipher - Changes to asymmetric key API
+
+
+ crypto/Makefile                                   |    9 +
+ crypto/rsa.c                                      |   83 +++++---
+ crypto/rsa_helper.c                               |   42 +++-
+ crypto/rsakey.asn1                                |    5 
+ crypto/rsaprivkey.asn1                            |   11 +
+ crypto/rsapubkey.asn1                             |    4 
+ crypto/testmgr.c                                  |   39 ++--
+ crypto/testmgr.h                                  |   36 +++-
+ drivers/crypto/qat/qat_common/Makefile            |   12 +
+ drivers/crypto/qat/qat_common/qat_asym_algs.c     |  213 ++++++++++++++++-----
+ drivers/crypto/qat/qat_common/qat_rsakey.asn1     |    5 
+ drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1 |   11 +
+ drivers/crypto/qat/qat_common/qat_rsapubkey.asn1  |    4 
+ include/crypto/akcipher.h                         |   91 +++++++--
+ include/crypto/internal/rsa.h                     |    7 -
+ include/linux/mpi.h                               |    4 
+ lib/mpi/mpicoder.c                                |  191 +++++++++++++++++++
+ 17 files changed, 603 insertions(+), 164 deletions(-)
+ delete mode 100644 crypto/rsakey.asn1
+ create mode 100644 crypto/rsaprivkey.asn1
+ create mode 100644 crypto/rsapubkey.asn1
+ delete mode 100644 drivers/crypto/qat/qat_common/qat_rsakey.asn1
+ create mode 100644 drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1
+ create mode 100644 drivers/crypto/qat/qat_common/qat_rsapubkey.asn1
+
+--
