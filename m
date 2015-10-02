@@ -1,79 +1,55 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH] crypto: atmel: Check for clk_prepare_enable() return value
-Date: Fri,  2 Oct 2015 14:12:58 +0200
-Message-ID: <1443787978-26624-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	LABBE Corentin <clabbe.montjoie@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Subject: unaligned access in pkcs7_verify
+Date: Fri, 2 Oct 2015 10:00:14 -0400
+Message-ID: <20151002140014.GI18263@oracle.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: sowmini.varadhan@oracle.com
+To: dhowells@redhat.com, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f169.google.com ([209.85.212.169]:35134 "EHLO
-	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752069AbbJBMNE (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:33443 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751800AbbJBOAh (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 2 Oct 2015 08:13:04 -0400
+	Fri, 2 Oct 2015 10:00:37 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-clk_prepare_enable() can fail so add a check for this and
-return the error code if it fails.
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
----
- drivers/crypto/atmel-aes.c  | 6 +++++-
- drivers/crypto/atmel-sha.c  | 6 +++++-
- drivers/crypto/atmel-tdes.c | 6 +++++-
- 3 files changed, 15 insertions(+), 3 deletions(-)
+Hi,
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index 0f9a9dc..de8f5da 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -260,7 +260,11 @@ static struct atmel_aes_dev *atmel_aes_find_dev(struct atmel_aes_ctx *ctx)
+I'm getting a lot of unaligned access messages each time I 
+do "modprobe [-r] <module>" on sparc:
+
+Kernel unaligned access at TPC[6ad9b4] pkcs7_verify+0x1ec/0x5e0
+Kernel unaligned access at TPC[6a5484] crypto_shash_finup+0xc/0x5c
+Kernel unaligned access at TPC[6a5390] crypto_shash_update+0xc/0x54
+Kernel unaligned access at TPC[10150308] sha1_sparc64_update+0x14/0x5c [sha1_sparc64]
+Kernel unaligned access at TPC[101501ac] __sha1_sparc64_update+0xc/0x98 [sha1_sparc64]
+
+Looks like these are being caused by an unaligned desc at
+
+        desc = digest + digest_size;
+
+Doing this:
+
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -46,7 +46,8 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
+                return (PTR_ERR(tfm) == -ENOENT) ? -ENOPKG : PTR_ERR(tfm);
  
- static int atmel_aes_hw_init(struct atmel_aes_dev *dd)
- {
--	clk_prepare_enable(dd->iclk);
-+	int err;
-+
-+	err = clk_prepare_enable(dd->iclk);
-+	if (err)
-+		return err;
+        desc_size = crypto_shash_descsize(tfm) + sizeof(*desc);
+-       sinfo->sig.digest_size = digest_size = crypto_shash_digestsize(tfm);
++       sinfo->sig.digest_size = digest_size = 
++               ALIGN(crypto_shash_digestsize(tfm), sizeof (*desc));
  
- 	if (!(dd->flags & AES_FLAGS_INIT)) {
- 		atmel_aes_write(dd, AES_CR, AES_CR_SWRST);
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 5b35433..5e6cf08 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -794,7 +794,11 @@ static void atmel_sha_finish_req(struct ahash_request *req, int err)
- 
- static int atmel_sha_hw_init(struct atmel_sha_dev *dd)
- {
--	clk_prepare_enable(dd->iclk);
-+	int err;
-+
-+	err = clk_prepare_enable(dd->iclk);
-+	if (err)
-+		return err;
- 
- 	if (!(SHA_FLAGS_INIT & dd->flags)) {
- 		atmel_sha_write(dd, SHA_CR, SHA_CR_SWRST);
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index ca29997..504e903 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -218,7 +218,11 @@ static struct atmel_tdes_dev *atmel_tdes_find_dev(struct atmel_tdes_ctx *ctx)
- 
- static int atmel_tdes_hw_init(struct atmel_tdes_dev *dd)
- {
--	clk_prepare_enable(dd->iclk);
-+	int err;
-+
-+	err = clk_prepare_enable(dd->iclk);
-+	if (err)
-+		return err;
- 
- 	if (!(dd->flags & TDES_FLAGS_INIT)) {
- 		atmel_tdes_write(dd, TDES_CR, TDES_CR_SWRST);
--- 
-2.4.9
+        ret = -ENOMEM;
+        digest = kzalloc(digest_size + desc_size, GFP_KERNEL);
+
+makes the unaliagned message go away, but I dont know if
+sinfo->sig.digest_size needs to be set to the (unaligned) raw 
+value of crypto_shash_digestsize() itself, and how to verify that
+this doesnt break something else in crypto
+
+--Sowmini
