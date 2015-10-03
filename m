@@ -1,55 +1,46 @@
-From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
-Subject: unaligned access in pkcs7_verify
-Date: Fri, 2 Oct 2015 10:00:14 -0400
-Message-ID: <20151002140014.GI18263@oracle.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: sowmini.varadhan@oracle.com
-To: dhowells@redhat.com, linux-crypto@vger.kernel.org
+From: Daniel Thompson <daniel.thompson@linaro.org>
+Subject: [PATCH 0/3] hwrng: stm32 - add support for STM32 HW RNG
+Date: Sat,  3 Oct 2015 21:35:16 +0100
+Message-ID: <1443904519-24012-1-git-send-email-daniel.thompson@linaro.org>
+Cc: Daniel Thompson <daniel.thompson@linaro.org>,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	patches@linaro.org, linaro-kernel@lists.linaro.org,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>
+To: Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:33443 "EHLO
-	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751800AbbJBOAh (ORCPT
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:32777 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750788AbbJCUfj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 2 Oct 2015 10:00:37 -0400
-Content-Disposition: inline
+	Sat, 3 Oct 2015 16:35:39 -0400
+Received: by wiclk2 with SMTP id lk2so73222271wic.0
+        for <linux-crypto@vger.kernel.org>; Sat, 03 Oct 2015 13:35:38 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+This patchset introduces a driver for the STM32 hardware random number
+generator.
 
-Hi,
+Daniel Thompson (3):
+  dt-bindings: Document the STM32 HW RNG bindings
+  hwrng: stm32 - add support for STM32 HW RNG
+  ARM: dts: stm32f429: Adopt STM32 RNG driver
 
-I'm getting a lot of unaligned access messages each time I 
-do "modprobe [-r] <module>" on sparc:
+ .../devicetree/bindings/hwrng/stm32-rng.txt        |  21 +++
+ arch/arm/boot/dts/stm32f429.dtsi                   |   7 +
+ drivers/char/hw_random/Kconfig                     |  12 ++
+ drivers/char/hw_random/Makefile                    |   1 +
+ drivers/char/hw_random/stm32-rng.c                 | 192 +++++++++++++++++++++
+ 5 files changed, 233 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/hwrng/stm32-rng.txt
+ create mode 100644 drivers/char/hw_random/stm32-rng.c
 
-Kernel unaligned access at TPC[6ad9b4] pkcs7_verify+0x1ec/0x5e0
-Kernel unaligned access at TPC[6a5484] crypto_shash_finup+0xc/0x5c
-Kernel unaligned access at TPC[6a5390] crypto_shash_update+0xc/0x54
-Kernel unaligned access at TPC[10150308] sha1_sparc64_update+0x14/0x5c [sha1_sparc64]
-Kernel unaligned access at TPC[101501ac] __sha1_sparc64_update+0xc/0x98 [sha1_sparc64]
-
-Looks like these are being caused by an unaligned desc at
-
-        desc = digest + digest_size;
-
-Doing this:
-
---- a/crypto/asymmetric_keys/pkcs7_verify.c
-+++ b/crypto/asymmetric_keys/pkcs7_verify.c
-@@ -46,7 +46,8 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
-                return (PTR_ERR(tfm) == -ENOENT) ? -ENOPKG : PTR_ERR(tfm);
- 
-        desc_size = crypto_shash_descsize(tfm) + sizeof(*desc);
--       sinfo->sig.digest_size = digest_size = crypto_shash_digestsize(tfm);
-+       sinfo->sig.digest_size = digest_size = 
-+               ALIGN(crypto_shash_digestsize(tfm), sizeof (*desc));
- 
-        ret = -ENOMEM;
-        digest = kzalloc(digest_size + desc_size, GFP_KERNEL);
-
-makes the unaliagned message go away, but I dont know if
-sinfo->sig.digest_size needs to be set to the (unaligned) raw 
-value of crypto_shash_digestsize() itself, and how to verify that
-this doesnt break something else in crypto
-
---Sowmini
+--
+2.4.3
