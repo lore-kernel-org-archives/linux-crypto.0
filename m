@@ -1,7 +1,7 @@
 From: Daniel Thompson <daniel.thompson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: [PATCH 1/3] dt-bindings: Document the STM32 HW RNG bindings
-Date: Sat,  3 Oct 2015 21:35:17 +0100
-Message-ID: <1443904519-24012-2-git-send-email-daniel.thompson@linaro.org>
+Subject: [PATCH 3/3] ARM: dts: stm32f429: Adopt STM32 RNG driver
+Date: Sat,  3 Oct 2015 21:35:19 +0100
+Message-ID: <1443904519-24012-4-git-send-email-daniel.thompson@linaro.org>
 References: <1443904519-24012-1-git-send-email-daniel.thompson@linaro.org>
 Cc: Daniel Thompson <daniel.thompson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
 	devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
@@ -20,42 +20,32 @@ In-Reply-To: <1443904519-24012-1-git-send-email-daniel.thompson-QSEj5FYQhm4dnm+y
 Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-This adds documenttaion of device tree binds for the STM32 hardware
-random number generator.
+New bindings and driver have been created for STM32 series parts. This
+patch integrates this changes.
 
 Signed-off-by: Daniel Thompson <daniel.thompson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 ---
- .../devicetree/bindings/hwrng/stm32-rng.txt         | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/hwrng/stm32-rng.txt
+ arch/arm/boot/dts/stm32f429.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/hwrng/stm32-rng.txt b/Documentation/devicetree/bindings/hwrng/stm32-rng.txt
-new file mode 100644
-index 000000000000..47f04176f93b
---- /dev/null
-+++ b/Documentation/devicetree/bindings/hwrng/stm32-rng.txt
-@@ -0,0 +1,21 @@
-+STMicroelectronics STM32 HW RNG
-+===============================
+diff --git a/arch/arm/boot/dts/stm32f429.dtsi b/arch/arm/boot/dts/stm32f429.dtsi
+index cb0613090243..90081fc22c6c 100644
+--- a/arch/arm/boot/dts/stm32f429.dtsi
++++ b/arch/arm/boot/dts/stm32f429.dtsi
+@@ -175,6 +175,13 @@
+ 			reg = <0x40023800 0x400>;
+ 			clocks = <&clk_hse>;
+ 		};
 +
-+The STM32 hardware random number generator is a simple fixed purpose IP and
-+is fully separated from other crypto functions.
-+
-+Required properties:
-+
-+- compatible : Should be "st,stm32-rng"
-+- reg : Should be register base and length as documented in the datasheet
-+- interrupts : The designated IRQ line for the RNG
-+- clocks : The clock needed to enable the RNG
-+
-+Example:
-+
-+	rng: rng@50060800 {
-+		compatible = "st,stm32-rng";
-+		reg = <0x50060800 0x400>;
-+		interrupts = <80>;
-+		clocks = <&rcc 0 38>;
-+	};
++		rng: rng@50060800 {
++			compatible = "st,stm32-rng";
++			reg = <0x50060800 0x400>;
++			interrupts = <80>;
++			clocks = <&rcc 0 38>;
++		};
+ 	};
+ };
+ 
 -- 
 2.4.3
 
