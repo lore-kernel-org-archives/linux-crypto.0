@@ -1,79 +1,43 @@
-From: Dave Kleikamp <dave.kleikamp@oracle.com>
-Subject: [PATCH] sparc/crypto: initialize blkcipher.ivsize
-Date: Mon, 5 Oct 2015 10:08:51 -0500
-Message-ID: <56129283.1090804@oracle.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>
-To: "David S. Miller" <davem@davemloft.net>
-Return-path: <sparclinux-owner@vger.kernel.org>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Lee Jones <lee.jones@linaro.org>
+Subject: [PATCH] hwrng: st: dt: Fix trivial typo in node address
+Date: Mon,  5 Oct 2015 16:10:42 +0100
+Message-ID: <1444057842-23439-1-git-send-email-lee.jones@linaro.org>
+Cc: kernel@stlinux.com, herbert@gondor.apana.org.au,
+	devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+	mpm@selenic.com, sboyd@codeaurora.org,
+	Lee Jones <lee.jones@linaro.org>
+To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:36746 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752645AbbJEPLT (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 5 Oct 2015 11:11:19 -0400
+Received: by wicgb1 with SMTP id gb1so124169051wic.1
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Oct 2015 08:11:18 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Some of the crypto algorithms write to the initialization vector,
-but no space has been allocated for it. This clobbers adjacent memory.
+DT nodes should not append their addresses with '0x'.
 
-Signed-off-by: Dave Kleikamp <dave.kleikamp@oracle.com>
+Suggested-by: Stephen Boyd <sboyd@codeaurora.org>
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- arch/sparc/crypto/aes_glue.c      | 2 ++
- arch/sparc/crypto/camellia_glue.c | 1 +
- arch/sparc/crypto/des_glue.c      | 2 ++
- 3 files changed, 5 insertions(+)
+ Documentation/devicetree/bindings/rng/st,rng.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/sparc/crypto/aes_glue.c b/arch/sparc/crypto/aes_glue.c
-index 2e48eb8..c90930d 100644
---- a/arch/sparc/crypto/aes_glue.c
-+++ b/arch/sparc/crypto/aes_glue.c
-@@ -433,6 +433,7 @@ static struct crypto_alg algs[] = { {
- 		.blkcipher = {
- 			.min_keysize	= AES_MIN_KEY_SIZE,
- 			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.ivsize		= AES_BLOCK_SIZE,
- 			.setkey		= aes_set_key,
- 			.encrypt	= cbc_encrypt,
- 			.decrypt	= cbc_decrypt,
-@@ -452,6 +453,7 @@ static struct crypto_alg algs[] = { {
- 		.blkcipher = {
- 			.min_keysize	= AES_MIN_KEY_SIZE,
- 			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.ivsize		= AES_BLOCK_SIZE,
- 			.setkey		= aes_set_key,
- 			.encrypt	= ctr_crypt,
- 			.decrypt	= ctr_crypt,
-diff --git a/arch/sparc/crypto/camellia_glue.c b/arch/sparc/crypto/camellia_glue.c
-index 6bf2479..561a84d 100644
---- a/arch/sparc/crypto/camellia_glue.c
-+++ b/arch/sparc/crypto/camellia_glue.c
-@@ -274,6 +274,7 @@ static struct crypto_alg algs[] = { {
- 		.blkcipher = {
- 			.min_keysize	= CAMELLIA_MIN_KEY_SIZE,
- 			.max_keysize	= CAMELLIA_MAX_KEY_SIZE,
-+			.ivsize		= CAMELLIA_BLOCK_SIZE,
- 			.setkey		= camellia_set_key,
- 			.encrypt	= cbc_encrypt,
- 			.decrypt	= cbc_decrypt,
-diff --git a/arch/sparc/crypto/des_glue.c b/arch/sparc/crypto/des_glue.c
-index dd6a34f..61af794 100644
---- a/arch/sparc/crypto/des_glue.c
-+++ b/arch/sparc/crypto/des_glue.c
-@@ -429,6 +429,7 @@ static struct crypto_alg algs[] = { {
- 		.blkcipher = {
- 			.min_keysize	= DES_KEY_SIZE,
- 			.max_keysize	= DES_KEY_SIZE,
-+			.ivsize		= DES_BLOCK_SIZE,
- 			.setkey		= des_set_key,
- 			.encrypt	= cbc_encrypt,
- 			.decrypt	= cbc_decrypt,
-@@ -485,6 +486,7 @@ static struct crypto_alg algs[] = { {
- 		.blkcipher = {
- 			.min_keysize	= DES3_EDE_KEY_SIZE,
- 			.max_keysize	= DES3_EDE_KEY_SIZE,
-+			.ivsize		= DES3_EDE_BLOCK_SIZE,
- 			.setkey		= des3_ede_set_key,
- 			.encrypt	= cbc3_encrypt,
- 			.decrypt	= cbc3_decrypt,
+diff --git a/Documentation/devicetree/bindings/rng/st,rng.txt b/Documentation/devicetree/bindings/rng/st,rng.txt
+index dbc64e6..35734bc 100644
+--- a/Documentation/devicetree/bindings/rng/st,rng.txt
++++ b/Documentation/devicetree/bindings/rng/st,rng.txt
+@@ -8,7 +8,7 @@ clocks		: Phandle to device's clock (See: ../clocks/clock-bindings.txt)
+ 
+ Example:
+ 
+-rng@0xfee80000 {
++rng@fee80000 {
+ 	compatible      = "st,rng";
+ 	reg		= <0xfee80000 0x1000>;
+ 	clocks          = <&clk_sysin>;
 -- 
-2.6.0
-
+1.9.1
