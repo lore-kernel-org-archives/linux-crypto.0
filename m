@@ -1,43 +1,76 @@
-From: Lee Jones <lee.jones@linaro.org>
-Subject: [PATCH] hwrng: st: dt: Fix trivial typo in node address
-Date: Mon,  5 Oct 2015 16:10:42 +0100
-Message-ID: <1444057842-23439-1-git-send-email-lee.jones@linaro.org>
-Cc: kernel@stlinux.com, herbert@gondor.apana.org.au,
-	devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
-	mpm@selenic.com, sboyd@codeaurora.org,
-	Lee Jones <lee.jones@linaro.org>
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:36746 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752645AbbJEPLT (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 5 Oct 2015 11:11:19 -0400
-Received: by wicgb1 with SMTP id gb1so124169051wic.1
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Oct 2015 08:11:18 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Rob Herring <robherring2@gmail.com>
+Subject: Re: [PATCH 1/3] dt-bindings: Document the STM32 HW RNG bindings
+Date: Mon, 5 Oct 2015 10:34:38 -0500
+Message-ID: <CAL_JsqLt2=Cb8SDAQG7XiMNC7NV59MimYETyt87-QYHt31cnsQ@mail.gmail.com>
+References: <1443904519-24012-1-git-send-email-daniel.thompson@linaro.org> <1443904519-24012-2-git-send-email-daniel.thompson@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	linux-crypto@vger.kernel.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Linaro Patches <patches@linaro.org>,
+	"linaro-kernel@lists.linaro.org" <linaro-kernel@lists.linaro.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>
+To: Daniel Thompson <daniel.thompson@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1443904519-24012-2-git-send-email-daniel.thompson@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-DT nodes should not append their addresses with '0x'.
+On Sat, Oct 3, 2015 at 3:35 PM, Daniel Thompson
+<daniel.thompson@linaro.org> wrote:
+> This adds documenttaion of device tree binds for the STM32 hardware
+> random number generator.
+>
+> Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
+> ---
+>  .../devicetree/bindings/hwrng/stm32-rng.txt         | 21 +++++++++++++++++++++
 
-Suggested-by: Stephen Boyd <sboyd@codeaurora.org>
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
----
- Documentation/devicetree/bindings/rng/st,rng.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Please use bindings/rng/... as I'm consolidating bindings there.
 
-diff --git a/Documentation/devicetree/bindings/rng/st,rng.txt b/Documentation/devicetree/bindings/rng/st,rng.txt
-index dbc64e6..35734bc 100644
---- a/Documentation/devicetree/bindings/rng/st,rng.txt
-+++ b/Documentation/devicetree/bindings/rng/st,rng.txt
-@@ -8,7 +8,7 @@ clocks		: Phandle to device's clock (See: ../clocks/clock-bindings.txt)
- 
- Example:
- 
--rng@0xfee80000 {
-+rng@fee80000 {
- 	compatible      = "st,rng";
- 	reg		= <0xfee80000 0x1000>;
- 	clocks          = <&clk_sysin>;
--- 
-1.9.1
+Otherwise,
+
+Acked-by: Rob Herring <robh@kernel.org>
+
+>  1 file changed, 21 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/hwrng/stm32-rng.txt
+>
+> diff --git a/Documentation/devicetree/bindings/hwrng/stm32-rng.txt b/Documentation/devicetree/bindings/hwrng/stm32-rng.txt
+> new file mode 100644
+> index 000000000000..47f04176f93b
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/hwrng/stm32-rng.txt
+> @@ -0,0 +1,21 @@
+> +STMicroelectronics STM32 HW RNG
+> +===============================
+> +
+> +The STM32 hardware random number generator is a simple fixed purpose IP and
+> +is fully separated from other crypto functions.
+> +
+> +Required properties:
+> +
+> +- compatible : Should be "st,stm32-rng"
+> +- reg : Should be register base and length as documented in the datasheet
+> +- interrupts : The designated IRQ line for the RNG
+> +- clocks : The clock needed to enable the RNG
+> +
+> +Example:
+> +
+> +       rng: rng@50060800 {
+> +               compatible = "st,stm32-rng";
+> +               reg = <0x50060800 0x400>;
+> +               interrupts = <80>;
+> +               clocks = <&rcc 0 38>;
+> +       };
+> --
+> 2.4.3
+>
