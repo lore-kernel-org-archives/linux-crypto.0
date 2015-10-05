@@ -1,217 +1,190 @@
 From: Daniel Thompson <daniel.thompson@linaro.org>
-Subject: Re: [PATCH 2/3] hwrng: stm32 - add support for STM32 HW RNG
-Date: Mon, 5 Oct 2015 10:26:06 +0100
-Message-ID: <CAMTL27H989owtMN9Rkn4u1S+sDatwf+VV_OV=6YdJ3_KX0iPEw@mail.gmail.com>
-References: <1443904519-24012-1-git-send-email-daniel.thompson@linaro.org>
-	<1443904519-24012-3-git-send-email-daniel.thompson@linaro.org>
-	<5610E8E4.3040507@gmail.com>
+Subject: Re: [PATCH v2 5/7] hwrng: st: Add support for ST's HW Random Number
+ Generator
+Date: Mon, 5 Oct 2015 11:44:30 +0100
+Message-ID: <5612548E.8090405@linaro.org>
+References: <1442497557-9271-1-git-send-email-lee.jones@linaro.org>
+ <1442497557-9271-6-git-send-email-lee.jones@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	linux-crypto@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>,
-	Patch Tracking <patches@linaro.org>,
-	Linaro Kernel Mailman List <linaro-kernel@lists.linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>
-To: Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5610E8E4.3040507@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: kernel@stlinux.com, Pankaj Dev <pankaj.dev@st.com>
+To: Lee Jones <lee.jones@linaro.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org, peter@korsgaard.com,
+	festevam@gmail.com, kieranbingham@gmail.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:33727 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752655AbbJEKod (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 5 Oct 2015 06:44:33 -0400
+Received: by wiclk2 with SMTP id lk2so113808411wic.0
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Oct 2015 03:44:32 -0700 (PDT)
+In-Reply-To: <1442497557-9271-6-git-send-email-lee.jones@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 4 October 2015 at 09:52, Maxime Coquelin <mcoquelin.stm32@gmail.com> wrote:
-> Hi Daniel,
->
-> On 10/03/2015 10:35 PM, Daniel Thompson wrote:
->>
->> Add support for STMicroelectronics STM32 random number generator.
->>
->> The config value defaults to N, reflecting the fact that STM32 is a
->> very low resource microcontroller platform and unlikely to be targeted
->> by any "grown up" defconfigs.
->>
->> Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
->> ---
->>   drivers/char/hw_random/Kconfig     |  12 +++
->>   drivers/char/hw_random/Makefile    |   1 +
->>   drivers/char/hw_random/stm32-rng.c | 192
->> +++++++++++++++++++++++++++++++++++++
->>   3 files changed, 205 insertions(+)
->>   create mode 100644 drivers/char/hw_random/stm32-rng.c
->
-> <snip>
->>
->> diff --git a/drivers/char/hw_random/stm32-rng.c
->> b/drivers/char/hw_random/stm32-rng.c
->> new file mode 100644
->> index 000000000000..37dfa5fca105
->> --- /dev/null
->> +++ b/drivers/char/hw_random/stm32-rng.c
->> @@ -0,0 +1,192 @@
->
-> <snip>
->
->> +#include <linux/clk.h>
->> +#include <linux/delay.h>
->> +#include <linux/hw_random.h>
->> +#include <linux/io.h>
->> +#include <linux/kernel.h>
->> +#include <linux/module.h>
->> +#include <linux/of_address.h>
->> +#include <linux/of_platform.h>
->> +#include <linux/slab.h>
->> +
->> +#define RNG_CR 0x00
->> +#define RNG_CR_RNGEN BIT(2)
->> +
->> +#define RNG_SR 0x04
->> +#define RNG_SR_SEIS BIT(6)
->> +#define RNG_SR_CEIS BIT(5)
->> +#define RNG_SR_DRDY BIT(0)
->> +
->> +#define RNG_DR 0x08
->> +
->> +/*
->> + * It takes 40 cycles @ 48MHz to generate each random number (e.g. <1us).
->> + * At the time of writing STM32 parts max out at ~200MHz meaning a
->> timeout
->> + * of 500 leaves us a very comfortable margin for error. The loop to
->> which
->> + * the timeout applies takes at least 4 instructions per cycle so the
->> + * timeout is enough to take us up to multi-GHz parts!
->> + */
->> +#define RNG_TIMEOUT 500
->> +
->> +struct stm32_rng_private {
->> +       struct hwrng rng;
->> +       void __iomem *base;
->> +       struct clk *clk;
->> +};
->> +
->> +static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool
->> wait)
->> +{
->> +       struct stm32_rng_private *priv =
->> +           container_of(rng, struct stm32_rng_private, rng);
->> +       u32 cr, sr;
->> +       int retval = 0;
->> +
->> +       /* enable random number generation */
->> +       clk_enable(priv->clk);
->> +       cr = readl(priv->base + RNG_CR);
->> +       writel(cr | RNG_CR_RNGEN, priv->base + RNG_CR);
->> +
->> +       while (max > sizeof(u32)) {
->> +               sr = readl(priv->base + RNG_SR);
->> +               if (!sr && wait) {
->> +                       unsigned int timeout = RNG_TIMEOUT;
->> +
->> +                       do {
->> +                               cpu_relax();
->> +                               sr = readl(priv->base + RNG_SR);
->> +                       } while (!sr && --timeout);
->> +               }
->> +
->> +               /* Has h/ware error dection been triggered? */
->> +               if (WARN_ON(sr & (RNG_SR_SEIS | RNG_SR_CEIS)))
->
-> Maybe you should instead use WARN_ONCE?
-> Because from what I understand in the datasheet, CEIS bit indicates and
-> error with clock configuration.
-> If that happens, it is likely the same error will occur each time this
-> function will be called.
+Hi Lee
 
-Ok.
+Late but...
+
+On 17/09/15 14:45, Lee Jones wrote:
+> diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+> index 055bb01..8bcfb45 100644
+> --- a/drivers/char/hw_random/Makefile
+> +++ b/drivers/char/hw_random/Makefile
+> @@ -30,4 +30,5 @@ obj-$(CONFIG_HW_RANDOM_TPM) += tpm-rng.o
+>   obj-$(CONFIG_HW_RANDOM_BCM2835) += bcm2835-rng.o
+>   obj-$(CONFIG_HW_RANDOM_IPROC_RNG200) += iproc-rng200.o
+>   obj-$(CONFIG_HW_RANDOM_MSM) += msm-rng.o
+> +obj-$(CONFIG_HW_RANDOM_ST) += st-rng.o
+>   obj-$(CONFIG_HW_RANDOM_XGENE) += xgene-rng.o
+> diff --git a/drivers/char/hw_random/st-rng.c b/drivers/char/hw_random/st-rng.c
+> new file mode 100644
+> index 0000000..8c8a435
+> --- /dev/null
+> +++ b/drivers/char/hw_random/st-rng.c
+> @@ -0,0 +1,144 @@
+> +/*
+> + * ST Random Number Generator Driver ST's Platforms
+> + *
+> + * Author: Pankaj Dev: <pankaj.dev@st.com>
+> + *         Lee Jones <lee.jones@linaro.org>
+> + *
+> + * Copyright (C) 2015 STMicroelectronics (R&D) Limited
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +
+> +#include <linux/clk.h>
+> +#include <linux/delay.h>
+> +#include <linux/hw_random.h>
+> +#include <linux/io.h>
+> +#include <linux/module.h>
+> +#include <linux/of.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/slab.h>
+> +
+> +/* Registers */
+> +#define ST_RNG_STATUS_REG		0x20
+> +#define ST_RNG_DATA_REG			0x24
+> +
+> +/* Registers fields */
+> +#define ST_RNG_STATUS_BAD_SEQUENCE	BIT(0)
+> +#define ST_RNG_STATUS_BAD_ALTERNANCE	BIT(1)
+> +#define ST_RNG_STATUS_FIFO_FULL		BIT(5)
+> +
+> +#define ST_RNG_FIFO_SIZE		8
+> +#define ST_RNG_SAMPLE_SIZE		2 /* 2 Byte (16bit) samples */
+> +
+> +/* Samples are available every 0.667us, which we round to 1us */
+> +#define ST_RNG_FILL_FIFO_TIMEOUT   (1 * (ST_RNG_FIFO_SIZE / ST_RNG_SAMPLE_SIZE))
+> +
+> +struct st_rng_data {
+> +	void __iomem	*base;
+> +	struct clk	*clk;
+> +	struct hwrng	ops;
+> +};
+> +
+> +static int st_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+> +{
+> +	struct st_rng_data *ddata = (struct st_rng_data *)rng->priv;
+> +	u32 status;
+> +	int i;
+> +
+> +	if (max < sizeof(u16))
+> +		return -EINVAL;
+> +
+> +	/* Wait until FIFO is full - max 4uS*/
+> +	for (i = 0; i < ST_RNG_FILL_FIFO_TIMEOUT; i++) {
+> +		status = readl_relaxed(ddata->base + ST_RNG_STATUS_REG);
+> +		if (status & ST_RNG_STATUS_FIFO_FULL)
+> +			break;
+> +		udelay(1);
+
+How much bandwidth does using udelay() cost? I think it could be >10% 
+compared to a tighter polling loop.
 
 
->> +                       break;
->> +
->> +               /* No data ready... */
->> +               if (!sr)
->> +                       break;
->
-> Maybe you could perform this check before the error detection, as if !sr,
-> the HW error condition will be always false.
+> +	}
+> +
+> +	if (i == ST_RNG_FILL_FIFO_TIMEOUT)
+> +		return 0;
 
-I plan to combine both checks since timing out is still a serious
-error even if the h/ware didn't detect it.
-
->>
->> +
->> +               *(u32 *)data = readl(priv->base + RNG_DR);
->> +
->> +               retval += sizeof(u32);
->> +               data += sizeof(u32);
->> +               max -= sizeof(u32);
->> +       }
->> +
->> +       /* disable the generator */
->> +       writel(cr, priv->base + RNG_CR);
->> +       clk_disable(priv->clk);
->> +
->> +       return retval || !wait ? retval : -EIO;
->> +}
->
->
-> Couldn't we use "_relaxed" versions of readl/writel?
-> I might save some not needed barriers.
-
-Will fix. I had a "historic" reason to avoid _relaxed but this is no
-longer relevant.
+Isn't a timeout an error condition?
 
 
->> +static int stm32_rng_probe(struct platform_device *ofdev)
->> +{
->> +       struct device *dev = &ofdev->dev;
->> +       struct device_node *np = ofdev->dev.of_node;
->> +       struct stm32_rng_private *priv;
->> +       struct resource res;
->> +       int err;
->> +
->> +       priv = devm_kzalloc(dev, sizeof(struct stm32_rng_private),
->> GFP_KERNEL);
->> +       if (!priv)
->> +               return -ENOMEM;
->> +
->> +       err = of_address_to_resource(np, 0, &res);
->> +       if (err)
->> +               return err;
->> +
->> +       priv->base = devm_ioremap_resource(dev, &res);
->> +       if (IS_ERR(priv->base))
->> +               return PTR_ERR(priv->base);
->> +
->> +       priv->clk = devm_clk_get(&ofdev->dev, NULL);
->> +       if (IS_ERR(priv->clk))
->> +               return PTR_ERR(priv->clk);
->> +
->> +       dev_set_drvdata(dev, priv);
->> +
->> +       priv->rng.name = dev_driver_string(dev),
->> +       priv->rng.init = stm32_rng_init,
->> +       priv->rng.cleanup = stm32_rng_cleanup,
->> +       priv->rng.read = stm32_rng_read,
->> +       priv->rng.priv = (unsigned long) dev;
->> +
->> +       err = hwrng_register(&priv->rng);
->> +       if (err)
->> +               return err;
->> +
->> +       return 0;
->
-> As detected with Coccinelle by Fengguang build system, you could simplify:
-> return hwrng_register(&priv->rng);
+> +
+> +	for (i = 0; i < ST_RNG_FIFO_SIZE && i < max; i += 2)
+> +		*(u16 *)(data + i) =
+> +			readl_relaxed(ddata->base + ST_RNG_DATA_REG);
+> +
+> +	return i;	/* No of bytes read */
+> +}
+> +
+> +static int st_rng_probe(struct platform_device *pdev)
+> +{
+> +	struct st_rng_data *ddata;
+> +	struct resource *res;
+> +	struct clk *clk;
+> +	void __iomem *base;
+> +	int ret;
+> +
+> +	ddata = devm_kzalloc(&pdev->dev, sizeof(*ddata), GFP_KERNEL);
+> +	if (!ddata)
+> +		return -ENOMEM;
+> +
+> +	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> +	base = devm_ioremap_resource(&pdev->dev, res);
+> +	if (IS_ERR(base))
+> +		return PTR_ERR(base);
+> +
+> +	clk = devm_clk_get(&pdev->dev, NULL);
+> +	if (IS_ERR(clk))
+> +		return PTR_ERR(clk);
+> +
+> +	ret = clk_prepare_enable(clk);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ddata->ops.priv	= (unsigned long)ddata;
+> +	ddata->ops.read	= st_rng_read;
+> +	ddata->ops.name	= pdev->name;
+> +	ddata->base	= base;
+> +	ddata->clk	= clk;
+> +
+> +	dev_set_drvdata(&pdev->dev, ddata);
+> +
+> +	ret = hwrng_register(&ddata->ops);
+> +	if (ret) {
+> +		dev_err(&pdev->dev, "Failed to register HW RNG\n");
 
-Will do.
+Why shout about this particular error but not any others? Perhaps just 
+rely on the driver core to report the error here?
 
 
-Thanks
+> +		return ret;
+> +	}
+> +
+> +	dev_info(&pdev->dev, "Successfully registered HW RNG\n");
+> +
+> +	return 0;
+> +}
+> +
+> +static int st_rng_remove(struct platform_device *pdev)
+> +{
+> +	struct st_rng_data *ddata = dev_get_drvdata(&pdev->dev);
+> +
+> +	hwrng_unregister(&ddata->ops);
+> +
+> +	clk_disable_unprepare(ddata->clk);
+
+This mismatches the error paths in the probe function (there is no 
+cleanup of clock counts in probe function).
+
 
 Daniel.
