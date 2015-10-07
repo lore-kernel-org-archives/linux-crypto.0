@@ -1,40 +1,45 @@
 From: Lee Jones <lee.jones@linaro.org>
-Subject: [PATCH v2 0/3] hwrng: st: Couple of improvements
-Date: Wed,  7 Oct 2015 13:23:26 +0100
-Message-ID: <1444220609-31251-1-git-send-email-lee.jones@linaro.org>
+Subject: [PATCH v2 3/3] hwrng: st: Improve FIFO size/depth description
+Date: Wed,  7 Oct 2015 13:23:29 +0100
+Message-ID: <1444220609-31251-4-git-send-email-lee.jones@linaro.org>
+References: <1444220609-31251-1-git-send-email-lee.jones@linaro.org>
 Cc: kernel@stlinux.com, herbert@gondor.apana.org.au,
 	linux-crypto@vger.kernel.org, pankaj.dev@st.com,
 	daniel.thompson@linaro.org, linux@arm.linux.org.uk,
 	Lee Jones <lee.jones@linaro.org>
 To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:37494 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751340AbbJGMZe (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 Oct 2015 08:25:34 -0400
-Received: by wicfx3 with SMTP id fx3so25719517wic.0
-        for <linux-crypto@vger.kernel.org>; Wed, 07 Oct 2015 05:25:32 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1444220609-31251-1-git-send-email-lee.jones@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This set contains a minor documentation fix, greater clarification
-with how the FIFO depth/size is represented and finally a fix to
-prevent early timeout during data acquisition.
+The original representation of FIFO size in the driver coupled with the
+ambiguity in the documentation meant that it was easy to confuse readers.
+This lead to a false positive BUG-find and subsequently time wastage
+debugging this phantom issue.
 
-v1 => v2:
- - Remove phantom bugfix (FIFO really is 4 deep, not 8)
- - Double timeout value to account for inconsistent call to udelay()
-   - Suggested-by: Russell King <rmk+kernel@arm.linux.org.uk>
+Hopefully this patch can prevent future readers from falling into the
+same trap.
 
-Lee Jones (3):
-  hwrng: st: dt: Fix trivial typo in node address
-  hwrng: st: Use real-world device timings for timeout
-  hwrng: st: Improve FIFO size/depth description
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
+---
+ drivers/char/hw_random/st-rng.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
- Documentation/devicetree/bindings/rng/st,rng.txt |  2 +-
- drivers/char/hw_random/st-rng.c                  | 13 ++++++++++---
- 2 files changed, 11 insertions(+), 4 deletions(-)
-
+diff --git a/drivers/char/hw_random/st-rng.c b/drivers/char/hw_random/st-rng.c
+index 17f0a09..1d35363 100644
+--- a/drivers/char/hw_random/st-rng.c
++++ b/drivers/char/hw_random/st-rng.c
+@@ -29,8 +29,9 @@
+ #define ST_RNG_STATUS_BAD_ALTERNANCE	BIT(1)
+ #define ST_RNG_STATUS_FIFO_FULL		BIT(5)
+ 
+-#define ST_RNG_FIFO_SIZE		8
+ #define ST_RNG_SAMPLE_SIZE		2 /* 2 Byte (16bit) samples */
++#define ST_RNG_FIFO_DEPTH		4
++#define ST_RNG_FIFO_SIZE		(ST_RNG_FIFO_DEPTH * ST_RNG_SAMPLE_SIZE)
+ 
+ /*
+  * Samples are documented to be available every 0.667us, so in theory
 -- 
 1.9.1
