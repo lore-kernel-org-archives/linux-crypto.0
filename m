@@ -1,68 +1,40 @@
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH] crypto x86/camellia_aesni_avx: Fix CPU feature checks
-Date: Wed, 7 Oct 2015 09:25:58 +0200
-Message-ID: <20151007072558.GF7837@gmail.com>
-References: <1444131093.2956.122.camel@decadent.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org,
-	=?iso-8859-1?Q?St=E9phane?= Glondu <glondu@debian.org>,
-	stable <stable@vger.kernel.org>, x86@kernel.org,
-	Dave Hansen <dave@sr71.net>
-To: Ben Hutchings <ben@decadent.org.uk>
+From: Lee Jones <lee.jones@linaro.org>
+Subject: [PATCH v2 0/3] hwrng: st: Couple of improvements
+Date: Wed,  7 Oct 2015 13:23:26 +0100
+Message-ID: <1444220609-31251-1-git-send-email-lee.jones@linaro.org>
+Cc: kernel@stlinux.com, herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org, pankaj.dev@st.com,
+	daniel.thompson@linaro.org, linux@arm.linux.org.uk,
+	Lee Jones <lee.jones@linaro.org>
+To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f173.google.com ([209.85.212.173]:33016 "EHLO
-	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751032AbbJGH0C (ORCPT
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:37494 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751340AbbJGMZe (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 Oct 2015 03:26:02 -0400
-Content-Disposition: inline
-In-Reply-To: <1444131093.2956.122.camel@decadent.org.uk>
+	Wed, 7 Oct 2015 08:25:34 -0400
+Received: by wicfx3 with SMTP id fx3so25719517wic.0
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Oct 2015 05:25:32 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+This set contains a minor documentation fix, greater clarification
+with how the FIFO depth/size is represented and finally a fix to
+prevent early timeout during data acquisition.
 
-* Ben Hutchings <ben@decadent.org.uk> wrote:
+v1 => v2:
+ - Remove phantom bugfix (FIFO really is 4 deep, not 8)
+ - Double timeout value to account for inconsistent call to udelay()
+   - Suggested-by: Russell King <rmk+kernel@arm.linux.org.uk>
 
-> We need to explicitly check the AVX and AES CPU features, as we can't
-> infer them from the related XSAVE feature flags.  For example, the
-> Core i3 2310M passes the XSAVE feature test but does not implement
-> AES-NI.
->=20
-> Reported-and-tested-by: St=E9phane Glondu <glondu@debian.org>
-> References: https://bugs.debian.org/800934
-> Fixes: ce4f5f9b65ae ("x86/fpu, crypto x86/camellia_aesni_avx: Simplif=
-y...")
-> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
-> Cc: stable <stable@vger.kernel.org> # 4.2
-> ---
->  arch/x86/crypto/camellia_aesni_avx_glue.c | 5 +++++
->  1 file changed, 5 insertions(+)
->=20
-> diff --git a/arch/x86/crypto/camellia_aesni_avx_glue.c b/arch/x86/cry=
-pto/camellia_aesni_avx_glue.c
-> index 80a0e43..bacaa13 100644
-> --- a/arch/x86/crypto/camellia_aesni_avx_glue.c
-> +++ b/arch/x86/crypto/camellia_aesni_avx_glue.c
-> @@ -554,6 +554,11 @@ static int __init camellia_aesni_init(void)
->  {
->  	const char *feature_name;
-> =20
-> +	if (!cpu_has_avx || !cpu_has_aes || !cpu_has_osxsave) {
-> +		pr_info("AVX or AES-NI instructions are not detected.\n");
-> +		return -ENODEV;
-> +	}
-> +
->  	if (!cpu_has_xfeatures(XSTATE_SSE | XSTATE_YMM, &feature_name)) {
->  		pr_info("CPU feature '%s' is not supported.\n", feature_name);
->  		return -ENODEV;
+Lee Jones (3):
+  hwrng: st: dt: Fix trivial typo in node address
+  hwrng: st: Use real-world device timings for timeout
+  hwrng: st: Improve FIFO size/depth description
 
-Good catch!
+ Documentation/devicetree/bindings/rng/st,rng.txt |  2 +-
+ drivers/char/hw_random/st-rng.c                  | 13 ++++++++++---
+ 2 files changed, 11 insertions(+), 4 deletions(-)
 
-Do we still need the cpu_has_xfeatures() check after the cpuid based ch=
-eck?
-
-Thanks,
-
-	Ingo
+-- 
+1.9.1
