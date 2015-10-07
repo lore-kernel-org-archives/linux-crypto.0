@@ -1,47 +1,68 @@
-From: Lee Jones <lee.jones@linaro.org>
-Subject: [RESEND 2/3] hwrng: st: Use real-world device timings for timeout
-Date: Tue,  6 Oct 2015 17:12:50 +0100
-Message-ID: <1444147971-25778-2-git-send-email-lee.jones@linaro.org>
-References: <1444147971-25778-1-git-send-email-lee.jones@linaro.org>
-Cc: kernel@stlinux.com, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org, peter@korsgaard.com,
-	festevam@gmail.com, pankaj.dev@st.com, daniel.thompson@linaro.org,
-	Lee Jones <lee.jones@linaro.org>
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1444147971-25778-1-git-send-email-lee.jones@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH] crypto x86/camellia_aesni_avx: Fix CPU feature checks
+Date: Wed, 7 Oct 2015 09:25:58 +0200
+Message-ID: <20151007072558.GF7837@gmail.com>
+References: <1444131093.2956.122.camel@decadent.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org,
+	=?iso-8859-1?Q?St=E9phane?= Glondu <glondu@debian.org>,
+	stable <stable@vger.kernel.org>, x86@kernel.org,
+	Dave Hansen <dave@sr71.net>
+To: Ben Hutchings <ben@decadent.org.uk>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:33016 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751032AbbJGH0C (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 7 Oct 2015 03:26:02 -0400
+Content-Disposition: inline
+In-Reply-To: <1444131093.2956.122.camel@decadent.org.uk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Samples are documented to be available every 0.667us, so in theory
-the 8 sample deep FIFO should take 5.336us to fill.  However, during
-thorough testing, it became apparent that filling the FIFO actually
-takes closer to 12us.
 
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
----
- drivers/char/hw_random/st-rng.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+* Ben Hutchings <ben@decadent.org.uk> wrote:
 
-diff --git a/drivers/char/hw_random/st-rng.c b/drivers/char/hw_random/st-rng.c
-index 8c8a435..a1ff080 100644
---- a/drivers/char/hw_random/st-rng.c
-+++ b/drivers/char/hw_random/st-rng.c
-@@ -32,8 +32,13 @@
- #define ST_RNG_FIFO_SIZE		8
- #define ST_RNG_SAMPLE_SIZE		2 /* 2 Byte (16bit) samples */
- 
--/* Samples are available every 0.667us, which we round to 1us */
--#define ST_RNG_FILL_FIFO_TIMEOUT   (1 * (ST_RNG_FIFO_SIZE / ST_RNG_SAMPLE_SIZE))
-+/*
-+ * Samples are documented to be available every 0.667us, so in theory
-+ * the 8 sample deep FIFO should take 5.336us to fill.  However, during
-+ * thorough testing, it became apparent that filling the FIFO actually
-+ * takes closer to 12us.
-+ */
-+#define ST_RNG_FILL_FIFO_TIMEOUT	12
- 
- struct st_rng_data {
- 	void __iomem	*base;
--- 
-1.9.1
+> We need to explicitly check the AVX and AES CPU features, as we can't
+> infer them from the related XSAVE feature flags.  For example, the
+> Core i3 2310M passes the XSAVE feature test but does not implement
+> AES-NI.
+>=20
+> Reported-and-tested-by: St=E9phane Glondu <glondu@debian.org>
+> References: https://bugs.debian.org/800934
+> Fixes: ce4f5f9b65ae ("x86/fpu, crypto x86/camellia_aesni_avx: Simplif=
+y...")
+> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+> Cc: stable <stable@vger.kernel.org> # 4.2
+> ---
+>  arch/x86/crypto/camellia_aesni_avx_glue.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/arch/x86/crypto/camellia_aesni_avx_glue.c b/arch/x86/cry=
+pto/camellia_aesni_avx_glue.c
+> index 80a0e43..bacaa13 100644
+> --- a/arch/x86/crypto/camellia_aesni_avx_glue.c
+> +++ b/arch/x86/crypto/camellia_aesni_avx_glue.c
+> @@ -554,6 +554,11 @@ static int __init camellia_aesni_init(void)
+>  {
+>  	const char *feature_name;
+> =20
+> +	if (!cpu_has_avx || !cpu_has_aes || !cpu_has_osxsave) {
+> +		pr_info("AVX or AES-NI instructions are not detected.\n");
+> +		return -ENODEV;
+> +	}
+> +
+>  	if (!cpu_has_xfeatures(XSTATE_SSE | XSTATE_YMM, &feature_name)) {
+>  		pr_info("CPU feature '%s' is not supported.\n", feature_name);
+>  		return -ENODEV;
+
+Good catch!
+
+Do we still need the cpu_has_xfeatures() check after the cpuid based ch=
+eck?
+
+Thanks,
+
+	Ingo
