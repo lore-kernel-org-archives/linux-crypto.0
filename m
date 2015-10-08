@@ -1,40 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v5 1/2] lib/mpi: Add mpi sgl helpers
-Date: Thu, 8 Oct 2015 21:36:26 +0800
-Message-ID: <20151008133626.GA24687@gondor.apana.org.au>
-References: <20151002051032.27263.21150.stgit@tstruk-mobl1>
- <20151002051038.27263.5476.stgit@tstruk-mobl1>
- <20151008130203.GA24128@gondor.apana.org.au>
- <56167048.5080505@intel.com>
+Subject: Re: [PATCH v1 0/4] crypto: ccp - CCP driver updates 2015-10-01
+Date: Thu, 8 Oct 2015 22:22:55 +0800
+Message-ID: <20151008142255.GA25166@gondor.apana.org.au>
+References: <20151001213225.4286.44278.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: linux-crypto@vger.kernel.org, David Miller <davem@davemloft.net>
+To: Tom Lendacky <thomas.lendacky@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:58214 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:58221 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757562AbbJHNg3 (ORCPT
+	with ESMTP id S932443AbbJHOXB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Oct 2015 09:36:29 -0400
+	Thu, 8 Oct 2015 10:23:01 -0400
 Content-Disposition: inline
-In-Reply-To: <56167048.5080505@intel.com>
+In-Reply-To: <20151001213225.4286.44278.stgit@tlendack-t1.amdoffice.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 08, 2015 at 06:31:52AM -0700, Tadeusz Struk wrote:
->
-> The sgl has to be big enough to take the whole integer.
-> What would be the point to export only part of a number?
+On Thu, Oct 01, 2015 at 04:32:25PM -0500, Tom Lendacky wrote:
+> The following patches are included in this driver update series:
+> 
+> - Remove the usage of BUG_ON and replace with WARN_ON and an error
+>   return code
+> - Remove unused variable
+> - Change references to accelerator to offload
+> - Use the module name in the driver structure instead of a
+>   descriptive name
+>  
+> This patch series is based on cryptodev-2.6.
 
-You're not getting it.  Just because the SGL is X bytes long
-it doesn't give you the right to write X bytes.  The number of
-bytes that you may write to (let's call it Y) may be smaller.
-
-The value of Y must be passed into the helper and verified.
-
-This is why dst_len exists.
-
-Cheers,
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
