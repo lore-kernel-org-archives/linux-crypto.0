@@ -1,36 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v1 0/4] crypto: ccp - CCP driver updates 2015-10-01
-Date: Thu, 8 Oct 2015 22:22:55 +0800
-Message-ID: <20151008142255.GA25166@gondor.apana.org.au>
-References: <20151001213225.4286.44278.stgit@tlendack-t1.amdoffice.net>
+Subject: Re: [PATCH] crypto: qce: dma_map_sg can handle chained SG
+Date: Thu, 8 Oct 2015 22:23:14 +0800
+Message-ID: <20151008142314.GB25166@gondor.apana.org.au>
+References: <20151001140106.GC27726@gondor.apana.org.au>
+ <1443765662-21638-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, David Miller <davem@davemloft.net>
-To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: davem@davemloft.net, cristian.stoica@freescale.com, axboe@fb.com,
+	dan.j.williams@intel.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:58221 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:39194 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932443AbbJHOXB (ORCPT
+	with ESMTP id S932443AbbJHOX1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Oct 2015 10:23:01 -0400
+	Thu, 8 Oct 2015 10:23:27 -0400
 Content-Disposition: inline
-In-Reply-To: <20151001213225.4286.44278.stgit@tlendack-t1.amdoffice.net>
+In-Reply-To: <1443765662-21638-1-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 01, 2015 at 04:32:25PM -0500, Tom Lendacky wrote:
-> The following patches are included in this driver update series:
+On Fri, Oct 02, 2015 at 08:01:02AM +0200, LABBE Corentin wrote:
+> The qce driver use two dma_map_sg path according to SG are chained
+> or not.
+> Since dma_map_sg can handle both case, clean the code with all
+> references to sg chained.
 > 
-> - Remove the usage of BUG_ON and replace with WARN_ON and an error
->   return code
-> - Remove unused variable
-> - Change references to accelerator to offload
-> - Use the module name in the driver structure instead of a
->   descriptive name
->  
-> This patch series is based on cryptodev-2.6.
+> Thus removing qce_mapsg, qce_unmapsg and qce_countsg functions.
+> 
+> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
