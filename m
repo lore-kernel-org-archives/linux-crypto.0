@@ -1,41 +1,50 @@
-From: Alexander Kuleshov <kuleshovmail@gmail.com>
-Subject: [PATCH] crypto/jitterentropy-kcapi: fix a comment reflecting function name changed
-Date: Wed,  7 Oct 2015 23:38:14 +0600
-Message-ID: <1444239494-8906-1-git-send-email-kuleshovmail@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Alexander Kuleshov <kuleshovmail@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH  v5 1/2] lib/mpi: Add mpi sgl helpers
+Date: Thu, 8 Oct 2015 21:02:03 +0800
+Message-ID: <20151008130203.GA24128@gondor.apana.org.au>
+References: <20151002051032.27263.21150.stgit@tstruk-mobl1>
+ <20151002051038.27263.5476.stgit@tstruk-mobl1>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f182.google.com ([209.85.217.182]:34312 "EHLO
-	mail-lb0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754463AbbJGRjo (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:33479 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755371AbbJHNCJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 Oct 2015 13:39:44 -0400
+	Thu, 8 Oct 2015 09:02:09 -0400
+Content-Disposition: inline
+In-Reply-To: <20151002051038.27263.5476.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The clocksource does not provide clocksource_register() function since
-f893598 commit (clocksource: Mostly kill clocksource_register()), but
-__clocksource_register() instead.
+On Thu, Oct 01, 2015 at 10:10:38PM -0700, Tadeusz Struk wrote:
+>
+> +/**
+> + * mpi_write_to_sgl() - Funnction exports MPI to an sgl (msb first)
+> + *
+> + * This function works in the same way as the mpi_read_buffer, but it
+> + * takes an sgl instead of u8 * buf.
+> + *
+> + * @a:		a multi precision integer
+> + * @sgl:	scatterlist to write to. Needs to be at least
+> + *		mpi_get_size(a) long.
+> + * @nbytes:	receives the actual length of the data written.
+> + * @sign:	if not NULL, it will be set to the sign of a.
+> + *
+> + * Return:	0 on success or error code in case of error
+> + */
+> +int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
+> +		     int *sign)
 
-Signed-off-by: Alexander Kuleshov <kuleshovmail@gmail.com>
----
- crypto/jitterentropy-kcapi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Where is the maximum length of sgl? You should not assume that the
+entire SG list is for you to use.  So the length that you are allowed
+to use should be passed in explicitly.  You can just put it into
+nbytes.
 
-diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
-index ceea83d..4b030df 100644
---- a/crypto/jitterentropy-kcapi.c
-+++ b/crypto/jitterentropy-kcapi.c
-@@ -101,7 +101,7 @@ void jent_get_nstime(__u64 *out)
- 	 *
- 	 * The list of available timers can be obtained from
- 	 * /sys/devices/system/clocksource/clocksource0/available_clocksource
--	 * and are registered with clocksource_register()
-+	 * and are registered with __clocksource_register()
- 	 */
- 	if ((0 == tmp) &&
- 	   (0 == __getnstimeofday(&ts))) {
+Thanks,
 -- 
-2.6.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
