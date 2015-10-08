@@ -1,42 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH V2] crypto/nx842: Add CRC and validation support
-Date: Thu, 8 Oct 2015 21:23:40 +0800
-Message-ID: <20151008132340.GB24362@gondor.apana.org.au>
-References: <1443933331.28024.35.camel@hbabu-laptop>
+Subject: Re: [PATCH] crypto/jitterentropy-kcapi: fix a comment reflecting
+ function name changed
+Date: Thu, 8 Oct 2015 21:28:44 +0800
+Message-ID: <20151008132844.GA24600@gondor.apana.org.au>
+References: <1444239494-8906-1-git-send-email-kuleshovmail@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, ddstreet@ieee.org,
+Cc: "David S . Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Haren Myneni <haren@linux.vnet.ibm.com>
+To: Alexander Kuleshov <kuleshovmail@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1443933331.28024.35.camel@hbabu-laptop>
+In-Reply-To: <1444239494-8906-1-git-send-email-kuleshovmail@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Oct 03, 2015 at 09:35:31PM -0700, Haren Myneni wrote:
->
-> diff --git a/lib/842/842_decompress.c b/lib/842/842_decompress.c
-> index 5446ff0..b0db568 100644
-> --- a/lib/842/842_decompress.c
-> +++ b/lib/842/842_decompress.c
-> @@ -285,6 +285,7 @@ int sw842_decompress(const u8 *in, unsigned int
-> ilen,
->  	struct sw842_param p;
->  	int ret;
->  	u64 op, rep, tmp, bytes, total;
-> +	u64 crc;
->  
->  	p.in = (u8 *)in;
->  	p.bit = 0;
-> @@ -375,6 +376,22 @@ int sw842_decompress(const u8 *in, unsigned int
-> ilen,
->  		}
->  	} while (op != OP_END);
+On Wed, Oct 07, 2015 at 11:38:14PM +0600, Alexander Kuleshov wrote:
+> The clocksource does not provide clocksource_register() function since
+> f893598 commit (clocksource: Mostly kill clocksource_register()), but
+> __clocksource_register() instead.
+> 
+> Signed-off-by: Alexander Kuleshov <kuleshovmail@gmail.com>
+> ---
+>  crypto/jitterentropy-kcapi.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+> index ceea83d..4b030df 100644
+> --- a/crypto/jitterentropy-kcapi.c
+> +++ b/crypto/jitterentropy-kcapi.c
+> @@ -101,7 +101,7 @@ void jent_get_nstime(__u64 *out)
+>  	 *
+>  	 * The list of available timers can be obtained from
+>  	 * /sys/devices/system/clocksource/clocksource0/available_clocksource
+> -	 * and are registered with clocksource_register()
+> +	 * and are registered with __clocksource_register()
 
-Your patch is white-space corrupted.  Please resend.
+Please get rid of the reference to clocksource_register altogether.
+It's simply unnecessary.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
