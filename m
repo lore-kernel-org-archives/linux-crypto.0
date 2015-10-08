@@ -1,38 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/3] hwrng: st: Couple of improvements
-Date: Thu, 8 Oct 2015 22:23:40 +0800
-Message-ID: <20151008142340.GD25166@gondor.apana.org.au>
-References: <1444220609-31251-1-git-send-email-lee.jones@linaro.org>
+From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Subject: Re: unaligned access in pkcs7_verify
+Date: Thu, 8 Oct 2015 10:43:43 -0400
+Message-ID: <20151008144343.GE19655@oracle.com>
+References: <20151002140014.GI18263@oracle.com>
+ <20151008131519.GA24362@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel@stlinux.com, linux-crypto@vger.kernel.org,
-	pankaj.dev@st.com, daniel.thompson@linaro.org,
-	linux@arm.linux.org.uk
-To: Lee Jones <lee.jones@linaro.org>
+Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:46323 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932649AbbJHOXy (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:37243 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933171AbbJHOny (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Oct 2015 10:23:54 -0400
+	Thu, 8 Oct 2015 10:43:54 -0400
 Content-Disposition: inline
-In-Reply-To: <1444220609-31251-1-git-send-email-lee.jones@linaro.org>
+In-Reply-To: <20151008131519.GA24362@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Oct 07, 2015 at 01:23:26PM +0100, Lee Jones wrote:
-> This set contains a minor documentation fix, greater clarification
-> with how the FIFO depth/size is represented and finally a fix to
-> prevent early timeout during data acquisition.
-> 
-> v1 => v2:
->  - Remove phantom bugfix (FIFO really is 4 deep, not 8)
->  - Double timeout value to account for inconsistent call to udelay()
->    - Suggested-by: Russell King <rmk+kernel@arm.linux.org.uk>
+On (10/08/15 21:15), Herbert Xu wrote:
+> >         desc_size = crypto_shash_descsize(tfm) + sizeof(*desc);
+> > -       sinfo->sig.digest_size = digest_size = crypto_shash_digestsize(tfm);
+> > +       sinfo->sig.digest_size = digest_size = 
+> > +               ALIGN(crypto_shash_digestsize(tfm), sizeof (*desc));
+  :
+> What hash algorithm were you using?
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Algorithm is sha1. From printk, crypto_shash_descsize(tfm) comes out
+to 0x60, digest_size to 0x14. Stack trace (for each modprobe [-r]) is 
+
+	pkcs7_verify+0x1d0/0x5e0
+	system_verify_data+0x54/0xb4
+	mod_verify_sig+0xa0/0xc4
+	load_module+0x48/0x16a0
+	SyS_init_module+0x114/0x128
+	linux_sparc_syscall+0x34/0x44
+
+--Sowmini
