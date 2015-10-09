@@ -1,7 +1,7 @@
 From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH v3 2/5] crypto: marvell: fix stack smashing in marvell/hash.c
-Date: Fri, 09 Oct 2015 20:43:38 +0100
-Message-ID: <E1ZkdZq-0005IZ-M2@rmk-PC.arm.linux.org.uk>
+Subject: [PATCH v3 4/5] crypto: marvell: fix wrong hash results
+Date: Fri, 09 Oct 2015 20:43:48 +0100
+Message-ID: <E1Zkda0-0005In-UI@rmk-PC.arm.linux.org.uk>
 References: <20151009194309.GA7401@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -14,63 +14,70 @@ Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
 To: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Arnaud Ebalard <arno@natisbad.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:51400 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:51414 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751892AbbJITns (ORCPT
+	with ESMTP id S1754413AbbJITn7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Oct 2015 15:43:48 -0400
+	Fri, 9 Oct 2015 15:43:59 -0400
 In-Reply-To: <20151009194309.GA7401@n2100.arm.linux.org.uk>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Several of the algorithms in marvell/hash.c have a statesize of zero.
-When an AF_ALG accept() on an already-accepted file descriptor to
-calls into hash_accept(), this causes:
+Attempting to use the sha1 digest for openssh via openssl reveals that
+the result from the hash is wrong: this happens when we export the
+state from one socket and import it into another via calling accept().
 
-	char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req))];
+The reason for this is because the operation is reset to "initial block"
+state, whereas we may be past the first fragment of data to be hashed.
 
-to be zero-sized, but we still pass this to:
+Arrange for the operation code to avoid the initialisation of the state,
+thereby preserving the imported state.
 
-	err = crypto_ahash_export(req, state);
-
-which proceeds to write to 'state' as if it was a "struct md5_state",
-"struct sha1_state" etc.  Add the necessary initialisers for the
-.statesize member.
-
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 ---
- drivers/crypto/marvell/hash.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/crypto/marvell/hash.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-index e8d0d7128137..a259aced3b42 100644
+index 458867ce9515..b7c2c05f1a01 100644
 --- a/drivers/crypto/marvell/hash.c
 +++ b/drivers/crypto/marvell/hash.c
-@@ -870,6 +870,7 @@ struct ahash_alg mv_md5_alg = {
- 	.import = mv_cesa_md5_import,
- 	.halg = {
- 		.digestsize = MD5_DIGEST_SIZE,
-+		.statesize = sizeof(struct md5_state),
- 		.base = {
- 			.cra_name = "md5",
- 			.cra_driver_name = "mv-md5",
-@@ -959,6 +960,7 @@ struct ahash_alg mv_sha1_alg = {
- 	.import = mv_cesa_sha1_import,
- 	.halg = {
- 		.digestsize = SHA1_DIGEST_SIZE,
-+		.statesize = sizeof(struct sha1_state),
- 		.base = {
- 			.cra_name = "sha1",
- 			.cra_driver_name = "mv-sha1",
-@@ -1048,6 +1050,7 @@ struct ahash_alg mv_sha256_alg = {
- 	.import = mv_cesa_sha256_import,
- 	.halg = {
- 		.digestsize = SHA256_DIGEST_SIZE,
-+		.statesize = sizeof(struct sha256_state),
- 		.base = {
- 			.cra_name = "sha256",
- 			.cra_driver_name = "mv-sha256",
+@@ -835,6 +835,11 @@ static int mv_cesa_md5_import(struct ahash_request *req, const void *in)
+ 	if (ret)
+ 		return ret;
+ 
++	if (in_state->byte_count >= sizeof(in_state->block))
++		mv_cesa_update_op_cfg(&creq->op_tmpl,
++				      CESA_SA_DESC_CFG_MID_FRAG,
++				      CESA_SA_DESC_CFG_FRAG_MSK);
++
+ 	creq->len = in_state->byte_count;
+ 	memcpy(creq->state, in_state->hash, digsize);
+ 	creq->cache_ptr = 0;
+@@ -929,6 +934,11 @@ static int mv_cesa_sha1_import(struct ahash_request *req, const void *in)
+ 	if (ret)
+ 		return ret;
+ 
++	if (in_state->count >= SHA1_BLOCK_SIZE)
++		mv_cesa_update_op_cfg(&creq->op_tmpl,
++				      CESA_SA_DESC_CFG_MID_FRAG,
++				      CESA_SA_DESC_CFG_FRAG_MSK);
++
+ 	creq->len = in_state->count;
+ 	memcpy(creq->state, in_state->state, digsize);
+ 	creq->cache_ptr = 0;
+@@ -1034,6 +1044,11 @@ static int mv_cesa_sha256_import(struct ahash_request *req, const void *in)
+ 	if (ret)
+ 		return ret;
+ 
++	if (in_state->count >= SHA256_BLOCK_SIZE)
++		mv_cesa_update_op_cfg(&creq->op_tmpl,
++				      CESA_SA_DESC_CFG_MID_FRAG,
++				      CESA_SA_DESC_CFG_FRAG_MSK);
++
+ 	creq->len = in_state->count;
+ 	memcpy(creq->state, in_state->state, digsize);
+ 	creq->cache_ptr = 0;
 -- 
 2.1.0
