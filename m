@@ -1,89 +1,46 @@
-From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 3/3] crypto: marvell: initialise struct mv_cesa_ahash_req
-Date: Fri, 09 Oct 2015 11:29:55 +0100
-Message-ID: <E1ZkUvz-0004Qa-7C@rmk-PC.arm.linux.org.uk>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/3] crypto: ensure algif_hash does not pass a zero-sized
+ state
+Date: Fri, 9 Oct 2015 18:34:28 +0800
+Message-ID: <20151009103428.GA1410@gondor.apana.org.au>
 References: <20151009102904.GL32532@n2100.arm.linux.org.uk>
+ <E1ZkUvo-0004QO-U8@rmk-PC.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org
-To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+To: Russell King <rmk+kernel@arm.linux.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:50060 "EHLO
-	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965448AbbJIK37 (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:38219 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757660AbbJIKel (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Oct 2015 06:29:59 -0400
-In-Reply-To: <20151009102904.GL32532@n2100.arm.linux.org.uk>
+	Fri, 9 Oct 2015 06:34:41 -0400
 Content-Disposition: inline
+In-Reply-To: <E1ZkUvo-0004QO-U8@rmk-PC.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When a AF_ALG fd is accepted a second time (hence hash_accept() is
-used), hash_accept_parent() allocates a new private context using
-sock_kmalloc().  This context is uninitialised.  After use of the new
-fd, we eventually end up with the kernel complaining:
+On Fri, Oct 09, 2015 at 11:29:44AM +0100, Russell King wrote:
+> If the algorithm passed a zero statesize, do not pass a valid pointer
+> into the export/import functions.  Passing a valid pointer covers up
+> bugs in driver code which then go on to smash the kernel stack.
+> Instead, pass NULL, which will cause any attempt to write to the
+> pointer to fail.
+> 
+> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 
-marvell-cesa f1090000.crypto: dma_pool_free cesa_padding, c0627770/0 (bad dma)
+The state size should never be zero for a hash algorithm.  Having
+a zero state means that the hash output must always be identical.
+Such an algorithm would be quite useless.
 
-where c0627770 is a random address.  Poisoning the memory allocated by
-the above sock_kmalloc() produces kernel oopses within the marvell hash
-code, particularly the interrupt handling.
+So how about adding a check upon hash registration to verify that
+the state size is greater than zero? The place to do it would be
+shash_prepare_alg and ahash_prepare_alg.
 
-The following simplfied call sequence occurs:
-
-hash_accept()
-  crypto_ahash_export()
-    marvell hash export function
-  af_alg_accept()
-    hash_accept_parent()	<== allocates uninitialised struct hash_ctx
-  crypto_ahash_import()
-    marvell hash import function
-
-hash_ctx contains the struct mv_cesa_ahash_req in its req.__ctx member,
-and, as the marvell hash import function only partially initialises
-this structure, we end up with a lot of members which are left with
-whatever data was in memory prior to sock_kmalloc().
-
-Add zero-initialisation of this structure.
-
-Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
----
- drivers/crypto/marvell/hash.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-index a259aced3b42..699839816505 100644
---- a/drivers/crypto/marvell/hash.c
-+++ b/drivers/crypto/marvell/hash.c
-@@ -831,6 +831,8 @@ static int mv_cesa_md5_import(struct ahash_request *req, const void *in)
- 	unsigned int cache_ptr;
- 	int ret;
- 
-+	memset(creq, 0, sizeof(*creq));
-+
- 	creq->len = in_state->byte_count;
- 	memcpy(creq->state, in_state->hash, digsize);
- 	creq->cache_ptr = 0;
-@@ -921,6 +923,8 @@ static int mv_cesa_sha1_import(struct ahash_request *req, const void *in)
- 	unsigned int cache_ptr;
- 	int ret;
- 
-+	memset(creq, 0, sizeof(*creq));
-+
- 	creq->len = in_state->count;
- 	memcpy(creq->state, in_state->state, digsize);
- 	creq->cache_ptr = 0;
-@@ -1022,6 +1026,8 @@ static int mv_cesa_sha256_import(struct ahash_request *req, const void *in)
- 	unsigned int cache_ptr;
- 	int ret;
- 
-+	memset(creq, 0, sizeof(*creq));
-+
- 	creq->len = in_state->count;
- 	memcpy(creq->state, in_state->state, digsize);
- 	creq->cache_ptr = 0;
+Thanks,
 -- 
-2.1.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
