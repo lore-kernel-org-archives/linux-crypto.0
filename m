@@ -1,41 +1,53 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/3] crypto: fixes for Marvell hash
-Date: Fri, 9 Oct 2015 22:35:48 +0800
-Message-ID: <20151009143547.GA3391@gondor.apana.org.au>
-References: <20151009102904.GL32532@n2100.arm.linux.org.uk>
- <20151009141243.329dd60d@free-electrons.com>
- <20151009123132.GP32532@n2100.arm.linux.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Subject: [PATCH] MAINTAINERS: add maintainers for the Marvell Crypto driver
+Date: Fri,  9 Oct 2015 17:39:02 +0200
+Message-ID: <1444405142-4469-1-git-send-email-thomas.petazzoni@free-electrons.com>
 Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+	Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Russell King <linux@arm.linux.org.uk>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:34378 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751489AbbJIOf7 (ORCPT
+Received: from down.free-electrons.com ([37.187.137.238]:33848 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1755593AbbJIPjM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Oct 2015 10:35:59 -0400
-Content-Disposition: inline
-In-Reply-To: <20151009123132.GP32532@n2100.arm.linux.org.uk>
+	Fri, 9 Oct 2015 11:39:12 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Oct 09, 2015 at 01:31:32PM +0100, Russell King - ARM Linux wrote:
-> 
-> Hmm.  You know, given how broken this is, I've a good mind to say that
-> this is more hassle than it's worth to get these simple fixes merged,
-> especially as there's no MAINTAINERS entry for them.  I'm not sending
-> the patch series a third time.  I could say if maintainers can't be
-> bothered to ensure that they're listed in MAINTAINERS then they aren't
-> maintainers at all.
+A new crypto driver for Marvell ARM platforms was added in
+drivers/crypto/marvell/ as part of commit f63601fd616ab ("crypto:
+marvell/cesa - add a new driver for Marvell's CESA"). This commit adds
+the relevant developers to the list of maintainers.
 
-There is no need to send them again Russell.  They look good to me
-and I'll apply them.
+Cc: Boris Brezillon <boris.brezillon@free-electrons.com>
+Cc: Arnaud Ebalard <arno@natisbad.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Russell King <linux@arm.linux.org.uk>
+Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+---
+ MAINTAINERS | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Thanks,
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7ba7ab7..d3f47f5c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -6555,6 +6555,13 @@ M:	Guenter Roeck <linux@roeck-us.net>
+ S:	Maintained
+ F:	drivers/net/dsa/mv88e6352.c
+ 
++MARVELL CRYPTO DRIVER
++M:	Boris Brezillon <boris.brezillon@free-electrons.com>
++M:	Arnaud Ebalard <arno@natisbad.org>
++F:	drivers/crypto/marvell/
++S:	Maintained
++L:	linux-crypto@vger.kernel.org
++
+ MARVELL GIGABIT ETHERNET DRIVERS (skge/sky2)
+ M:	Mirko Lindner <mlindner@marvell.com>
+ M:	Stephen Hemminger <stephen@networkplumber.org>
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.6.1
