@@ -1,98 +1,41 @@
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [PATCH v2 0/3] crypto: fixes for Marvell hash
-Date: Fri, 9 Oct 2015 13:42:59 +0100
-Message-ID: <20151009124259.GA23058@n2100.arm.linux.org.uk>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/3] crypto: fixes for Marvell hash
+Date: Fri, 9 Oct 2015 22:35:48 +0800
+Message-ID: <20151009143547.GA3391@gondor.apana.org.au>
 References: <20151009102904.GL32532@n2100.arm.linux.org.uk>
- <20151009104637.GA18798@n2100.arm.linux.org.uk>
+ <20151009141243.329dd60d@free-electrons.com>
+ <20151009123132.GP32532@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org
-To: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:50359 "EHLO
-	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754432AbbJIMnL (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:34378 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751489AbbJIOf7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Oct 2015 08:43:11 -0400
+	Fri, 9 Oct 2015 10:35:59 -0400
 Content-Disposition: inline
-In-Reply-To: <20151009104637.GA18798@n2100.arm.linux.org.uk>
+In-Reply-To: <20151009123132.GP32532@n2100.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Thomas says you're the maintainers of the marvell crypto driver.  I
-picked sending these patches to Thomas because I couldn't work out
-who should be receiving them.  If you wish to be copied on patches,
-please put yourselves in the MAINTAINERS file.  In the mean time, you
-can find the patches on the crypto list if you wish to review them.
-
-Thanks.
-
-On Fri, Oct 09, 2015 at 11:46:37AM +0100, Russell King - ARM Linux wrote:
-> Version 2, same as version 1 but with a different patch 1, thanks to
-> Herbert for an alternative approach on that one.
+On Fri, Oct 09, 2015 at 01:31:32PM +0100, Russell King - ARM Linux wrote:
 > 
->  crypto/ahash.c                | 3 ++-
->  crypto/shash.c                | 3 ++-
->  drivers/crypto/marvell/hash.c | 9 +++++++++
->  3 files changed, 13 insertions(+), 2 deletions(-)
-> 
-> On Fri, Oct 09, 2015 at 11:29:04AM +0100, Russell King - ARM Linux wrote:
-> > This small series of patches addresses oopses seen when trying to use
-> > the AF_ALG interface via openssl with openssh.  This series does not
-> > address all problems, but merely stops the kernel from smashing its
-> > kernel stack and oopsing.
-> > 
-> > With these fixes in place, the kernel no longer oopses.  However, with
-> > the digests enabled in openssl, openssh refuses to work, producing the
-> > following when attempting to connect to the target system:
-> > 
-> > Corrupted MAC on input.
-> > Disconnecting: Packet corrupt
-> > 
-> > It's been hard enough to get this far; the crypto code is not the easiest
-> > code to debug for a new-comer due to the amount of state needed to be
-> > retained to understand the code (all the inline functions masking
-> > multiple levels of containerisation and pointer dereference does not
-> > make it easy to track what is stored where, and once I've been through
-> > one bit of code, I find I'm having to revisit the same piece of code a
-> > bit later to re-understand what it's doing.)
-> > 
-> > It's been difficult enough to find the engine plugin for openssl - the
-> > original git repo which hosted it is now dead
-> > (http://src.carnivore.it/users/common/af_alg/).  All that seems to be
-> > left is someone's modified version on github, which seems to get some
-> > maintanence.  Debian doesn't seem to carry AF_ALG openssl support, and
-> > seems to only carry one package (strongswan) which supports this
-> > interface.
-> > 
-> > Hence, I'm leaving further debugging to other parties, especially as
-> > the userspace tooling for the AF_ALG seems rather lacking.  (Are there
-> > any test programs, if so, can their location be documented and placed
-> > in Documentation/crypto please?)
-> > 
-> > I'm not sure who the maintainer for drivers/crypto/marvell is, so I've
-> > picked Thomas.  It would be nice if there was an entry in MAINTAINERS
-> > for this driver.
-> > 
-> > The first patch in this series avoids kernel stack smashing if a crypto
-> > driver forgets to set the 'statesize' member, but writes to what seems
-> > to be a valid pointer passed to its export function.  Of course, this
-> > won't completely stop stack smashing if the statesize member is
-> > smaller than the data which the export function writes.  This patch is
-> > optional.
-> > 
-> > The second patch adds the necessary statesize members to the Marvell
-> > code which were previously missing.  Fixing this uncovered a further
-> > problem, which the third patch addresses.
-> 
-> -- 
-> FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-> according to speedtest.net.
+> Hmm.  You know, given how broken this is, I've a good mind to say that
+> this is more hassle than it's worth to get these simple fixes merged,
+> especially as there's no MAINTAINERS entry for them.  I'm not sending
+> the patch series a third time.  I could say if maintainers can't be
+> bothered to ensure that they're listed in MAINTAINERS then they aren't
+> maintainers at all.
 
+There is no need to send them again Russell.  They look good to me
+and I'll apply them.
+
+Thanks,
 -- 
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
