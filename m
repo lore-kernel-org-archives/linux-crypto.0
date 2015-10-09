@@ -1,72 +1,55 @@
-From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH v2 2/3] crypto: marvell: fix stack smashing in marvell/hash.c
-Date: Fri, 09 Oct 2015 11:48:49 +0100
-Message-ID: <E1ZkVEH-0006GU-5m@rmk-PC.arm.linux.org.uk>
-References: <20151009104637.GA18798@n2100.arm.linux.org.uk>
+From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Subject: Re: [PATCH 0/3] crypto: fixes for Marvell hash
+Date: Fri, 9 Oct 2015 14:12:43 +0200
+Message-ID: <20151009141243.329dd60d@free-electrons.com>
+References: <20151009102904.GL32532@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org
-To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:50116 "EHLO
-	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752094AbbJIKsx (ORCPT
+Received: from down.free-electrons.com ([37.187.137.238]:57425 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752625AbbJIMMp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Oct 2015 06:48:53 -0400
-In-Reply-To: <20151009104637.GA18798@n2100.arm.linux.org.uk>
-Content-Disposition: inline
+	Fri, 9 Oct 2015 08:12:45 -0400
+In-Reply-To: <20151009102904.GL32532@n2100.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Several of the algorithms in marvell/hash.c have a statesize of zero.
-When an AF_ALG accept() on an already-accepted file descriptor to
-calls into hash_accept(), this causes:
+Hello Russell,
 
-	char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req))];
+On Fri, 9 Oct 2015 11:29:05 +0100, Russell King - ARM Linux wrote:
+> This small series of patches addresses oopses seen when trying to use
+> the AF_ALG interface via openssl with openssh.  This series does not
+> address all problems, but merely stops the kernel from smashing its
+> kernel stack and oopsing.
 
-to be zero-sized, but we still pass this to:
+Thanks for debugging this and for the patches. However, could you Cc
+the main authors of the driver:
 
-	err = crypto_ahash_export(req, state);
+Boris Brezillon <boris.brezillon@free-electrons.com>
+Arnaud Ebalard <arno@natisbad.org>
 
-which proceeds to write to 'state' as if it was a "struct md5_state",
-"struct sha1_state" etc.  Add the necessary initialisers for the
-.statesize member.
+> I'm not sure who the maintainer for drivers/crypto/marvell is, so I've
+> picked Thomas.  It would be nice if there was an entry in MAINTAINERS
+> for this driver.
 
-Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
----
- drivers/crypto/marvell/hash.c | 3 +++
- 1 file changed, 3 insertions(+)
+Indeed. However get_maintainer.pl gets this right:
 
-diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-index e8d0d7128137..a259aced3b42 100644
---- a/drivers/crypto/marvell/hash.c
-+++ b/drivers/crypto/marvell/hash.c
-@@ -870,6 +870,7 @@ struct ahash_alg mv_md5_alg = {
- 	.import = mv_cesa_md5_import,
- 	.halg = {
- 		.digestsize = MD5_DIGEST_SIZE,
-+		.statesize = sizeof(struct md5_state),
- 		.base = {
- 			.cra_name = "md5",
- 			.cra_driver_name = "mv-md5",
-@@ -959,6 +960,7 @@ struct ahash_alg mv_sha1_alg = {
- 	.import = mv_cesa_sha1_import,
- 	.halg = {
- 		.digestsize = SHA1_DIGEST_SIZE,
-+		.statesize = sizeof(struct sha1_state),
- 		.base = {
- 			.cra_name = "sha1",
- 			.cra_driver_name = "mv-sha1",
-@@ -1048,6 +1050,7 @@ struct ahash_alg mv_sha256_alg = {
- 	.import = mv_cesa_sha256_import,
- 	.halg = {
- 		.digestsize = SHA256_DIGEST_SIZE,
-+		.statesize = sizeof(struct sha256_state),
- 		.base = {
- 			.cra_name = "sha256",
- 			.cra_driver_name = "mv-sha256",
+$ ./scripts/get_maintainer.pl -f drivers/crypto/marvell/cesa.c 
+Herbert Xu <herbert@gondor.apana.org.au> (maintainer:CRYPTO API,commit_signer:11/12=92%)
+"David S. Miller" <davem@davemloft.net> (maintainer:CRYPTO API)
+Boris BREZILLON <boris.brezillon@free-electrons.com> (commit_signer:11/12=92%,authored:6/12=50%,added_lines:538/558=96%,removed_lines:7/12=58%)
+Arnaud Ebalard <arno@natisbad.org> (commit_signer:7/12=58%,authored:4/12=33%,removed_lines:1/12=8%)
+Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com> (commit_signer:1/12=8%,authored:1/12=8%,removed_lines:3/12=25%)
+Krzysztof Kozlowski <k.kozlowski@samsung.com> (commit_signer:1/12=8%,authored:1/12=8%,removed_lines:1/12=8%)
+
+Thomas
 -- 
-2.1.0
+Thomas Petazzoni, CTO, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
