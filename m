@@ -1,42 +1,45 @@
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
 Subject: Re: [PATCH] MAINTAINERS: add maintainers for the Marvell Crypto
  driver
-Date: Fri, 9 Oct 2015 16:40:36 +0100
-Message-ID: <20151009154036.GY32532@n2100.arm.linux.org.uk>
+Date: Fri, 9 Oct 2015 17:56:29 +0200
+Message-ID: <20151009175629.545e124a@bbrezillon>
 References: <1444405142-4469-1-git-send-email-thomas.petazzoni@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Russell King <linux@arm.linux.org.uk>
 To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:50823 "EHLO
-	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755077AbbJIPkm (ORCPT
+Received: from down.free-electrons.com ([37.187.137.238]:34179 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752565AbbJIP4d (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Oct 2015 11:40:42 -0400
-Content-Disposition: inline
+	Fri, 9 Oct 2015 11:56:33 -0400
 In-Reply-To: <1444405142-4469-1-git-send-email-thomas.petazzoni@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Oct 09, 2015 at 05:39:02PM +0200, Thomas Petazzoni wrote:
+On Fri,  9 Oct 2015 17:39:02 +0200
+Thomas Petazzoni <thomas.petazzoni@free-electrons.com> wrote:
+
 > A new crypto driver for Marvell ARM platforms was added in
 > drivers/crypto/marvell/ as part of commit f63601fd616ab ("crypto:
 > marvell/cesa - add a new driver for Marvell's CESA"). This commit adds
 > the relevant developers to the list of maintainers.
 > 
 > Cc: Boris Brezillon <boris.brezillon@free-electrons.com>
+
+Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+
+Thanks,
+
+Boris
+
 > Cc: Arnaud Ebalard <arno@natisbad.org>
 > Cc: Herbert Xu <herbert@gondor.apana.org.au>
 > Cc: Russell King <linux@arm.linux.org.uk>
-
-Suggested-by: Russell King <rmk+kernel@arm.linux.org.uk>
-
-;)
-
 > Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 > ---
 >  MAINTAINERS | 7 +++++++
@@ -60,10 +63,10 @@ Suggested-by: Russell King <rmk+kernel@arm.linux.org.uk>
 >  MARVELL GIGABIT ETHERNET DRIVERS (skge/sky2)
 >  M:	Mirko Lindner <mlindner@marvell.com>
 >  M:	Stephen Hemminger <stephen@networkplumber.org>
-> -- 
-> 2.6.1
-> 
+
+
 
 -- 
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+Boris Brezillon, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
