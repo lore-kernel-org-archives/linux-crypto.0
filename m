@@ -1,76 +1,90 @@
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [PATCH v3 1/5] crypto: ensure algif_hash does not pass a
- zero-sized state
-Date: Sat, 10 Oct 2015 17:52:29 +0100
-Message-ID: <20151010165229.GH32532@n2100.arm.linux.org.uk>
-References: <20151009194309.GA7401@n2100.arm.linux.org.uk>
- <E1ZkdZl-0005IT-IU@rmk-PC.arm.linux.org.uk>
- <20151010184607.353cb5f3@bbrezillon>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH v3b 5/5] crypto: marvell: factor out common import/export functions
+Date: Sat, 10 Oct 2015 20:07:36 +0200
+Message-ID: <201510102007.36214.marex@denx.de>
+References: <E1Zkda6-0005Ix-2x@rmk-PC.arm.linux.org.uk> <87d1wn2ewu.fsf@natisbad.org> <20151010112925.GF32532@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Cc: Arnaud Ebalard <arno@natisbad.org>,
+	Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
 	Jason Cooper <jason@lakedaemon.net>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org
-To: Boris Brezillon <boris.brezillon@free-electrons.com>
+To: "Russell King - ARM Linux" <linux@arm.linux.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:53895 "EHLO
-	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752490AbbJJQwk (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.9]:44770 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751135AbbJJSU6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 10 Oct 2015 12:52:40 -0400
-Content-Disposition: inline
-In-Reply-To: <20151010184607.353cb5f3@bbrezillon>
+	Sat, 10 Oct 2015 14:20:58 -0400
+In-Reply-To: <20151010112925.GF32532@n2100.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Oct 10, 2015 at 06:46:07PM +0200, Boris Brezillon wrote:
-> On Fri, 09 Oct 2015 20:43:33 +0100
-> Russell King <rmk+kernel@arm.linux.org.uk> wrote:
+On Saturday, October 10, 2015 at 01:29:25 PM, Russell King - ARM Linux wrote:
+> On Sat, Oct 10, 2015 at 12:31:29PM +0200, Arnaud Ebalard wrote:
+> > Hi Russel,
 > 
-> > If the algorithm passed a zero statesize, do not pass a valid pointer
-> > into the export/import functions.  Passing a valid pointer covers up
-> > bugs in driver code which then go on to smash the kernel stack.
-> > Instead, pass NULL, which will cause any attempt to write to the
-> > pointer to fail.
+>            ^
+> 
+> > Russell King - ARM Linux <linux@arm.linux.org.uk> writes:
+> > > Software:
+> > > The 'numbers' are in 1000s of bytes per second processed.
+> > > type             16 bytes     64 bytes    256 bytes   1024 bytes   8192
+> > > bytes md5              13948.89k    42477.61k   104619.41k  
+> > > 165140.82k   199273.13k sha1             13091.91k    36463.89k   
+> > > 75393.88k   103893.33k   117104.50k sha256           13573.92k   
+> > > 30492.25k    52700.33k    64247.81k    68722.69k
+> > > 
+> > > Hardware:
+> > > The 'numbers' are in 1000s of bytes per second processed.
+> > > type             16 bytes     64 bytes    256 bytes   1024 bytes   8192
+> > > bytes md5               3964.55k    13782.11k    43181.71k  
+> > > 180263.38k  1446616.18k sha1              4609.16k     8922.35k   
+> > > 35422.87k   333575.31k  2122547.20k sha256           13519.62k   
+> > > 30484.10k    52547.47k    64285.21k    68530.60k
+> 
+> Okay, the reason for the difference in SHA256 speed is because the
+> "openssl speed" code *totally* *bypasses* the engine support, whereas
+> the md5 and sha1 do not.  It even bypasses the normal method used to
+> get hold of the sha256 implementation (EVP_sha256), and goes straight
+> to using SHA256() directly in openssl/crypto/sha/sha256.c.  It looks
+> like the same goes for the AES tests too.
+> 
+> > I had a lot of performance results at various levels (tcrypt module on
+> > variations of the drivers (tasklet, threaded irq, full polling, etc),
+> > IPsec tunnel and transport mode through to see how it behaves w/ two
+> > mvneta instances also eating CPU cycles for incoming/outgoing packets)
+> > but those where done on an encryption use case. Some are provided
+> > in [2]. In an early (read dirty) polling-based version of the driver,
+> > the CESA on an Armada 370 (mirabox) was verified to be capable of near
+> > 100MB/s on buffers of 1500+ bytes for AES CBC encryption. Current
+> > version of the driver is not as good (say half that value) but it
+> > behaves better. A Mirabox can easily route 1500 bytes packets at 100MB/s
+> > between its two interfaces but when you mix both using IPsec in tunnel
+> > mode on one side, you end up w/ perfs between 10 to 15MB/s, IIRC. I
+> > think it's interesting to see where it ends up w/ the engine exposed to
+> > userland consumers (e.g. sth like SSH).
 > > 
-> > Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
-> > ---
-> >  crypto/ahash.c | 3 ++-
-> >  crypto/shash.c | 3 ++-
-> >  2 files changed, 4 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/crypto/ahash.c b/crypto/ahash.c
-> > index 8acb886032ae..9c1dc8d6106a 100644
-> > --- a/crypto/ahash.c
-> > +++ b/crypto/ahash.c
-> > @@ -544,7 +544,8 @@ static int ahash_prepare_alg(struct ahash_alg *alg)
-> >  	struct crypto_alg *base = &alg->halg.base;
-> >  
-> >  	if (alg->halg.digestsize > PAGE_SIZE / 8 ||
-> > -	    alg->halg.statesize > PAGE_SIZE / 8)
-> > +	    alg->halg.statesize > PAGE_SIZE / 8 ||
-> > +	    alg->halg.statesize == 0)
+> > I cannot promise a huge amount of time but I'll try and find some to
+> > play w/ AF_ALG using openssl and CESA in the coming weeks.
 > 
-> Just read Russel's answer to the cover letter, and I wonder if the
-> following test wouldn't fix the problem:
+> I think what we draw from my investigation is that "openssl speed" is
+> utterly crap - you don't actually know what's being tested there.  Some
+> things test the engine, others bypass the engine infrastructure totally
+> and test the openssl software implementation instead.
 > 
-> 	    (alg->halg.statesize == 0 && (alg->import || alg->export))
-> 
-> I mean, the only valid case where statesize can be zero is when you
-> don't have any state associated to the crypto algorithm, and if that's
-> the case, ->import() and ->export() functions are useless, isn't ?
+> So, if you think "openssl speed" is a good way to measure the speed of
+> digests and ciphers that openssl supplies to applications, *think again*.
+> It doesn't.
 
-However, that brings up a question.
+Add to that the fact that openssl speed does NOT verify the results of the
+transformations, so it's not usable for detecting errors during high load.
+It's utter crap, just like you said.
 
-If you're using AF_ALG, and you attach to (say) the ARM Neon SHA512
-implementation through it, and then use accept() to duplicate it's
-state, what prevents the kernel from oopsing when hash_accept() calls
-crypto_ahash_export(), which then dereferences the NULL alg->export
-function pointer?
-
--- 
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+Best regards,
+Marek Vasut
