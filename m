@@ -1,99 +1,112 @@
-From: Corentin LABBE <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH 8/8] crypto: testmgr: Use the xxx_zero_message_hash from
- headers
-Date: Mon, 12 Oct 2015 21:31:20 +0200
-Message-ID: <561C0A88.7010309@gmail.com>
-References: <201510130309.4gXCrZOa%fengguang.wu@intel.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH 3/8] crypto: ccp: Use precalculated hash from headers
+Date: Mon, 12 Oct 2015 16:16:48 -0500
+Message-ID: <561C2340.9080909@amd.com>
+References: <1444668826-6531-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1444668826-6531-4-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: thomas.lendacky@amd.com, geert+renesas@glider.be,
-	ulf.hansson@linaro.org, wsa@the-dreams.de, keescook@chromium.org,
-	maxime.ripard@free-electrons.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+To: LABBE Corentin <clabbe.montjoie@gmail.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<geert+renesas@glider.be>, <ulf.hansson@linaro.org>,
+	<wsa@the-dreams.de>, <keescook@chromium.org>,
+	<maxime.ripard@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:36458 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751067AbbJLTbY (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 12 Oct 2015 15:31:24 -0400
-In-Reply-To: <201510130309.4gXCrZOa%fengguang.wu@intel.com>
+Received: from mail-by2on0077.outbound.protection.outlook.com ([207.46.100.77]:51712
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751284AbbJLVRA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 12 Oct 2015 17:17:00 -0400
+In-Reply-To: <1444668826-6531-4-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Le 12/10/2015 21:24, kbuild test robot a =E9crit :
-> Hi LABBE,
->=20
-> [auto build test ERROR on crypto/master -- if it's inappropriate base=
-, please suggest rules for selecting the more suitable base]
->=20
-> url:    https://github.com/0day-ci/linux/commits/LABBE-Corentin/crypt=
-o-hash-add-zero-length-message-hash-for-shax-and-md5/20151013-005943
-> config: arm-mmp (attached as .config)
-> reproduce:
->         wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tes=
-ts.git/plain/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # save the attached .config to linux build tree
->         make.cross ARCH=3Darm=20
->=20
-> All errors (new ones prefixed by >>):
->=20
->    In file included from crypto/testmgr.c:48:0:
->>> crypto/testmgr.h:370:13: error: 'md5_zero_message_hash' undeclared =
-here (not in a function)
->       .digest =3D md5_zero_message_hash,
->                 ^
->>> crypto/testmgr.h:715:13: error: 'sha1_zero_message_hash' undeclared=
- here (not in a function)
->       .digest =3D sha1_zero_message_hash,
->                 ^
->>> crypto/testmgr.h:715:3: error: initializer element is not constant
->       .digest =3D sha1_zero_message_hash,
->       ^
->    crypto/testmgr.h:715:3: error: (near initialization for 'sha1_tv_t=
-emplate[0].digest')
->>> crypto/testmgr.h:906:13: error: 'sha224_zero_message_hash' undeclar=
-ed here (not in a function)
->       .digest =3D sha224_zero_message_hash,
->                 ^
->    crypto/testmgr.h:906:3: error: initializer element is not constant
->       .digest =3D sha224_zero_message_hash,
->       ^
->    crypto/testmgr.h:906:3: error: (near initialization for 'sha224_tv=
-_template[0].digest')
->>> crypto/testmgr.h:1077:13: error: 'sha256_zero_message_hash' undecla=
-red here (not in a function)
->       .digest =3D sha256_zero_message_hash,
->                 ^
->    crypto/testmgr.h:1077:3: error: initializer element is not constan=
-t
->       .digest =3D sha256_zero_message_hash,
->       ^
->    crypto/testmgr.h:1077:3: error: (near initialization for 'sha256_t=
-v_template[0].digest')
->=20
-> vim +/md5_zero_message_hash +370 crypto/testmgr.h
->=20
->    364	 * MD5 test vectors from RFC1321
->    365	 */
->    366	#define MD5_TEST_VECTORS	7
->    367=09
->    368	static struct hash_testvec md5_tv_template[] =3D {
->    369		{
->  > 370			.digest	=3D md5_zero_message_hash,
->    371		}, {
->    372			.plaintext =3D "a",
->    373			.psize	=3D 1,
->=20
+On 10/12/2015 11:53 AM, LABBE Corentin wrote:
+> Precalculated hash for empty message are now present in hash headers.
+> This patch just use them.
+>
+> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+
+Just a minor comment below.
+
+Tested-by: Tom Lendacky <thomas.lendacky@amd.com>
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+
 > ---
-> 0-DAY kernel test infrastructure                Open Source Technolog=
-y Center
-> https://lists.01.org/pipermail/kbuild-all                   Intel Cor=
-poration
->=20
+>   drivers/crypto/ccp/ccp-ops.c | 40 ++++++++--------------------------------
+>   1 file changed, 8 insertions(+), 32 deletions(-)
+>
+> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+> index d09c6c4..3002b418 100644
+> --- a/drivers/crypto/ccp/ccp-ops.c
+> +++ b/drivers/crypto/ccp/ccp-ops.c
+> @@ -152,32 +152,6 @@ static const __be32 ccp_sha256_init[CCP_SHA_CTXSIZE / sizeof(__be32)] = {
+>   	cpu_to_be32(SHA256_H6), cpu_to_be32(SHA256_H7),
+>   };
+>
+> -/* The CCP cannot perform zero-length sha operations so the caller
+> - * is required to buffer data for the final operation.  However, a
+> - * sha operation for a message with a total length of zero is valid
+> - * so known values are required to supply the result.
+> - */
+> -static const u8 ccp_sha1_zero[CCP_SHA_CTXSIZE] = {
+> -	0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d,
+> -	0x32, 0x55, 0xbf, 0xef, 0x95, 0x60, 0x18, 0x90,
+> -	0xaf, 0xd8, 0x07, 0x09, 0x00, 0x00, 0x00, 0x00,
+> -	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> -};
+> -
+> -static const u8 ccp_sha224_zero[CCP_SHA_CTXSIZE] = {
+> -	0xd1, 0x4a, 0x02, 0x8c, 0x2a, 0x3a, 0x2b, 0xc9,
+> -	0x47, 0x61, 0x02, 0xbb, 0x28, 0x82, 0x34, 0xc4,
+> -	0x15, 0xa2, 0xb0, 0x1f, 0x82, 0x8e, 0xa6, 0x2a,
+> -	0xc5, 0xb3, 0xe4, 0x2f, 0x00, 0x00, 0x00, 0x00,
+> -};
+> -
+> -static const u8 ccp_sha256_zero[CCP_SHA_CTXSIZE] = {
+> -	0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14,
+> -	0x9a, 0xfb, 0xf4, 0xc8, 0x99, 0x6f, 0xb9, 0x24,
+> -	0x27, 0xae, 0x41, 0xe4, 0x64, 0x9b, 0x93, 0x4c,
+> -	0xa4, 0x95, 0x99, 0x1b, 0x78, 0x52, 0xb8, 0x55,
+> -};
+> -
+>   static u32 ccp_addr_lo(struct ccp_dma_info *info)
+>   {
+>   	return lower_32_bits(info->address + info->offset);
+> @@ -1388,18 +1362,20 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+>   		if (sha->msg_bits)
+>   			return -EINVAL;
+>
+> -		/* A sha operation for a message with a total length of zero,
+> -		 * return known result.
+> -		 */
+> +/* The CCP cannot perform zero-length sha operations so the caller
+> + * is required to buffer data for the final operation.  However, a
+> + * sha operation for a message with a total length of zero is valid
+> + * so known values are required to supply the result.
+> + */
 
-Oups I forgot to add sha and md5 header, I will resend tomorow.
+This comment should be indented and re-flowed to be consistent with
+previous comments in this same section.
 
-Regards
+Thanks,
+Tom
+
+>   		switch (sha->type) {
+>   		case CCP_SHA_TYPE_1:
+> -			sha_zero = ccp_sha1_zero;
+> +			sha_zero = sha1_zero_message_hash;
+>   			break;
+>   		case CCP_SHA_TYPE_224:
+> -			sha_zero = ccp_sha224_zero;
+> +			sha_zero = sha224_zero_message_hash;
+>   			break;
+>   		case CCP_SHA_TYPE_256:
+> -			sha_zero = ccp_sha256_zero;
+> +			sha_zero = sha256_zero_message_hash;
+>   			break;
+>   		default:
+>   			return -EINVAL;
+>
