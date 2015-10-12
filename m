@@ -1,24 +1,36 @@
-From: Vera@vger.kernel.org, Hollin@vger.kernel.org, Kvan@vger.kernel.org
-Subject: I Have An Urgent Matter To Discuss With You
-Date: Mon, 12 Oct 2015 03:42:00 +0530
-Message-ID: <SG2PR0201MB095154F581623A14243359A3B8320__46270.6990344033$1444601549$gmane$org@SG2PR0201MB0951.apcprd02.prod.outlook.com>
-Reply-To: <verahollinkvan1@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: hash import/export
+Date: Mon, 12 Oct 2015 09:44:49 +0800
+Message-ID: <20151012014449.GA22774@gondor.apana.org.au>
+References: <20151011193427.GI32532@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: Recipients@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	linux-crypto@vger.kernel.org
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pu1apc01hn0232.outbound.protection.outlook.com ([104.47.126.232]:22256
-	"EHLO APC01-PU1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752680AbbJKWMO convert rfc822-to-8bit (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:39897 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752451AbbJLBo6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 11 Oct 2015 18:12:14 -0400
-Content-Description: Mail message body
+	Sun, 11 Oct 2015 21:44:58 -0400
+Content-Disposition: inline
+In-Reply-To: <20151011193427.GI32532@n2100.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-My name is Vera Hollin Kvan,i have an urgent matter to discuss with you please do not ignore this message make sure you reply me urgently with this email: verahollinkvan1@gmail.com
+On Sun, Oct 11, 2015 at 08:34:27PM +0100, Russell King - ARM Linux wrote:
+> 
+> Is there any reason a driver can't define its own structure to be
+> exported here which can be shared between each of the different methods
+> it supports?
 
+For algorithms in general you can use any format you like and there
+is no restriction.  However, for specific algorithms such as crc32c
+and family there is a requirement to use a fixed format.
 
-Mein Name ist Vera Hollin Kvan, ich habe eine dringende Angelegenheit mit Ihnen besprechen Sie bitte nicht, diese Nachricht ignorieren sicherzustellen, dass Sie mir antworten dringend mit dieser E-Mail: verahollinkvan1@gmail.com
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
