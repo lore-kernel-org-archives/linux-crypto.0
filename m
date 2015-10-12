@@ -1,36 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: hash import/export
-Date: Mon, 12 Oct 2015 09:44:49 +0800
-Message-ID: <20151012014449.GA22774@gondor.apana.org.au>
-References: <20151011193427.GI32532@n2100.arm.linux.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	linux-crypto@vger.kernel.org
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:39897 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752451AbbJLBo6 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 11 Oct 2015 21:44:58 -0400
-Content-Disposition: inline
-In-Reply-To: <20151011193427.GI32532@n2100.arm.linux.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Daniel Thompson <daniel.thompson@linaro.org>
+Subject: [PATCH 0/3] hwrng: stm32 - add support for STM32 HW RNG
+Date: Mon, 12 Oct 2015 09:21:27 +0100
+Message-ID: <1444638090-22886-1-git-send-email-daniel.thompson@linaro.org>
+References: <1443904519-24012-1-git-send-email-daniel.thompson@linaro.org>
+Cc: Daniel Thompson <daniel.thompson@linaro.org>,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	patches@linaro.org, linaro-kernel@lists.linaro.org,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>
+To: Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1443904519-24012-1-git-send-email-daniel.thompson@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Oct 11, 2015 at 08:34:27PM +0100, Russell King - ARM Linux wrote:
-> 
-> Is there any reason a driver can't define its own structure to be
-> exported here which can be shared between each of the different methods
-> it supports?
+This patchset introduces a driver for the STM32 hardware random number
+generator.
 
-For algorithms in general you can use any format you like and there
-is no restriction.  However, for specific algorithms such as crc32c
-and family there is a requirement to use a fixed format.
+v2:
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ * Moved binding docs from .../hwrng/ to .../rng/ and renamed to match
+   convention in new directory (Rob Herring).
+ * Adopted runtime PM and auto-suspend instead of managing the clocks
+   from the read function (Linus Walleij). Increased bandwidth by ~30%.
+ * Simplified error detection in main read loop (Linus Walleij, Maxime
+   Coquelin).
+ * Only WARN_ONCE() when hardware failure mechanisms trigger (Maxime
+   Coquelin).
+ * Simplify end of probe function after cocci warning (Fengguang Wu).
+ * Switch to devm_hwrng_register.
+
+
+Daniel Thompson (3):
+  dt-bindings: Document the STM32 HW RNG bindings
+  hwrng: stm32 - add support for STM32 HW RNG
+  ARM: dts: stm32f429: Adopt STM32 RNG driver
+
+ .../devicetree/bindings/rng/st,stm32-rng.txt       |  21 +++
+ arch/arm/boot/dts/stm32f429.dtsi                   |   7 +
+ drivers/char/hw_random/Kconfig                     |  12 ++
+ drivers/char/hw_random/Makefile                    |   1 +
+ drivers/char/hw_random/stm32-rng.c                 | 202 +++++++++++++++++++++
+ 5 files changed, 243 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/st,stm32-rng.txt
+ create mode 100644 drivers/char/hw_random/stm32-rng.c
+
+--
+2.4.3
