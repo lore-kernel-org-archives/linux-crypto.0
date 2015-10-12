@@ -1,296 +1,319 @@
 From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH 1/2] crypto: atmel: use devm_xxx() managed function
-Date: Mon, 12 Oct 2015 19:47:03 +0200
-Message-ID: <1444672025-21757-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	LABBE Corentin <clabbe.montjoie@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f172.google.com ([209.85.212.172]:37998 "EHLO
-	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751882AbbJLRrs (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 12 Oct 2015 13:47:48 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Subject: [PATCH 2/2] crypto: ux500: Use devm_xxx() managed function
+Date: Mon, 12 Oct 2015 19:47:04 +0200
+Message-ID: <1444672025-21757-2-git-send-email-clabbe.montjoie@gmail.com>
+References: <1444672025-21757-1-git-send-email-clabbe.montjoie@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	asaf.vertz@tandemg.com, clabbe.montjoie@gmail.com,
+	cristian.stoica@freescale.com, geert+renesas@glider.be,
+	keescook@chromium.org, maxime.ripard@free-electrons.com,
+	ulf.hansson@linaro.org, vinod.koul@intel.com, wsa@the-dreams.de
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1444672025-21757-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Using the devm_xxx() managed function to stripdown the error and remove
-code.
+Using the devm_xxx() managed function to stripdown the error
+and remove code.
+In the same time, we replace request_mem_region/ioremap by the unified
+devm_ioremap_resource() function.
 
 Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/atmel-aes.c  | 38 +++++++++-----------------------------
- drivers/crypto/atmel-sha.c  | 27 +++++++++------------------
- drivers/crypto/atmel-tdes.c | 29 +++++++----------------------
- 3 files changed, 25 insertions(+), 69 deletions(-)
+ drivers/crypto/ux500/cryp/cryp_core.c | 70 +++++------------------------------
+ drivers/crypto/ux500/hash/hash_core.c | 49 ++++--------------------
+ 2 files changed, 16 insertions(+), 103 deletions(-)
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index de8f5da..fb16d81 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -1324,7 +1324,6 @@ static int atmel_aes_probe(struct platform_device *pdev)
- 	struct crypto_platform_data *pdata;
+diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+index fded0a5..1c1bd10 100644
+--- a/drivers/crypto/ux500/cryp/cryp_core.c
++++ b/drivers/crypto/ux500/cryp/cryp_core.c
+@@ -1414,7 +1414,7 @@ static int ux500_cryp_probe(struct platform_device *pdev)
  	struct device *dev = &pdev->dev;
- 	struct resource *aes_res;
--	unsigned long aes_phys_size;
- 	int err;
  
- 	pdata = pdev->dev.platform_data;
-@@ -1341,7 +1340,7 @@ static int atmel_aes_probe(struct platform_device *pdev)
- 		goto aes_dd_err;
- 	}
- 
--	aes_dd = kzalloc(sizeof(struct atmel_aes_dev), GFP_KERNEL);
-+	aes_dd = devm_kzalloc(&pdev->dev, sizeof(*aes_dd), GFP_KERNEL);
- 	if (aes_dd == NULL) {
- 		dev_err(dev, "unable to alloc data struct.\n");
- 		err = -ENOMEM;
-@@ -1372,36 +1371,35 @@ static int atmel_aes_probe(struct platform_device *pdev)
- 		goto res_err;
- 	}
- 	aes_dd->phys_base = aes_res->start;
--	aes_phys_size = resource_size(aes_res);
- 
- 	/* Get the IRQ */
- 	aes_dd->irq = platform_get_irq(pdev,  0);
- 	if (aes_dd->irq < 0) {
- 		dev_err(dev, "no IRQ resource info\n");
- 		err = aes_dd->irq;
--		goto aes_irq_err;
-+		goto res_err;
- 	}
- 
--	err = request_irq(aes_dd->irq, atmel_aes_irq, IRQF_SHARED, "atmel-aes",
--						aes_dd);
-+	err = devm_request_irq(&pdev->dev, aes_dd->irq, atmel_aes_irq,
-+			       IRQF_SHARED, "atmel-aes", aes_dd);
- 	if (err) {
- 		dev_err(dev, "unable to request aes irq.\n");
--		goto aes_irq_err;
-+		goto res_err;
- 	}
- 
- 	/* Initializing the clock */
--	aes_dd->iclk = clk_get(&pdev->dev, "aes_clk");
-+	aes_dd->iclk = devm_clk_get(&pdev->dev, "aes_clk");
- 	if (IS_ERR(aes_dd->iclk)) {
- 		dev_err(dev, "clock initialization failed.\n");
- 		err = PTR_ERR(aes_dd->iclk);
--		goto clk_err;
-+		goto res_err;
- 	}
- 
--	aes_dd->io_base = ioremap(aes_dd->phys_base, aes_phys_size);
-+	aes_dd->io_base = devm_ioremap_resource(&pdev->dev, aes_res);
- 	if (!aes_dd->io_base) {
- 		dev_err(dev, "can't ioremap\n");
- 		err = -ENOMEM;
--		goto aes_io_err;
-+		goto res_err;
- 	}
- 
- 	atmel_aes_hw_version_init(aes_dd);
-@@ -1438,17 +1436,9 @@ err_algs:
- err_aes_dma:
- 	atmel_aes_buff_cleanup(aes_dd);
- err_aes_buff:
--	iounmap(aes_dd->io_base);
--aes_io_err:
--	clk_put(aes_dd->iclk);
--clk_err:
--	free_irq(aes_dd->irq, aes_dd);
--aes_irq_err:
- res_err:
- 	tasklet_kill(&aes_dd->done_task);
- 	tasklet_kill(&aes_dd->queue_task);
--	kfree(aes_dd);
--	aes_dd = NULL;
- aes_dd_err:
- 	dev_err(dev, "initialization failed.\n");
- 
-@@ -1473,16 +1463,6 @@ static int atmel_aes_remove(struct platform_device *pdev)
- 
- 	atmel_aes_dma_cleanup(aes_dd);
- 
--	iounmap(aes_dd->io_base);
+ 	dev_dbg(dev, "[%s]", __func__);
+-	device_data = kzalloc(sizeof(struct cryp_device_data), GFP_ATOMIC);
++	device_data = devm_kzalloc(dev, sizeof(*device_data), GFP_ATOMIC);
+ 	if (!device_data) {
+ 		dev_err(dev, "[%s]: kzalloc() failed!", __func__);
+ 		ret = -ENOMEM;
+@@ -1435,23 +1435,15 @@ static int ux500_cryp_probe(struct platform_device *pdev)
+ 		dev_err(dev, "[%s]: platform_get_resource() failed",
+ 				__func__);
+ 		ret = -ENODEV;
+-		goto out_kfree;
+-	}
 -
--	clk_put(aes_dd->iclk);
+-	res = request_mem_region(res->start, resource_size(res), pdev->name);
+-	if (res == NULL) {
+-		dev_err(dev, "[%s]: request_mem_region() failed",
+-				__func__);
+-		ret = -EBUSY;
+-		goto out_kfree;
++		goto out;
+ 	}
+ 
+ 	device_data->phybase = res->start;
+-	device_data->base = ioremap(res->start, resource_size(res));
++	device_data->base = devm_ioremap_resource(dev, res);
+ 	if (!device_data->base) {
+ 		dev_err(dev, "[%s]: ioremap failed!", __func__);
+ 		ret = -ENOMEM;
+-		goto out_free_mem;
++		goto out;
+ 	}
+ 
+ 	spin_lock_init(&device_data->ctx_lock);
+@@ -1463,11 +1455,11 @@ static int ux500_cryp_probe(struct platform_device *pdev)
+ 		dev_err(dev, "[%s]: could not get cryp regulator", __func__);
+ 		ret = PTR_ERR(device_data->pwr_regulator);
+ 		device_data->pwr_regulator = NULL;
+-		goto out_unmap;
++		goto out;
+ 	}
+ 
+ 	/* Enable the clk for CRYP hardware block */
+-	device_data->clk = clk_get(&pdev->dev, NULL);
++	device_data->clk = devm_clk_get(&pdev->dev, NULL);
+ 	if (IS_ERR(device_data->clk)) {
+ 		dev_err(dev, "[%s]: clk_get() failed!", __func__);
+ 		ret = PTR_ERR(device_data->clk);
+@@ -1477,7 +1469,7 @@ static int ux500_cryp_probe(struct platform_device *pdev)
+ 	ret = clk_prepare(device_data->clk);
+ 	if (ret) {
+ 		dev_err(dev, "[%s]: clk_prepare() failed!", __func__);
+-		goto out_clk;
++		goto out_regulator;
+ 	}
+ 
+ 	/* Enable device power (and clock) */
+@@ -1510,11 +1502,8 @@ static int ux500_cryp_probe(struct platform_device *pdev)
+ 		goto out_power;
+ 	}
+ 
+-	ret = request_irq(res_irq->start,
+-			  cryp_interrupt_handler,
+-			  0,
+-			  "cryp1",
+-			  device_data);
++	ret = devm_request_irq(&pdev->dev, res_irq->start,
++			       cryp_interrupt_handler, 0, "cryp1", device_data);
+ 	if (ret) {
+ 		dev_err(dev, "[%s]: Unable to request IRQ", __func__);
+ 		goto out_power;
+@@ -1550,28 +1539,15 @@ out_power:
+ out_clk_unprepare:
+ 	clk_unprepare(device_data->clk);
+ 
+-out_clk:
+-	clk_put(device_data->clk);
 -
--	if (aes_dd->irq > 0)
--		free_irq(aes_dd->irq, aes_dd);
+ out_regulator:
+ 	regulator_put(device_data->pwr_regulator);
+ 
+-out_unmap:
+-	iounmap(device_data->base);
 -
--	kfree(aes_dd);
--	aes_dd = NULL;
+-out_free_mem:
+-	release_mem_region(res->start, resource_size(res));
+-
+-out_kfree:
+-	kfree(device_data);
+ out:
+ 	return ret;
+ }
+ 
+ static int ux500_cryp_remove(struct platform_device *pdev)
+ {
+-	struct resource *res = NULL;
+-	struct resource *res_irq = NULL;
+ 	struct cryp_device_data *device_data;
+ 
+ 	dev_dbg(&pdev->dev, "[%s]", __func__);
+@@ -1607,37 +1583,18 @@ static int ux500_cryp_remove(struct platform_device *pdev)
+ 	if (list_empty(&driver_data.device_list.k_list))
+ 		cryp_algs_unregister_all();
+ 
+-	res_irq = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
+-	if (!res_irq)
+-		dev_err(&pdev->dev, "[%s]: IORESOURCE_IRQ, unavailable",
+-			__func__);
+-	else {
+-		disable_irq(res_irq->start);
+-		free_irq(res_irq->start, device_data);
+-	}
+-
+ 	if (cryp_disable_power(&pdev->dev, device_data, false))
+ 		dev_err(&pdev->dev, "[%s]: cryp_disable_power() failed",
+ 			__func__);
+ 
+ 	clk_unprepare(device_data->clk);
+-	clk_put(device_data->clk);
+ 	regulator_put(device_data->pwr_regulator);
+ 
+-	iounmap(device_data->base);
+-
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (res)
+-		release_mem_region(res->start, resource_size(res));
+-
+-	kfree(device_data);
 -
  	return 0;
  }
  
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 5e6cf08..660d8c0 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -1349,11 +1349,9 @@ static int atmel_sha_probe(struct platform_device *pdev)
- 	struct crypto_platform_data	*pdata;
- 	struct device *dev = &pdev->dev;
- 	struct resource *sha_res;
--	unsigned long sha_phys_size;
- 	int err;
+ static void ux500_cryp_shutdown(struct platform_device *pdev)
+ {
+-	struct resource *res_irq = NULL;
+ 	struct cryp_device_data *device_data;
  
--	sha_dd = devm_kzalloc(&pdev->dev, sizeof(struct atmel_sha_dev),
--				GFP_KERNEL);
-+	sha_dd = devm_kzalloc(&pdev->dev, sizeof(*sha_dd), GFP_KERNEL);
- 	if (sha_dd == NULL) {
- 		dev_err(dev, "unable to alloc data struct.\n");
- 		err = -ENOMEM;
-@@ -1382,7 +1380,6 @@ static int atmel_sha_probe(struct platform_device *pdev)
- 		goto res_err;
- 	}
- 	sha_dd->phys_base = sha_res->start;
--	sha_phys_size = resource_size(sha_res);
+ 	dev_dbg(&pdev->dev, "[%s]", __func__);
+@@ -1673,15 +1630,6 @@ static void ux500_cryp_shutdown(struct platform_device *pdev)
+ 	if (list_empty(&driver_data.device_list.k_list))
+ 		cryp_algs_unregister_all();
  
- 	/* Get the IRQ */
- 	sha_dd->irq = platform_get_irq(pdev,  0);
-@@ -1392,26 +1389,26 @@ static int atmel_sha_probe(struct platform_device *pdev)
- 		goto res_err;
- 	}
- 
--	err = request_irq(sha_dd->irq, atmel_sha_irq, IRQF_SHARED, "atmel-sha",
--						sha_dd);
-+	err = devm_request_irq(&pdev->dev, sha_dd->irq, atmel_sha_irq,
-+			       IRQF_SHARED, "atmel-sha", sha_dd);
- 	if (err) {
- 		dev_err(dev, "unable to request sha irq.\n");
- 		goto res_err;
- 	}
- 
- 	/* Initializing the clock */
--	sha_dd->iclk = clk_get(&pdev->dev, "sha_clk");
-+	sha_dd->iclk = devm_clk_get(&pdev->dev, "sha_clk");
- 	if (IS_ERR(sha_dd->iclk)) {
- 		dev_err(dev, "clock initialization failed.\n");
- 		err = PTR_ERR(sha_dd->iclk);
--		goto clk_err;
-+		goto res_err;
- 	}
- 
--	sha_dd->io_base = ioremap(sha_dd->phys_base, sha_phys_size);
-+	sha_dd->io_base = devm_ioremap_resource(&pdev->dev, sha_res);
- 	if (!sha_dd->io_base) {
- 		dev_err(dev, "can't ioremap\n");
- 		err = -ENOMEM;
--		goto sha_io_err;
-+		goto res_err;
- 	}
- 
- 	atmel_sha_hw_version_init(sha_dd);
-@@ -1425,12 +1422,12 @@ static int atmel_sha_probe(struct platform_device *pdev)
- 			if (IS_ERR(pdata)) {
- 				dev_err(&pdev->dev, "platform data not available\n");
- 				err = PTR_ERR(pdata);
--				goto err_pdata;
-+				goto res_err;
- 			}
- 		}
- 		if (!pdata->dma_slave) {
- 			err = -ENXIO;
--			goto err_pdata;
-+			goto res_err;
- 		}
- 		err = atmel_sha_dma_init(sha_dd, pdata);
- 		if (err)
-@@ -1461,12 +1458,6 @@ err_algs:
- 	if (sha_dd->caps.has_dma)
- 		atmel_sha_dma_cleanup(sha_dd);
- err_sha_dma:
--err_pdata:
--	iounmap(sha_dd->io_base);
--sha_io_err:
--	clk_put(sha_dd->iclk);
--clk_err:
--	free_irq(sha_dd->irq, sha_dd);
- res_err:
- 	tasklet_kill(&sha_dd->done_task);
- sha_dd_err:
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 504e903..2c7a628 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -1359,7 +1359,6 @@ static int atmel_tdes_probe(struct platform_device *pdev)
- 	struct crypto_platform_data	*pdata;
- 	struct device *dev = &pdev->dev;
- 	struct resource *tdes_res;
--	unsigned long tdes_phys_size;
- 	int err;
- 
- 	tdes_dd = devm_kmalloc(&pdev->dev, sizeof(*tdes_dd), GFP_KERNEL);
-@@ -1393,7 +1392,6 @@ static int atmel_tdes_probe(struct platform_device *pdev)
- 		goto res_err;
- 	}
- 	tdes_dd->phys_base = tdes_res->start;
--	tdes_phys_size = resource_size(tdes_res);
- 
- 	/* Get the IRQ */
- 	tdes_dd->irq = platform_get_irq(pdev,  0);
-@@ -1403,26 +1401,26 @@ static int atmel_tdes_probe(struct platform_device *pdev)
- 		goto res_err;
- 	}
- 
--	err = request_irq(tdes_dd->irq, atmel_tdes_irq, IRQF_SHARED,
--			"atmel-tdes", tdes_dd);
-+	err = devm_request_irq(&pdev->dev, tdes_dd->irq, atmel_tdes_irq,
-+			       IRQF_SHARED, "atmel-tdes", tdes_dd);
- 	if (err) {
- 		dev_err(dev, "unable to request tdes irq.\n");
--		goto tdes_irq_err;
-+		goto res_err;
- 	}
- 
- 	/* Initializing the clock */
--	tdes_dd->iclk = clk_get(&pdev->dev, "tdes_clk");
-+	tdes_dd->iclk = devm_clk_get(&pdev->dev, "tdes_clk");
- 	if (IS_ERR(tdes_dd->iclk)) {
- 		dev_err(dev, "clock initialization failed.\n");
- 		err = PTR_ERR(tdes_dd->iclk);
--		goto clk_err;
-+		goto res_err;
- 	}
- 
--	tdes_dd->io_base = ioremap(tdes_dd->phys_base, tdes_phys_size);
-+	tdes_dd->io_base = devm_ioremap_resource(&pdev->dev, tdes_res);
- 	if (!tdes_dd->io_base) {
- 		dev_err(dev, "can't ioremap\n");
- 		err = -ENOMEM;
--		goto tdes_io_err;
-+		goto res_err;
- 	}
- 
- 	atmel_tdes_hw_version_init(tdes_dd);
-@@ -1478,12 +1476,6 @@ err_tdes_dma:
- err_pdata:
- 	atmel_tdes_buff_cleanup(tdes_dd);
- err_tdes_buff:
--	iounmap(tdes_dd->io_base);
--tdes_io_err:
--	clk_put(tdes_dd->iclk);
--clk_err:
--	free_irq(tdes_dd->irq, tdes_dd);
--tdes_irq_err:
- res_err:
- 	tasklet_kill(&tdes_dd->done_task);
- 	tasklet_kill(&tdes_dd->queue_task);
-@@ -1514,13 +1506,6 @@ static int atmel_tdes_remove(struct platform_device *pdev)
- 
- 	atmel_tdes_buff_cleanup(tdes_dd);
- 
--	iounmap(tdes_dd->io_base);
+-	res_irq = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
+-	if (!res_irq)
+-		dev_err(&pdev->dev, "[%s]: IORESOURCE_IRQ, unavailable",
+-			__func__);
+-	else {
+-		disable_irq(res_irq->start);
+-		free_irq(res_irq->start, device_data);
+-	}
 -
--	clk_put(tdes_dd->iclk);
+ 	if (cryp_disable_power(&pdev->dev, device_data, false))
+ 		dev_err(&pdev->dev, "[%s]: cryp_disable_power() failed",
+ 			__func__);
+diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+index 5f5f360..8b9391f 100644
+--- a/drivers/crypto/ux500/hash/hash_core.c
++++ b/drivers/crypto/ux500/hash/hash_core.c
+@@ -1657,7 +1657,7 @@ static int ux500_hash_probe(struct platform_device *pdev)
+ 	struct hash_device_data *device_data;
+ 	struct device		*dev = &pdev->dev;
+ 
+-	device_data = kzalloc(sizeof(*device_data), GFP_ATOMIC);
++	device_data = devm_kzalloc(dev, sizeof(*device_data), GFP_ATOMIC);
+ 	if (!device_data) {
+ 		ret = -ENOMEM;
+ 		goto out;
+@@ -1670,22 +1670,15 @@ static int ux500_hash_probe(struct platform_device *pdev)
+ 	if (!res) {
+ 		dev_dbg(dev, "%s: platform_get_resource() failed!\n", __func__);
+ 		ret = -ENODEV;
+-		goto out_kfree;
+-	}
 -
--	if (tdes_dd->irq >= 0)
--		free_irq(tdes_dd->irq, tdes_dd);
+-	res = request_mem_region(res->start, resource_size(res), pdev->name);
+-	if (res == NULL) {
+-		dev_dbg(dev, "%s: request_mem_region() failed!\n", __func__);
+-		ret = -EBUSY;
+-		goto out_kfree;
++		goto out;
+ 	}
+ 
+ 	device_data->phybase = res->start;
+-	device_data->base = ioremap(res->start, resource_size(res));
++	device_data->base = devm_ioremap_resource(dev, res);
+ 	if (!device_data->base) {
+ 		dev_err(dev, "%s: ioremap() failed!\n", __func__);
+ 		ret = -ENOMEM;
+-		goto out_free_mem;
++		goto out;
+ 	}
+ 	spin_lock_init(&device_data->ctx_lock);
+ 	spin_lock_init(&device_data->power_state_lock);
+@@ -1696,11 +1689,11 @@ static int ux500_hash_probe(struct platform_device *pdev)
+ 		dev_err(dev, "%s: regulator_get() failed!\n", __func__);
+ 		ret = PTR_ERR(device_data->regulator);
+ 		device_data->regulator = NULL;
+-		goto out_unmap;
++		goto out;
+ 	}
+ 
+ 	/* Enable the clock for HASH1 hardware block */
+-	device_data->clk = clk_get(dev, NULL);
++	device_data->clk = devm_clk_get(dev, NULL);
+ 	if (IS_ERR(device_data->clk)) {
+ 		dev_err(dev, "%s: clk_get() failed!\n", __func__);
+ 		ret = PTR_ERR(device_data->clk);
+@@ -1710,7 +1703,7 @@ static int ux500_hash_probe(struct platform_device *pdev)
+ 	ret = clk_prepare(device_data->clk);
+ 	if (ret) {
+ 		dev_err(dev, "%s: clk_prepare() failed!\n", __func__);
+-		goto out_clk;
++		goto out_regulator;
+ 	}
+ 
+ 	/* Enable device power (and clock) */
+@@ -1752,20 +1745,9 @@ out_power:
+ out_clk_unprepare:
+ 	clk_unprepare(device_data->clk);
+ 
+-out_clk:
+-	clk_put(device_data->clk);
+-
+ out_regulator:
+ 	regulator_put(device_data->regulator);
+ 
+-out_unmap:
+-	iounmap(device_data->base);
+-
+-out_free_mem:
+-	release_mem_region(res->start, resource_size(res));
+-
+-out_kfree:
+-	kfree(device_data);
+ out:
+ 	return ret;
+ }
+@@ -1776,7 +1758,6 @@ out:
+  */
+ static int ux500_hash_remove(struct platform_device *pdev)
+ {
+-	struct resource		*res;
+ 	struct hash_device_data *device_data;
+ 	struct device		*dev = &pdev->dev;
+ 
+@@ -1816,17 +1797,8 @@ static int ux500_hash_remove(struct platform_device *pdev)
+ 			__func__);
+ 
+ 	clk_unprepare(device_data->clk);
+-	clk_put(device_data->clk);
+ 	regulator_put(device_data->regulator);
+ 
+-	iounmap(device_data->base);
+-
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (res)
+-		release_mem_region(res->start, resource_size(res));
+-
+-	kfree(device_data);
 -
  	return 0;
  }
  
+@@ -1836,7 +1808,6 @@ static int ux500_hash_remove(struct platform_device *pdev)
+  */
+ static void ux500_hash_shutdown(struct platform_device *pdev)
+ {
+-	struct resource *res = NULL;
+ 	struct hash_device_data *device_data;
+ 
+ 	device_data = platform_get_drvdata(pdev);
+@@ -1870,12 +1841,6 @@ static void ux500_hash_shutdown(struct platform_device *pdev)
+ 	if (list_empty(&driver_data.device_list.k_list))
+ 		ahash_algs_unregister_all(device_data);
+ 
+-	iounmap(device_data->base);
+-
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (res)
+-		release_mem_region(res->start, resource_size(res));
+-
+ 	if (hash_disable_power(device_data, false))
+ 		dev_err(&pdev->dev, "%s: hash_disable_power() failed\n",
+ 			__func__);
 -- 
 2.4.9
