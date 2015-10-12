@@ -1,71 +1,59 @@
-From: Daniel Thompson <daniel.thompson@linaro.org>
-Subject: [PATCH 1/3] dt-bindings: Document the STM32 HW RNG bindings
-Date: Mon, 12 Oct 2015 09:21:28 +0100
-Message-ID: <1444638090-22886-2-git-send-email-daniel.thompson@linaro.org>
-References: <1443904519-24012-1-git-send-email-daniel.thompson@linaro.org>
- <1444638090-22886-1-git-send-email-daniel.thompson@linaro.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: unaligned access in pkcs7_verify
+Date: Mon, 12 Oct 2015 21:32:09 +0800
+Message-ID: <20151012133209.GA27746@gondor.apana.org.au>
+References: <20151002140014.GI18263@oracle.com>
+ <20151008131519.GA24362@gondor.apana.org.au>
+ <20151008144343.GE19655@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
- Daniel Thompson <daniel.thompson@linaro.org>, linaro-kernel@lists.linaro.org,
- Pawel Moll <pawel.moll@arm.com>, patches@linaro.org,
- Ian Campbell <ijc+devicetree@hellion.org.uk>, linux-kernel@vger.kernel.org,
- Rob Herring <robh+dt@kernel.org>, linux-crypto@vger.kernel.org,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, Kumar Gala <galak@codeaurora.org>,
- linux-arm-kernel@lists.infradead.org
-To: Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1444638090-22886-1-git-send-email-daniel.thompson@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:39171 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751796AbbJLNcS (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 12 Oct 2015 09:32:18 -0400
+Content-Disposition: inline
+In-Reply-To: <20151008144343.GE19655@oracle.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This adds documentation of device tree bindings for the STM32 hardware
-random number generator.
+On Thu, Oct 08, 2015 at 10:43:43AM -0400, Sowmini Varadhan wrote:
+> On (10/08/15 21:15), Herbert Xu wrote:
+> > >         desc_size = crypto_shash_descsize(tfm) + sizeof(*desc);
+> > > -       sinfo->sig.digest_size = digest_size = crypto_shash_digestsize(tfm);
+> > > +       sinfo->sig.digest_size = digest_size = 
+> > > +               ALIGN(crypto_shash_digestsize(tfm), sizeof (*desc));
+>   :
+> > What hash algorithm were you using?
+> 
+> Algorithm is sha1. From printk, crypto_shash_descsize(tfm) comes out
+> to 0x60, digest_size to 0x14. Stack trace (for each modprobe [-r]) is 
+> 
+> 	pkcs7_verify+0x1d0/0x5e0
+> 	system_verify_data+0x54/0xb4
+> 	mod_verify_sig+0xa0/0xc4
+> 	load_module+0x48/0x16a0
+> 	SyS_init_module+0x114/0x128
+> 	linux_sparc_syscall+0x34/0x44
 
-Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
-Acked-by: Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Acked-by: Rob Herring <robh@kernel.org>
----
- .../devicetree/bindings/rng/st,stm32-rng.txt        | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/rng/st,stm32-rng.txt
+Thanks.  We have two bugs here.  First of all pkcs7_verify definitely
+shouldn't place the structure after the digest without aligning the
+pointer.  So something like your patch is needed (but please use
+alignof instead of sizeof).  Also don't put in digest_size but
+instead align the pointer like
 
-diff --git a/Documentation/devicetree/bindings/rng/st,stm32-rng.txt b/Documentation/devicetree/bindings/rng/st,stm32-rng.txt
-new file mode 100644
-index 000000000000..47f04176f93b
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/st,stm32-rng.txt
-@@ -0,0 +1,21 @@
-+STMicroelectronics STM32 HW RNG
-+===============================
-+
-+The STM32 hardware random number generator is a simple fixed purpose IP and
-+is fully separated from other crypto functions.
-+
-+Required properties:
-+
-+- compatible : Should be "st,stm32-rng"
-+- reg : Should be register base and length as documented in the datasheet
-+- interrupts : The designated IRQ line for the RNG
-+- clocks : The clock needed to enable the RNG
-+
-+Example:
-+
-+	rng: rng@50060800 {
-+		compatible = "st,stm32-rng";
-+		reg = <0x50060800 0x400>;
-+		interrupts = <80>;
-+		clocks = <&rcc 0 38>;
-+	};
+	desc = PTR_ALIGN(digest + digest_size, ...)
+
+The sparc sha algorithms themselves need to declare the alignment
+that they require.  Currently they claim to be able to handle any
+alignment which appears to not be the case.
+
+Cheers,
 -- 
-2.4.3
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
