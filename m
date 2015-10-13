@@ -1,58 +1,41 @@
-From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
-Subject: [PATCH] crypto/pkcs7_verify: Fix unaligned access in pkcs7_verify()
-Date: Tue, 13 Oct 2015 10:54:01 -0400
-Message-ID: <20151013145401.GM20800@oracle.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: Crypto Fixes for 4.3
+Date: Tue, 13 Oct 2015 10:23:39 -0700
+Message-ID: <CA+55aFz0ZdjpC_FpM6h=z_boK8HeKzgt_7Zm14TnrZYqx1SaUQ@mail.gmail.com>
+References: <20140401100001.GA12386@gondor.apana.org.au>
+	<20140605062336.GA14440@gondor.apana.org.au>
+	<20140804130339.GA1178@gondor.apana.org.au>
+	<20141007131826.GA29688@gondor.apana.org.au>
+	<20141211125119.GA12380@gondor.apana.org.au>
+	<20150214094328.GA7457@gondor.apana.org.au>
+	<20150626102234.GA19393@gondor.apana.org.au>
+	<20150908092502.GA8332@gondor.apana.org.au>
+	<20150916103014.GA12315@gondor.apana.org.au>
+	<20150926200133.GA19035@gondor.apana.org.au>
+	<20151013121750.GA6408@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	dhowells@redhat.com, marcel@holtmann.org, David.Woodhouse@intel.com
-To: sowmini.varadhan@oracle.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
+In-Reply-To: <20151013121750.GA6408@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Tue, Oct 13, 2015 at 5:17 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> This push fixes the following issues:
+>
+> * Fix AVX detection to prevent use of non-existent AESNI.
+> * Some SPARC ciphers did not set their IV size which may lead
+>   to memory corruption.
 
-On sparc, we see unaligned access messages on each modprobe[-r]:
+Hmm. It looks like you also quietly added a ahash fix this morning.
 
-Kernel unaligned access at TPC[6ad9b4] pkcs7_verify [..]
-Kernel unaligned access at TPC[6a5484] crypto_shash_finup [..]
-Kernel unaligned access at TPC[6a5390] crypto_shash_update [..]
-Kernel unaligned access at TPC[10150308] sha1_sparc64_update [..]
-Kernel unaligned access at TPC[101501ac] __sha1_sparc64_update [..]
+I took it despite it not being described or in the diffstat. But
+please send new pull requests when you update a branch you asked me to
+pull.
 
-These ware triggered by mod_verify_sig() invocations of pkcs_verify(), and
-are are being caused by an unaligned desc at (sha1, digest_size is 0x14)
-        desc = digest + digest_size;
-
-To fix this, pkcs7_verify needs to make sure that desc is pointing
-at an aligned value past the digest_size, and kzalloc appropriately,
-taking alignment values into consideration.
-
-Signed-off-by: Sowmini Varadhan <sowmini.varadhan@oracle.com>
----
- crypto/asymmetric_keys/pkcs7_verify.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-index d20c0b4..325575c 100644
---- a/crypto/asymmetric_keys/pkcs7_verify.c
-+++ b/crypto/asymmetric_keys/pkcs7_verify.c
-@@ -49,11 +49,12 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
- 	sinfo->sig.digest_size = digest_size = crypto_shash_digestsize(tfm);
- 
- 	ret = -ENOMEM;
--	digest = kzalloc(digest_size + desc_size, GFP_KERNEL);
-+	digest = kzalloc(ALIGN(digest_size, __alignof__(*desc)) + desc_size,
-+			 GFP_KERNEL);
- 	if (!digest)
- 		goto error_no_desc;
- 
--	desc = digest + digest_size;
-+	desc = PTR_ALIGN(digest + digest_size, __alignof__(*desc));
- 	desc->tfm   = tfm;
- 	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
- 
--- 
-1.7.1
+                    Linus
