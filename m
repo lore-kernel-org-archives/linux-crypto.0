@@ -1,54 +1,58 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 1/5] crypto: ensure algif_hash does not pass a
- zero-sized state
-Date: Tue, 13 Oct 2015 22:33:12 +0800
-Message-ID: <20151013143312.GA7903@gondor.apana.org.au>
-References: <20151009194309.GA7401@n2100.arm.linux.org.uk>
- <E1ZkdZl-0005IT-IU@rmk-PC.arm.linux.org.uk>
+From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Subject: [PATCH] crypto/pkcs7_verify: Fix unaligned access in pkcs7_verify()
+Date: Tue, 13 Oct 2015 10:54:01 -0400
+Message-ID: <20151013145401.GM20800@oracle.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Russell King <rmk+kernel@arm.linux.org.uk>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51802 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752655AbbJMOd0 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Oct 2015 10:33:26 -0400
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	dhowells@redhat.com, marcel@holtmann.org, David.Woodhouse@intel.com
+To: sowmini.varadhan@oracle.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <E1ZkdZl-0005IT-IU@rmk-PC.arm.linux.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Oct 09, 2015 at 08:43:33PM +0100, Russell King wrote:
-> If the algorithm passed a zero statesize, do not pass a valid pointer
-> into the export/import functions.  Passing a valid pointer covers up
-> bugs in driver code which then go on to smash the kernel stack.
-> Instead, pass NULL, which will cause any attempt to write to the
-> pointer to fail.
-> 
-> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 
-Patch applied without the shash hunk.  I also replaced your commit
-message as it no longer makes any sense:
+On sparc, we see unaligned access messages on each modprobe[-r]:
 
-    crypto: ahash - ensure statesize is non-zero
+Kernel unaligned access at TPC[6ad9b4] pkcs7_verify [..]
+Kernel unaligned access at TPC[6a5484] crypto_shash_finup [..]
+Kernel unaligned access at TPC[6a5390] crypto_shash_update [..]
+Kernel unaligned access at TPC[10150308] sha1_sparc64_update [..]
+Kernel unaligned access at TPC[101501ac] __sha1_sparc64_update [..]
 
-    Unlike shash algorithms, ahash drivers must implement export
-    and import as their descriptors may contain hardware state and
-    cannot be exported as is.  Unfortunately some ahash drivers did
-    not provide them and end up causing crashes with algif_hash.
+These ware triggered by mod_verify_sig() invocations of pkcs_verify(), and
+are are being caused by an unaligned desc at (sha1, digest_size is 0x14)
+        desc = digest + digest_size;
 
-    This patch adds a check to prevent these drivers from registering
-    ahash algorithms until they are fixed.
+To fix this, pkcs7_verify needs to make sure that desc is pointing
+at an aligned value past the digest_size, and kzalloc appropriately,
+taking alignment values into consideration.
 
-Thanks,
+Signed-off-by: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+---
+ crypto/asymmetric_keys/pkcs7_verify.c |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index d20c0b4..325575c 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -49,11 +49,12 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
+ 	sinfo->sig.digest_size = digest_size = crypto_shash_digestsize(tfm);
+ 
+ 	ret = -ENOMEM;
+-	digest = kzalloc(digest_size + desc_size, GFP_KERNEL);
++	digest = kzalloc(ALIGN(digest_size, __alignof__(*desc)) + desc_size,
++			 GFP_KERNEL);
+ 	if (!digest)
+ 		goto error_no_desc;
+ 
+-	desc = digest + digest_size;
++	desc = PTR_ALIGN(digest + digest_size, __alignof__(*desc));
+ 	desc->tfm   = tfm;
+ 	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.1
