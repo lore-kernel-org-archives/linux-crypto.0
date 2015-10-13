@@ -1,48 +1,57 @@
-From: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-Subject: [PATCH] crypto: ccm - remove goto
-Date: Tue, 13 Oct 2015 13:48:25 +0530
-Message-ID: <1444724305-3235-1-git-send-email-sudipm.mukherjee@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f43.google.com ([209.85.220.43]:33756 "EHLO
-	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932072AbbJMISd (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Oct 2015 04:18:33 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.3
+Date: Tue, 13 Oct 2015 20:17:50 +0800
+Message-ID: <20151013121750.GA6408@gondor.apana.org.au>
+References: <20140401100001.GA12386@gondor.apana.org.au>
+ <20140605062336.GA14440@gondor.apana.org.au>
+ <20140804130339.GA1178@gondor.apana.org.au>
+ <20141007131826.GA29688@gondor.apana.org.au>
+ <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150626102234.GA19393@gondor.apana.org.au>
+ <20150908092502.GA8332@gondor.apana.org.au>
+ <20150916103014.GA12315@gondor.apana.org.au>
+ <20150926200133.GA19035@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20150926200133.GA19035@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Instead of using goto and jumping to a label and then returning from
-there, lets return directly. The label out: is not used from anywhere
-else in the code.
+Hi Linus:
 
-Signed-off-by: Sudip Mukherjee <sudip@vectorindia.org>
----
- crypto/ccm.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+This push fixes the following issues:
 
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index cc31ea4..daa7e6d 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -881,14 +881,13 @@ static int crypto_rfc4309_create(struct crypto_template *tmpl,
- 	if (err)
- 		goto out_drop_alg;
- 
--out:
- 	return err;
- 
- out_drop_alg:
- 	crypto_drop_aead(spawn);
- out_free_inst:
- 	kfree(inst);
--	goto out;
-+	return err;
- }
- 
- static struct crypto_template crypto_rfc4309_tmpl = {
+* Fix AVX detection to prevent use of non-existent AESNI.
+* Some SPARC ciphers did not set their IV size which may lead
+  to memory corruption.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Ben Hutchings (1):
+      crypto: camellia_aesni_avx - Fix CPU feature checks
+
+Dave Kleikamp (1):
+      crypto: sparc - initialize blkcipher.ivsize
+
+ arch/sparc/crypto/aes_glue.c              |    2 ++
+ arch/sparc/crypto/camellia_glue.c         |    1 +
+ arch/sparc/crypto/des_glue.c              |    2 ++
+ arch/x86/crypto/camellia_aesni_avx_glue.c |    5 +++++
+ 4 files changed, 10 insertions(+)
+
+Thanks,
 -- 
-1.9.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
