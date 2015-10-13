@@ -1,64 +1,65 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3b 5/5] crypto: marvell: factor out common import/export
- functions
-Date: Tue, 13 Oct 2015 21:00:48 +0800
-Message-ID: <20151013130048.GA6820@gondor.apana.org.au>
-References: <E1Zkda6-0005Ix-2x@rmk-PC.arm.linux.org.uk>
- <E1Zke3a-00042e-Jx@rmk-PC.arm.linux.org.uk>
- <87oag78y8i.fsf@natisbad.org>
- <20151009235132.GE32532@n2100.arm.linux.org.uk>
- <87d1wn2ewu.fsf@natisbad.org>
- <20151010112925.GF32532@n2100.arm.linux.org.uk>
- <20151010161754.GG32532@n2100.arm.linux.org.uk>
- <20151011065505.GA17272@gondor.apana.org.au>
+From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Subject: Re: unaligned access in pkcs7_verify
+Date: Tue, 13 Oct 2015 09:29:28 -0400
+Message-ID: <20151013132928.GK20800@oracle.com>
+References: <20151002140014.GI18263@oracle.com>
+ <20151008131519.GA24362@gondor.apana.org.au>
+ <20151008144343.GE19655@oracle.com>
+ <20151012133209.GA27746@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Arnaud Ebalard <arno@natisbad.org>,
-	Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Marek Vasut <marex@denx.de>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:50963 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752930AbbJMNBM (ORCPT
+Received: from userp1040.oracle.com ([156.151.31.81]:26781 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752559AbbJMN3i (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Oct 2015 09:01:12 -0400
+	Tue, 13 Oct 2015 09:29:38 -0400
 Content-Disposition: inline
-In-Reply-To: <20151011065505.GA17272@gondor.apana.org.au>
+In-Reply-To: <20151012133209.GA27746@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Oct 11, 2015 at 02:55:05PM +0800, Herbert Xu wrote:
-> On Sat, Oct 10, 2015 at 05:17:54PM +0100, Russell King - ARM Linux wrote:
-> >
-> > I _also_ notice that despite having the ARM assembly crypto functions
-> > enabled and built-in to the kernel, they don't appear in /proc/crypto -
-> > and this is because of patch 1 in this series, which blocks out any
-> > crypto driver which has a zero statesize (as the ARM crypto functions
-> > appear to have.)  I found this by rebuilding the ARM crypto stuff as
-> > modules, and then trying to insert them:
+On (10/12/15 21:32), Herbert Xu wrote:
 > 
-> They're buggy and unfortunately this wasn't caught during the
-> review process.  The import/export functions are required and
-> certainly not optional.
+> .. pkcs7_verify definitely
+> shouldn't place the structure after the digest without aligning the
+> pointer.  So something like your patch is needed (but please use
+> alignof instead of sizeof).  Also don't put in digest_size but
+> instead align the pointer like
+> 
+> 	desc = PTR_ALIGN(digest + digest_size, ...)
 
-OK it looks like I was confused.  Yes the import and export functions
-are required but for shash algorithms we provide a simple default.
-This means that implementations can simply leave it NULL and they
-will then use the default import/export functions which exports
-the shash_desc as the state.
+I tried the patch below for 24+ hours, and it ran without mishaps. 
+But given that the panics I saw earlier (page faults typically
+triggered  by openswan's pluto) occurred unpredictably, it would be 
+useful to have an expert-review of this code.
 
-So Russell what I'll do is apply your patch without the hunk
-for shash_prepare_alg.  IOW we will block any ahash algorithms
-that leave state as zero since ahash does not provide a default
-import/export function (it can't because it may involve hardware
-state).  shash algorithms on the other hand won't be affected.
+Thanks,
+--Sowmini
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index d20c0b4..958ac01 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -46,14 +46,15 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
+ 		return (PTR_ERR(tfm) == -ENOENT) ? -ENOPKG : PTR_ERR(tfm);
+ 
+ 	desc_size = crypto_shash_descsize(tfm) + sizeof(*desc);
+-	sinfo->sig.digest_size = digest_size = crypto_shash_digestsize(tfm);
+-
++	sinfo->sig.digest_size = crypto_shash_digestsize(tfm);
++	digest_size = crypto_shash_digestsize(tfm) +
++		ALIGN(crypto_shash_digestsize(tfm), __alignof__(*desc));
+ 	ret = -ENOMEM;
+ 	digest = kzalloc(digest_size + desc_size, GFP_KERNEL);
+ 	if (!digest)
+ 		goto error_no_desc;
+ 
+-	desc = digest + digest_size;
++	desc = PTR_ALIGN(digest + digest_size, __alignof__(*desc));
+ 	desc->tfm   = tfm;
+ 	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
+ 
