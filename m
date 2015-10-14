@@ -1,58 +1,36 @@
-From: Haren Myneni <haren@linux.vnet.ibm.com>
-Subject: Re: [PATCH V3] crypto/nx842: Add CRC and validation support
-Date: Wed, 14 Oct 2015 13:20:07 -0700
-Message-ID: <561EB8F7.5020206@linux.vnet.ibm.com>
-References: <1444337151.10131.10.camel@hbabu-laptop> <20151014142718.GD17455@gondor.apana.org.au> <CALZtOND_g3Y6AT4HMVMTS7c0L4hx5AdxZ-bCQKSc7KogVnoQdQ@mail.gmail.com>
+From: Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH] crypto: x86: Remove duplicate define of
+ SHA1_DIGEST_SIZE
+Date: Wed, 14 Oct 2015 22:44:39 +0200 (CEST)
+Message-ID: <alpine.DEB.2.11.1510142242030.3960@nanos>
+References: <1444850171-17931-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	Haren Myneni <hbabu@us.ibm.com>
-To: Dan Streetman <ddstreet@ieee.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: ameenali023@gmail.com, bp@alien8.de, dan.carpenter@oracle.com,
+	davem@davemloft.net, firogm@gmail.com, herbert@gondor.apana.org.au,
+	hpa@zytor.com, mingo@redhat.com, minipli@googlemail.com,
+	smueller@chronox.de, tim.c.chen@linux.intel.com, x86@kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e34.co.us.ibm.com ([32.97.110.152]:51756 "EHLO
-	e34.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753481AbbJNUU1 (ORCPT
+Received: from www.linutronix.de ([62.245.132.108]:57167 "EHLO
+	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752964AbbJNUpt (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Oct 2015 16:20:27 -0400
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <haren@linux.vnet.ibm.com>;
-	Wed, 14 Oct 2015 14:20:26 -0600
-In-Reply-To: <CALZtOND_g3Y6AT4HMVMTS7c0L4hx5AdxZ-bCQKSc7KogVnoQdQ@mail.gmail.com>
+	Wed, 14 Oct 2015 16:45:49 -0400
+In-Reply-To: <1444850171-17931-1-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/14/2015 07:30 AM, Dan Streetman wrote:
-> On Wed, Oct 14, 2015 at 10:27 AM, Herbert Xu
-> <herbert@gondor.apana.org.au> wrote:
->> On Thu, Oct 08, 2015 at 01:45:51PM -0700, Haren Myneni wrote:
->>>
->>> This patch adds CRC generation and validation support for nx-842.
->>> Add CRC flag so that nx842 coprocessor includes CRC during compression
->>> and validates during decompression.
->>>
->>> Also changes in 842 SW compression to append CRC value at the end
->>> of template and checks during decompression.
->>>
->>> Signed-off-by: Haren Myneni <haren@us.ibm.com>
->>
->> Patch applied.  Thanks.
-> 
-> Thanks Herbert, sorry I didn't have a chance to ack it :)
-> 
-> Haren, as I don't have access to the NX PowerPC hardware anymore and
-> you've taken this over for IBM, can you change the maintainer to
-> yourself?
+On Wed, 14 Oct 2015, LABBE Corentin wrote:
 
-Dan, OK, I will send the patch. 
+> The sha x86 crypto code use two define for the same thing:
+> NUM_SHA1_DIGEST_WORDS and SHA1_DIGEST_LENGTH
+> Replace them by SHA1_DIGEST_SIZE/4
 
-> 
->> --
->> Email: Herbert Xu <herbert@gondor.apana.org.au>
->> Home Page: http://gondor.apana.org.au/~herbert/
->> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-> 
+That's wrong. Use only one for the number of words and make the define
+so it's derived from the LENGTH.
+
+Thanks,
+
+	tglx
