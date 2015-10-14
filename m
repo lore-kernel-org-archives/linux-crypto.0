@@ -1,43 +1,48 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto/pkcs7_verify: Fix unaligned access in
- pkcs7_verify()
-Date: Wed, 14 Oct 2015 22:29:15 +0800
-Message-ID: <20151014142915.GI17455@gondor.apana.org.au>
-References: <20151013145401.GM20800@oracle.com>
+From: Dan Streetman <ddstreet@ieee.org>
+Subject: Re: [PATCH V3] crypto/nx842: Add CRC and validation support
+Date: Wed, 14 Oct 2015 10:30:13 -0400
+Message-ID: <CALZtOND_g3Y6AT4HMVMTS7c0L4hx5AdxZ-bCQKSc7KogVnoQdQ@mail.gmail.com>
+References: <1444337151.10131.10.camel@hbabu-laptop> <20151014142718.GD17455@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	davem@davemloft.net, dhowells@redhat.com, marcel@holtmann.org,
-	David.Woodhouse@intel.com
-To: Sowmini Varadhan <sowmini.varadhan@oracle.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20151013145401.GM20800@oracle.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: Haren Myneni <haren@linux.vnet.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Haren Myneni <hbabu@us.ibm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-io0-f182.google.com ([209.85.223.182]:33883 "EHLO
+	mail-io0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753540AbbJNOax (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 14 Oct 2015 10:30:53 -0400
+In-Reply-To: <20151014142718.GD17455@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Oct 13, 2015 at 10:54:01AM -0400, Sowmini Varadhan wrote:
-> 
-> On sparc, we see unaligned access messages on each modprobe[-r]:
-> 
-> Kernel unaligned access at TPC[6ad9b4] pkcs7_verify [..]
-> Kernel unaligned access at TPC[6a5484] crypto_shash_finup [..]
-> Kernel unaligned access at TPC[6a5390] crypto_shash_update [..]
-> Kernel unaligned access at TPC[10150308] sha1_sparc64_update [..]
-> Kernel unaligned access at TPC[101501ac] __sha1_sparc64_update [..]
-> 
-> These ware triggered by mod_verify_sig() invocations of pkcs_verify(), and
-> are are being caused by an unaligned desc at (sha1, digest_size is 0x14)
->         desc = digest + digest_size;
-> 
-> To fix this, pkcs7_verify needs to make sure that desc is pointing
-> at an aligned value past the digest_size, and kzalloc appropriately,
-> taking alignment values into consideration.
-> 
-> Signed-off-by: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+On Wed, Oct 14, 2015 at 10:27 AM, Herbert Xu
+<herbert@gondor.apana.org.au> wrote:
+> On Thu, Oct 08, 2015 at 01:45:51PM -0700, Haren Myneni wrote:
+>>
+>> This patch adds CRC generation and validation support for nx-842.
+>> Add CRC flag so that nx842 coprocessor includes CRC during compression
+>> and validates during decompression.
+>>
+>> Also changes in 842 SW compression to append CRC value at the end
+>> of template and checks during decompression.
+>>
+>> Signed-off-by: Haren Myneni <haren@us.ibm.com>
+>
+> Patch applied.  Thanks.
 
-Patch applied.  Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks Herbert, sorry I didn't have a chance to ack it :)
+
+Haren, as I don't have access to the NX PowerPC hardware anymore and
+you've taken this over for IBM, can you change the maintainer to
+yourself?
+
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
