@@ -1,7 +1,7 @@
 From: Joonsoo Kim <js1304@gmail.com>
-Subject: [PATCH v4 6/8] zram: pass zstrm down to decompression path
-Date: Wed, 14 Oct 2015 16:38:22 +0900
-Message-ID: <1444808304-29320-7-git-send-email-iamjoonsoo.kim@lge.com>
+Subject: [PATCH v4 7/8] zram: use crypto contextless compression API to (de)compress
+Date: Wed, 14 Oct 2015 16:38:23 +0900
+Message-ID: <1444808304-29320-8-git-send-email-iamjoonsoo.kim@lge.com>
 References: <1444808304-29320-1-git-send-email-iamjoonsoo.kim@lge.com>
 Cc: Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
 	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
@@ -9,150 +9,341 @@ Cc: Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Stephan Mueller <smueller@chronox.de>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
 	Joonsoo Kim <iamjoonsoo.kim@lge.com>
 To: Andrew Morton <akpm@linux-foundation.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f54.google.com ([209.85.220.54]:33167 "EHLO
-	mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752928AbbJNHiu (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Oct 2015 03:38:50 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1444808304-29320-1-git-send-email-iamjoonsoo.kim@lge.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+Until now, zram uses compression algorithm through direct call
+to core algorithm function, but, it has drawback that we need to add
+compression algorithm manually to zram if needed. Without this work,
+we cannot utilize various compression algorithms in the system.
+Moreover, to add new compression algorithm, we need to know how to use it
+and this is somewhat time-consuming.
 
-Introduce zcomp_decompress_begin()/zcomp_decompress_end() as a
-preparation for crypto API-powered zcomp.
+When I tested new algorithms such as zlib, these problems make me hard
+to test them. To prevent these problem in the future, I think that
+using crypto API for compression is better approach and this patch
+implements it.
 
-Change zcomp_decompress() signature to require zstrm parameter.
+The reason we need to support vairous compression algorithms is that
+zram's performance is highly depend on workload and compression algorithm
+and architecture. Every compression algorithm has it's own strong point.
+For example, zlib is the best for compression ratio, but, it's
+(de)compression speed is rather slow. Against my expectation, in my kernel
+build test with zram swap, in low-memory condition on x86, zlib shows best
+performance than others. In this case, I guess that compression ratio is
+the most important factor.
 
-Unlike zcomp_compress_begin(), zcomp_decompress_begin() may return
-zstrm if currently selected compression backend require zstrm for
-decompression or NULL if it does not.
+Kernel build elapsed time in QEMU 8 CPUs 448 MB with zram swap
+lzo : deflate
+188.3 s : 181.9 s
+(3% improvement)
 
-Acked-by: Minchan Kim <minchan@kernel.org>
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+Unlike this situation, on ARM, maybe fast (de)compression speed is
+the most important because it's computation speed is slower than x86.
+
+We can't expect what algorithm is the best fit for one's system, because
+it needs too complex calculation. We need to test it in case by case and
+easy to use new compression algorithm by this patch will help
+that situation.
+
+Note that this patch just convert zram to use crypto contextless
+compression API but doesn't change compression algorithm selection
+interface in zram. So it doesn't support zlib yet. Following patch
+will change this interface and enable various compression algorithm.
+
 Signed-off-by: Joonsoo Kim <iamjoonsoo.kim@lge.com>
 ---
- drivers/block/zram/zcomp.c    |  3 ++-
- drivers/block/zram/zcomp.h    |  3 ++-
- drivers/block/zram/zram_drv.c | 20 ++++++++++++++++----
- 3 files changed, 20 insertions(+), 6 deletions(-)
+ drivers/block/zram/Kconfig    |  8 +++---
+ drivers/block/zram/Makefile   |  4 +--
+ drivers/block/zram/zcomp.c    | 63 ++++++++++++++++++++++++++++---------------
+ drivers/block/zram/zcomp.h    | 21 +++------------
+ drivers/block/zram/zram_drv.c |  6 ++---
+ 5 files changed, 52 insertions(+), 50 deletions(-)
 
+diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
+index 386ba3d..7619bed 100644
+--- a/drivers/block/zram/Kconfig
++++ b/drivers/block/zram/Kconfig
+@@ -1,8 +1,7 @@
+ config ZRAM
+ 	tristate "Compressed RAM block device support"
+ 	depends on BLOCK && SYSFS && ZSMALLOC
+-	select LZO_COMPRESS
+-	select LZO_DECOMPRESS
++	select CRYPTO_LZO
+ 	default n
+ 	help
+ 	  Creates virtual block devices called /dev/zramX (X = 0, 1, ...).
+@@ -18,9 +17,8 @@ config ZRAM
+ config ZRAM_LZ4_COMPRESS
+ 	bool "Enable LZ4 algorithm support"
+ 	depends on ZRAM
+-	select LZ4_COMPRESS
+-	select LZ4_DECOMPRESS
++	select CRYPTO_LZ4
+ 	default n
+ 	help
+ 	  This option enables LZ4 compression algorithm support. Compression
+-	  algorithm can be changed using `comp_algorithm' device attribute.
+\ No newline at end of file
++	  algorithm can be changed using `comp_algorithm' device attribute.
+diff --git a/drivers/block/zram/Makefile b/drivers/block/zram/Makefile
+index be0763f..9e2b79e 100644
+--- a/drivers/block/zram/Makefile
++++ b/drivers/block/zram/Makefile
+@@ -1,5 +1,3 @@
+-zram-y	:=	zcomp_lzo.o zcomp.o zram_drv.o
+-
+-zram-$(CONFIG_ZRAM_LZ4_COMPRESS) += zcomp_lz4.o
++zram-y	:=	zcomp.o zram_drv.o
+ 
+ obj-$(CONFIG_ZRAM)	+=	zram.o
 diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 52d5b04..e3016da 100644
+index e3016da..9be83db 100644
 --- a/drivers/block/zram/zcomp.c
 +++ b/drivers/block/zram/zcomp.c
-@@ -336,7 +336,8 @@ int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
- 			zstrm->private);
+@@ -15,10 +15,6 @@
+ #include <linux/sched.h>
+ 
+ #include "zcomp.h"
+-#include "zcomp_lzo.h"
+-#ifdef CONFIG_ZRAM_LZ4_COMPRESS
+-#include "zcomp_lz4.h"
+-#endif
+ 
+ /*
+  * single zcomp_strm backend
+@@ -43,19 +39,20 @@ struct zcomp_strm_multi {
+ 	wait_queue_head_t strm_wait;
+ };
+ 
+-static struct zcomp_backend *backends[] = {
+-	&zcomp_lzo,
++static const char * const backends[] = {
++	"lzo",
+ #ifdef CONFIG_ZRAM_LZ4_COMPRESS
+-	&zcomp_lz4,
++	"lz4",
+ #endif
+ 	NULL
+ };
+ 
+-static struct zcomp_backend *find_backend(const char *compress)
++static const char *find_backend(const char *compress)
+ {
+ 	int i = 0;
+ 	while (backends[i]) {
+-		if (sysfs_streq(compress, backends[i]->name))
++		if (sysfs_streq(compress, backends[i]) &&
++			crypto_has_comp(backends[i], 0, 0))
+ 			break;
+ 		i++;
+ 	}
+@@ -65,7 +62,7 @@ static struct zcomp_backend *find_backend(const char *compress)
+ static void zcomp_strm_free(struct zcomp *comp, struct zcomp_strm *zstrm)
+ {
+ 	if (zstrm->private)
+-		comp->backend->destroy(zstrm->private);
++		crypto_ccomp_free_context(comp->tfm, zstrm->private);
+ 	free_pages((unsigned long)zstrm->buffer, 1);
+ 	kfree(zstrm);
+ }
+@@ -80,7 +77,13 @@ static struct zcomp_strm *zcomp_strm_alloc(struct zcomp *comp)
+ 	if (!zstrm)
+ 		return NULL;
+ 
+-	zstrm->private = comp->backend->create();
++	zstrm->private = crypto_ccomp_alloc_context(comp->tfm);
++	if (IS_ERR(zstrm->private)) {
++		zstrm->private = NULL;
++		zcomp_strm_free(comp, zstrm);
++		return NULL;
++	}
++
+ 	/*
+ 	 * allocate 2 pages. 1 for compressed data, plus 1 extra for the
+ 	 * case when compressed size is larger than the original one
+@@ -274,12 +277,12 @@ ssize_t zcomp_available_show(const char *comp, char *buf)
+ 	int i = 0;
+ 
+ 	while (backends[i]) {
+-		if (!strcmp(comp, backends[i]->name))
++		if (!strcmp(comp, backends[i]))
+ 			sz += scnprintf(buf + sz, PAGE_SIZE - sz - 2,
+-					"[%s] ", backends[i]->name);
++					"[%s] ", backends[i]);
+ 		else
+ 			sz += scnprintf(buf + sz, PAGE_SIZE - sz - 2,
+-					"%s ", backends[i]->name);
++					"%s ", backends[i]);
+ 		i++;
+ 	}
+ 	sz += scnprintf(buf + sz, PAGE_SIZE - sz, "\n");
+@@ -320,7 +323,10 @@ void zcomp_compress_end(struct zcomp *comp, struct zcomp_strm *zstrm)
+ /* May return NULL, may sleep */
+ struct zcomp_strm *zcomp_decompress_begin(struct zcomp *comp)
+ {
+-	return NULL;
++	if (crypto_ccomp_decomp_noctx(comp->tfm))
++		return NULL;
++
++	return zcomp_strm_find(comp);
  }
  
--int zcomp_decompress(struct zcomp *comp, const unsigned char *src,
-+int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
-+		const unsigned char *src,
- 		size_t src_len, unsigned char *dst)
+ void zcomp_decompress_end(struct zcomp *comp, struct zcomp_strm *zstrm)
+@@ -330,22 +336,29 @@ void zcomp_decompress_end(struct zcomp *comp, struct zcomp_strm *zstrm)
+ }
+ 
+ int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
+-		const unsigned char *src, size_t *dst_len)
++		const unsigned char *src, unsigned int *dst_len)
  {
- 	return comp->backend->decompress(src, src_len, dst);
+-	return comp->backend->compress(src, zstrm->buffer, dst_len,
+-			zstrm->private);
++	*dst_len = PAGE_SIZE << 1;
++
++	return crypto_ccomp_compress(comp->tfm, src, PAGE_SIZE,
++			zstrm->buffer, dst_len, zstrm->private);
+ }
+ 
+ int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
+ 		const unsigned char *src,
+-		size_t src_len, unsigned char *dst)
++		unsigned int src_len, unsigned char *dst)
+ {
+-	return comp->backend->decompress(src, src_len, dst);
++	unsigned int size = PAGE_SIZE;
++	void *private = zstrm ? zstrm->private : NULL;
++
++	return crypto_ccomp_decompress(comp->tfm, src, src_len,
++					dst, &size, private);
+ }
+ 
+ void zcomp_destroy(struct zcomp *comp)
+ {
+ 	comp->destroy(comp);
++	crypto_free_ccomp(comp->tfm);
+ 	kfree(comp);
+ }
+ 
+@@ -360,7 +373,7 @@ void zcomp_destroy(struct zcomp *comp)
+ struct zcomp *zcomp_create(const char *compress, int max_strm)
+ {
+ 	struct zcomp *comp;
+-	struct zcomp_backend *backend;
++	const char *backend;
+ 	int error;
+ 
+ 	backend = find_backend(compress);
+@@ -371,12 +384,18 @@ struct zcomp *zcomp_create(const char *compress, int max_strm)
+ 	if (!comp)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	comp->backend = backend;
++	comp->tfm = crypto_alloc_ccomp(backend, 0, 0);
++	if (IS_ERR(comp->tfm)) {
++		kfree(comp);
++		return ERR_CAST(comp->tfm);
++	}
++
+ 	if (max_strm > 1)
+ 		error = zcomp_strm_multi_create(comp, max_strm);
+ 	else
+ 		error = zcomp_strm_single_create(comp);
+ 	if (error) {
++		crypto_free_ccomp(comp->tfm);
+ 		kfree(comp);
+ 		return ERR_PTR(error);
+ 	}
 diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
-index 616e013..4c09c01 100644
+index 4c09c01..df9268d 100644
 --- a/drivers/block/zram/zcomp.h
 +++ b/drivers/block/zram/zcomp.h
-@@ -66,7 +66,8 @@ int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
+@@ -11,6 +11,7 @@
+ #define _ZCOMP_H_
+ 
+ #include <linux/mutex.h>
++#include <crypto/compress.h>
+ 
+ struct zcomp_strm {
+ 	/* compression/decompression buffer */
+@@ -25,24 +26,10 @@ struct zcomp_strm {
+ 	struct list_head list;
+ };
+ 
+-/* static compression backend */
+-struct zcomp_backend {
+-	int (*compress)(const unsigned char *src, unsigned char *dst,
+-			size_t *dst_len, void *private);
+-
+-	int (*decompress)(const unsigned char *src, size_t src_len,
+-			unsigned char *dst);
+-
+-	void *(*create)(void);
+-	void (*destroy)(void *private);
+-
+-	const char *name;
+-};
+-
+ /* dynamic per-device compression frontend */
+ struct zcomp {
+ 	void *stream;
+-	struct zcomp_backend *backend;
++	struct crypto_ccomp *tfm;
+ 
+ 	struct zcomp_strm *(*strm_find)(struct zcomp *comp);
+ 	void (*strm_release)(struct zcomp *comp, struct zcomp_strm *zstrm);
+@@ -61,14 +48,14 @@ struct zcomp_strm *zcomp_compress_begin(struct zcomp *comp);
+ void zcomp_compress_end(struct zcomp *comp, struct zcomp_strm *zstrm);
+ 
+ int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
+-		const unsigned char *src, size_t *dst_len);
++		const unsigned char *src, unsigned int *dst_len);
+ 
  struct zcomp_strm *zcomp_decompress_begin(struct zcomp *comp);
  void zcomp_decompress_end(struct zcomp *comp, struct zcomp_strm *zstrm);
  
--int zcomp_decompress(struct zcomp *comp, const unsigned char *src,
-+int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
-+		const unsigned char *src,
- 		size_t src_len, unsigned char *dst);
+ int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
+ 		const unsigned char *src,
+-		size_t src_len, unsigned char *dst);
++		unsigned int src_len, unsigned char *dst);
  
  bool zcomp_set_max_streams(struct zcomp *comp, int num_strm);
+ #endif /* _ZCOMP_H_ */
 diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 83a06f2..85d5301 100644
+index 85d5301..6f04fb2 100644
 --- a/drivers/block/zram/zram_drv.c
 +++ b/drivers/block/zram/zram_drv.c
-@@ -560,7 +560,8 @@ static void zram_free_page(struct zram *zram, size_t index)
- 	zram_set_obj_size(meta, index, 0);
- }
- 
--static int zram_decompress_page(struct zram *zram, char *mem, u32 index)
-+static int zram_decompress_page(struct zram *zram, struct zcomp_strm *zstrm,
-+		char *mem, u32 index)
- {
- 	int ret = 0;
+@@ -567,7 +567,7 @@ static int zram_decompress_page(struct zram *zram, struct zcomp_strm *zstrm,
  	unsigned char *cmem;
-@@ -582,7 +583,7 @@ static int zram_decompress_page(struct zram *zram, char *mem, u32 index)
- 	if (size == PAGE_SIZE)
- 		copy_page(mem, cmem);
- 	else
--		ret = zcomp_decompress(zram->comp, cmem, size, mem);
-+		ret = zcomp_decompress(zram->comp, zstrm, cmem, size, mem);
- 	zs_unmap_object(meta->mem_pool, handle);
- 	bit_spin_unlock(ZRAM_ACCESS, &meta->table[index].value);
- 
-@@ -602,6 +603,7 @@ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
- 	struct page *page;
- 	unsigned char *user_mem, *uncmem = NULL;
  	struct zram_meta *meta = zram->meta;
-+	struct zcomp_strm *zstrm;
- 	page = bvec->bv_page;
+ 	unsigned long handle;
+-	size_t size;
++	unsigned int size;
  
  	bit_spin_lock(ZRAM_ACCESS, &meta->table[index].value);
-@@ -617,6 +619,7 @@ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
- 		/* Use  a temporary buffer to decompress the page */
- 		uncmem = kmalloc(PAGE_SIZE, GFP_NOIO);
+ 	handle = meta->table[index].handle;
+@@ -656,7 +656,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
+ 			   int offset)
+ {
+ 	int ret = 0;
+-	size_t clen;
++	unsigned int clen;
+ 	unsigned long handle;
+ 	struct page *page;
+ 	unsigned char *user_mem, *cmem, *src, *uncmem = NULL;
+@@ -731,7 +731,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
  
-+	zstrm = zcomp_decompress_begin(zram->comp);
- 	user_mem = kmap_atomic(page);
- 	if (!is_partial_io(bvec))
- 		uncmem = user_mem;
-@@ -627,7 +630,7 @@ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
- 		goto out_cleanup;
- 	}
- 
--	ret = zram_decompress_page(zram, uncmem, index);
-+	ret = zram_decompress_page(zram, zstrm, uncmem, index);
- 	/* Should NEVER happen. Return bio error if it does. */
- 	if (unlikely(ret))
- 		goto out_cleanup;
-@@ -636,10 +639,14 @@ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
- 		memcpy(user_mem + bvec->bv_offset, uncmem + offset,
- 				bvec->bv_len);
- 
-+	zcomp_decompress_end(zram->comp, zstrm);
-+	zstrm = NULL;
-+
- 	flush_dcache_page(page);
- 	ret = 0;
- out_cleanup:
- 	kunmap_atomic(user_mem);
-+	zcomp_decompress_end(zram->comp, zstrm);
- 	if (is_partial_io(bvec))
- 		kfree(uncmem);
- 	return ret;
-@@ -659,6 +666,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
- 
- 	page = bvec->bv_page;
- 	if (is_partial_io(bvec)) {
-+		struct zcomp_strm *zstrm;
- 		/*
- 		 * This is a partial IO. We need to read the full page
- 		 * before to write the changes.
-@@ -668,7 +676,11 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
- 			ret = -ENOMEM;
- 			goto out;
- 		}
--		ret = zram_decompress_page(zram, uncmem, index);
-+
-+		zstrm = zcomp_decompress_begin(zram->comp);
-+		ret = zram_decompress_page(zram, zstrm, uncmem, index);
-+		zcomp_decompress_end(zram->comp, zstrm);
-+
- 		if (ret)
- 			goto out;
- 	}
+ 	handle = zs_malloc(meta->mem_pool, clen);
+ 	if (!handle) {
+-		pr_err("Error allocating memory for compressed page: %u, size=%zu\n",
++		pr_err("Error allocating memory for compressed page: %u, size=%u\n",
+ 			index, clen);
+ 		ret = -ENOMEM;
+ 		goto out;
 -- 
 1.9.1
