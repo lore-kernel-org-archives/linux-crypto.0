@@ -1,7 +1,7 @@
 From: Daniel Thompson <daniel.thompson@linaro.org>
-Subject: [PATCH v3 1/3] dt-bindings: Document the STM32 HW RNG bindings
-Date: Wed, 14 Oct 2015 16:55:23 +0100
-Message-ID: <1444838125-3422-2-git-send-email-daniel.thompson@linaro.org>
+Subject: [PATCH v3 3/3] ARM: dts: stm32f429: Adopt STM32 RNG driver
+Date: Wed, 14 Oct 2015 16:55:25 +0100
+Message-ID: <1444838125-3422-4-git-send-email-daniel.thompson@linaro.org>
 References: <1443904519-24012-1-git-send-email-daniel.thompson@linaro.org>
  <1444838125-3422-1-git-send-email-daniel.thompson@linaro.org>
 Cc: Daniel Thompson <daniel.thompson@linaro.org>,
@@ -18,54 +18,43 @@ Cc: Daniel Thompson <daniel.thompson@linaro.org>,
 To: Matt Mackall <mpm@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f170.google.com ([209.85.212.170]:34906 "EHLO
-	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932645AbbJNPzo (ORCPT
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:34290 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932668AbbJNPzt (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Oct 2015 11:55:44 -0400
-Received: by wicll6 with SMTP id ll6so3738832wic.0
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Oct 2015 08:55:42 -0700 (PDT)
+	Wed, 14 Oct 2015 11:55:49 -0400
+Received: by wicgb1 with SMTP id gb1so135545218wic.1
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Oct 2015 08:55:48 -0700 (PDT)
 In-Reply-To: <1444838125-3422-1-git-send-email-daniel.thompson@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This adds documentation of device tree bindings for the STM32 hardware
-random number generator.
+New bindings and driver have been created for STM32 series parts. This
+patch integrates this changes.
 
 Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
 Acked-by: Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Acked-by: Rob Herring <robh@kernel.org>
 ---
- .../devicetree/bindings/rng/st,stm32-rng.txt        | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/rng/st,stm32-rng.txt
+ arch/arm/boot/dts/stm32f429.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/rng/st,stm32-rng.txt b/Documentation/devicetree/bindings/rng/st,stm32-rng.txt
-new file mode 100644
-index 000000000000..47f04176f93b
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/st,stm32-rng.txt
-@@ -0,0 +1,21 @@
-+STMicroelectronics STM32 HW RNG
-+===============================
+diff --git a/arch/arm/boot/dts/stm32f429.dtsi b/arch/arm/boot/dts/stm32f429.dtsi
+index cb0613090243..90081fc22c6c 100644
+--- a/arch/arm/boot/dts/stm32f429.dtsi
++++ b/arch/arm/boot/dts/stm32f429.dtsi
+@@ -175,6 +175,13 @@
+ 			reg = <0x40023800 0x400>;
+ 			clocks = <&clk_hse>;
+ 		};
 +
-+The STM32 hardware random number generator is a simple fixed purpose IP and
-+is fully separated from other crypto functions.
-+
-+Required properties:
-+
-+- compatible : Should be "st,stm32-rng"
-+- reg : Should be register base and length as documented in the datasheet
-+- interrupts : The designated IRQ line for the RNG
-+- clocks : The clock needed to enable the RNG
-+
-+Example:
-+
-+	rng: rng@50060800 {
-+		compatible = "st,stm32-rng";
-+		reg = <0x50060800 0x400>;
-+		interrupts = <80>;
-+		clocks = <&rcc 0 38>;
-+	};
++		rng: rng@50060800 {
++			compatible = "st,stm32-rng";
++			reg = <0x50060800 0x400>;
++			interrupts = <80>;
++			clocks = <&rcc 0 38>;
++		};
+ 	};
+ };
+ 
 -- 
 2.4.3
