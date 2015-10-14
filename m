@@ -1,48 +1,66 @@
-From: Dan Streetman <ddstreet@ieee.org>
-Subject: Re: [PATCH V3] crypto/nx842: Add CRC and validation support
-Date: Wed, 14 Oct 2015 10:30:13 -0400
-Message-ID: <CALZtOND_g3Y6AT4HMVMTS7c0L4hx5AdxZ-bCQKSc7KogVnoQdQ@mail.gmail.com>
-References: <1444337151.10131.10.camel@hbabu-laptop> <20151014142718.GD17455@gondor.apana.org.au>
+From: Maxime Coquelin <mcoquelin.stm32-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 0/3] hwrng: stm32 - add support for STM32 HW RNG
+Date: Wed, 14 Oct 2015 16:46:26 +0200
+Message-ID: <CALszF6Db3mzM6xn2Tf4Bs65mGGY5UZspM3NniEC6eHei0oG1NA@mail.gmail.com>
+References: <1443904519-24012-1-git-send-email-daniel.thompson@linaro.org>
+	<1444638090-22886-1-git-send-email-daniel.thompson@linaro.org>
+	<20151014142822.GF17455@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Haren Myneni <haren@linux.vnet.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	Haren Myneni <hbabu@us.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f182.google.com ([209.85.223.182]:33883 "EHLO
-	mail-io0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753540AbbJNOax (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Oct 2015 10:30:53 -0400
-In-Reply-To: <20151014142718.GD17455@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Daniel Thompson <daniel.thompson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+	"devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
+	<linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, linaro-kernel-cunTk1MwBs8s++Sfvej+rw@public.gmane.org,
+	Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
+	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
+	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>,
+	Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20151014142822.GF17455-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Oct 14, 2015 at 10:27 AM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> On Thu, Oct 08, 2015 at 01:45:51PM -0700, Haren Myneni wrote:
+Herbert,
+
+2015-10-14 16:28 GMT+02:00 Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>:
+> On Mon, Oct 12, 2015 at 09:21:27AM +0100, Daniel Thompson wrote:
+>> This patchset introduces a driver for the STM32 hardware random number
+>> generator.
 >>
->> This patch adds CRC generation and validation support for nx-842.
->> Add CRC flag so that nx842 coprocessor includes CRC during compression
->> and validates during decompression.
+>> v2:
 >>
->> Also changes in 842 SW compression to append CRC value at the end
->> of template and checks during decompression.
->>
->> Signed-off-by: Haren Myneni <haren@us.ibm.com>
+>>  * Moved binding docs from .../hwrng/ to .../rng/ and renamed to match
+>>    convention in new directory (Rob Herring).
+>>  * Adopted runtime PM and auto-suspend instead of managing the clocks
+>>    from the read function (Linus Walleij). Increased bandwidth by ~30%.
+>>  * Simplified error detection in main read loop (Linus Walleij, Maxime
+>>    Coquelin).
+>>  * Only WARN_ONCE() when hardware failure mechanisms trigger (Maxime
+>>    Coquelin).
+>>  * Simplify end of probe function after cocci warning (Fengguang Wu).
+>>  * Switch to devm_hwrng_register.
 >
-> Patch applied.  Thanks.
+> All applied.  Thanks!
 
-Thanks Herbert, sorry I didn't have a chance to ack it :)
+I see you again have applied the DT patch like for STi three weeks ago.
+The DT patch should go through the arm_soc tree to avoid Linus having
+to handle conflicts resolution.
 
-Haren, as I don't have access to the NX PowerPC hardware anymore and
-you've taken this over for IBM, can you change the maintainer to
-yourself?
+Can you please remove these two patches from your tree?
+ba25d8b ARM: STi: STiH407: Enable the 2 HW Random Number Generators
+for STiH4{07, 10}
+b47c9fa ARM: dts: stm32f429: Adopt STM32 RNG driver
 
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks,
+Maxime
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
