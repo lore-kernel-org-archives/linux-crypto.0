@@ -1,71 +1,68 @@
 From: Daniel Thompson <daniel.thompson@linaro.org>
-Subject: Re: [cryptodev:master 62/67]
- drivers/char/hw_random/stm32-rng.c:163:51: error: 'pdev' undeclared
-Date: Wed, 14 Oct 2015 16:15:01 +0100
-Message-ID: <561E7175.7050106@linaro.org>
-References: <201510142211.TZbOa7j7%fengguang.wu@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Subject: [PATCH v3 0/3] hwrng: stm32 - add support for STM32 HW RNG
+Date: Wed, 14 Oct 2015 16:55:22 +0100
+Message-ID: <1444838125-3422-1-git-send-email-daniel.thompson@linaro.org>
+References: <1443904519-24012-1-git-send-email-daniel.thompson@linaro.org>
+Cc: Daniel Thompson <daniel.thompson@linaro.org>,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	patches@linaro.org, linaro-kernel@lists.linaro.org,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>,
 	Linus Walleij <linus.walleij@linaro.org>
-To: kbuild test robot <fengguang.wu@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f172.google.com ([209.85.212.172]:34686 "EHLO
-	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752157AbbJNPPE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Oct 2015 11:15:04 -0400
-Received: by wicgb1 with SMTP id gb1so134048503wic.1
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Oct 2015 08:15:03 -0700 (PDT)
-In-Reply-To: <201510142211.TZbOa7j7%fengguang.wu@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1443904519-24012-1-git-send-email-daniel.thompson@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 14/10/15 15:59, kbuild test robot wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> head:   62f57d05e287e950c6e1246b1dba08e12985195a
-> commit: c6a97c42e399ad0d639f616e58e13f0b4ae87626 [62/67] hwrng: stm32 - add support for STM32 HW RNG
-> config: i386-allmodconfig (attached as .config)
-> reproduce:
->          git checkout c6a97c42e399ad0d639f616e58e13f0b4ae87626
->          # save the attached .config to linux build tree
->          make ARCH=i386
->
-> All errors (new ones prefixed by >>):
->
->     drivers/char/hw_random/stm32-rng.c: In function 'stm32_rng_runtime_suspend':
->>> drivers/char/hw_random/stm32-rng.c:163:51: error: 'pdev' undeclared (first use in this function)
->       struct stm32_rng_private *priv = dev_get_drvdata(pdev);
->                                                        ^
->     drivers/char/hw_random/stm32-rng.c:163:51: note: each undeclared identifier is reported only once for each function it appears in
->     drivers/char/hw_random/stm32-rng.c: In function 'stm32_rng_runtime_resume':
->     drivers/char/hw_random/stm32-rng.c:172:51: error: 'pdev' undeclared (first use in this function)
->       struct stm32_rng_private *priv = dev_get_drvdata(pdev);
->                                                        ^
->
-> vim +/pdev +163 drivers/char/hw_random/stm32-rng.c
->
->     157		return devm_hwrng_register(dev, &priv->rng);
->     158	}
->     159	
->     160	#ifdef CONFIG_PM
->     161	static int stm32_rng_runtime_suspend(struct device *dev)
->     162	{
->   > 163		struct stm32_rng_private *priv = dev_get_drvdata(pdev);
->     164	
->     165		stm32_rng_cleanup(&priv->rng);
->     166	
+This patchset introduces a driver for the STM32 hardware random number
+generator.
 
-Oops...
+Herbert: I have assumed the v2 version is *so* badly broken (sorry
+         again for that) that you would probably choose to remove v2
+	 completely and replace it with v3. In a moment I will also
+	 post a patch to fix the build without ripping out v2. Choose
+	 whichever suits you best.
 
-That is a serious oversight on my side. Unlike all my other kernel work 
-I test the STM32 stuff with a buildroot wrapper. I checked that I had 
-CONFIG_PM enabled (for good compile coverage) but it looks like I forgot 
-the "linux-rebuild" when I made final tweaks to the patchset.
+v3:
 
-I will fix immediately.
+ * Fixed build with CONFIG_PM (Fengguang Wu). Runtime tested as normal
+   and also build tested on stm32 (which has CONFIG_PM set) and on
+   x86/COMPILE_TEST with and without CONFIG_PM.
+
+v2:
+
+ * Moved binding docs from .../hwrng/ to .../rng/ and renamed to match
+   convention in new directory (Rob Herring).
+ * Adopted runtime PM and auto-suspend instead of managing the clocks
+   from the read function (Linus Walleij). Increased bandwidth by ~30%.
+ * Simplified error detection in main read loop (Linus Walleij, Maxime
+   Coquelin).
+ * Only WARN_ONCE() when hardware failure mechanisms trigger (Maxime
+   Coquelin).
+ * Simplify end of probe function after cocci warning (Fengguang Wu).
+ * Switch to devm_hwrng_register.
 
 
-Daniel.
+Daniel Thompson (3):
+  dt-bindings: Document the STM32 HW RNG bindings
+  hwrng: stm32 - add support for STM32 HW RNG
+  ARM: dts: stm32f429: Adopt STM32 RNG driver
+
+ .../devicetree/bindings/rng/st,stm32-rng.txt       |  21 +++
+ arch/arm/boot/dts/stm32f429.dtsi                   |   7 +
+ drivers/char/hw_random/Kconfig                     |  12 ++
+ drivers/char/hw_random/Makefile                    |   1 +
+ drivers/char/hw_random/stm32-rng.c                 | 202 +++++++++++++++++++++
+ 5 files changed, 243 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/st,stm32-rng.txt
+ create mode 100644 drivers/char/hw_random/stm32-rng.c
+
+--
+2.4.3
