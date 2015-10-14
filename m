@@ -1,32 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v6 0/2] crypto: akcipher - Changes to asymmetric key API
-Date: Wed, 14 Oct 2015 22:26:50 +0800
-Message-ID: <20151014142650.GB17455@gondor.apana.org.au>
-References: <20151008162644.2509.28472.stgit@tstruk-mobl1>
+Subject: Re: [PATCH v2] crypto/jitterentropy-kcapi: remove unnecessary
+ information from a comment
+Date: Wed, 14 Oct 2015 22:27:06 +0800
+Message-ID: <20151014142705.GC17455@gondor.apana.org.au>
+References: <1444324345-20050-1-git-send-email-kuleshovmail@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Alexander Kuleshov <kuleshovmail@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51882 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:38907 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752420AbbJNO0z (ORCPT
+	with ESMTP id S1753341AbbJNO1J (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Oct 2015 10:26:55 -0400
+	Wed, 14 Oct 2015 10:27:09 -0400
 Content-Disposition: inline
-In-Reply-To: <20151008162644.2509.28472.stgit@tstruk-mobl1>
+In-Reply-To: <1444324345-20050-1-git-send-email-kuleshovmail@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 08, 2015 at 09:26:44AM -0700, Tadeusz Struk wrote:
-> This series updates the asymmetric key API.
-> The changes include
->  - setkey function has been split into set_priv_key and set_pub_key.
->  - akcipher requests takes sgl for src and dst instead of void *.
-> Users of the API i.e. two existing RSA implementation and
-> test mgr code have been updated accordingly.
+On Thu, Oct 08, 2015 at 11:12:25PM +0600, Alexander Kuleshov wrote:
+> The clocksource does not provide clocksource_register() function since
+> f893598 commit (clocksource: Mostly kill clocksource_register()), so
+> let's remove unnecessary information about this function from a comment.
+> 
+> Signed-off-by: Alexander Kuleshov <kuleshovmail@gmail.com>
+> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Both applied.  Thanks!
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
