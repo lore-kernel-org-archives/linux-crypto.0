@@ -1,100 +1,59 @@
-From: Joonsoo Kim <js1304@gmail.com>
-Subject: [PATCH v4 0/8] zram: introduce contextless compression API and use it on zram
-Date: Wed, 14 Oct 2015 16:38:16 +0900
-Message-ID: <1444808304-29320-1-git-send-email-iamjoonsoo.kim@lge.com>
-Cc: Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH 2/3] hwrng: stm32 - add support for STM32 HW RNG
+Date: Wed, 14 Oct 2015 09:39:03 +0200
+Message-ID: <CACRpkdZgHv+1w2Toj-JBk6WA+1q-wU7BCuZi2b_QWB2kq3K=Ng@mail.gmail.com>
+References: <1443904519-24012-1-git-send-email-daniel.thompson@linaro.org>
+	<1444638090-22886-1-git-send-email-daniel.thompson@linaro.org>
+	<1444638090-22886-3-git-send-email-daniel.thompson@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Matt Mackall <mpm@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>
-To: Andrew Morton <akpm@linux-foundation.org>
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Patch Tracking <patches@linaro.org>,
+	Linaro Kernel Mailman List <linaro-kernel@lists.linaro.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>
+To: Daniel Thompson <daniel.thompson@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f50.google.com ([209.85.220.50]:36450 "EHLO
-	mail-pa0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752041AbbJNHib (ORCPT
+Received: from mail-ob0-f175.google.com ([209.85.214.175]:34575 "EHLO
+	mail-ob0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753121AbbJNHjE (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Oct 2015 03:38:31 -0400
+	Wed, 14 Oct 2015 03:39:04 -0400
+Received: by obbda8 with SMTP id da8so33191739obb.1
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Oct 2015 00:39:03 -0700 (PDT)
+In-Reply-To: <1444638090-22886-3-git-send-email-daniel.thompson@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patchset introduce contextless compression API and use it on zram in
-order to support more compression algorithm without more overhead.
+On Mon, Oct 12, 2015 at 10:21 AM, Daniel Thompson
+<daniel.thompson@linaro.org> wrote:
 
-The reason we need to support vairous compression algorithms is that
-zram's performance is highly depend on workload and compression algorithm
-and architecture. Every compression algorithm has it's own strong point.
-For example, zlib is the best for compression ratio, but, it's
-(de)compression speed is rather slow. Against my expectation, in my kernel
-build test with zram swap, in low-memory condition on x86, zlib shows best
-performance than others. In this case, I guess that compression ratio is
-the most important factor.
+> Add support for STMicroelectronics STM32 random number generator.
+>
+> The config value defaults to N, reflecting the fact that STM32 is a
+> very low resource microcontroller platform and unlikely to be targeted
+> by any "grown up" defconfigs.
+>
+> Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
 
-Kernel build elapsed time in QEMU 8 CPUs 448 MB with zram swap
-lzo : deflate
-188.3 s : 181.9 s
-(3% improvement)
+This is a fine driver, love the performance boost you reported
+and stand corrected on the likeness of the other Nomadik driver.
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-Unlike this situation, on ARM, maybe fast (de)compression speed is
-the most important because it's computation speed is slower than x86.
+> +static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
 
-Anyway, there is a concern from Sergey to use crypto API in zram. Current
-crypto API has a limitation that always require tfm object to (de)compress
-something because some of (de)compression function requires scratch buffer
-embedded on tfm even if some of (de)compression function doesn't
-require it. Due to above reason, using crypto API rather than calling
-compression library directly causes more memory footprint and this is
-why zram doesn't use crypto API before.
+Now this read() function is so nice that I feel obliged to
+go in and tidy up the Nomadik driver to be as nice.
 
-To solve this problem, this patchset introduce contextless compression API.
-This new compression API doesn't require user to use tfm one by one.
-Tfm is only used for distinguishing compression algorithm and maybe
-keeping algorithm parameter so can be used concurrently. Context is now
-separate from tfm and user needs to allocate and manage it separately.
-With this separation, we can save memory in some cases and get the best
-performance.
-
-This patchset solves Sergey's concern perfectly and provides possibility
-to use various compression algorithm in zram.
-
-Thanks.
-
-Joonsoo Kim (6):
-  crypto/compress: introduce contextless compression and remove unused
-    pcomp
-  crypto/lzo: support contextless compression API
-  crypto/lz4: support contextless compressiona API
-  crypto/deflate: support contextless compression API
-  zram: use crypto contextless compression API to (de)compress
-  zram: enable contextless compression alg in zram
-
-Sergey Senozhatsky (2):
-  zram: make stream find and release functions static
-  zram: pass zstrm down to decompression path
-
- Documentation/blockdev/zram.txt    |  29 ++-
- crypto/Kconfig                     |  18 +-
- crypto/Makefile                    |   3 +-
- crypto/ccompress.c                 |  95 +++++++++
- crypto/deflate.c                   |  96 +++++++++-
- crypto/lz4.c                       |  77 +++++++-
- crypto/lzo.c                       |  81 ++++++--
- crypto/pcompress.c                 | 115 -----------
- crypto/zlib.c                      | 381 -------------------------------------
- drivers/block/zram/Kconfig         |  13 +-
- drivers/block/zram/Makefile        |   4 +-
- drivers/block/zram/zcomp.c         | 104 ++++++----
- drivers/block/zram/zcomp.h         |  32 ++--
- drivers/block/zram/zram_drv.c      |  33 +++-
- include/crypto/compress.h          | 118 ++++--------
- include/crypto/internal/compress.h |  28 ---
- include/linux/crypto.h             |   2 +-
- 17 files changed, 488 insertions(+), 741 deletions(-)
- create mode 100644 crypto/ccompress.c
- delete mode 100644 crypto/pcompress.c
- delete mode 100644 crypto/zlib.c
- delete mode 100644 include/crypto/internal/compress.h
-
--- 
-1.9.1
+Yours,
+Linus Walleij
