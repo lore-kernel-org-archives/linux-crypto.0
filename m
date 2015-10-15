@@ -1,41 +1,59 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v3 3/3] crypto: keywrap - add testmgr support
-Date: Thu, 15 Oct 2015 08:41:40 +0200
-Message-ID: <7771087.SKby23zovI@myon.chronox.de>
-References: <3564891.reL3VOPkWo@tachyon.chronox.de> <2368869.z13cidVPPU@tauon.atsec.com> <20151015005833.GA22073@gondor.apana.org.au>
+Subject: [PATCH v4 2/3] crypto: keywrap - enable compilation
+Date: Thu, 15 Oct 2015 09:06:56 +0200
+Message-ID: <5374203.OtdO8SCWcB@myon.chronox.de>
+References: <5314960.0aGFzHXOSP@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org,
-	Boris Brezillon <boris.brezillon@free-electrons.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: boris.brezillon@free-electrons.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34336 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:34344 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753919AbbJOGlm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 Oct 2015 02:41:42 -0400
-In-Reply-To: <20151015005833.GA22073@gondor.apana.org.au>
+	id S1754259AbbJOHH7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 15 Oct 2015 03:07:59 -0400
+In-Reply-To: <5314960.0aGFzHXOSP@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 15. Oktober 2015, 08:58:33 schrieb Herbert Xu:
+Hook keywrap source code into Kconfig and Makefile
 
-Hi Herbert,
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/Kconfig  | 7 +++++++
+ crypto/Makefile | 1 +
+ 2 files changed, 8 insertions(+)
 
-> On Wed, Oct 14, 2015 at 08:44:53PM +0200, Stephan Mueller wrote:
-> > Did you apply the depending patch referenced in the beginning?
-> > 
-> > https://lkml.org/lkml/2015/6/16/342
-> > 
-> > I thought I understood you wanted to pull it. If not, I will add the
-> > necessary code and resubmit.
-> 
-> Yes but I want to finish the skcipher conversion before applying
-> these patches so please don't depend on them just yet.
-
-Ok, then I will resubmit my patch, including the aforementioned patch giving 
-credits to Boris.
-
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index fc93444..7240821 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -348,6 +348,13 @@ config CRYPTO_XTS
+ 	  key size 256, 384 or 512 bits. This implementation currently
+ 	  can't handle a sectorsize which is not a multiple of 16 bytes.
+ 
++config CRYPTO_KEYWRAP
++	tristate "Key wrapping support"
++	select CRYPTO_BLKCIPHER
++	help
++	  Support for key wrapping (NIST SP800-38F / RFC3394) without
++	  padding.
++
+ comment "Hash modes"
+ 
+ config CRYPTO_CMAC
+diff --git a/crypto/Makefile b/crypto/Makefile
+index d897e0b..f7aba92 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -70,6 +70,7 @@ obj-$(CONFIG_CRYPTO_CTS) += cts.o
+ obj-$(CONFIG_CRYPTO_LRW) += lrw.o
+ obj-$(CONFIG_CRYPTO_XTS) += xts.o
+ obj-$(CONFIG_CRYPTO_CTR) += ctr.o
++obj-$(CONFIG_CRYPTO_KEYWRAP) += keywrap.o
+ obj-$(CONFIG_CRYPTO_GCM) += gcm.o
+ obj-$(CONFIG_CRYPTO_CCM) += ccm.o
+ obj-$(CONFIG_CRYPTO_CHACHA20POLY1305) += chacha20poly1305.o
 -- 
-Ciao
-Stephan
+2.5.0
