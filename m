@@ -1,42 +1,39 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH] crypto/pkcs7_verify: Fix unaligned access in pkcs7_verify()
-Date: Thu, 15 Oct 2015 16:16:04 +0100
-Message-ID: <20287.1444922164@warthog.procyon.org.uk>
-References: <20151013145401.GM20800@oracle.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, marcel@holtmann.org, David.Woodhouse@intel.com
-To: Sowmini Varadhan <sowmini.varadhan@oracle.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:35603 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752255AbbJOPQK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 Oct 2015 11:16:10 -0400
-In-Reply-To: <20151013145401.GM20800@oracle.com>
-Content-ID: <20286.1444922164.1@warthog.procyon.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: [PATCH] lib/mpi: clean unused SHA1_DIGEST_LENGTH
+Date: Thu, 15 Oct 2015 20:34:53 +0200
+Message-ID: <1444934124-3883-1-git-send-email-clabbe.montjoie@gmail.com>
+References: <1444849860-16334-1-git-send-email-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: clabbe.montjoie@gmail.com, herbert@gondor.apana.org.au,
+	tadeusz.struk@intel.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1444849860-16334-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Sowmini Varadhan <sowmini.varadhan@oracle.com> wrote:
+The define SHA1_DIGEST_LENGTH is not used anywhere, so remove it.
 
-> On sparc, we see unaligned access messages on each modprobe[-r]:
-> 
-> Kernel unaligned access at TPC[6ad9b4] pkcs7_verify [..]
-> Kernel unaligned access at TPC[6a5484] crypto_shash_finup [..]
-> Kernel unaligned access at TPC[6a5390] crypto_shash_update [..]
-> Kernel unaligned access at TPC[10150308] sha1_sparc64_update [..]
-> Kernel unaligned access at TPC[101501ac] __sha1_sparc64_update [..]
-> 
-> These ware triggered by mod_verify_sig() invocations of pkcs_verify(), and
-> are are being caused by an unaligned desc at (sha1, digest_size is 0x14)
->         desc = digest + digest_size;
-> 
-> To fix this, pkcs7_verify needs to make sure that desc is pointing
-> at an aligned value past the digest_size, and kzalloc appropriately,
-> taking alignment values into consideration.
-> 
-> Signed-off-by: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+---
+ include/linux/mpi.h | 6 ------
+ 1 file changed, 6 deletions(-)
 
-Acked-by: David Howells <dhowells@redhat.com>
+diff --git a/include/linux/mpi.h b/include/linux/mpi.h
+index 641b7d6..a792b38 100644
+--- a/include/linux/mpi.h
++++ b/include/linux/mpi.h
+@@ -32,12 +32,6 @@
+ 
+ #include <linux/types.h>
+ 
+-/* DSI defines */
+-
+-#define SHA1_DIGEST_LENGTH   20
+-
+-/*end of DSI defines */
+-
+ #define BYTES_PER_MPI_LIMB	(BITS_PER_LONG / 8)
+ #define BITS_PER_MPI_LIMB	BITS_PER_LONG
+ 
+-- 
+2.4.9
