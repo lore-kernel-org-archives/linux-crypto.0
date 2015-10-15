@@ -1,43 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4 0/3] SP800-38F / RFC3394 key wrapping
-Date: Thu, 15 Oct 2015 21:20:15 +0800
-Message-ID: <20151015132015.GF3981@gondor.apana.org.au>
-References: <5314960.0aGFzHXOSP@myon.chronox.de>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH] crypto/pkcs7_verify: Fix unaligned access in pkcs7_verify()
+Date: Thu, 15 Oct 2015 16:16:04 +0100
+Message-ID: <20287.1444922164@warthog.procyon.org.uk>
+References: <20151013145401.GM20800@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: boris.brezillon@free-electrons.com, linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net, marcel@holtmann.org, David.Woodhouse@intel.com
+To: Sowmini Varadhan <sowmini.varadhan@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47113 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752642AbbJONUW (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 Oct 2015 09:20:22 -0400
-Content-Disposition: inline
-In-Reply-To: <5314960.0aGFzHXOSP@myon.chronox.de>
+Received: from mx1.redhat.com ([209.132.183.28]:35603 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752255AbbJOPQK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 15 Oct 2015 11:16:10 -0400
+In-Reply-To: <20151013145401.GM20800@oracle.com>
+Content-ID: <20286.1444922164.1@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 15, 2015 at 09:05:48AM +0200, Stephan Mueller wrote:
-> Hi,
-> 
-> Changes v4:
-> * make patch 3/3 standalone by incorporating and updating patch
-> https://lkml.org/lkml/2015/6/16/342
-> 
-> Changes v3:
-> * split patch for easier review
-> * add support for full SGL handling in decrypt by adding a "fast-forward"
-> function
-> * significant simplification of code and removal of one memcpy per round
-> * use of scatterwalk API throughout code and removal of self-written code
-> * perform a full CAVS test with all AES implementations available on X86
->   (C, assembler and AES-NI)
+Sowmini Varadhan <sowmini.varadhan@oracle.com> wrote:
 
-v3 applied as we discussed earlier.
+> On sparc, we see unaligned access messages on each modprobe[-r]:
+> 
+> Kernel unaligned access at TPC[6ad9b4] pkcs7_verify [..]
+> Kernel unaligned access at TPC[6a5484] crypto_shash_finup [..]
+> Kernel unaligned access at TPC[6a5390] crypto_shash_update [..]
+> Kernel unaligned access at TPC[10150308] sha1_sparc64_update [..]
+> Kernel unaligned access at TPC[101501ac] __sha1_sparc64_update [..]
+> 
+> These ware triggered by mod_verify_sig() invocations of pkcs_verify(), and
+> are are being caused by an unaligned desc at (sha1, digest_size is 0x14)
+>         desc = digest + digest_size;
+> 
+> To fix this, pkcs7_verify needs to make sure that desc is pointing
+> at an aligned value past the digest_size, and kzalloc appropriately,
+> taking alignment values into consideration.
+> 
+> Signed-off-by: Sowmini Varadhan <sowmini.varadhan@oracle.com>
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Acked-by: David Howells <dhowells@redhat.com>
