@@ -1,42 +1,49 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: [PATCH v4 3/3] crypto: keywrap - add testmgr support
-Date: Thu, 15 Oct 2015 15:11:50 +0800
-Message-ID: <20151015071150.GA1223@gondor.apana.org.au>
-References: <5314960.0aGFzHXOSP@myon.chronox.de>
- <2963701.QnyuGqI2Hv@myon.chronox.de>
+Date: Thu, 15 Oct 2015 09:13:55 +0200
+Message-ID: <14602522.JAGjWGXiOv@myon.chronox.de>
+References: <5314960.0aGFzHXOSP@myon.chronox.de> <2963701.QnyuGqI2Hv@myon.chronox.de> <20151015071150.GA1223@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: boris.brezillon@free-electrons.com, linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:57926 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932449AbbJOHL5 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 Oct 2015 03:11:57 -0400
-Content-Disposition: inline
-In-Reply-To: <2963701.QnyuGqI2Hv@myon.chronox.de>
+Received: from mail.eperm.de ([89.247.134.16]:34352 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753668AbbJOHN6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 15 Oct 2015 03:13:58 -0400
+In-Reply-To: <20151015071150.GA1223@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 15, 2015 at 09:07:40AM +0200, Stephan Mueller wrote:
-> The testmanager code for symmetric ciphers is extended to allow
-> verification of the IV after a cipher operation.
+Am Donnerstag, 15. Oktober 2015, 15:11:50 schrieb Herbert Xu:
+
+Hi Herbert,
+
+> On Thu, Oct 15, 2015 at 09:07:40AM +0200, Stephan Mueller wrote:
+> > The testmanager code for symmetric ciphers is extended to allow
+> > verification of the IV after a cipher operation.
+> > 
+> > In addition, test vectors for kw(aes) for encryption and decryption are
+> > added.
+> > 
+> > Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
 > 
-> In addition, test vectors for kw(aes) for encryption and decryption are
-> added.
+> Oh I see.  This patch can be applied without affect any existing
+> drivers.  In that case I'll just apply Boris's original patch #1
+> and then reapply your previous submission.
 > 
-> Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> Sorry for the confusion.
 
-Oh I see.  This patch can be applied without affect any existing
-drivers.  In that case I'll just apply Boris's original patch #1
-and then reapply your previous submission.
+Note, I had to convert akcipher to skcipher -- thus, I guess you want to take 
+the newer patch and once you get back to Boris' original submission, just pull 
+the updates to the test vectors.
+> 
+> Thanks,
 
-Sorry for the confusion.
 
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
