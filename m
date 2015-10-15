@@ -1,45 +1,63 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 1/5] crypto: ensure algif_hash does not pass a
- zero-sized state
-Date: Thu, 15 Oct 2015 17:41:47 +0800
-Message-ID: <20151015094147.GA2157@gondor.apana.org.au>
-References: <20151009194309.GA7401@n2100.arm.linux.org.uk>
- <E1ZkdZl-0005IT-IU@rmk-PC.arm.linux.org.uk>
- <20151013143312.GA7903@gondor.apana.org.au>
- <20151015093930.GA32532@n2100.arm.linux.org.uk>
+From: LABBE Corentin <montjoie.mailing@gmail.com>
+Subject: Re: [PATCH 1/8] crypto: hash: add zero length message hash for shax
+ and md5
+Date: Thu, 15 Oct 2015 11:42:04 +0200
+Message-ID: <20151015094204.GA6305@Red>
+References: <1444668826-6531-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1444668826-6531-2-git-send-email-clabbe.montjoie@gmail.com>
+ <20151014100802.GA15884@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	"David S. Miller" <davem@davemloft.net>,
+Cc: LABBE Corentin <clabbe.montjoie@gmail.com>, davem@davemloft.net,
+	thomas.lendacky@amd.com, geert+renesas@glider.be,
+	ulf.hansson@linaro.org, wsa@the-dreams.de, keescook@chromium.org,
+	maxime.ripard@free-electrons.com, linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:42397 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751048AbbJOJmF (ORCPT
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:36529 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751048AbbJOJmK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 Oct 2015 05:42:05 -0400
+	Thu, 15 Oct 2015 05:42:10 -0400
 Content-Disposition: inline
-In-Reply-To: <20151015093930.GA32532@n2100.arm.linux.org.uk>
+In-Reply-To: <20151014100802.GA15884@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 15, 2015 at 10:39:30AM +0100, Russell King - ARM Linux wrote:
->
-> The CAAM driver is similarly buggy - it has export/import functions in
-> its ahash drivers, but zero statesize.
+On Wed, Oct 14, 2015 at 06:08:02PM +0800, Herbert Xu wrote:
+> On Mon, Oct 12, 2015 at 06:53:39PM +0200, LABBE Corentin wrote:
+> > Some crypto drivers cannot process empty data message and return a
+> > precalculated hash for md5/sha1/sha224/sha256.
+> > 
+> > This patch add thoses precalculated hash in include/crypto.
+> > 
+> > Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+> > ---
+> >  include/crypto/md5.h |  5 +++++
+> >  include/crypto/sha.h | 20 ++++++++++++++++++++
+> >  2 files changed, 25 insertions(+)
+> > 
+> > diff --git a/include/crypto/md5.h b/include/crypto/md5.h
+> > index 146af82..6496ee0 100644
+> > --- a/include/crypto/md5.h
+> > +++ b/include/crypto/md5.h
+> > @@ -13,6 +13,11 @@
+> >  #define MD5_H2	0x98badcfeUL
+> >  #define MD5_H3	0x10325476UL
+> >  
+> > +static const u8 md5_zero_message_hash[MD5_DIGEST_SIZE] = {
+> > +	0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04,
+> > +	0xe9, 0x80, 0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e,
+> > +};
+> > +
 > 
-> User exploitable kernel stack smashing... I'd suggest putting this patch
-> into stable kernels as high priority, as I'm pretty sure this could be
+> This potentially creates this structure in every file that includes
+> md5.h.  How about putting it into md5_generic and exporting it?
+> 
 
-I agree.  It should already be on its way to stable as Linus has
-pulled it into his tree and it carries a stable cc.
+md5_generic does not exists, do you mean md5.c ?
+I have made some try with EXPORT_SYMBOL() but without success.
+Do you have any example of how to do that ?
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards
