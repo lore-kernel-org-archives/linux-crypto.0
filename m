@@ -1,89 +1,40 @@
-From: Joonsoo Kim <iamjoonsoo.kim@lge.com>
-Subject: Re: [PATCH v4 8/8] zram: enable contextless compression alg in zram
-Date: Thu, 15 Oct 2015 09:45:22 +0900
-Message-ID: <20151015004522.GA4900@js1304-P5Q-DELUXE>
-References: <1444808304-29320-1-git-send-email-iamjoonsoo.kim@lge.com>
- <1444808304-29320-9-git-send-email-iamjoonsoo.kim@lge.com>
- <20151015002903.GB1735@swordfish>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v3 3/3] crypto: keywrap - add testmgr support
+Date: Thu, 15 Oct 2015 08:58:33 +0800
+Message-ID: <20151015005833.GA22073@gondor.apana.org.au>
+References: <3564891.reL3VOPkWo@tachyon.chronox.de>
+ <2239265.sodxccK8do@tachyon.chronox.de>
+ <20151014142623.GA17455@gondor.apana.org.au>
+ <2368869.z13cidVPPU@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Minchan Kim <minchan@kernel.org>,
-	Nitin Gupta <ngupta@vflare.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:46773 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753101AbbJOA6i (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 14 Oct 2015 20:58:38 -0400
 Content-Disposition: inline
-In-Reply-To: <20151015002903.GB1735@swordfish>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <2368869.z13cidVPPU@tauon.atsec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 15, 2015 at 09:29:03AM +0900, Sergey Senozhatsky wrote:
-> Hi,
+On Wed, Oct 14, 2015 at 08:44:53PM +0200, Stephan Mueller wrote:
+>
+> Did you apply the depending patch referenced in the beginning?
 > 
-> On (10/14/15 16:38), Joonsoo Kim wrote:
-> [..]
-> >  static const char * const backends[] = {
-> >  	"lzo",
-> > -#ifdef CONFIG_ZRAM_LZ4_COMPRESS
-> >  	"lz4",
-> > -#endif
-> >  	NULL
-> >  };
-> >  
-> >  static const char *find_backend(const char *compress)
-> >  {
-> > -	int i = 0;
-> > -	while (backends[i]) {
-> > -		if (sysfs_streq(compress, backends[i]) &&
-> > -			crypto_has_comp(backends[i], 0, 0))
-> > -			break;
-> > -		i++;
-> > -	}
-> > -	return backends[i];
-> > +	if (crypto_has_comp(compress, 0, 0))
-> > +		return compress;
-> > +
-> > +	return NULL;
-> >  }
-> >  
-> >  static void zcomp_strm_free(struct zcomp *comp, struct zcomp_strm *zstrm)
-> > @@ -277,6 +271,9 @@ ssize_t zcomp_available_show(const char *comp, char *buf)
-> >  	int i = 0;
-> >  
-> >  	while (backends[i]) {
-> > +		if (!crypto_has_comp(backends[i], 0, 0))
-> > +			continue;
-> > +
+> https://lkml.org/lkml/2015/6/16/342
 > 
-> hm... this sort of looks a bit `unnatural' to me. we have two _independent_
-> sets -- what zram supports and what crypto supports. that's why you have
-> to do extra work and consult crypto. can we return back the old scheme:
-> use ifdef CONFIG in backends, but replace CONFIG_ZRAM with CONFIG_CRYPTO?
-> 
-> e.g.
-> 
-> 	static const char * const backends[] = {
-> 		"lzo",
-> 	#ifdef CONFIG_CRYPTO_LZ4
-> 		"lz4",
-> 	#endif
-> 		NULL
-> 	};
-> 
-> 
-> so you can remove `crypto_has_comp(backends[i], 0, 0)' from
-> zcomp_available_show(), because zram will support *only* what
-> crypto supports.
+> I thought I understood you wanted to pull it. If not, I will add the necessary 
+> code and resubmit.
 
-Hello, Sergey.
+Yes but I want to finish the skcipher conversion before applying
+these patches so please don't depend on them just yet.
 
-Okay. I will change it in next spin.
-
-Anyway, now I noticed that crypto_has_comp() is not proper API to
-check contextless compression algorithm. I will change it, too.
-
-Thanks.
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
