@@ -1,55 +1,58 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: add asynchronous compression support
-Date: Fri, 16 Oct 2015 23:13:54 +0800
-Message-ID: <20151016151354.GA16648@gondor.apana.org.au>
-References: <1445008260-39367-1-git-send-email-weigang.li@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, tadeusz.struk@intel.com,
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-To: Weigang Li <weigang.li@intel.com>
+From: Daniel Thompson <daniel.thompson@linaro.org>
+Subject: [PATCH] hwrng: exynos - Fix unbalanced PM runtime get/puts
+Date: Fri, 16 Oct 2015 17:01:51 +0100
+Message-ID: <1445011311-32142-1-git-send-email-daniel.thompson@linaro.org>
+Cc: Daniel Thompson <daniel.thompson@linaro.org>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	patches@linaro.org, linaro-kernel@lists.linaro.org,
+	Kukjin Kim <kgene@kernel.org>,
+	Krzysztof Kozlowski <k.kozlowski@samsung.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Matt Mackall <mpm@selenic.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52433 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932207AbbJPPN7 (ORCPT
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:35983 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932305AbbJPQCN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 16 Oct 2015 11:13:59 -0400
-Content-Disposition: inline
-In-Reply-To: <1445008260-39367-1-git-send-email-weigang.li@intel.com>
+	Fri, 16 Oct 2015 12:02:13 -0400
+Received: by wicgb1 with SMTP id gb1so15284609wic.1
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2015 09:02:12 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Oct 16, 2015 at 11:11:00PM +0800, Weigang Li wrote:
-> This patch set introduces Asynchronous Compression API.
-> What is proposed is a new crypto type called crypto_acomp_type, 
-> plus new struct acomp_alg and struct crypto_acomp, together with number 
-> of helper functions to register acomp type algorithms and allocate tfm 
-> instances. This is to make it similar to how the existing crypto API 
-> works for the ablkcipher, and akcipher types.
-> The operations the new interface will provide are:
-> 
-> 	int (*compress)(struct acompress_request *req);
-> 	int (*decompress)(struct acompress_request *req);
-> 
-> The benefits it gives interface are:
-> - the new interface allows for asynchronous implementations and
->   scatterlist buffer that can use hardware to offload the compression
->   operations, the new asynchronous API can be called by the linux kernel
->   components (i.e., btrfs) who want to use hardware acceleration for data
->   compression.
-> 
-> New helper functions have been added to allocate crypto_acomp instances 
-> and invoke the operations to make it easier to use.
-> 
-> Signed-off-by: Weigang Li <weigang.li@intel.com>
+Currently this driver calls pm_runtime_get_sync() rampantly
+but never puts anything back. This makes it impossible for the
+device to autosuspend properly; it will remain fully active
+after the first use.
 
-Thanks for the patch! Joonsoo Kim is also working on the compression
-interface for zram.  Could you two collaborate and come up with one
-interface rather than two?
+Fix in the obvious way.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
+Cc: Kukjin Kim <kgene@kernel.org>
+Cc: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+---
+
+Notes:
+    Compile tested only (CONFIG_PM=y, CONFIG_HW_RANDOM_EXYNOS=m); I spotted
+    this whilst reviewing the code and don't have an exynos platform to
+    test on.
+
+ drivers/char/hw_random/exynos-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/char/hw_random/exynos-rng.c b/drivers/char/hw_random/exynos-rng.c
+index dc4701fd814f..73318e2a34dd 100644
+--- a/drivers/char/hw_random/exynos-rng.c
++++ b/drivers/char/hw_random/exynos-rng.c
+@@ -95,7 +95,7 @@ static int exynos_read(struct hwrng *rng, void *buf,
+ 	*data = exynos_rng_readl(exynos_rng, EXYNOS_PRNG_OUT1_OFFSET);
+
+ 	pm_runtime_mark_last_busy(exynos_rng->dev);
+-	pm_runtime_autosuspend(exynos_rng->dev);
++	pm_runtime_put_sync_autosuspend(exynos_rng->dev);
+
+ 	return 4;
+ }
+--
+2.4.3
