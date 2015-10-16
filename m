@@ -1,27 +1,58 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH] crypto: x86: Remove duplicate define of SHA1_DIGEST_SIZE
-Date: Fri, 16 Oct 2015 09:04:58 -0700
-Message-ID: <1445011498.14635.1.camel@schen9-desk2.jf.intel.com>
-References: <1444850171-17931-1-git-send-email-clabbe.montjoie@gmail.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] crypto: qat - fix crypto_get_instance_node function
+Date: Fri, 16 Oct 2015 11:40:56 -0700
+Message-ID: <20151016184056.21772.40366.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: ameenali023@gmail.com, bp@alien8.de, dan.carpenter@oracle.com,
-	davem@davemloft.net, firogm@gmail.com, herbert@gondor.apana.org.au,
-	hpa@zytor.com, mingo@redhat.com, minipli@googlemail.com,
-	smueller@chronox.de, tglx@linutronix.de, x86@kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1444850171-17931-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	tadeusz.struk@intel.com
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:18061 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932303AbbJPSnY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 16 Oct 2015 14:43:24 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2015-10-14 at 21:15 +0200, LABBE Corentin wrote:
-> The sha x86 crypto code use two define for the same thing:
-> NUM_SHA1_DIGEST_WORDS and SHA1_DIGEST_LENGTH
-> Replace them by SHA1_DIGEST_SIZE/4
+qat_crypto_get_instance_node function needs to handle situation when the
+first dev in the list is not started.
 
-Thanks.  Acked-by: Tim Chen <tim.c.chen@linux.intel.com>
-> 
-> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ drivers/crypto/qat/qat_common/qat_crypto.c |   20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/qat/qat_common/qat_crypto.c b/drivers/crypto/qat/qat_common/qat_crypto.c
+index 25db27c..9cab154 100644
+--- a/drivers/crypto/qat/qat_common/qat_crypto.c
++++ b/drivers/crypto/qat/qat_common/qat_crypto.c
+@@ -118,11 +118,23 @@ struct qat_crypto_instance *qat_crypto_get_instance_node(int node)
+ 			}
+ 		}
+ 	}
+-	if (!accel_dev) {
+-		pr_err("QAT: Could not find a device on node %d\n", node);
+-		accel_dev = adf_devmgr_get_first();
++	if (!accel_dev)
++		pr_info("QAT: Could not find a device on node %d\n", node);
++
++	/* Get any started device */
++	list_for_each(itr, adf_devmgr_get_head()) {
++		struct adf_accel_dev *tmp_dev;
++
++		tmp_dev = list_entry(itr, struct adf_accel_dev, list);
++
++		if (adf_dev_started(tmp_dev) &&
++		    !list_empty(&tmp_dev->crypto_list)) {
++			accel_dev = tmp_dev;
++			break;
++		}
+ 	}
+-	if (!accel_dev || !adf_dev_started(accel_dev))
++
++	if (!accel_dev)
+ 		return NULL;
+ 
+ 	best = ~0;
