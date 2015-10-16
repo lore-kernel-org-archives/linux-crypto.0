@@ -1,58 +1,27 @@
-From: Daniel Thompson <daniel.thompson@linaro.org>
-Subject: [PATCH] hwrng: exynos - Fix unbalanced PM runtime get/puts
-Date: Fri, 16 Oct 2015 17:01:51 +0100
-Message-ID: <1445011311-32142-1-git-send-email-daniel.thompson@linaro.org>
-Cc: Daniel Thompson <daniel.thompson@linaro.org>,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	patches@linaro.org, linaro-kernel@lists.linaro.org,
-	Kukjin Kim <kgene@kernel.org>,
-	Krzysztof Kozlowski <k.kozlowski@samsung.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Matt Mackall <mpm@selenic.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:35983 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932305AbbJPQCN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 16 Oct 2015 12:02:13 -0400
-Received: by wicgb1 with SMTP id gb1so15284609wic.1
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2015 09:02:12 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH] crypto: x86: Remove duplicate define of SHA1_DIGEST_SIZE
+Date: Fri, 16 Oct 2015 09:04:58 -0700
+Message-ID: <1445011498.14635.1.camel@schen9-desk2.jf.intel.com>
+References: <1444850171-17931-1-git-send-email-clabbe.montjoie@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: ameenali023@gmail.com, bp@alien8.de, dan.carpenter@oracle.com,
+	davem@davemloft.net, firogm@gmail.com, herbert@gondor.apana.org.au,
+	hpa@zytor.com, mingo@redhat.com, minipli@googlemail.com,
+	smueller@chronox.de, tglx@linutronix.de, x86@kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1444850171-17931-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Currently this driver calls pm_runtime_get_sync() rampantly
-but never puts anything back. This makes it impossible for the
-device to autosuspend properly; it will remain fully active
-after the first use.
+On Wed, 2015-10-14 at 21:15 +0200, LABBE Corentin wrote:
+> The sha x86 crypto code use two define for the same thing:
+> NUM_SHA1_DIGEST_WORDS and SHA1_DIGEST_LENGTH
+> Replace them by SHA1_DIGEST_SIZE/4
 
-Fix in the obvious way.
-
-Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
-Cc: Kukjin Kim <kgene@kernel.org>
-Cc: Krzysztof Kozlowski <k.kozlowski@samsung.com>
----
-
-Notes:
-    Compile tested only (CONFIG_PM=y, CONFIG_HW_RANDOM_EXYNOS=m); I spotted
-    this whilst reviewing the code and don't have an exynos platform to
-    test on.
-
- drivers/char/hw_random/exynos-rng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/char/hw_random/exynos-rng.c b/drivers/char/hw_random/exynos-rng.c
-index dc4701fd814f..73318e2a34dd 100644
---- a/drivers/char/hw_random/exynos-rng.c
-+++ b/drivers/char/hw_random/exynos-rng.c
-@@ -95,7 +95,7 @@ static int exynos_read(struct hwrng *rng, void *buf,
- 	*data = exynos_rng_readl(exynos_rng, EXYNOS_PRNG_OUT1_OFFSET);
-
- 	pm_runtime_mark_last_busy(exynos_rng->dev);
--	pm_runtime_autosuspend(exynos_rng->dev);
-+	pm_runtime_put_sync_autosuspend(exynos_rng->dev);
-
- 	return 4;
- }
---
-2.4.3
+Thanks.  Acked-by: Tim Chen <tim.c.chen@linux.intel.com>
+> 
+> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
