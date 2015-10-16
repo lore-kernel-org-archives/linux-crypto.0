@@ -1,58 +1,69 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH] crypto: qat - fix crypto_get_instance_node function
-Date: Fri, 16 Oct 2015 11:40:56 -0700
-Message-ID: <20151016184056.21772.40366.stgit@tstruk-mobl1>
+From: Victoria Milhoan <vicki.milhoan@freescale.com>
+Subject: Re: [PATCH v3 1/5] crypto: ensure algif_hash does not pass a
+ zero-sized state
+Date: Fri, 16 Oct 2015 16:24:54 -0700
+Message-ID: <20151016162454.64d1102514dfc9c84a9d8be1@freescale.com>
+References: <20151009194309.GA7401@n2100.arm.linux.org.uk>
+	<E1ZkdZl-0005IT-IU@rmk-PC.arm.linux.org.uk>
+	<20151013143312.GA7903@gondor.apana.org.au>
+	<20151015093930.GA32532@n2100.arm.linux.org.uk>
+	<20151015094147.GA2157@gondor.apana.org.au>
+	<20151015125944.GB32532@n2100.arm.linux.org.uk>
+	<20151015131338.GA3901@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	tadeusz.struk@intel.com
-To: herbert@gondor.apana.org.au
+Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>,
+	Fabio Estevam <fabio.estevam@freescale.com>,
+	Horia Geant? <horia.geanta@freescale.com>,
+	Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:18061 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932303AbbJPSnY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 16 Oct 2015 14:43:24 -0400
+Received: from mail-bn1bbn0105.outbound.protection.outlook.com ([157.56.111.105]:36252
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751492AbbJPXZH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 16 Oct 2015 19:25:07 -0400
+In-Reply-To: <20151015131338.GA3901@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-qat_crypto_get_instance_node function needs to handle situation when the
-first dev in the list is not started.
+On Thu, 15 Oct 2015 21:13:38 +0800
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
- drivers/crypto/qat/qat_common/qat_crypto.c |   20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+> On Thu, Oct 15, 2015 at 01:59:44PM +0100, Russell King - ARM Linux wrote:
+> >
+> > I think the CAAM driver is pretty unfixable from a trivial point of
+> > view.  This driver exports a huge amount of state - it contains both a
+> > struct caam_hash_ctx and a struct caam_hash_state, which totals up to
+> > 1600 bytes.  This fails the:
+> 
+> Right just dumping the state out as is not going to work.  This
+> is not supposed to be how export works anyway.  But it doesn't
+> look too bad as most of that 1600 is consumed by the hardware
+> program descriptor which can easily be regenerated upon import.
+> 
+> The only things that need to be exported AFAICS are key and buf_X.
 
-diff --git a/drivers/crypto/qat/qat_common/qat_crypto.c b/drivers/crypto/qat/qat_common/qat_crypto.c
-index 25db27c..9cab154 100644
---- a/drivers/crypto/qat/qat_common/qat_crypto.c
-+++ b/drivers/crypto/qat/qat_common/qat_crypto.c
-@@ -118,11 +118,23 @@ struct qat_crypto_instance *qat_crypto_get_instance_node(int node)
- 			}
- 		}
- 	}
--	if (!accel_dev) {
--		pr_err("QAT: Could not find a device on node %d\n", node);
--		accel_dev = adf_devmgr_get_first();
-+	if (!accel_dev)
-+		pr_info("QAT: Could not find a device on node %d\n", node);
-+
-+	/* Get any started device */
-+	list_for_each(itr, adf_devmgr_get_head()) {
-+		struct adf_accel_dev *tmp_dev;
-+
-+		tmp_dev = list_entry(itr, struct adf_accel_dev, list);
-+
-+		if (adf_dev_started(tmp_dev) &&
-+		    !list_empty(&tmp_dev->crypto_list)) {
-+			accel_dev = tmp_dev;
-+			break;
-+		}
- 	}
--	if (!accel_dev || !adf_dev_started(accel_dev))
-+
-+	if (!accel_dev)
- 		return NULL;
- 
- 	best = ~0;
+I just pushed out a patch for export/import functions in the CAAM driver. The
+patch has been through testing with OpenSSL and the AF_ALG plugin on the MX6.
+
+> 
+> Cheers,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+-- 
+Victoria Milhoan <vicki.milhoan@freescale.com>
