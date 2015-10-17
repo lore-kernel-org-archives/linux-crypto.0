@@ -1,11 +1,10 @@
 From: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Subject: Re: [PATCH] crypto: caam - Add support for hashing export and import
  functions
-Date: Sat, 17 Oct 2015 15:11:37 +0100
-Message-ID: <20151017141137.GN32532@n2100.arm.linux.org.uk>
+Date: Sat, 17 Oct 2015 18:36:36 +0100
+Message-ID: <20151017173636.GO32532@n2100.arm.linux.org.uk>
 References: <1445037573-29667-1-git-send-email-vicki.milhoan@freescale.com>
- <20151017094300.GL32532@n2100.arm.linux.org.uk>
- <20151017065744.8ef86a4edd0de0084ed8e5c6@freescale.com>
+ <20151017105254.GM32532@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
@@ -15,52 +14,77 @@ Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
 	davem@davemloft.net
 To: Victoria Milhoan <vicki.milhoan@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:42922 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:43294 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751841AbbJQOLq (ORCPT
+	with ESMTP id S1751668AbbJQRgs (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 17 Oct 2015 10:11:46 -0400
+	Sat, 17 Oct 2015 13:36:48 -0400
 Content-Disposition: inline
-In-Reply-To: <20151017065744.8ef86a4edd0de0084ed8e5c6@freescale.com>
+In-Reply-To: <20151017105254.GM32532@n2100.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Oct 17, 2015 at 06:57:44AM -0700, Victoria Milhoan wrote:
-> Correct - this was apparently the wrong patch I pushed out. The one I'm
-> actively using has this fixed (this is the only difference). I will make
-> this change in v2 after reviewing your other comments.
+On Sat, Oct 17, 2015 at 11:52:54AM +0100, Russell King - ARM Linux wrote:
+> Now, with that change, and with your change to buf_0/buf_1, I see
+> (before the import/export functions are used) several of these errors:
+> 
+> caam_jr 2101000.jr0: 40000501: DECO: desc idx 5: SGT Length Error. The descriptor is trying to read more data than is contained in the SGT table.
+> 
+> when checking using openssh.  They don't occur when testing with openssl
+> performing normal hashes (as per my previously posted script) but only
+> with openssh.
 
-Thanks Victoria, but please perform the tests I've suggested in one of
-my previous emails - merely testing with openssl's built-in tests aren't
-sufficient.  Also, openssl is non-obvious with what it's testing,
-especially if you're using "openssl speed".  I'm afraid it's a case of
-"you don't know what's being tested unless you've read the openssl
-source" :(
+The hardware seems to be quite justified in complaining - I've added code
+to dump out the scatter list as well:
 
-However, while trying to debug the DECO stuff, I've stumbled across this:
+jobdesc@879: e4bd7c18: b0861c08 3cd29080 f1400000 34bd7c38  .......<..@.8|.4
+jobdesc@879: e4bd7c28: 00000068 f8400000 3ccf3640 00000028  h.....@.@6.<(...
+sg@882: e4bd7c38: 00000000 3ccf3640 00000028 00000000
+sg@882: e4bd7c48: 00000000 34bd7300 00000006 00000000
+sg@882: e4bd7c58: 00000000 7528a070 40000020 00000000
 
-static inline void append_ptr(u32 *desc, dma_addr_t ptr)
-{
-        dma_addr_t *offset = (dma_addr_t *)desc_end(desc);
+If I'm interpreting this correctly:
 
-        *offset = ptr;
+	f1400000 34bd7c38 00000068
 
-        (*desc) += CAAM_PTR_SZ / CAAM_CMD_SZ;
-}
+tells the CAAM to read 0x68 bytes using the scatterlist at 0x34bd7c38.
 
-where I think 'desc' points to memory used for the descriptor, which is
-read by hardware, correct?
+The scatterlist here contains three entries, which have lengths 0x28,
+0x6 and 0x20, which total up to 0x4e bytes, not 0x68.
 
-If that's true, why are we using dma_addr_t here?  dma_addr_t can be
-either 32-bit or 64-bit depending on the kernel configuration, and I
-suspect if this driver is built with dma_addr_t set to 64-bit, things
-will go awry.
+Now, looking at how the scatterlist is created, I have yet more questions.
 
-Also, what endianness are the hardware descriptors?  Are they always
-native CPU endian, or are they fixed as little endian?  If they're always
-little endian, is there any reason not to use __le32 and cpu_to_le32()/
-le32_to_cpu() as appropriate to ensure that it works on big endian
-systems?
+1. What's this dma_map_sg_chained() and dma_unmap_sg_chained() stuff?
+   What's wrong with just calling dma_map_sg() on the scatterlist, giving
+   it the number of entries we want to map?  dma_map_sg() is supposed to
+   deal with chained scatterlists, if it doesn't, it's buggy.
+
+2. src_map_to_sec4_sg() fails to check whether dma_map_sg_chained() failed.
+   if it failed, we continue anyway, poking invalid addresses into the
+   hardware scatterlist, thereby causing memory corruption.
+
+3. __sg_count() - what's going on with this.  This seems to assume that
+   scatterlists aren't chained as:
+
+                if (!sg_is_last(sg) && (sg + 1)->length == 0)
+
+   sg + 1 may _not_ be sg_next(sg) - and this will walk off the end of
+   the array.
+
+4. Is the try_buf_map_to_sec4_sg() call correct?  Shouldn't it be:
+
+@@ -838,7 +838,7 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 		state->buf_dma = try_buf_map_to_sec4_sg(jrdev,
+ 							edesc->sec4_sg + 1,
+ 							buf, state->buf_dma,
+-							*next_buflen, *buflen);
++							*buflen, last_buflen);
+ 
+ 		if (src_nents) {
+  			src_map_to_sec4_sg(jrdev, req->src, src_nents,
+
+   Indeed, with this change, my ssh test works, and the DECO errors are
+   gone.
 
 -- 
 FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
