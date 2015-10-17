@@ -1,133 +1,111 @@
 From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [PATCH] crypto: caam - Add support for hashing export and import
- functions
-Date: Sat, 17 Oct 2015 08:39:23 +0100
-Message-ID: <20151017073923.GJ32532@n2100.arm.linux.org.uk>
-References: <1445037573-29667-1-git-send-email-vicki.milhoan@freescale.com>
+Subject: Re: [PATCH v3 1/5] crypto: ensure algif_hash does not pass a
+ zero-sized state
+Date: Sat, 17 Oct 2015 08:56:21 +0100
+Message-ID: <20151017075621.GK32532@n2100.arm.linux.org.uk>
+References: <20151009194309.GA7401@n2100.arm.linux.org.uk>
+ <E1ZkdZl-0005IT-IU@rmk-PC.arm.linux.org.uk>
+ <20151013143312.GA7903@gondor.apana.org.au>
+ <20151015093930.GA32532@n2100.arm.linux.org.uk>
+ <20151015094147.GA2157@gondor.apana.org.au>
+ <20151015125944.GB32532@n2100.arm.linux.org.uk>
+ <20151015131338.GA3901@gondor.apana.org.au>
+ <20151016162454.64d1102514dfc9c84a9d8be1@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	horia.geanta@freescale.com, fabio.estevam@freescale.com,
-	boris.brezillon@free-electrons.com, arno@natisbad.org,
-	thomas.petazzoni@free-electrons.com, jason@lakedaemon.net,
-	davem@davemloft.net
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Fabio Estevam <fabio.estevam@freescale.com>,
+	Horia Geant? <horia.geanta@freescale.com>,
+	Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
 To: Victoria Milhoan <vicki.milhoan@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:42415 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:42452 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750914AbbJQHjf (ORCPT
+	with ESMTP id S1751066AbbJQH4e (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 17 Oct 2015 03:39:35 -0400
+	Sat, 17 Oct 2015 03:56:34 -0400
 Content-Disposition: inline
-In-Reply-To: <1445037573-29667-1-git-send-email-vicki.milhoan@freescale.com>
+In-Reply-To: <20151016162454.64d1102514dfc9c84a9d8be1@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Oct 16, 2015 at 04:19:33PM -0700, Victoria Milhoan wrote:
-> @@ -319,7 +319,7 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
->  		have_key = OP_ALG_AAI_HMAC_PRECOMP;
->  
->  	/* ahash_update shared descriptor */
-> -	desc = ctx->sh_desc_update;
-> +	desc = kmalloc(DESC_HASH_MAX_USED_BYTES, GFP_KERNEL | GFP_DMA);
+On Fri, Oct 16, 2015 at 04:24:54PM -0700, Victoria Milhoan wrote:
+> On Thu, 15 Oct 2015 21:13:38 +0800
+> Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> 
+> > On Thu, Oct 15, 2015 at 01:59:44PM +0100, Russell King - ARM Linux wrote:
+> > >
+> > > I think the CAAM driver is pretty unfixable from a trivial point of
+> > > view.  This driver exports a huge amount of state - it contains both a
+> > > struct caam_hash_ctx and a struct caam_hash_state, which totals up to
+> > > 1600 bytes.  This fails the:
+> > 
+> > Right just dumping the state out as is not going to work.  This
+> > is not supposed to be how export works anyway.  But it doesn't
+> > look too bad as most of that 1600 is consumed by the hardware
+> > program descriptor which can easily be regenerated upon import.
+> > 
+> > The only things that need to be exported AFAICS are key and buf_X.
+> 
+> I just pushed out a patch for export/import functions in the CAAM driver. The
+> patch has been through testing with OpenSSL and the AF_ALG plugin on the MX6.
 
-What if kmalloc() fails?  Should this really oops the kernel?  Ditto
-for every other kmalloc you've added below.
- 
-> @@ -1557,6 +1575,20 @@ static int ahash_export(struct ahash_request *req, void *out)
->  	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
->  	struct caam_hash_state *state = ahash_request_ctx(req);
->  
-> +	/*
-> +	 * Do not export the data buffers. New buffers are
-> +	 * allocated during import.
-> +	 */
-> +	kfree(state->buf_0);
-> +	kfree(state->buf_1);
-> +	state->buf_0 = NULL;
-> +	state->buf_1 = NULL;
-> +
-> +	state->current_buf = 0;
-> +	state->buf_dma = 0;
-> +	state->buflen_0 = 0;
-> +	state->buflen_1 = 0;
-> +
+Be careful with that.  There's two ways to test:
 
-So what if I export, and then continue using _this_ context later?
+1. Checking hash output.
 
-> @@ -1605,6 +1641,8 @@ static struct caam_hash_template driver_hash[] = {
->  			.setkey = ahash_setkey,
->  			.halg = {
->  				.digestsize = SHA1_DIGEST_SIZE,
-> +				.statesize = sizeof(struct caam_hash_ctx) +
-> +					     sizeof(struct caam_hash_state),
+Preparation - copy openssl.cnf and add this to openssl.cnf:
 
-Much prefer to have a 'struct caam_hash_export_state' thing rather than
-litter the code with the knowledge that these two go together.
+openssl_conf            = openssl_def
 
->  				},
->  			},
->  		.alg_type = OP_ALG_ALGSEL_SHA1,
-> @@ -1626,6 +1664,8 @@ static struct caam_hash_template driver_hash[] = {
->  			.setkey = ahash_setkey,
->  			.halg = {
->  				.digestsize = SHA224_DIGEST_SIZE,
-> +				.statesize = sizeof(struct caam_hash_ctx) +
-> +					     sizeof(struct caam_hash_state),
->  				},
->  			},
->  		.alg_type = OP_ALG_ALGSEL_SHA224,
-> @@ -1647,6 +1687,8 @@ static struct caam_hash_template driver_hash[] = {
->  			.setkey = ahash_setkey,
->  			.halg = {
->  				.digestsize = SHA256_DIGEST_SIZE,
-> +				.statesize = sizeof(struct caam_hash_ctx) +
-> +					     sizeof(struct caam_hash_state),
->  				},
->  			},
->  		.alg_type = OP_ALG_ALGSEL_SHA256,
-> @@ -1668,6 +1710,8 @@ static struct caam_hash_template driver_hash[] = {
->  			.setkey = ahash_setkey,
->  			.halg = {
->  				.digestsize = SHA384_DIGEST_SIZE,
-> +				.statesize = sizeof(struct caam_hash_ctx) +
-> +					     sizeof(struct caam_hash_state),
->  				},
->  			},
->  		.alg_type = OP_ALG_ALGSEL_SHA384,
-> @@ -1689,6 +1733,8 @@ static struct caam_hash_template driver_hash[] = {
->  			.setkey = ahash_setkey,
->  			.halg = {
->  				.digestsize = SHA512_DIGEST_SIZE,
-> +				.statesize = sizeof(struct caam_hash_ctx) +
-> +					     sizeof(struct caam_hash_state),
->  				},
->  			},
->  		.alg_type = OP_ALG_ALGSEL_SHA512,
-> @@ -1710,6 +1756,8 @@ static struct caam_hash_template driver_hash[] = {
->  			.setkey = ahash_setkey,
->  			.halg = {
->  				.digestsize = MD5_DIGEST_SIZE,
-> +				.statesize = sizeof(struct caam_hash_ctx) +
-> +					     sizeof(struct caam_hash_state),
->  				},
->  			},
->  		.alg_type = OP_ALG_ALGSEL_MD5,
-> @@ -1796,6 +1844,12 @@ static void caam_hash_cra_exit(struct crypto_tfm *tfm)
->  		dma_unmap_single(ctx->jrdev, ctx->sh_desc_finup_dma,
->  				 desc_bytes(ctx->sh_desc_finup), DMA_TO_DEVICE);
->  
-> +	kfree(ctx->sh_desc_update);
-> +	kfree(ctx->sh_desc_update_first);
-> +	kfree(ctx->sh_desc_fin);
-> +	kfree(ctx->sh_desc_digest);
-> +	kfree(ctx->sh_desc_finup);
-> +
+[openssl_def]
+engines                 = engine_section
 
-What happens to these when ahash_import() overwrites all the context
-state?  Doesn't this mean we end up with double-kfree()s ?
+[engine_section]
+af_alg                  = af_alg_engine
 
-Also, did you test this DMA debug enabled?
+[af_alg_engine]
+CIPHERS=aes-128-cbc aes-192-cbc aes-256-cbc des-cbc des-ede3-cbc
+
+DIGESTS=md5 sha1 sha256 sha512
+
+# Putting this last means we register the above as the default algorithms
+default_algorithms      = ALL
+
+Then:
+
+#!/bin/sh
+
+for type in md5 sha1 sha256 sha512; do
+   echo -n "Checking $type hash:"
+   for file in /bin/*; do
+      echo -n " $file"
+      if ! OPENSSL_CONF=./openssl.cnf openssl dgst -$type < $file | sed "s,(stdin)= ,,;s,\$,\t$file," | ${type}sum -c > /dev/null; then
+         echo " ... failed"
+         echo -n "Openssl says: " >&2
+         OPENSSL_CONF=./openssl.cnf openssl dgst -$type < $file | sed "s,(stdin)= ,,;s,\$,\t$file," >&2
+         echo -n "${type}sum says: " >&2
+         ${type}sum $file >&2
+         exit 1
+      fi
+   done
+   echo " ... ok"
+done
+echo "All hashes passed"
+
+The above will verify that the hashes are producing the correct answers
+for a range of files.  This does _not_ test the export/import paths.
+
+2. Backup the existing openssl.cnf and replace it with the above modified
+   version.  Then try to ssh into the platform.  This will verify the
+   export/import side of things.  If ssh fails to connect to the target,
+   you know that the crypto drivers for SHA1 are broken, probably due to
+   export/import.
 
 -- 
 FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
