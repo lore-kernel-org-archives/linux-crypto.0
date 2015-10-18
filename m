@@ -1,7 +1,7 @@
 From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 5/6] crypto: caam: fix indentation of close braces
-Date: Sun, 18 Oct 2015 17:51:31 +0100
-Message-ID: <E1ZnrBD-0005nf-35@rmk-PC.arm.linux.org.uk>
+Subject: [PATCH 6/6] crypto: caam: fix DMA API leak
+Date: Sun, 18 Oct 2015 17:51:36 +0100
+Message-ID: <E1ZnrBI-0005nl-65@rmk-PC.arm.linux.org.uk>
 References: <20151018165046.GA7997@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -12,88 +12,109 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 To: Victoria Milhoan <vicki.milhoan@freescale.com>,
 	horia.geanta@freescale.com, fabio.estevam@freescale.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45373 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45376 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932081AbbJRQvm (ORCPT
+	with ESMTP id S932081AbbJRQvo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2015 12:51:42 -0400
+	Sun, 18 Oct 2015 12:51:44 -0400
 In-Reply-To: <20151018165046.GA7997@n2100.arm.linux.org.uk>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The kernel's coding style suggests that closing braces for initialisers
-should not be aligned to the open brace column.  The CodingStyle doc
-shows how this should be done.  Remove the additional tab.
+caamhash contains this weird code:
+
+	src_nents = sg_count(req->src, req->nbytes, &chained);
+	dma_map_sg_chained(jrdev, req->src, src_nents ? : 1, DMA_TO_DEVICE,
+			   chained);
+	...
+	edesc->src_nents = src_nents;
+
+sg_count() returns zero when __sg_count() returns zero or one.  This
+is used to mean that we don't need to use a hardware scatterlist.
+However, setting src_nents to zero causes problems when we unmap:
+
+        if (edesc->src_nents)
+                dma_unmap_sg_chained(dev, req->src, edesc->src_nents,
+                                     DMA_TO_DEVICE, edesc->chained);
+
+as zero here means that we have no entries to unmap.
+
+This can be fixed in two ways: either by writing the number of entries
+that were requested of dma_map_sg_chained(), or by reworking the "no
+SG required" case.
+
+We adopt the re-work solution here - we replace sg_count() with
+__sg_count(), so src_nents now contains the real number of scatterlist
+entries, and we then change the test for using the hardware scatterlist
+to src_nents > 1 rather than just non-zero.
+
+This change passes my sshd, openssl tests hashing /bin and tcrypt
+tests.
 
 Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 ---
- drivers/crypto/caam/caamhash.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/crypto/caam/caamhash.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 7dd80b0b3f51..f30c93840bba 100644
+index f30c93840bba..28434ad08cb4 100644
 --- a/drivers/crypto/caam/caamhash.c
 +++ b/drivers/crypto/caam/caamhash.c
-@@ -1653,8 +1653,8 @@ static struct caam_hash_template driver_hash[] = {
- 			.halg = {
- 				.digestsize = SHA1_DIGEST_SIZE,
- 				.statesize = sizeof(struct caam_export_state),
--				},
- 			},
-+		},
- 		.alg_type = OP_ALG_ALGSEL_SHA1,
- 		.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 	}, {
-@@ -1675,8 +1675,8 @@ static struct caam_hash_template driver_hash[] = {
- 			.halg = {
- 				.digestsize = SHA224_DIGEST_SIZE,
- 				.statesize = sizeof(struct caam_export_state),
--				},
- 			},
-+		},
- 		.alg_type = OP_ALG_ALGSEL_SHA224,
- 		.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
- 	}, {
-@@ -1697,8 +1697,8 @@ static struct caam_hash_template driver_hash[] = {
- 			.halg = {
- 				.digestsize = SHA256_DIGEST_SIZE,
- 				.statesize = sizeof(struct caam_export_state),
--				},
- 			},
-+		},
- 		.alg_type = OP_ALG_ALGSEL_SHA256,
- 		.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 	}, {
-@@ -1719,8 +1719,8 @@ static struct caam_hash_template driver_hash[] = {
- 			.halg = {
- 				.digestsize = SHA384_DIGEST_SIZE,
- 				.statesize = sizeof(struct caam_export_state),
--				},
- 			},
-+		},
- 		.alg_type = OP_ALG_ALGSEL_SHA384,
- 		.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
- 	}, {
-@@ -1741,8 +1741,8 @@ static struct caam_hash_template driver_hash[] = {
- 			.halg = {
- 				.digestsize = SHA512_DIGEST_SIZE,
- 				.statesize = sizeof(struct caam_export_state),
--				},
- 			},
-+		},
- 		.alg_type = OP_ALG_ALGSEL_SHA512,
- 		.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
- 	}, {
-@@ -1763,8 +1763,8 @@ static struct caam_hash_template driver_hash[] = {
- 			.halg = {
- 				.digestsize = MD5_DIGEST_SIZE,
- 				.statesize = sizeof(struct caam_export_state),
--				},
- 			},
-+		},
- 		.alg_type = OP_ALG_ALGSEL_MD5,
- 		.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
- 	},
+@@ -1095,10 +1095,13 @@ static int ahash_digest(struct ahash_request *req)
+ 	u32 options;
+ 	int sh_len;
+ 
+-	src_nents = sg_count(req->src, req->nbytes, &chained);
+-	dma_map_sg_chained(jrdev, req->src, src_nents ? : 1, DMA_TO_DEVICE,
++	src_nents = __sg_count(req->src, req->nbytes, &chained);
++	dma_map_sg_chained(jrdev, req->src, src_nents, DMA_TO_DEVICE,
+ 			   chained);
+-	sec4_sg_bytes = src_nents * sizeof(struct sec4_sg_entry);
++	if (src_nents > 1)
++		sec4_sg_bytes = src_nents * sizeof(struct sec4_sg_entry);
++	else
++		sec4_sg_bytes = 0;
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+ 	edesc = kzalloc(sizeof(*edesc) + sec4_sg_bytes + DESC_JOB_IO_LEN,
+@@ -1117,7 +1120,7 @@ static int ahash_digest(struct ahash_request *req)
+ 	desc = edesc->hw_desc;
+ 	init_job_desc_shared(desc, ptr, sh_len, HDR_SHARE_DEFER | HDR_REVERSE);
+ 
+-	if (src_nents) {
++	if (src_nents > 1) {
+ 		sg_to_sec4_sg_last(req->src, src_nents, edesc->sec4_sg, 0);
+ 		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
+@@ -1447,11 +1450,15 @@ static int ahash_update_first(struct ahash_request *req)
+ 	to_hash = req->nbytes - *next_buflen;
+ 
+ 	if (to_hash) {
+-		src_nents = sg_count(req->src, req->nbytes - (*next_buflen),
+-				     &chained);
+-		dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
++		src_nents = __sg_count(req->src, req->nbytes - (*next_buflen),
++				       &chained);
++		dma_map_sg_chained(jrdev, req->src, src_nents,
+ 				   DMA_TO_DEVICE, chained);
+-		sec4_sg_bytes = src_nents * sizeof(struct sec4_sg_entry);
++		if (src_nents > 1)
++			sec4_sg_bytes = src_nents *
++					sizeof(struct sec4_sg_entry);
++		else
++			sec4_sg_bytes = 0;
+ 
+ 		/*
+ 		 * allocate space for base edesc and hw desc commands,
+@@ -1472,7 +1479,7 @@ static int ahash_update_first(struct ahash_request *req)
+ 				 DESC_JOB_IO_LEN;
+ 		edesc->dst_dma = 0;
+ 
+-		if (src_nents) {
++		if (src_nents > 1) {
+ 			sg_to_sec4_sg_last(req->src, src_nents,
+ 					   edesc->sec4_sg, 0);
+ 			edesc->sec4_sg_dma = dma_map_single(jrdev,
 -- 
 2.1.0
