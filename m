@@ -1,72 +1,63 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH 0/6] Sparse related fixes
-Date: Sun, 18 Oct 2015 19:49:43 +0200
-Message-ID: <20151018194943.21a63743@bbrezillon>
-References: <20151009102904.GL32532@n2100.arm.linux.org.uk>
-	<20151009104637.GA18798@n2100.arm.linux.org.uk>
-	<20151009194309.GA7401@n2100.arm.linux.org.uk>
-	<20151018161649.GA6651@n2100.arm.linux.org.uk>
-	<20151018173039.GA9737@n2100.arm.linux.org.uk>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v2 5/5] crypto: algif_akcipher - enable compilation
+Date: Sun, 18 Oct 2015 12:49:03 +0200
+Message-ID: <3228278.hONuqQtS6Z@myon.chronox.de>
+References: <1831785.BBs8Hj3CxY@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Arnaud Ebalard <arno@natisbad.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jason Cooper <jason@lakedaemon.net>,
-	linux-crypto@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-api@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:60033 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751214AbbJRRt4 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2015 13:49:56 -0400
-In-Reply-To: <20151018173039.GA9737@n2100.arm.linux.org.uk>
+Received: from mail.eperm.de ([89.247.134.16]:34356 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752305AbbJRWFd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 18 Oct 2015 18:05:33 -0400
+In-Reply-To: <1831785.BBs8Hj3CxY@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, 18 Oct 2015 18:30:39 +0100
-Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
+Add the Makefile and Kconfig updates to allow algif_akcipher to be
+compiled.
 
-> Continuing on from the previous set of 18 patches, I also fixed a
-> number of sparse problems and other cleanups.  I don't deem these
-> suitable for -rc merging, especially now that we're basically at
-> -rc6.
-> 
-> The first patch switches the driver over to appropriately using
-> the relaxed IO accessors - this avoids calling out to the heavy
-> barrier on every read and write operation, but only calling out on
-> those which really matter.
-> 
-> We switch to using dma_addr_t for DMA addresses which are not accessed
-> by hardware, and using gfp_t for the get_free_page flags.  String-based
-> MMIO accesses are used instead of plain memcpy()/memset() which prevents
-> us potentially stumbling over GCC optimisations that it thinks it may
-> make with these functions.
-> 
-> We convert as much of the hardware state to __le32 endian markings,
-> and use cpu_to_le32() as appropriate.  A number of places are left
-> unfixed, as we temporarily store CPU native endian values at these
-> locations; these warnings should not be fixed (basically, only
-> appropriate sparse warnings should be fixed without penalising code.)
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/Kconfig  | 9 +++++++++
+ crypto/Makefile | 1 +
+ 2 files changed, 10 insertions(+)
 
-To the whole series:
-
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-
-> 
->  drivers/crypto/marvell/cesa.h   | 44 ++++++++++++++++++++---------------------
->  drivers/crypto/marvell/cipher.c | 13 ++++++------
->  drivers/crypto/marvell/hash.c   | 23 +++++++++++----------
->  drivers/crypto/marvell/tdma.c   | 42 ++++++++++++++++++++-------------------
->  4 files changed, 62 insertions(+), 60 deletions(-)
-> 
-
-
-
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index fc93444..aa5d3aa 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1632,6 +1632,15 @@ config CRYPTO_USER_API_AEAD
+ 	  This option enables the user-spaces interface for AEAD
+ 	  cipher algorithms.
+ 
++config CRYPTO_USER_API_AKCIPHER
++	tristate "User-space interface for asymmetric key cipher algorithms"
++	depends on NET
++	select CRYPTO_AKCIPHER2
++	select CRYPTO_USER_API
++	help
++	  This option enables the user-spaces interface for asymmetric
++	  key cipher algorithms.
++
+ config CRYPTO_HASH_INFO
+ 	bool
+ 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index d897e0b..3aaa914 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -120,6 +120,7 @@ obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
+ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+ obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
+ obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
++obj-$(CONFIG_CRYPTO_USER_API_AKCIPHER) += algif_akcipher.o
+ 
+ #
+ # generic algorithms and the async_tx api
 -- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+2.5.0
