@@ -1,8 +1,7 @@
 From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 5/6] crypto: marvell: fix missing cpu_to_le32() in
- mv_cesa_dma_add_op()
-Date: Sun, 18 Oct 2015 18:31:20 +0100
-Message-ID: <E1Znrnk-00064U-SZ@rmk-PC.arm.linux.org.uk>
+Subject: [PATCH 6/6] crypto: marvell: use __le32 for hardware descriptors
+Date: Sun, 18 Oct 2015 18:31:26 +0100
+Message-ID: <E1Znrnq-00064a-0G@rmk-PC.arm.linux.org.uk>
 References: <20151018173039.GA9737@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -15,38 +14,135 @@ To: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
 	Jason Cooper <jason@lakedaemon.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45487 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45491 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932087AbbJRRbb (ORCPT
+	with ESMTP id S932087AbbJRRbf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2015 13:31:31 -0400
+	Sun, 18 Oct 2015 13:31:35 -0400
 In-Reply-To: <20151018173039.GA9737@n2100.arm.linux.org.uk>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When tdma->src is freed in mv_cesa_dma_cleanup(), we convert the DMA
-address from a little-endian value prior to calling dma_pool_free().
-However, mv_cesa_dma_add_op() assigns tdma->src without first converting
-the DMA address to little endian.  Fix this.
+Much of the driver uses cpu_to_le32() to convert values for descriptors
+to little endian before writing.  Use __le32 to define the hardware-
+accessed parts of the descriptors, and ensure most places where it's
+reasonable to do so use cpu_to_le32() when assigning to these.
 
 Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 ---
- drivers/crypto/marvell/tdma.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/marvell/cesa.h | 32 ++++++++++++++++----------------
+ drivers/crypto/marvell/tdma.c |  9 ++++++---
+ 2 files changed, 22 insertions(+), 19 deletions(-)
 
+diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
+index 752131ae1ef2..bd985e72520b 100644
+--- a/drivers/crypto/marvell/cesa.h
++++ b/drivers/crypto/marvell/cesa.h
+@@ -174,19 +174,19 @@
+ 
+ #define CESA_SA_DESC_MAC_DATA(offset)					\
+ 	cpu_to_le32(CESA_SA_DATA_SRAM_OFFSET + (offset))
+-#define CESA_SA_DESC_MAC_DATA_MSK		GENMASK(15, 0)
++#define CESA_SA_DESC_MAC_DATA_MSK		cpu_to_le32(GENMASK(15, 0))
+ 
+ #define CESA_SA_DESC_MAC_TOTAL_LEN(total_len)	cpu_to_le32((total_len) << 16)
+-#define CESA_SA_DESC_MAC_TOTAL_LEN_MSK		GENMASK(31, 16)
++#define CESA_SA_DESC_MAC_TOTAL_LEN_MSK		cpu_to_le32(GENMASK(31, 16))
+ 
+ #define CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX	0xffff
+ 
+ #define CESA_SA_DESC_MAC_DIGEST(offset)					\
+ 	cpu_to_le32(CESA_SA_MAC_DIG_SRAM_OFFSET + (offset))
+-#define CESA_SA_DESC_MAC_DIGEST_MSK		GENMASK(15, 0)
++#define CESA_SA_DESC_MAC_DIGEST_MSK		cpu_to_le32(GENMASK(15, 0))
+ 
+ #define CESA_SA_DESC_MAC_FRAG_LEN(frag_len)	cpu_to_le32((frag_len) << 16)
+-#define CESA_SA_DESC_MAC_FRAG_LEN_MSK		GENMASK(31, 16)
++#define CESA_SA_DESC_MAC_FRAG_LEN_MSK		cpu_to_le32(GENMASK(31, 16))
+ 
+ #define CESA_SA_DESC_MAC_IV(offset)					\
+ 	cpu_to_le32((CESA_SA_MAC_IIV_SRAM_OFFSET + (offset)) |		\
+@@ -219,14 +219,14 @@
+  * to be executed.
+  */
+ struct mv_cesa_sec_accel_desc {
+-	u32 config;
+-	u32 enc_p;
+-	u32 enc_len;
+-	u32 enc_key_p;
+-	u32 enc_iv;
+-	u32 mac_src_p;
+-	u32 mac_digest;
+-	u32 mac_iv;
++	__le32 config;
++	__le32 enc_p;
++	__le32 enc_len;
++	__le32 enc_key_p;
++	__le32 enc_iv;
++	__le32 mac_src_p;
++	__le32 mac_digest;
++	__le32 mac_iv;
+ };
+ 
+ /**
+@@ -293,10 +293,10 @@ struct mv_cesa_op_ctx {
+  * operation.
+  */
+ struct mv_cesa_tdma_desc {
+-	u32 byte_cnt;
+-	u32 src;
+-	u32 dst;
+-	u32 next_dma;
++	__le32 byte_cnt;
++	__le32 src;
++	__le32 dst;
++	__le32 next_dma;
+ 
+ 	/* Software state */
+ 	dma_addr_t cur_dma;
 diff --git a/drivers/crypto/marvell/tdma.c b/drivers/crypto/marvell/tdma.c
-index 2738e24bcc59..06bdeac27e3d 100644
+index 06bdeac27e3d..76427981275b 100644
 --- a/drivers/crypto/marvell/tdma.c
 +++ b/drivers/crypto/marvell/tdma.c
-@@ -140,7 +140,7 @@ struct mv_cesa_op_ctx *mv_cesa_dma_add_op(struct mv_cesa_tdma_chain *chain,
+@@ -126,6 +126,7 @@ struct mv_cesa_op_ctx *mv_cesa_dma_add_op(struct mv_cesa_tdma_chain *chain,
+ 	struct mv_cesa_tdma_desc *tdma;
+ 	struct mv_cesa_op_ctx *op;
+ 	dma_addr_t dma_handle;
++	unsigned int size;
+ 
+ 	tdma = mv_cesa_dma_add_desc(chain, flags);
+ 	if (IS_ERR(tdma))
+@@ -137,9 +138,11 @@ struct mv_cesa_op_ctx *mv_cesa_dma_add_op(struct mv_cesa_tdma_chain *chain,
+ 
+ 	*op = *op_templ;
+ 
++	size = skip_ctx ? sizeof(op->desc) : sizeof(*op);
++
  	tdma = chain->last;
  	tdma->op = op;
- 	tdma->byte_cnt = (skip_ctx ? sizeof(op->desc) : sizeof(*op)) | BIT(31);
--	tdma->src = dma_handle;
-+	tdma->src = cpu_to_le32(dma_handle);
+-	tdma->byte_cnt = (skip_ctx ? sizeof(op->desc) : sizeof(*op)) | BIT(31);
++	tdma->byte_cnt = cpu_to_le32(size | BIT(31));
+ 	tdma->src = cpu_to_le32(dma_handle);
  	tdma->flags = CESA_TDMA_DST_IN_SRAM | CESA_TDMA_OP;
  
- 	return op;
+@@ -156,7 +159,7 @@ int mv_cesa_dma_add_data_transfer(struct mv_cesa_tdma_chain *chain,
+ 	if (IS_ERR(tdma))
+ 		return PTR_ERR(tdma);
+ 
+-	tdma->byte_cnt = size | BIT(31);
++	tdma->byte_cnt = cpu_to_le32(size | BIT(31));
+ 	tdma->src = src;
+ 	tdma->dst = dst;
+ 
+@@ -185,7 +188,7 @@ int mv_cesa_dma_add_dummy_end(struct mv_cesa_tdma_chain *chain, gfp_t flags)
+ 	if (IS_ERR(tdma))
+ 		return PTR_ERR(tdma);
+ 
+-	tdma->byte_cnt = BIT(31);
++	tdma->byte_cnt = cpu_to_le32(BIT(31));
+ 
+ 	return 0;
+ }
 -- 
 2.1.0
