@@ -1,8 +1,7 @@
 From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 03/18] crypto: marvell: add flag to determine algorithm
- endianness
-Date: Sun, 18 Oct 2015 17:23:40 +0100
-Message-ID: <E1ZnqkG-0005WH-TE@rmk-PC.arm.linux.org.uk>
+Subject: [PATCH 04/18] crypto: marvell: fix the bit length endianness
+Date: Sun, 18 Oct 2015 17:23:46 +0100
+Message-ID: <E1ZnqkM-0005WN-0o@rmk-PC.arm.linux.org.uk>
 References: <20151018161649.GA6651@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -15,121 +14,53 @@ To: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
 	Jason Cooper <jason@lakedaemon.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45202 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45209 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753037AbbJRQXv (ORCPT
+	with ESMTP id S1753037AbbJRQX4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2015 12:23:51 -0400
+	Sun, 18 Oct 2015 12:23:56 -0400
 In-Reply-To: <20151018161649.GA6651@n2100.arm.linux.org.uk>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Rather than determining whether we're using a MD5 hash by looking at
-the digest size, switch to a cleaner solution using a per-request flag
-initialised by the method type.
+The endianness of the bit length used in the final stage depends on the
+endianness of the algorithm - md5 hashes need it to be in little endian
+format, whereas SHA hashes need it in big endian format.  Use the
+previously added algorithm endianness flag to control this.
 
 Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 ---
- drivers/crypto/marvell/cesa.h |  1 +
- drivers/crypto/marvell/hash.c | 17 +++++++++--------
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ drivers/crypto/marvell/hash.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
-index e19302c9dec9..5d5b66ea2ceb 100644
---- a/drivers/crypto/marvell/cesa.h
-+++ b/drivers/crypto/marvell/cesa.h
-@@ -612,6 +612,7 @@ struct mv_cesa_ahash_req {
- 	u64 len;
- 	int src_nents;
- 	bool last_req;
-+	bool algo_le;
- 	u32 state[8];
- };
- 
 diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-index f59faabcd34f..aa12274608ab 100644
+index aa12274608ab..dc2c65b52d7a 100644
 --- a/drivers/crypto/marvell/hash.c
 +++ b/drivers/crypto/marvell/hash.c
-@@ -351,7 +351,7 @@ static int mv_cesa_ahash_process(struct crypto_async_request *req, u32 status)
- 		 * Hardware's MD5 digest is in little endian format, but
- 		 * SHA in big endian format
- 		 */
--		if (digsize == MD5_DIGEST_SIZE) {
-+		if (creq->algo_le) {
- 			__le32 *result = (void *)ahashreq->result;
+@@ -179,7 +179,6 @@ static int mv_cesa_ahash_pad_len(struct mv_cesa_ahash_req *creq)
  
- 			for (i = 0; i < digsize / 4; i++)
-@@ -407,7 +407,7 @@ static const struct mv_cesa_req_ops mv_cesa_ahash_req_ops = {
- };
- 
- static int mv_cesa_ahash_init(struct ahash_request *req,
--			      struct mv_cesa_op_ctx *tmpl)
-+			      struct mv_cesa_op_ctx *tmpl, bool algo_le)
+ static int mv_cesa_ahash_pad_req(struct mv_cesa_ahash_req *creq, u8 *buf)
  {
- 	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	__be64 bits = cpu_to_be64(creq->len << 3);
+ 	unsigned int index, padlen;
  
-@@ -421,6 +421,7 @@ static int mv_cesa_ahash_init(struct ahash_request *req,
- 	mv_cesa_set_mac_op_frag_len(tmpl, 0);
- 	creq->op_tmpl = *tmpl;
- 	creq->len = 0;
-+	creq->algo_le = algo_le;
+ 	buf[0] = 0x80;
+@@ -187,7 +186,14 @@ static int mv_cesa_ahash_pad_req(struct mv_cesa_ahash_req *creq, u8 *buf)
+ 	index = creq->len & CESA_HASH_BLOCK_SIZE_MSK;
+ 	padlen = mv_cesa_ahash_pad_len(creq);
+ 	memset(buf + 1, 0, padlen - 1);
+-	memcpy(buf + padlen, &bits, sizeof(bits));
++
++	if (creq->algo_le) {
++		__le64 bits = cpu_to_le64(creq->len << 3);
++		memcpy(buf + padlen, &bits, sizeof(bits));
++	} else {
++		__be64 bits = cpu_to_be64(creq->len << 3);
++		memcpy(buf + padlen, &bits, sizeof(bits));
++	}
  
- 	return 0;
- }
-@@ -861,7 +862,7 @@ static int mv_cesa_md5_init(struct ahash_request *req)
- 
- 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_MD5);
- 
--	mv_cesa_ahash_init(req, &tmpl);
-+	mv_cesa_ahash_init(req, &tmpl, true);
- 
- 	return 0;
- }
-@@ -924,7 +925,7 @@ static int mv_cesa_sha1_init(struct ahash_request *req)
- 
- 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_SHA1);
- 
--	mv_cesa_ahash_init(req, &tmpl);
-+	mv_cesa_ahash_init(req, &tmpl, false);
- 
- 	return 0;
- }
-@@ -987,7 +988,7 @@ static int mv_cesa_sha256_init(struct ahash_request *req)
- 
- 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_SHA256);
- 
--	mv_cesa_ahash_init(req, &tmpl);
-+	mv_cesa_ahash_init(req, &tmpl, false);
- 
- 	return 0;
- }
-@@ -1218,7 +1219,7 @@ static int mv_cesa_ahmac_md5_init(struct ahash_request *req)
- 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_MD5);
- 	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
- 
--	mv_cesa_ahash_init(req, &tmpl);
-+	mv_cesa_ahash_init(req, &tmpl, true);
- 
- 	return 0;
- }
-@@ -1288,7 +1289,7 @@ static int mv_cesa_ahmac_sha1_init(struct ahash_request *req)
- 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_SHA1);
- 	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
- 
--	mv_cesa_ahash_init(req, &tmpl);
-+	mv_cesa_ahash_init(req, &tmpl, false);
- 
- 	return 0;
- }
-@@ -1378,7 +1379,7 @@ static int mv_cesa_ahmac_sha256_init(struct ahash_request *req)
- 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_SHA256);
- 	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
- 
--	mv_cesa_ahash_init(req, &tmpl);
-+	mv_cesa_ahash_init(req, &tmpl, false);
- 
- 	return 0;
+ 	return padlen + 8;
  }
 -- 
 2.1.0
