@@ -1,8 +1,8 @@
 From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 12/18] crypto: marvell: ensure iter.base.op_len is the full op
- length
-Date: Sun, 18 Oct 2015 17:24:26 +0100
-Message-ID: <E1Znql0-0005XF-VZ@rmk-PC.arm.linux.org.uk>
+Subject: [PATCH 13/18] crypto: marvell: avoid adding final operation within
+ loop
+Date: Sun, 18 Oct 2015 17:24:32 +0100
+Message-ID: <E1Znql6-0005XL-4R@rmk-PC.arm.linux.org.uk>
 References: <20151018161649.GA6651@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -15,63 +15,75 @@ To: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
 	Jason Cooper <jason@lakedaemon.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45267 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45274 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932094AbbJRQYl (ORCPT
+	with ESMTP id S932094AbbJRQYq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2015 12:24:41 -0400
+	Sun, 18 Oct 2015 12:24:46 -0400
 In-Reply-To: <20151018161649.GA6651@n2100.arm.linux.org.uk>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When we process the last request of data, and the request contains user
-data, the loop in mv_cesa_ahash_dma_req_init() marks the first data size
-as being iter.base.op_len which does not include the size of the cache
-data.  This means we end up hashing an insufficient amount of data.
-
-Fix this by always including the cache size in the first operation
-length of any request.
-
-This has the effect that for a request containing no user data,
-
-	iter.base.op_len === iter.src.op_offset === creq->cache_ptr
-
-As a result, we include one further change to use iter.base.op_len in
-the cache-but-no-user-data case to make the next change clearer.
+Avoid adding the final operation within the loop, but instead add it
+outside.  We combine this with the handling for the no-data case.
 
 Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 ---
- drivers/crypto/marvell/hash.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/crypto/marvell/hash.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-index c4693321fdc8..b4da73d294af 100644
+index b4da73d294af..dc8ab343ad9f 100644
 --- a/drivers/crypto/marvell/hash.c
 +++ b/drivers/crypto/marvell/hash.c
-@@ -27,10 +27,10 @@ mv_cesa_ahash_req_iter_init(struct mv_cesa_ahash_dma_iter *iter,
- 			    struct ahash_request *req)
- {
- 	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
--	unsigned int len = req->nbytes;
-+	unsigned int len = req->nbytes + creq->cache_ptr;
+@@ -602,6 +602,7 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
+ 	struct mv_cesa_tdma_chain chain;
+ 	struct mv_cesa_ahash_dma_iter iter;
+ 	struct mv_cesa_op_ctx *op = NULL;
++	unsigned int frag_len;
+ 	int ret;
  
- 	if (!creq->last_req)
--		len = (len + creq->cache_ptr) & ~CESA_HASH_BLOCK_SIZE_MSK;
-+		len &= ~CESA_HASH_BLOCK_SIZE_MSK;
+ 	dreq->chain.first = NULL;
+@@ -631,25 +632,34 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
+ 		/*
+ 		 * Add all the new data, inserting an operation block and
+ 		 * launch command between each full SRAM block-worth of
+-		 * data.
++		 * data. We intentionally do not add the final op block.
+ 		 */
+-		do {
++		while (true) {
+ 			ret = mv_cesa_dma_add_op_transfers(&chain, &iter.base,
+ 							   &iter.src, flags);
+ 			if (ret)
+ 				goto err_free_tdma;
  
- 	mv_cesa_req_dma_iter_init(&iter->base, len);
- 	mv_cesa_sg_dma_iter_init(&iter->src, req->src, DMA_TO_DEVICE);
-@@ -646,10 +646,10 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
++			frag_len = iter.base.op_len;
++
++			if (!mv_cesa_ahash_req_iter_next_op(&iter))
++				break;
++
+ 			op = mv_cesa_dma_add_frag(&chain, &creq->op_tmpl,
+-						  iter.base.op_len, flags);
++						  frag_len, flags);
+ 			if (IS_ERR(op)) {
+ 				ret = PTR_ERR(op);
  				goto err_free_tdma;
  			}
- 		} while (mv_cesa_ahash_req_iter_next_op(&iter));
--	} else if (creq->cache_ptr) {
-+	} else if (iter.base.op_len) {
+-		} while (mv_cesa_ahash_req_iter_next_op(&iter));
+-	} else if (iter.base.op_len) {
++		}
++	} else {
  		/* Account for the data that was in the cache. */
- 		op = mv_cesa_dma_add_frag(&chain, &creq->op_tmpl,
--					  creq->cache_ptr, flags);
-+					  iter.base.op_len, flags);
+-		op = mv_cesa_dma_add_frag(&chain, &creq->op_tmpl,
+-					  iter.base.op_len, flags);
++		frag_len = iter.base.op_len;
++	}
++
++	if (frag_len) {
++		op = mv_cesa_dma_add_frag(&chain, &creq->op_tmpl, frag_len,
++					  flags);
  		if (IS_ERR(op)) {
  			ret = PTR_ERR(op);
  			goto err_free_tdma;
