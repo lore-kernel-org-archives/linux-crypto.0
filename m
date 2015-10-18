@@ -1,62 +1,63 @@
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: [PATCH v2 0/6] Fix CAAM hash driver
-Date: Sun, 18 Oct 2015 17:50:47 +0100
-Message-ID: <20151018165046.GA7997@n2100.arm.linux.org.uk>
-References: <20151017185055.GQ32532@n2100.arm.linux.org.uk>
+From: Russell King <rmk+kernel@arm.linux.org.uk>
+Subject: [PATCH 1/6] crypto: caam: print errno code when hash registration
+ fails
+Date: Sun, 18 Oct 2015 17:51:10 +0100
+Message-ID: <E1ZnrAs-0005nF-Kv@rmk-PC.arm.linux.org.uk>
+References: <20151018165046.GA7997@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org
 To: Victoria Milhoan <vicki.milhoan@freescale.com>,
 	horia.geanta@freescale.com, fabio.estevam@freescale.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45339 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45349 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932081AbbJRQvD (ORCPT
+	with ESMTP id S932081AbbJRQvT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2015 12:51:03 -0400
+	Sun, 18 Oct 2015 12:51:19 -0400
+In-Reply-To: <20151018165046.GA7997@n2100.arm.linux.org.uk>
 Content-Disposition: inline
-In-Reply-To: <20151017185055.GQ32532@n2100.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The following series fixes the CAAM hash driver, allowing it to work
-with the previously merged "crypto: ahash - ensure statesize is non-
-zero" patch.
+Print the errno code when hash registration fails, so we know why the
+failure occurred.  This aids debugging.
 
-This is non-trivial, because CAAM exports a huge 1600 bytes of data,
-which, if we set .statesize to this, still results in the core code
-rejecting the driver.  So, we need to shrink the amount of state
-exported.
+Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+---
+ drivers/crypto/caam/caamhash.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-The first, most obvious one to get rid of is the export of the
-caam_hash_ctx structure, which is shared between the socket being
-exported from and imported to - copying it away and back again was
-a complete no-op.
-
-The second is that we don't need to export both pending-bytes buffers.
-Only one will be in use at any time.
-
-A problem was encountered while testing, where the size of the pending
-bytes buffer was not added to the scatterlist with the correct length.
-This is also fixed in this series, by patch 3.  This bug was introduced
-by a prior commit trying to fix a tcrypt error.  However, the change is
-wrong, but I have to question whether the test was correct or not - the
-backtrace contains a function "test_ahash_pnum" which doesn't seem to
-exist in mainline, nor does it seem to exist in any previous mainline
-kernel.
-
-Version 2 of this series addresses a mismerge in patch 5 of the
-original series, and adds further information to patch 3.
-
-Further testing with tcrypt showed up a problem identified by the
-DMA API debugging (different to the original one referred to in
-patch 3) where we leak DMA mappings.
-
- drivers/crypto/caam/caamhash.c | 101 +++++++++++++++++++++++++++++------------
- 1 file changed, 71 insertions(+), 30 deletions(-)
-
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 94433b9fc200..2faf71ccbd43 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1952,8 +1952,9 @@ static int __init caam_algapi_hash_init(void)
+ 
+ 		err = crypto_register_ahash(&t_alg->ahash_alg);
+ 		if (err) {
+-			pr_warn("%s alg registration failed\n",
+-				t_alg->ahash_alg.halg.base.cra_driver_name);
++			pr_warn("%s alg registration failed: %d\n",
++				t_alg->ahash_alg.halg.base.cra_driver_name,
++				err);
+ 			kfree(t_alg);
+ 		} else
+ 			list_add_tail(&t_alg->entry, &hash_list);
+@@ -1968,8 +1969,9 @@ static int __init caam_algapi_hash_init(void)
+ 
+ 		err = crypto_register_ahash(&t_alg->ahash_alg);
+ 		if (err) {
+-			pr_warn("%s alg registration failed\n",
+-				t_alg->ahash_alg.halg.base.cra_driver_name);
++			pr_warn("%s alg registration failed: %d\n",
++				t_alg->ahash_alg.halg.base.cra_driver_name,
++				err);
+ 			kfree(t_alg);
+ 		} else
+ 			list_add_tail(&t_alg->entry, &hash_list);
 -- 
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+2.1.0
