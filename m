@@ -1,7 +1,8 @@
 From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 4/6] crypto: marvell: use memcpy_fromio()/memcpy_toio()
-Date: Sun, 18 Oct 2015 18:31:15 +0100
-Message-ID: <E1Znrnf-00064N-OS@rmk-PC.arm.linux.org.uk>
+Subject: [PATCH 5/6] crypto: marvell: fix missing cpu_to_le32() in
+ mv_cesa_dma_add_op()
+Date: Sun, 18 Oct 2015 18:31:20 +0100
+Message-ID: <E1Znrnk-00064U-SZ@rmk-PC.arm.linux.org.uk>
 References: <20151018173039.GA9737@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -14,110 +15,38 @@ To: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
 	Jason Cooper <jason@lakedaemon.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45480 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45487 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932087AbbJRRb0 (ORCPT
+	with ESMTP id S932087AbbJRRbb (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2015 13:31:26 -0400
+	Sun, 18 Oct 2015 13:31:31 -0400
 In-Reply-To: <20151018173039.GA9737@n2100.arm.linux.org.uk>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use the IO memcpy() functions when copying from/to MMIO memory.
-These locations were found via sparse.
+When tdma->src is freed in mv_cesa_dma_cleanup(), we convert the DMA
+address from a little-endian value prior to calling dma_pool_free().
+However, mv_cesa_dma_add_op() assigns tdma->src without first converting
+the DMA address to little endian.  Fix this.
 
 Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 ---
- drivers/crypto/marvell/cipher.c | 11 ++++++-----
- drivers/crypto/marvell/hash.c   | 16 ++++++++--------
- 2 files changed, 14 insertions(+), 13 deletions(-)
+ drivers/crypto/marvell/tdma.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
-index 4db2d632204f..6edae64bb387 100644
---- a/drivers/crypto/marvell/cipher.c
-+++ b/drivers/crypto/marvell/cipher.c
-@@ -98,10 +98,10 @@ static void mv_cesa_ablkcipher_std_step(struct ablkcipher_request *req)
+diff --git a/drivers/crypto/marvell/tdma.c b/drivers/crypto/marvell/tdma.c
+index 2738e24bcc59..06bdeac27e3d 100644
+--- a/drivers/crypto/marvell/tdma.c
++++ b/drivers/crypto/marvell/tdma.c
+@@ -140,7 +140,7 @@ struct mv_cesa_op_ctx *mv_cesa_dma_add_op(struct mv_cesa_tdma_chain *chain,
+ 	tdma = chain->last;
+ 	tdma->op = op;
+ 	tdma->byte_cnt = (skip_ctx ? sizeof(op->desc) : sizeof(*op)) | BIT(31);
+-	tdma->src = dma_handle;
++	tdma->src = cpu_to_le32(dma_handle);
+ 	tdma->flags = CESA_TDMA_DST_IN_SRAM | CESA_TDMA_OP;
  
- 	/* FIXME: only update enc_len field */
- 	if (!sreq->skip_ctx) {
--		memcpy(engine->sram, &sreq->op, sizeof(sreq->op));
-+		memcpy_toio(engine->sram, &sreq->op, sizeof(sreq->op));
- 		sreq->skip_ctx = true;
- 	} else {
--		memcpy(engine->sram, &sreq->op, sizeof(sreq->op.desc));
-+		memcpy_toio(engine->sram, &sreq->op, sizeof(sreq->op.desc));
- 	}
- 
- 	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACCEL0_DONE);
-@@ -145,8 +145,9 @@ static int mv_cesa_ablkcipher_process(struct crypto_async_request *req,
- 	if (ret)
- 		return ret;
- 
--	memcpy(ablkreq->info, engine->sram + CESA_SA_CRYPT_IV_SRAM_OFFSET,
--	       crypto_ablkcipher_ivsize(crypto_ablkcipher_reqtfm(ablkreq)));
-+	memcpy_fromio(ablkreq->info,
-+		      engine->sram + CESA_SA_CRYPT_IV_SRAM_OFFSET,
-+		      crypto_ablkcipher_ivsize(crypto_ablkcipher_reqtfm(ablkreq)));
- 
- 	return 0;
- }
-@@ -181,7 +182,7 @@ mv_cesa_ablkcipher_std_prepare(struct ablkcipher_request *req)
- 	sreq->size = 0;
- 	sreq->offset = 0;
- 	mv_cesa_adjust_op(engine, &sreq->op);
--	memcpy(engine->sram, &sreq->op, sizeof(sreq->op));
-+	memcpy_toio(engine->sram, &sreq->op, sizeof(sreq->op));
- }
- 
- static inline void mv_cesa_ablkcipher_prepare(struct crypto_async_request *req,
-diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-index 84ddc4cbfa9d..8330815d72fc 100644
---- a/drivers/crypto/marvell/hash.c
-+++ b/drivers/crypto/marvell/hash.c
-@@ -209,8 +209,8 @@ static void mv_cesa_ahash_std_step(struct ahash_request *req)
- 	size_t  len;
- 
- 	if (creq->cache_ptr)
--		memcpy(engine->sram + CESA_SA_DATA_SRAM_OFFSET, creq->cache,
--		       creq->cache_ptr);
-+		memcpy_toio(engine->sram + CESA_SA_DATA_SRAM_OFFSET,
-+			    creq->cache, creq->cache_ptr);
- 
- 	len = min_t(size_t, req->nbytes + creq->cache_ptr - sreq->offset,
- 		    CESA_SA_SRAM_PAYLOAD_SIZE);
-@@ -251,10 +251,10 @@ static void mv_cesa_ahash_std_step(struct ahash_request *req)
- 			if (len + trailerlen > CESA_SA_SRAM_PAYLOAD_SIZE) {
- 				len &= CESA_HASH_BLOCK_SIZE_MSK;
- 				new_cache_ptr = 64 - trailerlen;
--				memcpy(creq->cache,
--				       engine->sram +
--				       CESA_SA_DATA_SRAM_OFFSET + len,
--				       new_cache_ptr);
-+				memcpy_fromio(creq->cache,
-+					      engine->sram +
-+					      CESA_SA_DATA_SRAM_OFFSET + len,
-+					      new_cache_ptr);
- 			} else {
- 				len += mv_cesa_ahash_pad_req(creq,
- 						engine->sram + len +
-@@ -272,7 +272,7 @@ static void mv_cesa_ahash_std_step(struct ahash_request *req)
- 	mv_cesa_update_op_cfg(op, frag_mode, CESA_SA_DESC_CFG_FRAG_MSK);
- 
- 	/* FIXME: only update enc_len field */
--	memcpy(engine->sram, op, sizeof(*op));
-+	memcpy_toio(engine->sram, op, sizeof(*op));
- 
- 	if (frag_mode == CESA_SA_DESC_CFG_FIRST_FRAG)
- 		mv_cesa_update_op_cfg(op, CESA_SA_DESC_CFG_MID_FRAG,
-@@ -312,7 +312,7 @@ static void mv_cesa_ahash_std_prepare(struct ahash_request *req)
- 
- 	sreq->offset = 0;
- 	mv_cesa_adjust_op(engine, &creq->op_tmpl);
--	memcpy(engine->sram, &creq->op_tmpl, sizeof(creq->op_tmpl));
-+	memcpy_toio(engine->sram, &creq->op_tmpl, sizeof(creq->op_tmpl));
- }
- 
- static void mv_cesa_ahash_step(struct crypto_async_request *req)
+ 	return op;
 -- 
 2.1.0
