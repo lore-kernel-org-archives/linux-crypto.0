@@ -1,7 +1,8 @@
 From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 3/6] crypto: caam: fix non-block aligned hash calculation
-Date: Sun, 18 Oct 2015 17:51:20 +0100
-Message-ID: <E1ZnrB2-0005nT-S2@rmk-PC.arm.linux.org.uk>
+Subject: [PATCH 4/6] crypto: caam: only export the state we really need to
+ export
+Date: Sun, 18 Oct 2015 17:51:25 +0100
+Message-ID: <E1ZnrB7-0005nZ-Vo@rmk-PC.arm.linux.org.uk>
 References: <20151018165046.GA7997@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -12,79 +13,140 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 To: Victoria Milhoan <vicki.milhoan@freescale.com>,
 	horia.geanta@freescale.com, fabio.estevam@freescale.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45361 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45367 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932081AbbJRQva (ORCPT
+	with ESMTP id S932081AbbJRQvf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2015 12:51:30 -0400
+	Sun, 18 Oct 2015 12:51:35 -0400
 In-Reply-To: <20151018165046.GA7997@n2100.arm.linux.org.uk>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-caam does not properly calculate the size of the retained state
-when non-block aligned hashes are requested - it uses the wrong
-buffer sizes, which results in errors such as:
+Avoid exporting lots of state by only exporting what we really require,
+which is the buffer containing the set of pending bytes to be hashed,
+number of pending bytes, the context buffer, and the function pointer
+state.  This reduces down the exported state size to 216 bytes from
+576 bytes.
 
-caam_jr 2102000.jr1: 40000501: DECO: desc idx 5: SGT Length Error. The descriptor is trying to read more data than is contained in the SGT table.
-
-We end up here with:
-
-in_len 0x46 blocksize 0x40 last_bufsize 0x0 next_bufsize 0x6
-to_hash 0x40 ctx_len 0x28 nbytes 0x20
-
-which results in a job descriptor of:
-
-jobdesc@889: ed03d918: b0861c08 3daa0080 f1400000 3d03d938
-jobdesc@889: ed03d928: 00000068 f8400000 3cde2a40 00000028
-
-where the word at 0xed03d928 is the expected data size (0x68), and a
-scatterlist containing:
-
-sg@892: ed03d938: 00000000 3cde2a40 00000028 00000000
-sg@892: ed03d948: 00000000 3d03d100 00000006 00000000
-sg@892: ed03d958: 00000000 7e8aa700 40000020 00000000
-
-0x68 comes from 0x28 (the context size) plus the "in_len" rounded down
-to a block size (0x40).  in_len comes from 0x26 bytes of unhashed data
-from the previous operation, plus the 0x20 bytes from the latest
-operation.
-
-The fixed version would create:
-
-sg@892: ed03d938: 00000000 3cde2a40 00000028 00000000
-sg@892: ed03d948: 00000000 3d03d100 00000026 00000000
-sg@892: ed03d958: 00000000 7e8aa700 40000020 00000000
-
-which replaces the 0x06 length with the correct 0x26 bytes of previously
-unhashed data.
-
-This fixes a previous commit which erroneously "fixed" this due to a
-DMA-API bug report; that commit indicates that the bug was caused via a
-test_ahash_pnum() function in the tcrypt module.  No such function has
-ever existed in the mainline kernel.  Given that the change in this
-commit has been tested with DMA API debug enabled and shows no issue,
-I can only conclude that test_ahash_pnum() was triggering that bad
-behaviour by CAAM.
-
-Fixes: 7d5196aba3c8 ("crypto: caam - Correct DMA unmap size in ahash_update_ctx()")
 Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 ---
- drivers/crypto/caam/caamhash.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/caam/caamhash.c | 44 ++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 40 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 3ce6083c2e43..dcee360065f3 100644
+index dcee360065f3..7dd80b0b3f51 100644
 --- a/drivers/crypto/caam/caamhash.c
 +++ b/drivers/crypto/caam/caamhash.c
-@@ -829,7 +829,7 @@ static int ahash_update_ctx(struct ahash_request *req)
- 		state->buf_dma = try_buf_map_to_sec4_sg(jrdev,
- 							edesc->sec4_sg + 1,
- 							buf, state->buf_dma,
--							*next_buflen, *buflen);
-+							*buflen, last_buflen);
+@@ -134,6 +134,15 @@ struct caam_hash_state {
+ 	int current_buf;
+ };
  
- 		if (src_nents) {
- 			src_map_to_sec4_sg(jrdev, req->src, src_nents,
++struct caam_export_state {
++	u8 buf[CAAM_MAX_HASH_BLOCK_SIZE];
++	u8 caam_ctx[MAX_CTX_LEN];
++	int buflen;
++	int (*update)(struct ahash_request *req);
++	int (*final)(struct ahash_request *req);
++	int (*finup)(struct ahash_request *req);
++};
++
+ /* Common job descriptor seq in/out ptr routines */
+ 
+ /* Map state->caam_ctx, and append seq_out_ptr command that points to it */
+@@ -1574,20 +1583,41 @@ static int ahash_final(struct ahash_request *req)
+ 
+ static int ahash_export(struct ahash_request *req, void *out)
+ {
+-	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
+ 	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct caam_export_state *export = out;
++	int len;
++	u8 *buf;
+ 
+-	memcpy(out, state, sizeof(struct caam_hash_state));
++	if (state->current_buf) {
++		buf = state->buf_1;
++		len = state->buflen_1;
++	} else {
++		buf = state->buf_0;
++		len = state->buflen_1;
++	}
++
++	memcpy(export->buf, buf, len);
++	memcpy(export->caam_ctx, state->caam_ctx, sizeof(export->caam_ctx));
++	export->buflen = len;
++	export->update = state->update;
++	export->final = state->final;
++	export->finup = state->finup;
+ 
+ 	return 0;
+ }
+ 
+ static int ahash_import(struct ahash_request *req, const void *in)
+ {
+-	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
+ 	struct caam_hash_state *state = ahash_request_ctx(req);
++	const struct caam_export_state *export = in;
+ 
+-	memcpy(state, in, sizeof(struct caam_hash_state));
++	memset(state, 0, sizeof(*state));
++	memcpy(state->buf_0, export->buf, export->buflen);
++	memcpy(state->caam_ctx, export->caam_ctx, sizeof(state->caam_ctx));
++	state->buflen_0 = export->buflen;
++	state->update = export->update;
++	state->final = export->final;
++	state->finup = export->finup;
+ 
+ 	return 0;
+ }
+@@ -1622,6 +1652,7 @@ static struct caam_hash_template driver_hash[] = {
+ 			.setkey = ahash_setkey,
+ 			.halg = {
+ 				.digestsize = SHA1_DIGEST_SIZE,
++				.statesize = sizeof(struct caam_export_state),
+ 				},
+ 			},
+ 		.alg_type = OP_ALG_ALGSEL_SHA1,
+@@ -1643,6 +1674,7 @@ static struct caam_hash_template driver_hash[] = {
+ 			.setkey = ahash_setkey,
+ 			.halg = {
+ 				.digestsize = SHA224_DIGEST_SIZE,
++				.statesize = sizeof(struct caam_export_state),
+ 				},
+ 			},
+ 		.alg_type = OP_ALG_ALGSEL_SHA224,
+@@ -1664,6 +1696,7 @@ static struct caam_hash_template driver_hash[] = {
+ 			.setkey = ahash_setkey,
+ 			.halg = {
+ 				.digestsize = SHA256_DIGEST_SIZE,
++				.statesize = sizeof(struct caam_export_state),
+ 				},
+ 			},
+ 		.alg_type = OP_ALG_ALGSEL_SHA256,
+@@ -1685,6 +1718,7 @@ static struct caam_hash_template driver_hash[] = {
+ 			.setkey = ahash_setkey,
+ 			.halg = {
+ 				.digestsize = SHA384_DIGEST_SIZE,
++				.statesize = sizeof(struct caam_export_state),
+ 				},
+ 			},
+ 		.alg_type = OP_ALG_ALGSEL_SHA384,
+@@ -1706,6 +1740,7 @@ static struct caam_hash_template driver_hash[] = {
+ 			.setkey = ahash_setkey,
+ 			.halg = {
+ 				.digestsize = SHA512_DIGEST_SIZE,
++				.statesize = sizeof(struct caam_export_state),
+ 				},
+ 			},
+ 		.alg_type = OP_ALG_ALGSEL_SHA512,
+@@ -1727,6 +1762,7 @@ static struct caam_hash_template driver_hash[] = {
+ 			.setkey = ahash_setkey,
+ 			.halg = {
+ 				.digestsize = MD5_DIGEST_SIZE,
++				.statesize = sizeof(struct caam_export_state),
+ 				},
+ 			},
+ 		.alg_type = OP_ALG_ALGSEL_MD5,
 -- 
 2.1.0
