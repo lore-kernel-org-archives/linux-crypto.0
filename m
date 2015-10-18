@@ -1,120 +1,90 @@
-From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 6/6] crypto: caam: fix DMA API leak
-Date: Sun, 18 Oct 2015 17:51:36 +0100
-Message-ID: <E1ZnrBI-0005nl-65@rmk-PC.arm.linux.org.uk>
-References: <20151018165046.GA7997@n2100.arm.linux.org.uk>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: Re: [PATCH 00/18] crypto: further fixes for Marvell CESA hash
+Date: Sun, 18 Oct 2015 19:18:35 +0200
+Message-ID: <20151018191835.7f00641c@bbrezillon>
+References: <20151009102904.GL32532@n2100.arm.linux.org.uk>
+	<20151009104637.GA18798@n2100.arm.linux.org.uk>
+	<20151009194309.GA7401@n2100.arm.linux.org.uk>
+	<20151018161649.GA6651@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Victoria Milhoan <vicki.milhoan@freescale.com>,
-	horia.geanta@freescale.com, fabio.estevam@freescale.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Cooper <jason@lakedaemon.net>,
+	linux-crypto@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>,
+	Arnaud Ebalard <arno@natisbad.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45376 "EHLO
-	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932081AbbJRQvo (ORCPT
+Received: from down.free-electrons.com ([37.187.137.238]:59820 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S932104AbbJRRSv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2015 12:51:44 -0400
-In-Reply-To: <20151018165046.GA7997@n2100.arm.linux.org.uk>
-Content-Disposition: inline
+	Sun, 18 Oct 2015 13:18:51 -0400
+In-Reply-To: <20151018161649.GA6651@n2100.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-caamhash contains this weird code:
+Hi Russell
 
-	src_nents = sg_count(req->src, req->nbytes, &chained);
-	dma_map_sg_chained(jrdev, req->src, src_nents ? : 1, DMA_TO_DEVICE,
-			   chained);
-	...
-	edesc->src_nents = src_nents;
+On Sun, 18 Oct 2015 17:16:49 +0100
+Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
 
-sg_count() returns zero when __sg_count() returns zero or one.  This
-is used to mean that we don't need to use a hardware scatterlist.
-However, setting src_nents to zero causes problems when we unmap:
+> Following on from the previous series, this series addresses further
+> problems with the Marvell CESA hash driver found while testing it my
+> openssl/ssh scenarios.
+> 
+> The first patch improves one from the previous series: we can get the
+> transform more directly using req->base.tfm rather than going round
+> the houses.
+> 
+> The next few patches rework the algorithm endianness conversions.
+> There are two things which depend on the algorithm endianness - the
+> format of the result, and the format of the bit length in the last
+> block.  We introduce a flag to convey this information, and keep
+> the creq->state format in CPU endian mode for consistency.
+> 
+> Some of the inconsistent hash results are down to the template
+> operation not being properly initialised - so we zero initialise all
+> template operations.
+> 
+> The following patches (from "factor out first fragment decisions to
+> helper") rework the digest handling to ensure that we always provide
+> the hardware with a complete block of data to hash, otherwise it can
+> be left mid-calculation, which then causes state to leak to
+> subsequent operations.  This requires a re-structure of the way we
+> put together the DMA entries, so it's done in relatively small steps.
+> 
+> This results in the CESA driver passing all tests I can throw at it
+> via the AF_ALG openssl plugin with the exception of asking for the
+> hash of /dev/null.  This returns an all zero result, rather than the
+> correct hash value.  This bug is pending further diagnosis, but it
+> is believed not to be a driver specific bug as iMX6 CAAM also behaves
+> the same.
+> 
+> Unfortunately, this is a large series, but the driver unfortunately
+> needs this level of bug fixing to work properly.
 
-        if (edesc->src_nents)
-                dma_unmap_sg_chained(dev, req->src, edesc->src_nents,
-                                     DMA_TO_DEVICE, edesc->chained);
+Thanks for spending some time fixing those bugs and
+simplifying/factorizing/documenting the hash logic.
 
-as zero here means that we have no entries to unmap.
+To the whole series:
 
-This can be fixed in two ways: either by writing the number of entries
-that were requested of dma_map_sg_chained(), or by reworking the "no
-SG required" case.
+Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 
-We adopt the re-work solution here - we replace sg_count() with
-__sg_count(), so src_nents now contains the real number of scatterlist
-entries, and we then change the test for using the hardware scatterlist
-to src_nents > 1 rather than just non-zero.
+Note that my ack might seem quite quick compared to the amount of
+changes, but Russell actually sent me a preliminary version last
+Wednesday.
 
-This change passes my sshd, openssl tests hashing /bin and tcrypt
-tests.
+Arnaud, if you have some time, could you also have a look at those
+patches?
 
-Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
----
- drivers/crypto/caam/caamhash.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+Best Regards,
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index f30c93840bba..28434ad08cb4 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -1095,10 +1095,13 @@ static int ahash_digest(struct ahash_request *req)
- 	u32 options;
- 	int sh_len;
- 
--	src_nents = sg_count(req->src, req->nbytes, &chained);
--	dma_map_sg_chained(jrdev, req->src, src_nents ? : 1, DMA_TO_DEVICE,
-+	src_nents = __sg_count(req->src, req->nbytes, &chained);
-+	dma_map_sg_chained(jrdev, req->src, src_nents, DMA_TO_DEVICE,
- 			   chained);
--	sec4_sg_bytes = src_nents * sizeof(struct sec4_sg_entry);
-+	if (src_nents > 1)
-+		sec4_sg_bytes = src_nents * sizeof(struct sec4_sg_entry);
-+	else
-+		sec4_sg_bytes = 0;
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
- 	edesc = kzalloc(sizeof(*edesc) + sec4_sg_bytes + DESC_JOB_IO_LEN,
-@@ -1117,7 +1120,7 @@ static int ahash_digest(struct ahash_request *req)
- 	desc = edesc->hw_desc;
- 	init_job_desc_shared(desc, ptr, sh_len, HDR_SHARE_DEFER | HDR_REVERSE);
- 
--	if (src_nents) {
-+	if (src_nents > 1) {
- 		sg_to_sec4_sg_last(req->src, src_nents, edesc->sec4_sg, 0);
- 		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
- 					    sec4_sg_bytes, DMA_TO_DEVICE);
-@@ -1447,11 +1450,15 @@ static int ahash_update_first(struct ahash_request *req)
- 	to_hash = req->nbytes - *next_buflen;
- 
- 	if (to_hash) {
--		src_nents = sg_count(req->src, req->nbytes - (*next_buflen),
--				     &chained);
--		dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
-+		src_nents = __sg_count(req->src, req->nbytes - (*next_buflen),
-+				       &chained);
-+		dma_map_sg_chained(jrdev, req->src, src_nents,
- 				   DMA_TO_DEVICE, chained);
--		sec4_sg_bytes = src_nents * sizeof(struct sec4_sg_entry);
-+		if (src_nents > 1)
-+			sec4_sg_bytes = src_nents *
-+					sizeof(struct sec4_sg_entry);
-+		else
-+			sec4_sg_bytes = 0;
- 
- 		/*
- 		 * allocate space for base edesc and hw desc commands,
-@@ -1472,7 +1479,7 @@ static int ahash_update_first(struct ahash_request *req)
- 				 DESC_JOB_IO_LEN;
- 		edesc->dst_dma = 0;
- 
--		if (src_nents) {
-+		if (src_nents > 1) {
- 			sg_to_sec4_sg_last(req->src, src_nents,
- 					   edesc->sec4_sg, 0);
- 			edesc->sec4_sg_dma = dma_map_single(jrdev,
+Boris
+
 -- 
-2.1.0
+Boris Brezillon, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
