@@ -1,8 +1,8 @@
 From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 06/18] crypto: marvell: const-ify argument to
- mv_cesa_get_op_cfg()
-Date: Sun, 18 Oct 2015 17:23:56 +0100
-Message-ID: <E1ZnqkW-0005WZ-8x@rmk-PC.arm.linux.org.uk>
+Subject: [PATCH 07/18] crypto: marvell: factor out first fragment decisions to
+ helper
+Date: Sun, 18 Oct 2015 17:24:01 +0100
+Message-ID: <E1Znqkb-0005Wk-CF@rmk-PC.arm.linux.org.uk>
 References: <20151018161649.GA6651@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -15,36 +15,77 @@ To: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
 	Jason Cooper <jason@lakedaemon.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45220 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45232 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932094AbbJRQYH (ORCPT
+	with ESMTP id S932094AbbJRQYP (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2015 12:24:07 -0400
+	Sun, 18 Oct 2015 12:24:15 -0400
 In-Reply-To: <20151018161649.GA6651@n2100.arm.linux.org.uk>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-mv_cesa_get_op_cfg() does not write to its argument, it only reads.
-So, let's make it const.
+Multiple locations in the driver test the operation context fragment
+type, checking whether it is a first fragment or not.  Introduce a
+mv_cesa_mac_op_is_first_frag() helper, which returns true if the
+fragment operation is for a first fragment.
 
 Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 ---
- drivers/crypto/marvell/cesa.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/marvell/cesa.h | 6 ++++++
+ drivers/crypto/marvell/hash.c | 9 +++------
+ 2 files changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
-index 5d5b66ea2ceb..cd646d7c14e2 100644
+index cd646d7c14e2..e9f732138ba3 100644
 --- a/drivers/crypto/marvell/cesa.h
 +++ b/drivers/crypto/marvell/cesa.h
-@@ -627,7 +627,7 @@ static inline void mv_cesa_update_op_cfg(struct mv_cesa_op_ctx *op,
- 	op->desc.config |= cpu_to_le32(cfg);
+@@ -686,6 +686,12 @@ static inline u32 mv_cesa_get_int_mask(struct mv_cesa_engine *engine)
+ 	return engine->int_mask;
  }
  
--static inline u32 mv_cesa_get_op_cfg(struct mv_cesa_op_ctx *op)
-+static inline u32 mv_cesa_get_op_cfg(const struct mv_cesa_op_ctx *op)
- {
- 	return le32_to_cpu(op->desc.config);
- }
++static inline bool mv_cesa_mac_op_is_first_frag(const struct mv_cesa_op_ctx *op)
++{
++	return (mv_cesa_get_op_cfg(op) & CESA_SA_DESC_CFG_FRAG_MSK) ==
++		CESA_SA_DESC_CFG_FIRST_FRAG;
++}
++
+ int mv_cesa_queue_req(struct crypto_async_request *req);
+ 
+ /*
+diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
+index 82d9e3d09331..938ecfeb8ffe 100644
+--- a/drivers/crypto/marvell/hash.c
++++ b/drivers/crypto/marvell/hash.c
+@@ -524,8 +524,7 @@ mv_cesa_ahash_dma_add_data(struct mv_cesa_tdma_chain *chain,
+ 
+ 	mv_cesa_set_mac_op_frag_len(op, dma_iter->base.op_len);
+ 
+-	if ((mv_cesa_get_op_cfg(&creq->op_tmpl) & CESA_SA_DESC_CFG_FRAG_MSK) ==
+-	    CESA_SA_DESC_CFG_FIRST_FRAG)
++	if (mv_cesa_mac_op_is_first_frag(&creq->op_tmpl))
+ 		mv_cesa_update_op_cfg(&creq->op_tmpl,
+ 				      CESA_SA_DESC_CFG_MID_FRAG,
+ 				      CESA_SA_DESC_CFG_FRAG_MSK);
+@@ -561,8 +560,7 @@ mv_cesa_ahash_dma_last_req(struct mv_cesa_tdma_chain *chain,
+ 	if (op && creq->len <= CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX) {
+ 		u32 frag = CESA_SA_DESC_CFG_NOT_FRAG;
+ 
+-		if ((mv_cesa_get_op_cfg(op) & CESA_SA_DESC_CFG_FRAG_MSK) !=
+-		    CESA_SA_DESC_CFG_FIRST_FRAG)
++		if (!mv_cesa_mac_op_is_first_frag(op))
+ 			frag = CESA_SA_DESC_CFG_LAST_FRAG;
+ 
+ 		mv_cesa_update_op_cfg(op, frag, CESA_SA_DESC_CFG_FRAG_MSK);
+@@ -600,8 +598,7 @@ mv_cesa_ahash_dma_last_req(struct mv_cesa_tdma_chain *chain,
+ 	if (padoff >= trailerlen)
+ 		return op;
+ 
+-	if ((mv_cesa_get_op_cfg(&creq->op_tmpl) & CESA_SA_DESC_CFG_FRAG_MSK) !=
+-	    CESA_SA_DESC_CFG_FIRST_FRAG)
++	if (!mv_cesa_mac_op_is_first_frag(&creq->op_tmpl))
+ 		mv_cesa_update_op_cfg(&creq->op_tmpl,
+ 				      CESA_SA_DESC_CFG_MID_FRAG,
+ 				      CESA_SA_DESC_CFG_FRAG_MSK);
 -- 
 2.1.0
