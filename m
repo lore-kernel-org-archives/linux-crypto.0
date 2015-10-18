@@ -1,7 +1,7 @@
 From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 1/6] crypto: marvell: use readl_relaxed()/writel_relaxed()
-Date: Sun, 18 Oct 2015 18:31:00 +0100
-Message-ID: <E1ZnrnQ-000641-A3@rmk-PC.arm.linux.org.uk>
+Subject: [PATCH 2/6] crypto: marvell: use dma_addr_t for cur_dma
+Date: Sun, 18 Oct 2015 18:31:05 +0100
+Message-ID: <E1ZnrnV-00064B-EH@rmk-PC.arm.linux.org.uk>
 References: <20151018173039.GA9737@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -14,116 +14,64 @@ To: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
 	Jason Cooper <jason@lakedaemon.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45455 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45466 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932087AbbJRRbJ (ORCPT
+	with ESMTP id S932087AbbJRRbQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2015 13:31:09 -0400
+	Sun, 18 Oct 2015 13:31:16 -0400
 In-Reply-To: <20151018173039.GA9737@n2100.arm.linux.org.uk>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use relaxed IO accessors where appropriate.
+cur_dma is part of the software state, not read by the hardware.
+Storing it in LE32 format is wrong, use dma_addr_t for this.
 
 Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 ---
- drivers/crypto/marvell/cesa.h   |  2 +-
- drivers/crypto/marvell/cipher.c |  2 +-
- drivers/crypto/marvell/hash.c   |  7 +++----
- drivers/crypto/marvell/tdma.c   | 20 ++++++++++----------
- 4 files changed, 15 insertions(+), 16 deletions(-)
+ drivers/crypto/marvell/cesa.h | 4 +++-
+ drivers/crypto/marvell/tdma.c | 6 +++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
-index e9f732138ba3..e19877402ec9 100644
+index e19877402ec9..dbe4970d6c64 100644
 --- a/drivers/crypto/marvell/cesa.h
 +++ b/drivers/crypto/marvell/cesa.h
-@@ -677,7 +677,7 @@ static inline void mv_cesa_set_int_mask(struct mv_cesa_engine *engine,
- 	if (int_mask == engine->int_mask)
- 		return;
- 
--	writel(int_mask, engine->regs + CESA_SA_INT_MSK);
-+	writel_relaxed(int_mask, engine->regs + CESA_SA_INT_MSK);
- 	engine->int_mask = int_mask;
- }
- 
-diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
-index 3df2f4e7adb2..4db2d632204f 100644
---- a/drivers/crypto/marvell/cipher.c
-+++ b/drivers/crypto/marvell/cipher.c
-@@ -105,7 +105,7 @@ static void mv_cesa_ablkcipher_std_step(struct ablkcipher_request *req)
- 	}
- 
- 	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACCEL0_DONE);
--	writel(CESA_SA_CFG_PARA_DIS, engine->regs + CESA_SA_CFG);
-+	writel_relaxed(CESA_SA_CFG_PARA_DIS, engine->regs + CESA_SA_CFG);
- 	writel(CESA_SA_CMD_EN_CESA_SA_ACCL0, engine->regs + CESA_SA_CMD);
- }
- 
-diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-index 7cd0f0decf6c..84ddc4cbfa9d 100644
---- a/drivers/crypto/marvell/hash.c
-+++ b/drivers/crypto/marvell/hash.c
-@@ -281,7 +281,7 @@ static void mv_cesa_ahash_std_step(struct ahash_request *req)
- 	creq->cache_ptr = new_cache_ptr;
- 
- 	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACCEL0_DONE);
--	writel(CESA_SA_CFG_PARA_DIS, engine->regs + CESA_SA_CFG);
-+	writel_relaxed(CESA_SA_CFG_PARA_DIS, engine->regs + CESA_SA_CFG);
- 	writel(CESA_SA_CMD_EN_CESA_SA_ACCL0, engine->regs + CESA_SA_CMD);
- }
- 
-@@ -344,7 +344,7 @@ static int mv_cesa_ahash_process(struct crypto_async_request *req, u32 status)
- 
- 	digsize = crypto_ahash_digestsize(crypto_ahash_reqtfm(ahashreq));
- 	for (i = 0; i < digsize / 4; i++)
--		creq->state[i] = readl(engine->regs + CESA_IVDIG(i));
-+		creq->state[i] = readl_relaxed(engine->regs + CESA_IVDIG(i));
- 
- 	if (creq->cache_ptr)
- 		sg_pcopy_to_buffer(ahashreq->src, creq->src_nents,
-@@ -390,8 +390,7 @@ static void mv_cesa_ahash_prepare(struct crypto_async_request *req,
- 
- 	digsize = crypto_ahash_digestsize(crypto_ahash_reqtfm(ahashreq));
- 	for (i = 0; i < digsize / 4; i++)
--		writel(creq->state[i],
--		       engine->regs + CESA_IVDIG(i));
-+		writel_relaxed(creq->state[i], engine->regs + CESA_IVDIG(i));
- }
- 
- static void mv_cesa_ahash_req_cleanup(struct crypto_async_request *req)
+@@ -297,7 +297,9 @@ struct mv_cesa_tdma_desc {
+ 	u32 src;
+ 	u32 dst;
+ 	u32 next_dma;
+-	u32 cur_dma;
++
++	/* Software state */
++	dma_addr_t cur_dma;
+ 	struct mv_cesa_tdma_desc *next;
+ 	union {
+ 		struct mv_cesa_op_ctx *op;
 diff --git a/drivers/crypto/marvell/tdma.c b/drivers/crypto/marvell/tdma.c
-index 64a366c50174..e8e8a7f7659b 100644
+index e8e8a7f7659b..c8256f5916b0 100644
 --- a/drivers/crypto/marvell/tdma.c
 +++ b/drivers/crypto/marvell/tdma.c
-@@ -41,18 +41,18 @@ void mv_cesa_dma_step(struct mv_cesa_tdma_req *dreq)
- {
- 	struct mv_cesa_engine *engine = dreq->base.engine;
+@@ -69,7 +69,7 @@ void mv_cesa_dma_cleanup(struct mv_cesa_tdma_req *dreq)
  
--	writel(0, engine->regs + CESA_SA_CFG);
-+	writel_relaxed(0, engine->regs + CESA_SA_CFG);
+ 		tdma = tdma->next;
+ 		dma_pool_free(cesa_dev->dma->tdma_desc_pool, old_tdma,
+-			      le32_to_cpu(old_tdma->cur_dma));
++			      old_tdma->cur_dma);
+ 	}
  
- 	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACC0_IDMA_DONE);
--	writel(CESA_TDMA_DST_BURST_128B | CESA_TDMA_SRC_BURST_128B |
--	       CESA_TDMA_NO_BYTE_SWAP | CESA_TDMA_EN,
--	       engine->regs + CESA_TDMA_CONTROL);
--
--	writel(CESA_SA_CFG_ACT_CH0_IDMA | CESA_SA_CFG_MULTI_PKT |
--	       CESA_SA_CFG_CH0_W_IDMA | CESA_SA_CFG_PARA_DIS,
--	       engine->regs + CESA_SA_CFG);
--	writel(dreq->chain.first->cur_dma,
--	       engine->regs + CESA_TDMA_NEXT_ADDR);
-+	writel_relaxed(CESA_TDMA_DST_BURST_128B | CESA_TDMA_SRC_BURST_128B |
-+		       CESA_TDMA_NO_BYTE_SWAP | CESA_TDMA_EN,
-+		       engine->regs + CESA_TDMA_CONTROL);
-+
-+	writel_relaxed(CESA_SA_CFG_ACT_CH0_IDMA | CESA_SA_CFG_MULTI_PKT |
-+		       CESA_SA_CFG_CH0_W_IDMA | CESA_SA_CFG_PARA_DIS,
-+		       engine->regs + CESA_SA_CFG);
-+	writel_relaxed(dreq->chain.first->cur_dma,
-+		       engine->regs + CESA_TDMA_NEXT_ADDR);
- 	writel(CESA_SA_CMD_EN_CESA_SA_ACCL0, engine->regs + CESA_SA_CMD);
- }
+ 	dreq->chain.first = NULL;
+@@ -105,9 +105,9 @@ mv_cesa_dma_add_desc(struct mv_cesa_tdma_chain *chain, gfp_t flags)
+ 		return ERR_PTR(-ENOMEM);
  
+ 	memset(new_tdma, 0, sizeof(*new_tdma));
+-	new_tdma->cur_dma = cpu_to_le32(dma_handle);
++	new_tdma->cur_dma = dma_handle;
+ 	if (chain->last) {
+-		chain->last->next_dma = new_tdma->cur_dma;
++		chain->last->next_dma = cpu_to_le32(dma_handle);
+ 		chain->last->next = new_tdma;
+ 	} else {
+ 		chain->first = new_tdma;
 -- 
 2.1.0
