@@ -1,8 +1,8 @@
 From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 13/18] crypto: marvell: avoid adding final operation within
- loop
-Date: Sun, 18 Oct 2015 17:24:32 +0100
-Message-ID: <E1Znql6-0005XL-4R@rmk-PC.arm.linux.org.uk>
+Subject: [PATCH 15/18] crypto: marvell: rearrange handling for hw finished
+ hashes
+Date: Sun, 18 Oct 2015 17:24:42 +0100
+Message-ID: <E1ZnqlG-0005XX-Ae@rmk-PC.arm.linux.org.uk>
 References: <20151018161649.GA6651@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -15,77 +15,87 @@ To: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
 	Jason Cooper <jason@lakedaemon.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45274 "EHLO
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45288 "EHLO
 	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932094AbbJRQYq (ORCPT
+	with ESMTP id S932094AbbJRQY4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2015 12:24:46 -0400
+	Sun, 18 Oct 2015 12:24:56 -0400
 In-Reply-To: <20151018161649.GA6651@n2100.arm.linux.org.uk>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Avoid adding the final operation within the loop, but instead add it
-outside.  We combine this with the handling for the no-data case.
+Rearrange the last request handling for hardware finished hashes
+by moving the generation of the fragment operation into this path.
+This results in a simplified sequence to handle this case, and
+allows us to move the software padded case further down into the
+function.  Add comments describing these parts.
 
 Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 ---
- drivers/crypto/marvell/hash.c | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+ drivers/crypto/marvell/hash.c | 35 ++++++++++++++++++++++++-----------
+ 1 file changed, 24 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-index b4da73d294af..dc8ab343ad9f 100644
+index b8ed0478031a..d2265beaaa6b 100644
 --- a/drivers/crypto/marvell/hash.c
 +++ b/drivers/crypto/marvell/hash.c
-@@ -602,6 +602,7 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
- 	struct mv_cesa_tdma_chain chain;
- 	struct mv_cesa_ahash_dma_iter iter;
- 	struct mv_cesa_op_ctx *op = NULL;
-+	unsigned int frag_len;
+@@ -529,32 +529,45 @@ mv_cesa_ahash_dma_last_req(struct mv_cesa_tdma_chain *chain,
+ 	struct mv_cesa_op_ctx *op;
  	int ret;
  
- 	dreq->chain.first = NULL;
-@@ -631,25 +632,34 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
- 		/*
- 		 * Add all the new data, inserting an operation block and
- 		 * launch command between each full SRAM block-worth of
--		 * data.
-+		 * data. We intentionally do not add the final op block.
- 		 */
--		do {
-+		while (true) {
- 			ret = mv_cesa_dma_add_op_transfers(&chain, &iter.base,
- 							   &iter.src, flags);
- 			if (ret)
- 				goto err_free_tdma;
+-	if (frag_len) {
++	/*
++	 * If the transfer is smaller than our maximum length, and we have
++	 * some data outstanding, we can ask the engine to finish the hash.
++	 */
++	if (creq->len <= CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX && frag_len) {
+ 		op = mv_cesa_dma_add_frag(chain, &creq->op_tmpl, frag_len,
+ 					  flags);
+ 		if (IS_ERR(op))
+ 			return op;
+-	} else {
+-		op = NULL;
+-	}
+-
+-	if (op && creq->len <= CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX) {
+-		u32 frag = CESA_SA_DESC_CFG_NOT_FRAG;
+-
+-		if (!mv_cesa_mac_op_is_first_frag(op))
+-			frag = CESA_SA_DESC_CFG_LAST_FRAG;
  
-+			frag_len = iter.base.op_len;
-+
-+			if (!mv_cesa_ahash_req_iter_next_op(&iter))
-+				break;
-+
- 			op = mv_cesa_dma_add_frag(&chain, &creq->op_tmpl,
--						  iter.base.op_len, flags);
-+						  frag_len, flags);
- 			if (IS_ERR(op)) {
- 				ret = PTR_ERR(op);
- 				goto err_free_tdma;
- 			}
--		} while (mv_cesa_ahash_req_iter_next_op(&iter));
--	} else if (iter.base.op_len) {
-+		}
+-		mv_cesa_update_op_cfg(op, frag, CESA_SA_DESC_CFG_FRAG_MSK);
++		mv_cesa_set_mac_op_total_len(op, creq->len);
++		mv_cesa_update_op_cfg(op, mv_cesa_mac_op_is_first_frag(op) ?
++						CESA_SA_DESC_CFG_NOT_FRAG :
++						CESA_SA_DESC_CFG_LAST_FRAG,
++				      CESA_SA_DESC_CFG_FRAG_MSK);
+ 
+ 		return op;
+ 	}
+ 
++	/*
++	 * The request is longer than the engine can handle, or we have
++	 * no data outstanding. Manually generate the padding, adding it
++	 * as a "mid" fragment.
++	 */
+ 	ret = mv_cesa_ahash_dma_alloc_padding(ahashdreq, flags);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+ 	trailerlen = mv_cesa_ahash_pad_req(creq, ahashdreq->padding);
+ 
++	if (frag_len) {
++		op = mv_cesa_dma_add_frag(chain, &creq->op_tmpl, frag_len,
++					  flags);
++		if (IS_ERR(op))
++			return op;
 +	} else {
- 		/* Account for the data that was in the cache. */
--		op = mv_cesa_dma_add_frag(&chain, &creq->op_tmpl,
--					  iter.base.op_len, flags);
-+		frag_len = iter.base.op_len;
++		op = NULL;
 +	}
 +
-+	if (frag_len) {
-+		op = mv_cesa_dma_add_frag(&chain, &creq->op_tmpl, frag_len,
-+					  flags);
- 		if (IS_ERR(op)) {
- 			ret = PTR_ERR(op);
- 			goto err_free_tdma;
+ 	if (op) {
+ 		len = min(CESA_SA_SRAM_PAYLOAD_SIZE - dma_iter->base.op_len,
+ 			  trailerlen);
 -- 
 2.1.0
