@@ -1,93 +1,36 @@
-From: arno@natisbad.org (Arnaud Ebalard)
-Subject: Re: [PATCH 00/18] crypto: further fixes for Marvell CESA hash
-Date: Mon, 19 Oct 2015 01:57:47 +0200
-Message-ID: <87oafvzq4k.fsf@natisbad.org>
-References: <20151009102904.GL32532@n2100.arm.linux.org.uk>
-	<20151009104637.GA18798@n2100.arm.linux.org.uk>
-	<20151009194309.GA7401@n2100.arm.linux.org.uk>
-	<20151018161649.GA6651@n2100.arm.linux.org.uk>
-	<20151018191835.7f00641c@bbrezillon>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v2 0/5] crypto: add algif_akcipher user space API
+Date: Mon, 19 Oct 2015 09:32:30 +0800
+Message-ID: <20151019013230.GA3156@gondor.apana.org.au>
+References: <1831785.BBs8Hj3CxY@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jason Cooper <jason@lakedaemon.net>,
-	linux-crypto@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-To: Boris Brezillon <boris.brezillon@free-electrons.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 36.223.133.77.rev.sfr.net ([77.133.223.36]:50279 "EHLO
-	smtp.natisbad.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751680AbbJRX6I (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2015 19:58:08 -0400
-In-Reply-To: <20151018191835.7f00641c@bbrezillon> (Boris Brezillon's message
-	of "Sun, 18 Oct 2015 19:18:35 +0200")
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1831785.BBs8Hj3CxY-Veo+UhszpQh6vwJ5+F2VIg@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+On Sun, Oct 18, 2015 at 12:44:00PM +0200, Stephan Mueller wrote:
+> Hi,
+> 
+> This patch set adds the AF_ALG user space API to externalize the
+> asymmetric cipher API recently added to the kernel crypto API.
+> 
+> The patch set is tested with the user space library of libkcapi [1].
+> Use [1] test/test.sh for a full test run. The test covers the
+> following scenarios:
 
-Boris Brezillon <boris.brezillon@free-electrons.com> writes:
-
-> On Sun, 18 Oct 2015 17:16:49 +0100
-> Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
->
->> Following on from the previous series, this series addresses further
->> problems with the Marvell CESA hash driver found while testing it my
->> openssl/ssh scenarios.
->> 
->> The first patch improves one from the previous series: we can get the
->> transform more directly using req->base.tfm rather than going round
->> the houses.
->> 
->> The next few patches rework the algorithm endianness conversions.
->> There are two things which depend on the algorithm endianness - the
->> format of the result, and the format of the bit length in the last
->> block.  We introduce a flag to convey this information, and keep
->> the creq->state format in CPU endian mode for consistency.
->> 
->> Some of the inconsistent hash results are down to the template
->> operation not being properly initialised - so we zero initialise all
->> template operations.
->> 
->> The following patches (from "factor out first fragment decisions to
->> helper") rework the digest handling to ensure that we always provide
->> the hardware with a complete block of data to hash, otherwise it can
->> be left mid-calculation, which then causes state to leak to
->> subsequent operations.  This requires a re-structure of the way we
->> put together the DMA entries, so it's done in relatively small steps.
->> 
->> This results in the CESA driver passing all tests I can throw at it
->> via the AF_ALG openssl plugin with the exception of asking for the
->> hash of /dev/null.  This returns an all zero result, rather than the
->> correct hash value.  This bug is pending further diagnosis, but it
->> is believed not to be a driver specific bug as iMX6 CAAM also behaves
->> the same.
->> 
->> Unfortunately, this is a large series, but the driver unfortunately
->> needs this level of bug fixing to work properly.
->
-> Thanks for spending some time fixing those bugs and
-> simplifying/factorizing/documenting the hash logic.
->
-> To the whole series:
->
-> Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
->
-> Note that my ack might seem quite quick compared to the amount of
-> changes, but Russell actually sent me a preliminary version last
-> Wednesday.
->
-> Arnaud, if you have some time, could you also have a look at those
-> patches?
-
-I have tested the whole set and it works fine on my mirabox (crypto
-manager tests are ok). I have started reading the patches but I am only
-at patch 08/18 right now; everything looks good for now. I'll continue
-tomorrow.
+Thanks Stephan.  But I would prefer to defer this til after we have
+completed the conversion of current in-kernel users.  This is because
+changing the kernel interface is easy while changing the user-space
+interface is not.
 
 Cheers,
-
-a+
+-- 
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
