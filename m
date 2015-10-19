@@ -1,60 +1,65 @@
 From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
-Subject: [PATCH 4/4] hwrng: exynos - Add Device Tree support
-Date: Mon, 19 Oct 2015 13:37:42 +0900
-Message-ID: <1445229462-32395-5-git-send-email-k.kozlowski@samsung.com>
-References: <1445229462-32395-1-git-send-email-k.kozlowski@samsung.com>
+Subject: [PATCH 0/3] ARM: dts: Enable Exynos RNG module
+Date: Mon, 19 Oct 2015 14:00:31 +0900
+Message-ID: <1445230834-32689-1-git-send-email-k.kozlowski@samsung.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Cc: Heiner Kallweit <hkallweit1@gmail.com>
 To: Kukjin Kim <kgene@kernel.org>,
-	Krzysztof Kozlowski <k.kozlowski@samsung.com>,
-	Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout4.w1.samsung.com ([210.118.77.14]:33618 "EHLO
-	mailout4.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752485AbbJSEiH (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 Oct 2015 00:38:07 -0400
-In-reply-to: <1445229462-32395-1-git-send-email-k.kozlowski@samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+ Krzysztof Kozlowski <k.kozlowski@samsung.com>,
+ Sylwester Nawrocki <s.nawrocki@samsung.com>,
+ Tomasz Figa <tomasz.figa@gmail.com>,
+ Michael Turquette <mturquette@baylibre.com>,
+ Stephen Boyd <sboyd@codeaurora.org>, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-samsung-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+ Matt Mackall <mpm@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-crypto@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add Device Tree support for the driver. The Pseudo Random Number
-Generator module is the same in almost all of Exynos SoCs, since
-Exynos4210 (however the tests were done only on Trats2 board with
-Exynos4412). There are some differences on newer Exynos Octa
-(Exynos542x) SoCs.
+Hi,
 
-Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
----
- drivers/char/hw_random/exynos-rng.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/drivers/char/hw_random/exynos-rng.c b/drivers/char/hw_random/exynos-rng.c
-index 162adbda1b70..7077c7741dae 100644
---- a/drivers/char/hw_random/exynos-rng.c
-+++ b/drivers/char/hw_random/exynos-rng.c
-@@ -188,10 +188,19 @@ static const struct dev_pm_ops exynos_rng_pm_ops = {
- 			   exynos_rng_runtime_resume, NULL)
- };
- 
-+static const struct of_device_id exynos_rng_dt_match[] = {
-+	{
-+		.compatible = "samsung,exynos4-rng",
-+	},
-+	{ },
-+};
-+MODULE_DEVICE_TABLE(of, exynos_rng_dt_match);
-+
- static struct platform_driver exynos_rng_driver = {
- 	.driver		= {
- 		.name	= "exynos-rng",
- 		.pm	= &exynos_rng_pm_ops,
-+		.of_match_table = exynos_rng_dt_match,
- 	},
- 	.probe		= exynos_rng_probe,
- };
+The patchset adds necessary clock from Security SubSystem (SSS)
+and enables the PRNG module of Exynos for Trats2 board.
+
+The first patch (clock) is required for other ones so please
+take everything in one step.
+
+The actual Device Tree support (and compatible) was sent in separate
+patch:
+ - https://patchwork.kernel.org/patch/7432891/
+ - http://marc.info/?l=linux-crypto-vger&m=144522952725052&w=2
+
+The device can be tested (after applying both patchsets) with:
+$ echo exynos > /sys/class/misc/hw_random/rng_current
+$ dd if=/dev/hwrng of=/dev/null bs=1 count=16
+
+
+Best regards,
+Krzysztof
+
+Krzysztof Kozlowski (3):
+  clk: samsung: exynos4: Add SSS gate clock
+  ARM: dts: Add PRNG module for exynos4
+  ARM: dts: Enable PRNG module on exynos4412-trats2
+
+ arch/arm/boot/dts/exynos4.dtsi          | 8 ++++++++
+ arch/arm/boot/dts/exynos4412-trats2.dts | 4 ++++
+ drivers/clk/samsung/clk-exynos4.c       | 1 +
+ include/dt-bindings/clock/exynos4.h     | 1 +
+ 4 files changed, 14 insertions(+)
+
 -- 
 1.9.1
