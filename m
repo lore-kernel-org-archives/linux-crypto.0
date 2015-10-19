@@ -1,68 +1,71 @@
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [PATCH 03/18] crypto: marvell: add flag to determine algorithm
- endianness
-Date: Mon, 19 Oct 2015 16:25:07 +0100
-Message-ID: <20151019152507.GL32532@n2100.arm.linux.org.uk>
-References: <20151018161649.GA6651@n2100.arm.linux.org.uk>
- <E1ZnqkG-0005WH-TE@rmk-PC.arm.linux.org.uk>
- <20151019150451.GB3953@io.lakedaemon.net>
+From: Tobias Jakobi <tjakobi@math.uni-bielefeld.de>
+Subject: Re: [PATCH 0/3] ARM: dts: Enable Exynos RNG module
+Date: Mon, 19 Oct 2015 18:11:19 +0200
+Message-ID: <56251627.4050908@math.uni-bielefeld.de>
+References: <1445230834-32689-1-git-send-email-k.kozlowski@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+To: Krzysztof Kozlowski <k.kozlowski@samsung.com>,
+	Kukjin Kim <kgene@kernel.org>,
+	Sylwester Nawrocki <s.nawrocki@samsung.com>,
+	Tomasz Figa <tomasz.figa@gmail.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@codeaurora.org>,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-clk@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org
-To: Jason Cooper <jason@lakedaemon.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:48052 "EHLO
-	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752884AbbJSPZV (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 Oct 2015 11:25:21 -0400
-Content-Disposition: inline
-In-Reply-To: <20151019150451.GB3953@io.lakedaemon.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-Reply-To: <1445230834-32689-1-git-send-email-k.kozlowski@samsung.com>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Oct 19, 2015 at 03:04:51PM +0000, Jason Cooper wrote:
-> Hey Russell,
+Hello Krzysztof,
+
+I can confirm that this also works on a Odroid-X2, so I guess it's safe
+to enable the PRNG for all Exynos4412-based Odroid devices.
+
+Any chance that you might also take a look at the other hwcrypto stuff
+on the SoC ('samsung,exynos4210-secss' compatible)?
+
+With best wishes,
+Tobias
+
+
+Krzysztof Kozlowski wrote:
+> Hi,
 > 
-> On Sun, Oct 18, 2015 at 05:23:40PM +0100, Russell King wrote:
-> >  static int mv_cesa_ahash_init(struct ahash_request *req,
-> > -			      struct mv_cesa_op_ctx *tmpl)
-> > +			      struct mv_cesa_op_ctx *tmpl, bool algo_le)
 > 
-> nit: Would it make more sense the do bool algo_endian, and then ...
-
-I don't like "bool"s that don't self-document what they mean.
-What does "if (algo_endian)" mean?  It's pretty clear what
-"if (algo_le)" means in the context of endianness, though I'll
-give you that "if (algo_little_endian)" would be a lot better.
-
+> The patchset adds necessary clock from Security SubSystem (SSS)
+> and enables the PRNG module of Exynos for Trats2 board.
 > 
-> > @@ -861,7 +862,7 @@ static int mv_cesa_md5_init(struct ahash_request *req)
-> >  
-> >  	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_MD5);
-> >  
-> > -	mv_cesa_ahash_init(req, &tmpl);
-> > +	mv_cesa_ahash_init(req, &tmpl, true);
+> The first patch (clock) is required for other ones so please
+> take everything in one step.
 > 
-> 	mv_cesa_ahash_init(req, &tmpl, ALGO_ENDIAN_LITTLE);
+> The actual Device Tree support (and compatible) was sent in separate
+> patch:
+>  - https://patchwork.kernel.org/patch/7432891/
+>  - http://marc.info/?l=linux-crypto-vger&m=144522952725052&w=2
 > 
-> 'true' doesn't seem as obvious.  But again, nit-picky.
-
-I did think about:
-
-enum {
-	ALGO_LITTLE_ENDIAN,
-	ALGO_BIG_ENDIAN,
-};
-
-and passing an int algo_endian around, but that seemed to be like too
-much bloat... though if you want to insist, I could make that change.
-
--- 
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+> The device can be tested (after applying both patchsets) with:
+> $ echo exynos > /sys/class/misc/hw_random/rng_current
+> $ dd if=/dev/hwrng of=/dev/null bs=1 count=16
+> 
+> 
+> Best regards,
+> Krzysztof
+> 
+> Krzysztof Kozlowski (3):
+>   clk: samsung: exynos4: Add SSS gate clock
+>   ARM: dts: Add PRNG module for exynos4
+>   ARM: dts: Enable PRNG module on exynos4412-trats2
+> 
+>  arch/arm/boot/dts/exynos4.dtsi          | 8 ++++++++
+>  arch/arm/boot/dts/exynos4412-trats2.dts | 4 ++++
+>  drivers/clk/samsung/clk-exynos4.c       | 1 +
+>  include/dt-bindings/clock/exynos4.h     | 1 +
+>  4 files changed, 14 insertions(+)
+> 
