@@ -1,7 +1,7 @@
 From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
-Subject: [PATCH 1/4] dt-bindings: rng: Describe Exynos4 PRNG bindings
-Date: Mon, 19 Oct 2015 13:37:39 +0900
-Message-ID: <1445229462-32395-2-git-send-email-k.kozlowski@samsung.com>
+Subject: [PATCH 4/4] hwrng: exynos - Add Device Tree support
+Date: Mon, 19 Oct 2015 13:37:42 +0900
+Message-ID: <1445229462-32395-5-git-send-email-k.kozlowski@samsung.com>
 References: <1445229462-32395-1-git-send-email-k.kozlowski@samsung.com>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>
 To: Kukjin Kim <kgene@kernel.org>,
@@ -11,42 +11,50 @@ To: Kukjin Kim <kgene@kernel.org>,
 	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout4.w1.samsung.com ([210.118.77.14]:33618 "EHLO
+	mailout4.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752485AbbJSEiH (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 19 Oct 2015 00:38:07 -0400
 In-reply-to: <1445229462-32395-1-git-send-email-k.kozlowski@samsung.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Document the bindings used by exynos-rng Pseudo Random Number Generator
-driver.
+Add Device Tree support for the driver. The Pseudo Random Number
+Generator module is the same in almost all of Exynos SoCs, since
+Exynos4210 (however the tests were done only on Trats2 board with
+Exynos4412). There are some differences on newer Exynos Octa
+(Exynos542x) SoCs.
 
 Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
 ---
- .../devicetree/bindings/rng/samsung,exynos-rng4.txt     | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos-rng4.txt
+ drivers/char/hw_random/exynos-rng.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/rng/samsung,exynos-rng4.txt b/Documentation/devicetree/bindings/rng/samsung,exynos-rng4.txt
-new file mode 100644
-index 000000000000..4ca8dd4d7e66
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/samsung,exynos-rng4.txt
-@@ -0,0 +1,17 @@
-+Exynos Pseudo Random Number Generator
+diff --git a/drivers/char/hw_random/exynos-rng.c b/drivers/char/hw_random/exynos-rng.c
+index 162adbda1b70..7077c7741dae 100644
+--- a/drivers/char/hw_random/exynos-rng.c
++++ b/drivers/char/hw_random/exynos-rng.c
+@@ -188,10 +188,19 @@ static const struct dev_pm_ops exynos_rng_pm_ops = {
+ 			   exynos_rng_runtime_resume, NULL)
+ };
+ 
++static const struct of_device_id exynos_rng_dt_match[] = {
++	{
++		.compatible = "samsung,exynos4-rng",
++	},
++	{ },
++};
++MODULE_DEVICE_TABLE(of, exynos_rng_dt_match);
 +
-+Required properties:
-+
-+- compatible  : Should be "samsung,exynos4-rng".
-+- reg         : Specifies base physical address and size of the registers map.
-+- clocks      : Phandle to clock-controller plus clock-specifier pair.
-+- clock-names : "secss" as a clock name.
-+
-+Example:
-+
-+	rng@10830400 {
-+		compatible = "samsung,exynos4-rng";
-+		reg = <0x10830400 0x200>;
-+		clocks = <&clock CLK_SSS>;
-+		clock-names = "secss";
-+	};
+ static struct platform_driver exynos_rng_driver = {
+ 	.driver		= {
+ 		.name	= "exynos-rng",
+ 		.pm	= &exynos_rng_pm_ops,
++		.of_match_table = exynos_rng_dt_match,
+ 	},
+ 	.probe		= exynos_rng_probe,
+ };
 -- 
 1.9.1
