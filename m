@@ -1,41 +1,30 @@
-From: Stephen Boyd <sboyd@codeaurora.org>
-Subject: Re: [PATCH 1/3] clk: samsung: exynos4: Add SSS gate clock
-Date: Mon, 19 Oct 2015 12:59:46 -0700
-Message-ID: <20151019195946.GH10182@codeaurora.org>
-References: <1445230834-32689-1-git-send-email-k.kozlowski@samsung.com>
- <1445230834-32689-2-git-send-email-k.kozlowski@samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Kukjin Kim <kgene@kernel.org>,
-	Sylwester Nawrocki <s.nawrocki@samsung.com>,
-	Tomasz Figa <tomasz.figa@gmail.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-clk@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	Heiner Kallweit <hkallweit1@gmail.com>
-To: Krzysztof Kozlowski <k.kozlowski@samsung.com>
-Return-path: <linux-clk-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1445230834-32689-2-git-send-email-k.kozlowski@samsung.com>
-Sender: linux-clk-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Subject: [PATCH 0/2] xfrm/crypto: unaligned access fixes
+Date: Mon, 19 Oct 2015 17:23:27 -0400
+Message-ID: <cover.1445286755.git.sowmini.varadhan@oracle.com>
+Cc: herbert@gondor.apana.org.au, dhowells@redhat.com,
+	davem@davemloft.net, zohar@linux.vnet.ibm.com,
+	David.Woodhouse@intel.com, sowmini.varadhan@oracle.com,
+	steffen.klassert@secunet.com
+To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from aserp1040.oracle.com ([141.146.126.69]:46454 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750876AbbJSVYk (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 19 Oct 2015 17:24:40 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/19, Krzysztof Kozlowski wrote:
-> Add a gate clock for controlling all clocks of Security Sub System
-> (SSS).
-> 
-> Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
-> ---
+A two-part patchset that fixes some "unaligned access" warnings
+that showed up my sparc test machines with ipsec set up.
 
-The To: list is huge, so I have no idea if you want me to apply
-this patch or not, and given that it's part of a series that has
-dts changes I guess that means it should go through arm-soc:
 
-Acked-by: Stephen Boyd <sboyd@codeaurora.org>
+Sowmini Varadhan (2):
+  crypto/x509: Fix unaligned access in x509_get_sig_params()
+  Fix unaligned access in xfrm_notify_sa() for DELSA
 
--- 
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
-a Linux Foundation Collaborative Project
+ crypto/asymmetric_keys/x509_public_key.c |    5 +++--
+ net/xfrm/xfrm_user.c                     |    2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
