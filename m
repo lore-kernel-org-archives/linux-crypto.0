@@ -1,30 +1,32 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH 1/2] crypto/x509: Fix unaligned access in x509_get_sig_params()
-Date: Tue, 20 Oct 2015 10:50:38 +0100
-Message-ID: <21610.1445334638@warthog.procyon.org.uk>
-References: <288f39ff7c8b0bc60693e338fc8f6cea9008d443.1445286755.git.sowmini.varadhan@oracle.com> <cover.1445286755.git.sowmini.varadhan@oracle.com> <cover.1445286755.git.sowmini.varadhan@oracle.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] lib/mpi: clean unused SHA1_DIGEST_LENGTH
+Date: Tue, 20 Oct 2015 22:19:39 +0800
+Message-ID: <20151020141939.GA7625@gondor.apana.org.au>
+References: <1444849860-16334-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1444934124-3883-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	zohar@linux.vnet.ibm.com, David.Woodhouse@intel.com,
-	steffen.klassert@secunet.com
-To: Sowmini Varadhan <sowmini.varadhan@oracle.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <288f39ff7c8b0bc60693e338fc8f6cea9008d443.1445286755.git.sowmini.varadhan@oracle.com>
-Content-ID: <21609.1445334638.1@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: tadeusz.struk@intel.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:46114 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751725AbbJTOTo (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Oct 2015 10:19:44 -0400
+Content-Disposition: inline
+In-Reply-To: <1444934124-3883-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Sowmini Varadhan <sowmini.varadhan@oracle.com> wrote:
-
-> x509_get_sig_params() has the same code pattern as the one in
-> pkcs7_verify() that is fixed by commit 62f57d05e287 ("crypto: pkcs7 - Fix
-> unaligned access in pkcs7_verify()") so apply a similar fix here: make
-> sure that desc is pointing at an algined value past the digest_size,
-> and take alignment values into consideration when doing kzalloc()
+On Thu, Oct 15, 2015 at 08:34:53PM +0200, LABBE Corentin wrote:
+> The define SHA1_DIGEST_LENGTH is not used anywhere, so remove it.
 > 
-> Signed-off-by: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 
-Acked-by: David Howells <dhowells@redhat.com>
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
