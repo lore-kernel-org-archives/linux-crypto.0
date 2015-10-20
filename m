@@ -1,31 +1,31 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v2 1/5] MPI: fix off by one in mpi_read_raw_from_sgl
-Date: Tue, 20 Oct 2015 22:20:22 +0800
-Message-ID: <20151020142022.GD7625@gondor.apana.org.au>
-References: <1831785.BBs8Hj3CxY@myon.chronox.de>
- <3192672.E3TvJmsW94@myon.chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: qat - fix crypto_get_instance_node function
+Date: Tue, 20 Oct 2015 22:20:07 +0800
+Message-ID: <20151020142007.GC7625@gondor.apana.org.au>
+References: <20151016184056.21772.40366.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:60599 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753222AbbJTOUJ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Oct 2015 10:20:09 -0400
 Content-Disposition: inline
-In-Reply-To: <3192672.E3TvJmsW94-Veo+UhszpQh6vwJ5+F2VIg@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20151016184056.21772.40366.stgit@tstruk-mobl1>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Oct 18, 2015 at 12:45:18PM +0200, Stephan Mueller wrote:
-> The patch fixes the analysis of the input data which contains an off
-> by one.
+On Fri, Oct 16, 2015 at 11:40:56AM -0700, Tadeusz Struk wrote:
+> qat_crypto_get_instance_node function needs to handle situation when the
+> first dev in the list is not started.
 > 
-> The issue is visible when the SGL contains one byte per SG entry.
-> The code for checking for zero bytes does not operate on the data byte.
-> 
-> Signed-off-by: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 
 Patch applied.  Thanks.
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
