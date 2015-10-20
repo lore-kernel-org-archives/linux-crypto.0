@@ -1,48 +1,41 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH] crypto: sun4i-ss: add missing statesize
-Date: Tue, 20 Oct 2015 20:05:10 +0200
-Message-ID: <1445364310-4277-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: clabbe.montjoie@gmail.com, davem@davemloft.net,
-	herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
-	maxime.ripard@free-electrons.com
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] crypto: qat - when stopping all devices make fure VF are
+ stopped first
+Date: Tue, 20 Oct 2015 12:50:03 -0700
+Message-ID: <20151020195003.8954.19651.stgit@tstruk-mobl1>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	tadeusz.struk@intel.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f170.google.com ([209.85.212.170]:34272 "EHLO
-	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751178AbbJTSFU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Oct 2015 14:05:20 -0400
+Received: from mga03.intel.com ([134.134.136.65]:50409 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751323AbbJTTw3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Oct 2015 15:52:29 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-sun4i-ss implementaton of md5/sha1 is via ahash algorithms.
-A recent change make impossible to load them without giving statesize.
-This patch specifiy statesize for sha1 and md5.
+When stopping all devices make sure VFs are stopped before the
+corresponding PF.
+VFs will always be after PF so just need to loop back.
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- drivers/crypto/sunxi-ss/sun4i-ss-core.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/crypto/qat/qat_common/adf_ctl_drv.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-core.c b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-index eab6fe2..107cd2a 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-@@ -39,6 +39,7 @@ static struct sun4i_ss_alg_template ss_algs[] = {
- 		.import = sun4i_hash_import_md5,
- 		.halg = {
- 			.digestsize = MD5_DIGEST_SIZE,
-+			.statesize = sizeof(struct md5_state),
- 			.base = {
- 				.cra_name = "md5",
- 				.cra_driver_name = "md5-sun4i-ss",
-@@ -66,6 +67,7 @@ static struct sun4i_ss_alg_template ss_algs[] = {
- 		.import = sun4i_hash_import_sha1,
- 		.halg = {
- 			.digestsize = SHA1_DIGEST_SIZE,
-+			.statesize = sizeof(struct sha1_state),
- 			.base = {
- 				.cra_name = "sha1",
- 				.cra_driver_name = "sha1-sun4i-ss",
--- 
-2.4.10
+diff --git a/drivers/crypto/qat/qat_common/adf_ctl_drv.c b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
+index 03856ad..bd8dfa1 100644
+--- a/drivers/crypto/qat/qat_common/adf_ctl_drv.c
++++ b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
+@@ -278,7 +278,7 @@ static int adf_ctl_stop_devices(uint32_t id)
+ 	struct list_head *itr, *head = adf_devmgr_get_head();
+ 	int ret = 0;
+ 
+-	list_for_each(itr, head) {
++	list_for_each_prev(itr, head) {
+ 		struct adf_accel_dev *accel_dev =
+ 				list_entry(itr, struct adf_accel_dev, list);
+ 		if (id == accel_dev->accel_id || id == ADF_CFG_ALL_DEVICES) {
