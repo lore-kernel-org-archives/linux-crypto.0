@@ -1,26 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] akcipher: Don't #include crypto/public_key.h as the
- contents aren't used
-Date: Tue, 20 Oct 2015 22:26:07 +0800
-Message-ID: <20151020142607.GI7625@gondor.apana.org.au>
-References: <20151019111945.9535.66118.stgit@warthog.procyon.org.uk>
+Subject: Re: [PATCH 1/2] crypto/x509: Fix unaligned access in
+ x509_get_sig_params()
+Date: Tue, 20 Oct 2015 22:26:41 +0800
+Message-ID: <20151020142641.GJ7625@gondor.apana.org.au>
+References: <cover.1445286755.git.sowmini.varadhan@oracle.com>
+ <288f39ff7c8b0bc60693e338fc8f6cea9008d443.1445286755.git.sowmini.varadhan@oracle.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: tadeusz.struk@intel.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, dhowells@redhat.com, davem@davemloft.net,
+	zohar@linux.vnet.ibm.com, David.Woodhouse@intel.com,
+	steffen.klassert@secunet.com
+To: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:43785 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752857AbbJTO0s (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Oct 2015 10:26:48 -0400
 Content-Disposition: inline
-In-Reply-To: <20151019111945.9535.66118.stgit@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <288f39ff7c8b0bc60693e338fc8f6cea9008d443.1445286755.git.sowmini.varadhan@oracle.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Oct 19, 2015 at 12:19:45PM +0100, David Howells wrote:
-> Don't #include crypto/public_key.h in akcipher as the contents of the
-> header aren't used and changes in a future patch cause it to fail to
-> compile if CONFIG_KEYS=n.
+On Mon, Oct 19, 2015 at 05:23:28PM -0400, Sowmini Varadhan wrote:
+> x509_get_sig_params() has the same code pattern as the one in
+> pkcs7_verify() that is fixed by commit 62f57d05e287 ("crypto: pkcs7 - Fix
+> unaligned access in pkcs7_verify()") so apply a similar fix here: make
+> sure that desc is pointing at an algined value past the digest_size,
+> and take alignment values into consideration when doing kzalloc()
 > 
-> Signed-off-by: David Howells <dhowells@redhat.com>
+> Signed-off-by: Sowmini Varadhan <sowmini.varadhan@oracle.com>
 
 Patch applied.  Thanks.
 -- 
