@@ -1,56 +1,73 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/6] Sparse related fixes
-Date: Tue, 20 Oct 2015 22:21:17 +0800
-Message-ID: <20151020142117.GF7625@gondor.apana.org.au>
-References: <20151009102904.GL32532@n2100.arm.linux.org.uk>
- <20151009104637.GA18798@n2100.arm.linux.org.uk>
- <20151009194309.GA7401@n2100.arm.linux.org.uk>
- <20151018161649.GA6651@n2100.arm.linux.org.uk>
- <20151018173039.GA9737@n2100.arm.linux.org.uk>
+Subject: Re: [PATCH v2 0/6] Fix CAAM hash driver
+Date: Tue, 20 Oct 2015 22:23:46 +0800
+Message-ID: <20151020142346.GG7625@gondor.apana.org.au>
+References: <20151017185055.GQ32532@n2100.arm.linux.org.uk>
+ <20151018165046.GA7997@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>,
+Cc: Victoria Milhoan <vicki.milhoan@freescale.com>,
+	horia.geanta@freescale.com, fabio.estevam@freescale.com,
 	"David S. Miller" <davem@davemloft.net>,
-	Jason Cooper <jason@lakedaemon.net>,
-	linux-crypto@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+	linux-crypto@vger.kernel.org
 To: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55288 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:56750 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753146AbbJTOV0 (ORCPT
+	with ESMTP id S1753137AbbJTOXz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Oct 2015 10:21:26 -0400
+	Tue, 20 Oct 2015 10:23:55 -0400
 Content-Disposition: inline
-In-Reply-To: <20151018173039.GA9737@n2100.arm.linux.org.uk>
+In-Reply-To: <20151018165046.GA7997@n2100.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Oct 18, 2015 at 06:30:39PM +0100, Russell King - ARM Linux wrote:
-> Continuing on from the previous set of 18 patches, I also fixed a
-> number of sparse problems and other cleanups.  I don't deem these
-> suitable for -rc merging, especially now that we're basically at
-> -rc6.
+On Sun, Oct 18, 2015 at 05:50:47PM +0100, Russell King - ARM Linux wrote:
+> The following series fixes the CAAM hash driver, allowing it to work
+> with the previously merged "crypto: ahash - ensure statesize is non-
+> zero" patch.
 > 
-> The first patch switches the driver over to appropriately using
-> the relaxed IO accessors - this avoids calling out to the heavy
-> barrier on every read and write operation, but only calling out on
-> those which really matter.
+> This is non-trivial, because CAAM exports a huge 1600 bytes of data,
+> which, if we set .statesize to this, still results in the core code
+> rejecting the driver.  So, we need to shrink the amount of state
+> exported.
 > 
-> We switch to using dma_addr_t for DMA addresses which are not accessed
-> by hardware, and using gfp_t for the get_free_page flags.  String-based
-> MMIO accesses are used instead of plain memcpy()/memset() which prevents
-> us potentially stumbling over GCC optimisations that it thinks it may
-> make with these functions.
+> The first, most obvious one to get rid of is the export of the
+> caam_hash_ctx structure, which is shared between the socket being
+> exported from and imported to - copying it away and back again was
+> a complete no-op.
 > 
-> We convert as much of the hardware state to __le32 endian markings,
-> and use cpu_to_le32() as appropriate.  A number of places are left
-> unfixed, as we temporarily store CPU native endian values at these
-> locations; these warnings should not be fixed (basically, only
-> appropriate sparse warnings should be fixed without penalising code.)
+> The second is that we don't need to export both pending-bytes buffers.
+> Only one will be in use at any time.
+> 
+> A problem was encountered while testing, where the size of the pending
+> bytes buffer was not added to the scatterlist with the correct length.
+> This is also fixed in this series, by patch 3.  This bug was introduced
+> by a prior commit trying to fix a tcrypt error.  However, the change is
+> wrong, but I have to question whether the test was correct or not - the
+> backtrace contains a function "test_ahash_pnum" which doesn't seem to
+> exist in mainline, nor does it seem to exist in any previous mainline
+> kernel.
+> 
+> Version 2 of this series addresses a mismerge in patch 5 of the
+> original series, and adds further information to patch 3.
+> 
+> Further testing with tcrypt showed up a problem identified by the
+> DMA API debugging (different to the original one referred to in
+> patch 3) where we leak DMA mappings.
 
-All applied.  Thanks.
+Patches 1-5 applied.  Patch 6 failed to apply because the cryptodev
+tree already has a patch that converts caam to use dma_map_sg instead
+of the caam-specific dma_map_sg_chained.  If your patch is still
+needed could you please rebase it on top of cryptodev?
+
+commit 13fb8fd7a81923f7a64b4e688fe0bdaf1ea26adf
+Author: LABBE Corentin <clabbe.montjoie@gmail.com>
+Date:   Wed Sep 23 13:55:27 2015 +0200
+
+    crypto: caam - dma_map_sg can handle chained SG
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
