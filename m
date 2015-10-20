@@ -1,91 +1,78 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 5/8] crypto: akcipher: fix typos in include/crypto/akcipher.h
-Date: Tue, 20 Oct 2015 09:57:18 +0200
-Message-ID: <5998625.MV1BPvB99o@tauon.atsec.com>
-References: <1445326444-11019-1-git-send-email-clabbe.montjoie@gmail.com> <1445326444-11019-6-git-send-email-clabbe.montjoie@gmail.com>
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Subject: Re: [PATCH 4/6] crypto: marvell: use memcpy_fromio()/memcpy_toio()
+Date: Tue, 20 Oct 2015 08:58:52 +0100
+Message-ID: <20151020075852.GT32532@n2100.arm.linux.org.uk>
+References: <20151018173039.GA9737@n2100.arm.linux.org.uk>
+ <E1Znrnf-00064N-OS@rmk-PC.arm.linux.org.uk>
+ <87oafucudc.fsf@natisbad.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Arnaud Ebalard <arno@natisbad.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34373 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752398AbbJTH5Y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Oct 2015 03:57:24 -0400
-In-Reply-To: <1445326444-11019-6-git-send-email-clabbe.montjoie@gmail.com>
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:49707 "EHLO
+	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753000AbbJTH7N (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Oct 2015 03:59:13 -0400
+Content-Disposition: inline
+In-Reply-To: <87oafucudc.fsf@natisbad.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 20. Oktober 2015, 09:34:01 schrieb LABBE Corentin:
+On Tue, Oct 20, 2015 at 01:26:55AM +0200, Arnaud Ebalard wrote:
+> Hi Russell,
+> 
+> Russell King <rmk+kernel@arm.linux.org.uk> writes:
+> 
+> > Use the IO memcpy() functions when copying from/to MMIO memory.
+> > These locations were found via sparse.
+> 
+> On recent MVEBU hardware, *_std_* function are not expected to be used
+> because we will instead use the TDMA-based versions. So the only
+> possible penalty we could get (if any) from this change on recent
+> devices is for the copy of the IV in mv_cesa_ablkcipher_process(). Out
+> of curiosity, I took a quick look at what is generated and it seems this
+> results in a call to mmiocpy(): 
+> 
+> 00000340 <mv_cesa_ablkcipher_process>:
+>      340:       e1a0c00d        mov     ip, sp
+>      344:       e92dd830        push    {r4, r5, fp, ip, lr, pc}
+>      348:       e24cb004        sub     fp, ip, #4
+>      34c:       e24dd008        sub     sp, sp, #8
+> 
+>      ....
+> 
+>      3a4:       e5943010        ldr     r3, [r4, #16]
+>      3a8:       e5951008        ldr     r1, [r5, #8]
+>      3ac:       e594001c        ldr     r0, [r4, #28]
+>      3b0:       e2811040        add     r1, r1, #64     ; 0x40
+>      3b4:       e593201c        ldr     r2, [r3, #28]
+>      3b8:       ebfffffe        bl      0 <mmiocpy>
+> 
+> which if I am not mistaken is provided by arch/arm/lib/memcpy.S via:
+> 
+> ENTRY(mmiocpy)
+> ENTRY(memcpy)
+> 
+> #include "copy_template.S"
+> 
+> ENDPROC(memcpy)
+> ENDPROC(mmiocpy)
+> 
+> Am I right in concluding this will end up being the code of a usual
+> memcpy(), i.e. the change is a noop in the final code compared to
+> previous version? 
 
-Hi LABBE,
+Almost - what's different is the compiler is not allowed to "optimise"
+this memcpy call.  See 1bd46782d08b ("ARM: avoid unwanted GCC
+memset()/memcpy() optimisations for IO variants")
 
->Fix numerous spelling error in include/crypto/akcipher.h
->
->Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
->---
-> include/crypto/akcipher.h | 14 +++++++-------
-> 1 file changed, 7 insertions(+), 7 deletions(-)
->
->diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
->index 69d163e..0c9fa68 100644
->--- a/include/crypto/akcipher.h
->+++ b/include/crypto/akcipher.h
->@@ -19,12 +19,12 @@
->  *
->  * @base:	Common attributes for async crypto requests
->  * @src:	Pointer to memory containing the input parameters
->- *		The format of the parameter(s) is expeted to be Octet String
->- * @dst:	Pointer to memory whare the result will be stored
->+ *		The format of the parameter(s) is expected to be Octet String
->+ * @dst:	Pointer to memory where the result will be stored
->  * @src_len:	Size of the input parameter
->- * @dst_len:	Size of the output buffer. It needs to be at leaset
->+ * @dst_len:	Size of the output buffer. It needs to be at least
->  *		as big as the expected result depending	on the operation
->- *		After operation it will be updated with the acctual size of 
-the
->+ *		After operation it will be updated with the actual size of the
->  *		result. In case of error, where the dst_len was insufficient,
->  *		it will be updated to the size required for the operation.
->  * @__ctx:	Start of private context data
->@@ -59,7 +59,7 @@ struct crypto_akcipher {
->  *		algorithm. In case of error, where the dst_len was 
-insufficient,
->  *		the req->dst_len will be updated to the size required for the
->  *		operation
->- * @encrypt:	Function performs an encrytp operation as defined by public 
-key
->+ * @encrypt:	Function performs an encrypt operation as defined by public
->key *		algorithm. In case of error, where the dst_len was 
-insufficient,
->*		the req->dst_len will be updated to the size required for the
->  *		operation
->@@ -224,7 +224,7 @@ static inline void akcipher_request_set_callback(struct
->akcipher_request *req, }
->
-> /**
->- * akcipher_request_set_crypt() -- Sets reqest parameters
->+ * akcipher_request_set_crypt() -- Sets request parameters
-
-Note, this patch will clash with my patch that I sent 2 days ago: I removed 
-the double slashes from these lines here as they do not look good in a 
-DocBook.
->  *
->  * Sets parameters required by crypto operation
->  *
->@@ -233,7 +233,7 @@ static inline void akcipher_request_set_callback(struct
->akcipher_request *req, * @dst:	ptr of output parameter
->  * @src_len:	size of the input buffer
->  * @dst_len:	size of the output buffer. It will be updated by the
->- *		implementation to reflect the acctual size of the result
->+ *		implementation to reflect the actual size of the result
->  */
-> static inline void akcipher_request_set_crypt(struct akcipher_request *req,
-> 					      void *src, void *dst,
-
-
-Ciao
-Stephan
+-- 
+FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
