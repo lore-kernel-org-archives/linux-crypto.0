@@ -1,127 +1,79 @@
 From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH 2/8] crypto: niagara: Use precalculated hash from headers
-Date: Tue, 20 Oct 2015 09:33:58 +0200
-Message-ID: <1445326444-11019-3-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH 8/8] crypto: testmgr: Use the xxx_zero_message_hash from headers
+Date: Tue, 20 Oct 2015 09:34:04 +0200
+Message-ID: <1445326444-11019-9-git-send-email-clabbe.montjoie@gmail.com>
 References: <1445326444-11019-1-git-send-email-clabbe.montjoie@gmail.com>
 Cc: LABBE Corentin <clabbe.montjoie@gmail.com>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: davem@davemloft.net, herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f173.google.com ([209.85.212.173]:37558 "EHLO
-	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752355AbbJTHeO (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Oct 2015 03:34:14 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1445326444-11019-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Precalculated hash for empty message are now present in hash headers.
-This patch just use them.
+Since md5/shaxxx headers have hash for zero message length, just use them.
 
 Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/n2_core.c | 33 ++++++---------------------------
- 1 file changed, 6 insertions(+), 27 deletions(-)
+ crypto/testmgr.h | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
-index 2e8dab9..8ea6c32 100644
---- a/drivers/crypto/n2_core.c
-+++ b/drivers/crypto/n2_core.c
-@@ -241,7 +241,7 @@ static inline bool n2_should_run_async(struct spu_queue *qp, int this_len)
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 03b2f19..7a8f51e 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -28,6 +28,8 @@
+ #include <linux/zlib.h>
  
- struct n2_ahash_alg {
- 	struct list_head	entry;
--	const char		*hash_zero;
-+	const u8		*hash_zero;
- 	const u32		*hash_init;
- 	u8			hw_op_hashsz;
- 	u8			digest_size;
-@@ -1267,7 +1267,7 @@ static LIST_HEAD(cipher_algs);
+ #include <crypto/compress.h>
++#include <crypto/md5.h>
++#include <crypto/sha.h>
  
- struct n2_hash_tmpl {
- 	const char	*name;
--	const char	*hash_zero;
-+	const u8	*hash_zero;
- 	const u32	*hash_init;
- 	u8		hw_op_hashsz;
- 	u8		digest_size;
-@@ -1276,40 +1276,19 @@ struct n2_hash_tmpl {
- 	u8		hmac_type;
- };
+ #define MAX_DIGEST_SIZE		64
+ #define MAX_TAP			8
+@@ -367,8 +369,7 @@ static struct hash_testvec md4_tv_template [] = {
  
--static const char md5_zero[MD5_DIGEST_SIZE] = {
--	0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04,
--	0xe9, 0x80, 0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e,
--};
- static const u32 md5_init[MD5_HASH_WORDS] = {
- 	cpu_to_le32(MD5_H0),
- 	cpu_to_le32(MD5_H1),
- 	cpu_to_le32(MD5_H2),
- 	cpu_to_le32(MD5_H3),
- };
--static const char sha1_zero[SHA1_DIGEST_SIZE] = {
--	0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d, 0x32,
--	0x55, 0xbf, 0xef, 0x95, 0x60, 0x18, 0x90, 0xaf, 0xd8,
--	0x07, 0x09
--};
- static const u32 sha1_init[SHA1_DIGEST_SIZE / 4] = {
- 	SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4,
- };
--static const char sha256_zero[SHA256_DIGEST_SIZE] = {
--	0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14, 0x9a,
--	0xfb, 0xf4, 0xc8, 0x99, 0x6f, 0xb9, 0x24, 0x27, 0xae,
--	0x41, 0xe4, 0x64, 0x9b, 0x93, 0x4c, 0xa4, 0x95, 0x99,
--	0x1b, 0x78, 0x52, 0xb8, 0x55
--};
- static const u32 sha256_init[SHA256_DIGEST_SIZE / 4] = {
- 	SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
- 	SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7,
- };
--static const char sha224_zero[SHA224_DIGEST_SIZE] = {
--	0xd1, 0x4a, 0x02, 0x8c, 0x2a, 0x3a, 0x2b, 0xc9, 0x47,
--	0x61, 0x02, 0xbb, 0x28, 0x82, 0x34, 0xc4, 0x15, 0xa2,
--	0xb0, 0x1f, 0x82, 0x8e, 0xa6, 0x2a, 0xc5, 0xb3, 0xe4,
--	0x2f
--};
- static const u32 sha224_init[SHA256_DIGEST_SIZE / 4] = {
- 	SHA224_H0, SHA224_H1, SHA224_H2, SHA224_H3,
- 	SHA224_H4, SHA224_H5, SHA224_H6, SHA224_H7,
-@@ -1317,7 +1296,7 @@ static const u32 sha224_init[SHA256_DIGEST_SIZE / 4] = {
- 
- static const struct n2_hash_tmpl hash_tmpls[] = {
- 	{ .name		= "md5",
--	  .hash_zero	= md5_zero,
-+	  .hash_zero	= md5_zero_message_hash,
- 	  .hash_init	= md5_init,
- 	  .auth_type	= AUTH_TYPE_MD5,
- 	  .hmac_type	= AUTH_TYPE_HMAC_MD5,
-@@ -1325,7 +1304,7 @@ static const struct n2_hash_tmpl hash_tmpls[] = {
- 	  .digest_size	= MD5_DIGEST_SIZE,
- 	  .block_size	= MD5_HMAC_BLOCK_SIZE },
- 	{ .name		= "sha1",
--	  .hash_zero	= sha1_zero,
-+	  .hash_zero	= sha1_zero_message_hash,
- 	  .hash_init	= sha1_init,
- 	  .auth_type	= AUTH_TYPE_SHA1,
- 	  .hmac_type	= AUTH_TYPE_HMAC_SHA1,
-@@ -1333,7 +1312,7 @@ static const struct n2_hash_tmpl hash_tmpls[] = {
- 	  .digest_size	= SHA1_DIGEST_SIZE,
- 	  .block_size	= SHA1_BLOCK_SIZE },
- 	{ .name		= "sha256",
--	  .hash_zero	= sha256_zero,
-+	  .hash_zero	= sha256_zero_message_hash,
- 	  .hash_init	= sha256_init,
- 	  .auth_type	= AUTH_TYPE_SHA256,
- 	  .hmac_type	= AUTH_TYPE_HMAC_SHA256,
-@@ -1341,7 +1320,7 @@ static const struct n2_hash_tmpl hash_tmpls[] = {
- 	  .digest_size	= SHA256_DIGEST_SIZE,
- 	  .block_size	= SHA256_BLOCK_SIZE },
- 	{ .name		= "sha224",
--	  .hash_zero	= sha224_zero,
-+	  .hash_zero	= sha224_zero_message_hash,
- 	  .hash_init	= sha224_init,
- 	  .auth_type	= AUTH_TYPE_SHA256,
- 	  .hmac_type	= AUTH_TYPE_RESERVED,
+ static struct hash_testvec md5_tv_template[] = {
+ 	{
+-		.digest	= "\xd4\x1d\x8c\xd9\x8f\x00\xb2\x04"
+-			  "\xe9\x80\x09\x98\xec\xf8\x42\x7e",
++		.digest	= md5_zero_message_hash,
+ 	}, {
+ 		.plaintext = "a",
+ 		.psize	= 1,
+@@ -713,8 +714,7 @@ static struct hash_testvec sha1_tv_template[] = {
+ 	{
+ 		.plaintext = "",
+ 		.psize	= 0,
+-		.digest	= "\xda\x39\xa3\xee\x5e\x6b\x4b\x0d\x32\x55"
+-			  "\xbf\xef\x95\x60\x18\x90\xaf\xd8\x07\x09",
++		.digest	= sha1_zero_message_hash,
+ 	}, {
+ 		.plaintext = "abc",
+ 		.psize	= 3,
+@@ -905,10 +905,7 @@ static struct hash_testvec sha224_tv_template[] = {
+ 	{
+ 		.plaintext = "",
+ 		.psize	= 0,
+-		.digest	= "\xd1\x4a\x02\x8c\x2a\x3a\x2b\xc9"
+-			  "\x47\x61\x02\xbb\x28\x82\x34\xc4"
+-			  "\x15\xa2\xb0\x1f\x82\x8e\xa6\x2a"
+-			  "\xc5\xb3\xe4\x2f",
++		.digest	= sha224_zero_message_hash,
+ 	}, {
+ 		.plaintext = "abc",
+ 		.psize  = 3,
+@@ -1079,10 +1076,7 @@ static struct hash_testvec sha256_tv_template[] = {
+ 	{
+ 		.plaintext = "",
+ 		.psize	= 0,
+-		.digest	= "\xe3\xb0\xc4\x42\x98\xfc\x1c\x14"
+-			  "\x9a\xfb\xf4\xc8\x99\x6f\xb9\x24"
+-			  "\x27\xae\x41\xe4\x64\x9b\x93\x4c"
+-			  "\xa4\x95\x99\x1b\x78\x52\xb8\x55",
++		.digest	= sha256_zero_message_hash,
+ 	}, {
+ 		.plaintext = "abc",
+ 		.psize	= 3,
 -- 
 2.4.10
