@@ -1,78 +1,30 @@
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [PATCH 4/6] crypto: marvell: use memcpy_fromio()/memcpy_toio()
-Date: Tue, 20 Oct 2015 08:58:52 +0100
-Message-ID: <20151020075852.GT32532@n2100.arm.linux.org.uk>
-References: <20151018173039.GA9737@n2100.arm.linux.org.uk>
- <E1Znrnf-00064N-OS@rmk-PC.arm.linux.org.uk>
- <87oafucudc.fsf@natisbad.org>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH 1/2] crypto/x509: Fix unaligned access in x509_get_sig_params()
+Date: Tue, 20 Oct 2015 10:50:38 +0100
+Message-ID: <21610.1445334638@warthog.procyon.org.uk>
+References: <288f39ff7c8b0bc60693e338fc8f6cea9008d443.1445286755.git.sowmini.varadhan@oracle.com> <cover.1445286755.git.sowmini.varadhan@oracle.com> <cover.1445286755.git.sowmini.varadhan@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Arnaud Ebalard <arno@natisbad.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:49707 "EHLO
-	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753000AbbJTH7N (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Oct 2015 03:59:13 -0400
-Content-Disposition: inline
-In-Reply-To: <87oafucudc.fsf@natisbad.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	zohar@linux.vnet.ibm.com, David.Woodhouse@intel.com,
+	steffen.klassert@secunet.com
+To: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <288f39ff7c8b0bc60693e338fc8f6cea9008d443.1445286755.git.sowmini.varadhan@oracle.com>
+Content-ID: <21609.1445334638.1@warthog.procyon.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 20, 2015 at 01:26:55AM +0200, Arnaud Ebalard wrote:
-> Hi Russell,
-> 
-> Russell King <rmk+kernel@arm.linux.org.uk> writes:
-> 
-> > Use the IO memcpy() functions when copying from/to MMIO memory.
-> > These locations were found via sparse.
-> 
-> On recent MVEBU hardware, *_std_* function are not expected to be used
-> because we will instead use the TDMA-based versions. So the only
-> possible penalty we could get (if any) from this change on recent
-> devices is for the copy of the IV in mv_cesa_ablkcipher_process(). Out
-> of curiosity, I took a quick look at what is generated and it seems this
-> results in a call to mmiocpy(): 
-> 
-> 00000340 <mv_cesa_ablkcipher_process>:
->      340:       e1a0c00d        mov     ip, sp
->      344:       e92dd830        push    {r4, r5, fp, ip, lr, pc}
->      348:       e24cb004        sub     fp, ip, #4
->      34c:       e24dd008        sub     sp, sp, #8
-> 
->      ....
-> 
->      3a4:       e5943010        ldr     r3, [r4, #16]
->      3a8:       e5951008        ldr     r1, [r5, #8]
->      3ac:       e594001c        ldr     r0, [r4, #28]
->      3b0:       e2811040        add     r1, r1, #64     ; 0x40
->      3b4:       e593201c        ldr     r2, [r3, #28]
->      3b8:       ebfffffe        bl      0 <mmiocpy>
-> 
-> which if I am not mistaken is provided by arch/arm/lib/memcpy.S via:
-> 
-> ENTRY(mmiocpy)
-> ENTRY(memcpy)
-> 
-> #include "copy_template.S"
-> 
-> ENDPROC(memcpy)
-> ENDPROC(mmiocpy)
-> 
-> Am I right in concluding this will end up being the code of a usual
-> memcpy(), i.e. the change is a noop in the final code compared to
-> previous version? 
+Sowmini Varadhan <sowmini.varadhan@oracle.com> wrote:
 
-Almost - what's different is the compiler is not allowed to "optimise"
-this memcpy call.  See 1bd46782d08b ("ARM: avoid unwanted GCC
-memset()/memcpy() optimisations for IO variants")
+> x509_get_sig_params() has the same code pattern as the one in
+> pkcs7_verify() that is fixed by commit 62f57d05e287 ("crypto: pkcs7 - Fix
+> unaligned access in pkcs7_verify()") so apply a similar fix here: make
+> sure that desc is pointing at an algined value past the digest_size,
+> and take alignment values into consideration when doing kzalloc()
+> 
+> Signed-off-by: Sowmini Varadhan <sowmini.varadhan@oracle.com>
 
--- 
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+Acked-by: David Howells <dhowells@redhat.com>
