@@ -1,57 +1,50 @@
-From: "Li, Weigang" <weigang.li@intel.com>
-Subject: RE: [PATCH] crypto: add asynchronous compression support
-Date: Wed, 21 Oct 2015 07:59:58 +0000
-Message-ID: <929511EA6367314D8E32364A24D45FA612FED34B@shsmsx102.ccr.corp.intel.com>
-References: <1445008260-39367-1-git-send-email-weigang.li@intel.com>
- <20151016151354.GA16648@gondor.apana.org.au>
- <929511EA6367314D8E32364A24D45FA612FE85D3@shsmsx102.ccr.corp.intel.com>
- <000e01d10a12$9e381660$daa84320$@lge.com> <20151019084905.GE963@bbox>
- <20151021073322.GA31901@swordfish>
- <20151021073418.GA14479@gondor.apana.org.au>
+From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Subject: Re: [PATCH net-next 2/2] xfrm: Fix unaligned access in
+ xfrm_notify_sa() for DELSA
+Date: Wed, 21 Oct 2015 06:54:42 -0400
+Message-ID: <20151021105442.GM6948@oracle.com>
+References: <cover.1445286755.git.sowmini.varadhan@oracle.com>
+ <65f37efeff5af105c89493dda4f38c61e4cd495f.1445286755.git.sowmini.varadhan@oracle.com>
+ <20151021065704.GM7701@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: Minchan Kim <minchan@kernel.org>,
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-	Dan Streetman <ddstreet@ieee.org>,
-	Seth Jennings <sjennings@variantweb.net>,
-	"Struk, Tadeusz" <tadeusz.struk@intel.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, herbert@gondor.apana.org.au,
+	dhowells@redhat.com, davem@davemloft.net, zohar@linux.vnet.ibm.com,
+	David.Woodhouse@intel.com
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:26336 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752023AbbJUIAH convert rfc822-to-8bit (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:37317 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752334AbbJUKzG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Oct 2015 04:00:07 -0400
-In-Reply-To: <20151021073418.GA14479@gondor.apana.org.au>
-Content-Language: en-US
+	Wed, 21 Oct 2015 06:55:06 -0400
+Content-Disposition: inline
+In-Reply-To: <20151021065704.GM7701@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> -----Original Message-----
-> From: Herbert Xu [mailto:herbert@gondor.apana.org.au]
-> Sent: Wednesday, October 21, 2015 3:34 PM
-> To: Sergey Senozhatsky
-> Cc: Minchan Kim; Joonsoo Kim; Dan Streetman; Seth Jennings; Li, Weigang;
-> Struk, Tadeusz
-> Subject: Re: [PATCH] crypto: add asynchronous compression support
+On (10/21/15 08:57), Steffen Klassert wrote:
+> > --- a/net/xfrm/xfrm_user.c
+> > +++ b/net/xfrm/xfrm_user.c
+> > @@ -2659,7 +2659,7 @@ static int xfrm_notify_sa(struct xfrm_state *x, const struct km_event *c)
+> >  		if (attr == NULL)
+> >  			goto out_free_skb;
+> >  
+> > -		p = nla_data(attr);
+> > +		p = PTR_ALIGN(nla_data(attr), __alignof__(*p));
 > 
-> On Wed, Oct 21, 2015 at 04:33:22PM +0900, Sergey Senozhatsky wrote:
-> >
-> > the thing is -- I still want to have/use SW compressors; and they [the
-> > existing S/W algorithms] want virtual addresses. so we need to
-> > kmap_atomic pages in every SW algorithm? isn't it simpler to keep
-> > kmap_atomic_to_page around?
+> Hm, this breaks userspace notifications on 64-bit systems.
+> Userspace expects this to be aligned to 4, with your patch
+> it is aligned to 8 on 64-bit.
 > 
-> The Crypto API will do it for you.  Have a look at how we handle it for aead
-> and ahash for example.
+> Without your patch I get the correct notification when deleting a SA:
 > 
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
-> http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
-Adding the "linux-crypto" list back to the latest discussion.
+But __alignof__(*p) is 8 on sparc, and without the patch I get
+all types of unaligned access. So what do you suggest as the fix?
+
+(and openswan/pluto dont flag any errors with the patch, which is
+a separate bug).
+
+--Sowmini
