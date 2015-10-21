@@ -1,38 +1,39 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH] crypto: qat - don't use userspace pointer
-Date: Wed, 21 Oct 2015 12:30:45 -0700
-Message-ID: <20151021193044.30343.6431.stgit@tstruk-mobl1>
+From: Greg KH <greg@kroah.com>
+Subject: Re: [PATCH] crypto: qat - don't use userspace pointer
+Date: Wed, 21 Oct 2015 14:46:43 -0700
+Message-ID: <20151021214643.GA8346@kroah.com>
+References: <20151021193044.30343.6431.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	stable@vger.kernel.org, tadeusz.struk@intel.com
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	qat-linux@intel.com, stable@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:39120 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752752AbbJUTdN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Oct 2015 15:33:13 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:45863 "EHLO
+	out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751043AbbJUVqs (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Oct 2015 17:46:48 -0400
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id 08A6720BDB
+	for <linux-crypto@vger.kernel.org>; Wed, 21 Oct 2015 17:46:45 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20151021193044.30343.6431.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Bugfix - don't dereference userspace pointer.
+On Wed, Oct 21, 2015 at 12:30:45PM -0700, Tadeusz Struk wrote:
+> Bugfix - don't dereference userspace pointer.
+> 
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> ---
+>  drivers/crypto/qat/qat_common/adf_ctl_drv.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
- drivers/crypto/qat/qat_common/adf_ctl_drv.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+<formletter>
 
-diff --git a/drivers/crypto/qat/qat_common/adf_ctl_drv.c b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
-index ebc1c63..fcb790e 100644
---- a/drivers/crypto/qat/qat_common/adf_ctl_drv.c
-+++ b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
-@@ -198,7 +198,7 @@ static int adf_copy_key_value_data(struct adf_accel_dev *accel_dev,
- 			goto out_err;
- 		}
- 
--		params_head = section_head->params;
-+		params_head = section.params;
- 
- 		while (params_head) {
- 			if (copy_from_user(&key_val, (void __user *)params_head,
+This is not the correct way to submit patches for inclusion in the
+stable kernel tree.  Please read Documentation/stable_kernel_rules.txt
+for how to do this properly.
+
+</formletter>
