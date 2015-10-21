@@ -1,43 +1,70 @@
-From: Sandy Harris <sandyinchina@gmail.com>
-Subject: Re: [Cryptography] Randomness for crypto, github repositories
-Date: Wed, 21 Oct 2015 13:28:08 -0400
-Message-ID: <CACXcFm=Fa1OkM7atPfzC6GXFxL64JBB9kX9EN1eV-i=u5ziTqQ@mail.gmail.com>
-References: <CACXcFmkg_YMdxr59rHxqskSj1__6-ooakyCWxe8rXsjyOu+6Mg@mail.gmail.com>
-	<ce4305849b5abc370afd5336d2328a73.squirrel@www.deadhat.com>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [PATCH 00/10] KEYS: Change how keys are determined to be trusted
+Date: Wed, 21 Oct 2015 14:11:08 -0400
+Message-ID: <1445451068.2459.302.camel@linux.vnet.ibm.com>
+References: <20151021151314.4583.90962.stgit@warthog.procyon.org.uk>
+	 <1445446968.2459.272.camel@linux.vnet.ibm.com>
+	 <CA+5PVA5Oz9dwrPY_+65J58iqaQ3RehCp2J5PPPkxsF1ObiCOvw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org,
-	Cryptography <cryptography@metzdowd.com>
-To: rng@lists.bitrot.info
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f180.google.com ([209.85.223.180]:34900 "EHLO
-	mail-io0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751404AbbJUR2I (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Oct 2015 13:28:08 -0400
-Received: by iofz202 with SMTP id z202so65021635iof.2
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Oct 2015 10:28:08 -0700 (PDT)
-In-Reply-To: <ce4305849b5abc370afd5336d2328a73.squirrel@www.deadhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
+	linux-security-module <linux-security-module@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	"Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
+To: Josh Boyer <jwboyer@fedoraproject.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CA+5PVA5Oz9dwrPY_+65J58iqaQ3RehCp2J5PPPkxsF1ObiCOvw@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Oct 21, 2015 at 1:06 PM,  <dj@deadhat.com> wrote:
+On Wed, 2015-10-21 at 13:21 -0400, Josh Boyer wrote:
+> On Wed, Oct 21, 2015 at 1:02 PM, Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
+> > On Wed, 2015-10-21 at 16:13 +0100, David Howells wrote:
+> >> Here's a set of patches that changes how keys are determined to be trusted
+> >> - currently, that's a case of whether a key has KEY_FLAG_TRUSTED set upon
+> >> it.  A keyring can then have a flag set (KEY_FLAG_TRUSTED ONLY) that
+> >> indicates that only keys with this flag set may be added to that keyring.
+> >>
+> >> Further, any time an X.509 certificate is instantiated without this flag
+> >> set, the certificate is judged against the contents of the system trusted
+> >> keyring to determine whether KEY_FLAG_TRUSTED should be set upon it.
+> >>
+> >> With these patches, KEY_FLAG_TRUSTED is removed.  The kernel may add
+> >> implicitly trusted keys to a trusted-only keyring by asserting
+> >> KEY_ALLOC_TRUSTED when the key is created,
+> >
+> > Ok, but only the x509 certificates built into the kernel image should be
+> > automatically trusted and can be added to a trusted keyring, because the
+> > kernel itself was signed (and verified).  These certificates extend the
+> > (UEFI) certificate chain of trust that is rooted in hardware to the OS.
+> 
+> That doesn't sound accurate to me.  The cert built into the kernel
+> image doesn't extend the UEFI certificates.  In most cases, it is a
+> ephemeral cert that is automatically generated at kernel build time
+> and then discarded.  It is not chained to or derived from any of the
+> UEFI certs stored in the db (or mok) variables.  The built-in cert is
+> used for module loading verification.  I agree that it should be
+> trusted, but not really for the reason you list.  Perhaps you meant
+> the key that the PE image of the kernel is signed with?  If so, the
+> kernel doesn't load that.  Only shim (and grub2 via shim) read that
+> key.
 
-> I've only looked at it briefly, but I have a question.. Are you trying to
-> use the GCM Galois multiply as an entropy extractor?
+This is similar to the concept of the MoK DB.  Keys added to the MoK
+aren't signed by a UEFI key, yet they extend the UEFI secure boot
+certificate chain of trust.  Similarly, the certificates built into the
+kernel image don't need to be signed by a UEFI/MoK key for it to extend
+the certificate chain of trust.
 
-Yes, the basic idea is to use a series of GCM multiplies over the pool
-data to replace the hashing of that data in the current driver. There
-are complications; each hash uses two quasi-constants -- initialiser
-and GCM multiplier -- and hashes a counter along with the pool data.
-The counter changes on every iteration and is sometimes changed more
-drastically, and the constants are sometimes updated
+> However, that does bring up the UEFI db/mok certs and how to deal with
+> those.  The out-of-tree patches we have add them to the system keyring
+> as trusted keys.  We can modify the patches to use KEY_ALLOC_TRUSTED
+> to preserve that functionality I suppose.
 
-> I don't know of any proof that it is a good extractor for any class of
-> entropic data. That doesn't mean there isn't one, but I've not heard of
-> one.
+Certificates are use case specific.  Just because a key was trusted at
+the UEFI layer doesn't mean it should be trusted by the kernel (eg.
+Microsoft key).  To illustrate this point, David Howells/David Woodhouse
+recently posted/upstreamed patches to differentiate how keys loaded onto
+the system keyring may be used. (Reference needed.)
 
-Good question. It seems to me th at if it is secure for its
-authentication usage, where it replaces an HMAC, then it should be
-safe in this application. But no, I don't have a proof & the question
-is worth some analysis.
+Mimi
