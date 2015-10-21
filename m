@@ -1,8 +1,8 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 07/10] X.509: Extract signature digest and make self-signed
- cert checks earlier
-Date: Wed, 21 Oct 2015 16:14:21 +0100
-Message-ID: <20151021151421.4583.25712.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 08/10] PKCS#7: Make the signature a pointer rather than
+ embedding it
+Date: Wed, 21 Oct 2015 16:14:31 +0100
+Message-ID: <20151021151431.4583.71498.stgit@warthog.procyon.org.uk>
 References: <20151021151314.4583.90962.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -15,392 +15,333 @@ In-Reply-To: <20151021151314.4583.90962.stgit@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Extract the signature digest for an X.509 certificate earlier, at the end
-of x509_cert_parse() rather than leaving it to the callers thereof.
+Point to the public_key_signature struct from the pkcs7_signed_info struct
+rather than embedding it.  This makes it easier to have it take an
+arbitrary number of MPIs in future.
 
-Further, immediately after that, check the signature on self-signed
-certificates, also rather in the callers of x509_cert_parse().
-
-This we need to determine whether or not the X.509 cert requires crypto
-that we don't support before we do the above two steps.
-
-We note in the x509_certificate struct the following bits of information:
-
- (1) Whether the signature is self-signed (even if we can't check the
-     signature due to missing crypto).
-
- (2) Whether the key held in the certificate needs unsupported crypto to be
-     used.  We may get a PKCS#7 message with X.509 certs that we can't make
-     use of - we just ignore them and give ENOPKG at the end it we couldn't
-     verify anything if at least one of these unusable certs are in the
-     chain of trust.
-
- (3) Whether the signature held in the certificate needs unsupported crypto
-     to be checked.  We can still use the key held in this certificate,
-     even if we can't check the signature on it - if it is held in the
-     system trusted keyring, for instance.  We just can't add it to a ring
-     of trusted keys or follow it further up the chain of trust.
-
-Making these checks earlier allows x509_check_signature() to be removed and
-replaced with direct calls to public_key_verify_signature().
+We also save a copy of the digest in the signature without sharing the
+memory with the crypto layer metadata.  This means we can use
+public_key_free() to get rid of the signature record.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- crypto/asymmetric_keys/pkcs7_verify.c     |   38 ++------
- crypto/asymmetric_keys/x509_cert_parser.c |   10 ++
- crypto/asymmetric_keys/x509_parser.h      |    7 +
- crypto/asymmetric_keys/x509_public_key.c  |  139 ++++++++++++++++++++---------
- 4 files changed, 121 insertions(+), 73 deletions(-)
+ crypto/asymmetric_keys/pkcs7_parser.c |   38 +++++++++++++++---------
+ crypto/asymmetric_keys/pkcs7_parser.h |   10 +++---
+ crypto/asymmetric_keys/pkcs7_trust.c  |    4 +--
+ crypto/asymmetric_keys/pkcs7_verify.c |   52 +++++++++++++++++----------------
+ 4 files changed, 56 insertions(+), 48 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-index e225dccdf559..1dede0199673 100644
---- a/crypto/asymmetric_keys/pkcs7_verify.c
-+++ b/crypto/asymmetric_keys/pkcs7_verify.c
-@@ -190,9 +190,8 @@ static int pkcs7_verify_sig_chain(struct pkcs7_message *pkcs7,
- 			 x509->subject,
- 			 x509->raw_serial_size, x509->raw_serial);
- 		x509->seen = true;
--		ret = x509_get_sig_params(x509);
--		if (ret < 0)
--			goto maybe_missing_crypto_in_x509;
-+		if (x509->unsupported_key)
-+			goto unsupported_crypto_in_x509;
- 
- 		pr_debug("- issuer %s\n", x509->issuer);
- 		sig = x509->sig;
-@@ -203,22 +202,14 @@ static int pkcs7_verify_sig_chain(struct pkcs7_message *pkcs7,
- 			pr_debug("- authkeyid.skid %*phN\n",
- 				 sig->auth_ids[1]->len, sig->auth_ids[1]->data);
- 
--		if ((!x509->sig->auth_ids[0] && !x509->sig->auth_ids[1]) ||
--		    strcmp(x509->subject, x509->issuer) == 0) {
-+		if (x509->self_signed) {
- 			/* If there's no authority certificate specified, then
- 			 * the certificate must be self-signed and is the root
- 			 * of the chain.  Likewise if the cert is its own
- 			 * authority.
- 			 */
--			pr_debug("- no auth?\n");
--			if (x509->raw_subject_size != x509->raw_issuer_size ||
--			    memcmp(x509->raw_subject, x509->raw_issuer,
--				   x509->raw_issuer_size) != 0)
--				return 0;
--
--			ret = x509_check_signature(x509->pub, x509);
--			if (ret < 0)
--				goto maybe_missing_crypto_in_x509;
-+			if (x509->unsupported_sig)
-+				goto unsupported_crypto_in_x509;
- 			x509->signer = x509;
- 			pr_debug("- self-signed\n");
- 			return 0;
-@@ -270,7 +261,7 @@ static int pkcs7_verify_sig_chain(struct pkcs7_message *pkcs7,
- 				sinfo->index);
- 			return 0;
- 		}
--		ret = x509_check_signature(p->pub, x509);
-+		ret = public_key_verify_signature(p->pub, p->sig);
- 		if (ret < 0)
- 			return ret;
- 		x509->signer = p;
-@@ -282,16 +273,14 @@ static int pkcs7_verify_sig_chain(struct pkcs7_message *pkcs7,
- 		might_sleep();
+diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
+index 7b69783cff99..8454ae5b5aa8 100644
+--- a/crypto/asymmetric_keys/pkcs7_parser.c
++++ b/crypto/asymmetric_keys/pkcs7_parser.c
+@@ -44,9 +44,7 @@ struct pkcs7_parse_context {
+ static void pkcs7_free_signed_info(struct pkcs7_signed_info *sinfo)
+ {
+ 	if (sinfo) {
+-		mpi_free(sinfo->sig.mpi[0]);
+-		kfree(sinfo->sig.digest);
+-		kfree(sinfo->signing_cert_id);
++		public_key_free(NULL, sinfo->sig);
+ 		kfree(sinfo);
  	}
+ }
+@@ -125,6 +123,10 @@ struct pkcs7_message *pkcs7_parse_message(const void *data, size_t datalen)
+ 	ctx->sinfo = kzalloc(sizeof(struct pkcs7_signed_info), GFP_KERNEL);
+ 	if (!ctx->sinfo)
+ 		goto out_no_sinfo;
++	ctx->sinfo->sig = kzalloc(sizeof(struct public_key_signature),
++				  GFP_KERNEL);
++	if (!ctx->sinfo->sig)
++		goto out_no_sig;
  
--maybe_missing_crypto_in_x509:
-+unsupported_crypto_in_x509:
- 	/* Just prune the certificate chain at this point if we lack some
- 	 * crypto module to go further.  Note, however, we don't want to set
--	 * sinfo->missing_crypto as the signed info block may still be
-+	 * sinfo->unsupported_crypto as the signed info block may still be
- 	 * validatable against an X.509 cert lower in the chain that we have a
- 	 * trusted copy of.
- 	 */
--	if (ret == -ENOPKG)
--		return 0;
--	return ret;
-+	return 0;
+ 	ctx->data = (unsigned long)data;
+ 	ctx->ppcerts = &ctx->certs;
+@@ -150,6 +152,7 @@ out:
+ 		ctx->certs = cert->next;
+ 		x509_free_certificate(cert);
+ 	}
++out_no_sig:
+ 	pkcs7_free_signed_info(ctx->sinfo);
+ out_no_sinfo:
+ 	pkcs7_free_message(ctx->msg);
+@@ -219,25 +222,25 @@ int pkcs7_sig_note_digest_algo(void *context, size_t hdrlen,
+ 
+ 	switch (ctx->last_oid) {
+ 	case OID_md4:
+-		ctx->sinfo->sig.pkey_hash_algo = HASH_ALGO_MD4;
++		ctx->sinfo->sig->pkey_hash_algo = HASH_ALGO_MD4;
+ 		break;
+ 	case OID_md5:
+-		ctx->sinfo->sig.pkey_hash_algo = HASH_ALGO_MD5;
++		ctx->sinfo->sig->pkey_hash_algo = HASH_ALGO_MD5;
+ 		break;
+ 	case OID_sha1:
+-		ctx->sinfo->sig.pkey_hash_algo = HASH_ALGO_SHA1;
++		ctx->sinfo->sig->pkey_hash_algo = HASH_ALGO_SHA1;
+ 		break;
+ 	case OID_sha256:
+-		ctx->sinfo->sig.pkey_hash_algo = HASH_ALGO_SHA256;
++		ctx->sinfo->sig->pkey_hash_algo = HASH_ALGO_SHA256;
+ 		break;
+ 	case OID_sha384:
+-		ctx->sinfo->sig.pkey_hash_algo = HASH_ALGO_SHA384;
++		ctx->sinfo->sig->pkey_hash_algo = HASH_ALGO_SHA384;
+ 		break;
+ 	case OID_sha512:
+-		ctx->sinfo->sig.pkey_hash_algo = HASH_ALGO_SHA512;
++		ctx->sinfo->sig->pkey_hash_algo = HASH_ALGO_SHA512;
+ 		break;
+ 	case OID_sha224:
+-		ctx->sinfo->sig.pkey_hash_algo = HASH_ALGO_SHA224;
++		ctx->sinfo->sig->pkey_hash_algo = HASH_ALGO_SHA224;
+ 	default:
+ 		printk("Unsupported digest algo: %u\n", ctx->last_oid);
+ 		return -ENOPKG;
+@@ -256,7 +259,7 @@ int pkcs7_sig_note_pkey_algo(void *context, size_t hdrlen,
+ 
+ 	switch (ctx->last_oid) {
+ 	case OID_rsaEncryption:
+-		ctx->sinfo->sig.pkey_algo = PKEY_ALGO_RSA;
++		ctx->sinfo->sig->pkey_algo = PKEY_ALGO_RSA;
+ 		break;
+ 	default:
+ 		printk("Unsupported pkey algo: %u\n", ctx->last_oid);
+@@ -617,16 +620,17 @@ int pkcs7_sig_note_signature(void *context, size_t hdrlen,
+ 			     const void *value, size_t vlen)
+ {
+ 	struct pkcs7_parse_context *ctx = context;
++	struct public_key_signature *sig = ctx->sinfo->sig;
+ 	MPI mpi;
+ 
+-	BUG_ON(ctx->sinfo->sig.pkey_algo != PKEY_ALGO_RSA);
++	BUG_ON(sig->pkey_algo != PKEY_ALGO_RSA);
+ 
+ 	mpi = mpi_read_raw_data(value, vlen);
+ 	if (!mpi)
+ 		return -ENOMEM;
+ 
+-	ctx->sinfo->sig.mpi[0] = mpi;
+-	ctx->sinfo->sig.nr_mpi = 1;
++	sig->mpi[0] = mpi;
++	sig->nr_mpi = 1;
+ 	return 0;
  }
  
- /*
-@@ -378,9 +367,8 @@ int pkcs7_verify(struct pkcs7_message *pkcs7,
- 		 enum key_being_used_for usage)
- {
- 	struct pkcs7_signed_info *sinfo;
--	struct x509_certificate *x509;
- 	int enopkg = -ENOPKG;
--	int ret, n;
-+	int ret;
+@@ -662,12 +666,16 @@ int pkcs7_note_signed_info(void *context, size_t hdrlen,
  
- 	kenter("");
+ 	pr_devel("SINFO KID: %u [%*phN]\n", kid->len, kid->len, kid->data);
  
-@@ -422,12 +410,6 @@ int pkcs7_verify(struct pkcs7_message *pkcs7,
- 		return -EINVAL;
- 	}
+-	sinfo->signing_cert_id = kid;
++	sinfo->sig->auth_ids[0] = kid;
+ 	sinfo->index = ++ctx->sinfo_index;
+ 	*ctx->ppsinfo = sinfo;
+ 	ctx->ppsinfo = &sinfo->next;
+ 	ctx->sinfo = kzalloc(sizeof(struct pkcs7_signed_info), GFP_KERNEL);
+ 	if (!ctx->sinfo)
+ 		return -ENOMEM;
++	ctx->sinfo->sig = kzalloc(sizeof(struct public_key_signature),
++				  GFP_KERNEL);
++	if (!ctx->sinfo->sig)
++		return -ENOMEM;
+ 	return 0;
+ }
+diff --git a/crypto/asymmetric_keys/pkcs7_parser.h b/crypto/asymmetric_keys/pkcs7_parser.h
+index c8159983ed8f..f4e81074f5e0 100644
+--- a/crypto/asymmetric_keys/pkcs7_parser.h
++++ b/crypto/asymmetric_keys/pkcs7_parser.h
+@@ -40,19 +40,17 @@ struct pkcs7_signed_info {
+ #define	sinfo_has_ms_statement_type	5
+ 	time64_t	signing_time;
  
--	for (n = 0, x509 = pkcs7->certs; x509; x509 = x509->next, n++) {
--		ret = x509_get_sig_params(x509);
--		if (ret < 0)
--			return ret;
--	}
+-	/* Issuing cert serial number and issuer's name [PKCS#7 or CMS ver 1]
+-	 * or issuing cert's SKID [CMS ver 3].
+-	 */
+-	struct asymmetric_key_id *signing_cert_id;
 -
- 	for (sinfo = pkcs7->signed_infos; sinfo; sinfo = sinfo->next) {
- 		ret = pkcs7_verify_one(pkcs7, sinfo);
- 		if (ret < 0) {
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index 09706bf112f3..f8cb4b01932a 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -108,6 +108,11 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
- 	if (ret < 0)
- 		goto error_decode;
- 
-+	/* Grab the signature bits */
-+	ret = x509_get_sig_params(cert);
-+	if (ret < 0)
-+		goto error_decode;
-+
- 	/* Generate cert issuer + serial number key ID */
- 	kid = asymmetric_key_generate_id(cert->raw_serial,
- 					 cert->raw_serial_size,
-@@ -119,6 +124,11 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
- 	}
- 	cert->id = kid;
- 
-+	/* Detect self-signed certificates */
-+	ret = x509_check_for_self_signed(cert);
-+	if (ret < 0)
-+		goto error_decode;
-+
- 	kfree(ctx);
- 	return cert;
- 
-diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
-index 63ff787c74b3..05eef1c68881 100644
---- a/crypto/asymmetric_keys/x509_parser.h
-+++ b/crypto/asymmetric_keys/x509_parser.h
-@@ -39,7 +39,9 @@ struct x509_certificate {
- 	unsigned	index;
- 	bool		seen;			/* Infinite recursion prevention */
- 	bool		verified;
--	bool		unsupported_crypto;	/* T if can't be verified due to missing crypto */
-+	bool		self_signed;		/* T if self-signed (check unsupported_sig too) */
-+	bool		unsupported_key;	/* T if key uses unsupported crypto */
-+	bool		unsupported_sig;	/* T if signature uses unsupported crypto */
+ 	/* Message signature.
+ 	 *
+ 	 * This contains the generated digest of _either_ the Content Data or
+ 	 * the Authenticated Attributes [RFC2315 9.3].  If the latter, one of
+ 	 * the attributes contains the digest of the the Content Data within
+ 	 * it.
++	 *
++	 * THis also contains the issuing cert serial number and issuer's name
++	 * [PKCS#7 or CMS ver 1] or issuing cert's SKID [CMS ver 3].
+ 	 */
+-	struct public_key_signature sig;
++	struct public_key_signature *sig;
  };
  
- /*
-@@ -55,5 +57,4 @@ extern int x509_decode_time(time64_t *_t,  size_t hdrlen,
-  * x509_public_key.c
-  */
- extern int x509_get_sig_params(struct x509_certificate *cert);
--extern int x509_check_signature(const struct public_key *pub,
--				struct x509_certificate *cert);
-+extern int x509_check_for_self_signed(struct x509_certificate *cert);
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index 6b3711fa71d1..2b9e754e3ab9 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -165,10 +165,20 @@ int x509_get_sig_params(struct x509_certificate *cert)
- 
- 	pr_devel("==>%s()\n", __func__);
- 
--	if (cert->unsupported_crypto)
--		return -ENOPKG;
--	if (sig->rsa.s)
-+	if (cert->pub->pkey_algo >= PKEY_ALGO__LAST ||
-+	    !pkey_algo[cert->pub->pkey_algo])
-+		cert->unsupported_key = true;
-+
-+	if (sig->pkey_algo >= PKEY_ALGO__LAST ||
-+	    !pkey_algo[sig->pkey_algo])
-+		cert->unsupported_sig = true;
-+
-+	/* We check the hash if we can - even if we can't then verify it */
-+	if (sig->pkey_hash_algo >= PKEY_HASH__LAST ||
-+	    !hash_algo_name[sig->pkey_hash_algo]) {
-+		cert->unsupported_sig = true;
- 		return 0;
-+	}
- 
- 	sig->rsa.s = mpi_read_raw_data(cert->raw_sig, cert->raw_sig_size);
- 	if (!sig->rsa.s)
-@@ -181,8 +191,8 @@ int x509_get_sig_params(struct x509_certificate *cert)
- 	tfm = crypto_alloc_shash(hash_algo_name[sig->pkey_hash_algo], 0, 0);
- 	if (IS_ERR(tfm)) {
- 		if (PTR_ERR(tfm) == -ENOENT) {
--			cert->unsupported_crypto = true;
--			return -ENOPKG;
-+			cert->unsupported_sig = true;
-+			return 0;
- 		}
- 		return PTR_ERR(tfm);
- 	}
-@@ -217,26 +227,60 @@ error:
- EXPORT_SYMBOL_GPL(x509_get_sig_params);
- 
- /*
-- * Check the signature on a certificate using the provided public key
-+ * Check for self-signedness in an X.509 cert and if found, check the signature
-+ * immediately if we can.
-  */
--int x509_check_signature(const struct public_key *pub,
--			 struct x509_certificate *cert)
-+int x509_check_for_self_signed(struct x509_certificate *cert)
+ struct pkcs7_message {
+diff --git a/crypto/asymmetric_keys/pkcs7_trust.c b/crypto/asymmetric_keys/pkcs7_trust.c
+index 7bb9389fd644..400ef359448a 100644
+--- a/crypto/asymmetric_keys/pkcs7_trust.c
++++ b/crypto/asymmetric_keys/pkcs7_trust.c
+@@ -27,7 +27,7 @@ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
+ 				    struct pkcs7_signed_info *sinfo,
+ 				    struct key *trust_keyring)
  {
--	int ret;
-+	int ret = 0;
- 
- 	pr_devel("==>%s()\n", __func__);
- 
--	ret = x509_get_sig_params(cert);
--	if (ret < 0)
--		return ret;
-+	if (cert->raw_subject_size != cert->raw_issuer_size ||
-+	    memcmp(cert->raw_subject, cert->raw_issuer,
-+		   cert->raw_issuer_size) != 0)
-+		goto not_self_signed;
-+
-+	if (cert->sig->auth_ids[0] || cert->sig->auth_ids[1]) {
-+		/* If the AKID is present it may have one or two parts.  If
-+		 * both are supplied, both must match.
-+		 */
-+		bool a = asymmetric_key_id_same(cert->skid, cert->sig->auth_ids[1]);
-+		bool b = asymmetric_key_id_same(cert->id, cert->sig->auth_ids[0]);
-+
-+		if (!a && !b)
-+			goto not_self_signed;
-+
-+		ret = -EKEYREJECTED;
-+		if (((a && !b) || (b && !a)) &&
-+		    cert->sig->auth_ids[0] && cert->sig->auth_ids[1])
-+			goto out;
-+	}
-+
-+	ret = -EKEYREJECTED;
-+	if (cert->pub->pkey_algo != cert->sig->pkey_algo)
-+		goto out;
- 
--	ret = public_key_verify_signature(pub, cert->sig);
--	if (ret == -ENOPKG)
--		cert->unsupported_crypto = true;
--	pr_debug("Cert Verification: %d\n", ret);
-+	ret = public_key_verify_signature(cert->pub, cert->sig);
-+	if (ret < 0) {
-+		if (ret == -ENOPKG) {
-+			cert->unsupported_sig = true;
-+			ret = 0;
-+		}
-+		goto out;
-+	}
-+
-+	pr_devel("Cert Self-signature verified");
-+	cert->self_signed = true;
-+
-+out:
-+	pr_devel("<==%s() = %d\n", __func__, ret);
- 	return ret;
-+
-+not_self_signed:
-+	pr_devel("<==%s() = 0 [not]\n", __func__);
-+	return 0;
- }
--EXPORT_SYMBOL_GPL(x509_check_signature);
- 
- /*
-  * Check the new certificate against the ones in the trust keyring.  If one of
-@@ -256,20 +300,25 @@ static int x509_validate_trust(struct x509_certificate *cert,
- 
- 	if (!trust_keyring)
- 		return -EOPNOTSUPP;
--
- 	if (ca_keyid && !asymmetric_key_id_partial(sig->auth_ids[1], ca_keyid))
- 		return -EPERM;
-+	if (cert->unsupported_sig)
-+		return -ENOPKG;
- 
+-	struct public_key_signature *sig = &sinfo->sig;
++	struct public_key_signature *sig = sinfo->sig;
+ 	struct x509_certificate *x509, *last = NULL, *p;
+ 	struct key *key;
+ 	int ret;
+@@ -102,7 +102,7 @@ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
+ 	 * the signed info directly.
+ 	 */
  	key = x509_request_asymmetric_key(trust_keyring,
- 					  sig->auth_ids[0], sig->auth_ids[1],
+-					  sinfo->signing_cert_id,
++					  sinfo->sig->auth_ids[0],
+ 					  NULL,
  					  false);
--	if (!IS_ERR(key))  {
--		if (!use_builtin_keys
--		    || test_bit(KEY_FLAG_BUILTIN, &key->flags))
--			ret = x509_check_signature(key->payload.data[asym_crypto],
--						   cert);
--		key_put(key);
-+	if (IS_ERR(key))
-+		return PTR_ERR(key);
+ 	if (!IS_ERR(key)) {
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index 1dede0199673..3b8124c2cd91 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -25,35 +25,38 @@
+ static int pkcs7_digest(struct pkcs7_message *pkcs7,
+ 			struct pkcs7_signed_info *sinfo)
+ {
++	struct public_key_signature *sig = sinfo->sig;
+ 	struct crypto_shash *tfm;
+ 	struct shash_desc *desc;
+-	size_t digest_size, desc_size;
+-	void *digest;
++	size_t desc_size;
+ 	int ret;
+ 
+-	kenter(",%u,%u", sinfo->index, sinfo->sig.pkey_hash_algo);
++	kenter(",%u,%u", sinfo->index, sig->pkey_hash_algo);
+ 
+-	if (sinfo->sig.pkey_hash_algo >= PKEY_HASH__LAST ||
+-	    !hash_algo_name[sinfo->sig.pkey_hash_algo])
++	if (sig->pkey_hash_algo >= PKEY_HASH__LAST ||
++	    !hash_algo_name[sig->pkey_hash_algo])
+ 		return -ENOPKG;
+ 
+ 	/* Allocate the hashing algorithm we're going to need and find out how
+ 	 * big the hash operational data will be.
+ 	 */
+-	tfm = crypto_alloc_shash(hash_algo_name[sinfo->sig.pkey_hash_algo],
++	tfm = crypto_alloc_shash(hash_algo_name[sinfo->sig->pkey_hash_algo],
+ 				 0, 0);
+ 	if (IS_ERR(tfm))
+ 		return (PTR_ERR(tfm) == -ENOENT) ? -ENOPKG : PTR_ERR(tfm);
+ 
+ 	desc_size = crypto_shash_descsize(tfm) + sizeof(*desc);
+-	sinfo->sig.digest_size = digest_size = crypto_shash_digestsize(tfm);
++	sig->digest_size = crypto_shash_digestsize(tfm);
+ 
+ 	ret = -ENOMEM;
+-	digest = kzalloc(digest_size + desc_size, GFP_KERNEL);
+-	if (!digest)
++	sig->digest = kmalloc(sig->digest_size, GFP_KERNEL);
++	if (!sig->digest)
++		goto error_no_desc;
 +
-+	if (!use_builtin_keys ||
-+	    test_bit(KEY_FLAG_BUILTIN, &key->flags)) {
-+		ret = public_key_verify_signature(
-+			key->payload.data[asym_crypto], cert->sig);
-+		if (ret == -ENOPKG)
-+			cert->unsupported_sig = true;
++	desc = kzalloc(desc_size, GFP_KERNEL);
++	if (!desc)
+ 		goto error_no_desc;
+ 
+-	desc = digest + digest_size;
+ 	desc->tfm   = tfm;
+ 	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
+ 
+@@ -61,10 +64,11 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
+ 	ret = crypto_shash_init(desc);
+ 	if (ret < 0)
+ 		goto error;
+-	ret = crypto_shash_finup(desc, pkcs7->data, pkcs7->data_len, digest);
++	ret = crypto_shash_finup(desc, pkcs7->data, pkcs7->data_len,
++				 sig->digest);
+ 	if (ret < 0)
+ 		goto error;
+-	pr_devel("MsgDigest = [%*ph]\n", 8, digest);
++	pr_devel("MsgDigest = [%*ph]\n", 8, sig->digest);
+ 
+ 	/* However, if there are authenticated attributes, there must be a
+ 	 * message digest attribute amongst them which corresponds to the
+@@ -79,14 +83,15 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
+ 			goto error;
+ 		}
+ 
+-		if (sinfo->msgdigest_len != sinfo->sig.digest_size) {
++		if (sinfo->msgdigest_len != sig->digest_size) {
+ 			pr_debug("Sig %u: Invalid digest size (%u)\n",
+ 				 sinfo->index, sinfo->msgdigest_len);
+ 			ret = -EBADMSG;
+ 			goto error;
+ 		}
+ 
+-		if (memcmp(digest, sinfo->msgdigest, sinfo->msgdigest_len) != 0) {
++		if (memcmp(sig->digest, sinfo->msgdigest,
++			   sinfo->msgdigest_len) != 0) {
+ 			pr_debug("Sig %u: Message digest doesn't match\n",
+ 				 sinfo->index);
+ 			ret = -EKEYREJECTED;
+@@ -98,7 +103,7 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
+ 		 * convert the attributes from a CONT.0 into a SET before we
+ 		 * hash it.
+ 		 */
+-		memset(digest, 0, sinfo->sig.digest_size);
++		memset(sig->digest, 0, sig->digest_size);
+ 
+ 		ret = crypto_shash_init(desc);
+ 		if (ret < 0)
+@@ -108,17 +113,14 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
+ 		if (ret < 0)
+ 			goto error;
+ 		ret = crypto_shash_finup(desc, sinfo->authattrs,
+-					 sinfo->authattrs_len, digest);
++					 sinfo->authattrs_len, sig->digest);
+ 		if (ret < 0)
+ 			goto error;
+-		pr_devel("AADigest = [%*ph]\n", 8, digest);
++		pr_devel("AADigest = [%*ph]\n", 8, sig->digest);
  	}
-+	key_put(key);
- 	return ret;
+ 
+-	sinfo->sig.digest = digest;
+-	digest = NULL;
+-
+ error:
+-	kfree(digest);
++	kfree(desc);
+ error_no_desc:
+ 	crypto_free_shash(tfm);
+ 	kleave(" = %d", ret);
+@@ -145,12 +147,12 @@ static int pkcs7_find_key(struct pkcs7_message *pkcs7,
+ 		 * PKCS#7 message - but I can't be 100% sure of that.  It's
+ 		 * possible this will need element-by-element comparison.
+ 		 */
+-		if (!asymmetric_key_id_same(x509->id, sinfo->signing_cert_id))
++		if (!asymmetric_key_id_same(x509->id, sinfo->sig->auth_ids[0]))
+ 			continue;
+ 		pr_devel("Sig %u: Found cert serial match X.509[%u]\n",
+ 			 sinfo->index, certix);
+ 
+-		if (x509->pub->pkey_algo != sinfo->sig.pkey_algo) {
++		if (x509->pub->pkey_algo != sinfo->sig->pkey_algo) {
+ 			pr_warn("Sig %u: X.509 algo and PKCS#7 sig algo don't match\n",
+ 				sinfo->index);
+ 			continue;
+@@ -165,7 +167,7 @@ static int pkcs7_find_key(struct pkcs7_message *pkcs7,
+ 	 */
+ 	pr_debug("Sig %u: Issuing X.509 cert not found (#%*phN)\n",
+ 		 sinfo->index,
+-		 sinfo->signing_cert_id->len, sinfo->signing_cert_id->data);
++		 sinfo->sig->auth_ids[0]->len, sinfo->sig->auth_ids[0]->data);
+ 	return 0;
  }
  
-@@ -292,36 +341,42 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
- 	pr_devel("Cert Issuer: %s\n", cert->issuer);
- 	pr_devel("Cert Subject: %s\n", cert->subject);
- 
--	if (cert->pub->pkey_algo >= PKEY_ALGO__LAST ||
--	    cert->sig->pkey_algo >= PKEY_ALGO__LAST ||
--	    cert->sig->pkey_hash_algo >= PKEY_HASH__LAST ||
--	    !pkey_algo[cert->pub->pkey_algo] ||
--	    !pkey_algo[cert->sig->pkey_algo] ||
--	    !hash_algo_name[cert->sig->pkey_hash_algo]) {
-+	if (cert->unsupported_key) {
- 		ret = -ENOPKG;
- 		goto error_free_cert;
+@@ -324,7 +326,7 @@ static int pkcs7_verify_one(struct pkcs7_message *pkcs7,
  	}
  
- 	pr_devel("Cert Key Algo: %s\n", pkey_algo_name[cert->pub->pkey_algo]);
- 	pr_devel("Cert Valid period: %lld-%lld\n", cert->valid_from, cert->valid_to);
--	pr_devel("Cert Signature: %s + %s\n",
--		 pkey_algo_name[cert->sig->pkey_algo],
--		 hash_algo_name[cert->sig->pkey_hash_algo]);
+ 	/* Verify the PKCS#7 binary against the key */
+-	ret = public_key_verify_signature(sinfo->signer->pub, &sinfo->sig);
++	ret = public_key_verify_signature(sinfo->signer->pub, sinfo->sig);
+ 	if (ret < 0)
+ 		return ret;
  
- 	cert->pub->algo = pkey_algo[cert->pub->pkey_algo];
- 	cert->pub->id_type = PKEY_ID_X509;
- 
- 	/* Check the signature on the key if it appears to be self-signed */
--	if ((!cert->sig->auth_ids[0] && !cert->sig->auth_ids[1]) ||
--	    asymmetric_key_id_same(cert->skid, cert->sig->auth_ids[1]) ||
--	    asymmetric_key_id_same(cert->id, cert->sig->auth_ids[0])) {
--		ret = x509_check_signature(cert->pub, cert); /* self-signed */
--		if (ret < 0)
--			goto error_free_cert;
-+	if (cert->unsupported_sig) {
-+		public_key_free(NULL, cert->sig);
-+		cert->sig = NULL;
- 	} else {
--		ret = x509_validate_trust(cert, get_system_trusted_keyring());
--		if (ret == -EKEYREJECTED)
--			goto error_free_cert;
-+		pr_devel("Cert Signature: %s + %s\n",
-+			 pkey_algo_name[cert->sig->pkey_algo],
-+			 hash_algo_name[cert->sig->pkey_hash_algo]);
-+
-+		if (cert->self_signed) {
-+			/* Self-signed */
-+			if (cert->unsupported_sig) {
-+				ret = -ENOPKG;
-+				goto error_free_cert;
-+			}
-+
-+			/* There's no point retaining the signature */
-+			public_key_free(NULL, cert->sig);
-+			cert->sig = NULL;
-+		} else {
-+			ret = x509_validate_trust(cert,
-+						  get_system_trusted_keyring());
-+			if (ret == -EKEYREJECTED)
-+				goto error_free_cert;
-+		}
- 	}
- 
- 	/* Propose a description */
