@@ -1,55 +1,106 @@
 From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: (unknown)
-Date: Fri, 23 Oct 2015 14:10:25 +0200
-Message-ID: <1445602236-24130-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-To: acme@ghostprotocols.net, al.drozdov@gmail.com,
-	alexander.h.duyck@redhat.com, daniel@iogearbox.net,
-	davem@davemloft.net, dmitry.tarnyagin@lockless.no,
-	dwmw2@infradead.org, edumazet@google.com, eyal.birger@gmail.com,
-	fw@strlen.de, gustavo@padovan.org, hannes@stressinduktion.org,
-	herbert@gondor.apana.org.au, jiri@resnulli.us, jmorris@namei.org,
-	johan.hedberg@gmail.com, kaber@trash.net, kuznet@ms2.inr.ac.ru,
-	marcel@holtmann.org, mst@redhat.com, pablo@netfilter.org,
-	samuel@sortiz.org, tom@herbertland.com, viro@zeniv.linux.org.uk,
-	willemb@google.com, yoshfuji@linux-ipv6.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f195.google.com ([209.85.212.195]:36384 "EHLO
-	mail-wi0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751711AbbJWMLT (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 23 Oct 2015 08:11:19 -0400
-Subject: 
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Subject: [PATCH 11/11] crypto: algif: Change some variable to size_t
+Date: Fri, 23 Oct 2015 14:10:36 +0200
+Message-ID: <1445602236-24130-12-git-send-email-clabbe.montjoie@gmail.com>
+References: <1445602236-24130-1-git-send-email-clabbe.montjoie@gmail.com>
+Cc: LABBE Corentin <clabbe.montjoie@gmail.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: davem@davemloft.net, herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1445602236-24130-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+Some variable are set as int but store only positive values.
+Furthermore there are used in operation/function that wait for unsigned
+value.
+This patch set them as size_t.
 
-Hello
+Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+---
+ crypto/algif_aead.c     |  6 +++---
+ crypto/algif_skcipher.c | 10 +++++-----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-This patch series was begun by my finding that memcpy_[to|from]_msg have
-a parameter len which is an int but used as size_t in whole functions.
-Without blindly changing the parameter to size_t, I have tried to see if
-anywhere in linux source code, someone give a negative argument with
-the following (unfinished) coccinnelle patch.
-virtual report
-@@
-type T;
-signed T i;
-@@
-(
-memcpy_from_msg
-|
-memcpy_to_msg
-)
- (...,
-- i)
-+ (size_t)i)
-
-With that I found many place where int variable is used to store unsigned values
-and which could be set as size_t since there are used againt size_t
-and/or given to functions that wait for size_t.
-It permit also to found a bug in net/llc/af_llc.c where a size_t variable
-stored error codes.
-
-Regards
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index 0aa6fdf..f70bcf8 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -213,7 +213,7 @@ static int aead_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
+ 	}
+ 
+ 	while (size) {
+-		unsigned long len = size;
++		size_t len = size;
+ 		struct scatterlist *sg = NULL;
+ 
+ 		/* use the existing memory in an allocated page */
+@@ -247,7 +247,7 @@ static int aead_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
+ 		/* allocate a new page */
+ 		len = min_t(unsigned long, size, aead_sndbuf(sk));
+ 		while (len) {
+-			int plen = 0;
++			size_t plen = 0;
+ 
+ 			if (sgl->cur >= ALG_MAX_PAGES) {
+ 				aead_put_sgl(sk);
+@@ -256,7 +256,7 @@ static int aead_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
+ 			}
+ 
+ 			sg = sgl->sg + sgl->cur;
+-			plen = min_t(int, len, PAGE_SIZE);
++			plen = min_t(size_t, len, PAGE_SIZE);
+ 
+ 			sg_assign_page(sg, alloc_page(GFP_KERNEL));
+ 			err = -ENOMEM;
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index af31a0e..bbb1b66 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -40,7 +40,7 @@ struct skcipher_ctx {
+ 	struct af_alg_completion completion;
+ 
+ 	atomic_t inflight;
+-	unsigned used;
++	size_t used;
+ 
+ 	unsigned int len;
+ 	bool more;
+@@ -153,7 +153,7 @@ static int skcipher_alloc_sgl(struct sock *sk)
+ 	return 0;
+ }
+ 
+-static void skcipher_pull_sgl(struct sock *sk, int used, int put)
++static void skcipher_pull_sgl(struct sock *sk, size_t used, int put)
+ {
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct skcipher_ctx *ctx = ask->private;
+@@ -167,7 +167,7 @@ static void skcipher_pull_sgl(struct sock *sk, int used, int put)
+ 		sg = sgl->sg;
+ 
+ 		for (i = 0; i < sgl->cur; i++) {
+-			int plen = min_t(int, used, sg[i].length);
++			size_t plen = min_t(size_t, used, sg[i].length);
+ 
+ 			if (!sg_page(sg + i))
+ 				continue;
+@@ -348,7 +348,7 @@ static int skcipher_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	while (size) {
+ 		struct scatterlist *sg;
+ 		unsigned long len = size;
+-		int plen;
++		size_t plen;
+ 
+ 		if (ctx->merge) {
+ 			sgl = list_entry(ctx->tsgl.prev,
+@@ -390,7 +390,7 @@ static int skcipher_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		sg_unmark_end(sg + sgl->cur);
+ 		do {
+ 			i = sgl->cur;
+-			plen = min_t(int, len, PAGE_SIZE);
++			plen = min_t(size_t, len, PAGE_SIZE);
+ 
+ 			sg_assign_page(sg + i, alloc_page(GFP_KERNEL));
+ 			err = -ENOMEM;
+-- 
+2.4.10
