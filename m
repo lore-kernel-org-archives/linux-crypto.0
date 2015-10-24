@@ -1,106 +1,112 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH 11/11] crypto: algif: Change some variable to size_t
-Date: Fri, 23 Oct 2015 14:10:36 +0200
-Message-ID: <1445602236-24130-12-git-send-email-clabbe.montjoie@gmail.com>
-References: <1445602236-24130-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: LABBE Corentin <clabbe.montjoie@gmail.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: davem@davemloft.net, herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1445602236-24130-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Tobias Jakobi <tjakobi@math.uni-bielefeld.de>
+Subject: Re: [PATCH 0/3] ARM: dts: Enable Exynos RNG module
+Date: Sun, 25 Oct 2015 01:58:15 +0200
+Message-ID: <562C1B17.3080303@math.uni-bielefeld.de>
+References: <1445230834-32689-1-git-send-email-k.kozlowski@samsung.com>
+ <56251627.4050908@math.uni-bielefeld.de> <562581BD.3070609@samsung.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+To: Krzysztof Kozlowski <k.kozlowski@samsung.com>,
+	Kukjin Kim <kgene@kernel.org>,
+	Sylwester Nawrocki <s.nawrocki@samsung.com>,
+	Tomasz Figa <tomasz.figa@gmail.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@codeaurora.org>,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-clk@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp.math.uni-bielefeld.de ([129.70.45.10]:47994 "EHLO
+	smtp.math.uni-bielefeld.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752528AbbJXX6W (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 24 Oct 2015 19:58:22 -0400
+In-Reply-To: <562581BD.3070609@samsung.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Some variable are set as int but store only positive values.
-Furthermore there are used in operation/function that wait for unsigned
-value.
-This patch set them as size_t.
+Hello Krzysztof,
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
----
- crypto/algif_aead.c     |  6 +++---
- crypto/algif_skcipher.c | 10 +++++-----
- 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 0aa6fdf..f70bcf8 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -213,7 +213,7 @@ static int aead_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
- 	}
- 
- 	while (size) {
--		unsigned long len = size;
-+		size_t len = size;
- 		struct scatterlist *sg = NULL;
- 
- 		/* use the existing memory in an allocated page */
-@@ -247,7 +247,7 @@ static int aead_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
- 		/* allocate a new page */
- 		len = min_t(unsigned long, size, aead_sndbuf(sk));
- 		while (len) {
--			int plen = 0;
-+			size_t plen = 0;
- 
- 			if (sgl->cur >= ALG_MAX_PAGES) {
- 				aead_put_sgl(sk);
-@@ -256,7 +256,7 @@ static int aead_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
- 			}
- 
- 			sg = sgl->sg + sgl->cur;
--			plen = min_t(int, len, PAGE_SIZE);
-+			plen = min_t(size_t, len, PAGE_SIZE);
- 
- 			sg_assign_page(sg, alloc_page(GFP_KERNEL));
- 			err = -ENOMEM;
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index af31a0e..bbb1b66 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -40,7 +40,7 @@ struct skcipher_ctx {
- 	struct af_alg_completion completion;
- 
- 	atomic_t inflight;
--	unsigned used;
-+	size_t used;
- 
- 	unsigned int len;
- 	bool more;
-@@ -153,7 +153,7 @@ static int skcipher_alloc_sgl(struct sock *sk)
- 	return 0;
- }
- 
--static void skcipher_pull_sgl(struct sock *sk, int used, int put)
-+static void skcipher_pull_sgl(struct sock *sk, size_t used, int put)
- {
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct skcipher_ctx *ctx = ask->private;
-@@ -167,7 +167,7 @@ static void skcipher_pull_sgl(struct sock *sk, int used, int put)
- 		sg = sgl->sg;
- 
- 		for (i = 0; i < sgl->cur; i++) {
--			int plen = min_t(int, used, sg[i].length);
-+			size_t plen = min_t(size_t, used, sg[i].length);
- 
- 			if (!sg_page(sg + i))
- 				continue;
-@@ -348,7 +348,7 @@ static int skcipher_sendmsg(struct socket *sock, struct msghdr *msg,
- 	while (size) {
- 		struct scatterlist *sg;
- 		unsigned long len = size;
--		int plen;
-+		size_t plen;
- 
- 		if (ctx->merge) {
- 			sgl = list_entry(ctx->tsgl.prev,
-@@ -390,7 +390,7 @@ static int skcipher_sendmsg(struct socket *sock, struct msghdr *msg,
- 		sg_unmark_end(sg + sgl->cur);
- 		do {
- 			i = sgl->cur;
--			plen = min_t(int, len, PAGE_SIZE);
-+			plen = min_t(size_t, len, PAGE_SIZE);
- 
- 			sg_assign_page(sg + i, alloc_page(GFP_KERNEL));
- 			err = -ENOMEM;
--- 
-2.4.10
+Krzysztof Kozlowski wrote:
+> On 20.10.2015 01:11, Tobias Jakobi wrote:
+>> Hello Krzysztof,
+>>
+>> I can confirm that this also works on a Odroid-X2, so I guess it's safe
+>> to enable the PRNG for all Exynos4412-based Odroid devices.
+> 
+> Sure, I can send a patch for that. I can test it later also on Odroid-U3.
+Thanks already!
+
+
+
+>> Any chance that you might also take a look at the other hwcrypto stuff
+>> on the SoC ('samsung,exynos4210-secss' compatible)?
+> 
+> What do you mean? The s5p-sss driver already supports Device Tree.
+The driver supports DT, but it doesn't really work.
+
+I'm using the following DT entry to let the driver probe correctly:
+https://github.com/tobiasjakobi/linux-odroid/commit/82c00cddb5cbf89fad994784c28c8125beae8e13
+
+But the crypto self-test fails on boot:
+alg: skcipher: encryption failed on test 1 for ecb-aes-s5p: ret=22
+
+
+Another problems is that SSS and PRNG can't be used at the same time,
+since they both use common hardware resources (I think it was IO).
+
+
+With best wishes,
+Tobias
+
+
+> Best regards,
+> Krzysztof
+> 
+>>
+>> With best wishes,
+>> Tobias
+>>
+>>
+>> Krzysztof Kozlowski wrote:
+>>> Hi,
+>>>
+>>>
+>>> The patchset adds necessary clock from Security SubSystem (SSS)
+>>> and enables the PRNG module of Exynos for Trats2 board.
+>>>
+>>> The first patch (clock) is required for other ones so please
+>>> take everything in one step.
+>>>
+>>> The actual Device Tree support (and compatible) was sent in separate
+>>> patch:
+>>>  - https://patchwork.kernel.org/patch/7432891/
+>>>  - http://marc.info/?l=linux-crypto-vger&m=144522952725052&w=2
+>>>
+>>> The device can be tested (after applying both patchsets) with:
+>>> $ echo exynos > /sys/class/misc/hw_random/rng_current
+>>> $ dd if=/dev/hwrng of=/dev/null bs=1 count=16
+>>>
+>>>
+>>> Best regards,
+>>> Krzysztof
+>>>
+>>> Krzysztof Kozlowski (3):
+>>>   clk: samsung: exynos4: Add SSS gate clock
+>>>   ARM: dts: Add PRNG module for exynos4
+>>>   ARM: dts: Enable PRNG module on exynos4412-trats2
+>>>
+>>>  arch/arm/boot/dts/exynos4.dtsi          | 8 ++++++++
+>>>  arch/arm/boot/dts/exynos4412-trats2.dts | 4 ++++
+>>>  drivers/clk/samsung/clk-exynos4.c       | 1 +
+>>>  include/dt-bindings/clock/exynos4.h     | 1 +
+>>>  4 files changed, 14 insertions(+)
+>>>
+>>
+>>
+> 
