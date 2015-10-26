@@ -1,112 +1,57 @@
-From: Harsh Jain <harshjain.prof@gmail.com>
-Subject: Re: kernel tainted while exporting shash context using af_alg interface
-Date: Mon, 26 Oct 2015 14:51:01 +0530
-Message-ID: <CAFXBA==5iFOGWrZ+JtM4Yr1XnBL2NFRs=EMoeS4F2mF-R89iqQ@mail.gmail.com>
-References: <CAFXBA=mVmRsAk3fuyjf3WA-P+0dHKu0upUdb5Qxr0kwn1rKiDw@mail.gmail.com>
-	<2725312.7LhRVP0piv@tauon.atsec.com>
-	<CAFXBA==rM=XBykDC+K2tvS=Gya+ykBZp4ySnjQbPcgebOOYZGw@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.3
+Date: Mon, 26 Oct 2015 20:02:47 +0900
+Message-ID: <20151026110247.GA20464@gondor.apana.org.au>
+References: <20131107080131.GA32307@gondor.apana.org.au>
+ <20140123115319.GA20602@gondor.apana.org.au>
+ <20140401100001.GA12386@gondor.apana.org.au>
+ <20140605062336.GA14440@gondor.apana.org.au>
+ <20140804130339.GA1178@gondor.apana.org.au>
+ <20141007131826.GA29688@gondor.apana.org.au>
+ <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150626102234.GA19393@gondor.apana.org.au>
+ <20150908092502.GA8332@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary=001a11c3c964d38c680522fe7a81
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lf0-f49.google.com ([209.85.215.49]:35548 "EHLO
-	mail-lf0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750971AbbJZJVD (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:37775 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752902AbbJZLDR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 26 Oct 2015 05:21:03 -0400
-Received: by lfbn126 with SMTP id n126so105579190lfb.2
-        for <linux-crypto@vger.kernel.org>; Mon, 26 Oct 2015 02:21:01 -0700 (PDT)
-In-Reply-To: <CAFXBA==rM=XBykDC+K2tvS=Gya+ykBZp4ySnjQbPcgebOOYZGw@mail.gmail.com>
+	Mon, 26 Oct 2015 07:03:17 -0400
+Content-Disposition: inline
+In-Reply-To: <20150908092502.GA8332@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
---001a11c3c964d38c680522fe7a81
-Content-Type: text/plain; charset=UTF-8
+Hi Linus:
 
-Hi Stephan,
-
-I tried 1 more patch. This time result is correct. Find attached patch
-file. Is there any side effect of this patch.
+This push fixes a problem in the Crypto API that may cause spurious
+errors when signals are received by the process that made the orignal
+system call into the kernel.
 
 
-Regards
-Harsh Jain
+Please pull from
 
-On Mon, Oct 26, 2015 at 11:49 AM, Harsh Jain <harshjain.prof@gmail.com> wrote:
-> Hi Stephan,
->
-> I also tried test program in libkcapi and it works. libkcapi opens
-> socket of type "hmac(sha1)" .Openssl opens multiple "sha1" type socket
-> and uses the partial results to calculate hmac.
->
->  "crypto_ahash_init()" function initialises the *tfm variable in
-> crypto_shash structure.It gets called when user calls write() system
-> call. To give a try I updated the hash_accept() function and re-run.
-> This time kernel didn't crashed but result calculated is wrong.
->
-> How accept() sys call decide weather to call alg_accept() or hash_accept()?
->
-> Find attached patch and strace.Right now af_alg code is not accessible
-> to me. I will share it tomorrow.
->
->
->
-> Thanks and Regards
-> Harsh jain
->
-> On Sun, Oct 25, 2015 at 5:28 PM, Stephan Mueller <smueller@chronox.de> wrote:
->> Am Sonntag, 25. Oktober 2015, 11:56:27 schrieb Harsh Jain:
->>
->> Hi Harsh,
->>
->>>Hi,
->>>
->>>
->>>When trying to calculate HMAC(SHA1) with openssl using af-alg engine
->>>kernel crashes.Find below the command used and kernel. I have added
->>>some debug print in logs.
->>>
->>>Command used : ./openssl dgst -engine af_alg -sha1 -hmac "key" r.txt
->>>kernel version : 3.17.8
->>>
->>>Initial Investigation : In shash_desc structure tfm pointer contains
->>>5a5a5a5a5a5a5a5a(invalid pointer), when it triess to reference export
->>>function pointer it crashes. As per my understanding tfm object should
->>>have pointer of memory bloack allocated in
->>>"crypto_init_shash_ops_async" function
->>>
->>>Please give some pointers to debug the issue.Any documentation to
->>>understand the crypto-api code.
->>
->> May I ask you to send 2 things: the source code of the OpenSSL af_alg engine
->> that you use (IIRC it is not included upstream, I want to be sure I used the
->> right one).
->>
->> Further, can you attach an strace of the aforementioned command?
->>
->> Note, I am playing and abusing the AF_ALG interface for quite some time with
->> [1] but I did not come across any issues like the one you describe here.
->>
->> [1] http://www.chronox.de/libkcapi.html
->>
->> Ciao
->> Stephan
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
---001a11c3c964d38c680522fe7a81
-Content-Type: application/octet-stream; name="algif_hash_2.patch"
-Content-Disposition: attachment; filename="algif_hash_2.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ig7qi45h2
 
-LS0tIGFsZ2lmX2hhc2hfb3JpZy5jCTIwMTUtMTAtMjUgMTM6Mjc6MjkuMjIwMzgzNjk0IC0wNDAw
-CisrKyBhbGdpZl9oYXNoLmMJMjAxNS0xMC0yNiAwNDozODozOC40MjI5MjMzNDcgLTA0MDAKQEAg
-LTIxNyw2ICsyMTcsMTMgQEAgc3RhdGljIGludCBoYXNoX2FjY2VwdChzdHJ1Y3Qgc29ja2V0ICpz
-bwogCWR1bXBfc3RhY2soKTsJCiAJcHJpbnRrKEtFUk5fREVCVUcgIisrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrXG4iKTsKIAorCWlmICghY3R4LT5tb3JlKSB7CisJCWVyciA9IGNyeXB0b19h
-aGFzaF9pbml0KCZjdHgtPnJlcSk7CisgICAgICAgICAgICAgICAgaWYgKGVycikgeworCQkJcHJp
-bnRrKEtFUk5fREVCVUcgImhhc2hfYWNjZXB0OiBFcnJvciBpbiBjcnlwdG9fYWhhc2hfaW5pdFxu
-Iik7ICAgICAgICAKKwkgICAgICAgICAgICAgICAgcmV0dXJuIGVycjsKKwkJfQorCX0KIAllcnIg
-PSBjcnlwdG9fYWhhc2hfZXhwb3J0KHJlcSwgc3RhdGUpOwogCWlmIChlcnIpCiAJCXJldHVybiBl
-cnI7Cg==
---001a11c3c964d38c680522fe7a81--
+Herbert Xu (1):
+      crypto: api - Only abort operations on fatal signal
+
+ crypto/ablkcipher.c  |    2 +-
+ crypto/algapi.c      |    2 +-
+ crypto/api.c         |    6 +++---
+ crypto/crypto_user.c |    2 +-
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
