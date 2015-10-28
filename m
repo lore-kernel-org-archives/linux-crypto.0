@@ -1,50 +1,83 @@
-From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH v2 0/5] crypto: add algif_akcipher user space API
-Date: Wed, 28 Oct 2015 00:47:53 +0100
-Message-ID: <1885267.SGBklDhT9E@myon.chronox.de>
-References: <1831785.BBs8Hj3CxY@myon.chronox.de> <1499937.MpmApGzYrd@tauon.atsec.com> <1445989396.3405.131.camel@infradead.org>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: kernel tainted while exporting shash context using af_alg interface
+Date: Wed, 28 Oct 2015 01:09:58 +0100
+Message-ID: <2100556.thFK4ZhSZX@myon.chronox.de>
+References: <CAFXBA=mVmRsAk3fuyjf3WA-P+0dHKu0upUdb5Qxr0kwn1rKiDw@mail.gmail.com> <CAFXBA==rM=XBykDC+K2tvS=Gya+ykBZp4ySnjQbPcgebOOYZGw@mail.gmail.com> <CAFXBA==5iFOGWrZ+JtM4Yr1XnBL2NFRs=EMoeS4F2mF-R89iqQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Marcel Holtmann <marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: David Woodhouse <dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1445989396.3405.131.camel-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+To: Harsh Jain <harshjain.prof@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:34418 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754450AbbJ1AKD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 27 Oct 2015 20:10:03 -0400
+In-Reply-To: <CAFXBA==5iFOGWrZ+JtM4Yr1XnBL2NFRs=EMoeS4F2mF-R89iqQ@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 28. Oktober 2015, 08:43:16 schrieb David Woodhouse:
+Am Montag, 26. Oktober 2015, 14:51:01 schrieb Harsh Jain:
 
-Hi David,
+Hi Harsh,
 
-> > Albeit that all sounds like the crown jewel, how do you propose that shall
-> > happen?
-> > 
-> > Assume that you have a web server that has a pub and priv key in its
-> > current configuration -- I guess that is the vast majority of configs.
-> > 
-> > Can you please elaborate how the process for such a web server shall
-> > really
-> > work?
+> Hi Stephan,
 > 
-> 1. Create a kernel-side key.
-> 2. Use it.
-> 
-> That may require adding an API similar to the one you're proposing, but
-> working with kernel keys instead of directly with akcipher. Or perhaps
-> the key subsystem can already offer what you need in userspace. David?
+> I tried 1 more patch. This time result is correct. Find attached patch
+> file. Is there any side effect of this patch.
 
-Ohh, I see. So, you are saying that there should not be a setpub/privkey for 
-the akcipher AF_ALG interface?!
+The strace is enlightening.
 
-If somebody wants to use akcipher, he shall set the key via the keyring and 
-akcipher shall obtain it from the keyring?
+The user space code does an accept on an already accepted FD
 
-However, for the actual data shoveling, AF_ALG should still be used?
+It seems your user space does something like:
+
+socket()
+fd = bind()
+fd1 = accept(fd)
+fd2 = accept(fd1)
+fd3 = accept(fd2)
+...
+
+That is an error in the user space code. The correct way would be like the 
+code in [1] with all the lines until the line 553 (the code afterwards is for 
+vmsplice).
+
+So, the code goes like that:
+
+tfmfd = socket()
+bind(tfmfd)
+opfd = accept(tfmfd);
+
+>From now on, you use opfd for all sendmsg/recvmsg operations.
+
+
+However, any error in user space should not crash the kernel. So, a fix should 
+be done. But I think your code is not correct as it solidifies a broken user 
+space code.
+
+I would rather think the following patch should be added to prevent the oops. 
+At least for me, multiple accepts does not crash the kernel. Can you please 
+test whether this patch ensures you kernel stays sane?
+
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index 1396ad0..785df23 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -183,6 +183,9 @@ static int hash_accept(struct socket *sock, struct socket 
+*newsock, int flags)
+ 	struct hash_ctx *ctx2;
+ 	int err;
+ 
++	if (!ctx->more)
++		return -EINVAL;
++
+ 	err = crypto_ahash_export(req, state);
+ 	if (err)
+ 		return err;
+
+
+[1] https://github.com/smuellerDD/libkcapi/blob/master/lib/kcapi-kernel-if.c#L534
 
 
 -- 
