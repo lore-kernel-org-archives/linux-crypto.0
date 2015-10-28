@@ -1,103 +1,94 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: kernel tainted while exporting shash context using af_alg interface
-Date: Wed, 28 Oct 2015 12:23:54 +0100
-Message-ID: <28376488.AMz6xlEXXD@tauon.atsec.com>
-References: <CAFXBA=mVmRsAk3fuyjf3WA-P+0dHKu0upUdb5Qxr0kwn1rKiDw@mail.gmail.com> <42534143.fhk1W1Xe60@myon.chronox.de> <CAFXBA=mM=6TRbGV1VfE7fHnvYecit+rZgExduCex+wzKmd231Q@mail.gmail.com>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: [PATCH 0/5] x86 AES-CBC encryption with AVX2 multi-buffer
+Date: Wed, 28 Oct 2015 14:17:55 -0700
+Message-ID: <1446067075.14635.2.camel@schen9-desk2.jf.intel.com>
+References: <cover.1445565339.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Harsh Jain <harshjain.prof@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Chandramouli Narayanan <mouli_7982@yahoo.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	Stephan Mueller <smueller@chronox.de>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34443 "EHLO mail.eperm.de"
+Received: from mga14.intel.com ([192.55.52.115]:8009 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755831AbbJ1LYA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 28 Oct 2015 07:24:00 -0400
-In-Reply-To: <CAFXBA=mM=6TRbGV1VfE7fHnvYecit+rZgExduCex+wzKmd231Q@mail.gmail.com>
+	id S1752688AbbJ1VR4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 28 Oct 2015 17:17:56 -0400
+In-Reply-To: <cover.1445565339.git.tim.c.chen@linux.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 28. Oktober 2015, 16:24:34 schrieb Harsh Jain:
 
-Hi Harsh,
+In this patch series, we introduce AES CBC encryption that is parallelized
+on x86_64 cpu with AVX2. The multi-buffer technique takes advantage
+of wide AVX2 register and encrypt 8 data streams in parallel with SIMD
+instructions. Decryption is handled as in the existing AESNI Intel CBC
+implementation which can already parallelize decryption even for a single
+data stream.
 
->Hi Stephan,
->
->I tried your patch on my machine. Kernel is not crashing. The openssl
->break with this. Can you share HMAC program which you are suspecting
->it will not work or do you already have some test written in
->libkcapi/test.sh which will fail.
+Please see the multi-buffer whitepaper for details of the technique:
+http://www.intel.com/content/www/us/en/communications/communications-ia-multi-buffer-paper.html
 
-See comments above test/kcapi-main.c:cavs_hash
+It is important that any driver uses this algorithm properly for scenarios
+where we have many data streams that can fill up the data lanes most of
+the time.  It shouldn't be used when only a single data stream is expected
+mostly. Otherwise we may incurr extra delays when we have frequent gaps in
+data lanes, causing us to wait till data come in to fill the data lanes
+before initiating encryption.  We may have to wait for flush operations
+to commence when no new data come in after some wait time. However we
+keep this extra delay to a minimum by opportunistically flushing the
+unfinished jobs if crypto daemon is the only active task running on a cpu.
 
- * HMAC command line invocation:
- * $ ./kcapi -x 3 -c "hmac(sha1)" -k 6e77ebd479da794707bc6cde3694f552ea892dab 
--p  
-31b62a797adbff6b8a358d2b5206e01fee079de8cdfc4695138bba163b4efbf30127343e7fd4fbc696c3d38d8f27f57c024b5056f726ceeb4c31d98e57751ec8cbe8904ee0f9b031ae6a0c55da5e062475b3d7832191d4057643ef5fa446801d59a04693e573a8159cd2416b7bd39c7f0fe63c599365e04d596c05736beaab58
- * 7f204ea665666f5bd2b370e546d1b408005e4d85
+By using this technique, we saw a throughput increase of up to
+5.8x under optimal conditions when we have fully loaded encryption jobs
+filling up all the data lanes.
 
-To do that, apply your patch and then
+Tim Chen (5):
+  crypto: Multi-buffer encryptioin infrastructure support
+  crypto: AES CBC multi-buffer data structures
+  crypto: AES CBC multi-buffer scheduler
+  crypto: AES CBC by8 encryption
+  crypto: AES CBC multi-buffer glue code
 
-1. open lib/kcapi-kernel-if.c and change line 567 from
+ arch/x86/crypto/Makefile                           |   1 +
+ arch/x86/crypto/aes-cbc-mb/Makefile                |  22 +
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S        | 774 +++++++++++++++++++
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_mb.c            | 815 +++++++++++++++++++++
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_ctx.h        |  96 +++
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_mgr.h        | 131 ++++
+ arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c       | 145 ++++
+ arch/x86/crypto/aes-cbc-mb/mb_mgr_datastruct.S     | 270 +++++++
+ arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S | 222 ++++++
+ arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S     | 416 +++++++++++
+ arch/x86/crypto/aes-cbc-mb/reg_sizes.S             | 125 ++++
+ crypto/Kconfig                                     |  16 +
+ crypto/blkcipher.c                                 |  29 +-
+ crypto/mcryptd.c                                   | 256 ++++++-
+ crypto/scatterwalk.c                               |   7 +
+ include/crypto/algapi.h                            |   1 +
+ include/crypto/mcryptd.h                           |  36 +
+ include/crypto/scatterwalk.h                       |   6 +
+ include/linux/crypto.h                             |   1 +
+ 19 files changed, 3364 insertions(+), 5 deletions(-)
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/Makefile
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_mb.c
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_ctx.h
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_mgr.h
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_datastruct.S
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/reg_sizes.S
 
-handle->opfd = accept(handle->tfmfd, NULL, 0);
-
-
-to
-
-handle->opfd = accept(handle->tfmfd, NULL, 0);
-handle->opfd = accept(handle->opfd, NULL, 0);
-handle->opfd = accept(handle->opfd, NULL, 0);
-handle->opfd = accept(handle->opfd, NULL, 0);
-handle->opfd = accept(handle->opfd, NULL, 0);
-
-You will see that the hash commands will pass, the HMAC fails
-
-Without your patch, the kernel crashes (same as with your OpenSSL code).
-
-The reason is that setkey is applied on the TFM that is not conveyed to the 
-subsequent TFMs generated with new accepts.
->
->
->Regards
->Harsh Jain
->
->On Wed, Oct 28, 2015 at 6:25 AM, Stephan Mueller <smueller@chronox.de> wrote:
->> Am Mittwoch, 28. Oktober 2015, 01:09:58 schrieb Stephan Mueller:
->> 
->> Hi Harsh,
->> 
->>> However, any error in user space should not crash the kernel. So, a fix
->>> should be done. But I think your code is not correct as it solidifies a
->>> broken user space code.
->> 
->> After thinking a bit again, I think your approach is correct after all. I
->> was able to reproduce the crash by simply adding more accept calls to my
->> test code. And I can confirm that your patch works, for hashes.
->> 
->> *BUT* it does NOT work for HMAC as the key is set on the TFM and the
->> subsequent accepts do not transport the key. Albeit your code prevents the
->> kernel from crashing, the HMAC calculation will be done with an empty key
->> as
->> the setkey operation does not reach the TFM handle in the subordinate
->> accept() call.
->> 
->> So, I would think that the second accept is simply broken, for HMAC at
->> least.
->> 
->> Herbert, what is the purpose of that subordinate accept that is implemented
->> with hash_accept? As this is broken for HMACs, should it be removed
->> entirely?
->> 
->> --
->> Ciao
->> Stephan
->
->--
->To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
->the body of a message to majordomo@vger.kernel.org
->More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Ciao
-Stephan
+-- 
+1.7.11.7
