@@ -1,52 +1,68 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 5/5] crypto: AES CBC multi-buffer glue code
-Date: Thu, 29 Oct 2015 03:03:54 +0100
-Message-ID: <2511888.9MT8h10EQL@tauon.atsec.com>
-References: <cover.1445565339.git.tim.c.chen@linux.intel.com> <1446067169.14635.7.camel@schen9-desk2.jf.intel.com>
+From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Subject: Re: [PATCH 0/3] ARM: dts: Enable Exynos RNG module
+Date: Thu, 29 Oct 2015 15:24:54 +0900
+Message-ID: <5631BBB6.9080204@samsung.com>
+References: <1445230834-32689-1-git-send-email-k.kozlowski@samsung.com>
+ <56251627.4050908@math.uni-bielefeld.de> <562581BD.3070609@samsung.com>
+ <562C1B17.3080303@math.uni-bielefeld.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Chandramouli Narayanan <mouli_7982@yahoo.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34446 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750927AbbJ2CEA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 28 Oct 2015 22:04:00 -0400
-In-Reply-To: <1446067169.14635.7.camel@schen9-desk2.jf.intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+To: Tobias Jakobi <tjakobi@math.uni-bielefeld.de>,
+	Kukjin Kim <kgene@kernel.org>,
+	Sylwester Nawrocki <s.nawrocki@samsung.com>,
+	Tomasz Figa <tomasz.figa@gmail.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@codeaurora.org>,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-clk@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-clk-owner@vger.kernel.org>
+In-reply-to: <562C1B17.3080303@math.uni-bielefeld.de>
+Sender: linux-clk-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 28. Oktober 2015, 14:19:29 schrieb Tim Chen:
+On 25.10.2015 08:58, Tobias Jakobi wrote:
+> Hello Krzysztof,
+> 
+> 
+> Krzysztof Kozlowski wrote:
+>> On 20.10.2015 01:11, Tobias Jakobi wrote:
+>>> Hello Krzysztof,
+>>>
+>>> I can confirm that this also works on a Odroid-X2, so I guess it's safe
+>>> to enable the PRNG for all Exynos4412-based Odroid devices.
+>>
+>> Sure, I can send a patch for that. I can test it later also on Odroid-U3.
+> Thanks already!
+> 
+> 
+> 
+>>> Any chance that you might also take a look at the other hwcrypto stuff
+>>> on the SoC ('samsung,exynos4210-secss' compatible)?
+>>
+>> What do you mean? The s5p-sss driver already supports Device Tree.
+> The driver supports DT, but it doesn't really work.
+> 
+> I'm using the following DT entry to let the driver probe correctly:
+> https://github.com/tobiasjakobi/linux-odroid/commit/82c00cddb5cbf89fad994784c28c8125beae8e13
+> 
+> But the crypto self-test fails on boot:
+> alg: skcipher: encryption failed on test 1 for ecb-aes-s5p: ret=22
+> 
+> 
+> Another problems is that SSS and PRNG can't be used at the same time,
+> since they both use common hardware resources (I think it was IO).
+> 
 
-Hi Tim,
+Thanks for explaining this. I added the issue to the long TODO list but
+I don't know when I will be able to dig into this.
 
->+
->+	/* check for dependent cpu features */
->+	if (!cpu_has_aes) {
->+		pr_err("aes_cbc_mb_mod_init: no aes support\n");
->+		err = -ENODEV;
->+		goto err1;
->+	}
+If anyone wants to look into this, please go ahead...
 
-In your post 0/5, you say that this mechanism needs AVX2. In the existing 
-AESNI glue code I find
+Best regards,
+Krzysztof
 
-#ifdef CONFIG_X86_64
-#ifdef CONFIG_AS_AVX2
-        if (boot_cpu_has(X86_FEATURE_AVX2)) {
-
-...
-
-Why would that CPU check not be needed here?
-
-Ciao
-Stephan
