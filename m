@@ -1,50 +1,150 @@
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [RFC PATCH] crypto: RSA padding transform
-Date: Fri, 30 Oct 2015 17:35:46 +0900
-Message-ID: <E8E1521C-0D05-402E-B1C0-E204ED5BF28C@holtmann.org>
-References: <1441494029-6765-1-git-send-email-andrew.zaborowski@intel.com> <CAOq732JmhBh7kqDH1mMhUz1MXz9zJSx1jaqdBMjgDVvtraSrrQ@mail.gmail.com> <55ED9FDC.60602@intel.com> <1807044.IVByMVeBDE@tauon.atsec.com> <CAOq732LoTvUzDTM7vRHU3QCHeuL0vD4Bh24kqB0R8i0yCQdsJw@mail.gmail.com>
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: Stephan Mueller <smueller@chronox.de>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	linux-crypto@vger.kernel.org
-To: Andrzej Zaborowski <andrew.zaborowski@intel.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v2 3/5] crypto: AF_ALG -- add setpubkey setsockopt call
+Date: Fri, 30 Oct 2015 09:42:27 +0100
+Message-ID: <1977247.RiyifmUyDD@tauon.atsec.com>
+References: <1831785.BBs8Hj3CxY@myon.chronox.de> <1500043.fUe7nt4IEH@myon.chronox.de> <DE14D478-A941-4F5B-A43F-7C6DB51E2CCE@holtmann.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-api@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:58432 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932637AbbJ3Ifv convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 30 Oct 2015 04:35:51 -0400
-In-Reply-To: <CAOq732LoTvUzDTM7vRHU3QCHeuL0vD4Bh24kqB0R8i0yCQdsJw@mail.gmail.com>
+Received: from mail.eperm.de ([89.247.134.16]:34457 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758670AbbJ3Imd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 30 Oct 2015 04:42:33 -0400
+In-Reply-To: <DE14D478-A941-4F5B-A43F-7C6DB51E2CCE@holtmann.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Andrzej,
+Am Freitag, 30. Oktober 2015, 17:16:47 schrieb Marcel Holtmann:
 
->>> I can see now that with all these padding schemes there will be more buffer
->>> copied on top of this, so I wonder if it still make sense.
->>> Herbert?
+Hi Marcel,
+
+>Hi Stephan,
+>
+>> For supporting asymmetric ciphers, user space must be able to set the
+>> public key. The patch adds a new setsockopt call for setting the public
+>> key.
 >> 
->> When the padding stuff comes into play, I think the SGL approach avoids
->> memcpy() invocations.
+>> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+>> ---
+>> crypto/af_alg.c         | 14 +++++++++++---
+>> include/crypto/if_alg.h |  1 +
+>> 2 files changed, 12 insertions(+), 3 deletions(-)
 >> 
->> For example, Andrzej's approach currently is to copy the *entire* source data
->> into a buffer where the padding is added.
+>> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+>> index a8e7aa3..bf6528e 100644
+>> --- a/crypto/af_alg.c
+>> +++ b/crypto/af_alg.c
+>> @@ -173,13 +173,16 @@ static int alg_bind(struct socket *sock, struct
+>> sockaddr *uaddr, int addr_len) }
 >> 
->> With SGLs, Andrzej only needs a buffer with the padding (which I would think
->> could even reside on the stack, provided some bounds checks are done), and
->> modify the SGL by preprending the padding buffer to the SGL with the source
->> data.
-> 
-> Yes, in the case of the padding schemes, using sgl's would actually
-> save a memcpy both on encrypt/sign and decrypt/verify.  Whether it'd
-> actually help I'm not sure -- the number of pointers you need to
-> touch, etc. may add up to around 128/256 bytes of memory access
-> anyway.
+>> static int alg_setkey(struct sock *sk, char __user *ukey,
+>> -		      unsigned int keylen)
+>> +		      unsigned int keylen, bool pubkey)
+>> {
+>> 
+>> 	struct alg_sock *ask = alg_sk(sk);
+>> 	const struct af_alg_type *type = ask->type;
+>> 	u8 *key;
+>> 	int err;
+>> 
+>> +	if (pubkey && !type->setpubkey)
+>> +		return -EOPNOTSUPP;
+>> +
+>> 
+>> 	key = sock_kmalloc(sk, keylen, GFP_KERNEL);
+>> 	if (!key)
+>> 	
+>> 		return -ENOMEM;
+>> 
+>> @@ -188,7 +191,10 @@ static int alg_setkey(struct sock *sk, char __user
+>> *ukey,> 
+>> 	if (copy_from_user(key, ukey, keylen))
+>> 	
+>> 		goto out;
+>> 
+>> -	err = type->setkey(ask->private, key, keylen);
+>> +	if (pubkey)
+>> +		err = type->setpubkey(ask->private, key, keylen);
+>> +	else
+>> +		err = type->setkey(ask->private, key, keyless);
+>
+>why is this kind of hackery needed? Why not just introduce alg_setpubkey to
+>keep this a lot cleaner.
 
-I think we have akcipher patches using sgl now. Would it make sense to update this patch against them.
+You are fully correct. I wanted to spare a re-implementation of the setkey 
+function. But instead of that hack, having something like the following would 
+be much cleaner:
 
-Regards
+setkey_common() {
+...
+	heavy lifting
+...
+}
 
-Marcel
+setpubkey() {
+	setkey_common(type->setpubkey)
+}
+
+setkey() {
+	setkey_common(type->setkey)
+}
+
+>> out:
+>> 	sock_kzfree_s(sk, key, keylen);
+>> 
+>> @@ -212,12 +218,14 @@ static int alg_setsockopt(struct socket *sock, int
+>> level, int optname,> 
+>> 	switch (optname) {
+>> 
+>> 	case ALG_SET_KEY:
+>> +	case ALG_SET_PUBKEY:
+>> 		if (sock->state == SS_CONNECTED)
+>> 		
+>> 			goto unlock;
+>> 		
+>> 		if (!type->setkey)
+>> 		
+>> 			goto unlock;
+>> 
+>> -		err = alg_setkey(sk, optval, optlen);
+>> +		err = alg_setkey(sk, optval, optlen,
+>> +				 (optname == ALG_SET_PUBKEY) ? true : false);
+>> 
+>> 		break;
+>
+>Same here. Why not give ALG_SET_PUBKEY a separate case statement. Especially
+>since you have to check type->setkey vs type->setpubkey.
+
+Same here.
+
+>> 	case ALG_SET_AEAD_AUTHSIZE:
+>> 		if (sock->state == SS_CONNECTED)
+>> 
+>> diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+>> index 018afb2..ca4dc72 100644
+>> --- a/include/crypto/if_alg.h
+>> +++ b/include/crypto/if_alg.h
+>> @@ -49,6 +49,7 @@ struct af_alg_type {
+>> 
+>> 	void *(*bind)(const char *name, u32 type, u32 mask);
+>> 	void (*release)(void *private);
+>> 	int (*setkey)(void *private, const u8 *key, unsigned int keylen);
+>> 
+>> +	int (*setpubkey)(void *private, const u8 *key, unsigned int keylen);
+>> 
+>> 	int (*accept)(void *private, struct sock *sk);
+>> 	int (*setauthsize)(void *private, unsigned int authorize);
+>
+>Regards
+>
+>Marcel
+
+Thanks.
+
+Ciao
+Stephan
