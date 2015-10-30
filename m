@@ -1,40 +1,64 @@
-From: Zain Wang <zain.wang@rock-chips.com>
-Subject: [RESEND PATCH 2/4] clk: rockchip: set an id for crypto clk
-Date: Fri, 30 Oct 2015 16:22:47 +0800
-Message-ID: <1446193369-4453-3-git-send-email-zain.wang@rock-chips.com>
+From: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+Subject: [RESEND PATCH 3/4] ARM: dts: rockchip: Add Crypto drivers for rk3288
+Date: Fri, 30 Oct 2015 16:22:48 +0800
+Message-ID: <1446193369-4453-4-git-send-email-zain.wang@rock-chips.com>
 References: <1446193369-4453-1-git-send-email-zain.wang@rock-chips.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-	eddie.cai@rock-chips.com, Zain Wang <zain.wang@rock-chips.com>
-To: zhengsq@rock-chips.com, hl@rock-chips.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	mturquette@baylibre.com, heiko@sntech.de, pawel.moll@arm.com,
-	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
-	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1446193369-4453-1-git-send-email-zain.wang@rock-chips.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>,
+ linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+ eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org, hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+ davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org,
+ pawel.moll-5wv7dgnIgG8@public.gmane.org, ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+ galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org
+Return-path: <linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+In-Reply-To: <1446193369-4453-1-git-send-email-zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-rockchip>,
+ <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-rockchip/>
+List-Post: <mailto:linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Help: <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-rockchip>,
+ <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
+Sender: "Linux-rockchip" <linux-rockchip-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Errors-To: linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-set an id for crypto clk, so that it can be called in other part.
+Add Crypto drivers for rk3288 including crypto controller and dma clk.
 
-Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
+Signed-off-by: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
 ---
- drivers/clk/rockchip/clk-rk3288.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/boot/dts/rk3288.dtsi | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/drivers/clk/rockchip/clk-rk3288.c b/drivers/clk/rockchip/clk-rk3288.c
-index 9040878..d74bd5d 100644
---- a/drivers/clk/rockchip/clk-rk3288.c
-+++ b/drivers/clk/rockchip/clk-rk3288.c
-@@ -295,7 +295,7 @@ static struct rockchip_clk_branch rk3288_clk_branches[] __initdata = {
- 			RK3288_CLKGATE_CON(0), 4, GFLAGS),
- 	GATE(0, "c2c_host", "aclk_cpu_src", 0,
- 			RK3288_CLKGATE_CON(13), 8, GFLAGS),
--	COMPOSITE_NOMUX(0, "crypto", "aclk_cpu_pre", 0,
-+	COMPOSITE_NOMUX(SRST_CRYPTO, "crypto", "aclk_cpu_pre", 0,
- 			RK3288_CLKSEL_CON(26), 6, 2, DFLAGS,
- 			RK3288_CLKGATE_CON(5), 4, GFLAGS),
- 	GATE(0, "aclk_bus_2pmu", "aclk_cpu_pre", CLK_IGNORE_UNUSED,
+diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288.dtsi
+index 6a79c9c..1706706 100644
+--- a/arch/arm/boot/dts/rk3288.dtsi
++++ b/arch/arm/boot/dts/rk3288.dtsi
+@@ -170,6 +170,22 @@
+ 		};
+ 	};
+ 
++	crypto: cypto-controller@ff8a0000 {
++		compatible = "rockchip,crypto";
++		reg = <0xff8a0000 0x4000>;
++		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&cru ACLK_CRYPTO>,
++			 <&cru HCLK_CRYPTO>,
++			 <&cru SRST_CRYPTO>,
++			 <&cru ACLK_DMAC1>;
++
++		clock-names = "aclk_crypto",
++			      "hclk_crypto",
++			      "srst_crypto",
++				  "apb_pclk";
++		status = "okay";
++	};
++
+ 	reserved-memory {
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
 -- 
 1.9.1
