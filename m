@@ -1,150 +1,88 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2 3/5] crypto: AF_ALG -- add setpubkey setsockopt call
-Date: Fri, 30 Oct 2015 09:42:27 +0100
-Message-ID: <1977247.RiyifmUyDD@tauon.atsec.com>
-References: <1831785.BBs8Hj3CxY@myon.chronox.de> <1500043.fUe7nt4IEH@myon.chronox.de> <DE14D478-A941-4F5B-A43F-7C6DB51E2CCE@holtmann.org>
+From: Heiko Stuebner <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>
+Subject: Re: [RESEND PATCH 2/4] clk: rockchip: set an id for crypto clk
+Date: Fri, 30 Oct 2015 09:54:02 +0100
+Message-ID: <4280600.OxjmG17dRp@phil>
+References: <1446193369-4453-1-git-send-email-zain.wang@rock-chips.com> <1446193369-4453-3-git-send-email-zain.wang@rock-chips.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-api@vger.kernel.org
-To: Marcel Holtmann <marcel@holtmann.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34457 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758670AbbJ3Imd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 30 Oct 2015 04:42:33 -0400
-In-Reply-To: <DE14D478-A941-4F5B-A43F-7C6DB51E2CCE@holtmann.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org, hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org, Chris Zhong <zyw-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+To: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1446193369-4453-3-git-send-email-zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 30. Oktober 2015, 17:16:47 schrieb Marcel Holtmann:
+Hi Zain,
 
-Hi Marcel,
+Am Freitag, 30. Oktober 2015, 16:22:47 schrieb Zain Wang:
+> set an id for crypto clk, so that it can be called in other part.
+> 
+> Signed-off-by: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+> ---
+>  drivers/clk/rockchip/clk-rk3288.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/clk/rockchip/clk-rk3288.c b/drivers/clk/rockchip/clk-rk3288.c
+> index 9040878..d74bd5d 100644
+> --- a/drivers/clk/rockchip/clk-rk3288.c
+> +++ b/drivers/clk/rockchip/clk-rk3288.c
+> @@ -295,7 +295,7 @@ static struct rockchip_clk_branch rk3288_clk_branches[] __initdata = {
+>  			RK3288_CLKGATE_CON(0), 4, GFLAGS),
+>  	GATE(0, "c2c_host", "aclk_cpu_src", 0,
+>  			RK3288_CLKGATE_CON(13), 8, GFLAGS),
+> -	COMPOSITE_NOMUX(0, "crypto", "aclk_cpu_pre", 0,
+> +	COMPOSITE_NOMUX(SRST_CRYPTO, "crypto", "aclk_cpu_pre", 0,
 
->Hi Stephan,
->
->> For supporting asymmetric ciphers, user space must be able to set the
->> public key. The patch adds a new setsockopt call for setting the public
->> key.
->> 
->> Signed-off-by: Stephan Mueller <smueller@chronox.de>
->> ---
->> crypto/af_alg.c         | 14 +++++++++++---
->> include/crypto/if_alg.h |  1 +
->> 2 files changed, 12 insertions(+), 3 deletions(-)
->> 
->> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
->> index a8e7aa3..bf6528e 100644
->> --- a/crypto/af_alg.c
->> +++ b/crypto/af_alg.c
->> @@ -173,13 +173,16 @@ static int alg_bind(struct socket *sock, struct
->> sockaddr *uaddr, int addr_len) }
->> 
->> static int alg_setkey(struct sock *sk, char __user *ukey,
->> -		      unsigned int keylen)
->> +		      unsigned int keylen, bool pubkey)
->> {
->> 
->> 	struct alg_sock *ask = alg_sk(sk);
->> 	const struct af_alg_type *type = ask->type;
->> 	u8 *key;
->> 	int err;
->> 
->> +	if (pubkey && !type->setpubkey)
->> +		return -EOPNOTSUPP;
->> +
->> 
->> 	key = sock_kmalloc(sk, keylen, GFP_KERNEL);
->> 	if (!key)
->> 	
->> 		return -ENOMEM;
->> 
->> @@ -188,7 +191,10 @@ static int alg_setkey(struct sock *sk, char __user
->> *ukey,> 
->> 	if (copy_from_user(key, ukey, keylen))
->> 	
->> 		goto out;
->> 
->> -	err = type->setkey(ask->private, key, keylen);
->> +	if (pubkey)
->> +		err = type->setpubkey(ask->private, key, keylen);
->> +	else
->> +		err = type->setkey(ask->private, key, keyless);
->
->why is this kind of hackery needed? Why not just introduce alg_setpubkey to
->keep this a lot cleaner.
+the id you want to use actually is a soft-reset index, not a clock-id.
+You would need to add a real id, in this case with an sclk_ prefix.
 
-You are fully correct. I wanted to spare a re-implementation of the setkey 
-function. But instead of that hack, having something like the following would 
-be much cleaner:
+>  			RK3288_CLKSEL_CON(26), 6, 2, DFLAGS,
+>  			RK3288_CLKGATE_CON(5), 4, GFLAGS),
+>  	GATE(0, "aclk_bus_2pmu", "aclk_cpu_pre", CLK_IGNORE_UNUSED,
+> 
 
-setkey_common() {
-...
-	heavy lifting
-...
-}
+It should probably look more like below, but as suggested by Stephen Boyd
+in another thread, we should coordinate with Chris to add more necessary clock
+ids in one go:
+-------- 8< -----------
+diff --git a/drivers/clk/rockchip/clk-rk3288.c b/drivers/clk/rockchip/clk-rk3288.c
+index 9040878..9fd9f5a 100644
+--- a/drivers/clk/rockchip/clk-rk3288.c
++++ b/drivers/clk/rockchip/clk-rk3288.c
+@@ -295,7 +295,7 @@ static struct rockchip_clk_branch rk3288_clk_branches[] __initdata = {
+ 			RK3288_CLKGATE_CON(0), 4, GFLAGS),
+ 	GATE(0, "c2c_host", "aclk_cpu_src", 0,
+ 			RK3288_CLKGATE_CON(13), 8, GFLAGS),
+-	COMPOSITE_NOMUX(0, "crypto", "aclk_cpu_pre", 0,
++	COMPOSITE_NOMUX(SCLK_CRYPTO, "sclk_crypto", "aclk_cpu_pre", 0,
+ 			RK3288_CLKSEL_CON(26), 6, 2, DFLAGS,
+ 			RK3288_CLKGATE_CON(5), 4, GFLAGS),
+ 	GATE(0, "aclk_bus_2pmu", "aclk_cpu_pre", CLK_IGNORE_UNUSED,
+diff --git a/include/dt-bindings/clock/rk3288-cru.h b/include/dt-bindings/clock/rk3288-cru.h
+index c719aac..9e0a5e9 100644
+--- a/include/dt-bindings/clock/rk3288-cru.h
++++ b/include/dt-bindings/clock/rk3288-cru.h
+@@ -86,6 +86,7 @@
+ #define SCLK_USBPHY480M_SRC	122
+ #define SCLK_PVTM_CORE		123
+ #define SCLK_PVTM_GPU		124
++#define SCLK_CRYPTO		125
+ 
+ #define SCLK_MAC		151
+ #define SCLK_MACREF_OUT		152
+-- 
+2.6.1
 
-setpubkey() {
-	setkey_common(type->setpubkey)
-}
-
-setkey() {
-	setkey_common(type->setkey)
-}
-
->> out:
->> 	sock_kzfree_s(sk, key, keylen);
->> 
->> @@ -212,12 +218,14 @@ static int alg_setsockopt(struct socket *sock, int
->> level, int optname,> 
->> 	switch (optname) {
->> 
->> 	case ALG_SET_KEY:
->> +	case ALG_SET_PUBKEY:
->> 		if (sock->state == SS_CONNECTED)
->> 		
->> 			goto unlock;
->> 		
->> 		if (!type->setkey)
->> 		
->> 			goto unlock;
->> 
->> -		err = alg_setkey(sk, optval, optlen);
->> +		err = alg_setkey(sk, optval, optlen,
->> +				 (optname == ALG_SET_PUBKEY) ? true : false);
->> 
->> 		break;
->
->Same here. Why not give ALG_SET_PUBKEY a separate case statement. Especially
->since you have to check type->setkey vs type->setpubkey.
-
-Same here.
-
->> 	case ALG_SET_AEAD_AUTHSIZE:
->> 		if (sock->state == SS_CONNECTED)
->> 
->> diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
->> index 018afb2..ca4dc72 100644
->> --- a/include/crypto/if_alg.h
->> +++ b/include/crypto/if_alg.h
->> @@ -49,6 +49,7 @@ struct af_alg_type {
->> 
->> 	void *(*bind)(const char *name, u32 type, u32 mask);
->> 	void (*release)(void *private);
->> 	int (*setkey)(void *private, const u8 *key, unsigned int keylen);
->> 
->> +	int (*setpubkey)(void *private, const u8 *key, unsigned int keylen);
->> 
->> 	int (*accept)(void *private, struct sock *sk);
->> 	int (*setauthsize)(void *private, unsigned int authorize);
->
->Regards
->
->Marcel
-
-Thanks.
-
-Ciao
-Stephan
+-------- 8< -----------
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
