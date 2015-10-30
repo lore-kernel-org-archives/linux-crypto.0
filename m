@@ -1,84 +1,104 @@
-From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: [PATCH v2 2/3] crypto: add entry for sm3-256
-Date: Fri, 30 Oct 2015 13:35:08 +0200
-Message-ID: <1446204910-29948-3-git-send-email-jarkko.sakkinen@linux.intel.com>
-References: <1446204910-29948-1-git-send-email-jarkko.sakkinen@linux.intel.com>
-Cc: tpmdd-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-	chris.j.arges@canonical.com, seth.forshee@canonical.com,
-	colin.king@canonical.com, josh@joshtriplett.org,
-	Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org (open list:CRYPTO API),
-	linux-api@vger.kernel.org (open list:ABI/API)
-To: Peter Huewe <peterhuewe@gmx.de>,
-	Marcel Selhorst <tpmdd@selhorst.net>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	David Howells <dhowells@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1446204910-29948-1-git-send-email-jarkko.sakkinen@linux.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: crypto: algif_hash - Only export and import on sockets with data
+Date: Fri, 30 Oct 2015 20:16:51 +0800
+Message-ID: <20151030121651.GA23757@gondor.apana.org.au>
+References: <CAFXBA=mVmRsAk3fuyjf3WA-P+0dHKu0upUdb5Qxr0kwn1rKiDw@mail.gmail.com>
+ <28376488.AMz6xlEXXD@tauon.atsec.com>
+ <CAFXBA==pRTY57SkfPRnW_6MVRUJ0J8Uwi+Bigxtk21WNhvY3jA@mail.gmail.com>
+ <3576256.SqRabKS4lK@tauon.atsec.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Harsh Jain <harshjain.prof@gmail.com>, linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:60474 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1031011AbbJ3MQ5 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 30 Oct 2015 08:16:57 -0400
+Content-Disposition: inline
+In-Reply-To: <3576256.SqRabKS4lK@tauon.atsec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Added entry for sm3-256 to the following tables:
+On Fri, Oct 30, 2015 at 12:10:51PM +0100, Stephan Mueller wrote:
+> Am Freitag, 30. Oktober 2015, 14:02:27 schrieb Harsh Jain:
+> 
+> Hi Harsh,
+> 
+> >Hi Stephan,
+> >
+> >If we add sendmsg() in between 2 accept calls then the setkey problem
+> >will happen?
+> >
+> >handle->opfd = accept(handle->tfmfd, NULL, 0);
+> >sendmsg()
+> >handle->opfd = accept(handle->opfd, NULL, 0);
+> >sendmsg()
+> >handle->opfd = accept(handle->opfd, NULL, 0);
+> 
+> Without testing, I would very much expect that, because the setkey does not 
+> apply to the subordinate tfm.
 
-* hash_algo_name
-* hash_digest_size
+setkey should be needed as the subsequent accept will all be based
+on the same parent fd, meaning that they will all use a single tfm.
 
-Needed for TPM 2.0 trusted key sealing.
+Please try the following patch.
 
-Signed-off-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
----
- crypto/hash_info.c             | 2 ++
- include/crypto/hash_info.h     | 3 +++
- include/uapi/linux/hash_info.h | 1 +
- 3 files changed, 6 insertions(+)
+---8<---
+The hash_accept call fails to work on sockets that have not received
+any data.  For some algorithm implementations it may cause crashes.
 
-diff --git a/crypto/hash_info.c b/crypto/hash_info.c
-index 3e7ff46..7b1e0b1 100644
---- a/crypto/hash_info.c
-+++ b/crypto/hash_info.c
-@@ -31,6 +31,7 @@ const char *const hash_algo_name[HASH_ALGO__LAST] = {
- 	[HASH_ALGO_TGR_128]	= "tgr128",
- 	[HASH_ALGO_TGR_160]	= "tgr160",
- 	[HASH_ALGO_TGR_192]	= "tgr192",
-+	[HASH_ALGO_SM3_256]	= "sm3-256",
- };
- EXPORT_SYMBOL_GPL(hash_algo_name);
+This patch fixes this by ensuring that we only export and import on
+sockets that have received data.
+
+Cc: stable@vger.kernel.org
+Reported-by: Harsh Jain <harshjain.prof@gmail.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index 1396ad0..bbda6b4 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -181,11 +181,14 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags)
+ 	struct sock *sk2;
+ 	struct alg_sock *ask2;
+ 	struct hash_ctx *ctx2;
++	bool more = ctx->more;
+ 	int err;
  
-@@ -52,5 +53,6 @@ const int hash_digest_size[HASH_ALGO__LAST] = {
- 	[HASH_ALGO_TGR_128]	= TGR128_DIGEST_SIZE,
- 	[HASH_ALGO_TGR_160]	= TGR160_DIGEST_SIZE,
- 	[HASH_ALGO_TGR_192]	= TGR192_DIGEST_SIZE,
-+	[HASH_ALGO_SM3_256]	= SM3256_DIGEST_SIZE,
- };
- EXPORT_SYMBOL_GPL(hash_digest_size);
-diff --git a/include/crypto/hash_info.h b/include/crypto/hash_info.h
-index e1e5a3e..56f217d 100644
---- a/include/crypto/hash_info.h
-+++ b/include/crypto/hash_info.h
-@@ -34,6 +34,9 @@
- #define TGR160_DIGEST_SIZE 20
- #define TGR192_DIGEST_SIZE 24
+-	err = crypto_ahash_export(req, state);
+-	if (err)
+-		return err;
++	if (more) {
++		err = crypto_ahash_export(req, state);
++		if (err)
++			return err;
++	}
  
-+/* not defined in include/crypto/ */
-+#define SM3256_DIGEST_SIZE 32
-+
- extern const char *const hash_algo_name[HASH_ALGO__LAST];
- extern const int hash_digest_size[HASH_ALGO__LAST];
+ 	err = af_alg_accept(ask->parent, newsock);
+ 	if (err)
+@@ -194,12 +197,14 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags)
+ 	sk2 = newsock->sk;
+ 	ask2 = alg_sk(sk2);
+ 	ctx2 = ask2->private;
+-	ctx2->more = 1;
++	ctx2->more = more;
  
-diff --git a/include/uapi/linux/hash_info.h b/include/uapi/linux/hash_info.h
-index ca18c45..ebf8fd8 100644
---- a/include/uapi/linux/hash_info.h
-+++ b/include/uapi/linux/hash_info.h
-@@ -31,6 +31,7 @@ enum hash_algo {
- 	HASH_ALGO_TGR_128,
- 	HASH_ALGO_TGR_160,
- 	HASH_ALGO_TGR_192,
-+	HASH_ALGO_SM3_256,
- 	HASH_ALGO__LAST
- };
+-	err = crypto_ahash_import(&ctx2->req, state);
+-	if (err) {
+-		sock_orphan(sk2);
+-		sock_put(sk2);
++	if (more) {
++		err = crypto_ahash_import(&ctx2->req, state);
++		if (err) {
++			sock_orphan(sk2);
++			sock_put(sk2);
++		}
+ 	}
  
+ 	return err;
 -- 
-2.5.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
