@@ -1,104 +1,88 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: algif_hash - Only export and import on sockets with data
-Date: Fri, 30 Oct 2015 20:16:51 +0800
-Message-ID: <20151030121651.GA23757@gondor.apana.org.au>
-References: <CAFXBA=mVmRsAk3fuyjf3WA-P+0dHKu0upUdb5Qxr0kwn1rKiDw@mail.gmail.com>
- <28376488.AMz6xlEXXD@tauon.atsec.com>
- <CAFXBA==pRTY57SkfPRnW_6MVRUJ0J8Uwi+Bigxtk21WNhvY3jA@mail.gmail.com>
- <3576256.SqRabKS4lK@tauon.atsec.com>
+From: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [RESEND PATCH 4/4] crypto: rk_crypto - add DT bindings
+ documentation
+Date: Fri, 30 Oct 2015 14:03:34 +0000
+Message-ID: <20151030140334.GB31073@leverpostej>
+References: <1446193369-4453-1-git-send-email-zain.wang@rock-chips.com>
+ <1446193369-4453-5-git-send-email-zain.wang@rock-chips.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Harsh Jain <harshjain.prof@gmail.com>, linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60474 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1031011AbbJ3MQ5 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 30 Oct 2015 08:16:57 -0400
+Cc: zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org, hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org
+To: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <3576256.SqRabKS4lK@tauon.atsec.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1446193369-4453-5-git-send-email-zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Oct 30, 2015 at 12:10:51PM +0100, Stephan Mueller wrote:
-> Am Freitag, 30. Oktober 2015, 14:02:27 schrieb Harsh Jain:
+On Fri, Oct 30, 2015 at 04:22:49PM +0800, Zain Wang wrote:
+> Add DT bindings documentation for the rk3288 crypto drivers.
 > 
-> Hi Harsh,
+> Signed-off-by: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+> ---
+>  .../devicetree/bindings/crypto/rk-crypto.txt       | 31 ++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/rk-crypto.txt
 > 
-> >Hi Stephan,
-> >
-> >If we add sendmsg() in between 2 accept calls then the setkey problem
-> >will happen?
-> >
-> >handle->opfd = accept(handle->tfmfd, NULL, 0);
-> >sendmsg()
-> >handle->opfd = accept(handle->opfd, NULL, 0);
-> >sendmsg()
-> >handle->opfd = accept(handle->opfd, NULL, 0);
+> diff --git a/Documentation/devicetree/bindings/crypto/rk-crypto.txt b/Documentation/devicetree/bindings/crypto/rk-crypto.txt
+> new file mode 100644
+> index 0000000..1e50768
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/rk-crypto.txt
+> @@ -0,0 +1,31 @@
+> +Rockchip Electronics And Security Accelerator
+> +
+> +Required properties:
+> +- compatible: should be "rockchip,crypto"
+
+Choose a more specific name. Rockchip could easily come up with another
+crypto accelerator later.
+
+> +- reg: base physical address of the engine and length of memory mapped
+> +       region.
+> +- interrupts: interrupt number
+> +- clocks: clock specifiers
+> +- clock-names: "aclk_crypto" used to clock data
+> +			   "hclk_crypto" used to clock data
+> +			   "srst_crypto" used to clock crypto accelerator
+> +			   "apb_pclk"    used to clock dma
+> +-status: Enable
+
+No need to mention the status property.
+
+Thanks,
+Mark.
+
+> +
+> +Examples:
+> +
+> +	crypto: cypto-controller@ff8a0000 {
+> +		compatible = "rockchip,crypto";
+> +		reg = <0xff8a0000 0x4000>;
+> +		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
+> +		clocks = <&cru ACLK_CRYPTO>,
+> +			 <&cru HCLK_CRYPTO>,
+> +			 <&cru SRST_CRYPTO>,
+> +			 <&cru ACLK_DMAC1>;
+> +
+> +		clock-names = "aclk_crypto",
+> +			      "hclk_crypto",
+> +			      "srst_crypto",
+> +				  "apb_pclk";
+> +		status = "okay";
+> +	};
+> -- 
+> 1.9.1
 > 
-> Without testing, I would very much expect that, because the setkey does not 
-> apply to the subordinate tfm.
-
-setkey should be needed as the subsequent accept will all be based
-on the same parent fd, meaning that they will all use a single tfm.
-
-Please try the following patch.
-
----8<---
-The hash_accept call fails to work on sockets that have not received
-any data.  For some algorithm implementations it may cause crashes.
-
-This patch fixes this by ensuring that we only export and import on
-sockets that have received data.
-
-Cc: stable@vger.kernel.org
-Reported-by: Harsh Jain <harshjain.prof@gmail.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index 1396ad0..bbda6b4 100644
---- a/crypto/algif_hash.c
-+++ b/crypto/algif_hash.c
-@@ -181,11 +181,14 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags)
- 	struct sock *sk2;
- 	struct alg_sock *ask2;
- 	struct hash_ctx *ctx2;
-+	bool more = ctx->more;
- 	int err;
- 
--	err = crypto_ahash_export(req, state);
--	if (err)
--		return err;
-+	if (more) {
-+		err = crypto_ahash_export(req, state);
-+		if (err)
-+			return err;
-+	}
- 
- 	err = af_alg_accept(ask->parent, newsock);
- 	if (err)
-@@ -194,12 +197,14 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags)
- 	sk2 = newsock->sk;
- 	ask2 = alg_sk(sk2);
- 	ctx2 = ask2->private;
--	ctx2->more = 1;
-+	ctx2->more = more;
- 
--	err = crypto_ahash_import(&ctx2->req, state);
--	if (err) {
--		sock_orphan(sk2);
--		sock_put(sk2);
-+	if (more) {
-+		err = crypto_ahash_import(&ctx2->req, state);
-+		if (err) {
-+			sock_orphan(sk2);
-+			sock_put(sk2);
-+		}
- 	}
- 
- 	return err;
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> 
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
