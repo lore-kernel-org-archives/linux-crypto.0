@@ -1,76 +1,103 @@
-From: Heiko Stuebner <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>
-Subject: Re: [RESEND PATCH 4/4] crypto: rk_crypto - add DT bindings documentation
-Date: Fri, 30 Oct 2015 15:08:35 +0100
-Message-ID: <1830252.moyLTPMs2Y@phil>
-References: <1446193369-4453-1-git-send-email-zain.wang@rock-chips.com> <1446193369-4453-5-git-send-email-zain.wang@rock-chips.com>
+From: Heiko Stuebner <heiko@sntech.de>
+Subject: Re: [RESEND PATCH 1/4] Crypto: Crypto driver support aes/des/des3 for rk3288
+Date: Fri, 30 Oct 2015 15:26:08 +0100
+Message-ID: <2230290.pTq1BehVXW@phil>
+References: <1446193369-4453-1-git-send-email-zain.wang@rock-chips.com> <1446193369-4453-2-git-send-email-zain.wang@rock-chips.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org, hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org,
-	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org,
-	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org
-To: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1446193369-4453-5-git-send-email-zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: zhengsq@rock-chips.com, hl@rock-chips.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	mturquette@baylibre.com, pawel.moll@arm.com,
+	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
+	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+	eddie.cai@rock-chips.com
+To: Zain Wang <zain.wang@rock-chips.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from gloria.sntech.de ([95.129.55.99]:43143 "EHLO gloria.sntech.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757660AbbJ3O0Y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 30 Oct 2015 10:26:24 -0400
+In-Reply-To: <1446193369-4453-2-git-send-email-zain.wang@rock-chips.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 Hi,
 
-Am Freitag, 30. Oktober 2015, 16:22:49 schrieb Zain Wang:
-> Add DT bindings documentation for the rk3288 crypto drivers.
+first of all, thanks for working on this, it will be really cool to see the
+crypto accelerator supported in the kernel :-)
+
+Am Freitag, 30. Oktober 2015, 16:22:46 schrieb Zain Wang:
+> Crypto driver support cbc/ecb two chainmode, and aes/des/des3 three cipher mode.
+> The names registered are:
+>     ecb(aes) cbc(aes) ecb(des) cbc(des) ecb(des3_ede) cbc(des3_ede)
+> You can alloc tags above in your case.
 > 
-> Signed-off-by: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+> And other algorithms and platforms will be added later on.
+> 
+> Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
 > ---
->  .../devicetree/bindings/crypto/rk-crypto.txt       | 31 ++++++++++++++++++++++
->  1 file changed, 31 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/rk-crypto.txt
+>  drivers/crypto/Makefile                            |   1 +
+>  drivers/crypto/rk_crypto/Makefile                  |   3 +
+>  drivers/crypto/rk_crypto/rk3288_crypto.c           | 393 ++++++++++++++++
+>  drivers/crypto/rk_crypto/rk3288_crypto.h           | 291 ++++++++++++
+>  .../crypto/rk_crypto/rk3288_crypto_ablkcipher.c    | 502 +++++++++++++++++++++
+>  5 files changed, 1190 insertions(+)
+>  create mode 100644 drivers/crypto/rk_crypto/Makefile
+>  create mode 100644 drivers/crypto/rk_crypto/rk3288_crypto.c
+>  create mode 100644 drivers/crypto/rk_crypto/rk3288_crypto.h
+>  create mode 100644 drivers/crypto/rk_crypto/rk3288_crypto_ablkcipher.c
 > 
-> diff --git a/Documentation/devicetree/bindings/crypto/rk-crypto.txt b/Documentation/devicetree/bindings/crypto/rk-crypto.txt
+> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+> index c3ced6f..00d103c 100644
+> --- a/drivers/crypto/Makefile
+> +++ b/drivers/crypto/Makefile
+> @@ -29,3 +29,4 @@ obj-$(CONFIG_CRYPTO_DEV_QAT) += qat/
+>  obj-$(CONFIG_CRYPTO_DEV_QCE) += qce/
+>  obj-$(CONFIG_CRYPTO_DEV_VMX) += vmx/
+>  obj-$(CONFIG_CRYPTO_DEV_SUN4I_SS) += sunxi-ss/
+> +obj-$(CONFIG_CRYPTO_DEV_RK3288) += rk_crypto/
+
+as Mark said in the other mail, there may very well follow other Rockchip
+crypto-related drivers, so maybe it might be better to name the core
+option CONFIG_CRYPTO_DEV_ROCKCHIP. And then maybe define
+CONFIG_CRYPTO_DEV_RK3288 in a Kconfig in the subdirectory (like vmx does).
+
+
+> diff --git a/drivers/crypto/rk_crypto/Makefile b/drivers/crypto/rk_crypto/Makefile
 > new file mode 100644
-> index 0000000..1e50768
+> index 0000000..0f62d87
 > --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/rk-crypto.txt
-> @@ -0,0 +1,31 @@
-> +Rockchip Electronics And Security Accelerator
-> +
-> +Required properties:
-> +- compatible: should be "rockchip,crypto"
-> +- reg: base physical address of the engine and length of memory mapped
-> +       region.
-> +- interrupts: interrupt number
-> +- clocks: clock specifiers
-> +- clock-names: "aclk_crypto" used to clock data
-> +			   "hclk_crypto" used to clock data
-> +			   "srst_crypto" used to clock crypto accelerator
-> +			   "apb_pclk"    used to clock dma
+> +++ b/drivers/crypto/rk_crypto/Makefile
 
-The TRM area of the crypto IP block does not specifiy any special naming for
-its clocks, but as a general rule clock names are in the scope of the ip block
-so there is no need to add _crypto to every one of them :-) .
-
-I'd suggest clock-names as "aclk", "hclk", "crypto" for the devicetree, with
-crypto being the clock that actually drives the operation.
+generally, a lot of those subdirectories reference only the manufacturer
+name, so my suggestion would be to name yours just "rockchip" instead of
+"rk_crypto", to also ease readability.
 
 
-Secondly, why do you need to drive the clock of the peripheral dma-
-controller itself (your apb_pclk)? The documentation in the TRM is
-quite sparse, so this might very well be justified, but it looks odd that
-you need to control the dmac1-clock when it looks like the crypto block
-is doing its own dma and neither system-dma has any crypto-related
-channel.
+> @@ -0,0 +1,3 @@
+> +obj-$(CONFIG_CRYPTO_DEV_RK3288) += rk_crypto_driver.o
+> +rk_crypto_driver-objs := rk3288_crypto.o \
+> +			 rk3288_crypto_ablkcipher.o \
 
-So I'd really like some explanation for this :-)
+that looks looks wrong.
+
+(1) the config option does not get defined in any Kconfig file in your set
+(2) naming the driver generically while you compile a variant will hinder
+    multiplatform kernels, because you might want to build both the rk3288
+    code and some additional stuff?
+(3) the _driver suffix is unnecessary
+
+So I guess just name it rk3288_crypto.o ?
+
+[...]
+
+While I have read through the code implementing the device, I haven't
+seen anything spring out but do not know enough about the crypto subsystem
+itself. But it looks like you got some feedback already anyway from others :-)
 
 
 Thanks
 Heiko
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
