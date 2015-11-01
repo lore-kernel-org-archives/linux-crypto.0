@@ -1,74 +1,84 @@
-From: Ram Pai <linuxram@us.ibm.com>
-Subject: Re: [PATCH] nx-842: Endian swap ->count before handing over to the
- nx-842 compressor
-Date: Sat, 31 Oct 2015 11:39:30 -0700
-Message-ID: <20151031183930.GB22547@ram.oc3035372033.ibm.com>
-References: <20151030224536.GB22549@ram.oc3035372033.ibm.com>
- <CALZtONDNpw=bpmrykQomZiFZZs+CaGxyPZRL5_aWg=vTSyTrJw@mail.gmail.com>
-Reply-To: Ram Pai <linuxram@us.ibm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH v2] crypto: algif_hash - Only export and import on sockets
+ with data
+Date: Sun, 1 Nov 2015 17:11:19 +0800
+Message-ID: <20151101091119.GA3035@gondor.apana.org.au>
+References: <CAFXBA=mVmRsAk3fuyjf3WA-P+0dHKu0upUdb5Qxr0kwn1rKiDw@mail.gmail.com>
+ <3576256.SqRabKS4lK@tauon.atsec.com>
+ <20151030121651.GA23757@gondor.apana.org.au>
+ <2587504.xtsMOV5mei@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Haren Myneni <hbabu@us.ibm.com>
-To: Dan Streetman <ddstreet@ieee.org>
+Cc: Harsh Jain <harshjain.prof@gmail.com>, linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e18.ny.us.ibm.com ([129.33.205.208]:57137 "EHLO
-	e18.ny.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750834AbbJaSjj (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:41146 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751200AbbKAJL1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 31 Oct 2015 14:39:39 -0400
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <linuxram@us.ibm.com>;
-	Sat, 31 Oct 2015 14:39:38 -0400
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-	by d01dlp02.pok.ibm.com (Postfix) with ESMTP id 81F5A6E803F
-	for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2015 14:27:46 -0400 (EDT)
-Received: from d01av03.pok.ibm.com (d01av03.pok.ibm.com [9.56.224.217])
-	by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id t9VIdZCJ64028882
-	for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2015 18:39:35 GMT
-Received: from d01av03.pok.ibm.com (localhost [127.0.0.1])
-	by d01av03.pok.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id t9VIdY2r024532
-	for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2015 14:39:35 -0400
+	Sun, 1 Nov 2015 04:11:27 -0500
 Content-Disposition: inline
-In-Reply-To: <CALZtONDNpw=bpmrykQomZiFZZs+CaGxyPZRL5_aWg=vTSyTrJw@mail.gmail.com>
+In-Reply-To: <2587504.xtsMOV5mei@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Oct 31, 2015 at 08:38:17AM -0400, Dan Streetman wrote:
-> On Fri, Oct 30, 2015 at 6:45 PM, Ram Pai <linuxram@us.ibm.com> wrote:
-> > The nx-842 compressor overshoots the output buffer corrupting memory. Verified
-> > that the following patch fixes the issue on a little-endian system.
-> >
-> > Signed-off-by: Ram Pai <linuxram@us.ibm.com>
-> > ---
-> >  drivers/crypto/nx/nx-842-powernv.c |    2 +-
-> >  1 files changed, 1 insertions(+), 1 deletions(-)
-> >
-> > diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
-> > index 3750e13..3b80ea7 100644
-> > --- a/drivers/crypto/nx/nx-842-powernv.c
-> > +++ b/drivers/crypto/nx/nx-842-powernv.c
-> > @@ -66,7 +66,7 @@ static void setup_indirect_dde(struct data_descriptor_entry *dde,
-> >                                unsigned int dde_count, unsigned int byte_count)
-> >  {
-> >         dde->flags = 0;
-> > -       dde->count = dde_count;
-> > +       dde->count = cpu_to_be32(dde_count);
+On Sat, Oct 31, 2015 at 12:45:47AM +0100, Stephan Mueller wrote:
 > 
-> ->count is u8, I don't think this is correct...you could change
-> dde_count to a u8, but I'm skeptical that's required at all, are you
-> sure this is your problem?  The dde->length should restrict the coproc
-> from r/w past the output buffer anyway, even if the ->count is too
-> large...
+> Testing complete: patch solves the oops and allows to successfully perform 
+> HMAC even when having subsequent accepts and operating on those subsequent 
+> accepts.
 
-Dan, you are right. The problem does resurface even after the above change.
-There is something else going on. Please ignore this patch for now.
+Thanks Stephan!
 
-I see corruption, when the output buffer is smaller than needed to hold
-the compressed data. I expect it to return -ENOSPC, but its not; instead
-overshoots and corrupts.
+Unfortunately my patch is incomplete as some other thread could
+change ctx->more while we're in the middle of the accept call.
 
-RP
+So here is an updated version.
+
+---8<---
+The hash_accept call fails to work on sockets that have not received
+any data.  For some algorithm implementations it may cause crashes.
+
+This patch fixes this by ensuring that we only export and import on
+sockets that have received data.
+
+Cc: stable@vger.kernel.org
+Reported-by: Harsh Jain <harshjain.prof@gmail.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index 1396ad0..b4c24fe 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -181,9 +181,14 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags)
+ 	struct sock *sk2;
+ 	struct alg_sock *ask2;
+ 	struct hash_ctx *ctx2;
++	bool more;
+ 	int err;
+ 
+-	err = crypto_ahash_export(req, state);
++	lock_sock(sk);
++	more = ctx->more;
++	err = more ? crypto_ahash_export(req, state) : 0;
++	release_sock(sk);
++
+ 	if (err)
+ 		return err;
+ 
+@@ -194,7 +199,10 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags)
+ 	sk2 = newsock->sk;
+ 	ask2 = alg_sk(sk2);
+ 	ctx2 = ask2->private;
+-	ctx2->more = 1;
++	ctx2->more = more;
++
++	if (!more)
++		return err;
+ 
+ 	err = crypto_ahash_import(&ctx2->req, state);
+ 	if (err) {
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
