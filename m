@@ -1,11 +1,11 @@
 From: Zain <zain.wang@rock-chips.com>
 Subject: Re: [RESEND PATCH 1/4] Crypto: Crypto driver support aes/des/des3 for
  rk3288
-Date: Mon, 2 Nov 2015 16:22:36 +0800
-Message-ID: <56371D4C.3060301@rock-chips.com>
+Date: Mon, 2 Nov 2015 16:32:49 +0800
+Message-ID: <56371FB1.10306@rock-chips.com>
 References: <1446193369-4453-1-git-send-email-zain.wang@rock-chips.com>
  <1446193369-4453-2-git-send-email-zain.wang@rock-chips.com>
- <20151030085825.GA6458@Red>
+ <3425744.hizMDCBUxp@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
@@ -17,58 +17,59 @@ Cc: zhengsq@rock-chips.com, hl@rock-chips.com,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
 	eddie.cai@rock-chips.com
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from regular2.263xmail.com ([211.157.152.3]:43040 "EHLO
-	regular2.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751024AbbKBI0o (ORCPT
+Received: from regular1.263xmail.com ([211.150.99.137]:53158 "EHLO
+	regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751230AbbKBIdS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Nov 2015 03:26:44 -0500
-In-Reply-To: <20151030085825.GA6458@Red>
+	Mon, 2 Nov 2015 03:33:18 -0500
+In-Reply-To: <3425744.hizMDCBUxp@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi LABBE,
+Hi Stephan,
 
-On 2015=E5=B9=B410=E6=9C=8830=E6=97=A5 16:58, LABBE Corentin wrote:
-> On Fri, Oct 30, 2015 at 04:22:46PM +0800, Zain Wang wrote:
+On 2015=E5=B9=B410=E6=9C=8830=E6=97=A5 16:59, Stephan Mueller wrote:
+> Am Freitag, 30. Oktober 2015, 16:22:46 schrieb Zain Wang:
+>
+> Hi Zain,
+>
 >> Crypto driver support cbc/ecb two chainmode, and aes/des/des3 three =
-cipher mode.
->> The names registered are:
->>     ecb(aes) cbc(aes) ecb(des) cbc(des) ecb(des3_ede) cbc(des3_ede)
+cipher
+>> mode. The names registered are:
+>>    ecb(aes) cbc(aes) ecb(des) cbc(des) ecb(des3_ede) cbc(des3_ede)
 >> You can alloc tags above in your case.
 >>
 >> And other algorithms and platforms will be added later on.
 >>
 >> Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
 >> ---
->>  drivers/crypto/Makefile                            |   1 +
->>  drivers/crypto/rk_crypto/Makefile                  |   3 +
->>  drivers/crypto/rk_crypto/rk3288_crypto.c           | 393 ++++++++++=
-++++++
->>  drivers/crypto/rk_crypto/rk3288_crypto.h           | 291 ++++++++++=
-++
->>  .../crypto/rk_crypto/rk3288_crypto_ablkcipher.c    | 502 ++++++++++=
-+++++++++++
->>  5 files changed, 1190 insertions(+)
->>  create mode 100644 drivers/crypto/rk_crypto/Makefile
->>  create mode 100644 drivers/crypto/rk_crypto/rk3288_crypto.c
->>  create mode 100644 drivers/crypto/rk_crypto/rk3288_crypto.h
->>  create mode 100644 drivers/crypto/rk_crypto/rk3288_crypto_ablkciphe=
-r.c
+>> drivers/crypto/Makefile                            |   1 +
+>> drivers/crypto/rk_crypto/Makefile                  |   3 +
+>> drivers/crypto/rk_crypto/rk3288_crypto.c           | 393 +++++++++++=
++++++
+>> drivers/crypto/rk_crypto/rk3288_crypto.h           | 291 +++++++++++=
++
+>> .../crypto/rk_crypto/rk3288_crypto_ablkcipher.c    | 502
+>> +++++++++++++++++++++ 5 files changed, 1190 insertions(+)
+>> create mode 100644 drivers/crypto/rk_crypto/Makefile
+>> create mode 100644 drivers/crypto/rk_crypto/rk3288_crypto.c
+>> create mode 100644 drivers/crypto/rk_crypto/rk3288_crypto.h
+>> create mode 100644 drivers/crypto/rk_crypto/rk3288_crypto_ablkcipher=
+=2Ec
 >>
 >> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
 >> index c3ced6f..00d103c 100644
 >> --- a/drivers/crypto/Makefile
 >> +++ b/drivers/crypto/Makefile
 >> @@ -29,3 +29,4 @@ obj-$(CONFIG_CRYPTO_DEV_QAT) +=3D qat/
->>  obj-$(CONFIG_CRYPTO_DEV_QCE) +=3D qce/
->>  obj-$(CONFIG_CRYPTO_DEV_VMX) +=3D vmx/
->>  obj-$(CONFIG_CRYPTO_DEV_SUN4I_SS) +=3D sunxi-ss/
+>> obj-$(CONFIG_CRYPTO_DEV_QCE) +=3D qce/
+>> obj-$(CONFIG_CRYPTO_DEV_VMX) +=3D vmx/
+>> obj-$(CONFIG_CRYPTO_DEV_SUN4I_SS) +=3D sunxi-ss/
 >> +obj-$(CONFIG_CRYPTO_DEV_RK3288) +=3D rk_crypto/
->> diff --git a/drivers/crypto/rk_crypto/Makefile b/drivers/crypto/rk_c=
-rypto/Makefile
->> new file mode 100644
+>> diff --git a/drivers/crypto/rk_crypto/Makefile
+>> b/drivers/crypto/rk_crypto/Makefile new file mode 100644
 >> index 0000000..0f62d87
 >> --- /dev/null
 >> +++ b/drivers/crypto/rk_crypto/Makefile
@@ -76,9 +77,8 @@ rypto/Makefile
 >> +obj-$(CONFIG_CRYPTO_DEV_RK3288) +=3D rk_crypto_driver.o
 >> +rk_crypto_driver-objs :=3D rk3288_crypto.o \
 >> +			 rk3288_crypto_ablkcipher.o \
->> diff --git a/drivers/crypto/rk_crypto/rk3288_crypto.c b/drivers/cryp=
-to/rk_crypto/rk3288_crypto.c
->> new file mode 100644
+>> diff --git a/drivers/crypto/rk_crypto/rk3288_crypto.c
+>> b/drivers/crypto/rk_crypto/rk3288_crypto.c new file mode 100644
 >> index 0000000..fe55d7e
 >> --- /dev/null
 >> +++ b/drivers/crypto/rk_crypto/rk3288_crypto.c
@@ -141,9 +141,6 @@ dify it
 >> +
 >> +	return -ENOENT;
 >> +}
-> Please return the error value given by clk_prepare_enable()
-ok! done!
->
 >> +
 >> +static void rk_crypto_disable_clk(struct crypto_info_t *dev)
 >> +{
@@ -175,9 +172,6 @@ ok! done!
 >> +			      struct scatterlist *sg_dst)
 >> +{
 >> +	uint32_t count;
-> u32 is prefered over uint32_t
-ok! done!
->
 >> +	int ret;
 >> +
 >> +	dev->aligned =3D dev->aligned ?
@@ -196,7 +190,8 @@ ok! done!
 >> +		dev->addr_in =3D sg_dma_address(sg_src);
 >> +
 >> +		if (sg_dst !=3D NULL) {
->> +			ret =3D dma_map_sg(dev->dev, sg_dst, 1, DMA_FROM_DEVICE);
+>> +			ret =3D dma_map_sg(dev->dev, sg_dst, 1,=20
+> DMA_FROM_DEVICE);
 >> +			if (!ret) {
 >> +				dev_err(dev->dev,
 >> +					"[%s:%d] dma_map_sg(dst)  error\n",
@@ -223,7 +218,8 @@ ok! done!
 >> +		sg_init_one(&dev->sg_tmp, dev->addr_vir, count);
 >> +		ret =3D dma_map_sg(dev->dev, &dev->sg_tmp, 1, DMA_TO_DEVICE);
 >> +		if (!ret) {
->> +			dev_err(dev->dev, "[%s:%d] dma_map_sg(sg_tmp)  error\n",
+>> +			dev_err(dev->dev, "[%s:%d] dma_map_sg(sg_tmp) =20
+> error\n",
 >> +							__func__, __LINE__);
 >> +			return -ENOMEM;
 >> +		}
@@ -343,11 +339,6 @@ SH) {
 >> +		crypto_unregister_alg(rk_cipher_algs[k]);
 >> +	return err;
 >> +}
-> You never set err to anything different from 0, so even in case of er=
-ror the function return 0.
-ok!
-in next version, the err value can be given by crypto_register_alg()
->
 >> +
 >> +static void rk_crypto_unregister(void)
 >> +{
@@ -356,9 +347,6 @@ in next version, the err value can be given by crypto_register_alg()
 >> +	for (i =3D 0; i < ARRAY_SIZE(rk_cipher_algs); i++)
 >> +		crypto_unregister_alg(rk_cipher_algs[i]);
 >> +}
-> You could set i to unsigned for cleaning a possible warning
-ok! done!
->
 >> +
 >> +static int rk_crypto_probe(struct platform_device *pdev)
 >> +{
@@ -378,11 +366,6 @@ ok! done!
 >> +	crypto_info->reg =3D devm_ioremap_resource(&pdev->dev, res);
 >> +	if (IS_ERR(crypto_info->reg)) {
 >> +		dev_warn(crypto_info->dev, "Error on remap reg\n");
-> Typo, ioremap ?
-> And you warn about an error ?
-this is typo.
-in next version, it will be removed.
->
 >> +		err =3D PTR_ERR(crypto_info->reg);
 >> +		goto err_ioremap;
 >> +	}
@@ -391,10 +374,6 @@ in next version, it will be removed.
 >> +	if (IS_ERR(crypto_info->aclk)) {
 >> +		dev_err(dev, "failed to find crypto clock source\n");
 >> +		err =3D -ENOENT;
-> The err must be set with PTR_ERR()
-> And you could also use devm_clk_get()
-ok! done!
->
 >> +		goto err_ioremap;
 >> +	}
 >> +
@@ -402,9 +381,6 @@ ok! done!
 >> +	if (IS_ERR(crypto_info->hclk)) {
 >> +		dev_err(dev, "failed to find crypto clock source\n");
 >> +		err =3D -ENOENT;
-> Same comment
-ok! done!
->
 >> +		goto err_ioremap;
 >> +	}
 >> +
@@ -412,9 +388,6 @@ ok! done!
 >> +	if (IS_ERR(crypto_info->clk)) {
 >> +		dev_err(dev, "failed to find crypto clock source\n");
 >> +		err =3D -ENOENT;
-> Same comment
-ok! done!
->
 >> +		goto err_ioremap;
 >> +	}
 >> +
@@ -422,9 +395,6 @@ ok! done!
 >> +	if (IS_ERR(crypto_info->pclk)) {
 >> +		dev_err(dev, "failed to find crypto clock source\n");
 >> +		err =3D -ENOENT;
-> Same comment
-ok! done!
->
 >> +		goto err_ioremap;
 >> +	}
 >> +
@@ -439,9 +409,6 @@ ok! done!
 >> +	err =3D request_irq(crypto_info->irq, crypto_irq_handle, IRQF_SHAR=
 ED,
 >> +			  "rk-crypto", pdev);
-> You could use devm_request_irq()
-ok! done!
->
 >> +	if (err) {
 >> +		dev_warn(crypto_info->dev, "irq request failed.\n");
 >> +		goto err_ioremap;
@@ -463,9 +430,6 @@ ok! done!
 >> +	err =3D rk_crypto_register();
 >> +	if (err) {
 >> +		pr_info("err in register alg");
-> Use dev_err()
-ok! done!
->
 >> +		goto err_reg_alg;
 >> +	}
 >> +
@@ -475,9 +439,6 @@ ok! done!
 >> +	free_irq(crypto_info->irq, crypto_info);
 >> +err_ioremap:
 >> +	kfree(crypto_info);
-> Wrong, you do not have to free something allocated with devm_kzalloc
-ok! done!
->
 >> +	crypto_p =3D NULL;
 >> +
 >> +	return err;
@@ -521,9 +482,8 @@ ok! done!
 >> +
 >> +MODULE_LICENSE("GPL");
 >> +MODULE_AUTHOR("Zain Wang");
->> diff --git a/drivers/crypto/rk_crypto/rk3288_crypto.h b/drivers/cryp=
-to/rk_crypto/rk3288_crypto.h
->> new file mode 100644
+>> diff --git a/drivers/crypto/rk_crypto/rk3288_crypto.h
+>> b/drivers/crypto/rk_crypto/rk3288_crypto.h new file mode 100644
 >> index 0000000..27022bc
 >> --- /dev/null
 >> +++ b/drivers/crypto/rk_crypto/rk3288_crypto.h
@@ -755,10 +715,6 @@ to/rk_crypto/rk3288_crypto.h
 >> +#define CRYPTO_GET_REG_VIRT(dev, offset)   ((dev)->reg + (offset))
 >> +
 >> +#define MD5_DIGEST_SIZE			16
-> #This is already defined in incluude/crypto/md5.h
-ok!
-in next version, it will be removed.
->
 >> +#define RK_ALIGN_MASK			(sizeof(u32)-1)
 >> +
 >> +struct crypto_info_t {
@@ -823,9 +779,9 @@ in next version, it will be removed.
 >> +extern struct crypto_alg rk_cbc_des3_ede_alg;
 >> +
 >> +#endif
->> diff --git a/drivers/crypto/rk_crypto/rk3288_crypto_ablkcipher.c b/d=
-rivers/crypto/rk_crypto/rk3288_crypto_ablkcipher.c
->> new file mode 100644
+>> diff --git a/drivers/crypto/rk_crypto/rk3288_crypto_ablkcipher.c
+>> b/drivers/crypto/rk_crypto/rk3288_crypto_ablkcipher.c new file mode =
+100644
 >> index 0000000..3d08875
 >> --- /dev/null
 >> +++ b/drivers/crypto/rk_crypto/rk3288_crypto_ablkcipher.c
@@ -905,7 +861,8 @@ ytes)
 >> +
 >> +	if (keylen !=3D AES_KEYSIZE_128 && keylen !=3D AES_KEYSIZE_192 &&
 >> +	    keylen !=3D AES_KEYSIZE_256) {
->> +		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
+>> +		crypto_ablkcipher_set_flags(cipher,=20
+> CRYPTO_TFM_RES_BAD_KEY_LEN);
 >> +		pr_err("[%s:%d] expect key len =3D %d\n",
 >> +						__func__, __LINE__, keylen);
 >> +		return -EINVAL;
@@ -927,7 +884,8 @@ ytes)
 >> +	}
 >> +
 >> +	if (keylen !=3D DES_KEY_SIZE && keylen !=3D DES3_EDE_KEY_SIZE) {
->> +		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
+>> +		crypto_ablkcipher_set_flags(cipher,=20
+> CRYPTO_TFM_RES_BAD_KEY_LEN);
 >> +		pr_err("[%s:%d] expect key len =3D %d\n",
 >> +						__func__, __LINE__, keylen);
 >> +		return -EINVAL;
@@ -1074,8 +1032,8 @@ DES;
 >> +
 >> +static void rk_ablk_hw_init(struct crypto_info_t *dev)
 >> +{
->> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(dev->ab=
-lk_req);
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(dev-
+>> ablk_req);
 >> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
 >> +	uint32_t conf_reg =3D 0;
 >> +
@@ -1086,7 +1044,8 @@ lk_req);
 >> +			     RK_CRYPTO_TDES_BYTESWAP_IV;
 >> +		CRYPTO_WRITE(dev, RK_CRYPTO_TDES_CTRL, dev->mode);
 >> +
->> +		memcpy(dev->reg + RK_CRYPTO_TDES_IV_0, dev->ablk_req->info, 8);
+>> +		memcpy(dev->reg + RK_CRYPTO_TDES_IV_0, dev->ablk_req->info,=20
+> 8);
 >> +		conf_reg =3D RK_CRYPTO_DESSEL;
 >> +	} else {
 >> +		dev->mode |=3D RK_CRYPTO_AES_FIFO_MODE |
@@ -1101,7 +1060,8 @@ lk_req);
 >> +
 >> +		CRYPTO_WRITE(dev, RK_CRYPTO_AES_CTRL, dev->mode);
 >> +
->> +		memcpy(dev->reg + RK_CRYPTO_AES_IV_0, dev->ablk_req->info, 16);
+>> +		memcpy(dev->reg + RK_CRYPTO_AES_IV_0, dev->ablk_req->info,=20
+> 16);
 >> +	}
 >> +	conf_reg |=3D RK_CRYPTO_BYTESWAP_BTFIFO |
 >> +		    RK_CRYPTO_BYTESWAP_BRFIFO;
@@ -1154,10 +1114,6 @@ lk_req);
 >> +					  dev->total - dev->left_bytes -
 >> +					  dev->count)) {
 >> +			err =3D -ENOMEM;
-> I am not sure -ENOMEM is the good error to return
-ok!
-EINVAL may be better than ENOMEM.
->
 >> +			goto out_rx;
 >> +		}
 >> +	}
@@ -1193,14 +1149,6 @@ EINVAL may be better than ENOMEM.
 >> +	ctx->dev->addr_vir =3D (void *)__get_free_page(GFP_KERNEL);
 >> +	if (!ctx->dev->addr_vir) {
 >> +		pr_err("failed to kmalloc for addr_vir\n");
-> Since you have acces to the dev ptr, you could use all dev_xxx functi=
-ons.
-> This comment, apply to whole file.
-> Moreover, checkpatch said that you do not have to warn about a failed=
- memory allocation.
-ok!
-in next version, it will be removed.
->
 >> +		return -ENOMEM;
 >> +	}
 >> +	return ctx->dev->enable_clk(ctx->dev);
@@ -1218,6 +1166,23 @@ in next version, it will be removed.
 >> +	.cra_name		=3D "ecb(aes)",
 >> +	.cra_driver_name	=3D "ecb-aes-rk",
 >> +	.cra_priority		=3D 100,
+> The following comment applies to all of the following definitions: wi=
+th this=20
+> priority you selected the same as the default software implementation=
+=2E I guess=20
+> when having software and your implementation registered, your impleme=
+ntation=20
+> will only be picked by chance.
+>
+> If there are assembler or other optimized implementations, they will =
+surely be=20
+> picked as they usually have a higher prio.
+>
+> Is that really the intention here?
+thanks for your comment.
+in next version, the prio will be higher.
+>
+>
 >> +	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER |
 >> +				  CRYPTO_ALG_ASYNC,
 >> +	.cra_blocksize		=3D AES_BLOCK_SIZE,
@@ -1349,10 +1314,9 @@ in next version, it will be removed.
 >> +		.decrypt	=3D rk_des3_ede_cbc_decrypt,
 >> +	}
 >> +};
->> --=20
->> 1.9.1
-> Best regards
 >
+> Ciao
+> Stephan
 >
 >
 >
