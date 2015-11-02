@@ -1,343 +1,1360 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Update for 4.4
-Date: Mon, 2 Nov 2015 16:04:27 +0800
-Message-ID: <20151102080427.GA8465@gondor.apana.org.au>
-References: <20140123115319.GA20602@gondor.apana.org.au>
- <20140401100001.GA12386@gondor.apana.org.au>
- <20140605062336.GA14440@gondor.apana.org.au>
- <20140804130339.GA1178@gondor.apana.org.au>
- <20141007131826.GA29688@gondor.apana.org.au>
- <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150415033951.GA1406@gondor.apana.org.au>
- <20150622084457.GA7806@gondor.apana.org.au>
- <20150831135655.GA2694@gondor.apana.org.au>
+From: Zain <zain.wang@rock-chips.com>
+Subject: Re: [RESEND PATCH 1/4] Crypto: Crypto driver support aes/des/des3 for
+ rk3288
+Date: Mon, 2 Nov 2015 16:22:36 +0800
+Message-ID: <56371D4C.3060301@rock-chips.com>
+References: <1446193369-4453-1-git-send-email-zain.wang@rock-chips.com>
+ <1446193369-4453-2-git-send-email-zain.wang@rock-chips.com>
+ <20151030085825.GA6458@Red>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: zhengsq@rock-chips.com, hl@rock-chips.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	mturquette@baylibre.com, heiko@sntech.de, pawel.moll@arm.com,
+	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
+	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+	eddie.cai@rock-chips.com
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49463 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751738AbbKBIEi (ORCPT
+Received: from regular2.263xmail.com ([211.157.152.3]:43040 "EHLO
+	regular2.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751024AbbKBI0o (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Nov 2015 03:04:38 -0500
-Content-Disposition: inline
-In-Reply-To: <20150831135655.GA2694@gondor.apana.org.au>
+	Mon, 2 Nov 2015 03:26:44 -0500
+In-Reply-To: <20151030085825.GA6458@Red>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Hi LABBE,
 
-Here is the crypto update for 4.4:
-
-API:
-
-* Add support for cipher output IVs in testmgr.
-* Add missing crypto_ahash_blocksize helper.
-* Mark authenc and des ciphers as not allowed under FIPS.
-
-Algorithms:
-
-* Add CRC support to 842 compression.
-* Add keywrap algorithm.
-* A number of changes to the akcipher interface:
-  + Separate functions for setting public/private keys.
-  + Use SG lists.
-
-Drivers:
-
-* Add Intel SHA Extension optimised SHA1 and SHA256.
-* Use dma_map_sg instead of custom functions in crypto drivers.
-* Add support for STM32 RNG.
-* Add support for ST RNG.
-* Add Device Tree support to exynos RNG driver.
-* Add support for mxs-dcp crypto device on MX6SL.
-* Add xts(aes) support to caam.
-* Add ctr(aes) and xts(aes) support to qat.
-* A large set of fixes from Russell King for the marvell/cesa driver.
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Alexander Kuleshov (1):
-      crypto: jitterentropy - remove unnecessary information from a comment
-
-Arnd Bergmann (1):
-      crypto: mxs-dcp - mxs-dcp is an stmp device
-
-Boris BREZILLON (1):
-      crypto: testmgr - test IV value after a cipher operation
-
-Boris Brezillon (1):
-      crypto: marvell/cesa - fix memory leak
-
-Catalin Vasile (1):
-      crypto: caam - add support for acipher xts(aes)
-
-Daniel Thompson (5):
-      dt-bindings: Document the STM32 HW RNG bindings
-      hwrng: stm32 - add support for STM32 HW RNG
-      ARM: dts: stm32f429: Adopt STM32 RNG driver
-      hwrng: stm32 - Fix build with CONFIG_PM
-      hwrng: exynos - Fix unbalanced PM runtime get/puts
-
-David Howells (1):
-      crypto: akcipher - Don't #include crypto/public_key.h as the contents aren't used
-
-Fabio Estevam (6):
-      crypto: mxs-dcp - Allow MXS_DCP to be used on MX6SL
-      hwrng: mxc-rnga - Remove unneeded goto label
-      hwrng: mxc-rnga - Remove uneeded initialization
-      hwrng: mxc-rnga - Remove unnecessary dev_info message
-      hwrng: mxc-rnga - Use the preferred format for kzalloc
-      crypto: caam - Remove unused JUMP_TYPE_MASK definition
-
-Geliang Tang (1):
-      crypto: skcipher - blkcipher and ablkcipher should it be static
-
-Haren Myneni (1):
-      crypto: 842 - Add CRC and validation support
-
-Herbert Xu (1):
-      crypto: ahash - Add crypto_ahash_blocksize
-
-Horia Geant? (1):
-      crypto: tcrypt - avoid mapping from module image addresses
-
-John Griffin (1):
-      crypto: qat - don't check for iommu
-
-John Haxby (1):
-      crypto: testmgr - Disable fips-allowed for authenc() and des() ciphers
-
-Krzysztof Kozlowski (4):
-      dt-bindings: rng: Describe Exynos4 PRNG bindings
-      hwrng: exynos - Add timeout for waiting on init done
-      hwrng: exynos - Fix missing configuration after suspend to RAM
-      hwrng: exynos - Add Device Tree support
-
-LABBE Corentin (14):
-      crypto: bfin_crc - replace sg_count by sg_nents
-      crypto: amcc - replace get_sg_count by sg_nents_for_len
-      crypto: sahara - replace sahara_sg_length with sg_nents_for_len
-      crypto: talitos - dma_map_sg can handle chained SG
-      crypto: caam - dma_map_sg can handle chained SG
-      crypto: sahara - dma_map_sg can handle chained SG
-      crypto: qce - dma_map_sg can handle chained SG
-      crypto: atmel - Check for clk_prepare_enable() return value
-      crypto: atmel - use devm_xxx() managed function
-      crypto: ux500 - Use devm_xxx() managed function
-      crypto: s390/sha - replace raw value by their coresponding define
-      crypto: sahara - set array of const as const
-      crypto: n2 - set array of const as const
-      lib/mpi: clean unused SHA1_DIGEST_LENGTH
-
-Lee Jones (10):
-      hwrng: doc - Fix device node name reference /dev/hw_random => /dev/hwrng
-      hwrng: Kconfig - Fix device node name reference /dev/hw_random => /dev/hwrng
-      hwrng: core - Simplify RNG switching from sysfs
-      hwrng: st - Provide DT bindings for ST's Random Number Generator
-      hwrng: st - Add support for ST's HW Random Number Generator
-      ARM: STi: STiH407: Enable the 2 HW Random Number Generators for STiH4{07, 10}
-      MAINTAINERS: Add ST's Random Number Generator to the ST entry
-      hwrng: st: dt: Fix trivial typo in node address
-      hwrng: st - Use real-world device timings for timeout
-      hwrng: st - Improve FIFO size/depth description
-
-Luis de Bethencourt (4):
-      crypto: amcc - Fix module autoload for OF platform driver
-      crypto: picoxcell - Fix module autoload for OF platform driver
-      crypto: ux500 - Fix module autoload for OF platform drivers
-      hwrng: Fix module autoload for OF platform drivers
-
-Nicolas Iooss (1):
-      crypto: crc32c-pclmul - use .rodata instead of .rotata
-
-Russell King (32):
-      crypto: marvell/cesa - fix stack smashing in marvell/hash.c
-      crypto: marvell/cesa - initialise struct mv_cesa_ahash_req
-      crypto: marvell/cesa - fix wrong hash results
-      crypto: marvell/cesa - factor out common import/export functions
-      crypto: marvell/cesa - easier way to get the transform
-      crypto: marvell/cesa - keep creq->state in CPU endian format at all times
-      crypto: marvell/cesa - add flag to determine algorithm endianness
-      crypto: marvell/cesa - fix the bit length endianness
-      crypto: marvell/cesa - ensure template operation is initialised
-      crypto: marvell/cesa - const-ify argument to mv_cesa_get_op_cfg()
-      crypto: marvell/cesa - factor out first fragment decisions to helper
-      crypto: marvell/cesa - factor out adding an operation and launching it
-      crypto: marvell/cesa - always ensure mid-fragments after first-fragment
-      crypto: marvell/cesa - move mv_cesa_dma_add_frag() calls
-      crypto: marvell/cesa - use presence of scatterlist to determine data load
-      crypto: marvell/cesa - ensure iter.base.op_len is the full op length
-      crypto: marvell/cesa - avoid adding final operation within loop
-      crypto: marvell/cesa - rearrange last request handling
-      crypto: marvell/cesa - rearrange handling for hw finished hashes
-      crypto: marvell/cesa - rearrange handling for sw padded hashes
-      crypto: marvell/cesa - fix first-fragment handling in mv_cesa_ahash_dma_last_req()
-      crypto: caam - print errno code when hash registration fails
-      crypto: caam - avoid needlessly saving and restoring caam_hash_ctx
-      crypto: caam - fix non-block aligned hash calculation
-      crypto: caam - only export the state we really need to export
-      crypto: caam - fix indentation of close braces
-      crypto: marvell/cesa - use readl_relaxed()/writel_relaxed()
-      crypto: marvell/cesa - use dma_addr_t for cur_dma
-      crypto: marvell/cesa - use gfp_t for gfp flags
-      crypto: marvell/cesa - use memcpy_fromio()/memcpy_toio()
-      crypto: marvell/cesa - fix missing cpu_to_le32() in mv_cesa_dma_add_op()
-      crypto: marvell/cesa - use __le32 for hardware descriptors
-
-Sowmini Varadhan (2):
-      crypto: pkcs7 - Fix unaligned access in pkcs7_verify()
-      crypto: asymmetric_keys - Fix unaligned access in x509_get_sig_params()
-
-Stephan Mueller (4):
-      crypto: keywrap - add key wrapping block chaining mode
-      crypto: keywrap - enable compilation
-      crypto: keywrap - add testmgr support
-      lib/mpi: fix off by one in mpi_read_raw_from_sgl
-
-Tadeusz Struk (7):
-      crypto: qat - Add load balancing across devices
-      crypto: qat - remove empty functions and turn qat_uregister fn to void
-      crypto: qat - add support for ctr(aes) and xts(aes)
-      crypto: qat - remove unneeded variable
-      lib/mpi: Add mpi sgl helpers
-      crypto: akcipher - Changes to asymmetric key API
-      crypto: qat - fix crypto_get_instance_node function
-
-Thomas Petazzoni (1):
-      MAINTAINERS: add maintainers for the Marvell Crypto driver
-
-Tom Lendacky (4):
-      crypto: ccp - Replace BUG_ON with WARN_ON and a return code
-      crypto: ccp - Remove use ACPI field
-      crypto: ccp - Change references to accelerator to offload
-      crypto: ccp - Use module name in driver structures
-
-Vaishali Thakkar (1):
-      hwrng: octeon - Use devm_hwrng_register
-
-sudip (1):
-      crypto: asymmetric_keys - remove always false comparison
-
-tim (7):
-      crypto: x86/sha - Intel SHA Extensions optimized SHA1 transform function
-      crypto: x86/sha - Intel SHA Extensions optimized SHA256 transform function
-      crypto: x86/sha - glue code for Intel SHA extensions optimized SHA1 & SHA256
-      crypto: x86/sha - Add build support for Intel SHA Extensions optimized SHA1 and SHA256
-      crypto: x86/sha - Restructure x86 sha1 glue code to expose all the available sha1 transforms
-      crypto: x86/sha - Restructure x86 sha256 glue code to expose all the available sha256 transforms
-      crypto: x86/sha - Restructure x86 sha512 glue code to expose all the available sha512 transforms
-
- .../bindings/rng/samsung,exynos-rng4.txt           |   17 +
- Documentation/devicetree/bindings/rng/st,rng.txt   |   15 +
- .../devicetree/bindings/rng/st,stm32-rng.txt       |   21 +
- Documentation/hw_random.txt                        |    8 +-
- MAINTAINERS                                        |    8 +
- arch/arm/boot/dts/stih407-family.dtsi              |   14 +
- arch/arm/boot/dts/stm32f429.dtsi                   |    7 +
- arch/s390/crypto/sha.h                             |    2 +-
- arch/x86/Makefile                                  |    6 +-
- arch/x86/crypto/Makefile                           |    8 +
- arch/x86/crypto/crc32c-pcl-intel-asm_64.S          |    2 +-
- arch/x86/crypto/sha1_ni_asm.S                      |  302 +++++++++++++
- arch/x86/crypto/sha1_ssse3_glue.c                  |  314 ++++++++++---
- arch/x86/crypto/sha256_ni_asm.S                    |  353 +++++++++++++++
- arch/x86/crypto/sha256_ssse3_glue.c                |  329 ++++++++++++--
- arch/x86/crypto/sha512_ssse3_glue.c                |  249 +++++++++--
- crypto/Kconfig                                     |   17 +-
- crypto/Makefile                                    |   10 +-
- crypto/akcipher.c                                  |    1 -
- crypto/asymmetric_keys/pkcs7_verify.c              |    5 +-
- crypto/asymmetric_keys/x509_cert_parser.c          |    6 +-
- crypto/asymmetric_keys/x509_public_key.c           |    5 +-
- crypto/jitterentropy-kcapi.c                       |    4 -
- crypto/keywrap.c                                   |  419 +++++++++++++++++
- crypto/rsa.c                                       |   83 ++--
- crypto/rsa_helper.c                                |   42 +-
- crypto/rsakey.asn1                                 |    5 -
- crypto/rsaprivkey.asn1                             |   11 +
- crypto/rsapubkey.asn1                              |    4 +
- crypto/skcipher.c                                  |    4 +-
- crypto/tcrypt.c                                    |   17 +-
- crypto/testmgr.c                                   |   83 ++--
- crypto/testmgr.h                                   |   77 +++-
- drivers/char/hw_random/Kconfig                     |   24 +-
- drivers/char/hw_random/Makefile                    |    2 +
- drivers/char/hw_random/core.c                      |    2 +-
- drivers/char/hw_random/exynos-rng.c                |   58 ++-
- drivers/char/hw_random/mxc-rnga.c                  |   14 +-
- drivers/char/hw_random/octeon-rng.c                |   12 +-
- drivers/char/hw_random/pasemi-rng.c                |    1 +
- drivers/char/hw_random/ppc4xx-rng.c                |    1 +
- drivers/char/hw_random/st-rng.c                    |  151 +++++++
- drivers/char/hw_random/stm32-rng.c                 |  202 +++++++++
- drivers/crypto/Kconfig                             |    5 +-
- drivers/crypto/amcc/crypto4xx_core.c               |   23 +-
- drivers/crypto/atmel-aes.c                         |   44 +-
- drivers/crypto/atmel-sha.c                         |   33 +-
- drivers/crypto/atmel-tdes.c                        |   35 +-
- drivers/crypto/bfin_crc.c                          |   25 +-
- drivers/crypto/caam/caamalg.c                      |  232 +++++++---
- drivers/crypto/caam/caamhash.c                     |  131 +++---
- drivers/crypto/caam/desc.h                         |    1 -
- drivers/crypto/caam/sg_sw_sec4.h                   |   72 +--
- drivers/crypto/ccp/Kconfig                         |   13 +-
- drivers/crypto/ccp/ccp-crypto-aes-cmac.c           |   20 +-
- drivers/crypto/ccp/ccp-crypto-main.c               |    6 +-
- drivers/crypto/ccp/ccp-crypto-sha.c                |   13 +
- drivers/crypto/ccp/ccp-ops.c                       |  108 +++--
- drivers/crypto/ccp/ccp-pci.c                       |    2 +-
- drivers/crypto/ccp/ccp-platform.c                  |    6 +-
- drivers/crypto/marvell/cesa.h                      |   55 ++-
- drivers/crypto/marvell/cipher.c                    |   13 +-
- drivers/crypto/marvell/hash.c                      |  471 ++++++++++----------
- drivers/crypto/marvell/tdma.c                      |   42 +-
- drivers/crypto/n2_core.c                           |    2 +-
- drivers/crypto/nx/nx-842-powernv.c                 |    4 +-
- drivers/crypto/nx/nx-842-pseries.c                 |    8 +-
- drivers/crypto/picoxcell_crypto.c                  |    1 +
- drivers/crypto/qat/qat_common/Makefile             |   12 +-
- drivers/crypto/qat/qat_common/adf_common_drv.h     |    4 +-
- drivers/crypto/qat/qat_common/adf_ctl_drv.c        |    6 -
- drivers/crypto/qat/qat_common/adf_init.c           |    8 +-
- drivers/crypto/qat/qat_common/adf_sriov.c          |    7 +-
- drivers/crypto/qat/qat_common/qat_algs.c           |  178 +++++---
- drivers/crypto/qat/qat_common/qat_asym_algs.c      |  213 ++++++---
- drivers/crypto/qat/qat_common/qat_crypto.c         |   79 ++--
- drivers/crypto/qat/qat_common/qat_hal.c            |    5 +-
- drivers/crypto/qat/qat_common/qat_rsakey.asn1      |    5 -
- drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1  |   11 +
- drivers/crypto/qat/qat_common/qat_rsapubkey.asn1   |    4 +
- drivers/crypto/qce/ablkcipher.c                    |   30 +-
- drivers/crypto/qce/cipher.h                        |    4 -
- drivers/crypto/qce/dma.c                           |   52 ---
- drivers/crypto/qce/dma.h                           |    5 -
- drivers/crypto/qce/sha.c                           |   18 +-
- drivers/crypto/qce/sha.h                           |    2 -
- drivers/crypto/sahara.c                            |  108 +----
- drivers/crypto/talitos.c                           |  104 +----
- drivers/crypto/ux500/cryp/cryp_core.c              |   71 +--
- drivers/crypto/ux500/hash/hash_core.c              |   50 +--
- include/crypto/akcipher.h                          |   90 +++-
- include/crypto/hash.h                              |   14 +
- include/crypto/internal/rsa.h                      |    7 +-
- include/linux/mpi.h                                |   10 +-
- lib/842/842.h                                      |    2 +
- lib/842/842_compress.c                             |   13 +
- lib/842/842_decompress.c                           |   17 +
- lib/mpi/mpicoder.c                                 |  199 +++++++++
- 98 files changed, 4070 insertions(+), 1538 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 2015=E5=B9=B410=E6=9C=8830=E6=97=A5 16:58, LABBE Corentin wrote:
+> On Fri, Oct 30, 2015 at 04:22:46PM +0800, Zain Wang wrote:
+>> Crypto driver support cbc/ecb two chainmode, and aes/des/des3 three =
+cipher mode.
+>> The names registered are:
+>>     ecb(aes) cbc(aes) ecb(des) cbc(des) ecb(des3_ede) cbc(des3_ede)
+>> You can alloc tags above in your case.
+>>
+>> And other algorithms and platforms will be added later on.
+>>
+>> Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
+>> ---
+>>  drivers/crypto/Makefile                            |   1 +
+>>  drivers/crypto/rk_crypto/Makefile                  |   3 +
+>>  drivers/crypto/rk_crypto/rk3288_crypto.c           | 393 ++++++++++=
+++++++
+>>  drivers/crypto/rk_crypto/rk3288_crypto.h           | 291 ++++++++++=
+++
+>>  .../crypto/rk_crypto/rk3288_crypto_ablkcipher.c    | 502 ++++++++++=
++++++++++++
+>>  5 files changed, 1190 insertions(+)
+>>  create mode 100644 drivers/crypto/rk_crypto/Makefile
+>>  create mode 100644 drivers/crypto/rk_crypto/rk3288_crypto.c
+>>  create mode 100644 drivers/crypto/rk_crypto/rk3288_crypto.h
+>>  create mode 100644 drivers/crypto/rk_crypto/rk3288_crypto_ablkciphe=
+r.c
+>>
+>> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+>> index c3ced6f..00d103c 100644
+>> --- a/drivers/crypto/Makefile
+>> +++ b/drivers/crypto/Makefile
+>> @@ -29,3 +29,4 @@ obj-$(CONFIG_CRYPTO_DEV_QAT) +=3D qat/
+>>  obj-$(CONFIG_CRYPTO_DEV_QCE) +=3D qce/
+>>  obj-$(CONFIG_CRYPTO_DEV_VMX) +=3D vmx/
+>>  obj-$(CONFIG_CRYPTO_DEV_SUN4I_SS) +=3D sunxi-ss/
+>> +obj-$(CONFIG_CRYPTO_DEV_RK3288) +=3D rk_crypto/
+>> diff --git a/drivers/crypto/rk_crypto/Makefile b/drivers/crypto/rk_c=
+rypto/Makefile
+>> new file mode 100644
+>> index 0000000..0f62d87
+>> --- /dev/null
+>> +++ b/drivers/crypto/rk_crypto/Makefile
+>> @@ -0,0 +1,3 @@
+>> +obj-$(CONFIG_CRYPTO_DEV_RK3288) +=3D rk_crypto_driver.o
+>> +rk_crypto_driver-objs :=3D rk3288_crypto.o \
+>> +			 rk3288_crypto_ablkcipher.o \
+>> diff --git a/drivers/crypto/rk_crypto/rk3288_crypto.c b/drivers/cryp=
+to/rk_crypto/rk3288_crypto.c
+>> new file mode 100644
+>> index 0000000..fe55d7e
+>> --- /dev/null
+>> +++ b/drivers/crypto/rk_crypto/rk3288_crypto.c
+>> @@ -0,0 +1,393 @@
+>> +/*
+>> + *Crypto acceleration support for Rockchip RK3288
+>> + *
+>> + * Copyright (c) 2015, Fuzhou Rockchip Electronics Co., Ltd
+>> + *
+>> + * Author: Zain Wang <zain.wang@rock-chips.com>
+>> + *
+>> + * This program is free software; you can redistribute it and/or mo=
+dify it
+>> + * under the terms and conditions of the GNU General Public License=
+,
+>> + * version 2, as published by the Free Software Foundation.
+>> + *
+>> + * Some ideas are from marvell/cesa.c and s5p-sss.c driver.
+>> + */
+>> +
+>> +#include "rk3288_crypto.h"
+>> +#include <linux/module.h>
+>> +#include <linux/platform_device.h>
+>> +#include <linux/of.h>
+>> +#include <linux/clk.h>
+>> +#include <linux/crypto.h>
+>> +
+>> +struct crypto_info_t *crypto_p;
+>> +
+>> +static int rk_crypto_enable_clk(struct crypto_info_t *dev)
+>> +{
+>> +	if (clk_prepare_enable(dev->clk)) {
+>> +		dev_err(dev->dev, "[%s:%d], Couldn't enable clock 'clk'\n",
+>> +						__func__, __LINE__);
+>> +		return -ENOENT;
+>> +	}
+>> +	if (clk_prepare_enable(dev->aclk)) {
+>> +		dev_err(dev->dev, "[%s:%d], Couldn't enable clock 'aclk'\n",
+>> +						__func__, __LINE__);
+>> +		goto err_aclk;
+>> +	}
+>> +	if (clk_prepare_enable(dev->hclk)) {
+>> +		dev_err(dev->dev, "[%s:%d], Couldn't enable clock 'hclk'\n",
+>> +						__func__, __LINE__);
+>> +		goto err_hclk;
+>> +	}
+>> +	if (clk_prepare_enable(dev->pclk)) {
+>> +		dev_err(dev->dev, "[%s:%d], Couldn't enable clock 'pclk'\n",
+>> +						__func__, __LINE__);
+>> +		goto err_pclk;
+>> +	}
+>> +	return 0;
+>> +
+>> +err_pclk:
+>> +	clk_disable_unprepare(dev->hclk);
+>> +err_hclk:
+>> +	clk_disable_unprepare(dev->aclk);
+>> +err_aclk:
+>> +	clk_disable_unprepare(dev->clk);
+>> +
+>> +	return -ENOENT;
+>> +}
+> Please return the error value given by clk_prepare_enable()
+ok! done!
+>
+>> +
+>> +static void rk_crypto_disable_clk(struct crypto_info_t *dev)
+>> +{
+>> +	clk_disable_unprepare(dev->hclk);
+>> +	clk_disable_unprepare(dev->aclk);
+>> +	clk_disable_unprepare(dev->pclk);
+>> +	clk_disable_unprepare(dev->clk);
+>> +}
+>> +
+>> +static int check_alignment(struct scatterlist *sg_src,
+>> +			   struct scatterlist *sg_dst,
+>> +			   int align_mask)
+>> +{
+>> +	int in, out, align;
+>> +
+>> +	in =3D IS_ALIGNED((u32)sg_src->offset, 4) &&
+>> +	     IS_ALIGNED(sg_src->length, align_mask);
+>> +	if (sg_dst =3D=3D NULL)
+>> +		return in;
+>> +	out =3D IS_ALIGNED((u32)sg_dst->offset, 4) &&
+>> +	      IS_ALIGNED(sg_dst->length, align_mask);
+>> +	align =3D in && out;
+>> +
+>> +	return (align && (sg_src->length =3D=3D sg_dst->length));
+>> +}
+>> +
+>> +static int rk_load_data(struct crypto_info_t *dev,
+>> +			      struct scatterlist *sg_src,
+>> +			      struct scatterlist *sg_dst)
+>> +{
+>> +	uint32_t count;
+> u32 is prefered over uint32_t
+ok! done!
+>
+>> +	int ret;
+>> +
+>> +	dev->aligned =3D dev->aligned ?
+>> +		check_alignment(sg_src, sg_dst, dev->align_size) :
+>> +		dev->aligned;
+>> +	if (dev->aligned) {
+>> +		count =3D min(dev->left_bytes, sg_src->length);
+>> +		dev->left_bytes -=3D count;
+>> +
+>> +		ret =3D dma_map_sg(dev->dev, sg_src, 1, DMA_TO_DEVICE);
+>> +		if (!ret) {
+>> +			dev_err(dev->dev, "[%s:%d] dma_map_sg(src)  error\n",
+>> +							__func__, __LINE__);
+>> +			return -EINVAL;
+>> +		}
+>> +		dev->addr_in =3D sg_dma_address(sg_src);
+>> +
+>> +		if (sg_dst !=3D NULL) {
+>> +			ret =3D dma_map_sg(dev->dev, sg_dst, 1, DMA_FROM_DEVICE);
+>> +			if (!ret) {
+>> +				dev_err(dev->dev,
+>> +					"[%s:%d] dma_map_sg(dst)  error\n",
+>> +					__func__, __LINE__);
+>> +				dma_unmap_sg(dev->dev, sg_src, 1,
+>> +						DMA_TO_DEVICE);
+>> +				return -EINVAL;
+>> +			}
+>> +			dev->addr_out =3D sg_dma_address(sg_dst);
+>> +		}
+>> +	} else {
+>> +		count =3D (dev->left_bytes > PAGE_SIZE) ?
+>> +			PAGE_SIZE : dev->left_bytes;
+>> +
+>> +		ret =3D sg_pcopy_to_buffer(dev->first, dev->nents,
+>> +					 dev->addr_vir, count,
+>> +					 dev->total - dev->left_bytes);
+>> +		if (!ret) {
+>> +			dev_err(dev->dev, "[%s:%d] pcopy err\n",
+>> +						__func__, __LINE__);
+>> +			return -EINVAL;
+>> +		}
+>> +		dev->left_bytes -=3D count;
+>> +		sg_init_one(&dev->sg_tmp, dev->addr_vir, count);
+>> +		ret =3D dma_map_sg(dev->dev, &dev->sg_tmp, 1, DMA_TO_DEVICE);
+>> +		if (!ret) {
+>> +			dev_err(dev->dev, "[%s:%d] dma_map_sg(sg_tmp)  error\n",
+>> +							__func__, __LINE__);
+>> +			return -ENOMEM;
+>> +		}
+>> +		dev->addr_in =3D sg_dma_address(&dev->sg_tmp);
+>> +
+>> +		if (sg_dst !=3D NULL) {
+>> +			ret =3D dma_map_sg(dev->dev, &dev->sg_tmp, 1,
+>> +					 DMA_FROM_DEVICE);
+>> +			if (!ret) {
+>> +				dev_err(dev->dev,
+>> +					"[%s:%d] dma_map_sg(sg_tmp)  error\n",
+>> +					__func__, __LINE__);
+>> +				dma_unmap_sg(dev->dev, &dev->sg_tmp, 1,
+>> +					     DMA_TO_DEVICE);
+>> +				return -ENOMEM;
+>> +			}
+>> +			dev->addr_out =3D sg_dma_address(&dev->sg_tmp);
+>> +		}
+>> +	}
+>> +	dev->count =3D count;
+>> +	return 0;
+>> +}
+>> +
+>> +static void rk_unload_data(struct crypto_info_t *dev)
+>> +{
+>> +	struct scatterlist *sg_in, *sg_out;
+>> +
+>> +	sg_in =3D dev->aligned ? dev->sg_src : &dev->sg_tmp;
+>> +	dma_unmap_sg(dev->dev, sg_in, 1, DMA_TO_DEVICE);
+>> +
+>> +	if (dev->sg_dst !=3D NULL) {
+>> +		sg_out =3D dev->aligned ? dev->sg_dst : &dev->sg_tmp;
+>> +		dma_unmap_sg(dev->dev, sg_out, 1, DMA_FROM_DEVICE);
+>> +	}
+>> +}
+>> +
+>> +static irqreturn_t crypto_irq_handle(int irq, void *dev_id)
+>> +{
+>> +	struct crypto_info_t *dev  =3D platform_get_drvdata(dev_id);
+>> +	uint32_t interrupt_status;
+>> +	int err =3D 0;
+>> +
+>> +	spin_lock(&dev->lock);
+>> +
+>> +	if (irq =3D=3D dev->irq) {
+>> +		interrupt_status =3D CRYPTO_READ(dev, RK_CRYPTO_INTSTS);
+>> +		CRYPTO_WRITE(dev, RK_CRYPTO_INTSTS, interrupt_status);
+>> +		if (interrupt_status & 0x0a) {
+>> +			dev_warn(dev->dev, "DMA Error\n");
+>> +			err =3D -EFAULT;
+>> +		} else if (interrupt_status & 0x05)
+>> +			err =3D dev->update(dev);
+>> +
+>> +		if (err)
+>> +			dev->complete(dev, err);
+>> +	}
+>> +	spin_unlock(&dev->lock);
+>> +	return IRQ_HANDLED;
+>> +}
+>> +
+>> +static void rk_crypto_tasklet_cb(unsigned long data)
+>> +{
+>> +	struct crypto_info_t *dev =3D (struct crypto_info_t *)data;
+>> +	struct crypto_async_request *async_req, *backlog;
+>> +	struct rk_ahash_reqctx *hash_reqctx;
+>> +	struct rk_cipher_reqctx *ablk_reqctx;
+>> +	int err =3D 0;
+>> +
+>> +	spin_lock(&dev->lock);
+>> +	backlog   =3D crypto_get_backlog(&dev->queue);
+>> +	async_req =3D crypto_dequeue_request(&dev->queue);
+>> +	spin_unlock(&dev->lock);
+>> +	if (!async_req) {
+>> +		dev_err(dev->dev, "async_req is NULL !!\n");
+>> +		return;
+>> +	}
+>> +	if (backlog) {
+>> +		backlog->complete(backlog, -EINPROGRESS);
+>> +		backlog =3D NULL;
+>> +	}
+>> +
+>> +	if (crypto_tfm_alg_type(async_req->tfm) =3D=3D CRYPTO_ALG_TYPE_AHA=
+SH) {
+>> +		dev->ahash_req =3D ahash_request_cast(async_req);
+>> +		hash_reqctx =3D ahash_request_ctx(dev->ahash_req);
+>> +	} else {
+>> +		dev->ablk_req =3D ablkcipher_request_cast(async_req);
+>> +		ablk_reqctx   =3D ablkcipher_request_ctx(dev->ablk_req);
+>> +	}
+>> +	err =3D dev->start(dev);
+>> +	if (err)
+>> +		dev->complete(dev, err);
+>> +}
+>> +
+>> +static struct crypto_alg *rk_cipher_algs[] =3D {
+>> +	&rk_ecb_aes_alg,
+>> +	&rk_cbc_aes_alg,
+>> +	&rk_ecb_des_alg,
+>> +	&rk_cbc_des_alg,
+>> +	&rk_ecb_des3_ede_alg,
+>> +	&rk_cbc_des3_ede_alg,
+>> +};
+>> +
+>> +static int rk_crypto_register(void)
+>> +{
+>> +	int i, k;
+>> +	int err =3D 0;
+>> +
+>> +	for (i =3D 0; i < ARRAY_SIZE(rk_cipher_algs); i++) {
+>> +		if (crypto_register_alg(rk_cipher_algs[i]))
+>> +			goto err_cipher_algs;
+>> +	}
+>> +	return err;
+>> +
+>> +err_cipher_algs:
+>> +	for (k =3D 0; k < i; k++)
+>> +		crypto_unregister_alg(rk_cipher_algs[k]);
+>> +	return err;
+>> +}
+> You never set err to anything different from 0, so even in case of er=
+ror the function return 0.
+ok!
+in next version, the err value can be given by crypto_register_alg()
+>
+>> +
+>> +static void rk_crypto_unregister(void)
+>> +{
+>> +	int i;
+>> +
+>> +	for (i =3D 0; i < ARRAY_SIZE(rk_cipher_algs); i++)
+>> +		crypto_unregister_alg(rk_cipher_algs[i]);
+>> +}
+> You could set i to unsigned for cleaning a possible warning
+ok! done!
+>
+>> +
+>> +static int rk_crypto_probe(struct platform_device *pdev)
+>> +{
+>> +	int err =3D 0;
+>> +	struct resource *res;
+>> +	struct device *dev =3D &pdev->dev;
+>> +	struct crypto_info_t *crypto_info;
+>> +
+>> +	crypto_info =3D devm_kzalloc(&pdev->dev,
+>> +			sizeof(*crypto_info), GFP_KERNEL);
+>> +	if (!crypto_info)
+>> +		return -ENOMEM;
+>> +
+>> +	spin_lock_init(&crypto_info->lock);
+>> +
+>> +	res =3D platform_get_resource(pdev, IORESOURCE_MEM, 0);
+>> +	crypto_info->reg =3D devm_ioremap_resource(&pdev->dev, res);
+>> +	if (IS_ERR(crypto_info->reg)) {
+>> +		dev_warn(crypto_info->dev, "Error on remap reg\n");
+> Typo, ioremap ?
+> And you warn about an error ?
+this is typo.
+in next version, it will be removed.
+>
+>> +		err =3D PTR_ERR(crypto_info->reg);
+>> +		goto err_ioremap;
+>> +	}
+>> +
+>> +	crypto_info->aclk =3D clk_get(&pdev->dev, "aclk_crypto");
+>> +	if (IS_ERR(crypto_info->aclk)) {
+>> +		dev_err(dev, "failed to find crypto clock source\n");
+>> +		err =3D -ENOENT;
+> The err must be set with PTR_ERR()
+> And you could also use devm_clk_get()
+ok! done!
+>
+>> +		goto err_ioremap;
+>> +	}
+>> +
+>> +	crypto_info->hclk =3D clk_get(&pdev->dev, "hclk_crypto");
+>> +	if (IS_ERR(crypto_info->hclk)) {
+>> +		dev_err(dev, "failed to find crypto clock source\n");
+>> +		err =3D -ENOENT;
+> Same comment
+ok! done!
+>
+>> +		goto err_ioremap;
+>> +	}
+>> +
+>> +	crypto_info->clk =3D clk_get(&pdev->dev, "srst_crypto");
+>> +	if (IS_ERR(crypto_info->clk)) {
+>> +		dev_err(dev, "failed to find crypto clock source\n");
+>> +		err =3D -ENOENT;
+> Same comment
+ok! done!
+>
+>> +		goto err_ioremap;
+>> +	}
+>> +
+>> +	crypto_info->pclk =3D clk_get(&pdev->dev, "apb_pclk");
+>> +	if (IS_ERR(crypto_info->pclk)) {
+>> +		dev_err(dev, "failed to find crypto clock source\n");
+>> +		err =3D -ENOENT;
+> Same comment
+ok! done!
+>
+>> +		goto err_ioremap;
+>> +	}
+>> +
+>> +	crypto_info->irq =3D platform_get_irq(pdev, 0);
+>> +	if (crypto_info->irq < 0) {
+>> +		dev_warn(crypto_info->dev,
+>> +				"control Interrupt is not available.\n");
+>> +		err =3D crypto_info->irq;
+>> +		goto err_ioremap;
+>> +	}
+>> +
+>> +	err =3D request_irq(crypto_info->irq, crypto_irq_handle, IRQF_SHAR=
+ED,
+>> +			  "rk-crypto", pdev);
+> You could use devm_request_irq()
+ok! done!
+>
+>> +	if (err) {
+>> +		dev_warn(crypto_info->dev, "irq request failed.\n");
+>> +		goto err_ioremap;
+>> +	}
+>> +
+>> +	crypto_info->dev =3D &pdev->dev;
+>> +	platform_set_drvdata(pdev, crypto_info);
+>> +	crypto_p =3D crypto_info;
+>> +
+>> +	tasklet_init(&crypto_info->crypto_tasklet,
+>> +			rk_crypto_tasklet_cb, (unsigned long)crypto_info);
+>> +	crypto_init_queue(&crypto_info->queue, 50);
+>> +
+>> +	crypto_info->enable_clk =3D rk_crypto_enable_clk;
+>> +	crypto_info->disable_clk =3D rk_crypto_disable_clk;
+>> +	crypto_info->load_data =3D rk_load_data;
+>> +	crypto_info->unload_data =3D rk_unload_data;
+>> +
+>> +	err =3D rk_crypto_register();
+>> +	if (err) {
+>> +		pr_info("err in register alg");
+> Use dev_err()
+ok! done!
+>
+>> +		goto err_reg_alg;
+>> +	}
+>> +
+>> +	return 0;
+>> +
+>> +err_reg_alg:
+>> +	free_irq(crypto_info->irq, crypto_info);
+>> +err_ioremap:
+>> +	kfree(crypto_info);
+> Wrong, you do not have to free something allocated with devm_kzalloc
+ok! done!
+>
+>> +	crypto_p =3D NULL;
+>> +
+>> +	return err;
+>> +}
+>> +
+>> +static int rk_crypto_remove(struct platform_device *pdev)
+>> +{
+>> +	struct crypto_info_t *crypto_tmp =3D platform_get_drvdata(pdev);
+>> +
+>> +	rk_crypto_unregister();
+>> +	tasklet_kill(&crypto_tmp->crypto_tasklet);
+>> +	free_irq(crypto_tmp->irq, crypto_tmp);
+>> +	kfree(crypto_tmp);
+>> +	crypto_p =3D NULL;
+>> +
+>> +	return 0;
+>> +}
+>> +#ifdef CONFIG_OF
+>> +static const struct of_device_id crypto_of_id_table[] =3D {
+>> +	{ .compatible =3D "rockchip,crypto" },
+>> +	{}
+>> +};
+>> +#endif /* CONFIG_OF */
+>> +
+>> +static const struct platform_device_id crypto_id_table[] =3D {
+>> +	{ "rockchip,crypto" },
+>> +	{}
+>> +};
+>> +
+>> +static struct platform_driver crypto_driver =3D {
+>> +	.probe		=3D rk_crypto_probe,
+>> +	.remove		=3D rk_crypto_remove,
+>> +	.driver		=3D {
+>> +		.name	=3D "rockchip,crypto",
+>> +		.of_match_table	=3D of_match_ptr(crypto_of_id_table),
+>> +	},
+>> +	.id_table	=3D crypto_id_table,
+>> +};
+>> +
+>> +module_platform_driver(crypto_driver);
+>> +
+>> +MODULE_LICENSE("GPL");
+>> +MODULE_AUTHOR("Zain Wang");
+>> diff --git a/drivers/crypto/rk_crypto/rk3288_crypto.h b/drivers/cryp=
+to/rk_crypto/rk3288_crypto.h
+>> new file mode 100644
+>> index 0000000..27022bc
+>> --- /dev/null
+>> +++ b/drivers/crypto/rk_crypto/rk3288_crypto.h
+>> @@ -0,0 +1,291 @@
+>> +#ifndef __RK3288_CRYPTO_H__
+>> +#define __RK3288_CRYPTO_H__
+>> +
+>> +#include <crypto/sha.h>
+>> +#include <crypto/internal/hash.h>
+>> +#include <crypto/aes.h>
+>> +#include <crypto/des.h>
+>> +#include <crypto/ctr.h>
+>> +#include <crypto/algapi.h>
+>> +#include <linux/interrupt.h>
+>> +#include <linux/delay.h>
+>> +
+>> +#define _SBF(s, v)			((v) << (s))
+>> +#define _BIT(b)				_SBF(b, 1)
+>> +
+>> +#define FLAGS_HASH_SHA1			_SBF(2, 0x00)
+>> +#define FLAGS_HASH_MD5			_SBF(2, 0x01)
+>> +#define FLAGS_HASH_SHA256		_SBF(2, 0x02)
+>> +#define FLAGS_HASH_PRNG			_SBF(2, 0x03)
+>> +
+>> +/* Crypto control registers*/
+>> +#define RK_CRYPTO_INTSTS		0x0000
+>> +#define RK_CRYPTO_PKA_DONE_INT		_BIT(5)
+>> +#define RK_CRYPTO_HASH_DONE_INT		_BIT(4)
+>> +#define RK_CRYPTO_HRDMA_ERR_INT		_BIT(3)
+>> +#define RK_CRYPTO_HRDMA_DONE_INT	_BIT(2)
+>> +#define RK_CRYPTO_BCDMA_ERR_INT		_BIT(1)
+>> +#define RK_CRYPTO_BCDMA_DONE_INT	_BIT(0)
+>> +
+>> +#define RK_CRYPTO_INTENA		0x0004
+>> +#define RK_CRYPTO_PKA_DONE_ENA		_BIT(5)
+>> +#define RK_CRYPTO_HASH_DONE_ENA		_BIT(4)
+>> +#define RK_CRYPTO_HRDMA_ERR_ENA		_BIT(3)
+>> +#define RK_CRYPTO_HRDMA_DONE_ENA	_BIT(2)
+>> +#define RK_CRYPTO_BCDMA_ERR_ENA		_BIT(1)
+>> +#define RK_CRYPTO_BCDMA_DONE_ENA	_BIT(0)
+>> +
+>> +#define RK_CRYPTO_CTRL			0x0008
+>> +#define RK_CRYPTO_WRITE_MASK		(0xFFFF<<16)
+>> +#define RK_CRYPTO_TRNG_FLUSH		_BIT(9)
+>> +#define RK_CRYPTO_TRNG_START		_BIT(8)
+>> +#define RK_CRYPTO_PKA_FLUSH		_BIT(7)
+>> +#define RK_CRYPTO_HASH_FLUSH		_BIT(6)
+>> +#define RK_CRYPTO_BLOCK_FLUSH		_BIT(5)
+>> +#define RK_CRYPTO_PKA_START		_BIT(4)
+>> +#define RK_CRYPTO_HASH_START		_BIT(3)
+>> +#define RK_CRYPTO_BLOCK_START		_BIT(2)
+>> +#define RK_CRYPTO_TDES_START		_BIT(1)
+>> +#define RK_CRYPTO_AES_START		_BIT(0)
+>> +
+>> +#define RK_CRYPTO_CONF			0x000c
+>> +/* HASH Receive DMA Address Mode:   fix | increment */
+>> +#define RK_CRYPTO_HR_ADDR_MODE		_BIT(8)
+>> +/* Block Transmit DMA Address Mode: fix | increment */
+>> +#define RK_CRYPTO_BT_ADDR_MODE		_BIT(7)
+>> +/* Block Receive DMA Address Mode:  fix | increment */
+>> +#define RK_CRYPTO_BR_ADDR_MODE		_BIT(6)
+>> +#define RK_CRYPTO_BYTESWAP_HRFIFO	_BIT(5)
+>> +#define RK_CRYPTO_BYTESWAP_BTFIFO	_BIT(4)
+>> +#define RK_CRYPTO_BYTESWAP_BRFIFO	_BIT(3)
+>> +/* AES =3D 0 OR DES =3D 1 */
+>> +#define RK_CRYPTO_DESSEL				_BIT(2)
+>> +#define RK_CYYPTO_HASHINSEL_INDEPENDENT_SOURCE		_SBF(0, 0x00)
+>> +#define RK_CYYPTO_HASHINSEL_BLOCK_CIPHER_INPUT		_SBF(0, 0x01)
+>> +#define RK_CYYPTO_HASHINSEL_BLOCK_CIPHER_OUTPUT		_SBF(0, 0x02)
+>> +
+>> +/* Block Receiving DMA Start Address Register */
+>> +#define RK_CRYPTO_BRDMAS		0x0010
+>> +/* Block Transmitting DMA Start Address Register */
+>> +#define RK_CRYPTO_BTDMAS		0x0014
+>> +/* Block Receiving DMA Length Register */
+>> +#define RK_CRYPTO_BRDMAL		0x0018
+>> +/* Hash Receiving DMA Start Address Register */
+>> +#define RK_CRYPTO_HRDMAS		0x001c
+>> +/* Hash Receiving DMA Length Register */
+>> +#define RK_CRYPTO_HRDMAL		0x0020
+>> +
+>> +/* AES registers */
+>> +#define RK_CRYPTO_AES_CTRL			  0x0080
+>> +#define RK_CRYPTO_AES_BYTESWAP_CNT	_BIT(11)
+>> +#define RK_CRYPTO_AES_BYTESWAP_KEY	_BIT(10)
+>> +#define RK_CRYPTO_AES_BYTESWAP_IV	_BIT(9)
+>> +#define RK_CRYPTO_AES_BYTESWAP_DO	_BIT(8)
+>> +#define RK_CRYPTO_AES_BYTESWAP_DI	_BIT(7)
+>> +#define RK_CRYPTO_AES_KEY_CHANGE	_BIT(6)
+>> +#define RK_CRYPTO_AES_ECB_MODE		_SBF(4, 0x00)
+>> +#define RK_CRYPTO_AES_CBC_MODE		_SBF(4, 0x01)
+>> +#define RK_CRYPTO_AES_CTR_MODE		_SBF(4, 0x02)
+>> +#define RK_CRYPTO_AES_128_bit_key	_SBF(2, 0x00)
+>> +#define RK_CRYPTO_AES_192_bit_key	_SBF(2, 0x01)
+>> +#define RK_CRYPTO_AES_256_bit_key	_SBF(2, 0x02)
+>> +/* Slave =3D 0 / fifo =3D 1 */
+>> +#define RK_CRYPTO_AES_FIFO_MODE		_BIT(1)
+>> +/* Encryption =3D 0 , Decryption =3D 1 */
+>> +#define RK_CRYPTO_AES_DEC		_BIT(0)
+>> +
+>> +#define RK_CRYPTO_AES_STS		0x0084
+>> +#define RK_CRYPTO_AES_DONE		_BIT(0)
+>> +
+>> +/* AES Input Data 0-3 Register */
+>> +#define RK_CRYPTO_AES_DIN_0		0x0088
+>> +#define RK_CRYPTO_AES_DIN_1		0x008c
+>> +#define RK_CRYPTO_AES_DIN_2		0x0090
+>> +#define RK_CRYPTO_AES_DIN_3		0x0094
+>> +
+>> +/* AES output Data 0-3 Register */
+>> +#define RK_CRYPTO_AES_DOUT_0		0x0098
+>> +#define RK_CRYPTO_AES_DOUT_1		0x009c
+>> +#define RK_CRYPTO_AES_DOUT_2		0x00a0
+>> +#define RK_CRYPTO_AES_DOUT_3		0x00a4
+>> +
+>> +/* AES IV Data 0-3 Register */
+>> +#define RK_CRYPTO_AES_IV_0		0x00a8
+>> +#define RK_CRYPTO_AES_IV_1		0x00ac
+>> +#define RK_CRYPTO_AES_IV_2		0x00b0
+>> +#define RK_CRYPTO_AES_IV_3		0x00b4
+>> +
+>> +/* AES Key Data 0-3 Register */
+>> +#define RK_CRYPTO_AES_KEY_0		0x00b8
+>> +#define RK_CRYPTO_AES_KEY_1		0x00bc
+>> +#define RK_CRYPTO_AES_KEY_2		0x00c0
+>> +#define RK_CRYPTO_AES_KEY_3		0x00c4
+>> +#define RK_CRYPTO_AES_KEY_4		0x00c8
+>> +#define RK_CRYPTO_AES_KEY_5		0x00cc
+>> +#define RK_CRYPTO_AES_KEY_6		0x00d0
+>> +#define RK_CRYPTO_AES_KEY_7		0x00d4
+>> +
+>> +/* AES Input Counter 0-3 Register */
+>> +#define RK_CRYPTO_AES_CNT_0		0x00d8
+>> +#define RK_CRYPTO_AES_CNT_1		0x00dc
+>> +#define RK_CRYPTO_AES_CNT_2		0x00e0
+>> +#define RK_CRYPTO_AES_CNT_3		0x00e4
+>> +
+>> +/* des/tdes */
+>> +#define RK_CRYPTO_TDES_CTRL		0x0100
+>> +#define RK_CRYPTO_TDES_BYTESWAP_KEY	_BIT(8)
+>> +#define RK_CRYPTO_TDES_BYTESWAP_IV	_BIT(7)
+>> +#define RK_CRYPTO_TDES_BYTESWAP_DO	_BIT(6)
+>> +#define RK_CRYPTO_TDES_BYTESWAP_DI	_BIT(5)
+>> +/* 0: ECB, 1: CBC */
+>> +#define RK_CRYPTO_TDES_CHAINMODE	_BIT(4)
+>> +/* TDES Key Mode, 0 : EDE, 1 : EEE */
+>> +#define RK_CRYPTO_TDES_EEE		_BIT(3)
+>> +/* 0: DES, 1:TDES */
+>> +#define RK_CRYPTO_TDES_SELECT		_BIT(2)
+>> +/* 0: Slave, 1:Fifo */
+>> +#define RK_CRYPTO_TDES_FIFO_MODE	_BIT(1)
+>> +/* Encryption =3D 0 , Decryption =3D 1 */
+>> +#define RK_CRYPTO_TDES_DEC		_BIT(0)
+>> +
+>> +#define RK_CRYPTO_TDES_STS		0x0104
+>> +#define RK_CRYPTO_TDES_DONE		_BIT(0)
+>> +
+>> +#define RK_CRYPTO_TDES_DIN_0		0x0108
+>> +#define RK_CRYPTO_TDES_DIN_1		0x010c
+>> +#define RK_CRYPTO_TDES_DOUT_0		0x0110
+>> +#define RK_CRYPTO_TDES_DOUT_1		0x0114
+>> +#define RK_CRYPTO_TDES_IV_0		0x0118
+>> +#define RK_CRYPTO_TDES_IV_1		0x011c
+>> +#define RK_CRYPTO_TDES_KEY1_0		0x0120
+>> +#define RK_CRYPTO_TDES_KEY1_1		0x0124
+>> +#define RK_CRYPTO_TDES_KEY2_0		0x0128
+>> +#define RK_CRYPTO_TDES_KEY2_1		0x012c
+>> +#define RK_CRYPTO_TDES_KEY3_0		0x0130
+>> +#define RK_CRYPTO_TDES_KEY3_1		0x0134
+>> +
+>> +/* HASH */
+>> +#define RK_CRYPTO_HASH_CTRL		0x0180
+>> +#define RK_CRYPTO_HASH_SWAP_DO		_BIT(3)
+>> +#define RK_CRYPTO_HASH_SWAP_DI		_BIT(2)
+>> +#define RK_CRYPTO_HASH_SHA1		_SBF(0, 0x00)
+>> +#define RK_CRYPTO_HASH_MD5		_SBF(0, 0x01)
+>> +#define RK_CRYPTO_HASH_SHA256		_SBF(0, 0x02)
+>> +#define RK_CRYPTO_HASH_PRNG		_SBF(0, 0x03)
+>> +
+>> +#define RK_CRYPTO_HASH_STS		0x0184
+>> +#define RK_CRYPTO_HASH_DONE		_BIT(0)
+>> +
+>> +#define RK_CRYPTO_HASH_MSG_LEN		0x0188
+>> +#define RK_CRYPTO_HASH_DOUT_0		0x018c
+>> +#define RK_CRYPTO_HASH_DOUT_1		0x0190
+>> +#define RK_CRYPTO_HASH_DOUT_2		0x0194
+>> +#define RK_CRYPTO_HASH_DOUT_3		0x0198
+>> +#define RK_CRYPTO_HASH_DOUT_4		0x019c
+>> +#define RK_CRYPTO_HASH_DOUT_5		0x01a0
+>> +#define RK_CRYPTO_HASH_DOUT_6		0x01a4
+>> +#define RK_CRYPTO_HASH_DOUT_7		0x01a8
+>> +#define RK_CRYPTO_HASH_SEED_0		0x01ac
+>> +#define RK_CRYPTO_HASH_SEED_1		0x01b0
+>> +#define RK_CRYPTO_HASH_SEED_2		0x01b4
+>> +#define RK_CRYPTO_HASH_SEED_3		0x01b8
+>> +#define RK_CRYPTO_HASH_SEED_4		0x01bc
+>> +
+>> +/* TRNG */
+>> +#define RK_CRYPTO_TRNG_CTRL		0x0200
+>> +#define RK_CRYPTO_OSC_ENABLE		_BIT(16)
+>> +
+>> +#define RK_CRYPTO_TRNG_DOUT_0		0x0204
+>> +#define RK_CRYPTO_TRNG_DOUT_1		0x0208
+>> +#define RK_CRYPTO_TRNG_DOUT_2		0x020c
+>> +#define RK_CRYPTO_TRNG_DOUT_3		0x0210
+>> +#define RK_CRYPTO_TRNG_DOUT_4		0x0214
+>> +#define RK_CRYPTO_TRNG_DOUT_5		0x0218
+>> +#define RK_CRYPTO_TRNG_DOUT_6		0x021c
+>> +#define RK_CRYPTO_TRNG_DOUT_7		0x0220
+>> +
+>> +/* PAK OR RSA */
+>> +#define RK_CRYPTO_PKA_CTRL			0x0280
+>> +#define RK_CRYPTO_PKA_BLOCK_SIZE_512BIT		_SBF(0, 0x00)
+>> +#define RK_CRYPTO_PKA_BLOCK_SIZE_1024BIT	_SBF(0, 0x01)
+>> +#define RK_CRYPTO_PKA_BLOCK_SIZE_2048BIT	_SBF(0, 0x02)
+>> +
+>> +/* result =3D (M ^ E) mod N */
+>> +#define RK_CRYPTO_PKA_M			0x0400
+>> +/* C =3D 2 ^ (2n+2) mod N */
+>> +#define RK_CRYPTO_PKA_C			0x0500
+>> +#define RK_CRYPTO_PKA_N			0x0600
+>> +#define RK_CRYPTO_PKA_E			0x0700
+>> +
+>> +#define CRYPTO_READ(dev, offset)		  \
+>> +		__raw_readl(((dev)->reg + (offset)))
+>> +#define CRYPTO_WRITE(dev, offset, val)	  \
+>> +		__raw_writel((val), ((dev)->reg + (offset)))
+>> +/* get register virt address */
+>> +#define CRYPTO_GET_REG_VIRT(dev, offset)   ((dev)->reg + (offset))
+>> +
+>> +#define MD5_DIGEST_SIZE			16
+> #This is already defined in incluude/crypto/md5.h
+ok!
+in next version, it will be removed.
+>
+>> +#define RK_ALIGN_MASK			(sizeof(u32)-1)
+>> +
+>> +struct crypto_info_t {
+>> +	struct device			*dev;
+>> +	struct clk			*aclk;
+>> +	struct clk			*hclk;
+>> +	struct clk			*clk;
+>> +	struct clk			*pclk;
+>> +	void __iomem			*reg;
+>> +	int				irq;
+>> +	struct crypto_queue		queue;
+>> +	struct tasklet_struct		crypto_tasklet;
+>> +	struct ahash_request		*ahash_req;
+>> +	struct ablkcipher_request	*ablk_req;
+>> +	spinlock_t			lock;
+>> +
+>> +	/* the public variable */
+>> +	struct scatterlist		*sg_src;
+>> +	struct scatterlist		*sg_dst;
+>> +	struct scatterlist		sg_tmp;
+>> +	struct scatterlist		*first;
+>> +	unsigned int			left_bytes;
+>> +	char				*addr_vir;
+>> +	int				aligned;
+>> +	int				align_size;
+>> +	size_t				nents;
+>> +	unsigned int			total;
+>> +	uint32_t			count;
+>> +	uint32_t			mode;
+>> +	dma_addr_t			addr_in;
+>> +	dma_addr_t			addr_out;
+>> +	int (*start)(struct crypto_info_t *dev);
+>> +	int (*update)(struct crypto_info_t *dev);
+>> +	void (*complete)(struct crypto_info_t *dev, int err);
+>> +	int (*enable_clk)(struct crypto_info_t *dev);
+>> +	void (*disable_clk)(struct crypto_info_t *dev);
+>> +	int (*load_data)(struct crypto_info_t *dev,
+>> +			  struct scatterlist *sg_src,
+>> +			  struct scatterlist *sg_dst);
+>> +	void (*unload_data)(struct crypto_info_t *dev);
+>> +};
+>> +
+>> +/* the private variable of hash */
+>> +struct rk_ahash_ctx {
+>> +	struct crypto_info_t		*dev;
+>> +	int				FLAG_FINUP;
+>> +	int				first_op;
+>> +};
+>> +
+>> +/* the private variable of cipher */
+>> +struct rk_cipher_ctx {
+>> +	struct crypto_info_t		*dev;
+>> +	int				keylen;
+>> +};
+>> +extern struct crypto_info_t *crypto_p;
+>> +
+>> +extern struct crypto_alg rk_ecb_aes_alg;
+>> +extern struct crypto_alg rk_cbc_aes_alg;
+>> +extern struct crypto_alg rk_ecb_des_alg;
+>> +extern struct crypto_alg rk_cbc_des_alg;
+>> +extern struct crypto_alg rk_ecb_des3_ede_alg;
+>> +extern struct crypto_alg rk_cbc_des3_ede_alg;
+>> +
+>> +#endif
+>> diff --git a/drivers/crypto/rk_crypto/rk3288_crypto_ablkcipher.c b/d=
+rivers/crypto/rk_crypto/rk3288_crypto_ablkcipher.c
+>> new file mode 100644
+>> index 0000000..3d08875
+>> --- /dev/null
+>> +++ b/drivers/crypto/rk_crypto/rk3288_crypto_ablkcipher.c
+>> @@ -0,0 +1,502 @@
+>> +/*
+>> + *Crypto acceleration support for Rockchip RK3288
+>> + *
+>> + * Copyright (c) 2015, Fuzhou Rockchip Electronics Co., Ltd
+>> + *
+>> + * Author: Zain Wang <zain.wang@rock-chips.com>
+>> + *
+>> + * This program is free software; you can redistribute it and/or mo=
+dify it
+>> + * under the terms and conditions of the GNU General Public License=
+,
+>> + * version 2, as published by the Free Software Foundation.
+>> + *
+>> + * Some ideas are from marvell/cesa.c and s5p-sss.c driver.
+>> + */
+>> +#include "rk3288_crypto.h"
+>> +
+>> +#define RK_CRYPTO_DEC			_BIT(0)
+>> +#define AES	0
+>> +#define TDES	_BIT(16)
+>> +
+>> +static void rk_crypto_complete(struct crypto_info_t *dev, int err)
+>> +{
+>> +	if (dev->ablk_req->base.complete !=3D NULL) {
+>> +		if (err)
+>> +			dev_warn(dev->dev, "[%s:%d] err =3D %d\n",
+>> +						__func__, __LINE__, err);
+>> +		dev->ablk_req->base.complete(&dev->ablk_req->base, err);
+>> +	}
+>> +}
+>> +
+>> +static int rk_handle_req(struct ablkcipher_request *req, int alig_b=
+ytes)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	struct crypto_info_t *dev =3D ctx->dev;
+>> +	int err;
+>> +
+>> +	if (!IS_ALIGNED(req->nbytes, alig_bytes))
+>> +		return -EINVAL;
+>> +
+>> +	spin_lock(&dev->lock);
+>> +	err =3D ablkcipher_enqueue_request(&dev->queue, req);
+>> +	spin_unlock(&dev->lock);
+>> +	tasklet_schedule(&dev->crypto_tasklet);
+>> +	return err;
+>> +}
+>> +
+>> +static void rk_ablk_init(struct crypto_info_t *dev,
+>> +				struct ablkcipher_request *req)
+>> +{
+>> +	dev->left_bytes =3D req->nbytes;
+>> +	dev->total =3D req->nbytes;
+>> +	dev->sg_src =3D req->src;
+>> +	dev->first =3D req->src;
+>> +	dev->nents =3D sg_nents(req->src);
+>> +	dev->sg_dst =3D req->dst;
+>> +	dev->aligned =3D 1;
+>> +	dev->ablk_req =3D req;
+>> +}
+>> +
+>> +static int rk_aes_setkey(struct crypto_ablkcipher *cipher,
+>> +			const uint8_t *key, unsigned int keylen)
+>> +{
+>> +	struct crypto_tfm *tfm =3D crypto_ablkcipher_tfm(cipher);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_tfm_ctx(tfm);
+>> +
+>> +	if (key =3D=3D NULL) {
+>> +		pr_err("[%s:%d] no key error\n", __func__, __LINE__);
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	if (keylen !=3D AES_KEYSIZE_128 && keylen !=3D AES_KEYSIZE_192 &&
+>> +	    keylen !=3D AES_KEYSIZE_256) {
+>> +		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
+>> +		pr_err("[%s:%d] expect key len =3D %d\n",
+>> +						__func__, __LINE__, keylen);
+>> +		return -EINVAL;
+>> +	}
+>> +	ctx->keylen =3D keylen;
+>> +	memcpy(ctx->dev->reg + RK_CRYPTO_AES_KEY_0, key, keylen);
+>> +	return 0;
+>> +}
+>> +
+>> +static int rk_tdes_setkey(struct crypto_ablkcipher *cipher,
+>> +			const uint8_t *key, unsigned int keylen)
+>> +{
+>> +	struct crypto_tfm *tfm =3D crypto_ablkcipher_tfm(cipher);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_tfm_ctx(tfm);
+>> +
+>> +	if (key =3D=3D NULL) {
+>> +		pr_err("[%s:%d] no key error\n", __func__, __LINE__);
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	if (keylen !=3D DES_KEY_SIZE && keylen !=3D DES3_EDE_KEY_SIZE) {
+>> +		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
+>> +		pr_err("[%s:%d] expect key len =3D %d\n",
+>> +						__func__, __LINE__, keylen);
+>> +		return -EINVAL;
+>> +	}
+>> +	ctx->keylen =3D keylen;
+>> +	memcpy(ctx->dev->reg + RK_CRYPTO_TDES_KEY1_0, key, keylen);
+>> +	return 0;
+>> +}
+>> +
+>> +static int rk_aes_ecb_encrypt(struct ablkcipher_request *req)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	struct crypto_info_t *dev =3D ctx->dev;
+>> +
+>> +	dev->mode =3D RK_CRYPTO_AES_ECB_MODE | AES;
+>> +	rk_ablk_init(dev, req);
+>> +	return rk_handle_req(req, dev->align_size);
+>> +}
+>> +
+>> +static int rk_aes_ecb_decrypt(struct ablkcipher_request *req)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	struct crypto_info_t *dev =3D ctx->dev;
+>> +
+>> +	dev->mode =3D RK_CRYPTO_AES_ECB_MODE | RK_CRYPTO_DEC | AES;
+>> +	rk_ablk_init(dev, req);
+>> +	return rk_handle_req(req, dev->align_size);
+>> +}
+>> +
+>> +static int rk_aes_cbc_encrypt(struct ablkcipher_request *req)
+>> +{
+>> +
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	struct crypto_info_t *dev =3D ctx->dev;
+>> +
+>> +	dev->mode =3D RK_CRYPTO_AES_CBC_MODE | AES;
+>> +	rk_ablk_init(dev, req);
+>> +	return rk_handle_req(req, dev->align_size);
+>> +}
+>> +
+>> +static int rk_aes_cbc_decrypt(struct ablkcipher_request *req)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	struct crypto_info_t *dev =3D ctx->dev;
+>> +
+>> +	dev->mode =3D RK_CRYPTO_AES_CBC_MODE | RK_CRYPTO_DEC | AES;
+>> +	rk_ablk_init(dev, req);
+>> +	return rk_handle_req(req, dev->align_size);
+>> +}
+>> +
+>> +static int rk_des_ecb_encrypt(struct ablkcipher_request *req)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	struct crypto_info_t *dev =3D ctx->dev;
+>> +
+>> +	dev->mode =3D TDES;
+>> +	rk_ablk_init(dev, req);
+>> +	return rk_handle_req(req, dev->align_size);
+>> +}
+>> +
+>> +static int rk_des_ecb_decrypt(struct ablkcipher_request *req)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	struct crypto_info_t *dev =3D ctx->dev;
+>> +
+>> +	dev->mode =3D RK_CRYPTO_DEC | TDES;
+>> +	rk_ablk_init(dev, req);
+>> +	return rk_handle_req(req, dev->align_size);
+>> +}
+>> +
+>> +static int rk_des_cbc_encrypt(struct ablkcipher_request *req)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	struct crypto_info_t *dev =3D ctx->dev;
+>> +
+>> +	dev->mode =3D RK_CRYPTO_TDES_CHAINMODE | TDES;
+>> +	rk_ablk_init(dev, req);
+>> +	return rk_handle_req(req, dev->align_size);
+>> +}
+>> +
+>> +static int rk_des_cbc_decrypt(struct ablkcipher_request *req)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	struct crypto_info_t *dev =3D ctx->dev;
+>> +
+>> +	dev->mode =3D RK_CRYPTO_TDES_CHAINMODE | RK_CRYPTO_DEC | TDES;
+>> +	rk_ablk_init(dev, req);
+>> +	return rk_handle_req(req, dev->align_size);
+>> +}
+>> +
+>> +static int rk_des3_ede_ecb_encrypt(struct ablkcipher_request *req)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	struct crypto_info_t *dev =3D ctx->dev;
+>> +
+>> +	dev->mode =3D RK_CRYPTO_TDES_SELECT | TDES;
+>> +	rk_ablk_init(dev, req);
+>> +	return rk_handle_req(req, dev->align_size);
+>> +}
+>> +
+>> +static int rk_des3_ede_ecb_decrypt(struct ablkcipher_request *req)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	struct crypto_info_t *dev =3D ctx->dev;
+>> +
+>> +	dev->mode =3D RK_CRYPTO_TDES_SELECT | RK_CRYPTO_DEC | TDES;
+>> +	rk_ablk_init(dev, req);
+>> +	return rk_handle_req(req, dev->align_size);
+>> +}
+>> +
+>> +static int rk_des3_ede_cbc_encrypt(struct ablkcipher_request *req)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	struct crypto_info_t *dev =3D ctx->dev;
+>> +
+>> +	dev->mode =3D RK_CRYPTO_TDES_SELECT | RK_CRYPTO_TDES_CHAINMODE | T=
+DES;
+>> +	rk_ablk_init(dev, req);
+>> +	return rk_handle_req(req, dev->align_size);
+>> +}
+>> +
+>> +static int rk_des3_ede_cbc_decrypt(struct ablkcipher_request *req)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	struct crypto_info_t *dev =3D ctx->dev;
+>> +
+>> +	dev->mode =3D RK_CRYPTO_TDES_SELECT | RK_CRYPTO_TDES_CHAINMODE |
+>> +		    RK_CRYPTO_DEC | TDES;
+>> +	rk_ablk_init(dev, req);
+>> +	return rk_handle_req(req, dev->align_size);
+>> +}
+>> +
+>> +static void rk_ablk_hw_init(struct crypto_info_t *dev)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(dev->ab=
+lk_req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	uint32_t conf_reg =3D 0;
+>> +
+>> +	if (dev->mode & TDES) {
+>> +		dev->mode &=3D ~TDES;
+>> +		dev->mode |=3D RK_CRYPTO_TDES_FIFO_MODE |
+>> +			     RK_CRYPTO_TDES_BYTESWAP_KEY |
+>> +			     RK_CRYPTO_TDES_BYTESWAP_IV;
+>> +		CRYPTO_WRITE(dev, RK_CRYPTO_TDES_CTRL, dev->mode);
+>> +
+>> +		memcpy(dev->reg + RK_CRYPTO_TDES_IV_0, dev->ablk_req->info, 8);
+>> +		conf_reg =3D RK_CRYPTO_DESSEL;
+>> +	} else {
+>> +		dev->mode |=3D RK_CRYPTO_AES_FIFO_MODE |
+>> +			     RK_CRYPTO_AES_KEY_CHANGE |
+>> +			     RK_CRYPTO_AES_BYTESWAP_KEY |
+>> +			     RK_CRYPTO_AES_BYTESWAP_IV;
+>> +
+>> +		if (ctx->keylen =3D=3D AES_KEYSIZE_192)
+>> +			dev->mode |=3D RK_CRYPTO_AES_192_bit_key;
+>> +		else if (ctx->keylen =3D=3D AES_KEYSIZE_256)
+>> +			dev->mode |=3D RK_CRYPTO_AES_256_bit_key;
+>> +
+>> +		CRYPTO_WRITE(dev, RK_CRYPTO_AES_CTRL, dev->mode);
+>> +
+>> +		memcpy(dev->reg + RK_CRYPTO_AES_IV_0, dev->ablk_req->info, 16);
+>> +	}
+>> +	conf_reg |=3D RK_CRYPTO_BYTESWAP_BTFIFO |
+>> +		    RK_CRYPTO_BYTESWAP_BRFIFO;
+>> +	CRYPTO_WRITE(dev, RK_CRYPTO_CONF, conf_reg);
+>> +	CRYPTO_WRITE(dev, RK_CRYPTO_INTENA,
+>> +		     RK_CRYPTO_BCDMA_ERR_ENA | RK_CRYPTO_BCDMA_DONE_ENA);
+>> +}
+>> +
+>> +static void crypto_dma_start(struct crypto_info_t *dev)
+>> +{
+>> +	CRYPTO_WRITE(dev, RK_CRYPTO_BRDMAS, dev->addr_in);
+>> +	CRYPTO_WRITE(dev, RK_CRYPTO_BRDMAL, dev->count / 4);
+>> +	CRYPTO_WRITE(dev, RK_CRYPTO_BTDMAS, dev->addr_out);
+>> +	CRYPTO_WRITE(dev, RK_CRYPTO_CTRL, RK_CRYPTO_BLOCK_START |
+>> +			(RK_CRYPTO_BLOCK_START << 16));
+>> +}
+>> +
+>> +static int rk_set_data_start(struct crypto_info_t *dev)
+>> +{
+>> +	int err;
+>> +
+>> +	err =3D dev->load_data(dev, dev->sg_src, dev->sg_dst);
+>> +	if (!err)
+>> +		crypto_dma_start(dev);
+>> +	return err;
+>> +}
+>> +
+>> +static int rk_ablk_start(struct crypto_info_t *dev)
+>> +{
+>> +	int err;
+>> +
+>> +	spin_lock(&dev->lock);
+>> +	rk_ablk_hw_init(dev);
+>> +	err =3D rk_set_data_start(dev);
+>> +	spin_unlock(&dev->lock);
+>> +	return err;
+>> +}
+>> +/* return:
+>> + *	true	some err was occurred
+>> + *	fault	no err, please continue
+>> + */
+>> +static int rk_ablk_rx(struct crypto_info_t *dev)
+>> +{
+>> +	int err =3D 0;
+>> +
+>> +	dev->unload_data(dev);
+>> +	if (!dev->aligned) {
+>> +		if (!sg_pcopy_from_buffer(dev->ablk_req->dst, dev->nents,
+>> +					  dev->addr_vir, dev->count,
+>> +					  dev->total - dev->left_bytes -
+>> +					  dev->count)) {
+>> +			err =3D -ENOMEM;
+> I am not sure -ENOMEM is the good error to return
+ok!
+EINVAL may be better than ENOMEM.
+>
+>> +			goto out_rx;
+>> +		}
+>> +	}
+>> +	if (dev->left_bytes) {
+>> +		if (dev->aligned) {
+>> +			if (sg_is_last(dev->sg_src)) {
+>> +				dev_warn(dev->dev, "[%s:%d], lack of data\n",
+>> +							__func__, __LINE__);
+>> +				err =3D -ENOMEM;
+>> +				goto out_rx;
+>> +			}
+>> +			dev->sg_src =3D sg_next(dev->sg_src);
+>> +			dev->sg_dst =3D sg_next(dev->sg_dst);
+>> +		}
+>> +		err =3D rk_set_data_start(dev);
+>> +	} else {
+>> +		/* here show the calculation is over without any err */
+>> +		dev->complete(dev, 0);
+>> +	}
+>> +out_rx:
+>> +	return err;
+>> +}
+>> +
+>> +static int rk_ablk_cra_init(struct crypto_tfm *tfm)
+>> +{
+>> +	struct rk_cipher_ctx *ctx =3D crypto_tfm_ctx(tfm);
+>> +
+>> +	ctx->dev =3D crypto_p;
+>> +	ctx->dev->align_size =3D crypto_tfm_alg_alignmask(tfm) + 1;
+>> +	ctx->dev->start =3D rk_ablk_start;
+>> +	ctx->dev->update =3D rk_ablk_rx;
+>> +	ctx->dev->complete =3D rk_crypto_complete;
+>> +	ctx->dev->addr_vir =3D (void *)__get_free_page(GFP_KERNEL);
+>> +	if (!ctx->dev->addr_vir) {
+>> +		pr_err("failed to kmalloc for addr_vir\n");
+> Since you have acces to the dev ptr, you could use all dev_xxx functi=
+ons.
+> This comment, apply to whole file.
+> Moreover, checkpatch said that you do not have to warn about a failed=
+ memory allocation.
+ok!
+in next version, it will be removed.
+>
+>> +		return -ENOMEM;
+>> +	}
+>> +	return ctx->dev->enable_clk(ctx->dev);
+>> +}
+>> +
+>> +static void rk_ablk_cra_exit(struct crypto_tfm *tfm)
+>> +{
+>> +	struct rk_cipher_ctx *ctx =3D crypto_tfm_ctx(tfm);
+>> +
+>> +	free_page((unsigned long)ctx->dev->addr_vir);
+>> +	ctx->dev->disable_clk(ctx->dev);
+>> +}
+>> +
+>> +struct crypto_alg rk_ecb_aes_alg =3D {
+>> +	.cra_name		=3D "ecb(aes)",
+>> +	.cra_driver_name	=3D "ecb-aes-rk",
+>> +	.cra_priority		=3D 100,
+>> +	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER |
+>> +				  CRYPTO_ALG_ASYNC,
+>> +	.cra_blocksize		=3D AES_BLOCK_SIZE,
+>> +	.cra_ctxsize		=3D sizeof(struct rk_cipher_ctx),
+>> +	.cra_alignmask		=3D 0x0f,
+>> +	.cra_type		=3D &crypto_ablkcipher_type,
+>> +	.cra_module		=3D THIS_MODULE,
+>> +	.cra_init		=3D rk_ablk_cra_init,
+>> +	.cra_exit		=3D rk_ablk_cra_exit,
+>> +	.cra_u.ablkcipher	=3D {
+>> +		.min_keysize	=3D AES_MIN_KEY_SIZE,
+>> +		.max_keysize	=3D AES_MAX_KEY_SIZE,
+>> +		.setkey		=3D rk_aes_setkey,
+>> +		.encrypt	=3D rk_aes_ecb_encrypt,
+>> +		.decrypt	=3D rk_aes_ecb_decrypt,
+>> +	}
+>> +};
+>> +
+>> +struct crypto_alg rk_cbc_aes_alg =3D {
+>> +	.cra_name		=3D "cbc(aes)",
+>> +	.cra_driver_name	=3D "cbc-aes-rk",
+>> +	.cra_priority		=3D 100,
+>> +	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER |
+>> +				  CRYPTO_ALG_ASYNC,
+>> +	.cra_blocksize		=3D AES_BLOCK_SIZE,
+>> +	.cra_ctxsize		=3D sizeof(struct rk_cipher_ctx),
+>> +	.cra_alignmask		=3D 0x0f,
+>> +	.cra_type		=3D &crypto_ablkcipher_type,
+>> +	.cra_module		=3D THIS_MODULE,
+>> +	.cra_init		=3D rk_ablk_cra_init,
+>> +	.cra_exit		=3D rk_ablk_cra_exit,
+>> +	.cra_u.ablkcipher	=3D {
+>> +		.min_keysize	=3D AES_MIN_KEY_SIZE,
+>> +		.max_keysize	=3D AES_MAX_KEY_SIZE,
+>> +		.ivsize		=3D AES_BLOCK_SIZE,
+>> +		.setkey		=3D rk_aes_setkey,
+>> +		.encrypt	=3D rk_aes_cbc_encrypt,
+>> +		.decrypt	=3D rk_aes_cbc_decrypt,
+>> +	}
+>> +};
+>> +
+>> +struct crypto_alg rk_ecb_des_alg =3D {
+>> +	.cra_name		=3D "ecb(des)",
+>> +	.cra_driver_name	=3D "ecb-des-rk",
+>> +	.cra_priority		=3D 100,
+>> +	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER |
+>> +				  CRYPTO_ALG_ASYNC,
+>> +	.cra_blocksize		=3D DES_BLOCK_SIZE,
+>> +	.cra_ctxsize		=3D sizeof(struct rk_cipher_ctx),
+>> +	.cra_alignmask		=3D 0x07,
+>> +	.cra_type		=3D &crypto_ablkcipher_type,
+>> +	.cra_module		=3D THIS_MODULE,
+>> +	.cra_init		=3D rk_ablk_cra_init,
+>> +	.cra_exit		=3D rk_ablk_cra_exit,
+>> +	.cra_u.ablkcipher	=3D {
+>> +		.min_keysize	=3D DES_KEY_SIZE,
+>> +		.max_keysize	=3D DES_KEY_SIZE,
+>> +		.setkey		=3D rk_tdes_setkey,
+>> +		.encrypt	=3D rk_des_ecb_encrypt,
+>> +		.decrypt	=3D rk_des_ecb_decrypt,
+>> +	}
+>> +};
+>> +
+>> +struct crypto_alg rk_cbc_des_alg =3D {
+>> +	.cra_name		=3D "cbc(des)",
+>> +	.cra_driver_name	=3D "cbc-des-rk",
+>> +	.cra_priority		=3D 100,
+>> +	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER |
+>> +				  CRYPTO_ALG_ASYNC,
+>> +	.cra_blocksize		=3D DES_BLOCK_SIZE,
+>> +	.cra_ctxsize		=3D sizeof(struct rk_cipher_ctx),
+>> +	.cra_alignmask		=3D 0x07,
+>> +	.cra_type		=3D &crypto_ablkcipher_type,
+>> +	.cra_module		=3D THIS_MODULE,
+>> +	.cra_init		=3D rk_ablk_cra_init,
+>> +	.cra_exit		=3D rk_ablk_cra_exit,
+>> +	.cra_u.ablkcipher	=3D {
+>> +		.min_keysize	=3D DES_KEY_SIZE,
+>> +		.max_keysize	=3D DES_KEY_SIZE,
+>> +		.ivsize		=3D DES_BLOCK_SIZE,
+>> +		.setkey		=3D rk_tdes_setkey,
+>> +		.encrypt	=3D rk_des_cbc_encrypt,
+>> +		.decrypt	=3D rk_des_cbc_decrypt,
+>> +	}
+>> +};
+>> +
+>> +struct crypto_alg rk_ecb_des3_ede_alg =3D {
+>> +	.cra_name		=3D "ecb(des3_ede)",
+>> +	.cra_driver_name	=3D "ecb-des3-ede-rk",
+>> +	.cra_priority		=3D 100,
+>> +	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER |
+>> +				  CRYPTO_ALG_ASYNC,
+>> +	.cra_blocksize		=3D DES_BLOCK_SIZE,
+>> +	.cra_ctxsize		=3D sizeof(struct rk_cipher_ctx),
+>> +	.cra_alignmask		=3D 0x07,
+>> +	.cra_type		=3D &crypto_ablkcipher_type,
+>> +	.cra_module		=3D THIS_MODULE,
+>> +	.cra_init		=3D rk_ablk_cra_init,
+>> +	.cra_exit		=3D rk_ablk_cra_exit,
+>> +	.cra_u.ablkcipher	=3D {
+>> +		.min_keysize	=3D DES3_EDE_KEY_SIZE,
+>> +		.max_keysize	=3D DES3_EDE_KEY_SIZE,
+>> +		.ivsize		=3D DES_BLOCK_SIZE,
+>> +		.setkey		=3D rk_tdes_setkey,
+>> +		.encrypt	=3D rk_des3_ede_ecb_encrypt,
+>> +		.decrypt	=3D rk_des3_ede_ecb_decrypt,
+>> +	}
+>> +};
+>> +
+>> +struct crypto_alg rk_cbc_des3_ede_alg =3D {
+>> +	.cra_name		=3D "cbc(des3_ede)",
+>> +	.cra_driver_name	=3D "cbc-des3-ede-rk",
+>> +	.cra_priority		=3D 100,
+>> +	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER |
+>> +				  CRYPTO_ALG_ASYNC,
+>> +	.cra_blocksize		=3D DES_BLOCK_SIZE,
+>> +	.cra_ctxsize		=3D sizeof(struct rk_cipher_ctx),
+>> +	.cra_alignmask		=3D 0x07,
+>> +	.cra_type		=3D &crypto_ablkcipher_type,
+>> +	.cra_module		=3D THIS_MODULE,
+>> +	.cra_init		=3D rk_ablk_cra_init,
+>> +	.cra_exit		=3D rk_ablk_cra_exit,
+>> +	.cra_u.ablkcipher	=3D {
+>> +		.min_keysize	=3D DES3_EDE_KEY_SIZE,
+>> +		.max_keysize	=3D DES3_EDE_KEY_SIZE,
+>> +		.ivsize		=3D DES_BLOCK_SIZE,
+>> +		.setkey		=3D rk_tdes_setkey,
+>> +		.encrypt	=3D rk_des3_ede_cbc_encrypt,
+>> +		.decrypt	=3D rk_des3_ede_cbc_decrypt,
+>> +	}
+>> +};
+>> --=20
+>> 1.9.1
+> Best regards
+>
+>
+>
+>
+Thanks
+Zain
