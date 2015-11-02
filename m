@@ -1,167 +1,92 @@
-From: Harsh Jain <harshjain.prof@gmail.com>
-Subject: Re: kernel tainted while exporting shash context using af_alg interface
-Date: Mon, 2 Nov 2015 11:18:37 +0530
-Message-ID: <CAFXBA=neaMFvwPWtrKHabo+rZa+iQ3gUE2LQV5-BxUX=BD6y=w@mail.gmail.com>
-References: <CAFXBA=mVmRsAk3fuyjf3WA-P+0dHKu0upUdb5Qxr0kwn1rKiDw@mail.gmail.com>
-	<28376488.AMz6xlEXXD@tauon.atsec.com>
-	<CAFXBA==pRTY57SkfPRnW_6MVRUJ0J8Uwi+Bigxtk21WNhvY3jA@mail.gmail.com>
-	<3576256.SqRabKS4lK@tauon.atsec.com>
+From: Zain <zain.wang@rock-chips.com>
+Subject: Re: [RESEND PATCH 2/4] clk: rockchip: set an id for crypto clk
+Date: Mon, 2 Nov 2015 15:54:18 +0800
+Message-ID: <563716AA.5050809@rock-chips.com>
+References: <1446193369-4453-1-git-send-email-zain.wang@rock-chips.com>
+ <1446193369-4453-3-git-send-email-zain.wang@rock-chips.com>
+ <4280600.OxjmG17dRp@phil>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lf0-f45.google.com ([209.85.215.45]:32774 "EHLO
-	mail-lf0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751019AbbKBFsj (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Nov 2015 00:48:39 -0500
-Received: by lfbf136 with SMTP id f136so42781229lfb.0
-        for <linux-crypto@vger.kernel.org>; Sun, 01 Nov 2015 21:48:37 -0800 (PST)
-In-Reply-To: <3576256.SqRabKS4lK@tauon.atsec.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: zhengsq@rock-chips.com, hl@rock-chips.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	mturquette@baylibre.com, pawel.moll@arm.com,
+	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
+	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+	eddie.cai@rock-chips.com, Chris Zhong <zyw@rock-chips.com>
+To: Heiko Stuebner <heiko@sntech.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <4280600.OxjmG17dRp@phil>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+Hi Heiko,
 
-I tried patch on my setup and its working fine.
-Thanks Stephan, Herbert for your support.
-
-Regards
-Harsh Jain
-
-On Fri, Oct 30, 2015 at 4:40 PM, Stephan Mueller <smueller@chronox.de> wrote:
-> Am Freitag, 30. Oktober 2015, 14:02:27 schrieb Harsh Jain:
+On 2015=E5=B9=B410=E6=9C=8830=E6=97=A5 16:54, Heiko Stuebner wrote:
+> Hi Zain,
 >
-> Hi Harsh,
+> Am Freitag, 30. Oktober 2015, 16:22:47 schrieb Zain Wang:
+>> set an id for crypto clk, so that it can be called in other part.
+>>
+>> Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
+>> ---
+>>  drivers/clk/rockchip/clk-rk3288.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/clk/rockchip/clk-rk3288.c b/drivers/clk/rockchi=
+p/clk-rk3288.c
+>> index 9040878..d74bd5d 100644
+>> --- a/drivers/clk/rockchip/clk-rk3288.c
+>> +++ b/drivers/clk/rockchip/clk-rk3288.c
+>> @@ -295,7 +295,7 @@ static struct rockchip_clk_branch rk3288_clk_bra=
+nches[] __initdata =3D {
+>>  			RK3288_CLKGATE_CON(0), 4, GFLAGS),
+>>  	GATE(0, "c2c_host", "aclk_cpu_src", 0,
+>>  			RK3288_CLKGATE_CON(13), 8, GFLAGS),
+>> -	COMPOSITE_NOMUX(0, "crypto", "aclk_cpu_pre", 0,
+>> +	COMPOSITE_NOMUX(SRST_CRYPTO, "crypto", "aclk_cpu_pre", 0,
+> the id you want to use actually is a soft-reset index, not a clock-id=
+=2E
+> You would need to add a real id, in this case with an sclk_ prefix.
+ok! done!
 >
->>Hi Stephan,
+>>  			RK3288_CLKSEL_CON(26), 6, 2, DFLAGS,
+>>  			RK3288_CLKGATE_CON(5), 4, GFLAGS),
+>>  	GATE(0, "aclk_bus_2pmu", "aclk_cpu_pre", CLK_IGNORE_UNUSED,
 >>
->>If we add sendmsg() in between 2 accept calls then the setkey problem
->>will happen?
->>
->>handle->opfd = accept(handle->tfmfd, NULL, 0);
->>sendmsg()
->>handle->opfd = accept(handle->opfd, NULL, 0);
->>sendmsg()
->>handle->opfd = accept(handle->opfd, NULL, 0);
->
-> Without testing, I would very much expect that, because the setkey does not
-> apply to the subordinate tfm.
->>
->>If yes, Then may be it is expected behavior and user is supposed to
->>set the key explicitly with some other system call.Why I am saying
->>this is. I remember somewhere in kernel code I read some comment
->>related to setkey operations.
->
-> I would like to wait for Herbert to chime in here on how he thinks this would
-> work.
->>
->>In that case my patch should work. 1 doubt I have related to patch is
->>do I need to set "ctx->more" =1 after initialisation.
->>
->>Correct me If I am wrong.
->>
->>
->>Thanks for your support.
->>
->>
->>regards
->>Harsh Jain
->>
->>On Wed, Oct 28, 2015 at 4:53 PM, Stephan Mueller <smueller@chronox.de> wrote:
->>> Am Mittwoch, 28. Oktober 2015, 16:24:34 schrieb Harsh Jain:
->>>
->>> Hi Harsh,
->>>
->>>>Hi Stephan,
->>>>
->>>>I tried your patch on my machine. Kernel is not crashing. The openssl
->>>>break with this. Can you share HMAC program which you are suspecting
->>>>it will not work or do you already have some test written in
->>>>libkcapi/test.sh which will fail.
->>>>
->>> See comments above test/kcapi-main.c:cavs_hash
->>>
->>>  * HMAC command line invocation:
->>>  * $ ./kcapi -x 3 -c "hmac(sha1)" -k
->>>  6e77ebd479da794707bc6cde3694f552ea892dab
->>>
->>> -p
->>> 31b62a797adbff6b8a358d2b5206e01fee079de8cdfc4695138bba163b4efbf30127343e7fd
->>> 4fbc696c3d38d8f27f57c024b5056f726ceeb4c31d98e57751ec8cbe8904ee0f9b031ae6a0c
->>> 55da5e062475b3d7832191d4057643ef5fa446801d59a04693e573a8159cd2416b7bd39c7f0
->>> fe63c599365e04d596c05736beaab58>
->>>  * 7f204ea665666f5bd2b370e546d1b408005e4d85
->>>
->>> To do that, apply your patch and then
->>>
->>> 1. open lib/kcapi-kernel-if.c and change line 567 from
->>>
->>> handle->opfd = accept(handle->tfmfd, NULL, 0);
->>>
->>>
->>> to
->>>
->>> handle->opfd = accept(handle->tfmfd, NULL, 0);
->>> handle->opfd = accept(handle->opfd, NULL, 0);
->>> handle->opfd = accept(handle->opfd, NULL, 0);
->>> handle->opfd = accept(handle->opfd, NULL, 0);
->>> handle->opfd = accept(handle->opfd, NULL, 0);
->>>
->>> You will see that the hash commands will pass, the HMAC fails
->>>
->>> Without your patch, the kernel crashes (same as with your OpenSSL code).
->>>
->>> The reason is that setkey is applied on the TFM that is not conveyed to the
->>> subsequent TFMs generated with new accepts.
->>>
->>>>Regards
->>>>Harsh Jain
->>>>
->>>>On Wed, Oct 28, 2015 at 6:25 AM, Stephan Mueller <smueller@chronox.de>
-> wrote:
->>>>> Am Mittwoch, 28. Oktober 2015, 01:09:58 schrieb Stephan Mueller:
->>>>>
->>>>> Hi Harsh,
->>>>>
->>>>>> However, any error in user space should not crash the kernel. So, a fix
->>>>>> should be done. But I think your code is not correct as it solidifies a
->>>>>> broken user space code.
->>>>>
->>>>> After thinking a bit again, I think your approach is correct after all. I
->>>>> was able to reproduce the crash by simply adding more accept calls to my
->>>>> test code. And I can confirm that your patch works, for hashes.
->>>>>
->>>>> *BUT* it does NOT work for HMAC as the key is set on the TFM and the
->>>>> subsequent accepts do not transport the key. Albeit your code prevents
->>>>> the
->>>>> kernel from crashing, the HMAC calculation will be done with an empty key
->>>>> as
->>>>> the setkey operation does not reach the TFM handle in the subordinate
->>>>> accept() call.
->>>>>
->>>>> So, I would think that the second accept is simply broken, for HMAC at
->>>>> least.
->>>>>
->>>>> Herbert, what is the purpose of that subordinate accept that is
->>>>> implemented
->>>>> with hash_accept? As this is broken for HMACs, should it be removed
->>>>> entirely?
->>>>>
->>>>> --
->>>>> Ciao
->>>>> Stephan
->>>>
->>>>--
->>>>To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
->>>>the body of a message to majordomo@vger.kernel.org
->>>>More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>>
->>> Ciao
->>> Stephan
->
->
-> Ciao
-> Stephan
+> It should probably look more like below, but as suggested by Stephen =
+Boyd
+> in another thread, we should coordinate with Chris to add more necess=
+ary clock
+> ids in one go:
+> -------- 8< -----------
+> diff --git a/drivers/clk/rockchip/clk-rk3288.c b/drivers/clk/rockchip=
+/clk-rk3288.c
+> index 9040878..9fd9f5a 100644
+> --- a/drivers/clk/rockchip/clk-rk3288.c
+> +++ b/drivers/clk/rockchip/clk-rk3288.c
+> @@ -295,7 +295,7 @@ static struct rockchip_clk_branch rk3288_clk_bran=
+ches[] __initdata =3D {
+>  			RK3288_CLKGATE_CON(0), 4, GFLAGS),
+>  	GATE(0, "c2c_host", "aclk_cpu_src", 0,
+>  			RK3288_CLKGATE_CON(13), 8, GFLAGS),
+> -	COMPOSITE_NOMUX(0, "crypto", "aclk_cpu_pre", 0,
+> +	COMPOSITE_NOMUX(SCLK_CRYPTO, "sclk_crypto", "aclk_cpu_pre", 0,
+>  			RK3288_CLKSEL_CON(26), 6, 2, DFLAGS,
+>  			RK3288_CLKGATE_CON(5), 4, GFLAGS),
+>  	GATE(0, "aclk_bus_2pmu", "aclk_cpu_pre", CLK_IGNORE_UNUSED,
+> diff --git a/include/dt-bindings/clock/rk3288-cru.h b/include/dt-bind=
+ings/clock/rk3288-cru.h
+> index c719aac..9e0a5e9 100644
+> --- a/include/dt-bindings/clock/rk3288-cru.h
+> +++ b/include/dt-bindings/clock/rk3288-cru.h
+> @@ -86,6 +86,7 @@
+>  #define SCLK_USBPHY480M_SRC	122
+>  #define SCLK_PVTM_CORE		123
+>  #define SCLK_PVTM_GPU		124
+> +#define SCLK_CRYPTO		125
+> =20
+>  #define SCLK_MAC		151
+>  #define SCLK_MACREF_OUT		152
