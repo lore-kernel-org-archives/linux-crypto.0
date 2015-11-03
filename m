@@ -1,93 +1,68 @@
-From: Zain <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
-Subject: Re: [RESEND PATCH 1/4] Crypto: Crypto driver support aes/des/des3 for
- rk3288
-Date: Tue, 3 Nov 2015 09:07:47 +0800
-Message-ID: <563808E3.5090005@rock-chips.com>
-References: <1446193369-4453-1-git-send-email-zain.wang@rock-chips.com>
- <1446193369-4453-2-git-send-email-zain.wang@rock-chips.com>
- <2230290.pTq1BehVXW@phil>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
- hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org, ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
- mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
- eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
- zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org
-To: Heiko Stuebner <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>
-Return-path: <linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-In-Reply-To: <2230290.pTq1BehVXW@phil>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-rockchip>,
- <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-rockchip/>
-List-Post: <mailto:linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Help: <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-rockchip>,
- <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
-Sender: "Linux-rockchip" <linux-rockchip-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-Errors-To: linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Zain Wang <zain.wang@rock-chips.com>
+Subject: [PATCH v1 4/4] crypto: rk_crypto - add DT bindings documentation
+Date: Tue,  3 Nov 2015 13:52:08 +0800
+Message-ID: <1446529928-12521-5-git-send-email-zain.wang@rock-chips.com>
+References: <1446529928-12521-1-git-send-email-zain.wang@rock-chips.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+	eddie.cai@rock-chips.com, Zain Wang <zain.wang@rock-chips.com>
+To: zhengsq@rock-chips.com, hl@rock-chips.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	mturquette@baylibre.com, heiko@sntech.de, pawel.moll@arm.com,
+	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
+	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from regular1.263xmail.com ([211.150.99.138]:53588 "EHLO
+	regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751892AbbKCFyn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 Nov 2015 00:54:43 -0500
+In-Reply-To: <1446529928-12521-1-git-send-email-zain.wang@rock-chips.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-SGkgSGVpa28sCgpPbiAyMDE15bm0MTDmnIgzMOaXpSAyMjoyNiwgSGVpa28gU3R1ZWJuZXIgd3Jv
-dGU6Cj4gSGksCj4KPiBmaXJzdCBvZiBhbGwsIHRoYW5rcyBmb3Igd29ya2luZyBvbiB0aGlzLCBp
-dCB3aWxsIGJlIHJlYWxseSBjb29sIHRvIHNlZSB0aGUKPiBjcnlwdG8gYWNjZWxlcmF0b3Igc3Vw
-cG9ydGVkIGluIHRoZSBrZXJuZWwgOi0pCj4KPiBBbSBGcmVpdGFnLCAzMC4gT2t0b2JlciAyMDE1
-LCAxNjoyMjo0NiBzY2hyaWViIFphaW4gV2FuZzoKPj4gQ3J5cHRvIGRyaXZlciBzdXBwb3J0IGNi
-Yy9lY2IgdHdvIGNoYWlubW9kZSwgYW5kIGFlcy9kZXMvZGVzMyB0aHJlZSBjaXBoZXIgbW9kZS4K
-Pj4gVGhlIG5hbWVzIHJlZ2lzdGVyZWQgYXJlOgo+PiAgICAgZWNiKGFlcykgY2JjKGFlcykgZWNi
-KGRlcykgY2JjKGRlcykgZWNiKGRlczNfZWRlKSBjYmMoZGVzM19lZGUpCj4+IFlvdSBjYW4gYWxs
-b2MgdGFncyBhYm92ZSBpbiB5b3VyIGNhc2UuCj4+Cj4+IEFuZCBvdGhlciBhbGdvcml0aG1zIGFu
-ZCBwbGF0Zm9ybXMgd2lsbCBiZSBhZGRlZCBsYXRlciBvbi4KPj4KPj4gU2lnbmVkLW9mZi1ieTog
-WmFpbiBXYW5nIDx6YWluLndhbmdAcm9jay1jaGlwcy5jb20+Cj4+IC0tLQo+PiAgZHJpdmVycy9j
-cnlwdG8vTWFrZWZpbGUgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDEgKwo+PiAgZHJp
-dmVycy9jcnlwdG8vcmtfY3J5cHRvL01ha2VmaWxlICAgICAgICAgICAgICAgICAgfCAgIDMgKwo+
-PiAgZHJpdmVycy9jcnlwdG8vcmtfY3J5cHRvL3JrMzI4OF9jcnlwdG8uYyAgICAgICAgICAgfCAz
-OTMgKysrKysrKysrKysrKysrKwo+PiAgZHJpdmVycy9jcnlwdG8vcmtfY3J5cHRvL3JrMzI4OF9j
-cnlwdG8uaCAgICAgICAgICAgfCAyOTEgKysrKysrKysrKysrCj4+ICAuLi4vY3J5cHRvL3JrX2Ny
-eXB0by9yazMyODhfY3J5cHRvX2FibGtjaXBoZXIuYyAgICB8IDUwMiArKysrKysrKysrKysrKysr
-KysrKysKPj4gIDUgZmlsZXMgY2hhbmdlZCwgMTE5MCBpbnNlcnRpb25zKCspCj4+ICBjcmVhdGUg
-bW9kZSAxMDA2NDQgZHJpdmVycy9jcnlwdG8vcmtfY3J5cHRvL01ha2VmaWxlCj4+ICBjcmVhdGUg
-bW9kZSAxMDA2NDQgZHJpdmVycy9jcnlwdG8vcmtfY3J5cHRvL3JrMzI4OF9jcnlwdG8uYwo+PiAg
-Y3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvY3J5cHRvL3JrX2NyeXB0by9yazMyODhfY3J5cHRv
-LmgKPj4gIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL2NyeXB0by9ya19jcnlwdG8vcmszMjg4
-X2NyeXB0b19hYmxrY2lwaGVyLmMKPj4KPj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5cHRvL01h
-a2VmaWxlIGIvZHJpdmVycy9jcnlwdG8vTWFrZWZpbGUKPj4gaW5kZXggYzNjZWQ2Zi4uMDBkMTAz
-YyAxMDA2NDQKPj4gLS0tIGEvZHJpdmVycy9jcnlwdG8vTWFrZWZpbGUKPj4gKysrIGIvZHJpdmVy
-cy9jcnlwdG8vTWFrZWZpbGUKPj4gQEAgLTI5LDMgKzI5LDQgQEAgb2JqLSQoQ09ORklHX0NSWVBU
-T19ERVZfUUFUKSArPSBxYXQvCj4+ICBvYmotJChDT05GSUdfQ1JZUFRPX0RFVl9RQ0UpICs9IHFj
-ZS8KPj4gIG9iai0kKENPTkZJR19DUllQVE9fREVWX1ZNWCkgKz0gdm14Lwo+PiAgb2JqLSQoQ09O
-RklHX0NSWVBUT19ERVZfU1VONElfU1MpICs9IHN1bnhpLXNzLwo+PiArb2JqLSQoQ09ORklHX0NS
-WVBUT19ERVZfUkszMjg4KSArPSBya19jcnlwdG8vCj4gYXMgTWFyayBzYWlkIGluIHRoZSBvdGhl
-ciBtYWlsLCB0aGVyZSBtYXkgdmVyeSB3ZWxsIGZvbGxvdyBvdGhlciBSb2NrY2hpcAo+IGNyeXB0
-by1yZWxhdGVkIGRyaXZlcnMsIHNvIG1heWJlIGl0IG1pZ2h0IGJlIGJldHRlciB0byBuYW1lIHRo
-ZSBjb3JlCj4gb3B0aW9uIENPTkZJR19DUllQVE9fREVWX1JPQ0tDSElQLiBBbmQgdGhlbiBtYXli
-ZSBkZWZpbmUKPiBDT05GSUdfQ1JZUFRPX0RFVl9SSzMyODggaW4gYSBLY29uZmlnIGluIHRoZSBz
-dWJkaXJlY3RvcnkgKGxpa2Ugdm14IGRvZXMpLgpvayEgZG9uZSEKPgo+Cj4+IGRpZmYgLS1naXQg
-YS9kcml2ZXJzL2NyeXB0by9ya19jcnlwdG8vTWFrZWZpbGUgYi9kcml2ZXJzL2NyeXB0by9ya19j
-cnlwdG8vTWFrZWZpbGUKPj4gbmV3IGZpbGUgbW9kZSAxMDA2NDQKPj4gaW5kZXggMDAwMDAwMC4u
-MGY2MmQ4Nwo+PiAtLS0gL2Rldi9udWxsCj4+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL3JrX2NyeXB0
-by9NYWtlZmlsZQo+IGdlbmVyYWxseSwgYSBsb3Qgb2YgdGhvc2Ugc3ViZGlyZWN0b3JpZXMgcmVm
-ZXJlbmNlIG9ubHkgdGhlIG1hbnVmYWN0dXJlcgo+IG5hbWUsIHNvIG15IHN1Z2dlc3Rpb24gd291
-bGQgYmUgdG8gbmFtZSB5b3VycyBqdXN0ICJyb2NrY2hpcCIgaW5zdGVhZCBvZgo+ICJya19jcnlw
-dG8iLCB0byBhbHNvIGVhc2UgcmVhZGFiaWxpdHkuCm9rISBkb25lIQo+Cj4KPj4gQEAgLTAsMCAr
-MSwzIEBACj4+ICtvYmotJChDT05GSUdfQ1JZUFRPX0RFVl9SSzMyODgpICs9IHJrX2NyeXB0b19k
-cml2ZXIubwo+PiArcmtfY3J5cHRvX2RyaXZlci1vYmpzIDo9IHJrMzI4OF9jcnlwdG8ubyBcCj4+
-ICsJCQkgcmszMjg4X2NyeXB0b19hYmxrY2lwaGVyLm8gXAo+IHRoYXQgbG9va3MgbG9va3Mgd3Jv
-bmcuCj4KPiAoMSkgdGhlIGNvbmZpZyBvcHRpb24gZG9lcyBub3QgZ2V0IGRlZmluZWQgaW4gYW55
-IEtjb25maWcgZmlsZSBpbiB5b3VyIHNldAppIGFtIHNvcnJ5IGFib3V0IGl0LCBpIHdpbGwgY29t
-bWl0IGl0IG5leHQgdmVyc2lvbi4KPiAoMikgbmFtaW5nIHRoZSBkcml2ZXIgZ2VuZXJpY2FsbHkg
-d2hpbGUgeW91IGNvbXBpbGUgYSB2YXJpYW50IHdpbGwgaGluZGVyCj4gICAgIG11bHRpcGxhdGZv
-cm0ga2VybmVscywgYmVjYXVzZSB5b3UgbWlnaHQgd2FudCB0byBidWlsZCBib3RoIHRoZSByazMy
-ODgKPiAgICAgY29kZSBhbmQgc29tZSBhZGRpdGlvbmFsIHN0dWZmPwppIHdhbnQgdG8gY29tbWl0
-IGhhc2ggYmFzZSBvbiB0aGlzIHBhdGNoIGxhdGVyLgo+ICgzKSB0aGUgX2RyaXZlciBzdWZmaXgg
-aXMgdW5uZWNlc3NhcnkKb2shIGRvbmUuCj4KPiBTbyBJIGd1ZXNzIGp1c3QgbmFtZSBpdCByazMy
-ODhfY3J5cHRvLm8gPwo+Cj4gWy4uLl0KPgo+IFdoaWxlIEkgaGF2ZSByZWFkIHRocm91Z2ggdGhl
-IGNvZGUgaW1wbGVtZW50aW5nIHRoZSBkZXZpY2UsIEkgaGF2ZW4ndAo+IHNlZW4gYW55dGhpbmcg
-c3ByaW5nIG91dCBidXQgZG8gbm90IGtub3cgZW5vdWdoIGFib3V0IHRoZSBjcnlwdG8gc3Vic3lz
-dGVtCj4gaXRzZWxmLiBCdXQgaXQgbG9va3MgbGlrZSB5b3UgZ290IHNvbWUgZmVlZGJhY2sgYWxy
-ZWFkeSBhbnl3YXkgZnJvbSBvdGhlcnMgOi0pCnRoYW5rcyBmb3IgeW91ciBjb21tZW50cy4KPgo+
-IFRoYW5rcwo+IEhlaWtvCj4KPgo+ClRoYW5rcwpaYWluCgoKX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX18KTGludXgtcm9ja2NoaXAgbWFpbGluZyBsaXN0Ckxp
-bnV4LXJvY2tjaGlwQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVhZC5v
-cmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1yb2NrY2hpcAo=
+Add DT bindings documentation for the rk3288 crypto drivers.
+
+Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
+---
+ .../devicetree/bindings/crypto/rockchip-crypto.txt | 29 ++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+
+diff --git a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+new file mode 100644
+index 0000000..d27e203
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+@@ -0,0 +1,29 @@
++Rockchip Electronics And Security Accelerator
++
++Required properties:
++- compatible: Should be "rockchip,rk3288-crypto"
++- reg: base physical address of the engine and length of memory mapped
++       region
++- interrupts: interrupt number
++- clocks: reference to the clocks about crypto
++- clock-names: "aclk" used to clock data
++	       "hclk" used to clock data
++	       "srst" used to clock crypto accelerator
++	       "apb_pclk" used to clock dma
++
++Examples:
++
++	crypto: cypto-controller@ff8a0000 {
++		compatible = "rockchip,rk3288-crypto";
++		reg = <0xff8a0000 0x4000>;
++		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&cru ACLK_CRYPTO>,
++			 <&cru HCLK_CRYPTO>,
++			 <&cru SCLK_CRYPTO>,
++			 <&cru ACLK_DMAC1>;
++		clock-names = "aclk",
++			      "hclk",
++			      "sclk",
++			      "apb_pclk";
++		status = "okay";
++	};
+-- 
+1.9.1
