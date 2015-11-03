@@ -1,69 +1,66 @@
-From: Dan Streetman <ddstreet@ieee.org>
-Subject: Re: [PATCH] nx-842: Endian swap ->count before handing over to the
- nx-842 compressor
-Date: Mon, 2 Nov 2015 15:24:03 -0500
-Message-ID: <CALZtONDeyNPJL=TDwwzLnLWaayxu+yqPcKuKy0WVOrLAWs06tw@mail.gmail.com>
-References: <20151030224536.GB22549@ram.oc3035372033.ibm.com>
- <CALZtONDNpw=bpmrykQomZiFZZs+CaGxyPZRL5_aWg=vTSyTrJw@mail.gmail.com> <20151031183930.GB22547@ram.oc3035372033.ibm.com>
+From: Zain <zain.wang@rock-chips.com>
+Subject: Re: [RESEND PATCH 4/4] crypto: rk_crypto - add DT bindings
+ documentation
+Date: Tue, 3 Nov 2015 08:29:42 +0800
+Message-ID: <5637FFF6.20202@rock-chips.com>
+References: <1446193369-4453-1-git-send-email-zain.wang@rock-chips.com>
+ <1446193369-4453-5-git-send-email-zain.wang@rock-chips.com>
+ <20151030140334.GB31073@leverpostej> <56372942.2080900@rock-chips.com>
+ <CAL_JsqLj6m2Df+LW4F++hEgxYkyqPDbeMVv8QrF7-eVCZJfj6w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Haren Myneni <hbabu@us.ibm.com>
-To: Ram Pai <linuxram@us.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Mark Rutland <mark.rutland@arm.com>, zhengsq@rock-chips.com,
+	hl@rock-chips.com, Herbert Xu <herbert@gondor.apana.org.au>,
+	David Miller <davem@davemloft.net>,
+	Michael Turquette <mturquette@baylibre.com>,
+	=?UTF-8?Q?Heiko_St=c3=bcbner?= <heiko@sntech.de>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>,
+	Russell King - ARM Linux <linux@arm.linux.org.uk>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	"open list:ARM/Rockchip SoC..." <linux-rockchip@lists.infradead.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	eddie.cai@rock-chips.com
+To: Rob Herring <robh+dt@kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f181.google.com ([209.85.223.181]:35243 "EHLO
-	mail-io0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752846AbbKBUYn (ORCPT
+Received: from regular1.263xmail.com ([211.150.99.134]:41475 "EHLO
+	regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752614AbbKCA3u (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Nov 2015 15:24:43 -0500
-Received: by iofz202 with SMTP id z202so155918540iof.2
-        for <linux-crypto@vger.kernel.org>; Mon, 02 Nov 2015 12:24:42 -0800 (PST)
-In-Reply-To: <20151031183930.GB22547@ram.oc3035372033.ibm.com>
+	Mon, 2 Nov 2015 19:29:50 -0500
+In-Reply-To: <CAL_JsqLj6m2Df+LW4F++hEgxYkyqPDbeMVv8QrF7-eVCZJfj6w@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Oct 31, 2015 at 2:39 PM, Ram Pai <linuxram@us.ibm.com> wrote:
-> On Sat, Oct 31, 2015 at 08:38:17AM -0400, Dan Streetman wrote:
->> On Fri, Oct 30, 2015 at 6:45 PM, Ram Pai <linuxram@us.ibm.com> wrote:
->> > The nx-842 compressor overshoots the output buffer corrupting memory. Verified
->> > that the following patch fixes the issue on a little-endian system.
->> >
->> > Signed-off-by: Ram Pai <linuxram@us.ibm.com>
->> > ---
->> >  drivers/crypto/nx/nx-842-powernv.c |    2 +-
->> >  1 files changed, 1 insertions(+), 1 deletions(-)
->> >
->> > diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
->> > index 3750e13..3b80ea7 100644
->> > --- a/drivers/crypto/nx/nx-842-powernv.c
->> > +++ b/drivers/crypto/nx/nx-842-powernv.c
->> > @@ -66,7 +66,7 @@ static void setup_indirect_dde(struct data_descriptor_entry *dde,
->> >                                unsigned int dde_count, unsigned int byte_count)
->> >  {
->> >         dde->flags = 0;
->> > -       dde->count = dde_count;
->> > +       dde->count = cpu_to_be32(dde_count);
+Hi Mark,
+
+On 2015=E5=B9=B411=E6=9C=8802=E6=97=A5 23:39, Rob Herring wrote:
+> On Mon, Nov 2, 2015 at 3:13 AM, Zain <zain.wang@rock-chips.com> wrote=
+:
+>> Hi Mark
 >>
->> ->count is u8, I don't think this is correct...you could change
->> dde_count to a u8, but I'm skeptical that's required at all, are you
->> sure this is your problem?  The dde->length should restrict the coproc
->> from r/w past the output buffer anyway, even if the ->count is too
->> large...
+>> On 2015=E5=B9=B410=E6=9C=8830=E6=97=A5 22:03, Mark Rutland wrote:
+>>> On Fri, Oct 30, 2015 at 04:22:49PM +0800, Zain Wang wrote:
+>>>> Add DT bindings documentation for the rk3288 crypto drivers.
+>>>>
+>>>> Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
+>>>> ---
+>>>> +Required properties:
+>>>> +- compatible: should be "rockchip,crypto"
+>>> Choose a more specific name. Rockchip could easily come up with ano=
+ther
+>>> crypto accelerator later.
+>> ok! done.
+>> rk3288_crypto may be better than crypto.
+> Yes, but use '-' not '_'.
+ok! done!
 >
-> Dan, you are right. The problem does resurface even after the above change.
-> There is something else going on. Please ignore this patch for now.
+> Rob
 >
-> I see corruption, when the output buffer is smaller than needed to hold
-> the compressed data. I expect it to return -ENOSPC, but its not; instead
-> overshoots and corrupts.
-
-what are the in/out buffer sizes and alignment when it overruns the
-output buffer?  and is it for compression or decompression?  does it
-happen if you disable CRC (since Haren just enabled it recently)?
-
-
 >
-> RP
 >
+Thanks
+Zain
