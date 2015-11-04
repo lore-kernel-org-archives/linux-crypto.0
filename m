@@ -1,12 +1,12 @@
 From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH 4/7] crypto: qce: check return value of sg_nents_for_len
-Date: Wed,  4 Nov 2015 21:13:36 +0100
-Message-ID: <1446668045-8620-4-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH 7/7] crypto: amcc: check return value of sg_nents_for_len
+Date: Wed,  4 Nov 2015 21:13:39 +0100
+Message-ID: <1446668045-8620-7-git-send-email-clabbe.montjoie@gmail.com>
 References: <1446668045-8620-1-git-send-email-clabbe.montjoie@gmail.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: axboe@fb.com, clabbe.montjoie@gmail.com,
-	cristian.stoica@freescale.com, dan.j.williams@intel.com,
-	davem@davemloft.net, herbert@gondor.apana.org.au
+To: clabbe.montjoie@gmail.com, davem@davemloft.net,
+	dmitry.torokhov@gmail.com, fabio.estevam@freescale.com,
+	herbert@gondor.apana.org.au
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1446668045-8620-1-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
@@ -17,44 +17,23 @@ its return value.
 
 Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/qce/ablkcipher.c | 8 ++++++++
- drivers/crypto/qce/sha.c        | 5 +++++
- 2 files changed, 13 insertions(+)
+ drivers/crypto/amcc/crypto4xx_core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/crypto/qce/ablkcipher.c b/drivers/crypto/qce/ablkcipher.c
-index 2c0d63d..dbcbbe2 100644
---- a/drivers/crypto/qce/ablkcipher.c
-+++ b/drivers/crypto/qce/ablkcipher.c
-@@ -83,6 +83,14 @@ qce_ablkcipher_async_req_handle(struct crypto_async_request *async_req)
- 		rctx->dst_nents = sg_nents_for_len(req->dst, req->nbytes);
- 	else
- 		rctx->dst_nents = rctx->src_nents;
-+	if (rctx->src_nents < 0) {
-+		dev_err(qce->dev, "Invalid numbers of src SG.\n");
-+		return rctx->src_nents;
-+	}
-+	if (rctx->dst_nents < 0) {
-+		dev_err(qce->dev, "Invalid numbers of dst SG.\n");
-+		return -rctx->dst_nents;
-+	}
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index 27288fc..e6f7757 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -781,6 +781,10 @@ u32 crypto4xx_build_pd(struct crypto_async_request *req,
  
- 	rctx->dst_nents += 1;
- 
-diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-index 0c9973e..47e114a 100644
---- a/drivers/crypto/qce/sha.c
-+++ b/drivers/crypto/qce/sha.c
-@@ -92,6 +92,11 @@ static int qce_ahash_async_req_handle(struct crypto_async_request *async_req)
- 	}
- 
- 	rctx->src_nents = sg_nents_for_len(req->src, req->nbytes);
-+	if (rctx->src_nents < 0) {
-+		dev_err(qce->dev, "Invalid numbers of src SG.\n");
-+		return rctx->src_nents;
+ 	/* figure how many gd is needed */
+ 	num_gd = sg_nents_for_len(src, datalen);
++	if ((int)num_gd < 0) {
++		dev_err(dev->core_dev->device, "Invalid number of src SG.\n");
++		return -EINVAL;
 +	}
-+
- 	ret = dma_map_sg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE);
- 	if (ret < 0)
- 		return ret;
+ 	if (num_gd == 1)
+ 		num_gd = 0;
+ 
 -- 
 2.4.10
