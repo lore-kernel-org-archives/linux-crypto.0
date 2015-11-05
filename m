@@ -1,122 +1,60 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH 2/7] crypto: talitos: check return value of sg_nents_for_len
-Date: Wed,  4 Nov 2015 21:13:34 +0100
-Message-ID: <1446668045-8620-2-git-send-email-clabbe.montjoie@gmail.com>
-References: <1446668045-8620-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: LABBE Corentin <clabbe.montjoie@gmail.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: davem@davemloft.net, herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1446668045-8620-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Harsh Jain <harshjain.prof@gmail.com>
+Subject: Re: [PATCH v2] crypto: algif_hash - Only export and import on sockets
+ with data
+Date: Thu, 5 Nov 2015 13:12:04 +0530
+Message-ID: <CAFXBA==77BA3aF6UzjK+s6P+Aw7HRy7-xELn6oiyOFgWjdAKvw@mail.gmail.com>
+References: <CAFXBA=mVmRsAk3fuyjf3WA-P+0dHKu0upUdb5Qxr0kwn1rKiDw@mail.gmail.com>
+	<2587504.xtsMOV5mei@myon.chronox.de>
+	<20151101091119.GA3035@gondor.apana.org.au>
+	<1470343.4RyZqhtxup@myon.chronox.de>
+	<20151102031204.GA7372@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-lf0-f51.google.com ([209.85.215.51]:35273 "EHLO
+	mail-lf0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1161148AbbKEHmG (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Nov 2015 02:42:06 -0500
+Received: by lfbn126 with SMTP id n126so53847829lfb.2
+        for <linux-crypto@vger.kernel.org>; Wed, 04 Nov 2015 23:42:04 -0800 (PST)
+In-Reply-To: <20151102031204.GA7372@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The sg_nents_for_len() function could fail, this patch add a check for
-its return value.
+Hi herbert,
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
----
- drivers/crypto/talitos.c | 41 ++++++++++++++++++++++++++++++++++-------
- 1 file changed, 34 insertions(+), 7 deletions(-)
+Which kernel versions will have this patch?
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 46f531e..898ab6c 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -1216,6 +1216,7 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 	struct talitos_private *priv = dev_get_drvdata(dev);
- 	bool is_sec1 = has_ftr_sec1(priv);
- 	int max_len = is_sec1 ? TALITOS1_MAX_DATA_LEN : TALITOS2_MAX_DATA_LEN;
-+	void *err;
- 
- 	if (cryptlen + authsize > max_len) {
- 		dev_err(dev, "length exceeds h/w max limit\n");
-@@ -1228,14 +1229,29 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 	if (!dst || dst == src) {
- 		src_nents = sg_nents_for_len(src,
- 					     assoclen + cryptlen + authsize);
-+		if (src_nents < 0) {
-+			dev_err(dev, "Invalid number of src SG.\n");
-+			err = ERR_PTR(-EINVAL);
-+			goto error_sg;
-+		}
- 		src_nents = (src_nents == 1) ? 0 : src_nents;
- 		dst_nents = dst ? src_nents : 0;
- 	} else { /* dst && dst != src*/
- 		src_nents = sg_nents_for_len(src, assoclen + cryptlen +
- 						 (encrypt ? 0 : authsize));
-+		if (src_nents < 0) {
-+			dev_err(dev, "Invalid number of src SG.\n");
-+			err = ERR_PTR(-EINVAL);
-+			goto error_sg;
-+		}
- 		src_nents = (src_nents == 1) ? 0 : src_nents;
- 		dst_nents = sg_nents_for_len(dst, assoclen + cryptlen +
- 						 (encrypt ? authsize : 0));
-+		if (dst_nents < 0) {
-+			dev_err(dev, "Invalid number of dst SG.\n");
-+			err = ERR_PTR(-EINVAL);
-+			goto error_sg;
-+		}
- 		dst_nents = (dst_nents == 1) ? 0 : dst_nents;
- 	}
- 
-@@ -1260,11 +1276,9 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 
- 	edesc = kmalloc(alloc_len, GFP_DMA | flags);
- 	if (!edesc) {
--		if (iv_dma)
--			dma_unmap_single(dev, iv_dma, ivsize, DMA_TO_DEVICE);
--
- 		dev_err(dev, "could not allocate edescriptor\n");
--		return ERR_PTR(-ENOMEM);
-+		err = ERR_PTR(-ENOMEM);
-+		goto error_sg;
- 	}
- 
- 	edesc->src_nents = src_nents;
-@@ -1277,6 +1291,10 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 						     DMA_BIDIRECTIONAL);
- 
- 	return edesc;
-+error_sg:
-+	if (iv_dma)
-+		dma_unmap_single(dev, iv_dma, ivsize, DMA_TO_DEVICE);
-+	return err;
- }
- 
- static struct talitos_edesc *aead_edesc_alloc(struct aead_request *areq, u8 *iv,
-@@ -1830,11 +1848,16 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
- 	unsigned int nbytes_to_hash;
- 	unsigned int to_hash_later;
- 	unsigned int nsg;
-+	int nents;
- 
- 	if (!req_ctx->last && (nbytes + req_ctx->nbuf <= blocksize)) {
- 		/* Buffer up to one whole block */
--		sg_copy_to_buffer(areq->src,
--				  sg_nents_for_len(areq->src, nbytes),
-+		nents = sg_nents_for_len(areq->src, nbytes);
-+		if (nents < 0) {
-+			dev_err(ctx->dev, "Invalid number of src SG.\n");
-+			return nents;
-+		}
-+		sg_copy_to_buffer(areq->src, nents,
- 				  req_ctx->buf + req_ctx->nbuf, nbytes);
- 		req_ctx->nbuf += nbytes;
- 		return 0;
-@@ -1867,7 +1890,11 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
- 		req_ctx->psrc = areq->src;
- 
- 	if (to_hash_later) {
--		int nents = sg_nents_for_len(areq->src, nbytes);
-+		nents = sg_nents_for_len(areq->src, nbytes);
-+		if (nents < 0) {
-+			dev_err(ctx->dev, "Invalid number of src SG.\n");
-+			return nents;
-+		}
- 		sg_pcopy_to_buffer(areq->src, nents,
- 				      req_ctx->bufnext,
- 				      to_hash_later,
--- 
-2.4.10
+Regards
+Harsh Jain
+
+On Mon, Nov 2, 2015 at 8:42 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Sun, Nov 01, 2015 at 12:07:12PM +0100, Stephan Mueller wrote:
+>> Am Sonntag, 1. November 2015, 17:11:19 schrieb Herbert Xu:
+>>
+>> Hi Herbert,
+>>
+>> > On Sat, Oct 31, 2015 at 12:45:47AM +0100, Stephan Mueller wrote:
+>> > > Testing complete: patch solves the oops and allows to successfully perform
+>> > > HMAC even when having subsequent accepts and operating on those subsequent
+>> > > accepts.
+>> >
+>> > Thanks Stephan!
+>> >
+>> > Unfortunately my patch is incomplete as some other thread could
+>> > change ctx->more while we're in the middle of the accept call.
+>> >
+>> > So here is an updated version.
+>>
+>> Shouldn't that patch to into stable (and hopefully into 4.3) as well?
+>
+> Yes it is going into stable.
+>
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
