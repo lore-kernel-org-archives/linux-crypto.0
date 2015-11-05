@@ -1,38 +1,53 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: algif_hash - Only export and import on
- sockets with data
-Date: Thu, 5 Nov 2015 20:19:21 +0800
-Message-ID: <20151105121921.GB5776@gondor.apana.org.au>
-References: <CAFXBA=mVmRsAk3fuyjf3WA-P+0dHKu0upUdb5Qxr0kwn1rKiDw@mail.gmail.com>
- <2587504.xtsMOV5mei@myon.chronox.de>
- <20151101091119.GA3035@gondor.apana.org.au>
- <1470343.4RyZqhtxup@myon.chronox.de>
- <20151102031204.GA7372@gondor.apana.org.au>
- <CAFXBA==77BA3aF6UzjK+s6P+Aw7HRy7-xELn6oiyOFgWjdAKvw@mail.gmail.com>
+From: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Subject: Re: [PATCH] crypto: sun4i-ss: add missing statesize
+Date: Thu, 5 Nov 2015 08:07:19 -0800
+Message-ID: <20151105160719.GG6114@lukather>
+References: <1446709737-11316-1-git-send-email-clabbe.montjoie@gmail.com>
+Reply-To: maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org
-To: Harsh Jain <harshjain.prof@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55764 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1030515AbbKEMT1 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Nov 2015 07:19:27 -0500
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="oIK88BWnNPSddvdK"
+Cc: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, wens-jdAy2FN1RRM@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
+	stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-sunxi+bncBD2ZNBF5VYJRBO755WYQKGQEZF7J5MQ-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <CAFXBA==77BA3aF6UzjK+s6P+Aw7HRy7-xELn6oiyOFgWjdAKvw@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1446709737-11316-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 05, 2015 at 01:12:04PM +0530, Harsh Jain wrote:
-> Hi herbert,
+--oIK88BWnNPSddvdK
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+
+Hi,
+
+On Thu, Nov 05, 2015 at 08:48:57AM +0100, LABBE Corentin wrote:
+> sun4i-ss implementaton of md5/sha1 is via ahash algorithms.
+> A recent change make impossible to load them without giving statesize.
+
+Which one?
+
+> This patch specifiy statesize for sha1 and md5.
 > 
-> Which kernel versions will have this patch?
+> Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 
-It has to go into 4.4 first before it gets backported.
+Please also add a Fixes tag (and the stable version it applies to).
 
-Cheers,
+Thanks!
+Maxime
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Maxime Ripard, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
+--oIK88BWnNPSddvdK--
