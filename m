@@ -1,59 +1,304 @@
-From: Zain <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
-Subject: Re: [PATCH v2 3/4] ARM: dts: rockchip: Add Crypto drivers for rk3288
-Date: Fri, 6 Nov 2015 18:27:33 +0800
-Message-ID: <563C8095.30905@rock-chips.com>
-References: <1446772644-2352-1-git-send-email-zain.wang@rock-chips.com>
- <1446772644-2352-4-git-send-email-zain.wang@rock-chips.com>
- <4509145.eZ7GP0e6gb@phil>
+From: Heiko Stuebner <heiko@sntech.de>
+Subject: Re: [PATCH v1 1/4] Crypto: Crypto driver support aes/des/des3 for rk3288
+Date: Fri, 06 Nov 2015 11:38:13 +0100
+Message-ID: <42555092.2WGsqrpJvE@phil>
+References: <1446529928-12521-1-git-send-email-zain.wang@rock-chips.com> <1446529928-12521-2-git-send-email-zain.wang@rock-chips.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
- hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org, ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
- mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
- eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
- zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org
-To: Heiko Stuebner <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>
-Return-path: <linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-In-Reply-To: <4509145.eZ7GP0e6gb@phil>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-rockchip>,
- <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-rockchip/>
-List-Post: <mailto:linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Help: <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-rockchip>,
- <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
-Sender: "Linux-rockchip" <linux-rockchip-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-Errors-To: linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: zhengsq@rock-chips.com, hl@rock-chips.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	mturquette@baylibre.com, pawel.moll@arm.com,
+	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
+	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+	eddie.cai@rock-chips.com
+To: Zain Wang <zain.wang@rock-chips.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from gloria.sntech.de ([95.129.55.99]:47567 "EHLO gloria.sntech.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1033156AbbKFKif (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 6 Nov 2015 05:38:35 -0500
+In-Reply-To: <1446529928-12521-2-git-send-email-zain.wang@rock-chips.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-CgpPbiAyMDE15bm0MTHmnIgwNuaXpSAxODoxMiwgSGVpa28gU3R1ZWJuZXIgd3JvdGU6Cj4gQW0g
-RnJlaXRhZywgNi4gTm92ZW1iZXIgMjAxNSwgMDk6MTc6MjMgc2NocmllYiBaYWluIFdhbmc6Cj4+
-IEFkZCBDcnlwdG8gZHJpdmVycyBmb3IgcmszMjg4IGluY2x1ZGluZyBjcnlwdG8gY29udHJvbGxl
-ciBhbmQgZG1hIGNsay4KPj4KPj4gU2lnbmVkLW9mZi1ieTogWmFpbiBXYW5nIDx6YWluLndhbmdA
-cm9jay1jaGlwcy5jb20+Cj4+IC0tLQo+Pgo+PiBDaGFuZ2VkIGluIHYyOgo+PiAtIE5vbmUKPj4K
-Pj4gQ2hhbmdlZCBpbiB2MToKPj4gLSByZW1vdmUgdGhlIF9jcnlwdG8gc3VmZml4Cj4+IC0gdXNl
-ICJyb2NrY2hpcCxyazMyODgtY3J5cHRvIiBpbnN0ZWFkIG9mICJyb2NrY2hpcCxyazMyODgiCj4+
-Cj4+ICBhcmNoL2FybS9ib290L2R0cy9yazMyODguZHRzaSB8IDE1ICsrKysrKysrKysrKysrKwo+
-PiAgMSBmaWxlIGNoYW5nZWQsIDE1IGluc2VydGlvbnMoKykKPj4KPj4gZGlmZiAtLWdpdCBhL2Fy
-Y2gvYXJtL2Jvb3QvZHRzL3JrMzI4OC5kdHNpIGIvYXJjaC9hcm0vYm9vdC9kdHMvcmszMjg4LmR0
-c2kKPj4gaW5kZXggNmE3OWM5Yy4uN2I3OTE0ZSAxMDA2NDQKPj4gLS0tIGEvYXJjaC9hcm0vYm9v
-dC9kdHMvcmszMjg4LmR0c2kKPj4gKysrIGIvYXJjaC9hcm0vYm9vdC9kdHMvcmszMjg4LmR0c2kK
-Pj4gQEAgLTE3MCw2ICsxNzAsMjEgQEAKPj4gIAkJfTsKPj4gIAl9Owo+PiAgCj4+ICsJY3J5cHRv
-OiBjeXB0by1jb250cm9sbGVyQGZmOGEwMDAwIHsKPj4gKwkJY29tcGF0aWJsZSA9ICJyb2NrY2hp
-cCxyazMyODgtY3J5cHRvIjsKPj4gKwkJcmVnID0gPDB4ZmY4YTAwMDAgMHg0MDAwPjsKPj4gKwkJ
-aW50ZXJydXB0cyA9IDxHSUNfU1BJIDQ4IElSUV9UWVBFX0xFVkVMX0hJR0g+Owo+PiArCQljbG9j
-a3MgPSA8JmNydSBBQ0xLX0NSWVBUTz4sCj4+ICsJCQkgPCZjcnUgSENMS19DUllQVE8+LAo+PiAr
-CQkJIDwmY3J1IFNDTEtfQ1JZUFRPPiwKPj4gKwkJCSA8JmNydSBBQ0xLX0RNQUMxPjsKPj4gKwkJ
-Y2xvY2stbmFtZXMgPSAiYWNsayIsCj4+ICsJCQkgICAgICAiaGNsayIsCj4+ICsJCQkgICAgICAi
-c2NsayIsCj4+ICsJCQkgICAgICAiYXBiX3BjbGsiOwo+PiArCQlzdGF0dXMgPSAib2theSI7Cj4+
-ICsJfTsKPj4gKwo+IHBsZWFzZSBtb3ZlIHRoYXQgd2hvbGUgbm9kZSB0byB0aGUgcmlnaHQgbG9j
-YXRpb24uIEVudHJpZXMgYXJlIHNvcnRlZCBieSAKPiByZWdpc3RlciBhZGRyZXNzICh0aGUgZmY4
-YTAwMDAgc2hvdWxkIHRoZW4gb2YgY291cnNlIGJlIGJlbG93ICBpMnNAZmY4OTAwMDAgCj4gYW5k
-IGFib3ZlIHZvcEBmZjkzMDAwMCkKb2shIGRvbmUhCj4KPgo+PiAgCXJlc2VydmVkLW1lbW9yeSB7
-Cj4+ICAJCSNhZGRyZXNzLWNlbGxzID0gPDE+Owo+PiAgCQkjc2l6ZS1jZWxscyA9IDwxPjsKPj4K
-Pgo+Cj4KCgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
-TGludXgtcm9ja2NoaXAgbWFpbGluZyBsaXN0CkxpbnV4LXJvY2tjaGlwQGxpc3RzLmluZnJhZGVh
-ZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1y
-b2NrY2hpcAo=
+Hi Zain,
+
+Am Dienstag, 3. November 2015, 13:52:05 schrieb Zain Wang:
+> Crypto driver support cbc/ecb two chainmode, and aes/des/des3 three cipher
+> mode.
+> The names registered are:
+>     ecb(aes) cbc(aes) ecb(des) cbc(des) ecb(des3_ede) cbc(des3_ede)
+> You can alloc tags above in your case.
+> 
+> And other algorithms and platforms will be added later on.
+> 
+> Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
+> ---
+>  drivers/crypto/Kconfig                             |  11 +
+>  drivers/crypto/Makefile                            |   1 +
+>  drivers/crypto/rockchip/Makefile                   |   3 +
+>  drivers/crypto/rockchip/rk3288_crypto.c            | 383 ++++++++++++++++
+>  drivers/crypto/rockchip/rk3288_crypto.h            | 290 ++++++++++++
+>  drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c | 501 +++++++++++++++++++++
+>  6 files changed, 1189 insertions(+)
+>  create mode 100644 drivers/crypto/rockchip/Makefile
+>  create mode 100644 drivers/crypto/rockchip/rk3288_crypto.c
+>  create mode 100644 drivers/crypto/rockchip/rk3288_crypto.h
+>  create mode 100644 drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
+> 
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 2569e04..d1e42cf 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -498,4 +498,15 @@ config CRYPTO_DEV_SUN4I_SS
+>  	  To compile this driver as a module, choose M here: the module
+>  	  will be called sun4i-ss.
+>  
+> +config CRYPTO_DEV_ROCKCHIP
+> +	tristate "Rockchip's Cryptographic Engine driver"
+> +
+> +	select CRYPTO_AES
+> +	select CRYPTO_DES
+> +	select CRYPTO_BLKCIPHER
+> +
+> +	help
+> +	  This driver interfaces with the hardware crypto accelerator.
+> +	  Supporting cbc/ecb chainmode, and aes/des/des3_ede cipher mode.
+> +
+>  endif # CRYPTO_HW
+> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+> index c3ced6f..713de9d 100644
+> --- a/drivers/crypto/Makefile
+> +++ b/drivers/crypto/Makefile
+> @@ -29,3 +29,4 @@ obj-$(CONFIG_CRYPTO_DEV_QAT) += qat/
+>  obj-$(CONFIG_CRYPTO_DEV_QCE) += qce/
+>  obj-$(CONFIG_CRYPTO_DEV_VMX) += vmx/
+>  obj-$(CONFIG_CRYPTO_DEV_SUN4I_SS) += sunxi-ss/
+> +obj-$(CONFIG_CRYPTO_DEV_ROCKCHIP) += rockchip/
+> diff --git a/drivers/crypto/rockchip/Makefile b/drivers/crypto/rockchip/Makefile
+> new file mode 100644
+> index 0000000..7051c6c
+> --- /dev/null
+> +++ b/drivers/crypto/rockchip/Makefile
+> @@ -0,0 +1,3 @@
+> +obj-$(CONFIG_CRYPTO_DEV_ROCKCHIP) += rk_crypto.o
+> +rk_crypto-objs := rk3288_crypto.o \
+> +		  rk3288_crypto_ablkcipher.o \
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
+> new file mode 100644
+> index 0000000..02830f2
+> --- /dev/null
+> +++ b/drivers/crypto/rockchip/rk3288_crypto.c
+> @@ -0,0 +1,383 @@
+
+[...]
+
+
+> +static int rk_crypto_probe(struct platform_device *pdev)
+> +{
+> +	int err = 0;
+> +	struct resource *res;
+> +	struct device *dev = &pdev->dev;
+> +	struct crypto_info_t *crypto_info;
+> +
+
+rk3288 chromebooks use the crypto-engine to validate the boot images and
+seem to leave it in a half-on state. This results in an irq pending
+during probe and thus a null-pointer dereference in the irq-handler, as
+it runs before the crypto-device is fully initialized.
+
+resetting the crypto block, successfull fixed that issue, so I did the
+following change:
+
+-------------------
+diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288.dtsi
+index 121b6d5..e978fb2 100644
+--- a/arch/arm/boot/dts/rk3288.dtsi
++++ b/arch/arm/boot/dts/rk3288.dtsi
+@@ -182,6 +182,8 @@
+ 			      "hclk",
+ 			      "sclk",
+ 			      "apb_pclk";
++		resets = <&cru SRST_CRYPTO>;
++		reset-names = "crypto";
+ 		status = "okay";
+ 	};
+ 
+diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
+index 02830f2..2245d3d 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto.c
++++ b/drivers/crypto/rockchip/rk3288_crypto.c
+@@ -18,6 +18,7 @@
+ #include <linux/of.h>
+ #include <linux/clk.h>
+ #include <linux/crypto.h>
++#include <linux/reset.h>
+ 
+ struct crypto_info_t *crypto_p;
+ 
+@@ -266,6 +267,15 @@ static int rk_crypto_probe(struct platform_device *pdev)
+ 	struct resource *res;
+ 	struct device *dev = &pdev->dev;
+ 	struct crypto_info_t *crypto_info;
++	struct reset_control *rst;
++
++	/* reset the block to remove any pending actions */
++	rst = devm_reset_control_get(dev, "crypto");
++	if (!IS_ERR(rst)) {
++		reset_control_assert(rst);
++		usleep_range(10, 20);
++		reset_control_deassert(rst);
++	}
+ 
+ 	crypto_info = devm_kzalloc(&pdev->dev,
+ 			sizeof(*crypto_info), GFP_KERNEL);
+-------------------
+
+
+> +	crypto_info = devm_kzalloc(&pdev->dev,
+> +			sizeof(*crypto_info), GFP_KERNEL);
+> +	if (!crypto_info)
+> +		return -ENOMEM;
+> +
+> +	spin_lock_init(&crypto_info->lock);
+> +
+> +	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> +	crypto_info->reg = devm_ioremap_resource(&pdev->dev, res);
+> +	if (IS_ERR(crypto_info->reg)) {
+> +		err = PTR_ERR(crypto_info->reg);
+> +		goto err_ioremap;
+> +	}
+> +
+> +	crypto_info->aclk = devm_clk_get(&pdev->dev, "aclk");
+> +	if (IS_ERR(crypto_info->aclk)) {
+> +		err = PTR_ERR(crypto_info->aclk);
+> +		goto err_ioremap;
+> +	}
+> +
+> +	crypto_info->hclk = devm_clk_get(&pdev->dev, "hclk");
+> +	if (IS_ERR(crypto_info->hclk)) {
+> +		err = PTR_ERR(crypto_info->hclk);
+> +		goto err_ioremap;
+> +	}
+> +
+> +	crypto_info->sclk = devm_clk_get(&pdev->dev, "sclk");
+> +	if (IS_ERR(crypto_info->sclk)) {
+> +		err = PTR_ERR(crypto_info->sclk);
+> +		goto err_ioremap;
+> +	}
+> +
+> +	crypto_info->dmaclk = devm_clk_get(&pdev->dev, "apb_pclk");
+> +	if (IS_ERR(crypto_info->dmaclk)) {
+> +		err = PTR_ERR(crypto_info->dmaclk);
+> +		goto err_ioremap;
+> +	}
+> +
+> +	crypto_info->irq = platform_get_irq(pdev, 0);
+> +	if (crypto_info->irq < 0) {
+> +		dev_warn(crypto_info->dev,
+> +				"control Interrupt is not available.\n");
+> +		err = crypto_info->irq;
+> +		goto err_ioremap;
+> +	}
+> +
+> +	err = devm_request_irq(&pdev->dev, crypto_info->irq, crypto_irq_handle,
+> +				IRQF_SHARED, "rk-crypto", pdev);
+> +
+> +	if (err) {
+> +		dev_err(crypto_info->dev, "irq request failed.\n");
+> +		goto err_ioremap;
+> +	}
+> +
+> +	crypto_info->dev = &pdev->dev;
+> +	platform_set_drvdata(pdev, crypto_info);
+> +	crypto_p = crypto_info;
+> +
+> +	tasklet_init(&crypto_info->crypto_tasklet,
+> +			rk_crypto_tasklet_cb, (unsigned long)crypto_info);
+> +	crypto_init_queue(&crypto_info->queue, 50);
+> +
+> +	crypto_info->enable_clk = rk_crypto_enable_clk;
+> +	crypto_info->disable_clk = rk_crypto_disable_clk;
+> +	crypto_info->load_data = rk_load_data;
+> +	crypto_info->unload_data = rk_unload_data;
+> +
+> +	err = rk_crypto_register();
+> +	if (err) {
+> +		dev_err(dev, "err in register alg");
+> +		goto err_reg_alg;
+> +	}
+> +
+> +	return 0;
+> +
+> +err_reg_alg:
+> +	free_irq(crypto_info->irq, crypto_info);
+> +err_ioremap:
+> +	crypto_p = NULL;
+> +
+> +	return err;
+> +}
+> +
+
+[...]
+
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
+> new file mode 100644
+> index 0000000..153aafb
+> --- /dev/null
+> +++ b/drivers/crypto/rockchip/rk3288_crypto.h
+
+[...]
+
+> +
+> +#define CRYPTO_READ(dev, offset)		  \
+> +		__raw_readl(((dev)->reg + (offset)))
+> +#define CRYPTO_WRITE(dev, offset, val)	  \
+> +		__raw_writel((val), ((dev)->reg + (offset)))
+> +/* get register virt address */
+> +#define CRYPTO_GET_REG_VIRT(dev, offset)   ((dev)->reg + (offset))
+> +
+> +#define RK_ALIGN_MASK			(sizeof(u32)-1)
+> +
+> +struct crypto_info_t {
+
+this is highly rockchip specific, so should probably be named
+	rk_crypto_info
+or similar instead of a generic sounding crypto_info_t
+
+[...]
+
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c b/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
+> new file mode 100644
+> index 0000000..b3de229
+> --- /dev/null
+> +++ b/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
+> @@ -0,0 +1,501 @@
+
+[...]
+
+> +static int rk_ablk_cra_init(struct crypto_tfm *tfm)
+> +{
+> +	struct rk_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+> +
+> +	ctx->dev = crypto_p;
+
+as said above, please no static pointers for devices.
+
+For example, sunxi_ss does the following to transport the core device-data
+into the init function:
+
+	struct sun4i_tfm_ctx *op = crypto_tfm_ctx(tfm);
+	struct crypto_alg *alg = tfm->__crt_alg;
+	struct sun4i_ss_alg_template *algt;
+
+	algt = container_of(alg, struct sun4i_ss_alg_template, alg.crypto);
+	op->ss = algt->ss;
+
+so you could probably do something similar
+
+
+Thanks
+Heiko
