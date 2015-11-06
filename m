@@ -1,94 +1,78 @@
-From: Zain <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
-Subject: Re: [PATCH v2 0/4] Crypto: add crypto accelerator support for rk3288
-Date: Fri, 6 Nov 2015 17:53:32 +0800
-Message-ID: <563C789C.8020106@rock-chips.com>
+From: Heiko Stuebner <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>
+Subject: Re: [PATCH v2 3/4] ARM: dts: rockchip: Add Crypto drivers for rk3288
+Date: Fri, 06 Nov 2015 11:12:55 +0100
+Message-ID: <4509145.eZ7GP0e6gb@phil>
 References: <1446772644-2352-1-git-send-email-zain.wang@rock-chips.com>
- <563C0430.9000607@gmail.com>
+ <1446772644-2352-4-git-send-email-zain.wang@rock-chips.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Caesar Wang <caesar.upstream-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org,
-	hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org,
-	pawel.moll-5wv7dgnIgG8@public.gmane.org, ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
-	robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
-	mark.rutland-5wv7dgnIgG8@public.gmane.org
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <563C0430.9000607-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
+ hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org, ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
+ mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+ eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+ zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org
+To: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+Return-path: <linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+In-Reply-To: <1446772644-2352-4-git-send-email-zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-rockchip>,
+ <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-rockchip/>
+List-Post: <mailto:linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Help: <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-rockchip>,
+ <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
+Sender: "Linux-rockchip" <linux-rockchip-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Errors-To: linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
+Am Freitag, 6. November 2015, 09:17:23 schrieb Zain Wang:
+> Add Crypto drivers for rk3288 including crypto controller and dma clk.
+> 
+> Signed-off-by: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+> ---
+> 
+> Changed in v2:
+> - None
+> 
+> Changed in v1:
+> - remove the _crypto suffix
+> - use "rockchip,rk3288-crypto" instead of "rockchip,rk3288"
+> 
+>  arch/arm/boot/dts/rk3288.dtsi | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+> 
+> diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288.dtsi
+> index 6a79c9c..7b7914e 100644
+> --- a/arch/arm/boot/dts/rk3288.dtsi
+> +++ b/arch/arm/boot/dts/rk3288.dtsi
+> @@ -170,6 +170,21 @@
+>  		};
+>  	};
+>  
+> +	crypto: cypto-controller@ff8a0000 {
+> +		compatible = "rockchip,rk3288-crypto";
+> +		reg = <0xff8a0000 0x4000>;
+> +		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
+> +		clocks = <&cru ACLK_CRYPTO>,
+> +			 <&cru HCLK_CRYPTO>,
+> +			 <&cru SCLK_CRYPTO>,
+> +			 <&cru ACLK_DMAC1>;
+> +		clock-names = "aclk",
+> +			      "hclk",
+> +			      "sclk",
+> +			      "apb_pclk";
+> +		status = "okay";
+> +	};
+> +
+
+please move that whole node to the right location. Entries are sorted by 
+register address (the ff8a0000 should then of course be below  i2s@ff890000 
+and above vop@ff930000)
 
 
-On 2015=E5=B9=B411=E6=9C=8806=E6=97=A5 09:36, Caesar Wang wrote:
-> Hi
->
-> =E5=9C=A8 2015=E5=B9=B411=E6=9C=8806=E6=97=A5 09:17, Zain Wang =E5=86=
-=99=E9=81=93:
->> This commit support three cipher(AES/DES/DES3) and two
->> chainmode(ecb/cbc),
->> and the more algorithms and new hash drivers will be added later on.
->>
->> Changed in v2:
->> - remove some part about hash
->> - add weak key detection
->> - changed some variate's type
->>
->> Changed in v1:
->> - modify some variate's name
->> - modify some variate's type
->> - modify some return value
->> - remove or modify some print info
->> - use more dev_xxx in probe
->> - modify the prio of cipher
->> - add Kconfig
->>
->> Zain Wang (4):
->>    Crypto: Crypto driver support aes/des/des3 for rk3288
->>    clk: rockchip: set an id for crypto clk
->>    ARM: dts: rockchip: Add Crypto drivers for rk3288
->>    crypto: rockchip/crypto - add DT bindings documentation
-> I guess the series patchs order should be:
->
-> pacth 1/4 dt-binds/
-> patch 2/4 clk id
-> patch 3/4 crypto driver
-> patch 4/4 dts
->
-ok! done!
->
->
->>
->>   .../devicetree/bindings/crypto/rockchip-crypto.txt |  29 ++
->>   arch/arm/boot/dts/rk3288.dtsi                      |  15 +
->>   drivers/clk/rockchip/clk-rk3288.c                  |   2 +-
->>   drivers/crypto/Kconfig                             |  11 +
->>   drivers/crypto/Makefile                            |   1 +
->>   drivers/crypto/rockchip/Makefile                   |   3 +
->>   drivers/crypto/rockchip/rk3288_crypto.c            | 380
->> +++++++++++++++
->>   drivers/crypto/rockchip/rk3288_crypto.h            | 222 +++++++++
->>   drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c | 511
->> +++++++++++++++++++++
->>   include/dt-bindings/clock/rk3288-cru.h             |   1 +
->>   10 files changed, 1174 insertions(+), 1 deletion(-)
->>   create mode 100644
->> Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
->>   create mode 100644 drivers/crypto/rockchip/Makefile
->>   create mode 100644 drivers/crypto/rockchip/rk3288_crypto.c
->>   create mode 100644 drivers/crypto/rockchip/rk3288_crypto.h
->>   create mode 100644 drivers/crypto/rockchip/rk3288_crypto_ablkciphe=
-r.c
->>
->
->
-
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" i=
-n
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  	reserved-memory {
+>  		#address-cells = <1>;
+>  		#size-cells = <1>;
+> 
