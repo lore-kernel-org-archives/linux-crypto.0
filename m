@@ -1,72 +1,91 @@
-From: Zain Wang <zain.wang@rock-chips.com>
-Subject: [PATCH v2 4/4] crypto: rockchip/crypto - add DT bindings documentation
-Date: Fri,  6 Nov 2015 09:17:24 +0800
-Message-ID: <1446772644-2352-5-git-send-email-zain.wang@rock-chips.com>
+From: Caesar Wang <caesar.upstream@gmail.com>
+Subject: Re: [PATCH v2 0/4] Crypto: add crypto accelerator support for rk3288
+Date: Fri, 6 Nov 2015 09:36:48 +0800
+Message-ID: <563C0430.9000607@gmail.com>
 References: <1446772644-2352-1-git-send-email-zain.wang@rock-chips.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-	eddie.cai@rock-chips.com, Zain Wang <zain.wang@rock-chips.com>
-To: zhengsq@rock-chips.com, hl@rock-chips.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	mturquette@baylibre.com, heiko@sntech.de, pawel.moll@arm.com,
-	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
-	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, eddie.cai@rock-chips.com,
+	linux-crypto@vger.kernel.org
+To: Zain Wang <zain.wang@rock-chips.com>, zhengsq@rock-chips.com,
+	hl@rock-chips.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, mturquette@baylibre.com, heiko@sntech.de,
+	pawel.moll@arm.com, ijc+devicetree@hellion.org.uk,
+	robh+dt@kernel.org, galak@codeaurora.org, linux@arm.linux.org.uk,
+	mark.rutland@arm.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f43.google.com ([209.85.220.43]:35679 "EHLO
+	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S965402AbbKFBhG (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Nov 2015 20:37:06 -0500
 In-Reply-To: <1446772644-2352-1-git-send-email-zain.wang@rock-chips.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Add DT bindings documentation for the rk3288 crypto drivers.
+Hi
 
-Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
----
+=E5=9C=A8 2015=E5=B9=B411=E6=9C=8806=E6=97=A5 09:17, Zain Wang =E5=86=99=
+=E9=81=93:
+> This commit support three cipher(AES/DES/DES3) and two chainmode(ecb/=
+cbc),
+> and the more algorithms and new hash drivers will be added later on.
+>
+> Changed in v2:
+> - remove some part about hash
+> - add weak key detection
+> - changed some variate's type
+>
+> Changed in v1:
+> - modify some variate's name
+> - modify some variate's type
+> - modify some return value
+> - remove or modify some print info
+> - use more dev_xxx in probe
+> - modify the prio of cipher
+> - add Kconfig
+>
+> Zain Wang (4):
+>    Crypto: Crypto driver support aes/des/des3 for rk3288
+>    clk: rockchip: set an id for crypto clk
+>    ARM: dts: rockchip: Add Crypto drivers for rk3288
+>    crypto: rockchip/crypto - add DT bindings documentation
+I guess the series patchs order should be:
 
-Changde in v2:
-- None
+pacth 1/4 dt-binds/
+patch 2/4 clk id
+patch 3/4 crypto driver
+patch 4/4 dts
 
-Changed in v1:
-- remove the _crypto suffix
-- use "rockchip,rk3288-crypto" instead of "rockchip,rk3288"
-- remove the description of status
 
- .../devicetree/bindings/crypto/rockchip-crypto.txt | 29 ++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
 
-diff --git a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-new file mode 100644
-index 0000000..d27e203
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-@@ -0,0 +1,29 @@
-+Rockchip Electronics And Security Accelerator
-+
-+Required properties:
-+- compatible: Should be "rockchip,rk3288-crypto"
-+- reg: base physical address of the engine and length of memory mapped
-+       region
-+- interrupts: interrupt number
-+- clocks: reference to the clocks about crypto
-+- clock-names: "aclk" used to clock data
-+	       "hclk" used to clock data
-+	       "srst" used to clock crypto accelerator
-+	       "apb_pclk" used to clock dma
-+
-+Examples:
-+
-+	crypto: cypto-controller@ff8a0000 {
-+		compatible = "rockchip,rk3288-crypto";
-+		reg = <0xff8a0000 0x4000>;
-+		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
-+		clocks = <&cru ACLK_CRYPTO>,
-+			 <&cru HCLK_CRYPTO>,
-+			 <&cru SCLK_CRYPTO>,
-+			 <&cru ACLK_DMAC1>;
-+		clock-names = "aclk",
-+			      "hclk",
-+			      "sclk",
-+			      "apb_pclk";
-+		status = "okay";
-+	};
--- 
-1.9.1
+>
+>   .../devicetree/bindings/crypto/rockchip-crypto.txt |  29 ++
+>   arch/arm/boot/dts/rk3288.dtsi                      |  15 +
+>   drivers/clk/rockchip/clk-rk3288.c                  |   2 +-
+>   drivers/crypto/Kconfig                             |  11 +
+>   drivers/crypto/Makefile                            |   1 +
+>   drivers/crypto/rockchip/Makefile                   |   3 +
+>   drivers/crypto/rockchip/rk3288_crypto.c            | 380 ++++++++++=
++++++
+>   drivers/crypto/rockchip/rk3288_crypto.h            | 222 +++++++++
+>   drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c | 511 ++++++++++=
++++++++++++
+>   include/dt-bindings/clock/rk3288-cru.h             |   1 +
+>   10 files changed, 1174 insertions(+), 1 deletion(-)
+>   create mode 100644 Documentation/devicetree/bindings/crypto/rockchi=
+p-crypto.txt
+>   create mode 100644 drivers/crypto/rockchip/Makefile
+>   create mode 100644 drivers/crypto/rockchip/rk3288_crypto.c
+>   create mode 100644 drivers/crypto/rockchip/rk3288_crypto.h
+>   create mode 100644 drivers/crypto/rockchip/rk3288_crypto_ablkcipher=
+=2Ec
+>
+
+
+--=20
+Thanks,
+Caesar
