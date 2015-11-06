@@ -1,39 +1,96 @@
-From: Jamie Iles <jamie@jamieiles.com>
-Subject: Re: [PATCH 5/7] crypto: picoxcell: check return value of
- sg_nents_for_len
-Date: Fri, 6 Nov 2015 15:30:57 +0000
-Message-ID: <20151106153057.GA10738@page>
-References: <1446668045-8620-1-git-send-email-clabbe.montjoie@gmail.com>
- <1446668045-8620-5-git-send-email-clabbe.montjoie@gmail.com>
+From: Grygorii Strashko <grygorii.strashko@ti.com>
+Subject: Re: [PATCH] hw_random: omap3-rom-rng: convert timer to delayed work
+Date: Fri, 6 Nov 2015 21:20:52 +0200
+Message-ID: <563CFD94.5030008@ti.com>
+References: <1446761724-5191-1-git-send-email-aaro.koskinen@iki.fi>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-	jamie@jamieiles.com, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+To: Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	<linux-crypto@vger.kernel.org>, Sebastian Reichel <sre@kernel.org>,
+	=?UTF-8?Q?Pali_Roh=c3=a1r?= <pali.rohar@gmail.com>,
+	<linux-omap@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:36657 "EHLO
-	mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750806AbbKFPbA (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Nov 2015 10:31:00 -0500
-Received: by wmww144 with SMTP id w144so32762586wmw.1
-        for <linux-crypto@vger.kernel.org>; Fri, 06 Nov 2015 07:30:58 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <1446668045-8620-5-git-send-email-clabbe.montjoie@gmail.com>
+Received: from bear.ext.ti.com ([192.94.94.41]:48283 "EHLO bear.ext.ti.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S965790AbbKFTVO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 6 Nov 2015 14:21:14 -0500
+In-Reply-To: <1446761724-5191-1-git-send-email-aaro.koskinen@iki.fi>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 04, 2015 at 09:13:37PM +0100, LABBE Corentin wrote:
-> The sg_nents_for_len() function could fail, this patch add a check for
-> its return value.
-> In the same time, we remove sg_count() as it is used as an alias of
-> sg_nents_for_len.
-> 
-> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+On 11/06/2015 12:15 AM, Aaro Koskinen wrote:
+> We cannot put the HW RNG to idle using a timer because we cannot disable
+> clocks from atomic context. Use a delayed work instead.
+>
+> Fixes a warning with CONFIG_DEBUG_MUTEXES on Nokia N900 during boot.
+>
+> Reported-by: Sebastian Reichel <sre@kernel.org>
+> Signed-off-by: Aaro Koskinen <aaro.koskinen@iki.fi>
+> ---
+>   drivers/char/hw_random/omap3-rom-rng.c | 11 ++++++-----
+>   1 file changed, 6 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
+> index a405cdc..58191c6 100644
+> --- a/drivers/char/hw_random/omap3-rom-rng.c
+> +++ b/drivers/char/hw_random/omap3-rom-rng.c
+> @@ -29,11 +29,11 @@
+>   /* param1: ptr, param2: count, param3: flag */
+>   static u32 (*omap3_rom_rng_call)(u32, u32, u32);
+>
+> -static struct timer_list idle_timer;
+> +static struct delayed_work idle_work;
+>   static int rng_idle;
+>   static struct clk *rng_clk;
+>
+> -static void omap3_rom_rng_idle(unsigned long data)
+> +static void omap3_rom_rng_idle(struct work_struct *work)
+>   {
+>   	int r;
+>
+> @@ -51,7 +51,7 @@ static int omap3_rom_rng_get_random(void *buf, unsigned int count)
+>   	u32 r;
+>   	u32 ptr;
+>
+> -	del_timer_sync(&idle_timer);
+> +	cancel_delayed_work_sync(&idle_work);
+>   	if (rng_idle) {
+>   		clk_prepare_enable(rng_clk);
+>   		r = omap3_rom_rng_call(0, 0, RNG_GEN_PRNG_HW_INIT);
+> @@ -65,7 +65,7 @@ static int omap3_rom_rng_get_random(void *buf, unsigned int count)
+>
+>   	ptr = virt_to_phys(buf);
+>   	r = omap3_rom_rng_call(ptr, count, RNG_GEN_HW);
+> -	mod_timer(&idle_timer, jiffies + msecs_to_jiffies(500));
+> +	schedule_delayed_work(&idle_work, msecs_to_jiffies(500));
+>   	if (r != 0)
+>   		return -EINVAL;
+>   	return 0;
+> @@ -102,7 +102,7 @@ static int omap3_rom_rng_probe(struct platform_device *pdev)
+>   		return -EINVAL;
+>   	}
+>
+> -	setup_timer(&idle_timer, omap3_rom_rng_idle, 0);
+> +	INIT_DELAYED_WORK(&idle_work, omap3_rom_rng_idle);
+>   	rng_clk = devm_clk_get(&pdev->dev, "ick");
+>   	if (IS_ERR(rng_clk)) {
+>   		pr_err("unable to get RNG clock\n");
+> @@ -118,6 +118,7 @@ static int omap3_rom_rng_probe(struct platform_device *pdev)
+>
+>   static int omap3_rom_rng_remove(struct platform_device *pdev)
+>   {
+> +	cancel_delayed_work_sync(&idle_work);
+>   	hwrng_unregister(&omap3_rom_rng_ops);
+>   	clk_disable_unprepare(rng_clk);
+>   	return 0;
+>
 
-Acked-by: Jamie Iles <jamie@jamieiles.com>
+Sry, It looks like PM runtime autosuspend might work well here.
+What do you think?
 
-thanks for doing this!
-
-Jamie
+-- 
+regards,
+-grygorii
