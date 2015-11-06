@@ -1,64 +1,90 @@
-From: "Li, Weigang" <weigang.li@intel.com>
-Subject: RE: [PATCH] crypto: add asynchronous compression support
-Date: Fri, 6 Nov 2015 01:55:42 +0000
-Message-ID: <929511EA6367314D8E32364A24D45FA613009218@shsmsx102.ccr.corp.intel.com>
-References: <1445008260-39367-1-git-send-email-weigang.li@intel.com>
- <20151016151354.GA16648@gondor.apana.org.au>
+From: Caesar Wang <caesar.upstream@gmail.com>
+Subject: Re: [PATCH v2 3/4] ARM: dts: rockchip: Add Crypto drivers for rk3288
+Date: Fri, 6 Nov 2015 10:00:51 +0800
+Message-ID: <563C09D3.1050508@gmail.com>
+References: <1446772644-2352-1-git-send-email-zain.wang@rock-chips.com>
+ <1446772644-2352-4-git-send-email-zain.wang@rock-chips.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"Struk, Tadeusz" <tadeusz.struk@intel.com>,
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: zhengsq@rock-chips.com, hl@rock-chips.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	mturquette@baylibre.com, heiko@sntech.de, pawel.moll@arm.com,
+	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
+	galak@codeaurora.org, linux@arm.linux.org.uk,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, eddie.cai@rock-chips.com,
+	linux-crypto@vger.kernel.org
+To: Zain Wang <zain.wang@rock-chips.com>, mark.rutland@arm.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:51710 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S965545AbbKFBzq convert rfc822-to-8bit (ORCPT
+Received: from mail-pa0-f48.google.com ([209.85.220.48]:35722 "EHLO
+	mail-pa0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1030909AbbKFCBJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Nov 2015 20:55:46 -0500
-In-Reply-To: <20151016151354.GA16648@gondor.apana.org.au>
-Content-Language: en-US
+	Thu, 5 Nov 2015 21:01:09 -0500
+In-Reply-To: <1446772644-2352-4-git-send-email-zain.wang@rock-chips.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-After sync with Joonsoo Kim offline, he agreed to merge this acomp patch with his ccomp patch, thanks Joonsoo!
+the subject should be add the node/info for crypto...
 
------Original Message-----
-From: Herbert Xu [mailto:herbert@gondor.apana.org.au] 
-Sent: Friday, October 16, 2015 11:14 PM
-To: Li, Weigang
-Cc: linux-crypto@vger.kernel.org; Struk, Tadeusz; Joonsoo Kim; Sergey Senozhatsky
-Subject: Re: [PATCH] crypto: add asynchronous compression support
+=E5=9C=A8 2015=E5=B9=B411=E6=9C=8806=E6=97=A5 09:17, Zain Wang =E5=86=99=
+=E9=81=93:
+> Add Crypto drivers for rk3288 including crypto controller and dma clk=
+=2E
+>
+> Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
+> ---
+>
+> Changed in v2:
+> - None
+>
+> Changed in v1:
+> - remove the _crypto suffix
+> - use "rockchip,rk3288-crypto" instead of "rockchip,rk3288"
+>
+>   arch/arm/boot/dts/rk3288.dtsi | 15 +++++++++++++++
+>   1 file changed, 15 insertions(+)
+>
+> diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288=
+=2Edtsi
+> index 6a79c9c..7b7914e 100644
+> --- a/arch/arm/boot/dts/rk3288.dtsi
+> +++ b/arch/arm/boot/dts/rk3288.dtsi
+> @@ -170,6 +170,21 @@
+>   		};
+>   	};
+>  =20
+> +	crypto: cypto-controller@ff8a0000 {
+> +		compatible =3D "rockchip,rk3288-crypto";
+> +		reg =3D <0xff8a0000 0x4000>;
+> +		interrupts =3D <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
+> +		clocks =3D <&cru ACLK_CRYPTO>,
+> +			 <&cru HCLK_CRYPTO>,
+> +			 <&cru SCLK_CRYPTO>,
+> +			 <&cru ACLK_DMAC1>;
+> +		clock-names =3D "aclk",
+> +			      "hclk",
+> +			      "sclk",
+> +			      "apb_pclk";
 
-On Fri, Oct 16, 2015 at 11:11:00PM +0800, Weigang Li wrote:
-> This patch set introduces Asynchronous Compression API.
-> What is proposed is a new crypto type called crypto_acomp_type, plus 
-> new struct acomp_alg and struct crypto_acomp, together with number of 
-> helper functions to register acomp type algorithms and allocate tfm 
-> instances. This is to make it similar to how the existing crypto API 
-> works for the ablkcipher, and akcipher types.
-> The operations the new interface will provide are:
-> 
-> 	int (*compress)(struct acompress_request *req);
-> 	int (*decompress)(struct acompress_request *req);
-> 
-> The benefits it gives interface are:
-> - the new interface allows for asynchronous implementations and
->   scatterlist buffer that can use hardware to offload the compression
->   operations, the new asynchronous API can be called by the linux kernel
->   components (i.e., btrfs) who want to use hardware acceleration for data
->   compression.
-> 
-> New helper functions have been added to allocate crypto_acomp 
-> instances and invoke the operations to make it easier to use.
-> 
-> Signed-off-by: Weigang Li <weigang.li@intel.com>
+I guess  you can do this:
 
-Thanks for the patch! Joonsoo Kim is also working on the compression interface for zram.  Could you two collaborate and come up with one interface rather than two?
+clocks =3D <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,  <&cru SCLK_CRYPTO>,=
+  <&cru ACLK_DMAC1>;
 
-Cheers,
---
-Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+clock-names =3D "aclk", "hclk",  "sclk", "apb_pclk";
+
+
+> +		status =3D "okay";
+> +	};
+> +
+>   	reserved-memory {
+>   		#address-cells =3D <1>;
+>   		#size-cells =3D <1>;
+
+
+--=20
+Thanks,
+Caesar
