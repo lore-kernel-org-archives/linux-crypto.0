@@ -1,88 +1,56 @@
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v2 4/4] crypto: rockchip/crypto - add DT bindings
- documentation
-Date: Thu, 5 Nov 2015 20:27:45 -0600
-Message-ID: <20151106022745.GA16227@rob-hp-laptop>
-References: <1446772644-2352-1-git-send-email-zain.wang@rock-chips.com>
- <1446772644-2352-5-git-send-email-zain.wang@rock-chips.com>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH] crypto: sun4i-ss: add missing statesize
+Date: Fri, 6 Nov 2015 12:56:39 +0800
+Message-ID: <20151106045639.GA14722@gondor.apana.org.au>
+References: <1446709737-11316-1-git-send-email-clabbe.montjoie@gmail.com>
+ <20151105160719.GG6114@lukather>
+Reply-To: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: zhengsq@rock-chips.com, hl@rock-chips.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	mturquette@baylibre.com, heiko@sntech.de, pawel.moll@arm.com,
-	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
-	linux@arm.linux.org.uk, mark.rutland@arm.com,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-	eddie.cai@rock-chips.com
-To: Zain Wang <zain.wang@rock-chips.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:54463 "EHLO mail.kernel.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1031154AbbKFC1v (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Nov 2015 21:27:51 -0500
+Content-Type: text/plain; charset=UTF-8
+Cc: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	wens-jdAy2FN1RRM@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org, stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Return-path: <linux-sunxi+bncBDTY5EWUQMEBBIPG6CYQKGQEFWED6KI-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1446772644-2352-5-git-send-email-zain.wang@rock-chips.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20151105160719.GG6114@lukather>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Nov 06, 2015 at 09:17:24AM +0800, Zain Wang wrote:
-> Add DT bindings documentation for the rk3288 crypto drivers.
+On Thu, Nov 05, 2015 at 08:07:19AM -0800, Maxime Ripard wrote:
 > 
-> Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
+> On Thu, Nov 05, 2015 at 08:48:57AM +0100, LABBE Corentin wrote:
+> > sun4i-ss implementaton of md5/sha1 is via ahash algorithms.
+> > A recent change make impossible to load them without giving statesize.
+> 
+> Which one?
 
-Acked-by: Rob Herring <robh@kernel.org>
+We recently disabled ahash drivers that do not declare statesize
+because it can lead to a crash when the driver is used through
+algif.
 
-> ---
+Not declaring statesize is a bug anyway but the fact that it
+is exported through algif makes it much worse.
+
+> > This patch specifiy statesize for sha1 and md5.
+> > 
+> > Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> > Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > 
-> Changde in v2:
-> - None
-> 
-> Changed in v1:
-> - remove the _crypto suffix
-> - use "rockchip,rk3288-crypto" instead of "rockchip,rk3288"
-> - remove the description of status
-> 
->  .../devicetree/bindings/crypto/rockchip-crypto.txt | 29 ++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> new file mode 100644
-> index 0000000..d27e203
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> @@ -0,0 +1,29 @@
-> +Rockchip Electronics And Security Accelerator
-> +
-> +Required properties:
-> +- compatible: Should be "rockchip,rk3288-crypto"
-> +- reg: base physical address of the engine and length of memory mapped
-> +       region
-> +- interrupts: interrupt number
-> +- clocks: reference to the clocks about crypto
-> +- clock-names: "aclk" used to clock data
-> +	       "hclk" used to clock data
-> +	       "srst" used to clock crypto accelerator
-> +	       "apb_pclk" used to clock dma
-> +
-> +Examples:
-> +
-> +	crypto: cypto-controller@ff8a0000 {
-> +		compatible = "rockchip,rk3288-crypto";
-> +		reg = <0xff8a0000 0x4000>;
-> +		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
-> +		clocks = <&cru ACLK_CRYPTO>,
-> +			 <&cru HCLK_CRYPTO>,
-> +			 <&cru SCLK_CRYPTO>,
-> +			 <&cru ACLK_DMAC1>;
-> +		clock-names = "aclk",
-> +			      "hclk",
-> +			      "sclk",
-> +			      "apb_pclk";
-> +		status = "okay";
-> +	};
-> -- 
-> 1.9.1
-> 
-> 
+> Please also add a Fixes tag (and the stable version it applies to).
+
+I don't see the point for a fixes tag as it would simply refer
+to the original patch-set that added the driver.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
