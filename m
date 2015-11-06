@@ -1,7 +1,7 @@
 From: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
-Subject: [PATCH v2 2/4] clk: rockchip: set an id for crypto clk
-Date: Fri,  6 Nov 2015 09:17:22 +0800
-Message-ID: <1446772644-2352-3-git-send-email-zain.wang@rock-chips.com>
+Subject: [PATCH v2 3/4] ARM: dts: rockchip: Add Crypto drivers for rk3288
+Date: Fri,  6 Nov 2015 09:17:23 +0800
+Message-ID: <1446772644-2352-4-git-send-email-zain.wang@rock-chips.com>
 References: <1446772644-2352-1-git-send-email-zain.wang@rock-chips.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -26,46 +26,46 @@ Sender: "Linux-rockchip" <linux-rockchip-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7
 Errors-To: linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-set an id for crypto clk, so that it can be called in other part.
+Add Crypto drivers for rk3288 including crypto controller and dma clk.
 
 Signed-off-by: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
 ---
 
-Changed in v2: 
+Changed in v2:
 - None
 
 Changed in v1:
-- define SCLK_CRYPTO in rk3288-cru.h
-- use SCLK_CRYPTO instead of SRST_CRYPTO
+- remove the _crypto suffix
+- use "rockchip,rk3288-crypto" instead of "rockchip,rk3288"
 
- drivers/clk/rockchip/clk-rk3288.c      | 2 +-
- include/dt-bindings/clock/rk3288-cru.h | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ arch/arm/boot/dts/rk3288.dtsi | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/drivers/clk/rockchip/clk-rk3288.c b/drivers/clk/rockchip/clk-rk3288.c
-index 9040878..3fceda1 100644
---- a/drivers/clk/rockchip/clk-rk3288.c
-+++ b/drivers/clk/rockchip/clk-rk3288.c
-@@ -295,7 +295,7 @@ static struct rockchip_clk_branch rk3288_clk_branches[] __initdata = {
- 			RK3288_CLKGATE_CON(0), 4, GFLAGS),
- 	GATE(0, "c2c_host", "aclk_cpu_src", 0,
- 			RK3288_CLKGATE_CON(13), 8, GFLAGS),
--	COMPOSITE_NOMUX(0, "crypto", "aclk_cpu_pre", 0,
-+	COMPOSITE_NOMUX(SCLK_CRYPTO, "crypto", "aclk_cpu_pre", 0,
- 			RK3288_CLKSEL_CON(26), 6, 2, DFLAGS,
- 			RK3288_CLKGATE_CON(5), 4, GFLAGS),
- 	GATE(0, "aclk_bus_2pmu", "aclk_cpu_pre", CLK_IGNORE_UNUSED,
-diff --git a/include/dt-bindings/clock/rk3288-cru.h b/include/dt-bindings/clock/rk3288-cru.h
-index c719aac..30dcd60 100644
---- a/include/dt-bindings/clock/rk3288-cru.h
-+++ b/include/dt-bindings/clock/rk3288-cru.h
-@@ -86,6 +86,7 @@
- #define SCLK_USBPHY480M_SRC	122
- #define SCLK_PVTM_CORE		123
- #define SCLK_PVTM_GPU		124
-+#define SCLK_CRYPTO			125
+diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288.dtsi
+index 6a79c9c..7b7914e 100644
+--- a/arch/arm/boot/dts/rk3288.dtsi
++++ b/arch/arm/boot/dts/rk3288.dtsi
+@@ -170,6 +170,21 @@
+ 		};
+ 	};
  
- #define SCLK_MAC		151
- #define SCLK_MACREF_OUT		152
++	crypto: cypto-controller@ff8a0000 {
++		compatible = "rockchip,rk3288-crypto";
++		reg = <0xff8a0000 0x4000>;
++		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&cru ACLK_CRYPTO>,
++			 <&cru HCLK_CRYPTO>,
++			 <&cru SCLK_CRYPTO>,
++			 <&cru ACLK_DMAC1>;
++		clock-names = "aclk",
++			      "hclk",
++			      "sclk",
++			      "apb_pclk";
++		status = "okay";
++	};
++
+ 	reserved-memory {
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
 -- 
 1.9.1
