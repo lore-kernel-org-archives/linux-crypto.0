@@ -1,96 +1,40 @@
-From: Grygorii Strashko <grygorii.strashko@ti.com>
-Subject: Re: [PATCH] hw_random: omap3-rom-rng: convert timer to delayed work
-Date: Fri, 6 Nov 2015 21:20:52 +0200
-Message-ID: <563CFD94.5030008@ti.com>
-References: <1446761724-5191-1-git-send-email-aaro.koskinen@iki.fi>
+From: Sandy Harris <sandyinchina@gmail.com>
+Subject: Re: [PATCH v2 1/4] Crypto: Crypto driver support aes/des/des3 for rk3288
+Date: Fri, 6 Nov 2015 23:40:33 -0500
+Message-ID: <CACXcFmmFeK6kO7Q9sWf0SE5gmw0ZzX126=TUaA6YPGApVsopCg@mail.gmail.com>
+References: <1446772644-2352-1-git-send-email-zain.wang@rock-chips.com>
+	<1446772644-2352-2-git-send-email-zain.wang@rock-chips.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-To: Aaro Koskinen <aaro.koskinen@iki.fi>,
-	Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	<linux-crypto@vger.kernel.org>, Sebastian Reichel <sre@kernel.org>,
-	=?UTF-8?Q?Pali_Roh=c3=a1r?= <pali.rohar@gmail.com>,
-	<linux-omap@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+To: Zain Wang <zain.wang@rock-chips.com>, linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bear.ext.ti.com ([192.94.94.41]:48283 "EHLO bear.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S965790AbbKFTVO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Nov 2015 14:21:14 -0500
-In-Reply-To: <1446761724-5191-1-git-send-email-aaro.koskinen@iki.fi>
+Received: from mail-io0-f171.google.com ([209.85.223.171]:34280 "EHLO
+	mail-io0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751003AbbKGEke (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 6 Nov 2015 23:40:34 -0500
+Received: by iody8 with SMTP id y8so141550310iod.1
+        for <linux-crypto@vger.kernel.org>; Fri, 06 Nov 2015 20:40:34 -0800 (PST)
+In-Reply-To: <1446772644-2352-2-git-send-email-zain.wang@rock-chips.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 11/06/2015 12:15 AM, Aaro Koskinen wrote:
-> We cannot put the HW RNG to idle using a timer because we cannot disable
-> clocks from atomic context. Use a delayed work instead.
->
-> Fixes a warning with CONFIG_DEBUG_MUTEXES on Nokia N900 during boot.
->
-> Reported-by: Sebastian Reichel <sre@kernel.org>
-> Signed-off-by: Aaro Koskinen <aaro.koskinen@iki.fi>
-> ---
->   drivers/char/hw_random/omap3-rom-rng.c | 11 ++++++-----
->   1 file changed, 6 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
-> index a405cdc..58191c6 100644
-> --- a/drivers/char/hw_random/omap3-rom-rng.c
-> +++ b/drivers/char/hw_random/omap3-rom-rng.c
-> @@ -29,11 +29,11 @@
->   /* param1: ptr, param2: count, param3: flag */
->   static u32 (*omap3_rom_rng_call)(u32, u32, u32);
->
-> -static struct timer_list idle_timer;
-> +static struct delayed_work idle_work;
->   static int rng_idle;
->   static struct clk *rng_clk;
->
-> -static void omap3_rom_rng_idle(unsigned long data)
-> +static void omap3_rom_rng_idle(struct work_struct *work)
->   {
->   	int r;
->
-> @@ -51,7 +51,7 @@ static int omap3_rom_rng_get_random(void *buf, unsigned int count)
->   	u32 r;
->   	u32 ptr;
->
-> -	del_timer_sync(&idle_timer);
-> +	cancel_delayed_work_sync(&idle_work);
->   	if (rng_idle) {
->   		clk_prepare_enable(rng_clk);
->   		r = omap3_rom_rng_call(0, 0, RNG_GEN_PRNG_HW_INIT);
-> @@ -65,7 +65,7 @@ static int omap3_rom_rng_get_random(void *buf, unsigned int count)
->
->   	ptr = virt_to_phys(buf);
->   	r = omap3_rom_rng_call(ptr, count, RNG_GEN_HW);
-> -	mod_timer(&idle_timer, jiffies + msecs_to_jiffies(500));
-> +	schedule_delayed_work(&idle_work, msecs_to_jiffies(500));
->   	if (r != 0)
->   		return -EINVAL;
->   	return 0;
-> @@ -102,7 +102,7 @@ static int omap3_rom_rng_probe(struct platform_device *pdev)
->   		return -EINVAL;
->   	}
->
-> -	setup_timer(&idle_timer, omap3_rom_rng_idle, 0);
-> +	INIT_DELAYED_WORK(&idle_work, omap3_rom_rng_idle);
->   	rng_clk = devm_clk_get(&pdev->dev, "ick");
->   	if (IS_ERR(rng_clk)) {
->   		pr_err("unable to get RNG clock\n");
-> @@ -118,6 +118,7 @@ static int omap3_rom_rng_probe(struct platform_device *pdev)
->
->   static int omap3_rom_rng_remove(struct platform_device *pdev)
->   {
-> +	cancel_delayed_work_sync(&idle_work);
->   	hwrng_unregister(&omap3_rom_rng_ops);
->   	clk_disable_unprepare(rng_clk);
->   	return 0;
->
+On Thu, Nov 5, 2015 at 8:17 PM, Zain Wang <zain.wang@rock-chips.com> wrote:
+> The names registered are:
+>     ecb(aes) cbc(aes) ecb(des) cbc(des) ecb(des3_ede) cbc(des3_ede)
+> You can alloc tags above in your case.
 
-Sry, It looks like PM runtime autosuspend might work well here.
-What do you think?
+Why on Earth are you allowing DES? Here's a reference from around the
+turn of the century on why the FreeS/WAN project refused to implement
+it then:
+http://www.freeswan.org/freeswan_trees/freeswan-1.97/doc/politics.html#desnotsecure
 
--- 
-regards,
--grygorii
+In 1998 a $200,000-odd purpose-built machine using FPGAs could break
+DES in a few days. Morre's Law applies; my guess would be that today
+you could break it in hours for well under $10,000 using either GPUs
+or Intel's Xeon Phi.
+
+Even if you have to implement DES because you need it as a component
+for 3DES and some standards still require 3DES, single DES should not
+be exposed in the user interface.
