@@ -1,53 +1,69 @@
-From: James Morris <jmorris@namei.org>
-Subject: Re: [PATCH v4] keys, trusted: select hash algorithm for TPM2 chips
-Date: Tue, 10 Nov 2015 00:00:25 +1100 (AEDT)
-Message-ID: <alpine.LRH.2.20.1511092359320.30224@namei.org>
-References: <1446752588-3429-1-git-send-email-jarkko.sakkinen@linux.intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Cc: Peter Huewe <peterhuewe@gmx.de>,
-	Marcel Selhorst <tpmdd@selhorst.net>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	Petko Manolov <petkan@mip-labs.com>,
-	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-	"Mark D. Baushke" <mdb@juniper.net>,
-	David Safford <safford@us.ibm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	David Howells <dhowells@redhat.com>,
-	James Morris <james.l.morris@oracle.com>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	"open list:KEYS-TRUSTED" <linux-security-module@vger.kernel.org>,
-	"open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-	"moderated list:TPM DEVICE DRIVER"
-	<tpmdd-devel@lists.
-To: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Subject: [RFC] i.MX6 CAAM blob generator for IMA/EVM initialization
+Date: Mon,  9 Nov 2015 16:18:25 +0100
+Message-ID: <1447082306-19946-1-git-send-email-s.trumtrar@pengutronix.de>
+Cc: linux-ima-devel@lists.sourceforge.net,
+	linux-ima-user@lists.sourceforge.net, keyrings@linux-nfs.org,
+	David Howells <dhowells@redhat.com>, kernel@pengutronix.de,
+	Steffen Trumtrar <s.trumtrar@pengutronix.de>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tundra.namei.org ([65.99.196.166]:49585 "EHLO namei.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751936AbbKINBV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Nov 2015 08:01:21 -0500
-In-Reply-To: <1446752588-3429-1-git-send-email-jarkko.sakkinen@linux.intel.com>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:43199 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750989AbbKIPTC (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 Nov 2015 10:19:02 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 5 Nov 2015, Jarkko Sakkinen wrote:
+Hi!
 
-> v4:
-> 
-> * Added missing select CRYPTO_HASH_INFO in drivers/char/tpm/Kconfig
-> 
-> Signed-off-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+The RFC Patch attached after this cover letter is mostly for illustration
+purposes, so please don't waste too much time reviewing the code ;-)
+
+For context I'll try to describe the problem that this patch tries to solve.
+
+I need to be able to boot an EVM signed (and dongled) rootfs. The CAAM on
+the i.MX6 has support for an OTP key and can en/decrypt data.
+It also has a feature for generating red blobs: basically a chunk of data,
+that is encrypted with the OTP key, which can be saved on some medium as a
+secret to decrypt the EVM HMAC secret for one specific device.
+
+To open the rootfs, the secret is handed from the bootloader to the kernel
+as a base64 encoded string via the cmdline to an initramfs.
+In the initramfs the sysfs file "modifier" is set to something starting with
+"kernel:evm" and the base64 string is written to the sysfs file "blob".
+The CAAM than decodes the red blob and, in case of "kernel:evm", initializes
+the EVM or otherwise writes the result to "payload" if the modifier starts
+with "user:". Therefore a blob that was generated for EVM never leaves the
+kernel on decryption.
+Generation of blobs goes like: echoing "modifier" to something and echoing
+the payload to "payload". The red blob can than be read from "blob".
 
 
-Reviewed-by: James Morris <james.l.morris@oracle.com>
+So, the sysfs interface is not the best option, I guess. The question is:
+What is the right approach for a setup like this?
+I need to:
+  - be able to encrypt the secret and store it somewhere
+  - to load the stored secret and decrypt it later
+  - initialize IMA/EVM with the secret
 
+Would something like
+  - security/keys/encrypted-keys/encrypted.c
+be the correct approach?
+
+Thanks,
+Steffen
+
+
+Steffen Trumtrar (1):
+  crypto: caam - add red blobifier
+
+ drivers/crypto/caam/Kconfig    |   9 +
+ drivers/crypto/caam/Makefile   |   1 +
+ drivers/crypto/caam/blob_gen.c | 528 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 538 insertions(+)
+ create mode 100644 drivers/crypto/caam/blob_gen.c
 
 -- 
-James Morris
-<jmorris@namei.org>
+2.6.1
