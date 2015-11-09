@@ -1,80 +1,84 @@
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Subject: Re: [PATCH 12/13] [media] omap3isp: Support for deferred probing when requesting DMA channel
-Date: Mon, 09 Nov 2015 21:50:12 +0200
-Message-ID: <11319647.puY9n5DpsR@avalon>
-References: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com> <1432646768-12532-13-git-send-email-peter.ujfalusi@ti.com>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [Linux-ima-user] [RFC] i.MX6 CAAM blob generator for IMA/EVM
+ initialization
+Date: Mon, 09 Nov 2015 15:29:41 -0500
+Message-ID: <1447100981.2728.23.camel@linux.vnet.ibm.com>
+References: <1447082306-19946-1-git-send-email-s.trumtrar@pengutronix.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: vinod.koul@intel.com, tony@atomide.com, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dan.j.williams@intel.com,
-	dmaengine@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-omap@vger.kernel.org, linux-mmc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-media@vger.kernel.org, alsa-devel@alsa-project.org,
-	Mauro Carvalho Chehab <mchehab@osg.samsung.com>
-To: Peter Ujfalusi <peter.ujfalusi@ti.com>
-Return-path: <linux-mmc-owner@vger.kernel.org>
-In-Reply-To: <1432646768-12532-13-git-send-email-peter.ujfalusi@ti.com>
-Sender: linux-mmc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, keyrings@linux-nfs.org,
+	linux-ima-user@lists.sourceforge.net,
+	David Howells <dhowells@redhat.com>, kernel@pengutronix.de,
+	linux-ima-devel@lists.sourceforge.net,
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e28smtp01.in.ibm.com ([122.248.162.1]:54594 "EHLO
+	e28smtp01.in.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750851AbbKIU3y (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 Nov 2015 15:29:54 -0500
+Received: from /spool/local
+	by e28smtp01.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
+	Tue, 10 Nov 2015 01:59:52 +0530
+Received: from d28relay04.in.ibm.com (d28relay04.in.ibm.com [9.184.220.61])
+	by d28dlp02.in.ibm.com (Postfix) with ESMTP id 011AB394005B
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2015 01:59:48 +0530 (IST)
+Received: from d28av01.in.ibm.com (d28av01.in.ibm.com [9.184.220.63])
+	by d28relay04.in.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id tA9KTlNf3015106
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2015 01:59:47 +0530
+Received: from d28av01.in.ibm.com (localhost [127.0.0.1])
+	by d28av01.in.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id tA9KTkYs001195
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2015 01:59:47 +0530
+In-Reply-To: <1447082306-19946-1-git-send-email-s.trumtrar@pengutronix.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Peter,
-
-Thank you for the patch.
-
-What happened to this patch series ? It looks like 
-dma_request_slave_channel_compat_reason() isn't in mainline, so I can't apply 
-this patch.
-
-I'll mark this patch as deferred in patchwork, please resubmit it if you 
-resubmit the series (and by the look of it the issue you're trying to fix 
-still exists, so it would be nice if you could get it eventually fixed).
-
-On Tuesday 26 May 2015 16:26:07 Peter Ujfalusi wrote:
-> Switch to use ma_request_slave_channel_compat_reason() to request the DMA
-> channel. Only fall back to pio mode if the error code returned is not
-> -EPROBE_DEFER, otherwise return from the probe with the -EPROBE_DEFER.
+On Mon, 2015-11-09 at 16:18 +0100, Steffen Trumtrar wrote:
+> Hi!
 > 
-> Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
-> CC: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-> CC: Mauro Carvalho Chehab <mchehab@osg.samsung.com>
-> ---
->  drivers/media/platform/omap3isp/isphist.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
+> The RFC Patch attached after this cover letter is mostly for illustration
+> purposes, so please don't waste too much time reviewing the code ;-)
 > 
-> diff --git a/drivers/media/platform/omap3isp/isphist.c
-> b/drivers/media/platform/omap3isp/isphist.c index
-> 7138b043a4aa..e690ca13af0e 100644
-> --- a/drivers/media/platform/omap3isp/isphist.c
-> +++ b/drivers/media/platform/omap3isp/isphist.c
-> @@ -499,14 +499,20 @@ int omap3isp_hist_init(struct isp_device *isp)
->  		if (res)
->  			sig = res->start;
+> For context I'll try to describe the problem that this patch tries to solve.
 > 
-> -		hist->dma_ch = dma_request_slave_channel_compat(mask,
-> +		hist->dma_ch = dma_request_slave_channel_compat_reason(mask,
->  				omap_dma_filter_fn, &sig, isp->dev, "hist");
-> -		if (!hist->dma_ch)
-> +		if (IS_ERR(hist->dma_ch)) {
-> +			ret = PTR_ERR(hist->dma_ch);
-> +			if (ret == -EPROBE_DEFER)
-> +				return ret;
-> +
-> +			hist->dma_ch = NULL;
->  			dev_warn(isp->dev,
->  				 "hist: DMA channel request failed, using PIO\n");
-> -		else
-> +		} else {
->  			dev_dbg(isp->dev, "hist: using DMA channel %s\n",
->  				dma_chan_name(hist->dma_ch));
-> +		}
->  	}
+> I need to be able to boot an EVM signed (and dongled) rootfs. The CAAM on
+> the i.MX6 has support for an OTP key and can en/decrypt data.
+> It also has a feature for generating red blobs: basically a chunk of data,
+> that is encrypted with the OTP key, which can be saved on some medium as a
+> secret to decrypt the EVM HMAC secret for one specific device.
 > 
->  	hist->ops = &hist_ops;
+> To open the rootfs, the secret is handed from the bootloader to the kernel
+> as a base64 encoded string via the cmdline to an initramfs.
+> In the initramfs the sysfs file "modifier" is set to something starting with
+> "kernel:evm" and the base64 string is written to the sysfs file "blob".
+> The CAAM than decodes the red blob and, in case of "kernel:evm", initializes
+> the EVM or otherwise writes the result to "payload" if the modifier starts
+> with "user:". Therefore a blob that was generated for EVM never leaves the
+> kernel on decryption.
+> Generation of blobs goes like: echoing "modifier" to something and echoing
+> the payload to "payload". The red blob can than be read from "blob".
+> 
+> 
+> So, the sysfs interface is not the best option, I guess. The question is:
+> What is the right approach for a setup like this?
+> I need to:
+>   - be able to encrypt the secret and store it somewhere
+>   - to load the stored secret and decrypt it later
+>   - initialize IMA/EVM with the secret
+> 
+> Would something like
+>   - security/keys/encrypted-keys/encrypted.c
+> be the correct approach?
 
--- 
-Regards,
+Instead of using the CAAM for OTP encrypting/decrypting, can it be used
+to load the EVM key directly?  Dmitry's patches, which will be
+upstreamed in 4.5
+https://git.kernel.org/cgit/linux/kernel/git/zohar/linux-integrity.git/log/?h=for-next-4.5?   adds support for a crypto device to directly load the EVM key.
 
-Laurent Pinchart
+FYI, the EVM key is an encrypted key, which encrypts/decrypts either a
+trusted or user type key.
 
+Mimi
