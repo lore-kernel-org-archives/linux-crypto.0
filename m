@@ -1,43 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] crypto: sun4i-ss: add missing statesize
-Date: Mon, 9 Nov 2015 11:58:48 +0800
-Message-ID: <20151109035848.GA2163@gondor.apana.org.au>
-References: <1447006457@msgid.manchmal.in-ulm.de>
+Date: Mon, 9 Nov 2015 15:38:10 +0800
+Message-ID: <20151109073745.GA3106@gondor.apana.org.au>
+References: <1447054026-4243-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: maxime.ripard@free-electrons.com, clabbe.montjoie@gmail.com,
-	davem@davemloft.net, wens@csie.org, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-sunxi@googlegroups.com, stable@vger.kernel.org
-To: Christoph Biedl <linux-kernel.bfrz@manchmal.in-ulm.de>
+Cc: davem@davemloft.net, maxime.ripard@free-electrons.com,
+	wens@csie.org, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:42649 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:49083 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751705AbbKID7N (ORCPT
+	with ESMTP id S1750814AbbKIHiW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 8 Nov 2015 22:59:13 -0500
+	Mon, 9 Nov 2015 02:38:22 -0500
 Content-Disposition: inline
-In-Reply-To: <1447006457@msgid.manchmal.in-ulm.de>
+In-Reply-To: <1447054026-4243-1-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Christoph Biedl <linux-kernel.bfrz@manchmal.in-ulm.de> wrote:
->
-> Fixes: should rather point to the commit that caused the breakage in my
-> opinion. Which did this by intention:
+On Mon, Nov 09, 2015 at 08:27:06AM +0100, LABBE Corentin wrote:
+> sun4i-ss implementaton of md5/sha1 is via ahash algorithms.
+> A recent change make impossible to load them without giving statesize.
+> This patch specifiy statesize for sha1 and md5.
+> 
+> Fixes: 8996eafdcbad ("crypto: ahash - ensure statesize is non-zero")
 
-Absolutely not.  That patch is correct and if you revert that
-you will simply end up registering a broken driver into the system
-that may then lead to crashes that can be triggered from user-space.
-
-> | commit 8996eafdcbad149ac0f772fb1649fbb75c482a6a
-> | Author: Russell King <rmk+kernel@arm.linux.org.uk>
-> | Date:   Fri Oct 9 20:43:33 2015 +0100
-> | 
-> |     crypto: ahash - ensure statesize is non-zero
-> (...)
-> +     This patch adds a check to prevent these drivers from registering
-> +     ahash algorithms until they are fixed.
+Nack.  As I said this commit is absolutely correct and if you really
+have to slap on a fixes header then make it the original changeset
+that added the driver.  It's the driver that's broken, not the API.
 
 Cheers,
 -- 
