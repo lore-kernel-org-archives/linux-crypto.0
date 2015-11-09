@@ -1,38 +1,53 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: sun4i-ss: add missing statesize
-Date: Mon, 9 Nov 2015 15:38:10 +0800
-Message-ID: <20151109073745.GA3106@gondor.apana.org.au>
-References: <1447054026-4243-1-git-send-email-clabbe.montjoie@gmail.com>
+From: James Morris <jmorris@namei.org>
+Subject: Re: [PATCH v4] keys, trusted: select hash algorithm for TPM2 chips
+Date: Tue, 10 Nov 2015 00:00:25 +1100 (AEDT)
+Message-ID: <alpine.LRH.2.20.1511092359320.30224@namei.org>
+References: <1446752588-3429-1-git-send-email-jarkko.sakkinen@linux.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, maxime.ripard@free-electrons.com,
-	wens@csie.org, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Cc: Peter Huewe <peterhuewe@gmx.de>,
+	Marcel Selhorst <tpmdd@selhorst.net>,
+	Mimi Zohar <zohar@linux.vnet.ibm.com>,
+	Petko Manolov <petkan@mip-labs.com>,
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+	"Mark D. Baushke" <mdb@juniper.net>,
+	David Safford <safford@us.ibm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	David Howells <dhowells@redhat.com>,
+	James Morris <james.l.morris@oracle.com>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	"open list:KEYS-TRUSTED" <linux-security-module@vger.kernel.org>,
+	"open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+	"moderated list:TPM DEVICE DRIVER"
+	<tpmdd-devel@lists.
+To: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49083 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750814AbbKIHiW (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Nov 2015 02:38:22 -0500
-Content-Disposition: inline
-In-Reply-To: <1447054026-4243-1-git-send-email-clabbe.montjoie@gmail.com>
+Received: from tundra.namei.org ([65.99.196.166]:49585 "EHLO namei.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751936AbbKINBV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 Nov 2015 08:01:21 -0500
+In-Reply-To: <1446752588-3429-1-git-send-email-jarkko.sakkinen@linux.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Nov 09, 2015 at 08:27:06AM +0100, LABBE Corentin wrote:
-> sun4i-ss implementaton of md5/sha1 is via ahash algorithms.
-> A recent change make impossible to load them without giving statesize.
-> This patch specifiy statesize for sha1 and md5.
+On Thu, 5 Nov 2015, Jarkko Sakkinen wrote:
+
+> v4:
 > 
-> Fixes: 8996eafdcbad ("crypto: ahash - ensure statesize is non-zero")
+> * Added missing select CRYPTO_HASH_INFO in drivers/char/tpm/Kconfig
+> 
+> Signed-off-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
 
-Nack.  As I said this commit is absolutely correct and if you really
-have to slap on a fixes header then make it the original changeset
-that added the driver.  It's the driver that's broken, not the API.
 
-Cheers,
+Reviewed-by: James Morris <james.l.morris@oracle.com>
+
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+James Morris
+<jmorris@namei.org>
