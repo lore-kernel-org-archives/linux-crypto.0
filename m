@@ -1,43 +1,62 @@
-From: Orlando <orlcp440@gmail.com>
-Subject: Hardware Crypto Driver
-Date: Tue, 10 Nov 2015 09:49:40 -0500
-Message-ID: <CAG3F19ArjmvN=hEsL67f1vH56nxVfZryV9utNCqosVT9J6FTCQ@mail.gmail.com>
+From: Andrey Utkin <andrey.od.utkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Req for mentor - [BUG]Busy luks disk not closable forever if medium
+ is removed
+Date: Tue, 10 Nov 2015 21:27:38 +0200
+Message-ID: <5642452A.6090906@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f49.google.com ([209.85.213.49]:36514 "EHLO
-	mail-vk0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753113AbbKJOtl (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Nov 2015 09:49:41 -0500
-Received: by vkas68 with SMTP id s68so13394134vka.3
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2015 06:49:40 -0800 (PST)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="DiF9EVaO2c3vELXrUKn5rwjPnKr8PF6Ax"
+To: kernel-mentors-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org, linux-newbie-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello, I am new to the crypto framework in linux kernel and mailing
-list in general. I am porting a driver omap-aes.c to my platform and
-having problems with IV being modified against my will. I am doing
-AES-128-CTR and I need the IV to increment by 1 every 16 bytes.
-Instead some garbage IV is being returned to me after I do an encrypt
-operation.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--DiF9EVaO2c3vELXrUKn5rwjPnKr8PF6Ax
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I have no idea how the IV is being manipulated since the omap-aes.c
-driver accepts and write the IV to the Hardware that comes from upper
-layers but it never writes it back to the upper layers after doing
-encryption.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D107641
+I believe it is an issue which should _better_ be fixed in kernel. My
+level of knowledge doesn't allow me to identify the location to  work
+on, however, I am interested to work on this.
+Any help, ideas, thoughts, comments are appreciated.
+Thanks.
 
-I found this entry in the algo registration structure in the device driver
-.cra_u.ablkcipher = {
-.min_keysize = AES_MIN_KEY_SIZE,
-.max_keysize = AES_MAX_KEY_SIZE,
-.geniv = "seqiv",
+--=20
+OpenPGP usage is appreciated (it also helps your letter to bypass spam
+filters). To email me with encryption easily, go
+https://encrypt.to/0xC6FCDB11
 
->From some clues I got online the .geniv is telling a module to
-generate the IV? The module says that it will salt the IV but my
-requirements are that the IV must be used as is without salt. I
-removed the .geniv line from the source code but still my IV seems to
-be getting corrupted/modified. Does anybody know what I should do to
-fix this or which resource online I should read to learn how to deal
-with this?
+
+--DiF9EVaO2c3vELXrUKn5rwjPnKr8PF6Ax
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJWQkUqAAoJENVqfNDG/NsRR74P/R4WkBitkFAF4c2wiAFva5G5
+YhbJ/OP+IJg6MyjUY9W+LoCesCkTniXD/SeZju/cgDlmkFYIL2X8IOcimdoqm16P
+6z8hIwHDN6AxBn7Queg6PaDEFAbClfwbnItNOxNsnI42//mMwtYaekH0gx2MQwrC
+cOFRfNl69GsDIUcQnSWy4rSxI1axWissCan/8kePX5C6+0AR+oMJoAQGEQrQ3GJb
+HVUqkTVTdiatkvkwJ52PZTGQV/Q5yl2CXDAgSJhqxa0Dz5fk/LYPVSaszd2aww8t
+sAnTx9kzN5eg20DsFsGkI5tFMYVrKL7dw2qEyMhYhNRWYnZNc0Bk0pYxTwnLzXHU
+qLYijGDo73cqm+8fwwbpgWF+C8n3A8AGfjj1sUfocDp5rHWSnmyHSfZMQS+CR2UN
+9uqnMDMAPi/fOfYBmb8Ozjj1S//A3SZt/e2MLTS+AeASeTsHN8fYnQtwAHEJorEZ
+LRE+JpJTqsOMDTOty5XoQkUEe4K9qUw4rXI8qoC1Gkmzjg/QzC1dzB3nU+fLjMGC
+cDFocqlyr+lvyKu505rIOjOIDDZi4w6MlVC3T7xEYLubfU8a91zY52CJe+5NQsYC
+ekfdfgMQ5VObiFz1bfXjhHwt9k5+nvii3s6EFeZVs6yDkTFJmd9S6d181DCj6YV4
+tLrw92hG/Tkwoj0M5USI
+=Yuz+
+-----END PGP SIGNATURE-----
+
+--DiF9EVaO2c3vELXrUKn5rwjPnKr8PF6Ax--
+--
+To unsubscribe from this list: send the line "unsubscribe linux-usb" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
