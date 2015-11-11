@@ -1,45 +1,69 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Hardware Crypto Driver
-Date: Wed, 11 Nov 2015 12:24:03 +0800
-Message-ID: <20151111042403.GA21253@gondor.apana.org.au>
-References: <CAG3F19ArjmvN=hEsL67f1vH56nxVfZryV9utNCqosVT9J6FTCQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Orlando <orlcp440@gmail.com>
+From: Zain Wang <zain.wang@rock-chips.com>
+Subject: [PATCH v3 0/4] crypto: add crypto accelerator support for rk3288
+Date: Wed, 11 Nov 2015 14:35:55 +0800
+Message-ID: <1447223759-20730-1-git-send-email-zain.wang@rock-chips.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+	eddie.cai@rock-chips.com, Zain Wang <zain.wang@rock-chips.com>
+To: zhengsq@rock-chips.com, hl@rock-chips.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	mturquette@baylibre.com, heiko@sntech.de, pawel.moll@arm.com,
+	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
+	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:46270 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751285AbbKKEYI (ORCPT
+Received: from regular1.263xmail.com ([211.150.99.130]:56048 "EHLO
+	regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751635AbbKKGgu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Nov 2015 23:24:08 -0500
-Content-Disposition: inline
-In-Reply-To: <CAG3F19ArjmvN=hEsL67f1vH56nxVfZryV9utNCqosVT9J6FTCQ@mail.gmail.com>
+	Wed, 11 Nov 2015 01:36:50 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Orlando <orlcp440@gmail.com> wrote:
-> Hello, I am new to the crypto framework in linux kernel and mailing
-> list in general. I am porting a driver omap-aes.c to my platform and
-> having problems with IV being modified against my will. I am doing
-> AES-128-CTR and I need the IV to increment by 1 every 16 bytes.
-> Instead some garbage IV is being returned to me after I do an encrypt
-> operation.
-> 
-> I have no idea how the IV is being manipulated since the omap-aes.c
-> driver accepts and write the IV to the Hardware that comes from upper
-> layers but it never writes it back to the upper layers after doing
-> encryption.
+This commit support three cipher(AES/DES/DES3) and two chainmode(ecb/cbc),
+and the more algorithms and new hash drivers will be added later on.
 
-The omap-aes is probably buggy in this regard.  The crypto selftest
-system isn't currently testing this so a number of buggy drivers
-have slipped through.
+Changed in v3:
+- add OF depended in Kconfig
+- rename some variate
+- add reset property
+- remove crypto_p variate
 
-If you can send us a patch to fix this it would be great.  Otherwise
-I will be working through the drivers during the skcipher conversion.
+Changed in v2:
+- remove some part about hash
+- add weak key detection
+- changed some variate's type
 
-Thanks,
+Changed in v1:
+- modify some variate's name
+- modify some variate's type
+- modify some return value
+- remove or modify some print info
+- use more dev_xxx in probe
+- modify the prio of cipher
+- add Kconfig
+
+Zain Wang (4):
+  crypto: rockchip/crypto - add DT bindings documentation
+  clk: rockchip: set an ID for crypto clk
+  Crypto: rockchip/crypto - add crypto driver for rk3288
+  ARM: dts: rockchip: Add Crypto node for rk3288
+
+ .../devicetree/bindings/crypto/rockchip-crypto.txt |  29 ++
+ arch/arm/boot/dts/rk3288.dtsi                      |  12 +
+ drivers/clk/rockchip/clk-rk3288.c                  |   2 +-
+ drivers/crypto/Kconfig                             |  11 +
+ drivers/crypto/Makefile                            |   1 +
+ drivers/crypto/rockchip/Makefile                   |   3 +
+ drivers/crypto/rockchip/rk3288_crypto.c            | 392 +++++++++++++++
+ drivers/crypto/rockchip/rk3288_crypto.h            | 220 +++++++++
+ drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c | 527 +++++++++++++++++++++
+ include/dt-bindings/clock/rk3288-cru.h             |   1 +
+ 10 files changed, 1197 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+ create mode 100644 drivers/crypto/rockchip/Makefile
+ create mode 100644 drivers/crypto/rockchip/rk3288_crypto.c
+ create mode 100644 drivers/crypto/rockchip/rk3288_crypto.h
+ create mode 100644 drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
