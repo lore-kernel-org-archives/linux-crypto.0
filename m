@@ -1,92 +1,40 @@
-From: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH v3 1/4] crypto: rockchip/crypto - add DT bindings
- documentation
-Date: Wed, 11 Nov 2015 14:24:05 -0600
-Message-ID: <20151111202405.GA6512@rob-hp-laptop>
-References: <1447223759-20730-1-git-send-email-zain.wang@rock-chips.com>
- <1447223759-20730-2-git-send-email-zain.wang@rock-chips.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH 4/4] crypto: RSA padding algorithm
+Date: Wed, 11 Nov 2015 13:58:27 -0800
+Message-ID: <5643BA03.20606@intel.com>
+References: <1447203525-16796-1-git-send-email-andrew.zaborowski@intel.com>
+ <1447203525-16796-4-git-send-email-andrew.zaborowski@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org, hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org,
-	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org,
-	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
-	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org
-To: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1447223759-20730-2-git-send-email-zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+To: Andrew Zaborowski <andrew.zaborowski@intel.com>,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:59698 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751522AbbKKWBh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 11 Nov 2015 17:01:37 -0500
+In-Reply-To: <1447203525-16796-4-git-send-email-andrew.zaborowski@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 11, 2015 at 02:35:56PM +0800, Zain Wang wrote:
-> Add DT bindings documentation for the rk3288 crypto drivers.
+On 11/10/2015 04:58 PM, Andrew Zaborowski wrote:
+> This patch adds PKCS#1 v1.5 standard RSA padding as a separate template.
+> This way an RSA cipher with padding can be obtained by instantiating
+> "pkcs1pad(rsa)".  The reason for adding this is that RSA is almost
+> never used without this padding (or OAEP) so it will be needed for
+> either certificate work in the kernel or the userspace, and also I hear
+> that it is likely implemented by hardware RSA in which case an
+> implementation of the whole "pkcs1pad(rsa)" can be provided.
 > 
-> Signed-off-by: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
-
-Acked-by: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-
+> Signed-off-by: Andrew Zaborowski <andrew.zaborowski@intel.com>
 > ---
-> 
-> Changed in v3:
-> - add reset property
-> 
-> Changed in v2:
-> - None
-> 
-> Changed in v1:
-> - remove the _crypto suffix
-> - use "rockchip,rk3288-crypto" instead of "rockchip,rk3288"
-> - remove the description of status
-> 
-> 
->  .../devicetree/bindings/crypto/rockchip-crypto.txt | 29 ++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> new file mode 100644
-> index 0000000..096df34
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> @@ -0,0 +1,29 @@
-> +Rockchip Electronics And Security Accelerator
-> +
-> +Required properties:
-> +- compatible: Should be "rockchip,rk3288-crypto"
-> +- reg: Base physical address of the engine and length of memory mapped
-> +       region
-> +- interrupts: Interrupt number
-> +- clocks: Reference to the clocks about crypto
-> +- clock-names: "aclk" used to clock data
-> +	       "hclk" used to clock data
-> +	       "sclk" used to clock crypto accelerator
-> +	       "apb_pclk" used to clock dma
-> +- resets: Must contain an entry for each entry in reset-names.
-> +	  See ../reset/reset.txt for details.
-> +- reset-names: Must include the name "crypto-rst".
-> +
-> +Examples:
-> +
-> +	crypto: cypto-controller@ff8a0000 {
-> +		compatible = "rockchip,rk3288-crypto";
-> +		reg = <0xff8a0000 0x4000>;
-> +		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
-> +		clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
-> +			 <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
-> +		clock-names = "aclk", "hclk", "sclk", "apb_pclk";
-> +		resets = <&cru SRST_CRYPTO>;
-> +		reset-names = "crypto-rst";
-> +		status = "okay";
-> +	};
-> -- 
-> 1.9.1
-> 
-> 
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  crypto/Makefile               |   1 +
+>  crypto/rsa-padding.c          | 586 ++++++++++++++++++++++++++++++++++++++++++
+>  crypto/rsa.c                  |  16 +-
+>  include/crypto/internal/rsa.h |   2 +
+>  4 files changed, 604 insertions(+), 1 deletion(-)
+>  create mode 100644 crypto/rsa-padding.c
+
+Can we call this new file rsa-pkcs1pad.c instead?
+Thanks
