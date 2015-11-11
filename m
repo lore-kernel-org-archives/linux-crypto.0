@@ -1,62 +1,95 @@
-From: Andrey Utkin <andrey.od.utkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Req for mentor - [BUG]Busy luks disk not closable forever if medium
- is removed
-Date: Tue, 10 Nov 2015 21:27:38 +0200
-Message-ID: <5642452A.6090906@gmail.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="DiF9EVaO2c3vELXrUKn5rwjPnKr8PF6Ax"
-To: kernel-mentors-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org, linux-newbie-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH 2/4] crypto: rsa: only require output buffers as big as needed.
+Date: Wed, 11 Nov 2015 01:58:43 +0100
+Message-ID: <1447203525-16796-2-git-send-email-andrew.zaborowski@intel.com>
+References: <1447203525-16796-1-git-send-email-andrew.zaborowski@intel.com>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:33591 "EHLO
+	mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751762AbbKKA7F (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 10 Nov 2015 19:59:05 -0500
+Received: by wmec201 with SMTP id c201so160140660wme.0
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2015 16:59:04 -0800 (PST)
+Received: from localhost.localdomain (9.Red-2-136-109.dynamicIP.rima-tde.net. [2.136.109.9])
+        by smtp.gmail.com with ESMTPSA id lf10sm6255702wjb.23.2015.11.10.16.59.03
+        for <linux-crypto@vger.kernel.org>
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Tue, 10 Nov 2015 16:59:03 -0800 (PST)
+In-Reply-To: <1447203525-16796-1-git-send-email-andrew.zaborowski@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DiF9EVaO2c3vELXrUKn5rwjPnKr8PF6Ax
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+rhe RSA operations explicitly left-align the integers being written
+skipping any leading zero bytes, but still require the output buffers to
+include just enough space for the integer + the leading zero bytes.
+Since the size of integer + the leading zero bytes (i.e. the key modulus
+size) can now be obtained more easily through crypto_akcipher_maxsize
+change the operations to only require as big a buffer as actually needed
+if the caller has that information.  The semantics for request->dst_len
+don't change.
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D107641
-I believe it is an issue which should _better_ be fixed in kernel. My
-level of knowledge doesn't allow me to identify the location to  work
-on, however, I am interested to work on this.
-Any help, ideas, thoughts, comments are appreciated.
-Thanks.
+Signed-off-by: Andrew Zaborowski <andrew.zaborowski@intel.com>
+---
+ crypto/rsa.c | 24 ------------------------
+ 1 file changed, 24 deletions(-)
 
---=20
-OpenPGP usage is appreciated (it also helps your letter to bypass spam
-filters). To email me with encryption easily, go
-https://encrypt.to/0xC6FCDB11
-
-
---DiF9EVaO2c3vELXrUKn5rwjPnKr8PF6Ax
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJWQkUqAAoJENVqfNDG/NsRR74P/R4WkBitkFAF4c2wiAFva5G5
-YhbJ/OP+IJg6MyjUY9W+LoCesCkTniXD/SeZju/cgDlmkFYIL2X8IOcimdoqm16P
-6z8hIwHDN6AxBn7Queg6PaDEFAbClfwbnItNOxNsnI42//mMwtYaekH0gx2MQwrC
-cOFRfNl69GsDIUcQnSWy4rSxI1axWissCan/8kePX5C6+0AR+oMJoAQGEQrQ3GJb
-HVUqkTVTdiatkvkwJ52PZTGQV/Q5yl2CXDAgSJhqxa0Dz5fk/LYPVSaszd2aww8t
-sAnTx9kzN5eg20DsFsGkI5tFMYVrKL7dw2qEyMhYhNRWYnZNc0Bk0pYxTwnLzXHU
-qLYijGDo73cqm+8fwwbpgWF+C8n3A8AGfjj1sUfocDp5rHWSnmyHSfZMQS+CR2UN
-9uqnMDMAPi/fOfYBmb8Ozjj1S//A3SZt/e2MLTS+AeASeTsHN8fYnQtwAHEJorEZ
-LRE+JpJTqsOMDTOty5XoQkUEe4K9qUw4rXI8qoC1Gkmzjg/QzC1dzB3nU+fLjMGC
-cDFocqlyr+lvyKu505rIOjOIDDZi4w6MlVC3T7xEYLubfU8a91zY52CJe+5NQsYC
-ekfdfgMQ5VObiFz1bfXjhHwt9k5+nvii3s6EFeZVs6yDkTFJmd9S6d181DCj6YV4
-tLrw92hG/Tkwoj0M5USI
-=Yuz+
------END PGP SIGNATURE-----
-
---DiF9EVaO2c3vELXrUKn5rwjPnKr8PF6Ax--
---
-To unsubscribe from this list: send the line "unsubscribe linux-usb" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/crypto/rsa.c b/crypto/rsa.c
+index 1093e04..58aad69 100644
+--- a/crypto/rsa.c
++++ b/crypto/rsa.c
+@@ -91,12 +91,6 @@ static int rsa_enc(struct akcipher_request *req)
+ 		goto err_free_c;
+ 	}
+ 
+-	if (req->dst_len < mpi_get_size(pkey->n)) {
+-		req->dst_len = mpi_get_size(pkey->n);
+-		ret = -EOVERFLOW;
+-		goto err_free_c;
+-	}
+-
+ 	ret = -ENOMEM;
+ 	m = mpi_read_raw_from_sgl(req->src, req->src_len);
+ 	if (!m)
+@@ -136,12 +130,6 @@ static int rsa_dec(struct akcipher_request *req)
+ 		goto err_free_m;
+ 	}
+ 
+-	if (req->dst_len < mpi_get_size(pkey->n)) {
+-		req->dst_len = mpi_get_size(pkey->n);
+-		ret = -EOVERFLOW;
+-		goto err_free_m;
+-	}
+-
+ 	ret = -ENOMEM;
+ 	c = mpi_read_raw_from_sgl(req->src, req->src_len);
+ 	if (!c)
+@@ -180,12 +168,6 @@ static int rsa_sign(struct akcipher_request *req)
+ 		goto err_free_s;
+ 	}
+ 
+-	if (req->dst_len < mpi_get_size(pkey->n)) {
+-		req->dst_len = mpi_get_size(pkey->n);
+-		ret = -EOVERFLOW;
+-		goto err_free_s;
+-	}
+-
+ 	ret = -ENOMEM;
+ 	m = mpi_read_raw_from_sgl(req->src, req->src_len);
+ 	if (!m)
+@@ -225,12 +207,6 @@ static int rsa_verify(struct akcipher_request *req)
+ 		goto err_free_m;
+ 	}
+ 
+-	if (req->dst_len < mpi_get_size(pkey->n)) {
+-		req->dst_len = mpi_get_size(pkey->n);
+-		ret = -EOVERFLOW;
+-		goto err_free_m;
+-	}
+-
+ 	ret = -ENOMEM;
+ 	s = mpi_read_raw_from_sgl(req->src, req->src_len);
+ 	if (!s) {
+-- 
+2.1.4
