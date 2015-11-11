@@ -1,44 +1,70 @@
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH 4/4] crypto: RSA padding algorithm
-Date: Wed, 11 Nov 2015 22:25:29 +0900
-Message-ID: <6C8201C5-35DF-4DDE-A056-FF54E2A12D66@holtmann.org>
-References: <1447203525-16796-1-git-send-email-andrew.zaborowski@intel.com> <1447203525-16796-4-git-send-email-andrew.zaborowski@intel.com> <1592431.XvasPcx0bt@tauon.atsec.com>
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: Andrew Zaborowski <andrew.zaborowski@intel.com>,
-	linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+From: Orlando <orlcp440@gmail.com>
+Subject: Re: Hardware Crypto Driver
+Date: Wed, 11 Nov 2015 09:54:37 -0500
+Message-ID: <CAG3F19DdmCnWPpuC6w4W8YrYU8+q8BEmgYX0DqrbPRVqC2-16A@mail.gmail.com>
+References: <CAG3F19ArjmvN=hEsL67f1vH56nxVfZryV9utNCqosVT9J6FTCQ@mail.gmail.com>
+	<20151111042403.GA21253@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [82.165.8.211] ([82.165.8.211]:39721 "EHLO mail.holtmann.org"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752254AbbKKNa4 convert rfc822-to-8bit (ORCPT
+Received: from mail-yk0-f174.google.com ([209.85.160.174]:34979 "EHLO
+	mail-yk0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752391AbbKKOyh (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Nov 2015 08:30:56 -0500
-In-Reply-To: <1592431.XvasPcx0bt@tauon.atsec.com>
+	Wed, 11 Nov 2015 09:54:37 -0500
+Received: by ykba77 with SMTP id a77so51687298ykb.2
+        for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2015 06:54:37 -0800 (PST)
+In-Reply-To: <20151111042403.GA21253@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Stephan,
+I think the main problem might be my lack of understanding how IVs are
+handled by the kernel crypto framework. It seems the omap-aes.c driver
+is indicating to the crypto framework that it wants IV generation to
+be handled automatically by the crypto framework by filling this field
+.geniv = "eseqiv". Is there a way I can tell the kernel crypto
+framework to stop handling IV generation? Even if I remove the .geniv
+field it gets set with a default value by the crypto framework. I have
+tried .geniv = "<built-in>" but then when I make a crypto call it does
+not use the driver anymore. What are the required things I must do if
+I set .geniv = "<built-in>" ?
 
->> This patch adds PKCS#1 v1.5 standard RSA padding as a separate template.
->> This way an RSA cipher with padding can be obtained by instantiating
->> "pkcs1pad(rsa)".  The reason for adding this is that RSA is almost
->> never used without this padding (or OAEP) so it will be needed for
->> either certificate work in the kernel or the userspace, and also I hear
->> that it is likely implemented by hardware RSA in which case an
->> implementation of the whole "pkcs1pad(rsa)" can be provided.
-> 
-> In general, I think that there is a PKCS 1 implementation in the kernel in 
-> crypto/asymmetric_keys/rsa.c
-> 
-> Shouldn't that all somehow being synchronized?
-> 
-> Maybe this patch should go in but then crypto/asymmetric_keys/rsa.c should 
-> kind of being removed or point to kernel crypto API?
+static struct crypto_alg algs[] = {
+{
+.cra_name = "ctr(aes)",
+.cra_driver_name = "ctr-aes-omap",
+.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
+ CRYPTO_ALG_KERN_DRIVER_ONLY |
+ CRYPTO_ALG_ASYNC,
+.cra_u.ablkcipher = {
+.geniv = "eseqiv",
 
-I think crypto/asymmetric_keys/ needs to move to security/keys/asymmetric/ and then utilize akcipher and also PKCS 1 from crypto/
-
-Regards
-
-Marcel
+On Tue, Nov 10, 2015 at 11:24 PM, Herbert Xu
+<herbert@gondor.apana.org.au> wrote:
+> Orlando <orlcp440@gmail.com> wrote:
+>> Hello, I am new to the crypto framework in linux kernel and mailing
+>> list in general. I am porting a driver omap-aes.c to my platform and
+>> having problems with IV being modified against my will. I am doing
+>> AES-128-CTR and I need the IV to increment by 1 every 16 bytes.
+>> Instead some garbage IV is being returned to me after I do an encrypt
+>> operation.
+>>
+>> I have no idea how the IV is being manipulated since the omap-aes.c
+>> driver accepts and write the IV to the Hardware that comes from upper
+>> layers but it never writes it back to the upper layers after doing
+>> encryption.
+>
+> The omap-aes is probably buggy in this regard.  The crypto selftest
+> system isn't currently testing this so a number of buggy drivers
+> have slipped through.
+>
+> If you can send us a patch to fix this it would be great.  Otherwise
+> I will be working through the drivers during the skcipher conversion.
+>
+> Thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
