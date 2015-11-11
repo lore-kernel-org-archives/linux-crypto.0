@@ -1,101 +1,92 @@
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 1/4] lib/mpi: only require buffers as big as needed for the integer
-Date: Wed, 11 Nov 2015 01:58:42 +0100
-Message-ID: <1447203525-16796-1-git-send-email-andrew.zaborowski@intel.com>
+Subject: [PATCH 3/4] crypto: akcipher: add crypto_akcipher_type methods needed by templates.
+Date: Wed, 11 Nov 2015 01:58:44 +0100
+Message-ID: <1447203525-16796-3-git-send-email-andrew.zaborowski@intel.com>
+References: <1447203525-16796-1-git-send-email-andrew.zaborowski@intel.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:33578 "EHLO
-	mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751760AbbKKA7F (ORCPT
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:37742 "EHLO
+	mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751760AbbKKA7H (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Nov 2015 19:59:05 -0500
-Received: by wmec201 with SMTP id c201so160140196wme.0
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2015 16:59:03 -0800 (PST)
+	Tue, 10 Nov 2015 19:59:07 -0500
+Received: by wmww144 with SMTP id w144so24460267wmw.0
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2015 16:59:06 -0800 (PST)
 Received: from localhost.localdomain (9.Red-2-136-109.dynamicIP.rima-tde.net. [2.136.109.9])
-        by smtp.gmail.com with ESMTPSA id lf10sm6255702wjb.23.2015.11.10.16.59.02
+        by smtp.gmail.com with ESMTPSA id lf10sm6255702wjb.23.2015.11.10.16.59.04
         for <linux-crypto@vger.kernel.org>
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 10 Nov 2015 16:59:02 -0800 (PST)
+        Tue, 10 Nov 2015 16:59:05 -0800 (PST)
+In-Reply-To: <1447203525-16796-1-git-send-email-andrew.zaborowski@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Since mpi_write_to_sgl and mpi_read_buffer explicitly left-align the
-integers being written it makes no sense to require a buffer big enough for
-the number + the leading zero bytes which are not written.  The error
-returned also doesn't convey any information.  So instead require only the
-size needed and return -EOVERFLOW to signal when buffer too short.
+Add two dummy methods that are required by the crypto API internals:
+.ctxsize and .init
+(just because the framework calls them without checking if they were
+provided).  They're only required by the complicated code path needed to
+instantiate a template algorithm.  Also expose crypto_akcipher_type like
+other crypto types are exposed to be used from outside modules.
 
 Signed-off-by: Andrew Zaborowski <andrew.zaborowski@intel.com>
 ---
- lib/mpi/mpicoder.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
+ crypto/akcipher.c       | 16 +++++++++++++++-
+ include/crypto/algapi.h |  1 +
+ 2 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index c7e0a70..074d2df 100644
---- a/lib/mpi/mpicoder.c
-+++ b/lib/mpi/mpicoder.c
-@@ -135,7 +135,9 @@ EXPORT_SYMBOL_GPL(mpi_read_from_buffer);
-  * @buf:	bufer to which the output will be written to. Needs to be at
-  *		leaset mpi_get_size(a) long.
-  * @buf_len:	size of the buf.
-- * @nbytes:	receives the actual length of the data written.
-+ * @nbytes:	receives the actual length of the data written on success and
-+ *		the data to-be-written on -EOVERFLOW in case buf_len was too
-+ *		small.
-  * @sign:	if not NULL, it will be set to the sign of a.
-  *
-  * Return:	0 on success or error code in case of error
-@@ -148,7 +150,7 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
- 	unsigned int n = mpi_get_size(a);
- 	int i, lzeros = 0;
+diff --git a/crypto/akcipher.c b/crypto/akcipher.c
+index 120ec04..6ef7f99 100644
+--- a/crypto/akcipher.c
++++ b/crypto/akcipher.c
+@@ -53,6 +53,11 @@ static void crypto_akcipher_show(struct seq_file *m, struct crypto_alg *alg)
+ 	seq_puts(m, "type         : akcipher\n");
+ }
  
--	if (buf_len < n || !buf || !nbytes)
-+	if (!buf || !nbytes)
- 		return -EINVAL;
- 
- 	if (sign)
-@@ -163,6 +165,11 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
- 			break;
- 	}
- 
-+	if (buf_len < n - lzeros) {
-+		*nbytes = n - lzeros;
-+		return -EOVERFLOW;
-+	}
++static int crypto_akcipher_init(struct crypto_tfm *tfm, u32 type, u32 mask)
++{
++	return 0;
++}
 +
- 	p = buf;
- 	*nbytes = n - lzeros;
+ static void crypto_akcipher_exit_tfm(struct crypto_tfm *tfm)
+ {
+ 	struct crypto_akcipher *akcipher = __crypto_akcipher_tfm(tfm);
+@@ -75,8 +80,16 @@ static int crypto_akcipher_init_tfm(struct crypto_tfm *tfm)
+ 	return 0;
+ }
  
-@@ -332,7 +339,8 @@ EXPORT_SYMBOL_GPL(mpi_set_buffer);
-  * @nbytes:	in/out param - it has the be set to the maximum number of
-  *		bytes that can be written to sgl. This has to be at least
-  *		the size of the integer a. On return it receives the actual
-- *		length of the data written.
-+ *		length of the data written on success or the data that would
-+ *		be written if buffer was too small.
-  * @sign:	if not NULL, it will be set to the sign of a.
-  *
-  * Return:	0 on success or error code in case of error
-@@ -345,7 +353,7 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
- 	unsigned int n = mpi_get_size(a);
- 	int i, x, y = 0, lzeros = 0, buf_len;
- 
--	if (!nbytes || *nbytes < n)
-+	if (!nbytes)
- 		return -EINVAL;
- 
- 	if (sign)
-@@ -360,6 +368,11 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
- 			break;
- 	}
- 
-+	if (*nbytes < n - lzeros) {
-+		*nbytes = n - lzeros;
-+		return -EOVERFLOW;
-+	}
+-static const struct crypto_type crypto_akcipher_type = {
++static unsigned int crypto_akcipher_ctxsize(struct crypto_alg *alg, u32 type,
++					    u32 mask)
++{
++	return alg->cra_ctxsize;
++}
 +
- 	*nbytes = n - lzeros;
- 	buf_len = sgl->length;
- 	p2 = sg_virt(sgl);
++const struct crypto_type crypto_akcipher_type = {
++	.ctxsize = crypto_akcipher_ctxsize,
+ 	.extsize = crypto_alg_extsize,
++	.init = crypto_akcipher_init,
+ 	.init_tfm = crypto_akcipher_init_tfm,
+ #ifdef CONFIG_PROC_FS
+ 	.show = crypto_akcipher_show,
+@@ -87,6 +100,7 @@ static const struct crypto_type crypto_akcipher_type = {
+ 	.type = CRYPTO_ALG_TYPE_AKCIPHER,
+ 	.tfmsize = offsetof(struct crypto_akcipher, base),
+ };
++EXPORT_SYMBOL_GPL(crypto_akcipher_type);
+ 
+ struct crypto_akcipher *crypto_alloc_akcipher(const char *alg_name, u32 type,
+ 					      u32 mask)
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index c9fe145..1089f20 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -130,6 +130,7 @@ struct ablkcipher_walk {
+ 
+ extern const struct crypto_type crypto_ablkcipher_type;
+ extern const struct crypto_type crypto_blkcipher_type;
++extern const struct crypto_type crypto_akcipher_type;
+ 
+ void crypto_mod_put(struct crypto_alg *alg);
+ 
 -- 
 2.1.4
