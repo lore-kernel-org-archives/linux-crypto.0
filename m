@@ -1,105 +1,92 @@
-From: Orlando <orlcp440@gmail.com>
-Subject: Re: Hardware Crypto Driver
-Date: Wed, 11 Nov 2015 10:47:29 -0500
-Message-ID: <CAG3F19Cq9vqOeVOd5o-+52KV_wbc7J+7SFOyaRVzV0GW9up4wA@mail.gmail.com>
-References: <CAG3F19ArjmvN=hEsL67f1vH56nxVfZryV9utNCqosVT9J6FTCQ@mail.gmail.com>
-	<20151111042403.GA21253@gondor.apana.org.au>
-	<CAG3F19DdmCnWPpuC6w4W8YrYU8+q8BEmgYX0DqrbPRVqC2-16A@mail.gmail.com>
-	<20151111150218.GA25002@gondor.apana.org.au>
+From: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH v3 1/4] crypto: rockchip/crypto - add DT bindings
+ documentation
+Date: Wed, 11 Nov 2015 14:24:05 -0600
+Message-ID: <20151111202405.GA6512@rob-hp-laptop>
+References: <1447223759-20730-1-git-send-email-zain.wang@rock-chips.com>
+ <1447223759-20730-2-git-send-email-zain.wang@rock-chips.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yk0-f175.google.com ([209.85.160.175]:33715 "EHLO
-	mail-yk0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751826AbbKKPr3 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Nov 2015 10:47:29 -0500
-Received: by ykdv3 with SMTP id v3so54832100ykd.0
-        for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2015 07:47:29 -0800 (PST)
-In-Reply-To: <20151111150218.GA25002@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org, hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org
+To: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1447223759-20730-2-git-send-email-zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-I will not be able to use your changes since I am running kernel
-3.4.48 and I cannot change it for my project (embedded system).
+On Wed, Nov 11, 2015 at 02:35:56PM +0800, Zain Wang wrote:
+> Add DT bindings documentation for the rk3288 crypto drivers.
+> 
+> Signed-off-by: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
 
-The reason I am suspecting that the crypto framework is
-generating/manipulating the IV for my driver is because when I do a
-cat /proc/crypto I get two instances of the AES-CTR cipher instance
-instead of one. One says
+Acked-by: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 
-name         : ctr(aes)
-driver       : ctr-aes-omap
-selftest     : passed
-type         : ablkcipher
-
-which is correct and how I want it. However, there is another that
-gets automagically added by the crypto framework itself called
-
-name         : ctr(aes)
-driver       : ctr-aes-omap
-selftest     : passed
-type         : givcipher
-
-this second one has the flag CRYPTO_ALG_TYPE_GIVCIPHER set and I read that
-CRYPTO_ALG_TYPE_GIVCIPHER  = Asynchronous multi-block cipher packed
-together with an IV generator (see geniv field in the /proc/crypto
-listing for the known IV generators)
-
-as you can see, it says that it has a IV generator. I also read that I
-can supply some callbacks for me to handle IV manipulation myself in
-the driver by adding these fields
-.cra_u.ablkcipher = {
-                .givencrypt     = omap_givencrypt,
-                .givdecrypt     = omap_givdecrypt,
-
-However, they never seems be get called. It seems they are only
-supported for AEAD.
-
-givencrypt
-Update the IV for encryption. With this function, a cipher
-implementation may provide the function on how to update the IV for
-encryption.
-
-givdecrypt
-Update the IV for decryption. This is the reverse of givencrypt
-
-I have taken a look at others crypto hardware drivers implementation
-and I do not see them manipulating or returning back the resulting IV
-after the hardware operation is done. Which makes me believe the IV
-incrementing/etc (CTR) is being handled by software in the kernel
-crypto framework. I see the omap-aes.c driver receives the IV from the
-crypto framework (comes from my user space openssl app) and writes it
-into the hardware crypto engine. After the hardware finishes
-encrypting the plaintext the IV has been incremented but this new IV
-is not being written back into the kernel crypto framework to go back
-to my user app.
-
-What would I have to do to make sure the correct IV gets back to the user?
-
-
-On Wed, Nov 11, 2015 at 10:02 AM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> On Wed, Nov 11, 2015 at 09:54:37AM -0500, Orlando wrote:
->> I think the main problem might be my lack of understanding how IVs are
->> handled by the kernel crypto framework. It seems the omap-aes.c driver
->> is indicating to the crypto framework that it wants IV generation to
->> be handled automatically by the crypto framework by filling this field
->> .geniv = "eseqiv". Is there a way I can tell the kernel crypto
->> framework to stop handling IV generation? Even if I remove the .geniv
->> field it gets set with a default value by the crypto framework. I have
->> tried .geniv = "<built-in>" but then when I make a crypto call it does
->> not use the driver anymore. What are the required things I must do if
->> I set .geniv = "<built-in>" ?
->
-> geniv is completely unrelated to this.  In fact, in the current
-> kernel geniv is no longer used and I will remove it once the skcipher
-> conversion is done.
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> ---
+> 
+> Changed in v3:
+> - add reset property
+> 
+> Changed in v2:
+> - None
+> 
+> Changed in v1:
+> - remove the _crypto suffix
+> - use "rockchip,rk3288-crypto" instead of "rockchip,rk3288"
+> - remove the description of status
+> 
+> 
+>  .../devicetree/bindings/crypto/rockchip-crypto.txt | 29 ++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+> new file mode 100644
+> index 0000000..096df34
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+> @@ -0,0 +1,29 @@
+> +Rockchip Electronics And Security Accelerator
+> +
+> +Required properties:
+> +- compatible: Should be "rockchip,rk3288-crypto"
+> +- reg: Base physical address of the engine and length of memory mapped
+> +       region
+> +- interrupts: Interrupt number
+> +- clocks: Reference to the clocks about crypto
+> +- clock-names: "aclk" used to clock data
+> +	       "hclk" used to clock data
+> +	       "sclk" used to clock crypto accelerator
+> +	       "apb_pclk" used to clock dma
+> +- resets: Must contain an entry for each entry in reset-names.
+> +	  See ../reset/reset.txt for details.
+> +- reset-names: Must include the name "crypto-rst".
+> +
+> +Examples:
+> +
+> +	crypto: cypto-controller@ff8a0000 {
+> +		compatible = "rockchip,rk3288-crypto";
+> +		reg = <0xff8a0000 0x4000>;
+> +		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
+> +		clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
+> +			 <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
+> +		clock-names = "aclk", "hclk", "sclk", "apb_pclk";
+> +		resets = <&cru SRST_CRYPTO>;
+> +		reset-names = "crypto-rst";
+> +		status = "okay";
+> +	};
+> -- 
+> 1.9.1
+> 
+> 
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
