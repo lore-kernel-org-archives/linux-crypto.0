@@ -1,95 +1,101 @@
 From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH 2/4] crypto: rsa: only require output buffers as big as needed.
-Date: Wed, 11 Nov 2015 01:58:43 +0100
-Message-ID: <1447203525-16796-2-git-send-email-andrew.zaborowski@intel.com>
-References: <1447203525-16796-1-git-send-email-andrew.zaborowski@intel.com>
+Subject: [PATCH 1/4] lib/mpi: only require buffers as big as needed for the integer
+Date: Wed, 11 Nov 2015 01:58:42 +0100
+Message-ID: <1447203525-16796-1-git-send-email-andrew.zaborowski@intel.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:33591 "EHLO
-	mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751762AbbKKA7F (ORCPT
+Received: from mail-wm0-f47.google.com ([74.125.82.47]:33578 "EHLO
+	mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751760AbbKKA7F (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Tue, 10 Nov 2015 19:59:05 -0500
-Received: by wmec201 with SMTP id c201so160140660wme.0
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2015 16:59:04 -0800 (PST)
+Received: by wmec201 with SMTP id c201so160140196wme.0
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2015 16:59:03 -0800 (PST)
 Received: from localhost.localdomain (9.Red-2-136-109.dynamicIP.rima-tde.net. [2.136.109.9])
-        by smtp.gmail.com with ESMTPSA id lf10sm6255702wjb.23.2015.11.10.16.59.03
+        by smtp.gmail.com with ESMTPSA id lf10sm6255702wjb.23.2015.11.10.16.59.02
         for <linux-crypto@vger.kernel.org>
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 10 Nov 2015 16:59:03 -0800 (PST)
-In-Reply-To: <1447203525-16796-1-git-send-email-andrew.zaborowski@intel.com>
+        Tue, 10 Nov 2015 16:59:02 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-rhe RSA operations explicitly left-align the integers being written
-skipping any leading zero bytes, but still require the output buffers to
-include just enough space for the integer + the leading zero bytes.
-Since the size of integer + the leading zero bytes (i.e. the key modulus
-size) can now be obtained more easily through crypto_akcipher_maxsize
-change the operations to only require as big a buffer as actually needed
-if the caller has that information.  The semantics for request->dst_len
-don't change.
+Since mpi_write_to_sgl and mpi_read_buffer explicitly left-align the
+integers being written it makes no sense to require a buffer big enough for
+the number + the leading zero bytes which are not written.  The error
+returned also doesn't convey any information.  So instead require only the
+size needed and return -EOVERFLOW to signal when buffer too short.
 
 Signed-off-by: Andrew Zaborowski <andrew.zaborowski@intel.com>
 ---
- crypto/rsa.c | 24 ------------------------
- 1 file changed, 24 deletions(-)
+ lib/mpi/mpicoder.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/rsa.c b/crypto/rsa.c
-index 1093e04..58aad69 100644
---- a/crypto/rsa.c
-+++ b/crypto/rsa.c
-@@ -91,12 +91,6 @@ static int rsa_enc(struct akcipher_request *req)
- 		goto err_free_c;
+diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
+index c7e0a70..074d2df 100644
+--- a/lib/mpi/mpicoder.c
++++ b/lib/mpi/mpicoder.c
+@@ -135,7 +135,9 @@ EXPORT_SYMBOL_GPL(mpi_read_from_buffer);
+  * @buf:	bufer to which the output will be written to. Needs to be at
+  *		leaset mpi_get_size(a) long.
+  * @buf_len:	size of the buf.
+- * @nbytes:	receives the actual length of the data written.
++ * @nbytes:	receives the actual length of the data written on success and
++ *		the data to-be-written on -EOVERFLOW in case buf_len was too
++ *		small.
+  * @sign:	if not NULL, it will be set to the sign of a.
+  *
+  * Return:	0 on success or error code in case of error
+@@ -148,7 +150,7 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
+ 	unsigned int n = mpi_get_size(a);
+ 	int i, lzeros = 0;
+ 
+-	if (buf_len < n || !buf || !nbytes)
++	if (!buf || !nbytes)
+ 		return -EINVAL;
+ 
+ 	if (sign)
+@@ -163,6 +165,11 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
+ 			break;
  	}
  
--	if (req->dst_len < mpi_get_size(pkey->n)) {
--		req->dst_len = mpi_get_size(pkey->n);
--		ret = -EOVERFLOW;
--		goto err_free_c;
--	}
--
- 	ret = -ENOMEM;
- 	m = mpi_read_raw_from_sgl(req->src, req->src_len);
- 	if (!m)
-@@ -136,12 +130,6 @@ static int rsa_dec(struct akcipher_request *req)
- 		goto err_free_m;
++	if (buf_len < n - lzeros) {
++		*nbytes = n - lzeros;
++		return -EOVERFLOW;
++	}
++
+ 	p = buf;
+ 	*nbytes = n - lzeros;
+ 
+@@ -332,7 +339,8 @@ EXPORT_SYMBOL_GPL(mpi_set_buffer);
+  * @nbytes:	in/out param - it has the be set to the maximum number of
+  *		bytes that can be written to sgl. This has to be at least
+  *		the size of the integer a. On return it receives the actual
+- *		length of the data written.
++ *		length of the data written on success or the data that would
++ *		be written if buffer was too small.
+  * @sign:	if not NULL, it will be set to the sign of a.
+  *
+  * Return:	0 on success or error code in case of error
+@@ -345,7 +353,7 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
+ 	unsigned int n = mpi_get_size(a);
+ 	int i, x, y = 0, lzeros = 0, buf_len;
+ 
+-	if (!nbytes || *nbytes < n)
++	if (!nbytes)
+ 		return -EINVAL;
+ 
+ 	if (sign)
+@@ -360,6 +368,11 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
+ 			break;
  	}
  
--	if (req->dst_len < mpi_get_size(pkey->n)) {
--		req->dst_len = mpi_get_size(pkey->n);
--		ret = -EOVERFLOW;
--		goto err_free_m;
--	}
--
- 	ret = -ENOMEM;
- 	c = mpi_read_raw_from_sgl(req->src, req->src_len);
- 	if (!c)
-@@ -180,12 +168,6 @@ static int rsa_sign(struct akcipher_request *req)
- 		goto err_free_s;
- 	}
- 
--	if (req->dst_len < mpi_get_size(pkey->n)) {
--		req->dst_len = mpi_get_size(pkey->n);
--		ret = -EOVERFLOW;
--		goto err_free_s;
--	}
--
- 	ret = -ENOMEM;
- 	m = mpi_read_raw_from_sgl(req->src, req->src_len);
- 	if (!m)
-@@ -225,12 +207,6 @@ static int rsa_verify(struct akcipher_request *req)
- 		goto err_free_m;
- 	}
- 
--	if (req->dst_len < mpi_get_size(pkey->n)) {
--		req->dst_len = mpi_get_size(pkey->n);
--		ret = -EOVERFLOW;
--		goto err_free_m;
--	}
--
- 	ret = -ENOMEM;
- 	s = mpi_read_raw_from_sgl(req->src, req->src_len);
- 	if (!s) {
++	if (*nbytes < n - lzeros) {
++		*nbytes = n - lzeros;
++		return -EOVERFLOW;
++	}
++
+ 	*nbytes = n - lzeros;
+ 	buf_len = sgl->length;
+ 	p2 = sg_virt(sgl);
 -- 
 2.1.4
