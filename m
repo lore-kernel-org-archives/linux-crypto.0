@@ -1,8 +1,8 @@
 From: Heiko Stuebner <heiko@sntech.de>
-Subject: Re: [PATCH v3 0/4] crypto: add crypto accelerator support for rk3288
-Date: Thu, 12 Nov 2015 10:56:52 +0100
-Message-ID: <7910783.rT7PcfhDUF@phil>
-References: <1447223759-20730-1-git-send-email-zain.wang@rock-chips.com>
+Subject: Re: [PATCH v3 4/4] ARM: dts: rockchip: Add Crypto node for rk3288
+Date: Thu, 12 Nov 2015 11:00:23 +0100
+Message-ID: <2270449.oxEXk1fLcI@phil>
+References: <1447223759-20730-1-git-send-email-zain.wang@rock-chips.com> <1447223759-20730-5-git-send-email-zain.wang@rock-chips.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
@@ -15,66 +15,58 @@ Cc: zhengsq@rock-chips.com, hl@rock-chips.com,
 	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
 	eddie.cai@rock-chips.com
 To: Zain Wang <zain.wang@rock-chips.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gloria.sntech.de ([95.129.55.99]:48577 "EHLO gloria.sntech.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753644AbbKLJ5Q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Nov 2015 04:57:16 -0500
-In-Reply-To: <1447223759-20730-1-git-send-email-zain.wang@rock-chips.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1447223759-20730-5-git-send-email-zain.wang@rock-chips.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 11. November 2015, 14:35:55 schrieb Zain Wang:
-> This commit support three cipher(AES/DES/DES3) and two chainmode(ecb/cbc),
-> and the more algorithms and new hash drivers will be added later on.
-
-I gave this a spin using tcrypt on my rk3288 chromebook and it seems to
-work nicely for modes 200 (aes), 201 (des3) and 204 (des), so this series
-
-Tested-by: Heiko Stuebner <heiko@sntech.de>
-
+Am Mittwoch, 11. November 2015, 14:35:59 schrieb Zain Wang:
+> Add Crypto node for rk3288 including crypto controller and dma clk.
 > 
+> Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
+
+I'd like to pick this one and the clock-patch2 up, once the crypto
+driver itself got accepted and we have an Ack from the clock-maintainers
+for the clock-id patch.
+
+
+Heiko
+
+> ---
 > Changed in v3:
-> - add OF depended in Kconfig
-> - rename some variate
 > - add reset property
-> - remove crypto_p variate
 > 
 > Changed in v2:
-> - remove some part about hash
-> - add weak key detection
-> - changed some variate's type
+> - None
 > 
 > Changed in v1:
-> - modify some variate's name
-> - modify some variate's type
-> - modify some return value
-> - remove or modify some print info
-> - use more dev_xxx in probe
-> - modify the prio of cipher
-> - add Kconfig
+> - remove the _crypto suffix
+> - use "rockchip,rk3288-crypto" instead of "rockchip,rk3288"
 > 
-> Zain Wang (4):
->   crypto: rockchip/crypto - add DT bindings documentation
->   clk: rockchip: set an ID for crypto clk
->   Crypto: rockchip/crypto - add crypto driver for rk3288
->   ARM: dts: rockchip: Add Crypto node for rk3288
+>  arch/arm/boot/dts/rk3288.dtsi | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 > 
->  .../devicetree/bindings/crypto/rockchip-crypto.txt |  29 ++
->  arch/arm/boot/dts/rk3288.dtsi                      |  12 +
->  drivers/clk/rockchip/clk-rk3288.c                  |   2 +-
->  drivers/crypto/Kconfig                             |  11 +
->  drivers/crypto/Makefile                            |   1 +
->  drivers/crypto/rockchip/Makefile                   |   3 +
->  drivers/crypto/rockchip/rk3288_crypto.c            | 392 +++++++++++++++
->  drivers/crypto/rockchip/rk3288_crypto.h            | 220 +++++++++
->  drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c | 527 +++++++++++++++++++++
->  include/dt-bindings/clock/rk3288-cru.h             |   1 +
->  10 files changed, 1197 insertions(+), 1 deletion(-)
->  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
->  create mode 100644 drivers/crypto/rockchip/Makefile
->  create mode 100644 drivers/crypto/rockchip/rk3288_crypto.c
->  create mode 100644 drivers/crypto/rockchip/rk3288_crypto.h
->  create mode 100644 drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
-> 
+> diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288.dtsi
+> index 6a79c9c..f0d1217 100644
+> --- a/arch/arm/boot/dts/rk3288.dtsi
+> +++ b/arch/arm/boot/dts/rk3288.dtsi
+> @@ -778,6 +778,18 @@
+>  		status = "disabled";
+>  	};
+>  
+> +	crypto: cypto-controller@ff8a0000 {
+> +		compatible = "rockchip,rk3288-crypto";
+> +		reg = <0xff8a0000 0x4000>;
+> +		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
+> +		clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
+> +			 <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
+> +		clock-names = "aclk", "hclk", "sclk", "apb_pclk";
+> +		resets = <&cru SRST_CRYPTO>;
+> +		reset-names = "crypto-rst";
+> +		status = "okay";
+> +	};
+> +
+>  	vopb: vop@ff930000 {
+>  		compatible = "rockchip,rk3288-vop";
+>  		reg = <0xff930000 0x19c>;
 > 
