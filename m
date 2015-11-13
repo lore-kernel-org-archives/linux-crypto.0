@@ -1,48 +1,35 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH] crypto: sun4i-ss: add missing statesize
-Date: Fri, 13 Nov 2015 14:10:28 +0100
-Message-ID: <1447420229-17911-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: <stable@vger.kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: clabbe.montjoie@gmail.com, davem@davemloft.net,
-	herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
-	maxime.ripard@free-electrons.com, wens@csie.org
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Andrzej Zaborowski <andrew.zaborowski@intel.com>
+Subject: Re: [PATCH 1/4] lib/mpi: only require buffers as big as needed for
+ the integer
+Date: Sat, 14 Nov 2015 00:46:53 +0100
+Message-ID: <CAOq732JuB0HroBvjw4UxaE1DphnpYYvjq_2fGw+tfHkAgo7hVA@mail.gmail.com>
+References: <1447412495-4370-1-git-send-email-andrew.zaborowski@intel.com>
+	<1971326.IIk0rEidCT@tauon.atsec.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:36804 "EHLO
+	mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752497AbbKMXqz (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 13 Nov 2015 18:46:55 -0500
+Received: by wmww144 with SMTP id w144so47984072wmw.1
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2015 15:46:54 -0800 (PST)
+In-Reply-To: <1971326.IIk0rEidCT@tauon.atsec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-sun4i-ss implementaton of md5/sha1 is via ahash algorithms.
-Commit 8996eafdcbad ("crypto: ahash - ensure statesize is non-zero")
-made impossible to load them without giving statesize. This patch
-specifiy statesize for sha1 and md5.
+Hi Stephan,
 
-Fixes: 6298e948215f ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
-Cc: <stable@vger.kernel.org> # v4.3+
-Tested-by: Chen-Yu Tsai <wens@csie.org>
-Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
----
- drivers/crypto/sunxi-ss/sun4i-ss-core.c | 2 ++
- 1 file changed, 2 insertions(+)
+On 13 November 2015 at 13:47, Stephan Mueller <smueller@chronox.de> wrote:
+> Sorry to be picky here, but is this v2? If yes, may I ask (at least for the
+> future) for brief notation of the changes as well as a marking of the patches.
 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-core.c b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-index eab6fe2..107cd2a 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-@@ -39,6 +39,7 @@ static struct sun4i_ss_alg_template ss_algs[] = {
- 		.import = sun4i_hash_import_md5,
- 		.halg = {
- 			.digestsize = MD5_DIGEST_SIZE,
-+			.statesize = sizeof(struct md5_state),
- 			.base = {
- 				.cra_name = "md5",
- 				.cra_driver_name = "md5-sun4i-ss",
-@@ -66,6 +67,7 @@ static struct sun4i_ss_alg_template ss_algs[] = {
- 		.import = sun4i_hash_import_sha1,
- 		.halg = {
- 			.digestsize = SHA1_DIGEST_SIZE,
-+			.statesize = sizeof(struct sha1_state),
- 			.base = {
- 				.cra_name = "sha1",
- 				.cra_driver_name = "sha1-sun4i-ss",
--- 
-2.4.10
+There are no changes in patches 1-3, I wasn't sure if it was okay to
+resend just that one patch that was affected.  I'll include some
+indication of that next time for the clients that don't make it
+apparent that a message is a plain resend.
+
+Best regards
