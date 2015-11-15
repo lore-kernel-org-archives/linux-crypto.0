@@ -1,8 +1,8 @@
 From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH 1/4] crypto-ixp4xx: Delete unnecessary checks before the
- function call "dma_pool_destroy"
-Date: Sun, 15 Nov 2015 19:49:16 +0100
-Message-ID: <5648D3AC.6090904@users.sourceforge.net>
+Subject: [PATCH 2/4] crypto-ixp4xx: Two function calls less in
+ init_ixp_crypto() after error detection
+Date: Sun, 15 Nov 2015 19:50:51 +0100
+Message-ID: <5648D40B.8020002@users.sourceforge.net>
 References: <5307CAA2.8060406@users.sourceforge.net>
  <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6>
  <530A086E.8010901@users.sourceforge.net>
@@ -29,38 +29,38 @@ Cc: LKML <linux-kernel@vger.kernel.org>,
 To: "David S. Miller" <davem@davemloft.net>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org
-Return-path: <kernel-janitors-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <5648D2C1.8050603@users.sourceforge.net>
-Sender: kernel-janitors-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sun, 15 Nov 2015 16:51:21 +0100
+Date: Sun, 15 Nov 2015 18:28:39 +0100
 
-The dma_pool_destroy() function tests whether its argument is NULL
-and then returns immediately. Thus the test around the calls is not needed.
+The dma_pool_destroy() function was called twice with a null pointer
+if a "npe_error" was reported.
 
-This issue was detected by using the Coccinelle software.
+This implementation detail could be improved by the introduction
+of another jump label.
 
 Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 ---
- drivers/crypto/ixp4xx_crypto.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/crypto/ixp4xx_crypto.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index 8f27903..e52496a 100644
+index e52496a..efe0eca 100644
 --- a/drivers/crypto/ixp4xx_crypto.c
 +++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -510,10 +510,8 @@ npe_error:
+@@ -509,9 +509,11 @@ static int init_ixp_crypto(struct device *dev)
+ npe_error:
  	printk(KERN_ERR "%s not responding\n", npe_name(npe_c));
  	ret = -EIO;
++	goto release_npe;
  err:
--	if (ctx_pool)
--		dma_pool_destroy(ctx_pool);
--	if (buffer_pool)
--		dma_pool_destroy(buffer_pool);
-+	dma_pool_destroy(ctx_pool);
-+	dma_pool_destroy(buffer_pool);
+ 	dma_pool_destroy(ctx_pool);
+ 	dma_pool_destroy(buffer_pool);
++release_npe:
  	npe_release(npe_c);
  	return ret;
  }
