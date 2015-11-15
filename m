@@ -1,7 +1,8 @@
 From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH 0/4] crypto-ixp4xx: Deletion of a few unnecessary checks
-Date: Sun, 15 Nov 2015 19:45:21 +0100
-Message-ID: <5648D2C1.8050603@users.sourceforge.net>
+Subject: [PATCH 1/4] crypto-ixp4xx: Delete unnecessary checks before the
+ function call "dma_pool_destroy"
+Date: Sun, 15 Nov 2015 19:49:16 +0100
+Message-ID: <5648D3AC.6090904@users.sourceforge.net>
 References: <5307CAA2.8060406@users.sourceforge.net>
  <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6>
  <530A086E.8010901@users.sourceforge.net>
@@ -18,7 +19,7 @@ References: <5307CAA2.8060406@users.sourceforge.net>
  <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
  <530DD06F.4090703@users.sourceforge.net>
  <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
- <5317A59D.4@users.sourceforge.net>
+ <5317A59D.4@users.sourceforge.net> <5648D2C1.8050603@users.sourceforge.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -28,29 +29,40 @@ Cc: LKML <linux-kernel@vger.kernel.org>,
 To: "David S. Miller" <davem@davemloft.net>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.17.12]:51826 "EHLO mout.web.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751574AbbKOSpf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 15 Nov 2015 13:45:35 -0500
-In-Reply-To: <5317A59D.4@users.sourceforge.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+In-Reply-To: <5648D2C1.8050603@users.sourceforge.net>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sun, 15 Nov 2015 19:39:00 +0100
+Date: Sun, 15 Nov 2015 16:51:21 +0100
 
-Further update suggestions were taken into account after a patch
-was applied from static source code analysis.
+The dma_pool_destroy() function tests whether its argument is NULL
+and then returns immediately. Thus the test around the calls is not needed.
 
-Markus Elfring (4):
-  Delete unnecessary checks before the function call "dma_pool_destroy"
-  Two function calls less in init_ixp_crypto() after error detection
-  Reduce assignment for a variable in init_ixp_crypto()
-  Less function calls in init_ixp_crypto() after error detection
+This issue was detected by using the Coccinelle software.
 
- drivers/crypto/ixp4xx_crypto.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+---
+ drivers/crypto/ixp4xx_crypto.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
+diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
+index 8f27903..e52496a 100644
+--- a/drivers/crypto/ixp4xx_crypto.c
++++ b/drivers/crypto/ixp4xx_crypto.c
+@@ -510,10 +510,8 @@ npe_error:
+ 	printk(KERN_ERR "%s not responding\n", npe_name(npe_c));
+ 	ret = -EIO;
+ err:
+-	if (ctx_pool)
+-		dma_pool_destroy(ctx_pool);
+-	if (buffer_pool)
+-		dma_pool_destroy(buffer_pool);
++	dma_pool_destroy(ctx_pool);
++	dma_pool_destroy(buffer_pool);
+ 	npe_release(npe_c);
+ 	return ret;
+ }
 -- 
 2.6.2
