@@ -1,8 +1,8 @@
 From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH 2/4] crypto-ixp4xx: Two function calls less in
- init_ixp_crypto() after error detection
-Date: Sun, 15 Nov 2015 19:50:51 +0100
-Message-ID: <5648D40B.8020002@users.sourceforge.net>
+Subject: [PATCH 3/4] crypto-ixp4xx: Reduce assignment for a variable in
+ init_ixp_crypto()
+Date: Sun, 15 Nov 2015 19:52:22 +0100
+Message-ID: <5648D466.10307@users.sourceforge.net>
 References: <5307CAA2.8060406@users.sourceforge.net>
  <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6>
  <530A086E.8010901@users.sourceforge.net>
@@ -35,34 +35,62 @@ Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sun, 15 Nov 2015 18:28:39 +0100
+Date: Sun, 15 Nov 2015 19:06:44 +0100
 
-The dma_pool_destroy() function was called twice with a null pointer
-if a "npe_error" was reported.
+The variable "ret" was set more often than necessary by the
+init_ixp_crypto() function.
 
-This implementation detail could be improved by the introduction
-of another jump label.
+* Omit its initialisation at the beginning.
+
+* Use an error return code in two cases directly.
+
+* Improve compliance with the Linux coding style convention.
 
 Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 ---
- drivers/crypto/ixp4xx_crypto.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/crypto/ixp4xx_crypto.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index e52496a..efe0eca 100644
+index efe0eca..97da36a 100644
 --- a/drivers/crypto/ixp4xx_crypto.c
 +++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -509,9 +509,11 @@ static int init_ixp_crypto(struct device *dev)
- npe_error:
- 	printk(KERN_ERR "%s not responding\n", npe_name(npe_c));
- 	ret = -EIO;
-+	goto release_npe;
- err:
- 	dma_pool_destroy(ctx_pool);
- 	dma_pool_destroy(buffer_pool);
-+release_npe:
- 	npe_release(npe_c);
- 	return ret;
- }
+@@ -433,17 +433,17 @@ static void crypto_done_action(unsigned long arg)
+ 
+ static int init_ixp_crypto(struct device *dev)
+ {
+-	int ret = -ENODEV;
++	int ret;
+ 	u32 msg[2] = { 0, 0 };
+ 
+ 	if (! ( ~(*IXP4XX_EXP_CFG2) & (IXP4XX_FEATURE_HASH |
+ 				IXP4XX_FEATURE_AES | IXP4XX_FEATURE_DES))) {
+ 		printk(KERN_ERR "ixp_crypto: No HW crypto available\n");
+-		return ret;
++		return -ENODEV;
+ 	}
+ 	npe_c = npe_request(NPE_ID);
+ 	if (!npe_c)
+-		return ret;
++		return -ENODEV;
+ 
+ 	if (!npe_running(npe_c)) {
+ 		ret = npe_load_firmware(npe_c, npe_name(npe_c), dev);
+@@ -481,13 +481,14 @@ static int init_ixp_crypto(struct device *dev)
+ 	BUILD_BUG_ON(SHA1_DIGEST_SIZE > sizeof(struct buffer_desc));
+ 	buffer_pool = dma_pool_create("buffer", dev,
+ 			sizeof(struct buffer_desc), 32, 0);
+-	ret = -ENOMEM;
+ 	if (!buffer_pool) {
++		ret = -ENOMEM;
+ 		goto err;
+ 	}
+ 	ctx_pool = dma_pool_create("context", dev,
+ 			NPE_CTX_LEN, 16, 0);
+ 	if (!ctx_pool) {
++		ret = -ENOMEM;
+ 		goto err;
+ 	}
+ 	ret = qmgr_request_queue(SEND_QID, NPE_QLEN_TOTAL, 0, 0,
 -- 
 2.6.2
