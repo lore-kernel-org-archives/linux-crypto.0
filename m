@@ -1,44 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] Timing leaks in certain HW-crypto drivers
-Date: Mon, 16 Nov 2015 21:38:24 +0800
-Message-ID: <20151116133824.GA30580@gondor.apana.org.au>
-References: <1447604082-1883-1-git-send-email-david@sigma-star.at>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: David Gstir <david@sigma-star.at>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:33068 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752948AbbKPNi2 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Nov 2015 08:38:28 -0500
-Content-Disposition: inline
-In-Reply-To: <1447604082-1883-1-git-send-email-david@sigma-star.at>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Geliang Tang <geliangtang@163.com>
+Subject: [PATCH 2/2] crypto: mcryptd - use list_first_entry_or_null()
+Date: Mon, 16 Nov 2015 22:37:15 +0800
+Message-ID: <d6b0e641f72c3f72a759a7266dd103dcd0b19886.1447684469.git.geliangtang@163.com>
+References: <1c77a1fba395b9f7fa6fae64f639b98a5662735e.1447684469.git.geliangtang@163.com>
+Cc: Geliang Tang <geliangtang@163.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1c77a1fba395b9f7fa6fae64f639b98a5662735e.1447684469.git.geliangtang@163.com>
+In-Reply-To: <1c77a1fba395b9f7fa6fae64f639b98a5662735e.1447684469.git.geliangtang@163.com>
+References: <1c77a1fba395b9f7fa6fae64f639b98a5662735e.1447684469.git.geliangtang@163.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Nov 15, 2015 at 05:14:40PM +0100, David Gstir wrote:
-> [resend to linux-crypto]
-> 
-> Hi,
-> 
-> the following patches fix timing leaks which are introduced by using
-> (non-constant time) memcmp() to verify cryptograhic authentication tags.
-> Specifically, the AES-GCM and AES-CCM implementations in the IBM Power
-> in-Nest Crypto acceleration driver and the AEAD decryption function in the
-> Freescale SEC (talitos) driver are vulnerable to this kind of attack.
-> These timing leaks can be used by an attacker to find the correct
-> authentication tag value for arbitrary messages with far less effort
-> than brute-force testing all 2^n possible values for a n-bit tag.
-> 
-> The fix is rather simple: Use crypto_memneq() as the generic implementations
-> in crypto/* already do.
+Simplify mcryptd_opportunistic_flush() with list_first_entry_or_null().
 
-Both patches applied.
+Signed-off-by: Geliang Tang <geliangtang@163.com>
+---
+ crypto/mcryptd.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-Thanks,
+diff --git a/crypto/mcryptd.c b/crypto/mcryptd.c
+index fe5b495a..f78d4fc 100644
+--- a/crypto/mcryptd.c
++++ b/crypto/mcryptd.c
+@@ -128,13 +128,9 @@ static void mcryptd_opportunistic_flush(void)
+ 	flist = per_cpu_ptr(mcryptd_flist, smp_processor_id());
+ 	while (single_task_running()) {
+ 		mutex_lock(&flist->lock);
+-		if (list_empty(&flist->list)) {
+-			mutex_unlock(&flist->lock);
+-			return;
+-		}
+-		cstate = list_entry(flist->list.next,
++		cstate = list_first_entry_or_null(&flist->list,
+ 				struct mcryptd_alg_cstate, flush_list);
+-		if (!cstate->flusher_engaged) {
++		if (!cstate || !cstate->flusher_engaged) {
+ 			mutex_unlock(&flist->lock);
+ 			return;
+ 		}
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.5.0
