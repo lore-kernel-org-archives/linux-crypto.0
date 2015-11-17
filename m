@@ -1,37 +1,60 @@
-From: Greg KH <greg@kroah.com>
-Subject: Re: [PATCH] crypto: sun4i-ss: add missing statesize
-Date: Tue, 17 Nov 2015 13:51:10 -0800
-Message-ID: <20151117215110.GB18515@kroah.com>
-References: <1447420229-17911-1-git-send-email-clabbe.montjoie@gmail.com>
- <20151117140938.GH9546@gondor.apana.org.au>
- <20151117142603.GA1669@Red>
- <20151117142742.GA10019@gondor.apana.org.au>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v2 1/5] crypto: Multi-buffer encryptioin infrastructure
+ support
+Date: Tue, 17 Nov 2015 14:59:29 -0800
+Message-ID: <1447801169.4933.28.camel@schen9-desk2.jf.intel.com>
+References: <cover.1446158797.git.tim.c.chen@linux.intel.com>
+	 <1446157263.14635.15.camel@schen9-desk2.jf.intel.com>
+	 <20151117130633.GB8032@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: LABBE Corentin <clabbe.montjoie@gmail.com>, davem@davemloft.net,
-	linux-arm-kernel@lists.infradead.org,
-	maxime.ripard@free-electrons.com, wens@csie.org,
-	stable@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Stephan Mueller <smueller@chronox.de>,
+	Chandramouli Narayanan <mouli_7982@yahoo.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20151117142742.GA10019@gondor.apana.org.au>
-Sender: stable-owner@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20151117130633.GB8032@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Nov 17, 2015 at 10:27:42PM +0800, Herbert Xu wrote:
-> On Tue, Nov 17, 2015 at 03:26:03PM +0100, LABBE Corentin wrote:
-> >
-> > I have lots of user reporting that they cannot use the device since it wont load.
-> > For me it need to go stable since it respect all "stable rules", simple, tested, minimal, and fix a real bug that bother people.
+On Tue, 2015-11-17 at 21:06 +0800, Herbert Xu wrote:
+> On Thu, Oct 29, 2015 at 03:21:03PM -0700, Tim Chen wrote:
+> > 
+> > c) Add support to crypto scatterwalk support that can sleep during
+> > encryption operation, as we may have buffers for jobs in data lanes
+> > that are half-finished, waiting for additional jobs to come to fill
+> > empty lanes before we start the encryption again.  Therefore, we need to
+> > enhance crypto walk with the option to map data buffers non-atomically.
+> > This is done by algorithms run from crypto daemon who knows it is safe
+> > to do so as it can save and restore FPU state in correct context.
 > 
-> Well it will hit stable eventually.  I just don't feel comfortable
-> with sending it in straight away.
+> What about the existing ablkcipher scatterwalk helpers?
+> 
+> Cheers,
 
-You can't send it in "straight away", the rule is that it has to be in
-Linus's tree first, don't worry, you are doing it correctly.
+I suppose blkcipher was originally used because we 
+were under the impression that there are less buffer copying
+and less allocation of intermediate buffers
+with blkcipher walk. 
 
-thanks,
+But looking at the blkcipher walk and ablkcipher
+walk code more carefully now, I am not sure that's really true
+as it seems like ablkcipher keep all intermediate buffers till the
+end and copy them to destination in one shot while blkcipher does
+that at walk of every chunk.  The advantage of blkcipher is
+you don't have as many outstanding buffers in a list.  If there's
+really not much speed difference, I can try to use ablkcipher.
 
-greg k-h
+Herbert, would you prefer me to use ablkcipher scatter walk instead,
+assuming the overhead of both walk are about the same?
+
+Thanks.
+
+Tim
