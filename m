@@ -1,93 +1,48 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] crypto: atmel: fix 64-bit warnings
-Date: Tue, 17 Nov 2015 10:22:06 +0100
-Message-ID: <4444008.DmhAgm3J77@wuerfel>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.4
+Date: Tue, 17 Nov 2015 17:41:21 +0800
+Message-ID: <20151117094121.GA7756@gondor.apana.org.au>
+References: <20140401100001.GA12386@gondor.apana.org.au>
+ <20140605062336.GA14440@gondor.apana.org.au>
+ <20140804130339.GA1178@gondor.apana.org.au>
+ <20141007131826.GA29688@gondor.apana.org.au>
+ <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150626102234.GA19393@gondor.apana.org.au>
+ <20150908092502.GA8332@gondor.apana.org.au>
+ <20151026110247.GA20464@gondor.apana.org.au>
+ <20151111070818.GA22344@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Leilei Zhao <leilei.zhao@atmel.com>,
-	Nicolas Ferre <nicolas.ferre@atmel.com>,
-	Nicolas Royer <nicolas@eukrea.com>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:63168 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751686AbbKQJY3 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Nov 2015 04:24:29 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20151111070818.GA22344@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The atmel AES driver assumes that 'int' and 'size_t' are the same
-type in multiple locations, which the compiler warns about when
-building it for 64-bit systems:
+Hi Linus:
 
-In file included from ../drivers/crypto/atmel-aes.c:17:0:
-drivers/crypto/atmel-aes.c: In function 'atmel_aes_sg_copy':
-include/linux/kernel.h:724:17: warning: comparison of distinct pointer types lacks a cast
-drivers/crypto/atmel-aes.c:448:11: note: in expansion of macro 'min'
+This push fixes a bug in the qat driver where a user-space pointer
+is dereferenced.
 
-drivers/crypto/atmel-aes.c: In function 'atmel_aes_crypt_dma_stop':
-include/linux/kern_levels.h:4:18: warning: format '%u' expects argument of type 'unsigned int', but argument 2 has type 'size_t {aka long unsigned int}' [-Wformat=]
 
-This changes the format strings to use the %z modifier when printing
-a size_t, and makes sure that we use the correct size_t type where
-needed. In case of sg_dma_len(), the type of the result depends
-on CONFIG_NEED_SG_DMA_LENGTH, so we have to use min_t to get it to
-work in all configurations.
+Please pull from
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index fb16d812c8f5..bfb1f799bf56 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -184,7 +184,7 @@ static int atmel_aes_sg_length(struct ablkcipher_request *req,
- static int atmel_aes_sg_copy(struct scatterlist **sg, size_t *offset,
- 			void *buf, size_t buflen, size_t total, int out)
- {
--	unsigned int count, off = 0;
-+	size_t count, off = 0;
- 
- 	while (buflen && total) {
- 		count = min((*sg)->length - *offset, total);
-@@ -444,8 +444,8 @@ static int atmel_aes_crypt_dma_start(struct atmel_aes_dev *dd)
- 
- 
- 	if (fast)  {
--		count = min(dd->total, sg_dma_len(dd->in_sg));
--		count = min(count, sg_dma_len(dd->out_sg));
-+		count = min_t(size_t, dd->total, sg_dma_len(dd->in_sg));
-+		count = min_t(size_t, count, sg_dma_len(dd->out_sg));
- 
- 		err = dma_map_sg(dd->dev, dd->in_sg, 1, DMA_TO_DEVICE);
- 		if (!err) {
-@@ -639,7 +639,7 @@ static int atmel_aes_crypt_dma_stop(struct atmel_aes_dev *dd)
- 				dd->buf_out, dd->buflen, dd->dma_size, 1);
- 			if (count != dd->dma_size) {
- 				err = -EINVAL;
--				pr_err("not all data converted: %u\n", count);
-+				pr_err("not all data converted: %zu\n", count);
- 			}
- 		}
- 	}
-@@ -666,7 +666,7 @@ static int atmel_aes_buff_init(struct atmel_aes_dev *dd)
- 	dd->dma_addr_in = dma_map_single(dd->dev, dd->buf_in,
- 					dd->buflen, DMA_TO_DEVICE);
- 	if (dma_mapping_error(dd->dev, dd->dma_addr_in)) {
--		dev_err(dd->dev, "dma %d bytes error\n", dd->buflen);
-+		dev_err(dd->dev, "dma %zd bytes error\n", dd->buflen);
- 		err = -EINVAL;
- 		goto err_map_in;
- 	}
-@@ -674,7 +674,7 @@ static int atmel_aes_buff_init(struct atmel_aes_dev *dd)
- 	dd->dma_addr_out = dma_map_single(dd->dev, dd->buf_out,
- 					dd->buflen, DMA_FROM_DEVICE);
- 	if (dma_mapping_error(dd->dev, dd->dma_addr_out)) {
--		dev_err(dd->dev, "dma %d bytes error\n", dd->buflen);
-+		dev_err(dd->dev, "dma %zd bytes error\n", dd->buflen);
- 		err = -EINVAL;
- 		goto err_map_out;
- 	}
+
+Tadeusz Struk (1):
+      crypto: qat - don't use userspace pointer
+
+ drivers/crypto/qat/qat_common/adf_ctl_drv.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
