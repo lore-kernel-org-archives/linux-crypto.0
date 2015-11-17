@@ -1,31 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 7/9] crypto: constify pci_error_handlers structures
-Date: Tue, 17 Nov 2015 22:09:54 +0800
-Message-ID: <20151117140953.GI9546@gondor.apana.org.au>
-References: <1447495621-9161-1-git-send-email-Julia.Lawall@lip6.fr>
- <1447495621-9161-8-git-send-email-Julia.Lawall@lip6.fr>
+Subject: Re: [PATCH] crypto: sun4i-ss: add missing statesize
+Date: Tue, 17 Nov 2015 22:09:38 +0800
+Message-ID: <20151117140938.GH9546@gondor.apana.org.au>
+References: <1447420229-17911-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
-	kernel-janitors@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>, qat-linux@intel.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Julia Lawall <Julia.Lawall@lip6.fr>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
+Cc: davem@davemloft.net, linux-arm-kernel@lists.infradead.org,
+	maxime.ripard@free-electrons.com, wens@csie.org,
+	stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1447495621-9161-8-git-send-email-Julia.Lawall@lip6.fr>
-Sender: kernel-janitors-owner@vger.kernel.org
+In-Reply-To: <1447420229-17911-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Nov 14, 2015 at 11:06:59AM +0100, Julia Lawall wrote:
-> This pci_error_handlers structure is never modified, like all the other
-> pci_error_handlers structures, so declare it as const.
+On Fri, Nov 13, 2015 at 02:10:28PM +0100, LABBE Corentin wrote:
+> sun4i-ss implementaton of md5/sha1 is via ahash algorithms.
+> Commit 8996eafdcbad ("crypto: ahash - ensure statesize is non-zero")
+> made impossible to load them without giving statesize. This patch
+> specifiy statesize for sha1 and md5.
 > 
-> Done with the help of Coccinelle.
-> 
-> Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+> Fixes: 6298e948215f ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
+> Cc: <stable@vger.kernel.org> # v4.3+
+> Tested-by: Chen-Yu Tsai <wens@csie.org>
+> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 
-Patch applied.  Thanks.
+Patch applied to cryptodev as I don't think it needs to go into
+stable straight away.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
