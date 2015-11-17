@@ -1,27 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: qat - fix get instance function
-Date: Tue, 17 Nov 2015 22:07:31 +0800
-Message-ID: <20151117140731.GD9546@gondor.apana.org.au>
-References: <20151022133036.3097.59054.stgit@tstruk-mobl1>
+Subject: Re: [PATCH] crypto: qat - remove superfluous check from adf_probe
+Date: Tue, 17 Nov 2015 22:07:51 +0800
+Message-ID: <20151117140751.GE9546@gondor.apana.org.au>
+References: <1445523792-28389-1-git-send-email-salvatore.benedetto@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:50827 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:49892 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753917AbbKQOHe (ORCPT
+	with ESMTP id S1751929AbbKQOHx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Nov 2015 09:07:34 -0500
+	Tue, 17 Nov 2015 09:07:53 -0500
 Content-Disposition: inline
-In-Reply-To: <20151022133036.3097.59054.stgit@tstruk-mobl1>
+In-Reply-To: <1445523792-28389-1-git-send-email-salvatore.benedetto@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 22, 2015 at 06:30:36AM -0700, Tadeusz Struk wrote:
-> Fix the logic in case we have found a device on a given node.
+On Thu, Oct 22, 2015 at 03:23:12PM +0100, Salvatore Benedetto wrote:
+>  - ent->device is already checked at the beginning of the function
+>    against the same value. This check is a duplicate.
 > 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
 
 Patch applied.  Thanks.
 -- 
