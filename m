@@ -1,52 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/4] crypto-ixp4xx: Reduce assignment for a variable in
- init_ixp_crypto()
-Date: Tue, 17 Nov 2015 21:48:48 +0800
-Message-ID: <20151117134848.GA9452@gondor.apana.org.au>
-References: <alpine.DEB.2.10.1402251014170.2080@hadrien>
- <530CD2C4.4050903@users.sourceforge.net>
- <alpine.DEB.2.10.1402251840450.7035@hadrien>
- <530CF8FF.8080600@users.sourceforge.net>
- <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
- <530DD06F.4090703@users.sourceforge.net>
- <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
- <5317A59D.4@users.sourceforge.net>
- <5648D2C1.8050603@users.sourceforge.net>
- <5648D466.10307@users.sourceforge.net>
+Subject: Re: [PATCH] nx-842: Ignore bit 3 of condition register returned by
+ icswx
+Date: Tue, 17 Nov 2015 22:00:20 +0800
+Message-ID: <20151117140020.GA9546@gondor.apana.org.au>
+References: <20151030224301.GA22549@ram.oc3035372033.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	kernel-janitors@vger.kernel.org,
-	Julia Lawall <julia.lawall@lip6.fr>
-To: SF Markus Elfring <elfring@users.sourceforge.net>
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	ddstreet@ieee.org, hbabu@us.ibm.com
+To: Ram Pai <linuxram@us.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:40997 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:33739 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753815AbbKQNsz (ORCPT
+	with ESMTP id S1751822AbbKQOA0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Nov 2015 08:48:55 -0500
+	Tue, 17 Nov 2015 09:00:26 -0500
 Content-Disposition: inline
-In-Reply-To: <5648D466.10307@users.sourceforge.net>
+In-Reply-To: <20151030224301.GA22549@ram.oc3035372033.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Nov 15, 2015 at 07:52:22PM +0100, SF Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Sun, 15 Nov 2015 19:06:44 +0100
+On Fri, Oct 30, 2015 at 03:43:01PM -0700, Ram Pai wrote:
+> icswx occasionally under heavy load sets bit 3 of condition register 0.
+> It has no software implication.
 > 
-> The variable "ret" was set more often than necessary by the
-> init_ixp_crypto() function.
+> Currently that bit is interpreted by the driver as a failure, when
+> it should have calmly ignored it.
 > 
-> * Omit its initialisation at the beginning.
-> 
-> * Use an error return code in two cases directly.
-> 
-> * Improve compliance with the Linux coding style convention.
-> 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
 
-Again I don't see how this is making the code better so nack.
+Your patch is corrupted:
+
+$ patch -s -p1 < .git/rebase-apply/patch 
+patch: **** malformed patch at line 21: To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+$
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
