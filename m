@@ -1,32 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: qat - when stopping all devices make fure VF are
- stopped first
-Date: Tue, 17 Nov 2015 22:06:48 +0800
-Message-ID: <20151117140648.GB9546@gondor.apana.org.au>
-References: <20151020195003.8954.19651.stgit@tstruk-mobl1>
+Subject: Re: [PATCH 1/7] crypto: marvell: check return value of
+ sg_nents_for_len
+Date: Tue, 17 Nov 2015 22:09:05 +0800
+Message-ID: <20151117140905.GG9546@gondor.apana.org.au>
+References: <1446668045-8620-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:34036 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754017AbbKQOGy (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Nov 2015 09:06:54 -0500
+Cc: arno@natisbad.org, boris.brezillon@free-electrons.com,
+	davem@davemloft.net, thomas.petazzoni@free-electrons.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20151020195003.8954.19651.stgit@tstruk-mobl1>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1446668045-8620-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 20, 2015 at 12:50:03PM -0700, Tadeusz Struk wrote:
-> When stopping all devices make sure VFs are stopped before the
-> corresponding PF.
-> VFs will always be after PF so just need to loop back.
+On Wed, Nov 04, 2015 at 09:13:33PM +0100, LABBE Corentin wrote:
+> The sg_nents_for_len() function could fail, this patch add a check for
+> its return value.
 > 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
