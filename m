@@ -1,46 +1,37 @@
-From: Andrzej Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 3/4] crypto: akcipher: add crypto_akcipher_type methods
- needed by templates.
-Date: Tue, 17 Nov 2015 22:47:11 +0100
-Message-ID: <CAOq732JGbGmHeBKX39ZRRdKvrqDhO6H7DinVBY8dGxvqqaUJ0A@mail.gmail.com>
-References: <1447412495-4370-3-git-send-email-andrew.zaborowski@intel.com>
-	<20151117134251.GA9363@gondor.apana.org.au>
+From: Greg KH <greg@kroah.com>
+Subject: Re: [PATCH] crypto: sun4i-ss: add missing statesize
+Date: Tue, 17 Nov 2015 13:51:10 -0800
+Message-ID: <20151117215110.GB18515@kroah.com>
+References: <1447420229-17911-1-git-send-email-clabbe.montjoie@gmail.com>
+ <20151117140938.GH9546@gondor.apana.org.au>
+ <20151117142603.GA1669@Red>
+ <20151117142742.GA10019@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: LABBE Corentin <clabbe.montjoie@gmail.com>, davem@davemloft.net,
+	linux-arm-kernel@lists.infradead.org,
+	maxime.ripard@free-electrons.com, wens@csie.org,
+	stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:37712 "EHLO
-	mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754950AbbKQVrM (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Nov 2015 16:47:12 -0500
-Received: by wmww144 with SMTP id w144so45708380wmw.0
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2015 13:47:11 -0800 (PST)
-In-Reply-To: <20151117134251.GA9363@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <stable-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20151117142742.GA10019@gondor.apana.org.au>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+On Tue, Nov 17, 2015 at 10:27:42PM +0800, Herbert Xu wrote:
+> On Tue, Nov 17, 2015 at 03:26:03PM +0100, LABBE Corentin wrote:
+> >
+> > I have lots of user reporting that they cannot use the device since it wont load.
+> > For me it need to go stable since it respect all "stable rules", simple, tested, minimal, and fix a real bug that bother people.
+> 
+> Well it will hit stable eventually.  I just don't feel comfortable
+> with sending it in straight away.
 
-On 17 November 2015 at 14:42, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> Andrew Zaborowski <andrew.zaborowski@intel.com> wrote:
->> Add two dummy methods that are required by the crypto API internals:
->> .ctxsize and .init
->> (just because the framework calls them without checking if they were
->> provided).  They're only required by the complicated code path needed to
->> instantiate a template algorithm.  Also expose crypto_akcipher_type like
->> other crypto types are exposed to be used from outside modules.
->>
->> Signed-off-by: Andrew Zaborowski <andrew.zaborowski@intel.com>
->
-> Nack.  They are only required if you use obsolete methods of creating
-> a tfm.
+You can't send it in "straight away", the rule is that it has to be in
+Linus's tree first, don't worry, you are doing it correctly.
 
-Will you then accept a patch to add a cra_u.akcipher to struct
-crypto_alg?  I see shash/ahash use one method to create instances and
-blkcipher use another.  I have no way to know which of them is
-"obsolete" (possibly both) and that was the reason for sending an RFC
-first.
+thanks,
 
-Best regards
+greg k-h
