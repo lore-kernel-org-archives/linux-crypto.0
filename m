@@ -1,64 +1,75 @@
-From: Zain Wang <zain.wang@rock-chips.com>
-Subject: [PATCH v4 4/4] ARM: dts: rockchip: Add Crypto node for rk3288
-Date: Tue, 17 Nov 2015 12:00:47 +0800
-Message-ID: <1447732847-30514-5-git-send-email-zain.wang@rock-chips.com>
+From: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+Subject: [PATCH v4 2/4] clk: rockchip: set an ID for crypto clk
+Date: Tue, 17 Nov 2015 12:00:45 +0800
+Message-ID: <1447732847-30514-3-git-send-email-zain.wang@rock-chips.com>
 References: <1447732847-30514-1-git-send-email-zain.wang@rock-chips.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-	eddie.cai@rock-chips.com, Zain Wang <zain.wang@rock-chips.com>
-To: zhengsq@rock-chips.com, hl@rock-chips.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	mturquette@baylibre.com, heiko@sntech.de, pawel.moll@arm.com,
-	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
-	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1447732847-30514-1-git-send-email-zain.wang@rock-chips.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org,
+ linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org, hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+ davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org,
+ pawel.moll-5wv7dgnIgG8@public.gmane.org, ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+ galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org
+Return-path: <linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+In-Reply-To: <1447732847-30514-1-git-send-email-zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-rockchip>,
+ <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-rockchip/>
+List-Post: <mailto:linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Help: <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-rockchip>,
+ <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
+Sender: "Linux-rockchip" <linux-rockchip-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Errors-To: linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add Crypto node for rk3288 including crypto controller and dma clk.
+Set an ID for crypto clk, so that it can be called in other part.
 
-Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
-Tested-by: Heiko Stuebner <heiko@sntech.de>
+Signed-off-by: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+Acked-by: Michael Turquette <mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>
+Tested-by: Heiko Stuebner <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>
 ---
 Changed in v4:
 - None
-
 Changed in v3:
-- add reset property
-
-Changed in v2:
 - None
-
+Changed in v2: 
+- None
 Changed in v1:
-- remove the _crypto suffix
-- use "rockchip,rk3288-crypto" instead of "rockchip,rk3288"
+- define SCLK_CRYPTO in rk3288-cru.h
+- use SCLK_CRYPTO instead of SRST_CRYPTO
 
- arch/arm/boot/dts/rk3288.dtsi | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/clk/rockchip/clk-rk3288.c      | 2 +-
+ include/dt-bindings/clock/rk3288-cru.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288.dtsi
-index 6a79c9c..f0d1217 100644
---- a/arch/arm/boot/dts/rk3288.dtsi
-+++ b/arch/arm/boot/dts/rk3288.dtsi
-@@ -778,6 +778,18 @@
- 		status = "disabled";
- 	};
+diff --git a/drivers/clk/rockchip/clk-rk3288.c b/drivers/clk/rockchip/clk-rk3288.c
+index 9040878..3fceda1 100644
+--- a/drivers/clk/rockchip/clk-rk3288.c
++++ b/drivers/clk/rockchip/clk-rk3288.c
+@@ -295,7 +295,7 @@ static struct rockchip_clk_branch rk3288_clk_branches[] __initdata = {
+ 			RK3288_CLKGATE_CON(0), 4, GFLAGS),
+ 	GATE(0, "c2c_host", "aclk_cpu_src", 0,
+ 			RK3288_CLKGATE_CON(13), 8, GFLAGS),
+-	COMPOSITE_NOMUX(0, "crypto", "aclk_cpu_pre", 0,
++	COMPOSITE_NOMUX(SCLK_CRYPTO, "crypto", "aclk_cpu_pre", 0,
+ 			RK3288_CLKSEL_CON(26), 6, 2, DFLAGS,
+ 			RK3288_CLKGATE_CON(5), 4, GFLAGS),
+ 	GATE(0, "aclk_bus_2pmu", "aclk_cpu_pre", CLK_IGNORE_UNUSED,
+diff --git a/include/dt-bindings/clock/rk3288-cru.h b/include/dt-bindings/clock/rk3288-cru.h
+index c719aac..30dcd60 100644
+--- a/include/dt-bindings/clock/rk3288-cru.h
++++ b/include/dt-bindings/clock/rk3288-cru.h
+@@ -86,6 +86,7 @@
+ #define SCLK_USBPHY480M_SRC	122
+ #define SCLK_PVTM_CORE		123
+ #define SCLK_PVTM_GPU		124
++#define SCLK_CRYPTO			125
  
-+	crypto: cypto-controller@ff8a0000 {
-+		compatible = "rockchip,rk3288-crypto";
-+		reg = <0xff8a0000 0x4000>;
-+		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
-+		clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
-+			 <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
-+		clock-names = "aclk", "hclk", "sclk", "apb_pclk";
-+		resets = <&cru SRST_CRYPTO>;
-+		reset-names = "crypto-rst";
-+		status = "okay";
-+	};
-+
- 	vopb: vop@ff930000 {
- 		compatible = "rockchip,rk3288-vop";
- 		reg = <0xff930000 0x19c>;
+ #define SCLK_MAC		151
+ #define SCLK_MACREF_OUT		152
 -- 
 1.9.1
