@@ -1,10 +1,9 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 8/8] crypto: testmgr: Use the xxx_zero_message_hash from
- headers
-Date: Tue, 17 Nov 2015 17:56:57 +0800
-Message-ID: <20151117095657.GC7837@gondor.apana.org.au>
-References: <1445326444-11019-1-git-send-email-clabbe.montjoie@gmail.com>
- <1445326444-11019-9-git-send-email-clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH 1/4] crypto: hifn_795x: replace simple_strtoul by
+ kstrtouint
+Date: Tue, 17 Nov 2015 18:04:18 +0800
+Message-ID: <20151117100418.GA8032@gondor.apana.org.au>
+References: <1445496712-5654-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
@@ -12,20 +11,20 @@ Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
 To: LABBE Corentin <clabbe.montjoie@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1445326444-11019-9-git-send-email-clabbe.montjoie@gmail.com>
+In-Reply-To: <1445496712-5654-1-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 20, 2015 at 09:34:04AM +0200, LABBE Corentin wrote:
-> Since md5/shaxxx headers have hash for zero message length, just use them.
+On Thu, Oct 22, 2015 at 08:51:49AM +0200, LABBE Corentin wrote:
+> The simple_strtoul function is marked as obsolete.
+> This patch replace it by kstrtouint at the cost of changing some function
+> return type from void to int.
 > 
 > Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 
-This too would need a dependency on the MD5/SHA Kconfig options.
-
-However, for now this is just too hard as it would result in a
-circular dependency.  Let's revisit this after we move the test
-vectors into the generic implementations.
+If you're going to clean this up then please take one more step and
+store the result of req in hifn_init so that you don't have to parse
+it over and over agin.
 
 Thanks,
 -- 
