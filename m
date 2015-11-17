@@ -1,42 +1,42 @@
-From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH 1/1] crypto: tcrypt: fix keysize argument of test_aead_speed for gcm(aes)
-Date: Tue, 17 Nov 2015 13:37:10 +0100
-Message-ID: <35cb25c643325f2051831dde57cba2362925cd56.1447763536.git.cyrille.pitchen@atmel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 1/5] crypto: Multi-buffer encryptioin infrastructure
+ support
+Date: Tue, 17 Nov 2015 21:06:33 +0800
+Message-ID: <20151117130633.GB8032@gondor.apana.org.au>
+References: <cover.1446158797.git.tim.c.chen@linux.intel.com>
+ <1446157263.14635.15.camel@schen9-desk2.jf.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	Cyrille Pitchen <cyrille.pitchen@atmel.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from eusmtp01.atmel.com ([212.144.249.242]:29127 "EHLO
-	eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751683AbbKQMgt (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Nov 2015 07:36:49 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Stephan Mueller <smueller@chronox.de>,
+	Chandramouli Narayanan <mouli_7982@yahoo.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1446157263.14635.15.camel@schen9-desk2.jf.intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The key sizes used by AES in GCM mode should be 128, 192 or 256 bits (16,
-24 or 32 bytes).
-There is no additional 4byte nonce as for RFC 4106.
+On Thu, Oct 29, 2015 at 03:21:03PM -0700, Tim Chen wrote:
+> 
+> c) Add support to crypto scatterwalk support that can sleep during
+> encryption operation, as we may have buffers for jobs in data lanes
+> that are half-finished, waiting for additional jobs to come to fill
+> empty lanes before we start the encryption again.  Therefore, we need to
+> enhance crypto walk with the option to map data buffers non-atomically.
+> This is done by algorithms run from crypto daemon who knows it is safe
+> to do so as it can save and restore FPU state in correct context.
 
-Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
----
- crypto/tcrypt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+What about the existing ablkcipher scatterwalk helpers?
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 46a4a757d478..270bc4b82bd9 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1789,7 +1789,7 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
- 		test_aead_speed("rfc4106(gcm(aes))", ENCRYPT, sec,
- 				NULL, 0, 16, 16, aead_speed_template_20);
- 		test_aead_speed("gcm(aes)", ENCRYPT, sec,
--				NULL, 0, 16, 8, aead_speed_template_20);
-+				NULL, 0, 16, 8, speed_template_16_24_32);
- 		break;
- 
- 	case 212:
+Cheers,
 -- 
-1.8.2.2
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
