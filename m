@@ -1,39 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/5] crypto: Multi-buffer encryptioin infrastructure
- support
-Date: Tue, 17 Nov 2015 21:06:33 +0800
-Message-ID: <20151117130633.GB8032@gondor.apana.org.au>
-References: <cover.1446158797.git.tim.c.chen@linux.intel.com>
- <1446157263.14635.15.camel@schen9-desk2.jf.intel.com>
+Subject: Re: [PATCH] hw_random: omap3-rom-rng: convert timer to delayed work
+Date: Tue, 17 Nov 2015 21:36:33 +0800
+Message-ID: <20151117133633.GC8032@gondor.apana.org.au>
+References: <1446761724-5191-1-git-send-email-aaro.koskinen@iki.fi>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	Chandramouli Narayanan <mouli_7982@yahoo.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org,
+	Sebastian Reichel <sre@kernel.org>,
+	Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
+	linux-omap@vger.kernel.org
+To: Aaro Koskinen <aaro.koskinen@iki.fi>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:60895 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752301AbbKQNgn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 17 Nov 2015 08:36:43 -0500
 Content-Disposition: inline
-In-Reply-To: <1446157263.14635.15.camel@schen9-desk2.jf.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1446761724-5191-1-git-send-email-aaro.koskinen@iki.fi>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 29, 2015 at 03:21:03PM -0700, Tim Chen wrote:
+On Fri, Nov 06, 2015 at 12:15:24AM +0200, Aaro Koskinen wrote:
+> We cannot put the HW RNG to idle using a timer because we cannot disable
+> clocks from atomic context. Use a delayed work instead.
 > 
-> c) Add support to crypto scatterwalk support that can sleep during
-> encryption operation, as we may have buffers for jobs in data lanes
-> that are half-finished, waiting for additional jobs to come to fill
-> empty lanes before we start the encryption again.  Therefore, we need to
-> enhance crypto walk with the option to map data buffers non-atomically.
-> This is done by algorithms run from crypto daemon who knows it is safe
-> to do so as it can save and restore FPU state in correct context.
+> Fixes a warning with CONFIG_DEBUG_MUTEXES on Nokia N900 during boot.
+> 
+> Reported-by: Sebastian Reichel <sre@kernel.org>
+> Signed-off-by: Aaro Koskinen <aaro.koskinen@iki.fi>
 
-What about the existing ablkcipher scatterwalk helpers?
+Thanks for the patch.  Can you please remove timer.h and include
+workqueue.h instead?
 
 Cheers,
 -- 
