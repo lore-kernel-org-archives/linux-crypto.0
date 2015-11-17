@@ -1,51 +1,85 @@
-From: Geliang Tang <geliangtang@163.com>
-Subject: [PATCH 1/2] crypto: api - use list_first_entry_or_null and list_next_entry
-Date: Mon, 16 Nov 2015 22:37:14 +0800
-Message-ID: <1c77a1fba395b9f7fa6fae64f639b98a5662735e.1447684469.git.geliangtang@163.com>
-Cc: Geliang Tang <geliangtang@163.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
+From: Zain Wang <zain.wang@rock-chips.com>
+Subject: [PATCH v4 1/4] crypto: rockchip/crypto - add DT bindings documentation
+Date: Tue, 17 Nov 2015 12:00:44 +0800
+Message-ID: <1447732847-30514-2-git-send-email-zain.wang@rock-chips.com>
+References: <1447732847-30514-1-git-send-email-zain.wang@rock-chips.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+	eddie.cai@rock-chips.com, Zain Wang <zain.wang@rock-chips.com>
+To: zhengsq@rock-chips.com, hl@rock-chips.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	mturquette@baylibre.com, heiko@sntech.de, pawel.moll@arm.com,
+	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
+	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from m50-133.163.com ([123.125.50.133]:36882 "EHLO m50-133.163.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752688AbbKPOhg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Nov 2015 09:37:36 -0500
+Received: from regular1.263xmail.com ([211.150.99.139]:44716 "EHLO
+	regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751639AbbKQEDD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 Nov 2015 23:03:03 -0500
+In-Reply-To: <1447732847-30514-1-git-send-email-zain.wang@rock-chips.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Simplify crypto_more_spawns() with list_first_entry_or_null()
-and list_next_entry().
+Add DT bindings documentation for the rk3288 crypto drivers.
 
-Signed-off-by: Geliang Tang <geliangtang@163.com>
+Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
+Acked-by: Rob Herring <robh@kernel.org>
+Tested-by: Heiko Stuebner <heiko@sntech.de>
+
 ---
- crypto/algapi.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+Changed in v4:
+- None
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 59bf491..7be76aa 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -93,16 +93,15 @@ static struct list_head *crypto_more_spawns(struct crypto_alg *alg,
- {
- 	struct crypto_spawn *spawn, *n;
- 
--	if (list_empty(stack))
-+	spawn = list_first_entry_or_null(stack, struct crypto_spawn, list);
-+	if (!spawn)
- 		return NULL;
- 
--	spawn = list_first_entry(stack, struct crypto_spawn, list);
--	n = list_entry(spawn->list.next, struct crypto_spawn, list);
-+	n = list_next_entry(spawn, list);
- 
- 	if (spawn->alg && &n->list != stack && !n->alg)
- 		n->alg = (n->list.next == stack) ? alg :
--			 &list_entry(n->list.next, struct crypto_spawn,
--				     list)->inst->alg;
-+			 &list_next_entry(n, list)->inst->alg;
- 
- 	list_move(&spawn->list, secondary_spawns);
- 
+Changed in v3:
+- add reset property
+
+Changed in v2:
+- None
+
+Changed in v1:
+- remove the _crypto suffix
+- use "rockchip,rk3288-crypto" instead of "rockchip,rk3288"
+- remove the description of status
+
+ .../devicetree/bindings/crypto/rockchip-crypto.txt | 29 ++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+
+diff --git a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+new file mode 100644
+index 0000000..096df34
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+@@ -0,0 +1,29 @@
++Rockchip Electronics And Security Accelerator
++
++Required properties:
++- compatible: Should be "rockchip,rk3288-crypto"
++- reg: Base physical address of the engine and length of memory mapped
++       region
++- interrupts: Interrupt number
++- clocks: Reference to the clocks about crypto
++- clock-names: "aclk" used to clock data
++	       "hclk" used to clock data
++	       "sclk" used to clock crypto accelerator
++	       "apb_pclk" used to clock dma
++- resets: Must contain an entry for each entry in reset-names.
++	  See ../reset/reset.txt for details.
++- reset-names: Must include the name "crypto-rst".
++
++Examples:
++
++	crypto: cypto-controller@ff8a0000 {
++		compatible = "rockchip,rk3288-crypto";
++		reg = <0xff8a0000 0x4000>;
++		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
++			 <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
++		clock-names = "aclk", "hclk", "sclk", "apb_pclk";
++		resets = <&cru SRST_CRYPTO>;
++		reset-names = "crypto-rst";
++		status = "okay";
++	};
 -- 
-2.5.0
+1.9.1
