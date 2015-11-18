@@ -1,55 +1,58 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v2 1/5] crypto: Multi-buffer encryptioin infrastructure
- support
-Date: Wed, 18 Nov 2015 07:58:56 -0800
-Message-ID: <1447862336.4933.36.camel@schen9-desk2.jf.intel.com>
-References: <cover.1446158797.git.tim.c.chen@linux.intel.com>
-	 <1446157263.14635.15.camel@schen9-desk2.jf.intel.com>
-	 <20151117130633.GB8032@gondor.apana.org.au>
-	 <1447801169.4933.28.camel@schen9-desk2.jf.intel.com>
-	 <20151118000748.GC13894@gondor.apana.org.au>
-	 <1447806614.4933.32.camel@schen9-desk2.jf.intel.com>
-	 <20151118050645.GA15327@gondor.apana.org.au>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Subject: Re: [PATCH 02/13] dmaengine: Introduce dma_request_slave_channel_compat_reason()
+Date: Wed, 18 Nov 2015 18:00:41 +0200
+Message-ID: <CAHp75Ve+n0PhOJKu+=y9_zuqC1rSBTdBSjHAdu6BKK0FzDmE0A@mail.gmail.com>
+References: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com>
+	<6358656.jIv3GGCCXu@wuerfel>
+	<CAHp75VeZFXp9i_zz7CBkVQVPGQxuzYk9AbWbbbn33r8YX3LCdw@mail.gmail.com>
+	<8215351.e99Q2vhQ5T@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	Chandramouli Narayanan <mouli_7982@yahoo.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20151118050645.GA15327@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Peter Ujfalusi <peter.ujfalusi@ti.com>,
+	Vinod Koul <vinod.koul@intel.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Tony Lindgren <tony@atomide.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	dmaengine <dmaengine@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
+	Linux MMC List <linux-mmc@vger.kernel.org>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-spi <linux-spi@vger.kernel.org>,
+	Linux Media Mailing List <linux-media@vger.kernel.org>,
+	ALSA Development Mailing List <alsa-devel@alsa-project.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-yk0-f195.google.com ([209.85.160.195]:33958 "EHLO
+	mail-yk0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755191AbbKRQAn convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 18 Nov 2015 11:00:43 -0500
+In-Reply-To: <8215351.e99Q2vhQ5T@wuerfel>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2015-11-18 at 13:06 +0800, Herbert Xu wrote:
-> On Tue, Nov 17, 2015 at 04:30:14PM -0800, Tim Chen wrote:
-> > On Wed, 2015-11-18 at 08:07 +0800, Herbert Xu wrote:
-> > > On Tue, Nov 17, 2015 at 02:59:29PM -0800, Tim Chen wrote:
-> > > >
-> > > > Herbert, would you prefer me to use ablkcipher scatter walk instead,
-> > > > assuming the overhead of both walk are about the same?
-> > > 
-> > > Well since you are going to potentially sleep in the middle of
-> > > an operation I'd think ablkcipher is required, no?
-> > 
-> > We're using blkcipher walk in the implementation. 
-> > As long as we use kmap and instead of kmap_atomic,
-> > it allows us to sleep in the middle of the walk.
-> 
-> What if you were called from an atomic context, such as IPsec?
-> 
+On Wed, Nov 18, 2015 at 5:51 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+> On Wednesday 18 November 2015 17:43:04 Andy Shevchenko wrote:
+>> >
+>> > I assume that the sst-firmware.c case is a mistake, it should just=
+ use a
+>> > plain DMA_SLAVE and not DMA_MEMCPY.
+>>
+>> Other way around.
+>>
+>
+> Ok, I see. In that case I guess it also shouldn't call
+> dmaengine_slave_config(), right? I don't think that's valid
+> on a MEMCPY channel.
 
-IPSec will invoke this multi-buffer encrypt with async request.
-The work is done in crypto daemon, so it wouldn't be in atomic
-context.  But anyway, I'm okay with switching to ablkcipher walk,
-as long as it doesn't incur too much more overhead than blkcipher
-walk.
+Hmm=E2=80=A6 That's right, though I suspect still one thing why it's do=
+ne this
+way. Let's ask Vinod and Liam about that.
 
-Tim
+--=20
+With Best Regards,
+Andy Shevchenko
