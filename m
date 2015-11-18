@@ -1,97 +1,47 @@
-From: Aaro Koskinen <aaro.koskinen@iki.fi>
-Subject: [PATCH v2] hw_random: omap3-rom-rng: convert timer to delayed work
-Date: Wed, 18 Nov 2015 21:59:01 +0200
-Message-ID: <1447876741-24114-1-git-send-email-aaro.koskinen@iki.fi>
-Cc: Aaro Koskinen <aaro.koskinen@iki.fi>
-To: Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, Sebastian Reichel <sre@kernel.org>,
-	=?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>,
-	linux-omap@vger.kernel.org
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: re: crypto: sahara - check return value of sg_nents_for_len
+Date: Thu, 19 Nov 2015 02:06:42 +0300
+Message-ID: <20151118230642.GA29804@mwanda>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: clabbe.montjoie@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from emh04.mail.saunalahti.fi ([62.142.5.110]:32980 "EHLO
-	emh04.mail.saunalahti.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753403AbbKRT7O (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:40200 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751776AbbKRXGu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Nov 2015 14:59:14 -0500
+	Wed, 18 Nov 2015 18:06:50 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-We cannot put the HW RNG to idle using a timer because we cannot disable
-clocks from atomic context. Use a delayed work instead.
+Hello LABBE Corentin,
 
-Fixes a warning with CONFIG_DEBUG_MUTEXES on Nokia N900 during boot.
+The patch 6c2b74d4774f: "crypto: sahara - check return value of
+sg_nents_for_len" from Nov 4, 2015, leads to the following static
+checker warning:
 
-Reported-by: Sebastian Reichel <sre@kernel.org>
-Signed-off-by: Aaro Koskinen <aaro.koskinen@iki.fi>
----
+	drivers/crypto/sahara.c:480 sahara_hw_descriptor_create()
+	warn: unsigned 'dev->nb_in_sg' is never less than zero.
 
-	v2: Include workqueue.h instead of timer.h.
+drivers/crypto/sahara.c
+   479          dev->nb_in_sg = sg_nents_for_len(dev->in_sg, dev->total);
+   480          if (dev->nb_in_sg < 0) {
+                    ^^^^^^^^^^^^^^^^^
+Unsigned is never less than zero.
 
- drivers/char/hw_random/omap3-rom-rng.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+   481                  dev_err(dev->device, "Invalid numbers of src SG.\n");
+   482                  return dev->nb_in_sg;
+   483          }
 
-diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
-index a405cdc..8da14f1 100644
---- a/drivers/char/hw_random/omap3-rom-rng.c
-+++ b/drivers/char/hw_random/omap3-rom-rng.c
-@@ -17,7 +17,7 @@
- #include <linux/init.h>
- #include <linux/random.h>
- #include <linux/hw_random.h>
--#include <linux/timer.h>
-+#include <linux/workqueue.h>
- #include <linux/clk.h>
- #include <linux/err.h>
- #include <linux/platform_device.h>
-@@ -29,11 +29,11 @@
- /* param1: ptr, param2: count, param3: flag */
- static u32 (*omap3_rom_rng_call)(u32, u32, u32);
- 
--static struct timer_list idle_timer;
-+static struct delayed_work idle_work;
- static int rng_idle;
- static struct clk *rng_clk;
- 
--static void omap3_rom_rng_idle(unsigned long data)
-+static void omap3_rom_rng_idle(struct work_struct *work)
- {
- 	int r;
- 
-@@ -51,7 +51,7 @@ static int omap3_rom_rng_get_random(void *buf, unsigned int count)
- 	u32 r;
- 	u32 ptr;
- 
--	del_timer_sync(&idle_timer);
-+	cancel_delayed_work_sync(&idle_work);
- 	if (rng_idle) {
- 		clk_prepare_enable(rng_clk);
- 		r = omap3_rom_rng_call(0, 0, RNG_GEN_PRNG_HW_INIT);
-@@ -65,7 +65,7 @@ static int omap3_rom_rng_get_random(void *buf, unsigned int count)
- 
- 	ptr = virt_to_phys(buf);
- 	r = omap3_rom_rng_call(ptr, count, RNG_GEN_HW);
--	mod_timer(&idle_timer, jiffies + msecs_to_jiffies(500));
-+	schedule_delayed_work(&idle_work, msecs_to_jiffies(500));
- 	if (r != 0)
- 		return -EINVAL;
- 	return 0;
-@@ -102,7 +102,7 @@ static int omap3_rom_rng_probe(struct platform_device *pdev)
- 		return -EINVAL;
- 	}
- 
--	setup_timer(&idle_timer, omap3_rom_rng_idle, 0);
-+	INIT_DELAYED_WORK(&idle_work, omap3_rom_rng_idle);
- 	rng_clk = devm_clk_get(&pdev->dev, "ick");
- 	if (IS_ERR(rng_clk)) {
- 		pr_err("unable to get RNG clock\n");
-@@ -118,6 +118,7 @@ static int omap3_rom_rng_probe(struct platform_device *pdev)
- 
- static int omap3_rom_rng_remove(struct platform_device *pdev)
- {
-+	cancel_delayed_work_sync(&idle_work);
- 	hwrng_unregister(&omap3_rom_rng_ops);
- 	clk_disable_unprepare(rng_clk);
- 	return 0;
--- 
-2.4.0
+There are several other similar bugs as well:
+
+drivers/crypto/sahara.c:485 sahara_hw_descriptor_create() warn: unsigned 'dev->nb_out_sg' is never less than zero.
+drivers/crypto/sahara.c:804 sahara_sha_hw_links_create() warn: unsigned 'dev->nb_in_sg' is never less than zero.
+drivers/crypto/picoxcell_crypto.c:298 spacc_sg_to_ddt() warn: unsigned 'nents' is never less than zero.
+drivers/crypto/picoxcell_crypto.c:338 spacc_aead_make_ddts() warn: unsigned 'src_nents' is never less than zero.
+drivers/crypto/picoxcell_crypto.c:348 spacc_aead_make_ddts() warn: unsigned 'dst_nents' is never less than zero.
+
+regards,
+dan carpenter
