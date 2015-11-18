@@ -1,115 +1,56 @@
-From: Ismail Kizir <ikizir@gmail.com>
-Subject: Re: A new, fast and "unbreakable" encryption algorithm
-Date: Wed, 18 Nov 2015 21:39:49 +0200
-Message-ID: <CAFJyfaMgf7zud5qUH66GjzgJeUjKX6oySYsXcXsuzf6m9B9xkw@mail.gmail.com>
-References: <CAFJyfaOpgXj7pJfGA5jf7-95VfgC+-yZu4t6_6OGRvx_OtuzuQ@mail.gmail.com>
-	<CACXcFmkefuSVyk1vrFQ12c9UdyN1zBqqtz-2MpdKcs4hS15d7A@mail.gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH v3] crypto: atmel: fix bogus select
+Date: Wed, 18 Nov 2015 20:54:03 +0100
+Message-ID: <3878434.NqzKGChk39@wuerfel>
+References: <201511190227.fHF3LVfw%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org
-To: Sandy Harris <sandyinchina@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:33692 "EHLO
-	mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754512AbbKRTjv (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Nov 2015 14:39:51 -0500
-Received: by wmec201 with SMTP id c201so295330796wme.0
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Nov 2015 11:39:50 -0800 (PST)
-In-Reply-To: <CACXcFmkefuSVyk1vrFQ12c9UdyN1zBqqtz-2MpdKcs4hS15d7A@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: kbuild-all@01.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, Leilei Zhao <leilei.zhao@atmel.com>,
+	Nicolas Ferre <nicolas.ferre@atmel.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Ludovic Desroches <ludovic.desroches@atmel.com>,
+	linux-kernel@vger.kernel.org,
+	Alexandre Belloni <alexandre.belloni@free-electrons.com>
+To: kbuild test robot <lkp@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <201511190227.fHF3LVfw%fengguang.wu@intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello Sandy,
+On Thursday 19 November 2015 02:17:21 kbuild test robot wrote:
+> 
+> [auto build test WARNING on: cryptodev/master]
+> [also build test WARNING on: v4.4-rc1 next-20151118]
+> 
+> url:    https://github.com/0day-ci/linux/commits/Arnd-Bergmann/crypto-atmel-fix-bogus-select/20151118-233706
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> config: tile-allmodconfig (attached as .config)
+> reproduce:
+>         wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # save the attached .config to linux build tree
+>         make.cross ARCH=tile 
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>    drivers/crypto/atmel-aes.c: In function 'atmel_aes_sg_copy':
+> >> drivers/crypto/atmel-aes.c:191:11: warning: comparison of distinct pointer types lacks a cast [enabled by default]
+>    drivers/crypto/atmel-aes.c: In function 'atmel_aes_crypt_dma_start':
+>    drivers/crypto/atmel-aes.c:447:11: warning: comparison of distinct pointer types lacks a cast [enabled by default]
+>    drivers/crypto/atmel-aes.c:448:11: warning: comparison of distinct pointer types lacks a cast [enabled by default]
+>    drivers/crypto/atmel-aes.c: In function 'atmel_aes_crypt_dma_stop':
+> >> drivers/crypto/atmel-aes.c:642:5: warning: format '%u' expects argument of type 'unsigned int', but argument 2 has type 'size_t' [-Wformat]
+>    drivers/crypto/atmel-aes.c: In function 'atmel_aes_buff_init':
+> >> drivers/crypto/atmel-aes.c:669:3: warning: format '%d' expects argument of type 'int', but argument 3 has type 'size_t' [-Wformat]
+>    drivers/crypto/atmel-aes.c:677:3: warning: format '%d' expects argument of type 'int', but argument 3 has type 'size_t' [-Wformat]
+> 
+> 
 
-I agree every word you wrote.
-That's why, I am trying to explain all my login publicly to
-professionals. It's not rocket science. You will "just understand"
-when you read:
+Thanks for the report. I actually submitted a patch for these yesterday, but
+I should have realized now that there is a dependency between the two patches,
+and the other one needs to be applied first to avoid generating these
+warnings in allmodconfig builds for all architectures.
 
-Until today, we were looking from the "wrong side" I guess.
-
-We were all thinking that we must have a "fixed" key which must never change!
-
-Why?
-
-
-I begun to ask that question: "Why the key must be fixed?" and changed
-the paradigm.
-
-And I decided to dynamically update the key in encyption and decryption process.
-
-
-The essential logic of the algorithm is using the key as a "jump
-table" which is dynamically updated with every "jump" we make.
-
-
-To understand better how it functions, suppose that we don't have a
-complex function.
-
-
-Given the key body length(L) is a power of 2, and M is an integer to
-tell us where we are in the "key body":
-
-
-We just take the byte at position M of the key body, we XOR that byte
-with the byte to be encrypted(X).
-
-We increase the byte at position M and "jump to" (M+X)%L
-
-
-So, every time we encrypt a byte, we also change the key. It's a bit
-more complicated than this. But essentially this is the base logic. In
-real function, we do more complex operations with more variables like
-the salt(or nonce) value, the last byte we encrypted, the key
-checksum(against related key attacks) etc.
-
-Briefly, to decypher a ciphertext, a cracker needs to find out the
-key, and, to find out the key, cracker needs to find out the
-plaintext, because the key is dynamically updated according the
-plaintext during encryption process: Impossible!
-
-
-If you want to learn about the details, just take a look at the source
-code I've published on this blog.
-
-
-I believe this algorithm is the future of the encryption.
-
-
-Use it! And please, let me know if you use: ikizir@gmail.com
-
-On Wed, Nov 18, 2015 at 9:31 PM, Sandy Harris <sandyinchina@gmail.com> wrote:
-> On Wed, Nov 18, 2015 at 12:10 AM, Ismail Kizir <ikizir@gmail.com> wrote:
->
->> I've developed a new encryption algorithm, which dynamically changes
->> the key according to plaintext and practically impossible to break.
->
-> There is a very long history of crypto whose author considers is
-> secure being quickly broken. This happens to nearly all methods
-> devised by amateurs and quite a few from professionals.
->
-> Despite that, amateurs like me & (I presume) you keep trying.
-> This is probably a good thing. Here's one of mine:
-> https://aezoo.compute.dtu.dk/doku.php?id=enchilada
->
->> I also opened to public with MIT&GPL dual License.
->
-> This is excellent. Many people make claims for their
-> algorithm without publishing details, which is ludicrous
-> since no-one can analyze it without those details. You
-> have avoided that pitfall.
->
->> I will present a paper on a Turkish National Inet-tr 2015 Symposium
->
-> A paper describing the design would make analysis
-> much easier than doing it from source code, and
-> like every other algorithm yours will need lots of
-> analysis before it might become sensible for
-> people to trust it.
->
-> I suggest you subscribe to the crypto list:
-> http://www.metzdowd.com/mailman/listinfo/cryptography
->
-> Once your paper is published, post a link there
-> to invite analysis.
+	Arnd
