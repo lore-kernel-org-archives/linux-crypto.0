@@ -1,68 +1,65 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v3] crypto: atmel: fix bogus select
-Date: Wed, 18 Nov 2015 16:33:54 +0100
-Message-ID: <12173927.U7ILfy5BBh@wuerfel>
+From: Andy Shevchenko <andy.shevchenko-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 02/13] dmaengine: Introduce dma_request_slave_channel_compat_reason()
+Date: Wed, 18 Nov 2015 17:43:04 +0200
+Message-ID: <CAHp75VeZFXp9i_zz7CBkVQVPGQxuzYk9AbWbbbn33r8YX3LCdw@mail.gmail.com>
+References: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com>
+	<6347063.Gd6coh6hX8@wuerfel>
+	<564C8E1F.8010501@ti.com>
+	<6358656.jIv3GGCCXu@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Leilei Zhao <leilei.zhao@atmel.com>,
-	Nicolas Ferre <nicolas.ferre@atmel.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Ludovic Desroches <ludovic.desroches@atmel.com>,
-	linux-kernel@vger.kernel.org,
-	Alexandre Belloni <alexandre.belloni@free-electrons.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.130]:56797 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754017AbbKRPec (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Nov 2015 10:34:32 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Peter Ujfalusi <peter.ujfalusi-l0cyMroinI0@public.gmane.org>,
+	Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>,
+	Tony Lindgren <tony-4v6yS6AI5VpBDgjK7y7TUQ@public.gmane.org>,
+	"devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	dmaengine <dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-omap-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-omap-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linux MMC List <linux-mmc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-crypto <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-spi <linux-spi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linux Media Mailing List <linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	ALSA Development Mailing List <alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org>
+To: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+Return-path: <linux-spi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <6358656.jIv3GGCCXu@wuerfel>
+Sender: linux-spi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
->From 0d53d42a56e9a3769847fd03c703876f2c063fb4 Mon Sep 17 00:00:00 2001
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Tue, 27 Jan 2015 22:34:04 +0100
-Subject: [PATCH] [SUBMITTED] crypto: atmel: fix bogus select
+On Wed, Nov 18, 2015 at 5:07 PM, Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org> wrote:
+> On Wednesday 18 November 2015 16:41:35 Peter Ujfalusi wrote:
+>> On 11/18/2015 04:29 PM, Arnd Bergmann wrote:
+>> > On Wednesday 18 November 2015 16:21:26 Peter Ujfalusi wrote:
+>> >> 2. non slave channel requests, where only the functionality matters, like
+>> >> memcpy, interleaved, memset, etc.
+>> >> We could have a simple:
+>> >> dma_request_channel(mask);
+>> >>
+>> >> But looking at the drivers using dmaengine legacy dma_request_channel() API:
+>> >> Some sets DMA_INTERRUPT or DMA_PRIVATE or DMA_SG along with DMA_SLAVE:
+>> >> drivers/misc/carma/carma-fpga.c                 DMA_INTERRUPT|DMA_SLAVE|DMA_SG
+>> >> drivers/misc/carma/carma-fpga-program.c         DMA_MEMCPY|DMA_SLAVE|DMA_SG
+>> >> drivers/media/platform/soc_camera/mx3_camera.c  DMA_SLAVE|DMA_PRIVATE
+>> >> sound/soc/intel/common/sst-firmware.c           DMA_SLAVE|DMA_MEMCPY
+>> >>
+>> >> as examples.
+>> >> Not sure how valid are these...
+>
+> I just had a look myself. carma has been removed fortunately in linux-next,
+> so we don't have to worry about that any more.
+>
+> I assume that the sst-firmware.c case is a mistake, it should just use a
+> plain DMA_SLAVE and not DMA_MEMCPY.
 
-The Atmel at91 crypto driver unconditionally selects AT_HDMAC,
-which results in a Kconfig warning if that driver is not enabled:
+Other way around.
 
-warning: (CRYPTO_DEV_ATMEL_AES) selects AT_HDMAC which has unmet direct dependencies (DMADEVICES && ARCH_AT91)
-
-The crypto driver itself does not actually have a dependency
-on a particular dma engine, other than this being the one that
-is used in at91.
-
-Removing the 'select' gets rid of the warning, but can cause
-the driver to be unusable if the HDMAC is not enabled at the
-same time. To work around that, this patch clarifies the runtime
-dependency to be 'AT_HDMAC || AT_XDMAC', but adds an alternative
-for COMPILE_TEST, which lets the driver get build on all systems.
-
-The ARCH_AT91 dependency is implied by AT_XDMAC || AT_HDMAC now
-and no longer needs to be listed separately.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-I found this one in my backlog, it still seems relevant and I forgot
-to send a new version after the last round of comments.
-
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 2569e043317e..5357bc1f9e4b 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -378,10 +378,9 @@ config CRYPTO_DEV_BFIN_CRC
- 
- config CRYPTO_DEV_ATMEL_AES
- 	tristate "Support for Atmel AES hw accelerator"
--	depends on ARCH_AT91
-+	depends on AT_XDMAC || AT_HDMAC || COMPILE_TEST
- 	select CRYPTO_AES
- 	select CRYPTO_BLKCIPHER
--	select AT_HDMAC
- 	help
- 	  Some Atmel processors have AES hw accelerator.
- 	  Select this if you want to use the Atmel module for
+-- 
+With Best Regards,
+Andy Shevchenko
+--
+To unsubscribe from this list: send the line "unsubscribe linux-spi" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
