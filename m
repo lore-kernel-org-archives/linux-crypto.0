@@ -1,81 +1,68 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 02/13] dmaengine: Introduce dma_request_slave_channel_compat_reason()
-Date: Wed, 18 Nov 2015 16:07:42 +0100
-Message-ID: <6358656.jIv3GGCCXu@wuerfel>
-References: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com> <6347063.Gd6coh6hX8@wuerfel> <564C8E1F.8010501@ti.com>
+Subject: [PATCH v3] crypto: atmel: fix bogus select
+Date: Wed, 18 Nov 2015 16:33:54 +0100
+Message-ID: <12173927.U7ILfy5BBh@wuerfel>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Vinod Koul <vinod.koul@intel.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Tony Lindgren <tony@atomide.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	dmaengine@vger.kernel.org,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
-	Linux MMC List <linux-mmc@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	linux-spi <linux-spi@vger.kernel.org>,
-	Linux Media Mailing List <linux-media@vger.kernel.org>,
-	ALSA Development Mailing List <alsa-devel@alsa-project.org>
-To: Peter Ujfalusi <peter.ujfalusi@ti.com>
+Cc: Leilei Zhao <leilei.zhao@atmel.com>,
+	Nicolas Ferre <nicolas.ferre@atmel.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Ludovic Desroches <ludovic.desroches@atmel.com>,
+	linux-kernel@vger.kernel.org,
+	Alexandre Belloni <alexandre.belloni@free-electrons.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([217.72.192.73]:54117 "EHLO
+Received: from mout.kundenserver.de ([212.227.126.130]:56797 "EHLO
 	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755977AbbKRPH4 (ORCPT
+	with ESMTP id S1754017AbbKRPec (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Nov 2015 10:07:56 -0500
-In-Reply-To: <564C8E1F.8010501@ti.com>
+	Wed, 18 Nov 2015 10:34:32 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday 18 November 2015 16:41:35 Peter Ujfalusi wrote:
-> On 11/18/2015 04:29 PM, Arnd Bergmann wrote:
-> > On Wednesday 18 November 2015 16:21:26 Peter Ujfalusi wrote:
-> >> 2. non slave channel requests, where only the functionality matters, like
-> >> memcpy, interleaved, memset, etc.
-> >> We could have a simple:
-> >> dma_request_channel(mask);
-> >>
-> >> But looking at the drivers using dmaengine legacy dma_request_channel() API:
-> >> Some sets DMA_INTERRUPT or DMA_PRIVATE or DMA_SG along with DMA_SLAVE:
-> >> drivers/misc/carma/carma-fpga.c                 DMA_INTERRUPT|DMA_SLAVE|DMA_SG
-> >> drivers/misc/carma/carma-fpga-program.c         DMA_MEMCPY|DMA_SLAVE|DMA_SG
-> >> drivers/media/platform/soc_camera/mx3_camera.c  DMA_SLAVE|DMA_PRIVATE
-> >> sound/soc/intel/common/sst-firmware.c           DMA_SLAVE|DMA_MEMCPY
-> >>
-> >> as examples.
-> >> Not sure how valid are these...
+>From 0d53d42a56e9a3769847fd03c703876f2c063fb4 Mon Sep 17 00:00:00 2001
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Tue, 27 Jan 2015 22:34:04 +0100
+Subject: [PATCH] [SUBMITTED] crypto: atmel: fix bogus select
 
-I just had a look myself. carma has been removed fortunately in linux-next,
-so we don't have to worry about that any more.
+The Atmel at91 crypto driver unconditionally selects AT_HDMAC,
+which results in a Kconfig warning if that driver is not enabled:
 
-I assume that the sst-firmware.c case is a mistake, it should just use a
-plain DMA_SLAVE and not DMA_MEMCPY.
+warning: (CRYPTO_DEV_ATMEL_AES) selects AT_HDMAC which has unmet direct dependencies (DMADEVICES && ARCH_AT91)
 
-Aside from these, everyone else uses either DMA_CYCLIC in addition to
-DMA_SLAVE, which seems valid, or they use DMA_PRIVATE, which I think is
-redundant in slave drivers and can be removed.
+The crypto driver itself does not actually have a dependency
+on a particular dma engine, other than this being the one that
+is used in at91.
 
-> > It's usually not much harder to separate out the legacy case from
-> > the normal dma_request_slave_channel_reason(), so those drivers don't
-> > really need to use the unified compat API.
-> 
-> The current dma_request_slave_channel()/_reason() is not the 'legacy' API.
-> Currently there is no way to get the reason why the dma channel request fails
-> when using the _compat() version of the API, which is used by drivers which
-> can be used in DT or in legacy mode as well. Sure, they all could have local
-> if(){}else{} for handling this, but it is not a nice thing.
-> 
-> As it was discussed instead of adding the _reason() version for the _compat
-> call, we should simplify the dmaengine API for getting the channel and at the
-> same time we will have ERR_PTR returned instead of NULL.
+Removing the 'select' gets rid of the warning, but can cause
+the driver to be unusable if the HDMAC is not enabled at the
+same time. To work around that, this patch clarifies the runtime
+dependency to be 'AT_HDMAC || AT_XDMAC', but adds an alternative
+for COMPILE_TEST, which lets the driver get build on all systems.
 
-What I meant was that we don't need to handle them with the unified
-simple interface. The users of DMA_CYCLIC can just keep using
-an internal helper that only deals with the legacy case, or use
-dma_request_slave() or whatever is the new API for the DT case.
+The ARCH_AT91 dependency is implied by AT_XDMAC || AT_HDMAC now
+and no longer needs to be listed separately.
 
-	Arnd
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+I found this one in my backlog, it still seems relevant and I forgot
+to send a new version after the last round of comments.
+
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 2569e043317e..5357bc1f9e4b 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -378,10 +378,9 @@ config CRYPTO_DEV_BFIN_CRC
+ 
+ config CRYPTO_DEV_ATMEL_AES
+ 	tristate "Support for Atmel AES hw accelerator"
+-	depends on ARCH_AT91
++	depends on AT_XDMAC || AT_HDMAC || COMPILE_TEST
+ 	select CRYPTO_AES
+ 	select CRYPTO_BLKCIPHER
+-	select AT_HDMAC
+ 	help
+ 	  Some Atmel processors have AES hw accelerator.
+ 	  Select this if you want to use the Atmel module for
