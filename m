@@ -1,56 +1,97 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v3] crypto: atmel: fix bogus select
-Date: Wed, 18 Nov 2015 20:54:03 +0100
-Message-ID: <3878434.NqzKGChk39@wuerfel>
-References: <201511190227.fHF3LVfw%fengguang.wu@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: kbuild-all@01.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, Leilei Zhao <leilei.zhao@atmel.com>,
-	Nicolas Ferre <nicolas.ferre@atmel.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Ludovic Desroches <ludovic.desroches@atmel.com>,
-	linux-kernel@vger.kernel.org,
-	Alexandre Belloni <alexandre.belloni@free-electrons.com>
-To: kbuild test robot <lkp@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <201511190227.fHF3LVfw%fengguang.wu@intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Aaro Koskinen <aaro.koskinen@iki.fi>
+Subject: [PATCH v2] hw_random: omap3-rom-rng: convert timer to delayed work
+Date: Wed, 18 Nov 2015 21:59:01 +0200
+Message-ID: <1447876741-24114-1-git-send-email-aaro.koskinen@iki.fi>
+Cc: Aaro Koskinen <aaro.koskinen@iki.fi>
+To: Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, Sebastian Reichel <sre@kernel.org>,
+	=?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>,
+	linux-omap@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from emh04.mail.saunalahti.fi ([62.142.5.110]:32980 "EHLO
+	emh04.mail.saunalahti.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753403AbbKRT7O (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 18 Nov 2015 14:59:14 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thursday 19 November 2015 02:17:21 kbuild test robot wrote:
-> 
-> [auto build test WARNING on: cryptodev/master]
-> [also build test WARNING on: v4.4-rc1 next-20151118]
-> 
-> url:    https://github.com/0day-ci/linux/commits/Arnd-Bergmann/crypto-atmel-fix-bogus-select/20151118-233706
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> config: tile-allmodconfig (attached as .config)
-> reproduce:
->         wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # save the attached .config to linux build tree
->         make.cross ARCH=tile 
-> 
-> All warnings (new ones prefixed by >>):
-> 
->    drivers/crypto/atmel-aes.c: In function 'atmel_aes_sg_copy':
-> >> drivers/crypto/atmel-aes.c:191:11: warning: comparison of distinct pointer types lacks a cast [enabled by default]
->    drivers/crypto/atmel-aes.c: In function 'atmel_aes_crypt_dma_start':
->    drivers/crypto/atmel-aes.c:447:11: warning: comparison of distinct pointer types lacks a cast [enabled by default]
->    drivers/crypto/atmel-aes.c:448:11: warning: comparison of distinct pointer types lacks a cast [enabled by default]
->    drivers/crypto/atmel-aes.c: In function 'atmel_aes_crypt_dma_stop':
-> >> drivers/crypto/atmel-aes.c:642:5: warning: format '%u' expects argument of type 'unsigned int', but argument 2 has type 'size_t' [-Wformat]
->    drivers/crypto/atmel-aes.c: In function 'atmel_aes_buff_init':
-> >> drivers/crypto/atmel-aes.c:669:3: warning: format '%d' expects argument of type 'int', but argument 3 has type 'size_t' [-Wformat]
->    drivers/crypto/atmel-aes.c:677:3: warning: format '%d' expects argument of type 'int', but argument 3 has type 'size_t' [-Wformat]
-> 
-> 
+We cannot put the HW RNG to idle using a timer because we cannot disable
+clocks from atomic context. Use a delayed work instead.
 
-Thanks for the report. I actually submitted a patch for these yesterday, but
-I should have realized now that there is a dependency between the two patches,
-and the other one needs to be applied first to avoid generating these
-warnings in allmodconfig builds for all architectures.
+Fixes a warning with CONFIG_DEBUG_MUTEXES on Nokia N900 during boot.
 
-	Arnd
+Reported-by: Sebastian Reichel <sre@kernel.org>
+Signed-off-by: Aaro Koskinen <aaro.koskinen@iki.fi>
+---
+
+	v2: Include workqueue.h instead of timer.h.
+
+ drivers/char/hw_random/omap3-rom-rng.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
+index a405cdc..8da14f1 100644
+--- a/drivers/char/hw_random/omap3-rom-rng.c
++++ b/drivers/char/hw_random/omap3-rom-rng.c
+@@ -17,7 +17,7 @@
+ #include <linux/init.h>
+ #include <linux/random.h>
+ #include <linux/hw_random.h>
+-#include <linux/timer.h>
++#include <linux/workqueue.h>
+ #include <linux/clk.h>
+ #include <linux/err.h>
+ #include <linux/platform_device.h>
+@@ -29,11 +29,11 @@
+ /* param1: ptr, param2: count, param3: flag */
+ static u32 (*omap3_rom_rng_call)(u32, u32, u32);
+ 
+-static struct timer_list idle_timer;
++static struct delayed_work idle_work;
+ static int rng_idle;
+ static struct clk *rng_clk;
+ 
+-static void omap3_rom_rng_idle(unsigned long data)
++static void omap3_rom_rng_idle(struct work_struct *work)
+ {
+ 	int r;
+ 
+@@ -51,7 +51,7 @@ static int omap3_rom_rng_get_random(void *buf, unsigned int count)
+ 	u32 r;
+ 	u32 ptr;
+ 
+-	del_timer_sync(&idle_timer);
++	cancel_delayed_work_sync(&idle_work);
+ 	if (rng_idle) {
+ 		clk_prepare_enable(rng_clk);
+ 		r = omap3_rom_rng_call(0, 0, RNG_GEN_PRNG_HW_INIT);
+@@ -65,7 +65,7 @@ static int omap3_rom_rng_get_random(void *buf, unsigned int count)
+ 
+ 	ptr = virt_to_phys(buf);
+ 	r = omap3_rom_rng_call(ptr, count, RNG_GEN_HW);
+-	mod_timer(&idle_timer, jiffies + msecs_to_jiffies(500));
++	schedule_delayed_work(&idle_work, msecs_to_jiffies(500));
+ 	if (r != 0)
+ 		return -EINVAL;
+ 	return 0;
+@@ -102,7 +102,7 @@ static int omap3_rom_rng_probe(struct platform_device *pdev)
+ 		return -EINVAL;
+ 	}
+ 
+-	setup_timer(&idle_timer, omap3_rom_rng_idle, 0);
++	INIT_DELAYED_WORK(&idle_work, omap3_rom_rng_idle);
+ 	rng_clk = devm_clk_get(&pdev->dev, "ick");
+ 	if (IS_ERR(rng_clk)) {
+ 		pr_err("unable to get RNG clock\n");
+@@ -118,6 +118,7 @@ static int omap3_rom_rng_probe(struct platform_device *pdev)
+ 
+ static int omap3_rom_rng_remove(struct platform_device *pdev)
+ {
++	cancel_delayed_work_sync(&idle_work);
+ 	hwrng_unregister(&omap3_rom_rng_ops);
+ 	clk_disable_unprepare(rng_clk);
+ 	return 0;
+-- 
+2.4.0
