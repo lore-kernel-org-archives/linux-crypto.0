@@ -1,55 +1,49 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/5] crypto: Multi-buffer encryptioin infrastructure
- support
-Date: Wed, 18 Nov 2015 13:06:45 +0800
-Message-ID: <20151118050645.GA15327@gondor.apana.org.au>
-References: <cover.1446158797.git.tim.c.chen@linux.intel.com>
- <1446157263.14635.15.camel@schen9-desk2.jf.intel.com>
- <20151117130633.GB8032@gondor.apana.org.au>
- <1447801169.4933.28.camel@schen9-desk2.jf.intel.com>
- <20151118000748.GC13894@gondor.apana.org.au>
- <1447806614.4933.32.camel@schen9-desk2.jf.intel.com>
+From: Ismail Kizir <ikizir@gmail.com>
+Subject: A new, fast and "unbreakable" encryption algorithm
+Date: Wed, 18 Nov 2015 07:10:30 +0200
+Message-ID: <CAFJyfaOpgXj7pJfGA5jf7-95VfgC+-yZu4t6_6OGRvx_OtuzuQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	Chandramouli Narayanan <mouli_7982@yahoo.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44622 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750763AbbKRFH1 (ORCPT
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:34541 "EHLO
+	mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750783AbbKRFKb (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Nov 2015 00:07:27 -0500
-Content-Disposition: inline
-In-Reply-To: <1447806614.4933.32.camel@schen9-desk2.jf.intel.com>
+	Wed, 18 Nov 2015 00:10:31 -0500
+Received: by wmvv187 with SMTP id v187so260152326wmv.1
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2015 21:10:30 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 17, 2015 at 04:30:14PM -0800, Tim Chen wrote:
-> On Wed, 2015-11-18 at 08:07 +0800, Herbert Xu wrote:
-> > On Tue, Nov 17, 2015 at 02:59:29PM -0800, Tim Chen wrote:
-> > >
-> > > Herbert, would you prefer me to use ablkcipher scatter walk instead,
-> > > assuming the overhead of both walk are about the same?
-> > 
-> > Well since you are going to potentially sleep in the middle of
-> > an operation I'd think ablkcipher is required, no?
-> 
-> We're using blkcipher walk in the implementation. 
-> As long as we use kmap and instead of kmap_atomic,
-> it allows us to sleep in the middle of the walk.
+Hello,
 
-What if you were called from an atomic context, such as IPsec?
+I've developed a new encryption algorithm, which dynamically changes
+the key according to plaintext and practically impossible to break. I
+also opened to public with MIT&GPL dual License.
+It is also quite fast; ~80% faster than the fastest mode of AES
+without cpu instruction set support.
+I will present a paper on a Turkish National Inet-tr 2015 Symposium on
+3 December:
+It is a very simple and yet efficient logic. Anyone who looks at the
+self documented(in English) C code at
+http://ismail-kizir.blogspot.com/2015/11/hohha-dynamic-xor-algorithm-source-code.html
+ may understand why and how it is unbreakable.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I simply use the key as a jump table and, with every encrypted byte, I
+change the jump table(the key) as a result of 3-4 parameters including
+the last plaintext byte itself. Briefly, I encypt the plaintext with
+the key and also dynamically encrypt the key with the plaintext.
+The code is self documented in English.
+On Linux simply
+gcc HohhaDynamicXOR.c -O2 -Wall
+./a.out
+will make integrity checks and print benchmarks. It is production ready.
+Other algorithm results are the output of the "openssl speed" command.
+If I am right; you will not be disappointed to include "Hohha Dynamic
+XOR Encryption Algorithm" on Linux Kernel.
+
+I will be glad to see my algorithm included in Linux distributions.
+
+Regards
+Ismail Kizir
