@@ -1,49 +1,48 @@
-From: Ismail Kizir <ikizir@gmail.com>
-Subject: A new, fast and "unbreakable" encryption algorithm
-Date: Wed, 18 Nov 2015 07:10:30 +0200
-Message-ID: <CAFJyfaOpgXj7pJfGA5jf7-95VfgC+-yZu4t6_6OGRvx_OtuzuQ@mail.gmail.com>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Subject: Re: crypto-ixp4xx: Deletion of a few unnecessary checks
+Date: Wed, 18 Nov 2015 08:28:26 +0100
+Message-ID: <564C289A.5010507@users.sourceforge.net>
+References: <alpine.DEB.2.10.1402251014170.2080@hadrien>
+ <530CD2C4.4050903@users.sourceforge.net>
+ <alpine.DEB.2.10.1402251840450.7035@hadrien>
+ <530CF8FF.8080600@users.sourceforge.net>
+ <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
+ <530DD06F.4090703@users.sourceforge.net>
+ <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
+ <5317A59D.4@users.sourceforge.net> <5648D2C1.8050603@users.sourceforge.net>
+ <564B489F.10308@users.sourceforge.net>
+ <20151118000358.GA13894@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	LKML <linux-kernel@vger.kernel.org>,
+	kernel-janitors@vger.kernel.org,
+	Julia Lawall <julia.lawall@lip6.fr>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:34541 "EHLO
-	mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750783AbbKRFKb (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Nov 2015 00:10:31 -0500
-Received: by wmvv187 with SMTP id v187so260152326wmv.1
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2015 21:10:30 -0800 (PST)
+Received: from mout.web.de ([212.227.15.14]:63614 "EHLO mout.web.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751852AbbKRH2s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 18 Nov 2015 02:28:48 -0500
+In-Reply-To: <20151118000358.GA13894@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+>>   Delete unnecessary checks before the function call "dma_pool_destroy"
 
-I've developed a new encryption algorithm, which dynamically changes
-the key according to plaintext and practically impossible to break. I
-also opened to public with MIT&GPL dual License.
-It is also quite fast; ~80% faster than the fastest mode of AES
-without cpu instruction set support.
-I will present a paper on a Turkish National Inet-tr 2015 Symposium on
-3 December:
-It is a very simple and yet efficient logic. Anyone who looks at the
-self documented(in English) C code at
-http://ismail-kizir.blogspot.com/2015/11/hohha-dynamic-xor-algorithm-source-code.html
- may understand why and how it is unbreakable.
+It seems that you accepted this specific update suggestion, didn't you?
+https://lkml.org/lkml/2015/11/17/391
+https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1021951.html
 
-I simply use the key as a jump table and, with every encrypted byte, I
-change the jump table(the key) as a result of 3-4 parameters including
-the last plaintext byte itself. Briefly, I encypt the plaintext with
-the key and also dynamically encrypt the key with the plaintext.
-The code is self documented in English.
-On Linux simply
-gcc HohhaDynamicXOR.c -O2 -Wall
-./a.out
-will make integrity checks and print benchmarks. It is production ready.
-Other algorithm results are the output of the "openssl speed" command.
-If I am right; you will not be disappointed to include "Hohha Dynamic
-XOR Encryption Algorithm" on Linux Kernel.
 
-I will be glad to see my algorithm included in Linux distributions.
+>>   Reduce assignment for a variable in init_ixp_crypto()
+>>   crypto-ixp4xx: Less function calls in init_ixp_crypto() after error detection
+> 
+> You completely ignored my comments.  Nack.
 
-Regards
-Ismail Kizir
+Will it be useful to clarify the proposed changes a bit more?
+
+Regards,
+Markus
