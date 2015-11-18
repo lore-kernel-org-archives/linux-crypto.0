@@ -1,46 +1,55 @@
-From: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
-Subject: Re: [PATCH 02/13] dmaengine: Introduce dma_request_slave_channel_compat_reason()
-Date: Wed, 18 Nov 2015 16:51:54 +0100
-Message-ID: <8215351.e99Q2vhQ5T@wuerfel>
-References: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com> <6358656.jIv3GGCCXu@wuerfel> <CAHp75VeZFXp9i_zz7CBkVQVPGQxuzYk9AbWbbbn33r8YX3LCdw@mail.gmail.com>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v2 1/5] crypto: Multi-buffer encryptioin infrastructure
+ support
+Date: Wed, 18 Nov 2015 07:58:56 -0800
+Message-ID: <1447862336.4933.36.camel@schen9-desk2.jf.intel.com>
+References: <cover.1446158797.git.tim.c.chen@linux.intel.com>
+	 <1446157263.14635.15.camel@schen9-desk2.jf.intel.com>
+	 <20151117130633.GB8032@gondor.apana.org.au>
+	 <1447801169.4933.28.camel@schen9-desk2.jf.intel.com>
+	 <20151118000748.GC13894@gondor.apana.org.au>
+	 <1447806614.4933.32.camel@schen9-desk2.jf.intel.com>
+	 <20151118050645.GA15327@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Peter Ujfalusi <peter.ujfalusi-l0cyMroinI0@public.gmane.org>,
-	Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>,
-	Tony Lindgren <tony-4v6yS6AI5VpBDgjK7y7TUQ@public.gmane.org>,
-	"devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	dmaengine <dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-omap-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-omap-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux MMC List <linux-mmc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-spi <linux-spi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux Media Mailing List <linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	ALSA Development Mailing List <alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org>
-To: Andy Shevchenko <andy.shevchenko-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-spi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAHp75VeZFXp9i_zz7CBkVQVPGQxuzYk9AbWbbbn33r8YX3LCdw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-spi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Stephan Mueller <smueller@chronox.de>,
+	Chandramouli Narayanan <mouli_7982@yahoo.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20151118050645.GA15327@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wednesday 18 November 2015 17:43:04 Andy Shevchenko wrote:
-> >
-> > I assume that the sst-firmware.c case is a mistake, it should just use a
-> > plain DMA_SLAVE and not DMA_MEMCPY.
+On Wed, 2015-11-18 at 13:06 +0800, Herbert Xu wrote:
+> On Tue, Nov 17, 2015 at 04:30:14PM -0800, Tim Chen wrote:
+> > On Wed, 2015-11-18 at 08:07 +0800, Herbert Xu wrote:
+> > > On Tue, Nov 17, 2015 at 02:59:29PM -0800, Tim Chen wrote:
+> > > >
+> > > > Herbert, would you prefer me to use ablkcipher scatter walk instead,
+> > > > assuming the overhead of both walk are about the same?
+> > > 
+> > > Well since you are going to potentially sleep in the middle of
+> > > an operation I'd think ablkcipher is required, no?
+> > 
+> > We're using blkcipher walk in the implementation. 
+> > As long as we use kmap and instead of kmap_atomic,
+> > it allows us to sleep in the middle of the walk.
 > 
-> Other way around.
+> What if you were called from an atomic context, such as IPsec?
 > 
 
-Ok, I see. In that case I guess it also shouldn't call
-dmaengine_slave_config(), right? I don't think that's valid
-on a MEMCPY channel.
+IPSec will invoke this multi-buffer encrypt with async request.
+The work is done in crypto daemon, so it wouldn't be in atomic
+context.  But anyway, I'm okay with switching to ablkcipher walk,
+as long as it doesn't incur too much more overhead than blkcipher
+walk.
 
-	Arnd
---
-To unsubscribe from this list: send the line "unsubscribe linux-spi" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Tim
