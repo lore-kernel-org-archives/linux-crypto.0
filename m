@@ -1,39 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/4] crypto: akcipher: add crypto_akcipher_type methods
- needed by templates.
-Date: Wed, 18 Nov 2015 08:05:47 +0800
-Message-ID: <20151118000547.GB13894@gondor.apana.org.au>
-References: <1447412495-4370-3-git-send-email-andrew.zaborowski@intel.com>
- <20151117134251.GA9363@gondor.apana.org.au>
- <CAOq732JGbGmHeBKX39ZRRdKvrqDhO6H7DinVBY8dGxvqqaUJ0A@mail.gmail.com>
+Subject: Re: [PATCH v2 1/5] crypto: Multi-buffer encryptioin infrastructure
+ support
+Date: Wed, 18 Nov 2015 08:07:48 +0800
+Message-ID: <20151118000748.GC13894@gondor.apana.org.au>
+References: <cover.1446158797.git.tim.c.chen@linux.intel.com>
+ <1446157263.14635.15.camel@schen9-desk2.jf.intel.com>
+ <20151117130633.GB8032@gondor.apana.org.au>
+ <1447801169.4933.28.camel@schen9-desk2.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Andrzej Zaborowski <andrew.zaborowski@intel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Stephan Mueller <smueller@chronox.de>,
+	Chandramouli Narayanan <mouli_7982@yahoo.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55155 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:33925 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932084AbbKRAFu (ORCPT
+	with ESMTP id S1754385AbbKRAIW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Nov 2015 19:05:50 -0500
+	Tue, 17 Nov 2015 19:08:22 -0500
 Content-Disposition: inline
-In-Reply-To: <CAOq732JGbGmHeBKX39ZRRdKvrqDhO6H7DinVBY8dGxvqqaUJ0A@mail.gmail.com>
+In-Reply-To: <1447801169.4933.28.camel@schen9-desk2.jf.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 17, 2015 at 10:47:11PM +0100, Andrzej Zaborowski wrote:
+On Tue, Nov 17, 2015 at 02:59:29PM -0800, Tim Chen wrote:
 >
-> Will you then accept a patch to add a cra_u.akcipher to struct
-> crypto_alg?  I see shash/ahash use one method to create instances and
+> Herbert, would you prefer me to use ablkcipher scatter walk instead,
+> assuming the overhead of both walk are about the same?
 
-No as struct crypto_alg is obsolete.
-
-> blkcipher use another.  I have no way to know which of them is
-> "obsolete" (possibly both) and that was the reason for sending an RFC
-> first.
-
-AEAD is the best example to use for templates.  It was recently
-converted.
+Well since you are going to potentially sleep in the middle of
+an operation I'd think ablkcipher is required, no?
 
 Cheers,
 -- 
