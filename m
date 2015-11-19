@@ -1,74 +1,64 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v2 1/5] crypto: Multi-buffer encryptioin infrastructure
- support
-Date: Wed, 18 Nov 2015 18:39:30 -0800
-Message-ID: <1447900770.4933.75.camel@schen9-desk2.jf.intel.com>
-References: <cover.1446158797.git.tim.c.chen@linux.intel.com>
-	 <1446157263.14635.15.camel@schen9-desk2.jf.intel.com>
-	 <20151117130633.GB8032@gondor.apana.org.au>
-	 <1447801169.4933.28.camel@schen9-desk2.jf.intel.com>
-	 <20151118000748.GC13894@gondor.apana.org.au>
-	 <1447806614.4933.32.camel@schen9-desk2.jf.intel.com>
-	 <20151118050645.GA15327@gondor.apana.org.au>
-	 <1447862336.4933.36.camel@schen9-desk2.jf.intel.com>
-	 <20151119001201.GA24293@gondor.apana.org.au>
+From: "Li, Weigang" <weigang.li@intel.com>
+Subject: RE: [PATCH] crypto: add asynchronous compression support
+Date: Thu, 19 Nov 2015 05:52:41 +0000
+Message-ID: <929511EA6367314D8E32364A24D45FA61301F63F@shsmsx102.ccr.corp.intel.com>
+References: <1445008260-39367-1-git-send-email-weigang.li@intel.com>
+ <20151016151354.GA16648@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	Chandramouli Narayanan <mouli_7982@yahoo.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"Struk, Tadeusz" <tadeusz.struk@intel.com>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:49012 "EHLO mga02.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:57958 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754125AbbKSCjd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Nov 2015 21:39:33 -0500
-In-Reply-To: <20151119001201.GA24293@gondor.apana.org.au>
+	id S1750815AbbKSFwp convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 19 Nov 2015 00:52:45 -0500
+In-Reply-To: <20151016151354.GA16648@gondor.apana.org.au>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2015-11-19 at 08:12 +0800, Herbert Xu wrote:
-> On Wed, Nov 18, 2015 at 07:58:56AM -0800, Tim Chen wrote:
-> >
-> > IPSec will invoke this multi-buffer encrypt with async request.
-> > The work is done in crypto daemon, so it wouldn't be in atomic
-> > context.  But anyway, I'm okay with switching to ablkcipher walk,
-> > as long as it doesn't incur too much more overhead than blkcipher
-> > walk.
+On 10/16/2015 11:13 PM, Herbert Xu wrote:
+> On Fri, Oct 16, 2015 at 11:11:00PM +0800, Weigang Li wrote:
+>> This patch set introduces Asynchronous Compression API.
+>> What is proposed is a new crypto type called crypto_acomp_type,
+>> plus new struct acomp_alg and struct crypto_acomp, together with number
+>> of helper functions to register acomp type algorithms and allocate tfm
+>> instances. This is to make it similar to how the existing crypto API
+>> works for the ablkcipher, and akcipher types.
+>> The operations the new interface will provide are:
+>>
+>> 	int (*compress)(struct acompress_request *req);
+>> 	int (*decompress)(struct acompress_request *req);
+>>
+>> The benefits it gives interface are:
+>> - the new interface allows for asynchronous implementations and
+>>    scatterlist buffer that can use hardware to offload the compression
+>>    operations, the new asynchronous API can be called by the linux kernel
+>>    components (i.e., btrfs) who want to use hardware acceleration for data
+>>    compression.
+>>
+>> New helper functions have been added to allocate crypto_acomp instances
+>> and invoke the operations to make it easier to use.
+>>
+>> Signed-off-by: Weigang Li <weigang.li@intel.com>
 > 
-> What if some other user called the blkcipher interface in an atomic
-> context? You can't guarantee that your algorithm is only picked up
-> through the ablkcipher interface, unless of course you do something
-> like __driver-ctr-aes-aesni.
-
-The __cbc-aes-aesni-mb algorithm is marked as internal algorithm 
-with flag CRYPTO_ALG_INTERNAL, so it should not be picked up by other
-algorithms and should only be invoked from mcryptd.
-
-Anyway, I've udpated the aes_cbc_mb code with ablkcipher helper.
-So I will be posting the new series with ablkcipher walk
-after testing is done.
-
+> Thanks for the patch! Joonsoo Kim is also working on the compression
+> interface for zram.  Could you two collaborate and come up with one
+> interface rather than two?
 > 
-> Hmm I was just looking at the sha_mb code and something doesn't
-> look right.  For instance, can sha1_mb_update ever return
-> -EINPROGRESS? This would be wrong as it's registered as an shash
-> algorithm.
+> Cheers,
+> 
+Hello Herbert,
 
-The __sha1-mb works in tandem with the outer layer of mcryptd 
-aysnc algorithm. It does the completion for the outer 
-async algorithm.  So as far as mcryptd is concerned, the
-inner algorithm is synchronous in the sense that it is done
-once it dispatch the job to __sha1-mb and don't have to worry about it.
-I don't think mcryptd check for the return value from __sha1-mb
-so it should be okay to return 0 instead of -EINPROGRESS.  
-I'll double check that.
+After sync-up with Joonsoo Kim, we think it may be not feasible for a s/w implementation of the sg-list based asynchronous interface, we propose separate interfaces (patches) for acomp & ccomp. The reasons are:
+1. to support sg-list in the ccomp (like what shash/ahash did), the partial update is required, some algorithms do not support partial update (i.e., lzo), that means:
+2. the format of output buffer (sg-list) will be different, e.g., the lzo need contain the "length" info for each block in the output sg-list in order to de-compression, while zlib doesn't need, then it is difficult to have a single async sg-list i/f.
+3. to compress a sg-list buffer, the lzo also requires an intermediate buffer to save the output of a block, and copy it back to the sg-list output buffer, it will introduce the complexity and cost, we don't see value for sg-list support in a s/w compression.
 
-Tim
+Any suggestions?
