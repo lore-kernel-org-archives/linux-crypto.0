@@ -1,64 +1,47 @@
-From: Andy Shevchenko <andy.shevchenko-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 02/13] dmaengine: Introduce dma_request_slave_channel_compat_reason()
-Date: Fri, 20 Nov 2015 16:08:47 +0200
-Message-ID: <CAHp75VcEb1OP=mTQEAuQ6G_RswPCfvG4UzcFG+NBfJxABZVBcA@mail.gmail.com>
-References: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com>
-	<4533695.7ZVFN1S94o@wuerfel>
-	<564EF502.6040708@ti.com>
-	<6118451.vaLZWOZEF5@wuerfel>
-	<CAHp75VdoHqPMNGFfz4mPhX+Lw+vxgiyqFS8j5+kQ9Z9CHt=OTA@mail.gmail.com>
-	<564F1253.4000800@ti.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>, Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>,
-	Tony Lindgren <tony-4v6yS6AI5VpBDgjK7y7TUQ@public.gmane.org>,
-	"devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	dmaengine <dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-omap-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-omap-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux MMC List <linux-mmc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-spi <linux-spi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux Media Mailing List <linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	ALSA Development Mailing List <alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org>
-To: Peter Ujfalusi <peter.ujfalusi-l0cyMroinI0@public.gmane.org>
-Return-path: <linux-spi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <564F1253.4000800-l0cyMroinI0@public.gmane.org>
-Sender: linux-spi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Geliang Tang <geliangtang@163.com>
+Subject: [PATCH] crypto: padlock-aes - use offset_in_page macro
+Date: Sat, 21 Nov 2015 22:24:11 +0800
+Message-ID: <19b0bc324e0d893c4b516f3873b6dcbcff0da6ea.1448115766.git.geliangtang@163.com>
+Cc: Geliang Tang <geliangtang@163.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from m50-133.163.com ([123.125.50.133]:49360 "EHLO m50-133.163.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751720AbbKUOZV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 21 Nov 2015 09:25:21 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 20, 2015 at 2:30 PM, Peter Ujfalusi <peter.ujfalusi-l0cyMroinI0@public.gmane.org> wrote:
-> On 11/20/2015 02:24 PM, Andy Shevchenko wrote:
->> On Fri, Nov 20, 2015 at 12:58 PM, Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org> wrote:
->>> On Friday 20 November 2015 12:25:06 Peter Ujfalusi wrote:
->>>> On 11/19/2015 01:25 PM, Arnd Bergmann wrote:
->>
->>> Another idea would be to remove the filter function from struct dma_chan_map
->>> and pass the map through platform data
->>
->> Why not unified device properties?
->
-> Is this some Windows/ACPI feature?
+Use offset_in_page macro instead of (addr & ~PAGE_MASK).
 
-Nope.
+Signed-off-by: Geliang Tang <geliangtang@163.com>
+---
+ drivers/crypto/padlock-aes.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Check drivers/base/property.c
-
-> Quick search gives mostly MSDN and
-> Windows10 related links.
->
-> We only need dma_chan_map for platforms which has not been converted to DT and
-> still using legacy boot. Or platforms which can still boot in legacy mode. In
-> DT/ACPI mode we do not need this map at all.
-
-
+diff --git a/drivers/crypto/padlock-aes.c b/drivers/crypto/padlock-aes.c
+index da2d677..be2dd10 100644
+--- a/drivers/crypto/padlock-aes.c
++++ b/drivers/crypto/padlock-aes.c
+@@ -238,7 +238,7 @@ static inline void ecb_crypt(const u8 *in, u8 *out, u32 *key,
+ 	/* Padlock in ECB mode fetches at least ecb_fetch_bytes of data.
+ 	 * We could avoid some copying here but it's probably not worth it.
+ 	 */
+-	if (unlikely(((unsigned long)in & ~PAGE_MASK) + ecb_fetch_bytes > PAGE_SIZE)) {
++	if (unlikely(offset_in_page(in) + ecb_fetch_bytes > PAGE_SIZE)) {
+ 		ecb_crypt_copy(in, out, key, cword, count);
+ 		return;
+ 	}
+@@ -250,7 +250,7 @@ static inline u8 *cbc_crypt(const u8 *in, u8 *out, u32 *key,
+ 			    u8 *iv, struct cword *cword, int count)
+ {
+ 	/* Padlock in CBC mode fetches at least cbc_fetch_bytes of data. */
+-	if (unlikely(((unsigned long)in & ~PAGE_MASK) + cbc_fetch_bytes > PAGE_SIZE))
++	if (unlikely(offset_in_page(in) + cbc_fetch_bytes > PAGE_SIZE))
+ 		return cbc_crypt_copy(in, out, key, iv, cword, count);
+ 
+ 	return rep_xcrypt_cbc(in, out, key, iv, cword, count);
 -- 
-With Best Regards,
-Andy Shevchenko
---
-To unsubscribe from this list: send the line "unsubscribe linux-spi" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+2.5.0
