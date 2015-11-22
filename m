@@ -1,81 +1,96 @@
-From: Nick Kossifidis <mickflemm@gmail.com>
-Subject: hwrng: Some concerns about add_hwgenerator_randomness
-Date: Sun, 22 Nov 2015 02:15:12 -0600
-Message-ID: <CAFtRNNz9mdXuL-+EY=pqSpnza2RMJjoU0X+Y06ZRWgEEmsyXVg@mail.gmail.com>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [RFC] KEYS: Exposing {a,}symmetric key ops to userspace and
+ other bits
+Date: Sun, 22 Nov 2015 09:41:51 -0500
+Message-ID: <1448203311.2546.34.camel@linux.vnet.ibm.com>
+References: <23924.1448017665@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: mpm@selenic.com, herbert@gondor.apana.org.au,
-	"Theodore Ts'o" <tytso@mit.edu>
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Tadeusz Struk <tadeusz.struk@intel.com>, dwmw2@infradead.org,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	Petko Manolov <petkan@mip-labs.com>,
+	"Mark D. Baushke" <mdb@juniper.net>
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qk0-f171.google.com ([209.85.220.171]:35157 "EHLO
-	mail-qk0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751011AbbKVIPN (ORCPT
+Received: from e28smtp08.in.ibm.com ([122.248.162.8]:50589 "EHLO
+	e28smtp08.in.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751995AbbKVOmC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 22 Nov 2015 03:15:13 -0500
-Received: by qkao63 with SMTP id o63so49321182qka.2
-        for <linux-crypto@vger.kernel.org>; Sun, 22 Nov 2015 00:15:12 -0800 (PST)
+	Sun, 22 Nov 2015 09:42:02 -0500
+Received: from /spool/local
+	by e28smtp08.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
+	Sun, 22 Nov 2015 20:11:59 +0530
+In-Reply-To: <23924.1448017665@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello all,
+On Fri, 2015-11-20 at 11:07 +0000, David Howells wrote:
+> Hi Marcel, Mimi, Tadeus,
+> 
+> I want to consider adding or doing the following bits to the keyrings
+> facility, aiming for the next merge window:
+> 
+>  (*) Bring in the patches that I posted to change how the trust model on a
+>      keyring works.
+> 
+>      The model will then be that keys aren't automatically marked trusted, but
+>      linking a key into a keyring that is marked trusted-only will validate
+>      the key against the contents of the keyring before permitting its
+>      addition.
 
-I've been doing some reading on hw_random core and the drivers that
-use it and it seems that three of them use the quality parameter on
-the hwrng struct. When a driver sets this value, it ends up directly
-on credit_entropy_bits in random through add_hwgenerator_randomness
-and there is no way of disabling this behavior.
+This trust model is flawed.   We've already discussed this trust model
+back when first introducing the concept of a trusted keyring.   Refer to
+the v3 "ima: extending secure boot certificate chain of trust" patch set
+https://lwn.net/Articles/576563/, which describes two methods of
+verifying a certificate before adding the key to the trusted keyring.  
 
-Even if the user sets hw_random's default_quality to 0 (the
-default/safe value), the value on the hwrng struct overrides it:
+The first method  "4/5 KEYS: verify certificate is signed by a trusted
+key on the target keyriing" is similar to the method being proposed
+here.  The subsequent patch "5/5 KEYS: verify certificate is signed by a
+trusted key on a particular keyring" rejected using the same keyring for
+validating the new key being added.  It defined a new separate keyring
+for validating the keys.  (Neither of these patches were upstreamed.)
 
-hw_random/core.c:
-current_quality = rng->quality ? : default_quality;
+Dmitry Kasatkin proposed a third method, which identified the "trusted"
+key(s) on the system keyring, instead of maintaining a separate keyring.
+As there wasn't a usecase requiring a separate keyring at the time, his
+approach was upstreamed.  Now Petko Manoliv and Mark Bausche  have a
+valid use case scenario for having a separate keyring.  (For the details
+refer to:
+https://www.mail-archive.com/linux-security-module@vger.kernel.org/msg03503.html)
 
-The three drivers that set rng->quality are:
+With the proposed trust model change, the keys trusted to verify file
+signatures would be allowed to also verify certificate signatures.  For
+example, a system owner trusts company A to verify file signatures, yet
+they want to retain control over which certificates may be added to the
+keyring.  Just because company A trusts company/government X, doesn't
+mean the system owner also trusts company/government X.   By having one
+keyring, other certificates signed by company A could be added to the
+keyring.
 
-virtio-rng: sets it to 1000
-chaoskey: sets it to 1024 + 1023 (!) which gets re-set to 1024 in hwrng_init
-zcrypt: sets it to 900 by default but provides a module option to
-disable this behavior and set it to 0 (so that's an exception)
+>      Note that we can then vary the policy on a per-keyring basis.
+> 
+>  (*) Add Mimi's patches to allow keys/keyrings to be marked undeletable.  This
+>      is for the purpose of creating blacklists and to prevent people from
+>      removing entries in the blacklist.  Note that only the kernel can create
+>      a blacklist - we don't want userspace generating them as a way to take up
+>      kernel space.
+> 
+>      I think the right way to do this is to not allow marked keys to be
+>      unlinked from marked keyrings, but to allow marked keys to be unlinked
+>      from ordinary keyrings.
+> 
+>      The reason the 'keep' mark is required on individual keys is to prevent
+>      the keys from being directly revoked, expired or invalidated by keyctl
+>      without reference to the keyring.  Marked keys that are set expirable
+>      when they're created will still expire and be subsequently removed and if
+>      a marked key or marked keyring loses all its references it still gets
+>      gc'd.
 
-I suggest to use the quality parameter of hwrng as "minimum entropy"
-or "guaranteed entropy" of the hwrng and if default_quality (the value
-set by the user) is larger than this, use it as an upper boundary
-(because the device can't "guarantee" more entropy), else If
-default_quality is less than this or zero, use default_quality
-instead. Do you agree with this, should I send a patch for it ?
+Agreed.  I'll fix and re-post soon.
 
-Also there is another issue when drivers call
-add_hwgenerator_randomness directly, ath9k does this -on
-wireless-testing- to provide random data from its ADC and use the
-wireless card as an entropy source. Other drivers might also do it in
-the future (I couldn't find more users other than hw_random/core.c and
-ath9k for now). Again there is no way to check or override the quality
-parameter passed there and it goes directly to random's
-credit_entropy_bits. Is this function meant to be used by anyone or is
-it an API between hw_random and random only ? The documentation on
-hw_random (it's declared on hw_random.h) hasn't been updated to
-reflect how this function should be used or what restrictions apply to
-the quality parameter when used (the commit log said that developers
-should be careful but nothing specific).
-
-We could have a parameter like "max_hwgenerator_quality" on random
-that makes it possible to filter the quality parameter passed on
-add_hwgenerator_randomness, no matter who uses it.
-
-Finally I suggest that we have an ioctl on random to completely
-disable add_hwgenerator_randomness and that's because if someone wants
-to use a userspace daemon to seed random through /dev/hwrng by doing
-further statistical analysis/monitoring (e.g. rngd or something
-similar), he/she will be mixing the same data on the pool twice (one
-through hw_random -> add_hwgenerator_randomness -even with zero
-quality- and one trough sysctl). I 'd also like to send a patch for
-this if you agree.
-
-Thanks a lot for your time, have a nice weekend.
-
--- 
-GPG ID: 0xEE878588
-As you read this post global entropy rises. Have Fun ;-)
-Nick
+Mimi
