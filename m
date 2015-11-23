@@ -1,48 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3] crypto: atmel: fix bogus select
-Date: Mon, 23 Nov 2015 21:05:10 +0800
-Message-ID: <20151123130510.GF7866@gondor.apana.org.au>
-References: <12173927.U7ILfy5BBh@wuerfel>
+Subject: Re: [PATCH v2] hw_random: omap3-rom-rng: convert timer to delayed
+ work
+Date: Mon, 23 Nov 2015 21:05:31 +0800
+Message-ID: <20151123130531.GG7866@gondor.apana.org.au>
+References: <1447876741-24114-1-git-send-email-aaro.koskinen@iki.fi>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Leilei Zhao <leilei.zhao@atmel.com>,
-	Nicolas Ferre <nicolas.ferre@atmel.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Ludovic Desroches <ludovic.desroches@atmel.com>,
-	linux-kernel@vger.kernel.org,
-	Alexandre Belloni <alexandre.belloni@free-electrons.com>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org,
+	Sebastian Reichel <sre@kernel.org>,
+	Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
+	linux-omap@vger.kernel.org
+To: Aaro Koskinen <aaro.koskinen@iki.fi>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:44694 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753589AbbKWNFo (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 23 Nov 2015 08:05:44 -0500
 Content-Disposition: inline
-In-Reply-To: <12173927.U7ILfy5BBh@wuerfel>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1447876741-24114-1-git-send-email-aaro.koskinen@iki.fi>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 18, 2015 at 04:33:54PM +0100, Arnd Bergmann wrote:
-> >From 0d53d42a56e9a3769847fd03c703876f2c063fb4 Mon Sep 17 00:00:00 2001
-> From: Arnd Bergmann <arnd@arndb.de>
-> Date: Tue, 27 Jan 2015 22:34:04 +0100
-> Subject: [PATCH] [SUBMITTED] crypto: atmel: fix bogus select
+On Wed, Nov 18, 2015 at 09:59:01PM +0200, Aaro Koskinen wrote:
+> We cannot put the HW RNG to idle using a timer because we cannot disable
+> clocks from atomic context. Use a delayed work instead.
 > 
-> The Atmel at91 crypto driver unconditionally selects AT_HDMAC,
-> which results in a Kconfig warning if that driver is not enabled:
+> Fixes a warning with CONFIG_DEBUG_MUTEXES on Nokia N900 during boot.
 > 
-> warning: (CRYPTO_DEV_ATMEL_AES) selects AT_HDMAC which has unmet direct dependencies (DMADEVICES && ARCH_AT91)
-> 
-> The crypto driver itself does not actually have a dependency
-> on a particular dma engine, other than this being the one that
-> is used in at91.
-> 
-> Removing the 'select' gets rid of the warning, but can cause
-> the driver to be unusable if the HDMAC is not enabled at the
-> same time. To work around that, this patch clarifies the runtime
-> dependency to be 'AT_HDMAC || AT_XDMAC', but adds an alternative
-> for COMPILE_TEST, which lets the driver get build on all systems.
-> 
-> The ARCH_AT91 dependency is implied by AT_XDMAC || AT_HDMAC now
-> and no longer needs to be listed separately.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Reported-by: Sebastian Reichel <sre@kernel.org>
+> Signed-off-by: Aaro Koskinen <aaro.koskinen@iki.fi>
 
 Patch applied.  Thanks.
 -- 
