@@ -1,47 +1,43 @@
-From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
-Subject: Re: [RFC PATCH 2/2] Crypto kernel tls socket
-Date: Mon, 23 Nov 2015 16:59:06 -0500
-Message-ID: <20151123215906.GH30089@oracle.com>
-References: <cover.1448299690.git.davejwatson@fb.com>
- <ac7783121ef9442741d67aca5d170f02d851ae03.1448299690.git.davejwatson@fb.com>
- <20151123192730.GB30089@oracle.com>
- <20151123214312.GA2319382@devbig217.prn1.facebook.com>
+From: Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>
+Subject: Re: [PATCH v4 2/4] clk: rockchip: set an ID for crypto clk
+Date: Tue, 24 Nov 2015 00:24:14 +0100
+Message-ID: <3324035.fFJ7jKO18L@diego>
+References: <1447732847-30514-1-git-send-email-zain.wang@rock-chips.com>
+ <1447732847-30514-3-git-send-email-zain.wang@rock-chips.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Tom Herbert <tom@herbertland.com>, netdev@vger.kernel.org,
-	davem@davemloft.net, Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-team@fb.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20151123214312.GA2319382@devbig217.prn1.facebook.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
+ hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org, ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
+ mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+ eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+ zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org
+To: linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Return-path: <linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+In-Reply-To: <1447732847-30514-3-git-send-email-zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-rockchip>,
+ <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-rockchip/>
+List-Post: <mailto:linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Help: <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-rockchip>,
+ <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
+Sender: "Linux-rockchip" <linux-rockchip-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Errors-To: linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On (11/23/15 13:43), Dave Watson wrote:
+Hi Zain,
+
+Am Dienstag, 17. November 2015, 12:00:45 schrieb Zain Wang:
+> Set an ID for crypto clk, so that it can be called in other part.
 > 
-> For kcm, opfd is the fd you would pass along in kcm_attach.
-> For rds, it looks like you'd want to use opfd as the sock instead of
-> the new one created by sock_create_kern in rds_tcp_conn_connect.
+> Signed-off-by: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+> Acked-by: Michael Turquette <mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>
+> Tested-by: Heiko Stuebner <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>
 
-I see.
-
-It's something to consider, and it would certainly secure the
-RDS header and app data, but TLS by itself may not be
-enough- we'd need to protect the TCP control plane as well, and 
-at the moment, I'm finding that even using esp-null (or AO, or MD5,
-for that matter) means that I lose GSO, and perf tanks. I'll try to
-put all my data together for this for netdev 1.1.
+I've split this into the header and clk-rk3288.c changes and applied it to my 
+clk-ids and clock branch for 4.5
 
 
-> > E.g., if I get a cipher-suite request outside the aes-ni, what would
-> > happen (punt to uspace?)
-> >
-> > --Sowmini
-> 
-> Right, bind() would fail and you would fallback to uspace.
-
-That's the approach that Solaris KSSL took, back in 1999. It quickly
-became obsolete, again more details in netdev 1.1.
-
---Sowmini
+Thanks
+Heiko
