@@ -1,94 +1,55 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: hwrng: Some concerns about add_hwgenerator_randomness
-Date: Mon, 23 Nov 2015 12:32:20 +0100
-Message-ID: <7284232.Rfr2UkYBuS@tauon.atsec.com>
-References: <CAFtRNNz9mdXuL-+EY=pqSpnza2RMJjoU0X+Y06ZRWgEEmsyXVg@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v4 3/4] Crypto: rockchip/crypto - add crypto driver for
+ rk3288
+Date: Mon, 23 Nov 2015 20:51:42 +0800
+Message-ID: <20151123125142.GA7709@gondor.apana.org.au>
+References: <1447732847-30514-1-git-send-email-zain.wang@rock-chips.com>
+ <1447732847-30514-4-git-send-email-zain.wang@rock-chips.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, mpm@selenic.com,
-	herbert@gondor.apana.org.au, Theodore Ts'o <tytso@mit.edu>
-To: Nick Kossifidis <mickflemm@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: zhengsq@rock-chips.com, hl@rock-chips.com, davem@davemloft.net,
+	mturquette@baylibre.com, heiko@sntech.de, pawel.moll@arm.com,
+	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
+	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+	eddie.cai@rock-chips.com
+To: Zain Wang <zain.wang@rock-chips.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34543 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752160AbbKWLcY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Nov 2015 06:32:24 -0500
-In-Reply-To: <CAFtRNNz9mdXuL-+EY=pqSpnza2RMJjoU0X+Y06ZRWgEEmsyXVg@mail.gmail.com>
+Received: from helcar.hengli.com.au ([209.40.204.226]:59302 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750853AbbKWMwY (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 23 Nov 2015 07:52:24 -0500
+Content-Disposition: inline
+In-Reply-To: <1447732847-30514-4-git-send-email-zain.wang@rock-chips.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Sonntag, 22. November 2015, 02:15:12 schrieb Nick Kossifidis:
+On Tue, Nov 17, 2015 at 12:00:46PM +0800, Zain Wang wrote:
+>
+> +static void rk_ablk_hw_init(struct rk_crypto_info *dev)
+> +{
+> +	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(dev->ablk_req);
+> +	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+> +	u32 conf_reg = 0;
+> +
+> +	if (dev->mode & TDES) {
+> +		dev->mode &= ~TDES;
+> +		dev->mode |= RK_CRYPTO_TDES_FIFO_MODE |
+> +			     RK_CRYPTO_TDES_BYTESWAP_KEY |
+> +			     RK_CRYPTO_TDES_BYTESWAP_IV;
+> +		CRYPTO_WRITE(dev, RK_CRYPTO_TDES_CTRL, dev->mode);
+> +
+> +		memcpy(dev->reg + RK_CRYPTO_TDES_IV_0, dev->ablk_req->info, 8);
 
-Hi Nick,
+Please ensure that the IV is copied back after the operation.
+I know that many existing drivers are buggy in this regard but
+they will be fixed soon and we will start enforcing this rule
+so I don't want to add any new drivers that break this rule.
 
->Hello all,
->
->I've been doing some reading on hw_random core and the drivers that
->use it and it seems that three of them use the quality parameter on
->the hwrng struct. When a driver sets this value, it ends up directly
->on credit_entropy_bits in random through add_hwgenerator_randomness
->and there is no way of disabling this behavior.
-
-IIRC, you can disable or alter the quality value them using the kernel command 
-line.
->
->Even if the user sets hw_random's default_quality to 0 (the
->default/safe value), the value on the hwrng struct overrides it:
->
->hw_random/core.c:
->current_quality = rng->quality ? : default_quality;
-
-Looking at that code, I would think that this is wrong as this overwrites the 
-kernel command line option.
->
->The three drivers that set rng->quality are:
->
->virtio-rng: sets it to 1000
->chaoskey: sets it to 1024 + 1023 (!) which gets re-set to 1024 in hwrng_init
->zcrypt: sets it to 900 by default but provides a module option to
->disable this behavior and set it to 0 (so that's an exception)
->
->I suggest to use the quality parameter of hwrng as "minimum entropy"
->or "guaranteed entropy" of the hwrng and if default_quality (the value
->set by the user) is larger than this, use it as an upper boundary
->(because the device can't "guarantee" more entropy), else If
->default_quality is less than this or zero, use default_quality
->instead. Do you agree with this, should I send a patch for it ?
->
->Also there is another issue when drivers call
->add_hwgenerator_randomness directly, ath9k does this -on
->wireless-testing- to provide random data from its ADC and use the
->wireless card as an entropy source. Other drivers might also do it in
->the future (I couldn't find more users other than hw_random/core.c and
->ath9k for now). Again there is no way to check or override the quality
->parameter passed there and it goes directly to random's
->credit_entropy_bits. Is this function meant to be used by anyone or is
->it an API between hw_random and random only ? The documentation on
->hw_random (it's declared on hw_random.h) hasn't been updated to
->reflect how this function should be used or what restrictions apply to
->the quality parameter when used (the commit log said that developers
->should be careful but nothing specific).
->
->We could have a parameter like "max_hwgenerator_quality" on random
->that makes it possible to filter the quality parameter passed on
->add_hwgenerator_randomness, no matter who uses it.
->
->Finally I suggest that we have an ioctl on random to completely
->disable add_hwgenerator_randomness and that's because if someone wants
-
-Again, I thought you can set that with the kernel command line, provided the 
-aforementioned code is changed.
-
->to use a userspace daemon to seed random through /dev/hwrng by doing
->further statistical analysis/monitoring (e.g. rngd or something
->similar), he/she will be mixing the same data on the pool twice (one
->through hw_random -> add_hwgenerator_randomness -even with zero
->quality- and one trough sysctl). I 'd also like to send a patch for
->this if you agree.
->
->Thanks a lot for your time, have a nice weekend.
-
-
-Ciao
-Stephan
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
