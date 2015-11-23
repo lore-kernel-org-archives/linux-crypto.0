@@ -1,37 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] hw_random: omap3-rom-rng: convert timer to delayed
- work
-Date: Mon, 23 Nov 2015 21:05:31 +0800
-Message-ID: <20151123130531.GG7866@gondor.apana.org.au>
-References: <1447876741-24114-1-git-send-email-aaro.koskinen@iki.fi>
+Subject: Re: [PATCH 1/2] crypto: sahara: set nb_[in|out]_sg as signed int
+Date: Mon, 23 Nov 2015 21:05:46 +0800
+Message-ID: <20151123130546.GH7866@gondor.apana.org.au>
+References: <1447936699-26854-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org,
-	Sebastian Reichel <sre@kernel.org>,
-	Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
-	linux-omap@vger.kernel.org
-To: Aaro Koskinen <aaro.koskinen@iki.fi>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44694 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753589AbbKWNFo (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Nov 2015 08:05:44 -0500
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1447876741-24114-1-git-send-email-aaro.koskinen@iki.fi>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1447936699-26854-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Nov 18, 2015 at 09:59:01PM +0200, Aaro Koskinen wrote:
-> We cannot put the HW RNG to idle using a timer because we cannot disable
-> clocks from atomic context. Use a delayed work instead.
+On Thu, Nov 19, 2015 at 01:38:17PM +0100, LABBE Corentin wrote:
+> The two unsigned int variables nb_in_sg and nb_out_sg can be assigned
+> signed value (-EINVAL) from sg_nents_for_len().
+> Furthermore they are used only by dma_map_sg and dma_unmap_sg which wait
+> for an signed int, so they must be set as int.
 > 
-> Fixes a warning with CONFIG_DEBUG_MUTEXES on Nokia N900 during boot.
-> 
-> Reported-by: Sebastian Reichel <sre@kernel.org>
-> Signed-off-by: Aaro Koskinen <aaro.koskinen@iki.fi>
+> Fixes: 6c2b74d4774f ("crypto: sahara - check return value of sg_nents_for_len")
+> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 
-Patch applied.  Thanks.
+Both patches applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
