@@ -1,67 +1,73 @@
-From: Dan Streetman <ddstreet@ieee.org>
-Subject: Re: [PATCH] crypto: nx: use of_property_read_u32()
-Date: Mon, 23 Nov 2015 09:16:21 -0500
-Message-ID: <CALZtONCqTg_wP9_TgKm6wevsVF7Mrrw8fYAMcRqsyOcmJ-aS+w@mail.gmail.com>
-References: <1448272614-24337-1-git-send-email-saurabh.truth@gmail.com>
+From: Dave Watson <davejwatson@fb.com>
+Subject: [RFC PATCH 0/2] Crypto kernel TLS socket
+Date: Mon, 23 Nov 2015 09:42:24 -0800
+Message-ID: <cover.1448299690.git.davejwatson@fb.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>
-To: Saurabh Sengar <saurabh.truth@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Cc: <linux-kernel@vger.kernel.org>, <kernel-team@fb.com>
+To: Tom Herbert <tom@herbertland.com>, <netdev@vger.kernel.org>,
+	<davem@davemloft.net>,
+	Sowmini Varadhan <sowmini.varadhan@oracle.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	<linux-crypto@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1448272614-24337-1-git-send-email-saurabh.truth@gmail.com>
+Content-Disposition: inline
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Nov 23, 2015 at 4:56 AM, Saurabh Sengar <saurabh.truth@gmail.com> wrote:
-> use of_propert_read_u32() for reading int value,
-> it can help reducing number of variables used
->
-> Signed-off-by: Saurabh Sengar <saurabh.truth@gmail.com>
+An approach for a kernel TLS socket.
 
-Acked-by: Dan Streetman <ddstreet@ieee.org>
+Only the symmetric encryption / decryption is done in-kernel, as well
+as minimal framing handling.  The handshake is kept in userspace, and
+the negotiated cipher / keys / IVs are then set on the algif_tls
+socket, which is then hooked in to a tcp socket using
+sk_write_space/sk_data_ready hooks.
 
-> ---
->  drivers/crypto/nx/nx-842-powernv.c | 11 ++++-------
->  1 file changed, 4 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
-> index 9ef51fa..87f7a0f 100644
-> --- a/drivers/crypto/nx/nx-842-powernv.c
-> +++ b/drivers/crypto/nx/nx-842-powernv.c
-> @@ -525,7 +525,6 @@ static int nx842_powernv_decompress(const unsigned char *in, unsigned int inlen,
->  static int __init nx842_powernv_probe(struct device_node *dn)
->  {
->         struct nx842_coproc *coproc;
-> -       struct property *ct_prop, *ci_prop;
->         unsigned int ct, ci;
->         int chip_id;
->
-> @@ -534,18 +533,16 @@ static int __init nx842_powernv_probe(struct device_node *dn)
->                 pr_err("ibm,chip-id missing\n");
->                 return -EINVAL;
->         }
-> -       ct_prop = of_find_property(dn, "ibm,842-coprocessor-type", NULL);
-> -       if (!ct_prop) {
-> +
-> +       if (of_property_read_u32(dn, "ibm,842-coprocessor-type", &ct)) {
->                 pr_err("ibm,842-coprocessor-type missing\n");
->                 return -EINVAL;
->         }
-> -       ct = be32_to_cpu(*(unsigned int *)ct_prop->value);
-> -       ci_prop = of_find_property(dn, "ibm,842-coprocessor-instance", NULL);
-> -       if (!ci_prop) {
-> +
-> +       if (of_property_read_u32(dn, "ibm,842-coprocessor-instance", &ci)) {
->                 pr_err("ibm,842-coprocessor-instance missing\n");
->                 return -EINVAL;
->         }
-> -       ci = be32_to_cpu(*(unsigned int *)ci_prop->value);
->
->         coproc = kmalloc(sizeof(*coproc), GFP_KERNEL);
->         if (!coproc)
-> --
-> 1.9.1
->
+If a non application-data TLS record is seen, it is left on the TCP
+socket and an error is returned on the ALG socket, and the record is
+left for userspace to manage. Userspace can't ignore the message, but
+could just close the socket.
+
+TLS could potentially also be done directly on the TCP socket, but
+seemed a bit harder to work with the OOB data for non application_data
+messages, and the sockopts / CMSGS already exist for ALG sockets.  The
+flip side is having to manage two fds in userspace.
+
+Some reasons we're looking at this:
+
+1) Access to sendfile/splice for CDN-type applications.  We were
+   inspired by Netflix exploring this in FreeBSD
+
+   https://people.freebsd.org/~rrs/asiabsd_2015_tls.pdf
+
+   For perf, this patch is almost on par with userspace OpenSSL.
+   Currently there are some copies and allocs to support
+   scatter/gather in aesni-intel_glue.c, but with some extra work to
+   remove those (not included here), a sendfile() is faster than the
+   equivalent userspace read/SSL_write using a 128k buffer by 2~7%.
+
+2) Access to the unencrypted bytes in kernelspace.  For example, Tom
+   Herbert's kcm would need this
+
+   https://lwn.net/Articles/657999/
+
+3) NIC offload. To support running aesni routines on the NIC instead
+   of the processor, we would probably need enough of the framing
+   interface put in kernel.
+
+
+Dave Watson (2):
+  Crypto support aesni rfc5288
+  Crypto kernel tls socket
+
+ arch/x86/crypto/aesni-intel_asm.S        |    6 +
+ arch/x86/crypto/aesni-intel_avx-x86_64.S |    4 +
+ arch/x86/crypto/aesni-intel_glue.c       |  105 ++-
+ crypto/Kconfig                           |   12 +
+ crypto/Makefile                          |    1 +
+ crypto/algif_tls.c                       | 1233 ++++++++++++++++++++++++++++++
+ 6 files changed, 1334 insertions(+), 27 deletions(-)
+ create mode 100644 crypto/algif_tls.c
+
+--
+2.4.6
