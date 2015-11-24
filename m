@@ -1,23 +1,24 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: padlock-aes - use offset_in_page macro
-Date: Tue, 24 Nov 2015 18:24:10 +0800
-Message-ID: <20151124102410.GB363@gondor.apana.org.au>
-References: <19b0bc324e0d893c4b516f3873b6dcbcff0da6ea.1448115766.git.geliangtang@163.com>
+Subject: Re: [PATCH] crypto: nx: use of_property_read_u32()
+Date: Tue, 24 Nov 2015 18:24:29 +0800
+Message-ID: <20151124102429.GC363@gondor.apana.org.au>
+References: <1448272614-24337-1-git-send-email-saurabh.truth@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
+Cc: ddstreet@ieee.org, davem@davemloft.net,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Geliang Tang <geliangtang@163.com>
+To: Saurabh Sengar <saurabh.truth@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <19b0bc324e0d893c4b516f3873b6dcbcff0da6ea.1448115766.git.geliangtang@163.com>
+In-Reply-To: <1448272614-24337-1-git-send-email-saurabh.truth@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Nov 21, 2015 at 10:24:11PM +0800, Geliang Tang wrote:
-> Use offset_in_page macro instead of (addr & ~PAGE_MASK).
+On Mon, Nov 23, 2015 at 03:26:54PM +0530, Saurabh Sengar wrote:
+> use of_propert_read_u32() for reading int value,
+> it can help reducing number of variables used
 > 
-> Signed-off-by: Geliang Tang <geliangtang@163.com>
+> Signed-off-by: Saurabh Sengar <saurabh.truth@gmail.com>
 
 Patch applied.  Thanks.
 -- 
