@@ -1,43 +1,55 @@
-From: Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>
-Subject: Re: [PATCH v4 2/4] clk: rockchip: set an ID for crypto clk
-Date: Tue, 24 Nov 2015 00:24:14 +0100
-Message-ID: <3324035.fFJ7jKO18L@diego>
+From: Zain <zain.wang@rock-chips.com>
+Subject: Re: [PATCH v4 3/4] Crypto: rockchip/crypto - add crypto driver for
+ rk3288
+Date: Tue, 24 Nov 2015 08:48:54 +0800
+Message-ID: <5653B3F6.9080006@rock-chips.com>
 References: <1447732847-30514-1-git-send-email-zain.wang@rock-chips.com>
- <1447732847-30514-3-git-send-email-zain.wang@rock-chips.com>
+ <1447732847-30514-4-git-send-email-zain.wang@rock-chips.com>
+ <20151123125142.GA7709@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
- hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org, ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
- mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
- eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
- zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org
-To: linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-Return-path: <linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-In-Reply-To: <1447732847-30514-3-git-send-email-zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-rockchip>,
- <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-rockchip/>
-List-Post: <mailto:linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Help: <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-rockchip>,
- <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
-Sender: "Linux-rockchip" <linux-rockchip-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-Errors-To: linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
-
-Hi Zain,
-
-Am Dienstag, 17. November 2015, 12:00:45 schrieb Zain Wang:
-> Set an ID for crypto clk, so that it can be called in other part.
-> 
-> Signed-off-by: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
-> Acked-by: Michael Turquette <mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>
-> Tested-by: Heiko Stuebner <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>
-
-I've split this into the header and clk-rk3288.c changes and applied it to my 
-clk-ids and clock branch for 4.5
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: zhengsq@rock-chips.com, hl@rock-chips.com, davem@davemloft.net,
+	mturquette@baylibre.com, heiko@sntech.de, pawel.moll@arm.com,
+	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
+	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+	eddie.cai@rock-chips.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from regular1.263xmail.com ([211.150.99.133]:55301 "EHLO
+	regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751843AbbKXAtI (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 23 Nov 2015 19:49:08 -0500
+In-Reply-To: <20151123125142.GA7709@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 
-Thanks
-Heiko
+
+On 2015=E5=B9=B411=E6=9C=8823=E6=97=A5 20:51, Herbert Xu wrote:
+> On Tue, Nov 17, 2015 at 12:00:46PM +0800, Zain Wang wrote:
+>> +static void rk_ablk_hw_init(struct rk_crypto_info *dev)
+>> +{
+>> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(dev->ab=
+lk_req);
+>> +	struct rk_cipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+>> +	u32 conf_reg =3D 0;
+>> +
+>> +	if (dev->mode & TDES) {
+>> +		dev->mode &=3D ~TDES;
+>> +		dev->mode |=3D RK_CRYPTO_TDES_FIFO_MODE |
+>> +			     RK_CRYPTO_TDES_BYTESWAP_KEY |
+>> +			     RK_CRYPTO_TDES_BYTESWAP_IV;
+>> +		CRYPTO_WRITE(dev, RK_CRYPTO_TDES_CTRL, dev->mode);
+>> +
+>> +		memcpy(dev->reg + RK_CRYPTO_TDES_IV_0, dev->ablk_req->info, 8);
+> Please ensure that the IV is copied back after the operation.
+> I know that many existing drivers are buggy in this regard but
+> they will be fixed soon and we will start enforcing this rule
+> so I don't want to add any new drivers that break this rule.
+Thanks your responding, I will fix it in v5.
+>
+> Thanks,
