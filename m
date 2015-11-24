@@ -1,24 +1,24 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: nx: use of_property_read_u32()
-Date: Tue, 24 Nov 2015 18:24:29 +0800
-Message-ID: <20151124102429.GC363@gondor.apana.org.au>
-References: <1448272614-24337-1-git-send-email-saurabh.truth@gmail.com>
+Subject: Re: [PATCH] drivers/crypto/qat/qat_common/Makefile: fix typo in
+ clean-files
+Date: Tue, 24 Nov 2015 18:23:51 +0800
+Message-ID: <20151124102351.GA363@gondor.apana.org.au>
+References: <1447977979-16061-1-git-send-email-jim.epost@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: ddstreet@ieee.org, davem@davemloft.net,
+Cc: tadeusz.struk@intel.com, davem@davemloft.net, qat-linux@intel.com,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Saurabh Sengar <saurabh.truth@gmail.com>
+To: Jim Davis <jim.epost@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1448272614-24337-1-git-send-email-saurabh.truth@gmail.com>
+In-Reply-To: <1447977979-16061-1-git-send-email-jim.epost@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Nov 23, 2015 at 03:26:54PM +0530, Saurabh Sengar wrote:
-> use of_propert_read_u32() for reading int value,
-> it can help reducing number of variables used
+On Thu, Nov 19, 2015 at 05:06:19PM -0700, Jim Davis wrote:
+> A typo in the Makefile leaves qat_rsaprivkey-asn1.h hanging around.
 > 
-> Signed-off-by: Saurabh Sengar <saurabh.truth@gmail.com>
+> Signed-off-by: Jim Davis <jim.epost@gmail.com>
 
 Patch applied.  Thanks.
 -- 
