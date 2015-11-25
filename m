@@ -1,41 +1,41 @@
-From: Alexander Kuleshov <kuleshovmail@gmail.com>
-Subject: [PATCH] crypto/cryptod: use crypto_skcipher_type() for getting skcipher type
-Date: Wed, 25 Nov 2015 23:48:28 +0600
-Message-ID: <1448473708-9609-1-git-send-email-kuleshovmail@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Alexander Kuleshov <kuleshovmail@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Ameen <ameenali023@gmail.com>
+Subject: [PATCH 2/2] updating for keypayload null check.
+Date: Wed, 25 Nov 2015 21:04:15 +0200
+Message-ID: <1448478255-5443-1-git-send-email-AmeenAli023@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ameen <AmeenAli023@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	dhowells@redhat.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lf0-f54.google.com ([209.85.215.54]:35002 "EHLO
-	mail-lf0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750832AbbKYRuy (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:35755 "EHLO
+	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751270AbbKYTEW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Nov 2015 12:50:54 -0500
+	Wed, 25 Nov 2015 14:04:22 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The <linux/crypto.h> provides inline function - crypto_skcipher_type().
-Let's use it in the cryptd_alloc_ablkcipher() instead of direct calculation.
+adding NULL check to make it fail safe.
 
-Signed-off-by: Alexander Kuleshov <kuleshovmail@gmail.com>
+Signed-Off-By : Ameen Ali <AmeenAli023@gmail.com>
 ---
- crypto/cryptd.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ crypto/asymmetric_keys/x509_public_key.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index c81861b..c4af8aa 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -887,8 +887,7 @@ struct cryptd_ablkcipher *cryptd_alloc_ablkcipher(const char *alg_name,
- 	if (snprintf(cryptd_alg_name, CRYPTO_MAX_ALG_NAME,
- 		     "cryptd(%s)", alg_name) >= CRYPTO_MAX_ALG_NAME)
- 		return ERR_PTR(-EINVAL);
--	type &= ~(CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_GENIV);
--	type |= CRYPTO_ALG_TYPE_BLKCIPHER;
-+	type = crypto_skcipher_type(type);
- 	mask &= ~CRYPTO_ALG_TYPE_MASK;
- 	mask |= (CRYPTO_ALG_GENIV | CRYPTO_ALG_TYPE_BLKCIPHER_MASK);
- 	tfm = crypto_alloc_base(cryptd_alg_name, type, mask);
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 2a44b37..76610cc 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -286,6 +286,10 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ 	char *desc = NULL, *p;
+ 	int ret;
+ 
++	if(prep == NULL){
++		pr_debug("NULL payload");
++		return PTR_ERR(prep);
++	}
+ 	cert = x509_cert_parse(prep->data, prep->datalen);
+ 	if (IS_ERR(cert))
+ 		return PTR_ERR(cert);
 -- 
 2.5.0
