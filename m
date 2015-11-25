@@ -1,40 +1,38 @@
-From: Andrzej Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH v3 3/4] crypto: akcipher: add akcipher declarations useful
- for templates.
-Date: Tue, 24 Nov 2015 21:54:57 +0100
-Message-ID: <CAOq732LT4JoBzHv3Jd=ZXzWkU+LMc1Zmqv4WvM4K4X5LRps3ow@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v3 3/4] crypto: akcipher: add akcipher declarations
+ useful for templates.
+Date: Wed, 25 Nov 2015 09:18:20 +0800
+Message-ID: <20151125011820.GB5907@gondor.apana.org.au>
 References: <1447989215-523-3-git-send-email-andrew.zaborowski@intel.com>
-	<20151124095408.GA315@gondor.apana.org.au>
+ <20151124095408.GA315@gondor.apana.org.au>
+ <CAOq732LT4JoBzHv3Jd=ZXzWkU+LMc1Zmqv4WvM4K4X5LRps3ow@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Andrzej Zaborowski <andrew.zaborowski@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:34172 "EHLO
-	mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753666AbbKXUy7 (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:58872 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754248AbbKYBS0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 24 Nov 2015 15:54:59 -0500
-Received: by wmvv187 with SMTP id v187so228500885wmv.1
-        for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2015 12:54:57 -0800 (PST)
-In-Reply-To: <20151124095408.GA315@gondor.apana.org.au>
+	Tue, 24 Nov 2015 20:18:26 -0500
+Content-Disposition: inline
+In-Reply-To: <CAOq732LT4JoBzHv3Jd=ZXzWkU+LMc1Zmqv4WvM4K4X5LRps3ow@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 24 November 2015 at 10:54, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> Andrew Zaborowski <andrew.zaborowski@intel.com> wrote:
->> Expose crypto_akcipher_type like other crypto types are exposed to be
->> used from outside akcipher.c.  Add a struct akcipher_instance similar to
->> aead_instance with just the right size for an akcipher template
->> instance, and two macros for converting to/from crypto_instance.
+On Tue, Nov 24, 2015 at 09:54:57PM +0100, Andrzej Zaborowski wrote:
 >
-> You're still doing some things in the old way.  With new templates,
-> you shouldn't need to export the crypto type at all.  Please look
-> at how AEAD does it.
+> It doesn't need to export crypto_aead_type but instead needs to export
+> crypto_aead_grab and aead_register_instance.  I'll add those for
+> akcipher and resend then.  Would there be any point defining a
+> crypto_akcipher_spawn following the AEAD pattern?
 
-It doesn't need to export crypto_aead_type but instead needs to export
-crypto_aead_grab and aead_register_instance.  I'll add those for
-akcipher and resend then.  Would there be any point defining a
-crypto_akcipher_spawn following the AEAD pattern?
+Well if you need to spawn an akcipher (which I presume you do) then
+yes you should define it.
 
-Best regards
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
