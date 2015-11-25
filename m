@@ -1,7 +1,7 @@
 From: Zain Wang <zain.wang@rock-chips.com>
-Subject: [PATCH v5 2/4] clk: rockchip: set an ID for crypto clk
-Date: Wed, 25 Nov 2015 13:43:31 +0800
-Message-ID: <1448430213-27203-3-git-send-email-zain.wang@rock-chips.com>
+Subject: [PATCH v5 4/4] ARM: dts: rockchip: Add Crypto node for rk3288
+Date: Wed, 25 Nov 2015 13:43:33 +0800
+Message-ID: <1448430213-27203-5-git-send-email-zain.wang@rock-chips.com>
 References: <1448430213-27203-1-git-send-email-zain.wang@rock-chips.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
@@ -11,62 +11,57 @@ To: zhengsq@rock-chips.com, hl@rock-chips.com,
 	mturquette@baylibre.com, heiko@sntech.de, pawel.moll@arm.com,
 	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
 	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from regular1.263xmail.com ([211.150.99.139]:56753 "EHLO
-	regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932380AbbKYFp5 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Nov 2015 00:45:57 -0500
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1448430213-27203-1-git-send-email-zain.wang@rock-chips.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Set an ID for crypto clk, so that it can be called in other part.
+Add Crypto node for rk3288 including crypto controller and dma clk.
 
 Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
-Acked-by: Michael Turquette <mturquette@baylibre.com>
 Tested-by: Heiko Stuebner <heiko@sntech.de>
 ---
 Changed in v5:
 - None
+
 Changed in v4:
 - None
+
 Changed in v3:
+- add reset property
+
+Changed in v2:
 - None
-Changed in v2: 
-- None
+
 Changed in v1:
-- define SCLK_CRYPTO in rk3288-cru.h
-- use SCLK_CRYPTO instead of SRST_CRYPTO
+- remove the _crypto suffix
+- use "rockchip,rk3288-crypto" instead of "rockchip,rk3288"
 
- drivers/clk/rockchip/clk-rk3288.c      | 2 +-
- include/dt-bindings/clock/rk3288-cru.h | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ arch/arm/boot/dts/rk3288.dtsi | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/drivers/clk/rockchip/clk-rk3288.c b/drivers/clk/rockchip/clk-rk3288.c
-index 9040878..3fceda1 100644
---- a/drivers/clk/rockchip/clk-rk3288.c
-+++ b/drivers/clk/rockchip/clk-rk3288.c
-@@ -295,7 +295,7 @@ static struct rockchip_clk_branch rk3288_clk_branches[] __initdata = {
- 			RK3288_CLKGATE_CON(0), 4, GFLAGS),
- 	GATE(0, "c2c_host", "aclk_cpu_src", 0,
- 			RK3288_CLKGATE_CON(13), 8, GFLAGS),
--	COMPOSITE_NOMUX(0, "crypto", "aclk_cpu_pre", 0,
-+	COMPOSITE_NOMUX(SCLK_CRYPTO, "crypto", "aclk_cpu_pre", 0,
- 			RK3288_CLKSEL_CON(26), 6, 2, DFLAGS,
- 			RK3288_CLKGATE_CON(5), 4, GFLAGS),
- 	GATE(0, "aclk_bus_2pmu", "aclk_cpu_pre", CLK_IGNORE_UNUSED,
-diff --git a/include/dt-bindings/clock/rk3288-cru.h b/include/dt-bindings/clock/rk3288-cru.h
-index c719aac..30dcd60 100644
---- a/include/dt-bindings/clock/rk3288-cru.h
-+++ b/include/dt-bindings/clock/rk3288-cru.h
-@@ -86,6 +86,7 @@
- #define SCLK_USBPHY480M_SRC	122
- #define SCLK_PVTM_CORE		123
- #define SCLK_PVTM_GPU		124
-+#define SCLK_CRYPTO			125
+diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288.dtsi
+index ad44d80..c6b1aa4 100644
+--- a/arch/arm/boot/dts/rk3288.dtsi
++++ b/arch/arm/boot/dts/rk3288.dtsi
+@@ -781,6 +781,18 @@
+ 		status = "disabled";
+ 	};
  
- #define SCLK_MAC		151
- #define SCLK_MACREF_OUT		152
++	crypto: cypto-controller@ff8a0000 {
++		compatible = "rockchip,rk3288-crypto";
++		reg = <0xff8a0000 0x4000>;
++		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
++			 <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
++		clock-names = "aclk", "hclk", "sclk", "apb_pclk";
++		resets = <&cru SRST_CRYPTO>;
++		reset-names = "crypto-rst";
++		status = "okay";
++	};
++
+ 	vopb: vop@ff930000 {
+ 		compatible = "rockchip,rk3288-vop";
+ 		reg = <0xff930000 0x19c>;
 -- 
 1.9.1
