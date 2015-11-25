@@ -1,50 +1,53 @@
-From: Zain <zain.wang@rock-chips.com>
-Subject: Re: [PATCH v5 2/4] clk: rockchip: set an ID for crypto clk
-Date: Wed, 25 Nov 2015 16:53:06 +0800
-Message-ID: <565576F2.3010906@rock-chips.com>
-References: <1448430213-27203-1-git-send-email-zain.wang@rock-chips.com>
- <1448430213-27203-3-git-send-email-zain.wang@rock-chips.com>
- <2906658.6OeVssif4z@diego>
+From: Kalle Valo <kvalo@codeaurora.org>
+Subject: Re: [PATCH 2/2] ath9k: export HW random number generator
+Date: Wed, 25 Nov 2015 11:16:22 +0200
+Message-ID: <87io4qphg9.fsf@kamboji.qca.qualcomm.com>
+References: <1436946847-10909-1-git-send-email-miaoqing@qca.qualcomm.com>
+	<a8b787bd17d94e8899bf1be6131165b2@NASANEXM01E.na.qualcomm.com>
+	<55B60BC9.8040800@rempel-privat.de>
+	<3945775.m5HblJPgiO@tauon.atsec.com>
+	<8738043ith.fsf@kamboji.qca.qualcomm.com>
+	<3ec13417acdc48628adaedb68d259b9c@NASANEXM01E.na.qualcomm.com>
+	<CAFtRNNyWzRKQbq1wa8=6V=tOQzB3g9jEBLhAO7iSchNAzf=fkQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: zhengsq@rock-chips.com, hl@rock-chips.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	mturquette@baylibre.com, pawel.moll@arm.com,
-	ijc+devicetree@hellion.org.uk, robh+dt@kernel.org,
-	galak@codeaurora.org, linux@arm.linux.org.uk, mark.rutland@arm.com,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-	eddie.cai@rock-chips.com
-To: =?UTF-8?Q?Heiko_St=c3=bcbner?= <heiko@sntech.de>
+Content-Type: text/plain; charset=us-ascii
+Cc: "Pan\, Miaoqing" <miaoqing@qti.qualcomm.com>,
+	Stephan Mueller <smueller@chronox.de>,
+	"Sepehrdad\, Pouyan" <pouyans@qti.qualcomm.com>,
+	"Jacobson\, David" <djacobso@qti.qualcomm.com>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	"linville\@tuxdriver.com" <linville@tuxdriver.com>,
+	"linux-wireless\@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"Theodore Ts'o" <tytso@mit.edu>,
+	"linux-crypto\@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"nhorman\@tuxdriver.com" <nhorman@tuxdriver.com>
+To: Nick Kossifidis <mickflemm@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from regular1.263xmail.com ([211.150.99.134]:51258 "EHLO
-	regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752547AbbKYIxR (ORCPT
+Received: from smtp.codeaurora.org ([198.145.29.96]:35594 "EHLO
+	smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754720AbbKYJQa (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Nov 2015 03:53:17 -0500
-In-Reply-To: <2906658.6OeVssif4z@diego>
+	Wed, 25 Nov 2015 04:16:30 -0500
+In-Reply-To: <CAFtRNNyWzRKQbq1wa8=6V=tOQzB3g9jEBLhAO7iSchNAzf=fkQ@mail.gmail.com>
+	(Nick Kossifidis's message of "Sat, 7 Nov 2015 17:39:21 -0600")
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Nick Kossifidis <mickflemm@gmail.com> writes:
 
+> That was partially my intention too when I submitted
+> 2aa56cca3571fd08c0c38f3e2d4bb0bfb3def3c5 which mixes FFT measurements
+> to the entropy pool without providing any estimation on entropy
+> (entropy estimation is the wrong approach, read the papers on fortuna
+> for more information on that). I believe that this approach is better
+> than mine because FFT data is too much (high throughput) and may have
+> a negative impact on the pool when mixed like this (even without the
+> entropy count) so Kale please revert my patch also (I was about to
+> submit a request for reverting it and writing something similar when
+> this thread came up).
 
-On 2015=E5=B9=B411=E6=9C=8825=E6=97=A5 16:14, Heiko St=C3=BCbner wrote:
-> Hi Zain,
->
-> Am Mittwoch, 25. November 2015, 13:43:31 schrieb Zain Wang:
->> Set an ID for crypto clk, so that it can be called in other part.
->>
->> Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
->> Acked-by: Michael Turquette <mturquette@baylibre.com>
->> Tested-by: Heiko Stuebner <heiko@sntech.de>
-> I've already taken this patch, so no need to resubmit on further vers=
-ion.
-Thanks for your reminding.
+Could you submit the revert as a patch and with the explonation in the
+commit log, please?
 
-Zain
->
-> Heiko
->
->
->
+-- 
+Kalle Valo
