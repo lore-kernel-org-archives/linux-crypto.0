@@ -1,53 +1,103 @@
-From: Kalle Valo <kvalo@codeaurora.org>
-Subject: Re: [PATCH 2/2] ath9k: export HW random number generator
-Date: Wed, 25 Nov 2015 11:16:22 +0200
-Message-ID: <87io4qphg9.fsf@kamboji.qca.qualcomm.com>
-References: <1436946847-10909-1-git-send-email-miaoqing@qca.qualcomm.com>
-	<a8b787bd17d94e8899bf1be6131165b2@NASANEXM01E.na.qualcomm.com>
-	<55B60BC9.8040800@rempel-privat.de>
-	<3945775.m5HblJPgiO@tauon.atsec.com>
-	<8738043ith.fsf@kamboji.qca.qualcomm.com>
-	<3ec13417acdc48628adaedb68d259b9c@NASANEXM01E.na.qualcomm.com>
-	<CAFtRNNyWzRKQbq1wa8=6V=tOQzB3g9jEBLhAO7iSchNAzf=fkQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "Pan\, Miaoqing" <miaoqing@qti.qualcomm.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	"Sepehrdad\, Pouyan" <pouyans@qti.qualcomm.com>,
-	"Jacobson\, David" <djacobso@qti.qualcomm.com>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	"linville\@tuxdriver.com" <linville@tuxdriver.com>,
-	"linux-wireless\@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	"linux-crypto\@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"nhorman\@tuxdriver.com" <nhorman@tuxdriver.com>
-To: Nick Kossifidis <mickflemm@gmail.com>
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH v4 1/4] lib/mpi: only require buffers as big as needed for the integer
+Date: Wed, 25 Nov 2015 11:12:14 +0100
+Message-ID: <1448446337-17176-1-git-send-email-andrew.zaborowski@intel.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.codeaurora.org ([198.145.29.96]:35594 "EHLO
-	smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754720AbbKYJQa (ORCPT
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:34412 "EHLO
+	mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752179AbbKYKMa (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Nov 2015 04:16:30 -0500
-In-Reply-To: <CAFtRNNyWzRKQbq1wa8=6V=tOQzB3g9jEBLhAO7iSchNAzf=fkQ@mail.gmail.com>
-	(Nick Kossifidis's message of "Sat, 7 Nov 2015 17:39:21 -0600")
+	Wed, 25 Nov 2015 05:12:30 -0500
+Received: by wmvv187 with SMTP id v187so249240905wmv.1
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2015 02:12:29 -0800 (PST)
+Received: from localhost.localdomain (9.Red-2-136-109.dynamicIP.rima-tde.net. [2.136.109.9])
+        by smtp.gmail.com with ESMTPSA id z13sm22062283wjr.47.2015.11.25.02.12.27
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Wed, 25 Nov 2015 02:12:28 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Nick Kossifidis <mickflemm@gmail.com> writes:
+Since mpi_write_to_sgl and mpi_read_buffer explicitly left-align the
+integers being written it makes no sense to require a buffer big enough for
+the number + the leading zero bytes which are not written.  The error
+returned also doesn't convey any information.  So instead require only the
+size needed and return -EOVERFLOW to signal when buffer too short.
 
-> That was partially my intention too when I submitted
-> 2aa56cca3571fd08c0c38f3e2d4bb0bfb3def3c5 which mixes FFT measurements
-> to the entropy pool without providing any estimation on entropy
-> (entropy estimation is the wrong approach, read the papers on fortuna
-> for more information on that). I believe that this approach is better
-> than mine because FFT data is too much (high throughput) and may have
-> a negative impact on the pool when mixed like this (even without the
-> entropy count) so Kale please revert my patch also (I was about to
-> submit a request for reverting it and writing something similar when
-> this thread came up).
+Signed-off-by: Andrew Zaborowski <andrew.zaborowski@intel.com>
+---
+No changes since v1
+---
+ lib/mpi/mpicoder.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
-Could you submit the revert as a patch and with the explonation in the
-commit log, please?
-
+diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
+index c7e0a70..074d2df 100644
+--- a/lib/mpi/mpicoder.c
++++ b/lib/mpi/mpicoder.c
+@@ -135,7 +135,9 @@ EXPORT_SYMBOL_GPL(mpi_read_from_buffer);
+  * @buf:	bufer to which the output will be written to. Needs to be at
+  *		leaset mpi_get_size(a) long.
+  * @buf_len:	size of the buf.
+- * @nbytes:	receives the actual length of the data written.
++ * @nbytes:	receives the actual length of the data written on success and
++ *		the data to-be-written on -EOVERFLOW in case buf_len was too
++ *		small.
+  * @sign:	if not NULL, it will be set to the sign of a.
+  *
+  * Return:	0 on success or error code in case of error
+@@ -148,7 +150,7 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
+ 	unsigned int n = mpi_get_size(a);
+ 	int i, lzeros = 0;
+ 
+-	if (buf_len < n || !buf || !nbytes)
++	if (!buf || !nbytes)
+ 		return -EINVAL;
+ 
+ 	if (sign)
+@@ -163,6 +165,11 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
+ 			break;
+ 	}
+ 
++	if (buf_len < n - lzeros) {
++		*nbytes = n - lzeros;
++		return -EOVERFLOW;
++	}
++
+ 	p = buf;
+ 	*nbytes = n - lzeros;
+ 
+@@ -332,7 +339,8 @@ EXPORT_SYMBOL_GPL(mpi_set_buffer);
+  * @nbytes:	in/out param - it has the be set to the maximum number of
+  *		bytes that can be written to sgl. This has to be at least
+  *		the size of the integer a. On return it receives the actual
+- *		length of the data written.
++ *		length of the data written on success or the data that would
++ *		be written if buffer was too small.
+  * @sign:	if not NULL, it will be set to the sign of a.
+  *
+  * Return:	0 on success or error code in case of error
+@@ -345,7 +353,7 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
+ 	unsigned int n = mpi_get_size(a);
+ 	int i, x, y = 0, lzeros = 0, buf_len;
+ 
+-	if (!nbytes || *nbytes < n)
++	if (!nbytes)
+ 		return -EINVAL;
+ 
+ 	if (sign)
+@@ -360,6 +368,11 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
+ 			break;
+ 	}
+ 
++	if (*nbytes < n - lzeros) {
++		*nbytes = n - lzeros;
++		return -EOVERFLOW;
++	}
++
+ 	*nbytes = n - lzeros;
+ 	buf_len = sgl->length;
+ 	p2 = sg_virt(sgl);
 -- 
-Kalle Valo
+2.1.4
