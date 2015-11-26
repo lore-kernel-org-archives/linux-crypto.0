@@ -1,36 +1,31 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4 4/4] crypto: RSA padding algorithm
-Date: Thu, 26 Nov 2015 16:54:12 +0800
-Message-ID: <20151126085412.GA22159@gondor.apana.org.au>
-References: <1448446337-17176-4-git-send-email-andrew.zaborowski@intel.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: ghash-clmulni: does not load
+Date: Thu, 26 Nov 2015 13:45:26 +0100
+Message-ID: <4267678.SA4Iv35LnJ@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org
-To: Andrew Zaborowski <andrew.zaborowski@intel.com>
+To: tadeusz.struk@intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54506 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752193AbbKZIyP (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Nov 2015 03:54:15 -0500
-Content-Disposition: inline
-In-Reply-To: <1448446337-17176-4-git-send-email-andrew.zaborowski@intel.com>
+Received: from mail.eperm.de ([89.247.134.16]:34586 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751019AbbKZMp3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 26 Nov 2015 07:45:29 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Andrew Zaborowski <andrew.zaborowski@intel.com> wrote:
->
-> +struct crypto_template rsa_pkcs1pad_tmpl = {
-> +       .name = "pkcs1pad",
-> +       .create = pkcs1pad_create,
-> +       .free = pkcs1pad_free,
+Hi Tadeusz,
 
-Please use inst->free instead (crypto/gcm.c is a good example).
+testing the current cryptodev-2.6 tree, ghash-clmulni does not load. In the 
+init function
 
-BTW the first two patches are fine so you don't have to post them.
+	err = crypto_register_ahash(&ghash_async_alg);
 
-Thanks,
+returns EINVAL.
+
+Any ideas?
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
