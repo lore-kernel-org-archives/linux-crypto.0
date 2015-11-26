@@ -1,33 +1,43 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: mxs-dcp: Failed to register sha1 hash
-Date: Thu, 26 Nov 2015 13:14:12 -0200
-Message-ID: <CAOMZO5AyAAfZM07KYHCfRaeia8Ut1F6s=jsFg6C3YYzHx8C5UA@mail.gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: mxs-dcp: Failed to register sha1 hash
+Date: Thu, 26 Nov 2015 16:25:30 +0100
+Message-ID: <160969925.mts3FEnayM@myon.chronox.de>
+References: <CAOMZO5AyAAfZM07KYHCfRaeia8Ut1F6s=jsFg6C3YYzHx8C5UA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org
-To: =?UTF-8?B?TWFyZWsgVmHFoXV0?= <marex@denx.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Marek =?utf-8?B?VmHFoXV0?= <marex@denx.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+To: Fabio Estevam <festevam@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f178.google.com ([209.85.213.178]:33977 "EHLO
-	mail-ig0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751916AbbKZPOM (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Nov 2015 10:14:12 -0500
-Received: by igvg19 with SMTP id g19so16276154igv.1
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Nov 2015 07:14:12 -0800 (PST)
+Received: from mail.eperm.de ([89.247.134.16]:34595 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751916AbbKZPZe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 26 Nov 2015 10:25:34 -0500
+In-Reply-To: <CAOMZO5AyAAfZM07KYHCfRaeia8Ut1F6s=jsFg6C3YYzHx8C5UA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Am Donnerstag, 26. November 2015, 13:14:12 schrieb Fabio Estevam:
 
-On kernel 4.1.13 and also on 4.4.0-rc2-next-20151126 I see the
-following error on mx28:
+Hi Fabio,
 
-[    2.245453] mxs-dcp 80028000.dcp: Failed to register sha1 hash!
-[    2.253928] mxs-dcp: probe of 80028000.dcp failed with error -22
+> Hi,
+> 
+> On kernel 4.1.13 and also on 4.4.0-rc2-next-20151126 I see the
+> following error on mx28:
+> 
+> [    2.245453] mxs-dcp 80028000.dcp: Failed to register sha1 hash!
+> [    2.253928] mxs-dcp: probe of 80028000.dcp failed with error -22
+> 
+> Does anyone have any idea how to fix this?
 
-Does anyone have any idea how to fix this?
+Briefly looking into drivers/crypto/mxs-dcp.c, it is an ahash and does not 
+contain halg.statesize in the algo definitions. Thus it looks very much like 
+the same issue that I see with ghash.
 
-Thanks,
 
-Fabio Estevam
+-- 
+Ciao
+Stephan
