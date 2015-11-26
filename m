@@ -1,31 +1,55 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: ahash and halg.statesize
-Date: Thu, 26 Nov 2015 17:01:24 +0100
-Message-ID: <17889830.Qe4KtthDOe@tauon.atsec.com>
+From: Fabio Estevam <fabio.estevam@freescale.com>
+Subject: [PATCH] crypto: mxs-dcp - Initialize .statesize fields
+Date: Thu, 26 Nov 2015 13:47:41 -0200
+Message-ID: <1448552861-17410-1-git-send-email-fabio.estevam@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain
+Cc: <marex@denx.de>, <smueller@chronox.de>,
+	<linux-crypto@vger.kernel.org>,
+	Fabio Estevam <fabio.estevam@freescale.com>,
+	<stable@vger.kernel.org>
+To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34600 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752504AbbKZQBa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Nov 2015 11:01:30 -0500
+Received: from mail-bn1bbn0105.outbound.protection.outlook.com ([157.56.111.105]:53203
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751368AbbKZQCB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 26 Nov 2015 11:02:01 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+Initialize .statesize fields in order to avoid the following error
+on probe:
 
-after Fabio's confirmation on the mxs-dcp ahash implementations, I briefly 
-looked for the invocation of crypto_register_ahash and found numerous 
-invocations. After taking two examples (sahara, n2), I did not find 
-halg.statesize.
+mxs-dcp 80028000.dcp: Failed to register sha1 hash!
+mxs-dcp: probe of 80028000.dcp failed with error -22
 
-Thus, I would conclude that none of these ciphers would work currently.
+Cc: <stable@vger.kernel.org> # 4.1+
+Suggested-by: Stephan Mueller <smueller@chronox.de>
+Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
+---
+ drivers/crypto/mxs-dcp.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-I am currently not sure how to solve that issue as every ahash implementation 
-must be assessed for its statesize.
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+index 59ed54e..e65d379 100644
+--- a/drivers/crypto/mxs-dcp.c
++++ b/drivers/crypto/mxs-dcp.c
+@@ -836,6 +836,7 @@ static struct ahash_alg dcp_sha1_alg = {
+ 	.digest	= dcp_sha_digest,
+ 	.halg	= {
+ 		.digestsize	= SHA1_DIGEST_SIZE,
++		.statesize	= sizeof(struct sha1_state),
+ 		.base		= {
+ 			.cra_name		= "sha1",
+ 			.cra_driver_name	= "sha1-dcp",
+@@ -860,6 +861,7 @@ static struct ahash_alg dcp_sha256_alg = {
+ 	.digest	= dcp_sha_digest,
+ 	.halg	= {
+ 		.digestsize	= SHA256_DIGEST_SIZE,
++		.statesize	= sizeof(struct sha256_state),
+ 		.base		= {
+ 			.cra_name		= "sha256",
+ 			.cra_driver_name	= "sha256-dcp",
+-- 
+1.9.1
