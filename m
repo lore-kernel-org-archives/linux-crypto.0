@@ -1,51 +1,46 @@
-From: Andrzej Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH v5 3/4] crypto: akcipher: add akcipher declarations needed
- by templates.
-Date: Fri, 27 Nov 2015 16:10:41 +0100
-Message-ID: <CAOq732K-A3-ypsLavOJrT_ENuSM=zuriJo0F5bS1dNuhbeRTDA@mail.gmail.com>
-References: <1448574808-11320-1-git-send-email-andrew.zaborowski@intel.com>
-	<20151127131213.GA29590@gondor.apana.org.au>
+From: Jiri Slaby <jslaby@suse.cz>
+Subject: Re: [PATCH] hw_random: core, sleep interruptible in read
+Date: Fri, 27 Nov 2015 16:40:34 +0100
+Message-ID: <56587972.8050405@suse.cz>
+References: <1448567789-2470-1-git-send-email-jslaby@suse.cz>
+ <20151127130603.GA29503@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+	linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:35419 "EHLO
-	mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753894AbbK0PKm (ORCPT
+Received: from mail-wm0-f46.google.com ([74.125.82.46]:36053 "EHLO
+	mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754871AbbK0Pki (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Nov 2015 10:10:42 -0500
-Received: by wmuu63 with SMTP id u63so58915094wmu.0
-        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2015 07:10:41 -0800 (PST)
-In-Reply-To: <20151127131213.GA29590@gondor.apana.org.au>
+	Fri, 27 Nov 2015 10:40:38 -0500
+In-Reply-To: <20151127130603.GA29503@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
-
-On 27 November 2015 at 14:12, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> Andrew Zaborowski <andrew.zaborowski@intel.com> wrote:
+On 11/27/2015, 02:06 PM, Herbert Xu wrote:
+> On Thu, Nov 26, 2015 at 08:56:29PM +0100, Jiri Slaby wrote:
 >>
->> @@ -75,9 +76,22 @@ static int crypto_akcipher_init_tfm(struct crypto_tfm *tfm)
->>        return 0;
->> }
->>
->> +static void crypto_akcipher_free_instance(struct crypto_instance *inst)
->> +{
->> +       struct akcipher_instance *akcipher = akcipher_instance(inst);
->> +
->> +       if (!akcipher->free) {
->> +               inst->tmpl->free(inst);
->> +               return;
->> +       }
->
-> You don't need this bit.  AEAD has it because there were legacy
-> templates but you are starting from a clean slate.
+>> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+>> index a064237ff362..f003df162e09 100644
+>> --- a/drivers/char/hw_random/core.c
+>> +++ b/drivers/char/hw_random/core.c
+>> @@ -238,7 +238,10 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
+>>  			goto out;
+>>  		}
+>>  
+>> -		mutex_lock(&reading_mutex);
+>> +		if (mutex_lock_interruptible(&reading_mutex)) {
+>> +			err = -EINTR;
+> 
+> Shouldn't this be ERESTARTSYS?
 
-You're right there aren't any users that need this now but again is
-there any reason you prefer the inst->free approach?
+Yes, it actually can, given the retval is returned only if no data were
+read yet.
 
-BTW note the lines that assign inst->free in crypto/gcm.c end with
-commas which could lead to confusion.
-
-Best regards
+thanks,
+-- 
+js
+suse labs
