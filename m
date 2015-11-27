@@ -1,78 +1,36 @@
-From: Jiri Slaby <jslaby@suse.cz>
-Subject: [PATCH v2] hw_random: core, sleep interruptible in read
-Date: Fri, 27 Nov 2015 16:50:43 +0100
-Message-ID: <1448639443-21760-1-git-send-email-jslaby@suse.cz>
-References: <20151127130603.GA29503@gondor.apana.org.au>
-Cc: linux-kernel@vger.kernel.org, Jiri Slaby <jslaby@suse.cz>,
-	Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:40857 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751484AbbK0Pur (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Nov 2015 10:50:47 -0500
-In-Reply-To: <20151127130603.GA29503@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>
+Subject: Re: [PATCH v5 4/4] ARM: dts: rockchip: Add Crypto node for rk3288
+Date: Fri, 27 Nov 2015 18:25:45 +0100
+Message-ID: <5241592.XItMSCcUBk@diego>
+References: <1448430213-27203-1-git-send-email-zain.wang@rock-chips.com> <1448430213-27203-5-git-send-email-zain.wang@rock-chips.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: zhengsq-TNX95d0MmH7DzftRWevZcw@public.gmane.org, hl-TNX95d0MmH7DzftRWevZcw@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	eddie.cai-TNX95d0MmH7DzftRWevZcw@public.gmane.org
+To: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1448430213-27203-5-git-send-email-zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-hwrng kthread can be waiting via hwrng_fillfn for some data from a rng
-like virtio-rng:
-hwrng           D ffff880093e17798     0   382      2 0x00000000
-...
-Call Trace:
- [<ffffffff817339c6>] wait_for_completion_killable+0x96/0x210
- [<ffffffffa00aa1b7>] virtio_read+0x57/0xf0 [virtio_rng]
- [<ffffffff814f4a35>] hwrng_fillfn+0x75/0x130
- [<ffffffff810aa243>] kthread+0xf3/0x110
+Am Mittwoch, 25. November 2015, 13:43:33 schrieb Zain Wang:
+> Add Crypto node for rk3288 including crypto controller and dma clk.
+> 
+> Signed-off-by: Zain Wang <zain.wang-TNX95d0MmH7DzftRWevZcw@public.gmane.org>
+> Tested-by: Heiko Stuebner <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>
 
-And when some user program tries to read the /dev node in this state,
-we get:
-rngd            D ffff880093e17798     0   762      1 0x00000004
-...
-Call Trace:
- [<ffffffff817351ac>] mutex_lock_nested+0x15c/0x3e0
- [<ffffffff814f478e>] rng_dev_read+0x6e/0x240
- [<ffffffff81231958>] __vfs_read+0x28/0xe0
- [<ffffffff81232393>] vfs_read+0x83/0x130
+applied to my dts32 branch for 4.5 .
 
-And this is indeed unkillable. So use mutex_lock_interruptible
-instead of mutex_lock in rng_dev_read and exit immediatelly when
-interrupted. And possibly return already read data, if any (as POSIX
-allows).
-
-v2: use ERESTARTSYS instead of EINTR
-
-Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-Cc: Matt Mackall <mpm@selenic.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: <linux-crypto@vger.kernel.org>
----
- drivers/char/hw_random/core.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index a064237ff362..ca5a5325eb6f 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -238,7 +238,10 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
- 			goto out;
- 		}
- 
--		mutex_lock(&reading_mutex);
-+		if (mutex_lock_interruptible(&reading_mutex)) {
-+			err = -ERESTARTSYS;
-+			goto out_put;
-+		}
- 		if (!data_avail) {
- 			bytes_read = rng_get_data(rng, rng_buffer,
- 				rng_buffer_size(),
-@@ -288,6 +291,7 @@ out:
- 
- out_unlock_reading:
- 	mutex_unlock(&reading_mutex);
-+out_put:
- 	put_rng(rng);
- 	goto out;
- }
--- 
-2.6.3
+Thanks
+Heiko
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
