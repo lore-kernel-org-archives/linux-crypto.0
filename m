@@ -1,38 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: mxs-dcp - Initialize .statesize fields
-Date: Fri, 27 Nov 2015 22:31:45 +0800
-Message-ID: <20151127143145.GA30135@gondor.apana.org.au>
-References: <1448552861-17410-1-git-send-email-fabio.estevam@freescale.com>
- <20151127125239.GA29303@gondor.apana.org.au>
- <5269835.Et7mvBlT7h@tauon.atsec.com>
+From: Andrzej Zaborowski <andrew.zaborowski@intel.com>
+Subject: Re: [PATCH v5 3/4] crypto: akcipher: add akcipher declarations needed
+ by templates.
+Date: Fri, 27 Nov 2015 16:10:41 +0100
+Message-ID: <CAOq732K-A3-ypsLavOJrT_ENuSM=zuriJo0F5bS1dNuhbeRTDA@mail.gmail.com>
+References: <1448574808-11320-1-git-send-email-andrew.zaborowski@intel.com>
+	<20151127131213.GA29590@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Fabio Estevam <fabio.estevam@freescale.com>, marex@denx.de,
-	linux-crypto@vger.kernel.org, stable@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38355 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754013AbbK0OcA (ORCPT
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:35419 "EHLO
+	mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753894AbbK0PKm (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Nov 2015 09:32:00 -0500
-Content-Disposition: inline
-In-Reply-To: <5269835.Et7mvBlT7h@tauon.atsec.com>
+	Fri, 27 Nov 2015 10:10:42 -0500
+Received: by wmuu63 with SMTP id u63so58915094wmu.0
+        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2015 07:10:41 -0800 (PST)
+In-Reply-To: <20151127131213.GA29590@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 27, 2015 at 03:25:22PM +0100, Stephan Mueller wrote:
+Hi Herbert,
+
+On 27 November 2015 at 14:12, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> Andrew Zaborowski <andrew.zaborowski@intel.com> wrote:
+>>
+>> @@ -75,9 +76,22 @@ static int crypto_akcipher_init_tfm(struct crypto_tfm *tfm)
+>>        return 0;
+>> }
+>>
+>> +static void crypto_akcipher_free_instance(struct crypto_instance *inst)
+>> +{
+>> +       struct akcipher_instance *akcipher = akcipher_instance(inst);
+>> +
+>> +       if (!akcipher->free) {
+>> +               inst->tmpl->free(inst);
+>> +               return;
+>> +       }
 >
-> May I ask you for a brief reference on how that should be covered so that we 
-> can fix all other problematic implementations?
+> You don't need this bit.  AEAD has it because there were legacy
+> templates but you are starting from a clean slate.
 
-Basically export needs to write the complete hash state into
-a buffer of size statesize, and import needs to be able to read
-such a buffer and generate a hash state from it which can then
-be updated/finalised.
+You're right there aren't any users that need this now but again is
+there any reason you prefer the inst->free approach?
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+BTW note the lines that assign inst->free in crypto/gcm.c end with
+commas which could lead to confusion.
+
+Best regards
