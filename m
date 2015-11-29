@@ -1,231 +1,30 @@
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH v6 3/4] crypto: akcipher: add akcipher declarations needed by templates.
-Date: Sun, 29 Nov 2015 13:02:20 +0100
-Message-ID: <1448798541-17580-1-git-send-email-andrew.zaborowski@intel.com>
-To: linux-crypto@vger.kernel.org
+From: Rui Wang <rui.y.wang@intel.com>
+Subject: [PATCH 0/2] crypto: Fix driver load failure
+Date: Sun, 29 Nov 2015 22:45:32 +0800
+Message-ID: <1448808334-8424-1-git-send-email-rui.y.wang@intel.com>
+Cc: ying.huang@intel.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, rui.y.wang@intel.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:37942 "EHLO
-	mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751461AbbK2MCa (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 29 Nov 2015 07:02:30 -0500
-Received: by wmec201 with SMTP id c201so105054221wme.1
-        for <linux-crypto@vger.kernel.org>; Sun, 29 Nov 2015 04:02:29 -0800 (PST)
-Received: from localhost.localdomain (255.Red-2-136-100.dynamicIP.rima-tde.net. [2.136.100.255])
-        by smtp.gmail.com with ESMTPSA id jz1sm41789668wjc.27.2015.11.29.04.02.27
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Sun, 29 Nov 2015 04:02:28 -0800 (PST)
+Received: from mga14.intel.com ([192.55.52.115]:45630 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752548AbbK2PDa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 29 Nov 2015 10:03:30 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add a struct akcipher_instance and struct akcipher_spawn similar to
-how AEAD declares them and the macros for converting to/from
-crypto_instance/crypto_spawn.  Also add register functions to
-avoid exposing crypto_akcipher_type.
+ghash_clmulni_intel fails to load on Linux 4.3+ with the following message:
+"modprobe: ERROR: could not insert 'ghash_clmulni_intel': Invalid argument"
 
-Signed-off-by: Andrew Zaborowski <andrew.zaborowski@intel.com>
----
-v2: no changes since v1
-v3: drop the new crypto_akcipher_type methods and
-    add struct akcipher_instance
-v4: avoid exposing crypto_akcipher_type after all, add struct akcipher_spawn
-    and utilities
-v5: add akcipher_instance.free
-v6: only support akcipher_instance.free, not crypto_template.free,
-    add further akcipher.h macros
----
- crypto/akcipher.c                  | 34 ++++++++++++++-
- include/crypto/internal/akcipher.h | 84 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 117 insertions(+), 1 deletion(-)
+These two patches need to go together, for the driver to load correctly.
 
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index 120ec04..def301e 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -21,6 +21,7 @@
- #include <linux/cryptouser.h>
- #include <net/netlink.h>
- #include <crypto/akcipher.h>
-+#include <crypto/internal/akcipher.h>
- #include "internal.h"
- 
- #ifdef CONFIG_NET
-@@ -75,9 +76,17 @@ static int crypto_akcipher_init_tfm(struct crypto_tfm *tfm)
- 	return 0;
- }
- 
-+static void crypto_akcipher_free_instance(struct crypto_instance *inst)
-+{
-+	struct akcipher_instance *akcipher = akcipher_instance(inst);
-+
-+	akcipher->free(akcipher);
-+}
-+
- static const struct crypto_type crypto_akcipher_type = {
- 	.extsize = crypto_alg_extsize,
- 	.init_tfm = crypto_akcipher_init_tfm,
-+	.free = crypto_akcipher_free_instance,
- #ifdef CONFIG_PROC_FS
- 	.show = crypto_akcipher_show,
- #endif
-@@ -88,6 +97,14 @@ static const struct crypto_type crypto_akcipher_type = {
- 	.tfmsize = offsetof(struct crypto_akcipher, base),
- };
- 
-+int crypto_grab_akcipher(struct crypto_akcipher_spawn *spawn, const char *name,
-+			 u32 type, u32 mask)
-+{
-+	spawn->base.frontend = &crypto_akcipher_type;
-+	return crypto_grab_spawn(&spawn->base, name, type, mask);
-+}
-+EXPORT_SYMBOL_GPL(crypto_grab_akcipher);
-+
- struct crypto_akcipher *crypto_alloc_akcipher(const char *alg_name, u32 type,
- 					      u32 mask)
- {
-@@ -95,13 +112,20 @@ struct crypto_akcipher *crypto_alloc_akcipher(const char *alg_name, u32 type,
- }
- EXPORT_SYMBOL_GPL(crypto_alloc_akcipher);
- 
--int crypto_register_akcipher(struct akcipher_alg *alg)
-+static void akcipher_prepare_alg(struct akcipher_alg *alg)
- {
- 	struct crypto_alg *base = &alg->base;
- 
- 	base->cra_type = &crypto_akcipher_type;
- 	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
- 	base->cra_flags |= CRYPTO_ALG_TYPE_AKCIPHER;
-+}
-+
-+int crypto_register_akcipher(struct akcipher_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
-+
-+	akcipher_prepare_alg(alg);
- 	return crypto_register_alg(base);
- }
- EXPORT_SYMBOL_GPL(crypto_register_akcipher);
-@@ -112,5 +136,13 @@ void crypto_unregister_akcipher(struct akcipher_alg *alg)
- }
- EXPORT_SYMBOL_GPL(crypto_unregister_akcipher);
- 
-+int akcipher_register_instance(struct crypto_template *tmpl,
-+			       struct akcipher_instance *inst)
-+{
-+	akcipher_prepare_alg(&inst->alg);
-+	return crypto_register_instance(tmpl, akcipher_crypto_instance(inst));
-+}
-+EXPORT_SYMBOL_GPL(akcipher_register_instance);
-+
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Generic public key cipher type");
-diff --git a/include/crypto/internal/akcipher.h b/include/crypto/internal/akcipher.h
-index 9a2bda1..8f90c99 100644
---- a/include/crypto/internal/akcipher.h
-+++ b/include/crypto/internal/akcipher.h
-@@ -13,6 +13,22 @@
- #ifndef _CRYPTO_AKCIPHER_INT_H
- #define _CRYPTO_AKCIPHER_INT_H
- #include <crypto/akcipher.h>
-+#include <crypto/algapi.h>
-+
-+struct akcipher_instance {
-+	void (*free)(struct akcipher_instance *inst);
-+	union {
-+		struct {
-+			char head[offsetof(struct akcipher_alg, base)];
-+			struct crypto_instance base;
-+		} s;
-+		struct akcipher_alg alg;
-+	};
-+};
-+
-+struct crypto_akcipher_spawn {
-+	struct crypto_spawn base;
-+};
- 
- /*
-  * Transform internal helpers.
-@@ -38,6 +54,62 @@ static inline const char *akcipher_alg_name(struct crypto_akcipher *tfm)
- 	return crypto_akcipher_tfm(tfm)->__crt_alg->cra_name;
- }
- 
-+static inline struct crypto_instance *akcipher_crypto_instance(
-+		struct akcipher_instance *inst)
-+{
-+	return container_of(&inst->alg.base, struct crypto_instance, alg);
-+}
-+
-+static inline struct akcipher_instance *akcipher_instance(
-+		struct crypto_instance *inst)
-+{
-+	return container_of(&inst->alg, struct akcipher_instance, alg.base);
-+}
-+
-+static inline struct akcipher_instance *akcipher_alg_instance(
-+		struct crypto_akcipher *akcipher)
-+{
-+	return akcipher_instance(crypto_tfm_alg_instance(&akcipher->base));
-+}
-+
-+static inline void *akcipher_instance_ctx(struct akcipher_instance *inst)
-+{
-+	return crypto_instance_ctx(akcipher_crypto_instance(inst));
-+}
-+
-+static inline void crypto_set_akcipher_spawn(
-+		struct crypto_akcipher_spawn *spawn,
-+		struct crypto_instance *inst)
-+{
-+	crypto_set_spawn(&spawn->base, inst);
-+}
-+
-+int crypto_grab_akcipher(struct crypto_akcipher_spawn *spawn, const char *name,
-+		u32 type, u32 mask);
-+
-+static inline struct crypto_akcipher *crypto_spawn_akcipher(
-+		struct crypto_akcipher_spawn *spawn)
-+{
-+	return crypto_spawn_tfm2(&spawn->base);
-+}
-+
-+static inline void crypto_drop_akcipher(struct crypto_akcipher_spawn *spawn)
-+{
-+	crypto_drop_spawn(&spawn->base);
-+}
-+
-+static inline struct akcipher_alg *crypto_spawn_akcipher_alg(
-+		struct crypto_akcipher_spawn *spawn)
-+{
-+	return container_of(spawn->base.alg, struct akcipher_alg, base);
-+}
-+
-+static inline struct crypto_akcipher *crypto_spawn_akcipher(
-+	struct crypto_akcipher_spawn *spawn)
-+{
-+	return crypto_spawn_tfm2(&spawn->base);
-+}
-+
- /**
-  * crypto_register_akcipher() -- Register public key algorithm
-  *
-@@ -57,4 +129,16 @@ int crypto_register_akcipher(struct akcipher_alg *alg);
-  * @alg:	algorithm definition
-  */
- void crypto_unregister_akcipher(struct akcipher_alg *alg);
-+
-+/**
-+ * akcipher_register_instance() -- Unregister public key template instance
-+ *
-+ * Function registers an implementation of an asymmetric key algorithm
-+ * created from a template
-+ *
-+ * @tmpl:	the template from which the algorithm was created
-+ * @inst:	the template instance
-+ */
-+int akcipher_register_instance(struct crypto_template *tmpl,
-+		struct akcipher_instance *inst);
- #endif
+Rui Wang (2):
+  crypto: ghash-clmulni - Fix load failure
+  crypto: cryptd - Assign statesize properly
+
+ arch/x86/crypto/ghash-clmulni-intel_glue.c | 26 ++++++++++++++++++++++++++
+ crypto/cryptd.c                            |  1 +
+ 2 files changed, 27 insertions(+)
+
 -- 
-2.1.4
+1.8.5.2
