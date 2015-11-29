@@ -1,30 +1,38 @@
 From: Rui Wang <rui.y.wang@intel.com>
-Subject: [PATCH 0/2] crypto: Fix driver load failure
-Date: Sun, 29 Nov 2015 22:45:32 +0800
-Message-ID: <1448808334-8424-1-git-send-email-rui.y.wang@intel.com>
+Subject: [PATCH 2/2] crypto: cryptd - Assign statesize properly
+Date: Sun, 29 Nov 2015 22:45:34 +0800
+Message-ID: <1448808334-8424-3-git-send-email-rui.y.wang@intel.com>
+References: <1448808334-8424-1-git-send-email-rui.y.wang@intel.com>
 Cc: ying.huang@intel.com, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org, rui.y.wang@intel.com
 To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:45630 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752548AbbK2PDa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 29 Nov 2015 10:03:30 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1448808334-8424-1-git-send-email-rui.y.wang@intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-ghash_clmulni_intel fails to load on Linux 4.3+ with the following message:
-"modprobe: ERROR: could not insert 'ghash_clmulni_intel': Invalid argument"
+cryptd_create_hash() fails by returning -EINVAL.  It is because after
+8996eafdc ("crypto: ahash - ensure statesize is non-zero") all ahash
+drivers must have a non-zero statesize.
 
-These two patches need to go together, for the driver to load correctly.
+This patch fixes the problem by properly assigning the statesize.
 
-Rui Wang (2):
-  crypto: ghash-clmulni - Fix load failure
-  crypto: cryptd - Assign statesize properly
+Signed-off-by: Rui Wang <rui.y.wang@intel.com>
+---
+ crypto/cryptd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
- arch/x86/crypto/ghash-clmulni-intel_glue.c | 26 ++++++++++++++++++++++++++
- crypto/cryptd.c                            |  1 +
- 2 files changed, 27 insertions(+)
-
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index c81861b..8b40db8 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -637,6 +637,7 @@ static int cryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
+ 	inst->alg.halg.base.cra_flags = type;
+ 
+ 	inst->alg.halg.digestsize = salg->digestsize;
++	inst->alg.halg.statesize = salg->statesize;
+ 	inst->alg.halg.base.cra_ctxsize = sizeof(struct cryptd_hash_ctx);
+ 
+ 	inst->alg.halg.base.cra_init = cryptd_hash_init_tfm;
 -- 
 1.8.5.2
