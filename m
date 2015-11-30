@@ -1,77 +1,62 @@
-From: Rui Wang <rui.y.wang@intel.com>
-Subject: [PATCH 1/2] crypto: ghash-clmulni - Fix load failure
-Date: Sun, 29 Nov 2015 22:45:33 +0800
-Message-ID: <1448808334-8424-2-git-send-email-rui.y.wang@intel.com>
-References: <1448808334-8424-1-git-send-email-rui.y.wang@intel.com>
-Cc: ying.huang@intel.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, rui.y.wang@intel.com
-To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1448808334-8424-1-git-send-email-rui.y.wang@intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Rameshwar Sahu <rsahu@apm.com>
+Subject: Re: [PATCH v2 0/3] dmaengine: Add supports for APM X-Gene SoC CRC32C
+ accerlerator driver
+Date: Mon, 30 Nov 2015 14:06:03 +0530
+Message-ID: <CAFd313zqimQtG8epeo3U7gzxWRf0hqO4K8hOFy4UK-6pG5GcJg@mail.gmail.com>
+References: <rsahu@apm.com>
+	<1447665169-14003-1-git-send-email-rsahu@apm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: dmaengine@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, jcm@redhat.com,
+	patches@apm.com, linux-crypto@vger.kernel.org,
+	Rameshwar Prasad Sahu <rsahu@apm.com>,
+	Kaustubh Gondkar <kgondkar@apm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+	Vinod Koul <vinod.koul@intel.com>, dan.j.williams@intel.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ig0-f177.google.com ([209.85.213.177]:37471 "EHLO
+	mail-ig0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753281AbbK3IgF (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 30 Nov 2015 03:36:05 -0500
+Received: by igcto18 with SMTP id to18so65612046igc.0
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Nov 2015 00:36:03 -0800 (PST)
+In-Reply-To: <1447665169-14003-1-git-send-email-rsahu@apm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-ghash_clmulni_intel fails to load on Linux 4.3+ with the following message:
-"modprobe: ERROR: could not insert 'ghash_clmulni_intel': Invalid argument"
+On Mon, Nov 16, 2015 at 2:42 PM,  <rsahu@apm.com> wrote:
+> From: Rameshwar Prasad Sahu <rsahu@apm.com>
+>
+> This patch implements support for APM X-Gene SoC CRC32C h/w accelerator driver
+> and adds CRC32C computations support in dmaengine framework. APM X-Gene SoC has
+> DMA engine capable of performing CRC32C computations.
+>
+> v2 changes:
+>         1. Added helper function in dmaengine framework
+>         2. Documented CRC32C support in Documentations/dmaengine/provider.txt
+>         3. Fixed algo name
+>         4. Fixed coding style issues
+>
+> Signed-off-by: Rameshwar Prasad Sahu <rsahu@apm.com>
+> ---
+>
+> Rameshwar Prasad Sahu (3):
+>   dmaengine: Add support for new feature CRC32C computations
+>   dmaengine: xgene-dma: Add support for CRC32C computations via DMA
+>     engine
+>   Crypto: Add support for APM X-Gene SoC CRC32C h/w accelerator driver
+>
+>  Documentation/dmaengine/provider.txt |    3 +
+>  drivers/crypto/Kconfig               |    8 +
+>  drivers/crypto/Makefile              |    1 +
+>  drivers/crypto/xgene-crc32c.c        |  234 +++++++++++++++++++++++++
+>  drivers/dma/dmaengine.c              |    2 +
+>  drivers/dma/xgene-dma.c              |  314 ++++++++++++++++++++++++++++++++--
+>  include/linux/dmaengine.h            |   13 ++
+>  7 files changed, 560 insertions(+), 15 deletions(-)
+>  create mode 100755 drivers/crypto/xgene-crc32c.c
 
-After 8996eafdc ("crypto: ahash - ensure statesize is non-zero") all ahash
-drivers are required to implement import()/export(), and must have a non-
-zero statesize.
-
-This patch has been tested with the algif_hash interface. The calculated
-digest values, after several rounds of import()s and export()s, match those
-calculated by tcrypt.
-
-Signed-off-by: Rui Wang <rui.y.wang@intel.com>
----
- arch/x86/crypto/ghash-clmulni-intel_glue.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
-
-diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-index 440df0c..a69321a 100644
---- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
-+++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-@@ -219,6 +219,29 @@ static int ghash_async_final(struct ahash_request *req)
- 	}
- }
- 
-+static int ghash_async_import(struct ahash_request *req, const void *in)
-+{
-+	struct ahash_request *cryptd_req = ahash_request_ctx(req);
-+	struct shash_desc *desc = cryptd_shash_desc(cryptd_req);
-+	struct ghash_desc_ctx *dctx = shash_desc_ctx(desc);
-+
-+	ghash_async_init(req);
-+	memcpy(dctx, in, sizeof(*dctx));
-+	return 0;
-+
-+}
-+
-+static int ghash_async_export(struct ahash_request *req, void *out)
-+{
-+	struct ahash_request *cryptd_req = ahash_request_ctx(req);
-+	struct shash_desc *desc = cryptd_shash_desc(cryptd_req);
-+	struct ghash_desc_ctx *dctx = shash_desc_ctx(desc);
-+
-+	memcpy(out, dctx, sizeof(*dctx));
-+	return 0;
-+
-+}
-+
- static int ghash_async_digest(struct ahash_request *req)
- {
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-@@ -288,8 +311,11 @@ static struct ahash_alg ghash_async_alg = {
- 	.final		= ghash_async_final,
- 	.setkey		= ghash_async_setkey,
- 	.digest		= ghash_async_digest,
-+	.export		= ghash_async_export,
-+	.import		= ghash_async_import,
- 	.halg = {
- 		.digestsize	= GHASH_DIGEST_SIZE,
-+		.statesize = sizeof(struct ghash_desc_ctx),
- 		.base = {
- 			.cra_name		= "ghash",
- 			.cra_driver_name	= "ghash-clmulni",
--- 
-1.8.5.2
+Any Comments on above patchset ??
