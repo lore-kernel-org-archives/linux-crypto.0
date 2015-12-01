@@ -1,51 +1,63 @@
 From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
 Subject: Re: ipsec impact on performance
-Date: Tue, 1 Dec 2015 13:37:20 -0500
-Message-ID: <20151201183720.GE21252@oracle.com>
+Date: Tue, 1 Dec 2015 13:45:04 -0500
+Message-ID: <20151201184504.GF21252@oracle.com>
 References: <20151201175953.GC21252@oracle.com>
- <CALx6S35uLqbuJTAFLMeT-BcyZw_fksz+7BkS=Nt7_3-nYMHF2A@mail.gmail.com>
+ <565DE446.2070609@hpe.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>,
-	linux-crypto@vger.kernel.org
-To: Tom Herbert <tom@herbertland.com>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Rick Jones <rick.jones2@hpe.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from aserp1040.oracle.com ([141.146.126.69]:35293 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755932AbbLASpJ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 1 Dec 2015 13:45:09 -0500
 Content-Disposition: inline
-In-Reply-To: <CALx6S35uLqbuJTAFLMeT-BcyZw_fksz+7BkS=Nt7_3-nYMHF2A@mail.gmail.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <565DE446.2070609@hpe.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On (12/01/15 10:18), Tom Herbert wrote:
-> >      8.5-9.5 Gbps clear traffic, TSO disabled, so GSO, GRO is in effect
-> >      3-4 Gbps clear traffic, with both TSO/GSO disabled
-> >      1.8-2 Gbps for esp-null.
+On (12/01/15 10:17), Rick Jones wrote:
 > 
-> Are you losing checksum offload also?
+> What do the perf profiles show?  Presumably, loss of TSO/GSO means
+> an increase in the per-packet costs, but if the ipsec path
+> significantly increases the per-byte costs...
 
-I tried with both checksum offload on and off.
-For the GSO case, doesnt make a huge difference to perf. 
-For my patch, I disable h/w cksum offload, so that I can leverage
-from the existing cksum calculations in the existing GSO code. That helps
-a bit (goes from 3 Gbps -> 3.2 Gbps, but I need a 2x jump here)
+For ESP-null, there's actually very little work to do - we just
+need to add the 8 byte ESP header with an spi and a seq#.. no
+crypto work to do.. so the overhead *should* be minimal, else
+we've painted ourself into a corner where we can't touch anything
+including TCP options like md5.
 
+perf profiles: I used perf tracepoints to instrument latency.
+Yes, there is function call overhead for the xfrm path. So, for example,
+the stack ends up being like this:
+                          :
+                  e5d2f2 ip_finish_output ([kerne.kallsyms])
+                  75d6d0 ip_output ([kernel.kallsyms])
+              7c08ad xfrm_output_resume ([kernel.kallsyms])
+              7c0aae xfrm_output ([kernel.kallsyms])
+              7b1bdd xfrm4_output_finish ([kernel.kallsyms])
+              7b1c7e __xfrm4_output ([kernel.kallsyms])
+              7b1dbe xfrm4_output ([kernel.kallsyms])
+                  75bac4 ip_local_out ([kernel.kallsyms])
+                  75c012 ip_queue_xmit ([kernel.kallsyms])
+                  7736a3 tcp_transmit_skb ([kernel.kallsyms])
+	                  :
+where the detour into xfrm has been indented out, and esp_output
+gets called out of xfrm_output_resume(). And as I said, there's
+some nickels-and-dimes of perf to be squeezed out from 
+better memory management in xfrm, but the fact that it doesnt move
+beyond 3 Gbps strikes me as some other bottleneck/serialization.
 
-> Thanks for the nice data! We could certainly implement GRO/GSO for
-> esp-null to get your numbers up but I don't think that would be very
-> useful to anyone. Do you have the performance numbers using real
-> encryption?
+> Short of a perf profile, I suppose one way to probe for per-packet
+> versus per-byte would be to up the MTU.  That should reduce the
+> per-packet costs while keeping the per-byte roughly the same.
 
-I was using esp-null merely to not have the crypto itself perturb
-the numbers (i.e., just focus on the s/w overhead for now), but here
-are the numbers for the stock linux kernel stack
-                Gbps  peak cpu util
-esp-null         1.8   71%
-aes-gcm-c-256    1.6   79%
-aes-ccm-a-128    0.7   96%
-
-That trend made me think that if we can get esp-null to be as close
-as possible to GSO/GRO, the rest will follow closely behind.
-
-So is my patch in the right direction? Anything obvious I am missing?
-I'd like to budge that number beyond 3 Gbps :-)
+actually the hack/rfc I sent out does help (in that it almost
+doubles the existing 1.8 Gbps). Problem is that this cliff is much
+steeper than that, and there's more hidden somewhere.
 
 --Sowmini
