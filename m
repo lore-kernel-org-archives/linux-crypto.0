@@ -1,141 +1,61 @@
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH] crypto: talitos - add new crypto modes
-Date: Tue,  1 Dec 2015 12:44:15 +0100 (CET)
-Message-ID: <20151201114415.97E331A2438@localhost.localdomain>
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David S Miller <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v3 5/5] crypto: AES CBC multi-buffer glue code
+Date: Tue, 01 Dec 2015 09:19:33 -0800
+Message-ID: <1448990373.22260.0.camel@schen9-desk2.jf.intel.com>
+References: <cover.1447977406.git.tim.c.chen@linux.intel.com>
+	 <1447971340.4933.81.camel@schen9-desk2.jf.intel.com>
+	 <20151124094710.GA32679@gondor.apana.org.au>
+	 <1448389806.4933.112.camel@schen9-desk2.jf.intel.com>
+	 <20151126084912.GA22103@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Stephan Mueller <smueller@chronox.de>,
+	Chandramouli Narayanan <mouli_7982@yahoo.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:1670 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756120AbbLARUM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 1 Dec 2015 12:20:12 -0500
+In-Reply-To: <20151126084912.GA22103@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds the following algorithms to the talitos driver:
-* ecb(aes)
-* ctr(aes)
-* ecb(des)
-* cbc(des)
-* ecb(des3_ede)
+On Thu, 2015-11-26 at 16:49 +0800, Herbert Xu wrote:
+> On Tue, Nov 24, 2015 at 10:30:06AM -0800, Tim Chen wrote:
+> >
+> > On the decrypt path, we don't need to use multi-buffer algorithm
+> > as aes-cbc decrypt can be parallelized inherently on a single
+> > request.  So most of the time the outer layer algorithm
+> > cbc_mb_async_ablk_decrypt can bypass mcryptd and
+> > invoke mb_aes_cbc_decrypt synchronously
+> > to do aes_cbc_dec when fpu is available.
+> > This avoids the overhead of going through mcryptd.  Hence
+> > the use of blkcipher on the inner layer.  For the mcryptd
+> > path, we will complete a decrypt request in one shot so
+> > blkcipher usage should be fine.
+> 
+> I think there is a misunderstanding here.  Just because you're
+> using/exporting through the ablkcipher interface doesn't mean
+> that you are asynchrounous.  For example, all blkcipher algorithms
+> can be accessed through the ablkcipher interface and they of course
+> remain synchrounous.
+> 
+> So I don't see how using an ablkcipher in the inner layer changes
+> anything at all.  You can still return immediately and not bother
+> with completion functions when you are synchrounous.
+> 
+> Cheers,
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
----
- drivers/crypto/talitos.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/talitos.h |  1 +
- 2 files changed, 84 insertions(+)
+OK, I'll try to see if I can cast things back to the original ablkcipher
+request and use that to walk the sg list.
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index ab33898..a0d4a08 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -2324,6 +2324,22 @@ static struct talitos_alg_template driver_algs[] = {
- 	/* ABLKCIPHER algorithms. */
- 	{	.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
- 		.alg.crypto = {
-+			.cra_name = "ecb(aes)",
-+			.cra_driver_name = "ecb-aes-talitos",
-+			.cra_blocksize = AES_BLOCK_SIZE,
-+			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-+				     CRYPTO_ALG_ASYNC,
-+			.cra_ablkcipher = {
-+				.min_keysize = AES_MIN_KEY_SIZE,
-+				.max_keysize = AES_MAX_KEY_SIZE,
-+				.ivsize = AES_BLOCK_SIZE,
-+			}
-+		},
-+		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-+				     DESC_HDR_SEL0_AESU,
-+	},
-+	{	.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
-+		.alg.crypto = {
- 			.cra_name = "cbc(aes)",
- 			.cra_driver_name = "cbc-aes-talitos",
- 			.cra_blocksize = AES_BLOCK_SIZE,
-@@ -2341,6 +2357,73 @@ static struct talitos_alg_template driver_algs[] = {
- 	},
- 	{	.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
- 		.alg.crypto = {
-+			.cra_name = "ctr(aes)",
-+			.cra_driver_name = "ctr-aes-talitos",
-+			.cra_blocksize = AES_BLOCK_SIZE,
-+			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-+				     CRYPTO_ALG_ASYNC,
-+			.cra_ablkcipher = {
-+				.min_keysize = AES_MIN_KEY_SIZE,
-+				.max_keysize = AES_MAX_KEY_SIZE,
-+				.ivsize = AES_BLOCK_SIZE,
-+			}
-+		},
-+		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-+				     DESC_HDR_SEL0_AESU |
-+				     DESC_HDR_MODE0_AESU_CTR,
-+	},
-+	{	.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
-+		.alg.crypto = {
-+			.cra_name = "ecb(des)",
-+			.cra_driver_name = "ecb-des-talitos",
-+			.cra_blocksize = DES_BLOCK_SIZE,
-+			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-+				     CRYPTO_ALG_ASYNC,
-+			.cra_ablkcipher = {
-+				.min_keysize = DES_KEY_SIZE,
-+				.max_keysize = DES_KEY_SIZE,
-+				.ivsize = DES_BLOCK_SIZE,
-+			}
-+		},
-+		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-+				     DESC_HDR_SEL0_DEU,
-+	},
-+	{	.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
-+		.alg.crypto = {
-+			.cra_name = "cbc(des)",
-+			.cra_driver_name = "cbc-des-talitos",
-+			.cra_blocksize = DES_BLOCK_SIZE,
-+			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-+				     CRYPTO_ALG_ASYNC,
-+			.cra_ablkcipher = {
-+				.min_keysize = DES_KEY_SIZE,
-+				.max_keysize = DES_KEY_SIZE,
-+				.ivsize = DES_BLOCK_SIZE,
-+			}
-+		},
-+		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-+				     DESC_HDR_SEL0_DEU |
-+				     DESC_HDR_MODE0_DEU_CBC,
-+	},
-+	{	.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
-+		.alg.crypto = {
-+			.cra_name = "ecb(des3_ede)",
-+			.cra_driver_name = "ecb-3des-talitos",
-+			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-+			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-+				     CRYPTO_ALG_ASYNC,
-+			.cra_ablkcipher = {
-+				.min_keysize = DES3_EDE_KEY_SIZE,
-+				.max_keysize = DES3_EDE_KEY_SIZE,
-+				.ivsize = DES3_EDE_BLOCK_SIZE,
-+			}
-+		},
-+		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-+				     DESC_HDR_SEL0_DEU |
-+				     DESC_HDR_MODE0_DEU_3DES,
-+	},
-+	{	.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
-+		.alg.crypto = {
- 			.cra_name = "cbc(des3_ede)",
- 			.cra_driver_name = "cbc-3des-talitos",
- 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-diff --git a/drivers/crypto/talitos.h b/drivers/crypto/talitos.h
-index 0090f32..8dd8f40 100644
---- a/drivers/crypto/talitos.h
-+++ b/drivers/crypto/talitos.h
-@@ -345,6 +345,7 @@ static inline bool has_ftr_sec1(struct talitos_private *priv)
- /* primary execution unit mode (MODE0) and derivatives */
- #define	DESC_HDR_MODE0_ENCRYPT		cpu_to_be32(0x00100000)
- #define	DESC_HDR_MODE0_AESU_CBC		cpu_to_be32(0x00200000)
-+#define	DESC_HDR_MODE0_AESU_CTR		cpu_to_be32(0x00600000)
- #define	DESC_HDR_MODE0_DEU_CBC		cpu_to_be32(0x00400000)
- #define	DESC_HDR_MODE0_DEU_3DES		cpu_to_be32(0x00200000)
- #define	DESC_HDR_MODE0_MDEU_CONT	cpu_to_be32(0x08000000)
--- 
-2.1.0
+Tim
