@@ -1,38 +1,39 @@
-From: Rick Jones <rick.jones2@hpe.com>
+From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
 Subject: Re: ipsec impact on performance
-Date: Tue, 1 Dec 2015 10:50:31 -0800
-Message-ID: <565DEBF7.7040304@hpe.com>
-References: <20151201175953.GC21252@oracle.com> <565DE446.2070609@hpe.com>
+Date: Tue, 1 Dec 2015 14:01:27 -0500
+Message-ID: <20151201190127.GG21252@oracle.com>
+References: <20151201175953.GC21252@oracle.com>
+ <565DE446.2070609@hpe.com>
  <20151201184504.GF21252@oracle.com>
+ <565DEBF7.7040304@hpe.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+To: Rick Jones <rick.jones2@hpe.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from g4t3425.houston.hp.com ([15.201.208.53]:7315 "EHLO
-	g4t3425.houston.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751416AbbLASud (ORCPT
+Received: from userp1040.oracle.com ([156.151.31.81]:40752 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932065AbbLATBe (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Dec 2015 13:50:33 -0500
-In-Reply-To: <20151201184504.GF21252@oracle.com>
+	Tue, 1 Dec 2015 14:01:34 -0500
+Content-Disposition: inline
+In-Reply-To: <565DEBF7.7040304@hpe.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 12/01/2015 10:45 AM, Sowmini Varadhan wrote:
-> On (12/01/15 10:17), Rick Jones wrote:
->>
->> What do the perf profiles show?  Presumably, loss of TSO/GSO means
->> an increase in the per-packet costs, but if the ipsec path
->> significantly increases the per-byte costs...
->
-> For ESP-null, there's actually very little work to do - we just
-> need to add the 8 byte ESP header with an spi and a seq#.. no
-> crypto work to do.. so the overhead *should* be minimal, else
-> we've painted ourself into a corner where we can't touch anything
-> including TCP options like md5.
+On (12/01/15 10:50), Rick Jones wrote:
+> 
+> Something of a longshot, but are you sure you are still getting
+> effective CKO/GRO on the receiver?
 
-Something of a longshot, but are you sure you are still getting 
-effective CKO/GRO on the receiver?
+Good question. With ipsec, GRO (like GSO) gets implicitly disabled.
 
-rick jones
+But when I explictly disable GRO on receiver, leaving only GSO
+on sender, I can still get about 6 Gbps for clear traffic.
+
+Thus if I could get closer to 6 Gbps for my patch, I'd at least
+know that it was just GRO that was missing.. but I'm only getting 
+3 Gbps, which makes me think I missed something else on the sender
+itself.
+
+--Sowmini
