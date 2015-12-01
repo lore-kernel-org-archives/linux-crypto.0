@@ -1,82 +1,51 @@
-From: Tom Herbert <tom@herbertland.com>
+From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
 Subject: Re: ipsec impact on performance
-Date: Tue, 1 Dec 2015 10:18:12 -0800
-Message-ID: <CALx6S35uLqbuJTAFLMeT-BcyZw_fksz+7BkS=Nt7_3-nYMHF2A@mail.gmail.com>
+Date: Tue, 1 Dec 2015 13:37:20 -0500
+Message-ID: <20151201183720.GE21252@oracle.com>
 References: <20151201175953.GC21252@oracle.com>
+ <CALx6S35uLqbuJTAFLMeT-BcyZw_fksz+7BkS=Nt7_3-nYMHF2A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>,
 	linux-crypto@vger.kernel.org
-To: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+To: Tom Herbert <tom@herbertland.com>
 Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20151201175953.GC21252@oracle.com>
+Content-Disposition: inline
+In-Reply-To: <CALx6S35uLqbuJTAFLMeT-BcyZw_fksz+7BkS=Nt7_3-nYMHF2A@mail.gmail.com>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Dec 1, 2015 at 9:59 AM, Sowmini Varadhan
-<sowmini.varadhan@oracle.com> wrote:
->
-> I instrumented iperf with and without ipsec, just using esp-null,
-> and 1 thread, to keep things simple. I'm seeing some pretty dismal
-> performance numbers with ipsec, and trying to think of ways to
-> improve this. Here are my findings, please share feedback.
->
-> I suspect that a big part of the problem is the implicit loss of GSO,
-> and this is made worse by some inefficiencies in the xfrm code:
-> for single stream iperf (to avoid effects of rx-hash), I see the
-> following on a 10G p2p ethernet link.
->      8.5-9.5 Gbps clear traffic, TSO disabled, so GSO, GRO is in effect
->      3-4 Gbps clear traffic, with both TSO/GSO disabled
->      1.8-2 Gbps for esp-null.
+On (12/01/15 10:18), Tom Herbert wrote:
+> >      8.5-9.5 Gbps clear traffic, TSO disabled, so GSO, GRO is in effect
+> >      3-4 Gbps clear traffic, with both TSO/GSO disabled
+> >      1.8-2 Gbps for esp-null.
+> 
+> Are you losing checksum offload also?
 
-Are you losing checksum offload also?
+I tried with both checksum offload on and off.
+For the GSO case, doesnt make a huge difference to perf. 
+For my patch, I disable h/w cksum offload, so that I can leverage
+from the existing cksum calculations in the existing GSO code. That helps
+a bit (goes from 3 Gbps -> 3.2 Gbps, but I need a 2x jump here)
 
-> So the above numbers suggest that losing TSO/GSO results in one
-> big drop in performance, and then there's another cliff for the
-> clear -> esp-null transition. And those cliffs apply even if you are
-> merely doing TCP-MD5 or AO for basic protection of the TCP connection.
->
-> I tried moving things about a bit to defer the ipsec after GSO - I'll
-> share my experimental patch as an RFC in a separate thread. (Disclaimer:
-> the patch is just an experiment at this point).
->
-> In that patch, I'm only focussing on esp-null and transp-mode ipsec
-> for now, just to get some basic performance numbers to see if this is
-> at all interesting.  Essentially my hack mainly involves the following
->
-> - don't disable TSO in sk_setup_caps() if a dst->header_len is found
-> - in xfrm4_output, if GSO is applicable, bail out without esp header
->   addition - that will get done after skb_segment()
-> - at the end of tcp_gso_segment() (when tcp segment is available),
->   set things up for xfrm_output_one and trigger the esp_output..
->   I have to be very careful about setting up skb pointers here, since
->   it looks like esp_output overloads the mac_header pointer e.g., for
->   setting up the ip protocol field
->
-> If I do all these things, the ipsec+iperf improves slightly- for
-> esp-null, I move from approx 1.8 Gbps  to about 3 Gbps, but clearly,
-> this is still quite far from the 8 - 9 Gbps that I can get with just
-> GSO+GRO for non-ipsec traffic.
->
-> There are some inefficiencies that I can see in the xfrm code,
-> that I am inheriting in my patch, e.g.,:
->   memory management in the xfrm code has room for improvement. Every
->   pass through xfrm_transport_output ends up doing a (avoidable?) memmove,
->   and each pass through esp_output ends up doing a kmalloc/free of the
->   "tmp" buffer.
-> But these are all still relatively small things - tweaking them
-> doesnt get me significantly past the 3 Gbps limit. Any suggestions
-> on how to make this budge (or design criticism of the patch) would
-> be welcome.
->
-Thanks for the nice data! We could certainly implement GRO/GSO for
-esp-null to get your numbers up but I don't think that would be very
-useful to anyone. Do you have the performance numbers using real
-encryption?
 
-> --Sowmini
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe netdev" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Thanks for the nice data! We could certainly implement GRO/GSO for
+> esp-null to get your numbers up but I don't think that would be very
+> useful to anyone. Do you have the performance numbers using real
+> encryption?
+
+I was using esp-null merely to not have the crypto itself perturb
+the numbers (i.e., just focus on the s/w overhead for now), but here
+are the numbers for the stock linux kernel stack
+                Gbps  peak cpu util
+esp-null         1.8   71%
+aes-gcm-c-256    1.6   79%
+aes-ccm-a-128    0.7   96%
+
+That trend made me think that if we can get esp-null to be as close
+as possible to GSO/GRO, the rest will follow closely behind.
+
+So is my patch in the right direction? Anything obvious I am missing?
+I'd like to budge that number beyond 3 Gbps :-)
+
+--Sowmini
