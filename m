@@ -1,52 +1,63 @@
-From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
-Subject: Re: ipsec impact on performance
-Date: Wed, 2 Dec 2015 08:25:11 -0500
-Message-ID: <20151202132511.GL23178@oracle.com>
-References: <20151201175953.GC21252@oracle.com>
- <CALx6S35uLqbuJTAFLMeT-BcyZw_fksz+7BkS=Nt7_3-nYMHF2A@mail.gmail.com>
- <20151201183720.GE21252@oracle.com>
- <063D6719AE5E284EB5DD2968C1650D6D1CBE0ED7@AcuExch.aculab.com>
- <20151202121156.GK23178@oracle.com>
- <063D6719AE5E284EB5DD2968C1650D6D1CBE0F39@AcuExch.aculab.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Tom Herbert <tom@herbertland.com>,
-	Linux Kernel Network Developers <netdev@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: David Laight <David.Laight@ACULAB.COM>
+From: Thierry Reding <thierry.reding@gmail.com>
+Subject: [PATCH] crypto: n2 - Use platform_register/unregister_drivers()
+Date: Wed,  2 Dec 2015 17:16:36 +0100
+Message-ID: <1449072996-10591-1-git-send-email-thierry.reding@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:49297 "EHLO
-	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932150AbbLBNZ0 (ORCPT
+Received: from mail-wm0-f51.google.com ([74.125.82.51]:35599 "EHLO
+	mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750829AbbLBQQi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Dec 2015 08:25:26 -0500
-Content-Disposition: inline
-In-Reply-To: <063D6719AE5E284EB5DD2968C1650D6D1CBE0F39@AcuExch.aculab.com>
+	Wed, 2 Dec 2015 11:16:38 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On (12/02/15 12:41), David Laight wrote:
-> 
-> Also what/how are you measuring cpu use.
-> I'm not sure anything on Linux gives you a truly accurate value
-> when processes are running for very short periods.
+From: Thierry Reding <treding@nvidia.com>
 
-I was using mpstat, while running iperf. Should I be using
-something else? or running it for longer intervals?
+These new helpers simplify implementing multi-driver modules and
+properly handle failure to register one driver by unregistering all
+previously registered drivers.
 
-but I hope we are not doomed at 1 Gbps, or else security itself would
-come at a very unattractive cost. Anyway, even aside from crypto.
-we need to have some way to add TCP options (that depend on the 
-contents of the tcp header) etc post-GSO, in the interest of not 
-ossifying the stack.
+Signed-off-by: Thierry Reding <treding@nvidia.com>
+---
+ drivers/crypto/n2_core.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
-> On an SMP system you also get big effects when work is switched
-> between cpus. I've got some tests that run a lot faster if I
-> put all but one of the cpus into a busy-loop in userspace
-> (eg: while :; do :; done)!
-
-yes Rick Jones also pointed the same thing to me, and one of the
-things I was going to try out later today is to instrument the
-effects of pinning irqs and iperf threads to a specific cpu.
-
---Sowmini
+diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
+index 5450880abb7b..739a786b9f08 100644
+--- a/drivers/crypto/n2_core.c
++++ b/drivers/crypto/n2_core.c
+@@ -2243,22 +2243,19 @@ static struct platform_driver n2_mau_driver = {
+ 	.remove		=	n2_mau_remove,
+ };
+ 
++static struct platform_driver * const drivers[] = {
++	&n2_crypto_driver,
++	&n2_mau_driver,
++};
++
+ static int __init n2_init(void)
+ {
+-	int err = platform_driver_register(&n2_crypto_driver);
+-
+-	if (!err) {
+-		err = platform_driver_register(&n2_mau_driver);
+-		if (err)
+-			platform_driver_unregister(&n2_crypto_driver);
+-	}
+-	return err;
++	return platform_register_drivers(drivers, ARRAY_SIZE(drivers));
+ }
+ 
+ static void __exit n2_exit(void)
+ {
+-	platform_driver_unregister(&n2_mau_driver);
+-	platform_driver_unregister(&n2_crypto_driver);
++	platform_unregister_drivers(drivers, ARRAY_SIZE(drivers));
+ }
+ 
+ module_init(n2_init);
+-- 
+2.5.0
