@@ -1,65 +1,57 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v3 5/5] crypto: AES CBC multi-buffer glue code
-Date: Wed, 02 Dec 2015 12:03:58 -0800
-Message-ID: <1449086638.22260.16.camel@schen9-desk2.jf.intel.com>
-References: <cover.1447977406.git.tim.c.chen@linux.intel.com>
-	 <1447971340.4933.81.camel@schen9-desk2.jf.intel.com>
-	 <20151124094710.GA32679@gondor.apana.org.au>
-	 <1448389806.4933.112.camel@schen9-desk2.jf.intel.com>
-	 <20151126084912.GA22103@gondor.apana.org.au>
-	 <1448990373.22260.0.camel@schen9-desk2.jf.intel.com>
+From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Subject: Re: ipsec impact on performance
+Date: Wed, 2 Dec 2015 15:50:28 -0500
+Message-ID: <20151202205028.GB15262@oracle.com>
+References: <20151201175953.GC21252@oracle.com>
+ <CALx6S35uLqbuJTAFLMeT-BcyZw_fksz+7BkS=Nt7_3-nYMHF2A@mail.gmail.com>
+ <20151201183720.GE21252@oracle.com>
+ <063D6719AE5E284EB5DD2968C1650D6D1CBE0ED7@AcuExch.aculab.com>
+ <20151202121156.GK23178@oracle.com>
+ <063D6719AE5E284EB5DD2968C1650D6D1CBE0F39@AcuExch.aculab.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	Chandramouli Narayanan <mouli_7982@yahoo.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1448990373.22260.0.camel@schen9-desk2.jf.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Tom Herbert <tom@herbertland.com>,
+	Linux Kernel Network Developers <netdev@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	rick.jones2@hpe.com
+To: David Laight <David.Laight@ACULAB.COM>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from userp1040.oracle.com ([156.151.31.81]:19592 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754437AbbLBUus (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 2 Dec 2015 15:50:48 -0500
+Content-Disposition: inline
+In-Reply-To: <063D6719AE5E284EB5DD2968C1650D6D1CBE0F39@AcuExch.aculab.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2015-12-01 at 09:19 -0800, Tim Chen wrote:
-> On Thu, 2015-11-26 at 16:49 +0800, Herbert Xu wrote:
-> > On Tue, Nov 24, 2015 at 10:30:06AM -0800, Tim Chen wrote:
-> > >
-> > > On the decrypt path, we don't need to use multi-buffer algorithm
-> > > as aes-cbc decrypt can be parallelized inherently on a single
-> > > request.  So most of the time the outer layer algorithm
-> > > cbc_mb_async_ablk_decrypt can bypass mcryptd and
-> > > invoke mb_aes_cbc_decrypt synchronously
-> > > to do aes_cbc_dec when fpu is available.
-> > > This avoids the overhead of going through mcryptd.  Hence
-> > > the use of blkcipher on the inner layer.  For the mcryptd
-> > > path, we will complete a decrypt request in one shot so
-> > > blkcipher usage should be fine.
-> > 
-> > I think there is a misunderstanding here.  Just because you're
-> > using/exporting through the ablkcipher interface doesn't mean
-> > that you are asynchrounous.  For example, all blkcipher algorithms
-> > can be accessed through the ablkcipher interface and they of course
-> > remain synchrounous.
-> > 
-> > So I don't see how using an ablkcipher in the inner layer changes
-> > anything at all.  You can still return immediately and not bother
-> > with completion functions when you are synchrounous.
-> > 
-> > Cheers,
-> 
-> OK, I'll try to see if I can cast things back to the original ablkcipher
-> request and use that to walk the sg list.
-> 
+On (12/02/15 12:41), David Laight wrote:
+> You are getting 0.7 Gbps with ass-ccm-a-128, scale the esp-null back to
+> that and it would use 7/18*71 = 27% of the cpu.
+> So 69% of the cpu in the a-128 case is probably caused by the
+> encryption itself.
+> Even if the rest of the code cost nothing you'd not increase
+> above 1Gbps.
 
-Herbert,
+Fortunately, the situation is not quite hopeless yet.
 
-I've sent out a new version of this series to use ablkcipher on the
-inner layer of decrypt.  Thanks.
+Thanks to Rick Jones for supplying the hints for this, but with
+some careful manual pinning of irqs and iperf processes to cpus,
+I can get to 4.5 Gbps for the esp-null case.
 
-Tim
+Given that the [clear traffic + GSO without GRO] gets me about 5-7 Gbps,
+the 4.5 Gbps is not that far off (and at that point, the nickel-and-dime
+tweaks may help even more).
+
+For AES-GCM, I'm able to go from 1.8 Gbps (no GSO) to 2.8 Gbps.
+Still not great, but proves that we haven't yet hit any upper bounds
+yet.
+
+I think a lot of the manual tweaking of irq/process placement
+is needed because the existing rps/rfs flow steering is looking
+for TCP/UDP flow numbers to do the steering. It can just as easily
+use the IPsec SPI numbers to do this, and that's another place where
+we can make this more ipsec-friendly.
+
+--Sowmini
