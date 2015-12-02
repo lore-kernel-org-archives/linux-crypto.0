@@ -1,39 +1,52 @@
-From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+From: David Ahern <dsa@cumulusnetworks.com>
 Subject: Re: ipsec impact on performance
-Date: Tue, 1 Dec 2015 14:01:27 -0500
-Message-ID: <20151201190127.GG21252@oracle.com>
-References: <20151201175953.GC21252@oracle.com>
- <565DE446.2070609@hpe.com>
- <20151201184504.GF21252@oracle.com>
- <565DEBF7.7040304@hpe.com>
+Date: Tue, 1 Dec 2015 16:56:24 -0800
+Message-ID: <565E41B8.1080206@cumulusnetworks.com>
+References: <20151201175953.GC21252@oracle.com> <565DE446.2070609@hpe.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Rick Jones <rick.jones2@hpe.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:40752 "EHLO
-	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932065AbbLATBe (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Dec 2015 14:01:34 -0500
-Content-Disposition: inline
-In-Reply-To: <565DEBF7.7040304@hpe.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+To: Rick Jones <rick.jones2@hpe.com>,
+	Sowmini Varadhan <sowmini.varadhan@oracle.com>,
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <565DE446.2070609@hpe.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On (12/01/15 10:50), Rick Jones wrote:
-> 
-> Something of a longshot, but are you sure you are still getting
-> effective CKO/GRO on the receiver?
+On 12/1/15 10:17 AM, Rick Jones wrote:
+> On 12/01/2015 09:59 AM, Sowmini Varadhan wrote:
+>> But these are all still relatively small things - tweaking them
+>> doesnt get me significantly past the 3 Gbps limit. Any suggestions
+>> on how to make this budge (or design criticism of the patch) would
+>> be welcome.
+>
+> What do the perf profiles show?  Presumably, loss of TSO/GSO means an
+> increase in the per-packet costs, but if the ipsec path significantly
+> increases the per-byte costs...
+>
+> Short of a perf profile, I suppose one way to probe for per-packet
+> versus per-byte would be to up the MTU.  That should reduce the
+> per-packet costs while keeping the per-byte roughly the same.
 
-Good question. With ipsec, GRO (like GSO) gets implicitly disabled.
+Using iperf3 and AH with NULL algorithm between 2 peers connected by a 
+10G link.
 
-But when I explictly disable GRO on receiver, leaving only GSO
-on sender, I can still get about 6 Gbps for clear traffic.
+Without AH configured I get a steady 9.9 Gbps with iperf3 consuming 
+about 55% cpu.
 
-Thus if I could get closer to 6 Gbps for my patch, I'd at least
-know that it was just GRO that was missing.. but I'm only getting 
-3 Gbps, which makes me think I missed something else on the sender
-itself.
+With AH I get ~1.5 Gbps with MTU at 1500:
 
---Sowmini
+[  4]   0.00-1.01   sec   160 MBytes  1.33 Gbits/sec   23    905 KBytes
+[  4]   1.01-2.00   sec   211 MBytes  1.79 Gbits/sec    0    996 KBytes
+
+iperf3 runs about 60% CPU and ksoftirqd/2 is at 86%.
+
+
+Bumping the MTU to 9000:
+
+[  4]   3.00-4.00   sec   914 MBytes  7.67 Gbits/sec  260   1.01 MBytes
+[  4]   4.00-5.00   sec  1012 MBytes  8.49 Gbits/sec    0   1.23 MBytes
+[  4]   5.00-6.00   sec  1.15 GBytes  9.88 Gbits/sec    0   1.23 MBytes
+
+At this rate iperf3 was at 95% CPU and ksoftirqd was not relevant.
