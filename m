@@ -1,34 +1,21 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v6 4/4] crypto: RSA padding algorithm
-Date: Fri, 4 Dec 2015 22:12:25 +0800
-Message-ID: <20151204141225.GA17284@gondor.apana.org.au>
-References: <1448798541-17580-2-git-send-email-andrew.zaborowski@intel.com>
+From: Chan <entun.santosa@unpad.ac.id>
+Subject: Attn:Response needed
+Date: Thu, 3 Dec 2015 21:23:05 +0700 (WIT)
+Message-ID: <1298993805.83083.1449152585702.JavaMail.root@unpad.ac.id>
+Reply-To: "createlm10111@gmail.com" <createlm10111@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+To: undisclosed-recipients:;
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:57406 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751185AbbLDOM3 (ORCPT
+Received: from mail-oi0-f101.google.com ([209.85.218.101]:36203 "EHLO
+	mail-oi0-f101.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751547AbbLDONM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Dec 2015 09:12:29 -0500
-Content-Disposition: inline
-In-Reply-To: <1448798541-17580-2-git-send-email-andrew.zaborowski@intel.com>
+	Fri, 4 Dec 2015 09:13:12 -0500
+Received: by oie188 with SMTP id 188so2231727oie.3
+        for <linux-crypto@vger.kernel.org>; Fri, 04 Dec 2015 06:13:11 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Andrew Zaborowski <andrew.zaborowski@intel.com> wrote:
->
-> +       err = crypto_akcipher_encrypt(&req_ctx->child_req);
-> +       if (err != -EINPROGRESS && err != -EBUSY)
-> +               return pkcs1pad_encrypt_sign_complete(req, err);
-
-What if err == -EBUSY but the bit MAY_BACKLOG is not set? In that
-case you need to call complete, right?
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I am Mr Chan Yuan,we are looking for a representative in your country to assist us pick up funds from our clients in your location. If you are interested do get back me for futher details.There is no financial obligation on your part. Do also note that your are entitled to 10% of each installmental payment made out to you by our clients.If you think you can handle this position please write back to us with you full name and address,for more information on our enquiry
