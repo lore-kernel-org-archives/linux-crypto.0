@@ -1,35 +1,35 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: ipsec impact on performance
-Date: Thu, 03 Dec 2015 14:33:28 -0500 (EST)
-Message-ID: <20151203.143328.1246663523839158336.davem@davemloft.net>
-References: <20151201175953.GC21252@oracle.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] crypto: fix kernel-doc warnings in crypto/aead.h
+Date: Thu, 3 Dec 2015 12:00:41 -0800
+Message-ID: <56609F69.1080203@infradead.org>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-To: sowmini.varadhan@oracle.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:43872 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752498AbbLCTda (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Dec 2015 14:33:30 -0500
-In-Reply-To: <20151201175953.GC21252@oracle.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>
+To: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
-Date: Tue, 1 Dec 2015 12:59:53 -0500
+From: Randy Dunlap <rdunlap@infradead.org>
 
-> I instrumented iperf with and without ipsec, just using esp-null, 
-> and 1 thread, to keep things simple. I'm seeing some pretty dismal 
-> performance numbers with ipsec, and trying to think of ways to
-> improve this. Here are my findings, please share feedback.
+Fix 21 occurrences of this kernel-doc warning in <crypto/aead.h>:
 
-Doesn't skb_cow_data() contribute significantly to the ESP base cost,
-especially for TCP packets?
+..//include/crypto/aead.h:149: warning: No description found for parameter 'base'
 
-I mean, we're copying every TCP data frame.
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+ include/crypto/aead.h |    1 +
+ 1 file changed, 1 insertion(+)
 
-If this is the case, even with GSO/whatever offloads, I expect that
-performance will be roughly halfed.
+--- lnx-44-rc3.orig/include/crypto/aead.h
++++ lnx-44-rc3/include/crypto/aead.h
+@@ -128,6 +128,7 @@ struct aead_request {
+  * @exit: Deinitialize the cryptographic transformation object. This is a
+  *	  counterpart to @init, used to remove various changes set in
+  *	  @init.
++ * @base: Definition of a generic crypto cipher algorithm.
+  *
+  * All fields except @ivsize is mandatory and must be filled.
+  */
