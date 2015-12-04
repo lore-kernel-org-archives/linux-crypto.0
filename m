@@ -1,50 +1,22 @@
-From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+From: Sandy Harris <sandyinchina@gmail.com>
 Subject: Re: ipsec impact on performance
-Date: Thu, 3 Dec 2015 15:32:24 -0500
-Message-ID: <20151203203224.GA25340@oracle.com>
+Date: Fri, 4 Dec 2015 00:18:43 -0500
+Message-ID: <CACXcFm=RhctbE-+cJNEdBE2DdRuvh7hSwX4Kzwn8UO=SUFxPPw@mail.gmail.com>
 References: <20151201175953.GC21252@oracle.com>
- <20151203.143328.1246663523839158336.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+To: Sowmini Varadhan <sowmini.varadhan@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:37714 "EHLO
-	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753386AbbLCUca (ORCPT
+Received: from mail-ig0-f170.google.com ([209.85.213.170]:33042 "EHLO
+	mail-ig0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750712AbbLDFSo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Dec 2015 15:32:30 -0500
-Content-Disposition: inline
-In-Reply-To: <20151203.143328.1246663523839158336.davem@davemloft.net>
+	Fri, 4 Dec 2015 00:18:44 -0500
+In-Reply-To: <20151201175953.GC21252@oracle.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On (12/03/15 14:33), David Miller wrote:
-> 
-> Doesn't skb_cow_data() contribute significantly to the ESP base cost,
-> especially for TCP packets?
-
-Indeed. For esp-null, it's about half of the total time spent
-in esp_output (for one run that I just instrumented with perf 
-tracepoints 2.5 ms compared to 5.8 ms)
-
-It never goes into the slow path of skb_cow_data (the path
-with comment about mincer fragments) because whether or not you
-do this after GSO, TCP makes sure to fit within the MSS, so (unless you
-have Jumbo enabled?) you'd send it something that does not have
-a fraglist.
-
-Was the cow_data call just intended to handle the fraglist case? 
-Or is there something else more generic going on here (it's hard
-to tell because esp_output doesnt have too many comments to explain
-what it thinks its doing, as it juggles different len fields around)
-
-> I mean, we're copying every TCP data frame.
-> 
-> If this is the case, even with GSO/whatever offloads, I expect that
-> performance will be roughly halfed.
-
-The other obvious "low-hanging fruit" is to address the TODO in the
-comment above esp_alloc_tmp.
-
---Sowmini
+This article is old (turn of the century) but it may have numbers
+worth comparing to
+http://www.freeswan.org/freeswan_trees/CURRENT-TREE/doc/performance.html
