@@ -1,35 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] crypto: Fix driver load failure
-Date: Fri, 4 Dec 2015 22:41:24 +0800
-Message-ID: <20151204144124.GC17703@gondor.apana.org.au>
-References: <1448808334-8424-1-git-send-email-rui.y.wang@intel.com>
+Subject: Re: [PATCH] crypto: caam - pass the correct buffer length
+Date: Fri, 4 Dec 2015 22:41:38 +0800
+Message-ID: <20151204144138.GD17703@gondor.apana.org.au>
+References: <1448888638-7921-1-git-send-email-fabio.estevam@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: ying.huang@intel.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Rui Wang <rui.y.wang@intel.com>
+Cc: horia.geanta@freescale.com, linux-crypto@vger.kernel.org
+To: Fabio Estevam <fabio.estevam@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:43968 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:53531 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752911AbbLDOl1 (ORCPT
+	with ESMTP id S1753260AbbLDOlm (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Dec 2015 09:41:27 -0500
+	Fri, 4 Dec 2015 09:41:42 -0500
 Content-Disposition: inline
-In-Reply-To: <1448808334-8424-1-git-send-email-rui.y.wang@intel.com>
+In-Reply-To: <1448888638-7921-1-git-send-email-fabio.estevam@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Nov 29, 2015 at 10:45:32PM +0800, Rui Wang wrote:
-> ghash_clmulni_intel fails to load on Linux 4.3+ with the following message:
-> "modprobe: ERROR: could not insert 'ghash_clmulni_intel': Invalid argument"
+On Mon, Nov 30, 2015 at 11:03:58AM -0200, Fabio Estevam wrote:
+> When buffer 0 is used we should use buflen_0 instead of buflen_1.
 > 
-> These two patches need to go together, for the driver to load correctly.
+> Fix it.
 > 
-> Rui Wang (2):
->   crypto: ghash-clmulni - Fix load failure
->   crypto: cryptd - Assign statesize properly
+> Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
