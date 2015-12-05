@@ -1,7 +1,8 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH 0/7] Add support for qat_c3xxx and qat_c62x devices
-Date: Fri, 04 Dec 2015 16:56:12 -0800
-Message-ID: <20151205005612.27411.60451.stgit@tstruk-mobl1>
+Subject: [PATCH 1/7] crypto: qat - add new device definitions
+Date: Fri, 04 Dec 2015 16:56:17 -0800
+Message-ID: <20151205005617.27411.90530.stgit@tstruk-mobl1>
+References: <20151205005612.27411.60451.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -9,101 +10,41 @@ Cc: linux-crypto@vger.kernel.org, pingchao.yang@intel.com,
 	qat-linux@intel.com, tadeusz.struk@intel.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:37390 "EHLO mga02.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:53304 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755091AbbLEA7W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Dec 2015 19:59:22 -0500
+	id S1755672AbbLEA71 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 4 Dec 2015 19:59:27 -0500
+In-Reply-To: <20151205005612.27411.60451.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The following series adds support for the new
-qat_c3xxx and qat_c62x acceleration devices.
+Add dev ids and names for the new device types.
 
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
-Pingchao Yang (1):
-      crypto: qat - add support for new devices to FW loader
+ drivers/crypto/qat/qat_common/adf_accel_devices.h |   10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Tadeusz Struk (6):
-      crypto: qat - add new device definitions
-      crypto: qat - move isr files to qat common so that they can be reused
-      crypto: qat - add support for c3xxx accel type
-      crypto: qat - add support for c62x accel type
-      crypto: qat - add support for c3xxxvf accel type
-      crypto: qat - add support for c62xvf accel type
-
- drivers/crypto/qat/Kconfig                         |   44 ++
- drivers/crypto/qat/Makefile                        |    4 
- drivers/crypto/qat/qat_c3xxx/Makefile              |    3 
- drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |  248 +++++++++
- drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.h   |   84 +++
- drivers/crypto/qat/qat_c3xxx/adf_drv.c             |  335 ++++++++++++
- drivers/crypto/qat/qat_c3xxxvf/Makefile            |    3 
- .../crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c   |  173 ++++++
- .../crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.h   |   64 ++
- drivers/crypto/qat/qat_c3xxxvf/adf_drv.c           |  305 +++++++++++
- drivers/crypto/qat/qat_c62x/Makefile               |    3 
- drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c     |  248 +++++++++
- drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h     |   84 +++
- drivers/crypto/qat/qat_c62x/adf_drv.c              |  335 ++++++++++++
- drivers/crypto/qat/qat_c62xvf/Makefile             |    3 
- drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c |  173 ++++++
- drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.h |   64 ++
- drivers/crypto/qat/qat_c62xvf/adf_drv.c            |  305 +++++++++++
- drivers/crypto/qat/qat_common/Makefile             |    2 
- drivers/crypto/qat/qat_common/adf_accel_devices.h  |   14 -
- drivers/crypto/qat/qat_common/adf_accel_engine.c   |    9 
- drivers/crypto/qat/qat_common/adf_admin.c          |    3 
- drivers/crypto/qat/qat_common/adf_aer.c            |    2 
- drivers/crypto/qat/qat_common/adf_cfg_common.h     |    4 
- drivers/crypto/qat/qat_common/adf_common_drv.h     |   19 +
- drivers/crypto/qat/qat_common/adf_ctl_drv.c        |    8 
- drivers/crypto/qat/qat_common/adf_dev_mgr.c        |   36 +
- drivers/crypto/qat/qat_common/adf_init.c           |   21 -
- drivers/crypto/qat/qat_common/adf_isr.c            |  348 +++++++++++++
- drivers/crypto/qat/qat_common/adf_pf2vf_msg.c      |   23 -
- drivers/crypto/qat/qat_common/adf_transport.c      |   20 -
- .../crypto/qat/qat_common/adf_transport_internal.h |    2 
- drivers/crypto/qat/qat_common/adf_vf_isr.c         |  280 ++++++++++
- .../qat/qat_common/icp_qat_fw_loader_handle.h      |   10 
- drivers/crypto/qat/qat_common/icp_qat_hal.h        |   37 +
- drivers/crypto/qat/qat_common/icp_qat_uclo.h       |  165 ++++++
- drivers/crypto/qat/qat_common/qat_crypto.c         |   92 +++
- drivers/crypto/qat/qat_common/qat_hal.c            |  122 +++-
- drivers/crypto/qat/qat_common/qat_uclo.c           |  555 +++++++++++++++++++-
- drivers/crypto/qat/qat_dh895xcc/Makefile           |    4 
- .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c |    5 
- .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |    7 
- drivers/crypto/qat/qat_dh895xcc/adf_drv.c          |   95 ---
- drivers/crypto/qat/qat_dh895xcc/adf_drv.h          |   58 --
- drivers/crypto/qat/qat_dh895xcc/adf_isr.c          |  332 ------------
- drivers/crypto/qat/qat_dh895xccvf/Makefile         |    4 
- .../qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c    |    5 
- .../qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.h    |   10 
- drivers/crypto/qat/qat_dh895xccvf/adf_drv.c        |   87 ---
- drivers/crypto/qat/qat_dh895xccvf/adf_drv.h        |   57 --
- drivers/crypto/qat/qat_dh895xccvf/adf_isr.c        |  258 ---------
- 51 files changed, 4112 insertions(+), 1060 deletions(-)
- create mode 100644 drivers/crypto/qat/qat_c3xxx/Makefile
- create mode 100644 drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c
- create mode 100644 drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.h
- create mode 100644 drivers/crypto/qat/qat_c3xxx/adf_drv.c
- create mode 100644 drivers/crypto/qat/qat_c3xxxvf/Makefile
- create mode 100644 drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
- create mode 100644 drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.h
- create mode 100644 drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
- create mode 100644 drivers/crypto/qat/qat_c62x/Makefile
- create mode 100644 drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c
- create mode 100644 drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h
- create mode 100644 drivers/crypto/qat/qat_c62x/adf_drv.c
- create mode 100644 drivers/crypto/qat/qat_c62xvf/Makefile
- create mode 100644 drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c
- create mode 100644 drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.h
- create mode 100644 drivers/crypto/qat/qat_c62xvf/adf_drv.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_isr.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_vf_isr.c
- delete mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_drv.h
- delete mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_isr.c
- delete mode 100644 drivers/crypto/qat/qat_dh895xccvf/adf_drv.h
- delete mode 100644 drivers/crypto/qat/qat_dh895xccvf/adf_isr.c
-
---
+diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
+index ca853d5..9786a2e 100644
+--- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
+@@ -55,8 +55,18 @@
+ 
+ #define ADF_DH895XCC_DEVICE_NAME "dh895xcc"
+ #define ADF_DH895XCCVF_DEVICE_NAME "dh895xccvf"
++#define ADF_C62X_DEVICE_NAME "c62x"
++#define ADF_C62XVF_DEVICE_NAME "c62xvf"
++#define ADF_C3XXX_DEVICE_NAME "c3xxx"
++#define ADF_C3XXXVF_DEVICE_NAME "c3xxxvf"
+ #define ADF_DH895XCC_PCI_DEVICE_ID 0x435
+ #define ADF_DH895XCCIOV_PCI_DEVICE_ID 0x443
++#define ADF_C62X_PCI_DEVICE_ID 0x37c8
++#define ADF_C62XIOV_PCI_DEVICE_ID 0x37c9
++#define ADF_C3XXX_PCI_DEVICE_ID 0x19e2
++#define ADF_C3XXXIOV_PCI_DEVICE_ID 0x19e3
++#define ADF_ERRSOU3 (0x3A000 + 0x0C)
++#define ADF_ERRSOU5 (0x3A000 + 0xD8)
+ #define ADF_PCI_MAX_BARS 3
+ #define ADF_DEVICE_NAME_LENGTH 32
+ #define ADF_ETR_MAX_RINGS_PER_BANK 16
