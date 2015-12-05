@@ -1,7 +1,7 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH 5/7] crypto: qat - add support for c62x accel type
-Date: Fri, 04 Dec 2015 16:56:40 -0800
-Message-ID: <20151205005639.27411.35179.stgit@tstruk-mobl1>
+Subject: [PATCH 6/7] crypto: qat - add support for c3xxxvf accel type
+Date: Fri, 04 Dec 2015 16:56:45 -0800
+Message-ID: <20151205005645.27411.26291.stgit@tstruk-mobl1>
 References: <20151205005612.27411.60451.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,84 +10,80 @@ Cc: linux-crypto@vger.kernel.org, pingchao.yang@intel.com,
 	qat-linux@intel.com, tadeusz.struk@intel.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:3718 "EHLO mga14.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:16674 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752806AbbLEA7t (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Dec 2015 19:59:49 -0500
+	id S1755644AbbLEA7z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 4 Dec 2015 19:59:55 -0500
 In-Reply-To: <20151205005612.27411.60451.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add support for qat c62x accel type
+Add support for c3xxx accelerator Virtual Function
 
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- drivers/crypto/qat/Kconfig                     |   11 +
- drivers/crypto/qat/Makefile                    |    1 
- drivers/crypto/qat/qat_c62x/Makefile           |    3 
- drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c |  248 ++++++++++++++++++
- drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h |   84 ++++++
- drivers/crypto/qat/qat_c62x/adf_drv.c          |  335 ++++++++++++++++++++++++
- drivers/crypto/qat/qat_common/adf_cfg_common.h |    1 
- 7 files changed, 683 insertions(+)
- create mode 100644 drivers/crypto/qat/qat_c62x/Makefile
- create mode 100644 drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c
- create mode 100644 drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h
- create mode 100644 drivers/crypto/qat/qat_c62x/adf_drv.c
+ drivers/crypto/qat/Kconfig                         |   11 +
+ drivers/crypto/qat/Makefile                        |    1 
+ drivers/crypto/qat/qat_c3xxxvf/Makefile            |    3 
+ .../crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c   |  173 +++++++++++
+ .../crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.h   |   64 ++++
+ drivers/crypto/qat/qat_c3xxxvf/adf_drv.c           |  305 ++++++++++++++++++++
+ drivers/crypto/qat/qat_common/adf_cfg_common.h     |    3 
+ 7 files changed, 559 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/crypto/qat/qat_c3xxxvf/Makefile
+ create mode 100644 drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
+ create mode 100644 drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.h
+ create mode 100644 drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
 
 diff --git a/drivers/crypto/qat/Kconfig b/drivers/crypto/qat/Kconfig
-index 7b3e791..33ae482 100644
+index 33ae482..c2d1886 100644
 --- a/drivers/crypto/qat/Kconfig
 +++ b/drivers/crypto/qat/Kconfig
-@@ -33,6 +33,17 @@ config CRYPTO_DEV_QAT_C3XXX
- 	  To compile this as a module, choose M here: the module
- 	  will be called qat_c3xxx.
+@@ -56,3 +56,14 @@ config CRYPTO_DEV_QAT_DH895xCCVF
  
-+config CRYPTO_DEV_QAT_C62X
-+	tristate "Support for Intel(R) C62X"
+ 	  To compile this as a module, choose M here: the module
+ 	  will be called qat_dh895xccvf.
++
++config CRYPTO_DEV_QAT_C3XXXVF
++	tristate "Support for Intel(R) C3XXX Virtual Function"
 +	depends on X86 && PCI
 +	select CRYPTO_DEV_QAT
 +	help
-+	  Support for Intel(R) C62x with Intel(R) QuickAssist Technology
-+	  for accelerating crypto and compression workloads.
++	  Support for Intel(R) C3xxx with Intel(R) QuickAssist Technology
++	  Virtual Function for accelerating crypto and compression workloads.
 +
 +	  To compile this as a module, choose M here: the module
-+	  will be called qat_c62x.
-+
- config CRYPTO_DEV_QAT_DH895xCCVF
- 	tristate "Support for Intel(R) DH895xCC Virtual Function"
- 	depends on X86 && PCI
++	  will be called qat_c3xxxvf.
 diff --git a/drivers/crypto/qat/Makefile b/drivers/crypto/qat/Makefile
-index e08d660..6bc4194 100644
+index 6bc4194..ac86281 100644
 --- a/drivers/crypto/qat/Makefile
 +++ b/drivers/crypto/qat/Makefile
-@@ -1,4 +1,5 @@
- obj-$(CONFIG_CRYPTO_DEV_QAT) += qat_common/
- obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCC) += qat_dh895xcc/
+@@ -3,3 +3,4 @@ obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCC) += qat_dh895xcc/
  obj-$(CONFIG_CRYPTO_DEV_QAT_C3XXX) += qat_c3xxx/
-+obj-$(CONFIG_CRYPTO_DEV_QAT_C62X) += qat_c62x/
+ obj-$(CONFIG_CRYPTO_DEV_QAT_C62X) += qat_c62x/
  obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCCVF) += qat_dh895xccvf/
-diff --git a/drivers/crypto/qat/qat_c62x/Makefile b/drivers/crypto/qat/qat_c62x/Makefile
++obj-$(CONFIG_CRYPTO_DEV_QAT_C3XXXVF) += qat_c3xxxvf/
+diff --git a/drivers/crypto/qat/qat_c3xxxvf/Makefile b/drivers/crypto/qat/qat_c3xxxvf/Makefile
 new file mode 100644
-index 0000000..bd75ace
+index 0000000..16d178e
 --- /dev/null
-+++ b/drivers/crypto/qat/qat_c62x/Makefile
++++ b/drivers/crypto/qat/qat_c3xxxvf/Makefile
 @@ -0,0 +1,3 @@
 +ccflags-y := -I$(src)/../qat_common
-+obj-$(CONFIG_CRYPTO_DEV_QAT_C62X) += qat_c62x.o
-+qat_c62x-objs := adf_drv.o adf_c62x_hw_data.o
-diff --git a/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c b/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c
++obj-$(CONFIG_CRYPTO_DEV_QAT_C3XXXVF) += qat_c3xxxvf.o
++qat_c3xxxvf-objs := adf_drv.o adf_c3xxxvf_hw_data.o
+diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c b/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
 new file mode 100644
-index 0000000..879e04c
+index 0000000..1af321c
 --- /dev/null
-+++ b/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c
-@@ -0,0 +1,248 @@
++++ b/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
+@@ -0,0 +1,173 @@
 +/*
 +  This file is provided under a dual BSD/GPLv2 license.  When using or
 +  redistributing this file, you may do so under either license.
 +
 +  GPL LICENSE SUMMARY
-+  Copyright(c) 2014 Intel Corporation.
++  Copyright(c) 2015 Intel Corporation.
 +  This program is free software; you can redistribute it and/or modify
 +  it under the terms of version 2 of the GNU General Public License as
 +  published by the Free Software Foundation.
@@ -101,261 +97,7 @@ index 0000000..879e04c
 +  qat-linux@intel.com
 +
 +  BSD LICENSE
-+  Copyright(c) 2014 Intel Corporation.
-+  Redistribution and use in source and binary forms, with or without
-+  modification, are permitted provided that the following conditions
-+  are met:
-+
-+	* Redistributions of source code must retain the above copyright
-+	  notice, this list of conditions and the following disclaimer.
-+	* Redistributions in binary form must reproduce the above copyright
-+	  notice, this list of conditions and the following disclaimer in
-+	  the documentation and/or other materials provided with the
-+	  distribution.
-+	* Neither the name of Intel Corporation nor the names of its
-+	  contributors may be used to endorse or promote products derived
-+	  from this software without specific prior written permission.
-+
-+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+*/
-+#include <adf_accel_devices.h>
-+#include <adf_common_drv.h>
-+#include <adf_pf2vf_msg.h>
-+#include "adf_c62x_hw_data.h"
-+
-+/* Worker thread to service arbiter mappings based on dev SKUs */
-+static const u32 thrd_to_arb_map_8_me_sku[] = {
-+	0x12222AAA, 0x11222AAA, 0x12222AAA, 0x11222AAA, 0x12222AAA,
-+	0x11222AAA, 0x12222AAA, 0x11222AAA, 0, 0
-+};
-+
-+static const u32 thrd_to_arb_map_10_me_sku[] = {
-+	0x12222AAA, 0x11222AAA, 0x12222AAA, 0x11222AAA, 0x12222AAA,
-+	0x11222AAA, 0x12222AAA, 0x11222AAA, 0x12222AAA, 0x11222AAA
-+};
-+
-+static struct adf_hw_device_class c62x_class = {
-+	.name = ADF_C62X_DEVICE_NAME,
-+	.type = DEV_C62X,
-+	.instances = 0
-+};
-+
-+static u32 get_accel_mask(u32 fuse)
-+{
-+	return (~fuse) >> ADF_C62X_ACCELERATORS_REG_OFFSET &
-+			  ADF_C62X_ACCELERATORS_MASK;
-+}
-+
-+static u32 get_ae_mask(u32 fuse)
-+{
-+	return (~fuse) & ADF_C62X_ACCELENGINES_MASK;
-+}
-+
-+static u32 get_num_accels(struct adf_hw_device_data *self)
-+{
-+	u32 i, ctr = 0;
-+
-+	if (!self || !self->accel_mask)
-+		return 0;
-+
-+	for (i = 0; i < ADF_C62X_MAX_ACCELERATORS; i++) {
-+		if (self->accel_mask & (1 << i))
-+			ctr++;
-+	}
-+	return ctr;
-+}
-+
-+static u32 get_num_aes(struct adf_hw_device_data *self)
-+{
-+	u32 i, ctr = 0;
-+
-+	if (!self || !self->ae_mask)
-+		return 0;
-+
-+	for (i = 0; i < ADF_C62X_MAX_ACCELENGINES; i++) {
-+		if (self->ae_mask & (1 << i))
-+			ctr++;
-+	}
-+	return ctr;
-+}
-+
-+static u32 get_misc_bar_id(struct adf_hw_device_data *self)
-+{
-+	return ADF_C62X_PMISC_BAR;
-+}
-+
-+static u32 get_etr_bar_id(struct adf_hw_device_data *self)
-+{
-+	return ADF_C62X_ETR_BAR;
-+}
-+
-+static u32 get_sram_bar_id(struct adf_hw_device_data *self)
-+{
-+	return ADF_C62X_SRAM_BAR;
-+}
-+
-+static enum dev_sku_info get_sku(struct adf_hw_device_data *self)
-+{
-+	int aes = get_num_aes(self);
-+
-+	if (aes == 8)
-+		return DEV_SKU_2;
-+	else if (aes == 10)
-+		return DEV_SKU_4;
-+
-+	return DEV_SKU_UNKNOWN;
-+}
-+
-+static void adf_get_arbiter_mapping(struct adf_accel_dev *accel_dev,
-+				    u32 const **arb_map_config)
-+{
-+	switch (accel_dev->accel_pci_dev.sku) {
-+	case DEV_SKU_2:
-+		*arb_map_config = thrd_to_arb_map_8_me_sku;
-+		break;
-+	case DEV_SKU_4:
-+		*arb_map_config = thrd_to_arb_map_10_me_sku;
-+		break;
-+	default:
-+		dev_err(&GET_DEV(accel_dev),
-+			"The configuration doesn't match any SKU");
-+		*arb_map_config = NULL;
-+	}
-+}
-+
-+static u32 get_pf2vf_offset(u32 i)
-+{
-+	return ADF_C62X_PF2VF_OFFSET(i);
-+}
-+
-+static u32 get_vintmsk_offset(u32 i)
-+{
-+	return ADF_C62X_VINTMSK_OFFSET(i);
-+}
-+
-+static void adf_enable_error_correction(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_hw_device_data *hw_device = accel_dev->hw_device;
-+	struct adf_bar *misc_bar = &GET_BARS(accel_dev)[ADF_C62X_PMISC_BAR];
-+	void __iomem *csr = misc_bar->virt_addr;
-+	unsigned int val, i;
-+
-+	/* Enable Accel Engine error detection & correction */
-+	for (i = 0; i < hw_device->get_num_aes(hw_device); i++) {
-+		val = ADF_CSR_RD(csr, ADF_C62X_AE_CTX_ENABLES(i));
-+		val |= ADF_C62X_ENABLE_AE_ECC_ERR;
-+		ADF_CSR_WR(csr, ADF_C62X_AE_CTX_ENABLES(i), val);
-+		val = ADF_CSR_RD(csr, ADF_C62X_AE_MISC_CONTROL(i));
-+		val |= ADF_C62X_ENABLE_AE_ECC_PARITY_CORR;
-+		ADF_CSR_WR(csr, ADF_C62X_AE_MISC_CONTROL(i), val);
-+	}
-+
-+	/* Enable shared memory error detection & correction */
-+	for (i = 0; i < hw_device->get_num_accels(hw_device); i++) {
-+		val = ADF_CSR_RD(csr, ADF_C62X_UERRSSMSH(i));
-+		val |= ADF_C62X_ERRSSMSH_EN;
-+		ADF_CSR_WR(csr, ADF_C62X_UERRSSMSH(i), val);
-+		val = ADF_CSR_RD(csr, ADF_C62X_CERRSSMSH(i));
-+		val |= ADF_C62X_ERRSSMSH_EN;
-+		ADF_CSR_WR(csr, ADF_C62X_CERRSSMSH(i), val);
-+	}
-+}
-+
-+static void adf_enable_ints(struct adf_accel_dev *accel_dev)
-+{
-+	void __iomem *addr;
-+
-+	addr = (&GET_BARS(accel_dev)[ADF_C62X_PMISC_BAR])->virt_addr;
-+
-+	/* Enable bundle and misc interrupts */
-+	ADF_CSR_WR(addr, ADF_C62X_SMIAPF0_MASK_OFFSET,
-+		   ADF_C62X_SMIA0_MASK);
-+	ADF_CSR_WR(addr, ADF_C62X_SMIAPF1_MASK_OFFSET,
-+		   ADF_C62X_SMIA1_MASK);
-+}
-+
-+static int adf_pf_enable_vf2pf_comms(struct adf_accel_dev *accel_dev)
-+{
-+	return 0;
-+}
-+
-+void adf_init_hw_data_c62x(struct adf_hw_device_data *hw_data)
-+{
-+	hw_data->dev_class = &c62x_class;
-+	hw_data->instance_id = c62x_class.instances++;
-+	hw_data->num_banks = ADF_C62X_ETR_MAX_BANKS;
-+	hw_data->num_accel = ADF_C62X_MAX_ACCELERATORS;
-+	hw_data->num_logical_accel = 1;
-+	hw_data->num_engines = ADF_C62X_MAX_ACCELENGINES;
-+	hw_data->tx_rx_gap = ADF_C62X_RX_RINGS_OFFSET;
-+	hw_data->tx_rings_mask = ADF_C62X_TX_RINGS_MASK;
-+	hw_data->alloc_irq = adf_isr_resource_alloc;
-+	hw_data->free_irq = adf_isr_resource_free;
-+	hw_data->enable_error_correction = adf_enable_error_correction;
-+	hw_data->get_accel_mask = get_accel_mask;
-+	hw_data->get_ae_mask = get_ae_mask;
-+	hw_data->get_num_accels = get_num_accels;
-+	hw_data->get_num_aes = get_num_aes;
-+	hw_data->get_sram_bar_id = get_sram_bar_id;
-+	hw_data->get_etr_bar_id = get_etr_bar_id;
-+	hw_data->get_misc_bar_id = get_misc_bar_id;
-+	hw_data->get_pf2vf_offset = get_pf2vf_offset;
-+	hw_data->get_vintmsk_offset = get_vintmsk_offset;
-+	hw_data->get_sku = get_sku;
-+	hw_data->fw_name = ADF_C62X_FW;
-+	hw_data->fw_mmp_name = ADF_C62X_MMP;
-+	hw_data->init_admin_comms = adf_init_admin_comms;
-+	hw_data->exit_admin_comms = adf_exit_admin_comms;
-+	hw_data->disable_iov = adf_disable_sriov;
-+	hw_data->send_admin_init = adf_send_admin_init;
-+	hw_data->init_arb = adf_init_arb;
-+	hw_data->exit_arb = adf_exit_arb;
-+	hw_data->get_arb_mapping = adf_get_arbiter_mapping;
-+	hw_data->enable_ints = adf_enable_ints;
-+	hw_data->enable_vf2pf_comms = adf_pf_enable_vf2pf_comms;
-+	hw_data->min_iov_compat_ver = ADF_PFVF_COMPATIBILITY_VERSION;
-+}
-+
-+void adf_clean_hw_data_c62x(struct adf_hw_device_data *hw_data)
-+{
-+	hw_data->dev_class->instances--;
-+}
-diff --git a/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h b/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h
-new file mode 100644
-index 0000000..17a8a32
---- /dev/null
-+++ b/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h
-@@ -0,0 +1,84 @@
-+/*
-+  This file is provided under a dual BSD/GPLv2 license.  When using or
-+  redistributing this file, you may do so under either license.
-+
-+  GPL LICENSE SUMMARY
-+  Copyright(c) 2014 Intel Corporation.
-+  This program is free software; you can redistribute it and/or modify
-+  it under the terms of version 2 of the GNU General Public License as
-+  published by the Free Software Foundation.
-+
-+  This program is distributed in the hope that it will be useful, but
-+  WITHOUT ANY WARRANTY; without even the implied warranty of
-+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+  General Public License for more details.
-+
-+  Contact Information:
-+  qat-linux@intel.com
-+
-+  BSD LICENSE
-+  Copyright(c) 2014 Intel Corporation.
++  Copyright(c) 2015 Intel Corporation.
 +  Redistribution and use in source and binary forms, with or without
 +  modification, are permitted provided that the following conditions
 +  are met:
@@ -382,50 +124,209 @@ index 0000000..17a8a32
 +  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 +  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 +*/
-+#ifndef ADF_C62X_HW_DATA_H_
-+#define ADF_C62X_HW_DATA_H_
++#include <adf_accel_devices.h>
++#include <adf_pf2vf_msg.h>
++#include <adf_common_drv.h>
++#include "adf_c3xxxvf_hw_data.h"
 +
-+/* PCIe configuration space */
-+#define ADF_C62X_SRAM_BAR 0
-+#define ADF_C62X_PMISC_BAR 1
-+#define ADF_C62X_ETR_BAR 2
-+#define ADF_C62X_RX_RINGS_OFFSET 8
-+#define ADF_C62X_TX_RINGS_MASK 0xFF
-+#define ADF_C62X_MAX_ACCELERATORS 5
-+#define ADF_C62X_MAX_ACCELENGINES 10
-+#define ADF_C62X_ACCELERATORS_REG_OFFSET 16
-+#define ADF_C62X_ACCELERATORS_MASK 0x1F
-+#define ADF_C62X_ACCELENGINES_MASK 0x3FF
-+#define ADF_C62X_ETR_MAX_BANKS 16
-+#define ADF_C62X_SMIAPF0_MASK_OFFSET (0x3A000 + 0x28)
-+#define ADF_C62X_SMIAPF1_MASK_OFFSET (0x3A000 + 0x30)
-+#define ADF_C62X_SMIA0_MASK 0xFFFF
-+#define ADF_C62X_SMIA1_MASK 0x1
-+/* Error detection and correction */
-+#define ADF_C62X_AE_CTX_ENABLES(i) (i * 0x1000 + 0x20818)
-+#define ADF_C62X_AE_MISC_CONTROL(i) (i * 0x1000 + 0x20960)
-+#define ADF_C62X_ENABLE_AE_ECC_ERR BIT(28)
-+#define ADF_C62X_ENABLE_AE_ECC_PARITY_CORR (BIT(24) | BIT(12))
-+#define ADF_C62X_UERRSSMSH(i) (i * 0x4000 + 0x18)
-+#define ADF_C62X_CERRSSMSH(i) (i * 0x4000 + 0x10)
-+#define ADF_C62X_ERRSSMSH_EN BIT(3)
++static struct adf_hw_device_class c3xxxiov_class = {
++	.name = ADF_C3XXXVF_DEVICE_NAME,
++	.type = DEV_C3XXXVF,
++	.instances = 0
++};
 +
-+#define ADF_C62X_PF2VF_OFFSET(i)	(0x3A000 + 0x280 + ((i) * 0x04))
-+#define ADF_C62X_VINTMSK_OFFSET(i)	(0x3A000 + 0x200 + ((i) * 0x04))
++static u32 get_accel_mask(u32 fuse)
++{
++	return ADF_C3XXXIOV_ACCELERATORS_MASK;
++}
 +
-+/* Firmware Binary */
-+#define ADF_C62X_FW "qat_c62x.bin"
-+#define ADF_C62X_MMP "qat_c62x_mmp.bin"
++static u32 get_ae_mask(u32 fuse)
++{
++	return ADF_C3XXXIOV_ACCELENGINES_MASK;
++}
 +
-+void adf_init_hw_data_c62x(struct adf_hw_device_data *hw_data);
-+void adf_clean_hw_data_c62x(struct adf_hw_device_data *hw_data);
-+#endif
-diff --git a/drivers/crypto/qat/qat_c62x/adf_drv.c b/drivers/crypto/qat/qat_c62x/adf_drv.c
++static u32 get_num_accels(struct adf_hw_device_data *self)
++{
++	return ADF_C3XXXIOV_MAX_ACCELERATORS;
++}
++
++static u32 get_num_aes(struct adf_hw_device_data *self)
++{
++	return ADF_C3XXXIOV_MAX_ACCELENGINES;
++}
++
++static u32 get_misc_bar_id(struct adf_hw_device_data *self)
++{
++	return ADF_C3XXXIOV_PMISC_BAR;
++}
++
++static u32 get_etr_bar_id(struct adf_hw_device_data *self)
++{
++	return ADF_C3XXXIOV_ETR_BAR;
++}
++
++static enum dev_sku_info get_sku(struct adf_hw_device_data *self)
++{
++	return DEV_SKU_VF;
++}
++
++static u32 get_pf2vf_offset(u32 i)
++{
++	return ADF_C3XXXIOV_PF2VF_OFFSET;
++}
++
++static u32 get_vintmsk_offset(u32 i)
++{
++	return ADF_C3XXXIOV_VINTMSK_OFFSET;
++}
++
++static int adf_vf_int_noop(struct adf_accel_dev *accel_dev)
++{
++	return 0;
++}
++
++static void adf_vf_void_noop(struct adf_accel_dev *accel_dev)
++{
++}
++
++static int adf_vf2pf_init(struct adf_accel_dev *accel_dev)
++{
++	u32 msg = (ADF_VF2PF_MSGORIGIN_SYSTEM |
++		(ADF_VF2PF_MSGTYPE_INIT << ADF_VF2PF_MSGTYPE_SHIFT));
++
++	if (adf_iov_putmsg(accel_dev, msg, 0)) {
++		dev_err(&GET_DEV(accel_dev),
++			"Failed to send Init event to PF\n");
++		return -EFAULT;
++	}
++	return 0;
++}
++
++static void adf_vf2pf_shutdown(struct adf_accel_dev *accel_dev)
++{
++	u32 msg = (ADF_VF2PF_MSGORIGIN_SYSTEM |
++	    (ADF_VF2PF_MSGTYPE_SHUTDOWN << ADF_VF2PF_MSGTYPE_SHIFT));
++
++	if (adf_iov_putmsg(accel_dev, msg, 0))
++		dev_err(&GET_DEV(accel_dev),
++			"Failed to send Shutdown event to PF\n");
++}
++
++void adf_init_hw_data_c3xxxiov(struct adf_hw_device_data *hw_data)
++{
++	hw_data->dev_class = &c3xxxiov_class;
++	hw_data->num_banks = ADF_C3XXXIOV_ETR_MAX_BANKS;
++	hw_data->num_accel = ADF_C3XXXIOV_MAX_ACCELERATORS;
++	hw_data->num_logical_accel = 1;
++	hw_data->num_engines = ADF_C3XXXIOV_MAX_ACCELENGINES;
++	hw_data->tx_rx_gap = ADF_C3XXXIOV_RX_RINGS_OFFSET;
++	hw_data->tx_rings_mask = ADF_C3XXXIOV_TX_RINGS_MASK;
++	hw_data->alloc_irq = adf_vf_isr_resource_alloc;
++	hw_data->free_irq = adf_vf_isr_resource_free;
++	hw_data->enable_error_correction = adf_vf_void_noop;
++	hw_data->init_admin_comms = adf_vf_int_noop;
++	hw_data->exit_admin_comms = adf_vf_void_noop;
++	hw_data->send_admin_init = adf_vf2pf_init;
++	hw_data->init_arb = adf_vf_int_noop;
++	hw_data->exit_arb = adf_vf_void_noop;
++	hw_data->disable_iov = adf_vf2pf_shutdown;
++	hw_data->get_accel_mask = get_accel_mask;
++	hw_data->get_ae_mask = get_ae_mask;
++	hw_data->get_num_accels = get_num_accels;
++	hw_data->get_num_aes = get_num_aes;
++	hw_data->get_etr_bar_id = get_etr_bar_id;
++	hw_data->get_misc_bar_id = get_misc_bar_id;
++	hw_data->get_pf2vf_offset = get_pf2vf_offset;
++	hw_data->get_vintmsk_offset = get_vintmsk_offset;
++	hw_data->get_sku = get_sku;
++	hw_data->enable_ints = adf_vf_void_noop;
++	hw_data->enable_vf2pf_comms = adf_enable_vf2pf_comms;
++	hw_data->min_iov_compat_ver = ADF_PFVF_COMPATIBILITY_VERSION;
++	hw_data->dev_class->instances++;
++	adf_devmgr_update_class_index(hw_data);
++}
++
++void adf_clean_hw_data_c3xxxiov(struct adf_hw_device_data *hw_data)
++{
++	hw_data->dev_class->instances--;
++	adf_devmgr_update_class_index(hw_data);
++}
+diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.h b/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.h
 new file mode 100644
-index 0000000..512c565
+index 0000000..934f216
 --- /dev/null
-+++ b/drivers/crypto/qat/qat_c62x/adf_drv.c
-@@ -0,0 +1,335 @@
++++ b/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.h
+@@ -0,0 +1,64 @@
++/*
++  This file is provided under a dual BSD/GPLv2 license.  When using or
++  redistributing this file, you may do so under either license.
++
++  GPL LICENSE SUMMARY
++  Copyright(c) 2015 Intel Corporation.
++  This program is free software; you can redistribute it and/or modify
++  it under the terms of version 2 of the GNU General Public License as
++  published by the Free Software Foundation.
++
++  This program is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++  General Public License for more details.
++
++  Contact Information:
++  qat-linux@intel.com
++
++  BSD LICENSE
++  Copyright(c) 2015 Intel Corporation.
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions
++  are met:
++
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above copyright
++      notice, this list of conditions and the following disclaimer in
++      the documentation and/or other materials provided with the
++      distribution.
++    * Neither the name of Intel Corporation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++#ifndef ADF_C3XXXVF_HW_DATA_H_
++#define ADF_C3XXXVF_HW_DATA_H_
++
++#define ADF_C3XXXIOV_PMISC_BAR 1
++#define ADF_C3XXXIOV_ACCELERATORS_MASK 0x1
++#define ADF_C3XXXIOV_ACCELENGINES_MASK 0x1
++#define ADF_C3XXXIOV_MAX_ACCELERATORS 1
++#define ADF_C3XXXIOV_MAX_ACCELENGINES 1
++#define ADF_C3XXXIOV_RX_RINGS_OFFSET 8
++#define ADF_C3XXXIOV_TX_RINGS_MASK 0xFF
++#define ADF_C3XXXIOV_ETR_BAR 0
++#define ADF_C3XXXIOV_ETR_MAX_BANKS 1
++#define ADF_C3XXXIOV_PF2VF_OFFSET	0x200
++#define ADF_C3XXXIOV_VINTMSK_OFFSET	0x208
++
++void adf_init_hw_data_c3xxxiov(struct adf_hw_device_data *hw_data);
++void adf_clean_hw_data_c3xxxiov(struct adf_hw_device_data *hw_data);
++#endif
+diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
+new file mode 100644
+index 0000000..1ac4ae9
+--- /dev/null
++++ b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
+@@ -0,0 +1,305 @@
 +/*
 +  This file is provided under a dual BSD/GPLv2 license.  When using or
 +  redistributing this file, you may do so under either license.
@@ -488,13 +389,13 @@ index 0000000..512c565
 +#include <adf_accel_devices.h>
 +#include <adf_common_drv.h>
 +#include <adf_cfg.h>
-+#include "adf_c62x_hw_data.h"
++#include "adf_c3xxxvf_hw_data.h"
 +
 +#define ADF_SYSTEM_DEVICE(device_id) \
 +	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
 +
 +static const struct pci_device_id adf_pci_tbl[] = {
-+	ADF_SYSTEM_DEVICE(ADF_C62X_PCI_DEVICE_ID),
++	ADF_SYSTEM_DEVICE(ADF_C3XXXIOV_PCI_DEVICE_ID),
 +	{0,}
 +};
 +MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
@@ -504,10 +405,9 @@ index 0000000..512c565
 +
 +static struct pci_driver adf_driver = {
 +	.id_table = adf_pci_tbl,
-+	.name = ADF_C62X_DEVICE_NAME,
++	.name = ADF_C3XXXVF_DEVICE_NAME,
 +	.probe = adf_probe,
 +	.remove = adf_remove,
-+	.sriov_configure = adf_sriov_configure,
 +};
 +
 +static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
@@ -519,6 +419,7 @@ index 0000000..512c565
 +static void adf_cleanup_accel(struct adf_accel_dev *accel_dev)
 +{
 +	struct adf_accel_pci *accel_pci_dev = &accel_dev->accel_pci_dev;
++	struct adf_accel_dev *pf;
 +	int i;
 +
 +	for (i = 0; i < ADF_PCI_MAX_BARS; i++) {
@@ -530,8 +431,8 @@ index 0000000..512c565
 +
 +	if (accel_dev->hw_device) {
 +		switch (accel_pci_dev->pci_dev->device) {
-+		case ADF_C62X_PCI_DEVICE_ID:
-+			adf_clean_hw_data_c62x(accel_dev->hw_device);
++		case ADF_C3XXXIOV_PCI_DEVICE_ID:
++			adf_clean_hw_data_c3xxxiov(accel_dev->hw_device);
 +			break;
 +		default:
 +			break;
@@ -541,12 +442,14 @@ index 0000000..512c565
 +	}
 +	adf_cfg_dev_remove(accel_dev);
 +	debugfs_remove(accel_dev->debugfs_dir);
-+	adf_devmgr_rm_dev(accel_dev, NULL);
++	pf = adf_devmgr_pci_to_accel_dev(accel_pci_dev->pci_dev->physfn);
++	adf_devmgr_rm_dev(accel_dev, pf);
 +}
 +
 +static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 +{
 +	struct adf_accel_dev *accel_dev;
++	struct adf_accel_dev *pf;
 +	struct adf_accel_pci *accel_pci_dev;
 +	struct adf_hw_device_data *hw_data;
 +	char name[ADF_DEVICE_NAME_LENGTH];
@@ -554,19 +457,11 @@ index 0000000..512c565
 +	int ret, bar_mask;
 +
 +	switch (ent->device) {
-+	case ADF_C62X_PCI_DEVICE_ID:
++	case ADF_C3XXXIOV_PCI_DEVICE_ID:
 +		break;
 +	default:
 +		dev_err(&pdev->dev, "Invalid device 0x%x.\n", ent->device);
 +		return -ENODEV;
-+	}
-+
-+	if (num_possible_nodes() > 1 && dev_to_node(&pdev->dev) < 0) {
-+		/* If the accelerator is connected to a node with no memory
-+		 * there is no point in using the accelerator since the remote
-+		 * memory transaction will be very slow. */
-+		dev_err(&pdev->dev, "Invalid NUMA configuration.\n");
-+		return -EINVAL;
 +	}
 +
 +	accel_dev = kzalloc_node(sizeof(*accel_dev), GFP_KERNEL,
@@ -574,17 +469,18 @@ index 0000000..512c565
 +	if (!accel_dev)
 +		return -ENOMEM;
 +
-+	INIT_LIST_HEAD(&accel_dev->crypto_list);
++	accel_dev->is_vf = true;
++	pf = adf_devmgr_pci_to_accel_dev(pdev->physfn);
 +	accel_pci_dev = &accel_dev->accel_pci_dev;
 +	accel_pci_dev->pci_dev = pdev;
 +
-+	/* Add accel device to accel table.
-+	 * This should be called before adf_cleanup_accel is called */
-+	if (adf_devmgr_add_dev(accel_dev, NULL)) {
++	/* Add accel device to accel table */
++	if (adf_devmgr_add_dev(accel_dev, pf)) {
 +		dev_err(&pdev->dev, "Failed to add new accelerator device.\n");
 +		kfree(accel_dev);
 +		return -EFAULT;
 +	}
++	INIT_LIST_HEAD(&accel_dev->crypto_list);
 +
 +	accel_dev->owner = THIS_MODULE;
 +	/* Allocate and configure device configuration structure */
@@ -594,24 +490,13 @@ index 0000000..512c565
 +		ret = -ENOMEM;
 +		goto out_err;
 +	}
-+
 +	accel_dev->hw_device = hw_data;
-+	adf_init_hw_data_c62x(accel_dev->hw_device);
-+	pci_read_config_byte(pdev, PCI_REVISION_ID, &accel_pci_dev->revid);
-+	pci_read_config_dword(pdev, ADF_DEVICE_FUSECTL_OFFSET,
-+			      &hw_data->fuses);
++	adf_init_hw_data_c3xxxiov(accel_dev->hw_device);
 +
 +	/* Get Accelerators and Accelerators Engines masks */
 +	hw_data->accel_mask = hw_data->get_accel_mask(hw_data->fuses);
 +	hw_data->ae_mask = hw_data->get_ae_mask(hw_data->fuses);
 +	accel_pci_dev->sku = hw_data->get_sku(hw_data);
-+	/* If the device has no acceleration engines then ignore it. */
-+	if (!hw_data->accel_mask || !hw_data->ae_mask ||
-+	    ((~hw_data->ae_mask) & 0x01)) {
-+		dev_err(&pdev->dev, "No acceleration units found");
-+		ret = -EFAULT;
-+		goto out_err;
-+	}
 +
 +	/* Create dev top level debugfs entry */
 +	snprintf(name, sizeof(name), "%s%s_%02x:%02d.%02d",
@@ -651,14 +536,10 @@ index 0000000..512c565
 +		pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
 +	}
 +
-+	if (pci_request_regions(pdev, ADF_C62X_DEVICE_NAME)) {
++	if (pci_request_regions(pdev, ADF_C3XXXVF_DEVICE_NAME)) {
 +		ret = -EFAULT;
 +		goto out_err_disable;
 +	}
-+
-+	/* Read accelerator capabilities mask */
-+	pci_read_config_dword(pdev, ADF_DEVICE_LEGFUSE_OFFSET,
-+			      &hw_data->accel_capabilities_mask);
 +
 +	/* Find and map all the device's BARS */
 +	i = 0;
@@ -679,18 +560,8 @@ index 0000000..512c565
 +		}
 +	}
 +	pci_set_master(pdev);
-+
-+	if (adf_enable_aer(accel_dev, &adf_driver)) {
-+		dev_err(&pdev->dev, "Failed to enable aer\n");
-+		ret = -EFAULT;
-+		goto out_err_free_reg;
-+	}
-+
-+	if (pci_save_state(pdev)) {
-+		dev_err(&pdev->dev, "Failed to save pci state\n");
-+		ret = -ENOMEM;
-+		goto out_err_free_reg;
-+	}
++	/* Completion for VF2PF request/response message exchange */
++	init_completion(&accel_dev->vf.iov_msg_completion);
 +
 +	ret = qat_crypto_dev_config(accel_dev);
 +	if (ret)
@@ -732,7 +603,6 @@ index 0000000..512c565
 +		dev_err(&GET_DEV(accel_dev), "Failed to stop QAT accel dev\n");
 +
 +	adf_dev_shutdown(accel_dev);
-+	adf_disable_aer(accel_dev);
 +	adf_cleanup_accel(accel_dev);
 +	adf_cleanup_pci_dev(accel_dev);
 +	kfree(accel_dev);
@@ -752,6 +622,7 @@ index 0000000..512c565
 +static void __exit adfdrv_release(void)
 +{
 +	pci_unregister_driver(&adf_driver);
++	adf_clean_vf_map(true);
 +}
 +
 +module_init(adfdrv_init);
@@ -762,14 +633,16 @@ index 0000000..512c565
 +MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
 +MODULE_VERSION(ADF_DRV_VERSION);
 diff --git a/drivers/crypto/qat/qat_common/adf_cfg_common.h b/drivers/crypto/qat/qat_common/adf_cfg_common.h
-index 39884c9..5aae6b9 100644
+index 5aae6b9..59a5d2a 100644
 --- a/drivers/crypto/qat/qat_common/adf_cfg_common.h
 +++ b/drivers/crypto/qat/qat_common/adf_cfg_common.h
-@@ -72,6 +72,7 @@ enum adf_device_type {
- 	DEV_UNKNOWN = 0,
+@@ -73,7 +73,8 @@ enum adf_device_type {
  	DEV_DH895XCC,
  	DEV_DH895XCCVF,
-+	DEV_C62X,
- 	DEV_C3XXX
+ 	DEV_C62X,
+-	DEV_C3XXX
++	DEV_C3XXX,
++	DEV_C3XXXVF
  };
  
+ struct adf_dev_status_info {
