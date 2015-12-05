@@ -1,7 +1,7 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH 2/7] crypto: qat - add support for new devices to FW loader
-Date: Fri, 04 Dec 2015 16:56:23 -0800
-Message-ID: <20151205005623.27411.66854.stgit@tstruk-mobl1>
+Subject: [PATCH 5/7] crypto: qat - add support for c62x accel type
+Date: Fri, 04 Dec 2015 16:56:40 -0800
+Message-ID: <20151205005639.27411.35179.stgit@tstruk-mobl1>
 References: <20151205005612.27411.60451.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,1325 +10,766 @@ Cc: linux-crypto@vger.kernel.org, pingchao.yang@intel.com,
 	qat-linux@intel.com, tadeusz.struk@intel.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:39059 "EHLO mga09.intel.com"
+Received: from mga14.intel.com ([192.55.52.115]:3718 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755672AbbLEA7d (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Dec 2015 19:59:33 -0500
+	id S1752806AbbLEA7t (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 4 Dec 2015 19:59:49 -0500
 In-Reply-To: <20151205005612.27411.60451.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Pingchao Yang <pingchao.yang@intel.com>
-
-FW loader updates for new qat devices
+Add support for qat c62x accel type
 
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- drivers/crypto/qat/qat_common/adf_accel_engine.c   |    9 
- drivers/crypto/qat/qat_common/adf_common_drv.h     |   10 
- .../qat/qat_common/icp_qat_fw_loader_handle.h      |   10 
- drivers/crypto/qat/qat_common/icp_qat_hal.h        |   37 +
- drivers/crypto/qat/qat_common/icp_qat_uclo.h       |  165 ++++++
- drivers/crypto/qat/qat_common/qat_hal.c            |  122 +++-
- drivers/crypto/qat/qat_common/qat_uclo.c           |  555 +++++++++++++++++++-
- 7 files changed, 823 insertions(+), 85 deletions(-)
+ drivers/crypto/qat/Kconfig                     |   11 +
+ drivers/crypto/qat/Makefile                    |    1 
+ drivers/crypto/qat/qat_c62x/Makefile           |    3 
+ drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c |  248 ++++++++++++++++++
+ drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h |   84 ++++++
+ drivers/crypto/qat/qat_c62x/adf_drv.c          |  335 ++++++++++++++++++++++++
+ drivers/crypto/qat/qat_common/adf_cfg_common.h |    1 
+ 7 files changed, 683 insertions(+)
+ create mode 100644 drivers/crypto/qat/qat_c62x/Makefile
+ create mode 100644 drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c
+ create mode 100644 drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h
+ create mode 100644 drivers/crypto/qat/qat_c62x/adf_drv.c
 
-diff --git a/drivers/crypto/qat/qat_common/adf_accel_engine.c b/drivers/crypto/qat/qat_common/adf_accel_engine.c
-index 20b08bd..a42fc42 100644
---- a/drivers/crypto/qat/qat_common/adf_accel_engine.c
-+++ b/drivers/crypto/qat/qat_common/adf_accel_engine.c
-@@ -78,9 +78,12 @@ int adf_ae_fw_load(struct adf_accel_dev *accel_dev)
- 	uof_addr = (void *)loader_data->uof_fw->data;
- 	mmp_size = loader_data->mmp_fw->size;
- 	mmp_addr = (void *)loader_data->mmp_fw->data;
--	qat_uclo_wr_mimage(loader_data->fw_loader, mmp_addr, mmp_size);
--	if (qat_uclo_map_uof_obj(loader_data->fw_loader, uof_addr, uof_size)) {
--		dev_err(&GET_DEV(accel_dev), "Failed to map UOF\n");
-+	if (qat_uclo_wr_mimage(loader_data->fw_loader, mmp_addr, mmp_size)) {
-+		dev_err(&GET_DEV(accel_dev), "Failed to load MMP\n");
+diff --git a/drivers/crypto/qat/Kconfig b/drivers/crypto/qat/Kconfig
+index 7b3e791..33ae482 100644
+--- a/drivers/crypto/qat/Kconfig
++++ b/drivers/crypto/qat/Kconfig
+@@ -33,6 +33,17 @@ config CRYPTO_DEV_QAT_C3XXX
+ 	  To compile this as a module, choose M here: the module
+ 	  will be called qat_c3xxx.
+ 
++config CRYPTO_DEV_QAT_C62X
++	tristate "Support for Intel(R) C62X"
++	depends on X86 && PCI
++	select CRYPTO_DEV_QAT
++	help
++	  Support for Intel(R) C62x with Intel(R) QuickAssist Technology
++	  for accelerating crypto and compression workloads.
++
++	  To compile this as a module, choose M here: the module
++	  will be called qat_c62x.
++
+ config CRYPTO_DEV_QAT_DH895xCCVF
+ 	tristate "Support for Intel(R) DH895xCC Virtual Function"
+ 	depends on X86 && PCI
+diff --git a/drivers/crypto/qat/Makefile b/drivers/crypto/qat/Makefile
+index e08d660..6bc4194 100644
+--- a/drivers/crypto/qat/Makefile
++++ b/drivers/crypto/qat/Makefile
+@@ -1,4 +1,5 @@
+ obj-$(CONFIG_CRYPTO_DEV_QAT) += qat_common/
+ obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCC) += qat_dh895xcc/
+ obj-$(CONFIG_CRYPTO_DEV_QAT_C3XXX) += qat_c3xxx/
++obj-$(CONFIG_CRYPTO_DEV_QAT_C62X) += qat_c62x/
+ obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCCVF) += qat_dh895xccvf/
+diff --git a/drivers/crypto/qat/qat_c62x/Makefile b/drivers/crypto/qat/qat_c62x/Makefile
+new file mode 100644
+index 0000000..bd75ace
+--- /dev/null
++++ b/drivers/crypto/qat/qat_c62x/Makefile
+@@ -0,0 +1,3 @@
++ccflags-y := -I$(src)/../qat_common
++obj-$(CONFIG_CRYPTO_DEV_QAT_C62X) += qat_c62x.o
++qat_c62x-objs := adf_drv.o adf_c62x_hw_data.o
+diff --git a/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c b/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c
+new file mode 100644
+index 0000000..879e04c
+--- /dev/null
++++ b/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c
+@@ -0,0 +1,248 @@
++/*
++  This file is provided under a dual BSD/GPLv2 license.  When using or
++  redistributing this file, you may do so under either license.
++
++  GPL LICENSE SUMMARY
++  Copyright(c) 2014 Intel Corporation.
++  This program is free software; you can redistribute it and/or modify
++  it under the terms of version 2 of the GNU General Public License as
++  published by the Free Software Foundation.
++
++  This program is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++  General Public License for more details.
++
++  Contact Information:
++  qat-linux@intel.com
++
++  BSD LICENSE
++  Copyright(c) 2014 Intel Corporation.
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions
++  are met:
++
++	* Redistributions of source code must retain the above copyright
++	  notice, this list of conditions and the following disclaimer.
++	* Redistributions in binary form must reproduce the above copyright
++	  notice, this list of conditions and the following disclaimer in
++	  the documentation and/or other materials provided with the
++	  distribution.
++	* Neither the name of Intel Corporation nor the names of its
++	  contributors may be used to endorse or promote products derived
++	  from this software without specific prior written permission.
++
++  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++#include <adf_accel_devices.h>
++#include <adf_common_drv.h>
++#include <adf_pf2vf_msg.h>
++#include "adf_c62x_hw_data.h"
++
++/* Worker thread to service arbiter mappings based on dev SKUs */
++static const u32 thrd_to_arb_map_8_me_sku[] = {
++	0x12222AAA, 0x11222AAA, 0x12222AAA, 0x11222AAA, 0x12222AAA,
++	0x11222AAA, 0x12222AAA, 0x11222AAA, 0, 0
++};
++
++static const u32 thrd_to_arb_map_10_me_sku[] = {
++	0x12222AAA, 0x11222AAA, 0x12222AAA, 0x11222AAA, 0x12222AAA,
++	0x11222AAA, 0x12222AAA, 0x11222AAA, 0x12222AAA, 0x11222AAA
++};
++
++static struct adf_hw_device_class c62x_class = {
++	.name = ADF_C62X_DEVICE_NAME,
++	.type = DEV_C62X,
++	.instances = 0
++};
++
++static u32 get_accel_mask(u32 fuse)
++{
++	return (~fuse) >> ADF_C62X_ACCELERATORS_REG_OFFSET &
++			  ADF_C62X_ACCELERATORS_MASK;
++}
++
++static u32 get_ae_mask(u32 fuse)
++{
++	return (~fuse) & ADF_C62X_ACCELENGINES_MASK;
++}
++
++static u32 get_num_accels(struct adf_hw_device_data *self)
++{
++	u32 i, ctr = 0;
++
++	if (!self || !self->accel_mask)
++		return 0;
++
++	for (i = 0; i < ADF_C62X_MAX_ACCELERATORS; i++) {
++		if (self->accel_mask & (1 << i))
++			ctr++;
++	}
++	return ctr;
++}
++
++static u32 get_num_aes(struct adf_hw_device_data *self)
++{
++	u32 i, ctr = 0;
++
++	if (!self || !self->ae_mask)
++		return 0;
++
++	for (i = 0; i < ADF_C62X_MAX_ACCELENGINES; i++) {
++		if (self->ae_mask & (1 << i))
++			ctr++;
++	}
++	return ctr;
++}
++
++static u32 get_misc_bar_id(struct adf_hw_device_data *self)
++{
++	return ADF_C62X_PMISC_BAR;
++}
++
++static u32 get_etr_bar_id(struct adf_hw_device_data *self)
++{
++	return ADF_C62X_ETR_BAR;
++}
++
++static u32 get_sram_bar_id(struct adf_hw_device_data *self)
++{
++	return ADF_C62X_SRAM_BAR;
++}
++
++static enum dev_sku_info get_sku(struct adf_hw_device_data *self)
++{
++	int aes = get_num_aes(self);
++
++	if (aes == 8)
++		return DEV_SKU_2;
++	else if (aes == 10)
++		return DEV_SKU_4;
++
++	return DEV_SKU_UNKNOWN;
++}
++
++static void adf_get_arbiter_mapping(struct adf_accel_dev *accel_dev,
++				    u32 const **arb_map_config)
++{
++	switch (accel_dev->accel_pci_dev.sku) {
++	case DEV_SKU_2:
++		*arb_map_config = thrd_to_arb_map_8_me_sku;
++		break;
++	case DEV_SKU_4:
++		*arb_map_config = thrd_to_arb_map_10_me_sku;
++		break;
++	default:
++		dev_err(&GET_DEV(accel_dev),
++			"The configuration doesn't match any SKU");
++		*arb_map_config = NULL;
++	}
++}
++
++static u32 get_pf2vf_offset(u32 i)
++{
++	return ADF_C62X_PF2VF_OFFSET(i);
++}
++
++static u32 get_vintmsk_offset(u32 i)
++{
++	return ADF_C62X_VINTMSK_OFFSET(i);
++}
++
++static void adf_enable_error_correction(struct adf_accel_dev *accel_dev)
++{
++	struct adf_hw_device_data *hw_device = accel_dev->hw_device;
++	struct adf_bar *misc_bar = &GET_BARS(accel_dev)[ADF_C62X_PMISC_BAR];
++	void __iomem *csr = misc_bar->virt_addr;
++	unsigned int val, i;
++
++	/* Enable Accel Engine error detection & correction */
++	for (i = 0; i < hw_device->get_num_aes(hw_device); i++) {
++		val = ADF_CSR_RD(csr, ADF_C62X_AE_CTX_ENABLES(i));
++		val |= ADF_C62X_ENABLE_AE_ECC_ERR;
++		ADF_CSR_WR(csr, ADF_C62X_AE_CTX_ENABLES(i), val);
++		val = ADF_CSR_RD(csr, ADF_C62X_AE_MISC_CONTROL(i));
++		val |= ADF_C62X_ENABLE_AE_ECC_PARITY_CORR;
++		ADF_CSR_WR(csr, ADF_C62X_AE_MISC_CONTROL(i), val);
++	}
++
++	/* Enable shared memory error detection & correction */
++	for (i = 0; i < hw_device->get_num_accels(hw_device); i++) {
++		val = ADF_CSR_RD(csr, ADF_C62X_UERRSSMSH(i));
++		val |= ADF_C62X_ERRSSMSH_EN;
++		ADF_CSR_WR(csr, ADF_C62X_UERRSSMSH(i), val);
++		val = ADF_CSR_RD(csr, ADF_C62X_CERRSSMSH(i));
++		val |= ADF_C62X_ERRSSMSH_EN;
++		ADF_CSR_WR(csr, ADF_C62X_CERRSSMSH(i), val);
++	}
++}
++
++static void adf_enable_ints(struct adf_accel_dev *accel_dev)
++{
++	void __iomem *addr;
++
++	addr = (&GET_BARS(accel_dev)[ADF_C62X_PMISC_BAR])->virt_addr;
++
++	/* Enable bundle and misc interrupts */
++	ADF_CSR_WR(addr, ADF_C62X_SMIAPF0_MASK_OFFSET,
++		   ADF_C62X_SMIA0_MASK);
++	ADF_CSR_WR(addr, ADF_C62X_SMIAPF1_MASK_OFFSET,
++		   ADF_C62X_SMIA1_MASK);
++}
++
++static int adf_pf_enable_vf2pf_comms(struct adf_accel_dev *accel_dev)
++{
++	return 0;
++}
++
++void adf_init_hw_data_c62x(struct adf_hw_device_data *hw_data)
++{
++	hw_data->dev_class = &c62x_class;
++	hw_data->instance_id = c62x_class.instances++;
++	hw_data->num_banks = ADF_C62X_ETR_MAX_BANKS;
++	hw_data->num_accel = ADF_C62X_MAX_ACCELERATORS;
++	hw_data->num_logical_accel = 1;
++	hw_data->num_engines = ADF_C62X_MAX_ACCELENGINES;
++	hw_data->tx_rx_gap = ADF_C62X_RX_RINGS_OFFSET;
++	hw_data->tx_rings_mask = ADF_C62X_TX_RINGS_MASK;
++	hw_data->alloc_irq = adf_isr_resource_alloc;
++	hw_data->free_irq = adf_isr_resource_free;
++	hw_data->enable_error_correction = adf_enable_error_correction;
++	hw_data->get_accel_mask = get_accel_mask;
++	hw_data->get_ae_mask = get_ae_mask;
++	hw_data->get_num_accels = get_num_accels;
++	hw_data->get_num_aes = get_num_aes;
++	hw_data->get_sram_bar_id = get_sram_bar_id;
++	hw_data->get_etr_bar_id = get_etr_bar_id;
++	hw_data->get_misc_bar_id = get_misc_bar_id;
++	hw_data->get_pf2vf_offset = get_pf2vf_offset;
++	hw_data->get_vintmsk_offset = get_vintmsk_offset;
++	hw_data->get_sku = get_sku;
++	hw_data->fw_name = ADF_C62X_FW;
++	hw_data->fw_mmp_name = ADF_C62X_MMP;
++	hw_data->init_admin_comms = adf_init_admin_comms;
++	hw_data->exit_admin_comms = adf_exit_admin_comms;
++	hw_data->disable_iov = adf_disable_sriov;
++	hw_data->send_admin_init = adf_send_admin_init;
++	hw_data->init_arb = adf_init_arb;
++	hw_data->exit_arb = adf_exit_arb;
++	hw_data->get_arb_mapping = adf_get_arbiter_mapping;
++	hw_data->enable_ints = adf_enable_ints;
++	hw_data->enable_vf2pf_comms = adf_pf_enable_vf2pf_comms;
++	hw_data->min_iov_compat_ver = ADF_PFVF_COMPATIBILITY_VERSION;
++}
++
++void adf_clean_hw_data_c62x(struct adf_hw_device_data *hw_data)
++{
++	hw_data->dev_class->instances--;
++}
+diff --git a/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h b/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h
+new file mode 100644
+index 0000000..17a8a32
+--- /dev/null
++++ b/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h
+@@ -0,0 +1,84 @@
++/*
++  This file is provided under a dual BSD/GPLv2 license.  When using or
++  redistributing this file, you may do so under either license.
++
++  GPL LICENSE SUMMARY
++  Copyright(c) 2014 Intel Corporation.
++  This program is free software; you can redistribute it and/or modify
++  it under the terms of version 2 of the GNU General Public License as
++  published by the Free Software Foundation.
++
++  This program is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++  General Public License for more details.
++
++  Contact Information:
++  qat-linux@intel.com
++
++  BSD LICENSE
++  Copyright(c) 2014 Intel Corporation.
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions
++  are met:
++
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above copyright
++      notice, this list of conditions and the following disclaimer in
++      the documentation and/or other materials provided with the
++      distribution.
++    * Neither the name of Intel Corporation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++#ifndef ADF_C62X_HW_DATA_H_
++#define ADF_C62X_HW_DATA_H_
++
++/* PCIe configuration space */
++#define ADF_C62X_SRAM_BAR 0
++#define ADF_C62X_PMISC_BAR 1
++#define ADF_C62X_ETR_BAR 2
++#define ADF_C62X_RX_RINGS_OFFSET 8
++#define ADF_C62X_TX_RINGS_MASK 0xFF
++#define ADF_C62X_MAX_ACCELERATORS 5
++#define ADF_C62X_MAX_ACCELENGINES 10
++#define ADF_C62X_ACCELERATORS_REG_OFFSET 16
++#define ADF_C62X_ACCELERATORS_MASK 0x1F
++#define ADF_C62X_ACCELENGINES_MASK 0x3FF
++#define ADF_C62X_ETR_MAX_BANKS 16
++#define ADF_C62X_SMIAPF0_MASK_OFFSET (0x3A000 + 0x28)
++#define ADF_C62X_SMIAPF1_MASK_OFFSET (0x3A000 + 0x30)
++#define ADF_C62X_SMIA0_MASK 0xFFFF
++#define ADF_C62X_SMIA1_MASK 0x1
++/* Error detection and correction */
++#define ADF_C62X_AE_CTX_ENABLES(i) (i * 0x1000 + 0x20818)
++#define ADF_C62X_AE_MISC_CONTROL(i) (i * 0x1000 + 0x20960)
++#define ADF_C62X_ENABLE_AE_ECC_ERR BIT(28)
++#define ADF_C62X_ENABLE_AE_ECC_PARITY_CORR (BIT(24) | BIT(12))
++#define ADF_C62X_UERRSSMSH(i) (i * 0x4000 + 0x18)
++#define ADF_C62X_CERRSSMSH(i) (i * 0x4000 + 0x10)
++#define ADF_C62X_ERRSSMSH_EN BIT(3)
++
++#define ADF_C62X_PF2VF_OFFSET(i)	(0x3A000 + 0x280 + ((i) * 0x04))
++#define ADF_C62X_VINTMSK_OFFSET(i)	(0x3A000 + 0x200 + ((i) * 0x04))
++
++/* Firmware Binary */
++#define ADF_C62X_FW "qat_c62x.bin"
++#define ADF_C62X_MMP "qat_c62x_mmp.bin"
++
++void adf_init_hw_data_c62x(struct adf_hw_device_data *hw_data);
++void adf_clean_hw_data_c62x(struct adf_hw_device_data *hw_data);
++#endif
+diff --git a/drivers/crypto/qat/qat_c62x/adf_drv.c b/drivers/crypto/qat/qat_c62x/adf_drv.c
+new file mode 100644
+index 0000000..512c565
+--- /dev/null
++++ b/drivers/crypto/qat/qat_c62x/adf_drv.c
+@@ -0,0 +1,335 @@
++/*
++  This file is provided under a dual BSD/GPLv2 license.  When using or
++  redistributing this file, you may do so under either license.
++
++  GPL LICENSE SUMMARY
++  Copyright(c) 2014 Intel Corporation.
++  This program is free software; you can redistribute it and/or modify
++  it under the terms of version 2 of the GNU General Public License as
++  published by the Free Software Foundation.
++
++  This program is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++  General Public License for more details.
++
++  Contact Information:
++  qat-linux@intel.com
++
++  BSD LICENSE
++  Copyright(c) 2014 Intel Corporation.
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions
++  are met:
++
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above copyright
++      notice, this list of conditions and the following disclaimer in
++      the documentation and/or other materials provided with the
++      distribution.
++    * Neither the name of Intel Corporation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/pci.h>
++#include <linux/init.h>
++#include <linux/types.h>
++#include <linux/fs.h>
++#include <linux/slab.h>
++#include <linux/errno.h>
++#include <linux/device.h>
++#include <linux/dma-mapping.h>
++#include <linux/platform_device.h>
++#include <linux/workqueue.h>
++#include <linux/io.h>
++#include <adf_accel_devices.h>
++#include <adf_common_drv.h>
++#include <adf_cfg.h>
++#include "adf_c62x_hw_data.h"
++
++#define ADF_SYSTEM_DEVICE(device_id) \
++	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
++
++static const struct pci_device_id adf_pci_tbl[] = {
++	ADF_SYSTEM_DEVICE(ADF_C62X_PCI_DEVICE_ID),
++	{0,}
++};
++MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
++
++static int adf_probe(struct pci_dev *dev, const struct pci_device_id *ent);
++static void adf_remove(struct pci_dev *dev);
++
++static struct pci_driver adf_driver = {
++	.id_table = adf_pci_tbl,
++	.name = ADF_C62X_DEVICE_NAME,
++	.probe = adf_probe,
++	.remove = adf_remove,
++	.sriov_configure = adf_sriov_configure,
++};
++
++static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
++{
++	pci_release_regions(accel_dev->accel_pci_dev.pci_dev);
++	pci_disable_device(accel_dev->accel_pci_dev.pci_dev);
++}
++
++static void adf_cleanup_accel(struct adf_accel_dev *accel_dev)
++{
++	struct adf_accel_pci *accel_pci_dev = &accel_dev->accel_pci_dev;
++	int i;
++
++	for (i = 0; i < ADF_PCI_MAX_BARS; i++) {
++		struct adf_bar *bar = &accel_pci_dev->pci_bars[i];
++
++		if (bar->virt_addr)
++			pci_iounmap(accel_pci_dev->pci_dev, bar->virt_addr);
++	}
++
++	if (accel_dev->hw_device) {
++		switch (accel_pci_dev->pci_dev->device) {
++		case ADF_C62X_PCI_DEVICE_ID:
++			adf_clean_hw_data_c62x(accel_dev->hw_device);
++			break;
++		default:
++			break;
++		}
++		kfree(accel_dev->hw_device);
++		accel_dev->hw_device = NULL;
++	}
++	adf_cfg_dev_remove(accel_dev);
++	debugfs_remove(accel_dev->debugfs_dir);
++	adf_devmgr_rm_dev(accel_dev, NULL);
++}
++
++static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
++{
++	struct adf_accel_dev *accel_dev;
++	struct adf_accel_pci *accel_pci_dev;
++	struct adf_hw_device_data *hw_data;
++	char name[ADF_DEVICE_NAME_LENGTH];
++	unsigned int i, bar_nr;
++	int ret, bar_mask;
++
++	switch (ent->device) {
++	case ADF_C62X_PCI_DEVICE_ID:
++		break;
++	default:
++		dev_err(&pdev->dev, "Invalid device 0x%x.\n", ent->device);
++		return -ENODEV;
++	}
++
++	if (num_possible_nodes() > 1 && dev_to_node(&pdev->dev) < 0) {
++		/* If the accelerator is connected to a node with no memory
++		 * there is no point in using the accelerator since the remote
++		 * memory transaction will be very slow. */
++		dev_err(&pdev->dev, "Invalid NUMA configuration.\n");
++		return -EINVAL;
++	}
++
++	accel_dev = kzalloc_node(sizeof(*accel_dev), GFP_KERNEL,
++				 dev_to_node(&pdev->dev));
++	if (!accel_dev)
++		return -ENOMEM;
++
++	INIT_LIST_HEAD(&accel_dev->crypto_list);
++	accel_pci_dev = &accel_dev->accel_pci_dev;
++	accel_pci_dev->pci_dev = pdev;
++
++	/* Add accel device to accel table.
++	 * This should be called before adf_cleanup_accel is called */
++	if (adf_devmgr_add_dev(accel_dev, NULL)) {
++		dev_err(&pdev->dev, "Failed to add new accelerator device.\n");
++		kfree(accel_dev);
++		return -EFAULT;
++	}
++
++	accel_dev->owner = THIS_MODULE;
++	/* Allocate and configure device configuration structure */
++	hw_data = kzalloc_node(sizeof(*hw_data), GFP_KERNEL,
++			       dev_to_node(&pdev->dev));
++	if (!hw_data) {
++		ret = -ENOMEM;
 +		goto out_err;
 +	}
-+	if (qat_uclo_map_obj(loader_data->fw_loader, uof_addr, uof_size)) {
-+		dev_err(&GET_DEV(accel_dev), "Failed to map FW\n");
- 		goto out_err;
- 	}
- 	if (qat_uclo_wr_all_uimage(loader_data->fw_loader)) {
-diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
-index 3f76bd4..d482022 100644
---- a/drivers/crypto/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
-@@ -178,6 +178,8 @@ void qat_hal_reset(struct icp_qat_fw_loader_handle *handle);
- int qat_hal_clr_reset(struct icp_qat_fw_loader_handle *handle);
- void qat_hal_set_live_ctx(struct icp_qat_fw_loader_handle *handle,
- 			  unsigned char ae, unsigned int ctx_mask);
-+int qat_hal_check_ae_active(struct icp_qat_fw_loader_handle *handle,
-+			    unsigned int ae);
- int qat_hal_set_ae_lm_mode(struct icp_qat_fw_loader_handle *handle,
- 			   unsigned char ae, enum icp_qat_uof_regtype lm_type,
- 			   unsigned char mode);
-@@ -216,10 +218,10 @@ int qat_hal_wr_lm(struct icp_qat_fw_loader_handle *handle,
- 		  unsigned char ae, unsigned short lm_addr, unsigned int value);
- int qat_uclo_wr_all_uimage(struct icp_qat_fw_loader_handle *handle);
- void qat_uclo_del_uof_obj(struct icp_qat_fw_loader_handle *handle);
--int qat_uclo_map_uof_obj(struct icp_qat_fw_loader_handle *handle,
--			 void *addr_ptr, int mem_size);
--void qat_uclo_wr_mimage(struct icp_qat_fw_loader_handle *handle,
--			void *addr_ptr, int mem_size);
-+int qat_uclo_wr_mimage(struct icp_qat_fw_loader_handle *handle, void *addr_ptr,
-+		       int mem_size);
-+int qat_uclo_map_obj(struct icp_qat_fw_loader_handle *handle,
-+		     void *addr_ptr, int mem_size);
- #if defined(CONFIG_PCI_IOV)
- int adf_sriov_configure(struct pci_dev *pdev, int numvfs);
- void adf_disable_sriov(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_fw_loader_handle.h b/drivers/crypto/qat/qat_common/icp_qat_fw_loader_handle.h
-index 5e1aa40..2ffef3e 100644
---- a/drivers/crypto/qat/qat_common/icp_qat_fw_loader_handle.h
-+++ b/drivers/crypto/qat/qat_common/icp_qat_fw_loader_handle.h
-@@ -68,11 +68,21 @@ struct icp_qat_fw_loader_hal_handle {
- 
- struct icp_qat_fw_loader_handle {
- 	struct icp_qat_fw_loader_hal_handle *hal_handle;
-+	struct pci_dev *pci_dev;
- 	void *obj_handle;
-+	void *sobj_handle;
-+	bool fw_auth;
- 	void __iomem *hal_sram_addr_v;
- 	void __iomem *hal_cap_g_ctl_csr_addr_v;
- 	void __iomem *hal_cap_ae_xfer_csr_addr_v;
- 	void __iomem *hal_cap_ae_local_csr_addr_v;
- 	void __iomem *hal_ep_csr_addr_v;
- };
 +
-+struct icp_firml_dram_desc {
-+	void __iomem *dram_base_addr;
-+	void *dram_base_addr_v;
-+	dma_addr_t dram_bus_addr;
-+	u64 dram_size;
-+};
- #endif
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_hal.h b/drivers/crypto/qat/qat_common/icp_qat_hal.h
-index 85b6d24..7187917 100644
---- a/drivers/crypto/qat/qat_common/icp_qat_hal.h
-+++ b/drivers/crypto/qat/qat_common/icp_qat_hal.h
-@@ -81,6 +81,31 @@ enum hal_ae_csr {
- 	LOCAL_CSR_STATUS = 0x180,
- };
- 
-+enum fcu_csr {
-+	FCU_CONTROL           = 0x8c0,
-+	FCU_STATUS            = 0x8c4,
-+	FCU_STATUS1           = 0x8c8,
-+	FCU_DRAM_ADDR_LO      = 0x8cc,
-+	FCU_DRAM_ADDR_HI      = 0x8d0,
-+	FCU_RAMBASE_ADDR_HI   = 0x8d4,
-+	FCU_RAMBASE_ADDR_LO   = 0x8d8
-+};
++	accel_dev->hw_device = hw_data;
++	adf_init_hw_data_c62x(accel_dev->hw_device);
++	pci_read_config_byte(pdev, PCI_REVISION_ID, &accel_pci_dev->revid);
++	pci_read_config_dword(pdev, ADF_DEVICE_FUSECTL_OFFSET,
++			      &hw_data->fuses);
 +
-+enum fcu_cmd {
-+	FCU_CTRL_CMD_NOOP  = 0,
-+	FCU_CTRL_CMD_AUTH  = 1,
-+	FCU_CTRL_CMD_LOAD  = 2,
-+	FCU_CTRL_CMD_START = 3
-+};
-+
-+enum fcu_sts {
-+	FCU_STS_NO_STS    = 0,
-+	FCU_STS_VERI_DONE = 1,
-+	FCU_STS_LOAD_DONE = 2,
-+	FCU_STS_VERI_FAIL = 3,
-+	FCU_STS_LOAD_FAIL = 4,
-+	FCU_STS_BUSY      = 5
-+};
- #define UA_ECS                      (0x1 << 31)
- #define ACS_ABO_BITPOS              31
- #define ACS_ACNO                    0x7
-@@ -98,6 +123,13 @@ enum hal_ae_csr {
- #define LCS_STATUS          (0x1)
- #define MMC_SHARE_CS_BITPOS         2
- #define GLOBAL_CSR                0xA00
-+#define FCU_CTRL_AE_POS     0x8
-+#define FCU_AUTH_STS_MASK   0x7
-+#define FCU_STS_DONE_POS    0x9
-+#define FCU_STS_AUTHFWLD_POS 0X8
-+#define FCU_LOADED_AE_POS   0x16
-+#define FW_AUTH_WAIT_PERIOD 10
-+#define FW_AUTH_MAX_RETRY   300
- 
- #define SET_CAP_CSR(handle, csr, val) \
- 	ADF_CSR_WR(handle->hal_cap_g_ctl_csr_addr_v, csr, val)
-@@ -106,14 +138,14 @@ enum hal_ae_csr {
- #define SET_GLB_CSR(handle, csr, val) SET_CAP_CSR(handle, csr + GLOBAL_CSR, val)
- #define GET_GLB_CSR(handle, csr) GET_CAP_CSR(handle, GLOBAL_CSR + csr)
- #define AE_CSR(handle, ae) \
--	(handle->hal_cap_ae_local_csr_addr_v + \
-+	((char __iomem *)handle->hal_cap_ae_local_csr_addr_v + \
- 	((ae & handle->hal_handle->ae_mask) << 12))
- #define AE_CSR_ADDR(handle, ae, csr) (AE_CSR(handle, ae) + (0x3ff & csr))
- #define SET_AE_CSR(handle, ae, csr, val) \
- 	ADF_CSR_WR(AE_CSR_ADDR(handle, ae, csr), 0, val)
- #define GET_AE_CSR(handle, ae, csr) ADF_CSR_RD(AE_CSR_ADDR(handle, ae, csr), 0)
- #define AE_XFER(handle, ae) \
--	(handle->hal_cap_ae_xfer_csr_addr_v + \
-+	((char __iomem *)handle->hal_cap_ae_xfer_csr_addr_v + \
- 	((ae & handle->hal_handle->ae_mask) << 12))
- #define AE_XFER_ADDR(handle, ae, reg) (AE_XFER(handle, ae) + \
- 	((reg & 0xff) << 2))
-@@ -121,5 +153,4 @@ enum hal_ae_csr {
- 	ADF_CSR_WR(AE_XFER_ADDR(handle, ae, reg), 0, val)
- #define SRAM_WRITE(handle, addr, val) \
- 	ADF_CSR_WR(handle->hal_sram_addr_v, addr, val)
--#define SRAM_READ(handle, addr) ADF_CSR_RD(handle->hal_sram_addr_v, addr)
- #endif
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_uclo.h b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
-index 2132a8c..d97db99 100644
---- a/drivers/crypto/qat/qat_common/icp_qat_uclo.h
-+++ b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
-@@ -47,32 +47,55 @@
- #ifndef __ICP_QAT_UCLO_H__
- #define __ICP_QAT_UCLO_H__
- 
--#define ICP_QAT_AC_C_CPU_TYPE     0x00400000
-+#define ICP_QAT_AC_895XCC_DEV_TYPE 0x00400000
-+#define ICP_QAT_AC_C62X_DEV_TYPE   0x01000000
-+#define ICP_QAT_AC_C3XXX_DEV_TYPE  0x02000000
- #define ICP_QAT_UCLO_MAX_AE       12
- #define ICP_QAT_UCLO_MAX_CTX      8
- #define ICP_QAT_UCLO_MAX_UIMAGE   (ICP_QAT_UCLO_MAX_AE * ICP_QAT_UCLO_MAX_CTX)
- #define ICP_QAT_UCLO_MAX_USTORE   0x4000
- #define ICP_QAT_UCLO_MAX_XFER_REG 128
- #define ICP_QAT_UCLO_MAX_GPR_REG  128
--#define ICP_QAT_UCLO_MAX_NN_REG   128
- #define ICP_QAT_UCLO_MAX_LMEM_REG 1024
- #define ICP_QAT_UCLO_AE_ALL_CTX   0xff
- #define ICP_QAT_UOF_OBJID_LEN     8
- #define ICP_QAT_UOF_FID 0xc6c2
- #define ICP_QAT_UOF_MAJVER 0x4
- #define ICP_QAT_UOF_MINVER 0x11
--#define ICP_QAT_UOF_NN_MODE_NOTCARE   0xff
- #define ICP_QAT_UOF_OBJS        "UOF_OBJS"
- #define ICP_QAT_UOF_STRT        "UOF_STRT"
--#define ICP_QAT_UOF_GTID        "UOF_GTID"
- #define ICP_QAT_UOF_IMAG        "UOF_IMAG"
- #define ICP_QAT_UOF_IMEM        "UOF_IMEM"
--#define ICP_QAT_UOF_MSEG        "UOF_MSEG"
- #define ICP_QAT_UOF_LOCAL_SCOPE     1
- #define ICP_QAT_UOF_INIT_EXPR               0
- #define ICP_QAT_UOF_INIT_REG                1
- #define ICP_QAT_UOF_INIT_REG_CTX            2
- #define ICP_QAT_UOF_INIT_EXPR_ENDIAN_SWAP   3
-+#define ICP_QAT_SUOF_OBJ_ID_LEN             8
-+#define ICP_QAT_SUOF_FID  0x53554f46
-+#define ICP_QAT_SUOF_MAJVER 0x0
-+#define ICP_QAT_SUOF_MINVER 0x1
-+#define ICP_QAT_SIMG_AE_INIT_SEQ_LEN    (50 * sizeof(unsigned long long))
-+#define ICP_QAT_SIMG_AE_INSTS_LEN       (0x4000 * sizeof(unsigned long long))
-+#define ICP_QAT_CSS_FWSK_MODULUS_LEN    256
-+#define ICP_QAT_CSS_FWSK_EXPONENT_LEN   4
-+#define ICP_QAT_CSS_FWSK_PAD_LEN        252
-+#define ICP_QAT_CSS_FWSK_PUB_LEN   (ICP_QAT_CSS_FWSK_MODULUS_LEN + \
-+				    ICP_QAT_CSS_FWSK_EXPONENT_LEN + \
-+				    ICP_QAT_CSS_FWSK_PAD_LEN)
-+#define ICP_QAT_CSS_SIGNATURE_LEN   256
-+#define ICP_QAT_CSS_AE_IMG_LEN     (sizeof(struct icp_qat_simg_ae_mode) + \
-+				    ICP_QAT_SIMG_AE_INIT_SEQ_LEN +         \
-+				    ICP_QAT_SIMG_AE_INSTS_LEN)
-+#define ICP_QAT_CSS_AE_SIMG_LEN    (sizeof(struct icp_qat_css_hdr) + \
-+				    ICP_QAT_CSS_FWSK_PUB_LEN + \
-+				    ICP_QAT_CSS_SIGNATURE_LEN + \
-+				    ICP_QAT_CSS_AE_IMG_LEN)
-+#define ICP_QAT_AE_IMG_OFFSET	   (sizeof(struct icp_qat_css_hdr) + \
-+				    ICP_QAT_CSS_FWSK_MODULUS_LEN + \
-+				    ICP_QAT_CSS_FWSK_EXPONENT_LEN + \
-+				    ICP_QAT_CSS_SIGNATURE_LEN)
-+#define ICP_QAT_CSS_MAX_IMAGE_LEN   0x40000
- 
- #define ICP_QAT_CTX_MODE(ae_mode) ((ae_mode) & 0xf)
- #define ICP_QAT_NN_MODE(ae_mode) (((ae_mode) >> 0x4) & 0xf)
-@@ -112,6 +135,11 @@ enum icp_qat_uof_regtype {
- 	ICP_NEIGH_REL,
- };
- 
-+enum icp_qat_css_fwtype {
-+	CSS_AE_FIRMWARE = 0,
-+	CSS_MMP_FIRMWARE = 1
-+};
-+
- struct icp_qat_uclo_page {
- 	struct icp_qat_uclo_encap_page *encap_page;
- 	struct icp_qat_uclo_region *region;
-@@ -235,7 +263,7 @@ struct icp_qat_uof_filechunkhdr {
- };
- 
- struct icp_qat_uof_objhdr {
--	unsigned int cpu_type;
-+	unsigned int ac_dev_type;
- 	unsigned short min_cpu_ver;
- 	unsigned short max_cpu_ver;
- 	short max_chunks;
-@@ -326,7 +354,7 @@ struct icp_qat_uof_image {
- 	unsigned int img_name;
- 	unsigned int ae_assigned;
- 	unsigned int ctx_assigned;
--	unsigned int cpu_type;
-+	unsigned int ac_dev_type;
- 	unsigned int entry_address;
- 	unsigned int fill_pattern[2];
- 	unsigned int reloadable_size;
-@@ -374,4 +402,127 @@ struct icp_qat_uof_batch_init {
- 	unsigned int size;
- 	struct icp_qat_uof_batch_init *next;
- };
-+
-+struct icp_qat_suof_img_hdr {
-+	char          *simg_buf;
-+	unsigned long simg_len;
-+	char          *css_header;
-+	char          *css_key;
-+	char          *css_signature;
-+	char          *css_simg;
-+	unsigned long simg_size;
-+	unsigned int  ae_num;
-+	unsigned int  ae_mask;
-+	unsigned int  fw_type;
-+	unsigned long simg_name;
-+	unsigned long appmeta_data;
-+};
-+
-+struct icp_qat_suof_img_tbl {
-+	unsigned int num_simgs;
-+	struct icp_qat_suof_img_hdr *simg_hdr;
-+};
-+
-+struct icp_qat_suof_handle {
-+	unsigned int  file_id;
-+	unsigned int  check_sum;
-+	char          min_ver;
-+	char          maj_ver;
-+	char          fw_type;
-+	char          *suof_buf;
-+	unsigned int  suof_size;
-+	char          *sym_str;
-+	unsigned int  sym_size;
-+	struct icp_qat_suof_img_tbl img_table;
-+};
-+
-+struct icp_qat_fw_auth_desc {
-+	unsigned int   img_len;
-+	unsigned int   reserved;
-+	unsigned int   css_hdr_high;
-+	unsigned int   css_hdr_low;
-+	unsigned int   img_high;
-+	unsigned int   img_low;
-+	unsigned int   signature_high;
-+	unsigned int   signature_low;
-+	unsigned int   fwsk_pub_high;
-+	unsigned int   fwsk_pub_low;
-+	unsigned int   img_ae_mode_data_high;
-+	unsigned int   img_ae_mode_data_low;
-+	unsigned int   img_ae_init_data_high;
-+	unsigned int   img_ae_init_data_low;
-+	unsigned int   img_ae_insts_high;
-+	unsigned int   img_ae_insts_low;
-+};
-+
-+struct icp_qat_auth_chunk {
-+	struct icp_qat_fw_auth_desc fw_auth_desc;
-+	u64 chunk_size;
-+	u64 chunk_bus_addr;
-+};
-+
-+struct icp_qat_css_hdr {
-+	unsigned int module_type;
-+	unsigned int header_len;
-+	unsigned int header_ver;
-+	unsigned int module_id;
-+	unsigned int module_vendor;
-+	unsigned int date;
-+	unsigned int size;
-+	unsigned int key_size;
-+	unsigned int module_size;
-+	unsigned int exponent_size;
-+	unsigned int fw_type;
-+	unsigned int reserved[21];
-+};
-+
-+struct icp_qat_simg_ae_mode {
-+	unsigned int     file_id;
-+	unsigned short   maj_ver;
-+	unsigned short   min_ver;
-+	unsigned int     dev_type;
-+	unsigned short   devmax_ver;
-+	unsigned short   devmin_ver;
-+	unsigned int     ae_mask;
-+	unsigned int     ctx_enables;
-+	char             fw_type;
-+	char             ctx_mode;
-+	char             nn_mode;
-+	char             lm0_mode;
-+	char             lm1_mode;
-+	char             scs_mode;
-+	char             lm2_mode;
-+	char             lm3_mode;
-+	char             tindex_mode;
-+	unsigned char    reserved[7];
-+	char             simg_name[256];
-+	char             appmeta_data[256];
-+};
-+
-+struct icp_qat_suof_filehdr {
-+	unsigned int     file_id;
-+	unsigned int     check_sum;
-+	char             min_ver;
-+	char             maj_ver;
-+	char             fw_type;
-+	char             reserved;
-+	unsigned short   max_chunks;
-+	unsigned short   num_chunks;
-+};
-+
-+struct icp_qat_suof_chunk_hdr {
-+	char chunk_id[ICP_QAT_SUOF_OBJ_ID_LEN];
-+	u64 offset;
-+	u64 size;
-+};
-+
-+struct icp_qat_suof_strtable {
-+	unsigned int tab_length;
-+	unsigned int strings;
-+};
-+
-+struct icp_qat_suof_objhdr {
-+	unsigned int img_length;
-+	unsigned int reserved;
-+};
- #endif
-diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
-index 380e761..45c1739 100644
---- a/drivers/crypto/qat/qat_common/qat_hal.c
-+++ b/drivers/crypto/qat/qat_common/qat_hal.c
-@@ -45,21 +45,22 @@
-   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
- #include <linux/slab.h>
-+#include <linux/delay.h>
- 
- #include "adf_accel_devices.h"
- #include "adf_common_drv.h"
- #include "icp_qat_hal.h"
- #include "icp_qat_uclo.h"
- 
--#define BAD_REGADDR               0xffff
--#define MAX_RETRY_TIMES           10000
--#define INIT_CTX_ARB_VALUE        0x0
-+#define BAD_REGADDR	       0xffff
-+#define MAX_RETRY_TIMES	   10000
-+#define INIT_CTX_ARB_VALUE	0x0
- #define INIT_CTX_ENABLE_VALUE     0x0
--#define INIT_PC_VALUE             0x0
-+#define INIT_PC_VALUE	     0x0
- #define INIT_WAKEUP_EVENTS_VALUE  0x1
- #define INIT_SIG_EVENTS_VALUE     0x1
- #define INIT_CCENABLE_VALUE       0x2000
--#define RST_CSR_QAT_LSB           20
-+#define RST_CSR_QAT_LSB	   20
- #define RST_CSR_AE_LSB		  0
- #define MC_TIMESTAMP_ENABLE       (0x1 << 7)
- 
-@@ -391,9 +392,6 @@ static int qat_hal_check_ae_alive(struct icp_qat_fw_loader_handle *handle)
- 	unsigned int times = MAX_RETRY_TIMES;
- 
- 	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
--		if (!(handle->hal_handle->ae_mask & (1 << ae)))
--			continue;
--
- 		qat_hal_rd_ae_csr(handle, ae, PROFILE_COUNT,
- 				  (unsigned int *)&base_cnt);
- 		base_cnt &= 0xffff;
-@@ -413,6 +411,20 @@ static int qat_hal_check_ae_alive(struct icp_qat_fw_loader_handle *handle)
- 	return 0;
- }
- 
-+int qat_hal_check_ae_active(struct icp_qat_fw_loader_handle *handle,
-+			    unsigned int ae)
-+{
-+	unsigned int enable = 0, active = 0;
-+
-+	qat_hal_rd_ae_csr(handle, ae, CTX_ENABLES, &enable);
-+	qat_hal_rd_ae_csr(handle, ae, ACTIVE_CTX_STATUS, &active);
-+	if ((enable & (0xff >> CE_ENABLE_BITPOS)) ||
-+	    (active & (1 << ACS_ABO_BITPOS)))
-+		return 1;
-+	else
-+		return 0;
-+}
-+
- static void qat_hal_reset_timestamp(struct icp_qat_fw_loader_handle *handle)
- {
- 	unsigned int misc_ctl;
-@@ -425,8 +437,6 @@ static void qat_hal_reset_timestamp(struct icp_qat_fw_loader_handle *handle)
- 			    (~MC_TIMESTAMP_ENABLE));
- 
- 	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
--		if (!(handle->hal_handle->ae_mask & (1 << ae)))
--			continue;
- 		qat_hal_wr_ae_csr(handle, ae, TIMESTAMP_LOW, 0);
- 		qat_hal_wr_ae_csr(handle, ae, TIMESTAMP_HIGH, 0);
- 	}
-@@ -440,8 +450,9 @@ static void qat_hal_reset_timestamp(struct icp_qat_fw_loader_handle *handle)
- #define ESRAM_AUTO_INIT_CSR_OFFSET 0xC1C
- static int qat_hal_init_esram(struct icp_qat_fw_loader_handle *handle)
- {
--	void __iomem *csr_addr = handle->hal_ep_csr_addr_v +
--				 ESRAM_AUTO_INIT_CSR_OFFSET;
-+	void __iomem *csr_addr =
-+			(void __iomem *)((uintptr_t)handle->hal_ep_csr_addr_v +
-+			ESRAM_AUTO_INIT_CSR_OFFSET);
- 	unsigned int csr_val, times = 30;
- 
- 	csr_val = ADF_CSR_RD(csr_addr, 0);
-@@ -493,8 +504,6 @@ int qat_hal_clr_reset(struct icp_qat_fw_loader_handle *handle)
- 
- 	/* Set undefined power-up/reset states to reasonable default values */
- 	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
--		if (!(handle->hal_handle->ae_mask & (1 << ae)))
--			continue;
- 		qat_hal_wr_ae_csr(handle, ae, CTX_ENABLES,
- 				  INIT_CTX_ENABLE_VALUE);
- 		qat_hal_wr_indr_csr(handle, ae, ICP_QAT_UCLO_AE_ALL_CTX,
-@@ -598,25 +607,31 @@ static void qat_hal_enable_ctx(struct icp_qat_fw_loader_handle *handle,
- 	qat_hal_wr_ae_csr(handle, ae, CTX_ENABLES, ctx);
- }
- 
--static int qat_hal_clear_gpr(struct icp_qat_fw_loader_handle *handle)
-+static void qat_hal_clear_xfer(struct icp_qat_fw_loader_handle *handle)
- {
- 	unsigned char ae;
--	unsigned int ctx_mask = ICP_QAT_UCLO_AE_ALL_CTX;
--	int times = MAX_RETRY_TIMES;
--	unsigned int csr_val = 0;
- 	unsigned short reg;
--	unsigned int savctx = 0;
--	int ret = 0;
- 
- 	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
--		if (!(handle->hal_handle->ae_mask & (1 << ae)))
--			continue;
- 		for (reg = 0; reg < ICP_QAT_UCLO_MAX_GPR_REG; reg++) {
- 			qat_hal_init_rd_xfer(handle, ae, 0, ICP_SR_RD_ABS,
- 					     reg, 0);
- 			qat_hal_init_rd_xfer(handle, ae, 0, ICP_DR_RD_ABS,
- 					     reg, 0);
- 		}
-+	}
-+}
-+
-+static int qat_hal_clear_gpr(struct icp_qat_fw_loader_handle *handle)
-+{
-+	unsigned char ae;
-+	unsigned int ctx_mask = ICP_QAT_UCLO_AE_ALL_CTX;
-+	int times = MAX_RETRY_TIMES;
-+	unsigned int csr_val = 0;
-+	unsigned int savctx = 0;
-+	int ret = 0;
-+
-+	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
- 		qat_hal_rd_ae_csr(handle, ae, AE_MISC_CONTROL, &csr_val);
- 		csr_val &= ~(1 << MMC_SHARE_CS_BITPOS);
- 		qat_hal_wr_ae_csr(handle, ae, AE_MISC_CONTROL, csr_val);
-@@ -638,8 +653,6 @@ static int qat_hal_clear_gpr(struct icp_qat_fw_loader_handle *handle)
- 		qat_hal_enable_ctx(handle, ae, ctx_mask);
- 	}
- 	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
--		if (!(handle->hal_handle->ae_mask & (1 << ae)))
--			continue;
- 		/* wait for AE to finish */
- 		do {
- 			ret = qat_hal_wait_cycles(handle, ae, 20, 1);
-@@ -667,10 +680,10 @@ static int qat_hal_clear_gpr(struct icp_qat_fw_loader_handle *handle)
- 	return 0;
- }
- 
--#define ICP_DH895XCC_AE_OFFSET      0x20000
--#define ICP_DH895XCC_CAP_OFFSET     (ICP_DH895XCC_AE_OFFSET + 0x10000)
-+#define ICP_QAT_AE_OFFSET	0x20000
-+#define ICP_QAT_CAP_OFFSET       (ICP_QAT_AE_OFFSET + 0x10000)
- #define LOCAL_TO_XFER_REG_OFFSET    0x800
--#define ICP_DH895XCC_EP_OFFSET      0x3a000
-+#define ICP_QAT_EP_OFFSET	0x3a000
- int qat_hal_init(struct adf_accel_dev *accel_dev)
- {
- 	unsigned char ae;
-@@ -687,15 +700,22 @@ int qat_hal_init(struct adf_accel_dev *accel_dev)
- 	if (!handle)
- 		return -ENOMEM;
- 
--	handle->hal_cap_g_ctl_csr_addr_v = misc_bar->virt_addr +
--						ICP_DH895XCC_CAP_OFFSET;
--	handle->hal_cap_ae_xfer_csr_addr_v = misc_bar->virt_addr +
--						ICP_DH895XCC_AE_OFFSET;
--	handle->hal_ep_csr_addr_v = misc_bar->virt_addr +
--				    ICP_DH895XCC_EP_OFFSET;
--	handle->hal_cap_ae_local_csr_addr_v =
--		handle->hal_cap_ae_xfer_csr_addr_v + LOCAL_TO_XFER_REG_OFFSET;
- 	handle->hal_sram_addr_v = sram_bar->virt_addr;
-+	handle->hal_cap_g_ctl_csr_addr_v =
-+		(void __iomem *)((uintptr_t)misc_bar->virt_addr +
-+				 ICP_QAT_CAP_OFFSET);
-+	handle->hal_cap_ae_xfer_csr_addr_v =
-+		(void __iomem *)((uintptr_t)misc_bar->virt_addr +
-+				 ICP_QAT_AE_OFFSET);
-+	handle->hal_ep_csr_addr_v =
-+		(void __iomem *)((uintptr_t)misc_bar->virt_addr +
-+				 ICP_QAT_EP_OFFSET);
-+	handle->hal_cap_ae_local_csr_addr_v =
-+		(void __iomem *)((uintptr_t)handle->hal_cap_ae_xfer_csr_addr_v +
-+				 LOCAL_TO_XFER_REG_OFFSET);
-+	handle->pci_dev = pci_info->pci_dev;
-+	handle->fw_auth = (handle->pci_dev->device ==
-+			   ADF_DH895XCC_PCI_DEVICE_ID) ? false : true;
- 	handle->hal_handle = kzalloc(sizeof(*handle->hal_handle), GFP_KERNEL);
- 	if (!handle->hal_handle)
- 		goto out_hal_handle;
-@@ -723,14 +743,16 @@ int qat_hal_init(struct adf_accel_dev *accel_dev)
- 		dev_err(&GET_DEV(accel_dev), "qat_hal_clr_reset error\n");
- 		goto out_err;
- 	}
--	if (qat_hal_clear_gpr(handle))
--		goto out_err;
-+	qat_hal_clear_xfer(handle);
-+	if (!handle->fw_auth) {
-+		if (qat_hal_clear_gpr(handle))
-+			goto out_err;
++	/* Get Accelerators and Accelerators Engines masks */
++	hw_data->accel_mask = hw_data->get_accel_mask(hw_data->fuses);
++	hw_data->ae_mask = hw_data->get_ae_mask(hw_data->fuses);
++	accel_pci_dev->sku = hw_data->get_sku(hw_data);
++	/* If the device has no acceleration engines then ignore it. */
++	if (!hw_data->accel_mask || !hw_data->ae_mask ||
++	    ((~hw_data->ae_mask) & 0x01)) {
++		dev_err(&pdev->dev, "No acceleration units found");
++		ret = -EFAULT;
++		goto out_err;
 +	}
 +
- 	/* Set SIGNATURE_ENABLE[0] to 0x1 in order to enable ALU_OUT csr */
- 	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
- 		unsigned int csr_val = 0;
- 
--		if (!(hw_data->ae_mask & (1 << ae)))
--			continue;
- 		qat_hal_rd_ae_csr(handle, ae, SIGNATURE_ENABLE, &csr_val);
- 		csr_val |= 0x1;
- 		qat_hal_wr_ae_csr(handle, ae, SIGNATURE_ENABLE, csr_val);
-@@ -756,15 +778,31 @@ void qat_hal_deinit(struct icp_qat_fw_loader_handle *handle)
- void qat_hal_start(struct icp_qat_fw_loader_handle *handle, unsigned char ae,
- 		   unsigned int ctx_mask)
- {
--	qat_hal_put_wakeup_event(handle, ae, (~ctx_mask) &
-+	int retry = 0;
-+	unsigned int fcu_sts = 0;
++	/* Create dev top level debugfs entry */
++	snprintf(name, sizeof(name), "%s%s_%02x:%02d.%02d",
++		 ADF_DEVICE_NAME_PREFIX, hw_data->dev_class->name,
++		 pdev->bus->number, PCI_SLOT(pdev->devfn),
++		 PCI_FUNC(pdev->devfn));
 +
-+	if (handle->fw_auth) {
-+		SET_CAP_CSR(handle, FCU_CONTROL, FCU_CTRL_CMD_START);
-+		do {
-+			msleep(FW_AUTH_WAIT_PERIOD);
-+			fcu_sts = GET_CAP_CSR(handle, FCU_STATUS);
-+			if (((fcu_sts >> FCU_STS_DONE_POS) & 0x1))
-+				return;
-+		} while (retry++ < FW_AUTH_MAX_RETRY);
-+		pr_err("QAT: start error (AE 0x%x FCU_STS = 0x%x)\n", ae,
-+		       fcu_sts);
-+	} else {
-+		qat_hal_put_wakeup_event(handle, ae, (~ctx_mask) &
- 				 ICP_QAT_UCLO_AE_ALL_CTX, 0x10000);
--	qat_hal_enable_ctx(handle, ae, ctx_mask);
-+		qat_hal_enable_ctx(handle, ae, ctx_mask);
++	accel_dev->debugfs_dir = debugfs_create_dir(name, NULL);
++	if (!accel_dev->debugfs_dir) {
++		dev_err(&pdev->dev, "Could not create debugfs dir %s\n", name);
++		ret = -EINVAL;
++		goto out_err;
 +	}
- }
- 
- void qat_hal_stop(struct icp_qat_fw_loader_handle *handle, unsigned char ae,
- 		  unsigned int ctx_mask)
- {
--	qat_hal_disable_ctx(handle, ae, ctx_mask);
-+	if (!handle->fw_auth)
-+		qat_hal_disable_ctx(handle, ae, ctx_mask);
- }
- 
- void qat_hal_set_pc(struct icp_qat_fw_loader_handle *handle,
-diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
-index c48f181..25d15f1 100644
---- a/drivers/crypto/qat/qat_common/qat_uclo.c
-+++ b/drivers/crypto/qat/qat_common/qat_uclo.c
-@@ -47,7 +47,7 @@
- #include <linux/slab.h>
- #include <linux/ctype.h>
- #include <linux/kernel.h>
--
-+#include <linux/delay.h>
- #include "adf_accel_devices.h"
- #include "adf_common_drv.h"
- #include "icp_qat_uclo.h"
-@@ -119,10 +119,10 @@ static char *qat_uclo_get_string(struct icp_qat_uof_strtable *str_table,
- {
- 	if ((!str_table->table_len) || (str_offset > str_table->table_len))
- 		return NULL;
--	return (char *)(((unsigned long)(str_table->strings)) + str_offset);
-+	return (char *)(((uintptr_t)(str_table->strings)) + str_offset);
- }
- 
--static int qat_uclo_check_format(struct icp_qat_uof_filehdr *hdr)
-+static int qat_uclo_check_uof_format(struct icp_qat_uof_filehdr *hdr)
- {
- 	int maj = hdr->maj_ver & 0xff;
- 	int min = hdr->min_ver & 0xff;
-@@ -139,6 +139,31 @@ static int qat_uclo_check_format(struct icp_qat_uof_filehdr *hdr)
- 	return 0;
- }
- 
-+static int qat_uclo_check_suof_format(struct icp_qat_suof_filehdr *suof_hdr)
-+{
-+	int maj = suof_hdr->maj_ver & 0xff;
-+	int min = suof_hdr->min_ver & 0xff;
 +
-+	if (suof_hdr->file_id != ICP_QAT_SUOF_FID) {
-+		pr_err("QAT: invalid header 0x%x\n", suof_hdr->file_id);
-+		return -EINVAL;
-+	}
-+	if (suof_hdr->fw_type != 0) {
-+		pr_err("QAT: unsupported firmware type\n");
-+		return -EINVAL;
-+	}
-+	if (suof_hdr->num_chunks <= 0x1) {
-+		pr_err("QAT: SUOF chunk amount is incorrect\n");
-+		return -EINVAL;
-+	}
-+	if (maj != ICP_QAT_SUOF_MAJVER || min != ICP_QAT_SUOF_MINVER) {
-+		pr_err("QAT: bad SUOF version, major 0x%x, minor 0x%x\n",
-+		       maj, min);
-+		return -EINVAL;
-+	}
-+	return 0;
-+}
-+
- static void qat_uclo_wr_sram_by_words(struct icp_qat_fw_loader_handle *handle,
- 				      unsigned int addr, unsigned int *val,
- 				      unsigned int num_in_bytes)
-@@ -275,7 +300,7 @@ static int qat_uclo_create_batch_init_list(struct icp_qat_fw_loader_handle
- 	unsigned int i, flag = 0;
- 
- 	mem_val_attr =
--		(struct icp_qat_uof_memvar_attr *)((unsigned long)init_mem +
-+		(struct icp_qat_uof_memvar_attr *)((uintptr_t)init_mem +
- 		sizeof(struct icp_qat_uof_initmem));
- 
- 	init_header = *init_tab_base;
-@@ -425,8 +450,8 @@ static int qat_uclo_init_memory(struct icp_qat_fw_loader_handle *handle)
- 			if (qat_uclo_init_ae_memory(handle, initmem))
- 				return -EINVAL;
- 		}
--		initmem = (struct icp_qat_uof_initmem *)((unsigned long)(
--			(unsigned long)initmem +
-+		initmem = (struct icp_qat_uof_initmem *)((uintptr_t)(
-+			(uintptr_t)initmem +
- 			sizeof(struct icp_qat_uof_initmem)) +
- 			(sizeof(struct icp_qat_uof_memvar_attr) *
- 			initmem->val_attr_num));
-@@ -454,7 +479,7 @@ static void *qat_uclo_find_chunk(struct icp_qat_uof_objhdr *obj_hdr,
- 	int i;
- 	struct icp_qat_uof_chunkhdr *chunk_hdr =
- 	    (struct icp_qat_uof_chunkhdr *)
--	    ((unsigned long)obj_hdr + sizeof(struct icp_qat_uof_objhdr));
-+	    ((uintptr_t)obj_hdr + sizeof(struct icp_qat_uof_objhdr));
- 
- 	for (i = 0; i < obj_hdr->num_chunks; i++) {
- 		if ((cur < (void *)&chunk_hdr[i]) &&
-@@ -596,7 +621,7 @@ static void qat_uclo_map_image_page(struct icp_qat_uof_encap_obj
- 	page->uwblock = (struct icp_qat_uclo_encap_uwblock *)uwblock;
- 	for (i = 0; i < uword_block_tab->entry_num; i++)
- 		page->uwblock[i].micro_words =
--		(unsigned long)encap_uof_obj->beg_uof + uwblock[i].uword_offset;
-+		(uintptr_t)encap_uof_obj->beg_uof + uwblock[i].uword_offset;
- }
- 
- static int qat_uclo_map_uimage(struct icp_qat_uclo_objhandle *obj_handle,
-@@ -697,7 +722,7 @@ qat_uclo_map_str_table(struct icp_qat_uclo_objhdr *obj_hdr,
- 		memcpy(&str_table->table_len, obj_hdr->file_buff +
- 		       chunk_hdr->offset, sizeof(str_table->table_len));
- 		hdr_size = (char *)&str_table->strings - (char *)str_table;
--		str_table->strings = (unsigned long)obj_hdr->file_buff +
-+		str_table->strings = (uintptr_t)obj_hdr->file_buff +
- 					chunk_hdr->offset + hdr_size;
- 		return str_table;
- 	}
-@@ -721,13 +746,31 @@ qat_uclo_map_initmem_table(struct icp_qat_uof_encap_obj *encap_uof_obj,
- 	}
- }
- 
-+static unsigned int
-+qat_uclo_get_dev_type(struct icp_qat_fw_loader_handle *handle)
-+{
-+	switch (handle->pci_dev->device) {
-+	case ADF_DH895XCC_PCI_DEVICE_ID:
-+		return ICP_QAT_AC_895XCC_DEV_TYPE;
-+	case ADF_C62X_PCI_DEVICE_ID:
-+		return ICP_QAT_AC_C62X_DEV_TYPE;
-+	case ADF_C3XXX_PCI_DEVICE_ID:
-+		return ICP_QAT_AC_C3XXX_DEV_TYPE;
-+	default:
-+		pr_err("QAT: unsupported device 0x%x\n",
-+		       handle->pci_dev->device);
-+		return 0;
-+	}
-+}
-+
- static int qat_uclo_check_uof_compat(struct icp_qat_uclo_objhandle *obj_handle)
- {
- 	unsigned int maj_ver, prod_type = obj_handle->prod_type;
- 
--	if (!(prod_type & obj_handle->encap_uof_obj.obj_hdr->cpu_type)) {
--		pr_err("QAT: UOF type 0x%x not match with cur platform 0x%x\n",
--		       obj_handle->encap_uof_obj.obj_hdr->cpu_type, prod_type);
-+	if (!(prod_type & obj_handle->encap_uof_obj.obj_hdr->ac_dev_type)) {
-+		pr_err("QAT: UOF type 0x%x doesn't match with platform 0x%x\n",
-+		       obj_handle->encap_uof_obj.obj_hdr->ac_dev_type,
-+		       prod_type);
- 		return -EINVAL;
- 	}
- 	maj_ver = obj_handle->prod_rev & 0xff;
-@@ -932,7 +975,7 @@ static int qat_uclo_parse_uof_obj(struct icp_qat_fw_loader_handle *handle)
- 	obj_handle->encap_uof_obj.obj_hdr = (struct icp_qat_uof_objhdr *)
- 					     obj_handle->obj_hdr->file_buff;
- 	obj_handle->uword_in_bytes = 6;
--	obj_handle->prod_type = ICP_QAT_AC_C_CPU_TYPE;
-+	obj_handle->prod_type = qat_uclo_get_dev_type(handle);
- 	obj_handle->prod_rev = PID_MAJOR_REV |
- 			(PID_MINOR_REV & handle->hal_handle->revision_id);
- 	if (qat_uclo_check_uof_compat(obj_handle)) {
-@@ -969,23 +1012,435 @@ out_err:
- 	return -EFAULT;
- }
- 
--void qat_uclo_wr_mimage(struct icp_qat_fw_loader_handle *handle,
--			void *addr_ptr, int mem_size)
-+static int qat_uclo_map_suof_file_hdr(struct icp_qat_fw_loader_handle *handle,
-+				      struct icp_qat_suof_filehdr *suof_ptr,
-+				      int suof_size)
- {
--	qat_uclo_wr_sram_by_words(handle, 0, addr_ptr, ALIGN(mem_size, 4));
-+	unsigned int check_sum = 0;
-+	unsigned int min_ver_offset = 0;
-+	struct icp_qat_suof_handle *suof_handle = handle->sobj_handle;
-+
-+	suof_handle->file_id = ICP_QAT_SUOF_FID;
-+	suof_handle->suof_buf = (char *)suof_ptr;
-+	suof_handle->suof_size = suof_size;
-+	min_ver_offset = suof_size - offsetof(struct icp_qat_suof_filehdr,
-+					      min_ver);
-+	check_sum = qat_uclo_calc_str_checksum((char *)&suof_ptr->min_ver,
-+					       min_ver_offset);
-+	if (check_sum != suof_ptr->check_sum) {
-+		pr_err("QAT: incorrect SUOF checksum\n");
-+		return -EINVAL;
-+	}
-+	suof_handle->check_sum = suof_ptr->check_sum;
-+	suof_handle->min_ver = suof_ptr->min_ver;
-+	suof_handle->maj_ver = suof_ptr->maj_ver;
-+	suof_handle->fw_type = suof_ptr->fw_type;
-+	return 0;
- }
- 
--int qat_uclo_map_uof_obj(struct icp_qat_fw_loader_handle *handle,
--			 void *addr_ptr, int mem_size)
-+static void qat_uclo_map_simg(struct icp_qat_suof_handle *suof_handle,
-+			      struct icp_qat_suof_img_hdr *suof_img_hdr,
-+			      struct icp_qat_suof_chunk_hdr *suof_chunk_hdr)
- {
--	struct icp_qat_uof_filehdr *filehdr;
--	struct icp_qat_uclo_objhandle *objhdl;
-+	struct icp_qat_simg_ae_mode *ae_mode;
-+	struct icp_qat_suof_objhdr *suof_objhdr;
-+
-+	suof_img_hdr->simg_buf  = (suof_handle->suof_buf +
-+				   suof_chunk_hdr->offset +
-+				   sizeof(*suof_objhdr));
-+	suof_img_hdr->simg_len = ((struct icp_qat_suof_objhdr *)(uintptr_t)
-+				  (suof_handle->suof_buf +
-+				   suof_chunk_hdr->offset))->img_length;
-+
-+	suof_img_hdr->css_header = suof_img_hdr->simg_buf;
-+	suof_img_hdr->css_key = (suof_img_hdr->css_header +
-+				 sizeof(struct icp_qat_css_hdr));
-+	suof_img_hdr->css_signature = suof_img_hdr->css_key +
-+				      ICP_QAT_CSS_FWSK_MODULUS_LEN +
-+				      ICP_QAT_CSS_FWSK_EXPONENT_LEN;
-+	suof_img_hdr->css_simg = suof_img_hdr->css_signature +
-+				 ICP_QAT_CSS_SIGNATURE_LEN;
-+
-+	ae_mode = (struct icp_qat_simg_ae_mode *)(suof_img_hdr->css_simg);
-+	suof_img_hdr->ae_mask = ae_mode->ae_mask;
-+	suof_img_hdr->simg_name = (unsigned long)&ae_mode->simg_name;
-+	suof_img_hdr->appmeta_data = (unsigned long)&ae_mode->appmeta_data;
-+	suof_img_hdr->fw_type = ae_mode->fw_type;
-+}
- 
--	BUILD_BUG_ON(ICP_QAT_UCLO_MAX_AE >=
--		     (sizeof(handle->hal_handle->ae_mask) * 8));
-+static void
-+qat_uclo_map_suof_symobjs(struct icp_qat_suof_handle *suof_handle,
-+			  struct icp_qat_suof_chunk_hdr *suof_chunk_hdr)
-+{
-+	char **sym_str = (char **)&suof_handle->sym_str;
-+	unsigned int *sym_size = &suof_handle->sym_size;
-+	struct icp_qat_suof_strtable *str_table_obj;
-+
-+	*sym_size = *(unsigned int *)(uintptr_t)
-+		   (suof_chunk_hdr->offset + suof_handle->suof_buf);
-+	*sym_str = (char *)(uintptr_t)
-+		   (suof_handle->suof_buf + suof_chunk_hdr->offset +
-+		   sizeof(str_table_obj->tab_length));
-+}
- 
--	if (!handle || !addr_ptr || mem_size < 24)
-+static int qat_uclo_check_simg_compat(struct icp_qat_fw_loader_handle *handle,
-+				      struct icp_qat_suof_img_hdr *img_hdr)
-+{
-+	struct icp_qat_simg_ae_mode *img_ae_mode = NULL;
-+	unsigned int prod_rev, maj_ver, prod_type;
-+
-+	prod_type = qat_uclo_get_dev_type(handle);
-+	img_ae_mode = (struct icp_qat_simg_ae_mode *)img_hdr->css_simg;
-+	prod_rev = PID_MAJOR_REV |
-+			 (PID_MINOR_REV & handle->hal_handle->revision_id);
-+	if (img_ae_mode->dev_type != prod_type) {
-+		pr_err("QAT: incompatible product type %x\n",
-+		       img_ae_mode->dev_type);
- 		return -EINVAL;
-+	}
-+	maj_ver = prod_rev & 0xff;
-+	if ((maj_ver > img_ae_mode->devmax_ver) ||
-+	    (maj_ver < img_ae_mode->devmin_ver)) {
-+		pr_err("QAT: incompatible device majver 0x%x\n", maj_ver);
-+		return -EINVAL;
-+	}
-+	return 0;
-+}
-+
-+static void qat_uclo_del_suof(struct icp_qat_fw_loader_handle *handle)
-+{
-+	struct icp_qat_suof_handle *sobj_handle = handle->sobj_handle;
-+
-+	kfree(sobj_handle->img_table.simg_hdr);
-+	sobj_handle->img_table.simg_hdr = NULL;
-+	kfree(handle->sobj_handle);
-+	handle->sobj_handle = NULL;
-+}
-+
-+static void qat_uclo_tail_img(struct icp_qat_suof_img_hdr *suof_img_hdr,
-+			      unsigned int img_id, unsigned int num_simgs)
-+{
-+	struct icp_qat_suof_img_hdr img_header;
-+
-+	if (img_id != num_simgs - 1) {
-+		memcpy(&img_header, &suof_img_hdr[num_simgs - 1],
-+		       sizeof(*suof_img_hdr));
-+		memcpy(&suof_img_hdr[num_simgs - 1], &suof_img_hdr[img_id],
-+		       sizeof(*suof_img_hdr));
-+		memcpy(&suof_img_hdr[img_id], &img_header,
-+		       sizeof(*suof_img_hdr));
-+	}
-+}
-+
-+static int qat_uclo_map_suof(struct icp_qat_fw_loader_handle *handle,
-+			     struct icp_qat_suof_filehdr *suof_ptr,
-+			     int suof_size)
-+{
-+	struct icp_qat_suof_handle *suof_handle = handle->sobj_handle;
-+	struct icp_qat_suof_chunk_hdr *suof_chunk_hdr = NULL;
-+	struct icp_qat_suof_img_hdr *suof_img_hdr = NULL;
-+	int ret = 0, ae0_img = ICP_QAT_UCLO_MAX_AE;
-+	unsigned int i = 0;
-+	struct icp_qat_suof_img_hdr img_header;
-+
-+	if (!suof_ptr || (suof_size == 0)) {
-+		pr_err("QAT: input parameter SUOF pointer/size is NULL\n");
-+		return -EINVAL;
-+	}
-+	if (qat_uclo_check_suof_format(suof_ptr))
-+		return -EINVAL;
-+	ret = qat_uclo_map_suof_file_hdr(handle, suof_ptr, suof_size);
++	/* Create device configuration table */
++	ret = adf_cfg_dev_add(accel_dev);
 +	if (ret)
-+		return ret;
-+	suof_chunk_hdr = (struct icp_qat_suof_chunk_hdr *)
-+			 ((uintptr_t)suof_ptr + sizeof(*suof_ptr));
++		goto out_err;
 +
-+	qat_uclo_map_suof_symobjs(suof_handle, suof_chunk_hdr);
-+	suof_handle->img_table.num_simgs = suof_ptr->num_chunks - 1;
-+
-+	if (suof_handle->img_table.num_simgs != 0) {
-+		suof_img_hdr = kzalloc(suof_handle->img_table.num_simgs *
-+				       sizeof(img_header), GFP_KERNEL);
-+		if (!suof_img_hdr)
-+			return -ENOMEM;
-+		suof_handle->img_table.simg_hdr = suof_img_hdr;
++	/* enable PCI device */
++	if (pci_enable_device(pdev)) {
++		ret = -EFAULT;
++		goto out_err;
 +	}
 +
-+	for (i = 0; i < suof_handle->img_table.num_simgs; i++) {
-+		qat_uclo_map_simg(handle->sobj_handle, &suof_img_hdr[i],
-+				  &suof_chunk_hdr[1 + i]);
-+		ret = qat_uclo_check_simg_compat(handle,
-+						 &suof_img_hdr[i]);
-+		if (ret)
-+			return ret;
-+		if ((suof_img_hdr[i].ae_mask & 0x1) != 0)
-+			ae0_img = i;
-+	}
-+	qat_uclo_tail_img(suof_img_hdr, ae0_img,
-+			  suof_handle->img_table.num_simgs);
-+	return 0;
-+}
++	/* set dma identifier */
++	if (pci_set_dma_mask(pdev, DMA_BIT_MASK(64))) {
++		if ((pci_set_dma_mask(pdev, DMA_BIT_MASK(32)))) {
++			dev_err(&pdev->dev, "No usable DMA configuration\n");
++			ret = -EFAULT;
++			goto out_err_disable;
++		} else {
++			pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(32));
++		}
 +
-+#define ADD_ADDR(high, low)  ((((uint64_t)high) << 32) + low)
-+#define BITS_IN_DWORD 32
-+
-+static int qat_uclo_auth_fw(struct icp_qat_fw_loader_handle *handle,
-+			    struct icp_qat_fw_auth_desc *desc)
-+{
-+	unsigned int fcu_sts, retry = 0;
-+	u64 bus_addr;
-+
-+	bus_addr = ADD_ADDR(desc->css_hdr_high, desc->css_hdr_low)
-+			   - sizeof(struct icp_qat_auth_chunk);
-+	SET_CAP_CSR(handle, FCU_DRAM_ADDR_HI, (bus_addr >> BITS_IN_DWORD));
-+	SET_CAP_CSR(handle, FCU_DRAM_ADDR_LO, bus_addr);
-+	SET_CAP_CSR(handle, FCU_CONTROL, FCU_CTRL_CMD_AUTH);
-+
-+	do {
-+		msleep(FW_AUTH_WAIT_PERIOD);
-+		fcu_sts = GET_CAP_CSR(handle, FCU_STATUS);
-+		if ((fcu_sts & FCU_AUTH_STS_MASK) == FCU_STS_VERI_FAIL)
-+			goto auth_fail;
-+		if (((fcu_sts >> FCU_STS_AUTHFWLD_POS) & 0x1))
-+			if ((fcu_sts & FCU_AUTH_STS_MASK) == FCU_STS_VERI_DONE)
-+				return 0;
-+	} while (retry++ < FW_AUTH_MAX_RETRY);
-+auth_fail:
-+	pr_err("QAT: authentication error (FCU_STATUS = 0x%x),retry = %d\n",
-+	       fcu_sts & FCU_AUTH_STS_MASK, retry);
-+	return -EINVAL;
-+}
-+
-+static int qat_uclo_simg_alloc(struct icp_qat_fw_loader_handle *handle,
-+			       struct icp_firml_dram_desc *dram_desc,
-+			       unsigned int size)
-+{
-+	void *vptr;
-+	dma_addr_t ptr;
-+
-+	vptr = dma_alloc_coherent(&handle->pci_dev->dev,
-+				  size, &ptr, GFP_KERNEL);
-+	if (!vptr)
-+		return -ENOMEM;
-+	dram_desc->dram_base_addr_v = vptr;
-+	dram_desc->dram_bus_addr = ptr;
-+	dram_desc->dram_size = size;
-+	return 0;
-+}
-+
-+static void qat_uclo_simg_free(struct icp_qat_fw_loader_handle *handle,
-+			       struct icp_firml_dram_desc *dram_desc)
-+{
-+	dma_free_coherent(&handle->pci_dev->dev,
-+			  (size_t)(dram_desc->dram_size),
-+			  (dram_desc->dram_base_addr_v),
-+			  dram_desc->dram_bus_addr);
-+	memset(dram_desc, 0, sizeof(*dram_desc));
-+}
-+
-+static void qat_uclo_ummap_auth_fw(struct icp_qat_fw_loader_handle *handle,
-+				   struct icp_qat_fw_auth_desc **desc)
-+{
-+	struct icp_firml_dram_desc dram_desc;
-+
-+	dram_desc.dram_base_addr_v = *desc;
-+	dram_desc.dram_bus_addr = ((struct icp_qat_auth_chunk *)
-+				   (*desc))->chunk_bus_addr;
-+	dram_desc.dram_size = ((struct icp_qat_auth_chunk *)
-+			       (*desc))->chunk_size;
-+	qat_uclo_simg_free(handle, &dram_desc);
-+}
-+
-+static int qat_uclo_map_auth_fw(struct icp_qat_fw_loader_handle *handle,
-+				char *image, unsigned int size,
-+				struct icp_qat_fw_auth_desc **desc)
-+{
-+	struct icp_qat_css_hdr *css_hdr = (struct icp_qat_css_hdr *)image;
-+	struct icp_qat_fw_auth_desc *auth_desc;
-+	struct icp_qat_auth_chunk *auth_chunk;
-+	u64 virt_addr,  bus_addr, virt_base;
-+	unsigned int length, simg_offset = sizeof(*auth_chunk);
-+	struct icp_firml_dram_desc img_desc;
-+
-+	if (size > (ICP_QAT_AE_IMG_OFFSET + ICP_QAT_CSS_MAX_IMAGE_LEN)) {
-+		pr_err("QAT: error, input image size overflow %d\n", size);
-+		return -EINVAL;
-+	}
-+	length = (css_hdr->fw_type == CSS_AE_FIRMWARE) ?
-+		 ICP_QAT_CSS_AE_SIMG_LEN + simg_offset :
-+		 size + ICP_QAT_CSS_FWSK_PAD_LEN + simg_offset;
-+	if (qat_uclo_simg_alloc(handle, &img_desc, length)) {
-+		pr_err("QAT: error, allocate continuous dram fail\n");
-+		return -ENOMEM;
-+	}
-+
-+	auth_chunk = img_desc.dram_base_addr_v;
-+	auth_chunk->chunk_size = img_desc.dram_size;
-+	auth_chunk->chunk_bus_addr = img_desc.dram_bus_addr;
-+	virt_base = (uintptr_t)img_desc.dram_base_addr_v + simg_offset;
-+	bus_addr  = img_desc.dram_bus_addr + simg_offset;
-+	auth_desc = img_desc.dram_base_addr_v;
-+	auth_desc->css_hdr_high = (unsigned int)(bus_addr >> BITS_IN_DWORD);
-+	auth_desc->css_hdr_low = (unsigned int)bus_addr;
-+	virt_addr = virt_base;
-+
-+	memcpy((void *)(uintptr_t)virt_addr, image, sizeof(*css_hdr));
-+	/* pub key */
-+	bus_addr = ADD_ADDR(auth_desc->css_hdr_high, auth_desc->css_hdr_low) +
-+			   sizeof(*css_hdr);
-+	virt_addr = virt_addr + sizeof(*css_hdr);
-+
-+	auth_desc->fwsk_pub_high = (unsigned int)(bus_addr >> BITS_IN_DWORD);
-+	auth_desc->fwsk_pub_low = (unsigned int)bus_addr;
-+
-+	memcpy((void *)(uintptr_t)virt_addr,
-+	       (void *)(image + sizeof(*css_hdr)),
-+	       ICP_QAT_CSS_FWSK_MODULUS_LEN);
-+	/* padding */
-+	memset((void *)(uintptr_t)(virt_addr + ICP_QAT_CSS_FWSK_MODULUS_LEN),
-+	       0, ICP_QAT_CSS_FWSK_PAD_LEN);
-+
-+	/* exponent */
-+	memcpy((void *)(uintptr_t)(virt_addr + ICP_QAT_CSS_FWSK_MODULUS_LEN +
-+	       ICP_QAT_CSS_FWSK_PAD_LEN),
-+	       (void *)(image + sizeof(*css_hdr) +
-+			ICP_QAT_CSS_FWSK_MODULUS_LEN),
-+	       sizeof(unsigned int));
-+
-+	/* signature */
-+	bus_addr = ADD_ADDR(auth_desc->fwsk_pub_high,
-+			    auth_desc->fwsk_pub_low) +
-+		   ICP_QAT_CSS_FWSK_PUB_LEN;
-+	virt_addr = virt_addr + ICP_QAT_CSS_FWSK_PUB_LEN;
-+	auth_desc->signature_high = (unsigned int)(bus_addr >> BITS_IN_DWORD);
-+	auth_desc->signature_low = (unsigned int)bus_addr;
-+
-+	memcpy((void *)(uintptr_t)virt_addr,
-+	       (void *)(image + sizeof(*css_hdr) +
-+	       ICP_QAT_CSS_FWSK_MODULUS_LEN +
-+	       ICP_QAT_CSS_FWSK_EXPONENT_LEN),
-+	       ICP_QAT_CSS_SIGNATURE_LEN);
-+
-+	bus_addr = ADD_ADDR(auth_desc->signature_high,
-+			    auth_desc->signature_low) +
-+		   ICP_QAT_CSS_SIGNATURE_LEN;
-+	virt_addr += ICP_QAT_CSS_SIGNATURE_LEN;
-+
-+	auth_desc->img_high = (unsigned int)(bus_addr >> BITS_IN_DWORD);
-+	auth_desc->img_low = (unsigned int)bus_addr;
-+	auth_desc->img_len = size - ICP_QAT_AE_IMG_OFFSET;
-+	memcpy((void *)(uintptr_t)virt_addr,
-+	       (void *)(image + ICP_QAT_AE_IMG_OFFSET),
-+	       auth_desc->img_len);
-+	virt_addr = virt_base;
-+	/* AE firmware */
-+	if (((struct icp_qat_css_hdr *)(uintptr_t)virt_addr)->fw_type ==
-+	    CSS_AE_FIRMWARE) {
-+		auth_desc->img_ae_mode_data_high = auth_desc->img_high;
-+		auth_desc->img_ae_mode_data_low = auth_desc->img_low;
-+		bus_addr = ADD_ADDR(auth_desc->img_ae_mode_data_high,
-+				    auth_desc->img_ae_mode_data_low) +
-+			   sizeof(struct icp_qat_simg_ae_mode);
-+
-+		auth_desc->img_ae_init_data_high = (unsigned int)
-+						 (bus_addr >> BITS_IN_DWORD);
-+		auth_desc->img_ae_init_data_low = (unsigned int)bus_addr;
-+		bus_addr += ICP_QAT_SIMG_AE_INIT_SEQ_LEN;
-+		auth_desc->img_ae_insts_high = (unsigned int)
-+					     (bus_addr >> BITS_IN_DWORD);
-+		auth_desc->img_ae_insts_low = (unsigned int)bus_addr;
 +	} else {
-+		auth_desc->img_ae_insts_high = auth_desc->img_high;
-+		auth_desc->img_ae_insts_low = auth_desc->img_low;
++		pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
 +	}
-+	*desc = auth_desc;
-+	return 0;
-+}
 +
-+static int qat_uclo_load_fw(struct icp_qat_fw_loader_handle *handle,
-+			    struct icp_qat_fw_auth_desc *desc)
-+{
-+	unsigned int i;
-+	unsigned int fcu_sts;
-+	struct icp_qat_simg_ae_mode *virt_addr;
-+	unsigned int fcu_loaded_ae_pos = FCU_LOADED_AE_POS;
++	if (pci_request_regions(pdev, ADF_C62X_DEVICE_NAME)) {
++		ret = -EFAULT;
++		goto out_err_disable;
++	}
 +
-+	virt_addr = (void *)((uintptr_t)desc +
-+		     sizeof(struct icp_qat_auth_chunk) +
-+		     sizeof(struct icp_qat_css_hdr) +
-+		     ICP_QAT_CSS_FWSK_PUB_LEN +
-+		     ICP_QAT_CSS_SIGNATURE_LEN);
-+	for (i = 0; i < handle->hal_handle->ae_max_num; i++) {
-+		int retry = 0;
++	/* Read accelerator capabilities mask */
++	pci_read_config_dword(pdev, ADF_DEVICE_LEGFUSE_OFFSET,
++			      &hw_data->accel_capabilities_mask);
 +
-+		if (!((virt_addr->ae_mask >> i) & 0x1))
-+			continue;
-+		if (qat_hal_check_ae_active(handle, i)) {
-+			pr_err("QAT: AE %d is active\n", i);
-+			return -EINVAL;
-+		}
-+		SET_CAP_CSR(handle, FCU_CONTROL,
-+			    (FCU_CTRL_CMD_LOAD | (i << FCU_CTRL_AE_POS)));
++	/* Find and map all the device's BARS */
++	i = 0;
++	bar_mask = pci_select_bars(pdev, IORESOURCE_MEM);
++	for_each_set_bit(bar_nr, (const unsigned long *)&bar_mask,
++			 ADF_PCI_MAX_BARS * 2) {
++		struct adf_bar *bar = &accel_pci_dev->pci_bars[i++];
 +
-+		do {
-+			msleep(FW_AUTH_WAIT_PERIOD);
-+			fcu_sts = GET_CAP_CSR(handle, FCU_STATUS);
-+			if (((fcu_sts & FCU_AUTH_STS_MASK) ==
-+			    FCU_STS_LOAD_DONE) &&
-+			    ((fcu_sts >> fcu_loaded_ae_pos) & (1 << i)))
-+				break;
-+		} while (retry++ < FW_AUTH_MAX_RETRY);
-+		if (retry > FW_AUTH_MAX_RETRY) {
-+			pr_err("QAT: firmware load failed timeout %x\n", retry);
-+			return -EINVAL;
++		bar->base_addr = pci_resource_start(pdev, bar_nr);
++		if (!bar->base_addr)
++			break;
++		bar->size = pci_resource_len(pdev, bar_nr);
++		bar->virt_addr = pci_iomap(accel_pci_dev->pci_dev, bar_nr, 0);
++		if (!bar->virt_addr) {
++			dev_err(&pdev->dev, "Failed to map BAR %d\n", bar_nr);
++			ret = -EFAULT;
++			goto out_err_free_reg;
 +		}
 +	}
-+	return 0;
++	pci_set_master(pdev);
++
++	if (adf_enable_aer(accel_dev, &adf_driver)) {
++		dev_err(&pdev->dev, "Failed to enable aer\n");
++		ret = -EFAULT;
++		goto out_err_free_reg;
++	}
++
++	if (pci_save_state(pdev)) {
++		dev_err(&pdev->dev, "Failed to save pci state\n");
++		ret = -ENOMEM;
++		goto out_err_free_reg;
++	}
++
++	ret = qat_crypto_dev_config(accel_dev);
++	if (ret)
++		goto out_err_free_reg;
++
++	ret = adf_dev_init(accel_dev);
++	if (ret)
++		goto out_err_dev_shutdown;
++
++	ret = adf_dev_start(accel_dev);
++	if (ret)
++		goto out_err_dev_stop;
++
++	return ret;
++
++out_err_dev_stop:
++	adf_dev_stop(accel_dev);
++out_err_dev_shutdown:
++	adf_dev_shutdown(accel_dev);
++out_err_free_reg:
++	pci_release_regions(accel_pci_dev->pci_dev);
++out_err_disable:
++	pci_disable_device(accel_pci_dev->pci_dev);
++out_err:
++	adf_cleanup_accel(accel_dev);
++	kfree(accel_dev);
++	return ret;
 +}
 +
-+static int qat_uclo_map_suof_obj(struct icp_qat_fw_loader_handle *handle,
-+				 void *addr_ptr, int mem_size)
++static void adf_remove(struct pci_dev *pdev)
 +{
-+	struct icp_qat_suof_handle *suof_handle;
++	struct adf_accel_dev *accel_dev = adf_devmgr_pci_to_accel_dev(pdev);
 +
-+	suof_handle = kzalloc(sizeof(*suof_handle), GFP_KERNEL);
-+	if (!suof_handle)
-+		return -ENOMEM;
-+	handle->sobj_handle = suof_handle;
-+	if (qat_uclo_map_suof(handle, addr_ptr, mem_size)) {
-+		qat_uclo_del_suof(handle);
-+		pr_err("QAT: map SUOF failed\n");
-+		return -EINVAL;
++	if (!accel_dev) {
++		pr_err("QAT: Driver removal failed\n");
++		return;
++	}
++	if (adf_dev_stop(accel_dev))
++		dev_err(&GET_DEV(accel_dev), "Failed to stop QAT accel dev\n");
++
++	adf_dev_shutdown(accel_dev);
++	adf_disable_aer(accel_dev);
++	adf_cleanup_accel(accel_dev);
++	adf_cleanup_pci_dev(accel_dev);
++	kfree(accel_dev);
++}
++
++static int __init adfdrv_init(void)
++{
++	request_module("intel_qat");
++
++	if (pci_register_driver(&adf_driver)) {
++		pr_err("QAT: Driver initialization failed\n");
++		return -EFAULT;
 +	}
 +	return 0;
 +}
 +
-+int qat_uclo_wr_mimage(struct icp_qat_fw_loader_handle *handle,
-+		       void *addr_ptr, int mem_size)
++static void __exit adfdrv_release(void)
 +{
-+	struct icp_qat_fw_auth_desc *desc = NULL;
-+	int status = 0;
-+
-+	if (handle->fw_auth) {
-+		if (!qat_uclo_map_auth_fw(handle, addr_ptr, mem_size, &desc))
-+			status = qat_uclo_auth_fw(handle, desc);
-+		qat_uclo_ummap_auth_fw(handle, &desc);
-+	} else {
-+		if (handle->pci_dev->device == ADF_C3XXX_PCI_DEVICE_ID) {
-+			pr_err("QAT: C3XXX doesn't support unsigned MMP\n");
-+			return -EINVAL;
-+		}
-+		qat_uclo_wr_sram_by_words(handle, 0, addr_ptr, mem_size);
-+	}
-+	return status;
++	pci_unregister_driver(&adf_driver);
 +}
 +
-+static int qat_uclo_map_uof_obj(struct icp_qat_fw_loader_handle *handle,
-+				void *addr_ptr, int mem_size)
-+{
-+	struct icp_qat_uof_filehdr *filehdr;
-+	struct icp_qat_uclo_objhandle *objhdl;
++module_init(adfdrv_init);
++module_exit(adfdrv_release);
 +
- 	objhdl = kzalloc(sizeof(*objhdl), GFP_KERNEL);
- 	if (!objhdl)
- 		return -ENOMEM;
-@@ -993,7 +1448,7 @@ int qat_uclo_map_uof_obj(struct icp_qat_fw_loader_handle *handle,
- 	if (!objhdl->obj_buf)
- 		goto out_objbuf_err;
- 	filehdr = (struct icp_qat_uof_filehdr *)objhdl->obj_buf;
--	if (qat_uclo_check_format(filehdr))
-+	if (qat_uclo_check_uof_format(filehdr))
- 		goto out_objhdr_err;
- 	objhdl->obj_hdr = qat_uclo_map_chunk((char *)objhdl->obj_buf, filehdr,
- 					     ICP_QAT_UOF_OBJS);
-@@ -1016,11 +1471,27 @@ out_objbuf_err:
- 	return -ENOMEM;
- }
++MODULE_LICENSE("Dual BSD/GPL");
++MODULE_AUTHOR("Intel");
++MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
++MODULE_VERSION(ADF_DRV_VERSION);
+diff --git a/drivers/crypto/qat/qat_common/adf_cfg_common.h b/drivers/crypto/qat/qat_common/adf_cfg_common.h
+index 39884c9..5aae6b9 100644
+--- a/drivers/crypto/qat/qat_common/adf_cfg_common.h
++++ b/drivers/crypto/qat/qat_common/adf_cfg_common.h
+@@ -72,6 +72,7 @@ enum adf_device_type {
+ 	DEV_UNKNOWN = 0,
+ 	DEV_DH895XCC,
+ 	DEV_DH895XCCVF,
++	DEV_C62X,
+ 	DEV_C3XXX
+ };
  
-+int qat_uclo_map_obj(struct icp_qat_fw_loader_handle *handle,
-+		     void *addr_ptr, int mem_size)
-+{
-+	BUILD_BUG_ON(ICP_QAT_UCLO_MAX_AE >=
-+		     (sizeof(handle->hal_handle->ae_mask) * 8));
-+
-+	if (!handle || !addr_ptr || mem_size < 24)
-+		return -EINVAL;
-+
-+	return (handle->fw_auth) ?
-+			qat_uclo_map_suof_obj(handle, addr_ptr, mem_size) :
-+			qat_uclo_map_uof_obj(handle, addr_ptr, mem_size);
-+}
-+
- void qat_uclo_del_uof_obj(struct icp_qat_fw_loader_handle *handle)
- {
- 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
- 	unsigned int a;
- 
-+	if (handle->sobj_handle)
-+		qat_uclo_del_suof(handle);
- 	if (!obj_handle)
- 		return;
- 
-@@ -1055,7 +1526,7 @@ static void qat_uclo_fill_uwords(struct icp_qat_uclo_objhandle *obj_handle,
- 		    encap_page->uwblock[i].words_num - 1) {
- 			raddr -= encap_page->uwblock[i].start_addr;
- 			raddr *= obj_handle->uword_in_bytes;
--			memcpy(&uwrd, (void *)(((unsigned long)
-+			memcpy(&uwrd, (void *)(((uintptr_t)
- 			       encap_page->uwblock[i].micro_words) + raddr),
- 			       obj_handle->uword_in_bytes);
- 			uwrd = uwrd & 0xbffffffffffull;
-@@ -1147,7 +1618,33 @@ static void qat_uclo_wr_uimage_page(struct icp_qat_fw_loader_handle *handle,
- 	}
- }
- 
--int qat_uclo_wr_all_uimage(struct icp_qat_fw_loader_handle *handle)
-+static int qat_uclo_wr_suof_img(struct icp_qat_fw_loader_handle *handle)
-+{
-+	unsigned int i;
-+	struct icp_qat_fw_auth_desc *desc = NULL;
-+	struct icp_qat_suof_handle *sobj_handle = handle->sobj_handle;
-+	struct icp_qat_suof_img_hdr *simg_hdr = sobj_handle->img_table.simg_hdr;
-+
-+	for (i = 0; i < sobj_handle->img_table.num_simgs; i++) {
-+		if (qat_uclo_map_auth_fw(handle,
-+					 (char *)simg_hdr[i].simg_buf,
-+					 (unsigned int)
-+					 (simg_hdr[i].simg_len),
-+					 &desc))
-+			goto wr_err;
-+		if (qat_uclo_auth_fw(handle, desc))
-+			goto wr_err;
-+		if (qat_uclo_load_fw(handle, desc))
-+			goto wr_err;
-+		qat_uclo_ummap_auth_fw(handle, &desc);
-+	}
-+	return 0;
-+wr_err:
-+	qat_uclo_ummap_auth_fw(handle, &desc);
-+	return -EINVAL;
-+}
-+
-+static int qat_uclo_wr_uof_img(struct icp_qat_fw_loader_handle *handle)
- {
- 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
- 	unsigned int i;
-@@ -1164,3 +1661,9 @@ int qat_uclo_wr_all_uimage(struct icp_qat_fw_loader_handle *handle)
- 	}
- 	return 0;
- }
-+
-+int qat_uclo_wr_all_uimage(struct icp_qat_fw_loader_handle *handle)
-+{
-+	return (handle->fw_auth) ? qat_uclo_wr_suof_img(handle) :
-+				   qat_uclo_wr_uof_img(handle);
-+}
