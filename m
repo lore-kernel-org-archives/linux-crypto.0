@@ -1,226 +1,69 @@
-From: Andrew Zaborowski <andrew.zaborowski@intel.com>
-Subject: [PATCH v7 3/4] crypto: akcipher: add akcipher declarations needed by templates.
-Date: Sat,  5 Dec 2015 17:09:33 +0100
-Message-ID: <1449331774-22692-1-git-send-email-andrew.zaborowski@intel.com>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:33494 "EHLO
-	mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753472AbbLEQJ4 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 5 Dec 2015 11:09:56 -0500
-Received: by wmec201 with SMTP id c201so112578533wme.0
-        for <linux-crypto@vger.kernel.org>; Sat, 05 Dec 2015 08:09:55 -0800 (PST)
-Received: from localhost.localdomain (242.Red-2-136-114.dynamicIP.rima-tde.net. [2.136.114.242])
-        by smtp.gmail.com with ESMTPSA id a76sm8325657wma.19.2015.12.05.08.09.53
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Sat, 05 Dec 2015 08:09:54 -0800 (PST)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH 1/2] blkcipher: Copy iv from desc even for 0-len walks
+Date: Sun,  6 Dec 2015 02:51:37 +0100
+Message-ID: <1449366698-2422-1-git-send-email-Jason@zx2c4.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Netdev <netdev@vger.kernel.org>, martin@strongswan.org
+Return-path: <netdev-owner@vger.kernel.org>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add a struct akcipher_instance and struct akcipher_spawn similar to
-how AEAD declares them and the macros for converting to/from
-crypto_instance/crypto_spawn.  Also add register functions to
-avoid exposing crypto_akcipher_type.
+Some ciphers actually support encrypting zero length plaintexts. For
+example, many AEAD modes support this. The resulting ciphertext for
+those winds up being only the authentication tag, which is a result of
+the key, the iv, the additional data, and the fact that the plaintext
+had zero length. The blkcipher constructors won't copy the IV to the
+right place, however, when using a zero length input, resulting in
+some significant problems when ciphers call their initialization
+routines, only to find that the ->iv parameter is uninitialized. One
+such example of this would be using chacha20poly1305 with a zero length
+input, which then calls chacha20, which calls the key setup routine,
+which eventually OOPSes due to the uninitialized ->iv member.
 
-Signed-off-by: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Cc: <stable@vger.kernel.org>
 ---
-v2: no changes since v1
-v3: drop the new crypto_akcipher_type methods and
-    add struct akcipher_instance
-v4: avoid exposing crypto_akcipher_type after all, add struct akcipher_spawn
-    and utilities
-v5: add akcipher_instance.free
-v6: only support akcipher_instance.free, not crypto_template.free,
-    add further akcipher.h macros
-v7: remove duplicate crypto_spawn_akcipher added in v6
----
- crypto/akcipher.c                  | 34 ++++++++++++++++-
- include/crypto/internal/akcipher.h | 78 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 111 insertions(+), 1 deletion(-)
+ crypto/ablkcipher.c | 2 +-
+ crypto/blkcipher.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index 120ec04..def301e 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -21,6 +21,7 @@
- #include <linux/cryptouser.h>
- #include <net/netlink.h>
- #include <crypto/akcipher.h>
-+#include <crypto/internal/akcipher.h>
- #include "internal.h"
+diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
+index b4ffc5b..e5b5721 100644
+--- a/crypto/ablkcipher.c
++++ b/crypto/ablkcipher.c
+@@ -277,12 +277,12 @@ static int ablkcipher_walk_first(struct ablkcipher_request *req,
+ 	if (WARN_ON_ONCE(in_irq()))
+ 		return -EDEADLK;
  
- #ifdef CONFIG_NET
-@@ -75,9 +76,17 @@ static int crypto_akcipher_init_tfm(struct crypto_tfm *tfm)
- 	return 0;
- }
++	walk->iv = req->info;
+ 	walk->nbytes = walk->total;
+ 	if (unlikely(!walk->total))
+ 		return 0;
  
-+static void crypto_akcipher_free_instance(struct crypto_instance *inst)
-+{
-+	struct akcipher_instance *akcipher = akcipher_instance(inst);
-+
-+	akcipher->free(akcipher);
-+}
-+
- static const struct crypto_type crypto_akcipher_type = {
- 	.extsize = crypto_alg_extsize,
- 	.init_tfm = crypto_akcipher_init_tfm,
-+	.free = crypto_akcipher_free_instance,
- #ifdef CONFIG_PROC_FS
- 	.show = crypto_akcipher_show,
- #endif
-@@ -88,6 +97,14 @@ static const struct crypto_type crypto_akcipher_type = {
- 	.tfmsize = offsetof(struct crypto_akcipher, base),
- };
+ 	walk->iv_buffer = NULL;
+-	walk->iv = req->info;
+ 	if (unlikely(((unsigned long)walk->iv & alignmask))) {
+ 		int err = ablkcipher_copy_iv(walk, tfm, alignmask);
  
-+int crypto_grab_akcipher(struct crypto_akcipher_spawn *spawn, const char *name,
-+			 u32 type, u32 mask)
-+{
-+	spawn->base.frontend = &crypto_akcipher_type;
-+	return crypto_grab_spawn(&spawn->base, name, type, mask);
-+}
-+EXPORT_SYMBOL_GPL(crypto_grab_akcipher);
-+
- struct crypto_akcipher *crypto_alloc_akcipher(const char *alg_name, u32 type,
- 					      u32 mask)
- {
-@@ -95,13 +112,20 @@ struct crypto_akcipher *crypto_alloc_akcipher(const char *alg_name, u32 type,
- }
- EXPORT_SYMBOL_GPL(crypto_alloc_akcipher);
+diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
+index 11b9814..8cc1622 100644
+--- a/crypto/blkcipher.c
++++ b/crypto/blkcipher.c
+@@ -326,12 +326,12 @@ static int blkcipher_walk_first(struct blkcipher_desc *desc,
+ 	if (WARN_ON_ONCE(in_irq()))
+ 		return -EDEADLK;
  
--int crypto_register_akcipher(struct akcipher_alg *alg)
-+static void akcipher_prepare_alg(struct akcipher_alg *alg)
- {
- 	struct crypto_alg *base = &alg->base;
++	walk->iv = desc->info;
+ 	walk->nbytes = walk->total;
+ 	if (unlikely(!walk->total))
+ 		return 0;
  
- 	base->cra_type = &crypto_akcipher_type;
- 	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
- 	base->cra_flags |= CRYPTO_ALG_TYPE_AKCIPHER;
-+}
-+
-+int crypto_register_akcipher(struct akcipher_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
-+
-+	akcipher_prepare_alg(alg);
- 	return crypto_register_alg(base);
- }
- EXPORT_SYMBOL_GPL(crypto_register_akcipher);
-@@ -112,5 +136,13 @@ void crypto_unregister_akcipher(struct akcipher_alg *alg)
- }
- EXPORT_SYMBOL_GPL(crypto_unregister_akcipher);
- 
-+int akcipher_register_instance(struct crypto_template *tmpl,
-+			       struct akcipher_instance *inst)
-+{
-+	akcipher_prepare_alg(&inst->alg);
-+	return crypto_register_instance(tmpl, akcipher_crypto_instance(inst));
-+}
-+EXPORT_SYMBOL_GPL(akcipher_register_instance);
-+
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Generic public key cipher type");
-diff --git a/include/crypto/internal/akcipher.h b/include/crypto/internal/akcipher.h
-index 9a2bda1..479a007 100644
---- a/include/crypto/internal/akcipher.h
-+++ b/include/crypto/internal/akcipher.h
-@@ -13,6 +13,22 @@
- #ifndef _CRYPTO_AKCIPHER_INT_H
- #define _CRYPTO_AKCIPHER_INT_H
- #include <crypto/akcipher.h>
-+#include <crypto/algapi.h>
-+
-+struct akcipher_instance {
-+	void (*free)(struct akcipher_instance *inst);
-+	union {
-+		struct {
-+			char head[offsetof(struct akcipher_alg, base)];
-+			struct crypto_instance base;
-+		} s;
-+		struct akcipher_alg alg;
-+	};
-+};
-+
-+struct crypto_akcipher_spawn {
-+	struct crypto_spawn base;
-+};
- 
- /*
-  * Transform internal helpers.
-@@ -38,6 +54,56 @@ static inline const char *akcipher_alg_name(struct crypto_akcipher *tfm)
- 	return crypto_akcipher_tfm(tfm)->__crt_alg->cra_name;
- }
- 
-+static inline struct crypto_instance *akcipher_crypto_instance(
-+		struct akcipher_instance *inst)
-+{
-+	return container_of(&inst->alg.base, struct crypto_instance, alg);
-+}
-+
-+static inline struct akcipher_instance *akcipher_instance(
-+		struct crypto_instance *inst)
-+{
-+	return container_of(&inst->alg, struct akcipher_instance, alg.base);
-+}
-+
-+static inline struct akcipher_instance *akcipher_alg_instance(
-+		struct crypto_akcipher *akcipher)
-+{
-+	return akcipher_instance(crypto_tfm_alg_instance(&akcipher->base));
-+}
-+
-+static inline void *akcipher_instance_ctx(struct akcipher_instance *inst)
-+{
-+	return crypto_instance_ctx(akcipher_crypto_instance(inst));
-+}
-+
-+static inline void crypto_set_akcipher_spawn(
-+		struct crypto_akcipher_spawn *spawn,
-+		struct crypto_instance *inst)
-+{
-+	crypto_set_spawn(&spawn->base, inst);
-+}
-+
-+int crypto_grab_akcipher(struct crypto_akcipher_spawn *spawn, const char *name,
-+		u32 type, u32 mask);
-+
-+static inline struct crypto_akcipher *crypto_spawn_akcipher(
-+		struct crypto_akcipher_spawn *spawn)
-+{
-+	return crypto_spawn_tfm2(&spawn->base);
-+}
-+
-+static inline void crypto_drop_akcipher(struct crypto_akcipher_spawn *spawn)
-+{
-+	crypto_drop_spawn(&spawn->base);
-+}
-+
-+static inline struct akcipher_alg *crypto_spawn_akcipher_alg(
-+		struct crypto_akcipher_spawn *spawn)
-+{
-+	return container_of(spawn->base.alg, struct akcipher_alg, base);
-+}
-+
- /**
-  * crypto_register_akcipher() -- Register public key algorithm
-  *
-@@ -57,4 +123,16 @@ int crypto_register_akcipher(struct akcipher_alg *alg);
-  * @alg:	algorithm definition
-  */
- void crypto_unregister_akcipher(struct akcipher_alg *alg);
-+
-+/**
-+ * akcipher_register_instance() -- Unregister public key template instance
-+ *
-+ * Function registers an implementation of an asymmetric key algorithm
-+ * created from a template
-+ *
-+ * @tmpl:	the template from which the algorithm was created
-+ * @inst:	the template instance
-+ */
-+int akcipher_register_instance(struct crypto_template *tmpl,
-+		struct akcipher_instance *inst);
- #endif
+ 	walk->buffer = NULL;
+-	walk->iv = desc->info;
+ 	if (unlikely(((unsigned long)walk->iv & walk->alignmask))) {
+ 		int err = blkcipher_copy_iv(walk);
+ 		if (err)
 -- 
-2.1.4
+2.6.3
