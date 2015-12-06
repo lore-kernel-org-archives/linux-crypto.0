@@ -1,64 +1,91 @@
-From: Haren Myneni <haren@linux.vnet.ibm.com>
-Subject: crypto/nx842: Ignore queue overflow informative error
-Date: Sat, 05 Dec 2015 23:46:44 -0800
-Message-ID: <1449388004.2096.12.camel@hbabu-laptop>
+From: Daniel Axtens <dja@axtens.net>
+Subject: Re: crypto/nx842: Ignore queue overflow informative error
+Date: Mon, 07 Dec 2015 09:57:14 +1100
+Message-ID: <87bna36v91.fsf@gamma.ozlabs.ibm.com>
+References: <1449388004.2096.12.camel@hbabu-laptop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: hbabu@us.ibm.com
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+To: Haren Myneni <haren@linux.vnet.ibm.com>,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
 	ddstreet@ieee.org, mpe@ellerman.id.au, pair@us.ibm.com,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linuxppc-dev@lists.ozlabs.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e31.co.us.ibm.com ([32.97.110.149]:52077 "EHLO
-	e31.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751446AbbLFHqw (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 6 Dec 2015 02:46:52 -0500
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <haren@linux.vnet.ibm.com>;
-	Sun, 6 Dec 2015 00:46:52 -0700
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1449388004.2096.12.camel@hbabu-laptop>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-NX842 coprocessor sets bit 3 if queue is overflow. It is just for
-information to the user. So the driver prints this informative message
-and ignores it.
-    
-Signed-off-by: Haren Myneni <haren@us.ibm.com>
+Haren Myneni <haren@linux.vnet.ibm.com> writes:
 
-diff --git a/arch/powerpc/include/asm/icswx.h b/arch/powerpc/include/asm/icswx.h
-index 9f8402b..d1a2a2d 100644
---- a/arch/powerpc/include/asm/icswx.h
-+++ b/arch/powerpc/include/asm/icswx.h
-@@ -164,6 +164,7 @@ struct coprocessor_request_block {
- #define ICSWX_INITIATED		(0x8)
- #define ICSWX_BUSY		(0x4)
- #define ICSWX_REJECTED		(0x2)
-+#define ICSWX_BIT3		(0x1)	/* undefined or set from XERSO. */
- 
- static inline int icswx(__be32 ccw, struct coprocessor_request_block *crb)
- {
-diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
-index 9ef51fa..321b8e8 100644
---- a/drivers/crypto/nx/nx-842-powernv.c
-+++ b/drivers/crypto/nx/nx-842-powernv.c
-@@ -442,6 +442,15 @@ static int nx842_powernv_function(const unsigned char *in, unsigned int inlen,
- 			     (unsigned int)ccw,
- 			     (unsigned int)be32_to_cpu(crb->ccw));
- 
-+	/*
-+	 * NX842 coprocessor uses 3rd bit to report queue overflow which is
-+	 * not an error, just for information to user. So, ignore this bit.
-+	 */
-+	if (ret & ICSWX_BIT3) {
-+		pr_info_ratelimited("842 coprocessor queue overflow\n");
-+		ret &= ~ICSWX_BIT3;
-+	}
-+
- 	switch (ret) {
- 	case ICSWX_INITIATED:
- 		ret = wait_for_csb(wmem, csb);
+> NX842 coprocessor sets bit 3 if queue is overflow. It is just for
+> information to the user. So the driver prints this informative message
+> and ignores it.
+
+What queue, and what happens when the queue overflows? It seems like
+*something* would need to be done, somewhere, by someone?
+
+I realise that as a piece of IBM hardware this is probably an incredibly
+optimistic question, but is this behaviour documented publically anywhere?
+(As a distant second best, is it documented internally anywhere that I
+can read?)
+
+> --- a/drivers/crypto/nx/nx-842-powernv.c
+> +++ b/drivers/crypto/nx/nx-842-powernv.c
+> @@ -442,6 +442,15 @@ static int nx842_powernv_function(const unsigned cha=
+r *in, unsigned int inlen,
+>  			     (unsigned int)ccw,
+>  			     (unsigned int)be32_to_cpu(crb->ccw));
+>=20=20
+> +	/*
+> +	 * NX842 coprocessor uses 3rd bit to report queue overflow which is
+> +	 * not an error, just for information to user. So, ignore this bit.
+> +	 */
+> +	if (ret & ICSWX_BIT3) {
+> +		pr_info_ratelimited("842 coprocessor queue overflow\n");
+It doesn't look like this is done anywhere else in the file, but should
+this be prefixed with something? Something like "nx-842: Coprocessor
+queue overflow"?
+
+Regards,
+Daniel
+
+> +		ret &=3D ~ICSWX_BIT3;
+> +	}
+> +
+>  	switch (ret) {
+>  	case ICSWX_INITIATED:
+>  		ret =3D wait_for_csb(wmem, csb);
+>
+>
+> _______________________________________________
+> Linuxppc-dev mailing list
+> Linuxppc-dev@lists.ozlabs.org
+> https://lists.ozlabs.org/listinfo/linuxppc-dev
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: GPGTools - https://gpgtools.org
+
+iQIcBAEBCgAGBQJWZL1KAAoJEPC3R3P2I92F4sgQAJsF4q1l/tqt8V9ck5rZnjfZ
+yLWbpa/N0IfSpzxsbmXz5kApiQnnkq5A8GLK89nvP23CIrGJEIny1LGJdM7FunDu
+OEk+KW5pflVVSybWIAajgpH6zn8gX/c9miiQH8qxbEqDDhg19mWjEfyjDs9riAny
+8evdLJnD9Tq7TuUSZgLGr/Hlb7pnNF9u4/pX09FEBvcy3enna0lcymKXiirHFS/h
+waJDBs7/LGXd9eTiDqvvz75lcBfufk8F6XAq8WxOp4AtbnFB+UP/cTjEuIXry+Pc
+6+PAj4JIlYHQBtzGsBPzP1HSKz98d8SpjrfRqKzTezrR/Pqp+g3BEAilDuJLuuB1
+EMlLL/DTixpHqkjcs045N/QGVSmcNuNTrLAHvfeAWKNC9u3xSyKcS3ci9dUH/q/q
+ZkTHmk6QjBy1K5VMGVj9hZNRY3XnZe2JaXOX8bRkFodX6J6jeOmn9M6z483Zh9kb
+ZP+bjZNFApPHJV5doZuInsnJfXImGIhiCp17yS69E/C99TusQgW/nNFEyLVTXc1i
+6SszCiicWp+Iov9DJcAZ+3hnAX6Xc+nkIk0LwPnMB5oQaB+stv13sYvgFHtmpRqu
+UY4RzUB+NDeiQaVZuV3feAbnAz17uJMeswE8S8ruq+RjDnb5XODUIkTny5RcoSii
+pyl7G4JsSvSZnPo/TnMV
+=eGI3
+-----END PGP SIGNATURE-----
+--=-=-=--
