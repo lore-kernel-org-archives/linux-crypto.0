@@ -1,67 +1,64 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH 2/2] chacha20poly1305: Skip encryption/decryption for 0-len
-Date: Sun,  6 Dec 2015 02:51:38 +0100
-Message-ID: <1449366698-2422-2-git-send-email-Jason@zx2c4.com>
-References: <1449366698-2422-1-git-send-email-Jason@zx2c4.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org
+From: Haren Myneni <haren@linux.vnet.ibm.com>
+Subject: crypto/nx842: Ignore queue overflow informative error
+Date: Sat, 05 Dec 2015 23:46:44 -0800
+Message-ID: <1449388004.2096.12.camel@hbabu-laptop>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: hbabu@us.ibm.com
 To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	ddstreet@ieee.org, mpe@ellerman.id.au, pair@us.ibm.com,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Netdev <netdev@vger.kernel.org>, martin@strongswan.org
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <1449366698-2422-1-git-send-email-Jason@zx2c4.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	linuxppc-dev@lists.ozlabs.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e31.co.us.ibm.com ([32.97.110.149]:52077 "EHLO
+	e31.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751446AbbLFHqw (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 6 Dec 2015 02:46:52 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <haren@linux.vnet.ibm.com>;
+	Sun, 6 Dec 2015 00:46:52 -0700
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-If the length of the plaintext is zero, there's no need to waste cycles
-on encryption and decryption. Using the chacha20poly1305 construction
-for zero-length plaintexts is a common way of using a shared encryption
-key for AAD authentication.
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: <stable@vger.kernel.org>
----
- crypto/chacha20poly1305.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+NX842 coprocessor sets bit 3 if queue is overflow. It is just for
+information to the user. So the driver prints this informative message
+and ignores it.
+    
+Signed-off-by: Haren Myneni <haren@us.ibm.com>
 
-diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
-index 99c3cce..7b6b935 100644
---- a/crypto/chacha20poly1305.c
-+++ b/crypto/chacha20poly1305.c
-@@ -130,6 +130,9 @@ static int chacha_decrypt(struct aead_request *req)
- 	struct scatterlist *src, *dst;
- 	int err;
+diff --git a/arch/powerpc/include/asm/icswx.h b/arch/powerpc/include/asm/icswx.h
+index 9f8402b..d1a2a2d 100644
+--- a/arch/powerpc/include/asm/icswx.h
++++ b/arch/powerpc/include/asm/icswx.h
+@@ -164,6 +164,7 @@ struct coprocessor_request_block {
+ #define ICSWX_INITIATED		(0x8)
+ #define ICSWX_BUSY		(0x4)
+ #define ICSWX_REJECTED		(0x2)
++#define ICSWX_BIT3		(0x1)	/* undefined or set from XERSO. */
  
-+	if (rctx->cryptlen == 0)
-+		goto skip;
+ static inline int icswx(__be32 ccw, struct coprocessor_request_block *crb)
+ {
+diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
+index 9ef51fa..321b8e8 100644
+--- a/drivers/crypto/nx/nx-842-powernv.c
++++ b/drivers/crypto/nx/nx-842-powernv.c
+@@ -442,6 +442,15 @@ static int nx842_powernv_function(const unsigned char *in, unsigned int inlen,
+ 			     (unsigned int)ccw,
+ 			     (unsigned int)be32_to_cpu(crb->ccw));
+ 
++	/*
++	 * NX842 coprocessor uses 3rd bit to report queue overflow which is
++	 * not an error, just for information to user. So, ignore this bit.
++	 */
++	if (ret & ICSWX_BIT3) {
++		pr_info_ratelimited("842 coprocessor queue overflow\n");
++		ret &= ~ICSWX_BIT3;
++	}
 +
- 	chacha_iv(creq->iv, req, 1);
- 
- 	sg_init_table(rctx->src, 2);
-@@ -150,6 +153,7 @@ static int chacha_decrypt(struct aead_request *req)
- 	if (err)
- 		return err;
- 
-+skip:
- 	return poly_verify_tag(req);
- }
- 
-@@ -415,6 +419,9 @@ static int chacha_encrypt(struct aead_request *req)
- 	struct scatterlist *src, *dst;
- 	int err;
- 
-+	if (req->cryptlen == 0)
-+		goto skip;
-+
- 	chacha_iv(creq->iv, req, 1);
- 
- 	sg_init_table(rctx->src, 2);
-@@ -435,6 +442,7 @@ static int chacha_encrypt(struct aead_request *req)
- 	if (err)
- 		return err;
- 
-+skip:
- 	return poly_genkey(req);
- }
- 
--- 
-2.6.3
+ 	switch (ret) {
+ 	case ICSWX_INITIATED:
+ 		ret = wait_for_csb(wmem, csb);
