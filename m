@@ -1,41 +1,33 @@
-From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
-Subject: Re: ipsec impact on performance
-Date: Mon, 7 Dec 2015 06:27:48 -0500
-Message-ID: <20151207112748.GB14535@oracle.com>
-References: <20151201175953.GC21252@oracle.com>
- <20151202065305.GB14008@secunet.com>
- <20151202120538.GJ23178@oracle.com>
- <20151203084508.GD14008@secunet.com>
- <20151203113820.GX15262@oracle.com>
- <20151207084050.GH14008@secunet.com>
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Subject: [PATCH RFC 00/13] Further iMX CAAM updates
+Date: Mon, 7 Dec 2015 19:11:35 +0000
+Message-ID: <20151207191134.GV8644@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Fabio Estevam <fabio.estevam@freescale.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:39802 "EHLO
-	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755075AbbLGL14 (ORCPT
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:60499 "EHLO
+	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932328AbbLGTLs (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Dec 2015 06:27:56 -0500
+	Mon, 7 Dec 2015 14:11:48 -0500
 Content-Disposition: inline
-In-Reply-To: <20151207084050.GH14008@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On (12/07/15 09:40), Steffen Klassert wrote:
-> 
-> I've pushed it to
-> 
-> https://git.kernel.org/cgit/linux/kernel/git/klassert/linux-stk.git/log/?h=net-next-ipsec-offload
-> 
-> It is just example code, nothing that I would show usually.
-> But you asked for it, so here is it :)
+Here are further imx-caam updates that I've had since before the
+previous merge window.  Please review and (I guess) if Freescale
+folk can provide acks etc that would be nice.  Thanks.
 
-that's fine, I dont expect more at this point, just want to 
-test-drive it, and see how it compares to my approach. 
+ drivers/crypto/caam/caamhash.c | 415 +++++++++++++++++++++++------------------
+ drivers/crypto/caam/intern.h   |   1 -
+ drivers/crypto/caam/jr.c       |  25 +--
+ 3 files changed, 246 insertions(+), 195 deletions(-)
 
-thanks!
 
-> The GRO part seems to work well, the GSO part is just a hack at the 
-> moment.
+-- 
+FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
