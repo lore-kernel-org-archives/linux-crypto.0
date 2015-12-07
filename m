@@ -1,132 +1,80 @@
-From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH RFC 11/11] crypto: caam: get rid of tasklet
-Date: Mon, 07 Dec 2015 19:12:51 +0000
-Message-ID: <E1a61DP-0007nL-FH@rmk-PC.arm.linux.org.uk>
-References: <20151207191134.GV8644@n2100.arm.linux.org.uk>
+From: Dan Streetman <ddstreet@ieee.org>
+Subject: Re: crypto/nx842: Ignore queue overflow informative error
+Date: Mon, 7 Dec 2015 14:34:26 -0500
+Message-ID: <CALZtONCw9+wvSQ+vwsvSWa_itR-G9ZBkuXftzNHV9oTd8YZFaw@mail.gmail.com>
+References: <1449388004.2096.12.camel@hbabu-laptop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Fabio Estevam <fabio.estevam@freescale.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:60545 "EHLO
-	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932307AbbLGTM4 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Dec 2015 14:12:56 -0500
-In-Reply-To: <20151207191134.GV8644@n2100.arm.linux.org.uk>
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Michael Ellerman <mpe@ellerman.id.au>, pair@us.ibm.com,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	Haren Myneni <hbabu@us.ibm.com>
+To: Haren Myneni <haren@linux.vnet.ibm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1449388004.2096.12.camel@hbabu-laptop>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Threaded interrupts can perform the function of the tasklet, and much
-more safely too - without races when trying to take the tasklet and
-interrupt down on device removal.
+On Sun, Dec 6, 2015 at 2:46 AM, Haren Myneni <haren@linux.vnet.ibm.com> wrote:
+>
+> NX842 coprocessor sets bit 3 if queue is overflow. It is just for
+> information to the user. So the driver prints this informative message
+> and ignores it.
+>
+> Signed-off-by: Haren Myneni <haren@us.ibm.com>
+>
+> diff --git a/arch/powerpc/include/asm/icswx.h b/arch/powerpc/include/asm/icswx.h
+> index 9f8402b..d1a2a2d 100644
+> --- a/arch/powerpc/include/asm/icswx.h
+> +++ b/arch/powerpc/include/asm/icswx.h
+> @@ -164,6 +164,7 @@ struct coprocessor_request_block {
+>  #define ICSWX_INITIATED                (0x8)
+>  #define ICSWX_BUSY             (0x4)
+>  #define ICSWX_REJECTED         (0x2)
+> +#define ICSWX_BIT3             (0x1)   /* undefined or set from XERSO. */
 
-With the old code, there is a window where we call tasklet_kill().  If
-the interrupt handler happens to be running on a different CPU, and
-subsequently calls tasklet_schedule(), the tasklet will be re-scheduled
-for execution.
+Since this isn't defined by the icswx rfc workbook, it probably
+shouldn't go here, it would make more sense to put it into nx-842.h
+and call it something like "ICSWX_NX_QUEUE_OVERFLOW" or similar
+NX-specific meaningful name.
 
-Switching to a hardirq/threadirq combination implementation avoids this,
-and it also means generic code deals with the teardown sequencing of the
-threaded and non-threaded parts.
+>
+>  static inline int icswx(__be32 ccw, struct coprocessor_request_block *crb)
+>  {
+> diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
+> index 9ef51fa..321b8e8 100644
+> --- a/drivers/crypto/nx/nx-842-powernv.c
+> +++ b/drivers/crypto/nx/nx-842-powernv.c
+> @@ -442,6 +442,15 @@ static int nx842_powernv_function(const unsigned char *in, unsigned int inlen,
+>                              (unsigned int)ccw,
+>                              (unsigned int)be32_to_cpu(crb->ccw));
+>
+> +       /*
+> +        * NX842 coprocessor uses 3rd bit to report queue overflow which is
+> +        * not an error, just for information to user. So, ignore this bit.
+> +        */
 
-Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
----
- drivers/crypto/caam/intern.h |  1 -
- drivers/crypto/caam/jr.c     | 25 +++++++++----------------
- 2 files changed, 9 insertions(+), 17 deletions(-)
+a meaningfully named bit define means you don't need to explain it
+with a comment :-)
 
-diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index e2bcacc1a921..5d4c05074a5c 100644
---- a/drivers/crypto/caam/intern.h
-+++ b/drivers/crypto/caam/intern.h
-@@ -41,7 +41,6 @@ struct caam_drv_private_jr {
- 	struct device		*dev;
- 	int ridx;
- 	struct caam_job_ring __iomem *rregs;	/* JobR's register space */
--	struct tasklet_struct irqtask;
- 	int irq;			/* One per queue */
- 
- 	/* Number of scatterlist crypt transforms active on the JobR */
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index f7e0d8d4c3da..b77ee2b88f37 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -73,8 +73,6 @@ int caam_jr_shutdown(struct device *dev)
- 
- 	ret = caam_reset_hw_jr(dev);
- 
--	tasklet_kill(&jrp->irqtask);
--
- 	/* Release interrupt */
- 	free_irq(jrp->irq, dev);
- 
-@@ -130,7 +128,7 @@ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
- 
- 	/*
- 	 * Check the output ring for ready responses, kick
--	 * tasklet if jobs done.
-+	 * the threaded irq if jobs done.
- 	 */
- 	irqstate = rd_reg32(&jrp->rregs->jrintstatus);
- 	if (!irqstate)
-@@ -152,18 +150,13 @@ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
- 	/* Have valid interrupt at this point, just ACK and trigger */
- 	wr_reg32(&jrp->rregs->jrintstatus, irqstate);
- 
--	preempt_disable();
--	tasklet_schedule(&jrp->irqtask);
--	preempt_enable();
--
--	return IRQ_HANDLED;
-+	return IRQ_WAKE_THREAD;
- }
- 
--/* Deferred service handler, run as interrupt-fired tasklet */
--static void caam_jr_dequeue(unsigned long devarg)
-+static irqreturn_t caam_jr_threadirq(int irq, void *st_dev)
- {
- 	int hw_idx, sw_idx, i, head, tail;
--	struct device *dev = (struct device *)devarg;
-+	struct device *dev = st_dev;
- 	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
- 	void (*usercall)(struct device *dev, u32 *desc, u32 status, void *arg);
- 	u32 *userdesc, userstatus;
-@@ -237,6 +230,8 @@ static void caam_jr_dequeue(unsigned long devarg)
- 
- 	/* reenable / unmask IRQs */
- 	clrbits32(&jrp->rregs->rconfig_lo, JRCFG_IMSK);
-+
-+	return IRQ_HANDLED;
- }
- 
- /**
-@@ -394,11 +389,10 @@ static int caam_jr_init(struct device *dev)
- 
- 	jrp = dev_get_drvdata(dev);
- 
--	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);
--
- 	/* Connect job ring interrupt handler. */
--	error = request_irq(jrp->irq, caam_jr_interrupt, IRQF_SHARED,
--			    dev_name(dev), dev);
-+	error = request_threaded_irq(jrp->irq, caam_jr_interrupt,
-+				     caam_jr_threadirq, IRQF_SHARED,
-+				     dev_name(dev), dev);
- 	if (error) {
- 		dev_err(dev, "can't connect JobR %d interrupt (%d)\n",
- 			jrp->ridx, jrp->irq);
-@@ -460,7 +454,6 @@ static int caam_jr_init(struct device *dev)
- out_free_irq:
- 	free_irq(jrp->irq, dev);
- out_kill_deq:
--	tasklet_kill(&jrp->irqtask);
- 	return error;
- }
- 
--- 
-2.1.0
+However, I suggest that you do explain *why* a queue overflow isn't an
+error - either here or (probably better) at the #define of the bit -
+because that isn't obvious.
+
+> +       if (ret & ICSWX_BIT3) {
+> +               pr_info_ratelimited("842 coprocessor queue overflow\n");
+
+if it's not an error, should this be pr_debug_ratelimited instead?
+What is an end user expected to do if they see this msg in the log?
+
+> +               ret &= ~ICSWX_BIT3;
+> +       }
+> +
+>         switch (ret) {
+>         case ICSWX_INITIATED:
+>                 ret = wait_for_csb(wmem, csb);
+>
+>
