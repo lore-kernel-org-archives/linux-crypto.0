@@ -1,58 +1,35 @@
-From: Julia Lawall <Julia.Lawall@lip6.fr>
-Subject: [PATCH] crypto: constify drbg_state_ops structures
-Date: Mon,  7 Dec 2015 21:36:57 +0100
-Message-ID: <1449520617-1964-1-git-send-email-Julia.Lawall@lip6.fr>
-Cc: kernel-janitors@vger.kernel.org,
+From: Fabio Estevam <festevam@gmail.com>
+Subject: Re: [PATCH RFC 00/13] Further iMX CAAM updates
+Date: Mon, 7 Dec 2015 18:59:37 -0200
+Message-ID: <CAOMZO5DxzmrnKDfqR7WEpD2-cAt0L2Fc+eD7y0QHnhkjRFki3w@mail.gmail.com>
+References: <20151207191134.GV8644@n2100.arm.linux.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Fabio Estevam <fabio.estevam@freescale.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+	linux-crypto@vger.kernel.org
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>,
+	=?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@freescale.com>,
+	vicki.milhoan@freescale.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:16828 "EHLO
-	mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932984AbbLGUtI (ORCPT
+Received: from mail-ig0-f173.google.com ([209.85.213.173]:34770 "EHLO
+	mail-ig0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S964935AbbLGU7h (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Dec 2015 15:49:08 -0500
+	Mon, 7 Dec 2015 15:59:37 -0500
+Received: by igvg19 with SMTP id g19so87754954igv.1
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Dec 2015 12:59:37 -0800 (PST)
+In-Reply-To: <20151207191134.GV8644@n2100.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The drbg_state_ops structures are never modified, so declare them as const.
+Horia and Victoria,
 
-Done with the help of Coccinelle.
+On Mon, Dec 7, 2015 at 5:11 PM, Russell King - ARM Linux
+<linux@arm.linux.org.uk> wrote:
+> Here are further imx-caam updates that I've had since before the
+> previous merge window.  Please review and (I guess) if Freescale
+> folk can provide acks etc that would be nice.  Thanks.
 
-Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
-
----
- crypto/drbg.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index a7c2314..ab6ef1d 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -626,7 +626,7 @@ out:
- 	return len;
- }
- 
--static struct drbg_state_ops drbg_ctr_ops = {
-+static const struct drbg_state_ops drbg_ctr_ops = {
- 	.update		= drbg_ctr_update,
- 	.generate	= drbg_ctr_generate,
- 	.crypto_init	= drbg_init_sym_kernel,
-@@ -752,7 +752,7 @@ static int drbg_hmac_generate(struct drbg_state *drbg,
- 	return len;
- }
- 
--static struct drbg_state_ops drbg_hmac_ops = {
-+static const struct drbg_state_ops drbg_hmac_ops = {
- 	.update		= drbg_hmac_update,
- 	.generate	= drbg_hmac_generate,
- 	.crypto_init	= drbg_init_hash_kernel,
-@@ -1032,7 +1032,7 @@ out:
-  * scratchpad usage: as update and generate are used isolated, both
-  * can use the scratchpad
-  */
--static struct drbg_state_ops drbg_hash_ops = {
-+static const struct drbg_state_ops drbg_hash_ops = {
- 	.update		= drbg_hash_update,
- 	.generate	= drbg_hash_generate,
- 	.crypto_init	= drbg_init_hash_kernel,
+Could you please help reviewing? Thanks
