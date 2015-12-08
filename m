@@ -1,7 +1,7 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
+From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
 Subject: Re: ipsec impact on performance
-Date: Tue, 8 Dec 2015 12:32:44 +0100
-Message-ID: <20151208113244.GK14008@secunet.com>
+Date: Tue, 8 Dec 2015 06:51:15 -0500
+Message-ID: <20151208115115.GJ4415@oracle.com>
 References: <20151201175953.GC21252@oracle.com>
  <20151202065305.GB14008@secunet.com>
  <20151202120538.GJ23178@oracle.com>
@@ -9,32 +9,30 @@ References: <20151201175953.GC21252@oracle.com>
  <20151203113820.GX15262@oracle.com>
  <20151207084050.GH14008@secunet.com>
  <20151207112748.GB14535@oracle.com>
+ <20151208113244.GK14008@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-To: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:56156 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755401AbbLHLcs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Dec 2015 06:32:48 -0500
+Received: from userp1040.oracle.com ([156.151.31.81]:51293 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752347AbbLHLvV (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 8 Dec 2015 06:51:21 -0500
 Content-Disposition: inline
-In-Reply-To: <20151207112748.GB14535@oracle.com>
+In-Reply-To: <20151208113244.GK14008@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 07, 2015 at 06:27:48AM -0500, Sowmini Varadhan wrote:
-> On (12/07/15 09:40), Steffen Klassert wrote:
-> > 
-> > I've pushed it to
-> > 
-> > https://git.kernel.org/cgit/linux/kernel/git/klassert/linux-stk.git/log/?h=net-next-ipsec-offload
-> > 
-> > It is just example code, nothing that I would show usually.
-> > But you asked for it, so here is it :)
+On (12/08/15 12:32), Steffen Klassert wrote:
 > 
-> that's fine, I dont expect more at this point, just want to 
-> test-drive it, and see how it compares to my approach. 
+> Would be nice if you could share the results. Comments are
 
-Would be nice if you could share the results. Comments are
-welcome too, of course.
+Sure, not a problem. Give me some time though, I'm also looking
+into the skb_cow_data and other memory-management issues that
+were flagged on this thread. 
+
+I'll have all this info by netdev, at the latest.
+
+--Sowmini
