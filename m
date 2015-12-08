@@ -1,122 +1,81 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH v2 2/4] crypto: niagara: Use precalculated hash from headers
-Date: Tue,  8 Dec 2015 09:10:51 +0100
-Message-ID: <1449562253-13846-3-git-send-email-clabbe.montjoie@gmail.com>
-References: <1449562253-13846-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: LABBE Corentin <clabbe.montjoie@gmail.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: davem@davemloft.net, herbert@gondor.apana.org.au
+From: Dmitry Vyukov <dvyukov@google.com>
+Subject: WARNING in crypto_wait_for_test
+Date: Tue, 8 Dec 2015 12:12:27 +0100
+Message-ID: <CACT4Y+bws9Scv7o3AB2wPM0ZJAeDvO+kZ45h-p5viDk9ZAe9KQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+Cc: syzkaller <syzkaller@googlegroups.com>,
+	Kostya Serebryany <kcc@google.com>,
+	Alexander Potapenko <glider@google.com>,
+	Sasha Levin <sasha.levin@oracle.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1449562253-13846-1-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Precalculated hash for empty message are now present in hash headers.
-This patch just use them.
+Hello,
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
----
- drivers/crypto/n2_core.c | 33 ++++++---------------------------
- 1 file changed, 6 insertions(+), 27 deletions(-)
+The following program triggers a WARNING in crypto_wait_for_test:
 
-diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
-index 5450880..febbd5e 100644
---- a/drivers/crypto/n2_core.c
-+++ b/drivers/crypto/n2_core.c
-@@ -241,7 +241,7 @@ static inline bool n2_should_run_async(struct spu_queue *qp, int this_len)
- 
- struct n2_ahash_alg {
- 	struct list_head	entry;
--	const char		*hash_zero;
-+	const u8		*hash_zero;
- 	const u32		*hash_init;
- 	u8			hw_op_hashsz;
- 	u8			digest_size;
-@@ -1267,7 +1267,7 @@ static LIST_HEAD(cipher_algs);
- 
- struct n2_hash_tmpl {
- 	const char	*name;
--	const char	*hash_zero;
-+	const u8	*hash_zero;
- 	const u32	*hash_init;
- 	u8		hw_op_hashsz;
- 	u8		digest_size;
-@@ -1276,40 +1276,19 @@ struct n2_hash_tmpl {
- 	u8		hmac_type;
- };
- 
--static const char md5_zero[MD5_DIGEST_SIZE] = {
--	0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04,
--	0xe9, 0x80, 0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e,
--};
- static const u32 md5_init[MD5_HASH_WORDS] = {
- 	cpu_to_le32(MD5_H0),
- 	cpu_to_le32(MD5_H1),
- 	cpu_to_le32(MD5_H2),
- 	cpu_to_le32(MD5_H3),
- };
--static const char sha1_zero[SHA1_DIGEST_SIZE] = {
--	0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d, 0x32,
--	0x55, 0xbf, 0xef, 0x95, 0x60, 0x18, 0x90, 0xaf, 0xd8,
--	0x07, 0x09
--};
- static const u32 sha1_init[SHA1_DIGEST_SIZE / 4] = {
- 	SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4,
- };
--static const char sha256_zero[SHA256_DIGEST_SIZE] = {
--	0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14, 0x9a,
--	0xfb, 0xf4, 0xc8, 0x99, 0x6f, 0xb9, 0x24, 0x27, 0xae,
--	0x41, 0xe4, 0x64, 0x9b, 0x93, 0x4c, 0xa4, 0x95, 0x99,
--	0x1b, 0x78, 0x52, 0xb8, 0x55
--};
- static const u32 sha256_init[SHA256_DIGEST_SIZE / 4] = {
- 	SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
- 	SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7,
- };
--static const char sha224_zero[SHA224_DIGEST_SIZE] = {
--	0xd1, 0x4a, 0x02, 0x8c, 0x2a, 0x3a, 0x2b, 0xc9, 0x47,
--	0x61, 0x02, 0xbb, 0x28, 0x82, 0x34, 0xc4, 0x15, 0xa2,
--	0xb0, 0x1f, 0x82, 0x8e, 0xa6, 0x2a, 0xc5, 0xb3, 0xe4,
--	0x2f
--};
- static const u32 sha224_init[SHA256_DIGEST_SIZE / 4] = {
- 	SHA224_H0, SHA224_H1, SHA224_H2, SHA224_H3,
- 	SHA224_H4, SHA224_H5, SHA224_H6, SHA224_H7,
-@@ -1317,7 +1296,7 @@ static const u32 sha224_init[SHA256_DIGEST_SIZE / 4] = {
- 
- static const struct n2_hash_tmpl hash_tmpls[] = {
- 	{ .name		= "md5",
--	  .hash_zero	= md5_zero,
-+	  .hash_zero	= md5_zero_message_hash,
- 	  .hash_init	= md5_init,
- 	  .auth_type	= AUTH_TYPE_MD5,
- 	  .hmac_type	= AUTH_TYPE_HMAC_MD5,
-@@ -1325,7 +1304,7 @@ static const struct n2_hash_tmpl hash_tmpls[] = {
- 	  .digest_size	= MD5_DIGEST_SIZE,
- 	  .block_size	= MD5_HMAC_BLOCK_SIZE },
- 	{ .name		= "sha1",
--	  .hash_zero	= sha1_zero,
-+	  .hash_zero	= sha1_zero_message_hash,
- 	  .hash_init	= sha1_init,
- 	  .auth_type	= AUTH_TYPE_SHA1,
- 	  .hmac_type	= AUTH_TYPE_HMAC_SHA1,
-@@ -1333,7 +1312,7 @@ static const struct n2_hash_tmpl hash_tmpls[] = {
- 	  .digest_size	= SHA1_DIGEST_SIZE,
- 	  .block_size	= SHA1_BLOCK_SIZE },
- 	{ .name		= "sha256",
--	  .hash_zero	= sha256_zero,
-+	  .hash_zero	= sha256_zero_message_hash,
- 	  .hash_init	= sha256_init,
- 	  .auth_type	= AUTH_TYPE_SHA256,
- 	  .hmac_type	= AUTH_TYPE_HMAC_SHA256,
-@@ -1341,7 +1320,7 @@ static const struct n2_hash_tmpl hash_tmpls[] = {
- 	  .digest_size	= SHA256_DIGEST_SIZE,
- 	  .block_size	= SHA256_BLOCK_SIZE },
- 	{ .name		= "sha224",
--	  .hash_zero	= sha224_zero,
-+	  .hash_zero	= sha224_zero_message_hash,
- 	  .hash_init	= sha224_init,
- 	  .auth_type	= AUTH_TYPE_SHA256,
- 	  .hmac_type	= AUTH_TYPE_RESERVED,
--- 
-2.4.10
+// autogenerated by syzkaller (http://github.com/google/syzkaller)
+#include <syscall.h>
+#include <string.h>
+#include <stdint.h>
+
+int main()
+{
+        long r0 = syscall(SYS_mmap, 0x20000000ul, 0x1000ul, 0x3ul,
+0x32ul, 0xfffffffffffffffful, 0x0ul);
+        long r1 = syscall(SYS_socket, 0x26ul, 0x5ul, 0x0ul, 0, 0, 0);
+        *(uint16_t*)0x20000000 = 0x26;
+        memcpy((void*)0x20000002,
+"\x73\x6b\x63\x69\x70\x68\x65\x72\x00\x00\x00\x00\x00\x00", 14);
+        *(uint32_t*)0x20000010 = 0x1008;
+        *(uint32_t*)0x20000014 = 0x469b167b45d89a6;
+        memcpy((void*)0x20000018,
+"\x63\x74\x72\x28\x64\x65\x73\x33\x5f\x65\x64\x65\x29\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+64);
+        long r7 = syscall(SYS_bind, r1, 0x20000000ul, 0x58ul, 0, 0, 0);
+        return 0;
+}
+
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 11087 at crypto/algapi.c:343
+crypto_wait_for_test+0xc4/0xf0()
+Modules linked in:
+CPU: 1 PID: 11087 Comm: a.out Tainted: G        W       4.4.0-rc3+ #151
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/2011
+ 0000000000000001 ffff88006ca07a78 ffffffff82e0f4b8 0000000041b58ab3
+ ffffffff87a9a265 ffffffff82e0f406 ffff88003711e080 00000000ffffffff
+ ffffffff89913aa0 0000000000000001 0000000000000001 0000000000002b4f
+Call Trace:
+ [<     inline     >] __dump_stack lib/dump_stack.c:15
+ [<ffffffff82e0f4b8>] dump_stack+0xb2/0xfa lib/dump_stack.c:50
+ [<ffffffff81373336>] warn_slowpath_common+0xe6/0x170 kernel/panic.c:460
+ [<ffffffff81373589>] warn_slowpath_null+0x29/0x30 kernel/panic.c:493
+ [<ffffffff82ba29e4>] crypto_wait_for_test+0xc4/0xf0 crypto/algapi.c:343
+ [<ffffffff82ba2d20>] crypto_register_instance+0x220/0x350 crypto/algapi.c:558
+ [<ffffffff82ba9564>] crypto_givcipher_default+0x4f4/0x620
+crypto/ablkcipher.c:601
+ [<ffffffff82ba984a>] crypto_lookup_skcipher+0x1ba/0x2f0 crypto/ablkcipher.c:658
+ [<ffffffff82ba9aae>] crypto_alloc_ablkcipher+0x5e/0x1f0 crypto/ablkcipher.c:693
+ [<ffffffff82d2a875>] skcipher_bind+0x25/0x30 crypto/algif_skcipher.c:754
+ [<ffffffff82d28129>] alg_bind+0x1a9/0x410 crypto/af_alg.c:155
+ [<ffffffff856b3a6a>] SYSC_bind+0x20a/0x2c0 net/socket.c:1383
+ [<ffffffff856b70f4>] SyS_bind+0x24/0x30 net/socket.c:1369
+ [<ffffffff86a89fb6>] entry_SYSCALL_64_fastpath+0x16/0x7a
+arch/x86/entry/entry_64.S:185
+---[ end trace 49f86739a736fa2b ]---
+
+
+strace:
+socket(PF_ALG, SOCK_SEQPACKET, 0)       = 3
+bind(3, {sa_family=AF_ALG, sa_data="skcipher\0\0\0\0\0\0"}, 88) = -1
+ENOENT (No such file or directory)
+
+
+On commit 31ade3b83e1821da5fbb2f11b5b3d4ab2ec39db8 (Nov 29).
