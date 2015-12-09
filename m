@@ -1,41 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/7] Add support for qat_c3xxx and qat_c62x devices
-Date: Wed, 9 Dec 2015 20:12:24 +0800
-Message-ID: <20151209121224.GB27962@gondor.apana.org.au>
-References: <20151205005612.27411.60451.stgit@tstruk-mobl1>
+Subject: Re: [PATCH 1/2] blkcipher: Copy iv from desc even for 0-len walks
+Date: Wed, 9 Dec 2015 20:18:58 +0800
+Message-ID: <20151209121858.GC27962@gondor.apana.org.au>
+References: <1449366698-2422-1-git-send-email-Jason@zx2c4.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, pingchao.yang@intel.com,
-	qat-linux@intel.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+	martin@strongswan.org, stable@vger.kernel.org
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:37157 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:33896 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754133AbbLIMMs (ORCPT
+	with ESMTP id S1750904AbbLIMTc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Dec 2015 07:12:48 -0500
+	Wed, 9 Dec 2015 07:19:32 -0500
 Content-Disposition: inline
-In-Reply-To: <20151205005612.27411.60451.stgit@tstruk-mobl1>
+In-Reply-To: <1449366698-2422-1-git-send-email-Jason@zx2c4.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 04, 2015 at 04:56:12PM -0800, Tadeusz Struk wrote:
-> The following series adds support for the new
-> qat_c3xxx and qat_c62x acceleration devices.
+On Sun, Dec 06, 2015 at 02:51:37AM +0100, Jason A. Donenfeld wrote:
+> Some ciphers actually support encrypting zero length plaintexts. For
+> example, many AEAD modes support this. The resulting ciphertext for
+> those winds up being only the authentication tag, which is a result of
+> the key, the iv, the additional data, and the fact that the plaintext
+> had zero length. The blkcipher constructors won't copy the IV to the
+> right place, however, when using a zero length input, resulting in
+> some significant problems when ciphers call their initialization
+> routines, only to find that the ->iv parameter is uninitialized. One
+> such example of this would be using chacha20poly1305 with a zero length
+> input, which then calls chacha20, which calls the key setup routine,
+> which eventually OOPSes due to the uninitialized ->iv member.
 > 
-> ---
-> Pingchao Yang (1):
->       crypto: qat - add support for new devices to FW loader
-> 
-> Tadeusz Struk (6):
->       crypto: qat - add new device definitions
->       crypto: qat - move isr files to qat common so that they can be reused
->       crypto: qat - add support for c3xxx accel type
->       crypto: qat - add support for c62x accel type
->       crypto: qat - add support for c3xxxvf accel type
->       crypto: qat - add support for c62xvf accel type
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> Cc: <stable@vger.kernel.org>
 
-All applied.  Thanks.
+Applied to crypto.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
