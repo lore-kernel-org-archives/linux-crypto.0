@@ -1,39 +1,47 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH v2 0/3] dmaengine: Add supports for APM X-Gene SoC
- CRC32C accerlerator driver
-Date: Wed, 09 Dec 2015 12:37:16 -0500 (EST)
-Message-ID: <20151209.123716.1633991691492130781.davem@davemloft.net>
-References: <20151209082748.GA26696@gondor.apana.org.au>
-	<CAFd313z3zaXMAgKWa9KwQw1QxU4LuW_uoAz5_=42viYk2zaaOA@mail.gmail.com>
-	<20151209084458.GA26803@gondor.apana.org.au>
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Subject: Re: [PATCH RFC 00/13] Further iMX CAAM updates
+Date: Wed, 9 Dec 2015 18:21:30 +0000
+Message-ID: <20151209182130.GI8644@n2100.arm.linux.org.uk>
+References: <20151207191134.GV8644@n2100.arm.linux.org.uk>
+ <5668435B.3020000@freescale.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: rsahu@apm.com, vinod.koul@intel.com, dan.j.williams@intel.com,
-	dmaengine@vger.kernel.org, arnd@arndb.de,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, jcm@redhat.com,
-	patches@apm.com, linux-crypto@vger.kernel.org, kgondkar@apm.com
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Fabio Estevam <fabio.estevam@freescale.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:34898 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752062AbbLIRhX (ORCPT
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:37823 "EHLO
+	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752897AbbLISVr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Dec 2015 12:37:23 -0500
-In-Reply-To: <20151209084458.GA26803@gondor.apana.org.au>
+	Wed, 9 Dec 2015 13:21:47 -0500
+Content-Disposition: inline
+In-Reply-To: <5668435B.3020000@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Wed, 9 Dec 2015 16:44:58 +0800
+On Wed, Dec 09, 2015 at 05:06:03PM +0200, Horia Geant=C4=83 wrote:
+> On 12/7/2015 9:11 PM, Russell King - ARM Linux wrote:
+> > Here are further imx-caam updates that I've had since before the
+> > previous merge window.  Please review and (I guess) if Freescale
+> > folk can provide acks etc that would be nice.  Thanks.
+>=20
+> Thanks Russell.
+>=20
+> Note that the patch set does not apply cleanly, please rebase on late=
+st
+> cryptodev-2.6 tree.
 
-> On Wed, Dec 09, 2015 at 02:13:32PM +0530, Rameshwar Sahu wrote:
->>
->> Yes, we are not upstream in-kernel users right now, but later client
->> ma upstream there patches.
-> 
-> Well I'd prefer to not take any crypto drivers that don't have
-> in-kernel users.
+I'm afraid I'm not a fan of digging out random git trees, rebasing
+patches on top of them, and then not being able to test them locally
+without dragging the entire tree into my own tree.  I'd rather wait
+another kernel cycle instead of polluting my own tree with commits
+from other trees.
 
-+1
+--=20
+RMK's Patch system: http://www.arm.linux.org.uk/developer/patches/
+=46TTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
