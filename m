@@ -1,48 +1,39 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [cryptodev:master 53/54] crypto/rsa-pkcs1pad.c:135:1: warning:
- 'pkcs1pad_encrypt_sign_complete' uses dynamic stack allocation
-Date: Thu, 10 Dec 2015 09:47:12 +0800
-Message-ID: <20151210014712.GB31692@gondor.apana.org.au>
-References: <201512100225.MWaG2I5C%fengguang.wu@intel.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH] crypto: qat - enable VF irq after guest exits
+ ungracefully
+Date: Wed, 9 Dec 2015 21:26:58 -0800
+Message-ID: <56690D22.7090605@intel.com>
+References: <20151209195946.17574.50691.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
-	kbuild-all@01.org, linux-crypto@vger.kernel.org
-To: kbuild test robot <fengguang.wu@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: xin.zeng@intel.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:39088 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751129AbbLJBrS (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Dec 2015 20:47:18 -0500
-Content-Disposition: inline
-In-Reply-To: <201512100225.MWaG2I5C%fengguang.wu@intel.com>
+Received: from mga02.intel.com ([134.134.136.20]:1205 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751011AbbLJFaN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 10 Dec 2015 00:30:13 -0500
+In-Reply-To: <20151209195946.17574.50691.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 10, 2015 at 02:49:27AM +0800, kbuild test robot wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> head:   161151d79ff4f7ed35d4ebb0eb7727a517c34ef2
-> commit: 3d5b1ecdea6fb94f8c61554fcb2ba776a2d3d0e6 [53/54] crypto: rsa - RSA padding algorithm
-> config: s390-allmodconfig (attached as .config)
-> reproduce:
->         wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         git checkout 3d5b1ecdea6fb94f8c61554fcb2ba776a2d3d0e6
->         # save the attached .config to linux build tree
->         make.cross ARCH=s390 
+Hi Herbert,
+On 12/09/2015 11:59 AM, Tadeusz Struk wrote:
+> From: Signed-off-by: Zeng Xin <xin.zeng@intel.com>
 > 
-> All warnings (new ones prefixed by >>):
+> The VF bundle interrupt is not triggered any more in
+> the case when guest is shut down with sample app running.
+> Need to clear the flag interrupt bit when restarting to fix
+> this irrecoverable state.
 > 
->    crypto/rsa-pkcs1pad.c: In function 'pkcs1pad_encrypt_sign_complete':
-> >> crypto/rsa-pkcs1pad.c:135:1: warning: 'pkcs1pad_encrypt_sign_complete' uses dynamic stack allocation
->     }
->     ^
+> Signed-off-by: Zeng Xin <xin.zeng@intel.com>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> ---
+>  drivers/crypto/qat/qat_common/adf_transport.c      |    3 ++-
+>  .../qat/qat_common/adf_transport_access_macros.h   |    5 +++++
+>  2 files changed, 7 insertions(+), 1 deletion(-)
 
-Indeed that looks bad.  Andrzej please fix this.
-
-Thanks,
+Please ignore this one. I'll send a v2. 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+TS
