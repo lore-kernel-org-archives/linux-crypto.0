@@ -1,49 +1,40 @@
-From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: [PATCH 0/2] crypto: KEYS: convert public key to akcipher api
-Date: Thu, 10 Dec 2015 16:56:17 -0500
-Message-ID: <1449784577.5028.2.camel@linux.vnet.ibm.com>
-References: <20151209235226.11783.57073.stgit@tstruk-mobl1>
-	 <1449771957.2694.2.camel@linux.vnet.ibm.com> <5669C6E4.8030002@intel.com>
-	 <1449776225.4183.1.camel@linux.vnet.ibm.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [patch -next] crypto: qat - uint8_t is not large enough for accel_id
+Date: Fri, 11 Dec 2015 01:00:44 +0300
+Message-ID: <20151210220044.GA21797@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, dhowells@redhat.com,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Bruce Allan <bruce.w.allan@intel.com>,
+	Pingchao Yang <pingchao.yang@intel.com>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
 To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1449776225.4183.1.camel@linux.vnet.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from userp1040.oracle.com ([156.151.31.81]:23738 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751512AbbLJWBC (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 10 Dec 2015 17:01:02 -0500
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2015-12-10 at 14:37 -0500, Mimi Zohar wrote:
-> On Thu, 2015-12-10 at 10:39 -0800, Tadeusz Struk wrote:
-> > Hi Mimi,
-> > On 12/10/2015 10:25 AM, Mimi Zohar wrote:
-> > >> This patch set converts the module verification and digital signature
-> > >> > code to the new akcipher API.
-> > >> > RSA implementation has been removed from crypto/asymmetric_keys and the
-> > >> > new API is used for cryptographic primitives.
-> > >> > There is no need for MPI above the akcipher API anymore.
-> > >> > Modules can be verified with software as well as HW RSA implementations.
-> > > With these two patches my system doesn't even boot.  Digging deeper...
-> > > 
-> > 
-> > It needs RSA implementation built-in.
-> > Could you check if you have CONFIG_CRYPTO_RSA=y
-> 
-> The diff between this config and the previous one:
-> < CONFIG_CRYPTO_AKCIPHER=y
-> < CONFIG_CRYPTO_RSA=y
-> ---
-> > # CONFIG_CRYPTO_RSA is not set
+->accel_id has to be large enough to hold ADF_MAX_DEVICES + 1 (which is
+1025) so uint8_t is too small.
 
-FYI, dracut loaded the keys on the IMA keyring properly.  When we try to
-pivot root, real root /sbin/init fails appraisal.  The audit subsystem
-is showing "invalid-signature".
+Fixes: 890c55f4dc0e ('crypto: qat - add support for c3xxx accel type')
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-There's no additional debugging information with the boot command line
-options rd.debug or systemd.log_level=debug.
-
-Mimi
+diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
+index 4d78ec0..1e1cdef 100644
+--- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
+@@ -251,6 +251,6 @@ struct adf_accel_dev {
+ 		} vf;
+ 	};
+ 	bool is_vf;
+-	uint8_t accel_id;
++	unsigned int accel_id;
+ } __packed;
+ #endif
