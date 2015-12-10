@@ -1,38 +1,73 @@
-From: Fabrizio Demaria <fabrizio.f.demaria@gmail.com>
-Subject: "crypto_hash_setkey" call from atomic context
-Date: Thu, 10 Dec 2015 16:59:31 +0100
-Message-ID: <CACzeOEfg9x+aEwuP9xH3BLd5+RzpDBZBGsnsLw7skW9FP5LVGw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "Nordell, Joakim" <joakim.nordell@intel.com>,
-	"Chen, Shujuan" <shujuan.chen@intel.com>, doru.gucea@intel.com
-To: linux-crypto@vger.kernel.org
+From: Semen Protsenko <semen.protsenko@linaro.org>
+Subject: [PATCH] crypto: omap-des: Fix "schedule while atomic" bug
+Date: Thu, 10 Dec 2015 18:06:59 +0200
+Message-ID: <1449763619-11883-1-git-send-email-semen.protsenko@linaro.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Grygorii Strashko <grygorii.strashko@globallogic.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f170.google.com ([209.85.213.170]:36324 "EHLO
-	mail-ig0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750910AbbLJP7c convert rfc822-to-8bit (ORCPT
+Received: from mail-lf0-f43.google.com ([209.85.215.43]:35633 "EHLO
+	mail-lf0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750790AbbLJQHD (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 Dec 2015 10:59:32 -0500
-Received: by mail-ig0-f170.google.com with SMTP id ph11so18464757igc.1
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Dec 2015 07:59:31 -0800 (PST)
+	Thu, 10 Dec 2015 11:07:03 -0500
+Received: by lfdl133 with SMTP id l133so59761236lfd.2
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Dec 2015 08:07:01 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+From: Sam Protsenko <semen.protsenko@linaro.org>
 
-I am investigating the current usage of kernel crypto-libraries in the
-SCTP code, considering to adopt the same crypto framework for the
-MPTCP implementation.
+When using DES module the next bug appears:
 
-In sm_make_chunk.c, the crypto function "crypto_hash_setkey" is called
-in an atomic context, despite the fact that this function CAN invoke a
-GFP_KERNEL (sleeping) memory allocation. Calling a sleeping function
-from an atomic context can end up in deadlock.
-Is there a way to make sure that =E2=80=9Ccrypto_hash_setkey=E2=80=9D c=
-an be safely
-called in an atomic context, considering all the possible code-paths
-followed by the function?
+    BUG: scheduling while atomic: kworker/0:1/63/0x00000102
 
-Thanks,
-=46abrizio
+With backtrace as follows:
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< cut here >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+[<c0012294>] (dump_backtrace) from [<c00124ac>] (show_stack+0x18/0x1c)
+[<c0012494>] (show_stack) from [<c0752554>] (dump_stack+0x84/0xc4)
+[<c07524d0>] (dump_stack) from [<c0750218>] (__schedule_bug+0x54/0x64)
+[<c07501c4>] (__schedule_bug) from [<c07548a4>] (__schedule+0x4ac/0x53c)
+[<c07543f8>] (__schedule) from [<c075496c>] (schedule+0x38/0x88)
+[<c0754934>] (schedule) from [<c03c3984>] (rpm_resume+0x158/0x59c)
+[<c03c382c>] (rpm_resume) from [<c03c3e1c>] (__pm_runtime_resume+0x54/0x6c)
+[<c03c3dc8>] (__pm_runtime_resume) from [<c0568ff8>] (omap_des_handle_queue+0x154/0x7bc)
+[<c0568ea4>] (omap_des_handle_queue) from [<c05696b8>] (omap_des_crypt+0x58/0xbc)
+[<c0569660>] (omap_des_crypt) from [<c0569730>] (omap_des_cbc_decrypt+0x14/0x18)
+[<c056971c>] (omap_des_cbc_decrypt) from [<c0297534>] (authenc_verify_ahash_done+0xe0/0xe8)
+[<c0297454>] (authenc_verify_ahash_done) from [<c056a330>] (omap_sham_finish_req+0x58/0xa8)
+[<c056a2d8>] (omap_sham_finish_req) from [<c056b714>] (omap_sham_done_task+0x1c0/0x1e0)
+[<c056b554>] (omap_sham_done_task) from [<c003e53c>] (tasklet_action+0x80/0x118)
+[<c003e4bc>] (tasklet_action) from [<c003e740>] (__do_softirq+0x11c/0x260)
+[<c003e624>] (__do_softirq) from [<c003eb64>] (irq_exit+0xc0/0xfc)
+[<c003eaa4>] (irq_exit) from [<c000f1c4>] (handle_IRQ+0x4c/0x98)
+[<c000f178>] (handle_IRQ) from [<c0008568>] (gic_handle_irq+0x34/0x64)
+[<c0008534>] (gic_handle_irq) from [<c0758540>] (__irq_svc+0x40/0x70)
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< cut here >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Insight was seen in drivers/crypto/omap-sham.c driver.
+All credits for this patch go to Grygorii Strashko.
+
+Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
+---
+ drivers/crypto/omap-des.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index 0a70e46..db1ef28 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -1086,6 +1086,7 @@ static int omap_des_probe(struct platform_device *pdev)
+ 	dd->phys_base = res->start;
+ 
+ 	pm_runtime_enable(dev);
++	pm_runtime_irq_safe(dev);
+ 	err = pm_runtime_get_sync(dev);
+ 	if (err < 0) {
+ 		pm_runtime_put_noidle(dev);
+-- 
+2.6.2
