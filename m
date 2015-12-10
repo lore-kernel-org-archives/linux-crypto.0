@@ -1,56 +1,49 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [cryptodev:master 50/54] adf_c3xxxvf_hw_data.c:undefined
- reference to `adf_iov_putmsg'
-Date: Thu, 10 Dec 2015 12:20:18 -0800
-Message-ID: <5669DE82.9060202@intel.com>
-References: <201512100448.vh4ozVCt%fengguang.wu@intel.com>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [PATCH 0/2] crypto: KEYS: convert public key to akcipher api
+Date: Thu, 10 Dec 2015 16:56:17 -0500
+Message-ID: <1449784577.5028.2.camel@linux.vnet.ibm.com>
+References: <20151209235226.11783.57073.stgit@tstruk-mobl1>
+	 <1449771957.2694.2.camel@linux.vnet.ibm.com> <5669C6E4.8030002@intel.com>
+	 <1449776225.4183.1.camel@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: kbuild test robot <fengguang.wu@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:31114 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753240AbbLJUXm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 Dec 2015 15:23:42 -0500
-In-Reply-To: <201512100448.vh4ozVCt%fengguang.wu@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: herbert@gondor.apana.org.au, dhowells@redhat.com,
+	linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1449776225.4183.1.camel@linux.vnet.ibm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
-On 12/09/2015 12:22 PM, kbuild test robot wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> head:   161151d79ff4f7ed35d4ebb0eb7727a517c34ef2
-> commit: 8b206f2d666f41f0aa83dec83504801ee945d3dc [50/54] crypto: qat - add support for c3xxxvf accel type
-> config: x86_64-randconfig-x009-12092253 (attached as .config)
-> reproduce:
->         git checkout 8b206f2d666f41f0aa83dec83504801ee945d3dc
->         # save the attached .config to linux build tree
->         make ARCH=x86_64 
+On Thu, 2015-12-10 at 14:37 -0500, Mimi Zohar wrote:
+> On Thu, 2015-12-10 at 10:39 -0800, Tadeusz Struk wrote:
+> > Hi Mimi,
+> > On 12/10/2015 10:25 AM, Mimi Zohar wrote:
+> > >> This patch set converts the module verification and digital signature
+> > >> > code to the new akcipher API.
+> > >> > RSA implementation has been removed from crypto/asymmetric_keys and the
+> > >> > new API is used for cryptographic primitives.
+> > >> > There is no need for MPI above the akcipher API anymore.
+> > >> > Modules can be verified with software as well as HW RSA implementations.
+> > > With these two patches my system doesn't even boot.  Digging deeper...
+> > > 
+> > 
+> > It needs RSA implementation built-in.
+> > Could you check if you have CONFIG_CRYPTO_RSA=y
 > 
-> All errors (new ones prefixed by >>):
-> 
->    drivers/built-in.o: In function `adf_pf2vf_bh_handler':
->    adf_vf_isr.c:(.text+0x8dd066): undefined reference to `adf_enable_pf2vf_interrupts'
->    drivers/built-in.o: In function `adf_isr':
->    adf_vf_isr.c:(.text+0x8dd123): undefined reference to `adf_disable_pf2vf_interrupts'
->    drivers/built-in.o: In function `adf_vf2pf_shutdown':
->>> adf_c3xxxvf_hw_data.c:(.text+0x8ee265): undefined reference to `adf_iov_putmsg'
->    drivers/built-in.o: In function `adf_vf2pf_init':
->    adf_c3xxxvf_hw_data.c:(.text+0x8ee2a5): undefined reference to `adf_iov_putmsg'
->    drivers/built-in.o: In function `adf_init_hw_data_c3xxxiov':
->    (.text+0x8ee3e3): undefined reference to `adf_enable_vf2pf_comms'
-> 
+> The diff between this config and the previous one:
+> < CONFIG_CRYPTO_AKCIPHER=y
+> < CONFIG_CRYPTO_RSA=y
+> ---
+> > # CONFIG_CRYPTO_RSA is not set
 
-In this configuration we have
-# CONFIG_PCI_IOV is not set
+FYI, dracut loaded the keys on the IMA keyring properly.  When we try to
+pivot root, real root /sbin/init fails appraisal.  The audit subsystem
+is showing "invalid-signature".
 
-The patch that I've sent yesterday for the other issue
-https://patchwork.kernel.org/patch/7811971/
-should fix this one as well.
-Thanks
+There's no additional debugging information with the boot command line
+options rd.debug or systemd.log_level=debug.
 
--- 
-TS
+Mimi
