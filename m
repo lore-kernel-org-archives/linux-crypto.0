@@ -1,31 +1,51 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH] crypto: qat - fix CTX_ENABLES bits shift direction issue
-Date: Fri, 11 Dec 2015 07:22:12 -0800
-Message-ID: <566AEA24.3000507@intel.com>
-References: <1449812574-35124-1-git-send-email-pingchao.yang@intel.com>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v4 5/5] crypto: AES CBC multi-buffer glue code
+Date: Fri, 11 Dec 2015 08:54:40 -0800
+Message-ID: <1449852880.3057.15.camel@schen9-desk2.jf.intel.com>
+References: <cover.1449091633.git.tim.c.chen@linux.intel.com>
+	 <1449086565.22260.15.camel@schen9-desk2.jf.intel.com>
+	 <20151209025242.GA24861@gondor.apana.org.au>
+	 <1449681794.22260.58.camel@schen9-desk2.jf.intel.com>
+	 <20151210014519.GA31692@gondor.apana.org.au>
+	 <1449765585.3057.9.camel@schen9-desk2.jf.intel.com>
+	 <20151211032340.GC10399@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, dan.carpenter@oracle.com
-To: Yang Pingchao <pingchao.yang@intel.com>,
-	herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:42767 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752909AbbLKPZ2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Dec 2015 10:25:28 -0500
-In-Reply-To: <1449812574-35124-1-git-send-email-pingchao.yang@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Stephan Mueller <smueller@chronox.de>,
+	Chandramouli Narayanan <mouli_7982@yahoo.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20151211032340.GC10399@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 12/10/2015 09:42 PM, Yang Pingchao wrote:
-> AE CTX bits should be 8-15 in CTX_ENABLES, so the mask value 0xff should be
-> left shifted 0x8
+On Fri, 2015-12-11 at 11:23 +0800, Herbert Xu wrote:
+> On Thu, Dec 10, 2015 at 08:39:45AM -0800, Tim Chen wrote:
+> >
+> > The inner cipher is called synchronously from the outer layer 
+> > async cipher algorithm in cbc_mb_async_ablk_decrypt via
+> > 
+> >         err = crypto_blkcipher_crt(child_tfm)->decrypt(
+> >                 &rctx->desc, req->dst, req->src, req->nbytes);
 > 
-> Reported-by:   Dan Carpenter <dan.carpenter@oracle.com>
-> Signed-off-by: Yang Pingchao <pingchao.yang@intel.com>
-> ---
->  drivers/crypto/qat/qat_common/qat_hal.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> We should avoid bypassing the API and directly calling crypto
+> driver functions like this.
+> 
+> What if you made it a proper ablkcipher and just called it through
+> the API?
+> 
+> Thanks,
 
-Acked-by: Tadeusz Struk <tadeusz.struk@intel.com>
+Direct call I assume have less overhead.  Let me think about
+making the inner cipher ablkcipher.  I may need to rewrite a lot
+of the glue layer :(
+
+Tim
