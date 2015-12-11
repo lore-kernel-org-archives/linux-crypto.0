@@ -1,47 +1,51 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4 5/5] crypto: AES CBC multi-buffer glue code
-Date: Fri, 11 Dec 2015 11:23:40 +0800
-Message-ID: <20151211032340.GC10399@gondor.apana.org.au>
-References: <cover.1449091633.git.tim.c.chen@linux.intel.com>
- <1449086565.22260.15.camel@schen9-desk2.jf.intel.com>
- <20151209025242.GA24861@gondor.apana.org.au>
- <1449681794.22260.58.camel@schen9-desk2.jf.intel.com>
- <20151210014519.GA31692@gondor.apana.org.au>
- <1449765585.3057.9.camel@schen9-desk2.jf.intel.com>
+Subject: Re: "crypto_hash_setkey" call from atomic context
+Date: Fri, 11 Dec 2015 15:42:23 +0800
+Message-ID: <20151211074223.GA11688@gondor.apana.org.au>
+References: <CACzeOEfg9x+aEwuP9xH3BLd5+RzpDBZBGsnsLw7skW9FP5LVGw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	Chandramouli Narayanan <mouli_7982@yahoo.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org, joakim.nordell@intel.com,
+	shujuan.chen@intel.com, doru.gucea@intel.com
+To: Fabrizio Demaria <fabrizio.f.demaria@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:37547 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751568AbbLKHm3 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 Dec 2015 02:42:29 -0500
 Content-Disposition: inline
-In-Reply-To: <1449765585.3057.9.camel@schen9-desk2.jf.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <CACzeOEfg9x+aEwuP9xH3BLd5+RzpDBZBGsnsLw7skW9FP5LVGw@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 10, 2015 at 08:39:45AM -0800, Tim Chen wrote:
->
-> The inner cipher is called synchronously from the outer layer 
-> async cipher algorithm in cbc_mb_async_ablk_decrypt via
-> 
->         err = crypto_blkcipher_crt(child_tfm)->decrypt(
->                 &rctx->desc, req->dst, req->src, req->nbytes);
+=46abrizio Demaria <fabrizio.f.demaria@gmail.com> wrote:
+> Hello,
+>=20
+> I am investigating the current usage of kernel crypto-libraries in th=
+e
+> SCTP code, considering to adopt the same crypto framework for the
+> MPTCP implementation.
+>=20
+> In sm_make_chunk.c, the crypto function "crypto_hash_setkey" is calle=
+d
+> in an atomic context, despite the fact that this function CAN invoke =
+a
+> GFP_KERNEL (sleeping) memory allocation. Calling a sleeping function
+> from an atomic context can end up in deadlock.
+> Is there a way to make sure that =E2=80=9Ccrypto_hash_setkey=E2=80=9D=
+ can be safely
+> called in an atomic context, considering all the possible code-paths
+> followed by the function?
 
-We should avoid bypassing the API and directly calling crypto
-driver functions like this.
+Indeed, in general setkey should not be invoked in atomic contexts.
+The only exception would be extremely simple hashes such as CRC.
 
-What if you made it a proper ablkcipher and just called it through
-the API?
+Keys should be setup before hand.  So SCTP needs to be fixed.
 
-Thanks,
--- 
+Cheers,
+--=20
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
