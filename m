@@ -1,28 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: constify drbg_state_ops structures
-Date: Fri, 11 Dec 2015 11:00:27 +0800
-Message-ID: <20151211030027.GA10399@gondor.apana.org.au>
-References: <1449520617-1964-1-git-send-email-Julia.Lawall@lip6.fr>
+Subject: Re: [PATCH 1/2] crypto: sahara: fix 64-bit dma_addr_t compilation
+Date: Fri, 11 Dec 2015 11:00:46 +0800
+Message-ID: <20151211030046.GB10399@gondor.apana.org.au>
+References: <1707164.bU6CqSGiie@wuerfel>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: kernel-janitors@vger.kernel.org,
+Cc: linux-crypto@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Julia Lawall <Julia.Lawall@lip6.fr>
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1449520617-1964-1-git-send-email-Julia.Lawall@lip6.fr>
+In-Reply-To: <1707164.bU6CqSGiie@wuerfel>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Dec 07, 2015 at 09:36:57PM +0100, Julia Lawall wrote:
-> The drbg_state_ops structures are never modified, so declare them as const.
+On Tue, Dec 08, 2015 at 04:23:51PM +0100, Arnd Bergmann wrote:
+> The sahara hardware uses DMA descriptors with 32-bit addresses, but
+> dma_addr_t is variable size depending on whether we want to support
+> any devices that use 64-bit DMA addresses in hardware.
+> This means that the definition of the DMA descriptor structure is wrong,
+> and we helpfully get a compiler warning about them too:
 > 
-> Done with the help of Coccinelle.
+> drivers/crypto/sahara.c:423:372: warning: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'dma_addr_t {aka long long unsigned int}' [-Wformat=]
 > 
-> Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+> This changes the definition of the sahara_hw_desc and sahara_hw_link
+> structures to only contain fixed-length members, which is required
+> to make the driver work on ARM LPAE mode, and avoids most of the
+> gcc warnings we get.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Patch applied.  Thanks.
+Both patches applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
