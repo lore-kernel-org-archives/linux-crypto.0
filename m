@@ -1,53 +1,49 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4 5/5] crypto: AES CBC multi-buffer glue code
-Date: Sat, 12 Dec 2015 13:48:06 +0800
-Message-ID: <20151212054806.GG17504@gondor.apana.org.au>
-References: <cover.1449091633.git.tim.c.chen@linux.intel.com>
- <1449086565.22260.15.camel@schen9-desk2.jf.intel.com>
- <20151209025242.GA24861@gondor.apana.org.au>
- <1449681794.22260.58.camel@schen9-desk2.jf.intel.com>
- <20151210014519.GA31692@gondor.apana.org.au>
- <1449765585.3057.9.camel@schen9-desk2.jf.intel.com>
- <20151211032340.GC10399@gondor.apana.org.au>
- <1449852880.3057.15.camel@schen9-desk2.jf.intel.com>
+From: Segher Boessenkool <segher@kernel.crashing.org>
+Subject: Re: Crypto/nx842: Ignore invalid XER[S0] return error
+Date: Sat, 12 Dec 2015 02:43:48 -0600
+Message-ID: <20151212084348.GA26552@gate.crashing.org>
+References: <1449891029.19568.5.camel@hbabu-laptop>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	Chandramouli Narayanan <mouli_7982@yahoo.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
+Cc: herbert@gondor.apana.org.au, ddstreet@ieee.org,
+	davem@davemloft.net, mpe@ellerman.id.au, pair@us.ibm.com,
+	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Haren Myneni <haren@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:34452 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750910AbbLLFsq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 12 Dec 2015 00:48:46 -0500
+Received: from gate.crashing.org ([63.228.1.57]:60177 "EHLO gate.crashing.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751122AbbLLIoU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 12 Dec 2015 03:44:20 -0500
 Content-Disposition: inline
-In-Reply-To: <1449852880.3057.15.camel@schen9-desk2.jf.intel.com>
+In-Reply-To: <1449891029.19568.5.camel@hbabu-laptop>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 11, 2015 at 08:54:40AM -0800, Tim Chen wrote:
-> Direct call I assume have less overhead.  Let me think about
+On Fri, Dec 11, 2015 at 07:30:29PM -0800, Haren Myneni wrote:
+> NX842 coprocessor sets 3rd bit in CR register with XER[S0] which is
+> nothing to do with NX request. On powerpc, XER[S0] will be set if
+> overflow in FPU and stays until another floating point operation is
+> executed. Since this bit can be set with other valuable return status,
+> ignore this XER[S0] value.
 
-static inline int crypto_ablkcipher_encrypt(struct ablkcipher_request *req)
-{
-	struct ablkcipher_tfm *crt =
-		crypto_ablkcipher_crt(crypto_ablkcipher_reqtfm(req));
-	return crt->encrypt(req);
-}
+XER[SO] is the *integer* summary overflow bit.  It is set by OE=1
+instructions ("addo" and the like), and can only be cleared explicitly
+(using "mtxer").
 
-I don't see any overhead there that you could eliminate by calling
-crt->encrypt directly.
+The floating point overflow bit is FPSCR[OX].
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> +	/*
+> +	 * NX842 coprocessor sets 3rd bit in CR register with XER[S0].
+> +	 * Setting XER[S0] happens if overflow in FPU and stays until
+> +	 * other floating operation is executed. XER[S0] value is nothing
+> +	 * to NX and no use to user. Since this bit can be set with other
+> +	 * return values, ignore this error.
+> +	 */
+> +	if (ret & ICSWX_XERS0)
+> +		ret &= ~ICSWX_XERS0;
+
+You can just always clear it, there is no need to check if it is set first.
+
+
+Segher
