@@ -1,71 +1,77 @@
-From: Haren Myneni <haren@linux.vnet.ibm.com>
-Subject: Crypto/nx842: Ignore invalid XER[S0] return error
-Date: Fri, 11 Dec 2015 19:30:29 -0800
-Message-ID: <1449891029.19568.5.camel@hbabu-laptop>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-To: herbert@gondor.apana.org.au, ddstreet@ieee.org,
-	davem@davemloft.net, mpe@ellerman.id.au, pair@us.ibm.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Subject: [PATCH] crypto: rsa-padding - don't allocate buffer on stack
+Date: Sat, 12 Dec 2015 00:03:51 -0500
+Message-ID: <1449896631-20472-1-git-send-email-andrew.zaborowski@intel.com>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qk0-f180.google.com ([209.85.220.180]:34704 "EHLO
+	mail-qk0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750800AbbLLFEC (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 12 Dec 2015 00:04:02 -0500
+Received: by qkdp187 with SMTP id p187so69260430qkd.1
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Dec 2015 21:04:01 -0800 (PST)
+Received: from localhost.localdomain ([190.234.106.52])
+        by smtp.gmail.com with ESMTPSA id b126sm15208402ywd.3.2015.12.11.21.04.00
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Fri, 11 Dec 2015 21:04:00 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+Avoid the s390 compile "warning: 'pkcs1pad_encrypt_sign_complete'
+uses dynamic stack allocation" reported by kbuild test robot.  Don't
+use a flat zero-filled buffer, instead zero the contents of the SGL.
 
-NX842 coprocessor sets 3rd bit in CR register with XER[S0] which is
-nothing to do with NX request. On powerpc, XER[S0] will be set if
-overflow in FPU and stays until another floating point operation is
-executed. Since this bit can be set with other valuable return status,
-ignore this XER[S0] value.
+Signed-off-by: Andrew Zaborowski <andrew.zaborowski@intel.com>
+---
+ crypto/rsa-pkcs1pad.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
 
-One of other bits (INITIATED, BUSY or REJECTED) will be returned for
-any given NX request.
-
-Signed-off-by: Haren Myneni <haren@us.ibm.com>
-
-diff --git a/arch/powerpc/include/asm/icswx.h b/arch/powerpc/include/asm/icswx.h
-index 9f8402b..27e588f 100644
---- a/arch/powerpc/include/asm/icswx.h
-+++ b/arch/powerpc/include/asm/icswx.h
-@@ -164,6 +164,7 @@ struct coprocessor_request_block {
- #define ICSWX_INITIATED		(0x8)
- #define ICSWX_BUSY		(0x4)
- #define ICSWX_REJECTED		(0x2)
-+#define ICSWX_XERS0		(0x1)	/* undefined or set from XERSO. */
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index accc67d..50f5c97 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -110,21 +110,32 @@ static int pkcs1pad_encrypt_sign_complete(struct akcipher_request *req, int err)
+ 	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+ 	struct pkcs1pad_ctx *ctx = akcipher_tfm_ctx(tfm);
+ 	struct pkcs1pad_request *req_ctx = akcipher_request_ctx(req);
+-	uint8_t zeros[ctx->key_size - req_ctx->child_req.dst_len];
++	size_t pad_len = ctx->key_size - req_ctx->child_req.dst_len;
++	size_t chunk_len, pad_left;
++	struct sg_mapping_iter miter;
  
- static inline int icswx(__be32 ccw, struct coprocessor_request_block *crb)
- {
-diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
-index 9ef51fa..6bc33ae 100644
---- a/drivers/crypto/nx/nx-842-powernv.c
-+++ b/drivers/crypto/nx/nx-842-powernv.c
-@@ -442,6 +442,16 @@ static int nx842_powernv_function(const unsigned char *in, unsigned int inlen,
- 			     (unsigned int)ccw,
- 			     (unsigned int)be32_to_cpu(crb->ccw));
- 
-+	/*
-+	 * NX842 coprocessor sets 3rd bit in CR register with XER[S0].
-+	 * Setting XER[S0] happens if overflow in FPU and stays until
-+	 * other floating operation is executed. XER[S0] value is nothing
-+	 * to NX and no use to user. Since this bit can be set with other
-+	 * return values, ignore this error.
-+	 */
-+	if (ret & ICSWX_XERS0)
-+		ret &= ~ICSWX_XERS0;
+ 	if (!err) {
+-		if (req_ctx->child_req.dst_len < ctx->key_size) {
+-			memset(zeros, 0, sizeof(zeros));
+-			sg_copy_from_buffer(req->dst,
+-					sg_nents_for_len(req->dst,
+-						sizeof(zeros)),
+-					zeros, sizeof(zeros));
++		if (pad_len) {
++			sg_miter_start(&miter, req->dst,
++					sg_nents_for_len(req->dst, pad_len),
++					SG_MITER_ATOMIC | SG_MITER_TO_SG);
 +
- 	switch (ret) {
- 	case ICSWX_INITIATED:
- 		ret = wait_for_csb(wmem, csb);
-@@ -454,10 +464,6 @@ static int nx842_powernv_function(const unsigned char *in, unsigned int inlen,
- 		pr_err_ratelimited("ICSWX rejected\n");
- 		ret = -EPROTO;
- 		break;
--	default:
--		pr_err_ratelimited("Invalid ICSWX return code %x\n", ret);
--		ret = -EPROTO;
--		break;
- 	}
++			pad_left = pad_len;
++			while (pad_left) {
++				sg_miter_next(&miter);
++
++				chunk_len = min(miter.length, pad_left);
++				memset(miter.addr, 0, chunk_len);
++				pad_left -= chunk_len;
++			}
++
++			sg_miter_stop(&miter);
+ 		}
  
- 	if (!ret)
+ 		sg_pcopy_from_buffer(req->dst,
+ 				sg_nents_for_len(req->dst, ctx->key_size),
+ 				req_ctx->out_buf, req_ctx->child_req.dst_len,
+-				sizeof(zeros));
++				pad_len);
+ 	}
+ 	req->dst_len = ctx->key_size;
+ 
+-- 
+2.1.4
