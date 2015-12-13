@@ -1,83 +1,46 @@
-From: Haren Myneni <haren@linux.vnet.ibm.com>
-Subject: [PATCH] crypto/nx842: Mask XERS0 bit in return value
-Date: Sun, 13 Dec 2015 03:30:41 -0800
-Message-ID: <1450006242.19568.11.camel@hbabu-laptop>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-To: herbert@gondor.apana.org.au, segher@kernel.crashing.org,
-	ddstreet@ieee.org, davem@davemloft.net, pair@us.ibm.com,
-	mpe@ellerman.id.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e33.co.us.ibm.com ([32.97.110.151]:42198 "EHLO
-	e33.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751759AbbLMLaz (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 13 Dec 2015 06:30:55 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <haren@linux.vnet.ibm.com>;
-	Sun, 13 Dec 2015 04:30:54 -0700
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Jarkko Sakkinen <jarkko.sakkinen-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+Subject: [PATCH v2 0/3] TPM 2.0 trusted key features for v4.5
+Date: Sun, 13 Dec 2015 17:42:28 +0200
+Message-ID: <1450021353-8775-1-git-send-email-jarkko.sakkinen@linux.intel.com>
+Cc: Jarkko Sakkinen <jarkko.sakkinen-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>,
+	James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+	Jason Gunthorpe <jgunthorpe-ePGOBjL8dl3ta4EC/59zMFaTQe2KTcn/@public.gmane.org>,
+	keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org (open list:KEYS-ENCRYPTED),
+	linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org (open list:ABI/API),
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org (open list:CRYPTO API),
+	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org (open list:DOCUMENTATION),
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org (open list),
+	linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org (open list:KEYS-ENCRYPTED),
+	tpmdd-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org (moderated list:TPM DEVICE DRIVER)
+To: Peter Huewe <peterhuewe-Mmb7MZpHnFY@public.gmane.org>,
+	Marcel Selhorst <tpmdd-yWjUBOtONefk1uMJSBkQmQ@public.gmane.org>,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+	Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
+These are the remaining features to enable trusted keys for TPM 2.0 that were
+not finished by the v4.4 merge window. These patches enable authorization
+policy based sealing (like using PCRs together with a password for example or
+something more complicated) with a user selected hash algorithm.
 
-NX842 coprocessor sets 3rd bit in CR register with XER[S0] which is
-nothing to do with NX request. Since this bit can be set with other
-valuable return status, mast this bit.
+Jarkko Sakkinen (3):
+  keys, trusted: fix: *do not* allow duplicate key options
+  keys, trusted: select hash algorithm for TPM2 chips
+  keys, trusted: seal with a TPM2 authorization policy
 
-One of other bits (INITIATED, BUSY or REJECTED) will be returned for
-any given NX request.
+ Documentation/security/keys-trusted-encrypted.txt | 31 +++++++-----
+ crypto/hash_info.c                                |  2 +
+ drivers/char/tpm/tpm.h                            | 10 ++--
+ drivers/char/tpm/tpm2-cmd.c                       | 60 ++++++++++++++++++++---
+ include/crypto/hash_info.h                        |  3 ++
+ include/keys/trusted-type.h                       |  5 ++
+ include/uapi/linux/hash_info.h                    |  1 +
+ security/keys/Kconfig                             |  1 +
+ security/keys/trusted.c                           | 56 ++++++++++++++++++++-
+ 9 files changed, 147 insertions(+), 22 deletions(-)
 
-Signed-off-by: Haren Myneni <haren@us.ibm.com>
----
- arch/powerpc/include/asm/icswx.h   |    1 +
- drivers/crypto/nx/nx-842-powernv.c |   12 ++++++++----
- 2 files changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/icswx.h b/arch/powerpc/include/asm/icswx.h
-index 9f8402b..27e588f 100644
---- a/arch/powerpc/include/asm/icswx.h
-+++ b/arch/powerpc/include/asm/icswx.h
-@@ -164,6 +164,7 @@ struct coprocessor_request_block {
- #define ICSWX_INITIATED		(0x8)
- #define ICSWX_BUSY		(0x4)
- #define ICSWX_REJECTED		(0x2)
-+#define ICSWX_XERS0		(0x1)	/* undefined or set from XERSO. */
- 
- static inline int icswx(__be32 ccw, struct coprocessor_request_block *crb)
- {
-diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
-index 9ef51fa..6e105e8 100644
---- a/drivers/crypto/nx/nx-842-powernv.c
-+++ b/drivers/crypto/nx/nx-842-powernv.c
-@@ -442,6 +442,14 @@ static int nx842_powernv_function(const unsigned char *in, unsigned int inlen,
- 			     (unsigned int)ccw,
- 			     (unsigned int)be32_to_cpu(crb->ccw));
- 
-+	/*
-+	 * NX842 coprocessor sets 3rd bit in CR register with XER[S0].
-+	 * XER[S0] is the integer summary overflow bit which is nothing
-+	 * to do NX. Since this bit can be set with other return values,
-+	 * mask this bit.
-+	 */
-+	ret &= ~ICSWX_XERS0;
-+
- 	switch (ret) {
- 	case ICSWX_INITIATED:
- 		ret = wait_for_csb(wmem, csb);
-@@ -454,10 +462,6 @@ static int nx842_powernv_function(const unsigned char *in, unsigned int inlen,
- 		pr_err_ratelimited("ICSWX rejected\n");
- 		ret = -EPROTO;
- 		break;
--	default:
--		pr_err_ratelimited("Invalid ICSWX return code %x\n", ret);
--		ret = -EPROTO;
--		break;
- 	}
- 
- 	if (!ret)
 -- 
-1.7.0.4
+2.5.0
