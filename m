@@ -1,93 +1,55 @@
-From: Haren Myneni <haren@linux.vnet.ibm.com>
-Subject: Re: Crypto/nx842: Ignore invalid XER[S0] return error
-Date: Sat, 12 Dec 2015 16:39:06 -0800
-Message-ID: <566CBE2A.1080107@linux.vnet.ibm.com>
-References: <1449891029.19568.5.camel@hbabu-laptop> <20151212084348.GA26552@gate.crashing.org> <566CA746.1090001@linux.vnet.ibm.com> <20151213000550.GA9787@gate.crashing.org>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH v2 0/2] crypto: KEYS: convert public key to akcipher api
+Date: Sat, 12 Dec 2015 18:26:14 -0800
+Message-ID: <20151213022614.12730.76645.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, ddstreet@ieee.org,
-	davem@davemloft.net, mpe@ellerman.id.au, pair@us.ibm.com,
-	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Segher Boessenkool <segher@kernel.crashing.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e19.ny.us.ibm.com ([129.33.205.209]:43390 "EHLO
-	e19.ny.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751187AbbLMAjY (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 12 Dec 2015 19:39:24 -0500
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <haren@linux.vnet.ibm.com>;
-	Sat, 12 Dec 2015 19:39:23 -0500
-In-Reply-To: <20151213000550.GA9787@gate.crashing.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: tadeusz.struk@intel.com, linux-kernel@vger.kernel.org,
+	dhowells@redhat.com, linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, zohar@linux.vnet.ibm.com
+To: herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 12/12/2015 04:05 PM, Segher Boessenkool wrote:
-> On Sat, Dec 12, 2015 at 03:01:26PM -0800, Haren Myneni wrote:
->> On 12/12/2015 12:43 AM, Segher Boessenkool wrote:
->>> On Fri, Dec 11, 2015 at 07:30:29PM -0800, Haren Myneni wrote:
->>>> NX842 coprocessor sets 3rd bit in CR register with XER[S0] which is
->>>> nothing to do with NX request. On powerpc, XER[S0] will be set if
->>>> overflow in FPU and stays until another floating point operation is
->>>> executed. Since this bit can be set with other valuable return status,
->>>> ignore this XER[S0] value.
->>>
->>> XER[SO] is the *integer* summary overflow bit.  It is set by OE=1
->>> instructions ("addo" and the like), and can only be cleared explicitly
->>> (using "mtxer").
->>
->> Thanks for the correct description. I was told XER[S0] is floating overflow from FPU.
-> 
-> You can use the Power ISA document to make sure for yourself.
-> 
->>>> +	if (ret & ICSWX_XERS0)
->>>> +		ret &= ~ICSWX_XERS0;
->>>
->>> You can just always clear it, there is no need to check if it is set first.
->>
->> Do you mean reset this before calling NX?
-> 
-> I mean write this as simply
-> 
-> +	ret &= ~ICSWX_XERS0;
-> 
-> (without any "if").
-> 
->> I believe NX coprocessor should not set CR bit as XER[S0] nothing to do with NX request and it is no use.
-> 
-> Many instructions set the CR bit to XER[SO] -- store conditional, slbfee.,
-> and all "normal" dot insns and of course cmp[l][i].  Or, shorter: "everything"
-> does this.
-> 
->> NX is copying this CR bit with XER. But reset XER[S0] has to be done before NX request.
-> 
-> Only if you care what the final value of bit 3 in the CR will be.  Even
-> in the unusual case where you want to look at all CR field bits at once
-> it is cheap to just mask out the bit (as you do).
-> 
->> We can not do this in icswx since this instruction can be used by other coprocessors in future. But I am not comfortable clearing as we are not touching this XER in the driver or result of NX operation. So I am proposing this patch to fix this not proper NX behaviour - ignores CR bit. 
-> 
-> I really wouldn't call it "not proper", that makes it sound like there
-> is an implementation bug or design mistake.  Instead, you could say that
-> your switch statement looks at the values of bits 0, 1, and 2, so you
-> just mask those -- you do not care about the value of bit 3, so you mask
-> it out.
-> 
-> Something like
-> 
-> +	/* Mask out the bits we do not care about. */
-> +	ret &= ~ICSWX_XERS0;
+This patch set converts the module verification and digital signature
+code to the new akcipher API.
+RSA implementation has been removed from crypto/asymmetric_keys and the
+new API is used for cryptographic primitives.
+There is no need for MPI above the akcipher API anymore.
+Modules can be verified with software as well as HW RSA implementations.
 
-icswx RFC says CR[3] bit can be undefined or set to XER[S0]. So was thinking NX should have ignored since no use to user. I may be wrong.
+Patches generated against cryptodev-2.6
 
-Thanks for your help. I will repost this patch with your suggestions.
+Changes in v2:
+- Fix the whey public_key_signature is setup. The pointer s needs to
+  point to the signature instread of the signature_v2_hdr.  
+- Select CRYPTO_RSA when INTEGRITY_ASYMMETRIC_KEYS is selected.
 
-Thanks
-Haren
-> 
-> 
-> Segher
-> 
+---
+
+Tadeusz Struk (2):
+      crypto: KEYS: convert public key to the akcipher api
+      integrity: convert digsig to akcipher api
+
+ crypto/asymmetric_keys/Kconfig            |    2 
+ crypto/asymmetric_keys/Makefile           |    7 -
+ crypto/asymmetric_keys/pkcs7_parser.c     |   12 +-
+ crypto/asymmetric_keys/pkcs7_trust.c      |    2 
+ crypto/asymmetric_keys/pkcs7_verify.c     |    2 
+ crypto/asymmetric_keys/public_key.c       |   64 +++------
+ crypto/asymmetric_keys/public_key.h       |   36 -----
+ crypto/asymmetric_keys/rsa.c              |  213 +++++++++++------------------
+ crypto/asymmetric_keys/x509_cert_parser.c |   37 +----
+ crypto/asymmetric_keys/x509_public_key.c  |   17 +-
+ crypto/asymmetric_keys/x509_rsakey.asn1   |    4 -
+ include/crypto/public_key.h               |   49 ++-----
+ security/integrity/Kconfig                |    1 
+ security/integrity/digsig_asymmetric.c    |   10 -
+ 14 files changed, 140 insertions(+), 316 deletions(-)
+ delete mode 100644 crypto/asymmetric_keys/public_key.h
+ delete mode 100644 crypto/asymmetric_keys/x509_rsakey.asn1
+
+--
+TS
