@@ -1,76 +1,45 @@
-From: Tadeusz Struk <tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2 0/5] crypto: add algif_akcipher user space API
-Date: Mon, 14 Dec 2015 10:06:21 -0800
-Message-ID: <566F051D.4080408@intel.com>
-References: <1831785.BBs8Hj3CxY@myon.chronox.de>
- <BDD3AC1F-26D5-41D2-863B-CF8C7BF5FFEE@holtmann.org>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: WARNING in crypto_wait_for_test
+Date: Mon, 14 Dec 2015 23:45:02 +0100
+Message-ID: <3121405.vKidzTde2R@tauon.atsec.com>
+References: <CACT4Y+bws9Scv7o3AB2wPM0ZJAeDvO+kZ45h-p5viDk9ZAe9KQ@mail.gmail.com> <6672511.rbcxt2K4Lk@tauon.atsec.com> <20151214125219.GA1514@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Marcel Holtmann <marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>,
-	Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>,
-	David Woodhouse <dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BDD3AC1F-26D5-41D2-863B-CF8C7BF5FFEE-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Dmitry Vyukov <dvyukov@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	syzkaller <syzkaller@googlegroups.com>,
+	Kostya Serebryany <kcc@google.com>,
+	Alexander Potapenko <glider@google.com>,
+	Sasha Levin <sasha.levin@oracle.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20151214125219.GA1514@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
-On 10/26/2015 09:54 PM, Marcel Holtmann wrote:
-> Hi Stephan,
-> 
->> This patch set adds the AF_ALG user space API to externalize the
->> asymmetric cipher API recently added to the kernel crypto API.
->>
->> The patch set is tested with the user space library of libkcapi [1].
->> Use [1] test/test.sh for a full test run. The test covers the
->> following scenarios:
->>
->> 	* sendmsg of one IOVEC
->>
->> 	* sendmsg of 16 IOVECs with non-linear buffer
->>
->> 	* vmsplice of one IOVEC
->>
->> 	* vmsplice of 15 IOVECs with non-linear buffer
->>
->> 	* invoking multiple separate cipher operations with one
->> 	  open cipher handle
->>
->> 	* encryption with private key (using vector from testmgr.h)
->>
->> 	* encryption with public key (using vector from testmgr.h)
->>
->> 	* decryption with private key (using vector from testmgr.h)
-> 
-> after having discussions with David Howells and David Woodhouse, I don't think we should expose akcipher via AF_ALG at all. I think the akcipher operations for sign/verify/encrypt/decrypt should operate on asymmetric keys in the first place. With akcipher you are pretty much bound to public and private keys and the key is the important part and not the akcipher itself. Especially since we want to support private keys in hardware (like TPM for example).
-> 
-> It seems more appropriate to use keyctl to derive the symmetric session key from your asymmetric key. And then use the symmetric session key id with skcipher via AF_ALG. Especially once symmetric key type has been introduced this seems to be trivial then.
-> 
-> I am not really in favor of having two userspace facing APIs for asymmetric cipher usage. And we need to have an API that is capable to work with hardware keys.
+Am Montag, 14. Dezember 2015, 20:52:19 schrieb Herbert Xu:
 
-If we would have something like this:
+Hi Herbert,
 
-diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
-index f2acd2f..02e6162 100644
---- a/include/uapi/linux/if_alg.h
-+++ b/include/uapi/linux/if_alg.h
-@@ -34,9 +34,12 @@ struct af_alg_iv {
- #define ALG_SET_OP			3
- #define ALG_SET_AEAD_ASSOCLEN		4
- #define ALG_SET_AEAD_AUTHSIZE		5
-+#define ALG_SET_PUBKEY			6
-+#define ALG_SET_PUBKEY_ID		7
+>On Thu, Dec 10, 2015 at 03:14:24AM +0100, Stephan Mueller wrote:
+>> Herbert, alg_bind currently blacklists one bit in the mask and type bit
+>> array. Shouldn't we instead white-list the allowed bits?
+>
+>Well a bogus mask shouldn't lead to the warning anyway.
+>
+>The warning in question is triggered only if crypto_schedule_test
+>returns NOTIFY_OK, which can only happen if try_module_get fails,
+>kzalloc fails, or if kthread_run fails.  All of these would be
+>real bugs (well except for the kzalloc failure perhaps).
 
-in case of ALG_SET_PUBKEY the key will be provided by user space
-and in case of ALG_SET_PUBKEY_ID the PF_ALG layer will retrieve the
-key from the keyring using the ID provided form user space.
-Will this be ok with you Marcel and David?
-Thanks,
+But with the given code, when you remove the bogus mask setting (which in turn 
+leaves it as 0), the code works flawless.
 
--- 
-TS
+>
+>Thanks,
+
+
+Ciao
+Stephan
