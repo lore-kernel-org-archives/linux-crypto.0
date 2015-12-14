@@ -1,317 +1,200 @@
-From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: [PATCH v2 2/3] keys, trusted: select hash algorithm for TPM2 chips
-Date: Sun, 13 Dec 2015 17:42:30 +0200
-Message-ID: <1450021353-8775-3-git-send-email-jarkko.sakkinen@linux.intel.com>
-References: <1450021353-8775-1-git-send-email-jarkko.sakkinen@linux.intel.com>
-Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-	David Safford <safford@us.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	James Morris <james.l.morris@oracle.com>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	linux-security-module@vger.kernel.org (open list:KEYS-ENCRYPTED),
-	keyrings@vger.kernel.org (open list:KEYS-ENCRYPTED),
-	linux-doc@vger.kernel.org (open list:DOCUMENTATION),
-	linux-kernel@vger.kernel.org (open list),
-	linux-crypto@vger.kernel.org (open list:CRYPTO API),
-	tpmdd-devel@lists.sourceforge.net (moderated list:TPM DEVICE DRIVER),
-	linux-api@vger.kernel.org (open list:ABI/API)
-To: Peter Huewe <peterhuewe@gmx.de>,
-	Marcel Selhorst <tpmdd@selhorst.net>,
-	David Howells <dhowells@redhat.com>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1450021353-8775-1-git-send-email-jarkko.sakkinen@linux.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Zain <zain.wang@rock-chips.com>
+Subject: Re: [RFC PATCH V3] Crypto: rockchip/crypto - add hash support for
+ crypto engine in rk3288
+Date: Mon, 14 Dec 2015 09:50:38 +0800
+Message-ID: <566E206E.7000802@rock-chips.com>
+References: <1449799103-24221-1-git-send-email-zain.wang@rock-chips.com>
+ <20151211085458.GA14705@Red>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: heiko@sntech.de, herbert@gondor.apana.org.au, davem@davemloft.net,
+	eddie.cai@rock-chips.com, linux-rockchip@lists.infradead.org,
+	linux-crypto@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from regular1.263xmail.com ([211.150.99.138]:34894 "EHLO
+	regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751697AbbLNBu5 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 13 Dec 2015 20:50:57 -0500
+In-Reply-To: <20151211085458.GA14705@Red>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Added 'hash=' option for selecting the hash algorithm for add_key()
-syscall and documentation for it.
+Hi,
 
-Added entry for sm3-256 to the following tables in order to support
-TPM_ALG_SM3_256:
-
-* hash_algo_name
-* hash_digest_size
-
-Includes support for the following hash algorithms:
-
-* sha1
-* sha256
-* sha384
-* sha512
-* sm3-256
-
-Signed-off-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Tested-by: Colin Ian King <colin.king@canonical.com>
-Reviewed-by: James Morris <james.l.morris@oracle.com>
----
- Documentation/security/keys-trusted-encrypted.txt |  3 ++
- crypto/hash_info.c                                |  2 ++
- drivers/char/tpm/tpm.h                            | 10 +++++--
- drivers/char/tpm/tpm2-cmd.c                       | 36 +++++++++++++++++++++--
- include/crypto/hash_info.h                        |  3 ++
- include/keys/trusted-type.h                       |  1 +
- include/uapi/linux/hash_info.h                    |  1 +
- security/keys/Kconfig                             |  1 +
- security/keys/trusted.c                           | 27 ++++++++++++++++-
- 9 files changed, 77 insertions(+), 7 deletions(-)
-
-diff --git a/Documentation/security/keys-trusted-encrypted.txt b/Documentation/security/keys-trusted-encrypted.txt
-index e105ae9..fd2565b 100644
---- a/Documentation/security/keys-trusted-encrypted.txt
-+++ b/Documentation/security/keys-trusted-encrypted.txt
-@@ -38,6 +38,9 @@ Usage:
-        pcrlock=	  pcr number to be extended to "lock" blob
-        migratable= 0|1 indicating permission to reseal to new PCR values,
-                    default 1 (resealing allowed)
-+       hash=      hash algorithm name as a string. For TPM 1.x the only
-+                  allowed value is sha1. For TPM 2.x the allowed values
-+		  are sha1, sha256, sha384, sha512 and sm3-256.
- 
- "keyctl print" returns an ascii hex copy of the sealed key, which is in standard
- TPM_STORED_DATA format.  The key length for new keys are always in bytes.
-diff --git a/crypto/hash_info.c b/crypto/hash_info.c
-index 3e7ff46..7b1e0b1 100644
---- a/crypto/hash_info.c
-+++ b/crypto/hash_info.c
-@@ -31,6 +31,7 @@ const char *const hash_algo_name[HASH_ALGO__LAST] = {
- 	[HASH_ALGO_TGR_128]	= "tgr128",
- 	[HASH_ALGO_TGR_160]	= "tgr160",
- 	[HASH_ALGO_TGR_192]	= "tgr192",
-+	[HASH_ALGO_SM3_256]	= "sm3-256",
- };
- EXPORT_SYMBOL_GPL(hash_algo_name);
- 
-@@ -52,5 +53,6 @@ const int hash_digest_size[HASH_ALGO__LAST] = {
- 	[HASH_ALGO_TGR_128]	= TGR128_DIGEST_SIZE,
- 	[HASH_ALGO_TGR_160]	= TGR160_DIGEST_SIZE,
- 	[HASH_ALGO_TGR_192]	= TGR192_DIGEST_SIZE,
-+	[HASH_ALGO_SM3_256]	= SM3256_DIGEST_SIZE,
- };
- EXPORT_SYMBOL_GPL(hash_digest_size);
-diff --git a/drivers/char/tpm/tpm.h b/drivers/char/tpm/tpm.h
-index 347fc61..542a80c 100644
---- a/drivers/char/tpm/tpm.h
-+++ b/drivers/char/tpm/tpm.h
-@@ -83,16 +83,20 @@ enum tpm2_structures {
- };
- 
- enum tpm2_return_codes {
--	TPM2_RC_INITIALIZE	= 0x0100,
--	TPM2_RC_TESTING		= 0x090A,
-+	TPM2_RC_HASH		= 0x0083, /* RC_FMT1 */
-+	TPM2_RC_INITIALIZE	= 0x0100, /* RC_VER1 */
- 	TPM2_RC_DISABLED	= 0x0120,
-+	TPM2_RC_TESTING		= 0x090A, /* RC_WARN */
- };
- 
- enum tpm2_algorithms {
- 	TPM2_ALG_SHA1		= 0x0004,
- 	TPM2_ALG_KEYEDHASH	= 0x0008,
- 	TPM2_ALG_SHA256		= 0x000B,
--	TPM2_ALG_NULL		= 0x0010
-+	TPM2_ALG_SHA384		= 0x000C,
-+	TPM2_ALG_SHA512		= 0x000D,
-+	TPM2_ALG_NULL		= 0x0010,
-+	TPM2_ALG_SM3_256	= 0x0012,
- };
- 
- enum tpm2_command_codes {
-diff --git a/drivers/char/tpm/tpm2-cmd.c b/drivers/char/tpm/tpm2-cmd.c
-index c121304..d9d0822 100644
---- a/drivers/char/tpm/tpm2-cmd.c
-+++ b/drivers/char/tpm/tpm2-cmd.c
-@@ -16,6 +16,7 @@
-  */
- 
- #include "tpm.h"
-+#include <crypto/hash_info.h>
- #include <keys/trusted-type.h>
- 
- enum tpm2_object_attributes {
-@@ -104,6 +105,19 @@ struct tpm2_cmd {
- 	union tpm2_cmd_params	params;
- } __packed;
- 
-+struct tpm2_hash {
-+	unsigned int crypto_id;
-+	unsigned int tpm_id;
-+};
-+
-+static struct tpm2_hash tpm2_hash_map[] = {
-+	{HASH_ALGO_SHA1, TPM2_ALG_SHA1},
-+	{HASH_ALGO_SHA256, TPM2_ALG_SHA256},
-+	{HASH_ALGO_SHA384, TPM2_ALG_SHA384},
-+	{HASH_ALGO_SHA512, TPM2_ALG_SHA512},
-+	{HASH_ALGO_SM3_256, TPM2_ALG_SM3_256},
-+};
-+
- /*
-  * Array with one entry per ordinal defining the maximum amount
-  * of time the chip could take to return the result. The values
-@@ -429,8 +443,20 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
- {
- 	unsigned int blob_len;
- 	struct tpm_buf buf;
-+	u32 hash;
-+	int i;
- 	int rc;
- 
-+	for (i = 0; i < ARRAY_SIZE(tpm2_hash_map); i++) {
-+		if (options->hash == tpm2_hash_map[i].crypto_id) {
-+			hash = tpm2_hash_map[i].tpm_id;
-+			break;
-+		}
-+	}
-+
-+	if (i == ARRAY_SIZE(tpm2_hash_map))
-+		return -EINVAL;
-+
- 	rc = tpm_buf_init(&buf, TPM2_ST_SESSIONS, TPM2_CC_CREATE);
- 	if (rc)
- 		return rc;
-@@ -455,7 +481,7 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
- 	tpm_buf_append_u16(&buf, 14);
- 
- 	tpm_buf_append_u16(&buf, TPM2_ALG_KEYEDHASH);
--	tpm_buf_append_u16(&buf, TPM2_ALG_SHA256);
-+	tpm_buf_append_u16(&buf, hash);
- 	tpm_buf_append_u32(&buf, TPM2_ATTR_USER_WITH_AUTH);
- 	tpm_buf_append_u16(&buf, 0); /* policy digest size */
- 	tpm_buf_append_u16(&buf, TPM2_ALG_NULL);
-@@ -488,8 +514,12 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
- out:
- 	tpm_buf_destroy(&buf);
- 
--	if (rc > 0)
--		rc = -EPERM;
-+	if (rc > 0) {
-+		if ((rc & TPM2_RC_HASH) == TPM2_RC_HASH)
-+			rc = -EINVAL;
-+		else
-+			rc = -EPERM;
-+	}
- 
- 	return rc;
- }
-diff --git a/include/crypto/hash_info.h b/include/crypto/hash_info.h
-index e1e5a3e..56f217d 100644
---- a/include/crypto/hash_info.h
-+++ b/include/crypto/hash_info.h
-@@ -34,6 +34,9 @@
- #define TGR160_DIGEST_SIZE 20
- #define TGR192_DIGEST_SIZE 24
- 
-+/* not defined in include/crypto/ */
-+#define SM3256_DIGEST_SIZE 32
-+
- extern const char *const hash_algo_name[HASH_ALGO__LAST];
- extern const int hash_digest_size[HASH_ALGO__LAST];
- 
-diff --git a/include/keys/trusted-type.h b/include/keys/trusted-type.h
-index f91ecd9..a6a1008 100644
---- a/include/keys/trusted-type.h
-+++ b/include/keys/trusted-type.h
-@@ -36,6 +36,7 @@ struct trusted_key_options {
- 	uint32_t pcrinfo_len;
- 	unsigned char pcrinfo[MAX_PCRINFO_SIZE];
- 	int pcrlock;
-+	uint32_t hash;
- };
- 
- extern struct key_type key_type_trusted;
-diff --git a/include/uapi/linux/hash_info.h b/include/uapi/linux/hash_info.h
-index ca18c45..ebf8fd8 100644
---- a/include/uapi/linux/hash_info.h
-+++ b/include/uapi/linux/hash_info.h
-@@ -31,6 +31,7 @@ enum hash_algo {
- 	HASH_ALGO_TGR_128,
- 	HASH_ALGO_TGR_160,
- 	HASH_ALGO_TGR_192,
-+	HASH_ALGO_SM3_256,
- 	HASH_ALGO__LAST
- };
- 
-diff --git a/security/keys/Kconfig b/security/keys/Kconfig
-index 72483b8..fe4d74e 100644
---- a/security/keys/Kconfig
-+++ b/security/keys/Kconfig
-@@ -54,6 +54,7 @@ config TRUSTED_KEYS
- 	select CRYPTO
- 	select CRYPTO_HMAC
- 	select CRYPTO_SHA1
-+	select CRYPTO_HASH_INFO
- 	help
- 	  This option provides support for creating, sealing, and unsealing
- 	  keys in the kernel. Trusted keys are random number symmetric keys,
-diff --git a/security/keys/trusted.c b/security/keys/trusted.c
-index 7c183c7..8f1300c 100644
---- a/security/keys/trusted.c
-+++ b/security/keys/trusted.c
-@@ -11,6 +11,7 @@
-  * See Documentation/security/keys-trusted-encrypted.txt
-  */
- 
-+#include <crypto/hash_info.h>
- #include <linux/uaccess.h>
- #include <linux/module.h>
- #include <linux/init.h>
-@@ -710,7 +711,8 @@ enum {
- 	Opt_err = -1,
- 	Opt_new, Opt_load, Opt_update,
- 	Opt_keyhandle, Opt_keyauth, Opt_blobauth,
--	Opt_pcrinfo, Opt_pcrlock, Opt_migratable
-+	Opt_pcrinfo, Opt_pcrlock, Opt_migratable,
-+	Opt_hash,
- };
- 
- static const match_table_t key_tokens = {
-@@ -723,6 +725,7 @@ static const match_table_t key_tokens = {
- 	{Opt_pcrinfo, "pcrinfo=%s"},
- 	{Opt_pcrlock, "pcrlock=%s"},
- 	{Opt_migratable, "migratable=%s"},
-+	{Opt_hash, "hash=%s"},
- 	{Opt_err, NULL}
- };
- 
-@@ -737,6 +740,14 @@ static int getoptions(char *c, struct trusted_key_payload *pay,
- 	unsigned long handle;
- 	unsigned long lock;
- 	unsigned long token_mask = 0;
-+	int i;
-+	int tpm2;
-+
-+	tpm2 = tpm_is_tpm2(TPM_ANY_NUM);
-+	if (tpm2 < 0)
-+		return tpm2;
-+
-+	opt->hash = tpm2 ? HASH_ALGO_SHA256 : HASH_ALGO_SHA1;
- 
- 	while ((p = strsep(&c, " \t"))) {
- 		if (*p == '\0' || *p == ' ' || *p == '\t')
-@@ -790,6 +801,20 @@ static int getoptions(char *c, struct trusted_key_payload *pay,
- 				return -EINVAL;
- 			opt->pcrlock = lock;
- 			break;
-+		case Opt_hash:
-+			for (i = 0; i < HASH_ALGO__LAST; i++) {
-+				if (!strcmp(args[0].from, hash_algo_name[i])) {
-+					opt->hash = i;
-+					break;
-+				}
-+			}
-+			if (i == HASH_ALGO__LAST)
-+				return -EINVAL;
-+			if  (!tpm2 && i != HASH_ALGO_SHA1) {
-+				pr_info("trusted_key: TPM 1.x only supports SHA-1.\n");
-+				return -EINVAL;
-+			}
-+			break;
- 		default:
- 			return -EINVAL;
- 		}
--- 
-2.5.0
+=E5=9C=A8 2015=E5=B9=B412=E6=9C=8811=E6=97=A5 16:54, LABBE Corentin =E5=
+=86=99=E9=81=93:
+> Hello
+>
+> I have some minor comments below.
+>
+> On Fri, Dec 11, 2015 at 09:58:23AM +0800, Zain Wang wrote:
+>> Add md5 sha1 sha256 support for crypto engine in rk3288.
+>> This patch can't support multiple updatings because of limited of IC=
+,
+>> as result, it can't support import and export too.
+>>
+>> Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
+>> ---
+>>
+>> Changes in V3:
+>> - add switch instead of multiple if.
+>>
+>> Changes in V2:
+>> - add some comments to code.
+>> - fix some issues about zero message process.
+>>
+>>  drivers/crypto/rockchip/Makefile                   |   1 +
+>>  drivers/crypto/rockchip/rk3288_crypto.c            |  33 +-
+>>  drivers/crypto/rockchip/rk3288_crypto.h            |  50 ++-
+>>  drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c |  20 +-
+>>  drivers/crypto/rockchip/rk3288_crypto_ahash.c      | 394 ++++++++++=
++++++++++++
+>>  5 files changed, 480 insertions(+), 18 deletions(-)
+>>  create mode 100644 drivers/crypto/rockchip/rk3288_crypto_ahash.c
+>>
+>> diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypt=
+o/rockchip/rk3288_crypto.h
+>> index 604ffe7..01d8299 100644
+>> --- a/drivers/crypto/rockchip/rk3288_crypto.h
+>> +++ b/drivers/crypto/rockchip/rk3288_crypto.h
+>> @@ -6,6 +6,10 @@
+>>  #include <crypto/algapi.h>
+>>  #include <linux/interrupt.h>
+>>  #include <linux/delay.h>
+>> +#include <crypto/internal/hash.h>
+>> +
+>> +#include "crypto/md5.h"
+>> +#include "crypto/sha.h"
+> It is proper to include with <> not ""
+Ok, done!
+>> diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers=
+/crypto/rockchip/rk3288_crypto_ahash.c
+>> new file mode 100644
+>> index 0000000..a5795f6
+>> --- /dev/null
+>> +++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+>> @@ -0,0 +1,394 @@
+>> +/*
+>> + * Crypto acceleration support for Rockchip RK3288
+>> + *
+>> + * Copyright (c) 2015, Fuzhou Rockchip Electronics Co., Ltd
+>> + *
+>> + * Author: Zain Wang <zain.wang@rock-chips.com>
+>> + *
+>> + * This program is free software; you can redistribute it and/or mo=
+dify it
+>> + * under the terms and conditions of the GNU General Public License=
+,
+>> + * version 2, as published by the Free Software Foundation.
+>> + *
+>> + * Some ideas are from marvell/cesa.c and s5p-sss.c driver.
+>> + */
+>> +#include "rk3288_crypto.h"
+>> +
+>> +/*
+>> + * IC can not process zero message hash,
+>> + * so we put the fixed hash out when met zero message.
+>> + */
+>> +const static u8 *sha1_zero_message_hash =3D {
+>> +	"\xda\x39\xa3\xee\x5e\x6b\x4b\x0d\x32\x55"
+>> +	"\xbf\xef\x95\x60\x18\x90\xaf\xd8\x07\x09"
+>> +};
+>> +
+>> +const static u8 *sha256_zero_message_hash =3D {
+>> +	"\xe3\xb0\xc4\x42\x98\xfc\x1c\x14"
+>> +	"\x9a\xfb\xf4\xc8\x99\x6f\xb9\x24"
+>> +	"\x27\xae\x41\xe4\x64\x9b\x93\x4c"
+>> +	"\xa4\x95\x99\x1b\x78\x52\xb8\x55"
+>> +};
+>> +
+>> +const static u8 *md5_zero_message_hash =3D {
+>> +	"\xd4\x1d\x8c\xd9\x8f\x00\xb2\x04"
+>> +	"\xe9\x80\x09\x98\xec\xf8\x42\x7e"
+>> +};
+>> +
+>> +
+>> +static int zero_message_process(struct ahash_request *req)
+>> +{
+>> +	struct crypto_ahash *tfm =3D crypto_ahash_reqtfm(req);
+>> +
+>> +	switch (crypto_ahash_digestsize(tfm)) {
+>> +	case SHA1_DIGEST_SIZE:
+>> +		memcpy(req->result, sha1_zero_message_hash, SHA1_DIGEST_SIZE);
+>> +		break;
+>> +	case SHA256_DIGEST_SIZE:
+>> +		memcpy(req->result, sha256_zero_message_hash,
+>> +		       SHA256_DIGEST_SIZE);
+>> +		break;
+>> +	case MD5_DIGEST_SIZE:
+>> +		memcpy(req->result, md5_zero_message_hash, MD5_DIGEST_SIZE);
+>> +		break;
+>> +	default:
+>> +		return -EINVAL;
+>> +		break;
+>> +	}
+> You could store crypto_ahash_digestsize result and use it in memcpy.
+> You could also store the name of xxx_zero_message_hash in crypto_alg =
+like n2 do.
+> Perhaps a combination of the two could produce more generic code.
+You are right, it will fix it as your first way.
+>> +struct rk_crypto_tmp rk_ahash_sha256 =3D {
+>> +	.type =3D ALG_TYPE_HASH,
+>> +	.alg.hash =3D {
+>> +	.init =3D rk_ahash_init,
+>> +	.update =3D rk_ahash_update,
+>> +	.final =3D rk_ahash_final,
+>> +	.finup =3D rk_ahash_finup,
+>> +	.digest =3D rk_ahash_digest,
+>> +		.halg =3D {
+>> +			 .digestsize =3D SHA256_DIGEST_SIZE,
+>> +			 .statesize =3D sizeof(struct sha256_state),
+>> +			 .base =3D {
+>> +				  .cra_name =3D "sha256",
+>> +				  .cra_driver_name =3D "rk-sha256",
+>> +				  .cra_priority =3D 300,
+>> +				  .cra_flags =3D CRYPTO_ALG_ASYNC |
+>> +					       CRYPTO_ALG_NEED_FALLBACK,
+>> +				  .cra_blocksize =3D SHA256_BLOCK_SIZE,
+>> +				  .cra_ctxsize =3D sizeof(struct rk_ahash_ctx),
+>> +				  .cra_alignmask =3D 0,
+>> +				  .cra_init =3D rk_cra_hash_init,
+>> +				  .cra_exit =3D rk_cra_hash_exit,
+>> +				  .cra_module =3D THIS_MODULE,
+>> +				  }
+>> +			 }
+>> +	}
+>> +};
+>> +
+>> +struct rk_crypto_tmp rk_ahash_md5 =3D {
+>> +	.type =3D ALG_TYPE_HASH,
+>> +	.alg.hash =3D {
+>> +		.init =3D rk_ahash_init,
+>> +		.update =3D rk_ahash_update,
+>> +		.final =3D rk_ahash_final,
+>> +		.finup =3D rk_ahash_finup,
+>> +		.digest =3D rk_ahash_digest,
+>> +		.halg =3D {
+>> +			 .digestsize =3D MD5_DIGEST_SIZE,
+>> +			 .statesize =3D sizeof(struct md5_state),
+>> +			 .base =3D {
+>> +				  .cra_name =3D "md5",
+>> +				  .cra_driver_name =3D "rk-md5",
+>> +				  .cra_priority =3D 300,
+>> +				  .cra_flags =3D CRYPTO_ALG_ASYNC |
+>> +					       CRYPTO_ALG_NEED_FALLBACK,
+> You said that the driver need a fallback, but I do not see any use of=
+ it.
+I will remove it.
+The idea of this part is from mv_ceas.c, and I forgot to remove it that
+I did not use a fallback actually.:'(
+>
+> Regards
+>
+>
+>
+>
+Thanks,
+Zain
