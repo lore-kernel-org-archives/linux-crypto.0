@@ -1,42 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: "crypto_hash_setkey" call from atomic context
-Date: Mon, 14 Dec 2015 17:57:00 +0800
-Message-ID: <20151214095700.GA32274@gondor.apana.org.au>
-References: <CACzeOEfg9x+aEwuP9xH3BLd5+RzpDBZBGsnsLw7skW9FP5LVGw@mail.gmail.com>
- <20151211074223.GA11688@gondor.apana.org.au>
- <CACzeOEfOSi7T2CmE1HjU-ryCGEBj-b0h2E-o0BrmKWiFvMcEHQ@mail.gmail.com>
+Subject: Re: WARNING in crypto_wait_for_test
+Date: Mon, 14 Dec 2015 20:52:19 +0800
+Message-ID: <20151214125219.GA1514@gondor.apana.org.au>
+References: <CACT4Y+bws9Scv7o3AB2wPM0ZJAeDvO+kZ45h-p5viDk9ZAe9KQ@mail.gmail.com>
+ <6672511.rbcxt2K4Lk@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"Nordell, Joakim" <joakim.nordell@intel.com>,
-	"Chen, Shujuan" <shujuan.chen@intel.com>, doru.gucea@intel.com
-To: Fabrizio Demaria <fabrizio.f.demaria@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36955 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932127AbbLNJ5V (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 14 Dec 2015 04:57:21 -0500
+Cc: Dmitry Vyukov <dvyukov@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	syzkaller <syzkaller@googlegroups.com>,
+	Kostya Serebryany <kcc@google.com>,
+	Alexander Potapenko <glider@google.com>,
+	Sasha Levin <sasha.levin@oracle.com>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CACzeOEfOSi7T2CmE1HjU-ryCGEBj-b0h2E-o0BrmKWiFvMcEHQ@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <6672511.rbcxt2K4Lk@tauon.atsec.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Dec 14, 2015 at 09:53:03AM +0100, Fabrizio Demaria wrote:
-> In our MPTCP implementation we handled the setkey problem by
-> pre-allocating a properly aligned key's buffer right after
-> "crypto_alloc_hash", outside atomic context [1]. Would this workaround
-> be enough to guarantee that "crypto_hash_setkey" can be safely called
-> in atomic contexts? Is it always the case that "crypto_hash_setkey"
-> calls "crypto_shash_setkey"?
+On Thu, Dec 10, 2015 at 03:14:24AM +0100, Stephan Mueller wrote:
+>
+> Herbert, alg_bind currently blacklists one bit in the mask and type bit array. 
+> Shouldn't we instead white-list the allowed bits?
 
-First of all don't use crypto_hash_* in new code.  It is obsolete.
-Instead use shash or ahash as appropirate.
+Well a bogus mask shouldn't lead to the warning anyway.
 
-The proper way to manage keys is to set them when you allocate the
-tfm.  You should use a different tfm for each key.
+The warning in question is triggered only if crypto_schedule_test
+returns NOTIFY_OK, which can only happen if try_module_get fails,
+kzalloc fails, or if kthread_run fails.  All of these would be
+real bugs (well except for the kzalloc failure perhaps).
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
