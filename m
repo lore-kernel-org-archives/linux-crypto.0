@@ -1,69 +1,75 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH v2 2/2] integrity: convert digsig to akcipher api
-Date: Mon, 14 Dec 2015 06:59:02 -0800
-Message-ID: <566ED936.6070801@intel.com>
-References: <20151213022614.12730.76645.stgit@tstruk-mobl1>
- <20151213022624.12730.35862.stgit@tstruk-mobl1>
- <1450099487.2702.32.camel@linux.vnet.ibm.com>
+From: Tadeusz Struk <tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2 0/5] crypto: add algif_akcipher user space API
+Date: Mon, 14 Dec 2015 10:06:21 -0800
+Message-ID: <566F051D.4080408@intel.com>
+References: <1831785.BBs8Hj3CxY@myon.chronox.de>
+ <BDD3AC1F-26D5-41D2-863B-CF8C7BF5FFEE@holtmann.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>, dhowells@redhat.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:44088 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751334AbbLNPCW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 14 Dec 2015 10:02:22 -0500
-In-Reply-To: <1450099487.2702.32.camel@linux.vnet.ibm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Marcel Holtmann <marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>,
+	Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>,
+	David Woodhouse <dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <BDD3AC1F-26D5-41D2-863B-CF8C7BF5FFEE-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 12/14/2015 05:24 AM, Mimi Zohar wrote:
-> On Sat, 2015-12-12 at 18:26 -0800, Tadeusz Struk wrote:
->> Convert asymmetric_verify to akcipher api.
->>
->> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
->> ---
->>  security/integrity/Kconfig             |    1 +
->>  security/integrity/digsig_asymmetric.c |   10 +++-------
->>  2 files changed, 4 insertions(+), 7 deletions(-)
->>
->> diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
->> index 73c457b..f0b2463 100644
->> --- a/security/integrity/Kconfig
->> +++ b/security/integrity/Kconfig
->> @@ -36,6 +36,7 @@ config INTEGRITY_ASYMMETRIC_KEYS
->>          select ASYMMETRIC_KEY_TYPE
->>          select ASYMMETRIC_PUBLIC_KEY_SUBTYPE
->>          select PUBLIC_KEY_ALGO_RSA
->> +        select CRYPTO_RSA
->>          select X509_CERTIFICATE_PARSER
->>  	help
->>  	  This option enables digital signature verification using
->> diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
->> index 4fec181..5629372 100644
->> --- a/security/integrity/digsig_asymmetric.c
->> +++ b/security/integrity/digsig_asymmetric.c
->> @@ -92,13 +92,9 @@ int asymmetric_verify(struct key *keyring, const char *sig,
->>  	pks.pkey_hash_algo = hdr->hash_algo;
->>  	pks.digest = (u8 *)data;
->>  	pks.digest_size = datalen;
->> -	pks.nr_mpi = 1;
->> -	pks.rsa.s = mpi_read_raw_data(hdr->sig, siglen);
->> -
->> -	if (pks.rsa.s)
->> -		ret = verify_signature(key, &pks);
->> -
->> -	mpi_free(pks.rsa.s);
->> +	pks.s = hdr->sig;
+Hi,
+On 10/26/2015 09:54 PM, Marcel Holtmann wrote:
+> Hi Stephan,
 > 
-> Thanks!  With this change, my system is now able to boot.
+>> This patch set adds the AF_ALG user space API to externalize the
+>> asymmetric cipher API recently added to the kernel crypto API.
+>>
+>> The patch set is tested with the user space library of libkcapi [1].
+>> Use [1] test/test.sh for a full test run. The test covers the
+>> following scenarios:
+>>
+>> 	* sendmsg of one IOVEC
+>>
+>> 	* sendmsg of 16 IOVECs with non-linear buffer
+>>
+>> 	* vmsplice of one IOVEC
+>>
+>> 	* vmsplice of 15 IOVECs with non-linear buffer
+>>
+>> 	* invoking multiple separate cipher operations with one
+>> 	  open cipher handle
+>>
+>> 	* encryption with private key (using vector from testmgr.h)
+>>
+>> 	* encryption with public key (using vector from testmgr.h)
+>>
+>> 	* decryption with private key (using vector from testmgr.h)
 > 
-Thanks Mimi.
+> after having discussions with David Howells and David Woodhouse, I don't think we should expose akcipher via AF_ALG at all. I think the akcipher operations for sign/verify/encrypt/decrypt should operate on asymmetric keys in the first place. With akcipher you are pretty much bound to public and private keys and the key is the important part and not the akcipher itself. Especially since we want to support private keys in hardware (like TPM for example).
+> 
+> It seems more appropriate to use keyctl to derive the symmetric session key from your asymmetric key. And then use the symmetric session key id with skcipher via AF_ALG. Especially once symmetric key type has been introduced this seems to be trivial then.
+> 
+> I am not really in favor of having two userspace facing APIs for asymmetric cipher usage. And we need to have an API that is capable to work with hardware keys.
 
-David, do you have any comments to this patch set? If not could you ACK please.
+If we would have something like this:
+
+diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
+index f2acd2f..02e6162 100644
+--- a/include/uapi/linux/if_alg.h
++++ b/include/uapi/linux/if_alg.h
+@@ -34,9 +34,12 @@ struct af_alg_iv {
+ #define ALG_SET_OP			3
+ #define ALG_SET_AEAD_ASSOCLEN		4
+ #define ALG_SET_AEAD_AUTHSIZE		5
++#define ALG_SET_PUBKEY			6
++#define ALG_SET_PUBKEY_ID		7
+
+in case of ALG_SET_PUBKEY the key will be provided by user space
+and in case of ALG_SET_PUBKEY_ID the PF_ALG layer will retrieve the
+key from the keyring using the ID provided form user space.
+Will this be ok with you Marcel and David?
 Thanks,
 
 -- 
