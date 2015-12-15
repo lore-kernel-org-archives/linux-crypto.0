@@ -1,43 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: WARNING in crypto_wait_for_test
-Date: Tue, 15 Dec 2015 12:14:52 +0800
-Message-ID: <20151215041452.GA9196@gondor.apana.org.au>
-References: <CACT4Y+bws9Scv7o3AB2wPM0ZJAeDvO+kZ45h-p5viDk9ZAe9KQ@mail.gmail.com>
- <6672511.rbcxt2K4Lk@tauon.atsec.com>
- <20151214125219.GA1514@gondor.apana.org.au>
- <3121405.vKidzTde2R@tauon.atsec.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [patch] crypto: qat - fix some timeout tests
+Date: Tue, 15 Dec 2015 13:05:15 +0300
+Message-ID: <20151215100515.GB20848@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Dmitry Vyukov <dvyukov@google.com>,
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	syzkaller <syzkaller@googlegroups.com>,
-	Kostya Serebryany <kcc@google.com>,
-	Alexander Potapenko <glider@google.com>,
-	Sasha Levin <sasha.levin@oracle.com>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:42047 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932321AbbLOEPF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 14 Dec 2015 23:15:05 -0500
+	Bruce Allan <bruce.w.allan@intel.com>,
+	Pingchao Yang <pingchao.yang@intel.com>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <3121405.vKidzTde2R@tauon.atsec.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Dec 14, 2015 at 11:45:02PM +0100, Stephan Mueller wrote:
->
-> But with the given code, when you remove the bogus mask setting (which in turn 
-> leaves it as 0), the code works flawless.
+We do an "if (!times)" test later to see if we ran the loop too many
+times, but because it is a postop negate that means times is -1 when we
+exit that way.  I have fixed this by changing it from a post op to a
+preop.
 
-Please find out exactly why this would be triggering the warning
-because your previous explanation of not being able to find the
-algorithm due to the mask does not make sense.
+Fixes: b3416fb8a2f5 ('crypto: qat - Intel(R) QAT accelengine part of fw loader')
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+This means we only loop 9999 times instead of 10000 like before but I
+figure it probably doesn't matter.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
+index 45c1739..2b078a6 100644
+--- a/drivers/crypto/qat/qat_common/qat_hal.c
++++ b/drivers/crypto/qat/qat_common/qat_hal.c
+@@ -171,7 +171,7 @@ static int qat_hal_wait_cycles(struct icp_qat_fw_loader_handle *handle,
+ 
+ 	qat_hal_rd_ae_csr(handle, ae, PROFILE_COUNT, &base_cnt);
+ 	base_cnt &= 0xffff;
+-	while ((int)cycles > elapsed_cycles && times--) {
++	while ((int)cycles > elapsed_cycles && --times) {
+ 		if (chk_inactive)
+ 			qat_hal_rd_ae_csr(handle, ae, ACTIVE_CTX_STATUS, &csr);
+ 
