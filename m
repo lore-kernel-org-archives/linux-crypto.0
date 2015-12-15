@@ -1,42 +1,58 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH] net: fix uninitialized variable issue
-Date: Tue, 15 Dec 2015 10:46:17 -0800
-Message-ID: <20151215184617.11620.23369.stgit@tstruk-mobl1>
+From: Eric Dumazet <eric.dumazet@gmail.com>
+Subject: Re: [PATCH] net: fix uninitialized variable issue
+Date: Tue, 15 Dec 2015 11:02:09 -0800
+Message-ID: <1450206129.8474.48.camel@edumazet-glaptop2.roam.corp.google.com>
+References: <20151215184617.11620.23369.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: tadeusz.struk@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	freude@linux.vnet.ibm.com, viro@zeniv.linux.org.uk,
-	linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, freude@linux.vnet.ibm.com,
+	viro@zeniv.linux.org.uk, linux-crypto@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:10470 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932358AbbLOSth (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Dec 2015 13:49:37 -0500
+Received: from mail-pa0-f47.google.com ([209.85.220.47]:34193 "EHLO
+	mail-pa0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753949AbbLOTCM (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 15 Dec 2015 14:02:12 -0500
+In-Reply-To: <20151215184617.11620.23369.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-msg_iocb needs to be initialized on the recv/recvfrom path.
-Otherwise afalg will wrongly interpret it as an async call.
+On Tue, 2015-12-15 at 10:46 -0800, Tadeusz Struk wrote:
+> msg_iocb needs to be initialized on the recv/recvfrom path.
+> Otherwise afalg will wrongly interpret it as an async call.
+> 
+> Cc: stable@vger.kernel.org
+> Reported-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> ---
+>  net/socket.c |    1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/net/socket.c b/net/socket.c
+> index dd2c247..80ca820 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -1702,6 +1702,7 @@ SYSCALL_DEFINE6(recvfrom, int, fd, void __user *, ubuf, size_t, size,
+>  	msg.msg_name = addr ? (struct sockaddr *)&address : NULL;
+>  	/* We assume all kernel code knows the size of sockaddr_storage */
+>  	msg.msg_namelen = 0;
+> +	msg.msg_iocb = NULL;
+>  	if (sock->file->f_flags & O_NONBLOCK)
+>  		flags |= MSG_DONTWAIT;
+>  	err = sock_recvmsg(sock, &msg, iov_iter_count(&msg.msg_iter), flags);
+> 
 
-Cc: stable@vger.kernel.org
-Reported-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
- net/socket.c |    1 +
- 1 file changed, 1 insertion(+)
+Do not add "Cc: stable@vger.kernel.org" for networking patches, thanks 
+( Documentation/networking/netdev-FAQ.txt )
 
-diff --git a/net/socket.c b/net/socket.c
-index dd2c247..80ca820 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -1702,6 +1702,7 @@ SYSCALL_DEFINE6(recvfrom, int, fd, void __user *, ubuf, size_t, size,
- 	msg.msg_name = addr ? (struct sockaddr *)&address : NULL;
- 	/* We assume all kernel code knows the size of sockaddr_storage */
- 	msg.msg_namelen = 0;
-+	msg.msg_iocb = NULL;
- 	if (sock->file->f_flags & O_NONBLOCK)
- 		flags |= MSG_DONTWAIT;
- 	err = sock_recvmsg(sock, &msg, iov_iter_count(&msg.msg_iter), flags);
+Do you know when was this bug added ?
+
+Please add the 
+
+Fixes:  12-digit-sha1 ("patch title")
+
+Thanks.
