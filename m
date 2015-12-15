@@ -1,103 +1,57 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH v3 3/4] crypto: ccp: Use precalculated hash from headers
-Date: Tue, 15 Dec 2015 14:00:22 +0100
-Message-ID: <1450184423-31155-4-git-send-email-clabbe.montjoie@gmail.com>
-References: <1450184423-31155-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: LABBE Corentin <clabbe.montjoie@gmail.com>,
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v4 5/5] crypto: AES CBC multi-buffer glue code
+Date: Tue, 15 Dec 2015 10:36:39 -0800
+Message-ID: <1450204599.3057.40.camel@schen9-desk2.jf.intel.com>
+References: <cover.1449091633.git.tim.c.chen@linux.intel.com>
+	 <1449086565.22260.15.camel@schen9-desk2.jf.intel.com>
+	 <20151209025242.GA24861@gondor.apana.org.au>
+	 <1449681794.22260.58.camel@schen9-desk2.jf.intel.com>
+	 <20151210014519.GA31692@gondor.apana.org.au>
+	 <1449765585.3057.9.camel@schen9-desk2.jf.intel.com>
+	 <20151211032340.GC10399@gondor.apana.org.au>
+	 <1449852880.3057.15.camel@schen9-desk2.jf.intel.com>
+	 <20151212054806.GG17504@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Stephan Mueller <smueller@chronox.de>,
+	Chandramouli Narayanan <mouli_7982@yahoo.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: davem@davemloft.net, herbert@gondor.apana.org.au,
-	thomas.lendacky@amd.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1450184423-31155-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga04.intel.com ([192.55.52.120]:25750 "EHLO mga04.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933669AbbLOSgj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 15 Dec 2015 13:36:39 -0500
+In-Reply-To: <20151212054806.GG17504@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Precalculated hash for empty message are now present in hash headers.
-This patch just use them.
+On Sat, 2015-12-12 at 13:48 +0800, Herbert Xu wrote:
+> On Fri, Dec 11, 2015 at 08:54:40AM -0800, Tim Chen wrote:
+> > Direct call I assume have less overhead.  Let me think about
+> 
+> static inline int crypto_ablkcipher_encrypt(struct ablkcipher_request *req)
+> {
+> 	struct ablkcipher_tfm *crt =
+> 		crypto_ablkcipher_crt(crypto_ablkcipher_reqtfm(req));
+> 	return crt->encrypt(req);
+> }
+> 
+> I don't see any overhead there that you could eliminate by calling
+> crt->encrypt directly.
+> 
+> Cheers,
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-Tested-by: Tom Lendacky <thomas.lendacky@amd.com>
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
----
- drivers/crypto/ccp/Kconfig   |  1 +
- drivers/crypto/ccp/ccp-ops.c | 39 ++++++++-------------------------------
- 2 files changed, 9 insertions(+), 31 deletions(-)
+Okay, I'll attempt to convert the inner cipher to ablk.  It may
+take me a bit of time.
 
-diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
-index 3cd8481..9ce0920 100644
---- a/drivers/crypto/ccp/Kconfig
-+++ b/drivers/crypto/ccp/Kconfig
-@@ -3,6 +3,7 @@ config CRYPTO_DEV_CCP_DD
- 	depends on CRYPTO_DEV_CCP
- 	default m
- 	select HW_RANDOM
-+	select CRYPTO_SHA1
- 	help
- 	  Provides the interface to use the AMD Cryptographic Coprocessor
- 	  which can be used to offload encryption operations such as SHA,
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index c6e883b..6613aee 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -152,32 +152,6 @@ static const __be32 ccp_sha256_init[CCP_SHA_CTXSIZE / sizeof(__be32)] = {
- 	cpu_to_be32(SHA256_H6), cpu_to_be32(SHA256_H7),
- };
- 
--/* The CCP cannot perform zero-length sha operations so the caller
-- * is required to buffer data for the final operation.  However, a
-- * sha operation for a message with a total length of zero is valid
-- * so known values are required to supply the result.
-- */
--static const u8 ccp_sha1_zero[CCP_SHA_CTXSIZE] = {
--	0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d,
--	0x32, 0x55, 0xbf, 0xef, 0x95, 0x60, 0x18, 0x90,
--	0xaf, 0xd8, 0x07, 0x09, 0x00, 0x00, 0x00, 0x00,
--	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
--};
--
--static const u8 ccp_sha224_zero[CCP_SHA_CTXSIZE] = {
--	0xd1, 0x4a, 0x02, 0x8c, 0x2a, 0x3a, 0x2b, 0xc9,
--	0x47, 0x61, 0x02, 0xbb, 0x28, 0x82, 0x34, 0xc4,
--	0x15, 0xa2, 0xb0, 0x1f, 0x82, 0x8e, 0xa6, 0x2a,
--	0xc5, 0xb3, 0xe4, 0x2f, 0x00, 0x00, 0x00, 0x00,
--};
--
--static const u8 ccp_sha256_zero[CCP_SHA_CTXSIZE] = {
--	0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14,
--	0x9a, 0xfb, 0xf4, 0xc8, 0x99, 0x6f, 0xb9, 0x24,
--	0x27, 0xae, 0x41, 0xe4, 0x64, 0x9b, 0x93, 0x4c,
--	0xa4, 0x95, 0x99, 0x1b, 0x78, 0x52, 0xb8, 0x55,
--};
--
- static u32 ccp_addr_lo(struct ccp_dma_info *info)
- {
- 	return lower_32_bits(info->address + info->offset);
-@@ -1391,18 +1365,21 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 		if (sha->msg_bits)
- 			return -EINVAL;
- 
--		/* A sha operation for a message with a total length of zero,
--		 * return known result.
-+		/* The CCP cannot perform zero-length sha operations so the
-+		 * caller is required to buffer data for the final operation.
-+		 * However, a sha operation for a message with a total length
-+		 * of zero is valid so known values are required to supply
-+		 * the result.
- 		 */
- 		switch (sha->type) {
- 		case CCP_SHA_TYPE_1:
--			sha_zero = ccp_sha1_zero;
-+			sha_zero = sha1_zero_message_hash;
- 			break;
- 		case CCP_SHA_TYPE_224:
--			sha_zero = ccp_sha224_zero;
-+			sha_zero = sha224_zero_message_hash;
- 			break;
- 		case CCP_SHA_TYPE_256:
--			sha_zero = ccp_sha256_zero;
-+			sha_zero = sha256_zero_message_hash;
- 			break;
- 		default:
- 			return -EINVAL;
--- 
-2.4.10
+Thanks.
+
+Tim
