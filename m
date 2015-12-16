@@ -1,48 +1,56 @@
-From: walter harms <wharms@bfs.de>
-Subject: Re: [PATCH] crypto: qat - fix CTX_ENABLES bits shift direction issue
-Date: Wed, 16 Dec 2015 09:09:34 +0100
-Message-ID: <56711C3E.6070302@bfs.de>
+From: "Yang, Pingchao" <pingchao.yang@intel.com>
+Subject: RE: [PATCH] crypto: qat - fix CTX_ENABLES bits shift direction issue
+Date: Wed, 16 Dec 2015 08:22:04 +0000
+Message-ID: <CCF907412D2569469812043FCFD0B6FB4AEC7455@SHSMSX101.ccr.corp.intel.com>
 References: <1450233580-58266-1-git-send-email-pingchao.yang@intel.com>
-Reply-To: wharms@bfs.de
+ <56711C3E.6070302@bfs.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, dan.carpenter@oracle.com,
-	tadeusz.struk@intel.com, linux-crypto@vger.kernel.org,
-	qat-linux@intel.com, kernel-janitors@vger.kernel.org
-To: Yang Pingchao <pingchao.yang@intel.com>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-In-Reply-To: <1450233580-58266-1-git-send-email-pingchao.yang@intel.com>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"dan.carpenter@oracle.com" <dan.carpenter@oracle.com>,
+	"Struk, Tadeusz" <tadeusz.struk@intel.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	qat-linux <qat-linux@intel.com>,
+	"kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>
+To: "wharms@bfs.de" <wharms@bfs.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:61494 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753695AbbLPIW1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 16 Dec 2015 03:22:27 -0500
+In-Reply-To: <56711C3E.6070302@bfs.de>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-
-
-Am 16.12.2015 03:39, schrieb Yang Pingchao:
-> AE CTX bits should be 8-15 in CTX_ENABLES, so the mask
-> value 0xff should be left shifted 0x8.
-> 
-> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> Signed-off-by: Yang Pingchao <pingchao.yang@intel.com>
-> ---
->  drivers/crypto/qat/qat_common/qat_hal.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
-> index 45c1739..81bd1fe 100644
-> --- a/drivers/crypto/qat/qat_common/qat_hal.c
-> +++ b/drivers/crypto/qat/qat_common/qat_hal.c
-> @@ -418,7 +418,7 @@ int qat_hal_check_ae_active(struct icp_qat_fw_loader_handle *handle,
->  
->  	qat_hal_rd_ae_csr(handle, ae, CTX_ENABLES, &enable);
->  	qat_hal_rd_ae_csr(handle, ae, ACTIVE_CTX_STATUS, &active);
-> -	if ((enable & (0xff >> CE_ENABLE_BITPOS)) ||
-> +	if ((enable & (0xff << CE_ENABLE_BITPOS)) ||
->  	    (active & (1 << ACS_ABO_BITPOS)))
->  		return 1;
->  	else
-
-Is there any reason for using 0xff << CE_ENABLE_BITPOS instead of 0xff00 ?
-
-re,
- wh
+DQpUaGVyZSBpcyBubyB2ZXJ5IHN0cm9uZyByZWFzb24sIGJ1dCBJIHRoaW5rIDB4ZmYgPDwgQ0Vf
+RU5BQkxFX0JJVFBPUyBpcyBtb3JlIGNsZWFybHkgZm9yIHJlYWRpbmcsDQpTbyB0aGF0IHdlIGNh
+biBjbGVhcmx5IGtub3cgd2UgYXJlIGFjY2Vzc2luZyB0aGUgOCBDVFhzIGluIENUWF9FTkFCTEVT
+IENTUiA4LTE1IGJpdHMuDQoNCkJlc3QgUmVnYXJkcywNClBpbmdjaGFvIHlhbmcNCg0KDQotLS0t
+LU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogd2FsdGVyIGhhcm1zIFttYWlsdG86d2hhcm1z
+QGJmcy5kZV0gDQpTZW50OiBXZWRuZXNkYXksIERlY2VtYmVyIDE2LCAyMDE1IDQ6MTAgUE0NClRv
+OiBZYW5nLCBQaW5nY2hhbw0KQ2M6IGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdTsgZGFuLmNh
+cnBlbnRlckBvcmFjbGUuY29tOyBTdHJ1aywgVGFkZXVzejsgbGludXgtY3J5cHRvQHZnZXIua2Vy
+bmVsLm9yZzsgcWF0LWxpbnV4OyBrZXJuZWwtamFuaXRvcnNAdmdlci5rZXJuZWwub3JnDQpTdWJq
+ZWN0OiBSZTogW1BBVENIXSBjcnlwdG86IHFhdCAtIGZpeCBDVFhfRU5BQkxFUyBiaXRzIHNoaWZ0
+IGRpcmVjdGlvbiBpc3N1ZQ0KDQoNCg0KQW0gMTYuMTIuMjAxNSAwMzozOSwgc2NocmllYiBZYW5n
+IFBpbmdjaGFvOg0KPiBBRSBDVFggYml0cyBzaG91bGQgYmUgOC0xNSBpbiBDVFhfRU5BQkxFUywg
+c28gdGhlIG1hc2sgdmFsdWUgMHhmZiANCj4gc2hvdWxkIGJlIGxlZnQgc2hpZnRlZCAweDguDQo+
+IA0KPiBSZXBvcnRlZC1ieTogRGFuIENhcnBlbnRlciA8ZGFuLmNhcnBlbnRlckBvcmFjbGUuY29t
+Pg0KPiBTaWduZWQtb2ZmLWJ5OiBZYW5nIFBpbmdjaGFvIDxwaW5nY2hhby55YW5nQGludGVsLmNv
+bT4NCj4gLS0tDQo+ICBkcml2ZXJzL2NyeXB0by9xYXQvcWF0X2NvbW1vbi9xYXRfaGFsLmMgfCAy
+ICstDQo+ICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4g
+DQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by9xYXQvcWF0X2NvbW1vbi9xYXRfaGFsLmMg
+DQo+IGIvZHJpdmVycy9jcnlwdG8vcWF0L3FhdF9jb21tb24vcWF0X2hhbC5jDQo+IGluZGV4IDQ1
+YzE3MzkuLjgxYmQxZmUgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL3FhdC9xYXRfY29t
+bW9uL3FhdF9oYWwuYw0KPiArKysgYi9kcml2ZXJzL2NyeXB0by9xYXQvcWF0X2NvbW1vbi9xYXRf
+aGFsLmMNCj4gQEAgLTQxOCw3ICs0MTgsNyBAQCBpbnQgcWF0X2hhbF9jaGVja19hZV9hY3RpdmUo
+c3RydWN0IA0KPiBpY3BfcWF0X2Z3X2xvYWRlcl9oYW5kbGUgKmhhbmRsZSwNCj4gIA0KPiAgCXFh
+dF9oYWxfcmRfYWVfY3NyKGhhbmRsZSwgYWUsIENUWF9FTkFCTEVTLCAmZW5hYmxlKTsNCj4gIAlx
+YXRfaGFsX3JkX2FlX2NzcihoYW5kbGUsIGFlLCBBQ1RJVkVfQ1RYX1NUQVRVUywgJmFjdGl2ZSk7
+DQo+IC0JaWYgKChlbmFibGUgJiAoMHhmZiA+PiBDRV9FTkFCTEVfQklUUE9TKSkgfHwNCj4gKwlp
+ZiAoKGVuYWJsZSAmICgweGZmIDw8IENFX0VOQUJMRV9CSVRQT1MpKSB8fA0KPiAgCSAgICAoYWN0
+aXZlICYgKDEgPDwgQUNTX0FCT19CSVRQT1MpKSkNCj4gIAkJcmV0dXJuIDE7DQo+ICAJZWxzZQ0K
+DQpJcyB0aGVyZSBhbnkgcmVhc29uIGZvciB1c2luZyAweGZmIDw8IENFX0VOQUJMRV9CSVRQT1Mg
+aW5zdGVhZCBvZiAweGZmMDAgPw0KDQpyZSwNCiB3aA0K
