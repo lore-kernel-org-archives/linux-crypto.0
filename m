@@ -1,36 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 2/4] crypto: niagara: Use precalculated hash from
- headers
-Date: Thu, 17 Dec 2015 16:51:41 +0800
-Message-ID: <20151217085141.GA9390@gondor.apana.org.au>
-References: <1450184423-31155-1-git-send-email-clabbe.montjoie@gmail.com>
- <1450184423-31155-3-git-send-email-clabbe.montjoie@gmail.com>
- <20151217084018.GA9166@gondor.apana.org.au>
- <20151217084824.GA20217@Red>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: [PATCH v4 0/4] crypto: add precalculated hash for zero message length
+Date: Thu, 17 Dec 2015 13:45:38 +0100
+Message-ID: <1450356342-12971-1-git-send-email-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: clabbe.montjoie@gmail.com, davem@davemloft.net,
+	geert+renesas@glider.be, herbert@gondor.apana.org.au,
+	luis@debethencourt.com, maxime.ripard@free-electrons.com,
+	thomas.lendacky@amd.com, vinod.koul@intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:43923 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751501AbbLQIvo (ORCPT
+Received: from mail-wm0-f48.google.com ([74.125.82.48]:34310 "EHLO
+	mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756051AbbLQMpv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Dec 2015 03:51:44 -0500
-Content-Disposition: inline
-In-Reply-To: <20151217084824.GA20217@Red>
+	Thu, 17 Dec 2015 07:45:51 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 17, 2015 at 09:48:24AM +0100, LABBE Corentin wrote:
->
-> You are right, I missed it also in ccp/ux500.
+Hello
 
-I think you need it for all three drivers.
+Some crypto drivers cannot process empty data message and so rely on
+precalculated hash.
+This patch series add precalculated hash in headers and
+make the drivers use them.
 
-Cheers,
+Changes since v3
+- Added missing Kconfig depends on SHA256
+
+Changes since v2
+- Added missing Kconfig depends on MD5/SHA1
+
+Changes since v1
+- Moved arrays from headers to c file and made them EXPORT.
+
+LABBE Corentin (4):
+  crypto: hash: add zero length message hash for shax and md5
+  crypto: niagara: Use precalculated hash from headers
+  crypto: ccp: Use precalculated hash from headers
+  crypto: ux500: Use precalculated hash from headers
+
+ crypto/md5.c                          |  6 ++++++
+ crypto/sha1_generic.c                 |  7 +++++++
+ crypto/sha256_generic.c               | 16 ++++++++++++++
+ drivers/crypto/Kconfig                |  3 +++
+ drivers/crypto/ccp/Kconfig            |  2 ++
+ drivers/crypto/ccp/ccp-ops.c          | 39 +++++++----------------------------
+ drivers/crypto/n2_core.c              | 33 ++++++-----------------------
+ drivers/crypto/ux500/Kconfig          |  2 ++
+ drivers/crypto/ux500/hash/hash_core.c | 20 ++----------------
+ include/crypto/md5.h                  |  2 ++
+ include/crypto/sha.h                  |  6 ++++++
+ 11 files changed, 60 insertions(+), 76 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.4.10
