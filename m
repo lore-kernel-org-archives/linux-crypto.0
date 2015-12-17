@@ -1,38 +1,50 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto/nx842: Mask XERS0 bit in return value
-Date: Thu, 17 Dec 2015 16:45:55 +0800
-Message-ID: <20151217084555.GA9239@gondor.apana.org.au>
-References: <1450006242.19568.11.camel@hbabu-laptop>
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH v3 2/4] crypto: niagara: Use precalculated hash from
+ headers
+Date: Thu, 17 Dec 2015 09:48:24 +0100
+Message-ID: <20151217084824.GA20217@Red>
+References: <1450184423-31155-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1450184423-31155-3-git-send-email-clabbe.montjoie@gmail.com>
+ <20151217084018.GA9166@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: segher@kernel.crashing.org, ddstreet@ieee.org, davem@davemloft.net,
-	pair@us.ibm.com, mpe@ellerman.id.au, linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-To: Haren Myneni <haren@linux.vnet.ibm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:42016 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755775AbbLQIqV (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Dec 2015 03:46:21 -0500
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1450006242.19568.11.camel@hbabu-laptop>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20151217084018.GA9166@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Dec 13, 2015 at 03:30:41AM -0800, Haren Myneni wrote:
+On Thu, Dec 17, 2015 at 04:40:18PM +0800, Herbert Xu wrote:
+> On Tue, Dec 15, 2015 at 02:00:21PM +0100, LABBE Corentin wrote:
+> > Precalculated hash for empty message are now present in hash headers.
+> > This patch just use them.
+> > 
+> > Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+> > ---
+> >  drivers/crypto/Kconfig   |  2 ++
+> >  drivers/crypto/n2_core.c | 33 ++++++---------------------------
+> >  2 files changed, 8 insertions(+), 27 deletions(-)
+> > 
+> > diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> > index b9ec295..dea754b 100644
+> > --- a/drivers/crypto/Kconfig
+> > +++ b/drivers/crypto/Kconfig
+> > @@ -194,6 +194,8 @@ config CRYPTO_DEV_NIAGARA2
+> >         select CRYPTO_DES
+> >         select CRYPTO_BLKCIPHER
+> >         select CRYPTO_HASH
+> > +       select CRYPTO_MD5
+> > +       select CRYPTO_SHA1
 > 
-> NX842 coprocessor sets 3rd bit in CR register with XER[S0] which is
-> nothing to do with NX request. Since this bit can be set with other
-> valuable return status, mast this bit.
+> Don't we need CRYPTO_SHA256 as well?
 > 
-> One of other bits (INITIATED, BUSY or REJECTED) will be returned for
-> any given NX request.
-> 
-> Signed-off-by: Haren Myneni <haren@us.ibm.com>
+> Thanks,
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hello
+
+You are right, I missed it also in ccp/ux500.
+
+Regards
