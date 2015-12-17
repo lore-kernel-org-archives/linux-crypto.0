@@ -1,45 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 2/4] crypto: niagara: Use precalculated hash from
- headers
-Date: Thu, 17 Dec 2015 16:40:18 +0800
-Message-ID: <20151217084018.GA9166@gondor.apana.org.au>
-References: <1450184423-31155-1-git-send-email-clabbe.montjoie@gmail.com>
- <1450184423-31155-3-git-send-email-clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH 1/2] crypto: atmel-sha: Removed unused variable "err"
+Date: Thu, 17 Dec 2015 16:46:09 +0800
+Message-ID: <20151217084609.GB9239@gondor.apana.org.au>
+References: <20151214084411.GA8727@visteon.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: "Pathak, Rahul (R.)" <rpathak@visteon.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1450184423-31155-3-git-send-email-clabbe.montjoie@gmail.com>
+In-Reply-To: <20151214084411.GA8727@visteon.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Dec 15, 2015 at 02:00:21PM +0100, LABBE Corentin wrote:
-> Precalculated hash for empty message are now present in hash headers.
-> This patch just use them.
+On Mon, Dec 14, 2015 at 08:44:19AM +0000, Pathak, Rahul (R.) wrote:
+> From: Rahul Pathak <rpathak@visteon.com>
 > 
-> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-> ---
->  drivers/crypto/Kconfig   |  2 ++
->  drivers/crypto/n2_core.c | 33 ++++++---------------------------
->  2 files changed, 8 insertions(+), 27 deletions(-)
+> Removed unused variable "err" and directly return "0"
 > 
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index b9ec295..dea754b 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -194,6 +194,8 @@ config CRYPTO_DEV_NIAGARA2
->         select CRYPTO_DES
->         select CRYPTO_BLKCIPHER
->         select CRYPTO_HASH
-> +       select CRYPTO_MD5
-> +       select CRYPTO_SHA1
+> Reported by coccicheck -
+> ./drivers/crypto/atmel-sha.c:758:5-8: Unneeded variable: "err". Return "0" on line 766
+> 
+> Signed-off-by: Rahul Pathak <rpathak@visteon.com>
 
-Don't we need CRYPTO_SHA256 as well?
-
-Thanks,
+Both patches applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
