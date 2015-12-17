@@ -1,7 +1,7 @@
 From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH 12/24] crypto: atmel-aes: remove unused 'err' member of struct atmel_aes_dev
-Date: Thu, 17 Dec 2015 17:48:43 +0100
-Message-ID: <75eec0cd71650aa6526aebbe619eb36ce3372a03.1450366831.git.cyrille.pitchen@atmel.com>
+Subject: [PATCH 13/24] crypto: atmel-aes: reduce latency of DMA completion
+Date: Thu, 17 Dec 2015 17:48:44 +0100
+Message-ID: <a8f43f97c34da143330a883cac79ac5f83f5b859.1450366831.git.cyrille.pitchen@atmel.com>
 References: <cover.1450366831.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -15,42 +15,29 @@ In-Reply-To: <cover.1450366831.git.cyrille.pitchen@atmel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This 'err' member was initialized to 0 but its value never changed.
+atmel_aes_dma_callback() now directly calls the 'resume' callback instead
+of scheduling the done task, which in turn only calls the very same
+'resume' callback.
 
 Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
 ---
- drivers/crypto/atmel-aes.c | 5 -----
- 1 file changed, 5 deletions(-)
+ drivers/crypto/atmel-aes.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index ac551ee2d624..25dc7bd73532 100644
+index 25dc7bd73532..8a2b3e81c087 100644
 --- a/drivers/crypto/atmel-aes.c
 +++ b/drivers/crypto/atmel-aes.c
-@@ -127,7 +127,6 @@ struct atmel_aes_dev {
- 	int	irq;
+@@ -337,8 +337,8 @@ static void atmel_aes_dma_callback(void *data)
+ {
+ 	struct atmel_aes_dev *dd = data;
  
- 	unsigned long		flags;
--	int	err;
+-	/* dma_lch_out - completed */
+-	tasklet_schedule(&dd->done_task);
++	dd->is_async = true;
++	(void)dd->resume(dd);
+ }
  
- 	spinlock_t		lock;
- 	struct crypto_queue	queue;
-@@ -288,7 +287,6 @@ static int atmel_aes_hw_init(struct atmel_aes_dev *dd)
- 		atmel_aes_write(dd, AES_CR, AES_CR_SWRST);
- 		atmel_aes_write(dd, AES_MR, 0xE << AES_MR_CKEY_OFFSET);
- 		dd->flags |= AES_FLAGS_INIT;
--		dd->err = 0;
- 	}
- 
- 	return 0;
-@@ -1171,9 +1169,6 @@ static int atmel_aes_dma_complete(struct atmel_aes_dev *dd)
- 	int err;
- 
- 	err = atmel_aes_crypt_dma_stop(dd);
--
--	err = dd->err ? : err;
--
- 	if (dd->total && !err) {
- 		if (dd->flags & AES_FLAGS_FAST) {
- 			dd->in_sg = sg_next(dd->in_sg);
+ static int atmel_aes_crypt_dma(struct atmel_aes_dev *dd,
 -- 
 1.8.2.2
