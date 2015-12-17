@@ -1,7 +1,7 @@
 From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH 05/24] crypto: atmel-aes: remove unused header includes
-Date: Thu, 17 Dec 2015 17:48:36 +0100
-Message-ID: <c33f39fa103fa81c834d87c2eed899b88268726d.1450366831.git.cyrille.pitchen@atmel.com>
+Subject: [PATCH 06/24] crypto: atmel-aes: propagate error from atmel_aes_hw_version_init()
+Date: Thu, 17 Dec 2015 17:48:37 +0100
+Message-ID: <dea22778fbf867b60208b3b8fcf7230170cda6a3.1450366831.git.cyrille.pitchen@atmel.com>
 References: <cover.1450366831.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -15,29 +15,54 @@ In-Reply-To: <cover.1450366831.git.cyrille.pitchen@atmel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hash headers have nothing to do with AES block ciphers.
+Before this patch atmel_aes_hw_version_init() had no returned value.
+However it calls atmel_aes_hw_init(), which may fail. So check the
+returned code of atmel_aes_hw_init() and propagate error if needed.
 
 Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
 ---
- drivers/crypto/atmel-aes.c | 3 ---
- 1 file changed, 3 deletions(-)
+ drivers/crypto/atmel-aes.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index e948bf2b8a8e..7d1b055811c4 100644
+index 7d1b055811c4..9a9e1b88a384 100644
 --- a/drivers/crypto/atmel-aes.c
 +++ b/drivers/crypto/atmel-aes.c
-@@ -33,12 +33,9 @@
- #include <linux/of_device.h>
- #include <linux/delay.h>
- #include <linux/crypto.h>
--#include <linux/cryptohash.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/algapi.h>
- #include <crypto/aes.h>
--#include <crypto/hash.h>
--#include <crypto/internal/hash.h>
- #include <linux/platform_data/crypto-atmel.h>
- #include <dt-bindings/dma/at91.h>
- #include "atmel-aes-regs.h"
+@@ -280,16 +280,20 @@ static inline unsigned int atmel_aes_get_version(struct atmel_aes_dev *dd)
+ 	return atmel_aes_read(dd, AES_HW_VERSION) & 0x00000fff;
+ }
+ 
+-static void atmel_aes_hw_version_init(struct atmel_aes_dev *dd)
++static int atmel_aes_hw_version_init(struct atmel_aes_dev *dd)
+ {
+-	atmel_aes_hw_init(dd);
++	int err;
++
++	err = atmel_aes_hw_init(dd);
++	if (err)
++		return err;
+ 
+ 	dd->hw_version = atmel_aes_get_version(dd);
+ 
+-	dev_info(dd->dev,
+-			"version: 0x%x\n", dd->hw_version);
++	dev_info(dd->dev, "version: 0x%x\n", dd->hw_version);
+ 
+ 	clk_disable_unprepare(dd->iclk);
++	return 0;
+ }
+ 
+ static void atmel_aes_finish_req(struct atmel_aes_dev *dd, int err)
+@@ -1407,7 +1411,9 @@ static int atmel_aes_probe(struct platform_device *pdev)
+ 		goto res_err;
+ 	}
+ 
+-	atmel_aes_hw_version_init(aes_dd);
++	err = atmel_aes_hw_version_init(aes_dd);
++	if (err)
++		goto res_err;
+ 
+ 	atmel_aes_get_cap(aes_dd);
+ 
 -- 
 1.8.2.2
