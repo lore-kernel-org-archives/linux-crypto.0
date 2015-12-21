@@ -1,43 +1,53 @@
-From: Greg KH <greg@kroah.com>
-Subject: Re: [PATCH] Renaming dh895xcc mmp fw
-Date: Mon, 21 Dec 2015 07:35:10 -0800
-Message-ID: <20151221153510.GB28556@kroah.com>
+From: "Atta, Ahsan" <ahsan.atta@intel.com>
+Subject: [PATCH] Renaming dh895xcc mmp fw
+Date: Mon, 21 Dec 2015 16:59:17 +0000
+Message-ID: <E0A450CA4D390344969A8802152422FF44A1BE6D@irsmsx105.ger.corp.intel.com>
 References: <1450371133-20595-1-git-send-email-ahsan.atta@intel.com>
- <E0A450CA4D390344969A8802152422FF44A1B879@irsmsx105.ger.corp.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	qat-linux <qat-linux@intel.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"Struk, Tadeusz" <tadeusz.struk@intel.com>
-To: "Atta, Ahsan" <ahsan.atta@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:47559 "EHLO
-	out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750965AbbLUPmF (ORCPT
+Received: from mga09.intel.com ([134.134.136.24]:32057 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751351AbbLUQ7U convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Dec 2015 10:42:05 -0500
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
-	by mailout.nyi.internal (Postfix) with ESMTP id 22A4E21B24
-	for <linux-crypto@vger.kernel.org>; Mon, 21 Dec 2015 10:35:13 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <E0A450CA4D390344969A8802152422FF44A1B879@irsmsx105.ger.corp.intel.com>
+	Mon, 21 Dec 2015 11:59:20 -0500
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 21, 2015 at 02:36:57PM +0000, Atta, Ahsan wrote:
-> Renaming dh895xcc mmp fw
-> 
-> Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
-> ---
->  .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+Renaming dh895xcc mmp fw
 
-<formletter>
+Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+---
+ .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-This is not the correct way to submit patches for inclusion in the
-stable kernel tree.  Please read Documentation/stable_kernel_rules.txt
-for how to do this properly.
+diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
+index 72eacfd..f3c5de9 100644
+--- a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
++++ b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
+@@ -82,7 +82,7 @@
+ #define ADF_DH895XCC_VINTMSK_OFFSET(i)	(0x3A000 + 0x200 + ((i) * 0x04))
+ /* FW names */
+ #define ADF_DH895XCC_FW "qat_895xcc.bin"
+-#define ADF_DH895XCC_MMP "qat_mmp.bin"
++#define ADF_DH895XCC_MMP "qat_dh895xcc_mmp.bin"
+ 
+ void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data);  void adf_clean_hw_data_dh895xcc(struct adf_hw_device_data *hw_data);
+--
+1.7.4.1
 
-</formletter>
+--------------------------------------------------------------
+Intel Research and Development Ireland Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+
+
+This e-mail and any attachments may contain confidential material for the sole
+use of the intended recipient(s). Any review or distribution by others is
+strictly prohibited. If you are not the intended recipient, please contact the
+sender and delete all copies.
