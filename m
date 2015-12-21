@@ -1,43 +1,52 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: WARNING in crypto_wait_for_test
-Date: Sun, 20 Dec 2015 22:32:34 +0100
-Message-ID: <2207331.ptLrPvxQO5@myon.chronox.de>
-References: <CACT4Y+bws9Scv7o3AB2wPM0ZJAeDvO+kZ45h-p5viDk9ZAe9KQ@mail.gmail.com> <20151218084917.GA20345@gondor.apana.org.au> <20151218111657.GA21126@gondor.apana.org.au>
+From: "Atta, Ahsan" <ahsan.atta@intel.com>
+Subject: [PATCH] Renaming dh895xcc mmp fw
+Date: Mon, 21 Dec 2015 14:36:57 +0000
+Message-ID: <E0A450CA4D390344969A8802152422FF44A1B879@irsmsx105.ger.corp.intel.com>
+References: <1450371133-20595-1-git-send-email-ahsan.atta@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Dmitry Vyukov <dvyukov@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	syzkaller <syzkaller@googlegroups.com>,
-	Kostya Serebryany <kcc@google.com>,
-	Alexander Potapenko <glider@google.com>,
-	Sasha Levin <sasha.levin@oracle.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20151218111657.GA21126@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	qat-linux <qat-linux@intel.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"Struk, Tadeusz" <tadeusz.struk@intel.com>
+To: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <1450371133-20595-1-git-send-email-ahsan.atta@intel.com>
+Content-Language: en-US
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 18. Dezember 2015, 19:16:57 schrieb Herbert Xu:
+Renaming dh895xcc mmp fw
 
-Hi Herbert,
+Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+---
+ .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-> On Fri, Dec 18, 2015 at 04:49:17PM +0800, Herbert Xu wrote:
-> > OK turns out I was looking at the wrong WARN_ON line.
-> > 
-> > This particular bug is a legacy of the geniv construct we have
-> > for ablkcipher.
-> > 
-> > It should disappear once we remove geniv which I will do as part
-> > of the skcipher conversion.
-> 
-> This patch should fix the problem.
+diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
+index 72eacfd..f3c5de9 100644
+--- a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
++++ b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
+@@ -82,7 +82,7 @@
+ #define ADF_DH895XCC_VINTMSK_OFFSET(i)	(0x3A000 + 0x200 + ((i) * 0x04))
+ /* FW names */
+ #define ADF_DH895XCC_FW "qat_895xcc.bin"
+-#define ADF_DH895XCC_MMP "qat_mmp.bin"
++#define ADF_DH895XCC_MMP "qat_dh895xcc_mmp.bin"
+ 
+ void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data);  void adf_clean_hw_data_dh895xcc(struct adf_hw_device_data *hw_data);
+--
+1.7.4.1
 
-Yes, it does. Thanks.
+--------------------------------------------------------------
+Intel Research and Development Ireland Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
 
-Tested-by: <smueller@chronox.de>
 
--- 
-Ciao
-Stephan
+This e-mail and any attachments may contain confidential material for the sole
+use of the intended recipient(s). Any review or distribution by others is
+strictly prohibited. If you are not the intended recipient, please contact the
+sender and delete all copies.
