@@ -1,53 +1,63 @@
-From: "Atta, Ahsan" <ahsan.atta@intel.com>
-Subject: [PATCH] Renaming dh895xcc mmp fw
-Date: Mon, 21 Dec 2015 16:59:17 +0000
-Message-ID: <E0A450CA4D390344969A8802152422FF44A1BE6D@irsmsx105.ger.corp.intel.com>
-References: <1450371133-20595-1-git-send-email-ahsan.atta@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:32057 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751351AbbLUQ7U convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Dec 2015 11:59:20 -0500
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Dan Streetman <ddstreet@ieee.org>
+Subject: [PATCH] crypto: 842 - remove WARN inside printk
+Date: Mon, 21 Dec 2015 12:52:10 -0500
+Message-ID: <1450720330-30676-1-git-send-email-ddstreet@ieee.org>
+References: <5671C83C.7@infradead.org>
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Haren Myneni <haren@linux.vnet.ibm.com>,
+	linux-next@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Dan Streetman <ddstreet@ieee.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-next-owner@vger.kernel.org>
+In-Reply-To: <5671C83C.7@infradead.org>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Renaming dh895xcc mmp fw
+Remove the WARN() from the beN_to_cpu macro, which is used as a param to a
+pr_debug() call.  With a certain kernel config, this printk-in-printk
+results in the no_printk() macro trying to recursively call the
+no_printk() macro, and since macros can't recursively call themselves
+a build error results.
 
-Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Dan Streetman <ddstreet@ieee.org>
 ---
- .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ lib/842/842_decompress.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
-index 72eacfd..f3c5de9 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
-@@ -82,7 +82,7 @@
- #define ADF_DH895XCC_VINTMSK_OFFSET(i)	(0x3A000 + 0x200 + ((i) * 0x04))
- /* FW names */
- #define ADF_DH895XCC_FW "qat_895xcc.bin"
--#define ADF_DH895XCC_MMP "qat_mmp.bin"
-+#define ADF_DH895XCC_MMP "qat_dh895xcc_mmp.bin"
+diff --git a/lib/842/842_decompress.c b/lib/842/842_decompress.c
+index 8881dad..a7f278d 100644
+--- a/lib/842/842_decompress.c
++++ b/lib/842/842_decompress.c
+@@ -69,7 +69,7 @@ struct sw842_param {
+ 	((s) == 2 ? be16_to_cpu(get_unaligned((__be16 *)d)) :	\
+ 	 (s) == 4 ? be32_to_cpu(get_unaligned((__be32 *)d)) :	\
+ 	 (s) == 8 ? be64_to_cpu(get_unaligned((__be64 *)d)) :	\
+-	 WARN(1, "pr_debug param err invalid size %x\n", s))
++	 0)
  
- void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data);  void adf_clean_hw_data_dh895xcc(struct adf_hw_device_data *hw_data);
---
-1.7.4.1
-
---------------------------------------------------------------
-Intel Research and Development Ireland Limited
-Registered in Ireland
-Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
-Registered Number: 308263
-
-
-This e-mail and any attachments may contain confidential material for the sole
-use of the intended recipient(s). Any review or distribution by others is
-strictly prohibited. If you are not the intended recipient, please contact the
-sender and delete all copies.
+ static int next_bits(struct sw842_param *p, u64 *d, u8 n);
+ 
+@@ -202,10 +202,14 @@ static int __do_index(struct sw842_param *p, u8 size, u8 bits, u64 fsize)
+ 		return -EINVAL;
+ 	}
+ 
+-	pr_debug("index%x to %lx off %lx adjoff %lx tot %lx data %lx\n",
+-		 size, (unsigned long)index, (unsigned long)(index * size),
+-		 (unsigned long)offset, (unsigned long)total,
+-		 (unsigned long)beN_to_cpu(&p->ostart[offset], size));
++	if (size != 2 && size != 4 && size != 8)
++		WARN(1, "__do_index invalid size %x\n", size);
++	else
++		pr_debug("index%x to %lx off %lx adjoff %lx tot %lx data %lx\n",
++			 size, (unsigned long)index,
++			 (unsigned long)(index * size), (unsigned long)offset,
++			 (unsigned long)total,
++			 (unsigned long)beN_to_cpu(&p->ostart[offset], size));
+ 
+ 	memcpy(p->out, &p->ostart[offset], size);
+ 	p->out += size;
+-- 
+2.5.0
