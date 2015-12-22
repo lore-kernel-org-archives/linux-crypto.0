@@ -1,45 +1,42 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH v2 1/2] crypto: KEYS: convert public key to the akcipher
- api
-Date: Tue, 22 Dec 2015 06:23:59 -0800
-Message-ID: <56795CFF.1080106@intel.com>
-References: <201512200735.x3U85zQL%fengguang.wu@intel.com>
- <5678684F.2020308@gmail.com> <20151222120919.GA25163@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: kbuild test robot <lkp@intel.com>, kbuild-all@01.org,
-	linux-kernel@vger.kernel.org, dhowells@redhat.com,
-	linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, zohar@linux.vnet.ibm.com
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Tadeusz Struk <tstruk@gmail.com>
+Subject: [PATCH] crypto: qat - Rename dh895xcc mmp firmware
+Date: Tue, 22 Dec 2015 10:13:10 -0800
+Message-ID: <1450807990-24289-1-git-send-email-tadeusz.struk@intel.com>
+Cc: <linux-crypto@vger.kernel.org>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Ahsan Atta <ahsan.atta@intel.com>
+To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:26098 "EHLO mga03.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:21899 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932164AbbLVO11 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Dec 2015 09:27:27 -0500
-In-Reply-To: <20151222120919.GA25163@gondor.apana.org.au>
+	id S1753947AbbLVSQy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 22 Dec 2015 13:16:54 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert
-On 12/22/2015 04:09 AM, Herbert Xu wrote:
-> On Mon, Dec 21, 2015 at 12:59:59PM -0800, Tadeusz Struk wrote:
->>
->> The previous patch was broken, re-sending again, sorry.
->>
->> I think there is something missing in this configuration.
->> cat .config | grep KEXEC_BZIMAGE_VERIFY_SIG gives nothing.
->> Anyways, this patch should fix it.
-> 
-> No this is unacceptable.  Please fix it properly by making the
-> header file self-contained, e.g., by using a forward declaration.
+From: Ahsan Atta <ahsan.atta@intel.com>
 
-What about the first two. This one is completely unrelated.
-It only supposed to fix some random configuration issue
-reported by a build robot, which isn't really important now.
-The other two convert the module verifier to the new API.
-Thanks,
+Rename dh895xcc mmp fw to make it consistent with other mmp
+images
+
+Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
+index 72eacfd..57a749f 100644
+--- a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
++++ b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
+@@ -82,7 +82,7 @@
+ #define ADF_DH895XCC_VINTMSK_OFFSET(i)	(0x3A000 + 0x200 + ((i) * 0x04))
+ /* FW names */
+ #define ADF_DH895XCC_FW "qat_895xcc.bin"
+-#define ADF_DH895XCC_MMP "qat_mmp.bin"
++#define ADF_DH895XCC_MMP "qat_895xxcc_mmp.bin"
+ 
+ void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data);
+ void adf_clean_hw_data_dh895xcc(struct adf_hw_device_data *hw_data);
 -- 
-TS
+2.1.4
