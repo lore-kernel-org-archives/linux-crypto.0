@@ -1,29 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: rsa-padding - don't allocate buffer on stack
-Date: Tue, 22 Dec 2015 21:21:21 +0800
-Message-ID: <20151222132121.GA25844@gondor.apana.org.au>
-References: <1449896631-20472-1-git-send-email-andrew.zaborowski@intel.com>
+Subject: Re: [PATCH] crypto: qat - fix some timeout tests
+Date: Tue, 22 Dec 2015 21:23:05 +0800
+Message-ID: <20151222132305.GB25829@gondor.apana.org.au>
+References: <1450246190-60770-1-git-send-email-pingchao.yang@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Cc: dan.carpenter@oracle.com, tadeusz.struk@intel.com,
+	linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	kernel-janitors@vger.kernel.org
+To: Yang Pingchao <pingchao.yang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52027 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:33894 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752515AbbLVNVp (ORCPT
+	with ESMTP id S1754347AbbLVNXi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Dec 2015 08:21:45 -0500
+	Tue, 22 Dec 2015 08:23:38 -0500
 Content-Disposition: inline
-In-Reply-To: <1449896631-20472-1-git-send-email-andrew.zaborowski@intel.com>
+In-Reply-To: <1450246190-60770-1-git-send-email-pingchao.yang@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Andrew Zaborowski <andrew.zaborowski@intel.com> wrote:
-> Avoid the s390 compile "warning: 'pkcs1pad_encrypt_sign_complete'
-> uses dynamic stack allocation" reported by kbuild test robot.  Don't
-> use a flat zero-filled buffer, instead zero the contents of the SGL.
+On Wed, Dec 16, 2015 at 02:09:50PM +0800, Yang Pingchao wrote:
+> Change the timeout condition since the times value would be -1 after
+> running MAX_RETRY_TIMES.
 > 
-> Signed-off-by: Andrew Zaborowski <andrew.zaborowski@intel.com>
+> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Signed-off-by: Yang Pingchao <pingchao.yang@intel.com>
 
 Patch applied.  Thanks.
 -- 
