@@ -1,42 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/2] crypto: KEYS: convert public key to the akcipher
- api
-Date: Tue, 22 Dec 2015 20:09:19 +0800
-Message-ID: <20151222120919.GA25163@gondor.apana.org.au>
-References: <201512200735.x3U85zQL%fengguang.wu@intel.com>
- <5678684F.2020308@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild test robot <lkp@intel.com>,
-	Tadeusz Struk <tadeusz.struk@intel.com>, kbuild-all@01.org,
-	linux-kernel@vger.kernel.org, dhowells@redhat.com,
-	linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, zohar@linux.vnet.ibm.com
-To: Tadeusz Struk <tstruk@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47397 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752294AbbLVMJh (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Dec 2015 07:09:37 -0500
-Content-Disposition: inline
-In-Reply-To: <5678684F.2020308@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [RFC PATCH 3/5] crypto: sunxi-ss: fix dev_dbg() output type
+Date: Tue, 22 Dec 2015 12:27:45 +0000
+Message-ID: <1450787267-26836-4-git-send-email-andre.przywara@arm.com>
+References: <1450787267-26836-1-git-send-email-andre.przywara@arm.com>
+Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com,
+	linux-sunxi@googlegroups.com, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Corentin Labbe <clabbe.montjoie@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Maxime Ripard <maxime.ripard@free-electrons.com>,
+	Chen-Yu Tsai <wens@csie.org>, arnd@arndb.de
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1450787267-26836-1-git-send-email-andre.przywara@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Dec 21, 2015 at 12:59:59PM -0800, Tadeusz Struk wrote:
-> 
-> The previous patch was broken, re-sending again, sorry.
-> 
-> I think there is something missing in this configuration.
-> cat .config | grep KEXEC_BZIMAGE_VERIFY_SIG gives nothing.
-> Anyways, this patch should fix it.
+The length parameter in this dev_dbg() call is actually a size_t,
+so use the proper type to avoid warnings when compiling for 64-bit
+architectures.
 
-No this is unacceptable.  Please fix it properly by making the
-header file self-contained, e.g., by using a forward declaration.
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+index b3bc7bd..af2690c 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+@@ -251,7 +251,7 @@ static int sun4i_ss_cipher_poll(struct ablkcipher_request *areq)
+ 		spaces = readl(ss->base + SS_FCSR);
+ 		rx_cnt = SS_RXFIFO_SPACES(spaces);
+ 		tx_cnt = SS_TXFIFO_SPACES(spaces);
+-		dev_dbg(ss->dev, "%x %u/%u %u/%u cnt=%u %u/%u %u/%u cnt=%u %u %u\n",
++		dev_dbg(ss->dev, "%x %u/%zu %u/%u cnt=%u %u/%zu %u/%u cnt=%u %u %u\n",
+ 			mode,
+ 			oi, mi.length, ileft, areq->nbytes, rx_cnt,
+ 			oo, mo.length, oleft, areq->nbytes, tx_cnt,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.5.1
