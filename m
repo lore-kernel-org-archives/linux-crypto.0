@@ -1,50 +1,47 @@
-From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [RFC PATCH 2/5] crypto: sunxi-ss: fix min3() call
- to match types
-Date: Wed, 23 Dec 2015 00:07:41 +0000
-Message-ID: <5679E5CD.2070103@arm.com>
-References: <1450787267-26836-1-git-send-email-andre.przywara@arm.com>
- <1450787267-26836-3-git-send-email-andre.przywara@arm.com>
- <201512222306.58681.arnd@arndb.de>
-Reply-To: andre.przywara-5wv7dgnIgG8@public.gmane.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 1/2] crypto: KEYS: convert public key to the akcipher
+ api
+Date: Wed, 23 Dec 2015 10:33:43 +0800
+Message-ID: <20151223023343.GA31104@gondor.apana.org.au>
+References: <201512200735.x3U85zQL%fengguang.wu@intel.com>
+ <5678684F.2020308@gmail.com>
+ <20151222120919.GA25163@gondor.apana.org.au>
+ <56795CFF.1080106@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-   Chen-Yu Tsai <wens-jdAy2FN1RRM@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-   marc.zyngier-5wv7dgnIgG8@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org,
-   linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
-   Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-   "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
-To: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-Return-path: <linux-sunxi+bncBDNZNK75ZIKRB6OL46ZQKGQE7BQIB2A-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-In-Reply-To: <201512222306.58681.arnd-r2nGTMty4D4@public.gmane.org>
-List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <https://groups.google.com/group/linux-sunxi
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Subscribe: <https://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <https://groups.google.com/group/linux-sunxi/subscribe>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Tadeusz Struk <tstruk@gmail.com>,
+	kbuild test robot <lkp@intel.com>, kbuild-all@01.org,
+	linux-kernel@vger.kernel.org, dhowells@redhat.com,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, zohar@linux.vnet.ibm.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:53983 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753181AbbLWCdy (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 22 Dec 2015 21:33:54 -0500
+Content-Disposition: inline
+In-Reply-To: <56795CFF.1080106@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Arnd,
-On 12/22/15 22:06, Arnd Bergmann wrote:
-> On Tuesday 22 December 2015, Andre Przywara wrote:
->> The min3() macro expects all arguments to be of the same type (or
->> size at least). While two arguments are ints or u32s, one is size_t,
->> which does not match on 64-bit architectures.
->> Cast the size_t to u32 to make min3() happy. In this context here the
->> length should never exceed 32 bits anyway.
->>
->> Signed-off-by: Andre Przywara <andre.przywara-5wv7dgnIgG8@public.gmane.org>
-> 
-> Looks correct, but a bit ugly. Could we avoid the casts by using
-> temporary variables to keep the size_t based data?
+On Tue, Dec 22, 2015 at 06:23:59AM -0800, Tadeusz Struk wrote:
+>
+> What about the first two. This one is completely unrelated.
+> It only supposed to fix some random configuration issue
+> reported by a build robot, which isn't really important now.
+> The other two convert the module verifier to the new API.
 
-I guess this gets even uglier, but I found a better solution by
-promoting the other involved variables to size_t in this function. This
-works nicely for most of the cases, I just need two size_t casts now.
-Will send an updated version soon.
+No this compile breakage was introduced by your first two patches
+because you changed crypto/public_key.h which is used by entities
+outside of your patch.
+
+So fix your first two patches by not breaking existing users
+of it.
 
 Cheers,
-Andre.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
