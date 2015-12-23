@@ -1,40 +1,91 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: 842 - remove WARN inside printk
-Date: Wed, 23 Dec 2015 18:25:28 +0800
-Message-ID: <20151223102528.GB1205@gondor.apana.org.au>
-References: <5671C83C.7@infradead.org>
- <1450720330-30676-1-git-send-email-ddstreet@ieee.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Haren Myneni <haren@linux.vnet.ibm.com>,
-	linux-next@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel <linux-kernel@vger.kernel.org>
-To: Dan Streetman <ddstreet@ieee.org>
+From: Geliang Tang <geliangtang@163.com>
+Subject: [PATCH] crypto: ccp - use to_pci_dev and to_platform_device
+Date: Wed, 23 Dec 2015 20:49:01 +0800
+Message-ID: <3a86c7e2921be1783aaab4dfbb3f4021a0e2f8d4.1450874840.git.geliangtang@163.com>
+Cc: Geliang Tang <geliangtang@163.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Tom Lendacky <thomas.lendacky@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47217 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753314AbbLWKZw (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Dec 2015 05:25:52 -0500
-Content-Disposition: inline
-In-Reply-To: <1450720330-30676-1-git-send-email-ddstreet@ieee.org>
+Received: from m50-132.163.com ([123.125.50.132]:50853 "EHLO m50-132.163.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750959AbbLWMtk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 23 Dec 2015 07:49:40 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 21, 2015 at 12:52:10PM -0500, Dan Streetman wrote:
-> Remove the WARN() from the beN_to_cpu macro, which is used as a param to a
-> pr_debug() call.  With a certain kernel config, this printk-in-printk
-> results in the no_printk() macro trying to recursively call the
-> no_printk() macro, and since macros can't recursively call themselves
-> a build error results.
-> 
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
-> Signed-off-by: Dan Streetman <ddstreet@ieee.org>
+Use to_pci_dev() and to_platform_device() instead of open-coding.
 
-Patch applied.  Thanks.
+Signed-off-by: Geliang Tang <geliangtang@163.com>
+---
+ drivers/crypto/ccp/ccp-pci.c      | 8 ++++----
+ drivers/crypto/ccp/ccp-platform.c | 6 ++----
+ 2 files changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/crypto/ccp/ccp-pci.c b/drivers/crypto/ccp/ccp-pci.c
+index 6ade02f..7690467 100644
+--- a/drivers/crypto/ccp/ccp-pci.c
++++ b/drivers/crypto/ccp/ccp-pci.c
+@@ -44,7 +44,7 @@ static int ccp_get_msix_irqs(struct ccp_device *ccp)
+ {
+ 	struct ccp_pci *ccp_pci = ccp->dev_specific;
+ 	struct device *dev = ccp->dev;
+-	struct pci_dev *pdev = container_of(dev, struct pci_dev, dev);
++	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct msix_entry msix_entry[MSIX_VECTORS];
+ 	unsigned int name_len = sizeof(ccp_pci->msix[0].name) - 1;
+ 	int v, ret;
+@@ -86,7 +86,7 @@ e_irq:
+ static int ccp_get_msi_irq(struct ccp_device *ccp)
+ {
+ 	struct device *dev = ccp->dev;
+-	struct pci_dev *pdev = container_of(dev, struct pci_dev, dev);
++	struct pci_dev *pdev = to_pci_dev(dev);
+ 	int ret;
+ 
+ 	ret = pci_enable_msi(pdev);
+@@ -133,7 +133,7 @@ static void ccp_free_irqs(struct ccp_device *ccp)
+ {
+ 	struct ccp_pci *ccp_pci = ccp->dev_specific;
+ 	struct device *dev = ccp->dev;
+-	struct pci_dev *pdev = container_of(dev, struct pci_dev, dev);
++	struct pci_dev *pdev = to_pci_dev(dev);
+ 
+ 	if (ccp_pci->msix_count) {
+ 		while (ccp_pci->msix_count--)
+@@ -149,7 +149,7 @@ static void ccp_free_irqs(struct ccp_device *ccp)
+ static int ccp_find_mmio_area(struct ccp_device *ccp)
+ {
+ 	struct device *dev = ccp->dev;
+-	struct pci_dev *pdev = container_of(dev, struct pci_dev, dev);
++	struct pci_dev *pdev = to_pci_dev(dev);
+ 	resource_size_t io_len;
+ 	unsigned long io_flags;
+ 
+diff --git a/drivers/crypto/ccp/ccp-platform.c b/drivers/crypto/ccp/ccp-platform.c
+index 01b50cb..66dd7c9 100644
+--- a/drivers/crypto/ccp/ccp-platform.c
++++ b/drivers/crypto/ccp/ccp-platform.c
+@@ -35,8 +35,7 @@ struct ccp_platform {
+ static int ccp_get_irq(struct ccp_device *ccp)
+ {
+ 	struct device *dev = ccp->dev;
+-	struct platform_device *pdev = container_of(dev,
+-					struct platform_device, dev);
++	struct platform_device *pdev = to_platform_device(dev);
+ 	int ret;
+ 
+ 	ret = platform_get_irq(pdev, 0);
+@@ -78,8 +77,7 @@ static void ccp_free_irqs(struct ccp_device *ccp)
+ static struct resource *ccp_find_mmio_area(struct ccp_device *ccp)
+ {
+ 	struct device *dev = ccp->dev;
+-	struct platform_device *pdev = container_of(dev,
+-					struct platform_device, dev);
++	struct platform_device *pdev = to_platform_device(dev);
+ 	struct resource *ior;
+ 
+ 	ior = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.5.0
