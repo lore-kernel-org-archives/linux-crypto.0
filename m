@@ -1,40 +1,32 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
 Subject: Re: [PATCH v4] crypto: KEYS: convert public key and digsig asym to
  the akcipher api
-Date: Thu, 24 Dec 2015 04:21:03 +0800
-Message-ID: <20151223202103.GA4717@gondor.apana.org.au>
+Date: Wed, 23 Dec 2015 19:00:39 -0800
+Message-ID: <567B5FD7.3090600@intel.com>
 References: <20151223143352.5035.85876.stgit@tstruk-mobl1>
- <20151223145130.GA2598@gondor.apana.org.au>
- <567AB6AF.4040702@intel.com>
+ <20151223145130.GA2598@gondor.apana.org.au> <567AB6AF.4040702@intel.com>
+ <20151223202103.GA4717@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Cc: linux-kernel@vger.kernel.org, dhowells@redhat.com,
 	linux-security-module@vger.kernel.org,
 	linux-crypto@vger.kernel.org, zohar@linux.vnet.ibm.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:53252 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752470AbbLWUVN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Dec 2015 15:21:13 -0500
-Content-Disposition: inline
-In-Reply-To: <567AB6AF.4040702@intel.com>
+Received: from mga01.intel.com ([192.55.52.88]:25126 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751778AbbLXDEJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 23 Dec 2015 22:04:09 -0500
+In-Reply-To: <20151223202103.GA4717@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 23, 2015 at 06:58:55AM -0800, Tadeusz Struk wrote:
-> 
-> Because the first patch modifies the struct public_key and removes the MPIs from it,
-> which the code modified in the second patch still uses. If bisect only takes the first
-> then the build will fail on the security/integrity/digsig_asymmetric.c as reported by
-> kbuild test robot:
+On 12/23/2015 12:21 PM, Herbert Xu wrote:
+> Why not just leave the MPIs in the structure and only remove them
+> by adding a third patch?
 
-Why not just leave the MPIs in the structure and only remove them
-by adding a third patch?
-
-Cheers,
+Right, I think that's a better way of resolving this. v5 on it's way.
+Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+TS
