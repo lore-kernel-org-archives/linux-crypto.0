@@ -1,70 +1,152 @@
-From: Julia Lawall <julia.lawall@lip6.fr>
-Subject: Re: crypto: algif_skcipher - Require setkey before accept(2)
-Date: Fri, 25 Dec 2015 07:54:48 +0100 (CET)
-Message-ID: <alpine.DEB.2.02.1512250753010.2084@localhost6.localdomain6>
-References: <201512241831.VN3LufSe%fengguang.wu@intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH v2] crypto: algif_skcipher - Require setkey before accept(2)
+Date: Fri, 25 Dec 2015 15:40:05 +0800
+Message-ID: <20151225074005.GA14690@gondor.apana.org.au>
+References: <CACT4Y+YOwOfRHOwJ=FA9aaL2cZ-PRhTvd_mCzxx2nnN_L3tygw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: kbuild-all@01.org, Dmitry Vyukov <dvyukov@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	syzkaller <syzkaller@googlegroups.com>,
-	Kostya Serebryany <kcc@google.com>,
-	Alexander Potapenko <glider@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Sasha Levin <sasha.levin@oracle.com>,
-	Kees Cook <keescook@google.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: syzkaller@googlegroups.com, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kcc@google.com, glider@google.com, edumazet@google.com,
+	sasha.levin@oracle.com, keescook@google.com
+To: Dmitry Vyukov <dvyukov@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:61647 "EHLO
-	mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751513AbbLYGyw (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:35463 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753180AbbLYHkT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 Dec 2015 01:54:52 -0500
-In-Reply-To: <201512241831.VN3LufSe%fengguang.wu@intel.com>
+	Fri, 25 Dec 2015 02:40:19 -0500
+Content-Disposition: inline
+In-Reply-To: <CACT4Y+YOwOfRHOwJ=FA9aaL2cZ-PRhTvd_mCzxx2nnN_L3tygw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Lines 766, 767 don't look correct at all.
+Dmitry Vyukov <dvyukov@google.com> wrote:
+>
+> I am testing with your two patches:
+> crypto: algif_skcipher - Use new skcipher interface
+> crypto: algif_skcipher - Require setkey before accept(2)
+> on top of a88164345b81292b55a8d4829fdd35c8d611cd7d (Dec 23).
 
-julia
+You sent the email to everyone on the original CC list except me.
+Please don't do that.
 
-On Thu, 24 Dec 2015, kbuild test robot wrote:
+> Now the following program causes a bunch of use-after-frees and them
+> kills kernel:
 
-> In-Reply-To: <20151224093902.GA8235@gondor.apana.org.au>
-> 
-> [if your patch is applied to the wrong git tree, please drop us a note to help improving the system]
-> Hi Herbert,
-> 
-> [auto build test WARNING on crypto/master]
-> [also build test WARNING on next-20151223]
-> [cannot apply to v4.4-rc6]
-> 
-> url:    https://github.com/0day-ci/linux/commits/Herbert-Xu/crypto-algif_skcipher-Require-setkey-before-accept-2/20151224-174142
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
-> :::::: branch date: 63 minutes ago
-> :::::: commit date: 63 minutes ago
-> 
-> >> crypto/algif_skcipher.c:767:18-21: ERROR: reference preceded by free on line 766
-> 
-> git remote add linux-review https://github.com/0day-ci/linux
-> git remote update linux-review
-> git checkout 7f3e28b295bcfeb7fba928af15780f1bb3051430
-> vim +767 crypto/algif_skcipher.c
-> 
-> 7f3e28b2 Herbert Xu 2015-12-24  760  	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
-> 7f3e28b2 Herbert Xu 2015-12-24  761  	if (!tfm)
-> 7f3e28b2 Herbert Xu 2015-12-24  762  		return ERR_PTR(-ENOMEM);
-> 7f3e28b2 Herbert Xu 2015-12-24  763  
-> 7f3e28b2 Herbert Xu 2015-12-24  764  	tfm->skcipher = crypto_alloc_skcipher(name, type, mask);
-> 7f3e28b2 Herbert Xu 2015-12-24  765  	if (IS_ERR(tfm->skcipher)) {
-> 7f3e28b2 Herbert Xu 2015-12-24 @766  		kfree(tfm);
-> 7f3e28b2 Herbert Xu 2015-12-24 @767  		return ERR_CAST(tfm->skcipher);
-> 7f3e28b2 Herbert Xu 2015-12-24  768  	}
-> 7f3e28b2 Herbert Xu 2015-12-24  769  
-> 7f3e28b2 Herbert Xu 2015-12-24  770  	return tfm;
-> 
-> ---
-> 0-DAY kernel test infrastructure                Open Source Technology Center
-> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
-> 
+Yes there is an obvious bug in the patch that Julia Lawall has
+responded to in another thread.  Here is a fixed version.
+
+---8<--
+Some cipher implementations will crash if you try to use them
+without calling setkey first.  This patch adds a check so that
+the accept(2) call will fail with -ENOKEY if setkey hasn't been
+done on the socket yet.
+
+Cc: stable@vger.kernel.org
+Reported-by: Dmitry Vyukov <dvyukov@google.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 5c756b3..f4431bc 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -31,6 +31,11 @@ struct skcipher_sg_list {
+ 	struct scatterlist sg[0];
+ };
+ 
++struct skcipher_tfm {
++	struct crypto_skcipher *skcipher;
++	bool has_key;
++};
++
+ struct skcipher_ctx {
+ 	struct list_head tsgl;
+ 	struct af_alg_sgl rsgl;
+@@ -750,17 +755,41 @@ static struct proto_ops algif_skcipher_ops = {
+ 
+ static void *skcipher_bind(const char *name, u32 type, u32 mask)
+ {
+-	return crypto_alloc_skcipher(name, type, mask);
++	struct skcipher_tfm *tfm;
++	struct crypto_skcipher *skcipher;
++
++	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
++	if (!tfm)
++		return ERR_PTR(-ENOMEM);
++
++	skcipher = crypto_alloc_skcipher(name, type, mask);
++	if (IS_ERR(skcipher)) {
++		kfree(tfm);
++		return ERR_CAST(skcipher);
++	}
++
++	tfm->skcipher = skcipher;
++
++	return tfm;
+ }
+ 
+ static void skcipher_release(void *private)
+ {
+-	crypto_free_skcipher(private);
++	struct skcipher_tfm *tfm = private;
++
++	crypto_free_skcipher(tfm->skcipher);
++	kfree(tfm);
+ }
+ 
+ static int skcipher_setkey(void *private, const u8 *key, unsigned int keylen)
+ {
+-	return crypto_skcipher_setkey(private, key, keylen);
++	struct skcipher_tfm *tfm = private;
++	int err;
++
++	err = crypto_skcipher_setkey(tfm->skcipher, key, keylen);
++	tfm->has_key = !err;
++
++	return err;
+ }
+ 
+ static void skcipher_wait(struct sock *sk)
+@@ -792,20 +821,25 @@ static int skcipher_accept_parent(void *private, struct sock *sk)
+ {
+ 	struct skcipher_ctx *ctx;
+ 	struct alg_sock *ask = alg_sk(sk);
+-	unsigned int len = sizeof(*ctx) + crypto_skcipher_reqsize(private);
++	struct skcipher_tfm *tfm = private;
++	struct crypto_skcipher *skcipher = tfm->skcipher;
++	unsigned int len = sizeof(*ctx) + crypto_skcipher_reqsize(skcipher);
++
++	if (!tfm->has_key)
++		return -ENOKEY;
+ 
+ 	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
+ 	if (!ctx)
+ 		return -ENOMEM;
+ 
+-	ctx->iv = sock_kmalloc(sk, crypto_skcipher_ivsize(private),
++	ctx->iv = sock_kmalloc(sk, crypto_skcipher_ivsize(skcipher),
+ 			       GFP_KERNEL);
+ 	if (!ctx->iv) {
+ 		sock_kfree_s(sk, ctx, len);
+ 		return -ENOMEM;
+ 	}
+ 
+-	memset(ctx->iv, 0, crypto_skcipher_ivsize(private));
++	memset(ctx->iv, 0, crypto_skcipher_ivsize(skcipher));
+ 
+ 	INIT_LIST_HEAD(&ctx->tsgl);
+ 	ctx->len = len;
+@@ -818,7 +852,7 @@ static int skcipher_accept_parent(void *private, struct sock *sk)
+ 
+ 	ask->private = ctx;
+ 
+-	skcipher_request_set_tfm(&ctx->req, private);
++	skcipher_request_set_tfm(&ctx->req, skcipher);
+ 	skcipher_request_set_callback(&ctx->req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+ 				      af_alg_complete, &ctx->completion);
+ 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
