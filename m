@@ -1,66 +1,70 @@
-From: Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [RFC PATCH 3/5] crypto: sunxi-ss: fix dev_dbg()
- output type
-Date: Thu, 24 Dec 2015 13:56:25 +0100
-Message-ID: <567BEB79.7050201@gmail.com>
-References: <1450787267-26836-1-git-send-email-andre.przywara@arm.com>
- <1450787267-26836-4-git-send-email-andre.przywara@arm.com>
-Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Julia Lawall <julia.lawall@lip6.fr>
+Subject: Re: crypto: algif_skcipher - Require setkey before accept(2)
+Date: Fri, 25 Dec 2015 07:54:48 +0100 (CET)
+Message-ID: <alpine.DEB.2.02.1512250753010.2084@localhost6.localdomain6>
+References: <201512241831.VN3LufSe%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Cc: marc.zyngier-5wv7dgnIgG8@public.gmane.org, catalin.marinas-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org,
- linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
- linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
- "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Andre Przywara <andre.przywara-5wv7dgnIgG8@public.gmane.org>,
- Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
- Chen-Yu Tsai <wens-jdAy2FN1RRM@public.gmane.org>, arnd-r2nGTMty4D4@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBCOX56ZQKGQEAUYRJ3A-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-In-Reply-To: <1450787267-26836-4-git-send-email-andre.przywara-5wv7dgnIgG8@public.gmane.org>
-List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <https://groups.google.com/group/linux-sunxi
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Subscribe: <https://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <https://groups.google.com/group/linux-sunxi/subscribe>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: kbuild-all@01.org, Dmitry Vyukov <dvyukov@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	syzkaller <syzkaller@googlegroups.com>,
+	Kostya Serebryany <kcc@google.com>,
+	Alexander Potapenko <glider@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Sasha Levin <sasha.levin@oracle.com>,
+	Kees Cook <keescook@google.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:61647 "EHLO
+	mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751513AbbLYGyw (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 Dec 2015 01:54:52 -0500
+In-Reply-To: <201512241831.VN3LufSe%fengguang.wu@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Le 22/12/2015 13:27, Andre Przywara a =C3=A9crit :
-> The length parameter in this dev_dbg() call is actually a size_t,
-> so use the proper type to avoid warnings when compiling for 64-bit
-> architectures.
->=20
-> Signed-off-by: Andre Przywara <andre.przywara-5wv7dgnIgG8@public.gmane.org>
+Lines 766, 767 don't look correct at all.
+
+julia
+
+On Thu, 24 Dec 2015, kbuild test robot wrote:
+
+> In-Reply-To: <20151224093902.GA8235@gondor.apana.org.au>
+> 
+> [if your patch is applied to the wrong git tree, please drop us a note to help improving the system]
+> Hi Herbert,
+> 
+> [auto build test WARNING on crypto/master]
+> [also build test WARNING on next-20151223]
+> [cannot apply to v4.4-rc6]
+> 
+> url:    https://github.com/0day-ci/linux/commits/Herbert-Xu/crypto-algif_skcipher-Require-setkey-before-accept-2/20151224-174142
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
+> :::::: branch date: 63 minutes ago
+> :::::: commit date: 63 minutes ago
+> 
+> >> crypto/algif_skcipher.c:767:18-21: ERROR: reference preceded by free on line 766
+> 
+> git remote add linux-review https://github.com/0day-ci/linux
+> git remote update linux-review
+> git checkout 7f3e28b295bcfeb7fba928af15780f1bb3051430
+> vim +767 crypto/algif_skcipher.c
+> 
+> 7f3e28b2 Herbert Xu 2015-12-24  760  	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
+> 7f3e28b2 Herbert Xu 2015-12-24  761  	if (!tfm)
+> 7f3e28b2 Herbert Xu 2015-12-24  762  		return ERR_PTR(-ENOMEM);
+> 7f3e28b2 Herbert Xu 2015-12-24  763  
+> 7f3e28b2 Herbert Xu 2015-12-24  764  	tfm->skcipher = crypto_alloc_skcipher(name, type, mask);
+> 7f3e28b2 Herbert Xu 2015-12-24  765  	if (IS_ERR(tfm->skcipher)) {
+> 7f3e28b2 Herbert Xu 2015-12-24 @766  		kfree(tfm);
+> 7f3e28b2 Herbert Xu 2015-12-24 @767  		return ERR_CAST(tfm->skcipher);
+> 7f3e28b2 Herbert Xu 2015-12-24  768  	}
+> 7f3e28b2 Herbert Xu 2015-12-24  769  
+> 7f3e28b2 Herbert Xu 2015-12-24  770  	return tfm;
+> 
 > ---
->  drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/s=
-unxi-ss/sun4i-ss-cipher.c
-> index b3bc7bd..af2690c 100644
-> --- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-> +++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-> @@ -251,7 +251,7 @@ static int sun4i_ss_cipher_poll(struct ablkcipher_req=
-uest *areq)
->  		spaces =3D readl(ss->base + SS_FCSR);
->  		rx_cnt =3D SS_RXFIFO_SPACES(spaces);
->  		tx_cnt =3D SS_TXFIFO_SPACES(spaces);
-> -		dev_dbg(ss->dev, "%x %u/%u %u/%u cnt=3D%u %u/%u %u/%u cnt=3D%u %u %u\n=
-",
-> +		dev_dbg(ss->dev, "%x %u/%zu %u/%u cnt=3D%u %u/%zu %u/%u cnt=3D%u %u %u=
-\n",
->  			mode,
->  			oi, mi.length, ileft, areq->nbytes, rx_cnt,
->  			oo, mo.length, oleft, areq->nbytes, tx_cnt,
->=20
-
-Acked-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
---=20
-You received this message because you are subscribed to the Google Groups "=
-linux-sunxi" group.
-To unsubscribe from this group and stop receiving emails from it, send an e=
-mail to linux-sunxi+unsubscribe-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
-For more options, visit https://groups.google.com/d/optout.
+> 0-DAY kernel test infrastructure                Open Source Technology Center
+> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+> 
