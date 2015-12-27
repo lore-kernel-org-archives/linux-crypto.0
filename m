@@ -1,180 +1,75 @@
-From: Tadeusz Struk <tstruk@gmail.com>
-Subject: [PATCH v2] crypto: AF_ALG - add support for keys/asymmetric-type
-Date: Sat, 26 Dec 2015 07:50:14 -0800
-Message-ID: <20151226155014.27615.14985.stgit@desktop.home>
+From: Maxime Ripard <maxime.ripard@free-electrons.com>
+Subject: Re: [RFC PATCH 3/5] crypto: sunxi-ss: fix dev_dbg() output type
+Date: Sun, 27 Dec 2015 23:05:49 +0100
+Message-ID: <20151227220549.GV30359@lukather>
+References: <1450787267-26836-1-git-send-email-andre.przywara@arm.com>
+ <1450787267-26836-4-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: tadeusz.struk@intel.com, smueller@chronox.de,
-	linux-api@vger.kernel.org, marcel@holtmann.org,
-	linux-kernel@vger.kernel.org, dhowells@redhat.com,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	tstruk@gmail.com, zohar@linux.vnet.ibm.com, dwmw2@infradead.org
-To: herbert@gondor.apana.org.au
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="FclElvQKoGCylS3A"
+Cc: Chen-Yu Tsai <wens@csie.org>, arnd@arndb.de, marc.zyngier@arm.com,
+	catalin.marinas@arm.com, will.deacon@arm.com,
+	linux-sunxi@googlegroups.com, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Corentin Labbe <clabbe.montjoie@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f179.google.com ([209.85.192.179]:35427 "EHLO
-	mail-pf0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751145AbbLZPuQ (ORCPT
+Received: from down.free-electrons.com ([37.187.137.238]:57268 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753564AbbL0WFv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 26 Dec 2015 10:50:16 -0500
+	Sun, 27 Dec 2015 17:05:51 -0500
+Content-Disposition: inline
+In-Reply-To: <1450787267-26836-4-git-send-email-andre.przywara@arm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Tadeusz Struk <tadeusz.struk@intel.com>
 
-Created on top of patchset from Stephan Mueller <smueller@chronox.de>
-https://patchwork.kernel.org/patch/7877921/
-https://patchwork.kernel.org/patch/7877971/
-https://patchwork.kernel.org/patch/7877961/
+--FclElvQKoGCylS3A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This patch adds support for asymmetric key type to AF_ALG.
-It will work as follows: A new PF_ALG socket options will be
-added on top of existing ALG_SET_KEY and ALG_SET_PUBKEY, namely
-ALG_SET_PUBKEY_ID and ALG_SET_KEY_ID for setting public and
-private keys respectively. When these new options will be used
-the user instead of providing the key material, will provide a
-key id and the key itself will be obtained from kernel keyring
-subsystem. The user will use the standard tools (keyctl tool
-or the keyctl syscall) for key instantiation and to obtain the
-key id. The key id can also be obtained by reading the
-/proc/keys file.
+On Tue, Dec 22, 2015 at 12:27:45PM +0000, Andre Przywara wrote:
+> The length parameter in this dev_dbg() call is actually a size_t,
+> so use the proper type to avoid warnings when compiling for 64-bit
+> architectures.
+>=20
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 
-When a key will be found, the request_key() function will
-return a requested key. Next the asymmetric key subtype will be
-used to obtain the public_key, which can be either a public key
-or a private key from the cryptographic point of view, and the
-key payload will be passed to the akcipher pf_alg subtype.
-Pf_alg code will then call crypto API functions, either the
-crypto_akcipher_set_priv_key or the crypto_akcipher_set_pub_key,
-depending on the used option. Subsequently the asymmetric key
-will be freed and return code returned back to the user.
+Acked-by: Maxime Ripard <maxime.ripard@free-electrons.com>
 
-Currently the interface will be restricted only to asymmetric
-ciphers, but it can be extended later to work with symmetric
-ciphers if required.
+Thanks!
+Maxime
 
-The assumption is that access rights for a given user will be
-verified by the key subsystem so the pf_alg interface can call
-the request_key() without checking if the user has appropriate
-rights (Please verify this assumption).
+--=20
+Maxime Ripard, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
 
-Changes in v2:
-Separate logic for setkey and setkey_id into two separate
-functions as proposed by Stephan.
+--FclElvQKoGCylS3A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
- crypto/af_alg.c             |   49 +++++++++++++++++++++++++++++++++++++++----
- include/uapi/linux/if_alg.h |    2 ++
- 2 files changed, 47 insertions(+), 4 deletions(-)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 767a134..e96e8c9 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -22,6 +22,8 @@
- #include <linux/net.h>
- #include <linux/rwsem.h>
- #include <linux/security.h>
-+#include <crypto/public_key.h>
-+#include <keys/asymmetric-type.h>
- 
- struct alg_type_list {
- 	const struct af_alg_type *type;
-@@ -172,8 +174,38 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
- 	return 0;
- }
- 
-+static int alg_setkey_id(void *private, const u8 *key, unsigned int keylen,
-+			 int (*setkey)(void *private, const u8 *key,
-+				       unsigned int keylen))
-+{
-+	struct key *keyring;
-+	struct public_key *pkey;
-+	char key_name[12];
-+	u32 keyid = *((u32 *)key);
-+	int err;
-+
-+	sprintf(key_name, "id:%08x", keyid);
-+	keyring = request_key(&key_type_asymmetric, key_name, NULL);
-+
-+	err = -ENOKEY;
-+	if (IS_ERR(keyring))
-+		goto out;
-+
-+	pkey = keyring->payload.data[asym_crypto];
-+	if (!pkey) {
-+		key_put(keyring);
-+		goto out;
-+	}
-+
-+	err = setkey(private, pkey->key, pkey->keylen);
-+	key_put(keyring);
-+
-+out:
-+	return err;
-+}
-+
- static int alg_setkey(struct sock *sk, char __user *ukey,
--		      unsigned int keylen,
-+		      unsigned int keylen, bool key_id,
- 		      int (*setkey)(void *private, const u8 *key,
- 				    unsigned int keylen))
- {
-@@ -192,7 +224,8 @@ static int alg_setkey(struct sock *sk, char __user *ukey,
- 	if (copy_from_user(key, ukey, keylen))
- 		goto out;
- 
--	err = setkey(ask->private, key, keylen);
-+	err = key_id ? alg_setkey_id(ask->private, key, keylen, setkey) :
-+		       setkey(ask->private, key, keylen);
- 
- out:
- 	sock_kzfree_s(sk, key, keylen);
-@@ -207,6 +240,8 @@ static int alg_setsockopt(struct socket *sock, int level, int optname,
- 	struct alg_sock *ask = alg_sk(sk);
- 	const struct af_alg_type *type;
- 	int err = -ENOPROTOOPT;
-+	bool key_id = ((optname == ALG_SET_PUBKEY_ID) ||
-+		       (optname == ALG_SET_KEY_ID));
- 
- 	lock_sock(sk);
- 	type = ask->type;
-@@ -216,16 +251,22 @@ static int alg_setsockopt(struct socket *sock, int level, int optname,
- 
- 	switch (optname) {
- 	case ALG_SET_KEY:
-+	case ALG_SET_KEY_ID:
- 		if (sock->state == SS_CONNECTED)
- 			goto unlock;
- 
--		err = alg_setkey(sk, optval, optlen, type->setkey);
-+		/* ALG_SET_KEY_ID is only for akcipher */
-+		if (!strcmp(type->name, "akcipher") && key_id)
-+			goto unlock;
-+
-+		err = alg_setkey(sk, optval, optlen, key_id, type->setkey);
- 		break;
- 	case ALG_SET_PUBKEY:
-+	case ALG_SET_PUBKEY_ID:
- 		if (sock->state == SS_CONNECTED)
- 			goto unlock;
- 
--		err = alg_setkey(sk, optval, optlen, type->setpubkey);
-+		err = alg_setkey(sk, optval, optlen, key_id, type->setpubkey);
- 		break;
- 	case ALG_SET_AEAD_AUTHSIZE:
- 		if (sock->state == SS_CONNECTED)
-diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
-index 02e6162..0379766 100644
---- a/include/uapi/linux/if_alg.h
-+++ b/include/uapi/linux/if_alg.h
-@@ -35,6 +35,8 @@ struct af_alg_iv {
- #define ALG_SET_AEAD_ASSOCLEN		4
- #define ALG_SET_AEAD_AUTHSIZE		5
- #define ALG_SET_PUBKEY			6
-+#define ALG_SET_PUBKEY_ID		7
-+#define ALG_SET_KEY_ID			8
- 
- /* Operations */
- #define ALG_OP_DECRYPT			0
+iQIcBAEBAgAGBQJWgGC9AAoJEBx+YmzsjxAghREQAJW6BnkfMfW2KUmlqbgz6UBk
+JTKDlIrtQTDdGjlnT4xvCa9WBPMSbTdcqqlnESj8ZUiRYZ1eTRzXoyvw9DwafgfY
+VUv/QO0xC/707mID4AuND8ou21PQUk6+jD0+hBUoaoxaItvdxnMWOnYJycwg0ADZ
+nqpmX5/GzeE3fmMiahWl8HN6Xu0kkWjQ1cEXc0RTOKk5+b6FdEl56nnaC3TBPRJf
+6MGhpJ7A9JFM3a1FSQQITLnAG272ADlowvDjisUyxpJJwdPWv+znggneKM0ZivGf
+R2Gruj4YdzVEIAeTf6kQtJA1OcRl6Ti/2r7fg5PyR40+XvdceIuiNFzI5ckf7R/K
+u/ZGFCvyabLaTpL9wR/E35Lw5D4JjNyUPpU5bsOgLOqOUD/+0hlXXSIGe5kGqsV3
+MX4jL2L9ftIyPpRKwndxmvlEeFfcB++Q4Xy4KLxUcE/jtY5j+pql9Nz2VLWKvYCj
+iU15EdqrXA/8wR1yPyKiOFSiEhbdQ++PpDFst5oWDWEb6pEN1NaY7SP4qksYWG4c
+dIuCak69np89xG3z/RNN850l8/WoosTxvkC4lS+fkU9J8gy77G6BoX9u2S5gDTvo
+AsOa+xmhjnUV+mWfTyEIVgv9EiKPL8S06uuxFjXeqyWAx9HvM4X8NJIJY+rrVWK9
+8LThLxXJwBauJ9sMcqq9
+=Wmrq
+-----END PGP SIGNATURE-----
+
+--FclElvQKoGCylS3A--
