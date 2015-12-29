@@ -1,35 +1,39 @@
-From: "Jeff Skoll" <verna.viajar@icdd.uni-kassel.de>
-Subject: Donation/Charity
-Date: Tue, 29 Dec 2015 00:02:35 -0500
-Message-ID: <auto-000005780116@mailadmin.uni-kassel.de>
-Reply-To: jeff.skoll@skollcharity.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: algif_skcipher - Require setkey before
+ accept(2)
+Date: Tue, 29 Dec 2015 21:24:03 +0800
+Message-ID: <20151229132403.GA5243@gondor.apana.org.au>
+References: <CACT4Y+Y-K+QTNw3ZokVrRz4pCvMUN6GqRjDGdd1H2M=Qp1GRYA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Me <verna.viajar@icdd.uni-kassel.de>
+Content-Type: text/plain; charset=us-ascii
+Cc: syzkaller@googlegroups.com, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kcc@google.com, glider@google.com, edumazet@google.com,
+	sasha.levin@oracle.com, keescook@google.com
+To: Dmitry Vyukov <dvyukov@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx3.its.uni-kassel.de ([141.51.12.64]:55811 "EHLO
-	mx3.its.uni-kassel.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750916AbbL2GVg convert rfc822-to-8bit (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:54690 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752049AbbL2NYO (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 29 Dec 2015 01:21:36 -0500
-Content-Description: Mail message body
+	Tue, 29 Dec 2015 08:24:14 -0500
+Content-Disposition: inline
+In-Reply-To: <CACT4Y+Y-K+QTNw3ZokVrRz4pCvMUN6GqRjDGdd1H2M=Qp1GRYA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
-My name is Jeffrey Skoll, a philanthropist and the founder of one of th=
-e largest private foundations in the world. I believe strongly in =E2=80=
-=98giving while living.=E2=80=99 I had one idea that never changed in m=
-y mind =E2=80=94 that you should use your wealth to help people and I h=
-ave decided to secretly give USD2.498 Million to a randomly selected in=
-dividual. On receipt of this email, you should count yourself as the in=
-dividual. Kindly get back to me at your earliest convenience, so I know=
- your email address is valid.
+Dmitry Vyukov <dvyukov@google.com> wrote:
+>
+> My email client just followed instructions in your email. You've said
+> to Reply-to: syzkaller@googlegroups.com.
 
-Visit the web page to know more about me: http://www.theglobeandmail.co=
-m/news/national/meet-the-canadian-billionaire-whos-giving-it-all-away/a=
-rticle4209888/ or you can read an article of me on Wikipedia.
+I did not set this Reply-To header.  It's most likely set by your
+broken Google Groups setup.  So either you should start actually
+replying to my email address or your future emails will most
+likely not be read by me.
 
-Regards,
-Jeffrey Skoll.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
