@@ -1,226 +1,73 @@
 From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: use-after-free in hash_sock_destruct
-Date: Tue, 29 Dec 2015 16:29:17 +0100
-Message-ID: <CACT4Y+a7_ox1GN78jntXwAR4XjLcNxLOkb=jtdaNhKuaOottHg@mail.gmail.com>
-References: <CACT4Y+a8Y5qz7rODCJ9QJbVhNv2WmS+COx7dSejGU=3kBWjLLQ@mail.gmail.com>
- <20151229144037.GA5576@gondor.apana.org.au> <CACT4Y+bn=SOHH-Ac4fV9yCH2mwWjo2wUYD-omaeRJ=R0W7a+MQ@mail.gmail.com>
+Subject: crypto: deadlock in alg_setsockopt
+Date: Tue, 29 Dec 2015 19:36:14 +0100
+Message-ID: <CACT4Y+Y0k-SuTCVMJOdymwvgEHiM+dSJ3hLOmEb6ZdK=t39gXA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+Content-Transfer-Encoding: 8BIT
+Cc: syzkaller <syzkaller@googlegroups.com>,
 	Kostya Serebryany <kcc@google.com>,
 	Alexander Potapenko <glider@google.com>,
-	Eric Dumazet <edumazet@google.com>,
 	Sasha Levin <sasha.levin@oracle.com>,
-	Kees Cook <keescook@google.com>
-To: syzkaller <syzkaller@googlegroups.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+	Eric Dumazet <edumazet@google.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:36481 "EHLO
+Received: from mail-wm0-f51.google.com ([74.125.82.51]:34808 "EHLO
 	mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753570AbbL2P3i (ORCPT
+	with ESMTP id S1753745AbbL2Sge convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 29 Dec 2015 10:29:38 -0500
-Received: by mail-wm0-f51.google.com with SMTP id l65so35678882wmf.1
-        for <linux-crypto@vger.kernel.org>; Tue, 29 Dec 2015 07:29:37 -0800 (PST)
-In-Reply-To: <CACT4Y+bn=SOHH-Ac4fV9yCH2mwWjo2wUYD-omaeRJ=R0W7a+MQ@mail.gmail.com>
+	Tue, 29 Dec 2015 13:36:34 -0500
+Received: by mail-wm0-f51.google.com with SMTP id u188so18741436wmu.1
+        for <linux-crypto@vger.kernel.org>; Tue, 29 Dec 2015 10:36:34 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 29, 2015 at 4:28 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
-> On Tue, Dec 29, 2015 at 3:40 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->> On Thu, Dec 17, 2015 at 01:59:50PM +0100, Dmitry Vyukov wrote:
->>>
->>> The following program causes use-after-free in hash_sock_destruct:
->>
->> This patch should fix the problem.  AFAIK everything that you have
->> reported should now be fixed.  If you still have issues please
->> resubmit them (and please cc me).  Thanks!
->
-> Thanks Herbert!
-> I will do another round of crypto testing with this patch (on top of
-> the other two patches) and report if I see any bugs.
+Hello,
 
-Doh! Now +Herbert
+On commit 8513342170278468bac126640a5d2d12ffbff106
++ crypto: algif_skcipher - Use new skcipher interface
++ crypto: algif_skcipher - Require setkey before accept(2)
++ crypto: af_alg - Disallow bind/setkey/... after accept(2)
 
->> ---8<---
->> Subject: crypto: af_alg - Disallow bind/setkey/... after accept(2)
->>
->> Each af_alg parent socket obtained by socket(2) corresponds to a
->> tfm object once bind(2) has succeeded.  An accept(2) call on that
->> parent socket creates a context which then uses the tfm object.
->>
->> Therefore as long as any child sockets created by accept(2) exist
->> the parent socket must not be modified or freed.
->>
->> This patch guarantees this by using locks and a reference count
->> on the parent socket.  Any attempt to modify the parent socket will
->> fail with EBUSY.
->>
->> Cc: stable@vger.kernel.org
->> Reported-by: Dmitry Vyukov <dvyukov@google.com>
->> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->>
->> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
->> index a8e7aa3..f5a2426 100644
->> --- a/crypto/af_alg.c
->> +++ b/crypto/af_alg.c
->> @@ -125,6 +125,23 @@ int af_alg_release(struct socket *sock)
->>  }
->>  EXPORT_SYMBOL_GPL(af_alg_release);
->>
->> +void af_alg_release_parent(struct sock *sk)
->> +{
->> +       struct alg_sock *ask = alg_sk(sk);
->> +       bool last;
->> +
->> +       sk = ask->parent;
->> +       ask = alg_sk(sk);
->> +
->> +       lock_sock(sk);
->> +       last = !--ask->refcnt;
->> +       release_sock(sk);
->> +
->> +       if (last)
->> +               sock_put(sk);
->> +}
->> +EXPORT_SYMBOL_GPL(af_alg_release_parent);
->> +
->>  static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
->>  {
->>         const u32 forbidden = CRYPTO_ALG_INTERNAL;
->> @@ -133,6 +150,7 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
->>         struct sockaddr_alg *sa = (void *)uaddr;
->>         const struct af_alg_type *type;
->>         void *private;
->> +       int err;
->>
->>         if (sock->state == SS_CONNECTED)
->>                 return -EINVAL;
->> @@ -160,16 +178,22 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
->>                 return PTR_ERR(private);
->>         }
->>
->> +       err = -EBUSY;
->>         lock_sock(sk);
->> +       if (ask->refcnt)
->> +               goto unlock;
->>
->>         swap(ask->type, type);
->>         swap(ask->private, private);
->>
->> +       err = 0;
->> +
->> +unlock:
->>         release_sock(sk);
->>
->>         alg_do_release(type, private);
->>
->> -       return 0;
->> +       return err;
->>  }
->>
->>  static int alg_setkey(struct sock *sk, char __user *ukey,
->> @@ -188,14 +212,41 @@ static int alg_setkey(struct sock *sk, char __user *ukey,
->>         if (copy_from_user(key, ukey, keylen))
->>                 goto out;
->>
->> +       err = -EBUSY;
->> +       lock_sock(sk);
->> +       if (ask->refcnt)
->> +               goto unlock;
->> +
->>         err = type->setkey(ask->private, key, keylen);
->>
->> +unlock:
->> +       release_sock(sk);
->> +
->>  out:
->>         sock_kzfree_s(sk, key, keylen);
->>
->>         return err;
->>  }
->>
->> +static int alg_setauthsize(struct sock *sk, unsigned int size)
->> +{
->> +       int err;
->> +       struct alg_sock *ask = alg_sk(sk);
->> +       const struct af_alg_type *type = ask->type;
->> +
->> +       err = -EBUSY;
->> +       lock_sock(sk);
->> +       if (ask->refcnt)
->> +               goto unlock;
->> +
->> +       err = type->setauthsize(ask->private, size);
->> +
->> +unlock:
->> +       release_sock(sk);
->> +
->> +       return err;
->> +}
->> +
->>  static int alg_setsockopt(struct socket *sock, int level, int optname,
->>                           char __user *optval, unsigned int optlen)
->>  {
->> @@ -224,7 +275,7 @@ static int alg_setsockopt(struct socket *sock, int level, int optname,
->>                         goto unlock;
->>                 if (!type->setauthsize)
->>                         goto unlock;
->> -               err = type->setauthsize(ask->private, optlen);
->> +               err = alg_setauthsize(sk, optlen);
->>         }
->>
->>  unlock:
->> @@ -264,7 +315,8 @@ int af_alg_accept(struct sock *sk, struct socket *newsock)
->>
->>         sk2->sk_family = PF_ALG;
->>
->> -       sock_hold(sk);
->> +       if (!ask->refcnt++)
->> +               sock_hold(sk);
->>         alg_sk(sk2)->parent = sk;
->>         alg_sk(sk2)->type = type;
->>
->> diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
->> index 018afb2..589716f 100644
->> --- a/include/crypto/if_alg.h
->> +++ b/include/crypto/if_alg.h
->> @@ -30,6 +30,8 @@ struct alg_sock {
->>
->>         struct sock *parent;
->>
->> +       unsigned int refcnt;
->> +
->>         const struct af_alg_type *type;
->>         void *private;
->>  };
->> @@ -67,6 +69,7 @@ int af_alg_register_type(const struct af_alg_type *type);
->>  int af_alg_unregister_type(const struct af_alg_type *type);
->>
->>  int af_alg_release(struct socket *sock);
->> +void af_alg_release_parent(struct sock *sk);
->>  int af_alg_accept(struct sock *sk, struct socket *newsock);
->>
->>  int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, int len);
->> @@ -83,11 +86,6 @@ static inline struct alg_sock *alg_sk(struct sock *sk)
->>         return (struct alg_sock *)sk;
->>  }
->>
->> -static inline void af_alg_release_parent(struct sock *sk)
->> -{
->> -       sock_put(alg_sk(sk)->parent);
->> -}
->> -
->>  static inline void af_alg_init_completion(struct af_alg_completion *completion)
->>  {
->>         init_completion(&completion->completion);
->> --
->> Email: Herbert Xu <herbert@gondor.apana.org.au>
->> Home Page: http://gondor.apana.org.au/~herbert/
->> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->>
->> --
->> You received this message because you are subscribed to the Google Groups "syzkaller" group.
->> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller+unsubscribe@googlegroups.com.
->> For more options, visit https://groups.google.com/d/optout.
+The following program creates an unkillable, deadlocked process:
+
+// autogenerated by syzkaller (http://github.com/google/syzkaller)
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <string.h>
+#include <stdint.h>
+#include <pthread.h>
+
+long r[10];
+
+int main()
+{
+        memset(r, -1, sizeof(r));
+        r[0] = syscall(SYS_mmap, 0x20000000ul, 0x10000ul, 0x3ul,
+0x32ul, 0xfffffffffffffffful, 0x0ul);
+        r[1] = syscall(SYS_socket, 0x26ul, 0x5ul, 0x0ul, 0, 0, 0);
+        *(uint16_t*)0x20000112 = (uint16_t)0x26;
+        memcpy((void*)0x20000114,
+"\x73\x6b\x63\x69\x70\x68\x65\x72\x00\x00\x00\x00\x00\x00", 14);
+        *(uint32_t*)0x20000122 = (uint32_t)0x209;
+        *(uint32_t*)0x20000126 = (uint32_t)0x4e;
+        memcpy((void*)0x2000012a,
+"\x65\x63\x62\x28\x61\x72\x63\x34\x29\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+64);
+        r[7] = syscall(SYS_bind, r[1], 0x20000112ul, 0x58ul, 0, 0, 0);
+        r[9] = syscall(SYS_setsockopt, r[1], 0x117ul, 0x1ul,
+0x20003000ul, 0xd2ul, 0);
+        return 0;
+}
+
+root     28768  0.0  0.0   1144     4 pts/0    D+   18:25   0:00  |
+   \_ ./a.out
+
+# cat /proc/28768/stack
+[<ffffffff84b65496>] __lock_sock+0xe6/0x160
+[<ffffffff84b6560b>] lock_sock_nested+0xfb/0x120
+[<ffffffff827dd899>] alg_setsockopt+0x2a9/0x3d0
+[<ffffffff84b605b8>] SyS_setsockopt+0x158/0x240
+[<ffffffff85c8ebb6>] entry_SYSCALL_64_fastpath+0x16/0x7a
