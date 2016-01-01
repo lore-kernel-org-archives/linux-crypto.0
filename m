@@ -1,12 +1,12 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: crypto: use-after-free in rng_recvmsg
-Date: Wed, 30 Dec 2015 21:54:09 +0100
-Message-ID: <1770781.3L9ebnaMWA@myon.chronox.de>
-References: <CACT4Y+b4tFGXuaTbTkbt5u=E2K5RXOcihXnj7jtEZaCB+FwqPg@mail.gmail.com>
+Subject: Re: [PATCH v2] crypto: af_alg - Disallow bind/setkey/... after accept(2)
+Date: Fri, 01 Jan 2016 21:12:40 +0100
+Message-ID: <65988221.D1d1cZYMWB@myon.chronox.de>
+References: <CACT4Y+Y0k-SuTCVMJOdymwvgEHiM+dSJ3hLOmEb6ZdK=t39gXA@mail.gmail.com> <20151230034753.GA8776@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Dmitry Vyukov <dvyukov@google.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
 	syzkaller <syzkaller@googlegroups.com>,
@@ -14,37 +14,43 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	Alexander Potapenko <glider@google.com>,
 	Sasha Levin <sasha.levin@oracle.com>,
 	Eric Dumazet <edumazet@google.com>
-To: Dmitry Vyukov <dvyukov@google.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:41072 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753338AbbL3UyM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 30 Dec 2015 15:54:12 -0500
-In-Reply-To: <CACT4Y+b4tFGXuaTbTkbt5u=E2K5RXOcihXnj7jtEZaCB+FwqPg@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20151230034753.GA8776@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Montag, 28. Dezember 2015, 14:48:48 schrieb Dmitry Vyukov:
+Am Mittwoch, 30. Dezember 2015, 11:47:53 schrieb Herbert Xu:
 
-Hi Dmitry,
+Hi Herbert,
 
-> Hello,
+> On Tue, Dec 29, 2015 at 07:36:14PM +0100, Dmitry Vyukov wrote:
+> > Hello,
+> > 
+> > On commit 8513342170278468bac126640a5d2d12ffbff106
+> > + crypto: algif_skcipher - Use new skcipher interface
+> > + crypto: algif_skcipher - Require setkey before accept(2)
+> > + crypto: af_alg - Disallow bind/setkey/... after accept(2)
 > 
-> On commit a88164345b81292b55a8d4829fdd35c8d611cd7d (Dec 23)
-> + crypto: algif_skcipher - Use new skcipher interface
-> + crypto: algif_skcipher - Require setkey before accept(2)
-> 
-> The following program triggers use-after-free in rng_recvmsg:
+> OK there is a silly bug in the last patch.  Here is an updated
+> version.
 
-Thank you for the bug report.
+With this patch, the AF_ALG interface stops working. I tested the HMAC 
+operation and I am unable to set the key with the following call:
 
-After applying the patch from Herbert [1], I was not able to reproduce the 
-issue even after 1000 rounds of the test code. Considering the issue and the 
-patch from Herbert, I would consider the issue being fixed.
+ret = setsockopt(handle->tfmfd, SOL_ALG, ALG_SET_KEY, key, keylen);
 
-[1] http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg17450.html
+This call returns EBUSY.
 
-Thank you.
+The test can be performed with [1] using the following call:
+
+test/kcapi -x 3 -c "hmac(sha1)" -k 6e77ebd479da794707bc6cde3694f552ea892dab -p  
+31b62a797adbff6b8a358d2b5206e01fee079de8cdfc4695138bba163b4efbf30127343e7fd4fbc696c3d38d8f27f57c024b5056f726ceeb4c31d98e57751ec8cbe8904ee0f9b031ae6a0c55da5e062475b3d7832191d4057643ef5fa446801d59a04693e573a8159cd2416b7bd39c7f0fe63c599365e04d596c05736beaab58
+
+Without the patch, all works.
+
+[1] http://www.chronox.de/libkcapi.html
+
 -- 
 Ciao
 Stephan
