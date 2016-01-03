@@ -1,61 +1,41 @@
 From: Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH v2] crypto: algif_skcipher - Require setkey before
- accept(2)
-Date: Sun, 3 Jan 2016 10:42:28 +0100
-Message-ID: <5688ED04.4090802@gmail.com>
-References: <CACT4Y+YOwOfRHOwJ=FA9aaL2cZ-PRhTvd_mCzxx2nnN_L3tygw@mail.gmail.com>
- <5687BA0F.3020104@gmail.com> <5687E19E.2070801@gmail.com>
- <1647086.cdlVYfuqk1@myon.chronox.de> <56883096.1020009@gmail.com>
- <20160103013126.GA30385@gondor.apana.org.au>
+Subject: Re: next-20151231 - aes crypto algorithm went missing?
+Date: Sun, 3 Jan 2016 11:20:03 +0100
+Message-ID: <5688F5D3.7080605@gmail.com>
+References: <4632.1451799253@turing-police.cc.vt.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: Stephan Mueller <smueller@chronox.de>,
-	Dmitry Vyukov <dvyukov@google.com>, syzkaller@googlegroups.com,
-	davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kcc@google.com, glider@google.com,
-	edumazet@google.com, sasha.levin@oracle.com, keescook@google.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Valdis Kletnieks <Valdis.Kletnieks@vt.edu>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:35208 "EHLO
-	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751329AbcACJmc (ORCPT
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:38819 "EHLO
+	mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751792AbcACKUG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 3 Jan 2016 04:42:32 -0500
-In-Reply-To: <20160103013126.GA30385@gondor.apana.org.au>
+	Sun, 3 Jan 2016 05:20:06 -0500
+In-Reply-To: <4632.1451799253@turing-police.cc.vt.edu>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/03/2016 02:31 AM, Herbert Xu wrote:
-> On Sat, Jan 02, 2016 at 09:18:30PM +0100, Milan Broz wrote:
->>
->> But I cannot change thousands of cryptsetup installations that are actively using that code.
->> This is clear userspace breakage which should not happen this way.
+On 01/03/2016 06:34 AM, Valdis Kletnieks wrote:
+> So booting into a next-20151222 kernel, I can mount an external drive
+> that uses cryptLuks.  I try -1231, and I get this failure:
 > 
-> I'll try to add some compatibility code for your case, assuming
-> your modus operandi is accept(2) followed by a single setkey before
-> proceeding to encryption/decryption.
-
-Hi,
-
-yes, basically it prepares socket()/bind()/accept() and then it calls setkey once.
-(I'll try to fix in next releases to call setkey first though.)
-
-I am doing exactly the same for AF_ALG HMAC (hmac(<hash>) key,
-does this requirement for order if accept/setkey applies there as well?
-(It is not enforced yet.)
-
-Anyway, you can easily simulate that skcipher API call just with running "cryptsetup benchmark"
-(with accept() patch it will print N/A for all ciphers while without patch it measures some
-more-or-less magic performance numbers :)
-
+> Failed to setup dm-crypt key mapping for device /dev/sdb2.
+> Check that kernel supports aes-cbc-essiv:sha256 cipher (check syslog for more info).
 > 
->> (Moreover it still doesn't work for cipher_null that has min/max key size 0.)
-> 
-> Setkey works just fine on cipher_null.
+> Tracked it down to this difference in /proc/crypto between the 12/22 and 12/31:
 
-Yes, it works if ALG_SET_KEY is set to zero-length key.
-I just re-introduced old bug to code, sorry.
+...
+> This ringing any bells, before I start the New Year with a bisect? :)
 
-Thanks!
+Perhaps see the discussion in thread
+[PATCH v2] crypto: algif_skcipher - Require setkey before accept(2)
+
+Could you try to revert this patch?
+http://git.kernel.org/cgit/linux/kernel/git/next/linux-next-history.git/commit/crypto?id=9f47e11b9e3169ff4cb35b3cdac0e0f7c2fcfe27
+
 Milan
