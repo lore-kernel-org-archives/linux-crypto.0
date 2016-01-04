@@ -1,7 +1,7 @@
 From: Joonsoo Kim <js1304@gmail.com>
-Subject: [PATCH RFC 2/7] crypto/compress: introduce sychronuous compression API
-Date: Mon,  4 Jan 2016 13:46:53 +0900
-Message-ID: <1451882819-2810-3-git-send-email-iamjoonsoo.kim@lge.com>
+Subject: [PATCH RFC 5/7] crypto: testmgr: add scompress/acompress test
+Date: Mon,  4 Jan 2016 13:46:56 +0900
+Message-ID: <1451882819-2810-6-git-send-email-iamjoonsoo.kim@lge.com>
 References: <1451882819-2810-1-git-send-email-iamjoonsoo.kim@lge.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Weigang Li <weigang.li@intel.com>,
@@ -9,276 +9,269 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Minchan Kim <minchan@kernel.org>, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org, Joonsoo Kim <iamjoonsoo.kim@lge.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f43.google.com ([209.85.220.43]:33818 "EHLO
+	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752711AbcADErd (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 3 Jan 2016 23:47:33 -0500
 In-Reply-To: <1451882819-2810-1-git-send-email-iamjoonsoo.kim@lge.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
-
-This introduces new compression APIs. Major change is that APIs are
-stateless. Instead of previous implementation, tfm objects doesn't
-embedded any context so we can de/compress concurrently with one tfm
-object. Instead, thsi de/compression context is coupled with the request.
-This architecture change will make APIs more flexible.
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 Signed-off-by: Joonsoo Kim <iamjoonsoo.kim@lge.com>
 ---
- crypto/Kconfig            |   5 ++
- crypto/Makefile           |   1 +
- crypto/scompress.c        | 114 ++++++++++++++++++++++++++++++++++++++++++++++
- include/crypto/compress.h |  76 +++++++++++++++++++++++++++++++
- include/linux/crypto.h    |   1 +
- 5 files changed, 197 insertions(+)
- create mode 100644 crypto/scompress.c
- create mode 100644 include/crypto/compress.h
+ crypto/Kconfig   |   1 +
+ crypto/testmgr.c | 173 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 165 insertions(+), 9 deletions(-)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index c80d34f..7159520 100644
+index b4b485c..f487502 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -84,6 +84,10 @@ config CRYPTO_RNG_DEFAULT
- 	tristate
- 	select CRYPTO_DRBG_MENU
+@@ -118,6 +118,7 @@ config CRYPTO_MANAGER2
+ 	select CRYPTO_HASH2
+ 	select CRYPTO_BLKCIPHER2
+ 	select CRYPTO_AKCIPHER2
++	select CRYPTO_COMPRESS2
  
-+config CRYPTO_SCOMPRESS
-+	tristate
-+	select CRYPTO_ALGAPI2
-+
- config CRYPTO_AKCIPHER2
- 	tristate
- 	select CRYPTO_ALGAPI2
-@@ -1499,6 +1503,7 @@ config CRYPTO_LZO
- 	select CRYPTO_ALGAPI
- 	select LZO_COMPRESS
- 	select LZO_DECOMPRESS
-+	select SCOMPRESS
- 	help
- 	  This is the LZO algorithm.
- 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index ffe18c9..16ef796 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -28,6 +28,7 @@ crypto_hash-y += ahash.o
- crypto_hash-y += shash.o
- obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
- 
-+obj-$(CONFIG_CRYPTO_SCOMPRESS) += scompress.o
- obj-$(CONFIG_CRYPTO_AKCIPHER2) += akcipher.o
- 
- $(obj)/rsapubkey-asn1.o: $(obj)/rsapubkey-asn1.c $(obj)/rsapubkey-asn1.h
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-new file mode 100644
-index 0000000..7c9955b
---- /dev/null
-+++ b/crypto/scompress.c
-@@ -0,0 +1,114 @@
-+/*
-+ * Cryptographic API.
-+ *
-+ * Synchronous compression operations.
-+ *
-+ * Copyright 2015 LG Electronics Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; version 2 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.
-+ * If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include <linux/crypto.h>
-+#include <linux/errno.h>
-+#include <linux/module.h>
-+#include <linux/seq_file.h>
-+#include <linux/cryptouser.h>
-+
+ config CRYPTO_USER
+ 	tristate "Userspace cryptographic algorithm configuration"
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 086aa4d..bd0c639 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -32,6 +32,7 @@
+ #include <crypto/rng.h>
+ #include <crypto/drbg.h>
+ #include <crypto/akcipher.h>
 +#include <crypto/compress.h>
-+#include <net/netlink.h>
-+
-+#include "internal.h"
-+
-+
-+static int crypto_scomp_init(struct crypto_tfm *tfm, u32 type, u32 mask)
-+{
-+	return 0;
-+}
-+
-+static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
-+{
-+	return 0;
-+}
-+
-+#ifdef CONFIG_NET
-+static int crypto_scomp_report(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	struct crypto_report_comp rcomp;
-+
-+	strncpy(rcomp.type, "scomp", sizeof(rcomp.type));
-+	if (nla_put(skb, CRYPTOCFGA_REPORT_COMPRESS,
-+		    sizeof(struct crypto_report_comp), &rcomp))
-+		goto nla_put_failure;
-+	return 0;
-+
-+nla_put_failure:
-+	return -EMSGSIZE;
-+}
-+#else
-+static int crypto_scomp_report(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	return -ENOSYS;
-+}
-+#endif
-+
-+static void crypto_scomp_show(struct seq_file *m, struct crypto_alg *alg)
-+	__attribute__ ((unused));
-+static void crypto_scomp_show(struct seq_file *m, struct crypto_alg *alg)
-+{
-+	seq_puts(m, "type         : scomp\n");
-+}
-+
-+static const struct crypto_type crypto_scomp_type = {
-+	.extsize	= crypto_alg_extsize,
-+	.init		= crypto_scomp_init,
-+	.init_tfm	= crypto_scomp_init_tfm,
-+#ifdef CONFIG_PROC_FS
-+	.show		= crypto_scomp_show,
-+#endif
-+	.report		= crypto_scomp_report,
-+	.maskclear	= ~CRYPTO_ALG_TYPE_MASK,
-+	.maskset	= CRYPTO_ALG_TYPE_MASK,
-+	.type		= CRYPTO_ALG_TYPE_SCOMPRESS,
-+	.tfmsize	= offsetof(struct crypto_scomp, base),
-+};
-+
-+struct crypto_scomp *crypto_alloc_scomp(const char *alg_name, u32 type,
-+					u32 mask)
-+{
-+	return crypto_alloc_tfm(alg_name, &crypto_scomp_type, type, mask);
-+}
-+EXPORT_SYMBOL_GPL(crypto_alloc_scomp);
-+
-+int crypto_register_scomp(struct scomp_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
-+
-+	base->cra_type = &crypto_scomp_type;
-+	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
-+	base->cra_flags |= CRYPTO_ALG_TYPE_SCOMPRESS;
-+
-+	return crypto_register_alg(base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_register_scomp);
-+
-+int crypto_unregister_scomp(struct scomp_alg *alg)
-+{
-+	return crypto_unregister_alg(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_unregister_scomp);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Synchronous compression operations");
-+MODULE_AUTHOR("LG Electronics Inc.");
-+
-diff --git a/include/crypto/compress.h b/include/crypto/compress.h
-new file mode 100644
-index 0000000..4d89a68
---- /dev/null
-+++ b/include/crypto/compress.h
-@@ -0,0 +1,76 @@
-+#ifndef _CRYPTO_COMPRESS_H
-+#define _CRYPTO_COMPRESS_H
-+#include <linux/crypto.h>
-+
-+struct crypto_scomp {
-+	struct crypto_tfm base;
-+};
-+
-+struct scomp_alg {
-+	void *(*alloc_ctx)(struct crypto_scomp *tfm);
-+	void (*free_ctx)(struct crypto_scomp *tfm, void *ctx);
-+	int (*compress)(struct crypto_scomp *tfm, const u8 *src,
-+		unsigned int slen, u8 *dst, unsigned int *dlen, void *ctx);
-+	int (*decompress)(struct crypto_scomp *tfm, const u8 *src,
-+		unsigned int slen, u8 *dst, unsigned int *dlen, void *ctx);
-+
-+	struct crypto_alg base;
-+};
-+
-+extern struct crypto_scomp *crypto_alloc_scomp(const char *alg_name, u32 type,
-+					       u32 mask);
-+
-+static inline struct crypto_tfm *crypto_scomp_tfm(struct crypto_scomp *tfm)
-+{
-+	return &tfm->base;
-+}
-+
-+static inline struct crypto_scomp *crypto_scomp_cast(struct crypto_tfm *tfm)
-+{
-+	return (struct crypto_scomp *)tfm;
-+}
-+
-+static inline void crypto_free_scomp(struct crypto_scomp *tfm)
-+{
-+	crypto_destroy_tfm(tfm, crypto_scomp_tfm(tfm));
-+}
-+
-+static inline struct scomp_alg *__crypto_scomp_alg(struct crypto_alg *alg)
-+{
-+	return container_of(alg, struct scomp_alg, base);
-+}
-+
-+static inline struct scomp_alg *crypto_scomp_alg(struct crypto_scomp *tfm)
-+{
-+	return __crypto_scomp_alg(crypto_scomp_tfm(tfm)->__crt_alg);
-+}
-+
-+static inline void *crypto_scomp_alloc_ctx(struct crypto_scomp *tfm)
-+{
-+	return crypto_scomp_alg(tfm)->alloc_ctx(tfm);
-+}
-+
-+static inline void crypto_scomp_free_ctx(struct crypto_scomp *tfm,
-+						void *ctx)
-+{
-+	return crypto_scomp_alg(tfm)->free_ctx(tfm, ctx);
-+}
-+
-+static inline int crypto_scomp_compress(struct crypto_scomp *tfm,
-+				const u8 *src, unsigned int slen,
-+				u8 *dst, unsigned int *dlen, void *ctx)
-+{
-+	return crypto_scomp_alg(tfm)->compress(tfm, src, slen, dst, dlen, ctx);
-+}
-+
-+static inline int crypto_scomp_decompress(struct crypto_scomp *tfm,
-+				const u8 *src, unsigned int slen,
-+				u8 *dst, unsigned int *dlen, void *ctx)
-+{
-+	return crypto_scomp_alg(tfm)->decompress(tfm, src, slen,
-+						dst, dlen, ctx);
-+}
-+
-+extern int crypto_register_scomp(struct scomp_alg *alg);
-+extern int crypto_unregister_scomp(struct scomp_alg *alg);
-+#endif
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index ab2a745..726df9b 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -54,6 +54,7 @@
- #define CRYPTO_ALG_TYPE_AHASH		0x0000000a
- #define CRYPTO_ALG_TYPE_RNG		0x0000000c
- #define CRYPTO_ALG_TYPE_AKCIPHER	0x0000000d
-+#define CRYPTO_ALG_TYPE_SCOMPRESS	0x0000000e
  
- #define CRYPTO_ALG_TYPE_HASH_MASK	0x0000000e
- #define CRYPTO_ALG_TYPE_AHASH_MASK	0x0000000c
+ #include "internal.h"
+ 
+@@ -1205,12 +1206,14 @@ static int test_skcipher(struct crypto_skcipher *tfm, int enc,
+ 	return 0;
+ }
+ 
+-static int test_comp(struct crypto_comp *tfm, struct comp_testvec *ctemplate,
+-		     struct comp_testvec *dtemplate, int ctcount, int dtcount)
++static int test_comp(struct crypto_tfm *tfm, void *ctx, int type,
++		struct comp_testvec *ctemplate, struct comp_testvec *dtemplate,
++		int ctcount, int dtcount)
+ {
+-	const char *algo = crypto_tfm_alg_driver_name(crypto_comp_tfm(tfm));
++	const char *algo = crypto_tfm_alg_driver_name(tfm);
+ 	unsigned int i;
+ 	char result[COMP_BUF_SIZE];
++	struct scatterlist src, dst;
+ 	int ret;
+ 
+ 	for (i = 0; i < ctcount; i++) {
+@@ -1220,8 +1223,33 @@ static int test_comp(struct crypto_comp *tfm, struct comp_testvec *ctemplate,
+ 		memset(result, 0, sizeof (result));
+ 
+ 		ilen = ctemplate[i].inlen;
+-		ret = crypto_comp_compress(tfm, ctemplate[i].input,
+-		                           ilen, result, &dlen);
++
++		switch (type) {
++		case 0:
++			ret = crypto_comp_compress(crypto_comp_cast(tfm),
++					ctemplate[i].input, ilen,
++					result, &dlen);
++			break;
++
++		case 1:
++			ret = crypto_scomp_compress(crypto_scomp_cast(tfm),
++					ctemplate[i].input, ilen,
++					result, &dlen, ctx);
++			break;
++
++		case 2:
++			sg_init_one(&src, ctemplate[i].input, ilen);
++			sg_init_one(&dst, result, dlen);
++			acomp_request_set_comp(ctx, &src, &dst, ilen, dlen);
++			ret = crypto_acomp_compress(ctx);
++			dlen = ((struct acomp_req *)ctx)->out_len;
++			break;
++
++		default:
++			ret = 1;
++			break;
++		}
++
+ 		if (ret) {
+ 			printk(KERN_ERR "alg: comp: compression failed "
+ 			       "on test %d for %s: ret=%d\n", i + 1, algo,
+@@ -1253,8 +1281,32 @@ static int test_comp(struct crypto_comp *tfm, struct comp_testvec *ctemplate,
+ 		memset(result, 0, sizeof (result));
+ 
+ 		ilen = dtemplate[i].inlen;
+-		ret = crypto_comp_decompress(tfm, dtemplate[i].input,
+-		                             ilen, result, &dlen);
++		switch (type) {
++		case 0:
++			ret = crypto_comp_decompress(crypto_comp_cast(tfm),
++						dtemplate[i].input, ilen,
++						result, &dlen);
++			break;
++
++		case 1:
++			ret = crypto_scomp_decompress(crypto_scomp_cast(tfm),
++						dtemplate[i].input, ilen,
++						result, &dlen, ctx);
++			break;
++
++		case 2:
++			sg_init_one(&src, dtemplate[i].input, ilen);
++			sg_init_one(&dst, result, dlen);
++			acomp_request_set_comp(ctx, &src, &dst, ilen, dlen);
++			ret = crypto_acomp_decompress(ctx);
++			dlen = ((struct acomp_req *)ctx)->out_len;
++			break;
++
++		default:
++			ret = 1;
++			break;
++		}
++
+ 		if (ret) {
+ 			printk(KERN_ERR "alg: comp: decompression failed "
+ 			       "on test %d for %s: ret=%d\n", i + 1, algo,
+@@ -1446,7 +1498,8 @@ static int alg_test_comp(const struct alg_test_desc *desc, const char *driver,
+ 		return PTR_ERR(tfm);
+ 	}
+ 
+-	err = test_comp(tfm, desc->suite.comp.comp.vecs,
++	err = test_comp(crypto_comp_tfm(tfm), NULL, 0,
++			desc->suite.comp.comp.vecs,
+ 			desc->suite.comp.decomp.vecs,
+ 			desc->suite.comp.comp.count,
+ 			desc->suite.comp.decomp.count);
+@@ -1455,6 +1508,92 @@ static int alg_test_comp(const struct alg_test_desc *desc, const char *driver,
+ 	return err;
+ }
+ 
++static int __alg_test_scomp(const struct alg_test_desc *desc,
++			const char *driver, u32 type, u32 mask)
++{
++	struct crypto_scomp *tfm;
++	void *ctx;
++	int err;
++
++	tfm = crypto_alloc_scomp(driver, type, mask);
++	if (IS_ERR(tfm)) {
++		printk(KERN_ERR "alg: scomp: Failed to load transform for %s: "
++		       "%ld\n", driver, PTR_ERR(tfm));
++		return PTR_ERR(tfm);
++	}
++
++	ctx = crypto_scomp_alloc_ctx(tfm);
++	if (IS_ERR(ctx)) {
++		printk(KERN_ERR "alg: scomp: Failed to alloc context for %s: "
++		       "%ld\n", driver, PTR_ERR(ctx));
++		err = PTR_ERR(ctx);
++		goto out;
++	}
++
++	err = test_comp(crypto_scomp_tfm(tfm), ctx, 1,
++			desc->suite.comp.comp.vecs,
++			desc->suite.comp.decomp.vecs,
++			desc->suite.comp.comp.count,
++			desc->suite.comp.decomp.count);
++
++	crypto_scomp_free_ctx(tfm, ctx);
++
++out:
++	crypto_free_scomp(tfm);
++	return err;
++}
++
++static int __alg_test_acomp(const struct alg_test_desc *desc,
++			const char *driver, u32 type, u32 mask)
++{
++	struct crypto_acomp *tfm;
++	struct acomp_req *req;
++	int err;
++
++	tfm = crypto_alloc_acomp(driver, type, mask);
++	if (IS_ERR(tfm)) {
++		printk(KERN_ERR "alg: acomp: Failed to load transform for %s: "
++		       "%ld\n", driver, PTR_ERR(tfm));
++		return PTR_ERR(tfm);
++	}
++
++	req = acomp_request_alloc(tfm, GFP_KERNEL);
++	if (!req) {
++		printk(KERN_ERR "alg: acomp: Failed to alloc request for %s: ",
++			driver);
++		err = -ENOMEM;
++		goto out;
++	}
++
++	err = test_comp(crypto_acomp_tfm(tfm), req, 2,
++			desc->suite.comp.comp.vecs,
++			desc->suite.comp.decomp.vecs,
++			desc->suite.comp.comp.count,
++			desc->suite.comp.decomp.count);
++
++	acomp_request_free(req);
++
++out:
++	crypto_free_acomp(tfm);
++	return err;
++}
++
++static int alg_test_scomp(const struct alg_test_desc *desc, const char *driver,
++			 u32 type, u32 mask)
++{
++	int err;
++
++	err = __alg_test_scomp(desc, driver, type, mask);
++	if (err)
++		return err;
++
++	err = __alg_test_acomp(desc, driver, type, mask);
++	if (err)
++		return err;
++
++	return err;
++}
++
+ static int alg_test_hash(const struct alg_test_desc *desc, const char *driver,
+ 			 u32 type, u32 mask)
+ {
+@@ -3203,7 +3342,7 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
+-		.alg = "lzo",
++		.alg = "lzo-generic",
+ 		.test = alg_test_comp,
+ 		.fips_allowed = 1,
+ 		.suite = {
+@@ -3219,6 +3358,22 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "lzo-scomp",
++		.test = alg_test_scomp,
++		.fips_allowed = 1,
++		.suite = {
++			.comp = {
++				.comp = {
++					.vecs = lzo_comp_tv_template,
++					.count = LZO_COMP_TEST_VECTORS
++				},
++				.decomp = {
++					.vecs = lzo_decomp_tv_template,
++					.count = LZO_DECOMP_TEST_VECTORS
++				}
++			}
++		}
++	}, {
+ 		.alg = "md4",
+ 		.test = alg_test_hash,
+ 		.suite = {
 -- 
 1.9.1
