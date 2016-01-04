@@ -1,60 +1,79 @@
-From: Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH 1/2] crypto: af_alg - Add nokey compatibility path
-Date: Mon, 4 Jan 2016 13:33:54 +0100
-Message-ID: <568A66B2.4090307@gmail.com>
-References: <CACT4Y+YOwOfRHOwJ=FA9aaL2cZ-PRhTvd_mCzxx2nnN_L3tygw@mail.gmail.com>
- <5687BA0F.3020104@gmail.com> <5687E19E.2070801@gmail.com>
- <1647086.cdlVYfuqk1@myon.chronox.de> <56883096.1020009@gmail.com>
- <20160103013126.GA30385@gondor.apana.org.au> <5688ED04.4090802@gmail.com>
- <20160104043518.GA4411@gondor.apana.org.au>
+From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+	<u.kleine-koenig@pengutronix.de>
+Subject: Re: [RFC PATCH 2/5] crypto: sunxi-ss: fix min3() call to match types
+Date: Mon, 4 Jan 2016 15:20:01 +0100
+Message-ID: <20160104142001.GB28361@pengutronix.de>
+References: <1450787267-26836-1-git-send-email-andre.przywara@arm.com>
+ <1450787267-26836-3-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Stephan Mueller <smueller@chronox.de>,
-	Dmitry Vyukov <dvyukov@google.com>, syzkaller@googlegroups.com,
-	davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kcc@google.com, glider@google.com,
-	edumazet@google.com, sasha.levin@oracle.com, keescook@google.com,
-	Ondrej Kozina <okozina@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160104043518.GA4411@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Maxime Ripard <maxime.ripard@free-electrons.com>,
+	Chen-Yu Tsai <wens@csie.org>, arnd@arndb.de,
+	Herbert Xu <herbert@gondor.apana.org.au>, marc.zyngier@arm.com,
+	catalin.marinas@arm.com, will.deacon@arm.com,
+	linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
+	Corentin Labbe <clabbe.montjoie@gmail.com>,
+	linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-arm-kernel@lists.infradead.org
+To: Andre Przywara <andre.przywara@arm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:46881 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751297AbcADOUR (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 4 Jan 2016 09:20:17 -0500
+Content-Disposition: inline
+In-Reply-To: <1450787267-26836-3-git-send-email-andre.przywara@arm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
+
+On Tue, Dec 22, 2015 at 12:27:44PM +0000, Andre Przywara wrote:
+> The min3() macro expects all arguments to be of the same type (or
+> size at least). While two arguments are ints or u32s, one is size_t,
+> which does not match on 64-bit architectures.
+> Cast the size_t to u32 to make min3() happy. In this context here the
+> length should never exceed 32 bits anyway.
+>=20
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 12 ++++++------
+>  drivers/crypto/sunxi-ss/sun4i-ss-hash.c   |  8 ++++----
+>  2 files changed, 10 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/cryp=
+to/sunxi-ss/sun4i-ss-cipher.c
+> index a19ee12..b3bc7bd 100644
+> --- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+> +++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+> @@ -79,7 +79,7 @@ static int sun4i_ss_opti_poll(struct ablkcipher_req=
+uest *areq)
+>  	oi =3D 0;
+>  	oo =3D 0;
+>  	do {
+> -		todo =3D min3(rx_cnt, ileft, (mi.length - oi) / 4);
+> +		todo =3D min3(rx_cnt, ileft, (u32)(mi.length - oi) / 4);
+
+=46or this case the min function has a min_t variant to specify the
+argument. What about introducing min3_t?
+
+BTW, I don't understand why min3(x, y, z) isn't just defined as
+
+	#define min3(x, y, z) min(min(x, y), z)
+
+but instead as:
+
+	#define min3(x, y, z) min((typeof(x))min(x, y), z)
+
+=2E I thought min(x, y) has the same type as x anyhow?
+
+Best regards
+Uwe
 
 
-On 01/04/2016 05:35 AM, Herbert Xu wrote:
-> On Sun, Jan 03, 2016 at 10:42:28AM +0100, Milan Broz wrote:
->>
->> yes, basically it prepares socket()/bind()/accept() and then it calls setkey once.
->> (I'll try to fix in next releases to call setkey first though.)
-> 
-> OK please try these two patches (warning, totally untested).
-
-Well, it is not much better.
-
-I had to apply another two patches that are not mentioned and are not in your tree yet
-before it:
-  crypto: af_alg - Disallow bind_setkey_... after accept(2)
-  crypto: use-after-free in alg_bind
-
-then it at least compiles correctly.
-
-skcipher works, But I still see two compatibility problems:
-
-- hmac() is now failing the same way (SETKEY after accept())
-(I initially tested without two patches above, these are not in linux-next yet.)
-This breaks all cryptsetup TrueCrypt support (and moreover all systems if
-kernel crypto API is set as a default vcrypto backend - but that's not default).
-
-- cipher_null before worked without setkey, now it requires to set key
-(either before or after accept().
-This was actually probably bad workaround in cryptsetup, anyway it will now cause
-old cryptsetup-reencrypt tool failing with your patches.
-(Try "cryptsetup benchmark -c cipher_null-ecb". I am not sure what to do here,
-but not requiring setkey for "cipher" that has no key internally seems ok for me...)
-
-As I said, I'll fix it in cryptsetup upstream but we are breaking  a lot of existing systems.
-Isn't there better way, how to fix it?
-
-Milan
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig        =
+    |
+Industrial Linux Solutions                 | http://www.pengutronix.de/=
+  |
