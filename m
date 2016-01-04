@@ -1,7 +1,7 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/2] crypto: af_alg - Add nokey compatibility path
-Date: Mon, 4 Jan 2016 13:35:18 +0900
-Message-ID: <20160104043518.GA4411@gondor.apana.org.au>
+Subject: [PATCH 2/2] crypto: algif_skcipher - Add nokey compatibility path
+Date: Mon, 4 Jan 2016 13:36:12 +0900
+Message-ID: <20160104043612.GA4477@gondor.apana.org.au>
 References: <CACT4Y+YOwOfRHOwJ=FA9aaL2cZ-PRhTvd_mCzxx2nnN_L3tygw@mail.gmail.com>
  <5687BA0F.3020104@gmail.com>
  <5687E19E.2070801@gmail.com>
@@ -9,6 +9,7 @@ References: <CACT4Y+YOwOfRHOwJ=FA9aaL2cZ-PRhTvd_mCzxx2nnN_L3tygw@mail.gmail.com>
  <56883096.1020009@gmail.com>
  <20160103013126.GA30385@gondor.apana.org.au>
  <5688ED04.4090802@gmail.com>
+ <20160104043518.GA4411@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Stephan Mueller <smueller@chronox.de>,
@@ -18,94 +19,217 @@ Cc: Stephan Mueller <smueller@chronox.de>,
 	edumazet@google.com, sasha.levin@oracle.com, keescook@google.com
 To: Milan Broz <gmazyland@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55465 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:54327 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752524AbcADEgF (ORCPT
+	with ESMTP id S1752524AbcADEgV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 3 Jan 2016 23:36:05 -0500
+	Sun, 3 Jan 2016 23:36:21 -0500
 Content-Disposition: inline
-In-Reply-To: <5688ED04.4090802@gmail.com>
+In-Reply-To: <20160104043518.GA4411@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jan 03, 2016 at 10:42:28AM +0100, Milan Broz wrote:
-> 
-> yes, basically it prepares socket()/bind()/accept() and then it calls setkey once.
-> (I'll try to fix in next releases to call setkey first though.)
-
-OK please try these two patches (warning, totally untested).
-
----8<---
 This patch adds a compatibility path to support old applications
 that do acept(2) before setkey.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index eaf98e2..6566d2e 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -76,6 +76,8 @@ int af_alg_register_type(const struct af_alg_type *type)
- 		goto unlock;
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index f4431bc..110bab4 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -753,6 +753,99 @@ static struct proto_ops algif_skcipher_ops = {
+ 	.poll		=	skcipher_poll,
+ };
  
- 	type->ops->owner = THIS_MODULE;
-+	if (type->ops_nokey)
-+		type->ops_nokey->owner = THIS_MODULE;
- 	node->type = type;
- 	list_add(&node->list, &alg_types);
- 	err = 0;
-@@ -267,6 +269,7 @@ int af_alg_accept(struct sock *sk, struct socket *newsock)
- 	const struct af_alg_type *type;
- 	struct sock *sk2;
- 	int err;
-+	bool nokey;
- 
- 	lock_sock(sk);
- 	type = ask->type;
-@@ -285,12 +288,17 @@ int af_alg_accept(struct sock *sk, struct socket *newsock)
- 	security_sk_clone(sk, sk2);
- 
- 	err = type->accept(ask->private, sk2);
++static int skcipher_check_key(struct socket *sock)
++{
++	int err;
++	struct sock *psk;
++	struct alg_sock *pask;
++	struct skcipher_tfm *tfm;
++	struct sock *sk = sock->sk;
++	struct alg_sock *ask = alg_sk(sk);
 +
-+	nokey = err == -ENOKEY;
-+	if (nokey && type->accept_nokey)
-+		err = type->accept_nokey(ask->private, sk2);
++	if (ask->refcnt)
++		return 0;
 +
- 	if (err)
- 		goto unlock;
- 
- 	sk2->sk_family = PF_ALG;
- 
--	if (!ask->refcnt++)
-+	if (nokey || !ask->refcnt++)
- 		sock_hold(sk);
- 	alg_sk(sk2)->parent = sk;
- 	alg_sk(sk2)->type = type;
-@@ -298,6 +306,9 @@ int af_alg_accept(struct sock *sk, struct socket *newsock)
- 	newsock->ops = type->ops;
- 	newsock->state = SS_CONNECTED;
- 
-+	if (nokey)
-+		newsock->ops = type->ops_nokey;
++	psk = ask->parent;
++	pask = alg_sk(ask->parent);
++	tfm = pask->private;
 +
- 	err = 0;
++	err = -ENOKEY;
++	lock_sock(psk);
++	if (!tfm->has_key)
++		goto unlock;
++
++	if (!pask->refcnt++)
++		sock_hold(psk);
++
++	ask->refcnt = 1;
++	sock_put(psk);
++
++	err = 0;
++
++unlock:
++	release_sock(psk);
++
++	return err;
++}
++
++static int skcipher_sendmsg_nokey(struct socket *sock, struct msghdr *msg,
++				  size_t size)
++{
++	int err;
++
++	err = skcipher_check_key(sock);
++	if (err)
++		return err;
++
++	return skcipher_sendmsg(sock, msg, size);
++}
++
++static ssize_t skcipher_sendpage_nokey(struct socket *sock, struct page *page,
++				       int offset, size_t size, int flags)
++{
++	int err;
++
++	err = skcipher_check_key(sock);
++	if (err)
++		return err;
++
++	return skcipher_sendpage(sock, page, offset, size, flags);
++}
++
++static int skcipher_recvmsg_nokey(struct socket *sock, struct msghdr *msg,
++				  size_t ignored, int flags)
++{
++	int err;
++
++	err = skcipher_check_key(sock);
++	if (err)
++		return err;
++
++	return skcipher_recvmsg(sock, msg, ignored, flags);
++}
++
++static struct proto_ops algif_skcipher_ops_nokey = {
++	.family		=	PF_ALG,
++
++	.connect	=	sock_no_connect,
++	.socketpair	=	sock_no_socketpair,
++	.getname	=	sock_no_getname,
++	.ioctl		=	sock_no_ioctl,
++	.listen		=	sock_no_listen,
++	.shutdown	=	sock_no_shutdown,
++	.getsockopt	=	sock_no_getsockopt,
++	.mmap		=	sock_no_mmap,
++	.bind		=	sock_no_bind,
++	.accept		=	sock_no_accept,
++	.setsockopt	=	sock_no_setsockopt,
++
++	.release	=	af_alg_release,
++	.sendmsg	=	skcipher_sendmsg_nokey,
++	.sendpage	=	skcipher_sendpage_nokey,
++	.recvmsg	=	skcipher_recvmsg_nokey,
++	.poll		=	skcipher_poll,
++};
++
+ static void *skcipher_bind(const char *name, u32 type, u32 mask)
+ {
+ 	struct skcipher_tfm *tfm;
+@@ -802,7 +895,7 @@ static void skcipher_wait(struct sock *sk)
+ 		msleep(100);
+ }
  
- unlock:
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 589716f..df82844 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -52,9 +52,11 @@ struct af_alg_type {
- 	void (*release)(void *private);
- 	int (*setkey)(void *private, const u8 *key, unsigned int keylen);
- 	int (*accept)(void *private, struct sock *sk);
-+	int (*accept_nokey)(void *private, struct sock *sk);
- 	int (*setauthsize)(void *private, unsigned int authsize);
+-static void skcipher_sock_destruct(struct sock *sk)
++static void skcipher_sock_destruct_common(struct sock *sk)
+ {
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct skcipher_ctx *ctx = ask->private;
+@@ -814,10 +907,33 @@ static void skcipher_sock_destruct(struct sock *sk)
+ 	skcipher_free_sgl(sk);
+ 	sock_kzfree_s(sk, ctx->iv, crypto_skcipher_ivsize(tfm));
+ 	sock_kfree_s(sk, ctx, ctx->len);
++}
++
++static void skcipher_sock_destruct(struct sock *sk)
++{
++	skcipher_sock_destruct_common(sk);
+ 	af_alg_release_parent(sk);
+ }
  
- 	struct proto_ops *ops;
-+	struct proto_ops *ops_nokey;
- 	struct module *owner;
- 	char name[14];
+-static int skcipher_accept_parent(void *private, struct sock *sk)
++static void skcipher_release_parent_nokey(struct sock *sk)
++{
++	struct alg_sock *ask = alg_sk(sk);
++
++	if (!ask->refcnt) {
++		sock_put(ask->parent);
++		return;
++	}
++
++	af_alg_release_parent(sk);
++}
++
++static void skcipher_sock_destruct_nokey(struct sock *sk)
++{
++	skcipher_sock_destruct_common(sk);
++	skcipher_release_parent_nokey(sk);
++}
++
++static int skcipher_accept_parent_common(void *private, struct sock *sk)
+ {
+ 	struct skcipher_ctx *ctx;
+ 	struct alg_sock *ask = alg_sk(sk);
+@@ -825,9 +941,6 @@ static int skcipher_accept_parent(void *private, struct sock *sk)
+ 	struct crypto_skcipher *skcipher = tfm->skcipher;
+ 	unsigned int len = sizeof(*ctx) + crypto_skcipher_reqsize(skcipher);
+ 
+-	if (!tfm->has_key)
+-		return -ENOKEY;
+-
+ 	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
+ 	if (!ctx)
+ 		return -ENOMEM;
+@@ -861,12 +974,38 @@ static int skcipher_accept_parent(void *private, struct sock *sk)
+ 	return 0;
+ }
+ 
++static int skcipher_accept_parent(void *private, struct sock *sk)
++{
++	struct skcipher_tfm *tfm = private;
++
++	if (!tfm->has_key)
++		return -ENOKEY;
++
++	return skcipher_accept_parent_common(private, sk);
++}
++
++static int skcipher_accept_parent_nokey(void *private, struct sock *sk)
++{
++	int err;
++
++	err = skcipher_accept_parent_common(private, sk);
++	if (err)
++		goto out;
++
++	sk->sk_destruct = skcipher_sock_destruct_nokey;
++
++out:
++	return err;
++}
++
+ static const struct af_alg_type algif_type_skcipher = {
+ 	.bind		=	skcipher_bind,
+ 	.release	=	skcipher_release,
+ 	.setkey		=	skcipher_setkey,
+ 	.accept		=	skcipher_accept_parent,
++	.accept_nokey	=	skcipher_accept_parent_nokey,
+ 	.ops		=	&algif_skcipher_ops,
++	.ops_nokey	=	&algif_skcipher_ops_nokey,
+ 	.name		=	"skcipher",
+ 	.owner		=	THIS_MODULE
  };
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
