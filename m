@@ -1,20 +1,20 @@
 From: Yang Pingchao <pingchao.yang@intel.com>
-Subject: [PATCH V2] crypto: qat - fix timeout issues
-Date: Thu,  7 Jan 2016 09:07:12 +0800
-Message-ID: <1452128832-146693-1-git-send-email-pingchao.yang@intel.com>
+Subject: [PATCH V3] crypto: qat - fix timeout issues
+Date: Thu,  7 Jan 2016 09:39:46 +0800
+Message-ID: <1452130786-147187-1-git-send-email-pingchao.yang@intel.com>
 Cc: tadeusz.struk@intel.com, linux-crypto@vger.kernel.org,
 	qat-linux@intel.com, Yang Pingchao <pingchao.yang@intel.com>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:25850 "EHLO mga02.intel.com"
+Received: from mga04.intel.com ([192.55.52.120]:47376 "EHLO mga04.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752199AbcAGBHV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 6 Jan 2016 20:07:21 -0500
+	id S1752243AbcAGBji (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 6 Jan 2016 20:39:38 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Change the variable times data type and timeout conditon since the value of times
-should be -1 after loop.
+Change the variable times data type and timeout conditon since the value
+of times should be -1 after loop.
 
 Signed-off-by: Yang Pingchao <pingchao.yang@intel.com>
 ---
