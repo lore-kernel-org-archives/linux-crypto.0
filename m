@@ -1,42 +1,105 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: relocate ALG_MAX_PAGES to uapi
-Date: Fri, 8 Jan 2016 20:51:54 +0800
-Message-ID: <20160108125154.GA5533@gondor.apana.org.au>
-References: <2751031.ZCTdkaqdWA@myon.chronox.de>
+Subject: [PATCH 1/2] crypto: hash - Add crypto_ahash_has_setkey
+Date: Fri, 8 Jan 2016 21:28:26 +0800
+Message-ID: <20160108132826.GA5808@gondor.apana.org.au>
+References: <CACT4Y+YOwOfRHOwJ=FA9aaL2cZ-PRhTvd_mCzxx2nnN_L3tygw@mail.gmail.com>
+ <5687BA0F.3020104@gmail.com>
+ <5687E19E.2070801@gmail.com>
+ <1647086.cdlVYfuqk1@myon.chronox.de>
+ <56883096.1020009@gmail.com>
+ <20160103013126.GA30385@gondor.apana.org.au>
+ <5688ED04.4090802@gmail.com>
+ <20160104043518.GA4411@gondor.apana.org.au>
+ <568A66B2.4090307@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Cc: Stephan Mueller <smueller@chronox.de>,
+	Dmitry Vyukov <dvyukov@google.com>, syzkaller@googlegroups.com,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kcc@google.com, glider@google.com,
+	edumazet@google.com, sasha.levin@oracle.com, keescook@google.com,
+	Ondrej Kozina <okozina@redhat.com>
+To: Milan Broz <gmazyland@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38297 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:43383 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755106AbcAHMv5 (ORCPT
+	with ESMTP id S1752349AbcAHN2l (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Jan 2016 07:51:57 -0500
+	Fri, 8 Jan 2016 08:28:41 -0500
 Content-Disposition: inline
-In-Reply-To: <2751031.ZCTdkaqdWA@myon.chronox.de>
+In-Reply-To: <568A66B2.4090307@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 25, 2015 at 06:14:54PM +0100, Stephan Mueller wrote:
-> The define of ALG_MAX_PAGES is relevant for user space as this macro
-> defines the maximum number of pages to be processed in one go by
-> vmsplice/splice. If user space does not obey that limit, the calling
-> thread will hang until a recvmsg is called (by another thread).
-> 
-> As user space should have the ability to prevent such blocks, it needs
-> to know about the limit. Therefore, the define is moved to the uapi
-> header file.
-> 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+This patch adds a way for ahash users to determine whether a key
+is required by a crypto_ahash transform.
 
-I don't like exporting details like this.  User-space should not
-be relying on voodoo like this to avoid hanging.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Please show me the program that actually hangs so we can figure
-out what if anything needs to be done to address this.
-
-Thanks,
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 9c1dc8d..d19b523 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -451,6 +451,7 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+ 	struct ahash_alg *alg = crypto_ahash_alg(hash);
+ 
+ 	hash->setkey = ahash_nosetkey;
++	hash->has_setkey = false;
+ 	hash->export = ahash_no_export;
+ 	hash->import = ahash_no_import;
+ 
+@@ -463,8 +464,10 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+ 	hash->finup = alg->finup ?: ahash_def_finup;
+ 	hash->digest = alg->digest;
+ 
+-	if (alg->setkey)
++	if (alg->setkey) {
+ 		hash->setkey = alg->setkey;
++		hash->has_setkey = true;
++	}
+ 	if (alg->export)
+ 		hash->export = alg->export;
+ 	if (alg->import)
+diff --git a/crypto/shash.c b/crypto/shash.c
+index ecb1e3d..88a27de 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -355,8 +355,10 @@ int crypto_init_shash_ops_async(struct crypto_tfm *tfm)
+ 	crt->finup = shash_async_finup;
+ 	crt->digest = shash_async_digest;
+ 
+-	if (alg->setkey)
++	if (alg->setkey) {
+ 		crt->setkey = shash_async_setkey;
++		crt->has_setkey = true;
++	}
+ 	if (alg->export)
+ 		crt->export = shash_async_export;
+ 	if (alg->import)
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 3d69c93..6361892 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -204,6 +204,7 @@ struct crypto_ahash {
+ 		      unsigned int keylen);
+ 
+ 	unsigned int reqsize;
++	bool has_setkey;
+ 	struct crypto_tfm base;
+ };
+ 
+@@ -375,6 +376,11 @@ static inline void *ahash_request_ctx(struct ahash_request *req)
+ int crypto_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 			unsigned int keylen);
+ 
++static inline bool crypto_ahash_has_setkey(struct crypto_ahash *tfm)
++{
++	return tfm->has_setkey;
++}
++
+ /**
+  * crypto_ahash_finup() - update and finalize message digest
+  * @req: reference to the ahash_request handle that holds all information
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
