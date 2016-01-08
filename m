@@ -1,48 +1,39 @@
-From: Dave Young <dyoung-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Kexec_file_load failed with "Missing required AuthAttr"
-Date: Thu, 7 Jan 2016 13:25:07 +0800
-Message-ID: <20160107052507.GA12900@dhcp-128-65.nay.redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: Make CRYPTO_CBC select CRYPTO_ECHAINIV
+Date: Fri, 8 Jan 2016 18:48:55 +0900
+Message-ID: <20160108094855.GA3472@gondor.apana.org.au>
+References: <568AC07B.8020605@gmx.de>
+ <4445865.9O5pIU29W2@myon.chronox.de>
+ <568AD989.8060802@gmx.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: xlpang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, kexec-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <kexec-bounces+glkk-kexec=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org
+To: Thomas Egerer <hakke_007@gmx.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:49934 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750794AbcAHJtL (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 8 Jan 2016 04:49:11 -0500
 Content-Disposition: inline
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/kexec>,
- <mailto:kexec-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/kexec/>
-List-Post: <mailto:kexec-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Help: <mailto:kexec-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/kexec>,
- <mailto:kexec-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
-Sender: "kexec" <kexec-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-Errors-To: kexec-bounces+glkk-kexec=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <568AD989.8060802@gmx.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Mon, Jan 04, 2016 at 09:43:53PM +0100, Thomas Egerer wrote:
+> Similar to CTR mode selecting CRYPTO_SEQIV, CBC mode requires echainiv
+> and has to select CRYPTO_ECHAINIV in order to work properly. This solves
+> the issues caused by a misconfiguration as described in [1].
+> 
+> [1] https://lists.strongswan.org/pipermail/users/2015-December/009074.html
+> 
+> Signed-off-by: Thomas Egerer <hakke_007@gmx.de>
 
-I saw the warning "Missing required AuthAttr" when testing kexec, known issue?
-Idea about how to fix it?
+Please patch net/ipvX/Kconfig instead as ECHAINIV is only used
+by IPsec.
 
-The kernel is latest linus tree plus sevral patches from Toshi to cleanup io resource structure.
-
-in function pkcs7_sig_note_set_of_authattrs():
-        if (!test_bit(sinfo_has_content_type, &sinfo->aa_set) ||
-            !test_bit(sinfo_has_message_digest, &sinfo->aa_set) ||
-            (ctx->msg->data_type == OID_msIndirectData &&
-             !test_bit(sinfo_has_ms_opus_info, &sinfo->aa_set))) {
-                pr_warn("Missing required AuthAttr\n");
-                return -EBADMSG;
-        }
-
-The third condition below is true:
-(ctx->msg->data_type == OID_msIndirectData &&
-             !test_bit(sinfo_has_ms_opus_info, &sinfo->aa_set))
-
-I signed the kernel with redhat test key like below:
-pesign -c 'Red Hat Test Certificate' -i arch/x86/boot/bzImage -o /boot/vmlinuz-4.4.0-rc8+ -s --force
-
-Thanks
-Dave
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
