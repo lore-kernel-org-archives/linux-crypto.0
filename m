@@ -1,38 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Make CRYPTO_CBC select CRYPTO_ECHAINIV
-Date: Fri, 8 Jan 2016 18:48:55 +0900
-Message-ID: <20160108094855.GA3472@gondor.apana.org.au>
-References: <568AC07B.8020605@gmx.de>
- <4445865.9O5pIU29W2@myon.chronox.de>
- <568AD989.8060802@gmx.de>
+Subject: Re: ahash alg that does not implement import/export failed to
+ register
+Date: Fri, 8 Jan 2016 18:54:54 +0900
+Message-ID: <20160108095454.GB3472@gondor.apana.org.au>
+References: <1450488694.30844.11.camel@schen9-desk2.jf.intel.com>
+ <20151219023308.GA27731@gondor.apana.org.au>
+ <568E7AFB.8080905@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org
-To: Thomas Egerer <hakke_007@gmx.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49934 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750794AbcAHJtL (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Jan 2016 04:49:11 -0500
+Cc: Tim Chen <tim.c.chen@linux.intel.com>,
+	Russell King - ARM Linux <linux@arm.linux.org.uk>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	"megha.dey" <megha.dey@intel.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <568AD989.8060802@gmx.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <568E7AFB.8080905@amd.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jan 04, 2016 at 09:43:53PM +0100, Thomas Egerer wrote:
-> Similar to CTR mode selecting CRYPTO_SEQIV, CBC mode requires echainiv
-> and has to select CRYPTO_ECHAINIV in order to work properly. This solves
-> the issues caused by a misconfiguration as described in [1].
+On Thu, Jan 07, 2016 at 08:49:31AM -0600, Tom Lendacky wrote:
 > 
-> [1] https://lists.strongswan.org/pipermail/users/2015-December/009074.html
-> 
-> Signed-off-by: Thomas Egerer <hakke_007@gmx.de>
+> Is it expected that import and export should work across algorithm
+> implementations (eg. export sha1 state from hardware driver and import
+> into sha1-generic algorithm)?  Or is the state purely meant for use by
+> the driver only? I see a few hardware drivers exporting/importing
+> to/from sha1_state and sha256_state and that is what prompts this
+> question.
 
-Please patch net/ipvX/Kconfig instead as ECHAINIV is only used
-by IPsec.
+For algorithms in general there is no requirement for the states
+to be exported in a particular format.  For certain special cases
+such as crc32c we do require a specific format but you don't have
+to worry about this for SHA.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
