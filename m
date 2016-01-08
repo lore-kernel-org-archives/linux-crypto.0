@@ -1,7 +1,7 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/2] crypto: hash - Add crypto_ahash_has_setkey
-Date: Fri, 8 Jan 2016 21:28:26 +0800
-Message-ID: <20160108132826.GA5808@gondor.apana.org.au>
+Subject: [PATCH 2/2] crypto: algif_hash - Require setkey before accept(2)
+Date: Fri, 8 Jan 2016 21:31:04 +0800
+Message-ID: <20160108133104.GA5838@gondor.apana.org.au>
 References: <CACT4Y+YOwOfRHOwJ=FA9aaL2cZ-PRhTvd_mCzxx2nnN_L3tygw@mail.gmail.com>
  <5687BA0F.3020104@gmail.com>
  <5687E19E.2070801@gmail.com>
@@ -11,6 +11,7 @@ References: <CACT4Y+YOwOfRHOwJ=FA9aaL2cZ-PRhTvd_mCzxx2nnN_L3tygw@mail.gmail.com>
  <5688ED04.4090802@gmail.com>
  <20160104043518.GA4411@gondor.apana.org.au>
  <568A66B2.4090307@gmail.com>
+ <20160108132826.GA5808@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Stephan Mueller <smueller@chronox.de>,
@@ -21,85 +22,290 @@ Cc: Stephan Mueller <smueller@chronox.de>,
 	Ondrej Kozina <okozina@redhat.com>
 To: Milan Broz <gmazyland@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:43383 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:58970 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752349AbcAHN2l (ORCPT
+	with ESMTP id S1750866AbcAHNbN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Jan 2016 08:28:41 -0500
+	Fri, 8 Jan 2016 08:31:13 -0500
 Content-Disposition: inline
-In-Reply-To: <568A66B2.4090307@gmail.com>
+In-Reply-To: <20160108132826.GA5808@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds a way for ahash users to determine whether a key
-is required by a crypto_ahash transform.
+Hash implementations that require a key may crash if you use
+them without setting a key.  This patch adds the necessary checks
+so that if you do attempt to use them without a key that we return
+-ENOKEY instead of proceeding.
+
+This patch also adds a compatibility path to support old applications
+that do acept(2) before setkey.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 9c1dc8d..d19b523 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -451,6 +451,7 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
- 	struct ahash_alg *alg = crypto_ahash_alg(hash);
- 
- 	hash->setkey = ahash_nosetkey;
-+	hash->has_setkey = false;
- 	hash->export = ahash_no_export;
- 	hash->import = ahash_no_import;
- 
-@@ -463,8 +464,10 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
- 	hash->finup = alg->finup ?: ahash_def_finup;
- 	hash->digest = alg->digest;
- 
--	if (alg->setkey)
-+	if (alg->setkey) {
- 		hash->setkey = alg->setkey;
-+		hash->has_setkey = true;
-+	}
- 	if (alg->export)
- 		hash->export = alg->export;
- 	if (alg->import)
-diff --git a/crypto/shash.c b/crypto/shash.c
-index ecb1e3d..88a27de 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -355,8 +355,10 @@ int crypto_init_shash_ops_async(struct crypto_tfm *tfm)
- 	crt->finup = shash_async_finup;
- 	crt->digest = shash_async_digest;
- 
--	if (alg->setkey)
-+	if (alg->setkey) {
- 		crt->setkey = shash_async_setkey;
-+		crt->has_setkey = true;
-+	}
- 	if (alg->export)
- 		crt->export = shash_async_export;
- 	if (alg->import)
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 3d69c93..6361892 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -204,6 +204,7 @@ struct crypto_ahash {
- 		      unsigned int keylen);
- 
- 	unsigned int reqsize;
-+	bool has_setkey;
- 	struct crypto_tfm base;
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index b4c24fe..46637be 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -34,6 +34,11 @@ struct hash_ctx {
+ 	struct ahash_request req;
  };
  
-@@ -375,6 +376,11 @@ static inline void *ahash_request_ctx(struct ahash_request *req)
- int crypto_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
- 			unsigned int keylen);
++struct algif_hash_tfm {
++	struct crypto_ahash *hash;
++	bool has_key;
++};
++
+ static int hash_sendmsg(struct socket *sock, struct msghdr *msg,
+ 			size_t ignored)
+ {
+@@ -235,22 +240,151 @@ static struct proto_ops algif_hash_ops = {
+ 	.accept		=	hash_accept,
+ };
  
-+static inline bool crypto_ahash_has_setkey(struct crypto_ahash *tfm)
++static int hash_check_key(struct socket *sock)
 +{
-+	return tfm->has_setkey;
++	int err;
++	struct sock *psk;
++	struct alg_sock *pask;
++	struct algif_hash_tfm *tfm;
++	struct sock *sk = sock->sk;
++	struct alg_sock *ask = alg_sk(sk);
++
++	if (ask->refcnt)
++		return 0;
++
++	psk = ask->parent;
++	pask = alg_sk(ask->parent);
++	tfm = pask->private;
++
++	err = -ENOKEY;
++	lock_sock(psk);
++	if (!tfm->has_key)
++		goto unlock;
++
++	if (!pask->refcnt++)
++		sock_hold(psk);
++
++	ask->refcnt = 1;
++	sock_put(psk);
++
++	err = 0;
++
++unlock:
++	release_sock(psk);
++
++	return err;
 +}
 +
- /**
-  * crypto_ahash_finup() - update and finalize message digest
-  * @req: reference to the ahash_request handle that holds all information
++static int hash_sendmsg_nokey(struct socket *sock, struct msghdr *msg,
++			      size_t size)
++{
++	int err;
++
++	err = hash_check_key(sock);
++	if (err)
++		return err;
++
++	return hash_sendmsg(sock, msg, size);
++}
++
++static ssize_t hash_sendpage_nokey(struct socket *sock, struct page *page,
++				   int offset, size_t size, int flags)
++{
++	int err;
++
++	err = hash_check_key(sock);
++	if (err)
++		return err;
++
++	return hash_sendpage(sock, page, offset, size, flags);
++}
++
++static int hash_recvmsg_nokey(struct socket *sock, struct msghdr *msg,
++			      size_t ignored, int flags)
++{
++	int err;
++
++	err = hash_check_key(sock);
++	if (err)
++		return err;
++
++	return hash_recvmsg(sock, msg, ignored, flags);
++}
++
++static int hash_accept_nokey(struct socket *sock, struct socket *newsock,
++			     int flags)
++{
++	int err;
++
++	err = hash_check_key(sock);
++	if (err)
++		return err;
++
++	return hash_accept(sock, newsock, flags);
++}
++
++static struct proto_ops algif_hash_ops_nokey = {
++	.family		=	PF_ALG,
++
++	.connect	=	sock_no_connect,
++	.socketpair	=	sock_no_socketpair,
++	.getname	=	sock_no_getname,
++	.ioctl		=	sock_no_ioctl,
++	.listen		=	sock_no_listen,
++	.shutdown	=	sock_no_shutdown,
++	.getsockopt	=	sock_no_getsockopt,
++	.mmap		=	sock_no_mmap,
++	.bind		=	sock_no_bind,
++	.setsockopt	=	sock_no_setsockopt,
++	.poll		=	sock_no_poll,
++
++	.release	=	af_alg_release,
++	.sendmsg	=	hash_sendmsg_nokey,
++	.sendpage	=	hash_sendpage_nokey,
++	.recvmsg	=	hash_recvmsg_nokey,
++	.accept		=	hash_accept_nokey,
++};
++
+ static void *hash_bind(const char *name, u32 type, u32 mask)
+ {
+-	return crypto_alloc_ahash(name, type, mask);
++	struct algif_hash_tfm *tfm;
++	struct crypto_ahash *hash;
++
++	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
++	if (!tfm)
++		return ERR_PTR(-ENOMEM);
++
++	hash = crypto_alloc_ahash(name, type, mask);
++	if (IS_ERR(hash)) {
++		kfree(tfm);
++		return ERR_CAST(hash);
++	}
++
++	tfm->hash = hash;
++
++	return tfm;
+ }
+ 
+ static void hash_release(void *private)
+ {
+-	crypto_free_ahash(private);
++	struct algif_hash_tfm *tfm = private;
++
++	crypto_free_ahash(tfm->hash);
++	kfree(tfm);
+ }
+ 
+ static int hash_setkey(void *private, const u8 *key, unsigned int keylen)
+ {
+-	return crypto_ahash_setkey(private, key, keylen);
++	struct algif_hash_tfm *tfm = private;
++	int err;
++
++	err = crypto_ahash_setkey(tfm->hash, key, keylen);
++	tfm->has_key = !err;
++
++	return err;
+ }
+ 
+-static void hash_sock_destruct(struct sock *sk)
++static void hash_sock_destruct_common(struct sock *sk)
+ {
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct hash_ctx *ctx = ask->private;
+@@ -258,15 +392,40 @@ static void hash_sock_destruct(struct sock *sk)
+ 	sock_kzfree_s(sk, ctx->result,
+ 		      crypto_ahash_digestsize(crypto_ahash_reqtfm(&ctx->req)));
+ 	sock_kfree_s(sk, ctx, ctx->len);
++}
++
++static void hash_sock_destruct(struct sock *sk)
++{
++	hash_sock_destruct_common(sk);
+ 	af_alg_release_parent(sk);
+ }
+ 
+-static int hash_accept_parent(void *private, struct sock *sk)
++static void hash_release_parent_nokey(struct sock *sk)
++{
++	struct alg_sock *ask = alg_sk(sk);
++
++	if (!ask->refcnt) {
++		sock_put(ask->parent);
++		return;
++	}
++
++	af_alg_release_parent(sk);
++}
++
++static void hash_sock_destruct_nokey(struct sock *sk)
++{
++	hash_sock_destruct_common(sk);
++	hash_release_parent_nokey(sk);
++}
++
++static int hash_accept_parent_common(void *private, struct sock *sk)
+ {
+ 	struct hash_ctx *ctx;
+ 	struct alg_sock *ask = alg_sk(sk);
+-	unsigned len = sizeof(*ctx) + crypto_ahash_reqsize(private);
+-	unsigned ds = crypto_ahash_digestsize(private);
++	struct algif_hash_tfm *tfm = private;
++	struct crypto_ahash *hash = tfm->hash;
++	unsigned len = sizeof(*ctx) + crypto_ahash_reqsize(hash);
++	unsigned ds = crypto_ahash_digestsize(hash);
+ 
+ 	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
+ 	if (!ctx)
+@@ -286,7 +445,7 @@ static int hash_accept_parent(void *private, struct sock *sk)
+ 
+ 	ask->private = ctx;
+ 
+-	ahash_request_set_tfm(&ctx->req, private);
++	ahash_request_set_tfm(&ctx->req, hash);
+ 	ahash_request_set_callback(&ctx->req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+ 				   af_alg_complete, &ctx->completion);
+ 
+@@ -295,12 +454,38 @@ static int hash_accept_parent(void *private, struct sock *sk)
+ 	return 0;
+ }
+ 
++static int hash_accept_parent(void *private, struct sock *sk)
++{
++	struct algif_hash_tfm *tfm = private;
++
++	if (!tfm->has_key && crypto_ahash_has_setkey(tfm->hash))
++		return -ENOKEY;
++
++	return hash_accept_parent_common(private, sk);
++}
++
++static int hash_accept_parent_nokey(void *private, struct sock *sk)
++{
++	int err;
++
++	err = hash_accept_parent_common(private, sk);
++	if (err)
++		goto out;
++
++	sk->sk_destruct = hash_sock_destruct_nokey;
++
++out:
++	return err;
++}
++
+ static const struct af_alg_type algif_type_hash = {
+ 	.bind		=	hash_bind,
+ 	.release	=	hash_release,
+ 	.setkey		=	hash_setkey,
+ 	.accept		=	hash_accept_parent,
++	.accept_nokey	=	hash_accept_parent_nokey,
+ 	.ops		=	&algif_hash_ops,
++	.ops_nokey	=	&algif_hash_ops_nokey,
+ 	.name		=	"hash",
+ 	.owner		=	THIS_MODULE
+ };
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
