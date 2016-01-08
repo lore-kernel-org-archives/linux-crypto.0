@@ -1,8 +1,8 @@
 From: Andre Przywara <andre.przywara-5wv7dgnIgG8@public.gmane.org>
-Subject: [RESEND PATCH 1/2] crypto: sunxi-ss-cipher: promote
+Subject: [RESEND PATCH 2/2] crypto: sunxi-ss-hash: promote
  variables to match types in min3() calls
-Date: Fri,  8 Jan 2016 11:24:08 +0000
-Message-ID: <1452252249-12040-2-git-send-email-andre.przywara@arm.com>
+Date: Fri,  8 Jan 2016 11:24:09 +0000
+Message-ID: <1452252249-12040-3-git-send-email-andre.przywara@arm.com>
 References: <1452252249-12040-1-git-send-email-andre.przywara@arm.com>
 Reply-To: andre.przywara-5wv7dgnIgG8@public.gmane.org
 Mime-Version: 1.0
@@ -17,7 +17,7 @@ To: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
 	Chen-Yu Tsai <wens-jdAy2FN1RRM@public.gmane.org>,
 	Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
-Return-path: <linux-sunxi+bncBDNZNK75ZIKRB4NYX22AKGQEOPDZUDA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Return-path: <linux-sunxi+bncBDNZNK75ZIKRB5FYX22AKGQEPDRWJJA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 In-Reply-To: <1452252249-12040-1-git-send-email-andre.przywara-5wv7dgnIgG8@public.gmane.org>
 List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
@@ -32,74 +32,90 @@ List-Id: linux-crypto.vger.kernel.org
 
 The min3() macro expects all arguments to be of the same type (or
 size at least).
-Change the type of some local variables in sun4i-ss-cipher.c to
+Change the type of some local variables in sun4i-ss-hash.c to
 size_t to match the type used in some generic structures we
 compare against.
 That shouldn't change anything for 32-bit (as size_t is unsigned int
 there anyway), but allows compilation for 64-bit architectures.
+There are two casts still necessary, because we can't change the type
+in a generic structure.
 
 Signed-off-by: Andre Przywara <andre.przywara-5wv7dgnIgG8@public.gmane.org>
 ---
- drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 12 ++++++------
+ drivers/crypto/sunxi-ss/sun4i-ss.h      |  2 +-
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-index a19ee12..707f30f 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-@@ -25,13 +25,13 @@ static int sun4i_ss_opti_poll(struct ablkcipher_request *areq)
- 	struct sun4i_cipher_req_ctx *ctx = ablkcipher_request_ctx(areq);
- 	u32 mode = ctx->mode;
- 	/* when activating SS, the default FIFO space is SS_RX_DEFAULT(32) */
--	u32 rx_cnt = SS_RX_DEFAULT;
--	u32 tx_cnt = 0;
-+	size_t rx_cnt = SS_RX_DEFAULT;
-+	size_t tx_cnt = 0;
- 	u32 spaces;
- 	u32 v;
- 	int i, err = 0;
--	unsigned int ileft = areq->nbytes;
--	unsigned int oleft = areq->nbytes;
-+	size_t ileft = areq->nbytes;
-+	size_t oleft = areq->nbytes;
- 	unsigned int todo;
- 	struct sg_mapping_iter mi, mo;
- 	unsigned int oi, oo; /* offset for in and out */
-@@ -134,13 +134,13 @@ static int sun4i_ss_cipher_poll(struct ablkcipher_request *areq)
- 	struct sun4i_cipher_req_ctx *ctx = ablkcipher_request_ctx(areq);
- 	u32 mode = ctx->mode;
- 	/* when activating SS, the default FIFO space is SS_RX_DEFAULT(32) */
--	u32 rx_cnt = SS_RX_DEFAULT;
--	u32 tx_cnt = 0;
-+	size_t rx_cnt = SS_RX_DEFAULT;
-+	size_t tx_cnt = 0;
- 	u32 v;
- 	u32 spaces;
- 	int i, err = 0;
--	unsigned int ileft = areq->nbytes;
--	unsigned int oleft = areq->nbytes;
-+	size_t ileft = areq->nbytes;
-+	size_t oleft = areq->nbytes;
- 	unsigned int todo;
- 	struct sg_mapping_iter mi, mo;
- 	unsigned int oi, oo;	/* offset for in and out */
-@@ -148,7 +148,7 @@ static int sun4i_ss_cipher_poll(struct ablkcipher_request *areq)
- 	char bufo[4 * SS_TX_MAX]; /* buffer for linearize SG dst */
- 	unsigned int ob = 0;	/* offset in buf */
- 	unsigned int obo = 0;	/* offset in bufo*/
--	unsigned int obl = 0;	/* length of data in bufo */
-+	size_t obl = 0;	/* length of data in bufo */
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+index ff80314..c0384f1 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+@@ -170,7 +170,7 @@ int sun4i_hash_update(struct ahash_request *areq)
+ 	struct sun4i_ss_ctx *ss = op->ss;
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+ 	unsigned int in_i = 0; /* advancement in the current SG */
+-	unsigned int end;
++	size_t end;
+ 	/*
+ 	 * end is the position when we need to stop writing to the device,
+ 	 * to be compared to i
+@@ -181,7 +181,7 @@ int sun4i_hash_update(struct ahash_request *areq)
+ 	size_t copied = 0;
+ 	struct sg_mapping_iter mi;
  
- 	if (areq->nbytes == 0)
- 		return 0;
-@@ -251,7 +251,7 @@ static int sun4i_ss_cipher_poll(struct ablkcipher_request *areq)
- 		spaces = readl(ss->base + SS_FCSR);
- 		rx_cnt = SS_RXFIFO_SPACES(spaces);
- 		tx_cnt = SS_TXFIFO_SPACES(spaces);
--		dev_dbg(ss->dev, "%x %u/%u %u/%u cnt=%u %u/%u %u/%u cnt=%u %u %u\n",
-+		dev_dbg(ss->dev, "%x %u/%zu %zu/%u cnt=%zu %u/%zu %zu/%u cnt=%zu %u %u\n",
- 			mode,
- 			oi, mi.length, ileft, areq->nbytes, rx_cnt,
- 			oo, mo.length, oleft, areq->nbytes, tx_cnt,
+-	dev_dbg(ss->dev, "%s %s bc=%llu len=%u mode=%x wl=%u h0=%0x",
++	dev_dbg(ss->dev, "%s %s bc=%llu len=%u mode=%x wl=%zu h0=%0x",
+ 		__func__, crypto_tfm_alg_name(areq->base.tfm),
+ 		op->byte_count, areq->nbytes, op->mode,
+ 		op->len, op->hash[0]);
+@@ -206,7 +206,7 @@ int sun4i_hash_update(struct ahash_request *areq)
+ 	end = ((areq->nbytes + op->len) / 64) * 64 - op->len;
+ 
+ 	if (end > areq->nbytes || areq->nbytes - end > 63) {
+-		dev_err(ss->dev, "ERROR: Bound error %u %u\n",
++		dev_err(ss->dev, "ERROR: Bound error %zu %u\n",
+ 			end, areq->nbytes);
+ 		return -EINVAL;
+ 	}
+@@ -266,7 +266,7 @@ int sun4i_hash_update(struct ahash_request *areq)
+ 		}
+ 		if (mi.length - in_i > 3 && i < end) {
+ 			/* how many bytes we can read from current SG */
+-			in_r = min3(mi.length - in_i, areq->nbytes - i,
++			in_r = min3(mi.length - in_i, (size_t)areq->nbytes - i,
+ 				    ((mi.length - in_i) / 4) * 4);
+ 			/* how many bytes we can write in the device*/
+ 			todo = min3((u32)(end - i) / 4, rx_cnt, (u32)in_r / 4);
+@@ -289,7 +289,7 @@ int sun4i_hash_update(struct ahash_request *areq)
+ 	if ((areq->nbytes - i) < 64) {
+ 		while (i < areq->nbytes && in_i < mi.length && op->len < 64) {
+ 			/* how many bytes we can read from current SG */
+-			in_r = min3(mi.length - in_i, areq->nbytes - i,
++			in_r = min3(mi.length - in_i, (size_t)areq->nbytes - i,
+ 				    64 - op->len);
+ 			memcpy(op->buf + op->len, mi.addr + in_i, in_r);
+ 			op->len += in_r;
+@@ -352,7 +352,7 @@ int sun4i_hash_final(struct ahash_request *areq)
+ 	u32 wb = 0;
+ 	unsigned int nwait, nbw = 0;
+ 
+-	dev_dbg(ss->dev, "%s: byte=%llu len=%u mode=%x wl=%u h=%x",
++	dev_dbg(ss->dev, "%s: byte=%llu len=%u mode=%x wl=%zu h=%x",
+ 		__func__, op->byte_count, areq->nbytes, op->mode,
+ 		op->len, op->hash[0]);
+ 
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss.h b/drivers/crypto/sunxi-ss/sun4i-ss.h
+index 8e9c05f..c15fa21 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss.h
++++ b/drivers/crypto/sunxi-ss/sun4i-ss.h
+@@ -162,7 +162,7 @@ struct sun4i_req_ctx {
+ 	u64 byte_count; /* number of bytes "uploaded" to the device */
+ 	u32 hash[5]; /* for storing SS_IVx register */
+ 	char buf[64];
+-	unsigned int len;
++	size_t len;
+ 	struct sun4i_ss_ctx *ss;
+ };
+ 
 -- 
 2.6.4
