@@ -1,39 +1,53 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: algif_hash bug?
-Date: Fri, 8 Jan 2016 14:55:14 -0600
-Message-ID: <56902232.2010309@amd.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/2] crypto: af_alg - Add nokey compatibility path
+Date: Sat, 9 Jan 2016 13:41:03 +0800
+Message-ID: <20160109054103.GA11188@gondor.apana.org.au>
+References: <5687BA0F.3020104@gmail.com>
+ <5687E19E.2070801@gmail.com>
+ <1647086.cdlVYfuqk1@myon.chronox.de>
+ <56883096.1020009@gmail.com>
+ <20160103013126.GA30385@gondor.apana.org.au>
+ <5688ED04.4090802@gmail.com>
+ <20160104043518.GA4411@gondor.apana.org.au>
+ <568A66B2.4090307@gmail.com>
+ <20160108124851.GA5425@gondor.apana.org.au>
+ <568FFE18.6090900@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Stephan Mueller <smueller@chronox.de>,
+	Dmitry Vyukov <dvyukov@google.com>, syzkaller@googlegroups.com,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kcc@google.com, glider@google.com,
+	edumazet@google.com, sasha.levin@oracle.com, keescook@google.com,
+	Ondrej Kozina <okozina@redhat.com>
+To: Milan Broz <gmazyland@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0057.outbound.protection.outlook.com ([207.46.100.57]:51751
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1755611AbcAHUzd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Jan 2016 15:55:33 -0500
+Received: from helcar.hengli.com.au ([209.40.204.226]:36530 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751134AbcAIFlS (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 9 Jan 2016 00:41:18 -0500
+Content-Disposition: inline
+In-Reply-To: <568FFE18.6090900@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert,
+On Fri, Jan 08, 2016 at 07:21:12PM +0100, Milan Broz wrote:
+>
+> > Yes algif_hash would need the same compatibility patch and I'm
+> > working on that.
+> 
+> Ok, I fixed this already.
 
-AF_ALG hash supports the accept() call to allow for partial hash states
-to be cloned. If an accept() is issued against a socket before ever
-doing a send(), crypto_ahash_init() will never have been called for the
-original socket.  The hash_accept function in algif_hash will call
-crypto_ahash_export() which will return an uninitialized request context
-and then use that for import into the new socket. A problem arises here
-because hash_accept sets the 'more' bit of the new context to 1
-(ctx2->more = 1). This will cause the first send() call for the new
-socket to skip calling crypto_ahash_init() which can result in an
-error or oops because the request context for the cloned socket was
-never initialized.
+Can you please test the two patches that I sent for algif_hash?
 
-Is it assumed that the accept() call should only ever be made after
-having issued at least one send()? Should the ctx2->more value be the
-value from the original context so that crypto_ahash_init() is called
-when needed?
+> So it is used in production but just for this specific case.
 
-Thanks,
-Tom
+OK I will add something similar to the algif_hash has_setkey
+logic for cipher_null.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
