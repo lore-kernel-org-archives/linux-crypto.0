@@ -1,29 +1,44 @@
-From: Anatoly Pugachev <matorola@gmail.com>
-Subject: linux kernel (sparc), n2 rng for newer hardware
-Date: Sat, 9 Jan 2016 23:18:27 +0300
-Message-ID: <CADxRZqwHDVZrmaM7AOyxSLhMbbUhMXpqnRCaoma+SZGyxxFfeg@mail.gmail.com>
+From: Thomas Egerer <hakke_007@gmx.de>
+Subject: Re: [PATCH] crypto: Make CRYPTO_CBC select CRYPTO_ECHAINIV
+Date: Sun, 10 Jan 2016 21:16:34 +0100
+Message-ID: <5692BC22.4010903@gmx.de>
+References: <568AC07B.8020605@gmx.de> <4445865.9O5pIU29W2@myon.chronox.de>
+ <568AD989.8060802@gmx.de> <20160108094855.GA3472@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: davem@redhat.com
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f48.google.com ([209.85.213.48]:36507 "EHLO
-	mail-vk0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755366AbcAIUS2 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 9 Jan 2016 15:18:28 -0500
-Received: by mail-vk0-f48.google.com with SMTP id n1so53343454vkb.3
-        for <linux-crypto@vger.kernel.org>; Sat, 09 Jan 2016 12:18:28 -0800 (PST)
+Received: from mout.gmx.net ([212.227.15.18]:54816 "EHLO mout.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757348AbcAJUQC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 10 Jan 2016 15:16:02 -0500
+In-Reply-To: <20160108094855.GA3472@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello!
+On 01/08/2016 10:48 AM, Herbert Xu wrote:
+> On Mon, Jan 04, 2016 at 09:43:53PM +0100, Thomas Egerer wrote:
+>> Similar to CTR mode selecting CRYPTO_SEQIV, CBC mode requires echainiv
+>> and has to select CRYPTO_ECHAINIV in order to work properly. This solves
+>> the issues caused by a misconfiguration as described in [1].
+>>
+>> [1] https://lists.strongswan.org/pipermail/users/2015-December/009074.html
+>>
+>> Signed-off-by: Thomas Egerer <hakke_007@gmx.de>
+> 
+> Please patch net/ipvX/Kconfig instead as ECHAINIV is only used
+> by IPsec.
+This does not seem right to me. By depending on CRYPTO_CBC in a particular
+Kconfig, I would expect the 'default algorithm for CBC' to be transitively
+selected with it. It's what CRYPTO_CTR does. There are a couple of places
+that use select CRYPTO_CBC but not CRYPTO_ECHAINIV  (ext4, wusbcore, md
+to mention a few). Wouldn't these end up unusable too, if CBC-mode doesn't
+activate echainiv?
 
-Could someone please (Dave?) read my message from
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=809815#32
+Cheers,
+Thomas
 
-It's about fix to n2_rng (sparc) kernel module, but I'm not a kernel
-or C/C++ programmer, and I can't write a proper patch to n2_rng (i
-have no idea about data field of of_device_id structure).
-
-Thanks.
+> Thanks,
+> 
