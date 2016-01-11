@@ -1,49 +1,83 @@
-From: Krzysztof Kozlowski <k.kozlowski.k@gmail.com>
-Subject: [PATCH 2/2] crypto: s5p-sss - Use memcpy_toio for iomem annotated memory
-Date: Mon, 11 Jan 2016 20:45:51 +0900
-Message-ID: <1452512751-4084-2-git-send-email-k.kozlowski.k@gmail.com>
-References: <1452512751-4084-1-git-send-email-k.kozlowski.k@gmail.com>
-Cc: Krzysztof Kozlowski <k.kozlowski.k@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 1/2] crypto: skcipher - Add crypto_skcipher_has_setkey
+Date: Mon, 11 Jan 2016 21:26:50 +0800
+Message-ID: <20160111132650.GA25134@gondor.apana.org.au>
+References: <1647086.cdlVYfuqk1@myon.chronox.de>
+ <56883096.1020009@gmail.com>
+ <20160103013126.GA30385@gondor.apana.org.au>
+ <5688ED04.4090802@gmail.com>
+ <20160104043518.GA4411@gondor.apana.org.au>
+ <568A66B2.4090307@gmail.com>
+ <20160108124851.GA5425@gondor.apana.org.au>
+ <568FFE18.6090900@gmail.com>
+ <20160109054103.GA11188@gondor.apana.org.au>
+ <5690DD9C.4010408@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Stephan Mueller <smueller@chronox.de>,
+	Dmitry Vyukov <dvyukov@google.com>, syzkaller@googlegroups.com,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kcc@google.com, glider@google.com,
+	edumazet@google.com, sasha.levin@oracle.com, keescook@google.com,
+	Ondrej Kozina <okozina@redhat.com>
+To: Milan Broz <gmazyland@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1452512751-4084-1-git-send-email-k.kozlowski.k@gmail.com>
+Content-Disposition: inline
+In-Reply-To: <5690DD9C.4010408@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Use memcpy_toio to fix following sparse warning:
+This patch adds a way for skcipher users to determine whether a key
+is required by a transform.
 
-drivers/crypto/s5p-sss.c:386:40: warning: incorrect type in argument 1 (different address spaces)
-drivers/crypto/s5p-sss.c:386:40:    expected void *<noident>
-drivers/crypto/s5p-sss.c:386:40:    got void [noderef] <asn:2>*
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Signed-off-by: Krzysztof Kozlowski <k.kozlowski.k@gmail.com>
----
- drivers/crypto/s5p-sss.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index e10284744fd2..5f161a9777e3 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -383,7 +383,7 @@ static void s5p_set_aes(struct s5p_aes_dev *dev,
- 	void __iomem *keystart;
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index 7591928..d199c0b 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -118,6 +118,7 @@ static int crypto_init_skcipher_ops_blkcipher(struct crypto_tfm *tfm)
+ 	skcipher->decrypt = skcipher_decrypt_blkcipher;
  
- 	if (iv)
--		memcpy(dev->aes_ioaddr + SSS_REG_AES_IV_DATA(0), iv, 0x10);
-+		memcpy_toio(dev->aes_ioaddr + SSS_REG_AES_IV_DATA(0), iv, 0x10);
+ 	skcipher->ivsize = crypto_blkcipher_ivsize(blkcipher);
++	skcipher->has_setkey = calg->cra_blkcipher.max_keysize;
  
- 	if (keylen == AES_KEYSIZE_256)
- 		keystart = dev->aes_ioaddr + SSS_REG_AES_KEY_DATA(0);
-@@ -392,7 +392,7 @@ static void s5p_set_aes(struct s5p_aes_dev *dev,
- 	else
- 		keystart = dev->aes_ioaddr + SSS_REG_AES_KEY_DATA(4);
+ 	return 0;
+ }
+@@ -210,6 +211,7 @@ static int crypto_init_skcipher_ops_ablkcipher(struct crypto_tfm *tfm)
+ 	skcipher->ivsize = crypto_ablkcipher_ivsize(ablkcipher);
+ 	skcipher->reqsize = crypto_ablkcipher_reqsize(ablkcipher) +
+ 			    sizeof(struct ablkcipher_request);
++	skcipher->has_setkey = calg->cra_ablkcipher.max_keysize;
  
--	memcpy(keystart, key, keylen);
-+	memcpy_toio(keystart, key, keylen);
+ 	return 0;
+ }
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index d8dd41f..fd8742a 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -61,6 +61,8 @@ struct crypto_skcipher {
+ 	unsigned int ivsize;
+ 	unsigned int reqsize;
+ 
++	bool has_setkey;
++
+ 	struct crypto_tfm base;
+ };
+ 
+@@ -305,6 +307,11 @@ static inline int crypto_skcipher_setkey(struct crypto_skcipher *tfm,
+ 	return tfm->setkey(tfm, key, keylen);
  }
  
- static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
++static inline bool crypto_skcipher_has_setkey(struct crypto_skcipher *tfm)
++{
++	return tfm->has_setkey;
++}
++
+ /**
+  * crypto_skcipher_reqtfm() - obtain cipher handle from request
+  * @req: skcipher_request out of which the cipher handle is to be obtained
 -- 
-2.1.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
