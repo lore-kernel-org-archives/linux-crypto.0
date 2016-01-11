@@ -1,51 +1,53 @@
-From: Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH 2/2] crypto: algif_skcipher - Add key check exception for
- cipher_null
-Date: Mon, 11 Jan 2016 15:59:40 +0100
-Message-ID: <5693C35C.1090906@gmail.com>
-References: <56883096.1020009@gmail.com>
- <20160103013126.GA30385@gondor.apana.org.au> <5688ED04.4090802@gmail.com>
- <20160104043518.GA4411@gondor.apana.org.au> <568A66B2.4090307@gmail.com>
- <20160108124851.GA5425@gondor.apana.org.au> <568FFE18.6090900@gmail.com>
- <20160109054103.GA11188@gondor.apana.org.au> <5690DD9C.4010408@gmail.com>
- <20160111132650.GA25134@gondor.apana.org.au>
- <20160111132941.GA25260@gondor.apana.org.au>
+From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Subject: Re: [RFC PATCH 0/2] Crypto kernel TLS socket
+Date: Mon, 11 Jan 2016 16:12:44 +0100
+Message-ID: <CAJU7za+TgKsOr64o3YnMicDrhZ8hx0rdjAU+EKrmQ8Qj=s2FVA@mail.gmail.com>
+References: <cover.1448299690.git.davejwatson@fb.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Stephan Mueller <smueller@chronox.de>,
-	Dmitry Vyukov <dvyukov@google.com>, syzkaller@googlegroups.com,
-	davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kcc@google.com, glider@google.com,
-	edumazet@google.com, sasha.levin@oracle.com, keescook@google.com,
-	Ondrej Kozina <okozina@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160111132941.GA25260@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+To: netdev@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <cover.1448299690.git.davejwatson@fb.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 01/11/2016 02:29 PM, Herbert Xu wrote:
-> This patch adds an exception to the key check so that cipher_null
-> users may continue to use algif_skcipher without setting a key.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-> index 110bab4..4a5bdb6 100644
-> --- a/crypto/algif_skcipher.c
-> +++ b/crypto/algif_skcipher.c
-> @@ -978,7 +978,7 @@ static int skcipher_accept_parent(void *private, struct sock *sk)
->  {
->  	struct skcipher_tfm *tfm = private;
->  
-> -	if (!tfm->has_key)
-> +	if (!tfm->has_key && crypto_skcipher_has_setkey(tfm->skcipher))
->  		return -ENOKEY;
->  
->  	return skcipher_accept_parent_common(private, sk);
+On Mon, Nov 23, 2015 at 6:42 PM, Dave Watson <davejwatson@fb.com> wrote:
+> An approach for a kernel TLS socket.
+> Only the symmetric encryption / decryption is done in-kernel, as well
+> as minimal framing handling.  The handshake is kept in userspace, and
+> the negotiated cipher / keys / IVs are then set on the algif_tls
+> socket, which is then hooked in to a tcp socket using
+> sk_write_space/sk_data_ready hooks.
+> If a non application-data TLS record is seen, it is left on the TCP
+> socket and an error is returned on the ALG socket, and the record is
+> left for userspace to manage. Userspace can't ignore the message, but
+> could just close the socket.
+> TLS could potentially also be done directly on the TCP socket, but
+> seemed a bit harder to work with the OOB data for non application_data
+> messages, and the sockopts / CMSGS already exist for ALG sockets.  The
+> flip side is having to manage two fds in userspace.
+> Some reasons we're looking at this:
+>
+> 1) Access to sendfile/splice for CDN-type applications.  We were
+>    inspired by Netflix exploring this in FreeBSD
+>
+>    https://people.freebsd.org/~rrs/asiabsd_2015_tls.pdf
+>
+>    For perf, this patch is almost on par with userspace OpenSSL.
+>    Currently there are some copies and allocs to support
+>    scatter/gather in aesni-intel_glue.c, but with some extra work to
+>    remove those (not included here), a sendfile() is faster than the
+>    equivalent userspace read/SSL_write using a 128k buffer by 2~7%.
 
-Reported-and-tested-by: Milan Broz <gmazyland@gmail.com>
+Hi,
+ That's quite an interesting feature as we were investigating
+something similar for openconnect VPN. One additional argument for
+such functionality is the acceleration of SSL VPNs. With a TLS (or
+DTLS) socket one could avoid expensive copies from tun to userspace
+and then to network layer and vice versa. The tricky part would be how
+easy one could switch from the kernel TLS implementation to userspace
+TLS implementation (e.g., to perform a rehandshake) and vice versa.
 
-Thanks,
-Milan
+regards,
+Nikos
