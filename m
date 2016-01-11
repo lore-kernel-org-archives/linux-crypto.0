@@ -1,9 +1,9 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/2] crypto: skcipher - Add crypto_skcipher_has_setkey
-Date: Mon, 11 Jan 2016 21:26:50 +0800
-Message-ID: <20160111132650.GA25134@gondor.apana.org.au>
-References: <1647086.cdlVYfuqk1@myon.chronox.de>
- <56883096.1020009@gmail.com>
+Subject: [PATCH 2/2] crypto: algif_skcipher - Add key check exception for
+ cipher_null
+Date: Mon, 11 Jan 2016 21:29:41 +0800
+Message-ID: <20160111132941.GA25260@gondor.apana.org.au>
+References: <56883096.1020009@gmail.com>
  <20160103013126.GA30385@gondor.apana.org.au>
  <5688ED04.4090802@gmail.com>
  <20160104043518.GA4411@gondor.apana.org.au>
@@ -12,6 +12,7 @@ References: <1647086.cdlVYfuqk1@myon.chronox.de>
  <568FFE18.6090900@gmail.com>
  <20160109054103.GA11188@gondor.apana.org.au>
  <5690DD9C.4010408@gmail.com>
+ <20160111132650.GA25134@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Stephan Mueller <smueller@chronox.de>,
@@ -23,60 +24,28 @@ Cc: Stephan Mueller <smueller@chronox.de>,
 To: Milan Broz <gmazyland@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <5690DD9C.4010408@gmail.com>
+In-Reply-To: <20160111132650.GA25134@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds a way for skcipher users to determine whether a key
-is required by a transform.
+This patch adds an exception to the key check so that cipher_null
+users may continue to use algif_skcipher without setting a key.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 7591928..d199c0b 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -118,6 +118,7 @@ static int crypto_init_skcipher_ops_blkcipher(struct crypto_tfm *tfm)
- 	skcipher->decrypt = skcipher_decrypt_blkcipher;
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 110bab4..4a5bdb6 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -978,7 +978,7 @@ static int skcipher_accept_parent(void *private, struct sock *sk)
+ {
+ 	struct skcipher_tfm *tfm = private;
  
- 	skcipher->ivsize = crypto_blkcipher_ivsize(blkcipher);
-+	skcipher->has_setkey = calg->cra_blkcipher.max_keysize;
+-	if (!tfm->has_key)
++	if (!tfm->has_key && crypto_skcipher_has_setkey(tfm->skcipher))
+ 		return -ENOKEY;
  
- 	return 0;
- }
-@@ -210,6 +211,7 @@ static int crypto_init_skcipher_ops_ablkcipher(struct crypto_tfm *tfm)
- 	skcipher->ivsize = crypto_ablkcipher_ivsize(ablkcipher);
- 	skcipher->reqsize = crypto_ablkcipher_reqsize(ablkcipher) +
- 			    sizeof(struct ablkcipher_request);
-+	skcipher->has_setkey = calg->cra_ablkcipher.max_keysize;
- 
- 	return 0;
- }
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index d8dd41f..fd8742a 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -61,6 +61,8 @@ struct crypto_skcipher {
- 	unsigned int ivsize;
- 	unsigned int reqsize;
- 
-+	bool has_setkey;
-+
- 	struct crypto_tfm base;
- };
- 
-@@ -305,6 +307,11 @@ static inline int crypto_skcipher_setkey(struct crypto_skcipher *tfm,
- 	return tfm->setkey(tfm, key, keylen);
- }
- 
-+static inline bool crypto_skcipher_has_setkey(struct crypto_skcipher *tfm)
-+{
-+	return tfm->has_setkey;
-+}
-+
- /**
-  * crypto_skcipher_reqtfm() - obtain cipher handle from request
-  * @req: skcipher_request out of which the cipher handle is to be obtained
+ 	return skcipher_accept_parent_common(private, sk);
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
