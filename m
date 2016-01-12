@@ -1,212 +1,251 @@
 From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: crypto: ablk_decrypt causes BUG in scatterwalk
-Date: Tue, 12 Jan 2016 19:10:21 +0100
-Message-ID: <CACT4Y+ZO8ExkhjwHzEMwzDY_UGS8yEGY5b4CCyYt-UQ9jWFtcQ@mail.gmail.com>
-References: <CACT4Y+bjJ9Hs-jT1SAWZS95xnr+dxP-1H8jGb8u7XzpEZKDX8Q@mail.gmail.com>
- <20160112131644.GA906@gondor.apana.org.au> <CACT4Y+awm8d-tjVJi8RZdTh0zAP9PqXYcWDzc9xQV=RLbKKtuw@mail.gmail.com>
- <CACT4Y+aFyPyZHV5TnW_Z_MMgEunS0F1V-dvBqzSbSGeWU_TNYw@mail.gmail.com> <CACT4Y+Y6NFH1Q9=HCW=jYmCKRewnjUpWD6Xv-+F5B5=APWFT6A@mail.gmail.com>
+Subject: crypto: use-after-free in hash_sock_destruct_common
+Date: Tue, 12 Jan 2016 19:31:03 +0100
+Message-ID: <CACT4Y+YP0Ppj41P9mX1SPSEXkV=ffe0vuK1Ap7r0Ub8GROD5nQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+Content-Transfer-Encoding: 8BIT
+Cc: syzkaller <syzkaller@googlegroups.com>,
 	Kostya Serebryany <kcc@google.com>,
 	Alexander Potapenko <glider@google.com>,
 	Sasha Levin <sasha.levin@oracle.com>,
 	Eric Dumazet <edumazet@google.com>
-To: syzkaller <syzkaller@googlegroups.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:34813 "EHLO
-	mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751515AbcALSKm (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jan 2016 13:10:42 -0500
-Received: by mail-wm0-f47.google.com with SMTP id u188so266914532wmu.1
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Jan 2016 10:10:41 -0800 (PST)
-In-Reply-To: <CACT4Y+Y6NFH1Q9=HCW=jYmCKRewnjUpWD6Xv-+F5B5=APWFT6A@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jan 12, 2016 at 6:09 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
-> I can _not_ reproduce it on clean upstream tree, nor on
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git.
-> I probably messed up something with the unmerged fixes during my rebase.
-> Sorry.
+Hello,
 
-Wait, no. I can reproduce it on
+The following program triggers use-after-free in
+hash_sock_destruct_common. This is on master of
 git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-master (cd7e98414462b9db70067ac29896c58210b13b69). The difference was
-in .config. Below is my config grep CRYPTO.
-Please try to reproduce it with this config.
+(cd7e98414462b9db70067ac29896c58210b13b69). I've also seen a similar
+crash in skcipher_sock_destruct_common.
 
-CONFIG_BLK_DEV_CRYPTOLOOP=y
-CONFIG_RTLLIB_CRYPTO_CCMP=m
-CONFIG_RTLLIB_CRYPTO_TKIP=m
-CONFIG_RTLLIB_CRYPTO_WEP=m
-# CONFIG_CRYPTO_SKEIN is not set
-CONFIG_CRYPTO=y
-CONFIG_CRYPTO_ALGAPI=y
-CONFIG_CRYPTO_ALGAPI2=y
-CONFIG_CRYPTO_AEAD=y
-CONFIG_CRYPTO_AEAD2=y
-CONFIG_CRYPTO_BLKCIPHER=y
-CONFIG_CRYPTO_BLKCIPHER2=y
-CONFIG_CRYPTO_HASH=y
-CONFIG_CRYPTO_HASH2=y
-CONFIG_CRYPTO_RNG=y
-CONFIG_CRYPTO_RNG2=y
-CONFIG_CRYPTO_RNG_DEFAULT=y
-CONFIG_CRYPTO_PCOMP=y
-CONFIG_CRYPTO_PCOMP2=y
-CONFIG_CRYPTO_AKCIPHER2=y
-CONFIG_CRYPTO_AKCIPHER=y
-CONFIG_CRYPTO_RSA=y
-CONFIG_CRYPTO_MANAGER=y
-CONFIG_CRYPTO_MANAGER2=y
-CONFIG_CRYPTO_USER=y
-# CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
-CONFIG_CRYPTO_GF128MUL=y
-CONFIG_CRYPTO_NULL=y
-CONFIG_CRYPTO_NULL2=y
-CONFIG_CRYPTO_PCRYPT=y
-CONFIG_CRYPTO_WORKQUEUE=y
-CONFIG_CRYPTO_CRYPTD=y
-CONFIG_CRYPTO_MCRYPTD=y
-CONFIG_CRYPTO_AUTHENC=y
-# CONFIG_CRYPTO_TEST is not set
-CONFIG_CRYPTO_ABLK_HELPER=y
-CONFIG_CRYPTO_GLUE_HELPER_X86=y
-CONFIG_CRYPTO_CCM=y
-CONFIG_CRYPTO_GCM=y
-CONFIG_CRYPTO_CHACHA20POLY1305=y
-CONFIG_CRYPTO_SEQIV=y
-CONFIG_CRYPTO_ECHAINIV=y
-CONFIG_CRYPTO_CBC=y
-CONFIG_CRYPTO_CTR=y
-CONFIG_CRYPTO_CTS=y
-CONFIG_CRYPTO_ECB=y
-CONFIG_CRYPTO_LRW=y
-CONFIG_CRYPTO_PCBC=y
-CONFIG_CRYPTO_XTS=y
-CONFIG_CRYPTO_KEYWRAP=y
-CONFIG_CRYPTO_CMAC=y
-CONFIG_CRYPTO_HMAC=y
-CONFIG_CRYPTO_XCBC=y
-CONFIG_CRYPTO_VMAC=y
-CONFIG_CRYPTO_CRC32C=y
-CONFIG_CRYPTO_CRC32C_INTEL=y
-CONFIG_CRYPTO_CRC32=y
-CONFIG_CRYPTO_CRC32_PCLMUL=y
-CONFIG_CRYPTO_CRCT10DIF=y
-CONFIG_CRYPTO_CRCT10DIF_PCLMUL=y
-CONFIG_CRYPTO_GHASH=y
-CONFIG_CRYPTO_POLY1305=y
-CONFIG_CRYPTO_POLY1305_X86_64=y
-CONFIG_CRYPTO_MD4=y
-CONFIG_CRYPTO_MD5=y
-CONFIG_CRYPTO_MICHAEL_MIC=y
-CONFIG_CRYPTO_RMD128=y
-CONFIG_CRYPTO_RMD160=y
-CONFIG_CRYPTO_RMD256=y
-CONFIG_CRYPTO_RMD320=y
-CONFIG_CRYPTO_SHA1=y
-CONFIG_CRYPTO_SHA1_SSSE3=y
-CONFIG_CRYPTO_SHA256_SSSE3=y
-CONFIG_CRYPTO_SHA512_SSSE3=y
-CONFIG_CRYPTO_SHA1_MB=y
-CONFIG_CRYPTO_SHA256=y
-CONFIG_CRYPTO_SHA512=y
-CONFIG_CRYPTO_TGR192=y
-CONFIG_CRYPTO_WP512=y
-CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL=y
-CONFIG_CRYPTO_AES=y
-CONFIG_CRYPTO_AES_X86_64=y
-CONFIG_CRYPTO_AES_NI_INTEL=y
-CONFIG_CRYPTO_ANUBIS=y
-CONFIG_CRYPTO_ARC4=y
-CONFIG_CRYPTO_BLOWFISH=y
-CONFIG_CRYPTO_BLOWFISH_COMMON=y
-CONFIG_CRYPTO_BLOWFISH_X86_64=y
-CONFIG_CRYPTO_CAMELLIA=y
-CONFIG_CRYPTO_CAMELLIA_X86_64=y
-CONFIG_CRYPTO_CAMELLIA_AESNI_AVX_X86_64=y
-CONFIG_CRYPTO_CAMELLIA_AESNI_AVX2_X86_64=y
-CONFIG_CRYPTO_CAST_COMMON=y
-CONFIG_CRYPTO_CAST5=y
-CONFIG_CRYPTO_CAST5_AVX_X86_64=y
-CONFIG_CRYPTO_CAST6=y
-CONFIG_CRYPTO_CAST6_AVX_X86_64=y
-CONFIG_CRYPTO_DES=y
-CONFIG_CRYPTO_DES3_EDE_X86_64=y
-CONFIG_CRYPTO_FCRYPT=y
-CONFIG_CRYPTO_KHAZAD=y
-CONFIG_CRYPTO_SALSA20=y
-CONFIG_CRYPTO_SALSA20_X86_64=y
-CONFIG_CRYPTO_CHACHA20=y
-CONFIG_CRYPTO_CHACHA20_X86_64=y
-CONFIG_CRYPTO_SEED=y
-CONFIG_CRYPTO_SERPENT=y
-CONFIG_CRYPTO_SERPENT_SSE2_X86_64=y
-CONFIG_CRYPTO_SERPENT_AVX_X86_64=y
-CONFIG_CRYPTO_SERPENT_AVX2_X86_64=y
-CONFIG_CRYPTO_TEA=y
-CONFIG_CRYPTO_TWOFISH=y
-CONFIG_CRYPTO_TWOFISH_COMMON=y
-CONFIG_CRYPTO_TWOFISH_X86_64=y
-CONFIG_CRYPTO_TWOFISH_X86_64_3WAY=y
-CONFIG_CRYPTO_TWOFISH_AVX_X86_64=y
-CONFIG_CRYPTO_DEFLATE=y
-CONFIG_CRYPTO_ZLIB=y
-CONFIG_CRYPTO_LZO=y
-CONFIG_CRYPTO_842=y
-CONFIG_CRYPTO_LZ4=y
-CONFIG_CRYPTO_LZ4HC=y
-CONFIG_CRYPTO_ANSI_CPRNG=y
-CONFIG_CRYPTO_DRBG_MENU=y
-CONFIG_CRYPTO_DRBG_HMAC=y
-# CONFIG_CRYPTO_DRBG_HASH is not set
-# CONFIG_CRYPTO_DRBG_CTR is not set
-CONFIG_CRYPTO_DRBG=y
-CONFIG_CRYPTO_JITTERENTROPY=y
-CONFIG_CRYPTO_USER_API=y
-CONFIG_CRYPTO_USER_API_HASH=y
-CONFIG_CRYPTO_USER_API_SKCIPHER=y
-CONFIG_CRYPTO_USER_API_RNG=y
-CONFIG_CRYPTO_USER_API_AEAD=y
-CONFIG_CRYPTO_HASH_INFO=y
-CONFIG_CRYPTO_HW=y
-# CONFIG_CRYPTO_DEV_PADLOCK is not set
-# CONFIG_CRYPTO_DEV_CCP is not set
-# CONFIG_CRYPTO_DEV_QAT_DH895xCC is not set
-# CONFIG_CRYPTO_DEV_QAT_DH895xCCVF is not set
+// autogenerated by syzkaller (http://github.com/google/syzkaller)
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <string.h>
+#include <stdint.h>
+#include <pthread.h>
 
+int fd;
 
+void *thr(void *arg)
+{
+        switch ((long)arg) {
+        case 0:
+                break;
+        case 1:
+                break;
+        case 2:
+                *(uint16_t*)0x20023000 = (uint16_t)0x26;
+                memcpy((void*)0x20023002,
+"\x68\x61\x73\x68\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 14);
+                *(uint32_t*)0x20023010 = (uint32_t)0x2000;
+                *(uint32_t*)0x20023014 = (uint32_t)0x84;
+                memcpy((void*)0x20023018,
+"\x74\x67\x72\x31\x36\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+64);
+                syscall(SYS_bind, fd, 0x20023000ul, 0x58ul, 0, 0, 0);
+                break;
+        case 3:
+                syscall(SYS_accept, fd, 0x0ul, 0x2000affcul, 0, 0, 0);
+                break;
+        }
+        return 0;
+}
 
+int main()
+{
+        long i;
+        pthread_t th[4];
 
+        fd = syscall(SYS_socket, 0x26ul, 0x5ul, 0x0ul, 0, 0, 0);
+        syscall(SYS_mmap, 0x20000000ul, 0x28000ul, 0x3ul, 0x32ul,
+0xfffffffffffffffful, 0x0ul);
+        for (i = 0; i < 4; i++) {
+                pthread_create(&th[i], 0, thr, (void*)i);
+                usleep(10000);
+        }
+        for (i = 0; i < 4; i++) {
+                pthread_create(&th[i], 0, thr, (void*)i);
+                if (i%2==0)
+                        usleep(10000);
+        }
+        usleep(100000);
+        return 0;
+}
 
-> On Tue, Jan 12, 2016 at 5:27 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
->> On Tue, Jan 12, 2016 at 2:23 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
->>> On Tue, Jan 12, 2016 at 2:16 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->>>> On Tue, Jan 12, 2016 at 10:27:44AM +0100, Dmitry Vyukov wrote:
->>>>> Hello,
->>>>>
->>>>> The following program cause BUG in scatterwalk:
->>>>
->>>> Weird, I can't reproduce the crash.  Can you perhaps convert this to
->>>> a non-racy reproduction, possibly by using strace to find the order
->>>> of execution that leads to the crash?
->>>
->>>
->>> Concurrent execution seems to be important to reproduce the crash. I
->>> wasn't able to reproduce it in single-threaded mode.
->>> Try to run it in a tight parallel loop for some time.
->>
->>
->> I've extracted another reproducer:
->> https://gist.githubusercontent.com/dvyukov/94aed45494edf1dff0a8/raw/a31f439fdcdd8a8905235a9bce6e5863ca8ccf68/gistfile1.txt
->>
->> I don't know whether there is a simpler way to run a reproducer in a
->> tight parallel loop, but I use:
->> $ go get golang.org/x/tools/cmd/stress
->> $ GOPATH/bin/stress -p 16 ./a.out
->>
->> It triggers the BUG within seconds for me.
+==================================================================
+BUG: KASAN: use-after-free in hash_sock_destruct_common+0x12b/0x160 at
+addr ffff880064550490
+Read of size 8 by task a.out/6513
+=============================================================================
+BUG kmalloc-192 (Not tainted): kasan: bad access detected
+-----------------------------------------------------------------------------
+
+Disabling lock debugging due to kernel taint
+INFO: Allocated in crypto_create_tfm+0x7a/0x210 age=147 cpu=2 pid=6516
+[<      none      >] __slab_alloc+0x535/0x5d0 mm/slub.c:2399
+[<     inline     >] slab_alloc_node mm/slub.c:2467
+[<     inline     >] slab_alloc mm/slub.c:2509
+[<      none      >] __kmalloc+0x2cd/0x370 mm/slub.c:3414
+[<     inline     >] kmalloc include/linux/slab.h:445
+[<     inline     >] kzalloc include/linux/slab.h:593
+[<      none      >] crypto_create_tfm+0x7a/0x210 crypto/api.c:470
+[<      none      >] crypto_alloc_tfm+0x11d/0x330 crypto/api.c:555
+[<      none      >] crypto_alloc_ahash+0x14/0x20 crypto/ahash.c:541
+[<      none      >] hash_bind+0x66/0xe0 crypto/algif_hash.c:357
+[<      none      >] alg_bind+0x179/0x3c0 crypto/af_alg.c:175
+[<      none      >] SYSC_bind+0x1ae/0x210 net/socket.c:1383
+[<      none      >] SyS_bind+0x9/0x10 net/socket.c:1369
+[<      none      >] entry_SYSCALL_64_fastpath+0x16/0x7a
+arch/x86/entry/entry_64.S:185
+INFO: Freed in kzfree+0x28/0x30 age=121 cpu=3 pid=6520
+[<      none      >] __slab_free+0x1e7/0x310 mm/slub.c:2584
+[<     inline     >] slab_free mm/slub.c:2733
+[<      none      >] kfree+0x29f/0x2c0 mm/slub.c:3514
+[<      none      >] kzfree+0x28/0x30 mm/slab_common.c:1270
+[<      none      >] crypto_destroy_tfm+0xac/0x150 crypto/api.c:596
+[<     inline     >] crypto_free_ahash include/crypto/hash.h:259
+[<      none      >] hash_release+0x2b/0x40 crypto/algif_hash.c:372
+[<     inline     >] alg_do_release crypto/af_alg.c:118
+[<      none      >] alg_bind+0x269/0x3c0 crypto/af_alg.c:196
+[<      none      >] SYSC_bind+0x1ae/0x210 net/socket.c:1383
+[<      none      >] SyS_bind+0x9/0x10 net/socket.c:1369
+[<      none      >] entry_SYSCALL_64_fastpath+0x16/0x7a
+arch/x86/entry/entry_64.S:185
+INFO: Slab 0xffffea0001915400 objects=16 used=9 fp=0xffff880064550400
+flags=0x5fffc0000004080
+INFO: Object 0xffff880064550400 @offset=1024 fp=0xffff880064550e00
+
+Bytes b4 ffff8800645503f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00  ................
+Object ffff880064550400: 00 0e 55 64 00 88 ff ff 00 00 00 00 00 00 00
+00  ..Ud............
+Object ffff880064550410: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00  ................
+Object ffff880064550420: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00  ................
+Object ffff880064550430: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00  ................
+Object ffff880064550440: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00  ................
+Object ffff880064550450: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00  ................
+Object ffff880064550460: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00  ................
+Object ffff880064550470: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00  ................
+Object ffff880064550480: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00  ................
+Object ffff880064550490: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00  ................
+Object ffff8800645504a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00  ................
+Object ffff8800645504b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00  ................
+Redzone ffff8800645504c0: bb bb bb bb bb bb bb bb
+    ........
+Padding ffff8800645505f8: 00 00 00 00 00 00 00 00
+    ........
+CPU: 1 PID: 6513 Comm: a.out Tainted: G    B           4.4.0-rc1+ #3
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/2011
+ ffff880064550000 ffff8800340a7a88 ffffffff828b0ea7 ffff88003e804a00
+ ffff8800340a7ab8 ffffffff816fa734 ffff88003e804a00 ffffea0001915400
+ ffff880064550400 0000000000000000 ffff8800340a7ae0 ffffffff81700c9f
+Call Trace:
+ [<     inline     >] __dump_stack lib/dump_stack.c:15
+ [<ffffffff828b0ea7>] dump_stack+0x4b/0x64 lib/dump_stack.c:50
+ [<ffffffff816fa734>] print_trailer+0xf4/0x150 mm/slub.c:652
+ [<ffffffff81700c9f>] object_err+0x2f/0x40 mm/slub.c:659
+ [<     inline     >] print_address_description mm/kasan/report.c:138
+ [<ffffffff817034d6>] kasan_report_error+0x206/0x520 mm/kasan/report.c:236
+ [<     inline     >] kasan_report mm/kasan/report.c:259
+ [<ffffffff817038ee>] __asan_report_load8_noabort+0x3e/0x40
+mm/kasan/report.c:280
+ [<     inline     >] crypto_ahash_digestsize include/crypto/hash.h:291
+ [<ffffffff827f12ab>] hash_sock_destruct_common+0x12b/0x160
+crypto/algif_hash.c:393
+ [<ffffffff827f1e6d>] hash_sock_destruct_nokey+0xd/0x90 crypto/algif_hash.c:417
+ [<ffffffff84d122cf>] sk_destruct+0x3f/0x420 net/core/sock.c:1448
+ [<ffffffff84d126ff>] __sk_free+0x4f/0x1e0 net/core/sock.c:1476
+ [<ffffffff84d128a3>] sk_free+0x13/0x20 net/core/sock.c:1487
+ [<     inline     >] sock_put include/net/sock.h:1623
+ [<ffffffff827f035f>] af_alg_release+0x3f/0x50 crypto/af_alg.c:125
+ [<ffffffff84cfdaa3>] sock_release+0x83/0x1a0 net/socket.c:571
+ [<ffffffff84cfdbcd>] sock_close+0xd/0x20 net/socket.c:1022
+ [<ffffffff81749d70>] __fput+0x210/0x750 fs/file_table.c:208
+ [<ffffffff8174a319>] ____fput+0x9/0x10 fs/file_table.c:244
+ [<ffffffff81388992>] task_work_run+0x132/0x200 kernel/task_work.c:115
+ [<     inline     >] exit_task_work include/linux/task_work.h:21
+ [<ffffffff8133989b>] do_exit+0x7fb/0x2be0 kernel/exit.c:748
+ [<ffffffff8133bdb4>] do_group_exit+0xf4/0x2f0 kernel/exit.c:878
+ [<     inline     >] SYSC_exit_group kernel/exit.c:889
+ [<ffffffff8133bfc8>] SyS_exit_group+0x18/0x20 kernel/exit.c:887
+ [<ffffffff85e519f6>] entry_SYSCALL_64_fastpath+0x16/0x7a
+arch/x86/entry/entry_64.S:185
+Memory state around the buggy address:
+ ffff880064550380: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff880064550400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff880064550480: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+                         ^
+ ffff880064550500: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff880064550580: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+BUG: unable to handle kernel paging request at fffffffffffffff8
+IP: [<ffffffff827f1238>] hash_sock_destruct_common+0xb8/0x160
+crypto/algif_hash.c:392
+PGD 6fa5067 PUD 6fa7067 PMD 0
+Oops: 0000 [#1] SMP DEBUG_PAGEALLOC KASAN
+Modules linked in:
+CPU: 1 PID: 6513 Comm: a.out Tainted: G    B           4.4.0-rc1+ #3
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/2011
+task: ffff880037bbc380 ti: ffff8800340a0000 task.ti: ffff8800340a0000
+RIP: 0010:[<ffffffff827f1238>]  [<ffffffff827f1238>]
+hash_sock_destruct_common+0xb8/0x160
+RSP: 0018:ffff8800340a7ba8  EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: ffff8800663740c0 RCX: 0000000000000000
+RDX: 1fffffffffffffff RSI: 0000000000000001 RDI: ffff8800663743f0
+RBP: ffff8800340a7bc8 R08: 0000000000000001 R09: 0000000000000000
+R10: ffffffff861e0380 R11: 0000000000000000 R12: ffff880066373780
+R13: 0000000000000000 R14: 0000000000000000 R15: ffff880067e92110
+FS:  0000000000000000(0000) GS:ffff88003ed00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: fffffffffffffff8 CR3: 0000000006fa2000 CR4: 00000000000006e0
+Stack:
+ 0000000000000000 ffff880066373780 ffffffff8738c1e0 ffff8800665ff828
+ ffff8800340a7be0 ffffffff827f1e6d ffff880066373780 ffff8800340a7c08
+ ffffffff84d122cf ffff880066373780 ffffffff8738c1e0 ffff8800665ff828
+Call Trace:
+ [<ffffffff827f1e6d>] hash_sock_destruct_nokey+0xd/0x90 crypto/algif_hash.c:417
+ [<ffffffff84d122cf>] sk_destruct+0x3f/0x420 net/core/sock.c:1448
+ [<ffffffff84d126ff>] __sk_free+0x4f/0x1e0 net/core/sock.c:1476
+ [<ffffffff84d128a3>] sk_free+0x13/0x20 net/core/sock.c:1487
+ [<     inline     >] sock_put include/net/sock.h:1623
+ [<ffffffff827f035f>] af_alg_release+0x3f/0x50 crypto/af_alg.c:125
+ [<ffffffff84cfdaa3>] sock_release+0x83/0x1a0 net/socket.c:571
+ [<ffffffff84cfdbcd>] sock_close+0xd/0x20 net/socket.c:1022
+ [<ffffffff81749d70>] __fput+0x210/0x750 fs/file_table.c:208
+ [<ffffffff8174a319>] ____fput+0x9/0x10 fs/file_table.c:244
+ [<ffffffff81388992>] task_work_run+0x132/0x200 kernel/task_work.c:115
+ [<     inline     >] exit_task_work include/linux/task_work.h:21
+ [<ffffffff8133989b>] do_exit+0x7fb/0x2be0 kernel/exit.c:748
+ [<ffffffff8133bdb4>] do_group_exit+0xf4/0x2f0 kernel/exit.c:878
+ [<     inline     >] SYSC_exit_group kernel/exit.c:889
+ [<ffffffff8133bfc8>] SyS_exit_group+0x18/0x20 kernel/exit.c:887
+ [<ffffffff85e519f6>] entry_SYSCALL_64_fastpath+0x16/0x7a
+arch/x86/entry/entry_64.S:185
+Code: fc ff df 49 8d 7d f8 48 89 fa 48 c1 ea 03 0f b6 04 02 84 c0 74
+04 3c 03 7e 78 48 8d bb 30 03 00 00 48 b8 00 00 00 00 00 fc ff df <41>
+8b 55 f8 48 89 f9 48 c1 e9 03 80 3c 01 00 75 7b 48 8b b3 30
+RIP  [<ffffffff827f1238>] hash_sock_destruct_common+0xb8/0x160
+crypto/algif_hash.c:392
+ RSP <ffff8800340a7ba8>
+CR2: fffffffffffffff8
+---[ end trace 130c2827b1841caa ]---
+Fixing recursive fault but reboot is needed!
