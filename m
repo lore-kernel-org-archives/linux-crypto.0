@@ -1,63 +1,53 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH v2 1/2] crypto: caam - make write transactions bufferable on PPC platforms
-Date: Tue, 12 Jan 2016 17:59:29 +0200
-Message-ID: <1452614369-21252-1-git-send-email-horia.geanta@nxp.com>
-References: <1452611650-15803-2-git-send-email-horia.geanta@nxp.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: crypto: ablk_decrypt causes BUG in scatterwalk
+Date: Tue, 12 Jan 2016 17:27:53 +0100
+Message-ID: <CACT4Y+aFyPyZHV5TnW_Z_MMgEunS0F1V-dvBqzSbSGeWU_TNYw@mail.gmail.com>
+References: <CACT4Y+bjJ9Hs-jT1SAWZS95xnr+dxP-1H8jGb8u7XzpEZKDX8Q@mail.gmail.com>
+ <20160112131644.GA906@gondor.apana.org.au> <CACT4Y+awm8d-tjVJi8RZdTh0zAP9PqXYcWDzc9xQV=RLbKKtuw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Fabio Estevam <fabio.estevam@nxp.com>,
-	Alex Porosanu <alexandru.porosanu@nxp.com>,
-	Scott Wood <scott.wood@nxp.com>, <stable@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	Kostya Serebryany <kcc@google.com>,
+	Alexander Potapenko <glider@google.com>,
+	Sasha Levin <sasha.levin@oracle.com>,
+	Eric Dumazet <edumazet@google.com>
+To: syzkaller <syzkaller@googlegroups.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0089.outbound.protection.outlook.com ([65.55.169.89]:40064
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1761190AbcALP7k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jan 2016 10:59:40 -0500
-In-Reply-To: <1452611650-15803-2-git-send-email-horia.geanta@nxp.com>
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:36891 "EHLO
+	mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753955AbcALQ2N (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Jan 2016 11:28:13 -0500
+Received: by mail-wm0-f43.google.com with SMTP id f206so329234076wmf.0
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Jan 2016 08:28:13 -0800 (PST)
+In-Reply-To: <CACT4Y+awm8d-tjVJi8RZdTh0zAP9PqXYcWDzc9xQV=RLbKKtuw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Previous change (see "Fixes" tag) to the MCFGR register
-clears AWCACHE[0] ("bufferable" AXI3 attribute) (which is "1" at POR).
+On Tue, Jan 12, 2016 at 2:23 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
+> On Tue, Jan 12, 2016 at 2:16 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>> On Tue, Jan 12, 2016 at 10:27:44AM +0100, Dmitry Vyukov wrote:
+>>> Hello,
+>>>
+>>> The following program cause BUG in scatterwalk:
+>>
+>> Weird, I can't reproduce the crash.  Can you perhaps convert this to
+>> a non-racy reproduction, possibly by using strace to find the order
+>> of execution that leads to the crash?
+>
+>
+> Concurrent execution seems to be important to reproduce the crash. I
+> wasn't able to reproduce it in single-threaded mode.
+> Try to run it in a tight parallel loop for some time.
 
-This makes all writes non-bufferable, causing a ~ 5% performance drop
-for PPC-based platforms.
 
-Rework previous change such that MCFGR[AWCACHE]=3D4'b0011
-(bufferable + cacheable) for all platforms.
-Note: For ARM-based platforms, AWCACHE[0] is ignored
-by the interconnect IP.
+I've extracted another reproducer:
+https://gist.githubusercontent.com/dvyukov/94aed45494edf1dff0a8/raw/a31f439fdcdd8a8905235a9bce6e5863ca8ccf68/gistfile1.txt
 
-Cc: <stable@vger.kernel.org> # 4.3+
-=46ixes: f10967495144 ("crypto: caam - fix snooping for write transacti=
-ons")
-Signed-off-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
----
+I don't know whether there is a simpler way to run a reproducer in a
+tight parallel loop, but I use:
+$ go get golang.org/x/tools/cmd/stress
+$ GOPATH/bin/stress -p 16 ./a.out
 
-v2: Cc-ed stable.
-
- drivers/crypto/caam/ctrl.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 8abb4bc548cc..69d4a1326fee 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -534,8 +534,8 @@ static int caam_probe(struct platform_device *pdev)
- 	 * long pointers in master configuration register
- 	 */
- 	clrsetbits_32(&ctrl->mcr, MCFGR_AWCACHE_MASK, MCFGR_AWCACHE_CACH |
--		      MCFGR_WDENABLE | (sizeof(dma_addr_t) =3D=3D sizeof(u64) ?
--					MCFGR_LONG_PTR : 0));
-+		      MCFGR_AWCACHE_BUFF | MCFGR_WDENABLE |
-+		      (sizeof(dma_addr_t) =3D=3D sizeof(u64) ? MCFGR_LONG_PTR : 0));
-=20
- 	/*
- 	 *  Read the Compile Time paramters and SCFGR to determine
---=20
-2.4.4
+It triggers the BUG within seconds for me.
