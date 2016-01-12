@@ -1,41 +1,44 @@
-From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: crypto: ablk_decrypt causes BUG in scatterwalk
-Date: Tue, 12 Jan 2016 14:23:05 +0100
-Message-ID: <CACT4Y+awm8d-tjVJi8RZdTh0zAP9PqXYcWDzc9xQV=RLbKKtuw@mail.gmail.com>
-References: <CACT4Y+bjJ9Hs-jT1SAWZS95xnr+dxP-1H8jGb8u7XzpEZKDX8Q@mail.gmail.com>
- <20160112131644.GA906@gondor.apana.org.au>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH 0/2] crypto: caam - performance fixes/improvements
+Date: Tue, 12 Jan 2016 17:14:08 +0200
+Message-ID: <1452611650-15803-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Kostya Serebryany <kcc@google.com>,
-	Alexander Potapenko <glider@google.com>,
-	Sasha Levin <sasha.levin@oracle.com>,
-	Eric Dumazet <edumazet@google.com>
-To: syzkaller <syzkaller@googlegroups.com>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <linux-crypto@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Fabio Estevam <fabio.estevam@nxp.com>,
+	Alex Porosanu <alexandru.porosanu@nxp.com>,
+	Scott Wood <scott.wood@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:36977 "EHLO
-	mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753093AbcALNX0 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jan 2016 08:23:26 -0500
-Received: by mail-wm0-f54.google.com with SMTP id f206so319967081wmf.0
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Jan 2016 05:23:25 -0800 (PST)
-In-Reply-To: <20160112131644.GA906@gondor.apana.org.au>
+Received: from mail-bn1on0060.outbound.protection.outlook.com ([157.56.110.60]:14559
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S965021AbcALP2s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Jan 2016 10:28:48 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 12, 2016 at 2:16 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Tue, Jan 12, 2016 at 10:27:44AM +0100, Dmitry Vyukov wrote:
->> Hello,
->>
->> The following program cause BUG in scatterwalk:
->
-> Weird, I can't reproduce the crash.  Can you perhaps convert this to
-> a non-racy reproduction, possibly by using strace to find the order
-> of execution that leads to the crash?
+The following patches increase/fix CAAM performance by modifying
+the configuration of MCFGR (Master Configuration Register):
+-1st patch fixes a ~ 5% performance drop on PPC platforms
+-2nd patch improves performance in some use cases, since CAAM DMA
+transfers are optimized
 
 
-Concurrent execution seems to be important to reproduce the crash. I
-wasn't able to reproduce it in single-threaded mode.
-Try to run it in a tight parallel loop for some time.
+Note: AWCACHE[0] (AXI3 "bufferable") and AWCACHE[1] (AXI3 "cacheable")
+are set irrespective of platform, since:
+-for ARM-based SoCs: the interconnect IP ignores AWCACHE[0]
+-for PPC-based SoCs: PAMU handles coherency control, not AWCACHE[1]
+
+Horia Geant=C4=83 (2):
+  crypto: caam - make write transactions bufferable on PPC platforms
+  crypto: caam - enable LARGE_BURST for enhancing DMA transactions size
+
+ drivers/crypto/caam/ctrl.c | 4 ++--
+ drivers/crypto/caam/regs.h | 3 ++-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+--=20
+2.4.4
