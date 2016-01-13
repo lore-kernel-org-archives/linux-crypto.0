@@ -1,28 +1,42 @@
-From: Jari Ruusu <jariruusu@users.sourceforge.net>
-Subject: Announce loop-AES-v3.7g file/swap crypto package
-Date: Wed, 13 Jan 2016 11:36:10 +0200
-Message-ID: <CACMCwJKZWd3xmCSj8X7fxSRCFfsPwzN4OxJ00wJT-URs28RUcw@mail.gmail.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: crypto: use-after-free in hash_sock_destruct_common
+Date: Wed, 13 Jan 2016 11:27:18 +0100
+Message-ID: <CACT4Y+ab_8UnsYzCP6ZhZD_PUCVJ==r_OcO+O+mcd33mqDGozQ@mail.gmail.com>
+References: <CACT4Y+YP0Ppj41P9mX1SPSEXkV=ffe0vuK1Ap7r0Ub8GROD5nQ@mail.gmail.com>
+ <20160113065729.GA8123@gondor.apana.org.au> <CACT4Y+YOiaC1px6SD2hTAGwSd4i8GsTm59uQ+ux1U8EzdoQfPA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-kernel@vger.kernel.org
-To: linux-crypto@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	Kostya Serebryany <kcc@google.com>,
+	Alexander Potapenko <glider@google.com>,
+	Sasha Levin <sasha.levin@oracle.com>,
+	Eric Dumazet <edumazet@google.com>,
+	syzkaller <syzkaller@googlegroups.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CACT4Y+YOiaC1px6SD2hTAGwSd4i8GsTm59uQ+ux1U8EzdoQfPA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-loop-AES changes since previous release:
-- Fixed a bug in util-linux-2.27.1 patch that resulted in /tmp partition
-  with random encryption keys not working at all. If /sbin/mkfs was from
-  older version of util-linux, then this bug did not trigger. This problem
-  was reported by Gabriel Vlasiu.
-- Worked around block layer interface changes on 4.4 kernels.
+On Wed, Jan 13, 2016 at 11:25 AM, Dmitry Vyukov <dvyukov@google.com> wrote:
+> On Wed, Jan 13, 2016 at 7:57 AM, Herbert Xu <herbert@gondor.apana.org.au>
+> wrote:
+>>
+>> On Tue, Jan 12, 2016 at 07:31:03PM +0100, Dmitry Vyukov wrote:
+>> >
+>> > The following program triggers use-after-free in
+>> > hash_sock_destruct_common. This is on master of
+>> > git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+>> > (cd7e98414462b9db70067ac29896c58210b13b69). I've also seen a similar
+>> > crash in skcipher_sock_destruct_common.
+>>
+>> OK the new compatibility nokey path introduced some new problems.
+>> Please try the following patches.
+>
+>
+> Yes, these 4 patches fix the crash for me. Thanks for quick fix!
+>
+> Tested-by: Dmitry Vyukov <dvyukov@google.com>
 
-bzip2 compressed tarball is here:
-
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7g.tar.bz2
-    md5sum 6fb2217b15586295ce949e93538a701d
-
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7g.tar.bz2.sign
-
--- 
-Jari Ruusu  4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD  ACDF F073 3C80 8132 F189
+Oops, resending as plain text.
