@@ -1,38 +1,28 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH RFC 0/7] Introduce new async/sync compression APIs
-Date: Wed, 13 Jan 2016 16:29:27 +0800
-Message-ID: <20160113082927.GA8655@gondor.apana.org.au>
-References: <1451882819-2810-1-git-send-email-iamjoonsoo.kim@lge.com>
- <5694B2B2.7050806@intel.com>
- <20160112124739.GA679@gondor.apana.org.au>
- <20160113083134.GA6966@js1304-P5Q-DELUXE>
+From: Jari Ruusu <jariruusu@users.sourceforge.net>
+Subject: Announce loop-AES-v3.7g file/swap crypto package
+Date: Wed, 13 Jan 2016 11:36:10 +0200
+Message-ID: <CACMCwJKZWd3xmCSj8X7fxSRCFfsPwzN4OxJ00wJT-URs28RUcw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "Li, Weigang" <weigang.li@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-	Minchan Kim <minchan@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Joonsoo Kim <iamjoonsoo.kim@lge.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:39364 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751684AbcAMI3k (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 Jan 2016 03:29:40 -0500
-Content-Disposition: inline
-In-Reply-To: <20160113083134.GA6966@js1304-P5Q-DELUXE>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 13, 2016 at 05:31:34PM +0900, Joonsoo Kim wrote:
->
-> Herbert, for you, is it better to send it after merge window?
+loop-AES changes since previous release:
+- Fixed a bug in util-linux-2.27.1 patch that resulted in /tmp partition
+  with random encryption keys not working at all. If /sbin/mkfs was from
+  older version of util-linux, then this bug did not trigger. This problem
+  was reported by Gabriel Vlasiu.
+- Worked around block layer interface changes on 4.4 kernels.
 
-Yes that would be very much appreciated.
+bzip2 compressed tarball is here:
 
-Thanks,
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7g.tar.bz2
+    md5sum 6fb2217b15586295ce949e93538a701d
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7g.tar.bz2.sign
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jari Ruusu  4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD  ACDF F073 3C80 8132 F189
