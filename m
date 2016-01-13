@@ -1,90 +1,86 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 4/4] crypto: af_alg - Forbid bind(2) when nokey child sockets
- are present
-Date: Wed, 13 Jan 2016 15:03:32 +0800
-Message-ID: <20160113070332.GD8169@gondor.apana.org.au>
-References: <CACT4Y+YP0Ppj41P9mX1SPSEXkV=ffe0vuK1Ap7r0Ub8GROD5nQ@mail.gmail.com>
- <20160113065729.GA8123@gondor.apana.org.au>
- <20160113065903.GA8169@gondor.apana.org.au>
- <20160113070036.GB8169@gondor.apana.org.au>
- <20160113070106.GC8169@gondor.apana.org.au>
+From: Joonsoo Kim <iamjoonsoo.kim@lge.com>
+Subject: Re: [PATCH RFC 0/7] Introduce new async/sync compression APIs
+Date: Wed, 13 Jan 2016 17:31:34 +0900
+Message-ID: <20160113083134.GA6966@js1304-P5Q-DELUXE>
+References: <1451882819-2810-1-git-send-email-iamjoonsoo.kim@lge.com>
+ <5694B2B2.7050806@intel.com>
+ <20160112124739.GA679@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	syzkaller <syzkaller@googlegroups.com>,
-	Kostya Serebryany <kcc@google.com>,
-	Alexander Potapenko <glider@google.com>,
-	Sasha Levin <sasha.levin@oracle.com>,
-	Eric Dumazet <edumazet@google.com>
-To: Dmitry Vyukov <dvyukov@google.com>
+Cc: "Li, Weigang" <weigang.li@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	Minchan Kim <minchan@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:33748 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751436AbcAMHDj (ORCPT
+Received: from LGEAMRELO12.lge.com ([156.147.23.52]:47348 "EHLO
+	lgeamrelo12.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750812AbcAMI2Q (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 Jan 2016 02:03:39 -0500
+	Wed, 13 Jan 2016 03:28:16 -0500
 Content-Disposition: inline
-In-Reply-To: <20160113070106.GC8169@gondor.apana.org.au>
+In-Reply-To: <20160112124739.GA679@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch forbids the calling of bind(2) when there are child
-sockets created by accept(2) in existence, even if they are created
-on the nokey path.
+On Tue, Jan 12, 2016 at 08:47:39PM +0800, Herbert Xu wrote:
+> On Tue, Jan 12, 2016 at 04:00:50PM +0800, Li, Weigang wrote:
+> > On 1/4/2016 12:46 PM, Joonsoo Kim wrote:
+> > >Happy New Year!
+> > >
+> > >This patchset is to introduce new compression APIs. It supports async/sync
+> > >compression although there is no async compression driver yet. But, async
+> > >APIs can be used as front-end to sync compression algorithm. Major change
+> > >is that now APIs are stateless. Instead of previous implementation, tfm
+> > >objects doesn't embedded any context so we can de/compress concurrently
+> > >with one tfm object. Instead, this de/compression context is coupled with
+> > >the request. This architecture change will make APIs more flexible.
+> > >
+> > >This is just a RFC so commit description isn't sufficient. If Herbert
+> > >confirms that this is what he expect, I will respin the series with proper
+> > >commit description and adding more algorithm support.
+> > >
+> > >Thanks.
+> > >
+> > >Joonsoo Kim (6):
+> > >   crypto/compress: remove unused pcomp interface
+> > >   crypto/compress: introduce sychronuous compression API
+> > >   crypto/lzo: support SCOMPRESS alg type
+> > >   crypto: testmgr: add scompress/acompress test
+> > >   crypto/compress: add algorithm type specific flag, DECOMP_NOCTX
+> > >   crypto/lzo: add CRYPTO_ALG_SCOMPRESS_DECOMP_NOCTX cra_flags
+> > >
+> > >Weigang Li (1):
+> > >   crypto: add asynchronous compression support
+> > >
+> > >  crypto/Kconfig                     |  19 +-
+> > >  crypto/Makefile                    |   4 +-
+> > >  crypto/acompress.c                 | 164 ++++++++++++++++
+> > >  crypto/lzo.c                       |  95 +++++++--
+> > >  crypto/pcompress.c                 | 115 -----------
+> > >  crypto/scompress.c                 | 283 +++++++++++++++++++++++++++
+> > >  crypto/testmgr.c                   | 376 +++++++++++++++---------------------
+> > >  crypto/testmgr.h                   | 142 --------------
+> > >  crypto/zlib.c                      | 381 -------------------------------------
+> > >  include/crypto/compress.h          | 354 +++++++++++++++++++++++++---------
+> > >  include/crypto/internal/compress.h |  32 +---
+> > >  include/linux/crypto.h             |  10 +-
+> > >  12 files changed, 969 insertions(+), 1006 deletions(-)
+> > >  create mode 100644 crypto/acompress.c
+> > >  delete mode 100644 crypto/pcompress.c
+> > >  create mode 100644 crypto/scompress.c
+> > >  delete mode 100644 crypto/zlib.c
+> > >
+> > Hello Herbert,
+> > Any comments on this patchset?
+> 
+> The interfaces look good to me.
 
-This is needed as those child sockets have references to the tfm
-object which bind(2) will destroy.
+Thanks for confirmation.
+Then, I will add more algorithm support and respin next version
+with minor fixes.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Herbert, for you, is it better to send it after merge window?
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index e7cb836..f5e18c2 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -130,19 +130,16 @@ EXPORT_SYMBOL_GPL(af_alg_release);
- void af_alg_release_parent(struct sock *sk)
- {
- 	struct alg_sock *ask = alg_sk(sk);
--	bool last;
-+	unsigned int nokey = ask->nokey_refcnt;
-+	bool last = nokey && !ask->refcnt;
- 
- 	sk = ask->parent;
--
--	if (ask->nokey_refcnt && !ask->refcnt) {
--		sock_put(sk);
--		return;
--	}
--
- 	ask = alg_sk(sk);
- 
- 	lock_sock(sk);
--	last = !--ask->refcnt;
-+	ask->nokey_refcnt -= nokey;
-+	if (!last)
-+		last = !--ask->refcnt;
- 	release_sock(sk);
- 
- 	if (last)
-@@ -188,7 +185,7 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
- 
- 	err = -EBUSY;
- 	lock_sock(sk);
--	if (ask->refcnt)
-+	if (ask->refcnt | ask->nokey_refcnt)
- 		goto unlock;
- 
- 	swap(ask->type, type);
-@@ -306,6 +303,7 @@ int af_alg_accept(struct sock *sk, struct socket *newsock)
- 
- 	if (nokey || !ask->refcnt++)
- 		sock_hold(sk);
-+	ask->nokey_refcnt += nokey;
- 	alg_sk(sk2)->parent = sk;
- 	alg_sk(sk2)->type = type;
- 	alg_sk(sk2)->nokey_refcnt = nokey;
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks.
