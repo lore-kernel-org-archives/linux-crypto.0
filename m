@@ -1,70 +1,45 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH 4.3.y] crypto: fix test vector for rsa
-Date: Wed, 13 Jan 2016 20:57:40 -0800
-Message-ID: <56972AC4.4010501@intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 0/2] crypto: Fix race condition in *_check_key
+Date: Thu, 14 Jan 2016 22:13:41 +0800
+Message-ID: <20160114141341.GA21300@gondor.apana.org.au>
+References: <CACT4Y+ap-GiGRjwWr9kDwMNwQOg5TbJfi8kGD2H2Qv5SBrQK4Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-	David Howells <dhowells@redhat.com>
-To: Greg KH <gregkh@linuxfoundation.org>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	syzkaller <syzkaller@googlegroups.com>,
+	Kostya Serebryany <kcc@google.com>,
+	Alexander Potapenko <glider@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Sasha Levin <sasha.levin@oracle.com>
+To: Dmitry Vyukov <dvyukov@google.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:48538 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753122AbcANONt (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 14 Jan 2016 09:13:49 -0500
+Content-Disposition: inline
+In-Reply-To: <CACT4Y+ap-GiGRjwWr9kDwMNwQOg5TbJfi8kGD2H2Qv5SBrQK4Q@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
-After the fix to the asn1_decoder in commit: 0d62e9dd
-"ASN.1: Fix non-match detection failure on data overrun"
-the rsa algorithm is failing to register in 4.3 stable kernels with
-error: "alg: rsa: test failed on vector 4, err=-74"
+On Wed, Jan 13, 2016 at 12:58:34PM +0100, Dmitry Vyukov wrote:
+> 
+> The following program triggers use-after-free in skcipher_sock_destruct.
+> This is on upstream commit 03891f9c853d5c4473224478a1e03ea00d70ff8d +
+> all pending patches from
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git +
+> 4 latest Herbert patches.
 
-This happens because the asn1 definition for the rsa key that has been
-added in 4.2 defined all 3 components of the key as non-optional, as
-the asn1_decoder before the fix was working fine for both the private
-and public keys.
+OK, the check_key function is buggy in that it doesn't lock the
+child socket so if you make two syscalls on the child socket at
+the same time you can end up freeing the parent socket.
 
-This patch adds the missing (fake) component to one key vector to allow
-the algorithm to successfully register and be used with a valid private
-keys later. This is only to make the asn1_decoder successfully parse the
-key and the fake component is never used in the test as the vector is
-marked as public key.
+Please try these two patches.
 
-This patch applies only to 4.3 kernels as the 4.2 version of asn1_decoder
-works fine with the asn1 definition.
-4.4 is also ok because the akcipher interface has been changed, and
-the set_key function has been split into set_public_key and set_priv_key
-and there are two separate asn1 definitions for the two key formats
-with all the required components correctly defined (commit 22287b0).
-
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 64b8a80..450f30e 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -270,7 +270,7 @@ static struct akcipher_testvec rsa_tv_template[] = {
- 	.c_size = 256,
- 	}, {
- 	.key =
--	"\x30\x82\x01\x09" /* sequence of 265 bytes */
-+	"\x30\x82\x01\x0C" /* sequence of 268 bytes */
- 	"\x02\x82\x01\x00" /* modulus - integer of 256 bytes */
- 	"\xDB\x10\x1A\xC2\xA3\xF1\xDC\xFF\x13\x6B\xED\x44\xDF\xF0\x02\x6D"
- 	"\x13\xC7\x88\xDA\x70\x6B\x54\xF1\xE8\x27\xDC\xC3\x0F\x99\x6A\xFA"
-@@ -288,8 +288,9 @@ static struct akcipher_testvec rsa_tv_template[] = {
- 	"\x55\xE6\x29\x69\xD1\xC2\xE8\xB9\x78\x59\xF6\x79\x10\xC6\x4E\xEB"
- 	"\x6A\x5E\xB9\x9A\xC7\xC4\x5B\x63\xDA\xA3\x3F\x5E\x92\x7A\x81\x5E"
- 	"\xD6\xB0\xE2\x62\x8F\x74\x26\xC2\x0C\xD3\x9A\x17\x47\xE6\x8E\xAB"
--	"\x02\x03\x01\x00\x01", /* public key - integer of 3 bytes */
--	.key_len = 269,
-+	"\x02\x03\x01\x00\x01" /* public key - integer of 3 bytes */
-+	"\x02\x01\x00", /* private key - integer of 1 byte */
-+	.key_len = 272,
- 	.m = "\x54\x85\x9b\x34\x2c\x49\xea\x2a",
- 	.c =
- 	"\xb2\x97\x76\xb4\xae\x3e\x38\x3c\x7e\x64\x1f\xcc\xa2\x7f\xf6\xbe"
-
+Thanks,
 -- 
-TS
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
