@@ -1,8 +1,9 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 0/2] crypto: Fix race condition in *_check_key
-Date: Thu, 14 Jan 2016 22:13:41 +0800
-Message-ID: <20160114141341.GA21300@gondor.apana.org.au>
+Subject: [PATCH 1/2] crypto: algif_hash - Fix race condition in hash_check_key
+Date: Thu, 14 Jan 2016 22:15:28 +0800
+Message-ID: <20160114141528.GA21348@gondor.apana.org.au>
 References: <CACT4Y+ap-GiGRjwWr9kDwMNwQOg5TbJfi8kGD2H2Qv5SBrQK4Q@mail.gmail.com>
+ <20160114141341.GA21300@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -14,31 +15,53 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Sasha Levin <sasha.levin@oracle.com>
 To: Dmitry Vyukov <dvyukov@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48538 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:57834 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753122AbcANONt (ORCPT
+	with ESMTP id S1754023AbcANOPb (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 Jan 2016 09:13:49 -0500
+	Thu, 14 Jan 2016 09:15:31 -0500
 Content-Disposition: inline
-In-Reply-To: <CACT4Y+ap-GiGRjwWr9kDwMNwQOg5TbJfi8kGD2H2Qv5SBrQK4Q@mail.gmail.com>
+In-Reply-To: <20160114141341.GA21300@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 13, 2016 at 12:58:34PM +0100, Dmitry Vyukov wrote:
-> 
-> The following program triggers use-after-free in skcipher_sock_destruct.
-> This is on upstream commit 03891f9c853d5c4473224478a1e03ea00d70ff8d +
-> all pending patches from
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git +
-> 4 latest Herbert patches.
+We need to lock the child socket in hash_check_key as otherwise
+two simultaneous calls can cause the parent socket to be freed.
 
-OK, the check_key function is buggy in that it doesn't lock the
-child socket so if you make two syscalls on the child socket at
-the same time you can end up freeing the parent socket.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Please try these two patches.
-
-Thanks,
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index 46637be..598f141 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -242,15 +242,16 @@ static struct proto_ops algif_hash_ops = {
+ 
+ static int hash_check_key(struct socket *sock)
+ {
+-	int err;
++	int err = 0;
+ 	struct sock *psk;
+ 	struct alg_sock *pask;
+ 	struct algif_hash_tfm *tfm;
+ 	struct sock *sk = sock->sk;
+ 	struct alg_sock *ask = alg_sk(sk);
+ 
++	lock_sock(sk);
+ 	if (ask->refcnt)
+-		return 0;
++		goto unlock_child;
+ 
+ 	psk = ask->parent;
+ 	pask = alg_sk(ask->parent);
+@@ -271,6 +272,8 @@ static int hash_check_key(struct socket *sock)
+ 
+ unlock:
+ 	release_sock(psk);
++unlock_child:
++	release_sock(sk);
+ 
+ 	return err;
+ }
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
