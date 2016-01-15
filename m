@@ -1,74 +1,61 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 2/2] crypto: algif_skcipher - Fix race condition in
- skcipher_check_key
-Date: Fri, 15 Jan 2016 22:02:20 +0800
-Message-ID: <20160115140220.GB31859@gondor.apana.org.au>
-References: <CACT4Y+ap-GiGRjwWr9kDwMNwQOg5TbJfi8kGD2H2Qv5SBrQK4Q@mail.gmail.com>
- <20160114141341.GA21300@gondor.apana.org.au>
- <CACT4Y+bEJ4iVqUB8yFT=7bHgyaQmFQUq08kEa8Wp_poj5Mthog@mail.gmail.com>
- <20160115135900.GA31813@gondor.apana.org.au>
+From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
+Subject: [PATCH 0/5] crypto: atmel-sha: fix registration issue and other bugs
+Date: Fri, 15 Jan 2016 15:49:30 +0100
+Message-ID: <cover.1452867917.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	syzkaller <syzkaller@googlegroups.com>,
-	Kostya Serebryany <kcc@google.com>,
-	Alexander Potapenko <glider@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Sasha Levin <sasha.levin@oracle.com>
-To: Dmitry Vyukov <dvyukov@google.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20160115135900.GA31813@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	Cyrille Pitchen <cyrille.pitchen@atmel.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<nicolas.ferre@atmel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from eusmtp01.atmel.com ([212.144.249.242]:39219 "EHLO
+	eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751115AbcAOOtG (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 15 Jan 2016 09:49:06 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-We need to lock the child socket in skcipher_check_key as otherwise
-two simultaneous calls can cause the parent socket to be freed.
+Hi all,
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+This series of patches fixes many issues such as the algo registration failure
+or the broken support of context switches.
 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 39df2a9..dc7d91b 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -755,22 +755,23 @@ static struct proto_ops algif_skcipher_ops = {
- 
- static int skcipher_check_key(struct socket *sock)
- {
--	int err;
-+	int err = 0;
- 	struct sock *psk;
- 	struct alg_sock *pask;
- 	struct skcipher_tfm *tfm;
- 	struct sock *sk = sock->sk;
- 	struct alg_sock *ask = alg_sk(sk);
- 
-+	lock_sock(sk);
- 	if (ask->refcnt)
--		return 0;
-+		goto unlock_child;
- 
- 	psk = ask->parent;
- 	pask = alg_sk(ask->parent);
- 	tfm = pask->private;
- 
- 	err = -ENOKEY;
--	lock_sock(psk);
-+	lock_sock_nested(psk, SINGLE_DEPTH_NESTING);
- 	if (!tfm->has_key)
- 		goto unlock;
- 
-@@ -784,6 +785,8 @@ static int skcipher_check_key(struct socket *sock)
- 
- unlock:
- 	release_sock(psk);
-+unlock_child:
-+	release_sock(sk);
- 
- 	return err;
- }
+This series was applied to linux-next and tested on a sama5d2 xplained
+ultra board. We now pass the tcrypt tests in the following modes:
+-  2: sha1
+-  6: sha256
+- 11: sha384
+- 12: sha512
+- 33: sha224
+
+The context switch fix was tested with a userspace program using the cryptodev
+module. This single thread program computes the SHA256 hashes of many files
+by splitting then into fixed size chunks. The chunks of each file are
+processed by calling 'update' operations using a round robin algorithm.
+
+However, the .import() / .export() implementation was NOT tested!
+Nonetheless the last patch is needed to fix the registration issue, otherwise
+atmel_sha_probe() would still fail.
+
+Best regards,
+
+Cyrille
+
+
+Cyrille Pitchen (5):
+  crypto: atmel-sha: fix crash when computing digest on empty message
+  crypto: atmel-sha: fix a race between the 'done' tasklet and the
+    crypto client
+  crypto: atmel-sha: add support of sama5d2x SoCs
+  crypto: atmel-sha: fix context switches
+  crypto: atmel-sha: fix algorihtm registration
+
+ drivers/crypto/atmel-sha-regs.h |   4 +
+ drivers/crypto/atmel-sha.c      | 186 +++++++++++++++++++++++++++++++++-------
+ 2 files changed, 158 insertions(+), 32 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.2.2
