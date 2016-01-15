@@ -1,8 +1,8 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: crypto: qat - remove to call get_sram_bar_id for qat_c3xxx
-Date: Fri, 15 Jan 2016 10:28:51 -0800
-Message-ID: <56993A63.5060304@intel.com>
-References: <1452074194-115019-1-git-send-email-pingchao.yang@intel.com>
+Subject: Re: [V3] crypto: qat - fix timeout issues
+Date: Fri, 15 Jan 2016 10:29:01 -0800
+Message-ID: <56993A6D.4060901@intel.com>
+References: <1452130786-147187-1-git-send-email-pingchao.yang@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -10,60 +10,77 @@ Cc: Pingchao Yang <pingchao.yang@intel.com>,
 	linux-crypto@vger.kernel.org, qat-linux@intel.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:23997 "EHLO mga01.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:40526 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754512AbcAOSch (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 15 Jan 2016 13:32:37 -0500
-In-Reply-To: <1452074194-115019-1-git-send-email-pingchao.yang@intel.com>
+	id S1754512AbcAOScp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 15 Jan 2016 13:32:45 -0500
+In-Reply-To: <1452130786-147187-1-git-send-email-pingchao.yang@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/06/2016 01:56 AM, Pingchao Yang wrote:
-> From: Pingchao Yang <pingchao.yang@intel.com>
+On 01/06/2016 05:39 PM, Pingchao Yang wrote:
+> Change the variable times data type and timeout conditon since the value
+> of times should be -1 after loop.
 > 
-> Reported-by : Struk, Tadeusz <tadeusz.struk@intel.com>
 > Signed-off-by: Yang Pingchao <pingchao.yang@intel.com>
 > 
 > ---
-> drivers/crypto/qat/qat_common/qat_hal.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
+> drivers/crypto/qat/qat_common/qat_hal.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
 > 
 > diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
-> index 0d0b5ed..bcb39b0 100644
+> index 0ac0ba8..7786e6e 100644
 > --- a/drivers/crypto/qat/qat_common/qat_hal.c
 > +++ b/drivers/crypto/qat/qat_common/qat_hal.c
-> @@ -693,14 +693,12 @@ int qat_hal_init(struct adf_accel_dev *accel_dev)
->  	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
->  	struct adf_bar *misc_bar =
->  			&pci_info->pci_bars[hw_data->get_misc_bar_id(hw_data)];
-> -	struct adf_bar *sram_bar =
-> -			&pci_info->pci_bars[hw_data->get_sram_bar_id(hw_data)];
-> +	struct adf_bar *sram_bar;
+> @@ -389,7 +389,7 @@ static int qat_hal_check_ae_alive(struct icp_qat_fw_loader_handle *handle)
+>  {
+>  	unsigned int base_cnt, cur_cnt;
+>  	unsigned char ae;
+> -	unsigned int times = MAX_RETRY_TIMES;
+> +	int times = MAX_RETRY_TIMES;
 >  
->  	handle = kzalloc(sizeof(*handle), GFP_KERNEL);
->  	if (!handle)
->  		return -ENOMEM;
+>  	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
+>  		qat_hal_rd_ae_csr(handle, ae, PROFILE_COUNT,
+> @@ -402,7 +402,7 @@ static int qat_hal_check_ae_alive(struct icp_qat_fw_loader_handle *handle)
+>  			cur_cnt &= 0xffff;
+>  		} while (times-- && (cur_cnt == base_cnt));
 >  
-> -	handle->hal_sram_addr_v = sram_bar->virt_addr;
->  	handle->hal_cap_g_ctl_csr_addr_v =
->  		(void __iomem *)((uintptr_t)misc_bar->virt_addr +
->  				 ICP_QAT_CAP_OFFSET);
-> @@ -714,6 +712,11 @@ int qat_hal_init(struct adf_accel_dev *accel_dev)
->  		(void __iomem *)((uintptr_t)handle->hal_cap_ae_xfer_csr_addr_v +
->  				 LOCAL_TO_XFER_REG_OFFSET);
->  	handle->pci_dev = pci_info->pci_dev;
-> +	if (handle->pci_dev->device != ADF_C3XXX_PCI_DEVICE_ID) {
-> +		sram_bar =
-> +			&pci_info->pci_bars[hw_data->get_sram_bar_id(hw_data)];
-> +		handle->hal_sram_addr_v = sram_bar->virt_addr;
-> +	}
->  	handle->fw_auth = (handle->pci_dev->device ==
->  			   ADF_DH895XCC_PCI_DEVICE_ID) ? false : true;
->  	handle->hal_handle = kzalloc(sizeof(*handle->hal_handle), GFP_KERNEL);
+> -		if (!times) {
+> +		if (times < 0) {
+>  			pr_err("QAT: AE%d is inactive!!\n", ae);
+>  			return -EFAULT;
+>  		}
+> @@ -453,7 +453,8 @@ static int qat_hal_init_esram(struct icp_qat_fw_loader_handle *handle)
+>  	void __iomem *csr_addr =
+>  			(void __iomem *)((uintptr_t)handle->hal_ep_csr_addr_v +
+>  			ESRAM_AUTO_INIT_CSR_OFFSET);
+> -	unsigned int csr_val, times = 30;
+> +	unsigned int csr_val;
+> +	int times = 30;
+>  
+>  	csr_val = ADF_CSR_RD(csr_addr, 0);
+>  	if ((csr_val & ESRAM_AUTO_TINIT) && (csr_val & ESRAM_AUTO_TINIT_DONE))
+> @@ -467,7 +468,7 @@ static int qat_hal_init_esram(struct icp_qat_fw_loader_handle *handle)
+>  		qat_hal_wait_cycles(handle, 0, ESRAM_AUTO_INIT_USED_CYCLES, 0);
+>  		csr_val = ADF_CSR_RD(csr_addr, 0);
+>  	} while (!(csr_val & ESRAM_AUTO_TINIT_DONE) && times--);
+> -	if ((!times)) {
+> +	if ((times < 0)) {
+>  		pr_err("QAT: Fail to init eSram!\n");
+>  		return -EFAULT;
+>  	}
+> @@ -658,7 +659,7 @@ static int qat_hal_clear_gpr(struct icp_qat_fw_loader_handle *handle)
+>  			ret = qat_hal_wait_cycles(handle, ae, 20, 1);
+>  		} while (ret && times--);
+>  
+> -		if (!times) {
+> +		if (times < 0) {
+>  			pr_err("QAT: clear GPR of AE %d failed", ae);
+>  			return -EINVAL;
+>  		}
 > 
 Herbert,
-This fixes issue related to invalid BAR mapping on C3XXX device,
-which leads to memory corruption and kernel oops.
+This fixes integer overflow issue around csr initialization.
 Please include this fix into 4.5.
 Thanks,
 
