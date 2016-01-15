@@ -1,10 +1,12 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 0/2] crypto: Fix race condition in *_check_key
-Date: Fri, 15 Jan 2016 21:59:00 +0800
-Message-ID: <20160115135900.GA31813@gondor.apana.org.au>
+Subject: [v2 PATCH 1/2] crypto: algif_hash - Fix race condition in
+ hash_check_key
+Date: Fri, 15 Jan 2016 22:01:08 +0800
+Message-ID: <20160115140108.GA31859@gondor.apana.org.au>
 References: <CACT4Y+ap-GiGRjwWr9kDwMNwQOg5TbJfi8kGD2H2Qv5SBrQK4Q@mail.gmail.com>
  <20160114141341.GA21300@gondor.apana.org.au>
  <CACT4Y+bEJ4iVqUB8yFT=7bHgyaQmFQUq08kEa8Wp_poj5Mthog@mail.gmail.com>
+ <20160115135900.GA31813@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -16,48 +18,61 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Sasha Levin <sasha.levin@oracle.com>
 To: Dmitry Vyukov <dvyukov@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54293 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:56818 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751154AbcAON7G (ORCPT
+	with ESMTP id S1751942AbcAOOBM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 15 Jan 2016 08:59:06 -0500
+	Fri, 15 Jan 2016 09:01:12 -0500
 Content-Disposition: inline
-In-Reply-To: <CACT4Y+bEJ4iVqUB8yFT=7bHgyaQmFQUq08kEa8Wp_poj5Mthog@mail.gmail.com>
+In-Reply-To: <20160115135900.GA31813@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 15, 2016 at 10:06:11AM +0100, Dmitry Vyukov wrote:
-> 
-> With these patches I see lots of:
-> 
-> [ INFO: possible recursive locking detected ]
-> 4.4.0+ #250 Not tainted
-> ---------------------------------------------
-> syz-executor/16742 is trying to acquire lock:
->  (sk_lock-AF_ALG){+.+.+.}, at: [<     inline     >] lock_sock
-> include/net/sock.h:1480
->  (sk_lock-AF_ALG){+.+.+.}, at: [<ffffffff828661d2>]
-> hash_check_key.isra.3+0xd2/0x210 crypto/algif_hash.c:261
-> 
-> but task is already holding lock:
->  (sk_lock-AF_ALG){+.+.+.}, at: [<     inline     >] lock_sock
-> include/net/sock.h:1480
->  (sk_lock-AF_ALG){+.+.+.}, at: [<ffffffff82866126>]
-> hash_check_key.isra.3+0x26/0x210 crypto/algif_hash.c:252
-> 
-> other info that might help us debug this:
->  Possible unsafe locking scenario:
-> 
->        CPU0
->        ----
->   lock(sk_lock-AF_ALG);
->   lock(sk_lock-AF_ALG);
-> 
->  *** DEADLOCK ***
-> 
->  May be due to missing lock nesting notation
+We need to lock the child socket in hash_check_key as otherwise
+two simultaneous calls can cause the parent socket to be freed.
 
-Indeed.  Here is an updated version.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index 46637be..0557e62 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -242,22 +242,23 @@ static struct proto_ops algif_hash_ops = {
+ 
+ static int hash_check_key(struct socket *sock)
+ {
+-	int err;
++	int err = 0;
+ 	struct sock *psk;
+ 	struct alg_sock *pask;
+ 	struct algif_hash_tfm *tfm;
+ 	struct sock *sk = sock->sk;
+ 	struct alg_sock *ask = alg_sk(sk);
+ 
++	lock_sock(sk);
+ 	if (ask->refcnt)
+-		return 0;
++		goto unlock_child;
+ 
+ 	psk = ask->parent;
+ 	pask = alg_sk(ask->parent);
+ 	tfm = pask->private;
+ 
+ 	err = -ENOKEY;
+-	lock_sock(psk);
++	lock_sock_nested(psk, SINGLE_DEPTH_NESTING);
+ 	if (!tfm->has_key)
+ 		goto unlock;
+ 
+@@ -271,6 +272,8 @@ static int hash_check_key(struct socket *sock)
+ 
+ unlock:
+ 	release_sock(psk);
++unlock_child:
++	release_sock(sk);
+ 
+ 	return err;
+ }
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
