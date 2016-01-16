@@ -1,36 +1,53 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH 0/2] n2rng: Attach on T5/M5, T7/M7 SPARC CPUs
-Date: Fri, 15 Jan 2016 15:22:53 -0500 (EST)
-Message-ID: <20160115.152253.1613974535141140248.davem@davemloft.net>
-References: <20160113214318.GB32766@yogzotot>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v2] crypto: AF_ALG - add support for keys/asymmetric-type
+Date: Sat, 16 Jan 2016 10:51:53 +0000
+Message-ID: <5232.1452941513@warthog.procyon.org.uk>
+References: <569677D6.7070704@intel.com> <20151226155014.27615.14985.stgit@desktop.home> <10464.1452691882@warthog.procyon.org.uk> <569659AC.9070506@intel.com> <1452697593.88154.49.camel@infradead.org>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
-	herbert@gondor.apana.org.au
-To: matorola@gmail.com
-Return-path: <sparclinux-owner@vger.kernel.org>
-In-Reply-To: <20160113214318.GB32766@yogzotot>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, David Woodhouse <dwmw2@infradead.org>,
+	Tadeusz Struk <tstruk@gmail.com>, herbert@gondor.apana.org.au,
+	smueller@chronox.de, linux-api@vger.kernel.org,
+	marcel@holtmann.org, linux-kernel@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	zohar@linux.vnet.ibm.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:53821 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751848AbcAPKv5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 16 Jan 2016 05:51:57 -0500
+In-Reply-To: <569677D6.7070704@intel.com>
+Content-ID: <5231.1452941513.1@warthog.procyon.org.uk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Anatoly Pugachev <matorola@gmail.com>
-Date: Thu, 14 Jan 2016 00:43:18 +0300
+Tadeusz Struk <tadeusz.struk@intel.com> wrote:
 
-> This patch adds support for recent oracle hardware (T5/M5, T7/M7 SPARC CPUs),
-> so n2_rng driver would work on them.
-> 
-> 1. n2rng: Attach on T5/M5, T7/M7 SPARC CPUs
-> 2. n2rng: documentation, add DT bindings, vendor prefixes
-> 
-> PS: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=809815#32
-> 
-> Signed-off-by: Anatoly Pugachev <matorola@gmail.com>
+> I think the coupling of an algorithm to its key is the problem here.
+> Usually an algorithm should be able to work with any (valid) key.
 
-This series looks fine:
+A key stored in hardware and used through that hardware won't necessarily
+support all crypto operations - it may be restricted to just signing or just
+encrypting for example.
 
-Acked-by: David S. Miller <davem@davemloft.net>
+> The solution to this can be implemented on the crypto API. 
+> If the TMP driver would register its supported algorithms on the crypto API
+> and in the setkey function it would check if a key is a real key or this
+> "something" (probably a ptr to TMP dev instance?) then in the first
+> case it would fallback to an implementation that takes a key data.
+> In the second case it can do its thing whatever it is.
 
-Herbert, please take this via your crypto tree.
+>From what Herbert has said, he won't go for that since the TPM keys are
+restricted in the operations one can use the key for.
 
-Thanks!
+I think the crypto API is what we use when the key data is available to us in
+the kernel - but it should be driven through the asymmetric key API.  You ask
+the asymmetric key API to verify a key, say, then that will switch to the TPM
+driver or to the software public key implementation.  The latter will then
+load the appropriate crypto layer akcipher algorithm (eg. RSA) and use that -
+where the akcipher implementation will either be a software one or will get
+offloaded to some hardware that can do it - but that doesn't itself securely
+hold the key.
+
+David
