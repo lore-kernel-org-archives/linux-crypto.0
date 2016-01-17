@@ -1,60 +1,48 @@
 From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?=
-	<noltari@gmail.com>
-Subject: [PATCH 4/4] hw_random: brcm63xx-rng: document device tree bindings
-Date: Sun, 17 Jan 2016 10:03:57 +0100
-Message-ID: <1453021437-12531-4-git-send-email-noltari@gmail.com>
+	<noltari-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH 3/4] hw_random: bcm63xx-rng: allow building for BMIPS_GENERIC
+Date: Sun, 17 Jan 2016 10:03:56 +0100
+Message-ID: <1453021437-12531-3-git-send-email-noltari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?=
-	<noltari@gmail.com>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	f.fainelli@gmail.com, jogo@openwrt.org, cernekee@gmail.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:34586 "EHLO
-	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752587AbcAQJDf (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 17 Jan 2016 04:03:35 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	<noltari-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, jogo-p3rKhJxN3npAfugRpC6u6w@public.gmane.org, cernekee-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Documents device tree bindings for random number generator present on B=
-roadcom
-BCM6368 SoC.
+Now that we have device tree support and BCM6368 is supported in BMIPS_=
+GENERIC,
+we can use it for BMIPS_GENERIC too.
 
-Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
+Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- Documentation/devicetree/bindings/rng/brcm,bcm6368.txt | 17 ++++++++++=
-+++++++
- 1 file changed, 17 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/rng/brcm,bcm6368.=
-txt
+ drivers/char/hw_random/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/rng/brcm,bcm6368.txt b/D=
-ocumentation/devicetree/bindings/rng/brcm,bcm6368.txt
-new file mode 100644
-index 0000000..4b5ac60
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/brcm,bcm6368.txt
-@@ -0,0 +1,17 @@
-+BCM6368 Random number generator
-+
-+Required properties:
-+
-+- compatible : should be "brcm,bcm6368-rng"
-+- reg : Specifies base physical address and size of the registers
-+- clocks : phandle to clock-controller plus clock-specifier pair
-+- clock-names : "ipsec" as a clock name
-+
-+Example:
-+	random: rng@10004180 {
-+		compatible =3D "brcm,bcm6368-rng";
-+		reg =3D <0x10004180 0x14>;
-+
-+		clocks =3D <&periph_clk 18>;
-+		clock-names =3D "ipsec";
-+	};
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kc=
+onfig
+index dbf2271..8d89590 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -77,7 +77,7 @@ config HW_RANDOM_ATMEL
+=20
+ config HW_RANDOM_BCM63XX
+ 	tristate "Broadcom BCM63xx Random Number Generator support"
+-	depends on BCM63XX
++	depends on BCM63XX || BMIPS_GENERIC
+ 	default HW_RANDOM
+ 	---help---
+ 	  This driver provides kernel-side support for the Random Number
 --=20
 1.9.1
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" i=
+n
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
