@@ -1,8 +1,8 @@
 From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?=
 	<noltari@gmail.com>
-Subject: [PATCH 1/4] hw_random: bcm63xx-rng: remove unused variables
-Date: Sun, 17 Jan 2016 10:03:54 +0100
-Message-ID: <1453021437-12531-1-git-send-email-noltari@gmail.com>
+Subject: [PATCH 2/4] hw_random: bcm63xx-rng: add device tree support
+Date: Sun, 17 Jan 2016 10:03:55 +0100
+Message-ID: <1453021437-12531-2-git-send-email-noltari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
@@ -11,46 +11,47 @@ Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?=
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
 	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
 	f.fainelli@gmail.com, jogo@openwrt.org, cernekee@gmail.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:34566 "EHLO
+	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751779AbcAQJDd (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 17 Jan 2016 04:03:33 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-These variables where left as unused in commit 6229c16060fe
-("hwrng: bcm63xx - make use of devm_hwrng_register")
-
-=46ixes the following warning:
-drivers/char/hw_random/bcm63xx-rng.c: In function 'bcm63xx_rng_probe':
-drivers/char/hw_random/bcm63xx-rng.c:85:16: warning: unused variable 'r=
-ng'
-[-Wunused-variable]
-  struct hwrng *rng;
-                ^
-drivers/char/hw_random/bcm63xx-rng.c:82:14: warning: unused variable 'c=
-lk'
-[-Wunused-variable]
-  struct clk *clk;
+Adds device tree support for BCM6368, which seems to be the only BCM63x=
+x with
+bcm63xx-rng support.
 
 Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
 ---
- drivers/char/hw_random/bcm63xx-rng.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/char/hw_random/bcm63xx-rng.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/drivers/char/hw_random/bcm63xx-rng.c b/drivers/char/hw_ran=
 dom/bcm63xx-rng.c
-index 4b31f13..c303f30 100644
+index c303f30..38553f0 100644
 --- a/drivers/char/hw_random/bcm63xx-rng.c
 +++ b/drivers/char/hw_random/bcm63xx-rng.c
-@@ -79,10 +79,8 @@ static int bcm63xx_rng_data_read(struct hwrng *rng, =
-u32 *data)
- static int bcm63xx_rng_probe(struct platform_device *pdev)
- {
- 	struct resource *r;
--	struct clk *clk;
- 	int ret;
- 	struct bcm63xx_rng_priv *priv;
--	struct hwrng *rng;
+@@ -130,10 +130,17 @@ static int bcm63xx_rng_probe(struct platform_devi=
+ce *pdev)
+ 	return 0;
+ }
 =20
- 	r =3D platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	if (!r) {
++static const struct of_device_id bcm63xx_rng_of_match[] =3D {
++	{ .compatible =3D "brcm,bcm6368-rng", },
++	{},
++};
++MODULE_DEVICE_TABLE(of, bcm63xx_rng_of_match);
++
+ static struct platform_driver bcm63xx_rng_driver =3D {
+ 	.probe		=3D bcm63xx_rng_probe,
+ 	.driver		=3D {
+ 		.name	=3D "bcm63xx-rng",
++		.of_match_table =3D bcm63xx_rng_of_match,
+ 	},
+ };
+=20
 --=20
 1.9.1
