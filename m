@@ -1,18 +1,18 @@
 From: Peter Jones <pjones@redhat.com>
 Subject: [PATCH] Don't require SpcSpOpusInfo in Authenticode pkcs7 signatures
-Date: Mon, 18 Jan 2016 10:49:13 -0500
-Message-ID: <1453132153-19563-1-git-send-email-pjones@redhat.com>
+Date: Mon, 18 Jan 2016 10:49:58 -0500
+Message-ID: <1453132198-19644-1-git-send-email-pjones@redhat.com>
 References: <20160115081249.GA19487@dhcp-128-65.nay.redhat.com>
-Cc: David Howells <dhowells@redhat.com?>, linux-crypto@vger.kernel.org,
+Cc: David Howells <dhowells@redhat.com>, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org, kexec@lists.infradead.org,
 	xlpang@redhat.com, vgoyal@redhat.com,
 	Peter Jones <pjones@redhat.com>
 To: Dave Young <dyoung@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51856 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:47770 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755589AbcARPtj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 18 Jan 2016 10:49:39 -0500
+	id S1755585AbcARPuA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 18 Jan 2016 10:50:00 -0500
 In-Reply-To: <20160115081249.GA19487@dhcp-128-65.nay.redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
