@@ -1,76 +1,132 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] crypto: ixp4xx: avoid uninitialized variable use
-Date: Mon, 18 Jan 2016 16:40:15 +0100
-Message-ID: <4569235.PkyVAB6DSj@wuerfel>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	davem@davemloft.net,
-	Krzysztof =?utf-8?B?SGHFgmFzYQ==?= <khalasa@piap.pl>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Peter Jones <pjones@redhat.com>
+Subject: [PATCH] Don't require SpcSpOpusInfo in Authenticode pkcs7 signatures
+Date: Mon, 18 Jan 2016 10:49:13 -0500
+Message-ID: <1453132153-19563-1-git-send-email-pjones@redhat.com>
+References: <20160115081249.GA19487@dhcp-128-65.nay.redhat.com>
+Cc: David Howells <dhowells@redhat.com?>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kexec@lists.infradead.org,
+	xlpang@redhat.com, vgoyal@redhat.com,
+	Peter Jones <pjones@redhat.com>
+To: Dave Young <dyoung@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:51856 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755589AbcARPtj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 18 Jan 2016 10:49:39 -0500
+In-Reply-To: <20160115081249.GA19487@dhcp-128-65.nay.redhat.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The move to the new AEAD interface introduced a path through the
-aead_perform() function in the ixp4xx_crypto driver that leaves
-lastlen uninitialized, as gcc warns:
+Dave Young reported:
+> Hi,
+>
+> I saw the warning "Missing required AuthAttr" when testing kexec,
+> known issue?  Idea about how to fix it?
+>
+> The kernel is latest linus tree plus sevral patches from Toshi to
+> cleanup io resource structure.
+>
+> in function pkcs7_sig_note_set_of_authattrs():
+>         if (!test_bit(sinfo_has_content_type, &sinfo->aa_set) ||
+>             !test_bit(sinfo_has_message_digest, &sinfo->aa_set) ||
+>             (ctx->msg->data_type == OID_msIndirectData &&
+>              !test_bit(sinfo_has_ms_opus_info, &sinfo->aa_set))) {
+>                 pr_warn("Missing required AuthAttr\n");
+>                 return -EBADMSG;
+>         }
+>
+> The third condition below is true:
+> (ctx->msg->data_type == OID_msIndirectData &&
+>              !test_bit(sinfo_has_ms_opus_info, &sinfo->aa_set))
+>
+> I signed the kernel with redhat test key like below:
+> pesign -c 'Red Hat Test Certificate' -i arch/x86/boot/bzImage -o /boot/vmlinuz-4.4.0-rc8+ -s --force
 
-crypto/ixp4xx_crypto.c:1072:5: error: 'lastlen' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-crypto/ixp4xx_crypto.c: In function 'aead_perform':
-  if (unlikely(lastlen < authsize)) {
+And right he is!  The Authenticode specification is a paragon amongst
+technical documents, and has this pearl of wisdom to offer:
 
-I don't really understand what the code does, but the warning
-appears to be correct, and this is my best guess at how it
-should behave instead: I'm introducing a temporary variable
-that indicates whether we need to allocate an extra buffer
-or not, and defaults that variable to 'false', so we only
-allocate the buffer if one of the cases happen where we know
-that "lastlen < authsize".
+---------------------------------
+Authenticode-Specific SignerInfo UnauthenticatedAttributes Structures
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Fixes: d7295a8dc965 ("crypto: ixp4xx - Convert to new AEAD interface")
+  The following Authenticode-specific data structures are present in
+  SignerInfo authenticated attributes.
+
+  SpcSpOpusInfo
+  SpcSpOpusInfo is identified by SPC_SP_OPUS_INFO_OBJID
+  (1.3.6.1.4.1.311.2.1.12) and is defined as follows:
+  SpcSpOpusInfo ::= SEQUENCE {
+    programName  [0] EXPLICIT SpcString OPTIONAL,
+    moreInfo     [1] EXPLICIT SpcLink OPTIONAL,
+  } --#public--
+
+  SpcSpOpusInfo has two fields:
+    programName
+      This field contains the program description:
+      If publisher chooses not to specify a description, the SpcString
+      structure contains a zero-length program name.
+      If the publisher chooses to specify a
+      description, the SpcString structure contains a Unicode string.
+    moreInfo
+      This field is set to an SPCLink structure that contains a URL for
+      a Web site with more information about the signer. The URL is an
+      ASCII string.
+---------------------------------
+
+Which is to say that this is an optional *unauthenticated* field which
+may be present in the Authenticated Attribute list.  This is not how
+pkcs7 is supposed to work, so when David implemented this, he didn't
+appreciate the subtlety the original spec author was working with, and
+missed the part of the sublime prose that says this Authenticated
+Attribute is an Unauthenticated Attribute.  As a result, the code in
+question simply takes as given that the Authenticated Attributes should
+be authenticated.
+
+But this one should not, individually.  Because it says it's not
+authenticated.
+
+It still has to hash right so the TBS digest is correct.  So it is both
+authenticated and unauthenticated, all at once.  Truly, a wonder of
+technical accomplishment.
+
+Additionally, pesign's implementation has always attempted to be
+compatible with the signatures emitted from contemporary versions of
+Microsoft's signtool.exe.  During the initial implementation, Microsoft
+signatures always produced the same values for SpcSpOpusInfo -
+{U"Microsoft Windows", "http://www.microsoft.com"} - without regard to
+who the signer was.
+
+Sometime between Windows 8 and Windows 8.1 they stopped including the
+field in their signatures altogether, and as such pesign stopped
+producing them in commits c0c4da6 and d79cb0c, sometime around June of
+2012.  The theory here is that anything that breaks with
+pesign signatures would also be breaking with signtool.exe sigs as well,
+and that'll be a more noticed problem for firmwares parsing it, so it'll
+get fixed.  The fact that we've done exactly this bug in Linux code is
+first class, grade A irony.
+
+So anyway, we should not be checking this field for presence or any
+particular value: if the field exists, it should be at the right place,
+but aside from that, as long as the hash matches the field is good.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
+ crypto/asymmetric_keys/pkcs7_parser.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-Hi Herbert,
-
-It was one of your patches that introduced the warning, so you may
-be able to come up with a better fix than I did. Please see this as
-a bug report. I have applied it in my ARM randconfig test tree to shut
-up the warning for now.
-
-diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index e52496a172d0..00c39a5aa4c7 100644
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -999,6 +999,7 @@ static int aead_perform(struct aead_request *req, int encrypt,
- 				GFP_KERNEL : GFP_ATOMIC;
- 	enum dma_data_direction src_direction = DMA_BIDIRECTIONAL;
- 	unsigned int lastlen;
-+	bool shortbuf = false;
+diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
+index 758acab..8f3056c 100644
+--- a/crypto/asymmetric_keys/pkcs7_parser.c
++++ b/crypto/asymmetric_keys/pkcs7_parser.c
+@@ -547,9 +547,7 @@ int pkcs7_sig_note_set_of_authattrs(void *context, size_t hdrlen,
+ 	struct pkcs7_signed_info *sinfo = ctx->sinfo;
  
- 	if (qmgr_stat_full(SEND_QID))
- 		return -EAGAIN;
-@@ -1052,6 +1053,8 @@ static int aead_perform(struct aead_request *req, int encrypt,
- 			if (lastlen >= authsize)
- 				crypt->icv_rev_aes = buf->phys_addr +
- 						     buf->buf_len - authsize;
-+			else
-+				shortbuf = true;
- 		}
+ 	if (!test_bit(sinfo_has_content_type, &sinfo->aa_set) ||
+-	    !test_bit(sinfo_has_message_digest, &sinfo->aa_set) ||
+-	    (ctx->msg->data_type == OID_msIndirectData &&
+-	     !test_bit(sinfo_has_ms_opus_info, &sinfo->aa_set))) {
++	    !test_bit(sinfo_has_message_digest, &sinfo->aa_set)) {
+ 		pr_warn("Missing required AuthAttr\n");
+ 		return -EBADMSG;
  	}
- 
-@@ -1067,9 +1070,11 @@ static int aead_perform(struct aead_request *req, int encrypt,
- 		if (lastlen >= authsize)
- 			crypt->icv_rev_aes = buf->phys_addr +
- 					     buf->buf_len - authsize;
-+		else
-+			shortbuf = true;
- 	}
- 
--	if (unlikely(lastlen < authsize)) {
-+	if (unlikely(shortbuf)) {
- 		/* The 12 hmac bytes are scattered,
- 		 * we need to copy them into a safe buffer */
- 		req_ctx->hmac_virt = dma_pool_alloc(buffer_pool, flags,
+-- 
+2.5.0
