@@ -1,132 +1,57 @@
-From: Peter Jones <pjones@redhat.com>
-Subject: [PATCH] Don't require SpcSpOpusInfo in Authenticode pkcs7 signatures
-Date: Mon, 18 Jan 2016 10:49:58 -0500
-Message-ID: <1453132198-19644-1-git-send-email-pjones@redhat.com>
-References: <20160115081249.GA19487@dhcp-128-65.nay.redhat.com>
-Cc: David Howells <dhowells@redhat.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kexec@lists.infradead.org,
-	xlpang@redhat.com, vgoyal@redhat.com,
-	Peter Jones <pjones@redhat.com>
-To: Dave Young <dyoung@redhat.com>
+From: Jean Delvare <jdelvare@suse.de>
+Subject: [PATCH] crypto: Fix crc32c soft dependency
+Date: Mon, 18 Jan 2016 17:06:05 +0100
+Message-ID: <20160118170605.4e4a022f@endymion.delvare>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Tim Chen <tim.c.chen@linux.intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Michal Marek <mmarek@suse.cz>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:47770 "EHLO mx1.redhat.com"
+Received: from mx2.suse.de ([195.135.220.15]:40973 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755585AbcARPuA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 18 Jan 2016 10:50:00 -0500
-In-Reply-To: <20160115081249.GA19487@dhcp-128-65.nay.redhat.com>
+	id S1755689AbcARQGJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 18 Jan 2016 11:06:09 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dave Young reported:
-> Hi,
->
-> I saw the warning "Missing required AuthAttr" when testing kexec,
-> known issue?  Idea about how to fix it?
->
-> The kernel is latest linus tree plus sevral patches from Toshi to
-> cleanup io resource structure.
->
-> in function pkcs7_sig_note_set_of_authattrs():
->         if (!test_bit(sinfo_has_content_type, &sinfo->aa_set) ||
->             !test_bit(sinfo_has_message_digest, &sinfo->aa_set) ||
->             (ctx->msg->data_type == OID_msIndirectData &&
->              !test_bit(sinfo_has_ms_opus_info, &sinfo->aa_set))) {
->                 pr_warn("Missing required AuthAttr\n");
->                 return -EBADMSG;
->         }
->
-> The third condition below is true:
-> (ctx->msg->data_type == OID_msIndirectData &&
->              !test_bit(sinfo_has_ms_opus_info, &sinfo->aa_set))
->
-> I signed the kernel with redhat test key like below:
-> pesign -c 'Red Hat Test Certificate' -i arch/x86/boot/bzImage -o /boot/vmlinuz-4.4.0-rc8+ -s --force
+I don't think it makes sense for a module to have a soft dependency
+on itself. This seems quite cyclic by nature and I can't see what
+purpose it could serve.
 
-And right he is!  The Authenticode specification is a paragon amongst
-technical documents, and has this pearl of wisdom to offer:
+OTOH libcrc32c calls crypto_alloc_shash("crc32c", 0, 0) so it pretty
+much assumes that some incarnation of the "crc32c" hash algorithm has
+been loaded. Therefore it makes sense to have the soft dependency
+there (as crc-t10dif does.)
 
----------------------------------
-Authenticode-Specific SignerInfo UnauthenticatedAttributes Structures
-
-  The following Authenticode-specific data structures are present in
-  SignerInfo authenticated attributes.
-
-  SpcSpOpusInfo
-  SpcSpOpusInfo is identified by SPC_SP_OPUS_INFO_OBJID
-  (1.3.6.1.4.1.311.2.1.12) and is defined as follows:
-  SpcSpOpusInfo ::= SEQUENCE {
-    programName  [0] EXPLICIT SpcString OPTIONAL,
-    moreInfo     [1] EXPLICIT SpcLink OPTIONAL,
-  } --#public--
-
-  SpcSpOpusInfo has two fields:
-    programName
-      This field contains the program description:
-      If publisher chooses not to specify a description, the SpcString
-      structure contains a zero-length program name.
-      If the publisher chooses to specify a
-      description, the SpcString structure contains a Unicode string.
-    moreInfo
-      This field is set to an SPCLink structure that contains a URL for
-      a Web site with more information about the signer. The URL is an
-      ASCII string.
----------------------------------
-
-Which is to say that this is an optional *unauthenticated* field which
-may be present in the Authenticated Attribute list.  This is not how
-pkcs7 is supposed to work, so when David implemented this, he didn't
-appreciate the subtlety the original spec author was working with, and
-missed the part of the sublime prose that says this Authenticated
-Attribute is an Unauthenticated Attribute.  As a result, the code in
-question simply takes as given that the Authenticated Attributes should
-be authenticated.
-
-But this one should not, individually.  Because it says it's not
-authenticated.
-
-It still has to hash right so the TBS digest is correct.  So it is both
-authenticated and unauthenticated, all at once.  Truly, a wonder of
-technical accomplishment.
-
-Additionally, pesign's implementation has always attempted to be
-compatible with the signatures emitted from contemporary versions of
-Microsoft's signtool.exe.  During the initial implementation, Microsoft
-signatures always produced the same values for SpcSpOpusInfo -
-{U"Microsoft Windows", "http://www.microsoft.com"} - without regard to
-who the signer was.
-
-Sometime between Windows 8 and Windows 8.1 they stopped including the
-field in their signatures altogether, and as such pesign stopped
-producing them in commits c0c4da6 and d79cb0c, sometime around June of
-2012.  The theory here is that anything that breaks with
-pesign signatures would also be breaking with signtool.exe sigs as well,
-and that'll be a more noticed problem for firmwares parsing it, so it'll
-get fixed.  The fact that we've done exactly this bug in Linux code is
-first class, grade A irony.
-
-So anyway, we should not be checking this field for presence or any
-particular value: if the field exists, it should be at the right place,
-but aside from that, as long as the hash matches the field is good.
-
-Signed-off-by: Peter Jones <pjones@redhat.com>
+Signed-off-by: Jean Delvare <jdelvare@suse.de>
+Cc: Tim Chen <tim.c.chen@linux.intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
 ---
- crypto/asymmetric_keys/pkcs7_parser.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ crypto/crc32c_generic.c |    1 -
+ lib/libcrc32c.c         |    1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
-index 758acab..8f3056c 100644
---- a/crypto/asymmetric_keys/pkcs7_parser.c
-+++ b/crypto/asymmetric_keys/pkcs7_parser.c
-@@ -547,9 +547,7 @@ int pkcs7_sig_note_set_of_authattrs(void *context, size_t hdrlen,
- 	struct pkcs7_signed_info *sinfo = ctx->sinfo;
- 
- 	if (!test_bit(sinfo_has_content_type, &sinfo->aa_set) ||
--	    !test_bit(sinfo_has_message_digest, &sinfo->aa_set) ||
--	    (ctx->msg->data_type == OID_msIndirectData &&
--	     !test_bit(sinfo_has_ms_opus_info, &sinfo->aa_set))) {
-+	    !test_bit(sinfo_has_message_digest, &sinfo->aa_set)) {
- 		pr_warn("Missing required AuthAttr\n");
- 		return -EBADMSG;
- 	}
+--- linux-4.5-rc0.orig/crypto/crc32c_generic.c	2016-01-11 00:01:32.000000000 +0100
++++ linux-4.5-rc0/crypto/crc32c_generic.c	2016-01-18 16:47:35.243398451 +0100
+@@ -172,4 +172,3 @@ MODULE_DESCRIPTION("CRC32c (Castagnoli)
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_CRYPTO("crc32c");
+ MODULE_ALIAS_CRYPTO("crc32c-generic");
+-MODULE_SOFTDEP("pre: crc32c");
+--- linux-4.5-rc0.orig/lib/libcrc32c.c	2016-01-11 00:01:32.000000000 +0100
++++ linux-4.5-rc0/lib/libcrc32c.c	2016-01-18 16:47:47.978681236 +0100
+@@ -74,3 +74,4 @@ module_exit(libcrc32c_mod_fini);
+ MODULE_AUTHOR("Clay Haapala <chaapala@cisco.com>");
+ MODULE_DESCRIPTION("CRC32c (Castagnoli) calculations");
+ MODULE_LICENSE("GPL");
++MODULE_SOFTDEP("pre: crc32c");
+
+
 -- 
-2.5.0
+Jean Delvare
+SUSE L3 Support
