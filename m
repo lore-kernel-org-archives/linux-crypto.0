@@ -1,37 +1,76 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: CRYPTO_DEV_ATMEL_AES should depend on HAS_DMA
-Date: Mon, 18 Jan 2016 23:25:38 +0800
-Message-ID: <20160118152538.GE717@gondor.apana.org.au>
-References: <1452865686-687-1-git-send-email-geert@linux-m68k.org>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] crypto: ixp4xx: avoid uninitialized variable use
+Date: Mon, 18 Jan 2016 16:40:15 +0100
+Message-ID: <4569235.PkyVAB6DSj@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Cyrille Pitchen <cyrille.pitchen@atmel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52938 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754944AbcARPZu (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 18 Jan 2016 10:25:50 -0500
-Content-Disposition: inline
-In-Reply-To: <1452865686-687-1-git-send-email-geert@linux-m68k.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	davem@davemloft.net,
+	Krzysztof =?utf-8?B?SGHFgmFzYQ==?= <khalasa@piap.pl>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jan 15, 2016 at 02:48:06PM +0100, Geert Uytterhoeven wrote:
-> If NO_DMA=y:
-> 
->     ERROR: "dma_unmap_sg" [drivers/crypto/atmel-aes.ko] undefined!
->     ERROR: "dma_map_sg" [drivers/crypto/atmel-aes.ko] undefined!
-> 
-> Add a dependency on HAS_DMA to fix this.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+The move to the new AEAD interface introduced a path through the
+aead_perform() function in the ixp4xx_crypto driver that leaves
+lastlen uninitialized, as gcc warns:
 
-Patch applied.  Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+crypto/ixp4xx_crypto.c:1072:5: error: 'lastlen' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+crypto/ixp4xx_crypto.c: In function 'aead_perform':
+  if (unlikely(lastlen < authsize)) {
+
+I don't really understand what the code does, but the warning
+appears to be correct, and this is my best guess at how it
+should behave instead: I'm introducing a temporary variable
+that indicates whether we need to allocate an extra buffer
+or not, and defaults that variable to 'false', so we only
+allocate the buffer if one of the cases happen where we know
+that "lastlen < authsize".
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Fixes: d7295a8dc965 ("crypto: ixp4xx - Convert to new AEAD interface")
+---
+
+Hi Herbert,
+
+It was one of your patches that introduced the warning, so you may
+be able to come up with a better fix than I did. Please see this as
+a bug report. I have applied it in my ARM randconfig test tree to shut
+up the warning for now.
+
+diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
+index e52496a172d0..00c39a5aa4c7 100644
+--- a/drivers/crypto/ixp4xx_crypto.c
++++ b/drivers/crypto/ixp4xx_crypto.c
+@@ -999,6 +999,7 @@ static int aead_perform(struct aead_request *req, int encrypt,
+ 				GFP_KERNEL : GFP_ATOMIC;
+ 	enum dma_data_direction src_direction = DMA_BIDIRECTIONAL;
+ 	unsigned int lastlen;
++	bool shortbuf = false;
+ 
+ 	if (qmgr_stat_full(SEND_QID))
+ 		return -EAGAIN;
+@@ -1052,6 +1053,8 @@ static int aead_perform(struct aead_request *req, int encrypt,
+ 			if (lastlen >= authsize)
+ 				crypt->icv_rev_aes = buf->phys_addr +
+ 						     buf->buf_len - authsize;
++			else
++				shortbuf = true;
+ 		}
+ 	}
+ 
+@@ -1067,9 +1070,11 @@ static int aead_perform(struct aead_request *req, int encrypt,
+ 		if (lastlen >= authsize)
+ 			crypt->icv_rev_aes = buf->phys_addr +
+ 					     buf->buf_len - authsize;
++		else
++			shortbuf = true;
+ 	}
+ 
+-	if (unlikely(lastlen < authsize)) {
++	if (unlikely(shortbuf)) {
+ 		/* The 12 hmac bytes are scattered,
+ 		 * we need to copy them into a safe buffer */
+ 		req_ctx->hmac_virt = dma_pool_alloc(buffer_pool, flags,
