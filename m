@@ -1,70 +1,43 @@
-From: Raj Ammanur <rammanur@arista.com>
-Subject: Re: [PATCH] crypto: aesni-intel - avoid IPsec re-ordering
-Date: Tue, 19 Jan 2016 09:39:51 -0800
-Message-ID: <CAMFBXfkgjTtBX4sePTr30WenzDgw=h0yp8fp17de=ao+8AT=Mg@mail.gmail.com>
-References: <CAMFBXfk=u_QYTdz0+P1WoNwuGN1xBaw0Ff2Y_XvLdQnKTasOcw@mail.gmail.com>
-	<20160119074343.GA7753@gondor.apana.org.au>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH] crypto: Fix crc32c soft dependency
+Date: Tue, 19 Jan 2016 13:13:42 -0800
+Message-ID: <1453238022.30844.20.camel@schen9-desk2.jf.intel.com>
+References: <20160118170605.4e4a022f@endymion.delvare>
+	 <20160119075726.GA7842@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Jean Delvare <jdelvare@suse.de>, linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Michal Marek <mmarek@suse.cz>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:35263 "EHLO
-	mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755254AbcASRjx (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Jan 2016 12:39:53 -0500
-Received: by mail-wm0-f51.google.com with SMTP id r129so100156326wmr.0
-        for <linux-crypto@vger.kernel.org>; Tue, 19 Jan 2016 09:39:53 -0800 (PST)
-In-Reply-To: <20160119074343.GA7753@gondor.apana.org.au>
+Received: from mga09.intel.com ([134.134.136.24]:37134 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752919AbcASVNn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 19 Jan 2016 16:13:43 -0500
+In-Reply-To: <20160119075726.GA7842@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Thanks a bunch Herbert. I will try out the patch when you make it available.
+On Tue, 2016-01-19 at 15:57 +0800, Herbert Xu wrote:
+> On Mon, Jan 18, 2016 at 05:06:05PM +0100, Jean Delvare wrote:
+> > I don't think it makes sense for a module to have a soft dependency
+> > on itself. This seems quite cyclic by nature and I can't see what
+> > purpose it could serve.
+> > 
+> > OTOH libcrc32c calls crypto_alloc_shash("crc32c", 0, 0) so it pretty
+> > much assumes that some incarnation of the "crc32c" hash algorithm has
+> > been loaded. Therefore it makes sense to have the soft dependency
+> > there (as crc-t10dif does.)
+> > 
+> > Signed-off-by: Jean Delvare <jdelvare@suse.de>
+> > Cc: Tim Chen <tim.c.chen@linux.intel.com>
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> 
+> Well caught.  Patch applied, thanks!
 
+Thanks for the fix.
 
-Are there any thoughts for these other questions from you or anyone
-else on the list, more
-importantly regarding backlog handling in ESP ?
-
-
-2. When the pkts are put on the async work queue, the queue size is initialized
-as 100 in cryptd_init_queue() in crypto/cryptd.c. Does anyone know how/why
-100 was picked ?
-
-3. In cryptd_queue_worker(), the backlog->complete() callback is invoked with
--EINPROGRESS. In net/ipv4/esp4.c, there is no handling for EINPROGRESS
-in esp_input_done()/esp_input_done2(). Am I reading the code correctly and
-is there any expectation that ESP should support backlog and have backlog
-handling ? Currently, the pkt just gets dropped as the EINPROGRESS is treated
-as nexthdr and hence is invalid.
-
-
-
-On Mon, Jan 18, 2016 at 11:43 PM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> Raj Ammanur <rammanur@arista.com> wrote:
->>
->> First, I would like to report that we are also seeing problem where IPSec
->> packets are getting queued up to the workqueue for async processing because
->> of the FPU not being available. Since there are also a lot of input pkts, by the
->> time xfrm_input() is invoked again after the async operation is completed, the
->> IPsec pkts are either out of sequence or out of the replay window, since the
->> replay window has advanced. We are using IPSec tunnel between two
->> switches connected over a Long Fat Network and have sender and receiver
->> servers connected to the two ends of the tunnel. Because of  the TCP
->> receiver receiving  pkts either out of order or not receiving pkts because of
->> dropped pkts, this is causing significant drop in TCP throughtput on Long Fat
->> Networks, where  the network latency is high.
->
-> Thanks for the reminder.  I will try to post a patch for this soon.
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Tim
