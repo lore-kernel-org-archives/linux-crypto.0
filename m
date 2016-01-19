@@ -1,62 +1,52 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH] crypto: af_alg - add async support to algif_aead
-Date: Tue, 19 Jan 2016 07:18:32 -0800
-Message-ID: <569E53C8.9090803@intel.com>
-References: <20160115192112.3065.45755.stgit@tstruk-mobl1>
- <1641011.7xuR0fALWB@myon.chronox.de> <569D034F.5090905@gmail.com>
- <20160119003428.GA5571@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Stephan Mueller <smueller@chronox.de>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Tadeusz Struk <tstruk@gmail.com>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] Reduced reqsize in qat_algs
+Date: Tue, 19 Jan 2016 17:34:04 +0000
+Message-ID: <1453224844-426-1-git-send-email-giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org, tadeusz.struk@intel.com,
+	"Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:26921 "EHLO mga02.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:61359 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754297AbcASPWT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Jan 2016 10:22:19 -0500
-In-Reply-To: <20160119003428.GA5571@gondor.apana.org.au>
+	id S932414AbcASReJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 19 Jan 2016 12:34:09 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/18/2016 04:34 PM, Herbert Xu wrote:
->> My understanding is that the sock_kmalloc is mainly used for allocations
->> > of the user provided  data, because it keeps tracks of how much memory
->> > is allocated by a socket, and makes sure that is will not exceed the
->> > sysctl_optmem_max limit. Usually the internal structures, with fixed
->> > size are allocated simply with kmalloc. I don't think that using
->> > sock_kmalloc will give us any benefit here.
-> If there is only ever one of them per-socket then kmalloc is fine,
-> otherwise you should use sock_kmalloc.
+From: Cabiddu, Giovanni <giovanni.cabiddu@intel.com>
 
-There is one per request. There can be a few of them at a given time.
-We have the same thing in skcipher and we use kmalloc there. 
+req_alloc functions already take into account the request data structure
+when allocating memory.
 
-> 
->> I agree that they are very similar, but I found it much easier to debug
->> > when they are separate functions. I would prefer to keep them separate.
->> > They are also separate in algif_skcipher. It makes it also easier to
->> > read and understand.
-> I too would prefer a common function.  However we can do this
-> later if we wish.
->  
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ drivers/crypto/qat/qat_common/qat_algs.c |    6 ++----
+ 1 files changed, 2 insertions(+), 4 deletions(-)
 
-lets do this later then.
-
-> 
->> > The inflight ctr is incremented only if an asynchronous request has been
->> > successfully en-queued for processing. If a user forges to call recvmsg
->> > then the function that increments it won't be even called.
->> > >From the other hand we don't want to give the option to interrupt the
->> > wait, because in a case, when we do have request being processed by some
->> > hardware, and the user kills the process, causing the socket to be
->> > freed, then we will get an Oops in the callback.
-> This should be replaced with a sock_hold.
-
-Ok, I will try sock_hold.
-Thanks,
-
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index 59e4c3af..1e8852a8 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -1064,8 +1064,7 @@ static int qat_alg_aead_init(struct crypto_aead *tfm,
+ 	if (IS_ERR(ctx->hash_tfm))
+ 		return PTR_ERR(ctx->hash_tfm);
+ 	ctx->qat_hash_alg = hash;
+-	crypto_aead_set_reqsize(tfm, sizeof(struct aead_request) +
+-				     sizeof(struct qat_crypto_request));
++	crypto_aead_set_reqsize(tfm, sizeof(struct qat_crypto_request));
+ 	return 0;
+ }
+ 
+@@ -1114,8 +1113,7 @@ static int qat_alg_ablkcipher_init(struct crypto_tfm *tfm)
+ 	struct qat_alg_ablkcipher_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	spin_lock_init(&ctx->lock);
+-	tfm->crt_ablkcipher.reqsize = sizeof(struct ablkcipher_request) +
+-					sizeof(struct qat_crypto_request);
++	tfm->crt_ablkcipher.reqsize = sizeof(struct qat_crypto_request);
+ 	ctx->tfm = tfm;
+ 	return 0;
+ }
 -- 
-TS
+1.7.4.1
