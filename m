@@ -1,66 +1,110 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: af_alg - add async support to algif_aead
-Date: Tue, 19 Jan 2016 08:34:28 +0800
-Message-ID: <20160119003428.GA5571@gondor.apana.org.au>
-References: <20160115192112.3065.45755.stgit@tstruk-mobl1>
- <1641011.7xuR0fALWB@myon.chronox.de>
- <569D034F.5090905@gmail.com>
+Subject: Re: [PATCH] crypto: ixp4xx: avoid uninitialized variable use
+Date: Tue, 19 Jan 2016 09:00:21 +0800
+Message-ID: <20160119010021.GB5571@gondor.apana.org.au>
+References: <4569235.PkyVAB6DSj@wuerfel>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Stephan Mueller <smueller@chronox.de>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Tadeusz Struk <tstruk@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	davem@davemloft.net,
+	Krzysztof =?utf-8?Q?Ha=C5=82asa?= <khalasa@piap.pl>
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:50362 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:39944 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755517AbcASAei (ORCPT
+	with ESMTP id S1756599AbcASBA0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 18 Jan 2016 19:34:38 -0500
+	Mon, 18 Jan 2016 20:00:26 -0500
 Content-Disposition: inline
-In-Reply-To: <569D034F.5090905@gmail.com>
+In-Reply-To: <4569235.PkyVAB6DSj@wuerfel>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 18, 2016 at 07:22:55AM -0800, Tadeusz Struk wrote:
->
-> My understanding is that the sock_kmalloc is mainly used for allocations
-> of the user provided  data, because it keeps tracks of how much memory
-> is allocated by a socket, and makes sure that is will not exceed the
-> sysctl_optmem_max limit. Usually the internal structures, with fixed
-> size are allocated simply with kmalloc. I don't think that using
-> sock_kmalloc will give us any benefit here.
-
-If there is only ever one of them per-socket then kmalloc is fine,
-otherwise you should use sock_kmalloc.
-
-> > The code in the aead_recvmsg_sync and _async is very very similar with the 
-> > exception of the areq handling.
-> > 
-> > What I am wondering, is it possible to consolidate both into one, considering 
-> > that the real difference according to my understanding is the 
-> > af_alg_wait_for_completion usage (in _sync) vs. the use of a self-written 
-> > callback (_async)?
+On Mon, Jan 18, 2016 at 04:40:15PM +0100, Arnd Bergmann wrote:
+> The move to the new AEAD interface introduced a path through the
+> aead_perform() function in the ixp4xx_crypto driver that leaves
+> lastlen uninitialized, as gcc warns:
 > 
-> I agree that they are very similar, but I found it much easier to debug
-> when they are separate functions. I would prefer to keep them separate.
-> They are also separate in algif_skcipher. It makes it also easier to
-> read and understand.
+> crypto/ixp4xx_crypto.c:1072:5: error: 'lastlen' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+> crypto/ixp4xx_crypto.c: In function 'aead_perform':
+>   if (unlikely(lastlen < authsize)) {
+> 
+> I don't really understand what the code does, but the warning
+> appears to be correct, and this is my best guess at how it
+> should behave instead: I'm introducing a temporary variable
+> that indicates whether we need to allocate an extra buffer
+> or not, and defaults that variable to 'false', so we only
+> allocate the buffer if one of the cases happen where we know
+> that "lastlen < authsize".
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Fixes: d7295a8dc965 ("crypto: ixp4xx - Convert to new AEAD interface")
+> ---
+> 
+> Hi Herbert,
+> 
+> It was one of your patches that introduced the warning, so you may
+> be able to come up with a better fix than I did. Please see this as
+> a bug report. I have applied it in my ARM randconfig test tree to shut
+> up the warning for now.
 
-I too would prefer a common function.  However we can do this
-later if we wish.
+How about this?
+
+---8<---
+Subject: crypto: ixp4xx - Fix false lastlen uninitialised warning
+
+This patch fixes a false positive uninitialised variable warning
+in aead_perform by moving the source processing in front of the
+destination processing, thus ensuring that the initialisation of
+lastlen is always visible to gcc.
+
+Reported-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
+index e52496a..2296934 100644
+--- a/drivers/crypto/ixp4xx_crypto.c
++++ b/drivers/crypto/ixp4xx_crypto.c
+@@ -1031,6 +1031,18 @@ static int aead_perform(struct aead_request *req, int encrypt,
+ 	BUG_ON(ivsize && !req->iv);
+ 	memcpy(crypt->iv, req->iv, ivsize);
  
-> The inflight ctr is incremented only if an asynchronous request has been
-> successfully en-queued for processing. If a user forges to call recvmsg
-> then the function that increments it won't be even called.
-> >From the other hand we don't want to give the option to interrupt the
-> wait, because in a case, when we do have request being processed by some
-> hardware, and the user kills the process, causing the socket to be
-> freed, then we will get an Oops in the callback.
-
-This should be replaced with a sock_hold.
-
-Cheers,
++	buf = chainup_buffers(dev, req->src, crypt->auth_len,
++			      &src_hook, flags, src_direction);
++	req_ctx->src = src_hook.next;
++	crypt->src_buf = src_hook.phys_next;
++	if (!buf)
++		goto free_buf_src;
++
++	lastlen = buf->buf_len;
++	if (lastlen >= authsize)
++		crypt->icv_rev_aes = buf->phys_addr +
++				     buf->buf_len - authsize;
++
+ 	req_ctx->dst = NULL;
+ 
+ 	if (req->src != req->dst) {
+@@ -1055,20 +1067,6 @@ static int aead_perform(struct aead_request *req, int encrypt,
+ 		}
+ 	}
+ 
+-	buf = chainup_buffers(dev, req->src, crypt->auth_len,
+-			      &src_hook, flags, src_direction);
+-	req_ctx->src = src_hook.next;
+-	crypt->src_buf = src_hook.phys_next;
+-	if (!buf)
+-		goto free_buf_src;
+-
+-	if (!encrypt || !req_ctx->dst) {
+-		lastlen = buf->buf_len;
+-		if (lastlen >= authsize)
+-			crypt->icv_rev_aes = buf->phys_addr +
+-					     buf->buf_len - authsize;
+-	}
+-
+ 	if (unlikely(lastlen < authsize)) {
+ 		/* The 12 hmac bytes are scattered,
+ 		 * we need to copy them into a safe buffer */
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
