@@ -1,111 +1,65 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ixp4xx: avoid uninitialized variable use
-Date: Tue, 19 Jan 2016 09:00:21 +0800
-Message-ID: <20160119010021.GB5571@gondor.apana.org.au>
-References: <4569235.PkyVAB6DSj@wuerfel>
+Subject: Re: linux-next/drivers/crypto/atmel-aes.c:282: possible missing
+ break ?
+Date: Tue, 19 Jan 2016 09:05:43 +0800
+Message-ID: <20160119010542.GA5813@gondor.apana.org.au>
+References: <DUB128-W8218FB17B6FF976EA4B2C49CC00@phx.gbl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	davem@davemloft.net,
-	Krzysztof =?utf-8?Q?Ha=C5=82asa?= <khalasa@piap.pl>
-To: Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: David Binderman <dcb314@hotmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:39944 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:36901 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756599AbcASBA0 (ORCPT
+	with ESMTP id S932391AbcASBFt (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 18 Jan 2016 20:00:26 -0500
+	Mon, 18 Jan 2016 20:05:49 -0500
 Content-Disposition: inline
-In-Reply-To: <4569235.PkyVAB6DSj@wuerfel>
+In-Reply-To: <DUB128-W8218FB17B6FF976EA4B2C49CC00@phx.gbl>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 18, 2016 at 04:40:15PM +0100, Arnd Bergmann wrote:
-> The move to the new AEAD interface introduced a path through the
-> aead_perform() function in the ixp4xx_crypto driver that leaves
-> lastlen uninitialized, as gcc warns:
-> 
-> crypto/ixp4xx_crypto.c:1072:5: error: 'lastlen' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-> crypto/ixp4xx_crypto.c: In function 'aead_perform':
->   if (unlikely(lastlen < authsize)) {
-> 
-> I don't really understand what the code does, but the warning
-> appears to be correct, and this is my best guess at how it
-> should behave instead: I'm introducing a temporary variable
-> that indicates whether we need to allocate an extra buffer
-> or not, and defaults that variable to 'false', so we only
-> allocate the buffer if one of the cases happen where we know
-> that "lastlen < authsize".
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> Fixes: d7295a8dc965 ("crypto: ixp4xx - Convert to new AEAD interface")
-> ---
-> 
-> Hi Herbert,
-> 
-> It was one of your patches that introduced the warning, so you may
-> be able to come up with a better fix than I did. Please see this as
-> a bug report. I have applied it in my ARM randconfig test tree to shut
-> up the warning for now.
+On Mon, Jan 18, 2016 at 03:41:46PM +0000, David Binderman wrote:
+> Hello there,
+>=20
+> [linux-next/drivers/crypto/atmel-aes.c:285]: (warning) Buffer 'tmp' i=
+s being written before its old content has been used. 'break;' missing?
+>=20
+> =A0=A0=A0 case AES_GCMHR(3):
+> =A0=A0=A0=A0=A0=A0=A0 snprintf(tmp, sz, "GCMHR[%u]", (offset - AES_GC=
+MHR(0))>> 2);
+>=20
+> =A0=A0=A0 default:
+> =A0=A0=A0=A0=A0=A0=A0 snprintf(tmp, sz, "0x%02x", offset);
+> =A0=A0=A0=A0=A0=A0=A0 break;
 
-How about this?
+Indeed.  Thanks!
 
 ---8<---
-Subject: crypto: ixp4xx - Fix false lastlen uninitialised warning
+Subject: crypto: atmel-aes - Add missing break to atmel_aes_reg_name
 
-This patch fixes a false positive uninitialised variable warning
-in aead_perform by moving the source processing in front of the
-destination processing, thus ensuring that the initialisation of
-lastlen is always visible to gcc.
+The debug function atmel_aes_reg_name was missing a break for
+AES_GCMHR.
 
-Reported-by: Arnd Bergmann <arnd@arndb.de>
+Reported-by: David Binderman <dcb314@hotmail.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index e52496a..2296934 100644
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -1031,6 +1031,18 @@ static int aead_perform(struct aead_request *req, int encrypt,
- 	BUG_ON(ivsize && !req->iv);
- 	memcpy(crypt->iv, req->iv, ivsize);
- 
-+	buf = chainup_buffers(dev, req->src, crypt->auth_len,
-+			      &src_hook, flags, src_direction);
-+	req_ctx->src = src_hook.next;
-+	crypt->src_buf = src_hook.phys_next;
-+	if (!buf)
-+		goto free_buf_src;
-+
-+	lastlen = buf->buf_len;
-+	if (lastlen >= authsize)
-+		crypt->icv_rev_aes = buf->phys_addr +
-+				     buf->buf_len - authsize;
-+
- 	req_ctx->dst = NULL;
- 
- 	if (req->src != req->dst) {
-@@ -1055,20 +1067,6 @@ static int aead_perform(struct aead_request *req, int encrypt,
- 		}
- 	}
- 
--	buf = chainup_buffers(dev, req->src, crypt->auth_len,
--			      &src_hook, flags, src_direction);
--	req_ctx->src = src_hook.next;
--	crypt->src_buf = src_hook.phys_next;
--	if (!buf)
--		goto free_buf_src;
--
--	if (!encrypt || !req_ctx->dst) {
--		lastlen = buf->buf_len;
--		if (lastlen >= authsize)
--			crypt->icv_rev_aes = buf->phys_addr +
--					     buf->buf_len - authsize;
--	}
--
- 	if (unlikely(lastlen < authsize)) {
- 		/* The 12 hmac bytes are scattered,
- 		 * we need to copy them into a safe buffer */
--- 
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index 5621612..6dd3317 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -280,6 +280,7 @@ static const char *atmel_aes_reg_name(u32 offset, c=
+har *tmp, size_t sz)
+ 	case AES_GCMHR(2):
+ 	case AES_GCMHR(3):
+ 		snprintf(tmp, sz, "GCMHR[%u]", (offset - AES_GCMHR(0)) >> 2);
++		break;
+=20
+ 	default:
+ 		snprintf(tmp, sz, "0x%02x", offset);
+--=20
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
