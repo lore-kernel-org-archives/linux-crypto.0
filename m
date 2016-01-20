@@ -1,43 +1,53 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH] crypto: Fix crc32c soft dependency
-Date: Tue, 19 Jan 2016 13:13:42 -0800
-Message-ID: <1453238022.30844.20.camel@schen9-desk2.jf.intel.com>
-References: <20160118170605.4e4a022f@endymion.delvare>
-	 <20160119075726.GA7842@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: aesni-intel - avoid IPsec re-ordering
+Date: Wed, 20 Jan 2016 11:25:37 +0800
+Message-ID: <20160120032537.GA18992@gondor.apana.org.au>
+References: <CAMFBXfk=u_QYTdz0+P1WoNwuGN1xBaw0Ff2Y_XvLdQnKTasOcw@mail.gmail.com>
+ <20160119074343.GA7753@gondor.apana.org.au>
+ <CAMFBXfkgjTtBX4sePTr30WenzDgw=h0yp8fp17de=ao+8AT=Mg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Jean Delvare <jdelvare@suse.de>, linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Michal Marek <mmarek@suse.cz>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Raj Ammanur <rammanur@arista.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:37134 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752919AbcASVNn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Jan 2016 16:13:43 -0500
-In-Reply-To: <20160119075726.GA7842@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:51528 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S935000AbcATDZn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 19 Jan 2016 22:25:43 -0500
+Content-Disposition: inline
+In-Reply-To: <CAMFBXfkgjTtBX4sePTr30WenzDgw=h0yp8fp17de=ao+8AT=Mg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2016-01-19 at 15:57 +0800, Herbert Xu wrote:
-> On Mon, Jan 18, 2016 at 05:06:05PM +0100, Jean Delvare wrote:
-> > I don't think it makes sense for a module to have a soft dependency
-> > on itself. This seems quite cyclic by nature and I can't see what
-> > purpose it could serve.
-> > 
-> > OTOH libcrc32c calls crypto_alloc_shash("crc32c", 0, 0) so it pretty
-> > much assumes that some incarnation of the "crc32c" hash algorithm has
-> > been loaded. Therefore it makes sense to have the soft dependency
-> > there (as crc-t10dif does.)
-> > 
-> > Signed-off-by: Jean Delvare <jdelvare@suse.de>
-> > Cc: Tim Chen <tim.c.chen@linux.intel.com>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > Cc: "David S. Miller" <davem@davemloft.net>
+On Tue, Jan 19, 2016 at 09:39:51AM -0800, Raj Ammanur wrote:
+> Thanks a bunch Herbert. I will try out the patch when you make it available.
 > 
-> Well caught.  Patch applied, thanks!
+> 
+> Are there any thoughts for these other questions from you or anyone
+> else on the list, more
+> importantly regarding backlog handling in ESP ?
+> 
+> 
+> 2. When the pkts are put on the async work queue, the queue size is initialized
+> as 100 in cryptd_init_queue() in crypto/cryptd.c. Does anyone know how/why
+> 100 was picked ?
 
-Thanks for the fix.
+This should probably be increased to match NAPI queue lengths.
 
-Tim
+> 3. In cryptd_queue_worker(), the backlog->complete() callback is invoked with
+> -EINPROGRESS. In net/ipv4/esp4.c, there is no handling for EINPROGRESS
+> in esp_input_done()/esp_input_done2(). Am I reading the code correctly and
+> is there any expectation that ESP should support backlog and have backlog
+> handling ? Currently, the pkt just gets dropped as the EINPROGRESS is treated
+> as nexthdr and hence is invalid.
+
+IPsec does not use crypto backlogging so complete should never be
+called with EINPROGRESS.  If the queue length is exceeded the
+packet will be dropped.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
