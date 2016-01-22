@@ -1,44 +1,136 @@
-From: Horia Ioan Geanta Neag <horia.geanta@nxp.com>
-Subject: Re: [PATCH 0/2] crypto: caam - performance fixes/improvements
-Date: Fri, 22 Jan 2016 16:52:36 +0000
-Message-ID: <56A25E3F.8070004@nxp.com>
-References: <1452611650-15803-1-git-send-email-horia.geanta@nxp.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v1] crypto: ccp - Add hash state import and export support
+Date: Fri, 22 Jan 2016 11:22:48 -0600
+Message-ID: <56A26568.3000806@amd.com>
+References: <20160112171738.23496.44254.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Fabio Estevam <fabio.estevam@nxp.com>,
-	Alexandru Porosanu <alexandru.porosanu@nxp.com>,
-	Scott Wood <scott.wood@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Transfer-Encoding: 7bit
+Cc: David Miller <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-am1on0058.outbound.protection.outlook.com ([157.56.112.58]:55472
-	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
+Received: from mail-bn1bon0058.outbound.protection.outlook.com ([157.56.111.58]:26688
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751908AbcAVR0a (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Jan 2016 12:26:30 -0500
-In-Reply-To: <1452611650-15803-1-git-send-email-horia.geanta@nxp.com>
-Content-Language: en-US
-Content-ID: <96452F2985D3894994A920F748186758@eurprd04.prod.outlook.com>
+	id S1754415AbcAVRzK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 22 Jan 2016 12:55:10 -0500
+In-Reply-To: <20160112171738.23496.44254.stgit@tlendack-t1.amdoffice.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-T24gMS8xMi8yMDE2IDU6MTQgUE0sIEhvcmlhIEdlYW50xIMgd3JvdGU6DQo+IFRoZSBmb2xsb3dp
-bmcgcGF0Y2hlcyBpbmNyZWFzZS9maXggQ0FBTSBwZXJmb3JtYW5jZSBieSBtb2RpZnlpbmcNCj4g
-dGhlIGNvbmZpZ3VyYXRpb24gb2YgTUNGR1IgKE1hc3RlciBDb25maWd1cmF0aW9uIFJlZ2lzdGVy
-KToNCj4gLTFzdCBwYXRjaCBmaXhlcyBhIH4gNSUgcGVyZm9ybWFuY2UgZHJvcCBvbiBQUEMgcGxh
-dGZvcm1zDQo+IC0ybmQgcGF0Y2ggaW1wcm92ZXMgcGVyZm9ybWFuY2UgaW4gc29tZSB1c2UgY2Fz
-ZXMsIHNpbmNlIENBQU0gRE1BDQo+IHRyYW5zZmVycyBhcmUgb3B0aW1pemVkDQo+IA0KPiANCj4g
-Tm90ZTogQVdDQUNIRVswXSAoQVhJMyAiYnVmZmVyYWJsZSIpIGFuZCBBV0NBQ0hFWzFdIChBWEkz
-ICJjYWNoZWFibGUiKQ0KPiBhcmUgc2V0IGlycmVzcGVjdGl2ZSBvZiBwbGF0Zm9ybSwgc2luY2U6
-DQo+IC1mb3IgQVJNLWJhc2VkIFNvQ3M6IHRoZSBpbnRlcmNvbm5lY3QgSVAgaWdub3JlcyBBV0NB
-Q0hFWzBdDQo+IC1mb3IgUFBDLWJhc2VkIFNvQ3M6IFBBTVUgaGFuZGxlcyBjb2hlcmVuY3kgY29u
-dHJvbCwgbm90IEFXQ0FDSEVbMV0NCj4gDQo+IEhvcmlhIEdlYW50xIMgKDIpOg0KPiAgIGNyeXB0
-bzogY2FhbSAtIG1ha2Ugd3JpdGUgdHJhbnNhY3Rpb25zIGJ1ZmZlcmFibGUgb24gUFBDIHBsYXRm
-b3Jtcw0KPiAgIGNyeXB0bzogY2FhbSAtIGVuYWJsZSBMQVJHRV9CVVJTVCBmb3IgZW5oYW5jaW5n
-IERNQSB0cmFuc2FjdGlvbnMgc2l6ZQ0KDQpIZXJiZXJ0LCBJIHNlZSB0aGF0IHlvdSd2ZSBzZW50
-IHRoZSBjcnlwdG8gZml4ZXMgZm9yIDQuNSBwdWxsIHJlcXVlc3QuDQpBbnkgcmVhc29uIHdoeSB0
-aGVzZSBwYXRjaGVzIHdlcmUgbm90IGluY2x1ZGVkPw0KSSB3YXMgZXhwZWN0aW5nIGF0IGxlYXN0
-IHRoZSBmaXJzdCBvbmUgdG8gZ2V0IGl0LCBpdCdzIGV2ZW4gQ2MtaW5nIHN0YWJsZS4NCg0KVGhh
-bmtzLA0KSG9yaWENCg==
+On 01/12/2016 11:17 AM, Tom Lendacky wrote:
+> Commit 8996eafdcbad ("crypto: ahash - ensure statesize is non-zero")
+> added a check to prevent ahash algorithms from successfully registering
+> if the import and export functions were not implemented. This prevents
+> an oops in the hash_accept function of algif_hash. This commit causes
+> the ccp-crypto module SHA support and AES CMAC support from successfully
+> registering and causing the ccp-crypto module load to fail because the
+> ahash import and export functions are not implemented.
+> 
+> Update the CCP Crypto API support to provide import and export support
+> for ahash algorithms.
+> 
+> Cc: <stable@vger.kernel.org> # 3.14.x-
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+
+Herbert, is it possible this patch can be part of Crypto Fixes for 4.5?
+
+Thanks,
+Tom
+
+> ---
+>  drivers/crypto/ccp/ccp-crypto-aes-cmac.c |   23 +++++++++++++++++++++++
+>  drivers/crypto/ccp/ccp-crypto-sha.c      |   23 +++++++++++++++++++++++
+>  2 files changed, 46 insertions(+)
+> 
+> diff --git a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
+> index d89f20c..00207cf 100644
+> --- a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
+> +++ b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
+> @@ -220,6 +220,26 @@ static int ccp_aes_cmac_digest(struct ahash_request *req)
+>  	return ccp_aes_cmac_finup(req);
+>  }
+>  
+> +static int ccp_aes_cmac_export(struct ahash_request *req, void *out)
+> +{
+> +	struct ccp_aes_cmac_req_ctx *rctx = ahash_request_ctx(req);
+> +	struct ccp_aes_cmac_req_ctx *state = out;
+> +
+> +	*state = *rctx;
+> +
+> +	return 0;
+> +}
+> +
+> +static int ccp_aes_cmac_import(struct ahash_request *req, const void *in)
+> +{
+> +	struct ccp_aes_cmac_req_ctx *rctx = ahash_request_ctx(req);
+> +	const struct ccp_aes_cmac_req_ctx *state = in;
+> +
+> +	*rctx = *state;
+> +
+> +	return 0;
+> +}
+> +
+>  static int ccp_aes_cmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+>  			       unsigned int key_len)
+>  {
+> @@ -352,10 +372,13 @@ int ccp_register_aes_cmac_algs(struct list_head *head)
+>  	alg->final = ccp_aes_cmac_final;
+>  	alg->finup = ccp_aes_cmac_finup;
+>  	alg->digest = ccp_aes_cmac_digest;
+> +	alg->export = ccp_aes_cmac_export;
+> +	alg->import = ccp_aes_cmac_import;
+>  	alg->setkey = ccp_aes_cmac_setkey;
+>  
+>  	halg = &alg->halg;
+>  	halg->digestsize = AES_BLOCK_SIZE;
+> +	halg->statesize = sizeof(struct ccp_aes_cmac_req_ctx);
+>  
+>  	base = &halg->base;
+>  	snprintf(base->cra_name, CRYPTO_MAX_ALG_NAME, "cmac(aes)");
+> diff --git a/drivers/crypto/ccp/ccp-crypto-sha.c b/drivers/crypto/ccp/ccp-crypto-sha.c
+> index d14b3f2..3aae58d 100644
+> --- a/drivers/crypto/ccp/ccp-crypto-sha.c
+> +++ b/drivers/crypto/ccp/ccp-crypto-sha.c
+> @@ -207,6 +207,26 @@ static int ccp_sha_digest(struct ahash_request *req)
+>  	return ccp_sha_finup(req);
+>  }
+>  
+> +static int ccp_sha_export(struct ahash_request *req, void *out)
+> +{
+> +	struct ccp_sha_req_ctx *rctx = ahash_request_ctx(req);
+> +	struct ccp_sha_req_ctx *state = out;
+> +
+> +	*state = *rctx;
+> +
+> +	return 0;
+> +}
+> +
+> +static int ccp_sha_import(struct ahash_request *req, const void *in)
+> +{
+> +	struct ccp_sha_req_ctx *rctx = ahash_request_ctx(req);
+> +	const struct ccp_sha_req_ctx *state = in;
+> +
+> +	*rctx = *state;
+> +
+> +	return 0;
+> +}
+> +
+>  static int ccp_sha_setkey(struct crypto_ahash *tfm, const u8 *key,
+>  			  unsigned int key_len)
+>  {
+> @@ -403,9 +423,12 @@ static int ccp_register_sha_alg(struct list_head *head,
+>  	alg->final = ccp_sha_final;
+>  	alg->finup = ccp_sha_finup;
+>  	alg->digest = ccp_sha_digest;
+> +	alg->export = ccp_sha_export;
+> +	alg->import = ccp_sha_import;
+>  
+>  	halg = &alg->halg;
+>  	halg->digestsize = def->digest_size;
+> +	halg->statesize = sizeof(struct ccp_sha_req_ctx);
+>  
+>  	base = &halg->base;
+>  	snprintf(base->cra_name, CRYPTO_MAX_ALG_NAME, "%s", def->name);
+> 
