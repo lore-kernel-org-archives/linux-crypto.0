@@ -1,81 +1,44 @@
-From: Nicolas Ferre <nicolas.ferre@atmel.com>
-Subject: Re: [PATCH 0/5] crypto: atmel-sha: fix registration issue and other
- bugs
-Date: Fri, 22 Jan 2016 17:52:45 +0100
-Message-ID: <56A25E5D.6050504@atmel.com>
-References: <cover.1452867917.git.cyrille.pitchen@atmel.com>
+From: Horia Ioan Geanta Neag <horia.geanta@nxp.com>
+Subject: Re: [PATCH 0/2] crypto: caam - performance fixes/improvements
+Date: Fri, 22 Jan 2016 16:52:36 +0000
+Message-ID: <56A25E3F.8070004@nxp.com>
+References: <1452611650-15803-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-To: Cyrille Pitchen <cyrille.pitchen@atmel.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Fabio Estevam <fabio.estevam@nxp.com>,
+	Alexandru Porosanu <alexandru.porosanu@nxp.com>,
+	Scott Wood <scott.wood@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from eusmtp01.atmel.com ([212.144.249.243]:24487 "EHLO
-	eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750940AbcAVQwv (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Jan 2016 11:52:51 -0500
-In-Reply-To: <cover.1452867917.git.cyrille.pitchen@atmel.com>
+Received: from mail-am1on0058.outbound.protection.outlook.com ([157.56.112.58]:55472
+	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751908AbcAVR0a (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 22 Jan 2016 12:26:30 -0500
+In-Reply-To: <1452611650-15803-1-git-send-email-horia.geanta@nxp.com>
+Content-Language: en-US
+Content-ID: <96452F2985D3894994A920F748186758@eurprd04.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Le 15/01/2016 15:49, Cyrille Pitchen a =E9crit :
-> Hi all,
->=20
-> This series of patches fixes many issues such as the algo registratio=
-n failure
-> or the broken support of context switches.
-
-I think it's eligible as a "fixes" series for 4.5... Herbert, is the
-whole series can be queued as fixes, in your opinion?
-
-And, on the whole series:
-Acked-by: Nicolas Ferre <nicolas.ferre@atmel.com>
-
-
-> This series was applied to linux-next and tested on a sama5d2 xplaine=
-d
-> ultra board. We now pass the tcrypt tests in the following modes:
-> -  2: sha1
-> -  6: sha256
-> - 11: sha384
-> - 12: sha512
-> - 33: sha224
->=20
-> The context switch fix was tested with a userspace program using the =
-cryptodev
-> module. This single thread program computes the SHA256 hashes of many=
- files
-> by splitting then into fixed size chunks. The chunks of each file are
-> processed by calling 'update' operations using a round robin algorith=
-m.
->=20
-> However, the .import() / .export() implementation was NOT tested!
-> Nonetheless the last patch is needed to fix the registration issue, o=
-therwise
-> atmel_sha_probe() would still fail.
->=20
-> Best regards,
->=20
-> Cyrille
->=20
->=20
-> Cyrille Pitchen (5):
->   crypto: atmel-sha: fix crash when computing digest on empty message
->   crypto: atmel-sha: fix a race between the 'done' tasklet and the
->     crypto client
->   crypto: atmel-sha: add support of sama5d2x SoCs
->   crypto: atmel-sha: fix context switches
->   crypto: atmel-sha: fix algorihtm registration
->=20
->  drivers/crypto/atmel-sha-regs.h |   4 +
->  drivers/crypto/atmel-sha.c      | 186 ++++++++++++++++++++++++++++++=
-+++-------
->  2 files changed, 158 insertions(+), 32 deletions(-)
->=20
-
-
---=20
-Nicolas Ferre
+T24gMS8xMi8yMDE2IDU6MTQgUE0sIEhvcmlhIEdlYW50xIMgd3JvdGU6DQo+IFRoZSBmb2xsb3dp
+bmcgcGF0Y2hlcyBpbmNyZWFzZS9maXggQ0FBTSBwZXJmb3JtYW5jZSBieSBtb2RpZnlpbmcNCj4g
+dGhlIGNvbmZpZ3VyYXRpb24gb2YgTUNGR1IgKE1hc3RlciBDb25maWd1cmF0aW9uIFJlZ2lzdGVy
+KToNCj4gLTFzdCBwYXRjaCBmaXhlcyBhIH4gNSUgcGVyZm9ybWFuY2UgZHJvcCBvbiBQUEMgcGxh
+dGZvcm1zDQo+IC0ybmQgcGF0Y2ggaW1wcm92ZXMgcGVyZm9ybWFuY2UgaW4gc29tZSB1c2UgY2Fz
+ZXMsIHNpbmNlIENBQU0gRE1BDQo+IHRyYW5zZmVycyBhcmUgb3B0aW1pemVkDQo+IA0KPiANCj4g
+Tm90ZTogQVdDQUNIRVswXSAoQVhJMyAiYnVmZmVyYWJsZSIpIGFuZCBBV0NBQ0hFWzFdIChBWEkz
+ICJjYWNoZWFibGUiKQ0KPiBhcmUgc2V0IGlycmVzcGVjdGl2ZSBvZiBwbGF0Zm9ybSwgc2luY2U6
+DQo+IC1mb3IgQVJNLWJhc2VkIFNvQ3M6IHRoZSBpbnRlcmNvbm5lY3QgSVAgaWdub3JlcyBBV0NB
+Q0hFWzBdDQo+IC1mb3IgUFBDLWJhc2VkIFNvQ3M6IFBBTVUgaGFuZGxlcyBjb2hlcmVuY3kgY29u
+dHJvbCwgbm90IEFXQ0FDSEVbMV0NCj4gDQo+IEhvcmlhIEdlYW50xIMgKDIpOg0KPiAgIGNyeXB0
+bzogY2FhbSAtIG1ha2Ugd3JpdGUgdHJhbnNhY3Rpb25zIGJ1ZmZlcmFibGUgb24gUFBDIHBsYXRm
+b3Jtcw0KPiAgIGNyeXB0bzogY2FhbSAtIGVuYWJsZSBMQVJHRV9CVVJTVCBmb3IgZW5oYW5jaW5n
+IERNQSB0cmFuc2FjdGlvbnMgc2l6ZQ0KDQpIZXJiZXJ0LCBJIHNlZSB0aGF0IHlvdSd2ZSBzZW50
+IHRoZSBjcnlwdG8gZml4ZXMgZm9yIDQuNSBwdWxsIHJlcXVlc3QuDQpBbnkgcmVhc29uIHdoeSB0
+aGVzZSBwYXRjaGVzIHdlcmUgbm90IGluY2x1ZGVkPw0KSSB3YXMgZXhwZWN0aW5nIGF0IGxlYXN0
+IHRoZSBmaXJzdCBvbmUgdG8gZ2V0IGl0LCBpdCdzIGV2ZW4gQ2MtaW5nIHN0YWJsZS4NCg0KVGhh
+bmtzLA0KSG9yaWENCg==
