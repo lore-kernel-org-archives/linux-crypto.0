@@ -1,67 +1,67 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/2] crypto: api - Add crypto_type_has_alg helper
-Date: Sat, 23 Jan 2016 13:51:01 +0800
-Message-ID: <20160123055101.GA24235@gondor.apana.org.au>
+Subject: [PATCH 2/2] crypto: hash - Add crypto_has_ahash helper
+Date: Sat, 23 Jan 2016 13:52:40 +0800
+Message-ID: <20160123055240.GA24268@gondor.apana.org.au>
+References: <20160123055101.GA24235@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36335 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:51450 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750823AbcAWFvF (ORCPT
+	with ESMTP id S1751634AbcAWFwn (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 23 Jan 2016 00:51:05 -0500
+	Sat, 23 Jan 2016 00:52:43 -0500
 Content-Disposition: inline
+In-Reply-To: <20160123055101.GA24235@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds the helper crypto_type_has_alg which is meant
-to replace crypto_has_alg for new-style crypto types.  Rather
-than hard-coding type/mask information they're now retrieved
-from the crypto_type object.
+This patch adds the helper crypto_has_ahash which should replace
+crypto_has_hash.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 7be76aa..731255a 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -987,6 +987,21 @@ unsigned int crypto_alg_extsize(struct crypto_alg *alg)
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index d19b523..8b08a59 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -542,6 +542,12 @@ struct crypto_ahash *crypto_alloc_ahash(const char *alg_name, u32 type,
  }
- EXPORT_SYMBOL_GPL(crypto_alg_extsize);
+ EXPORT_SYMBOL_GPL(crypto_alloc_ahash);
  
-+int crypto_type_has_alg(const char *name, const struct crypto_type *frontend,
-+			u32 type, u32 mask)
++int crypto_has_ahash(const char *alg_name, u32 type, u32 mask)
 +{
-+	int ret = 0;
-+	struct crypto_alg *alg = crypto_find_alg(name, frontend, type, mask);
-+
-+	if (!IS_ERR(alg)) {
-+		crypto_mod_put(alg);
-+		ret = 1;
-+	}
-+
-+	return ret;
++	return crypto_type_has_alg(alg_name, &crypto_ahash_type, type, mask);
 +}
-+EXPORT_SYMBOL_GPL(crypto_type_has_alg);
++EXPORT_SYMBOL_GPL(crypto_has_ahash);
 +
- static int __init crypto_algapi_init(void)
+ static int ahash_prepare_alg(struct ahash_alg *alg)
  {
- 	crypto_init_proc();
-diff --git a/crypto/internal.h b/crypto/internal.h
-index 00e42a3..7eefcdb 100644
---- a/crypto/internal.h
-+++ b/crypto/internal.h
-@@ -104,6 +104,9 @@ int crypto_probing_notify(unsigned long val, void *v);
+ 	struct crypto_alg *base = &alg->halg.base;
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 6361892..5700e6a 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -259,6 +260,18 @@ static inline void crypto_free_ahash(struct crypto_ahash *tfm)
+ 	crypto_destroy_tfm(tfm, crypto_ahash_tfm(tfm));
+ }
  
- unsigned int crypto_alg_extsize(struct crypto_alg *alg);
- 
-+int crypto_type_has_alg(const char *name, const struct crypto_type *frontend,
-+			u32 type, u32 mask);
++/**
++ * crypto_has_ahash() - Search for the availability of an ahash.
++ * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
++ *	      ahash
++ * @type: specifies the type of the ahash 
++ * @mask: specifies the mask for the ahash 
++ *
++ * Return: true when the ahash is known to the kernel crypto API; false
++ *	   otherwise
++ */
++int crypto_has_ahash(const char *alg_name, u32 type, u32 mask);
 +
- static inline struct crypto_alg *crypto_alg_get(struct crypto_alg *alg)
+ static inline unsigned int crypto_ahash_alignmask(
+ 	struct crypto_ahash *tfm)
  {
- 	atomic_inc(&alg->cra_refcnt);
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
