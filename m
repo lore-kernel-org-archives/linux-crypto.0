@@ -1,136 +1,68 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v1] crypto: ccp - Add hash state import and export support
-Date: Fri, 22 Jan 2016 11:22:48 -0600
-Message-ID: <56A26568.3000806@amd.com>
-References: <20160112171738.23496.44254.stgit@tlendack-t1.amdoffice.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 1/2] crypto: api - Add crypto_type_has_alg helper
+Date: Sat, 23 Jan 2016 13:51:01 +0800
+Message-ID: <20160123055101.GA24235@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: David Miller <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0058.outbound.protection.outlook.com ([157.56.111.58]:26688
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754415AbcAVRzK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Jan 2016 12:55:10 -0500
-In-Reply-To: <20160112171738.23496.44254.stgit@tlendack-t1.amdoffice.net>
+Received: from helcar.hengli.com.au ([209.40.204.226]:36335 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750823AbcAWFvF (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 23 Jan 2016 00:51:05 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/12/2016 11:17 AM, Tom Lendacky wrote:
-> Commit 8996eafdcbad ("crypto: ahash - ensure statesize is non-zero")
-> added a check to prevent ahash algorithms from successfully registering
-> if the import and export functions were not implemented. This prevents
-> an oops in the hash_accept function of algif_hash. This commit causes
-> the ccp-crypto module SHA support and AES CMAC support from successfully
-> registering and causing the ccp-crypto module load to fail because the
-> ahash import and export functions are not implemented.
-> 
-> Update the CCP Crypto API support to provide import and export support
-> for ahash algorithms.
-> 
-> Cc: <stable@vger.kernel.org> # 3.14.x-
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+This patch adds the helper crypto_type_has_alg which is meant
+to replace crypto_has_alg for new-style crypto types.  Rather
+than hard-coding type/mask information they're now retrieved
+from the crypto_type object.
 
-Herbert, is it possible this patch can be part of Crypto Fixes for 4.5?
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Thanks,
-Tom
-
-> ---
->  drivers/crypto/ccp/ccp-crypto-aes-cmac.c |   23 +++++++++++++++++++++++
->  drivers/crypto/ccp/ccp-crypto-sha.c      |   23 +++++++++++++++++++++++
->  2 files changed, 46 insertions(+)
-> 
-> diff --git a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
-> index d89f20c..00207cf 100644
-> --- a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
-> +++ b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
-> @@ -220,6 +220,26 @@ static int ccp_aes_cmac_digest(struct ahash_request *req)
->  	return ccp_aes_cmac_finup(req);
->  }
->  
-> +static int ccp_aes_cmac_export(struct ahash_request *req, void *out)
-> +{
-> +	struct ccp_aes_cmac_req_ctx *rctx = ahash_request_ctx(req);
-> +	struct ccp_aes_cmac_req_ctx *state = out;
-> +
-> +	*state = *rctx;
-> +
-> +	return 0;
-> +}
-> +
-> +static int ccp_aes_cmac_import(struct ahash_request *req, const void *in)
-> +{
-> +	struct ccp_aes_cmac_req_ctx *rctx = ahash_request_ctx(req);
-> +	const struct ccp_aes_cmac_req_ctx *state = in;
-> +
-> +	*rctx = *state;
-> +
-> +	return 0;
-> +}
-> +
->  static int ccp_aes_cmac_setkey(struct crypto_ahash *tfm, const u8 *key,
->  			       unsigned int key_len)
->  {
-> @@ -352,10 +372,13 @@ int ccp_register_aes_cmac_algs(struct list_head *head)
->  	alg->final = ccp_aes_cmac_final;
->  	alg->finup = ccp_aes_cmac_finup;
->  	alg->digest = ccp_aes_cmac_digest;
-> +	alg->export = ccp_aes_cmac_export;
-> +	alg->import = ccp_aes_cmac_import;
->  	alg->setkey = ccp_aes_cmac_setkey;
->  
->  	halg = &alg->halg;
->  	halg->digestsize = AES_BLOCK_SIZE;
-> +	halg->statesize = sizeof(struct ccp_aes_cmac_req_ctx);
->  
->  	base = &halg->base;
->  	snprintf(base->cra_name, CRYPTO_MAX_ALG_NAME, "cmac(aes)");
-> diff --git a/drivers/crypto/ccp/ccp-crypto-sha.c b/drivers/crypto/ccp/ccp-crypto-sha.c
-> index d14b3f2..3aae58d 100644
-> --- a/drivers/crypto/ccp/ccp-crypto-sha.c
-> +++ b/drivers/crypto/ccp/ccp-crypto-sha.c
-> @@ -207,6 +207,26 @@ static int ccp_sha_digest(struct ahash_request *req)
->  	return ccp_sha_finup(req);
->  }
->  
-> +static int ccp_sha_export(struct ahash_request *req, void *out)
-> +{
-> +	struct ccp_sha_req_ctx *rctx = ahash_request_ctx(req);
-> +	struct ccp_sha_req_ctx *state = out;
-> +
-> +	*state = *rctx;
-> +
-> +	return 0;
-> +}
-> +
-> +static int ccp_sha_import(struct ahash_request *req, const void *in)
-> +{
-> +	struct ccp_sha_req_ctx *rctx = ahash_request_ctx(req);
-> +	const struct ccp_sha_req_ctx *state = in;
-> +
-> +	*rctx = *state;
-> +
-> +	return 0;
-> +}
-> +
->  static int ccp_sha_setkey(struct crypto_ahash *tfm, const u8 *key,
->  			  unsigned int key_len)
->  {
-> @@ -403,9 +423,12 @@ static int ccp_register_sha_alg(struct list_head *head,
->  	alg->final = ccp_sha_final;
->  	alg->finup = ccp_sha_finup;
->  	alg->digest = ccp_sha_digest;
-> +	alg->export = ccp_sha_export;
-> +	alg->import = ccp_sha_import;
->  
->  	halg = &alg->halg;
->  	halg->digestsize = def->digest_size;
-> +	halg->statesize = sizeof(struct ccp_sha_req_ctx);
->  
->  	base = &halg->base;
->  	snprintf(base->cra_name, CRYPTO_MAX_ALG_NAME, "%s", def->name);
-> 
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 7be76aa..731255a 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -987,6 +987,21 @@ unsigned int crypto_alg_extsize(struct crypto_alg *alg)
+ }
+ EXPORT_SYMBOL_GPL(crypto_alg_extsize);
+ 
++int crypto_type_has_alg(const char *name, const struct crypto_type *frontend,
++			u32 type, u32 mask)
++{
++	int ret = 0;
++	struct crypto_alg *alg = crypto_find_alg(name, frontend, type, mask);
++
++	if (!IS_ERR(alg)) {
++		crypto_mod_put(alg);
++		ret = 1;
++	}
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(crypto_type_has_alg);
++
+ static int __init crypto_algapi_init(void)
+ {
+ 	crypto_init_proc();
+diff --git a/crypto/internal.h b/crypto/internal.h
+index 00e42a3..7eefcdb 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -104,6 +104,9 @@ int crypto_probing_notify(unsigned long val, void *v);
+ 
+ unsigned int crypto_alg_extsize(struct crypto_alg *alg);
+ 
++int crypto_type_has_alg(const char *name, const struct crypto_type *frontend,
++			u32 type, u32 mask);
++
+ static inline struct crypto_alg *crypto_alg_get(struct crypto_alg *alg)
+ {
+ 	atomic_inc(&alg->cra_refcnt);
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
