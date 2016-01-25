@@ -1,78 +1,82 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: re: [PATCH] eCryptfs: Clean up crypto initialization
-Date: Mon, 25 Jan 2016 17:23:11 +0300
-Message-ID: <20160125142311.GA15355@mwanda>
+From: Anatoly Pugachev <matorola@gmail.com>
+Subject: [PATCH 1/2] n2rng: documentation, add DT bindings, vendor prefixes
+Date: Mon, 25 Jan 2016 19:09:21 +0300
+Message-ID: <20160125160921.GA26873@yogzotot>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: ecryptfs@vger.kernel.org, linux-crypto@vger.kernel.org
-To: mhalcrow@us.ibm.com
-Return-path: <ecryptfs-owner@vger.kernel.org>
+Cc: sparclinux@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
+Return-path: <sparclinux-owner@vger.kernel.org>
 Content-Disposition: inline
-Sender: ecryptfs-owner@vger.kernel.org
+Sender: sparclinux-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello Michael Halcrow,
+n2rng: documentation, add DT bindings, vendor prefixes
 
-The patch e5d9cbde6ce0: "[PATCH] eCryptfs: Clean up crypto
-initialization" from Oct 30, 2006, leads to the following static
-checker warning:
+Signed-off-by: Anatoly Pugachev <matorola@gmail.com>
+---
+ .../devicetree/bindings/sparc_sun_oracle_rng.txt   | 30 ++++++++++++++++++++++
+ .../devicetree/bindings/vendor-prefixes.txt        |  2 ++
+ 2 files changed, 32 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/sparc_sun_oracle_rng.txt
 
-	fs/ecryptfs/crypto.c:1625 ecryptfs_process_key_cipher()
-	error: get_random_bytes() 'dummy_key' too small (64 vs 4294967295)
+diff --git a/Documentation/devicetree/bindings/sparc_sun_oracle_rng.txt b/Documentation/devicetree/bindings/sparc_sun_oracle_rng.txt
+new file mode 100644
+index 0000000..b0b2111
+--- /dev/null
++++ b/Documentation/devicetree/bindings/sparc_sun_oracle_rng.txt
+@@ -0,0 +1,30 @@
++HWRNG support for the n2_rng driver
++
++Required properties:
++- reg		: base address to sample from
++- compatible	: should contain one of the following
++	RNG versions:
++	- 'SUNW,n2-rng' for Niagara 2 Platform (SUN UltraSPARC T2 CPU)
++	- 'SUNW,vf-rng' for Victoria Falls Platform (SUN UltraSPARC T2 Plus CPU)
++	- 'SUNW,kt-rng' for Rainbow/Yosemite Falls Platform (SUN SPARC T3/T4), (UltraSPARC KT/Niagara 3 - development names)
++	more recent systems (after Oracle acquisition of SUN)
++	- 'ORCL,m4-rng' for SPARC T5/M5
++	- 'ORCL,m7-rng' for SPARC T7/M7
++
++Examples:
++/* linux LDOM on SPARC T5-2 */
++Node 0xf029a4f4
++	.node:  f029a4f4
++	rng-#units:  00000002
++	compatible: 'ORCL,m4-rng'
++	reg:  0000000e
++	name: 'random-number-generator'
++
++/* solaris on SPARC M7-8 */
++Node 0xf028c08c
++	rng-#units:  00000003
++	compatible: 'ORCL,m7-rng'
++	reg:  0000000e
++	name:  'random-number-generator'
++
++PS: see as well prtconfs.git by DaveM
+diff --git a/Documentation/devicetree/bindings/vendor-prefixes.txt b/Documentation/devicetree/bindings/vendor-prefixes.txt
+index 72e2c5a..e00029d 100644
+--- a/Documentation/devicetree/bindings/vendor-prefixes.txt
++++ b/Documentation/devicetree/bindings/vendor-prefixes.txt
+@@ -170,6 +170,7 @@ opencores	OpenCores.org
+ option	Option NV
+ ortustech	Ortus Technology Co., Ltd.
+ ovti	OmniVision Technologies
++ORCL	Oracle Corporation
+ panasonic	Panasonic Corporation
+ parade	Parade Technologies Inc.
+ pericom	Pericom Technology Inc.
+@@ -227,6 +228,7 @@ startek	Startek
+ ste	ST-Ericsson
+ stericsson	ST-Ericsson
+ synology	Synology, Inc.
++SUNW	Sun Microsystems, Inc
+ tbs	TBS Technologies
+ tcl	Toby Churchill Ltd.
+ technologic	Technologic Systems
+-- 
+2.7.0
 
-fs/ecryptfs/crypto.c
-  1593  static int
-  1594  ecryptfs_process_key_cipher(struct crypto_blkcipher **key_tfm,
-  1595                              char *cipher_name, size_t *key_size)
-  1596  {
-  1597          char dummy_key[ECRYPTFS_MAX_KEY_BYTES];
-  1598          char *full_alg_name = NULL;
-  1599          int rc;
-  1600  
-  1601          *key_tfm = NULL;
-  1602          if (*key_size > ECRYPTFS_MAX_KEY_BYTES) {
-  1603                  rc = -EINVAL;
-  1604                  printk(KERN_ERR "Requested key size is [%zd] bytes; maximum "
-  1605                        "allowable is [%d]\n", *key_size, ECRYPTFS_MAX_KEY_BYTES);
-  1606                  goto out;
-  1607          }
-  1608          rc = ecryptfs_crypto_api_algify_cipher_name(&full_alg_name, cipher_name,
-  1609                                                      "ecb");
-  1610          if (rc)
-  1611                  goto out;
-  1612          *key_tfm = crypto_alloc_blkcipher(full_alg_name, 0, CRYPTO_ALG_ASYNC);
-  1613          if (IS_ERR(*key_tfm)) {
-  1614                  rc = PTR_ERR(*key_tfm);
-  1615                  printk(KERN_ERR "Unable to allocate crypto cipher with name "
-  1616                         "[%s]; rc = [%d]\n", full_alg_name, rc);
-  1617                  goto out;
-  1618          }
-  1619          crypto_blkcipher_set_flags(*key_tfm, CRYPTO_TFM_REQ_WEAK_KEY);
-  1620          if (*key_size == 0) {
-  1621                  struct blkcipher_alg *alg = crypto_blkcipher_alg(*key_tfm);
-  1622  
-  1623                  *key_size = alg->max_keysize;
-
-My concern here is that arc4 has a max_keysize of ARC4_MAX_KEY_SIZE (256).
-
-  1624          }
-  1625          get_random_bytes(dummy_key, *key_size);
-
-Potentially leading to memory corruption here.  This is static analysis
-work so I may be wrong.
-
-  1626          rc = crypto_blkcipher_setkey(*key_tfm, dummy_key, *key_size);
-  1627          if (rc) {
-  1628                  printk(KERN_ERR "Error attempting to set key of size [%zd] for "
-  1629                         "cipher [%s]; rc = [%d]\n", *key_size, full_alg_name,
-  1630                         rc);
-  1631                  rc = -EINVAL;
-  1632                  goto out;
-  1633          }
-  1634  out:
-  1635          kfree(full_alg_name);
-  1636          return rc;
-  1637  }
-
-regards,
-dan carpenter
