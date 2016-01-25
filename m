@@ -1,49 +1,36 @@
-From: Anatoly Pugachev <matorola@gmail.com>
-Subject: Re: [PATCH 2/2] n2rng: Attach on T5/M5, T7/M7 SPARC CPUs
-Date: Tue, 26 Jan 2016 00:19:02 +0300
-Message-ID: <20160125211902.GA27907@yogzotot>
-References: <20160125160939.GB26873@yogzotot>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: AF_ALG: hash returns -ENOKEY
+Date: Mon, 25 Jan 2016 22:22:36 +0100
+Message-ID: <6333443.68gdEOIkbe@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: sparclinux@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: linux-crypto@vger.kernel.org
-Return-path: <sparclinux-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20160125160939.GB26873@yogzotot>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:42490 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933015AbcAYVWr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Jan 2016 16:22:47 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-n2rng: Attach on T5/M5, T7/M7 SPARC CPUs
+Hi Herbert,
 
-(space to tab fixes after variable names)
+during testing of the current cryptodev-2.6 key, the AF_ALG hash does not seem 
+to work as it used to.
 
-Signed-off-by: Anatoly Pugachev <matorola@gmail.com>
----
- drivers/char/hw_random/n2-drv.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+Regardless whether I use the vmsplice or the sendmsg call, I get -ENOKEY using 
+a normal hash.
 
-diff --git a/drivers/char/hw_random/n2-drv.c b/drivers/char/hw_random/n2-drv.c
-index 843d6f6..3b06c1d6 100644
---- a/drivers/char/hw_random/n2-drv.c
-+++ b/drivers/char/hw_random/n2-drv.c
-@@ -743,6 +743,16 @@ static const struct of_device_id n2rng_match[] = {
- 		.compatible	= "SUNW,kt-rng",
- 		.data		= (void *) 1,
- 	},
-+	{
-+		.name		= "random-number-generator",
-+		.compatible	= "ORCL,m4-rng",
-+		.data		= (void *) 1,
-+	},
-+	{
-+		.name		= "random-number-generator",
-+		.compatible	= "ORCL,m7-rng",
-+		.data		= (void *) 1,
-+	},
- 	{},
- };
- MODULE_DEVICE_TABLE(of, n2rng_match);
--- 
-2.7.0
+When you use by libkcapi/test/ [1] test application with the following 
+command, I always get the error:
 
+./kcapi -x 3 -c sha256 -p 38f86d
+
+Expected result is 
+cc42f645c5aa76ac3154b023359b665375fc3ae42f025fe961fb0f65205ad70e
+
+[1] http://www.chronox.de/libkcapi.html
+
+Ciao
+Stephan
