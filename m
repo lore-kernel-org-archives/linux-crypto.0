@@ -1,43 +1,42 @@
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH 15/26] Bluetooth: Use skcipher and hash
-Date: Mon, 25 Jan 2016 07:48:46 +0100
-Message-ID: <B35B9E9E-DA6B-4AAD-B1EF-2DE778645CAC@holtmann.org>
-References: <20160124131021.GA31153@gondor.apana.org.au> <E1aNKYo-0008Dp-5h@gondolin.me.apana.org.au>
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/2] crypto: caam - performance fixes/improvements
+Date: Mon, 25 Jan 2016 15:11:03 +0800
+Message-ID: <20160125071103.GA5609@gondor.apana.org.au>
+References: <1452611650-15803-1-git-send-email-horia.geanta@nxp.com>
+ <56A25E3F.8070004@nxp.com>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	devel@driverdev.osuosl.org, dm-devel@redhat.com,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-cifs@vger.kernel.org, ecryptfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	linux-nfs@vger.kernel.org, keyrings@vger.kernel.org,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	ceph-devel@vger.kernel.org, linux-wpan@vger.kernel.org,
-	linux-afs@lists.infradead.org, drbd-dev@lists.linbit.com,
-	open-iscsi@googlegroups.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <ecryptfs-owner@vger.kernel.org>
-In-Reply-To: <E1aNKYo-0008Dp-5h@gondolin.me.apana.org.au>
-Sender: ecryptfs-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Fabio Estevam <fabio.estevam@nxp.com>,
+	Alexandru Porosanu <alexandru.porosanu@nxp.com>,
+	Scott Wood <scott.wood@nxp.com>
+To: Horia Ioan Geanta Neag <horia.geanta@nxp.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:40065 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752163AbcAYHLJ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Jan 2016 02:11:09 -0500
+Content-Disposition: inline
+In-Reply-To: <56A25E3F.8070004@nxp.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+On Fri, Jan 22, 2016 at 04:52:36PM +0000, Horia Ioan Geanta Neag wrote:
+> Herbert, I see that you've sent the crypto fixes for 4.5 pull request.
+> Any reason why these patches were not included?
+> I was expecting at least the first one to get it, it's even Cc-ing stable.
 
-> This patch replaces uses of blkcipher with skcipher and the long
-> obsolete hash interface with shash.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Well the second patch is definitely too late for 4.5. In future
+please don't bundle patches together unless they are all obviously
+critical bug fixes or they may all be postponed to the next merge
+window.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+I'll look at the first patch again.
 
-> ---
-> 
-> net/bluetooth/smp.c |  135 ++++++++++++++++++++++++----------------------------
-> 1 file changed, 63 insertions(+), 72 deletions(-)
-
-Regards
-
-Marcel
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
