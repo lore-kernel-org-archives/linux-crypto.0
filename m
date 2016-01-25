@@ -1,50 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/5] crypto: atmel-sha: fix registration issue and other
- bugs
-Date: Mon, 25 Jan 2016 22:48:49 +0800
-Message-ID: <20160125144849.GH8840@gondor.apana.org.au>
-References: <cover.1452867917.git.cyrille.pitchen@atmel.com>
+Subject: Re: [PATCH] Reduced reqsize in qat_algs
+Date: Mon, 25 Jan 2016 22:49:15 +0800
+Message-ID: <20160125144915.GJ8840@gondor.apana.org.au>
+References: <1453224844-426-1-git-send-email-giovanni.cabiddu@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, nicolas.ferre@atmel.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-To: Cyrille Pitchen <cyrille.pitchen@atmel.com>
+Cc: linux-crypto@vger.kernel.org, tadeusz.struk@intel.com
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:35449 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:48084 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756044AbcAYOs6 (ORCPT
+	with ESMTP id S1757362AbcAYOtR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Jan 2016 09:48:58 -0500
+	Mon, 25 Jan 2016 09:49:17 -0500
 Content-Disposition: inline
-In-Reply-To: <cover.1452867917.git.cyrille.pitchen@atmel.com>
+In-Reply-To: <1453224844-426-1-git-send-email-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 15, 2016 at 03:49:30PM +0100, Cyrille Pitchen wrote:
-> Hi all,
+On Tue, Jan 19, 2016 at 05:34:04PM +0000, Giovanni Cabiddu wrote:
+> From: Cabiddu, Giovanni <giovanni.cabiddu@intel.com>
 > 
-> This series of patches fixes many issues such as the algo registration failure
-> or the broken support of context switches.
+> req_alloc functions already take into account the request data structure
+> when allocating memory.
 > 
-> This series was applied to linux-next and tested on a sama5d2 xplained
-> ultra board. We now pass the tcrypt tests in the following modes:
-> -  2: sha1
-> -  6: sha256
-> - 11: sha384
-> - 12: sha512
-> - 33: sha224
-> 
-> The context switch fix was tested with a userspace program using the cryptodev
-> module. This single thread program computes the SHA256 hashes of many files
-> by splitting then into fixed size chunks. The chunks of each file are
-> processed by calling 'update' operations using a round robin algorithm.
-> 
-> However, the .import() / .export() implementation was NOT tested!
-> Nonetheless the last patch is needed to fix the registration issue, otherwise
-> atmel_sha_probe() would still fail.
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 
-Patch 1-4 applied.  Please fix the alignment issue with patch 5.
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
