@@ -1,66 +1,61 @@
-From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: Re: [PATCH 0/5] crypto: atmel-sha: fix registration issue and other
- bugs
-Date: Mon, 25 Jan 2016 15:56:24 +0100
-Message-ID: <56A63798.5050208@atmel.com>
-References: <cover.1452867917.git.cyrille.pitchen@atmel.com>
- <20160125144849.GH8840@gondor.apana.org.au>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v1] crypto: ccp - Add hash state import and export support
+Date: Mon, 25 Jan 2016 08:58:41 -0600
+Message-ID: <56A63821.1090501@amd.com>
+References: <20160112171738.23496.44254.stgit@tlendack-t1.amdoffice.net>
+ <56A26568.3000806@amd.com> <20160125072044.GB5609@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <davem@davemloft.net>, <nicolas.ferre@atmel.com>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>, David Miller <davem@davemloft.net>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from eusmtp01.atmel.com ([212.144.249.243]:54248 "EHLO
-	eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755678AbcAYO42 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Jan 2016 09:56:28 -0500
-In-Reply-To: <20160125144849.GH8840@gondor.apana.org.au>
+Received: from mail-bl2on0056.outbound.protection.outlook.com ([65.55.169.56]:25863
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1755517AbcAYO6w (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Jan 2016 09:58:52 -0500
+In-Reply-To: <20160125072044.GB5609@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
-
-Le 25/01/2016 15:48, Herbert Xu a =E9crit :
-> On Fri, Jan 15, 2016 at 03:49:30PM +0100, Cyrille Pitchen wrote:
->> Hi all,
+On 01/25/2016 01:20 AM, Herbert Xu wrote:
+> On Fri, Jan 22, 2016 at 11:22:48AM -0600, Tom Lendacky wrote:
+>> On 01/12/2016 11:17 AM, Tom Lendacky wrote:
+>>> Commit 8996eafdcbad ("crypto: ahash - ensure statesize is non-zero")
+>>> added a check to prevent ahash algorithms from successfully registering
+>>> if the import and export functions were not implemented. This prevents
+>>> an oops in the hash_accept function of algif_hash. This commit causes
+>>> the ccp-crypto module SHA support and AES CMAC support from successfully
+>>> registering and causing the ccp-crypto module load to fail because the
+>>> ahash import and export functions are not implemented.
+>>>
+>>> Update the CCP Crypto API support to provide import and export support
+>>> for ahash algorithms.
+>>>
+>>> Cc: <stable@vger.kernel.org> # 3.14.x-
+>>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 >>
->> This series of patches fixes many issues such as the algo registrati=
-on failure
->> or the broken support of context switches.
->>
->> This series was applied to linux-next and tested on a sama5d2 xplain=
-ed
->> ultra board. We now pass the tcrypt tests in the following modes:
->> -  2: sha1
->> -  6: sha256
->> - 11: sha384
->> - 12: sha512
->> - 33: sha224
->>
->> The context switch fix was tested with a userspace program using the=
- cryptodev
->> module. This single thread program computes the SHA256 hashes of man=
-y files
->> by splitting then into fixed size chunks. The chunks of each file ar=
-e
->> processed by calling 'update' operations using a round robin algorit=
-hm.
->>
->> However, the .import() / .export() implementation was NOT tested!
->> Nonetheless the last patch is needed to fix the registration issue, =
-otherwise
->> atmel_sha_probe() would still fail.
->=20
-> Patch 1-4 applied.  Please fix the alignment issue with patch 5.
->=20
+>> Herbert, is it possible this patch can be part of Crypto Fixes for 4.5?
+> 
+> While your patch is probably OK the rctx structure just contains
+> too much crap for me to feel safe about pushing this in at this
+> point in time.  So I'd like to have it cook for another cycle.
+> 
+> The reason I'm overly cautious is because import/export is directly
+> exposed to user-space so if we get this wrong then we may open
+> up a root hole.
 
-OK, I will fix it soon!
+Many of the fields in the rctx structure are set during the update
+operation and don't matter to the driver from an export and import
+perspective. I included them to make the routines simple, but if
+user-space exposure is a concern I can pare down the amount of data
+that is exported and imported. I can send a follow-on patch to do
+that if you prefer.
 
+Thanks,
+Tom
 
-Best regards,
-
-Cyrille
+> 
+> Cheers,
+> 
