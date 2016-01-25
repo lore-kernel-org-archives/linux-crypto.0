@@ -1,164 +1,43 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: GCM: cra_name == cra_driver_name
-Date: Mon, 25 Jan 2016 22:48:38 +0100
-Message-ID: <4642565.JLlnFcM15x@positron.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:42506 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750972AbcAYVsm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Jan 2016 16:48:42 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Richard Weinberger <richard@nod.at>
+Subject: [PATCH 05/22] hw_random: Fix dependencies for !HAS_IOMEM archs
+Date: Mon, 25 Jan 2016 23:24:04 +0100
+Message-ID: <1453760661-1444-6-git-send-email-richard@nod.at>
+References: <1453760661-1444-1-git-send-email-richard@nod.at>
+Cc: user-mode-linux-devel@lists.sourceforge.net,
+	Richard Weinberger <richard@nod.at>,
+	Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Lee Jones <lee.jones@linaro.org>,
+	Kieran Bingham <kieranbingham@gmail.com>,
+	Pankaj Dev <pankaj.dev@st.com>, Ray Jui <rjui@broadcom.com>,
+	Scott Branden <sbranden@broadcom.com>,
+	Daniel Thompson <daniel.thompson@linaro.org>,
+	linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1453760661-1444-1-git-send-email-richard@nod.at>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+Not every arch has io memory.
+So, unbreak the build by fixing the dependencies.
 
-with the current cryptodev tree, when I call a compound AEAD cipher with 
-cra_driver_name for the first time, this cra_driver_name gets registered also 
-as cra_name. Note, using other compound ciphers (like HMAC or symmetric 
-ciphers), I do not see that error.
+Signed-off-by: Richard Weinberger <richard@nod.at>
+---
+ drivers/char/hw_random/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-With that registering, I am not able to resolve the cipher with usual common 
-cra_name.
-
-Note, when I initialized an AEAD cipher with a cra_name, then all works as it 
-used to be.
-
-For example:
-
-name         : seqiv(rfc4106(gcm_base(ctr(aes-generic),ghash-generic)))
-driver       : seqiv(rfc4106(gcm_base(ctr(aes-generic),ghash-generic)))
-module       : seqiv
-priority     : 100
-refcnt       : 1
-selftest     : passed
-internal     : no
-type         : aead
-async        : yes
-blocksize    : 1
-ivsize       : 8
-maxauthsize  : 16
-geniv        : <none>
-
-name         : rfc4106(gcm_base(ctr(aes-generic),ghash-generic))
-driver       : rfc4106(gcm_base(ctr(aes-generic),ghash-generic))
-module       : gcm
-priority     : 100
-refcnt       : 1
-selftest     : passed
-internal     : no
-type         : aead
-async        : yes
-blocksize    : 1
-ivsize       : 8
-maxauthsize  : 16
-geniv        : <none>
-
-name         : ccm_base(ctr(aes-generic),aes-generic)
-driver       : ccm_base(ctr(aes-generic),aes-generic)
-module       : ccm
-priority     : 100
-refcnt       : 1
-selftest     : passed
-internal     : no
-type         : aead
-async        : yes
-blocksize    : 1
-ivsize       : 16
-maxauthsize  : 16
-geniv        : <none>
-
-name         : gcm_base(ctr(aes-generic),ghash-generic)
-driver       : gcm_base(ctr(aes-generic),ghash-generic)
-module       : gcm
-priority     : 100
-refcnt       : 1
-selftest     : passed
-internal     : no
-type         : aead
-async        : yes
-blocksize    : 1
-ivsize       : 12
-maxauthsize  : 16
-geniv        : <none>
-
-name         : seqiv(rfc4106(gcm_base(ctr(aes-aesni),ghash-clmulni)))
-driver       : seqiv(rfc4106(gcm_base(ctr(aes-aesni),ghash-clmulni)))
-module       : seqiv
-priority     : 350
-refcnt       : 1
-selftest     : passed
-internal     : no
-type         : aead
-async        : yes
-blocksize    : 1
-ivsize       : 8
-maxauthsize  : 16
-geniv        : <none>
-
-name         : rfc4106(gcm_base(ctr(aes-aesni),ghash-clmulni))
-driver       : rfc4106(gcm_base(ctr(aes-aesni),ghash-clmulni))
-module       : gcm
-priority     : 350
-refcnt       : 1
-selftest     : passed
-internal     : no
-type         : aead
-async        : yes
-blocksize    : 1
-ivsize       : 8
-maxauthsize  : 16
-geniv        : <none>
-
-name         : gcm_base(ctr(aes-aesni),ghash-clmulni)
-driver       : gcm_base(ctr(aes-aesni),ghash-clmulni)
-module       : gcm
-priority     : 350
-refcnt       : 1
-selftest     : passed
-internal     : no
-type         : aead
-async        : yes
-blocksize    : 1
-ivsize       : 12
-maxauthsize  : 16
-geniv        : <none>
-
-name         : ccm_base(ctr-aes-aesni,aes-aesni)
-driver       : ccm_base(ctr-aes-aesni,aes-aesni)
-module       : ccm
-priority     : 350
-refcnt       : 1
-selftest     : passed
-internal     : no
-type         : aead
-async        : yes
-blocksize    : 1
-ivsize       : 16
-maxauthsize  : 16
-geniv        : <none>
-
-name         : gcm_base(ctr-aes-aesni,ghash-clmulni)
-driver       : gcm_base(ctr-aes-aesni,ghash-clmulni)
-module       : gcm
-priority     : 400
-refcnt       : 1
-selftest     : passed
-internal     : no
-type         : aead
-async        : yes
-blocksize    : 1
-ivsize       : 12
-maxauthsize  : 16
-geniv        : <none>
-
-
-
-
-
-Ciao
-Stephan
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index dbf2271..ff00331 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -372,6 +372,7 @@ config HW_RANDOM_XGENE
+ config HW_RANDOM_STM32
+ 	tristate "STMicroelectronics STM32 random number generator"
+ 	depends on HW_RANDOM && (ARCH_STM32 || COMPILE_TEST)
++	depends on HAS_IOMEM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+ 	  Generator hardware found on STM32 microcontrollers.
+-- 
+1.8.4.5
