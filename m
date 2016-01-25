@@ -1,32 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] Don't require SpcSpOpusInfo in Authenticode pkcs7
- signatures
-Date: Mon, 25 Jan 2016 22:00:58 +0800
-Message-ID: <20160125140058.GA8379@gondor.apana.org.au>
-References: <20160119010844.GA2919@dhcp-128-65.nay.redhat.com>
+Subject: Re: [PATCH v2 1/3] crypto: sahara - avoid needlessly saving and
+ restoring sahara_ctx
+Date: Mon, 25 Jan 2016 22:07:28 +0800
+Message-ID: <20160125140728.GA8414@gondor.apana.org.au>
+References: <1452707524-7695-1-git-send-email-festevam@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: pjones@redhat.com, dhowells@redhat.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kexec@lists.infradead.org, xlpang@redhat.com, vgoyal@redhat.com
-To: Dave Young <dyoung@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: marex@denx.de, s.trumtrar@pengutronix.de, thomas.lendacky@amd.com,
+	linux@arm.linux.org.uk, linux-crypto@vger.kernel.org,
+	Fabio Estevam <fabio.estevam@nxp.com>
+To: Fabio Estevam <festevam@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:59594 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754021AbcAYOHw (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Jan 2016 09:07:52 -0500
 Content-Disposition: inline
-In-Reply-To: <20160119010844.GA2919@dhcp-128-65.nay.redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1452707524-7695-1-git-send-email-festevam@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Dave Young <dyoung@redhat.com> wrote:
->
->> So anyway, we should not be checking this field for presence or any
->> particular value: if the field exists, it should be at the right place,
->> but aside from that, as long as the hash matches the field is good.
->> 
->> Signed-off-by: Peter Jones <pjones@redhat.com>
->
-> Tested-by: Dave Young <dyoung@redhat.com>
+On Wed, Jan 13, 2016 at 03:52:02PM -0200, Fabio Estevam wrote:
+> From: Fabio Estevam <fabio.estevam@nxp.com>
+> 
+> Based on commit 434b421241f2d0 ("crypto: caam - avoid needlessly saving and
+> restoring caam_hash_ctx") from Russell King.
+> 
+> When exporting and importing the hash state, we will only export and
+> import into hashes which share the same struct crypto_ahash pointer.
+> (See hash_accept->af_alg_accept->hash_accept_parent.)
+>     
+> This means that saving the sahara_ctx structure on export, and
+> restoring it on import is a waste of resources.  So, remove this code.
+> 
+> Signed-off-by: Fabio Estevam <fabio.estevam@nxp.com>
 
-Patch applied.  Thanks!
+Very good.  Not only is it a waste, it's a gaping security hole
+because modifying the tfm from import will corrupt it.
+
+But this is not enough, you're still copying things like the mutex
+which should not be copied but instead should be reinitialised in
+import.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
