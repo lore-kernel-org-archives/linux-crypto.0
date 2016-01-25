@@ -1,47 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] n2rng: Attach on T5/M5, T7/M7 SPARC CPUs
-Date: Mon, 25 Jan 2016 22:41:01 +0800
-Message-ID: <20160125144101.GC8414@gondor.apana.org.au>
-References: <20160113214318.GB32766@yogzotot>
- <20160115.152253.1613974535141140248.davem@davemloft.net>
+Subject: Re: [PATCH] crypto: ANSI X9.31 DRNG is not allowed in FIPS 140-2
+Date: Mon, 25 Jan 2016 22:47:17 +0800
+Message-ID: <20160125144717.GA8840@gondor.apana.org.au>
+References: <2027518.YhRjo0CQ2K@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: matorola@gmail.com, linux-crypto@vger.kernel.org,
-	sparclinux@vger.kernel.org
-To: David Miller <davem@davemloft.net>
-Return-path: <sparclinux-owner@vger.kernel.org>
+Cc: nhorman@tuxdriver.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:46943 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755517AbcAYOr3 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Jan 2016 09:47:29 -0500
 Content-Disposition: inline
-In-Reply-To: <20160115.152253.1613974535141140248.davem@davemloft.net>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <2027518.YhRjo0CQ2K@myon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 15, 2016 at 03:22:53PM -0500, David Miller wrote:
-> From: Anatoly Pugachev <matorola@gmail.com>
-> Date: Thu, 14 Jan 2016 00:43:18 +0300
+On Tue, Jan 05, 2016 at 01:12:21PM +0100, Stephan Mueller wrote:
+> As per update of the FIPS 140-2 Annex C supported by SP800-131A, the
+> ANSI X9.31 DRNG is not an allowed cipher in FIPS mode any more.
 > 
-> > This patch adds support for recent oracle hardware (T5/M5, T7/M7 SPARC CPUs),
-> > so n2_rng driver would work on them.
-> > 
-> > 1. n2rng: Attach on T5/M5, T7/M7 SPARC CPUs
-> > 2. n2rng: documentation, add DT bindings, vendor prefixes
-> > 
-> > PS: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=809815#32
-> > 
-> > Signed-off-by: Anatoly Pugachev <matorola@gmail.com>
-> 
-> This series looks fine:
-> 
-> Acked-by: David S. Miller <davem@davemloft.net>
-> 
-> Herbert, please take this via your crypto tree.
+> CC: Neil Horman <nhorman@tuxdriver.com>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-I'd love to but unfortunately the pathces are white-space damaged
-and all the tabs have turned into spaces.
-
-Anatoly, could you please repost with a mailer that does not eat
-tabs for lunch?
-
-Thanks!
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
