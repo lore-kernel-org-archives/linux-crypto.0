@@ -1,136 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 16/26] libceph: Use skcipher
-Date: Tue, 26 Jan 2016 18:54:55 +0800
-Message-ID: <20160126105455.GA19674@gondor.apana.org.au>
-References: <20160124131021.GA31153@gondor.apana.org.au>
- <E1aNKYy-0008E6-GI@gondolin.me.apana.org.au>
- <CAOi1vP9jmMYHR21UeAO175susZ5V74vcXyoxwayBVSTFHxjhBQ@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] crypto: add algif_akcipher user space API
+Date: Tue, 26 Jan 2016 19:12:09 +0800
+Message-ID: <20160126111209.GA21069@gondor.apana.org.au>
+References: <2602093.Yrp6nKrmX6@myon.chronox.de>
+ <63219617.tVA5DWIBaO@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, linux-cifs@vger.kernel.org,
- linux-nfs@vger.kernel.org, open-iscsi@googlegroups.com,
- netdev <netdev@vger.kernel.org>, ecryptfs@vger.kernel.org,
- linux-wireless@vger.kernel.org,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- linux-f2fs-devel@lists.sourceforge.net, linux-bluetooth@vger.kernel.org,
- dm-devel@redhat.com, keyrings@vger.kernel.org,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
- Ceph Development <ceph-devel@vger.kernel.org>, linux-ext4@vger.kernel.org,
- linux-wpan@vger.kernel.org, linux-afs@lists.infradead.org,
- Lars Ellenberg <drbd-dev@lists.linbit.com>
-To: Ilya Dryomov <idryomov@gmail.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: tadeusz.struk@intel.com, marcel@holtmann.org, dwmw2@infradead.org,
+	linux-api@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:49332 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752924AbcAZLMf (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Jan 2016 06:12:35 -0500
 Content-Disposition: inline
-In-Reply-To: <CAOi1vP9jmMYHR21UeAO175susZ5V74vcXyoxwayBVSTFHxjhBQ@mail.gmail.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <63219617.tVA5DWIBaO@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 25, 2016 at 05:18:47PM +0100, Ilya Dryomov wrote:
+On Mon, Jan 25, 2016 at 10:34:53PM +0100, Stephan Mueller wrote:
+> Am Freitag, 18. Dezember 2015, 00:49:57 schrieb Stephan Mueller:
 > 
-> Could you get rid of ivsize instead of assigning to it - see the
-> attached diff?
+> Hi Herbert,
+> 
+> [...]
+> 
+> > Changes v3:
+> >  * fix hack in alg_setkey and alg_setsockopt by avoding branches for
+> >  setkey and setpubkey as pointed out by Marcel Holtmann
+> >  * removal of patch for fixing SGL handling as this is already included
+> 
+> I have ported the code to 4.5. Shall I wait for comments from you for the 
+> current code or shall I post v4 for the current cryptodev tree?
 
-How about an incremental patch like this? Thanks!
+Until the objections in
 
----8<---
-From: Ilya Dryomov <idryomov@gmail.com>
-Subject: libceph: Remove unnecessary ivsize variables
+http://www.gossamer-threads.com/lists/linux/kernel/2333253
 
-This patch removes the unnecessary ivsize variabls as they always
-have the value of AES_BLOCK_SIZE.
+are resolved I'm not taking any patches that export akcipher
+via algif.
 
-Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
-
-diff --git a/net/ceph/crypto.c b/net/ceph/crypto.c
-index fb9cb2b..db2847a 100644
---- a/net/ceph/crypto.c
-+++ b/net/ceph/crypto.c
-@@ -166,8 +166,7 @@ static int ceph_aes_encrypt(const void *key, int key_len,
- 	struct crypto_skcipher *tfm = ceph_crypto_alloc_cipher();
- 	SKCIPHER_REQUEST_ON_STACK(req, tfm);
- 	int ret;
--	int ivsize = AES_BLOCK_SIZE;
--	char iv[ivsize];
-+	char iv[AES_BLOCK_SIZE];
- 	size_t zero_padding = (0x10 - (src_len & 0x0f));
- 	char pad[16];
- 
-@@ -186,7 +185,7 @@ static int ceph_aes_encrypt(const void *key, int key_len,
- 		goto out_tfm;
- 
- 	crypto_skcipher_setkey((void *)tfm, key, key_len);
--	memcpy(iv, aes_iv, ivsize);
-+	memcpy(iv, aes_iv, AES_BLOCK_SIZE);
- 
- 	skcipher_request_set_tfm(req, tfm);
- 	skcipher_request_set_callback(req, 0, NULL, NULL);
-@@ -229,8 +228,7 @@ static int ceph_aes_encrypt2(const void *key, int key_len, void *dst,
- 	struct crypto_skcipher *tfm = ceph_crypto_alloc_cipher();
- 	SKCIPHER_REQUEST_ON_STACK(req, tfm);
- 	int ret;
--	int ivsize = AES_BLOCK_SIZE;
--	char iv[ivsize];
-+	char iv[AES_BLOCK_SIZE];
- 	size_t zero_padding = (0x10 - ((src1_len + src2_len) & 0x0f));
- 	char pad[16];
- 
-@@ -250,7 +248,7 @@ static int ceph_aes_encrypt2(const void *key, int key_len, void *dst,
- 		goto out_tfm;
- 
- 	crypto_skcipher_setkey((void *)tfm, key, key_len);
--	memcpy(iv, aes_iv, ivsize);
-+	memcpy(iv, aes_iv, AES_BLOCK_SIZE);
- 
- 	skcipher_request_set_tfm(req, tfm);
- 	skcipher_request_set_callback(req, 0, NULL, NULL);
-@@ -294,8 +292,7 @@ static int ceph_aes_decrypt(const void *key, int key_len,
- 	struct crypto_skcipher *tfm = ceph_crypto_alloc_cipher();
- 	SKCIPHER_REQUEST_ON_STACK(req, tfm);
- 	char pad[16];
--	int ivsize = AES_BLOCK_SIZE;
--	char iv[16];
-+	char iv[AES_BLOCK_SIZE];
- 	int ret;
- 	int last_byte;
- 
-@@ -310,7 +307,7 @@ static int ceph_aes_decrypt(const void *key, int key_len,
- 		goto out_tfm;
- 
- 	crypto_skcipher_setkey((void *)tfm, key, key_len);
--	memcpy(iv, aes_iv, ivsize);
-+	memcpy(iv, aes_iv, AES_BLOCK_SIZE);
- 
- 	skcipher_request_set_tfm(req, tfm);
- 	skcipher_request_set_callback(req, 0, NULL, NULL);
-@@ -363,8 +360,7 @@ static int ceph_aes_decrypt2(const void *key, int key_len,
- 	struct crypto_skcipher *tfm = ceph_crypto_alloc_cipher();
- 	SKCIPHER_REQUEST_ON_STACK(req, tfm);
- 	char pad[16];
--	int ivsize = AES_BLOCK_SIZE;
--	char iv[ivsize];
-+	char iv[AES_BLOCK_SIZE];
- 	int ret;
- 	int last_byte;
- 
-@@ -380,7 +376,7 @@ static int ceph_aes_decrypt2(const void *key, int key_len,
- 		goto out_tfm;
- 
- 	crypto_skcipher_setkey((void *)tfm, key, key_len);
--	memcpy(iv, aes_iv, ivsize);
-+	memcpy(iv, aes_iv, AES_BLOCK_SIZE);
- 
- 	skcipher_request_set_tfm(req, tfm);
- 	skcipher_request_set_callback(req, 0, NULL, NULL);
-
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
