@@ -1,42 +1,58 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH 16/26] libceph: Use skcipher
-Date: Tue, 26 Jan 2016 19:33:52 +0800
-Message-ID: <20160126113352.GA21159@gondor.apana.org.au>
-References: <20160124131021.GA31153@gondor.apana.org.au>
- <E1aNKYy-0008E6-GI@gondolin.me.apana.org.au>
- <CAOi1vP9jmMYHR21UeAO175susZ5V74vcXyoxwayBVSTFHxjhBQ@mail.gmail.com>
- <20160126105455.GA19674@gondor.apana.org.au>
- <CAOi1vP9kB5a-JeZ1PriwyQO0XH4Qh3UKidp==NPvVw-AsL=uqw@mail.gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 1/2] crypto: jitterentropy - always select CRYPTO_RNG
+Date: Tue, 26 Jan 2016 12:49:36 +0100
+Message-ID: <29082633.aRvKnNisWH@wuerfel>
+References: <1453740644-1980309-1-git-send-email-arnd@arndb.de> <20160126103018.GA19508@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	netdev <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org,
-	dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ecryptfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-f2fs-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Ceph Development <ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-wpan-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	Lars Ellenberg <drbd-dev-cunTk1MwBs8qoQakbn7OcQ@public.gmane.org>,
-	open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-To: Ilya Dryomov <idryomov-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CAOi1vP9kB5a-JeZ1PriwyQO0XH4Qh3UKidp==NPvVw-AsL=uqw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mout.kundenserver.de ([212.227.126.134]:55945 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756014AbcAZLuV (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Jan 2016 06:50:21 -0500
+In-Reply-To: <20160126103018.GA19508@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 26, 2016 at 12:29:57PM +0100, Ilya Dryomov wrote:
->
-> LGTM.  You want to take it through crypto?
+On Tuesday 26 January 2016 18:30:18 Herbert Xu wrote:
+> On Mon, Jan 25, 2016 at 05:50:34PM +0100, Arnd Bergmann wrote:
+> > When building the jitterentropy driver by itself, we get a link error
+> > when CRYPTO_RNG is not enabled as well:
+> > 
+> > crypto/built-in.o: In function `jent_mod_init':
+> > jitterentropy-kcapi.c:(.init.text+0x98): undefined reference to `crypto_register_rng'
+> > crypto/built-in.o: In function `jent_mod_exit':
+> > jitterentropy-kcapi.c:(.exit.text+0x60): undefined reference to `crypto_unregister_rng'
+> > 
+> > This moves the 'select CRYPTO_RNG' from CRYPTO_DRBG to CRYPTO_JITTERENTROPY
+> > to ensure the API is always there when it's used, not just when DRBG is
+> > also enabled.
+> > 
+> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> > ---
+> >  crypto/Kconfig | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/crypto/Kconfig b/crypto/Kconfig
+> > index 7240821137fd..99109b93604a 100644
+> > --- a/crypto/Kconfig
+> > +++ b/crypto/Kconfig
+> > @@ -1586,13 +1586,13 @@ config CRYPTO_DRBG_CTR
+> >  config CRYPTO_DRBG
+> >       tristate
+> >       default CRYPTO_DRBG_MENU
+> > -     select CRYPTO_RNG
+> 
+> I think we should leave this there as DRBG itself is an RNG and
+> it just uses JITTERENTROPY which happens to be an RNG.
 
-That's probably the easiest route since I'd like to take the first
-patch through cryptodev.
+Good idea. Should I resend a modified version or do you want to just
+adapt it yourself?
 
-Thanks,
--- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	Arnd
