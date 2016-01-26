@@ -1,48 +1,53 @@
-From: Baolin Wang <baolin.wang@linaro.org>
-Subject: [PATCH 1/3] crypto: Introduce crypto_queue_len() helper function
-Date: Tue, 26 Jan 2016 20:25:38 +0800
-Message-ID: <75865be3c2ff947df2fa422d37a7d404c320e15b.1453810716.git.baolin.wang@linaro.org>
-References: <cover.1453810716.git.baolin.wang@linaro.org>
-Cc: broonie@kernel.org, linus.walleij@linaro.org, arnd@arndb.de,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	baolin.wang@linaro.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: GCM: cra_name == cra_driver_name
+Date: Tue, 26 Jan 2016 14:14:40 +0100
+Message-ID: <10394749.3Yi2f5rYLG@tauon.atsec.com>
+References: <4642565.JLlnFcM15x@positron.chronox.de> <20160126111352.GB21069@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f177.google.com ([209.85.192.177]:36334 "EHLO
-	mail-pf0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933947AbcAZM0c (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jan 2016 07:26:32 -0500
-Received: by mail-pf0-f177.google.com with SMTP id n128so98445552pfn.3
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Jan 2016 04:26:32 -0800 (PST)
-In-Reply-To: <cover.1453810716.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1453810716.git.baolin.wang@linaro.org>
-References: <cover.1453810716.git.baolin.wang@linaro.org>
+Received: from mail.eperm.de ([89.247.134.16]:42542 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S965819AbcAZNOm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Jan 2016 08:14:42 -0500
+In-Reply-To: <20160126111352.GB21069@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch introduces crypto_queue_len() helper function to help to get the
-queue length in the crypto queue list now.
+Am Dienstag, 26. Januar 2016, 19:13:52 schrieb Herbert Xu:
 
-Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
----
- include/crypto/algapi.h |    4 ++++
- 1 file changed, 4 insertions(+)
+Hi Herbert,
 
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index c9fe145..4f861c4 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -184,6 +184,10 @@ int crypto_enqueue_request(struct crypto_queue *queue,
- 			   struct crypto_async_request *request);
- struct crypto_async_request *crypto_dequeue_request(struct crypto_queue *queue);
- int crypto_tfm_in_queue(struct crypto_queue *queue, struct crypto_tfm *tfm);
-+static inline unsigned int crypto_queue_len(struct crypto_queue *queue)
-+{
-+	return queue->qlen;
-+}
- 
- /* These functions require the input/output to be aligned as u32. */
- void crypto_inc(u8 *a, unsigned int size);
--- 
-1.7.9.5
+>On Mon, Jan 25, 2016 at 10:48:38PM +0100, Stephan Mueller wrote:
+>> Hi Herbert,
+>> 
+>> with the current cryptodev tree, when I call a compound AEAD cipher with
+>> cra_driver_name for the first time, this cra_driver_name gets registered
+>> also as cra_name. Note, using other compound ciphers (like HMAC or
+>> symmetric ciphers), I do not see that error.
+>> 
+>> With that registering, I am not able to resolve the cipher with usual
+>> common
+>> cra_name.
+>> 
+>> Note, when I initialized an AEAD cipher with a cra_name, then all works as
+>> it used to be.
+>
+>Is this a new problem? I thought it always worked like this.
+
+At least I have seen that now for the first time. But maybe I have not tested 
+this order of invocation before.
+>
+>I was going to fix it to generate a proper cra_name after I'm
+>done with the skcipher conversion.
+
+Ok, thanks.
+>
+>Cheers,
+
+
+Ciao
+Stephan
