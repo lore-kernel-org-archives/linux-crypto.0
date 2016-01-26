@@ -1,47 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 0/4] crypto: add algif_akcipher user space API
-Date: Tue, 26 Jan 2016 19:12:09 +0800
-Message-ID: <20160126111209.GA21069@gondor.apana.org.au>
-References: <2602093.Yrp6nKrmX6@myon.chronox.de>
- <63219617.tVA5DWIBaO@positron.chronox.de>
+Subject: Re: GCM: cra_name == cra_driver_name
+Date: Tue, 26 Jan 2016 19:13:52 +0800
+Message-ID: <20160126111352.GB21069@gondor.apana.org.au>
+References: <4642565.JLlnFcM15x@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: tadeusz.struk@intel.com, marcel@holtmann.org, dwmw2@infradead.org,
-	linux-api@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49332 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:37576 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752924AbcAZLMf (ORCPT
+	with ESMTP id S933556AbcAZLN4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jan 2016 06:12:35 -0500
+	Tue, 26 Jan 2016 06:13:56 -0500
 Content-Disposition: inline
-In-Reply-To: <63219617.tVA5DWIBaO@positron.chronox.de>
+In-Reply-To: <4642565.JLlnFcM15x@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 25, 2016 at 10:34:53PM +0100, Stephan Mueller wrote:
-> Am Freitag, 18. Dezember 2015, 00:49:57 schrieb Stephan Mueller:
-> 
+On Mon, Jan 25, 2016 at 10:48:38PM +0100, Stephan Mueller wrote:
 > Hi Herbert,
 > 
-> [...]
+> with the current cryptodev tree, when I call a compound AEAD cipher with 
+> cra_driver_name for the first time, this cra_driver_name gets registered also 
+> as cra_name. Note, using other compound ciphers (like HMAC or symmetric 
+> ciphers), I do not see that error.
 > 
-> > Changes v3:
-> >  * fix hack in alg_setkey and alg_setsockopt by avoding branches for
-> >  setkey and setpubkey as pointed out by Marcel Holtmann
-> >  * removal of patch for fixing SGL handling as this is already included
+> With that registering, I am not able to resolve the cipher with usual common 
+> cra_name.
 > 
-> I have ported the code to 4.5. Shall I wait for comments from you for the 
-> current code or shall I post v4 for the current cryptodev tree?
+> Note, when I initialized an AEAD cipher with a cra_name, then all works as it 
+> used to be.
 
-Until the objections in
+Is this a new problem? I thought it always worked like this.
 
-http://www.gossamer-threads.com/lists/linux/kernel/2333253
-
-are resolved I'm not taking any patches that export akcipher
-via algif.
+I was going to fix it to generate a proper cra_name after I'm
+done with the skcipher conversion.
 
 Cheers,
 -- 
