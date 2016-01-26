@@ -1,32 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] n2rng: Attach on T5/M5, T7/M7 SPARC CPUs
-Date: Tue, 26 Jan 2016 22:48:36 +0800
-Message-ID: <20160126144836.GA23264@gondor.apana.org.au>
-References: <20160125160939.GB26873@yogzotot>
- <20160125211902.GA27907@yogzotot>
+Subject: Re: [PATCH] crypto: hash - select CRYPTO_HASH where needed
+Date: Tue, 26 Jan 2016 22:48:54 +0800
+Message-ID: <20160126144854.GB23264@gondor.apana.org.au>
+References: <1453740685-1980366-1-git-send-email-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org
-To: Anatoly Pugachev <matorola@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:32969 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965934AbcAZOsj (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jan 2016 09:48:39 -0500
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20160125211902.GA27907@yogzotot>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1453740685-1980366-1-git-send-email-arnd@arndb.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jan 26, 2016 at 12:19:02AM +0300, Anatoly Pugachev wrote:
-> n2rng: Attach on T5/M5, T7/M7 SPARC CPUs
+On Mon, Jan 25, 2016 at 05:51:21PM +0100, Arnd Bergmann wrote:
+> The ghash and poly1305 hash implementations can be enabled when
+> CONFIG_CRYPTO_HASH is turned off, causing a link error:
 > 
-> (space to tab fixes after variable names)
+> crypto/built-in.o: In function `ghash_mod_init':
+> (.init.text+0xd0): undefined reference to `crypto_register_shash'
+> crypto/built-in.o: In function `ghash_mod_exit':
+> (.exit.text+0xb4): undefined reference to `crypto_unregister_shash'
+> crypto/built-in.o: In function `poly1305_mod_init':
+> (.init.text+0xb4): undefined reference to `crypto_register_shash'
+> crypto/built-in.o: In function `poly1305_mod_exit':
+> (.exit.text+0x98): undefined reference to `crypto_unregister_shash'
 > 
-> Signed-off-by: Anatoly Pugachev <matorola@gmail.com>
+> This adds an explicit 'select', like all other hashes have it.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Both patches applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
