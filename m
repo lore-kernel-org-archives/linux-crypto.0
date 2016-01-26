@@ -1,52 +1,50 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: jitterentropy - always select CRYPTO_RNG
-Date: Tue, 26 Jan 2016 18:30:18 +0800
-Message-ID: <20160126103018.GA19508@gondor.apana.org.au>
-References: <1453740644-1980309-1-git-send-email-arnd@arndb.de>
+Subject: Re: [PATCH 1/4] crypto: sunxi - don't print uninitialized data
+Date: Tue, 26 Jan 2016 18:44:27 +0800
+Message-ID: <20160126104427.GA19583@gondor.apana.org.au>
+References: <1453740845-1980433-1-git-send-email-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
+	Chen-Yu Tsai <wens@csie.org>,
+	LABBE Corentin <clabbe.montjoie@gmail.com>,
+	Maxime Ripard <maxime.ripard@free-electrons.com>,
 	linux-kernel@vger.kernel.org
 To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:43771 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932701AbcAZKpD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Jan 2016 05:45:03 -0500
 Content-Disposition: inline
-In-Reply-To: <1453740644-1980309-1-git-send-email-arnd@arndb.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1453740845-1980433-1-git-send-email-arnd@arndb.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 25, 2016 at 05:50:34PM +0100, Arnd Bergmann wrote:
-> When building the jitterentropy driver by itself, we get a link error
-> when CRYPTO_RNG is not enabled as well:
+On Mon, Jan 25, 2016 at 05:53:48PM +0100, Arnd Bergmann wrote:
+> gcc correctly warns that the printk output contains a variable that
+> is not initialized in some cases:
 > 
-> crypto/built-in.o: In function `jent_mod_init':
-> jitterentropy-kcapi.c:(.init.text+0x98): undefined reference to `crypto_register_rng'
-> crypto/built-in.o: In function `jent_mod_exit':
-> jitterentropy-kcapi.c:(.exit.text+0x60): undefined reference to `crypto_unregister_rng'
+> drivers/crypto/sunxi-ss/sun4i-ss-cipher.c: In function 'sun4i_ss_cipher_poll':
+> drivers/crypto/sunxi-ss/sun4i-ss-cipher.c:254:76: warning: 'todo' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> drivers/crypto/sunxi-ss/sun4i-ss-cipher.c:144:15: note: 'todo' was declared here
 > 
-> This moves the 'select CRYPTO_RNG' from CRYPTO_DRBG to CRYPTO_JITTERENTROPY
-> to ensure the API is always there when it's used, not just when DRBG is
-> also enabled.
+> This adds an explicit initialization to zero in the exact case where it
+> was missing, to avoid leaking stack data to the console and to shut up
+> that warning.
 > 
 > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  crypto/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 7240821137fd..99109b93604a 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -1586,13 +1586,13 @@ config CRYPTO_DRBG_CTR
->  config CRYPTO_DRBG
->  	tristate
->  	default CRYPTO_DRBG_MENU
-> -	select CRYPTO_RNG
 
-I think we should leave this there as DRBG itself is an RNG and
-it just uses JITTERENTROPY which happens to be an RNG.
+This is actually a bogus warning because todo is always initialised
+but gcc can't see that because it's behind multiple conditionals.
 
-Otherwise this looks OK to me.
+It would be great if we can restructure the code so that gcc can see
+this while at the same time also improving the readability of the
+loop.
+
+Otherwise just initialise it at the top or use uninitialised_var.
 
 Thanks,
 -- 
