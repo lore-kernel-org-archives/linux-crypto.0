@@ -1,53 +1,57 @@
-From: Joonsoo Kim <js1304@gmail.com>
-Subject: [PATCH v2 02/10] crypto: add algorithm type specific flag, CRYPTO_ALG_PRIVATE
-Date: Tue, 26 Jan 2016 17:15:04 +0900
-Message-ID: <1453796112-14273-3-git-send-email-iamjoonsoo.kim@lge.com>
-References: <1453796112-14273-1-git-send-email-iamjoonsoo.kim@lge.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Weigang Li <weigang.li@intel.com>,
-	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-	Minchan Kim <minchan@kernel.org>,
-	Dan Streetman <ddstreet@ieee.org>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Daniel Thompson <daniel.thompson@linaro.org>
+Subject: Re: [PATCH 05/22] hw_random: Fix dependencies for !HAS_IOMEM archs
+Date: Tue, 26 Jan 2016 09:58:51 +0000
+Message-ID: <56A7435B.5000405@linaro.org>
+References: <1453760661-1444-1-git-send-email-richard@nod.at>
+ <1453760661-1444-6-git-send-email-richard@nod.at>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: user-mode-linux-devel@lists.sourceforge.net,
+	Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Lee Jones <lee.jones@linaro.org>,
+	Kieran Bingham <kieranbingham@gmail.com>,
+	Pankaj Dev <pankaj.dev@st.com>, Ray Jui <rjui@broadcom.com>,
+	Scott Branden <sbranden@broadcom.com>,
+	linux-crypto@vger.kernel.org
+To: Richard Weinberger <richard@nod.at>, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f65.google.com ([209.85.220.65]:34661 "EHLO
-	mail-pa0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932090AbcAZIPf (ORCPT
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:36188 "EHLO
+	mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S964956AbcAZJ6y (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jan 2016 03:15:35 -0500
-In-Reply-To: <1453796112-14273-1-git-send-email-iamjoonsoo.kim@lge.com>
+	Tue, 26 Jan 2016 04:58:54 -0500
+Received: by mail-wm0-f42.google.com with SMTP id l65so96816429wmf.1
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jan 2016 01:58:53 -0800 (PST)
+In-Reply-To: <1453760661-1444-6-git-send-email-richard@nod.at>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In following patch, new synchronous compression APIs will be
-introduced and it needs one flags to determine whether context buffer is
-needed or not for decompression. It can be implemented by flag in it's own
-algorithm structure definition but because there is a room in general
-crypto_alg flag, this patch reuses it to reduce complexity. It possibly
-can be used for other algorithm type.
+On 25/01/16 22:24, Richard Weinberger wrote:
+> Not every arch has io memory.
+> So, unbreak the build by fixing the dependencies.
+>
+> Signed-off-by: Richard Weinberger <richard@nod.at>
 
-Signed-off-by: Joonsoo Kim <iamjoonsoo.kim@lge.com>
----
- include/linux/crypto.h | 5 +++++
- 1 file changed, 5 insertions(+)
+Reviewed-by: Daniel Thompson <daniel.thompson@linaro.org>
 
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index ab2a745..96530a1 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -101,6 +101,11 @@
- #define CRYPTO_ALG_INTERNAL		0x00002000
- 
- /*
-+ * Use this flag as algorithm type specific one.
-+ */
-+#define CRYPTO_ALG_PRIVATE		0x00004000
-+
-+/*
-  * Transform masks and values (for crt_flags).
-  */
- #define CRYPTO_TFM_REQ_MASK		0x000fff00
--- 
-1.9.1
+Thanks for cleaning up after me!
+
+> ---
+>   drivers/char/hw_random/Kconfig | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+> index dbf2271..ff00331 100644
+> --- a/drivers/char/hw_random/Kconfig
+> +++ b/drivers/char/hw_random/Kconfig
+> @@ -372,6 +372,7 @@ config HW_RANDOM_XGENE
+>   config HW_RANDOM_STM32
+>   	tristate "STMicroelectronics STM32 random number generator"
+>   	depends on HW_RANDOM && (ARCH_STM32 || COMPILE_TEST)
+> +	depends on HAS_IOMEM
+>   	help
+>   	  This driver provides kernel-side support for the Random Number
+>   	  Generator hardware found on STM32 microcontrollers.
+>
