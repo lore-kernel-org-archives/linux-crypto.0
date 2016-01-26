@@ -1,52 +1,128 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH] crypto : sha1-mb : Add missing args_digest offset
-Date: Mon, 25 Jan 2016 17:17:57 -0800
-Message-ID: <1453771077.21738.15.camel@schen9-desk2.jf.intel.com>
-References: <1453769169-27479-1-git-send-email-megha.dey@intel.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 1/4] crypto: add template handling for RNGs
+Date: Tue, 26 Jan 2016 07:19:52 +0100
+Message-ID: <4598846.P3rW2MaR68@positron.chronox.de>
+References: <4445045.XP4c23S4mB@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux=kernel@vger.kernel.org,
-	Megha Dey <megha.dey@linux.intel.com>
-To: Megha Dey <megha.dey@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:4321 "EHLO mga03.intel.com"
+Received: from mail.eperm.de ([89.247.134.16]:42524 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933143AbcAZBR6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Jan 2016 20:17:58 -0500
-In-Reply-To: <1453769169-27479-1-git-send-email-megha.dey@intel.com>
+	id S1755379AbcAZGWE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Jan 2016 01:22:04 -0500
+In-Reply-To: <4445045.XP4c23S4mB@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2016-01-25 at 16:46 -0800, Megha Dey wrote:
-> From: Megha Dey <megha.dey@linux.intel.com>
-> 
-> The _args_digest is defined as _args+_digest, both of which are the first
-> members of 2 separate structures, effectively yielding _args_digest to have
-> a value of zero. Thus, no errors have spawned yet due to this. To ensure
-> sanity, adding the missing _args_digest offset to the sha1_mb_mgr_submit.S.
-> 
+This patch adds the ability to register templates for RNGs. RNGs are
+"meta" mechanisms using raw cipher primitives. Thus, RNGs can now be
+implemented as templates to allow the complete flexibility the kernel
+crypto API provides.
 
-Thanks for cleaning this up.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/rng.c         | 31 +++++++++++++++++++++++++++++++
+ include/crypto/rng.h | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 70 insertions(+)
 
-Acked-by: Tim Chen <tim.c.chen@linux.intel.com>
-
-> Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
-> ---
->  arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S b/arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S
-> index 2ab9560..c420d89 100644
-> --- a/arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S
-> +++ b/arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S
-> @@ -197,7 +197,7 @@ len_is_0:
->  	vpinsrd  $1, _args_digest+1*32(state , idx, 4), %xmm0, %xmm0
->  	vpinsrd  $2, _args_digest+2*32(state , idx, 4), %xmm0, %xmm0
->  	vpinsrd  $3, _args_digest+3*32(state , idx, 4), %xmm0, %xmm0
-> -	movl    4*32(state, idx, 4), DWORD_tmp
-> +	movl     _args_digest+4*32(state, idx, 4), DWORD_tmp
->  
->  	vmovdqu  %xmm0, _result_digest(job_rax)
->  	movl    DWORD_tmp, _result_digest+1*16(job_rax)
+diff --git a/crypto/rng.c b/crypto/rng.c
+index b81cffb..92cc02a 100644
+--- a/crypto/rng.c
++++ b/crypto/rng.c
+@@ -232,5 +232,36 @@ void crypto_unregister_rngs(struct rng_alg *algs, int count)
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_rngs);
+ 
++void rng_free_instance(struct crypto_instance *inst)
++{
++	crypto_drop_spawn(crypto_instance_ctx(inst));
++	kfree(rng_instance(inst));
++}
++EXPORT_SYMBOL_GPL(rng_free_instance);
++
++static int rng_prepare_alg(struct rng_alg *alg)
++{
++	struct crypto_alg *base = &alg->base;
++
++	base->cra_type = &crypto_rng_type;
++	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
++	base->cra_flags |= CRYPTO_ALG_TYPE_RNG;
++
++	return 0;
++}
++
++int rng_register_instance(struct crypto_template *tmpl,
++			  struct rng_instance *inst)
++{
++	int err;
++
++	err = rng_prepare_alg(&inst->alg);
++	if (err)
++		return err;
++
++	return crypto_register_instance(tmpl, rng_crypto_instance(inst));
++}
++EXPORT_SYMBOL_GPL(rng_register_instance);
++
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Random Number Generator");
+diff --git a/include/crypto/rng.h b/include/crypto/rng.h
+index b95ede3..b8a6ea3 100644
+--- a/include/crypto/rng.h
++++ b/include/crypto/rng.h
+@@ -15,6 +15,7 @@
+ #define _CRYPTO_RNG_H
+ 
+ #include <linux/crypto.h>
++#include <crypto/algapi.h>
+ 
+ struct crypto_rng;
+ 
+@@ -197,4 +198,42 @@ static inline int crypto_rng_seedsize(struct crypto_rng *tfm)
+ 	return crypto_rng_alg(tfm)->seedsize;
+ }
+ 
++struct rng_instance {
++	struct rng_alg alg;
++};
++
++static inline struct rng_instance *rng_alloc_instance(
++	const char *name, struct crypto_alg *alg)
++{
++	return crypto_alloc_instance2(name, alg,
++				      sizeof(struct rng_alg) - sizeof(*alg));
++}
++
++static inline struct crypto_instance *rng_crypto_instance(
++	struct rng_instance *inst)
++{
++	return container_of(&inst->alg.base, struct crypto_instance, alg);
++}
++
++static inline void *rng_instance_ctx(struct rng_instance *inst)
++{
++	return crypto_instance_ctx(rng_crypto_instance(inst));
++}
++
++static inline struct rng_alg *__crypto_rng_alg(struct crypto_alg *alg)
++{
++	return container_of(alg, struct rng_alg, base);
++}
++
++static inline struct rng_instance *rng_instance(
++	struct crypto_instance *inst)
++{
++	return container_of(__crypto_rng_alg(&inst->alg),
++			    struct rng_instance, alg);
++}
++
++int rng_register_instance(struct crypto_template *tmpl,
++			  struct rng_instance *inst);
++void rng_free_instance(struct crypto_instance *inst);
++
+ #endif
+-- 
+2.5.0
