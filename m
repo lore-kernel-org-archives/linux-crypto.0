@@ -1,37 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: algif_hash: creating 0 sized array in hash_accept
-Date: Tue, 26 Jan 2016 22:46:13 +0800
-Message-ID: <20160126144613.GA23202@gondor.apana.org.au>
-References: <56A6119C.1080203@oracle.com>
- <20160125135846.GB8256@gondor.apana.org.au>
- <56A77411.5030209@oracle.com>
- <20160126140724.GA22685@gondor.apana.org.au>
- <56A7831E.5020208@oracle.com>
+Subject: Re: [PATCH 2/2] n2rng: Attach on T5/M5, T7/M7 SPARC CPUs
+Date: Tue, 26 Jan 2016 22:48:36 +0800
+Message-ID: <20160126144836.GA23264@gondor.apana.org.au>
+References: <20160125160939.GB26873@yogzotot>
+ <20160125211902.GA27907@yogzotot>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>
-To: Sasha Levin <sasha.levin@oracle.com>
+Cc: linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org
+To: Anatoly Pugachev <matorola@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38093 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:32969 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754116AbcAZOqT (ORCPT
+	with ESMTP id S965934AbcAZOsj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jan 2016 09:46:19 -0500
+	Tue, 26 Jan 2016 09:48:39 -0500
 Content-Disposition: inline
-In-Reply-To: <56A7831E.5020208@oracle.com>
+In-Reply-To: <20160125211902.GA27907@yogzotot>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 26, 2016 at 09:30:54AM -0500, Sasha Levin wrote:
->
-> The C spec forbids it, so ubsan complains :)
+On Tue, Jan 26, 2016 at 12:19:02AM +0300, Anatoly Pugachev wrote:
+> n2rng: Attach on T5/M5, T7/M7 SPARC CPUs
+> 
+> (space to tab fixes after variable names)
+> 
+> Signed-off-by: Anatoly Pugachev <matorola@gmail.com>
 
-If you really care about this then please send a patch that adds
-?: 1 to the size.
-
-Cheers,
+Both patches applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
