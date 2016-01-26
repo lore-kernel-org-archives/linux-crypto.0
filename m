@@ -1,36 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: hash - select CRYPTO_HASH where needed
-Date: Tue, 26 Jan 2016 22:48:54 +0800
-Message-ID: <20160126144854.GB23264@gondor.apana.org.au>
-References: <1453740685-1980366-1-git-send-email-arnd@arndb.de>
+Subject: Re: [PATCH 05/22] hw_random: Fix dependencies for !HAS_IOMEM archs
+Date: Tue, 26 Jan 2016 22:49:11 +0800
+Message-ID: <20160126144911.GC23264@gondor.apana.org.au>
+References: <1453760661-1444-1-git-send-email-richard@nod.at>
+ <1453760661-1444-6-git-send-email-richard@nod.at>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-kernel@vger.kernel.org,
+	user-mode-linux-devel@lists.sourceforge.net,
+	Matt Mackall <mpm@selenic.com>,
+	Lee Jones <lee.jones@linaro.org>,
+	Kieran Bingham <kieranbingham@gmail.com>,
+	Pankaj Dev <pankaj.dev@st.com>, Ray Jui <rjui@broadcom.com>,
+	Scott Branden <sbranden@broadcom.com>,
+	Daniel Thompson <daniel.thompson@linaro.org>,
+	linux-crypto@vger.kernel.org
+To: Richard Weinberger <richard@nod.at>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1453740685-1980366-1-git-send-email-arnd@arndb.de>
+In-Reply-To: <1453760661-1444-6-git-send-email-richard@nod.at>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jan 25, 2016 at 05:51:21PM +0100, Arnd Bergmann wrote:
-> The ghash and poly1305 hash implementations can be enabled when
-> CONFIG_CRYPTO_HASH is turned off, causing a link error:
+On Mon, Jan 25, 2016 at 11:24:04PM +0100, Richard Weinberger wrote:
+> Not every arch has io memory.
+> So, unbreak the build by fixing the dependencies.
 > 
-> crypto/built-in.o: In function `ghash_mod_init':
-> (.init.text+0xd0): undefined reference to `crypto_register_shash'
-> crypto/built-in.o: In function `ghash_mod_exit':
-> (.exit.text+0xb4): undefined reference to `crypto_unregister_shash'
-> crypto/built-in.o: In function `poly1305_mod_init':
-> (.init.text+0xb4): undefined reference to `crypto_register_shash'
-> crypto/built-in.o: In function `poly1305_mod_exit':
-> (.exit.text+0x98): undefined reference to `crypto_unregister_shash'
-> 
-> This adds an explicit 'select', like all other hashes have it.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Richard Weinberger <richard@nod.at>
 
 Patch applied.  Thanks.
 -- 
