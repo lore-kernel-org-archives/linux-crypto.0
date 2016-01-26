@@ -1,52 +1,36 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 2/2] crypto: jitterentropy - always select CRYPTO_RNG
-Date: Tue, 26 Jan 2016 14:47:10 +0100
-Message-ID: <1453816035-3070440-1-git-send-email-arnd@arndb.de>
-References: <1453815902-3070323-1-git-send-email-arnd@arndb.de>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Arnd Bergmann <arnd@arndb.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: crypto: algif_hash: creating 0 sized array in hash_accept
+Date: Tue, 26 Jan 2016 22:07:24 +0800
+Message-ID: <20160126140724.GA22685@gondor.apana.org.au>
+References: <56A6119C.1080203@oracle.com>
+ <20160125135846.GB8256@gondor.apana.org.au>
+ <56A77411.5030209@oracle.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>
+To: Sasha Levin <sasha.levin@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([217.72.192.73]:58791 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965470AbcAZNr5 (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:47660 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S965332AbcAZOHc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jan 2016 08:47:57 -0500
-In-Reply-To: <1453815902-3070323-1-git-send-email-arnd@arndb.de>
+	Tue, 26 Jan 2016 09:07:32 -0500
+Content-Disposition: inline
+In-Reply-To: <56A77411.5030209@oracle.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When building the jitterentropy driver by itself, we get a link error
-when CRYPTO_RNG is not enabled as well:
+On Tue, Jan 26, 2016 at 08:26:41AM -0500, Sasha Levin wrote:
+>
+> This seems to be happening with "digest_null".
 
-crypto/built-in.o: In function `jent_mod_init':
-jitterentropy-kcapi.c:(.init.text+0x98): undefined reference to `crypto_register_rng'
-crypto/built-in.o: In function `jent_mod_exit':
-jitterentropy-kcapi.c:(.exit.text+0x60): undefined reference to `crypto_unregister_rng'
+In that case this is expected as digest_null obviously has no
+state.  So why is a zero-length array disallowed by ubsan?
 
-This adds a 'select CRYPTO_RNG' to CRYPTO_JITTERENTROPY to ensure the API
-is always there when it's used, not just when DRBG is also enabled.
-CRYPTO_DRBG would set it implicitly through CRYPTO_JITTERENTROPY now,
-but this leaves it in place to make it explicit what the driver does.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- crypto/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 3be07ad1d80d..88248821af82 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1595,6 +1595,7 @@ endif	# if CRYPTO_DRBG_MENU
- 
- config CRYPTO_JITTERENTROPY
- 	tristate "Jitterentropy Non-Deterministic Random Number Generator"
-+	select CRYPTO_RNG
- 	help
- 	  The Jitterentropy RNG is a noise that is intended
- 	  to provide seed to another RNG. The RNG does not
+Cheers,
 -- 
-2.7.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
