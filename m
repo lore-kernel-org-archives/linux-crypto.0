@@ -1,7 +1,7 @@
 From: Joonsoo Kim <js1304@gmail.com>
-Subject: [PATCH v2 08/10] crypto/842: support new compression APIs
-Date: Tue, 26 Jan 2016 17:15:10 +0900
-Message-ID: <1453796112-14273-9-git-send-email-iamjoonsoo.kim@lge.com>
+Subject: [PATCH v2 05/10] crypto/lzo: support new compression APIs
+Date: Tue, 26 Jan 2016 17:15:07 +0900
+Message-ID: <1453796112-14273-6-git-send-email-iamjoonsoo.kim@lge.com>
 References: <1453796112-14273-1-git-send-email-iamjoonsoo.kim@lge.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Weigang Li <weigang.li@intel.com>,
@@ -21,117 +21,156 @@ Let's support it.
 
 Signed-off-by: Joonsoo Kim <iamjoonsoo.kim@lge.com>
 ---
- crypto/842.c   | 85 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
  crypto/Kconfig |  1 +
- 2 files changed, 83 insertions(+), 3 deletions(-)
+ crypto/lzo.c   | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 83 insertions(+), 13 deletions(-)
 
-diff --git a/crypto/842.c b/crypto/842.c
-index 98e387e..47cf7e5 100644
---- a/crypto/842.c
-+++ b/crypto/842.c
-@@ -32,10 +32,46 @@
- #include <linux/crypto.h>
- #include <linux/sw842.h>
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index f22f4e9..b4b485c 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1503,6 +1503,7 @@ config CRYPTO_LZO
+ 	select CRYPTO_ALGAPI
+ 	select LZO_COMPRESS
+ 	select LZO_DECOMPRESS
++	select CRYPTO_COMPRESS2
+ 	help
+ 	  This is the LZO algorithm.
+ 
+diff --git a/crypto/lzo.c b/crypto/lzo.c
+index 4b3e925..94cd7a4 100644
+--- a/crypto/lzo.c
++++ b/crypto/lzo.c
+@@ -23,39 +23,56 @@
+ #include <linux/mm.h>
+ #include <linux/lzo.h>
  
 +#include <crypto/compress.h>
 +
- struct crypto842_ctx {
--	char wmem[SW842_MEM_COMPRESS];	/* working memory for compress */
-+	void *wmem;	/* working memory for compress */
+ struct lzo_ctx {
+ 	void *lzo_comp_mem;
  };
  
-+static void *crypto842_alloc_ctx(struct crypto_scomp *tfm)
++static void *lzo_alloc_ctx(struct crypto_scomp *tfm)
 +{
 +	void *ctx;
 +
-+	ctx = kmalloc(SW842_MEM_COMPRESS, GFP_KERNEL);
++	ctx = kmalloc(LZO1X_MEM_COMPRESS,
++		    GFP_KERNEL | __GFP_NOWARN | __GFP_REPEAT);
++	if (!ctx)
++		ctx = vmalloc(LZO1X_MEM_COMPRESS);
 +	if (!ctx)
 +		return ERR_PTR(-ENOMEM);
 +
 +	return ctx;
 +}
 +
-+static int crypto842_init(struct crypto_tfm *tfm)
-+{
-+	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	ctx->wmem = crypto842_alloc_ctx(NULL);
-+	if (IS_ERR(ctx->wmem))
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+static void crypto842_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+{
-+	kfree(ctx);
-+}
-+
-+static void crypto842_exit(struct crypto_tfm *tfm)
-+{
-+	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	crypto842_free_ctx(NULL, ctx->wmem);
-+}
-+
- static int crypto842_compress(struct crypto_tfm *tfm,
- 			      const u8 *src, unsigned int slen,
- 			      u8 *dst, unsigned int *dlen)
-@@ -45,6 +81,13 @@ static int crypto842_compress(struct crypto_tfm *tfm,
- 	return sw842_compress(src, slen, dst, dlen, ctx->wmem);
+ static int lzo_init(struct crypto_tfm *tfm)
+ {
+ 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	ctx->lzo_comp_mem = kmalloc(LZO1X_MEM_COMPRESS,
+-				    GFP_KERNEL | __GFP_NOWARN | __GFP_REPEAT);
+-	if (!ctx->lzo_comp_mem)
+-		ctx->lzo_comp_mem = vmalloc(LZO1X_MEM_COMPRESS);
+-	if (!ctx->lzo_comp_mem)
++	ctx->lzo_comp_mem = lzo_alloc_ctx(NULL);
++	if (IS_ERR(ctx->lzo_comp_mem))
+ 		return -ENOMEM;
+ 
+ 	return 0;
  }
  
-+static int crypto842_scompress(struct crypto_scomp *tfm,
-+			      const u8 *src, unsigned int slen,
-+			      u8 *dst, unsigned int *dlen, void *ctx)
++static void lzo_free_ctx(struct crypto_scomp *tfm, void *ctx)
 +{
-+	return sw842_compress(src, slen, dst, dlen, ctx);
++	kvfree(ctx);
 +}
 +
- static int crypto842_decompress(struct crypto_tfm *tfm,
- 				const u8 *src, unsigned int slen,
- 				u8 *dst, unsigned int *dlen)
-@@ -52,27 +95,63 @@ static int crypto842_decompress(struct crypto_tfm *tfm,
- 	return sw842_decompress(src, slen, dst, dlen);
+ static void lzo_exit(struct crypto_tfm *tfm)
+ {
+ 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	kvfree(ctx->lzo_comp_mem);
++	lzo_free_ctx(NULL, ctx->lzo_comp_mem);
  }
  
-+static int crypto842_sdecompress(struct crypto_scomp *tfm,
-+				const u8 *src, unsigned int slen,
-+				u8 *dst, unsigned int *dlen, void *ctx)
+-static int lzo_compress(struct crypto_tfm *tfm, const u8 *src,
+-			    unsigned int slen, u8 *dst, unsigned int *dlen)
++static int __lzo_compress(const u8 *src, unsigned int slen,
++			u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	size_t tmp_len = *dlen; /* size_t(ulong) <-> uint on 64 bit */
+ 	int err;
+ 
+-	err = lzo1x_1_compress(src, slen, dst, &tmp_len, ctx->lzo_comp_mem);
++	err = lzo1x_1_compress(src, slen, dst, &tmp_len, ctx);
+ 
+ 	if (err != LZO_E_OK)
+ 		return -EINVAL;
+@@ -64,8 +81,22 @@ static int lzo_compress(struct crypto_tfm *tfm, const u8 *src,
+ 	return 0;
+ }
+ 
+-static int lzo_decompress(struct crypto_tfm *tfm, const u8 *src,
+-			      unsigned int slen, u8 *dst, unsigned int *dlen)
++static int lzo_compress(struct crypto_tfm *tfm, const u8 *src,
++			    unsigned int slen, u8 *dst, unsigned int *dlen)
 +{
-+	return sw842_decompress(src, slen, dst, dlen);
++	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	return __lzo_compress(src, slen, dst, dlen, ctx->lzo_comp_mem);
 +}
 +
++static int lzo_scompress(struct crypto_scomp *tfm, const u8 *src,
++		unsigned int slen, u8 *dst, unsigned int *dlen, void *ctx)
++{
++	return __lzo_compress(src, slen, dst, dlen, ctx);
++}
++
++static int __lzo_decompress(const u8 *src, unsigned int slen,
++				u8 *dst, unsigned int *dlen)
+ {
+ 	int err;
+ 	size_t tmp_len = *dlen; /* size_t(ulong) <-> uint on 64 bit */
+@@ -77,7 +108,18 @@ static int lzo_decompress(struct crypto_tfm *tfm, const u8 *src,
+ 
+ 	*dlen = tmp_len;
+ 	return 0;
++}
++
++static int lzo_decompress(struct crypto_tfm *tfm, const u8 *src,
++			      unsigned int slen, u8 *dst, unsigned int *dlen)
++{
++	return __lzo_decompress(src, slen, dst, dlen);
++}
+ 
++static int lzo_sdecompress(struct crypto_scomp *tfm, const u8 *src,
++		unsigned int slen, u8 *dst, unsigned int *dlen, void *ctx)
++{
++	return __lzo_decompress(src, slen, dst, dlen);
+ }
+ 
  static struct crypto_alg alg = {
- 	.cra_name		= "842",
- 	.cra_driver_name	= "842-generic",
- 	.cra_priority		= 100,
- 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
--	.cra_ctxsize		= sizeof(struct crypto842_ctx),
- 	.cra_module		= THIS_MODULE,
-+	.cra_init		= crypto842_init,
-+	.cra_exit		= crypto842_exit,
- 	.cra_u			= { .compress = {
- 	.coa_compress		= crypto842_compress,
- 	.coa_decompress		= crypto842_decompress } }
+@@ -92,14 +134,41 @@ static struct crypto_alg alg = {
+ 	.coa_decompress  	= lzo_decompress } }
  };
  
 +static struct scomp_alg scomp = {
-+	.alloc_ctx		= crypto842_alloc_ctx,
-+	.free_ctx		= crypto842_free_ctx,
-+	.compress		= crypto842_scompress,
-+	.decompress		= crypto842_sdecompress,
++	.alloc_ctx		= lzo_alloc_ctx,
++	.free_ctx		= lzo_free_ctx,
++	.compress		= lzo_scompress,
++	.decompress		= lzo_sdecompress,
 +	.base			= {
-+		.cra_name	= "842",
-+		.cra_driver_name= "842-scomp",
-+		.cra_priority	= 100,
++		.cra_name	= "lzo",
++		.cra_driver_name= "lzo-scomp",
 +		.cra_flags	= CRYPTO_ALG_TYPE_SCOMPRESS |
 +					CRYPTO_SCOMP_DECOMP_NOCTX,
 +		.cra_module	= THIS_MODULE,
 +	}
 +};
 +
- static int __init crypto842_mod_init(void)
+ static int __init lzo_mod_init(void)
  {
 -	return crypto_register_alg(&alg);
 +	int ret;
@@ -148,26 +187,13 @@ index 98e387e..47cf7e5 100644
 +
 +	return ret;
  }
- module_init(crypto842_mod_init);
  
- static void __exit crypto842_mod_exit(void)
+ static void __exit lzo_mod_fini(void)
  {
  	crypto_unregister_alg(&alg);
 +	crypto_unregister_scomp(&scomp);
  }
- module_exit(crypto842_mod_exit);
  
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 2641a60..351b859 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1512,6 +1512,7 @@ config CRYPTO_842
- 	select CRYPTO_ALGAPI
- 	select 842_COMPRESS
- 	select 842_DECOMPRESS
-+	select CRYPTO_COMPRESS2
- 	help
- 	  This is the 842 algorithm.
- 
+ module_init(lzo_mod_init);
 -- 
 1.9.1
