@@ -1,84 +1,62 @@
-From: Sasha Levin <sasha.levin@oracle.com>
-Subject: Re: crypto: algif_hash: creating 0 sized array in hash_accept
-Date: Tue, 26 Jan 2016 08:26:41 -0500
-Message-ID: <56A77411.5030209@oracle.com>
-References: <56A6119C.1080203@oracle.com>
- <20160125135846.GB8256@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH v2 1/2] crypto: sunxi - don't print confusing data
+Date: Tue, 26 Jan 2016 14:44:50 +0100
+Message-ID: <1453815902-3070323-1-git-send-email-arnd@arndb.de>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Arnd Bergmann <arnd@arndb.de>,
+	Corentin Labbe <clabbe.montjoie@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Maxime Ripard <maxime.ripard@free-electrons.com>,
+	Chen-Yu Tsai <wens@csie.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1050.oracle.com ([141.146.126.70]:39496 "EHLO
-	aserp1050.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933342AbcAZN15 (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.134]:53296 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S965130AbcAZNp7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jan 2016 08:27:57 -0500
-In-Reply-To: <20160125135846.GB8256@gondor.apana.org.au>
+	Tue, 26 Jan 2016 08:45:59 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/25/2016 08:58 AM, Herbert Xu wrote:
-> On Mon, Jan 25, 2016 at 07:14:20AM -0500, Sasha Levin wrote:
->> Hi all,
->>
->> While fuzzing with trinity inside a KVM tools guest running the latest -next kernel
->> I've hit:
->>
->> [  828.386074] UBSAN: Undefined behaviour in crypto/algif_hash.c:185:7
->> [  828.386811] variable length array bound value 0 <= 0
->> [  828.387606] CPU: 1 PID: 17792 Comm: trinity-c313 Not tainted 4.4.0-next-20160122-sasha-00019-gd2a2eb4-dirty #2819
->> [  828.388957]  1ffff10038e06f65 0000000087690421 ffff8801c7037ba8 ffffffffa34474f1
->> [  828.394655]  0000000041b58ab3 ffffffffaf84c518 ffffffffa3447426 ffff8801c7037b70
->> [  828.394684]  0000000087690421 ffffffffb329b1e0 ffff8801c7037c38 0000000000000000
->> [  828.394708] Call Trace:
->> [  828.394868] dump_stack (lib/dump_stack.c:52)
->> [  828.395040] ? _atomic_dec_and_lock (lib/dump_stack.c:27)
->> [  828.395079] ubsan_epilogue (lib/ubsan.c:165)
->> [  828.395101] __ubsan_handle_vla_bound_not_positive (lib/ubsan.c:364)
->> [  828.395118] ? __ubsan_handle_out_of_bounds (lib/ubsan.c:352)
->> [  828.395179] ? sock_alloc_file (net/socket.c:388)
->> [  828.395194] ? sock_splice_read (net/socket.c:356)
->> [  828.395217] ? check_preemption_disabled (lib/smp_processor_id.c:52)
->> [  828.395244] hash_accept (crypto/algif_hash.c:185 (discriminator 1))
->> [  828.395264] SYSC_accept4 (net/socket.c:1476)
->> [  828.395282] ? sockfd_lookup_light (net/socket.c:1427)
->> [  828.395319] ? _raw_spin_unlock_bh (kernel/locking/spinlock.c:208)
->> [  828.395339] ? release_sock (net/core/sock.c:2446)
->> [  828.395645] ? hash_accept_parent_nokey (crypto/algif_hash.c:380)
->> [  828.396457] ? map_id_down (kernel/user_namespace.c:201)
->> [  828.396484] ? SyS_futex (kernel/futex.c:3099)
->> [  828.396502] ? do_futex (kernel/futex.c:3099)
->> [  828.396519] ? SyS_socket (net/socket.c:1213)
->> [  828.396536] ? move_addr_to_kernel (net/socket.c:1213)
->> [  828.396552] SyS_accept (net/socket.c:1506)
->> [  828.396569] entry_SYSCALL_64_fastpath (arch/x86/entry/entry_64.S:186)
->> [  828.396596] ? vm_mmap_pgoff (mm/util.c:325)
->>
->> Which is this code snippet:
->>
->> static int hash_accept(struct socket *sock, struct socket *newsock, int flags)
->> {
->>         struct sock *sk = sock->sk;
->>         struct alg_sock *ask = alg_sk(sk);
->>         struct hash_ctx *ctx = ask->private;
->>         struct ahash_request *req = &ctx->req;
->>         char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req))];
->>
->>
->> Where crypto_ahash_statesize(crypto_ahash_reqtfm(req)) == 0.
-> 
-> This should not be possible because we forbid any algorithm with
-> a zero statesize from being registered.  Please tell us what
-> algorithm you were using that led to this crash.
+gcc correctly warns that the printk output contains a variable that
+it thinks is not initialized in some cases:
 
-Hey Herbert,
+drivers/crypto/sunxi-ss/sun4i-ss-cipher.c: In function 'sun4i_ss_cipher_poll':
+drivers/crypto/sunxi-ss/sun4i-ss-cipher.c:254:76: warning: 'todo' may be used uninitialized in this function [-Wmaybe-uninitialized]
+drivers/crypto/sunxi-ss/sun4i-ss-cipher.c:144:15: note: 'todo' was declared here
 
-This seems to be happening with "digest_null".
+A closer look at the function reveals that the variable is always
+initialized at this point (ileft is guaranteed to be positive at the
+start), but its contents are not well-defined:
+Depending on some other variables, it might be either a count in
+words or bytes, and it could refer to either input or output.
 
+The easiest solution apparently is to remove the confusing output
+and let the reader figure out the state from the other variables.
 
-Thanks,
-Sasha
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+index a19ee127edca..7be3fbcd8d78 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+@@ -251,11 +251,10 @@ static int sun4i_ss_cipher_poll(struct ablkcipher_request *areq)
+ 		spaces = readl(ss->base + SS_FCSR);
+ 		rx_cnt = SS_RXFIFO_SPACES(spaces);
+ 		tx_cnt = SS_TXFIFO_SPACES(spaces);
+-		dev_dbg(ss->dev, "%x %u/%u %u/%u cnt=%u %u/%u %u/%u cnt=%u %u %u\n",
++		dev_dbg(ss->dev, "%x %u/%u %u/%u cnt=%u %u/%u %u/%u cnt=%u %u\n",
+ 			mode,
+ 			oi, mi.length, ileft, areq->nbytes, rx_cnt,
+-			oo, mo.length, oleft, areq->nbytes, tx_cnt,
+-			todo, ob);
++			oo, mo.length, oleft, areq->nbytes, tx_cnt, ob);
+ 
+ 		if (tx_cnt == 0)
+ 			continue;
+-- 
+2.7.0
