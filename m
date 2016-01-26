@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 1/4] crypto: add template handling for RNGs
-Date: Tue, 26 Jan 2016 07:19:52 +0100
-Message-ID: <4598846.P3rW2MaR68@positron.chronox.de>
+Subject: [PATCH 4/4] crypto: kdf - enable compilation
+Date: Tue, 26 Jan 2016 07:21:28 +0100
+Message-ID: <2991837.GFdFa5iSiG@positron.chronox.de>
 References: <4445045.XP4c23S4mB@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -9,120 +9,51 @@ Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:42524 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:42516 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755379AbcAZGWE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	id S1755390AbcAZGWE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
 	Tue, 26 Jan 2016 01:22:04 -0500
 In-Reply-To: <4445045.XP4c23S4mB@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds the ability to register templates for RNGs. RNGs are
-"meta" mechanisms using raw cipher primitives. Thus, RNGs can now be
-implemented as templates to allow the complete flexibility the kernel
-crypto API provides.
+Include KDF into Kconfig and Makefile for compilation
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/rng.c         | 31 +++++++++++++++++++++++++++++++
- include/crypto/rng.h | 39 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 70 insertions(+)
+ crypto/Kconfig  | 7 +++++++
+ crypto/Makefile | 1 +
+ 2 files changed, 8 insertions(+)
 
-diff --git a/crypto/rng.c b/crypto/rng.c
-index b81cffb..92cc02a 100644
---- a/crypto/rng.c
-+++ b/crypto/rng.c
-@@ -232,5 +232,36 @@ void crypto_unregister_rngs(struct rng_alg *algs, int count)
- }
- EXPORT_SYMBOL_GPL(crypto_unregister_rngs);
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 7240821..aa4e1a4 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -355,6 +355,13 @@ config CRYPTO_KEYWRAP
+ 	  Support for key wrapping (NIST SP800-38F / RFC3394) without
+ 	  padding.
  
-+void rng_free_instance(struct crypto_instance *inst)
-+{
-+	crypto_drop_spawn(crypto_instance_ctx(inst));
-+	kfree(rng_instance(inst));
-+}
-+EXPORT_SYMBOL_GPL(rng_free_instance);
++config CRYPTO_KDF
++	tristate "Key Derivation Function (SP800-108)"
++	select CRYPTO_RNG
++	help
++	  Support for KDF compliant to SP800-108. All three types of
++	  KDF specified in SP800-108 are implemented.
 +
-+static int rng_prepare_alg(struct rng_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
-+
-+	base->cra_type = &crypto_rng_type;
-+	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
-+	base->cra_flags |= CRYPTO_ALG_TYPE_RNG;
-+
-+	return 0;
-+}
-+
-+int rng_register_instance(struct crypto_template *tmpl,
-+			  struct rng_instance *inst)
-+{
-+	int err;
-+
-+	err = rng_prepare_alg(&inst->alg);
-+	if (err)
-+		return err;
-+
-+	return crypto_register_instance(tmpl, rng_crypto_instance(inst));
-+}
-+EXPORT_SYMBOL_GPL(rng_register_instance);
-+
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Random Number Generator");
-diff --git a/include/crypto/rng.h b/include/crypto/rng.h
-index b95ede3..b8a6ea3 100644
---- a/include/crypto/rng.h
-+++ b/include/crypto/rng.h
-@@ -15,6 +15,7 @@
- #define _CRYPTO_RNG_H
+ comment "Hash modes"
  
- #include <linux/crypto.h>
-+#include <crypto/algapi.h>
- 
- struct crypto_rng;
- 
-@@ -197,4 +198,42 @@ static inline int crypto_rng_seedsize(struct crypto_rng *tfm)
- 	return crypto_rng_alg(tfm)->seedsize;
- }
- 
-+struct rng_instance {
-+	struct rng_alg alg;
-+};
-+
-+static inline struct rng_instance *rng_alloc_instance(
-+	const char *name, struct crypto_alg *alg)
-+{
-+	return crypto_alloc_instance2(name, alg,
-+				      sizeof(struct rng_alg) - sizeof(*alg));
-+}
-+
-+static inline struct crypto_instance *rng_crypto_instance(
-+	struct rng_instance *inst)
-+{
-+	return container_of(&inst->alg.base, struct crypto_instance, alg);
-+}
-+
-+static inline void *rng_instance_ctx(struct rng_instance *inst)
-+{
-+	return crypto_instance_ctx(rng_crypto_instance(inst));
-+}
-+
-+static inline struct rng_alg *__crypto_rng_alg(struct crypto_alg *alg)
-+{
-+	return container_of(alg, struct rng_alg, base);
-+}
-+
-+static inline struct rng_instance *rng_instance(
-+	struct crypto_instance *inst)
-+{
-+	return container_of(__crypto_rng_alg(&inst->alg),
-+			    struct rng_instance, alg);
-+}
-+
-+int rng_register_instance(struct crypto_template *tmpl,
-+			  struct rng_instance *inst);
-+void rng_free_instance(struct crypto_instance *inst);
-+
- #endif
+ config CRYPTO_CMAC
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 2acdbbd..79a2092 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -72,6 +72,7 @@ obj-$(CONFIG_CRYPTO_LRW) += lrw.o
+ obj-$(CONFIG_CRYPTO_XTS) += xts.o
+ obj-$(CONFIG_CRYPTO_CTR) += ctr.o
+ obj-$(CONFIG_CRYPTO_KEYWRAP) += keywrap.o
++obj-$(CONFIG_CRYPTO_KDF) += kdf.o
+ obj-$(CONFIG_CRYPTO_GCM) += gcm.o
+ obj-$(CONFIG_CRYPTO_CCM) += ccm.o
+ obj-$(CONFIG_CRYPTO_CHACHA20POLY1305) += chacha20poly1305.o
 -- 
 2.5.0
