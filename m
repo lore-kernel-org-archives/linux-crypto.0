@@ -1,7 +1,7 @@
 From: Joonsoo Kim <js1304@gmail.com>
-Subject: [PATCH v2 03/10] crypto/compress: introduce sychronuous compression API
-Date: Tue, 26 Jan 2016 17:15:05 +0900
-Message-ID: <1453796112-14273-4-git-send-email-iamjoonsoo.kim@lge.com>
+Subject: [PATCH v2 07/10] crypto/lz4hc: support new compression APIs
+Date: Tue, 26 Jan 2016 17:15:09 +0900
+Message-ID: <1453796112-14273-8-git-send-email-iamjoonsoo.kim@lge.com>
 References: <1453796112-14273-1-git-send-email-iamjoonsoo.kim@lge.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Weigang Li <weigang.li@intel.com>,
@@ -11,299 +11,189 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Joonsoo Kim <iamjoonsoo.kim@lge.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f65.google.com ([209.85.220.65]:36549 "EHLO
+	mail-pa0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933749AbcAZIP7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Jan 2016 03:15:59 -0500
 In-Reply-To: <1453796112-14273-1-git-send-email-iamjoonsoo.kim@lge.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This introduces new compression APIs. Major change is that APIs are
-stateless. Instead of previous implementation, tfm objects doesn't
-embedded any context so we can de/compress concurrently with one tfm
-object. Instead, this de/compression context is coupled with the request.
-This architecture change will make APIs more flexible and we can naturally
-use asynchronous APIs as front-end of synchronous compression algorithm.
-
-Moreover, thanks to this change, we can decompress without context buffer
-if algorithm supports it. You can check it by crypto_scomp_decomp_noctx()
-and in this case we can achieve maximum parallelism without
-memory overhead caused by context buffer.
+Now, new compression APIs are introduced and it has some benefits.
+Let's support it.
 
 Signed-off-by: Joonsoo Kim <iamjoonsoo.kim@lge.com>
 ---
- crypto/Kconfig            |   5 ++
- crypto/Makefile           |   1 +
- crypto/scompress.c        | 114 ++++++++++++++++++++++++++++++++++++++++++++++
- include/crypto/compress.h |  93 +++++++++++++++++++++++++++++++++++++
- include/linux/crypto.h    |   1 +
- 5 files changed, 214 insertions(+)
- create mode 100644 crypto/scompress.c
- create mode 100644 include/crypto/compress.h
+ crypto/Kconfig |  1 +
+ crypto/lz4hc.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 82 insertions(+), 10 deletions(-)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index c80d34f..7159520 100644
+index 72ab0d7..2641a60 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -84,6 +84,10 @@ config CRYPTO_RNG_DEFAULT
- 	tristate
- 	select CRYPTO_DRBG_MENU
- 
-+config CRYPTO_SCOMPRESS
-+	tristate
-+	select CRYPTO_ALGAPI2
-+
- config CRYPTO_AKCIPHER2
- 	tristate
- 	select CRYPTO_ALGAPI2
-@@ -1499,6 +1503,7 @@ config CRYPTO_LZO
+@@ -1529,6 +1529,7 @@ config CRYPTO_LZ4HC
  	select CRYPTO_ALGAPI
- 	select LZO_COMPRESS
- 	select LZO_DECOMPRESS
-+	select SCOMPRESS
+ 	select LZ4HC_COMPRESS
+ 	select LZ4_DECOMPRESS
++	select CRYPTO_COMPRESS2
  	help
- 	  This is the LZO algorithm.
+ 	  This is the LZ4 high compression mode algorithm.
  
-diff --git a/crypto/Makefile b/crypto/Makefile
-index ffe18c9..16ef796 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -28,6 +28,7 @@ crypto_hash-y += ahash.o
- crypto_hash-y += shash.o
- obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
+diff --git a/crypto/lz4hc.c b/crypto/lz4hc.c
+index a1d3b5b..569a8a7 100644
+--- a/crypto/lz4hc.c
++++ b/crypto/lz4hc.c
+@@ -23,36 +23,53 @@
+ #include <linux/vmalloc.h>
+ #include <linux/lz4.h>
  
-+obj-$(CONFIG_CRYPTO_SCOMPRESS) += scompress.o
- obj-$(CONFIG_CRYPTO_AKCIPHER2) += akcipher.o
- 
- $(obj)/rsapubkey-asn1.o: $(obj)/rsapubkey-asn1.c $(obj)/rsapubkey-asn1.h
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-new file mode 100644
-index 0000000..7c9955b
---- /dev/null
-+++ b/crypto/scompress.c
-@@ -0,0 +1,114 @@
-+/*
-+ * Cryptographic API.
-+ *
-+ * Synchronous compression operations.
-+ *
-+ * Copyright 2015 LG Electronics Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; version 2 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.
-+ * If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include <linux/crypto.h>
-+#include <linux/errno.h>
-+#include <linux/module.h>
-+#include <linux/seq_file.h>
-+#include <linux/cryptouser.h>
-+
 +#include <crypto/compress.h>
-+#include <net/netlink.h>
 +
-+#include "internal.h"
-+
-+
-+static int crypto_scomp_init(struct crypto_tfm *tfm, u32 type, u32 mask)
-+{
-+	return 0;
-+}
-+
-+static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
-+{
-+	return 0;
-+}
-+
-+#ifdef CONFIG_NET
-+static int crypto_scomp_report(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	struct crypto_report_comp rcomp;
-+
-+	strncpy(rcomp.type, "scomp", sizeof(rcomp.type));
-+	if (nla_put(skb, CRYPTOCFGA_REPORT_COMPRESS,
-+		    sizeof(struct crypto_report_comp), &rcomp))
-+		goto nla_put_failure;
-+	return 0;
-+
-+nla_put_failure:
-+	return -EMSGSIZE;
-+}
-+#else
-+static int crypto_scomp_report(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	return -ENOSYS;
-+}
-+#endif
-+
-+static void crypto_scomp_show(struct seq_file *m, struct crypto_alg *alg)
-+	__attribute__ ((unused));
-+static void crypto_scomp_show(struct seq_file *m, struct crypto_alg *alg)
-+{
-+	seq_puts(m, "type         : scomp\n");
-+}
-+
-+static const struct crypto_type crypto_scomp_type = {
-+	.extsize	= crypto_alg_extsize,
-+	.init		= crypto_scomp_init,
-+	.init_tfm	= crypto_scomp_init_tfm,
-+#ifdef CONFIG_PROC_FS
-+	.show		= crypto_scomp_show,
-+#endif
-+	.report		= crypto_scomp_report,
-+	.maskclear	= ~CRYPTO_ALG_TYPE_MASK,
-+	.maskset	= CRYPTO_ALG_TYPE_MASK,
-+	.type		= CRYPTO_ALG_TYPE_SCOMPRESS,
-+	.tfmsize	= offsetof(struct crypto_scomp, base),
-+};
-+
-+struct crypto_scomp *crypto_alloc_scomp(const char *alg_name, u32 type,
-+					u32 mask)
-+{
-+	return crypto_alloc_tfm(alg_name, &crypto_scomp_type, type, mask);
-+}
-+EXPORT_SYMBOL_GPL(crypto_alloc_scomp);
-+
-+int crypto_register_scomp(struct scomp_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
-+
-+	base->cra_type = &crypto_scomp_type;
-+	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
-+	base->cra_flags |= CRYPTO_ALG_TYPE_SCOMPRESS;
-+
-+	return crypto_register_alg(base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_register_scomp);
-+
-+int crypto_unregister_scomp(struct scomp_alg *alg)
-+{
-+	return crypto_unregister_alg(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_unregister_scomp);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Synchronous compression operations");
-+MODULE_AUTHOR("LG Electronics Inc.");
-+
-diff --git a/include/crypto/compress.h b/include/crypto/compress.h
-new file mode 100644
-index 0000000..e4053fc
---- /dev/null
-+++ b/include/crypto/compress.h
-@@ -0,0 +1,93 @@
-+#ifndef _CRYPTO_COMPRESS_H
-+#define _CRYPTO_COMPRESS_H
-+#include <linux/crypto.h>
-+
-+#define CRYPTO_SCOMP_DECOMP_NOCTX CRYPTO_ALG_PRIVATE
-+
-+struct crypto_scomp {
-+	struct crypto_tfm base;
-+};
-+
-+struct scomp_alg {
-+	void *(*alloc_ctx)(struct crypto_scomp *tfm);
-+	void (*free_ctx)(struct crypto_scomp *tfm, void *ctx);
-+	int (*compress)(struct crypto_scomp *tfm, const u8 *src,
-+		unsigned int slen, u8 *dst, unsigned int *dlen, void *ctx);
-+	int (*decompress)(struct crypto_scomp *tfm, const u8 *src,
-+		unsigned int slen, u8 *dst, unsigned int *dlen, void *ctx);
-+
-+	struct crypto_alg base;
-+};
-+
-+extern struct crypto_scomp *crypto_alloc_scomp(const char *alg_name, u32 type,
-+					       u32 mask);
-+
-+static inline struct crypto_tfm *crypto_scomp_tfm(struct crypto_scomp *tfm)
-+{
-+	return &tfm->base;
-+}
-+
-+static inline struct crypto_scomp *crypto_scomp_cast(struct crypto_tfm *tfm)
-+{
-+	return (struct crypto_scomp *)tfm;
-+}
-+
-+static inline void crypto_free_scomp(struct crypto_scomp *tfm)
-+{
-+	crypto_destroy_tfm(tfm, crypto_scomp_tfm(tfm));
-+}
-+
-+static inline int crypto_has_scomp(const char *alg_name, u32 type, u32 mask)
-+{
-+	type &= ~CRYPTO_ALG_TYPE_MASK;
-+	type |= CRYPTO_ALG_TYPE_SCOMPRESS;
-+	mask |= CRYPTO_ALG_TYPE_MASK;
-+
-+	return crypto_has_alg(alg_name, type, mask);
-+}
-+
-+static inline struct scomp_alg *__crypto_scomp_alg(struct crypto_alg *alg)
-+{
-+	return container_of(alg, struct scomp_alg, base);
-+}
-+
-+static inline struct scomp_alg *crypto_scomp_alg(struct crypto_scomp *tfm)
-+{
-+	return __crypto_scomp_alg(crypto_scomp_tfm(tfm)->__crt_alg);
-+}
-+
-+static inline void *crypto_scomp_alloc_ctx(struct crypto_scomp *tfm)
-+{
-+	return crypto_scomp_alg(tfm)->alloc_ctx(tfm);
-+}
-+
-+static inline void crypto_scomp_free_ctx(struct crypto_scomp *tfm,
-+						void *ctx)
-+{
-+	return crypto_scomp_alg(tfm)->free_ctx(tfm, ctx);
-+}
-+
-+static inline int crypto_scomp_compress(struct crypto_scomp *tfm,
-+				const u8 *src, unsigned int slen,
-+				u8 *dst, unsigned int *dlen, void *ctx)
-+{
-+	return crypto_scomp_alg(tfm)->compress(tfm, src, slen, dst, dlen, ctx);
-+}
-+
-+static inline int crypto_scomp_decompress(struct crypto_scomp *tfm,
-+				const u8 *src, unsigned int slen,
-+				u8 *dst, unsigned int *dlen, void *ctx)
-+{
-+	return crypto_scomp_alg(tfm)->decompress(tfm, src, slen,
-+						dst, dlen, ctx);
-+}
-+
-+static inline bool crypto_scomp_decomp_noctx(struct crypto_scomp *tfm)
-+{
-+	return crypto_scomp_tfm(tfm)->__crt_alg->cra_flags &
-+				CRYPTO_SCOMP_DECOMP_NOCTX;
-+}
-+
-+extern int crypto_register_scomp(struct scomp_alg *alg);
-+extern int crypto_unregister_scomp(struct scomp_alg *alg);
-+#endif
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 96530a1..ba73c18 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -54,6 +54,7 @@
- #define CRYPTO_ALG_TYPE_AHASH		0x0000000a
- #define CRYPTO_ALG_TYPE_RNG		0x0000000c
- #define CRYPTO_ALG_TYPE_AKCIPHER	0x0000000d
-+#define CRYPTO_ALG_TYPE_SCOMPRESS	0x0000000e
+ struct lz4hc_ctx {
+ 	void *lz4hc_comp_mem;
+ };
  
- #define CRYPTO_ALG_TYPE_HASH_MASK	0x0000000e
- #define CRYPTO_ALG_TYPE_AHASH_MASK	0x0000000c
++static void *lz4hc_alloc_ctx(struct crypto_scomp *tfm)
++{
++	void *ctx;
++
++	ctx = vmalloc(LZ4HC_MEM_COMPRESS);
++	if (!ctx)
++		return ERR_PTR(-ENOMEM);
++
++	return ctx;
++}
++
+ static int lz4hc_init(struct crypto_tfm *tfm)
+ {
+ 	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	ctx->lz4hc_comp_mem = vmalloc(LZ4HC_MEM_COMPRESS);
+-	if (!ctx->lz4hc_comp_mem)
++	ctx->lz4hc_comp_mem = lz4hc_alloc_ctx(NULL);
++	if (IS_ERR(ctx->lz4hc_comp_mem))
+ 		return -ENOMEM;
+ 
+ 	return 0;
+ }
+ 
++static void lz4hc_free_ctx(struct crypto_scomp *tfm, void *ctx)
++{
++	vfree(ctx);
++}
++
+ static void lz4hc_exit(struct crypto_tfm *tfm)
+ {
+ 	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	vfree(ctx->lz4hc_comp_mem);
++	lz4hc_free_ctx(NULL, ctx->lz4hc_comp_mem);
+ }
+ 
+-static int lz4hc_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+-			    unsigned int slen, u8 *dst, unsigned int *dlen)
++static int __lz4hc_compress_crypto(const u8 *src, unsigned int slen,
++				u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	size_t tmp_len = *dlen;
+ 	int err;
+ 
+-	err = lz4hc_compress(src, slen, dst, &tmp_len, ctx->lz4hc_comp_mem);
++	err = lz4hc_compress(src, slen, dst, &tmp_len, ctx);
+ 
+ 	if (err < 0)
+ 		return -EINVAL;
+@@ -61,8 +78,23 @@ static int lz4hc_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ 	return 0;
+ }
+ 
+-static int lz4hc_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
+-			      unsigned int slen, u8 *dst, unsigned int *dlen)
++static int lz4hc_scompress(struct crypto_scomp *tfm, const u8 *src,
++		unsigned int slen, u8 *dst, unsigned int *dlen, void *ctx)
++{
++	return __lz4hc_compress_crypto(src, slen, dst, dlen, ctx);
++}
++
++static int lz4hc_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
++			unsigned int slen, u8 *dst, unsigned int *dlen)
++{
++	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	return __lz4hc_compress_crypto(src, slen, dst, dlen,
++					ctx->lz4hc_comp_mem);
++}
++
++static int __lz4hc_decompress_crypto(const u8 *src, unsigned int slen,
++				u8 *dst, unsigned int *dlen, void *ctx)
+ {
+ 	int err;
+ 	size_t tmp_len = *dlen;
+@@ -76,6 +108,18 @@ static int lz4hc_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ 	return err;
+ }
+ 
++static int lz4hc_sdecompress(struct crypto_scomp *tfm, const u8 *src,
++		unsigned int slen, u8 *dst, unsigned int *dlen, void *ctx)
++{
++	return __lz4hc_decompress_crypto(src, slen, dst, dlen, NULL);
++}
++
++static int lz4hc_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
++			      unsigned int slen, u8 *dst, unsigned int *dlen)
++{
++	return __lz4hc_decompress_crypto(src, slen, dst, dlen, NULL);
++}
++
+ static struct crypto_alg alg_lz4hc = {
+ 	.cra_name		= "lz4hc",
+ 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
+@@ -89,14 +133,41 @@ static struct crypto_alg alg_lz4hc = {
+ 	.coa_decompress		= lz4hc_decompress_crypto } }
+ };
+ 
++static struct scomp_alg scomp = {
++	.alloc_ctx		= lz4hc_alloc_ctx,
++	.free_ctx		= lz4hc_free_ctx,
++	.compress		= lz4hc_scompress,
++	.decompress		= lz4hc_sdecompress,
++	.base			= {
++		.cra_name	= "lz4hc",
++		.cra_driver_name= "lz4hc-scomp",
++		.cra_flags	= CRYPTO_ALG_TYPE_SCOMPRESS |
++					CRYPTO_SCOMP_DECOMP_NOCTX,
++		.cra_module	= THIS_MODULE,
++	}
++};
++
+ static int __init lz4hc_mod_init(void)
+ {
+-	return crypto_register_alg(&alg_lz4hc);
++	int ret;
++
++	ret = crypto_register_alg(&alg_lz4hc);
++	if (ret)
++		return ret;
++
++	ret = crypto_register_scomp(&scomp);
++	if (ret) {
++		crypto_unregister_alg(&alg_lz4hc);
++		return ret;
++	}
++
++	return ret;
+ }
+ 
+ static void __exit lz4hc_mod_fini(void)
+ {
+ 	crypto_unregister_alg(&alg_lz4hc);
++	crypto_unregister_scomp(&scomp);
+ }
+ 
+ module_init(lz4hc_mod_init);
 -- 
 1.9.1
