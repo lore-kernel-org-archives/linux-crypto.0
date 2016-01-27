@@ -1,105 +1,88 @@
 From: kbuild test robot <fengguang.wu@intel.com>
-Subject: [cryptodev:master 49/61] drivers/block/drbd/drbd_worker.c:304:1:
- warning: 'drbd_csum_ee' uses dynamic stack allocation
-Date: Wed, 27 Jan 2016 22:49:13 +0800
-Message-ID: <201601272211.GCUCVq2l%fengguang.wu@intel.com>
+Subject: [cryptodev:master 50/61] drivers/nfc/s3fwrn5/firmware.c:501:1:
+ warning: 's3fwrn5_fw_download' uses dynamic stack allocation
+Date: Wed, 27 Jan 2016 22:56:02 +0800
+Message-ID: <201601272200.na1LCqZY%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="IJpNTDwzlM2Ie8A6"
+Content-Type: multipart/mixed; boundary="bp/iNruPH9dso1Pn"
 Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:44894 "EHLO mga01.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:25780 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932725AbcA0Oth (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 Jan 2016 09:49:37 -0500
+	id S932868AbcA0O4s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 27 Jan 2016 09:56:48 -0500
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
---IJpNTDwzlM2Ie8A6
+--bp/iNruPH9dso1Pn
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
 head:   2f313e029020f1fa5f58f38f48ff6988d67fc3c1
-commit: 9534d67195118c39edf2ec0bb74e59993c4c0677 [49/61] drbd: Use shash and ahash
+commit: 4a31340b36302d46207c6bb54d103d9fb568e916 [50/61] nfc: s3fwrn5: Use shash
 config: s390-allyesconfig (attached as .config)
 reproduce:
         wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        git checkout 9534d67195118c39edf2ec0bb74e59993c4c0677
+        git checkout 4a31340b36302d46207c6bb54d103d9fb568e916
         # save the attached .config to linux build tree
         make.cross ARCH=s390 
 
 All warnings (new ones prefixed by >>):
 
-   drivers/block/drbd/drbd_worker.c: In function 'drbd_csum_ee':
->> drivers/block/drbd/drbd_worker.c:304:1: warning: 'drbd_csum_ee' uses dynamic stack allocation
-    }
-    ^
-   drivers/block/drbd/drbd_worker.c: In function 'drbd_csum_bio':
->> drivers/block/drbd/drbd_worker.c:327:1: warning: 'drbd_csum_bio' uses dynamic stack allocation
-    }
-    ^
---
-   drivers/block/drbd/drbd_receiver.c: In function 'drbd_do_auth':
->> drivers/block/drbd/drbd_receiver.c:5092:1: warning: 'drbd_do_auth' uses dynamic stack allocation
+   drivers/nfc/s3fwrn5/firmware.c: In function 's3fwrn5_fw_download':
+>> drivers/nfc/s3fwrn5/firmware.c:501:1: warning: 's3fwrn5_fw_download' uses dynamic stack allocation
     }
     ^
 
-vim +/drbd_csum_ee +304 drivers/block/drbd/drbd_worker.c
+vim +/s3fwrn5_fw_download +501 drivers/nfc/s3fwrn5/firmware.c
 
-45bb912b Lars Ellenberg      2010-05-14  298  	/* and now the last, possibly only partially used page */
-db830c46 Andreas Gruenbacher 2011-02-04  299  	len = peer_req->i.size & (PAGE_SIZE - 1);
-45bb912b Lars Ellenberg      2010-05-14  300  	sg_set_page(&sg, page, len ?: PAGE_SIZE, 0);
-9534d671 Herbert Xu          2016-01-24  301  	ahash_request_set_crypt(req, &sg, digest, sg.length);
-9534d671 Herbert Xu          2016-01-24  302  	crypto_ahash_finup(req);
-9534d671 Herbert Xu          2016-01-24  303  	ahash_request_zero(req);
-45bb912b Lars Ellenberg      2010-05-14 @304  }
-45bb912b Lars Ellenberg      2010-05-14  305  
-9534d671 Herbert Xu          2016-01-24  306  void drbd_csum_bio(struct crypto_ahash *tfm, struct bio *bio, void *digest)
-b411b363 Philipp Reisner     2009-09-25  307  {
-9534d671 Herbert Xu          2016-01-24  308  	AHASH_REQUEST_ON_STACK(req, tfm);
-b411b363 Philipp Reisner     2009-09-25  309  	struct scatterlist sg;
-7988613b Kent Overstreet     2013-11-23  310  	struct bio_vec bvec;
-7988613b Kent Overstreet     2013-11-23  311  	struct bvec_iter iter;
-b411b363 Philipp Reisner     2009-09-25  312  
-9534d671 Herbert Xu          2016-01-24  313  	ahash_request_set_tfm(req, tfm);
-9534d671 Herbert Xu          2016-01-24  314  	ahash_request_set_callback(req, 0, NULL, NULL);
-b411b363 Philipp Reisner     2009-09-25  315  
-b411b363 Philipp Reisner     2009-09-25  316  	sg_init_table(&sg, 1);
-9534d671 Herbert Xu          2016-01-24  317  	crypto_ahash_init(req);
-b411b363 Philipp Reisner     2009-09-25  318  
-7988613b Kent Overstreet     2013-11-23  319  	bio_for_each_segment(bvec, bio, iter) {
-7988613b Kent Overstreet     2013-11-23  320  		sg_set_page(&sg, bvec.bv_page, bvec.bv_len, bvec.bv_offset);
-9534d671 Herbert Xu          2016-01-24  321  		ahash_request_set_crypt(req, &sg, NULL, sg.length);
-9534d671 Herbert Xu          2016-01-24  322  		crypto_ahash_update(req);
-b411b363 Philipp Reisner     2009-09-25  323  	}
-9534d671 Herbert Xu          2016-01-24  324  	ahash_request_set_crypt(req, NULL, digest, 0);
-9534d671 Herbert Xu          2016-01-24  325  	crypto_ahash_final(req);
-9534d671 Herbert Xu          2016-01-24  326  	ahash_request_zero(req);
-b411b363 Philipp Reisner     2009-09-25 @327  }
-b411b363 Philipp Reisner     2009-09-25  328  
-9676c760 Lars Ellenberg      2011-02-22  329  /* MAYBE merge common code with w_e_end_ov_req */
-99920dc5 Andreas Gruenbacher 2011-03-16  330  static int w_e_send_csum(struct drbd_work *w, int cancel)
+c04c674f Robert Baldyga 2015-08-20  485  			goto out;
+c04c674f Robert Baldyga 2015-08-20  486  		}
+c04c674f Robert Baldyga 2015-08-20  487  	}
+c04c674f Robert Baldyga 2015-08-20  488  
+c04c674f Robert Baldyga 2015-08-20  489  	ret = s3fwrn5_fw_complete_update_mode(fw_info);
+c04c674f Robert Baldyga 2015-08-20  490  	if (ret < 0) {
+c04c674f Robert Baldyga 2015-08-20  491  		dev_err(&fw_info->ndev->nfc_dev->dev,
+c04c674f Robert Baldyga 2015-08-20  492  			"Unable to complete update mode\n");
+c04c674f Robert Baldyga 2015-08-20  493  		goto out;
+c04c674f Robert Baldyga 2015-08-20  494  	}
+c04c674f Robert Baldyga 2015-08-20  495  
+c04c674f Robert Baldyga 2015-08-20  496  	dev_info(&fw_info->ndev->nfc_dev->dev,
+c04c674f Robert Baldyga 2015-08-20  497  		"Firmware update: success\n");
+c04c674f Robert Baldyga 2015-08-20  498  
+c04c674f Robert Baldyga 2015-08-20  499  out:
+c04c674f Robert Baldyga 2015-08-20  500  	return ret;
+c04c674f Robert Baldyga 2015-08-20 @501  }
+c04c674f Robert Baldyga 2015-08-20  502  
+c04c674f Robert Baldyga 2015-08-20  503  void s3fwrn5_fw_init(struct s3fwrn5_fw_info *fw_info, const char *fw_name)
+c04c674f Robert Baldyga 2015-08-20  504  {
+c04c674f Robert Baldyga 2015-08-20  505  	fw_info->parity = 0x00;
+c04c674f Robert Baldyga 2015-08-20  506  	fw_info->rsp = NULL;
+c04c674f Robert Baldyga 2015-08-20  507  	fw_info->fw.fw = NULL;
+c04c674f Robert Baldyga 2015-08-20  508  	strcpy(fw_info->fw_name, fw_name);
+c04c674f Robert Baldyga 2015-08-20  509  	init_completion(&fw_info->completion);
 
-:::::: The code at line 304 was first introduced by commit
-:::::: 45bb912bd5ea4d2b3a270a93cbdf767a0e2df6f5 drbd: Allow drbd_epoch_entries to use multiple bios. This should allow for better performance if the lower level IO stack of the peers differs in limits exposed either via the queue, or via some merge_bvec_fn.
+:::::: The code at line 501 was first introduced by commit
+:::::: c04c674fadeb4a8e6522fc838d4620f7cfd4c621 nfc: s3fwrn5: Add driver for Samsung S3FWRN5 NFC Chip
 
-:::::: TO: Lars Ellenberg <lars.ellenberg@linbit.com>
-:::::: CC: Philipp Reisner <philipp.reisner@linbit.com>
+:::::: TO: Robert Baldyga <r.baldyga@samsung.com>
+:::::: CC: Samuel Ortiz <sameo@linux.intel.com>
 
 ---
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---IJpNTDwzlM2Ie8A6
+--bp/iNruPH9dso1Pn
 Content-Type: application/octet-stream
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICFLYqFYAAy5jb25maWcAlFxLd+Q2rt7nV9TpzOLexaTbj1TSd44XlERVcUoS1SJVfmx0
+H4sICCvaqFYAAy5jb25maWcAlFxLd+Q2rt7nV9TpzOLexaTbj1TSd44XlERVcUoS1SJVfmx0
 3O7qjk9sV49dziT//gLUC3xI5WSRtvCBFAkCIABS9eMPPy7Y62H/eHu4v7t9ePhr8W33tHu+
 Pey+LL7eP+z+tUjkopB6wROhfwLm7P7p9c/3L2cfPyzOf/r5pw//fL47WWx2z0+7h0W8f/p6
 /+0VWt/vn3748YdYFqlYNXleX/zVP9zIgjdJzkZKJuNNwstG1WUpKz0CSrN4oysWcx+rLhXP
@@ -843,4 +826,4 @@ Shv3gHixdlMGmAV+SW3fPeIngaWUmetN1eFtmcNyz9Kz9FTjBEKfQ7Az1M5k1LkAeCjKjO44
 wVtjcTLhId3J26cwz2Z63p7psm5Uoi9UrfPs5O1TmGczPW+XZ+nJ26cwz2Z63i7P0rbaP95t
 mzDP6jJPTt4+hXk20/O22j/ebedNXNUnb5/+D4DZfGhVfwIA
 
---IJpNTDwzlM2Ie8A6--
+--bp/iNruPH9dso1Pn--
