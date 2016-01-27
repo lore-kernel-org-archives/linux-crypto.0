@@ -1,74 +1,56 @@
-From: Corentin LABBE <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH v2 1/2] crypto: sunxi - don't print confusing data
-Date: Wed, 27 Jan 2016 20:42:26 +0100
-Message-ID: <56A91DA2.5040608@gmail.com>
-References: <1453815902-3070323-1-git-send-email-arnd@arndb.de>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] crypto: aead - move aead_request_cast helper to aead.h
+Date: Wed, 27 Jan 2016 14:09:16 -0800
+Message-ID: <20160127220916.12466.99501.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-arm-kernel@lists.infradead.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Maxime Ripard <maxime.ripard@free-electrons.com>,
-	Chen-Yu Tsai <wens@csie.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: smueller@chronox.de, tadeusz.struk@intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1453815902-3070323-1-git-send-email-arnd@arndb.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Le 26/01/2016 14:44, Arnd Bergmann a =E9crit :
-> gcc correctly warns that the printk output contains a variable that
-> it thinks is not initialized in some cases:
->=20
-> drivers/crypto/sunxi-ss/sun4i-ss-cipher.c: In function 'sun4i_ss_ciph=
-er_poll':
-> drivers/crypto/sunxi-ss/sun4i-ss-cipher.c:254:76: warning: 'todo' may=
- be used uninitialized in this function [-Wmaybe-uninitialized]
-> drivers/crypto/sunxi-ss/sun4i-ss-cipher.c:144:15: note: 'todo' was de=
-clared here
->=20
-> A closer look at the function reveals that the variable is always
-> initialized at this point (ileft is guaranteed to be positive at the
-> start), but its contents are not well-defined:
-> Depending on some other variables, it might be either a count in
-> words or bytes, and it could refer to either input or output.
->=20
-> The easiest solution apparently is to remove the confusing output
-> and let the reader figure out the state from the other variables.
->=20
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/cryp=
-to/sunxi-ss/sun4i-ss-cipher.c
-> index a19ee127edca..7be3fbcd8d78 100644
-> --- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-> +++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-> @@ -251,11 +251,10 @@ static int sun4i_ss_cipher_poll(struct ablkciph=
-er_request *areq)
->  		spaces =3D readl(ss->base + SS_FCSR);
->  		rx_cnt =3D SS_RXFIFO_SPACES(spaces);
->  		tx_cnt =3D SS_TXFIFO_SPACES(spaces);
-> -		dev_dbg(ss->dev, "%x %u/%u %u/%u cnt=3D%u %u/%u %u/%u cnt=3D%u %u =
-%u\n",
-> +		dev_dbg(ss->dev, "%x %u/%u %u/%u cnt=3D%u %u/%u %u/%u cnt=3D%u %u\=
-n",
->  			mode,
->  			oi, mi.length, ileft, areq->nbytes, rx_cnt,
-> -			oo, mo.length, oleft, areq->nbytes, tx_cnt,
-> -			todo, ob);
-> +			oo, mo.length, oleft, areq->nbytes, tx_cnt, ob);
-> =20
->  		if (tx_cnt =3D=3D 0)
->  			continue;
->=20
+Move the helper function to common header for everybody to use.
 
-Hello
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ drivers/crypto/atmel-aes.c |    6 ------
+ include/crypto/aead.h      |    6 ++++++
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-A bit late but Acked-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-
-Thanks
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index 6dd3317..949af89 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -369,12 +369,6 @@ static inline size_t atmel_aes_padlen(size_t len, size_t block_size)
+ 	return len ? block_size - len : 0;
+ }
+ 
+-static inline struct aead_request *
+-aead_request_cast(struct crypto_async_request *req)
+-{
+-	return container_of(req, struct aead_request, base);
+-}
+-
+ static struct atmel_aes_dev *atmel_aes_find_dev(struct atmel_aes_base_ctx *ctx)
+ {
+ 	struct atmel_aes_dev *aes_dd = NULL;
+diff --git a/include/crypto/aead.h b/include/crypto/aead.h
+index 84d13b1..2de15fc 100644
+--- a/include/crypto/aead.h
++++ b/include/crypto/aead.h
+@@ -304,6 +304,12 @@ static inline struct crypto_aead *crypto_aead_reqtfm(struct aead_request *req)
+ 	return __crypto_aead_cast(req->base.tfm);
+ }
+ 
++static inline struct aead_request *aead_request_cast(
++					struct crypto_async_request *req)
++{
++	return container_of(req, struct aead_request, base);
++}
++
+ /**
+  * crypto_aead_encrypt() - encrypt plaintext
+  * @req: reference to the aead_request handle that holds all information
