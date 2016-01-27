@@ -1,67 +1,76 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH] crypto: af_alg - add async support to algif_aead
-Date: Wed, 27 Jan 2016 14:41:36 -0800
-Message-ID: <56A947A0.7080705@intel.com>
-References: <201601280638.gQ8Esy5g%fengguang.wu@intel.com>
+From: "Laison Computech Inc" <danny@lamicro.com>
+Subject: NEW ARRIVALS, CISCO,CPU's,Memory, LAPTOP AND AVAYA
+Date: Wed, 27 Jan 2016 12:41:51 +0700
+Message-ID: <201601270544.AQX06493__16006.2725692571$1453951445$gmane$org@razorgate1.infokom.net>
+Reply-To: <LaisonComputer@computer4u.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain;
+	charset="Windows-1251"
 Content-Transfer-Encoding: 7bit
-Cc: kbuild-all@01.org, herbert@gondor.apana.org.au,
-	smueller@chronox.de, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: kbuild test robot <lkp@intel.com>
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:31533 "EHLO mga04.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934365AbcA0Wpa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 Jan 2016 17:45:30 -0500
-In-Reply-To: <201601280638.gQ8Esy5g%fengguang.wu@intel.com>
+Received: from razorgate1.infokom.net ([202.147.192.101]:12251 "EHLO
+	razorgate1.infokom.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1161368AbcA1DXp (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 27 Jan 2016 22:23:45 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/27/2016 02:29 PM, kbuild test robot wrote:
-> Hi Tadeusz,
-> 
-> [auto build test ERROR on cryptodev/master]
-> [also build test ERROR on v4.5-rc1 next-20160127]
-> [if your patch is applied to the wrong git tree, please drop us a note to help improving the system]
-> 
-> url:    https://github.com/0day-ci/linux/commits/Tadeusz-Struk/crypto-af_alg-add-async-support-to-algif_aead/20160128-061818
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> config: x86_64-randconfig-x011-01270835 (attached as .config)
-> reproduce:
->         # save the attached .config to linux build tree
->         make ARCH=x86_64 
-> 
-> All error/warnings (new ones prefixed by >>):
-> 
->    crypto/algif_aead.c: In function 'aead_async_cb':
->>> crypto/algif_aead.c:386:29: error: implicit declaration of function 'aead_request_cast' [-Werror=implicit-function-declaration]
->      struct aead_request *req = aead_request_cast(_req);
->                                 ^
->>> crypto/algif_aead.c:386:29: warning: initialization makes pointer from integer without a cast [-Wint-conversion]
->    cc1: some warnings being treated as errors
-> 
-> vim +/aead_request_cast +386 crypto/algif_aead.c
-> 
->    380	static void aead_async_cb(struct crypto_async_request *_req, int err)
->    381	{
->    382		struct sock *sk = _req->data;
->    383		struct alg_sock *ask = alg_sk(sk);
->    384		struct aead_ctx *ctx = ask->private;
->    385		struct crypto_aead *tfm = crypto_aead_reqtfm(&ctx->aead_req);
->  > 386		struct aead_request *req = aead_request_cast(_req);
->    387		struct aead_async_req *areq = GET_ASYM_REQ(req, tfm);
->    388		struct scatterlist *sg = areq->tsgl;
->    389		struct aead_async_rsgl *rsgl;
-> 
+Dear Sir/Madam,
 
-Thanks for the report.
-It has dependency on this one https://patchwork.kernel.org/patch/8144731/
-which has been sent one minute earlier.
-I do not want to squash them into one patch, because they are not really related.
-Herbert, how should this be handled?
-Thanks,
+Clean tested working pulls CPUs and QTYs in stock.
+
+115  X   X5650
+65  X   E5410
+75  X   X5660
+145  X   E5530
+100  X   E5645
+40  X   X5680
+75  X   X5690
+
+Brand new sealed  IP phones and QTYs in stock.
+
+55 x CP-7937G
+77 x CP-7942G
+54 x CP-7945G
+75 x CP-7962G
+......
+45 x Avaya 9630
+65 x Avaya 9641
+55 x Avaya 9640
+
+All NIB.
+
+Here is our current stock list.
+
+ SSD drives and 750 gig 2.5" sata drives
+
+We also have
+250 x i5 dell
+133 x HP
+360 x Lenevo
+all grade A
+
+Here is the qty in stock for laptops
  
--- 
-TS
+150 x E6500 Dell Latitude E6500 Core 2 Duo 2.80GHz T9600 4GB 160GB DVD+/-RW Win 7
+ 60 x E6510 Dell Ltitude E6510. 15.6" Intel Core i5- M520 @ 2.40GHz. 4GB. 320GB DVD+/-RW Win 7
+30 X 8530P HP EliteBook 8530p 15.4" Laptop 2.53GHz Core 2 Duo T9400, 4GB RAM, 160GB HDD, Win
+100 x  8740W  HP EliteBook 8740w 17" 2.4Ghz Core i5 6GB 250GB Win 7 Pr
+45 x 8760W HP EliteBook 8760W 17.3" 2nd Gen Intel Core i7 2.70GHz 8GB 320GB Windows 7 Pro
+50 x DELL 6520Dell latitude e6520 15.6" i5-2520M 2.5Ghz, 8GB Ram, 500GB HD Win 7 @ $115
+120 x DELL 6420 Laptop Dell Latitude E6420 14" Intel Core i5 2.4Ghz 4GB RAM 250GB HDD DVD Win 7
+150 x T410 Lenovo ThinkPad Laptop T410s 14.1" 2.40GHz Core i5 4GB RAM 160GB Win 7
+180 x 8440P HP EliteBook 8440p 14" M520 Core i5 2.4GHz 4GB 250GB Win 7
+
+
+Let me know if you're interested. We are very open to offers and willing to work with you to make sure that we have a deal.
+
+Thank You
+Barbara Johnson
+Laison Computech Inc
+210 N Scoring Ave,
+Rialto California, 92376
+Tel: +1-657-232-7047
+Fax: +1-347-214-047
