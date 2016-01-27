@@ -1,102 +1,37 @@
-From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Subject: Re: [Linux-ima-user] [RFC] i.MX6 CAAM blob generator for IMA/EVM initialization
-Date: Wed, 27 Jan 2016 11:04:42 +0100
-Message-ID: <73d1snz6bp.fsf@unicorn.hi.pengutronix.de>
-References: <1447082306-19946-1-git-send-email-s.trumtrar@pengutronix.de> <1447100981.2728.23.camel@linux.vnet.ibm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto : sha1-mb : Add missing args_digest offset
+Date: Wed, 27 Jan 2016 22:16:33 +0800
+Message-ID: <20160127141633.GA1601@gondor.apana.org.au>
+References: <1453769169-27479-1-git-send-email-megha.dey@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: linux-crypto@vger.kernel.org, keyrings@linux-nfs.org,
-	linux-ima-user@lists.sourceforge.net,
-	David Howells <dhowells@redhat.com>, kernel@pengutronix.de,
-	linux-ima-devel@lists.sourceforge.net,
-	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux=kernel@vger.kernel.org,
+	Megha Dey <megha.dey@linux.intel.com>
+To: Megha Dey <megha.dey@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:40517 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932099AbcA0KE7 (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:40650 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932737AbcA0OQx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 Jan 2016 05:04:59 -0500
-In-reply-to: <1447100981.2728.23.camel@linux.vnet.ibm.com>
+	Wed, 27 Jan 2016 09:16:53 -0500
+Content-Disposition: inline
+In-Reply-To: <1453769169-27479-1-git-send-email-megha.dey@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Mon, Jan 25, 2016 at 04:46:09PM -0800, Megha Dey wrote:
+> From: Megha Dey <megha.dey@linux.intel.com>
+> 
+> The _args_digest is defined as _args+_digest, both of which are the first
+> members of 2 separate structures, effectively yielding _args_digest to have
+> a value of zero. Thus, no errors have spawned yet due to this. To ensure
+> sanity, adding the missing _args_digest offset to the sha1_mb_mgr_submit.S.
+> 
+> Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
 
-Hi!
-
-Mimi Zohar writes:
-
-> On Mon, 2015-11-09 at 16:18 +0100, Steffen Trumtrar wrote:
->> Hi!
->> 
->> The RFC Patch attached after this cover letter is mostly for illustration
->> purposes, so please don't waste too much time reviewing the code ;-)
->> 
->> For context I'll try to describe the problem that this patch tries to solve.
->> 
->> I need to be able to boot an EVM signed (and dongled) rootfs. The CAAM on
->> the i.MX6 has support for an OTP key and can en/decrypt data.
->> It also has a feature for generating red blobs: basically a chunk of data,
->> that is encrypted with the OTP key, which can be saved on some medium as a
->> secret to decrypt the EVM HMAC secret for one specific device.
->> 
->> To open the rootfs, the secret is handed from the bootloader to the kernel
->> as a base64 encoded string via the cmdline to an initramfs.
->> In the initramfs the sysfs file "modifier" is set to something starting with
->> "kernel:evm" and the base64 string is written to the sysfs file "blob".
->> The CAAM than decodes the red blob and, in case of "kernel:evm", initializes
->> the EVM or otherwise writes the result to "payload" if the modifier starts
->> with "user:". Therefore a blob that was generated for EVM never leaves the
->> kernel on decryption.
->> Generation of blobs goes like: echoing "modifier" to something and echoing
->> the payload to "payload". The red blob can than be read from "blob".
->> 
->> 
->> So, the sysfs interface is not the best option, I guess. The question is:
->> What is the right approach for a setup like this?
->> I need to:
->>   - be able to encrypt the secret and store it somewhere
->>   - to load the stored secret and decrypt it later
->>   - initialize IMA/EVM with the secret
->> 
->> Would something like
->>   - security/keys/encrypted-keys/encrypted.c
->> be the correct approach?
->
-> Instead of using the CAAM for OTP encrypting/decrypting, can it be used
-> to load the EVM key directly?  Dmitry's patches, which will be
-> upstreamed in 4.5
-> https://git.kernel.org/cgit/linux/kernel/git/zohar/linux-integrity.git/log/?h=for-next-4.5?   adds support for a crypto device to directly load the EVM key.
->
-
-The patches look good and I use them for loading the EVM key from the
-CAAM driver. But I still need the OTP decryption functionality.
-
-The key data that I hand to evm_set_key must be device specific but I
-don't want to use the fused OTP in the CAAM directly.
-The OTP is used to protect multiple random keys. Therefore I need to
-generate encrypted blobs that I can store on some unsecure memory
-(EEPROM, NAND,...) and be able to hand that later back to the CAAM
-module, to then get back an IMA/EVM, ecryptfs, $something key.
-
-> FYI, the EVM key is an encrypted key, which encrypts/decrypts either a
-> trusted or user type key.
->
-So the normal approach would be to have a key in the kernel keyring
-and decrypt it with the key loaded with evm_set_key?
-
-Can I somehow use the keyring framework as an abstraction around my
-blobbing/deblobbing functionality?
-So that the "keyring" calls into the crypto driver to decrypt the data
-and uses the crypto driver to encrypt the keys when I want to "dump"
-them?
-
-
-Thanks,
-Steffen
-
+Applied.
 -- 
-Pengutronix e.K.                           | Steffen Trumtrar            |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
