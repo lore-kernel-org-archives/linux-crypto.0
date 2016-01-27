@@ -1,88 +1,88 @@
 From: kbuild test robot <fengguang.wu@intel.com>
-Subject: [cryptodev:master 50/61] drivers/nfc/s3fwrn5/firmware.c:501:1:
- warning: 's3fwrn5_fw_download' uses dynamic stack allocation
-Date: Wed, 27 Jan 2016 22:56:02 +0800
-Message-ID: <201601272200.na1LCqZY%fengguang.wu@intel.com>
+Subject: [cryptodev:master 53/61] fs/nfsd/nfs4recover.c:147:1: warning:
+ 'nfs4_make_rec_clidname' uses dynamic stack allocation
+Date: Wed, 27 Jan 2016 23:02:19 +0800
+Message-ID: <201601272315.oEVogoPm%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="bp/iNruPH9dso1Pn"
+Content-Type: multipart/mixed; boundary="d6Gm4EdcadzBjdND"
 Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:25780 "EHLO mga01.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:63846 "EHLO mga03.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932868AbcA0O4s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 Jan 2016 09:56:48 -0500
+	id S933054AbcA0PDu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 27 Jan 2016 10:03:50 -0500
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
---bp/iNruPH9dso1Pn
+--d6Gm4EdcadzBjdND
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
 head:   2f313e029020f1fa5f58f38f48ff6988d67fc3c1
-commit: 4a31340b36302d46207c6bb54d103d9fb568e916 [50/61] nfc: s3fwrn5: Use shash
+commit: 1edb82d2021c7bae96509c03c4c5ef789f1e09a3 [53/61] nfsd: Use shash
 config: s390-allyesconfig (attached as .config)
 reproduce:
         wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        git checkout 4a31340b36302d46207c6bb54d103d9fb568e916
+        git checkout 1edb82d2021c7bae96509c03c4c5ef789f1e09a3
         # save the attached .config to linux build tree
         make.cross ARCH=s390 
 
 All warnings (new ones prefixed by >>):
 
-   drivers/nfc/s3fwrn5/firmware.c: In function 's3fwrn5_fw_download':
->> drivers/nfc/s3fwrn5/firmware.c:501:1: warning: 's3fwrn5_fw_download' uses dynamic stack allocation
+   fs/nfsd/nfs4recover.c: In function 'nfs4_make_rec_clidname':
+>> fs/nfsd/nfs4recover.c:147:1: warning: 'nfs4_make_rec_clidname' uses dynamic stack allocation
     }
     ^
 
-vim +/s3fwrn5_fw_download +501 drivers/nfc/s3fwrn5/firmware.c
+vim +/nfs4_make_rec_clidname +147 fs/nfsd/nfs4recover.c
 
-c04c674f Robert Baldyga 2015-08-20  485  			goto out;
-c04c674f Robert Baldyga 2015-08-20  486  		}
-c04c674f Robert Baldyga 2015-08-20  487  	}
-c04c674f Robert Baldyga 2015-08-20  488  
-c04c674f Robert Baldyga 2015-08-20  489  	ret = s3fwrn5_fw_complete_update_mode(fw_info);
-c04c674f Robert Baldyga 2015-08-20  490  	if (ret < 0) {
-c04c674f Robert Baldyga 2015-08-20  491  		dev_err(&fw_info->ndev->nfc_dev->dev,
-c04c674f Robert Baldyga 2015-08-20  492  			"Unable to complete update mode\n");
-c04c674f Robert Baldyga 2015-08-20  493  		goto out;
-c04c674f Robert Baldyga 2015-08-20  494  	}
-c04c674f Robert Baldyga 2015-08-20  495  
-c04c674f Robert Baldyga 2015-08-20  496  	dev_info(&fw_info->ndev->nfc_dev->dev,
-c04c674f Robert Baldyga 2015-08-20  497  		"Firmware update: success\n");
-c04c674f Robert Baldyga 2015-08-20  498  
-c04c674f Robert Baldyga 2015-08-20  499  out:
-c04c674f Robert Baldyga 2015-08-20  500  	return ret;
-c04c674f Robert Baldyga 2015-08-20 @501  }
-c04c674f Robert Baldyga 2015-08-20  502  
-c04c674f Robert Baldyga 2015-08-20  503  void s3fwrn5_fw_init(struct s3fwrn5_fw_info *fw_info, const char *fw_name)
-c04c674f Robert Baldyga 2015-08-20  504  {
-c04c674f Robert Baldyga 2015-08-20  505  	fw_info->parity = 0x00;
-c04c674f Robert Baldyga 2015-08-20  506  	fw_info->rsp = NULL;
-c04c674f Robert Baldyga 2015-08-20  507  	fw_info->fw.fw = NULL;
-c04c674f Robert Baldyga 2015-08-20  508  	strcpy(fw_info->fw_name, fw_name);
-c04c674f Robert Baldyga 2015-08-20  509  	init_completion(&fw_info->completion);
+1edb82d2 Herbert Xu    2016-01-24  131  		status = crypto_shash_digest(desc, clname->data, clname->len,
+1edb82d2 Herbert Xu    2016-01-24  132  					     cksum.data);
+1edb82d2 Herbert Xu    2016-01-24  133  		shash_desc_zero(desc);
+1edb82d2 Herbert Xu    2016-01-24  134  	}
+a55370a3 NeilBrown     2005-06-23  135  
+2216d449 Jeff Layton   2012-11-12  136  	if (status)
+35058687 Herbert Xu    2006-08-24  137  		goto out;
+a55370a3 NeilBrown     2005-06-23  138  
+a55370a3 NeilBrown     2005-06-23  139  	md5_to_hex(dname, cksum.data);
+a55370a3 NeilBrown     2005-06-23  140  
+2216d449 Jeff Layton   2012-11-12  141  	status = 0;
+a55370a3 NeilBrown     2005-06-23  142  out:
+2bd9e7b6 Krishna Kumar 2008-10-20  143  	kfree(cksum.data);
+1edb82d2 Herbert Xu    2016-01-24  144  	crypto_free_shash(tfm);
+35058687 Herbert Xu    2006-08-24  145  out_no_tfm:
+a55370a3 NeilBrown     2005-06-23  146  	return status;
+a55370a3 NeilBrown     2005-06-23 @147  }
+190e4fbf NeilBrown     2005-06-23  148  
+2216d449 Jeff Layton   2012-11-12  149  /*
+2216d449 Jeff Layton   2012-11-12  150   * If we had an error generating the recdir name for the legacy tracker
+2216d449 Jeff Layton   2012-11-12  151   * then warn the admin. If the error doesn't appear to be transient,
+2216d449 Jeff Layton   2012-11-12  152   * then disable recovery tracking.
+2216d449 Jeff Layton   2012-11-12  153   */
+2216d449 Jeff Layton   2012-11-12  154  static void
+7255e716 Jeff Layton   2013-05-09  155  legacy_recdir_name_error(struct nfs4_client *clp, int error)
 
-:::::: The code at line 501 was first introduced by commit
-:::::: c04c674fadeb4a8e6522fc838d4620f7cfd4c621 nfc: s3fwrn5: Add driver for Samsung S3FWRN5 NFC Chip
+:::::: The code at line 147 was first introduced by commit
+:::::: a55370a3c0106106a975c5a09cee800611d0cf50 [PATCH] knfsd: nfsd4: reboot hash
 
-:::::: TO: Robert Baldyga <r.baldyga@samsung.com>
-:::::: CC: Samuel Ortiz <sameo@linux.intel.com>
+:::::: TO: NeilBrown <neilb@cse.unsw.edu.au>
+:::::: CC: Linus Torvalds <torvalds@ppc970.osdl.org>
 
 ---
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---bp/iNruPH9dso1Pn
+--d6Gm4EdcadzBjdND
 Content-Type: application/octet-stream
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICCvaqFYAAy5jb25maWcAlFxLd+Q2rt7nV9TpzOLexaTbj1TSd44XlERVcUoS1SJVfmx0
+H4sICKXbqFYAAy5jb25maWcAlFxLd+Q2rt7nV9TpzOLexaTbj1TSd44XlERVcUoS1SJVfmx0
 3O7qjk9sV49dziT//gLUC3xI5WSRtvCBFAkCIABS9eMPPy7Y62H/eHu4v7t9ePhr8W33tHu+
 Pey+LL7eP+z+tUjkopB6wROhfwLm7P7p9c/3L2cfPyzOf/r5pw//fL47WWx2z0+7h0W8f/p6
 /+0VWt/vn3748YdYFqlYNXleX/zVP9zIgjdJzkZKJuNNwstG1WUpKz0CSrN4oysWcx+rLhXP
@@ -826,4 +826,4 @@ Shv3gHixdlMGmAV+SW3fPeIngaWUmetN1eFtmcNyz9Kz9FTjBEKfQ7Az1M5k1LkAeCjKjO44
 wVtjcTLhId3J26cwz2Z63p7psm5Uoi9UrfPs5O1TmGczPW+XZ+nJ26cwz2Z63i7P0rbaP95t
 mzDP6jJPTt4+hXk20/O22j/ebedNXNUnb5/+D4DZfGhVfwIA
 
---bp/iNruPH9dso1Pn--
+--d6Gm4EdcadzBjdND--
