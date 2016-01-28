@@ -1,8 +1,8 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH v2 1/2] crypto: skcipher - return the correct request to the
- user
-Date: Thu, 28 Jan 2016 07:24:00 -0800
-Message-ID: <20160128152359.5394.37085.stgit@tstruk-mobl1>
+Subject: [PATCH v2 2/2] crypto: algif_skcipher - fix async callback after
+ skcipher convertion
+Date: Thu, 28 Jan 2016 07:24:05 -0800
+Message-ID: <20160128152405.5394.38574.stgit@tstruk-mobl1>
 References: <20160128152354.5394.90834.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -15,41 +15,35 @@ In-Reply-To: <20160128152354.5394.90834.stgit@tstruk-mobl1>
 Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-A user of the skcipher api may have some private context associated with
-a request, like for instance the algif_skcipher does, so the api needs to
-return the original skcipher_request in the callback instead of the
-ablkcipher_request subtype.
+Before the skcipher conversion the async callback used the
+crypto_async_request directly as the ablkcipher_request.
+It wasn't quite correct, but it worked fine since the
+crypto_async_request *base was the first member of the ablkcipher_request
+struct. After the skcipher conversion it is not the case anymore and
+a proper cast helper needs to be used.
 
 Cc: <stable@vger.kernel.org> # 4.4.x-
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- crypto/skcipher.c |    9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ crypto/algif_skcipher.c |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 69230e9..22a9c2a 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -142,6 +142,13 @@ static int skcipher_setkey_ablkcipher(struct crypto_skcipher *tfm,
- 	return err;
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 38c1aa8..927ed7a 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -100,11 +100,12 @@ static void skcipher_free_async_sgls(struct skcipher_async_req *sreq)
+ 	kfree(sreq->tsg);
  }
  
-+static void skcipher_complete(struct crypto_async_request *req_base, int err)
-+{
-+	struct skcipher_request *req = req_base->data;
-+
-+	req->base.complete(&req->base, err);
-+}
-+
- static int skcipher_crypt_ablkcipher(struct skcipher_request *req,
- 				     int (*crypt)(struct ablkcipher_request *))
+-static void skcipher_async_cb(struct crypto_async_request *req, int err)
++static void skcipher_async_cb(struct crypto_async_request *req_base, int err)
  {
-@@ -151,7 +158,7 @@ static int skcipher_crypt_ablkcipher(struct skcipher_request *req,
- 
- 	ablkcipher_request_set_tfm(subreq, *ctx);
- 	ablkcipher_request_set_callback(subreq, skcipher_request_flags(req),
--					req->base.complete, req->base.data);
-+					skcipher_complete, req);
- 	ablkcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
- 				     req->iv);
+-	struct sock *sk = req->data;
++	struct sock *sk = req_base->data;
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct skcipher_ctx *ctx = ask->private;
++	struct skcipher_request *req = skcipher_request_cast(req_base);
+ 	struct skcipher_async_req *sreq = GET_SREQ(req, ctx);
+ 	struct kiocb *iocb = sreq->iocb;
  
