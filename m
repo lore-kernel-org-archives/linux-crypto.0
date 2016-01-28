@@ -1,76 +1,86 @@
-From: "Laison Computech Inc" <danny@lamicro.com>
-Subject: NEW ARRIVALS, CISCO,CPU's,Memory, LAPTOP AND AVAYA
-Date: Wed, 27 Jan 2016 12:41:51 +0700
-Message-ID: <201601270544.AQX06493__16006.2725692571$1453951445$gmane$org@razorgate1.infokom.net>
-Reply-To: <LaisonComputer@computer4u.com>
+From: Joonsoo Kim <iamjoonsoo.kim@lge.com>
+Subject: Re: [PATCH v2 04/10] crypto/compress: add asynchronous compression
+ support
+Date: Thu, 28 Jan 2016 12:19:42 +0900
+Message-ID: <20160128031941.GA14467@js1304-P5Q-DELUXE>
+References: <1453796112-14273-1-git-send-email-iamjoonsoo.kim@lge.com>
+ <1453796112-14273-5-git-send-email-iamjoonsoo.kim@lge.com>
+ <20160127074140.GA30335@gondor.apana.org.au>
+ <56A878C9.8050202@intel.com>
+ <20160127080355.GA31330@gondor.apana.org.au>
+ <20160127080926.GA31516@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Cc: "Li, Weigang" <weigang.li@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	Minchan Kim <minchan@kernel.org>,
+	Dan Streetman <ddstreet@ieee.org>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from razorgate1.infokom.net ([202.147.192.101]:12251 "EHLO
-	razorgate1.infokom.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161368AbcA1DXp (ORCPT
+Received: from LGEAMRELO12.lge.com ([156.147.23.52]:39895 "EHLO
+	lgeamrelo12.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S967625AbcA1Dur (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 Jan 2016 22:23:45 -0500
+	Wed, 27 Jan 2016 22:50:47 -0500
+Content-Disposition: inline
+In-Reply-To: <20160127080926.GA31516@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear Sir/Madam,
+Hello, Herbert.
 
-Clean tested working pulls CPUs and QTYs in stock.
+On Wed, Jan 27, 2016 at 04:09:26PM +0800, Herbert Xu wrote:
+> On Wed, Jan 27, 2016 at 04:03:55PM +0800, Herbert Xu wrote:
+> > On Wed, Jan 27, 2016 at 03:59:05PM +0800, Li, Weigang wrote:
+> > >
+> > > The acomp is also SG-based, while scomp only accepts flat buffer.
+> > 
+> > Right, but do we need a pointer-based scomp at all? IPComp would
+> > certainly be better off with an SG-based interface.  Any other
+> > users of compression are presumably dealing with large amounts
+> > of data where an SG interface would make more sense.
+> > 
+> > A pointer interface makes sense for shash because you may be hashing
+> > 16 bytes at a time.  Nobody sane is going to be compressing 16 bytes,
+> > or are they?
 
-115  X   X5650
-65  X   E5410
-75  X   X5660
-145  X   E5530
-100  X   E5645
-40  X   X5680
-75  X   X5690
+Hmm... I'm not an expert on this area so below of my analysis would be
+wrong.
 
-Brand new sealed  IP phones and QTYs in stock.
+Some of compression example in kernel do compression with PAGE_SIZE and
+compressed size is naturally less than PAGE_SIZE. There are many cases
+that compressed size is below than 100 bytes. To keep and handle data,
+they somtimes use kmalloced buffer and I guess it isn't suitable for
+SG-based interface. Is it okay to use SG-based interface
+if kmalloced object covers two pages?
 
-55 x CP-7937G
-77 x CP-7942G
-54 x CP-7945G
-75 x CP-7962G
-......
-45 x Avaya 9630
-65 x Avaya 9641
-55 x Avaya 9640
+And, even, someone uses vmalloced buffer that's also not suitable for
+SG-based interface. For large amount data case, vmalloced buffer is
+more suitable and it needs pointer interface.
 
-All NIB.
+> Note that I'm fine with keeping an scomp interface underneath
+> for those algorithms where the best way to handle SG input is
+> to linearise things.  But I would prefer that this interface is
+> not exposed to kernel users unless it is absolutely required.
 
-Here is our current stock list.
+I have tested asynchronous compression APIs in zram and I saw
+regression. Atomic allocation and setting up SG lists are culprit
+for this regression. Moreover, zram optimizes linearisation
+to get the best performance so it has two Kconfig options. One of
+them cannot be support in the general layer. Not supporting pointer
+based APIs unavoidably causes regression to zram in this case.
 
- SSD drives and 750 gig 2.5" sata drives
+And, S/W compression algorithms that exists in kernel
+are pointer based so it's natural to support it first
+in crypto compression. That will help existing users to change
+their direct library call to crypto compression without any regression.
+They may be happy to change it because they just could get more
+algorithm support without any loss.
 
-We also have
-250 x i5 dell
-133 x HP
-360 x Lenevo
-all grade A
+I think that supporting pointer-based interface has some merits
+mentioned above. However, I'm not sure what's the benefit if we only
+support SG-based interface and it's bigger than above.
 
-Here is the qty in stock for laptops
- 
-150 x E6500 Dell Latitude E6500 Core 2 Duo 2.80GHz T9600 4GB 160GB DVD+/-RW Win 7
- 60 x E6510 Dell Ltitude E6510. 15.6" Intel Core i5- M520 @ 2.40GHz. 4GB. 320GB DVD+/-RW Win 7
-30 X 8530P HP EliteBook 8530p 15.4" Laptop 2.53GHz Core 2 Duo T9400, 4GB RAM, 160GB HDD, Win
-100 x  8740W  HP EliteBook 8740w 17" 2.4Ghz Core i5 6GB 250GB Win 7 Pr
-45 x 8760W HP EliteBook 8760W 17.3" 2nd Gen Intel Core i7 2.70GHz 8GB 320GB Windows 7 Pro
-50 x DELL 6520Dell latitude e6520 15.6" i5-2520M 2.5Ghz, 8GB Ram, 500GB HD Win 7 @ $115
-120 x DELL 6420 Laptop Dell Latitude E6420 14" Intel Core i5 2.4Ghz 4GB RAM 250GB HDD DVD Win 7
-150 x T410 Lenovo ThinkPad Laptop T410s 14.1" 2.40GHz Core i5 4GB RAM 160GB Win 7
-180 x 8440P HP EliteBook 8440p 14" M520 Core i5 2.4GHz 4GB 250GB Win 7
-
-
-Let me know if you're interested. We are very open to offers and willing to work with you to make sure that we have a deal.
-
-Thank You
-Barbara Johnson
-Laison Computech Inc
-210 N Scoring Ave,
-Rialto California, 92376
-Tel: +1-657-232-7047
-Fax: +1-347-214-047
+Thanks.
