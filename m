@@ -1,236 +1,154 @@
-From: Catalin Vasile <cata.vasile@nxp.com>
-Subject: [RFC 2/2] crypto: tcrypt - Add ahash digest bandwidth tests support
-Date: Fri, 29 Jan 2016 15:33:07 +0200
-Message-ID: <1454074387-8321-3-git-send-email-cata.vasile@nxp.com>
-References: <1454074387-8321-1-git-send-email-cata.vasile@nxp.com>
+From: Sudeep Holla <sudeep.holla@arm.com>
+Subject: Re: Duplicated module names
+Date: Fri, 29 Jan 2016 15:58:20 +0000
+Message-ID: <CAPKp9ub189GoMWm552=SL=VF5WaYAtwkJ+o2Dmn5=wTj=6GPBg@mail.gmail.com>
+References: <56A91B6A.2060205@oracle.com>
+	<CAKi4VA+MC=hXMQ2kHi4_Xv2w7qQcG443zj9+rKo_JKoSzgDvYQ@mail.gmail.com>
+	<56AA98D6.7020305@oracle.com>
+	<CAKi4VAKF-Ywm=VK4wzDdr-O0Fi8Gv8X--CQcJ4FFia0Gu1Xaeg@mail.gmail.com>
+	<87h9hxrkvs.fsf@rustcorp.com.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto-owner@vger.kernel.org>, <horia.geanta@nxp.com>,
-	<cristian.stoica@nxp.com>, <alexandru.porosanu@nxp.com>,
-	Catalin Vasile <cata.vasile@nxp.com>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>,
+	Samson Yeung <samson.yeung@oracle.com>,
+	linux-modules <linux-modules@vger.kernel.org>,
+	lkml <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, David Airlie <airlied@linux.ie>,
+	Tomi Valkeinen <tomi.valkeinen@ti.com>,
+	Kyungmin Park <kyungmin.park@samsung.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Sudeep Holla <sudeep.holla@arm.com>
+To: Rusty Russell <rusty@rustcorp.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0066.outbound.protection.outlook.com ([157.56.111.66]:30812
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1756078AbcA2Ntq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Jan 2016 08:49:46 -0500
-In-Reply-To: <1454074387-8321-1-git-send-email-cata.vasile@nxp.com>
+Received: from mail-ig0-f195.google.com ([209.85.213.195]:36409 "EHLO
+	mail-ig0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932179AbcA2P6V convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Jan 2016 10:58:21 -0500
+In-Reply-To: <87h9hxrkvs.fsf@rustcorp.com.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Catalin Vasile <cata.vasile@nxp.com>
----
- crypto/tcrypt.c | 190 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 190 insertions(+)
+On Fri, Jan 29, 2016 at 5:54 AM, Rusty Russell <rusty@rustcorp.com.au> wrote:
+> Lucas De Marchi <lucas.de.marchi@gmail.com> writes:
+>> Hi!
+>>
+>> CC'ing Rusty and mailing lists
+>
+> Thanks.
+>
+>> Rusty and ohers: it looks like both CONFIG_CRC32 and
+>> CONFIG_CRYPTO_CRC32 can be compiled as module, and they generate
+>> modules with the same name, crc32.  Could that be fixed?
+>
+> Gah.  Looks like it's been that way since at least 2014, too.
+>
+> I think we could rename it to crypto_crc32, but I don't think it's the
+> only one.  Marco, I think depmod should probably FAIL if two modules
+> have the same name, which would at least find such problems.
+>
+> (BTW is there a nice way to figure out if a config var is a tristate?  These
+> are only problematic if both CONFIG_ are tristate.)
+>
+> Here's a hacky attempt to look for problems:
+>
+> rusty@rusty-Lemur:~/devel/kernel/linux (master)$ KCONFIGS=`find * -name 'Kconfig*'`; for m in `find [b-z]* -name 'Makefile*'`; do sed -n 's,obj-\$(CONFIG.*+= \([a-z0-9_-]\+\.o\)$,'$m' \1,p' <$m | sort -u; done | sort -k 2 | uniq -D -f 1 | while read m obj; do fgrep -w $obj $m /dev/null; done | while read LINE; do conf=`echo $LINE | sed 's/.*\$(CONFIG_\([A-Z0-9_]*\).*/\1/'`; if grep -C2 "^config $conf\$" $KCONFIGS | fgrep -q tristate; then echo $LINE; fi; done
+>
+> Here are the results (mildly filtered by me):
+>
+[...]
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index f56419d..02a3856 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1316,6 +1316,176 @@ static void band_acipher(const char *algo, int enc, unsigned int secs,
- 	band_acipher_destroy_session_ctx(&ses_ctx);
- }
- 
-+static inline struct ahash_request
-+*band_ahash_alloc_req_digest(struct band_session_ctx *ses_ctx)
-+{
-+	struct ahash_request *req;
-+	struct band_req_ctx *br;
-+	void *buf_sg;
-+	u8 *icv;
-+	size_t req_size = sizeof(struct ahash_request) +
-+			  crypto_ahash_reqsize(ses_ctx->tfm);
-+	size_t src_size = ses_ctx->job_size -
-+			  crypto_ahash_digestsize(ses_ctx->tfm);
-+	size_t no_sg_entries = DIV_ROUND_UP(src_size, PAGE_SIZE);
-+	int rv;
-+	int i;
-+
-+	rv = band_alloc_req(ses_ctx, (void **)&req, (void **)&buf_sg);
-+	if (unlikely(rv))
-+		return NULL;
-+
-+	br = ((void *)req) + req_size;
-+	icv = buf_sg + src_size;
-+	sg_init_table(br->sg, no_sg_entries);
-+	if (src_size < PAGE_SIZE)
-+		sg_set_buf(br->sg, buf_sg, src_size);
-+	else
-+		for (i = 0; i < no_sg_entries; i++) {
-+			sg_set_buf(br->sg + i, buf_sg, PAGE_SIZE);
-+			buf_sg += PAGE_SIZE;
-+		}
-+	ahash_request_set_tfm(req, ses_ctx->tfm);
-+	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+					band_complete, br);
-+	ahash_request_set_crypt(req, br->sg, icv, src_size);
-+
-+	init_completion(&br->completion);
-+	br->session = ses_ctx;
-+
-+	return req;
-+}
-+
-+static int band_ahash_jiffies_digest(struct band_session_ctx *ses_ctx, int secs)
-+{
-+	struct ahash_request *req;
-+	unsigned long start, end;
-+	unsigned long stop;
-+	int elapsed_secs;
-+	int bcount;
-+	int no_jobs_done;
-+	int ret;
-+	unsigned long long band;
-+
-+	for (start = jiffies, end = start + secs * HZ, bcount = 0;
-+	     time_before(jiffies, end); bcount++) {
-+		req = band_ahash_alloc_req_digest(ses_ctx);
-+		if (unlikely(req == NULL))
-+			break;
-+		ret = do_one_band_op(&req->base, crypto_ahash_digest(req));
-+		if (unlikely(ret != -EINPROGRESS && ret))
-+			break;
-+	}
-+
-+	stop = jiffies;
-+	no_jobs_done = atomic_read(&band_async_done);
-+	elapsed_secs = (stop - start) / HZ;
-+
-+	while (atomic_read(&band_async_done) < bcount)
-+		cpu_relax();
-+
-+	band = ses_ctx->job_size - crypto_ahash_digestsize(ses_ctx->tfm);
-+	band = no_jobs_done * band;
-+	pr_cont("%d operations in %d seconds (%llu bytes processed)\n",
-+		bcount, secs, band);
-+
-+	return 0;
-+}
-+
-+static inline int
-+band_ahash_init_session_ctx(const char *algo,
-+			    struct band_session_ctx *ses_ctx)
-+{
-+	struct crypto_ahash *tfm;
-+	struct kmem_cache *req_cache;
-+	mempool_t *req_mpool;
-+	size_t req_size;
-+	int err;
-+
-+	tfm = crypto_alloc_ahash(algo, 0, 0);
-+	if (IS_ERR(tfm)) {
-+		pr_err("failed to load transform for %s: %ld\n",
-+		       algo, PTR_ERR(tfm));
-+		return PTR_ERR(tfm);
-+	}
-+
-+	req_size = sizeof(struct ahash_request) +
-+		   crypto_ahash_reqsize(tfm) +
-+		   sizeof(struct band_req_ctx);
-+	req_cache = kmem_cache_create("tcrypt-band-ahash-req",
-+				      req_size, 0, 0, NULL);
-+	if (unlikely(!req_cache)) {
-+		pr_err("failed to allocate request cache memory\n");
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
-+	req_mpool = mempool_create(1024, mempool_alloc_slab, mempool_free_slab,
-+				   req_cache);
-+	if (unlikely(!req_mpool)) {
-+		pr_err("failed to allocate request memory pool\n");
-+		err = -ENOMEM;
-+		goto out_free_cache;
-+	}
-+
-+	ses_ctx->req_mpool = req_mpool;
-+	ses_ctx->tfm = tfm;
-+
-+	return 0;
-+
-+out_free_cache:
-+	kmem_cache_destroy(req_cache);
-+out:
-+	crypto_free_ahash(tfm);
-+	return err;
-+}
-+
-+static inline void
-+band_ahash_destroy_session_ctx(struct band_session_ctx *ses_ctx)
-+{
-+	struct kmem_cache *req_cache = ses_ctx->req_mpool->pool_data;
-+
-+	mempool_destroy(ses_ctx->req_mpool);
-+	kmem_cache_destroy(req_cache);
-+	crypto_free_ahash(ses_ctx->tfm);
-+}
-+
-+static void band_ahash_digest(const char *algo, unsigned int secs)
-+{
-+	struct band_session_ctx ses_ctx;
-+	u32 *b_size;
-+	int i, ret;
-+
-+	if (!secs)
-+		return;
-+
-+	ret = band_ahash_init_session_ctx(algo, &ses_ctx);
-+	if (unlikely(ret))
-+		return;
-+
-+	pr_info("\ntesting band of async %s (%s)\n", algo,
-+		get_driver_name(crypto_ahash, ses_ctx.tfm));
-+
-+	b_size = aead_sizes;
-+	i = 0;
-+	do {
-+		pr_info("test %u (%d byte blocks): ", i, *b_size);
-+
-+		ses_ctx.job_size = *b_size +
-+				   crypto_ahash_digestsize(ses_ctx.tfm);
-+		atomic_set(&band_async_done, 0);
-+		ret = band_ahash_jiffies_digest(&ses_ctx, secs);
-+		if (ret) {
-+			pr_err("hashing failed ret=%d\n", ret);
-+			break;
-+		}
-+		b_size++;
-+		i++;
-+	} while (*b_size);
-+
-+	band_ahash_destroy_session_ctx(&ses_ctx);
-+}
-+
- static inline int do_one_acipher_op(struct ablkcipher_request *req, int ret)
- {
- 	if (ret == -EINPROGRESS || ret == -EBUSY) {
-@@ -2691,6 +2861,26 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
- 		band_acipher("ctr(blowfish)", DECRYPT, sec, NULL, 0,
- 				   speed_template_8_32);
- 		break;
-+	case 700:
-+		if (alg) {
-+			band_ahash_digest(alg, sec);
-+			break;
-+		}
-+	case 701:
-+		band_ahash_digest("md5", sec);
-+		break;
-+	case 702:
-+		band_ahash_digest("sha1", sec);
-+		break;
-+	case 703:
-+		band_ahash_digest("sha256", sec);
-+		break;
-+	case 704:
-+		band_ahash_digest("sha384", sec);
-+		break;
-+	case 705:
-+		band_ahash_digest("sha512", sec);
-+		break;
- 	case 1000:
- 		test_available();
- 		break;
+>
+> drivers/hwmon/Makefile:obj-$(CONFIG_SENSORS_VEXPRESS) += vexpress.o
+> drivers/regulator/Makefile:obj-$(CONFIG_REGULATOR_VEXPRESS) += vexpress.o
+>
+
+Indeed causes issues if both are built as modules, only once succeeds.
+I will post these 2 patches separately soon.
+
+-->8
+
+>From 1eb0d653d90e3f5fe05c6f63a17976226309e1ec Mon Sep 17 00:00:00 2001
+From: Sudeep Holla <sudeep.holla@arm.com>
+Date: Fri, 29 Jan 2016 15:40:24 +0000
+Subject: [PATCH 1/2] hwmon: (vexpress) rename vexpress hwmon implementation
+
+The vexpress hwmon implementation is currently just called vexpress.
+This is a problem because it clashes with another module with the same
+name in regulators.
+
+This patch renames the vexpress hwmon implementation to vexpress-hwmon
+so that there will be no clash in the module namespace.
+
+Reported-by: Rusty Russell <rusty@rustcorp.com.au>
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+---
+ drivers/hwmon/Makefile                         | 2 +-
+ drivers/hwmon/{vexpress.c => vexpress-hwmon.c} | 0
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename drivers/hwmon/{vexpress.c => vexpress-hwmon.c} (100%)
+
+diff --git a/drivers/hwmon/Makefile b/drivers/hwmon/Makefile
+index 30c94df31465..cfc09711810c 100644
+--- a/drivers/hwmon/Makefile
++++ b/drivers/hwmon/Makefile
+@@ -149,7 +149,7 @@ obj-$(CONFIG_SENSORS_TMP103) += tmp103.o
+ obj-$(CONFIG_SENSORS_TMP401) += tmp401.o
+ obj-$(CONFIG_SENSORS_TMP421) += tmp421.o
+ obj-$(CONFIG_SENSORS_TWL4030_MADC)+= twl4030-madc-hwmon.o
+-obj-$(CONFIG_SENSORS_VEXPRESS) += vexpress.o
++obj-$(CONFIG_SENSORS_VEXPRESS) += vexpress-hwmon.o
+ obj-$(CONFIG_SENSORS_VIA_CPUTEMP)+= via-cputemp.o
+ obj-$(CONFIG_SENSORS_VIA686A) += via686a.o
+ obj-$(CONFIG_SENSORS_VT1211) += vt1211.o
+diff --git a/drivers/hwmon/vexpress.c b/drivers/hwmon/vexpress-hwmon.c
+similarity index 100%
+rename from drivers/hwmon/vexpress.c
+rename to drivers/hwmon/vexpress-hwmon.c
 -- 
-1.8.3.1
+1.9.1
+
+>From 1520bd20d3863df87ca5d9461bf5a20d3f58e385 Mon Sep 17 00:00:00 2001
+From: Sudeep Holla <sudeep.holla@arm.com>
+Date: Fri, 29 Jan 2016 15:44:50 +0000
+Subject: [PATCH 2/2] regulator: vexpress: rename vexpress regulator
+ implementation
+
+The vexpress regulator implementation is currently just called vexpress.
+This is a problem because it clashes with another module with the same
+name in hardware monitors.
+
+This patch renames the vexpress regulator implementation to
+vexpress-regulator so that there will be no clash in the module namespace.
+
+Reported-by: Rusty Russell <rusty@rustcorp.com.au>
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+---
+ drivers/regulator/Makefile                             | 2 +-
+ drivers/regulator/{vexpress.c => vexpress-regulator.c} | 0
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename drivers/regulator/{vexpress.c => vexpress-regulator.c} (100%)
+
+diff --git a/drivers/regulator/Makefile b/drivers/regulator/Makefile
+index 980b1943fa81..755077a89a25 100644
+--- a/drivers/regulator/Makefile
++++ b/drivers/regulator/Makefile
+@@ -98,7 +98,7 @@ obj-$(CONFIG_REGULATOR_TPS65910) += tps65910-regulator.o
+ obj-$(CONFIG_REGULATOR_TPS65912) += tps65912-regulator.o
+ obj-$(CONFIG_REGULATOR_TPS80031) += tps80031-regulator.o
+ obj-$(CONFIG_REGULATOR_TWL4030) += twl-regulator.o
+-obj-$(CONFIG_REGULATOR_VEXPRESS) += vexpress.o
++obj-$(CONFIG_REGULATOR_VEXPRESS) += vexpress-regulator.o
+ obj-$(CONFIG_REGULATOR_WM831X) += wm831x-dcdc.o
+ obj-$(CONFIG_REGULATOR_WM831X) += wm831x-isink.o
+ obj-$(CONFIG_REGULATOR_WM831X) += wm831x-ldo.o
+diff --git a/drivers/regulator/vexpress.c
+b/drivers/regulator/vexpress-regulator.c
+similarity index 100%
+rename from drivers/regulator/vexpress.c
+rename to drivers/regulator/vexpress-regulator.c
+-- 
+1.9.1
