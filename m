@@ -1,163 +1,102 @@
 From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH v2] crypto: atmel-sha: fix algorihtm registration
-Date: Fri, 29 Jan 2016 17:04:02 +0100
-Message-ID: <da09591cf85a1882817bbf7cb527bb228d3f8f87.1454082992.git.cyrille.pitchen@atmel.com>
+Subject: [PATCH] crypto: atmel-aes - remove calls of clk_prepare() from atomic contexts
+Date: Fri, 29 Jan 2016 17:53:33 +0100
+Message-ID: <f8f0ac52fcfbbef5cbddb2a189128b253df7d678.1454086302.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>,
+	<matthias.mayr@student.kit.edu>,
 	Cyrille Pitchen <cyrille.pitchen@atmel.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 	<nicolas.ferre@atmel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from eusmtp01.atmel.com ([212.144.249.243]:32807 "EHLO
+	eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756214AbcA2QxD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Jan 2016 11:53:03 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch implements the missing .import() and .export() mandatory
-hooks for asynchronous hash algorithms. It also sets the relevant, non
-zero, value for the .statesize field when declaring the supported SHA
-algorithms. Indeed a zero value of .statesize prevents the algorithm from
-being registered.
+clk_prepare()/clk_unprepare() must not be called within atomic context.
+
+This patch calls clk_prepare() once for all from atmel_aes_probe() and
+clk_unprepare() from atmel_aes_remove().
+
+Then calls of clk_prepare_enable()/clk_disable_unprepare() were replaced
+by calls of clk_enable()/clk_disable().
 
 Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
+Reported-by: Matthias Mayr <matthias.mayr@student.kit.edu>
 ---
-ChangeLog
+ drivers/crypto/atmel-aes.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-v2: deal with unaligned in/out pointers in atmel_sha_import/atmel_sha_export
-
- drivers/crypto/atmel-sha.c | 61 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 60 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index da4c3055784f..63b09e01075c 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -66,7 +66,7 @@
- #define SHA_OP_UPDATE	1
- #define SHA_OP_FINAL	2
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index 6dd3317ca365..3eb3f1279fb7 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -400,7 +400,7 @@ static int atmel_aes_hw_init(struct atmel_aes_dev *dd)
+ {
+ 	int err;
  
--#define SHA_BUFFER_LEN		PAGE_SIZE
-+#define SHA_BUFFER_LEN		(PAGE_SIZE / 16)
+-	err = clk_prepare_enable(dd->iclk);
++	err = clk_enable(dd->iclk);
+ 	if (err)
+ 		return err;
  
- #define ATMEL_SHA_DMA_THRESHOLD		56
+@@ -430,7 +430,7 @@ static int atmel_aes_hw_version_init(struct atmel_aes_dev *dd)
  
-@@ -80,6 +80,17 @@ struct atmel_sha_caps {
+ 	dev_info(dd->dev, "version: 0x%x\n", dd->hw_version);
  
- struct atmel_sha_dev;
- 
-+/*
-+ * .statesize = sizeof(struct atmel_sha_state) must be <= PAGE_SIZE / 8 as
-+ * tested by the ahash_prepare_alg() function.
-+ */
-+struct atmel_sha_state {
-+	u8	digest[SHA512_DIGEST_SIZE];
-+	u8	buffer[SHA_BUFFER_LEN];
-+	u64	digcnt[2];
-+	size_t	bufcnt;
-+};
-+
- struct atmel_sha_reqctx {
- 	struct atmel_sha_dev	*dd;
- 	unsigned long	flags;
-@@ -1033,6 +1044,39 @@ static int atmel_sha_digest(struct ahash_request *req)
- 	return atmel_sha_init(req) ?: atmel_sha_finup(req);
+-	clk_disable_unprepare(dd->iclk);
++	clk_disable(dd->iclk);
+ 	return 0;
  }
  
-+
-+static int atmel_sha_export(struct ahash_request *req, void *out)
-+{
-+	const struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
-+	struct atmel_sha_state state;
-+
-+	memcpy(state.digest, ctx->digest, SHA512_DIGEST_SIZE);
-+	memcpy(state.buffer, ctx->buffer, ctx->bufcnt);
-+	state.bufcnt = ctx->bufcnt;
-+	state.digcnt[0] = ctx->digcnt[0];
-+	state.digcnt[1] = ctx->digcnt[1];
-+
-+	/* out might be unaligned. */
-+	memcpy(out, &state, sizeof(state));
-+	return 0;
-+}
-+
-+static int atmel_sha_import(struct ahash_request *req, const void *in)
-+{
-+	struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
-+	struct atmel_sha_state state;
-+
-+	/* in might be unaligned. */
-+	memcpy(&state, in, sizeof(state));
-+
-+	memcpy(ctx->digest, state.digest, SHA512_DIGEST_SIZE);
-+	memcpy(ctx->buffer, state.buffer, state.bufcnt);
-+	ctx->bufcnt = state.bufcnt;
-+	ctx->digcnt[0] = state.digcnt[0];
-+	ctx->digcnt[1] = state.digcnt[1];
-+	return 0;
-+}
-+
- static int atmel_sha_cra_init(struct crypto_tfm *tfm)
+@@ -448,7 +448,7 @@ static inline bool atmel_aes_is_encrypt(const struct atmel_aes_dev *dd)
+ 
+ static inline int atmel_aes_complete(struct atmel_aes_dev *dd, int err)
  {
- 	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
-@@ -1049,8 +1093,11 @@ static struct ahash_alg sha_1_256_algs[] = {
- 	.final		= atmel_sha_final,
- 	.finup		= atmel_sha_finup,
- 	.digest		= atmel_sha_digest,
-+	.export		= atmel_sha_export,
-+	.import		= atmel_sha_import,
- 	.halg = {
- 		.digestsize	= SHA1_DIGEST_SIZE,
-+		.statesize	= sizeof(struct atmel_sha_state),
- 		.base	= {
- 			.cra_name		= "sha1",
- 			.cra_driver_name	= "atmel-sha1",
-@@ -1070,8 +1117,11 @@ static struct ahash_alg sha_1_256_algs[] = {
- 	.final		= atmel_sha_final,
- 	.finup		= atmel_sha_finup,
- 	.digest		= atmel_sha_digest,
-+	.export		= atmel_sha_export,
-+	.import		= atmel_sha_import,
- 	.halg = {
- 		.digestsize	= SHA256_DIGEST_SIZE,
-+		.statesize	= sizeof(struct atmel_sha_state),
- 		.base	= {
- 			.cra_name		= "sha256",
- 			.cra_driver_name	= "atmel-sha256",
-@@ -1093,8 +1143,11 @@ static struct ahash_alg sha_224_alg = {
- 	.final		= atmel_sha_final,
- 	.finup		= atmel_sha_finup,
- 	.digest		= atmel_sha_digest,
-+	.export		= atmel_sha_export,
-+	.import		= atmel_sha_import,
- 	.halg = {
- 		.digestsize	= SHA224_DIGEST_SIZE,
-+		.statesize	= sizeof(struct atmel_sha_state),
- 		.base	= {
- 			.cra_name		= "sha224",
- 			.cra_driver_name	= "atmel-sha224",
-@@ -1116,8 +1169,11 @@ static struct ahash_alg sha_384_512_algs[] = {
- 	.final		= atmel_sha_final,
- 	.finup		= atmel_sha_finup,
- 	.digest		= atmel_sha_digest,
-+	.export		= atmel_sha_export,
-+	.import		= atmel_sha_import,
- 	.halg = {
- 		.digestsize	= SHA384_DIGEST_SIZE,
-+		.statesize	= sizeof(struct atmel_sha_state),
- 		.base	= {
- 			.cra_name		= "sha384",
- 			.cra_driver_name	= "atmel-sha384",
-@@ -1137,8 +1193,11 @@ static struct ahash_alg sha_384_512_algs[] = {
- 	.final		= atmel_sha_final,
- 	.finup		= atmel_sha_finup,
- 	.digest		= atmel_sha_digest,
-+	.export		= atmel_sha_export,
-+	.import		= atmel_sha_import,
- 	.halg = {
- 		.digestsize	= SHA512_DIGEST_SIZE,
-+		.statesize	= sizeof(struct atmel_sha_state),
- 		.base	= {
- 			.cra_name		= "sha512",
- 			.cra_driver_name	= "atmel-sha512",
+-	clk_disable_unprepare(dd->iclk);
++	clk_disable(dd->iclk);
+ 	dd->flags &= ~AES_FLAGS_BUSY;
+ 
+ 	if (dd->is_async)
+@@ -2091,10 +2091,14 @@ static int atmel_aes_probe(struct platform_device *pdev)
+ 		goto res_err;
+ 	}
+ 
+-	err = atmel_aes_hw_version_init(aes_dd);
++	err = clk_prepare(aes_dd->iclk);
+ 	if (err)
+ 		goto res_err;
+ 
++	err = atmel_aes_hw_version_init(aes_dd);
++	if (err)
++		goto iclk_unprepare;
++
+ 	atmel_aes_get_cap(aes_dd);
+ 
+ 	err = atmel_aes_buff_init(aes_dd);
+@@ -2127,6 +2131,8 @@ err_algs:
+ err_aes_dma:
+ 	atmel_aes_buff_cleanup(aes_dd);
+ err_aes_buff:
++iclk_unprepare:
++	clk_unprepare(aes_dd->iclk);
+ res_err:
+ 	tasklet_kill(&aes_dd->done_task);
+ 	tasklet_kill(&aes_dd->queue_task);
+@@ -2155,6 +2161,8 @@ static int atmel_aes_remove(struct platform_device *pdev)
+ 	atmel_aes_dma_cleanup(aes_dd);
+ 	atmel_aes_buff_cleanup(aes_dd);
+ 
++	clk_unprepare(aes_dd->iclk);
++
+ 	return 0;
+ }
+ 
 -- 
 1.8.2.2
