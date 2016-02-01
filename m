@@ -1,39 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC 1/2] crypto: tcrypt - Add acipher bandwidth tests support
-Date: Mon, 1 Feb 2016 22:21:59 +0800
-Message-ID: <20160201142159.GA11292@gondor.apana.org.au>
-References: <1454074387-8321-2-git-send-email-cata.vasile@nxp.com>
+Subject: Re: [PATCH] fix out of bound read in __test_aead()
+Date: Mon, 1 Feb 2016 22:26:40 +0800
+Message-ID: <20160201142640.GA11363@gondor.apana.org.au>
+References: <1454073009-13665-1-git-send-email-jmarchan@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-crypto-owner@vger.kernel.org,
-	horia.geanta@nxp.com, cristian.stoica@nxp.com,
-	alexandru.porosanu@nxp.com, cata.vasile@nxp.com
-To: Catalin Vasile <cata.vasile@nxp.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jerome Marchand <jmarchan@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54715 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:58446 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932417AbcBAOWF (ORCPT
+	with ESMTP id S932418AbcBAO0q (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Feb 2016 09:22:05 -0500
+	Mon, 1 Feb 2016 09:26:46 -0500
 Content-Disposition: inline
-In-Reply-To: <1454074387-8321-2-git-send-email-cata.vasile@nxp.com>
+In-Reply-To: <1454073009-13665-1-git-send-email-jmarchan@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Catalin Vasile <cata.vasile@nxp.com> wrote:
-> Signed-off-by: Catalin Vasile <cata.vasile@nxp.com>
+On Fri, Jan 29, 2016 at 02:10:09PM +0100, Jerome Marchand wrote:
+> __test_aead() reads MAX_IVLEN bytes from template[i].iv, but the
+> actual length of the initialisation vector can be shorter.
+> The length of the IV is already calculated earlier in the
+> function. Let's just reuses that.
+> This fix an out-of-bound error detected by KASan.
+> 
+> Signed-off-by: Jerome Marchand <jmarchan@redhat.com>
 
-Please give a description of what your patch does here.
+This patch creates a new warning that iv_len may be uninitialised.
 
-> +       case 600:
-> +               band_acipher("ecb(aes)", ENCRYPT, sec, NULL, 0,
-> +                                  speed_template_16_24_32);
-
-Rather than creating new test modes, which you would have to do
-for every asynchronous type going forward, how about making a new
-parameter that toggled this on and off? For example,
-
-modprobe tcrypt mode=601 band=1
+Please fix this and resubmit.
 
 Thanks,
 -- 
