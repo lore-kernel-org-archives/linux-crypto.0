@@ -1,68 +1,229 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v1] crypto: ccp - Limit the amount of information exported
-Date: Mon, 1 Feb 2016 16:18:44 -0600
-Message-ID: <56AFD9C4.3030701@amd.com>
-References: <20160129184514.10863.45404.stgit@tlendack-t1.amdoffice.net>
- <20160201143506.GC11410@gondor.apana.org.au>
+From: Joshua Henderson <joshua.henderson@microchip.com>
+Subject: [PATCH 2/2] rng: pic32-rng: Add PIC32 RNG hardware driver
+Date: Mon, 1 Feb 2016 15:41:42 -0700
+Message-ID: <1454366511-10640-2-git-send-email-joshua.henderson@microchip.com>
+References: <1454366511-10640-1-git-send-email-joshua.henderson@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, <stable@vger.kernel.org>,
-	David Miller <davem@davemloft.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0085.outbound.protection.outlook.com ([207.46.100.85]:28000
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754034AbcBAWSw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Feb 2016 17:18:52 -0500
-In-Reply-To: <20160201143506.GC11410@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: <linux-mips@linux-mips.org>,
+	Joshua Henderson <joshua.henderson@microchip.com>,
+	Purna Chandra Mandal <purna.mandal@microchip.com>,
+	Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Kieran Bingham <kieranbingham@gmail.com>,
+	Lee Jones <lee.jones@linaro.org>,
+	Pankaj Dev <pankaj.dev@st.com>,
+	Scott Branden <sbranden@broadcom.com>,
+	Daniel Thompson <daniel.thompson@linaro.org>,
+	Ray Jui <rjui@broadcom.com>, <linux-crypto@vger.kernel.org>
+To: <linux-kernel@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1454366511-10640-1-git-send-email-joshua.henderson@microchip.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 02/01/2016 08:35 AM, Herbert Xu wrote:
-> On Fri, Jan 29, 2016 at 12:45:14PM -0600, Tom Lendacky wrote:
->> Since the exported information can be exposed to user-space, instead of
->> exporting the entire request context only export the minimum information
->> needed.
->>
->> Cc: <stable@vger.kernel.org> # 3.14.x-
->> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
->> ---
->>  drivers/crypto/ccp/ccp-crypto-aes-cmac.c |   16 +++++++++++-----
->>  drivers/crypto/ccp/ccp-crypto-sha.c      |   20 +++++++++++++++-----
->>  drivers/crypto/ccp/ccp-crypto.h          |   22 ++++++++++++++++++++++
->>  3 files changed, 48 insertions(+), 10 deletions(-)
->>
->> diff --git a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
->> index 00207cf..6a2d836 100644
->> --- a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
->> +++ b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
->> @@ -223,9 +223,12 @@ static int ccp_aes_cmac_digest(struct ahash_request *req)
->>  static int ccp_aes_cmac_export(struct ahash_request *req, void *out)
->>  {
->>  	struct ccp_aes_cmac_req_ctx *rctx = ahash_request_ctx(req);
->> -	struct ccp_aes_cmac_req_ctx *state = out;
->> +	struct ccp_aes_cmac_exp_ctx *state = out;
->>  
->> -	*state = *rctx;
->> +	state->null_msg = rctx->null_msg;
->> +	memcpy(state->iv, rctx->iv, sizeof(state->iv));
->> +	state->buf_count = rctx->buf_count;
->> +	memcpy(state->buf, rctx->buf, sizeof(state->buf));
->>  
->>  	return 0;
->>  }
-> 
-> BTW this code needs to be fixed to not assume that in/out are
-> aligned.
-> 
+Add support for the hardware pseudo and true random number generator
+peripheral found on PIC32.
 
-Ugh, yeah I missed that.  I'll follow up with (yet) another patch
-to be alignment safe.
+Signed-off-by: Joshua Henderson <joshua.henderson@microchip.com>
+Signed-off-by: Purna Chandra Mandal <purna.mandal@microchip.com>
+---
+ drivers/char/hw_random/Kconfig     |   13 +++
+ drivers/char/hw_random/Makefile    |    1 +
+ drivers/char/hw_random/pic32-rng.c |  152 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 166 insertions(+)
+ create mode 100644 drivers/char/hw_random/pic32-rng.c
 
-Thanks,
-Tom
-
-> Cheers,
-> 
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index dbf2271..3ab0c46 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -381,6 +381,19 @@ config HW_RANDOM_STM32
+ 
+ 	  If unsure, say N.
+ 
++config HW_RANDOM_PIC32
++	tristate "Microchip PIC32 Random Number Generator support"
++	depends on HW_RANDOM && MACH_PIC32
++	default y
++	---help---
++	  This driver provides kernel-side support for the Random Number
++	  Generator hardware found on a PIC32.
++
++	  To compile this driver as a module, choose M here. the
++	  module will be called pic32-rng.
++
++	  If unsure, say Y.
++
+ endif # HW_RANDOM
+ 
+ config UML_RANDOM
+diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+index 5ad3976..f5a6fa7 100644
+--- a/drivers/char/hw_random/Makefile
++++ b/drivers/char/hw_random/Makefile
+@@ -33,3 +33,4 @@ obj-$(CONFIG_HW_RANDOM_MSM) += msm-rng.o
+ obj-$(CONFIG_HW_RANDOM_ST) += st-rng.o
+ obj-$(CONFIG_HW_RANDOM_XGENE) += xgene-rng.o
+ obj-$(CONFIG_HW_RANDOM_STM32) += stm32-rng.o
++obj-$(CONFIG_HW_RANDOM_PIC32) += pic32-rng.o
+diff --git a/drivers/char/hw_random/pic32-rng.c b/drivers/char/hw_random/pic32-rng.c
+new file mode 100644
+index 0000000..d2f32c4
+--- /dev/null
++++ b/drivers/char/hw_random/pic32-rng.c
+@@ -0,0 +1,152 @@
++/*
++ * PIC32 RNG driver
++ *
++ * Joshua Henderson <joshua.henderson@microchip.com>
++ * Copyright (C) 2016 Microchip Technology Inc.  All rights reserved.
++ *
++ * This program is free software; you can distribute it and/or modify it
++ * under the terms of the GNU General Public License (Version 2) as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++ * for more details.
++ */
++
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/delay.h>
++#include <linux/slab.h>
++#include <linux/err.h>
++#include <linux/io.h>
++#include <linux/hw_random.h>
++#include <linux/platform_device.h>
++#include <linux/of.h>
++#include <linux/of_device.h>
++#include <linux/clk.h>
++#include <linux/clkdev.h>
++
++#define RNGCON		0x04
++#define  TRNGEN		BIT(8)
++#define  PRNGEN		BIT(9)
++#define  PRNGCONT	BIT(10)
++#define  TRNGMOD	BIT(11)
++#define  SEEDLOAD	BIT(12)
++#define RNGPOLY1	0x08
++#define RNGPOLY2	0x0C
++#define RNGNUMGEN1	0x10
++#define RNGNUMGEN2	0x14
++#define RNGSEED1	0x18
++#define RNGSEED2	0x1C
++#define RNGRCNT		0x20
++#define  RCNT_MASK	0x7F
++
++struct pic32_rng {
++	void __iomem	*base;
++	struct hwrng	rng;
++	struct clk	*clk;
++};
++
++static int pic32_rng_read(struct hwrng *rng, void *buf, size_t max,
++			  bool wait)
++{
++	struct pic32_rng *prng = container_of(rng, struct pic32_rng, rng);
++	u64 *data = buf;
++
++	*data = ((u64)readl(prng->base + RNGNUMGEN2) << 32) +
++		readl(prng->base + RNGNUMGEN1);
++	return 4;
++}
++
++static int pic32_rng_probe(struct platform_device *pdev)
++{
++	struct pic32_rng *prng;
++	struct resource *res;
++	u32 v, t;
++	int ret;
++
++	prng = devm_kzalloc(&pdev->dev, sizeof(*prng), GFP_KERNEL);
++	if (!prng)
++		return -ENOMEM;
++
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	prng->base = devm_ioremap_resource(&pdev->dev, res);
++	if (IS_ERR(prng->base))
++		return PTR_ERR(prng->base);
++
++	prng->clk = devm_clk_get(&pdev->dev, NULL);
++	if (IS_ERR(prng->clk))
++		return PTR_ERR(prng->clk);
++
++	clk_prepare_enable(prng->clk);
++
++	/* enable TRNG in enhanced mode */
++	v = readl(prng->base + RNGCON);
++	v &= ~(TRNGEN | PRNGEN | 0xff);
++	v |= TRNGMOD;
++	writel(v | TRNGEN, prng->base + RNGCON);
++
++	/* wait for valid seed */
++	usleep_range(100, 200);
++	t = readl(prng->base + RNGRCNT) & RCNT_MASK;
++	if (t < 0x2A)
++		dev_warn(&pdev->dev, "seed not generated.\n");
++
++	/* load initial seed */
++	writel(v | SEEDLOAD, prng->base + RNGCON);
++
++	/* load initial polynomial: 42bit poly */
++	writel(0x00c00003, prng->base + RNGPOLY1);
++	writel(0x00000000, prng->base + RNGPOLY2);
++
++	/* start PRNG to generate 42bit random */
++	v |= 0x2A | PRNGCONT | PRNGEN;
++	writel(v, prng->base + RNGCON);
++
++	prng->rng.name = pdev->name;
++	prng->rng.read = pic32_rng_read;
++
++	ret = hwrng_register(&prng->rng);
++	if (ret)
++		goto err_register;
++
++	platform_set_drvdata(pdev, prng);
++
++	return 0;
++
++err_register:
++	return ret;
++}
++
++static int pic32_rng_remove(struct platform_device *pdev)
++{
++	struct pic32_rng *rng = platform_get_drvdata(pdev);
++
++	hwrng_unregister(&rng->rng);
++	writel(0, rng->base + RNGCON);
++	clk_disable_unprepare(rng->clk);
++	return 0;
++}
++
++static const struct of_device_id pic32_rng_of_match[] = {
++	{ .compatible	= "microchip,pic32mzda-rng", },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(of, pic32_rng_of_match);
++
++static struct platform_driver pic32_rng_driver = {
++	.probe		= pic32_rng_probe,
++	.remove		= pic32_rng_remove,
++	.driver		= {
++		.name	= "pic32-rng",
++		.owner	= THIS_MODULE,
++		.of_match_table = of_match_ptr(pic32_rng_of_match),
++	},
++};
++
++module_platform_driver(pic32_rng_driver);
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Joshua Henderson <joshua.henderson@microchip.com>");
++MODULE_DESCRIPTION("Microchip PIC32 RNG Driver");
+-- 
+1.7.9.5
