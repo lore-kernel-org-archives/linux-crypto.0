@@ -1,66 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 4/6] crypto: hash - Add helpers to return alg and driver names
-Date: Mon, 01 Feb 2016 21:36:52 +0800
-Message-ID: <E1aQEey-0002pN-Mg@gondolin.me.apana.org.au>
-References: <20160201133405.GA10754@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [RFC 1/2] crypto: tcrypt - Add acipher bandwidth tests support
+Date: Mon, 1 Feb 2016 22:21:59 +0800
+Message-ID: <20160201142159.GA11292@gondor.apana.org.au>
+References: <1454074387-8321-2-git-send-email-cata.vasile@nxp.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-crypto-owner@vger.kernel.org,
+	horia.geanta@nxp.com, cristian.stoica@nxp.com,
+	alexandru.porosanu@nxp.com, cata.vasile@nxp.com
+To: Catalin Vasile <cata.vasile@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44054 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:54715 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932320AbcBANgz (ORCPT
+	with ESMTP id S932417AbcBAOWF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Feb 2016 08:36:55 -0500
-Received: from gondolin.me.apana.org.au ([192.168.0.6])
-	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1aQEey-0002Ib-SL
-	for <linux-crypto@vger.kernel.org>; Tue, 02 Feb 2016 00:36:52 +1100
+	Mon, 1 Feb 2016 09:22:05 -0500
+Content-Disposition: inline
+In-Reply-To: <1454074387-8321-2-git-send-email-cata.vasile@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds helpers to retrieve the alg name and driver name
-of crypto_shash and crypto_ahash objects.
+Catalin Vasile <cata.vasile@nxp.com> wrote:
+> Signed-off-by: Catalin Vasile <cata.vasile@nxp.com>
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+Please give a description of what your patch does here.
 
- include/crypto/hash.h |   20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+> +       case 600:
+> +               band_acipher("ecb(aes)", ENCRYPT, sec, NULL, 0,
+> +                                  speed_template_16_24_32);
 
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index f855efa..1969f14 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -272,6 +272,16 @@ static inline void crypto_free_ahash(struct crypto_ahash *tfm)
-  */
- int crypto_has_ahash(const char *alg_name, u32 type, u32 mask);
- 
-+static inline const char *crypto_ahash_alg_name(struct crypto_ahash *tfm)
-+{
-+	return crypto_tfm_alg_name(crypto_ahash_tfm(tfm));
-+}
-+
-+static inline const char *crypto_ahash_driver_name(struct crypto_ahash *tfm)
-+{
-+	return crypto_tfm_alg_driver_name(crypto_ahash_tfm(tfm));
-+}
-+
- static inline unsigned int crypto_ahash_alignmask(
- 	struct crypto_ahash *tfm)
- {
-@@ -676,6 +686,16 @@ static inline void crypto_free_shash(struct crypto_shash *tfm)
- 	crypto_destroy_tfm(tfm, crypto_shash_tfm(tfm));
- }
- 
-+static inline const char *crypto_shash_alg_name(struct crypto_shash *tfm)
-+{
-+	return crypto_tfm_alg_name(crypto_shash_tfm(tfm));
-+}
-+
-+static inline const char *crypto_shash_driver_name(struct crypto_shash *tfm)
-+{
-+	return crypto_tfm_alg_driver_name(crypto_shash_tfm(tfm));
-+}
-+
- static inline unsigned int crypto_shash_alignmask(
- 	struct crypto_shash *tfm)
- {
+Rather than creating new test modes, which you would have to do
+for every asynchronous type going forward, how about making a new
+parameter that toggled this on and off? For example,
+
+modprobe tcrypt mode=601 band=1
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
