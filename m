@@ -1,56 +1,61 @@
-From: Andre Przywara <andre.przywara-5wv7dgnIgG8@public.gmane.org>
-Subject: [PATCH 02/11] crypto: sunxi-ss: prevent compilation on 64-bit
-Date: Mon,  1 Feb 2016 17:39:21 +0000
-Message-ID: <1454348370-3816-3-git-send-email-andre.przywara@arm.com>
-References: <1454348370-3816-1-git-send-email-andre.przywara@arm.com>
-Reply-To: andre.przywara-5wv7dgnIgG8@public.gmane.org
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH v2 1/2] crypto: aead - move aead_request_cast helper to
+ aead.h
+Date: Mon, 01 Feb 2016 11:17:30 -0800
+Message-ID: <20160201191730.21093.458.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Chen-Yu Tsai <wens-jdAy2FN1RRM@public.gmane.org>,
-	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-Return-path: <linux-sunxi+bncBDNZNK75ZIKRB2VQX22QKGQEKI6ME7I-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-In-Reply-To: <1454348370-3816-1-git-send-email-andre.przywara-5wv7dgnIgG8@public.gmane.org>
-List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <https://groups.google.com/group/linux-sunxi
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Subscribe: <https://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <https://groups.google.com/group/linux-sunxi/subscribe>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: smueller@chronox.de, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, tadeusz.struk@intel.com
+To: herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The driver for the sunxi-ss crypto engine is not entirely 64-bit safe,
-compilation on arm64 spits some warnings.
-The proper fix was deemed to involved [1], so since 64-bit SoCs won't
-have this IP block we just disable this driver for 64-bit.
+Move the helper function to common header for everybody to use.
 
-[1]: http://lists.infradead.org/pipermail/linux-arm-kernel/2016-January/399988.html
-     (and the reply)
+changes in v2:
+- move the helper to crypto/internal/aead.h
+  instead of crypto/aead.h
 
-Signed-off-by: Andre Przywara <andre.przywara-5wv7dgnIgG8@public.gmane.org>
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- drivers/crypto/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/atmel-aes.c     |    6 ------
+ include/crypto/internal/aead.h |    6 ++++++
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 07d4942..737200f 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -487,7 +487,7 @@ config CRYPTO_DEV_IMGTEC_HASH
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index 6dd3317..949af89 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -369,12 +369,6 @@ static inline size_t atmel_aes_padlen(size_t len, size_t block_size)
+ 	return len ? block_size - len : 0;
+ }
  
- config CRYPTO_DEV_SUN4I_SS
- 	tristate "Support for Allwinner Security System cryptographic accelerator"
--	depends on ARCH_SUNXI
-+	depends on ARCH_SUNXI && !64BIT
- 	select CRYPTO_MD5
- 	select CRYPTO_SHA1
- 	select CRYPTO_AES
--- 
-2.6.4
+-static inline struct aead_request *
+-aead_request_cast(struct crypto_async_request *req)
+-{
+-	return container_of(req, struct aead_request, base);
+-}
+-
+ static struct atmel_aes_dev *atmel_aes_find_dev(struct atmel_aes_base_ctx *ctx)
+ {
+ 	struct atmel_aes_dev *aes_dd = NULL;
+diff --git a/include/crypto/internal/aead.h b/include/crypto/internal/aead.h
+index 5554cdd..da38649 100644
+--- a/include/crypto/internal/aead.h
++++ b/include/crypto/internal/aead.h
+@@ -80,6 +80,12 @@ static inline u32 aead_request_flags(struct aead_request *req)
+ 	return req->base.flags;
+ }
+ 
++static inline struct aead_request *aead_request_cast(
++	struct crypto_async_request *req)
++{
++	return container_of(req, struct aead_request, base);
++}
++
+ static inline void crypto_set_aead_spawn(
+ 	struct crypto_aead_spawn *spawn, struct crypto_instance *inst)
+ {
