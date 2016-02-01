@@ -1,154 +1,111 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v3 PATCH 1/3] crypto: algif_skcipher - Do not assume that req is unchanged
-Date: Mon, 01 Feb 2016 21:08:01 +0800
-Message-ID: <E1aQED3-00022H-5o@gondolin.me.apana.org.au>
-References: <20160201130644.GA6904@gondor.apana.org.au>
-To: Tadeusz Struk <tadeusz.struk@intel.com>,
-	linux-crypto@vger.kernel.org
+From: Mathias Krause <minipli@googlemail.com>
+Subject: [PATCH] crypto: user - lock crypto_alg_list on alg dump
+Date: Mon,  1 Feb 2016 14:27:30 +0100
+Message-ID: <1454333250-21370-1-git-send-email-minipli@googlemail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	PaX Team <pageexec@freemail.hu>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:57907 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932505AbcBANIE (ORCPT
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:34386 "EHLO
+	mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932189AbcBAN1q (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Feb 2016 08:08:04 -0500
+	Mon, 1 Feb 2016 08:27:46 -0500
+Received: by mail-wm0-f43.google.com with SMTP id 128so70962378wmz.1
+        for <linux-crypto@vger.kernel.org>; Mon, 01 Feb 2016 05:27:45 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The async path in algif_skcipher assumes that the crypto completion
-function will be called with the original request.  This is not
-necessarily the case.  In fact there is no need for this anyway
-since we already embed information into the request with struct
-skcipher_async_req.
+We miss to take the crypto_alg_sem semaphore when traversing the
+crypto_alg_list for CRYPTO_MSG_GETALG dumps. This allows a race with
+crypto_unregister_alg() removing algorithms from the list while we're
+still traversing it, thereby leading to a use-after-free as show below:
 
-This patch adds a pointer to that struct and then passes it as
-the data to the callback function.
+[ 3482.071639] general protection fault: 0000 [#1] SMP
+[ 3482.075639] Modules linked in: aes_x86_64 glue_helper lrw ablk_helper cryptd gf128mul ipv6 pcspkr serio_raw virtio_net microcode virtio_pci virtio_ring virtio sr_mod cdrom [last unloaded: aesni_intel]
+[ 3482.075639] CPU: 1 PID: 11065 Comm: crconf Not tainted 4.3.4-grsec+ #126
+[ 3482.075639] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.7.5-20140531_083030-gandalf 04/01/2014
+[ 3482.075639] task: ffff88001cd41a40 ti: ffff88001cd422c8 task.ti: ffff88001cd422c8
+[ 3482.075639] RIP: 0010:[<ffffffff93722bd3>]  [<ffffffff93722bd3>] strncpy+0x13/0x30
+[ 3482.075639] RSP: 0018:ffff88001f713b60  EFLAGS: 00010202
+[ 3482.075639] RAX: ffff88001f6c4430 RBX: ffff88001f6c43a0 RCX: ffff88001f6c4430
+[ 3482.075639] RDX: 0000000000000040 RSI: fefefefefefeff16 RDI: ffff88001f6c4430
+[ 3482.075639] RBP: ffff88001f713b60 R08: ffff88001f6c4470 R09: ffff88001f6c4480
+[ 3482.075639] R10: 0000000000000002 R11: 0000000000000246 R12: ffff88001ce2aa28
+[ 3482.075639] R13: ffff880000093700 R14: ffff88001f5e4bf8 R15: 0000000000003b20
+[ 3482.075639] FS:  0000033826fa2700(0000) GS:ffff88001e900000(0000) knlGS:0000000000000000
+[ 3482.075639] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 3482.075639] CR2: ffffffffff600400 CR3: 00000000139ec000 CR4: 00000000001606f0
+[ 3482.075639] Stack:
+[ 3482.075639]  ffff88001f713bd8 ffffffff936ccd00 ffff88001e5c4200 ffff880000093700
+[ 3482.075639]  ffff88001f713bd0 ffffffff938ef4bf 0000000000000000 0000000000003b20
+[ 3482.075639]  ffff88001f5e4bf8 ffff88001f5e4848 0000000000000000 0000000000003b20
+[ 3482.075639] Call Trace:
+[ 3482.075639]  [<ffffffff936ccd00>] crypto_report_alg+0xc0/0x3e0
+[ 3482.075639]  [<ffffffff938ef4bf>] ? __alloc_skb+0x16f/0x300
+[ 3482.075639]  [<ffffffff936cd08a>] crypto_dump_report+0x6a/0x90
+[ 3482.075639]  [<ffffffff93935707>] netlink_dump+0x147/0x2e0
+[ 3482.075639]  [<ffffffff93935f99>] __netlink_dump_start+0x159/0x190
+[ 3482.075639]  [<ffffffff936ccb13>] crypto_user_rcv_msg+0xc3/0x130
+[ 3482.075639]  [<ffffffff936cd020>] ? crypto_report_alg+0x3e0/0x3e0
+[ 3482.075639]  [<ffffffff936cc4b0>] ? alg_test_crc32c+0x120/0x120
+[ 3482.075639]  [<ffffffff93933145>] ? __netlink_lookup+0xd5/0x120
+[ 3482.075639]  [<ffffffff936cca50>] ? crypto_add_alg+0x1d0/0x1d0
+[ 3482.075639]  [<ffffffff93938141>] netlink_rcv_skb+0xe1/0x130
+[ 3482.075639]  [<ffffffff936cc4f8>] crypto_netlink_rcv+0x28/0x40
+[ 3482.075639]  [<ffffffff939375a8>] netlink_unicast+0x108/0x180
+[ 3482.075639]  [<ffffffff93937c21>] netlink_sendmsg+0x541/0x770
+[ 3482.075639]  [<ffffffff938e31e1>] sock_sendmsg+0x21/0x40
+[ 3482.075639]  [<ffffffff938e4763>] SyS_sendto+0xf3/0x130
+[ 3482.075639]  [<ffffffff93444203>] ? bad_area_nosemaphore+0x13/0x20
+[ 3482.075639]  [<ffffffff93444470>] ? __do_page_fault+0x80/0x3a0
+[ 3482.075639]  [<ffffffff939d80cb>] entry_SYSCALL_64_fastpath+0x12/0x6e
+[ 3482.075639] Code: 88 4a ff 75 ed 5d 48 0f ba 2c 24 3f c3 66 66 2e 0f 1f 84 00 00 00 00 00 55 48 85 d2 48 89 f8 48 89 f9 4c 8d 04 17 48 89 e5 74 15 <0f> b6 16 80 fa 01 88 11 48 83 de ff 48 83 c1 01 4c 39 c1 75 eb
+[ 3482.075639] RIP  [<ffffffff93722bd3>] strncpy+0x13/0x30
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+To trigger the race run the following loops simultaneously for a while:
+  $ while : ; do modprobe aesni-intel; rmmod aesni-intel; done
+  $ while : ; do crconf show all > /dev/null; done
+
+Fix the race by taking the crypto_alg_sem read lock, thereby preventing
+crypto_unregister_alg() from modifying the algorithm list during the
+dump.
+
+This bug has been detected by the PaX memory sanitize feature.
+
+Signed-off-by: Mathias Krause <minipli@googlemail.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: PaX Team <pageexec@freemail.hu>
 ---
+ crypto/crypto_user.c |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
- crypto/algif_skcipher.c |   59 +++++++++++++++++++++---------------------------
- 1 file changed, 27 insertions(+), 32 deletions(-)
-
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 38c1aa8..a692e06 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -65,18 +65,10 @@ struct skcipher_async_req {
- 	struct skcipher_async_rsgl first_sgl;
- 	struct list_head list;
- 	struct scatterlist *tsg;
--	char iv[];
-+	atomic_t *inflight;
-+	struct skcipher_request req;
- };
+diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
+index 237f3795cfaa..43fe85f20d57 100644
+--- a/crypto/crypto_user.c
++++ b/crypto/crypto_user.c
+@@ -499,6 +499,7 @@ static int crypto_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
+ 		if (link->dump == NULL)
+ 			return -EINVAL;
  
--#define GET_SREQ(areq, ctx) (struct skcipher_async_req *)((char *)areq + \
--	crypto_skcipher_reqsize(crypto_skcipher_reqtfm(&ctx->req)))
--
--#define GET_REQ_SIZE(ctx) \
--	crypto_skcipher_reqsize(crypto_skcipher_reqtfm(&ctx->req))
--
--#define GET_IV_SIZE(ctx) \
--	crypto_skcipher_ivsize(crypto_skcipher_reqtfm(&ctx->req))
--
- #define MAX_SGL_ENTS ((4096 - sizeof(struct skcipher_sg_list)) / \
- 		      sizeof(struct scatterlist) - 1)
++		down_read(&crypto_alg_sem);
+ 		list_for_each_entry(alg, &crypto_alg_list, cra_list)
+ 			dump_alloc += CRYPTO_REPORT_MAXSIZE;
  
-@@ -102,15 +94,12 @@ static void skcipher_free_async_sgls(struct skcipher_async_req *sreq)
- 
- static void skcipher_async_cb(struct crypto_async_request *req, int err)
- {
--	struct sock *sk = req->data;
--	struct alg_sock *ask = alg_sk(sk);
--	struct skcipher_ctx *ctx = ask->private;
--	struct skcipher_async_req *sreq = GET_SREQ(req, ctx);
-+	struct skcipher_async_req *sreq = req->data;
- 	struct kiocb *iocb = sreq->iocb;
- 
--	atomic_dec(&ctx->inflight);
-+	atomic_dec(sreq->inflight);
- 	skcipher_free_async_sgls(sreq);
--	kfree(req);
-+	kzfree(sreq);
- 	iocb->ki_complete(iocb, err, err);
- }
- 
-@@ -509,37 +498,42 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
- {
- 	struct sock *sk = sock->sk;
- 	struct alg_sock *ask = alg_sk(sk);
-+	struct sock *psk = ask->parent;
-+	struct alg_sock *pask = alg_sk(psk);
- 	struct skcipher_ctx *ctx = ask->private;
-+	struct skcipher_tfm *skc = pask->private;
-+	struct crypto_skcipher *tfm = skc->skcipher;
- 	struct skcipher_sg_list *sgl;
- 	struct scatterlist *sg;
- 	struct skcipher_async_req *sreq;
- 	struct skcipher_request *req;
- 	struct skcipher_async_rsgl *last_rsgl = NULL;
- 	unsigned int txbufs = 0, len = 0, tx_nents = skcipher_all_sg_nents(ctx);
--	unsigned int reqlen = sizeof(struct skcipher_async_req) +
--				GET_REQ_SIZE(ctx) + GET_IV_SIZE(ctx);
-+	unsigned int reqsize = crypto_skcipher_reqsize(tfm);
-+	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
- 	int err = -ENOMEM;
- 	bool mark = false;
-+	char *iv;
- 
--	lock_sock(sk);
--	req = kmalloc(reqlen, GFP_KERNEL);
--	if (unlikely(!req))
--		goto unlock;
-+	sreq = kzalloc(sizeof(*req) + reqsize + ivsize, GFP_KERNEL);
-+	if (unlikely(!sreq))
-+		goto out;
- 
--	sreq = GET_SREQ(req, ctx);
-+	req = &sreq->req;
-+	iv = (char *)(req + 1) + reqsize;
- 	sreq->iocb = msg->msg_iocb;
--	memset(&sreq->first_sgl, '\0', sizeof(struct skcipher_async_rsgl));
- 	INIT_LIST_HEAD(&sreq->list);
-+	sreq->inflight = &ctx->inflight;
+@@ -508,8 +509,11 @@ static int crypto_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
+ 				.done = link->done,
+ 				.min_dump_alloc = dump_alloc,
+ 			};
+-			return netlink_dump_start(crypto_nlsk, skb, nlh, &c);
++			err = netlink_dump_start(crypto_nlsk, skb, nlh, &c);
+ 		}
++		up_read(&crypto_alg_sem);
 +
-+	lock_sock(sk);
- 	sreq->tsg = kcalloc(tx_nents, sizeof(*sg), GFP_KERNEL);
--	if (unlikely(!sreq->tsg)) {
--		kfree(req);
-+	if (unlikely(!sreq->tsg))
- 		goto unlock;
--	}
- 	sg_init_table(sreq->tsg, tx_nents);
--	memcpy(sreq->iv, ctx->iv, GET_IV_SIZE(ctx));
--	skcipher_request_set_tfm(req, crypto_skcipher_reqtfm(&ctx->req));
-+	memcpy(iv, ctx->iv, ivsize);
-+	skcipher_request_set_tfm(req, tfm);
- 	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				      skcipher_async_cb, sk);
-+				      skcipher_async_cb, sreq);
- 
- 	while (iov_iter_count(&msg->msg_iter)) {
- 		struct skcipher_async_rsgl *rsgl;
-@@ -615,7 +609,7 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
- 		sg_mark_end(sreq->tsg + txbufs - 1);
- 
- 	skcipher_request_set_crypt(req, sreq->tsg, sreq->first_sgl.sgl.sg,
--				   len, sreq->iv);
-+				   len, iv);
- 	err = ctx->enc ? crypto_skcipher_encrypt(req) :
- 			 crypto_skcipher_decrypt(req);
- 	if (err == -EINPROGRESS) {
-@@ -625,10 +619,11 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
++		return err;
  	}
- free:
- 	skcipher_free_async_sgls(sreq);
--	kfree(req);
- unlock:
- 	skcipher_wmem_wakeup(sk);
- 	release_sock(sk);
-+	kzfree(sreq);
-+out:
- 	return err;
- }
  
+ 	err = nlmsg_parse(nlh, crypto_msg_min[type], attrs, CRYPTOCFGA_MAX,
+-- 
+1.7.10.4
