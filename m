@@ -1,31 +1,56 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: aead - move aead_request_cast helper to aead.h
-Date: Tue, 2 Feb 2016 00:20:39 +0800
-Message-ID: <20160201162039.GA12748@gondor.apana.org.au>
-References: <20160127220916.12466.99501.stgit@tstruk-mobl1>
- <20160201094633.GA6299@gondor.apana.org.au>
- <56AF7DF3.1010305@intel.com>
+From: Andre Przywara <andre.przywara-5wv7dgnIgG8@public.gmane.org>
+Subject: [PATCH 02/11] crypto: sunxi-ss: prevent compilation on 64-bit
+Date: Mon,  1 Feb 2016 17:39:21 +0000
+Message-ID: <1454348370-3816-3-git-send-email-andre.przywara@arm.com>
+References: <1454348370-3816-1-git-send-email-andre.przywara@arm.com>
+Reply-To: andre.przywara-5wv7dgnIgG8@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: smueller@chronox.de, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <56AF7DF3.1010305@intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	Chen-Yu Tsai <wens-jdAy2FN1RRM@public.gmane.org>,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+Return-path: <linux-sunxi+bncBDNZNK75ZIKRB2VQX22QKGQEKI6ME7I-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+In-Reply-To: <1454348370-3816-1-git-send-email-andre.przywara-5wv7dgnIgG8@public.gmane.org>
+List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <https://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <https://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <https://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Feb 01, 2016 at 07:46:59AM -0800, Tadeusz Struk wrote:
->
-> Yes, I though about it, but I followed skcipher. The skcipher_request_cast()
-> helper is in crypto/skcipher.h not in crypto/internal/skcipher.h
-> Shouldn't this be consistent?
+The driver for the sunxi-ss crypto engine is not entirely 64-bit safe,
+compilation on arm64 spits some warnings.
+The proper fix was deemed to involved [1], so since 64-bit SoCs won't
+have this IP block we just disable this driver for 64-bit.
 
-Yes it should be moved into internal as well.
+[1]: http://lists.infradead.org/pipermail/linux-arm-kernel/2016-January/399988.html
+     (and the reply)
 
-Cheers,
+Signed-off-by: Andre Przywara <andre.przywara-5wv7dgnIgG8@public.gmane.org>
+---
+ drivers/crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 07d4942..737200f 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -487,7 +487,7 @@ config CRYPTO_DEV_IMGTEC_HASH
+ 
+ config CRYPTO_DEV_SUN4I_SS
+ 	tristate "Support for Allwinner Security System cryptographic accelerator"
+-	depends on ARCH_SUNXI
++	depends on ARCH_SUNXI && !64BIT
+ 	select CRYPTO_MD5
+ 	select CRYPTO_SHA1
+ 	select CRYPTO_AES
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.6.4
