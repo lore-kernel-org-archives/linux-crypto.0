@@ -1,84 +1,64 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 4.3.y] crypto: fix test vector for rsa
-Date: Tue, 2 Feb 2016 11:20:53 +0800
-Message-ID: <20160202032053.GC16987@gondor.apana.org.au>
-References: <56972AC4.4010501@intel.com>
- <20160202005253.GA31348@kroah.com>
+From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 02/11] crypto: sunxi-ss: prevent compilation
+ on 64-bit
+Date: Tue, 2 Feb 2016 09:42:54 +0100
+Message-ID: <20160202084254.GA22621@Red>
+References: <1454348370-3816-1-git-send-email-andre.przywara@arm.com>
+ <1454348370-3816-3-git-send-email-andre.przywara@arm.com>
+Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>, stable@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-	David Howells <dhowells@redhat.com>
-To: Greg KH <gregkh@linuxfoundation.org>
-Return-path: <stable-owner@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	Chen-Yu Tsai <wens-jdAy2FN1RRM@public.gmane.org>, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
+	Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Andre Przywara <andre.przywara-5wv7dgnIgG8@public.gmane.org>
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBEWYYG2QKGQEQGDJKCY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20160202005253.GA31348@kroah.com>
-Sender: stable-owner@vger.kernel.org
+In-Reply-To: <1454348370-3816-3-git-send-email-andre.przywara-5wv7dgnIgG8@public.gmane.org>
+List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <https://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <https://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <https://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Feb 01, 2016 at 04:52:53PM -0800, Greg KH wrote:
-> On Wed, Jan 13, 2016 at 08:57:40PM -0800, Tadeusz Struk wrote:
-> > Hi,
-> > After the fix to the asn1_decoder in commit: 0d62e9dd
-> > "ASN.1: Fix non-match detection failure on data overrun"
-> > the rsa algorithm is failing to register in 4.3 stable kernels with
-> > error: "alg: rsa: test failed on vector 4, err=-74"
-> > 
-> > This happens because the asn1 definition for the rsa key that has been
-> > added in 4.2 defined all 3 components of the key as non-optional, as
-> > the asn1_decoder before the fix was working fine for both the private
-> > and public keys.
-> > 
-> > This patch adds the missing (fake) component to one key vector to allow
-> > the algorithm to successfully register and be used with a valid private
-> > keys later. This is only to make the asn1_decoder successfully parse the
-> > key and the fake component is never used in the test as the vector is
-> > marked as public key.
-> > 
-> > This patch applies only to 4.3 kernels as the 4.2 version of asn1_decoder
-> > works fine with the asn1 definition.
-> > 4.4 is also ok because the akcipher interface has been changed, and
-> > the set_key function has been split into set_public_key and set_priv_key
-> > and there are two separate asn1 definitions for the two key formats
-> > with all the required components correctly defined (commit 22287b0).
-> > 
-> > Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
-> > ---
-> > diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-> > index 64b8a80..450f30e 100644
-> > --- a/crypto/testmgr.h
-> > +++ b/crypto/testmgr.h
-> > @@ -270,7 +270,7 @@ static struct akcipher_testvec rsa_tv_template[] = {
-> >  	.c_size = 256,
-> >  	}, {
-> >  	.key =
-> > -	"\x30\x82\x01\x09" /* sequence of 265 bytes */
-> > +	"\x30\x82\x01\x0C" /* sequence of 268 bytes */
-> >  	"\x02\x82\x01\x00" /* modulus - integer of 256 bytes */
-> >  	"\xDB\x10\x1A\xC2\xA3\xF1\xDC\xFF\x13\x6B\xED\x44\xDF\xF0\x02\x6D"
-> >  	"\x13\xC7\x88\xDA\x70\x6B\x54\xF1\xE8\x27\xDC\xC3\x0F\x99\x6A\xFA"
-> > @@ -288,8 +288,9 @@ static struct akcipher_testvec rsa_tv_template[] = {
-> >  	"\x55\xE6\x29\x69\xD1\xC2\xE8\xB9\x78\x59\xF6\x79\x10\xC6\x4E\xEB"
-> >  	"\x6A\x5E\xB9\x9A\xC7\xC4\x5B\x63\xDA\xA3\x3F\x5E\x92\x7A\x81\x5E"
-> >  	"\xD6\xB0\xE2\x62\x8F\x74\x26\xC2\x0C\xD3\x9A\x17\x47\xE6\x8E\xAB"
-> > -	"\x02\x03\x01\x00\x01", /* public key - integer of 3 bytes */
-> > -	.key_len = 269,
-> > +	"\x02\x03\x01\x00\x01" /* public key - integer of 3 bytes */
-> > +	"\x02\x01\x00", /* private key - integer of 1 byte */
-> > +	.key_len = 272,
-> >  	.m = "\x54\x85\x9b\x34\x2c\x49\xea\x2a",
-> >  	.c =
-> >  	"\xb2\x97\x76\xb4\xae\x3e\x38\x3c\x7e\x64\x1f\xcc\xa2\x7f\xf6\xbe"
-> > 
+On Mon, Feb 01, 2016 at 05:39:21PM +0000, Andre Przywara wrote:
+> The driver for the sunxi-ss crypto engine is not entirely 64-bit safe,
+> compilation on arm64 spits some warnings.
+> The proper fix was deemed to involved [1], so since 64-bit SoCs won't
+> have this IP block we just disable this driver for 64-bit.
 > 
-> I need an ack from the maintainer of this subsystem before I can take a
-> patch that is not already upstream in Linus's tree...
+> [1]: http://lists.infradead.org/pipermail/linux-arm-kernel/2016-January/399988.html
+>      (and the reply)
+> 
+> Signed-off-by: Andre Przywara <andre.przywara-5wv7dgnIgG8@public.gmane.org>
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Acked-by: Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> ---
+>  drivers/crypto/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 07d4942..737200f 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -487,7 +487,7 @@ config CRYPTO_DEV_IMGTEC_HASH
+>  
+>  config CRYPTO_DEV_SUN4I_SS
+>  	tristate "Support for Allwinner Security System cryptographic accelerator"
+> -	depends on ARCH_SUNXI
+> +	depends on ARCH_SUNXI && !64BIT
+>  	select CRYPTO_MD5
+>  	select CRYPTO_SHA1
+>  	select CRYPTO_AES
+> -- 
+> 2.6.4
+> 
+> -- 
