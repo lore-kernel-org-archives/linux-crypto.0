@@ -1,135 +1,40 @@
 From: Rui Wang <rui.y.wang@intel.com>
-Subject: Re: [PATCH v2 1/4] crypto x86/sha1_mb: Fix load failure
-Date: Tue,  2 Feb 2016 21:56:45 +0800
-Message-ID: <1454421405-19801-1-git-send-email-rui.y.wang@intel.com>
+Subject: Re: [PATCH v2 4/4] crypto: testmgr - Add a test case for import()/export()
+Date: Tue,  2 Feb 2016 22:16:34 +0800
+Message-ID: <1454422594-19990-1-git-send-email-rui.y.wang@intel.com>
 Cc: rui.y.wang@intel.com, tim.c.chen@linux.intel.com,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:44633 "EHLO mga04.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:46292 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754868AbcBBOQd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Feb 2016 09:16:33 -0500
+	id S1754451AbcBBOge (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 2 Feb 2016 09:36:34 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On  Monday, February 1, 2016 4:18 PM, Herbert Xu wrote:
->
-> On Wed, Jan 27, 2016 at 05:08:35PM +0800, Rui Wang wrote:
->>
->> +static int sha1_mb_async_import(struct ahash_request *req, const void 
->> +*in) {
->> +	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
->> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
->> +	struct sha1_mb_ctx *ctx = crypto_ahash_ctx(tfm);
->> +	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
->> +	struct crypto_shash *child = mcryptd_ahash_child(mcryptd_tfm);
->> +	struct mcryptd_hash_request_ctx *rctx;
->> +	struct shash_desc *desc;
->> +	int err;
->> +
->> +	memcpy(mcryptd_req, req, sizeof(*req));
->> +	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
->> +	rctx = ahash_request_ctx(mcryptd_req);
->> +	desc = &rctx->desc;
->> +	desc->tfm = child;
->> +	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
->> +
->> +	err = crypto_shash_init(desc);
->> +	if (err)
->> +		return err;
->
-> What is this desc for?
+On Mon, Feb 1, 2016 4:22 PM Herbert Xu wrote:
+> 
+> On Wed, Jan 27, 2016 at 05:08:38PM +0800, Rui Wang wrote:
+> >
+> > diff --git a/crypto/testmgr.h b/crypto/testmgr.h index
+> > da0a8fd..451e7eb 100644
+> > --- a/crypto/testmgr.h
+> > +++ b/crypto/testmgr.h
+> > @@ -44,6 +44,7 @@ struct hash_testvec {
+> >  	unsigned short psize;
+> >  	unsigned char np;
+> >  	unsigned char ksize;
+> > +	unsigned char partial;
+> 
+> Why not make it unconditional?
+> 
 
-Hi Herbert,
+I initially made it unconditional, but then I found that it can easily
+hang the machine during boot due to any import/export bug in any of
+the hash drivers. So I used this .partial flag to guard against this
+risk. Only when an author is confident that his driver can do this
+test, should he add this flag. What do you think?
 
-Yeah I just realized that the call to crypto_shash_init() isn't necessary
-here. What it does is overwritten by crypto_ahash_import(). But this desc
-still needs to be initialized here because it's newly allocated by
-ahash_request_alloc(). We eventually calls the shash version of import()
-which needs desc as an argument. The real context to be imported is then
-derived from shash_desc_ctx(desc).
-
-desc is a sub-field of struct mcryptd_hash_request_ctx, which is again a
-sub-field of the bigger blob allocated by ahash_request_alloc(). The entire
-blob's size is set in sha1_mb_async_init_tfm(). So a better version is as
-follows:
-
-(just removed the call to crypto_shash_init())
-
->From 4bcb73adbef99aada94c49f352063619aa24d43d Mon Sep 17 00:00:00 2001
-From: Rui Wang <rui.y.wang@intel.com>
-Date: Mon, 14 Dec 2015 17:22:13 +0800
-Subject: [PATCH v2 1/4] crypto x86/sha1_mb: Fix load failure
-
-modprobe sha1_mb fails with the following message:
-
-modprobe: ERROR: could not insert 'sha1_mb': No such device
-
-It is because it needs to set its statesize and implement its
-import() and export() interface.
-
-v2: remove redundant call to crypto_shash_init()
-
-Signed-off-by: Rui Wang <rui.y.wang@intel.com>
----
- arch/x86/crypto/sha-mb/sha1_mb.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
-
-diff --git a/arch/x86/crypto/sha-mb/sha1_mb.c b/arch/x86/crypto/sha-mb/sha1_mb.c
-index a841e97..a8a0224 100644
---- a/arch/x86/crypto/sha-mb/sha1_mb.c
-+++ b/arch/x86/crypto/sha-mb/sha1_mb.c
-@@ -762,6 +762,38 @@ static int sha1_mb_async_digest(struct ahash_request *req)
- 	return crypto_ahash_digest(mcryptd_req);
- }
- 
-+static int sha1_mb_async_export(struct ahash_request *req, void *out)
-+{
-+	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	struct sha1_mb_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
-+
-+	memcpy(mcryptd_req, req, sizeof(*req));
-+	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
-+	return crypto_ahash_export(mcryptd_req, out);
-+}
-+
-+static int sha1_mb_async_import(struct ahash_request *req, const void *in)
-+{
-+	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	struct sha1_mb_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
-+	struct crypto_shash *child = mcryptd_ahash_child(mcryptd_tfm);
-+	struct mcryptd_hash_request_ctx *rctx;
-+	struct shash_desc *desc;
-+
-+	memcpy(mcryptd_req, req, sizeof(*req));
-+	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
-+	rctx = ahash_request_ctx(mcryptd_req);
-+	desc = &rctx->desc;
-+	desc->tfm = child;
-+	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
-+
-+	return crypto_ahash_import(mcryptd_req, in);
-+}
-+
- static int sha1_mb_async_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct mcryptd_ahash *mcryptd_tfm;
-@@ -796,8 +828,11 @@ static struct ahash_alg sha1_mb_async_alg = {
- 	.final          = sha1_mb_async_final,
- 	.finup          = sha1_mb_async_finup,
- 	.digest         = sha1_mb_async_digest,
-+	.export		= sha1_mb_async_export,
-+	.import		= sha1_mb_async_import,
- 	.halg = {
- 		.digestsize     = SHA1_DIGEST_SIZE,
-+		.statesize	= sizeof(struct sha1_hash_ctx),
- 		.base = {
- 			.cra_name               = "sha1",
- 			.cra_driver_name        = "sha1_mb",
--- 
-1.8.3.1
+Thanks
+Rui
