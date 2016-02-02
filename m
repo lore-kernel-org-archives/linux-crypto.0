@@ -1,72 +1,130 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: Re: [PATCH v2 1/3] crypto: sahara - avoid needlessly saving and
- restoring sahara_ctx
-Date: Tue, 2 Feb 2016 15:18:47 -0200
-Message-ID: <CAOMZO5D-7xEhKyWhL3QDzF23ECLT+Yt=5-mc+ZRfAazZ=QfHEQ@mail.gmail.com>
-References: <1452707524-7695-1-git-send-email-festevam@gmail.com>
-	<20160125140728.GA8414@gondor.apana.org.au>
-	<CAOMZO5BE49yzqpEy3TAGAyY52XR_sq6NtFa6e1fdkDAP9Xt4Ow@mail.gmail.com>
-	<20160202144309.GA17909@gondor.apana.org.au>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: [PATCH v1] crypto: ccp - Don't assume export/import areas are
+ aligned
+Date: Tue, 2 Feb 2016 11:38:21 -0600
+Message-ID: <20160202173821.9736.99927.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: =?UTF-8?B?TWFyZWsgVmHFoXV0?= <marex@denx.de>,
-	Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Russell King <linux@arm.linux.org.uk>,
-	linux-crypto@vger.kernel.org, Fabio Estevam <fabio.estevam@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f177.google.com ([209.85.213.177]:37675 "EHLO
-	mail-ig0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753038AbcBBRSs (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Feb 2016 12:18:48 -0500
-Received: by mail-ig0-f177.google.com with SMTP id 5so16320473igt.0
-        for <linux-crypto@vger.kernel.org>; Tue, 02 Feb 2016 09:18:48 -0800 (PST)
-In-Reply-To: <20160202144309.GA17909@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, <stable@vger.kernel.org>,
+	"David Miller" <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Feb 2, 2016 at 12:43 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+Use a local variable for the exported and imported state so that
+alignment is not an issue. On export, set a local variable from the
+request context and then memcpy the contents of the local variable to
+the export memory area. On import, memcpy the import memory area into
+a local variable and then use the local variable to set the request
+context.
 
-> Preferably you shouldn't include the mutex in the exported state
-> at all.
+Cc: <stable@vger.kernel.org> # 3.14.x-
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+---
+ drivers/crypto/ccp/ccp-crypto-aes-cmac.c |   26 +++++++++++++---------
+ drivers/crypto/ccp/ccp-crypto-sha.c      |   36 ++++++++++++++++++------------
+ 2 files changed, 37 insertions(+), 25 deletions(-)
 
-Ok, so would it be safe to completely remove the mutex like this?
-
---- a/drivers/crypto/sahara.c
-+++ b/drivers/crypto/sahara.c
-@@ -182,7 +182,6 @@ struct sahara_sha_reqctx {
-        u8                      buf[SAHARA_MAX_SHA_BLOCK_SIZE];
-        u8                      rembuf[SAHARA_MAX_SHA_BLOCK_SIZE];
-        u8                      context[SHA256_DIGEST_SIZE + 4];
--       struct mutex            mutex;
-        unsigned int            mode;
-        unsigned int            digest_size;
-        unsigned int            context_size;
-@@ -1096,7 +1095,6 @@ static int sahara_sha_enqueue(struct ahash_request *req, i
-        if (!req->nbytes && !last)
-                return 0;
-
--       mutex_lock(&rctx->mutex);
-        rctx->last = last;
-
-        if (!rctx->active) {
-@@ -1109,7 +1107,6 @@ static int sahara_sha_enqueue(struct ahash_request *req, i
-        mutex_unlock(&dev->queue_mutex);
-
-        wake_up_process(dev->kthread);
--       mutex_unlock(&rctx->mutex);
-
-        return ret;
+diff --git a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
+index 6a2d836..d095452 100644
+--- a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
++++ b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
+@@ -223,12 +223,15 @@ static int ccp_aes_cmac_digest(struct ahash_request *req)
+ static int ccp_aes_cmac_export(struct ahash_request *req, void *out)
+ {
+ 	struct ccp_aes_cmac_req_ctx *rctx = ahash_request_ctx(req);
+-	struct ccp_aes_cmac_exp_ctx *state = out;
++	struct ccp_aes_cmac_exp_ctx state;
+ 
+-	state->null_msg = rctx->null_msg;
+-	memcpy(state->iv, rctx->iv, sizeof(state->iv));
+-	state->buf_count = rctx->buf_count;
+-	memcpy(state->buf, rctx->buf, sizeof(state->buf));
++	state.null_msg = rctx->null_msg;
++	memcpy(state.iv, rctx->iv, sizeof(state.iv));
++	state.buf_count = rctx->buf_count;
++	memcpy(state.buf, rctx->buf, sizeof(state.buf));
++
++	/* 'out' may not be aligned so memcpy from local variable */
++	memcpy(out, &state, sizeof(state));
+ 
+ 	return 0;
  }
-@@ -1137,8 +1134,6 @@ static int sahara_sha_init(struct ahash_request *req)
-        rctx->context_size = rctx->digest_size + 4;
-        rctx->active = 0;
-
--       mutex_init(&rctx->mutex);
+@@ -236,12 +239,15 @@ static int ccp_aes_cmac_export(struct ahash_request *req, void *out)
+ static int ccp_aes_cmac_import(struct ahash_request *req, const void *in)
+ {
+ 	struct ccp_aes_cmac_req_ctx *rctx = ahash_request_ctx(req);
+-	const struct ccp_aes_cmac_exp_ctx *state = in;
++	struct ccp_aes_cmac_exp_ctx state;
++
++	/* 'in' may not be aligned so memcpy to local variable */
++	memcpy(&state, in, sizeof(state));
+ 
+-	rctx->null_msg = state->null_msg;
+-	memcpy(rctx->iv, state->iv, sizeof(rctx->iv));
+-	rctx->buf_count = state->buf_count;
+-	memcpy(rctx->buf, state->buf, sizeof(rctx->buf));
++	rctx->null_msg = state.null_msg;
++	memcpy(rctx->iv, state.iv, sizeof(rctx->iv));
++	rctx->buf_count = state.buf_count;
++	memcpy(rctx->buf, state.buf, sizeof(rctx->buf));
+ 
+ 	return 0;
+ }
+diff --git a/drivers/crypto/ccp/ccp-crypto-sha.c b/drivers/crypto/ccp/ccp-crypto-sha.c
+index a67128a..7002c6b 100644
+--- a/drivers/crypto/ccp/ccp-crypto-sha.c
++++ b/drivers/crypto/ccp/ccp-crypto-sha.c
+@@ -210,14 +210,17 @@ static int ccp_sha_digest(struct ahash_request *req)
+ static int ccp_sha_export(struct ahash_request *req, void *out)
+ {
+ 	struct ccp_sha_req_ctx *rctx = ahash_request_ctx(req);
+-	struct ccp_sha_exp_ctx *state = out;
++	struct ccp_sha_exp_ctx state;
+ 
+-	state->type = rctx->type;
+-	state->msg_bits = rctx->msg_bits;
+-	state->first = rctx->first;
+-	memcpy(state->ctx, rctx->ctx, sizeof(state->ctx));
+-	state->buf_count = rctx->buf_count;
+-	memcpy(state->buf, rctx->buf, sizeof(state->buf));
++	state.type = rctx->type;
++	state.msg_bits = rctx->msg_bits;
++	state.first = rctx->first;
++	memcpy(state.ctx, rctx->ctx, sizeof(state.ctx));
++	state.buf_count = rctx->buf_count;
++	memcpy(state.buf, rctx->buf, sizeof(state.buf));
++
++	/* 'out' may not be aligned so memcpy from local variable */
++	memcpy(out, &state, sizeof(state));
+ 
+ 	return 0;
+ }
+@@ -225,14 +228,17 @@ static int ccp_sha_export(struct ahash_request *req, void *out)
+ static int ccp_sha_import(struct ahash_request *req, const void *in)
+ {
+ 	struct ccp_sha_req_ctx *rctx = ahash_request_ctx(req);
+-	const struct ccp_sha_exp_ctx *state = in;
 -
-        return 0;
+-	rctx->type = state->type;
+-	rctx->msg_bits = state->msg_bits;
+-	rctx->first = state->first;
+-	memcpy(rctx->ctx, state->ctx, sizeof(rctx->ctx));
+-	rctx->buf_count = state->buf_count;
+-	memcpy(rctx->buf, state->buf, sizeof(rctx->buf));
++	struct ccp_sha_exp_ctx state;
++
++	/* 'in' may not be aligned so memcpy to local variable */
++	memcpy(&state, in, sizeof(state));
++
++	rctx->type = state.type;
++	rctx->msg_bits = state.msg_bits;
++	rctx->first = state.first;
++	memcpy(rctx->ctx, state.ctx, sizeof(rctx->ctx));
++	rctx->buf_count = state.buf_count;
++	memcpy(rctx->buf, state.buf, sizeof(rctx->buf));
+ 
+ 	return 0;
  }
-
-Thanks
