@@ -1,40 +1,30 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC 1/2] crypto: tcrypt - Add acipher bandwidth tests support
-Date: Tue, 2 Feb 2016 23:11:41 +0800
-Message-ID: <20160202151141.GA21240@gondor.apana.org.au>
-References: <1454074387-8321-2-git-send-email-cata.vasile@nxp.com>
- <20160201142159.GA11292@gondor.apana.org.au>
- <DB5PR04MB130208D1DB2F7D0C1430E9AAEEDF0@DB5PR04MB1302.eurprd04.prod.outlook.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-crypto-owner@vger.kernel.org"
-	<linux-crypto-owner@vger.kernel.org>,
-	Horia Ioan Geanta Neag <horia.geanta@nxp.com>,
-	Cristian Stoica <cristian.stoica@nxp.com>,
-	Alexandru Porosanu <alexandru.porosanu@nxp.com>
-To: Catalin Vasile <cata.vasile@nxp.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:37791 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932526AbcBBPLo (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Feb 2016 10:11:44 -0500
-Content-Disposition: inline
-In-Reply-To: <DB5PR04MB130208D1DB2F7D0C1430E9AAEEDF0@DB5PR04MB1302.eurprd04.prod.outlook.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Rui Wang <rui.y.wang@intel.com>
+Subject: Re: [PATCH v2 4/4] crypto: testmgr - Add a test case for import()/export()
+Date: Tue,  2 Feb 2016 23:03:40 +0800
+Message-ID: <1454425420-20656-1-git-send-email-rui.y.wang@intel.com>
+Cc: rui.y.wang@intel.com, tim.c.chen@linux.intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Feb 02, 2016 at 11:27:07AM +0000, Catalin Vasile wrote:
+On Tue, Feb 2, 2016 10:45 PM Herbert Xu wrote:
 >
-> >modprobe tcrypt mode=601 band=1>
-> Are you referring to modify the speed tests to include a flag to start bandwidth tests?
-> If so, it sounds reasonable.
+> On Tue, Feb 02, 2016 at 10:16:34PM +0800, Rui Wang wrote:
+> >
+> > I initially made it unconditional, but then I found that it can easily
+> > hang the machine during boot due to any import/export bug in any of
+> > the hash drivers. So I used this .partial flag to guard against this
+> > risk. Only when an author is confident that his driver can do this
+> > test, should he add this flag. What do you think?
+> 
+> Well if they're buggy they may crash anyway.  Considering that all the buggy
+> drivers have probably been disabled for the time being I'd say let's make it
+> unconditional.
 
-Yes.
+You are right the ahash drivers are already disabled. The shash drivers using
+cryptd or mcryptd are probably OK by now. I'll do some tests.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks
+Rui 
