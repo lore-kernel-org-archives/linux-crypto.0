@@ -1,78 +1,53 @@
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 4.3.y] crypto: fix test vector for rsa
-Date: Mon, 1 Feb 2016 16:52:53 -0800
-Message-ID: <20160202005253.GA31348@kroah.com>
-References: <56972AC4.4010501@intel.com>
+From: Baolin Wang <baolin.wang@linaro.org>
+Subject: Re: [PATCH 0/3] Introduce the cypto engine framework
+Date: Tue, 2 Feb 2016 09:37:54 +0800
+Message-ID: <CAMz4kuJwwbR=4ukZYBeB4brwvRxMkXzs2v-jRvP395rgHk7Xgg@mail.gmail.com>
+References: <cover.1453810716.git.baolin.wang@linaro.org>
+	<20160201143358.GA11410@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-	David Howells <dhowells@redhat.com>
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <56972AC4.4010501@intel.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: David Miller <davem@davemloft.net>,
+	Mark Brown <broonie@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-yk0-f180.google.com ([209.85.160.180]:36293 "EHLO
+	mail-yk0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751938AbcBBBhz (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 1 Feb 2016 20:37:55 -0500
+Received: by mail-yk0-f180.google.com with SMTP id z7so93933721yka.3
+        for <linux-crypto@vger.kernel.org>; Mon, 01 Feb 2016 17:37:54 -0800 (PST)
+In-Reply-To: <20160201143358.GA11410@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 13, 2016 at 08:57:40PM -0800, Tadeusz Struk wrote:
-> Hi,
-> After the fix to the asn1_decoder in commit: 0d62e9dd
-> "ASN.1: Fix non-match detection failure on data overrun"
-> the rsa algorithm is failing to register in 4.3 stable kernels with
-> error: "alg: rsa: test failed on vector 4, err=-74"
-> 
-> This happens because the asn1 definition for the rsa key that has been
-> added in 4.2 defined all 3 components of the key as non-optional, as
-> the asn1_decoder before the fix was working fine for both the private
-> and public keys.
-> 
-> This patch adds the missing (fake) component to one key vector to allow
-> the algorithm to successfully register and be used with a valid private
-> keys later. This is only to make the asn1_decoder successfully parse the
-> key and the fake component is never used in the test as the vector is
-> marked as public key.
-> 
-> This patch applies only to 4.3 kernels as the 4.2 version of asn1_decoder
-> works fine with the asn1 definition.
-> 4.4 is also ok because the akcipher interface has been changed, and
-> the set_key function has been split into set_public_key and set_priv_key
-> and there are two separate asn1 definitions for the two key formats
-> with all the required components correctly defined (commit 22287b0).
-> 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
-> ---
-> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-> index 64b8a80..450f30e 100644
-> --- a/crypto/testmgr.h
-> +++ b/crypto/testmgr.h
-> @@ -270,7 +270,7 @@ static struct akcipher_testvec rsa_tv_template[] = {
->  	.c_size = 256,
->  	}, {
->  	.key =
-> -	"\x30\x82\x01\x09" /* sequence of 265 bytes */
-> +	"\x30\x82\x01\x0C" /* sequence of 268 bytes */
->  	"\x02\x82\x01\x00" /* modulus - integer of 256 bytes */
->  	"\xDB\x10\x1A\xC2\xA3\xF1\xDC\xFF\x13\x6B\xED\x44\xDF\xF0\x02\x6D"
->  	"\x13\xC7\x88\xDA\x70\x6B\x54\xF1\xE8\x27\xDC\xC3\x0F\x99\x6A\xFA"
-> @@ -288,8 +288,9 @@ static struct akcipher_testvec rsa_tv_template[] = {
->  	"\x55\xE6\x29\x69\xD1\xC2\xE8\xB9\x78\x59\xF6\x79\x10\xC6\x4E\xEB"
->  	"\x6A\x5E\xB9\x9A\xC7\xC4\x5B\x63\xDA\xA3\x3F\x5E\x92\x7A\x81\x5E"
->  	"\xD6\xB0\xE2\x62\x8F\x74\x26\xC2\x0C\xD3\x9A\x17\x47\xE6\x8E\xAB"
-> -	"\x02\x03\x01\x00\x01", /* public key - integer of 3 bytes */
-> -	.key_len = 269,
-> +	"\x02\x03\x01\x00\x01" /* public key - integer of 3 bytes */
-> +	"\x02\x01\x00", /* private key - integer of 1 byte */
-> +	.key_len = 272,
->  	.m = "\x54\x85\x9b\x34\x2c\x49\xea\x2a",
->  	.c =
->  	"\xb2\x97\x76\xb4\xae\x3e\x38\x3c\x7e\x64\x1f\xcc\xa2\x7f\xf6\xbe"
-> 
+On 1 February 2016 at 22:33, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Tue, Jan 26, 2016 at 08:25:37PM +0800, Baolin Wang wrote:
+>> Now block cipher engines need to implement and maintain their own queue/thread
+>> for processing requests, moreover currently helpers provided for only the queue
+>> itself (in crypto_enqueue_request() and crypto_dequeue_request()) but they
+>> don't help with the mechanics of driving the hardware (things like running the
+>> request immediately, DMA map it or providing a thread to process the queue in)
+>> even though a lot of that code really shouldn't vary that much from device to
+>> device.
+>>
+>> This patch introduces the crypto engine framework to help the crypto hardware
+>> drivers to queue requests.
+>
+> Very nice, all applied.  Thanks!
 
-I need an ack from the maintainer of this subsystem before I can take a
-patch that is not already upstream in Linus's tree...
+Thanks a lot!
 
-thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
-greg k-h
+
+
+-- 
+Baolin.wang
+Best Regards
