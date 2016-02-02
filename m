@@ -1,229 +1,78 @@
-From: Joshua Henderson <joshua.henderson@microchip.com>
-Subject: [PATCH 2/2] rng: pic32-rng: Add PIC32 RNG hardware driver
-Date: Mon, 1 Feb 2016 15:41:42 -0700
-Message-ID: <1454366511-10640-2-git-send-email-joshua.henderson@microchip.com>
-References: <1454366511-10640-1-git-send-email-joshua.henderson@microchip.com>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 4.3.y] crypto: fix test vector for rsa
+Date: Mon, 1 Feb 2016 16:52:53 -0800
+Message-ID: <20160202005253.GA31348@kroah.com>
+References: <56972AC4.4010501@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-mips@linux-mips.org>,
-	Joshua Henderson <joshua.henderson@microchip.com>,
-	Purna Chandra Mandal <purna.mandal@microchip.com>,
-	Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Kieran Bingham <kieranbingham@gmail.com>,
-	Lee Jones <lee.jones@linaro.org>,
-	Pankaj Dev <pankaj.dev@st.com>,
-	Scott Branden <sbranden@broadcom.com>,
-	Daniel Thompson <daniel.thompson@linaro.org>,
-	Ray Jui <rjui@broadcom.com>, <linux-crypto@vger.kernel.org>
-To: <linux-kernel@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1454366511-10640-1-git-send-email-joshua.henderson@microchip.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
+	David Howells <dhowells@redhat.com>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <stable-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <56972AC4.4010501@intel.com>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add support for the hardware pseudo and true random number generator
-peripheral found on PIC32.
+On Wed, Jan 13, 2016 at 08:57:40PM -0800, Tadeusz Struk wrote:
+> Hi,
+> After the fix to the asn1_decoder in commit: 0d62e9dd
+> "ASN.1: Fix non-match detection failure on data overrun"
+> the rsa algorithm is failing to register in 4.3 stable kernels with
+> error: "alg: rsa: test failed on vector 4, err=-74"
+> 
+> This happens because the asn1 definition for the rsa key that has been
+> added in 4.2 defined all 3 components of the key as non-optional, as
+> the asn1_decoder before the fix was working fine for both the private
+> and public keys.
+> 
+> This patch adds the missing (fake) component to one key vector to allow
+> the algorithm to successfully register and be used with a valid private
+> keys later. This is only to make the asn1_decoder successfully parse the
+> key and the fake component is never used in the test as the vector is
+> marked as public key.
+> 
+> This patch applies only to 4.3 kernels as the 4.2 version of asn1_decoder
+> works fine with the asn1 definition.
+> 4.4 is also ok because the akcipher interface has been changed, and
+> the set_key function has been split into set_public_key and set_priv_key
+> and there are two separate asn1 definitions for the two key formats
+> with all the required components correctly defined (commit 22287b0).
+> 
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> ---
+> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+> index 64b8a80..450f30e 100644
+> --- a/crypto/testmgr.h
+> +++ b/crypto/testmgr.h
+> @@ -270,7 +270,7 @@ static struct akcipher_testvec rsa_tv_template[] = {
+>  	.c_size = 256,
+>  	}, {
+>  	.key =
+> -	"\x30\x82\x01\x09" /* sequence of 265 bytes */
+> +	"\x30\x82\x01\x0C" /* sequence of 268 bytes */
+>  	"\x02\x82\x01\x00" /* modulus - integer of 256 bytes */
+>  	"\xDB\x10\x1A\xC2\xA3\xF1\xDC\xFF\x13\x6B\xED\x44\xDF\xF0\x02\x6D"
+>  	"\x13\xC7\x88\xDA\x70\x6B\x54\xF1\xE8\x27\xDC\xC3\x0F\x99\x6A\xFA"
+> @@ -288,8 +288,9 @@ static struct akcipher_testvec rsa_tv_template[] = {
+>  	"\x55\xE6\x29\x69\xD1\xC2\xE8\xB9\x78\x59\xF6\x79\x10\xC6\x4E\xEB"
+>  	"\x6A\x5E\xB9\x9A\xC7\xC4\x5B\x63\xDA\xA3\x3F\x5E\x92\x7A\x81\x5E"
+>  	"\xD6\xB0\xE2\x62\x8F\x74\x26\xC2\x0C\xD3\x9A\x17\x47\xE6\x8E\xAB"
+> -	"\x02\x03\x01\x00\x01", /* public key - integer of 3 bytes */
+> -	.key_len = 269,
+> +	"\x02\x03\x01\x00\x01" /* public key - integer of 3 bytes */
+> +	"\x02\x01\x00", /* private key - integer of 1 byte */
+> +	.key_len = 272,
+>  	.m = "\x54\x85\x9b\x34\x2c\x49\xea\x2a",
+>  	.c =
+>  	"\xb2\x97\x76\xb4\xae\x3e\x38\x3c\x7e\x64\x1f\xcc\xa2\x7f\xf6\xbe"
+> 
 
-Signed-off-by: Joshua Henderson <joshua.henderson@microchip.com>
-Signed-off-by: Purna Chandra Mandal <purna.mandal@microchip.com>
----
- drivers/char/hw_random/Kconfig     |   13 +++
- drivers/char/hw_random/Makefile    |    1 +
- drivers/char/hw_random/pic32-rng.c |  152 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 166 insertions(+)
- create mode 100644 drivers/char/hw_random/pic32-rng.c
+I need an ack from the maintainer of this subsystem before I can take a
+patch that is not already upstream in Linus's tree...
 
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index dbf2271..3ab0c46 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -381,6 +381,19 @@ config HW_RANDOM_STM32
- 
- 	  If unsure, say N.
- 
-+config HW_RANDOM_PIC32
-+	tristate "Microchip PIC32 Random Number Generator support"
-+	depends on HW_RANDOM && MACH_PIC32
-+	default y
-+	---help---
-+	  This driver provides kernel-side support for the Random Number
-+	  Generator hardware found on a PIC32.
-+
-+	  To compile this driver as a module, choose M here. the
-+	  module will be called pic32-rng.
-+
-+	  If unsure, say Y.
-+
- endif # HW_RANDOM
- 
- config UML_RANDOM
-diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-index 5ad3976..f5a6fa7 100644
---- a/drivers/char/hw_random/Makefile
-+++ b/drivers/char/hw_random/Makefile
-@@ -33,3 +33,4 @@ obj-$(CONFIG_HW_RANDOM_MSM) += msm-rng.o
- obj-$(CONFIG_HW_RANDOM_ST) += st-rng.o
- obj-$(CONFIG_HW_RANDOM_XGENE) += xgene-rng.o
- obj-$(CONFIG_HW_RANDOM_STM32) += stm32-rng.o
-+obj-$(CONFIG_HW_RANDOM_PIC32) += pic32-rng.o
-diff --git a/drivers/char/hw_random/pic32-rng.c b/drivers/char/hw_random/pic32-rng.c
-new file mode 100644
-index 0000000..d2f32c4
---- /dev/null
-+++ b/drivers/char/hw_random/pic32-rng.c
-@@ -0,0 +1,152 @@
-+/*
-+ * PIC32 RNG driver
-+ *
-+ * Joshua Henderson <joshua.henderson@microchip.com>
-+ * Copyright (C) 2016 Microchip Technology Inc.  All rights reserved.
-+ *
-+ * This program is free software; you can distribute it and/or modify it
-+ * under the terms of the GNU General Public License (Version 2) as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-+ * for more details.
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/delay.h>
-+#include <linux/slab.h>
-+#include <linux/err.h>
-+#include <linux/io.h>
-+#include <linux/hw_random.h>
-+#include <linux/platform_device.h>
-+#include <linux/of.h>
-+#include <linux/of_device.h>
-+#include <linux/clk.h>
-+#include <linux/clkdev.h>
-+
-+#define RNGCON		0x04
-+#define  TRNGEN		BIT(8)
-+#define  PRNGEN		BIT(9)
-+#define  PRNGCONT	BIT(10)
-+#define  TRNGMOD	BIT(11)
-+#define  SEEDLOAD	BIT(12)
-+#define RNGPOLY1	0x08
-+#define RNGPOLY2	0x0C
-+#define RNGNUMGEN1	0x10
-+#define RNGNUMGEN2	0x14
-+#define RNGSEED1	0x18
-+#define RNGSEED2	0x1C
-+#define RNGRCNT		0x20
-+#define  RCNT_MASK	0x7F
-+
-+struct pic32_rng {
-+	void __iomem	*base;
-+	struct hwrng	rng;
-+	struct clk	*clk;
-+};
-+
-+static int pic32_rng_read(struct hwrng *rng, void *buf, size_t max,
-+			  bool wait)
-+{
-+	struct pic32_rng *prng = container_of(rng, struct pic32_rng, rng);
-+	u64 *data = buf;
-+
-+	*data = ((u64)readl(prng->base + RNGNUMGEN2) << 32) +
-+		readl(prng->base + RNGNUMGEN1);
-+	return 4;
-+}
-+
-+static int pic32_rng_probe(struct platform_device *pdev)
-+{
-+	struct pic32_rng *prng;
-+	struct resource *res;
-+	u32 v, t;
-+	int ret;
-+
-+	prng = devm_kzalloc(&pdev->dev, sizeof(*prng), GFP_KERNEL);
-+	if (!prng)
-+		return -ENOMEM;
-+
-+	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-+	prng->base = devm_ioremap_resource(&pdev->dev, res);
-+	if (IS_ERR(prng->base))
-+		return PTR_ERR(prng->base);
-+
-+	prng->clk = devm_clk_get(&pdev->dev, NULL);
-+	if (IS_ERR(prng->clk))
-+		return PTR_ERR(prng->clk);
-+
-+	clk_prepare_enable(prng->clk);
-+
-+	/* enable TRNG in enhanced mode */
-+	v = readl(prng->base + RNGCON);
-+	v &= ~(TRNGEN | PRNGEN | 0xff);
-+	v |= TRNGMOD;
-+	writel(v | TRNGEN, prng->base + RNGCON);
-+
-+	/* wait for valid seed */
-+	usleep_range(100, 200);
-+	t = readl(prng->base + RNGRCNT) & RCNT_MASK;
-+	if (t < 0x2A)
-+		dev_warn(&pdev->dev, "seed not generated.\n");
-+
-+	/* load initial seed */
-+	writel(v | SEEDLOAD, prng->base + RNGCON);
-+
-+	/* load initial polynomial: 42bit poly */
-+	writel(0x00c00003, prng->base + RNGPOLY1);
-+	writel(0x00000000, prng->base + RNGPOLY2);
-+
-+	/* start PRNG to generate 42bit random */
-+	v |= 0x2A | PRNGCONT | PRNGEN;
-+	writel(v, prng->base + RNGCON);
-+
-+	prng->rng.name = pdev->name;
-+	prng->rng.read = pic32_rng_read;
-+
-+	ret = hwrng_register(&prng->rng);
-+	if (ret)
-+		goto err_register;
-+
-+	platform_set_drvdata(pdev, prng);
-+
-+	return 0;
-+
-+err_register:
-+	return ret;
-+}
-+
-+static int pic32_rng_remove(struct platform_device *pdev)
-+{
-+	struct pic32_rng *rng = platform_get_drvdata(pdev);
-+
-+	hwrng_unregister(&rng->rng);
-+	writel(0, rng->base + RNGCON);
-+	clk_disable_unprepare(rng->clk);
-+	return 0;
-+}
-+
-+static const struct of_device_id pic32_rng_of_match[] = {
-+	{ .compatible	= "microchip,pic32mzda-rng", },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, pic32_rng_of_match);
-+
-+static struct platform_driver pic32_rng_driver = {
-+	.probe		= pic32_rng_probe,
-+	.remove		= pic32_rng_remove,
-+	.driver		= {
-+		.name	= "pic32-rng",
-+		.owner	= THIS_MODULE,
-+		.of_match_table = of_match_ptr(pic32_rng_of_match),
-+	},
-+};
-+
-+module_platform_driver(pic32_rng_driver);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Joshua Henderson <joshua.henderson@microchip.com>");
-+MODULE_DESCRIPTION("Microchip PIC32 RNG Driver");
--- 
-1.7.9.5
+thanks,
+
+greg k-h
