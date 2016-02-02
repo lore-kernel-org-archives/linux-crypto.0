@@ -1,43 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/3] crypto: sahara - avoid needlessly saving and
- restoring sahara_ctx
-Date: Tue, 2 Feb 2016 22:43:09 +0800
-Message-ID: <20160202144309.GA17909@gondor.apana.org.au>
-References: <1452707524-7695-1-git-send-email-festevam@gmail.com>
- <20160125140728.GA8414@gondor.apana.org.au>
- <CAOMZO5BE49yzqpEy3TAGAyY52XR_sq6NtFa6e1fdkDAP9Xt4Ow@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] crypto: testmgr - Add a test case for
+ import()/export()
+Date: Tue, 2 Feb 2016 22:44:48 +0800
+Message-ID: <20160202144448.GB17909@gondor.apana.org.au>
+References: <1454422594-19990-1-git-send-email-rui.y.wang@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Marek =?utf-8?B?VmHFoXV0?= <marex@denx.de>,
-	Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Russell King <linux@arm.linux.org.uk>,
-	linux-crypto@vger.kernel.org, Fabio Estevam <fabio.estevam@nxp.com>
-To: Fabio Estevam <festevam@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:33409 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755774AbcBBOna (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Feb 2016 09:43:30 -0500
+Cc: tim.c.chen@linux.intel.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Rui Wang <rui.y.wang@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAOMZO5BE49yzqpEy3TAGAyY52XR_sq6NtFa6e1fdkDAP9Xt4Ow@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1454422594-19990-1-git-send-email-rui.y.wang@intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Feb 02, 2016 at 11:41:56AM -0200, Fabio Estevam wrote:
+On Tue, Feb 02, 2016 at 10:16:34PM +0800, Rui Wang wrote:
 >
-> static int sahara_sha_import(struct ahash_request *req, const void *in)
-> {
->     struct sahara_sha_reqctx *rctx = ahash_request_ctx(req);
-> 
->     mutex_init(&rctx->mutex);
->     memcpy(rctx, in, sizeof(struct sahara_sha_reqctx));
+> I initially made it unconditional, but then I found that it can easily
+> hang the machine during boot due to any import/export bug in any of
+> the hash drivers. So I used this .partial flag to guard against this
+> risk. Only when an author is confident that his driver can do this
+> test, should he add this flag. What do you think?
 
-Preferably you shouldn't include the mutex in the exported state
-at all.
+Well if they're buggy they may crash anyway.  Considering that all
+the buggy drivers have probably been disabled for the time being I'd
+say let's make it unconditional.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
