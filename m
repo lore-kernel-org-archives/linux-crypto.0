@@ -1,61 +1,66 @@
-From: "Jerome Marchand" <jmarchan@redhat.com>
-Subject: [PATCH v2] fix out of bound read in __test_aead()
-Date: Wed,  3 Feb 2016 13:58:12 +0100
-Message-ID: <1454504292-17882-1-git-send-email-jmarchan@redhat.com>
-References: <1454073009-13665-1-git-send-email-jmarchan@redhat.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
+From: Fabio Estevam <fabio.estevam@nxp.com>
+Subject: [PATCH v3 1/3] crypto: sahara - remove unneeded mutex in the exported state
+Date: Wed, 3 Feb 2016 10:46:50 -0200
+Message-ID: <1454503612-21344-1-git-send-email-fabio.estevam@nxp.com>
+Mime-Version: 1.0
+Content-Type: text/plain
+Cc: <s.trumtrar@pengutronix.de>, <marex@denx.de>,
+	<linux@arm.linux.org.uk>, <linux-crypto@vger.kernel.org>,
+	Fabio Estevam <fabio.estevam@nxp.com>
+To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44940 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753683AbcBCM6V (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Feb 2016 07:58:21 -0500
-In-Reply-To: <1454073009-13665-1-git-send-email-jmarchan@redhat.com>
+Received: from mail-bn1bon0099.outbound.protection.outlook.com ([157.56.111.99]:19136
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751682AbcBCNTw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 3 Feb 2016 08:19:52 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-__test_aead() reads MAX_IVLEN bytes from template[i].iv, but the
-actual length of the initialisation vector can be shorter.
-The length of the IV is already calculated earlier in the
-function. Let's just reuses that. Also the IV length is currently
-calculated several time for no reason. Let's fix that too.
-This fix an out-of-bound error detected by KASan.
+As pointed out by Herbert Xu we should not include the mutex in the
+exported state, so let's just get rid of it.
 
-Signed-off-by: Jerome Marchand <jmarchan@redhat.com>
+Signed-off-by: Fabio Estevam <fabio.estevam@nxp.com>
 ---
- crypto/testmgr.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/crypto/sahara.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index ae8c57fd..6691756 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -488,6 +488,8 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
- 	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
- 				  tcrypt_complete, &result);
+diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
+index 6c4f91c..7e8147d 100644
+--- a/drivers/crypto/sahara.c
++++ b/drivers/crypto/sahara.c
+@@ -182,7 +182,6 @@ struct sahara_sha_reqctx {
+ 	u8			buf[SAHARA_MAX_SHA_BLOCK_SIZE];
+ 	u8			rembuf[SAHARA_MAX_SHA_BLOCK_SIZE];
+ 	u8			context[SHA256_DIGEST_SIZE + 4];
+-	struct mutex		mutex;
+ 	unsigned int		mode;
+ 	unsigned int		digest_size;
+ 	unsigned int		context_size;
+@@ -1096,7 +1095,6 @@ static int sahara_sha_enqueue(struct ahash_request *req, int last)
+ 	if (!req->nbytes && !last)
+ 		return 0;
  
-+	iv_len = crypto_aead_ivsize(tfm);
-+
- 	for (i = 0, j = 0; i < tcount; i++) {
- 		if (template[i].np)
- 			continue;
-@@ -508,7 +510,6 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
+-	mutex_lock(&rctx->mutex);
+ 	rctx->last = last;
  
- 		memcpy(input, template[i].input, template[i].ilen);
- 		memcpy(assoc, template[i].assoc, template[i].alen);
--		iv_len = crypto_aead_ivsize(tfm);
- 		if (template[i].iv)
- 			memcpy(iv, template[i].iv, iv_len);
- 		else
-@@ -617,7 +618,7 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
- 		j++;
+ 	if (!rctx->active) {
+@@ -1109,7 +1107,6 @@ static int sahara_sha_enqueue(struct ahash_request *req, int last)
+ 	mutex_unlock(&dev->queue_mutex);
  
- 		if (template[i].iv)
--			memcpy(iv, template[i].iv, MAX_IVLEN);
-+			memcpy(iv, template[i].iv, iv_len);
- 		else
- 			memset(iv, 0, MAX_IVLEN);
+ 	wake_up_process(dev->kthread);
+-	mutex_unlock(&rctx->mutex);
+ 
+ 	return ret;
+ }
+@@ -1137,8 +1134,6 @@ static int sahara_sha_init(struct ahash_request *req)
+ 	rctx->context_size = rctx->digest_size + 4;
+ 	rctx->active = 0;
+ 
+-	mutex_init(&rctx->mutex);
+-
+ 	return 0;
+ }
  
 -- 
-2.5.0
+1.9.1
