@@ -1,157 +1,78 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v4 PATCH 1/3] crypto: algif_skcipher - Do not assume that req is unchanged
-Date: Wed, 03 Feb 2016 21:39:24 +0800
-Message-ID: <E1aQxeW-0007dX-Uj@gondolin.me.apana.org.au>
+Subject: [v4 PATCH 2/3] crypto: algif_skcipher - Do not dereference ctx without socket lock
+Date: Wed, 03 Feb 2016 21:39:26 +0800
+Message-ID: <E1aQxeY-0007dq-1D@gondolin.me.apana.org.au>
 References: <20160203133648.GA29251@gondor.apana.org.au>
 To: Tadeusz Struk <tadeusz.struk@intel.com>,
 	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36537 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:54435 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751944AbcBCNj1 (ORCPT
+	with ESMTP id S1752770AbcBCNj2 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Feb 2016 08:39:27 -0500
+	Wed, 3 Feb 2016 08:39:28 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The async path in algif_skcipher assumes that the crypto completion
-function will be called with the original request.  This is not
-necessarily the case.  In fact there is no need for this anyway
-since we already embed information into the request with struct
-skcipher_async_req.
+Any access to non-constant bits of the private context must be
+done under the socket lock, in particular, this includes ctx->req.
 
-This patch adds a pointer to that struct and then passes it as
-the data to the callback function.
+This patch moves such accesses under the lock, and fetches the
+tfm from the parent socket which is guaranteed to be constant,
+rather than from ctx->req.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/algif_skcipher.c |   60 ++++++++++++++++++++++--------------------------
- 1 file changed, 28 insertions(+), 32 deletions(-)
+ crypto/algif_skcipher.c |   15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 38c1aa8..ec07a86 100644
+index ec07a86..ef84353 100644
 --- a/crypto/algif_skcipher.c
 +++ b/crypto/algif_skcipher.c
-@@ -65,18 +65,10 @@ struct skcipher_async_req {
- 	struct skcipher_async_rsgl first_sgl;
- 	struct list_head list;
- 	struct scatterlist *tsg;
--	char iv[];
-+	atomic_t *inflight;
-+	struct skcipher_request req;
- };
- 
--#define GET_SREQ(areq, ctx) (struct skcipher_async_req *)((char *)areq + \
--	crypto_skcipher_reqsize(crypto_skcipher_reqtfm(&ctx->req)))
--
--#define GET_REQ_SIZE(ctx) \
--	crypto_skcipher_reqsize(crypto_skcipher_reqtfm(&ctx->req))
--
--#define GET_IV_SIZE(ctx) \
--	crypto_skcipher_ivsize(crypto_skcipher_reqtfm(&ctx->req))
--
- #define MAX_SGL_ENTS ((4096 - sizeof(struct skcipher_sg_list)) / \
- 		      sizeof(struct scatterlist) - 1)
- 
-@@ -102,15 +94,12 @@ static void skcipher_free_async_sgls(struct skcipher_async_req *sreq)
- 
- static void skcipher_async_cb(struct crypto_async_request *req, int err)
- {
--	struct sock *sk = req->data;
--	struct alg_sock *ask = alg_sk(sk);
--	struct skcipher_ctx *ctx = ask->private;
--	struct skcipher_async_req *sreq = GET_SREQ(req, ctx);
-+	struct skcipher_async_req *sreq = req->data;
- 	struct kiocb *iocb = sreq->iocb;
- 
--	atomic_dec(&ctx->inflight);
-+	atomic_dec(sreq->inflight);
- 	skcipher_free_async_sgls(sreq);
--	kfree(req);
-+	kzfree(sreq);
- 	iocb->ki_complete(iocb, err, err);
- }
- 
-@@ -509,37 +498,42 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
+@@ -295,8 +295,11 @@ static int skcipher_sendmsg(struct socket *sock, struct msghdr *msg,
  {
  	struct sock *sk = sock->sk;
  	struct alg_sock *ask = alg_sk(sk);
 +	struct sock *psk = ask->parent;
 +	struct alg_sock *pask = alg_sk(psk);
  	struct skcipher_ctx *ctx = ask->private;
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(&ctx->req);
 +	struct skcipher_tfm *skc = pask->private;
 +	struct crypto_skcipher *tfm = skc->skcipher;
+ 	unsigned ivsize = crypto_skcipher_ivsize(tfm);
  	struct skcipher_sg_list *sgl;
- 	struct scatterlist *sg;
+ 	struct af_alg_control con = {};
+@@ -508,7 +511,7 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
  	struct skcipher_async_req *sreq;
  	struct skcipher_request *req;
  	struct skcipher_async_rsgl *last_rsgl = NULL;
- 	unsigned int txbufs = 0, len = 0, tx_nents = skcipher_all_sg_nents(ctx);
--	unsigned int reqlen = sizeof(struct skcipher_async_req) +
--				GET_REQ_SIZE(ctx) + GET_IV_SIZE(ctx);
-+	unsigned int reqsize = crypto_skcipher_reqsize(tfm);
-+	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
+-	unsigned int txbufs = 0, len = 0, tx_nents = skcipher_all_sg_nents(ctx);
++	unsigned int txbufs = 0, len = 0, tx_nents;
+ 	unsigned int reqsize = crypto_skcipher_reqsize(tfm);
+ 	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
  	int err = -ENOMEM;
- 	bool mark = false;
-+	char *iv;
+@@ -526,6 +529,7 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 	sreq->inflight = &ctx->inflight;
  
--	lock_sock(sk);
--	req = kmalloc(reqlen, GFP_KERNEL);
--	if (unlikely(!req))
--		goto unlock;
-+	sreq = kzalloc(sizeof(*sreq) + reqsize + ivsize, GFP_KERNEL);
-+	if (unlikely(!sreq))
-+		goto out;
- 
--	sreq = GET_SREQ(req, ctx);
-+	req = &sreq->req;
-+	iv = (char *)(req + 1) + reqsize;
- 	sreq->iocb = msg->msg_iocb;
--	memset(&sreq->first_sgl, '\0', sizeof(struct skcipher_async_rsgl));
- 	INIT_LIST_HEAD(&sreq->list);
-+	sreq->inflight = &ctx->inflight;
-+
-+	lock_sock(sk);
+ 	lock_sock(sk);
++	tx_nents = skcipher_all_sg_nents(ctx);
  	sreq->tsg = kcalloc(tx_nents, sizeof(*sg), GFP_KERNEL);
--	if (unlikely(!sreq->tsg)) {
--		kfree(req);
-+	if (unlikely(!sreq->tsg))
+ 	if (unlikely(!sreq->tsg))
  		goto unlock;
--	}
- 	sg_init_table(sreq->tsg, tx_nents);
--	memcpy(sreq->iv, ctx->iv, GET_IV_SIZE(ctx));
--	skcipher_request_set_tfm(req, crypto_skcipher_reqtfm(&ctx->req));
-+	memcpy(iv, ctx->iv, ivsize);
-+	skcipher_request_set_tfm(req, tfm);
- 	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				      skcipher_async_cb, sk);
-+				      skcipher_async_cb, sreq);
- 
- 	while (iov_iter_count(&msg->msg_iter)) {
- 		struct skcipher_async_rsgl *rsgl;
-@@ -615,20 +609,22 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
- 		sg_mark_end(sreq->tsg + txbufs - 1);
- 
- 	skcipher_request_set_crypt(req, sreq->tsg, sreq->first_sgl.sgl.sg,
--				   len, sreq->iv);
-+				   len, iv);
- 	err = ctx->enc ? crypto_skcipher_encrypt(req) :
- 			 crypto_skcipher_decrypt(req);
- 	if (err == -EINPROGRESS) {
- 		atomic_inc(&ctx->inflight);
- 		err = -EIOCBQUEUED;
-+		sreq = NULL;
- 		goto unlock;
- 	}
- free:
- 	skcipher_free_async_sgls(sreq);
--	kfree(req);
- unlock:
- 	skcipher_wmem_wakeup(sk);
- 	release_sock(sk);
-+	kzfree(sreq);
-+out:
- 	return err;
- }
- 
+@@ -633,9 +637,12 @@ static int skcipher_recvmsg_sync(struct socket *sock, struct msghdr *msg,
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct alg_sock *ask = alg_sk(sk);
++	struct sock *psk = ask->parent;
++	struct alg_sock *pask = alg_sk(psk);
+ 	struct skcipher_ctx *ctx = ask->private;
+-	unsigned bs = crypto_skcipher_blocksize(crypto_skcipher_reqtfm(
+-		&ctx->req));
++	struct skcipher_tfm *skc = pask->private;
++	struct crypto_skcipher *tfm = skc->skcipher;
++	unsigned bs = crypto_skcipher_blocksize(tfm);
+ 	struct skcipher_sg_list *sgl;
+ 	struct scatterlist *sg;
+ 	int err = -EAGAIN;
