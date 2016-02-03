@@ -1,58 +1,35 @@
-From: Fabio Estevam <fabio.estevam@nxp.com>
-Subject: [PATCH v3 3/3] crypto: sahara - fill the statesize field
-Date: Wed, 3 Feb 2016 10:46:52 -0200
-Message-ID: <1454503612-21344-3-git-send-email-fabio.estevam@nxp.com>
-References: <1454503612-21344-1-git-send-email-fabio.estevam@nxp.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [v4 PATCH 0/3] crypto: algif_skcipher - fixes after skcipher
+ conversion
+Date: Wed, 3 Feb 2016 21:36:48 +0800
+Message-ID: <20160203133648.GA29251@gondor.apana.org.au>
+References: <20160201130644.GA6904@gondor.apana.org.au>
+ <E1aQED3-00022H-5o@gondolin.me.apana.org.au>
+ <56AFC83D.2010005@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <s.trumtrar@pengutronix.de>, <marex@denx.de>,
-	<linux@arm.linux.org.uk>, <linux-crypto@vger.kernel.org>,
-	Fabio Estevam <fabio.estevam@nxp.com>
-To: <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0088.outbound.protection.outlook.com ([65.55.169.88]:55376
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751407AbcBCNU3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Feb 2016 08:20:29 -0500
-In-Reply-To: <1454503612-21344-1-git-send-email-fabio.estevam@nxp.com>
+Received: from helcar.hengli.com.au ([209.40.204.226]:45502 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751003AbcBCNgy (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 3 Feb 2016 08:36:54 -0500
+Content-Disposition: inline
+In-Reply-To: <56AFC83D.2010005@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Currently the sahara driver fails to probe:
+On Mon, Feb 01, 2016 at 01:03:57PM -0800, Tadeusz Struk wrote:
+> 
+> I think this should be:
+> sreq = kzalloc(sizeof(*sreq) + reqsize + ivsize, GFP_KERNEL);
 
-sahara: probe of 63ff8000.crypto failed with error -22
+Good catch.  Here is another spin.
 
-This happens since commit 8996eafdcbad ("crypto: ahash - ensure statesize
-is non-zero"), which requires statesize to be filled.
-
-Pass the statesize members for sha1 and sha256, so we can probe
-the driver successfully again.
-
-Signed-off-by: Fabio Estevam <fabio.estevam@nxp.com>
----
- drivers/crypto/sahara.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
-index 9db09b6..c3f3d89 100644
---- a/drivers/crypto/sahara.c
-+++ b/drivers/crypto/sahara.c
-@@ -1259,6 +1259,7 @@ static struct ahash_alg sha_v3_algs[] = {
- 	.export		= sahara_sha_export,
- 	.import		= sahara_sha_import,
- 	.halg.digestsize	= SHA1_DIGEST_SIZE,
-+	.halg.statesize         = sizeof(struct sahara_sha_reqctx),
- 	.halg.base	= {
- 		.cra_name		= "sha1",
- 		.cra_driver_name	= "sahara-sha1",
-@@ -1286,6 +1287,7 @@ static struct ahash_alg sha_v4_algs[] = {
- 	.export		= sahara_sha_export,
- 	.import		= sahara_sha_import,
- 	.halg.digestsize	= SHA256_DIGEST_SIZE,
-+	.halg.statesize         = sizeof(struct sahara_sha_reqctx),
- 	.halg.base	= {
- 		.cra_name		= "sha256",
- 		.cra_driver_name	= "sahara-sha256",
+Thanks,
 -- 
-1.9.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
