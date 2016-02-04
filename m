@@ -1,48 +1,70 @@
-From: Joonsoo Kim <js1304@gmail.com>
-Subject: Re: [PATCH v2 04/10] crypto/compress: add asynchronous compression support
-Date: Thu, 4 Feb 2016 16:17:41 +0900
-Message-ID: <CAAmzW4NcXR+n5qeQh4NP7tJ-thhun_OE89WpLVAUnJ28U6n=3Q@mail.gmail.com>
-References: <1453796112-14273-1-git-send-email-iamjoonsoo.kim@lge.com>
-	<1453796112-14273-5-git-send-email-iamjoonsoo.kim@lge.com>
-	<20160127074140.GA30335@gondor.apana.org.au>
-	<56A878C9.8050202@intel.com>
-	<20160127080355.GA31330@gondor.apana.org.au>
-	<20160127080926.GA31516@gondor.apana.org.au>
-	<20160128031941.GA14467@js1304-P5Q-DELUXE>
-	<20160129100901.GA17272@gondor.apana.org.au>
-	<20160201021141.GA32125@js1304-P5Q-DELUXE>
-	<56B2C4A7.6060106@intel.com>
-	<20160204032850.GA2060@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "Li, Weigang" <weigang.li@intel.com>,
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-	Minchan Kim <minchan@kernel.org>,
-	Dan Streetman <ddstreet@ieee.org>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Marcus Meissner <meissner@suse.de>
+Subject: [PATCH] crypto: mark authenticated ctr(aes) also as FIPS able
+Date: Thu,  4 Feb 2016 15:30:26 +0100
+Message-ID: <1454596226-27843-1-git-send-email-meissner@suse.de>
+Cc: Marcus Meissner <meissner@suse.de>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f53.google.com ([209.85.218.53]:35385 "EHLO
-	mail-oi0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752003AbcBDHRm (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Feb 2016 02:17:42 -0500
-In-Reply-To: <20160204032850.GA2060@gondor.apana.org.au>
+Received: from mx2.suse.de ([195.135.220.15]:49173 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757104AbcBDOad (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 4 Feb 2016 09:30:33 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-2016-02-04 12:28 GMT+09:00 Herbert Xu <herbert@gondor.apana.org.au>:
-> On Thu, Feb 04, 2016 at 11:25:27AM +0800, Li, Weigang wrote:
->>
->> Please can you advise how to get the acomp patch accepted?
->
-> Can you do a posting of these patches without scomp so we can
-> evaluate the effects?
->
+Signed-off-by: Marcus Meissner <meissner@suse.de>
+---
+ crypto/testmgr.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Do you think not to merge scomp? Please let me know your overall
-plan about this.?
-
-Thanks.
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index ae8c57fd..ff6a799 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2143,6 +2143,10 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "authenc(hmac(sha1),ctr(aes))"
++		.test = alg_test_null,
++		.fips_allowed = 1,
++	}, {
+ 		.alg = "authenc(hmac(sha1),ecb(cipher_null))",
+ 		.test = alg_test_aead,
+ 		.suite = {
+@@ -2227,6 +2231,10 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "authenc(hmac(sha256),ctr(aes))"
++		.test = alg_test_null,
++		.fips_allowed = 1,
++	}, {
+ 		.alg = "authenc(hmac(sha384),cbc(des))",
+ 		.test = alg_test_aead,
+ 		.suite = {
+@@ -2253,6 +2261,10 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "authenc(hmac(sha384),ctr(aes))"
++		.test = alg_test_null,
++		.fips_allowed = 1,
++	}, {
+ 		.alg = "authenc(hmac(sha512),cbc(aes))",
+ 		.test = alg_test_aead,
+ 		.suite = {
+@@ -2292,6 +2304,10 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "authenc(hmac(sha512),ctr(aes))"
++		.test = alg_test_null,
++		.fips_allowed = 1,
++	}, {
+ 		.alg = "cbc(aes)",
+ 		.test = alg_test_skcipher,
+ 		.fips_allowed = 1,
+-- 
+2.1.4
