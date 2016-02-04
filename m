@@ -1,40 +1,59 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 5/6] staging: lustre: Use ahash
-Date: Thu, 4 Feb 2016 11:17:13 +0800
-Message-ID: <20160204031713.GB1782@gondor.apana.org.au>
-References: <20160201133405.GA10754@gondor.apana.org.au>
- <E1aQEez-0002pe-RL@gondolin.me.apana.org.au>
- <20160203224857.GA20244@kroah.com>
+From: "Li, Weigang" <weigang.li@intel.com>
+Subject: Re: [PATCH v2 04/10] crypto/compress: add asynchronous compression
+ support
+Date: Thu, 4 Feb 2016 11:25:27 +0800
+Message-ID: <56B2C4A7.6060106@intel.com>
+References: <1453796112-14273-1-git-send-email-iamjoonsoo.kim@lge.com>
+ <1453796112-14273-5-git-send-email-iamjoonsoo.kim@lge.com>
+ <20160127074140.GA30335@gondor.apana.org.au> <56A878C9.8050202@intel.com>
+ <20160127080355.GA31330@gondor.apana.org.au>
+ <20160127080926.GA31516@gondor.apana.org.au>
+ <20160128031941.GA14467@js1304-P5Q-DELUXE>
+ <20160129100901.GA17272@gondor.apana.org.au>
+ <20160201021141.GA32125@js1304-P5Q-DELUXE>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	devel@driverdev.osuosl.org
-To: Greg KH <greg@kroah.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	Minchan Kim <minchan@kernel.org>,
+	"Dan Streetman" <ddstreet@ieee.org>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+To: Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:34855 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965263AbcBDDRR (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Feb 2016 22:17:17 -0500
-Content-Disposition: inline
-In-Reply-To: <20160203224857.GA20244@kroah.com>
+Received: from mga04.intel.com ([192.55.52.120]:19279 "EHLO mga04.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753377AbcBDDZb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 3 Feb 2016 22:25:31 -0500
+In-Reply-To: <20160201021141.GA32125@js1304-P5Q-DELUXE>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Feb 03, 2016 at 02:48:57PM -0800, Greg KH wrote:
+On 2/1/2016 10:11 AM, Joonsoo Kim wrote:
+> On Fri, Jan 29, 2016 at 06:09:01PM +0800, Herbert Xu wrote:
+>> On Thu, Jan 28, 2016 at 12:19:42PM +0900, Joonsoo Kim wrote:
+>>>
+>>> I have tested asynchronous compression APIs in zram and I saw
+>>> regression. Atomic allocation and setting up SG lists are culprit
+>>> for this regression. Moreover, zram optimizes linearisation
+>>
+>> So which is it, atomic allocations or setting up SG lists? There
+>> is nothing in acomp that requires you to do an atomic allocation.
 >
-> This change breaks the build for me so I can't take this through my
-> tree.  I'm hoping you have a patch earlier in the series that adds these
-> functions, if so, feel free to take this through your tree:
-
-Sorry I should've CCed you on the earlier patches in the series too.
-But yes it would be easier to take this through the cryptodev tree
-as a later patch removes the crypto_hash interface.
-
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Atomic allocation are called for linearisation when needed. Zram's
+> compressed content is usually stored in two physically separate pages
+> so linearisation is needed. See scomp_map().
+>
+> Setting up SG lists means that to use acomp, sg_init_table(),
+> sg_set_page() are need to be called by zram unlike the case just
+> passing the pointer based buffer.
+>
+> Thanks.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+Hello Herbert & Joonsoo,
+Please can you advise how to get the acomp patch accepted?
