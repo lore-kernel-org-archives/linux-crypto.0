@@ -1,18 +1,14 @@
 From: Marcus Meissner <meissner@suse.de>
-Subject: [PATCH 2/2] crypto: testmgr: mark more algorithms as FIPS compliant
-Date: Fri,  5 Feb 2016 14:22:25 +0100
-Message-ID: <1454678545-7420-1-git-send-email-meissner@suse.de>
+Subject: [PATCH] crypto: testmgr: mark more algorithms as FIPS compliant
+Date: Fri,  5 Feb 2016 14:23:33 +0100
+Message-ID: <1454678613-28937-1-git-send-email-meissner@suse.de>
 Cc: Marcus Meissner <meissner@suse.de>
 To: herbert@gondor.apana.org.au, davem@davemloft.net,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	smueller@chronox.de
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:43577 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752096AbcBENW3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Feb 2016 08:22:29 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 Some more authenc() wrapped algorithms are FIPS compliant, tag
 them as such.
