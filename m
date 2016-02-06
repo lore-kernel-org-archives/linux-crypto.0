@@ -1,30 +1,34 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: RSA decryption output length
-Date: Fri, 5 Feb 2016 09:45:57 -0800
-Message-ID: <56B4DFD5.6010600@intel.com>
-References: <VI1PR04MB1311DE5E1DE2E2B818797450B8D20@VI1PR04MB1311.eurprd04.prod.outlook.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: user - lock crypto_alg_list on alg dump
+Date: Sat, 6 Feb 2016 15:45:52 +0800
+Message-ID: <20160206074552.GA22220@gondor.apana.org.au>
+References: <1454333250-21370-1-git-send-email-minipli@googlemail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-To: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	PaX Team <pageexec@freemail.hu>
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:36138 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932138AbcBERuB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Feb 2016 12:50:01 -0500
-In-Reply-To: <VI1PR04MB1311DE5E1DE2E2B818797450B8D20@VI1PR04MB1311.eurprd04.prod.outlook.com>
+Received: from helcar.hengli.com.au ([209.40.204.226]:43174 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750831AbcBFHqD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 6 Feb 2016 02:46:03 -0500
+Content-Disposition: inline
+In-Reply-To: <1454333250-21370-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Tudor-Dan,
-On 02/05/2016 07:25 AM, Tudor-Dan Ambarus wrote:
-> I see that in qat, if the RSA decryption output data has the first octets of value zero, you skip them, actualize the dst_len and memmove the decrypted data to the initial pointer (see [1]). Why do you do this? Why can't you keep the decryption output data of key length?
+On Mon, Feb 01, 2016 at 02:27:30PM +0100, Mathias Krause wrote:
+> We miss to take the crypto_alg_sem semaphore when traversing the
+> crypto_alg_list for CRYPTO_MSG_GETALG dumps. This allows a race with
+> crypto_unregister_alg() removing algorithms from the list while we're
+> still traversing it, thereby leading to a use-after-free as show below:
 
-This is because the SW RSA implementation works the same way.
-MPI lib also discards the leading zeros.
-The two implementations have to produce the same output for a given input.
-Thanks,
-
+Applied to crypto.  Thanks!
 -- 
-TS
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
