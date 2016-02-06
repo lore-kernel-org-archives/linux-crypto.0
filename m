@@ -1,31 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] fix out of bound read in __test_aead()
-Date: Sat, 6 Feb 2016 15:48:14 +0800
-Message-ID: <20160206074813.GI22220@gondor.apana.org.au>
-References: <1454073009-13665-1-git-send-email-jmarchan@redhat.com>
- <1454504292-17882-1-git-send-email-jmarchan@redhat.com>
+Subject: Re: [PATCH v3 1/3] crypto: sahara - remove unneeded mutex in the
+ exported state
+Date: Sat, 6 Feb 2016 15:48:02 +0800
+Message-ID: <20160206074802.GH22220@gondor.apana.org.au>
+References: <1454503612-21344-1-git-send-email-fabio.estevam@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Jerome Marchand <jmarchan@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: s.trumtrar@pengutronix.de, marex@denx.de, linux@arm.linux.org.uk,
+	linux-crypto@vger.kernel.org
+To: Fabio Estevam <fabio.estevam@nxp.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:47271 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751335AbcBFHsX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 6 Feb 2016 02:48:23 -0500
 Content-Disposition: inline
-In-Reply-To: <1454504292-17882-1-git-send-email-jmarchan@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1454503612-21344-1-git-send-email-fabio.estevam@nxp.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Feb 03, 2016 at 01:58:12PM +0100, Jerome Marchand wrote:
-> __test_aead() reads MAX_IVLEN bytes from template[i].iv, but the
-> actual length of the initialisation vector can be shorter.
-> The length of the IV is already calculated earlier in the
-> function. Let's just reuses that. Also the IV length is currently
-> calculated several time for no reason. Let's fix that too.
-> This fix an out-of-bound error detected by KASan.
+On Wed, Feb 03, 2016 at 10:46:50AM -0200, Fabio Estevam wrote:
+> As pointed out by Herbert Xu we should not include the mutex in the
+> exported state, so let's just get rid of it.
 > 
-> Signed-off-by: Jerome Marchand <jmarchan@redhat.com>
+> Signed-off-by: Fabio Estevam <fabio.estevam@nxp.com>
 
-Applied.
+All applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
