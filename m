@@ -1,242 +1,52 @@
-From: Joshua Henderson <joshua.henderson@microchip.com>
-Subject: [PATCH v2 2/2] rng: pic32-rng: Add PIC32 RNG hardware driver
-Date: Mon, 8 Feb 2016 14:17:53 -0700
-Message-ID: <1454966283-14965-2-git-send-email-joshua.henderson@microchip.com>
-References: <1454966283-14965-1-git-send-email-joshua.henderson@microchip.com>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: Transferring applied X.509 patches from crypto/next to
+ security/next
+Date: Mon, 08 Feb 2016 16:25:57 -0500
+Message-ID: <1454966757.3037.41.camel@linux.vnet.ibm.com>
+References: <20160206142705.GA23978@gondor.apana.org.au>
+	 <20160206074731.GF22220@gondor.apana.org.au>
+	 <20160202180848.2887.9937.stgit@tstruk-mobl1>
+	 <11215.1454752821@warthog.procyon.org.uk>
+	 <25680.1454939914@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Joshua Henderson <joshua.henderson@microchip.com>,
-	Purna Chandra Mandal <purna.mandal@microchip.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>,
-	Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Kieran Bingham <kieranbingham@gmail.com>,
-	Lee Jones <lee.jones@linaro.org>,
-	Pankaj Dev <pankaj.dev@st.com>,
-	Scott Branden <sbranden@broadcom.com>,
-	Daniel Thompson <daniel.thompson@linaro.org>,
-	Ray Jui <rjui@broadcom.com>, <linux-crypto@vger.kernel.org>
-To: <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1454966283-14965-1-git-send-email-joshua.henderson@microchip.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, jmorris@namei.org,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e28smtp08.in.ibm.com ([125.16.236.8]:40863 "EHLO
+	e28smtp08.in.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755478AbcBHV0N (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 8 Feb 2016 16:26:13 -0500
+Received: from localhost
+	by e28smtp08.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
+	Tue, 9 Feb 2016 02:56:08 +0530
+In-Reply-To: <25680.1454939914@warthog.procyon.org.uk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Add support for the hardware true random number generator
-peripheral found on PIC32.
+Hi Herbert,
 
-Signed-off-by: Joshua Henderson <joshua.henderson@microchip.com>
-Signed-off-by: Purna Chandra Mandal <purna.mandal@microchip.com>
----
-Changes since v1:
-	- Reorder includes to be alphabetic.
-	- Drop use of PRNG and only use TRNG.
-	- Fix dangling clock ref in error condition.
-	- Remove unecessary error handling and fix other cases.
----
- drivers/char/hw_random/Kconfig     |   13 +++
- drivers/char/hw_random/Makefile    |    1 +
- drivers/char/hw_random/pic32-rng.c |  155 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 169 insertions(+)
- create mode 100644 drivers/char/hw_random/pic32-rng.c
+On Mon, 2016-02-08 at 13:58 +0000, David Howells wrote:
+> Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> 
+> > > Hmmm...  That means that the crypto branch and the security branch are going
+> > > to conflict.
+> > 
+> > I thought you were OK with it going in now as you said that you'll
+> > fix it up later.  Sorry for the misunderstanding.  Do you want me to
+> > revert?
+> 
+> If you can back them out, I'll apply them to my keys-next branch.  Unless
+> James is willing to rebase security/next on top of your crypto branch?
 
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index dbf2271..3ab0c46 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -381,6 +381,19 @@ config HW_RANDOM_STM32
- 
- 	  If unsure, say N.
- 
-+config HW_RANDOM_PIC32
-+	tristate "Microchip PIC32 Random Number Generator support"
-+	depends on HW_RANDOM && MACH_PIC32
-+	default y
-+	---help---
-+	  This driver provides kernel-side support for the Random Number
-+	  Generator hardware found on a PIC32.
-+
-+	  To compile this driver as a module, choose M here. the
-+	  module will be called pic32-rng.
-+
-+	  If unsure, say Y.
-+
- endif # HW_RANDOM
- 
- config UML_RANDOM
-diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-index 5ad3976..f5a6fa7 100644
---- a/drivers/char/hw_random/Makefile
-+++ b/drivers/char/hw_random/Makefile
-@@ -33,3 +33,4 @@ obj-$(CONFIG_HW_RANDOM_MSM) += msm-rng.o
- obj-$(CONFIG_HW_RANDOM_ST) += st-rng.o
- obj-$(CONFIG_HW_RANDOM_XGENE) += xgene-rng.o
- obj-$(CONFIG_HW_RANDOM_STM32) += stm32-rng.o
-+obj-$(CONFIG_HW_RANDOM_PIC32) += pic32-rng.o
-diff --git a/drivers/char/hw_random/pic32-rng.c b/drivers/char/hw_random/pic32-rng.c
-new file mode 100644
-index 0000000..108897b
---- /dev/null
-+++ b/drivers/char/hw_random/pic32-rng.c
-@@ -0,0 +1,155 @@
-+/*
-+ * PIC32 RNG driver
-+ *
-+ * Joshua Henderson <joshua.henderson@microchip.com>
-+ * Copyright (C) 2016 Microchip Technology Inc.  All rights reserved.
-+ *
-+ * This program is free software; you can distribute it and/or modify it
-+ * under the terms of the GNU General Public License (Version 2) as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-+ * for more details.
-+ */
-+
-+#include <linux/clk.h>
-+#include <linux/clkdev.h>
-+#include <linux/err.h>
-+#include <linux/hw_random.h>
-+#include <linux/io.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/of_device.h>
-+#include <linux/platform_device.h>
-+#include <linux/slab.h>
-+
-+#define RNGCON		0x04
-+#define  TRNGEN		BIT(8)
-+#define  PRNGEN		BIT(9)
-+#define  PRNGCONT	BIT(10)
-+#define  TRNGMOD	BIT(11)
-+#define  SEEDLOAD	BIT(12)
-+#define RNGPOLY1	0x08
-+#define RNGPOLY2	0x0C
-+#define RNGNUMGEN1	0x10
-+#define RNGNUMGEN2	0x14
-+#define RNGSEED1	0x18
-+#define RNGSEED2	0x1C
-+#define RNGRCNT		0x20
-+#define  RCNT_MASK	0x7F
-+
-+struct pic32_rng {
-+	void __iomem	*base;
-+	struct hwrng	rng;
-+	struct clk	*clk;
-+};
-+
-+/*
-+ * The TRNG can generate up to 24Mbps. This is a timeout that should be safe
-+ * enough given the instructions in the loop and that the TRNG may not always
-+ * be at maximum rate.
-+ */
-+#define RNG_TIMEOUT 500
-+
-+static int pic32_rng_read(struct hwrng *rng, void *buf, size_t max,
-+			  bool wait)
-+{
-+	struct pic32_rng *priv = container_of(rng, struct pic32_rng, rng);
-+	u64 *data = buf;
-+	u32 t;
-+	unsigned int timeout = RNG_TIMEOUT;
-+
-+	if (max < 8)
-+		return 0;
-+
-+	do {
-+		t = readl(priv->base + RNGRCNT) & RCNT_MASK;
-+		if (t == 64) {
-+			/* TRNG value comes through the seed registers */
-+			*data = ((u64)readl(priv->base + RNGSEED2) << 32) +
-+				readl(priv->base + RNGSEED1);
-+			return 8;
-+		}
-+	} while (wait && --timeout);
-+
-+	return -EIO;
-+}
-+
-+static int pic32_rng_probe(struct platform_device *pdev)
-+{
-+	struct pic32_rng *priv;
-+	struct resource *res;
-+	u32 v;
-+	int ret;
-+
-+	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-+	priv->base = devm_ioremap_resource(&pdev->dev, res);
-+	if (IS_ERR(priv->base))
-+		return PTR_ERR(priv->base);
-+
-+	priv->clk = devm_clk_get(&pdev->dev, NULL);
-+	if (IS_ERR(priv->clk))
-+		return PTR_ERR(priv->clk);
-+
-+	ret = clk_prepare_enable(priv->clk);
-+	if (ret)
-+		return ret;
-+
-+	/* enable TRNG in enhanced mode */
-+	v = TRNGEN | TRNGMOD;
-+	writel(v, priv->base + RNGCON);
-+
-+	priv->rng.name = pdev->name;
-+	priv->rng.read = pic32_rng_read;
-+
-+	ret = hwrng_register(&priv->rng);
-+	if (ret)
-+		goto err_register;
-+
-+	platform_set_drvdata(pdev, priv);
-+
-+	return 0;
-+
-+err_register:
-+	clk_disable_unprepare(priv->clk);
-+	return ret;
-+}
-+
-+static int pic32_rng_remove(struct platform_device *pdev)
-+{
-+	struct pic32_rng *rng = platform_get_drvdata(pdev);
-+
-+	hwrng_unregister(&rng->rng);
-+	writel(0, rng->base + RNGCON);
-+	clk_disable_unprepare(rng->clk);
-+	return 0;
-+}
-+
-+static const struct of_device_id pic32_rng_of_match[] = {
-+	{ .compatible	= "microchip,pic32mzda-rng", },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, pic32_rng_of_match);
-+
-+static struct platform_driver pic32_rng_driver = {
-+	.probe		= pic32_rng_probe,
-+	.remove		= pic32_rng_remove,
-+	.driver		= {
-+		.name	= "pic32-rng",
-+		.owner	= THIS_MODULE,
-+		.of_match_table = of_match_ptr(pic32_rng_of_match),
-+	},
-+};
-+
-+module_platform_driver(pic32_rng_driver);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Joshua Henderson <joshua.henderson@microchip.com>");
-+MODULE_DESCRIPTION("Microchip PIC32 RNG Driver");
--- 
-1.7.9.5
+Could we upstream these patches via James' tree?  If you re-base these
+patches on top of the James' security-next branch and send him a pull
+request, we can then base on our patches on top of them.
+
+Mimi
