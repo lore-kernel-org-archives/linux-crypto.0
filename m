@@ -1,75 +1,217 @@
-From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH 2/2] crypto: atmel-sha - fix race in atmel_sha_final()
-Date: Mon, 8 Feb 2016 16:26:49 +0100
-Message-ID: <bb132102ffbea635f08e583ca43e064924e11714.1454944687.git.cyrille.pitchen@atmel.com>
-References: <cover.1454944687.git.cyrille.pitchen@atmel.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	Cyrille Pitchen <cyrille.pitchen@atmel.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<nicolas.ferre@atmel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <cover.1454944687.git.cyrille.pitchen@atmel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH 2/2] crypto: extended acomp api for supporting deflate algorithm parameters
+Date: Mon,  8 Feb 2016 16:10:03 +0000
+Message-ID: <1454947803-30644-3-git-send-email-giovanni.cabiddu@intel.com>
+References: <1454947803-30644-1-git-send-email-giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:36346 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755611AbcBHQKN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 8 Feb 2016 11:10:13 -0500
+In-Reply-To: <1454947803-30644-1-git-send-email-giovanni.cabiddu@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-When (!ctx->bufcnt && !(ctx->flags & SHA_FLAGS_PAD)), the former source
-code used to set the SHA_FLAGS_BUSY without checking whether this flag was
-already set. If so, the hardware is already processing another hash
-request so the processing of the req argument of atmel_sha_final() should
-be delayed by queueing this request, the same way as done for the
-(ctx->bufcnt != 0) case.
-
-Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/atmel-sha.c | 24 ++----------------------
- 1 file changed, 2 insertions(+), 22 deletions(-)
+ crypto/acompress.c                  |   16 +++++
+ include/crypto/acompress.h          |  116 +++++++++++++++++++++++++++++++++++
+ include/crypto/internal/acompress.h |   24 +++++++
+ 3 files changed, 156 insertions(+), 0 deletions(-)
 
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 7d27f96cdf02..596e489a4ca9 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -979,37 +979,17 @@ static int atmel_sha_update(struct ahash_request *req)
- static int atmel_sha_final(struct ahash_request *req)
- {
- 	struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
--	struct atmel_sha_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
--	struct atmel_sha_dev *dd = tctx->dd;
--
--	int err = 0;
+diff --git a/crypto/acompress.c b/crypto/acompress.c
+index 4c54ec9..37acc9d 100644
+--- a/crypto/acompress.c
++++ b/crypto/acompress.c
+@@ -114,5 +114,21 @@ int crypto_unregister_acomp(struct acomp_alg *alg)
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_acomp);
  
- 	ctx->flags |= SHA_FLAGS_FINUP;
++int crypto_register_acomp_deflate(struct acomp_deflate_alg *deflate_alg)
++{
++	struct acomp_alg *alg = &deflate_alg->base;
++
++	return crypto_register_acomp(alg);
++}
++EXPORT_SYMBOL_GPL(crypto_register_acomp_deflate);
++
++int crypto_unregister_acomp_deflate(struct acomp_deflate_alg *deflate_alg)
++{
++	struct acomp_alg *alg = &deflate_alg->base;
++
++	return crypto_unregister_acomp(alg);
++}
++EXPORT_SYMBOL_GPL(crypto_unregister_acomp_deflate);
++
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Asynchronous compression type");
+diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+index d562665..831964d 100644
+--- a/include/crypto/acompress.h
++++ b/include/crypto/acompress.h
+@@ -78,6 +78,22 @@ struct acomp_alg {
+ };
  
- 	if (ctx->flags & SHA_FLAGS_ERROR)
- 		return 0; /* uncompleted hash is not needed */
- 
--	if (ctx->bufcnt) {
--		return atmel_sha_enqueue(req, SHA_OP_FINAL);
--	} else if (!(ctx->flags & SHA_FLAGS_PAD)) { /* add padding */
--		err = atmel_sha_hw_init(dd);
--		if (err)
--			goto err1;
--
--		dd->req = req;
--		dd->flags |= SHA_FLAGS_BUSY;
--		err = atmel_sha_final_req(dd);
--	} else {
-+	if (ctx->flags & SHA_FLAGS_PAD)
- 		/* copy ready hash (+ finalize hmac) */
- 		return atmel_sha_finish(req);
--	}
--
--err1:
--	if (err != -EINPROGRESS)
--		/* done_task will not finish it, so do it here */
--		atmel_sha_finish_req(req, err);
- 
--	return err;
-+	return atmel_sha_enqueue(req, SHA_OP_FINAL);
+ /**
++ * struct acomp_deflate_alg - asynchronous deflate compression algorithm
++ *
++ * @compress_setup:	Configures the compressor
++ *		This function configures a deflate compressor. Input parameters
++ *		are encoded in netlink format. Allowed parameters are defined
++ *		by the acomp_deflate_params enum.
++ *
++ * @base:	Generic acomp algorithm data structure
++ */
++struct acomp_deflate_alg {
++	int (*compress_setup)(struct crypto_acomp *tfm, const void *params,
++				      unsigned int len);
++	struct acomp_alg base;
++};
++
++/**
+  * DOC: Asynchronous Compression API
+  *
+  * The Asynchronous Compression API is used with the algorithms of type
+@@ -260,4 +276,104 @@ static inline int crypto_acomp_decompress(struct acomp_req *req)
+ 	return alg->decompress(req);
  }
  
- static int atmel_sha_finup(struct ahash_request *req)
++/**
++ * acomp_deflate_compression_levels -- Supported list of compression levels
++ *
++ * Lower values will result in less compressibility in less time
++ */
++enum acomp_deflate_compression_levels {
++	ACOMP_DEFLATE_COMP_LEVEL_DEFAULT = (-1),
++	ACOMP_DEFLATE_COMP_LEVEL_NO_COMPRESSION = 0,
++	ACOMP_DEFLATE_COMP_LEVEL_1 = 1,
++	ACOMP_DEFLATE_COMP_LEVEL_2 = 2,
++	ACOMP_DEFLATE_COMP_LEVEL_3 = 3,
++	ACOMP_DEFLATE_COMP_LEVEL_4 = 4,
++	ACOMP_DEFLATE_COMP_LEVEL_5 = 5,
++	ACOMP_DEFLATE_COMP_LEVEL_6 = 6,
++	ACOMP_DEFLATE_COMP_LEVEL_7 = 7,
++	ACOMP_DEFLATE_COMP_LEVEL_8 = 8,
++	ACOMP_DEFLATE_COMP_LEVEL_9 = 9
++};
++
++/**
++ * acomp_deflate_huff_types -- Supported list of Huffman Tree types
++ *
++ * Specifies the Huffman tree type for the deflate algorithm
++ *
++ * ACOMP_DEFLATE_HT_DEFAULT:	default encoding
++ * ACOMP_DEFLATE_HT_STATIC:	compressor generates blocks
++ *		"compressed with fixed Huffman trees" as defined by RFC 1951
++ * ACOMP_DEFLATE_HT_FULL_DYNAMIC:	compressor generates blocks
++ *		"compressed with dynamic Huffman codes" as defined by RFC 1951
++ */
++enum acomp_deflate_huff_type {
++	ACOMP_DEFLATE_HT_DEFAULT,
++	ACOMP_DEFLATE_HT_STATIC,
++	ACOMP_DEFLATE_HT_FULL_DYNAMIC
++};
++
++/**
++ * acomp_deflate_format_type -- Supported format types
++ *
++ * Specifies the format output
++ *
++ * ACOMP_DEFLATE_HF_RAW:	output is raw deflate as defined by RFC 1951,
++ *		no header and no trailer
++ * ACOMP_DEFLATE_HF_ZLIB:	output is in compliance with RFC 1950,
++ *		i.e. the deflate stream starts and finishes with a zlib header
++ *		and footer
++ * ACOMP_DEFLATE_HF_GZIP:	output is in compliance with RFC 1952,
++ *		i.e. the deflate stream starts and finishes with a gzip header
++ *		and footer
++ */
++enum acomp_deflate_header_type {
++	ACOMP_DEFLATE_FORMAT_RAW,
++	ACOMP_DEFLATE_FORMAT_ZLIB,
++	ACOMP_DEFLATE_FORMAT_GZIP
++};
++
++/**
++ * acomp_deflate_params -- Allowed deflate parameters
++ *
++ * ACOMP_DEFLATE_COMP_LEVEL:	compression level, an integer
++ *		between -1 and 9.  The allowed list of values is specified by
++ *		acomp_deflate_compression_levels
++ * ACOMP_DEFLATE_HUFF_TYPE:	Huffman encoding, allowed values
++ *		are specified by acomp_deflate_huff_type
++ * ACOMP_DEFLATE_WINDOWS_SIZE:	base two logarithm of the size of the
++ *		history buffer. Allowed values are in the range 8..15
++ * ACOMP_DEFLATE_FORMAT_TYPE:	specifies the format type, allowed
++ *		values are specified by acomp_deflate_header_type
++ */
++enum acomp_deflate_params {
++	ACOMP_DEFLATE_COMP_LEVEL = 1,
++	ACOMP_DEFLATE_HUFF_TYPE,
++	ACOMP_DEFLATE_WINDOWS_SIZE,
++	ACOMP_DEFLATE_FORMAT_TYPE,
++	__ACOMP_DEFLATE_MAX,
++};
++
++#define ACOMP_DEFLATE_PARAMS_MAX	(__ACOMP_DEFLATE_MAX - 1)
++
++/**
++ * crypto_acomp_deflate_compress_setup() -- Invoke compressor setup
++ *
++ * Function invokes the deflate compress setup operation
++ *
++ * @tfm:	ACOMPRESS tfm handle
++ * @params:	compressor input parameters in netlink format.
++ *			Allowed parameters are defined by acomp_deflate_params
++ * @len:	size of the parameters
++ *
++ * Return: zero on success; error code in case of error
++ */
++static inline int crypto_acomp_deflate_compress_setup(
++					  struct crypto_acomp *tfm,
++					  const void *params, unsigned int len)
++{
++	struct acomp_alg *alg = crypto_acomp_alg(tfm);
++	struct acomp_deflate_alg *deflate_alg =
++			container_of(alg, struct acomp_deflate_alg, base);
++	return deflate_alg->compress_setup(tfm, params, len);
++}
+ #endif
+diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
+index 2061532..8218c8f 100644
+--- a/include/crypto/internal/acompress.h
++++ b/include/crypto/internal/acompress.h
+@@ -63,4 +63,28 @@ int crypto_register_acomp(struct acomp_alg *alg);
+  */
+ int crypto_unregister_acomp(struct acomp_alg *alg);
+ 
++/**
++ * crypto_register_acomp_deflate() -- Register async deflate algorithm
++ *
++ * Function registers an implementation of an asynchronous deflate
++ * compression algorithm
++ *
++ * @alg:	algorithm definition
++ *
++ * Return: zero on success; error code in case of error
++ */
++int crypto_register_acomp_deflate(struct acomp_deflate_alg *deflate_alg);
++
++/**
++ * crypto_unregister_acomp_deflate() -- Unregister async deflate algorithm
++ *
++ * Function unregisters an implementation of an asynchronous deflate
++ * compression algorithm
++ *
++ * @alg:	algorithm definition
++ *
++ * Return: zero on success; error code in case of error
++ */
++int crypto_unregister_acomp_deflate(struct acomp_deflate_alg *deflate_alg);
++
+ #endif
 -- 
-1.8.2.2
+1.7.4.1
