@@ -1,52 +1,59 @@
-From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: Transferring applied X.509 patches from crypto/next to
- security/next
-Date: Mon, 08 Feb 2016 16:25:57 -0500
-Message-ID: <1454966757.3037.41.camel@linux.vnet.ibm.com>
-References: <20160206142705.GA23978@gondor.apana.org.au>
-	 <20160206074731.GF22220@gondor.apana.org.au>
-	 <20160202180848.2887.9937.stgit@tstruk-mobl1>
-	 <11215.1454752821@warthog.procyon.org.uk>
-	 <25680.1454939914@warthog.procyon.org.uk>
+From: Daniel Thompson <daniel.thompson@linaro.org>
+Subject: Re: [PATCH v2 2/2] rng: pic32-rng: Add PIC32 RNG hardware driver
+Date: Mon, 8 Feb 2016 21:34:07 +0000
+Message-ID: <20160208213407.GA9389@wychelm.lan>
+References: <1454966283-14965-1-git-send-email-joshua.henderson@microchip.com>
+ <1454966283-14965-2-git-send-email-joshua.henderson@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, jmorris@namei.org,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Purna Chandra Mandal <purna.mandal@microchip.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>,
+	Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Kieran Bingham <kieranbingham@gmail.com>,
+	Lee Jones <lee.jones@linaro.org>,
+	Pankaj Dev <pankaj.dev@st.com>,
+	Scott Branden <sbranden@broadcom.com>,
+	Ray Jui <rjui@broadcom.com>, linux-crypto@vger.kernel.org
+To: Joshua Henderson <joshua.henderson@microchip.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e28smtp08.in.ibm.com ([125.16.236.8]:40863 "EHLO
-	e28smtp08.in.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755478AbcBHV0N (ORCPT
+Received: from mail-wm0-f46.google.com ([74.125.82.46]:33947 "EHLO
+	mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755273AbcBHVeM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Feb 2016 16:26:13 -0500
-Received: from localhost
-	by e28smtp08.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
-	Tue, 9 Feb 2016 02:56:08 +0530
-In-Reply-To: <25680.1454939914@warthog.procyon.org.uk>
+	Mon, 8 Feb 2016 16:34:12 -0500
+Received: by mail-wm0-f46.google.com with SMTP id 128so172780060wmz.1
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Feb 2016 13:34:12 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <1454966283-14965-2-git-send-email-joshua.henderson@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
-
-On Mon, 2016-02-08 at 13:58 +0000, David Howells wrote:
-> Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Mon, Feb 08, 2016 at 02:17:53PM -0700, Joshua Henderson wrote:
+> Add support for the hardware true random number generator
+> peripheral found on PIC32.
 > 
-> > > Hmmm...  That means that the crypto branch and the security branch are going
-> > > to conflict.
-> > 
-> > I thought you were OK with it going in now as you said that you'll
-> > fix it up later.  Sorry for the misunderstanding.  Do you want me to
-> > revert?
-> 
-> If you can back them out, I'll apply them to my keys-next branch.  Unless
-> James is willing to rebase security/next on top of your crypto branch?
+> Signed-off-by: Joshua Henderson <joshua.henderson@microchip.com>
+> Signed-off-by: Purna Chandra Mandal <purna.mandal@microchip.com>
 
-Could we upstream these patches via James' tree?  If you re-base these
-patches on top of the James' security-next branch and send him a pull
-request, we can then base on our patches on top of them.
+Reviewed-by: Daniel Thompson <daniel.thompson@linaro.org>
 
-Mimi
+> ---
+> Changes since v1:
+> 	- Reorder includes to be alphabetic.
+> 	- Drop use of PRNG and only use TRNG.
+
+Excellent!
+
+
+
+> 	- Fix dangling clock ref in error condition.
+> 	- Remove unecessary error handling and fix other cases.
+
+
+Daniel.
