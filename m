@@ -1,76 +1,337 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: fips: allow more ipsec related methods
-Date: Tue, 09 Feb 2016 14:44:59 +0100
-Message-ID: <2476935.g0THXc6DOC@tauon.atsec.com>
-References: <1455010357-1295-1-git-send-email-meissner@suse.de>
+Subject: [PATCH v2] crypto: xts - consolidate sanity check for keys
+Date: Tue, 09 Feb 2016 15:37:47 +0100
+Message-ID: <15158977.dkvNB9OP41@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Marcus Meissner <meissner@suse.de>
+Cc: linux-crypto@vger.kernel.org, ard.biesheuvel@linaro.org,
+	stockhausen@collogia.de, jang@de.ibm.com, ying.huang@intel.com,
+	jussi.kivilinna@mbnet.fi,
+	Johannes.Goetzfried@informatik.stud.uni-erlangen.de,
+	rsnel@cube.dyndns.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:33002 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:33022 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756748AbcBINpI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Feb 2016 08:45:08 -0500
-In-Reply-To: <1455010357-1295-1-git-send-email-meissner@suse.de>
+	id S1754339AbcBIOh4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Feb 2016 09:37:56 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 9. Februar 2016, 10:32:37 schrieb Marcus Meissner:
+Hi,
 
-Hi Marcus,
+Changes v2: remove comment and remove FIPS ifdefs as requested by Ard
+Biesheuvel
 
->IPSEC for aes-ctr requests:
->
->	authenc(digest_null,rfc3686(ctr(aes)))
->
->which can be used in FIPS mode.
->
->rfc3686(ctr(aes)) is already allowed for FIPS usage.
->
->I also allowed "digest_null" for FIPS usage.
->
->Signed-off-by: Marcus Meissner <meissner@suse.de>
+---8<---
 
-I am sorry, but I would say NACK here.
+The patch centralizes the XTS key check logic into the service function
+xts_check_key which is invoked from the different XTS implementations.
+With this, the XTS implementations in ARM, ARM64, PPC and S390 have now
+a sanity check for the XTS keys similar to the other arches.
 
-The reason is that the authenc() ciphers are AEAD ciphers. Such ciphers are 
-defined to be allowed for FIPS 140-2 usage in SP800-38F. But that SP only 
-allows ciphers if there is an authentication (i.e. a MAC) involved. With the 
-added authenc() algo, there seems to be no MAC.
+In addition, this service function received a check to ensure that the
+key != the tweak key which is mandated by FIPS 140-2 IG A.9. As the
+check is not present in the standards defining XTS, it is only enforced
+in FIPS mode of the kernel.
 
-In addition, the NULL cipher definitely cannot be considered allowed in FIPS 
-mode.
->---
-> crypto/testmgr.c | 5 +++++
-> 1 file changed, 5 insertions(+)
->
->diff --git a/crypto/testmgr.c b/crypto/testmgr.c
->index 190a290..6ad8ba2 100644
->--- a/crypto/testmgr.c
->+++ b/crypto/testmgr.c
->@@ -2089,6 +2089,10 @@ static const struct alg_test_desc alg_test_descs[] = {
->}
-> 		}
-> 	}, {
->+		.alg = "authenc(digest_null,rfc3686(ctr(aes)))",
->+		.test = alg_test_null,
->+		.fips_allowed = 1,
->+	}, {
-> 		.alg = "authenc(hmac(md5),ecb(cipher_null))",
-> 		.test = alg_test_aead,
-> 		.suite = {
->@@ -2768,6 +2772,7 @@ static const struct alg_test_desc alg_test_descs[] = {
-> 	}, {
-> 		.alg = "digest_null",
-> 		.test = alg_test_null,
->+		.fips_allowed = 1,
-> 	}, {
-> 		.alg = "drbg_nopr_ctr_aes128",
-> 		.test = alg_test_drbg,
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ arch/arm/crypto/aes-ce-glue.c       |  4 ++++
+ arch/arm/crypto/aesbs-glue.c        |  5 +++++
+ arch/arm64/crypto/aes-glue.c        |  4 ++++
+ arch/powerpc/crypto/aes-spe-glue.c  |  5 +++++
+ arch/s390/crypto/aes_s390.c         |  5 +++++
+ arch/x86/crypto/aesni-intel_glue.c  | 11 +++--------
+ arch/x86/crypto/camellia_glue.c     | 10 +++-------
+ arch/x86/crypto/cast6_avx_glue.c    | 10 +++-------
+ arch/x86/crypto/serpent_avx_glue.c  | 11 +++--------
+ arch/x86/crypto/serpent_sse2_glue.c | 11 +++--------
+ arch/x86/crypto/twofish_glue_3way.c | 10 +++-------
+ crypto/xts.c                        | 11 +++--------
+ include/crypto/xts.h                | 27 +++++++++++++++++++++++++++
+ 13 files changed, 71 insertions(+), 53 deletions(-)
 
-
-Ciao
-Stephan
+diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
+index b445a5d..85ff69b 100644
+--- a/arch/arm/crypto/aes-ce-glue.c
++++ b/arch/arm/crypto/aes-ce-glue.c
+@@ -152,6 +152,10 @@ static int xts_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 	struct crypto_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	int ret;
+ 
++	ret = xts_check_key(tfm, in_key, key_len);
++	if (ret)
++		return ret;
++
+ 	ret = ce_aes_expandkey(&ctx->key1, in_key, key_len / 2);
+ 	if (!ret)
+ 		ret = ce_aes_expandkey(&ctx->key2, &in_key[key_len / 2],
+diff --git a/arch/arm/crypto/aesbs-glue.c b/arch/arm/crypto/aesbs-glue.c
+index 6d68529..d004bd1 100644
+--- a/arch/arm/crypto/aesbs-glue.c
++++ b/arch/arm/crypto/aesbs-glue.c
+@@ -89,6 +89,11 @@ static int aesbs_xts_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ {
+ 	struct aesbs_xts_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	int bits = key_len * 4;
++	int err;
++
++	err = xts_check_key(tfm, in_key, key_len);
++	if (err)
++		return err;
+ 
+ 	if (private_AES_set_encrypt_key(in_key, bits, &ctx->enc.rk)) {
+ 		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index 05d9e16..c963d75 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -85,6 +85,10 @@ static int xts_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 	struct crypto_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	int ret;
+ 
++	ret = xts_check_key(tfm, in_key, key_len);
++	if (ret)
++		return ret;
++
+ 	ret = aes_expandkey(&ctx->key1, in_key, key_len / 2);
+ 	if (!ret)
+ 		ret = aes_expandkey(&ctx->key2, &in_key[key_len / 2],
+diff --git a/arch/powerpc/crypto/aes-spe-glue.c b/arch/powerpc/crypto/aes-spe-glue.c
+index 93ee046..1608079 100644
+--- a/arch/powerpc/crypto/aes-spe-glue.c
++++ b/arch/powerpc/crypto/aes-spe-glue.c
+@@ -126,6 +126,11 @@ static int ppc_xts_setkey(struct crypto_tfm *tfm, const u8 *in_key,
+ 		   unsigned int key_len)
+ {
+ 	struct ppc_xts_ctx *ctx = crypto_tfm_ctx(tfm);
++	int err;
++
++	err = xts_check_key(tfm, in_key, key_len);
++	if (err)
++		return err;
+ 
+ 	key_len >>= 1;
+ 
+diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
+index 0b9b95f..3f1a1a4 100644
+--- a/arch/s390/crypto/aes_s390.c
++++ b/arch/s390/crypto/aes_s390.c
+@@ -587,6 +587,11 @@ static int xts_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ {
+ 	struct s390_xts_ctx *xts_ctx = crypto_tfm_ctx(tfm);
+ 	u32 *flags = &tfm->crt_flags;
++	int err;
++
++	err = xts_check_key(tfm, in_key, key_len);
++	if (err)
++		return err;
+ 
+ 	switch (key_len) {
+ 	case 32:
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 3633ad6..064c7e2 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -639,16 +639,11 @@ static int xts_aesni_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 			    unsigned int keylen)
+ {
+ 	struct aesni_xts_ctx *ctx = crypto_tfm_ctx(tfm);
+-	u32 *flags = &tfm->crt_flags;
+ 	int err;
+ 
+-	/* key consists of keys of equal size concatenated, therefore
+-	 * the length must be even
+-	 */
+-	if (keylen % 2) {
+-		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+-		return -EINVAL;
+-	}
++	err = xts_check_key(tfm, key, keylen);
++	if (err)
++		return err;
+ 
+ 	/* first half of xts-key is for crypt */
+ 	err = aes_set_key_common(tfm, ctx->raw_crypt_ctx, key, keylen / 2);
+diff --git a/arch/x86/crypto/camellia_glue.c b/arch/x86/crypto/camellia_glue.c
+index 5c8b626..aa76cad 100644
+--- a/arch/x86/crypto/camellia_glue.c
++++ b/arch/x86/crypto/camellia_glue.c
+@@ -1503,13 +1503,9 @@ int xts_camellia_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 	u32 *flags = &tfm->crt_flags;
+ 	int err;
+ 
+-	/* key consists of keys of equal size concatenated, therefore
+-	 * the length must be even
+-	 */
+-	if (keylen % 2) {
+-		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+-		return -EINVAL;
+-	}
++	err = xts_check_key(tfm, key, keylen);
++	if (err)
++		return err;
+ 
+ 	/* first half of xts-key is for crypt */
+ 	err = __camellia_setkey(&ctx->crypt_ctx, key, keylen / 2, flags);
+diff --git a/arch/x86/crypto/cast6_avx_glue.c b/arch/x86/crypto/cast6_avx_glue.c
+index fca4595..50e6847 100644
+--- a/arch/x86/crypto/cast6_avx_glue.c
++++ b/arch/x86/crypto/cast6_avx_glue.c
+@@ -329,13 +329,9 @@ static int xts_cast6_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 	u32 *flags = &tfm->crt_flags;
+ 	int err;
+ 
+-	/* key consists of keys of equal size concatenated, therefore
+-	 * the length must be even
+-	 */
+-	if (keylen % 2) {
+-		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+-		return -EINVAL;
+-	}
++	err = xts_check_key(tfm, key, keylen);
++	if (err)
++		return err;
+ 
+ 	/* first half of xts-key is for crypt */
+ 	err = __cast6_setkey(&ctx->crypt_ctx, key, keylen / 2, flags);
+diff --git a/arch/x86/crypto/serpent_avx_glue.c b/arch/x86/crypto/serpent_avx_glue.c
+index 5dc3702..6f778d3 100644
+--- a/arch/x86/crypto/serpent_avx_glue.c
++++ b/arch/x86/crypto/serpent_avx_glue.c
+@@ -332,16 +332,11 @@ int xts_serpent_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 		       unsigned int keylen)
+ {
+ 	struct serpent_xts_ctx *ctx = crypto_tfm_ctx(tfm);
+-	u32 *flags = &tfm->crt_flags;
+ 	int err;
+ 
+-	/* key consists of keys of equal size concatenated, therefore
+-	 * the length must be even
+-	 */
+-	if (keylen % 2) {
+-		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+-		return -EINVAL;
+-	}
++	err = xts_check_key(tfm, key, keylen);
++	if (err)
++		return err;
+ 
+ 	/* first half of xts-key is for crypt */
+ 	err = __serpent_setkey(&ctx->crypt_ctx, key, keylen / 2);
+diff --git a/arch/x86/crypto/serpent_sse2_glue.c b/arch/x86/crypto/serpent_sse2_glue.c
+index 3643dd5..8943407 100644
+--- a/arch/x86/crypto/serpent_sse2_glue.c
++++ b/arch/x86/crypto/serpent_sse2_glue.c
+@@ -309,16 +309,11 @@ static int xts_serpent_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 			      unsigned int keylen)
+ {
+ 	struct serpent_xts_ctx *ctx = crypto_tfm_ctx(tfm);
+-	u32 *flags = &tfm->crt_flags;
+ 	int err;
+ 
+-	/* key consists of keys of equal size concatenated, therefore
+-	 * the length must be even
+-	 */
+-	if (keylen % 2) {
+-		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+-		return -EINVAL;
+-	}
++	err = xts_check_key(tfm, key, keylen);
++	if (err)
++		return err;
+ 
+ 	/* first half of xts-key is for crypt */
+ 	err = __serpent_setkey(&ctx->crypt_ctx, key, keylen / 2);
+diff --git a/arch/x86/crypto/twofish_glue_3way.c b/arch/x86/crypto/twofish_glue_3way.c
+index 56d8a08..2ebb5e9 100644
+--- a/arch/x86/crypto/twofish_glue_3way.c
++++ b/arch/x86/crypto/twofish_glue_3way.c
+@@ -277,13 +277,9 @@ int xts_twofish_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 	u32 *flags = &tfm->crt_flags;
+ 	int err;
+ 
+-	/* key consists of keys of equal size concatenated, therefore
+-	 * the length must be even
+-	 */
+-	if (keylen % 2) {
+-		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+-		return -EINVAL;
+-	}
++	err = xts_check_key(tfm, key, keylen);
++	if (err)
++		return err;
+ 
+ 	/* first half of xts-key is for crypt */
+ 	err = __twofish_setkey(&ctx->crypt_ctx, key, keylen / 2, flags);
+diff --git a/crypto/xts.c b/crypto/xts.c
+index f6fd43f..26ba583 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -35,16 +35,11 @@ static int setkey(struct crypto_tfm *parent, const u8 *key,
+ {
+ 	struct priv *ctx = crypto_tfm_ctx(parent);
+ 	struct crypto_cipher *child = ctx->tweak;
+-	u32 *flags = &parent->crt_flags;
+ 	int err;
+ 
+-	/* key consists of keys of equal size concatenated, therefore
+-	 * the length must be even */
+-	if (keylen % 2) {
+-		/* tell the user why there was an error */
+-		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+-		return -EINVAL;
+-	}
++	err = xts_check_key(parent, key, keylen);
++	if (err)
++		return err;
+ 
+ 	/* we need two cipher instances: one to compute the initial 'tweak'
+ 	 * by encrypting the IV (usually the 'plain' iv) and the other
+diff --git a/include/crypto/xts.h b/include/crypto/xts.h
+index 72c09eb..ede6b97 100644
+--- a/include/crypto/xts.h
++++ b/include/crypto/xts.h
+@@ -2,6 +2,9 @@
+ #define _CRYPTO_XTS_H
+ 
+ #include <crypto/b128ops.h>
++#include <linux/crypto.h>
++#include <crypto/algapi.h>
++#include <linux/fips.h>
+ 
+ struct scatterlist;
+ struct blkcipher_desc;
+@@ -24,4 +27,28 @@ int xts_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
+ 	      struct scatterlist *src, unsigned int nbytes,
+ 	      struct xts_crypt_req *req);
+ 
++static inline int xts_check_key(struct crypto_tfm *tfm,
++				const u8 *key, unsigned int keylen)
++{
++	u32 *flags = &tfm->crt_flags;
++
++	/*
++	 * key consists of keys of equal size concatenated, therefore
++	 * the length must be even.
++	 */
++	if (keylen % 2) {
++		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
++		return -EINVAL;
++	}
++
++	/* ensure that the AES and tweak key are not identical */
++	if (fips_enabled &&
++	    !crypto_memneq(key, key + (keylen / 2), keylen / 2)) {
++		*flags |= CRYPTO_TFM_RES_WEAK_KEY;
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
+ #endif  /* _CRYPTO_XTS_H */
+-- 
+2.5.0
