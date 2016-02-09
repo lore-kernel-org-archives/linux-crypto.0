@@ -1,34 +1,63 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH v5 0/3] crypto: KEYS: convert public key to akcipher api
-Date: Tue, 9 Feb 2016 09:10:37 -0800
-Message-ID: <56BA1D8D.7060304@intel.com>
-References: <20160202180848.2887.9937.stgit@tstruk-mobl1>
- <11836.1455036594@warthog.procyon.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, zohar@linux.vnet.ibm.com
-To: David Howells <dhowells@redhat.com>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v2 0/2] crypto: asynchronous compression api
+Date: Tue,  9 Feb 2016 17:31:07 +0000
+Message-ID: <1455039069-17475-1-git-send-email-giovanni.cabiddu@intel.com>
+References: <20160209105355.GA10652@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:23133 "EHLO mga01.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:2940 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754761AbcBIROl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Feb 2016 12:14:41 -0500
-In-Reply-To: <11836.1455036594@warthog.procyon.org.uk>
+	id S1756177AbcBIRba (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Feb 2016 12:31:30 -0500
+In-Reply-To: <20160209105355.GA10652@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 02/09/2016 08:49 AM, David Howells wrote:
-> Are these in a public git branch somewhere that I can just merge?
-> 
+The following patch set introduces acomp, a generic asynchronous
+(de)compression api.
+What is proposed is a new crypto type called crypto_acomp_type,
+plus a new struct acomp_alg and struct crypto_acomp, together
+with number of helper functions to register acomp type algorithms
+and allocate tfm instances. This is to make it similar to how the
+existing crypto API works for the ablkcipher, ahash, and aead types.
+This interface will allow the following operations:
 
-No, after Herbert reverted them they only exist as separate patches:
-https://patchwork.kernel.org/patch/8193021/raw/
-https://patchwork.kernel.org/patch/8193001/raw/
-https://patchwork.kernel.org/patch/8192991/raw/
+    int (*compress)(struct acomp_req *req);
+    int (*decompress)(struct acomp_req *req);
 
-Thanks
+The main benefit that this API gives is to allow for
+asynchronous implementations that can use compression hardware to
+offload the computation.
+
+Changes in v2:
+    - added compression and decompression request sizes in acomp_alg
+      in order to enable noctx support
+    - extended api with helpers to allocate compression and
+      decompression requests with different context sizes
+
+Changes from initial submit:
+    - added consumed and produced fields to acomp_req
+    - extended api to support configuration of deflate compressors
+
+---
+Giovanni Cabiddu (2):
+  crypto: add asynchronous compression api
+  crypto: extended acomp api for supporting deflate algorithm
+    parameters
+
+ crypto/Kconfig                      |   10 +
+ crypto/Makefile                     |    2 +
+ crypto/acompress.c                  |  134 +++++++++++
+ crypto/crypto_user.c                |   21 ++
+ include/crypto/acompress.h          |  438 +++++++++++++++++++++++++++++++++++
+ include/crypto/internal/acompress.h |   90 +++++++
+ include/linux/crypto.h              |    1 +
+ 7 files changed, 696 insertions(+), 0 deletions(-)
+ create mode 100644 crypto/acompress.c
+ create mode 100644 include/crypto/acompress.h
+ create mode 100644 include/crypto/internal/acompress.h
+
 -- 
-TS
+1.7.4.1
