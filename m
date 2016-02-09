@@ -1,31 +1,34 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: add asynchronous compression api
-Date: Tue, 9 Feb 2016 11:53:55 +0100
-Message-ID: <20160209105355.GA10652@gondor.apana.org.au>
-References: <1454947803-30644-1-git-send-email-giovanni.cabiddu@intel.com>
- <1454947803-30644-2-git-send-email-giovanni.cabiddu@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+From: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Subject: [PATCH] crypto: qat - Set ctx->e to NULL in qat_rsa_exit_tfm
+Date: Tue,  9 Feb 2016 11:21:35 +0000
+Message-ID: <1455016895-22090-1-git-send-email-salvatore.benedetto@intel.com>
+Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47070 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S964808AbcBIKyC (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Feb 2016 05:54:02 -0500
-Content-Disposition: inline
-In-Reply-To: <1454947803-30644-2-git-send-email-giovanni.cabiddu@intel.com>
+Received: from mga01.intel.com ([192.55.52.88]:63809 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753241AbcBILVv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Feb 2016 06:21:51 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Feb 08, 2016 at 04:10:02PM +0000, Giovanni Cabiddu wrote:
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
+---
+ drivers/crypto/qat/qat_common/qat_asym_algs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This is missing the noctx support.
-
-Cheers,
+diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+index 51c594f..54e386e 100644
+--- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+@@ -709,7 +709,7 @@ static void qat_rsa_exit_tfm(struct crypto_akcipher *tfm)
+ 	}
+ 	qat_crypto_put_instance(ctx->inst);
+ 	ctx->n = NULL;
+-	ctx->d = NULL;
++	ctx->e = NULL;
+ 	ctx->d = NULL;
+ }
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
