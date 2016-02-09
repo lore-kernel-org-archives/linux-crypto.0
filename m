@@ -1,54 +1,76 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Transferring applied X.509 patches from crypto/next to
- security/next
-Date: Tue, 9 Feb 2016 18:46:23 +0100
-Message-ID: <20160209174623.GA13228@gondor.apana.org.au>
-References: <20160209084028.GA9415@gondor.apana.org.au>
- <20160206142705.GA23978@gondor.apana.org.au>
- <20160206074731.GF22220@gondor.apana.org.au>
- <20160202180848.2887.9937.stgit@tstruk-mobl1>
- <11215.1454752821@warthog.procyon.org.uk>
- <25680.1454939914@warthog.procyon.org.uk>
- <alpine.LRH.2.20.1602091200580.6966@namei.org>
- <5856.1455032580@warthog.procyon.org.uk>
+Subject: Crypto Fixes for 4.5
+Date: Tue, 9 Feb 2016 18:54:11 +0100
+Message-ID: <20160209175411.GA13330@gondor.apana.org.au>
+References: <20140804130339.GA1178@gondor.apana.org.au>
+ <20141007131826.GA29688@gondor.apana.org.au>
+ <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150415033951.GA1406@gondor.apana.org.au>
+ <20150622084457.GA7806@gondor.apana.org.au>
+ <20150831135655.GA2694@gondor.apana.org.au>
+ <20151102080427.GA8465@gondor.apana.org.au>
+ <20160111101450.GA24044@gondor.apana.org.au>
+ <20160122101828.GA15966@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: James Morris <jmorris@namei.org>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, zohar@linux.vnet.ibm.com
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36603 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751802AbcBIRqd (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Feb 2016 12:46:33 -0500
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <5856.1455032580@warthog.procyon.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20160122101828.GA15966@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Feb 09, 2016 at 03:43:00PM +0000, David Howells wrote:
-> Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> 
-> > > > If you can back them out, I'll apply them to my keys-next branch.  Unless
-> > > > James is willing to rebase security/next on top of your crypto branch?
-> > > > 
-> > > 
-> > > I don't want to rebase my tree.
-> > 
-> > OK, I've just reverted the patches and pushed it out.
-> 
-> Thanks.  Can I copy your Signed-off-by line into the patches or put you down
-> as an Acked-by?
+Hi Linus:
 
-You can add my ack.
+This push fixes the following issues:
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+API:
 
-Cheers,
+* Fix async algif_skcipher, it was broken by recent fixes.
+* Fix potential race condition in algif_skcipher with ctx.
+* Fix potential memory corruption in algif_skcipher.
+* Add missing lock to crypto_user when doing an alg dump.
+
+Drivers:
+
+* marvell/cesa was testing the wrong variable for NULL after
+  allocation.
+* Fix potential double-free in atmel-sha.
+* Fix illegal call to sleepin function from atomic context in
+  atmel-sha.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Boris BREZILLON (1):
+      crypto: marvell/cesa - fix test in mv_cesa_dev_dma_init()
+
+Cyrille Pitchen (2):
+      crypto: atmel-sha - fix atmel_sha_remove()
+      crypto: atmel-sha - remove calls of clk_prepare() from atomic contexts
+
+Herbert Xu (3):
+      crypto: algif_skcipher - Do not assume that req is unchanged
+      crypto: algif_skcipher - Do not dereference ctx without socket lock
+      crypto: algif_skcipher - Do not set MAY_BACKLOG on the async path
+
+Mathias Krause (1):
+      crypto: user - lock crypto_alg_list on alg dump
+
+ crypto/algif_skcipher.c       |   80 +++++++++++++++++++++--------------------
+ crypto/crypto_user.c          |    6 +++-
+ drivers/crypto/atmel-sha.c    |   23 ++++++------
+ drivers/crypto/marvell/cesa.c |    2 +-
+ 4 files changed, 60 insertions(+), 51 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
