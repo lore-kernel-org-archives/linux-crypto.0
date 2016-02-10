@@ -1,77 +1,54 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.5
-Date: Tue, 9 Feb 2016 18:54:11 +0100
-Message-ID: <20160209175411.GA13330@gondor.apana.org.au>
-References: <20140804130339.GA1178@gondor.apana.org.au>
- <20141007131826.GA29688@gondor.apana.org.au>
- <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150415033951.GA1406@gondor.apana.org.au>
- <20150622084457.GA7806@gondor.apana.org.au>
- <20150831135655.GA2694@gondor.apana.org.au>
- <20151102080427.GA8465@gondor.apana.org.au>
- <20160111101450.GA24044@gondor.apana.org.au>
- <20160122101828.GA15966@gondor.apana.org.au>
+From: Mark McKinstry <Mark.McKinstry@alliedtelesis.co.nz>
+Subject: [PATCH] vti6: Add pmtu handling to vti6_xmit.
+Date: Wed, 10 Feb 2016 01:50:20 +0000
+Message-ID: <56BA975D.2040706@alliedtelesis.co.nz>
+References: <20150529182709.2147.78230.stgit@ahduyck-vm-fedora22>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20160122101828.GA15966@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: 8BIT
+Cc: "alexander.h.duyck@redhat.com" <alexander.h.duyck@redhat.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>,
+	"davem@davemloft.net" <davem@davemloft.net>
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from gate2.alliedtelesis.co.nz ([202.36.163.20]:37647 "EHLO
+	gate2.alliedtelesis.co.nz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755406AbcBJBuf convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Feb 2016 20:50:35 -0500
+Received: from mmarshal3.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id E1FE4806CB
+	for <linux-crypto@vger.kernel.org>; Wed, 10 Feb 2016 14:50:28 +1300 (NZDT)
+In-Reply-To: <20150529182709.2147.78230.stgit@ahduyck-vm-fedora22>
+Content-Language: en-US
+Content-ID: <E66334BC60A217498D2093ACAB2B4397@atlnz.lc>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
-
-This push fixes the following issues:
-
-API:
-
-* Fix async algif_skcipher, it was broken by recent fixes.
-* Fix potential race condition in algif_skcipher with ctx.
-* Fix potential memory corruption in algif_skcipher.
-* Add missing lock to crypto_user when doing an alg dump.
-
-Drivers:
-
-* marvell/cesa was testing the wrong variable for NULL after
-  allocation.
-* Fix potential double-free in atmel-sha.
-* Fix illegal call to sleepin function from atomic context in
-  atmel-sha.
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Boris BREZILLON (1):
-      crypto: marvell/cesa - fix test in mv_cesa_dev_dma_init()
-
-Cyrille Pitchen (2):
-      crypto: atmel-sha - fix atmel_sha_remove()
-      crypto: atmel-sha - remove calls of clk_prepare() from atomic contexts
-
-Herbert Xu (3):
-      crypto: algif_skcipher - Do not assume that req is unchanged
-      crypto: algif_skcipher - Do not dereference ctx without socket lock
-      crypto: algif_skcipher - Do not set MAY_BACKLOG on the async path
-
-Mathias Krause (1):
-      crypto: user - lock crypto_alg_list on alg dump
-
- crypto/algif_skcipher.c       |   80 +++++++++++++++++++++--------------------
- crypto/crypto_user.c          |    6 +++-
- drivers/crypto/atmel-sha.c    |   23 ++++++------
- drivers/crypto/marvell/cesa.c |    2 +-
- 4 files changed, 60 insertions(+), 51 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+http://www.spinics.net/lists/linux-crypto/msg15101.html
+> From: Steffen Klassert <steffen.klassert@xxxxxxxxxxx>
+>
+> We currently rely on the PMTU discovery of xfrm.
+> However if a packet is localy sent, the PMTU mechanism
+> of xfrm tries to to local socket notification what
+> might not work for applications like ping that don't
+> check for this. So add pmtu handling to vti6_xmit to
+> report MTU changes immediately.
+>
+> Signed-off-by: Steffen Klassert <steffen.klassert@xxxxxxxxxxx>
+> Signed-off-by: Alexander Duyck <alexander.h.duyck@xxxxxxxxxx>
+> ---
+>
+> So this version is slightly modified to cover the IPv4 case in addition to
+> the IPv6 case.  With this patch I was able to run netperf over either an
+> IPv4 or IPv6 address routed over the ip6_vti tunnel.
+We have the same issue. When we do a local ping to a remote device over
+a v4 vti tunnel and an intermediate device has a low mtu, pmtu
+discovery reduces the route's pmtu, and ping fails because it does not
+handle the local error message generated by xfrm4_tunnel_check_size().
+Your patch fixes our issue for v6 vti tunnels, but the issue still
+exists for v4 tunnels. Is there any particular reason this patch was
+not delivered for v4 tunnels too - i.e. in vti_xmit()?
