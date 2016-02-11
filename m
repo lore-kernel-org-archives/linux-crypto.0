@@ -1,49 +1,55 @@
-From: Michal Marek <mmarek@suse.com>
-Subject: [PATCH] X.509: Fix test for self-signed certificate
-Date: Thu, 11 Feb 2016 14:34:25 +0100
-Message-ID: <1455197665-11199-1-git-send-email-mmarek@suse.com>
-Cc: David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45552 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751875AbcBKNe7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Feb 2016 08:34:59 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
+Subject: [PATCH 1/3] Documentation: devicetree: add Freescale SCC bindings
+Date: Thu, 11 Feb 2016 15:04:43 +0100
+Message-ID: <1455199485-24458-1-git-send-email-s.trumtrar@pengutronix.de>
+Cc: Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
+	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
+	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	kernel-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org, Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
+To: Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-If either the Subject + subjectKeyId or the Issuer + Serial number
-differs between the certificate and the CA, the certificate is not
-self-signed. In practice, both will be equal for self-signed
-certificates and both will differ for CA-signed certificates. It is only
-an issue if the CA used the same serial number for its own self-signed
-certificate and the certificate we are checking. This is probably not
-valid / recommended, but we should not assume that the certificate is
-self-signed because of that.
+Add documentation for the Freescale Security Controller (SCC)
+found on i.MX25 SoCs.
 
-Fixes: 4573b64a31cd ("X.509: Support X.509 lookup by Issuer+Serial form AuthorityKeyIdentifier")
-Signed-off-by: Michal Marek <mmarek@suse.com>
+Signed-off-by: Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
 ---
- crypto/asymmetric_keys/x509_public_key.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ .../devicetree/bindings/crypto/fsl-imx-scc.txt          | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/fsl-imx-scc.txt
 
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index 7092d5cbb5d3..2c46e022a2a3 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -308,9 +308,10 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
- 	cert->pub->id_type = PKEY_ID_X509;
- 
- 	/* Check the signature on the key if it appears to be self-signed */
--	if ((!cert->akid_skid && !cert->akid_id) ||
--	    asymmetric_key_id_same(cert->skid, cert->akid_skid) ||
--	    asymmetric_key_id_same(cert->id, cert->akid_id)) {
-+	if ((!cert->akid_skid ||
-+			asymmetric_key_id_same(cert->skid, cert->akid_skid)) &&
-+	    (!cert->akid_id ||
-+			asymmetric_key_id_same(cert->id, cert->akid_id))) {
- 		ret = x509_check_signature(cert->pub, cert); /* self-signed */
- 		if (ret < 0)
- 			goto error_free_cert;
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-imx-scc.txt b/Documentation/devicetree/bindings/crypto/fsl-imx-scc.txt
+new file mode 100644
+index 000000000000..9a15ab8da94f
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/fsl-imx-scc.txt
+@@ -0,0 +1,17 @@
++Freescale Security Controller (SCC)
++
++Required properties:
++- compatible : Should be "fsl,imx25-scc".
++- reg : Should contain register location and length.
++- interrupts : Should contain interrupt numbers for SCM IRQ and SMN IRQ.
++
++Example:
++
++	scc: crypto@53fac000 {
++		compatible = "fsl,imx25-scc";
++		reg = <0x53fac000 0x4000>;
++		clocks = <&clks 111>;
++		clock-names = "ipg";
++		interrupts = <49>, <50>;
++		interrupt-names = "scm", "smn";
++	};
 -- 
-2.1.4
+2.7.0.rc3
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
