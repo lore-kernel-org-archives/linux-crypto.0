@@ -1,43 +1,49 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH v5 1/3] crypto: KEYS: convert public key and digsig asym to the akcipher api
-Date: Thu, 11 Feb 2016 10:08:37 +0000
-Message-ID: <17832.1455185317@warthog.procyon.org.uk>
-References: <16626.1455184286@warthog.procyon.org.uk> <56BBC321.1000503@intel.com> <20160202180853.2887.82271.stgit@tstruk-mobl1> <20160202180848.2887.9937.stgit@tstruk-mobl1> <5286.1455113876@warthog.procyon.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: dhowells@redhat.com, herbert@gondor.apana.org.au,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, zohar@linux.vnet.ibm.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <16626.1455184286@warthog.procyon.org.uk>
-Content-ID: <17831.1455185317.1@warthog.procyon.org.uk>
-Sender: owner-linux-security-module@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Michal Marek <mmarek@suse.com>
+Subject: [PATCH] X.509: Fix test for self-signed certificate
+Date: Thu, 11 Feb 2016 14:34:25 +0100
+Message-ID: <1455197665-11199-1-git-send-email-mmarek@suse.com>
+Cc: David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:45552 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751875AbcBKNe7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 11 Feb 2016 08:34:59 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-David Howells <dhowells@redhat.com> wrote:
+If either the Subject + subjectKeyId or the Issuer + Serial number
+differs between the certificate and the CA, the certificate is not
+self-signed. In practice, both will be equal for self-signed
+certificates and both will differ for CA-signed certificates. It is only
+an issue if the CA used the same serial number for its own self-signed
+certificate and the certificate we are checking. This is probably not
+valid / recommended, but we should not assume that the certificate is
+self-signed because of that.
 
-> Tadeusz Struk <tadeusz.struk@intel.com> wrote:
-> 
-> > > Why didn't you put the RSA signature parsing - ie. where the OID and the other
-> > > bits are checked - into crypto/rsa.c?
-> > > 
-> > 
-> > Do you want to get rid of the crypto/asymmetric_keys/rsa.c completely?
-> > I wanted to make the conversion churn as small as possible.
-> > I can move it in a subsequent patch if you want.
-> 
-> I was thinking of getting rid of it completely, yes.
-> 
-> But I was wondering if you had some other motivation, such as keeping the
-> crypto layer purely the mathematical operation.
-> 
-> It's an interesting question where to draw the line, actually.  The answer may
-> hinge on what things like the TPM do.  I should ask the TPM folks.
+Fixes: 4573b64a31cd ("X.509: Support X.509 lookup by Issuer+Serial form AuthorityKeyIdentifier")
+Signed-off-by: Michal Marek <mmarek@suse.com>
+---
+ crypto/asymmetric_keys/x509_public_key.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Looking in the TPM emulator, the TPM_Sign operation indeed puts the wrappings
-on, so this needs to go into the crypto layer.
-
-David
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 7092d5cbb5d3..2c46e022a2a3 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -308,9 +308,10 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ 	cert->pub->id_type = PKEY_ID_X509;
+ 
+ 	/* Check the signature on the key if it appears to be self-signed */
+-	if ((!cert->akid_skid && !cert->akid_id) ||
+-	    asymmetric_key_id_same(cert->skid, cert->akid_skid) ||
+-	    asymmetric_key_id_same(cert->id, cert->akid_id)) {
++	if ((!cert->akid_skid ||
++			asymmetric_key_id_same(cert->skid, cert->akid_skid)) &&
++	    (!cert->akid_id ||
++			asymmetric_key_id_same(cert->id, cert->akid_id))) {
+ 		ret = x509_check_signature(cert->pub, cert); /* self-signed */
+ 		if (ret < 0)
+ 			goto error_free_cert;
+-- 
+2.1.4
