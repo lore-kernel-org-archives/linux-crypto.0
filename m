@@ -1,72 +1,37 @@
-From: Jeremy Linton <jeremy.linton@arm.com>
-Subject: [PATCH] arm/arm64/crypto: assure that ECB modes don't require an IV
-Date: Fri, 12 Feb 2016 09:47:52 -0600
-Message-ID: <1455292072-5236-1-git-send-email-jeremy.linton@arm.com>
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, linux@arm.linux.org.uk,
-	catalin.marinas@arm.com, will.deacon@arm.com,
-	Jeremy Linton <jeremy.linton@arm.com>
-To: linux-arm-kernel@lists.infradead.org
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH 1/3] Documentation: devicetree: add Freescale SCC bindings
+Date: Fri, 12 Feb 2016 10:37:42 -0600
+Message-ID: <20160212163742.GA6769@rob-hp-laptop>
+References: <1455199485-24458-1-git-send-email-s.trumtrar@pengutronix.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Shawn Guo <shawnguo@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	kernel@pengutronix.de
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:33829 "EHLO foss.arm.com"
+Received: from mail.kernel.org ([198.145.29.136]:36185 "EHLO mail.kernel.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751646AbcBLPsB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 12 Feb 2016 10:48:01 -0500
+	id S1751172AbcBLQhr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 12 Feb 2016 11:37:47 -0500
+Content-Disposition: inline
+In-Reply-To: <1455199485-24458-1-git-send-email-s.trumtrar@pengutronix.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-ECB modes don't use an initialization vector. The kernel
-/proc/crypto interface doesn't reflect this properly.
+On Thu, Feb 11, 2016 at 03:04:43PM +0100, Steffen Trumtrar wrote:
+> Add documentation for the Freescale Security Controller (SCC)
+> found on i.MX25 SoCs.
+> 
+> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> ---
+>  .../devicetree/bindings/crypto/fsl-imx-scc.txt          | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/fsl-imx-scc.txt
 
-Signed-off-by: Jeremy Linton <jeremy.linton@arm.com>
----
- arch/arm/crypto/aes-ce-glue.c | 4 ++--
- arch/arm64/crypto/aes-glue.c  | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
-index b445a5d..89a3a3e 100644
---- a/arch/arm/crypto/aes-ce-glue.c
-+++ b/arch/arm/crypto/aes-ce-glue.c
-@@ -364,7 +364,7 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_blkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
--		.ivsize		= AES_BLOCK_SIZE,
-+		.ivsize		= 0,
- 		.setkey		= ce_aes_setkey,
- 		.encrypt	= ecb_encrypt,
- 		.decrypt	= ecb_decrypt,
-@@ -441,7 +441,7 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
--		.ivsize		= AES_BLOCK_SIZE,
-+		.ivsize		= 0,
- 		.setkey		= ablk_set_key,
- 		.encrypt	= ablk_encrypt,
- 		.decrypt	= ablk_decrypt,
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index 05d9e16..7a3d22a 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -294,7 +294,7 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_blkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
--		.ivsize		= AES_BLOCK_SIZE,
-+		.ivsize		= 0,
- 		.setkey		= aes_setkey,
- 		.encrypt	= ecb_encrypt,
- 		.decrypt	= ecb_decrypt,
-@@ -371,7 +371,7 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
--		.ivsize		= AES_BLOCK_SIZE,
-+		.ivsize		= 0,
- 		.setkey		= ablk_set_key,
- 		.encrypt	= ablk_encrypt,
- 		.decrypt	= ablk_decrypt,
--- 
-2.4.3
+Acked-by: Rob Herring <robh@kernel.org>
