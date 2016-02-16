@@ -1,41 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: implement DH primitives under akcipher API
-Date: Tue, 16 Feb 2016 20:19:39 +0000
-Message-ID: <20160216201939.GB11908@gondor.apana.org.au>
-References: <1455526915-23104-1-git-send-email-salvatore.benedetto@intel.com>
+Subject: Re: [PATCH] crypto: caam - Staticize caam_jr_shutdown()
+Date: Tue, 16 Feb 2016 20:20:02 +0000
+Message-ID: <20160216202002.GC11908@gondor.apana.org.au>
+References: <1455462501-18464-1-git-send-email-festevam@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Cc: horia.geanta@freescale.com, linux-crypto@vger.kernel.org,
+	Fabio Estevam <fabio.estevam@nxp.com>
+To: Fabio Estevam <festevam@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48881 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:59072 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751872AbcBPUTo (ORCPT
+	with ESMTP id S1753394AbcBPUUH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Feb 2016 15:19:44 -0500
+	Tue, 16 Feb 2016 15:20:07 -0500
 Content-Disposition: inline
-In-Reply-To: <1455526915-23104-1-git-send-email-salvatore.benedetto@intel.com>
+In-Reply-To: <1455462501-18464-1-git-send-email-festevam@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Feb 15, 2016 at 09:01:55AM +0000, Salvatore Benedetto wrote:
-> Implement Diffie-Hellman primitives required by the scheme under the
-> akcipher API. Here is how it works.
-> 1) Call set_pub_key() by passing DH parameters (p,g) in PKCS3 format
-> 2) Call set_priv_key() to set your own private key (xa) in raw format
-> 3) Call decrypt() without passing any data as input to get back the
->    public part which will be computed as g^xa mod p
-> 4) Call encrypt() by passing the counter part public key (yb) in raw format
->    as input to get back the shared secret calculated as zz = yb^xa mod p
+On Sun, Feb 14, 2016 at 01:08:21PM -0200, Fabio Estevam wrote:
+> From: Fabio Estevam <fabio.estevam@nxp.com>
 > 
-> A test is included in the patch. Test vector has been generated with
-> openssl
+> caam_jr_shutdown() is only used in this file, so it can be
+> made static.
 > 
-> Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
+> This avoids the following sparse warning:
+> 
+> drivers/crypto/caam/jr.c:68:5: warning: symbol 'caam_jr_shutdown' was not declared. Should it be static?
+> 
+> Signed-off-by: Fabio Estevam <fabio.estevam@nxp.com>
 
-Who is going to use this?
-
-Thanks,
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
