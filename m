@@ -1,36 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/2] crypto: asynchronous compression api
-Date: Tue, 16 Feb 2016 19:57:17 +0000
-Message-ID: <20160216195717.GA4207@gondor.apana.org.au>
-References: <20160209105355.GA10652@gondor.apana.org.au>
- <1455039069-17475-1-git-send-email-giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH 0/4] Documentation: crypto API documentation updates
+Date: Tue, 16 Feb 2016 20:17:46 +0000
+Message-ID: <20160216201746.GA11908@gondor.apana.org.au>
+References: <1550901.OUzcZboqul@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:58999 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:52985 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751477AbcBPT5W (ORCPT
+	with ESMTP id S1754110AbcBPURu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Feb 2016 14:57:22 -0500
+	Tue, 16 Feb 2016 15:17:50 -0500
 Content-Disposition: inline
-In-Reply-To: <1455039069-17475-1-git-send-email-giovanni.cabiddu@intel.com>
+In-Reply-To: <1550901.OUzcZboqul@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 09, 2016 at 05:31:07PM +0000, Giovanni Cabiddu wrote:
->
-> Changes in v2:
->     - added compression and decompression request sizes in acomp_alg
->       in order to enable noctx support
->     - extended api with helpers to allocate compression and
->       decompression requests with different context sizes
+On Tue, Feb 16, 2016 at 11:31:26AM +0100, Stephan Mueller wrote:
+> Hi,
+> 
+> This patch set updates the kernel crypto API documentation. Due to recent
+> updates to the API, the documentation needs to be synchronized with the
+> reality.
+> 
+> The output of the DocBook with these patches is found in [1].
 
-Can you give an example on how to use the noctx support with
-your acomp interface?
+All applied.  Thanks!
 
-Thanks,
+> Herbert: The documentation in include/crypto/skcipher.h references
+> CRYPTO_ALG_TYPE_SKCIPHER which does (not yet?) exist. Shall that reference
+> stay in the documentation?
+
+It will come into existence when I create the algorithm interface
+for skcipher.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
