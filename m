@@ -1,26 +1,32 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: mark authenticated ctr(aes) also as FIPS able
-Date: Tue, 16 Feb 2016 20:22:00 +0000
-Message-ID: <20160216202200.GH11908@gondor.apana.org.au>
-References: <1454755987-17941-1-git-send-email-meissner@suse.de>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH] crypto: qat - fix leak on error path
+Date: Tue, 16 Feb 2016 12:23:19 -0800
+Message-ID: <56C38537.109@intel.com>
+References: <1455145184-5610-1-git-send-email-tadeusz.struk@intel.com>
+ <20160216202046.GD11908@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Marcus Meissner <meissner@suse.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1454755987-17941-1-git-send-email-meissner@suse.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:59450 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755535AbcBPU12 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 16 Feb 2016 15:27:28 -0500
+In-Reply-To: <20160216202046.GD11908@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Feb 06, 2016 at 11:53:07AM +0100, Marcus Meissner wrote:
-> (2nd try that adds missing , to build.)
-> 
-> Signed-off-by: Marcus Meissner <meissner@suse.de>
+On 02/16/2016 12:20 PM, Herbert Xu wrote:
+> On Wed, Feb 10, 2016 at 02:59:44PM -0800, Tadeusz Struk wrote:
+>> > Fix a leak on error path in qat asym
+>> > 
+>> > Reported-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
+>> > Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> Appiled.
 
-Applied.
+Thanks Herbert, should we also push it to stable?
+Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+TS
