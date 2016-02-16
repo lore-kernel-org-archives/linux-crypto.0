@@ -1,42 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/4] Documentation: crypto API documentation updates
-Date: Tue, 16 Feb 2016 20:17:46 +0000
-Message-ID: <20160216201746.GA11908@gondor.apana.org.au>
-References: <1550901.OUzcZboqul@positron.chronox.de>
+Subject: Re: [PATCH] crypto: implement DH primitives under akcipher API
+Date: Tue, 16 Feb 2016 20:19:39 +0000
+Message-ID: <20160216201939.GB11908@gondor.apana.org.au>
+References: <1455526915-23104-1-git-send-email-salvatore.benedetto@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Cc: linux-crypto@vger.kernel.org
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52985 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:48881 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754110AbcBPURu (ORCPT
+	with ESMTP id S1751872AbcBPUTo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Feb 2016 15:17:50 -0500
+	Tue, 16 Feb 2016 15:19:44 -0500
 Content-Disposition: inline
-In-Reply-To: <1550901.OUzcZboqul@positron.chronox.de>
+In-Reply-To: <1455526915-23104-1-git-send-email-salvatore.benedetto@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 16, 2016 at 11:31:26AM +0100, Stephan Mueller wrote:
-> Hi,
+On Mon, Feb 15, 2016 at 09:01:55AM +0000, Salvatore Benedetto wrote:
+> Implement Diffie-Hellman primitives required by the scheme under the
+> akcipher API. Here is how it works.
+> 1) Call set_pub_key() by passing DH parameters (p,g) in PKCS3 format
+> 2) Call set_priv_key() to set your own private key (xa) in raw format
+> 3) Call decrypt() without passing any data as input to get back the
+>    public part which will be computed as g^xa mod p
+> 4) Call encrypt() by passing the counter part public key (yb) in raw format
+>    as input to get back the shared secret calculated as zz = yb^xa mod p
 > 
-> This patch set updates the kernel crypto API documentation. Due to recent
-> updates to the API, the documentation needs to be synchronized with the
-> reality.
+> A test is included in the patch. Test vector has been generated with
+> openssl
 > 
-> The output of the DocBook with these patches is found in [1].
+> Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
 
-All applied.  Thanks!
+Who is going to use this?
 
-> Herbert: The documentation in include/crypto/skcipher.h references
-> CRYPTO_ALG_TYPE_SKCIPHER which does (not yet?) exist. Shall that reference
-> stay in the documentation?
-
-It will come into existence when I create the algorithm interface
-for skcipher.
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
