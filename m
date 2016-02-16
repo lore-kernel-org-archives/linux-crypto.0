@@ -1,40 +1,25 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/2] dt/bindings: Add bindings for the PIC32 random
- number generator
-Date: Tue, 16 Feb 2016 20:21:21 +0000
-Message-ID: <20160216202121.GF11908@gondor.apana.org.au>
-References: <1454966283-14965-1-git-send-email-joshua.henderson@microchip.com>
+Subject: Re: [PATCH] crypto: mark authenticated ctr(aes) also as FIPS able
+Date: Tue, 16 Feb 2016 20:22:00 +0000
+Message-ID: <20160216202200.GH11908@gondor.apana.org.au>
+References: <1454755987-17941-1-git-send-email-meissner@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>,
-	Matt Mackall <mpm@selenic.com>,
-	Kieran Bingham <kieranbingham@gmail.com>,
-	Lee Jones <lee.jones@linaro.org>,
-	Pankaj Dev <pankaj.dev@st.com>,
-	Scott Branden <sbranden@broadcom.com>,
-	Daniel Thompson <daniel.thompson@linaro.org>,
-	Purna Chandra Mandal <purna.mandal@microchip.com>,
-	Ray Jui <rjui@broadcom.com>, linux-crypto@vger.kernel.org
-To: Joshua Henderson <joshua.henderson@microchip.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Marcus Meissner <meissner@suse.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1454966283-14965-1-git-send-email-joshua.henderson@microchip.com>
+In-Reply-To: <1454755987-17941-1-git-send-email-meissner@suse.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Feb 08, 2016 at 02:17:52PM -0700, Joshua Henderson wrote:
-> Document the devicetree bindings for the random number generator found
-> on Microchip PIC32 class devices.
+On Sat, Feb 06, 2016 at 11:53:07AM +0100, Marcus Meissner wrote:
+> (2nd try that adds missing , to build.)
 > 
-> Signed-off-by: Joshua Henderson <joshua.henderson@microchip.com>
-> Acked-by: Rob Herring <robh@kernel.org>
+> Signed-off-by: Marcus Meissner <meissner@suse.de>
 
-All applied.
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
