@@ -1,78 +1,58 @@
-From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Subject: Re: [PATCH 1/3] Documentation: devicetree: add Freescale SCC bindings
-Date: Tue, 16 Feb 2016 09:41:17 +0100
-Message-ID: <73fuwtdp3m.fsf@unicorn.hi.pengutronix.de>
-References: <1455199485-24458-1-git-send-email-s.trumtrar@pengutronix.de> <20160214075557.GP6756@tiger>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 3/4] Documentation: crypto - update AEAD AD handling
+Date: Tue, 16 Feb 2016 11:33:13 +0100
+Message-ID: <2896245.8YejBjdtIG@positron.chronox.de>
+References: <1550901.OUzcZboqul@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	kernel@pengutronix.de
-To: Shawn Guo <shawnguo@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:48841 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754328AbcBPIl0 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Feb 2016 03:41:26 -0500
-In-reply-to: <20160214075557.GP6756@tiger>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <1550901.OUzcZboqul@positron.chronox.de>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+The associated data handling with the kernel crypto API has been
+updated. This needs to be reflected in the documentation.
 
-Hi!
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ Documentation/DocBook/crypto-API.tmpl | 1 -
+ include/crypto/aead.h                 | 6 +++---
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-Shawn Guo writes:
-
-> On Thu, Feb 11, 2016 at 03:04:43PM +0100, Steffen Trumtrar wrote:
->> Add documentation for the Freescale Security Controller (SCC)
->> found on i.MX25 SoCs.
->> 
->> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
->> ---
->>  .../devicetree/bindings/crypto/fsl-imx-scc.txt          | 17 +++++++++++++++++
->>  1 file changed, 17 insertions(+)
->>  create mode 100644 Documentation/devicetree/bindings/crypto/fsl-imx-scc.txt
->> 
->> diff --git a/Documentation/devicetree/bindings/crypto/fsl-imx-scc.txt b/Documentation/devicetree/bindings/crypto/fsl-imx-scc.txt
->> new file mode 100644
->> index 000000000000..9a15ab8da94f
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/crypto/fsl-imx-scc.txt
->> @@ -0,0 +1,17 @@
->> +Freescale Security Controller (SCC)
->> +
->> +Required properties:
->> +- compatible : Should be "fsl,imx25-scc".
->> +- reg : Should contain register location and length.
->> +- interrupts : Should contain interrupt numbers for SCM IRQ and SMN IRQ.
->> +
->> +Example:
->> +
->> +	scc: crypto@53fac000 {
->> +		compatible = "fsl,imx25-scc";
->> +		reg = <0x53fac000 0x4000>;
->> +		clocks = <&clks 111>;
->> +		clock-names = "ipg";
->
-> Shouldn't these two be mentioned in properties list above too?
->
-
-What is the current policy on clocks in bindings? There are some with
-and some without.
-
-Of course I can add them to the required properties if necessary.
-
-Thanks,
-Steffen
-
+diff --git a/Documentation/DocBook/crypto-API.tmpl b/Documentation/DocBook/crypto-API.tmpl
+index a2986b2..50efc5a 100644
+--- a/Documentation/DocBook/crypto-API.tmpl
++++ b/Documentation/DocBook/crypto-API.tmpl
+@@ -1736,7 +1736,6 @@ read(opfd, out, outlen);
+ !Finclude/crypto/aead.h aead_request_free
+ !Finclude/crypto/aead.h aead_request_set_callback
+ !Finclude/crypto/aead.h aead_request_set_crypt
+-!Finclude/crypto/aead.h aead_request_set_assoc
+ !Finclude/crypto/aead.h aead_request_set_ad
+    </sect1>
+    <sect1><title>Synchronous Block Cipher API</title>
+diff --git a/include/crypto/aead.h b/include/crypto/aead.h
+index 84d13b1..957bb87 100644
+--- a/include/crypto/aead.h
++++ b/include/crypto/aead.h
+@@ -31,10 +31,10 @@
+  *
+  * For example: authenc(hmac(sha256), cbc(aes))
+  *
+- * The example code provided for the asynchronous block cipher operation
+- * applies here as well. Naturally all *ablkcipher* symbols must be exchanged
++ * The example code provided for the symmetric key cipher operation
++ * applies here as well. Naturally all *skcipher* symbols must be exchanged
+  * the *aead* pendants discussed in the following. In addition, for the AEAD
+- * operation, the aead_request_set_assoc function must be used to set the
++ * operation, the aead_request_set_ad function must be used to set the
+  * pointer to the associated data memory location before performing the
+  * encryption or decryption operation. In case of an encryption, the associated
+  * data memory is filled during the encryption operation. For decryption, the
 -- 
-Pengutronix e.K.                           | Steffen Trumtrar            |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.5.0
+
+
