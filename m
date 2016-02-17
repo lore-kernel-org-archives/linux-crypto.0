@@ -1,48 +1,73 @@
-From: Willy Tarreau <w@1wt.eu>
+From: "Thomas D." <whissi@whissi.de>
 Subject: Re: Broken userspace crypto in linux-4.1.18
-Date: Thu, 18 Feb 2016 00:33:53 +0100
-Message-ID: <20160217233353.GC31125@1wt.eu>
-References: <56C47DF9.6030704@whissi.de> <56C485AA.5060303@oracle.com> <56C49096.6040904@whissi.de> <56C4F068.8060806@oracle.com>
+Date: Thu, 18 Feb 2016 00:49:57 +0100
+Message-ID: <56C50725.6080408@whissi.de>
+References: <56C47DF9.6030704@whissi.de> <56C485AA.5060303@oracle.com>
+ <56C49096.6040904@whissi.de> <56C4F068.8060806@oracle.com>
+ <20160217233353.GC31125@1wt.eu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
 	"dvyukov@google.com" <dvyukov@google.com>,
 	"stable@vger.kernel.org" <stable@vger.kernel.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Sasha Levin <sasha.levin@oracle.com>,
-	"Thomas D." <whissi@whissi.de>
+To: Willy Tarreau <w@1wt.eu>, Sasha Levin <sasha.levin@oracle.com>
 Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <56C4F068.8060806@oracle.com>
+In-Reply-To: <20160217233353.GC31125@1wt.eu>
 Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Feb 17, 2016 at 05:12:56PM -0500, Sasha Levin wrote:
-> On 02/17/2016 10:24 AM, Thomas D. wrote:
-> > Hi,
-> > 
-> > Sasha Levin wrote:
-> >> > So either the upstream patch is broken, or the 4.1 backport is wrong/missing
-> >> > dependency/missing fix.
-> >> > 
-> >> > Any chance you could try 4.5-rc3 and see if that works for you? That'll narrow
-> >> > it down a lot.
-> > 4.5-rc3 works for me.
-> > 
-> > Linux-4.4.0 works, too.
-> 
-> Herbert,
-> 
-> Is there a dependency I missed in 4.1? I don't really see anything that
-> could have gone wrong there.
+Hi
 
-Or maybe Thomas can run a bisect ? Thomas, do you feel comfortable with
-doing this ? There are a few patches between 4.1.17 and 4.1.18, in 8
-steps it should be done, and only 4 if you limit yourself to the crypto
-directory. Stable versions are fast at bisecting because each patch
-touches a very isolated area so only the first build takes a bit of
-time but the other ones are often pretty fast. Finding the faulty
-patch can help spotting if something is wrong in its backport.
+Willy Tarreau wrote:
+>> Is there a dependency I missed in 4.1? I don't really see anything that
+>> could have gone wrong there.
+> 
+> Or maybe Thomas can run a bisect ?
 
-Regards,
-Willy
+I cannot follow. I did a bisect between 4.1.7 and 4.1.8 as I have written
+in my first mail. The bad commit was:
+
+> commit 0571ba52a19e18a1c20469454231eef681cb1310
+> Author: Herbert Xu
+> Date:   Wed Dec 30 11:47:53 2015 +0800
+> 
+>     crypto: af_alg - Disallow bind/setkey/... after accept(2)
+> 
+>     [ Upstream commit c840ac6af3f8713a71b4d2363419145760bd6044 ]
+> 
+>     Each af_alg parent socket obtained by socket(2) corresponds to a
+>     tfm object once bind(2) has succeeded.  An accept(2) call on that
+>     parent socket creates a context which then uses the tfm object.
+> 
+>     Therefore as long as any child sockets created by accept(2) exist
+>     the parent socket must not be modified or freed.
+> 
+>     This patch guarantees this by using locks and a reference count
+>     on the parent socket.  Any attempt to modify the parent socket will
+>     fail with EBUSY.
+
+
+bisect log:
+
+> Bisecting: 114 revisions left to test after this (roughly 7 steps)
+> [3a1e81ad84e4d880b00ecf7ad8d03b9b772ddfa7] crypto: algif_hash - Fix race condition in hash_check_key
+> Bisecting: 56 revisions left to test after this (roughly 6 steps)
+> [d6341753c418d3699948290d8c0b9d9dc78bd209] udf: Prevent buffer overrun with multi-byte characters
+> Bisecting: 28 revisions left to test after this (roughly 5 steps)
+> [13aedd784b84cb7d8a3bb835941d80e99f5c796e] dmaengine: dw: fix cyclic transfer setup
+> Bisecting: 14 revisions left to test after this (roughly 4 steps)
+> [664ecf4f243bac17065cd9878790d40a592e2f3d] zram/zcomp: use GFP_NOIO to allocate streams
+> Bisecting: 7 revisions left to test after this (roughly 3 steps)
+> [0571ba52a19e18a1c20469454231eef681cb1310] crypto: af_alg - Disallow bind/setkey/... after accept(2)
+> Bisecting: 3 revisions left to test after this (roughly 2 steps)
+> [2c641f5b0c8e87d43235ce39890bcc4d0c7cd2fb] memcg: only free spare array when readers are done
+> Bisecting: 1 revision left to test after this (roughly 1 step)
+> [0e19e24c3fe0abde8e2c5f4543616a251ccea6bf] kernel/panic.c: turn off locks debug before releasing console lock
+> Bisecting: 0 revisions left to test after this (roughly 0 steps)
+> [bc24ac15b0746172a8f603171352aa54abcf7c78] printk: do cond_resched() between lines while outputting to consoles
+> 0571ba52a19e18a1c20469454231eef681cb1310 is the first bad commit
+
+
+-Thomas
