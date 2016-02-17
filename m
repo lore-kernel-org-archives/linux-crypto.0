@@ -1,65 +1,90 @@
-From: lee joey <joeyli.kernel@gmail.com>
-Subject: Re: [PATCH] X.509: Fix test for self-signed certificate
-Date: Wed, 17 Feb 2016 10:57:27 +0800
-Message-ID: <CAGLnvc8J4dJSsCUR2Uz4nKpdNbaq6yq2o3E-R=NLXiAw7A0yAA@mail.gmail.com>
-References: <1455197665-11199-1-git-send-email-mmarek@suse.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH] crypto: fix compile errors of XTS
+Date: Wed, 17 Feb 2016 07:00:01 +0100
+Message-ID: <17540790.vcykgraQyO@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	linux-kernel@vger.kernel.org
-To: Michal Marek <mmarek@suse.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f181.google.com ([209.85.192.181]:35662 "EHLO
-	mail-pf0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933658AbcBQC52 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Feb 2016 21:57:28 -0500
-In-Reply-To: <1455197665-11199-1-git-send-email-mmarek@suse.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
+	Linux-Next <linux-next@vger.kernel.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kbuild test robot <fengguang.wu@intel.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-next-owner@vger.kernel.org>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-2016-02-11 21:34 GMT+08:00 Michal Marek <mmarek@suse.com>:
-> If either the Subject + subjectKeyId or the Issuer + Serial number
-> differs between the certificate and the CA, the certificate is not
-> self-signed. In practice, both will be equal for self-signed
-> certificates and both will differ for CA-signed certificates. It is only
-> an issue if the CA used the same serial number for its own self-signed
-> certificate and the certificate we are checking. This is probably not
-> valid / recommended, but we should not assume that the certificate is
-> self-signed because of that.
->
-> Fixes: 4573b64a31cd ("X.509: Support X.509 lookup by Issuer+Serial form AuthorityKeyIdentifier")
-> Signed-off-by: Michal Marek <mmarek@suse.com>
+Commit 28856a9e52c7 missed the addition of the crypto/xts.h include file
+for different architecture-specific AES implementations.
 
-Tested-by: Lee, Chun-Yi <jlee@suse.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ arch/arm/crypto/aes-ce-glue.c      | 1 +
+ arch/arm/crypto/aesbs-glue.c       | 1 +
+ arch/arm64/crypto/aes-glue.c       | 1 +
+ arch/powerpc/crypto/aes-spe-glue.c | 1 +
+ arch/s390/crypto/aes_s390.c        | 1 +
+ 5 files changed, 5 insertions(+)
 
-
-Regards
-
-Joey Lee
-
-> ---
->  crypto/asymmetric_keys/x509_public_key.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-> index 7092d5cbb5d3..2c46e022a2a3 100644
-> --- a/crypto/asymmetric_keys/x509_public_key.c
-> +++ b/crypto/asymmetric_keys/x509_public_key.c
-> @@ -308,9 +308,10 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
->         cert->pub->id_type = PKEY_ID_X509;
->
->         /* Check the signature on the key if it appears to be self-signed */
-> -       if ((!cert->akid_skid && !cert->akid_id) ||
-> -           asymmetric_key_id_same(cert->skid, cert->akid_skid) ||
-> -           asymmetric_key_id_same(cert->id, cert->akid_id)) {
-> +       if ((!cert->akid_skid ||
-> +                       asymmetric_key_id_same(cert->skid, cert->akid_skid)) &&
-> +           (!cert->akid_id ||
-> +                       asymmetric_key_id_same(cert->id, cert->akid_id))) {
->                 ret = x509_check_signature(cert->pub, cert); /* self-signed */
->                 if (ret < 0)
->                         goto error_free_cert;
-> --
-> 2.1.4
->
+diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
+index 85ff69b..b6961a2 100644
+--- a/arch/arm/crypto/aes-ce-glue.c
++++ b/arch/arm/crypto/aes-ce-glue.c
+@@ -15,6 +15,7 @@
+ #include <crypto/ablk_helper.h>
+ #include <crypto/algapi.h>
+ #include <linux/module.h>
++#include <crypto/xts.h>
+ 
+ MODULE_DESCRIPTION("AES-ECB/CBC/CTR/XTS using ARMv8 Crypto Extensions");
+ MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+diff --git a/arch/arm/crypto/aesbs-glue.c b/arch/arm/crypto/aesbs-glue.c
+index d004bd1..0511a6c 100644
+--- a/arch/arm/crypto/aesbs-glue.c
++++ b/arch/arm/crypto/aesbs-glue.c
+@@ -13,6 +13,7 @@
+ #include <crypto/ablk_helper.h>
+ #include <crypto/algapi.h>
+ #include <linux/module.h>
++#include <crypto/xts.h>
+ 
+ #include "aes_glue.h"
+ 
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index c963d75..897ad14 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -15,6 +15,7 @@
+ #include <crypto/algapi.h>
+ #include <linux/module.h>
+ #include <linux/cpufeature.h>
++#include <crypto/xts.h>
+ 
+ #include "aes-ce-setkey.h"
+ 
+diff --git a/arch/powerpc/crypto/aes-spe-glue.c b/arch/powerpc/crypto/aes-spe-glue.c
+index 1608079..ab11319 100644
+--- a/arch/powerpc/crypto/aes-spe-glue.c
++++ b/arch/powerpc/crypto/aes-spe-glue.c
+@@ -22,6 +22,7 @@
+ #include <asm/byteorder.h>
+ #include <asm/switch_to.h>
+ #include <crypto/algapi.h>
++#include <crypto/xts.h>
+ 
+ /*
+  * MAX_BYTES defines the number of bytes that are allowed to be processed
+diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
+index 3f1a1a4..48e1a2d 100644
+--- a/arch/s390/crypto/aes_s390.c
++++ b/arch/s390/crypto/aes_s390.c
+@@ -27,6 +27,7 @@
+ #include <linux/cpufeature.h>
+ #include <linux/init.h>
+ #include <linux/spinlock.h>
++#include <crypto/xts.h>
+ #include "crypt_s390.h"
+ 
+ #define AES_KEYLEN_128		1
+-- 
+2.5.0
