@@ -1,44 +1,32 @@
-From: "Thomas D." <whissi@whissi.de>
-Subject: Re: Broken userspace crypto in linux-4.1.18
-Date: Thu, 18 Feb 2016 12:09:34 +0100
-Message-ID: <56C5A66E.5010905@whissi.de>
-References: <56C47DF9.6030704@whissi.de> <20160217233353.GC31125@1wt.eu>
- <56C50725.6080408@whissi.de> <4580306.arupsYiYbb@positron.chronox.de>
- <56C591E7.5080808@suse.cz>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH] vti6: Add pmtu handling to vti6_xmit.
+Date: Thu, 18 Feb 2016 13:19:16 +0100
+Message-ID: <20160218121915.GH316@gauss.secunet.com>
+References: <20150529182709.2147.78230.stgit@ahduyck-vm-fedora22>
+ <56BA975D.2040706@alliedtelesis.co.nz>
+ <20160217070805.GA316@gauss.secunet.com>
+ <56C520F0.4050309@alliedtelesis.co.nz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Willy Tarreau <w@1wt.eu>, Sasha Levin <sasha.levin@oracle.com>,
+Content-Type: text/plain; charset="us-ascii"
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"alexander.h.duyck@redhat.com" <alexander.h.duyck@redhat.com>,
 	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"dvyukov@google.com" <dvyukov@google.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Jiri Slaby <jslaby@suse.cz>, Stephan Mueller <smueller@chronox.de>,
-	gmazyland@gmail.com
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <56C591E7.5080808@suse.cz>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	"davem@davemloft.net" <davem@davemloft.net>
+To: Mark McKinstry <Mark.McKinstry@alliedtelesis.co.nz>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from a.mx.secunet.com ([62.96.220.36]:36593 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1426301AbcBRMTV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 18 Feb 2016 07:19:21 -0500
+Content-Disposition: inline
+In-Reply-To: <56C520F0.4050309@alliedtelesis.co.nz>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Thu, Feb 18, 2016 at 01:40:00AM +0000, Mark McKinstry wrote:
+> This patch fixes our issue, thanks. In our scenario the tunnel path MTU 
+> now gets updated so that subsequent large packets sent over the tunnel 
+> get fragmented correctly.
 
-Jiri Slaby wrote:
->> That breakage was expected and forcasted by Milan Broz a couple of days ago on 
->> this mailing list.
->
-> Could you be more specific? What is "this mailing list"? stable or
-> crypto? I cannot see anything from Milan on this mailing list aka stable.
-
-Cannot speak for Stephan but I guess he means the "[PATCH v2] crypto:
-algif_skcipher - Require setkey before accept(2)" thread on the crypto ml:
-
-http://www.spinics.net/lists/linux-crypto/msg17931.html
-
-http://www.spinics.net/lists/linux-crypto/msg17936.html
-
-
-PS: In 4.4.2 it looks like the same commit breaking 4.1.8 was added
-however 4.4.2 works for me.
-
-
--Thomas
+I've applied this patch to the ipsec tree now.
+Thanks for testing!
