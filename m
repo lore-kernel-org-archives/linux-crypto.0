@@ -1,81 +1,97 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [cryptodev:master 95/102] arch/arm64/crypto/aes-glue.c:88:2: error: implicit declaration of function 'xts_check_key'
-Date: Thu, 18 Feb 2016 09:13:46 +0100
-Message-ID: <63297293.nlJ5af0sSv@positron.chronox.de>
-References: <201602181230.TW8SGoZR%fengguang.wu@intel.com>
+Subject: Re: Broken userspace crypto in linux-4.1.18
+Date: Thu, 18 Feb 2016 09:17:04 +0100
+Message-ID: <4580306.arupsYiYbb@positron.chronox.de>
+References: <56C47DF9.6030704@whissi.de> <20160217233353.GC31125@1wt.eu> <56C50725.6080408@whissi.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: kbuild test robot <fengguang.wu@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34134 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1425327AbcBRINi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Feb 2016 03:13:38 -0500
-In-Reply-To: <201602181230.TW8SGoZR%fengguang.wu@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Willy Tarreau <w@1wt.eu>, Sasha Levin <sasha.levin@oracle.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"dvyukov@google.com" <dvyukov@google.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: "Thomas D." <whissi@whissi.de>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <56C50725.6080408@whissi.de>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 18. Februar 2016, 12:35:33 schrieb kbuild test robot:
+Am Donnerstag, 18. Februar 2016, 00:49:57 schrieb Thomas D.:
 
-Hi,
+Hi Thomas,
 
-> tree:  
-> https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
-> master head:   49abc0d2e19b28e90f443334fb6cd66f275713e6
-> commit: 28856a9e52c7cac712af6c143de04766617535dc [95/102] crypto: xts -
-> consolidate sanity check for keys config: arm64-defconfig (attached as
-> .config)
-> reproduce:
->         wget
-> https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/m
-> ake.cross -O ~/bin/make.cross chmod +x ~/bin/make.cross
->         git checkout 28856a9e52c7cac712af6c143de04766617535dc
->         # save the attached .config to linux build tree
->         make.cross ARCH=arm64
+> Hi
 > 
-> Note: the cryptodev/master HEAD 49abc0d2e19b28e90f443334fb6cd66f275713e6
-> builds fine. It only hurts bisectibility.
+> Willy Tarreau wrote:
+> >> Is there a dependency I missed in 4.1? I don't really see anything that
+> >> could have gone wrong there.
+> > 
+> > Or maybe Thomas can run a bisect ?
 > 
-> All errors (new ones prefixed by >>):
+> I cannot follow. I did a bisect between 4.1.7 and 4.1.8 as I have written
 > 
->    arch/arm64/crypto/aes-glue.c: In function 'xts_set_key':
-> >> arch/arm64/crypto/aes-glue.c:88:2: error: implicit declaration of
-> >> function 'xts_check_key' [-Werror=implicit-function-declaration]
+> in my first mail. The bad commit was:
 
-With the patch sent and added yesterday that covered the addition of 
-crypto/xts.h to arch/arm64/crypto/aes-glue.c, this error should be covered.
+That breakage was expected and forcasted by Milan Broz a couple of days ago on 
+this mailing list. The referenced patch covered a bug that must have been 
+fixed but introduced a regression for backwards compatibility. Since then, 
+this regression was fixed.
 
-Did you use the cryptodev-2.6 tree from yesterday?
 
-Thanks
 
->      ret = xts_check_key(tfm, in_key, key_len);
->      ^
->    cc1: some warnings being treated as errors
+> > commit 0571ba52a19e18a1c20469454231eef681cb1310
+> > Author: Herbert Xu
+> > Date:   Wed Dec 30 11:47:53 2015 +0800
+> > 
+> >     crypto: af_alg - Disallow bind/setkey/... after accept(2)
+> >     
+> >     [ Upstream commit c840ac6af3f8713a71b4d2363419145760bd6044 ]
+> >     
+> >     Each af_alg parent socket obtained by socket(2) corresponds to a
+> >     tfm object once bind(2) has succeeded.  An accept(2) call on that
+> >     parent socket creates a context which then uses the tfm object.
+> >     
+> >     Therefore as long as any child sockets created by accept(2) exist
+> >     the parent socket must not be modified or freed.
+> >     
+> >     This patch guarantees this by using locks and a reference count
+> >     on the parent socket.  Any attempt to modify the parent socket will
+> >     fail with EBUSY.
 > 
-> vim +/xts_check_key +88 arch/arm64/crypto/aes-glue.c
+> bisect log:
+> > Bisecting: 114 revisions left to test after this (roughly 7 steps)
+> > [3a1e81ad84e4d880b00ecf7ad8d03b9b772ddfa7] crypto: algif_hash - Fix race
+> > condition in hash_check_key Bisecting: 56 revisions left to test after
+> > this (roughly 6 steps)
+> > [d6341753c418d3699948290d8c0b9d9dc78bd209] udf: Prevent buffer overrun
+> > with multi-byte characters Bisecting: 28 revisions left to test after
+> > this (roughly 5 steps)
+> > [13aedd784b84cb7d8a3bb835941d80e99f5c796e] dmaengine: dw: fix cyclic
+> > transfer setup Bisecting: 14 revisions left to test after this (roughly 4
+> > steps)
+> > [664ecf4f243bac17065cd9878790d40a592e2f3d] zram/zcomp: use GFP_NOIO to
+> > allocate streams Bisecting: 7 revisions left to test after this (roughly
+> > 3 steps)
+> > [0571ba52a19e18a1c20469454231eef681cb1310] crypto: af_alg - Disallow
+> > bind/setkey/... after accept(2) Bisecting: 3 revisions left to test after
+> > this (roughly 2 steps)
+> > [2c641f5b0c8e87d43235ce39890bcc4d0c7cd2fb] memcg: only free spare array
+> > when readers are done Bisecting: 1 revision left to test after this
+> > (roughly 1 step)
+> > [0e19e24c3fe0abde8e2c5f4543616a251ccea6bf] kernel/panic.c: turn off locks
+> > debug before releasing console lock Bisecting: 0 revisions left to test
+> > after this (roughly 0 steps)
+> > [bc24ac15b0746172a8f603171352aa54abcf7c78] printk: do cond_resched()
+> > between lines while outputting to consoles
+> > 0571ba52a19e18a1c20469454231eef681cb1310 is the first bad commit
 > 
->     82	static int xts_set_key(struct crypto_tfm *tfm, const u8 
-*in_key,
->     83			       unsigned int key_len)
->     84	{
->     85		struct crypto_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
->     86		int ret;
->     87
+> -Thomas
 > 
->   > 88		ret = xts_check_key(tfm, in_key, key_len);
-> 
->     89		if (ret)
->     90			return ret;
->     91
-> 
-> ---
-> 0-DAY kernel test infrastructure                Open Source Technology
-> Center https://lists.01.org/pipermail/kbuild-all                   Intel
-> Corporation
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 Ciao
