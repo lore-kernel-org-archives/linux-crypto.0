@@ -1,77 +1,76 @@
-From: Shawn Guo <shawnguo@kernel.org>
-Subject: Re: [PATCH 1/3] Documentation: devicetree: add Freescale SCC bindings
-Date: Thu, 18 Feb 2016 21:11:40 +0800
-Message-ID: <20160218131140.GV6756@tiger>
-References: <1455199485-24458-1-git-send-email-s.trumtrar@pengutronix.de>
- <20160214075557.GP6756@tiger>
- <73fuwtdp3m.fsf@unicorn.hi.pengutronix.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	kernel@pengutronix.de
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+From: Marcus Meissner <meissner@suse.de>
+Subject: [PATCH] crypto: allow rfc3686 aes-ctr variants in fips mode.
+Date: Fri, 19 Feb 2016 13:34:28 +0100
+Message-ID: <1455885268-15054-1-git-send-email-meissner@suse.de>
+Cc: Marcus Meissner <meissner@suse.de>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	smueller@chronox.de
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:45965 "EHLO mail.kernel.org"
+Received: from mx2.suse.de ([195.135.220.15]:52790 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1425675AbcBRNMW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Feb 2016 08:12:22 -0500
-Content-Disposition: inline
-In-Reply-To: <73fuwtdp3m.fsf@unicorn.hi.pengutronix.de>
+	id S1752615AbcBSMed (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 19 Feb 2016 07:34:33 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 16, 2016 at 09:41:17AM +0100, Steffen Trumtrar wrote:
-> 
-> Hi!
-> 
-> Shawn Guo writes:
-> 
-> > On Thu, Feb 11, 2016 at 03:04:43PM +0100, Steffen Trumtrar wrote:
-> >> Add documentation for the Freescale Security Controller (SCC)
-> >> found on i.MX25 SoCs.
-> >> 
-> >> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-> >> ---
-> >>  .../devicetree/bindings/crypto/fsl-imx-scc.txt          | 17 +++++++++++++++++
-> >>  1 file changed, 17 insertions(+)
-> >>  create mode 100644 Documentation/devicetree/bindings/crypto/fsl-imx-scc.txt
-> >> 
-> >> diff --git a/Documentation/devicetree/bindings/crypto/fsl-imx-scc.txt b/Documentation/devicetree/bindings/crypto/fsl-imx-scc.txt
-> >> new file mode 100644
-> >> index 000000000000..9a15ab8da94f
-> >> --- /dev/null
-> >> +++ b/Documentation/devicetree/bindings/crypto/fsl-imx-scc.txt
-> >> @@ -0,0 +1,17 @@
-> >> +Freescale Security Controller (SCC)
-> >> +
-> >> +Required properties:
-> >> +- compatible : Should be "fsl,imx25-scc".
-> >> +- reg : Should contain register location and length.
-> >> +- interrupts : Should contain interrupt numbers for SCM IRQ and SMN IRQ.
-> >> +
-> >> +Example:
-> >> +
-> >> +	scc: crypto@53fac000 {
-> >> +		compatible = "fsl,imx25-scc";
-> >> +		reg = <0x53fac000 0x4000>;
-> >> +		clocks = <&clks 111>;
-> >> +		clock-names = "ipg";
-> >
-> > Shouldn't these two be mentioned in properties list above too?
-> >
-> 
-> What is the current policy on clocks in bindings? There are some with
-> and some without.
-> 
-> Of course I can add them to the required properties if necessary.
+RFC 3686 CTR in various authenc methods.
 
-I think any required properties should be listed in "Required
-properties:" section.
+rfc3686(ctr(aes)) is already marked fips compliant,
+so these should be fine.
 
-Shawn
+Signed-off-by: Marcus Meissner <meissner@suse.de>
+---
+ crypto/testmgr.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 190a290..5316d59 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2167,6 +2167,10 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "authenc(hmac(sha1),rfc3686(ctr(aes)))",
++		.test = alg_test_null,
++		.fips_allowed = 1,
++	}, {
+ 		.alg = "authenc(hmac(sha224),cbc(des))",
+ 		.test = alg_test_aead,
+ 		.suite = {
+@@ -2239,6 +2243,10 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.test = alg_test_null,
+ 		.fips_allowed = 1,
+ 	}, {
++		.alg = "authenc(hmac(sha256),rfc3686(ctr(aes)))",
++		.test = alg_test_null,
++		.fips_allowed = 1,
++	}, {
+ 		.alg = "authenc(hmac(sha384),cbc(des))",
+ 		.test = alg_test_aead,
+ 		.suite = {
+@@ -2270,6 +2278,10 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.test = alg_test_null,
+ 		.fips_allowed = 1,
+ 	}, {
++		.alg = "authenc(hmac(sha384),rfc3686(ctr(aes)))",
++		.test = alg_test_null,
++		.fips_allowed = 1,
++	}, {
+ 		.alg = "authenc(hmac(sha512),cbc(aes))",
+ 		.fips_allowed = 1,
+ 		.test = alg_test_aead,
+@@ -2315,6 +2327,10 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.test = alg_test_null,
+ 		.fips_allowed = 1,
+ 	}, {
++		.alg = "authenc(hmac(sha512),rfc3686(ctr(aes)))",
++		.test = alg_test_null,
++		.fips_allowed = 1,
++	}, {
+ 		.alg = "cbc(aes)",
+ 		.test = alg_test_skcipher,
+ 		.fips_allowed = 1,
+-- 
+2.1.4
