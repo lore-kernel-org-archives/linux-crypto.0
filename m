@@ -1,54 +1,82 @@
-From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?=
-	<noltari@gmail.com>
-Subject: [PATCH] hw_random: brcm63xx-rng: fix non device tree compatibility
-Date: Sun, 21 Feb 2016 10:53:35 +0100
-Message-ID: <1456048415-18465-1-git-send-email-noltari@gmail.com>
+From: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+Subject: [PATCH 1/3] crypto: scatterwak - Add scatterwalk_sg_copychunks
+Date: Mon, 22 Feb 2016 11:16:15 +0200
+Message-ID: <1456132577-332-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?=
-	<noltari@gmail.com>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	linux-kernel@vger.kernel.org, f.fainelli@gmail.com,
-	jogo@openwrt.org, cernekee@gmail.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <cristian.stoica@nxp.com>,
+	<horia.geanta@nxp.com>, <alexandru.porosanu@nxp.com>,
+	Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+To: <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn1on0080.outbound.protection.outlook.com ([157.56.110.80]:37351
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753198AbcBVJa7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 22 Feb 2016 04:30:59 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Allow building when OF is not enabled as suggested by Florian
+This patch adds the function scatterwalk_sg_copychunks which writes
+a chunk of data from a scatterwalk to another scatterwalk.
+It will be used by caam driver to remove the leading zeros of RSA's
+algorithm output.
 
-Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
-Reported-by: Florian Fainelli <f.fainelli@gmail.com>
+Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 ---
- drivers/char/hw_random/bcm63xx-rng.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ crypto/scatterwalk.c         | 26 ++++++++++++++++++++++++++
+ include/crypto/scatterwalk.h |  2 ++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/drivers/char/hw_random/bcm63xx-rng.c b/drivers/char/hw_ran=
-dom/bcm63xx-rng.c
-index 38553f0..ca9c403 100644
---- a/drivers/char/hw_random/bcm63xx-rng.c
-+++ b/drivers/char/hw_random/bcm63xx-rng.c
-@@ -130,17 +130,19 @@ static int bcm63xx_rng_probe(struct platform_devi=
-ce *pdev)
- 	return 0;
+diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
+index ea5815c..bc3222d 100644
+--- a/crypto/scatterwalk.c
++++ b/crypto/scatterwalk.c
+@@ -125,6 +125,32 @@ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
  }
-=20
-+#ifdef CONFIG_OF
- static const struct of_device_id bcm63xx_rng_of_match[] =3D {
- 	{ .compatible =3D "brcm,bcm6368-rng", },
- 	{},
- };
- MODULE_DEVICE_TABLE(of, bcm63xx_rng_of_match);
-+#endif
-=20
- static struct platform_driver bcm63xx_rng_driver =3D {
- 	.probe		=3D bcm63xx_rng_probe,
- 	.driver		=3D {
- 		.name	=3D "bcm63xx-rng",
--		.of_match_table =3D bcm63xx_rng_of_match,
-+		.of_match_table =3D of_match_ptr(bcm63xx_rng_of_match),
- 	},
- };
-=20
---=20
-1.9.1
+ EXPORT_SYMBOL_GPL(scatterwalk_map_and_copy);
+ 
++void scatterwalk_sg_copychunks(struct scatter_walk *dest,
++			       struct scatter_walk *src, size_t nbytes)
++{
++	for (;;) {
++		unsigned int len_this_page = scatterwalk_pagelen(dest);
++		u8 *vaddr;
++
++		if (len_this_page > nbytes)
++			len_this_page = nbytes;
++
++		vaddr = scatterwalk_map(dest);
++		scatterwalk_copychunks(vaddr, src, len_this_page, 0);
++		scatterwalk_unmap(vaddr);
++
++		scatterwalk_advance(dest, len_this_page);
++
++		if (nbytes == len_this_page)
++			break;
++
++		nbytes -= len_this_page;
++
++		scatterwalk_pagedone(dest, 0, 1);
++	}
++}
++EXPORT_SYMBOL_GPL(scatterwalk_sg_copychunks);
++
+ int scatterwalk_bytes_sglen(struct scatterlist *sg, int num_bytes)
+ {
+ 	int offset = 0, n = 0;
+diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
+index 35f99b6..8b799c5 100644
+--- a/include/crypto/scatterwalk.h
++++ b/include/crypto/scatterwalk.h
+@@ -86,6 +86,8 @@ static inline void scatterwalk_unmap(void *vaddr)
+ void scatterwalk_start(struct scatter_walk *walk, struct scatterlist *sg);
+ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
+ 			    size_t nbytes, int out);
++void scatterwalk_sg_copychunks(struct scatter_walk *dest,
++			       struct scatter_walk *src, size_t nbytes);
+ void *scatterwalk_map(struct scatter_walk *walk);
+ void scatterwalk_done(struct scatter_walk *walk, int out, int more);
+ 
+-- 
+1.8.3.1
