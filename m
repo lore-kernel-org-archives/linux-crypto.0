@@ -1,58 +1,58 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: 3.14.61 breaks dm disk drive encryption?
-Date: Tue, 23 Feb 2016 07:22 +0100
-Message-ID: <3906278.XRapvzHJ78@tauon.atsec.com>
-References: <20160223061755.GA4979@release-approaches.com>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH 4/8] akcipher: Move the RSA DER encoding to the crypto layer
+Date: Tue, 23 Feb 2016 10:53:19 +0000
+Message-ID: <12559.1456224799@warthog.procyon.org.uk>
+References: <56CB9B34.20902@intel.com> <56CB68A2.50505@intel.com> <20160219171806.17223.91381.stgit@warthog.procyon.org.uk> <20160219171836.17223.9507.stgit@warthog.procyon.org.uk> <1562.1456180090@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: "J. Paul Reed" <preed@release-approaches.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60030 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932176AbcBWGWJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 23 Feb 2016 01:22:09 -0500
-In-Reply-To: <20160223061755.GA4979@release-approaches.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Cc: dhowells@redhat.com, keyrings@vger.kernel.org,
+	linux-security-module@vger.kernel.org, zohar@linux.vnet.ibm.com,
+	linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <56CB9B34.20902@intel.com>
+Content-ID: <12558.1456224799.1@warthog.procyon.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Montag, 22. Februar 2016, 22:17:55 schrieb J. Paul Reed:
+Tadeusz Struk <tadeusz.struk@intel.com> wrote:
 
-Hi J,
+> > Ummm...  Possibly.  Is that how it's used?
+> > 
+> > 	warthog>git grep pkcs1pad -- Documentation
+> > 	warthog1>
+> 
+> Yes, no docs. Sorry.
 
-> Hey all,
-> 
-> I just upgraded from 3.14.60 to 3.14.61, and when I try to mount my
-> luks-encrypted disk drives, I get an error saying the mapping couldn't be
-> created and to check whether aes-xts-plain64 is compiled into the kernel;
-> it is:
-> 
-> [preed@underworld linux-3.14.61]$ grep CRYPTO_AES .config
-> CONFIG_CRYPTO_AES=y
-> CONFIG_CRYPTO_AES_X86_64=y
-> CONFIG_CRYPTO_AES_NI_INTEL=y
-> 
-> This all works fine with 3.14.60 (and previous 3.14-versions), and I
-> compiled .61 by copying the .config over and "make oldconfig"'ing, so I'd
-> expect this to work.
-> 
-> I looked around for other config options I need to turn on but nothing
-> popped out at me. Looking through the changelog for 3.14.61, perhaps this
-> is related to the fix for 7e6978fb73 ?
-> 
-> I can provide more exact error messaging if it'd help, but I'd expect a
-> "make oldconfig" to carry over all the options correctly, as it's done for
-> the rest of the 3.14 kernels.
+Can I suggest you at least stick a quick usage summary in the banner comment
+at the top of the file?
 
-Please see the thread "Broken userspace in crypto in linux-4.1.8" from last 
-week in this mailing list for details.
+> > Anyway, the problem I have with this is that I want to get that knowledge
+> > out of the asymmetric key in-software public key subtype.  It knows "rsa",
+> > "dsa", "ecdsa", ... because that's all the OIDs tell it.
 > 
-> Any ideas?
+> Rigth, for now the public_key would need to build the full algorithm string as
+> follows:
 > 
-> thanks,
-> preed
+> vsprintf(name, "pkcs1pad(%s, %s)", pkey_algo_name[sig->pkey_algo],
+>          hash_algo_name[sig->pkey_hash_algo]);
 
+Does this apply to anything other than RSA?
 
-Ciao
-Stephan
+> Do you plan to add more padding schemes later? 
+
+No plans to, but one never knows.  I'm *assuming* that OID_rsaEncryption and
+OID_sha256WithRSAEncryption, for example, must implicitly specify the padding
+scheme (RFC4055 suggests I'm right in this assumption).
+
+We might have to suppose RSASSA-SSP at some point.
+
+> Yes, I can start woring on a subsequent patch based on your changes in
+> http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-rsa
+> Is that ok with you?
+
+Sure.
+
+David
