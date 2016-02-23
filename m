@@ -1,74 +1,53 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH 4/8] akcipher: Move the RSA DER encoding to the crypto
- layer
-Date: Mon, 22 Feb 2016 15:35:16 -0800
-Message-ID: <56CB9B34.20902@intel.com>
-References: <56CB68A2.50505@intel.com>
- <20160219171806.17223.91381.stgit@warthog.procyon.org.uk>
- <20160219171836.17223.9507.stgit@warthog.procyon.org.uk>
- <1562.1456180090@warthog.procyon.org.uk>
+From: Andrew Zaborowski <balrogg@googlemail.com>
+Subject: Re: [PATCH 4/8] akcipher: Move the RSA DER encoding to the crypto layer
+Date: Tue, 23 Feb 2016 01:01:50 +0100
+Message-ID: <CAOq732LxkcSbk93ofENxL-53SFRQEtK7PcLF9LDLYmctX9W7cA@mail.gmail.com>
+References: <20160219171806.17223.91381.stgit@warthog.procyon.org.uk>
+	<20160219171836.17223.9507.stgit@warthog.procyon.org.uk>
+	<56CB68A2.50505@intel.com>
+	<1562.1456180090@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
-	zohar@linux.vnet.ibm.com, linux-kernel@vger.kernel.org,
+Content-Type: text/plain; charset=UTF-8
+Cc: Tadeusz Struk <tadeusz.struk@intel.com>, keyrings@vger.kernel.org,
+	linux-security-module@vger.kernel.org, zohar@linux.vnet.ibm.com,
+	linux-kernel@vger.kernel.org,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:10617 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756573AbcBVXjd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 22 Feb 2016 18:39:33 -0500
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:35463 "EHLO
+	mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756487AbcBWABw (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 22 Feb 2016 19:01:52 -0500
 In-Reply-To: <1562.1456180090@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 02/22/2016 02:28 PM, David Howells wrote:
+Hi,
+
+On 22 February 2016 at 23:28, David Howells <dhowells@redhat.com> wrote:
 > Tadeusz Struk <tadeusz.struk@intel.com> wrote:
-> 
+>
 >> I wonder if this should be merged with the crypto/rsa-pkcs1pad.c template
 >> that we already have. Looks like the two do the same padding now.
+
+I think that'd be a good thing to do.
+
 >> Should we merge then and pass the hash param as a separate template param,
 >> e.g the public_key would allocate "pkcs1pad(rsa, sha1)"?
-> 
+>
 > Ummm...  Possibly.  Is that how it's used?
-> 
-> 	warthog>git grep pkcs1pad -- Documentation
-> 	warthog1>
 
-Yes, no docs. Sorry.
+Currently it only does the padding and doesn't care about the hash.
+The input is expected to be the entire DigestInfo struct.
 
-> 
-> Anyway, the problem I have with this is that I want to get that knowledge out
-> of the asymmetric key in-software public key subtype.  It knows "rsa", "dsa",
-> "ecdsa", ... because that's all the OIDs tell it.
+AIUI Tadeusz is proposing adding the hashing as a new feature.  Note
+though that the hash paremeter won't make sense for the encrypt,
+decrypt or verify operations.
 
-Rigth, for now the public_key would need to build the full algorithm string as
-follows:
+Also note that TLS 1.0 uses the padding to sign data that is not a
+DigestInfo structure and even for 1.2 there are situations where
+you'll be hashing the data yourself over some time and then you'll
+want the algorithm to only do the padding and RSA signing.
 
-vsprintf(name, "pkcs1pad(%s, %s)", pkey_algo_name[sig->pkey_algo],
-         hash_algo_name[sig->pkey_hash_algo]);
-
-Do you plan to add more padding schemes later? 
-
-> 
-> I guess if I have to, I can stoop to converting "rsa" to "pkcs1pad(rsa, sha1)".
-> 
-> Can you do me a really quick merge?  -rc5 is already out, and I want to get it
-> to James pronto - plus I have things that are pending on this change being
-> made.
-
-Yes, I can start woring on a subsequent patch based on your changes in
-http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-rsa
-Is that ok with you?
-
-> 
-> Oh - and how does the padding template find the algorithm DER encoding string
-> to use?  I have wondered whether it should be stored in with the hash
-> algorithm, but it probably makes more sense to keep it with the rsa module.
-
-We can put everything into the crypto/rsa-pkcs1pad.c
-This is where all the padding logic should be, I think.
-Thanks,
--- 
-TS
+Cheers
