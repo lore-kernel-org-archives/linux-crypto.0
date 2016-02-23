@@ -1,47 +1,39 @@
-From: Andrew Zaborowski <balrogg@googlemail.com>
-Subject: Re: [PATCH 4/8] akcipher: Move the RSA DER encoding to the crypto layer
-Date: Tue, 23 Feb 2016 12:25:28 +0100
-Message-ID: <CAOq732KiaTLY9PidbHZ5H8GvDgi5kpxRopd8rDqvrXpCUtwgTg@mail.gmail.com>
-References: <20160219171806.17223.91381.stgit@warthog.procyon.org.uk>
-	<20160219171836.17223.9507.stgit@warthog.procyon.org.uk>
-	<56CB68A2.50505@intel.com>
-	<1562.1456180090@warthog.procyon.org.uk>
-	<CAOq732LxkcSbk93ofENxL-53SFRQEtK7PcLF9LDLYmctX9W7cA@mail.gmail.com>
-	<12696.1456224917@warthog.procyon.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>, keyrings@vger.kernel.org,
-	linux-security-module@vger.kernel.org, zohar@linux.vnet.ibm.com,
-	linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <12696.1456224917@warthog.procyon.org.uk>
-Sender: owner-linux-security-module@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Sasha Levin <sasha.levin@oracle.com>
+Subject: [PATCH] crypto: algif_hash - correctly handle algos without state
+Date: Tue, 23 Feb 2016 12:01:56 -0500
+Message-ID: <1456246916-16130-1-git-send-email-sasha.levin@oracle.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sasha Levin <sasha.levin@oracle.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from aserp1040.oracle.com ([141.146.126.69]:17144 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751872AbcBWRCJ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Feb 2016 12:02:09 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi David,
+Algorithms without state will cause the creation of a 0 sized array, which
+is undefined outside of structs.
 
-On 23 February 2016 at 11:55, David Howells <dhowells@redhat.com> wrote:
-> Andrew Zaborowski <balrogg@googlemail.com> wrote:
->
->> AIUI Tadeusz is proposing adding the hashing as a new feature.  Note
->> though that the hash paremeter won't make sense for the encrypt,
->> decrypt or verify operations.
->
-> The hash parameter is necessary for the verify operation.  From my
-> perspective, I want a verify operation that takes the signature, the message
-> hash and the hash name and gives me back an error code.
+Signed-off-by: Sasha Levin <sasha.levin@oracle.com>
+---
+ crypto/algif_hash.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->From the certificates point of view yes, but the akcipher API only has
-the four operations each of which has one input buffer and out output
-buffer.
-
-Without overhauling akcipher you could modify pkcs1pad so that sign
-takes the hash as input, adds the DER struct in front of it to build
-the signature, and the verify operation could at most check that the
-DER string matches the hash type and return the hash.  But I think
-RFC2437 suggests that you rather compare the signatures, not the
-hashes.
-
-Cheers
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index 68a5cea..a9f923f 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -184,7 +184,7 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags)
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct hash_ctx *ctx = ask->private;
+ 	struct ahash_request *req = &ctx->req;
+-	char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req))];
++	char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req))?:1];
+ 	struct sock *sk2;
+ 	struct alg_sock *ask2;
+ 	struct hash_ctx *ctx2;
+-- 
+1.7.10.4
