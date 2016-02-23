@@ -1,53 +1,59 @@
-From: Andrew Zaborowski <balrogg@googlemail.com>
-Subject: Re: [PATCH 4/8] akcipher: Move the RSA DER encoding to the crypto layer
-Date: Tue, 23 Feb 2016 01:01:50 +0100
-Message-ID: <CAOq732LxkcSbk93ofENxL-53SFRQEtK7PcLF9LDLYmctX9W7cA@mail.gmail.com>
-References: <20160219171806.17223.91381.stgit@warthog.procyon.org.uk>
-	<20160219171836.17223.9507.stgit@warthog.procyon.org.uk>
-	<56CB68A2.50505@intel.com>
-	<1562.1456180090@warthog.procyon.org.uk>
+From: "J. Paul Reed" <preed@release-approaches.com>
+Subject: 3.14.61 breaks dm disk drive encryption?
+Date: Mon, 22 Feb 2016 22:17:55 -0800
+Message-ID: <20160223061755.GA4979@release-approaches.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>, keyrings@vger.kernel.org,
-	linux-security-module@vger.kernel.org, zohar@linux.vnet.ibm.com,
-	linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f45.google.com ([74.125.82.45]:35463 "EHLO
-	mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756487AbcBWABw (ORCPT
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:53312 "EHLO
+	out4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751926AbcBWGR6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 22 Feb 2016 19:01:52 -0500
-In-Reply-To: <1562.1456180090@warthog.procyon.org.uk>
+	Tue, 23 Feb 2016 01:17:58 -0500
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailout.nyi.internal (Postfix) with ESMTP id B0BAB209F3
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Feb 2016 01:17:57 -0500 (EST)
+Received: from release-approaches.com (c-50-174-131-147.hsd1.ca.comcast.net [50.174.131.147])
+	by mail.messagingengine.com (Postfix) with ESMTPA id 3A3B168009C
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Feb 2016 01:17:57 -0500 (EST)
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
 
-On 22 February 2016 at 23:28, David Howells <dhowells@redhat.com> wrote:
-> Tadeusz Struk <tadeusz.struk@intel.com> wrote:
->
->> I wonder if this should be merged with the crypto/rsa-pkcs1pad.c template
->> that we already have. Looks like the two do the same padding now.
+Hey all,
 
-I think that'd be a good thing to do.
+I just upgraded from 3.14.60 to 3.14.61, and when I try to mount my
+luks-encrypted disk drives, I get an error saying the mapping couldn't be
+created and to check whether aes-xts-plain64 is compiled into the kernel;
+it is:
 
->> Should we merge then and pass the hash param as a separate template param,
->> e.g the public_key would allocate "pkcs1pad(rsa, sha1)"?
->
-> Ummm...  Possibly.  Is that how it's used?
+[preed@underworld linux-3.14.61]$ grep CRYPTO_AES .config
+CONFIG_CRYPTO_AES=y
+CONFIG_CRYPTO_AES_X86_64=y
+CONFIG_CRYPTO_AES_NI_INTEL=y
 
-Currently it only does the padding and doesn't care about the hash.
-The input is expected to be the entire DigestInfo struct.
+This all works fine with 3.14.60 (and previous 3.14-versions), and I
+compiled .61 by copying the .config over and "make oldconfig"'ing, so I'd
+expect this to work.
 
-AIUI Tadeusz is proposing adding the hashing as a new feature.  Note
-though that the hash paremeter won't make sense for the encrypt,
-decrypt or verify operations.
+I looked around for other config options I need to turn on but nothing
+popped out at me. Looking through the changelog for 3.14.61, perhaps this
+is related to the fix for 7e6978fb73 ?
 
-Also note that TLS 1.0 uses the padding to sign data that is not a
-DigestInfo structure and even for 1.2 there are situations where
-you'll be hashing the data yourself over some time and then you'll
-want the algorithm to only do the padding and RSA signing.
+I can provide more exact error messaging if it'd help, but I'd expect a
+"make oldconfig" to carry over all the options correctly, as it's done for
+the rest of the 3.14 kernels.
 
-Cheers
+Any ideas?
+
+thanks,
+preed
+-- 
+J. Paul Reed
+Release Engineering Approaches
+Simply ship. Every time.
+
+http://release-approaches.com/
+(415) 226-9655
