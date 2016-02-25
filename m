@@ -1,36 +1,41 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Is a crypto_ahash_init required before invoking crypto_ahash_import?
-Date: Thu, 25 Feb 2016 15:56:31 -0600
-Message-ID: <56CF788F.5050209@amd.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Is a crypto_ahash_init required before invoking
+ crypto_ahash_import?
+Date: Thu, 25 Feb 2016 22:11:34 +0000
+Message-ID: <20160225221134.GA27728@gondor.apana.org.au>
+References: <56CF788F.5050209@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-To: <linux-crypto@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Tom Lendacky <thomas.lendacky@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0084.outbound.protection.outlook.com ([207.46.100.84]:59648
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750830AbcBYV4h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Feb 2016 16:56:37 -0500
+Received: from helcar.hengli.com.au ([209.40.204.226]:43082 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751474AbcBYWLj (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 25 Feb 2016 17:11:39 -0500
+Content-Disposition: inline
+In-Reply-To: <56CF788F.5050209@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I'm seeing an issue on one system that I wasn't seeing on another
-system. It turns out that the testmgr sha testing exports an ahash
-request context, allocates a new ahash request context and then imports
-into that new ahash request context. Since crypto_ahash_init() is not
-performed the driver request context could have random data in it,
-which ends up causing an error. As part of the import/export support
-that I added for the ccp driver I reduced the amount of data that was
-exported, but I guess I always assumed that crypto_ahash_init() would
-have been called before doing a crypto_ahash_import().
+On Thu, Feb 25, 2016 at 03:56:31PM -0600, Tom Lendacky wrote:
+>
+> I can fix this in the driver by doing a memset to zero of the request
+> context area during the import. But I guess I'm also wondering if there
+> is an expectation/requirement that crypto_ahash_init() be called before
+> doing an import?  If there is the I can add that to the testmgr code
+> instead.
 
-I can fix this in the driver by doing a memset to zero of the request
-context area during the import. But I guess I'm also wondering if there
-is an expectation/requirement that crypto_ahash_init() be called before
-doing an import?  If there is the I can add that to the testmgr code
-instead.
+No init means wiping out the hash state so that a new hash can be
+computed.  Import means importing the hash state so that computation
+can be continued from that point onwards.
 
-Thanks,
-Tom
+So they're independent of each other and you must be able to handle
+an import without an init and vice versa.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
