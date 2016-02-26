@@ -1,81 +1,40 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 2/2] lib/mpi: use "static inline" instead of "extern inline"
-Date: Fri, 26 Feb 2016 13:46:27 +0100
-Message-ID: <1456490794-1034544-2-git-send-email-arnd@arndb.de>
-References: <1456490794-1034544-1-git-send-email-arnd@arndb.de>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Dmitry Kasatkin <dmitry.kasatkin@intel.com>,
-	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Michal Marek <mmarek@suse.com>
+Subject: Re: [PATCH] X.509: Fix test for self-signed certificate
+Date: Fri, 26 Feb 2016 13:51:51 +0100
+Message-ID: <56D04A67.4070601@suse.com>
+References: <1455197665-11199-1-git-send-email-mmarek@suse.com>
+ <16658.1456325653@warthog.procyon.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.133]:64601 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753959AbcBZMrg (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 26 Feb 2016 07:47:36 -0500
-In-Reply-To: <1456490794-1034544-1-git-send-email-arnd@arndb.de>
+Received: from mx2.suse.de ([195.135.220.15]:53057 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751350AbcBZMvy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 26 Feb 2016 07:51:54 -0500
+In-Reply-To: <16658.1456325653@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When we use CONFIG_PROFILE_ALL_BRANCHES, every 'if()' introduces
-a static variable, but that is not allowed in 'extern inline'
-functions:
+On 2016-02-24 15:54, David Howells wrote:
+> Hi Michal,
+> 
+> I have the attached patch already in my queue.
+> 
+> David
+> ---
+> commit d19fcb825912c67e09e0575b95accaa42899e07f
+> Author: David Howells <dhowells@redhat.com>
+> Date:   Wed Feb 24 14:37:54 2016 +0000
+> 
+>     X.509: Don't treat self-signed keys specially
 
-mpi-inline.h:116:204: warning: '______f' is static but declared in inline function 'mpihelp_sub' which is not static
-mpi-inline.h:113:184: warning: '______f' is static but declared in inline function 'mpihelp_sub' which is not static
-mpi-inline.h:70:184: warning: '______f' is static but declared in inline function 'mpihelp_add' which is not static
-mpi-inline.h:56:204: warning: '______f' is static but declared in inline function 'mpihelp_add_1' which is not static
+Hi David,
 
-This changes the MPI code to use 'static inline' instead, to get
-rid of hundreds of warnings.
+this solves my problem too, obviously. I thought the signature check for
+self-signed certificates was a sort of consistency check.
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- lib/mpi/mpi-inline.h   | 2 +-
- lib/mpi/mpi-internal.h | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/lib/mpi/mpi-inline.h b/lib/mpi/mpi-inline.h
-index e2b39852b30a..c245ea31f785 100644
---- a/lib/mpi/mpi-inline.h
-+++ b/lib/mpi/mpi-inline.h
-@@ -30,7 +30,7 @@
- #define G10_MPI_INLINE_H
- 
- #ifndef G10_MPI_INLINE_DECL
--#define G10_MPI_INLINE_DECL  extern inline
-+#define G10_MPI_INLINE_DECL  static inline
- #endif
- 
- G10_MPI_INLINE_DECL mpi_limb_t
-diff --git a/lib/mpi/mpi-internal.h b/lib/mpi/mpi-internal.h
-index c65dd1bff45a..7eceeddb3fb8 100644
---- a/lib/mpi/mpi-internal.h
-+++ b/lib/mpi/mpi-internal.h
-@@ -168,19 +168,19 @@ void mpi_rshift_limbs(MPI a, unsigned int count);
- int mpi_lshift_limbs(MPI a, unsigned int count);
- 
- /*-- mpihelp-add.c --*/
--mpi_limb_t mpihelp_add_1(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
-+static inline mpi_limb_t mpihelp_add_1(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
- 			 mpi_size_t s1_size, mpi_limb_t s2_limb);
- mpi_limb_t mpihelp_add_n(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
- 			 mpi_ptr_t s2_ptr, mpi_size_t size);
--mpi_limb_t mpihelp_add(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr, mpi_size_t s1_size,
-+static inline mpi_limb_t mpihelp_add(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr, mpi_size_t s1_size,
- 		       mpi_ptr_t s2_ptr, mpi_size_t s2_size);
- 
- /*-- mpihelp-sub.c --*/
--mpi_limb_t mpihelp_sub_1(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
-+static inline mpi_limb_t mpihelp_sub_1(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
- 			 mpi_size_t s1_size, mpi_limb_t s2_limb);
- mpi_limb_t mpihelp_sub_n(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
- 			 mpi_ptr_t s2_ptr, mpi_size_t size);
--mpi_limb_t mpihelp_sub(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr, mpi_size_t s1_size,
-+static inline mpi_limb_t mpihelp_sub(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr, mpi_size_t s1_size,
- 		       mpi_ptr_t s2_ptr, mpi_size_t s2_size);
- 
- /*-- mpihelp-cmp.c --*/
--- 
-2.7.0
+Thanks,
+Michal
