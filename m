@@ -1,55 +1,54 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH] crypto: ccp - memset request context to zero during import
-Date: Thu, 25 Feb 2016 16:48:13 -0600
-Message-ID: <20160225224813.2020.48336.stgit@tlendack-t1.amdoffice.net>
+From: Milan Broz <gmazyland@gmail.com>
+Subject: Re: [PATCH] Re: Broken userspace crypto in linux-4.1.18
+Date: Fri, 26 Feb 2016 12:25:15 +0100
+Message-ID: <56D0361B.8040301@gmail.com>
+References: <56C47DF9.6030704@whissi.de> <20160217233353.GC31125@1wt.eu>
+ <56C50725.6080408@whissi.de> <4580306.arupsYiYbb@positron.chronox.de>
+ <56C591E7.5080808@suse.cz> <56C5A66E.5010905@whissi.de>
+ <56C87929.8040304@whissi.de> <56C9E865.3050500@gmail.com>
+ <56CD6AB6.7000801@suse.cz> <56CD6FD8.20004@gmail.com>
+ <20160224171203.GE16597@kroah.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0096.outbound.protection.outlook.com ([65.55.169.96]:9535
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750850AbcBYWsW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Feb 2016 17:48:22 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Jiri Slaby <jslaby@suse.cz>, "Thomas D." <whissi@whissi.de>,
+	Stephan Mueller <smueller@chronox.de>,
+	Willy Tarreau <w@1wt.eu>, Sasha Levin <sasha.levin@oracle.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"dvyukov@google.com" <dvyukov@google.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Ondrej Kozina <okozina@redhat.com>
+To: Greg KH <gregkh@linuxfoundation.org>,
+	Milan Broz <gmazyland@gmail.com>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20160224171203.GE16597@kroah.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Since a crypto_ahash_import() can be called against a request context
-that has not had a crypto_ahash_init() performed, the request context
-needs to be cleared to insure there is no random data present. If not,
-the random data can result in a kernel oops during crypto_ahash_update().
+On 02/24/2016 06:12 PM, Greg KH wrote:
+> On Wed, Feb 24, 2016 at 09:54:48AM +0100, Milan Broz wrote:
+>> On 02/24/2016 09:32 AM, Jiri Slaby wrote:
+>>>> +	af_alg_release_parent(sk);
+>>>
+>>> and this occurs to me like a double release?
+>>
+>> yes, my copy&paste mistake.
+> 
+> Which is why I want the real patches backported please.  Whenever we do
+> a "just this smaller patch" for a stable kernel, it is ALWAYS wrong.
 
-Cc: <stable@vger.kernel.org> # 3.14.x-
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
----
- drivers/crypto/ccp/ccp-crypto-aes-cmac.c |    1 +
- drivers/crypto/ccp/ccp-crypto-sha.c      |    1 +
- 2 files changed, 2 insertions(+)
+I think that it was clear that I do not want you to directly include
+this patch, just it points to the direction where is the problem.
 
-diff --git a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
-index d095452..3d9acc5 100644
---- a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
-+++ b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
-@@ -244,6 +244,7 @@ static int ccp_aes_cmac_import(struct ahash_request *req, const void *in)
- 	/* 'in' may not be aligned so memcpy to local variable */
- 	memcpy(&state, in, sizeof(state));
- 
-+	memset(rctx, 0, sizeof(*rctx));
- 	rctx->null_msg = state.null_msg;
- 	memcpy(rctx->iv, state.iv, sizeof(rctx->iv));
- 	rctx->buf_count = state.buf_count;
-diff --git a/drivers/crypto/ccp/ccp-crypto-sha.c b/drivers/crypto/ccp/ccp-crypto-sha.c
-index 7002c6b..8ef06fa 100644
---- a/drivers/crypto/ccp/ccp-crypto-sha.c
-+++ b/drivers/crypto/ccp/ccp-crypto-sha.c
-@@ -233,6 +233,7 @@ static int ccp_sha_import(struct ahash_request *req, const void *in)
- 	/* 'in' may not be aligned so memcpy to local variable */
- 	memcpy(&state, in, sizeof(state));
- 
-+	memset(rctx, 0, sizeof(*rctx));
- 	rctx->type = state.type;
- 	rctx->msg_bits = state.msg_bits;
- 	rctx->first = state.first;
+Anyway, seems the problem is only in 4.1.18.
+
+> Please backport the patches in a correct way so that we can apply
+> them...
+
+Not sure if it is still needed, but I'll reply to this thread with my git version
+of backported patches for 4.1.18.
+(Resp. only the first need changes, other then applied cleanly from upstream).
+
+Thanks,
+Milan
