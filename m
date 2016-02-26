@@ -1,40 +1,35 @@
-From: Michal Marek <mmarek@suse.com>
-Subject: Re: [PATCH] X.509: Fix test for self-signed certificate
-Date: Fri, 26 Feb 2016 13:51:51 +0100
-Message-ID: <56D04A67.4070601@suse.com>
-References: <1455197665-11199-1-git-send-email-mmarek@suse.com>
- <16658.1456325653@warthog.procyon.org.uk>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH 2/2] crypto: remove padding logic from rsa.c
+Date: Fri, 26 Feb 2016 14:00:21 +0000
+Message-ID: <21318.1456495221@warthog.procyon.org.uk>
+References: <20160224171258.29272.1684.stgit@tstruk-mobl1> <20160224171237.29272.51126.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org,
+	balrogg@googlemail.com, linux-security-module@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	zohar@linux.vnet.ibm.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:53057 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:60342 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751350AbcBZMvy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 26 Feb 2016 07:51:54 -0500
-In-Reply-To: <16658.1456325653@warthog.procyon.org.uk>
+	id S1753058AbcBZOAY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 26 Feb 2016 09:00:24 -0500
+In-Reply-To: <20160224171258.29272.1684.stgit@tstruk-mobl1>
+Content-ID: <21317.1456495221.1@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 2016-02-24 15:54, David Howells wrote:
-> Hi Michal,
-> 
-> I have the attached patch already in my queue.
-> 
-> David
-> ---
-> commit d19fcb825912c67e09e0575b95accaa42899e07f
-> Author: David Howells <dhowells@redhat.com>
-> Date:   Wed Feb 24 14:37:54 2016 +0000
-> 
->     X.509: Don't treat self-signed keys specially
+Tadeusz Struk <tadeusz.struk@intel.com> wrote:
 
-Hi David,
+> +		if (memcmp(sig->digest, output, sig->digest_size) ||
 
-this solves my problem too, obviously. I thought the signature check for
-self-signed certificates was a sort of consistency check.
+I've added " != 0" after the memcmp().
 
-Thanks,
-Michal
+> +		    req->dst_len != sig->digest_size)
+> +			ret = -EBADMSG;
+
+Btw, this has to be -EKEYREJECTED; -EBADMSG would indicate that the container
+is unparseable.  I wonder if we should propose a -ESIGREJECTED error...
+
+David
