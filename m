@@ -1,68 +1,55 @@
-From: Milan Broz <gmazyland@gmail.com>
-Subject: [PATCH 4/4]     crypto: algif_skcipher - Fix race condition in skcipher_check_key
-Date: Fri, 26 Feb 2016 12:44:11 +0100
-Message-ID: <1456487051-14652-4-git-send-email-gmazyland@gmail.com>
-References: <56D0361B.8040301@gmail.com>
- <1456487051-14652-1-git-send-email-gmazyland@gmail.com>
-Cc: stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
-To: linux-crypto@vger.kernel.org
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <1456487051-14652-1-git-send-email-gmazyland@gmail.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 1/2] lib/mpi: avoid assembler warning
+Date: Fri, 26 Feb 2016 13:46:26 +0100
+Message-ID: <1456490794-1034544-1-git-send-email-arnd@arndb.de>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Dmitry Kasatkin <dmitry.kasatkin@intel.com>,
+	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mout.kundenserver.de ([212.227.126.130]:57244 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751488AbcBZMrV (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 26 Feb 2016 07:47:21 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
+A wrapper around the umull assembly instruction might reuse
+the input register as an output, which is undefined on
+some ARM machines, as pointed out by this assembler warning:
 
-    commit 1822793a523e5d5730b19cc21160ff1717421bc8 upstream.
+  CC      lib/mpi/generic_mpih-mul1.o
+/tmp/ccxJuxIy.s: Assembler messages:
+/tmp/ccxJuxIy.s:53: rdhi, rdlo and rm must all be different
+  CC      lib/mpi/generic_mpih-mul2.o
+/tmp/ccI0scAD.s: Assembler messages:
+/tmp/ccI0scAD.s:53: rdhi, rdlo and rm must all be different
+  CC      lib/mpi/generic_mpih-mul3.o
+/tmp/ccMvVQcp.s: Assembler messages:
+/tmp/ccMvVQcp.s:53: rdhi, rdlo and rm must all be different
 
-    We need to lock the child socket in skcipher_check_key as otherwise
-    two simultaneous calls can cause the parent socket to be freed.
+This changes the constraints to force different registers to
+be used as output.
 
-    Cc: stable@vger.kernel.org
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- crypto/algif_skcipher.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ lib/mpi/longlong.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 83bcf75..c0f0356 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -757,22 +757,23 @@ static struct proto_ops algif_skcipher_ops = {
- 
- static int skcipher_check_key(struct socket *sock)
- {
--	int err;
-+	int err = 0;
- 	struct sock *psk;
- 	struct alg_sock *pask;
- 	struct skcipher_tfm *tfm;
- 	struct sock *sk = sock->sk;
- 	struct alg_sock *ask = alg_sk(sk);
- 
-+	lock_sock(sk);
- 	if (ask->refcnt)
--		return 0;
-+		goto unlock_child;
- 
- 	psk = ask->parent;
- 	pask = alg_sk(ask->parent);
- 	tfm = pask->private;
- 
- 	err = -ENOKEY;
--	lock_sock(psk);
-+	lock_sock_nested(psk, SINGLE_DEPTH_NESTING);
- 	if (!tfm->has_key)
- 		goto unlock;
- 
-@@ -786,6 +787,8 @@ static int skcipher_check_key(struct socket *sock)
- 
- unlock:
- 	release_sock(psk);
-+unlock_child:
-+	release_sock(sk);
- 
- 	return err;
- }
+diff --git a/lib/mpi/longlong.h b/lib/mpi/longlong.h
+index b90e255c2a68..93336502af08 100644
+--- a/lib/mpi/longlong.h
++++ b/lib/mpi/longlong.h
+@@ -216,7 +216,7 @@ extern UDItype __udiv_qrnnd(UDItype *, UDItype, UDItype, UDItype);
+ 	__asm__ ("%@ Inlined umul_ppmm\n" \
+ 		"umull %r1, %r0, %r2, %r3" \
+ 	: "=&r" ((USItype)(xh)), \
+-			"=r" ((USItype)(xl)) \
++			"=&r" ((USItype)(xl)) \
+ 	: "r" ((USItype)(a)), \
+ 			"r" ((USItype)(b)) \
+ 	: "r0", "r1")
 -- 
 2.7.0
