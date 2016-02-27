@@ -1,34 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: algif_hash - correctly handle algos without state
-Date: Sat, 27 Feb 2016 17:10:39 +0000
-Message-ID: <20160227171039.GA8420@gondor.apana.org.au>
-References: <1456246916-16130-1-git-send-email-sasha.levin@oracle.com>
+Subject: Re: [PATCH 2/2] crypto: remove padding logic from rsa.c
+Date: Sat, 27 Feb 2016 18:40:05 +0000
+Message-ID: <20160227184005.GA8856@gondor.apana.org.au>
+References: <20160224171258.29272.1684.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Sasha Levin <sasha.levin@oracle.com>
+Cc: dhowells@redhat.com, tadeusz.struk@intel.com,
+	linux-kernel@vger.kernel.org, balrogg@googlemail.com,
+	linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, zohar@linux.vnet.ibm.com,
+	James Morris <jmorris@namei.org>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49570 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:44647 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756553AbcB0RKt (ORCPT
+	with ESMTP id S1756590AbcB0SkS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 27 Feb 2016 12:10:49 -0500
+	Sat, 27 Feb 2016 13:40:18 -0500
 Content-Disposition: inline
-In-Reply-To: <1456246916-16130-1-git-send-email-sasha.levin@oracle.com>
+In-Reply-To: <20160224171258.29272.1684.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 23, 2016 at 12:01:56PM -0500, Sasha Levin wrote:
-> Algorithms without state will cause the creation of a 0 sized array, which
-> is undefined outside of structs.
+Tadeusz Struk <tadeusz.struk@intel.com> wrote:
+>
+> diff --git a/crypto/rsa.c b/crypto/rsa.c
+> index 9a7c9ca..77d737f 100644
+> --- a/crypto/rsa.c
+> +++ b/crypto/rsa.c
+> @@ -16,78 +16,6 @@
+> #include <crypto/algapi.h>
 > 
-> Signed-off-by: Sasha Levin <sasha.levin@oracle.com>
+> /*
+> - * Hash algorithm OIDs plus ASN.1 DER wrappings [RFC4880 sec 5.2.2].
+> - */
+> -static const u8 rsa_digest_info_md5[] = {
+> -       0x30, 0x20, 0x30, 0x0c, 0x06, 0x08,
+> -       0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x02, 0x05, /* OID */
+> -       0x05, 0x00, 0x04, 0x10
+> -};
 
-Actually the state size should never be zero and we check it upon
-algorithm registration, so how can this possibly happen?
-
-Thanks,
+Where did this come from? It's not in my tree.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
