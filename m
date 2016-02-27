@@ -1,58 +1,37 @@
-From: Sasha Levin <sasha.levin@oracle.com>
-Subject: Re: [PATCH] Re: Broken userspace crypto in linux-4.1.18
-Date: Fri, 26 Feb 2016 11:43:22 -0500
-Message-ID: <56D080AA.7030307@oracle.com>
-References: <56C47DF9.6030704@whissi.de> <20160217233353.GC31125@1wt.eu>
- <56C50725.6080408@whissi.de> <4580306.arupsYiYbb@positron.chronox.de>
- <56C591E7.5080808@suse.cz> <56C5A66E.5010905@whissi.de>
- <56C87929.8040304@whissi.de> <56C9E865.3050500@gmail.com>
- <56CD6AB6.7000801@suse.cz> <56CD6FD8.20004@gmail.com>
- <20160224171203.GE16597@kroah.com> <56D0361B.8040301@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Is a crypto_ahash_init required before invoking
+ crypto_ahash_import?
+Date: Sat, 27 Feb 2016 07:35:33 +0000
+Message-ID: <20160227073533.GA3693@gondor.apana.org.au>
+References: <56CF788F.5050209@amd.com>
+ <20160225221134.GA27728@gondor.apana.org.au>
+ <56CF7FAE.6060402@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Jiri Slaby <jslaby@suse.cz>, "Thomas D." <whissi@whissi.de>,
-	Stephan Mueller <smueller@chronox.de>,
-	Willy Tarreau <w@1wt.eu>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"dvyukov@google.com" <dvyukov@google.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Ondrej Kozina <okozina@redhat.com>
-To: Milan Broz <gmazyland@gmail.com>,
-	Greg KH <gregkh@linuxfoundation.org>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <56D0361B.8040301@gmail.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:55784 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751378AbcB0Hf7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 27 Feb 2016 02:35:59 -0500
+Content-Disposition: inline
+In-Reply-To: <56CF7FAE.6060402@amd.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 02/26/2016 06:25 AM, Milan Broz wrote:
-> On 02/24/2016 06:12 PM, Greg KH wrote:
->> On Wed, Feb 24, 2016 at 09:54:48AM +0100, Milan Broz wrote:
->>> On 02/24/2016 09:32 AM, Jiri Slaby wrote:
->>>>> +	af_alg_release_parent(sk);
->>>>
->>>> and this occurs to me like a double release?
->>>
->>> yes, my copy&paste mistake.
->>
->> Which is why I want the real patches backported please.  Whenever we do
->> a "just this smaller patch" for a stable kernel, it is ALWAYS wrong.
-> 
-> I think that it was clear that I do not want you to directly include
-> this patch, just it points to the direction where is the problem.
-> 
-> Anyway, seems the problem is only in 4.1.18.
-> 
->> Please backport the patches in a correct way so that we can apply
->> them...
-> 
-> Not sure if it is still needed, but I'll reply to this thread with my git version
-> of backported patches for 4.1.18.
-> (Resp. only the first need changes, other then applied cleanly from upstream).
+On Thu, Feb 25, 2016 at 04:26:54PM -0600, Tom Lendacky wrote:
+>
+> Thanks for the clarification Herbert.  I'll send in a patch to perform
+> the memset during the import.  I know it's late in the cycle, but will
+> you be able to apply it to the current cryptodev-2.6 tree which contains
+> the ccp import/export patches?
 
-Please do.
-
+Yes I will add it on top.
 
 Thanks,
-Sasha
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
