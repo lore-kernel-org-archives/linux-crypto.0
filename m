@@ -1,47 +1,40 @@
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH] PKCS#7: fix unitialized boolean 'want'
-Date: Sat, 27 Feb 2016 12:45:26 +0000
-Message-ID: <1456577126-5351-1-git-send-email-colin.king@canonical.com>
-Cc: linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	David Howells <dhowells@redhat.com>,
-	James Morris <james.l.morris@oracle.com>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	Peter Jones <pjones@redhat.com>, linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:60311 "EHLO
-	youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756331AbcB0Mpl (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 27 Feb 2016 07:45:41 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/4]     crypto: algif_skcipher - Require setkey before
+ accept(2)
+Date: Sat, 27 Feb 2016 14:45:34 +0000
+Message-ID: <20160227144534.GA7588@gondor.apana.org.au>
+References: <56D0361B.8040301@gmail.com>
+ <1456487051-14652-1-git-send-email-gmazyland@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, stable@vger.kernel.org
+To: Milan Broz <gmazyland@gmail.com>
+Return-path: <stable-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1456487051-14652-1-git-send-email-gmazyland@gmail.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+On Fri, Feb 26, 2016 at 12:44:08PM +0100, Milan Broz wrote:
+> From: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+>     commit dd504589577d8e8e70f51f997ad487a4cb6c026f upstream.
+> 
+>     Some cipher implementations will crash if you try to use them
+>     without calling setkey first.  This patch adds a check so that
+>     the accept(2) call will fail with -ENOKEY if setkey hasn't been
+>     done on the socket yet.
+> 
+>     Cc: stable@vger.kernel.org
+>     Reported-by: Dmitry Vyukov <dvyukov@google.com>
+>     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>     Tested-by: Dmitry Vyukov <dvyukov@google.com>
+>     [backported to 4.1 by Milan Broz <gmazyland@gmail.com>]
 
-The boolean want is not initialized and hence garbage. The default should
-be false (later it is only set to true on tne sinfo->authattrs check).
+Ack to all four patches.
 
-Found with static analysis using CoverityScan
-
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- crypto/asymmetric_keys/pkcs7_parser.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
-index 8f3056c..7a24e16 100644
---- a/crypto/asymmetric_keys/pkcs7_parser.c
-+++ b/crypto/asymmetric_keys/pkcs7_parser.c
-@@ -87,7 +87,7 @@ EXPORT_SYMBOL_GPL(pkcs7_free_message);
- static int pkcs7_check_authattrs(struct pkcs7_message *msg)
- {
- 	struct pkcs7_signed_info *sinfo;
--	bool want;
-+	bool want = false;
- 
- 	sinfo = msg->signed_infos;
- 	if (sinfo->authattrs) {
+Thanks Milan!
 -- 
-2.7.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
