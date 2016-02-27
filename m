@@ -1,38 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/3] KEYS: Use crypto rsa pkcs1pad module for software
- public keys
-Date: Sat, 27 Feb 2016 18:47:27 +0000
-Message-ID: <20160227184727.GA8926@gondor.apana.org.au>
-References: <20160226152333.29934.21098.stgit@warthog.procyon.org.uk>
+Subject: Re: [RFC PATCH v6] Crypto: rockchip/crypto - add hash support for
+ crypto engine in rk3288
+Date: Sat, 27 Feb 2016 20:33:04 +0100
+Message-ID: <20160227193304.GA9123@gondor.apana.org.au>
+References: <1455588901-14377-1-git-send-email-wzz@rock-chips.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: tadeusz.struk@intel.com, dhowells@redhat.com,
-	balrogg@googlemail.com, keyrings@vger.kernel.org,
-	zohar@linux.vnet.ibm.com, linux-crypto@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
+Cc: heiko@sntech.de, davem@davemloft.net, eddie.cai@rock-chips.com,
+	linux-rockchip@lists.infradead.org, linux-crypto@vger.kernel.org,
+	Zain Wang <zain.wang@rock-chips.com>
+To: Zain Wang <wzz@rock-chips.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:53418 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:49907 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756657AbcB0Srh (ORCPT
+	with ESMTP id S1751389AbcB0TdQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 27 Feb 2016 13:47:37 -0500
+	Sat, 27 Feb 2016 14:33:16 -0500
 Content-Disposition: inline
-In-Reply-To: <20160226152333.29934.21098.stgit@warthog.procyon.org.uk>
+In-Reply-To: <1455588901-14377-1-git-send-email-wzz@rock-chips.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-David Howells <dhowells@redhat.com> wrote:
+On Tue, Feb 16, 2016 at 10:15:01AM +0800, Zain Wang wrote:
+> From: Zain Wang <zain.wang@rock-chips.com>
 > 
-> Here's a set of patches that change the software public key asymmetric key
-> subtype to use the RSA pkcs1pad module in the crypto layer.  I've merged
-> together mine and Tadeusz's patches.
+> Add md5 sha1 sha256 support for crypto engine in rk3288.
 > 
-> I have not included Tadeusz's original three patches that converted to
-> using the raw rsa module in this set, but they're prerequisites for this.
+> Signed-off-by: Zain Wang <zain.wang@rock-chips.com>
 
-Looks OK to me.  Where do you want these patches to go?
-
-Cheers,
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
