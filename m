@@ -1,49 +1,47 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH 2/2] crypto: remove padding logic from rsa.c
-Date: Sat, 27 Feb 2016 19:20:19 -0800
-Message-ID: <56D26773.3080502@intel.com>
-References: <20160227184005.GA8856@gondor.apana.org.au>
+From: Milan Broz <gmazyland@gmail.com>
+Subject: Re: [PATCH 1/4] crypto: algif_skcipher - Require setkey before
+ accept(2)
+Date: Sun, 28 Feb 2016 09:18:17 +0100
+Message-ID: <56D2AD49.2060907@gmail.com>
+References: <56D0361B.8040301@gmail.com>
+ <1456487051-14652-1-git-send-email-gmazyland@gmail.com>
+ <56D217E6.4090208@oracle.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org,
-	balrogg@googlemail.com, linux-security-module@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	zohar@linux.vnet.ibm.com, James Morris <jmorris@namei.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+To: Sasha Levin <sasha.levin@oracle.com>, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:40057 "EHLO mga04.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932421AbcB1DYo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 27 Feb 2016 22:24:44 -0500
-In-Reply-To: <20160227184005.GA8856@gondor.apana.org.au>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:33997 "EHLO
+	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756973AbcB1ISV (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 28 Feb 2016 03:18:21 -0500
+In-Reply-To: <56D217E6.4090208@oracle.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
-On 02/27/2016 10:40 AM, Herbert Xu wrote:
-> Tadeusz Struk <tadeusz.struk@intel.com> wrote:
+On 02/27/2016 10:40 PM, Sasha Levin wrote:
+> On 02/26/2016 06:44 AM, Milan Broz wrote:
+>> From: Herbert Xu <herbert@gondor.apana.org.au>
 >>
->> diff --git a/crypto/rsa.c b/crypto/rsa.c
->> index 9a7c9ca..77d737f 100644
->> --- a/crypto/rsa.c
->> +++ b/crypto/rsa.c
->> @@ -16,78 +16,6 @@
->> #include <crypto/algapi.h>
+>>     commit dd504589577d8e8e70f51f997ad487a4cb6c026f upstream.
 >>
->> /*
->> - * Hash algorithm OIDs plus ASN.1 DER wrappings [RFC4880 sec 5.2.2].
->> - */
->> -static const u8 rsa_digest_info_md5[] = {
->> -       0x30, 0x20, 0x30, 0x0c, 0x06, 0x08,
->> -       0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x02, 0x05, /* OID */
->> -       0x05, 0x00, 0x04, 0x10
->> -};
+>>     Some cipher implementations will crash if you try to use them
+>>     without calling setkey first.  This patch adds a check so that
+>>     the accept(2) call will fail with -ENOKEY if setkey hasn't been
+>>     done on the socket yet.
+>>
+>>     Cc: stable@vger.kernel.org
+>>     Reported-by: Dmitry Vyukov <dvyukov@google.com>
+>>     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>>     Tested-by: Dmitry Vyukov <dvyukov@google.com>
+>>     [backported to 4.1 by Milan Broz <gmazyland@gmail.com>]
 > 
-> Where did this come from? It's not in my tree.
+> Thanks Milan. Can I add your Signed-off-by to this series?
 
-These are generated on top of
-http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-rsa
+yes,
+Signed-off-by: Milan Broz <gmazyland@gmail.com>
+
 Thanks,
--- 
-TS
+Milan
