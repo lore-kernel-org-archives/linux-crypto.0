@@ -1,45 +1,49 @@
-From: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: =?utf-8?Q?=D0=9A=D0=9B=D0=98=D0=95=D0=9D=D0=A2=D0=A1=D0?=
-	=?utf-8?Q?=9A=D0=98=D0=95_=D0=91=D0=90=D0=97=D0=AB!_=D0?=
-	=?utf-8?Q?=A2=D0=B5=D0=BB=5CViber=5CWhatsapp=3A_+79133913?=
-	=?utf-8?Q?837_Email=3A_aburov52=40gmail=2Ecom_Skype=3A_pr?=
-	=?utf-8?Q?odawez389?=
-Date: Sun, 28 Feb 2016 03:39:19 +0600
-Message-ID: <11EA5E864296B97AA6A3EA55A1796A81@vger.kernel.org>
-Reply-To: "linux-crypto@vger.kernel.org" <aburov52@gmail.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH 2/2] crypto: remove padding logic from rsa.c
+Date: Sat, 27 Feb 2016 19:20:19 -0800
+Message-ID: <56D26773.3080502@intel.com>
+References: <20160227184005.GA8856@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org,
+	balrogg@googlemail.com, linux-security-module@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	zohar@linux.vnet.ibm.com, James Morris <jmorris@namei.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 203-150-20-234.inter.net.th ([203.150.20.234]:49808 "EHLO
-	234.porar.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756780AbcB0X50 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 27 Feb 2016 18:57:26 -0500
-Received: from 203.150.20.235 (localhost [127.0.0.1])
-	by 234.porar.com (Postfix) with SMTP id 19EBA3A2427
-	for <linux-crypto@vger.kernel.org>; Sun, 28 Feb 2016 04:39:26 +0700 (ICT)
+Received: from mga04.intel.com ([192.55.52.120]:40057 "EHLO mga04.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932421AbcB1DYo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 27 Feb 2016 22:24:44 -0500
+In-Reply-To: <20160227184005.GA8856@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-=D0=9A=D0=9B=D0=98=D0=95=D0=9D=D0=A2=D0=A1=D0=9A=D0=98=D0=95 =D0=91=D0=90=
-=D0=97=D0=AB!
+Hi Herbert,
+On 02/27/2016 10:40 AM, Herbert Xu wrote:
+> Tadeusz Struk <tadeusz.struk@intel.com> wrote:
+>>
+>> diff --git a/crypto/rsa.c b/crypto/rsa.c
+>> index 9a7c9ca..77d737f 100644
+>> --- a/crypto/rsa.c
+>> +++ b/crypto/rsa.c
+>> @@ -16,78 +16,6 @@
+>> #include <crypto/algapi.h>
+>>
+>> /*
+>> - * Hash algorithm OIDs plus ASN.1 DER wrappings [RFC4880 sec 5.2.2].
+>> - */
+>> -static const u8 rsa_digest_info_md5[] = {
+>> -       0x30, 0x20, 0x30, 0x0c, 0x06, 0x08,
+>> -       0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x02, 0x05, /* OID */
+>> -       0x05, 0x00, 0x04, 0x10
+>> -};
+> 
+> Where did this come from? It's not in my tree.
 
-=D0=A1=D0=BE=D0=B1=D0=B5=D1=80=D0=B5=D0=BC =D0=B4=D0=BB=D1=8F =D0=92=D0=
-=B0=D1=81 =D0=BF=D0=BE =D0=B8=D0=BD=D1=82=D0=B5=D1=80=D0=BD=D0=B5=D1=82=
- =D0=B1=D0=B0=D0=B7=D1=83 =D0=B4=D0=B0=D0=BD=D0=BD=D1=8B=D1=85 =D0=BF=D0=
-=BE=D1=82=D0=B5=D0=BD=D1=86=D0=B8=D0=B0=D0=BB=D1=8C=D0=BD=D1=8B=D1=85 =D0=
-=BA=D0=BB=D0=B8=D0=B5=D0=BD=D1=82=D0=BE=D0=B2=20
-=D0=B4=D0=BB=D1=8F =D0=92=D0=B0=D1=88=D0=B5=D0=B3=D0=BE =D0=91=D0=B8=D0=
-=B7=D0=BD=D0=B5=D1=81=D0=B0!
-=D0=9C=D0=BD=D0=BE=D0=B3=D0=BE! =D0=91=D1=8B=D1=81=D1=82=D1=80=D0=BE! =D0=
-=9D=D0=B5=D0=B4=D0=BE=D1=80=D0=BE=D0=B3=D0=BE!=20
-=D0=A3=D0=B7=D0=BD=D0=B0=D0=B9=D1=82=D0=B5 =D0=BE=D0=B1 =D1=8D=D1=82=D0=
-=BE=D0=BC =D0=BF=D0=BE=D0=B4=D1=80=D0=BE=D0=B1=D0=BD=D0=B5=D0=B5 =D0=BF=
-=D0=BE=20
-=D0=A2=D0=B5=D0=BB: +79133913837
-Viber: +79133913837
-Whatsapp: +79133913837
-Skype: prodawez389
-Email: aburov52@gmail.com
+These are generated on top of
+http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-rsa
+Thanks,
+-- 
+TS
