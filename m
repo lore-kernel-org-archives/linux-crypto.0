@@ -1,38 +1,43 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH 0/3] KEYS: Use crypto rsa pkcs1pad module for software public keys
-Date: Mon, 29 Feb 2016 09:32:08 +0000
-Message-ID: <1381.1456738328@warthog.procyon.org.uk>
-References: <20160227184727.GA8926@gondor.apana.org.au>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] [RFC] mm/page_ref, crypto/async_pq: don't put_page from __exit
+Date: Mon, 29 Feb 2016 10:32:39 +0100
+Message-ID: <2604022.UWS8hJ6Ygv@wuerfel>
+References: <1456696663-2340682-1-git-send-email-arnd@arndb.de> <CAAmzW4N0YJc_O9ArC8e7Q5y4rmbHjj6-Q1yfvZ5LvORvG764cg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, tadeusz.struk@intel.com,
-	balrogg@googlemail.com, keyrings@vger.kernel.org,
-	zohar@linux.vnet.ibm.com, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Transfer-Encoding: 7Bit
+Cc: Joonsoo Kim <js1304@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Dan Williams <dan.j.williams@intel.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	Michal Nazarewicz <mina86@mina86.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	linux-crypto@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39435 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750724AbcB2JcM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 29 Feb 2016 04:32:12 -0500
-In-Reply-To: <20160227184727.GA8926@gondor.apana.org.au>
-Content-ID: <1380.1456738328.1@warthog.procyon.org.uk>
+Received: from mout.kundenserver.de ([212.227.17.10]:55206 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751093AbcB2Jds (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 29 Feb 2016 04:33:48 -0500
+In-Reply-To: <CAAmzW4N0YJc_O9ArC8e7Q5y4rmbHjj6-Q1yfvZ5LvORvG764cg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
-
-> David Howells <dhowells@redhat.com> wrote:
-> > 
-> > Here's a set of patches that change the software public key asymmetric key
-> > subtype to use the RSA pkcs1pad module in the crypto layer.  I've merged
-> > together mine and Tadeusz's patches.
-> > 
-> > I have not included Tadeusz's original three patches that converted to
-> > using the raw rsa module in this set, but they're prerequisites for this.
+On Monday 29 February 2016 16:40:02 Joonsoo Kim wrote:
 > 
-> Looks OK to me.  Where do you want these patches to go?
+> Hello, Arnd.
+> 
+> I think that we can avoid this error by using __free_page().
+> It would not be inlined so calling it would have no problem.
+> 
+> Could you test it, please?
 
-Can I turn that into an Reviewed-by?  I'll take them through my tree and
-James's tree.
+Yes, I suspect the driver should have done that anyway, new patch
+under way.
 
-David
+	Arnd
