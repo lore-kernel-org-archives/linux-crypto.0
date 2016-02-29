@@ -1,87 +1,81 @@
-From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
-	<u.kleine-koenig@pengutronix.de>
+From: Fabio Estevam <festevam-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH 3/3] hwrng: mxc-fsl - add support for Freescale RNGC
-Date: Mon, 29 Feb 2016 22:38:50 +0100
-Message-ID: <20160229213850.GS2613@pengutronix.de>
+Date: Mon, 29 Feb 2016 20:54:19 -0300
+Message-ID: <CAOMZO5BLYumOrBuoB5-RgzLAJ=o4zp9ocv4jcZRy=p6Pky1SyQ@mail.gmail.com>
 References: <1456761156-27664-1-git-send-email-s.trumtrar@pengutronix.de>
- <1456761156-27664-3-git-send-email-s.trumtrar@pengutronix.de>
- <CAOMZO5BN-1U6vX0HAHWX30t+23NnqEpOw6AttSgvqaZnq=cN6Q@mail.gmail.com>
+	<1456761156-27664-3-git-send-email-s.trumtrar@pengutronix.de>
+	<CAOMZO5BN-1U6vX0HAHWX30t+23NnqEpOw6AttSgvqaZnq=cN6Q@mail.gmail.com>
+	<20160229213850.GS2613@pengutronix.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-	Mark Rutland <mark.rutland@arm.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>,
-	Rob Herring <robh+dt@kernel.org>, linux-crypto@vger.kernel.org,
-	Sascha Hauer <kernel@pengutronix.de>,
-	Matt Mackall <mpm@selenic.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
-To: Fabio Estevam <festevam@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:57860 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750780AbcB2VjC (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 29 Feb 2016 16:39:02 -0500
-Content-Disposition: inline
-In-Reply-To: <CAOMZO5BN-1U6vX0HAHWX30t+23NnqEpOw6AttSgvqaZnq=cN6Q@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>,
+	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+	"devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
+	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
+	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>,
+	Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Sascha Hauer <kernel-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>,
+	Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+	Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	"linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
+	<linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?=
+	<u.kleine-koenig-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20160229213850.GS2613-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Feb 29, 2016 at 06:16:50PM -0300, Fabio Estevam wrote:
-> On Mon, Feb 29, 2016 at 12:52 PM, Steffen Trumtrar
-> <s.trumtrar@pengutronix.de> wrote:
->=20
-> > +       ret =3D clk_prepare_enable(rngc->clk);
-> > +       if (ret)
-> > +               return ret;
-> > +
-> > +       rngc->irq =3D platform_get_irq(pdev, 0);
-> > +       if (!rngc->irq) {
-> > +               dev_err(&pdev->dev, "FSL RNGC couldn't get irq\n");
-> > +               clk_disable_unprepare(rngc->clk);
-> > +
-> > +               return ret;
->=20
-> You are returning the wrong error code here:
->=20
-> Better do like this:
->=20
->        rngc->irq =3D platform_get_irq(pdev, 0);
->        if (rngc->irq < 0) {
+On Mon, Feb 29, 2016 at 6:38 PM, Uwe Kleine-K=C3=B6nig
+<u.kleine-koenig-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org> wrote:
+> On Mon, Feb 29, 2016 at 06:16:50PM -0300, Fabio Estevam wrote:
+>> On Mon, Feb 29, 2016 at 12:52 PM, Steffen Trumtrar
+>> <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org> wrote:
+>>
+>> > +       ret =3D clk_prepare_enable(rngc->clk);
+>> > +       if (ret)
+>> > +               return ret;
+>> > +
+>> > +       rngc->irq =3D platform_get_irq(pdev, 0);
+>> > +       if (!rngc->irq) {
+>> > +               dev_err(&pdev->dev, "FSL RNGC couldn't get irq\n")=
+;
+>> > +               clk_disable_unprepare(rngc->clk);
+>> > +
+>> > +               return ret;
+>>
+>> You are returning the wrong error code here:
+>>
+>> Better do like this:
+>>
+>>        rngc->irq =3D platform_get_irq(pdev, 0);
+>>        if (rngc->irq < 0) {
+>
+> rngc->irq is unsigned, so this is never true.
+>
+>>                dev_err(&pdev->dev, "FSL RNGC couldn't get irq\n");
+>>                clk_disable_unprepare(rngc->clk);
+>>                return rngc->irq;
+>>        }
+>
+> So here comes my better approach:
 
-rngc->irq is unsigned, so this is never true.
+As irq is only used inside probe it can be removed from struct mxc_rngc=
+=2E
 
->                dev_err(&pdev->dev, "FSL RNGC couldn't get irq\n");
->                clk_disable_unprepare(rngc->clk);
->                return rngc->irq;
->        }
+Or maybe like this:
 
-So here comes my better approach:
-
-	ret =3D platform_get_irq(pdev, 0);
-	if (ret <=3D 0) {
-		if (ret =3D=3D 0)
-			ret =3D -EINVAL;
-		dev_err(&pdev->dev, "FSL RNGC couldn't get irq\n");
-		clk_disable_unprepare(rngc->clk);
-
-		return ret;
-	}
-
-	rngc->irq =3D ret;
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig        =
-    |
-Industrial Linux Solutions                 | http://www.pengutronix.de/=
-  |
+         ret =3D platform_get_irq(pdev, 0);
+         if (ret < 0) {
+                 dev_err(&pdev->dev, "FSL RNGC couldn't get irq\n");
+                 clk_disable_unprepare(rngc->clk);
+                 return ret;
+         }
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" i=
+n
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
