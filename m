@@ -1,50 +1,55 @@
-From: Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [PATCH] crypto/async_pq: use __free_page() instead of put_page()
-Date: Mon, 29 Feb 2016 10:04:38 -0800
-Message-ID: <CAPcyv4jJzUieZ0i2jBqANwmYPUBVmQmhoDTPnr0KjPQXnoZqWQ@mail.gmail.com>
-References: <1456738445-876239-1-git-send-email-arnd@arndb.de>
+From: Fabio Estevam <festevam@gmail.com>
+Subject: Re: [PATCH 3/3] hwrng: mxc-fsl - add support for Freescale RNGC
+Date: Mon, 29 Feb 2016 18:16:50 -0300
+Message-ID: <CAOMZO5BN-1U6vX0HAHWX30t+23NnqEpOw6AttSgvqaZnq=cN6Q@mail.gmail.com>
+References: <1456761156-27664-1-git-send-email-s.trumtrar@pengutronix.de>
+	<1456761156-27664-3-git-send-email-s.trumtrar@pengutronix.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Joonsoo Kim <iamjoonsoo.kim@lge.com>, Linux MM <linux-mm@kvack.org>,
+Cc: Shawn Guo <shawnguo@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	Michal Nazarewicz <mina86@mina86.com>, Steven Rostedt <rostedt@goodmis.org>,
-	Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>,
-	NeilBrown <neilb@suse.com>, Markus Stockhausen <stockhausen@collogia.de>,
-	Vinod Koul <vinod.koul@intel.com>, linux-crypto@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <1456738445-876239-1-git-send-email-arnd@arndb.de>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+	Matt Mackall <mpm@selenic.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	linux-crypto@vger.kernel.org, Sascha Hauer <kernel@pengutronix.de>
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-oi0-f42.google.com ([209.85.218.42]:33233 "EHLO
+	mail-oi0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750780AbcB2VQv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 29 Feb 2016 16:16:51 -0500
+In-Reply-To: <1456761156-27664-3-git-send-email-s.trumtrar@pengutronix.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Feb 29, 2016 at 1:33 AM, Arnd Bergmann <arnd@arndb.de> wrote:
-> The addition of tracepoints to the page reference tracking had an
-> unfortunate side-effect in at least one driver that calls put_page
-> from its exit function, resulting in a link error:
->
-> `.exit.text' referenced in section `__jump_table' of crypto/built-in.o: defined in discarded section `.exit.text' of crypto/built-in.o
->
-> From a cursory look at that this driver, it seems that it may be
-> doing the wrong thing here anyway, as the page gets allocated
-> using 'alloc_page()', and should be freed using '__free_page()'
-> rather than 'put_page()'.
->
-> With this patch, I no longer get any other build errors from the
-> page_ref patch, so hopefully we can assume that it's always wrong
-> to call any of those functions from __exit code, and that no other
-> driver does it.
->
-> Fixes: 0f80830dd044 ("mm/page_ref: add tracepoint to track down page reference manipulation")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+On Mon, Feb 29, 2016 at 12:52 PM, Steffen Trumtrar
+<s.trumtrar@pengutronix.de> wrote:
 
-Acked-by: Dan Williams <dan.j.williams@intel.com>
+> +       ret = clk_prepare_enable(rngc->clk);
+> +       if (ret)
+> +               return ret;
+> +
+> +       rngc->irq = platform_get_irq(pdev, 0);
+> +       if (!rngc->irq) {
+> +               dev_err(&pdev->dev, "FSL RNGC couldn't get irq\n");
+> +               clk_disable_unprepare(rngc->clk);
+> +
+> +               return ret;
 
-Vinod, will you take this one?
+You are returning the wrong error code here:
 
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+Better do like this:
+
+       rngc->irq = platform_get_irq(pdev, 0);
+       if (rngc->irq < 0) {
+               dev_err(&pdev->dev, "FSL RNGC couldn't get irq\n");
+               clk_disable_unprepare(rngc->clk);
+               return rngc->irq;
+       }
