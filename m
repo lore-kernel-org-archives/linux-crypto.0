@@ -1,7 +1,7 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 2/4] crypto: ccp - Support for multiple CCPs
-Date: Tue, 1 Mar 2016 13:49:04 -0600
-Message-ID: <20160301194904.6788.84406.stgit@taos.amd.com>
+Subject: [PATCH 1/4] crypto: ccp - Remove check for x86 family and model
+Date: Tue, 1 Mar 2016 13:48:54 -0600
+Message-ID: <20160301194854.6788.20633.stgit@taos.amd.com>
 References: <20160301194831.6788.2154.stgit@taos.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,303 +10,100 @@ Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
 	<davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1on0088.outbound.protection.outlook.com ([157.56.110.88]:16072
+Received: from mail-bn1on0090.outbound.protection.outlook.com ([157.56.110.90]:47872
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750813AbcCAUEP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Mar 2016 15:04:15 -0500
+	id S1750813AbcCAUEx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 1 Mar 2016 15:04:53 -0500
 In-Reply-To: <20160301194831.6788.2154.stgit@taos.amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Enable management of >1 CCPs in a system. Each device will
-get a unique identifier, as well as uniquely named
-resources. Treat each CCP as an orthogonal unit and register
- resources individually.
+Each x86 SoC will make use of a unique PCI ID for the CCP
+device so it is not necessary to check for the CPU family
+and model.
 
 Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/ccp-dev.c      |  113 +++++++++++++++++++++++++++++++++----
- drivers/crypto/ccp/ccp-dev.h      |    9 +++
- drivers/crypto/ccp/ccp-pci.c      |    7 +-
- drivers/crypto/ccp/ccp-platform.c |    4 +
- 4 files changed, 114 insertions(+), 19 deletions(-)
+ drivers/crypto/ccp/ccp-dev.c |   47 ++++++++++--------------------------------
+ 1 file changed, 11 insertions(+), 36 deletions(-)
 
 diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index 725c590..dd71e67 100644
+index 861bacc..725c590 100644
 --- a/drivers/crypto/ccp/ccp-dev.c
 +++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -16,6 +16,8 @@
- #include <linux/sched.h>
- #include <linux/interrupt.h>
- #include <linux/spinlock.h>
-+#include <linux/rwlock_types.h>
-+#include <linux/types.h>
- #include <linux/mutex.h>
- #include <linux/delay.h>
- #include <linux/hw_random.h>
-@@ -37,20 +39,96 @@ struct ccp_tasklet_data {
- 	struct ccp_cmd *cmd;
- };
- 
--static struct ccp_device *ccp_dev;
--static inline struct ccp_device *ccp_get_device(void)
-+/* List of CCPs, CCP count, read-write access lock, and access functions
-+ *
-+ * Lock structure: get ccp_unit_lock for reading whenever we need to
-+ * examine the CCP list. While holding it for reading we can acquire
-+ * the RR lock to update the round-robin next-CCP pointer. The unit lock
-+ * must be acquired before the RR lock.
-+ *
-+ * If the unit-lock is acquired for writing, we have total control over
-+ * the list, so there's no value in getting the RR lock.
-+ */
-+static DEFINE_RWLOCK(ccp_unit_lock);
-+static LIST_HEAD(ccp_units);
-+
-+/* Round-robin counter */
-+static DEFINE_RWLOCK(ccp_rr_lock);
-+static struct ccp_device *ccp_rr;
-+
-+/* Ever-increasing value to produce unique unit numbers */
-+static atomic_t ccp_unit_ordinal;
-+unsigned int ccp_increment_unit_ordinal(void)
- {
--	return ccp_dev;
-+	return atomic_inc_return(&ccp_unit_ordinal);
+@@ -1,7 +1,7 @@
+ /*
+  * AMD Cryptographic Coprocessor (CCP) driver
+  *
+- * Copyright (C) 2013 Advanced Micro Devices, Inc.
++ * Copyright (C) 2013,2016 Advanced Micro Devices, Inc.
+  *
+  * Author: Tom Lendacky <thomas.lendacky@amd.com>
+  *
+@@ -577,41 +577,22 @@ bool ccp_queues_suspended(struct ccp_device *ccp)
  }
+ #endif
  
-+/*
-+ * Put this CCP on the unit list, which makes it available
-+ * for use.
-+ */
- static inline void ccp_add_device(struct ccp_device *ccp)
+-#ifdef CONFIG_X86
+-static const struct x86_cpu_id ccp_support[] = {
+-	{ X86_VENDOR_AMD, 22, },
+-	{ },
+-};
+-#endif
+-
+ static int __init ccp_mod_init(void)
  {
--	ccp_dev = ccp;
-+	unsigned long flags;
-+
-+	write_lock_irqsave(&ccp_unit_lock, flags);
-+	list_add_tail(&ccp->entry, &ccp_units);
-+	if (!ccp_rr)
-+		/* We already have the list lock (we're first) so this
-+		 * pointer can't change on us. Set its initial value.
-+		 */
-+		ccp_rr = ccp;
-+	write_unlock_irqrestore(&ccp_unit_lock, flags);
- }
+ #ifdef CONFIG_X86
+-	struct cpuinfo_x86 *cpuinfo = &boot_cpu_data;
+ 	int ret;
  
-+/* Remove this unit from the list of devices. If the next device
-+ * up for use is this one, adjust the pointer. If this is the last
-+ * device, NULL the pointer.
-+ */
- static inline void ccp_del_device(struct ccp_device *ccp)
- {
--	ccp_dev = NULL;
-+	unsigned long flags;
-+
-+	write_lock_irqsave(&ccp_unit_lock, flags);
-+	if (ccp_rr == ccp) {
-+		/* ccp_unit_lock is read/write; any read access
-+		 * will be suspended while we make changes to the
-+		 * list and RR pointer.
-+		 */
-+		if (list_is_last(&ccp_rr->entry, &ccp_units))
-+			ccp_rr = list_first_entry(&ccp_units, struct ccp_device,
-+						  entry);
-+		else
-+			ccp_rr = list_next_entry(ccp_rr, entry);
-+	}
-+	list_del(&ccp->entry);
-+	if (list_empty(&ccp_units))
-+		ccp_rr = NULL;
-+	write_unlock_irqrestore(&ccp_unit_lock, flags);
-+}
-+
-+static struct ccp_device *ccp_get_device(void)
-+{
-+	unsigned long flags;
-+	struct ccp_device *dp = NULL;
-+
-+	/* We round-robin through the unit list.
-+	 * The (ccp_rr) pointer refers to the next unit to use.
-+	 */
-+	read_lock_irqsave(&ccp_unit_lock, flags);
-+	if (!list_empty(&ccp_units)) {
-+		write_lock_irqsave(&ccp_rr_lock, flags);
-+		dp = ccp_rr;
-+		if (list_is_last(&ccp_rr->entry, &ccp_units))
-+			ccp_rr = list_first_entry(&ccp_units, struct ccp_device,
-+						  entry);
-+		else
-+			ccp_rr = list_next_entry(ccp_rr, entry);
-+		write_unlock_irqrestore(&ccp_rr_lock, flags);
-+	}
-+	read_unlock_irqrestore(&ccp_unit_lock, flags);
-+
-+	return dp;
- }
- 
- /**
-@@ -60,10 +138,14 @@ static inline void ccp_del_device(struct ccp_device *ccp)
-  */
- int ccp_present(void)
- {
--	if (ccp_get_device())
+-	if (!x86_match_cpu(ccp_support))
+-		return -ENODEV;
+-
+-	switch (cpuinfo->x86) {
+-	case 22:
+-		if ((cpuinfo->x86_model < 48) || (cpuinfo->x86_model > 63))
+-			return -ENODEV;
+-
+-		ret = ccp_pci_init();
+-		if (ret)
+-			return ret;
+-
+-		/* Don't leave the driver loaded if init failed */
+-		if (!ccp_get_device()) {
+-			ccp_pci_exit();
+-			return -ENODEV;
+-		}
+-
 -		return 0;
-+	unsigned long flags;
-+	int ret;
++	ret = ccp_pci_init();
++	if (ret)
++		return ret;
  
--	return -ENODEV;
-+	read_lock_irqsave(&ccp_unit_lock, flags);
-+	ret = list_empty(&ccp_units);
-+	read_unlock_irqrestore(&ccp_unit_lock, flags);
-+
-+	return ret ? -ENODEV : 0;
- }
- EXPORT_SYMBOL_GPL(ccp_present);
- 
-@@ -309,6 +391,10 @@ struct ccp_device *ccp_alloc_struct(struct device *dev)
- 	ccp->ksb_count = KSB_COUNT;
- 	ccp->ksb_start = 0;
- 
-+	ccp->ord = ccp_increment_unit_ordinal();
-+	snprintf(ccp->name, MAX_CCP_NAME_LEN, "ccp-%u", ccp->ord);
-+	snprintf(ccp->rngname, MAX_CCP_NAME_LEN, "ccp-%u-rng", ccp->ord);
-+
- 	return ccp;
- }
- 
-@@ -334,7 +420,8 @@ int ccp_init(struct ccp_device *ccp)
- 			continue;
- 
- 		/* Allocate a dma pool for this queue */
--		snprintf(dma_pool_name, sizeof(dma_pool_name), "ccp_q%d", i);
-+		snprintf(dma_pool_name, sizeof(dma_pool_name), "%s_q%d",
-+			 ccp->name, i);
- 		dma_pool = dma_pool_create(dma_pool_name, dev,
- 					   CCP_DMAPOOL_MAX_SIZE,
- 					   CCP_DMAPOOL_ALIGN, 0);
-@@ -416,7 +503,7 @@ int ccp_init(struct ccp_device *ccp)
- 		cmd_q = &ccp->cmd_q[i];
- 
- 		kthread = kthread_create(ccp_cmd_queue_thread, cmd_q,
--					 "ccp-q%u", cmd_q->id);
-+					 "%s-q%u", ccp->name, cmd_q->id);
- 		if (IS_ERR(kthread)) {
- 			dev_err(dev, "error creating queue thread (%ld)\n",
- 				PTR_ERR(kthread));
-@@ -429,7 +516,7 @@ int ccp_init(struct ccp_device *ccp)
+-		break;
++	/* Don't leave the driver loaded if init failed */
++	if (!ccp_get_device()) {
++		ccp_pci_exit();
++		return -ENODEV;
  	}
- 
- 	/* Register the RNG */
--	ccp->hwrng.name = "ccp-rng";
-+	ccp->hwrng.name = ccp->rngname;
- 	ccp->hwrng.read = ccp_trng_read;
- 	ret = hwrng_register(&ccp->hwrng);
- 	if (ret) {
-@@ -587,7 +674,7 @@ static int __init ccp_mod_init(void)
- 		return ret;
- 
- 	/* Don't leave the driver loaded if init failed */
--	if (!ccp_get_device()) {
-+	if (ccp_present() != 0) {
- 		ccp_pci_exit();
- 		return -ENODEV;
- 	}
-@@ -603,7 +690,7 @@ static int __init ccp_mod_init(void)
- 		return ret;
- 
- 	/* Don't leave the driver loaded if init failed */
--	if (!ccp_get_device()) {
-+	if (ccp_present() != 0) {
- 		ccp_platform_exit();
- 		return -ENODEV;
- 	}
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index 6ff8903..974dc05 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -1,7 +1,7 @@
- /*
-  * AMD Cryptographic Coprocessor (CCP) driver
-  *
-- * Copyright (C) 2013 Advanced Micro Devices, Inc.
-+ * Copyright (C) 2013,2016 Advanced Micro Devices, Inc.
-  *
-  * Author: Tom Lendacky <thomas.lendacky@amd.com>
-  *
-@@ -23,6 +23,7 @@
- #include <linux/hw_random.h>
- #include <linux/bitops.h>
- 
-+#define MAX_CCP_NAME_LEN		16
- #define MAX_DMAPOOL_NAME_LEN		32
- 
- #define MAX_HW_QUEUES			5
-@@ -184,6 +185,12 @@ struct ccp_cmd_queue {
- } ____cacheline_aligned;
- 
- struct ccp_device {
-+	struct list_head entry;
 +
-+	unsigned int ord;
-+	char name[MAX_CCP_NAME_LEN];
-+	char rngname[MAX_CCP_NAME_LEN];
-+
- 	struct device *dev;
++	return 0;
+ #endif
  
- 	/*
-diff --git a/drivers/crypto/ccp/ccp-pci.c b/drivers/crypto/ccp/ccp-pci.c
-index 7690467..668e515 100644
---- a/drivers/crypto/ccp/ccp-pci.c
-+++ b/drivers/crypto/ccp/ccp-pci.c
-@@ -1,7 +1,7 @@
- /*
-  * AMD Cryptographic Coprocessor (CCP) driver
-  *
-- * Copyright (C) 2013 Advanced Micro Devices, Inc.
-+ * Copyright (C) 2013,2016 Advanced Micro Devices, Inc.
-  *
-  * Author: Tom Lendacky <thomas.lendacky@amd.com>
-  *
-@@ -59,7 +59,8 @@ static int ccp_get_msix_irqs(struct ccp_device *ccp)
- 	ccp_pci->msix_count = ret;
- 	for (v = 0; v < ccp_pci->msix_count; v++) {
- 		/* Set the interrupt names and request the irqs */
--		snprintf(ccp_pci->msix[v].name, name_len, "ccp-%u", v);
-+		snprintf(ccp_pci->msix[v].name, name_len, "%s-%u",
-+			 ccp->name, v);
- 		ccp_pci->msix[v].vector = msix_entry[v].vector;
- 		ret = request_irq(ccp_pci->msix[v].vector, ccp_irq_handler,
- 				  0, ccp_pci->msix[v].name, dev);
-@@ -94,7 +95,7 @@ static int ccp_get_msi_irq(struct ccp_device *ccp)
- 		return ret;
+ #ifdef CONFIG_ARM64
+@@ -636,13 +617,7 @@ static int __init ccp_mod_init(void)
+ static void __exit ccp_mod_exit(void)
+ {
+ #ifdef CONFIG_X86
+-	struct cpuinfo_x86 *cpuinfo = &boot_cpu_data;
+-
+-	switch (cpuinfo->x86) {
+-	case 22:
+-		ccp_pci_exit();
+-		break;
+-	}
++	ccp_pci_exit();
+ #endif
  
- 	ccp->irq = pdev->irq;
--	ret = request_irq(ccp->irq, ccp_irq_handler, 0, "ccp", dev);
-+	ret = request_irq(ccp->irq, ccp_irq_handler, 0, ccp->name, dev);
- 	if (ret) {
- 		dev_notice(dev, "unable to allocate MSI IRQ (%d)\n", ret);
- 		goto e_msi;
-diff --git a/drivers/crypto/ccp/ccp-platform.c b/drivers/crypto/ccp/ccp-platform.c
-index 66dd7c9..4331318 100644
---- a/drivers/crypto/ccp/ccp-platform.c
-+++ b/drivers/crypto/ccp/ccp-platform.c
-@@ -1,7 +1,7 @@
- /*
-  * AMD Cryptographic Coprocessor (CCP) driver
-  *
-- * Copyright (C) 2014 Advanced Micro Devices, Inc.
-+ * Copyright (C) 2014,2016 Advanced Micro Devices, Inc.
-  *
-  * Author: Tom Lendacky <thomas.lendacky@amd.com>
-  *
-@@ -43,7 +43,7 @@ static int ccp_get_irq(struct ccp_device *ccp)
- 		return ret;
- 
- 	ccp->irq = ret;
--	ret = request_irq(ccp->irq, ccp_irq_handler, 0, "ccp", dev);
-+	ret = request_irq(ccp->irq, ccp_irq_handler, 0, ccp->name, dev);
- 	if (ret) {
- 		dev_notice(dev, "unable to allocate IRQ (%d)\n", ret);
- 		return ret;
+ #ifdef CONFIG_ARM64
