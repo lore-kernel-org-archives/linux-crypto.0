@@ -1,71 +1,63 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: implement DH primitives under akcipher API
-Date: Tue, 01 Mar 2016 12:17:15 +0100
-Message-ID: <4569151.ySIvlNFRgX@positron.chronox.de>
-References: <1455526915-23104-1-git-send-email-salvatore.benedetto@intel.com> <2214574.VuIVa0pDBJ@positron.chronox.de> <20160301110834.GA2383@sbenedet-virtual-machine>
+From: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
+Subject: RE: [PATCH 3/3] crypto: caam - add support for RSA algorithm
+Date: Tue, 1 Mar 2016 11:29:34 +0000
+Message-ID: <AM3PR04MB1300EE085E6E20DB3E964F9CB8BB0@AM3PR04MB1300.eurprd04.prod.outlook.com>
+References: <VI1PR04MB131149561E463EA7BE714866B8A30@VI1PR04MB1311.eurprd04.prod.outlook.com>
+ <20160227170824.GA8398@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: tadeusz.struk@intel.com, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au
-To: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "smueller@chronox.de" <smueller@chronox.de>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"Cristian Stoica" <cristian.stoica@nxp.com>,
+	Horia Ioan Geanta Neag <horia.geanta@nxp.com>,
+	Alexandru Porosanu <alexandru.porosanu@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60442 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752356AbcCALRT convert rfc822-to-8bit (ORCPT
+Received: from mail-am1on0057.outbound.protection.outlook.com ([157.56.112.57]:64704
+	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752026AbcCALpU convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Mar 2016 06:17:19 -0500
-In-Reply-To: <20160301110834.GA2383@sbenedet-virtual-machine>
+	Tue, 1 Mar 2016 06:45:20 -0500
+In-Reply-To: <20160227170824.GA8398@gondor.apana.org.au>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 1. M=E4rz 2016, 11:08:34 schrieb Salvatore Benedetto:
+Hi Herbert,
 
-Hi Salvatore,
+> >> -----Original Message-----
+> >> >+++ b/drivers/crypto/caam/caam_rsaprivkey.asn1
+> >> >@@ -0,0 +1,11 @@
+> >> >+RsaPrivKey ::= SEQUENCE {
+> >> >+    version         INTEGER,
+> >> >+    n               INTEGER ({ caam_rsa_get_n }),
+> >> >+    e               INTEGER ({ caam_rsa_get_e }),
+> >> >+    d               INTEGER ({ caam_rsa_get_d }),
+> >> >+    prime1          INTEGER,
+> >> >+    prime2          INTEGER,
+> >> >+    exponent1       INTEGER,
+> >> >+    exponent2       INTEGER,
+> >> >+    coefficient     INTEGER
+> >> >+}
+> >>
+> >> Why do you define your own ASN.1 sequence? Why not using the common
+> >> crypto/rsaprivkey.asn1?
+> >>
+> >
+> > [ta] The functions indicated in crypto/rsaprivkey.asn1 return the key
+> members in MPI format. Our hardware expects the keys as u8 buffers;
+> retrieving the key members in MPI format and then writing them to u8
+> buffers would be an unnecessary step.
+> 
+> Is there any reason why we can't change it to return the raw
+> integer and make the software RSA implementation do the MPI parsing
+> instead?
 
-> > > +static int dh_check_params_length(unsigned int p_len)
-> > > +{
-> > > +	switch (p_len) {
-> > > +	case 768:
-> > > +	case 1024:
-> > > +	case 1536:
-> > > +	case 2048:
-> > > +	case 3072:
-> > > +	case 4096:
-> > > +		return 0;
-> > > +	}
-> > > +	return -EINVAL;
-> > > +}
-> >=20
-> > What is the reason for restricting the size to 4096?
->=20
-> Honestly no reason.
-> Could not find restrictions in the spec about the params length.
+You will have a duplicate key allocation for the RSA software implementation.
+One when returning the raw integer and the other when doing the MPI parsing.
+Can we live with the duplicate allocation?
 
-I am just wondering because other DH impls allow longer sizes.
-
-And besides, I would like to disallow all < 2048 right from the start.
->=20
-> > > +
-> > > +static int dh_no_op(struct akcipher_request *req)
-> > > +{
-> > > +	return -ENOPROTOOPT;
-> > > +}
-> > > +
-> > > +static int dh_set_priv_key(struct crypto_akcipher *tfm, const vo=
-id
-> > > *key,
-> > > +			   unsigned int keylen)
-> > > +{
-> > > +	struct dh_params *params =3D akcipher_tfm_ctx(tfm);
-> >=20
-> > dh_get_params?
->=20
-> You mean adding a helper function? OK.
-
-Not adding, but using your helper function -- why do you have it there =
-in the=20
-first place? :-)
-
-Ciao
-Stephan
+Thanks,
+ta
