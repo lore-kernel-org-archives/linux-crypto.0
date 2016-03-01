@@ -1,43 +1,100 @@
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: crypto regression in 4.1.18: Check that kernel supports aes-cbc-essiv:sha256 cipher
-Date: Tue, 01 Mar 2016 02:58:54 +0000
-Message-ID: <20160301025853.GB17542@kroah.com>
-References: <alpine.LRH.2.11.1603010129330.3635@mail.ewheeler.net>
+From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+	<u.kleine-koenig@pengutronix.de>
+Subject: Re: [PATCH 3/3] hwrng: mxc-fsl - add support for Freescale RNGC
+Date: Tue, 1 Mar 2016 08:49:37 +0100
+Message-ID: <20160301074937.GU2613@pengutronix.de>
+References: <1456761156-27664-1-git-send-email-s.trumtrar@pengutronix.de>
+ <1456761156-27664-3-git-send-email-s.trumtrar@pengutronix.de>
+ <CAOMZO5BN-1U6vX0HAHWX30t+23NnqEpOw6AttSgvqaZnq=cN6Q@mail.gmail.com>
+ <20160229213850.GS2613@pengutronix.de>
+ <CAOMZO5BLYumOrBuoB5-RgzLAJ=o4zp9ocv4jcZRy=p6Pky1SyQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: "Wang, Rui Y" <rui.y.wang@intel.com>,
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+	Mark Rutland <mark.rutland@arm.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jean Delvare <jdelvare@suse.de>,
-	<linux-crypto@vger.kernel.org>, <stable@vger.kernel.org>
-To: Eric Wheeler <linux-crypto@lists.ewheeler.net>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <alpine.LRH.2.11.1603010129330.3635@mail.ewheeler.net>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Pawel Moll <pawel.moll@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>,
+	Rob Herring <robh+dt@kernel.org>, linux-crypto@vger.kernel.org,
+	Sascha Hauer <kernel@pengutronix.de>,
+	Matt Mackall <mpm@selenic.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>
+To: Fabio Estevam <festevam@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:46749 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750933AbcCAHty (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 1 Mar 2016 02:49:54 -0500
+Content-Disposition: inline
+In-Reply-To: <CAOMZO5BLYumOrBuoB5-RgzLAJ=o4zp9ocv4jcZRy=p6Pky1SyQ@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 01, 2016 at 01:32:05AM +0000, Eric Wheeler wrote:
-> Hello all,
-> 
-> We updated from 4.1.17 to 4.1.18 (same .config) and now get the following 
-> error when trying to open a LUKS volume.  We've reverted to 4.1.17 and it 
-> still works, so except that I'm not sure which commit caused the problem, 
-> it is likely one of the recent commits:
-> 
-> When we `cryptsetup luksOpen` the volume we get this:
-> 
->   Check that kernel supports aes-cbc-essiv:sha256 cipher (check syslog for more info).  
-> 
-> Note that I do not see any dm-crypto commits so I don't think its a 
-> dm-crypto issue. 
-> 
-> I'm happy to test, but can someone who knows the crypto stack suggest 
-> which of these patches I should focus on for testing? These are the 
-> commits in 4.1.18 that could be relevant:
+Hello Fabio,
 
-There are some pending crypto backports to resolve this that hopefully
-will show up in the next release, whenever Sasha gets to it.
+On Mon, Feb 29, 2016 at 08:54:19PM -0300, Fabio Estevam wrote:
+> On Mon, Feb 29, 2016 at 6:38 PM, Uwe Kleine-K=F6nig
+> <u.kleine-koenig@pengutronix.de> wrote:
+> > On Mon, Feb 29, 2016 at 06:16:50PM -0300, Fabio Estevam wrote:
+> >> On Mon, Feb 29, 2016 at 12:52 PM, Steffen Trumtrar
+> >> <s.trumtrar@pengutronix.de> wrote:
+> >>
+> >> > +       ret =3D clk_prepare_enable(rngc->clk);
+> >> > +       if (ret)
+> >> > +               return ret;
+> >> > +
+> >> > +       rngc->irq =3D platform_get_irq(pdev, 0);
+> >> > +       if (!rngc->irq) {
+> >> > +               dev_err(&pdev->dev, "FSL RNGC couldn't get irq\n=
+");
+> >> > +               clk_disable_unprepare(rngc->clk);
+> >> > +
+> >> > +               return ret;
+> >>
+> >> You are returning the wrong error code here:
+> >>
+> >> Better do like this:
+> >>
+> >>        rngc->irq =3D platform_get_irq(pdev, 0);
+> >>        if (rngc->irq < 0) {
+> >
+> > rngc->irq is unsigned, so this is never true.
+> >
+> >>                dev_err(&pdev->dev, "FSL RNGC couldn't get irq\n");
+> >>                clk_disable_unprepare(rngc->clk);
+> >>                return rngc->irq;
+> >>        }
+> >
+> > So here comes my better approach:
+>=20
+> As irq is only used inside probe it can be removed from struct mxc_rn=
+gc.
 
-thanks,
+Good idea.
 
-greg k-h
+> Or maybe like this:
+>=20
+>          ret =3D platform_get_irq(pdev, 0);
+>          if (ret < 0) {
+>                  dev_err(&pdev->dev, "FSL RNGC couldn't get irq\n");
+>                  clk_disable_unprepare(rngc->clk);
+>                  return ret;
+>          }
+
+Some people think platform_get_irq returning 0 should be handled as
+error.
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig        =
+    |
+Industrial Linux Solutions                 | http://www.pengutronix.de/=
+  |
