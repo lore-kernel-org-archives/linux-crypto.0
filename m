@@ -1,65 +1,53 @@
-From: Joonsoo Kim <js1304@gmail.com>
-Subject: Re: [PATCH] crypto/async_pq: use __free_page() instead of put_page()
-Date: Tue, 1 Mar 2016 22:54:50 +0900
-Message-ID: <CAAmzW4Nq8LiFGzyR4YjG8OPev-Pj1dUad+Bus2puSAk_tUcCsA@mail.gmail.com>
-References: <1456738445-876239-1-git-send-email-arnd@arndb.de>
-	<CAPcyv4jJzUieZ0i2jBqANwmYPUBVmQmhoDTPnr0KjPQXnoZqWQ@mail.gmail.com>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH 0/4] crypto: ccp - CCP driver updates  2016-03-01
+Date: Tue, 1 Mar 2016 13:48:43 -0600
+Message-ID: <20160301194831.6788.2154.stgit@taos.amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-	Linux MM <linux-mm@kvack.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	Michal Nazarewicz <mina86@mina86.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	NeilBrown <neilb@suse.com>,
-	Markus Stockhausen <stockhausen@collogia.de>,
-	Vinod Koul <vinod.koul@intel.com>,
-	linux-crypto@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Dan Williams <dan.j.williams@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f44.google.com ([209.85.218.44]:34861 "EHLO
-	mail-oi0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753513AbcCANyv (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Mar 2016 08:54:51 -0500
-In-Reply-To: <CAPcyv4jJzUieZ0i2jBqANwmYPUBVmQmhoDTPnr0KjPQXnoZqWQ@mail.gmail.com>
+Received: from mail-bn1bon0056.outbound.protection.outlook.com ([157.56.111.56]:10064
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1750813AbcCAUEG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 1 Mar 2016 15:04:06 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-2016-03-01 3:04 GMT+09:00 Dan Williams <dan.j.williams@intel.com>:
-> On Mon, Feb 29, 2016 at 1:33 AM, Arnd Bergmann <arnd@arndb.de> wrote:
->> The addition of tracepoints to the page reference tracking had an
->> unfortunate side-effect in at least one driver that calls put_page
->> from its exit function, resulting in a link error:
->>
->> `.exit.text' referenced in section `__jump_table' of crypto/built-in.o: defined in discarded section `.exit.text' of crypto/built-in.o
->>
->> From a cursory look at that this driver, it seems that it may be
->> doing the wrong thing here anyway, as the page gets allocated
->> using 'alloc_page()', and should be freed using '__free_page()'
->> rather than 'put_page()'.
->>
->> With this patch, I no longer get any other build errors from the
->> page_ref patch, so hopefully we can assume that it's always wrong
->> to call any of those functions from __exit code, and that no other
->> driver does it.
->>
->> Fixes: 0f80830dd044 ("mm/page_ref: add tracepoint to track down page reference manipulation")
->> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
->
-> Acked-by: Dan Williams <dan.j.williams@intel.com>
->
-> Vinod, will you take this one?
+The following patches are includes in this update series:
 
-Problematic patch ("mm/page_ref: ~~~") is not yet merged one. It is on mmotm
-and this fix should go together with it or before it. I think that
-handling this fix by
-Andrew is easier to all.
+- Remove the extraneous family check
+- Refactor code to enable support for >1 CCPs in a system
+- Add initial support for versioning
+- Refactor: move version-specific code to separate files 
+  where possible; abstract worker functions through a
+  struct of function pointers
 
-Thanks.
+This patch series is based on cryptodev-2.6
+
+---
+
+Gary R Hook (4):
+      crypto: ccp - Remove check for x86 family and model
+      crypto: ccp - Support for multiple CCPs
+      crypto: ccp - CCP versioning support
+      crypto: ccp - Add abstraction for device-specific calls
+
+
+ drivers/crypto/ccp/Makefile         |    2 
+ drivers/crypto/ccp/ccp-crypto-aes.c |   12 +
+ drivers/crypto/ccp/ccp-crypto-sha.c |    9 +
+ drivers/crypto/ccp/ccp-dev-v3.c     |  534 +++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/ccp-dev.c        |  471 ++++++++++---------------------
+ drivers/crypto/ccp/ccp-dev.h        |  155 ++++++++++
+ drivers/crypto/ccp/ccp-ops.c        |  381 +------------------------
+ drivers/crypto/ccp/ccp-pci.c        |   23 +-
+ drivers/crypto/ccp/ccp-platform.c   |   48 +++
+ include/linux/ccp.h                 |   17 +
+ 10 files changed, 938 insertions(+), 714 deletions(-)
+ create mode 100644 drivers/crypto/ccp/ccp-dev-v3.c
+
+--
