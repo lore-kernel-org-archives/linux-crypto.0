@@ -1,47 +1,46 @@
-From: Milan Broz <gmazyland@gmail.com>
-Subject: Re: crypto regression in 4.1.18: Check that kernel supports
- aes-cbc-essiv:sha256 cipher
-Date: Wed, 2 Mar 2016 18:49:27 +0100
-Message-ID: <56D727A7.8030800@gmail.com>
-References: <alpine.LRH.2.11.1603010129330.3635@mail.ewheeler.net>
- <20160301025853.GB17542@kroah.com>
+From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Subject: Re: [PATCH 07/14] hw_random: exynos: use __maybe_unused to hide pm
+ functions
+Date: Thu, 03 Mar 2016 08:43:54 +0900
+Message-ID: <56D77ABA.1040505@samsung.com>
+References: <1456934350-1389172-1-git-send-email-arnd@arndb.de>
+ <1456934350-1389172-8-git-send-email-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: "Wang, Rui Y" <rui.y.wang@intel.com>,
+Cc: linux-arm-kernel@lists.infradead.org,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Daniel Thompson <daniel.thompson@linaro.org>,
+	linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>, Matt Mackall <mpm@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jean Delvare <jdelvare@suse.de>, linux-crypto@vger.kernel.org,
-	stable@vger.kernel.org
-To: Greg KH <gregkh@linuxfoundation.org>,
-	Eric Wheeler <linux-crypto@lists.ewheeler.net>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20160301025853.GB17542@kroah.com>
-Sender: stable-owner@vger.kernel.org
+	Kukjin Kim <kgene@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-reply-to: <1456934350-1389172-8-git-send-email-arnd@arndb.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 03/01/2016 03:58 AM, Greg KH wrote:
-> On Tue, Mar 01, 2016 at 01:32:05AM +0000, Eric Wheeler wrote:
->> Hello all,
->>
->> We updated from 4.1.17 to 4.1.18 (same .config) and now get the following 
->> error when trying to open a LUKS volume.  We've reverted to 4.1.17 and it 
->> still works, so except that I'm not sure which commit caused the problem, 
->> it is likely one of the recent commits:
->>
->> When we `cryptsetup luksOpen` the volume we get this:
->>
->>   Check that kernel supports aes-cbc-essiv:sha256 cipher (check syslog for more info).  
->>
->> Note that I do not see any dm-crypto commits so I don't think its a 
->> dm-crypto issue. 
->>
->> I'm happy to test, but can someone who knows the crypto stack suggest 
->> which of these patches I should focus on for testing? These are the 
->> commits in 4.1.18 that could be relevant:
+On 03.03.2016 00:58, Arnd Bergmann wrote:
+> The exynos random driver uses #ifdef to check for CONFIG_PM, but
+> then uses SIMPLE_DEV_PM_OPS, which leaves the references out when
+> CONFIG_PM_SLEEP is not defined, so we get a warning with
+> PM=y && PM_SLEEP=n:
 > 
-> There are some pending crypto backports to resolve this that hopefully
-> will show up in the next release, whenever Sasha gets to it.
+> drivers/char/hw_random/exynos-rng.c:166:12: error: 'exynos_rng_suspend' defined but not used [-Werror=unused-function]
+> drivers/char/hw_random/exynos-rng.c:171:12: error: 'exynos_rng_resume' defined but not used [-Werror=unused-function]
+> 
+> This removes the incorrect #ifdef and instead uses a __maybe_unused
+> annotation to let the compiler know it can silently drop
+> the function definition.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/char/hw_random/exynos-rng.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+> 
 
-Also there is already released cryptsetup 1.7.1 that works even with this kernel.
+Reviewed-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
 
-Milan
+Best regards,
+Krzysztof
