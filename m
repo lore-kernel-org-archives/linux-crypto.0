@@ -1,74 +1,89 @@
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] crypto: implement DH primitives under akcipher API
-Date: Tue, 1 Mar 2016 12:25:33 -0800
-Message-ID: <3E4EC1AA-9696-4DBF-9C0A-18EF94300FDC@holtmann.org>
-References: <1455526915-23104-1-git-send-email-salvatore.benedetto@intel.com>
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-To: Salvatore Benedetto <salvatore.benedetto@intel.com>
+From: Sandy Harris <sandyinchina@gmail.com>
+Subject: Re: [PATCH 1/7] A couple of generated files
+Date: Tue, 1 Mar 2016 22:15:59 -0500
+Message-ID: <CACXcFm=4wBghNX8+nwU44_6pLFVTD+5Zt_2masojReeagKNUrw@mail.gmail.com>
+References: <1446906642-19372-1-git-send-email-sandyinchina@gmail.com>
+	<20151107165343.GA29133@io.lakedaemon.net>
+	<CACXcFmkw0O3Od7oAYz8+ZSrRaT-L1kDL=2yStLvKbwOt1QGR2A@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: "Theodore Ts\\'o" <tytso@mit.edu>,
+	"H. Peter Anvin" <hpa@zytor.com>, John Denker <jsd@av8n.com>,
+	LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: Jason Cooper <jason@lakedaemon.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [82.165.8.211] ([82.165.8.211]:49186 "EHLO mail.holtmann.org"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751032AbcCAUZ6 convert rfc822-to-8bit (ORCPT
+Received: from mail-ig0-f194.google.com ([209.85.213.194]:35432 "EHLO
+	mail-ig0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751102AbcCBDQA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Mar 2016 15:25:58 -0500
-In-Reply-To: <1455526915-23104-1-git-send-email-salvatore.benedetto@intel.com>
+	Tue, 1 Mar 2016 22:16:00 -0500
+In-Reply-To: <CACXcFmkw0O3Od7oAYz8+ZSrRaT-L1kDL=2yStLvKbwOt1QGR2A@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Salvatore,
+This set of patches, plus some later ones that simplify the
+code and get rid of one major bug are now at:
+https://github.com/sandy-harris
 
-> Implement Diffie-Hellman primitives required by the scheme under the
-> akcipher API. Here is how it works.
-> 1) Call set_pub_key() by passing DH parameters (p,g) in PKCS3 format
-> 2) Call set_priv_key() to set your own private key (xa) in raw format
+Directory for these changes is random.gcm
 
-this combination seems odd since it is normally the remote public key and the local private key. Generally the public key and private key are both remote ones.
+An out-of-kernel test program for an older version
+is in random.test
 
-For using PKCS3 format is this standardized somewhere? I don't think it is a good idea to invent new ones here.
+On Sat, Nov 7, 2015 at 1:50 PM, Sandy Harris <sandyinchina@gmail.com> wrote:
 
-In addition, how would this work for ECDH?
-
-> 3) Call decrypt() without passing any data as input to get back the
->   public part which will be computed as g^xa mod p
-> 4) Call encrypt() by passing the counter part public key (yb) in raw format
->   as input to get back the shared secret calculated as zz = yb^xa mod p
-> 
-> A test is included in the patch. Test vector has been generated with
-> openssl
-> 
-> Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
-> ---
-> crypto/Kconfig    |   8 ++
-> crypto/Makefile   |   7 ++
-> crypto/dh.c       | 264 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> crypto/pkcs3.asn1 |   5 ++
-> crypto/tcrypt.c   |   4 +
-> crypto/testmgr.c  | 140 +++++++++++++++++++++++++++--
-> crypto/testmgr.h  | 208 +++++++++++++++++++++++++++++++++++++++++-
-> 7 files changed, 627 insertions(+), 9 deletions(-)
-> create mode 100644 crypto/dh.c
-> create mode 100644 crypto/pkcs3.asn1
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index f6bfdda..fd5b78d 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -101,6 +101,14 @@ config CRYPTO_RSA
-> 	help
-> 	  Generic implementation of the RSA public key algorithm.
-> 
-> +config CRYPTO_DH
-> +	tristate "Diffie-Hellman algorithm"
-> +	select CRYPTO_AKCIPHER
-> +	select MPILIB
-> +	select ASN1
-
-I really wonder that depending on ASN1 is a good idea here. As mentioned above ECDH would make sense to actually have supported from the beginning. The Bluetooth subsystem could be then converted to utilize in kernel ECC key generation and ECDH shared secret computation. It would be good to show this is truly generic DH.
-
-Regards
-
-Marcel
+> There are two groups of changes, each controlled by a config
+> variable. Default for both is 'n'.
+>
+> CONFIG_RANDOM_INIT: initialise the pools with data from
+> /dev/urandom on the machine that compiles the kernel.
+> Comments for the generator program scripts/gen_random.c
+> have details.
+>
+> The main change in random.c is adding conditionals
+> to make it use the random data if CONFIG_RANDOM_INIT
+> is set. There is also a trivial fix updating a reference to an
+> obsoleted in a comment, and I added some sanity-check
+> #if tests for odd #define parameter values.
+>
+> This is a fairly simple change. I do not think it needs a config
+> variable; it should just be the default. However I put it under
+> config control for testing.
+>
+> CONFIG_RANDOM_GCM controls a much larger and
+> less clearly desirable set of changes. It switches
+> compilation between random.c and and a heavily
+> modified version random_gcm.c
+>
+> This uses the hash from AES-GCM instead of SHA-1,
+> and that allows a lot of other changes. The main
+> design goal was to decouple the two output pools
+> so that heavy use of the nonblocking pool cannot
+> deplete entropy in the input pool. The nonblocking
+> pool usually rekeys from the blocking pool instead.
+> random_gcm.c has extensive comments on both
+> the rationale for this approach & the details of my
+> implementation.
+>
+> random_gcm.c is not close to being a finished
+> product, in particular my code is not yet well
+> integrated with existing driver code.
+>
+> Most of the code was developed and has been
+> fairly well tested outside the kernel.
+> Test program is at:
+> https://github.com/sandy-harris/random.test
+>
+> I just dropped a large chunk of that code into
+> a copy of random.c, made modifications to
+> make the style match better & to get it to
+> compile in the kernel context, then deleted
+> a few chunks of existing driver code and
+> replaced them with calls to my stuff.
+>
+> Proper integration would involve both
+> replacing more of the existing code with
+> new and moving a few important bits of
+> the existing code into some of my functions.
+> In particular, my stuff does not yet block
+> in the right places.
