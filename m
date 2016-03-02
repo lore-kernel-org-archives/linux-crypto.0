@@ -1,98 +1,89 @@
 From: Salvatore Benedetto <salvatore.benedetto@intel.com>
 Subject: Re: [PATCH] crypto: implement DH primitives under akcipher API
-Date: Wed, 2 Mar 2016 09:38:31 +0000
-Message-ID: <20160302093831.GA2384@sbenedet-virtual-machine>
+Date: Wed, 2 Mar 2016 09:53:51 +0000
+Message-ID: <20160302095351.GB2384@sbenedet-virtual-machine>
 References: <1455526915-23104-1-git-send-email-salvatore.benedetto@intel.com>
- <3E4EC1AA-9696-4DBF-9C0A-18EF94300FDC@holtmann.org>
+ <2214574.VuIVa0pDBJ@positron.chronox.de>
+ <20160301110834.GA2383@sbenedet-virtual-machine>
+ <4569151.ySIvlNFRgX@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: herbert@gondor.apana.org.au, tadeusz.struk@intel.com,
+	linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:57927 "EHLO mga09.intel.com"
+Received: from mga04.intel.com ([192.55.52.120]:23174 "EHLO mga04.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752727AbcCBJid (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Mar 2016 04:38:33 -0500
+	id S1753065AbcCBJxx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 2 Mar 2016 04:53:53 -0500
 Content-Disposition: inline
-In-Reply-To: <3E4EC1AA-9696-4DBF-9C0A-18EF94300FDC@holtmann.org>
+In-Reply-To: <4569151.ySIvlNFRgX@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 01, 2016 at 12:25:33PM -0800, Marcel Holtmann wrote:
+On Tue, Mar 01, 2016 at 12:17:15PM +0100, Stephan Mueller wrote:
 
-Hi Marcel,
+Hi Stephan,
 
+> Am Dienstag, 1. M=E4rz 2016, 11:08:34 schrieb Salvatore Benedetto:
+>=20
 > Hi Salvatore,
-> 
-> > Implement Diffie-Hellman primitives required by the scheme under the
-> > akcipher API. Here is how it works.
-> > 1) Call set_pub_key() by passing DH parameters (p,g) in PKCS3 format
-> > 2) Call set_priv_key() to set your own private key (xa) in raw format
-> 
-> this combination seems odd since it is normally the remote public key and the local private key. Generally the public key and private key are both remote ones.
+>=20
+> > > > +static int dh_check_params_length(unsigned int p_len)
+> > > > +{
+> > > > +	switch (p_len) {
+> > > > +	case 768:
+> > > > +	case 1024:
+> > > > +	case 1536:
+> > > > +	case 2048:
+> > > > +	case 3072:
+> > > > +	case 4096:
+> > > > +		return 0;
+> > > > +	}
+> > > > +	return -EINVAL;
+> > > > +}
+> > >=20
+> > > What is the reason for restricting the size to 4096?
+> >=20
+> > Honestly no reason.
+> > Could not find restrictions in the spec about the params length.
+>=20
+> I am just wondering because other DH impls allow longer sizes.
+>=20
+> And besides, I would like to disallow all < 2048 right from the start=
+=2E
+>
 
-I'm not sure I understand what you mean here. Usually the public key is
-remote and the private key is local. How can the private key be remote?
+Hmm.. What range would you suggest?
 
-> 
-> For using PKCS3 format is this standardized somewhere? I don't think it is a good idea to invent new ones here.
+I just thought that having the same range we support with RSA would be =
+OK for now.
 
-PKCS3 is the format used by openssl for genating DH params, that's why I
-used it.
+> > > > +
+> > > > +static int dh_no_op(struct akcipher_request *req)
+> > > > +{
+> > > > +	return -ENOPROTOOPT;
+> > > > +}
+> > > > +
+> > > > +static int dh_set_priv_key(struct crypto_akcipher *tfm, const =
+void
+> > > > *key,
+> > > > +			   unsigned int keylen)
+> > > > +{
+> > > > +	struct dh_params *params =3D akcipher_tfm_ctx(tfm);
+> > >=20
+> > > dh_get_params?
+> >=20
+> > You mean adding a helper function? OK.
+>=20
+> Not adding, but using your helper function -- why do you have it ther=
+e in the=20
+> first place? :-)
+>
 
-> 
-> In addition, how would this work for ECDH?
-
-Don't know. There is not even ECC support right now.
-
-> 
-> > 3) Call decrypt() without passing any data as input to get back the
-> >   public part which will be computed as g^xa mod p
-> > 4) Call encrypt() by passing the counter part public key (yb) in raw format
-> >   as input to get back the shared secret calculated as zz = yb^xa mod p
-> > 
-> > A test is included in the patch. Test vector has been generated with
-> > openssl
-> > 
-> > Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
-> > ---
-> > crypto/Kconfig    |   8 ++
-> > crypto/Makefile   |   7 ++
-> > crypto/dh.c       | 264 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > crypto/pkcs3.asn1 |   5 ++
-> > crypto/tcrypt.c   |   4 +
-> > crypto/testmgr.c  | 140 +++++++++++++++++++++++++++--
-> > crypto/testmgr.h  | 208 +++++++++++++++++++++++++++++++++++++++++-
-> > 7 files changed, 627 insertions(+), 9 deletions(-)
-> > create mode 100644 crypto/dh.c
-> > create mode 100644 crypto/pkcs3.asn1
-> > 
-> > diff --git a/crypto/Kconfig b/crypto/Kconfig
-> > index f6bfdda..fd5b78d 100644
-> > --- a/crypto/Kconfig
-> > +++ b/crypto/Kconfig
-> > @@ -101,6 +101,14 @@ config CRYPTO_RSA
-> > 	help
-> > 	  Generic implementation of the RSA public key algorithm.
-> > 
-> > +config CRYPTO_DH
-> > +	tristate "Diffie-Hellman algorithm"
-> > +	select CRYPTO_AKCIPHER
-> > +	select MPILIB
-> > +	select ASN1
-> 
-> I really wonder that depending on ASN1 is a good idea here. As mentioned above ECDH would make sense to actually have supported from the beginning. The Bluetooth subsystem could be then converted to utilize in kernel ECC key generation and ECDH shared secret computation. It would be good to show this is truly generic DH.
-> 
-
-This is an RFC. I understand it is not the best approach, but
-the idea behind was to try to reuse the akcipher for DH.
-
-Thanks for your comments.
+True. I actually use it in dh_generate_public_key and
+dh_compute_shared_secret. I'll fix that, thanks.
 
 Regards,
 Salvatore
-
-> Regards
-> 
-> Marcel
-> 
