@@ -1,78 +1,48 @@
-From: Yang Pingchao <pingchao.yang@intel.com>
-Subject: [PATCH] crypto: qat - Change the definition of icp_qat_uof_regtype
-Date: Thu,  3 Mar 2016 02:46:45 -0500
-Message-ID: <1456991205-34197-1-git-send-email-pingchao.yang@intel.com>
-Cc: <tadeusz.struk@intel.com>, <linux-crypto@vger.kernel.org>,
-	Yang Pingchao <pingchao.yang@intel.com>
-To: <herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/3] KEYS: Use crypto rsa pkcs1pad module for software
+ public keys
+Date: Thu, 3 Mar 2016 09:43:31 +0100
+Message-ID: <20160303084331.GB3260@gondor.apana.org.au>
+References: <20160227184727.GA8926@gondor.apana.org.au>
+ <1381.1456738328@warthog.procyon.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: tadeusz.struk@intel.com, balrogg@googlemail.com,
+	keyrings@vger.kernel.org, zohar@linux.vnet.ibm.com,
+	linux-crypto@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:19067 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753194AbcCCHth (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Mar 2016 02:49:37 -0500
+Received: from helcar.hengli.com.au ([209.40.204.226]:37152 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751316AbcCCIns (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 Mar 2016 03:43:48 -0500
+Content-Disposition: inline
+In-Reply-To: <1381.1456738328@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
- The definition of icp_qat_uof_regtype should be coherent with
- the definition in firmware compiler.
+On Mon, Feb 29, 2016 at 09:32:08AM +0000, David Howells wrote:
+> Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> 
+> > David Howells <dhowells@redhat.com> wrote:
+> > > 
+> > > Here's a set of patches that change the software public key asymmetric key
+> > > subtype to use the RSA pkcs1pad module in the crypto layer.  I've merged
+> > > together mine and Tadeusz's patches.
+> > > 
+> > > I have not included Tadeusz's original three patches that converted to
+> > > using the raw rsa module in this set, but they're prerequisites for this.
+> > 
+> > Looks OK to me.  Where do you want these patches to go?
+> 
+> Can I turn that into an Reviewed-by?  I'll take them through my tree and
+> James's tree.
 
-Signed-off-by: Yang Pingchao <pingchao.yang@intel.com>
----
- drivers/crypto/qat/qat_common/icp_qat_uclo.h | 42 ++++++++++++++--------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
+Of course.
 
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_uclo.h b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
-index d97db99..5d1ee7e 100644
---- a/drivers/crypto/qat/qat_common/icp_qat_uclo.h
-+++ b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
-@@ -112,27 +112,27 @@ enum icp_qat_uof_mem_region {
- };
- 
- enum icp_qat_uof_regtype {
--	ICP_NO_DEST,
--	ICP_GPA_REL,
--	ICP_GPA_ABS,
--	ICP_GPB_REL,
--	ICP_GPB_ABS,
--	ICP_SR_REL,
--	ICP_SR_RD_REL,
--	ICP_SR_WR_REL,
--	ICP_SR_ABS,
--	ICP_SR_RD_ABS,
--	ICP_SR_WR_ABS,
--	ICP_DR_REL,
--	ICP_DR_RD_REL,
--	ICP_DR_WR_REL,
--	ICP_DR_ABS,
--	ICP_DR_RD_ABS,
--	ICP_DR_WR_ABS,
--	ICP_LMEM,
--	ICP_LMEM0,
--	ICP_LMEM1,
--	ICP_NEIGH_REL,
-+	ICP_NO_DEST	= 0,
-+	ICP_GPA_REL	= 1,
-+	ICP_GPA_ABS	= 2,
-+	ICP_GPB_REL	= 3,
-+	ICP_GPB_ABS	= 4,
-+	ICP_SR_REL	= 5,
-+	ICP_SR_RD_REL	= 6,
-+	ICP_SR_WR_REL	= 7,
-+	ICP_SR_ABS	= 8,
-+	ICP_SR_RD_ABS	= 9,
-+	ICP_SR_WR_ABS	= 10,
-+	ICP_DR_REL	= 19,
-+	ICP_DR_RD_REL	= 20,
-+	ICP_DR_WR_REL	= 21,
-+	ICP_DR_ABS	= 22,
-+	ICP_DR_RD_ABS	= 23,
-+	ICP_DR_WR_ABS	= 24,
-+	ICP_LMEM	= 26,
-+	ICP_LMEM0	= 27,
-+	ICP_LMEM1	= 28,
-+	ICP_NEIGH_REL	= 31,
- };
- 
- enum icp_qat_css_fwtype {
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 -- 
-2.4.3
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
