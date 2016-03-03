@@ -1,46 +1,78 @@
-From: Baolin Wang <baolin.wang@linaro.org>
-Subject: [PATCH 4/4] md: dm-crypt: Initialize the sector number for one request
-Date: Thu,  3 Mar 2016 13:19:39 +0800
-Message-ID: <7c56c594c2398b4d5740d733d7e98d6586217819.1456981315.git.baolin.wang@linaro.org>
-References: <cover.1456981314.git.baolin.wang@linaro.org>
-Cc: akpm@linux-foundation.org, david.s.gordon@intel.com,
-	thomas.lendacky@amd.com, robert.jarzmik@free.fr,
-	yamada.masahiro@socionext.com, smueller@chronox.de,
-	tadeusz.struk@intel.com, standby24x7@gmail.com, shli@kernel.org,
-	broonie@kernel.org, linus.walleij@linaro.org, arnd@arndb.de,
-	baolin.wang@linaro.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net, agk@redhat.com,
-	snitzer@redhat.com, axboe@fb.com, dm-devel@redhat.com
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <cover.1456981314.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1456981314.git.baolin.wang@linaro.org>
-References: <cover.1456981314.git.baolin.wang@linaro.org>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Yang Pingchao <pingchao.yang@intel.com>
+Subject: [PATCH] crypto: qat - Change the definition of icp_qat_uof_regtype
+Date: Thu,  3 Mar 2016 02:46:45 -0500
+Message-ID: <1456991205-34197-1-git-send-email-pingchao.yang@intel.com>
+Cc: <tadeusz.struk@intel.com>, <linux-crypto@vger.kernel.org>,
+	Yang Pingchao <pingchao.yang@intel.com>
+To: <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:19067 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753194AbcCCHth (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 Mar 2016 02:49:37 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-If the crypto engine can support the bulk mode, that means the contiguous
-requests from one block can be merged into one request to be handled by
-crypto engine. If so, the crypto engine need the sector number of one request
-to do merging action.
+ The definition of icp_qat_uof_regtype should be coherent with
+ the definition in firmware compiler.
 
-Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
+Signed-off-by: Yang Pingchao <pingchao.yang@intel.com>
 ---
- drivers/md/dm-crypt.c |    1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/qat/qat_common/icp_qat_uclo.h | 42 ++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 3147c8d..9e2dbfd 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -866,6 +866,7 @@ static int crypt_convert_block(struct crypt_config *cc,
- 			return r;
- 	}
+diff --git a/drivers/crypto/qat/qat_common/icp_qat_uclo.h b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
+index d97db99..5d1ee7e 100644
+--- a/drivers/crypto/qat/qat_common/icp_qat_uclo.h
++++ b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
+@@ -112,27 +112,27 @@ enum icp_qat_uof_mem_region {
+ };
  
-+	req->sector = ctx->cc_sector;
- 	ablkcipher_request_set_crypt(req, &dmreq->sg_in, &dmreq->sg_out,
- 				     1 << SECTOR_SHIFT, iv);
+ enum icp_qat_uof_regtype {
+-	ICP_NO_DEST,
+-	ICP_GPA_REL,
+-	ICP_GPA_ABS,
+-	ICP_GPB_REL,
+-	ICP_GPB_ABS,
+-	ICP_SR_REL,
+-	ICP_SR_RD_REL,
+-	ICP_SR_WR_REL,
+-	ICP_SR_ABS,
+-	ICP_SR_RD_ABS,
+-	ICP_SR_WR_ABS,
+-	ICP_DR_REL,
+-	ICP_DR_RD_REL,
+-	ICP_DR_WR_REL,
+-	ICP_DR_ABS,
+-	ICP_DR_RD_ABS,
+-	ICP_DR_WR_ABS,
+-	ICP_LMEM,
+-	ICP_LMEM0,
+-	ICP_LMEM1,
+-	ICP_NEIGH_REL,
++	ICP_NO_DEST	= 0,
++	ICP_GPA_REL	= 1,
++	ICP_GPA_ABS	= 2,
++	ICP_GPB_REL	= 3,
++	ICP_GPB_ABS	= 4,
++	ICP_SR_REL	= 5,
++	ICP_SR_RD_REL	= 6,
++	ICP_SR_WR_REL	= 7,
++	ICP_SR_ABS	= 8,
++	ICP_SR_RD_ABS	= 9,
++	ICP_SR_WR_ABS	= 10,
++	ICP_DR_REL	= 19,
++	ICP_DR_RD_REL	= 20,
++	ICP_DR_WR_REL	= 21,
++	ICP_DR_ABS	= 22,
++	ICP_DR_RD_ABS	= 23,
++	ICP_DR_WR_ABS	= 24,
++	ICP_LMEM	= 26,
++	ICP_LMEM0	= 27,
++	ICP_LMEM1	= 28,
++	ICP_NEIGH_REL	= 31,
+ };
  
+ enum icp_qat_css_fwtype {
 -- 
-1.7.9.5
-
+2.4.3
