@@ -1,70 +1,41 @@
-From: Vinod Koul <vinod.koul@intel.com>
-Subject: Re: [PATCH] crypto/async_pq: use __free_page() instead of put_page()
-Date: Thu, 3 Mar 2016 21:20:35 +0530
-Message-ID: <20160303155035.GT11154@localhost>
-References: <1456738445-876239-1-git-send-email-arnd@arndb.de>
- <CAPcyv4jJzUieZ0i2jBqANwmYPUBVmQmhoDTPnr0KjPQXnoZqWQ@mail.gmail.com>
- <CAAmzW4Nq8LiFGzyR4YjG8OPev-Pj1dUad+Bus2puSAk_tUcCsA@mail.gmail.com>
-Mime-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH V2] crypto: implement DH primitives under akcipher API
+Date: Thu, 3 Mar 2016 08:23:48 -0800
+Message-ID: <B4E74723-637F-4A0D-9081-0541F1DF64BD@holtmann.org>
+References: <1457007345-3412-1-git-send-email-salvatore.benedetto@intel.com>
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
 Content-Type: text/plain; charset=us-ascii
-Cc: Dan Williams <dan.j.williams@intel.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-	Linux MM <linux-mm@kvack.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	Michal Nazarewicz <mina86@mina86.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	NeilBrown <neilb@suse.com>,
-	Markus Stockhausen <stockhausen@collogia.de>,
-	linux-crypto@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Joonsoo Kim <js1304@gmail.com>
+Content-Transfer-Encoding: 8BIT
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:2793 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754539AbcCCPqh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Mar 2016 10:46:37 -0500
-Content-Disposition: inline
-In-Reply-To: <CAAmzW4Nq8LiFGzyR4YjG8OPev-Pj1dUad+Bus2puSAk_tUcCsA@mail.gmail.com>
+Received: from [82.165.8.211] ([82.165.8.211]:36518 "EHLO mail.holtmann.org"
+	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751002AbcCCQXy convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 Mar 2016 11:23:54 -0500
+In-Reply-To: <1457007345-3412-1-git-send-email-salvatore.benedetto@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 01, 2016 at 10:54:50PM +0900, Joonsoo Kim wrote:
-> 2016-03-01 3:04 GMT+09:00 Dan Williams <dan.j.williams@intel.com>:
-> > On Mon, Feb 29, 2016 at 1:33 AM, Arnd Bergmann <arnd@arndb.de> wrote:
-> >> The addition of tracepoints to the page reference tracking had an
-> >> unfortunate side-effect in at least one driver that calls put_page
-> >> from its exit function, resulting in a link error:
-> >>
-> >> `.exit.text' referenced in section `__jump_table' of crypto/built-in.o: defined in discarded section `.exit.text' of crypto/built-in.o
-> >>
-> >> From a cursory look at that this driver, it seems that it may be
-> >> doing the wrong thing here anyway, as the page gets allocated
-> >> using 'alloc_page()', and should be freed using '__free_page()'
-> >> rather than 'put_page()'.
-> >>
-> >> With this patch, I no longer get any other build errors from the
-> >> page_ref patch, so hopefully we can assume that it's always wrong
-> >> to call any of those functions from __exit code, and that no other
-> >> driver does it.
-> >>
-> >> Fixes: 0f80830dd044 ("mm/page_ref: add tracepoint to track down page reference manipulation")
-> >> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> >
-> > Acked-by: Dan Williams <dan.j.williams@intel.com>
-> >
-> > Vinod, will you take this one?
-> 
-> Problematic patch ("mm/page_ref: ~~~") is not yet merged one. It is on mmotm
-> and this fix should go together with it or before it. I think that
-> handling this fix by
-> Andrew is easier to all.
+Hi Salvatore,
 
-Okay fine by me.
+> Implement Diffie-Hellman primitives required by the scheme under the
+> akcipher API. Here is how it works.
+> 1) Call set_pub_key() by passing DH parameters (p,g) in PKCS3 format
+> 2) Call set_priv_key() to set your own private key (xa) in raw format
+> 3) Call decrypt() without passing any data as input to get back the
+>   public part which will be computed as g^xa mod p
+> 4) Call encrypt() by passing the counter part public key (yb) in raw format
+>   as input to get back the shared secret calculated as zz = yb^xa mod p
 
--- 
-~Vinod
+I am still not convinced that akcipher is good match for key exchange methods. I think we should try to introduce a new abstraction here.
+
+Overloading set_pub_key() with DH params and using decrypt() for private/public key pair generation seems not a good fit. It does not really match.
+
+And as I said before, we know for certain that ECDH has to happen as well. So we need to forward look into making that fit as well.
+
+Regards
+
+Marcel
