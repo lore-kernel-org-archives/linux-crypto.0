@@ -1,44 +1,70 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 4/4] crypto: ccp - Add abstraction for device-specific
- calls
-Date: Thu, 3 Mar 2016 08:28:36 -0600
-Message-ID: <56D84A14.7030205@amd.com>
-References: <20160301194831.6788.2154.stgit@taos.amd.com>
- <20160301194925.6788.93319.stgit@taos.amd.com>
+From: Vinod Koul <vinod.koul@intel.com>
+Subject: Re: [PATCH] crypto/async_pq: use __free_page() instead of put_page()
+Date: Thu, 3 Mar 2016 21:20:35 +0530
+Message-ID: <20160303155035.GT11154@localhost>
+References: <1456738445-876239-1-git-send-email-arnd@arndb.de>
+ <CAPcyv4jJzUieZ0i2jBqANwmYPUBVmQmhoDTPnr0KjPQXnoZqWQ@mail.gmail.com>
+ <CAAmzW4Nq8LiFGzyR4YjG8OPev-Pj1dUad+Bus2puSAk_tUcCsA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-To: Gary R Hook <gary.hook@amd.com>, <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Dan Williams <dan.j.williams@intel.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	Linux MM <linux-mm@kvack.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Michal Nazarewicz <mina86@mina86.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	NeilBrown <neilb@suse.com>,
+	Markus Stockhausen <stockhausen@collogia.de>,
+	linux-crypto@vger.kernel.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Joonsoo Kim <js1304@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0068.outbound.protection.outlook.com ([65.55.169.68]:33852
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752921AbcCCOoA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Mar 2016 09:44:00 -0500
-In-Reply-To: <20160301194925.6788.93319.stgit@taos.amd.com>
+Received: from mga02.intel.com ([134.134.136.20]:2793 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754539AbcCCPqh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 Mar 2016 10:46:37 -0500
+Content-Disposition: inline
+In-Reply-To: <CAAmzW4Nq8LiFGzyR4YjG8OPev-Pj1dUad+Bus2puSAk_tUcCsA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/01/2016 01:49 PM, Gary R Hook wrote:
-> Support for different generations of the coprocessor
-> requires that an abstraction layer be implemented for
-> interacting with the hardware. This patch splits out
-> version-specific functions to a separate file and populates
-> the version structure (acting as a driver) with function
-> pointers.
+On Tue, Mar 01, 2016 at 10:54:50PM +0900, Joonsoo Kim wrote:
+> 2016-03-01 3:04 GMT+09:00 Dan Williams <dan.j.williams@intel.com>:
+> > On Mon, Feb 29, 2016 at 1:33 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> >> The addition of tracepoints to the page reference tracking had an
+> >> unfortunate side-effect in at least one driver that calls put_page
+> >> from its exit function, resulting in a link error:
+> >>
+> >> `.exit.text' referenced in section `__jump_table' of crypto/built-in.o: defined in discarded section `.exit.text' of crypto/built-in.o
+> >>
+> >> From a cursory look at that this driver, it seems that it may be
+> >> doing the wrong thing here anyway, as the page gets allocated
+> >> using 'alloc_page()', and should be freed using '__free_page()'
+> >> rather than 'put_page()'.
+> >>
+> >> With this patch, I no longer get any other build errors from the
+> >> page_ref patch, so hopefully we can assume that it's always wrong
+> >> to call any of those functions from __exit code, and that no other
+> >> driver does it.
+> >>
+> >> Fixes: 0f80830dd044 ("mm/page_ref: add tracepoint to track down page reference manipulation")
+> >> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> >
+> > Acked-by: Dan Williams <dan.j.williams@intel.com>
+> >
+> > Vinod, will you take this one?
 > 
-> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+> Problematic patch ("mm/page_ref: ~~~") is not yet merged one. It is on mmotm
+> and this fix should go together with it or before it. I think that
+> handling this fix by
+> Andrew is easier to all.
 
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+Okay fine by me.
 
-> ---
->  drivers/crypto/ccp/Makefile       |    2 
->  drivers/crypto/ccp/ccp-dev-v3.c   |  534 +++++++++++++++++++++++++++++++++++++
->  drivers/crypto/ccp/ccp-dev.c      |  306 +--------------------
->  drivers/crypto/ccp/ccp-dev.h      |  138 +++++++++-
->  drivers/crypto/ccp/ccp-ops.c      |  381 +-------------------------
->  drivers/crypto/ccp/ccp-pci.c      |   10 -
->  drivers/crypto/ccp/ccp-platform.c |    7 
->  7 files changed, 711 insertions(+), 667 deletions(-)
->  create mode 100644 drivers/crypto/ccp/ccp-dev-v3.c
+-- 
+~Vinod
