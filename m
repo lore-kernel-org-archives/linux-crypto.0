@@ -1,35 +1,37 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: Left-over select to PUBLIC_KEY_ALGO_RSA
-Date: Fri, 04 Mar 2016 15:23:49 +0000
-Message-ID: <18370.1457105029@warthog.procyon.org.uk>
-References: <56D9A6FC.7000307@fau.de>
+From: Andreas Ziegler <andreas.ziegler@fau.de>
+Subject: Left-over select to PUBLIC_KEY_ALGO_RSA
+Date: Fri, 4 Mar 2016 16:17:16 +0100
+Message-ID: <56D9A6FC.7000307@fau.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, Tadeusz Struk <tadeusz.struk@intel.com>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Valentin Rothberg <valentinrothberg@gmail.com>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
-To: Andreas Ziegler <andreas.ziegler@fau.de>
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <56D9A6FC.7000307@fau.de>
-Content-ID: <18369.1457105029.1@warthog.procyon.org.uk>
 Sender: owner-linux-security-module@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Andreas Ziegler <andreas.ziegler@fau.de> wrote:
+Hi David,
 
-> As the corresponding option is gone, the select statement can safely be
-> removed. Should I prepare a simple patch for that?
+your patch "akcipher: Move the RSA DER encoding check to the crypto
+layer" showed up in linux-next today as commit d43de6c780a8 (that is,
+next-20160304).
 
-Please.
+It removes the CONFIG_PUBLIC_KEY_ALGO_RSA option, but does leave one
+reference to it in place inside security/integrity/Kconfig, in the
+definition of CONFIG_INTEGRITY_ASYMMETRIC_KEYS.
 
-> I detected this by using scripts/checkkconfigsymbols on today's and
-> yesterday's linux-next trees (i.e., "./scripts/checkkconfigsymbols.py -d
-> next-20160303..next-20160304").
+As the corresponding option is gone, the select statement can safely be
+removed. Should I prepare a simple patch for that?
 
-Interesting - I didn't realise that exists.  This sort of consistency check
-should be run every time the Kconfig files are parsed.
+I detected this by using scripts/checkkconfigsymbols on today's and
+yesterday's linux-next trees (i.e., "./scripts/checkkconfigsymbols.py -d
+next-20160303..next-20160304").
 
-Thanks,
-David
+Best regards,
+
+Andreas
