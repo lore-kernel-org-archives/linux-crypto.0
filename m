@@ -1,37 +1,45 @@
 From: Andreas Ziegler <andreas.ziegler@fau.de>
-Subject: Left-over select to PUBLIC_KEY_ALGO_RSA
-Date: Fri, 4 Mar 2016 16:17:16 +0100
-Message-ID: <56D9A6FC.7000307@fau.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
+Subject: [PATCH] security: integrity: Remove select to deleted option PUBLIC_KEY_ALGO_RSA
+Date: Fri,  4 Mar 2016 19:00:06 +0100
+Message-ID: <1457114406-29804-1-git-send-email-andreas.ziegler@fau.de>
+References: <18370.1457105029@warthog.procyon.org.uk>
+Cc: "Serge E. Hallyn" <serge@hallyn.com>,
+	David Howells <dhowells@redhat.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Valentin Rothberg <valentinrothberg@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-Sender: owner-linux-security-module@vger.kernel.org
+	Andreas Ziegler <andreas.ziegler@fau.de>
+To: James Morris <james.l.morris@oracle.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <18370.1457105029@warthog.procyon.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi David,
+Commit d43de6c780a8 ("akcipher: Move the RSA DER encoding check to
+the crypto layer") removed the Kconfig option PUBLIC_KEY_ALGO_RSA,
+but forgot to remove a 'select' to this option in the definition of
+INTEGRITY_ASYMMETRIC_KEYS.
 
-your patch "akcipher: Move the RSA DER encoding check to the crypto
-layer" showed up in linux-next today as commit d43de6c780a8 (that is,
-next-20160304).
+Let's remove the select, as it's ineffective now.
 
-It removes the CONFIG_PUBLIC_KEY_ALGO_RSA option, but does leave one
-reference to it in place inside security/integrity/Kconfig, in the
-definition of CONFIG_INTEGRITY_ASYMMETRIC_KEYS.
+Signed-off-by: Andreas Ziegler <andreas.ziegler@fau.de>
+---
+ security/integrity/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
 
-As the corresponding option is gone, the select statement can safely be
-removed. Should I prepare a simple patch for that?
-
-I detected this by using scripts/checkkconfigsymbols on today's and
-yesterday's linux-next trees (i.e., "./scripts/checkkconfigsymbols.py -d
-next-20160303..next-20160304").
-
-Best regards,
-
-Andreas
+diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
+index 979be65..da95658 100644
+--- a/security/integrity/Kconfig
++++ b/security/integrity/Kconfig
+@@ -35,7 +35,6 @@ config INTEGRITY_ASYMMETRIC_KEYS
+ 	default n
+         select ASYMMETRIC_KEY_TYPE
+         select ASYMMETRIC_PUBLIC_KEY_SUBTYPE
+-        select PUBLIC_KEY_ALGO_RSA
+         select CRYPTO_RSA
+         select X509_CERTIFICATE_PARSER
+ 	help
+-- 
+1.9.1
