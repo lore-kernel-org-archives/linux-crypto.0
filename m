@@ -1,68 +1,73 @@
-From: Baolin Wang <baolin.wang@linaro.org>
-Subject: Re: [PATCH 1/4] scatterlist: Introduce some helper functions
-Date: Fri, 4 Mar 2016 14:53:49 +0800
-Message-ID: <CAMz4kuKMTTSF7_D47xJqhoKporaibXjame9aLgyrHWDSsKvM4Q@mail.gmail.com>
-References: <cover.1456981314.git.baolin.wang@linaro.org>
-	<3bff3e286d3ee01ebb7e26d7233075054c42a7a9.1456981314.git.baolin.wang@linaro.org>
-	<87povbpe3l.fsf@belgarion.home>
-	<CAMz4kuKtwCkgG-3GeCtfnAX5zN8MkwyVr2XVYzaV3Z6SFFcZww@mail.gmail.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH] vti6: Add pmtu handling to vti6_xmit.
+Date: Fri, 4 Mar 2016 08:05:25 +0100
+Message-ID: <20160304070525.GA3347@gauss.secunet.com>
+References: <20150529182709.2147.78230.stgit@ahduyck-vm-fedora22>
+ <56BA975D.2040706@alliedtelesis.co.nz>
+ <20160217070805.GA316@gauss.secunet.com>
+ <56C520F0.4050309@alliedtelesis.co.nz>
+ <20160218121915.GH316@gauss.secunet.com>
+ <56CE22A3.7030702@alliedtelesis.co.nz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>,
-	Alasdair G Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@redhat.com>, axboe@fb.com,
-	dm-devel@redhat.com, akpm@linux-foundation.org,
-	david.s.gordon@intel.com, Tom Lendacky <thomas.lendacky@amd.com>,
-	Masahiro Yamada <yamada.masahiro@socionext.com>,
-	smueller@chronox.de, tadeusz.struk@intel.com,
-	Masanari Iida <standby24x7@gmail.com>, shli@kernel.org,
-	Mark Brown <broonie@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
-To: Robert Jarzmik <robert.jarzmik@free.fr>
+Content-Type: text/plain; charset="us-ascii"
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"alexander.h.duyck@redhat.com" <alexander.h.duyck@redhat.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"davem@davemloft.net" <davem@davemloft.net>
+To: Mark McKinstry <Mark.McKinstry@alliedtelesis.co.nz>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yw0-f180.google.com ([209.85.161.180]:36480 "EHLO
-	mail-yw0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751080AbcCDGxu (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Mar 2016 01:53:50 -0500
-Received: by mail-yw0-f180.google.com with SMTP id i131so24586051ywc.3
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Mar 2016 22:53:50 -0800 (PST)
-In-Reply-To: <CAMz4kuKtwCkgG-3GeCtfnAX5zN8MkwyVr2XVYzaV3Z6SFFcZww@mail.gmail.com>
+Received: from a.mx.secunet.com ([62.96.220.36]:51809 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751164AbcCDHFa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 4 Mar 2016 02:05:30 -0500
+Content-Disposition: inline
+In-Reply-To: <56CE22A3.7030702@alliedtelesis.co.nz>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
->>> + **/
->>> +static inline bool sg_is_contiguous(struct scatterlist *sga,
->>> +                                 struct scatterlist *sgb)
->>> +{
->>> +     return ((sga->page_link & ~0x3UL) + sga->offset + sga->length ==
->>> +             (sgb->page_link & ~0x3UL));
->>> +}
->> I don't understand that one.
->> sga->page_link is a pointer to a "struct page *". How can it be added to an
->> offset within a page ???
->
->
-> Ah, sorry that's a mistake. It should check as below:
-> static inline bool sg_is_contiguous(struct scatterlist *sga, struct
-> scatterlist *sgb)
-> {
->     return (unsigned int)sg_virt(sga) + sga->length == (unsigned
-> int)sg_virt(sgb);
-> }
+On Wed, Feb 24, 2016 at 09:37:39PM +0000, Mark McKinstry wrote:
+> On 19/02/16 01:19, Steffen Klassert wrote:
+> > On Thu, Feb 18, 2016 at 01:40:00AM +0000, Mark McKinstry wrote:
+> >> This patch fixes our issue, thanks. In our scenario the tunnel path MTU
+> >> now gets updated so that subsequent large packets sent over the tunnel
+> >> get fragmented correctly.
+> > I've applied this patch to the ipsec tree now.
+> > Thanks for testing!
+> I spoke too soon. Upon further testing with this patch we have found it 
+> causes
+> a skt buffer leak. This is problematic for us and can cause memory 
+> exhaustion in
+> one of our test scenarios that has an IPv4 IPsec tunnel over a PPP link. 
 
-sorry, it should be:
-static inline bool sg_is_contiguous(struct scatterlist *sga,
-   struct scatterlist *sgb)
-{
-    return (unsigned long)sg_virt(sga) + sga->length ==
-               (unsigned long)sg_virt(sgb);
-}
+The patch below is what I plan to apply on top of the original patch.
 
+Subject: [PATCH] vti: Fix recource leeks on pmtu discovery
+
+A recent patch introduced pmtu handling directly in the
+vti transmit routine. Unfortunately we now return without
+releasing the dst_entry and freeing the sk_buff. This patch
+fixes the issue.
+
+Fixes: 325b71fe0f57 ("vti: Add pmtu handling to vti_xmit.")
+Reported-by: Mark McKinstry <Mark.McKinstry@alliedtelesis.co.nz>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ net/ipv4/ip_vti.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/ip_vti.c b/net/ipv4/ip_vti.c
+index 6862305..2ea2b6e 100644
+--- a/net/ipv4/ip_vti.c
++++ b/net/ipv4/ip_vti.c
+@@ -206,7 +206,8 @@ static netdev_tx_t vti_xmit(struct sk_buff *skb, struct net_device *dev,
+ 		else
+ 			icmpv6_send(skb, ICMPV6_PKT_TOOBIG, 0, mtu);
+ 
+-		return -EMSGSIZE;
++		dst_release(dst);
++		goto tx_error;
+ 	}
+ 
+ 	err = dst_output(tunnel->net, skb->sk, skb);
 -- 
-Baolin.wang
-Best Regards
+1.9.1
