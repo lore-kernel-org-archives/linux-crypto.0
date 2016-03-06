@@ -1,17 +1,16 @@
 From: Vladimir Zapolskiy <vz@mleia.com>
-Subject: [PATCH] crypto: atmel: fix checks of error code returned by devm_ioremap_resource()
-Date: Sun,  6 Mar 2016 03:21:52 +0200
-Message-ID: <1457227312-3190-1-git-send-email-vz@mleia.com>
-Cc: Cyrille Pitchen <cyrille.pitchen@atmel.com>,
-	LABBE Corentin <clabbe.montjoie@gmail.com>,
+Subject: [PATCH] crypto: ux500: fix checks of error code returned by devm_ioremap_resource()
+Date: Sun,  6 Mar 2016 03:22:04 +0200
+Message-ID: <1457227324-3243-1-git-send-email-vz@mleia.com>
+Cc: LABBE Corentin <clabbe.montjoie@gmail.com>,
 	linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mleia.com ([178.79.152.223]:41538 "EHLO mail.mleia.com"
+Received: from mleia.com ([178.79.152.223]:41554 "EHLO mail.mleia.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751116AbcCFBWA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 5 Mar 2016 20:22:00 -0500
+	id S1751116AbcCFBWL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 5 Mar 2016 20:22:11 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -22,60 +21,43 @@ The devm_ioremap_resource() function returns ERR_PTR() and never
 returns NULL, which makes useless a following check for NULL.
 
 Signed-off-by: Vladimir Zapolskiy <vz@mleia.com>
-Fixes: b0e8b3417a62 ("crypto: atmel - use devm_xxx() managed function")
+Fixes: 5a4eea2658c93 ("crypto: ux500 - Use devm_xxx() managed function")
 ---
- drivers/crypto/atmel-aes.c  | 4 ++--
- drivers/crypto/atmel-sha.c  | 4 ++--
- drivers/crypto/atmel-tdes.c | 4 ++--
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/crypto/ux500/cryp/cryp_core.c | 4 ++--
+ drivers/crypto/ux500/hash/hash_core.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index 3eb3f12..7de007a 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -2085,9 +2085,9 @@ static int atmel_aes_probe(struct platform_device *pdev)
+diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+index 4c243c1..790f7ca 100644
+--- a/drivers/crypto/ux500/cryp/cryp_core.c
++++ b/drivers/crypto/ux500/cryp/cryp_core.c
+@@ -1440,9 +1440,9 @@ static int ux500_cryp_probe(struct platform_device *pdev)
+ 
+ 	device_data->phybase = res->start;
+ 	device_data->base = devm_ioremap_resource(dev, res);
+-	if (!device_data->base) {
++	if (IS_ERR(device_data->base)) {
+ 		dev_err(dev, "[%s]: ioremap failed!", __func__);
+-		ret = -ENOMEM;
++		ret = PTR_ERR(device_data->base);
+ 		goto out;
  	}
  
- 	aes_dd->io_base = devm_ioremap_resource(&pdev->dev, aes_res);
--	if (!aes_dd->io_base) {
-+	if (IS_ERR(aes_dd->io_base)) {
- 		dev_err(dev, "can't ioremap\n");
--		err = -ENOMEM;
-+		err = PTR_ERR(aes_dd->io_base);
- 		goto res_err;
- 	}
+diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+index d6fdc58..574e87c 100644
+--- a/drivers/crypto/ux500/hash/hash_core.c
++++ b/drivers/crypto/ux500/hash/hash_core.c
+@@ -1659,9 +1659,9 @@ static int ux500_hash_probe(struct platform_device *pdev)
  
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 8bf9914..68d47a2 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -1404,9 +1404,9 @@ static int atmel_sha_probe(struct platform_device *pdev)
+ 	device_data->phybase = res->start;
+ 	device_data->base = devm_ioremap_resource(dev, res);
+-	if (!device_data->base) {
++	if (IS_ERR(device_data->base)) {
+ 		dev_err(dev, "%s: ioremap() failed!\n", __func__);
+-		ret = -ENOMEM;
++		ret = PTR_ERR(device_data->base);
+ 		goto out;
  	}
- 
- 	sha_dd->io_base = devm_ioremap_resource(&pdev->dev, sha_res);
--	if (!sha_dd->io_base) {
-+	if (IS_ERR(sha_dd->io_base)) {
- 		dev_err(dev, "can't ioremap\n");
--		err = -ENOMEM;
-+		err = PTR_ERR(sha_dd->io_base);
- 		goto res_err;
- 	}
- 
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 2c7a628..bf467d7 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -1417,9 +1417,9 @@ static int atmel_tdes_probe(struct platform_device *pdev)
- 	}
- 
- 	tdes_dd->io_base = devm_ioremap_resource(&pdev->dev, tdes_res);
--	if (!tdes_dd->io_base) {
-+	if (IS_ERR(tdes_dd->io_base)) {
- 		dev_err(dev, "can't ioremap\n");
--		err = -ENOMEM;
-+		err = PTR_ERR(tdes_dd->io_base);
- 		goto res_err;
- 	}
- 
+ 	spin_lock_init(&device_data->ctx_lock);
 -- 
 2.1.4
