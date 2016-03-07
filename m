@@ -1,84 +1,68 @@
-From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
-Subject: Re: [PATCH 1/2] crypto: s5p-sss - Minor coding cleanups
-Date: Mon, 07 Mar 2016 13:05:49 +0900
-Message-ID: <56DCFE1D.7000106@samsung.com>
-References: <1457259436-32560-1-git-send-email-krzk@kernel.org>
- <56DCD301.4030401@mleia.com>
+From: Cristian Stoica <cristian.stoica@nxp.com>
+Subject: Re: [PATCH 1/3] crypto: authenc - add TLS type encryption
+Date: Mon, 7 Mar 2016 09:05:16 +0000
+Message-ID: <AM4PR0401MB18766E17BCB4769B982ADFCBE7B10@AM4PR0401MB1876.eurprd04.prod.outlook.com>
+References: <20160306012044.6369.63924.stgit@tstruk-mobl1>,<20160306012049.6369.99836.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-To: Vladimir Zapolskiy <vz@mleia.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-samsung-soc@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>
+To: Tadeusz Struk <tadeusz.struk@intel.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:46050 "EHLO
-	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751840AbcCGEF5 (ORCPT
+Received: from mail-am1on0087.outbound.protection.outlook.com ([157.56.112.87]:19424
+	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752330AbcCGLgf convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 6 Mar 2016 23:05:57 -0500
-In-reply-to: <56DCD301.4030401@mleia.com>
+	Mon, 7 Mar 2016 06:36:35 -0500
+In-Reply-To: <20160306012049.6369.99836.stgit@tstruk-mobl1>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 07.03.2016 10:01, Vladimir Zapolskiy wrote:
-> Hi Krzysztof,
-> 
-> On 06.03.2016 12:17, Krzysztof Kozlowski wrote:
->> Remove unneeded inclusion of delay.h and get rid of indentation from
->> labels.
-> 
-> just in case are you aware of this discussion regarding goto labels
-> http://lkml.iu.edu/hypermail/linux/kernel/0706.0/0809.html ?
-> 
-> Practically there is no big need (neither it is a clean-up IMHO)
-> to change column 1 indentation of goto labels, however I do agree that
-> ^[a-z0-9_]\+:$ style of goto labels is 10 times more commonly used,
-> and that means it's a good time to update my ~/.emacs config.
-> 
-> Someone may want to fix the style of another 5000+ goto labels one day,
-> though it is better to have an officially agreed policy beforehand.
-> 
-> Anyway I do not strictly object against the change, see one my comment
-> below and feel free to add my
-> 
-> Acked-by: Vladimir Zapolskiy <vz@mleia.com>
-
-Actually I was not aware of that discussion, thanks for pointing this
-out. Mostly I encountered the style without indentation but of course
-that does not mean it is the only one.
-
-> 
->> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
->> ---
->>  drivers/crypto/s5p-sss.c | 15 +++++++--------
->>  1 file changed, 7 insertions(+), 8 deletions(-)
->>
->> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
->> index 5f161a9777e3..60f835455a41 100644
->> --- a/drivers/crypto/s5p-sss.c
->> +++ b/drivers/crypto/s5p-sss.c
->> @@ -11,7 +11,6 @@
->>   *
->>   */
->>  
->> -#include <linux/delay.h>
->>  #include <linux/err.h>
->>  #include <linux/module.h>
->>  #include <linux/init.h>
-> 
-> Since you are here, can you sort headers out, please?
-
-You mean sort by name (or by christmas tree)? I can... I am not sure
-about benefits of such patch (which should be the motivation for change).
+Hi Tadeusz,
 
 
-> And I'm pretty sure some more inclusions can be safely removed
-> from the list.
++static int crypto_encauth_dgst_verify(struct aead_request *req,
++                                     unsigned int flags)
++{
++       struct crypto_aead *tfm = crypto_aead_reqtfm(req);
++       unsigned int authsize = crypto_aead_authsize(tfm);
++       struct aead_instance *inst = aead_alg_instance(tfm);
++       struct crypto_encauth_ctx *ctx = crypto_aead_ctx(tfm);
++       struct encauth_instance_ctx *ictx = aead_instance_ctx(inst);
++       struct crypto_ahash *auth = ctx->auth;
++       struct encauth_request_ctx *areq_ctx = aead_request_ctx(req);
++       struct ahash_request *ahreq = (void *)(areq_ctx->tail + ictx->reqoff);
++       u8 *hash = areq_ctx->tail;
++       int i, err = 0, padd_err = 0;
++       u8 paddlen, *ihash;
++       u8 padd[255];
++
++       scatterwalk_map_and_copy(&paddlen, req->dst, req->assoclen +
++                                req->cryptlen - 1, 1, 0);
++
++       if (paddlen > 255 || paddlen > req->cryptlen) {
++               paddlen = 1;
++               padd_err = -EBADMSG;
++       }
++
++       scatterwalk_map_and_copy(padd, req->dst, req->assoclen +
++                                req->cryptlen - paddlen, paddlen, 0);
++
++       for (i = 0; i < paddlen; i++) {
++               if (padd[i] != paddlen)
++                       padd_err = -EBADMSG;
++       }
 
-I checked them while removing delay - all of them seem to be used.
 
-Best regards,
-Krzysztof
+This part seems to have the same issue my TLS patch has.
+See for reference what Andy Lutomirski had to say about it:
+
+http://www.mail-archive.com/linux-crypto%40vger.kernel.org/msg11719.html
+
+
+Cristian S.
