@@ -1,63 +1,84 @@
-From: Eric Wheeler <linux-crypto@lists.ewheeler.net>
-Subject: Re: crypto regression in 4.1.18: Check that kernel supports
- aes-cbc-essiv:sha256 cipher
-Date: Mon, 7 Mar 2016 04:02:30 +0000 (UTC)
-Message-ID: <alpine.LRH.2.11.1603070401170.11530@mail.ewheeler.net>
-References: <alpine.LRH.2.11.1603010129330.3635@mail.ewheeler.net> <20160301025853.GB17542@kroah.com> <56D727A7.8030800@gmail.com>
+From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Subject: Re: [PATCH 1/2] crypto: s5p-sss - Minor coding cleanups
+Date: Mon, 07 Mar 2016 13:05:49 +0900
+Message-ID: <56DCFE1D.7000106@samsung.com>
+References: <1457259436-32560-1-git-send-email-krzk@kernel.org>
+ <56DCD301.4030401@mleia.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: Greg KH <gregkh@linuxfoundation.org>,
-	"Wang, Rui Y" <rui.y.wang@intel.com>,
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+To: Vladimir Zapolskiy <vz@mleia.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jean Delvare <jdelvare@suse.de>, linux-crypto@vger.kernel.org,
-	stable@vger.kernel.org
-To: Milan Broz <gmazyland@gmail.com>
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-samsung-soc@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx.ewheeler.net ([71.19.153.34]:41120 "EHLO mail.ewheeler.net"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752008AbcCGECi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 6 Mar 2016 23:02:38 -0500
-In-Reply-To: <56D727A7.8030800@gmail.com>
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:46050 "EHLO
+	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751840AbcCGEF5 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 6 Mar 2016 23:05:57 -0500
+In-reply-to: <56DCD301.4030401@mleia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2 Mar 2016, Milan Broz wrote:
-
-> On 03/01/2016 03:58 AM, Greg KH wrote:
-> > On Tue, Mar 01, 2016 at 01:32:05AM +0000, Eric Wheeler wrote:
-> >> Hello all,
-> >>
-> >> We updated from 4.1.17 to 4.1.18 (same .config) and now get the following 
-> >> error when trying to open a LUKS volume.  We've reverted to 4.1.17 and it 
-> >> still works, so except that I'm not sure which commit caused the problem, 
-> >> it is likely one of the recent commits:
-> >>
-> >> When we `cryptsetup luksOpen` the volume we get this:
-> >>
-> >>   Check that kernel supports aes-cbc-essiv:sha256 cipher (check syslog for more info).  
-> >>
-> >> Note that I do not see any dm-crypto commits so I don't think its a 
-> >> dm-crypto issue. 
-> >>
-> >> I'm happy to test, but can someone who knows the crypto stack suggest 
-> >> which of these patches I should focus on for testing? These are the 
-> >> commits in 4.1.18 that could be relevant:
-> > 
-> > There are some pending crypto backports to resolve this that hopefully
-> > will show up in the next release, whenever Sasha gets to it.
+On 07.03.2016 10:01, Vladimir Zapolskiy wrote:
+> Hi Krzysztof,
 > 
-> Also there is already released cryptsetup 1.7.1 that works even with this kernel.
+> On 06.03.2016 12:17, Krzysztof Kozlowski wrote:
+>> Remove unneeded inclusion of delay.h and get rid of indentation from
+>> labels.
+> 
+> just in case are you aware of this discussion regarding goto labels
+> http://lkml.iu.edu/hypermail/linux/kernel/0706.0/0809.html ?
+> 
+> Practically there is no big need (neither it is a clean-up IMHO)
+> to change column 1 indentation of goto labels, however I do agree that
+> ^[a-z0-9_]\+:$ style of goto labels is 10 times more commonly used,
+> and that means it's a good time to update my ~/.emacs config.
+> 
+> Someone may want to fix the style of another 5000+ goto labels one day,
+> though it is better to have an officially agreed policy beforehand.
+> 
+> Anyway I do not strictly object against the change, see one my comment
+> below and feel free to add my
+> 
+> Acked-by: Vladimir Zapolskiy <vz@mleia.com>
 
-Interesting.  API change?  I'd like to read up on it.  Is there a commit 
-or mailing thread on the topic?
-
--Eric
+Actually I was not aware of that discussion, thanks for pointing this
+out. Mostly I encountered the style without indentation but of course
+that does not mean it is the only one.
 
 > 
-> Milan
+>> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+>> ---
+>>  drivers/crypto/s5p-sss.c | 15 +++++++--------
+>>  1 file changed, 7 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+>> index 5f161a9777e3..60f835455a41 100644
+>> --- a/drivers/crypto/s5p-sss.c
+>> +++ b/drivers/crypto/s5p-sss.c
+>> @@ -11,7 +11,6 @@
+>>   *
+>>   */
+>>  
+>> -#include <linux/delay.h>
+>>  #include <linux/err.h>
+>>  #include <linux/module.h>
+>>  #include <linux/init.h>
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe stable" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+> Since you are here, can you sort headers out, please?
+
+You mean sort by name (or by christmas tree)? I can... I am not sure
+about benefits of such patch (which should be the motivation for change).
+
+
+> And I'm pretty sure some more inclusions can be safely removed
+> from the list.
+
+I checked them while removing delay - all of them seem to be used.
+
+Best regards,
+Krzysztof
