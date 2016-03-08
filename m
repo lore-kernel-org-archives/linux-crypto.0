@@ -1,49 +1,41 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [patch] crypto: rsa-pkcs1pad: indent a couple statements
-Date: Tue, 8 Mar 2016 15:07:36 +0300
-Message-ID: <20160308120736.GC28684@mwanda>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH 1/3] crypto: authenc - add TLS type encryption
+Date: Tue, 8 Mar 2016 08:49:55 -0800
+Message-ID: <56DF02B3.1070006@intel.com>
+References: <20160306012044.6369.63924.stgit@tstruk-mobl1>
+ <20160306012049.6369.99836.stgit@tstruk-mobl1>
+ <AM4PR0401MB18766E17BCB4769B982ADFCBE7B10@AM4PR0401MB1876.eurprd04.prod.outlook.com>
+ <56DD90CB.4080704@intel.com>
+ <AM4PR0401MB1876F5088D4EC6BE577BC97CE7B10@AM4PR0401MB1876.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>
+To: Cristian Stoica <cristian.stoica@nxp.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:32264 "EHLO
-	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932068AbcCHMH6 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Mar 2016 07:07:58 -0500
-Content-Disposition: inline
+Received: from mga04.intel.com ([192.55.52.120]:32795 "EHLO mga04.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933430AbcCHQyc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 8 Mar 2016 11:54:32 -0500
+In-Reply-To: <AM4PR0401MB1876F5088D4EC6BE577BC97CE7B10@AM4PR0401MB1876.eurprd04.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-These if statements aren't indented far enough and it makes static
-checkers complain.
+Hi Cristian,
+On 03/08/2016 12:20 AM, Cristian Stoica wrote:
+> There is also a follow-up in the next paragraph:
+> 
+> "That pretty much sums up the new attack: the side-channel defenses that were hoped to be sufficient were found not to be (again). So the answer, this time I believe, is to make the processing rigorously constant-time."
+> 
+> The author makes new changes and continues instrumenting the code and still finds 20 CPU cycles (out of 18000) difference between medians for different paddings. This small difference was detected also on a timing side-channel - which is the point I'm making.
+> 
+> SSL/TLS is prone to this implementation issue and many user-space libraries got this wrong. It would be good to see some numbers to back-up the claim of timing differences as not being an issue for this one.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
-Hopefully GCC6 will start complaining about these as well?
-
-diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index 1cea67d..1eb5cbe 100644
---- a/crypto/rsa-pkcs1pad.c
-+++ b/crypto/rsa-pkcs1pad.c
-@@ -705,7 +705,7 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
- 			     CRYPTO_MAX_ALG_NAME, "pkcs1pad(%s)",
- 			     rsa_alg->base.cra_driver_name) >=
- 					CRYPTO_MAX_ALG_NAME)
--		goto out_drop_alg;
-+			goto out_drop_alg;
- 	} else {
- 		if (snprintf(inst->alg.base.cra_name,
- 			     CRYPTO_MAX_ALG_NAME, "pkcs1pad(%s,%s)",
-@@ -715,7 +715,7 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
- 			     CRYPTO_MAX_ALG_NAME, "pkcs1pad(%s,%s)",
- 			     rsa_alg->base.cra_driver_name, hash_name) >=
- 					CRYPTO_MAX_ALG_NAME)
--		goto out_free_hash;
-+			goto out_free_hash;
- 	}
- 
- 	inst->alg.base.cra_flags = rsa_alg->base.cra_flags & CRYPTO_ALG_ASYNC;
+It is hard to get the implementation right when the protocol design is error prone.
+Later we should run some tests on it and see how relevant will this be for a remote timing attack.
+Thanks,
+-- 
+TS
