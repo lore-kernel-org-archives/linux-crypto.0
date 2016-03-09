@@ -1,72 +1,30 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH] crypto: qat - remove redundant arbiter configuration
-Date: Tue,  8 Mar 2016 10:37:15 -0800
-Message-ID: <1457462235-27433-1-git-send-email-tadeusz.struk@intel.com>
-Cc: <linux-crypto@vger.kernel.org>, <ahsan.atta@intel.com>,
-	Tadeusz Struk <tadeusz.struk@intel.com>
-To: <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:49183 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750907AbcCHSmH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Mar 2016 13:42:07 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Cristian Stoica <cristian.stoica@nxp.com>
+Subject: Re: [PATCH 1/3] crypto: authenc - add TLS type encryption
+Date: Wed, 9 Mar 2016 08:18:12 +0000
+Message-ID: <AM4PR0401MB1876509BEA44E70B77BA3BAAE7B30@AM4PR0401MB1876.eurprd04.prod.outlook.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>
+To: Tadeusz Struk <tadeusz.struk@intel.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The default arbiter configuration for ring weights and response ordering
-is exactly what we want so we don't need to configure anything more.
-This will also fix the problem where number of bundles is different
-between different devices.
+Hi Tadeusz,
 
-Reported-by: Ahsan Atta <ahsan.atta@intel.com>
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
- drivers/crypto/qat/qat_common/adf_hw_arbiter.c | 19 -------------------
- 1 file changed, 19 deletions(-)
+>> SSL/TLS is prone to this implementation issue and many user-space libraries got this wrong. It would be good to see >>some numbers to back-up the claim of timing differences as not being an issue for this one.
 
-diff --git a/drivers/crypto/qat/qat_common/adf_hw_arbiter.c b/drivers/crypto/qat/qat_common/adf_hw_arbiter.c
-index f267d9e..d7dd18d 100644
---- a/drivers/crypto/qat/qat_common/adf_hw_arbiter.c
-+++ b/drivers/crypto/qat/qat_common/adf_hw_arbiter.c
-@@ -49,7 +49,6 @@
- #include "adf_transport_internal.h"
- 
- #define ADF_ARB_NUM 4
--#define ADF_ARB_REQ_RING_NUM 8
- #define ADF_ARB_REG_SIZE 0x4
- #define ADF_ARB_WTR_SIZE 0x20
- #define ADF_ARB_OFFSET 0x30000
-@@ -64,15 +63,6 @@
- 	ADF_CSR_WR(csr_addr, ADF_ARB_RINGSRVARBEN_OFFSET + \
- 	(ADF_ARB_REG_SLOT * index), value)
- 
--#define WRITE_CSR_ARB_RESPORDERING(csr_addr, index, value) \
--	ADF_CSR_WR(csr_addr, (ADF_ARB_OFFSET + \
--	ADF_ARB_RO_EN_OFFSET) + (ADF_ARB_REG_SIZE * index), value)
--
--#define WRITE_CSR_ARB_WEIGHT(csr_addr, arb, index, value) \
--	ADF_CSR_WR(csr_addr, (ADF_ARB_OFFSET + \
--	ADF_ARB_WTR_OFFSET) + (ADF_ARB_WTR_SIZE * arb) + \
--	(ADF_ARB_REG_SIZE * index), value)
--
- #define WRITE_CSR_ARB_SARCONFIG(csr_addr, index, value) \
- 	ADF_CSR_WR(csr_addr, ADF_ARB_OFFSET + \
- 	(ADF_ARB_REG_SIZE * index), value)
-@@ -99,15 +89,6 @@ int adf_init_arb(struct adf_accel_dev *accel_dev)
- 	for (arb = 0; arb < ADF_ARB_NUM; arb++)
- 		WRITE_CSR_ARB_SARCONFIG(csr, arb, arb_cfg);
- 
--	/* Setup service weighting */
--	for (arb = 0; arb < ADF_ARB_NUM; arb++)
--		for (i = 0; i < ADF_ARB_REQ_RING_NUM; i++)
--			WRITE_CSR_ARB_WEIGHT(csr, arb, i, 0xFFFFFFFF);
--
--	/* Setup ring response ordering */
--	for (i = 0; i < ADF_ARB_REQ_RING_NUM; i++)
--		WRITE_CSR_ARB_RESPORDERING(csr, i, 0xFFFFFFFF);
--
- 	/* Setup worker queue registers */
- 	for (i = 0; i < hw_data->num_engines; i++)
- 		WRITE_CSR_ARB_WQCFG(csr, i, i);
--- 
-2.1.4
+>It is hard to get the implementation right when the protocol design is error prone.
+>Later we should run some tests on it and see how relevant will this be for a remote timing attack.
+
+Why later and who will do it?
+
+If it's only a proof of concept, then it's a bad idea. You are practically advertising a use-it-but-cross-your-fingers implementation.
+If you intend to submit another hardware driver which _is_ constant time, then it is even more a bad idea. The end-user doesn't know which driver is actually running and if it is resistant or not to timing attacks.
+
+Cristian S.
