@@ -1,115 +1,102 @@
-From: "jakki stendeback" <jakkij0d0st@autorambler.ru>
-Subject: linux-crypto Your Electricity Bill 824703662393
-Date: Thu, 10 Mar 2016 03:37:03 +0300
-Message-ID: <1457570223.533690.24065.60675@mail.rambler.ru>
-Reply-To: "jakki stendeback" <jakkij0d0st@autorambler.ru>
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="_----------=_14575702232406582"
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org, linux-cvs@linux-mips.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mxout3.rambler.ru ([81.19.67.206]:52020 "EHLO mxout3.rambler.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933127AbcCJAzE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Mar 2016 19:55:04 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Subject: [PATCH v2 1/3] crypto: s5p-sss - Minor coding cleanups
+Date: Thu, 10 Mar 2016 10:31:45 +0900
+Message-ID: <1457573507-1687-1-git-send-email-k.kozlowski@samsung.com>
+Cc: Vladimir Zapolskiy <vz@mleia.com>,
+	linux-samsung-soc@vger.kernel.org,
+	Krzysztof Kozlowski <krzk@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+From: Krzysztof Kozlowski <krzk@kernel.org>
 
-This is a multi-part message in MIME format.
+Remove unneeded inclusion of delay.h and get rid of indentation from
+labels.
 
---_----------=_14575702232406582
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"; format="flowed"
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+Acked-by: Vladimir Zapolskiy <vz@mleia.com>
 
+---
 
+Changes since v1:
+1. Add Vladimir's acked-by.
+---
+ drivers/crypto/s5p-sss.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
---_----------=_14575702232406582
-Content-Disposition: attachment; filename="linux-crypto.zip"
-Content-Transfer-Encoding: base64
-Content-Type: application/x-zip-compressed; name="linux-crypto.zip"
-
-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
-AMwNAAAAAA==
-
---_----------=_14575702232406582--
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index 5f161a9777e3..60f835455a41 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -11,7 +11,6 @@
+  *
+  */
+ 
+-#include <linux/delay.h>
+ #include <linux/err.h>
+ #include <linux/module.h>
+ #include <linux/init.h>
+@@ -284,7 +283,7 @@ static int s5p_set_outdata(struct s5p_aes_dev *dev, struct scatterlist *sg)
+ 	dev->sg_dst = sg;
+ 	err = 0;
+ 
+- exit:
++exit:
+ 	return err;
+ }
+ 
+@@ -310,7 +309,7 @@ static int s5p_set_indata(struct s5p_aes_dev *dev, struct scatterlist *sg)
+ 	dev->sg_src = sg;
+ 	err = 0;
+ 
+- exit:
++exit:
+ 	return err;
+ }
+ 
+@@ -452,10 +451,10 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
+ 
+ 	return;
+ 
+- outdata_error:
++outdata_error:
+ 	s5p_unset_indata(dev);
+ 
+- indata_error:
++indata_error:
+ 	s5p_aes_complete(dev, err);
+ 	spin_unlock_irqrestore(&dev->lock, flags);
+ }
+@@ -506,7 +505,7 @@ static int s5p_aes_handle_req(struct s5p_aes_dev *dev,
+ 
+ 	tasklet_schedule(&dev->tasklet);
+ 
+- exit:
++exit:
+ 	return err;
+ }
+ 
+@@ -705,7 +704,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
+ 
+ 	return 0;
+ 
+- err_algs:
++err_algs:
+ 	dev_err(dev, "can't register '%s': %d\n", algs[i].cra_name, err);
+ 
+ 	for (j = 0; j < i; j++)
+@@ -713,7 +712,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
+ 
+ 	tasklet_kill(&pdata->tasklet);
+ 
+- err_irq:
++err_irq:
+ 	clk_disable_unprepare(pdata->clk);
+ 
+ 	s5p_dev = NULL;
+-- 
+2.5.0
