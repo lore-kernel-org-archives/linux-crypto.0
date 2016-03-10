@@ -1,102 +1,79 @@
 From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
-Subject: [PATCH v2 1/3] crypto: s5p-sss - Minor coding cleanups
-Date: Thu, 10 Mar 2016 10:31:45 +0900
-Message-ID: <1457573507-1687-1-git-send-email-k.kozlowski@samsung.com>
+Subject: [PATCH v2 3/3] crypto: s5p-sss - Sort the headers to improve
+ readability
+Date: Thu, 10 Mar 2016 10:31:47 +0900
+Message-ID: <1457573507-1687-3-git-send-email-k.kozlowski@samsung.com>
+References: <1457573507-1687-1-git-send-email-k.kozlowski@samsung.com>
 Cc: Vladimir Zapolskiy <vz@mleia.com>,
 	linux-samsung-soc@vger.kernel.org,
-	Krzysztof Kozlowski <krzk@kernel.org>
+	Krzysztof Kozlowski <k.kozlowski@samsung.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:10929 "EHLO
+	mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S934668AbcCJBcP (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 9 Mar 2016 20:32:15 -0500
+In-reply-to: <1457573507-1687-1-git-send-email-k.kozlowski@samsung.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Sort the headers alphabetically to improve readability and to spot
+duplications easier.
 
-Remove unneeded inclusion of delay.h and get rid of indentation from
-labels.
-
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-Acked-by: Vladimir Zapolskiy <vz@mleia.com>
+Suggested-by: Vladimir Zapolskiy <vz@mleia.com>
+Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
 
 ---
 
 Changes since v1:
-1. Add Vladimir's acked-by.
+1. New patch.
+
+My email differs from one used in previous patches because this time I
+am sending this from work.
 ---
- drivers/crypto/s5p-sss.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ drivers/crypto/s5p-sss.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index 5f161a9777e3..60f835455a41 100644
+index bac1f4593f98..46fbeb933939 100644
 --- a/drivers/crypto/s5p-sss.c
 +++ b/drivers/crypto/s5p-sss.c
-@@ -11,7 +11,6 @@
+@@ -11,23 +11,23 @@
   *
   */
  
--#include <linux/delay.h>
++#include <linux/clk.h>
++#include <linux/crypto.h>
++#include <linux/dma-mapping.h>
  #include <linux/err.h>
- #include <linux/module.h>
- #include <linux/init.h>
-@@ -284,7 +283,7 @@ static int s5p_set_outdata(struct s5p_aes_dev *dev, struct scatterlist *sg)
- 	dev->sg_dst = sg;
- 	err = 0;
+-#include <linux/module.h>
+-#include <linux/init.h>
+ #include <linux/errno.h>
++#include <linux/init.h>
++#include <linux/interrupt.h>
++#include <linux/io.h>
+ #include <linux/kernel.h>
+-#include <linux/clk.h>
++#include <linux/module.h>
++#include <linux/of.h>
+ #include <linux/platform_device.h>
+ #include <linux/scatterlist.h>
+-#include <linux/dma-mapping.h>
+-#include <linux/io.h>
+-#include <linux/of.h>
+-#include <linux/crypto.h>
+-#include <linux/interrupt.h>
  
-- exit:
-+exit:
- 	return err;
- }
+-#include <crypto/algapi.h>
+-#include <crypto/aes.h>
+ #include <crypto/ctr.h>
++#include <crypto/aes.h>
++#include <crypto/algapi.h>
+ #include <crypto/scatterwalk.h>
  
-@@ -310,7 +309,7 @@ static int s5p_set_indata(struct s5p_aes_dev *dev, struct scatterlist *sg)
- 	dev->sg_src = sg;
- 	err = 0;
- 
-- exit:
-+exit:
- 	return err;
- }
- 
-@@ -452,10 +451,10 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
- 
- 	return;
- 
-- outdata_error:
-+outdata_error:
- 	s5p_unset_indata(dev);
- 
-- indata_error:
-+indata_error:
- 	s5p_aes_complete(dev, err);
- 	spin_unlock_irqrestore(&dev->lock, flags);
- }
-@@ -506,7 +505,7 @@ static int s5p_aes_handle_req(struct s5p_aes_dev *dev,
- 
- 	tasklet_schedule(&dev->tasklet);
- 
-- exit:
-+exit:
- 	return err;
- }
- 
-@@ -705,7 +704,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
- 
- 	return 0;
- 
-- err_algs:
-+err_algs:
- 	dev_err(dev, "can't register '%s': %d\n", algs[i].cra_name, err);
- 
- 	for (j = 0; j < i; j++)
-@@ -713,7 +712,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
- 
- 	tasklet_kill(&pdata->tasklet);
- 
-- err_irq:
-+err_irq:
- 	clk_disable_unprepare(pdata->clk);
- 
- 	s5p_dev = NULL;
+ #define _SBF(s, v)                      ((v) << (s))
 -- 
 2.5.0
