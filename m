@@ -1,34 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: qat - remove redundant arbiter configuration
-Date: Fri, 11 Mar 2016 21:32:22 +0800
-Message-ID: <20160311133222.GF24332@gondor.apana.org.au>
-References: <1457462235-27433-1-git-send-email-tadeusz.struk@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, ahsan.atta@intel.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Subject: [PATCH v2 2/3] ARM: i.MX25: add RNGC node to dtsi
+Date: Fri, 11 Mar 2016 15:06:39 +0100
+Message-ID: <1457705200-16951-2-git-send-email-s.trumtrar@pengutronix.de>
+References: <1457705200-16951-1-git-send-email-s.trumtrar@pengutronix.de>
+Cc: Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	kernel@pengutronix.de, Steffen Trumtrar <s.trumtrar@pengutronix.de>
+To: Shawn Guo <shawnguo@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Matt Mackall <mpm@selenic.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:45472 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752909AbcCKNcZ (ORCPT
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:58622 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752957AbcCKOHK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Mar 2016 08:32:25 -0500
-Content-Disposition: inline
-In-Reply-To: <1457462235-27433-1-git-send-email-tadeusz.struk@intel.com>
+	Fri, 11 Mar 2016 09:07:10 -0500
+In-Reply-To: <1457705200-16951-1-git-send-email-s.trumtrar@pengutronix.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 08, 2016 at 10:37:15AM -0800, Tadeusz Struk wrote:
-> The default arbiter configuration for ring weights and response ordering
-> is exactly what we want so we don't need to configure anything more.
-> This will also fix the problem where number of bundles is different
-> between different devices.
-> 
-> Reported-by: Ahsan Atta <ahsan.atta@intel.com>
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+Add a devicetree entry for the Random Number Generator Version C (RNGC).
 
-Applied.
+Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+---
+Changes in v2:
+  - remove interrupt-names from dtsi
+
+ arch/arm/boot/dts/imx25.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm/boot/dts/imx25.dtsi b/arch/arm/boot/dts/imx25.dtsi
+index cde329e9b9e3..ebf11d9f123e 100644
+--- a/arch/arm/boot/dts/imx25.dtsi
++++ b/arch/arm/boot/dts/imx25.dtsi
+@@ -397,6 +397,14 @@
+ 				interrupts = <41>;
+ 			};
+ 
++			rng: rng@53fb0000 {
++				compatible = "fsl,imx25-rng";
++				reg = <0x53fb0000 0x4000>;
++				clocks = <&clks 109>;
++				clock-names = "ipg";
++				interrupts = <22>;
++			};
++
+ 			esdhc1: esdhc@53fb4000 {
+ 				compatible = "fsl,imx25-esdhc";
+ 				reg = <0x53fb4000 0x4000>;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.7.0
