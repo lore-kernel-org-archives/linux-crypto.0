@@ -1,46 +1,42 @@
-From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
-Subject: [PATCH 2/5] hwrng: exynos - Runtime suspend device after init
-Date: Fri, 11 Mar 2016 16:49:19 +0900
-Message-ID: <1457682562-21219-2-git-send-email-k.kozlowski@samsung.com>
-References: <1457682562-21219-1-git-send-email-k.kozlowski@samsung.com>
-Cc: Krzysztof Kozlowski <k.kozlowski@samsung.com>
-To: Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Kukjin Kim <kgene@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-reply-to: <1457682562-21219-1-git-send-email-k.kozlowski@samsung.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v3 3/3] crypto: add basic driver for the MXC SCC
+Date: Fri, 11 Mar 2016 21:16:40 +0800
+Message-ID: <20160311131640.GA23963@gondor.apana.org.au>
+References: <1457352005-17457-1-git-send-email-s.trumtrar@pengutronix.de>
+ <1457352005-17457-3-git-send-email-s.trumtrar@pengutronix.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Shawn Guo <shawnguo@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	kernel@pengutronix.de
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:54457 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752340AbcCKNRH (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 Mar 2016 08:17:07 -0500
+Content-Disposition: inline
+In-Reply-To: <1457352005-17457-3-git-send-email-s.trumtrar@pengutronix.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The driver uses pm_runtime_put_noidle() after initialization so the
-device might remain in active state if the core does not read from it
-(the read callback contains regular runtime put). The put_noidle() was
-chosen probably to avoid unneeded suspend and resume cycle after the
-initialization.
+On Mon, Mar 07, 2016 at 01:00:05PM +0100, Steffen Trumtrar wrote:
+>
+> +	if (ctx->ctrl & SCC_SCM_CTRL_CBC_MODE && req->info)
+> +		memcpy(scc->base + SCC_SCM_INIT_VECTOR_0, req->info,
+> +		       scc->block_size_bytes);
 
-However for this purpose autosuspend is enabled so it is safe to runtime
-put just after the initialization.
+Please ensure that the IV is copied back on exit.  I know many
+other drivers currently also don't do this but I'm trying to fix
+this so I'd rather not add more work for myself down the track :)
 
-Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
----
- drivers/char/hw_random/exynos-rng.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/char/hw_random/exynos-rng.c b/drivers/char/hw_random/exynos-rng.c
-index ada081232528..d1fd21e99368 100644
---- a/drivers/char/hw_random/exynos-rng.c
-+++ b/drivers/char/hw_random/exynos-rng.c
-@@ -77,7 +77,8 @@ static int exynos_init(struct hwrng *rng)
- 
- 	pm_runtime_get_sync(exynos_rng->dev);
- 	ret = exynos_rng_configure(exynos_rng);
--	pm_runtime_put_noidle(exynos_rng->dev);
-+	pm_runtime_mark_last_busy(exynos_rng->dev);
-+	pm_runtime_put_autosuspend(exynos_rng->dev);
- 
- 	return ret;
- }
+Thanks,
 -- 
-2.5.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
