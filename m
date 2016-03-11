@@ -1,35 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/4] crypto: ccp - CCP driver updates  2016-03-01
-Date: Fri, 11 Mar 2016 21:30:30 +0800
-Message-ID: <20160311133030.GA24332@gondor.apana.org.au>
-References: <20160301194831.6788.2154.stgit@taos.amd.com>
+Subject: Re: [PATCH] crypto: qat - Change the definition of
+ icp_qat_uof_regtype
+Date: Fri, 11 Mar 2016 21:31:23 +0800
+Message-ID: <20160311133123.GC24332@gondor.apana.org.au>
+References: <1456991205-34197-1-git-send-email-pingchao.yang@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
-	davem@davemloft.net
-To: Gary R Hook <gary.hook@amd.com>
+Cc: tadeusz.struk@intel.com, linux-crypto@vger.kernel.org
+To: Yang Pingchao <pingchao.yang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:35069 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:35380 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932083AbcCKNah (ORCPT
+	with ESMTP id S932083AbcCKNb0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Mar 2016 08:30:37 -0500
+	Fri, 11 Mar 2016 08:31:26 -0500
 Content-Disposition: inline
-In-Reply-To: <20160301194831.6788.2154.stgit@taos.amd.com>
+In-Reply-To: <1456991205-34197-1-git-send-email-pingchao.yang@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 01, 2016 at 01:48:43PM -0600, Gary R Hook wrote:
-> The following patches are includes in this update series:
+On Thu, Mar 03, 2016 at 02:46:45AM -0500, Yang Pingchao wrote:
+>  The definition of icp_qat_uof_regtype should be coherent with
+>  the definition in firmware compiler.
 > 
-> - Remove the extraneous family check
-> - Refactor code to enable support for >1 CCPs in a system
-> - Add initial support for versioning
-> - Refactor: move version-specific code to separate files 
->   where possible; abstract worker functions through a
->   struct of function pointers
-> 
-> This patch series is based on cryptodev-2.6
+> Signed-off-by: Yang Pingchao <pingchao.yang@intel.com>
 
 Applied.
 -- 
