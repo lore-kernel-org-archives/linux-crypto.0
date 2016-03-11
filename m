@@ -1,27 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [patch] crypto: rsa-pkcs1pad: indent a couple statements
-Date: Fri, 11 Mar 2016 21:21:38 +0800
-Message-ID: <20160311132138.GA24232@gondor.apana.org.au>
-References: <20160308120736.GC28684@mwanda>
+Subject: Re: [PATCH 0/4] crypto: ccp - CCP driver updates  2016-03-01
+Date: Fri, 11 Mar 2016 21:30:30 +0800
+Message-ID: <20160311133030.GA24332@gondor.apana.org.au>
+References: <20160301194831.6788.2154.stgit@taos.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
+	davem@davemloft.net
+To: Gary R Hook <gary.hook@amd.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:35069 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932083AbcCKNah (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 Mar 2016 08:30:37 -0500
 Content-Disposition: inline
-In-Reply-To: <20160308120736.GC28684@mwanda>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20160301194831.6788.2154.stgit@taos.amd.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 08, 2016 at 03:07:36PM +0300, Dan Carpenter wrote:
-> These if statements aren't indented far enough and it makes static
-> checkers complain.
+On Tue, Mar 01, 2016 at 01:48:43PM -0600, Gary R Hook wrote:
+> The following patches are includes in this update series:
 > 
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> - Remove the extraneous family check
+> - Refactor code to enable support for >1 CCPs in a system
+> - Add initial support for versioning
+> - Refactor: move version-specific code to separate files 
+>   where possible; abstract worker functions through a
+>   struct of function pointers
+> 
+> This patch series is based on cryptodev-2.6
 
-Sorry but this doesn't apply against cryptodev.
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
