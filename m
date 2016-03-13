@@ -1,52 +1,38 @@
-From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
-Subject: Re: [PATCH 5/5] hwrng: exynos - Disable runtime PM on driver unbind
-Date: Sat, 12 Mar 2016 14:26:31 +0900
-Message-ID: <56E3A887.1000807@samsung.com>
-References: <1457682562-21219-1-git-send-email-k.kozlowski@samsung.com>
- <1457682562-21219-5-git-send-email-k.kozlowski@samsung.com>
+From: Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [BUG] crypto: sun4i-ss: Random data corruption
+Date: Sun, 13 Mar 2016 13:40:26 +0100
+Message-ID: <56E55FBA.90703@gmail.com>
+Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-2
-Content-Transfer-Encoding: 7bit
-Cc: k.kozlowski.k@gmail.com
-To: Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Kukjin Kim <kgene@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-Reply-To: <1457682562-21219-5-git-send-email-k.kozlowski@samsung.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+To: "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ "linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org" <linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBPF7SW3QKGQEOSV6L4Y-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <https://groups.google.com/group/linux-sunxi
+List-Subscribe: <https://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <https://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
-W dniu 11.03.2016 o 16:49, Krzysztof Kozlowski pisze:
-> Driver enabled runtime PM but did not revert this on removal. Re-binding
-> of a device triggered warning:
-> 	exynos-rng 10830400.rng: Unbalanced pm_runtime_enable!
-> 
-> Fixes: b329669ea0b5 ("hwrng: exynos - Add support for Exynos random number generator")
-> Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
-> ---
->  drivers/char/hw_random/exynos-rng.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/drivers/char/hw_random/exynos-rng.c b/drivers/char/hw_random/exynos-rng.c
-> index 68c349bf66a0..cba1ff538c46 100644
-> --- a/drivers/char/hw_random/exynos-rng.c
-> +++ b/drivers/char/hw_random/exynos-rng.c
-> @@ -154,6 +154,13 @@ static int exynos_rng_probe(struct platform_device *pdev)
->  	return ret;
->  }
->  
-> +static int exynos_rng_remove(struct platform_device *pdev)
-> +{
-> +	pm_runtime_disable(&pdev->dev);
-> +
+Hello
 
-This is not sufficient. pm_runtime_dont_use_autosuspend() is also
-necessary here. I will send a v2.
+I had some report of random data corruption of people using cryptsetup with my sun4i-ss driver (via AF_ALG).
+Even if it is hard to hit, I could confirm it by continuously moving files on a LUKS encrypted FS and comparing hash of it before and after.
+The corruption is always when deciphering the end of 512bytes sector and always of a length multiple of 4.
 
-BTW, no problem if it is too late for taking this for v4.6. If this
-patchset misses merge window I'll resend it later.
+The only way of removing this random corruption is to transform all spinlock_bh by spinlock_irqsave.
+In fact this problem is extremely similar to another bug that I have encountered (https://lkml.org/lkml/2015/10/11/47)
+The only difference is that I do not need to remove SG_MITER_ATOMIC for removing the issue.
 
-Best regards,
-Krzysztof
+So my question remains nearly the same than on my first problem: Why disabling irq remove this data corruption ?
+
+Any help/suggestions will be really appreciated since I doesn't understand why this fix works.
+
+Regards
+
+LABBE Corentin
