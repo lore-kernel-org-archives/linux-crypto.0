@@ -1,7 +1,7 @@
 From: Baolin Wang <baolin.wang@linaro.org>
-Subject: [PATCH v2 1/4] scatterlist: Introduce some helper functions
-Date: Tue, 15 Mar 2016 15:47:59 +0800
-Message-ID: <9442060edaca12f520bcbb76545ad33a52346e58.1458023698.git.baolin.wang@linaro.org>
+Subject: [PATCH v2 2/4] crypto: Introduce some helper functions to help to merge requests
+Date: Tue, 15 Mar 2016 15:48:00 +0800
+Message-ID: <92a18ed761d18993087aad46d0c0f4f4721be6a3.1458023698.git.baolin.wang@linaro.org>
 References: <cover.1458023695.git.baolin.wang@linaro.org>
 Cc: akpm@linux-foundation.org, david.s.gordon@intel.com,
 	thomas.lendacky@amd.com, robert.jarzmik@free.fr,
@@ -19,161 +19,222 @@ References: <cover.1458023695.git.baolin.wang@linaro.org>
 Sender: linux-raid-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In crypto engine framework, one request can combine (copy) other requests'
-scatterlists into its dynamic sg table to manage them together as a bulk
-block , which can improve engine efficency with handling bulk block. Thus
-we need some helper functions to manage dynamic scattertables.
+Usually the dm-crypt subsystem will send encryption/descryption requests to
+the crypto layer one block at a time, making each request 512 bytes long,
+which is a much smaller size for hardware engine, that means the hardware
+engine can not play its best performance.
 
-This patch introduces 'sg_is_contiguous()' function to check if two
-scatterlists are contiguous, 'sg_alloc_empty_table()' function to
-allocate one empty dynamic sg table, 'sg_add_sg_to_table()' function
-to copy one mapped scatterlist into sg table and 'sg_table_is_empty'
-function to check if the sg table is empty.
+Now some cipher hardware engines prefer to handle bulk block rather than one
+sector (512 bytes) created by dm-crypt, cause these cipher engines can handle
+the intermediate values (IV) by themselves in one bulk block. This means we
+can increase the size of the request by merging request rather than always 512
+bytes and thus increase the hardware engine processing speed.
+
+This patch introduces some helper functions to help to merge requests to improve
+hardware engine efficiency.
 
 Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
 ---
- include/linux/scatterlist.h |   33 +++++++++++++++++++++
- lib/scatterlist.c           |   69 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 102 insertions(+)
+ crypto/ablk_helper.c         |  135 ++++++++++++++++++++++++++++++++++++++++++
+ include/crypto/ablk_helper.h |    3 +
+ include/linux/crypto.h       |    5 ++
+ 3 files changed, 143 insertions(+)
 
-diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-index 556ec1e..c1ed9f4 100644
---- a/include/linux/scatterlist.h
-+++ b/include/linux/scatterlist.h
-@@ -212,6 +212,20 @@ static inline void sg_unmark_end(struct scatterlist *sg)
- }
+diff --git a/crypto/ablk_helper.c b/crypto/ablk_helper.c
+index e1fcf53..3cf15cb 100644
+--- a/crypto/ablk_helper.c
++++ b/crypto/ablk_helper.c
+@@ -26,6 +26,7 @@
  
- /**
-+ * sg_table_is_empty - Check if the sg table is empty
-+ * @sgt: sg table
+ #include <linux/kernel.h>
+ #include <linux/crypto.h>
++#include <linux/device-mapper.h>
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/hardirq.h>
+@@ -34,6 +35,140 @@
+ #include <crypto/ablk_helper.h>
+ #include <asm/simd.h>
+ 
++/**
++ * ablk_link_request_if_contigous - try to link one request into previous one
++ * if the page address is contiguous.
++ * @list_req: the request from queue list
++ * @req: the new request need to be merged
 + *
-+ * Description:
-+ *   The 'orig_nents' member of one sg table is used to indicate how many
-+ *   scatterlists in the sg table.
++ * If the listed request and new request's pages of the scatterlists are
++ * contiguous, then merge the scatterlists of new request into the listed one.
 + *
-+ **/
-+static inline bool sg_table_is_empty(struct sg_table *sgt)
++ * Return true on success, others means failed.
++ */
++static bool ablk_link_request_if_contigous(struct ablkcipher_request *list_req,
++					   struct ablkcipher_request *req)
 +{
-+	return !sgt->orig_nents;
++	struct scatterlist *last_src_sg =
++		sg_last(list_req->sgt_src.sgl, list_req->sgt_src.nents);
++	struct scatterlist *last_dst_sg =
++		sg_last(list_req->sgt_dst.sgl, list_req->sgt_dst.nents);
++	struct scatterlist *req_src_sg = req->src;
++	struct scatterlist *req_dst_sg = req->dst;
++
++	if (!last_src_sg || !last_dst_sg)
++		return false;
++
++	/* Check if the src/dst scatterlists are contiguous */
++	if (!sg_is_contiguous(last_src_sg, req_src_sg) ||
++	    !sg_is_contiguous(last_dst_sg, req_dst_sg))
++		return false;
++
++	/*
++	 * If the request can be merged into the listed request after the
++	 * checking, then expand the listed request scatterlists' length.
++	 */
++	last_src_sg->length += req_src_sg->length;
++	last_dst_sg->length += req_dst_sg->length;
++	list_req->nbytes += req->nbytes;
++
++	return true;
 +}
 +
 +/**
-  * sg_phys - Return physical address of an sg entry
-  * @sg:	     SG entry
-  *
-@@ -241,6 +255,23 @@ static inline void *sg_virt(struct scatterlist *sg)
- 	return page_address(sg_page(sg)) + sg->offset;
- }
- 
-+/**
-+ * sg_is_contiguous - Check if the scatterlists are contiguous
-+ * @sga: SG entry
-+ * @sgb: SG entry
++ * ablk_merge_request - try to merge one request into previous one
++ * @list_req: the request from queue list
++ * @req: the request need to be merged
 + *
-+ * Description:
-+ *   If the sga scatterlist is contiguous with the sgb scatterlist,
-+ *   that means they can be merged together.
++ * This function will create a dynamic scatterlist table for both source
++ * and destination if the request is the first coming in.
 + *
-+ **/
-+static inline bool sg_is_contiguous(struct scatterlist *sga,
-+				    struct scatterlist *sgb)
++ * Return true on success, others means failed.
++ */
++static bool ablk_merge_request(struct ablkcipher_request *list_req,
++			       struct ablkcipher_request *req)
 +{
-+	return *(unsigned long *)sg_virt(sga) + sga->length ==
-+		*(unsigned long *)sg_virt(sgb);
++	struct sg_table *sgt_src = &list_req->sgt_src;
++	struct sg_table *sgt_dst = &list_req->sgt_dst;
++	unsigned int nents = SG_MAX_SINGLE_ALLOC;
++
++	if (sg_table_is_empty(sgt_src)) {
++		if (sg_alloc_empty_table(sgt_src, nents, GFP_ATOMIC))
++			return false;
++
++		if (sg_add_sg_to_table(sgt_src, list_req->src))
++			return false;
++	}
++
++	if (sg_table_is_empty(sgt_dst)) {
++		if (sg_alloc_empty_table(sgt_dst, nents, GFP_ATOMIC))
++			return false;
++
++		if (sg_add_sg_to_table(sgt_dst, list_req->dst))
++			return false;
++	}
++
++	/*
++	 * Check if the new request is contiguous for the listed request,
++	 * if it is contiguous then merge the new request into the listed one.
++	 */
++	if (ablk_link_request_if_contigous(list_req, req))
++		return true;
++
++	if (sg_add_sg_to_table(sgt_src, req->src))
++		return false;
++
++	if (sg_add_sg_to_table(sgt_dst, req->dst))
++		return false;
++
++	list_req->nbytes += req->nbytes;
++	return true;
 +}
 +
- int sg_nents(struct scatterlist *sg);
- int sg_nents_for_len(struct scatterlist *sg, u64 len);
- struct scatterlist *sg_next(struct scatterlist *);
-@@ -261,6 +292,8 @@ void sg_free_table(struct sg_table *);
- int __sg_alloc_table(struct sg_table *, unsigned int, unsigned int,
- 		     struct scatterlist *, gfp_t, sg_alloc_fn *);
- int sg_alloc_table(struct sg_table *, unsigned int, gfp_t);
-+int sg_alloc_empty_table(struct sg_table *, unsigned int, gfp_t);
-+int sg_add_sg_to_table(struct sg_table *, struct scatterlist *);
- int sg_alloc_table_from_pages(struct sg_table *sgt,
- 	struct page **pages, unsigned int n_pages,
- 	unsigned long offset, unsigned long size,
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index 004fc70..6d3f3b0 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -370,6 +370,75 @@ int sg_alloc_table(struct sg_table *table, unsigned int nents, gfp_t gfp_mask)
- EXPORT_SYMBOL(sg_alloc_table);
- 
- /**
-+ * sg_add_sg_to_table - Add one scatterlist into sg table
-+ * @sgt:	The sg table header to use
-+ * @src:	The sg need to be added into sg table
++/**
++ * ablk_try_merge - try to merge one request into previous one
++ * @queue: the crypto queue list
++ * @req: the request need to be merged
 + *
-+ * Description:
-+ *   The 'nents' member indicates how many mapped scatterlists has been added
-+ *   in the dynamic sg table. The 'orig_nents' member indicates the size of the
-+ *   dynamic sg table.
++ * Note: The merging action should be under the spinlock or mutex protection.
 + *
-+ *   Copy one mapped @src@ scatterlist into the dynamic sg table and increase
-+ *   'nents' member.
-+ *
-+ **/
-+int sg_add_sg_to_table(struct sg_table *sgt, struct scatterlist *src)
++ * Return 0 on success and others are failed.
++ */
++int ablk_try_merge(struct crypto_queue *queue,
++		   struct ablkcipher_request *req)
 +{
-+	unsigned int i = 0, orig_nents = sgt->orig_nents;
-+	struct scatterlist *sgl = sgt->sgl;
-+	struct scatterlist *sg;
++	struct ablkcipher_request *list_req;
++	struct crypto_async_request *async_req;
 +
-+	/* Check if there are enough space for the new sg to be added */
-+	if (sgt->nents >= sgt->orig_nents)
-+		return -EINVAL;
++	list_for_each_entry(async_req, &queue->list, list) {
++		list_req = ablkcipher_request_cast(async_req);
 +
-+	for_each_sg(sgl, sg, orig_nents, i) {
-+		if (sgt->nents > 0 && i == (sgt->nents - 1)) {
-+			sg_unmark_end(sg);
-+		} else if (i == sgt->nents) {
-+			memcpy(sg, src, sizeof(struct scatterlist));
-+			sg_mark_end(sg);
-+			sgt->nents++;
-+			break;
++		if (list_req->base.flags != req->base.flags)
++			continue;
++
++		/* Check that the request adds up to an even number of sectors */
++		if (!IS_ALIGNED(list_req->nbytes, (1U << SECTOR_SHIFT)))
++			continue;
++
++		if (list_req->nbytes + req->nbytes > UINT_MAX)
++			continue;
++
++		/*
++		 * We first check that the sectors are adjacent so we don't
++		 * mistadly coalesce something that is contigous in memory but
++		 * not contigous on disk.
++		 */
++		if (list_req->sector + list_req->nbytes /
++		    (1U << SECTOR_SHIFT) == req->sector) {
++			if (ablk_merge_request(list_req, req))
++				return 0;
 +		}
 +	}
 +
-+	return 0;
++	return 1;
 +}
++EXPORT_SYMBOL_GPL(ablk_try_merge);
 +
-+/**
-+ * sg_alloc_empty_table - Allocate one empty dynamic sg table
-+ * @sgt:	The sg table header to use
-+ * @nents:	Number of entries in sg list
-+ * @gfp_mask:	GFP allocation mask
-+ *
-+ *  Description:
-+ *    Allocate and initialize one dynamic sg table. One dynamic sg table means
-+ *    it need allocate @nents@ empty scatterlists entries and is used to copy
-+ *    other mapped scatterlists into the dynamic sg table.
-+ *
-+ *    The 'nents' member indicates how many scatterlists has been copied into
-+ *    the dynamic sg table. It should set 0 which means there are no mapped
-+ *    scatterlists added in this sg table now.
-+ *
-+ *    The 'orig_nents' member indicates the size of the dynamic sg table.
-+ *
-+ **/
-+int sg_alloc_empty_table(struct sg_table *sgt, unsigned int nents,
-+			 gfp_t gfp_mask)
-+{
-+	int ret;
+ int ablk_set_key(struct crypto_ablkcipher *tfm, const u8 *key,
+ 		 unsigned int key_len)
+ {
+diff --git a/include/crypto/ablk_helper.h b/include/crypto/ablk_helper.h
+index 4f93df5..12ae00d 100644
+--- a/include/crypto/ablk_helper.h
++++ b/include/crypto/ablk_helper.h
+@@ -8,6 +8,7 @@
+ #include <linux/crypto.h>
+ #include <linux/kernel.h>
+ #include <crypto/cryptd.h>
++#include <crypto/algapi.h>
+ 
+ struct async_helper_ctx {
+ 	struct cryptd_ablkcipher *cryptd_tfm;
+@@ -28,4 +29,6 @@ extern int ablk_init_common(struct crypto_tfm *tfm, const char *drv_name);
+ 
+ extern int ablk_init(struct crypto_tfm *tfm);
+ 
++extern int ablk_try_merge(struct crypto_queue *queue,
++			  struct ablkcipher_request *req);
+ #endif /* _CRYPTO_ABLK_HELPER_H */
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index e71cb70..f878bb1 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -21,6 +21,7 @@
+ #include <linux/kernel.h>
+ #include <linux/list.h>
+ #include <linux/bug.h>
++#include <linux/scatterlist.h>
+ #include <linux/slab.h>
+ #include <linux/string.h>
+ #include <linux/uaccess.h>
+@@ -170,6 +171,10 @@ struct ablkcipher_request {
+ 	struct scatterlist *src;
+ 	struct scatterlist *dst;
+ 
++	struct sg_table sgt_src;
++	struct sg_table sgt_dst;
++	sector_t	sector;
 +
-+	ret = sg_alloc_table(sgt, nents, gfp_mask);
-+	if (ret)
-+		return ret;
-+
-+	sgt->nents = 0;
-+	return 0;
-+}
-+
-+/**
-  * sg_alloc_table_from_pages - Allocate and initialize an sg table from
-  *			       an array of pages
-  * @sgt:	The sg table header to use
+ 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+ };
+ 
 -- 
 1.7.9.5
 
