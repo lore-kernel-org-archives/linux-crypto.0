@@ -1,46 +1,72 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH] vti6: Add pmtu handling to vti6_xmit.
-Date: Tue, 15 Mar 2016 13:28:01 +0100
-Message-ID: <20160315122801.GB3347@gauss.secunet.com>
-References: <20150529182709.2147.78230.stgit@ahduyck-vm-fedora22>
- <56BA975D.2040706@alliedtelesis.co.nz>
- <20160217070805.GA316@gauss.secunet.com>
- <56C520F0.4050309@alliedtelesis.co.nz>
- <20160218121915.GH316@gauss.secunet.com>
- <56CE22A3.7030702@alliedtelesis.co.nz>
- <20160304070525.GA3347@gauss.secunet.com>
- <56E73285.5000702@alliedtelesis.co.nz>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: eCryptfs: Use skcipher and shash
+Date: Wed, 16 Mar 2016 17:06:01 +0800
+Message-ID: <20160316090601.GA29058@gondor.apana.org.au>
+References: <20160316074141.GB12860@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"alexander.h.duyck@redhat.com" <alexander.h.duyck@redhat.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>
-To: Mark McKinstry <Mark.McKinstry@alliedtelesis.co.nz>
+Content-Type: text/plain; charset=us-ascii
+Cc: ecryptfs@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Dan Carpenter <dan.carpenter@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([62.96.220.36]:52116 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934666AbcCOM2H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Mar 2016 08:28:07 -0400
+Received: from helcar.hengli.com.au ([209.40.204.226]:42905 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933996AbcCPJGF (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 16 Mar 2016 05:06:05 -0400
 Content-Disposition: inline
-In-Reply-To: <56E73285.5000702@alliedtelesis.co.nz>
+In-Reply-To: <20160316074141.GB12860@mwanda>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 14, 2016 at 09:52:05PM +0000, Mark McKinstry wrote:
-> Your patch adds a dst_release() call to my suggested fix, but this is 
-> problematic because the kfree_skb() call at tx_error already takes care 
-> of releasing dst - via kfree_skb() > __kfree_skb() > skb_release_all() > 
-> skb_release_head_state() > skb_dst_drop()
->  > refdst_drop() > dst_release(). In our scenario your patch results in 
-> a negative refcount kernel warning being generated in dst_release() for 
-> every packet that is too big to go over the vti.
+On Wed, Mar 16, 2016 at 10:41:41AM +0300, Dan Carpenter wrote:
+> Hello Herbert Xu,
+> 
+> The patch 3095e8e366b4: "eCryptfs: Use skcipher and shash" from Jan
+> 25, 2016, leads to the following static checker warning:
+> 
+> 	fs/ecryptfs/keystore.c:1117 ecryptfs_parse_tag_70_packet()
+> 	error: potential null dereference 's'.  (kzalloc returns null)
 
-Hm. I've just noticed that my pmtu test does not trigger this
-codepath, so I did not see the warning.
+Thanks for catching this Dan.  It's probably easiest if I add
+this to the crypto tree.
 
-Seems like we do the pmtu handling too late, it should happen before
-we do skb_dst_set(). Also skb_scrub_packet() resets skb->ignore_df,
-so checking ignore_df after skb_scrub_packet() does not make much sense.
+---8<---
+eCryptfs: Fix null pointer dereference on kzalloc error path
 
-I'll send an updated version after some more testing.
+The conversion to skcipher and shash added a couple of null pointer
+dereference bugs on the kzalloc failure path.  This patch fixes them.
+
+Fixes: 3095e8e366b4 ("eCryptfs: Use skcipher and shash")
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/fs/ecryptfs/keystore.c b/fs/ecryptfs/keystore.c
+index c5c84df..9893d15 100644
+--- a/fs/ecryptfs/keystore.c
++++ b/fs/ecryptfs/keystore.c
+@@ -635,8 +635,7 @@ ecryptfs_write_tag_70_packet(char *dest, size_t *remaining_bytes,
+ 	if (!s) {
+ 		printk(KERN_ERR "%s: Out of memory whilst trying to kmalloc "
+ 		       "[%zd] bytes of kernel memory\n", __func__, sizeof(*s));
+-		rc = -ENOMEM;
+-		goto out;
++		return -ENOMEM;
+ 	}
+ 	(*packet_size) = 0;
+ 	rc = ecryptfs_find_auth_tok_for_sig(
+@@ -922,8 +921,7 @@ ecryptfs_parse_tag_70_packet(char **filename, size_t *filename_size,
+ 	if (!s) {
+ 		printk(KERN_ERR "%s: Out of memory whilst trying to kmalloc "
+ 		       "[%zd] bytes of kernel memory\n", __func__, sizeof(*s));
+-		rc = -ENOMEM;
+-		goto out;
++		return -ENOMEM;
+ 	}
+ 	if (max_packet_size < ECRYPTFS_TAG_70_MIN_METADATA_SIZE) {
+ 		printk(KERN_WARNING "%s: max_packet_size is [%zd]; it must be "
+
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
