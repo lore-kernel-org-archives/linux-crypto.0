@@ -1,7 +1,8 @@
 From: Boris Brezillon <boris.brezillon@free-electrons.com>
 Subject: [PATCH] crypto: marvell/cesa - forward devm_ioremap_resource() error code
-Date: Thu, 17 Mar 2016 10:47:10 +0100
-Message-ID: <1458208031-13463-1-git-send-email-boris.brezillon@free-electrons.com>
+Date: Thu, 17 Mar 2016 10:47:11 +0100
+Message-ID: <1458208031-13463-2-git-send-email-boris.brezillon@free-electrons.com>
+References: <1458208031-13463-1-git-send-email-boris.brezillon@free-electrons.com>
 Cc: Lior Amsalem <alior@marvell.com>,
 	Nadav Haklai <nadavh@marvell.com>,
 	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
@@ -19,11 +20,12 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:41683 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:41694 "EHLO
 	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932261AbcCQJrP (ORCPT
+	with ESMTP id S932393AbcCQJrP (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Thu, 17 Mar 2016 05:47:15 -0400
+In-Reply-To: <1458208031-13463-1-git-send-email-boris.brezillon@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
