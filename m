@@ -1,45 +1,47 @@
-From: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: =?utf-8?Q?=D0=9A=D0=9B=D0=98=D0=95=D0=9D=D0=A2=D0=A1=D0?=
-	=?utf-8?Q?=9A=D0=98=D0=95_=D0=91=D0=90=D0=97=D0=AB!_=D0?=
-	=?utf-8?Q?=A2=D0=B5=D0=BB=5CViber=5CWhatsapp=3A_+79139393?=
-	=?utf-8?Q?506_Email=3A_mnoskova760=40gmail=2Ecom_Skype=3A?=
-	=?utf-8?Q?_prodawez389?=
-Date: Fri, 18 Mar 2016 01:42:11 +0600
-Message-ID: <04FEB70714C0EF2CF0F5BC03A7241B16@vger.kernel.org>
-Reply-To: "linux-crypto@vger.kernel.org" <mnoskova760@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: <linux-crypto@vger.kernel.org>
+From: Sinan Kaya <okaya@codeaurora.org>
+Subject: [PATCH 1/3] crypto: marvell/cesa - replace dma_to_phys with dma_map_single
+Date: Thu, 17 Mar 2016 18:02:15 -0400
+Message-ID: <1458252137-24497-1-git-send-email-okaya@codeaurora.org>
+Cc: Sinan Kaya <okaya@codeaurora.org>,
+	Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, timur@codeaurora.org,
+	cov@codeaurora.org, nwatters@codeaurora.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from static-200-94-75-212.alestra.net.mx ([200.94.75.212]:51032 "EHLO
-	localhost.localdomain" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-	with ESMTP id S936842AbcCQUtg (ORCPT
+Received: from smtp.codeaurora.org ([198.145.29.96]:43724 "EHLO
+	smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1031953AbcCQWC2 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Mar 2016 16:49:36 -0400
-Received: from 200.94.75.212 (localhost [127.0.0.1])
-	by localhost.localdomain (Postfix) with SMTP id 6C8A3843EA22
-	for <linux-crypto@vger.kernel.org>; Thu, 17 Mar 2016 14:42:12 -0500 (CDT)
+	Thu, 17 Mar 2016 18:02:28 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-=D0=9A=D0=9B=D0=98=D0=95=D0=9D=D0=A2=D0=A1=D0=9A=D0=98=D0=95 =D0=91=D0=90=
-=D0=97=D0=AB!
+Getting ready to remove dma_to_phys API. Drivers should not be
+using this API for DMA operations. Instead, they should go
+through the dma_map or dma_alloc APIs.
 
-=D0=A1=D0=BE=D0=B1=D0=B5=D1=80=D0=B5=D0=BC =D0=B4=D0=BB=D1=8F =D0=92=D0=
-=B0=D1=81 =D0=BF=D0=BE =D0=B8=D0=BD=D1=82=D0=B5=D1=80=D0=BD=D0=B5=D1=82=
- =D0=B1=D0=B0=D0=B7=D1=83 =D0=B4=D0=B0=D0=BD=D0=BD=D1=8B=D1=85 =D0=BF=D0=
-=BE=D1=82=D0=B5=D0=BD=D1=86=D0=B8=D0=B0=D0=BB=D1=8C=D0=BD=D1=8B=D1=85 =D0=
-=BA=D0=BB=D0=B8=D0=B5=D0=BD=D1=82=D0=BE=D0=B2=20
-=D0=B4=D0=BB=D1=8F =D0=92=D0=B0=D1=88=D0=B5=D0=B3=D0=BE =D0=91=D0=B8=D0=
-=B7=D0=BD=D0=B5=D1=81=D0=B0!
-=D0=9C=D0=BD=D0=BE=D0=B3=D0=BE! =D0=91=D1=8B=D1=81=D1=82=D1=80=D0=BE! =D0=
-=9D=D0=B5=D0=B4=D0=BE=D1=80=D0=BE=D0=B3=D0=BE!=20
-=D0=A3=D0=B7=D0=BD=D0=B0=D0=B9=D1=82=D0=B5 =D0=BE=D0=B1 =D1=8D=D1=82=D0=
-=BE=D0=BC =D0=BF=D0=BE=D0=B4=D1=80=D0=BE=D0=B1=D0=BD=D0=B5=D0=B5 =D0=BF=
-=D0=BE=20
-=D0=A2=D0=B5=D0=BB: +79139393506
-Viber: +79139393506
-Whatsapp: +79139393506
-Skype: prodawez389
-Email: mnoskova760@gmail.com
+Signed-off-by: Sinan Kaya <okaya@codeaurora.org>
+---
+ drivers/crypto/marvell/cesa.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
+index c0656e7..52ddfa4 100644
+--- a/drivers/crypto/marvell/cesa.c
++++ b/drivers/crypto/marvell/cesa.c
+@@ -350,8 +350,8 @@ static int mv_cesa_get_sram(struct platform_device *pdev, int idx)
+ 	if (IS_ERR(engine->sram))
+ 		return PTR_ERR(engine->sram);
+ 
+-	engine->sram_dma = phys_to_dma(cesa->dev,
+-				       (phys_addr_t)res->start);
++	engine->sram_dma = dma_map_single(cesa->dev, engine->sram,
++					  DMA_TO_DEVICE);
+ 
+ 	return 0;
+ }
+-- 
+1.8.2.1
