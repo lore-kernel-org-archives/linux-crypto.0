@@ -1,55 +1,43 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH] crypto: ccp - fix lock acquisition code
-Date: Wed, 16 Mar 2016 09:02:26 -0500
-Message-ID: <20160316140226.28262.97717.stgit@taos>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1on0068.outbound.protection.outlook.com ([157.56.110.68]:27776
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S966737AbcCPOC4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 16 Mar 2016 10:02:56 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Vinicius Tinti <viniciustinti@gmail.com>
+Subject: [PATCH] x86: Avoid undefined behavior in macro expansion
+Date: Wed, 16 Mar 2016 23:48:49 -0300
+Message-ID: <1458182929-23866-1-git-send-email-viniciustinti@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Vinicius Tinti <viniciustinti@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, x86@kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch simplifies an unneeded read-write lock.
+C11 standard (at 6.10.3.3) says that ## operator (paste) has undefined
+behavior when one of the result operands is not a valid preprocessing
+token.
 
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
+Therefore the macro expansion may depend on compiler implementation
+which may or no preserve the leading white space.
+
+Moreover other places in kernel use CONCAT(a,b) instead of CONCAT(a, b).
+Changing favors concise usage.
+
+Signed-off-by: Vinicius Tinti <viniciustinti@gmail.com>
+Acked-by: Behan Webster <behanw@converseincode.com>
 ---
- drivers/crypto/ccp/ccp-dev.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/crypto/aes_ctrby8_avx-x86_64.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index 336e5b7..4dbc187 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -53,7 +53,7 @@ static DEFINE_RWLOCK(ccp_unit_lock);
- static LIST_HEAD(ccp_units);
+diff --git a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
+index a916c4a..7a71553 100644
+--- a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
++++ b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
+@@ -93,7 +93,7 @@
  
- /* Round-robin counter */
--static DEFINE_RWLOCK(ccp_rr_lock);
-+static DEFINE_SPINLOCK(ccp_rr_lock);
- static struct ccp_device *ccp_rr;
- 
- /* Ever-increasing value to produce unique unit numbers */
-@@ -128,14 +128,14 @@ static struct ccp_device *ccp_get_device(void)
- 	 */
- 	read_lock_irqsave(&ccp_unit_lock, flags);
- 	if (!list_empty(&ccp_units)) {
--		write_lock_irqsave(&ccp_rr_lock, flags);
-+		spin_lock(&ccp_rr_lock);
- 		dp = ccp_rr;
- 		if (list_is_last(&ccp_rr->entry, &ccp_units))
- 			ccp_rr = list_first_entry(&ccp_units, struct ccp_device,
- 						  entry);
- 		else
- 			ccp_rr = list_next_entry(ccp_rr, entry);
--		write_unlock_irqrestore(&ccp_rr_lock, flags);
-+		spin_unlock(&ccp_rr_lock);
- 	}
- 	read_unlock_irqrestore(&ccp_unit_lock, flags);
- 
+ #define tmp		%r10
+ #define	DDQ(i)		CONCAT(ddq_add_,i)
+-#define	XMM(i)		CONCAT(%xmm, i)
++#define	XMM(i)		CONCAT(%xmm,i)
+ #define	DDQ_DATA	0
+ #define	XDATA		1
+ #define KEY_128		1
+-- 
+2.7.3
