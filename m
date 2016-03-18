@@ -1,76 +1,105 @@
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH v3 2/8] crypto: add driver-side scomp interface
-Date: Fri, 18 Mar 2016 14:02:49 +0000
-Message-ID: <20160318140248.GA22461@sivswdev01.ir.intel.com>
-References: <20160216195717.GA4207@gondor.apana.org.au>
- <1456336310-3737-1-git-send-email-giovanni.cabiddu@intel.com>
- <1456336310-3737-3-git-send-email-giovanni.cabiddu@intel.com>
- <20160317110027.GA5378@gondor.apana.org.au>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: Re: [PATCH 1/3] crypto: marvell/cesa - replace dma_to_phys with
+ dma_map_single
+Date: Fri, 18 Mar 2016 15:20:19 +0100
+Message-ID: <20160318152019.4db444e5@bbrezillon>
+References: <1458252137-24497-1-git-send-email-okaya@codeaurora.org>
+	<20160317225459.GA19428@n2100.arm.linux.org.uk>
+	<80402e2f82651814b1411a25b1740288@codeaurora.org>
+	<20160317235020.GB19428@n2100.arm.linux.org.uk>
+	<20160318103028.4be15b78@bbrezillon>
+	<56EBE5BC.6000000@arm.com>
+	<56EC07E9.1000506@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Robin Murphy <robin.murphy@arm.com>,
+	Russell King - ARM Linux <linux@arm.linux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Herbert Xu <herbert@gondor.apana.org.au>, timur@codeaurora.org,
+	Arnaud Ebalard <arno@natisbad.org>,
+	linux-kernel@vger.kernel.org, cov@codeaurora.org,
+	"David S. Miller" <davem@davemloft.net>, nwatters@codeaurora.org,
+	linux-crypto@vger.kernel.org
+To: Sinan Kaya <okaya@codeaurora.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:32101 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752352AbcCRODY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Mar 2016 10:03:24 -0400
-Content-Disposition: inline
-In-Reply-To: <20160317110027.GA5378@gondor.apana.org.au>
+Received: from down.free-electrons.com ([37.187.137.238]:47666 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757066AbcCROUi (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 18 Mar 2016 10:20:38 -0400
+In-Reply-To: <56EC07E9.1000506@codeaurora.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+On Fri, 18 Mar 2016 09:51:37 -0400
+Sinan Kaya <okaya@codeaurora.org> wrote:
 
-I would like to have some clarifications before submitting a v4.
-
-On Thu, Mar 17, 2016 at 07:00:27PM +0800, Herbert Xu wrote:
-> On Wed, Feb 24, 2016 at 05:51:44PM +0000, Giovanni Cabiddu wrote:
-> >
-> > +#define CRYPTO_SCOMP_DECOMP_NOCTX CRYPTO_ALG_PRIVATE
+> On 3/18/2016 7:25 AM, Robin Murphy wrote:
+> > On 18/03/16 09:30, Boris Brezillon wrote:
+> >> On Thu, 17 Mar 2016 23:50:20 +0000
+> >> Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
+> >>
+> >>> On Thu, Mar 17, 2016 at 07:17:24PM -0400, okaya@codeaurora.org wrote:
+> >>>> What is the correct way? I don't want to write engine->sram_dma = sram
+> >>>
+> >>> Well, what the driver _is_ wanting to do is to go from a CPU physical
+> >>> address to a device DMA address.  phys_to_dma() looks like the correct
+> >>> thing there to me, but I guess that's just an offset and doesn't take
+> >>> account of any IOMMU that may be in the way.
+> >>>
+> >>> If you have an IOMMU, then the whole phys_to_dma() thing is a total
+> >>> failure as it only does a linear translation, and there are no
+> >>> interfaces in the kernel to take account of an IOMMU in the way.  So,
+> >>> it needs something designed for the job, implemented and discussed by
+> >>> the normal methods of proposing a new cross-arch interface for drivers
+> >>> to use.
+> >>>
+> >>> What I'm certain of, though, is that the change proposed in this patch
+> >>> will break current users of this driver: virt_to_page() on an address
+> >>> returned by ioremap() is completely undefined, and will result in
+> >>> either a kernel oops, or if not poking at memory which isn't a struct
+> >>> page, ultimately resulting in something that isn't SRAM being pointed
+> >>> to by "engine->sram_dma".
+> >>>
+> >>
+> >> Or we could just do
+> >>
+> >>     engine->sram_dma = res->start;
+> >>
+> >> which is pretty much what the SRAM/genalloc code is doing already.
+> > 
+> > As Russell points out this is yet another type of "set up a DMA master to access something other than kernel RAM" - there's already discussion in progress over how to handle this for dmaengine slaves[1], so gathering more use-cases might help distil exactly what the design of not-strictly-DMA-but-so-closely-coupled-it-can't-really-live-anywhere-else needs to be.
+> > 
+> > Robin.
+> > 
+> > [1]:http://lists.infradead.org/pipermail/linux-arm-kernel/2016-March/414422.html
+> > 
 > 
-> I don't think this should be an scomp-specific flag.  The point of
-> noctx is that we don't need to do a request-specific vmalloc.
-Are you suggesting to add to the struct acomp_req a pointer to a vmalloc
-area and remove the request context (which is contiguous to acomp_req and
-allocated in request_alloc)?
-
-> Chances are that with hardware offload that you won't have to do
-> such a vmalloc anyway.  IOW acomp implementations are much more
-> likely to be of the noctx type than scomp.
-Our HW offload will always need a context area in the acomp_req but
-I agree, there might be other acomp implementations which won't.
-
-> This is how I think it should work:
+> Thanks for the link. 
 > 
-> 1. There should be a single request_alloc function that allocates
-> just the request without the vmalloc.
-> 2. You then have to call an alloc_space function to allocate the
-> vmalloc area (let's stop calling it ctx as it may lead to confusion
-> with other contexts in the crypto API).
-Will allocate_space require a parameter which indicates the direction
-of the operation (compression or decompression) or are we relying on the
-user of the crypto API to know if he needs to call this function or not?
-
-> The second step can obviously be skipped for the noctx case.
+> dma_map_resource looks like to be the correct way of doing things. Just from
+> the purist point of view, a driver is not supposed to know the physical address
+> of a DMA address. That kills the intent of using DMA API. When programming descriptors,
+> the DMA addresses should be programmed not physical addresses so that the same 
+> driver can be used in a system with IOMMU. The IOMMU DMA ops will remap the DMA 
+> address to a bus address that is not physical address. All of this operation needs
+> to be isolated from the device driver.
 > 
-> Also instead of the private bit let's put this into the alg type:
 > 
-> #define CRYPTO_ALG_TYPE_ACOMP          0x00000008
-> #define CRYPTO_ALG_TYPE_ACOMP_NOCTX    0x00000009
-> #define CRYPTO_ALG_TYPE_SCOMP          0x0000000a
-> #define CRYPTO_ALG_TYPE_SCOMP_NOCTX    0x0000000b
-The reason why Joonsoo Kim proposed the concept of NOCTX was to avoid
-allocating a decompression context.
-Are you suggesting also to extend this concept to compression as well?
-If yes we would need a way to indicate for which direction the driver
-requires the context/space. How can we specify that?
+> I don't know the architecture or the driver enough to write this. This is not ideally
+> right but I can do this if Boris you are OK with this. 
+> 
+>      engine->sram_dma = res->start;
 
-> Now that we have killed crypto_hash we can shrink hash down to
-> two types and move it to 0xe, freeing up the space for acomp/scomp.
-Sounds good.
+I don't know.
 
-Thank you,
+How about waiting for the 'dma_{map,unmap}_resource' discussion to
+settle down before removing phy_to_dma()/dma_to_phys() APIs (as
+suggested by Robin and Russell)?
+
 
 -- 
-Giovanni
+Boris Brezillon, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
