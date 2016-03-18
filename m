@@ -1,86 +1,55 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH 1/3] crypto: marvell/cesa - replace dma_to_phys with
- dma_map_single
-Date: Fri, 18 Mar 2016 12:32:09 +0100
-Message-ID: <20160318123209.0d5a442a@bbrezillon>
-References: <1458252137-24497-1-git-send-email-okaya@codeaurora.org>
-	<20160317225459.GA19428@n2100.arm.linux.org.uk>
-	<80402e2f82651814b1411a25b1740288@codeaurora.org>
-	<20160317235020.GB19428@n2100.arm.linux.org.uk>
-	<20160318103028.4be15b78@bbrezillon>
-	<56EBE5BC.6000000@arm.com>
+From: Amitoj Kaur Chawla <amitoj1606@gmail.com>
+Subject: [PATCH] crypto: n2 - Remove return statement from void function
+Date: Fri, 18 Mar 2016 19:08:48 +0530
+Message-ID: <20160318133848.GA25643@amitoj-Inspiron-3542>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Herbert Xu <herbert@gondor.apana.org.au>, timur@codeaurora.org,
-	Arnaud Ebalard <arno@natisbad.org>,
-	linux-kernel@vger.kernel.org, okaya@codeaurora.org,
-	cov@codeaurora.org, "David S. Miller" <davem@davemloft.net>,
-	nwatters@codeaurora.org, linux-crypto@vger.kernel.org
-To: Robin Murphy <robin.murphy@arm.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: julia.lawall@lip6.fr
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:43639 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754771AbcCRLcM (ORCPT
+Received: from mail-pf0-f180.google.com ([209.85.192.180]:34540 "EHLO
+	mail-pf0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932620AbcCRNi6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Mar 2016 07:32:12 -0400
-In-Reply-To: <56EBE5BC.6000000@arm.com>
+	Fri, 18 Mar 2016 09:38:58 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 18 Mar 2016 11:25:48 +0000
-Robin Murphy <robin.murphy@arm.com> wrote:
+Return statement at the end of a void function is useless.
 
-> On 18/03/16 09:30, Boris Brezillon wrote:
-> > On Thu, 17 Mar 2016 23:50:20 +0000
-> > Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
-> >
-> >> On Thu, Mar 17, 2016 at 07:17:24PM -0400, okaya@codeaurora.org wrote:
-> >>> What is the correct way? I don't want to write engine->sram_dma = sram
-> >>
-> >> Well, what the driver _is_ wanting to do is to go from a CPU physical
-> >> address to a device DMA address.  phys_to_dma() looks like the correct
-> >> thing there to me, but I guess that's just an offset and doesn't take
-> >> account of any IOMMU that may be in the way.
-> >>
-> >> If you have an IOMMU, then the whole phys_to_dma() thing is a total
-> >> failure as it only does a linear translation, and there are no
-> >> interfaces in the kernel to take account of an IOMMU in the way.  So,
-> >> it needs something designed for the job, implemented and discussed by
-> >> the normal methods of proposing a new cross-arch interface for drivers
-> >> to use.
-> >>
-> >> What I'm certain of, though, is that the change proposed in this patch
-> >> will break current users of this driver: virt_to_page() on an address
-> >> returned by ioremap() is completely undefined, and will result in
-> >> either a kernel oops, or if not poking at memory which isn't a struct
-> >> page, ultimately resulting in something that isn't SRAM being pointed
-> >> to by "engine->sram_dma".
-> >>
-> >
-> > Or we could just do
-> >
-> > 	engine->sram_dma = res->start;
-> >
-> > which is pretty much what the SRAM/genalloc code is doing already.
-> 
-> As Russell points out this is yet another type of "set up a DMA master 
-> to access something other than kernel RAM" - there's already discussion 
-> in progress over how to handle this for dmaengine slaves[1], so 
-> gathering more use-cases might help distil exactly what the design of 
-> not-strictly-DMA-but-so-closely-coupled-it-can't-really-live-anywhere-else 
-> needs to be.
-> 
-> Robin.
-> 
-> [1]:http://lists.infradead.org/pipermail/linux-arm-kernel/2016-March/414422.html
-> 
+The Coccinelle semantic patch used to make this change is as follows:
+//<smpl>
+@@
+identifier f;
+expression e;
+@@
+void f(...) {
+<...
+- return
+  e;
+...>
+}
+//</smpl>
 
-Hm, interesting, thanks for the pointer.
+Signed-off-by: Amitoj Kaur Chawla <amitoj1606@gmail.com>
+---
+ drivers/crypto/n2_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
+index b85a7a7..c5aac25 100644
+--- a/drivers/crypto/n2_core.c
++++ b/drivers/crypto/n2_core.c
+@@ -1598,7 +1598,7 @@ static void *new_queue(unsigned long q_type)
+ 
+ static void free_queue(void *p, unsigned long q_type)
+ {
+-	return kmem_cache_free(queue_cache[q_type - 1], p);
++	kmem_cache_free(queue_cache[q_type - 1], p);
+ }
+ 
+ static int queue_cache_init(void)
 -- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+1.9.1
