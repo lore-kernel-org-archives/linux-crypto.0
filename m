@@ -1,7 +1,7 @@
 From: Nicolai Stange <nicstange@gmail.com>
-Subject: [PATCH RESEND v2 13/14] lib/mpi: mpi_read_raw_from_sgl(): sanitize meaning of indices
-Date: Mon, 21 Mar 2016 14:26:14 +0100
-Message-ID: <1458566775-5239-14-git-send-email-nicstange@gmail.com>
+Subject: [PATCH RESEND v2 03/14] lib/mpi: mpi_write_sgl(): purge redundant pointer arithmetic
+Date: Mon, 21 Mar 2016 14:26:04 +0100
+Message-ID: <1458566775-5239-4-git-send-email-nicstange@gmail.com>
 References: <1458566775-5239-1-git-send-email-nicstange@gmail.com>
 Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
 	Michal Marek <mmarek@suse.com>,
@@ -12,85 +12,51 @@ Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:34954 "EHLO
-	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755468AbcCUN0y (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:33412 "EHLO
+	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755652AbcCUN0j (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Mar 2016 09:26:54 -0400
+	Mon, 21 Mar 2016 09:26:39 -0400
 In-Reply-To: <1458566775-5239-1-git-send-email-nicstange@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Within the byte reading loop in mpi_read_raw_sgl(), there are two
-housekeeping indices used, z and x.
+Within the copying loop in mpi_write_sgl(), we have
 
-At all times, the index z represents the number of output bytes covered
-by the input SGEs for which processing has completed so far. This includes
-any leading zero bytes within the most significant limb.
+  if (lzeros) {
+    ...
+    p -= lzeros;
+    y = lzeros;
+  }
+  p = p - (sizeof(alimb) - y);
 
-The index x changes its meaning after the first outer loop's iteration
-though: while processing the first input SGE, it represents
+If lzeros == 0, then y == 0, too. Thus, lzeros gets subtracted and added
+back again to p.
 
-  "number of leading zero bytes in most significant output limb" +
-   "current position within current SGE"
-
-For the remaining SGEs OTOH, x corresponds just to
-
-  "current position within current SGE"
-
-After all, it is only the sum of z and x that has any meaning for the
-output buffer and thus, the
-
-  "number of leading zero bytes in most significant output limb"
-
-part can be moved away from x into z from the beginning, opening up the
-opportunity for cleaner code.
-
-Before the outer loop iterating over the SGEs, don't initialize z with
-zero, but with the number of leading zero bytes in the most significant
-output limb. For the inner loop iterating over a single SGE's bytes,
-get rid of the buf_shift offset to x' bounds and let x run from zero to
-sg->length - 1.
+Purge this redundancy.
 
 Signed-off-by: Nicolai Stange <nicstange@gmail.com>
 ---
- lib/mpi/mpicoder.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ lib/mpi/mpicoder.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index 5d02efe..3f114d2 100644
+index d8b372b..78ec4e1 100644
 --- a/lib/mpi/mpicoder.c
 +++ b/lib/mpi/mpicoder.c
-@@ -477,19 +477,17 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
- 
- 	j = nlimbs - 1;
- 	a = 0;
--	z = 0;
--	x = BYTES_PER_MPI_LIMB - nbytes % BYTES_PER_MPI_LIMB;
--	x %= BYTES_PER_MPI_LIMB;
-+	z = BYTES_PER_MPI_LIMB - nbytes % BYTES_PER_MPI_LIMB;
-+	z %= BYTES_PER_MPI_LIMB;
- 
- 	for_each_sg(sgl, sg, ents, i) {
- 		const u8 *buffer = sg_virt(sg) + lzeros;
- 		int len = sg->length - lzeros;
--		int buf_shift = x;
- 
- 		if  (sg_is_last(sg) && (len % BYTES_PER_MPI_LIMB))
- 			len += BYTES_PER_MPI_LIMB - (len % BYTES_PER_MPI_LIMB);
- 
--		for (; x < len + buf_shift; x++) {
-+		for (x = 0; x < len; x++) {
- 			a <<= 8;
- 			a |= *buffer++;
- 			if (((z + x + 1) % BYTES_PER_MPI_LIMB) == 0) {
-@@ -498,7 +496,6 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
- 			}
+@@ -407,12 +407,11 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
+ 			mpi_limb_t *limb2 = (void *)p - sizeof(alimb)
+ 				+ lzeros;
+ 			*limb1 = *limb2;
+-			p -= lzeros;
+ 			y = lzeros;
+ 			lzeros = 0;
  		}
- 		z += x;
--		x = 0;
- 		lzeros = 0;
- 	}
- 	return val;
+ 
+-		p = p - (sizeof(alimb) - y);
++		p = p - sizeof(alimb);
+ 
+ 		for (x = 0; x < sizeof(alimb) - y; x++) {
+ 			if (!buf_len) {
 -- 
 2.7.3
