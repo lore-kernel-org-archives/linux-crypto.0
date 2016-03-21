@@ -1,34 +1,40 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH 01/10] crypto: rsa - generalize ASN.1 sequences
-Date: Mon, 21 Mar 2016 08:24:46 -0700
-Message-ID: <56F0123E.2070004@intel.com>
-References: <1458325927-14737-1-git-send-email-tudor-dan.ambarus@nxp.com>
- <56EEB974.2030702@intel.com>
- <AM3PR04MB1300BAEA8175AAA8B7BD5A41B88F0@AM3PR04MB1300.eurprd04.prod.outlook.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: [PATCH] MAINTAINERS: Add a new maintainer for the CCP driver
+Date: Mon, 21 Mar 2016 11:43:22 -0500
+Message-ID: <20160321164321.22405.94570.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"smueller@chronox.de" <smueller@chronox.de>,
-	Horia Ioan Geanta Neag <horia.geanta@nxp.com>
-To: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Cc: Gary Hook <gary.hook@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Miller <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:50036 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755999AbcCUP3i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Mar 2016 11:29:38 -0400
-In-Reply-To: <AM3PR04MB1300BAEA8175AAA8B7BD5A41B88F0@AM3PR04MB1300.eurprd04.prod.outlook.com>
+Received: from mail-bn1on0083.outbound.protection.outlook.com ([157.56.110.83]:34253
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1756270AbcCUQnc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 21 Mar 2016 12:43:32 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/21/2016 03:11 AM, Tudor-Dan Ambarus wrote:
-> [ta] we can do this once, when initializing the tfm object.
-> 
-> I agree with all your suggestions, I will implement them.
-> 
-> Thank you for the review,
+Gary will be taking over future development of the CCP driver, so add
+him as a co-maintainer of the driver.
 
-Great. Thank you Tudor.
--- 
-TS
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+---
+ MAINTAINERS |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 30aca4a..8c42c07 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -623,6 +623,7 @@ F:	include/linux/altera_jtaguart.h
+ 
+ AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER
+ M:	Tom Lendacky <thomas.lendacky@amd.com>
++M:	Gary Hook <gary.hook@amd.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Supported
+ F:	drivers/crypto/ccp/
