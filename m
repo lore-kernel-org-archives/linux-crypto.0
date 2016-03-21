@@ -1,7 +1,7 @@
 From: Nicolai Stange <nicstange@gmail.com>
-Subject: [PATCH RESEND v2 07/14] lib/mpi: mpi_read_buffer(): replace open coded endian conversion
-Date: Mon, 21 Mar 2016 14:26:08 +0100
-Message-ID: <1458566775-5239-8-git-send-email-nicstange@gmail.com>
+Subject: [PATCH RESEND v2 09/14] lib/mpi: mpi_read_raw_from_sgl(): replace len argument by nbytes
+Date: Mon, 21 Mar 2016 14:26:10 +0100
+Message-ID: <1458566775-5239-10-git-send-email-nicstange@gmail.com>
 References: <1458566775-5239-1-git-send-email-nicstange@gmail.com>
 Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
 	Michal Marek <mmarek@suse.com>,
@@ -16,74 +16,63 @@ In-Reply-To: <1458566775-5239-1-git-send-email-nicstange@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Currently, the endian conversion from CPU order to BE is open coded in
-mpi_read_buffer().
+Currently, the nbytes local variable is calculated from the len argument
+as follows:
 
-Replace this by the centrally provided cpu_to_be*() macros.
-Copy from the temporary storage on stack to the destination buffer
-by means of memcpy().
+  ... mpi_read_raw_from_sgl(..., unsigned int len)
+  {
+    unsigned nbytes;
+    ...
+    if (!ents)
+      nbytes = 0;
+    else
+      nbytes = len - lzeros;
+    ...
+  }
+
+Given that nbytes is derived from len in a trivial way and that the len
+argument is shadowed by a local len variable in several loops, this is just
+confusing.
+
+Rename the len argument to nbytes and get rid of the nbytes local variable.
+Do the nbytes calculation in place.
 
 Signed-off-by: Nicolai Stange <nicstange@gmail.com>
 ---
- lib/mpi/mpicoder.c | 27 ++++++++++++---------------
- 1 file changed, 12 insertions(+), 15 deletions(-)
+ lib/mpi/mpicoder.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index 2fd8d41..a999ee1 100644
+index 27582e2..2de2c7d 100644
 --- a/lib/mpi/mpicoder.c
 +++ b/lib/mpi/mpicoder.c
-@@ -21,6 +21,7 @@
- #include <linux/bitops.h>
- #include <linux/count_zeros.h>
- #include <linux/byteorder/generic.h>
-+#include <linux/string.h>
- #include "mpi-internal.h"
- 
- #define MAX_EXTERN_MPI_BITS 16384
-@@ -164,7 +165,13 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
- 		    int *sign)
+@@ -418,15 +418,15 @@ EXPORT_SYMBOL_GPL(mpi_write_to_sgl);
+  * a new MPI and reads the content of the sgl to the MPI.
+  *
+  * @sgl:	scatterlist to read from
+- * @len:	number of bytes to read
++ * @nbytes:	number of bytes to read
+  *
+  * Return:	Pointer to a new MPI or NULL on error
+  */
+-MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int len)
++MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
  {
- 	uint8_t *p;
--	mpi_limb_t alimb;
-+#if BYTES_PER_MPI_LIMB == 4
-+	__be32 alimb;
-+#elif BYTES_PER_MPI_LIMB == 8
-+	__be64 alimb;
-+#else
-+#error please implement for this limb size.
-+#endif
- 	unsigned int n = mpi_get_size(a);
- 	int i, lzeros;
+ 	struct scatterlist *sg;
+ 	int x, i, j, z, lzeros, ents;
+-	unsigned int nbits, nlimbs, nbytes;
++	unsigned int nbits, nlimbs;
+ 	mpi_limb_t a;
+ 	MPI val = NULL;
  
-@@ -187,25 +194,15 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
- 	for (i = a->nlimbs - 1 - lzeros / BYTES_PER_MPI_LIMB,
- 			lzeros %= BYTES_PER_MPI_LIMB;
- 		i >= 0; i--) {
--		alimb = a->d[i];
- #if BYTES_PER_MPI_LIMB == 4
--		*p++ = alimb >> 24;
--		*p++ = alimb >> 16;
--		*p++ = alimb >> 8;
--		*p++ = alimb;
-+		alimb = cpu_to_be32(a->d[i]);
- #elif BYTES_PER_MPI_LIMB == 8
--		*p++ = alimb >> 56;
--		*p++ = alimb >> 48;
--		*p++ = alimb >> 40;
--		*p++ = alimb >> 32;
--		*p++ = alimb >> 24;
--		*p++ = alimb >> 16;
--		*p++ = alimb >> 8;
--		*p++ = alimb;
-+		alimb = cpu_to_be64(a->d[i]);
- #else
- #error please implement for this limb size.
- #endif
--
-+		memcpy(p, &alimb, BYTES_PER_MPI_LIMB);
-+		p += BYTES_PER_MPI_LIMB;
- 		if (lzeros > 0) {
- 			mpi_limb_t *limb1 = (void *)p - sizeof(alimb);
- 			mpi_limb_t *limb2 = (void *)p - sizeof(alimb)
+@@ -455,7 +455,7 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int len)
+ 	if (!ents)
+ 		nbytes = 0;
+ 	else
+-		nbytes = len - lzeros;
++		nbytes -= lzeros;
+ 
+ 	nbits = nbytes * 8;
+ 	if (nbits > MAX_EXTERN_MPI_BITS) {
 -- 
 2.7.3
