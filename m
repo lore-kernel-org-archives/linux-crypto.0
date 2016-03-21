@@ -1,56 +1,52 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [patch] crypto: marvell/cesa - remove unneeded condition
-Date: Mon, 21 Mar 2016 10:10:54 +0100
-Message-ID: <20160321101054.2c42ee16@bbrezillon>
-References: <20160321090342.GB31670@mwanda>
+From: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
+Subject: RE: [PATCH 01/10] crypto: rsa - generalize ASN.1 sequences
+Date: Mon, 21 Mar 2016 10:11:53 +0000
+Message-ID: <AM3PR04MB1300BAEA8175AAA8B7BD5A41B88F0@AM3PR04MB1300.eurprd04.prod.outlook.com>
+References: <1458325927-14737-1-git-send-email-tudor-dan.ambarus@nxp.com>
+ <56EEB974.2030702@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Arnaud Ebalard <arno@natisbad.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"smueller@chronox.de" <smueller@chronox.de>,
+	Horia Ioan Geanta Neag <horia.geanta@nxp.com>
+To: Tadeusz Struk <tadeusz.struk@intel.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:55586 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752638AbcCUJK5 (ORCPT
+Received: from mail-db3on0054.outbound.protection.outlook.com ([157.55.234.54]:30848
+	"EHLO emea01-db3-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753153AbcCUKL4 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Mar 2016 05:10:57 -0400
-In-Reply-To: <20160321090342.GB31670@mwanda>
+	Mon, 21 Mar 2016 06:11:56 -0400
+In-Reply-To: <56EEB974.2030702@intel.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 21 Mar 2016 12:03:43 +0300
-Dan Carpenter <dan.carpenter@oracle.com> wrote:
+Hi Tadeusz,
 
-> creq->cache[] is an array inside the struct, it's not a pointer and it
-> can't be NULL.
+> -----Original Message-----
+> From: Tadeusz Struk [mailto:tadeusz.struk@intel.com]
+> Sent: Sunday, March 20, 2016 4:54 PM
+> To: Tudor-Dan Ambarus; herbert@gondor.apana.org.au
+> Cc: linux-crypto@vger.kernel.org; smueller@chronox.de; Horia Ioan Geanta
+> Neag
+> Subject: Re: [PATCH 01/10] crypto: rsa - generalize ASN.1 sequences
+
+
+> static int rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
+>  			    unsigned int keylen)
+>  {
+> 	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
+> 	struct rsa_mpi_key *pkey = &ctx->key;
+>  	int ret;
 > 
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> 	ctx->action = &impl_action;
 
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+[ta] we can do this once, when initializing the tfm object.
 
-> 
-> diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-> index 7ca2e0f..7a5058d 100644
-> --- a/drivers/crypto/marvell/hash.c
-> +++ b/drivers/crypto/marvell/hash.c
-> @@ -768,8 +768,7 @@ static int mv_cesa_ahash_export(struct ahash_request *req, void *hash,
->  	*len = creq->len;
->  	memcpy(hash, creq->state, digsize);
->  	memset(cache, 0, blocksize);
-> -	if (creq->cache)
-> -		memcpy(cache, creq->cache, creq->cache_ptr);
-> +	memcpy(cache, creq->cache, creq->cache_ptr);
->  
->  	return 0;
->  }
+I agree with all your suggestions, I will implement them.
 
-
-
--- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Thank you for the review,
+ta
