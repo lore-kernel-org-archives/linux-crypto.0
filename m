@@ -1,69 +1,110 @@
 From: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
-Subject: RE: [PATCH 07/10] crypto: qat - remove duplicate ASN.1 parser
-Date: Mon, 21 Mar 2016 10:12:58 +0000
-Message-ID: <AM3PR04MB13002D8FB6F93E96333348D4B88F0@AM3PR04MB1300.eurprd04.prod.outlook.com>
+Subject: RE: [PATCH 10/10] crypto: caam - add support for RSA algorithm
+Date: Mon, 21 Mar 2016 11:07:06 +0000
+Message-ID: <AM3PR04MB130028052CD2D14B8F67663DB88F0@AM3PR04MB1300.eurprd04.prod.outlook.com>
 References: <1458325927-14737-1-git-send-email-tudor-dan.ambarus@nxp.com>
- <1458325927-14737-7-git-send-email-tudor-dan.ambarus@nxp.com>
- <56EEB9E8.3070808@intel.com>
+ <1458325927-14737-10-git-send-email-tudor-dan.ambarus@nxp.com>
+ <3630222.vHD2IgIHAY@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"smueller@chronox.de" <smueller@chronox.de>,
-	Horia Ioan Geanta Neag <horia.geanta@nxp.com>
-To: Tadeusz Struk <tadeusz.struk@intel.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"tadeusz.struk@intel.com" <tadeusz.struk@intel.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"Horia Ioan Geanta Neag" <horia.geanta@nxp.com>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-db3on0089.outbound.protection.outlook.com ([157.55.234.89]:63776
+Received: from mail-db3on0060.outbound.protection.outlook.com ([157.55.234.60]:4965
 	"EHLO emea01-db3-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752647AbcCUKNB convert rfc822-to-8bit (ORCPT
+	id S1753865AbcCULHL convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Mar 2016 06:13:01 -0400
-In-Reply-To: <56EEB9E8.3070808@intel.com>
+	Mon, 21 Mar 2016 07:07:11 -0400
+In-Reply-To: <3630222.vHD2IgIHAY@tauon.atsec.com>
 Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
+Hi Stephan,
 
 > -----Original Message-----
-> From: Tadeusz Struk [mailto:tadeusz.struk@intel.com]
-> Sent: Sunday, March 20, 2016 4:56 PM
-> To: Tudor-Dan Ambarus; herbert@gondor.apana.org.au
-> Cc: linux-crypto@vger.kernel.org; smueller@chronox.de; Horia Ioan Geanta
-> Neag
-> Subject: Re: [PATCH 07/10] crypto: qat - remove duplicate ASN.1 parser
+> From: Stephan Mueller [mailto:smueller@chronox.de]
+> Sent: Saturday, March 19, 2016 6:59 PM
+> To: Tudor-Dan Ambarus
+> Cc: herbert@gondor.apana.org.au; tadeusz.struk@intel.com; linux-
+> crypto@vger.kernel.org; Horia Ioan Geanta Neag
+> Subject: Re: [PATCH 10/10] crypto: caam - add support for RSA algorithm
 > 
-> On 03/18/2016 11:32 AM, Tudor Ambarus wrote:
-> > Use the RSA's software implementation parser with
-> > raw integer actions.
-> >
-> > Compile-tested only.
-> >
-> > Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-> > ---
-> >  drivers/crypto/qat/Kconfig                        |   3 +-
-> >  drivers/crypto/qat/qat_common/Makefile            |  10 +-
-> >  drivers/crypto/qat/qat_common/qat_asym_algs.c     | 265 +++++++---------
-> ------
-> >  drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1 |  11 -
-> >  drivers/crypto/qat/qat_common/qat_rsapubkey.asn1  |   4 -
-> >  5 files changed, 83 insertions(+), 210 deletions(-)
-> >  delete mode 100644 drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1
-> >  delete mode 100644 drivers/crypto/qat/qat_common/qat_rsapubkey.asn1
+> > +void rsa_free_key(struct rsa_raw_key *key)
+> > +{
+> > +	kzfree(key->d);
+> > +	key->d = NULL;
+> > +
+> > +	kfree(key->e);
+> > +	key->e = NULL;
+> > +
+> > +	kfree(key->n);
+> > +	key->n = NULL;
+> > +
+> > +	key->n_sz = 0;
+> > +	key->e_sz = 0;
+> > +}
 > 
-> Thanks for converting qat, but I'm working on adding support for the
-> Chinese
-> remainder algorithm, which gives us big performance improvement, so please
-> do not change the qat driver just yet.
-> Please just add a generic ANS.1 parser that would allow to obtain all
-> components of the private key and I'll use it to add the handlers
-> and remove the ASN.1 parsing from qat. I will then test it to make sure
-> that it works fine before it is committed.
+> As you implement raw key support for use in other drivers, shouldn't that
+> function go into some helper file like free_mpis().
+> > +
 
-[ta] Ok.
+[ta] I should also add an rsa_free_coherent_key(struct device *dev, struct rsa_raw_key *key), for those implementations that use the DMA-coherent API. 
 
-> Thanks,
-> --
-> TS
+
+> > +static int caam_rsa_dec(struct akcipher_request *req)
+> > +{
+> > +	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+> > +	struct rsa_raw_ctx *ctx = akcipher_tfm_ctx(tfm);
+> > +	struct rsa_raw_key *key = &ctx->key;
+> > +	struct device *jrdev = ctx->dev;
+> > +	struct rsa_edesc *edesc = NULL;
+> > +	size_t desclen = sizeof(struct rsa_priv_f1_desc);
+> > +	int ret;
+> > +
+> > +	if (unlikely(!key->n || !key->d))
+> > +		return -EINVAL;
+> > +
+> > +	if (req->dst_len < key->n_sz) {
+> > +		req->dst_len = key->n_sz;
+> > +		return -EOVERFLOW;
+> > +	}
+> > +
+> > +	/* Allocate extended descriptor. */
+> > +	edesc = rsa_edesc_alloc(req, desclen);
+> > +	if (IS_ERR(edesc))
+> > +		return PTR_ERR(edesc);
+> > +
+> > +	/* Initialize Job Descriptor. */
+> > +	ret = init_rsa_priv_f1_desc(req, edesc);
+> > +	if (ret)
+> > +		return ret;
+> 
+> Same here, kfree?
+
+[ta] Sure, thanks.
+
+> > +
+> > +	ret = caam_jr_enqueue(jrdev, edesc->hw_desc, rsa_priv_f1_done, req);
+> > +	if (!ret) {
+> > +		ret = -EINPROGRESS;
+> 
+> dto
+>
+
+[ta] resources are freed on rsa_priv_f1_done callback.
+ 
+> > +static struct akcipher_alg rsa = {
+> 
+> can you please name that something else, like caam_rsa? It is a real hassle
+> when searching some symbol and I get such a generic name.
+
+[ta] ok.
+
+Thank you for the review!
+ta
