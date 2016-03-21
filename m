@@ -1,7 +1,7 @@
 From: Nicolai Stange <nicstange@gmail.com>
-Subject: [PATCH RESEND v2 06/14] lib/mpi: mpi_read_buffer(): optimize skipping of leading zero limbs
-Date: Mon, 21 Mar 2016 14:26:07 +0100
-Message-ID: <1458566775-5239-7-git-send-email-nicstange@gmail.com>
+Subject: [PATCH RESEND v2 12/14] lib/mpi: mpi_read_raw_from_sgl(): fix nbits calculation
+Date: Mon, 21 Mar 2016 14:26:13 +0100
+Message-ID: <1458566775-5239-13-git-send-email-nicstange@gmail.com>
 References: <1458566775-5239-1-git-send-email-nicstange@gmail.com>
 Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
 	Michal Marek <mmarek@suse.com>,
@@ -11,58 +11,59 @@ Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
 	linux-kernel@vger.kernel.org, Nicolai Stange <nicstange@gmail.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:33572 "EHLO
+	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755997AbcCUN0w (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 21 Mar 2016 09:26:52 -0400
 In-Reply-To: <1458566775-5239-1-git-send-email-nicstange@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Currently, if the number of leading zeros is greater than fits into a
-complete limb, mpi_read_buffer() skips them by iterating over them
-limb-wise.
+The number of bits, nbits, is calculated in mpi_read_raw_from_sgl() as
+follows:
 
-Instead of skipping the high order zero limbs within the loop as shown
-above, adjust the copying loop's bounds.
+  nbits = nbytes * 8;
 
+Afterwards, the number of leading zero bits of the first byte get
+subtracted:
+
+  nbits -= count_leading_zeros(*(u8 *)(sg_virt(sgl) + lzeros));
+
+However, count_leading_zeros() takes an unsigned long and thus,
+the u8 gets promoted to an unsigned long.
+
+Thus, the above doesn't subtract the number of leading zeros in the most
+significant nonzero input byte from nbits, but the number of leading
+zeros of the most significant nonzero input byte promoted to unsigned long,
+i.e. BITS_PER_LONG - 8 too many.
+
+Fix this by subtracting
+
+  count_leading_zeros(...) - (BITS_PER_LONG - 8)
+
+from nbits only.
+
+Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
 Signed-off-by: Nicolai Stange <nicstange@gmail.com>
 ---
- lib/mpi/mpicoder.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ lib/mpi/mpicoder.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index 623439e..2fd8d41 100644
+index 4cf8516..5d02efe 100644
 --- a/lib/mpi/mpicoder.c
 +++ b/lib/mpi/mpicoder.c
-@@ -184,7 +184,9 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
- 	p = buf;
- 	*nbytes = n - lzeros;
- 
--	for (i = a->nlimbs - 1; i >= 0; i--) {
-+	for (i = a->nlimbs - 1 - lzeros / BYTES_PER_MPI_LIMB,
-+			lzeros %= BYTES_PER_MPI_LIMB;
-+		i >= 0; i--) {
- 		alimb = a->d[i];
- #if BYTES_PER_MPI_LIMB == 4
- 		*p++ = alimb >> 24;
-@@ -205,15 +207,11 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
- #endif
- 
- 		if (lzeros > 0) {
--			if (lzeros >= sizeof(alimb)) {
--				p -= sizeof(alimb);
--			} else {
--				mpi_limb_t *limb1 = (void *)p - sizeof(alimb);
--				mpi_limb_t *limb2 = (void *)p - sizeof(alimb)
--							+ lzeros;
--				*limb1 = *limb2;
--				p -= lzeros;
--			}
-+			mpi_limb_t *limb1 = (void *)p - sizeof(alimb);
-+			mpi_limb_t *limb2 = (void *)p - sizeof(alimb)
-+				+ lzeros;
-+			*limb1 = *limb2;
-+			p -= lzeros;
- 			lzeros -= sizeof(alimb);
- 		}
+@@ -460,7 +460,8 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
  	}
+ 
+ 	if (nbytes > 0)
+-		nbits -= count_leading_zeros(*(u8 *)(sg_virt(sgl) + lzeros));
++		nbits -= count_leading_zeros(*(u8 *)(sg_virt(sgl) + lzeros)) -
++			(BITS_PER_LONG - 8);
+ 
+ 	nlimbs = DIV_ROUND_UP(nbytes, BYTES_PER_MPI_LIMB);
+ 	val = mpi_alloc(nlimbs);
 -- 
 2.7.3
