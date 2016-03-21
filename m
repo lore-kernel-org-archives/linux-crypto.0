@@ -1,7 +1,7 @@
 From: Nicolai Stange <nicstange@gmail.com>
-Subject: [PATCH RESEND v2 09/14] lib/mpi: mpi_read_raw_from_sgl(): replace len argument by nbytes
-Date: Mon, 21 Mar 2016 14:26:10 +0100
-Message-ID: <1458566775-5239-10-git-send-email-nicstange@gmail.com>
+Subject: [PATCH RESEND v2 06/14] lib/mpi: mpi_read_buffer(): optimize skipping of leading zero limbs
+Date: Mon, 21 Mar 2016 14:26:07 +0100
+Message-ID: <1458566775-5239-7-git-send-email-nicstange@gmail.com>
 References: <1458566775-5239-1-git-send-email-nicstange@gmail.com>
 Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
 	Michal Marek <mmarek@suse.com>,
@@ -16,63 +16,53 @@ In-Reply-To: <1458566775-5239-1-git-send-email-nicstange@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Currently, the nbytes local variable is calculated from the len argument
-as follows:
+Currently, if the number of leading zeros is greater than fits into a
+complete limb, mpi_read_buffer() skips them by iterating over them
+limb-wise.
 
-  ... mpi_read_raw_from_sgl(..., unsigned int len)
-  {
-    unsigned nbytes;
-    ...
-    if (!ents)
-      nbytes = 0;
-    else
-      nbytes = len - lzeros;
-    ...
-  }
-
-Given that nbytes is derived from len in a trivial way and that the len
-argument is shadowed by a local len variable in several loops, this is just
-confusing.
-
-Rename the len argument to nbytes and get rid of the nbytes local variable.
-Do the nbytes calculation in place.
+Instead of skipping the high order zero limbs within the loop as shown
+above, adjust the copying loop's bounds.
 
 Signed-off-by: Nicolai Stange <nicstange@gmail.com>
 ---
- lib/mpi/mpicoder.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ lib/mpi/mpicoder.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
 diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index 27582e2..2de2c7d 100644
+index 623439e..2fd8d41 100644
 --- a/lib/mpi/mpicoder.c
 +++ b/lib/mpi/mpicoder.c
-@@ -418,15 +418,15 @@ EXPORT_SYMBOL_GPL(mpi_write_to_sgl);
-  * a new MPI and reads the content of the sgl to the MPI.
-  *
-  * @sgl:	scatterlist to read from
-- * @len:	number of bytes to read
-+ * @nbytes:	number of bytes to read
-  *
-  * Return:	Pointer to a new MPI or NULL on error
-  */
--MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int len)
-+MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
- {
- 	struct scatterlist *sg;
- 	int x, i, j, z, lzeros, ents;
--	unsigned int nbits, nlimbs, nbytes;
-+	unsigned int nbits, nlimbs;
- 	mpi_limb_t a;
- 	MPI val = NULL;
+@@ -184,7 +184,9 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
+ 	p = buf;
+ 	*nbytes = n - lzeros;
  
-@@ -455,7 +455,7 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int len)
- 	if (!ents)
- 		nbytes = 0;
- 	else
--		nbytes = len - lzeros;
-+		nbytes -= lzeros;
+-	for (i = a->nlimbs - 1; i >= 0; i--) {
++	for (i = a->nlimbs - 1 - lzeros / BYTES_PER_MPI_LIMB,
++			lzeros %= BYTES_PER_MPI_LIMB;
++		i >= 0; i--) {
+ 		alimb = a->d[i];
+ #if BYTES_PER_MPI_LIMB == 4
+ 		*p++ = alimb >> 24;
+@@ -205,15 +207,11 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
+ #endif
  
- 	nbits = nbytes * 8;
- 	if (nbits > MAX_EXTERN_MPI_BITS) {
+ 		if (lzeros > 0) {
+-			if (lzeros >= sizeof(alimb)) {
+-				p -= sizeof(alimb);
+-			} else {
+-				mpi_limb_t *limb1 = (void *)p - sizeof(alimb);
+-				mpi_limb_t *limb2 = (void *)p - sizeof(alimb)
+-							+ lzeros;
+-				*limb1 = *limb2;
+-				p -= lzeros;
+-			}
++			mpi_limb_t *limb1 = (void *)p - sizeof(alimb);
++			mpi_limb_t *limb2 = (void *)p - sizeof(alimb)
++				+ lzeros;
++			*limb1 = *limb2;
++			p -= lzeros;
+ 			lzeros -= sizeof(alimb);
+ 		}
+ 	}
 -- 
 2.7.3
