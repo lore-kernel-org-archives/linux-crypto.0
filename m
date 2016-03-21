@@ -1,7 +1,7 @@
 From: Nicolai Stange <nicstange@gmail.com>
-Subject: [PATCH RESEND v2 10/14] lib/mpi: mpi_read_raw_from_sgl(): don't include leading zero SGEs in nbytes
-Date: Mon, 21 Mar 2016 14:26:11 +0100
-Message-ID: <1458566775-5239-11-git-send-email-nicstange@gmail.com>
+Subject: [PATCH RESEND v2 14/14] lib/mpi: mpi_read_raw_from_sgl(): fix out-of-bounds buffer access
+Date: Mon, 21 Mar 2016 14:26:15 +0100
+Message-ID: <1458566775-5239-15-git-send-email-nicstange@gmail.com>
 References: <1458566775-5239-1-git-send-email-nicstange@gmail.com>
 Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
 	Michal Marek <mmarek@suse.com>,
@@ -16,69 +16,84 @@ In-Reply-To: <1458566775-5239-1-git-send-email-nicstange@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-At the very beginning of mpi_read_raw_from_sgl(), the leading zeros of
-the input scatterlist are counted:
+Within the copying loop in mpi_read_raw_from_sgl(), the last input SGE's
+byte count gets artificially extended as follows:
 
-  lzeros = 0;
-  for_each_sg(sgl, sg, ents, i) {
-    ...
-    if (/* sg contains nonzero bytes */)
-      break;
+  if (sg_is_last(sg) && (len % BYTES_PER_MPI_LIMB))
+    len += BYTES_PER_MPI_LIMB - (len % BYTES_PER_MPI_LIMB);
 
-    /* sg contains nothing but zeros here */
-    ents--;
-    lzeros = 0;
-  }
+Within the following byte copying loop, this causes reads beyond that
+SGE's allocated buffer:
 
-Later on, the total number of trailing nonzero bytes is calculated by
-subtracting the number of leading zero bytes from the total number of input
-bytes:
+  BUG: KASAN: slab-out-of-bounds in mpi_read_raw_from_sgl+0x331/0x650
+                                     at addr ffff8801e168d4d8
+  Read of size 1 by task systemd-udevd/721
+  [...]
+  Call Trace:
+   [<ffffffff818c4d35>] dump_stack+0xbc/0x117
+   [<ffffffff818c4c79>] ? _atomic_dec_and_lock+0x169/0x169
+   [<ffffffff814af5d1>] ? print_section+0x61/0xb0
+   [<ffffffff814b1109>] print_trailer+0x179/0x2c0
+   [<ffffffff814bc524>] object_err+0x34/0x40
+   [<ffffffff814bfdc7>] kasan_report_error+0x307/0x8c0
+   [<ffffffff814bf315>] ? kasan_unpoison_shadow+0x35/0x50
+   [<ffffffff814bf38e>] ? kasan_kmalloc+0x5e/0x70
+   [<ffffffff814c0ad1>] kasan_report+0x71/0xa0
+   [<ffffffff81938171>] ? mpi_read_raw_from_sgl+0x331/0x650
+   [<ffffffff814bf1a6>] __asan_load1+0x46/0x50
+   [<ffffffff81938171>] mpi_read_raw_from_sgl+0x331/0x650
+   [<ffffffff817f41b6>] rsa_verify+0x106/0x260
+   [<ffffffff817f40b0>] ? rsa_set_pub_key+0xf0/0xf0
+   [<ffffffff818edc79>] ? sg_init_table+0x29/0x50
+   [<ffffffff817f4d22>] ? pkcs1pad_sg_set_buf+0xb2/0x2e0
+   [<ffffffff817f5b74>] pkcs1pad_verify+0x1f4/0x2b0
+   [<ffffffff81831057>] public_key_verify_signature+0x3a7/0x5e0
+   [<ffffffff81830cb0>] ? public_key_describe+0x80/0x80
+   [<ffffffff817830f0>] ? keyring_search_aux+0x150/0x150
+   [<ffffffff818334a4>] ? x509_request_asymmetric_key+0x114/0x370
+   [<ffffffff814b83f0>] ? kfree+0x220/0x370
+   [<ffffffff818312c2>] public_key_verify_signature_2+0x32/0x50
+   [<ffffffff81830b5c>] verify_signature+0x7c/0xb0
+   [<ffffffff81835d0c>] pkcs7_validate_trust+0x42c/0x5f0
+   [<ffffffff813c391a>] system_verify_data+0xca/0x170
+   [<ffffffff813c3850>] ? top_trace_array+0x9b/0x9b
+   [<ffffffff81510b29>] ? __vfs_read+0x279/0x3d0
+   [<ffffffff8129372f>] mod_verify_sig+0x1ff/0x290
+  [...]
 
-  nbytes -= lzeros;
+The exact purpose of the len extension isn't clear to me, but due to
+its form, I suspect that it's a leftover somehow accounting for leading
+zero bytes within the most significant output limb.
 
-However, since lzeros gets reset to zero for each completely zero leading
-sg in the loop above, it doesn't include those.
+Note however that without that len adjustement, the total number of bytes
+ever processed by the inner loop equals nbytes and thus, the last output
+limb gets written at this point. Thus the net effect of the len adjustement
+cited above is just to keep the inner loop running for some more
+iterations, namely < BYTES_PER_MPI_LIMB ones, reading some extra bytes from
+beyond the last SGE's buffer and discarding them afterwards.
 
-Besides wasting resources by allocating a too large output buffer,
-this mistake propagates into the calculation of x, the number of
-leading zeros within the most significant output limb:
-
-  x = BYTES_PER_MPI_LIMB - nbytes % BYTES_PER_MPI_LIMB;
-
-What's more, the low order bytes of the output, equal in number to the
-extra bytes in nbytes, are left uninitialized.
-
-Fix this by adjusting nbytes for each completely zero leading scatterlist
-entry.
+Fix this issue by purging the extension of len beyond the last input SGE's
+buffer length.
 
 Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
 Signed-off-by: Nicolai Stange <nicstange@gmail.com>
 ---
- lib/mpi/mpicoder.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ lib/mpi/mpicoder.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
 diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index 2de2c7d..add9e81 100644
+index 3f114d2..0c534ac 100644
 --- a/lib/mpi/mpicoder.c
 +++ b/lib/mpi/mpicoder.c
-@@ -447,16 +447,12 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
- 			break;
+@@ -484,9 +484,6 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
+ 		const u8 *buffer = sg_virt(sg) + lzeros;
+ 		int len = sg->length - lzeros;
  
- 		ents--;
-+		nbytes -= lzeros;
- 		lzeros = 0;
- 	}
- 
- 	sgl = sg;
+-		if  (sg_is_last(sg) && (len % BYTES_PER_MPI_LIMB))
+-			len += BYTES_PER_MPI_LIMB - (len % BYTES_PER_MPI_LIMB);
 -
--	if (!ents)
--		nbytes = 0;
--	else
--		nbytes -= lzeros;
--
-+	nbytes -= lzeros;
- 	nbits = nbytes * 8;
- 	if (nbits > MAX_EXTERN_MPI_BITS) {
- 		pr_info("MPI: mpi too large (%u bits)\n", nbits);
+ 		for (x = 0; x < len; x++) {
+ 			a <<= 8;
+ 			a |= *buffer++;
 -- 
 2.7.3
