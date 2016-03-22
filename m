@@ -1,86 +1,120 @@
-From: Vinicius Tinti <viniciustinti@gmail.com>
-Subject: Re: [PATCH] x86: Avoid undefined behavior in macro expansion
-Date: Mon, 21 Mar 2016 23:18:42 -0300
-Message-ID: <CALD9WKx1XxbntrWd5RusKeY9cWzLzphOR2qAEK8h5PHZ=1CJCg@mail.gmail.com>
-References: <1458182929-23866-1-git-send-email-viniciustinti@gmail.com>
-	<20160319021533.GT17997@ZenIV.linux.org.uk>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH RESEND v2 00/14] lib/mpi: bug fixes and cleanup
+Date: Mon, 21 Mar 2016 21:54:36 -0700
+Message-ID: <56F0D00C.7000005@intel.com>
+References: <1458566775-5239-1-git-send-email-nicstange@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-	tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-	x86@kernel.org, linux-crypto@vger.kernel.org,
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: Michal Marek <mmarek@suse.com>,
+	Andrzej Zaborowski <andrew.zaborowski@intel.com>,
+	Stephan Mueller <smueller@chronox.de>,
+	Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-To: Al Viro <viro@zeniv.linux.org.uk>
+To: Nicolai Stange <nicstange@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:37084 "EHLO
-	mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750852AbcCVCSo (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Mar 2016 22:18:44 -0400
-In-Reply-To: <20160319021533.GT17997@ZenIV.linux.org.uk>
+Received: from mga01.intel.com ([192.55.52.88]:46002 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750824AbcCVE71 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 22 Mar 2016 00:59:27 -0400
+In-Reply-To: <1458566775-5239-1-git-send-email-nicstange@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 18, 2016 at 11:15 PM, Al Viro <viro@zeniv.linux.org.uk> wrote:
-> On Wed, Mar 16, 2016 at 11:48:49PM -0300, Vinicius Tinti wrote:
->> C11 standard (at 6.10.3.3) says that ## operator (paste) has undefined
->> behavior when one of the result operands is not a valid preprocessing
->> token.
->>
->> Therefore the macro expansion may depend on compiler implementation
->> which may or no preserve the leading white space.
->>
->> Moreover other places in kernel use CONCAT(a,b) instead of CONCAT(a, b).
->> Changing favors concise usage.
->
-> Huh?
->
->> -#define      XMM(i)          CONCAT(%xmm, i)
->> +#define      XMM(i)          CONCAT(%xmm,i)
->
-> What are you talking about?  Undefined behaviour is when the result of
-> concatenation of adjacent tokens is not a valid preprocessor token.
-> It says nothing about the either argument being a single token.
+Hi Nicolai,
+On 03/21/2016 06:26 AM, Nicolai Stange wrote:
+> This is a resend of v2 with the crypto people properly CC'd.
+> 
+> The original v1 can be found here:
+> 
+>   http://lkml.kernel.org/g/1458237606-4954-1-git-send-email-nicstange@gmail.com
+> 
+> 
+> While v1 (hopefully) fixed some issues in mpi_write_sgl() and
+> mpi_read_buffer() introduced by
+>   commit 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers") and by
+>   commit 9cbe21d8f89d ("lib/mpi: only require buffers as big as needed for
+>                         the integer"),
+> I missed that there are some, including out-of-bounds buffer accesses,
+> in mpi_read_raw_from_sgl() as well.
+> 
+> Hence v2, which includes the original stuff from v1 plus my new fixes to
+> mpi_read_raw_from_sgl().
+> 
+> 
+> Applicable to linux-next-20160318.
+> 
+> 
+> Changes to v1:
+>   - [1-8/14]
+>     former [1-8/8], unchanged.
+> 
+>   - [9-14/14]
+>     Added in v2. Fixes to mpi_read_raw_from_sgl().
+> 
+> Nicolai Stange (14):
+>   lib/mpi: mpi_write_sgl(): fix skipping of leading zero limbs
+>   lib/mpi: mpi_write_sgl(): fix style issue with lzero decrement
+>   lib/mpi: mpi_write_sgl(): purge redundant pointer arithmetic
+>   lib/mpi: mpi_write_sgl(): fix out-of-bounds stack access
+>   lib/mpi: mpi_write_sgl(): replace open coded endian conversion
+>   lib/mpi: mpi_read_buffer(): optimize skipping of leading zero limbs
+>   lib/mpi: mpi_read_buffer(): replace open coded endian conversion
+>   lib/mpi: mpi_read_buffer(): fix buffer overflow
+>   lib/mpi: mpi_read_raw_from_sgl(): replace len argument by nbytes
+>   lib/mpi: mpi_read_raw_from_sgl(): don't include leading zero SGEs in
+>     nbytes
+>   lib/mpi: mpi_read_raw_from_sgl(): purge redundant clearing of nbits
+>   lib/mpi: mpi_read_raw_from_sgl(): fix nbits calculation
+>   lib/mpi: mpi_read_raw_from_sgl(): sanitize meaning of indices
+>   lib/mpi: mpi_read_raw_from_sgl(): fix out-of-bounds buffer access
+> 
+>  lib/mpi/mpicoder.c | 122 +++++++++++++++++++----------------------------------
+>  1 file changed, 43 insertions(+), 79 deletions(-)
 
-Please check the example below otherwise it will be hard to explain.
+Thanks for sending this. Nice work. In fact the mpi_write_sgl() function
+worked only because the mpi_normalize() stripped all MSB zero limbs.
+Given that this will hold for all cases we can simplify this even more.
+Unfortunately I don't know if this will be true for mpi_sub() or
+mpi_set_ui() because they are declared in include/linux/mpi.h,
+but never defined anywhere.
 
-The problem is that _i_ can be a macro to be expanded too. And
-it can be a parameter for a _paste_ operator.
+I've found one problem in 08/14 in mpi_read_buffer()
+It's a pointer arithmetic issue, which causes the first limb to be
+written at an invalid address if lzeros > 0. This incremental patch
+fixes it.
 
-  // tricky code
-  #define CONCAT(a,b)    a##b
-  #define    XMM(i)        CONCAT(%xmm, i)
-  .macro foo n
-    x = XMM(\n)
-  .endm
+---8<---
+Subject: [PATCH] lib/mpi: fix pointer arithmetic issue in mpi_read_buffer
 
-_%xmm_ is not a problem but _i_ is.
+Fix pointer arithmetic issue, which causes the first limb to be
+written at invalid address if lzeros > 0.
 
-> In this case after the substitution of e.g. XMM(42) we get 3 tokens:
-> Punctuator[%] Identifier[xmm] Pp-number[42]
-> with ## instructing us to replace the last two with preprocessor token that
-> would be represented as concatenation of their representations.  Which is
-> to say, concatenation of xmm and 42, i.e. xmm42.  Which *is* a
-> representation of a valid preprocessor token - namely, Identifier[xmm42].
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ lib/mpi/mpicoder.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Agree. But it is not this case. I will add the code above at commit and
-describe it. It will be easy to explain what I am trying to solve.
+diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
+index 0c534ac..747606f 100644
+--- a/lib/mpi/mpicoder.c
++++ b/lib/mpi/mpicoder.c
+@@ -201,7 +201,7 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
+ #else
+ #error please implement for this limb size.
+ #endif
+-		memcpy(p, &alimb + lzeros, BYTES_PER_MPI_LIMB - lzeros);
++		memcpy(p, (u8 *)&alimb + lzeros, BYTES_PER_MPI_LIMB - lzeros);
+ 		p += BYTES_PER_MPI_LIMB - lzeros;
+ 		lzeros = 0;
+ 	}
 
-> No undefined behaviour at all.  And yes, you get two preprocessor tokens
-> in the expansion - % and xmm42.  Preprocessor works in terms of tokens,
-> not strings...
-
-Understood.
-
-> If you know of any compiler where these two variants would produce different
-> expansions of XMM(<sequence of digits>), please report it to maintainers of
-> the compiler in question; it's a bug, plain and simple.  And no, there's
-> no undefined behaviour in that.
-
-I reported a bug and discussed over it and I too believe that the tricky
-code that I have just sent triggers an undefined behavior.
-
-What do you think?
-
+---
+Other than that  please include my 
+Tested-by: Tadeusz Struk <tadeusz.struk@intel.com>
+for the whole series.
+Thanks,
 -- 
-Simplicity is the ultimate sophistication
+TS
