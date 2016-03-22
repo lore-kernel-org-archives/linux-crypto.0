@@ -1,115 +1,109 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 02/10] crypto: rsa_helper - add raw integer parser actions
-Date: Mon, 21 Mar 2016 20:14 +0100
-Message-ID: <2101032.u08j97mEB2@tauon.atsec.com>
-References: <1458325927-14737-1-git-send-email-tudor-dan.ambarus@nxp.com> <3040533.U92nQRUNV9@tauon.atsec.com> <AM3PR04MB13004732D24525234255CB72B88F0@AM3PR04MB1300.eurprd04.prod.outlook.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"tadeusz.struk@intel.com" <tadeusz.struk@intel.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Horia Ioan Geanta Neag <horia.geanta@nxp.com>
-To: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
+From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Subject: [PATCH v3 1/3] crypto: s5p-sss - Minor coding cleanups
+Date: Tue, 22 Mar 2016 10:58:23 +0900
+Message-ID: <1458611905-30157-1-git-send-email-k.kozlowski@samsung.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Vladimir Zapolskiy <vz@mleia.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:33312 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757342AbcCUTXD convert rfc822-to-8bit (ORCPT
+Received: from mailout4.w1.samsung.com ([210.118.77.14]:38530 "EHLO
+	mailout4.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754482AbcCVB7F (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Mar 2016 15:23:03 -0400
-In-Reply-To: <AM3PR04MB13004732D24525234255CB72B88F0@AM3PR04MB1300.eurprd04.prod.outlook.com>
+	Mon, 21 Mar 2016 21:59:05 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 21. M=E4rz 2016, 15:17:20 schrieb Tudor-Dan Ambarus:
+From: Krzysztof Kozlowski <krzk@kernel.org>
 
-Hi Tudor,
+Remove unneeded inclusion of delay.h and get rid of indentation from
+labels.
 
-> Hi Stephan,
->=20
-> > -----Original Message-----
-> > From: Stephan Mueller [mailto:smueller@chronox.de]
-> > Sent: Friday, March 18, 2016 9:47 PM
-> > To: Tudor-Dan Ambarus
-> > Cc: herbert@gondor.apana.org.au; tadeusz.struk@intel.com; linux-
-> > crypto@vger.kernel.org; Horia Ioan Geanta Neag
-> > Subject: Re: [PATCH 02/10] crypto: rsa_helper - add raw integer par=
-ser
-> > actions
-> >=20
-> > > +int rsa_check_key_length(unsigned int len)
-> > > +{
-> > > +	switch (len) {
-> > > +	case 512:
-> > > +	case 1024:
-> > > +	case 1536:
-> > > +	case 2048:
-> > > +	case 3072:
-> > > +	case 4096:
-> > > +		return 0;
-> > > +	}
-> >=20
-> > I know that you copied the code to a new location that was there al=
-ready.
-> > But
-> > based on the discussion we had for DH, does it make sense that the =
-kernel
-> > adds
-> > such (artificial) limits?
->=20
-> [ta] This is not within the scope of this patch set, but we can remov=
-e the
-> restrictions in a subsequent patch. Marcel has suggested to not impos=
-e
-> limits on the minimum length of the key. What about the maximum?
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+Acked-by: Vladimir Zapolskiy <vz@mleia.com>
 
-Why any restrictions at all? There is no mathematical reason. There is =
-only a=20
-technical reason which depends on the implementation.
+---
 
-I am not sure how large the keys can be for the software fallback. But =
-maybe=20
-it would make sense to have a general cap like 32k where the software f=
-allback=20
-can handle all key sizes up to that point.
+Changes since v2:
+1. None.
 
-> > > +
-> > > +	return -EINVAL;
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(rsa_check_key_length);
-> > > +
-> > > +int raw_rsa_get_n(void *context, size_t hdrlen, unsigned char ta=
-g,
-> > > +		  const void *value, size_t vlen)
-> > > +{
-> > > +	struct rsa_raw_ctx *ctx =3D context;
-> > > +	struct rsa_raw_key *key =3D &ctx->key;
-> > > +	const char *ptr =3D value;
-> > > +	int ret =3D -EINVAL;
-> > > +
-> > > +	while (!*ptr && vlen) {
-> > > +		ptr++;
-> > > +		vlen--;
-> > > +	}
-> > > +
-> > > +	key->n_sz =3D vlen;
-> > > +	/* In FIPS mode only allow key size 2K & 3K */
-> > > +	if (fips_enabled && (key->n_sz !=3D 256 && key->n_sz !=3D 384))=
- {
-> >=20
-> > Again, you copied that code that used to be there . But very very
-> > recently,
-> > NIST allowed 4k keys too. May I ask to allow it here?
->=20
-> I suggest to do this in a separate patch. Can you send us a pointer t=
-o the
-> NIST specification?
+Changes since v1:
+1. Add Vladimir's acked-by.
+---
+ drivers/crypto/s5p-sss.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-Sure, just let us not forget about it.
->=20
-> Thank you,
-> ta
-
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index 5f161a9777e3..60f835455a41 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -11,7 +11,6 @@
+  *
+  */
+ 
+-#include <linux/delay.h>
+ #include <linux/err.h>
+ #include <linux/module.h>
+ #include <linux/init.h>
+@@ -284,7 +283,7 @@ static int s5p_set_outdata(struct s5p_aes_dev *dev, struct scatterlist *sg)
+ 	dev->sg_dst = sg;
+ 	err = 0;
+ 
+- exit:
++exit:
+ 	return err;
+ }
+ 
+@@ -310,7 +309,7 @@ static int s5p_set_indata(struct s5p_aes_dev *dev, struct scatterlist *sg)
+ 	dev->sg_src = sg;
+ 	err = 0;
+ 
+- exit:
++exit:
+ 	return err;
+ }
+ 
+@@ -452,10 +451,10 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
+ 
+ 	return;
+ 
+- outdata_error:
++outdata_error:
+ 	s5p_unset_indata(dev);
+ 
+- indata_error:
++indata_error:
+ 	s5p_aes_complete(dev, err);
+ 	spin_unlock_irqrestore(&dev->lock, flags);
+ }
+@@ -506,7 +505,7 @@ static int s5p_aes_handle_req(struct s5p_aes_dev *dev,
+ 
+ 	tasklet_schedule(&dev->tasklet);
+ 
+- exit:
++exit:
+ 	return err;
+ }
+ 
+@@ -705,7 +704,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
+ 
+ 	return 0;
+ 
+- err_algs:
++err_algs:
+ 	dev_err(dev, "can't register '%s': %d\n", algs[i].cra_name, err);
+ 
+ 	for (j = 0; j < i; j++)
+@@ -713,7 +712,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
+ 
+ 	tasklet_kill(&pdata->tasklet);
+ 
+- err_irq:
++err_irq:
+ 	clk_disable_unprepare(pdata->clk);
+ 
+ 	s5p_dev = NULL;
+-- 
+2.5.0
