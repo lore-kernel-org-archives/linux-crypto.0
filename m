@@ -1,44 +1,36 @@
-From: Corentin LABBE <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH] crypto: sun4i-ss: use spin_lock_irq{save|restore}
-Date: Tue, 22 Mar 2016 18:48:00 +0100
-Message-ID: <56F18550.7030201@gmail.com>
-References: <1458662694-25527-1-git-send-email-clabbe.montjoie@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, stable <stable@vger.kernel.org>
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-	maxime.ripard@free-electrons.com, wens@csie.org
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] crypto: qat - make sure const_tab is 1024 bytes aligned
+Date: Tue, 22 Mar 2016 10:45:25 -0700
+Message-ID: <1458668725-21232-1-git-send-email-tadeusz.struk@intel.com>
+Cc: linux-crypto@vger.kernel.org, tadeusz.struk@intel.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:34585 "EHLO
-	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753479AbcCVRsI (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Mar 2016 13:48:08 -0400
-In-Reply-To: <1458662694-25527-1-git-send-email-clabbe.montjoie@gmail.com>
+Received: from mga03.intel.com ([134.134.136.65]:57834 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753479AbcCVRub (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 22 Mar 2016 13:50:31 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Le 22/03/2016 17:04, LABBE Corentin a =E9crit :
-> The current sun4i-ss driver is subject to data corruption when
-> ciphering/deciphering.
-> It occurs randomly on end of handled data.
-> No root cause have been found and the only way to remove it is to rep=
-lace
-> all spin_lock_bh by they irq counterparts.
->=20
-> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-> Cc: stable <stable@vger.kernel.org>
-> ---
->  drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
->=20
+FW requires the const_tab to be 1024 bytes aligned.
 
-Hello
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ drivers/crypto/qat/qat_common/adf_admin.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I have made a huge spelling problem, and didn't added Fixes tag.
-I will resend it.
-Sorry for the noise.
-
-Regards
+diff --git a/drivers/crypto/qat/qat_common/adf_admin.c b/drivers/crypto/qat/qat_common/adf_admin.c
+index eb557f6..ce7c462 100644
+--- a/drivers/crypto/qat/qat_common/adf_admin.c
++++ b/drivers/crypto/qat/qat_common/adf_admin.c
+@@ -61,7 +61,7 @@
+ #define ADF_DH895XCC_MAILBOX_STRIDE 0x1000
+ #define ADF_ADMINMSG_LEN 32
+ 
+-static const u8 const_tab[1024] = {
++static const u8 const_tab[1024] __aligned(1024) = {
+ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-- 
+2.1.4
