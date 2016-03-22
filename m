@@ -1,7 +1,7 @@
 From: Nicolai Stange <nicstange@gmail.com>
-Subject: [PATCH v3 13/14] lib/mpi: mpi_read_raw_from_sgl(): sanitize meaning of indices
-Date: Tue, 22 Mar 2016 13:18:07 +0100
-Message-ID: <1458649087-1721-1-git-send-email-nicstange@gmail.com>
+Subject: [PATCH v3 14/14] lib/mpi: mpi_read_raw_from_sgl(): fix out-of-bounds buffer access
+Date: Tue, 22 Mar 2016 13:18:16 +0100
+Message-ID: <1458649096-1794-1-git-send-email-nicstange@gmail.com>
 References: <1458648768-1469-1-git-send-email-nicstange@gmail.com>
 Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
 	Michal Marek <mmarek@suse.com>,
@@ -12,85 +12,93 @@ Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:36195 "EHLO
-	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756546AbcCVMSM (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:33727 "EHLO
+	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758702AbcCVMSV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Mar 2016 08:18:12 -0400
+	Tue, 22 Mar 2016 08:18:21 -0400
 In-Reply-To: <1458648768-1469-1-git-send-email-nicstange@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Within the byte reading loop in mpi_read_raw_sgl(), there are two
-housekeeping indices used, z and x.
+Within the copying loop in mpi_read_raw_from_sgl(), the last input SGE's
+byte count gets artificially extended as follows:
 
-At all times, the index z represents the number of output bytes covered
-by the input SGEs for which processing has completed so far. This includes
-any leading zero bytes within the most significant limb.
+  if (sg_is_last(sg) && (len % BYTES_PER_MPI_LIMB))
+    len += BYTES_PER_MPI_LIMB - (len % BYTES_PER_MPI_LIMB);
 
-The index x changes its meaning after the first outer loop's iteration
-though: while processing the first input SGE, it represents
+Within the following byte copying loop, this causes reads beyond that
+SGE's allocated buffer:
 
-  "number of leading zero bytes in most significant output limb" +
-   "current position within current SGE"
+  BUG: KASAN: slab-out-of-bounds in mpi_read_raw_from_sgl+0x331/0x650
+                                     at addr ffff8801e168d4d8
+  Read of size 1 by task systemd-udevd/721
+  [...]
+  Call Trace:
+   [<ffffffff818c4d35>] dump_stack+0xbc/0x117
+   [<ffffffff818c4c79>] ? _atomic_dec_and_lock+0x169/0x169
+   [<ffffffff814af5d1>] ? print_section+0x61/0xb0
+   [<ffffffff814b1109>] print_trailer+0x179/0x2c0
+   [<ffffffff814bc524>] object_err+0x34/0x40
+   [<ffffffff814bfdc7>] kasan_report_error+0x307/0x8c0
+   [<ffffffff814bf315>] ? kasan_unpoison_shadow+0x35/0x50
+   [<ffffffff814bf38e>] ? kasan_kmalloc+0x5e/0x70
+   [<ffffffff814c0ad1>] kasan_report+0x71/0xa0
+   [<ffffffff81938171>] ? mpi_read_raw_from_sgl+0x331/0x650
+   [<ffffffff814bf1a6>] __asan_load1+0x46/0x50
+   [<ffffffff81938171>] mpi_read_raw_from_sgl+0x331/0x650
+   [<ffffffff817f41b6>] rsa_verify+0x106/0x260
+   [<ffffffff817f40b0>] ? rsa_set_pub_key+0xf0/0xf0
+   [<ffffffff818edc79>] ? sg_init_table+0x29/0x50
+   [<ffffffff817f4d22>] ? pkcs1pad_sg_set_buf+0xb2/0x2e0
+   [<ffffffff817f5b74>] pkcs1pad_verify+0x1f4/0x2b0
+   [<ffffffff81831057>] public_key_verify_signature+0x3a7/0x5e0
+   [<ffffffff81830cb0>] ? public_key_describe+0x80/0x80
+   [<ffffffff817830f0>] ? keyring_search_aux+0x150/0x150
+   [<ffffffff818334a4>] ? x509_request_asymmetric_key+0x114/0x370
+   [<ffffffff814b83f0>] ? kfree+0x220/0x370
+   [<ffffffff818312c2>] public_key_verify_signature_2+0x32/0x50
+   [<ffffffff81830b5c>] verify_signature+0x7c/0xb0
+   [<ffffffff81835d0c>] pkcs7_validate_trust+0x42c/0x5f0
+   [<ffffffff813c391a>] system_verify_data+0xca/0x170
+   [<ffffffff813c3850>] ? top_trace_array+0x9b/0x9b
+   [<ffffffff81510b29>] ? __vfs_read+0x279/0x3d0
+   [<ffffffff8129372f>] mod_verify_sig+0x1ff/0x290
+  [...]
 
-For the remaining SGEs OTOH, x corresponds just to
+The exact purpose of the len extension isn't clear to me, but due to
+its form, I suspect that it's a leftover somehow accounting for leading
+zero bytes within the most significant output limb.
 
-  "current position within current SGE"
+Note however that without that len adjustement, the total number of bytes
+ever processed by the inner loop equals nbytes and thus, the last output
+limb gets written at this point. Thus the net effect of the len adjustement
+cited above is just to keep the inner loop running for some more
+iterations, namely < BYTES_PER_MPI_LIMB ones, reading some extra bytes from
+beyond the last SGE's buffer and discarding them afterwards.
 
-After all, it is only the sum of z and x that has any meaning for the
-output buffer and thus, the
+Fix this issue by purging the extension of len beyond the last input SGE's
+buffer length.
 
-  "number of leading zero bytes in most significant output limb"
-
-part can be moved away from x into z from the beginning, opening up the
-opportunity for cleaner code.
-
-Before the outer loop iterating over the SGEs, don't initialize z with
-zero, but with the number of leading zero bytes in the most significant
-output limb. For the inner loop iterating over a single SGE's bytes,
-get rid of the buf_shift offset to x' bounds and let x run from zero to
-sg->length - 1.
-
+Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
 Signed-off-by: Nicolai Stange <nicstange@gmail.com>
 ---
- lib/mpi/mpicoder.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ lib/mpi/mpicoder.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
 diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index 24a0155..a9f1097 100644
+index a9f1097..747606f 100644
 --- a/lib/mpi/mpicoder.c
 +++ b/lib/mpi/mpicoder.c
-@@ -477,19 +477,17 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
- 
- 	j = nlimbs - 1;
- 	a = 0;
--	z = 0;
--	x = BYTES_PER_MPI_LIMB - nbytes % BYTES_PER_MPI_LIMB;
--	x %= BYTES_PER_MPI_LIMB;
-+	z = BYTES_PER_MPI_LIMB - nbytes % BYTES_PER_MPI_LIMB;
-+	z %= BYTES_PER_MPI_LIMB;
- 
- 	for_each_sg(sgl, sg, ents, i) {
+@@ -484,9 +484,6 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
  		const u8 *buffer = sg_virt(sg) + lzeros;
  		int len = sg->length - lzeros;
--		int buf_shift = x;
  
- 		if  (sg_is_last(sg) && (len % BYTES_PER_MPI_LIMB))
- 			len += BYTES_PER_MPI_LIMB - (len % BYTES_PER_MPI_LIMB);
- 
--		for (; x < len + buf_shift; x++) {
-+		for (x = 0; x < len; x++) {
+-		if  (sg_is_last(sg) && (len % BYTES_PER_MPI_LIMB))
+-			len += BYTES_PER_MPI_LIMB - (len % BYTES_PER_MPI_LIMB);
+-
+ 		for (x = 0; x < len; x++) {
  			a <<= 8;
  			a |= *buffer++;
- 			if (((z + x + 1) % BYTES_PER_MPI_LIMB) == 0) {
-@@ -498,7 +496,6 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
- 			}
- 		}
- 		z += x;
--		x = 0;
- 		lzeros = 0;
- 	}
- 	return val;
 -- 
 2.7.4
