@@ -1,35 +1,84 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH RESEND v2 00/14] lib/mpi: bug fixes and cleanup
-Date: Tue, 22 Mar 2016 07:10:23 -0700
-Message-ID: <56F1524F.2060103@intel.com>
-References: <1458566775-5239-1-git-send-email-nicstange@gmail.com>
- <56F0D00C.7000005@intel.com> <87mvprrny6.fsf@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Michal Marek <mmarek@suse.com>,
-	Andrzej Zaborowski <andrew.zaborowski@intel.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Nicolai Stange <nicstange@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:50631 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759284AbcCVOTB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Mar 2016 10:19:01 -0400
-In-Reply-To: <87mvprrny6.fsf@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: [PATCH] crypto: sun4i-ss: use spin_lock_irq{save|restore}
+Date: Tue, 22 Mar 2016 17:04:54 +0100
+Message-ID: <1458662694-25527-1-git-send-email-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	LABBE Corentin <clabbe.montjoie@gmail.com>,
+	stable <stable@vger.kernel.org>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	maxime.ripard@free-electrons.com, wens@csie.org
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 03/22/2016 12:06 AM, Nicolai Stange wrote:
-> Ugh. I'll send a v3 fixing this up during the course of the day. Or do
-> you prefer to apply your incremental patch below to this v2 as it
-> stands?
+The current sun4i-ss driver is subject to data corruption when
+ciphering/deciphering.
+It occurs randomly on end of handled data.
+No root cause have been found and the only way to remove it is to replace
+all spin_lock_bh by they irq counterparts.
 
-Either way is fine with me.
-Thanks,
+Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+Cc: stable <stable@vger.kernel.org>
+---
+ drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+index a19ee12..e72fea73 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+@@ -35,6 +35,7 @@ static int sun4i_ss_opti_poll(struct ablkcipher_request *areq)
+ 	unsigned int todo;
+ 	struct sg_mapping_iter mi, mo;
+ 	unsigned int oi, oo; /* offset for in and out */
++	unsigned long flags;
+ 
+ 	if (areq->nbytes == 0)
+ 		return 0;
+@@ -49,7 +50,7 @@ static int sun4i_ss_opti_poll(struct ablkcipher_request *areq)
+ 		return -EINVAL;
+ 	}
+ 
+-	spin_lock_bh(&ss->slock);
++	spin_lock_irqsave(&ss->slock, flags);
+ 
+ 	for (i = 0; i < op->keylen; i += 4)
+ 		writel(*(op->key + i / 4), ss->base + SS_KEY0 + i);
+@@ -117,7 +118,7 @@ release_ss:
+ 	sg_miter_stop(&mi);
+ 	sg_miter_stop(&mo);
+ 	writel(0, ss->base + SS_CTL);
+-	spin_unlock_bh(&ss->slock);
++	spin_unlock_irqrestore(&ss->slock, flags);
+ 	return err;
+ }
+ 
+@@ -149,6 +150,7 @@ static int sun4i_ss_cipher_poll(struct ablkcipher_request *areq)
+ 	unsigned int ob = 0;	/* offset in buf */
+ 	unsigned int obo = 0;	/* offset in bufo*/
+ 	unsigned int obl = 0;	/* length of data in bufo */
++	unsigned long flags;
+ 
+ 	if (areq->nbytes == 0)
+ 		return 0;
+@@ -181,7 +183,7 @@ static int sun4i_ss_cipher_poll(struct ablkcipher_request *areq)
+ 	if (no_chunk == 1)
+ 		return sun4i_ss_opti_poll(areq);
+ 
+-	spin_lock_bh(&ss->slock);
++	spin_lock_irqsave(&ss->slock, flags);
+ 
+ 	for (i = 0; i < op->keylen; i += 4)
+ 		writel(*(op->key + i / 4), ss->base + SS_KEY0 + i);
+@@ -308,7 +310,7 @@ release_ss:
+ 	sg_miter_stop(&mi);
+ 	sg_miter_stop(&mo);
+ 	writel(0, ss->base + SS_CTL);
+-	spin_unlock_bh(&ss->slock);
++	spin_unlock_irqrestore(&ss->slock, flags);
+ 
+ 	return err;
+ }
 -- 
-TS
+2.7.3
