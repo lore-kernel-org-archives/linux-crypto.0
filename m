@@ -1,71 +1,68 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 2/8] crypto: add driver-side scomp interface
-Date: Wed, 23 Mar 2016 18:18:57 +0800
-Message-ID: <20160323101857.GA27198@gondor.apana.org.au>
-References: <20160216195717.GA4207@gondor.apana.org.au>
- <1456336310-3737-1-git-send-email-giovanni.cabiddu@intel.com>
- <1456336310-3737-3-git-send-email-giovanni.cabiddu@intel.com>
- <20160317110027.GA5378@gondor.apana.org.au>
- <20160318140248.GA22461@sivswdev01.ir.intel.com>
+Subject: Re: [PATCH] PKCS#7: pkcs7_validate_trust(): initialize the _trusted
+ output argument
+Date: Wed, 23 Mar 2016 20:59:12 +0800
+Message-ID: <20160323125912.GA29481@gondor.apana.org.au>
+References: <1458512626-2839-1-git-send-email-nicstange@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Howells <dhowells@redhat.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Nicolai Stange <nicstange@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38106 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:42050 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754819AbcCWKTV (ORCPT
+	with ESMTP id S1754010AbcCWM70 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Mar 2016 06:19:21 -0400
+	Wed, 23 Mar 2016 08:59:26 -0400
 Content-Disposition: inline
-In-Reply-To: <20160318140248.GA22461@sivswdev01.ir.intel.com>
+In-Reply-To: <1458512626-2839-1-git-send-email-nicstange@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 18, 2016 at 02:02:49PM +0000, Giovanni Cabiddu wrote:
->
-> Are you suggesting to add to the struct acomp_req a pointer to a vmalloc
-> area and remove the request context (which is contiguous to acomp_req and
-> allocated in request_alloc)?
+On Sun, Mar 20, 2016 at 11:23:46PM +0100, Nicolai Stange wrote:
+> Despite what the DocBook comment to pkcs7_validate_trust() says, the
+> *_trusted argument is never set to false.
+> 
+> pkcs7_validate_trust() only positively sets *_trusted upon encountering
+> a trusted PKCS#7 SignedInfo block.
+> 
+> This is quite unfortunate since its callers, system_verify_data() for
+> example, depend on pkcs7_validate_trust() clearing *_trusted on non-trust.
+> 
+> Indeed, UBSAN splats when attempting to load the uninitialized local
+> variable 'trusted' from system_verify_data() in pkcs7_validate_trust():
+> 
+>   UBSAN: Undefined behaviour in crypto/asymmetric_keys/pkcs7_trust.c:194:14
+>   load of value 82 is not a valid value for type '_Bool'
+>   [...]
+>   Call Trace:
+>     [<ffffffff818c4d35>] dump_stack+0xbc/0x117
+>     [<ffffffff818c4c79>] ? _atomic_dec_and_lock+0x169/0x169
+>     [<ffffffff8194113b>] ubsan_epilogue+0xd/0x4e
+>     [<ffffffff819419fa>] __ubsan_handle_load_invalid_value+0x111/0x158
+>     [<ffffffff819418e9>] ? val_to_string.constprop.12+0xcf/0xcf
+>     [<ffffffff818334a4>] ? x509_request_asymmetric_key+0x114/0x370
+>     [<ffffffff814b83f0>] ? kfree+0x220/0x370
+>     [<ffffffff818312c2>] ? public_key_verify_signature_2+0x32/0x50
+>     [<ffffffff81835e04>] pkcs7_validate_trust+0x524/0x5f0
+>     [<ffffffff813c391a>] system_verify_data+0xca/0x170
+>     [<ffffffff813c3850>] ? top_trace_array+0x9b/0x9b
+>     [<ffffffff81510b29>] ? __vfs_read+0x279/0x3d0
+>     [<ffffffff8129372f>] mod_verify_sig+0x1ff/0x290
+>     [...]
+> 
+> The implication is that pkcs7_validate_trust() effectively grants trust
+> when it really shouldn't have.
+> 
+> Fix this by explicitly setting *_trusted to false at the very beginning
+> of pkcs7_validate_trust().
+> 
+> Signed-off-by: Nicolai Stange <nicstange@gmail.com>
 
-What I'm suggesting is simply to generalise the noctx case so that
-it applies to acomp rather than just scomp.
-
-In fact, I think we should do it as a separate user interface, e.g.,
-crypto_qdecomp that does the decompression without a vmalloc work
-space.  You'd only have to implement decompression support for
-qdecomp since all compression algorithms require a vmalloc work
-space.
-
-So we would end up with crypto_acomp which always requires a
-vmalloc work space and crypto_qdecomp for the noctx case.
-
-Underneath you'd still maintain the two interfaces of acomp for
-the SG case and scomp for the linear case.
-
-> > Chances are that with hardware offload that you won't have to do
-> > such a vmalloc anyway.  IOW acomp implementations are much more
-> > likely to be of the noctx type than scomp.
-> Our HW offload will always need a context area in the acomp_req but
-> I agree, there might be other acomp implementations which won't.
-
-That's interesting, why would your hardware need a vmalloc work
-space per-request?
-
-> Will allocate_space require a parameter which indicates the direction
-> of the operation (compression or decompression) or are we relying on the
-> user of the crypto API to know if he needs to call this function or not?
-
-At this point I don't believe the savings would be worth our effort
-so let's continue doing what we currently do which is to always
-allocate for both directions.  Note that if you do the acomp/qdecomp
-split then you'd only do the allocation for acomp.
-
-In fact, we could then forget about the separate allocate_space
-call and just do it inside acomp_request_alloc as the noctx case
-would be accessed through the separate qdecomp interface.
-
-Thanks,
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
