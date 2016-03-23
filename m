@@ -1,7 +1,7 @@
 From: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-Subject: [PATCH v2 3/4] crypto: add CONFIG_ symbol for rsa helper
-Date: Wed, 23 Mar 2016 17:04:18 +0200
-Message-ID: <1458745459-1096-4-git-send-email-tudor-dan.ambarus@nxp.com>
+Subject: [PATCH v2 4/4] crypto: rsa_helper - export symbols for asn1 structures
+Date: Wed, 23 Mar 2016 17:04:19 +0200
+Message-ID: <1458745459-1096-5-git-send-email-tudor-dan.ambarus@nxp.com>
 References: <1458745459-1096-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -9,63 +9,36 @@ Cc: <linux-crypto@vger.kernel.org>, <smueller@chronox.de>,
 	<horia.geanta@nxp.com>, Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 To: <herbert@gondor.apana.org.au>, <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0093.outbound.protection.outlook.com ([65.55.169.93]:13563
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+Received: from mail-bn1on0078.outbound.protection.outlook.com ([157.56.110.78]:55520
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753113AbcCWPEg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Mar 2016 11:04:36 -0400
+	id S1753113AbcCWPEn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 23 Mar 2016 11:04:43 -0400
 In-Reply-To: <1458745459-1096-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-All RSA implementations can now use the key extract symbols
-by selecting CRYPTO_RSA_HELPER.
+Export rsapubkey_decoder and rsaprivkey_decoder structures,
+since they can (will) be used by caam and qat drivers.
 
 Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 ---
- crypto/Kconfig  | 8 ++++++--
- crypto/Makefile | 6 +++---
- 2 files changed, 9 insertions(+), 5 deletions(-)
+ crypto/rsa_helper.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index f6bfdda..2bdf882 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -93,11 +93,15 @@ config CRYPTO_AKCIPHER
- 	select CRYPTO_AKCIPHER2
- 	select CRYPTO_ALGAPI
+diff --git a/crypto/rsa_helper.c b/crypto/rsa_helper.c
+index df1f480..d81a0ec 100644
+--- a/crypto/rsa_helper.c
++++ b/crypto/rsa_helper.c
+@@ -21,6 +21,9 @@
+ #include "rsapubkey-asn1.h"
+ #include "rsaprivkey-asn1.h"
  
--config CRYPTO_RSA
--	tristate "RSA algorithm"
-+config CRYPTO_RSA_HELPER
-+	bool "RSA key extract helper"
- 	select CRYPTO_AKCIPHER
- 	select MPILIB
- 	select ASN1
++EXPORT_SYMBOL_GPL(rsapubkey_decoder);
++EXPORT_SYMBOL_GPL(rsaprivkey_decoder);
 +
-+config CRYPTO_RSA
-+	tristate "RSA algorithm"
-+	select CRYPTO_RSA_HELPER
- 	help
- 	  Generic implementation of the RSA public key algorithm.
- 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 4f4ef7e..d336d83 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -36,10 +36,10 @@ $(obj)/rsaprivkey-asn1.o: $(obj)/rsaprivkey-asn1.c $(obj)/rsaprivkey-asn1.h
- clean-files += rsapubkey-asn1.c rsapubkey-asn1.h
- clean-files += rsaprivkey-asn1.c rsaprivkey-asn1.h
- 
--rsa_generic-y := rsapubkey-asn1.o
--rsa_generic-y += rsaprivkey-asn1.o
-+crypto_rsa_helper-y += rsapubkey-asn1.o rsaprivkey-asn1.o rsa_helper.o
-+obj-$(CONFIG_CRYPTO_RSA_HELPER) += crypto_rsa_helper.o
-+
- rsa_generic-y += rsa.o
--rsa_generic-y += rsa_helper.o
- rsa_generic-y += rsa-pkcs1pad.o
- obj-$(CONFIG_CRYPTO_RSA) += rsa_generic.o
- 
+ int rsa_get_n(void *context, size_t hdrlen, unsigned char tag,
+ 	      const void *value, size_t vlen)
+ {
 -- 
 1.8.3.1
