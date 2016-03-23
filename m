@@ -1,43 +1,72 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH] crypto: qat - Remove redundant nrbg rings
-Date: Tue, 22 Mar 2016 11:25:21 -0700
-Message-ID: <1458671121-23244-1-git-send-email-tadeusz.struk@intel.com>
-Cc: linux-crypto@vger.kernel.org,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	Ahsan Atta <ahsan.atta@intel.com>
-To: herbert@gondor.apana.org.au
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v3 2/8] crypto: add driver-side scomp interface
+Date: Wed, 23 Mar 2016 18:18:57 +0800
+Message-ID: <20160323101857.GA27198@gondor.apana.org.au>
+References: <20160216195717.GA4207@gondor.apana.org.au>
+ <1456336310-3737-1-git-send-email-giovanni.cabiddu@intel.com>
+ <1456336310-3737-3-git-send-email-giovanni.cabiddu@intel.com>
+ <20160317110027.GA5378@gondor.apana.org.au>
+ <20160318140248.GA22461@sivswdev01.ir.intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:3294 "EHLO mga04.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750735AbcCVSaS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Mar 2016 14:30:18 -0400
+Received: from helcar.hengli.com.au ([209.40.204.226]:38106 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754819AbcCWKTV (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 23 Mar 2016 06:19:21 -0400
+Content-Disposition: inline
+In-Reply-To: <20160318140248.GA22461@sivswdev01.ir.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Ahsan Atta <ahsan.atta@intel.com>
+On Fri, Mar 18, 2016 at 02:02:49PM +0000, Giovanni Cabiddu wrote:
+>
+> Are you suggesting to add to the struct acomp_req a pointer to a vmalloc
+> area and remove the request context (which is contiguous to acomp_req and
+> allocated in request_alloc)?
 
-Remove redundant nrbg rings.
+What I'm suggesting is simply to generalise the noctx case so that
+it applies to acomp rather than just scomp.
 
-Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
- drivers/crypto/qat/qat_common/adf_cfg_strings.h | 2 --
- 1 file changed, 2 deletions(-)
+In fact, I think we should do it as a separate user interface, e.g.,
+crypto_qdecomp that does the decompression without a vmalloc work
+space.  You'd only have to implement decompression support for
+qdecomp since all compression algorithms require a vmalloc work
+space.
 
-diff --git a/drivers/crypto/qat/qat_common/adf_cfg_strings.h b/drivers/crypto/qat/qat_common/adf_cfg_strings.h
-index 1357511..7632ed0 100644
---- a/drivers/crypto/qat/qat_common/adf_cfg_strings.h
-+++ b/drivers/crypto/qat/qat_common/adf_cfg_strings.h
-@@ -57,10 +57,8 @@
- #define ADF_RING_DC_SIZE "NumConcurrentRequests"
- #define ADF_RING_ASYM_TX "RingAsymTx"
- #define ADF_RING_SYM_TX "RingSymTx"
--#define ADF_RING_RND_TX "RingNrbgTx"
- #define ADF_RING_ASYM_RX "RingAsymRx"
- #define ADF_RING_SYM_RX "RingSymRx"
--#define ADF_RING_RND_RX "RingNrbgRx"
- #define ADF_RING_DC_TX "RingTx"
- #define ADF_RING_DC_RX "RingRx"
- #define ADF_ETRMGR_BANK "Bank"
+So we would end up with crypto_acomp which always requires a
+vmalloc work space and crypto_qdecomp for the noctx case.
+
+Underneath you'd still maintain the two interfaces of acomp for
+the SG case and scomp for the linear case.
+
+> > Chances are that with hardware offload that you won't have to do
+> > such a vmalloc anyway.  IOW acomp implementations are much more
+> > likely to be of the noctx type than scomp.
+> Our HW offload will always need a context area in the acomp_req but
+> I agree, there might be other acomp implementations which won't.
+
+That's interesting, why would your hardware need a vmalloc work
+space per-request?
+
+> Will allocate_space require a parameter which indicates the direction
+> of the operation (compression or decompression) or are we relying on the
+> user of the crypto API to know if he needs to call this function or not?
+
+At this point I don't believe the savings would be worth our effort
+so let's continue doing what we currently do which is to always
+allocate for both directions.  Note that if you do the acomp/qdecomp
+split then you'd only do the allocation for acomp.
+
+In fact, we could then forget about the separate allocate_space
+call and just do it inside acomp_request_alloc as the noctx case
+would be accessed through the separate qdecomp interface.
+
+Thanks,
 -- 
-2.1.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
