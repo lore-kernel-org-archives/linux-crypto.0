@@ -1,68 +1,74 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] PKCS#7: pkcs7_validate_trust(): initialize the _trusted
- output argument
-Date: Wed, 23 Mar 2016 20:59:12 +0800
-Message-ID: <20160323125912.GA29481@gondor.apana.org.au>
-References: <1458512626-2839-1-git-send-email-nicstange@gmail.com>
+Subject: Crypto Fixes for 4.6
+Date: Wed, 23 Mar 2016 21:09:39 +0800
+Message-ID: <20160323130939.GA29644@gondor.apana.org.au>
+References: <20140804130339.GA1178@gondor.apana.org.au>
+ <20141007131826.GA29688@gondor.apana.org.au>
+ <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150415033951.GA1406@gondor.apana.org.au>
+ <20150622084457.GA7806@gondor.apana.org.au>
+ <20150831135655.GA2694@gondor.apana.org.au>
+ <20151102080427.GA8465@gondor.apana.org.au>
+ <20160111101450.GA24044@gondor.apana.org.au>
+ <20160122101828.GA15966@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Howells <dhowells@redhat.com>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Nicolai Stange <nicstange@gmail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:42050 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:38937 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754010AbcCWM70 (ORCPT
+	with ESMTP id S1754534AbcCWNJu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Mar 2016 08:59:26 -0400
+	Wed, 23 Mar 2016 09:09:50 -0400
 Content-Disposition: inline
-In-Reply-To: <1458512626-2839-1-git-send-email-nicstange@gmail.com>
+In-Reply-To: <20160122101828.GA15966@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Mar 20, 2016 at 11:23:46PM +0100, Nicolai Stange wrote:
-> Despite what the DocBook comment to pkcs7_validate_trust() says, the
-> *_trusted argument is never set to false.
-> 
-> pkcs7_validate_trust() only positively sets *_trusted upon encountering
-> a trusted PKCS#7 SignedInfo block.
-> 
-> This is quite unfortunate since its callers, system_verify_data() for
-> example, depend on pkcs7_validate_trust() clearing *_trusted on non-trust.
-> 
-> Indeed, UBSAN splats when attempting to load the uninitialized local
-> variable 'trusted' from system_verify_data() in pkcs7_validate_trust():
-> 
->   UBSAN: Undefined behaviour in crypto/asymmetric_keys/pkcs7_trust.c:194:14
->   load of value 82 is not a valid value for type '_Bool'
->   [...]
->   Call Trace:
->     [<ffffffff818c4d35>] dump_stack+0xbc/0x117
->     [<ffffffff818c4c79>] ? _atomic_dec_and_lock+0x169/0x169
->     [<ffffffff8194113b>] ubsan_epilogue+0xd/0x4e
->     [<ffffffff819419fa>] __ubsan_handle_load_invalid_value+0x111/0x158
->     [<ffffffff819418e9>] ? val_to_string.constprop.12+0xcf/0xcf
->     [<ffffffff818334a4>] ? x509_request_asymmetric_key+0x114/0x370
->     [<ffffffff814b83f0>] ? kfree+0x220/0x370
->     [<ffffffff818312c2>] ? public_key_verify_signature_2+0x32/0x50
->     [<ffffffff81835e04>] pkcs7_validate_trust+0x524/0x5f0
->     [<ffffffff813c391a>] system_verify_data+0xca/0x170
->     [<ffffffff813c3850>] ? top_trace_array+0x9b/0x9b
->     [<ffffffff81510b29>] ? __vfs_read+0x279/0x3d0
->     [<ffffffff8129372f>] mod_verify_sig+0x1ff/0x290
->     [...]
-> 
-> The implication is that pkcs7_validate_trust() effectively grants trust
-> when it really shouldn't have.
-> 
-> Fix this by explicitly setting *_trusted to false at the very beginning
-> of pkcs7_validate_trust().
-> 
-> Signed-off-by: Nicolai Stange <nicstange@gmail.com>
+Hi Linus:
 
-Patch applied.  Thanks!
+This push fixes the following issues:
+
+API:
+
+* Fix kzalloc error path crash in ecryptfs added by skcipher
+conversion.  Note the subject of the commit is screwed up and
+the correct subject is actually in the body.
+
+Drivers:
+
+* A number of fixes to the marvell cesa hashing code.
+* Remove bogus nested irqsave that clobbers the saved flags in ccp.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Boris BREZILLON (3):
+      crypto: marvell/cesa - fix memory leak
+      crypto: marvell/cesa - initialize hash states
+      crypto: marvell/cesa - forward devm_ioremap_resource() error code
+
+Gary R Hook (1):
+      crypto: ccp - fix lock acquisition code
+
+Herbert Xu (1):
+      eCryptfs: Use skcipher and shash
+
+ drivers/crypto/ccp/ccp-dev.c  |    6 +--
+ drivers/crypto/marvell/cesa.c |    2 +-
+ drivers/crypto/marvell/cesa.h |    3 +-
+ drivers/crypto/marvell/hash.c |  106 +++++++++++++++--------------------------
+ fs/ecryptfs/keystore.c        |    6 +--
+ 5 files changed, 46 insertions(+), 77 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
