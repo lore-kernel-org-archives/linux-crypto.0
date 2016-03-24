@@ -1,84 +1,153 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH RESEND] crypto: sun4i-ss: Replace spinlock_bh by spin_lock_irq{save|restore}
-Date: Wed, 23 Mar 2016 16:11:24 +0100
-Message-ID: <1458745884-27798-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	LABBE Corentin <clabbe.montjoie@gmail.com>,
-	stable <stable@vger.kernel.org>
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-	maxime.ripard@free-electrons.com, wens@csie.org
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: megha.dey@linux.intel.com
+Subject: [PATCH 0/7] crypto: SHA256 multibuffer implementation
+Date: Thu, 24 Mar 2016 13:25:56 -0700
+Message-ID: <1458851163-3448-1-git-send-email-megha.dey@linux.intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	tim.c.chen@linux.intel.com, fenghua.yu@intel.com,
+	Megha Dey <megha.dey@linux.intel.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:30530 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751683AbcCXUWa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 24 Mar 2016 16:22:30 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The current sun4i-ss driver could generate data corruption when ciphering/deciphering.
-It occurs randomly on end of handled data.
-No root cause have been found and the only way to remove it is to replace
-all spin_lock_bh by their irq counterparts.
+=46rom: Megha Dey <megha.dey@linux.intel.com>
 
-Fixes: 6298e948215f ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
-Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-Cc: stable <stable@vger.kernel.org>
----
- drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+In this patch series, we introduce the multi-buffer crypto algorithm on
+x86_64 and apply it to SHA256 hash computation.  The multi-buffer techn=
+ique
+takes advantage of the 8 data lanes in the AVX2 registers and allows
+computation to be performed on data from multiple jobs in parallel.
+This allows us to parallelize computations when data inter-dependency i=
+n
+a single crypto job prevents us to fully parallelize our computations.
+The algorithm can be extended to other hashing and encryption schemes
+in the future.
 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-index 7be3fbc..3830d7c 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-@@ -35,6 +35,7 @@ static int sun4i_ss_opti_poll(struct ablkcipher_request *areq)
- 	unsigned int todo;
- 	struct sg_mapping_iter mi, mo;
- 	unsigned int oi, oo; /* offset for in and out */
-+	unsigned long flags;
- 
- 	if (areq->nbytes == 0)
- 		return 0;
-@@ -49,7 +50,7 @@ static int sun4i_ss_opti_poll(struct ablkcipher_request *areq)
- 		return -EINVAL;
- 	}
- 
--	spin_lock_bh(&ss->slock);
-+	spin_lock_irqsave(&ss->slock, flags);
- 
- 	for (i = 0; i < op->keylen; i += 4)
- 		writel(*(op->key + i / 4), ss->base + SS_KEY0 + i);
-@@ -117,7 +118,7 @@ release_ss:
- 	sg_miter_stop(&mi);
- 	sg_miter_stop(&mo);
- 	writel(0, ss->base + SS_CTL);
--	spin_unlock_bh(&ss->slock);
-+	spin_unlock_irqrestore(&ss->slock, flags);
- 	return err;
- }
- 
-@@ -149,6 +150,7 @@ static int sun4i_ss_cipher_poll(struct ablkcipher_request *areq)
- 	unsigned int ob = 0;	/* offset in buf */
- 	unsigned int obo = 0;	/* offset in bufo*/
- 	unsigned int obl = 0;	/* length of data in bufo */
-+	unsigned long flags;
- 
- 	if (areq->nbytes == 0)
- 		return 0;
-@@ -181,7 +183,7 @@ static int sun4i_ss_cipher_poll(struct ablkcipher_request *areq)
- 	if (no_chunk == 1)
- 		return sun4i_ss_opti_poll(areq);
- 
--	spin_lock_bh(&ss->slock);
-+	spin_lock_irqsave(&ss->slock, flags);
- 
- 	for (i = 0; i < op->keylen; i += 4)
- 		writel(*(op->key + i / 4), ss->base + SS_KEY0 + i);
-@@ -307,7 +309,7 @@ release_ss:
- 	sg_miter_stop(&mi);
- 	sg_miter_stop(&mo);
- 	writel(0, ss->base + SS_CTL);
--	spin_unlock_bh(&ss->slock);
-+	spin_unlock_irqrestore(&ss->slock, flags);
- 
- 	return err;
- }
--- 
-2.7.3
+On multi-buffer SHA256 computation with AVX2, we see throughput increas=
+e
+up to 2.2x over the existing x86_64 single buffer AVX2 algorithm.
+
+The multi-buffer crypto algorithm is described in the following paper:
+Processing Multiple Buffers in Parallel to Increase Performance on
+Intel=C2=AE Architecture Processors
+http://www.intel.com/content/www/us/en/communications/communications-ia=
+-multi-buffer-paper.html
+
+The outline of the algorithm is sketched below:
+Any driver requesting the crypto service will place an async
+crypto request on the workqueue.  The multi-buffer crypto daemon will
+pull request from work queue and put each request in an empty data lane
+for multi-buffer crypto computation.  When all the empty lanes are fill=
+ed,
+computation will commence on the jobs in parallel and the job with the
+shortest remaining buffer will get completed and be returned.  To preve=
+nt
+prolonged stall when there is no new jobs arriving, we will flush a cry=
+pto
+job if it has not been completed after a maximum allowable delay.
+
+To accommodate the fragmented nature of scatter-gather, we will keep
+submitting the next scatter-buffer fragment for a job for multi-buffer
+computation until a job is completed and no more buffer fragments remai=
+n.
+At that time we will pull a new job to fill the now empty data slot.
+We call a get_completed_job function to check whether there are other
+jobs that have been completed when we job when we have no new job arriv=
+al
+to prevent extraneous delay in returning any completed jobs.
+
+The multi-buffer algorithm should be used for cases where crypto jobs
+submissions are at a reasonable high rate.  For low crypto job submissi=
+on
+rate, this algorithm will not be beneficial. The reason is at low rate,
+we do not fill out the data lanes before the maximum allowable latency,
+we will be flushing the jobs instead of processing them with all the
+data lanes full.  We will miss the benefit of parallel computation,
+and adding delay to the processing of the crypto job at the same time.
+Some tuning of the maximum latency parameter may be needed to get the
+best performance.
+
+Note that the tcrypt SHA256 speed test, we wait for a previous job to
+be completed before submitting a new job.  Hence this is not a valid
+test for multi-buffer algorithm as it requires multiple outstanding job=
+s
+submitted to fill the all data lanes to be effective (i.e. 8 outstandin=
+g
+jobs for the AVX2 case). An updated version of the tcrypt test is also
+included which would contain a more appropriate test for this scenario.
+
+As this is the first algorithm in the kernel's SHA256 crypto library th=
+at
+we have tried to use multi-buffer optimizations, feedbacks and testings
+will be much appreciated.
+
+Megha Dey (7):
+  crypto: sha1-mb - rename sha-mb to sha1-mb
+  crypto: sha256-mb - SHA256 multibuffer job manager and glue code
+  crypto: sha256-mb - Enable multibuffer support
+  crypto: sha256-mb - submit/flush routines for AVX2
+  crypto: sha256-mb - Algorithm data structures
+  crypto: sha256-mb - Crypto computation (x8 AVX2)
+  crypto: tcrypt - Add speed tests for SHA multibuffer algorithms
+
+ arch/x86/crypto/Makefile                           |    3 +-
+ arch/x86/crypto/{sha-mb =3D> sha1-mb}/Makefile       |    0
+ arch/x86/crypto/{sha-mb =3D> sha1-mb}/sha1_mb.c      |  122 ++-
+ .../{sha-mb/sha_mb_ctx.h =3D> sha1-mb/sha1_mb_ctx.h} |    2 +-
+ .../{sha-mb/sha_mb_mgr.h =3D> sha1-mb/sha1_mb_mgr.h} |    0
+ .../{sha-mb =3D> sha1-mb}/sha1_mb_mgr_datastruct.S   |    0
+ .../{sha-mb =3D> sha1-mb}/sha1_mb_mgr_flush_avx2.S   |    0
+ .../{sha-mb =3D> sha1-mb}/sha1_mb_mgr_init_avx2.c    |    3 +-
+ .../{sha-mb =3D> sha1-mb}/sha1_mb_mgr_submit_avx2.S  |    0
+ arch/x86/crypto/{sha-mb =3D> sha1-mb}/sha1_x8_avx2.S |    0
+ arch/x86/crypto/sha256-mb/Makefile                 |   11 +
+ arch/x86/crypto/sha256-mb/sha256_mb.c              | 1013 ++++++++++++=
+++++++++
+ arch/x86/crypto/sha256-mb/sha256_mb_ctx.h          |  136 +++
+ arch/x86/crypto/sha256-mb/sha256_mb_mgr.h          |  108 +++
+ .../crypto/sha256-mb/sha256_mb_mgr_datastruct.S    |  303 ++++++
+ .../crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S    |  323 +++++++
+ .../x86/crypto/sha256-mb/sha256_mb_mgr_init_avx2.c |   65 ++
+ .../crypto/sha256-mb/sha256_mb_mgr_submit_avx2.S   |  231 +++++
+ arch/x86/crypto/sha256-mb/sha256_x8_avx2.S         |  579 +++++++++++
+ crypto/Kconfig                                     |   16 +
+ crypto/tcrypt.c                                    |  122 +++
+ crypto/testmgr.c                                   |   18 +-
+ 22 files changed, 3008 insertions(+), 47 deletions(-)
+ rename arch/x86/crypto/{sha-mb =3D> sha1-mb}/Makefile (100%)
+ rename arch/x86/crypto/{sha-mb =3D> sha1-mb}/sha1_mb.c (89%)
+ rename arch/x86/crypto/{sha-mb/sha_mb_ctx.h =3D> sha1-mb/sha1_mb_ctx.h=
+} (99%)
+ rename arch/x86/crypto/{sha-mb/sha_mb_mgr.h =3D> sha1-mb/sha1_mb_mgr.h=
+} (100%)
+ rename arch/x86/crypto/{sha-mb =3D> sha1-mb}/sha1_mb_mgr_datastruct.S =
+(100%)
+ rename arch/x86/crypto/{sha-mb =3D> sha1-mb}/sha1_mb_mgr_flush_avx2.S =
+(100%)
+ rename arch/x86/crypto/{sha-mb =3D> sha1-mb}/sha1_mb_mgr_init_avx2.c (=
+99%)
+ rename arch/x86/crypto/{sha-mb =3D> sha1-mb}/sha1_mb_mgr_submit_avx2.S=
+ (100%)
+ rename arch/x86/crypto/{sha-mb =3D> sha1-mb}/sha1_x8_avx2.S (100%)
+ create mode 100644 arch/x86/crypto/sha256-mb/Makefile
+ create mode 100644 arch/x86/crypto/sha256-mb/sha256_mb.c
+ create mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_ctx.h
+ create mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_mgr.h
+ create mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_mgr_datastruct.=
+S
+ create mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.=
+S
+ create mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_mgr_init_avx2.c
+ create mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_mgr_submit_avx2=
+=2ES
+ create mode 100644 arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
+
+--=20
+1.9.1
