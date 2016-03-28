@@ -1,149 +1,95 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: drbg - set HMAC key only when altered
-Date: Mon, 28 Mar 2016 16:47:55 +0200
-Message-ID: <1989575.kgMrm1hmR5@positron.chronox.de>
+From: Cristian Stoica <cristian.stoica@nxp.com>
+Subject: RE: [PATCH v2 3/4] crypto: add CONFIG_ symbol for rsa helper
+Date: Mon, 28 Mar 2016 16:48:17 +0000
+Message-ID: <AM4PR0401MB1876223BF756FC5AF4A5A421E7860@AM4PR0401MB1876.eurprd04.prod.outlook.com>
+References: <1458745459-1096-1-git-send-email-tudor-dan.ambarus@nxp.com>
+ <1458745459-1096-4-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"smueller@chronox.de" <smueller@chronox.de>,
+	Horia Ioan Geanta Neag <horia.geanta@nxp.com>,
+	Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
+To: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"tadeusz.struk@intel.com" <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:33666 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751714AbcC1OsC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 28 Mar 2016 10:48:02 -0400
+Received: from mail-am1on0086.outbound.protection.outlook.com ([157.56.112.86]:33792
+	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1754814AbcC1QsU convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 28 Mar 2016 12:48:20 -0400
+In-Reply-To: <1458745459-1096-4-git-send-email-tudor-dan.ambarus@nxp.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The HMAC implementation allows setting the HMAC key independently from
-the hashing operation. Therefore, the key only needs to be set when a
-new key is generated.
+> -----Original Message-----
+> From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-
+> owner@vger.kernel.org] On Behalf Of Tudor Ambarus
+> Sent: Wednesday, March 23, 2016 5:04 PM
+> To: herbert@gondor.apana.org.au; tadeusz.struk@intel.com
+> Cc: linux-crypto@vger.kernel.org; smueller@chronox.de; Horia Ioan Geanta
+> Neag <horia.geanta@nxp.com>; Tudor-Dan Ambarus <tudor-
+> dan.ambarus@nxp.com>
+> Subject: [PATCH v2 3/4] crypto: add CONFIG_ symbol for rsa helper
+> 
+> All RSA implementations can now use the key extract symbols by selecting
+> CRYPTO_RSA_HELPER.
+> 
+> Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 
-This patch increases the speed of the HMAC DRBG by at least 35% depending
-on the use case.
-
-The patch is fully CAVS tested.
-
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c | 39 +++++++++++++++++++++++++--------------
- 1 file changed, 25 insertions(+), 14 deletions(-)
-
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 1b86310..0a3538f 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -592,8 +592,10 @@ static const struct drbg_state_ops drbg_ctr_ops = {
-  ******************************************************************/
- 
- #if defined(CONFIG_CRYPTO_DRBG_HASH) || defined(CONFIG_CRYPTO_DRBG_HMAC)
--static int drbg_kcapi_hash(struct drbg_state *drbg, const unsigned char *key,
--			   unsigned char *outval, const struct list_head *in);
-+static int drbg_kcapi_hash(struct drbg_state *drbg, unsigned char *outval,
-+			   const struct list_head *in);
-+static void drbg_kcapi_hmacsetkey(struct drbg_state *drbg,
-+				  const unsigned char *key);
- static int drbg_init_hash_kernel(struct drbg_state *drbg);
- static int drbg_fini_hash_kernel(struct drbg_state *drbg);
- #endif /* (CONFIG_CRYPTO_DRBG_HASH || CONFIG_CRYPTO_DRBG_HMAC) */
-@@ -619,9 +621,11 @@ static int drbg_hmac_update(struct drbg_state *drbg, struct list_head *seed,
- 	LIST_HEAD(seedlist);
- 	LIST_HEAD(vdatalist);
- 
--	if (!reseed)
-+	if (!reseed) {
- 		/* 10.1.2.3 step 2 -- memset(0) of C is implicit with kzalloc */
- 		memset(drbg->V, 1, drbg_statelen(drbg));
-+		drbg_kcapi_hmacsetkey(drbg, drbg->C);
-+	}
- 
- 	drbg_string_fill(&seed1, drbg->V, drbg_statelen(drbg));
- 	list_add_tail(&seed1.list, &seedlist);
-@@ -641,12 +645,13 @@ static int drbg_hmac_update(struct drbg_state *drbg, struct list_head *seed,
- 			prefix = DRBG_PREFIX1;
- 		/* 10.1.2.2 step 1 and 4 -- concatenation and HMAC for key */
- 		seed2.buf = &prefix;
--		ret = drbg_kcapi_hash(drbg, drbg->C, drbg->C, &seedlist);
-+		ret = drbg_kcapi_hash(drbg, drbg->C, &seedlist);
- 		if (ret)
- 			return ret;
-+		drbg_kcapi_hmacsetkey(drbg, drbg->C);
- 
- 		/* 10.1.2.2 step 2 and 5 -- HMAC for V */
--		ret = drbg_kcapi_hash(drbg, drbg->C, drbg->V, &vdatalist);
-+		ret = drbg_kcapi_hash(drbg, drbg->V, &vdatalist);
- 		if (ret)
- 			return ret;
- 
-@@ -681,7 +686,7 @@ static int drbg_hmac_generate(struct drbg_state *drbg,
- 	while (len < buflen) {
- 		unsigned int outlen = 0;
- 		/* 10.1.2.5 step 4.1 */
--		ret = drbg_kcapi_hash(drbg, drbg->C, drbg->V, &datalist);
-+		ret = drbg_kcapi_hash(drbg, drbg->V, &datalist);
- 		if (ret)
- 			return ret;
- 		outlen = (drbg_blocklen(drbg) < (buflen - len)) ?
-@@ -796,7 +801,7 @@ static int drbg_hash_df(struct drbg_state *drbg,
- 	while (len < outlen) {
- 		short blocklen = 0;
- 		/* 10.4.1 step 4.1 */
--		ret = drbg_kcapi_hash(drbg, NULL, tmp, entropylist);
-+		ret = drbg_kcapi_hash(drbg, tmp, entropylist);
- 		if (ret)
- 			goto out;
- 		/* 10.4.1 step 4.2 */
-@@ -874,7 +879,7 @@ static int drbg_hash_process_addtl(struct drbg_state *drbg,
- 	list_add_tail(&data1.list, &datalist);
- 	list_add_tail(&data2.list, &datalist);
- 	list_splice_tail(addtl, &datalist);
--	ret = drbg_kcapi_hash(drbg, NULL, drbg->scratchpad, &datalist);
-+	ret = drbg_kcapi_hash(drbg, drbg->scratchpad, &datalist);
- 	if (ret)
- 		goto out;
- 
-@@ -907,7 +912,7 @@ static int drbg_hash_hashgen(struct drbg_state *drbg,
- 	while (len < buflen) {
- 		unsigned int outlen = 0;
- 		/* 10.1.1.4 step hashgen 4.1 */
--		ret = drbg_kcapi_hash(drbg, NULL, dst, &datalist);
-+		ret = drbg_kcapi_hash(drbg, dst, &datalist);
- 		if (ret) {
- 			len = ret;
- 			goto out;
-@@ -956,7 +961,7 @@ static int drbg_hash_generate(struct drbg_state *drbg,
- 	list_add_tail(&data1.list, &datalist);
- 	drbg_string_fill(&data2, drbg->V, drbg_statelen(drbg));
- 	list_add_tail(&data2.list, &datalist);
--	ret = drbg_kcapi_hash(drbg, NULL, drbg->scratchpad, &datalist);
-+	ret = drbg_kcapi_hash(drbg, drbg->scratchpad, &datalist);
- 	if (ret) {
- 		len = ret;
- 		goto out;
-@@ -1600,14 +1605,20 @@ static int drbg_fini_hash_kernel(struct drbg_state *drbg)
- 	return 0;
- }
- 
--static int drbg_kcapi_hash(struct drbg_state *drbg, const unsigned char *key,
--			   unsigned char *outval, const struct list_head *in)
-+static void drbg_kcapi_hmacsetkey(struct drbg_state *drbg,
-+				  const unsigned char *key)
-+{
-+	struct sdesc *sdesc = (struct sdesc *)drbg->priv_data;
-+
-+	crypto_shash_setkey(sdesc->shash.tfm, key, drbg_statelen(drbg));
-+}
-+
-+static int drbg_kcapi_hash(struct drbg_state *drbg, unsigned char *outval,
-+			   const struct list_head *in)
- {
- 	struct sdesc *sdesc = (struct sdesc *)drbg->priv_data;
- 	struct drbg_string *input = NULL;
- 
--	if (key)
--		crypto_shash_setkey(sdesc->shash.tfm, key, drbg_statelen(drbg));
- 	crypto_shash_init(&sdesc->shash);
- 	list_for_each_entry(input, in, list)
- 		crypto_shash_update(&sdesc->shash, input->buf, input->len);
--- 
-2.5.0
+Acked-by: Cristian Stoica <cristian.stoica@nxp.com>
+> ---
+>  crypto/Kconfig  | 8 ++++++--
+>  crypto/Makefile | 6 +++---
+>  2 files changed, 9 insertions(+), 5 deletions(-)
+> 
+> diff --git a/crypto/Kconfig b/crypto/Kconfig index f6bfdda..2bdf882 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -93,11 +93,15 @@ config CRYPTO_AKCIPHER
+>  	select CRYPTO_AKCIPHER2
+>  	select CRYPTO_ALGAPI
+> 
+> -config CRYPTO_RSA
+> -	tristate "RSA algorithm"
+> +config CRYPTO_RSA_HELPER
+> +	bool "RSA key extract helper"
+>  	select CRYPTO_AKCIPHER
+>  	select MPILIB
+>  	select ASN1
+> +
+> +config CRYPTO_RSA
+> +	tristate "RSA algorithm"
+> +	select CRYPTO_RSA_HELPER
+>  	help
+>  	  Generic implementation of the RSA public key algorithm.
+> 
+> diff --git a/crypto/Makefile b/crypto/Makefile index 4f4ef7e..d336d83
+> 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -36,10 +36,10 @@ $(obj)/rsaprivkey-asn1.o: $(obj)/rsaprivkey-asn1.c
+> $(obj)/rsaprivkey-asn1.h  clean-files += rsapubkey-asn1.c rsapubkey-asn1.h
+> clean-files += rsaprivkey-asn1.c rsaprivkey-asn1.h
+> 
+> -rsa_generic-y := rsapubkey-asn1.o
+> -rsa_generic-y += rsaprivkey-asn1.o
+> +crypto_rsa_helper-y += rsapubkey-asn1.o rsaprivkey-asn1.o rsa_helper.o
+> +obj-$(CONFIG_CRYPTO_RSA_HELPER) += crypto_rsa_helper.o
+> +
+>  rsa_generic-y += rsa.o
+> -rsa_generic-y += rsa_helper.o
+>  rsa_generic-y += rsa-pkcs1pad.o
+>  obj-$(CONFIG_CRYPTO_RSA) += rsa_generic.o
+> 
+> --
+> 1.8.3.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in the
+> body of a message to majordomo@vger.kernel.org More majordomo info at
+> http://vger.kernel.org/majordomo-info.html
