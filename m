@@ -1,99 +1,117 @@
 From: Borislav Petkov <bp@alien8.de>
-Subject: [PATCH 03/10] x86/cpufeature: Kill cpu_has_osxsave
-Date: Tue, 29 Mar 2016 17:41:56 +0200
-Message-ID: <1459266123-21878-4-git-send-email-bp@alien8.de>
+Subject: [PATCH 07/10] x86/cpufeature: Kill cpu_has_xmm2
+Date: Tue, 29 Mar 2016 17:42:00 +0200
+Message-ID: <1459266123-21878-8-git-send-email-bp@alien8.de>
 References: <1459266123-21878-1-git-send-email-bp@alien8.de>
 Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
 To: X86 ML <x86@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.skyhub.de ([78.46.96.112]:50471 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757385AbcC2PmR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 29 Mar 2016 11:42:17 -0400
 In-Reply-To: <1459266123-21878-1-git-send-email-bp@alien8.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 From: Borislav Petkov <bp@suse.de>
-
-Use boot_cpu_has() instead.
 
 Signed-off-by: Borislav Petkov <bp@suse.de>
 Cc: linux-crypto@vger.kernel.org
 ---
- arch/x86/crypto/camellia_aesni_avx2_glue.c | 3 ++-
- arch/x86/crypto/camellia_aesni_avx_glue.c  | 2 +-
- arch/x86/crypto/serpent_avx2_glue.c        | 2 +-
- arch/x86/include/asm/cpufeature.h          | 1 -
- arch/x86/include/asm/xor_avx.h             | 4 ++--
- 5 files changed, 6 insertions(+), 6 deletions(-)
+ arch/x86/crypto/poly1305_glue.c     | 2 +-
+ arch/x86/crypto/serpent_sse2_glue.c | 2 +-
+ arch/x86/include/asm/cpufeature.h   | 1 -
+ arch/x86/kernel/cpu/amd.c           | 2 +-
+ arch/x86/kernel/cpu/intel.c         | 2 +-
+ arch/x86/lib/usercopy_32.c          | 4 ++--
+ 6 files changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/crypto/camellia_aesni_avx2_glue.c b/arch/x86/crypto/camellia_aesni_avx2_glue.c
-index d84456924563..c37f7028c85a 100644
---- a/arch/x86/crypto/camellia_aesni_avx2_glue.c
-+++ b/arch/x86/crypto/camellia_aesni_avx2_glue.c
-@@ -562,7 +562,8 @@ static int __init camellia_aesni_init(void)
- {
- 	const char *feature_name;
+diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
+index 4264a3d59589..b283868acdf8 100644
+--- a/arch/x86/crypto/poly1305_glue.c
++++ b/arch/x86/crypto/poly1305_glue.c
+@@ -179,7 +179,7 @@ static struct shash_alg alg = {
  
--	if (!cpu_has_avx2 || !cpu_has_avx || !cpu_has_aes || !cpu_has_osxsave) {
-+	if (!cpu_has_avx2 || !cpu_has_avx || !cpu_has_aes ||
-+	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
- 		pr_info("AVX2 or AES-NI instructions are not detected.\n");
+ static int __init poly1305_simd_mod_init(void)
+ {
+-	if (!cpu_has_xmm2)
++	if (!boot_cpu_has(X86_FEATURE_XMM2))
  		return -ENODEV;
- 	}
-diff --git a/arch/x86/crypto/camellia_aesni_avx_glue.c b/arch/x86/crypto/camellia_aesni_avx_glue.c
-index 93d8f295784e..65f64556725b 100644
---- a/arch/x86/crypto/camellia_aesni_avx_glue.c
-+++ b/arch/x86/crypto/camellia_aesni_avx_glue.c
-@@ -554,7 +554,7 @@ static int __init camellia_aesni_init(void)
- {
- 	const char *feature_name;
  
--	if (!cpu_has_avx || !cpu_has_aes || !cpu_has_osxsave) {
-+	if (!cpu_has_avx || !cpu_has_aes || !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
- 		pr_info("AVX or AES-NI instructions are not detected.\n");
- 		return -ENODEV;
- 	}
-diff --git a/arch/x86/crypto/serpent_avx2_glue.c b/arch/x86/crypto/serpent_avx2_glue.c
-index 6d198342e2de..408cae2b3543 100644
---- a/arch/x86/crypto/serpent_avx2_glue.c
-+++ b/arch/x86/crypto/serpent_avx2_glue.c
-@@ -538,7 +538,7 @@ static int __init init(void)
- {
- 	const char *feature_name;
+ #ifdef CONFIG_AS_AVX2
+diff --git a/arch/x86/crypto/serpent_sse2_glue.c b/arch/x86/crypto/serpent_sse2_glue.c
+index 8943407e8917..644f97ab8cac 100644
+--- a/arch/x86/crypto/serpent_sse2_glue.c
++++ b/arch/x86/crypto/serpent_sse2_glue.c
+@@ -600,7 +600,7 @@ static struct crypto_alg serpent_algs[10] = { {
  
--	if (!cpu_has_avx2 || !cpu_has_osxsave) {
-+	if (!cpu_has_avx2 || !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
- 		pr_info("AVX2 instructions are not detected.\n");
+ static int __init serpent_sse2_init(void)
+ {
+-	if (!cpu_has_xmm2) {
++	if (!boot_cpu_has(X86_FEATURE_XMM2)) {
+ 		printk(KERN_INFO "SSE2 instructions are not detected.\n");
  		return -ENODEV;
  	}
 diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufeature.h
-index 3aea54ecabfd..33c29aabc9aa 100644
+index a75154232db5..5e02bc2e8444 100644
 --- a/arch/x86/include/asm/cpufeature.h
 +++ b/arch/x86/include/asm/cpufeature.h
-@@ -135,7 +135,6 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
- #define cpu_has_x2apic		boot_cpu_has(X86_FEATURE_X2APIC)
- #define cpu_has_xsave		boot_cpu_has(X86_FEATURE_XSAVE)
- #define cpu_has_xsaves		boot_cpu_has(X86_FEATURE_XSAVES)
--#define cpu_has_osxsave		boot_cpu_has(X86_FEATURE_OSXSAVE)
- /*
-  * Do not add any more of those clumsy macros - use static_cpu_has() for
-  * fast paths and boot_cpu_has() otherwise!
-diff --git a/arch/x86/include/asm/xor_avx.h b/arch/x86/include/asm/xor_avx.h
-index 7c0a517ec751..e45e556140af 100644
---- a/arch/x86/include/asm/xor_avx.h
-+++ b/arch/x86/include/asm/xor_avx.h
-@@ -167,12 +167,12 @@ static struct xor_block_template xor_block_avx = {
+@@ -125,7 +125,6 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
+ #define cpu_has_apic		boot_cpu_has(X86_FEATURE_APIC)
+ #define cpu_has_fxsr		boot_cpu_has(X86_FEATURE_FXSR)
+ #define cpu_has_xmm		boot_cpu_has(X86_FEATURE_XMM)
+-#define cpu_has_xmm2		boot_cpu_has(X86_FEATURE_XMM2)
+ #define cpu_has_aes		boot_cpu_has(X86_FEATURE_AES)
+ #define cpu_has_avx		boot_cpu_has(X86_FEATURE_AVX)
+ #define cpu_has_avx2		boot_cpu_has(X86_FEATURE_AVX2)
+diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
+index 6e47e3a916f1..ea8f88a2a688 100644
+--- a/arch/x86/kernel/cpu/amd.c
++++ b/arch/x86/kernel/cpu/amd.c
+@@ -750,7 +750,7 @@ static void init_amd(struct cpuinfo_x86 *c)
+ 	if (c->x86 >= 0xf)
+ 		set_cpu_cap(c, X86_FEATURE_K8);
  
- #define AVX_XOR_SPEED \
- do { \
--	if (cpu_has_avx && cpu_has_osxsave) \
-+	if (cpu_has_avx && boot_cpu_has(X86_FEATURE_OSXSAVE)) \
- 		xor_speed(&xor_block_avx); \
- } while (0)
+-	if (cpu_has_xmm2) {
++	if (cpu_has(c, X86_FEATURE_XMM2)) {
+ 		/* MFENCE stops RDTSC speculation */
+ 		set_cpu_cap(c, X86_FEATURE_MFENCE_RDTSC);
+ 	}
+diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+index 628a9f853b84..1dba36fe73e5 100644
+--- a/arch/x86/kernel/cpu/intel.c
++++ b/arch/x86/kernel/cpu/intel.c
+@@ -456,7 +456,7 @@ static void init_intel(struct cpuinfo_x86 *c)
+ 			set_cpu_cap(c, X86_FEATURE_ARCH_PERFMON);
+ 	}
  
- #define AVX_SELECT(FASTEST) \
--	(cpu_has_avx && cpu_has_osxsave ? &xor_block_avx : FASTEST)
-+	(cpu_has_avx && boot_cpu_has(X86_FEATURE_OSXSAVE) ? &xor_block_avx : FASTEST)
+-	if (cpu_has_xmm2)
++	if (cpu_has(c, X86_FEATURE_XMM2))
+ 		set_cpu_cap(c, X86_FEATURE_LFENCE_RDTSC);
  
- #else
- 
+ 	if (boot_cpu_has(X86_FEATURE_DS)) {
+diff --git a/arch/x86/lib/usercopy_32.c b/arch/x86/lib/usercopy_32.c
+index 91d93b95bd86..b559d9238781 100644
+--- a/arch/x86/lib/usercopy_32.c
++++ b/arch/x86/lib/usercopy_32.c
+@@ -612,7 +612,7 @@ unsigned long __copy_from_user_ll_nocache(void *to, const void __user *from,
+ {
+ 	stac();
+ #ifdef CONFIG_X86_INTEL_USERCOPY
+-	if (n > 64 && cpu_has_xmm2)
++	if (n > 64 && static_cpu_has(X86_FEATURE_XMM2))
+ 		n = __copy_user_zeroing_intel_nocache(to, from, n);
+ 	else
+ 		__copy_user_zeroing(to, from, n);
+@@ -629,7 +629,7 @@ unsigned long __copy_from_user_ll_nocache_nozero(void *to, const void __user *fr
+ {
+ 	stac();
+ #ifdef CONFIG_X86_INTEL_USERCOPY
+-	if (n > 64 && cpu_has_xmm2)
++	if (n > 64 && static_cpu_has(X86_FEATURE_XMM2))
+ 		n = __copy_user_intel_nocache(to, from, n);
+ 	else
+ 		__copy_user(to, from, n);
 -- 
 2.7.3
