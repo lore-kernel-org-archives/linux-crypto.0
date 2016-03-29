@@ -1,117 +1,86 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: [PATCH 07/10] x86/cpufeature: Kill cpu_has_xmm2
-Date: Tue, 29 Mar 2016 17:42:00 +0200
-Message-ID: <1459266123-21878-8-git-send-email-bp@alien8.de>
-References: <1459266123-21878-1-git-send-email-bp@alien8.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-To: X86 ML <x86@kernel.org>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] crypto: qat - adf_dev_stop should not be called in atomic
+ context
+Date: Tue, 29 Mar 2016 10:20:36 -0700
+Message-ID: <20160329172036.2482.65213.stgit@tstruk-mobl1>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, tadeusz.struk@intel.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:50471 "EHLO mail.skyhub.de"
+Received: from mga09.intel.com ([134.134.136.24]:19246 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757385AbcC2PmR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 29 Mar 2016 11:42:17 -0400
-In-Reply-To: <1459266123-21878-1-git-send-email-bp@alien8.de>
+	id S1752781AbcC2RZa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 29 Mar 2016 13:25:30 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Borislav Petkov <bp@suse.de>
+VFs call adf_dev_stop() from a PF to VF interrupt bottom half.
+This causes an oops "scheduling while atomic", because it tries
+to aquire a mutex to unregister crypto algorithms.
+This patch fixes the issue by calling adf_dev_stop() asynchronusely.
 
-Signed-off-by: Borislav Petkov <bp@suse.de>
-Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- arch/x86/crypto/poly1305_glue.c     | 2 +-
- arch/x86/crypto/serpent_sse2_glue.c | 2 +-
- arch/x86/include/asm/cpufeature.h   | 1 -
- arch/x86/kernel/cpu/amd.c           | 2 +-
- arch/x86/kernel/cpu/intel.c         | 2 +-
- arch/x86/lib/usercopy_32.c          | 4 ++--
- 6 files changed, 6 insertions(+), 7 deletions(-)
+ drivers/crypto/qat/qat_common/adf_vf_isr.c |   31 +++++++++++++++++++++++++---
+ 1 file changed, 28 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-index 4264a3d59589..b283868acdf8 100644
---- a/arch/x86/crypto/poly1305_glue.c
-+++ b/arch/x86/crypto/poly1305_glue.c
-@@ -179,7 +179,7 @@ static struct shash_alg alg = {
+diff --git a/drivers/crypto/qat/qat_common/adf_vf_isr.c b/drivers/crypto/qat/qat_common/adf_vf_isr.c
+index 09427b3..8702b0e 100644
+--- a/drivers/crypto/qat/qat_common/adf_vf_isr.c
++++ b/drivers/crypto/qat/qat_common/adf_vf_isr.c
+@@ -51,6 +51,7 @@
+ #include <linux/slab.h>
+ #include <linux/errno.h>
+ #include <linux/interrupt.h>
++#include <linux/kthread.h>
+ #include "adf_accel_devices.h"
+ #include "adf_common_drv.h"
+ #include "adf_cfg.h"
+@@ -90,6 +91,18 @@ static void adf_disable_msi(struct adf_accel_dev *accel_dev)
+ 	pci_disable_msi(pdev);
+ }
  
- static int __init poly1305_simd_mod_init(void)
++static int adf_dev_stop_async(void *vf)
++{
++	struct adf_accel_dev *accel_dev = vf;
++
++	adf_dev_stop(accel_dev);
++	adf_dev_shutdown(accel_dev);
++
++	/* Re-enable PF2VF interrupts */
++	adf_enable_pf2vf_interrupts(accel_dev);
++	return 0;
++}
++
+ static void adf_pf2vf_bh_handler(void *data)
  {
--	if (!cpu_has_xmm2)
-+	if (!boot_cpu_has(X86_FEATURE_XMM2))
- 		return -ENODEV;
+ 	struct adf_accel_dev *accel_dev = data;
+@@ -107,11 +120,23 @@ static void adf_pf2vf_bh_handler(void *data)
+ 		goto err;
  
- #ifdef CONFIG_AS_AVX2
-diff --git a/arch/x86/crypto/serpent_sse2_glue.c b/arch/x86/crypto/serpent_sse2_glue.c
-index 8943407e8917..644f97ab8cac 100644
---- a/arch/x86/crypto/serpent_sse2_glue.c
-+++ b/arch/x86/crypto/serpent_sse2_glue.c
-@@ -600,7 +600,7 @@ static struct crypto_alg serpent_algs[10] = { {
- 
- static int __init serpent_sse2_init(void)
- {
--	if (!cpu_has_xmm2) {
-+	if (!boot_cpu_has(X86_FEATURE_XMM2)) {
- 		printk(KERN_INFO "SSE2 instructions are not detected.\n");
- 		return -ENODEV;
- 	}
-diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufeature.h
-index a75154232db5..5e02bc2e8444 100644
---- a/arch/x86/include/asm/cpufeature.h
-+++ b/arch/x86/include/asm/cpufeature.h
-@@ -125,7 +125,6 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
- #define cpu_has_apic		boot_cpu_has(X86_FEATURE_APIC)
- #define cpu_has_fxsr		boot_cpu_has(X86_FEATURE_FXSR)
- #define cpu_has_xmm		boot_cpu_has(X86_FEATURE_XMM)
--#define cpu_has_xmm2		boot_cpu_has(X86_FEATURE_XMM2)
- #define cpu_has_aes		boot_cpu_has(X86_FEATURE_AES)
- #define cpu_has_avx		boot_cpu_has(X86_FEATURE_AVX)
- #define cpu_has_avx2		boot_cpu_has(X86_FEATURE_AVX2)
-diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-index 6e47e3a916f1..ea8f88a2a688 100644
---- a/arch/x86/kernel/cpu/amd.c
-+++ b/arch/x86/kernel/cpu/amd.c
-@@ -750,7 +750,7 @@ static void init_amd(struct cpuinfo_x86 *c)
- 	if (c->x86 >= 0xf)
- 		set_cpu_cap(c, X86_FEATURE_K8);
- 
--	if (cpu_has_xmm2) {
-+	if (cpu_has(c, X86_FEATURE_XMM2)) {
- 		/* MFENCE stops RDTSC speculation */
- 		set_cpu_cap(c, X86_FEATURE_MFENCE_RDTSC);
- 	}
-diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-index 628a9f853b84..1dba36fe73e5 100644
---- a/arch/x86/kernel/cpu/intel.c
-+++ b/arch/x86/kernel/cpu/intel.c
-@@ -456,7 +456,7 @@ static void init_intel(struct cpuinfo_x86 *c)
- 			set_cpu_cap(c, X86_FEATURE_ARCH_PERFMON);
- 	}
- 
--	if (cpu_has_xmm2)
-+	if (cpu_has(c, X86_FEATURE_XMM2))
- 		set_cpu_cap(c, X86_FEATURE_LFENCE_RDTSC);
- 
- 	if (boot_cpu_has(X86_FEATURE_DS)) {
-diff --git a/arch/x86/lib/usercopy_32.c b/arch/x86/lib/usercopy_32.c
-index 91d93b95bd86..b559d9238781 100644
---- a/arch/x86/lib/usercopy_32.c
-+++ b/arch/x86/lib/usercopy_32.c
-@@ -612,7 +612,7 @@ unsigned long __copy_from_user_ll_nocache(void *to, const void __user *from,
- {
- 	stac();
- #ifdef CONFIG_X86_INTEL_USERCOPY
--	if (n > 64 && cpu_has_xmm2)
-+	if (n > 64 && static_cpu_has(X86_FEATURE_XMM2))
- 		n = __copy_user_zeroing_intel_nocache(to, from, n);
- 	else
- 		__copy_user_zeroing(to, from, n);
-@@ -629,7 +629,7 @@ unsigned long __copy_from_user_ll_nocache_nozero(void *to, const void __user *fr
- {
- 	stac();
- #ifdef CONFIG_X86_INTEL_USERCOPY
--	if (n > 64 && cpu_has_xmm2)
-+	if (n > 64 && static_cpu_has(X86_FEATURE_XMM2))
- 		n = __copy_user_intel_nocache(to, from, n);
- 	else
- 		__copy_user(to, from, n);
--- 
-2.7.3
+ 	switch ((msg & ADF_PF2VF_MSGTYPE_MASK) >> ADF_PF2VF_MSGTYPE_SHIFT) {
+-	case ADF_PF2VF_MSGTYPE_RESTARTING:
++	case ADF_PF2VF_MSGTYPE_RESTARTING: {
++		struct task_struct *tsk;
++
+ 		dev_dbg(&GET_DEV(accel_dev),
+ 			"Restarting msg received from PF 0x%x\n", msg);
+-		adf_dev_stop(accel_dev);
+-		break;
++		tsk = kthread_run(adf_dev_stop_async, accel_dev,
++				  "adf_stop_vf%d", accel_dev->accel_id);
++		if (IS_ERR(tsk))
++			dev_err(&GET_DEV(accel_dev),
++				"Couldn't schedule stop for vf_%d\n",
++				accel_dev->accel_id);
++
++		/* To ack, clear the PF2VFINT bit */
++		msg &= ~BIT(0);
++		ADF_CSR_WR(pmisc_bar_addr, hw_data->get_pf2vf_offset(0), msg);
++		return;
++	}
+ 	case ADF_PF2VF_MSGTYPE_VERSION_RESP:
+ 		dev_dbg(&GET_DEV(accel_dev),
+ 			"Version resp received from PF 0x%x\n", msg);
