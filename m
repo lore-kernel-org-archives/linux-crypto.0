@@ -1,48 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.6
-Date: Wed, 30 Mar 2016 17:11:50 +0800
-Message-ID: <20160330091150.GA17143@gondor.apana.org.au>
-References: <20140804130339.GA1178@gondor.apana.org.au>
- <20141007131826.GA29688@gondor.apana.org.au>
- <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150415033951.GA1406@gondor.apana.org.au>
- <20150622084457.GA7806@gondor.apana.org.au>
- <20150831135655.GA2694@gondor.apana.org.au>
- <20151102080427.GA8465@gondor.apana.org.au>
- <20160111101450.GA24044@gondor.apana.org.au>
- <20160122101828.GA15966@gondor.apana.org.au>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v3 7/7] crypto: AF_ALG - add support for key_id
+Date: Wed, 30 Mar 2016 17:31:46 +0100
+Message-ID: <14284.1459355506@warthog.procyon.org.uk>
+References: <20160330005734.25410.28829.stgit@tstruk-mobl1> <20160330005649.25410.70508.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, herbert@gondor.apana.org.au,
+	smueller@chronox.de, linux-api@vger.kernel.org,
+	marcel@holtmann.org, linux-kernel@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dwmw2@infradead.org, davem@davemloft.net
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20160122101828.GA15966@gondor.apana.org.au>
+In-Reply-To: <20160330005734.25410.28829.stgit@tstruk-mobl1>
+Content-ID: <14283.1459355506.1@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+Tadeusz Struk <tadeusz.struk@intel.com> wrote:
 
-This push fixes a bug in pkcs7_validate_trust and its users where
-the output value may in fact be taken from uninitialised memory.
+> +	keyring = request_key(&key_type_asymmetric, key_name, NULL);
+> +
+> +	err = -ENOKEY;
+> +	if (IS_ERR(keyring))
+> +		goto out;
+> +
+> +	pkey = keyring->payload.data[asym_crypto];
 
+NAK.  This is liable to crash in future.  You may not assume that you know
+what keyring->payload.data[asym_crypto] points to.
 
-Please pull from
+You may not use struct public_key outside of crypto/asymmetric_key/.  It's the
+internal data of the software subtype.  I'll move it out of the global header
+to remove the temptation;-).
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+You must use accessor functions such as verify_signature().  Feel free to add
+further accessor functions such as query_asym_capabilities(),
+create_signature(), encrypt_blob() and decrypt_blob() or something like that.
 
-
-Nicolai Stange (1):
-      PKCS#7: pkcs7_validate_trust(): initialize the _trusted output argument
-
- crypto/asymmetric_keys/pkcs7_trust.c |    2 ++
- 1 file changed, 2 insertions(+)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+David
