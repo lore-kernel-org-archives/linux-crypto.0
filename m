@@ -1,42 +1,48 @@
-From: Tadeusz Struk <tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v3 7/7] crypto: AF_ALG - add support for key_id
-Date: Tue, 29 Mar 2016 19:52:17 -0700
-Message-ID: <56FB3F61.2060805@intel.com>
-References: <201603300916.Og5tA3rF%fengguang.wu@intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.6
+Date: Wed, 30 Mar 2016 17:11:50 +0800
+Message-ID: <20160330091150.GA17143@gondor.apana.org.au>
+References: <20140804130339.GA1178@gondor.apana.org.au>
+ <20141007131826.GA29688@gondor.apana.org.au>
+ <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150415033951.GA1406@gondor.apana.org.au>
+ <20150622084457.GA7806@gondor.apana.org.au>
+ <20150831135655.GA2694@gondor.apana.org.au>
+ <20151102080427.GA8465@gondor.apana.org.au>
+ <20160111101450.GA24044@gondor.apana.org.au>
+ <20160122101828.GA15966@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: kbuild-all-JC7UmRfGjtg@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org,
-	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org
-To: kbuild test robot <lkp-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <201603300916.Og5tA3rF%fengguang.wu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20160122101828.GA15966@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
-On 03/29/2016 06:49 PM, kbuild test robot wrote:
-> Hi Tadeusz,
-> 
-> [auto build test ERROR on v4.6-rc1]
-> [also build test ERROR on next-20160329]
-> [cannot apply to crypto/master]
-> [if your patch is applied to the wrong git tree, please drop us a note to help improving the system]
-> 
-> url:    https://github.com/0day-ci/linux/commits/Tadeusz-Struk/crypto-algif-add-akcipher/20160330-090754
-> config: i386-randconfig-i1-03292045 (attached as .config)
-> reproduce:
->         # save the attached .config to linux build tree
->         make ARCH=i386 
-> 
-> All error/warnings (new ones prefixed by >>):
+Hi Linus:
 
-The patches have been generated against cryptodev-2.6 rebased on top of 4.6-rc1.
-It should work with crypto as soon as Herbert will rebase his repo.
+This push fixes a bug in pkcs7_validate_trust and its users where
+the output value may in fact be taken from uninitialised memory.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Nicolai Stange (1):
+      PKCS#7: pkcs7_validate_trust(): initialize the _trusted output argument
+
+ crypto/asymmetric_keys/pkcs7_trust.c |    2 ++
+ 1 file changed, 2 insertions(+)
+
 Thanks,
 -- 
-TS
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
