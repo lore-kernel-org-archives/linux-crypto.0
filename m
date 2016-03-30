@@ -1,51 +1,115 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH v3 7/7] crypto: AF_ALG - add support for key_id
-Date: Wed, 30 Mar 2016 10:19:43 -0700
-Message-ID: <56FC0AAF.3000404@intel.com>
-References: <20160330005734.25410.28829.stgit@tstruk-mobl1>
- <20160330005649.25410.70508.stgit@tstruk-mobl1>
- <14284.1459355506@warthog.procyon.org.uk>
+From: Mark McKinstry <Mark.McKinstry@alliedtelesis.co.nz>
+Subject: Re: [PATCH] vti6: Add pmtu handling to vti6_xmit.
+Date: Wed, 30 Mar 2016 21:04:03 +0000
+Message-ID: <56FC3F3D.2000408@alliedtelesis.co.nz>
+References: <20150529182709.2147.78230.stgit@ahduyck-vm-fedora22>
+ <56BA975D.2040706@alliedtelesis.co.nz>
+ <20160217070805.GA316@gauss.secunet.com>
+ <56C520F0.4050309@alliedtelesis.co.nz>
+ <20160218121915.GH316@gauss.secunet.com>
+ <56CE22A3.7030702@alliedtelesis.co.nz>
+ <20160304070525.GA3347@gauss.secunet.com>
+ <56E73285.5000702@alliedtelesis.co.nz>
+ <20160315122801.GB3347@gauss.secunet.com>
+ <20160322105318.GS3347@gauss.secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, smueller@chronox.de,
-	linux-api@vger.kernel.org, marcel@holtmann.org,
-	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, dwmw2@infradead.org,
-	davem@davemloft.net
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"alexander.h.duyck@redhat.com" <alexander.h.duyck@redhat.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"davem@davemloft.net" <davem@davemloft.net>
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:10495 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752247AbcC3RZI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 30 Mar 2016 13:25:08 -0400
-In-Reply-To: <14284.1459355506@warthog.procyon.org.uk>
+Received: from gate2.alliedtelesis.co.nz ([202.36.163.20]:37780 "EHLO
+	gate2.alliedtelesis.co.nz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752673AbcC3VEO convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 30 Mar 2016 17:04:14 -0400
+Received: from mmarshal3.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 4BCED8070D
+	for <linux-crypto@vger.kernel.org>; Thu, 31 Mar 2016 10:04:06 +1300 (NZDT)
+In-Reply-To: <20160322105318.GS3347@gauss.secunet.com>
+Content-Language: en-US
+Content-ID: <4702D8F322DBD24C868B3C584DEDD8E4@atlnz.lc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi David,
-On 03/30/2016 09:31 AM, David Howells wrote:
->> +	keyring = request_key(&key_type_asymmetric, key_name, NULL);
->> > +
->> > +	err = -ENOKEY;
->> > +	if (IS_ERR(keyring))
->> > +		goto out;
->> > +
->> > +	pkey = keyring->payload.data[asym_crypto];
-> NAK.  This is liable to crash in future.  You may not assume that you know
-> what keyring->payload.data[asym_crypto] points to.
-> 
-> You may not use struct public_key outside of crypto/asymmetric_key/.  It's the
-> internal data of the software subtype.  I'll move it out of the global header
-> to remove the temptation;-).
-> 
-> You must use accessor functions such as verify_signature().  Feel free to add
-> further accessor functions such as query_asym_capabilities(),
-> create_signature(), encrypt_blob() and decrypt_blob() or something like that.
+I've tested this patch in our scenario and I can confirm that it still 
+fixes all of our issues.
 
-Thanks for your response. I thought that the public_key_query_sw_key(pkey)
-check was enough for now.
-I'll remove public_key stuff from af_alg and add the accessors.
-Thanks,
--- 
-TS
+On 22/03/16 23:53, Steffen Klassert wrote:
+> On Tue, Mar 15, 2016 at 01:28:01PM +0100, Steffen Klassert wrote:
+>> On Mon, Mar 14, 2016 at 09:52:05PM +0000, Mark McKinstry wrote:
+>>> Your patch adds a dst_release() call to my suggested fix, but this is
+>>> problematic because the kfree_skb() call at tx_error already takes care
+>>> of releasing dst - via kfree_skb() > __kfree_skb() > skb_release_all() >
+>>> skb_release_head_state() > skb_dst_drop()
+>>>   > refdst_drop() > dst_release(). In our scenario your patch results in
+>>> a negative refcount kernel warning being generated in dst_release() for
+>>> every packet that is too big to go over the vti.
+>> Hm. I've just noticed that my pmtu test does not trigger this
+>> codepath, so I did not see the warning.
+>>
+>> Seems like we do the pmtu handling too late, it should happen before
+>> we do skb_dst_set(). Also skb_scrub_packet() resets skb->ignore_df,
+>> so checking ignore_df after skb_scrub_packet() does not make much sense.
+>>
+>> I'll send an updated version after some more testing.
+>>
+> I've added a testcase that triggers this codepath to my testing
+> environment. The patch below works for me, could you please test
+> if it fixes your problems?
+>
+> Subject: [PATCH] vti: Add pmtu handling to vti_xmit.
+>
+> We currently rely on the PMTU discovery of xfrm.
+> However if a packet is locally sent, the PMTU mechanism
+> of xfrm tries to do local socket notification what
+> might not work for applications like ping that don't
+> check for this. So add pmtu handling to vti_xmit to
+> report MTU changes immediately.
+>
+> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+> ---
+>   net/ipv4/ip_vti.c | 18 ++++++++++++++++++
+>   1 file changed, 18 insertions(+)
+>
+> diff --git a/net/ipv4/ip_vti.c b/net/ipv4/ip_vti.c
+> index 5cf10b7..a917903 100644
+> --- a/net/ipv4/ip_vti.c
+> +++ b/net/ipv4/ip_vti.c
+> @@ -156,6 +156,7 @@ static netdev_tx_t vti_xmit(struct sk_buff *skb, struct net_device *dev,
+>   	struct dst_entry *dst = skb_dst(skb);
+>   	struct net_device *tdev;	/* Device to other host */
+>   	int err;
+> +	int mtu;
+>   
+>   	if (!dst) {
+>   		dev->stats.tx_carrier_errors++;
+> @@ -192,6 +193,23 @@ static netdev_tx_t vti_xmit(struct sk_buff *skb, struct net_device *dev,
+>   			tunnel->err_count = 0;
+>   	}
+>   
+> +	mtu = dst_mtu(dst);
+> +	if (skb->len > mtu) {
+> +		skb_dst(skb)->ops->update_pmtu(skb_dst(skb), NULL, skb, mtu);
+> +		if (skb->protocol == htons(ETH_P_IP)) {
+> +			icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED,
+> +				  htonl(mtu));
+> +		} else {
+> +			if (mtu < IPV6_MIN_MTU)
+> +				mtu = IPV6_MIN_MTU;
+> +
+> +			icmpv6_send(skb, ICMPV6_PKT_TOOBIG, 0, mtu);
+> +		}
+> +
+> +		dst_release(dst);
+> +		goto tx_error;
+> +	}
+> +
+>   	skb_scrub_packet(skb, !net_eq(tunnel->net, dev_net(dev)));
+>   	skb_dst_set(skb, dst);
+>   	skb->dev = skb_dst(skb)->dev;
