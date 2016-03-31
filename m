@@ -1,48 +1,100 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: cipher implementations allowed to sleep?
-Date: Thu, 31 Mar 2016 13:47:50 +0200
-Message-ID: <5387862.2PP9F0yuod@tauon.atsec.com>
-References: <8342050.C1sDSzNQxT@tauon.atsec.com> <20160331092106.GA28538@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:33838 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751771AbcCaLrx convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 31 Mar 2016 07:47:53 -0400
-In-Reply-To: <20160331092106.GA28538@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: [PATCH 0/4] scatterlist: sg_table from virtual pointer
+Date: Thu, 31 Mar 2016 14:29:40 +0200
+Message-ID: <1459427384-21374-1-git-send-email-boris.brezillon@free-electrons.com>
+Cc: Mark Brown <broonie@kernel.org>,
+	linux-spi@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Vinod Koul <vinod.koul@intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	dmaengine@vger.kernel.org,
+	Mauro Carvalho Chehab <m.chehab@samsung.com>,
+	Hans Verkuil <hans.verkuil@cisco.com>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	linux-media@vger.kernel.org,
+	Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Richard Weinberger <richard@nod.at>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Vignesh R <vigneshr@ti.com>,
+	linux-mm@kvack.org,
+	Joerg Roedel <joro@8bytes.org>,
+	iommu@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org
+To: David Woodhouse <dwmw2@infradead.org>,
+	Brian Norris <computersforpeace@gmail.com>,
+	linux-mtd@lists.infradead.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dave Gordon <david.s.gordon@intel.com>
+Return-path: <owner-linux-mm@kvack.org>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 31. M=E4rz 2016, 17:21:06 schrieb Herbert Xu:
+Hello,
 
-Hi Herbert,
+This series has been extracted from another series [1] adding support
+for DMA operations in a NAND driver.
 
-> On Thu, Mar 31, 2016 at 11:18:48AM +0200, Stephan Mueller wrote:
-> > Hi Herbert,
-> >=20
-> > is it allowed that cipher implementations sleep? The driver of my q=
-uestion
-> > is whether I can use spin_lock_irqsave() as a lock around a cipher
-> > operation.
-> >=20
-> > The cipher operations in question are hashing, HMACing and symmetri=
-c
-> > ciphers.
-> Whether they can sleep is controlled by the MAY_SLEEP flag.
->=20
-> Of course, even if they can't sleep, if you invoke an async op
-> then it may return -EINPROGRESS and continue the processing in
-> the background.
+The reason I decided to post those patches separately is because they
+are touching core stuff, and I'd like to have feedback on these specific
+aspects.
 
-Considering the implementation in ansi_cprng.c, is it allowed to use=20
-spin_lock_bh with the sync operations assuming that a cipher implementa=
-tion=20
-may sleep?
+The idea is to provide a generic function creating an sg_table from
+a virtual pointer and a length. This operation is complicated by
+the different memory regions exposed in kernel space. For example,
+you have the lowmem region, which guarantees that buffers are
+physically contiguous, while the vmalloc region does not.
 
-Thanks
-Stephan
+sg_alloc_table_from_buf() detects in which memory region your buffer
+reside, and takes the appropriate precautions when creating the
+sg_table. This function also takes an extract parameter, allowing
+one to specify extra constraints, like the maximum DMA segment size,
+the required and the preferred alignment.
+
+Patch 1 and 2 are implementing sg_alloc_table_from_buf() (patch 1
+is needed to properly detect buffers residing in the highmem/kmap
+area).
+
+Patch 3 is making use of sg_alloc_table_from_buf() in the spi_map_buf()
+function (hopefully, other subsystems/drivers will be able to easily
+switch to this function too).
+
+Patch 4 is implementing what I really need: generic functions
+to map/unmap a virtual buffer passed through mtd->_read/_write().
+
+I'm not exactly a DMA or MM experts, so that would be great to have
+feedbacks on this approach. That's why I added so many people in Cc
+even if they're not directly impacted by those patches. Let me know if
+you want me to drop/add people from/to the recipient list.
+
+Thanks.
+
+Best Regards,
+
+Boris
+
+[1]http://www.spinics.net/lists/arm-kernel/msg493552.html
+
+Boris Brezillon (4):
+  mm: add is_highmem_addr() helper
+  scatterlist: add sg_alloc_table_from_buf() helper
+  spi: use sg_alloc_table_from_buf()
+  mtd: provide helper to prepare buffers for DMA operations
+
+ drivers/mtd/mtdcore.c       |  66 ++++++++++++++++
+ drivers/spi/spi.c           |  45 ++---------
+ include/linux/highmem.h     |  13 ++++
+ include/linux/mtd/mtd.h     |  25 ++++++
+ include/linux/scatterlist.h |  24 ++++++
+ lib/scatterlist.c           | 183 ++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 316 insertions(+), 40 deletions(-)
+
+-- 
+2.5.0
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
