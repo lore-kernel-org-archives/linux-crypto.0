@@ -1,38 +1,36 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: cipher implementations allowed to sleep?
-Date: Thu, 31 Mar 2016 15:02:03 +0200
-Message-ID: <9479344.AexDexa4Nc@tauon.atsec.com>
-References: <8342050.C1sDSzNQxT@tauon.atsec.com> <5387862.2PP9F0yuod@tauon.atsec.com> <20160331125825.GA30134@gondor.apana.org.au>
+From: Elder I Frank <eesdeityrs@jjhghg.website.tk>
+Subject: To Your Attention
+Date: Thu, 31 Mar 2016 06:30:21 -0700
+Message-ID: <AM3PR05MB0696FB3F8429797F098BAB1D89990@AM3PR05MB0696.eurprd05.prod.outlook.com>
+Reply-To: <elder_frank1@yahoo.co.jp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: Recipients <eesdeityrs@jjhghg.website.tk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:33842 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756238AbcCaNCI convert rfc822-to-8bit (ORCPT
+Received: from mail-am1hn0252.outbound.protection.outlook.com ([157.56.112.252]:14646
+	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752183AbcCaNpf convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 31 Mar 2016 09:02:08 -0400
-In-Reply-To: <20160331125825.GA30134@gondor.apana.org.au>
+	Thu, 31 Mar 2016 09:45:35 -0400
+Content-Description: Mail message body
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 31. M=E4rz 2016, 20:58:25 schrieb Herbert Xu:
+To Your Attention,
 
-Hi Herbert,
+On behalf of the board and management of International Monetary Committees it was resolved by the federal executive council and agreed that your Inheritance/Contract Fund valued at $10.5M would be released to you via DIPLOMATIC CHANNEL immediately your attention is received so you are advice to confirm the following information.send your reply to: elderifrank@gmail.com
 
-> On Thu, Mar 31, 2016 at 01:47:50PM +0200, Stephan Mueller wrote:
-> > Considering the implementation in ansi_cprng.c, is it allowed to us=
-e
-> > spin_lock_bh with the sync operations assuming that a cipher
-> > implementation
-> > may sleep?
->=20
-> As I said, it's only allowed to sleep if you set the MAY_SLEEP
-> flag.
+Your Name,===============
+Address,===================
+Next of kin.==============
+Your Occupation=============
+A scanned copy of your ID or passport.=============
+Direct TelePhone Number===================
 
-Now I see, I as a caller can controll whether it can sleep. Thank you.
+Regards
 
-Ciao
-Stephan
+Elder Idris Frank
+Federal Ministry of Finance
+Email:elderifrank@gmail.com
