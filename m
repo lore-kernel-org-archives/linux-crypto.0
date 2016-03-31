@@ -1,7 +1,7 @@
 From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH 1/4] mm: add is_highmem_addr() helper
-Date: Thu, 31 Mar 2016 14:29:41 +0200
-Message-ID: <1459427384-21374-2-git-send-email-boris.brezillon@free-electrons.com>
+Subject: [PATCH 3/4] spi: use sg_alloc_table_from_buf()
+Date: Thu, 31 Mar 2016 14:29:43 +0200
+Message-ID: <1459427384-21374-4-git-send-email-boris.brezillon@free-electrons.com>
 References: <1459427384-21374-1-git-send-email-boris.brezillon@free-electrons.com>
 Cc: Mark Brown <broonie@kernel.org>,
 	linux-spi@vger.kernel.org,
@@ -33,44 +33,73 @@ In-Reply-To: <1459427384-21374-1-git-send-email-boris.brezillon@free-electrons.c
 Sender: owner-linux-mm@kvack.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add an helper to check if a virtual address is in the highmem region.
+Replace custom implementation of sg_alloc_table_from_buf() by a call to
+sg_alloc_table_from_buf().
 
 Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 ---
- include/linux/highmem.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ drivers/spi/spi.c | 45 +++++----------------------------------------
+ 1 file changed, 5 insertions(+), 40 deletions(-)
 
-diff --git a/include/linux/highmem.h b/include/linux/highmem.h
-index bb3f329..13dff37 100644
---- a/include/linux/highmem.h
-+++ b/include/linux/highmem.h
-@@ -41,6 +41,14 @@ void kmap_flush_unused(void);
+diff --git a/drivers/spi/spi.c b/drivers/spi/spi.c
+index de2f2f9..eed461d 100644
+--- a/drivers/spi/spi.c
++++ b/drivers/spi/spi.c
+@@ -705,49 +705,14 @@ static int spi_map_buf(struct spi_master *master, struct device *dev,
+ 		       struct sg_table *sgt, void *buf, size_t len,
+ 		       enum dma_data_direction dir)
+ {
+-	const bool vmalloced_buf = is_vmalloc_addr(buf);
+-	unsigned int max_seg_size = dma_get_max_seg_size(dev);
+-	int desc_len;
+-	int sgs;
+-	struct page *vm_page;
+-	void *sg_buf;
+-	size_t min;
+-	int i, ret;
+-
+-	if (vmalloced_buf) {
+-		desc_len = min_t(int, max_seg_size, PAGE_SIZE);
+-		sgs = DIV_ROUND_UP(len + offset_in_page(buf), desc_len);
+-	} else {
+-		desc_len = min_t(int, max_seg_size, master->max_dma_len);
+-		sgs = DIV_ROUND_UP(len, desc_len);
+-	}
++	struct sg_constraints constraints = { };
++	int ret;
  
- struct page *kmap_to_page(void *addr);
+-	ret = sg_alloc_table(sgt, sgs, GFP_KERNEL);
+-	if (ret != 0)
++	constraints.max_segment_size = dma_get_max_seg_size(dev);
++	ret = sg_alloc_table_from_buf(sgt, buf, len, &constraints, GFP_KERNEL);
++	if (ret)
+ 		return ret;
  
-+static inline bool is_highmem_addr(const void *x)
-+{
-+	unsigned long vaddr = (unsigned long)x;
-+
-+	return vaddr >=  PKMAP_BASE &&
-+	       vaddr < ((PKMAP_BASE + LAST_PKMAP) * PAGE_SIZE);
-+}
-+
- #else /* CONFIG_HIGHMEM */
- 
- static inline unsigned int nr_free_highpages(void) { return 0; }
-@@ -50,6 +58,11 @@ static inline struct page *kmap_to_page(void *addr)
- 	return virt_to_page(addr);
- }
- 
-+static inline bool is_highmem_addr(const void *x)
-+{
-+	return false;
-+}
-+
- #define totalhigh_pages 0UL
- 
- #ifndef ARCH_HAS_KMAP
+-	for (i = 0; i < sgs; i++) {
+-
+-		if (vmalloced_buf) {
+-			min = min_t(size_t,
+-				    len, desc_len - offset_in_page(buf));
+-			vm_page = vmalloc_to_page(buf);
+-			if (!vm_page) {
+-				sg_free_table(sgt);
+-				return -ENOMEM;
+-			}
+-			sg_set_page(&sgt->sgl[i], vm_page,
+-				    min, offset_in_page(buf));
+-		} else {
+-			min = min_t(size_t, len, desc_len);
+-			sg_buf = buf;
+-			sg_set_buf(&sgt->sgl[i], sg_buf, min);
+-		}
+-
+-		buf += min;
+-		len -= min;
+-	}
+-
+ 	ret = dma_map_sg(dev, sgt->sgl, sgt->nents, dir);
+ 	if (!ret)
+ 		ret = -ENOMEM;
 -- 
 2.5.0
 
