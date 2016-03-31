@@ -1,141 +1,80 @@
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [PATCH 2/4] scatterlist: add sg_alloc_table_from_buf() helper
-Date: Thu, 31 Mar 2016 16:09:23 +0100
-Message-ID: <20160331150923.GL19428@n2100.arm.linux.org.uk>
+From: Mark Brown <broonie-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH 3/4] spi: use sg_alloc_table_from_buf()
+Date: Thu, 31 Mar 2016 10:23:53 -0700
+Message-ID: <20160331172353.GJ2350@sirena.org.uk>
 References: <1459427384-21374-1-git-send-email-boris.brezillon@free-electrons.com>
- <1459427384-21374-3-git-send-email-boris.brezillon@free-electrons.com>
- <20160331141412.GK19428@n2100.arm.linux.org.uk>
- <20160331164557.544ed780@bbrezillon>
+	<1459427384-21374-4-git-send-email-boris.brezillon@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Woodhouse <dwmw2@infradead.org>,
-	Brian Norris <computersforpeace@gmail.com>,
-	linux-mtd@lists.infradead.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dave Gordon <david.s.gordon@intel.com>,
-	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Vinod Koul <vinod.koul@intel.com>,
-	Richard Weinberger <richard@nod.at>, Joerg Roedel <joro@8bytes.org>,
-	linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org,
-	Vignesh R <vigneshr@ti.com>, linux-mm@kvack.org,
-	iommu@lists.linux-foundation.org, Mark Brown <broonie@kernel.org>,
-	Hans Verkuil <hans.verkuil@cisco.com>,
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-	dmaengine@vger.kernel.org, Dan Williams <dan.j.williams@intel.com>,
-	linux-media@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-arm-kernel@lists.infradead.org,
-	Mauro Carvalho Chehab <m.chehab@samsung.com>
-To: Boris Brezillon <boris.brezillon@free-electrons.com>
-Return-path: <owner-linux-mm@kvack.org>
-Content-Disposition: inline
-In-Reply-To: <20160331164557.544ed780@bbrezillon>
-Sender: owner-linux-mm@kvack.org
+Content-Type: multipart/mixed; boundary="===============1828128484583474438=="
+Cc: Vignesh R <vigneshr-l0cyMroinI0@public.gmane.org>, linux-mm-Bw31MaZKKs3YtjvyW6yDsg@public.gmane.org,
+	linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	Laurent Pinchart <laurent.pinchart-ryLnwIuWjnjg/C1BVhZhaw@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
+	Hans Verkuil <hans.verkuil-FYB4Gu1CFyUAvxtiuMwx3w@public.gmane.org>, linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	Dave Gordon <david.s.gordon-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-spi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	Brian Norris <computersforpeace-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	David Woodhouse <dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	Mauro Carvalho Chehab <m.chehab-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+To: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1459427384-21374-4-git-send-email-boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Mar 31, 2016 at 04:45:57PM +0200, Boris Brezillon wrote:
-> Hi Russell,
-> 
-> On Thu, 31 Mar 2016 15:14:13 +0100
-> Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
-> 
-> > On Thu, Mar 31, 2016 at 02:29:42PM +0200, Boris Brezillon wrote:
-> > > sg_alloc_table_from_buf() provides an easy solution to create an sg_table
-> > > from a virtual address pointer. This function takes care of dealing with
-> > > vmallocated buffers, buffer alignment, or DMA engine limitations (maximum
-> > > DMA transfer size).
-> > 
-> > Please note that the DMA API does not take account of coherency of memory
-> > regions other than non-high/lowmem - there are specific extensions to
-> > deal with this.
-> 
-> Ok, you said 'non-high/lowmem', this means vmalloced and kmapped buffers
-> already fall in this case, right?
-> 
-> Could you tell me more about those specific extensions?
 
-I was slightly confused - the extensions I was thinking of are those
-listed at the bottom of Documentation/cachetlb.txt, which have nothing
-to do with DMA.
+--===============1828128484583474438==
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="HHj6mHPeUinss9N+"
+Content-Disposition: inline
 
-However, it's probably worth reading Documentation/DMA-API-HOWTO.txt
-to read up on what kinds of memory are considered to be DMA-able in
-the kernel.
 
-> > What this means is that having an API that takes any virtual address
-> > pointer, converts it to a scatterlist which is then DMA mapped, is
-> > unsafe.
-> 
-> Which means some implementations already get this wrong (see
-> spi_map_buf(), and I'm pretty sure it's not the only one).
+--HHj6mHPeUinss9N+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Quite possible, but that is driver stuff, and driver stuff gets things
-wrong all the time. :)
+On Thu, Mar 31, 2016 at 02:29:43PM +0200, Boris Brezillon wrote:
+> Replace custom implementation of sg_alloc_table_from_buf() by a call to
+> sg_alloc_table_from_buf().
 
-> > It'll be okay for PIPT and non-aliasing VIPT cache architectures, but
-> > for other cache architectures this will hide this problem and make
-> > review harder.
-> > 
-> 
-> Ok, you lost me. I'll have to do my homework and try to understand what
-> this means :).
+Acked-by: Mark Brown <broonie-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 
-P = physical address
-V = virtual address
-I = indexed
-T = tag
+--HHj6mHPeUinss9N+
+Content-Type: application/pgp-signature; name="signature.asc"
 
-The tag is held in each cache line.  When a location is looked up in the
-cache, an index is used to locate a set of cache lines and the tag is
-compared to check which cache line in the set is the correct one (or
-whether the address even exists in the cache.)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-How the index and tag are derived varies between cache architectures.
+iQEcBAEBCAAGBQJW/V0aAAoJECTWi3JdVIfQuGEH+wdaKEhHxJuIIwseLFy64w88
+sFhI2BJSaVk6ppdvYIdf67ku24WUoLyYEApHSGXfhntu00xAlzBh8YZjvg6F41Yg
+7Ql/wnd5YumDVMT72a9Cv1OlJ+dsUdBJuQl7/A952W53l4IR2AcBDrJ/zBWQDtOc
+bbohxZsXJP+Qou2Q9x8OebYsFr3p2Hw3XjteAVB6jwA9gINwDDLj05HgRCKbotHe
+5bMQ3pj2I1ruS4wN44SWj7YOMvLzR3nE4xVOdHV+iaFhcVTkaYn7fuWi1fdSRChk
+tCB1auoxNjAIsfnsvj6nnzAOcW/kPwKzOKIgz58DZPFkgiRKDM9wuDnN2AlMPBI=
+=uMgt
+-----END PGP SIGNATURE-----
 
-PIPT = indexed by physical address, tagged with physical address.  Never
-aliases with itself in the presence of multiple virtual mappings.
+--HHj6mHPeUinss9N+--
 
-VIPT = indexed by virtual address, tagged with physical address.  If the
-bits from the virtual address do not overlap the MMU page size, it is
-also alias free, otherwise aliases can exist, but can be eliminated by
-"cache colouring" - ensuring that a physical address is always mapped
-with the same overlapping bits.
+--===============1828128484583474438==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-VIVT = indexed by virtual address, tagged with virtual address.  The
-worst kind of cache, since every different mapping of the same physical
-address is guaranteed by design to alias with other mappings.
 
-There is little cache colouring between different kernel mappings (eg,
-between lowmem and vmalloc space.)
-
-What this means is that, while the DMA API takes care of DMA aliases
-in the lowmem mappings, an alias-prone VIPT cache will remain incoherent
-with DMA if it is remapped into vmalloc space, and the mapping happens
-to have a different cache colour.  In other words, this is a data
-corruption issue.
-
-Hence, taking a range of vmalloc() addresses, converting them into a
-scatterlist, then using the DMA API on the scatterlist _only_ guarantees
-that the lowmem (and kmap'd highmem mappings) are coherent with DMA.
-There is no way for the DMA API to know that other mappings exist, and
-obviously flushing every possible cache line just because a mapping might
-exist multiplies the expense of the DMA API: not only in terms of time
-spent running through all the possibilities, which doubles for every
-aliasing bit of VIPT, but also TLB pressure since you'd have to create
-a mapping for each alias and tear it back down.
-
-VIVT is even worse, since there is no other virtual mapping which is
-coherent, would need to be known, and each mapping would need to be
-individually flushed.
-
--- 
-RMK's Patch system: http://www.arm.linux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+--===============1828128484583474438==--
