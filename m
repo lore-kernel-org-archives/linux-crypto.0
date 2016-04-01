@@ -1,67 +1,37 @@
-From: Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH v2 2/3] ARM: i.MX25: add RNGC node to dtsi
-Date: Fri, 1 Apr 2016 16:52:59 +0800
-Message-ID: <20160401085259.GH18833@tiger>
-References: <1457705200-16951-1-git-send-email-s.trumtrar@pengutronix.de>
- <1457705200-16951-2-git-send-email-s.trumtrar@pengutronix.de>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH] crypto: qat - adf_dev_stop should not be called in atomic
+ context
+Date: Fri, 1 Apr 2016 10:51:34 -0700
+Message-ID: <56FEB526.4050604@intel.com>
+References: <20160329172036.2482.65213.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-	Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
-	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
-	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	kernel-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org
-To: Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1457705200-16951-2-git-send-email-s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga04.intel.com ([192.55.52.120]:26709 "EHLO mga04.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751732AbcDAR4a (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 1 Apr 2016 13:56:30 -0400
+In-Reply-To: <20160329172036.2482.65213.stgit@tstruk-mobl1>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 11, 2016 at 03:06:39PM +0100, Steffen Trumtrar wrote:
-> Add a devicetree entry for the Random Number Generator Version C (RNGC).
+Hi Herbert,
+On 03/29/2016 10:20 AM, Tadeusz Struk wrote:
+> VFs call adf_dev_stop() from a PF to VF interrupt bottom half.
+> This causes an oops "scheduling while atomic", because it tries
+> to aquire a mutex to unregister crypto algorithms.
+> This patch fixes the issue by calling adf_dev_stop() asynchronusely.
 > 
-> Signed-off-by: Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 > ---
-> Changes in v2:
->   - remove interrupt-names from dtsi
-> 
->  arch/arm/boot/dts/imx25.dtsi | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/arch/arm/boot/dts/imx25.dtsi b/arch/arm/boot/dts/imx25.dtsi
-> index cde329e9b9e3..ebf11d9f123e 100644
-> --- a/arch/arm/boot/dts/imx25.dtsi
-> +++ b/arch/arm/boot/dts/imx25.dtsi
-> @@ -397,6 +397,14 @@
->  				interrupts = <41>;
->  			};
->  
-> +			rng: rng@53fb0000 {
-> +				compatible = "fsl,imx25-rng";
-> +				reg = <0x53fb0000 0x4000>;
-> +				clocks = <&clks 109>;
-> +				clock-names = "ipg";
+>  drivers/crypto/qat/qat_common/adf_vf_isr.c |   31 +++++++++++++++++++++++++---
+>  1 file changed, 28 insertions(+), 3 deletions(-)
 
-I think clock-names can be dropped too.
-
-Shawn
-
-> +				interrupts = <22>;
-> +			};
-> +
->  			esdhc1: esdhc@53fb4000 {
->  				compatible = "fsl,imx25-esdhc";
->  				reg = <0x53fb4000 0x4000>;
-> -- 
-> 2.7.0
-> 
-> 
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+This patch in not correct. Please drop it.
+I'll sent a v2 early next week.
+Thanks,
+-- 
+TS
