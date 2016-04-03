@@ -1,63 +1,67 @@
-From: Tema williams <temawilliams22@gmail.com>
-Subject: WE NEED YOUR HELP URGENTLY.
-Date: Sun, 3 Apr 2016 18:14:14 +0200
-Message-ID: <CA+hOsCvD3C4OmnF77sXHYmo_TOmxOYZx0ndPSdjPY=VrvrzoOQ@mail.gmail.com>
-Reply-To: temawilliams26@yahoo.com
+From: Jeffrey Walton <noloader@gmail.com>
+Subject: What are the requirements to create/open an AF_ALG socket type?
+Date: Sun, 3 Apr 2016 16:42:01 -0400
+Message-ID: <CAH8yC8mYXDu1M3FoyaS8K_pyECcD60DYJHMWw8Yr3pXCoqeNuA@mail.gmail.com>
+Reply-To: noloader@gmail.com
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-To: undisclosed-recipients:;
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f196.google.com ([209.85.213.196]:32810 "EHLO
-	mail-ig0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753993AbcDCQOQ (ORCPT
+Received: from mail-ig0-f169.google.com ([209.85.213.169]:33800 "EHLO
+	mail-ig0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751298AbcDCUmC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 3 Apr 2016 12:14:16 -0400
-Received: by mail-ig0-f196.google.com with SMTP id nt3so9681898igb.0
-        for <linux-crypto@vger.kernel.org>; Sun, 03 Apr 2016 09:14:15 -0700 (PDT)
+	Sun, 3 Apr 2016 16:42:02 -0400
+Received: by mail-ig0-f169.google.com with SMTP id gy3so3603199igb.1
+        for <linux-crypto@vger.kernel.org>; Sun, 03 Apr 2016 13:42:01 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear Sir/madam,
+I'm testing userspace crypto code using AF_ALG domain socket. The call
+to 'socket(AF_ALG, SOCK_SEQPACKET, 0)' always fails with errno=2. The
+failure has been experienced on 3.8, 4.1, 4.2 and 4.4 kernels
+(provided by Debian, Fedora, Lubuntu and Ubuntu). I also experienced
+it on a Gentoo kernel, but I don't recall the kernel version. I've
+checked the kernel configs, and they all include
+"CONFIG_CRYPTO_USER_API={y|m}".
 
-With due respect and to the glory of Almighty God whom we worship I
-call upon you to assist my family.
-Please Permit me to inform you of my desire of going into business
-relationship with you.
+When similar code is called from userland using the async crypto gear,
+then the call to socket usually succeeds. During async testing, I also
+see a dmesg about registering a socket family 38. The dmesg is not
+present during the non-async failures.
 
-My name is Tema Williams,The only Son of late Chief PATRICK WILLIAMS.
-My father was a very wealthy cocoa merchant in Abidjan but we are from
-Sierra Leone
-After my Father death I and my Family move to South Africa as refugee.
+I also checked the kernel crypto documentation at
+http://www.kernel.org/doc/Documentation/crypto/ and
+http://www.kernel.org/doc/htmldocs/crypto-API/User.html, but I don't
+see a requirement I might be missing. I also checked a couple of slide
+decks introducing the userspace crypto API, and I don't see what the
+presenters are doing differently. Finally, I checked the LVN example
+provided at http://lwn.net/Articles/410848/.
 
-My father was poisoned to death by his business associates on one of
-their outings on a business trip.
-Before his death in a private hospital in Abidjan he secretly called
-me on his bed side and told me that
-he has the sum of ($12.000,000 MILLION US DOLLAR) kept with a security
-and finance company in South Africa,
-He also explained to me that it was because of this wealth that he was
-poisoned by his business associates,
-that I should seek for a beneficiary in any country of my choice where
-I will transfer this money and use it for investment.
-I am honorably seeking for your assistance to transfer our fund out of
-South Africa.
-Upon the successful transfer of this fund,we shall make arrangement
-for me,my mother and younger sister to come
-over to your country to further our Education and invest in a
-profitable business that you may suggest.
+If it matters, I usually disable IPv6 via a boot parameter since I
+don't use it in my environments. But I'm guessing it has nothing to do
+with the problem since the async gear works fine.
 
-More over,I am willing to offer you 20% of the total sum as
-compensation for your effort/input after the successful
-transfer of this fund into your nominated bank account overseas.
+What are the requirements to create/open an AF_ALG socket?
 
-As we depend on God, and with God all things are possible.
-Anticipating to hear from you today.
+Or maybe, what is missing so the call to socket succeeds?
 
-Thanks and God bless.
-PLEASE CALL ME +27787597591
+Thanks in advance.
 
+**********
 
-Best regards,
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <linux/if_alg.h>
 
-Tema Williams
-(for the family)
+int main(int argc, char* argv[])
+{
+        s = socket(AF_ALG, SOCK_SEQPACKET, 0);
+        if (s == -1) {
+                fprintf(stderr, "Failed to open socket: %d\n", errno);
+                goto cleanup;
+        }
+        ...
+}
