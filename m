@@ -1,51 +1,76 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH] crypto: document correct return value for request
- allocation
-Date: Mon, 4 Apr 2016 09:27:22 +0200
-Message-ID: <20160404072722.GA856@Red>
-References: <1459612496-5094-1-git-send-email-ebiggers3@gmail.com>
+From: Vignesh R <vigneshr@ti.com>
+Subject: Re: [PATCH 1/4] mm: add is_highmem_addr() helper
+Date: Mon, 4 Apr 2016 13:44:11 +0530
+Message-ID: <57022253.70400@ti.com>
+References: <1459427384-21374-1-git-send-email-boris.brezillon@free-electrons.com>
+ <1459427384-21374-2-git-send-email-boris.brezillon@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-doc-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1459612496-5094-1-git-send-email-ebiggers3@gmail.com>
-Sender: linux-doc-owner@vger.kernel.org
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Cc: Mark Brown <broonie@kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Vinod Koul <vinod.koul@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>, <dmaengine@vger.kernel.org>,
+        Mauro
+ Carvalho Chehab <m.chehab@samsung.com>,
+        Hans Verkuil
+	<hans.verkuil@cisco.com>,
+        Laurent Pinchart
+	<laurent.pinchart@ideasonboard.com>,
+        <linux-media@vger.kernel.org>, Richard
+ Weinberger <richard@nod.at>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>, <linux-mm@kvack.org>,
+        Joerg Roedel <joro@8bytes.org>, <iommu@lists.linux-foundation.org>,
+        <linux-kernel@vger.kernel.org>
+To: Boris Brezillon <boris.brezillon@free-electrons.com>,
+        David Woodhouse
+	<dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        <linux-mtd@lists.infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Gordon <david.s.gordon@intel.com>
+Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <1459427384-21374-2-git-send-email-boris.brezillon@free-electrons.com>
+Sender: owner-linux-mm@kvack.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Apr 02, 2016 at 10:54:56AM -0500, Eric Biggers wrote:
-> Signed-off-by: Eric Biggers <ebiggers3@gmail.com>
-> ---
->  Documentation/DocBook/crypto-API.tmpl | 6 +++---
->  include/crypto/aead.h                 | 3 +--
->  include/crypto/hash.h                 | 3 +--
->  include/crypto/skcipher.h             | 3 +--
->  include/linux/crypto.h                | 3 +--
->  5 files changed, 7 insertions(+), 11 deletions(-)
+Hi,
+
+On 03/31/2016 05:59 PM, Boris Brezillon wrote:
+> Add an helper to check if a virtual address is in the highmem region.
 > 
-> diff --git a/Documentation/DocBook/crypto-API.tmpl b/Documentation/DocBook/crypto-API.tmpl
-> index 348619f..d55dc5a 100644
-> --- a/Documentation/DocBook/crypto-API.tmpl
-> +++ b/Documentation/DocBook/crypto-API.tmpl
-> @@ -1936,9 +1936,9 @@ static int test_skcipher(void)
->  	}
+> Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+> ---
+>  include/linux/highmem.h | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/include/linux/highmem.h b/include/linux/highmem.h
+> index bb3f329..13dff37 100644
+> --- a/include/linux/highmem.h
+> +++ b/include/linux/highmem.h
+> @@ -41,6 +41,14 @@ void kmap_flush_unused(void);
 >  
->  	req = skcipher_request_alloc(skcipher, GFP_KERNEL);
-> -	if (IS_ERR(req)) {
-> -		pr_info("could not allocate request queue\n");
-> -		ret = PTR_ERR(req);
-> +	if (!req) {
-> +		pr_info("could not allocate skcipher request\n");
-> +		ret = -ENOMEM;
->  		goto out;
->  	}
+>  struct page *kmap_to_page(void *addr);
+>  
+> +static inline bool is_highmem_addr(const void *x)
+> +{
+> +	unsigned long vaddr = (unsigned long)x;
+> +
+> +	return vaddr >=  PKMAP_BASE &&
+> +	       vaddr < ((PKMAP_BASE + LAST_PKMAP) * PAGE_SIZE);
 
-Hello
 
-I think pr_err is better than pr_info.
+Shouldn't this be:
+		vaddr < (PKMAP_BASE + (LAST_PKMAP * PAGE_SIZE)) ?
 
+-- 
 Regards
+Vignesh
 
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
