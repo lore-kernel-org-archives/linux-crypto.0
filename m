@@ -1,43 +1,67 @@
-From: "J. Bruce Fields" <bfields@fieldses.org>
-Subject: Re: [PATCH v2] sunrpc: Fix skcipher/shash conversion
-Date: Sun, 3 Apr 2016 23:38:33 -0400
-Message-ID: <20160404033833.GA22637@fieldses.org>
-References: <20160403001319.GB12588@fieldses.org>
- <20160403010952.GA25687@gondor.apana.org.au>
- <20160403035900.GB14318@fieldses.org>
- <20160403043715.GA26722@gondor.apana.org.au>
- <20160403221543.GB19744@fieldses.org>
- <20160404012202.GA31970@gondor.apana.org.au>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH 1/2] dt/bindings: Add bindings for hisilicon random
+ number generator
+Date: Mon, 4 Apr 2016 00:15:49 -0500
+Message-ID: <20160404051549.GF17806@rob-hp-laptop>
+References: <1459474664-11264-1-git-send-email-wangkefeng.wang@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fieldses.org ([173.255.197.46]:55546 "EHLO fieldses.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751022AbcDDDie (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 3 Apr 2016 23:38:34 -0400
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, xuwei5@hisilicon.com,
+ linux-crypto@vger.kernel.org, guohanjun@huawei.com,
+ linux-arm-kernel@lists.infradead.org
+To: Kefeng Wang <wangkefeng.wang@huawei.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20160404012202.GA31970@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1459474664-11264-1-git-send-email-wangkefeng.wang@huawei.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Apr 04, 2016 at 09:22:02AM +0800, Herbert Xu wrote:
-> On Sun, Apr 03, 2016 at 06:15:43PM -0400, J. Bruce Fields wrote:
-> > For some reason, the original didn't appear to get cc'd to the linux-nfs
-> > list.  Or did it, and I missed it?  I do get lazy sometimes, but in
-> > general something like this I'd at least grab and run some tests on.
-> > Especially if there's a git tree I can grab, then it just takes me a
-> > minute to kick off.
+On Fri, Apr 01, 2016 at 09:37:43AM +0800, Kefeng Wang wrote:
+> Document the devicetree bindings for the random number generator
+> found on Hisilicon Hip04 and Hip05 soc.
 > 
-> I'm pretty sure it did get to linux-nfs, or at least the archive :)
+> Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
+> ---
+>  Documentation/devicetree/bindings/rng/hisi-rng.txt | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rng/hisi-rng.txt
 > 
-> https://www.spinics.net/lists/linux-nfs/msg56240.html
+> diff --git a/Documentation/devicetree/bindings/rng/hisi-rng.txt b/Documentation/devicetree/bindings/rng/hisi-rng.txt
+> new file mode 100644
+> index 0000000..80f29b6
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/rng/hisi-rng.txt
+> @@ -0,0 +1,12 @@
+> +Hisilicon Random Number Generator
+> +
+> +Required properties:
+> +- compatible : Should be "hisilicon,hisi-rng"
 
-D'oh.  I was probably just lame, then.  Thanks for the fix.  Feel free
-to add my tested-by: if you want.
+hisi is a bit redundant with hisilicon and please define SoC specific 
+compatible strings.
 
-Hm, now I'm seeing list corruption in the rpc code on callbacks....
-That's almost certainly unrelated to this, though.
-
---b.
+> +- reg : Offset and length of the register set of this block
+> +
+> +Example:
+> +
+> +rng@d1010000 {
+> +	compatible = "hisilicon,hisi-rng";
+> +	reg = <0xd1010000 0x100>;
+> +};
+> -- 
+> 1.7.12.4
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe devicetree" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
