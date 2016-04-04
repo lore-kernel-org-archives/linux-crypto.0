@@ -1,45 +1,43 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+From: "J. Bruce Fields" <bfields@fieldses.org>
 Subject: Re: [PATCH v2] sunrpc: Fix skcipher/shash conversion
-Date: Mon, 4 Apr 2016 09:22:02 +0800
-Message-ID: <20160404012202.GA31970@gondor.apana.org.au>
+Date: Sun, 3 Apr 2016 23:38:33 -0400
+Message-ID: <20160404033833.GA22637@fieldses.org>
 References: <20160403001319.GB12588@fieldses.org>
  <20160403010952.GA25687@gondor.apana.org.au>
  <20160403035900.GB14318@fieldses.org>
  <20160403043715.GA26722@gondor.apana.org.au>
  <20160403221543.GB19744@fieldses.org>
+ <20160404012202.GA31970@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from fieldses.org ([173.255.197.46]:55546 "EHLO fieldses.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751022AbcDDDie (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 3 Apr 2016 23:38:34 -0400
 Content-Disposition: inline
-In-Reply-To: <20160403221543.GB19744-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20160404012202.GA31970@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Apr 03, 2016 at 06:15:43PM -0400, J. Bruce Fields wrote:
->
-> OK, I did get a chance to run this, and so far it looks good--it got
-> faszter than the last time, anyway.  Thanks!
+On Mon, Apr 04, 2016 at 09:22:02AM +0800, Herbert Xu wrote:
+> On Sun, Apr 03, 2016 at 06:15:43PM -0400, J. Bruce Fields wrote:
+> > For some reason, the original didn't appear to get cc'd to the linux-nfs
+> > list.  Or did it, and I missed it?  I do get lazy sometimes, but in
+> > general something like this I'd at least grab and run some tests on.
+> > Especially if there's a git tree I can grab, then it just takes me a
+> > minute to kick off.
+> 
+> I'm pretty sure it did get to linux-nfs, or at least the archive :)
+> 
+> https://www.spinics.net/lists/linux-nfs/msg56240.html
 
-Thanks!
+D'oh.  I was probably just lame, then.  Thanks for the fix.  Feel free
+to add my tested-by: if you want.
 
-> For some reason, the original didn't appear to get cc'd to the linux-nfs
-> list.  Or did it, and I missed it?  I do get lazy sometimes, but in
-> general something like this I'd at least grab and run some tests on.
-> Especially if there's a git tree I can grab, then it just takes me a
-> minute to kick off.
+Hm, now I'm seeing list corruption in the rpc code on callbacks....
+That's almost certainly unrelated to this, though.
 
-I'm pretty sure it did get to linux-nfs, or at least the archive :)
-
-https://www.spinics.net/lists/linux-nfs/msg56240.html
-
-Cheers,
--- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+--b.
