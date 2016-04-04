@@ -1,84 +1,169 @@
-From: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Subject: Re: [PATCH 1/4] mm: add is_highmem_addr() helper
-Date: Mon, 4 Apr 2016 17:05:58 +0200
-Message-ID: <20160404170558.0e3278b5@bbrezillon>
-References: <1459427384-21374-1-git-send-email-boris.brezillon@free-electrons.com>
-	<1459427384-21374-2-git-send-email-boris.brezillon@free-electrons.com>
-	<57022253.70400@ti.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: David Woodhouse <dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Brian Norris <computersforpeace-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	<linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-	Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
-	Dave Gordon <david.s.gordon-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Mark Brown <broonie-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, <linux-spi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	<linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-	Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	<dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Mauro Carvalho Chehab <m.chehab-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
-	Hans Verkuil <hans.verkuil-FYB4Gu1CFyUAvxtiuMwx3w@public.gmane.org>,
-	Laurent Pinchart <laurent.pinchart-ryLnwIuWjnjg/C1BVhZhaw@public.gmane.org>,
-	<linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	<linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <linux-mm-Bw31MaZKKs3YtjvyW6yDsg@public.gmane.org>,
-	Joerg Roedel <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>,
-	<iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Vignesh R <vigneshr-l0cyMroinI0@public.gmane.org>
-Return-path: <linux-spi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <57022253.70400-l0cyMroinI0@public.gmane.org>
-Sender: linux-spi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Borislav Petkov <bp@alien8.de>
+Subject: [PATCH 03/10] x86/cpufeature: Remove cpu_has_avx
+Date: Mon,  4 Apr 2016 22:24:56 +0200
+Message-ID: <1459801503-15600-4-git-send-email-bp@alien8.de>
+References: <1459801503-15600-1-git-send-email-bp@alien8.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: X86 ML <x86@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1459801503-15600-1-git-send-email-bp@alien8.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, 4 Apr 2016 13:44:11 +0530
-Vignesh R <vigneshr-l0cyMroinI0@public.gmane.org> wrote:
+From: Borislav Petkov <bp@suse.de>
 
-> Hi,
-> 
-> On 03/31/2016 05:59 PM, Boris Brezillon wrote:
-> > Add an helper to check if a virtual address is in the highmem region.
-> > 
-> > Signed-off-by: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-> > ---
-> >  include/linux/highmem.h | 13 +++++++++++++
-> >  1 file changed, 13 insertions(+)
-> > 
-> > diff --git a/include/linux/highmem.h b/include/linux/highmem.h
-> > index bb3f329..13dff37 100644
-> > --- a/include/linux/highmem.h
-> > +++ b/include/linux/highmem.h
-> > @@ -41,6 +41,14 @@ void kmap_flush_unused(void);
-> >  
-> >  struct page *kmap_to_page(void *addr);
-> >  
-> > +static inline bool is_highmem_addr(const void *x)
-> > +{
-> > +	unsigned long vaddr = (unsigned long)x;
-> > +
-> > +	return vaddr >=  PKMAP_BASE &&
-> > +	       vaddr < ((PKMAP_BASE + LAST_PKMAP) * PAGE_SIZE);
-> 
-> 
-> Shouldn't this be:
-> 		vaddr < (PKMAP_BASE + (LAST_PKMAP * PAGE_SIZE)) ?
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Cc: linux-crypto@vger.kernel.org
+---
+ arch/x86/crypto/aesni-intel_glue.c         | 2 +-
+ arch/x86/crypto/camellia_aesni_avx2_glue.c | 3 ++-
+ arch/x86/crypto/camellia_aesni_avx_glue.c  | 2 +-
+ arch/x86/crypto/chacha20_glue.c            | 3 ++-
+ arch/x86/crypto/poly1305_glue.c            | 3 ++-
+ arch/x86/crypto/sha1_ssse3_glue.c          | 2 +-
+ arch/x86/crypto/sha256_ssse3_glue.c        | 2 +-
+ arch/x86/crypto/sha512_ssse3_glue.c        | 2 +-
+ arch/x86/include/asm/cpufeature.h          | 1 -
+ arch/x86/include/asm/xor_avx.h             | 4 ++--
+ 10 files changed, 13 insertions(+), 11 deletions(-)
 
-Oops, yes indeed.
-
-Anyway, given Russell's feedback I don't think I'm gonna follow up on
-this series.
-
-Sorry.
-
-Boris
-
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 064c7e2bd7c8..5b7fa1471007 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -1477,7 +1477,7 @@ static int __init aesni_init(void)
+ 	}
+ 	aesni_ctr_enc_tfm = aesni_ctr_enc;
+ #ifdef CONFIG_AS_AVX
+-	if (cpu_has_avx) {
++	if (boot_cpu_has(X86_FEATURE_AVX)) {
+ 		/* optimize performance of ctr mode encryption transform */
+ 		aesni_ctr_enc_tfm = aesni_ctr_enc_avx_tfm;
+ 		pr_info("AES CTR mode by8 optimization enabled\n");
+diff --git a/arch/x86/crypto/camellia_aesni_avx2_glue.c b/arch/x86/crypto/camellia_aesni_avx2_glue.c
+index c07f699826a0..60907c139c4e 100644
+--- a/arch/x86/crypto/camellia_aesni_avx2_glue.c
++++ b/arch/x86/crypto/camellia_aesni_avx2_glue.c
+@@ -562,7 +562,8 @@ static int __init camellia_aesni_init(void)
+ {
+ 	const char *feature_name;
+ 
+-	if (!boot_cpu_has(X86_FEATURE_AVX2) || !cpu_has_avx ||
++	if (!boot_cpu_has(X86_FEATURE_AVX) ||
++	    !boot_cpu_has(X86_FEATURE_AVX2) ||
+ 	    !boot_cpu_has(X86_FEATURE_AES) ||
+ 	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
+ 		pr_info("AVX2 or AES-NI instructions are not detected.\n");
+diff --git a/arch/x86/crypto/camellia_aesni_avx_glue.c b/arch/x86/crypto/camellia_aesni_avx_glue.c
+index 6d256d59c5fd..d96429da88eb 100644
+--- a/arch/x86/crypto/camellia_aesni_avx_glue.c
++++ b/arch/x86/crypto/camellia_aesni_avx_glue.c
+@@ -554,7 +554,7 @@ static int __init camellia_aesni_init(void)
+ {
+ 	const char *feature_name;
+ 
+-	if (!cpu_has_avx ||
++	if (!boot_cpu_has(X86_FEATURE_AVX) ||
+ 	    !boot_cpu_has(X86_FEATURE_AES) ||
+ 	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
+ 		pr_info("AVX or AES-NI instructions are not detected.\n");
+diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha20_glue.c
+index cea061e137da..2d5c2e0bd939 100644
+--- a/arch/x86/crypto/chacha20_glue.c
++++ b/arch/x86/crypto/chacha20_glue.c
+@@ -129,7 +129,8 @@ static int __init chacha20_simd_mod_init(void)
+ 		return -ENODEV;
+ 
+ #ifdef CONFIG_AS_AVX2
+-	chacha20_use_avx2 = cpu_has_avx && boot_cpu_has(X86_FEATURE_AVX2) &&
++	chacha20_use_avx2 = boot_cpu_has(X86_FEATURE_AVX) &&
++			    boot_cpu_has(X86_FEATURE_AVX2) &&
+ 			    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
+ #endif
+ 	return crypto_register_alg(&alg);
+diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
+index ea21d2e440f7..e32142bc071d 100644
+--- a/arch/x86/crypto/poly1305_glue.c
++++ b/arch/x86/crypto/poly1305_glue.c
+@@ -183,7 +183,8 @@ static int __init poly1305_simd_mod_init(void)
+ 		return -ENODEV;
+ 
+ #ifdef CONFIG_AS_AVX2
+-	poly1305_use_avx2 = cpu_has_avx && boot_cpu_has(X86_FEATURE_AVX2) &&
++	poly1305_use_avx2 = boot_cpu_has(X86_FEATURE_AVX) &&
++			    boot_cpu_has(X86_FEATURE_AVX2) &&
+ 			    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
+ 	alg.descsize = sizeof(struct poly1305_simd_desc_ctx);
+ 	if (poly1305_use_avx2)
+diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+index dd14616b7739..1024e378a358 100644
+--- a/arch/x86/crypto/sha1_ssse3_glue.c
++++ b/arch/x86/crypto/sha1_ssse3_glue.c
+@@ -166,7 +166,7 @@ static struct shash_alg sha1_avx_alg = {
+ static bool avx_usable(void)
+ {
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL)) {
+-		if (cpu_has_avx)
++		if (boot_cpu_has(X86_FEATURE_AVX))
+ 			pr_info("AVX detected but unusable.\n");
+ 		return false;
+ 	}
+diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
+index 5f4d6086dc59..3ae0f43ebd37 100644
+--- a/arch/x86/crypto/sha256_ssse3_glue.c
++++ b/arch/x86/crypto/sha256_ssse3_glue.c
+@@ -201,7 +201,7 @@ static struct shash_alg sha256_avx_algs[] = { {
+ static bool avx_usable(void)
+ {
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL)) {
+-		if (cpu_has_avx)
++		if (boot_cpu_has(X86_FEATURE_AVX))
+ 			pr_info("AVX detected but unusable.\n");
+ 		return false;
+ 	}
+diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
+index 34e5083d6f36..0b17c83d027d 100644
+--- a/arch/x86/crypto/sha512_ssse3_glue.c
++++ b/arch/x86/crypto/sha512_ssse3_glue.c
+@@ -151,7 +151,7 @@ asmlinkage void sha512_transform_avx(u64 *digest, const char *data,
+ static bool avx_usable(void)
+ {
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL)) {
+-		if (cpu_has_avx)
++		if (boot_cpu_has(X86_FEATURE_AVX))
+ 			pr_info("AVX detected but unusable.\n");
+ 		return false;
+ 	}
+diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufeature.h
+index a6627b30bf45..3b232a120a5d 100644
+--- a/arch/x86/include/asm/cpufeature.h
++++ b/arch/x86/include/asm/cpufeature.h
+@@ -123,7 +123,6 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
+ #define cpu_has_apic		boot_cpu_has(X86_FEATURE_APIC)
+ #define cpu_has_fxsr		boot_cpu_has(X86_FEATURE_FXSR)
+ #define cpu_has_xmm		boot_cpu_has(X86_FEATURE_XMM)
+-#define cpu_has_avx		boot_cpu_has(X86_FEATURE_AVX)
+ #define cpu_has_xsave		boot_cpu_has(X86_FEATURE_XSAVE)
+ #define cpu_has_xsaves		boot_cpu_has(X86_FEATURE_XSAVES)
+ /*
+diff --git a/arch/x86/include/asm/xor_avx.h b/arch/x86/include/asm/xor_avx.h
+index e45e556140af..22a7b1870a31 100644
+--- a/arch/x86/include/asm/xor_avx.h
++++ b/arch/x86/include/asm/xor_avx.h
+@@ -167,12 +167,12 @@ static struct xor_block_template xor_block_avx = {
+ 
+ #define AVX_XOR_SPEED \
+ do { \
+-	if (cpu_has_avx && boot_cpu_has(X86_FEATURE_OSXSAVE)) \
++	if (boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_OSXSAVE)) \
+ 		xor_speed(&xor_block_avx); \
+ } while (0)
+ 
+ #define AVX_SELECT(FASTEST) \
+-	(cpu_has_avx && boot_cpu_has(X86_FEATURE_OSXSAVE) ? &xor_block_avx : FASTEST)
++	(boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_OSXSAVE) ? &xor_block_avx : FASTEST)
+ 
+ #else
+ 
 -- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
---
-To unsubscribe from this list: send the line "unsubscribe linux-spi" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+2.7.3
