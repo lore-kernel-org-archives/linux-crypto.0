@@ -1,31 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] MAINTAINERS: Add a new maintainer for the CCP driver
-Date: Tue, 5 Apr 2016 20:46:52 +0800
-Message-ID: <20160405124652.GH13048@gondor.apana.org.au>
-References: <20160321164321.22405.94570.stgit@tlendack-t1.amdoffice.net>
+Subject: Re: [PATCH v3 1/3] crypto: s5p-sss - Minor coding cleanups
+Date: Tue, 5 Apr 2016 20:47:14 +0800
+Message-ID: <20160405124714.GI13048@gondor.apana.org.au>
+References: <1458611905-30157-1-git-send-email-k.kozlowski@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Gary Hook <gary.hook@amd.com>,
-	David Miller <davem@davemloft.net>
-To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Vladimir Zapolskiy <vz@mleia.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Krzysztof Kozlowski <krzk@kernel.org>
+To: Krzysztof Kozlowski <k.kozlowski@samsung.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:46508 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:55786 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758116AbcDEMqz (ORCPT
+	with ESMTP id S1758440AbcDEMrX (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Apr 2016 08:46:55 -0400
+	Tue, 5 Apr 2016 08:47:23 -0400
 Content-Disposition: inline
-In-Reply-To: <20160321164321.22405.94570.stgit@tlendack-t1.amdoffice.net>
+In-Reply-To: <1458611905-30157-1-git-send-email-k.kozlowski@samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 21, 2016 at 11:43:22AM -0500, Tom Lendacky wrote:
-> Gary will be taking over future development of the CCP driver, so add
-> him as a co-maintainer of the driver.
+On Tue, Mar 22, 2016 at 10:58:23AM +0900, Krzysztof Kozlowski wrote:
+> From: Krzysztof Kozlowski <krzk@kernel.org>
 > 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Remove unneeded inclusion of delay.h and get rid of indentation from
+> labels.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+> Acked-by: Vladimir Zapolskiy <vz@mleia.com>
 
-Applied.
+All applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
