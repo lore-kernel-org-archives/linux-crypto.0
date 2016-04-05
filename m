@@ -1,32 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: qat - Remove redundant nrbg rings
-Date: Tue, 5 Apr 2016 20:48:15 +0800
-Message-ID: <20160405124815.GL13048@gondor.apana.org.au>
-References: <1458671121-23244-1-git-send-email-tadeusz.struk@intel.com>
+Subject: Re: [PATCH v2 0/2] crypto: qat fixes
+Date: Tue, 5 Apr 2016 20:48:42 +0800
+Message-ID: <20160405124842.GM13048@gondor.apana.org.au>
+References: <1458745600-1448-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Ahsan Atta <ahsan.atta@intel.com>
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: tadeusz.struk@intel.com, linux-crypto@vger.kernel.org,
+	smueller@chronox.de, horia.geanta@nxp.com
+To: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:33111 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:42733 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753752AbcDEMsX (ORCPT
+	with ESMTP id S1758487AbcDEMsq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Apr 2016 08:48:23 -0400
+	Tue, 5 Apr 2016 08:48:46 -0400
 Content-Disposition: inline
-In-Reply-To: <1458671121-23244-1-git-send-email-tadeusz.struk@intel.com>
+In-Reply-To: <1458745600-1448-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 22, 2016 at 11:25:21AM -0700, Tadeusz Struk wrote:
-> From: Ahsan Atta <ahsan.atta@intel.com>
+On Wed, Mar 23, 2016 at 05:06:38PM +0200, Tudor Ambarus wrote:
+> Initial patch set can be found here:
+>         http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg18185.html
 > 
-> Remove redundant nrbg rings.
+> This patch set is no longer related to the generalized ASN.1 parser.
+> Tadeusz will remove the ASN.1 parser from qat.
 > 
-> Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> No changes from initial patch set.
 
-Applied.
+All applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
