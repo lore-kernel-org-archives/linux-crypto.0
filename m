@@ -1,48 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH V2] crypto: implement DH primitives under akcipher API
-Date: Tue, 5 Apr 2016 19:08:37 +0800
-Message-ID: <20160405110837.GA11852@gondor.apana.org.au>
-References: <1457007345-3412-1-git-send-email-salvatore.benedetto@intel.com>
- <B4E74723-637F-4A0D-9081-0541F1DF64BD@holtmann.org>
+Subject: Re: [PATCH 0/3] crypto: af_alg - add TLS type encryption
+Date: Tue, 5 Apr 2016 19:29:40 +0800
+Message-ID: <20160405112940.GB11852@gondor.apana.org.au>
+References: <20160306012044.6369.63924.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Salvatore Benedetto <salvatore.benedetto@intel.com>,
-	linux-crypto@vger.kernel.org
-To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	davem@davemloft.net
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60802 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:48173 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756369AbcDELIq (ORCPT
+	with ESMTP id S1758096AbcDEL3r (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Apr 2016 07:08:46 -0400
+	Tue, 5 Apr 2016 07:29:47 -0400
 Content-Disposition: inline
-In-Reply-To: <B4E74723-637F-4A0D-9081-0541F1DF64BD@holtmann.org>
+In-Reply-To: <20160306012044.6369.63924.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Mar 03, 2016 at 08:23:48AM -0800, Marcel Holtmann wrote:
-> Hi Salvatore,
-> 
-> > Implement Diffie-Hellman primitives required by the scheme under the
-> > akcipher API. Here is how it works.
-> > 1) Call set_pub_key() by passing DH parameters (p,g) in PKCS3 format
-> > 2) Call set_priv_key() to set your own private key (xa) in raw format
-> > 3) Call decrypt() without passing any data as input to get back the
-> >   public part which will be computed as g^xa mod p
-> > 4) Call encrypt() by passing the counter part public key (yb) in raw format
-> >   as input to get back the shared secret calculated as zz = yb^xa mod p
-> 
-> I am still not convinced that akcipher is good match for key exchange methods. I think we should try to introduce a new abstraction here.
-> 
-> Overloading set_pub_key() with DH params and using decrypt() for private/public key pair generation seems not a good fit. It does not really match.
-> 
-> And as I said before, we know for certain that ECDH has to happen as well. So we need to forward look into making that fit as well.
+On Sat, Mar 05, 2016 at 05:20:44PM -0800, Tadeusz Struk wrote:
+> Hi,
+> The following series adds TLS type authentication. To do this a new
+> template, encauth, is introduced. It is derived from the existing authenc
+> template and modified to work in "first auth then encrypt" mode.
+> The algif interface is also changed to work with the new authentication type.
 
-I agree that akcipher is poor choice for this.  If we are going
-to add DH to the crypto API then it should be of its own type.
+What is the point of this patch-set? Who is going to be the user?
 
-But before we even go there what does the hardware acceleration
-actually look like?
+Also you're including padding into the algorithm.  That goes against
+the way we implemented IPsec.  What is the justification for doing
+it in the crypto layer instead of the protocol layer?
 
 Cheers,
 -- 
