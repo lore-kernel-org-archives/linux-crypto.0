@@ -1,29 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: qat - make sure const_tab is 1024 bytes aligned
-Date: Tue, 5 Apr 2016 20:48:00 +0800
-Message-ID: <20160405124800.GK13048@gondor.apana.org.au>
-References: <1458668725-21232-1-git-send-email-tadeusz.struk@intel.com>
+Subject: Re: [PATCH v3 00/14] lib/mpi: bug fixes and cleanup
+Date: Tue, 5 Apr 2016 20:47:33 +0800
+Message-ID: <20160405124733.GJ13048@gondor.apana.org.au>
+References: <1458648768-1469-1-git-send-email-nicstange@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55487 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757602AbcDEMsF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Apr 2016 08:48:05 -0400
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Michal Marek <mmarek@suse.com>,
+	Andrzej Zaborowski <andrew.zaborowski@intel.com>,
+	Stephan Mueller <smueller@chronox.de>,
+	Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Nicolai Stange <nicstange@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1458668725-21232-1-git-send-email-tadeusz.struk@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1458648768-1469-1-git-send-email-nicstange@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Mar 22, 2016 at 10:45:25AM -0700, Tadeusz Struk wrote:
-> FW requires the const_tab to be 1024 bytes aligned.
+On Tue, Mar 22, 2016 at 01:12:34PM +0100, Nicolai Stange wrote:
+> Former v2 can be found here:
 > 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+>   http://lkml.kernel.org/g/1458566775-5239-1-git-send-email-nicstange@gmail.com
+> 
+> 
+> This v3 series incorporates a fix to the pointer arithmetic issue in v2's
+> [8/14] ("lib/mpi: mpi_read_buffer(): fix buffer overflow") spotted by
+> Tadeusz Struk.
+> 
+> The rest, that is [1-7,9-14/14], go unchanged and have got a
+> 
+>   Tested-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> 
+> already.
+> 
+> 
+> Applicable to linux-next-20160322.
 
-Applied.
+All applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
