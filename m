@@ -1,34 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: drbg - set HMAC key only when altered
-Date: Tue, 5 Apr 2016 20:50:30 +0800
-Message-ID: <20160405125030.GO13048@gondor.apana.org.au>
-References: <1989575.kgMrm1hmR5@positron.chronox.de>
+Subject: Re: [PATCH] crypto: qat - explicitly stop all VFs first
+Date: Tue, 5 Apr 2016 20:50:59 +0800
+Message-ID: <20160405125059.GP13048@gondor.apana.org.au>
+References: <20160329172052.2522.93778.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54909 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:36030 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758454AbcDEMud (ORCPT
+	with ESMTP id S1758328AbcDEMvC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Apr 2016 08:50:33 -0400
+	Tue, 5 Apr 2016 08:51:02 -0400
 Content-Disposition: inline
-In-Reply-To: <1989575.kgMrm1hmR5@positron.chronox.de>
+In-Reply-To: <20160329172052.2522.93778.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 28, 2016 at 04:47:55PM +0200, Stephan Mueller wrote:
-> The HMAC implementation allows setting the HMAC key independently from
-> the hashing operation. Therefore, the key only needs to be set when a
-> new key is generated.
+On Tue, Mar 29, 2016 at 10:20:52AM -0700, Tadeusz Struk wrote:
+> When stopping devices it is not enought to loop backwards.
+> We need to explicitly stop all VFs first.
 > 
-> This patch increases the speed of the HMAC DRBG by at least 35% depending
-> on the use case.
-> 
-> The patch is fully CAVS tested.
-> 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 
 Applied.
 -- 
