@@ -1,32 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [patch] crypto: marvell/cesa - remove unneeded condition
-Date: Tue, 5 Apr 2016 20:46:36 +0800
-Message-ID: <20160405124636.GG13048@gondor.apana.org.au>
-References: <20160321090342.GB31670@mwanda>
+Subject: Re: [PATCH] MAINTAINERS: Add a new maintainer for the CCP driver
+Date: Tue, 5 Apr 2016 20:46:52 +0800
+Message-ID: <20160405124652.GH13048@gondor.apana.org.au>
+References: <20160321164321.22405.94570.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: linux-crypto@vger.kernel.org, Gary Hook <gary.hook@amd.com>,
+	David Miller <davem@davemloft.net>
+To: Tom Lendacky <thomas.lendacky@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38512 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:46508 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758412AbcDEMqr (ORCPT
+	with ESMTP id S1758116AbcDEMqz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Apr 2016 08:46:47 -0400
+	Tue, 5 Apr 2016 08:46:55 -0400
 Content-Disposition: inline
-In-Reply-To: <20160321090342.GB31670@mwanda>
+In-Reply-To: <20160321164321.22405.94570.stgit@tlendack-t1.amdoffice.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 21, 2016 at 12:03:43PM +0300, Dan Carpenter wrote:
-> creq->cache[] is an array inside the struct, it's not a pointer and it
-> can't be NULL.
+On Mon, Mar 21, 2016 at 11:43:22AM -0500, Tom Lendacky wrote:
+> Gary will be taking over future development of the CCP driver, so add
+> him as a co-maintainer of the driver.
 > 
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 
 Applied.
 -- 
