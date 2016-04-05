@@ -1,34 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/2] crypto: qat fixes
-Date: Tue, 5 Apr 2016 20:48:42 +0800
-Message-ID: <20160405124842.GM13048@gondor.apana.org.au>
-References: <1458745600-1448-1-git-send-email-tudor-dan.ambarus@nxp.com>
+Subject: Re: [PATCH RESEND] crypto: sun4i-ss: Replace spinlock_bh by
+ spin_lock_irq{save|restore}
+Date: Tue, 5 Apr 2016 20:49:43 +0800
+Message-ID: <20160405124943.GN13048@gondor.apana.org.au>
+References: <1458745884-27798-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: tadeusz.struk@intel.com, linux-crypto@vger.kernel.org,
-	smueller@chronox.de, horia.geanta@nxp.com
-To: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:42733 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758487AbcDEMsq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Apr 2016 08:48:46 -0400
+Cc: davem@davemloft.net, maxime.ripard@free-electrons.com,
+	wens@csie.org, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	stable <stable@vger.kernel.org>
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1458745600-1448-1-git-send-email-tudor-dan.ambarus@nxp.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1458745884-27798-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Mar 23, 2016 at 05:06:38PM +0200, Tudor Ambarus wrote:
-> Initial patch set can be found here:
->         http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg18185.html
+On Wed, Mar 23, 2016 at 04:11:24PM +0100, LABBE Corentin wrote:
+> The current sun4i-ss driver could generate data corruption when ciphering/deciphering.
+> It occurs randomly on end of handled data.
+> No root cause have been found and the only way to remove it is to replace
+> all spin_lock_bh by their irq counterparts.
 > 
-> This patch set is no longer related to the generalized ASN.1 parser.
-> Tadeusz will remove the ASN.1 parser from qat.
-> 
-> No changes from initial patch set.
+> Fixes: 6298e948215f ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
+> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+> Cc: stable <stable@vger.kernel.org>
 
-All applied.
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
