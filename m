@@ -1,32 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] hwrng: exynos - Fix misspelled Samsung address
-Date: Tue, 5 Apr 2016 20:52:56 +0800
-Message-ID: <20160405125256.GR13048@gondor.apana.org.au>
-References: <1459821868-26034-1-git-send-email-k.kozlowski@samsung.com>
+From: Mike Galbraith <umgwanakikbuti@gmail.com>
+Subject: [patch] crypto,ccp: Fix RT breaking #include <linux/rwlock_types.h>
+Date: Tue, 05 Apr 2016 15:03:21 +0200
+Message-ID: <1459861401.7776.4.camel@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Matt Mackall <mpm@selenic.com>, Kukjin Kim <kgene@kernel.org>,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Gary R Hook <gary.hook@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:33393 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750835AbcDEMxJ (ORCPT
+Received: from mail-wm0-f48.google.com ([74.125.82.48]:38819 "EHLO
+	mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758305AbcDENDZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Apr 2016 08:53:09 -0400
-Content-Disposition: inline
-In-Reply-To: <1459821868-26034-1-git-send-email-k.kozlowski@samsung.com>
+	Tue, 5 Apr 2016 09:03:25 -0400
+Received: by mail-wm0-f48.google.com with SMTP id u206so3311846wme.1
+        for <linux-crypto@vger.kernel.org>; Tue, 05 Apr 2016 06:03:24 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 05, 2016 at 11:04:28AM +0900, Krzysztof Kozlowski wrote:
-> Correct smasung.com into samsung.com.
-> 
-> Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
 
-Applied.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Direct include of rwlock_types.h breaks RT, use spinlock_types.h instead.
+
+Fixes: 553d2374db0b crypto: ccp - Support for multiple CCPs
+Signed-off-by: Mike Galbraith <umgwanakikbuti@gmail.com>
+---
+ drivers/crypto/ccp/ccp-dev.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/drivers/crypto/ccp/ccp-dev.c
++++ b/drivers/crypto/ccp/ccp-dev.c
+@@ -16,7 +16,7 @@
+ #include <linux/sched.h>
+ #include <linux/interrupt.h>
+ #include <linux/spinlock.h>
+-#include <linux/rwlock_types.h>
++#include <linux/spinlock_types.h>
+ #include <linux/types.h>
+ #include <linux/mutex.h>
+ #include <linux/delay.h>
