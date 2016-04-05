@@ -1,36 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/3] crypto: af_alg - add TLS type encryption
-Date: Tue, 5 Apr 2016 19:29:40 +0800
-Message-ID: <20160405112940.GB11852@gondor.apana.org.au>
-References: <20160306012044.6369.63924.stgit@tstruk-mobl1>
+Subject: Re: Asymmetric ciphers: counter measures
+Date: Tue, 5 Apr 2016 19:43:37 +0800
+Message-ID: <20160405114337.GC11852@gondor.apana.org.au>
+References: <1710408.OFMoxk9pvo@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	davem@davemloft.net
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: "Struk, Tadeusz" <tadeusz.struk@intel.com>,
+	linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48173 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:41700 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758096AbcDEL3r (ORCPT
+	with ESMTP id S1757824AbcDELnr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Apr 2016 07:29:47 -0400
+	Tue, 5 Apr 2016 07:43:47 -0400
 Content-Disposition: inline
-In-Reply-To: <20160306012044.6369.63924.stgit@tstruk-mobl1>
+In-Reply-To: <1710408.OFMoxk9pvo@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Mar 05, 2016 at 05:20:44PM -0800, Tadeusz Struk wrote:
-> Hi,
-> The following series adds TLS type authentication. To do this a new
-> template, encauth, is introduced. It is derived from the existing authenc
-> template and modified to work in "first auth then encrypt" mode.
-> The algif interface is also changed to work with the new authentication type.
+On Wed, Feb 24, 2016 at 12:27:03PM +0100, Stephan Mueller wrote:
+> 
+> Currently RSA does not implement anything and is even susceptible to timing 
+> attacks if I see that right as the leading zeros are stripped. In addition to 
 
-What is the point of this patch-set? Who is going to be the user?
+We should certainly fix this by not stripping the zeroes.
 
-Also you're including padding into the algorithm.  That goes against
-the way we implemented IPsec.  What is the justification for doing
-it in the crypto layer instead of the protocol layer?
+> the leading zeroes problem, blinding comes to mind. If we do blinding, what 
+> type of blinding is sufficient for a fallback (base, exponent, modulus)?
+
+It's not just a fallback.  If we ever export this to user-space this
+may become a primary implementation.
 
 Cheers,
 -- 
