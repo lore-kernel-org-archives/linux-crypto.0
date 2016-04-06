@@ -1,84 +1,49 @@
-From: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-Subject: [PATCH v3 1/3] crypto: scatterwak - Add scatterwalk_sg_copychunks
-Date: Wed, 6 Apr 2016 16:37:54 +0300
-Message-ID: <1459949876-11989-2-git-send-email-tudor-dan.ambarus@nxp.com>
-References: <1459949876-11989-1-git-send-email-tudor-dan.ambarus@nxp.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH 0/3] crypto: af_alg - add TLS type encryption
+Date: Wed, 6 Apr 2016 10:56:12 -0700
+Message-ID: <57054DBC.8010507@intel.com>
+References: <20160306012044.6369.63924.stgit@tstruk-mobl1>
+ <20160405112940.GB11852@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>, <smueller@chronox.de>,
-	<cristian.stoica@nxp.com>, <horia.geanta@nxp.com>,
-	Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-To: <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	davem@davemloft.net
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0095.outbound.protection.outlook.com ([65.55.169.95]:1953
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751648AbcDFNiI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 6 Apr 2016 09:38:08 -0400
-In-Reply-To: <1459949876-11989-1-git-send-email-tudor-dan.ambarus@nxp.com>
+Received: from mga01.intel.com ([192.55.52.88]:16739 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751678AbcDFSBU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 6 Apr 2016 14:01:20 -0400
+In-Reply-To: <20160405112940.GB11852@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds the function scatterwalk_sg_copychunks which writes
-a chunk of data from a scatterwalk to another scatterwalk.
-It will be used by caam driver to remove the leading zeros of RSA's
-algorithm output.
+Hi Herbert,
+On 04/05/2016 04:29 AM, Herbert Xu wrote:
+> On Sat, Mar 05, 2016 at 05:20:44PM -0800, Tadeusz Struk wrote:
+>> > Hi,
+>> > The following series adds TLS type authentication. To do this a new
+>> > template, encauth, is introduced. It is derived from the existing authenc
+>> > template and modified to work in "first auth then encrypt" mode.
+>> > The algif interface is also changed to work with the new authentication type.
+> What is the point of this patch-set? Who is going to be the user?
 
-Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
----
- crypto/scatterwalk.c         | 26 ++++++++++++++++++++++++++
- include/crypto/scatterwalk.h |  2 ++
- 2 files changed, 28 insertions(+)
+The intend is to enable HW acceleration of the TLS protocol.
+The way it will work is that the user space will send a packet of data
+via AF_ALG and HW will authenticate and encrypt it in one go.
 
-diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
-index ea5815c..bc3222d 100644
---- a/crypto/scatterwalk.c
-+++ b/crypto/scatterwalk.c
-@@ -125,6 +125,32 @@ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
- }
- EXPORT_SYMBOL_GPL(scatterwalk_map_and_copy);
- 
-+void scatterwalk_sg_copychunks(struct scatter_walk *dest,
-+			       struct scatter_walk *src, size_t nbytes)
-+{
-+	for (;;) {
-+		unsigned int len_this_page = scatterwalk_pagelen(dest);
-+		u8 *vaddr;
-+
-+		if (len_this_page > nbytes)
-+			len_this_page = nbytes;
-+
-+		vaddr = scatterwalk_map(dest);
-+		scatterwalk_copychunks(vaddr, src, len_this_page, 0);
-+		scatterwalk_unmap(vaddr);
-+
-+		scatterwalk_advance(dest, len_this_page);
-+
-+		if (nbytes == len_this_page)
-+			break;
-+
-+		nbytes -= len_this_page;
-+
-+		scatterwalk_pagedone(dest, 0, 1);
-+	}
-+}
-+EXPORT_SYMBOL_GPL(scatterwalk_sg_copychunks);
-+
- int scatterwalk_bytes_sglen(struct scatterlist *sg, int num_bytes)
- {
- 	int offset = 0, n = 0;
-diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index 35f99b6..8b799c5 100644
---- a/include/crypto/scatterwalk.h
-+++ b/include/crypto/scatterwalk.h
-@@ -86,6 +86,8 @@ static inline void scatterwalk_unmap(void *vaddr)
- void scatterwalk_start(struct scatter_walk *walk, struct scatterlist *sg);
- void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
- 			    size_t nbytes, int out);
-+void scatterwalk_sg_copychunks(struct scatter_walk *dest,
-+			       struct scatter_walk *src, size_t nbytes);
- void *scatterwalk_map(struct scatter_walk *walk);
- void scatterwalk_done(struct scatter_walk *walk, int out, int more);
- 
+> 
+> Also you're including padding into the algorithm.  That goes against
+> the way we implemented IPsec.  What is the justification for doing
+> it in the crypto layer instead of the protocol layer?
+
+This is because of how the TLS protocol work. In IPSEC the stack does the job
+of aligning the packet to block size and the crypto layer doesn't need to worry
+about padding. In TLS we need to make sure that after auth the buff is still
+block size align, and that is why we need padding.
+Do you think we should make the user to provide the data in a big enough buffer
+to accommodate the digest and padding and the padding itself?
+Thanks,
 -- 
-1.8.3.1
+TS
