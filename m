@@ -1,86 +1,38 @@
-From: zengzhaoxiu@163.com
-Subject: [PATCH v2 22/30] crypto: use parity functions in qat_hal
-Date: Wed,  6 Apr 2016 17:58:08 +0800
-Message-ID: <1459936688-8077-1-git-send-email-zengzhaoxiu@163.com>
-References: <57031D9D.801@gmail.com>
-Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Zhaoxiu Zeng <zhaoxiu.zeng@gmail.com>
-To: tadeusz.struk@intel.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, pingchao.yang@intel.com,
-	bruce.w.allan@intel.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <57031D9D.801@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH] PKCS#7: fix missing break on OID_sha224 case
+Date: Wed, 06 Apr 2016 13:55:17 +0100
+Message-ID: <2764.1459947317@warthog.procyon.org.uk>
+References: <1458316291-25705-1-git-send-email-colin.king@canonical.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Peter Jones <pjones@redhat.com>, linux-crypto@vger.kernel.org,
+	stable@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Colin King <colin.king@canonical.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:47347 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752382AbcDFMzV convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 6 Apr 2016 08:55:21 -0400
+In-Reply-To: <1458316291-25705-1-git-send-email-colin.king@canonical.com>
+Content-ID: <2762.1459947317.1@warthog.procyon.org.uk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Zhaoxiu Zeng <zhaoxiu.zeng@gmail.com>
+Colin King <colin.king@canonical.com> wrote:
 
-Signed-off-by: Zhaoxiu Zeng <zhaoxiu.zeng@gmail.com>
----
- drivers/crypto/qat/qat_common/qat_hal.c | 32 ++++++++++----------------------
- 1 file changed, 10 insertions(+), 22 deletions(-)
+> From: Colin Ian King <colin.king@canonical.com>
+> 
+> The OID_sha224 case is missing a break and it falls through
+> to the -ENOPKG error default.  Since HASH_ALGO_SHA224 seems
+> to be supported, this looks like an unintentional missing break.
+> 
+> Fixes: 07f081fb5057 ("PKCS#7: Add OIDs for sha224, sha284 and sha512 hash algos and use them")
+> Cc: <stable@vger.kernel.org> # 4.2+
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
-diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
-index 1e480f1..318558f 100644
---- a/drivers/crypto/qat/qat_common/qat_hal.c
-+++ b/drivers/crypto/qat/qat_common/qat_hal.c
-@@ -546,17 +546,6 @@ static void qat_hal_disable_ctx(struct icp_qat_fw_loader_handle *handle,
- 	qat_hal_wr_ae_csr(handle, ae, CTX_ENABLES, ctx);
- }
- 
--static uint64_t qat_hal_parity_64bit(uint64_t word)
--{
--	word ^= word >> 1;
--	word ^= word >> 2;
--	word ^= word >> 4;
--	word ^= word >> 8;
--	word ^= word >> 16;
--	word ^= word >> 32;
--	return word & 1;
--}
--
- static uint64_t qat_hal_set_uword_ecc(uint64_t uword)
- {
- 	uint64_t bit0_mask = 0xff800007fffULL, bit1_mask = 0x1f801ff801fULL,
-@@ -566,13 +555,13 @@ static uint64_t qat_hal_set_uword_ecc(uint64_t uword)
- 
- 	/* clear the ecc bits */
- 	uword &= ~(0x7fULL << 0x2C);
--	uword |= qat_hal_parity_64bit(bit0_mask & uword) << 0x2C;
--	uword |= qat_hal_parity_64bit(bit1_mask & uword) << 0x2D;
--	uword |= qat_hal_parity_64bit(bit2_mask & uword) << 0x2E;
--	uword |= qat_hal_parity_64bit(bit3_mask & uword) << 0x2F;
--	uword |= qat_hal_parity_64bit(bit4_mask & uword) << 0x30;
--	uword |= qat_hal_parity_64bit(bit5_mask & uword) << 0x31;
--	uword |= qat_hal_parity_64bit(bit6_mask & uword) << 0x32;
-+	uword |= (uint64_t)parity64(bit0_mask & uword) << 0x2C;
-+	uword |= (uint64_t)parity64(bit1_mask & uword) << 0x2D;
-+	uword |= (uint64_t)parity64(bit2_mask & uword) << 0x2E;
-+	uword |= (uint64_t)parity64(bit3_mask & uword) << 0x2F;
-+	uword |= (uint64_t)parity64(bit4_mask & uword) << 0x30;
-+	uword |= (uint64_t)parity64(bit5_mask & uword) << 0x31;
-+	uword |= (uint64_t)parity64(bit6_mask & uword) << 0x32;
- 	return uword;
- }
- 
-@@ -853,15 +842,14 @@ void qat_hal_wr_umem(struct icp_qat_fw_loader_handle *handle,
- 	uaddr |= UA_ECS;
- 	qat_hal_wr_ae_csr(handle, ae, USTORE_ADDRESS, uaddr);
- 	for (i = 0; i < words_num; i++) {
--		unsigned int uwrd_lo, uwrd_hi, tmp;
-+		unsigned int uwrd_lo, uwrd_hi;
- 
- 		uwrd_lo = ((data[i] & 0xfff0000) << 4) | (0x3 << 18) |
- 			  ((data[i] & 0xff00) << 2) |
- 			  (0x3 << 8) | (data[i] & 0xff);
- 		uwrd_hi = (0xf << 4) | ((data[i] & 0xf0000000) >> 28);
--		uwrd_hi |= (hweight32(data[i] & 0xffff) & 0x1) << 8;
--		tmp = ((data[i] >> 0x10) & 0xffff);
--		uwrd_hi |= (hweight32(tmp) & 0x1) << 9;
-+		uwrd_hi |= parity16(data[i]) << 8;
-+		uwrd_hi |= parity16(data[i] >> 16) << 9;
- 		qat_hal_wr_ae_csr(handle, ae, USTORE_DATA_LOWER, uwrd_lo);
- 		qat_hal_wr_ae_csr(handle, ae, USTORE_DATA_UPPER, uwrd_hi);
- 	}
--- 
-2.5.0
+Acked-by: David Howells <dhowells@redhat.com>
