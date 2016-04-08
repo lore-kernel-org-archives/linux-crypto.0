@@ -1,21 +1,38 @@
-From: contact@gdtfair.com
-Subject: (unknown)
-Date: Fri, 8 Apr 2016 10:06:26 +0800 (CST)
-Message-ID: <201604081006.u38A6QdH066077@us8.gowiden.net>
-To: <linux-crypto@vger.kernel.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/3] crypto: af_alg - add TLS type encryption
+Date: Fri, 8 Apr 2016 10:52:50 +0800
+Message-ID: <20160408025250.GA7596@gondor.apana.org.au>
+References: <20160306012044.6369.63924.stgit@tstruk-mobl1>
+ <20160405112940.GB11852@gondor.apana.org.au>
+ <57054DBC.8010507@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	davem@davemloft.net, netdev@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from us8.gowiden.net ([54.191.19.170]:58038 "EHLO us8.gowiden.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753274AbcDHCTr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 7 Apr 2016 22:19:47 -0400
-Received: from localhost (172.31.28.226)
-	by us8.gowiden.net  with SMTP id u38A6Yp6066269
-	for <linux-crypto@vger.kernel.org>; Fri, 8 Apr 2016 10:06:34 +0800 (CST)
-Received: from localhost (172.31.28.226)
-	by us8.gowiden.net  with SMTP id u38A6QdH066077
-	for <linux-crypto@vger.kernel.org>; Fri, 8 Apr 2016 10:06:26 +0800 (CST)
+Received: from helcar.hengli.com.au ([209.40.204.226]:46863 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753274AbcDHCxC (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 7 Apr 2016 22:53:02 -0400
+Content-Disposition: inline
+In-Reply-To: <57054DBC.8010507@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Wed, Apr 06, 2016 at 10:56:12AM -0700, Tadeusz Struk wrote:
+> 
+> The intend is to enable HW acceleration of the TLS protocol.
+> The way it will work is that the user space will send a packet of data
+> via AF_ALG and HW will authenticate and encrypt it in one go.
 
-nd of smlast
+There have been suggestions to implement TLS data-path within
+the kernel.  So we should decide whether we pursue that or go
+with your approach before we start adding algorithms.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
