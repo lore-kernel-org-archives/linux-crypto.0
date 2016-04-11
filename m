@@ -1,44 +1,62 @@
-From: Xiaodong Liu <xiaodong.liu@intel.com>
-Subject: Re: [PATCH 4/7] crypto: sha256-mb - submit/flush routines for AVX2
-Date: Mon, 11 Apr 2016 06:13:59 +0000
-Message-ID: <1460355239-41687-1-git-send-email-xiaodong.liu@intel.com>
-References: <1458851163-3448-5-git-send-email-megha.dey@linux.intel.com>
-Cc: Xiaodong Liu <xiaodong.liu@intel.com>,
-	linux-crypto@vger.kernel.org, tim.c.chen@linux.intel.com
-To: megha.dey@linux.intel.com
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v2 1/2] dt/bindings: Add bindings for hisilicon random
+ number generator
+Date: Mon, 11 Apr 2016 09:43:06 -0500
+Message-ID: <20160411144306.GA24637@rob-hp-laptop>
+References: <1460017397-30996-1-git-send-email-wangkefeng.wang@huawei.com>
+ <1460017397-30996-2-git-send-email-wangkefeng.wang@huawei.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	xuwei5@hisilicon.com, Mark Rutland <mark.rutland@arm.com>,
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>, guohanjun@huawei.com
+To: Kefeng Wang <wangkefeng.wang@huawei.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:11326 "EHLO mga03.intel.com"
+Received: from mail.kernel.org ([198.145.29.136]:51440 "EHLO mail.kernel.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752466AbcDKGT0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 Apr 2016 02:19:26 -0400
-In-reply-to: <1458851163-3448-5-git-send-email-megha.dey@linux.intel.com>
+	id S1753641AbcDKOnM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 11 Apr 2016 10:43:12 -0400
+Content-Disposition: inline
+In-Reply-To: <1460017397-30996-2-git-send-email-wangkefeng.wang@huawei.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Xiaodong Liu <xiaodong.liu@intel.com>
----
- sha256_mb_mgr_flush_avx2.S | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Thu, Apr 07, 2016 at 04:23:16PM +0800, Kefeng Wang wrote:
+> Document the devicetree bindings for the random number generator found
+> on Hisilicon Hip04 and Hip05 soc.
+> 
+> Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
+> ---
+>  Documentation/devicetree/bindings/rng/hisi-rng.txt | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rng/hisi-rng.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/rng/hisi-rng.txt b/Documentation/devicetree/bindings/rng/hisi-rng.txt
+> new file mode 100644
+> index 0000000..72efcc1
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/rng/hisi-rng.txt
+> @@ -0,0 +1,12 @@
+> +Hisilicon Random Number Generator
+> +
+> +Required properties:
+> +- compatible : Should be "hisilicon,rng"
+> +- reg : Offset and length of the register set of this block
+> +
+> +Example:
+> +
+> +rng@d1010000 {
+> +	compatible = "hisilicon,rng";
 
-diff --git a/sha256_mb_mgr_flush_avx2.S b/sha256_mb_mgr_flush_avx2.S
-index 93eda35..0bd791b 100644
---- a/sha256_mb_mgr_flush_avx2.S
-+++ b/sha256_mb_mgr_flush_avx2.S
-@@ -285,13 +285,13 @@ ENTRY(sha256_mb_mgr_get_comp_job_avx2)
- 	vpinsrd	$1, _args_digest+1*32(state, idx, 4), %xmm0, %xmm0
- 	vpinsrd	$2, _args_digest+2*32(state, idx, 4), %xmm0, %xmm0
- 	vpinsrd	$3, _args_digest+3*32(state, idx, 4), %xmm0, %xmm0
--	movl	_args_digest+4*32(state, idx, 4), tmp2_w
-+	movd	_args_digest+4*32(state, idx, 4), %xmm1
- 	vpinsrd	$1, _args_digest+5*32(state, idx, 4), %xmm1, %xmm1
- 	vpinsrd	$2, _args_digest+6*32(state, idx, 4), %xmm1, %xmm1
- 	vpinsrd	$3, _args_digest+7*32(state, idx, 4), %xmm1, %xmm1
- 
- 	vmovdqu	%xmm0, _result_digest(job_rax)
--	movl	tmp2_w, _result_digest+1*16(job_rax)
-+	vmovdqu	%xmm1, _result_digest+1*16(job_rax)
- 
- 	pop	%rbx
- 
--- 
-2.1.4
+This still needs SoC specific compatible strings.
+
+> +	reg = <0xd1010000 0x100>;
+> +};
+> -- 
+> 2.6.0.GIT
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe devicetree" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
