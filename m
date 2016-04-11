@@ -1,61 +1,220 @@
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v2 1/2] dt/bindings: Add bindings for hisilicon random
- number generator
-Date: Mon, 11 Apr 2016 09:43:06 -0500
-Message-ID: <20160411144306.GA24637@rob-hp-laptop>
-References: <1460017397-30996-1-git-send-email-wangkefeng.wang@huawei.com>
- <1460017397-30996-2-git-send-email-wangkefeng.wang@huawei.com>
+From: Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v3 2/2] hwrng: hisi: Add support for Hisilicon SoC RNG
+Date: Mon, 11 Apr 2016 09:29:22 -0600
+Message-ID: <CANLsYkxyjonQ-P22iN_7TWGKb-Z3SyF=rqtXc8FjJS5sU+8cHA@mail.gmail.com>
+References: <1460343718-2722-1-git-send-email-wangkefeng.wang@huawei.com>
+	<1460343718-2722-3-git-send-email-wangkefeng.wang@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	xuwei5@hisilicon.com, Mark Rutland <mark.rutland@arm.com>,
+Content-Type: text/plain; charset=UTF-8
+Cc: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Xu Wei <xuwei5@hisilicon.com>,
+	Mark Rutland <mark.rutland@arm.com>,
 	linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>, guohanjun@huawei.com
 To: Kefeng Wang <wangkefeng.wang@huawei.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:51440 "EHLO mail.kernel.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753641AbcDKOnM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 Apr 2016 10:43:12 -0400
-Content-Disposition: inline
-In-Reply-To: <1460017397-30996-2-git-send-email-wangkefeng.wang@huawei.com>
+Received: from mail-lf0-f47.google.com ([209.85.215.47]:36682 "EHLO
+	mail-lf0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755334AbcDKP33 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 11 Apr 2016 11:29:29 -0400
+Received: by mail-lf0-f47.google.com with SMTP id g184so162348660lfb.3
+        for <linux-crypto@vger.kernel.org>; Mon, 11 Apr 2016 08:29:28 -0700 (PDT)
+In-Reply-To: <1460343718-2722-3-git-send-email-wangkefeng.wang@huawei.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 07, 2016 at 04:23:16PM +0800, Kefeng Wang wrote:
-> Document the devicetree bindings for the random number generator found
-> on Hisilicon Hip04 and Hip05 soc.
-> 
+On 10 April 2016 at 21:01, Kefeng Wang <wangkefeng.wang@huawei.com> wrote:
+> This adds the Hisilicon Random Number Generator(RNG) support,
+> which is found in Hip04 and Hip05 soc.
+>
 > Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
 > ---
->  Documentation/devicetree/bindings/rng/hisi-rng.txt | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/rng/hisi-rng.txt
-> 
-> diff --git a/Documentation/devicetree/bindings/rng/hisi-rng.txt b/Documentation/devicetree/bindings/rng/hisi-rng.txt
+>  drivers/char/hw_random/Kconfig    |  13 ++++
+>  drivers/char/hw_random/Makefile   |   1 +
+>  drivers/char/hw_random/hisi-rng.c | 125 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 139 insertions(+)
+>  create mode 100644 drivers/char/hw_random/hisi-rng.c
+>
+> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+> index 67ee8b0..088b1bf 100644
+> --- a/drivers/char/hw_random/Kconfig
+> +++ b/drivers/char/hw_random/Kconfig
+> @@ -333,6 +333,19 @@ config HW_RANDOM_TPM
+>
+>           If unsure, say Y.
+>
+> +config HW_RANDOM_HISI
+> +       tristate "Hisilicon Random Number Generator support"
+> +       depends on HW_RANDOM && ARCH_HISI
+> +       default HW_RANDOM
+> +       ---help---
+> +         This driver provides kernel-side support for the Random Number
+> +         Generator hardware found on Hisilicon Hip04 and Hip05 SoC.
+> +
+> +         To compile this driver as a module, choose M here: the
+> +         module will be called hisi-rng.
+> +
+> +         If unsure, say Y.
+> +
+>  config HW_RANDOM_MSM
+>         tristate "Qualcomm SoCs Random Number Generator support"
+>         depends on HW_RANDOM && ARCH_QCOM
+> diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+> index f5a6fa7..e09305b 100644
+> --- a/drivers/char/hw_random/Makefile
+> +++ b/drivers/char/hw_random/Makefile
+> @@ -26,6 +26,7 @@ obj-$(CONFIG_HW_RANDOM_PPC4XX) += ppc4xx-rng.o
+>  obj-$(CONFIG_HW_RANDOM_PSERIES) += pseries-rng.o
+>  obj-$(CONFIG_HW_RANDOM_POWERNV) += powernv-rng.o
+>  obj-$(CONFIG_HW_RANDOM_EXYNOS) += exynos-rng.o
+> +obj-$(CONFIG_HW_RANDOM_HISI)   += hisi-rng.o
+>  obj-$(CONFIG_HW_RANDOM_TPM) += tpm-rng.o
+>  obj-$(CONFIG_HW_RANDOM_BCM2835) += bcm2835-rng.o
+>  obj-$(CONFIG_HW_RANDOM_IPROC_RNG200) += iproc-rng200.o
+> diff --git a/drivers/char/hw_random/hisi-rng.c b/drivers/char/hw_random/hisi-rng.c
 > new file mode 100644
-> index 0000000..72efcc1
+> index 0000000..6bdf28c
 > --- /dev/null
-> +++ b/Documentation/devicetree/bindings/rng/hisi-rng.txt
-> @@ -0,0 +1,12 @@
-> +Hisilicon Random Number Generator
+> +++ b/drivers/char/hw_random/hisi-rng.c
+> @@ -0,0 +1,125 @@
+> +/*
+> + * Copyright (C) 2016 HiSilicon Co., Ltd.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
 > +
-> +Required properties:
-> +- compatible : Should be "hisilicon,rng"
-> +- reg : Offset and length of the register set of this block
+> +#include <linux/err.h>
+> +#include <linux/kernel.h>
+> +#include <linux/hw_random.h>
+> +#include <linux/io.h>
+> +#include <linux/module.h>
+> +#include <linux/of.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/random.h>
 > +
-> +Example:
+> +#define RNG_SEED       0x0
+> +#define RNG_CTRL       0x4
+> +  #define RNG_SEED_SEL BIT(2)
+> +  #define RNG_RING_EN  BIT(1)
+> +  #define RNG_EN       BIT(0)
+> +#define RNG_RAN_NUM    0x10
+> +#define RNG_PHY_SEED   0x14
 > +
-> +rng@d1010000 {
-> +	compatible = "hisilicon,rng";
-
-This still needs SoC specific compatible strings.
-
-> +	reg = <0xd1010000 0x100>;
+> +#define to_hisi_rng(p) container_of(p, struct hisi_rng, rng)
+> +
+> +static int seed_sel;
+> +module_param(seed_sel, int, S_IRUGO);
+> +MODULE_PARM_DESC(seed_sel, "Auto reload seed. 0, use LFSR(default); 1, use ring oscillator.");
+> +
+> +struct hisi_rng {
+> +       void __iomem *base;
+> +       struct hwrng rng;
 > +};
-> -- 
-> 2.6.0.GIT
-> 
+> +
+> +static int hisi_rng_init(struct hwrng *rng)
+> +{
+> +       struct hisi_rng *hrng = to_hisi_rng(rng);
+> +       int val = RNG_EN;
+> +       u32 seed;
+> +
+> +       /* get a random number as initial seed */
+> +       get_random_bytes(&seed, sizeof(seed));
+> +
+> +       writel_relaxed(seed, hrng->base + RNG_SEED);
+> +
+> +       /**
+> +        * The seed is reload periodically, there are two choice
+> +        * of seeds, default seed using the value from LFSR, or
+> +        * will use seed generated by ring oscillator.
+> +        */
+> +       if (seed_sel == 1)
+> +               val |= RNG_RING_EN | RNG_SEED_SEL;
+> +
+> +       writel_relaxed(val, hrng->base + RNG_CTRL);
+> +       return 0;
+> +}
+> +
+> +static void hisi_rng_cleanup(struct hwrng *rng)
+> +{
+> +       struct hisi_rng *hrng = to_hisi_rng(rng);
+> +
+> +       writel_relaxed(0, hrng->base + RNG_CTRL);
+> +}
+> +
+> +static int hisi_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+> +{
+> +       struct hisi_rng *hrng = to_hisi_rng(rng);
+> +       u32 *data = buf;
+> +
+> +       *data = readl_relaxed(hrng->base + RNG_RAN_NUM);
+> +       return 4;
+> +}
+> +
+> +static int hisi_rng_probe(struct platform_device *pdev)
+> +{
+> +       struct hisi_rng *rng;
+> +       struct resource *res;
+> +       int ret;
+> +
+> +       rng = devm_kzalloc(&pdev->dev, sizeof(*rng), GFP_KERNEL);
+> +       if (!rng)
+> +               return -ENOMEM;
+> +
+> +       platform_set_drvdata(pdev, rng);
+> +
+> +       res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> +       rng->base = devm_ioremap_resource(&pdev->dev, res);
+> +       if (IS_ERR(rng->base))
+> +               return PTR_ERR(rng->base);
+> +
+> +       rng->rng.name = pdev->name;
+> +       rng->rng.init = hisi_rng_init;
+> +       rng->rng.cleanup = hisi_rng_cleanup;
+> +       rng->rng.read = hisi_rng_read;
+> +
+> +       ret = devm_hwrng_register(&pdev->dev, &rng->rng);
+> +       if (ret) {
+> +               dev_err(&pdev->dev, "failed to register hwrng\n");
+> +               return ret;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static const struct of_device_id hisi_rng_dt_ids[] = {
+> +       { .compatible = "hisilicon,rng" },
+> +       { }
+> +};
+> +MODULE_DEVICE_TABLE(of, hisi_rng_dt_ids);
+> +
+> +static struct platform_driver hisi_rng_driver = {
+> +       .probe          = hisi_rng_probe,
+> +       .driver         = {
+> +               .name   = "hisi-rng",
+> +               .of_match_table = of_match_ptr(hisi_rng_dt_ids),
+> +       },
+> +};
+> +
+> +module_platform_driver(hisi_rng_driver);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Kefeng Wang <wangkefeng.wang@huawei>");
+> +MODULE_DESCRIPTION("Hisilicon random number generator driver");
+
+Thanks for the modifications,
+
+Reviewed-by: Mathieu Poirier <mathieu.poirier@linaro.org>
+
+
+> --
+> 1.7.12.4
+>
 > --
 > To unsubscribe from this list: send the line "unsubscribe devicetree" in
 > the body of a message to majordomo@vger.kernel.org
