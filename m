@@ -1,79 +1,44 @@
-From: Kefeng Wang <wangkefeng.wang-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v2 1/2] dt/bindings: Add bindings for hisilicon random
- number generator
-Date: Tue, 12 Apr 2016 09:16:02 +0800
-Message-ID: <570C4C52.4020902@huawei.com>
-References: <1460017397-30996-1-git-send-email-wangkefeng.wang@huawei.com>
- <1460017397-30996-2-git-send-email-wangkefeng.wang@huawei.com>
- <20160411144306.GA24637@rob-hp-laptop>
+From: Pramod Kumar <pramod.kumar@broadcom.com>
+Subject: RE: Rabin Finger Print Support in Crypto Subsystem
+Date: Tue, 12 Apr 2016 14:31:03 +0530
+Message-ID: <140a89cef48ccfbeda2b562cdb5f4422@mail.gmail.com>
+References: <CAJ+tv6Jve0x-V2LcKZ_wQY1Bm13Awdxo6ih2t3OsTrK1LLF3HQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Cc: <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	<linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>, <xuwei5-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>,
-	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-	<linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	<guohanjun-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
-To: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20160411144306.GA24637@rob-hp-laptop>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-lf0-f51.google.com ([209.85.215.51]:35847 "EHLO
+	mail-lf0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751181AbcDLJBK convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Apr 2016 05:01:10 -0400
+Received: by mail-lf0-f51.google.com with SMTP id g184so15748245lfb.3
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Apr 2016 02:01:09 -0700 (PDT)
+In-Reply-To: <CAJ+tv6Jve0x-V2LcKZ_wQY1Bm13Awdxo6ih2t3OsTrK1LLF3HQ@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+Any input, Please...
 
-
-On 2016/4/11 22:43, Rob Herring wrote:
-> On Thu, Apr 07, 2016 at 04:23:16PM +0800, Kefeng Wang wrote:
->> Document the devicetree bindings for the random number generator found
->> on Hisilicon Hip04 and Hip05 soc.
->>
->> Signed-off-by: Kefeng Wang <wangkefeng.wang-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
->> ---
->>  Documentation/devicetree/bindings/rng/hisi-rng.txt | 12 ++++++++++++
->>  1 file changed, 12 insertions(+)
->>  create mode 100644 Documentation/devicetree/bindings/rng/hisi-rng.txt
->>
->> diff --git a/Documentation/devicetree/bindings/rng/hisi-rng.txt b/Documentation/devicetree/bindings/rng/hisi-rng.txt
->> new file mode 100644
->> index 0000000..72efcc1
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/rng/hisi-rng.txt
->> @@ -0,0 +1,12 @@
->> +Hisilicon Random Number Generator
->> +
->> +Required properties:
->> +- compatible : Should be "hisilicon,rng"
->> +- reg : Offset and length of the register set of this block
->> +
->> +Example:
->> +
->> +rng@d1010000 {
->> +	compatible = "hisilicon,rng";
-> 
-> This still needs SoC specific compatible strings.
-
-It is used by Hip04/Hip05 at lease, but for new SoC, like Hip06, it maybe different,
-using single Soc prefix is not proper, how about hisilicon,rng-v1, or add two compatible
-hisilicon,hip04-rng and hisilicon,hip05-rng? What's your option?
-
-Thanks.
-
-> 
->> +	reg = <0xd1010000 0x100>;
->> +};
->> -- 
->> 2.6.0.GIT
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe devicetree" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> .
-> 
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> -----Original Message-----
+> From: Pramod Kumar [mailto:pramod.kumar@broadcom.com]
+> Sent: 07 April 2016 14:21
+> To: linux-crypto@vger.kernel.org
+> Subject: Rabin Finger Print Support in Crypto Subsystem
+>
+> Hi Guys,
+>
+>
+> I was looking for =E2=80=9CRabin Finger Print=E2=80=9D support in Lin=
+ux crypto subsystem.
+> I don=E2=80=99t
+> see it being supported yet.  Is anybody putting any effort on this?  =
+Would
+> be
+> great if I=E2=80=99m being pointed to any discussion/effort.
+>
+>
+>
+> Regards,
+> Pramod
