@@ -1,92 +1,74 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 2/2] crypto: kpp - Add DH software implementation
-Date: Tue, 12 Apr 2016 15:21:23 +0200
-Message-ID: <365125038.ZIqeO5uAXD@tauon.atsec.com>
-References: <1460457556-3117-1-git-send-email-salvatore.benedetto@intel.com> <1607852.1Sj4nuRRVd@tauon.atsec.com> <309B30E91F5E2846B79BD9AA9711D0318E7DEE@IRSMSX102.ger.corp.intel.com>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v2 1/2] dt/bindings: Add bindings for hisilicon random
+ number generator
+Date: Tue, 12 Apr 2016 08:54:16 -0500
+Message-ID: <CAL_JsqJv57nX7a89OR8U1=m+MLQKJBCOeuORPWXwGRx_P9XXBQ@mail.gmail.com>
+References: <1460017397-30996-1-git-send-email-wangkefeng.wang@huawei.com>
+ <1460017397-30996-2-git-send-email-wangkefeng.wang@huawei.com>
+ <20160411144306.GA24637@rob-hp-laptop> <570C4C52.4020902@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "Benedetto, Salvatore" <salvatore.benedetto@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Wei Xu <xuwei5@hisilicon.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Hanjun Guo <guohanjun@huawei.com>
+To: Kefeng Wang <wangkefeng.wang@huawei.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34432 "EHLO mail.eperm.de"
+Received: from mail.kernel.org ([198.145.29.136]:43425 "EHLO mail.kernel.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933794AbcDLNV1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Apr 2016 09:21:27 -0400
-In-Reply-To: <309B30E91F5E2846B79BD9AA9711D0318E7DEE@IRSMSX102.ger.corp.intel.com>
+	id S932659AbcDLNyk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Apr 2016 09:54:40 -0400
+In-Reply-To: <570C4C52.4020902@huawei.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 12. April 2016, 13:18:42 schrieb Benedetto, Salvatore:
+On Mon, Apr 11, 2016 at 8:16 PM, Kefeng Wang <wangkefeng.wang@huawei.com> wrote:
+>
+>
+> On 2016/4/11 22:43, Rob Herring wrote:
+>> On Thu, Apr 07, 2016 at 04:23:16PM +0800, Kefeng Wang wrote:
+>>> Document the devicetree bindings for the random number generator found
+>>> on Hisilicon Hip04 and Hip05 soc.
+>>>
+>>> Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
+>>> ---
+>>>  Documentation/devicetree/bindings/rng/hisi-rng.txt | 12 ++++++++++++
+>>>  1 file changed, 12 insertions(+)
+>>>  create mode 100644 Documentation/devicetree/bindings/rng/hisi-rng.txt
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/rng/hisi-rng.txt b/Documentation/devicetree/bindings/rng/hisi-rng.txt
+>>> new file mode 100644
+>>> index 0000000..72efcc1
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/rng/hisi-rng.txt
+>>> @@ -0,0 +1,12 @@
+>>> +Hisilicon Random Number Generator
+>>> +
+>>> +Required properties:
+>>> +- compatible : Should be "hisilicon,rng"
+>>> +- reg : Offset and length of the register set of this block
+>>> +
+>>> +Example:
+>>> +
+>>> +rng@d1010000 {
+>>> +    compatible = "hisilicon,rng";
+>>
+>> This still needs SoC specific compatible strings.
+>
+> It is used by Hip04/Hip05 at lease, but for new SoC, like Hip06, it maybe different,
+> using single Soc prefix is not proper, how about hisilicon,rng-v1, or add two compatible
+> hisilicon,hip04-rng and hisilicon,hip05-rng? What's your option?
 
-Hi Salvatore,
+It is perfectly fine to include hisilicon,hip04-rng string for hip05
+and later if the block is the same. You should still have both strings
+(the original and current SoC) in case there is some issue or
+difference found.
 
-> Hi Stephan,
-> 
-> > -----Original Message-----
-> > From: Stephan Mueller [mailto:sm@eperm.de]
-> > Sent: Tuesday, April 12, 2016 2:01 PM
-> > To: Benedetto, Salvatore <salvatore.benedetto@intel.com>
-> > Cc: herbert@gondor.apana.org.au; linux-crypto@vger.kernel.org
-> > Subject: Re: [PATCH 2/2] crypto: kpp - Add DH software implementation
-> > 
-> > Am Dienstag, 12. April 2016, 11:39:16 schrieb Salvatore Benedetto:
-> > 
-> > Hi Salvatore,
-> > 
-> > >  * Implement MPI based Diffie-Hellman under kpp API
-> > >  * Add test with data generad by OpenSSL
-> > > 
-> > > Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
-> > > ---
-> > > 
-> > >  crypto/Kconfig      |   8 ++
-> > >  crypto/Makefile     |   2 +
-> > >  crypto/dh.c         | 233
-> > > 
-> > > ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > 
-> > crypto/testmgr.c    |
-> > 
-> > > 157 +++++++++++++++++++++++++++++++++++
-> > > 
-> > >  crypto/testmgr.h    | 208
-> > 
-> > ++++++++++++++++++++++++++++++++++++++++++++++
-> > 
-> > >  include/crypto/dh.h |  23 ++++++
-> > >  6 files changed, 631 insertions(+)
-> > >  create mode 100644 crypto/dh.c
-> > >  create mode 100644 include/crypto/dh.h
-> > > 
-> > > +
-> > > +static int dh_check_params_length(unsigned int p_len)
-> > > +{
-> > > +	switch (p_len) {
-> > > +	case 1536:
-> > > +	case 2048:
-> > > +	case 3072:
-> > > +	case 4096:
-> > > +	case 6144:
-> > > +	case 8192:
-> > > +		return 0;
-> > 
-> > Does the math require this check?
-> > 
-> > Wouldn't it be better to implement limits to the low side (i.e. p_len <
-> > 1536) and then add a real limit due to the implementation (e.g. it must
-> > be multiple of full bytes)?
-> 
-> The math itself does not require any check that I'm aware of.
-> As for the real limit, I think we have to add that as an hardware
-> that is only capable of handling up to 4096 bytes, should fall back
-> to the software implementation if a bigger param is used.
+Unless there is a real IP version defined, you should avoid made up
+version numbers.
 
-Then why not leave that check to the respective HW implementation and provide 
-support for all parameters in software? I.e. simply replace this check with a 
-lower boundary check only?
-
-
-Ciao
-Stephan
+Rob
