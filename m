@@ -1,69 +1,50 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH] crypto: sha1-mb - use corrcet pointer while completing
- jobs
-Date: Wed, 13 Apr 2016 11:26:02 -0700
-Message-ID: <1460571962.14714.46.camel@linux.intel.com>
-References: <1460454351-43534-1-git-send-email-xiaodong.liu@intel.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH 0/3] crypto: af_alg - add TLS type encryption
+Date: Wed, 13 Apr 2016 15:46:00 -0700
+Message-ID: <570ECC28.3030008@intel.com>
+References: <20160306012044.6369.63924.stgit@tstruk-mobl1>
+ <20160405112940.GB11852@gondor.apana.org.au> <57054DBC.8010507@intel.com>
+ <20160408025250.GA7596@gondor.apana.org.au>
+ <CALx6S37m_ayZJ4nth0SPNr2Km2+uBZUCtK4iqPKHTARv2eB4aA@mail.gmail.com>
+ <570CD852.7060003@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org, megha.dey@linux.intel.com,
-	Megha Dey <megha.dey@linux.intel.com>
-To: Xiaodong Liu <xiaodong.liu@intel.com>, herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Tom Herbert <tom@herbertland.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Network Developers <netdev@vger.kernel.org>,
+	davejwatson@fb.com, nmav@gnutls.org, fridolin.pokorny@gmail.com
+To: Fridolin Pokorny <fpokorny@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:50290 "EHLO mga02.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:57165 "EHLO mga03.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752554AbcDMS0F (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 Apr 2016 14:26:05 -0400
-In-Reply-To: <1460454351-43534-1-git-send-email-xiaodong.liu@intel.com>
+	id S1752614AbcDMWvo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 13 Apr 2016 18:51:44 -0400
+In-Reply-To: <570CD852.7060003@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2016-04-12 at 09:45 +0000, Xiaodong Liu wrote:
-> In sha_complete_job, incorrect mcryptd_hash_request_ctx pointer is
-> used
-> when check and complete other jobs. If the memory of first completed
-> req
-> is freed, while still completing other jobs in the func, kernel will
-> crash since NULL pointer is assigned to RIP.
+Hi Fridolin,
+On 04/12/2016 04:13 AM, Fridolin Pokorny wrote:
+> we were experimenting with this. We have a prove of concept of a kernel
+> TLS type socket, so called AF_KTLS, which is based on Dave Watson's
+> RFC5288 patch. It handles both TLS and DTLS, unfortunately it is not
+> ready now to be proposed here. There are still issues which should be
+> solved (but mostly user space API design) [1]. If you are interested, we
+> could combine efforts.
+> 
+> Regards,
+> Fridolin Pokorny
+> 
+> [1] https://github.com/fridex/af_ktls
 
-
-> Signed-off-by: Xiaodong Liu <xiaodong.liu@intel.com>
-> ---
-> =C2=A0arch/x86/crypto/sha-mb/sha1_mb.c | 4 ++--
-> =C2=A01 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/arch/x86/crypto/sha-mb/sha1_mb.c b/arch/x86/crypto/sha-
-> mb/sha1_mb.c
-> index a8a0224..081255c 100644
-> --- a/arch/x86/crypto/sha-mb/sha1_mb.c
-> +++ b/arch/x86/crypto/sha-mb/sha1_mb.c
-> @@ -453,10 +453,10 @@ static int sha_complete_job(struct
-> mcryptd_hash_request_ctx *rctx,
-> =C2=A0
-> =C2=A0			req =3D cast_mcryptd_ctx_to_req(req_ctx);
-> =C2=A0			if (irqs_disabled())
-> -				rctx->complete(&req->base, ret);
-> +				req_ctx->complete(&req->base, ret);
-> =C2=A0			else {
-> =C2=A0				local_bh_disable();
-> -				rctx->complete(&req->base, ret);
-> +				req_ctx->complete(&req->base, ret);
-> =C2=A0				local_bh_enable();
-> =C2=A0			}
-
-
-Agreed. =C2=A0Should use req_ctx which is the ctx for the
-next job that have been completed in the lanes
-instead of the first completed job rctx, whose=C2=A0
-completion could have been called and released.
-
-Should be propagated back to stable release.
-
-Acked-by: Tim Chen <tim.c.chen@linux.intel.com>
-
-Tim
-
->=C2=A0
-
-> =C2=A0		}
+I had a quick look and it looks like is limited only to gcm(aes). 
+I would be more interested to have a generic interface that could do generic algorithm
+suits like aes-cbc-hmac-sha1 also.
+This also seems to work in a synchronous (send one and wait) mode, which is a not good
+solution for HW accelerators, which I'm trying to enable.
+Thanks,
+-- 
+TS
