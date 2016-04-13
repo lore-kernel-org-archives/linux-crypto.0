@@ -1,42 +1,53 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 2/2] crypto: kpp - Add DH software implementation
-Date: Wed, 13 Apr 2016 11:23:27 +0200
-Message-ID: <3007460.XDCGCz3pFQ@tauon.atsec.com>
-References: <1460457556-3117-1-git-send-email-salvatore.benedetto@intel.com> <365125038.ZIqeO5uAXD@tauon.atsec.com> <309B30E91F5E2846B79BD9AA9711D0318E80ED@IRSMSX102.ger.corp.intel.com>
+From: Kefeng Wang <wangkefeng.wang@huawei.com>
+Subject: [PATCH v4 1/2] dt/bindings: Add bindings for hisilicon random number generator
+Date: Wed, 13 Apr 2016 18:11:27 +0800
+Message-ID: <1460542288-25941-2-git-send-email-wangkefeng.wang@huawei.com>
+References: <1460542288-25941-1-git-send-email-wangkefeng.wang@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "Benedetto, Salvatore" <salvatore.benedetto@intel.com>
+Content-Type: text/plain
+Cc: Mark Rutland <mark.rutland@arm.com>,
+	<linux-crypto@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	<guohanjun@huawei.com>, Kefeng Wang <wangkefeng.wang@huawei.com>
+To: <devicetree@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	"Rob Herring" <robh+dt@kernel.org>, <xuwei5@hisilicon.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34454 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932614AbcDMJXb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 Apr 2016 05:23:31 -0400
-In-Reply-To: <309B30E91F5E2846B79BD9AA9711D0318E80ED@IRSMSX102.ger.corp.intel.com>
+Received: from szxga03-in.huawei.com ([119.145.14.66]:45375 "EHLO
+	szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1030803AbcDMKFd (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 13 Apr 2016 06:05:33 -0400
+In-Reply-To: <1460542288-25941-1-git-send-email-wangkefeng.wang@huawei.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 13. April 2016, 09:07:38 schrieb Benedetto, Salvatore:
+Document the devicetree bindings for the random number generator found
+on Hisilicon Hip04 and Hip05 soc.
 
-Hi Salvatore,
-> 
-> I don't see any particular benefit in replacing this check with a lower
-> boundary check only. Values other than those listed are very unlikely.
-> Anyway, if you feel so strong about it and other people think the same I'm
-> OK with either check :-) Either case shouldn't harm.
+Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
+---
+ Documentation/devicetree/bindings/rng/hisi-rng.txt | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/hisi-rng.txt
 
-The kernel is not supposed to policy user decisions. It is only there to 
-perform operations. It is allowed to enforce policies to cover known 
-weaknesses though (hence the check for the lower boundary).
-
-So, if a user wants to use 2040 bit DH keys, what reason has the kernel to 
-object?
-
-Note, with the advancements of quantum computers is may be likely that we all 
-want to use very large keys for asymmetric ciphers in the not too distant 
-future.
-
-Ciao
-Stephan
+diff --git a/Documentation/devicetree/bindings/rng/hisi-rng.txt b/Documentation/devicetree/bindings/rng/hisi-rng.txt
+new file mode 100644
+index 0000000..d04d55a
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/hisi-rng.txt
+@@ -0,0 +1,12 @@
++Hisilicon Random Number Generator
++
++Required properties:
++- compatible : Should be "hisilicon,hip04-rng" or "hisilicon,hip05-rng"
++- reg : Offset and length of the register set of this block
++
++Example:
++
++rng@d1010000 {
++	compatible = "hisilicon,hip05-rng";
++	reg = <0xd1010000 0x100>;
++};
+-- 
+1.7.12.4
