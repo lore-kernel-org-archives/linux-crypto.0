@@ -1,61 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.6
-Date: Thu, 14 Apr 2016 14:25:35 +0800
-Message-ID: <20160414062535.GA19807@gondor.apana.org.au>
-References: <20141007131826.GA29688@gondor.apana.org.au>
- <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150415033951.GA1406@gondor.apana.org.au>
- <20150622084457.GA7806@gondor.apana.org.au>
- <20150831135655.GA2694@gondor.apana.org.au>
- <20151102080427.GA8465@gondor.apana.org.au>
- <20160111101450.GA24044@gondor.apana.org.au>
- <20160122101828.GA15966@gondor.apana.org.au>
- <20160330091150.GA17143@gondor.apana.org.au>
+From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Subject: Re: [PATCH 0/3] crypto: af_alg - add TLS type encryption
+Date: Thu, 14 Apr 2016 08:47:54 +0200
+Message-ID: <CAJU7zaJ434afnPTEGUvZOPbAyMnUDjLKP1xUyLVcyTZ5Hesq4Q@mail.gmail.com>
+References: <20160306012044.6369.63924.stgit@tstruk-mobl1> <20160405112940.GB11852@gondor.apana.org.au>
+ <57054DBC.8010507@intel.com> <20160408025250.GA7596@gondor.apana.org.au>
+ <CALx6S37m_ayZJ4nth0SPNr2Km2+uBZUCtK4iqPKHTARv2eB4aA@mail.gmail.com>
+ <570CD852.7060003@redhat.com> <570ECC28.3030008@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Linus Torvalds <torvalds@linux-foundation.org>,
+Content-Type: text/plain; charset=UTF-8
+Cc: Fridolin Pokorny <fpokorny@redhat.com>,
+	Tom Herbert <tom@herbertland.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:40027 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752076AbcDNGZp (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 Apr 2016 02:25:45 -0400
-Content-Disposition: inline
-In-Reply-To: <20160330091150.GA17143@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	Linux Kernel Network Developers <netdev@vger.kernel.org>,
+	Dave Watson <davejwatson@fb.com>, fridolin.pokorny@gmail.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <570ECC28.3030008@intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+On Thu, Apr 14, 2016 at 12:46 AM, Tadeusz Struk <tadeusz.struk@intel.com> wrote:
+> Hi Fridolin,
+> On 04/12/2016 04:13 AM, Fridolin Pokorny wrote:
+>> we were experimenting with this. We have a prove of concept of a kernel
+>> TLS type socket, so called AF_KTLS, which is based on Dave Watson's
+>> RFC5288 patch. It handles both TLS and DTLS, unfortunately it is not
+>> ready now to be proposed here. There are still issues which should be
+>> solved (but mostly user space API design) [1]. If you are interested, we
+>> could combine efforts.
+>>
+>> Regards,
+>> Fridolin Pokorny
+>>
+>> [1] https://github.com/fridex/af_ktls
+> I had a quick look and it looks like is limited only to gcm(aes).
+> I would be more interested to have a generic interface that could do generic algorithm
+> suits like aes-cbc-hmac-sha1 also.
 
-This push fixes an NFS regression caused by the skcipher/hash
-conversion in sunrpc.  It also fixes a build problem in certain
-configurations with bcm63xx.
+This is not a real limitation but an advantage. The cbc-hmac-sha1
+needs a lot of hacks to be implemented correct (just take a look at
+one of the existing implementations). There is no point to bring such
+hacks into kernel especially since these ciphersuites are banned from
+HTTP/2.0 (see RFC7540), and have been dropped from TLS 1.3.
 
+> This also seems to work in a synchronous (send one and wait) mode, which is a not good
+> solution for HW accelerators, which I'm trying to enable.
 
-Please pull from
+Is that something that cannot be addressed?
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git li=
-nus
-
-
-Herbert Xu (1):
-      sunrpc: Fix skcipher/shash conversion
-
-=C1lvaro Fern=E1ndez Rojas (1):
-      hwrng: bcm63xx - fix device tree compilation
-
- drivers/char/hw_random/bcm63xx-rng.c  |    1 +
- net/sunrpc/auth_gss/gss_krb5_crypto.c |    8 ++++++--
- net/sunrpc/auth_gss/gss_krb5_mech.c   |    3 ++-
- 3 files changed, 9 insertions(+), 3 deletions(-)
-
-Thanks,
---=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+regards,
+Nikos
