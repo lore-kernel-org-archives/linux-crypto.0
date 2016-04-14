@@ -1,55 +1,54 @@
-From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Subject: Re: [PATCH 0/3] crypto: af_alg - add TLS type encryption
-Date: Thu, 14 Apr 2016 08:47:54 +0200
-Message-ID: <CAJU7zaJ434afnPTEGUvZOPbAyMnUDjLKP1xUyLVcyTZ5Hesq4Q@mail.gmail.com>
-References: <20160306012044.6369.63924.stgit@tstruk-mobl1> <20160405112940.GB11852@gondor.apana.org.au>
- <57054DBC.8010507@intel.com> <20160408025250.GA7596@gondor.apana.org.au>
- <CALx6S37m_ayZJ4nth0SPNr2Km2+uBZUCtK4iqPKHTARv2eB4aA@mail.gmail.com>
- <570CD852.7060003@redhat.com> <570ECC28.3030008@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Fridolin Pokorny <fpokorny@redhat.com>,
-	Tom Herbert <tom@herbertland.com>,
+From: Michal Hocko <mhocko@kernel.org>
+Subject: [PATCH resend] crypto: get rid of superfluous __GFP_REPEAT
+Date: Thu, 14 Apr 2016 10:51:42 +0200
+Message-ID: <1460623902-7109-1-git-send-email-mhocko@kernel.org>
+References: <1460372892-8157-19-git-send-email-mhocko@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Michal Hocko <mhocko@suse.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Network Developers <netdev@vger.kernel.org>,
-	Dave Watson <davejwatson@fb.com>, fridolin.pokorny@gmail.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <570ECC28.3030008@intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	linux-crypto@vger.kernel.org
+To: <linux-mm@kvack.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:33296 "EHLO
+	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752540AbcDNIv5 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 14 Apr 2016 04:51:57 -0400
+In-Reply-To: <1460372892-8157-19-git-send-email-mhocko@kernel.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 14, 2016 at 12:46 AM, Tadeusz Struk <tadeusz.struk@intel.com> wrote:
-> Hi Fridolin,
-> On 04/12/2016 04:13 AM, Fridolin Pokorny wrote:
->> we were experimenting with this. We have a prove of concept of a kernel
->> TLS type socket, so called AF_KTLS, which is based on Dave Watson's
->> RFC5288 patch. It handles both TLS and DTLS, unfortunately it is not
->> ready now to be proposed here. There are still issues which should be
->> solved (but mostly user space API design) [1]. If you are interested, we
->> could combine efforts.
->>
->> Regards,
->> Fridolin Pokorny
->>
->> [1] https://github.com/fridex/af_ktls
-> I had a quick look and it looks like is limited only to gcm(aes).
-> I would be more interested to have a generic interface that could do generic algorithm
-> suits like aes-cbc-hmac-sha1 also.
+From: Michal Hocko <mhocko@suse.com>
 
-This is not a real limitation but an advantage. The cbc-hmac-sha1
-needs a lot of hacks to be implemented correct (just take a look at
-one of the existing implementations). There is no point to bring such
-hacks into kernel especially since these ciphersuites are banned from
-HTTP/2.0 (see RFC7540), and have been dropped from TLS 1.3.
+__GFP_REPEAT has a rather weak semantic but since it has been introduced
+around 2.6.12 it has been ignored for low order allocations.
 
-> This also seems to work in a synchronous (send one and wait) mode, which is a not good
-> solution for HW accelerators, which I'm trying to enable.
+lzo_init uses __GFP_REPEAT to allocate LZO1X_MEM_COMPRESS 16K. This is
+order 3 allocation request and __GFP_REPEAT is ignored for this size
+as well as all <= PAGE_ALLOC_COSTLY requests.
 
-Is that something that cannot be addressed?
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Michal Hocko <mhocko@suse.com>
+---
+ crypto/lzo.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-regards,
-Nikos
+diff --git a/crypto/lzo.c b/crypto/lzo.c
+index 4b3e92525dac..c3f3dd9a28c5 100644
+--- a/crypto/lzo.c
++++ b/crypto/lzo.c
+@@ -32,7 +32,7 @@ static int lzo_init(struct crypto_tfm *tfm)
+ 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	ctx->lzo_comp_mem = kmalloc(LZO1X_MEM_COMPRESS,
+-				    GFP_KERNEL | __GFP_NOWARN | __GFP_REPEAT);
++				    GFP_KERNEL | __GFP_NOWARN);
+ 	if (!ctx->lzo_comp_mem)
+ 		ctx->lzo_comp_mem = vmalloc(LZO1X_MEM_COMPRESS);
+ 	if (!ctx->lzo_comp_mem)
+-- 
+2.8.0.rc3
