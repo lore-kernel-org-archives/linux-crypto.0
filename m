@@ -1,41 +1,53 @@
-From: Tadeusz Struk <tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v5 6/6] crypto: AF_ALG - add support for key_id
-Date: Fri, 15 Apr 2016 14:32:47 -0700
-Message-ID: <57115DFF.4030605@intel.com>
-References: <201604160521.QBqFNMI6%fengguang.wu@intel.com>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [RFC PATCH] KEYS: Provide keyctls to do public key operations
+Date: Fri, 15 Apr 2016 23:00:59 +0100
+Message-ID: <5133.1460757659@warthog.procyon.org.uk>
+References: <571137C3.1050805@intel.com> <18908.1460671231@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: kbuild-all-JC7UmRfGjtg@public.gmane.org, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org,
-	linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org,
-	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org
-To: kbuild test robot <lkp-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <201604160521.QBqFNMI6%fengguang.wu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, pjones@redhat.com, marcel@holtmann.org,
+	dwmw2@infradead.org, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:49633 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751683AbcDOWBF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 15 Apr 2016 18:01:05 -0400
+In-Reply-To: <571137C3.1050805@intel.com>
+Content-ID: <5132.1460757659.1@warthog.procyon.org.uk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 04/15/2016 02:32 PM, kbuild test robot wrote:
-> Hi Tadeusz,
-> 
-> [auto build test ERROR on cryptodev/master]
-> [also build test ERROR on v4.6-rc3 next-20160415]
-> [if your patch is applied to the wrong git tree, please drop us a note to help improving the system]
-> 
-> url:    https://github.com/0day-ci/linux/commits/Tadeusz-Struk/crypto-algif-add-akcipher/20160416-043207
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> config: i386-allmodconfig (attached as .config)
-> reproduce:
->         # save the attached .config to linux build tree
->         make ARCH=i386 
+Tadeusz Struk <tadeusz.struk@intel.com> wrote:
 
-Hi,
-It's is for https://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-next
-plus this:
-https://patchwork.kernel.org/patch/8843381/
-Thanks,
--- 
-TS
+> > --- a/crypto/asymmetric_keys/signature.c
+> > +++ b/crypto/asymmetric_keys/signature.c
+> 
+> Since this file implements the enc/dec operations also
+> should it be renamed to crypto/asymmetric_keys/public_key_ops.c
+> or something similar? signature.c is a bit confusing now.
+
+Yes.  Or maybe accessors.c.  I'm also tempted to merge it into
+asymmetric_type.c.  One question is how many other ops we might want to add.
+
+It might even be worth making the functions key_encrypt_blob(),
+key_decrypt_blob(), key_create_signature() and key_verify_signature() and
+jumping through the type ops table.  I still haven't decided whether I want to
+go to that extent yet as it leads to an extra function call on the stack.
+
+> This will work perfectly for the algif_akcipher. Thanks for providing this.
+> I'm going to rebase my patches on top of this and resend.
+
+Note that this is a bit thrown together.  I'm travelling right now and
+conferencing next week which is why I haven't managed to test it yet - so
+beware, there may be dragons;-)
+
+> Should I use your keys-next as a base for the new version?
+
+That's the base I used.
+
+David
