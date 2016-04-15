@@ -1,38 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v5 1/3] Documentation: devicetree: add Freescale SCC
- bindings
-Date: Fri, 15 Apr 2016 22:34:23 +0800
-Message-ID: <20160415143423.GE733@gondor.apana.org.au>
-References: <1460451866-12821-1-git-send-email-s.trumtrar@pengutronix.de>
+Subject: Re: [PATCH] crypto: ccp - Prevent information leakage on export
+Date: Fri, 15 Apr 2016 22:36:14 +0800
+Message-ID: <20160415143614.GH733@gondor.apana.org.au>
+References: <20160413155225.6730.31823.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Shawn Guo <shawnguo@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	kernel@pengutronix.de
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Cc: linux-crypto@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ben Hutchings <ben@decadent.org.uk>,
+	David Miller <davem@davemloft.net>
+To: Tom Lendacky <thomas.lendacky@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:43011 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:37196 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750802AbcDOOew (ORCPT
+	with ESMTP id S1750924AbcDOOgU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 15 Apr 2016 10:34:52 -0400
+	Fri, 15 Apr 2016 10:36:20 -0400
 Content-Disposition: inline
-In-Reply-To: <1460451866-12821-1-git-send-email-s.trumtrar@pengutronix.de>
+In-Reply-To: <20160413155225.6730.31823.stgit@tlendack-t1.amdoffice.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 12, 2016 at 11:04:24AM +0200, Steffen Trumtrar wrote:
-> Add documentation for the Freescale Security Controller (SCC)
-> found on i.MX25 SoCs.
-> 
-> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-> Acked-by: Rob Herring <robh@kernel.org>
+On Wed, Apr 13, 2016 at 10:52:25AM -0500, Tom Lendacky wrote:
+> Prevent information from leaking to userspace by doing a memset to 0 of
+> the export state structure before setting the structure values and copying
+> it. This prevents un-initialized padding areas from being copied into the
+> export area.
 
-All applied.
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
