@@ -1,34 +1,33 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp - Prevent information leakage on export
-Date: Fri, 15 Apr 2016 22:36:14 +0800
-Message-ID: <20160415143614.GH733@gondor.apana.org.au>
-References: <20160413155225.6730.31823.stgit@tlendack-t1.amdoffice.net>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v4 0/2] Add Hisilicon Random Number Generator(RNG) support
+Date: Fri, 15 Apr 2016 22:36:01 +0800
+Message-ID: <20160415143600.GG733@gondor.apana.org.au>
+References: <1460542288-25941-1-git-send-email-wangkefeng.wang@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ben Hutchings <ben@decadent.org.uk>,
-	David Miller <davem@davemloft.net>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:37196 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750924AbcDOOgU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 15 Apr 2016 10:36:20 -0400
+Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, xuwei5-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org,
+	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, guohanjun-hv44wF8Li93QT0dZR+AlfA@public.gmane.org
+To: Kefeng Wang <wangkefeng.wang-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20160413155225.6730.31823.stgit@tlendack-t1.amdoffice.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1460542288-25941-1-git-send-email-wangkefeng.wang-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Apr 13, 2016 at 10:52:25AM -0500, Tom Lendacky wrote:
-> Prevent information from leaking to userspace by doing a memset to 0 of
-> the export state structure before setting the structure values and copying
-> it. This prevents un-initialized padding areas from being copied into the
-> export area.
+On Wed, Apr 13, 2016 at 06:11:26PM +0800, Kefeng Wang wrote:
+> Changes since v3:
+> - Compatible name "hisilicon,hip04-rng" and  "hisilicon,hip05-rng" are used,
+>   suggested by Robe Herring
+> - Add reviewed-by from Mathieu Poirier
 
-Applied.
+All applied.
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
