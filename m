@@ -1,59 +1,74 @@
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Subject: Re: [PATCH V3 00/29] bitops: add parity functions
-Date: Sun, 17 Apr 2016 05:38:57 -0700
-Message-ID: <20160417123857.GD33215@dtor-ws>
-References: <1460601525-3822-1-git-send-email-zengzhaoxiu@163.com>
+From: "Thomas D." <whissi@whissi.de>
+Subject: Re: [PATCH] Re: Broken userspace crypto in linux-4.1.18
+Date: Mon, 18 Apr 2016 00:17:21 +0200
+Message-ID: <7210213c-7446-5181-c2b2-8d7aaa756a2a@whissi.de>
+References: <56C47DF9.6030704@whissi.de> <20160217233353.GC31125@1wt.eu>
+ <56C50725.6080408@whissi.de> <4580306.arupsYiYbb@positron.chronox.de>
+ <56C591E7.5080808@suse.cz> <56C5A66E.5010905@whissi.de>
+ <56C87929.8040304@whissi.de> <56C9E865.3050500@gmail.com>
+ <56CD6AB6.7000801@suse.cz> <56CD6FD8.20004@gmail.com>
+ <20160224171203.GE16597@kroah.com> <56D0361B.8040301@gmail.com>
+ <56D080AA.7030307@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
-        Zhaoxiu Zeng <zhaoxiu.zeng@gmail.com>,
-        adi-buildroot-devel@lists.sourceforge.net,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Anton Blanchard <anton@samba.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        Borislav Petkov <bp@suse.de>,
-        Bruce Allan <bruce.w.allan@intel.com>,
-        Christophe Leroy <christophe.leroy@c-s.fr>,
-        David Herrmann <dh.herrmann@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Denys Vlasenko <dvlasenk@redhat.com>,
-        Duson Lin <dusonlin@emc.com.tw>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Hans Verkuil <hans.verkuil@cisco.com>,
-        Hartmut Knaack <knaack.h@gmx.de>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Hendrik Brueckne
-To: zengzhaoxiu@163.com
-Return-path: <linux-mips-bounce@linux-mips.org>
-Content-Disposition: inline
-In-Reply-To: <1460601525-3822-1-git-send-email-zengzhaoxiu@163.com>
-Sender: linux-mips-bounce@linux-mips.org
-Errors-to: linux-mips-bounce@linux-mips.org
-List-help: <mailto:ecartis@linux-mips.org?Subject=help>
-List-unsubscribe: <mailto:ecartis@linux-mips.org?subject=unsubscribe%20linux-mips>
-List-software: Ecartis version 1.0.0
-List-subscribe: <mailto:ecartis@linux-mips.org?subject=subscribe%20linux-mips>
-List-owner: <mailto:ralf@linux-mips.org>
-List-post: <mailto:linux-mips@linux-mips.org>
-List-archive: <http://www.linux-mips.org/archives/linux-mips/>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: Milan Broz <gmazyland@gmail.com>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jslaby@suse.cz>,
+	Stephan Mueller <smueller@chronox.de>,
+	Willy Tarreau <w@1wt.eu>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"dvyukov@google.com" <dvyukov@google.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Ondrej Kozina <okozina@redhat.com>
+To: Sasha Levin <sasha.levin@oracle.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from yamato.tf-network.de ([93.186.202.221]:49996 "EHLO
+	yamato.tf-network.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750970AbcDQWWv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 17 Apr 2016 18:22:51 -0400
+In-Reply-To: <56D080AA.7030307@oracle.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 14, 2016 at 10:36:41AM +0800, zengzhaoxiu@163.com wrote:
->  drivers/input/joystick/grip_mp.c             |  16 +--
->  drivers/input/joystick/sidewinder.c          |  24 +----
->  drivers/input/mouse/elantech.c               |  10 +-
->  drivers/input/mouse/elantech.h               |   1 -
->  drivers/input/serio/ams_delta_serio.c        |   8 +-
->  drivers/input/serio/pcips2.c                 |   2 +-
->  drivers/input/serio/sa1111ps2.c              |   2 +-
+Hi,
 
-For input bits:
+Sasha, can you please revert commit
+f857638dd72680e2a8faafef7eebb4534cb39fd1 like Greg did with linux-3.10.101
 
-Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> commit 1f2493fcd87bd810c608aa7976388157852eadb2
+> Author: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Date:   Sat Mar 12 21:30:16 2016 -0800
+> 
+>     Revert: "crypto: af_alg - Disallow bind/setkey/... after accept(2)"
+>     
+>     This reverts commit 5a707f0972e1c9d8a4a921ddae79d0f9dc36a341 which is
+>     commit c840ac6af3f8713a71b4d2363419145760bd6044 upstream.
+>     
+>     It's been widely reported that this patch breaks existing userspace
+>     applications when backported to the stable kernel releases.  As no fix
+>     seems to be forthcoming, just revert it to let systems work again.
 
-Thanks.
+and linux-3.14.65
 
--- 
-Dmitry
+> commit c4eb62da6f34bfa9bbcbd005210a90fdfca7e367
+> Author: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Date:   Sat Mar 12 21:30:16 2016 -0800
+> 
+>     Revert: "crypto: af_alg - Disallow bind/setkey/... after accept(2)"
+>     
+>     This reverts commit 06b4194533ff92ed5888840e3a6beaf29a8fe5d4 which is
+>     commit c840ac6af3f8713a71b4d2363419145760bd6044 upstream.
+>     
+>     It's been widely reported that this patch breaks existing userspace
+>     applications when backported to the stable kernel releases.  As no fix
+>     seems to be forthcoming, just revert it to let systems work again.
+
+
+Linux-3.18.x is the only LTS kernel left with this problem. If nobody
+cares we should at least revert back to a working kernel...
+
+
+-Thomas
