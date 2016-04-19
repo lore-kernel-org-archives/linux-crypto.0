@@ -1,78 +1,48 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH] crypto: marvell/cesa: Improving code readability
-Date: Tue, 19 Apr 2016 17:19:00 +0200
-Message-ID: <20160419171900.21563a54@bbrezillon>
-References: <1461078560-30924-1-git-send-email-romain.perier@free-electrons.com>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH 0/2] crypto: talitos - fix conversion to new AEAD interface
+Date: Tue, 19 Apr 2016 20:33:46 +0300
+Message-ID: <1461087228-19359-1-git-send-email-horia.geanta@nxp.com>
+References: <AM2PR04MB067377F55DDE5D5EE126EBF3986B0@AM2PR04MB0673.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Arnaud Ebalard <arno@natisbad.org>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Gregory Clement <gregory.clement@free-electrons.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Ofer Heifetz <oferh@marvell.com>, linux-crypto@vger.kernel.org
-To: Romain Perier <romain.perier@free-electrons.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <linux-crypto@vger.kernel.org>, Jonas Eymann <J.Eymann@gmx.net>,
+	"David S. Miller" <davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:54653 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932106AbcDSPTC (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Apr 2016 11:19:02 -0400
-In-Reply-To: <1461078560-30924-1-git-send-email-romain.perier@free-electrons.com>
+Received: from mail-by2on0063.outbound.protection.outlook.com ([207.46.100.63]:14686
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S933138AbcDSRs0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 19 Apr 2016 13:48:26 -0400
+In-Reply-To: <AM2PR04MB067377F55DDE5D5EE126EBF3986B0@AM2PR04MB0673.eurprd04.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 19 Apr 2016 17:09:20 +0200
-Romain Perier <romain.perier@free-electrons.com> wrote:
+Jonas Eymann reports a crash and some failures of AED algorithms
+with kernel 4.4.6, all easily reproducible with tcrypt.
 
-> When looking for available engines, the variable "engine" is
-> assigned to "&cesa->engines[i]" at the beginning of the for loop. Replacing
-> next occurences of "&cesa->engines[i]" by "engine" and in order to improve
-> readability.
-> 
-> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
+These have to do with the onversion to the new AEAD interface:
+aeb4c132f33d crypto: talitos - Convert to new AEAD interface
 
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+Problems occur for 4.3+ kernels, sending patches to -stable.
 
-> ---
->  drivers/crypto/marvell/cesa.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-> index 80239ae..e8ef9fd 100644
-> --- a/drivers/crypto/marvell/cesa.c
-> +++ b/drivers/crypto/marvell/cesa.c
-> @@ -475,18 +475,18 @@ static int mv_cesa_probe(struct platform_device *pdev)
->  		engine->regs = cesa->regs + CESA_ENGINE_OFF(i);
->  
->  		if (dram && cesa->caps->has_tdma)
-> -			mv_cesa_conf_mbus_windows(&cesa->engines[i], dram);
-> +			mv_cesa_conf_mbus_windows(engine, dram);
->  
-> -		writel(0, cesa->engines[i].regs + CESA_SA_INT_STATUS);
-> +		writel(0, engine->regs + CESA_SA_INT_STATUS);
->  		writel(CESA_SA_CFG_STOP_DIG_ERR,
-> -		       cesa->engines[i].regs + CESA_SA_CFG);
-> +		       engine->regs + CESA_SA_CFG);
->  		writel(engine->sram_dma & CESA_SA_SRAM_MSK,
-> -		       cesa->engines[i].regs + CESA_SA_DESC_P0);
-> +		       engine->regs + CESA_SA_DESC_P0);
->  
->  		ret = devm_request_threaded_irq(dev, irq, NULL, mv_cesa_int,
->  						IRQF_ONESHOT,
->  						dev_name(&pdev->dev),
-> -						&cesa->engines[i]);
-> +						engine);
->  		if (ret)
->  			goto err_cleanup;
->  	}
+(*) Proper fix for hash algorithms registration failures
+(implementation of import/export functionality) will be added separatel=
+y.
 
+Thannks,
+Horia
 
+Horia Geant=C4=83 (1):
+  crypto: talitos - fix AEAD tcrypt tests
 
--- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Jonas Eymann (1):
+  crypto: talitos - fix crash in talitos_cra_init()
+
+ drivers/crypto/talitos.c | 87 +++++++++++++++++++++++++++++++---------=
+--------
+ 1 file changed, 57 insertions(+), 30 deletions(-)
+
+--=20
+2.4.4
