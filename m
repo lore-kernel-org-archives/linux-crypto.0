@@ -1,53 +1,53 @@
-From: Philip Li <philip.li@intel.com>
-Subject: Re: [PATCH v5 6/6] crypto: AF_ALG - add support for key_id
-Date: Tue, 19 Apr 2016 18:25:17 +0800
-Message-ID: <20160419102517.GE8836@intel.com>
-References: <201604160521.QBqFNMI6%fengguang.wu@intel.com>
- <57115DFF.4030605@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild test robot <lkp@intel.com>, kbuild-all@01.org,
-	dhowells@redhat.com, herbert@gondor.apana.org.au,
-	smueller@chronox.de, linux-api@vger.kernel.org,
-	marcel@holtmann.org, linux-kernel@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dwmw2@infradead.org, davem@davemloft.net
-To: Tadeusz Struk <tadeusz.struk@intel.com>, xiaolong.ye@intel.com
+From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Subject: [PATCH 1/2] crypto: s5p-sss - Fix use after free of copied input
+ buffer in error path
+Date: Tue, 19 Apr 2016 15:44:11 +0200
+Message-ID: <1461073452-10426-1-git-send-email-k.kozlowski@samsung.com>
+Cc: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Krzysztof Kozlowski <k.kozlowski@samsung.com>,
+	Vladimir Zapolskiy <vz@mleia.com>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:2981 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752625AbcDSKVk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Apr 2016 06:21:40 -0400
-Content-Disposition: inline
-In-Reply-To: <57115DFF.4030605@intel.com>
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:21054 "EHLO
+	mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752545AbcDSNoa (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 19 Apr 2016 09:44:30 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 15, 2016 at 02:32:47PM -0700, Tadeusz Struk wrote:
-> On 04/15/2016 02:32 PM, kbuild test robot wrote:
-> > Hi Tadeusz,
-> > 
-> > [auto build test ERROR on cryptodev/master]
-> > [also build test ERROR on v4.6-rc3 next-20160415]
-> > [if your patch is applied to the wrong git tree, please drop us a note to help improving the system]
-> > 
-> > url:    https://github.com/0day-ci/linux/commits/Tadeusz-Struk/crypto-algif-add-akcipher/20160416-043207
-> > base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> > config: i386-allmodconfig (attached as .config)
-> > reproduce:
-> >         # save the attached .config to linux build tree
-> >         make ARCH=i386 
-> 
-> Hi,
-> It's is for https://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-next
-> plus this:
-> https://patchwork.kernel.org/patch/8843381/
+The driver makes copies of memory (input or output scatterlists) if they
+are not aligned. In s5p_aes_crypt_start() error path (on unsuccessful
+initialization of output scatterlist), if input scatterlist was not
+aligned, the driver first freed copied input memory and then unmapped it
+from the device, instead of doing otherwise (unmap and then free).
 
-Thanks Tadeusz for the feedback.
+This was wrong in two ways:
+1. Freed pages were still mapped to the device.
+2. The dma_unmap_sg() iterated over freed scatterlist structure.
 
-hi Xiaolong, anything we can do in 0day side to detect the base for this case?
+The call to s5p_free_sg_cpy() in this error path is not needed because
+the copied scatterlists will be freed by s5p_aes_complete().
 
-> Thanks,
-> -- 
-> TS
-> 
+Fixes: 9e4a1100a445 ("crypto: s5p-sss - Handle unaligned buffers")
+Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+---
+ drivers/crypto/s5p-sss.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index 4f6d5b3ec418..b0484d4d68d9 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -577,7 +577,6 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
+ 	return;
+ 
+ outdata_error:
+-	s5p_free_sg_cpy(dev, &dev->sg_src_cpy);
+ 	s5p_unset_indata(dev);
+ 
+ indata_error:
+-- 
+1.9.1
