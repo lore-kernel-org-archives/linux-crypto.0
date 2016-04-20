@@ -1,57 +1,46 @@
-From: "Jonas Eymann" <J.Eymann@gmx.net>
-Subject: Re: [PATCH 0/2] crypto: talitos - fix conversion to new AEAD
- interface
-Date: Wed, 20 Apr 2016 14:09:27 +0200
-Message-ID: <trinity-8dcdb1f6-150a-4801-b023-7884b3130854-1461154167206@3capp-gmx-bs61>
-References: <AM2PR04MB067377F55DDE5D5EE126EBF3986B0@AM2PR04MB0673.eurprd04.prod.outlook.com>
- <1461087228-19359-1-git-send-email-horia.geanta@nxp.com>,
- <20160420095838.GB3003@gondor.apana.org.au>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: AEAD in TALITOS SEC1 versus TALITOS SEC2
+Date: Wed, 20 Apr 2016 14:04:17 +0200
+Message-ID: <57177041.4090607@c-s.fr>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org
-To: horia.geanta@nxp.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto <linux-crypto@vger.kernel.org>
+To: LABBE Corentin <clabbe.montjoie@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Horia Geant? <horia.geanta@freescale.com>,
+	Jonas Eymann <J.Eymann@gmx.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.15.18]:63099 "EHLO mout.gmx.net"
+Received: from pegase1.c-s.fr ([93.17.236.30]:51826 "EHLO pegase1.c-s.fr"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752836AbcDTMJc convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 Apr 2016 08:09:32 -0400
-In-Reply-To: <20160420095838.GB3003@gondor.apana.org.au>
+	id S932253AbcDTMUj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 20 Apr 2016 08:20:39 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-sorry for the late reply, I was out of office. Thank you very much Hori=
-a for fixing the typo, adding the sign-off and also for the second patc=
-h. I'll also run some tests when I find the time to see how everything =
-works together.
+Today, in Talitos driver crypto alg registration is based on predefined 
+templates with a predefined descriptor type and verification against the 
+descriptors supported by the HW. This works well for ALG that require a 
+unique descriptor. But for IPsec this is slightly different:
+* IPsec can be performed with both DESC_HDR_TYPE_IPSEC_ESP and 
+DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU
+* DESC_HDR_TYPE_IPSEC_ESP is supported only by SEC2
+* DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU is supported by both SEC1 and SEC2
+* DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU is less performant than 
+DESC_HDR_TYPE_IPSEC_ESP
+So it is natural to use DESC_HDR_TYPE_IPSEC_ESP when it is supported and 
+use DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU otherwise ?
 
-Jonas
+What's the best way to implement the selection of the proper descriptor 
+type ?
+* We can duplicate the templates but it means that when both types are 
+supported the driver with try to register each AEAD alg twice
+* We can "on the fly" change the DESC_HDR_TYPE_IPSEC_ESP type into 
+DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU type ?
+* We can alter the templates at startup when we know we are on a SEC1, 
+changing all templates based on DESC_HDR_TYPE_IPSEC_ESP into templates 
+based on DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU
 
-> Gesendet: Mittwoch, 20. April 2016 um 11:58 Uhr
-> Von: "Herbert Xu" <herbert@gondor.apana.org.au>
-> An: "Horia Geant=C4=83" <horia.geanta@nxp.com>
-> Cc: linux-crypto@vger.kernel.org, "Jonas Eymann" <J.Eymann@gmx.net>, =
-"David S. Miller" <davem@davemloft.net>
-> Betreff: Re: [PATCH 0/2] crypto: talitos - fix conversion to new AEAD=
- interface
->
-> On Tue, Apr 19, 2016 at 08:33:46PM +0300, Horia Geant=C4=83 wrote:
-> > Jonas Eymann reports a crash and some failures of AED algorithms
-> > with kernel 4.4.6, all easily reproducible with tcrypt.
-> >=20
-> > These have to do with the onversion to the new AEAD interface:
-> > aeb4c132f33d crypto: talitos - Convert to new AEAD interface
-> >=20
-> > Problems occur for 4.3+ kernels, sending patches to -stable.
-> >=20
-> > (*) Proper fix for hash algorithms registration failures
-> > (implementation of import/export functionality) will be added separ=
-ately.
->=20
-> Both applied.  Thanks!
-> --=20
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->
+What would be the best approach from your point of view ?
+
+Christophe
