@@ -1,37 +1,3334 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crash in ppc4xx-rng on canyonland
-Date: Wed, 20 Apr 2016 17:58:15 +0800
-Message-ID: <20160420095815.GA3003@gondor.apana.org.au>
-References: <20160418095939.GA18915@gondor.apana.org.au>
- <14761928.ine93l7C6D@debian64>
+From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Subject: Re: console noise after commit c1e9b3b0eea
+Date: Wed, 20 Apr 2016 05:57:59 -0400
+Message-ID: <20160420095759.GD15852@oracle.com>
+References: <20160419223325.GA15852@oracle.com>
+ <CADxRZqzz304BDgQXjDkwJ4B0O0S4JUDK_XBa=Dvm-4orc1EBJw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-To: Christian Lamparter <chunkeey@googlemail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49120 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932446AbcDTJ6U (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 Apr 2016 05:58:20 -0400
+Content-Transfer-Encoding: 8BIT
+Cc: sparclinux@vger.kernel.org, herbert@gondor.apana.org.au,
+	mpm@selenic.com, linux-crypto@vger.kernel.org,
+	larry.bassel@oracle.com
+To: Anatoly Pugachev <matorola@gmail.com>
+Return-path: <sparclinux-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <14761928.ine93l7C6D@debian64>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <CADxRZqzz304BDgQXjDkwJ4B0O0S4JUDK_XBa=Dvm-4orc1EBJw@mail.gmail.com>
+Sender: sparclinux-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Apr 18, 2016 at 01:42:49PM +0200, Christian Lamparter wrote:
->
-> what else I fixed in v1->v2: 
->  - added a check to test trng device's status state with
->    of_device_is_available.
->  - if the hwrng device registration failed, the flag which
->    enables the trng was left enabled (note: the v1 code
->    disabled the hwrng device as part of crypto4xx_remove.
->    so it wasn't enabled when the crypto4xx driver was
->    unloaded)
+On (04/20/16 09:18), Anatoly Pugachev wrote:
+> the patch/commit is actually quite trivial, it just adds device_id
+> matches for newer T5/M7 CPUs to n2rng_match structure. Without this
+> patch, n2rng does not work on this newer CPUs. Works well on my T5-2
+> LDOM (tested with rng-tools and gpg --gen-key). I don't have M7
+> machine to test it with.
 
-Patch applied.  Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+understood, but my machine is actually running an older cpu, and
+I was using the same .config that I had been using for older kernel
+versions, so I'm not sure what all has changed in sync with this patch.
+
+> Can you please send me "prtconf -pv" output from your machine, as well
+> information on how do you run linux as LDOM container or baremetal
+> T5-2 ?
+
+I run linux on baremetal. Maybe I need a firmware upgrade, I have
+not checked.  Here is the prtconf output (with your patch reverted):
+
+System Configuration:  Sun Microsystems  sun4u
+Memory size: 523264 Megabytes
+System Peripherals (PROM Nodes):
+
+Node 0xf0229e94
+    :  f0229e94
+    :  01860010.e04630ca.00000000.4630ca77.00000000.00000000.00000000.00000000
+    :  00000007
+    :  
+    product-name: 'SPARC T5-2'
+    banner-name: 'SPARC T5-2'
+    name: 'sun4v-platform'
+    :  3b9aca00
+    :  00000000.00000001.00000100.00000002.00000003.00000101.00000105.00000108.00000107.00000118
+    :  0000007f
+    device_type: 'sun4v'
+    compatible: 'sun4v'
+    :  00000002
+    :  00000002
+
+    Node 0xf022d38c
+        :  f022d38c
+        name: 'packages'
+
+        Node 0xf024cf0c
+            :  f024cf0c
+            :  70636931.3030302c.37300070.63693130.30302c37.30007063.69657831.3030302c.37320070.63693130.30302c37.30007063.69657831.3030302c.37322e31.3030302e.37320070.63693130.30302c37.30007063.69657831.3030302c.38372e31.3030302e.38370070.63693130.30302c37.30007063.69657831.3030302c.37322e36.3237332e.31303865.00706369.31303030.2c373000.70636965.78313030.302c3732.2e313038.652e3632.37330070.63693130.30302c37.30007063.69657800.73756e34.762d7670.63690063.6c617373.30363034.30300063.6c617373.30363034.3030004f.52434c2c.6d34696f.732d7072.0073756e.34762d70.6572662d.636e7400.70636965.78383038.362c3135.32382e31.3038652e.34383438.006f7068.69720070.63696578.38303836.2c313531.352e3130.38652e34.38343800.6f706869.72007063.69657838.3038362c.31353231.2e313038.652e3762.3161006f.70686972.00706369.65783139.31
+ 322c31.34007868.63690064.65766963.65007573.62646576.69636500.7573622c.636c6173.73390068.75620075.73626966.2c636c61.73733900.68756200.75736269.662c636c.61737333.2e312e31.00757362.6b626400.75736269.662c636c.61737338.00757362.73746f72.61676500.70636931.6130332c.32303030.2e316130.332e3230.30300061.73742d67.72617068.69637300.70636931.3032622c.3532322e.31396132.2e313032.006d6174.726f782d.67726170.68696373.00706369.65783130.32622c35.32322e31.3961322e.31303200.6d617472.6f782d67.72617068.69637300.70636965.78313032.622c3532.32006d61.74726f78.2d677261.70686963.7300
+            name: 'SUNW,builtin-drivers'
+
+        Node 0xf026146c
+            :  f026146c
+            :  
+            :  
+            name: 'deblocker'
+
+        Node 0xf0261b68
+            :  f0261b68
+            :  
+            :  67707400.73756e00.6d627200
+            name: 'disk-label'
+
+        Node 0xf0264fa0
+            :  f0264fa0
+            :  
+            name: 'terminal-emulator'
+
+        Node 0xf0275904
+            :  f0275904
+            source: '/flashprom:'
+            name: 'dropins'
+
+        Node 0xf0276714
+            :  f0276714
+            name: 'SUNW,asr'
+
+        Node 0xf027bab4
+            :  f027bab4
+            name: 'kbd-translator'
+
+        Node 0xf027d1e8
+            :  f027d1e8
+            name: 'obp-tftp'
+
+    Node 0xf022d404
+        :  f022d404
+        bootargs: 'latest'
+        bootpath: '/pci@300/pci@1/pci@0/pci@2/scsi@0/disk@w5000cca0561f93a1,0:a'
+        :  fff04080
+        :  fff04290
+        :  fe997ea0
+        :  fe9a5d30
+        :  ffffffff
+        name: 'chosen'
+
+    Node 0xf022d478
+        :  f022d478
+        version: 'OBP 4.36.0 2014/04/04 15:50'
+        model: 'SUNW,4.36.0'
+        :  
+        :  
+        name: 'openprom'
+
+        Node 0xf022d508
+            :  f022d508
+            name: 'client-services'
+
+    Node 0xf022d5c0
+        :  f022d5c0
+        ttya-rts-dtr-off: 'false'
+        ttya-ignore-cd: 'true'
+        :  
+        :  
+        security-mode: 'none'
+        :  
+        security-#badlogins: '0'
+        verbosity: 'min'
+        diag-switch?: 'false'
+        local-mac-address?: 'true'
+        fcode-debug?: 'false'
+        scsi-initiator-id: '7'
+        :  
+        oem-logo?: 'false'
+        :  
+        oem-banner?: 'false'
+        ansi-terminal?: 'true'
+        screen-#columns: '80'
+        screen-#rows: '34'
+        ttya-mode: '9600,8,n,1,-'
+        output-device: 'virtual-console'
+        input-device: 'virtual-console'
+        auto-boot-on-error?: 'false'
+        load-base: '16384'
+        auto-boot?: 'false'
+        :  
+        boot-command: 'boot'
+        :  
+        boot-device: 'disk net'
+        multipath-boot?: 'false'
+        boot-device-index: '0'
+        use-nvramrc?: 'false'
+        :  
+        error-reset-recovery: 'boot'
+        name: 'options'
+
+    Node 0xf022d638
+        :  f022d638
+        screen: '/pci@380/pci@1/pci@0/pci@3/display@0'
+        net3: '/pci@3c0/pci@1/pci@0/pci@1/network@0,1'
+        net2: '/pci@3c0/pci@1/pci@0/pci@1/network@0'
+        disk5: '/pci@3c0/pci@1/pci@0/pci@2/scsi@0/disk@p1'
+        disk4: '/pci@3c0/pci@1/pci@0/pci@2/scsi@0/disk@p0'
+        scsi1: '/pci@3c0/pci@1/pci@0/pci@2/scsi@0'
+        cdrom: '/pci@3c0/pci@1/pci@0/pci@2/scsi@0/disk@p3'
+        net1: '/pci@300/pci@1/pci@0/pci@1/network@0,1'
+        net: '/pci@300/pci@1/pci@0/pci@1/network@0'
+        net0: '/pci@300/pci@1/pci@0/pci@1/network@0'
+        disk3: '/pci@300/pci@1/pci@0/pci@2/scsi@0/disk@p3'
+        disk2: '/pci@300/pci@1/pci@0/pci@2/scsi@0/disk@p2'
+        disk1: '/pci@300/pci@1/pci@0/pci@2/scsi@0/disk@p1'
+        disk: '/pci@300/pci@1/pci@0/pci@2/scsi@0/disk@p0'
+        disk0: '/pci@300/pci@1/pci@0/pci@2/scsi@0/disk@p0'
+        scsi: '/pci@300/pci@1/pci@0/pci@2/scsi@0'
+        scsi0: '/pci@300/pci@1/pci@0/pci@2/scsi@0'
+        virtual-console: '/virtual-devices/console@1'
+        name: 'aliases'
+
+    Node 0xf0240470
+        :  f0240470
+        :  00000000.30000000.0000003f.c0000000.00000800.00000000.00000040.00000000
+        :  0000083f.fff20000.00000000.00020000.00000800.00000000.0000003f.fff10000.0000003f.ef788000.00000000.00002000.00000000.30400000.0000003f.bf382000
+        name: 'memory'
+
+    Node 0xf0240a7c
+        :  f0240a7c
+        :  00000000.00002000.00000000.003fe000.80000000.30402740.00000000.00400000.00000000.01800000.80000800.00000740.00000000.40000000.00000000.00c00000.80000800.00000740.00000000.4182e000.00000000.027d2000.80000800.0182e740.00000000.f0000000.00000000.00400000.80000000.30000750.00000000.fe8f0000.00000000.00012000.8000083f.fff48750.00000000.fe902000.00000000.0000e000.8000083f.fffd8750.00000000.fe910000.00000000.00020000.8000083f.fff5a750.00000000.fe930000.00000000.00056000.8000083f.fff80750.00000000.fe986000.00000000.00006000.8000083f.fff7a750.00000000.fe98c000.00000000.00002000.8000083f.fffd6750.00000000.fe98e000.00000000.00002000.80008001.00000950.00000000.fe990000.00000000.00004000.80008090.00100950.00000000.fe994000.00000000.00010000.8000083f.fffe8750.00000000.fe9a4000.00000000.000040
+ 00.8000083f.ffffc750.00000000.fe9a8000.00000000.00006000.8000003f.ef782750.00000000.fe9ae000.00000000.00002000.8000083f.ffff8750.00000000.fe9b0000.00000000.00004000.8000003f.ef78a750.00000000.fe9b8000.00000000.00002000.8000003f.ef78e750.00000000.fe9ba000.00000000.0000a000.8000003f.effb0750.00000000.fe9c4000.00000000.00600000.8000003f.ef980750.00000000.fefc4000.00000000.00036000.8000003f.effba750.00000000.feffa000.00000000.00006000.8000003f.efff2750.00000000.fff00000.00000000.00010000.80000000.301f0750.00000000.fff10000.00000000.00002000.8000083f.ffffa750.00000000.fff12000.00000000.00002000.8000083f.fffe6750
+        :  00000000.00000000.00000800.00000000.fffff800.00000000.00000800.00000000
+        :  fffff800.00000000.000007fc.00000000.00000001.00000000.000007ff.00000000.00000000.ffff0000.00000000.0000e000.00000000.00000000.00000000.f0000000.00000000.f2200000.00000000.0c6f0000
+        :  00002000
+        name: 'virtual-memory'
+
+    Node 0xf026cf9c
+        :  f026cf9c
+        compatible: 'SUNW,iscsi-hba'
+        name: 'iscsi-hba'
+
+        Node 0xf02746f4
+            :  f02746f4
+            :  
+            device_type: 'block'
+            compatible: 'sd'
+            name: 'disk'
+
+    Node 0xf028db88
+        :  f028db88
+        :  00000001.00000001.f028db88.00000011
+        :  0000001f.00ffffff.00000003
+        :  00000001
+        :  c0000100.00000000.00000000.00000000
+        :  00000001
+        :  00000000
+        device_type: 'virtual-devices'
+        :  53554e57.2c73756e.34762d76.69727475.616c2d64.65766963.65730053.554e572c.76697274.75616c2d.64657669.63657300
+        name: 'virtual-devices'
+
+        Node 0xf028ec48
+            :  f028ec48
+            name: 'flashprom'
+            :  00000000
+
+        Node 0xf028f21c
+            :  f028f21c
+            :  00000002
+            compatible: 'ORCL,m4-rng'
+            :  0000000e
+            name: 'random-number-generator'
+
+        Node 0xf028f8a0
+            :  f028f8a0
+            :  00000001
+            :  00000000
+            :  00000200
+            compatible: 'SUNW,sun4v-channel-devices'
+            device_type: 'channel-devices'
+            name: 'channel-devices'
+
+            Node 0xf0290780
+                :  f0290780
+                compatible: 'SUNW,sun4v-channel'
+                :  00000000
+                name: 'virtual-channel'
+
+            Node 0xf0290854
+                :  f0290854
+                compatible: 'SUNW,sun4v-channel'
+                :  00000001
+                name: 'virtual-channel-client'
+
+            Node 0xf029092c
+                :  f029092c
+                compatible: 'SUNW,sun4v-channel'
+                :  00000002
+                name: 'virtual-channel-client'
+
+            Node 0xf0290a04
+                :  f0290a04
+                compatible: 'SUNW,sun4v-channel'
+                :  00000003
+                name: 'virtual-channel'
+
+            Node 0xf0290ad8
+                :  f0290ad8
+                compatible: 'SUNW,sun4v-domain-service'
+                :  00000000
+                name: 'virtual-domain-service'
+
+        Node 0xf0290bf0
+            :  f0290bf0
+            :  00000001
+            device_type: 'serial'
+            compatible: 'SUNW,sun4v-console'
+            name: 'console'
+            :  00000001
+
+        Node 0xf02913c0
+            :  f02913c0
+            compatible: 'SUNW,sun4v-tod'
+            :  00000005
+            name: 'rtc'
+
+    Node 0xf0291b94
+        :  f0291b94
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000000.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0291cbc
+        :  f0291cbc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000001.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0291de4
+        :  f0291de4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000002.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0291f0c
+        :  f0291f0c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000003.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0292034
+        :  f0292034
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000004.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029215c
+        :  f029215c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000005.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0292284
+        :  f0292284
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000006.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02923ac
+        :  f02923ac
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000007.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02924d4
+        :  f02924d4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000008.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02925fc
+        :  f02925fc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000009.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0292724
+        :  f0292724
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000000a.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029284c
+        :  f029284c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000000b.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0292974
+        :  f0292974
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000000c.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0292a9c
+        :  f0292a9c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000000d.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0292bc4
+        :  f0292bc4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000000e.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0292cec
+        :  f0292cec
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000000f.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0292e14
+        :  f0292e14
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000010.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0292f3c
+        :  f0292f3c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000011.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0293064
+        :  f0293064
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000012.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029318c
+        :  f029318c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000013.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02932b4
+        :  f02932b4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000014.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02933dc
+        :  f02933dc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000015.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0293504
+        :  f0293504
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000016.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029362c
+        :  f029362c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000017.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0293754
+        :  f0293754
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000018.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029387c
+        :  f029387c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000019.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02939a4
+        :  f02939a4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000001a.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0293acc
+        :  f0293acc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000001b.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0293bf4
+        :  f0293bf4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000001c.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0293d1c
+        :  f0293d1c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000001d.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0293e44
+        :  f0293e44
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000001e.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0293f6c
+        :  f0293f6c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000001f.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0294094
+        :  f0294094
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000020.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02941bc
+        :  f02941bc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000021.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02942e4
+        :  f02942e4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000022.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029440c
+        :  f029440c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000023.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0294534
+        :  f0294534
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000024.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029465c
+        :  f029465c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000025.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0294784
+        :  f0294784
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000026.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02948ac
+        :  f02948ac
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000027.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02949d4
+        :  f02949d4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000028.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0294afc
+        :  f0294afc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000029.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0294c24
+        :  f0294c24
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000002a.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0294d4c
+        :  f0294d4c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000002b.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0294e74
+        :  f0294e74
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000002c.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0294f9c
+        :  f0294f9c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000002d.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02950c4
+        :  f02950c4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000002e.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02951ec
+        :  f02951ec
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000002f.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0295314
+        :  f0295314
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000030.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029543c
+        :  f029543c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000031.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0295564
+        :  f0295564
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000032.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029568c
+        :  f029568c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000033.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02957b4
+        :  f02957b4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000034.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02958dc
+        :  f02958dc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000035.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0295a04
+        :  f0295a04
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000036.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0295b2c
+        :  f0295b2c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000037.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0295c54
+        :  f0295c54
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000038.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0295d7c
+        :  f0295d7c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000039.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0295ea4
+        :  f0295ea4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000003a.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0295fcc
+        :  f0295fcc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000003b.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02960f4
+        :  f02960f4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000003c.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029621c
+        :  f029621c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000003d.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0296344
+        :  f0296344
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000003e.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029646c
+        :  f029646c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000003f.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0296594
+        :  f0296594
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000040.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02966bc
+        :  f02966bc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000041.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02967e4
+        :  f02967e4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000042.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029690c
+        :  f029690c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000043.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0296a34
+        :  f0296a34
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000044.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0296b5c
+        :  f0296b5c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000045.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0296c84
+        :  f0296c84
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000046.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0296dac
+        :  f0296dac
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000047.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0296ed4
+        :  f0296ed4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000048.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0296ffc
+        :  f0296ffc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000049.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0297124
+        :  f0297124
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000004a.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029724c
+        :  f029724c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000004b.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0297374
+        :  f0297374
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000004c.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029749c
+        :  f029749c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000004d.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02975c4
+        :  f02975c4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000004e.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02976ec
+        :  f02976ec
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000004f.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0297814
+        :  f0297814
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000050.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029793c
+        :  f029793c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000051.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0297a64
+        :  f0297a64
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000052.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0297b8c
+        :  f0297b8c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000053.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0297cb4
+        :  f0297cb4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000054.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0297ddc
+        :  f0297ddc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000055.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0297f04
+        :  f0297f04
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000056.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029802c
+        :  f029802c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000057.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0298154
+        :  f0298154
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000058.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029827c
+        :  f029827c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000059.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02983a4
+        :  f02983a4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000005a.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02984cc
+        :  f02984cc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000005b.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02985f4
+        :  f02985f4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000005c.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029871c
+        :  f029871c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000005d.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0298844
+        :  f0298844
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000005e.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029896c
+        :  f029896c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000005f.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0298a94
+        :  f0298a94
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000060.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0298bbc
+        :  f0298bbc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000061.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0298ce4
+        :  f0298ce4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000062.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0298e0c
+        :  f0298e0c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000063.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0298f34
+        :  f0298f34
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000064.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029905c
+        :  f029905c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000065.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0299184
+        :  f0299184
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000066.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02992ac
+        :  f02992ac
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000067.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02993d4
+        :  f02993d4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000068.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02994fc
+        :  f02994fc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000069.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0299624
+        :  f0299624
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000006a.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029974c
+        :  f029974c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000006b.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0299874
+        :  f0299874
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000006c.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029999c
+        :  f029999c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000006d.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0299ac4
+        :  f0299ac4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000006e.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0299bec
+        :  f0299bec
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000006f.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0299d14
+        :  f0299d14
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000070.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0299e3c
+        :  f0299e3c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000071.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf0299f64
+        :  f0299f64
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000072.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029a08c
+        :  f029a08c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000073.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029a1b4
+        :  f029a1b4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000074.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029a2dc
+        :  f029a2dc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000075.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029a404
+        :  f029a404
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000076.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029a52c
+        :  f029a52c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000077.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029a654
+        :  f029a654
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000078.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029a77c
+        :  f029a77c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000079.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029a8a4
+        :  f029a8a4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000007a.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029a9cc
+        :  f029a9cc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000007b.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029aaf4
+        :  f029aaf4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000007c.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029ac1c
+        :  f029ac1c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000007d.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029ad44
+        :  f029ad44
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000007e.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029ae6c
+        :  f029ae6c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000007f.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029af94
+        :  f029af94
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000080.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029b0bc
+        :  f029b0bc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000081.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029b1e4
+        :  f029b1e4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000082.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029b30c
+        :  f029b30c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000083.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029b434
+        :  f029b434
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000084.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029b55c
+        :  f029b55c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000085.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029b684
+        :  f029b684
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000086.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029b7ac
+        :  f029b7ac
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000087.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029b8d4
+        :  f029b8d4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000088.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029b9fc
+        :  f029b9fc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000089.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029bb24
+        :  f029bb24
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000008a.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029bc4c
+        :  f029bc4c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000008b.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029bd74
+        :  f029bd74
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000008c.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029be9c
+        :  f029be9c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000008d.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029bfc4
+        :  f029bfc4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000008e.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029c0ec
+        :  f029c0ec
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000008f.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029c214
+        :  f029c214
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000090.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029c33c
+        :  f029c33c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000091.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029c464
+        :  f029c464
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000092.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029c58c
+        :  f029c58c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000093.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029c6b4
+        :  f029c6b4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000094.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029c7dc
+        :  f029c7dc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000095.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029c904
+        :  f029c904
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000096.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029ca2c
+        :  f029ca2c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000097.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029cb54
+        :  f029cb54
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000098.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029cc7c
+        :  f029cc7c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c0000099.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029cda4
+        :  f029cda4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000009a.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029cecc
+        :  f029cecc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000009b.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029cff4
+        :  f029cff4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000009c.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029d11c
+        :  f029d11c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000009d.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029d244
+        :  f029d244
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000009e.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029d36c
+        :  f029d36c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c000009f.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029d494
+        :  f029d494
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000a0.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029d5bc
+        :  f029d5bc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000a1.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029d6e4
+        :  f029d6e4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000a2.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029d80c
+        :  f029d80c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000a3.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029d934
+        :  f029d934
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000a4.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029da5c
+        :  f029da5c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000a5.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029db84
+        :  f029db84
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000a6.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029dcac
+        :  f029dcac
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000a7.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029ddd4
+        :  f029ddd4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000a8.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029defc
+        :  f029defc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000a9.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029e024
+        :  f029e024
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000aa.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029e14c
+        :  f029e14c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000ab.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029e274
+        :  f029e274
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000ac.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029e39c
+        :  f029e39c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000ad.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029e4c4
+        :  f029e4c4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000ae.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029e5ec
+        :  f029e5ec
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000af.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029e714
+        :  f029e714
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000b0.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029e83c
+        :  f029e83c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000b1.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029e964
+        :  f029e964
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000b2.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029ea8c
+        :  f029ea8c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000b3.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029ebb4
+        :  f029ebb4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000b4.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029ecdc
+        :  f029ecdc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000b5.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029ee04
+        :  f029ee04
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000b6.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029ef2c
+        :  f029ef2c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000b7.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029f054
+        :  f029f054
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000b8.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029f17c
+        :  f029f17c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000b9.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029f2a4
+        :  f029f2a4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000ba.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029f3cc
+        :  f029f3cc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000bb.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029f4f4
+        :  f029f4f4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000bc.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029f61c
+        :  f029f61c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000bd.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029f744
+        :  f029f744
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000be.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029f86c
+        :  f029f86c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000bf.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029f994
+        :  f029f994
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000c0.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029fabc
+        :  f029fabc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000c1.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029fbe4
+        :  f029fbe4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000c2.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029fd0c
+        :  f029fd0c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000c3.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029fe34
+        :  f029fe34
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000c4.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf029ff5c
+        :  f029ff5c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000c5.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a0084
+        :  f02a0084
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000c6.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a01ac
+        :  f02a01ac
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000c7.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a02d4
+        :  f02a02d4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000c8.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a03fc
+        :  f02a03fc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000c9.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a0524
+        :  f02a0524
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000ca.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a064c
+        :  f02a064c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000cb.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a0774
+        :  f02a0774
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000cc.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a089c
+        :  f02a089c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000cd.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a09c4
+        :  f02a09c4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000ce.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a0aec
+        :  f02a0aec
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000cf.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a0c14
+        :  f02a0c14
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000d0.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a0d3c
+        :  f02a0d3c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000d1.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a0e64
+        :  f02a0e64
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000d2.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a0f8c
+        :  f02a0f8c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000d3.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a10b4
+        :  f02a10b4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000d4.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a11dc
+        :  f02a11dc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000d5.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a1304
+        :  f02a1304
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000d6.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a142c
+        :  f02a142c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000d7.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a1554
+        :  f02a1554
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000d8.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a167c
+        :  f02a167c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000d9.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a17a4
+        :  f02a17a4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000da.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a18cc
+        :  f02a18cc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000db.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a19f4
+        :  f02a19f4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000dc.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a1b1c
+        :  f02a1b1c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000dd.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a1c44
+        :  f02a1c44
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000de.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a1d6c
+        :  f02a1d6c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000df.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a1e94
+        :  f02a1e94
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000e0.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a1fbc
+        :  f02a1fbc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000e1.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a20e4
+        :  f02a20e4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000e2.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a220c
+        :  f02a220c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000e3.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a2334
+        :  f02a2334
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000e4.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a245c
+        :  f02a245c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000e5.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a2584
+        :  f02a2584
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000e6.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a26ac
+        :  f02a26ac
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000e7.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a27d4
+        :  f02a27d4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000e8.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a28fc
+        :  f02a28fc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000e9.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a2a24
+        :  f02a2a24
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000ea.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a2b4c
+        :  f02a2b4c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000eb.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a2c74
+        :  f02a2c74
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000ec.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a2d9c
+        :  f02a2d9c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000ed.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a2ec4
+        :  f02a2ec4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000ee.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a2fec
+        :  f02a2fec
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000ef.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a3114
+        :  f02a3114
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000f0.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a323c
+        :  f02a323c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000f1.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a3364
+        :  f02a3364
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000f2.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a348c
+        :  f02a348c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000f3.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a35b4
+        :  f02a35b4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000f4.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a36dc
+        :  f02a36dc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000f5.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a3804
+        :  f02a3804
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000f6.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a392c
+        :  f02a392c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000f7.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a3a54
+        :  f02a3a54
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000f8.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a3b7c
+        :  f02a3b7c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000f9.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a3ca4
+        :  f02a3ca4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000fa.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a3dcc
+        :  f02a3dcc
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000fb.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a3ef4
+        :  f02a3ef4
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000fc.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a401c
+        :  f02a401c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000fd.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a4144
+        :  f02a4144
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000fe.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a426c
+        :  f02a426c
+        :  d6924470
+        :  53504152.432d5435.0053554e.572c7375.6e34762d.63707500.73756e34.7600
+        device_type: 'cpu'
+        :  c00000ff.00000000.00000000.00000000
+        name: 'cpu'
+
+    Node 0xf02a4398
+        :  f02a4398
+        :  00000800.00000000.00000000.00000001.f02a4398.00000002.00000800.00000000.00000000.00000002.f02a4398.00000003.00000800.00000000.00000000.00000003.f02a4398.00000004.00000800.00000000.00000000.00000004.f02a4398.00000001
+        :  00fff800.00000000.00000000.00000007
+        :  00000001
+        :  0000003f.0000003e
+        :  81000000.00000000.00000000.00000000.10000000.82000000.00000000.00100000.00000000.7ef00000.c3000000.00000001.10000000.00000006.f0000000
+        :  01000000.00000000.00000000.80008040.00000000.00000000.10000000.02000000.00000000.00000000.80008000.00000000.00000000.7f000000.03000000.00000001.00000000.80008001.00000000.00000007.00000000
+        :  c0000340.00000000.00000000.00000000
+        :  000000ff
+        :  00000000.80000000.00000000.40000000.00000000.c0000000.00000000.40000000.a0000000.00000000.01000000.00000000.c0000000.00000000.01000000.00000000
+        :  00000000.00000038.00000006
+        :  00000038
+        :  00000020
+        :  00000200
+        :  00000000.00000200
+        :  000003ff
+        :  00000200
+        :  00000000.7f000000.00800000.e0000000.3f000000.00800000
+        :  00000000.000000ff
+        :  00000000.00000006
+        :  
+        :  00000003
+        :  00000002
+        name: 'pci'
+        compatible: 'SUNW,sun4v-pci'
+        device_type: 'pciex'
+        :  80000000.80000000
+
+        Node 0xf02e05c4
+            :  f02e05c4
+            :  82000000.00000000.fff00000.82000000.00000000.fff00000.ffffffff.00200000.c3000000.00000001.00000000.c3000000.00000001.00000000.00000000.10000000
+            :  00000001.00000006
+            :  70636965.78313038.652c3831.39362e31.00706369.65783130.38652c38.31393600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+            :  00000800.00000000.00000000.00000000.00000000
+            :  00000003
+            :  00000002
+            device_type: 'pciex'
+            name: 'pci'
+            port-type: 'Root-Port'
+            :  00000000
+            :  00060400
+            :  00000001
+            :  00008196
+            :  0000108e
+
+            Node 0xf02e30ac
+                :  f02e30ac
+                :  82000000.00000000.fff00000.82000000.00000000.fff00000.ffffffff.00200000.c3000000.00000001.00000000.c3000000.00000001.00000000.00000000.10000000
+                :  00000002.00000006
+                :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                :  00010000.00000000.00000000.00000000.00000000
+                :  00000003
+                :  00000002
+                device_type: 'pciex'
+                name: 'pci'
+                port-type: 'Upstream-Port'
+                :  00000010
+                :  00060400
+                :  00000003
+                :  000080bf
+                :  0000111d
+
+                Node 0xf02e5b98
+                    :  f02e5b98
+                    :  c3000000.00000001.00002000.00000000.0fffe000
+                    :  82000000.00000000.fff00000.82000000.00000000.fff00000.ffffffff.00200000.c3000000.00000001.00000000.c3000000.00000001.00000000.00000000.10000000
+                    :  00000003.00000003
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00021800.00000000.00000000.00000000.00000000
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+                    Node 0xf02e8688
+                        :  f02e8688
+                        :  00000080
+                        :  83030010.00000001.00000000.00000000.00002000
+                        device_type: 'xchi'
+                        :  00030000.00000000.00000000.00000000.00000000.03030010.00000000.00000000.00000000.00002000
+                        :  70636965.78313931.322c3134.2e330070.63696578.31393132.2c313400.70636965.78636c61.73732c30.63303333.30007063.69657863.6c617373.2c306330.3300
+                        :  00000000
+                        :  00000001
+                        name: 'usb'
+                        port-type: 'PCIE-Endpoint'
+                        :  00000001
+                        :  00000010
+                        :  000c0330
+                        :  00000003
+                        :  00000014
+                        :  00001912
+
+                        Node 0xf03bd004
+                            :  f03bd004
+                            :  00000001
+                            device_type: 'usb_hub'
+                            :  00000001
+                            :  00000001
+                            :  0000000c
+                            :  00000001
+                            :  00
+                            :  00
+                            :  00
+                            :  75736234.62342c36.3536302e.62007573.62346234.2c363536.30007573.62346234.2c636c61.7373392e.302e3200.75736234.62342c63.6c617373.392e3000.75736234.62342c63.6c617373.39007573.622c636c.61737339.2e302e32.00757362.2c636c61.7373392e.30007573.622c636c.61737339.00757362.2c646576.69636500
+                            :  000004b4
+                            :  00006560
+                            :  0000000b
+                            name: 'hub'
+                            :  00000009
+                            :  00000000
+                            :  00000002
+                            :  00
+                            :  00000001
+                            :  00000005
+                            :  00000000
+                            :  00000001
+
+                            Node 0xf03bee6c
+                                :  f03bee6c
+                                device_type: 'usb_device'
+                                :  00000002
+                                :  00000000
+                                :  00000002
+                                compatible: 'usbdevice'
+                                name: 'device'
+
+                                Node 0xf03bf9b8
+                                    :  f03bf9b8
+                                    :  00000001
+                                    :  00000008
+                                    :  00000001
+                                    :  00000001
+                                    :  00
+                                    :  56697274.75616c20.45746820.44657669.63650000
+                                    :  53756e4d.6963726f.0000
+                                    :  75736234.33302c61.3461322e.31303000.75736234.33302c61.34613200.75736234.33302c63.6c617373.322e302e.30007573.62343330.2c636c61.7373322e.30007573.62343330.2c636c61.73733200.7573622c.636c6173.73322e30.2e300075.73622c63.6c617373.322e3000.7573622c.636c6173.73320075.73622c64.65766963.6500
+                                    :  00000430
+                                    :  0000a4a2
+                                    :  00000100
+                                    name: 'network'
+                                    :  00000002
+                                    :  00000000
+                                    :  00000000
+                                    :  00
+                                    :  00000003
+                                    :  00000000.00000000
+
+                                Node 0xf03bfd28
+                                    :  f03bfd28
+                                    :  00000001
+                                    :  00000040
+                                    :  00000003
+                                    :  00000040
+                                    :  00000002
+                                    :  00
+                                    :  56697274.75616c20.45746820.44657669.63650000
+                                    :  53756e4d.6963726f.0000
+                                    :  75736234.33302c61.3461322e.31303000.75736234.33302c61.34613200.75736234.33302c63.6c617373.322e302e.30007573.62343330.2c636c61.7373322e.30007573.62343330.2c636c61.73733200.7573622c.636c6173.73322e30.2e300075.73622c63.6c617373.322e3000.7573622c.636c6173.73320075.73622c64.65766963.6500
+                                    :  00000430
+                                    :  0000a4a2
+                                    :  00000100
+                                    name: 'network'
+                                    :  00000002
+                                    :  00000000
+                                    :  00000000
+                                    :  00
+                                    :  00000003
+                                    :  00000001.00000000
+
+                        Node 0xf03bdf38
+                            :  f03bdf38
+                            :  00000002
+                            device_type: 'usb_hub'
+                            :  00000001
+                            :  00000001
+                            :  0000000c
+                            :  00000001
+                            :  00
+                            :  00
+                            :  00
+                            :  75736234.62342c36.3536302e.62007573.62346234.2c363536.30007573.62346234.2c636c61.7373392e.302e3200.75736234.62342c63.6c617373.392e3000.75736234.62342c63.6c617373.39007573.622c636c.61737339.2e302e32.00757362.2c636c61.7373392e.30007573.622c636c.61737339.00757362.2c646576.69636500
+                            :  000004b4
+                            :  00006560
+                            :  0000000b
+                            name: 'hub'
+                            :  00000009
+                            :  00000000
+                            :  00000002
+                            :  00
+                            :  00000002
+                            :  00000008
+                            :  00000000
+                            :  00000001
+
+                Node 0xf02f5728
+                    :  f02f5728
+                    :  00000001.50434945.3500
+                    :  82000000.00000000.fff00000.82000000.00000000.fff00000.ffffffff.00200000
+                    :  00000004.00000004
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00022000.00000000.00000000.00000000.00000000
+                    :  00000005
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+                Node 0xf02f82dc
+                    :  f02f82dc
+                    :  00000001.50434945.3600
+                    :  82000000.00000000.fff00000.82000000.00000000.fff00000.ffffffff.00200000
+                    :  00000005.00000005
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00022800.00000000.00000000.00000000.00000000
+                    :  00000006
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+                Node 0xf02fae90
+                    :  f02fae90
+                    :  00000001.50434945.3700
+                    :  82000000.00000000.fff00000.82000000.00000000.fff00000.ffffffff.00200000
+                    :  00000006.00000006
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00023000.00000000.00000000.00000000.00000000
+                    :  00000007
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+    Node 0xf02b3190
+        :  f02b3190
+        :  00000800.00000000.00000000.00000001.f02b3190.00000002.00000800.00000000.00000000.00000002.f02b3190.00000003.00000800.00000000.00000000.00000003.f02b3190.00000004.00000800.00000000.00000000.00000004.f02b3190.00000001
+        :  00fff800.00000000.00000000.00000007
+        :  00000001
+        :  0000003f.0000003e
+        :  81000000.00000000.00002000.00000000.0fffe000.82000000.00000000.00200000.00000000.7ee00000.c3000000.00000003.30000000.00000004.d0000000
+        :  01000000.00000000.00000000.80008041.00000000.00000000.10000000.02000000.00000000.00000000.80008010.00000000.00000000.7f000000.03000000.00000001.00000000.80008011.00000000.00000007.00000000
+        :  c0000300.00000000.00000000.00000000
+        :  000000ff
+        :  00000000.80000000.00000000.40000000.00000000.c0000000.00000000.40000000.a0000000.00000000.01000000.00000000.c0000000.00000000.01000000.00000000
+        :  00000000.00000038.00000006
+        :  00000038
+        :  00000020
+        :  00000200
+        :  00000000.00000200
+        :  000003ff
+        :  00000200
+        :  00000000.7f000000.00800000.e0000000.3f000000.00800000
+        :  00000000.000000ff
+        :  00000000.00000005
+        :  
+        :  00000003
+        :  00000002
+        name: 'pci'
+        compatible: 'SUNW,sun4v-pci'
+        device_type: 'pciex'
+        :  80000000.80000000
+
+        Node 0xf02fdc20
+            :  f02fdc20
+            :  81000000.00000000.00000000.81000000.00000000.00000000.00000000.00002000.82000000.00000000.00100000.82000000.00000000.00100000.00000000.00100000.c3000000.00000001.00000000.c3000000.00000001.00000000.00000002.30000000
+            :  00000001.00000005
+            :  70636965.78313038.652c3831.39362e31.00706369.65783130.38652c38.31393600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+            :  00000800.00000000.00000000.00000000.00000000
+            :  00000003
+            :  00000002
+            device_type: 'pciex'
+            name: 'pci'
+            port-type: 'Root-Port'
+            :  00000000
+            :  00060400
+            :  00000001
+            :  00008196
+            :  0000108e
+
+            Node 0xf0300708
+                :  f0300708
+                :  81000000.00000000.00000000.81000000.00000000.00000000.00000000.00002000.82000000.00000000.00100000.82000000.00000000.00100000.00000000.00100000.c3000000.00000001.00000000.c3000000.00000001.00000000.00000002.30000000
+                :  00000002.00000005
+                :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                :  00010000.00000000.00000000.00000000.00000000
+                :  00000003
+                :  00000002
+                device_type: 'pciex'
+                name: 'pci'
+                port-type: 'Upstream-Port'
+                :  00000010
+                :  00060400
+                :  00000003
+                :  000080bf
+                :  0000111d
+
+                Node 0xf03031f4
+                    :  f03031f4
+                    :  81000000.00000000.00000040.00000000.00000fc0.c3000000.00000001.00508000.00000000.000f8000.c3000000.00000001.00900000.00000000.0f700000
+                    :  81000000.00000000.00000000.81000000.00000000.00000000.00000000.00001000.82000000.00000000.fff00000.82000000.00000000.fff00000.ffffffff.00200000.c3000000.00000001.00000000.c3000000.00000001.00000000.00000000.10000000
+                    :  00000003.00000003
+                    :  
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00020800.00000000.00000000.00000000.00000000
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+                    Node 0xf0305d04
+                        :  f0305d04
+                        :  0010e046.30ca
+                        :  0010e046.30ca
+                        :  83030000.00000001.00204000.00000000.00004000.83030003.00000001.00304000.00000000.00004000
+                        :  c3030010.00000001.00000000.00000000.00200000.81030018.00000000.00000000.00000000.00000020.c3030020.00000001.00200000.00000000.00004000
+                        :  03030000.00000000.00000000.00000000.00004000.03030003.00000000.00000000.00000000.00004000
+                        :  70636965.78383038.362c3135.32382e31.3038652e.34383438.2e310070.63696578.38303836.2c313532.382e3130.38652e34.38343800.70636965.78383038.362c3135.32382e31.00706369.65783830.38362c31.35323800.70636965.78636c61.73732c30.32303030.30007063.69657863.6c617373.2c303230.3000
+                        :  00030000.00000000.00000000.00000000.00000000.43030010.00000000.00000000.00000000.00200000.01030018.00000000.00000000.00000000.00000020.43030020.00000000.00000000.00000000.00004000
+                        :  00010000
+                        :  00000030
+                        device_type: 'network'
+                        name: 'network'
+                        :  00000002
+                        :  00000080
+                        :  00000040
+                        :  00000040
+                        :  00000040
+                        port-type: 'PCIE-Endpoint'
+                        :  00000002
+                        :  00000010
+                        :  00020000
+                        :  00004848
+                        :  0000108e
+                        :  00000001
+                        :  00001528
+                        :  00008086
+
+                    Node 0xf03107a4
+                        :  f03107a4
+                        :  0010e046.30cb
+                        :  0010e046.30cb
+                        :  83030100.00000001.00408000.00000000.00004000.83030103.00000001.00800000.00000000.00004000
+                        :  c3030110.00000001.00600000.00000000.00200000.81030118.00000000.00000020.00000000.00000020.c3030120.00000001.00404000.00000000.00004000
+                        :  03030100.00000000.00000000.00000000.00004000.03030103.00000000.00000000.00000000.00004000
+                        :  70636965.78383038.362c3135.32382e31.3038652e.34383438.2e310070.63696578.38303836.2c313532.382e3130.38652e34.38343800.70636965.78383038.362c3135.32382e31.00706369.65783830.38362c31.35323800.70636965.78636c61.73732c30.32303030.30007063.69657863.6c617373.2c303230.3000
+                        :  00030100.00000000.00000000.00000000.00000000.43030110.00000000.00000000.00000000.00200000.01030118.00000000.00000000.00000000.00000020.43030120.00000000.00000000.00000000.00004000
+                        :  00010000
+                        :  00000030
+                        device_type: 'network'
+                        name: 'network'
+                        :  00000002
+                        :  00000080
+                        :  00000040
+                        :  00000040
+                        :  00000040
+                        port-type: 'PCIE-Endpoint'
+                        :  00000001
+                        :  00000010
+                        :  00020000
+                        :  00004848
+                        :  0000108e
+                        :  00000001
+                        :  00001528
+                        :  00008086
+
+                Node 0xf031b37c
+                    :  f031b37c
+                    :  81000000.00000000.00001100.00000000.00000f00.c3000000.00000001.10010000.00000000.00030000.c3000000.00000001.10080000.00000000.0ff80000
+                    :  81000000.00000000.00001000.81000000.00000000.00001000.00000000.00001000.82000000.00000000.00100000.82000000.00000000.00100000.00000000.00100000.c3000000.00000001.10000000.c3000000.00000001.10000000.00000000.10000000
+                    :  00000004.00000004
+                    :  
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00021000.00000000.00000000.00000000.00000000
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+                    Node 0xf031de8c
+                        :  f031de8c
+                        firmware-version: '14.00.00.00'
+                        mpt-version: '2.00'
+                        :  50800200.0193f0f0
+                        :  81040010.00000000.00001000.00000000.00000100.83040014.00000001.10000000.00000000.00010000.8304001c.00000001.10040000.00000000.00040000.82040030.00000000.00100000.00000000.00100000
+                        :  70636965.78313030.302c3837.00706369.31303030.2c383700
+                        model: 'LSI,2308_2'
+                        :  00040000.00000000.00000000.00000000.00000000.01040010.00000000.00000000.00000000.00000100.03040014.00000000.00000000.00000000.00010000.0304001c.00000000.00000000.00000000.00040000.02040030.00000000.00000000.00000000.00100000
+                        version: '1.00.63'
+                        :  00000010
+                        device_type: 'scsi-sas'
+                        name: 'scsi'
+                        :  00000004
+                        port-type: 'PCIE-Endpoint'
+                        :  00000001
+                        :  00000010
+                        :  00010700
+                        :  00000087
+                        :  00001000
+                        :  00000005
+                        :  00000087
+                        :  00001000
+
+                        Node 0xf0333aa0
+                            :  f0333aa0
+                            device_type: 'byte'
+                            compatible: 'st'
+                            name: 'tape'
+
+                        Node 0xf0334aa8
+                            :  f0334aa8
+                            :  
+                            device_type: 'block'
+                            compatible: 'sd'
+                            name: 'disk'
+
+                Node 0xf033785c
+                    :  f033785c
+                    :  00000001.50434945.3100
+                    :  c3000000.00000001.20100000.00000000.07f00000
+                    :  82000000.00000000.fff00000.82000000.00000000.fff00000.ffffffff.00200000.c3000000.00000001.20000000.c3000000.00000001.20000000.00000002.10000000
+                    :  00000005.00000005
+                    :  
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00022000.00000000.00000000.00000000.00000000
+                    :  00000001
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+                    Node 0xf033a394
+                        :  f033a394
+                        :  c3050002.00000001.30000000.00000000.08000000
+                        :  83050010.00000001.20000000.00000000.00100000.c3050018.00000001.28000000.00000000.08000000
+                        :  43050002.00000000.00000000.00000000.08000000
+                        :  00050000.00000000.00000000.00000000.00000000.03050010.00000000.00000000.00000000.00100000.43050018.00000000.00000000.00000000.08000000
+                        :  70636965.78313562.332c3130.30332e31.3562332e.39302e30.00706369.65783135.62332c31.3030332e.31356233.2e393000.70636965.78313562.332c3130.30332e30.00706369.65783135.62332c31.30303300.70636965.78636c61.73732c30.63303630.30007063.69657863.6c617373.2c306330.3600
+                        name: 'pciex15b3,1003'
+                        :  00000001
+                        :  00000001
+                        :  00000040
+                        :  00000040
+                        :  00000040
+                        port-type: 'PCIE-Endpoint'
+                        :  00000001
+                        :  00000010
+                        :  000c0600
+                        :  00000090
+                        :  000015b3
+                        :  00000000
+                        :  00001003
+                        :  000015b3
+
+    Node 0xf02c1f88
+        :  f02c1f88
+        :  00000800.00000000.00000000.00000001.f02c1f88.00000002.00000800.00000000.00000000.00000002.f02c1f88.00000003.00000800.00000000.00000000.00000003.f02c1f88.00000004.00000800.00000000.00000000.00000004.f02c1f88.00000001
+        :  00fff800.00000000.00000000.00000007
+        :  00000001
+        :  0000003f.0000003e
+        :  81000000.00000000.00002000.00000000.0fffe000.82000000.00000000.00200000.00000000.7ee00000.c3000000.00000001.20000000.00000006.e0000000
+        :  01000000.00000000.00000000.800080c0.00000000.00000000.10000000.02000000.00000000.00000000.80008080.00000000.00000000.7f000000.03000000.00000001.00000000.80008081.00000000.00000007.00000000
+        :  c00003c0.00000000.00000000.00000000
+        :  000000ff
+        :  00000000.80000000.00000000.40000000.00000000.c0000000.00000000.40000000.a0000000.00000000.01000000.00000000.c0000000.00000000.01000000.00000000
+        :  00000000.00000038.00000006
+        :  00000038
+        :  00000020
+        :  00000200
+        :  00000000.00000200
+        :  000003ff
+        :  00000200
+        :  00000000.7f000000.00800000.e0000000.3f000000.00800000
+        :  00000000.000000ff
+        :  00000000.00000005
+        :  
+        :  00000003
+        :  00000002
+        name: 'pci'
+        compatible: 'SUNW,sun4v-pci'
+        device_type: 'pciex'
+        :  80000000.80000000
+
+        Node 0xf033aad4
+            :  f033aad4
+            :  81000000.00000000.00000000.81000000.00000000.00000000.00000000.00002000.82000000.00000000.00100000.82000000.00000000.00100000.00000000.00100000.c3000000.00000001.00000000.c3000000.00000001.00000000.00000000.20000000
+            :  00000001.00000005
+            :  70636965.78313038.652c3831.39362e31.00706369.65783130.38652c38.31393600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+            :  00000800.00000000.00000000.00000000.00000000
+            :  00000003
+            :  00000002
+            device_type: 'pciex'
+            name: 'pci'
+            port-type: 'Root-Port'
+            :  00000000
+            :  00060400
+            :  00000001
+            :  00008196
+            :  0000108e
+
+            Node 0xf033d5bc
+                :  f033d5bc
+                :  81000000.00000000.00000000.81000000.00000000.00000000.00000000.00002000.82000000.00000000.00100000.82000000.00000000.00100000.00000000.00100000.c3000000.00000001.00000000.c3000000.00000001.00000000.00000000.20000000
+                :  00000002.00000005
+                :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                :  00010000.00000000.00000000.00000000.00000000
+                :  00000003
+                :  00000002
+                device_type: 'pciex'
+                name: 'pci'
+                port-type: 'Upstream-Port'
+                :  00000010
+                :  00060400
+                :  00000003
+                :  000080bf
+                :  0000111d
+
+                Node 0xf03400a8
+                    :  f03400a8
+                    :  81000000.00000000.00000040.00000000.00000fc0.c3000000.00000001.00508000.00000000.000f8000.c3000000.00000001.00900000.00000000.0f700000
+                    :  81000000.00000000.00000000.81000000.00000000.00000000.00000000.00001000.82000000.00000000.fff00000.82000000.00000000.fff00000.ffffffff.00200000.c3000000.00000001.00000000.c3000000.00000001.00000000.00000000.10000000
+                    :  00000003.00000003
+                    :  
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00020800.00000000.00000000.00000000.00000000
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+                    Node 0xf0342bb8
+                        :  f0342bb8
+                        :  0010e046.30cc
+                        :  0010e046.30cc
+                        :  83030000.00000001.00204000.00000000.00004000.83030003.00000001.00304000.00000000.00004000
+                        :  c3030010.00000001.00000000.00000000.00200000.81030018.00000000.00000000.00000000.00000020.c3030020.00000001.00200000.00000000.00004000
+                        :  03030000.00000000.00000000.00000000.00004000.03030003.00000000.00000000.00000000.00004000
+                        :  70636965.78383038.362c3135.32382e31.3038652e.34383438.2e310070.63696578.38303836.2c313532.382e3130.38652e34.38343800.70636965.78383038.362c3135.32382e31.00706369.65783830.38362c31.35323800.70636965.78636c61.73732c30.32303030.30007063.69657863.6c617373.2c303230.3000
+                        :  00030000.00000000.00000000.00000000.00000000.43030010.00000000.00000000.00000000.00200000.01030018.00000000.00000000.00000000.00000020.43030020.00000000.00000000.00000000.00004000
+                        :  00010000
+                        :  00000030
+                        device_type: 'network'
+                        name: 'network'
+                        :  00000002
+                        :  00000080
+                        :  00000040
+                        :  00000040
+                        :  00000040
+                        port-type: 'PCIE-Endpoint'
+                        :  00000002
+                        :  00000010
+                        :  00020000
+                        :  00004848
+                        :  0000108e
+                        :  00000001
+                        :  00001528
+                        :  00008086
+
+                    Node 0xf034d658
+                        :  f034d658
+                        :  0010e046.30cd
+                        :  0010e046.30cd
+                        :  83030100.00000001.00408000.00000000.00004000.83030103.00000001.00800000.00000000.00004000
+                        :  c3030110.00000001.00600000.00000000.00200000.81030118.00000000.00000020.00000000.00000020.c3030120.00000001.00404000.00000000.00004000
+                        :  03030100.00000000.00000000.00000000.00004000.03030103.00000000.00000000.00000000.00004000
+                        :  70636965.78383038.362c3135.32382e31.3038652e.34383438.2e310070.63696578.38303836.2c313532.382e3130.38652e34.38343800.70636965.78383038.362c3135.32382e31.00706369.65783830.38362c31.35323800.70636965.78636c61.73732c30.32303030.30007063.69657863.6c617373.2c303230.3000
+                        :  00030100.00000000.00000000.00000000.00000000.43030110.00000000.00000000.00000000.00200000.01030118.00000000.00000000.00000000.00000020.43030120.00000000.00000000.00000000.00004000
+                        :  00010000
+                        :  00000030
+                        device_type: 'network'
+                        name: 'network'
+                        :  00000002
+                        :  00000080
+                        :  00000040
+                        :  00000040
+                        :  00000040
+                        port-type: 'PCIE-Endpoint'
+                        :  00000001
+                        :  00000010
+                        :  00020000
+                        :  00004848
+                        :  0000108e
+                        :  00000001
+                        :  00001528
+                        :  00008086
+
+                Node 0xf0358230
+                    :  f0358230
+                    :  81000000.00000000.00001100.00000000.00000f00.c3000000.00000001.10010000.00000000.00030000.c3000000.00000001.10080000.00000000.0ff80000
+                    :  81000000.00000000.00001000.81000000.00000000.00001000.00000000.00001000.82000000.00000000.00100000.82000000.00000000.00100000.00000000.00100000.c3000000.00000001.10000000.c3000000.00000001.10000000.00000000.10000000
+                    :  00000004.00000004
+                    :  
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00021000.00000000.00000000.00000000.00000000
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+                    Node 0xf035ad40
+                        :  f035ad40
+                        :  81040010.00000000.00001000.00000000.00000100.83040014.00000001.10000000.00000000.00010000.8304001c.00000001.10040000.00000000.00040000.82040030.00000000.00100000.00000000.00100000
+                        :  70636965.78313030.302c3837.00706369.31303030.2c383700
+                        model: 'LSI,2308_2'
+                        :  00040000.00000000.00000000.00000000.00000000.01040010.00000000.00000000.00000000.00000100.03040014.00000000.00000000.00000000.00010000.0304001c.00000000.00000000.00000000.00040000.02040030.00000000.00000000.00000000.00100000
+                        version: '1.00.63'
+                        :  00000010
+                        device_type: 'scsi-sas'
+                        name: 'scsi'
+                        :  00000004
+                        port-type: 'PCIE-Endpoint'
+                        :  00000001
+                        :  00000010
+                        :  00010700
+                        :  00000087
+                        :  00001000
+                        :  00000005
+                        :  00000087
+                        :  00001000
+
+                        Node 0xf0370954
+                            :  f0370954
+                            device_type: 'byte'
+                            compatible: 'st'
+                            name: 'tape'
+
+                        Node 0xf037195c
+                            :  f037195c
+                            :  
+                            device_type: 'block'
+                            compatible: 'sd'
+                            name: 'disk'
+
+                Node 0xf03742f0
+                    :  f03742f0
+                    :  00000001.50434945.3800
+                    :  82000000.00000000.fff00000.82000000.00000000.fff00000.ffffffff.00200000
+                    :  00000005.00000005
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00023800.00000000.00000000.00000000.00000000
+                    :  00000008
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+    Node 0xf02d0d80
+        :  f02d0d80
+        :  00000800.00000000.00000000.00000001.f02d0d80.00000002.00000800.00000000.00000000.00000002.f02d0d80.00000003.00000800.00000000.00000000.00000003.f02d0d80.00000004.00000800.00000000.00000000.00000004.f02d0d80.00000001
+        :  00fff800.00000000.00000000.00000007
+        :  00000001
+        :  0000003f.0000003e
+        :  81000000.00000000.00000000.00000000.10000000.82000000.00000000.02100000.00000000.7cf00000.c3000000.00000001.10000000.00000006.f0000000
+        :  01000000.00000000.00000000.800080c1.00000000.00000000.10000000.02000000.00000000.00000000.80008090.00000000.00000000.7f000000.03000000.00000001.00000000.80008091.00000000.00000007.00000000
+        :  c0000380.00000000.00000000.00000000
+        :  000000ff
+        :  00000000.80000000.00000000.40000000.00000000.c0000000.00000000.40000000.a0000000.00000000.01000000.00000000.c0000000.00000000.01000000.00000000
+        :  00000000.00000038.00000006
+        :  00000038
+        :  00000020
+        :  00000200
+        :  00000000.00000200
+        :  000003ff
+        :  00000200
+        :  00000000.7f000000.00800000.e0000000.3f000000.00800000
+        :  00000000.000000ff
+        :  00000000.00000006
+        :  
+        :  00000003
+        :  00000002
+        name: 'pci'
+        compatible: 'SUNW,sun4v-pci'
+        device_type: 'pciex'
+        :  80000000.80000000
+
+        Node 0xf03770c0
+            :  f03770c0
+            :  82000000.00000000.00100000.82000000.00000000.00100000.00000000.02000000.c3000000.00000001.00000000.c3000000.00000001.00000000.00000000.10000000
+            :  00000001.00000006
+            :  70636965.78313038.652c3831.39362e31.00706369.65783130.38652c38.31393600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+            :  00000800.00000000.00000000.00000000.00000000
+            :  00000003
+            :  00000002
+            device_type: 'pciex'
+            name: 'pci'
+            port-type: 'Root-Port'
+            :  00000000
+            :  00060400
+            :  00000001
+            :  00008196
+            :  0000108e
+
+            Node 0xf0379ba8
+                :  f0379ba8
+                :  82000000.00000000.00100000.82000000.00000000.00100000.00000000.02000000.c3000000.00000001.00000000.c3000000.00000001.00000000.00000000.10000000
+                :  00000002.00000006
+                :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                :  00010000.00000000.00000000.00000000.00000000
+                :  00000003
+                :  00000002
+                device_type: 'pciex'
+                name: 'pci'
+                port-type: 'Upstream-Port'
+                :  00000010
+                :  00060400
+                :  00000003
+                :  000080bf
+                :  0000111d
+
+                Node 0xf037c694
+                    :  f037c694
+                    :  82000000.00000000.00104000.00000000.0000c000.82000000.00000000.00120000.00000000.006e0000
+                    :  82000000.00000000.00100000.82000000.00000000.00100000.00000000.01f00000
+                    :  00000003.00000003
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00021800.00000000.00000000.00000000.00000000
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+                    Node 0xf037f184
+                        :  f037f184
+                        :  82030010.00000000.01000000.00000000.01000000.82030014.00000000.00100000.00000000.00004000.82030018.00000000.00800000.00000000.00800000.82030030.00000000.00110000.00000000.00010000
+                        :  70636965.78313032.622c3532.322e3139.61322e31.30322e35.00706369.65783130.32622c35.32322e31.3961322e.31303200.70636965.78313032.622c3532.322e3500.70636965.78313032.622c3532.32007063.69657863.6c617373.2c303330.30303000.70636965.78636c61.73732c30.33303000
+                        :  00030000.00000000.00000000.00000000.00000000.02030010.00000000.00000000.00000000.01000000.02030014.00000000.00000000.00000000.00004000.02030018.00000000.00000000.00000000.00800000.02030030.00000000.00000000.00000000.00010000
+                        device_type: 'display'
+                        name: 'display'
+                        port-type: 'Legacy-PCIE-Endpoint'
+                        :  00000001
+                        :  00000010
+                        :  00030000
+                        :  00000102
+                        :  000019a2
+                        :  00000005
+                        :  00000522
+                        :  0000102b
+
+                Node 0xf03830e0
+                    :  f03830e0
+                    :  00000001.50434945.3200
+                    :  c3000000.00000001.0000a000.00000000.00006000.c3000000.00000001.00098000.00000000.0ff68000
+                    :  82000000.00000000.02000000.82000000.00000000.02000000.00000000.00100000.c3000000.00000001.00000000.c3000000.00000001.00000000.00000000.10000000
+                    :  00000004.00000004
+                    :  
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00022800.00000000.00000000.00000000.00000000
+                    :  00000002
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+                    Node 0xf0385c18
+                        :  f0385c18
+                        :  c3040000.00000001.00010000.00000000.00008000
+                        :  c3040010.00000001.00000000.00000000.00008000.c3040020.00000001.00008000.00000000.00002000.82040030.00000000.02000000.00000000.00080000
+                        :  43040000.00000000.00000000.00000000.00008000
+                        :  10000090.fa6f2b7a
+                        :  20000090.fa6f2b7a
+                        :  00040000.00000000.00000000.00000000.00000000.43040010.00000000.00000000.00000000.00008000
+                        :  70636965.78313064.662c6532.30302e31.3064662e.65323065.2e313000.70636965.78313064.662c6532.30302e31.3064662e.65323065.00706369.65783130.64662c65.32306500.70636965.78313064.662c6532.30302e31.30007063.69657831.3064662c.65323030.00706369.6578636c.6173732c.30633034.30300070.63696578.636c6173.732c3063.303400
+                        :  02625a00
+                        :  00000000
+                        :  00000002
+                        copyright: 'Copyright (c) 2000-2013 Emulex'
+                        model: 'LPe16002-M6'
+                        name: 'SUNW,emlxs'
+                        device_type: 'scsi-fcp'
+                        manufacture: 'Emulex'
+                        fcode-version: '4.03a1'
+                        firmware-version: '1.1.43.8'
+                        :  0000fe00
+                        :  00000001
+                        :  00000002
+                        :  00000008
+                        :  00000008
+                        :  00000008
+                        port-type: 'PCIE-Endpoint'
+                        :  00000001
+                        :  00000010
+                        :  000c0400
+                        :  0000e20e
+                        :  000010df
+                        :  00000010
+                        :  0000e200
+                        :  000010df
+
+                        Node 0xf039bafc
+                            :  f039bafc
+                            :  00000000
+                            :  00000004
+                            :  00000000.00000000
+                            device_type: 'fp'
+                            name: 'fp'
+
+                            Node 0xf039c314
+                                :  f039c314
+                                device_type: 'block'
+                                compatible: 'ssd'
+                                name: 'disk'
+
+                            Node 0xf039d834
+                                :  f039d834
+                                compatible: 'tape'
+                                device_type: 'byte'
+                                name: 'st'
+
+                    Node 0xf039e8f4
+                        :  f039e8f4
+                        :  c3040100.00000001.00058000.00000000.00008000
+                        :  c3040110.00000001.00050000.00000000.00008000.82040130.00000000.02080000.00000000.00080000
+                        :  43040100.00000000.00000000.00000000.00008000
+                        :  10000090.fa6f2b7b
+                        :  20000090.fa6f2b7b
+                        :  00040100.00000000.00000000.00000000.00000000.43040110.00000000.00000000.00000000.00008000
+                        :  70636965.78313064.662c6532.30302e31.3064662e.65323065.2e313000.70636965.78313064.662c6532.30302e31.3064662e.65323065.00706369.65783130.64662c65.32306500.70636965.78313064.662c6532.30302e31.30007063.69657831.3064662c.65323030.00706369.6578636c.6173732c.30633034.30300070.63696578.636c6173.732c3063.303400
+                        :  02625a00
+                        :  00000000
+                        :  00000002
+                        copyright: 'Copyright (c) 2000-2013 Emulex'
+                        model: 'LPe16002-M6'
+                        name: 'SUNW,emlxs'
+                        device_type: 'scsi-fcp'
+                        manufacture: 'Emulex'
+                        fcode-version: '4.03a1'
+                        firmware-version: '1.1.43.8'
+                        :  0000fe00
+                        :  00000001
+                        :  00000009
+                        :  00000008
+                        :  00000008
+                        :  00000008
+                        port-type: 'PCIE-Endpoint'
+                        :  00000002
+                        :  00000010
+                        :  000c0400
+                        :  0000e20e
+                        :  000010df
+                        :  00000010
+                        :  0000e200
+                        :  000010df
+
+                        Node 0xf03b47d8
+                            :  f03b47d8
+                            :  00000000
+                            :  00000004
+                            :  00000000.00000000
+                            device_type: 'fp'
+                            name: 'fp'
+
+                            Node 0xf03b4ff0
+                                :  f03b4ff0
+                                device_type: 'block'
+                                compatible: 'ssd'
+                                name: 'disk'
+
+                            Node 0xf03b6510
+                                :  f03b6510
+                                compatible: 'tape'
+                                device_type: 'byte'
+                                name: 'st'
+
+                Node 0xf03b76c0
+                    :  f03b76c0
+                    :  00000001.50434945.3300
+                    :  82000000.00000000.fff00000.82000000.00000000.fff00000.ffffffff.00200000
+                    :  00000005.00000005
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00023000.00000000.00000000.00000000.00000000
+                    :  00000003
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+                Node 0xf03ba274
+                    :  f03ba274
+                    :  00000001.50434945.3400
+                    :  82000000.00000000.fff00000.82000000.00000000.fff00000.ffffffff.00200000
+                    :  00000006.00000006
+                    :  70636965.78313131.642c3830.62662e33.00706369.65783131.31642c38.30626600.70636965.78636c61.73732c30.36303430.30007063.69657863.6c617373.2c303630.3400
+                    :  00023800.00000000.00000000.00000000.00000000
+                    :  00000004
+                    :  00000003
+                    :  00000002
+                    device_type: 'pciex'
+                    name: 'pci'
+                    port-type: 'Downstream-Port'
+                    :  00000010
+                    :  00060400
+                    :  00000003
+                    :  000080bf
+                    :  0000111d
+
+    Node 0xf02dfb78
+        :  f02dfb78
+        :  c0000340.00000000.00000000.00000000
+        compatible: 'ORCL,m4ios-pr'
+        name: 'pci-performance-counters'
+
+    Node 0xf02dfe0c
+        :  f02dfe0c
+        :  c0000300.00000000.00000000.00000000
+        compatible: 'ORCL,m4ios-pr'
+        name: 'pci-performance-counters'
+
+    Node 0xf02e00a0
+        :  f02e00a0
+        :  c00003c0.00000000.00000000.00000000
+        compatible: 'ORCL,m4ios-pr'
+        name: 'pci-performance-counters'
+
+    Node 0xf02e0334
+        :  f02e0334
+        :  c0000380.00000000.00000000.00000000
+        compatible: 'ORCL,m4ios-pr'
+        name: 'pci-performance-counters'
+
+
