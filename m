@@ -1,64 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.6
-Date: Wed, 20 Apr 2016 17:49:25 +0800
-Message-ID: <20160420094925.GA2947@gondor.apana.org.au>
-References: <20141007131826.GA29688@gondor.apana.org.au>
- <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150415033951.GA1406@gondor.apana.org.au>
- <20150622084457.GA7806@gondor.apana.org.au>
- <20150831135655.GA2694@gondor.apana.org.au>
- <20151102080427.GA8465@gondor.apana.org.au>
- <20160111101450.GA24044@gondor.apana.org.au>
- <20160122101828.GA15966@gondor.apana.org.au>
- <20160330091150.GA17143@gondor.apana.org.au>
+Subject: Re: crash in ppc4xx-rng on canyonland
+Date: Wed, 20 Apr 2016 17:58:15 +0800
+Message-ID: <20160420095815.GA3003@gondor.apana.org.au>
+References: <20160418095939.GA18915@gondor.apana.org.au>
+ <14761928.ine93l7C6D@debian64>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: Christian Lamparter <chunkeey@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36385 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:49120 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933445AbcDTJte (ORCPT
+	with ESMTP id S932446AbcDTJ6U (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 Apr 2016 05:49:34 -0400
+	Wed, 20 Apr 2016 05:58:20 -0400
 Content-Disposition: inline
-In-Reply-To: <20160330091150.GA17143@gondor.apana.org.au>
+In-Reply-To: <14761928.ine93l7C6D@debian64>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Mon, Apr 18, 2016 at 01:42:49PM +0200, Christian Lamparter wrote:
+>
+> what else I fixed in v1->v2: 
+>  - added a check to test trng device's status state with
+>    of_device_is_available.
+>  - if the hwrng device registration failed, the flag which
+>    enables the trng was left enabled (note: the v1 code
+>    disabled the hwrng device as part of crypto4xx_remove.
+>    so it wasn't enabled when the crypto4xx driver was
+>    unloaded)
 
-This push fixes the following issues:
-
-- Incorrect output buffer size calculation in rsa-pkcs1pad.
-- Uninitialised padding bytes on exported state in ccp driver.
-- Potentially freed pointer used on completion callback in sha1-mb.
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Tadeusz Struk (1):
-      crypto: rsa-pkcs1pad - fix dst len
-
-Tom Lendacky (1):
-      crypto: ccp - Prevent information leakage on export
-
-Xiaodong Liu (1):
-      crypto: sha1-mb - use corrcet pointer while completing jobs
-
- arch/x86/crypto/sha-mb/sha1_mb.c         |    4 ++--
- crypto/rsa-pkcs1pad.c                    |   12 ++++++------
- drivers/crypto/ccp/ccp-crypto-aes-cmac.c |    3 +++
- drivers/crypto/ccp/ccp-crypto-sha.c      |    3 +++
- 4 files changed, 14 insertions(+), 8 deletions(-)
-
-Thanks,
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
