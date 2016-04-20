@@ -1,45 +1,64 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/4] scatterlist: Introduce some helper functions
-Date: Wed, 20 Apr 2016 16:38:42 +0800
-Message-ID: <20160420083842.GA2455@gondor.apana.org.au>
-References: <cover.1458023695.git.baolin.wang@linaro.org>
- <9442060edaca12f520bcbb76545ad33a52346e58.1458023698.git.baolin.wang@linaro.org>
- <87r3eoukb9.fsf@belgarion.home>
- <CAMz4kuKcJKHKoX8JTs5zSrre5y+cVo+hcHS6BZi1M=WOAHyu-g@mail.gmail.com>
- <CAMz4kuK41221jQGtDb0d4MfOXwr=7S5_1f0ThC3c+8TKHs6VgA@mail.gmail.com>
+Subject: Crypto Fixes for 4.6
+Date: Wed, 20 Apr 2016 17:49:25 +0800
+Message-ID: <20160420094925.GA2947@gondor.apana.org.au>
+References: <20141007131826.GA29688@gondor.apana.org.au>
+ <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150415033951.GA1406@gondor.apana.org.au>
+ <20150622084457.GA7806@gondor.apana.org.au>
+ <20150831135655.GA2694@gondor.apana.org.au>
+ <20151102080427.GA8465@gondor.apana.org.au>
+ <20160111101450.GA24044@gondor.apana.org.au>
+ <20160122101828.GA15966@gondor.apana.org.au>
+ <20160330091150.GA17143@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Robert Jarzmik <robert.jarzmik@free.fr>,
-	David Miller <davem@davemloft.net>,
-	Alasdair G Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@fb.com>,
-	dm-devel@redhat.com, Andrew Morton <akpm@linux-foundation.org>,
-	david.s.gordon@intel.com, Tom Lendacky <thomas.lendacky@amd.com>,
-	Masahiro Yamada <yamada.masahiro@socionext.com>,
-	smueller@chronox.de, tadeusz.struk@intel.com,
-	Masanari Iida <standby24x7@gmail.com>, shli@kernel.org,
-	Mark Brown <broonie@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
-To: Baolin Wang <baolin.wang@linaro.org>
-Return-path: <linux-raid-owner@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:36385 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933445AbcDTJte (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 20 Apr 2016 05:49:34 -0400
 Content-Disposition: inline
-In-Reply-To: <CAMz4kuK41221jQGtDb0d4MfOXwr=7S5_1f0ThC3c+8TKHs6VgA@mail.gmail.com>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20160330091150.GA17143@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 20, 2016 at 03:34:47PM +0800, Baolin Wang wrote:
-> It seems there are no more comments about this patchset? We really
-> want to these APIs to coalesce scatterlists to improve the crypto
-> engine efficiency. Thanks.
+Hi Linus:
 
-Your patch-set makes no sense.  If the data can be coalesced then
-it shouldn't have been split up in the first place.  I'm nacking
-the whole series.
+This push fixes the following issues:
 
-Cheers,
+- Incorrect output buffer size calculation in rsa-pkcs1pad.
+- Uninitialised padding bytes on exported state in ccp driver.
+- Potentially freed pointer used on completion callback in sha1-mb.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Tadeusz Struk (1):
+      crypto: rsa-pkcs1pad - fix dst len
+
+Tom Lendacky (1):
+      crypto: ccp - Prevent information leakage on export
+
+Xiaodong Liu (1):
+      crypto: sha1-mb - use corrcet pointer while completing jobs
+
+ arch/x86/crypto/sha-mb/sha1_mb.c         |    4 ++--
+ crypto/rsa-pkcs1pad.c                    |   12 ++++++------
+ drivers/crypto/ccp/ccp-crypto-aes-cmac.c |    3 +++
+ drivers/crypto/ccp/ccp-crypto-sha.c      |    3 +++
+ 4 files changed, 14 insertions(+), 8 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
