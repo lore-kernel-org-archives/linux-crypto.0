@@ -1,93 +1,38 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 1/6] crypto: DRBG - externalize DRBG functions for LRNG
-Date: Thu, 21 Apr 2016 11:12:34 +0200
-Message-ID: <3837879.otL5BHqnRK@positron.chronox.de>
-References: <9192755.iDgo3Omyqe@positron.chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/2] crypto: talitos - fix conversion to new AEAD
+ interface
+Date: Thu, 21 Apr 2016 19:02:39 +0800
+Message-ID: <20160421110239.GA12228@gondor.apana.org.au>
+References: <AM2PR04MB067377F55DDE5D5EE126EBF3986B0@AM2PR04MB0673.eurprd04.prod.outlook.com>
+ <1461087228-19359-1-git-send-email-horia.geanta@nxp.com>
+ <20160420095838.GB3003@gondor.apana.org.au>
+ <AM2PR04MB0673AF5B5E96C253102C7DC6986D0@AM2PR04MB0673.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sandyinchina@gmail.com
-To: Ted Tso <tytso@mit.edu>, herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <9192755.iDgo3Omyqe@positron.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Jonas Eymann <J.Eymann@gmx.net>,
+	"David S. Miller" <davem@davemloft.net>
+To: Horia Ioan Geanta Neag <horia.geanta@nxp.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:60730 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752019AbcDULCt (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 21 Apr 2016 07:02:49 -0400
+Content-Disposition: inline
+In-Reply-To: <AM2PR04MB0673AF5B5E96C253102C7DC6986D0@AM2PR04MB0673.eurprd04.prod.outlook.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch allows several DRBG functions to be called by the LRNG kernel
-code paths outside the drbg.c file.
+On Wed, Apr 20, 2016 at 11:29:52AM +0000, Horia Ioan Geanta Neag wrote:
+>
+> Shouldn't these have been included in the recent "Crypto Update for 4.6"
+> pull request?
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c         | 11 +++++------
- include/crypto/drbg.h |  7 +++++++
- 2 files changed, 12 insertions(+), 6 deletions(-)
+It will go in the next pull request.
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 0a3538f..c339a2e 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -113,7 +113,7 @@
-  * the SHA256 / AES 256 over other ciphers. Thus, the favored
-  * DRBGs are the latest entries in this array.
-  */
--static const struct drbg_core drbg_cores[] = {
-+struct drbg_core drbg_cores[] = {
- #ifdef CONFIG_CRYPTO_DRBG_CTR
- 	{
- 		.flags = DRBG_CTR | DRBG_STRENGTH128,
-@@ -205,7 +205,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
-  * Return: normalized strength in *bytes* value or 32 as default
-  *	   to counter programming errors
-  */
--static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
-+unsigned short drbg_sec_strength(drbg_flag_t flags)
- {
- 	switch (flags & DRBG_STRENGTH_MASK) {
- 	case DRBG_STRENGTH128:
-@@ -1140,7 +1140,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- }
- 
- /* Free all substructures in a DRBG state without the DRBG state structure */
--static inline void drbg_dealloc_state(struct drbg_state *drbg)
-+void drbg_dealloc_state(struct drbg_state *drbg)
- {
- 	if (!drbg)
- 		return;
-@@ -1159,7 +1159,7 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
-  * Allocate all sub-structures for a DRBG state.
-  * The DRBG state structure must already be allocated.
-  */
--static inline int drbg_alloc_state(struct drbg_state *drbg)
-+int drbg_alloc_state(struct drbg_state *drbg)
- {
- 	int ret = -ENOMEM;
- 	unsigned int sb_size = 0;
-@@ -1682,8 +1682,7 @@ static int drbg_kcapi_sym(struct drbg_state *drbg, const unsigned char *key,
-  *
-  * return: flags
-  */
--static inline void drbg_convert_tfm_core(const char *cra_driver_name,
--					 int *coreref, bool *pr)
-+void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool *pr)
- {
- 	int i = 0;
- 	size_t start = 0;
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index d961b2b..d24ec22 100644
---- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -268,4 +268,11 @@ enum drbg_prefixes {
- 	DRBG_PREFIX3
- };
- 
-+extern int drbg_alloc_state(struct drbg_state *drbg);
-+extern void drbg_dealloc_state(struct drbg_state *drbg);
-+extern void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref,
-+				  bool *pr);
-+extern struct drbg_core drbg_cores[];
-+extern unsigned short drbg_sec_strength(drbg_flag_t flags);
-+
- #endif /* _DRBG_H */
+Cheers,
 -- 
-2.5.5
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
