@@ -1,7 +1,8 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [RFC][PATCH 0/6] /dev/random - a new approach
-Date: Thu, 21 Apr 2016 11:11:55 +0200
-Message-ID: <9192755.iDgo3Omyqe@positron.chronox.de>
+Subject: [PATCH 1/6] crypto: DRBG - externalize DRBG functions for LRNG
+Date: Thu, 21 Apr 2016 11:12:34 +0200
+Message-ID: <3837879.otL5BHqnRK@positron.chronox.de>
+References: <9192755.iDgo3Omyqe@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
@@ -9,89 +10,84 @@ Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	sandyinchina@gmail.com
 To: Ted Tso <tytso@mit.edu>, herbert@gondor.apana.org.au
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <9192755.iDgo3Omyqe@positron.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert, Ted,
+This patch allows several DRBG functions to be called by the LRNG kernel
+code paths outside the drbg.c file.
 
-The venerable Linux /dev/random served users of cryptographic mechanisms well
-for a long time. Its behavior is well understood to deliver entropic data. In
-the last years, however, the Linux /dev/random showed signs of age where it has
-challenges to cope with modern computing environments ranging from tiny embedded
-systems, over new hardware resources such as SSDs, up to massive parallel
-systems as well as virtualized environments.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/drbg.c         | 11 +++++------
+ include/crypto/drbg.h |  7 +++++++
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-With the experience gained during numerous studies of /dev/random, entropy
-assessments of different noise source designs and assessing entropy behavior in
-virtual machines and other special environments, I felt to do something about
-it.
-
-I developed a different approach, which I call Linux Random Number Generator
-(LRNG) to collect entropy within the Linux kernel. The main improvements
-compared to the legacy /dev/random is to provide sufficient entropy during boot
-time as well as in virtual environments and when using SSDs. A secondary design
-goal is to limit the impact of the entropy collection on massive parallel
-systems and also allow the use accelerated cryptographic primitives. Also, all
-steps of the entropic data processing are testable. Finally massive performance
-improvements are visible at /dev/urandom / get_random_bytes.
-
-The design and implementation is driven by a set of goals described in [1]
-that the LRNG completely implements. Furthermore, [1] includes a
-comparison with RNG design suggestions such as SP800-90B, SP800-90C, and
-AIS20/31.
-
-Please find in [1] the full design discussion covering qualitative assessments
-of the entropy collection and entropy flow. Furthermore, a full testing of the
-data collection and data processing is performed. The testing focuses on the
-calculation of different types of minimum entropy values of raw noise data.
-All used test code and supportive tools are provided with [2]. The testing
-is concluded with a comparison to the legacy /dev/random implementation
-regarding performance and delivery time of entropic random data.
-
-To support a proper review of the code without interfering with the current
-functionality, the attached patch adds the LRNG to the cryptodev-2.6 tree as
-an option. The patches do not replace or even alter the legacy /dev/random
-implementation but allows the user to enable the LRNG at compile time. If it is
-enabled, the legacy /dev/random implementation is not compiled. On the other
-hand, if the LRNG support is disabled, the legacy /dev/random code is
-compiled unchanged. With this approach you see that the LRNG is API and ABI
-compatible with the legacy implementation.
-
-Stability tests were executed on 64 and 32 bit systems where the test KVM with 4
-vCPUs on 4 hyperthreads compiled the Linux kernel with make -j4 over and over
-for half a day. In addition, parallel cat /dev/urandom > /dev/null were
-exercised for a couple of hours. Also, stability tests by generating 500
-million interrupts were performed.
-
-[1] http://www.chronox.de/lrng/doc/lrng.pdf
-
-[2] http://www.chronox.de/lrng.html
-
-Stephan Mueller (6):
-  crypto: DRBG - externalize DRBG functions for LRNG
-  random: conditionally compile code depending on LRNG
-  crypto: Linux Random Number Generator
-  crypto: LRNG - enable compile
-  crypto: LRNG - hook LRNG into interrupt handler
-  hyperv IRQ handler: trigger LRNG
-
- crypto/Kconfig         |   10 +
- crypto/Makefile        |    1 +
- crypto/drbg.c          |   11 +-
- crypto/lrng.c          | 1803 ++++++++++++++++++++++++++++++++++++++++++++++++
- drivers/char/random.c  |    8 +
- drivers/hv/vmbus_drv.c |    3 +
- include/crypto/drbg.h  |    7 +
- include/linux/genhd.h  |    5 +
- include/linux/random.h |    8 +
- kernel/irq/handle.c    |    1 +
- 10 files changed, 1851 insertions(+), 6 deletions(-)
- create mode 100644 crypto/lrng.c
-
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 0a3538f..c339a2e 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -113,7 +113,7 @@
+  * the SHA256 / AES 256 over other ciphers. Thus, the favored
+  * DRBGs are the latest entries in this array.
+  */
+-static const struct drbg_core drbg_cores[] = {
++struct drbg_core drbg_cores[] = {
+ #ifdef CONFIG_CRYPTO_DRBG_CTR
+ 	{
+ 		.flags = DRBG_CTR | DRBG_STRENGTH128,
+@@ -205,7 +205,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
+  * Return: normalized strength in *bytes* value or 32 as default
+  *	   to counter programming errors
+  */
+-static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
++unsigned short drbg_sec_strength(drbg_flag_t flags)
+ {
+ 	switch (flags & DRBG_STRENGTH_MASK) {
+ 	case DRBG_STRENGTH128:
+@@ -1140,7 +1140,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ }
+ 
+ /* Free all substructures in a DRBG state without the DRBG state structure */
+-static inline void drbg_dealloc_state(struct drbg_state *drbg)
++void drbg_dealloc_state(struct drbg_state *drbg)
+ {
+ 	if (!drbg)
+ 		return;
+@@ -1159,7 +1159,7 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+  * Allocate all sub-structures for a DRBG state.
+  * The DRBG state structure must already be allocated.
+  */
+-static inline int drbg_alloc_state(struct drbg_state *drbg)
++int drbg_alloc_state(struct drbg_state *drbg)
+ {
+ 	int ret = -ENOMEM;
+ 	unsigned int sb_size = 0;
+@@ -1682,8 +1682,7 @@ static int drbg_kcapi_sym(struct drbg_state *drbg, const unsigned char *key,
+  *
+  * return: flags
+  */
+-static inline void drbg_convert_tfm_core(const char *cra_driver_name,
+-					 int *coreref, bool *pr)
++void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool *pr)
+ {
+ 	int i = 0;
+ 	size_t start = 0;
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index d961b2b..d24ec22 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -268,4 +268,11 @@ enum drbg_prefixes {
+ 	DRBG_PREFIX3
+ };
+ 
++extern int drbg_alloc_state(struct drbg_state *drbg);
++extern void drbg_dealloc_state(struct drbg_state *drbg);
++extern void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref,
++				  bool *pr);
++extern struct drbg_core drbg_cores[];
++extern unsigned short drbg_sec_strength(drbg_flag_t flags);
++
+ #endif /* _DRBG_H */
 -- 
 2.5.5
-
-,
-
-Ciao
-Stephan
