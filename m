@@ -1,47 +1,54 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [RFC][PATCH 0/6] /dev/random - a new approach
-Date: Fri, 22 Apr 2016 06:59:32 +0200
-Message-ID: <6974210.pKFp51TpM6@tauon.atsec.com>
-References: <9192755.iDgo3Omyqe@positron.chronox.de> <20160422025155.GA6690@thunk.org>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [patch 1/2] crypto: mxc-scc - signedness bugs in
+ mxc_scc_ablkcipher_req_init()
+Date: Fri, 22 Apr 2016 12:56:31 +0300
+Message-ID: <20160422095631.GC11398@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, sandyinchina@gmail.com
-To: Theodore Ts'o <tytso@mit.edu>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:53018 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750806AbcDVE7l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Apr 2016 00:59:41 -0400
-In-Reply-To: <20160422025155.GA6690@thunk.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+Content-Disposition: inline
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 21. April 2016, 22:51:55 schrieb Theodore Ts'o:
+->src_nents and ->dst_nents are unsigned so they can't be less than
+zero.  I fixed this by introducing a temporary "nents" variable.
 
-Hi Theodore,
+Fixes: d293b640ebd5 ('crypto: mxc-scc - add basic driver for the MXC SCC')
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-> I still have a massive problem with the claims that the "Jitter" RNG
-> provides any amount of entropy.  Just because you and I might not be
-> able to analyze it doesn't mean that somebody else couldn't.  After
-> all, DUAL-EC DRNG was very complicated and hard to analyze.  So would
-> be something like
-> 
->    AES(NSA_KEY, COUNTER++)
-> 
-> Very hard to analyze indeed.  Shall we run statistical tests?  They'll
-> pass with flying colors.
-> 
-> Secure?  Not so much.
-
-If you are concerned with that RNG, we can easily drop it from the LRNG. The 
-testing documented in the writeup disable the Jitter RNG to ensure that only 
-the LRNG IRQ collection is tested.
-
-The conclusions regarding timeliness of the seeding, the prevention of 
-draining the entropy pool are performed without the Jitter RNG which implies 
-that the Jitter RNG can be dropped without harm.
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/mxc-scc.c b/drivers/crypto/mxc-scc.c
+index 38b01bf..9b348a7 100644
+--- a/drivers/crypto/mxc-scc.c
++++ b/drivers/crypto/mxc-scc.c
+@@ -210,18 +210,21 @@ static int mxc_scc_ablkcipher_req_init(struct ablkcipher_request *req,
+ 				       struct mxc_scc_ctx *ctx)
+ {
+ 	struct mxc_scc *scc = ctx->scc;
++	int nents;
+ 
+-	ctx->src_nents = sg_nents_for_len(req->src, req->nbytes);
+-	if (ctx->src_nents < 0) {
++	nents = sg_nents_for_len(req->src, req->nbytes);
++	if (nents < 0) {
+ 		dev_err(scc->dev, "Invalid number of src SC");
+-		return ctx->src_nents;
++		return nents;
+ 	}
++	ctx->src_nents = nents;
+ 
+-	ctx->dst_nents = sg_nents_for_len(req->dst, req->nbytes);
+-	if (ctx->dst_nents < 0) {
++	nents = sg_nents_for_len(req->dst, req->nbytes);
++	if (nents < 0) {
+ 		dev_err(scc->dev, "Invalid number of dst SC");
+-		return ctx->dst_nents;
++		return nents;
+ 	}
++	ctx->dst_nents = nents;
+ 
+ 	ctx->size = 0;
+ 	ctx->offset = 0;
