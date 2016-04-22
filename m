@@ -1,187 +1,192 @@
 From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
-Subject: [PATCH 1/2] crypto: s5p-sss - Use common BIT macro
-Date: Fri, 22 Apr 2016 14:15:22 +0200
-Message-ID: <1461327323-23288-1-git-send-email-k.kozlowski@samsung.com>
+Subject: [PATCH 2/2] crypto: s5p-sss - Fix missed interrupts when working with
+ 8 kB blocks
+Date: Fri, 22 Apr 2016 14:15:23 +0200
+Message-ID: <1461327323-23288-2-git-send-email-k.kozlowski@samsung.com>
+References: <1461327323-23288-1-git-send-email-k.kozlowski@samsung.com>
 Cc: Vladimir Zapolskiy <vz@mleia.com>,
 	Krzysztof Kozlowski <k.kozlowski@samsung.com>,
+	stable@vger.kernel.org,
 	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:11983 "EHLO
-	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752316AbcDVMPc (ORCPT
+Received: from mailout4.w1.samsung.com ([210.118.77.14]:9619 "EHLO
+	mailout4.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752324AbcDVMPd (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Apr 2016 08:15:32 -0400
+	Fri, 22 Apr 2016 08:15:33 -0400
+In-reply-to: <1461327323-23288-1-git-send-email-k.kozlowski@samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The BIT() macro is obvious and well known, so prefer to use it instead
-of crafted own macro.
+The tcrypt testing module on Exynos5422-based Odroid XU3/4 board failed on
+testing 8 kB size blocks:
 
+	$ sudo modprobe tcrypt sec=1 mode=500
+	testing speed of async ecb(aes) (ecb-aes-s5p) encryption
+	test 0 (128 bit key, 16 byte blocks): 21971 operations in 1 seconds (351536 bytes)
+	test 1 (128 bit key, 64 byte blocks): 21731 operations in 1 seconds (1390784 bytes)
+	test 2 (128 bit key, 256 byte blocks): 21932 operations in 1 seconds (5614592 bytes)
+	test 3 (128 bit key, 1024 byte blocks): 21685 operations in 1 seconds (22205440 bytes)
+	test 4 (128 bit key, 8192 byte blocks):
+
+This was caused by a race issue of missed BRDMA_DONE ("Block cipher
+Receiving DMA") interrupt. Device starts processing the data in DMA mode
+immediately after setting length of DMA block: receiving (FCBRDMAL) or
+transmitting (FCBTDMAL). The driver sets these lengths from interrupt
+handler through s5p_set_dma_indata() function (or xxx_setdata()).
+
+However the interrupt handler was first dealing with receive buffer
+(dma-unmap old, dma-map new, set receive block length which starts the
+operation), then with transmit buffer and finally was clearing pending
+interrupts (FCINTPEND). Because of the time window between setting
+receive buffer length and clearing pending interrupts, the operation on
+receive buffer could end already and driver would miss new interrupt.
+
+User manual for Exynos5422 confirms in example code that setting DMA
+block lengths should be the last operation.
+
+The tcrypt hang could be also observed in following blocked-task dmesg:
+
+INFO: task modprobe:258 blocked for more than 120 seconds.
+      Not tainted 4.6.0-rc4-next-20160419-00005-g9eac8b7b7753-dirty #42
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+modprobe        D c06b09d8     0   258    256 0x00000000
+[<c06b09d8>] (__schedule) from [<c06b0f24>] (schedule+0x40/0xac)
+[<c06b0f24>] (schedule) from [<c06b49f8>] (schedule_timeout+0x124/0x178)
+[<c06b49f8>] (schedule_timeout) from [<c06b17fc>] (wait_for_common+0xb8/0x144)
+[<c06b17fc>] (wait_for_common) from [<bf0013b8>] (test_acipher_speed+0x49c/0x740 [tcrypt])
+[<bf0013b8>] (test_acipher_speed [tcrypt]) from [<bf003e8c>] (do_test+0x2240/0x30ec [tcrypt])
+[<bf003e8c>] (do_test [tcrypt]) from [<bf008048>] (tcrypt_mod_init+0x48/0xa4 [tcrypt])
+[<bf008048>] (tcrypt_mod_init [tcrypt]) from [<c010177c>] (do_one_initcall+0x3c/0x16c)
+[<c010177c>] (do_one_initcall) from [<c0191ff0>] (do_init_module+0x5c/0x1ac)
+[<c0191ff0>] (do_init_module) from [<c0185610>] (load_module+0x1a30/0x1d08)
+[<c0185610>] (load_module) from [<c0185ab0>] (SyS_finit_module+0x8c/0x98)
+[<c0185ab0>] (SyS_finit_module) from [<c01078c0>] (ret_fast_syscall+0x0/0x3c)
+
+Fixes: a49e490c7a8a ("crypto: s5p-sss - add S5PV210 advanced crypto engine support")
+Cc: <stable@vger.kernel.org>
 Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+
 ---
- drivers/crypto/s5p-sss.c | 95 ++++++++++++++++++++++++------------------------
- 1 file changed, 47 insertions(+), 48 deletions(-)
+
+Issue was easily reproduced on newer (faster?) SoCs, like Odroid XU3/XU4
+(Exynos5422). Still it was kind of time-related (adding printks or
+kernel debug options sometimes "was fixing" the issue). On older like
+Odroid U3 with Exynos4412 this works fine...
+
+I am marking this cc-stable because invalid operation comes from the
+first version of the driver.
+---
+ drivers/crypto/s5p-sss.c | 53 +++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 39 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index 71ca6a5d636d..b96532078d0c 100644
+index b96532078d0c..ac6d62b3be07 100644
 --- a/drivers/crypto/s5p-sss.c
 +++ b/drivers/crypto/s5p-sss.c
-@@ -31,45 +31,44 @@
- #include <crypto/scatterwalk.h>
+@@ -367,43 +367,55 @@ exit:
+ 	return err;
+ }
  
- #define _SBF(s, v)                      ((v) << (s))
--#define _BIT(b)                         _SBF(b, 1)
+-static void s5p_aes_tx(struct s5p_aes_dev *dev)
++/*
++ * Returns true if new transmitting (output) data is ready and its
++ * address+length have to be written to device (by calling
++ * s5p_set_dma_outdata()). False otherwise.
++ */
++static bool s5p_aes_tx(struct s5p_aes_dev *dev)
+ {
+ 	int err = 0;
++	bool ret = false;
  
- /* Feed control registers */
- #define SSS_REG_FCINTSTAT               0x0000
--#define SSS_FCINTSTAT_BRDMAINT          _BIT(3)
--#define SSS_FCINTSTAT_BTDMAINT          _BIT(2)
--#define SSS_FCINTSTAT_HRDMAINT          _BIT(1)
--#define SSS_FCINTSTAT_PKDMAINT          _BIT(0)
-+#define SSS_FCINTSTAT_BRDMAINT          BIT(3)
-+#define SSS_FCINTSTAT_BTDMAINT          BIT(2)
-+#define SSS_FCINTSTAT_HRDMAINT          BIT(1)
-+#define SSS_FCINTSTAT_PKDMAINT          BIT(0)
+ 	s5p_unset_outdata(dev);
  
- #define SSS_REG_FCINTENSET              0x0004
--#define SSS_FCINTENSET_BRDMAINTENSET    _BIT(3)
--#define SSS_FCINTENSET_BTDMAINTENSET    _BIT(2)
--#define SSS_FCINTENSET_HRDMAINTENSET    _BIT(1)
--#define SSS_FCINTENSET_PKDMAINTENSET    _BIT(0)
-+#define SSS_FCINTENSET_BRDMAINTENSET    BIT(3)
-+#define SSS_FCINTENSET_BTDMAINTENSET    BIT(2)
-+#define SSS_FCINTENSET_HRDMAINTENSET    BIT(1)
-+#define SSS_FCINTENSET_PKDMAINTENSET    BIT(0)
+ 	if (!sg_is_last(dev->sg_dst)) {
+ 		err = s5p_set_outdata(dev, sg_next(dev->sg_dst));
+-		if (err) {
++		if (err)
+ 			s5p_aes_complete(dev, err);
+-			return;
+-		}
+-
+-		s5p_set_dma_outdata(dev, dev->sg_dst);
++		else
++			ret = true;
+ 	} else {
+ 		s5p_aes_complete(dev, err);
  
- #define SSS_REG_FCINTENCLR              0x0008
--#define SSS_FCINTENCLR_BRDMAINTENCLR    _BIT(3)
--#define SSS_FCINTENCLR_BTDMAINTENCLR    _BIT(2)
--#define SSS_FCINTENCLR_HRDMAINTENCLR    _BIT(1)
--#define SSS_FCINTENCLR_PKDMAINTENCLR    _BIT(0)
-+#define SSS_FCINTENCLR_BRDMAINTENCLR    BIT(3)
-+#define SSS_FCINTENCLR_BTDMAINTENCLR    BIT(2)
-+#define SSS_FCINTENCLR_HRDMAINTENCLR    BIT(1)
-+#define SSS_FCINTENCLR_PKDMAINTENCLR    BIT(0)
+ 		dev->busy = true;
+ 		tasklet_schedule(&dev->tasklet);
+ 	}
++
++	return ret;
+ }
  
- #define SSS_REG_FCINTPEND               0x000C
--#define SSS_FCINTPEND_BRDMAINTP         _BIT(3)
--#define SSS_FCINTPEND_BTDMAINTP         _BIT(2)
--#define SSS_FCINTPEND_HRDMAINTP         _BIT(1)
--#define SSS_FCINTPEND_PKDMAINTP         _BIT(0)
-+#define SSS_FCINTPEND_BRDMAINTP         BIT(3)
-+#define SSS_FCINTPEND_BTDMAINTP         BIT(2)
-+#define SSS_FCINTPEND_HRDMAINTP         BIT(1)
-+#define SSS_FCINTPEND_PKDMAINTP         BIT(0)
+-static void s5p_aes_rx(struct s5p_aes_dev *dev)
++/*
++ * Returns true if new receiving (input) data is ready and its
++ * address+length have to be written to device (by calling
++ * s5p_set_dma_indata()). False otherwise.
++ */
++static bool s5p_aes_rx(struct s5p_aes_dev *dev)
+ {
+ 	int err;
++	bool ret = false;
  
- #define SSS_REG_FCFIFOSTAT              0x0010
--#define SSS_FCFIFOSTAT_BRFIFOFUL        _BIT(7)
--#define SSS_FCFIFOSTAT_BRFIFOEMP        _BIT(6)
--#define SSS_FCFIFOSTAT_BTFIFOFUL        _BIT(5)
--#define SSS_FCFIFOSTAT_BTFIFOEMP        _BIT(4)
--#define SSS_FCFIFOSTAT_HRFIFOFUL        _BIT(3)
--#define SSS_FCFIFOSTAT_HRFIFOEMP        _BIT(2)
--#define SSS_FCFIFOSTAT_PKFIFOFUL        _BIT(1)
--#define SSS_FCFIFOSTAT_PKFIFOEMP        _BIT(0)
-+#define SSS_FCFIFOSTAT_BRFIFOFUL        BIT(7)
-+#define SSS_FCFIFOSTAT_BRFIFOEMP        BIT(6)
-+#define SSS_FCFIFOSTAT_BTFIFOFUL        BIT(5)
-+#define SSS_FCFIFOSTAT_BTFIFOEMP        BIT(4)
-+#define SSS_FCFIFOSTAT_HRFIFOFUL        BIT(3)
-+#define SSS_FCFIFOSTAT_HRFIFOEMP        BIT(2)
-+#define SSS_FCFIFOSTAT_PKFIFOFUL        BIT(1)
-+#define SSS_FCFIFOSTAT_PKFIFOEMP        BIT(0)
+ 	s5p_unset_indata(dev);
  
- #define SSS_REG_FCFIFOCTRL              0x0014
--#define SSS_FCFIFOCTRL_DESSEL           _BIT(2)
-+#define SSS_FCFIFOCTRL_DESSEL           BIT(2)
- #define SSS_HASHIN_INDEPENDENT          _SBF(0, 0x00)
- #define SSS_HASHIN_CIPHER_INPUT         _SBF(0, 0x01)
- #define SSS_HASHIN_CIPHER_OUTPUT        _SBF(0, 0x02)
-@@ -77,52 +76,52 @@
- #define SSS_REG_FCBRDMAS                0x0020
- #define SSS_REG_FCBRDMAL                0x0024
- #define SSS_REG_FCBRDMAC                0x0028
--#define SSS_FCBRDMAC_BYTESWAP           _BIT(1)
--#define SSS_FCBRDMAC_FLUSH              _BIT(0)
-+#define SSS_FCBRDMAC_BYTESWAP           BIT(1)
-+#define SSS_FCBRDMAC_FLUSH              BIT(0)
+ 	if (!sg_is_last(dev->sg_src)) {
+ 		err = s5p_set_indata(dev, sg_next(dev->sg_src));
+-		if (err) {
++		if (err)
+ 			s5p_aes_complete(dev, err);
+-			return;
+-		}
+-
+-		s5p_set_dma_indata(dev, dev->sg_src);
++		else
++			ret = true;
+ 	}
++
++	return ret;
+ }
  
- #define SSS_REG_FCBTDMAS                0x0030
- #define SSS_REG_FCBTDMAL                0x0034
- #define SSS_REG_FCBTDMAC                0x0038
--#define SSS_FCBTDMAC_BYTESWAP           _BIT(1)
--#define SSS_FCBTDMAC_FLUSH              _BIT(0)
-+#define SSS_FCBTDMAC_BYTESWAP           BIT(1)
-+#define SSS_FCBTDMAC_FLUSH              BIT(0)
+ static irqreturn_t s5p_aes_interrupt(int irq, void *dev_id)
+@@ -412,17 +424,30 @@ static irqreturn_t s5p_aes_interrupt(int irq, void *dev_id)
+ 	struct s5p_aes_dev     *dev  = platform_get_drvdata(pdev);
+ 	uint32_t                status;
+ 	unsigned long           flags;
++	bool			set_dma_tx = false;
++	bool			set_dma_rx = false;
  
- #define SSS_REG_FCHRDMAS                0x0040
- #define SSS_REG_FCHRDMAL                0x0044
- #define SSS_REG_FCHRDMAC                0x0048
--#define SSS_FCHRDMAC_BYTESWAP           _BIT(1)
--#define SSS_FCHRDMAC_FLUSH              _BIT(0)
-+#define SSS_FCHRDMAC_BYTESWAP           BIT(1)
-+#define SSS_FCHRDMAC_FLUSH              BIT(0)
+ 	spin_lock_irqsave(&dev->lock, flags);
  
- #define SSS_REG_FCPKDMAS                0x0050
- #define SSS_REG_FCPKDMAL                0x0054
- #define SSS_REG_FCPKDMAC                0x0058
--#define SSS_FCPKDMAC_BYTESWAP           _BIT(3)
--#define SSS_FCPKDMAC_DESCEND            _BIT(2)
--#define SSS_FCPKDMAC_TRANSMIT           _BIT(1)
--#define SSS_FCPKDMAC_FLUSH              _BIT(0)
-+#define SSS_FCPKDMAC_BYTESWAP           BIT(3)
-+#define SSS_FCPKDMAC_DESCEND            BIT(2)
-+#define SSS_FCPKDMAC_TRANSMIT           BIT(1)
-+#define SSS_FCPKDMAC_FLUSH              BIT(0)
+ 	status = SSS_READ(dev, FCINTSTAT);
+ 	if (status & SSS_FCINTSTAT_BRDMAINT)
+-		s5p_aes_rx(dev);
++		set_dma_rx = s5p_aes_rx(dev);
+ 	if (status & SSS_FCINTSTAT_BTDMAINT)
+-		s5p_aes_tx(dev);
++		set_dma_tx = s5p_aes_tx(dev);
  
- #define SSS_REG_FCPKDMAO                0x005C
+ 	SSS_WRITE(dev, FCINTPEND, status);
  
- /* AES registers */
- #define SSS_REG_AES_CONTROL		0x00
--#define SSS_AES_BYTESWAP_DI             _BIT(11)
--#define SSS_AES_BYTESWAP_DO             _BIT(10)
--#define SSS_AES_BYTESWAP_IV             _BIT(9)
--#define SSS_AES_BYTESWAP_CNT            _BIT(8)
--#define SSS_AES_BYTESWAP_KEY            _BIT(7)
--#define SSS_AES_KEY_CHANGE_MODE         _BIT(6)
-+#define SSS_AES_BYTESWAP_DI             BIT(11)
-+#define SSS_AES_BYTESWAP_DO             BIT(10)
-+#define SSS_AES_BYTESWAP_IV             BIT(9)
-+#define SSS_AES_BYTESWAP_CNT            BIT(8)
-+#define SSS_AES_BYTESWAP_KEY            BIT(7)
-+#define SSS_AES_KEY_CHANGE_MODE         BIT(6)
- #define SSS_AES_KEY_SIZE_128            _SBF(4, 0x00)
- #define SSS_AES_KEY_SIZE_192            _SBF(4, 0x01)
- #define SSS_AES_KEY_SIZE_256            _SBF(4, 0x02)
--#define SSS_AES_FIFO_MODE               _BIT(3)
-+#define SSS_AES_FIFO_MODE               BIT(3)
- #define SSS_AES_CHAIN_MODE_ECB          _SBF(1, 0x00)
- #define SSS_AES_CHAIN_MODE_CBC          _SBF(1, 0x01)
- #define SSS_AES_CHAIN_MODE_CTR          _SBF(1, 0x02)
--#define SSS_AES_MODE_DECRYPT            _BIT(0)
-+#define SSS_AES_MODE_DECRYPT            BIT(0)
++	/*
++	 * Writing length of DMA block (either receiving or transmitting)
++	 * will start the operation immediately, so this should be done
++	 * at the end (even after clearing pending interrupts to not miss the
++	 * interrupt).
++	 */
++	if (set_dma_tx)
++		s5p_set_dma_outdata(dev, dev->sg_dst);
++	if (set_dma_rx)
++		s5p_set_dma_indata(dev, dev->sg_src);
++
+ 	spin_unlock_irqrestore(&dev->lock, flags);
  
- #define SSS_REG_AES_STATUS		0x04
--#define SSS_AES_BUSY                    _BIT(2)
--#define SSS_AES_INPUT_READY             _BIT(1)
--#define SSS_AES_OUTPUT_READY            _BIT(0)
-+#define SSS_AES_BUSY                    BIT(2)
-+#define SSS_AES_INPUT_READY             BIT(1)
-+#define SSS_AES_OUTPUT_READY            BIT(0)
- 
- #define SSS_REG_AES_IN_DATA(s)		(0x10 + (s << 2))
- #define SSS_REG_AES_OUT_DATA(s)		(0x20 + (s << 2))
-@@ -139,7 +138,7 @@
- 						SSS_AES_REG(dev, reg))
- 
- /* HW engine modes */
--#define FLAGS_AES_DECRYPT               _BIT(0)
-+#define FLAGS_AES_DECRYPT               BIT(0)
- #define FLAGS_AES_MODE_MASK             _SBF(1, 0x03)
- #define FLAGS_AES_CBC                   _SBF(1, 0x01)
- #define FLAGS_AES_CTR                   _SBF(1, 0x02)
+ 	return IRQ_HANDLED;
 -- 
 1.9.1
