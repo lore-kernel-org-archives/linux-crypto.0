@@ -1,70 +1,73 @@
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [RFC][PATCH 0/6] /dev/random - a new approach
-Date: Sun, 24 Apr 2016 17:21:09 +0200
-Message-ID: <20160424152109.GA8880@amd>
-References: <9192755.iDgo3Omyqe@positron.chronox.de>
+From: Joe Perches <joe@perches.com>
+Subject: Re: [PATCH v2 3/6] crypto: Linux Random Number Generator
+Date: Sun, 24 Apr 2016 09:43:20 -0700
+Message-ID: <1461516200.2726.73.camel@perches.com>
+References: <1589319.WyasadRQQe@positron.chronox.de>
+	 <4513249.IuhZztB3y6@positron.chronox.de>
+	 <1461497424.2726.55.camel@perches.com>
+	 <1907949.voNH4FmKbt@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Ted Tso <tytso@mit.edu>, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sandyinchina@gmail.com
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: herbert@gondor.apana.org.au, Theodore Tso <tytso@mit.edu>,
+	sandyinchina@gmail.com, Jason Cooper <jason@lakedaemon.net>,
+	John Denker <jsd@av8n.com>, "H. Peter Anvin" <hpa@zytor.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:33216 "EHLO
-	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752637AbcDXPVR (ORCPT
+Received: from smtprelay0233.hostedemail.com ([216.40.44.233]:48344 "EHLO
+	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752818AbcDXQnZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 24 Apr 2016 11:21:17 -0400
-Content-Disposition: inline
-In-Reply-To: <9192755.iDgo3Omyqe@positron.chronox.de>
+	Sun, 24 Apr 2016 12:43:25 -0400
+In-Reply-To: <1907949.voNH4FmKbt@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi!
+On Sun, 2016-04-24 at 16:12 +0200, Stephan Mueller wrote:
+> Am Sonntag, 24. April 2016, 04:30:24 schrieb Joe Perches:
+> > On Sun, 2016-04-24 at 12:40 +0200, Stephan Mueller wrote:
+> > > The LRNG with all its properties is documented in [1]. This
+> > > documentation covers the functional discussion as well as testing=
+ of all
+> > > aspects of entropy processing. In addition, the documentation exp=
+lains
+> > > the conducted regression tests to verify that the LRNG is API and=
+ ABI
+> > > compatible with the legacy /dev/random implementation.
+> > > [1] http://www.chronox.de/lrng.html
+> > Links get stale.
+> > It may be better to put an ascii version of the pdf
+> > in Documentation/ and the test code in tools/
+> I surely can do that. What would you think would be the proper locati=
+on to add=A0
+> such documentation? Simply Documentation/lrng.txt?
+>=20
+> How would you propose to handle the pictures (at least the big pictur=
+e)?
 
-> Please find in [1] the full design discussion covering qualitative assessments
-> of the entropy collection and entropy flow. Furthermore, a full
-> testing of the
+I think figure 2.1 could look ok using something like asciio.
+http://search.cpan.org/dist/App-Asciio/lib/App/Asciio.pm
 
-I don't get it.
+> Regarding the tests: those are no regression tests, but tests to allo=
+w other=A0
+> researches to verify whether the LRNG operates appropriately. Thus, w=
+ould=A0
+> adding it to a new directory of tools/crypto/rng be appropriate?
 
-# The
-# idea is that only after obtaining LRNG_POOL_SIZE_BITS healthy bits,
-# the
-#entropy pool is completely changed with new bits. Yet, the stuck bit
-# is not
-# discarded as it may still contain some entropy. Hence, it is simply
-# XORed
-# with the previous bit as the XOR operation maintains the entropy since
-# the previous time stamp and the current time stamp are not dependent
-# on each other.
+Whatever you think best would be fine with me.
 
-So you are relying on high-resolution timestamps. Ok. then you do kind
-of the check on the timestamps... ok, why not. But then you mix in the
-data regardless, saying that "they are not dependent" and thus can't
-hurt.
+> > > +	pr_info(DRIVER_NAME": deactivating initial RNG - %d bytes deliv=
+ered",
+> > > +		atomic_read(&lrng_initrng_bytes));
+> > Should use \n to terminate the format.
+> Thank you, fixed. Though, I am wondering why I do see the line feed i=
+n dmesg.=A0
 
-But you already know they _are_ dependent, that's what your stuck test
-told you:
+The kernel will add a newline to dmesg output whenever a new
+KERN_<LEVEL> is used, but there can be unprefixed content or
+KERN_CONT uses from another thread before another message
+that can unintentionally extend an old message without a
+newline termination.
 
-# Thus, the stuck test
-# ensures that:
-# (a) variations exist in the time deltas,
-# (b) variations of time deltas do not have a simple repeating pattern,
-# and
-# (c) variations do not have a linearly changing patterns (e.g. 1 - 2 -
-# 4 - 7
-# - 11 - 16).
-
-
-Now. I could imagine cases where interrupts are correlated... like
-some hardware may generate two interrupts for each event or something
-like that...
-
-What goes on if high resolution timer is not available?
-
-Best regards,
-									Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+cheers, Joe
