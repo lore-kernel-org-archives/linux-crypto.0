@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2 6/6] hyperv IRQ handler: trigger LRNG
-Date: Sun, 24 Apr 2016 12:44:13 +0200
-Message-ID: <2851381.PQhx4cj2Wv@positron.chronox.de>
+Subject: [PATCH v2 1/6] crypto: DRBG - externalize DRBG functions for LRNG
+Date: Sun, 24 Apr 2016 12:39:30 +0200
+Message-ID: <1558901.9LhUTTHIOE@positron.chronox.de>
 References: <1589319.WyasadRQQe@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -15,43 +15,80 @@ In-Reply-To: <1589319.WyasadRQQe@positron.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The Hyper-V Linux Integration Services use the VMBus implementation for
-communication with the Hypervisor. VMBus registers its own interrupt
-handler that completely bypasses the common Linux interrupt handling.
-
-The interrupt handler is now added the invocation of the LRNG IRQ
-collection function to also benefit from entropy under Hyper-V.
-
-If the implementation of the VMBus and its subordinate drivers is
-changed such that they resemble the Xen implementation where the
-received IRQs are forwarded to the standard Linux interrupt handling
-logic, this patch should be dropped.
+This patch allows several DRBG functions to be called by the LRNG kernel
+code paths outside the drbg.c file.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/hv/vmbus_drv.c | 3 +++
- 1 file changed, 3 insertions(+)
+ crypto/drbg.c         | 11 +++++------
+ include/crypto/drbg.h |  7 +++++++
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/hv/vmbus_drv.c b/drivers/hv/vmbus_drv.c
-index 64713ff..afa2de0 100644
---- a/drivers/hv/vmbus_drv.c
-+++ b/drivers/hv/vmbus_drv.c
-@@ -41,6 +41,7 @@
- #include <linux/ptrace.h>
- #include <linux/screen_info.h>
- #include <linux/kdebug.h>
-+#include <linux/random.h>
- #include "hyperv_vmbus.h"
- 
- static struct acpi_device  *hv_acpi_dev;
-@@ -801,6 +802,8 @@ static void vmbus_isr(void)
- 		else
- 			tasklet_schedule(hv_context.msg_dpc[cpu]);
- 	}
-+
-+	lrng_irq_process();
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 0a3538f..c339a2e 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -113,7 +113,7 @@
+  * the SHA256 / AES 256 over other ciphers. Thus, the favored
+  * DRBGs are the latest entries in this array.
+  */
+-static const struct drbg_core drbg_cores[] = {
++struct drbg_core drbg_cores[] = {
+ #ifdef CONFIG_CRYPTO_DRBG_CTR
+ 	{
+ 		.flags = DRBG_CTR | DRBG_STRENGTH128,
+@@ -205,7 +205,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
+  * Return: normalized strength in *bytes* value or 32 as default
+  *	   to counter programming errors
+  */
+-static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
++unsigned short drbg_sec_strength(drbg_flag_t flags)
+ {
+ 	switch (flags & DRBG_STRENGTH_MASK) {
+ 	case DRBG_STRENGTH128:
+@@ -1140,7 +1140,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
  }
  
+ /* Free all substructures in a DRBG state without the DRBG state structure */
+-static inline void drbg_dealloc_state(struct drbg_state *drbg)
++void drbg_dealloc_state(struct drbg_state *drbg)
+ {
+ 	if (!drbg)
+ 		return;
+@@ -1159,7 +1159,7 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+  * Allocate all sub-structures for a DRBG state.
+  * The DRBG state structure must already be allocated.
+  */
+-static inline int drbg_alloc_state(struct drbg_state *drbg)
++int drbg_alloc_state(struct drbg_state *drbg)
+ {
+ 	int ret = -ENOMEM;
+ 	unsigned int sb_size = 0;
+@@ -1682,8 +1682,7 @@ static int drbg_kcapi_sym(struct drbg_state *drbg, const unsigned char *key,
+  *
+  * return: flags
+  */
+-static inline void drbg_convert_tfm_core(const char *cra_driver_name,
+-					 int *coreref, bool *pr)
++void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool *pr)
+ {
+ 	int i = 0;
+ 	size_t start = 0;
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index d961b2b..d24ec22 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -268,4 +268,11 @@ enum drbg_prefixes {
+ 	DRBG_PREFIX3
+ };
  
++extern int drbg_alloc_state(struct drbg_state *drbg);
++extern void drbg_dealloc_state(struct drbg_state *drbg);
++extern void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref,
++				  bool *pr);
++extern struct drbg_core drbg_cores[];
++extern unsigned short drbg_sec_strength(drbg_flag_t flags);
++
+ #endif /* _DRBG_H */
 -- 
 2.5.5
