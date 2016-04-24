@@ -1,130 +1,70 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2 3/6] crypto: Linux Random Number Generator
-Date: Sun, 24 Apr 2016 16:12:34 +0200
-Message-ID: <1907949.voNH4FmKbt@positron.chronox.de>
-References: <1589319.WyasadRQQe@positron.chronox.de> <4513249.IuhZztB3y6@positron.chronox.de> <1461497424.2726.55.camel@perches.com>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [RFC][PATCH 0/6] /dev/random - a new approach
+Date: Sun, 24 Apr 2016 17:21:09 +0200
+Message-ID: <20160424152109.GA8880@amd>
+References: <9192755.iDgo3Omyqe@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, Theodore Tso <tytso@mit.edu>,
-	sandyinchina@gmail.com, Jason Cooper <jason@lakedaemon.net>,
-	John Denker <jsd@av8n.com>, "H. Peter Anvin" <hpa@zytor.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Joe Perches <joe@perches.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Ted Tso <tytso@mit.edu>, herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sandyinchina@gmail.com
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:53444 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751848AbcDXOMj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 24 Apr 2016 10:12:39 -0400
-In-Reply-To: <1461497424.2726.55.camel@perches.com>
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:33216 "EHLO
+	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752637AbcDXPVR (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 24 Apr 2016 11:21:17 -0400
+Content-Disposition: inline
+In-Reply-To: <9192755.iDgo3Omyqe@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Sonntag, 24. April 2016, 04:30:24 schrieb Joe Perches:
+Hi!
 
-Hi Joe,
+> Please find in [1] the full design discussion covering qualitative assessments
+> of the entropy collection and entropy flow. Furthermore, a full
+> testing of the
 
-thank you very much for your comments.
+I don't get it.
 
-> On Sun, 2016-04-24 at 12:40 +0200, Stephan Mueller wrote:
-> > The LRNG with all its properties is documented in [1]. This
-> > documentation covers the functional discussion as well as testing of all
-> > aspects of entropy processing. In addition, the documentation explains
-> > the conducted regression tests to verify that the LRNG is API and ABI
-> > compatible with the legacy /dev/random implementation.
-> > 
-> > [1] http://www.chronox.de/lrng.html
-> 
-> Thanks.
-> 
-> Links get stale.
-> 
-> It may be better to put an ascii version of the pdf
-> in Documentation/ and the test code in tools/
+# The
+# idea is that only after obtaining LRNG_POOL_SIZE_BITS healthy bits,
+# the
+#entropy pool is completely changed with new bits. Yet, the stuck bit
+# is not
+# discarded as it may still contain some entropy. Hence, it is simply
+# XORed
+# with the previous bit as the XOR operation maintains the entropy since
+# the previous time stamp and the current time stamp are not dependent
+# on each other.
 
-I surely can do that. What would you think would be the proper location to add 
-such documentation? Simply Documentation/lrng.txt?
+So you are relying on high-resolution timestamps. Ok. then you do kind
+of the check on the timestamps... ok, why not. But then you mix in the
+data regardless, saying that "they are not dependent" and thus can't
+hurt.
 
-How would you propose to handle the pictures (at least the big picture)?
+But you already know they _are_ dependent, that's what your stuck test
+told you:
 
-Regarding the tests: those are no regression tests, but tests to allow other 
-researches to verify whether the LRNG operates appropriately. Thus, would 
-adding it to a new directory of tools/crypto/rng be appropriate?
-> 
-> and some trivial notes:
-> > diff --git a/crypto/lrng.c b/crypto/lrng.c
-> 
-> []
-> 
-> > +/* debug macro */
-> > +#define DRIVER_NAME "lrng"
-> 
-> Using
-> #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> before any #include would be a lot more common.
-
-Fixed
-> 
-> > +#if 0
-> > +#define dbg(fmt, ...) pr_info(DRIVER_NAME": " fmt, ##__VA_ARGS__)
-> > +#else
-> > +#define dbg(fmt, ...)
-> > +#endif
-> 
-> pr_debug or is there some interaction with
-> dynamic_debug you want to avoid?
-> 
-> And it's generally better to use something like
-> 
-> #if 0
-> #define dbg(fmt, ...) pr_info(fmt, ##__VA_ARGS__)
-> #else
-> #define dbg(fmt, ...) no_printk(fmt, ##__VA_ARGS__)
-> 
-> so that new dbg statements would not have
-> format/argument mismatches and argument
-> evaluation side-effects are still eliminated.
-
-Fixed: I have replaced all invocations with pr_debug.
-> 
-> > +static void lrng_pdrbg_init_ops(u32 entropy_bits)
-> > +{
-> > +	if (lrng_pdrbg.pdrbg_fully_seeded)
-> > +		return;
-> > +
-> > +	BUILD_BUG_ON(LRNG_IRQ_MIN_NUM % LRNG_POOL_WORD_BITS);
-> > +	BUILD_BUG_ON((LRNG_MIN_SEED_ENTROPY_BITS * LRNG_IRQ_ENTROPY_BITS /
-> > +		     LRNG_DRBG_SECURITY_STRENGTH_BITS) > LRNG_IRQ_MIN_NUM);
-> > +
-> > +	/* DRBG is seeded with full security strength */
-> > +	if (entropy_bits >= LRNG_DRBG_SECURITY_STRENGTH_BITS) {
-> > +		lrng_pdrbg.pdrbg_fully_seeded = true;
-> > +		lrng_pdrbg.pdrbg_min_seeded = true;
-> > +		pr_info(DRIVER_NAME": primary DRBG fully seeded\n");
-> 
-> Using pr_fmt eliminates the need for these
-> DRIVER_NAME ": " prefix inclusions in the format
-
-All occurrences corrected.
-> 
-> > +static int __init lrng_init(void)
-> > +{
-> 
-> []
-> 
-> > +	pr_info(DRIVER_NAME": deactivating initial RNG - %d bytes delivered",
-> > +		atomic_read(&lrng_initrng_bytes));
-> 
-> Should use \n to terminate the format.
-
-Thank you, fixed. Though, I am wondering why I do see the line feed in dmesg. 
-Whatever, it is fixed.
-
-I have cover the fixes in my code. I will wait for more comments and release 
-these changes in a couple of days.
-
-Thanks a lot.
+# Thus, the stuck test
+# ensures that:
+# (a) variations exist in the time deltas,
+# (b) variations of time deltas do not have a simple repeating pattern,
+# and
+# (c) variations do not have a linearly changing patterns (e.g. 1 - 2 -
+# 4 - 7
+# - 11 - 16).
 
 
-Ciao
-Stephan
+Now. I could imagine cases where interrupts are correlated... like
+some hardware may generate two interrupts for each event or something
+like that...
+
+What goes on if high resolution timer is not available?
+
+Best regards,
+									Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
