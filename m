@@ -1,73 +1,70 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [RFC][PATCH 0/6] /dev/random - a new approach
-Date: Mon, 25 Apr 2016 07:12:02 +0200
-Message-ID: <2786389.45NX5QFsAJ@positron.chronox.de>
-References: <9192755.iDgo3Omyqe@positron.chronox.de> <9492847.lAf6tQpUi9@positron.chronox.de> <20160424212459.GA4725@amd>
+From: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
+Subject: RE: [PATCH v3 1/3] crypto: rsa - generalize ASN.1 sequences
+Date: Mon, 25 Apr 2016 05:54:44 +0000
+Message-ID: <VI1PR04MB1311D4BC09290639FD8F6581B8620@VI1PR04MB1311.eurprd04.prod.outlook.com>
+References: <1459949826-11840-1-git-send-email-tudor-dan.ambarus@nxp.com>
+ <1459949826-11840-2-git-send-email-tudor-dan.ambarus@nxp.com>
+ <20160415135245.GA334@gondor.apana.org.au>
+ <VI1PR04MB13110F6720DB1578EC6AF0B2B8680@VI1PR04MB1311.eurprd04.prod.outlook.com>
+ <20160415143851.GK733@gondor.apana.org.au>
+ <VI1PR04MB1311589CC8A871EF1543B4ECB8680@VI1PR04MB1311.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Ted Tso <tytso@mit.edu>, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sandyinchina@gmail.com
-To: Pavel Machek <pavel@ucw.cz>
+Content-Transfer-Encoding: 8BIT
+Cc: "'linux-crypto@vger.kernel.org'" <linux-crypto@vger.kernel.org>,
+	"'tadeusz.struk@intel.com'" <tadeusz.struk@intel.com>,
+	"'smueller@chronox.de'" <smueller@chronox.de>,
+	Cristian Stoica <cristian.stoica@nxp.com>,
+	Horia Ioan Geanta Neag <horia.geanta@nxp.com>
+To: 'Herbert Xu' <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:53518 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751945AbcDYFMG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Apr 2016 01:12:06 -0400
-In-Reply-To: <20160424212459.GA4725@amd>
+Received: from mail-db3on0081.outbound.protection.outlook.com ([157.55.234.81]:52468
+	"EHLO emea01-db3-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752042AbcDYFys convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Apr 2016 01:54:48 -0400
+In-Reply-To: <VI1PR04MB1311589CC8A871EF1543B4ECB8680@VI1PR04MB1311.eurprd04.prod.outlook.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Sonntag, 24. April 2016, 23:25:00 schrieb Pavel Machek:
+Hi Herbert,
 
-Hi Pavel,
-
-> > /* This RNG does not work if no high-resolution timer is available */
-> > BUG_ON(!random_get_entropy() && !random_get_entropy());
+> > On Fri, Apr 15, 2016 at 02:32:42PM +0000, Tudor-Dan Ambarus wrote:
+> > > > On Wed, Apr 06, 2016 at 04:37:04PM +0300, Tudor Ambarus wrote:
+> > > > > This approach has the advantage that users can select specific
+> > > > > parser actions by using a general parser with function pointers
+> > > > > to specific actions.
+> > > >
+> > > > I don't understand why we need different parsing functions in the
+> > > > first place.  Can't they just return raw integers always?
+> > > >
+> > > > You can then trivially convert the raw integers to MPI, no?
+> > >
+> > > We need different parsing functions so that we don't allocate duplicate
+> > buffers for the same data.
+> > >
+> > > You need to allocate buffers when getting the raw integers and you need
+> > to allocate other (duplicate) buffers when converting the raw integers to
+> > MPI.
+> > >
+> > > Using the proposed API each user can select the format of data he
+> wants,
+> > eliminating the need of a double conversion (with its drawbacks:
+> duplicate
+> > buffers, unnecessary cycles).
+> >
+> > The double allocation only happens with software RSA, right? I
+> > don't really think that is going to matter considering how slow
+> > it is, no?
 > 
-> Heh, does this cause BUG() with 2^-64 probability? :-).
+> The double allocation happens only with software RSA. I can't estimate the
+> performance hit for the double conversion. Naturally is to parse the data
+> only once. Plus, my suggestion is simple, faster and doesn't waste
+> resources.
 
-No, but for the listed arches, get_cycles would return 0. And I only call the 
-function twice to not be tripped by a potential wrap around at the time of 
-calling.
-> 
-> > If there is no high-resolution timer, the LRNG will not produce good
-> > entropic random numbers. The current kernel code implements
-> > high-resolution timers for all but the following architectures where
-> > neither random_get_entropy nor
-> > get_cycles are implemented:
-> Ok, what about stuff like Intel 486 (no RDTSC)?
-> 
-> > Thus, for all large-scale architectures, the LRNG would be applicable.
-> > 
-> > Please note that also the legacy /dev/random will have hard time to obtain
-> > entropy for these environments. The majority of the entropy comes
-> > from high-
-> 
-> Understood.
-> 
-> > Though, the patch I offer leaves the legacy /dev/random in peace for those
-> > architectures to not touch the status quo.
-> 
-> Well -- that's the major problem -- right? Makes it tricky to tell
-> what changed, and we had two RNGs to maintain.
+Do you want me to address some suggestions, or do you intend to apply this patch set?
 
-I would rather think that even the legacy /dev/random should not return any 
-values in those environments. The random numbers that are returned on these 
-systems are bogus, considering that the only noise source that could deliver 
-some entropy excluding timestamps (if you trust the user) are the HID event 
-values. And for those listed systems, I doubt very much that they are used in 
-a desktop environment where you have a console.
-
-If everybody agrees, I can surely add some logic to make the LRNG working on 
-those systems. But those additions cannot be subjected to a thorough entropy 
-analysis. Yet I feel that this is wrong.
-
-My goal with the LRNG is to provide a new design using proven techniques that 
-is forward looking. I am aware that the design does not work in circumstances 
-where the high-res timer is not present. But do we have to settle on the least 
-common denominator knowing that this one will not really work to begin with?
-
-Ciao
-Stephan
+Thanks,
+ta
