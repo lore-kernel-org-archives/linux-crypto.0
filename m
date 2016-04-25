@@ -1,45 +1,52 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 1/3] crypto: rsa - generalize ASN.1 sequences
-Date: Mon, 25 Apr 2016 13:58:56 +0800
-Message-ID: <20160425055856.GA8248@gondor.apana.org.au>
-References: <1459949826-11840-1-git-send-email-tudor-dan.ambarus@nxp.com>
- <1459949826-11840-2-git-send-email-tudor-dan.ambarus@nxp.com>
- <20160415135245.GA334@gondor.apana.org.au>
- <VI1PR04MB13110F6720DB1578EC6AF0B2B8680@VI1PR04MB1311.eurprd04.prod.outlook.com>
- <20160415143851.GK733@gondor.apana.org.au>
- <VI1PR04MB1311589CC8A871EF1543B4ECB8680@VI1PR04MB1311.eurprd04.prod.outlook.com>
- <VI1PR04MB1311D4BC09290639FD8F6581B8620@VI1PR04MB1311.eurprd04.prod.outlook.com>
+From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Subject: Re: [RFC][PATCH 0/6] /dev/random - a new approach
+Date: Mon, 25 Apr 2016 09:55:14 +0200
+Message-ID: <CAJU7zaJOSXefQkGb9H-uFr=Rxv16Gk=vYm60mOztS4uG=S0JcA@mail.gmail.com>
+References: <9192755.iDgo3Omyqe@positron.chronox.de> <CAJU7zaL26c33wApqb=S_NCP9gTZPMGnQ+DACjEi6vnXfTq6XkA@mail.gmail.com>
+ <1499137.D4Mft7n8bh@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "'linux-crypto@vger.kernel.org'" <linux-crypto@vger.kernel.org>,
-	"'tadeusz.struk@intel.com'" <tadeusz.struk@intel.com>,
-	"'smueller@chronox.de'" <smueller@chronox.de>,
-	Cristian Stoica <cristian.stoica@nxp.com>,
-	Horia Ioan Geanta Neag <horia.geanta@nxp.com>
-To: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Ted Tso <tytso@mit.edu>, Herbert Xu <herbert@gondor.apana.org.au>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Sandy Harris <sandyinchina@gmail.com>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:40859 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752100AbcDYF7F (ORCPT
+Received: from mail-lf0-f42.google.com ([209.85.215.42]:35238 "EHLO
+	mail-lf0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753805AbcDYHzz convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Apr 2016 01:59:05 -0400
-Content-Disposition: inline
-In-Reply-To: <VI1PR04MB1311D4BC09290639FD8F6581B8620@VI1PR04MB1311.eurprd04.prod.outlook.com>
+	Mon, 25 Apr 2016 03:55:55 -0400
+In-Reply-To: <1499137.D4Mft7n8bh@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Apr 25, 2016 at 05:54:44AM +0000, Tudor-Dan Ambarus wrote:
->
-> Do you want me to address some suggestions, or do you intend to apply this patch set?
+On Thu, Apr 21, 2016 at 5:16 PM, Stephan Mueller <smueller@chronox.de> =
+wrote:
+>> > ... DRBG is =E2=80=9Cminimally=E2=80=9D seeded with 112^6 bits of =
+entropy.
+>> > This is commonly achieved even before user space is initiated.
+>>
+>> Unfortunately one of the issues of the /dev/urandom interface is the
+>> fact that it may start providing random numbers even before the
+>> seeding is complete. From the above quote, I understand that this
+>> issue is not addressed by the new interface. That's a serious
+>> limitation (of the current and inherited by the new implementation),
+>> since most/all newly deployed systems from "cloud" images generate
+>> keys using /dev/urandom (for sshd for example) on boot, and it is
+>> unknown to these applications whether they operate with uninitialize=
+d
+>> seed.
+> One more item to consider: If you do not want to change to use getran=
+dom(2),
+> the LRNG provides you with another means.
 
-Please ensure that we have exactly one parser for the RSA keys.
-It should just return the raw integer with no other processing.
+The main problem is not about willing to switch to getrandom() or not,
+but finding any system where getrandom() exists. Today due to libc not
+having the call, we can only use /dev/urandom and applications would
+most likely continue to do so long time after getrandom() is
+introduced to libc.
 
-The software RSA implementation can then do the MPI conversion
-on top.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+regards,
+Nikos
