@@ -1,50 +1,58 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH] crypto: Make the page handling of hash walk
- compatible to networking.
-Date: Mon, 25 Apr 2016 18:05:27 +0800
-Message-ID: <20160425100527.GA9521@gondor.apana.org.au>
-References: <20160421071451.GE3347@gauss.secunet.com>
+Subject: Crypto Fixes for 4.6
+Date: Mon, 25 Apr 2016 19:12:06 +0800
+Message-ID: <20160425111206.GA10009@gondor.apana.org.au>
+References: <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150415033951.GA1406@gondor.apana.org.au>
+ <20150622084457.GA7806@gondor.apana.org.au>
+ <20150831135655.GA2694@gondor.apana.org.au>
+ <20151102080427.GA8465@gondor.apana.org.au>
+ <20160111101450.GA24044@gondor.apana.org.au>
+ <20160122101828.GA15966@gondor.apana.org.au>
+ <20160330091150.GA17143@gondor.apana.org.au>
+ <20160414062535.GA19807@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Sowmini Varadhan <sowmini.varadhan@oracle.com>,
-	linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:40465 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:42848 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754220AbcDYKFq (ORCPT
+	with ESMTP id S1753864AbcDYLM0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Apr 2016 06:05:46 -0400
+	Mon, 25 Apr 2016 07:12:26 -0400
 Content-Disposition: inline
-In-Reply-To: <20160421071451.GE3347@gauss.secunet.com>
+In-Reply-To: <20160414062535.GA19807@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 21, 2016 at 09:14:51AM +0200, Steffen Klassert wrote:
-> The network layer tries to allocate high order pages for skb_buff
-> fragments, this leads to problems if we pass such a buffer to
-> crypto because crypto assumes to have always order null pages
-> in the scatterlists.
+Hi Linus:
 
-I don't understand.  AFAICS the crypto API assumes no such thing.
-Of course there might be a bug there since we probably don't get
-too many superpages coming in normally.
+This push fixes a couple of regressions in the talitos driver
+that were introduced back in 4.3.  The first bug causes a crash
+when the driver's AEAD functionality is used while the second
+bug prevents its AEAD feature from working once you get past the
+first bug.
 
-> Herbert, I could not find out why this PAGE_SIZE limit is in place.
-> So not sure if this is the right fix. Also, would it be ok to merge
-> this, or whatever is the right fix through the IPsec tree? We need
-> this before we can change esp to avoid linearization.
 
-Your patch makes no sense.  When you do a kmap you can only do
-one page at a time.  So if you have a "superpage" (an SG list
-entry with multiple contiguous pages) then you must walk it one
-page at a time.
+Please pull from
 
-That's why we cap it at PAGE_SIZE.
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-Is it not walking the superpage properly?
 
-Cheers,
+Horia Geant? (1):
+      crypto: talitos - fix AEAD tcrypt tests
+
+Jonas Eymann (1):
+      crypto: talitos - fix crash in talitos_cra_init()
+
+ drivers/crypto/talitos.c |   87 ++++++++++++++++++++++++++++++----------------
+ 1 file changed, 57 insertions(+), 30 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
