@@ -1,37 +1,206 @@
-From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Subject: Re: [RFC][PATCH 0/6] /dev/random - a new approach
-Date: Mon, 25 Apr 2016 10:23:51 +0200
-Message-ID: <CAJU7zaL+jYCgq0RzSraCQF6hd6QtxhobkPtxt+_YqxiZ+vfkMw@mail.gmail.com>
-References: <9192755.iDgo3Omyqe@positron.chronox.de> <1499137.D4Mft7n8bh@tauon.atsec.com>
- <CAJU7zaJOSXefQkGb9H-uFr=Rxv16Gk=vYm60mOztS4uG=S0JcA@mail.gmail.com> <2009968.Rf1hsrr5t0@tauon.atsec.com>
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+Subject: Re: [PATCH 2/2] crypto: s5p-sss - Fix missed interrupts when working
+ with 8 kB blocks
+Date: Mon, 25 Apr 2016 11:37:07 +0200
+Message-ID: <571DE543.1030106@samsung.com>
+References: <1461327323-23288-1-git-send-email-k.kozlowski@samsung.com>
+ <1461327323-23288-2-git-send-email-k.kozlowski@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Ted Tso <tytso@mit.edu>, Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Sandy Harris <sandyinchina@gmail.com>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <2009968.Rf1hsrr5t0@tauon.atsec.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Vladimir Zapolskiy <vz@mleia.com>, stable@vger.kernel.org,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Krzysztof Kozlowski <k.kozlowski@samsung.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:53158 "EHLO
+	mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753780AbcDYJhL (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Apr 2016 05:37:11 -0400
+In-reply-to: <1461327323-23288-2-git-send-email-k.kozlowski@samsung.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Apr 25, 2016 at 10:02 AM, Stephan Mueller <smueller@chronox.de> wrote:
->> > One more item to consider: If you do not want to change to use
->> > getrandom(2), the LRNG provides you with another means.
->> The main problem is not about willing to switch to getrandom() or not,
->> but finding any system where getrandom() exists. Today due to libc not
->> having the call, we can only use /dev/urandom and applications would
->> most likely continue to do so long time after getrandom() is
->> introduced to libc.
-> Implement the syscall yourself with syscall(). If you get ENOSYS back, revert
-> to your old logic of seeding from /dev/urandom.
+Hello,
 
-That's far from a solution and I wouldn't recommend to anyone doing
-that. We cannot expect each and every program to do glibc's job. The
-purpose of a system call like getrandom is to simplify the complex use
-of /dev/urandom and eliminate it, not to make code handling randomness
-in applications even worse.
+On 2016-04-22 14:15, Krzysztof Kozlowski wrote:
+> The tcrypt testing module on Exynos5422-based Odroid XU3/4 board failed on
+> testing 8 kB size blocks:
+>
+> 	$ sudo modprobe tcrypt sec=1 mode=500
+> 	testing speed of async ecb(aes) (ecb-aes-s5p) encryption
+> 	test 0 (128 bit key, 16 byte blocks): 21971 operations in 1 seconds (351536 bytes)
+> 	test 1 (128 bit key, 64 byte blocks): 21731 operations in 1 seconds (1390784 bytes)
+> 	test 2 (128 bit key, 256 byte blocks): 21932 operations in 1 seconds (5614592 bytes)
+> 	test 3 (128 bit key, 1024 byte blocks): 21685 operations in 1 seconds (22205440 bytes)
+> 	test 4 (128 bit key, 8192 byte blocks):
+>
+> This was caused by a race issue of missed BRDMA_DONE ("Block cipher
+> Receiving DMA") interrupt. Device starts processing the data in DMA mode
+> immediately after setting length of DMA block: receiving (FCBRDMAL) or
+> transmitting (FCBTDMAL). The driver sets these lengths from interrupt
+> handler through s5p_set_dma_indata() function (or xxx_setdata()).
+>
+> However the interrupt handler was first dealing with receive buffer
+> (dma-unmap old, dma-map new, set receive block length which starts the
+> operation), then with transmit buffer and finally was clearing pending
+> interrupts (FCINTPEND). Because of the time window between setting
+> receive buffer length and clearing pending interrupts, the operation on
+> receive buffer could end already and driver would miss new interrupt.
+>
+> User manual for Exynos5422 confirms in example code that setting DMA
+> block lengths should be the last operation.
+>
+> The tcrypt hang could be also observed in following blocked-task dmesg:
+>
+> INFO: task modprobe:258 blocked for more than 120 seconds.
+>        Not tainted 4.6.0-rc4-next-20160419-00005-g9eac8b7b7753-dirty #42
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> modprobe        D c06b09d8     0   258    256 0x00000000
+> [<c06b09d8>] (__schedule) from [<c06b0f24>] (schedule+0x40/0xac)
+> [<c06b0f24>] (schedule) from [<c06b49f8>] (schedule_timeout+0x124/0x178)
+> [<c06b49f8>] (schedule_timeout) from [<c06b17fc>] (wait_for_common+0xb8/0x144)
+> [<c06b17fc>] (wait_for_common) from [<bf0013b8>] (test_acipher_speed+0x49c/0x740 [tcrypt])
+> [<bf0013b8>] (test_acipher_speed [tcrypt]) from [<bf003e8c>] (do_test+0x2240/0x30ec [tcrypt])
+> [<bf003e8c>] (do_test [tcrypt]) from [<bf008048>] (tcrypt_mod_init+0x48/0xa4 [tcrypt])
+> [<bf008048>] (tcrypt_mod_init [tcrypt]) from [<c010177c>] (do_one_initcall+0x3c/0x16c)
+> [<c010177c>] (do_one_initcall) from [<c0191ff0>] (do_init_module+0x5c/0x1ac)
+> [<c0191ff0>] (do_init_module) from [<c0185610>] (load_module+0x1a30/0x1d08)
+> [<c0185610>] (load_module) from [<c0185ab0>] (SyS_finit_module+0x8c/0x98)
+> [<c0185ab0>] (SyS_finit_module) from [<c01078c0>] (ret_fast_syscall+0x0/0x3c)
+>
+> Fixes: a49e490c7a8a ("crypto: s5p-sss - add S5PV210 advanced crypto engine support")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
 
-regards,
-Nikos
+Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
+
+This patch solved similar hang issue on Exynos4210 based Universal_C210
+board. Now AES crypto module works fine.
+
+> ---
+>
+> Issue was easily reproduced on newer (faster?) SoCs, like Odroid XU3/XU4
+> (Exynos5422). Still it was kind of time-related (adding printks or
+> kernel debug options sometimes "was fixing" the issue). On older like
+> Odroid U3 with Exynos4412 this works fine...
+>
+> I am marking this cc-stable because invalid operation comes from the
+> first version of the driver.
+> ---
+>   drivers/crypto/s5p-sss.c | 53 +++++++++++++++++++++++++++++++++++-------------
+>   1 file changed, 39 insertions(+), 14 deletions(-)
+>
+> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+> index b96532078d0c..ac6d62b3be07 100644
+> --- a/drivers/crypto/s5p-sss.c
+> +++ b/drivers/crypto/s5p-sss.c
+> @@ -367,43 +367,55 @@ exit:
+>   	return err;
+>   }
+>   
+> -static void s5p_aes_tx(struct s5p_aes_dev *dev)
+> +/*
+> + * Returns true if new transmitting (output) data is ready and its
+> + * address+length have to be written to device (by calling
+> + * s5p_set_dma_outdata()). False otherwise.
+> + */
+> +static bool s5p_aes_tx(struct s5p_aes_dev *dev)
+>   {
+>   	int err = 0;
+> +	bool ret = false;
+>   
+>   	s5p_unset_outdata(dev);
+>   
+>   	if (!sg_is_last(dev->sg_dst)) {
+>   		err = s5p_set_outdata(dev, sg_next(dev->sg_dst));
+> -		if (err) {
+> +		if (err)
+>   			s5p_aes_complete(dev, err);
+> -			return;
+> -		}
+> -
+> -		s5p_set_dma_outdata(dev, dev->sg_dst);
+> +		else
+> +			ret = true;
+>   	} else {
+>   		s5p_aes_complete(dev, err);
+>   
+>   		dev->busy = true;
+>   		tasklet_schedule(&dev->tasklet);
+>   	}
+> +
+> +	return ret;
+>   }
+>   
+> -static void s5p_aes_rx(struct s5p_aes_dev *dev)
+> +/*
+> + * Returns true if new receiving (input) data is ready and its
+> + * address+length have to be written to device (by calling
+> + * s5p_set_dma_indata()). False otherwise.
+> + */
+> +static bool s5p_aes_rx(struct s5p_aes_dev *dev)
+>   {
+>   	int err;
+> +	bool ret = false;
+>   
+>   	s5p_unset_indata(dev);
+>   
+>   	if (!sg_is_last(dev->sg_src)) {
+>   		err = s5p_set_indata(dev, sg_next(dev->sg_src));
+> -		if (err) {
+> +		if (err)
+>   			s5p_aes_complete(dev, err);
+> -			return;
+> -		}
+> -
+> -		s5p_set_dma_indata(dev, dev->sg_src);
+> +		else
+> +			ret = true;
+>   	}
+> +
+> +	return ret;
+>   }
+>   
+>   static irqreturn_t s5p_aes_interrupt(int irq, void *dev_id)
+> @@ -412,17 +424,30 @@ static irqreturn_t s5p_aes_interrupt(int irq, void *dev_id)
+>   	struct s5p_aes_dev     *dev  = platform_get_drvdata(pdev);
+>   	uint32_t                status;
+>   	unsigned long           flags;
+> +	bool			set_dma_tx = false;
+> +	bool			set_dma_rx = false;
+>   
+>   	spin_lock_irqsave(&dev->lock, flags);
+>   
+>   	status = SSS_READ(dev, FCINTSTAT);
+>   	if (status & SSS_FCINTSTAT_BRDMAINT)
+> -		s5p_aes_rx(dev);
+> +		set_dma_rx = s5p_aes_rx(dev);
+>   	if (status & SSS_FCINTSTAT_BTDMAINT)
+> -		s5p_aes_tx(dev);
+> +		set_dma_tx = s5p_aes_tx(dev);
+>   
+>   	SSS_WRITE(dev, FCINTPEND, status);
+>   
+> +	/*
+> +	 * Writing length of DMA block (either receiving or transmitting)
+> +	 * will start the operation immediately, so this should be done
+> +	 * at the end (even after clearing pending interrupts to not miss the
+> +	 * interrupt).
+> +	 */
+> +	if (set_dma_tx)
+> +		s5p_set_dma_outdata(dev, dev->sg_dst);
+> +	if (set_dma_rx)
+> +		s5p_set_dma_indata(dev, dev->sg_src);
+> +
+>   	spin_unlock_irqrestore(&dev->lock, flags);
+>   
+>   	return IRQ_HANDLED;
+
+Best regards
+-- 
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
