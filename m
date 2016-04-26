@@ -1,44 +1,54 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [RFC][PATCH 0/6] /dev/random - a new approach
-Date: Mon, 25 Apr 2016 21:11:37 -0400
-Message-ID: <20160426011137.GC28496@thunk.org>
-References: <9192755.iDgo3Omyqe@positron.chronox.de>
- <1499137.D4Mft7n8bh@tauon.atsec.com>
- <CAJU7zaJOSXefQkGb9H-uFr=Rxv16Gk=vYm60mOztS4uG=S0JcA@mail.gmail.com>
- <2009968.Rf1hsrr5t0@tauon.atsec.com>
- <CAJU7zaL+jYCgq0RzSraCQF6hd6QtxhobkPtxt+_YqxiZ+vfkMw@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/2 v2] crypto: Key-agreement Protocol Primitives API
+ (KPP)
+Date: Tue, 26 Apr 2016 09:19:57 +0800
+Message-ID: <20160426011957.GA16114@gondor.apana.org.au>
+References: <1460712316-3127-1-git-send-email-salvatore.benedetto@intel.com>
+ <1460712316-3127-2-git-send-email-salvatore.benedetto@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Stephan Mueller <smueller@chronox.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Sandy Harris <sandyinchina@gmail.com>
-To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Cc: linux-crypto@vger.kernel.org
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:39392 "EHLO imap.thunk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751089AbcDZBLn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Apr 2016 21:11:43 -0400
+Received: from helcar.hengli.com.au ([209.40.204.226]:57455 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750749AbcDZBUD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Apr 2016 21:20:03 -0400
 Content-Disposition: inline
-In-Reply-To: <CAJU7zaL+jYCgq0RzSraCQF6hd6QtxhobkPtxt+_YqxiZ+vfkMw@mail.gmail.com>
+In-Reply-To: <1460712316-3127-2-git-send-email-salvatore.benedetto@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Apr 25, 2016 at 10:23:51AM +0200, Nikos Mavrogiannopoulos wrote:
-> That's far from a solution and I wouldn't recommend to anyone doing
-> that. We cannot expect each and every program to do glibc's job. The
-> purpose of a system call like getrandom is to simplify the complex use
-> of /dev/urandom and eliminate it, not to make code handling randomness
-> in applications even worse.
+On Fri, Apr 15, 2016 at 10:25:15AM +0100, Salvatore Benedetto wrote:
+> Add key-agreement protocol primitives (kpp) API which allows to
+> implement primitives required by protocols such as DH and ECDH.
+> The API is composed mainly by the following functions
+>  * set_params() - It allows the user to set the parameters known to
+>    both parties involved in the key-agreement session
+>  * set_secret() - It allows the user to set his secret, also
+>    referred to as his private key
+>  * generate_public_key() - It generates the public key to be sent to
+>    the other counterpart involved in the key-agreement session. The
+>    function has to be called after set_params() and set_secret()
+>  * generate_secret() - It generates the shared secret for the session
+> 
+> Other functions such as init() and exit() are provided for allowing
+> cryptographic hardware to be inizialized properly before use
+> 
+> Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
 
-Yes, but if glibc is falling down on the job and refusing to export
-the system call (I think for political reasons; it's a Linux-only
-interface, so Hurd wouldn't have it), then the only solution is to
-either use syscall directly (it's not hard for getrandom, since we're
-not using 64-bit arguments which gets tricky for some architectures),
-or as Peter Avin has suggested, maybe kernel developers will have to
-start releasing the libinux library, and then teaching application
-authors to add -linux to their linker lines.
+I don't have any strong objections to this interface.
 
-						- Ted
+However, I'd like to see it along with an actual user.  Because
+otherwise I'm afraid that I'll soon start receiving patches adding
+drivers using this interface even before we settle on what the
+user interface looks like.  And what the user interface looks
+like is very important because it may impact how we structure
+this.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
