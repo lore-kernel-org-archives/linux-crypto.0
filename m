@@ -1,47 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: gcm - Fix rfc4543 decryption crash
-Date: Wed, 27 Apr 2016 12:17:44 +0800
-Message-ID: <20160427041744.GA27044@gondor.apana.org.au>
-References: <20160318144240.GA20816@gondor.apana.org.au>
- <20160318173423.GB19137@kroah.com>
- <20160319022307.GA25338@gondor.apana.org.au>
- <1461670976.14569.40.camel@decadent.org.uk>
+Subject: Re: random(4) changes
+Date: Wed, 27 Apr 2016 12:23:56 +0800
+Message-ID: <20160427042356.GB27044@gondor.apana.org.au>
+References: <20160426030735.GD28496@thunk.org>
+ <20160426110415.GA19340@gondor.apana.org.au>
+ <20160426204709.GH13997@two.firstfloor.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Greg KH <gregkh@linuxfoundation.org>, stable@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	patrick.meyer@vasgard.com
-To: Ben Hutchings <ben@decadent.org.uk>
-Return-path: <stable-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Theodore Ts'o <tytso@mit.edu>, smueller@chronox.de,
+	sandyinchina@gmail.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, jason@lakedaemon.net, jsd@av8n.com,
+	hpa@zytor.com
+To: Andi Kleen <andi@firstfloor.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:43085 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750811AbcD0EYQ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 27 Apr 2016 00:24:16 -0400
 Content-Disposition: inline
-In-Reply-To: <1461670976.14569.40.camel@decadent.org.uk>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20160426204709.GH13997@two.firstfloor.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 26, 2016 at 01:42:56PM +0200, Ben Hutchings wrote:
+On Tue, Apr 26, 2016 at 01:47:09PM -0700, Andi Kleen wrote:
 >
-> It looks like the bug was introduced in 3.10 by:
->=20
-> d733ac90f9fe8ac284e523f9920b507555b12f6d
-> Author: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-> Date:=A0=A0=A0Sun Apr 7 16:43:46 2013 +0300
->=20
-> =A0=A0=A0=A0crypto: gcm - fix rfc4543 to handle async crypto correctl=
-y
-> =A0 =A0=A0
-> So 3.2.y and 3.4.y don't need this fix - or should they get both fixe=
-s?
+> I posted patches to fix this. At some point it definitely has to be.
 
-If that patch is not present then my fix can't be applied.  However,
-I think this change itself is probably needed in 3.2/3.4 as otherwise
-GCM would be broken if the underlying cipher is async.  It's not a
-big deal on x86 because the main async AES provider also provides
-GCM directly, but on other architectures it may be an issue.
+Can you point me to the patch submission?
 
-Cheers,
---=20
+Thanks,
+-- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
