@@ -1,58 +1,131 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [RFC PATCH] crypto: Make the page handling of hash walk
- compatible to networking.
-Date: Thu, 28 Apr 2016 10:27:43 +0200
-Message-ID: <20160428082743.GO3347@gauss.secunet.com>
-References: <20160421071451.GE3347@gauss.secunet.com>
- <20160425100527.GA9521@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: Sowmini Varadhan <sowmini.varadhan@oracle.com>,
-	<linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Alexandru Ardelean <ardeleanalex@gmail.com>
+Subject: [PATCH] crypto: talitos: fix driver init
+Date: Thu, 28 Apr 2016 17:15:30 +0300
+Message-ID: <1461852930-714-1-git-send-email-aardelean@riverbed.com>
+Cc: Alexandru Ardelean <ardeleanalex@gmail.com>,
+	Alexandru Ardelean <aardelean@riverbed.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([62.96.220.36]:33650 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750932AbcD1I1r (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Apr 2016 04:27:47 -0400
-Content-Disposition: inline
-In-Reply-To: <20160425100527.GA9521@gondor.apana.org.au>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:33602 "EHLO
+	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752195AbcD1OPg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 28 Apr 2016 10:15:36 -0400
+Received: by mail-wm0-f67.google.com with SMTP id r12so23951439wme.0
+        for <linux-crypto@vger.kernel.org>; Thu, 28 Apr 2016 07:15:35 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Apr 25, 2016 at 06:05:27PM +0800, Herbert Xu wrote:
-> On Thu, Apr 21, 2016 at 09:14:51AM +0200, Steffen Klassert wrote:
-> > The network layer tries to allocate high order pages for skb_buff
-> > fragments, this leads to problems if we pass such a buffer to
-> > crypto because crypto assumes to have always order null pages
-> > in the scatterlists.
-> 
-> I don't understand.  AFAICS the crypto API assumes no such thing.
-> Of course there might be a bug there since we probably don't get
-> too many superpages coming in normally.
+From: Alexandru Ardelean <ardeleanalex@gmail.com>
 
-Maybe I misinterpreted the things I observed.
+Crypto hash algorithms must provide the statesize sometime
+from kernel 4.2 onwards.
+Since commit 8996eafdcbad149ac0f772fb1649fbb75c482a6a
 
-> 
-> > Herbert, I could not find out why this PAGE_SIZE limit is in place.
-> > So not sure if this is the right fix. Also, would it be ok to merge
-> > this, or whatever is the right fix through the IPsec tree? We need
-> > this before we can change esp to avoid linearization.
-> 
-> Your patch makes no sense.  
+Signed-off-by: Alexandru Ardelean <aardelean@riverbed.com>
+---
+ drivers/crypto/talitos.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-That's possible :)
-
-> When you do a kmap you can only do
-> one page at a time.  So if you have a "superpage" (an SG list
-> entry with multiple contiguous pages) then you must walk it one
-> page at a time.
-> 
-> That's why we cap it at PAGE_SIZE.
-> 
-> Is it not walking the superpage properly?
-
-The problem was that if offset (in a superpage) equals
-PAGE_SIZE in hash_walk_next(), nbytes becomes zero. So
-we map the page, but we don't hash and unmap because we
-exit the loop in shash_ahash_update() in this case.
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index aae0554..080e329 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -2458,6 +2458,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 	{	.type = CRYPTO_ALG_TYPE_AHASH,
+ 		.alg.hash = {
+ 			.halg.digestsize = MD5_DIGEST_SIZE,
++			.halg.statesize  = sizeof(struct talitos_ahash_req_ctx),
+ 			.halg.base = {
+ 				.cra_name = "md5",
+ 				.cra_driver_name = "md5-talitos",
+@@ -2473,6 +2474,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 	{	.type = CRYPTO_ALG_TYPE_AHASH,
+ 		.alg.hash = {
+ 			.halg.digestsize = SHA1_DIGEST_SIZE,
++			.halg.statesize  = sizeof(struct talitos_ahash_req_ctx),
+ 			.halg.base = {
+ 				.cra_name = "sha1",
+ 				.cra_driver_name = "sha1-talitos",
+@@ -2488,6 +2490,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 	{	.type = CRYPTO_ALG_TYPE_AHASH,
+ 		.alg.hash = {
+ 			.halg.digestsize = SHA224_DIGEST_SIZE,
++			.halg.statesize  = sizeof(struct talitos_ahash_req_ctx),
+ 			.halg.base = {
+ 				.cra_name = "sha224",
+ 				.cra_driver_name = "sha224-talitos",
+@@ -2503,6 +2506,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 	{	.type = CRYPTO_ALG_TYPE_AHASH,
+ 		.alg.hash = {
+ 			.halg.digestsize = SHA256_DIGEST_SIZE,
++			.halg.statesize  = sizeof(struct talitos_ahash_req_ctx),
+ 			.halg.base = {
+ 				.cra_name = "sha256",
+ 				.cra_driver_name = "sha256-talitos",
+@@ -2518,6 +2522,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 	{	.type = CRYPTO_ALG_TYPE_AHASH,
+ 		.alg.hash = {
+ 			.halg.digestsize = SHA384_DIGEST_SIZE,
++			.halg.statesize  = sizeof(struct talitos_ahash_req_ctx),
+ 			.halg.base = {
+ 				.cra_name = "sha384",
+ 				.cra_driver_name = "sha384-talitos",
+@@ -2533,6 +2538,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 	{	.type = CRYPTO_ALG_TYPE_AHASH,
+ 		.alg.hash = {
+ 			.halg.digestsize = SHA512_DIGEST_SIZE,
++			.halg.statesize  = sizeof(struct talitos_ahash_req_ctx),
+ 			.halg.base = {
+ 				.cra_name = "sha512",
+ 				.cra_driver_name = "sha512-talitos",
+@@ -2548,6 +2554,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 	{	.type = CRYPTO_ALG_TYPE_AHASH,
+ 		.alg.hash = {
+ 			.halg.digestsize = MD5_DIGEST_SIZE,
++			.halg.statesize  = sizeof(struct talitos_ahash_req_ctx),
+ 			.halg.base = {
+ 				.cra_name = "hmac(md5)",
+ 				.cra_driver_name = "hmac-md5-talitos",
+@@ -2563,6 +2570,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 	{	.type = CRYPTO_ALG_TYPE_AHASH,
+ 		.alg.hash = {
+ 			.halg.digestsize = SHA1_DIGEST_SIZE,
++			.halg.statesize  = sizeof(struct talitos_ahash_req_ctx),
+ 			.halg.base = {
+ 				.cra_name = "hmac(sha1)",
+ 				.cra_driver_name = "hmac-sha1-talitos",
+@@ -2578,6 +2586,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 	{	.type = CRYPTO_ALG_TYPE_AHASH,
+ 		.alg.hash = {
+ 			.halg.digestsize = SHA224_DIGEST_SIZE,
++			.halg.statesize  = sizeof(struct talitos_ahash_req_ctx),
+ 			.halg.base = {
+ 				.cra_name = "hmac(sha224)",
+ 				.cra_driver_name = "hmac-sha224-talitos",
+@@ -2593,6 +2602,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 	{	.type = CRYPTO_ALG_TYPE_AHASH,
+ 		.alg.hash = {
+ 			.halg.digestsize = SHA256_DIGEST_SIZE,
++			.halg.statesize  = sizeof(struct talitos_ahash_req_ctx),
+ 			.halg.base = {
+ 				.cra_name = "hmac(sha256)",
+ 				.cra_driver_name = "hmac-sha256-talitos",
+@@ -2608,6 +2618,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 	{	.type = CRYPTO_ALG_TYPE_AHASH,
+ 		.alg.hash = {
+ 			.halg.digestsize = SHA384_DIGEST_SIZE,
++			.halg.statesize  = sizeof(struct talitos_ahash_req_ctx),
+ 			.halg.base = {
+ 				.cra_name = "hmac(sha384)",
+ 				.cra_driver_name = "hmac-sha384-talitos",
+@@ -2623,6 +2634,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 	{	.type = CRYPTO_ALG_TYPE_AHASH,
+ 		.alg.hash = {
+ 			.halg.digestsize = SHA512_DIGEST_SIZE,
++			.halg.statesize  = sizeof(struct talitos_ahash_req_ctx),
+ 			.halg.base = {
+ 				.cra_name = "hmac(sha512)",
+ 				.cra_driver_name = "hmac-sha512-talitos",
+-- 
+2.8.1
