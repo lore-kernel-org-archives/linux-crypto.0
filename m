@@ -1,62 +1,50 @@
-From: "George Spelvin" <linux@horizon.com>
-Subject: Re: random(4) changes
-Date: 29 Apr 2016 18:32:36 -0400
-Message-ID: <20160429223236.18347.qmail@ns.horizon.com>
-References: <2585243.Yy23BEqhqI@positron.chronox.de>
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, sandyinchina@gmail.com, tytso@mit.edu
-To: linux@horizon.com, smueller@chronox.de
+From: Kim Phillips <kim.phillips@arm.com>
+Subject: Re: [PATCH] crypto: talitos: fix driver init
+Date: Fri, 29 Apr 2016 17:55:22 -0500
+Message-ID: <6a016fc9-b023-4d04-b163-998d6a85a8eb@GB-CAM-EXCAS1.Emea.Arm.com>
+References: <1461852930-714-1-git-send-email-aardelean@riverbed.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: 8BIT
+Cc: <linux-crypto@vger.kernel.org>,
+	Alexandru Ardelean <aardelean@riverbed.com>
+To: Alexandru Ardelean <ardeleanalex@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:25238 "HELO ns.horizon.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1752041AbcD2Wci (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Apr 2016 18:32:38 -0400
-In-Reply-To: <2585243.Yy23BEqhqI@positron.chronox.de>
+Received: from eu-smtp-delivery-143.mimecast.com ([146.101.78.143]:45428 "EHLO
+	eu-smtp-delivery-143.mimecast.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751689AbcD2Wzq convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Apr 2016 18:55:46 -0400
+In-Reply-To: <1461852930-714-1-git-send-email-aardelean@riverbed.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> I think we can agree that we disagree.
+On Thu, 28 Apr 2016 17:15:30 +0300
+Alexandru Ardelean <ardeleanalex@gmail.com> wrote:
 
-Yes, we agree on that, at least!
+> From: Alexandru Ardelean <ardeleanalex@gmail.com>
+>
+> Crypto hash algorithms must provide the statesize sometime
+> from kernel 4.2 onwards.
+> Since commit 8996eafdcbad149ac0f772fb1649fbb75c482a6a
+>
+> Signed-off-by: Alexandru Ardelean <aardelean@riverbed.com>
+> ---
 
-The problem is, this is supposed to be a matter of fact, not opinion,
-so there should be one right answer.
+This should already have been fixed here:
 
-I suppose it's possible it's still an issue of terminology, but we've
-exhausted
+www.spinics.net/lists/linux-crypto/msg19225.html
 
-> Though, I will get back to the drawing board and think about the problem
-> of how to efficiently collect entropy.
+> @@ -2458,6 +2458,7 @@ static struct talitos_alg_template driver_algs[] = {
+>       {       .type = CRYPTO_ALG_TYPE_AHASH,
+>               .alg.hash = {
+>                       .halg.digestsize = MD5_DIGEST_SIZE,
+> +                     .halg.statesize  = sizeof(struct talitos_ahash_req_ctx),
 
-For *collecting* it, there are two obvious sources that would be very
-nice to use, I've just never had the courage to dig into the relevant
-subsystems deep enough to add the hooks.
+although I'm not sure why these statesize assignments aren't being
+done in talitos_alg_alloc() there either
 
-These could be turned on when entropy is required and turned off afterward:
+Thanks,
 
-1) The RTC periodic interrupt.  This is invariably driven by
-   a separate 32.768 Hz crystal, so the jitter against the main
-   clock oscillator is a useful source.
-
-   A stadanrd PC RTC can run at up to 8 kHz, and probably deliver
-   a few hundred bits/s.
-
-2) Any available ADCs, especially audio ADCs.  A 16-bit or better ADC is a
-   very rich source of entropy.  We'd need hook into the audio subsystem
-   which could activate the ADC when needed and, most importantly,
-   guarantee that the data did not go anywhere else.
-
-   Becasue we can't guarantee that the audio input is quiet when collected,
-   the entropy would have to be estimated a priori rather than deduced
-   from measurements.  Some measurements would still be useful as a sanity
-   check to ensure the data isn't digital zero or something.
-
-
-For storing it after collecting it, I still think the current CRC-based
-scheme is pretty good.  Note that cyclical XOR is a special case of this,
-just using a polynomial of x^4096-1.  The good properties of CRCs for
-detection of hardware-type errors are exactly equivalent to the collision
-resistance properties desired for an entropy pool.
-
-A collision results in an undetected error in the former case, and loss
-of entropy in the latter.
+Kim
+IMPORTANT NOTICE: The contents of this email and any attachments are confidential and may also be privileged. If you are not the intended recipient, please notify the sender immediately and do not disclose the contents to any other person, use it for any purpose, or store or copy the information in any medium. Thank you.
