@@ -1,52 +1,64 @@
-From: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-Subject: [PATCH] lib: asn1_decoder - add MODULE_LICENSE("GPL")
-Date: Fri, 29 Apr 2016 17:48:08 +0300
-Message-ID: <1461941288-10356-1-git-send-email-tudor-dan.ambarus@nxp.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	"Tudor Ambarus" <tudor-dan.ambarus@nxp.com>
-To: <dhowells@redhat.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] crypto: qat - fix adf_ctl_drv.c:undefined reference to adf_init_pf_wq
+Date: Fri, 29 Apr 2016 10:43:40 -0700
+Message-ID: <1461951820-11225-1-git-send-email-tadeusz.struk@intel.com>
+References: <201604290313.pe3TL9PF%fengguang.wu@intel.com>
+Cc: linux-crypto@vger.kernel.org, fengguang.wu@intel.com,
+	tadeusz.struk@intel.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0056.outbound.protection.outlook.com ([157.56.111.56]:59785
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753369AbcD2OsU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Apr 2016 10:48:20 -0400
+Received: from mga04.intel.com ([192.55.52.120]:45364 "EHLO mga04.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751691AbcD2RoY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Apr 2016 13:44:24 -0400
+In-Reply-To: <201604290313.pe3TL9PF%fengguang.wu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-A kernel taint results when loading the rsa_generic module:
+Fix undefined reference issue reported by kbuild test robot.
 
-root@(none):~# modprobe rsa_generic
-asn1_decoder: module license 'unspecified' taints kernel.
-Disabling lock debugging due to kernel taint
-
-"Tainting" of the kernel is (usually) a way of indicating that
-a proprietary module has been inserted, which is not the case here.
-
-Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+Reported-by: kbuild test robot <fengguang.wu@intel.com>
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- lib/asn1_decoder.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/crypto/qat/qat_common/adf_common_drv.h | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/lib/asn1_decoder.c b/lib/asn1_decoder.c
-index 2b3f46c..b1ffcab 100644
---- a/lib/asn1_decoder.c
-+++ b/lib/asn1_decoder.c
-@@ -12,6 +12,7 @@
- #include <linux/export.h>
- #include <linux/kernel.h>
- #include <linux/errno.h>
-+#include <linux/module.h>
- #include <linux/asn1_decoder.h>
- #include <linux/asn1_ber_bytecode.h>
+diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
+index ff0b37b..35ffa940 100644
+--- a/drivers/crypto/qat/qat_common/adf_common_drv.h
++++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
+@@ -146,8 +146,6 @@ int adf_init_aer(void);
+ void adf_exit_aer(void);
+ int adf_init_vf_wq(void);
+ void adf_exit_vf_wq(void);
+-int adf_init_pf_wq(void);
+-void adf_exit_pf_wq(void);
+ int adf_init_admin_comms(struct adf_accel_dev *accel_dev);
+ void adf_exit_admin_comms(struct adf_accel_dev *accel_dev);
+ int adf_send_admin_init(struct adf_accel_dev *accel_dev);
+@@ -243,6 +241,8 @@ void adf_disable_pf2vf_interrupts(struct adf_accel_dev *accel_dev);
  
-@@ -504,3 +505,5 @@ error:
- 	return -EBADMSG;
+ int adf_vf2pf_init(struct adf_accel_dev *accel_dev);
+ void adf_vf2pf_shutdown(struct adf_accel_dev *accel_dev);
++int adf_init_pf_wq(void);
++void adf_exit_pf_wq(void);
+ #else
+ static inline int adf_sriov_configure(struct pci_dev *pdev, int numvfs)
+ {
+@@ -269,5 +269,14 @@ static inline int adf_vf2pf_init(struct adf_accel_dev *accel_dev)
+ static inline void adf_vf2pf_shutdown(struct adf_accel_dev *accel_dev)
+ {
  }
- EXPORT_SYMBOL_GPL(asn1_ber_decoder);
 +
-+MODULE_LICENSE("GPL");
++static inline int adf_init_pf_wq(void)
++{
++	return 0;
++}
++
++static inline void adf_exit_pf_wq(void)
++{
++}
+ #endif
+ #endif
 -- 
-1.8.3.1
+2.1.4
