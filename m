@@ -1,81 +1,38 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH 4/5] crypto: Use dma_pool_zalloc
-Date: Fri, 29 Apr 2016 22:37:50 +0200
-Message-ID: <20160429223750.3a7b6849@bbrezillon>
-References: <1461960552-7429-1-git-send-email-Julia.Lawall@lip6.fr>
-	<1461960552-7429-5-git-send-email-Julia.Lawall@lip6.fr>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: random(4) changes
+Date: Fri, 29 Apr 2016 23:54:43 +0200
+Message-ID: <2585243.Yy23BEqhqI@positron.chronox.de>
+References: <20160429200848.12765.qmail@ns.horizon.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: kernel-janitors@vger.kernel.org,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Julia Lawall <Julia.Lawall@lip6.fr>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, sandyinchina@gmail.com, tytso@mit.edu
+To: George Spelvin <linux@horizon.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:49863 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752651AbcD2Uhy (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Apr 2016 16:37:54 -0400
-In-Reply-To: <1461960552-7429-5-git-send-email-Julia.Lawall@lip6.fr>
+Received: from mail.eperm.de ([89.247.134.16]:54228 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752811AbcD2Vy5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Apr 2016 17:54:57 -0400
+In-Reply-To: <20160429200848.12765.qmail@ns.horizon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 29 Apr 2016 22:09:11 +0200
-Julia Lawall <Julia.Lawall@lip6.fr> wrote:
+Am Freitag, 29. April 2016, 16:08:48 schrieb George Spelvin:
 
-> Dma_pool_zalloc combines dma_pool_alloc and memset 0.  The semantic patch
-> that makes this transformation is as follows: (http://coccinelle.lip6.fr/)
-> 
-> // <smpl>
-> @@
-> expression d,e;
-> statement S;
-> @@
-> 
->         d =
-> -            dma_pool_alloc
-> +            dma_pool_zalloc
->              (...);
->         if (!d) S
-> -       memset(d, 0, sizeof(*d));
-> // </smpl>
-> 
-> Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+Hi George,
 
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-
+> > What I am saying that the bits in one given time stamp are mutually
+> > independent. I.e. bit 0 of one time stamp does not depend on bit 1 of that
+> > very same time stamp.
 > 
-> ---
-> 
->  drivers/crypto/marvell/tdma.c |    5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/crypto/marvell/tdma.c b/drivers/crypto/marvell/tdma.c
-> index 7642798..0ad8f1e 100644
-> --- a/drivers/crypto/marvell/tdma.c
-> +++ b/drivers/crypto/marvell/tdma.c
-> @@ -99,12 +99,11 @@ mv_cesa_dma_add_desc(struct mv_cesa_tdma_chain *chain, gfp_t flags)
->  	struct mv_cesa_tdma_desc *new_tdma = NULL;
->  	dma_addr_t dma_handle;
->  
-> -	new_tdma = dma_pool_alloc(cesa_dev->dma->tdma_desc_pool, flags,
-> -				  &dma_handle);
-> +	new_tdma = dma_pool_zalloc(cesa_dev->dma->tdma_desc_pool, flags,
-> +				   &dma_handle);
->  	if (!new_tdma)
->  		return ERR_PTR(-ENOMEM);
->  
-> -	memset(new_tdma, 0, sizeof(*new_tdma));
->  	new_tdma->cur_dma = dma_handle;
->  	if (chain->last) {
->  		chain->last->next_dma = cpu_to_le32(dma_handle);
+> And I'm saying that's wrong.
 
+I think we can agree that we disagree.
 
+I am not sure whether you have a point or not. Though, I will get back to the 
+drawing board and think about the problem of how to efficiently collect 
+entropy.
 
--- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Ciao
+Stephan
