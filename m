@@ -1,49 +1,83 @@
 From: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-Subject: [PATCH v4 0/3] crypto: caam - add support for RSA algorithm
-Date: Fri, 29 Apr 2016 16:10:18 +0300
-Message-ID: <1461935421-31363-1-git-send-email-tudor-dan.ambarus@nxp.com>
+Subject: [PATCH v4 1/3] crypto: scatterwak - Add scatterwalk_sg_copychunks
+Date: Fri, 29 Apr 2016 16:10:19 +0300
+Message-ID: <1461935421-31363-2-git-send-email-tudor-dan.ambarus@nxp.com>
+References: <1461935421-31363-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>,
 	Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bbn0100.outbound.protection.outlook.com ([157.56.111.100]:23726
+Received: from mail-bn1on0055.outbound.protection.outlook.com ([157.56.110.55]:4165
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753247AbcD2NKa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Apr 2016 09:10:30 -0400
+	id S1753365AbcD2NKb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Apr 2016 09:10:31 -0400
+In-Reply-To: <1461935421-31363-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Depends on:
- http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg18724.html
+This patch adds the function scatterwalk_sg_copychunks which writes
+a chunk of data from a scatterwalk to another scatterwalk.
+It will be used by caam driver to remove the leading zeros
+for the output data of the RSA algorithm, after the computation completes.
 
-v3 parch set can be found here:
- http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg18429.html
+Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+---
+ crypto/scatterwalk.c         | 26 ++++++++++++++++++++++++++
+ include/crypto/scatterwalk.h |  2 ++
+ 2 files changed, 28 insertions(+)
 
-Changes to v3 patch set:
-- "crypto: caam - add support for RSA algorithm"
-     - update the driver to use the new ASN.1 parser.
-
-Tudor Ambarus (3):
-  crypto: scatterwak - Add scatterwalk_sg_copychunks
-  crypto: scatterwalk - export scatterwalk_pagedone
-  crypto: caam - add support for RSA algorithm
-
- crypto/scatterwalk.c           |  31 ++-
- drivers/crypto/caam/Kconfig    |  12 ++
- drivers/crypto/caam/Makefile   |   4 +
- drivers/crypto/caam/caampkc.c  | 470 +++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/caam/caampkc.h  |  84 ++++++++
- drivers/crypto/caam/desc.h     |   2 +
- drivers/crypto/caam/pdb.h      |  16 +-
- drivers/crypto/caam/pkc_desc.c | 138 ++++++++++++
- include/crypto/scatterwalk.h   |   4 +
- 9 files changed, 758 insertions(+), 3 deletions(-)
- create mode 100644 drivers/crypto/caam/caampkc.c
- create mode 100644 drivers/crypto/caam/caampkc.h
- create mode 100644 drivers/crypto/caam/pkc_desc.c
-
+diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
+index ea5815c..bc3222d 100644
+--- a/crypto/scatterwalk.c
++++ b/crypto/scatterwalk.c
+@@ -125,6 +125,32 @@ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
+ }
+ EXPORT_SYMBOL_GPL(scatterwalk_map_and_copy);
+ 
++void scatterwalk_sg_copychunks(struct scatter_walk *dest,
++			       struct scatter_walk *src, size_t nbytes)
++{
++	for (;;) {
++		unsigned int len_this_page = scatterwalk_pagelen(dest);
++		u8 *vaddr;
++
++		if (len_this_page > nbytes)
++			len_this_page = nbytes;
++
++		vaddr = scatterwalk_map(dest);
++		scatterwalk_copychunks(vaddr, src, len_this_page, 0);
++		scatterwalk_unmap(vaddr);
++
++		scatterwalk_advance(dest, len_this_page);
++
++		if (nbytes == len_this_page)
++			break;
++
++		nbytes -= len_this_page;
++
++		scatterwalk_pagedone(dest, 0, 1);
++	}
++}
++EXPORT_SYMBOL_GPL(scatterwalk_sg_copychunks);
++
+ int scatterwalk_bytes_sglen(struct scatterlist *sg, int num_bytes)
+ {
+ 	int offset = 0, n = 0;
+diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
+index 35f99b6..8b799c5 100644
+--- a/include/crypto/scatterwalk.h
++++ b/include/crypto/scatterwalk.h
+@@ -86,6 +86,8 @@ static inline void scatterwalk_unmap(void *vaddr)
+ void scatterwalk_start(struct scatter_walk *walk, struct scatterlist *sg);
+ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
+ 			    size_t nbytes, int out);
++void scatterwalk_sg_copychunks(struct scatter_walk *dest,
++			       struct scatter_walk *src, size_t nbytes);
+ void *scatterwalk_map(struct scatter_walk *walk);
+ void scatterwalk_done(struct scatter_walk *walk, int out, int more);
+ 
 -- 
 1.8.3.1
