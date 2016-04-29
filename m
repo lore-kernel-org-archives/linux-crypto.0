@@ -1,100 +1,162 @@
-From: "George Spelvin" <linux@horizon.com>
+From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: random(4) changes
-Date: 29 Apr 2016 14:02:48 -0400
-Message-ID: <20160429180248.1713.qmail@ns.horizon.com>
-References: <4191223.qhyOqInRhP@tauon.atsec.com>
+Date: Fri, 29 Apr 2016 20:41:38 +0200
+Message-ID: <1893537.hxFTUMSmqB@positron.chronox.de>
+References: <20160429180248.1713.qmail@ns.horizon.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org, sandyinchina@gmail.com, tytso@mit.edu
-To: linux@horizon.com, smueller@chronox.de
+To: George Spelvin <linux@horizon.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:20220 "HELO ns.horizon.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751065AbcD2SCu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Apr 2016 14:02:50 -0400
-In-Reply-To: <4191223.qhyOqInRhP@tauon.atsec.com>
+Received: from mail.eperm.de ([89.247.134.16]:54214 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751045AbcD2Slm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Apr 2016 14:41:42 -0400
+In-Reply-To: <20160429180248.1713.qmail@ns.horizon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
->> 1. It DOES depend on the attacker.  Any statement about independence
->>    depends on the available knowledge.
->> 2. XOR being entropy preserving depends on independence ONLY, it does
->>    NOT depend on identical distribution.  The latter is a red herring.
->>    (An English metaphor for "irrelevant distraction.")
->> 3. Precisely because the bits are not independent, XOR is not
->>    guaranteed to be entropy-preserving (your sense) on real data.
+Am Freitag, 29. April 2016, 14:02:48 schrieb George Spelvin:
 
-> It seems we talk past each other. Your entire explanation refers to
-> individual bits that come in sequentially where the attacker inbetween
-> can analyze it and potentially modify his attack. Sure, in this case
-> they are not independent and I am not claiming that.
+Hi George,
 
-You can analyze it in two equivalent ways:
+> >> 1. It DOES depend on the attacker.  Any statement about independence
+> >> 
+> >>    depends on the available knowledge.
+> >> 
+> >> 2. XOR being entropy preserving depends on independence ONLY, it does
+> >> 
+> >>    NOT depend on identical distribution.  The latter is a red herring.
+> >>    (An English metaphor for "irrelevant distraction.")
+> >> 
+> >> 3. Precisely because the bits are not independent, XOR is not
+> >> 
+> >>    guaranteed to be entropy-preserving (your sense) on real data.
+> > 
+> > It seems we talk past each other. Your entire explanation refers to
+> > individual bits that come in sequentially where the attacker inbetween
+> > can analyze it and potentially modify his attack. Sure, in this case
+> > they are not independent and I am not claiming that.
+> 
+> You can analyze it in two equivalent ways:
+> 
+> 1. The attacker knows all previous timestamps, and we are tring to
+>    quantify their uncertainty about the current timestamp word.
+> 
+>    In this case, some of the attacker's knowledge will be about
+>    correlations between the bits of that word.
+> 
+>    I think this is the easier way to think about the problem and
+>    the formulation I prefer.  Especially because of the structure
+>    of the work you do afterward, XORing those 32 bits.
+> 
+> 2. An attacker knows all previous *bits*, and is presented with, and
+>    tries to guess, the 32 bits of the timestamp one at a time.
+> 
+>    In this case, information gleaned from previously-seen bits which
+>    would be called correlations in option 1 get incorporated into the
+>    predicted distribution of the current bit.
+> 
+>    For measuring the source entropy, this is also a valid way to
+>    proceed.  It's like Shannon's early studies of the entropy of
+>    English by letting readers read the first half of a novel and then
+>    asking them to guess what follows, one letter at a time.
+> 
+>    I think this form is less convenient in general, and it's particularly
+>    annoying when subsequently computing the parity of a word, as it's
+>    hard to talk about cancellations due to non-independent bits.
+> 
+> Entropy (Shannon, Renyi, and min-) is additive, meaning that the two
+> different ways of measuring will produce the same result.
+> 
+> Either way, word or bit at a time, we are trying to quantify the *new*
+> additional entropy contributed by the current sample.  That means
+> we assume for the analysis of each sample that all previous samples
+> are known to the attacker.
+> 
+> > But one single time stamp is one value where the entire 32 bits are
+> > generated in an atomic fashion to any observer -- there is no sequential
+> > obtaining of its bits, analyzing it and then reacting on it.
+> 
+> I never suggested doing it any other way, although as I explained above
+> it's possible to do so.
+> 
+> I was only considering processing *words* sequentially.
+> 
+> Knowledge of the previous *words* affect the predicted distribution
+> of individual bits in the current word.
 
-1. The attacker knows all previous timestamps, and we are tring to
-   quantify their uncertainty about the current timestamp word.
+That is all correct what you write and I concur. But you still do not answer 
+the point I am making. You always in all your descriptions compare two or more 
+time stamps. And I always concured that they are dependent -- and XOR will do 
+whatever to the entropy.
 
-   In this case, some of the attacker's knowledge will be about
-   correlations between the bits of that word.
+What I am saying that the bits in one given time stamp are mutually 
+independent. I.e. bit 0 of one time stamp does not depend on bit 1 of that 
+very same time stamp.
 
-   I think this is the easier way to think about the problem and
-   the formulation I prefer.  Especially because of the structure
-   of the work you do afterward, XORing those 32 bits.
+I totally agree with you that bit 0 from time stamp 1 may tell you something 
+about bit 0 of time stamp 2. And therefore I am not considering multiple time 
+stamps for this first step.
 
-2. An attacker knows all previous *bits*, and is presented with, and
-   tries to guess, the 32 bits of the timestamp one at a time.
+Let me quote the definitions from SP800-90B:
 
-   In this case, information gleaned from previously-seen bits which
-   would be called correlations in option 1 get incorporated into the
-   predicted distribution of the current bit.
+IID: A sequence of random variables for which each element of the sequence has 
+the same probability distribution as the other values and all values are 
+mutually independent.
 
-   For measuring the source entropy, this is also a valid way to
-   proceed.  It's like Shannon's early studies of the entropy of
-   English by letting readers read the first half of a novel and then
-   asking them to guess what follows, one letter at a time.
+Independent: Two discrete random variables X and Y are (statistically) 
+independent if the probability that an observation of X will have a certain 
+value does not change, given knowledge of the value of an observation of Y 
+(and vice versa). When this is the case, the probability that the observed 
+values of X and Y will be x and y, respectively, is equal to the probability 
+that the observed value of X will be x (determined without regard for the 
+value of y) multiplied by the probability that the observed value of Y will be 
+y (determined without regard for the value of x).
 
-   I think this form is less convenient in general, and it's particularly
-   annoying when subsequently computing the parity of a word, as it's
-   hard to talk about cancellations due to non-independent bits.
 
-Entropy (Shannon, Renyi, and min-) is additive, meaning that the two
-different ways of measuring will produce the same result.
+All I am claiming and all I am saying is that the bits 0 through 31 in one 
+given time stamp are mutually indpendent. And thus the XOR of those 
+independent bits is appropriate.
 
-Either way, word or bit at a time, we are trying to quantify the *new*
-additional entropy contributed by the current sample.  That means
-we assume for the analysis of each sample that all previous samples
-are known to the attacker.
+> 
+> When woring word-at-a-time like this, we also have to consider
+> cross-correlations among the bits of a word.  The most general way to
 
-> But one single time stamp is one value where the entire 32 bits are generated 
-> in an atomic fashion to any observer -- there is no sequential obtaining of 
-> its bits, analyzing it and then reacting on it.
+Tell me where the correlations should be within one word. Where do you claim 
+they come from?
 
-I never suggested doing it any other way, although as I explained above
-it's possible to do so.
+> express it is a set of 2^32 probabilities for each of the 2^32 possible
+> values.  The awkwardness of this form is why it's sometimes useful to
+> think about smaller pieces.
+> 
+> For example, if p(9) = 0.5, p(10) = 0.5, and p(x) = 0 for all other x,
+> then we have 1 bit of entropy in the word.
+> 
+> We can analyze it bit a time, and proceed in oe of two ways:
+> 
+> - If we go lsbit first, then we have 1 bit of entropy in bit 0, but
+>   then zero entropy in bit 1.
+> - If we go msbit first, we have 1 bit of entropy in bit 1, but then
+>   zero entropy in bit 0.
 
-I was only considering processing *words* sequentially.
+This description makes no sense.
+> 
+> Either way, there's only 1 bit of entropy total because of the
+> correlation between the bits.  Once we have seen one of the bits, the
+> entropy of the second one collapses to 0.
 
-Knowledge of the previous *words* affect the predicted distribution
-of individual bits in the current word.
+Again, where does the correlation is supposed to come from?
+> 
+> And either way, we have 1 bit of entropy in the word, but 0 bits of entropy
+> in the parity of the word.
 
-When woring word-at-a-time like this, we also have to consider
-cross-correlations among the bits of a word.  The most general way to
-express it is a set of 2^32 probabilities for each of the 2^32 possible
-values.  The awkwardness of this form is why it's sometimes useful to
-think about smaller pieces.
 
-For example, if p(9) = 0.5, p(10) = 0.5, and p(x) = 0 for all other x,
-then we have 1 bit of entropy in the word.
 
-We can analyze it bit a time, and proceed in oe of two ways:
 
-- If we go lsbit first, then we have 1 bit of entropy in bit 0, but
-  then zero entropy in bit 1.
-- If we go msbit first, we have 1 bit of entropy in bit 1, but then
-  zero entropy in bit 0.
 
-Either way, there's only 1 bit of entropy total because of the
-correlation between the bits.  Once we have seen one of the bits, the
-entropy of the second one collapses to 0.
 
-And either way, we have 1 bit of entropy in the word, but 0 bits of entropy
-in the parity of the word.
+Ciao
+Stephan
