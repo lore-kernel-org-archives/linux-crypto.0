@@ -1,67 +1,65 @@
-From: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-Subject: [PATCH v4 2/3] crypto: scatterwalk - export scatterwalk_pagedone
-Date: Fri, 29 Apr 2016 16:10:20 +0300
-Message-ID: <1461935421-31363-3-git-send-email-tudor-dan.ambarus@nxp.com>
-References: <1461935421-31363-1-git-send-email-tudor-dan.ambarus@nxp.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>,
-	Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-To: <herbert@gondor.apana.org.au>
+From: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+Subject: [PATCH] crypto: vmx - comply with ABIs that specify vrsave as reserved.
+Date: Fri, 29 Apr 2016 11:03:05 -0300
+Message-ID: <1461938585-7933-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
+Cc: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
+	"Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org (open list:IBM Power VMX Cryptographic
+	instructions)
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0057.outbound.protection.outlook.com ([157.56.111.57]:56468
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753275AbcD2NKd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Apr 2016 09:10:33 -0400
-In-Reply-To: <1461935421-31363-1-git-send-email-tudor-dan.ambarus@nxp.com>
+Received: from e24smtp03.br.ibm.com ([32.104.18.24]:57868 "EHLO
+	e24smtp03.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753230AbcD2OMT (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Apr 2016 10:12:19 -0400
+Received: from localhost
+	by e24smtp03.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <pfsmorigo@linux.vnet.ibm.com>;
+	Fri, 29 Apr 2016 11:12:16 -0300
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Used in caam driver. Export the symbol since the caam driver
-can be built as a module.
+It gives significant improvements ( ~+15%) on some modes.
 
-Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+These code has been adopted from OpenSSL project in collaboration
+with the original author (Andy Polyakov <appro@openssl.org>).
 ---
- crypto/scatterwalk.c         | 5 +++--
- include/crypto/scatterwalk.h | 2 ++
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ drivers/crypto/vmx/ppc-xlate.pl | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
-index bc3222d..03d34f9 100644
---- a/crypto/scatterwalk.c
-+++ b/crypto/scatterwalk.c
-@@ -47,8 +47,8 @@ void *scatterwalk_map(struct scatter_walk *walk)
- }
- EXPORT_SYMBOL_GPL(scatterwalk_map);
+diff --git a/drivers/crypto/vmx/ppc-xlate.pl b/drivers/crypto/vmx/ppc-xlate.pl
+index b999733..9f4994c 100644
+--- a/drivers/crypto/vmx/ppc-xlate.pl
++++ b/drivers/crypto/vmx/ppc-xlate.pl
+@@ -139,6 +139,26 @@ my $vmr = sub {
+     "	vor	$vx,$vy,$vy";
+ };
  
--static void scatterwalk_pagedone(struct scatter_walk *walk, int out,
--				 unsigned int more)
-+void scatterwalk_pagedone(struct scatter_walk *walk, int out,
-+			  unsigned int more)
- {
- 	if (out) {
- 		struct page *page;
-@@ -69,6 +69,7 @@ static void scatterwalk_pagedone(struct scatter_walk *walk, int out,
- 			scatterwalk_start(walk, sg_next(walk->sg));
- 	}
- }
-+EXPORT_SYMBOL_GPL(scatterwalk_pagedone);
- 
- void scatterwalk_done(struct scatter_walk *walk, int out, int more)
- {
-diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index 8b799c5..6535a20 100644
---- a/include/crypto/scatterwalk.h
-+++ b/include/crypto/scatterwalk.h
-@@ -89,6 +89,8 @@ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
- void scatterwalk_sg_copychunks(struct scatter_walk *dest,
- 			       struct scatter_walk *src, size_t nbytes);
- void *scatterwalk_map(struct scatter_walk *walk);
-+void scatterwalk_pagedone(struct scatter_walk *walk, int out,
-+			  unsigned int more);
- void scatterwalk_done(struct scatter_walk *walk, int out, int more);
- 
- void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
++# Some ABIs specify vrsave, special-purpose register #256, as reserved
++# for system use.
++my $no_vrsave = ($flavour =~ /aix|linux64le/);
++my $mtspr = sub {
++    my ($f,$idx,$ra) = @_;
++    if ($idx == 256 && $no_vrsave) {
++	"	or	$ra,$ra,$ra";
++    } else {
++	"	mtspr	$idx,$ra";
++    }
++};
++my $mfspr = sub {
++    my ($f,$rd,$idx) = @_;
++    if ($idx == 256 && $no_vrsave) {
++	"	li	$rd,-1";
++    } else {
++	"	mfspr	$rd,$idx";
++    }
++};
++
+ # PowerISA 2.06 stuff
+ sub vsxmem_op {
+     my ($f, $vrt, $ra, $rb, $op) = @_;
 -- 
-1.8.3.1
+2.5.0
