@@ -1,7 +1,7 @@
 From: Peter Ujfalusi <peter.ujfalusi@ti.com>
-Subject: [PATCH] crypto: omap-aes: Use dma_request_chan() for requesting DMA channel
-Date: Fri, 29 Apr 2016 16:02:18 +0300
-Message-ID: <1461934938-28297-1-git-send-email-peter.ujfalusi@ti.com>
+Subject: [PATCH] crypto: omap-des: Use dma_request_chan() for requesting DMA channel
+Date: Fri, 29 Apr 2016 16:02:56 +0300
+Message-ID: <1461934976-28391-1-git-send-email-peter.ujfalusi@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
@@ -22,14 +22,14 @@ CC: Herbert Xu <herbert@gondor.apana.org.au>
 CC: David S. Miller <davem@davemloft.net>
 CC: Lokesh Vutla <lokeshvutla@ti.com>
 ---
- drivers/crypto/omap-aes.c | 62 ++++++++++++-----------------------------------
- 1 file changed, 16 insertions(+), 46 deletions(-)
+ drivers/crypto/omap-des.c | 68 ++++++++++++-----------------------------------
+ 1 file changed, 17 insertions(+), 51 deletions(-)
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index d420ec751c7c..ce174d3b842c 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -26,7 +26,6 @@
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index dd7b93f2f94c..1f48b6d0738c 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -29,7 +29,6 @@
  #include <linux/scatterlist.h>
  #include <linux/dma-mapping.h>
  #include <linux/dmaengine.h>
@@ -37,7 +37,7 @@ index d420ec751c7c..ce174d3b842c 100644
  #include <linux/pm_runtime.h>
  #include <linux/of.h>
  #include <linux/of_device.h>
-@@ -176,9 +175,7 @@ struct omap_aes_dev {
+@@ -158,9 +157,7 @@ struct omap_des_dev {
  
  	struct scatter_walk		in_walk;
  	struct scatter_walk		out_walk;
@@ -47,9 +47,9 @@ index d420ec751c7c..ce174d3b842c 100644
  	struct dma_chan		*dma_lch_out;
  	int			in_sg_len;
  	int			out_sg_len;
-@@ -351,30 +348,21 @@ static void omap_aes_dma_out_callback(void *data)
+@@ -340,30 +337,21 @@ static void omap_des_dma_out_callback(void *data)
  
- static int omap_aes_dma_init(struct omap_aes_dev *dd)
+ static int omap_des_dma_init(struct omap_des_dev *dd)
  {
 -	int err = -ENOMEM;
 -	dma_cap_mask_t mask;
@@ -85,7 +85,7 @@ index d420ec751c7c..ce174d3b842c 100644
  		goto err_dma_out;
  	}
  
-@@ -382,14 +370,15 @@ static int omap_aes_dma_init(struct omap_aes_dev *dd)
+@@ -371,14 +359,15 @@ static int omap_des_dma_init(struct omap_des_dev *dd)
  
  err_dma_out:
  	dma_release_channel(dd->dma_lch_in);
@@ -96,7 +96,7 @@ index d420ec751c7c..ce174d3b842c 100644
  	return err;
  }
  
- static void omap_aes_dma_cleanup(struct omap_aes_dev *dd)
+ static void omap_des_dma_cleanup(struct omap_des_dev *dd)
  {
 +	if (dd->pio_only)
 +		return;
@@ -104,20 +104,23 @@ index d420ec751c7c..ce174d3b842c 100644
  	dma_release_channel(dd->dma_lch_out);
  	dma_release_channel(dd->dma_lch_in);
  }
-@@ -1080,9 +1069,6 @@ static int omap_aes_get_res_of(struct omap_aes_dev *dd,
- 		goto err;
+@@ -999,8 +988,6 @@ static int omap_des_get_of(struct omap_des_dev *dd,
+ 		return -EINVAL;
  	}
  
 -	dd->dma_out = -1; /* Dummy value that's unused */
 -	dd->dma_in = -1; /* Dummy value that's unused */
--
  	dd->pdata = match->data;
  
- err:
-@@ -1116,24 +1102,6 @@ static int omap_aes_get_res_pdev(struct omap_aes_dev *dd,
- 	}
- 	memcpy(res, r, sizeof(*res));
- 
+ 	return 0;
+@@ -1016,33 +1003,10 @@ static int omap_des_get_of(struct omap_des_dev *dd,
+ static int omap_des_get_pdev(struct omap_des_dev *dd,
+ 		struct platform_device *pdev)
+ {
+-	struct device *dev = &pdev->dev;
+-	struct resource *r;
+-	int err = 0;
+-
 -	/* Get the DMA out channel */
 -	r = platform_get_resource(pdev, IORESOURCE_DMA, 0);
 -	if (!r) {
@@ -136,30 +139,36 @@ index d420ec751c7c..ce174d3b842c 100644
 -	}
 -	dd->dma_in = r->start;
 -
- 	/* Only OMAP2/3 can be non-DT */
- 	dd->pdata = &omap_aes_pdata_omap2;
+ 	/* non-DT devices get pdata from pdev */
+ 	dd->pdata = pdev->dev.platform_data;
  
-@@ -1191,7 +1159,9 @@ static int omap_aes_probe(struct platform_device *pdev)
- 	tasklet_init(&dd->done_task, omap_aes_done_task, (unsigned long)dd);
+-err:
+-	return err;
++	return 0;
+ }
  
- 	err = omap_aes_dma_init(dd);
--	if (err && AES_REG_IRQ_STATUS(dd) && AES_REG_IRQ_ENABLE(dd)) {
+ static int omap_des_probe(struct platform_device *pdev)
+@@ -1106,7 +1070,9 @@ static int omap_des_probe(struct platform_device *pdev)
+ 	tasklet_init(&dd->queue_task, omap_des_queue_task, (unsigned long)dd);
+ 
+ 	err = omap_des_dma_init(dd);
+-	if (err && DES_REG_IRQ_STATUS(dd) && DES_REG_IRQ_ENABLE(dd)) {
 +	if (err == -EPROBE_DEFER) {
 +		goto err_irq;
-+	} else if (err && AES_REG_IRQ_STATUS(dd) && AES_REG_IRQ_ENABLE(dd)) {
++	} else if (err && DES_REG_IRQ_STATUS(dd) && DES_REG_IRQ_ENABLE(dd)) {
  		dd->pio_only = 1;
  
  		irq = platform_get_irq(pdev, 0);
-@@ -1248,8 +1218,8 @@ err_algs:
+@@ -1150,8 +1116,8 @@ err_algs:
  		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--)
  			crypto_unregister_alg(
  					&dd->pdata->algs_info[i].algs_list[j]);
 -	if (!dd->pio_only)
--		omap_aes_dma_cleanup(dd);
+-		omap_des_dma_cleanup(dd);
 +
-+	omap_aes_dma_cleanup(dd);
++	omap_des_dma_cleanup(dd);
  err_irq:
  	tasklet_kill(&dd->done_task);
- 	pm_runtime_disable(dev);
+ 	tasklet_kill(&dd->queue_task);
 -- 
 2.8.1
