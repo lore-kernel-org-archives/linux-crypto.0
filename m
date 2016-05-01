@@ -1,50 +1,59 @@
-From: Julia Lawall <Julia.Lawall@lip6.fr>
-Subject: [PATCH] crypto: constify ccp_actions structure
-Date: Sun,  1 May 2016 13:52:55 +0200
-Message-ID: <1462103575-21705-1-git-send-email-Julia.Lawall@lip6.fr>
-Cc: kernel-janitors@vger.kernel.org, Gary Hook <gary.hook@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Gadre Nayan <gadrenayan@gmail.com>
+Subject: Crypto hash function decryption
+Date: Sun, 1 May 2016 18:35:51 +0530
+Message-ID: <CAKJ7aR4t_7fhRuFDX0xMPRSCxEAvL4Wn0mjXRy_4-WA9T5xRDA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ig0-f178.google.com ([209.85.213.178]:35863 "EHLO
+	mail-ig0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751086AbcEANFw (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 1 May 2016 09:05:52 -0400
+Received: by mail-ig0-f178.google.com with SMTP id u10so63109343igr.1
+        for <linux-crypto@vger.kernel.org>; Sun, 01 May 2016 06:05:51 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The ccp_actions structure is never modified, so declare it as const.
+Hi,
 
-Done with the help of Coccinelle.
+I wanted to implement a simple encryption decryption of data in kernel
+space to start with the kernel crypto library.
 
-Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+I have the following:
 
----
- drivers/crypto/ccp/ccp-dev-v3.c |    2 +-
- drivers/crypto/ccp/ccp-dev.h    |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+int myFunction() {
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index 597fc50..d7a7103 100644
---- a/drivers/crypto/ccp/ccp-dev-v3.c
-+++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -526,7 +526,7 @@ static irqreturn_t ccp_irq_handler(int irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
--static struct ccp_actions ccp3_actions = {
-+static const struct ccp_actions ccp3_actions = {
- 	.perform_aes = ccp_perform_aes,
- 	.perform_xts_aes = ccp_perform_xts_aes,
- 	.perform_sha = ccp_perform_sha,
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index 5d986c9..bd41ffce 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -162,7 +162,7 @@ struct ccp_actions {
- /* Structure to hold CCP version-specific values */
- struct ccp_vdata {
- 	unsigned int version;
--	struct ccp_actions *perform;
-+	const struct ccp_actions *perform;
- };
- 
- extern struct ccp_vdata ccpv3;
+        struct scatterlist sg;
+        struct crypto_hash *tfm;
+        struct hash_desc desc;
+        unsigned char input[21];
+
+        pr_err("Starting Crypto hash function\n");
+        strcpy(input, "12345678901234567890");
+
+        tfm = crypto_alloc_hash("sha1", 0, CRYPTO_ALG_ASYNC);
+
+        desc.tfm = tfm;
+        desc.flags = 0;
+
+        sg_init_one(&sg, input, 21);
+        crypto_hash_init(&desc);
+
+        crypto_hash_update(&desc, &sg, 10);
+        crypto_hash_final(&desc, dataptr);
+
+        crypto_free_hash(tfm);
+        pr_err("Encryption done\nip: %s\nop: %s\n", input, dataptr);
+
+
+        return 0;
+}
+
+So I can get this function to encrypt the data. I wanted to know how I
+can decrypt this data (dataptr) back to my original string "123....".
+
+What api's should I use.
+
+THanks.
