@@ -1,59 +1,58 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: skcipher
-Date: Mon, 02 May 2016 07:51:21 +0200
-Message-ID: <1544687.NtFoiUyCFs@tauon.atsec.com>
-References: <CAKJ7aR5-GbkuFPQkw7DdKJLCKV48LzRY-WUeTeayZkK_h7cTUQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Gadre Nayan <gadrenayan@gmail.com>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: [RFC PATCH 0/3] random: replace urandom pool with a CRNG
+Date: Mon,  2 May 2016 02:26:50 -0400
+Message-ID: <1462170413-7164-1-git-send-email-tytso@mit.edu>
+Cc: smueller@chronox.de, herbert@gondor.apana.org.au,
+	andi@firstfloor.org, sandyinchina@gmail.com,
+	cryptography@lakedaemon.net, jsd@av8n.com, hpa@zytor.com,
+	linux-crypto@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:54392 "EHLO mail.eperm.de"
+Received: from imap.thunk.org ([74.207.234.97]:34734 "EHLO imap.thunk.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750851AbcEBFvZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 May 2016 01:51:25 -0400
-In-Reply-To: <CAKJ7aR5-GbkuFPQkw7DdKJLCKV48LzRY-WUeTeayZkK_h7cTUQ@mail.gmail.com>
+	id S1752642AbcEBG1P (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 2 May 2016 02:27:15 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 2. Mai 2016, 11:14:01 schrieb Gadre Nayan:
+Everyone is consing up their own random patches, so this is my set.  :-)
 
-Hi Gadre,
+By using a CRNG to replace the urandom pool, we address a number of
+complaints which Stephan Mueller has been concerned about.  We now use
+a much more aggressive interrupt sampling system to quickly initialize
+a CRNG which gets used in place of the original non-blocking pool.
+This tends to get initialized *very* quickly (before the devices are
+finished being proved.)  Like Stephan's proposal this assumes that we
+can get a bit of entropy per interrupt, which may be problematic on
+some architectures.  So after we do this quick-and-dirty
+initialization, we then fall back to the slower, more conservative
+interrupt sampling system to fill the input pool, and we will do a
+catastrophic reseeding once we get 128 bits using the slower but more
+conservative system, and every five minutes afterwards, if possible.
 
-> Hello,
-> 
-> I have read the crypto library documentation on chronox.de.
-> 
-> I used there sample code for symmetric key cipher operation.
-> However in the check:
-> 
-> skcipher = crypto_alloc_skcipher("cbc-aes-aesni", 0, 0);
-> if (IS_ERR(skcipher)) {
-> pr_info("could not allocate skcipher handle\n");
-> return PTR_ERR(skcipher);
-> }
-> 
-> I get could not allocate skcipher handle.
-> 
-> I have loaded all possible related modules for crypto:
-> lsmod (relevant):
-> algif_skcipher         32768  0
-> algif_hash             20480  0
-> algif_aead             20480  0
-> af_alg                 24576  3 algif_aead,algif_hash,algif_skcipher
-> cryptd
-> ablk_helper.
-> 
-> What am I missing here?
-> 
-> Also IS_ERR checks if the skcipher value may be <1000, it may include
-> the NULL check right?.
+In addition, on NUMA systems we make the CRNG state per-NUMA socket,
+to address the NUMA locking contention problem which Andi Kleen has
+been complaining about.  I'm not entirely sure this will work on the
+crazy big SGI systems, but they are rare.  Whether they are rarer than
+abusive userspace programs that are continuously pounding /dev/urandom
+is unclear.  If necessary we can make a config option to turn off the
+per-NUMA socket hack if it proves to be problematic.
 
-The allocation of the cipher failed. Please check /proc/crypto whether you 
-have the cipher registered with the kernel crypto API.
+Stephan Mueller (1):
+  random: add interrupt callback to VMBus IRQ handler
 
-The module listing does not show the AESNI cipher module.
+Theodore Ts'o (2):
+  random: replace non-blocking pool with a Chacha20-based CRNG
+  random: make /dev/urandom scalable for silly userspace programs
 
-Ciao
-Stephan
+ crypto/chacha20_generic.c |  61 ---------
+ drivers/char/random.c     | 340 ++++++++++++++++++++++++++++++++++++----------
+ drivers/hv/vmbus_drv.c    |   3 +
+ include/crypto/chacha20.h |   1 +
+ lib/Makefile              |   2 +-
+ lib/chacha20.c            |  79 +++++++++++
+ 6 files changed, 355 insertions(+), 131 deletions(-)
+ create mode 100644 lib/chacha20.c
+
+-- 
+2.5.0
