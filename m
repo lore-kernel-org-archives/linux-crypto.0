@@ -1,80 +1,48 @@
-From: <gregkh@linuxfoundation.org>
-Subject: Patch "crypto: gcm - Fix rfc4543 decryption crash" has been added to the 3.14-stable tree
-Date: Sun, 01 May 2016 15:59:15 -0700
-Message-ID: <146214355584167@kroah.com>
-References: <20160318144240.GA20816@gondor.apana.org.au>
+From: Gadre Nayan <gadrenayan@gmail.com>
+Subject: skcipher
+Date: Mon, 2 May 2016 11:14:01 +0530
+Message-ID: <CAKJ7aR5-GbkuFPQkw7DdKJLCKV48LzRY-WUeTeayZkK_h7cTUQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ANSI_X3.4-1968
-Content-Transfer-Encoding: 8bit
-Cc: <stable@vger.kernel.org>, <stable-commits@vger.kernel.org>
-To: herbert@gondor.apana.org.au, gregkh@linuxfoundation.org,
-	jussi.kivilinna@iki.fi, linux-crypto@vger.kernel.org,
-	patrick.meyer@vasgard.com
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20160318144240.GA20816@gondor.apana.org.au>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-io0-f176.google.com ([209.85.223.176]:35740 "EHLO
+	mail-io0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751072AbcEBFoD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 2 May 2016 01:44:03 -0400
+Received: by mail-io0-f176.google.com with SMTP id d62so159236996iof.2
+        for <linux-crypto@vger.kernel.org>; Sun, 01 May 2016 22:44:02 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+Hello,
 
-This is a note to let you know that I've just added the patch titled
+I have read the crypto library documentation on chronox.de.
 
-    crypto: gcm - Fix rfc4543 decryption crash
+I used there sample code for symmetric key cipher operation.
+However in the check:
 
-to the 3.14-stable tree which can be found at:
-    http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
+skcipher = crypto_alloc_skcipher("cbc-aes-aesni", 0, 0);
+if (IS_ERR(skcipher)) {
+pr_info("could not allocate skcipher handle\n");
+return PTR_ERR(skcipher);
+}
 
-The filename of the patch is:
-     crypto-gcm-fix-rfc4543-decryption-crash.patch
-and it can be found in the queue-3.14 subdirectory.
+I get could not allocate skcipher handle.
 
-If you, or anyone else, feels it should not be added to the stable tree,
-please let <stable@vger.kernel.org> know about it.
+I have loaded all possible related modules for crypto:
+lsmod (relevant):
+algif_skcipher         32768  0
+algif_hash             20480  0
+algif_aead             20480  0
+af_alg                 24576  3 algif_aead,algif_hash,algif_skcipher
+cryptd
+ablk_helper.
 
+What am I missing here?
 
->From herbert@gondor.apana.org.au  Sun May  1 15:39:20 2016
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Fri, 18 Mar 2016 22:42:40 +0800
-Subject: crypto: gcm - Fix rfc4543 decryption crash
-To: stable@vger.kernel.org, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Jussi Kivilinna <jussi.kivilinna@iki.fi>, patrick.meyer@vasgard.com
-Message-ID: <20160318144240.GA20816@gondor.apana.org.au>
-Content-Disposition: inline
+Also IS_ERR checks if the skcipher value may be <1000, it may include
+the NULL check right?.
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-
-This bug has already bee fixed upstream since 4.2.  However, it
-was fixed during the AEAD conversion so no fix was backported to
-the older kernels.
-
-When we do an RFC 4543 decryption, we will end up writing the
-ICV beyond the end of the dst buffer.  This should lead to a
-crash but for some reason it was never noticed.
-
-This patch fixes it by only writing back the ICV for encryption.
-
-Fixes: d733ac90f9fe ("crypto: gcm - fix rfc4543 to handle async...")
-Reported-by: Patrick Meyer <patrick.meyer@vasgard.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
----
- crypto/gcm.c |    3 +++
- 1 file changed, 3 insertions(+)
-
---- a/crypto/gcm.c
-+++ b/crypto/gcm.c
-@@ -1173,6 +1173,9 @@ static struct aead_request *crypto_rfc45
- 	aead_request_set_tfm(subreq, ctx->child);
- 	aead_request_set_callback(subreq, req->base.flags, crypto_rfc4543_done,
- 				  req);
-+	if (!enc)
-+		aead_request_set_callback(subreq, req->base.flags,
-+					  req->base.complete, req->base.data);
- 	aead_request_set_crypt(subreq, cipher, cipher, enc ? 0 : authsize, iv);
- 	aead_request_set_assoc(subreq, assoc, assoclen);
- 
-
-
-Patches currently in stable-queue which might be from herbert@gondor.apana.org.au are
-
-queue-3.14/crypto-gcm-fix-rfc4543-decryption-crash.patch
-queue-3.14/crypto-ccp-prevent-information-leakage-on-export.patch
+Thanks.
