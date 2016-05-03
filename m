@@ -1,7 +1,7 @@
-From: tytso@mit.edu
+From: "Austin S. Hemmelgarn" <ahferroin7@gmail.com>
 Subject: Re: [RFC][PATCH 0/6] /dev/random - a new approach
-Date: Tue, 3 May 2016 14:48:24 +0000
-Message-ID: <20160503144824.GB11832@thunk.org>
+Date: Tue, 3 May 2016 11:01:14 -0400
+Message-ID: <c2c67db6-8111-4304-03cd-25d479536d8e@gmail.com>
 References: <9192755.iDgo3Omyqe@positron.chronox.de>
  <1499137.D4Mft7n8bh@tauon.atsec.com>
  <CAJU7zaJOSXefQkGb9H-uFr=Rxv16Gk=vYm60mOztS4uG=S0JcA@mail.gmail.com>
@@ -10,49 +10,45 @@ References: <9192755.iDgo3Omyqe@positron.chronox.de>
  <20160426011137.GC28496@thunk.org>
  <CAJU7zaKTjb9QhYP6eVyri0b9Ow_GRpqT5HgOVpNMhaEDrVA4gA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Stephan Mueller <smueller@chronox.de>,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+To: Nikos Mavrogiannopoulos <nmav@gnutls.org>,
+	Theodore Ts'o <tytso@mit.edu>,
+	Stephan Mueller <smueller@chronox.de>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Sandy Harris <sandyinchina@gmail.com>
-To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
 In-Reply-To: <CAJU7zaKTjb9QhYP6eVyri0b9Ow_GRpqT5HgOVpNMhaEDrVA4gA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, May 03, 2016 at 03:57:15PM +0200, Nikos Mavrogiannopoulos wrote:
-> 
+On 2016-05-03 09:57, Nikos Mavrogiannopoulos wrote:
+> On Tue, Apr 26, 2016 at 3:11 AM, Theodore Ts'o <tytso@mit.edu> wrote:
+>> On Mon, Apr 25, 2016 at 10:23:51AM +0200, Nikos Mavrogiannopoulos wrote:
+>>> That's far from a solution and I wouldn't recommend to anyone doing
+>>> that. We cannot expect each and every program to do glibc's job. The
+>>> purpose of a system call like getrandom is to simplify the complex use
+>>> of /dev/urandom and eliminate it, not to make code handling randomness
+>>> in applications even worse.
+>> Yes, but if glibc is falling down on the job and refusing to export
+>> the system call (I think for political reasons; it's a Linux-only
+>> interface, so Hurd wouldn't have it),
+>
 > I believe their main concern is that they want to protect applications
 > which do not check error codes of system calls, when running on a
 > kernel which does not provide getrandom().  That way, they have an
 > almost impossible task to simulate getrandom() on kernel which do not
 > support it.
+If it had an existing call, then I could reasonably understand this. 
+They have no existing wrapper for it, so this really is just BS.  If an 
+application isn't checking error codes, then either:
+1. They are intentionally ignoring error codes.
+2. It's a bug in the application that needs to be fixed.
 
-The whole *point* of creating the getrandom(2) system call is that it
-can't be simulated/emulated in userspace.  If it can be, then there's
-no reason why the system call should exist.  This is one of the
-reasons why haven't implemented mysql or TLS inside the kernel.   :-)
-
-So if their standard is "we need to simulate getrandom(2) on a kernel
-which does not have it", we'll **never** see glibc support for it.  By
-definition, this is *impossible*.
-
-What they can do is do something which is as good as you can get for
-someone who is open-coding /dev/urandom support in userspace.  That
-means that you won't be able to (a) tell if the urandom pool is has
-been adequately initialized right after boot, (b) you will need to
-somehow deal with the case where the file descriptors have been
-exhausted, (c) or if you are running in a chroot where the system
-administrator didn't bother to include /dev/urandom.  About the best
-you can do is call abort(0), or if you want, you can let the
-application author specify some kind of "I want to run in insecure
-mode", via some magic glibc setting.  You could probably default this
-to "true" without a huge net reduction of security, because most
-application authors weren't getting this right anyway.  And then ones
-who do care, can set some kind of flag saying, "I promise to check the
-error return from getrandom(2) as implemented by glibc".
-
-     	     	  	       	  	      	 - Ted
+The fact that they feel they need to support poorly coded applications 
+in _new_ system call wrappers is itself somewhat disturbing.  There are 
+no existing applications using this function in glibc because it doesn't 
+exist in glibc, which means they can't claim legacy support and 
+therefore they want to actively enable people to write stupid programs.
