@@ -1,380 +1,705 @@
-From: kbuild test robot <fengguang.wu@intel.com>
-Subject: [cryptodev:master 56/77] ccp-dmaengine.c:undefined reference to
- `dma_async_tx_descriptor_init'
-Date: Tue, 3 May 2016 18:54:46 +0800
-Message-ID: <201605031844.IEHCbLGJ%fengguang.wu@intel.com>
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="NzB8fVQJ5HfG6fxh"
-Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Gary R Hook <gary.hook@amd.com>
-To: unlisted-recipients:; (no To-header on input)
+From: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Subject: [PATCH 1/3] crypto: Key-agreement Protocol Primitives API (KPP)
+Date: Tue,  3 May 2016 12:44:01 +0100
+Message-ID: <1462275843-19926-2-git-send-email-salvatore.benedetto@intel.com>
+References: <1462275843-19926-1-git-send-email-salvatore.benedetto@intel.com>
+Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:33141 "EHLO mga09.intel.com"
+Received: from mga04.intel.com ([192.55.52.120]:37370 "EHLO mga04.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932545AbcECK4w (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 May 2016 06:56:52 -0400
-Content-Disposition: inline
+	id S932269AbcECLo6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 May 2016 07:44:58 -0400
+In-Reply-To: <1462275843-19926-1-git-send-email-salvatore.benedetto@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Add key-agreement protocol primitives (kpp) API which allows to
+implement primitives required by protocols such as DH and ECDH.
+The API is composed mainly by the following functions
+ * set_params() - It allows the user to set the parameters known to
+   both parties involved in the key-agreement session
+ * set_secret() - It allows the user to set his secret, also
+   referred to as his private key
+ * generate_public_key() - It generates the public key to be sent to
+   the other counterpart involved in the key-agreement session. The
+   function has to be called after set_params() and set_secret()
+ * generate_secret() - It generates the shared secret for the session
 
---NzB8fVQJ5HfG6fxh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Other functions such as init() and exit() are provided for allowing
+cryptographic hardware to be inizialized properly before use
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-head:   bc197b2a9c7e0129fa0ec1961881e2a0b3bef967
-commit: 58ea8abf490415c390e0cc671e875510c9b66318 [56/77] crypto: ccp - Register the CCP as a DMA resource
-config: x86_64-randconfig-s4-05031628 (attached as .config)
-compiler: gcc-5 (Debian 5.3.1-14) 5.3.1 20160409
-reproduce:
-        git checkout 58ea8abf490415c390e0cc671e875510c9b66318
-        # save the attached .config to linux build tree
-        make ARCH=x86_64 
-
-Note: the cryptodev/master HEAD bc197b2a9c7e0129fa0ec1961881e2a0b3bef967 builds fine.
-      It only hurts bisectibility.
-
-All errors (new ones prefixed by >>):
-
+Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+ crypto/Kconfig                  |  10 ++
+ crypto/Makefile                 |   1 +
+ crypto/crypto_user.c            |  20 +++
+ crypto/kpp.c                    | 123 +++++++++++++++
+ include/crypto/internal/kpp.h   |  64 ++++++++
+ include/crypto/kpp.h            | 333 ++++++++++++++++++++++++++++++++++++++++
+ include/linux/crypto.h          |   1 +
+ include/uapi/linux/cryptouser.h |   5 +
+ 8 files changed, 557 insertions(+)
+ create mode 100644 crypto/kpp.c
+ create mode 100644 include/crypto/internal/kpp.h
+ create mode 100644 include/crypto/kpp.h
 
---NzB8fVQJ5HfG6fxh
-Content-Type: application/octet-stream
-Content-Disposition: attachment; filename=".config.gz"
-Content-Transfer-Encoding: base64
-
-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
-
---NzB8fVQJ5HfG6fxh--
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 93a1fdc..31bf962 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -93,6 +93,15 @@ config CRYPTO_AKCIPHER
+ 	select CRYPTO_AKCIPHER2
+ 	select CRYPTO_ALGAPI
+ 
++config CRYPTO_KPP2
++	tristate
++	select CRYPTO_ALGAPI2
++
++config CRYPTO_KPP
++	tristate
++	select CRYPTO_ALGAPI
++	select CRYPTO_KPP2
++
+ config CRYPTO_RSA
+ 	tristate "RSA algorithm"
+ 	select CRYPTO_AKCIPHER
+@@ -114,6 +123,7 @@ config CRYPTO_MANAGER2
+ 	select CRYPTO_HASH2
+ 	select CRYPTO_BLKCIPHER2
+ 	select CRYPTO_AKCIPHER2
++	select CRYPTO_KPP2
+ 
+ config CRYPTO_USER
+ 	tristate "Userspace cryptographic algorithm configuration"
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 4f4ef7e..5b60890 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -30,6 +30,7 @@ crypto_hash-y += shash.o
+ obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
+ 
+ obj-$(CONFIG_CRYPTO_AKCIPHER2) += akcipher.o
++obj-$(CONFIG_CRYPTO_KPP2) += kpp.o
+ 
+ $(obj)/rsapubkey-asn1.o: $(obj)/rsapubkey-asn1.c $(obj)/rsapubkey-asn1.h
+ $(obj)/rsaprivkey-asn1.o: $(obj)/rsaprivkey-asn1.c $(obj)/rsaprivkey-asn1.h
+diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
+index 43fe85f..d28513fb 100644
+--- a/crypto/crypto_user.c
++++ b/crypto/crypto_user.c
+@@ -28,6 +28,7 @@
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/internal/rng.h>
+ #include <crypto/akcipher.h>
++#include <crypto/kpp.h>
+ 
+ #include "internal.h"
+ 
+@@ -126,6 +127,21 @@ nla_put_failure:
+ 	return -EMSGSIZE;
+ }
+ 
++static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
++{
++	struct crypto_report_kpp rkpp;
++
++	strncpy(rkpp.type, "kpp", sizeof(rkpp.type));
++
++	if (nla_put(skb, CRYPTOCFGA_REPORT_KPP,
++		    sizeof(struct crypto_report_kpp), &rkpp))
++		goto nla_put_failure;
++	return 0;
++
++nla_put_failure:
++	return -EMSGSIZE;
++}
++
+ static int crypto_report_one(struct crypto_alg *alg,
+ 			     struct crypto_user_alg *ualg, struct sk_buff *skb)
+ {
+@@ -176,6 +192,10 @@ static int crypto_report_one(struct crypto_alg *alg,
+ 			goto nla_put_failure;
+ 
+ 		break;
++	case CRYPTO_ALG_TYPE_KPP:
++		if (crypto_report_kpp(skb, alg))
++			goto nla_put_failure;
++		break;
+ 	}
+ 
+ out:
+diff --git a/crypto/kpp.c b/crypto/kpp.c
+new file mode 100644
+index 0000000..d36ce05
+--- /dev/null
++++ b/crypto/kpp.c
+@@ -0,0 +1,123 @@
++/*
++ * Key-agreement Protocol Primitives (KPP)
++ *
++ * Copyright (c) 2016, Intel Corporation
++ * Authors: Salvatore Benedetto <salvatore.benedetto@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++#include <linux/errno.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/seq_file.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/crypto.h>
++#include <crypto/algapi.h>
++#include <linux/cryptouser.h>
++#include <net/netlink.h>
++#include <crypto/kpp.h>
++#include <crypto/internal/kpp.h>
++#include "internal.h"
++
++#ifdef CONFIG_NET
++static int crypto_kpp_report(struct sk_buff *skb, struct crypto_alg *alg)
++{
++	struct crypto_report_kpp rkpp;
++
++	strncpy(rkpp.type, "kpp", sizeof(rkpp.type));
++
++	if (nla_put(skb, CRYPTOCFGA_REPORT_KPP,
++		    sizeof(struct crypto_report_kpp), &rkpp))
++		goto nla_put_failure;
++	return 0;
++
++nla_put_failure:
++	return -EMSGSIZE;
++}
++#else
++static int crypto_kpp_report(struct sk_buff *skb, struct crypto_alg *alg)
++{
++	return -ENOSYS;
++}
++#endif
++
++static void crypto_kpp_show(struct seq_file *m, struct crypto_alg *alg)
++	__attribute__ ((unused));
++
++static void crypto_kpp_show(struct seq_file *m, struct crypto_alg *alg)
++{
++	seq_puts(m, "type         : kpp\n");
++}
++
++static void crypto_kpp_exit_tfm(struct crypto_tfm *tfm)
++{
++	struct crypto_kpp *kpp = __crypto_kpp_tfm(tfm);
++	struct kpp_alg *alg = crypto_kpp_alg(kpp);
++
++	alg->exit(kpp);
++}
++
++static int crypto_kpp_init_tfm(struct crypto_tfm *tfm)
++{
++	struct crypto_kpp *kpp = __crypto_kpp_tfm(tfm);
++	struct kpp_alg *alg = crypto_kpp_alg(kpp);
++
++	if (alg->exit)
++		kpp->base.exit = crypto_kpp_exit_tfm;
++
++	if (alg->init)
++		return alg->init(kpp);
++
++	return 0;
++}
++
++static const struct crypto_type crypto_kpp_type = {
++	.extsize = crypto_alg_extsize,
++	.init_tfm = crypto_kpp_init_tfm,
++#ifdef CONFIG_PROC_FS
++	.show = crypto_kpp_show,
++#endif
++	.report = crypto_kpp_report,
++	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
++	.maskset = CRYPTO_ALG_TYPE_MASK,
++	.type = CRYPTO_ALG_TYPE_KPP,
++	.tfmsize = offsetof(struct crypto_kpp, base),
++};
++
++struct crypto_kpp *crypto_alloc_kpp(const char *alg_name, u32 type, u32 mask)
++{
++	return crypto_alloc_tfm(alg_name, &crypto_kpp_type, type, mask);
++}
++EXPORT_SYMBOL_GPL(crypto_alloc_kpp);
++
++static void kpp_prepare_alg(struct kpp_alg *alg)
++{
++	struct crypto_alg *base = &alg->base;
++
++	base->cra_type = &crypto_kpp_type;
++	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
++	base->cra_flags |= CRYPTO_ALG_TYPE_KPP;
++}
++
++int crypto_register_kpp(struct kpp_alg *alg)
++{
++	struct crypto_alg *base = &alg->base;
++
++	kpp_prepare_alg(alg);
++	return crypto_register_alg(base);
++}
++EXPORT_SYMBOL_GPL(crypto_register_kpp);
++
++void crypto_unregister_kpp(struct kpp_alg *alg)
++{
++	crypto_unregister_alg(&alg->base);
++}
++EXPORT_SYMBOL_GPL(crypto_unregister_kpp);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Key-agreement Protocol Primitives");
+diff --git a/include/crypto/internal/kpp.h b/include/crypto/internal/kpp.h
+new file mode 100644
+index 0000000..ad3acf3
+--- /dev/null
++++ b/include/crypto/internal/kpp.h
+@@ -0,0 +1,64 @@
++/*
++ * Key-agreement Protocol Primitives (KPP)
++ *
++ * Copyright (c) 2016, Intel Corporation
++ * Authors: Salvatore Benedetto <salvatore.benedetto@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++#ifndef _CRYPTO_KPP_INT_H
++#define _CRYPTO_KPP_INT_H
++#include <crypto/kpp.h>
++#include <crypto/algapi.h>
++
++/*
++ * Transform internal helpers.
++ */
++static inline void *kpp_request_ctx(struct kpp_request *req)
++{
++	return req->__ctx;
++}
++
++static inline void *kpp_tfm_ctx(struct crypto_kpp *tfm)
++{
++	return tfm->base.__crt_ctx;
++}
++
++static inline void kpp_request_complete(struct kpp_request *req, int err)
++{
++	req->base.complete(&req->base, err);
++}
++
++static inline const char *kpp_alg_name(struct crypto_kpp *tfm)
++{
++	return crypto_kpp_tfm(tfm)->__crt_alg->cra_name;
++}
++
++/**
++ * crypto_register_kpp() -- Register key-agreement protocol primitives algorithm
++ *
++ * Function registers an implementation of a key-agreement protocol primitive
++ * algorithm
++ *
++ * @alg:	algorithm definition
++ *
++ * Return: zero on success; error code in case of error
++ */
++int crypto_register_kpp(struct kpp_alg *alg);
++
++/**
++ * crypto_unregister_kpp() -- Unregister key-agreement protocol primitive
++ * algorithm
++ *
++ * Function unregisters an implementation of a key-agreement protocol primitive
++ * algorithm
++ *
++ * @alg:	algorithm definition
++ */
++void crypto_unregister_kpp(struct kpp_alg *alg);
++
++#endif
+diff --git a/include/crypto/kpp.h b/include/crypto/kpp.h
+new file mode 100644
+index 0000000..8eb14a6
+--- /dev/null
++++ b/include/crypto/kpp.h
+@@ -0,0 +1,333 @@
++/*
++ * Key-agreement Protocol Primitives (KPP)
++ *
++ * Copyright (c) 2016, Intel Corporation
++ * Authors: Salvatore Benedetto <salvatore.benedetto@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++
++#ifndef _CRYPTO_KPP_
++#define _CRYPTO_KPP_
++#include <linux/crypto.h>
++
++/**
++ * struct kpp_request
++ *
++ * @base:	Common attributes for async crypto requests
++ * @src:	Source data
++ * @dst:	Destination data
++ * @src_len:	Size of the input buffer
++ * @dst_len:	Size of the output buffer. It needs to be at least
++ *		as big as the expected result depending	on the operation
++ *		After operation it will be updated with the actual size of the
++ *		result. In case of error where the dst sgl size was insufficient,
++ *		it will be updated to the size required for the operation.
++ * @__ctx:	Start of private context data
++ */
++struct kpp_request {
++	struct crypto_async_request base;
++	struct scatterlist *src;
++	struct scatterlist *dst;
++	unsigned int src_len;
++	unsigned int dst_len;
++	void *__ctx[] CRYPTO_MINALIGN_ATTR;
++};
++
++/**
++ * struct crypto_kpp - user-instantiated object which encapsulate
++ * algorithms and core processing logic
++ *
++ * @base:	Common crypto API algorithm data structure
++ */
++struct crypto_kpp {
++	struct crypto_tfm base;
++};
++
++/**
++ * struct kpp_alg - generic key-agreement protocol primitives
++ *
++ * @set_params:		Function invokes the protocol specific function
++ *			which knows how to decode and interpret the buffer
++ * @set_secret:		Function invokes the protocol specific function to
++ *			store the secret private key. The implementation knows
++ *			how to decode the buffer
++ * @generate_public_key: Function generate the public key to be sent to the
++ *			counterpart. In case of error, where output is not big
++ *			enough req->dst_len will be updated to the size
++ *			required
++ * @compute_shared_secret: Function compute the shared secret as defined by
++ *			the algorithm. The result is given back to the user.
++ *			In case of error, where output is not big enough,
++ *			req->dst_len will be updated to the size required
++ * @max_size:		Function returns the size of the output buffer
++ * @init:		Initialize the object. This is called only once at
++ *			instantiation time. In case the cryptographic hardware
++ *			needs to be initialized. Software fallback should be
++ *			put in place here.
++ * @exit:		Undo everything @init did.
++ *
++ * @reqsize:		Request context size required by algorithm
++ *			implementation
++ * @base		Common crypto API algorithm data structure
++ */
++struct kpp_alg {
++	int (*set_params)(struct crypto_kpp *tfm, void *buffer,
++			  unsigned int len);
++	int (*set_secret)(struct crypto_kpp *tfm, void *buffer,
++			  unsigned int len);
++	int (*generate_public_key)(struct kpp_request *req);
++	int (*compute_shared_secret)(struct kpp_request *req);
++
++	int (*max_size)(struct crypto_kpp *tfm);
++
++	int (*init)(struct crypto_kpp *tfm);
++	void (*exit)(struct crypto_kpp *tfm);
++
++	unsigned int reqsize;
++	struct crypto_alg base;
++};
++
++/**
++ * DOC: Generic Key-agreement Protocol Primitevs API
++ *
++ * The KPP API is used with the algorithm type
++ * CRYPTO_ALG_TYPE_KPP (listed as type "kpp" in /proc/crypto)
++ */
++
++/**
++ * crypto_alloc_kpp() - allocate KPP tfm handle
++ * @alg_name: is the name of the kpp algorithm (e.g. "dh", "ecdh")
++ * @type: specifies the type of the algorithm
++ * @mask: specifies the mask for the algorithm
++ *
++ * Allocate a handle for kpp algorithm. The returned struct crypto_kpp
++ * is requeried for any following API invocation
++ *
++ * Return: allocated handle in case of success; IS_ERR() is true in case of
++ *	   an error, PTR_ERR() returns the error code.
++ */
++struct crypto_kpp *crypto_alloc_kpp(const char *alg_name, u32 type, u32 mask);
++
++static inline struct crypto_tfm *crypto_kpp_tfm(struct crypto_kpp *tfm)
++{
++	return &tfm->base;
++}
++
++static inline struct kpp_alg *__crypto_kpp_alg(struct crypto_alg *alg)
++{
++	return container_of(alg, struct kpp_alg, base);
++}
++
++static inline struct crypto_kpp *__crypto_kpp_tfm(struct crypto_tfm *tfm)
++{
++	return container_of(tfm, struct crypto_kpp, base);
++}
++
++static inline struct kpp_alg *crypto_kpp_alg(struct crypto_kpp *tfm)
++{
++	return __crypto_kpp_alg(crypto_kpp_tfm(tfm)->__crt_alg);
++}
++
++static inline unsigned int crypto_kpp_reqsize(struct crypto_kpp *tfm)
++{
++	return crypto_kpp_alg(tfm)->reqsize;
++}
++
++static inline void kpp_request_set_tfm(struct kpp_request *req,
++				       struct crypto_kpp *tfm)
++{
++	req->base.tfm = crypto_kpp_tfm(tfm);
++}
++
++static inline struct crypto_kpp *crypto_kpp_reqtfm(struct kpp_request *req)
++{
++	return __crypto_kpp_tfm(req->base.tfm);
++}
++
++/**
++ * crypto_free_kpp() - free KPP tfm handle
++ *
++ * @tfm: KPP tfm handle allocated with crypto_alloc_kpp()
++ */
++static inline void crypto_free_kpp(struct crypto_kpp *tfm)
++{
++	crypto_destroy_tfm(tfm, crypto_kpp_tfm(tfm));
++}
++
++/**
++ * kpp_request_alloc() - allocates kpp request
++ *
++ * @tfm:	KPP tfm handle allocated with crypto_alloc_kpp()
++ * @gfp:	allocation flags
++ *
++ * Return: allocated handle in case of success or NULL in case of an error.
++ */
++static inline struct kpp_request *kpp_request_alloc(struct crypto_kpp *tfm,
++						    gfp_t gfp)
++{
++	struct kpp_request *req;
++
++	req = kmalloc(sizeof(*req) + crypto_kpp_reqsize(tfm), gfp);
++	if (likely(req))
++		kpp_request_set_tfm(req, tfm);
++
++	return req;
++}
++
++/**
++ * kpp_request_free() - zeroize and free kpp request
++ *
++ * @req:	request to free
++ */
++static inline void kpp_request_free(struct kpp_request *req)
++{
++	kzfree(req);
++}
++
++/**
++ * kpp_request_set_callback() - Sets an asynchronous callback.
++ *
++ * Callback will be called when an asynchronous operation on a given
++ * request is finished.
++ *
++ * @req:	request that the callback will be set for
++ * @flgs:	specify for instance if the operation may backlog
++ * @cmpl:	callback which will be called
++ * @data:	private data used by the caller
++ */
++static inline void kpp_request_set_callback(struct kpp_request *req,
++					    u32 flgs,
++					    crypto_completion_t cmpl,
++					    void *data)
++{
++	req->base.complete = cmpl;
++	req->base.data = data;
++	req->base.flags = flgs;
++}
++
++/**
++ * kpp_request_set_input() - Sets input buffer
++ *
++ * Sets parameters required by generate_public_key
++ *
++ * @req:	kpp request
++ * @input:	ptr to input scatter list
++ * @input_len:	size of the input scatter list
++ */
++static inline void kpp_request_set_input(struct kpp_request *req,
++					 struct scatterlist *input,
++					 unsigned int input_len)
++{
++	req->src = input;
++	req->src_len = input_len;
++}
++
++/**
++ * kpp_request_set_output() - Sets output buffer
++ *
++ * Sets parameters required by kpp operation
++ *
++ * @req:	kpp request
++ * @output:	ptr to output scatter list
++ * @output_len:	size of the output scatter list
++ */
++static inline void kpp_request_set_output(struct kpp_request *req,
++					  struct scatterlist *output,
++					  unsigned int output_len)
++{
++	req->dst = output;
++	req->dst_len = output_len;
++}
++
++/**
++ * crypto_kpp_set_params() - Invoke kpp operation
++ *
++ * Function invokes the specific kpp operation for a given alg
++ *
++ * @tfm:	tfm handle
++ *
++ * Return: zero on success; error code in case of error
++ */
++static inline int crypto_kpp_set_params(struct crypto_kpp *tfm,
++					void *buffer, unsigned int len)
++{
++	struct kpp_alg *alg = crypto_kpp_alg(tfm);
++
++	return alg->set_params(tfm, buffer, len);
++}
++
++/**
++ * crypto_kpp_set_secret() - Invoke kpp operation
++ *
++ * Function invokes the specific kpp operation for a given alg.
++ *
++ * @tfm:	tfm handle
++ *
++ * Return: zero on success; error code in case of error
++ */
++static inline int crypto_kpp_set_secret(struct crypto_kpp *tfm, void *buffer,
++					unsigned int len)
++{
++	struct kpp_alg *alg = crypto_kpp_alg(tfm);
++
++	return alg->set_secret(tfm, buffer, len);
++}
++
++/**
++ * crypto_kpp_generate_public_key() - Invoke kpp operation
++ *
++ * Function invokes the specific kpp operation for generating the public part
++ * for a given kpp algorithm
++ *
++ * @req:	kpp key request
++ *
++ * Return: zero on success; error code in case of error
++ */
++static inline int crypto_kpp_generate_public_key(struct kpp_request *req)
++{
++	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
++	struct kpp_alg *alg = crypto_kpp_alg(tfm);
++
++	return alg->generate_public_key(req);
++}
++
++/**
++ * crypto_kpp_compute_shared_secret() - Invoke kpp operation
++ *
++ * Function invokes the specific kpp operation for computing the shared secret
++ * for a given kpp algorithm.
++ *
++ * @req:	kpp key request
++ *
++ * Return: zero on success; error code in case of error
++ */
++static inline int crypto_kpp_compute_shared_secret(struct kpp_request *req)
++{
++	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
++	struct kpp_alg *alg = crypto_kpp_alg(tfm);
++
++	return alg->compute_shared_secret(req);
++}
++
++/**
++ * crypto_kpp_maxsize() - Get len for output buffer
++ *
++ * Function returns the output buffer size required
++ *
++ * @tfm:	KPP tfm handle allocated with crypto_alloc_kpp()
++ *
++ * Return: minimum len for output buffer or error code if key hasn't been set
++ */
++static inline int crypto_kpp_maxsize(struct crypto_kpp *tfm)
++{
++	struct kpp_alg *alg = crypto_kpp_alg(tfm);
++
++	return alg->max_size(tfm);
++}
++
++#endif
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 6e28c89..a4d1a05 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -54,6 +54,7 @@
+ #define CRYPTO_ALG_TYPE_AHASH		0x0000000a
+ #define CRYPTO_ALG_TYPE_RNG		0x0000000c
+ #define CRYPTO_ALG_TYPE_AKCIPHER	0x0000000d
++#define CRYPTO_ALG_TYPE_KPP		0x0000000e
+ 
+ #define CRYPTO_ALG_TYPE_HASH_MASK	0x0000000e
+ #define CRYPTO_ALG_TYPE_AHASH_MASK	0x0000000c
+diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
+index 2e67bb6..79b5ded 100644
+--- a/include/uapi/linux/cryptouser.h
++++ b/include/uapi/linux/cryptouser.h
+@@ -45,6 +45,7 @@ enum crypto_attr_type_t {
+ 	CRYPTOCFGA_REPORT_RNG,		/* struct crypto_report_rng */
+ 	CRYPTOCFGA_REPORT_CIPHER,	/* struct crypto_report_cipher */
+ 	CRYPTOCFGA_REPORT_AKCIPHER,	/* struct crypto_report_akcipher */
++	CRYPTOCFGA_REPORT_KPP,		/* struct crypto_report_kpp */
+ 	__CRYPTOCFGA_MAX
+ 
+ #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
+@@ -107,5 +108,9 @@ struct crypto_report_akcipher {
+ 	char type[CRYPTO_MAX_NAME];
+ };
+ 
++struct crypto_report_kpp {
++	char type[CRYPTO_MAX_NAME];
++};
++
+ #define CRYPTO_REPORT_MAXSIZE (sizeof(struct crypto_user_alg) + \
+ 			       sizeof(struct crypto_report_blkcipher))
+-- 
+1.9.1
