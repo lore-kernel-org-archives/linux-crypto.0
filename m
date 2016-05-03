@@ -1,70 +1,66 @@
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Subject: [PATCH v3] crypto: Add a flag allowing the self-tests to be disabled at runtime.
-Date: Tue,  3 May 2016 10:00:17 +0100
-Message-ID: <1462266017-28022-2-git-send-email-rjones@redhat.com>
-References: <1462266017-28022-1-git-send-email-rjones@redhat.com>
-Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-	corbet@lwn.net, herbert@gondor.apana.org.au, davem@davemloft.net,
-	sm@eperm.de
-To: linux-kernel@vger.kernel.org
+From: David Howells <dhowells@redhat.com>
+Subject: Re: v4.6-rc1 regression bisected, Problem loading in-kernel X.509 certificate (-2)
+Date: Tue, 03 May 2016 10:10:13 +0100
+Message-ID: <26795.1462266613@warthog.procyon.org.uk>
+References: <20160430083248.GA20775@cucamonga.audible.transient.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jamie Heilman <jamie@audible.transient.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1462266017-28022-1-git-send-email-rjones@redhat.com>
+In-Reply-To: <20160430083248.GA20775@cucamonga.audible.transient.net>
+Content-ID: <26794.1462266613.1@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Running self-tests for a short-lived KVM VM takes 28ms on my laptop.
-This commit adds a flag 'cryptomgr.notests' which allows them to be
-disabled.
+> Problem loading in-kernel X.509 certificate (-2)
 
-However if fips=1 as well, we ignore this flag as FIPS mode mandates
-that the self-tests are run.
+ENOENT?  Hmmm...  The only place that is generated is in the crypto layer.
+That suggests missing crypto of some sort.
 
-Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+The attached patch enables some debugging in some relevant files if you can
+try applying it to your kernel.
+
+David
 ---
- Documentation/kernel-parameters.txt | 3 +++
- crypto/testmgr.c                    | 9 +++++++++
- 2 files changed, 12 insertions(+)
-
-diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
-index 0b3de80..d4d5fb7 100644
---- a/Documentation/kernel-parameters.txt
-+++ b/Documentation/kernel-parameters.txt
-@@ -826,6 +826,9 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
- 			It will be ignored when crashkernel=X,high is not used
- 			or memory reserved is below 4G.
- 
-+	cryptomgr.notests
-+                        [KNL] Disable crypto self-tests
-+
- 	cs89x0_dma=	[HW,NET]
- 			Format: <dma>
- 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index b86883a..fcd89fe 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -35,6 +35,10 @@
- 
- #include "internal.h"
- 
-+static bool notests;
-+module_param(notests, bool, 0644);
-+MODULE_PARM_DESC(notests, "disable crypto self-tests");
-+
- #ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
- 
- /* a perfect nop */
-@@ -3868,6 +3872,11 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
- 	int j;
- 	int rc;
- 
-+	if (!fips_enabled && notests) {
-+		printk_once(KERN_INFO "alg: self-tests disabled\n");
-+		return 0;
-+	}
-+
- 	alg_test_descs_check_order();
- 
- 	if ((type & CRYPTO_ALG_TYPE_MASK) == CRYPTO_ALG_TYPE_CIPHER) {
--- 
-2.7.4
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index 50be2a15e531..573b3960867b 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -8,7 +8,7 @@
+  * as published by the Free Software Foundation; either version
+  * 2 of the Licence, or (at your option) any later version.
+  */
+-
++#define DEBUG
+ #define pr_fmt(fmt) "PKCS7: "fmt
+ #include <linux/kernel.h>
+ #include <linux/export.h>
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 0f8b264b3961..99f297129381 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -10,7 +10,7 @@
+  * as published by the Free Software Foundation; either version
+  * 2 of the Licence, or (at your option) any later version.
+  */
+-
++#define DEBUG
+ #define pr_fmt(fmt) "PKEY: "fmt
+ #include <linux/module.h>
+ #include <linux/export.h>
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 733c046aacc6..373d472022ef 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -8,7 +8,7 @@
+  * as published by the Free Software Foundation; either version
+  * 2 of the Licence, or (at your option) any later version.
+  */
+-
++#define DEBUG
+ #define pr_fmt(fmt) "X.509: "fmt
+ #include <linux/module.h>
+ #include <linux/kernel.h>
