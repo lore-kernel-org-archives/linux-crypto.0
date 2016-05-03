@@ -1,34 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: Add a flag allowing the self-tests to be
- disabled at runtime.
-Date: Tue, 3 May 2016 15:32:30 +0800
-Message-ID: <20160503073230.GA16768@gondor.apana.org.au>
-References: <1461927784-19114-1-git-send-email-rjones@redhat.com>
- <1461927784-19114-2-git-send-email-rjones@redhat.com>
+Subject: Re: [PATCH] crypto: rsa - return raw integer for the ASN.1 parser
+Date: Tue, 3 May 2016 15:39:57 +0800
+Message-ID: <20160503073957.GA16836@gondor.apana.org.au>
+References: <1461934306-29190-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, corbet@lwn.net, davem@davemloft.net,
-	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org
-To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: linux-crypto@vger.kernel.org
+To: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:37088 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:59306 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750732AbcECHck (ORCPT
+	with ESMTP id S1751176AbcECHkD (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 May 2016 03:32:40 -0400
+	Tue, 3 May 2016 03:40:03 -0400
 Content-Disposition: inline
-In-Reply-To: <1461927784-19114-2-git-send-email-rjones@redhat.com>
+In-Reply-To: <1461934306-29190-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 29, 2016 at 12:03:04PM +0100, Richard W.M. Jones wrote:
-> Running self-tests for a short-lived KVM VM takes 28ms on my laptop.
-> This commit adds a flag 'cryptomgr.notests' which allows them to be
-> disabled.
-> 
-> Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+On Fri, Apr 29, 2016 at 03:51:46PM +0300, Tudor Ambarus wrote:
+>
+>  struct rsa_key {
+> +	u8 *n;
+> +	u8 *e;
+> +	u8 *d;
+> +	dma_addr_t dma_n;
+> +	dma_addr_t dma_e;
+> +	dma_addr_t dma_d;
+> +	size_t n_sz;
+> +	size_t e_sz;
+> +	bool coherent;
+> +	gfp_t flags;
 
-Please address the conflict with FIPS mode.
+Please don't put the DMA primitives in the generic helper.  They
+should stay in the driver for now.
 
 Thanks,
 -- 
