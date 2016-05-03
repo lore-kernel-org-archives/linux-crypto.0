@@ -1,33 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: omap-aes: Use dma_request_chan() for requesting
- DMA channel
-Date: Tue, 3 May 2016 16:16:39 +0800
-Message-ID: <20160503081639.GB17166@gondor.apana.org.au>
-References: <1461934938-28297-1-git-send-email-peter.ujfalusi@ti.com>
+Subject: Re: [PATCH 1/2] crypto: qat - Fix typo in comments
+Date: Tue, 3 May 2016 16:17:02 +0800
+Message-ID: <20160503081702.GD17166@gondor.apana.org.au>
+References: <1461952800-14876-1-git-send-email-tadeusz.struk@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
-	t-kristo@ti.com, lokeshvutla@ti.com
-To: Peter Ujfalusi <peter.ujfalusi@ti.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:44580 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752047AbcECIRF (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 May 2016 04:17:05 -0400
 Content-Disposition: inline
-In-Reply-To: <1461934938-28297-1-git-send-email-peter.ujfalusi@ti.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1461952800-14876-1-git-send-email-tadeusz.struk@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 29, 2016 at 04:02:18PM +0300, Peter Ujfalusi wrote:
-> With the new dma_request_chan() the client driver does not need to look for
-> the DMA resource and it does not need to pass filter_fn anymore.
-> By switching to the new API the driver can now support deferred probing
-> against DMA.
+On Fri, Apr 29, 2016 at 10:59:59AM -0700, Tadeusz Struk wrote:
+> Fix copy and paste typo adf_isr.c
 > 
-> Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
-> CC: Herbert Xu <herbert@gondor.apana.org.au>
-> CC: David S. Miller <davem@davemloft.net>
-> CC: Lokesh Vutla <lokeshvutla@ti.com>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 
-All applied.
+Both applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
