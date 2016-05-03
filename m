@@ -1,54 +1,60 @@
-From: "Austin S. Hemmelgarn" <ahferroin7@gmail.com>
+From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Subject: Re: [RFC][PATCH 0/6] /dev/random - a new approach
-Date: Tue, 3 May 2016 11:01:14 -0400
-Message-ID: <c2c67db6-8111-4304-03cd-25d479536d8e@gmail.com>
-References: <9192755.iDgo3Omyqe@positron.chronox.de>
- <1499137.D4Mft7n8bh@tauon.atsec.com>
+Date: Tue, 3 May 2016 18:20:57 +0200
+Message-ID: <CAJU7zaLn6KCWjMTVmtS=NKsnBM7qbRf3Wf0Tpyxhi0Ctr6GqyA@mail.gmail.com>
+References: <9192755.iDgo3Omyqe@positron.chronox.de> <1499137.D4Mft7n8bh@tauon.atsec.com>
  <CAJU7zaJOSXefQkGb9H-uFr=Rxv16Gk=vYm60mOztS4uG=S0JcA@mail.gmail.com>
- <2009968.Rf1hsrr5t0@tauon.atsec.com>
- <CAJU7zaL+jYCgq0RzSraCQF6hd6QtxhobkPtxt+_YqxiZ+vfkMw@mail.gmail.com>
- <20160426011137.GC28496@thunk.org>
- <CAJU7zaKTjb9QhYP6eVyri0b9Ow_GRpqT5HgOVpNMhaEDrVA4gA@mail.gmail.com>
+ <2009968.Rf1hsrr5t0@tauon.atsec.com> <CAJU7zaL+jYCgq0RzSraCQF6hd6QtxhobkPtxt+_YqxiZ+vfkMw@mail.gmail.com>
+ <20160426011137.GC28496@thunk.org> <CAJU7zaKTjb9QhYP6eVyri0b9Ow_GRpqT5HgOVpNMhaEDrVA4gA@mail.gmail.com>
+ <20160503144824.GB11832@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-To: Nikos Mavrogiannopoulos <nmav@gnutls.org>,
-	Theodore Ts'o <tytso@mit.edu>,
+Content-Type: text/plain; charset=UTF-8
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Nikos Mavrogiannopoulos <nmav@gnutls.org>,
 	Stephan Mueller <smueller@chronox.de>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Sandy Harris <sandyinchina@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAJU7zaKTjb9QhYP6eVyri0b9Ow_GRpqT5HgOVpNMhaEDrVA4gA@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-yw0-f175.google.com ([209.85.161.175]:33290 "EHLO
+	mail-yw0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932543AbcECQVi (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 May 2016 12:21:38 -0400
+In-Reply-To: <20160503144824.GB11832@thunk.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 2016-05-03 09:57, Nikos Mavrogiannopoulos wrote:
-> On Tue, Apr 26, 2016 at 3:11 AM, Theodore Ts'o <tytso@mit.edu> wrote:
->> On Mon, Apr 25, 2016 at 10:23:51AM +0200, Nikos Mavrogiannopoulos wrote:
->>> That's far from a solution and I wouldn't recommend to anyone doing
->>> that. We cannot expect each and every program to do glibc's job. The
->>> purpose of a system call like getrandom is to simplify the complex use
->>> of /dev/urandom and eliminate it, not to make code handling randomness
->>> in applications even worse.
->> Yes, but if glibc is falling down on the job and refusing to export
->> the system call (I think for political reasons; it's a Linux-only
->> interface, so Hurd wouldn't have it),
+On Tue, May 3, 2016 at 4:48 PM,  <tytso@mit.edu> wrote:
+> On Tue, May 03, 2016 at 03:57:15PM +0200, Nikos Mavrogiannopoulos wrote:
+>> I believe their main concern is that they want to protect applications
+>> which do not check error codes of system calls, when running on a
+>> kernel which does not provide getrandom().  That way, they have an
+>> almost impossible task to simulate getrandom() on kernel which do not
+>> support it.
 >
-> I believe their main concern is that they want to protect applications
-> which do not check error codes of system calls, when running on a
-> kernel which does not provide getrandom().  That way, they have an
-> almost impossible task to simulate getrandom() on kernel which do not
-> support it.
-If it had an existing call, then I could reasonably understand this. 
-They have no existing wrapper for it, so this really is just BS.  If an 
-application isn't checking error codes, then either:
-1. They are intentionally ignoring error codes.
-2. It's a bug in the application that needs to be fixed.
+> The whole *point* of creating the getrandom(2) system call is that it
+> can't be simulated/emulated in userspace.  If it can be, then there's
+> no reason why the system call should exist.  This is one of the
+> reasons why haven't implemented mysql or TLS inside the kernel.   :-)
+> So if their standard is "we need to simulate getrandom(2) on a kernel
+> which does not have it", we'll **never** see glibc support for it.  By
+> definition, this is *impossible*.
 
-The fact that they feel they need to support poorly coded applications 
-in _new_ system call wrappers is itself somewhat disturbing.  There are 
-no existing applications using this function in glibc because it doesn't 
-exist in glibc, which means they can't claim legacy support and 
-therefore they want to actively enable people to write stupid programs.
+I know, and I share this opinion. To their defense they will have to
+provide a call which doesn't make applications fail in the following
+scenario:
+1. crypto/ssl libraries are compiled to use getrandom() because it is
+available in libc and and in kernel
+2. everything works fine
+3. the administrator downgrades the kernel to a version without
+getrandom() because his network card works better with that version
+4. Mayhem as applications fail
+
+However I don't see a way to avoid issues - though limited to corner
+cases - with any imperfect emulation. It would be much clear for glibc
+to just require a kernel with getrandom().
+
+regards,
+Nikos
