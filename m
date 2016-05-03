@@ -1,34 +1,44 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: v4.6-rc1 regression bisected, Problem loading in-kernel X.509 certificate (-2)
-Date: Tue, 03 May 2016 09:54:31 +0100
-Message-ID: <25450.1462265671@warthog.procyon.org.uk>
-References: <20160430083248.GA20775@cucamonga.audible.transient.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Jamie Heilman <jamie@audible.transient.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160430083248.GA20775@cucamonga.audible.transient.net>
-Content-ID: <25449.1462265671.1@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Subject: [PATCH v3] crypto: Add a flag allowing the self-tests to be disabled at runtime.
+Date: Tue,  3 May 2016 10:00:16 +0100
+Message-ID: <1462266017-28022-1-git-send-email-rjones@redhat.com>
+Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	corbet@lwn.net, herbert@gondor.apana.org.au, davem@davemloft.net,
+	sm@eperm.de
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:34295 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751131AbcECJAX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 May 2016 05:00:23 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Jamie Heilman <jamie@audible.transient.net> wrote:
+v2 -> v3:
 
-> I usually build my kernels to require module signatures and use
-> automatic signing.  As of v4.6-rc1 I'm getting this on boot:
-> 
-> Problem loading in-kernel X.509 certificate (-2)
-> 
-> I bisected that to commit d43de6c780a84def056afaf4fb3e66bdaa1efc00
-> (akcipher: Move the RSA DER encoding check to the crypto layer)
-> 
-> For some reason after this commit my system keyring always ends up
-> empty.  I use the deb-pkg make target.  My kernel config can
-> be found at
-> http://audible.transient.net/~jamie/k/modsign.config-4.6.0-rc5-guest
+ - Ignore the flag if FIPS mode is enabled.
 
-Do you have an example malfunctioning certificate that I can have a look at?
+v1 -> v2:
 
-David
+ - Use printk_once.  Because the serial console is so slow, printing
+   the message multiple times actually consumed about 6ms extra later
+   on during the boot.
+
+- - -
+
+I'm trying to reduce the time taken in the kernel in initcalls, with
+my aim being to reduce the current ~700ms spent in initcalls before
+userspace, down to something like 100ms.  All times on my Broadwell-U
+laptop, under virtualization.  The purpose of this is to be able to
+launch VMs around containers with minimal overhead, like Intel Clear
+Containers, but using standard distro kernels and qemu.
+
+Currently the kernel spends 28ms (on my laptop) running crypto
+algorithm self-tests.  Although it's possibe to disable these at
+compile time, Fedora kernel maintainers want to maintain a single
+kernel image for all uses.
+
+So this commit adds a runtime flag which callers can set to skip the
+self-tests in the fast container/virtualization case.
+
+Rich.
