@@ -1,36 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: omap-des: Integrate with the crypto engine
- framework
-Date: Tue, 3 May 2016 16:16:02 +0800
-Message-ID: <20160503081602.GA17166@gondor.apana.org.au>
-References: <a4d000f46bd5fa99b0ab832d85430e37a1c2d1bd.1461823641.git.baolin.wang@linaro.org>
+Subject: Re: [PATCH] crypto: qat - fix adf_ctl_drv.c:undefined reference to
+ adf_init_pf_wq
+Date: Tue, 3 May 2016 16:16:52 +0800
+Message-ID: <20160503081652.GC17166@gondor.apana.org.au>
+References: <201604290313.pe3TL9PF%fengguang.wu@intel.com>
+ <1461951820-11225-1-git-send-email-tadeusz.struk@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, broonie@kernel.org, linus.walleij@linaro.org,
-	arnd@arndb.de, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Baolin <baolin.wang@linaro.org>
+Cc: linux-crypto@vger.kernel.org, fengguang.wu@intel.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:50528 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:51250 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752772AbcECIQR (ORCPT
+	with ESMTP id S1752047AbcECIRA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 May 2016 04:16:17 -0400
+	Tue, 3 May 2016 04:17:00 -0400
 Content-Disposition: inline
-In-Reply-To: <a4d000f46bd5fa99b0ab832d85430e37a1c2d1bd.1461823641.git.baolin.wang@linaro.org>
+In-Reply-To: <1461951820-11225-1-git-send-email-tadeusz.struk@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 28, 2016 at 02:11:51PM +0800, Baolin wrote:
-> Since the crypto engine framework had been merged, thus this patch integrates
-> with the newly added crypto engine framework to make the crypto hardware
-> engine under utilized as each block needs to be processed before the crypto
-> hardware can start working on the next block.
+On Fri, Apr 29, 2016 at 10:43:40AM -0700, Tadeusz Struk wrote:
+> Fix undefined reference issue reported by kbuild test robot.
 > 
-> The crypto engine framework can manage and process the requests automatically,
-> so remove the 'queue' and 'queue_task' things in omap des driver.
-> 
-> Signed-off-by: Baolin <baolin.wang@linaro.org>
+> Reported-by: kbuild test robot <fengguang.wu@intel.com>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 
 Applied.
 -- 
