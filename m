@@ -1,59 +1,57 @@
-From: Anatoly Pugachev <matorola@gmail.com>
-Subject: Re: [crypto / sparc64] cryptomgr_test OOPS
-Date: Wed, 4 May 2016 22:10:47 +0300
-Message-ID: <CADxRZqzynaTAD+vcJwW2ueGnQyy=tQAJq2TvTT-_pZG26=_ZLQ@mail.gmail.com>
-References: <CADxRZqyMwme53etMrnx3xkpGsR6-W88RHLA3nh0GCGAzcz5=Fw@mail.gmail.com>
-	<20160503.123301.298039059390449291.davem@davemloft.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org
-To: David Miller <davem@davemloft.net>
-Return-path: <sparclinux-owner@vger.kernel.org>
-In-Reply-To: <20160503.123301.298039059390449291.davem@davemloft.net>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: [PATCH -v2 0/4] random: replace urandom pool with a CRNG
+Date: Wed,  4 May 2016 15:25:47 -0400
+Message-ID: <1462389951-29439-1-git-send-email-tytso@mit.edu>
+Cc: smueller@chronox.de, herbert@gondor.apana.org.au,
+	andi@firstfloor.org, sandyinchina@gmail.com,
+	cryptography@lakedaemon.net, jsd@av8n.com, hpa@zytor.com,
+	linux-crypto@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>
+To: Linux Kernel Developers List <linux-kernel@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:46906 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752524AbcEDT0F (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 4 May 2016 15:26:05 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 3, 2016 at 7:33 PM, David Miller <davem@davemloft.net> wrote:
-> From: Anatoly Pugachev <matorola@gmail.com>
-> Date: Tue, 3 May 2016 16:54:18 +0300
->
->> I have git kernel OOPS (4.6.0-rc6) on sparc64. This OOPS does not
->> happen, if I set the following kernel option:
->>
->> CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=y
->>
->> Can someone please look at https://bugzilla.kernel.org/show_bug.cgi?id=117551 ?
->
-> The lib/mpi/ code hasn't been touched in a long time, so I can only see that it might
-> be the crypto/rsa.c changes that happened this release.
->
-> Can you possibly bisect this or at least tell us that 4.5 doesn't have this problem?
+By using a CRNG to replace the urandom pool, we address a number of
+complaints which Stephan Mueller has been concerned about.  We now use
+a much more aggressive interrupt sampling system to quickly initialize
+a CRNG which gets used in place of the original non-blocking pool.
+This tends to get initialized *very* quickly (before the devices are
+finished being proved.)  Like Stephan's proposal, this assumes that we
+can get a bit of entropy per interrupt, which may be problematic on
+some architectures.  So after we do this quick-and-dirty
+initialization, we then fall back to the slower, more conservative
+interrupt sampling system to fill the input pool, and we will do a
+catastrophic reseeding once we get 128 bits using the slower but more
+conservative system, and every five minutes afterwards, if possible.
 
-David,
+In addition, on NUMA systems we make the CRNG state per-NUMA socket,
+to address the NUMA locking contention problem which Andi Kleen has
+been complaining about.  I'm not entirely sure this will work on the
+crazy big SGI systems, but they are rare.  Whether they are rarer than
+abusive userspace programs that are continuously pounding /dev/urandom
+is unclear.  If necessary we can make a config option to turn off the
+per-NUMA socket hack if it proves to be problematic.
 
-we're using 4.5.2 debian kernel here without this problem. I'm not
-sure I would be able to bisect, never did it before, but I could
-try...
+Stephan Mueller (1):
+  random: add interrupt callback to VMBus IRQ handler
 
-Here's a quick diff related to crypto for debian kernel configs:
+Theodore Ts'o (3):
+  random: replace non-blocking pool with a Chacha20-based CRNG
+  random: make /dev/urandom scalable for silly userspace programs
+  random: add backtracking protection to the CRNG
 
-$ diff -u /boot/config-4.5.0-2-sparc64-smp /boot/config-4.6.0-rc5-sparc64-smp
-@@ -5299,10 +5380,9 @@
- CONFIG_CRYPTO_RNG=m
- CONFIG_CRYPTO_RNG2=y
- CONFIG_CRYPTO_RNG_DEFAULT=m
--CONFIG_CRYPTO_PCOMP=m
--CONFIG_CRYPTO_PCOMP2=y
- CONFIG_CRYPTO_AKCIPHER2=y
--# CONFIG_CRYPTO_RSA is not set
-+CONFIG_CRYPTO_AKCIPHER=y
-+CONFIG_CRYPTO_RSA=y
- CONFIG_CRYPTO_MANAGER=y
- CONFIG_CRYPTO_MANAGER2=y
- # CONFIG_CRYPTO_USER is not set
+ crypto/chacha20_generic.c |  61 --------
+ drivers/char/random.c     | 372 +++++++++++++++++++++++++++++++++++++---------
+ drivers/hv/vmbus_drv.c    |   3 +
+ include/crypto/chacha20.h |   1 +
+ lib/Makefile              |   2 +-
+ lib/chacha20.c            |  79 ++++++++++
+ 6 files changed, 387 insertions(+), 131 deletions(-)
+ create mode 100644 lib/chacha20.c
 
-so, I need to compile 4.5.x kernel (or even older kernels) with
-CRYPTO_RSA=y and test how it would act. And if it would not crash, I
-could try to bisect.
-
-Thanks.
+-- 
+2.5.0
