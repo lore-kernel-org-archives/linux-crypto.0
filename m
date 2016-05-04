@@ -1,93 +1,55 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 1/7] asm-generic/io.h: add io{read,write}64 accessors
-Date: Thu, 05 May 2016 00:35:50 +0200
-Message-ID: <16429831.u9JK7qO1GE@wuerfel>
-References: <1462382179-11889-1-git-send-email-horia.geanta@nxp.com>
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: linux/bitops.h
+Date: Wed, 4 May 2016 16:06:38 -0700
+Message-ID: <20160504230638.GO13997@two.firstfloor.org>
+References: <1462170413-7164-1-git-send-email-tytso@mit.edu>
+ <1462170413-7164-2-git-send-email-tytso@mit.edu>
+ <CAH8yC8kEWaH7FM03LRxMk555784Cw-b816=O50WqXWW-0Nep5Q@mail.gmail.com>
+ <20160504174901.GC3901@thunk.org>
+ <CAH8yC8=sYbrY9gpz0mKMKrcj=kSh38SPyxfk4HGeB5mOU6=etA@mail.gmail.com>
+ <BB2EB46A-8AFE-4A8C-A486-3717AC178A7B@zytor.com>
+ <20160504190723.GD3901@thunk.org>
+ <572A6CDD.10503@av8n.com>
+ <C6DC09E0-98EA-4591-9336-4D2BE1699C2C@zytor.com>
+ <572A724C.6010704@av8n.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Scott Wood <scott.wood@nxp.com>,
-	Alexandru Porosanu <alexandru.porosanu@nxp.com>,
-	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
-	Cristian Stoica <cristian.stoica@nxp.com>,
-	Vineet Gupta <Vineet.Gupta1@synopsys.com>
-To: Horia =?utf-8?B?R2VhbnTEgw==?= <horia.geanta@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: "H. Peter Anvin" <hpa@zytor.com>, tytso@mit.edu,
+	noloader@gmail.com, linux-kernel@vger.kernel.org,
+	Stephan Mueller <smueller@chronox.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>, andi@firstfloor.org,
+	Sandy Harris <sandyinchina@gmail.com>,
+	cryptography@lakedaemon.net, linux-crypto@vger.kernel.org
+To: John Denker <jsd@av8n.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:52381 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752330AbcEDWgN convert rfc822-to-8bit (ORCPT
+Received: from one.firstfloor.org ([193.170.194.197]:56751 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753288AbcEDXGm (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 4 May 2016 18:36:13 -0400
-In-Reply-To: <1462382179-11889-1-git-send-email-horia.geanta@nxp.com>
+	Wed, 4 May 2016 19:06:42 -0400
+Content-Disposition: inline
+In-Reply-To: <572A724C.6010704@av8n.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday 04 May 2016 20:16:19 Horia Geant=C4=83 wrote:
-> @@ -625,6 +645,16 @@ static inline u32 ioread32be(const volatile void=
- __iomem *addr)
->  }
->  #endif
-> =20
-> +#ifdef CONFIG_64BIT
-> +#ifndef ioread64be
-> +#define ioread64be ioread64be
-> +static inline u64 ioread64be(const volatile void __iomem *addr)
-> +{
-> +       return __be64_to_cpu(__raw_readq(addr));
-> +}
-> +#endif
-> +#endif /* CONFIG_64BIT */
-> +
->  #ifndef iowrite16be
->  #define iowrite16be iowrite16be
->  static inline void iowrite16be(u16 value, void volatile __iomem *add=
-r)
-> @@ -641,6 +671,16 @@ static inline void iowrite32be(u32 value, volati=
-le void __iomem *addr)
->  }
->  #endif
-> =20
-> +#ifdef CONFIG_64BIT
-> +#ifndef iowrite64be
-> +#define iowrite64be iowrite64be
-> +static inline void iowrite64be(u64 value, volatile void __iomem *add=
-r)
-> +{
-> +       __raw_writeq(__cpu_to_be64(value), addr);
-> +}
-> +#endif
-> +#endif /* CONFIG_64BIT */
-> +
->=20
+On Wed, May 04, 2016 at 03:06:04PM -0700, John Denker wrote:
+> On 05/04/2016 02:56 PM, H. Peter Anvin wrote:
+> >> Beware that shifting by an amount >= the number of bits in the
+> >> word remains Undefined Behavior.
+> 
+> > This construct has been supported as a rotate since at least gcc2.
+> 
+> How then should we understand the story told in commit d7e35dfa?
+> Is the story wrong?
 
-I just noticed that these two are both a bit wrong, but they copy the
-mistake that already exists in the 16 and 32 bit versions: If an
-architecture overrides readq/writeq to have barriers but does not overr=
-ide
-ioread64be/iowrite64be, this will lack the barriers and behave differen=
-tly
-from the little-endian version. I think the only affected architecture
-is ARC, since ARM and ARM64 both override the big-endian accessors to
-have the correct barriers, and all others don't use barriers at all.
+I don't think Linux runs on a system where it would make a difference
+(like a VAX), and also gcc always converts it before it could.
+Even UBSan should not complain because it runs after the conversion
+to ROTATE.
 
-Maybe you can add a patch before this one to replace the 16/32-bit acce=
-ssors
-with ones that do a
+So it's unlikely to be a pressing issue.
 
-static inline void iowrite32be(u32 value, volatile void __iomem *addr)
-{
-	writel(swab32(value), addr);
-}
+-Andi
 
-This will lead to a double-swap on architectures that don't override it=
-,
-but it will work correctly on all architectures without them having
-to override the big-endian accessors.
-
-Aside from that, the patch looks fine.
-
-	Arnd
+-- 
+ak@linux.intel.com -- Speaking for myself only.
