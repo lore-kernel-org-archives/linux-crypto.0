@@ -1,39 +1,43 @@
 From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
-Subject: Re: [PATCH v2] lib/mpi: Fix kernel unaligned access in
- mpi_write_to_sgl
-Date: Wed, 4 May 2016 07:05:20 -0400
-Message-ID: <20160504110520.GC29618@oracle.com>
-References: <20160427174338.GA15460@oracle.com>
- <20160428010117.GA5262@gondor.apana.org.au>
- <20160428010827.GE15460@oracle.com>
- <20160503081230.GA17085@gondor.apana.org.au>
- <20160503101915.GI23757@oracle.com>
- <20160504023247.GA24809@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: hash - Fix page length clamping in hash walk
+Date: Wed, 4 May 2016 07:39:13 -0400
+Message-ID: <20160504113913.GD29618@oracle.com>
+References: <20160421071451.GE3347@gauss.secunet.com>
+ <20160425100527.GA9521@gondor.apana.org.au>
+ <20160428082743.GO3347@gauss.secunet.com>
+ <20160503095531.GA18007@gondor.apana.org.au>
+ <20160504093420.GB3347@gauss.secunet.com>
+ <20160504095256.GA27632@gondor.apana.org.au>
+ <20160504100854.GD3347@gauss.secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: tadeusz.struk@intel.com, linux-kernel@vger.kernel.org,
-	smueller@chronox.de, mmarek@suse.com, arnd@arndb.de,
-	andrew.zaborowski@intel.com,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:25924 "EHLO
+Received: from userp1040.oracle.com ([156.151.31.81]:42219 "EHLO
 	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751024AbcEDLFl (ORCPT
+	with ESMTP id S1750911AbcEDLjZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 4 May 2016 07:05:41 -0400
+	Wed, 4 May 2016 07:39:25 -0400
 Content-Disposition: inline
-In-Reply-To: <20160504023247.GA24809@gondor.apana.org.au>
+In-Reply-To: <20160504100854.GD3347@gauss.secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On (05/04/16 10:32), Herbert Xu wrote:
+On (05/04/16 12:08), Steffen Klassert wrote:
+> > > Sowmini, could you please doublecheck with your test setup?
+> > 
+> > Don't bother, my patch was crap.  Here's one that's more likely
+> > to work:
 > 
-> Please base it on cryptodev.
-> 
+> This one is much better, works here :)
 
-Looks like this got fixed in cryptodev by commit cece762f6f3c 
-("lib/mpi: mpi_write_sgl(): fix out-of-bounds stack access")
+The patch seems to work, but the caveat is that the original
+bug (iperf segv) was not always reproducible on demand - it depended
+on memory and other config. 
 
-Thanks,
+But looks like Steffen has a reliable way to reproduce the original
+problem, so lets go with this patch for now.
+
 --Sowmini
