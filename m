@@ -1,12 +1,11 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 2/7] arm64: add io{read,write}64be accessors
-Date: Wed, 4 May 2016 20:16:30 +0300
-Message-ID: <1462382190-11937-1-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH 3/7] powerpc: add io{read,write}64 accessors
+Date: Wed, 4 May 2016 20:16:38 +0300
+Message-ID: <1462382198-11985-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <linux-crypto@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
+Cc: <linux-crypto@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
 	<linux-kernel@vger.kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Scott Wood <scott.wood@nxp.com>,
@@ -14,53 +13,67 @@ Cc: <linux-crypto@vger.kernel.org>,
 	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
 	Cristian Stoica <cristian.stoica@nxp.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will.deacon@arm.com>
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Paul Mackerras <paulus@samba.org>,
+	"Michael Ellerman" <mpe@ellerman.id.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1on0061.outbound.protection.outlook.com ([157.56.110.61]:31420
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+Received: from mail-by2on0067.outbound.protection.outlook.com ([207.46.100.67]:12896
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752759AbcEDRQk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 4 May 2016 13:16:40 -0400
+	id S1752759AbcEDRQs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 4 May 2016 13:16:48 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This will allow device drivers to consistently use io{read,write}XXbe
+This will allow device drivers to consistently use io{read,write}XX
 also for 64-bit accesses.
 
-Signed-off-by: Alex Porosanu <alexandru.porosanu@nxp.com>
 Signed-off-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
 ---
- arch/arm64/include/asm/io.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/powerpc/kernel/iomap.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
-index 44be1e03ed65..9b6e408cfa51 100644
---- a/arch/arm64/include/asm/io.h
-+++ b/arch/arm64/include/asm/io.h
-@@ -174,13 +174,15 @@ extern void __iomem *ioremap_cache(phys_addr_t ph=
-ys_addr, size_t size);
- #define iounmap				__iounmap
+diff --git a/arch/powerpc/kernel/iomap.c b/arch/powerpc/kernel/iomap.c
+index 12e48d56f771..3963f0b68d52 100644
+--- a/arch/powerpc/kernel/iomap.c
++++ b/arch/powerpc/kernel/iomap.c
+@@ -38,6 +38,18 @@ EXPORT_SYMBOL(ioread16);
+ EXPORT_SYMBOL(ioread16be);
+ EXPORT_SYMBOL(ioread32);
+ EXPORT_SYMBOL(ioread32be);
++#ifdef __powerpc64__
++u64 ioread64(void __iomem *addr)
++{
++	return readq(addr);
++}
++u64 ioread64be(void __iomem *addr)
++{
++	return readq_be(addr);
++}
++EXPORT_SYMBOL(ioread64);
++EXPORT_SYMBOL(ioread64be);
++#endif /* __powerpc64__ */
+=20
+ void iowrite8(u8 val, void __iomem *addr)
+ {
+@@ -64,6 +76,18 @@ EXPORT_SYMBOL(iowrite16);
+ EXPORT_SYMBOL(iowrite16be);
+ EXPORT_SYMBOL(iowrite32);
+ EXPORT_SYMBOL(iowrite32be);
++#ifdef __powerpc64__
++void iowrite64(u64 val, void __iomem *addr)
++{
++	writeq(val, addr);
++}
++void iowrite64be(u64 val, void __iomem *addr)
++{
++	writeq_be(val, addr);
++}
++EXPORT_SYMBOL(iowrite64);
++EXPORT_SYMBOL(iowrite64be);
++#endif /* __powerpc64__ */
 =20
  /*
-- * io{read,write}{16,32}be() macros
-+ * io{read,write}{16,32,64}be() macros
-  */
- #define ioread16be(p)		({ __u16 __v =3D be16_to_cpu((__force __be16)__=
-raw_readw(p)); __iormb(); __v; })
- #define ioread32be(p)		({ __u32 __v =3D be32_to_cpu((__force __be32)__=
-raw_readl(p)); __iormb(); __v; })
-+#define ioread64be(p)		({ __u64 __v =3D be64_to_cpu((__force __be64)__=
-raw_readq(p)); __iormb(); __v; })
-=20
- #define iowrite16be(v,p)	({ __iowmb(); __raw_writew((__force __u16)cpu=
-_to_be16(v), p); })
- #define iowrite32be(v,p)	({ __iowmb(); __raw_writel((__force __u32)cpu=
-_to_be32(v), p); })
-+#define iowrite64be(v,p)	({ __iowmb(); __raw_writeq((__force __u64)cpu=
-_to_be64(v), p); })
-=20
- /*
-  * Convert a physical pointer to a virtual kernel pointer for /dev/mem
+  * These are the "repeat read/write" functions. Note the
 --=20
 2.4.4
