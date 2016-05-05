@@ -1,104 +1,63 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH v2 0/8] crypto: caam - add support for LS1043A SoC
-Date: Thu, 5 May 2016 18:33:55 +0300
-Message-ID: <1462462435-27403-1-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH v2 3/8] arm64: add io{read,write}64be accessors
+Date: Thu, 5 May 2016 18:36:04 +0300
+Message-ID: <1462462564-27731-1-git-send-email-horia.geanta@nxp.com>
+References: <1462462435-27403-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+Cc: <linux-crypto@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Cristian Stoica <cristian.stoica@nxp.com>,
 	Scott Wood <scott.wood@nxp.com>,
 	Alexandru Porosanu <alexandru.porosanu@nxp.com>,
-	Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
+	Cristian Stoica <cristian.stoica@nxp.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Arnd Bergmann <arnd@arndb.de>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will.deacon@arm.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Paul Mackerras <paulus@samba.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Rob Herring <robh+dt@kernel.org>,
-	Olof Johansson <olof@lixom.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0054.outbound.protection.outlook.com ([157.56.111.54]:15296
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754642AbcEEPeQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 May 2016 11:34:16 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	Will Deacon <will.deacon@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1462462435-27403-1-git-send-email-horia.geanta@nxp.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-v2:
-As suggested by Arnd, patch 1 fixes io{read,write}{16,32}be accessors
-to prevent the case when {read,write}{w,l} are overriden by arch-specif=
-ic
-ones having barriers, while the BE accessors previously mentioned are n=
-ot
-(thus behaving differently, having no barriers).
+This will allow device drivers to consistently use io{read,write}XXbe
+also for 64-bit accesses.
 
-Hi,
+Signed-off-by: Alex Porosanu <alexandru.porosanu@nxp.com>
+Signed-off-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
+---
+ arch/arm64/include/asm/io.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-[Patches 2-4 add io{read,write}64[be] accessors (generic, arm64, ppc64)=
-,
-such that CAAM's accessors in regs.h are simplified a bit.
-Patch 8 adds crypto node for LS1043A platform.
-Let me know if it's ok to go with these through the cryptodev-2.6 tree.=
-]
-
-This is a follow-up on the following RFC patch set:
-crypto: caam - Revamp I/O accessors
-https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg15878.html
-
-There are platforms such as LS1043A (or LS1012A) where core endianness
-does not match CAAM/SEC endianness (LE vs. BE).
-Add support in caam driver for these cases.
-
-Current patch set detects device endianness at runtime (as opposed to
-compile-time endianness), in order to support multiplatform kernels.
-Detection of device endianness is not device-tree based.
-Instead, SSTA ("SEC STAtus") register has a property such that
-reading it in any endianness and masking it properly, it's possible
-to deduce device endianness.
-
-The performance drop due to the runtime detection is < 1.0%.
-(An alternative implementation using function pointers has been tried,
-but lead to a bigger performance drop.)
-
-Thanks,
-Horia
-
-Cristian Stoica (1):
-  crypto: caam - fix offset field in hw sg entries
-
-Horia Geant=C4=83 (7):
-  asm-generic/io.h: allow barriers in io{read,write}{16,32}be
-  asm-generic/io.h: add io{read,write}64 accessors
-  arm64: add io{read,write}64be accessors
-  powerpc: add io{read,write}64 accessors
-  crypto: caam - handle core endianness !=3D caam endianness
-  crypto: caam - add ARCH_LAYERSCAPE to supported architectures
-  arm64: dts: ls1043a: add crypto node
-
- arch/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dts |   4 +
- arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi    |  43 ++++++
- arch/arm64/include/asm/io.h                       |   4 +-
- arch/powerpc/kernel/iomap.c                       |  24 ++++
- drivers/crypto/caam/Kconfig                       |   6 +-
- drivers/crypto/caam/caamhash.c                    |   5 +-
- drivers/crypto/caam/ctrl.c                        | 125 +++++++++++---=
-----
- drivers/crypto/caam/desc.h                        |   9 +-
- drivers/crypto/caam/desc_constr.h                 |  44 ++++---
- drivers/crypto/caam/jr.c                          |  22 ++--
- drivers/crypto/caam/pdb.h                         | 137 ++++++++++++++=
-+-----
- drivers/crypto/caam/regs.h                        | 151 ++++++++++++++=
-+-------
- drivers/crypto/caam/sg_sw_sec4.h                  |  17 +--
- include/asm-generic/io.h                          |  71 +++++++++-
- include/asm-generic/iomap.h                       |   8 ++
- 15 files changed, 494 insertions(+), 176 deletions(-)
-
+diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
+index 44be1e03ed65..9b6e408cfa51 100644
+--- a/arch/arm64/include/asm/io.h
++++ b/arch/arm64/include/asm/io.h
+@@ -174,13 +174,15 @@ extern void __iomem *ioremap_cache(phys_addr_t ph=
+ys_addr, size_t size);
+ #define iounmap				__iounmap
+=20
+ /*
+- * io{read,write}{16,32}be() macros
++ * io{read,write}{16,32,64}be() macros
+  */
+ #define ioread16be(p)		({ __u16 __v =3D be16_to_cpu((__force __be16)__=
+raw_readw(p)); __iormb(); __v; })
+ #define ioread32be(p)		({ __u32 __v =3D be32_to_cpu((__force __be32)__=
+raw_readl(p)); __iormb(); __v; })
++#define ioread64be(p)		({ __u64 __v =3D be64_to_cpu((__force __be64)__=
+raw_readq(p)); __iormb(); __v; })
+=20
+ #define iowrite16be(v,p)	({ __iowmb(); __raw_writew((__force __u16)cpu=
+_to_be16(v), p); })
+ #define iowrite32be(v,p)	({ __iowmb(); __raw_writel((__force __u32)cpu=
+_to_be32(v), p); })
++#define iowrite64be(v,p)	({ __iowmb(); __raw_writeq((__force __u64)cpu=
+_to_be64(v), p); })
+=20
+ /*
+  * Convert a physical pointer to a virtual kernel pointer for /dev/mem
 --=20
 2.4.4
