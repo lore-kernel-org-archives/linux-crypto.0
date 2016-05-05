@@ -1,64 +1,43 @@
-From: Vineet Gupta <Vineet.Gupta1@synopsys.com>
-Subject: Re: [PATCH 1/7] asm-generic/io.h: add io{read,write}64 accessors
-Date: Thu, 5 May 2016 16:35:08 +0530
-Message-ID: <572B28E4.3090700@synopsys.com>
-References: <1462382179-11889-1-git-send-email-horia.geanta@nxp.com>
- <16429831.u9JK7qO1GE@wuerfel>
- <C2D7FE5348E1B147BCA15975FBA23075F4EA07DD@us01wembx1.internal.synopsys.com>
- <4560398.4eHNWD6mu5@wuerfel>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH 1/4] random: replace non-blocking pool with a
+ Chacha20-based CRNG
+Date: Thu, 5 May 2016 08:49:06 -0400
+Message-ID: <20160505124906.GF10776@thunk.org>
+References: <1462389951-29439-1-git-send-email-tytso@mit.edu>
+ <1462389951-29439-2-git-send-email-tytso@mit.edu>
+ <2563613.fjdkC65vSW@myon.chronox.de>
+ <20160505011007.GB10776@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Cc: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Scott Wood <scott.wood@nxp.com>,
-	Alexandru Porosanu <alexandru.porosanu@nxp.com>,
-	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
-	Cristian Stoica <cristian.stoica@nxp.com>,
-	arcml <linux-snps-arc@lists.infradead.org>,
-	Noam Camus <noamc@ezchip.com>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <4560398.4eHNWD6mu5@wuerfel>
-Sender: linux-arch-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+To: Stephan Mueller <smueller@chronox.de>,
+	Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
+	herbert@gondor.apana.org.au, andi@firstfloor.org,
+	sandyinchina@gmail.com, cryptography@lakedaemon.net, jsd@av8n.com,
+	hpa@zytor.com, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:49552 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751890AbcEEMtT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 May 2016 08:49:19 -0400
+Content-Disposition: inline
+In-Reply-To: <20160505011007.GB10776@thunk.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thursday 05 May 2016 04:26 PM, Arnd Bergmann wrote:
-> On Thursday 05 May 2016 08:16:47 Vineet Gupta wrote:
->> > Thx for noticing this Arnd and the heads up. Does the patch below look ok to you ?
->> > 
->> > ----------->
->> > rom b7e719831c389ab4fa338b2e2e7c0d1ff90dabb0 Mon Sep 17 00:00:00 2001
->> > From: Vineet Gupta <vgupta@synopsys.com>
->> > Date: Thu, 5 May 2016 13:32:34 +0530
->> > Subject: [PATCH] ARC: Add missing io barriers to io{read,write}{16,32}be()
->> > 
->> > While reviewing a different change to asm-generic/io.h Arnd spotted that
->> > ARC ioread32 and ioread32be both of which come from asm-generic versions
->> > are not symmetrical in terms of calling the io barriers.
->> > 
->> > generic ioread32   -> ARC readl()                  [ has barriers]
->> > generic ioread32be -> __be32_to_cpu(__raw_readl()) [ lacks barriers]
->> > 
->> > While generic ioread32be is being remediated to call readl(), that involves
->> > a swab32(), causing double swaps on ioread32be() on Big Endian systems.
->> > 
->> > So provide our versions of big endian IO accessors to ensure io barrier
->> > calls while also keeping them optimal
->> > 
->> > Suggested-by: Arnd Bergmann <arnd@arndb.de>
->> > Cc: stable@vger.kernel.org  [4.2+]
->> > Signed-off-by: Vineet Gupta <vgupta@synopsys.com>
->
-> Yes, that looks correct. We probably want this regardless of the change
-> I proposed for the generic file, to avoid the double swap.
+On Wed, May 04, 2016 at 09:10:07PM -0400, Theodore Ts'o wrote:
+> On Wed, May 04, 2016 at 10:28:24PM +0200, Stephan Mueller wrote:
+> > > +out:
+> > > +	spin_unlock_irqrestore(&primary_crng.lock, flags);
+> > > +	return ret;
+> > 
+> > Where did you add the memzero_explict of tmp?
+> 
+> Oops, sorry, somehow that change got lost in the patch updates.  Fixed now.
 
-Indeed so - I've queued this for 4.6 fixes !
+Since that was the only change, instead of sending out the patch
+series again, I've just updated it at:
 
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
+git://git.kernel.org/pub/scm/linux/kernel/git/tytso/random.git dev
 
-Thx !
+
+						- Ted
