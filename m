@@ -1,62 +1,249 @@
-From: Anatoly Pugachev <matorola@gmail.com>
-Subject: Re: [crypto / sparc64] cryptomgr_test OOPS
-Date: Thu, 5 May 2016 18:31:51 +0300
-Message-ID: <CADxRZqzyZgG=e-6aPcHrEopq51nqoU0NqdMnRcCUWkw39XB56A@mail.gmail.com>
-References: <20160503.123301.298039059390449291.davem@davemloft.net>
-	<20160504040731.GA25758@gondor.apana.org.au>
-	<CADxRZqws2yAMSqeMDYb6w6OUXJMMbv9wMaY7Zc6YX+szk2vO3g@mail.gmail.com>
-	<20160505084249.GA4971@gondor.apana.org.au>
-	<CADxRZqwxB-+DTV-qKFK6CVXwVV0h9yDkH6GxcjmA-M9KY2HM7g@mail.gmail.com>
-	<efc65239-4d7f-8d32-8928-0ac1bd8e46f3@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
-	Nicolai Stange <nicstange@gmail.com>
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f65.google.com ([209.85.213.65]:35921 "EHLO
-	mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752377AbcEEPbw (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 May 2016 11:31:52 -0400
-In-Reply-To: <efc65239-4d7f-8d32-8928-0ac1bd8e46f3@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Salvatore Benedetto <salvatore.benedetto-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH v2] Bluetooth: convert smp module to crypto kpp API
+Date: Thu,  5 May 2016 16:32:13 +0100
+Message-ID: <1462462333-3798-1-git-send-email-salvatore.benedetto@intel.com>
+Cc: salvatore.benedetto-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org, johan.hedberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, gustavo-THi1TnShQwVAfugRpC6u6w@public.gmane.org,
+	linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, May 5, 2016 at 6:00 PM, Tadeusz Struk <tadeusz.struk@intel.com> wrote:
-> On 05/05/2016 02:40 AM, Anatoly Pugachev wrote:
->> sure, based on your cryptodev git, just tried 4.3 (6a13feb , good)
->> kernel in attempt to find (bisect) when RSA code break, already tested
->> 4.5 (44d1b6d , bad) , 4.4 (afd2ff9 , bad).
->> Going to try your patch soon (when I'm back home).
->> So far 4.3 passes RSA stage without OOPS, but for other reason does
->> not boot to login prompt. Boot log exempt (4.3), this is with
->> CONFIG_CRYPTO_RSA=y :
->
-> Anatoly, could you also give this a try please:
-> Thanks
->
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index b86883a..770970ff 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -1805,8 +1805,8 @@ static int do_test_rsa(struct crypto_akcipher *tfm,
->                 goto free_req;
->
->         sg_init_table(src_tab, 2);
-> -       sg_set_buf(&src_tab[0], vecs->m, 8);
-> -       sg_set_buf(&src_tab[1], vecs->m + 8, vecs->m_size - 8);
-> +       sg_set_buf(&src_tab[0], vecs->m, 4);
-> +       sg_set_buf(&src_tab[1], vecs->m + 4, vecs->m_size - 4);
->         sg_init_one(&dst, outbuf_enc, out_len_max);
->         akcipher_request_set_crypt(req, src_tab, &dst, vecs->m_size,
->                                    out_len_max);
+This patch has *not* been tested as I don't have the hardware.
+It's purpose is to show how to use the kpp API.
 
+Based on https://patchwork.kernel.org/patch/9022371/
 
-Tadeusz,
+Signed-off-by: Salvatore Benedetto <salvatore.benedetto-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+---
+v2: Also convert ecc_make_key to kpp API
 
-do you still want to test it , after I have reported that Herbert patch works?
+ net/bluetooth/smp.c | 184 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 181 insertions(+), 3 deletions(-)
 
-Thanks.
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 50976a6..4d28704 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -25,6 +25,8 @@
+ #include <crypto/b128ops.h>
+ #include <crypto/hash.h>
+ #include <crypto/skcipher.h>
++#include <crypto/kpp.h>
++#include <crypto/ecdh.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -211,6 +213,182 @@ static int aes_cmac(struct crypto_shash *tfm, const u8 k[16], const u8 *m,
+ 	return 0;
+ }
+ 
++struct ecdh_completion {
++	struct completion completion;
++	int err;
++};
++
++static void ecdh_complete(struct crypto_async_request *req, int err)
++{
++	struct ecdh_completion *res = req->data;
++
++	if (err == -EINPROGRESS)
++		return;
++
++	res->err = err;
++	complete(&res->completion);
++}
++
++static inline void swap_digits(u64 *in, u64 *out, unsigned int ndigits)
++{
++	int i;
++
++	for (i = 0; i < ndigits; i++)
++		out[i] = __swab64(in[ndigits - 1 - i]);
++}
++
++static bool compute_ecdh_shared_secret(const u8 public_key[64],
++				       const u8 private_key[32], u8 secret[32])
++{
++	struct crypto_kpp *tfm;
++	struct kpp_request *req;
++	struct ecdh_params p;
++	struct ecdh_completion result;
++	struct scatterlist src, dst;
++	u8 tmp[64];
++	int err = -ENOMEM;
++
++	tfm = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
++	if (IS_ERR(tfm)) {
++		pr_err("alg: kpp: Failed to load tfm for kpp: %ld\n",
++		       PTR_ERR(tfm));
++		return false;
++	}
++
++	req = kpp_request_alloc(tfm, GFP_KERNEL);
++	if (!req)
++		goto free_kpp;
++
++	init_completion(&result.completion);
++
++	/* Set curve_id */
++	p.curve_id = ECC_CURVE_NIST_P256;
++	err = crypto_kpp_set_params(tfm, (void *)&p, sizeof(p));
++	if (err)
++		goto free_req;
++
++	/* Security Manager Protocol holds digits in litte-endian order
++	 * while ECC API expect big-endian data
++	 */
++	swap_digits((u64 *)private_key, (u64 *)tmp, 4);
++
++	/* Set A private Key */
++	err = crypto_kpp_set_secret(tfm, (void *)tmp, 32);
++	if (err)
++		goto free_all;
++
++	swap_digits((u64 *)public_key, (u64 *)tmp, 4); /* x */
++	swap_digits((u64 *)&public_key[32], (u64 *)&tmp[32], 4); /* y */
++
++	sg_init_one(&src, tmp, 64);
++	sg_init_one(&dst, secret, 32);
++	kpp_request_set_input(req, &src, 64);
++	kpp_request_set_output(req, &dst, 32);
++	kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				 ecdh_complete, &result);
++	err = crypto_kpp_compute_shared_secret(req);
++	if (err == -EINPROGRESS) {
++		wait_for_completion(&result.completion);
++		err = result.err;
++	}
++	if (err < 0) {
++		pr_err("alg: ecdh: compute shard secret test failed. err %d\n",
++		       err);
++		goto free_all;
++	}
++
++	swap_digits((u64 *)secret, (u64 *)tmp, 4);
++	memcpy(secret, tmp, 32);
++
++free_all:
++free_req:
++	kpp_request_free(req);
++free_kpp:
++	crypto_free_kpp(tfm);
++	return (err == 0);
++}
++
++bool generate_ecdh_key_pair(u8 public_key[64], u8 private_key[32])
++{
++	struct crypto_kpp *tfm;
++	struct kpp_request *req;
++	struct ecdh_params p;
++	struct ecdh_completion result;
++	struct scatterlist dst;
++	u8 tmp[64];
++	int err = -ENOMEM;
++	const unsigned short max_tries = 16;
++	unsigned short tries = 0;
++
++	tfm = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
++	if (IS_ERR(tfm)) {
++		pr_err("alg: kpp: Failed to load tfm for kpp: %ld\n",
++		       PTR_ERR(tfm));
++		return false;
++	}
++
++	req = kpp_request_alloc(tfm, GFP_KERNEL);
++	if (!req)
++		goto free_kpp;
++
++	init_completion(&result.completion);
++
++	/* Set curve_id */
++	p.curve_id = ECC_CURVE_NIST_P256;
++	err = crypto_kpp_set_params(tfm, (void *)&p, sizeof(p));
++	if (err)
++		goto free_req;
++
++	do {
++		if (tries++ >= max_tries)
++			goto free_all;
++
++		get_random_bytes(private_key, 32);
++
++		/* Set private Key */
++		err = crypto_kpp_set_secret(tfm, (void *)private_key, 32);
++		if (err)
++			goto free_all;
++
++		sg_init_one(&dst, tmp, 64);
++		kpp_request_set_output(req, &dst, 64);
++		kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++					 ecdh_complete, &result);
++
++		err = crypto_kpp_generate_public_key(req);
++
++		if (err == -EINPROGRESS) {
++			wait_for_completion(&result.completion);
++			err = result.err;
++		}
++
++		/* Private key is not valid. Regenerate */
++		if (err == -EINVAL)
++			continue;
++
++		if (err < 0)
++			goto free_all;
++		else
++			break;
++
++	} while (true);
++
++	/* Keys are handed back in little endian as expected by Security
++	 * Manager Protocol
++	 */
++	swap_digits((u64 *)tmp, (u64 *)public_key, 4); /* x */
++	swap_digits((u64 *)&tmp[32], (u64 *)&public_key[32], 4); /* y */
++	swap_digits((u64 *)private_key, (u64 *)tmp, 4);
++	memcpy(private_key, tmp, 32);
++
++free_all:
++free_req:
++	kpp_request_free(req);
++free_kpp:
++	crypto_free_kpp(tfm);
++	return (err == 0);
++}
++
+ static int smp_f4(struct crypto_shash *tfm_cmac, const u8 u[32],
+ 		  const u8 v[32], const u8 x[16], u8 z, u8 res[16])
+ {
+@@ -564,7 +742,7 @@ int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16])
+ 	} else {
+ 		while (true) {
+ 			/* Generate local key pair for Secure Connections */
+-			if (!ecc_make_key(smp->local_pk, smp->local_sk))
++			if (!generate_ecdh_key_pair(smp->local_pk, smp->local_sk))
+ 				return -EIO;
+ 
+ 			/* This is unlikely, but we need to check that
+@@ -1862,7 +2040,7 @@ static u8 sc_send_public_key(struct smp_chan *smp)
+ 	} else {
+ 		while (true) {
+ 			/* Generate local key pair for Secure Connections */
+-			if (!ecc_make_key(smp->local_pk, smp->local_sk))
++			if (!generate_ecdh_key_pair(smp->local_pk, smp->local_sk))
+ 				return SMP_UNSPECIFIED;
+ 
+ 			/* This is unlikely, but we need to check that
+@@ -2630,7 +2808,7 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	SMP_DBG("Remote Public Key X: %32phN", smp->remote_pk);
+ 	SMP_DBG("Remote Public Key Y: %32phN", smp->remote_pk + 32);
+ 
+-	if (!ecdh_shared_secret(smp->remote_pk, smp->local_sk, smp->dhkey))
++	if (!compute_ecdh_shared_secret(smp->remote_pk, smp->local_sk, smp->dhkey))
+ 		return SMP_UNSPECIFIED;
+ 
+ 	SMP_DBG("DHKey %32phN", smp->dhkey);
+-- 
+1.9.1
