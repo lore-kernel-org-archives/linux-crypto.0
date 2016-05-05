@@ -1,45 +1,84 @@
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: UB in general ... and linux/bitops.h in particular
-Date: Thu, 5 May 2016 10:32:14 -0700
-Message-ID: <20160505173214.GP13997@two.firstfloor.org>
-References: <572A6F1C.2080708@av8n.com>
- <CAH8yC8kZDfw+6Ctog-C7Jb57rLnagAFMNwNfGH_dwa9fs=5h1Q@mail.gmail.com>
- <28624BFC-7C63-4F38-9F67-7CBFB0C6499B@zytor.com>
- <CAH8yC8ndyLipAdu5=vmyJ3eHYBS-mxQsRF2q2G2EuOfQxTpM7g@mail.gmail.com>
- <0015E1DE-DFF9-4CCE-805E-7AC286021BED@zytor.com>
- <CAH8yC8mbW5yTwbKN7_RMNVnTiKmtP0u3_2+tKV=-L4BZ6miGVw@mail.gmail.com>
- <20160505035028.GD10776@thunk.org>
- <CAH8yC8n974Z=mvXPsLiZqYPkVjBqtR=nqYQ-jJo194ECmWkofA@mail.gmail.com>
- <572AE9A2.20609@zytor.com>
- <572B71A7.1020100@av8n.com>
+From: Tadeusz Struk <tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH RESEND v5 0/6] crypto: algif - add akcipher
+Date: Thu, 05 May 2016 12:50:48 -0700
+Message-ID: <20160505195048.1843.7817.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "H. Peter Anvin" <hpa@zytor.com>, noloader@gmail.com,
-	Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
-	Stephan Mueller <smueller@chronox.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andi Kleen <andi@firstfloor.org>,
-	Sandy Harris <sandyinchina@gmail.com>,
-	cryptography@lakedaemon.net, linux-crypto@vger.kernel.org
-To: John Denker <jsd@av8n.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([193.170.194.197]:59152 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750803AbcEERcS (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 May 2016 13:32:18 -0400
-Content-Disposition: inline
-In-Reply-To: <572B71A7.1020100@av8n.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org,
+	smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org
+To: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-> Suggestions:
-> 
->  a) Going forward, I suggest that UB should not be invoked
->   unless there is a good solid reason.
+First four patches are a resend of the v3 algif_akcipher from
+Stephan Mueller, with minor changes after rebase on top of 4.6-rc1.
 
-Good luck rewriting most of the kernel source.
+The next three patches add support for keys stored in system
+keyring subsystem.
 
-This discussion is insane!
+First patch adds algif_akcipher nokey hadlers.
 
--Andi
+Second patch adds generic sign, verify, encrypt, decrypt accessors
+functions to the asymmetric key type. These will be defined by
+asymmetric subtypes, similarly to how public_key currently defines
+the verify_signature function.
+
+Third patch adds support for ALG_SET_KEY_ID and ALG_SET_PUBKEY_ID
+commands to AF_ALG and setkeyid operation to the af_alg_type struct.
+If the keyid is used then the afalg layer acquires the key for the
+keyring subsystem and uses the new asymmetric accessor functions
+instead of akcipher api. The asymmetric subtypes can use akcipher
+api internally.
+
+This is the same v5 version as before rebased on top of
+http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-asym-keyctl
+
+v5 changes:
+- drop public key changes and use new version provided by David
+
+v4 changes:
+- don't use internal public_key struct in af_alg.
+- add generic accessor functions to asymmetric key type, which take
+  the generic struct key type and resolve the specific subtype internally
+
+v3 changes:
+- include Stephan's patches (rebased on 4.6-rc1)
+- add algif_akcipher nokey hadlers
+- add public_key info struct to public_key and helper query functions
+- add a check if a key is a software accessible key on af_alg, and
+  return -ENOKEY if it isn't
+
+v2 changes:
+- pass the original skcipher request in ablkcipher.base.data instead of
+  casting it back from the ablkcipher request.
+- rename _req to base_req
+- dropped 3/3
+
+---
+
+Stephan Mueller (4):
+      crypto: AF_ALG -- add sign/verify API
+      crypto: AF_ALG -- add setpubkey setsockopt call
+      crypto: AF_ALG -- add asymmetric cipher interface
+      crypto: algif_akcipher - enable compilation
+
+Tadeusz Struk (2):
+      crypto: algif_akcipher - add ops_nokey
+      crypto: AF_ALG - add support for key_id
+
+ crypto/Kconfig              |    9 
+ crypto/Makefile             |    1 
+ crypto/af_alg.c             |   28 +
+ crypto/algif_akcipher.c     |  884 +++++++++++++++++++++++++++++++++++++++++++
+ include/crypto/if_alg.h     |    2 
+ include/uapi/linux/if_alg.h |    5 
+ 6 files changed, 924 insertions(+), 5 deletions(-)
+ create mode 100644 crypto/algif_akcipher.c
+
+--
+TS
