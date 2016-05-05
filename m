@@ -1,57 +1,67 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
+From: Anatoly Pugachev <matorola@gmail.com>
 Subject: Re: [crypto / sparc64] cryptomgr_test OOPS
-Date: Thu, 5 May 2016 08:00:19 -0700
-Message-ID: <efc65239-4d7f-8d32-8928-0ac1bd8e46f3@intel.com>
+Date: Thu, 5 May 2016 18:12:02 +0300
+Message-ID: <CADxRZqy1Fi6yt7ajDKV=5uG_7TS4LNjfH0i0a1FNfPJsChddwg@mail.gmail.com>
 References: <20160503.123301.298039059390449291.davem@davemloft.net>
- <20160504040731.GA25758@gondor.apana.org.au>
- <CADxRZqws2yAMSqeMDYb6w6OUXJMMbv9wMaY7Zc6YX+szk2vO3g@mail.gmail.com>
- <20160505084249.GA4971@gondor.apana.org.au>
- <CADxRZqwxB-+DTV-qKFK6CVXwVV0h9yDkH6GxcjmA-M9KY2HM7g@mail.gmail.com>
+	<20160504040731.GA25758@gondor.apana.org.au>
+	<CADxRZqws2yAMSqeMDYb6w6OUXJMMbv9wMaY7Zc6YX+szk2vO3g@mail.gmail.com>
+	<20160505084249.GA4971@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
-	Nicolai Stange <nicstange@gmail.com>
-To: Anatoly Pugachev <matorola@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:31414 "EHLO mga04.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756507AbcEEPBK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 May 2016 11:01:10 -0400
-In-Reply-To: <CADxRZqwxB-+DTV-qKFK6CVXwVV0h9yDkH6GxcjmA-M9KY2HM7g@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	sparclinux@vger.kernel.org, Nicolai Stange <nicstange@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <sparclinux-owner@vger.kernel.org>
+In-Reply-To: <20160505084249.GA4971@gondor.apana.org.au>
+Sender: sparclinux-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 05/05/2016 02:40 AM, Anatoly Pugachev wrote:
-> sure, based on your cryptodev git, just tried 4.3 (6a13feb , good)
-> kernel in attempt to find (bisect) when RSA code break, already tested
-> 4.5 (44d1b6d , bad) , 4.4 (afd2ff9 , bad).
-> Going to try your patch soon (when I'm back home).
-> So far 4.3 passes RSA stage without OOPS, but for other reason does
-> not boot to login prompt. Boot log exempt (4.3), this is with
-> CONFIG_CRYPTO_RSA=y :
-
-Anatoly, could you also give this a try please: 
-Thanks
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index b86883a..770970ff 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1805,8 +1805,8 @@ static int do_test_rsa(struct crypto_akcipher *tfm,
- 		goto free_req;
- 
- 	sg_init_table(src_tab, 2);
--	sg_set_buf(&src_tab[0], vecs->m, 8);
--	sg_set_buf(&src_tab[1], vecs->m + 8, vecs->m_size - 8);
-+	sg_set_buf(&src_tab[0], vecs->m, 4);
-+	sg_set_buf(&src_tab[1], vecs->m + 4, vecs->m_size - 4);
- 	sg_init_one(&dst, outbuf_enc, out_len_max);
- 	akcipher_request_set_crypt(req, src_tab, &dst, vecs->m_size,
- 				   out_len_max);
+On Thu, May 5, 2016 at 11:42 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Wed, May 04, 2016 at 05:49:04PM +0300, Anatoly Pugachev wrote:
+>>
+>> just tested cryptodev (
+>> http://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+>> ) kernel, same OOPS, but kernel version is 4.6.0-rc2+ .
+>> kernel OOPS message - https://paste.fedoraproject.org/362554/23732641/
+>
+> Anatoly, could you please test this patch on top of cryptodev?
+> Thanks!
+>
+> ---8<---
+> Subject: crypto: testmgr - Use kmalloc memory for RSA input
+>
+> As akcipher uses an SG interface, you must not use vmalloc memory
+> as input for it.  This patch fixes testmgr to copy the vmalloc
+> test vectors to kmalloc memory before running the test.
+>
+> This patch also removes a superfluous sg_virt call in do_test_rsa.
 
 
--- 
-TS
+Herbert,
+
+this patch, applied to your cryptodev git kernel, fixes OOPS and my
+debian sparc64 installation boots successfully:
+
+[5684721.625447] Unpacking initramfs...
+[5684721.858235] Freeing initrd memory: 11720K (fff8002034000000 -
+fff8002034b72000)
+[5684721.867127] futex hash table entries: 65536 (order: 9, 4194304 bytes)
+[5684721.868551] audit: initializing netlink subsys (disabled)
+[5684721.868640] audit: type=2000 audit(0.476:1): initialized
+[5684721.868868] Initialise system trusted keyring
+[5684721.869765] workingset: timestamp_bits=45 max_order=21 bucket_order=0
+[5684721.869879] zbud: loaded
+[5684721.920120] Key type asymmetric registered
+[5684721.920173] Asymmetric key parser 'x509' registered
+[5684721.920582] Block layer SCSI generic (bsg) driver version 0.4
+loaded (major 252)
+[5684721.921249] io scheduler noop registered
+[5684721.921297] io scheduler deadline registered
+[5684721.921628] io scheduler cfq registered (default)
+[5684721.922101] f029b808: ttyS0 at I/O 0x0 (irq = 1, base_baud =
+115200) is a SUN4V HCONS
+[5684721.922352] console [ttyHV0] enabled
+[5684721.923480] sunvdc.c:v1.2 (November 24, 2014)
+
+
+Thanks.
