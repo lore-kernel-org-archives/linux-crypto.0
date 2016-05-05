@@ -1,69 +1,57 @@
-From: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
-Subject: [PATCH] crypto: vmx - comply with ABIs that specify vrsave as reserved.
-Date: Thu,  5 May 2016 11:09:27 -0300
-Message-ID: <1462457367-15445-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
-References: <20160503081345.GA17118@gondor.apana.org.au>
-Cc: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
-	"Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org (open list:IBM Power VMX Cryptographic
-	instructions)
-To: linux-kernel@vger.kernel.org
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [crypto / sparc64] cryptomgr_test OOPS
+Date: Thu, 5 May 2016 08:00:19 -0700
+Message-ID: <efc65239-4d7f-8d32-8928-0ac1bd8e46f3@intel.com>
+References: <20160503.123301.298039059390449291.davem@davemloft.net>
+ <20160504040731.GA25758@gondor.apana.org.au>
+ <CADxRZqws2yAMSqeMDYb6w6OUXJMMbv9wMaY7Zc6YX+szk2vO3g@mail.gmail.com>
+ <20160505084249.GA4971@gondor.apana.org.au>
+ <CADxRZqwxB-+DTV-qKFK6CVXwVV0h9yDkH6GxcjmA-M9KY2HM7g@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	David Miller <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
+	Nicolai Stange <nicstange@gmail.com>
+To: Anatoly Pugachev <matorola@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp05.br.ibm.com ([32.104.18.26]:60966 "EHLO
-	e24smtp05.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751270AbcEEOJm (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 May 2016 10:09:42 -0400
-Received: from localhost
-	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <pfsmorigo@linux.vnet.ibm.com>;
-	Thu, 5 May 2016 11:09:40 -0300
-In-Reply-To: <20160503081345.GA17118@gondor.apana.org.au>
+Received: from mga04.intel.com ([192.55.52.120]:31414 "EHLO mga04.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756507AbcEEPBK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 May 2016 11:01:10 -0400
+In-Reply-To: <CADxRZqwxB-+DTV-qKFK6CVXwVV0h9yDkH6GxcjmA-M9KY2HM7g@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-It gives significant improvements ( ~+15%) on some modes.
+On 05/05/2016 02:40 AM, Anatoly Pugachev wrote:
+> sure, based on your cryptodev git, just tried 4.3 (6a13feb , good)
+> kernel in attempt to find (bisect) when RSA code break, already tested
+> 4.5 (44d1b6d , bad) , 4.4 (afd2ff9 , bad).
+> Going to try your patch soon (when I'm back home).
+> So far 4.3 passes RSA stage without OOPS, but for other reason does
+> not boot to login prompt. Boot log exempt (4.3), this is with
+> CONFIG_CRYPTO_RSA=y :
 
-These code has been adopted from OpenSSL project in collaboration
-with the original author (Andy Polyakov <appro@openssl.org>).
+Anatoly, could you also give this a try please: 
+Thanks
 
-Signed-off-by: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
----
- drivers/crypto/vmx/ppc-xlate.pl | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
-
-diff --git a/drivers/crypto/vmx/ppc-xlate.pl b/drivers/crypto/vmx/ppc-xlate.pl
-index b999733..9f4994c 100644
---- a/drivers/crypto/vmx/ppc-xlate.pl
-+++ b/drivers/crypto/vmx/ppc-xlate.pl
-@@ -139,6 +139,26 @@ my $vmr = sub {
-     "	vor	$vx,$vy,$vy";
- };
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index b86883a..770970ff 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1805,8 +1805,8 @@ static int do_test_rsa(struct crypto_akcipher *tfm,
+ 		goto free_req;
  
-+# Some ABIs specify vrsave, special-purpose register #256, as reserved
-+# for system use.
-+my $no_vrsave = ($flavour =~ /aix|linux64le/);
-+my $mtspr = sub {
-+    my ($f,$idx,$ra) = @_;
-+    if ($idx == 256 && $no_vrsave) {
-+	"	or	$ra,$ra,$ra";
-+    } else {
-+	"	mtspr	$idx,$ra";
-+    }
-+};
-+my $mfspr = sub {
-+    my ($f,$rd,$idx) = @_;
-+    if ($idx == 256 && $no_vrsave) {
-+	"	li	$rd,-1";
-+    } else {
-+	"	mfspr	$rd,$idx";
-+    }
-+};
-+
- # PowerISA 2.06 stuff
- sub vsxmem_op {
-     my ($f, $vrt, $ra, $rb, $op) = @_;
+ 	sg_init_table(src_tab, 2);
+-	sg_set_buf(&src_tab[0], vecs->m, 8);
+-	sg_set_buf(&src_tab[1], vecs->m + 8, vecs->m_size - 8);
++	sg_set_buf(&src_tab[0], vecs->m, 4);
++	sg_set_buf(&src_tab[1], vecs->m + 4, vecs->m_size - 4);
+ 	sg_init_one(&dst, outbuf_enc, out_len_max);
+ 	akcipher_request_set_crypt(req, src_tab, &dst, vecs->m_size,
+ 				   out_len_max);
+
+
 -- 
-2.5.5
+TS
