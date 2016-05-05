@@ -1,41 +1,35 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [crypto / sparc64] cryptomgr_test OOPS
-Date: Thu, 5 May 2016 09:17:32 -0700
-Message-ID: <a3758abe-ec4e-56f7-c05a-7e9dd462d7c2@intel.com>
-References: <20160503.123301.298039059390449291.davem@davemloft.net>
- <20160504040731.GA25758@gondor.apana.org.au>
- <CADxRZqws2yAMSqeMDYb6w6OUXJMMbv9wMaY7Zc6YX+szk2vO3g@mail.gmail.com>
- <20160505084249.GA4971@gondor.apana.org.au>
- <CADxRZqwxB-+DTV-qKFK6CVXwVV0h9yDkH6GxcjmA-M9KY2HM7g@mail.gmail.com>
- <20160505095020.GA5473@gondor.apana.org.au>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH v2 2/8] asm-generic/io.h: add io{read,write}64 accessors
+Date: Thu, 05 May 2016 18:29:53 +0200
+Message-ID: <4710958.T0fVy9H8Sa@wuerfel>
+References: <1462462435-27403-1-git-send-email-horia.geanta@nxp.com> <1462462556-27684-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	sparclinux@vger.kernel.org, Nicolai Stange <nicstange@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Anatoly Pugachev <matorola@gmail.com>
-Return-path: <sparclinux-owner@vger.kernel.org>
-In-Reply-To: <20160505095020.GA5473@gondor.apana.org.au>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Scott Wood <scott.wood@nxp.com>,
+	Alexandru Porosanu <alexandru.porosanu@nxp.com>,
+	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
+	Cristian Stoica <cristian.stoica@nxp.com>
+To: Horia =?utf-8?B?R2VhbnTEgw==?= <horia.geanta@nxp.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mout.kundenserver.de ([212.227.126.134]:63231 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752908AbcEEQaL convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 May 2016 12:30:11 -0400
+In-Reply-To: <1462462556-27684-1-git-send-email-horia.geanta@nxp.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 05/05/2016 02:50 AM, Herbert Xu wrote:
-> On Thu, May 05, 2016 at 12:40:18PM +0300, Anatoly Pugachev wrote:
->>
->> sure, based on your cryptodev git, just tried 4.3 (6a13feb , good)
->> kernel in attempt to find (bisect) when RSA code break, already tested
->> 4.5 (44d1b6d , bad) , 4.4 (afd2ff9 , bad).
->> Going to try your patch soon (when I'm back home).
->> So far 4.3 passes RSA stage without OOPS, but for other reason does
->> not boot to login prompt. Boot log exempt (4.3), this is with
->> CONFIG_CRYPTO_RSA=y :
-> 
-> That jibes with this being a problem with the SG list since it
-> was only added in 4.4.
+On Thursday 05 May 2016 18:35:56 Horia Geant=C4=83 wrote:
+> This will allow device drivers to consistently use io{read,write}XX
+> also for 64-bit accesses.
+>=20
+> Signed-off-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
+>=20
 
-Before 4.4 the rsa sw implementation kmalloced intermediate flat buffer
-and copied the data internally.
-Thanks,
--- 
-TS
+Acked-by: Arnd Bergmann <arnd@arndb.de>
