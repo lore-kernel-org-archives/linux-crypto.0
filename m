@@ -1,126 +1,71 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [crypto / sparc64] cryptomgr_test OOPS
-Date: Thu, 5 May 2016 16:42:49 +0800
-Message-ID: <20160505084249.GA4971@gondor.apana.org.au>
-References: <20160503.123301.298039059390449291.davem@davemloft.net>
- <20160504040731.GA25758@gondor.apana.org.au>
- <CADxRZqws2yAMSqeMDYb6w6OUXJMMbv9wMaY7Zc6YX+szk2vO3g@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	sparclinux@vger.kernel.org, Nicolai Stange <nicstange@gmail.com>
-To: Anatoly Pugachev <matorola@gmail.com>
+From: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Subject: [PATCH 0/3 v4] Key-agreement Protocol Primitives (KPP) API
+Date: Thu,  5 May 2016 10:17:34 +0100
+Message-ID: <1462439857-93895-1-git-send-email-salvatore.benedetto@intel.com>
+Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44064 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756159AbcEEIm4 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 May 2016 04:42:56 -0400
-Content-Disposition: inline
-In-Reply-To: <CADxRZqws2yAMSqeMDYb6w6OUXJMMbv9wMaY7Zc6YX+szk2vO3g@mail.gmail.com>
+Received: from mga11.intel.com ([192.55.52.93]:64326 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755902AbcEEJRz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 May 2016 05:17:55 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 04, 2016 at 05:49:04PM +0300, Anatoly Pugachev wrote:
->
-> just tested cryptodev (
-> http://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
-> ) kernel, same OOPS, but kernel version is 4.6.0-rc2+ .
-> kernel OOPS message - https://paste.fedoraproject.org/362554/23732641/
+Hi Herb,
 
-Anatoly, could you please test this patch on top of cryptodev?
-Thanks!
+the following patchset introduces a new API for abstracting key-agreement
+protocols such as DH and ECDH. It provides the primitives required for implementing
+the protocol, thus the name KPP (Key-agreement Protocol Primitives).
 
----8<---
-Subject: crypto: testmgr - Use kmalloc memory for RSA input
+Regards,
+Salvatore
 
-As akcipher uses an SG interface, you must not use vmalloc memory
-as input for it.  This patch fixes testmgr to copy the vmalloc
-test vectors to kmalloc memory before running the test.
+Changes from v1:
+ * Change check in dh_check_params_length based on Stephan review
 
-This patch also removes a superfluous sg_virt call in do_test_rsa.
+Changed from v2:
+ * Add support for ECDH (curve P192 and P256). I reused the ecc module
+   already present in net/bluetooth and extended it in order to select
+   different curves at runtime. Code for P192 was taken from tinycrypt.
 
-Cc: <stable@vger.kernel.org>
-Reported-by: Anatoly Pugachev <matorola@gmail.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Changed from v3:
+ * Move curve ID definition to public header ecdh.h as users need to
+   have access to those ids when selecting the curve
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index fcd89fe..c727fb0 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1780,6 +1780,7 @@ static int alg_test_drbg(const struct alg_test_desc *desc, const char *driver,
- static int do_test_rsa(struct crypto_akcipher *tfm,
- 		       struct akcipher_testvec *vecs)
- {
-+	char *xbuf[XBUFSIZE];
- 	struct akcipher_request *req;
- 	void *outbuf_enc = NULL;
- 	void *outbuf_dec = NULL;
-@@ -1788,9 +1789,12 @@ static int do_test_rsa(struct crypto_akcipher *tfm,
- 	int err = -ENOMEM;
- 	struct scatterlist src, dst, src_tab[2];
- 
-+	if (testmgr_alloc_buf(xbuf))
-+		return err;
-+
- 	req = akcipher_request_alloc(tfm, GFP_KERNEL);
- 	if (!req)
--		return err;
-+		goto free_xbuf;
- 
- 	init_completion(&result.completion);
- 
-@@ -1808,9 +1812,14 @@ static int do_test_rsa(struct crypto_akcipher *tfm,
- 	if (!outbuf_enc)
- 		goto free_req;
- 
-+	if (WARN_ON(vecs->m_size > PAGE_SIZE))
-+		goto free_all;
-+
-+	memcpy(xbuf[0], vecs->m, vecs->m_size);
-+
- 	sg_init_table(src_tab, 2);
--	sg_set_buf(&src_tab[0], vecs->m, 8);
--	sg_set_buf(&src_tab[1], vecs->m + 8, vecs->m_size - 8);
-+	sg_set_buf(&src_tab[0], xbuf[0], 8);
-+	sg_set_buf(&src_tab[1], xbuf[0] + 8, vecs->m_size - 8);
- 	sg_init_one(&dst, outbuf_enc, out_len_max);
- 	akcipher_request_set_crypt(req, src_tab, &dst, vecs->m_size,
- 				   out_len_max);
-@@ -1829,7 +1838,7 @@ static int do_test_rsa(struct crypto_akcipher *tfm,
- 		goto free_all;
- 	}
- 	/* verify that encrypted message is equal to expected */
--	if (memcmp(vecs->c, sg_virt(req->dst), vecs->c_size)) {
-+	if (memcmp(vecs->c, outbuf_enc, vecs->c_size)) {
- 		pr_err("alg: rsa: encrypt test failed. Invalid output\n");
- 		err = -EINVAL;
- 		goto free_all;
-@@ -1844,7 +1853,13 @@ static int do_test_rsa(struct crypto_akcipher *tfm,
- 		err = -ENOMEM;
- 		goto free_all;
- 	}
--	sg_init_one(&src, vecs->c, vecs->c_size);
-+
-+	if (WARN_ON(vecs->c_size > PAGE_SIZE))
-+		goto free_all;
-+
-+	memcpy(xbuf[0], vecs->c, vecs->c_size);
-+
-+	sg_init_one(&src, xbuf[0], vecs->c_size);
- 	sg_init_one(&dst, outbuf_dec, out_len_max);
- 	init_completion(&result.completion);
- 	akcipher_request_set_crypt(req, &src, &dst, vecs->c_size, out_len_max);
-@@ -1871,6 +1886,8 @@ free_all:
- 	kfree(outbuf_enc);
- free_req:
- 	akcipher_request_free(req);
-+free_xbuf:
-+	testmgr_free_buf(xbuf);
- 	return err;
- }
- 
+Salvatore Benedetto (3):
+  crypto: Key-agreement Protocol Primitives API (KPP)
+  crypto: kpp - Add DH software implementation
+  crypto: kpp - Add ECDH software support
+
+ crypto/Kconfig                  |   23 +
+ crypto/Makefile                 |    6 +
+ crypto/crypto_user.c            |   20 +
+ crypto/dh.c                     |  224 +++++++++
+ crypto/ecc.c                    | 1037 +++++++++++++++++++++++++++++++++++++++
+ crypto/ecc.h                    |   74 +++
+ crypto/ecc_curve_defs.h         |   57 +++
+ crypto/ecdh.c                   |  171 +++++++
+ crypto/kpp.c                    |  123 +++++
+ crypto/testmgr.c                |  275 +++++++++++
+ crypto/testmgr.h                |  281 +++++++++++
+ include/crypto/dh.h             |   23 +
+ include/crypto/ecdh.h           |   20 +
+ include/crypto/internal/kpp.h   |   64 +++
+ include/crypto/kpp.h            |  333 +++++++++++++
+ include/linux/crypto.h          |    1 +
+ include/uapi/linux/cryptouser.h |    5 +
+ 17 files changed, 2737 insertions(+)
+ create mode 100644 crypto/dh.c
+ create mode 100644 crypto/ecc.c
+ create mode 100644 crypto/ecc.h
+ create mode 100644 crypto/ecc_curve_defs.h
+ create mode 100644 crypto/ecdh.c
+ create mode 100644 crypto/kpp.c
+ create mode 100644 include/crypto/dh.h
+ create mode 100644 include/crypto/ecdh.h
+ create mode 100644 include/crypto/internal/kpp.h
+ create mode 100644 include/crypto/kpp.h
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
