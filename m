@@ -1,61 +1,72 @@
-From: Sandy Harris <sandyinchina@gmail.com>
+From: tytso@mit.edu
 Subject: Re: better patch for linux/bitops.h
-Date: Thu, 5 May 2016 17:34:50 -0400
-Message-ID: <CACXcFmmk=DZMVqgZAOm1Lf3LP76By50af8NnPquRA8sF2Vgk0w@mail.gmail.com>
-References: <CAH8yC8=sYbrY9gpz0mKMKrcj=kSh38SPyxfk4HGeB5mOU6=etA@mail.gmail.com>
-	<BB2EB46A-8AFE-4A8C-A486-3717AC178A7B@zytor.com>
-	<20160504190723.GD3901@thunk.org>
-	<572A6CDD.10503@av8n.com>
-	<572A6F1C.2080708@av8n.com>
-	<CAH8yC8kZDfw+6Ctog-C7Jb57rLnagAFMNwNfGH_dwa9fs=5h1Q@mail.gmail.com>
-	<28624BFC-7C63-4F38-9F67-7CBFB0C6499B@zytor.com>
-	<CAH8yC8ndyLipAdu5=vmyJ3eHYBS-mxQsRF2q2G2EuOfQxTpM7g@mail.gmail.com>
-	<0015E1DE-DFF9-4CCE-805E-7AC286021BED@zytor.com>
-	<CAH8yC8mbW5yTwbKN7_RMNVnTiKmtP0u3_2+tKV=-L4BZ6miGVw@mail.gmail.com>
-	<20160505035028.GD10776@thunk.org>
+Date: Thu, 5 May 2016 22:18:09 +0000
+Message-ID: <20160505221809.GC17625@thunk.org>
+References: <20160504190723.GD3901@thunk.org>
+ <572A6CDD.10503@av8n.com>
+ <572A6F1C.2080708@av8n.com>
+ <CAH8yC8kZDfw+6Ctog-C7Jb57rLnagAFMNwNfGH_dwa9fs=5h1Q@mail.gmail.com>
+ <28624BFC-7C63-4F38-9F67-7CBFB0C6499B@zytor.com>
+ <CAH8yC8ndyLipAdu5=vmyJ3eHYBS-mxQsRF2q2G2EuOfQxTpM7g@mail.gmail.com>
+ <0015E1DE-DFF9-4CCE-805E-7AC286021BED@zytor.com>
+ <CAH8yC8mbW5yTwbKN7_RMNVnTiKmtP0u3_2+tKV=-L4BZ6miGVw@mail.gmail.com>
+ <20160505035028.GD10776@thunk.org>
+ <CACXcFmmk=DZMVqgZAOm1Lf3LP76By50af8NnPquRA8sF2Vgk0w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Jeffrey Walton <noloader@gmail.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Jeffrey Walton <noloader@gmail.com>,
 	"H. Peter Anvin" <hpa@zytor.com>, John Denker <jsd@av8n.com>,
 	LKML <linux-kernel@vger.kernel.org>,
 	Stephan Mueller <smueller@chronox.de>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Andi Kleen <andi@firstfloor.org>,
-	Sandy Harris <sandyinchina@gmail.com>,
 	Jason Cooper <cryptography@lakedaemon.net>,
 	linux-crypto@vger.kernel.org
+To: Sandy Harris <sandyinchina@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f181.google.com ([209.85.223.181]:34738 "EHLO
-	mail-io0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755959AbcEEVew (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 May 2016 17:34:52 -0400
-In-Reply-To: <20160505035028.GD10776@thunk.org>
+Received: from imap.thunk.org ([74.207.234.97]:51732 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752284AbcEEWS1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 May 2016 18:18:27 -0400
+Content-Disposition: inline
+In-Reply-To: <CACXcFmmk=DZMVqgZAOm1Lf3LP76By50af8NnPquRA8sF2Vgk0w@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 4, 2016 at 11:50 PM, Theodore Ts'o <tytso@mit.edu> wrote:
+On Thu, May 05, 2016 at 05:34:50PM -0400, Sandy Harris wrote:
+> 
+> I completely fail to see why tests or compiler versions should be
+> part of the discussion. The C standard says the behaviour in
+> certain cases is undefined, so a standard-compliant compiler
+> can generate more-or-less any code there.
+> 
 
-> Instead of arguing over who's "sane" or "insane", can we come up with
-> a agreed upon set of tests, and a set of compiler and compiler
-> versions ...
+> As long as any of portability, reliability or security are among our
+> goals, any code that can give undefined behaviour should be
+> considered problematic.
 
-I completely fail to see why tests or compiler versions should be
-part of the discussion. The C standard says the behaviour in
-certain cases is undefined, so a standard-compliant compiler
-can generate more-or-less any code there.
+Because compilers have been known not necessarily to obey the specs,
+and/or interpret the specs in way that not everyone agrees with.  It's
+also the case that we are *already* disabling certain C optimizations
+which are technically allowed by the spec, but which kernel
+programmers consider insane (e.g., strict aliasing).
 
-As long as any of portability, reliability or security are among our
-goals, any code that can give undefined behaviour should be
-considered problematic.
+And of course, memzero_explicit() which crypto people understand is
+necessary, is something that technically compilers are allowed to
+optimize according to the spec.  So trying to write secure kernel code
+which will work on arbitrary compilers may well be impossible.
 
-> But instead of arguing over what works and doesn't, let's just create
-> the the test set and just try it on a wide range of compilers and
-> architectures, hmmm?
+And which is also why people have said (mostly in jest), "A
+sufficiently advanced compiler is indistinguishable from an
+adversary."  (I assume people will agree that optimizing away a memset
+needed to clear secrets from memory would be considered adversarial,
+at the very least!)
 
-No. Let's just fix the code so that undefined behaviour cannot occur.
+So this is why I tend to take a much more pragmatic viewpoint on
+things.  Sure, it makes sense to pay attention to what the C standard
+writers are trying to do to us; but if we need to suppress certain
+optimizations to write sane kernel code --- I'm ok with that.  And
+this is why using a trust-but-verify on a specific set of compilers
+and ranges of compiler versions is a really good idea....
 
-Creating test cases for a fix and trying them on a range of systems
-would be useful, perhaps essential, work. Doing tests without a fix
-would be a complete waste of time.
+    	      	       		     - Ted
