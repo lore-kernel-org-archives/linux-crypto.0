@@ -1,52 +1,58 @@
-From: Sasha Levin <sasha.levin@oracle.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
 Subject: Re: linux/bitops.h
-Date: Fri, 6 May 2016 16:08:27 -0400
-Message-ID: <572CF9BB.3060902@oracle.com>
-References: <1462170413-7164-1-git-send-email-tytso@mit.edu>
- <1462170413-7164-2-git-send-email-tytso@mit.edu>
- <CAH8yC8kEWaH7FM03LRxMk555784Cw-b816=O50WqXWW-0Nep5Q@mail.gmail.com>
- <20160504174901.GC3901@thunk.org>
- <CAH8yC8=sYbrY9gpz0mKMKrcj=kSh38SPyxfk4HGeB5mOU6=etA@mail.gmail.com>
- <BB2EB46A-8AFE-4A8C-A486-3717AC178A7B@zytor.com>
- <20160504190723.GD3901@thunk.org> <572A6CDD.10503@av8n.com>
- <C6DC09E0-98EA-4591-9336-4D2BE1699C2C@zytor.com> <572A724C.6010704@av8n.com>
- <572A9437.4020208@zytor.com>
- <CA+55aFwo28F4ZpXn440O_wONsFskd5prrTcRtVOOJvKVczy1iA@mail.gmail.com>
+Date: Fri, 06 May 2016 13:25:07 -0700
+Message-ID: <33C7EF5D-096B-4578-A0D8-E4B94D516F9A@zytor.com>
+References: <1462170413-7164-1-git-send-email-tytso@mit.edu> <1462170413-7164-2-git-send-email-tytso@mit.edu> <CAH8yC8kEWaH7FM03LRxMk555784Cw-b816=O50WqXWW-0Nep5Q@mail.gmail.com> <20160504174901.GC3901@thunk.org> <CAH8yC8=sYbrY9gpz0mKMKrcj=kSh38SPyxfk4HGeB5mOU6=etA@mail.gmail.com> <BB2EB46A-8AFE-4A8C-A486-3717AC178A7B@zytor.com> <20160504190723.GD3901@thunk.org> <572A6CDD.10503@av8n.com> <C6DC09E0-98EA-4591-9336-4D2BE1699C2C@zytor.com> <572A724C.6010704@av8n.com> <572A9437.4020208@zytor.com> <572CF971.9060100@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: John Denker <jsd@av8n.com>, "Theodore Ts'o" <tytso@mit.edu>,
-	noloader@gmail.com,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+To: Sasha Levin <sasha.levin@oracle.com>, John Denker <jsd@av8n.com>,
+	tytso@mit.edu, noloader@gmail.com, linux-kernel@vger.kernel.org,
 	Stephan Mueller <smueller@chronox.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andi Kleen <andi@firstfloor.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>, andi@firstfloor.org,
 	Sandy Harris <sandyinchina@gmail.com>,
-	cryptography@lakedaemon.net,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"H. Peter Anvin" <hpa@zytor.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:48120 "EHLO
-	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758232AbcEFUI6 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 May 2016 16:08:58 -0400
-In-Reply-To: <CA+55aFwo28F4ZpXn440O_wONsFskd5prrTcRtVOOJvKVczy1iA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	cryptography@lakedaemon.net, linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <572CF971.9060100@oracle.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 05/04/2016 08:48 PM, Linus Torvalds wrote:
-> That said, the fact that the other cases weren't changed
-> (rol64/ror64/ror32) does make that argument less interesting. Unless
-> there was some particular code that actively ended up using
-> "rol32(..0)" but not the other cases.
+On May 6, 2016 1:07:13 PM PDT, Sasha Levin <sasha.levin@oracle.com> wrote:
+>On 05/04/2016 08:30 PM, H. Peter Anvin wrote:
+>> On 05/04/16 15:06, John Denker wrote:
+>>> On 05/04/2016 02:56 PM, H. Peter Anvin wrote:
+>>>>> Beware that shifting by an amount >= the number of bits in the
+>>>>> word remains Undefined Behavior.
+>>>
+>>>> This construct has been supported as a rotate since at least gcc2.
+>>>
+>>> How then should we understand the story told in commit d7e35dfa?
+>>> Is the story wrong?
+>>>
+>>> At the very least, something inconsistent is going on.  There
+>>> are 8 functions.  Why did d7e35dfa change one of them but
+>>> not the other 7?
+>> 
+>> Yes. d7e35dfa is baloney IMNSHO.  All it does is produce worse code,
+>and the description even says so.
+>
+>No, the description says that it produces worse code for *really
+>really* ancient
+>GCC versions.
+>
+>> As I said, gcc has treated the former code as idiomatic since gcc 2,
+>so that support is beyond ancient.
+>
+>Because something works in a specific way on one compiler isn't a
+>reason to
+>ignore this noncompliance with the standard.
+>
+>
+>Thanks,
+>Sasha
 
-Right, the others seemed wrong as well but I couldn't find any code
-that triggers that, and preferred to fix just the one I was hitting.
-
-I can go fix the rest if that's something we want to do?
-
-
-Thanks,
-Sasha
+4.6.2 is not "really, really ancient."
+-- 
+Sent from my Android device with K-9 Mail. Please excuse brevity and formatting.
