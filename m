@@ -1,99 +1,62 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [RESEND PATCH v2 1/8] asm-generic/io.h: allow barriers in io{read,write}{16,32}be
-Date: Fri, 6 May 2016 11:28:14 +0300
-Message-ID: <1462523294-3383-1-git-send-email-horia.geanta@nxp.com>
-References: <1462462435-27403-1-git-send-email-horia.geanta@nxp.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH RESEND v5 1/6] crypto: AF_ALG -- add sign/verify API
+Date: Fri, 06 May 2016 12:36:29 +0200
+Message-ID: <1766747.q7yy3uptgu@positron.chronox.de>
+References: <20160505195048.1843.7817.stgit@tstruk-mobl1> <20160505195054.1843.11748.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1on0078.outbound.protection.outlook.com ([157.56.110.78]:59936
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1757792AbcEFI2Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 May 2016 04:28:25 -0400
-In-Reply-To: <1462462435-27403-1-git-send-email-horia.geanta@nxp.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: dhowells@redhat.com, herbert@gondor.apana.org.au,
+	linux-api@vger.kernel.org, marcel@holtmann.org,
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, dwmw2@infradead.org,
+	davem@davemloft.net
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20160505195054.1843.11748.stgit@tstruk-mobl1>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-While reviewing the addition of io{read,write}64be accessors, Arnd
+Am Donnerstag, 5. Mai 2016, 12:50:54 schrieb Tadeusz Struk:
 
--finds a potential problem:
-"If an architecture overrides readq/writeq to have barriers but does
-not override ioread64be/iowrite64be, this will lack the barriers and
-behave differently from the little-endian version. I think the only
-affected architecture is ARC, since ARM and ARM64 both override the
-big-endian accessors to have the correct barriers, and all others
-don't use barriers at all."
+Hi Tadeusz, David,
 
--suggests a fix for the same problem in existing code (16/32-bit
-accessors); the fix leads "to a double-swap on architectures that
-don't override the io{read,write}{16,32}be accessors, but it will
-work correctly on all architectures without them having to override
-these accessors."
+> From: Stephan Mueller <smueller@chronox.de>
+> 
+> Add the flags for handling signature generation and signature
+> verification.
+> 
+> Also, the patch adds the interface for setting a public key.
+> 
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 
-Suggested-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
----
+All four patches from me:
 
-Herbert, I forgot to add you and/or linux-crypto in the loop,
-so I am resending this patch. Apologies for the noise.
+Acked-by: Stephan Mueller <smueller@chronox.de>
 
-Current patch got the Ack from Arnd:
-https://lkml.org/lkml/2016/5/5/376
+> ---
+>  include/uapi/linux/if_alg.h |    3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
+> index f2acd2f..02e6162 100644
+> --- a/include/uapi/linux/if_alg.h
+> +++ b/include/uapi/linux/if_alg.h
+> @@ -34,9 +34,12 @@ struct af_alg_iv {
+>  #define ALG_SET_OP			3
+>  #define ALG_SET_AEAD_ASSOCLEN		4
+>  #define ALG_SET_AEAD_AUTHSIZE		5
+> +#define ALG_SET_PUBKEY			6
+> 
+>  /* Operations */
+>  #define ALG_OP_DECRYPT			0
+>  #define ALG_OP_ENCRYPT			1
+> +#define ALG_OP_SIGN			2
+> +#define ALG_OP_VERIFY			3
+> 
+>  #endif	/* _LINUX_IF_ALG_H */
 
-As the cover letter mentions, I am looking to go with patches 1-4
-through cryptodev tree.
 
- include/asm-generic/io.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/include/asm-generic/io.h b/include/asm-generic/io.h
-index eed3bbe88c8a..b79fb2c248a1 100644
---- a/include/asm-generic/io.h
-+++ b/include/asm-generic/io.h
-@@ -613,7 +613,7 @@ static inline void iowrite32(u32 value, volatile vo=
-id __iomem *addr)
- #define ioread16be ioread16be
- static inline u16 ioread16be(const volatile void __iomem *addr)
- {
--	return __be16_to_cpu(__raw_readw(addr));
-+	return swab16(readw(addr));
- }
- #endif
-=20
-@@ -621,7 +621,7 @@ static inline u16 ioread16be(const volatile void __=
-iomem *addr)
- #define ioread32be ioread32be
- static inline u32 ioread32be(const volatile void __iomem *addr)
- {
--	return __be32_to_cpu(__raw_readl(addr));
-+	return swab32(readl(addr));
- }
- #endif
-=20
-@@ -629,7 +629,7 @@ static inline u32 ioread32be(const volatile void __=
-iomem *addr)
- #define iowrite16be iowrite16be
- static inline void iowrite16be(u16 value, void volatile __iomem *addr)
- {
--	__raw_writew(__cpu_to_be16(value), addr);
-+	writew(swab16(value), addr);
- }
- #endif
-=20
-@@ -637,7 +637,7 @@ static inline void iowrite16be(u16 value, void vola=
-tile __iomem *addr)
- #define iowrite32be iowrite32be
- static inline void iowrite32be(u32 value, volatile void __iomem *addr)
- {
--	__raw_writel(__cpu_to_be32(value), addr);
-+	writel(swab32(value), addr);
- }
- #endif
-=20
---=20
-2.4.4
+Ciao
+Stephan
