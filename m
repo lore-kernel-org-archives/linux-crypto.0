@@ -1,35 +1,61 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [crypto / sparc64] cryptomgr_test OOPS
-Date: Fri, 06 May 2016 15:52:46 -0400 (EDT)
-Message-ID: <20160506.155246.1005161410295236920.davem@davemloft.net>
-References: <20160504040731.GA25758@gondor.apana.org.au>
-	<CADxRZqws2yAMSqeMDYb6w6OUXJMMbv9wMaY7Zc6YX+szk2vO3g@mail.gmail.com>
-	<20160505084249.GA4971@gondor.apana.org.au>
+From: Sasha Levin <sasha.levin@oracle.com>
+Subject: Re: linux/bitops.h
+Date: Fri, 6 May 2016 16:07:13 -0400
+Message-ID: <572CF971.9060100@oracle.com>
+References: <1462170413-7164-1-git-send-email-tytso@mit.edu>
+ <1462170413-7164-2-git-send-email-tytso@mit.edu>
+ <CAH8yC8kEWaH7FM03LRxMk555784Cw-b816=O50WqXWW-0Nep5Q@mail.gmail.com>
+ <20160504174901.GC3901@thunk.org>
+ <CAH8yC8=sYbrY9gpz0mKMKrcj=kSh38SPyxfk4HGeB5mOU6=etA@mail.gmail.com>
+ <BB2EB46A-8AFE-4A8C-A486-3717AC178A7B@zytor.com>
+ <20160504190723.GD3901@thunk.org> <572A6CDD.10503@av8n.com>
+ <C6DC09E0-98EA-4591-9336-4D2BE1699C2C@zytor.com> <572A724C.6010704@av8n.com>
+ <572A9437.4020208@zytor.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: matorola@gmail.com, linux-crypto@vger.kernel.org,
-	sparclinux@vger.kernel.org, nicstange@gmail.com
-To: herbert@gondor.apana.org.au
-Return-path: <sparclinux-owner@vger.kernel.org>
-In-Reply-To: <20160505084249.GA4971@gondor.apana.org.au>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+To: "H. Peter Anvin" <hpa@zytor.com>, John Denker <jsd@av8n.com>,
+	tytso@mit.edu, noloader@gmail.com, linux-kernel@vger.kernel.org,
+	Stephan Mueller <smueller@chronox.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>, andi@firstfloor.org,
+	Sandy Harris <sandyinchina@gmail.com>,
+	cryptography@lakedaemon.net, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from userp1040.oracle.com ([156.151.31.81]:24207 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758265AbcEFUH5 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 6 May 2016 16:07:57 -0400
+In-Reply-To: <572A9437.4020208@zytor.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Thu, 5 May 2016 16:42:49 +0800
+On 05/04/2016 08:30 PM, H. Peter Anvin wrote:
+> On 05/04/16 15:06, John Denker wrote:
+>> On 05/04/2016 02:56 PM, H. Peter Anvin wrote:
+>>>> Beware that shifting by an amount >= the number of bits in the
+>>>> word remains Undefined Behavior.
+>>
+>>> This construct has been supported as a rotate since at least gcc2.
+>>
+>> How then should we understand the story told in commit d7e35dfa?
+>> Is the story wrong?
+>>
+>> At the very least, something inconsistent is going on.  There
+>> are 8 functions.  Why did d7e35dfa change one of them but
+>> not the other 7?
+> 
+> Yes. d7e35dfa is baloney IMNSHO.  All it does is produce worse code, and the description even says so.
 
-> Subject: crypto: testmgr - Use kmalloc memory for RSA input
-> 
-> As akcipher uses an SG interface, you must not use vmalloc memory
-> as input for it.  This patch fixes testmgr to copy the vmalloc
-> test vectors to kmalloc memory before running the test.
-> 
-> This patch also removes a superfluous sg_virt call in do_test_rsa.
-> 
-> Cc: <stable@vger.kernel.org>
-> Reported-by: Anatoly Pugachev <matorola@gmail.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+No, the description says that it produces worse code for *really really* ancient
+GCC versions.
 
-I'm really surprised this didn't trigger on non-sparc64 systems, but
-what do I know :-)
+> As I said, gcc has treated the former code as idiomatic since gcc 2, so that support is beyond ancient.
+
+Because something works in a specific way on one compiler isn't a reason to
+ignore this noncompliance with the standard.
+
+
+Thanks,
+Sasha
