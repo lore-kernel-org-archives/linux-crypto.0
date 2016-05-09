@@ -1,50 +1,76 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: pkcs1pad_verify_complete: decoding missing?
-Date: Mon, 9 May 2016 12:31:21 -0700
-Message-ID: <5f4797dd-323e-ca0b-3559-4b0ac4a4ac0b@intel.com>
-References: <5061410.3QzdTXsEjv@positron.chronox.de>
- <10395258.qUa3tSVhS8@tauon.atsec.com>
- <ee26539d-0447-d9cc-a2d7-370cfe05781a@intel.com>
- <1867642.XvlejD3yXB@tauon.atsec.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+From: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Subject: [PATCH v5 0/3] Key-agreement Protocol Primitives (KPP) API
+Date: Mon,  9 May 2016 22:40:38 +0100
+Message-ID: <1462830041-7582-1-git-send-email-salvatore.benedetto@intel.com>
+Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:3000 "EHLO mga14.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:39807 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751001AbcEITc1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 May 2016 15:32:27 -0400
-In-Reply-To: <1867642.XvlejD3yXB@tauon.atsec.com>
+	id S1753057AbcEIVlA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 May 2016 17:41:00 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 05/09/2016 12:24 PM, Stephan Mueller wrote:
-> Am Montag, 9. Mai 2016, 12:17:21 schrieb Tadeusz Struk:
-> 
-> Hi Tadeusz,
-> 
->> On 05/09/2016 12:02 PM, Stephan Mueller wrote:
->>> One followup: is the final memcmp() between the decrypted hash and the
->>> hash of the message implemented in the RSA verify code path? At least I
->>> do not see it right away.
->>
->> It's in line #549
-> 
-> Do you rather mean line 535? If yes, how would I provide the message digest to 
-> the verify function?
-> 
-> Please note that at the main driver of my question is 
-> https://git.kernel.org/cgit/linux/kernel/git/herbert/cryptodev-2.6.git/tree/crypto/asymmetric_keys/public_key.c#n143
-> where the caller implements the memcmp().
-> 
+Hi Herb,
 
-Sorry, I misread your question. Yes, the final data comparison needs to be done by the user.
-We don't have the original msg (or its digest) in the context of the verify operation.
-The only thing we are given is the encrypted message (and the key to decrypt it).
-And you are right, in this case it is done in:
-https://git.kernel.org/cgit/linux/kernel/git/herbert/cryptodev-2.6.git/tree/crypto/asymmetric_keys/public_key.c#n143 
-Thanks,
+the following patchset introduces a new API for abstracting key-agreement
+protocols such as DH and ECDH. It provides the primitives required for implementing
+the protocol, thus the name KPP (Key-agreement Protocol Primitives).
+
+Regards,
+Salvatore
+
+Changes from v4:
+* If fips_enabled is set allow only P256 (or higher) as Stephan suggested
+* Pass ndigits as argument to ecdh_make_pub_key and ecdh_shared_secret
+  so that VLA can be used like in the rest of the module
+
+Changes from v3:
+* Move curve ID definition to public header ecdh.h as users need to
+  have access to those ids when selecting the curve
+
+Changes from v2:
+* Add support for ECDH (curve P192 and P256). I reused the ecc module
+  already present in net/bluetooth and extended it in order to select
+  different curves at runtime. Code for P192 was taken from tinycrypt.
+
+Changes from v1:
+* Change check in dh_check_params_length based on Stephan review
+
+Salvatore Benedetto (3):
+  crypto: Key-agreement Protocol Primitives API (KPP)
+  crypto: kpp - Add DH software implementation
+  crypto: kpp - Add ECDH software support
+
+ crypto/Kconfig                  |   23 +
+ crypto/Makefile                 |    6 +
+ crypto/crypto_user.c            |   20 +
+ crypto/dh.c                     |  224 +++++++++
+ crypto/ecc.c                    | 1016 +++++++++++++++++++++++++++++++++++++++
+ crypto/ecc.h                    |   70 +++
+ crypto/ecc_curve_defs.h         |   57 +++
+ crypto/ecdh.c                   |  171 +++++++
+ crypto/kpp.c                    |  123 +++++
+ crypto/testmgr.c                |  275 +++++++++++
+ crypto/testmgr.h                |  281 +++++++++++
+ include/crypto/dh.h             |   23 +
+ include/crypto/ecdh.h           |   24 +
+ include/crypto/internal/kpp.h   |   64 +++
+ include/crypto/kpp.h            |  333 +++++++++++++
+ include/linux/crypto.h          |    1 +
+ include/uapi/linux/cryptouser.h |    5 +
+ 17 files changed, 2716 insertions(+)
+ create mode 100644 crypto/dh.c
+ create mode 100644 crypto/ecc.c
+ create mode 100644 crypto/ecc.h
+ create mode 100644 crypto/ecc_curve_defs.h
+ create mode 100644 crypto/ecdh.c
+ create mode 100644 crypto/kpp.c
+ create mode 100644 include/crypto/dh.h
+ create mode 100644 include/crypto/ecdh.h
+ create mode 100644 include/crypto/internal/kpp.h
+ create mode 100644 include/crypto/kpp.h
+
 -- 
-TS
+1.9.1
