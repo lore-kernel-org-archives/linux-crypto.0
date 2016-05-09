@@ -1,94 +1,55 @@
-From: Horia Ioan Geanta Neag <horia.geanta@nxp.com>
-Subject: Re: [PATCH v2 4/8] powerpc: add io{read,write}64 accessors
-Date: Mon, 9 May 2016 08:20:13 +0000
-Message-ID: <AM2PR04MB0673A09EBC13818E0C2D764E98700@AM2PR04MB0673.eurprd04.prod.outlook.com>
-References: <1462462435-27403-1-git-send-email-horia.geanta@nxp.com>
- <1462462573-27779-1-git-send-email-horia.geanta@nxp.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: pkcs1pad_verify_complete: decoding missing?
+Date: Mon, 09 May 2016 12:24:08 +0200
+Message-ID: <5061410.3QzdTXsEjv@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-2
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Cristian Stoica" <cristian.stoica@nxp.com>,
-	Scott Wood <scott.wood@nxp.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"Tudor-Dan Ambarus" <tudor-dan.ambarus@nxp.com>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandru Porosanu <alexandru.porosanu@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Paul Mackerras <paulus@samba.org>,
-	"Michael Ellerman" <mpe@ellerman.id.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-am1on0097.outbound.protection.outlook.com ([157.56.112.97]:7872
-	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750934AbcEIIxQ convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 May 2016 04:53:16 -0400
-Content-Language: en-US
+Received: from mail.eperm.de ([89.247.134.16]:55068 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751360AbcEIKYF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 May 2016 06:24:05 -0400
+Received: from positron.chronox.de (rrcs-97-79-174-130.sw.biz.rr.com [97.79.174.130])
+	by mail.eperm.de (Postfix) with ESMTPA id 800082A0048
+	for <linux-crypto@vger.kernel.org>; Mon,  9 May 2016 12:24:01 +0200 (CEST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 5/5/2016 6:37 PM, Horia Geant=E3 wrote:
-> This will allow device drivers to consistently use io{read,write}XX
-> also for 64-bit accesses.
->=20
-> Signed-off-by: Horia Geant=E3 <horia.geanta@nxp.com>
+Hi,
 
-It would be great if PPC maintainers could Ack this patch.
+I am experimenting with pkcs1pad(rsa-generic) signature verify. The following 
+numbers shall serve as examples -- using other valid signatures, similar 
+results are visible.
 
-As stated in the cover letter: https://lkml.org/lkml/2016/5/5/340
-I'd like to go with the whole patch set via cryptodev-2.6 tree.
+All signatures are correct.
 
-Thanks,
-Horia
+The result of the signature verify operation is the following byte stream:
 
-> ---
->  arch/powerpc/kernel/iomap.c | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
->=20
-> diff --git a/arch/powerpc/kernel/iomap.c b/arch/powerpc/kernel/iomap.=
-c
-> index 12e48d56f771..3963f0b68d52 100644
-> --- a/arch/powerpc/kernel/iomap.c
-> +++ b/arch/powerpc/kernel/iomap.c
-> @@ -38,6 +38,18 @@ EXPORT_SYMBOL(ioread16);
->  EXPORT_SYMBOL(ioread16be);
->  EXPORT_SYMBOL(ioread32);
->  EXPORT_SYMBOL(ioread32be);
-> +#ifdef __powerpc64__
-> +u64 ioread64(void __iomem *addr)
-> +{
-> +	return readq(addr);
-> +}
-> +u64 ioread64be(void __iomem *addr)
-> +{
-> +	return readq_be(addr);
-> +}
-> +EXPORT_SYMBOL(ioread64);
-> +EXPORT_SYMBOL(ioread64be);
-> +#endif /* __powerpc64__ */
-> =20
->  void iowrite8(u8 val, void __iomem *addr)
->  {
-> @@ -64,6 +76,18 @@ EXPORT_SYMBOL(iowrite16);
->  EXPORT_SYMBOL(iowrite16be);
->  EXPORT_SYMBOL(iowrite32);
->  EXPORT_SYMBOL(iowrite32be);
-> +#ifdef __powerpc64__
-> +void iowrite64(u64 val, void __iomem *addr)
-> +{
-> +	writeq(val, addr);
-> +}
-> +void iowrite64be(u64 val, void __iomem *addr)
-> +{
-> +	writeq_be(val, addr);
-> +}
-> +EXPORT_SYMBOL(iowrite64);
-> +EXPORT_SYMBOL(iowrite64be);
-> +#endif /* __powerpc64__ */
-> =20
->  /*
->   * These are the "repeat read/write" functions. Note the
->=20
+3021300906052b0e03021a05000414ba3bc9c6fb57dfa3103e5991e8992d4387afa6f2d93e4f478d3cb74138b28cc5d1601f2bc549c2297e5bf76578fbaf5defe617748ac29f825aa974a56b7fdffe21f8d5c6abd7d9050525c60d94a36b3ce7a763af66b1ed501ebd0edd4b686a6bb8afd903c9ab97a60853fa7345fdd28fcc
+
+The hash of the message is:
+
+ba3bc9c6fb57dfa3103e5991e8992d4387afa6f2
+
+
+The hash of the message is embedded in the data stream returned by the 
+signature verify operation.
+
+Looking at the first bytes of the data stream from the signature verify, it 
+looks like an ASN.1 sequence.
+
+Looking into the function pkcs1pad_verify_complete, that suspicion is 
+confirmed: the padding is removed, but the decoding is not implemented. Shall 
+a caller implement the decoding?
+
+If so, what is the purpose of the pkcs1pad implementation when only a part of 
+the sig ver is implemented?
+
+Looking into pkcs1pad_sign, I also do not see the BER encoding. Again, shall 
+the caller do that?
+
+
+Ciao
+Stephan
