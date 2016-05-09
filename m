@@ -1,65 +1,126 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.6
-Date: Mon, 9 May 2016 16:46:37 +0800
-Message-ID: <20160509084637.GA6056@gondor.apana.org.au>
-References: <20141007131826.GA29688@gondor.apana.org.au>
- <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150415033951.GA1406@gondor.apana.org.au>
- <20150622084457.GA7806@gondor.apana.org.au>
- <20150831135655.GA2694@gondor.apana.org.au>
- <20151102080427.GA8465@gondor.apana.org.au>
- <20160111101450.GA24044@gondor.apana.org.au>
- <20160122101828.GA15966@gondor.apana.org.au>
- <20160330091150.GA17143@gondor.apana.org.au>
+From: Horia Ioan Geanta Neag <horia.geanta@nxp.com>
+Subject: Re: [PATCH v2 8/8] arm64: dts: ls1043a: add crypto node
+Date: Mon, 9 May 2016 08:28:38 +0000
+Message-ID: <AM2PR04MB067369B10B1C4A2848C265DC98700@AM2PR04MB0673.eurprd04.prod.outlook.com>
+References: <1462462435-27403-1-git-send-email-horia.geanta@nxp.com>
+ <1462462617-28153-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49151 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751782AbcEIIqr (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 May 2016 04:46:47 -0400
-Content-Disposition: inline
-In-Reply-To: <20160330091150.GA17143@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	Mingkai Hu <mingkai.hu@nxp.com>,
+	Scott Wood <scott.wood@nxp.com>,
+	Alexandru Porosanu <alexandru.porosanu@nxp.com>,
+	Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>,
+	Cristian Stoica <cristian.stoica@nxp.com>,
+	Fabio Estevam <fabio.estevam@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Rob Herring <robh+dt@kernel.org>,
+	Olof Johansson <olof@lixom.net>,
+	Shawn Guo <shawnguo@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
++Shawn
 
-This push fixes the following issues:
+On 5/5/2016 6:39 PM, Horia Geant=E3 wrote:
+> LS1043A has a SEC v5.4 security engine.
+> For now don't add rtic or sec_mon subnodes, since these features
+> haven't been tested yet.
+>=20
+> Signed-off-by: Horia Geant=E3 <horia.geanta@nxp.com>
 
-- Bug in ahash SG list walking that may lead to crashes.
-- Resource leak in qat.
-- Missing RSA dependency that causes it to fail.
+Shawn,
 
+IIUC, you are the de facto maintainer of arch/arm64/boot/dts/freescale
+entry, thus adding you to the loop.
+I'd like to get the Ack for this patch.
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Herbert Xu (1):
-      crypto: hash - Fix page length clamping in hash walk
-
-Tadeusz Struk (3):
-      crypto: qat - fix invalid pf2vf_resp_wq logic
-      crypto: qat - fix adf_ctl_drv.c:undefined reference to adf_init_pf_wq
-      crypto: rsa - select crypto mgr dependency
-
- crypto/Kconfig                                 |    1 +
- crypto/ahash.c                                 |    3 ++-
- drivers/crypto/qat/qat_common/adf_common_drv.h |   11 ++++++++++
- drivers/crypto/qat/qat_common/adf_ctl_drv.c    |    6 ++++++
- drivers/crypto/qat/qat_common/adf_sriov.c      |   26 +++++++++++++++---------
- 5 files changed, 36 insertions(+), 11 deletions(-)
+As stated in the cover letter: https://lkml.org/lkml/2016/5/5/340
+my intent is to go with the whole patch set via cryptodev-2.6 tree.
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Horia
+
+> ---
+>  arch/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dts |  4 +++
+>  arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi    | 43 +++++++++++++=
+++++++++++
+>  2 files changed, 47 insertions(+)
+>=20
+> diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dts b/arch=
+/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dts
+> index ce235577e90f..9b5b75a4f02a 100644
+> --- a/arch/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dts
+> +++ b/arch/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dts
+> @@ -49,6 +49,10 @@
+> =20
+>  / {
+>  	model =3D "LS1043A RDB Board";
+> +
+> +	aliases {
+> +		crypto =3D &crypto;
+> +	};
+>  };
+> =20
+>  &i2c0 {
+> diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi b/arch/ar=
+m64/boot/dts/freescale/fsl-ls1043a.dtsi
+> index be72bf5b58b5..529c198494d5 100644
+> --- a/arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi
+> +++ b/arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi
+> @@ -159,6 +159,49 @@
+>  			big-endian;
+>  		};
+> =20
+> +		crypto: crypto@1700000 {
+> +			compatible =3D "fsl,sec-v5.4", "fsl,sec-v5.0",
+> +				     "fsl,sec-v4.0";
+> +			fsl,sec-era =3D <3>;
+> +			#address-cells =3D <1>;
+> +			#size-cells =3D <1>;
+> +			ranges =3D <0x0 0x00 0x1700000 0x100000>;
+> +			reg =3D <0x00 0x1700000 0x0 0x100000>;
+> +			interrupts =3D <0 75 0x4>;
+> +
+> +			sec_jr0: jr@10000 {
+> +				compatible =3D "fsl,sec-v5.4-job-ring",
+> +					     "fsl,sec-v5.0-job-ring",
+> +					     "fsl,sec-v4.0-job-ring";
+> +				reg	   =3D <0x10000 0x10000>;
+> +				interrupts =3D <0 71 0x4>;
+> +			};
+> +
+> +			sec_jr1: jr@20000 {
+> +				compatible =3D "fsl,sec-v5.4-job-ring",
+> +					     "fsl,sec-v5.0-job-ring",
+> +					     "fsl,sec-v4.0-job-ring";
+> +				reg	   =3D <0x20000 0x10000>;
+> +				interrupts =3D <0 72 0x4>;
+> +			};
+> +
+> +			sec_jr2: jr@30000 {
+> +				compatible =3D "fsl,sec-v5.4-job-ring",
+> +					     "fsl,sec-v5.0-job-ring",
+> +					     "fsl,sec-v4.0-job-ring";
+> +				reg	   =3D <0x30000 0x10000>;
+> +				interrupts =3D <0 73 0x4>;
+> +			};
+> +
+> +			sec_jr3: jr@40000 {
+> +				compatible =3D "fsl,sec-v5.4-job-ring",
+> +					     "fsl,sec-v5.0-job-ring",
+> +					     "fsl,sec-v4.0-job-ring";
+> +				reg	   =3D <0x40000 0x10000>;
+> +				interrupts =3D <0 74 0x4>;
+> +			};
+> +		};
+> +
+>  		dcfg: dcfg@1ee0000 {
+>  			compatible =3D "fsl,ls1043a-dcfg", "syscon";
+>  			reg =3D <0x0 0x1ee0000 0x0 0x10000>;
+>=20
