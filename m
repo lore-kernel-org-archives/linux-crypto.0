@@ -1,56 +1,80 @@
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH v2 4/8] powerpc: add io{read,write}64 accessors
-Date: Wed, 11 May 2016 10:35:04 +1000
-Message-ID: <1462926904.10184.2.camel@ellerman.id.au>
-References: <1462462435-27403-1-git-send-email-horia.geanta@nxp.com>
-	 <1462462573-27779-1-git-send-email-horia.geanta@nxp.com>
-	 <AM2PR04MB0673A09EBC13818E0C2D764E98700@AM2PR04MB0673.eurprd04.prod.outlook.com>
-	 <DB5PR0401MB1928B01F60FF3137118F237891710@DB5PR0401MB1928.eurprd04.prod.outlook.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Cristian Stoica <cristian.stoica@nxp.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandru Porosanu <alexandru.porosanu@nxp.com>
-To: Scott Wood <scott.wood@nxp.com>,
-	Horia Ioan Geanta Neag <horia.geanta@nxp.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Paul Mackerras <paulus@samba.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <DB5PR0401MB1928B01F60FF3137118F237891710@DB5PR0401MB1928.eurprd04.prod.outlook.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Subject: [PATCH v6 0/3] Key-agreement Protocol Primitives (KPP) API
+Date: Wed, 11 May 2016 08:26:00 +0100
+Message-ID: <1462951563-50042-1-git-send-email-salvatore.benedetto@intel.com>
+Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:5865 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751324AbcEKH0j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 11 May 2016 03:26:39 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2016-05-10 at 18:50 +0000, Scott Wood wrote:
+Hi Herb,
 
-> On 05/09/2016 03:20 AM, Horia Ioan Geanta Neag wrote:
+the following patchset introduces a new API for abstracting key-agreement
+protocols such as DH and ECDH. It provides the primitives required for implementing
+the protocol, thus the name KPP (Key-agreement Protocol Primitives).
 
-> > On 5/5/2016 6:37 PM, Horia Geant=C4=83 wrote:
+Regards,
+Salvatore
 
-> > > This will allow device drivers to consistently use io{read,write}=
-XX
-> > > also for 64-bit accesses.
-> > >=20
-> > > Signed-off-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
-> >=20
-> > It would be great if PPC maintainers could Ack this patch.
-> >=20
-> > As stated in the cover letter: https://lkml.org/lkml/2016/5/5/340
-> > I'd like to go with the whole patch set via cryptodev-2.6 tree.
->=20
-> It looks good to me.  Michael?
+Changes from v5:
+* Fix ecdh loading in fips mode.
 
-I didn't get the cover letter, or any of the rest of the series, so alt=
-hough I
-saw the patch I had no context. And I didn't have time to chase it up.
+Changes from v4:
+* If fips_enabled is set allow only P256 (or higher) as Stephan suggested
+* Pass ndigits as argument to ecdh_make_pub_key and ecdh_shared_secret
+  so that VLA can be used like in the rest of the module
 
-At a glance it seems fine, so:
+Changes from v3:
+* Move curve ID definition to public header ecdh.h as users need to
+  have access to those ids when selecting the curve
 
-Acked-by: Michael Ellerman <mpe@ellerman.id.au>
+Changes from v2:
+* Add support for ECDH (curve P192 and P256). I reused the ecc module
+  already present in net/bluetooth and extended it in order to select
+  different curves at runtime. Code for P192 was taken from tinycrypt.
 
-cheers
+Changes from v1:
+* Change check in dh_check_params_length based on Stephan review
+
+
+Salvatore Benedetto (3):
+  crypto: Key-agreement Protocol Primitives API (KPP)
+  crypto: kpp - Add DH software implementation
+  crypto: kpp - Add ECDH software support
+
+ crypto/Kconfig                  |   23 +
+ crypto/Makefile                 |    6 +
+ crypto/crypto_user.c            |   20 +
+ crypto/dh.c                     |  224 +++++++++
+ crypto/ecc.c                    | 1016 +++++++++++++++++++++++++++++++++++++++
+ crypto/ecc.h                    |   70 +++
+ crypto/ecc_curve_defs.h         |   57 +++
+ crypto/ecdh.c                   |  171 +++++++
+ crypto/kpp.c                    |  123 +++++
+ crypto/testmgr.c                |  275 +++++++++++
+ crypto/testmgr.h                |  286 +++++++++++
+ include/crypto/dh.h             |   23 +
+ include/crypto/ecdh.h           |   24 +
+ include/crypto/internal/kpp.h   |   64 +++
+ include/crypto/kpp.h            |  333 +++++++++++++
+ include/linux/crypto.h          |    1 +
+ include/uapi/linux/cryptouser.h |    5 +
+ 17 files changed, 2721 insertions(+)
+ create mode 100644 crypto/dh.c
+ create mode 100644 crypto/ecc.c
+ create mode 100644 crypto/ecc.h
+ create mode 100644 crypto/ecc_curve_defs.h
+ create mode 100644 crypto/ecdh.c
+ create mode 100644 crypto/kpp.c
+ create mode 100644 include/crypto/dh.h
+ create mode 100644 include/crypto/ecdh.h
+ create mode 100644 include/crypto/internal/kpp.h
+ create mode 100644 include/crypto/kpp.h
+
+-- 
+2.5.0
