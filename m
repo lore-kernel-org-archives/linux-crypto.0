@@ -1,40 +1,51 @@
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH] crypto/ccp: remove rwlocks_types.h
-Date: Wed, 11 May 2016 12:06:20 +0200
-Message-ID: <1462961180-11135-1-git-send-email-bigeasy@linutronix.de>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, tglx@linutronix.de,
-	Peter Zijlstra <peterz@infradead.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: linux-crypto@vger.kernel.org
+From: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
+Subject: RE: [PATCH] crypto: rsa - return raw integer for the ASN.1 parser
+Date: Wed, 11 May 2016 07:41:31 +0000
+Message-ID: <VI1PR04MB1311A94658FE756E27429557B8720@VI1PR04MB1311.eurprd04.prod.outlook.com>
+References: <1461934306-29190-1-git-send-email-tudor-dan.ambarus@nxp.com>
+ <20160503073957.GA16836@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www.linutronix.de ([62.245.132.108]:47623 "EHLO
-	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932088AbcEKKGZ (ORCPT
+Received: from mail-db3on0055.outbound.protection.outlook.com ([157.55.234.55]:30240
+	"EHLO emea01-db3-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751400AbcEKKQo convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 May 2016 06:06:25 -0400
+	Wed, 11 May 2016 06:16:44 -0400
+In-Reply-To: <20160503073957.GA16836@gondor.apana.org.au>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Users of rwlocks should include spinlock.h instead including this
-header file. The current users of rwlocks_types.h are internal.
+Hi Herbert,
 
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- drivers/crypto/ccp/ccp-dev.c | 1 -
- 1 file changed, 1 deletion(-)
+> On Fri, Apr 29, 2016 at 03:51:46PM +0300, Tudor Ambarus wrote:
+> >
+> >  struct rsa_key {
+> > +	u8 *n;
+> > +	u8 *e;
+> > +	u8 *d;
+> > +	dma_addr_t dma_n;
+> > +	dma_addr_t dma_e;
+> > +	dma_addr_t dma_d;
+> > +	size_t n_sz;
+> > +	size_t e_sz;
+> > +	bool coherent;
+> > +	gfp_t flags;
+> 
+> Please don't put the DMA primitives in the generic helper.  They
+> should stay in the driver for now.
 
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index 4dbc18727235..2a8ad712a5f2 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -16,7 +16,6 @@
- #include <linux/sched.h>
- #include <linux/interrupt.h>
- #include <linux/spinlock.h>
--#include <linux/rwlock_types.h>
- #include <linux/types.h>
- #include <linux/mutex.h>
- #include <linux/delay.h>
--- 
-2.8.1
+If I move the DMA primitives to the driver context,
+I can't assure software coherency enforcement in rsa helper.
+
+If so, after the ANS.1 parsing, if a driver needs to enforce software
+coherency, it will have to allocate coherent memory and copy
+the ANS.1 parsed data there. Is this acceptable?
+
+Thanks,
+ta
