@@ -1,50 +1,51 @@
 From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [RFC PATCH 2/8] KEYS: Provide keyctls to drive the new key type
- ops for asymmetric keys [ver 3]
-Date: Wed, 11 May 2016 15:17:34 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1605111426140.16566@mjmartin-mac01.local>
-References: <20160511142152.4743.14414.stgit@warthog.procyon.org.uk> <20160511142207.4743.40300.stgit@warthog.procyon.org.uk>
+Subject: Re: [RFC PATCH 5/8] KEYS: Provide software public key query function
+ [ver 3]
+Date: Wed, 11 May 2016 16:50:05 -0700 (PDT)
+Message-ID: <alpine.OSX.2.20.1605111624090.16566@mjmartin-mac01.local>
+References: <20160511142152.4743.14414.stgit@warthog.procyon.org.uk> <20160511142230.4743.12500.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Cc: mathew.j.martineau@linux.intel.com, tadeusz.struk@intel.com,
 	linux-kernel@vger.kernel.org,
 	linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
 	linux-crypto@vger.kernel.org, dwmw2@infradead.org
 To: David Howells <dhowells@redhat.com>
 Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <20160511142207.4743.40300.stgit@warthog.procyon.org.uk>
+In-Reply-To: <20160511142230.4743.12500.stgit@warthog.procyon.org.uk>
 Sender: owner-linux-security-module@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 
 On Wed, 11 May 2016, David Howells wrote:
 
-> diff --git a/Documentation/security/keys.txt b/Documentation/security/keys.txt
-> index ca72b70a24b9..01c2ae28a8c0 100644
-> --- a/Documentation/security/keys.txt
-> +++ b/Documentation/security/keys.txt
-> +     If the key needs to be unlocked with a password, a logon-type key that
-> +     holds the password may be given as the password argument
+> Provide a query function for the software public key implementation.  This
+> permits information about such a key to be obtained using
+> query_asymmetric_key() or KEYCTL_PKEY_QUERY.
+>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> ---
+>
+> crypto/asymmetric_keys/public_key.c |   96 ++++++++++++++++++++++++++++++-----
+> 1 file changed, 82 insertions(+), 14 deletions(-)
+>
+> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+> index 96983906d2a2..e9967e5a2c25 100644
+> --- a/crypto/asymmetric_keys/public_key.c
+> +++ b/crypto/asymmetric_keys/public_key.c
+> +static int software_key_query(const struct kernel_pkey_params *params,
+> +			      struct kernel_pkey_query *info)
+> +{
 ...
-> +     If the key must be unlocked with a password before it can be used,
-> +     password_id should point to a logon-type key that holds this.
+> +	len = crypto_akcipher_maxsize(tfm);
+> +	info->key_size = len * 8;
+> +	info->max_data_size = len;
+> +	info->max_sig_size = len;
+> +	info->max_enc_size = len;
+> +	info->max_dec_size = len;
 
-It should be noted that the password_id should be 0 if no password is to 
-be used.
-
-> diff --git a/security/keys/keyctl_pkey.c b/security/keys/keyctl_pkey.c
-> new file mode 100644
-> index 000000000000..7f51db984aaa
-> --- /dev/null
-> +++ b/security/keys/keyctl_pkey.c
-> +long keyctl_pkey_e_d_s(int op,
-...
-> +	ret = params.key->type->asym_eds_op(&params, in, out);
-
-Need to check for NULL asym_eds_op before calling.
-
-
-Regards,
+If len > UINT16_MAX, should UINT16_MAX be reported as the max size? 
+Similar question for len*8 and key_size.
 
 --
 Mat Martineau
