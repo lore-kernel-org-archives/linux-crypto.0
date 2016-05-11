@@ -1,8 +1,8 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [RFC PATCH 8/8] KEYS: Implement PKCS#8 RSA Private Key parser [ver
- 3]
-Date: Wed, 11 May 2016 15:22:52 +0100
-Message-ID: <20160511142252.4743.21903.stgit@warthog.procyon.org.uk>
+Subject: [RFC PATCH 3/8] KEYS: Provide missing asymmetric key subops for new
+ key type ops [ver 3]
+Date: Wed, 11 May 2016 15:22:15 +0100
+Message-ID: <20160511142215.4743.34404.stgit@warthog.procyon.org.uk>
 References: <20160511142152.4743.14414.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -16,302 +16,463 @@ In-Reply-To: <20160511142152.4743.14414.stgit@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Implement PKCS#8 RSA Private Key format [RFC 5208] parser for the
-asymmetric key type.  For the moment, this will only support unencrypted
-DER blobs.  PEM and decryption can be added later.
+Provide the missing asymmetric key subops for new key type ops.  This
+include query, encrypt, decrypt and create signature.  Verify signature
+already exists.  Also provided are accessor functions for this:
 
-PKCS#8 keys can be loaded like this:
+	int query_asymmetric_key(const struct key *key,
+				 const struct key *password,
+				 struct kernel_pkey_query *info);
 
-	openssl pkcs8 -in private_key.pem -topk8 -nocrypt -outform DER | \
-	  keyctl padd asymmetric foo @s
+	int encrypt_blob(struct kernel_pkey_params *params,
+			 const void *data, void *enc);
+	int decrypt_blob(struct kernel_pkey_params *params,
+			 const void *enc, void *data);
+	int create_signature(struct kernel_pkey_params *params,
+			     const void *data, void *enc);
+
+The public_key_signature struct gains an encoding field to carry the
+encoding for verify_signature() and that function gains an extra key
+pointer that can be used to pass a pointer to a logon key carrying a
+password to unlock the key.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- Documentation/crypto/asymmetric-keys.txt |    2 
- crypto/asymmetric_keys/Kconfig           |   10 ++
- crypto/asymmetric_keys/Makefile          |   13 ++
- crypto/asymmetric_keys/pkcs8.asn1        |   24 ++++
- crypto/asymmetric_keys/pkcs8_parser.c    |  184 ++++++++++++++++++++++++++++++
- 5 files changed, 233 insertions(+)
- create mode 100644 crypto/asymmetric_keys/pkcs8.asn1
- create mode 100644 crypto/asymmetric_keys/pkcs8_parser.c
+ Documentation/crypto/asymmetric-keys.txt |   31 +++++++-
+ crypto/asymmetric_keys/asymmetric_keys.h |    3 +
+ crypto/asymmetric_keys/asymmetric_type.c |   60 ++++++++++++++--
+ crypto/asymmetric_keys/pkcs7_trust.c     |    2 -
+ crypto/asymmetric_keys/public_key.c      |    1 
+ crypto/asymmetric_keys/restrict.c        |    2 -
+ crypto/asymmetric_keys/signature.c       |  112 +++++++++++++++++++++++++++++-
+ include/crypto/public_key.h              |   13 +++
+ include/keys/asymmetric-subtype.h        |   10 +++
+ security/integrity/digsig_asymmetric.c   |    2 -
+ 10 files changed, 216 insertions(+), 20 deletions(-)
 
 diff --git a/Documentation/crypto/asymmetric-keys.txt b/Documentation/crypto/asymmetric-keys.txt
-index 93a071714de7..45e50c5695bf 100644
+index 8c07e0ea6bc0..93a071714de7 100644
 --- a/Documentation/crypto/asymmetric-keys.txt
 +++ b/Documentation/crypto/asymmetric-keys.txt
-@@ -254,6 +254,8 @@ Examples of blob formats for which parsers could be implemented include:
-  - X.509 ASN.1 stream.
-  - Pointer to TPM key.
-  - Pointer to UEFI key.
-+ - PKCS#8 private key [RFC 5208].
-+ - PKCS#5 encrypted private key [RFC 2898].
+@@ -123,6 +123,7 @@ An operation is provided to perform cryptographic signature verification, using
+ an asymmetric key to provide or to provide access to the public key.
  
- During key instantiation each parser in the list is tried until one doesn't
- return -EBADMSG.
-diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-index e28e912000a7..c145bdf88381 100644
---- a/crypto/asymmetric_keys/Kconfig
-+++ b/crypto/asymmetric_keys/Kconfig
-@@ -29,6 +29,16 @@ config X509_CERTIFICATE_PARSER
- 	  data and provides the ability to instantiate a crypto key from a
- 	  public key packet found inside the certificate.
+ 	int verify_signature(const struct key *key,
++			     const struct key *password,
+ 			     const struct public_key_signature *sig);
  
-+config PKCS8_PRIVATE_KEY_PARSER
-+	tristate "PKCS#8 private key parser"
-+	depends on ASYMMETRIC_PUBLIC_KEY_SUBTYPE
-+	select ASN1
-+	select OID_REGISTRY
-+	help
-+	  This option provides support for parsing PKCS#8 format blobs for
-+	  private key data and provides the ability to instantiate a crypto key
-+	  from that data.
+ The caller must have already obtained the key from some source and can then use
+@@ -148,6 +149,9 @@ In addition, the data must have been digested by the caller and the resulting
+ hash must be pointed to by sig->digest and the size of the hash be placed in
+ sig->digest_size.
+ 
++If the key needs to be unlocked with a passphrase, this can be passed in a
++logon key as the password argument.
 +
- config PKCS7_MESSAGE_PARSER
- 	tristate "PKCS#7 message parser"
- 	depends on X509_CERTIFICATE_PARSER
-diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
-index 6516855bec18..417035a53e98 100644
---- a/crypto/asymmetric_keys/Makefile
-+++ b/crypto/asymmetric_keys/Makefile
-@@ -34,6 +34,19 @@ clean-files	+= x509_akid-asn1.c x509_akid-asn1.h
- #
- # PKCS#7 message handling
- #
-+obj-$(CONFIG_PKCS8_PRIVATE_KEY_PARSER) += pkcs8_key_parser.o
-+pkcs8_key_parser-y := \
-+	pkcs8-asn1.o \
-+	pkcs8_parser.o
+ The function will return 0 upon success or -EKEYREJECTED if the signature
+ doesn't match.
+ 
+@@ -182,6 +186,10 @@ and looks like the following:
+ 
+ 		void (*describe)(const struct key *key, struct seq_file *m);
+ 		void (*destroy)(void *payload);
++		int (*query)(const struct kernel_pkey_params *params,
++			     struct kernel_pkey_query *info);
++		int (*eds_op)(struct kernel_pkey_params *params,
++			      const void *in, void *out);
+ 		int (*verify_signature)(const struct key *key,
+ 					const struct public_key_signature *sig);
+ 	};
+@@ -206,12 +214,25 @@ There are a number of operations defined by the subtype:
+      asymmetric key will look after freeing the fingerprint and releasing the
+      reference on the subtype module.
+ 
+- (3) verify_signature().
++ (3) query().
 +
-+$(obj)/pkcs8_parser.o: $(obj)/pkcs8-asn1.h
-+$(obj)/pkcs8-asn1.o: $(obj)/pkcs8-asn1.c $(obj)/pkcs8-asn1.h
++     Mandatory.  This is a function for querying the capabilities of a key.  A
++     password can be provided if the key needs unlocking.
 +
-+clean-files	+= pkcs8-asn1.c pkcs8-asn1.h
++ (4) eds_op().
 +
-+#
-+# PKCS#7 message handling
-+#
- obj-$(CONFIG_PKCS7_MESSAGE_PARSER) += pkcs7_message.o
- pkcs7_message-y := \
- 	pkcs7-asn1.o \
-diff --git a/crypto/asymmetric_keys/pkcs8.asn1 b/crypto/asymmetric_keys/pkcs8.asn1
-new file mode 100644
-index 000000000000..702c41a3c713
---- /dev/null
-+++ b/crypto/asymmetric_keys/pkcs8.asn1
-@@ -0,0 +1,24 @@
-+--
-+-- This is the unencrypted variant
-+--
-+PrivateKeyInfo ::= SEQUENCE {
-+	version			Version,
-+	privateKeyAlgorithm	PrivateKeyAlgorithmIdentifier,
-+	privateKey		PrivateKey,
-+	attributes		[0] IMPLICIT Attributes OPTIONAL
++     Optional.  This is the entry point for the encryption, decryption and
++     signature creation operations (which are distinguished by the operation ID
++     in the parameter struct).  The subtype may do anything it likes to
++     implement an operation, including offloading to hardware.  A password can
++     be provided if the key needs unlocking.
++
++ (5) verify_signature().
+ 
+-     Optional.  These are the entry points for the key usage operations.
+-     Currently there is only the one defined.  If not set, the caller will be
+-     given -ENOTSUPP.  The subtype may do anything it likes to implement an
+-     operation, including offloading to hardware.
++     Optional.  This is the entry point for signature verification.  The
++     subtype may do anything it likes to implement an operation, including
++     offloading to hardware.  A password can be provided if the key needs
++     unlocking.
+ 
+ 
+ ==========================
+diff --git a/crypto/asymmetric_keys/asymmetric_keys.h b/crypto/asymmetric_keys/asymmetric_keys.h
+index ca8e9ac34ce6..7be1ccf4fa9f 100644
+--- a/crypto/asymmetric_keys/asymmetric_keys.h
++++ b/crypto/asymmetric_keys/asymmetric_keys.h
+@@ -16,3 +16,6 @@ extern struct asymmetric_key_id *asymmetric_key_hex_to_key_id(const char *id);
+ extern int __asymmetric_key_hex_to_key_id(const char *id,
+ 					  struct asymmetric_key_id *match_id,
+ 					  size_t hexlen);
++
++extern int asymmetric_key_eds_op(struct kernel_pkey_params *params,
++				 const void *in, void *out);
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+index 6600181d5d01..0b33a3ba43bd 100644
+--- a/crypto/asymmetric_keys/asymmetric_type.c
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -17,6 +17,7 @@
+ #include <linux/module.h>
+ #include <linux/slab.h>
+ #include <linux/ctype.h>
++#include <keys/user-type.h>
+ #include "asymmetric_keys.h"
+ 
+ MODULE_LICENSE("GPL");
+@@ -451,15 +452,58 @@ static void asymmetric_key_destroy(struct key *key)
+ 	asymmetric_key_free_kids(kids);
+ }
+ 
++int asymmetric_key_eds_op(struct kernel_pkey_params *params,
++			  const void *in, void *out)
++{
++	const struct asymmetric_key_subtype *subtype;
++	struct key *key = params->key, *password = params->password;
++	int ret;
++
++	pr_devel("==>%s()\n", __func__);
++
++	if (key->type != &key_type_asymmetric ||
++	    (password && password->type != &key_type_logon))
++		return -EINVAL;
++	subtype = asymmetric_key_subtype(key);
++	if (!subtype ||
++	    !key->payload.data[0])
++		return -EINVAL;
++	if (!subtype->eds_op)
++		return -ENOTSUPP;
++
++	ret = subtype->eds_op(params, in, out);
++
++	pr_devel("<==%s() = %d\n", __func__, ret);
++	return ret;
 +}
 +
-+Version ::= INTEGER  ({ pkcs8_note_version })
++static int asymmetric_key_verify_signature(struct kernel_pkey_params *params,
++					   const void *in, const void *in2)
++{
++	struct public_key_signature sig = {
++		.s_size		= params->in2_len,
++		.digest_size	= params->in_len,
++		.encoding	= params->encoding,
++		.hash_algo	= params->hash_algo,
++		.digest		= (void *)in,
++		.s		= (void *)in2,
++	};
 +
-+PrivateKeyAlgorithmIdentifier ::= AlgorithmIdentifier ({ pkcs8_note_algo })
-+
-+PrivateKey ::= OCTET STRING ({ pkcs8_note_key })
-+
-+Attributes ::= SET OF Attribute
-+
-+Attribute ::= ANY
-+
-+AlgorithmIdentifier ::= SEQUENCE {
-+	algorithm   OBJECT IDENTIFIER ({ pkcs8_note_OID }),
-+	parameters  ANY OPTIONAL
++	return verify_signature(params->key, params->password, &sig);
 +}
-diff --git a/crypto/asymmetric_keys/pkcs8_parser.c b/crypto/asymmetric_keys/pkcs8_parser.c
-new file mode 100644
-index 000000000000..26a73c0b7eef
---- /dev/null
-+++ b/crypto/asymmetric_keys/pkcs8_parser.c
-@@ -0,0 +1,184 @@
-+/* PKCS#8 Private Key parser [RFC 5208].
++
+ struct key_type key_type_asymmetric = {
+-	.name		= "asymmetric",
+-	.preparse	= asymmetric_key_preparse,
+-	.free_preparse	= asymmetric_key_free_preparse,
+-	.instantiate	= generic_key_instantiate,
+-	.match_preparse	= asymmetric_key_match_preparse,
+-	.match_free	= asymmetric_key_match_free,
+-	.destroy	= asymmetric_key_destroy,
+-	.describe	= asymmetric_key_describe,
++	.name			= "asymmetric",
++	.preparse		= asymmetric_key_preparse,
++	.free_preparse		= asymmetric_key_free_preparse,
++	.instantiate		= generic_key_instantiate,
++	.match_preparse		= asymmetric_key_match_preparse,
++	.match_free		= asymmetric_key_match_free,
++	.destroy		= asymmetric_key_destroy,
++	.describe		= asymmetric_key_describe,
++	.asym_query		= query_asymmetric_key,
++	.asym_eds_op		= asymmetric_key_eds_op,
++	.asym_verify_signature	= asymmetric_key_verify_signature,
+ };
+ EXPORT_SYMBOL_GPL(key_type_asymmetric);
+ 
+diff --git a/crypto/asymmetric_keys/pkcs7_trust.c b/crypto/asymmetric_keys/pkcs7_trust.c
+index f6a009d88a33..908140e334cf 100644
+--- a/crypto/asymmetric_keys/pkcs7_trust.c
++++ b/crypto/asymmetric_keys/pkcs7_trust.c
+@@ -115,7 +115,7 @@ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
+ 	return -ENOKEY;
+ 
+ matched:
+-	ret = verify_signature(key, sig);
++	ret = verify_signature(key, NULL, sig);
+ 	key_put(key);
+ 	if (ret < 0) {
+ 		if (ret == -ENOMEM)
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index fd76b5fc3b3a..96983906d2a2 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -164,6 +164,7 @@ error_free_tfm:
+ EXPORT_SYMBOL_GPL(public_key_verify_signature);
+ 
+ static int public_key_verify_signature_2(const struct key *key,
++					 const struct key *password,
+ 					 const struct public_key_signature *sig)
+ {
+ 	const struct public_key *pk = key->payload.data[asym_crypto];
+diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
+index ac4bddf669de..d9efe00c5881 100644
+--- a/crypto/asymmetric_keys/restrict.c
++++ b/crypto/asymmetric_keys/restrict.c
+@@ -102,7 +102,7 @@ int restrict_link_by_signature(struct key *trust_keyring,
+ 	if (use_builtin_keys && !test_bit(KEY_FLAG_BUILTIN, &key->flags))
+ 		ret = -ENOKEY;
+ 	else
+-		ret = verify_signature(key, sig);
++		ret = verify_signature(key, NULL, sig);
+ 	key_put(key);
+ 	return ret;
+ }
+diff --git a/crypto/asymmetric_keys/signature.c b/crypto/asymmetric_keys/signature.c
+index 11b7ba170904..d69c76e2e991 100644
+--- a/crypto/asymmetric_keys/signature.c
++++ b/crypto/asymmetric_keys/signature.c
+@@ -16,7 +16,9 @@
+ #include <linux/export.h>
+ #include <linux/err.h>
+ #include <linux/slab.h>
++#include <linux/keyctl.h>
+ #include <crypto/public_key.h>
++#include <keys/user-type.h>
+ #include "asymmetric_keys.h"
+ 
+ /*
+@@ -37,13 +39,118 @@ void public_key_signature_free(struct public_key_signature *sig)
+ EXPORT_SYMBOL_GPL(public_key_signature_free);
+ 
+ /**
++ * query_asymmetric_key - Get information about an aymmetric key.
++ * @params: Various parameters.
++ * @info: Where to put the information.
++ */
++int query_asymmetric_key(const struct kernel_pkey_params *params,
++			 struct kernel_pkey_query *info)
++{
++	const struct asymmetric_key_subtype *subtype;
++	struct key *key = params->key, *password = params->password;
++	int ret;
++
++	pr_devel("==>%s()\n", __func__);
++
++	if (key->type != &key_type_asymmetric ||
++	    (password && password->type != &key_type_logon))
++		return -EINVAL;
++	subtype = asymmetric_key_subtype(key);
++	if (!subtype ||
++	    !key->payload.data[0])
++		return -EINVAL;
++	if (!subtype->query)
++		return -ENOTSUPP;
++
++	ret = subtype->query(params, info);
++
++	pr_devel("<==%s() = %d\n", __func__, ret);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(query_asymmetric_key);
++
++/**
++ * encrypt_blob - Encrypt data using an asymmetric key
++ * @params: Various parameters
++ * @data: Data blob to be encrypted, length params->data_len
++ * @enc: Encrypted data buffer, length params->enc_len
 + *
-+ * Copyright (C) 2016 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
++ * Encrypt the specified data blob using the private key specified by
++ * params->key.  The encrypted data is wrapped in an encoding if
++ * params->encoding is specified (eg. "pkcs1").
 + *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public Licence
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the Licence, or (at your option) any later version.
++ * If the key needs to be unlocked, a password can be supplied in a logon key
++ * specified by params->password.
++ *
++ * Returns the length of the data placed in the encrypted data buffer or an
++ * error.
 + */
++int encrypt_blob(struct kernel_pkey_params *params,
++		 const void *data, void *enc)
++{
++	params->op = kernel_pkey_encrypt;
++	return asymmetric_key_eds_op(params, data, enc);
++}
++EXPORT_SYMBOL_GPL(encrypt_blob);
 +
-+#define pr_fmt(fmt) "PKCS8: "fmt
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/export.h>
-+#include <linux/slab.h>
-+#include <linux/err.h>
-+#include <linux/oid_registry.h>
-+#include <keys/asymmetric-subtype.h>
-+#include <keys/asymmetric-parser.h>
-+#include <crypto/public_key.h>
-+#include "pkcs8-asn1.h"
-+
-+struct pkcs8_parse_context {
-+	struct public_key *pub;
-+	unsigned long	data;			/* Start of data */
-+	enum OID	last_oid;		/* Last OID encountered */
-+	enum OID	algo_oid;		/* Algorithm OID */
-+	u32		key_size;
-+	const void	*key;
-+};
-+
-+/*
-+ * Note an OID when we find one for later processing when we know how to
-+ * interpret it.
++/**
++ * decrypt_blob - Decrypt data using an asymmetric key
++ * @params: Various parameters
++ * @enc: Encrypted data to be decrypted, length params->enc_len
++ * @data: Decrypted data buffer, length params->data_len
++ *
++ * Decrypt the specified data blob using the private key specified by
++ * params->key.  The decrypted data is wrapped in an encoding if
++ * params->encoding is specified (eg. "pkcs1").
++ *
++ * If the private key needs to be unlocked, a password can be supplied in a
++ * logon key specified by params->password.
++ *
++ * Returns the length of the data placed in the decrypted data buffer or an
++ * error.
 + */
-+int pkcs8_note_OID(void *context, size_t hdrlen,
-+		   unsigned char tag,
-+		   const void *value, size_t vlen)
++int decrypt_blob(struct kernel_pkey_params *params,
++		 const void *enc, void *data)
 +{
-+	struct pkcs8_parse_context *ctx = context;
-+
-+	ctx->last_oid = look_up_OID(value, vlen);
-+	if (ctx->last_oid == OID__NR) {
-+		char buffer[50];
-+
-+		sprint_oid(value, vlen, buffer, sizeof(buffer));
-+		pr_info("Unknown OID: [%lu] %s\n",
-+			(unsigned long)value - ctx->data, buffer);
-+	}
-+	return 0;
++	params->op = kernel_pkey_decrypt;
++	return asymmetric_key_eds_op(params, enc, data);
 +}
++EXPORT_SYMBOL_GPL(decrypt_blob);
 +
-+/*
-+ * Note the version number of the ASN.1 blob.
++/**
++ * create_signature - Sign some data using an asymmetric key
++ * @params: Various parameters
++ * @data: Data blob to be signed, length params->data_len
++ * @enc: Signature buffer, length params->enc_len
++ *
++ * Sign the specified data blob using the private key specified by params->key.
++ * The signature is wrapped in an encoding if params->encoding is specified
++ * (eg. "pkcs1").  If the encoding needs to know the digest type, this can be
++ * passed through params->hash_algo (eg. "sha1").
++ *
++ * If the private key needs to be unlocked, a password can be supplied in a
++ * logon key specified by params->password.
++ *
++ * Returns the length of the data placed in the signature buffer or an error.
 + */
-+int pkcs8_note_version(void *context, size_t hdrlen,
-+		       unsigned char tag,
-+		       const void *value, size_t vlen)
++int create_signature(struct kernel_pkey_params *params,
++		     const void *data, void *enc)
 +{
-+	if (vlen != 1 || ((const u8 *)value)[0] != 0) {
-+		pr_warn("Unsupported PKCS#8 version\n");
-+		return -EBADMSG;
-+	}
-+	return 0;
++	params->op = kernel_pkey_sign;
++	return asymmetric_key_eds_op(params, data, enc);
 +}
++EXPORT_SYMBOL_GPL(create_signature);
 +
-+/*
-+ * Note the public algorithm.
-+ */
-+int pkcs8_note_algo(void *context, size_t hdrlen,
-+		    unsigned char tag,
-+		    const void *value, size_t vlen)
-+{
-+	struct pkcs8_parse_context *ctx = context;
++/**
+  * verify_signature - Initiate the use of an asymmetric key to verify a signature
+  * @key: The asymmetric key to verify against
++ * @password: Logon key containing passphrase if one is needed
+  * @sig: The signature to check
+  *
+  * Returns 0 if successful or else an error.
+  */
+ int verify_signature(const struct key *key,
++		     const struct key *password,
+ 		     const struct public_key_signature *sig)
+ {
+ 	const struct asymmetric_key_subtype *subtype;
+@@ -51,7 +158,8 @@ int verify_signature(const struct key *key,
+ 
+ 	pr_devel("==>%s()\n", __func__);
+ 
+-	if (key->type != &key_type_asymmetric)
++	if (key->type != &key_type_asymmetric ||
++	    (password && password->type != &key_type_logon))
+ 		return -EINVAL;
+ 	subtype = asymmetric_key_subtype(key);
+ 	if (!subtype ||
+@@ -60,7 +168,7 @@ int verify_signature(const struct key *key,
+ 	if (!subtype->verify_signature)
+ 		return -ENOTSUPP;
+ 
+-	ret = subtype->verify_signature(key, sig);
++	ret = subtype->verify_signature(key, password, sig);
+ 
+ 	pr_devel("<==%s() = %d\n", __func__, ret);
+ 	return ret;
+diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
+index 882ca0e1e7a5..1db6f1933dbd 100644
+--- a/include/crypto/public_key.h
++++ b/include/crypto/public_key.h
+@@ -14,6 +14,8 @@
+ #ifndef _LINUX_PUBLIC_KEY_H
+ #define _LINUX_PUBLIC_KEY_H
+ 
++#include <linux/keyctl.h>
 +
-+	if (ctx->last_oid != OID_rsaEncryption)
-+		return -ENOPKG;
+ /*
+  * Cryptographic data for the public-key subtype of the asymmetric key type.
+  *
+@@ -40,6 +42,7 @@ struct public_key_signature {
+ 	u8 digest_size;		/* Number of bytes in digest */
+ 	const char *pkey_algo;
+ 	const char *hash_algo;
++	const char *encoding;
+ };
+ 
+ extern void public_key_signature_free(struct public_key_signature *sig);
+@@ -54,8 +57,14 @@ extern int restrict_link_by_signature(struct key *trust_keyring,
+ 				      const struct key_type *type,
+ 				      const union key_payload *payload);
+ 
+-extern int verify_signature(const struct key *key,
+-			    const struct public_key_signature *sig);
++extern int query_asymmetric_key(const struct kernel_pkey_params *,
++				struct kernel_pkey_query *);
 +
-+	ctx->pub->pkey_algo = "rsa";
-+	return 0;
-+}
++extern int encrypt_blob(struct kernel_pkey_params *, const void *, void *);
++extern int decrypt_blob(struct kernel_pkey_params *, const void *, void *);
++extern int create_signature(struct kernel_pkey_params *, const void *, void *);
++extern int verify_signature(const struct key *, const struct key *,
++			    const struct public_key_signature *);
+ 
+ int public_key_verify_signature(const struct public_key *pkey,
+ 				const struct public_key_signature *sig);
+diff --git a/include/keys/asymmetric-subtype.h b/include/keys/asymmetric-subtype.h
+index 2480469ce8fb..e7da2b3c4f31 100644
+--- a/include/keys/asymmetric-subtype.h
++++ b/include/keys/asymmetric-subtype.h
+@@ -17,6 +17,8 @@
+ #include <linux/seq_file.h>
+ #include <keys/asymmetric-type.h>
+ 
++struct kernel_pkey_query;
++struct kernel_pkey_params;
+ struct public_key_signature;
+ 
+ /*
+@@ -34,8 +36,16 @@ struct asymmetric_key_subtype {
+ 	/* Destroy a key of this subtype */
+ 	void (*destroy)(void *payload_crypto, void *payload_auth);
+ 
++	int (*query)(const struct kernel_pkey_params *params,
++		     struct kernel_pkey_query *info);
 +
-+/*
-+ * Note the key data of the ASN.1 blob.
-+ */
-+int pkcs8_note_key(void *context, size_t hdrlen,
-+		   unsigned char tag,
-+		   const void *value, size_t vlen)
-+{
-+	struct pkcs8_parse_context *ctx = context;
++	/* Encrypt/decrypt/sign data */
++	int (*eds_op)(struct kernel_pkey_params *params,
++		      const void *in, void *out);
 +
-+	ctx->key = value;
-+	ctx->key_size = vlen;
-+	return 0;
-+}
-+
-+/*
-+ * Parse a PKCS#8 private key blob.
-+ */
-+static struct public_key *pkcs8_parse(const void *data, size_t datalen)
-+{
-+	struct pkcs8_parse_context ctx;
-+	struct public_key *pub;
-+	long ret;
-+
-+	memset(&ctx, 0, sizeof(ctx));
-+
-+	ret = -ENOMEM;
-+	ctx.pub = kzalloc(sizeof(struct public_key), GFP_KERNEL);
-+	if (!ctx.pub)
-+		goto error;
-+
-+	ctx.data = (unsigned long)data;
-+
-+	/* Attempt to decode the private key */
-+	ret = asn1_ber_decoder(&pkcs8_decoder, &ctx, data, datalen);
-+	if (ret < 0)
-+		goto error_decode;
-+
-+	ret = -ENOMEM;
-+	pub = ctx.pub;
-+	pub->key = kmemdup(ctx.key, ctx.key_size, GFP_KERNEL);
-+	if (!pub->key)
-+		goto error_decode;
-+
-+	pub->keylen = ctx.key_size;
-+	pub->key_is_private = true;
-+	return pub;
-+
-+error_decode:
-+	kfree(ctx.pub);
-+error:
-+	return ERR_PTR(ret);
-+}
-+
-+/*
-+ * Attempt to parse a data blob for a key as a PKCS#8 private key.
-+ */
-+static int pkcs8_key_preparse(struct key_preparsed_payload *prep)
-+{
-+	struct public_key *pub;
-+
-+	pub = pkcs8_parse(prep->data, prep->datalen);
-+	if (IS_ERR(pub))
-+		return PTR_ERR(pub);
-+
-+	pr_devel("Cert Key Algo: %s\n", pub->pkey_algo);
-+	pub->id_type = "PKCS8";
-+
-+	/* We're pinning the module by being linked against it */
-+	__module_get(public_key_subtype.owner);
-+	prep->payload.data[asym_subtype] = &public_key_subtype;
-+	prep->payload.data[asym_key_ids] = NULL;
-+	prep->payload.data[asym_crypto] = pub;
-+	prep->payload.data[asym_auth] = NULL;
-+	prep->quotalen = 100;
-+	return 0;
-+}
-+
-+static struct asymmetric_key_parser pkcs8_key_parser = {
-+	.owner	= THIS_MODULE,
-+	.name	= "pkcs8",
-+	.parse	= pkcs8_key_preparse,
-+};
-+
-+/*
-+ * Module stuff
-+ */
-+static int __init pkcs8_key_init(void)
-+{
-+	return register_asymmetric_key_parser(&pkcs8_key_parser);
-+}
-+
-+static void __exit pkcs8_key_exit(void)
-+{
-+	unregister_asymmetric_key_parser(&pkcs8_key_parser);
-+}
-+
-+module_init(pkcs8_key_init);
-+module_exit(pkcs8_key_exit);
-+
-+MODULE_DESCRIPTION("PKCS#8 certificate parser");
-+MODULE_LICENSE("GPL");
+ 	/* Verify the signature on a key of this subtype (optional) */
+ 	int (*verify_signature)(const struct key *key,
++				const struct key *password,
+ 				const struct public_key_signature *sig);
+ };
+ 
+diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
+index 80052ed8d467..09105f7d54d2 100644
+--- a/security/integrity/digsig_asymmetric.c
++++ b/security/integrity/digsig_asymmetric.c
+@@ -110,7 +110,7 @@ int asymmetric_verify(struct key *keyring, const char *sig,
+ 	pks.digest_size = datalen;
+ 	pks.s = hdr->sig;
+ 	pks.s_size = siglen;
+-	ret = verify_signature(key, &pks);
++	ret = verify_signature(key, NULL, &pks);
+ 	key_put(key);
+ 	pr_debug("%s() = %d\n", __func__, ret);
+ 	return ret;
