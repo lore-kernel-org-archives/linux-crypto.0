@@ -1,47 +1,53 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH RESEND v5 0/6] crypto: algif - add akcipher
-Date: Wed, 11 May 2016 15:25:21 +0100
-Message-ID: <5123.1462976721@warthog.procyon.org.uk>
-References: <20160505195048.1843.7817.stgit@tstruk-mobl1>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH] crypto/ccp: remove rwlocks_types.h
+Date: Wed, 11 May 2016 11:21:12 -0500
+Message-ID: <57335BF8.5000000@amd.com>
+References: <1462961180-11135-1-git-send-email-bigeasy@linutronix.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: dhowells@redhat.com, herbert@gondor.apana.org.au,
-	smueller@chronox.de, linux-api@vger.kernel.org,
-	marcel@holtmann.org, linux-kernel@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dwmw2@infradead.org, davem@davemloft.net
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, <tglx@linutronix.de>,
+	Peter Zijlstra <peterz@infradead.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	<linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42222 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751594AbcEKOZ0 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 May 2016 10:25:26 -0400
-In-Reply-To: <20160505195048.1843.7817.stgit@tstruk-mobl1>
-Content-ID: <5122.1462976721.1@warthog.procyon.org.uk>
+Received: from mail-bn1on0061.outbound.protection.outlook.com ([157.56.110.61]:31360
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S932541AbcEKQgv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 11 May 2016 12:36:51 -0400
+In-Reply-To: <1462961180-11135-1-git-send-email-bigeasy@linutronix.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Tadeusz Struk <tadeusz.struk@intel.com> wrote:
+On 05/11/2016 05:06 AM, Sebastian Andrzej Siewior wrote:
+> Users of rwlocks should include spinlock.h instead including this
+> header file. The current users of rwlocks_types.h are internal.
+> 
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-> This is the same v5 version as before rebased on top of
-> http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-asym-keyctl
+There's already been a patch submitted and accepted for this
+in the cryptodev tree:
 
-I've just reposted this.  The interface you're using should be the same, I
-think, but the details underneath have changed.
+commit 7587c4075400 ("crypto: ccp - Fix RT breaking #include <linux/rwlock_types.h>")
 
-Also, you can now supply private keys to the kernel if they're PKCS#8 encoded
-and keyctls are supplied that do encryption, decryption, signing and
-verifying, e.g.:
+Thanks,
+Tom
 
-	j=`openssl pkcs8 -in ~/pkcs7/firmwarekey2.priv -topk8 -nocrypt -outform DER | \
-	    keyctl padd asymmetric foo @s`
-	echo -n abcdefghijklmnopqrst >/tmp/data
-	keyctl pkey_encrypt $j 0 /tmp/data enc=pkcs1 >/tmp/enc
-	keyctl pkey_decrypt $j 0 /tmp/enc enc=pkcs1 >/tmp/dec
-	cmp /tmp/data /tmp/dec
-	keyctl pkey_sign $j 0 /tmp/data enc=pkcs1 hash=sha1 >/tmp/sig
-	keyctl pkey_verify $j 0 /tmp/data /tmp/sig enc=pkcs1 hash=sha1
-
-David
+> ---
+>  drivers/crypto/ccp/ccp-dev.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+> index 4dbc18727235..2a8ad712a5f2 100644
+> --- a/drivers/crypto/ccp/ccp-dev.c
+> +++ b/drivers/crypto/ccp/ccp-dev.c
+> @@ -16,7 +16,6 @@
+>  #include <linux/sched.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/spinlock.h>
+> -#include <linux/rwlock_types.h>
+>  #include <linux/types.h>
+>  #include <linux/mutex.h>
+>  #include <linux/delay.h>
+> 
