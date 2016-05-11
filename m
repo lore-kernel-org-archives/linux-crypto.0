@@ -1,8 +1,8 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [RFC PATCH 7/8] KEYS: Implement encrypt,
- decrypt and sign for software asymmetric key [ver 3]
-Date: Wed, 11 May 2016 15:22:45 +0100
-Message-ID: <20160511142245.4743.77379.stgit@warthog.procyon.org.uk>
+Subject: [RFC PATCH 6/8] KEYS: Allow the public_key struct to hold a private
+ key [ver 3]
+Date: Wed, 11 May 2016 15:22:38 +0100
+Message-ID: <20160511142238.4743.42177.stgit@warthog.procyon.org.uk>
 References: <20160511142152.4743.14414.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -16,164 +16,61 @@ In-Reply-To: <20160511142152.4743.14414.stgit@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Implement the encrypt, decrypt and sign operations for the software
-asymmetric key subtype.  This mostly involves offloading the call to the
-crypto layer.
+Put a flag in the public_key struct to indicate if the structure is holding
+a private key.  The private key must be held ASN.1 encoded in the format
+specified in RFC 3447 A.1.2.  This is the form required by crypto/rsa.c.
 
-Note that the decrypt and sign operations require a private key to be
-supplied.  Encrypt (and also verify) will work with either a public or a
-private key.  A public key can be supplied with an X.509 certificate and a
-private key can be supplied using a PKCS#8 blob:
-
-	# j=`openssl pkcs8 -in ~/pkcs7/firmwarekey2.priv -topk8 -nocrypt -outform DER | keyctl padd asymmetric foo @s`
-	# keyctl pkey_query $j - enc=pkcs1
-	key_size=4096
-	max_data_size=512
-	max_sig_size=512
-	max_enc_size=512
-	max_dec_size=512
-	encrypt=y
-	decrypt=y
-	sign=y
-	verify=y
-	# keyctl pkey_encrypt $j 0 data enc=pkcs1 >/tmp/enc
-	# keyctl pkey_decrypt $j 0 /tmp/enc enc=pkcs1 >/tmp/dec
-	# cmp data /tmp/dec
-	# keyctl pkey_sign $j 0 data enc=pkcs1 hash=sha1 >/tmp/sig
-	# keyctl pkey_verify $j 0 data /tmp/sig enc=pkcs1 hash=sha1
-	#
+The software encryption subtype's verification and query functions then
+need to select the appropriate crypto function to set the key.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- crypto/asymmetric_keys/public_key.c |   89 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 86 insertions(+), 3 deletions(-)
+ crypto/asymmetric_keys/public_key.c |   14 ++++++++++++--
+ include/crypto/public_key.h         |    1 +
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index 92997d4e8173..2bdb673cf074 100644
+index e9967e5a2c25..92997d4e8173 100644
 --- a/crypto/asymmetric_keys/public_key.c
 +++ b/crypto/asymmetric_keys/public_key.c
-@@ -128,7 +128,11 @@ static int software_key_query(const struct kernel_pkey_params *params,
- 	info->max_sig_size = len;
- 	info->max_enc_size = len;
- 	info->max_dec_size = len;
--	info->supported_ops = KEYCTL_SUPPORTS_VERIFY;
-+	info->supported_ops = (KEYCTL_SUPPORTS_ENCRYPT |
-+			       KEYCTL_SUPPORTS_VERIFY);
-+	if (pkey->key_is_private)
-+		info->supported_ops |= (KEYCTL_SUPPORTS_DECRYPT |
-+					KEYCTL_SUPPORTS_SIGN);
- 	ret = 0;
+@@ -113,7 +113,12 @@ static int software_key_query(const struct kernel_pkey_params *params,
+ 	if (IS_ERR(tfm))
+ 		return PTR_ERR(tfm);
  
- error_free_tfm:
-@@ -142,7 +146,7 @@ struct public_key_completion {
- 	int err;
- };
- 
--static void public_key_verify_done(struct crypto_async_request *req, int err)
-+static void public_key_crypto_done(struct crypto_async_request *req, int err)
- {
- 	struct public_key_completion *compl = req->data;
- 
-@@ -154,6 +158,84 @@ static void public_key_verify_done(struct crypto_async_request *req, int err)
- }
- 
- /*
-+ * Do encryption, decryption and signing ops.
-+ */
-+static int software_key_eds_op(struct kernel_pkey_params *params,
-+			       const void *in, void *out)
-+{
-+	struct public_key_completion compl;
-+	const struct public_key *pkey = params->key->payload.data[asym_crypto];
-+	struct akcipher_request *req;
-+	struct crypto_akcipher *tfm;
-+	struct scatterlist in_sg, out_sg;
-+	char alg_name[CRYPTO_MAX_ALG_NAME];
-+	int ret;
-+
-+	pr_devel("==>%s()\n", __func__);
-+
-+	ret = software_key_determine_akcipher(params->encoding,
-+					      params->hash_algo,
-+					      pkey, alg_name);
-+	if (ret < 0)
-+		return ret;
-+
-+	tfm = crypto_alloc_akcipher(alg_name, 0, 0);
-+	if (IS_ERR(tfm))
-+		return PTR_ERR(tfm);
-+
-+	req = akcipher_request_alloc(tfm, GFP_KERNEL);
-+	if (!req)
-+		goto error_free_tfm;
-+
+-	ret = crypto_akcipher_set_pub_key(tfm, pkey->key, pkey->keylen);
 +	if (pkey->key_is_private)
 +		ret = crypto_akcipher_set_priv_key(tfm,
 +						   pkey->key, pkey->keylen);
 +	else
 +		ret = crypto_akcipher_set_pub_key(tfm,
 +						  pkey->key, pkey->keylen);
-+	if (ret)
-+		goto error_free_req;
-+
-+	sg_init_one(&in_sg, in, params->in_len);
-+	sg_init_one(&out_sg, out, params->out_len);
-+	akcipher_request_set_crypt(req, &in_sg, &out_sg, params->in_len,
-+				   params->out_len);
-+	init_completion(&compl.completion);
-+	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
-+				      CRYPTO_TFM_REQ_MAY_SLEEP,
-+				      public_key_crypto_done, &compl);
-+
-+	/* Perform the encryption calculation. */
-+	switch (params->op) {
-+	case kernel_pkey_encrypt:
-+		ret = crypto_akcipher_encrypt(req);
-+		break;
-+	case kernel_pkey_decrypt:
-+		ret = crypto_akcipher_decrypt(req);
-+		break;
-+	case kernel_pkey_sign:
-+		ret = crypto_akcipher_sign(req);
-+		break;
-+	default:
-+		BUG();
-+	}
-+	if (ret == -EINPROGRESS) {
-+		wait_for_completion(&compl.completion);
-+		ret = compl.err;
-+	}
-+
-+	if (ret == 0)
-+		ret = req->dst_len;
-+
-+error_free_req:
-+	akcipher_request_free(req);
-+error_free_tfm:
-+	crypto_free_akcipher(tfm);
-+	pr_devel("<==%s() = %d\n", __func__, ret);
-+	return ret;
-+}
-+
-+/*
-  * Verify a signature using a public key.
-  */
- int public_key_verify_signature(const struct public_key *pkey,
-@@ -210,7 +292,7 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	init_completion(&compl.completion);
- 	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
- 				      CRYPTO_TFM_REQ_MAY_SLEEP,
--				      public_key_verify_done, &compl);
-+				      public_key_crypto_done, &compl);
+ 	if (ret < 0)
+ 		goto error_free_tfm;
  
- 	/* Perform the verification calculation.  This doesn't actually do the
- 	 * verification, but rather calculates the hash expected by the
-@@ -258,6 +340,7 @@ struct asymmetric_key_subtype public_key_subtype = {
- 	.describe		= public_key_describe,
- 	.destroy		= public_key_destroy,
- 	.query			= software_key_query,
-+	.eds_op			= software_key_eds_op,
- 	.verify_signature	= public_key_verify_signature_2,
+@@ -184,7 +189,12 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 	if (!req)
+ 		goto error_free_tfm;
+ 
+-	ret = crypto_akcipher_set_pub_key(tfm, pkey->key, pkey->keylen);
++	if (pkey->key_is_private)
++		ret = crypto_akcipher_set_priv_key(tfm,
++						   pkey->key, pkey->keylen);
++	else
++		ret = crypto_akcipher_set_pub_key(tfm,
++						  pkey->key, pkey->keylen);
+ 	if (ret)
+ 		goto error_free_req;
+ 
+diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
+index 1db6f1933dbd..a5096e72de5c 100644
+--- a/include/crypto/public_key.h
++++ b/include/crypto/public_key.h
+@@ -25,6 +25,7 @@
+ struct public_key {
+ 	void *key;
+ 	u32 keylen;
++	bool key_is_private;
+ 	const char *id_type;
+ 	const char *pkey_algo;
  };
- EXPORT_SYMBOL_GPL(public_key_subtype);
