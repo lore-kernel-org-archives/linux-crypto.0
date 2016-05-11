@@ -1,77 +1,50 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH] crypto: qat: remove unused vairable.
-Date: Wed, 11 May 2016 13:21:29 -0700
-Message-ID: <8e99795a-ed3c-8990-300a-031d7f61531e@intel.com>
-References: <1462994953-3195-1-git-send-email-falakreyaz@gmail.com>
+Subject: Re: RSA/MPI handling issues and keyctl access to public key keyrings
+Date: Wed, 11 May 2016 14:11:13 -0700
+Message-ID: <a3d967dd-697c-e20d-3a57-c53fc161bd05@intel.com>
+References: <268bb9cd-08ca-aae9-5b12-91d8c0195bc1@intel.com>
+ <7781.1462785198@warthog.procyon.org.uk>
+ <2114.1462974956@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Geliang Tang <geliangtang@163.com>, qat-linux@intel.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Muhammad Falak R Wani <falakreyaz@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "Zaborowski, Andrew" <andrew.zaborowski@intel.com>,
+	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:54239 "EHLO mga03.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:11916 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751400AbcEKUWl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 May 2016 16:22:41 -0400
-In-Reply-To: <1462994953-3195-1-git-send-email-falakreyaz@gmail.com>
+	id S1751617AbcEKVMN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 11 May 2016 17:12:13 -0400
+In-Reply-To: <2114.1462974956@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 05/11/2016 12:28 PM, Muhammad Falak R Wani wrote:
-> Remove the unused variable ret, and return 0 explicitly.
+On 05/11/2016 06:55 AM, David Howells wrote:
+> Tadeusz Struk <tadeusz.struk@intel.com> wrote:
+> 
+>>>  (2) rsa-pkcs1pad needs to indicate what the maximum content size is, given
+>>>      the minimum possible padding for the specified hash type (ie. a
+>>>      particular OID).
+>>
+>> The user needs to use crypto_akcipher_maxsize(tfm) to get the required buffer
+>> size for a given key.
+>> We do check if the buffer if big enough to accommodate padding and hash info.
+>> This is needed in sign and encrypt operations, and in both cases we check it,
+>> sign:
+>> https://git.kernel.org/cgit/linux/kernel/git/herbert/cryptodev-2.6.git/tree/crypto/rsa-pkcs1pad.c#n434
+>> and encrypt:
+>> https://git.kernel.org/cgit/linux/kernel/git/herbert/cryptodev-2.6.git/tree/crypto/rsa-pkcs1pad.c#n252
+> 
+> Can you supply a way to find out the reduced size from the padding?
+> 
 
-Thanks for the patch. In this case it will be even better
-to change the adf_ctl_stop_devices() to a void function.
----8<---
-Subject: [PATCH] crypto: qat - change the adf_ctl_stop_devices to void
-
-Change the adf_ctl_stop_devices to a void function.
-
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
- drivers/crypto/qat/qat_common/adf_ctl_drv.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/crypto/qat/qat_common/adf_ctl_drv.c b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
-index db21b49..abc7a7f 100644
---- a/drivers/crypto/qat/qat_common/adf_ctl_drv.c
-+++ b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
-@@ -270,10 +270,9 @@ static int adf_ctl_is_device_in_use(int id)
- 	return 0;
- }
- 
--static int adf_ctl_stop_devices(uint32_t id)
-+static void adf_ctl_stop_devices(uint32_t id)
- {
- 	struct adf_accel_dev *accel_dev;
--	int ret = 0;
- 
- 	list_for_each_entry(accel_dev, adf_devmgr_get_head(), list) {
- 		if (id == accel_dev->accel_id || id == ADF_CFG_ALL_DEVICES) {
-@@ -298,7 +297,6 @@ static int adf_ctl_stop_devices(uint32_t id)
- 			adf_dev_shutdown(accel_dev);
- 		}
- 	}
--	return ret;
- }
- 
- static int adf_ctl_ioctl_dev_stop(struct file *fp, unsigned int cmd,
-@@ -327,9 +325,8 @@ static int adf_ctl_ioctl_dev_stop(struct file *fp, unsigned int cmd,
- 		pr_info("QAT: Stopping acceleration device qat_dev%d.\n",
- 			ctl_data->device_id);
- 
--	ret = adf_ctl_stop_devices(ctl_data->device_id);
--	if (ret)
--		pr_err("QAT: failed to stop device.\n");
-+	adf_ctl_stop_devices(ctl_data->device_id);
-+
- out:
- 	kfree(ctl_data);
- 	return ret;
-
+Hi David,
+What exactly do you want to do? For the verify operation we don't know the
+reduced size before the operation. We only figure it out after we decrypt
+the message and then the req->dst_len gets the actual size of the message
+without padding.
 Thanks,
 -- 
 TS
