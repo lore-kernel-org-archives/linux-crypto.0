@@ -1,47 +1,81 @@
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [RFC PATCH 5/8] KEYS: Provide software public key query function
- [ver 3]
-Date: Thu, 12 May 2016 10:01:05 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1605120933350.23376@mjmartin-mac01.local>
-References: <alpine.OSX.2.20.1605111624090.16566@mjmartin-mac01.local> <20160511142152.4743.14414.stgit@warthog.procyon.org.uk> <20160511142230.4743.12500.stgit@warthog.procyon.org.uk> <25139.1463048363@warthog.procyon.org.uk>
+From: Johan Hedberg <johan.hedberg@intel.com>
+Subject: Re: [PATCH v2] Bluetooth: convert smp and selftest to crypto kpp API
+Date: Thu, 12 May 2016 21:04:55 +0300
+Message-ID: <20160512180455.GA4802@t440s.P-661HNU-F1>
+References: <1462831206-2947-1-git-send-email-salvatore.benedetto@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	tadeusz.struk@intel.com, linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, dwmw2@infradead.org
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, gustavo@padovan.org,
+	linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org,
+	marcel@holtmann.org
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:13593 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752450AbcELRBa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 May 2016 13:01:30 -0400
-In-Reply-To: <25139.1463048363@warthog.procyon.org.uk>
+Received: from mail-lf0-f54.google.com ([209.85.215.54]:36530 "EHLO
+	mail-lf0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752495AbcELSFD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 12 May 2016 14:05:03 -0400
+Received: by mail-lf0-f54.google.com with SMTP id u64so76444879lff.3
+        for <linux-crypto@vger.kernel.org>; Thu, 12 May 2016 11:05:02 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1462831206-2947-1-git-send-email-salvatore.benedetto@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Hi Salvatore,
 
-On Thu, 12 May 2016, David Howells wrote:
+On Mon, May 09, 2016, Salvatore Benedetto wrote:
+>  * Convert both smp and selftest to crypto kpp API
+>  * Remove module ecc as not more required
+>  * Add ecdh_helper functions for wrapping kpp async calls
+> 
+> This patch has been tested *only* with selftest, which is called on
+> module loading. smp-tester passes all tests but the first one, which
+> often times out. Same behavior is observed without this patch though.
+> 
+> This patch is based on https://patchwork.kernel.org/patch/9050061/
+> 
+> Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
+> ---
+>  net/bluetooth/Makefile      |   2 +-
+>  net/bluetooth/ecc.c         | 816 --------------------------------------------
+>  net/bluetooth/ecc.h         |  54 ---
+>  net/bluetooth/ecdh_helper.c | 204 +++++++++++
+>  net/bluetooth/ecdh_helper.h |  32 ++
+>  net/bluetooth/selftest.c    |   6 +-
+>  net/bluetooth/smp.c         |   8 +-
+>  7 files changed, 244 insertions(+), 878 deletions(-)
+>  delete mode 100644 net/bluetooth/ecc.c
+>  delete mode 100644 net/bluetooth/ecc.h
+>  create mode 100644 net/bluetooth/ecdh_helper.c
+>  create mode 100644 net/bluetooth/ecdh_helper.h
 
-> Mat Martineau <mathew.j.martineau@linux.intel.com> wrote:
->
->>> +	len = crypto_akcipher_maxsize(tfm);
->>> +	info->key_size = len * 8;
->>> +	info->max_data_size = len;
->>> +	info->max_sig_size = len;
->>> +	info->max_enc_size = len;
->>> +	info->max_dec_size = len;
->>
->> If len > UINT16_MAX, should UINT16_MAX be reported as the max size? Similar
->> question for len*8 and key_size.
->
-> key_size is 32 bits, but the other sizes are all 16 bits, so you would need a
-> 524288-bit key to exceed their capacity.  I'm not sure that's likely anytime
-> soon, but should I just make all the sizes 32-bit anyway?
+I tried this together with your kpp patches and I was able to
+successfully pair, so from that perspective we're fine and I have no
+objections for those patches being merged.
 
-Given that cryto_akcipher_maxsize() returns an int and keyctl_pkey_query 
-is part of the userspace API, I support bumping the sizes to 32-bit.
+There are a couple of things to improve with this patch however:
 
---
-Mat Martineau
-Intel OTC
+The first issue is that you're missing a 'select CRYPTO_ECDH' in
+net/bluetooth/Kconfig. Without this you'll end up creating a kernel that
+either doesn't build or a module that doesn't load.
+
+> +#ifndef __ECDH_HELPER_H
+> +#define __ECDH_HELPER_H
+
+Please leave out these include guards for internal headers. We try to
+avoid them there to force keeping the dependency chains simple. I
+realize you might have copied this from smp.h (which is the only
+internal header I could see having this) so that might need fixing in a
+separate patch.
+
+> +bool compute_ecdh_shared_secret(const u8 pub_a[64], const u8 priv_b[32],
+> +				u8 secret[32]);
+> +bool generate_ecdh_key_pair(u8 public_key[64], u8 private_key[32]);
+
+Could you try to come up with some shorter names than these since they
+cause the line lengths to go past 80 chars. In fact, can't you just keep
+the same names as our ecc.c was using. I don't think those names are
+taken by your new kpp code?
+
+Johan
