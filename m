@@ -1,55 +1,67 @@
 From: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-Subject: [PATCH v5 0/3] crypto: caam - add support for RSA algorithm
-Date: Thu, 12 May 2016 18:06:15 +0300
-Message-ID: <1463065578-14017-1-git-send-email-tudor-dan.ambarus@nxp.com>
+Subject: [PATCH 2/3] crypto: scatterwalk - export scatterwalk_pagedone
+Date: Thu, 12 May 2016 18:06:17 +0300
+Message-ID: <1463065578-14017-3-git-send-email-tudor-dan.ambarus@nxp.com>
+References: <1463065578-14017-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>,
 	Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1on0092.outbound.protection.outlook.com ([157.56.110.92]:54448
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+Received: from mail-bl2on0069.outbound.protection.outlook.com ([65.55.169.69]:8112
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752648AbcELPG0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 May 2016 11:06:26 -0400
+	id S1752648AbcELPGa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 12 May 2016 11:06:30 -0400
+In-Reply-To: <1463065578-14017-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Depends on:
-[PATCH v2] crypto: rsa - return raw integers for the ASN.1 parser
+Used in caam driver. Export the symbol since the caam driver
+can be built as a module.
 
-Changes from v4:
-- sync with ASN.1 parser
+Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+---
+ crypto/scatterwalk.c         | 5 +++--
+ include/crypto/scatterwalk.h | 2 ++
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-Changes from v3:
-- sync with ASN.1 parser
-
-Changes from v2:
-- sync with ASN.1 parser
-
-Changes from initial patch:
-- fix memory leaks on error path
-- rename struct akcipher_alg rsa to caam_rsa
-
-Tudor Ambarus (3):
-  crypto: scatterwak - Add scatterwalk_sg_copychunks
-  crypto: scatterwalk - export scatterwalk_pagedone
-  crypto: caam - add support for RSA algorithm
-
- crypto/scatterwalk.c           |  31 ++-
- drivers/crypto/caam/Kconfig    |  12 ++
- drivers/crypto/caam/Makefile   |   4 +
- drivers/crypto/caam/caampkc.c  | 466 +++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/caam/caampkc.h  |  94 +++++++++
- drivers/crypto/caam/desc.h     |   2 +
- drivers/crypto/caam/pdb.h      |  16 +-
- drivers/crypto/caam/pkc_desc.c | 138 ++++++++++++
- include/crypto/scatterwalk.h   |   4 +
- 9 files changed, 764 insertions(+), 3 deletions(-)
- create mode 100644 drivers/crypto/caam/caampkc.c
- create mode 100644 drivers/crypto/caam/caampkc.h
- create mode 100644 drivers/crypto/caam/pkc_desc.c
-
+diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
+index bc3222d..03d34f9 100644
+--- a/crypto/scatterwalk.c
++++ b/crypto/scatterwalk.c
+@@ -47,8 +47,8 @@ void *scatterwalk_map(struct scatter_walk *walk)
+ }
+ EXPORT_SYMBOL_GPL(scatterwalk_map);
+ 
+-static void scatterwalk_pagedone(struct scatter_walk *walk, int out,
+-				 unsigned int more)
++void scatterwalk_pagedone(struct scatter_walk *walk, int out,
++			  unsigned int more)
+ {
+ 	if (out) {
+ 		struct page *page;
+@@ -69,6 +69,7 @@ static void scatterwalk_pagedone(struct scatter_walk *walk, int out,
+ 			scatterwalk_start(walk, sg_next(walk->sg));
+ 	}
+ }
++EXPORT_SYMBOL_GPL(scatterwalk_pagedone);
+ 
+ void scatterwalk_done(struct scatter_walk *walk, int out, int more)
+ {
+diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
+index 8b799c5..6535a20 100644
+--- a/include/crypto/scatterwalk.h
++++ b/include/crypto/scatterwalk.h
+@@ -89,6 +89,8 @@ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
+ void scatterwalk_sg_copychunks(struct scatter_walk *dest,
+ 			       struct scatter_walk *src, size_t nbytes);
+ void *scatterwalk_map(struct scatter_walk *walk);
++void scatterwalk_pagedone(struct scatter_walk *walk, int out,
++			  unsigned int more);
+ void scatterwalk_done(struct scatter_walk *walk, int out, int more);
+ 
+ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
 -- 
 1.8.3.1
