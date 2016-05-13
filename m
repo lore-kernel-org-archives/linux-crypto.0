@@ -1,70 +1,56 @@
-From: Megha Dey <megha.dey@linux.intel.com>
-Subject: Re: SHA1-MB algorithm broken on latest kernel
-Date: Fri, 13 May 2016 10:32:26 -0700
-Message-ID: <1463160746.2594.11.camel@megha-Z97X-UD7-TH>
-References: <1463095866.2594.8.camel@megha-Z97X-UD7-TH>
-	 <20160513031020.GA12467@gondor.apana.org.au>
-	 <20160513055103.GB24504@gmail.com>
+From: Mat Martineau <mathew.j.martineau-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+Subject: Re: [PATCH RESEND v5 6/6] crypto: AF_ALG - add support for key_id
+Date: Fri, 13 May 2016 16:32:35 -0700 (PDT)
+Message-ID: <alpine.OSX.2.20.1605131616200.29074@mjmartin-mac01.local>
+References: <20160505195048.1843.7817.stgit@tstruk-mobl1> <20160505195120.1843.35821.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Josh Poimboeuf <jpoimboe@redhat.com>
-To: Ingo Molnar <mingo@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:1752 "EHLO mga04.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753758AbcEMR1K (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 May 2016 13:27:10 -0400
-In-Reply-To: <20160513055103.GB24504@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org
+To: Tadeusz Struk <tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20160505195120.1843.35821.stgit@tstruk-mobl1>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, 2016-05-13 at 07:51 +0200, Ingo Molnar wrote:
-> * Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> 
-> > On Thu, May 12, 2016 at 04:31:06PM -0700, Megha Dey wrote:
-> > > Hi,
-> > >  
-> > > When booting latest kernel with the CONFIG_CRYPTO_SHA1_MB enabled, I
-> > > observe a panic.
-> > >  
-> > > After having a quick look, on reverting the following patches, I am able
-> > > to complete the booting process.
-> > > aec4d0e301f17bb143341c82cc44685b8af0b945
-> > > 8691ccd764f9ecc69a6812dfe76214c86ac9ba06
-> > > 68874ac3304ade7ed5ebb12af00d6b9bbbca0a16
-> > >  
-> > > Of the 3 patches, aec4d0e301f17bb143341c82cc44685b8af0b945 seems wrong.
-> > > The r10 to r15 registers are used in sha1_x8_avx2.S, which is called
-> > > from sha1_mb_mgr_flush_avx2.S.
-> > >
-> > > I do not think the functionality of the SHA1-MB crypto algorithm has
-> > > been tested after applying these changes. (I am not sure if any of the
-> > > other crypto algorithms have been affected by these changes).
-> > 
-> > Josh, Ingo:
-> > 
-> > Any ideas on this? Should we revert?
-> 
-> Yeah, I think so - although another option would be to standardize sha1_x8_avx2() 
-> - the problem is that it is a function that clobbers registers without 
-> saving/restoring them, breaking the C function ABI. I realize it's written in 
-> assembly, but unless there are strong performance reasons to deviate from the 
-> regular calling convention it might make sense to fix that.
-> 
-> Do any warnings get generated after the revert, if you enable 
-> CONFIG_STACK_VALIDATION=y?
 
-After the revert and enabling CONFIG_STACK_VALIDATION:
-arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.o: warning: objtool:
-sha1_mb_mgr_flush_avx2()+0x20d: call without frame pointer save/setup
+Tadeusz -
 
-arch/x86/crypto/sha1-mb/sha1_mb_mgr_submit_avx2.o: warning: objtool:
-sha1_mb_mgr_submit_avx2()+0x115: call without frame pointer save/setup
+David updated the keys-asym-keyctl branch, and this patch set won't build 
+any more.
 
-> 
-> Thanks,
-> 
-> 	Ingo
+On Thu, 5 May 2016, Tadeusz Struk wrote:
+
+> diff --git a/crypto/algif_akcipher.c b/crypto/algif_akcipher.c
+> index e00793d..f486b6d 100644
+> --- a/crypto/algif_akcipher.c
+> +++ b/crypto/algif_akcipher.c
+> +static int asym_key_encrypt(const struct key *key, struct akcipher_request *req)
+...
+> +	params.data_len = req->src_len;
+> +	params.enc_len = req->dst_len;
+
+The params member names have changed (now in_len and out_len).
+
+> +	ret = encrypt_blob(&params, in, out);
+
+The encrypt function for the key can now be called with 
+params.key->type->asym_eds_op(). This also allows you to factor out the 
+duplication in asym_key_encrypt, asym_key_decrypt, and asym_key_sign. See 
+keyctl_pkey_e_d_s() in keyctl_pkey.c
+
+> +static int asym_key_verify(const struct key *key, struct akcipher_request *req)
+...
+> +	ret = verify_signature(key, NULL, &sig);
+
+key->type->asym_verify_signature() is available as well.
+
+
+Regards,
+
+--
+Mat Martineau
+Intel OTC
