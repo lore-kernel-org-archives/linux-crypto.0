@@ -1,77 +1,65 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: Intel SHA - add MODULE_ALIAS
-Date: Fri, 13 May 2016 14:02 +0200
-Message-ID: <2277976.2OBcIJC5tF@positron.chronox.de>
+From: Catalin Vasile <cata.vasile@nxp.com>
+Subject: Re: [PATCH] crypto: caam: add backlogging support
+Date: Fri, 13 May 2016 12:55:09 +0000
+Message-ID: <DB5PR04MB1302B3363939FD8E0FD6BBB2EE740@DB5PR04MB1302.eurprd04.prod.outlook.com>
+References: <1462540733-2170-1-git-send-email-cata.vasile@nxp.com>
+ <20160510094622.GA15860@gondor.apana.org.au>
+ <DB5PR04MB130246563C30EB92CDF5B5A1EE720@DB5PR04MB1302.eurprd04.prod.outlook.com>,<20160511105411.GB25016@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-crypto-owner@vger.kernel.org"
+	<linux-crypto-owner@vger.kernel.org>,
+	Horia Ioan Geanta Neag <horia.geanta@nxp.com>,
+	Alexandru Porosanu <alexandru.porosanu@nxp.com>,
+	Scott Wood <scott.wood@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:39268 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751510AbcEMMBs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 May 2016 08:01:48 -0400
+Received: from mail-db3on0066.outbound.protection.outlook.com ([157.55.234.66]:1281
+	"EHLO emea01-db3-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S932127AbcEMNK7 convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 13 May 2016 09:10:59 -0400
+In-Reply-To: <20160511105411.GB25016@gondor.apana.org.au>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add the MODULE_ALIAS for the cra_driver_name of the different ciphers to
-allow an automated loading if a driver name is used.
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- arch/x86/crypto/sha1_ssse3_glue.c   |  6 ++++++
- arch/x86/crypto/sha256_ssse3_glue.c | 10 ++++++++++
- arch/x86/crypto/sha512_ssse3_glue.c |  6 ++++++
- 3 files changed, 22 insertions(+)
 
-diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-index dd14616..3dcd929 100644
---- a/arch/x86/crypto/sha1_ssse3_glue.c
-+++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -374,3 +374,9 @@ MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm, Supplemental SSE3 accelerated");
- 
- MODULE_ALIAS_CRYPTO("sha1");
-+MODULE_ALIAS_CRYPTO("sha1-ssse3");
-+MODULE_ALIAS_CRYPTO("sha1-avx");
-+MODULE_ALIAS_CRYPTO("sha1-avx2");
-+#ifdef CONFIG_AS_SHA1_NI
-+MODULE_ALIAS_CRYPTO("sha1-ni");
-+#endif
-diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-index 5f4d608..0ac8d2f 100644
---- a/arch/x86/crypto/sha256_ssse3_glue.c
-+++ b/arch/x86/crypto/sha256_ssse3_glue.c
-@@ -427,4 +427,14 @@ MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA256 Secure Hash Algorithm, Supplemental SSE3 accelerated");
- 
- MODULE_ALIAS_CRYPTO("sha256");
-+MODULE_ALIAS_CRYPTO("sha256-ssse3");
-+MODULE_ALIAS_CRYPTO("sha256-avx");
-+MODULE_ALIAS_CRYPTO("sha256-avx2");
- MODULE_ALIAS_CRYPTO("sha224");
-+MODULE_ALIAS_CRYPTO("sha224-ssse3");
-+MODULE_ALIAS_CRYPTO("sha224-avx");
-+MODULE_ALIAS_CRYPTO("sha224-avx2");
-+#ifdef CONFIG_AS_SHA256_NI
-+MODULE_ALIAS_CRYPTO("sha256-ni");
-+MODULE_ALIAS_CRYPTO("sha224-ni");
-+#endif
-diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-index 34e5083..33058bc 100644
---- a/arch/x86/crypto/sha512_ssse3_glue.c
-+++ b/arch/x86/crypto/sha512_ssse3_glue.c
-@@ -346,4 +346,10 @@ MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA512 Secure Hash Algorithm, Supplemental SSE3 accelerated");
- 
- MODULE_ALIAS_CRYPTO("sha512");
-+MODULE_ALIAS_CRYPTO("sha512-ssse3");
-+MODULE_ALIAS_CRYPTO("sha512-avx");
-+MODULE_ALIAS_CRYPTO("sha512-avx2");
- MODULE_ALIAS_CRYPTO("sha384");
-+MODULE_ALIAS_CRYPTO("sha384-ssse3");
-+MODULE_ALIAS_CRYPTO("sha384-avx");
-+MODULE_ALIAS_CRYPTO("sha384-avx2");
--- 
-2.5.5
+> ________________________________________
+> From: Herbert Xu <herbert@gondor.apana.org.au>
+> Sent: Wednesday, May 11, 2016 1:54 PM
+> To: Catalin Vasile
+> Cc: linux-crypto@vger.kernel.org; linux-crypto-owner@vger.kernel.org; Horia Ioan Geanta Neag; Alexandru Porosanu; Scott Wood
+> Subject: Re: [PATCH] crypto: caam: add backlogging support> 
+
+> On Wed, May 11, 2016 at 07:53:19AM +0000, Catalin Vasile wrote:
+> >
+> > Every request will be queued and eventually done.
+> > The hardware equipment has a constraint on the number of tfms it can have.
+> > Is there a requirement to support an infinite number of tfms on a device?
+> >
+> > > You should use a software queue instead.>> 
+
+> As I said you drivers are always supposed to have a software queue
+> in addition to any hardware queues.  There is no reason why your
+> driver should be special in this regard.>
+
+Hi Herbert,
+
+We are inclining towards a hardware backlogging solution because on
+low end devices the software queue does not scale very well.
+Regarding your concerns, we are now evaluating adding a software queue based
+fallback solution: if the hardware backlogging fails because no hardware slots
+are available, backlog the job inside a crypto software queue.
+Is this hybrid configurable solution acceptable? Namely, if the hardware queue
+is full, to fallback to the crypto software queue.
+
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
