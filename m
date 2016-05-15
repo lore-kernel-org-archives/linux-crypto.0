@@ -1,56 +1,58 @@
-From: Mat Martineau <mathew.j.martineau-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-Subject: Re: [PATCH RESEND v5 6/6] crypto: AF_ALG - add support for key_id
-Date: Fri, 13 May 2016 16:32:35 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1605131616200.29074@mjmartin-mac01.local>
-References: <20160505195048.1843.7817.stgit@tstruk-mobl1> <20160505195120.1843.35821.stgit@tstruk-mobl1>
+From: <membership@instituteofcredit.org>
+Subject: (unknown)
+Date: Sat, 15 May 2016 03:15:24 0000
+Message-ID: <000101d1ae58$05a3f2e4$c0a80001@business.telecomitalia.it>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org
-To: Tadeusz Struk <tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20160505195120.1843.35821.stgit@tstruk-mobl1>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="EMAIL_990863_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: "linux-crypto" <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from host189-235-static.5-79-b.business.telecomitalia.it ([79.5.235.189]:40249
+	"HELO business.telecomitalia.it" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with SMTP id S1754026AbcENVPh (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 14 May 2016 17:15:37 -0400
+Subject: 
+Content-Disposition: attachment
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 
-Tadeusz -
 
-David updated the keys-asym-keyctl branch, and this patch set won't build 
-any more.
-
-On Thu, 5 May 2016, Tadeusz Struk wrote:
-
-> diff --git a/crypto/algif_akcipher.c b/crypto/algif_akcipher.c
-> index e00793d..f486b6d 100644
-> --- a/crypto/algif_akcipher.c
-> +++ b/crypto/algif_akcipher.c
-> +static int asym_key_encrypt(const struct key *key, struct akcipher_request *req)
-...
-> +	params.data_len = req->src_len;
-> +	params.enc_len = req->dst_len;
-
-The params member names have changed (now in_len and out_len).
-
-> +	ret = encrypt_blob(&params, in, out);
-
-The encrypt function for the key can now be called with 
-params.key->type->asym_eds_op(). This also allows you to factor out the 
-duplication in asym_key_encrypt, asym_key_decrypt, and asym_key_sign. See 
-keyctl_pkey_e_d_s() in keyctl_pkey.c
-
-> +static int asym_key_verify(const struct key *key, struct akcipher_request *req)
-...
-> +	ret = verify_signature(key, NULL, &sig);
-
-key->type->asym_verify_signature() is available as well.
-
-
-Regards,
-
---
-Mat Martineau
-Intel OTC
+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
