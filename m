@@ -1,53 +1,36 @@
-From: Jeffrey Walton <noloader@gmail.com>
-Subject: HWCAP_CRYPTO define for ARMv8?
-Date: Sun, 15 May 2016 06:13:49 -0400
-Message-ID: <CAH8yC8kRozR6Nf-Eozsuh4zdtAyx_+4gHOWYSrDWDmqwTVdWYg@mail.gmail.com>
-Reply-To: noloader@gmail.com
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v6 0/6] crypto: algif - add akcipher
+Date: Sun, 15 May 2016 13:59:05 +0200
+Message-ID: <2026134.OH4msitpZM@positron.chronox.de>
+References: <5123.1462976721@warthog.procyon.org.uk> <20160515041645.15888.94903.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: dhowells@redhat.com, herbert@gondor.apana.org.au,
+	linux-api@vger.kernel.org, marcel@holtmann.org,
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, dwmw2@infradead.org,
+	davem@davemloft.net
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f175.google.com ([209.85.223.175]:34169 "EHLO
-	mail-io0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752514AbcEOKNu (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 15 May 2016 06:13:50 -0400
-Received: by mail-io0-f175.google.com with SMTP id 190so180192924iow.1
-        for <linux-crypto@vger.kernel.org>; Sun, 15 May 2016 03:13:49 -0700 (PDT)
+Received: from mail.eperm.de ([89.247.134.16]:39378 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752283AbcEOL7O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 15 May 2016 07:59:14 -0400
+In-Reply-To: <20160515041645.15888.94903.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Everyone,
+Am Samstag, 14. Mai 2016, 21:16:45 schrieb Tadeusz Struk:
 
-It appears defines like HWCAP_CRC32 fall under the purview of the
-kernel. Confer, http://www.google.com/search?q="HWCAP_CRC32" (my
-apologies if this is not the case).
+Hi Tadeusz,
 
-We use getauxval(AT_HWCAP) and HWCAP_CRC32 for runtime detection of
-processor support for CRC. However, I can't find a similar symbol in
-the context of the crypto instructions. Confer,
-http://www.google.com/search?q="HWCAP_CRYPTO".
+> First four patches are a resend of the v3 algif_akcipher from
+> Stephan Mueller, with minor changes after rebase on top of 4.6-rc1.
 
-My question is, what are the equivalent defines for Crypto features?
+All four patches from me:
 
-Thanks in advance.
+Acked-by: Stephan Mueller <smueller@chronox.de>
 
-*****
-
-Below is from a 64-bit LeMaker HiKey
-(http://www.lemaker.org/product-hikey-index.html). It responds to
-getauxval(AT_HWCAP) and HWCAP_CRC32.
-
-$ cat /proc/cpuinfo
-Processor    : AArch64 Processor rev 3 (aarch64)
-processor    : 0
-...
-processor    : 7
-Features    : fp asimd evtstrm aes pmull sha1 sha2 crc32
-CPU implementer    : 0x41
-CPU architecture: AArch64
-CPU variant    : 0x0
-CPU part    : 0xd03
-CPU revision    : 3
-
-Hardware    : HiKey Development Board
+Ciao
+Stephan
