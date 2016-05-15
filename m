@@ -1,58 +1,89 @@
-From: <membership@instituteofcredit.org>
-Subject: (unknown)
-Date: Sat, 15 May 2016 03:15:24 0000
-Message-ID: <000101d1ae58$05a3f2e4$c0a80001@business.telecomitalia.it>
+From: Tadeusz Struk <tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH v6 0/6] crypto: algif - add akcipher
+Date: Sat, 14 May 2016 21:16:45 -0700
+Message-ID: <20160515041645.15888.94903.stgit@tstruk-mobl1>
+References: <5123.1462976721@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: application/zip; name="EMAIL_990863_linux-crypto.zip"
-Content-Transfer-Encoding: base64
-To: "linux-crypto" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from host189-235-static.5-79-b.business.telecomitalia.it ([79.5.235.189]:40249
-	"HELO business.telecomitalia.it" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with SMTP id S1754026AbcENVPh (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 14 May 2016 17:15:37 -0400
-Subject: 
-Content-Disposition: attachment
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org,
+	smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org
+To: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <5123.1462976721-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
+First four patches are a resend of the v3 algif_akcipher from
+Stephan Mueller, with minor changes after rebase on top of 4.6-rc1.
 
+The next three patches add support for keys stored in system
+keyring subsystem.
 
-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
+First patch adds algif_akcipher nokey hadlers.
+
+Second patch adds generic sign, verify, encrypt, decrypt accessors
+functions to the asymmetric key type. These will be defined by
+asymmetric subtypes, similarly to how public_key currently defines
+the verify_signature function.
+
+Third patch adds support for ALG_SET_KEY_ID and ALG_SET_PUBKEY_ID
+commands to AF_ALG and setkeyid operation to the af_alg_type struct.
+If the keyid is used then the afalg layer acquires the key for the
+keyring subsystem and uses the new asymmetric accessor functions
+instead of akcipher api. The asymmetric subtypes can use akcipher
+api internally.
+
+This is the same v5 version as before rebased on top of
+http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-asym-keyctl
+
+v6 changes:
+- update to reflect changes in kernel_pkey_params struct
+
+v5 changes:
+- drop public key changes and use new version provided by David
+
+v4 changes:
+- don't use internal public_key struct in af_alg.
+- add generic accessor functions to asymmetric key type, which take
+  the generic struct key type and resolve the specific subtype internally
+
+v3 changes:
+- include Stephan's patches (rebased on 4.6-rc1)
+- add algif_akcipher nokey hadlers
+- add public_key info struct to public_key and helper query functions
+- add a check if a key is a software accessible key on af_alg, and
+  return -ENOKEY if it isn't
+
+v2 changes:
+- pass the original skcipher request in ablkcipher.base.data instead of
+  casting it back from the ablkcipher request.
+- rename _req to base_req
+- dropped 3/3
+
+---
+
+Stephan Mueller (4):
+      crypto: AF_ALG -- add sign/verify API
+      crypto: AF_ALG -- add setpubkey setsockopt call
+      crypto: AF_ALG -- add asymmetric cipher interface
+      crypto: algif_akcipher - enable compilation
+
+Tadeusz Struk (2):
+      crypto: algif_akcipher - add ops_nokey
+      crypto: AF_ALG - add support for key_id
+
+ crypto/Kconfig              |    9 
+ crypto/Makefile             |    1 
+ crypto/af_alg.c             |   28 +
+ crypto/algif_akcipher.c     |  884 +++++++++++++++++++++++++++++++++++++++++++
+ include/crypto/if_alg.h     |    2 
+ include/uapi/linux/if_alg.h |    5 
+ 6 files changed, 924 insertions(+), 5 deletions(-)
+ create mode 100644 crypto/algif_akcipher.c
+
+--
+TS
