@@ -1,98 +1,164 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH v6 0/6] crypto: algif - add akcipher
-Date: Mon, 16 May 2016 13:46:10 -0700
-Message-ID: <eb4c6853-7493-2a3f-a669-21ef6a6f8768@intel.com>
-References: <5123.1462976721@warthog.procyon.org.uk>
- <20160515041645.15888.94903.stgit@tstruk-mobl1>
+From: Megha Dey <megha.dey@linux.intel.com>
+Subject: Re: [PATCH] crypto/sha1-mb: make sha1_x8_avx2() conform to C
+ function ABI
+Date: Mon, 16 May 2016 14:39:06 -0700
+Message-ID: <1463434746.2538.1.camel@megha-Z97X-UD7-TH>
+References: <1463095866.2594.8.camel@megha-Z97X-UD7-TH>
+	 <20160513031020.GA12467@gondor.apana.org.au>
+	 <20160513055103.GB24504@gmail.com>
+	 <1463160746.2594.11.camel@megha-Z97X-UD7-TH>
+	 <20160516144409.dkzqrpd3nlb36ygq@treble>
+	 <1463423472.5329.6.camel@megha-Z97X-UD7-TH>
+	 <20160516201618.u4zethkab3ohgtfb@treble>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, smueller@chronox.de,
-	linux-api@vger.kernel.org, marcel@holtmann.org,
-	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, dwmw2@infradead.org,
-	davem@davemloft.net
-To: dhowells@redhat.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:18008 "EHLO mga04.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750777AbcEPUrN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 May 2016 16:47:13 -0400
-In-Reply-To: <20160515041645.15888.94903.stgit@tstruk-mobl1>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Ingo Molnar <mingo@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Josh Poimboeuf <jpoimboe@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20160516201618.u4zethkab3ohgtfb@treble>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 05/14/2016 09:16 PM, Tadeusz Struk wrote:
-> First four patches are a resend of the v3 algif_akcipher from
-> Stephan Mueller, with minor changes after rebase on top of 4.6-rc1.
+On Mon, 2016-05-16 at 15:16 -0500, Josh Poimboeuf wrote:
+> On Mon, May 16, 2016 at 11:31:12AM -0700, Megha Dey wrote:
+> > On Mon, 2016-05-16 at 09:44 -0500, Josh Poimboeuf wrote:
+> > > On Fri, May 13, 2016 at 10:32:26AM -0700, Megha Dey wrote:
+> > > > On Fri, 2016-05-13 at 07:51 +0200, Ingo Molnar wrote:
+> > > > > * Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > > > > 
+> > > > > > On Thu, May 12, 2016 at 04:31:06PM -0700, Megha Dey wrote:
+> > > > > > > Hi,
+> > > > > > >  
+> > > > > > > When booting latest kernel with the CONFIG_CRYPTO_SHA1_MB enabled, I
+> > > > > > > observe a panic.
+> > > > > > >  
+> > > > > > > After having a quick look, on reverting the following patches, I am able
+> > > > > > > to complete the booting process.
+> > > > > > > aec4d0e301f17bb143341c82cc44685b8af0b945
+> > > > > > > 8691ccd764f9ecc69a6812dfe76214c86ac9ba06
+> > > > > > > 68874ac3304ade7ed5ebb12af00d6b9bbbca0a16
+> > > > > > >  
+> > > > > > > Of the 3 patches, aec4d0e301f17bb143341c82cc44685b8af0b945 seems wrong.
+> > > > > > > The r10 to r15 registers are used in sha1_x8_avx2.S, which is called
+> > > > > > > from sha1_mb_mgr_flush_avx2.S.
+> > > > > > >
+> > > > > > > I do not think the functionality of the SHA1-MB crypto algorithm has
+> > > > > > > been tested after applying these changes. (I am not sure if any of the
+> > > > > > > other crypto algorithms have been affected by these changes).
+> > > > > > 
+> > > > > > Josh, Ingo:
+> > > > > > 
+> > > > > > Any ideas on this? Should we revert?
+> > > > > 
+> > > > > Yeah, I think so - although another option would be to standardize sha1_x8_avx2() 
+> > > > > - the problem is that it is a function that clobbers registers without 
+> > > > > saving/restoring them, breaking the C function ABI. I realize it's written in 
+> > > > > assembly, but unless there are strong performance reasons to deviate from the 
+> > > > > regular calling convention it might make sense to fix that.
+> > > > > 
+> > > > > Do any warnings get generated after the revert, if you enable 
+> > > > > CONFIG_STACK_VALIDATION=y?
+> > > > 
+> > > > After the revert and enabling CONFIG_STACK_VALIDATION:
+> > > > arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.o: warning: objtool:
+> > > > sha1_mb_mgr_flush_avx2()+0x20d: call without frame pointer save/setup
+> > > > 
+> > > > arch/x86/crypto/sha1-mb/sha1_mb_mgr_submit_avx2.o: warning: objtool:
+> > > > sha1_mb_mgr_submit_avx2()+0x115: call without frame pointer save/setup
+> > > 
+> > > Megha,
+> > > 
+> > > Sorry for breaking it.  I completely missed the fact that the function
+> > > calls sha1_x8_avx2() which clobbers registers.
+> > > 
+> > > If the performance penalty isn't too bad, I'll submit a patch to
+> > > standardize sha1_x8_avx2() to follow the C ABI.
+> > > 
+> > > Do you have any tips for testing this code?  I've tried using the tcrypt
+> > > module, but no luck.
+> > > 
+> > Josh,
+> > Build the kernel with the following configs:
+> > CONFIG_CRYPTO_SHA1_MB=y
+> > CONFIG_CRYPTO_TEST=m
+> > CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n
+> > There was a kernel panic while booting. 
+> > So if after applying your new patch, we are able to get complete the
+> > boot, then we are good.
+> > 
+> > Could you please send a copy of the patch, I could test it on my end
+> > too. 
 > 
-> The next three patches add support for keys stored in system
-> keyring subsystem.
+> Thanks.  I was able to run the tests, though I didn't see a panic.  Can
+> you test with this patch?
 > 
-> First patch adds algif_akcipher nokey hadlers.
+> ----
 > 
-> Second patch adds generic sign, verify, encrypt, decrypt accessors
-> functions to the asymmetric key type. These will be defined by
-> asymmetric subtypes, similarly to how public_key currently defines
-> the verify_signature function.
+> From: Josh Poimboeuf <jpoimboe@redhat.com>
+> Subject: [PATCH] crypto/sha1-mb: make sha1_x8_avx2() conform to C function ABI
 > 
-> Third patch adds support for ALG_SET_KEY_ID and ALG_SET_PUBKEY_ID
-> commands to AF_ALG and setkeyid operation to the af_alg_type struct.
-> If the keyid is used then the afalg layer acquires the key for the
-> keyring subsystem and uses the new asymmetric accessor functions
-> instead of akcipher api. The asymmetric subtypes can use akcipher
-> api internally.
+> Megha Day reported a kernel panic in crypto code.  The problem is that
+> sha1_x8_avx2() clobbers registers r12-r15 without saving and restoring
+> them.
 > 
-> This is the same v5 version as before rebased on top of
-> http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-asym-keyctl
+> Before commit aec4d0e301f1 ("x86/asm/crypto: Simplify stack usage in
+> sha-mb functions"), those registers were saved and restored by the
+> callers of the function.  I removed them with that commit because I
+> didn't realize sha1_x8_avx2() clobbered them.
 > 
-> v6 changes:
-> - update to reflect changes in kernel_pkey_params struct
+> Fix the potential undefined behavior associated with clobbering the
+> registers and make the behavior less surprising by changing the
+> registers to be callee saved/restored to conform with the C function
+> call ABI.
 > 
-> v5 changes:
-> - drop public key changes and use new version provided by David
+> Also, rdx (aka RSP_SAVE) doesn't need to be saved: I verified that none
+> of the callers rely on it being saved, and it's not a callee-saved
+> register in the C ABI.
 > 
-> v4 changes:
-> - don't use internal public_key struct in af_alg.
-> - add generic accessor functions to asymmetric key type, which take
->   the generic struct key type and resolve the specific subtype internally
-> 
-> v3 changes:
-> - include Stephan's patches (rebased on 4.6-rc1)
-> - add algif_akcipher nokey hadlers
-> - add public_key info struct to public_key and helper query functions
-> - add a check if a key is a software accessible key on af_alg, and
->   return -ENOKEY if it isn't
-> 
-> v2 changes:
-> - pass the original skcipher request in ablkcipher.base.data instead of
->   casting it back from the ablkcipher request.
-> - rename _req to base_req
-> - dropped 3/3
-> 
+> Fixes: aec4d0e301f1 ("x86/asm/crypto: Simplify stack usage in sha-mb functions")
+> Cc: stable@vger.kernel.org # 4.6
+> Reported-by: Megha Dey <megha.dey@linux.intel.com>
+> Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 > ---
+>  arch/x86/crypto/sha-mb/sha1_x8_avx2.S | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
 > 
-> Stephan Mueller (4):
->       crypto: AF_ALG -- add sign/verify API
->       crypto: AF_ALG -- add setpubkey setsockopt call
->       crypto: AF_ALG -- add asymmetric cipher interface
->       crypto: algif_akcipher - enable compilation
-> 
-> Tadeusz Struk (2):
->       crypto: algif_akcipher - add ops_nokey
->       crypto: AF_ALG - add support for key_id
-> 
->  crypto/Kconfig              |    9 
->  crypto/Makefile             |    1 
->  crypto/af_alg.c             |   28 +
->  crypto/algif_akcipher.c     |  884 +++++++++++++++++++++++++++++++++++++++++++
->  include/crypto/if_alg.h     |    2 
->  include/uapi/linux/if_alg.h |    5 
->  6 files changed, 924 insertions(+), 5 deletions(-)
->  create mode 100644 crypto/algif_akcipher.c
+> diff --git a/arch/x86/crypto/sha-mb/sha1_x8_avx2.S b/arch/x86/crypto/sha-mb/sha1_x8_avx2.S
+> index 8e1b477..c9dae1c 100644
+> --- a/arch/x86/crypto/sha-mb/sha1_x8_avx2.S
+> +++ b/arch/x86/crypto/sha-mb/sha1_x8_avx2.S
+> @@ -296,7 +296,11 @@ W14  = TMP_
+>  #
+>  ENTRY(sha1_x8_avx2)
+>  
+> -	push	RSP_SAVE
+> +	# save callee-saved clobbered registers to comply with C function ABI
+> +	push	%r12
+> +	push	%r13
+> +	push	%r14
+> +	push	%r15
+>  
+>  	#save rsp
+>  	mov	%rsp, RSP_SAVE
+> @@ -446,7 +450,12 @@ lloop:
+>  	## Postamble
+>  
+>  	mov     RSP_SAVE, %rsp
+> -	pop	RSP_SAVE
+> +
+> +	# restore callee-saved clobbered registers
+> +	pop	%r15
+> +	pop	%r14
+> +	pop	%r13
+> +	pop	%r12
+>  
+>  	ret
+>  ENDPROC(sha1_x8_avx2)
 
-Hi David,
-Are you ok to take it into 4.7 via your linux-fs?
-Thanks,
--- 
-TS
+Hi Josh,
+I don't see the panic and am able to boot. However, I am not able to see
+the tests running. You said you were able to insert the tcrypt module
+and test this right?
