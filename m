@@ -1,123 +1,61 @@
-From: Horia Ioan Geanta Neag <horia.geanta@nxp.com>
-Subject: Re: [PATCH v2 0/8] crypto: caam - add support for LS1043A SoC
-Date: Mon, 16 May 2016 15:49:27 +0000
-Message-ID: <AM2PR04MB067320109DD38D223BEB6C4598770@AM2PR04MB0673.eurprd04.prod.outlook.com>
+From: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
+Subject: RE: [PATCH v2 6/8] crypto: caam - handle core endianness != caam
+ endianness
+Date: Mon, 16 May 2016 14:52:50 +0000
+Message-ID: <VI1PR04MB13118EA25CF114C4D638AE39B8770@VI1PR04MB1311.eurprd04.prod.outlook.com>
 References: <1462462435-27403-1-git-send-email-horia.geanta@nxp.com>
+ <1462462589-27873-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-2
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Cristian Stoica <cristian.stoica@nxp.com>,
 	Scott Wood <scott.wood@nxp.com>,
-	Alexandru Porosanu <alexandru.porosanu@nxp.com>,
-	Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will.deacon@arm.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Paul Mackerras <paulus@samba.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Rob Herring <robh+dt@kernel.org>,
-	Olof Johansson <olof@lixom.net>
+	"Alexandru Porosanu" <alexandru.porosanu@nxp.com>,
+	Cristian Stoica <cristian.stoica@nxp.com>,
+	Fabio Estevam <fabio.estevam@nxp.com>,
+	"Steven Cornelius" <steve.cornelius@nxp.com>
+To: Horia Ioan Geanta Neag <horia.geanta@nxp.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-am1on0100.outbound.protection.outlook.com ([157.56.112.100]:36480
-	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
+Received: from mail-db3on0076.outbound.protection.outlook.com ([157.55.234.76]:16292
+	"EHLO emea01-db3-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753892AbcEPPtc convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 May 2016 11:49:32 -0400
+	id S1754362AbcEPQZb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 May 2016 12:25:31 -0400
+In-Reply-To: <1462462589-27873-1-git-send-email-horia.geanta@nxp.com>
 Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 5/5/2016 6:34 PM, Horia Geant=E3 wrote:
-> v2:
-> As suggested by Arnd, patch 1 fixes io{read,write}{16,32}be accessors
-> to prevent the case when {read,write}{w,l} are overriden by arch-spec=
-ific
-> ones having barriers, while the BE accessors previously mentioned are=
- not
-> (thus behaving differently, having no barriers).
->=20
-> Hi,
->=20
-> [Patches 2-4 add io{read,write}64[be] accessors (generic, arm64, ppc6=
-4),
-> such that CAAM's accessors in regs.h are simplified a bit.
-> Patch 8 adds crypto node for LS1043A platform.
-> Let me know if it's ok to go with these through the cryptodev-2.6 tre=
-e.]
->=20
-Herbert,
-
-Could you apply the patch set, but without patch 8/8 I guess - since DT
-maintainers haven't ack-ed it?
-
-I assume it's too late for 4.7, however applying the patches would solv=
-e
-dependencies b/w on-going caam development.
-
-Thanks,
-Horia
-
-
-> This is a follow-up on the following RFC patch set:
-> crypto: caam - Revamp I/O accessors
-> https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg15878.ht=
-ml
->=20
-> There are platforms such as LS1043A (or LS1012A) where core endiannes=
-s
-> does not match CAAM/SEC endianness (LE vs. BE).
-> Add support in caam driver for these cases.
->=20
-> Current patch set detects device endianness at runtime (as opposed to
-> compile-time endianness), in order to support multiplatform kernels.
-> Detection of device endianness is not device-tree based.
-> Instead, SSTA ("SEC STAtus") register has a property such that
-> reading it in any endianness and masking it properly, it's possible
-> to deduce device endianness.
->=20
-> The performance drop due to the runtime detection is < 1.0%.
-> (An alternative implementation using function pointers has been tried=
-,
-> but lead to a bigger performance drop.)
->=20
-> Thanks,
-> Horia
->=20
-> Cristian Stoica (1):
->   crypto: caam - fix offset field in hw sg entries
->=20
-> Horia Geant=E3 (7):
->   asm-generic/io.h: allow barriers in io{read,write}{16,32}be
->   asm-generic/io.h: add io{read,write}64 accessors
->   arm64: add io{read,write}64be accessors
->   powerpc: add io{read,write}64 accessors
->   crypto: caam - handle core endianness !=3D caam endianness
->   crypto: caam - add ARCH_LAYERSCAPE to supported architectures
->   arm64: dts: ls1043a: add crypto node
->=20
->  arch/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dts |   4 +
->  arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi    |  43 ++++++
->  arch/arm64/include/asm/io.h                       |   4 +-
->  arch/powerpc/kernel/iomap.c                       |  24 ++++
->  drivers/crypto/caam/Kconfig                       |   6 +-
->  drivers/crypto/caam/caamhash.c                    |   5 +-
->  drivers/crypto/caam/ctrl.c                        | 125 +++++++++++-=
-------
->  drivers/crypto/caam/desc.h                        |   9 +-
->  drivers/crypto/caam/desc_constr.h                 |  44 ++++---
->  drivers/crypto/caam/jr.c                          |  22 ++--
->  drivers/crypto/caam/pdb.h                         | 137 ++++++++++++=
-+++-----
->  drivers/crypto/caam/regs.h                        | 151 ++++++++++++=
-+++-------
->  drivers/crypto/caam/sg_sw_sec4.h                  |  17 +--
->  include/asm-generic/io.h                          |  71 +++++++++-
->  include/asm-generic/iomap.h                       |   8 ++
->  15 files changed, 494 insertions(+), 176 deletions(-)
->=20
+PiBUaGVyZSBhcmUgU29DcyBsaWtlIExTMTA0M0Egd2hlcmUgQ0FBTSBlbmRpYW5uZXNzIChCRSkg
+ZG9lcyBub3QgbWF0Y2gNCj4gdGhlIGRlZmF1bHQgZW5kaWFubmVzcyBvZiB0aGUgY29yZSAoTEUp
+Lg0KPiBNb3Jlb3ZlciwgdGhlcmUgYXJlIHJlcXVpcmVtZW50cyBmb3IgdGhlIGRyaXZlciB0byBo
+YW5kbGUgY2FzZXMgbGlrZQ0KPiBDUFVfQklHX0VORElBTj15IG9uIEFSTS1iYXNlZCBTb0NzLg0K
+PiBUaGlzIHJlcXVpcmVzIGZvciBhIGNvbXBsZXRlIHJld3JpdGUgb2YgdGhlIEkvTyBhY2Nlc3Nv
+cnMuDQo+IA0KPiBQUEMtc3BlY2lmaWMgYWNjZXNzb3JzIC0ge2luLG91dH1fe2xlLGJlfVhYIC0g
+YXJlIHJlcGxhY2VkIHdpdGgNCj4gZ2VuZXJpYyBvbmVzIC0gaW97cmVhZCx3cml0ZX1bYmVdWFgu
+DQo+IA0KPiBFbmRpYW5uZXNzIGlzIGRldGVjdGVkIGR5bmFtaWNhbGx5IChhdCBydW50aW1lKSB0
+byBhbGxvdyBmb3INCj4gbXVsdGlwbGF0Zm9ybSBrZXJuZWxzLCBmb3IgZS5nLiBydW5uaW5nIHRo
+ZSBzYW1lIGtlcm5lbCBpbWFnZQ0KPiBvbiBMUzEwNDNBIChCRSBDQUFNKSBhbmQgTFMyMDgwQSAo
+TEUgQ0FBTSkgYXJtdjgtYmFzZWQgU29Dcy4NCj4gDQo+IFdoaWxlIGhlcmU6IGRlYnVnZnMgZW50
+cmllcyBuZWVkIHRvIHRha2UgaW50byBjb25zaWRlcmF0aW9uIHRoZQ0KPiBlbmRpYW5uZXNzIG9m
+IHRoZSBjb3JlIHdoZW4gZGlzcGxheWluZyBkYXRhLiBBZGQgdGhlIG5lY2Vzc2FyeQ0KPiBnbHVl
+IGNvZGUgc28gdGhlIGVudHJpZXMgcmVtYWluIHRoZSBzYW1lLCBidXQgdGhleSBhcmUgcHJvcGVy
+bHkNCj4gcmVhZCwgcmVnYXJkbGVzcyBvZiB0aGUgY29yZSBhbmQvb3IgU0VDIGVuZGlhbm5lc3Mu
+DQo+IA0KPiBOb3RlOiBwZGIuaCBmaXhlcyBvbmx5IHdoYXQgaXMgY3VycmVudGx5IGJlaW5nIHVz
+ZWQgKElQc2VjKS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEhvcmlhIEdlYW50xIMgPGhvcmlhLmdl
+YW50YUBueHAuY29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBBbGV4IFBvcm9zYW51IDxhbGV4YW5kcnUu
+cG9yb3NhbnVAbnhwLmNvbT4NCj4gLS0tDQo+ICBkcml2ZXJzL2NyeXB0by9jYWFtL0tjb25maWcg
+ICAgICAgfCAgIDQgLQ0KPiAgZHJpdmVycy9jcnlwdG8vY2FhbS9jYWFtaGFzaC5jICAgIHwgICA1
+ICstDQo+ICBkcml2ZXJzL2NyeXB0by9jYWFtL2N0cmwuYyAgICAgICAgfCAxMjUgKysrKysrKysr
+KysrKysrKysrKy0tLS0tLS0tLS0tLQ0KPiAgZHJpdmVycy9jcnlwdG8vY2FhbS9kZXNjLmggICAg
+ICAgIHwgICA3ICstDQo+ICBkcml2ZXJzL2NyeXB0by9jYWFtL2Rlc2NfY29uc3RyLmggfCAgNDQg
+KysrKysrKy0tLS0NCj4gIGRyaXZlcnMvY3J5cHRvL2NhYW0vanIuYyAgICAgICAgICB8ICAyMiAr
+KystLS0NCj4gIGRyaXZlcnMvY3J5cHRvL2NhYW0vcGRiLmggICAgICAgICB8IDEzNyArKysrKysr
+KysrKysrKysrKysrKysrKysrKy0tLS0tLS0tDQo+ICBkcml2ZXJzL2NyeXB0by9jYWFtL3JlZ3Mu
+aCAgICAgICAgfCAxNTEgKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLQ0KPiAtLS0t
+DQo+ICBkcml2ZXJzL2NyeXB0by9jYWFtL3NnX3N3X3NlYzQuaCAgfCAgMTEgKy0tDQo+ICA5IGZp
+bGVzIGNoYW5nZWQsIDM0MCBpbnNlcnRpb25zKCspLCAxNjYgZGVsZXRpb25zKC0pDQoNClJldmll
+d2VkLWJ5OiBUdWRvciBBbWJhcnVzIDx0dWRvci1kYW4uYW1iYXJ1c0BueHAuY29tPg0K
