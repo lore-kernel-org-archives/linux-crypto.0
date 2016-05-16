@@ -1,63 +1,54 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: Decrypting data in RX path
-Date: Mon, 16 May 2016 14:32:44 +0200
-Message-ID: <6061728.aByMvLa2kt@tauon.atsec.com>
-References: <CAKJ7aR5v5LmgZ5XAv8+9mAtksdSu=LJz=oK9AmHO2t4bDiqSzw@mail.gmail.com>
+Subject: Costs of asym self tests
+Date: Mon, 16 May 2016 15:30:09 +0200
+Message-ID: <2344876.zyy5ByWqZi@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Gadre Nayan <gadrenayan@gmail.com>
+Cc: "Struk, Tadeusz" <tadeusz.struk@intel.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.atsec.com ([195.30.99.214]:36422 "EHLO mail.atsec.com"
+Received: from mail.atsec.com ([195.30.99.214]:37970 "EHLO mail.atsec.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750787AbcEPMkp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 May 2016 08:40:45 -0400
+	id S1751815AbcEPNaO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 May 2016 09:30:14 -0400
 Received: from mail.atsec.com (localhost [127.0.0.1])
-	by mail.atsec.com (Postfix) with ESMTP id D3E6E212CA
-	for <linux-crypto@vger.kernel.org>; Mon, 16 May 2016 14:32:46 +0200 (CEST)
-In-Reply-To: <CAKJ7aR5v5LmgZ5XAv8+9mAtksdSu=LJz=oK9AmHO2t4bDiqSzw@mail.gmail.com>
+	by mail.atsec.com (Postfix) with ESMTP id 065C52131B
+	for <linux-crypto@vger.kernel.org>; Mon, 16 May 2016 15:30:11 +0200 (CEST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 16. Mai 2016, 17:24:12 schrieb Gadre Nayan:
+Hi,
 
-Hi Gadre,
+albeit it makes most sense to have asym self tests in the test manager as we 
+do right now, may I suggest some changes to it as follows. The issue I see is 
+that asym operations are very expensive.
 
-> Hi,
-> 
-> I am able to encrypt data using the asynchronous kernel crypto API's.
-> I can observe the encrypted data on the protocol analyzer.
-> 
-> I wanted to decry-pt the data now on the receiver side, So I have
-> following questions.
-> 
-> 1. What is the best place to decrypt the data, in kernel space (module
-> (pre-routing hook) or driver) OR user space using (maybe using raw
-> sockets or after socket recv).
+As we currently have RSA only, I can only refer to its implementation. But in 
+general, all new-and-coming asym self tests should be assessed accordingly.
 
-This is a very broad question and cannot be answered without knowning the 
-context.
-> 
-> What precautions should be taken in terms of locking while using
-> crypto api's in kernel space in RX path (Softirq context) --> Can
-> someone point to existing sample in kernel where decryption is done in
-> RX path.
+May I suggest to do the following:
 
-net/ipv4/esp4.c:esp_input for rx and esp_output for tx.
-> 
-> 
-> 2. If I encrypt data in kernel space can I decrypt it in User-space
-> using same encryption methods and Keys.
+- remove all self tests except the 2k tests. As the math works independent of 
+the key size, testing one key size is sufficient to demonstrate that the math 
+still works.
 
-Sure, if you have the keys and all information about the used crypto.
-> 
-> Thanks.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+- If we booted in FIPS mode, and we have PKCS#1 compiled, then:
 
+	* do not execute the raw RSA self test mentioned above
+
+	* perform an enc/dec test using the kernel crypto API with a 2k key
+
+	* if the asym key API is compiled, add a self test for siggen/ver
+
+With this approach, I would see that we limit the impact of the self test to 
+"normal" users as well as FIPS related use cases.
+
+If agreed, I could offer to implement the changes.
+
+Note, currently the self tests for RSA is not appropriate to allow the cipher 
+in FIPS mode (i.e. the fips_allowed=1 flag is actually not correct in the 
+current implementation).
 
 Ciao
 Stephan
