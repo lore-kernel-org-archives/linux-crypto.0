@@ -1,94 +1,81 @@
-From: Gadre Nayan <gadrenayan@gmail.com>
-Subject: Re: Decrypting data in RX path
-Date: Mon, 16 May 2016 20:10:56 +0530
-Message-ID: <CAKJ7aR5gJ=ebBgYPq6=eUQoVLi8xXz9EsRnRqWvh2_EG6s7p1g@mail.gmail.com>
-References: <CAKJ7aR5v5LmgZ5XAv8+9mAtksdSu=LJz=oK9AmHO2t4bDiqSzw@mail.gmail.com>
-	<6061728.aByMvLa2kt@tauon.atsec.com>
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: SHA1-MB algorithm broken on latest kernel
+Date: Mon, 16 May 2016 09:44:09 -0500
+Message-ID: <20160516144409.dkzqrpd3nlb36ygq@treble>
+References: <1463095866.2594.8.camel@megha-Z97X-UD7-TH>
+ <20160513031020.GA12467@gondor.apana.org.au>
+ <20160513055103.GB24504@gmail.com>
+ <1463160746.2594.11.camel@megha-Z97X-UD7-TH>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Cc: Ingo Molnar <mingo@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Megha Dey <megha.dey@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f196.google.com ([209.85.223.196]:33982 "EHLO
-	mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753410AbcEPOk5 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 May 2016 10:40:57 -0400
-Received: by mail-io0-f196.google.com with SMTP id d62so15198126iof.1
-        for <linux-crypto@vger.kernel.org>; Mon, 16 May 2016 07:40:56 -0700 (PDT)
-In-Reply-To: <6061728.aByMvLa2kt@tauon.atsec.com>
+Received: from mx1.redhat.com ([209.132.183.28]:38230 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753099AbcEPOoM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 May 2016 10:44:12 -0400
+Content-Disposition: inline
+In-Reply-To: <1463160746.2594.11.camel@megha-Z97X-UD7-TH>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Fri, May 13, 2016 at 10:32:26AM -0700, Megha Dey wrote:
+> On Fri, 2016-05-13 at 07:51 +0200, Ingo Molnar wrote:
+> > * Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > 
+> > > On Thu, May 12, 2016 at 04:31:06PM -0700, Megha Dey wrote:
+> > > > Hi,
+> > > >  
+> > > > When booting latest kernel with the CONFIG_CRYPTO_SHA1_MB enabled, I
+> > > > observe a panic.
+> > > >  
+> > > > After having a quick look, on reverting the following patches, I am able
+> > > > to complete the booting process.
+> > > > aec4d0e301f17bb143341c82cc44685b8af0b945
+> > > > 8691ccd764f9ecc69a6812dfe76214c86ac9ba06
+> > > > 68874ac3304ade7ed5ebb12af00d6b9bbbca0a16
+> > > >  
+> > > > Of the 3 patches, aec4d0e301f17bb143341c82cc44685b8af0b945 seems wrong.
+> > > > The r10 to r15 registers are used in sha1_x8_avx2.S, which is called
+> > > > from sha1_mb_mgr_flush_avx2.S.
+> > > >
+> > > > I do not think the functionality of the SHA1-MB crypto algorithm has
+> > > > been tested after applying these changes. (I am not sure if any of the
+> > > > other crypto algorithms have been affected by these changes).
+> > > 
+> > > Josh, Ingo:
+> > > 
+> > > Any ideas on this? Should we revert?
+> > 
+> > Yeah, I think so - although another option would be to standardize sha1_x8_avx2() 
+> > - the problem is that it is a function that clobbers registers without 
+> > saving/restoring them, breaking the C function ABI. I realize it's written in 
+> > assembly, but unless there are strong performance reasons to deviate from the 
+> > regular calling convention it might make sense to fix that.
+> > 
+> > Do any warnings get generated after the revert, if you enable 
+> > CONFIG_STACK_VALIDATION=y?
+> 
+> After the revert and enabling CONFIG_STACK_VALIDATION:
+> arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.o: warning: objtool:
+> sha1_mb_mgr_flush_avx2()+0x20d: call without frame pointer save/setup
+> 
+> arch/x86/crypto/sha1-mb/sha1_mb_mgr_submit_avx2.o: warning: objtool:
+> sha1_mb_mgr_submit_avx2()+0x115: call without frame pointer save/setup
 
-1. The context of the question "best place to decrypt in
-kernel(module/driver)" is I want to encrypt network packets sent from
-my system and decrypt them back to work with crypto apis. So the
-encryption part I have done in  a Kernel thread, decryption part could
-be either in driver or a pre-routing hook. Which is appropriate.
+Megha,
 
-2. I went through the esp_input function for rx.
+Sorry for breaking it.  I completely missed the fact that the function
+calls sha1_x8_avx2() which clobbers registers.
 
-As I understand, It allocates a decrypt request and and calls
-crypto_aead_decrypt(req).
+If the performance penalty isn't too bad, I'll submit a patch to
+standardize sha1_x8_avx2() to follow the C ABI.
 
-A. Since this request is asynchronous, it would be handled through
-condition variables, Am i right on this?
-B. Also the IPSEC routines like input and output would run in softirq context ?
-C. esp_input_done() is a callback for decrypt, so as soon as
-crypto_aead_decrypt(req) is called and the encryption does not happen
-immediately, it will return the error _EINPROGRESS. Now this will
-cause the esp_input function to return immediately. So then when is
-the deferred decryption checked. I see esp_input_done2 as well. How is
-the flow and call of these callbacks happening.
+Do you have any tips for testing this code?  I've tried using the tcrypt
+module, but no luck.
 
-Apologize for being so verbose.
-
-Thanks.
-
-
-
-
-
-On Mon, May 16, 2016 at 6:02 PM, Stephan Mueller <smueller@chronox.de> wrote:
-> Am Montag, 16. Mai 2016, 17:24:12 schrieb Gadre Nayan:
->
-> Hi Gadre,
->
->> Hi,
->>
->> I am able to encrypt data using the asynchronous kernel crypto API's.
->> I can observe the encrypted data on the protocol analyzer.
->>
->> I wanted to decry-pt the data now on the receiver side, So I have
->> following questions.
->>
->> 1. What is the best place to decrypt the data, in kernel space (module
->> (pre-routing hook) or driver) OR user space using (maybe using raw
->> sockets or after socket recv).
->
-> This is a very broad question and cannot be answered without knowning the
-> context.
->>
->> What precautions should be taken in terms of locking while using
->> crypto api's in kernel space in RX path (Softirq context) --> Can
->> someone point to existing sample in kernel where decryption is done in
->> RX path.
->
-> net/ipv4/esp4.c:esp_input for rx and esp_output for tx.
->>
->>
->> 2. If I encrypt data in kernel space can I decrypt it in User-space
->> using same encryption methods and Keys.
->
-> Sure, if you have the keys and all information about the used crypto.
->>
->> Thanks.
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
-> Ciao
-> Stephan
+-- 
+Josh
