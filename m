@@ -1,61 +1,88 @@
-From: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
-Subject: RE: [PATCH v2 6/8] crypto: caam - handle core endianness != caam
- endianness
-Date: Mon, 16 May 2016 14:52:50 +0000
-Message-ID: <VI1PR04MB13118EA25CF114C4D638AE39B8770@VI1PR04MB1311.eurprd04.prod.outlook.com>
-References: <1462462435-27403-1-git-send-email-horia.geanta@nxp.com>
- <1462462589-27873-1-git-send-email-horia.geanta@nxp.com>
+From: Megha Dey <megha.dey@linux.intel.com>
+Subject: Re: SHA1-MB algorithm broken on latest kernel
+Date: Mon, 16 May 2016 11:31:12 -0700
+Message-ID: <1463423472.5329.6.camel@megha-Z97X-UD7-TH>
+References: <1463095866.2594.8.camel@megha-Z97X-UD7-TH>
+	 <20160513031020.GA12467@gondor.apana.org.au>
+	 <20160513055103.GB24504@gmail.com>
+	 <1463160746.2594.11.camel@megha-Z97X-UD7-TH>
+	 <20160516144409.dkzqrpd3nlb36ygq@treble>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Scott Wood <scott.wood@nxp.com>,
-	"Alexandru Porosanu" <alexandru.porosanu@nxp.com>,
-	Cristian Stoica <cristian.stoica@nxp.com>,
-	Fabio Estevam <fabio.estevam@nxp.com>,
-	"Steven Cornelius" <steve.cornelius@nxp.com>
-To: Horia Ioan Geanta Neag <horia.geanta@nxp.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-db3on0076.outbound.protection.outlook.com ([157.55.234.76]:16292
-	"EHLO emea01-db3-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754362AbcEPQZb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 May 2016 12:25:31 -0400
-In-Reply-To: <1462462589-27873-1-git-send-email-horia.geanta@nxp.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Ingo Molnar <mingo@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Josh Poimboeuf <jpoimboe@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20160516144409.dkzqrpd3nlb36ygq@treble>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-PiBUaGVyZSBhcmUgU29DcyBsaWtlIExTMTA0M0Egd2hlcmUgQ0FBTSBlbmRpYW5uZXNzIChCRSkg
-ZG9lcyBub3QgbWF0Y2gNCj4gdGhlIGRlZmF1bHQgZW5kaWFubmVzcyBvZiB0aGUgY29yZSAoTEUp
-Lg0KPiBNb3Jlb3ZlciwgdGhlcmUgYXJlIHJlcXVpcmVtZW50cyBmb3IgdGhlIGRyaXZlciB0byBo
-YW5kbGUgY2FzZXMgbGlrZQ0KPiBDUFVfQklHX0VORElBTj15IG9uIEFSTS1iYXNlZCBTb0NzLg0K
-PiBUaGlzIHJlcXVpcmVzIGZvciBhIGNvbXBsZXRlIHJld3JpdGUgb2YgdGhlIEkvTyBhY2Nlc3Nv
-cnMuDQo+IA0KPiBQUEMtc3BlY2lmaWMgYWNjZXNzb3JzIC0ge2luLG91dH1fe2xlLGJlfVhYIC0g
-YXJlIHJlcGxhY2VkIHdpdGgNCj4gZ2VuZXJpYyBvbmVzIC0gaW97cmVhZCx3cml0ZX1bYmVdWFgu
-DQo+IA0KPiBFbmRpYW5uZXNzIGlzIGRldGVjdGVkIGR5bmFtaWNhbGx5IChhdCBydW50aW1lKSB0
-byBhbGxvdyBmb3INCj4gbXVsdGlwbGF0Zm9ybSBrZXJuZWxzLCBmb3IgZS5nLiBydW5uaW5nIHRo
-ZSBzYW1lIGtlcm5lbCBpbWFnZQ0KPiBvbiBMUzEwNDNBIChCRSBDQUFNKSBhbmQgTFMyMDgwQSAo
-TEUgQ0FBTSkgYXJtdjgtYmFzZWQgU29Dcy4NCj4gDQo+IFdoaWxlIGhlcmU6IGRlYnVnZnMgZW50
-cmllcyBuZWVkIHRvIHRha2UgaW50byBjb25zaWRlcmF0aW9uIHRoZQ0KPiBlbmRpYW5uZXNzIG9m
-IHRoZSBjb3JlIHdoZW4gZGlzcGxheWluZyBkYXRhLiBBZGQgdGhlIG5lY2Vzc2FyeQ0KPiBnbHVl
-IGNvZGUgc28gdGhlIGVudHJpZXMgcmVtYWluIHRoZSBzYW1lLCBidXQgdGhleSBhcmUgcHJvcGVy
-bHkNCj4gcmVhZCwgcmVnYXJkbGVzcyBvZiB0aGUgY29yZSBhbmQvb3IgU0VDIGVuZGlhbm5lc3Mu
-DQo+IA0KPiBOb3RlOiBwZGIuaCBmaXhlcyBvbmx5IHdoYXQgaXMgY3VycmVudGx5IGJlaW5nIHVz
-ZWQgKElQc2VjKS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEhvcmlhIEdlYW50xIMgPGhvcmlhLmdl
-YW50YUBueHAuY29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBBbGV4IFBvcm9zYW51IDxhbGV4YW5kcnUu
-cG9yb3NhbnVAbnhwLmNvbT4NCj4gLS0tDQo+ICBkcml2ZXJzL2NyeXB0by9jYWFtL0tjb25maWcg
-ICAgICAgfCAgIDQgLQ0KPiAgZHJpdmVycy9jcnlwdG8vY2FhbS9jYWFtaGFzaC5jICAgIHwgICA1
-ICstDQo+ICBkcml2ZXJzL2NyeXB0by9jYWFtL2N0cmwuYyAgICAgICAgfCAxMjUgKysrKysrKysr
-KysrKysrKysrKy0tLS0tLS0tLS0tLQ0KPiAgZHJpdmVycy9jcnlwdG8vY2FhbS9kZXNjLmggICAg
-ICAgIHwgICA3ICstDQo+ICBkcml2ZXJzL2NyeXB0by9jYWFtL2Rlc2NfY29uc3RyLmggfCAgNDQg
-KysrKysrKy0tLS0NCj4gIGRyaXZlcnMvY3J5cHRvL2NhYW0vanIuYyAgICAgICAgICB8ICAyMiAr
-KystLS0NCj4gIGRyaXZlcnMvY3J5cHRvL2NhYW0vcGRiLmggICAgICAgICB8IDEzNyArKysrKysr
-KysrKysrKysrKysrKysrKysrKy0tLS0tLS0tDQo+ICBkcml2ZXJzL2NyeXB0by9jYWFtL3JlZ3Mu
-aCAgICAgICAgfCAxNTEgKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLQ0KPiAtLS0t
-DQo+ICBkcml2ZXJzL2NyeXB0by9jYWFtL3NnX3N3X3NlYzQuaCAgfCAgMTEgKy0tDQo+ICA5IGZp
-bGVzIGNoYW5nZWQsIDM0MCBpbnNlcnRpb25zKCspLCAxNjYgZGVsZXRpb25zKC0pDQoNClJldmll
-d2VkLWJ5OiBUdWRvciBBbWJhcnVzIDx0dWRvci1kYW4uYW1iYXJ1c0BueHAuY29tPg0K
+On Mon, 2016-05-16 at 09:44 -0500, Josh Poimboeuf wrote:
+> On Fri, May 13, 2016 at 10:32:26AM -0700, Megha Dey wrote:
+> > On Fri, 2016-05-13 at 07:51 +0200, Ingo Molnar wrote:
+> > > * Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > > 
+> > > > On Thu, May 12, 2016 at 04:31:06PM -0700, Megha Dey wrote:
+> > > > > Hi,
+> > > > >  
+> > > > > When booting latest kernel with the CONFIG_CRYPTO_SHA1_MB enabled, I
+> > > > > observe a panic.
+> > > > >  
+> > > > > After having a quick look, on reverting the following patches, I am able
+> > > > > to complete the booting process.
+> > > > > aec4d0e301f17bb143341c82cc44685b8af0b945
+> > > > > 8691ccd764f9ecc69a6812dfe76214c86ac9ba06
+> > > > > 68874ac3304ade7ed5ebb12af00d6b9bbbca0a16
+> > > > >  
+> > > > > Of the 3 patches, aec4d0e301f17bb143341c82cc44685b8af0b945 seems wrong.
+> > > > > The r10 to r15 registers are used in sha1_x8_avx2.S, which is called
+> > > > > from sha1_mb_mgr_flush_avx2.S.
+> > > > >
+> > > > > I do not think the functionality of the SHA1-MB crypto algorithm has
+> > > > > been tested after applying these changes. (I am not sure if any of the
+> > > > > other crypto algorithms have been affected by these changes).
+> > > > 
+> > > > Josh, Ingo:
+> > > > 
+> > > > Any ideas on this? Should we revert?
+> > > 
+> > > Yeah, I think so - although another option would be to standardize sha1_x8_avx2() 
+> > > - the problem is that it is a function that clobbers registers without 
+> > > saving/restoring them, breaking the C function ABI. I realize it's written in 
+> > > assembly, but unless there are strong performance reasons to deviate from the 
+> > > regular calling convention it might make sense to fix that.
+> > > 
+> > > Do any warnings get generated after the revert, if you enable 
+> > > CONFIG_STACK_VALIDATION=y?
+> > 
+> > After the revert and enabling CONFIG_STACK_VALIDATION:
+> > arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.o: warning: objtool:
+> > sha1_mb_mgr_flush_avx2()+0x20d: call without frame pointer save/setup
+> > 
+> > arch/x86/crypto/sha1-mb/sha1_mb_mgr_submit_avx2.o: warning: objtool:
+> > sha1_mb_mgr_submit_avx2()+0x115: call without frame pointer save/setup
+> 
+> Megha,
+> 
+> Sorry for breaking it.  I completely missed the fact that the function
+> calls sha1_x8_avx2() which clobbers registers.
+> 
+> If the performance penalty isn't too bad, I'll submit a patch to
+> standardize sha1_x8_avx2() to follow the C ABI.
+> 
+> Do you have any tips for testing this code?  I've tried using the tcrypt
+> module, but no luck.
+> 
+Josh,
+Build the kernel with the following configs:
+CONFIG_CRYPTO_SHA1_MB=y
+CONFIG_CRYPTO_TEST=m
+CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n
+There was a kernel panic while booting. 
+So if after applying your new patch, we are able to get complete the
+boot, then we are good.
+
+Could you please send a copy of the patch, I could test it on my end
+too. 
