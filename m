@@ -1,81 +1,123 @@
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: SHA1-MB algorithm broken on latest kernel
-Date: Mon, 16 May 2016 09:44:09 -0500
-Message-ID: <20160516144409.dkzqrpd3nlb36ygq@treble>
-References: <1463095866.2594.8.camel@megha-Z97X-UD7-TH>
- <20160513031020.GA12467@gondor.apana.org.au>
- <20160513055103.GB24504@gmail.com>
- <1463160746.2594.11.camel@megha-Z97X-UD7-TH>
+From: Horia Ioan Geanta Neag <horia.geanta@nxp.com>
+Subject: Re: [PATCH v2 0/8] crypto: caam - add support for LS1043A SoC
+Date: Mon, 16 May 2016 15:49:27 +0000
+Message-ID: <AM2PR04MB067320109DD38D223BEB6C4598770@AM2PR04MB0673.eurprd04.prod.outlook.com>
+References: <1462462435-27403-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Ingo Molnar <mingo@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Megha Dey <megha.dey@linux.intel.com>
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Cristian Stoica <cristian.stoica@nxp.com>,
+	Scott Wood <scott.wood@nxp.com>,
+	Alexandru Porosanu <alexandru.porosanu@nxp.com>,
+	Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will.deacon@arm.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Paul Mackerras <paulus@samba.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Rob Herring <robh+dt@kernel.org>,
+	Olof Johansson <olof@lixom.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38230 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753099AbcEPOoM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 May 2016 10:44:12 -0400
-Content-Disposition: inline
-In-Reply-To: <1463160746.2594.11.camel@megha-Z97X-UD7-TH>
+Received: from mail-am1on0100.outbound.protection.outlook.com ([157.56.112.100]:36480
+	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753892AbcEPPtc convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 May 2016 11:49:32 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 13, 2016 at 10:32:26AM -0700, Megha Dey wrote:
-> On Fri, 2016-05-13 at 07:51 +0200, Ingo Molnar wrote:
-> > * Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > 
-> > > On Thu, May 12, 2016 at 04:31:06PM -0700, Megha Dey wrote:
-> > > > Hi,
-> > > >  
-> > > > When booting latest kernel with the CONFIG_CRYPTO_SHA1_MB enabled, I
-> > > > observe a panic.
-> > > >  
-> > > > After having a quick look, on reverting the following patches, I am able
-> > > > to complete the booting process.
-> > > > aec4d0e301f17bb143341c82cc44685b8af0b945
-> > > > 8691ccd764f9ecc69a6812dfe76214c86ac9ba06
-> > > > 68874ac3304ade7ed5ebb12af00d6b9bbbca0a16
-> > > >  
-> > > > Of the 3 patches, aec4d0e301f17bb143341c82cc44685b8af0b945 seems wrong.
-> > > > The r10 to r15 registers are used in sha1_x8_avx2.S, which is called
-> > > > from sha1_mb_mgr_flush_avx2.S.
-> > > >
-> > > > I do not think the functionality of the SHA1-MB crypto algorithm has
-> > > > been tested after applying these changes. (I am not sure if any of the
-> > > > other crypto algorithms have been affected by these changes).
-> > > 
-> > > Josh, Ingo:
-> > > 
-> > > Any ideas on this? Should we revert?
-> > 
-> > Yeah, I think so - although another option would be to standardize sha1_x8_avx2() 
-> > - the problem is that it is a function that clobbers registers without 
-> > saving/restoring them, breaking the C function ABI. I realize it's written in 
-> > assembly, but unless there are strong performance reasons to deviate from the 
-> > regular calling convention it might make sense to fix that.
-> > 
-> > Do any warnings get generated after the revert, if you enable 
-> > CONFIG_STACK_VALIDATION=y?
-> 
-> After the revert and enabling CONFIG_STACK_VALIDATION:
-> arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.o: warning: objtool:
-> sha1_mb_mgr_flush_avx2()+0x20d: call without frame pointer save/setup
-> 
-> arch/x86/crypto/sha1-mb/sha1_mb_mgr_submit_avx2.o: warning: objtool:
-> sha1_mb_mgr_submit_avx2()+0x115: call without frame pointer save/setup
+On 5/5/2016 6:34 PM, Horia Geant=E3 wrote:
+> v2:
+> As suggested by Arnd, patch 1 fixes io{read,write}{16,32}be accessors
+> to prevent the case when {read,write}{w,l} are overriden by arch-spec=
+ific
+> ones having barriers, while the BE accessors previously mentioned are=
+ not
+> (thus behaving differently, having no barriers).
+>=20
+> Hi,
+>=20
+> [Patches 2-4 add io{read,write}64[be] accessors (generic, arm64, ppc6=
+4),
+> such that CAAM's accessors in regs.h are simplified a bit.
+> Patch 8 adds crypto node for LS1043A platform.
+> Let me know if it's ok to go with these through the cryptodev-2.6 tre=
+e.]
+>=20
+Herbert,
 
-Megha,
+Could you apply the patch set, but without patch 8/8 I guess - since DT
+maintainers haven't ack-ed it?
 
-Sorry for breaking it.  I completely missed the fact that the function
-calls sha1_x8_avx2() which clobbers registers.
+I assume it's too late for 4.7, however applying the patches would solv=
+e
+dependencies b/w on-going caam development.
 
-If the performance penalty isn't too bad, I'll submit a patch to
-standardize sha1_x8_avx2() to follow the C ABI.
+Thanks,
+Horia
 
-Do you have any tips for testing this code?  I've tried using the tcrypt
-module, but no luck.
 
--- 
-Josh
+> This is a follow-up on the following RFC patch set:
+> crypto: caam - Revamp I/O accessors
+> https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg15878.ht=
+ml
+>=20
+> There are platforms such as LS1043A (or LS1012A) where core endiannes=
+s
+> does not match CAAM/SEC endianness (LE vs. BE).
+> Add support in caam driver for these cases.
+>=20
+> Current patch set detects device endianness at runtime (as opposed to
+> compile-time endianness), in order to support multiplatform kernels.
+> Detection of device endianness is not device-tree based.
+> Instead, SSTA ("SEC STAtus") register has a property such that
+> reading it in any endianness and masking it properly, it's possible
+> to deduce device endianness.
+>=20
+> The performance drop due to the runtime detection is < 1.0%.
+> (An alternative implementation using function pointers has been tried=
+,
+> but lead to a bigger performance drop.)
+>=20
+> Thanks,
+> Horia
+>=20
+> Cristian Stoica (1):
+>   crypto: caam - fix offset field in hw sg entries
+>=20
+> Horia Geant=E3 (7):
+>   asm-generic/io.h: allow barriers in io{read,write}{16,32}be
+>   asm-generic/io.h: add io{read,write}64 accessors
+>   arm64: add io{read,write}64be accessors
+>   powerpc: add io{read,write}64 accessors
+>   crypto: caam - handle core endianness !=3D caam endianness
+>   crypto: caam - add ARCH_LAYERSCAPE to supported architectures
+>   arm64: dts: ls1043a: add crypto node
+>=20
+>  arch/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dts |   4 +
+>  arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi    |  43 ++++++
+>  arch/arm64/include/asm/io.h                       |   4 +-
+>  arch/powerpc/kernel/iomap.c                       |  24 ++++
+>  drivers/crypto/caam/Kconfig                       |   6 +-
+>  drivers/crypto/caam/caamhash.c                    |   5 +-
+>  drivers/crypto/caam/ctrl.c                        | 125 +++++++++++-=
+------
+>  drivers/crypto/caam/desc.h                        |   9 +-
+>  drivers/crypto/caam/desc_constr.h                 |  44 ++++---
+>  drivers/crypto/caam/jr.c                          |  22 ++--
+>  drivers/crypto/caam/pdb.h                         | 137 ++++++++++++=
++++-----
+>  drivers/crypto/caam/regs.h                        | 151 ++++++++++++=
++++-------
+>  drivers/crypto/caam/sg_sw_sec4.h                  |  17 +--
+>  include/asm-generic/io.h                          |  71 +++++++++-
+>  include/asm-generic/iomap.h                       |   8 ++
+>  15 files changed, 494 insertions(+), 176 deletions(-)
+>=20
