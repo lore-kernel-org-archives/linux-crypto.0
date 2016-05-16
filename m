@@ -1,54 +1,48 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Costs of asym self tests
-Date: Mon, 16 May 2016 15:30:09 +0200
-Message-ID: <2344876.zyy5ByWqZi@tauon.atsec.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH RESEND v5 6/6] crypto: AF_ALG - add support for key_id
+Date: Mon, 16 May 2016 07:23:48 -0700
+Message-ID: <b1ce2519-df59-58c5-a1e4-c795afce3551@intel.com>
+References: <20160505195048.1843.7817.stgit@tstruk-mobl1>
+ <20160505195120.1843.35821.stgit@tstruk-mobl1>
+ <alpine.OSX.2.20.1605131616200.29074@mjmartin-mac01.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "Struk, Tadeusz" <tadeusz.struk@intel.com>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.atsec.com ([195.30.99.214]:37970 "EHLO mail.atsec.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751815AbcEPNaO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 May 2016 09:30:14 -0400
-Received: from mail.atsec.com (localhost [127.0.0.1])
-	by mail.atsec.com (Postfix) with ESMTP id 065C52131B
-	for <linux-crypto@vger.kernel.org>; Mon, 16 May 2016 15:30:11 +0200 (CEST)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: dhowells@redhat.com, herbert@gondor.apana.org.au,
+	smueller@chronox.de, linux-api@vger.kernel.org,
+	marcel@holtmann.org, linux-kernel@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dwmw2@infradead.org, davem@davemloft.net
+To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <alpine.OSX.2.20.1605131616200.29074@mjmartin-mac01.local>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+Hi Mat,
+On 05/13/2016 04:32 PM, Mat Martineau wrote:
+> 
+>> +    params.data_len = req->src_len;
+>> +    params.enc_len = req->dst_len;
 
-albeit it makes most sense to have asym self tests in the test manager as we 
-do right now, may I suggest some changes to it as follows. The issue I see is 
-that asym operations are very expensive.
+Thanks for info. I have sent an update for this.
 
-As we currently have RSA only, I can only refer to its implementation. But in 
-general, all new-and-coming asym self tests should be assessed accordingly.
+> 
+> The params member names have changed (now in_len and out_len).
+>> +    ret = encrypt_blob(&params, in, out);
+> 
+> The encrypt function for the key can now be called with params.key->type->asym_eds_op(). This also allows you to factor out the duplication in asym_key_encrypt, asym_key_decrypt, and asym_key_sign. See keyctl_pkey_e_d_s() in keyctl_pkey.c
+> 
+>> +static int asym_key_verify(const struct key *key, struct akcipher_request *req)
+> ...
+>> +    ret = verify_signature(key, NULL, &sig);
+> 
+> key->type->asym_verify_signature() is available as well.
 
-May I suggest to do the following:
-
-- remove all self tests except the 2k tests. As the math works independent of 
-the key size, testing one key size is sufficient to demonstrate that the math 
-still works.
-
-- If we booted in FIPS mode, and we have PKCS#1 compiled, then:
-
-	* do not execute the raw RSA self test mentioned above
-
-	* perform an enc/dec test using the kernel crypto API with a 2k key
-
-	* if the asym key API is compiled, add a self test for siggen/ver
-
-With this approach, I would see that we limit the impact of the self test to 
-"normal" users as well as FIPS related use cases.
-
-If agreed, I could offer to implement the changes.
-
-Note, currently the self tests for RSA is not appropriate to allow the cipher 
-in FIPS mode (i.e. the fips_allowed=1 flag is actually not correct in the 
-current implementation).
-
-Ciao
-Stephan
+Since these operation will be triggered from userspace I think it's better to use the
+official interface as defined in crypto/public_key.h instead of direct calls.
+Some operation may not be implemented for a given key type and the official interface
+performs necessary checks.
+Thanks,
+-- 
+TS
