@@ -1,46 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/8] crypto: caam - add support for LS1043A SoC
-Date: Tue, 17 May 2016 08:08:22 +0800
-Message-ID: <20160517000822.GA8536@gondor.apana.org.au>
-References: <1462462435-27403-1-git-send-email-horia.geanta@nxp.com>
- <AM2PR04MB067320109DD38D223BEB6C4598770@AM2PR04MB0673.eurprd04.prod.outlook.com>
+Subject: Re: [PATCH] crypto/sha1-mb: make sha1_x8_avx2() conform to C
+ function ABI
+Date: Tue, 17 May 2016 14:31:48 +0800
+Message-ID: <20160517063148.GA10389@gondor.apana.org.au>
+References: <1463095866.2594.8.camel@megha-Z97X-UD7-TH>
+ <20160513031020.GA12467@gondor.apana.org.au>
+ <20160513055103.GB24504@gmail.com>
+ <1463160746.2594.11.camel@megha-Z97X-UD7-TH>
+ <20160516144409.dkzqrpd3nlb36ygq@treble>
+ <1463423472.5329.6.camel@megha-Z97X-UD7-TH>
+ <20160516201618.u4zethkab3ohgtfb@treble>
+ <1463434746.2538.1.camel@megha-Z97X-UD7-TH>
+ <20160516214631.5cvnfgvppw74acah@treble>
+ <1463440073.2547.1.camel@megha-Z97X-UD7-TH>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will.deacon@arm.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Paul Mackerras <paulus@samba.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Rob Herring <robh+dt@kernel.org>,
-	Olof Johansson <olof@lixom.net>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Cristian Stoica <cristian.stoica@nxp.com>,
-	Scott Wood <scott.wood@nxp.com>,
-	Alexandru Porosanu <alexandru.porosanu@nxp.com>,
-	Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
-To: Horia Ioan Geanta Neag <horia.geanta@nxp.com>
+Cc: Josh Poimboeuf <jpoimboe@redhat.com>,
+	Ingo Molnar <mingo@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Megha Dey <megha.dey@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:53004 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:36927 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751248AbcEQAI6 (ORCPT
+	with ESMTP id S1750792AbcEQGc3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 May 2016 20:08:58 -0400
+	Tue, 17 May 2016 02:32:29 -0400
 Content-Disposition: inline
-In-Reply-To: <AM2PR04MB067320109DD38D223BEB6C4598770@AM2PR04MB0673.eurprd04.prod.outlook.com>
+In-Reply-To: <1463440073.2547.1.camel@megha-Z97X-UD7-TH>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 16, 2016 at 03:49:27PM +0000, Horia Ioan Geanta Neag wrote:
-> 
-> I assume it's too late for 4.7, however applying the patches would solve
-> dependencies b/w on-going caam development.
+On Mon, May 16, 2016 at 04:07:53PM -0700, Megha Dey wrote:
+>
+> ok. I tried at my end too using some printk's and nothing seems to be
+> broken. Also, if you intend to use the same commit message, I spell my
+> name as Megha Dey and not Day :)
 
-I will be merging this after the merge window is closed.
+Patch applied with the name corrected.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
