@@ -1,40 +1,39 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH 0/2] crypto: engine: permit to enqueue ashash_request
-Date: Wed, 18 May 2016 11:21:23 +0200
-Message-ID: <1463563285-11742-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	LABBE Corentin <clabbe.montjoie@gmail.com>
-To: baolin.wang@linaro.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [patch] crypto: omap-sham - potential Oops on error in probe
+Date: Wed, 18 May 2016 13:39:05 +0300
+Message-ID: <20160518103905.GA10470@mwanda>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Peter Ujfalusi <peter.ujfalusi@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:33485 "EHLO
-	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751973AbcERJVf (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:29942 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752486AbcERKjg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 May 2016 05:21:35 -0400
+	Wed, 18 May 2016 06:39:36 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello
+This if statement is reversed so we end up either leaking or Oopsing on
+error.
 
-I wanted to use the crypto engine for my Allwinner crypto driver but something
-prevented me to use it: it cannot enqueue hash requests.
-The first patch convert crypto engine to permit enqueuing of ahash_requests.
-The second patch convert the only driver using crypto engine.
+Fixes: dbe246209bc1 ('crypto: omap-sham - Use dma_request_chan() for requesting DMA channel')
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-The second patch was only compile tested but the crypto engine with
-hash support was tested on two different offtree driver (sun4i-ss and sun8i-ce)
-
-Regards
-
-LABBE Corentin (2):
-  crypto: engine: permit to enqueue ashash_request
-  crypto: omap: convert to the new cryptoengine API
-
- crypto/crypto_engine.c    | 17 +++++++----------
- drivers/crypto/omap-aes.c | 10 ++++++----
- include/crypto/algapi.h   | 14 +++++++-------
- 3 files changed, 20 insertions(+), 21 deletions(-)
-
--- 
-2.7.3
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 6eefaa2..63464e8 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1986,7 +1986,7 @@ err_algs:
+ 					&dd->pdata->algs_info[i].algs_list[j]);
+ err_pm:
+ 	pm_runtime_disable(dev);
+-	if (dd->polling_mode)
++	if (!dd->polling_mode)
+ 		dma_release_channel(dd->dma_lch);
+ data_err:
+ 	dev_err(dev, "initialization failed.\n");
