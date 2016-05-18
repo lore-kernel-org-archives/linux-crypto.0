@@ -1,61 +1,117 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: linux-4.6/drivers/crypto/ux500/hash/hash_core.c: 2 * possible
- bad size ?
-Date: Wed, 18 May 2016 15:46:50 +0800
-Message-ID: <20160518074650.GA6097@gondor.apana.org.au>
-References: <CAMzoamabHQ0SaMmkTfwDGGZBpOxSE6Qci4TwEUAEMbtWO3X-Ew@mail.gmail.com>
+From: Catalin Vasile <cata.vasile@nxp.com>
+Subject: Re: Decrypting data in RX path
+Date: Wed, 18 May 2016 07:01:18 +0000
+Message-ID: <DB5PR04MB13021E5E7CAF57D1188D65AEEE490@DB5PR04MB1302.eurprd04.prod.outlook.com>
+References: <CAKJ7aR5v5LmgZ5XAv8+9mAtksdSu=LJz=oK9AmHO2t4bDiqSzw@mail.gmail.com>
+	<6061728.aByMvLa2kt@tauon.atsec.com>,<CAKJ7aR5gJ=ebBgYPq6=eUQoVLi8xXz9EsRnRqWvh2_EG6s7p1g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dcb314@hotmail.com,
-	Andreas Westin <andreas.westin@stericsson.com>,
-	Linus Walleij <linus.walleij@linaro.org>
-To: David Binderman <linuxdev.baldrick@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: Gadre Nayan <gadrenayan@gmail.com>,
+	Stephan Mueller <smueller@chronox.de>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38075 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750795AbcERHrT (ORCPT
+Received: from mail-db3on0065.outbound.protection.outlook.com ([157.55.234.65]:10176
+	"EHLO emea01-db3-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1750790AbcERIdK convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 May 2016 03:47:19 -0400
-Content-Disposition: inline
-In-Reply-To: <CAMzoamabHQ0SaMmkTfwDGGZBpOxSE6Qci4TwEUAEMbtWO3X-Ew@mail.gmail.com>
+	Wed, 18 May 2016 04:33:10 -0400
+In-Reply-To: <CAKJ7aR5gJ=ebBgYPq6=eUQoVLi8xXz9EsRnRqWvh2_EG6s7p1g@mail.gmail.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 16, 2016 at 07:13:12PM +0100, David Binderman wrote:
-> Hello there,
-> 
-> 1.
-> 
-> linux-4.6/drivers/crypto/ux500/hash/hash_core.c:784]: (warning) Division by
-> result of sizeof(). memmove() expects a size in bytes, did you intend to
-> multiply instead?
-> 
-> Source code is
-> 
->                 memmove(req_ctx->state.buffer,
->                     device_data->state.buffer,
->                     HASH_BLOCK_SIZE / sizeof(u32));
-> 
-> Maybe better code
-> 
->                 memmove(req_ctx->state.buffer,
->                     device_data->state.buffer,
->                     HASH_BLOCK_SIZE);
-> 
-> 2.
-> 
-> linux-4.6/drivers/crypto/ux500/hash/hash_core.c:835]: (warning) Division by
-> result of sizeof(). memmove() expects a size in bytes, did you intend to
-> multiply instead?
-> 
-> Duplicate.
 
-Thanks for noticing these bugs.  This driver hasn't been maintained
-since 2012, so unless someone steps up I'm going to just delete it.
+Inline Comments
+________________________________________
+From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.kernel.org> on behalf of Gadre Nayan <gadrenayan@gmail.com>
+Sent: Monday, May 16, 2016 5:40 PM
+To: Stephan Mueller; linux-crypto@vger.kernel.org
+Subject: Re: Decrypting data in RX path
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hi,
+
+1. The context of the question "best place to decrypt in
+kernel(module/driver)" is I want to encrypt network packets sent from
+my system and decrypt them back to work with crypto apis. So the
+encryption part I have done in  a Kernel thread, decryption part could
+be either in driver or a pre-routing hook. Which is appropriate.
+
+2. I went through the esp_input function for rx.
+
+As I understand, It allocates a decrypt request and and calls
+crypto_aead_decrypt(req).
+
+A. Since this request is asynchronous, it would be handled through
+condition variables, Am i right on this?
+B. Also the IPSEC routines like input and output would run in softirq context ?
+C. esp_input_done() is a callback for decrypt, so as soon as
+crypto_aead_decrypt(req) is called and the encryption does not happen
+immediately, it will return the error _EINPROGRESS. Now this will
+cause the esp_input function to return immediately. So then when is
+the deferred decryption checked. I see esp_input_done2 as well. How is
+the flow and call of these callbacks happening.
+
+[Catalin Vasile]
+"aead_request_set_callback(req, 0, esp_output_done_esn, skb);"
+This piece of code sets into the request structure a callback.
+After the job is queued, you will receive an -EINPROGRESS and your current
+context will just return till it ends the current context (having nothing other to do).
+Later, the device will trigger an interrupt in the Kernel to announce it
+that a job has been done. The interrupt usually starts a kthread or a softirq
+which will process what jobs have ended. One of the processing part thingies
+is triggering the callback you have set. Although the context that sent the job
+no longer exist, the hardware driver uses its own contexts to run some custom
+you have sent (that code is represented by your callback).
+
+Apologize for being so verbose.
+
+Thanks.
+
+
+
+
+
+On Mon, May 16, 2016 at 6:02 PM, Stephan Mueller <smueller@chronox.de> wrote:
+> Am Montag, 16. Mai 2016, 17:24:12 schrieb Gadre Nayan:
+>
+> Hi Gadre,
+>
+>> Hi,
+>>
+>> I am able to encrypt data using the asynchronous kernel crypto API's.
+>> I can observe the encrypted data on the protocol analyzer.
+>>
+>> I wanted to decry-pt the data now on the receiver side, So I have
+>> following questions.
+>>
+>> 1. What is the best place to decrypt the data, in kernel space (module
+>> (pre-routing hook) or driver) OR user space using (maybe using raw
+>> sockets or after socket recv).
+>
+> This is a very broad question and cannot be answered without knowning the
+> context.
+>>
+>> What precautions should be taken in terms of locking while using
+>> crypto api's in kernel space in RX path (Softirq context) --> Can
+>> someone point to existing sample in kernel where decryption is done in
+>> RX path.
+>
+> net/ipv4/esp4.c:esp_input for rx and esp_output for tx.
+>>
+>>
+>> 2. If I encrypt data in kernel space can I decrypt it in User-space
+>> using same encryption methods and Keys.
+>
+> Sure, if you have the keys and all information about the used crypto.
+>>
+>> Thanks.
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> Ciao
+> Stephan
