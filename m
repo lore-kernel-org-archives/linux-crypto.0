@@ -1,92 +1,53 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH v3 5/8] crypto: caam - fix offset field in hw sg entries
-Date: Thu, 19 May 2016 18:11:18 +0300
-Message-ID: <1463670678-3045-1-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH v3 3/8] arm64: add io{read,write}64be accessors
+Date: Thu, 19 May 2016 18:11:04 +0300
+Message-ID: <1463670664-2856-1-git-send-email-horia.geanta@nxp.com>
 References: <1463670405-1059-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	<linux-kernel@vger.kernel.org>,
-	Cristian Stoica <cristian.stoica@nxp.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ "David S. Miller" <davem@davemloft.net>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0057.outbound.protection.outlook.com ([207.46.100.57]:26474
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754862AbcESPL1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 19 May 2016 11:11:27 -0400
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <1463670405-1059-1-git-send-email-horia.geanta@nxp.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-=46rom: Cristian Stoica <cristian.stoica@freescale.com>
-
-The offset field is 13 bits wide; make sure we don't overwrite more tha=
-n
-that in the caam hardware scatter gather structure.
-
-Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
-Signed-off-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
----
- drivers/crypto/caam/desc.h       | 2 +-
- drivers/crypto/caam/sg_sw_sec4.h | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
-index 1e93c6af2275..fe30ff69088c 100644
---- a/drivers/crypto/caam/desc.h
-+++ b/drivers/crypto/caam/desc.h
-@@ -20,7 +20,7 @@
- #define SEC4_SG_BPID_MASK	0x000000ff
- #define SEC4_SG_BPID_SHIFT	16
- #define SEC4_SG_LEN_MASK	0x3fffffff	/* Excludes EXT and FINAL */
--#define SEC4_SG_OFFS_MASK	0x00001fff
-+#define SEC4_SG_OFFSET_MASK	0x00001fff
-=20
- struct sec4_sg_entry {
- #ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
-diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_=
-sw_sec4.h
-index 12ec6616e89d..2311341b7356 100644
---- a/drivers/crypto/caam/sg_sw_sec4.h
-+++ b/drivers/crypto/caam/sg_sw_sec4.h
-@@ -11,12 +11,12 @@ struct sec4_sg_entry;
-  * convert single dma address to h/w link table format
-  */
- static inline void dma_to_sec4_sg_one(struct sec4_sg_entry *sec4_sg_pt=
-r,
--				      dma_addr_t dma, u32 len, u32 offset)
-+				      dma_addr_t dma, u32 len, u16 offset)
- {
- 	sec4_sg_ptr->ptr =3D dma;
- 	sec4_sg_ptr->len =3D len;
- 	sec4_sg_ptr->buf_pool_id =3D 0;
--	sec4_sg_ptr->offset =3D offset;
-+	sec4_sg_ptr->offset =3D offset & SEC4_SG_OFFSET_MASK;
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "sec4_sg_ptr@: ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, sec4_sg_ptr,
-@@ -30,7 +30,7 @@ static inline void dma_to_sec4_sg_one(struct sec4_sg_=
-entry *sec4_sg_ptr,
-  */
- static inline struct sec4_sg_entry *
- sg_to_sec4_sg(struct scatterlist *sg, int sg_count,
--	      struct sec4_sg_entry *sec4_sg_ptr, u32 offset)
-+	      struct sec4_sg_entry *sec4_sg_ptr, u16 offset)
- {
- 	while (sg_count) {
- 		dma_to_sec4_sg_one(sec4_sg_ptr, sg_dma_address(sg),
-@@ -48,7 +48,7 @@ sg_to_sec4_sg(struct scatterlist *sg, int sg_count,
-  */
- static inline void sg_to_sec4_sg_last(struct scatterlist *sg, int sg_c=
-ount,
- 				      struct sec4_sg_entry *sec4_sg_ptr,
--				      u32 offset)
-+				      u16 offset)
- {
- 	sec4_sg_ptr =3D sg_to_sec4_sg(sg, sg_count, sec4_sg_ptr, offset);
- 	sec4_sg_ptr->len |=3D SEC4_SG_LEN_FIN;
---=20
-2.4.4
+VGhpcyB3aWxsIGFsbG93IGRldmljZSBkcml2ZXJzIHRvIGNvbnNpc3RlbnRseSB1c2UgaW97cmVh
+ZCx3cml0ZX1YWGJlCmFsc28gZm9yIDY0LWJpdCBhY2Nlc3Nlcy4KCkFja2VkLWJ5OiBDYXRhbGlu
+IE1hcmluYXMgPGNhdGFsaW4ubWFyaW5hc0Bhcm0uY29tPgpTaWduZWQtb2ZmLWJ5OiBBbGV4IFBv
+cm9zYW51IDxhbGV4YW5kcnUucG9yb3NhbnVAbnhwLmNvbT4KU2lnbmVkLW9mZi1ieTogSG9yaWEg
+R2VhbnTEgyA8aG9yaWEuZ2VhbnRhQG54cC5jb20+Ci0tLQogYXJjaC9hcm02NC9pbmNsdWRlL2Fz
+bS9pby5oIHwgNCArKystCiAxIGZpbGUgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspLCAxIGRlbGV0
+aW9uKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9pby5oIGIvYXJjaC9h
+cm02NC9pbmNsdWRlL2FzbS9pby5oCmluZGV4IDQ0YmUxZTAzZWQ2NS4uOWI2ZTQwOGNmYTUxIDEw
+MDY0NAotLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2lvLmgKKysrIGIvYXJjaC9hcm02NC9p
+bmNsdWRlL2FzbS9pby5oCkBAIC0xNzQsMTMgKzE3NCwxNSBAQCBleHRlcm4gdm9pZCBfX2lvbWVt
+ICppb3JlbWFwX2NhY2hlKHBoeXNfYWRkcl90IHBoeXNfYWRkciwgc2l6ZV90IHNpemUpOwogI2Rl
+ZmluZSBpb3VubWFwCQkJCV9faW91bm1hcAogCiAvKgotICogaW97cmVhZCx3cml0ZX17MTYsMzJ9
+YmUoKSBtYWNyb3MKKyAqIGlve3JlYWQsd3JpdGV9ezE2LDMyLDY0fWJlKCkgbWFjcm9zCiAgKi8K
+ICNkZWZpbmUgaW9yZWFkMTZiZShwKQkJKHsgX191MTYgX192ID0gYmUxNl90b19jcHUoKF9fZm9y
+Y2UgX19iZTE2KV9fcmF3X3JlYWR3KHApKTsgX19pb3JtYigpOyBfX3Y7IH0pCiAjZGVmaW5lIGlv
+cmVhZDMyYmUocCkJCSh7IF9fdTMyIF9fdiA9IGJlMzJfdG9fY3B1KChfX2ZvcmNlIF9fYmUzMilf
+X3Jhd19yZWFkbChwKSk7IF9faW9ybWIoKTsgX192OyB9KQorI2RlZmluZSBpb3JlYWQ2NGJlKHAp
+CQkoeyBfX3U2NCBfX3YgPSBiZTY0X3RvX2NwdSgoX19mb3JjZSBfX2JlNjQpX19yYXdfcmVhZHEo
+cCkpOyBfX2lvcm1iKCk7IF9fdjsgfSkKIAogI2RlZmluZSBpb3dyaXRlMTZiZSh2LHApCSh7IF9f
+aW93bWIoKTsgX19yYXdfd3JpdGV3KChfX2ZvcmNlIF9fdTE2KWNwdV90b19iZTE2KHYpLCBwKTsg
+fSkKICNkZWZpbmUgaW93cml0ZTMyYmUodixwKQkoeyBfX2lvd21iKCk7IF9fcmF3X3dyaXRlbCgo
+X19mb3JjZSBfX3UzMiljcHVfdG9fYmUzMih2KSwgcCk7IH0pCisjZGVmaW5lIGlvd3JpdGU2NGJl
+KHYscCkJKHsgX19pb3dtYigpOyBfX3Jhd193cml0ZXEoKF9fZm9yY2UgX191NjQpY3B1X3RvX2Jl
+NjQodiksIHApOyB9KQogCiAvKgogICogQ29udmVydCBhIHBoeXNpY2FsIHBvaW50ZXIgdG8gYSB2
+aXJ0dWFsIGtlcm5lbCBwb2ludGVyIGZvciAvZGV2L21lbQotLSAKMi40LjQKCgpfX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1hcm0ta2VybmVsIG1h
+aWxpbmcgbGlzdApsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xp
+c3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0ta2VybmVsCg==
