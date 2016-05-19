@@ -1,172 +1,111 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH v3 2/8] asm-generic/io.h: add io{read,write}64 accessors
-Date: Thu, 19 May 2016 18:10:56 +0300
-Message-ID: <1463670656-2809-1-git-send-email-horia.geanta@nxp.com>
-References: <1463670405-1059-1-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH v3 0/8] crypto: caam - add support for LS1043A SoC
+Date: Thu, 19 May 2016 18:06:45 +0300
+Message-ID: <1463670405-1059-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <linux-crypto@vger.kernel.org>,
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	<linux-crypto@vger.kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Arnd Bergmann <arnd@arndb.de>, <linux-arch@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1463670405-1059-1-git-send-email-horia.geanta@nxp.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Olof Johansson <olof@lixom.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn1on0066.outbound.protection.outlook.com ([157.56.110.66]:8349
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1754041AbcESPWy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 19 May 2016 11:22:54 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This will allow device drivers to consistently use io{read,write}XX
-also for 64-bit accesses.
+v3:
+-DT maintainers - please ack patch 8/8 "arm64: dts: ls1043a: add crypto=
+ node"
+(to go into kernel 4.8 via crypto tree)
+-Fixed typo in pdb.h: s/be32/__be32
+-Appended Acks (from v2) into commit messages
+-Tested that current patch set works on top of RSA support being added =
+by
+Tudor Ambarus:
+[PATCH v6 0/3] crypto: caam - add support for RSA algorithm
+https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg19085.html
 
-Acked-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
----
- include/asm-generic/io.h    | 63 +++++++++++++++++++++++++++++++++++++=
-++++++++
- include/asm-generic/iomap.h |  8 ++++++
- 2 files changed, 71 insertions(+)
+v2:
+As suggested by Arnd, patch 1 fixes io{read,write}{16,32}be accessors
+to prevent the case when {read,write}{w,l} are overriden by arch-specif=
+ic
+ones having barriers, while the BE accessors previously mentioned are n=
+ot
+(thus behaving differently, having no barriers).
 
-diff --git a/include/asm-generic/io.h b/include/asm-generic/io.h
-index b79fb2c248a1..2af6ea95762d 100644
---- a/include/asm-generic/io.h
-+++ b/include/asm-generic/io.h
-@@ -585,6 +585,16 @@ static inline u32 ioread32(const volatile void __i=
-omem *addr)
- }
- #endif
-=20
-+#ifdef CONFIG_64BIT
-+#ifndef ioread64
-+#define ioread64 ioread64
-+static inline u64 ioread64(const volatile void __iomem *addr)
-+{
-+	return readq(addr);
-+}
-+#endif
-+#endif /* CONFIG_64BIT */
-+
- #ifndef iowrite8
- #define iowrite8 iowrite8
- static inline void iowrite8(u8 value, volatile void __iomem *addr)
-@@ -609,6 +619,16 @@ static inline void iowrite32(u32 value, volatile v=
-oid __iomem *addr)
- }
- #endif
-=20
-+#ifdef CONFIG_64BIT
-+#ifndef iowrite64
-+#define iowrite64 iowrite64
-+static inline void iowrite64(u64 value, volatile void __iomem *addr)
-+{
-+	writeq(value, addr);
-+}
-+#endif
-+#endif /* CONFIG_64BIT */
-+
- #ifndef ioread16be
- #define ioread16be ioread16be
- static inline u16 ioread16be(const volatile void __iomem *addr)
-@@ -625,6 +645,16 @@ static inline u32 ioread32be(const volatile void _=
-_iomem *addr)
- }
- #endif
-=20
-+#ifdef CONFIG_64BIT
-+#ifndef ioread64be
-+#define ioread64be ioread64be
-+static inline u64 ioread64be(const volatile void __iomem *addr)
-+{
-+	return swab64(readq(addr));
-+}
-+#endif
-+#endif /* CONFIG_64BIT */
-+
- #ifndef iowrite16be
- #define iowrite16be iowrite16be
- static inline void iowrite16be(u16 value, void volatile __iomem *addr)
-@@ -641,6 +671,16 @@ static inline void iowrite32be(u32 value, volatile=
- void __iomem *addr)
- }
- #endif
-=20
-+#ifdef CONFIG_64BIT
-+#ifndef iowrite64be
-+#define iowrite64be iowrite64be
-+static inline void iowrite64be(u64 value, volatile void __iomem *addr)
-+{
-+	writeq(swab64(value), addr);
-+}
-+#endif
-+#endif /* CONFIG_64BIT */
-+
- #ifndef ioread8_rep
- #define ioread8_rep ioread8_rep
- static inline void ioread8_rep(const volatile void __iomem *addr, void=
- *buffer,
-@@ -668,6 +708,17 @@ static inline void ioread32_rep(const volatile voi=
-d __iomem *addr,
- }
- #endif
-=20
-+#ifdef CONFIG_64BIT
-+#ifndef ioread64_rep
-+#define ioread64_rep ioread64_rep
-+static inline void ioread64_rep(const volatile void __iomem *addr,
-+				void *buffer, unsigned int count)
-+{
-+	readsq(addr, buffer, count);
-+}
-+#endif
-+#endif /* CONFIG_64BIT */
-+
- #ifndef iowrite8_rep
- #define iowrite8_rep iowrite8_rep
- static inline void iowrite8_rep(volatile void __iomem *addr,
-@@ -697,6 +748,18 @@ static inline void iowrite32_rep(volatile void __i=
-omem *addr,
- 	writesl(addr, buffer, count);
- }
- #endif
-+
-+#ifdef CONFIG_64BIT
-+#ifndef iowrite64_rep
-+#define iowrite64_rep iowrite64_rep
-+static inline void iowrite64_rep(volatile void __iomem *addr,
-+				 const void *buffer,
-+				 unsigned int count)
-+{
-+	writesq(addr, buffer, count);
-+}
-+#endif
-+#endif /* CONFIG_64BIT */
- #endif /* CONFIG_GENERIC_IOMAP */
-=20
- #ifdef __KERNEL__
-diff --git a/include/asm-generic/iomap.h b/include/asm-generic/iomap.h
-index d8f8622fa044..650fede33c25 100644
---- a/include/asm-generic/iomap.h
-+++ b/include/asm-generic/iomap.h
-@@ -30,12 +30,20 @@ extern unsigned int ioread16(void __iomem *);
- extern unsigned int ioread16be(void __iomem *);
- extern unsigned int ioread32(void __iomem *);
- extern unsigned int ioread32be(void __iomem *);
-+#ifdef CONFIG_64BIT
-+extern u64 ioread64(void __iomem *);
-+extern u64 ioread64be(void __iomem *);
-+#endif
-=20
- extern void iowrite8(u8, void __iomem *);
- extern void iowrite16(u16, void __iomem *);
- extern void iowrite16be(u16, void __iomem *);
- extern void iowrite32(u32, void __iomem *);
- extern void iowrite32be(u32, void __iomem *);
-+#ifdef CONFIG_64BIT
-+extern void iowrite64(u64, void __iomem *);
-+extern void iowrite64be(u64, void __iomem *);
-+#endif
-=20
- /*
-  * "string" versions of the above. Note that they
+Hi,
+
+[Patches 2-4 add io{read,write}64[be] accessors (generic, arm64, ppc64)=
+,
+such that CAAM's accessors in regs.h are simplified a bit.
+Patch 8 adds crypto node for LS1043A platform.
+Let me know if it's ok to go with these through the cryptodev-2.6 tree.=
+]
+
+This is a follow-up on the following RFC patch set:
+crypto: caam - Revamp I/O accessors
+https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg15878.html
+
+There are platforms such as LS1043A (or LS1012A) where core endianness
+does not match CAAM/SEC endianness (LE vs. BE).
+Add support in caam driver for these cases.
+
+Current patch set detects device endianness at runtime (as opposed to
+compile-time endianness), in order to support multiplatform kernels.
+Detection of device endianness is not device-tree based.
+Instead, SSTA ("SEC STAtus") register has a property such that
+reading it in any endianness and masking it properly, it's possible
+to deduce device endianness.
+
+The performance drop due to the runtime detection is < 1.0%.
+(An alternative implementation using function pointers has been tried,
+but lead to a bigger performance drop.)
+
+Thanks,
+Horia
+
+Cristian Stoica (1):
+  crypto: caam - fix offset field in hw sg entries
+
+Horia Geant=C4=83 (7):
+  asm-generic/io.h: allow barriers in io{read,write}{16,32}be
+  asm-generic/io.h: add io{read,write}64 accessors
+  arm64: add io{read,write}64be accessors
+  powerpc: add io{read,write}64 accessors
+  crypto: caam - handle core endianness !=3D caam endianness
+  crypto: caam - add ARCH_LAYERSCAPE to supported architectures
+  arm64: dts: ls1043a: add crypto node
+
+ arch/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dts |   4 +
+ arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi    |  43 ++++++
+ arch/arm64/include/asm/io.h                       |   4 +-
+ arch/powerpc/kernel/iomap.c                       |  24 ++++
+ drivers/crypto/caam/Kconfig                       |   6 +-
+ drivers/crypto/caam/caamhash.c                    |   5 +-
+ drivers/crypto/caam/ctrl.c                        | 125 +++++++++++---=
+----
+ drivers/crypto/caam/desc.h                        |   9 +-
+ drivers/crypto/caam/desc_constr.h                 |  44 ++++---
+ drivers/crypto/caam/jr.c                          |  22 ++--
+ drivers/crypto/caam/pdb.h                         | 137 ++++++++++++++=
++-----
+ drivers/crypto/caam/regs.h                        | 151 ++++++++++++++=
++-------
+ drivers/crypto/caam/sg_sw_sec4.h                  |  17 +--
+ include/asm-generic/io.h                          |  71 +++++++++-
+ include/asm-generic/iomap.h                       |   8 ++
+ 15 files changed, 494 insertions(+), 176 deletions(-)
+
 --=20
 2.4.4
