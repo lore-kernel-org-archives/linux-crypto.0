@@ -1,53 +1,107 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH v3 3/8] arm64: add io{read,write}64be accessors
-Date: Thu, 19 May 2016 18:11:04 +0300
-Message-ID: <1463670664-2856-1-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH v3 8/8] arm64: dts: ls1043a: add crypto node
+Date: Thu, 19 May 2016 18:11:49 +0300
+Message-ID: <1463670709-3193-1-git-send-email-horia.geanta@nxp.com>
 References: <1463670405-1059-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- "David S. Miller" <davem@davemloft.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <linux-crypto@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	<linux-kernel@vger.kernel.org>, Mingkai Hu <mingkai.hu@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Olof Johansson <olof@lixom.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1463670405-1059-1-git-send-email-horia.geanta@nxp.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-VGhpcyB3aWxsIGFsbG93IGRldmljZSBkcml2ZXJzIHRvIGNvbnNpc3RlbnRseSB1c2UgaW97cmVh
-ZCx3cml0ZX1YWGJlCmFsc28gZm9yIDY0LWJpdCBhY2Nlc3Nlcy4KCkFja2VkLWJ5OiBDYXRhbGlu
-IE1hcmluYXMgPGNhdGFsaW4ubWFyaW5hc0Bhcm0uY29tPgpTaWduZWQtb2ZmLWJ5OiBBbGV4IFBv
-cm9zYW51IDxhbGV4YW5kcnUucG9yb3NhbnVAbnhwLmNvbT4KU2lnbmVkLW9mZi1ieTogSG9yaWEg
-R2VhbnTEgyA8aG9yaWEuZ2VhbnRhQG54cC5jb20+Ci0tLQogYXJjaC9hcm02NC9pbmNsdWRlL2Fz
-bS9pby5oIHwgNCArKystCiAxIGZpbGUgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspLCAxIGRlbGV0
-aW9uKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9pby5oIGIvYXJjaC9h
-cm02NC9pbmNsdWRlL2FzbS9pby5oCmluZGV4IDQ0YmUxZTAzZWQ2NS4uOWI2ZTQwOGNmYTUxIDEw
-MDY0NAotLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2lvLmgKKysrIGIvYXJjaC9hcm02NC9p
-bmNsdWRlL2FzbS9pby5oCkBAIC0xNzQsMTMgKzE3NCwxNSBAQCBleHRlcm4gdm9pZCBfX2lvbWVt
-ICppb3JlbWFwX2NhY2hlKHBoeXNfYWRkcl90IHBoeXNfYWRkciwgc2l6ZV90IHNpemUpOwogI2Rl
-ZmluZSBpb3VubWFwCQkJCV9faW91bm1hcAogCiAvKgotICogaW97cmVhZCx3cml0ZX17MTYsMzJ9
-YmUoKSBtYWNyb3MKKyAqIGlve3JlYWQsd3JpdGV9ezE2LDMyLDY0fWJlKCkgbWFjcm9zCiAgKi8K
-ICNkZWZpbmUgaW9yZWFkMTZiZShwKQkJKHsgX191MTYgX192ID0gYmUxNl90b19jcHUoKF9fZm9y
-Y2UgX19iZTE2KV9fcmF3X3JlYWR3KHApKTsgX19pb3JtYigpOyBfX3Y7IH0pCiAjZGVmaW5lIGlv
-cmVhZDMyYmUocCkJCSh7IF9fdTMyIF9fdiA9IGJlMzJfdG9fY3B1KChfX2ZvcmNlIF9fYmUzMilf
-X3Jhd19yZWFkbChwKSk7IF9faW9ybWIoKTsgX192OyB9KQorI2RlZmluZSBpb3JlYWQ2NGJlKHAp
-CQkoeyBfX3U2NCBfX3YgPSBiZTY0X3RvX2NwdSgoX19mb3JjZSBfX2JlNjQpX19yYXdfcmVhZHEo
-cCkpOyBfX2lvcm1iKCk7IF9fdjsgfSkKIAogI2RlZmluZSBpb3dyaXRlMTZiZSh2LHApCSh7IF9f
-aW93bWIoKTsgX19yYXdfd3JpdGV3KChfX2ZvcmNlIF9fdTE2KWNwdV90b19iZTE2KHYpLCBwKTsg
-fSkKICNkZWZpbmUgaW93cml0ZTMyYmUodixwKQkoeyBfX2lvd21iKCk7IF9fcmF3X3dyaXRlbCgo
-X19mb3JjZSBfX3UzMiljcHVfdG9fYmUzMih2KSwgcCk7IH0pCisjZGVmaW5lIGlvd3JpdGU2NGJl
-KHYscCkJKHsgX19pb3dtYigpOyBfX3Jhd193cml0ZXEoKF9fZm9yY2UgX191NjQpY3B1X3RvX2Jl
-NjQodiksIHApOyB9KQogCiAvKgogICogQ29udmVydCBhIHBoeXNpY2FsIHBvaW50ZXIgdG8gYSB2
-aXJ0dWFsIGtlcm5lbCBwb2ludGVyIGZvciAvZGV2L21lbQotLSAKMi40LjQKCgpfX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1hcm0ta2VybmVsIG1h
-aWxpbmcgbGlzdApsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xp
-c3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0ta2VybmVsCg==
+LS1043A has a SEC v5.4 security engine.
+=46or now don't add rtic or sec_mon subnodes, since these features
+haven't been tested yet.
+
+Signed-off-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
+---
+
+To go into kernel 4.8 via crypto tree.
+
+ arch/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dts |  4 +++
+ arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi    | 43 +++++++++++++++=
+++++++++
+ 2 files changed, 47 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dts b/arch/a=
+rm64/boot/dts/freescale/fsl-ls1043a-rdb.dts
+index ce235577e90f..9b5b75a4f02a 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-ls1043a-rdb.dts
+@@ -49,6 +49,10 @@
+=20
+ / {
+ 	model =3D "LS1043A RDB Board";
++
++	aliases {
++		crypto =3D &crypto;
++	};
+ };
+=20
+ &i2c0 {
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi b/arch/arm6=
+4/boot/dts/freescale/fsl-ls1043a.dtsi
+index be72bf5b58b5..529c198494d5 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi
++++ b/arch/arm64/boot/dts/freescale/fsl-ls1043a.dtsi
+@@ -159,6 +159,49 @@
+ 			big-endian;
+ 		};
+=20
++		crypto: crypto@1700000 {
++			compatible =3D "fsl,sec-v5.4", "fsl,sec-v5.0",
++				     "fsl,sec-v4.0";
++			fsl,sec-era =3D <3>;
++			#address-cells =3D <1>;
++			#size-cells =3D <1>;
++			ranges =3D <0x0 0x00 0x1700000 0x100000>;
++			reg =3D <0x00 0x1700000 0x0 0x100000>;
++			interrupts =3D <0 75 0x4>;
++
++			sec_jr0: jr@10000 {
++				compatible =3D "fsl,sec-v5.4-job-ring",
++					     "fsl,sec-v5.0-job-ring",
++					     "fsl,sec-v4.0-job-ring";
++				reg	   =3D <0x10000 0x10000>;
++				interrupts =3D <0 71 0x4>;
++			};
++
++			sec_jr1: jr@20000 {
++				compatible =3D "fsl,sec-v5.4-job-ring",
++					     "fsl,sec-v5.0-job-ring",
++					     "fsl,sec-v4.0-job-ring";
++				reg	   =3D <0x20000 0x10000>;
++				interrupts =3D <0 72 0x4>;
++			};
++
++			sec_jr2: jr@30000 {
++				compatible =3D "fsl,sec-v5.4-job-ring",
++					     "fsl,sec-v5.0-job-ring",
++					     "fsl,sec-v4.0-job-ring";
++				reg	   =3D <0x30000 0x10000>;
++				interrupts =3D <0 73 0x4>;
++			};
++
++			sec_jr3: jr@40000 {
++				compatible =3D "fsl,sec-v5.4-job-ring",
++					     "fsl,sec-v5.0-job-ring",
++					     "fsl,sec-v4.0-job-ring";
++				reg	   =3D <0x40000 0x10000>;
++				interrupts =3D <0 74 0x4>;
++			};
++		};
++
+ 		dcfg: dcfg@1ee0000 {
+ 			compatible =3D "fsl,ls1043a-dcfg", "syscon";
+ 			reg =3D <0x0 0x1ee0000 0x0 0x10000>;
+--=20
+2.4.4
