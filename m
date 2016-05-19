@@ -1,39 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: public_key: select CRYPTO_AKCIPHER
-Date: Thu, 19 May 2016 18:01:04 +0800
-Message-ID: <20160519100104.GA25981@gondor.apana.org.au>
-References: <1463583366-1689248-1-git-send-email-arnd@arndb.de>
+Subject: Re: [patch] crypto: omap-sham - potential Oops on error in probe
+Date: Thu, 19 May 2016 18:07:22 +0800
+Message-ID: <20160519100722.GB25981@gondor.apana.org.au>
+References: <20160518103905.GA10470@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: David Howells <dhowells@redhat.com>,
+Cc: Peter Ujfalusi <peter.ujfalusi@ti.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:59166 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:44892 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753908AbcESKBg (ORCPT
+	with ESMTP id S1753960AbcESKHm (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 19 May 2016 06:01:36 -0400
+	Thu, 19 May 2016 06:07:42 -0400
 Content-Disposition: inline
-In-Reply-To: <1463583366-1689248-1-git-send-email-arnd@arndb.de>
+In-Reply-To: <20160518103905.GA10470@mwanda>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 18, 2016 at 04:55:56PM +0200, Arnd Bergmann wrote:
-> In some rare randconfig builds, we can end up with
-> ASYMMETRIC_PUBLIC_KEY_SUBTYPE enabled but CRYPTO_AKCIPHER disabled,
-> which fails to link because of the reference to crypto_alloc_akcipher:
+On Wed, May 18, 2016 at 01:39:05PM +0300, Dan Carpenter wrote:
+> This if statement is reversed so we end up either leaking or Oopsing on
+> error.
 > 
-> crypto/built-in.o: In function `public_key_verify_signature':
-> :(.text+0x110e4): undefined reference to `crypto_alloc_akcipher'
-> 
-> This adds a Kconfig 'select' statement to ensure the dependency
-> is always there.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Fixes: dbe246209bc1 ('crypto: omap-sham - Use dma_request_chan() for requesting DMA channel')
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
 Patch applied.  Thanks!
 -- 
