@@ -1,64 +1,64 @@
-From: Horia Ioan Geanta Neag <horia.geanta@nxp.com>
-Subject: Re: HWCAP_CRYPTO define for ARMv8?
-Date: Fri, 20 May 2016 09:56:00 +0000
-Message-ID: <AM2PR04MB0673B777A1EFD0F95545244B984B0@AM2PR04MB0673.eurprd04.prod.outlook.com>
-References: <CAH8yC8kRozR6Nf-Eozsuh4zdtAyx_+4gHOWYSrDWDmqwTVdWYg@mail.gmail.com>
+From: Gary R Hook <ghook@amd.com>
+Subject: Re: IV generation in cryptographic driver in AEAD
+Date: Fri, 20 May 2016 10:50:38 -0500
+Message-ID: <573F324E.7000100@amd.com>
+References: <20160520041901.GA2645@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-To: "noloader@gmail.com" <noloader@gmail.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Denis B <begun.denis@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-am1on0064.outbound.protection.outlook.com ([157.56.112.64]:19646
-	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
+Received: from mail-bl2on0076.outbound.protection.outlook.com ([65.55.169.76]:19363
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752668AbcETM2X convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 May 2016 08:28:23 -0400
-Content-Language: en-US
+	id S1750937AbcETPuu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 20 May 2016 11:50:50 -0400
+In-Reply-To: <20160520041901.GA2645@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 5/15/2016 1:13 PM, Jeffrey Walton wrote:
-> Hi Everyone,
-> 
-> It appears defines like HWCAP_CRC32 fall under the purview of the
-> kernel. Confer, http://www.google.com/search?q="HWCAP_CRC32" (my
-> apologies if this is not the case).
-> 
-> We use getauxval(AT_HWCAP) and HWCAP_CRC32 for runtime detection of
-> processor support for CRC. However, I can't find a similar symbol in
-> the context of the crypto instructions. Confer,
-> http://www.google.com/search?q="HWCAP_CRYPTO".
-> 
-> My question is, what are the equivalent defines for Crypto features?
-> 
-Take a look at arch/arm64/include/uapi/asm/hwcap.h
-#define HWCAP_AES               (1 << 3)
-#define HWCAP_PMULL             (1 << 4)
-#define HWCAP_SHA1              (1 << 5)
-#define HWCAP_SHA2              (1 << 6)
+On 05/19/2016 11:19 PM, Herbert Xu wrote:
+> Denis B <begun.denis@gmail.com> wrote:
+>> My algs struct now looks like this:
+>>
+>> static struct crypto_alg pp_crypto_algs[] = {
+>>    {
+>>       .cra_name = "authenc(hmac(sha256),cbc(aes))",
+>>       .cra_driver_name = "pp_crypto_cbc_hmac_sha256",
+>>       .cra_priority = 1, /**TODO set to highest values after
+>> implementing encrypt decrypt functions */
+>>       .cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
+>>       .cra_blocksize = AES_BLOCK_SIZE,
+>>       .cra_ctxsize = sizeof(struct pp_crypto_aead_ctx),
+>>       .cra_type = &crypto_nivaead_type,
+>>       .cra_u = {
+>>             .aead = {
+>>                 .setkey = pp_crypto_aead_setkey,
+>>                 .setauthsize = pp_crypto_aead_setauthsize,
+>>                 .decrypt = pp_crypto_aead_dec,
+>>                 .encrypt = pp_crypto_aead_enc,
+>>                 .givencrypt = NULL,
+>>                 .givdecrypt = NULL,
+>>                 .ivsize = AES_BLOCK_SIZE,
+>>                 .maxauthsize = SHA256_DIGEST_SIZE,
+>
+> You also need to set geniv to "eseqiv".
 
-Horia
+I just gotta ask. Forgive my ignorance.
 
-> Thanks in advance.
-> 
-> *****
-> 
-> Below is from a 64-bit LeMaker HiKey
-> (http://www.lemaker.org/product-hikey-index.html). It responds to
-> getauxval(AT_HWCAP) and HWCAP_CRC32.
-> 
-> $ cat /proc/cpuinfo
-> Processor    : AArch64 Processor rev 3 (aarch64)
-> processor    : 0
-> ...
-> processor    : 7
-> Features    : fp asimd evtstrm aes pmull sha1 sha2 crc32
-> CPU implementer    : 0x41
-> CPU architecture: AArch64
-> CPU variant    : 0x0
-> CPU part    : 0xd03
-> CPU revision    : 3
-> 
-> Hardware    : HiKey Development Board
+Why is (or should) setting geniv (be) required?
+
+crypto_givcipher_default() appears to call crypto_default_geniv() if the 
+geniv member
+is NULL. That function returns "eseqiv" or "chainiv" (under certain 
+conditions). If an
+implementation isn't generating its own IVs, shouldn't the default 
+happen anyway? Or is
+this more a matter of populating the structure with known, intentional 
+values?
+
+Thank you for any illumination provided.
+
+Gary
