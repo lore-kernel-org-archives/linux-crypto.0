@@ -1,50 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: IV generation in cryptographic driver in AEAD
-Date: Fri, 20 May 2016 12:19:01 +0800
-Message-ID: <20160520041901.GA2645@gondor.apana.org.au>
-References: <CADREXsrrkx2-G1x81ss5sCS1p4TZxywdsqo4Tkzt7LX4syu+BA@mail.gmail.com>
+Subject: Crypto Fixes for 4.7
+Date: Fri, 20 May 2016 16:41:05 +0800
+Message-ID: <20160520084105.GA3959@gondor.apana.org.au>
+References: <20141007131826.GA29688@gondor.apana.org.au>
+ <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150415033951.GA1406@gondor.apana.org.au>
+ <20150622084457.GA7806@gondor.apana.org.au>
+ <20150831135655.GA2694@gondor.apana.org.au>
+ <20151102080427.GA8465@gondor.apana.org.au>
+ <20160111101450.GA24044@gondor.apana.org.au>
+ <20160122101828.GA15966@gondor.apana.org.au>
+ <20160513055902.GA13595@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Denis B <begun.denis@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:53392 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753373AbcETETE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 May 2016 00:19:04 -0400
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CADREXsrrkx2-G1x81ss5sCS1p4TZxywdsqo4Tkzt7LX4syu+BA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20160513055902.GA13595@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Denis B <begun.denis@gmail.com> wrote:
-> My algs struct now looks like this:
-> 
-> static struct crypto_alg pp_crypto_algs[] = {
->   {
->      .cra_name = "authenc(hmac(sha256),cbc(aes))",
->      .cra_driver_name = "pp_crypto_cbc_hmac_sha256",
->      .cra_priority = 1, /**TODO set to highest values after
-> implementing encrypt decrypt functions */
->      .cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
->      .cra_blocksize = AES_BLOCK_SIZE,
->      .cra_ctxsize = sizeof(struct pp_crypto_aead_ctx),
->      .cra_type = &crypto_nivaead_type,
->      .cra_u = {
->            .aead = {
->                .setkey = pp_crypto_aead_setkey,
->                .setauthsize = pp_crypto_aead_setauthsize,
->                .decrypt = pp_crypto_aead_dec,
->                .encrypt = pp_crypto_aead_enc,
->                .givencrypt = NULL,
->                .givdecrypt = NULL,
->                .ivsize = AES_BLOCK_SIZE,
->                .maxauthsize = SHA256_DIGEST_SIZE,
+Hi Linus:
 
-You also need to set geniv to "eseqiv".
+This push fixes a regression that causes sha-mb to crash.
 
-Cheers,
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Josh Poimboeuf (1):
+      crypto: sha1-mb - make sha1_x8_avx2() conform to C function ABI
+
+ arch/x86/crypto/sha-mb/sha1_x8_avx2.S |   13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
