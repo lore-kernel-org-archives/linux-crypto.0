@@ -1,49 +1,37 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp - Fix AES XTS error for request sizes above
- 4096
-Date: Sat, 21 May 2016 07:35:43 +0800
-Message-ID: <20160520233543.GB18006@gondor.apana.org.au>
-References: <20160520223303.7738.5391.stgit@tlendack-t1.amdoffice.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Gary Hook <gary.hook@amd.com>,
-	David Miller <davem@davemloft.net>
-To: Tom Lendacky <thomas.lendacky@amd.com>
+From: Andrea Gelmini <andrea.gelmini@gelma.net>
+Subject: [PATCH 0010/1529] Fix typo
+Date: Sat, 21 May 2016 13:36:43 +0200
+Message-ID: <20160521113643.31792-1-andrea.gelmini@gelma.net>
+Cc: trivial@kernel.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net, corbet@lwn.net, linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org
+To: andrea.gelmini@gelma.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36168 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751230AbcETXft (ORCPT
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:34740 "EHLO
+	mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751354AbcEULgs (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 May 2016 19:35:49 -0400
-Content-Disposition: inline
-In-Reply-To: <20160520223303.7738.5391.stgit@tlendack-t1.amdoffice.net>
+	Sat, 21 May 2016 07:36:48 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 20, 2016 at 05:33:03PM -0500, Tom Lendacky wrote:
-> The ccp-crypto module for AES XTS support has a bug that can allow requests
-> greater than 4096 bytes in size to be passed to the CCP hardware. The CCP
-> hardware does not support request sizes larger than 4096, resulting in
-> incorrect output. The request should actually be handled by the fallback
-> mechanism instantiated by the ccp-crypto module.
-> 
-> Add a check to insure the request size is less than or equal to the maximum
-> supported size and use the fallback mechanism if it is not.
-> 
-> Cc: <stable@vger.kernel.org> # 3.14.x-
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Andrea Gelmini <andrea.gelmini@gelma.net>
+---
+ Documentation/crypto/asymmetric-keys.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm OK with this patch but I think it doesn't always need to go into
-the fallback.  I made a test vector split as 4064 bytes + 48 bytes
-and ccp handled it just fine.  It appears that the bug is actually
-in the handling of a single SG entry that's longer than a page,
-presumably because sg_next is used unconditionally instead of
-checking whether there is more in the current SG entry.
-
-But I'll merge your fix as it fixes a real problem.
-
-Thanks,
+diff --git a/Documentation/crypto/asymmetric-keys.txt b/Documentation/crypto/asymmetric-keys.txt
+index 8c07e0e..2b7816d 100644
+--- a/Documentation/crypto/asymmetric-keys.txt
++++ b/Documentation/crypto/asymmetric-keys.txt
+@@ -76,7 +76,7 @@ the criterion string:
+ Looking in /proc/keys, the last 8 hex digits of the key fingerprint are
+ displayed, along with the subtype:
+ 
+-	1a39e171 I-----     1 perm 3f010000     0     0 asymmetri modsign.0: DSA 5acc2142 []
++	1a39e171 I-----     1 perm 3f010000     0     0 asymmetric modsign.0: DSA 5acc2142 []
+ 
+ 
+ =========================
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.8.2.534.g1f66975
