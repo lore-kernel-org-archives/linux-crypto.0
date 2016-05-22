@@ -1,40 +1,48 @@
-From: Andrea Gelmini <andrea.gelmini@gelma.net>
-Subject: [PATCH 0211/1529] Fix typo
-Date: Sat, 21 May 2016 14:03:38 +0200
-Message-ID: <20160521120338.10915-1-andrea.gelmini@gelma.net>
-Cc: trivial@kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, benh@kernel.crashing.org, paulus@samba.org,
-	mpe@ellerman.id.au, linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-To: andrea.gelmini@gelma.net
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH 19/54] MAINTAINERS: Add file patterns for rng device tree bindings
+Date: Sun, 22 May 2016 11:05:56 +0200
+Message-ID: <1463907991-7916-20-git-send-email-geert@linux-m68k.org>
+References: <1463907991-7916-1-git-send-email-geert@linux-m68k.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+	Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+To: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f194.google.com ([209.85.217.194]:35775 "EHLO
-	mail-lb0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751641AbcEUMDo (ORCPT
+Received: from xavier.telenet-ops.be ([195.130.132.52]:34335 "EHLO
+	xavier.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752081AbcEVJGr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 21 May 2016 08:03:44 -0400
-Received: by mail-lb0-f194.google.com with SMTP id mx9so6877932lbb.2
-        for <linux-crypto@vger.kernel.org>; Sat, 21 May 2016 05:03:44 -0700 (PDT)
+	Sun, 22 May 2016 05:06:47 -0400
+In-Reply-To: <1463907991-7916-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Andrea Gelmini <andrea.gelmini@gelma.net>
----
- arch/powerpc/crypto/aes-spe-regs.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Submitters of device tree binding documentation may forget to CC
+the subsystem maintainer if this is missing.
 
-diff --git a/arch/powerpc/crypto/aes-spe-regs.h b/arch/powerpc/crypto/aes-spe-regs.h
-index 30d217b..2cc3a2c 100644
---- a/arch/powerpc/crypto/aes-spe-regs.h
-+++ b/arch/powerpc/crypto/aes-spe-regs.h
-@@ -18,7 +18,7 @@
- #define rLN r7	/* length of data to be processed			*/
- #define rIP r8	/* potiner to IV (CBC/CTR/XTS modes)			*/
- #define rKT r9	/* pointer to tweak key (XTS mode)			*/
--#define rT0 r11	/* pointers to en-/decrpytion tables			*/
-+#define rT0 r11	/* pointers to en-/decryption tables			*/
- #define rT1 r10
- #define rD0 r9	/* data 						*/
- #define rD1 r14
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Matt Mackall <mpm@selenic.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org
+---
+Please apply this patch directly if you want to be involved in device
+tree binding documentation for your subsystem.
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index bfeeb85bc41ae5f5..cd7793520e2cccfc 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -5277,6 +5277,7 @@ M:	Matt Mackall <mpm@selenic.com>
+ M:	Herbert Xu <herbert@gondor.apana.org.au>
+ L:	linux-crypto@vger.kernel.org
+ S:	Odd fixes
++F:	Documentation/devicetree/bindings/rng/
+ F:	Documentation/hw_random.txt
+ F:	drivers/char/hw_random/
+ F:	include/linux/hw_random.h
 -- 
-2.8.2.534.g1f66975
+1.9.1
