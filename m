@@ -1,43 +1,24 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH 14/54] MAINTAINERS: Add file patterns for crypto device tree bindings
-Date: Sun, 22 May 2016 11:05:51 +0200
-Message-ID: <1463907991-7916-15-git-send-email-geert@linux-m68k.org>
-References: <1463907991-7916-1-git-send-email-geert@linux-m68k.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Jari Ruusu <jariruusu@users.sourceforge.net>
+Subject: Announce loop-AES-v3.7h file/swap crypto package
+Date: Sun, 22 May 2016 14:07:07 +0300
+Message-ID: <CACMCwJ+4BuOP-EgVda+kUTwLobcF-r_oKE3LfUTRTmPG3QWSPg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1463907991-7916-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Submitters of device tree binding documentation may forget to CC
-the subsystem maintainer if this is missing.
+loop-AES changes since previous release:
+- Worked around block layer interface changes on 4.6 kernels.
 
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
----
-Please apply this patch directly if you want to be involved in device
-tree binding documentation for your subsystem.
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+bzip2 compressed tarball is here:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 878e4b4634f87ecd..0079717d52e46222 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3292,6 +3292,7 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
- S:	Maintained
- F:	Documentation/crypto/
-+F:	Documentation/devicetree/bindings/crypto/
- F:	Documentation/DocBook/crypto-API.tmpl
- F:	arch/*/crypto/
- F:	crypto/
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7h.tar.bz2
+    md5sum babef8f6d30ac13db76c8cde0d8879f5
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7h.tar.bz2.sign
+
 -- 
-1.9.1
+Jari Ruusu  4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD  ACDF F073 3C80 8132 F189
