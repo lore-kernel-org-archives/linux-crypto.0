@@ -1,58 +1,50 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH] crypto: ccp - Fix AES XTS error for request sizes above
- 4096
-Date: Mon, 23 May 2016 08:50:28 -0500
-Message-ID: <57430AA4.70000@amd.com>
-References: <20160520223303.7738.5391.stgit@tlendack-t1.amdoffice.net>
- <20160520233543.GB18006@gondor.apana.org.au>
+From: Gary R Hook <ghook@amd.com>
+Subject: Re: IV generation in cryptographic driver in AEAD
+Date: Mon, 23 May 2016 08:27:38 -0500
+Message-ID: <5743054A.3010009@amd.com>
+References: <20160520041901.GA2645@gondor.apana.org.au>
+ <573F324E.7000100@amd.com> <20160520233132.GA18006@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, Gary Hook <gary.hook@amd.com>,
-	"David Miller" <davem@davemloft.net>
+Cc: Denis B <begun.denis@gmail.com>, <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0059.outbound.protection.outlook.com ([207.46.100.59]:7025
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+Received: from mail-bn1on0074.outbound.protection.outlook.com ([157.56.110.74]:55472
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751651AbcEWOGY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 May 2016 10:06:24 -0400
-In-Reply-To: <20160520233543.GB18006@gondor.apana.org.au>
+	id S1750801AbcEWPBD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 23 May 2016 11:01:03 -0400
+In-Reply-To: <20160520233132.GA18006@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 05/20/2016 06:35 PM, Herbert Xu wrote:
-> On Fri, May 20, 2016 at 05:33:03PM -0500, Tom Lendacky wrote:
->> The ccp-crypto module for AES XTS support has a bug that can allow requests
->> greater than 4096 bytes in size to be passed to the CCP hardware. The CCP
->> hardware does not support request sizes larger than 4096, resulting in
->> incorrect output. The request should actually be handled by the fallback
->> mechanism instantiated by the ccp-crypto module.
+On 05/20/2016 06:31 PM, Herbert Xu wrote:
+> On Fri, May 20, 2016 at 10:50:38AM -0500, Gary R Hook wrote:
 >>
->> Add a check to insure the request size is less than or equal to the maximum
->> supported size and use the fallback mechanism if it is not.
+>> Why is (or should) setting geniv (be) required?
 >>
->> Cc: <stable@vger.kernel.org> # 3.14.x-
->> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> 
-> I'm OK with this patch but I think it doesn't always need to go into
-> the fallback.  I made a test vector split as 4064 bytes + 48 bytes
-> and ccp handled it just fine.  It appears that the bug is actually
-> in the handling of a single SG entry that's longer than a page,
-> presumably because sg_next is used unconditionally instead of
-> checking whether there is more in the current SG entry.
+>> crypto_givcipher_default() appears to call crypto_default_geniv() if
+>> the geniv member
+>> is NULL. That function returns "eseqiv" or "chainiv" (under certain
+>> conditions). If an
+>> implementation isn't generating its own IVs, shouldn't the default
+>> happen anyway? Or is
+>> this more a matter of populating the structure with known,
+>> intentional values?
+>>
+>> Thank you for any illumination provided.
+>
+> In the upstream kernel AEAD geniv has been completely phased out
+> and no longer exists.  Denis is working on an old kernel that still
+> has it.
+>
+> We haven't yet phased it out for skcipher but I'm working on it.
 
-I'll take a closer look at this. Something obviously isn't right but
-the code doesn't do anything related to PAGE size checks and works
-on the length specified in the SG entry.
+...and there was light.
 
-> 
-> But I'll merge your fix as it fixes a real problem.
+Thank you; very helpful.
 
-Thanks Herbert.
-
-Tom
-
-> 
-> Thanks,
-> 
+(I'll work harder on my line wraps... If someone knows how to get 
+Thunderbird
+to do it for me, I'd love to know.)
