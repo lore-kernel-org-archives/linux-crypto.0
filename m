@@ -1,53 +1,40 @@
-From: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-Subject: [PATCH] hwrng: stm32 - fix build warning
-Date: Mon, 23 May 2016 18:14:08 +0530
-Message-ID: <1464007448-25395-1-git-send-email-sudipm.mukherjee@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-To: Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v6 0/3] Key-agreement Protocol Primitives (KPP) API
+Date: Mon, 23 May 2016 20:44:27 +0200
+Message-ID: <8688641.Yei9vfB8rY@positron.chronox.de>
+References: <1462951563-50042-1-git-send-email-salvatore.benedetto@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f66.google.com ([209.85.220.66]:33852 "EHLO
-	mail-pa0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752789AbcEWROV (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 May 2016 13:14:21 -0400
+Received: from mail.eperm.de ([89.247.134.16]:39816 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753436AbcEWSoa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 23 May 2016 14:44:30 -0400
+In-Reply-To: <1462951563-50042-1-git-send-email-salvatore.benedetto@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-We have been getting build warning about:
-drivers/char/hw_random/stm32-rng.c: In function 'stm32_rng_read':
-drivers/char/hw_random/stm32-rng.c:82:19: warning: 'sr' may be used
-					uninitialized in this function
+Am Mittwoch, 11. Mai 2016, 08:26:00 schrieb Salvatore Benedetto:
 
-On checking the code it turns out that sr can never be used
-uninitialized as sr is getting initialized in the while loop and while
-loop will always execute as the minimum value of max can be 32.
-So just initialize sr to 0 while declaring it to silence the compiler.
+Hi Salvatore,
 
-Signed-off-by: Sudip Mukherjee <sudip.mukherjee@codethink.co.uk>
----
+> Hi Herb,
+> 
+> the following patchset introduces a new API for abstracting key-agreement
+> protocols such as DH and ECDH. It provides the primitives required for
+> implementing the protocol, thus the name KPP (Key-agreement Protocol
+> Primitives).
 
-build log at:
-https://travis-ci.org/sudipm-mukherjee/parport/jobs/132180906
+I just saw that in Linus' tree, a DH implementation popped up at 
+security/keys/dh.c
 
- drivers/char/hw_random/stm32-rng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Note, the implementation is also from an Intel developer.
 
-diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-index 92a8106..0533370 100644
---- a/drivers/char/hw_random/stm32-rng.c
-+++ b/drivers/char/hw_random/stm32-rng.c
-@@ -52,7 +52,7 @@ static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
- {
- 	struct stm32_rng_private *priv =
- 	    container_of(rng, struct stm32_rng_private, rng);
--	u32 sr;
-+	u32 sr = 0;
- 	int retval = 0;
- 
- 	pm_runtime_get_sync((struct device *) priv->rng.priv);
--- 
-1.9.1
+Would it make sense that both implementations are synced so that we only have 
+one and that we need to worry about side channels only once?
+
+Ciao
+Stephan
