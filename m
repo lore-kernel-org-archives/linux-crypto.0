@@ -1,7 +1,7 @@
 From: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
-Subject: [PATCH 1/4] dt-bindings: rng: Northstar Plus SoC rng bindings
-Date: Mon, 23 May 2016 12:20:48 -0400
-Message-ID: <1464020451-16520-2-git-send-email-yendapally.reddy@broadcom.com>
+Subject: [PATCH 4/4] hwrng: bcm2835: Read as much data as available
+Date: Mon, 23 May 2016 12:20:51 -0400
+Message-ID: <1464020451-16520-5-git-send-email-yendapally.reddy@broadcom.com>
 References: <1464020451-16520-1-git-send-email-yendapally.reddy@broadcom.com>
 Cc: devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -31,35 +31,42 @@ In-Reply-To: <1464020451-16520-1-git-send-email-yendapally.reddy@broadcom.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Document the bindings used by Northstar Plus(NSP) SoC random number
-generator.
+Read the requested number of data from the fifo
 
 Signed-off-by: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
 ---
- Documentation/devicetree/bindings/rng/brcm,bcm2835.txt | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ drivers/char/hw_random/bcm2835-rng.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt b/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
-index 07ccdaa..aa304d4 100644
---- a/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
-+++ b/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
-@@ -2,7 +2,7 @@ BCM2835 Random number generator
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+index b1e8b78..9bbdc07 100644
+--- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -43,6 +43,8 @@ static int bcm2835_rng_read(struct hwrng *rng, void *buf, size_t max,
+ 			       bool wait)
+ {
+ 	void __iomem *rng_base = (void __iomem *)rng->priv;
++	u32 max_words = max/sizeof(u32);
++	u32 num_words, count;
  
- Required properties:
+ 	while ((__raw_readl(rng_base + RNG_STATUS) >> 24) == 0) {
+ 		if (!wait)
+@@ -50,8 +52,14 @@ static int bcm2835_rng_read(struct hwrng *rng, void *buf, size_t max,
+ 		cpu_relax();
+ 	}
  
--- compatible : should be "brcm,bcm2835-rng"
-+- compatible : should be "brcm,bcm2835-rng"  or "brcm,bcm-nsp-rng"
- - reg : Specifies base physical address and size of the registers.
- 
- Example:
-@@ -11,3 +11,8 @@ rng {
-         compatible = "brcm,bcm2835-rng";
-         reg = <0x7e104000 0x10>;
- };
+-	*(u32 *)buf = __raw_readl(rng_base + RNG_DATA);
+-	return sizeof(u32);
++	num_words = (readl(rng_base + RNG_STATUS) >> 24);
++	if (num_words > max_words)
++		num_words = max_words;
 +
-+rng@18033000 {
-+	compatible = "brcm,bcm-nsp-rng";
-+	reg = <0x18033000 0x14>;
-+};
++	for (count = 0; count < num_words; count++)
++		((u32 *)buf)[count] = readl(rng_base + RNG_DATA);
++
++	return (num_words * sizeof(u32));
+ }
+ 
+ static struct hwrng bcm2835_rng_ops = {
 -- 
 2.1.0
