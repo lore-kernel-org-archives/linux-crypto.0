@@ -1,56 +1,116 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: key retention service: DH support
-Date: Tue, 24 May 2016 09:29:15 +0200
-Message-ID: <2025704.nsKCcck7Ux@tauon.atsec.com>
-References: <1884439.7dZQH0lY4q@tauon.atsec.com> <27639.1464073468@warthog.procyon.org.uk> <28895.1464074381@warthog.procyon.org.uk>
+From: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Subject: Re: [PATCH] hwrng: stm32 - fix build warning
+Date: Tue, 24 May 2016 09:59:41 +0200
+Message-ID: <CALszF6AxXY0LK5fToFg3095+gz6xcZz8KHaYqc=o39vjpBYDmA@mail.gmail.com>
+References: <1464007448-25395-1-git-send-email-sudipm.mukherjee@gmail.com>
+	<6297051.TAxtzW5OIB@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	mathew.j.martineau@linux.intel.com
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34708 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751937AbcEXH3T (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 24 May 2016 03:29:19 -0400
-In-Reply-To: <28895.1464074381@warthog.procyon.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+	Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <6297051.TAxtzW5OIB@wuerfel>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Dienstag, 24. Mai 2016, 08:19:41 schrieb David Howells:
+2016-05-23 22:35 GMT+02:00 Arnd Bergmann <arnd@arndb.de>:
+> On Monday, May 23, 2016 6:14:08 PM CEST Sudip Mukherjee wrote:
+>> We have been getting build warning about:
+>> drivers/char/hw_random/stm32-rng.c: In function 'stm32_rng_read':
+>> drivers/char/hw_random/stm32-rng.c:82:19: warning: 'sr' may be used
+>>                                       uninitialized in this function
+>>
+>> On checking the code it turns out that sr can never be used
+>> uninitialized as sr is getting initialized in the while loop and while
+>> loop will always execute as the minimum value of max can be 32.
+>> So just initialize sr to 0 while declaring it to silence the compiler.
+>>
+>> Signed-off-by: Sudip Mukherjee <sudip.mukherjee@codethink.co.uk>
+>> ---
+>
+> I notice that you are using a really old compiler. While this warning
+> seems to be valid in the sense that the compiler should figure out that
+> the variable might be used uninitialized, please update your toolchain
+> before reporting other such problems, as gcc-4.6 had a lot more false
+> positives that newer ones (5.x or 6.x) have.
+>
+>>
+>> build log at:
+>> https://travis-ci.org/sudipm-mukherjee/parport/jobs/132180906
+>>
+>>  drivers/char/hw_random/stm32-rng.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
+>> index 92a8106..0533370 100644
+>> --- a/drivers/char/hw_random/stm32-rng.c
+>> +++ b/drivers/char/hw_random/stm32-rng.c
+>> @@ -52,7 +52,7 @@ static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+>>  {
+>>       struct stm32_rng_private *priv =
+>>           container_of(rng, struct stm32_rng_private, rng);
+>> -     u32 sr;
+>> +     u32 sr = 0;
+>>       int retval = 0;
+>>
+>>       pm_runtime_get_sync((struct device *) priv->rng.priv);
+>
+> Does this work as well?
+>
+> diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
+> index 92a810648bd0..5c836b0afa40 100644
+> --- a/drivers/char/hw_random/stm32-rng.c
+> +++ b/drivers/char/hw_random/stm32-rng.c
+> @@ -79,7 +79,7 @@ static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+>                 max -= sizeof(u32);
+>         }
+>
+> -       if (WARN_ONCE(sr & (RNG_SR_SEIS | RNG_SR_CEIS),
+> +       if (WARN_ONCE(retval > 0 && (sr & (RNG_SR_SEIS | RNG_SR_CEIS)),
+>                       "bad RNG status - %x\n", sr))
+>                 writel_relaxed(0, priv->base + RNG_SR);
+>
+> I think it would be nicer to not add a bogus initialization.
+Hmm, no sure this nicer.
+The while loop can break before retval is incremented when sr value is
+not expected (sr != RNG_SR_DRDY).
+In that case, we certainly want to print sr value.
 
-Hi David,
+Maybe the better way is just to initialize sr with status register content?
 
-> Stephan Mueller <smueller@chronox.de> wrote:
-> > The KDF patches are fully tested. All that would be needed on the key
-> > retention side after the shared secret generation are the following calls:
-> > 
-> > kdf = crypto_alloc_rng(NAME, 0, 0);
-> > 
-> > crypto_rng_reset(kdf, <shared_secret>, sizeof(<shared_secret>));
-> > 
-> > crypto_rng_generate(kdf, LABEL, sizeof(LABEL), outbuf, outbuflen);
-> > 
-> > NAME would be the KDF type such as "kdf_ctr(hmac(sha256))"
-> > 
-> > LABEL would be an arbitrary string defined by the key service (e.g.
-> > "LxKeyRet").
-> 
-> So there wouldn't be a change to the DH keyctl (including functional)?
+diff --git a/drivers/char/hw_random/stm32-rng.c
+b/drivers/char/hw_random/stm32-rng.c
+index 92a810648bd0..07a6659d0fe6 100644
+--- a/drivers/char/hw_random/stm32-rng.c
++++ b/drivers/char/hw_random/stm32-rng.c
+@@ -57,8 +57,8 @@ static int stm32_rng_read(struct hwrng *rng, void
+*data, size_t max, bool wait)
 
-Assuming that the LABEL and/or the KDF name are not configurable by user 
-space, the only potential difference I would see is that a user could ask for 
-the length of the output data.
+        pm_runtime_get_sync((struct device *) priv->rng.priv);
 
-Think of it like the KDF in a network protocol where the shared secret has 
-some length X but the caller needs data of length Y for a specific use (e.g. a 
-symmetric key plus an HMAC key). The use case for such "local" DH operation 
-would be the writing of encrypted data while the system is locked. The 
-encryption of the actual file data is done using a symmetric algo with 
-symmetric key, potentially with an integrity key. Usually, the DH shared 
-secret size is not equal to the size of a symmetric key. So, a KDF would be 
-needed to bring it to the right size.
++       sr = readl_relaxed(priv->base + RNG_SR);
+        while (max > sizeof(u32)) {
+-               sr = readl_relaxed(priv->base + RNG_SR);
+                if (!sr && wait) {
+                        unsigned int timeout = RNG_TIMEOUT;
 
-Ciao
-Stephan
+@@ -77,6 +77,8 @@ static int stm32_rng_read(struct hwrng *rng, void
+*data, size_t max, bool wait)
+                retval += sizeof(u32);
+                data += sizeof(u32);
+                max -= sizeof(u32);
++
++               sr = readl_relaxed(priv->base + RNG_SR);
+        }
+
+        if (WARN_ONCE(sr & (RNG_SR_SEIS | RNG_SR_CEIS),
+
+
+Regards,
+Maxime
