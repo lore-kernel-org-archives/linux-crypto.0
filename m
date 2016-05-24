@@ -1,58 +1,90 @@
-From: Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>
-Subject: Re: [PATCH 2/4] hwrng: bcm2835: Support Broadcom NSP SoC rng
-Date: Mon, 23 May 2016 19:14:09 -0700
-Message-ID: <87oa7w2oem.fsf@eliezer.anholt.net>
-References: <1464020451-16520-1-git-send-email-yendapally.reddy@broadcom.com> <1464020451-16520-3-git-send-email-yendapally.reddy@broadcom.com>
+From: Eric Anholt <eric@anholt.net>
+Subject: Re: [PATCH 4/4] hwrng: bcm2835: Read as much data as available
+Date: Mon, 23 May 2016 19:21:00 -0700
+Message-ID: <87k2ik2o37.fsf@eliezer.anholt.net>
+References: <1464020451-16520-1-git-send-email-yendapally.reddy@broadcom.com> <1464020451-16520-5-git-send-email-yendapally.reddy@broadcom.com>
 Mime-Version: 1.0
 Content-Type: multipart/signed; boundary="=-=-=";
 	micalg=pgp-sha512; protocol="application/pgp-signature"
-Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-rpi-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+Cc: devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	linux-crypto@vger.kernel.org,
 	Yendapally Reddy Dhananjaya Reddy
-	<yendapally.reddy-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
-To: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-	Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
-	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
-	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>,
-	Stephen Warren <swarren-3lzwWm7+Weoh9ZMKESR00Q@public.gmane.org>,
-	Lee Jones <lee-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Russell King <linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org>,
-	Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-	Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-	Jon Mason <jonmason-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-	Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	Daniel Thompson <daniel.thompson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-	Kieran Bingham <kieranbingham-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Pankaj Dev <pankaj.dev-qxv4g6HH51o@public.gmane.org>,
-	Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>, noltari-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	Joshua Henderson <joshua.henderson-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1464020451-16520-3-git-send-email-yendapally.reddy-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+	<yendapally.reddy@broadcom.com>
+To: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>,
+	Stephen Warren <swarren@wwwdotorg.org>,
+	Lee Jones <lee@kernel.org>,
+	Russell King <linux@arm.linux.org.uk>,
+	Ray Jui <rjui@broadcom.com>,
+	Scott Branden <sbranden@broadcom.com>,
+	Jon Mason <jonmason@broadcom.com>,
+	Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Daniel Thompson <daniel.thompson@linaro.org>,
+	Kieran Bingham <kieranbingham@gmail.com>,
+	Pankaj Dev <pankaj.dev@st.com>,
+	Richard Weinberger <richard@nod.at>, noltari@gmail.com,
+	Joshua Henderson <joshua.henderson@microchip.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1464020451-16520-5-git-send-email-yendapally.reddy@broadcom.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 --=-=-=
 Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Yendapally Reddy Dhananjaya Reddy <yendapally.reddy-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
 writes:
 
-> This supports the random number generator available in NSP SoC.
-> Masks the rng interrupt for NSP.
+> Read the requested number of data from the fifo
+>
+> Signed-off-by: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadc=
+om.com>
+> ---
+>  drivers/char/hw_random/bcm2835-rng.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_rando=
+m/bcm2835-rng.c
+> index b1e8b78..9bbdc07 100644
+> --- a/drivers/char/hw_random/bcm2835-rng.c
+> +++ b/drivers/char/hw_random/bcm2835-rng.c
+> @@ -43,6 +43,8 @@ static int bcm2835_rng_read(struct hwrng *rng, void *bu=
+f, size_t max,
+>  			       bool wait)
+>  {
+>  	void __iomem *rng_base =3D (void __iomem *)rng->priv;
+> +	u32 max_words =3D max/sizeof(u32);
 
-The interrupt reg is also present on the 2835.  I would prefer for
-simplicity if you also initialized the register to the same value on the
-Pi, even though the firmware has presumably been setting it for us
-already.
+Style fix: Binary operators get a space on each side, so
+"max / sizeof(u32);"
 
-However, this patch is still correct and I'm fine with it, so it's:
+> @@ -50,8 +52,14 @@ static int bcm2835_rng_read(struct hwrng *rng, void *b=
+uf, size_t max,
+>  		cpu_relax();
+>  	}
+>=20=20
+> -	*(u32 *)buf =3D __raw_readl(rng_base + RNG_DATA);
+> -	return sizeof(u32);
+> +	num_words =3D (readl(rng_base + RNG_STATUS) >> 24);
 
-Acked-by: Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>
+Optional cleanup: here and in the return statement, drop the extra
+parenthesis.
+
+Functionality-wise, this patch looks great to me, and should make the
+driver more efficient.  With at least the binary operators change done,
+it will be:
+
+Reviewed-by: Eric Anholt <eric@anholt.net>
+
+Thanks!
 
 --=-=-=
 Content-Type: application/pgp-signature; name="signature.asc"
@@ -60,22 +92,18 @@ Content-Type: application/pgp-signature; name="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBCgAGBQJXQ7jxAAoJELXWKTbR/J7o18gP/3kYayocI6eOHIEdG++/KOHi
-jjBG6Z6q6ttcGLegMhugNdjcznwLrTT6dR/RSf62pdi8on+2cXZaFttwAlhiamO/
-DHIMYBFE/qpMtom20SMffy/CwAKzL0SMMVpcnbZ4b5lnBjAw97rNC495wrly+tDa
-Uxw9S0VZQcsrx35CcuMXOUe4Har2u/GL++4nZ3nR4H1LS8ryrOn/ydrQ77UI2UZ9
-VJjnDOmbVehj1xfiOQLgwHRqhfKY9xKemaeA2bmT44qHd/+zMPPzSR9q9fsrytA7
-yjOQa6SxHGySj/JpoXxYw/kK6EPo7/Kw9EuPu2FtYahtAKOBUVQ5p9yr4mb1yzfx
-9yZH160yKbeqz4R24o/zUMn2jWci9W0dJ2TCxvvXq6jykTi2fxLpu2Dyx5nHJr8E
-lqXSt4UnRz+zjn4zjK2+CIcXRmzUTavrRKBsxofP77op9qAhESFtLox0J9oGt1Oi
-445SY+uaf0Z7JquW23GD/2A1yn4F8hD9bpEuVpLz8CTixF/+jr0ej1E4uA3yCJ3N
-8Ql+13UsxDGdnitzTRTZ+zkr5ST7T3TNAeAr4le2m8omiHwRqDKSKzXvkqWqq853
-frfgvUIIe3tQ9oU5L/3nF6zkKS97VX1b502lL9xfOdqTCL9dgfmp6d0CUq8SfBBC
-J6YgCA54aq3EpSlS0ylI
-=KoxT
+iQIcBAEBCgAGBQJXQ7qNAAoJELXWKTbR/J7oJAoQAJwz5fT/lVxOs8Qt2XRrmVNk
+UZFz6J/hqv5h3n+54KR5PZ8bD3xbX4iv26EdLiWmuMjuc/Mpubsv4R9TDtewA5jy
+tjDGX9UT97HnMqnZTqIct8RcxONNb2WNwKBQcO5539zWmYNhg6/ifLbSyJ2AxiZv
+fQNwx6OWc5iZroujFeIPjWvMUN10MQHfT+JOWOIW82Xm8olZwb2Bx8kpJCgV3taO
+cmVGUc3/pu9c6wNMeXd/n0h4evKbHUTM/+pbJIR9Cpt1xIXJ6I0rUxasIaN8WOQH
+4BaxLgpFabWm5BfIJ77w9yMd+u2FXjOjKXml248cfJIt5KMCNrv7TecxYYUwHqeD
+uFLo77dm0ChBsCaUSPdoe4IlVAZKF/4cEQN3sx+4XJnJRqc49Ok1kUYxw/Vb7lVu
+ibNrXtt/8o7AP70zoCzRIbv8VMbR9ZQBWIB5Ydjo+sb2m6/M/H0qRNvuiWP9m6P/
+XMBzlreKCMpLJwB8xsX9/UOpLEe21J8VuOgqdLB50+mM6TCcjZ3sysH2Q+E0/QnU
+QIxzVyxl480K9bsa+jfY6wp1JxDXWj9a6bSd6Eu+DaeSAQ/m3ghs8l+fdgw9C1zj
+vWT2FTYd71WLGAXZoJUIhjDxs8HJcVGkphBNr+pz3pIOL5hkF4j1HP6qbdFcDQc6
++Zx2GR+8YDV5fq1MnY6U
+=JoWZ
 -----END PGP SIGNATURE-----
 --=-=-=--
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
