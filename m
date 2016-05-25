@@ -1,39 +1,49 @@
-From: "Richard Williams" <patricia.oliveira@delta-cafes.pt>
-Subject: Your Audience
-Date: Wed, 25 May 2016 11:05:40 +0100
-Message-ID: <20160525100541.5FB997F610E@out.security.telecom.pt>
-Reply-To: richwills19@yahoo.com
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: key retention service: DH support
+Date: Wed, 25 May 2016 18:25:28 +0800
+Message-ID: <20160525102528.GA16101@gondor.apana.org.au>
+References: <1884439.7dZQH0lY4q@tauon.atsec.com>
+ <2025704.nsKCcck7Ux@tauon.atsec.com>
+ <alpine.OSX.2.20.1605240851210.7071@tmhoole-mobl2.amr.corp.intel.com>
+ <1542958.TuajgKVjUG@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: Recipients <patricia.oliveira@delta-cafes.pt>
+Content-Type: text/plain; charset=us-ascii
+Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
+	David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out4.security.telecom.pt ([213.13.175.89]:36754 "EHLO
-	out2.security.telecom.pt" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751581AbcEYKPb convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 May 2016 06:15:31 -0400
-Received: from out1.security.telecom.pt (localhost [127.0.0.1])
-	by out2.security.telecom.pt (Postfix) with ESMTP id DE0CEC50878
-	for <linux-crypto@vger.kernel.org>; Wed, 25 May 2016 11:05:46 +0100 (WEST)
-Received: from out.security.telecom.pt (localhost [127.0.0.1])
-	by out1.security.telecom.pt (Postfix) with ESMTP id 5933F7F6149
-	for <linux-crypto@vger.kernel.org>; Wed, 25 May 2016 11:05:44 +0100 (WEST)
-Content-Description: Mail message body
+Received: from helcar.hengli.com.au ([209.40.204.226]:59862 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751148AbcEYKZp (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 25 May 2016 06:25:45 -0400
+Content-Disposition: inline
+In-Reply-To: <1542958.TuajgKVjUG@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Tue, May 24, 2016 at 06:45:09PM +0200, Stephan Mueller wrote:
+> Am Dienstag, 24. Mai 2016, 09:22:22 schrieb Mat Martineau:
+> 
+> Hi Mat, Herbert
+> > 
+> > KDF transformations would be extremely useful, but transforming the DH
+> > output using a KDF needs to be configurable. There are enough different
+> > uses for DH that it's important to have access to the raw values.
+> > 
+> > Since the KDF patches are not yet merged, I'm not sure of the best way to
+> > accomodate the future feature. We could future-proof KEYCTL_DH_COMPUTE by
+> > adding a 5th arg, an optional pointer to KDF configuration (NAME and
+> > LABEL). Or a separate KEYCTL_DH_COMPUTE_KDF command can be added later.
+> 
+> With that statement, Herbert, should we start looking into my KDF patches 
+> after the merge window closes?
 
-Hello
-I want to tell you something about Davies Ryan. Being the executor of the
-Will, it is possible that we may be tempted to make fortune out of our
-client situation. This proposal is with full financial benefit for both of
-us,If we can be of one accord, I shall give you a comprehensive detail as
-soon as you respond thank you.
+Sure.
 
-Regards
-Richard Williams
-
----
-This email has been checked for viruses by Avast antivirus software.
-https://www.avast.com/antivirus
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
