@@ -1,48 +1,63 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2] KEYS: Add placeholder KDF usage with DH
-Date: Thu, 26 May 2016 23:38:12 +0200
-Message-ID: <4396788.BlSbYuWPli@positron.chronox.de>
-References: <20160526165741.2634-1-mathew.j.martineau@linux.intel.com> <23038.1464293450@warthog.procyon.org.uk>
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH] KEYS: Add placeholder for KDF usage with DH
+Date: Thu, 26 May 2016 23:40:47 +0100
+Message-ID: <9470.1464302447@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
+Content-Transfer-Encoding: 8BIT
+Cc: dhowells@redhat.com,
+	Mat Martineau <mathew.j.martineau@linux.intel.com>,
+	Stephan Mueller <smueller@chronox.de>,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org
+To: jmorris@namei.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34870 "EHLO mail.eperm.de"
+Received: from mx1.redhat.com ([209.132.183.28]:41006 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754722AbcEZViQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 May 2016 17:38:16 -0400
-In-Reply-To: <23038.1464293450@warthog.procyon.org.uk>
+	id S1754857AbcEZWku convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 26 May 2016 18:40:50 -0400
+Content-ID: <9435.1464302422.1@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 26. Mai 2016, 21:10:50 schrieb David Howells:
+Hi James,
 
-Hi David,
+Could you pass this along to Linus as soon as possible, please?  This
+alters a new keyctl function added in the current merge window to allow for
+a future extension planned for the next merge window.
 
-Mat asked me to step in in case his patch needed an update.
+Thanks,
+David
+---
+From: Stephan Mueller <smueller@chronox.de>
+Date: Thu May 26 23:38:12 2016 +0200
 
----8<---
+KEYS: Add placeholder for KDF usage with DH
+
 The values computed during Diffie-Hellman key exchange are often used
 in combination with key derivation functions to create cryptographic
-keys. Add a placeholder for a later implementation to configure a
+keys.  Add a placeholder for a later implementation to configure a
 key derivation function that will transform the Diffie-Hellman
 result returned by the KEYCTL_DH_COMPUTE command.
 
-Signed-off-by: Mat Martineau <mathew.j.martineau@linux.intel.com>
+[This patch was stripped down from a patch produced by Mat Martineau that
+ had a bug in the compat code - so for the moment Stephan's patch simply
+ requires that the placeholder argument must be NULL]
+
+Original-signed-off-by: Mat Martineau <mathew.j.martineau@linux.intel.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Signed-off-by: David Howells <dhowells@redhat.com>
 ---
- Documentation/security/keys.txt | 5 ++++-
- security/keys/compat.c          | 2 +-
- security/keys/dh.c              | 8 +++++++-
- security/keys/internal.h        | 5 +++--
- security/keys/keyctl.c          | 4 ++--
+ Documentation/security/keys.txt |    5 ++++-
+ security/keys/compat.c          |    2 +-
+ security/keys/dh.c              |    8 +++++++-
+ security/keys/internal.h        |    5 +++--
+ security/keys/keyctl.c          |    4 ++--
  5 files changed, 17 insertions(+), 7 deletions(-)
 
 diff --git a/Documentation/security/keys.txt b/Documentation/security/keys.txt
-index 20d0571..3849814 100644
+index 20d05719bceb..3849814bfe6d 100644
 --- a/Documentation/security/keys.txt
 +++ b/Documentation/security/keys.txt
 @@ -826,7 +826,8 @@ The keyctl syscall functions are:
@@ -65,7 +80,7 @@ index 20d0571..3849814 100644
  
       If the buffer length is nonzero, the length of the result is
 diff --git a/security/keys/compat.c b/security/keys/compat.c
-index c8783b3..36c80bf 100644
+index c8783b3b628c..36c80bf5b89c 100644
 --- a/security/keys/compat.c
 +++ b/security/keys/compat.c
 @@ -134,7 +134,7 @@ COMPAT_SYSCALL_DEFINE5(keyctl, u32, option,
@@ -78,7 +93,7 @@ index c8783b3..36c80bf 100644
  	default:
  		return -EOPNOTSUPP;
 diff --git a/security/keys/dh.c b/security/keys/dh.c
-index 880505a..531ed2e 100644
+index 880505a4b9f1..531ed2ec132f 100644
 --- a/security/keys/dh.c
 +++ b/security/keys/dh.c
 @@ -78,7 +78,8 @@ error:
@@ -104,7 +119,7 @@ index 880505a..531ed2e 100644
  	if (keylen < 0 || !prime) {
  		/* buflen == 0 may be used to query the required buffer size,
 diff --git a/security/keys/internal.h b/security/keys/internal.h
-index 8ec7a52..a705a7d 100644
+index 8ec7a528365d..a705a7d92ad7 100644
 --- a/security/keys/internal.h
 +++ b/security/keys/internal.h
 @@ -260,10 +260,11 @@ static inline long keyctl_get_persistent(uid_t uid, key_serial_t destring)
@@ -122,7 +137,7 @@ index 8ec7a52..a705a7d 100644
  	return -EOPNOTSUPP;
  }
 diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
-index 3b135a0..d580ad0 100644
+index 3b135a0af344..d580ad06b792 100644
 --- a/security/keys/keyctl.c
 +++ b/security/keys/keyctl.c
 @@ -1688,8 +1688,8 @@ SYSCALL_DEFINE5(keyctl, int, option, unsigned long, arg2, unsigned long, arg3,
@@ -136,5 +151,3 @@ index 3b135a0..d580ad0 100644
  
  	default:
  		return -EOPNOTSUPP;
--- 
-2.5.5
