@@ -1,39 +1,66 @@
-From: Sandy Harris <sandyinchina@gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: AES-NI: slower than aes-generic?
-Date: Thu, 26 May 2016 14:20:19 -0400
-Message-ID: <CACXcFmnFn_BDv_xLra-gfSTsOP-diTwtvU4_TndLAv+WuXG4DQ@mail.gmail.com>
-References: <1567400.ZMFoPuCv2K@tauon.atsec.com>
+Date: Thu, 26 May 2016 20:49:39 +0200
+Message-ID: <4972668.UQ1QRNriDb@positron.chronox.de>
+References: <1567400.ZMFoPuCv2K@tauon.atsec.com> <CACXcFmnFn_BDv_xLra-gfSTsOP-diTwtvU4_TndLAv+WuXG4DQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>
-To: Stephan Mueller <stephan.mueller@atsec.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Stephan Mueller <stephan.mueller@atsec.com>,
+	linux-crypto@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>
+To: Sandy Harris <sandyinchina@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f171.google.com ([209.85.223.171]:36174 "EHLO
-	mail-io0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753400AbcEZSUU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 May 2016 14:20:20 -0400
-Received: by mail-io0-f171.google.com with SMTP id f8so58051450ioe.3
-        for <linux-crypto@vger.kernel.org>; Thu, 26 May 2016 11:20:19 -0700 (PDT)
-In-Reply-To: <1567400.ZMFoPuCv2K@tauon.atsec.com>
+Received: from mail.eperm.de ([89.247.134.16]:34862 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932127AbcEZStm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 26 May 2016 14:49:42 -0400
+In-Reply-To: <CACXcFmnFn_BDv_xLra-gfSTsOP-diTwtvU4_TndLAv+WuXG4DQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Stephan Mueller <stephan.mueller@atsec.com> wrote:
+Am Donnerstag, 26. Mai 2016, 14:20:19 schrieb Sandy Harris:
 
-> for the DRBG and the LRNG work I am doing, I also test the speed of the DRBG.
-> The DRBG can be considered as a form of block chaining mode on top of a raw
-> cipher.
->
-> What I am wondering is that when encrypting 256 16 byte blocks, I get a speed
-> of about 170 MB/s with the AES-NI driver. When using the aes-generic or aes-
-> asm, I get up to 180 MB/s with all else being equal. Note, that figure
-> includes a copy_to_user of the generated data.
+Hi Sandy,
+> 
+> Why are you using AES? Granted, it is a reasonable idea, but when Ted
+> replaced the non-blocking pool with a DBRG, he used a different cipher
+> (I think chacha, not certain) and I think chose not to use the crypto
+> library implementation to avoid kernel bloat.
+> 
+> So he has adopted on of your better ideas. Why not follow his
+> lead on how to implement it?
 
-Why are you using AES? Granted, it is a reasonable idea, but when Ted
-replaced the non-blocking pool with a DBRG, he used a different cipher
-(I think chacha, not certain) and I think chose not to use the crypto
-library implementation to avoid kernel bloat.
+Using the kernel crypto API one can relieve the CPU of the crypto work, if a 
+hardware or assembler implementation is available. This may be of particular 
+interest for smaller systems. So, for smaller systems (where kernel bloat is 
+bad, but where now these days more and more hardware crypto support is added), 
+we must weigh the kernel bloat (of 3 or 4 additional C files for the basic 
+kernel crypto API logic) against relieving the CPU of work.
 
-So he has adopted on of your better ideas. Why not follow his
-lead on how to implement it?
+Then, the use of the DRBG offers users to choose between a Hash/HMAC and CTR 
+implementation to suit their needs. The DRBG code is agnostic of the 
+underlying cipher. So, you could even use Blowfish instead of AES or whirlpool 
+instead of SHA -- these changes are just one entry in drbg_cores[] away 
+without any code change.
+
+Finally, the LRNG code is completely agnostic of the underlying deterministic 
+RNG. You only need a replacement of two small functions to invoke the seeding 
+and generate operation of a DRNG. So, if one wants a Chacha20, he can have it. 
+If one wants X9.31, he can have it. See section 2.8.3 [1] -- note, that DRNG 
+does not even need to be a kernel crypto API registered implementation.
+
+Bottom line, I want to give folks a full flexibility. That said, the LRNG code 
+is more of a logic to collect entropy and maintain two DRNG types which are 
+seeded according to a defined schedule than it is a tightly integrated RNG.
+
+Also, I am not so sure that simply taking a cipher, sprinkling some 
+backtracking logic on it implies you have a good DRNG. As of now, I have not 
+seen assessments from others for the Chacha20 DRNG approach. I personally 
+would think that the Chacha20 approach from Ted is good. Yet others may have a 
+more conservative approach of using a DRNG implementation that has been 
+reviewed by a lot of folks.
+
+[1] http://www.chronox.de/lrng/doc/lrng.pdf
+
+Ciao
+Stephan
