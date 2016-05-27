@@ -1,249 +1,178 @@
-From: Baolin Wang <baolin.wang@linaro.org>
-Subject: [RFC v2 3/3] md: dm-crypt: Introduce the bulk mode method when sending request
-Date: Fri, 27 May 2016 19:11:24 +0800
-Message-ID: <afa4ebdae7f8cb364d7563e8d32f064c0aa0111f.1464346333.git.baolin.wang@linaro.org>
-References: <cover.1464346333.git.baolin.wang@linaro.org>
-Cc: ebiggers3@gmail.com, js1304@gmail.com, tadeusz.struk@intel.com,
-	smueller@chronox.de, standby24x7@gmail.com, shli@kernel.org,
-	dan.j.williams@intel.com, martin.petersen@oracle.com,
-	sagig@mellanox.com, kent.overstreet@gmail.com,
-	keith.busch@intel.com, tj@kernel.org, ming.lei@canonical.com,
-	broonie@kernel.org, arnd@arndb.de, linux-crypto@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org, baolin.wang@linaro.org
-To: axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
-	dm-devel@redhat.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <cover.1464346333.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1464346333.git.baolin.wang@linaro.org>
-References: <cover.1464346333.git.baolin.wang@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Subject: [PATCH] crypto: s5p-sss - Use consistent indentation for variables and
+ members
+Date: Fri, 27 May 2016 13:49:40 +0200
+Message-ID: <1464349780-27674-1-git-send-email-k.kozlowski@samsung.com>
+Cc: Krzysztof Kozlowski <k.kozlowski@samsung.com>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+	Vladimir Zapolskiy <vz@mleia.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-samsung-soc@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:11697 "EHLO
+	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751660AbcE0Lty (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 May 2016 07:49:54 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-In now dm-crypt code, it is ineffective to map one segment (always one
-sector) of one bio with just only one scatterlist at one time for hardware
-crypto engine. Especially for some encryption mode (like ecb or xts mode)
-cooperating with the crypto engine, they just need one initial IV or null
-IV instead of different IV for each sector. In this situation We can consider
-to use multiple scatterlists to map the whole bio and send all scatterlists
-of one bio to crypto engine to encrypt or decrypt, which can improve the
-hardware engine's efficiency.
+Bring some consistency by:
+1. Replacing fixed-space indentation of structure members with just
+   tabs.
+2. Remove indentation in declaration of local variable between type and
+   name.  Driver was mixing usage of such indentation and lack of it.
+   When removing indentation, reorder variables in
+   reversed-christmas-tree order with first variables being initialized
+   ones.
 
-With this optimization, On my test setup (beaglebone black board) using 64KB
-I/Os on an eMMC storage device I saw about 60% improvement in throughput for
-encrypted writes, and about 100% improvement for encrypted reads. But this
-is not fit for other modes which need different IV for each sector.
-
-Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
+Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
 ---
- drivers/md/dm-crypt.c |  145 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 144 insertions(+), 1 deletion(-)
+ drivers/crypto/s5p-sss.c | 80 ++++++++++++++++++++++++------------------------
+ 1 file changed, 40 insertions(+), 40 deletions(-)
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 4f3cb35..2101f35 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -33,6 +33,7 @@
- #include <linux/device-mapper.h>
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index 2b3a0cfe3331..dce1af0ce85c 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -155,43 +155,43 @@
+  * expansion of its usage.
+  */
+ struct samsung_aes_variant {
+-	unsigned int		    aes_offset;
++	unsigned int			aes_offset;
+ };
  
- #define DM_MSG_PREFIX "crypt"
-+#define DM_MAX_SG_LIST	1024
+ struct s5p_aes_reqctx {
+-	unsigned long mode;
++	unsigned long			mode;
+ };
  
- /*
-  * context holding the current state of a multi-part conversion
-@@ -142,6 +143,9 @@ struct crypt_config {
- 	char *cipher;
- 	char *cipher_string;
+ struct s5p_aes_ctx {
+-	struct s5p_aes_dev         *dev;
++	struct s5p_aes_dev		*dev;
  
-+	struct sg_table sgt_in;
-+	struct sg_table sgt_out;
-+
- 	struct crypt_iv_operations *iv_gen_ops;
- 	union {
- 		struct iv_essiv_private essiv;
-@@ -837,6 +841,129 @@ static u8 *iv_of_dmreq(struct crypt_config *cc,
- 		crypto_skcipher_alignmask(any_tfm(cc)) + 1);
- }
+-	uint8_t                     aes_key[AES_MAX_KEY_SIZE];
+-	uint8_t                     nonce[CTR_RFC3686_NONCE_SIZE];
+-	int                         keylen;
++	uint8_t				aes_key[AES_MAX_KEY_SIZE];
++	uint8_t				nonce[CTR_RFC3686_NONCE_SIZE];
++	int				keylen;
+ };
  
-+static void crypt_init_sg_table(struct scatterlist *sgl)
-+{
-+	struct scatterlist *sg;
-+	int i;
-+
-+	for_each_sg(sgl, sg, DM_MAX_SG_LIST, i) {
-+		if (i < DM_MAX_SG_LIST - 1 && sg_is_last(sg))
-+			sg_unmark_end(sg);
-+		else if (i == DM_MAX_SG_LIST - 1)
-+			sg_mark_end(sg);
-+	}
-+
-+	for_each_sg(sgl, sg, DM_MAX_SG_LIST, i) {
-+		memset(sg, 0, sizeof(struct scatterlist));
-+
-+		if (i == DM_MAX_SG_LIST - 1)
-+			sg_mark_end(sg);
-+	}
-+}
-+
-+static void crypt_reinit_sg_table(struct crypt_config *cc)
-+{
-+	if (!cc->sgt_in.orig_nents || !cc->sgt_out.orig_nents)
-+		return;
-+
-+	crypt_init_sg_table(cc->sgt_in.sgl);
-+	crypt_init_sg_table(cc->sgt_out.sgl);
-+}
-+
-+static int crypt_alloc_sg_table(struct crypt_config *cc)
-+{
-+	unsigned int bulk_mode = skcipher_is_bulk_mode(any_tfm(cc));
-+	int ret = 0;
-+
-+	if (!bulk_mode)
-+		goto out_skip_alloc;
-+
-+	ret = sg_alloc_table(&cc->sgt_in, DM_MAX_SG_LIST, GFP_KERNEL);
-+	if (ret)
-+		goto out_skip_alloc;
-+
-+	ret = sg_alloc_table(&cc->sgt_out, DM_MAX_SG_LIST, GFP_KERNEL);
-+	if (ret)
-+		goto out_free_table;
-+
-+	return 0;
-+
-+out_free_table:
-+	sg_free_table(&cc->sgt_in);
-+out_skip_alloc:
-+	cc->sgt_in.orig_nents = 0;
-+	cc->sgt_out.orig_nents = 0;
-+
-+	return ret;
-+}
-+
-+static int crypt_convert_bulk_block(struct crypt_config *cc,
-+				    struct convert_context *ctx,
-+				    struct skcipher_request *req)
-+{
-+	struct bio *bio_in = ctx->bio_in;
-+	struct bio *bio_out = ctx->bio_out;
-+	unsigned int total_bytes = bio_in->bi_iter.bi_size;
-+	unsigned int total_sg_in, total_sg_out;
-+	struct scatterlist *sg_in, *sg_out;
-+	struct dm_crypt_request *dmreq;
-+	u8 *iv;
-+	int r;
-+
-+	if (!cc->sgt_in.orig_nents || !cc->sgt_out.orig_nents)
-+		return -EINVAL;
-+
-+	dmreq = dmreq_of_req(cc, req);
-+	iv = iv_of_dmreq(cc, dmreq);
-+	dmreq->iv_sector = ctx->cc_sector;
-+	dmreq->ctx = ctx;
-+
-+	total_sg_in = blk_bio_map_sg(bdev_get_queue(bio_in->bi_bdev),
-+				     bio_in, cc->sgt_in.sgl);
-+	if ((total_sg_in <= 0) || (total_sg_in > DM_MAX_SG_LIST)) {
-+		DMERR("%s in sg map error %d, sg table nents[%d]\n",
-+		      __func__, total_sg_in, cc->sgt_in.orig_nents);
-+		return -EINVAL;
-+	}
-+
-+	ctx->iter_in.bi_size -= total_bytes;
-+	sg_in = cc->sgt_in.sgl;
-+	sg_out = cc->sgt_in.sgl;
-+
-+	if (bio_data_dir(bio_in) == READ)
-+		goto set_crypt;
-+
-+	total_sg_out = blk_bio_map_sg(bdev_get_queue(bio_out->bi_bdev),
-+				      bio_out, cc->sgt_out.sgl);
-+	if ((total_sg_out <= 0) || (total_sg_out > DM_MAX_SG_LIST)) {
-+		DMERR("%s out sg map error %d, sg table nents[%d]\n",
-+		      __func__, total_sg_out, cc->sgt_out.orig_nents);
-+		return -EINVAL;
-+	}
-+
-+	ctx->iter_out.bi_size -= total_bytes;
-+	sg_out = cc->sgt_out.sgl;
-+
-+set_crypt:
-+	if (cc->iv_gen_ops) {
-+		r = cc->iv_gen_ops->generator(cc, iv, dmreq);
-+		if (r < 0)
-+			return r;
-+	}
-+
-+	skcipher_request_set_crypt(req, sg_in, sg_out, total_bytes, iv);
-+
-+	if (bio_data_dir(ctx->bio_in) == WRITE)
-+		r = crypto_skcipher_encrypt(req);
-+	else
-+		r = crypto_skcipher_decrypt(req);
-+
-+	if (!r && cc->iv_gen_ops && cc->iv_gen_ops->post)
-+		r = cc->iv_gen_ops->post(cc, iv, dmreq);
-+
-+	return r;
-+}
-+
- static int crypt_convert_block(struct crypt_config *cc,
- 			       struct convert_context *ctx,
- 			       struct skcipher_request *req)
-@@ -920,6 +1047,7 @@ static void crypt_free_req(struct crypt_config *cc,
- static int crypt_convert(struct crypt_config *cc,
- 			 struct convert_context *ctx)
+ struct s5p_aes_dev {
+-	struct device              *dev;
+-	struct clk                 *clk;
+-	void __iomem               *ioaddr;
+-	void __iomem               *aes_ioaddr;
+-	int                         irq_fc;
++	struct device			*dev;
++	struct clk			*clk;
++	void __iomem			*ioaddr;
++	void __iomem			*aes_ioaddr;
++	int				irq_fc;
+ 
+-	struct ablkcipher_request  *req;
+-	struct s5p_aes_ctx         *ctx;
+-	struct scatterlist         *sg_src;
+-	struct scatterlist         *sg_dst;
++	struct ablkcipher_request	*req;
++	struct s5p_aes_ctx		*ctx;
++	struct scatterlist		*sg_src;
++	struct scatterlist		*sg_dst;
+ 
+ 	/* In case of unaligned access: */
+-	struct scatterlist         *sg_src_cpy;
+-	struct scatterlist         *sg_dst_cpy;
++	struct scatterlist		*sg_src_cpy;
++	struct scatterlist		*sg_dst_cpy;
+ 
+-	struct tasklet_struct       tasklet;
+-	struct crypto_queue         queue;
+-	bool                        busy;
+-	spinlock_t                  lock;
++	struct tasklet_struct		tasklet;
++	struct crypto_queue		queue;
++	bool				busy;
++	spinlock_t			lock;
+ 
+-	struct samsung_aes_variant *variant;
++	struct samsung_aes_variant	*variant;
+ };
+ 
+ static struct s5p_aes_dev *s5p_dev;
+@@ -421,11 +421,11 @@ static bool s5p_aes_rx(struct s5p_aes_dev *dev)
+ static irqreturn_t s5p_aes_interrupt(int irq, void *dev_id)
  {
-+	unsigned int bulk_mode;
- 	int r;
+ 	struct platform_device *pdev = dev_id;
+-	struct s5p_aes_dev     *dev  = platform_get_drvdata(pdev);
+-	uint32_t                status;
+-	unsigned long           flags;
+-	bool			set_dma_tx = false;
+-	bool			set_dma_rx = false;
++	struct s5p_aes_dev *dev = platform_get_drvdata(pdev);
++	bool set_dma_tx = false;
++	bool set_dma_rx = false;
++	unsigned long flags;
++	uint32_t status;
  
- 	atomic_set(&ctx->cc_pending, 1);
-@@ -930,7 +1058,14 @@ static int crypt_convert(struct crypt_config *cc,
+ 	spin_lock_irqsave(&dev->lock, flags);
  
- 		atomic_inc(&ctx->cc_pending);
+@@ -538,10 +538,10 @@ static int s5p_set_outdata_start(struct s5p_aes_dev *dev,
  
--		r = crypt_convert_block(cc, ctx, ctx->req);
-+		bulk_mode = skcipher_is_bulk_mode(any_tfm(cc));
-+		if (!bulk_mode) {
-+			r = crypt_convert_block(cc, ctx, ctx->req);
-+		} else {
-+			r = crypt_convert_bulk_block(cc, ctx, ctx->req);
-+			if (r == -EINVAL)
-+				r = crypt_convert_block(cc, ctx, ctx->req);
-+		}
+ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
+ {
+-	struct ablkcipher_request  *req = dev->req;
+-	uint32_t                    aes_control;
+-	int                         err;
+-	unsigned long               flags;
++	struct ablkcipher_request *req = dev->req;
++	uint32_t aes_control;
++	unsigned long flags;
++	int err;
  
- 		switch (r) {
- 		/*
-@@ -1081,6 +1216,7 @@ static void crypt_dec_pending(struct dm_crypt_io *io)
- 	if (io->ctx.req)
- 		crypt_free_req(cc, io->ctx.req, base_bio);
+ 	aes_control = SSS_AES_KEY_CHANGE_MODE;
+ 	if (mode & FLAGS_AES_DECRYPT)
+@@ -653,10 +653,10 @@ exit:
  
-+	crypt_reinit_sg_table(cc);
- 	base_bio->bi_error = error;
- 	bio_endio(base_bio);
- }
-@@ -1563,6 +1699,9 @@ static void crypt_dtr(struct dm_target *ti)
- 	kzfree(cc->cipher);
- 	kzfree(cc->cipher_string);
+ static int s5p_aes_crypt(struct ablkcipher_request *req, unsigned long mode)
+ {
+-	struct crypto_ablkcipher   *tfm    = crypto_ablkcipher_reqtfm(req);
+-	struct s5p_aes_ctx         *ctx    = crypto_ablkcipher_ctx(tfm);
+-	struct s5p_aes_reqctx      *reqctx = ablkcipher_request_ctx(req);
+-	struct s5p_aes_dev         *dev    = ctx->dev;
++	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
++	struct s5p_aes_reqctx *reqctx = ablkcipher_request_ctx(req);
++	struct s5p_aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++	struct s5p_aes_dev *dev = ctx->dev;
  
-+	sg_free_table(&cc->sgt_in);
-+	sg_free_table(&cc->sgt_out);
-+
- 	/* Must zero key material before freeing */
- 	kzfree(cc);
- }
-@@ -1718,6 +1857,10 @@ static int crypt_ctr_cipher(struct dm_target *ti,
- 		}
- 	}
+ 	if (!IS_ALIGNED(req->nbytes, AES_BLOCK_SIZE)) {
+ 		dev_err(dev->dev, "request size is not exact amount of AES blocks\n");
+@@ -671,7 +671,7 @@ static int s5p_aes_crypt(struct ablkcipher_request *req, unsigned long mode)
+ static int s5p_aes_setkey(struct crypto_ablkcipher *cipher,
+ 			  const uint8_t *key, unsigned int keylen)
+ {
+-	struct crypto_tfm  *tfm = crypto_ablkcipher_tfm(cipher);
++	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
+ 	struct s5p_aes_ctx *ctx = crypto_tfm_ctx(tfm);
  
-+	ret = crypt_alloc_sg_table(cc);
-+	if (ret)
-+		DMWARN("Allocate sg table for bulk mode failed");
-+
- 	ret = 0;
- bad:
- 	kfree(cipher_api);
+ 	if (keylen != AES_KEYSIZE_128 &&
+@@ -763,11 +763,11 @@ static struct crypto_alg algs[] = {
+ 
+ static int s5p_aes_probe(struct platform_device *pdev)
+ {
+-	int                 i, j, err = -ENODEV;
+-	struct s5p_aes_dev *pdata;
+-	struct device      *dev = &pdev->dev;
+-	struct resource    *res;
++	struct device *dev = &pdev->dev;
++	int i, j, err = -ENODEV;
+ 	struct samsung_aes_variant *variant;
++	struct s5p_aes_dev *pdata;
++	struct resource *res;
+ 
+ 	if (s5p_dev)
+ 		return -EEXIST;
 -- 
-1.7.9.5
+1.9.1
