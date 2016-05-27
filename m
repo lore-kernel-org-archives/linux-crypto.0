@@ -1,7 +1,7 @@
 From: Baolin Wang <baolin.wang@linaro.org>
-Subject: [RFC v2 2/3] crypto: Introduce CRYPTO_ALG_BULK flag
-Date: Fri, 27 May 2016 19:11:23 +0800
-Message-ID: <47e9ddd8c9ea9ad9e29c8cb027d19d8459ea1479.1464346333.git.baolin.wang@linaro.org>
+Subject: [RFC v2 3/3] md: dm-crypt: Introduce the bulk mode method when sending request
+Date: Fri, 27 May 2016 19:11:24 +0800
+Message-ID: <afa4ebdae7f8cb364d7563e8d32f064c0aa0111f.1464346333.git.baolin.wang@linaro.org>
 References: <cover.1464346333.git.baolin.wang@linaro.org>
 Cc: ebiggers3@gmail.com, js1304@gmail.com, tadeusz.struk@intel.com,
 	smueller@chronox.de, standby24x7@gmail.com, shli@kernel.org,
@@ -21,61 +21,229 @@ References: <cover.1464346333.git.baolin.wang@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Now some cipher hardware engines prefer to handle bulk block rather than one
-sector (512 bytes) created by dm-crypt, cause these cipher engines can handle
-the intermediate values (IV) by themselves in one bulk block. This means we
-can increase the size of the request by merging request rather than always 512
-bytes and thus increase the hardware engine processing speed.
+In now dm-crypt code, it is ineffective to map one segment (always one
+sector) of one bio with just only one scatterlist at one time for hardware
+crypto engine. Especially for some encryption mode (like ecb or xts mode)
+cooperating with the crypto engine, they just need one initial IV or null
+IV instead of different IV for each sector. In this situation We can consider
+to use multiple scatterlists to map the whole bio and send all scatterlists
+of one bio to crypto engine to encrypt or decrypt, which can improve the
+hardware engine's efficiency.
 
-So introduce 'CRYPTO_ALG_BULK' flag to indicate this cipher can support bulk
-mode.
+With this optimization, On my test setup (beaglebone black board) using 64KB
+I/Os on an eMMC storage device I saw about 60% improvement in throughput for
+encrypted writes, and about 100% improvement for encrypted reads. But this
+is not fit for other modes which need different IV for each sector.
 
 Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
 ---
- include/crypto/skcipher.h |    7 +++++++
- include/linux/crypto.h    |    6 ++++++
- 2 files changed, 13 insertions(+)
+ drivers/md/dm-crypt.c |  145 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 144 insertions(+), 1 deletion(-)
 
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index 0f987f5..d89d29a 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -519,5 +519,12 @@ static inline void skcipher_request_set_crypt(
- 	req->iv = iv;
- }
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 4f3cb35..2101f35 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -33,6 +33,7 @@
+ #include <linux/device-mapper.h>
  
-+static inline unsigned int skcipher_is_bulk_mode(struct crypto_skcipher *sk_tfm)
-+{
-+	struct crypto_tfm *tfm = crypto_skcipher_tfm(sk_tfm);
-+
-+	return crypto_tfm_alg_bulk(tfm);
-+}
-+
- #endif	/* _CRYPTO_SKCIPHER_H */
- 
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 6e28c89..a315487 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -63,6 +63,7 @@
- #define CRYPTO_ALG_DEAD			0x00000020
- #define CRYPTO_ALG_DYING		0x00000040
- #define CRYPTO_ALG_ASYNC		0x00000080
-+#define CRYPTO_ALG_BULK			0x00000100
+ #define DM_MSG_PREFIX "crypt"
++#define DM_MAX_SG_LIST	1024
  
  /*
-  * Set this bit if and only if the algorithm requires another algorithm of
-@@ -623,6 +624,11 @@ static inline u32 crypto_tfm_alg_type(struct crypto_tfm *tfm)
- 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_TYPE_MASK;
+  * context holding the current state of a multi-part conversion
+@@ -142,6 +143,9 @@ struct crypt_config {
+ 	char *cipher;
+ 	char *cipher_string;
+ 
++	struct sg_table sgt_in;
++	struct sg_table sgt_out;
++
+ 	struct crypt_iv_operations *iv_gen_ops;
+ 	union {
+ 		struct iv_essiv_private essiv;
+@@ -837,6 +841,129 @@ static u8 *iv_of_dmreq(struct crypt_config *cc,
+ 		crypto_skcipher_alignmask(any_tfm(cc)) + 1);
  }
  
-+static inline unsigned int crypto_tfm_alg_bulk(struct crypto_tfm *tfm)
++static void crypt_init_sg_table(struct scatterlist *sgl)
 +{
-+	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_BULK;
++	struct scatterlist *sg;
++	int i;
++
++	for_each_sg(sgl, sg, DM_MAX_SG_LIST, i) {
++		if (i < DM_MAX_SG_LIST - 1 && sg_is_last(sg))
++			sg_unmark_end(sg);
++		else if (i == DM_MAX_SG_LIST - 1)
++			sg_mark_end(sg);
++	}
++
++	for_each_sg(sgl, sg, DM_MAX_SG_LIST, i) {
++		memset(sg, 0, sizeof(struct scatterlist));
++
++		if (i == DM_MAX_SG_LIST - 1)
++			sg_mark_end(sg);
++	}
 +}
 +
- static inline unsigned int crypto_tfm_alg_blocksize(struct crypto_tfm *tfm)
++static void crypt_reinit_sg_table(struct crypt_config *cc)
++{
++	if (!cc->sgt_in.orig_nents || !cc->sgt_out.orig_nents)
++		return;
++
++	crypt_init_sg_table(cc->sgt_in.sgl);
++	crypt_init_sg_table(cc->sgt_out.sgl);
++}
++
++static int crypt_alloc_sg_table(struct crypt_config *cc)
++{
++	unsigned int bulk_mode = skcipher_is_bulk_mode(any_tfm(cc));
++	int ret = 0;
++
++	if (!bulk_mode)
++		goto out_skip_alloc;
++
++	ret = sg_alloc_table(&cc->sgt_in, DM_MAX_SG_LIST, GFP_KERNEL);
++	if (ret)
++		goto out_skip_alloc;
++
++	ret = sg_alloc_table(&cc->sgt_out, DM_MAX_SG_LIST, GFP_KERNEL);
++	if (ret)
++		goto out_free_table;
++
++	return 0;
++
++out_free_table:
++	sg_free_table(&cc->sgt_in);
++out_skip_alloc:
++	cc->sgt_in.orig_nents = 0;
++	cc->sgt_out.orig_nents = 0;
++
++	return ret;
++}
++
++static int crypt_convert_bulk_block(struct crypt_config *cc,
++				    struct convert_context *ctx,
++				    struct skcipher_request *req)
++{
++	struct bio *bio_in = ctx->bio_in;
++	struct bio *bio_out = ctx->bio_out;
++	unsigned int total_bytes = bio_in->bi_iter.bi_size;
++	unsigned int total_sg_in, total_sg_out;
++	struct scatterlist *sg_in, *sg_out;
++	struct dm_crypt_request *dmreq;
++	u8 *iv;
++	int r;
++
++	if (!cc->sgt_in.orig_nents || !cc->sgt_out.orig_nents)
++		return -EINVAL;
++
++	dmreq = dmreq_of_req(cc, req);
++	iv = iv_of_dmreq(cc, dmreq);
++	dmreq->iv_sector = ctx->cc_sector;
++	dmreq->ctx = ctx;
++
++	total_sg_in = blk_bio_map_sg(bdev_get_queue(bio_in->bi_bdev),
++				     bio_in, cc->sgt_in.sgl);
++	if ((total_sg_in <= 0) || (total_sg_in > DM_MAX_SG_LIST)) {
++		DMERR("%s in sg map error %d, sg table nents[%d]\n",
++		      __func__, total_sg_in, cc->sgt_in.orig_nents);
++		return -EINVAL;
++	}
++
++	ctx->iter_in.bi_size -= total_bytes;
++	sg_in = cc->sgt_in.sgl;
++	sg_out = cc->sgt_in.sgl;
++
++	if (bio_data_dir(bio_in) == READ)
++		goto set_crypt;
++
++	total_sg_out = blk_bio_map_sg(bdev_get_queue(bio_out->bi_bdev),
++				      bio_out, cc->sgt_out.sgl);
++	if ((total_sg_out <= 0) || (total_sg_out > DM_MAX_SG_LIST)) {
++		DMERR("%s out sg map error %d, sg table nents[%d]\n",
++		      __func__, total_sg_out, cc->sgt_out.orig_nents);
++		return -EINVAL;
++	}
++
++	ctx->iter_out.bi_size -= total_bytes;
++	sg_out = cc->sgt_out.sgl;
++
++set_crypt:
++	if (cc->iv_gen_ops) {
++		r = cc->iv_gen_ops->generator(cc, iv, dmreq);
++		if (r < 0)
++			return r;
++	}
++
++	skcipher_request_set_crypt(req, sg_in, sg_out, total_bytes, iv);
++
++	if (bio_data_dir(ctx->bio_in) == WRITE)
++		r = crypto_skcipher_encrypt(req);
++	else
++		r = crypto_skcipher_decrypt(req);
++
++	if (!r && cc->iv_gen_ops && cc->iv_gen_ops->post)
++		r = cc->iv_gen_ops->post(cc, iv, dmreq);
++
++	return r;
++}
++
+ static int crypt_convert_block(struct crypt_config *cc,
+ 			       struct convert_context *ctx,
+ 			       struct skcipher_request *req)
+@@ -920,6 +1047,7 @@ static void crypt_free_req(struct crypt_config *cc,
+ static int crypt_convert(struct crypt_config *cc,
+ 			 struct convert_context *ctx)
  {
- 	return tfm->__crt_alg->cra_blocksize;
++	unsigned int bulk_mode;
+ 	int r;
+ 
+ 	atomic_set(&ctx->cc_pending, 1);
+@@ -930,7 +1058,14 @@ static int crypt_convert(struct crypt_config *cc,
+ 
+ 		atomic_inc(&ctx->cc_pending);
+ 
+-		r = crypt_convert_block(cc, ctx, ctx->req);
++		bulk_mode = skcipher_is_bulk_mode(any_tfm(cc));
++		if (!bulk_mode) {
++			r = crypt_convert_block(cc, ctx, ctx->req);
++		} else {
++			r = crypt_convert_bulk_block(cc, ctx, ctx->req);
++			if (r == -EINVAL)
++				r = crypt_convert_block(cc, ctx, ctx->req);
++		}
+ 
+ 		switch (r) {
+ 		/*
+@@ -1081,6 +1216,7 @@ static void crypt_dec_pending(struct dm_crypt_io *io)
+ 	if (io->ctx.req)
+ 		crypt_free_req(cc, io->ctx.req, base_bio);
+ 
++	crypt_reinit_sg_table(cc);
+ 	base_bio->bi_error = error;
+ 	bio_endio(base_bio);
+ }
+@@ -1563,6 +1699,9 @@ static void crypt_dtr(struct dm_target *ti)
+ 	kzfree(cc->cipher);
+ 	kzfree(cc->cipher_string);
+ 
++	sg_free_table(&cc->sgt_in);
++	sg_free_table(&cc->sgt_out);
++
+ 	/* Must zero key material before freeing */
+ 	kzfree(cc);
+ }
+@@ -1718,6 +1857,10 @@ static int crypt_ctr_cipher(struct dm_target *ti,
+ 		}
+ 	}
+ 
++	ret = crypt_alloc_sg_table(cc);
++	if (ret)
++		DMWARN("Allocate sg table for bulk mode failed");
++
+ 	ret = 0;
+ bad:
+ 	kfree(cipher_api);
 -- 
 1.7.9.5
