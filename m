@@ -1,7 +1,7 @@
 From: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
-Subject: [PATCH v2 1/4] dt-bindings: rng: Northstar Plus SoC rng bindings
-Date: Fri, 27 May 2016 06:10:38 -0400
-Message-ID: <1464343841-29504-2-git-send-email-yendapally.reddy@broadcom.com>
+Subject: [PATCH v2 3/4] ARM: dts: nsp: Add rng device tree entry
+Date: Fri, 27 May 2016 06:10:40 -0400
+Message-ID: <1464343841-29504-4-git-send-email-yendapally.reddy@broadcom.com>
 References: <1464343841-29504-1-git-send-email-yendapally.reddy@broadcom.com>
 Cc: devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -26,41 +26,41 @@ To: Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>,
 	Pankaj Dev <pankaj.dev@st.com>,
 	Richard Weinberger <richard@nod.at>, noltari@gmail.com,
 	Joshua Henderson <joshua.henderson@microchip.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f181.google.com ([209.85.192.181]:35537 "EHLO
+	mail-pf0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755679AbcE0KLO (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 May 2016 06:11:14 -0400
+Received: by mail-pf0-f181.google.com with SMTP id g64so40755708pfb.2
+        for <linux-crypto@vger.kernel.org>; Fri, 27 May 2016 03:11:09 -0700 (PDT)
 In-Reply-To: <1464343841-29504-1-git-send-email-yendapally.reddy@broadcom.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Document the bindings used by Northstar Plus(NSP) SoC random number
-generator.
+Add support for the random number generator to the Northstar Plus
+SoC device tree.
 
 Signed-off-by: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
-Acked-by: Eric Anholt <eric@anholt.net>
 ---
- Documentation/devicetree/bindings/rng/brcm,bcm2835.txt | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ arch/arm/boot/dts/bcm-nsp.dtsi | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt b/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
-index 07ccdaa..aa304d4 100644
---- a/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
-+++ b/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
-@@ -2,7 +2,7 @@ BCM2835 Random number generator
+diff --git a/arch/arm/boot/dts/bcm-nsp.dtsi b/arch/arm/boot/dts/bcm-nsp.dtsi
+index def9e78..1ed829e 100644
+--- a/arch/arm/boot/dts/bcm-nsp.dtsi
++++ b/arch/arm/boot/dts/bcm-nsp.dtsi
+@@ -206,6 +206,11 @@
+ 			brcm,nand-has-wp;
+ 		};
  
- Required properties:
- 
--- compatible : should be "brcm,bcm2835-rng"
-+- compatible : should be "brcm,bcm2835-rng"  or "brcm,bcm-nsp-rng"
- - reg : Specifies base physical address and size of the registers.
- 
- Example:
-@@ -11,3 +11,8 @@ rng {
-         compatible = "brcm,bcm2835-rng";
-         reg = <0x7e104000 0x10>;
- };
++		rng: rng@33000 {
++			compatible = "brcm,bcm-nsp-rng";
++			reg = <0x33000 0x14>;
++		};
 +
-+rng@18033000 {
-+	compatible = "brcm,bcm-nsp-rng";
-+	reg = <0x18033000 0x14>;
-+};
+ 		ccbtimer0: timer@34000 {
+ 			compatible = "arm,sp804";
+ 			reg = <0x34000 0x1000>;
 -- 
 2.1.0
