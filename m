@@ -1,7 +1,7 @@
 From: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
-Subject: [PATCH v2 3/4] ARM: dts: nsp: Add rng device tree entry
-Date: Fri, 27 May 2016 06:10:40 -0400
-Message-ID: <1464343841-29504-4-git-send-email-yendapally.reddy@broadcom.com>
+Subject: [PATCH v2 4/4] hwrng: bcm2835: Read as much data as available
+Date: Fri, 27 May 2016 06:10:41 -0400
+Message-ID: <1464343841-29504-5-git-send-email-yendapally.reddy@broadcom.com>
 References: <1464343841-29504-1-git-send-email-yendapally.reddy@broadcom.com>
 Cc: devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -26,41 +26,48 @@ To: Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>,
 	Pankaj Dev <pankaj.dev@st.com>,
 	Richard Weinberger <richard@nod.at>, noltari@gmail.com,
 	Joshua Henderson <joshua.henderson@microchip.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f181.google.com ([209.85.192.181]:35537 "EHLO
-	mail-pf0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755679AbcE0KLO (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 May 2016 06:11:14 -0400
-Received: by mail-pf0-f181.google.com with SMTP id g64so40755708pfb.2
-        for <linux-crypto@vger.kernel.org>; Fri, 27 May 2016 03:11:09 -0700 (PDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1464343841-29504-1-git-send-email-yendapally.reddy@broadcom.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add support for the random number generator to the Northstar Plus
-SoC device tree.
+Read the requested number of data from the fifo
 
 Signed-off-by: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
+Reviewed-by: Eric Anholt <eric@anholt.net>
 ---
- arch/arm/boot/dts/bcm-nsp.dtsi | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/char/hw_random/bcm2835-rng.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/boot/dts/bcm-nsp.dtsi b/arch/arm/boot/dts/bcm-nsp.dtsi
-index def9e78..1ed829e 100644
---- a/arch/arm/boot/dts/bcm-nsp.dtsi
-+++ b/arch/arm/boot/dts/bcm-nsp.dtsi
-@@ -206,6 +206,11 @@
- 			brcm,nand-has-wp;
- 		};
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+index b1e8b78..75ca820 100644
+--- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -43,6 +43,8 @@ static int bcm2835_rng_read(struct hwrng *rng, void *buf, size_t max,
+ 			       bool wait)
+ {
+ 	void __iomem *rng_base = (void __iomem *)rng->priv;
++	u32 max_words = max / sizeof(u32);
++	u32 num_words, count;
  
-+		rng: rng@33000 {
-+			compatible = "brcm,bcm-nsp-rng";
-+			reg = <0x33000 0x14>;
-+		};
+ 	while ((__raw_readl(rng_base + RNG_STATUS) >> 24) == 0) {
+ 		if (!wait)
+@@ -50,8 +52,14 @@ static int bcm2835_rng_read(struct hwrng *rng, void *buf, size_t max,
+ 		cpu_relax();
+ 	}
+ 
+-	*(u32 *)buf = __raw_readl(rng_base + RNG_DATA);
+-	return sizeof(u32);
++	num_words = readl(rng_base + RNG_STATUS) >> 24;
++	if (num_words > max_words)
++		num_words = max_words;
 +
- 		ccbtimer0: timer@34000 {
- 			compatible = "arm,sp804";
- 			reg = <0x34000 0x1000>;
++	for (count = 0; count < num_words; count++)
++		((u32 *)buf)[count] = readl(rng_base + RNG_DATA);
++
++	return num_words * sizeof(u32);
+ }
+ 
+ static struct hwrng bcm2835_rng_ops = {
 -- 
 2.1.0
