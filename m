@@ -1,73 +1,53 @@
-From: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
-Subject: [PATCH v2 4/4] hwrng: bcm2835: Read as much data as available
-Date: Fri, 27 May 2016 06:10:41 -0400
-Message-ID: <1464343841-29504-5-git-send-email-yendapally.reddy@broadcom.com>
-References: <1464343841-29504-1-git-send-email-yendapally.reddy@broadcom.com>
-Cc: devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	bcm-kernel-feedback-list@broadcom.com,
-	linux-crypto@vger.kernel.org,
-	Yendapally Reddy Dhananjaya Reddy
-	<yendapally.reddy@broadcom.com>
-To: Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>,
-	Stephen Warren <swarren@wwwdotorg.org>,
-	Lee Jones <lee@kernel.org>, Eric Anholt <eric@anholt.net>,
-	Russell King <linux@arm.linux.org.uk>,
-	Ray Jui <rjui@broadcom.com>,
-	Scott Branden <sbranden@broadcom.com>,
-	Jon Mason <jonmason@broadcom.com>,
-	Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Daniel Thompson <daniel.thompson@linaro.org>,
-	Kieran Bingham <kieranbingham@gmail.com>,
-	Pankaj Dev <pankaj.dev@st.com>,
-	Richard Weinberger <richard@nod.at>, noltari@gmail.com,
-	Joshua Henderson <joshua.henderson@microchip.com>
+From: Baolin Wang <baolin.wang@linaro.org>
+Subject: [RFC v2 0/3] Introduce the bulk mode method when sending request to crypto layer
+Date: Fri, 27 May 2016 19:11:21 +0800
+Message-ID: <cover.1464346333.git.baolin.wang@linaro.org>
+Cc: ebiggers3@gmail.com, js1304@gmail.com, tadeusz.struk@intel.com,
+	smueller@chronox.de, standby24x7@gmail.com, shli@kernel.org,
+	dan.j.williams@intel.com, martin.petersen@oracle.com,
+	sagig@mellanox.com, kent.overstreet@gmail.com,
+	keith.busch@intel.com, tj@kernel.org, ming.lei@canonical.com,
+	broonie@kernel.org, arnd@arndb.de, linux-crypto@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+	linux-kernel@vger.kernel.org, baolin.wang@linaro.org
+To: axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
+	dm-devel@redhat.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1464343841-29504-1-git-send-email-yendapally.reddy@broadcom.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Read the requested number of data from the fifo
+This patchset will check if the cipher can support bulk mode, then dm-crypt
+will handle different ways to send requests to crypto layer according to
+cipher mode. For bulk mode, we can use sg table to map the whole bio and
+send all scatterlists of one bio to crypto engine to encrypt or decrypt,
+which can improve the hardware engine's efficiency.
 
-Signed-off-by: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
-Reviewed-by: Eric Anholt <eric@anholt.net>
----
- drivers/char/hw_random/bcm2835-rng.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+As Milan pointed out we need one driver with using the new 'CRYPTO_ALG_BULK'
+flag, I'll add one cipher engine driver with 'CRYPTO_ALG_BULK' flag to test
+this optimization in next version, if I am sure this optimization is on the
+right direction according to your comments.
 
-diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-index b1e8b78..75ca820 100644
---- a/drivers/char/hw_random/bcm2835-rng.c
-+++ b/drivers/char/hw_random/bcm2835-rng.c
-@@ -43,6 +43,8 @@ static int bcm2835_rng_read(struct hwrng *rng, void *buf, size_t max,
- 			       bool wait)
- {
- 	void __iomem *rng_base = (void __iomem *)rng->priv;
-+	u32 max_words = max / sizeof(u32);
-+	u32 num_words, count;
- 
- 	while ((__raw_readl(rng_base + RNG_STATUS) >> 24) == 0) {
- 		if (!wait)
-@@ -50,8 +52,14 @@ static int bcm2835_rng_read(struct hwrng *rng, void *buf, size_t max,
- 		cpu_relax();
- 	}
- 
--	*(u32 *)buf = __raw_readl(rng_base + RNG_DATA);
--	return sizeof(u32);
-+	num_words = readl(rng_base + RNG_STATUS) >> 24;
-+	if (num_words > max_words)
-+		num_words = max_words;
-+
-+	for (count = 0; count < num_words; count++)
-+		((u32 *)buf)[count] = readl(rng_base + RNG_DATA);
-+
-+	return num_words * sizeof(u32);
- }
- 
- static struct hwrng bcm2835_rng_ops = {
+Looking forward to any comments and suggestions. Thanks.
+
+Changes since v1:
+ - Refactor the blk_bio_map_sg() function to avoid duplicated code.
+ - Move the sg table allocation to crypt_ctr_cipher() function to avoid memory
+ allocation in the IO path.
+ - Remove the crypt_sg_entry() function.
+ - Other optimization.
+
+Baolin Wang (3):
+  block: Introduce blk_bio_map_sg() to map one bio
+  crypto: Introduce CRYPTO_ALG_BULK flag
+  md: dm-crypt: Introduce the bulk mode method when sending request
+
+ block/blk-merge.c         |   36 +++++++++--
+ drivers/md/dm-crypt.c     |  145 ++++++++++++++++++++++++++++++++++++++++++++-
+ include/crypto/skcipher.h |    7 +++
+ include/linux/blkdev.h    |    2 +
+ include/linux/crypto.h    |    6 ++
+ 5 files changed, 190 insertions(+), 6 deletions(-)
+
 -- 
-2.1.0
+1.7.9.5
