@@ -1,153 +1,87 @@
-From: David Howells <dhowells@redhat.com>
-Subject: [PATCH] KEYS: Add placeholder for KDF usage with DH
-Date: Thu, 26 May 2016 23:40:47 +0100
-Message-ID: <9470.1464302447@warthog.procyon.org.uk>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: AES-NI: slower than aes-generic?
+Date: Thu, 26 May 2016 22:14:29 -0400
+Message-ID: <20160527021429.GA21331@thunk.org>
+References: <1567400.ZMFoPuCv2K@tauon.atsec.com>
+ <CACXcFmnFn_BDv_xLra-gfSTsOP-diTwtvU4_TndLAv+WuXG4DQ@mail.gmail.com>
+ <4972668.UQ1QRNriDb@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: dhowells@redhat.com,
-	Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org
-To: jmorris@namei.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Sandy Harris <sandyinchina@gmail.com>,
+	Stephan Mueller <stephan.mueller@atsec.com>,
+	linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41006 "EHLO mx1.redhat.com"
+Received: from imap.thunk.org ([74.207.234.97]:38516 "EHLO imap.thunk.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754857AbcEZWku convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 May 2016 18:40:50 -0400
-Content-ID: <9435.1464302422.1@warthog.procyon.org.uk>
+	id S932104AbcE0COh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 26 May 2016 22:14:37 -0400
+Content-Disposition: inline
+In-Reply-To: <4972668.UQ1QRNriDb@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi James,
+On Thu, May 26, 2016 at 08:49:39PM +0200, Stephan Mueller wrote:
+> 
+> Using the kernel crypto API one can relieve the CPU of the crypto work, if a 
+> hardware or assembler implementation is available. This may be of particular 
+> interest for smaller systems. So, for smaller systems (where kernel bloat is 
+> bad, but where now these days more and more hardware crypto support is added), 
+> we must weigh the kernel bloat (of 3 or 4 additional C files for the basic 
+> kernel crypto API logic) against relieving the CPU of work.
 
-Could you pass this along to Linus as soon as possible, please?  This
-alters a new keyctl function added in the current merge window to allow for
-a future extension planned for the next merge window.
+There are a number of caveats with using hardware acceleration; one is
+that many hardware accelerators are optimized for bulk data
+encryption, and so key scheduling, or switching between key schedules,
+can have a higher overhead that a pure software implementation.
 
-Thanks,
-David
----
-From: Stephan Mueller <smueller@chronox.de>
-Date: Thu May 26 23:38:12 2016 +0200
+There have also been situations where the hardware crypto engine is
+actually slower than a highly optimized software implementation.  This
+has been the case for certain ARM SOC's, for example.
 
-KEYS: Add placeholder for KDF usage with DH
+This is not that big of deal, if you are developing a cryptographic
+application (such as file system level encryption, for example) for a
+specific hardware platform (such as a specific Nexus device).  But if
+you are trying to develop a generic service that has to work on a wide
+variety of CPU architectures, and specific CPU/SOC implementations,
+life is a lot more complicated.  I've worked on both problems, let me
+assure you the second is way tricker than the first.
 
-The values computed during Diffie-Hellman key exchange are often used
-in combination with key derivation functions to create cryptographic
-keys.  Add a placeholder for a later implementation to configure a
-key derivation function that will transform the Diffie-Hellman
-result returned by the KEYCTL_DH_COMPUTE command.
+> Then, the use of the DRBG offers users to choose between a Hash/HMAC and CTR 
+> implementation to suit their needs. The DRBG code is agnostic of the 
+> underlying cipher. So, you could even use Blowfish instead of AES or whirlpool 
+> instead of SHA -- these changes are just one entry in drbg_cores[] away 
+> without any code change.
 
-[This patch was stripped down from a patch produced by Mat Martineau that
- had a bug in the compat code - so for the moment Stephan's patch simply
- requires that the placeholder argument must be NULL]
+I really question how much this matters in practice.  Unless you are a
+US Government Agency, where you might be laboring under a Federal
+mandate to use DUAL-EC DRBG (for example), most users really don't
+care about the details of the algorithm used in their random number
+generator.  Giving users choice (or lots of knobs) isn't necessarily
+always a feature, as the many TLS downgrade attacks have demonstrated.
 
-Original-signed-off-by: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
-Signed-off-by: David Howells <dhowells@redhat.com>
----
- Documentation/security/keys.txt |    5 ++++-
- security/keys/compat.c          |    2 +-
- security/keys/dh.c              |    8 +++++++-
- security/keys/internal.h        |    5 +++--
- security/keys/keyctl.c          |    4 ++--
- 5 files changed, 17 insertions(+), 7 deletions(-)
+This is why from my perspectve it's more important to implement an
+interface which is always there, and which by default is secure, to
+minimize the chances that random JV-team kernel developers working for
+a Linux distribution or some consumer electronics manufacturer won't
+actually make things worse.  As the Debian's attempt to "improve" the
+security of OpenSSL demonstrates, it doesn't always end well.  :-)
 
-diff --git a/Documentation/security/keys.txt b/Documentation/security/keys.txt
-index 20d05719bceb..3849814bfe6d 100644
---- a/Documentation/security/keys.txt
-+++ b/Documentation/security/keys.txt
-@@ -826,7 +826,8 @@ The keyctl syscall functions are:
-  (*) Compute a Diffie-Hellman shared secret or public key
- 
-        long keyctl(KEYCTL_DH_COMPUTE, struct keyctl_dh_params *params,
--		   char *buffer, size_t buflen);
-+		   char *buffer, size_t buflen,
-+		   void *reserved);
- 
-      The params struct contains serial numbers for three keys:
- 
-@@ -843,6 +844,8 @@ The keyctl syscall functions are:
-      public key.  If the base is the remote public key, the result is
-      the shared secret.
- 
-+     The reserved argument must be set to NULL.
-+
-      The buffer length must be at least the length of the prime, or zero.
- 
-      If the buffer length is nonzero, the length of the result is
-diff --git a/security/keys/compat.c b/security/keys/compat.c
-index c8783b3b628c..36c80bf5b89c 100644
---- a/security/keys/compat.c
-+++ b/security/keys/compat.c
-@@ -134,7 +134,7 @@ COMPAT_SYSCALL_DEFINE5(keyctl, u32, option,
- 
- 	case KEYCTL_DH_COMPUTE:
- 		return keyctl_dh_compute(compat_ptr(arg2), compat_ptr(arg3),
--					 arg4);
-+					 arg4, compat_ptr(arg5));
- 
- 	default:
- 		return -EOPNOTSUPP;
-diff --git a/security/keys/dh.c b/security/keys/dh.c
-index 880505a4b9f1..531ed2ec132f 100644
---- a/security/keys/dh.c
-+++ b/security/keys/dh.c
-@@ -78,7 +78,8 @@ error:
- }
- 
- long keyctl_dh_compute(struct keyctl_dh_params __user *params,
--		       char __user *buffer, size_t buflen)
-+		       char __user *buffer, size_t buflen,
-+		       void __user *reserved)
- {
- 	long ret;
- 	MPI base, private, prime, result;
-@@ -97,6 +98,11 @@ long keyctl_dh_compute(struct keyctl_dh_params __user *params,
- 		goto out;
- 	}
- 
-+	if (reserved) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
- 	keylen = mpi_from_key(pcopy.prime, buflen, &prime);
- 	if (keylen < 0 || !prime) {
- 		/* buflen == 0 may be used to query the required buffer size,
-diff --git a/security/keys/internal.h b/security/keys/internal.h
-index 8ec7a528365d..a705a7d92ad7 100644
---- a/security/keys/internal.h
-+++ b/security/keys/internal.h
-@@ -260,10 +260,11 @@ static inline long keyctl_get_persistent(uid_t uid, key_serial_t destring)
- 
- #ifdef CONFIG_KEY_DH_OPERATIONS
- extern long keyctl_dh_compute(struct keyctl_dh_params __user *, char __user *,
--			      size_t);
-+			      size_t, void __user *);
- #else
- static inline long keyctl_dh_compute(struct keyctl_dh_params __user *params,
--				     char __user *buffer, size_t buflen)
-+				     char __user *buffer, size_t buflen,
-+				     void __user *reserved)
- {
- 	return -EOPNOTSUPP;
- }
-diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
-index 3b135a0af344..d580ad06b792 100644
---- a/security/keys/keyctl.c
-+++ b/security/keys/keyctl.c
-@@ -1688,8 +1688,8 @@ SYSCALL_DEFINE5(keyctl, int, option, unsigned long, arg2, unsigned long, arg3,
- 
- 	case KEYCTL_DH_COMPUTE:
- 		return keyctl_dh_compute((struct keyctl_dh_params __user *) arg2,
--					 (char __user *) arg3,
--					 (size_t) arg4);
-+					 (char __user *) arg3, (size_t) arg4,
-+					 (void __user *) arg5);
- 
- 	default:
- 		return -EOPNOTSUPP;
+If we implement something which happens to result in a 2 minute stall
+in boot times, the danger is that a clueless engineer at Sony, or LGE,
+or Motorola, or BMW, or Toyota, etc, will "fix" the problem without
+telling anyone about what they did, and we might not notice right away
+that the fix was in fact catastrophically bad.
+
+These aren't the standard things which academics tend to worry about,
+which tend to assume that attackers will be able to read arbitrary
+kernel memory, and recovering such an exposure of the entropy pool is
+_the_ most important thing to worry about (as opposed to say, the
+contents of the user's private keys in the ssh-agent process).  But
+this will perhaps explain why worrying about accomodating users who
+care about whether Blowfish or AES should be used in their random
+number generator isn't near the top of my personal priority list.
+
+Cheers,
+
+						- Ted
