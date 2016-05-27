@@ -1,40 +1,29 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: tcrypt failing on hmac(crc32)
-Date: Fri, 27 May 2016 11:24:23 +0200
-Message-ID: <2026070.aoSVfl4Uuo@tauon.atsec.com>
-References: <20160525070752.GB6559@suse.de> <20160525130528.GA30676@suse.de> <20160527091932.GB924@suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Marcus Meissner <meissner@suse.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34904 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932529AbcE0JY0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 May 2016 05:24:26 -0400
-In-Reply-To: <20160527091932.GB924@suse.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH 0/6] crypto: talitos - implementation of AEAD for SEC1
+Date: Fri, 27 May 2016 11:32:32 +0200 (CEST)
+Message-ID: <cover.1464330501.git.christophe.leroy@c-s.fr>
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-crypto@vger.kernel.org
+To: Kim Phillips <kim.arm@arm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David S Miller <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 27. Mai 2016, 11:19:32 schrieb Marcus Meissner:
+This set of patches provides the implementation of AEAD for
+talitos SEC1.
 
-Hi Marcus,
+Christophe Leroy (6):
+  crypto: talitos - using helpers for all talitos_ptr operations
+  crypto: talitos - making mapping helpers more generic
+  crypto: talitos - Implement AEAD for SEC1 using HMAC_SNOOP_NO_AFEU
+  crypto: talitos - sg_to_link_tbl() not used anymore, remove it
+  crypto: talitos - implement cra_priority
+  crypto: talitos - templates for AEAD using HMAC_SNOOP_NO_AFEU
 
-> 
-> And it actually is:
-> 
-> [  180.942532] hmac: blocksize check failed, ds=4, cra_blocksize=1, ss=4
-> [  180.942541] alg: hash: Failed to load transform for hmac(crc32): -2
-> [  180.989191] tcrypt: one or more tests failed!
-> 
-> Should I remove hmac(crc32) from the testmgr list?
+ drivers/crypto/talitos.c | 657 +++++++++++++++++++++++++++++------------------
+ 1 file changed, 410 insertions(+), 247 deletions(-)
 
-I am wondering about that: there are test vectors for this cipher, so there 
-seem to be valid use cases. But the implementation is broken and nobody 
-noticed up to now. So, it seems it is not in use?
-
-Given that, I would think that hmac(crc32) could be removed from testmgr.
-
-Ciao
-Stephan
+-- 
+2.1.0
