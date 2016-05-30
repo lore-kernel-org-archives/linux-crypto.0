@@ -1,155 +1,51 @@
 From: Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH 2/5] random: make /dev/urandom scalable for silly userspace programs
-Date: Mon, 30 May 2016 01:39:22 -0400
-Message-ID: <1464586765-14436-3-git-send-email-tytso@mit.edu>
+Subject: [PATCH 5/5] random: properly align get_random_int_hash
+Date: Mon, 30 May 2016 01:39:25 -0400
+Message-ID: <1464586765-14436-6-git-send-email-tytso@mit.edu>
 References: <1464586765-14436-1-git-send-email-tytso@mit.edu>
 Cc: smueller@chronox.de, herbert@gondor.apana.org.au,
 	andi@firstfloor.org, sandyinchina@gmail.com,
 	cryptography@lakedaemon.net, jsd@av8n.com, hpa@zytor.com,
-	linux-crypto@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>
+	linux-crypto@vger.kernel.org, Eric Biggers <ebiggers3@gmail.com>,
+	Theodore Ts'o <tytso@mit.edu>
 To: Linux Kernel Developers List <linux-kernel@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1464586765-14436-1-git-send-email-tytso@mit.edu>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On a system with a 4 socket (NUMA) system where a large number of
-application threads were all trying to read from /dev/urandom, this
-can result in the system spending 80% of its time contending on the
-global urandom spinlock.  The application should have used its own
-PRNG, but let's try to help it from running, lemming-like, straight
-over the locking cliff.
+From: Eric Biggers <ebiggers3@gmail.com>
 
-Reported-by: Andi Kleen <ak@linux.intel.com>
+get_random_long() reads from the get_random_int_hash array using an
+unsigned long pointer.  For this code to be guaranteed correct on all
+architectures, the array must be aligned to an unsigned long boundary.
+
+Signed-off-by: Eric Biggers <ebiggers3@gmail.com>
 Signed-off-by: Theodore Ts'o <tytso@mit.edu>
 ---
- drivers/char/random.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 53 insertions(+), 4 deletions(-)
+ drivers/char/random.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 3a4d865..1778c84 100644
+index 860862f..90fb569 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -434,6 +434,8 @@ struct crng_state primary_crng = {
+@@ -2033,13 +2033,15 @@ int random_int_secret_init(void)
+ 	return 0;
+ }
+ 
++static DEFINE_PER_CPU(__u32 [MD5_DIGEST_WORDS], get_random_int_hash)
++		__aligned(sizeof(unsigned long));
++
+ /*
+  * Get a random word for internal kernel use only. Similar to urandom but
+  * with the goal of minimal entropy pool depletion. As a result, the random
+  * value is not cryptographically secure but for several uses the cost of
+  * depleting entropy is too high
   */
- static int crng_init = 0;
- #define crng_ready() (likely(crng_init >= 2))
-+static void _extract_crng(struct crng_state *crng,
-+			  __u8 out[CHACHA20_BLOCK_SIZE]);
- static void extract_crng(__u8 out[CHACHA20_BLOCK_SIZE]);
- static void process_random_ready_list(void);
- 
-@@ -754,6 +756,17 @@ static void credit_entropy_bits_safe(struct entropy_store *r, int nbits)
- 
- static DECLARE_WAIT_QUEUE_HEAD(crng_init_wait);
- 
-+#ifdef CONFIG_NUMA
-+/*
-+ * Hack to deal with crazy userspace progams when they are all trying
-+ * to access /dev/urandom in parallel.  The programs are almost
-+ * certainly doing something terribly wrong, but we'll work around
-+ * their brain damage.
-+ */
-+static struct crng_state **crng_node_pool __read_mostly;
-+#endif
-+
-+
- static void _initialize_crng(struct crng_state *crng)
+-static DEFINE_PER_CPU(__u32 [MD5_DIGEST_WORDS], get_random_int_hash);
+ unsigned int get_random_int(void)
  {
- 	int		i;
-@@ -774,11 +787,13 @@ static void _initialize_crng(struct crng_state *crng)
- 	crng->init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
- }
- 
-+#ifdef CONFIG_NUMA
- static void initialize_crng(struct crng_state *crng)
- {
- 	_initialize_crng(crng);
- 	spin_lock_init(&crng->lock);
- }
-+#endif
- 
- static int crng_fast_load(__u32 pool[4])
- {
-@@ -818,7 +833,7 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
- 		if (num == 0)
- 			return;
- 	} else
--		extract_crng(buf.block);
-+		_extract_crng(&primary_crng, buf.block);
- 	spin_lock_irqsave(&primary_crng.lock, flags);
- 	for (i = 0; i < 8; i++) {
- 		unsigned long	rv;
-@@ -838,19 +853,26 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
- 	spin_unlock_irqrestore(&primary_crng.lock, flags);
- }
- 
-+static inline void maybe_reseed_primary_crng(void)
-+{
-+	if (crng_init > 2 &&
-+	    time_after(jiffies, primary_crng.init_time + CRNG_RESEED_INTERVAL))
-+		crng_reseed(&primary_crng, &input_pool);
-+}
-+
- static inline void crng_wait_ready(void)
- {
- 	wait_event_interruptible(crng_init_wait, crng_ready());
- }
- 
--static void extract_crng(__u8 out[CHACHA20_BLOCK_SIZE])
-+static void _extract_crng(struct crng_state *crng,
-+			  __u8 out[CHACHA20_BLOCK_SIZE])
- {
- 	unsigned long v, flags;
--	struct crng_state *crng = &primary_crng;
- 
- 	if (crng_init > 2 &&
- 	    time_after(jiffies, crng->init_time + CRNG_RESEED_INTERVAL))
--		crng_reseed(crng, &input_pool);
-+		crng_reseed(crng, crng == &primary_crng ? &input_pool : NULL);
- 	spin_lock_irqsave(&crng->lock, flags);
- 	if (arch_get_random_long(&v))
- 		crng->state[14] ^= v;
-@@ -860,6 +882,17 @@ static void extract_crng(__u8 out[CHACHA20_BLOCK_SIZE])
- 	spin_unlock_irqrestore(&crng->lock, flags);
- }
- 
-+static void extract_crng(__u8 out[CHACHA20_BLOCK_SIZE])
-+{
-+#ifndef CONFIG_NUMA
-+	struct crng_state *crng = &primary_crng;
-+#else
-+	struct crng_state *crng = crng_node_pool[numa_node_id()];
-+#endif
-+
-+	_extract_crng(crng, out);
-+}
-+
- static ssize_t extract_crng_user(void __user *buf, size_t nbytes)
- {
- 	ssize_t ret = 0, i;
-@@ -1573,6 +1606,22 @@ static void init_std_data(struct entropy_store *r)
-  */
- static int rand_initialize(void)
- {
-+#ifdef CONFIG_NUMA
-+	int i;
-+	int num_nodes = num_possible_nodes();
-+	struct crng_state *crng;
-+
-+	crng_node_pool = kmalloc(num_nodes * sizeof(void *),
-+				 GFP_KERNEL|__GFP_NOFAIL);
-+
-+	for (i=0; i < num_nodes; i++) {
-+		crng = kmalloc(sizeof(struct crng_state),
-+			       GFP_KERNEL | __GFP_NOFAIL);
-+		initialize_crng(crng);
-+		crng_node_pool[i] = crng;
-+
-+	}
-+#endif
- 	init_std_data(&input_pool);
- 	init_std_data(&blocking_pool);
- 	_initialize_crng(&primary_crng);
+ 	__u32 *hash;
 -- 
 2.5.0
