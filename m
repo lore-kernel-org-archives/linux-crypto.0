@@ -1,43 +1,109 @@
 From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH v2 0/2] crypto: engine: permit to enqueue ashash_request
-Date: Mon, 30 May 2016 15:32:00 +0200
-Message-ID: <1464615122-16685-1-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH v2 2/2] crypto: omap: convert to the new cryptoengine API
+Date: Mon, 30 May 2016 15:32:02 +0200
+Message-ID: <1464615122-16685-3-git-send-email-clabbe.montjoie@gmail.com>
+References: <1464615122-16685-1-git-send-email-clabbe.montjoie@gmail.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	LABBE Corentin <clabbe.montjoie@gmail.com>
 To: herbert@gondor.apana.org.au, davem@davemloft.net,
 	baolin.wang@linaro.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:33595 "EHLO
-	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932508AbcE3NcZ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 30 May 2016 09:32:25 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1464615122-16685-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello
+Since the crypto engine has been converted to use crypto_async_request
+instead of ablkcipher_request, minor changes are needed to use it.
 
-I wanted to use the crypto engine for my Allwinner crypto driver but something
-prevented me to use it: it cannot enqueue hash requests.
-The first patch convert crypto engine to permit enqueuing of ahash_requests.
-The second patch convert the only driver using crypto engine.
-
-The second patch was only compile tested but the crypto engine with
-hash support was tested on two different offtree driver (sun4i-ss and sun8i-ce)
-
-Regards
-
-Changes since v1:
-- rebased on cryptodev for handling omap-des
-
-LABBE Corentin (2):
-  crypto: engine: permit to enqueue ashash_request
-  crypto: omap: convert to the new cryptoengine API
-
- crypto/crypto_engine.c    | 17 +++++++----------
+Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+---
  drivers/crypto/omap-aes.c | 10 ++++++----
- include/crypto/algapi.h   | 14 +++++++-------
- 3 files changed, 20 insertions(+), 21 deletions(-)
+ drivers/crypto/omap-des.c | 10 ++++++----
+ 2 files changed, 12 insertions(+), 8 deletions(-)
 
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index ce174d3..7007f13 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -519,7 +519,7 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
+ 
+ 	pr_debug("err: %d\n", err);
+ 
+-	crypto_finalize_request(dd->engine, req, err);
++	crypto_finalize_request(dd->engine, &req->base, err);
+ }
+ 
+ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
+@@ -592,14 +592,15 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
+ 				 struct ablkcipher_request *req)
+ {
+ 	if (req)
+-		return crypto_transfer_request_to_engine(dd->engine, req);
++		return crypto_transfer_request_to_engine(dd->engine, &req->base);
+ 
+ 	return 0;
+ }
+ 
+ static int omap_aes_prepare_req(struct crypto_engine *engine,
+-				struct ablkcipher_request *req)
++				struct crypto_async_request *areq)
+ {
++	struct ablkcipher_request *req = ablkcipher_request_cast(areq);
+ 	struct omap_aes_ctx *ctx = crypto_ablkcipher_ctx(
+ 			crypto_ablkcipher_reqtfm(req));
+ 	struct omap_aes_dev *dd = omap_aes_find_dev(ctx);
+@@ -642,8 +643,9 @@ static int omap_aes_prepare_req(struct crypto_engine *engine,
+ }
+ 
+ static int omap_aes_crypt_req(struct crypto_engine *engine,
+-			      struct ablkcipher_request *req)
++			      struct crypto_async_request *areq)
+ {
++	struct ablkcipher_request *req = ablkcipher_request_cast(areq);
+ 	struct omap_aes_ctx *ctx = crypto_ablkcipher_ctx(
+ 			crypto_ablkcipher_reqtfm(req));
+ 	struct omap_aes_dev *dd = omap_aes_find_dev(ctx);
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index 3eedb03..0da5686 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -506,7 +506,7 @@ static void omap_des_finish_req(struct omap_des_dev *dd, int err)
+ 	pr_debug("err: %d\n", err);
+ 
+ 	pm_runtime_put(dd->dev);
+-	crypto_finalize_request(dd->engine, req, err);
++	crypto_finalize_request(dd->engine, &req->base, err);
+ }
+ 
+ static int omap_des_crypt_dma_stop(struct omap_des_dev *dd)
+@@ -572,14 +572,15 @@ static int omap_des_handle_queue(struct omap_des_dev *dd,
+ 				 struct ablkcipher_request *req)
+ {
+ 	if (req)
+-		return crypto_transfer_request_to_engine(dd->engine, req);
++		return crypto_transfer_request_to_engine(dd->engine, &req->base);
+ 
+ 	return 0;
+ }
+ 
+ static int omap_des_prepare_req(struct crypto_engine *engine,
+-				struct ablkcipher_request *req)
++				struct crypto_async_request *areq)
+ {
++	struct ablkcipher_request *req = ablkcipher_request_cast(areq);
+ 	struct omap_des_ctx *ctx = crypto_ablkcipher_ctx(
+ 			crypto_ablkcipher_reqtfm(req));
+ 	struct omap_des_dev *dd = omap_des_find_dev(ctx);
+@@ -620,8 +621,9 @@ static int omap_des_prepare_req(struct crypto_engine *engine,
+ }
+ 
+ static int omap_des_crypt_req(struct crypto_engine *engine,
+-			      struct ablkcipher_request *req)
++			      struct crypto_async_request *areq)
+ {
++	struct ablkcipher_request *req = ablkcipher_request_cast(areq);
+ 	struct omap_des_ctx *ctx = crypto_ablkcipher_ctx(
+ 			crypto_ablkcipher_reqtfm(req));
+ 	struct omap_des_dev *dd = omap_des_find_dev(ctx);
 -- 
 2.7.3
