@@ -1,74 +1,155 @@
 From: Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH 3/5] random: add interrupt callback to VMBus IRQ handler
-Date: Mon, 30 May 2016 01:39:23 -0400
-Message-ID: <1464586765-14436-4-git-send-email-tytso@mit.edu>
+Subject: [PATCH 2/5] random: make /dev/urandom scalable for silly userspace programs
+Date: Mon, 30 May 2016 01:39:22 -0400
+Message-ID: <1464586765-14436-3-git-send-email-tytso@mit.edu>
 References: <1464586765-14436-1-git-send-email-tytso@mit.edu>
 Cc: smueller@chronox.de, herbert@gondor.apana.org.au,
 	andi@firstfloor.org, sandyinchina@gmail.com,
 	cryptography@lakedaemon.net, jsd@av8n.com, hpa@zytor.com,
-	linux-crypto@vger.kernel.org,
-	Stephan Mueller <stephan.mueller@atsec.com>,
-	Theodore Ts'o <tytso@mit.edu>
+	linux-crypto@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>
 To: Linux Kernel Developers List <linux-kernel@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:45496 "EHLO imap.thunk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1161105AbcE3FkQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 30 May 2016 01:40:16 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1464586765-14436-1-git-send-email-tytso@mit.edu>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Stephan Mueller <smueller@chronox.de>
+On a system with a 4 socket (NUMA) system where a large number of
+application threads were all trying to read from /dev/urandom, this
+can result in the system spending 80% of its time contending on the
+global urandom spinlock.  The application should have used its own
+PRNG, but let's try to help it from running, lemming-like, straight
+over the locking cliff.
 
-The Hyper-V Linux Integration Services use the VMBus implementation for
-communication with the Hypervisor. VMBus registers its own interrupt
-handler that completely bypasses the common Linux interrupt handling.
-This implies that the interrupt entropy collector is not triggered.
-
-This patch adds the interrupt entropy collection callback into the VMBus
-interrupt handler function.
-
-Signed-off-by: Stephan Mueller <stephan.mueller@atsec.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Reported-by: Andi Kleen <ak@linux.intel.com>
 Signed-off-by: Theodore Ts'o <tytso@mit.edu>
 ---
- drivers/char/random.c  | 1 +
- drivers/hv/vmbus_drv.c | 3 +++
- 2 files changed, 4 insertions(+)
+ drivers/char/random.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 53 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 1778c84..bf370a3 100644
+index 3a4d865..1778c84 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -1141,6 +1141,7 @@ void add_interrupt_randomness(int irq, int irq_flags)
- 	/* award one bit for the contents of the fast pool */
- 	credit_entropy_bits(r, credit + 1);
- }
-+EXPORT_SYMBOL_GPL(add_interrupt_randomness);
+@@ -434,6 +434,8 @@ struct crng_state primary_crng = {
+  */
+ static int crng_init = 0;
+ #define crng_ready() (likely(crng_init >= 2))
++static void _extract_crng(struct crng_state *crng,
++			  __u8 out[CHACHA20_BLOCK_SIZE]);
+ static void extract_crng(__u8 out[CHACHA20_BLOCK_SIZE]);
+ static void process_random_ready_list(void);
  
- #ifdef CONFIG_BLOCK
- void add_disk_randomness(struct gendisk *disk)
-diff --git a/drivers/hv/vmbus_drv.c b/drivers/hv/vmbus_drv.c
-index 952f20f..e82f7e1 100644
---- a/drivers/hv/vmbus_drv.c
-+++ b/drivers/hv/vmbus_drv.c
-@@ -42,6 +42,7 @@
- #include <linux/screen_info.h>
- #include <linux/kdebug.h>
- #include <linux/efi.h>
-+#include <linux/random.h>
- #include "hyperv_vmbus.h"
+@@ -754,6 +756,17 @@ static void credit_entropy_bits_safe(struct entropy_store *r, int nbits)
  
- static struct acpi_device  *hv_acpi_dev;
-@@ -806,6 +807,8 @@ static void vmbus_isr(void)
- 		else
- 			tasklet_schedule(hv_context.msg_dpc[cpu]);
- 	}
+ static DECLARE_WAIT_QUEUE_HEAD(crng_init_wait);
+ 
++#ifdef CONFIG_NUMA
++/*
++ * Hack to deal with crazy userspace progams when they are all trying
++ * to access /dev/urandom in parallel.  The programs are almost
++ * certainly doing something terribly wrong, but we'll work around
++ * their brain damage.
++ */
++static struct crng_state **crng_node_pool __read_mostly;
++#endif
 +
-+	add_interrupt_randomness(HYPERVISOR_CALLBACK_VECTOR, 0);
++
+ static void _initialize_crng(struct crng_state *crng)
+ {
+ 	int		i;
+@@ -774,11 +787,13 @@ static void _initialize_crng(struct crng_state *crng)
+ 	crng->init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
  }
  
++#ifdef CONFIG_NUMA
+ static void initialize_crng(struct crng_state *crng)
+ {
+ 	_initialize_crng(crng);
+ 	spin_lock_init(&crng->lock);
+ }
++#endif
  
+ static int crng_fast_load(__u32 pool[4])
+ {
+@@ -818,7 +833,7 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
+ 		if (num == 0)
+ 			return;
+ 	} else
+-		extract_crng(buf.block);
++		_extract_crng(&primary_crng, buf.block);
+ 	spin_lock_irqsave(&primary_crng.lock, flags);
+ 	for (i = 0; i < 8; i++) {
+ 		unsigned long	rv;
+@@ -838,19 +853,26 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
+ 	spin_unlock_irqrestore(&primary_crng.lock, flags);
+ }
+ 
++static inline void maybe_reseed_primary_crng(void)
++{
++	if (crng_init > 2 &&
++	    time_after(jiffies, primary_crng.init_time + CRNG_RESEED_INTERVAL))
++		crng_reseed(&primary_crng, &input_pool);
++}
++
+ static inline void crng_wait_ready(void)
+ {
+ 	wait_event_interruptible(crng_init_wait, crng_ready());
+ }
+ 
+-static void extract_crng(__u8 out[CHACHA20_BLOCK_SIZE])
++static void _extract_crng(struct crng_state *crng,
++			  __u8 out[CHACHA20_BLOCK_SIZE])
+ {
+ 	unsigned long v, flags;
+-	struct crng_state *crng = &primary_crng;
+ 
+ 	if (crng_init > 2 &&
+ 	    time_after(jiffies, crng->init_time + CRNG_RESEED_INTERVAL))
+-		crng_reseed(crng, &input_pool);
++		crng_reseed(crng, crng == &primary_crng ? &input_pool : NULL);
+ 	spin_lock_irqsave(&crng->lock, flags);
+ 	if (arch_get_random_long(&v))
+ 		crng->state[14] ^= v;
+@@ -860,6 +882,17 @@ static void extract_crng(__u8 out[CHACHA20_BLOCK_SIZE])
+ 	spin_unlock_irqrestore(&crng->lock, flags);
+ }
+ 
++static void extract_crng(__u8 out[CHACHA20_BLOCK_SIZE])
++{
++#ifndef CONFIG_NUMA
++	struct crng_state *crng = &primary_crng;
++#else
++	struct crng_state *crng = crng_node_pool[numa_node_id()];
++#endif
++
++	_extract_crng(crng, out);
++}
++
+ static ssize_t extract_crng_user(void __user *buf, size_t nbytes)
+ {
+ 	ssize_t ret = 0, i;
+@@ -1573,6 +1606,22 @@ static void init_std_data(struct entropy_store *r)
+  */
+ static int rand_initialize(void)
+ {
++#ifdef CONFIG_NUMA
++	int i;
++	int num_nodes = num_possible_nodes();
++	struct crng_state *crng;
++
++	crng_node_pool = kmalloc(num_nodes * sizeof(void *),
++				 GFP_KERNEL|__GFP_NOFAIL);
++
++	for (i=0; i < num_nodes; i++) {
++		crng = kmalloc(sizeof(struct crng_state),
++			       GFP_KERNEL | __GFP_NOFAIL);
++		initialize_crng(crng);
++		crng_node_pool[i] = crng;
++
++	}
++#endif
+ 	init_std_data(&input_pool);
+ 	init_std_data(&blocking_pool);
+ 	_initialize_crng(&primary_crng);
 -- 
 2.5.0
