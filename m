@@ -1,58 +1,45 @@
-From: Nicolai Stange <nicstange@gmail.com>
-Subject: Re: [PATCH 0/5] refactor mpi_read_from_buffer()
-Date: Tue, 31 May 2016 21:07:29 +0200
-Message-ID: <87r3cihwr2.fsf@gmail.com>
-References: <1464297595-24032-1-git-send-email-nicstange@gmail.com>
-	<20160531101909.GL15376@gondor.apana.org.au>
+From: Megha Dey <megha.dey@intel.com>
+Subject: Re: [PATCH 1/7] crypto : stylistic cleanup in sha1-mb
+Date: Tue, 31 May 2016 13:01:56 -0700
+Message-ID: <1464724916.9394.2.camel@megha-Z97X-UD7-TH>
+References: <1463704984-2136-1-git-send-email-megha.dey@intel.com>
+	 <20160531081311.GA14591@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Nicolai Stange <nicstange@gmail.com>,
-	David Howells <dhowells@redhat.com>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	Michal Marek <mmarek@suse.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	fenghua.yu@intel.com
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:36152 "EHLO
-	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751375AbcEaTHc (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 31 May 2016 15:07:32 -0400
-In-Reply-To: <20160531101909.GL15376@gondor.apana.org.au> (Herbert Xu's
-	message of "Tue, 31 May 2016 18:19:09 +0800")
+Received: from mga14.intel.com ([192.55.52.115]:1543 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751341AbcEaT4c (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 31 May 2016 15:56:32 -0400
+In-Reply-To: <20160531081311.GA14591@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
+On Tue, 2016-05-31 at 16:13 +0800, Herbert Xu wrote:
+> On Thu, May 19, 2016 at 05:43:04PM -0700, Megha Dey wrote:
+> > From: Megha Dey <megha.dey@linux.intel.com>
+> > 
+> > Currently there are several checkpatch warnings in the sha1_mb.c file:
+> > 'WARNING: line over 80 characters' in the sha1_mb.c file. Also, the
+> > syntax of some multi-line comments are not correct. This patch fixes
+> > these issues.
+> > 
+> > Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
+> 
+> This patch says 1/7 but there is no cover letter and I've only
+> seen patches 1 and 2.  What's going on?
 
-> On Thu, May 26, 2016 at 11:19:50PM +0200, Nicolai Stange wrote:
->> mpi_read_from_buffer() and mpi_read_raw_data() do almost the same and share a
->> fair amount of common code.
->> 
->> This patchset attempts to rewrite mpi_read_from_buffer() in order to implement
->> it in terms of mpi_read_raw_data().
->> 
->> The patches 1 and 3, i.e.
->>   "lib/mpi: mpi_read_from_buffer(): return error code"
->> and
->>   "lib/mpi: mpi_read_from_buffer(): return -EINVAL upon too short buffer"
->> do the groundwork in that they move any error detection unique to
->> mpi_read_from_buffer() out of the data handling loop.
->> 
->> The patches 2 and 4, that is
->>   "lib/digsig: digsig_verify_rsa(): return -EINVAL if modulo length is zero"
->> and
->>   "lib/mpi: mpi_read_from_buffer(): sanitize short buffer printk"
->> are not strictly necessary for the refactoring: they cleanup some minor oddities
->> related to error handling I came across.
->> 
->> Finally, the last patch in this series,
->>   "lib/mpi: refactor mpi_read_from_buffer() in terms of mpi_read_raw_data()"
->> actually does what this series is all about.
->> 
->> 
->> Applicable to linux-next-20160325.
->
-> All applied.
+Herbert , I had 7 patches for the async+avx2 sha256-mb implementation. I
+had sent just the async related changes here. However, I will resend the
+patches as 2 sets. One which has only async implementation changes and
+the other which has only sha256-mb avx2 implementation changes. Please
+disregard the current patches and review the ones I will be sending
+again.
 
-Thanks! (As well as for applying the separately sent patches, of course)
+> 
+> Cheers,
