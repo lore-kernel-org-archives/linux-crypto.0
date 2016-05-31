@@ -1,55 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/5] refactor mpi_read_from_buffer()
-Date: Tue, 31 May 2016 18:19:09 +0800
-Message-ID: <20160531101909.GL15376@gondor.apana.org.au>
-References: <1464297595-24032-1-git-send-email-nicstange@gmail.com>
+Subject: Re: [PATCH] crypto: s5p-sss - Use consistent indentation for
+ variables and members
+Date: Tue, 31 May 2016 18:19:54 +0800
+Message-ID: <20160531101954.GN15376@gondor.apana.org.au>
+References: <1464349780-27674-1-git-send-email-k.kozlowski@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: David Howells <dhowells@redhat.com>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	Michal Marek <mmarek@suse.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Nicolai Stange <nicstange@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55041 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751284AbcEaKTT (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 31 May 2016 06:19:19 -0400
+Cc: davem@davemloft.net, Vladimir Zapolskiy <vz@mleia.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-samsung-soc@vger.kernel.org,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1464297595-24032-1-git-send-email-nicstange@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1464349780-27674-1-git-send-email-k.kozlowski@samsung.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, May 26, 2016 at 11:19:50PM +0200, Nicolai Stange wrote:
-> mpi_read_from_buffer() and mpi_read_raw_data() do almost the same and share a
-> fair amount of common code.
+On Fri, May 27, 2016 at 01:49:40PM +0200, Krzysztof Kozlowski wrote:
+> Bring some consistency by:
+> 1. Replacing fixed-space indentation of structure members with just
+>    tabs.
+> 2. Remove indentation in declaration of local variable between type and
+>    name.  Driver was mixing usage of such indentation and lack of it.
+>    When removing indentation, reorder variables in
+>    reversed-christmas-tree order with first variables being initialized
+>    ones.
 > 
-> This patchset attempts to rewrite mpi_read_from_buffer() in order to implement
-> it in terms of mpi_read_raw_data().
-> 
-> The patches 1 and 3, i.e.
->   "lib/mpi: mpi_read_from_buffer(): return error code"
-> and
->   "lib/mpi: mpi_read_from_buffer(): return -EINVAL upon too short buffer"
-> do the groundwork in that they move any error detection unique to
-> mpi_read_from_buffer() out of the data handling loop.
-> 
-> The patches 2 and 4, that is
->   "lib/digsig: digsig_verify_rsa(): return -EINVAL if modulo length is zero"
-> and
->   "lib/mpi: mpi_read_from_buffer(): sanitize short buffer printk"
-> are not strictly necessary for the refactoring: they cleanup some minor oddities
-> related to error handling I came across.
-> 
-> Finally, the last patch in this series,
->   "lib/mpi: refactor mpi_read_from_buffer() in terms of mpi_read_raw_data()"
-> actually does what this series is all about.
-> 
-> 
-> Applicable to linux-next-20160325.
+> Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
 
-All applied.
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
