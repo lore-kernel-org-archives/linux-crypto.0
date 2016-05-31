@@ -1,98 +1,58 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v4 1/5] crypto: DRBG - externalize DRBG functions for LRNG
-Date: Tue, 31 May 2016 20:37:35 +0200
-Message-ID: <1727532.koGhzUTtM4@positron.chronox.de>
-References: <1668650.acZVSyjHlL@positron.chronox.de>
+From: Nicolai Stange <nicstange@gmail.com>
+Subject: Re: [PATCH 0/5] refactor mpi_read_from_buffer()
+Date: Tue, 31 May 2016 21:07:29 +0200
+Message-ID: <87r3cihwr2.fsf@gmail.com>
+References: <1464297595-24032-1-git-send-email-nicstange@gmail.com>
+	<20160531101909.GL15376@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Ted Tso <tytso@mit.edu>, Andi Kleen <andi@firstfloor.org>,
-	sandyinchina@gmail.com, Jason Cooper <cryptography@lakedaemon.net>,
-	John Denker <jsd@av8n.com>,
-	"H. Peter Anvin" <hpa@linux.intel.com>,
-	Joe Perches <joe@perches.com>, Pavel Machek <pavel@ucw.cz>,
-	George Spelvin <linux@horizon.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1668650.acZVSyjHlL@positron.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: Nicolai Stange <nicstange@gmail.com>,
+	David Howells <dhowells@redhat.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Michal Marek <mmarek@suse.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:36152 "EHLO
+	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751375AbcEaTHc (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 31 May 2016 15:07:32 -0400
+In-Reply-To: <20160531101909.GL15376@gondor.apana.org.au> (Herbert Xu's
+	message of "Tue, 31 May 2016 18:19:09 +0800")
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch allows several DRBG functions to be called by the LRNG kernel
-code paths outside the drbg.c file.
+Herbert Xu <herbert@gondor.apana.org.au> writes:
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c         | 11 +++++------
- include/crypto/drbg.h |  7 +++++++
- 2 files changed, 12 insertions(+), 6 deletions(-)
+> On Thu, May 26, 2016 at 11:19:50PM +0200, Nicolai Stange wrote:
+>> mpi_read_from_buffer() and mpi_read_raw_data() do almost the same and share a
+>> fair amount of common code.
+>> 
+>> This patchset attempts to rewrite mpi_read_from_buffer() in order to implement
+>> it in terms of mpi_read_raw_data().
+>> 
+>> The patches 1 and 3, i.e.
+>>   "lib/mpi: mpi_read_from_buffer(): return error code"
+>> and
+>>   "lib/mpi: mpi_read_from_buffer(): return -EINVAL upon too short buffer"
+>> do the groundwork in that they move any error detection unique to
+>> mpi_read_from_buffer() out of the data handling loop.
+>> 
+>> The patches 2 and 4, that is
+>>   "lib/digsig: digsig_verify_rsa(): return -EINVAL if modulo length is zero"
+>> and
+>>   "lib/mpi: mpi_read_from_buffer(): sanitize short buffer printk"
+>> are not strictly necessary for the refactoring: they cleanup some minor oddities
+>> related to error handling I came across.
+>> 
+>> Finally, the last patch in this series,
+>>   "lib/mpi: refactor mpi_read_from_buffer() in terms of mpi_read_raw_data()"
+>> actually does what this series is all about.
+>> 
+>> 
+>> Applicable to linux-next-20160325.
+>
+> All applied.
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 0a3538f..c339a2e 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -113,7 +113,7 @@
-  * the SHA256 / AES 256 over other ciphers. Thus, the favored
-  * DRBGs are the latest entries in this array.
-  */
--static const struct drbg_core drbg_cores[] = {
-+struct drbg_core drbg_cores[] = {
- #ifdef CONFIG_CRYPTO_DRBG_CTR
- 	{
- 		.flags = DRBG_CTR | DRBG_STRENGTH128,
-@@ -205,7 +205,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
-  * Return: normalized strength in *bytes* value or 32 as default
-  *	   to counter programming errors
-  */
--static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
-+unsigned short drbg_sec_strength(drbg_flag_t flags)
- {
- 	switch (flags & DRBG_STRENGTH_MASK) {
- 	case DRBG_STRENGTH128:
-@@ -1140,7 +1140,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- }
- 
- /* Free all substructures in a DRBG state without the DRBG state structure */
--static inline void drbg_dealloc_state(struct drbg_state *drbg)
-+void drbg_dealloc_state(struct drbg_state *drbg)
- {
- 	if (!drbg)
- 		return;
-@@ -1159,7 +1159,7 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
-  * Allocate all sub-structures for a DRBG state.
-  * The DRBG state structure must already be allocated.
-  */
--static inline int drbg_alloc_state(struct drbg_state *drbg)
-+int drbg_alloc_state(struct drbg_state *drbg)
- {
- 	int ret = -ENOMEM;
- 	unsigned int sb_size = 0;
-@@ -1682,8 +1682,7 @@ static int drbg_kcapi_sym(struct drbg_state *drbg, const unsigned char *key,
-  *
-  * return: flags
-  */
--static inline void drbg_convert_tfm_core(const char *cra_driver_name,
--					 int *coreref, bool *pr)
-+void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool *pr)
- {
- 	int i = 0;
- 	size_t start = 0;
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index d961b2b..d24ec22 100644
---- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -268,4 +268,11 @@ enum drbg_prefixes {
- 	DRBG_PREFIX3
- };
- 
-+extern int drbg_alloc_state(struct drbg_state *drbg);
-+extern void drbg_dealloc_state(struct drbg_state *drbg);
-+extern void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref,
-+				  bool *pr);
-+extern struct drbg_core drbg_cores[];
-+extern unsigned short drbg_sec_strength(drbg_flag_t flags);
-+
- #endif /* _DRBG_H */
--- 
-2.7.2
+Thanks! (As well as for applying the separately sent patches, of course)
