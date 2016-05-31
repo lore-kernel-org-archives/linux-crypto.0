@@ -1,8 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2 4/4] crypto: kdf - enable compilation
-Date: Tue, 31 May 2016 13:53:14 +0200
-Message-ID: <2224906.ZFlosLSE4i@positron.chronox.de>
-References: <17649236.piPdUxUzaM@positron.chronox.de>
+Subject: [PATCH v2 0/4] crypto: Key Derivation Function (SP800-108)
+Date: Tue, 31 May 2016 13:50:57 +0200
+Message-ID: <17649236.piPdUxUzaM@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
@@ -11,51 +10,50 @@ Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
 	keyrings@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:35254 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:35262 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753827AbcEaLyF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 31 May 2016 07:54:05 -0400
-In-Reply-To: <17649236.piPdUxUzaM@positron.chronox.de>
+	id S1754577AbcEaLyG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 31 May 2016 07:54:06 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Include KDF into Kconfig and Makefile for compilation.
+Hi,
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/Kconfig  | 7 +++++++
- crypto/Makefile | 1 +
- 2 files changed, 8 insertions(+)
+this patch set implements all three key derivation functions defined in
+SP800-108.
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 1d33beb..89c1891 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -349,6 +349,13 @@ config CRYPTO_KEYWRAP
- 	  Support for key wrapping (NIST SP800-38F / RFC3394) without
- 	  padding.
- 
-+config CRYPTO_KDF
-+	tristate "Key Derivation Function (SP800-108)"
-+	select CRYPTO_RNG
-+	help
-+	  Support for KDF compliant to SP800-108. All three types of
-+	  KDF specified in SP800-108 are implemented.
-+
- comment "Hash modes"
- 
- config CRYPTO_CMAC
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 4f4ef7e..7f7c4be 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -72,6 +72,7 @@ obj-$(CONFIG_CRYPTO_LRW) += lrw.o
- obj-$(CONFIG_CRYPTO_XTS) += xts.o
- obj-$(CONFIG_CRYPTO_CTR) += ctr.o
- obj-$(CONFIG_CRYPTO_KEYWRAP) += keywrap.o
-+obj-$(CONFIG_CRYPTO_KDF) += kdf.o
- obj-$(CONFIG_CRYPTO_GCM) += gcm.o
- obj-$(CONFIG_CRYPTO_CCM) += ccm.o
- obj-$(CONFIG_CRYPTO_CHACHA20POLY1305) += chacha20poly1305.o
+The implementation is provided as a template for random number generators,
+since a KDF can be considered a form of deterministic RNG where the key
+material is used as a seed.
+
+With the KDF implemented as a template, all types of keyed hashes can be
+utilized, including HMAC and CMAC. The testmgr tests are derived from
+publicly available test vectors from NIST.
+
+The KDF are all tested with a complete round of CAVS testing on 32 and 64 bit.
+
+The patch set introduces an extension to the kernel crypto API in the first
+patch by adding a template handling for random number generators based on the
+same logic as for keyed hashes.
+
+Changes v2:
+* port to 4.7-rc1
+
+Stephan Mueller (4):
+  crypto: add template handling for RNGs
+  crypto: kdf - add known answer tests
+  crypto: kdf - SP800-108 Key Derivation Function
+  crypto: kdf - enable compilation
+
+ crypto/Kconfig       |   7 +
+ crypto/Makefile      |   1 +
+ crypto/kdf.c         | 514 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/rng.c         |  31 ++++
+ crypto/testmgr.c     | 167 +++++++++++++++++
+ crypto/testmgr.h     | 111 +++++++++++
+ include/crypto/rng.h |  39 ++++
+ 7 files changed, 870 insertions(+)
+ create mode 100644 crypto/kdf.c
+
 -- 
 2.5.5
