@@ -1,78 +1,70 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH v6 6/6] crypto: AF_ALG - add support for key_id
-Date: Tue, 31 May 2016 10:44:03 -0700
-Message-ID: <304aa8f1-ef22-3f2d-53e5-3c020f7ceb40@intel.com>
-References: <20160515041645.15888.94903.stgit@tstruk-mobl1>
- <20160515041719.15888.27170.stgit@tstruk-mobl1>
- <alpine.OSX.2.20.1605251640370.12130@mjmartin-mac01.local>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v4 5/5] random: add interrupt callback to VMBus IRQ handler
+Date: Tue, 31 May 2016 20:39:59 +0200
+Message-ID: <1989711.xkQFMZuXrz@positron.chronox.de>
+References: <1668650.acZVSyjHlL@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Cc: dhowells@redhat.com, herbert@gondor.apana.org.au,
-	smueller@chronox.de, linux-api@vger.kernel.org,
-	marcel@holtmann.org, linux-kernel@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dwmw2@infradead.org, davem@davemloft.net
-To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Ted Tso <tytso@mit.edu>, Andi Kleen <andi@firstfloor.org>,
+	sandyinchina@gmail.com, Jason Cooper <cryptography@lakedaemon.net>,
+	John Denker <jsd@av8n.com>,
+	"H. Peter Anvin" <hpa@linux.intel.com>,
+	Joe Perches <joe@perches.com>, Pavel Machek <pavel@ucw.cz>,
+	George Spelvin <linux@horizon.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <alpine.OSX.2.20.1605251640370.12130@mjmartin-mac01.local>
+In-Reply-To: <1668650.acZVSyjHlL@positron.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Mat,
-On 05/25/2016 05:45 PM, Mat Martineau wrote:
-> 
-> On Sat, 14 May 2016, Tadeusz Struk wrote:
-> 
->> diff --git a/crypto/algif_akcipher.c b/crypto/algif_akcipher.c
->> index e00793d..6733df1 100644
->> --- a/crypto/algif_akcipher.c
->> +++ b/crypto/algif_akcipher.c
->> +static int asym_key_verify(const struct key *key, struct akcipher_request *req)
->> +{
->> +    struct public_key_signature sig;
->> +    char *src = NULL, *in;
->> +    int ret;
->> +
->> +    if (!sg_is_last(req->src)) {
->> +        src = kmalloc(req->src_len, GFP_KERNEL);
->> +        if (!src)
->> +            return -ENOMEM;
->> +        scatterwalk_map_and_copy(src, req->src, 0, req->src_len, 0);
->> +        in = src;
->> +    } else {
->> +        in = sg_virt(req->src);
->> +    }
->> +    sig.pkey_algo = "rsa";
->> +    sig.encoding = "pkcs1";
->> +    /* Need to find a way to pass the hash param */
-> 
-> Are you referring to sig.digest here? It looks like you will hit a BUG_ON() in public_key_verify_signature() if sig.digest is 0. However, sig.digest is unlikely to be 0 because the struct is not cleared - should fix this, since public_key_verify_signature() will try to follow that random pointer.
-> 
+The Hyper-V Linux Integration Services use the VMBus implementation for
+communication with the Hypervisor. VMBus registers its own interrupt
+handler that completely bypasses the common Linux interrupt handling.
+This implies that the interrupt entropy collector is not triggered.
 
-Right, I need to have a local buffer for the digest here.
+This patch adds the interrupt entropy collection callback into the VMBus
+interrupt handler function.
 
->> +    sig.hash_algo = "sha1";
->> +    sig.digest_size = 20;
->> +    sig.s_size = req->src_len;
->> +    sig.s = src;
->> +    ret = verify_signature(key, NULL, &sig);
-> 
-> Is the idea to write the signature to the socket, and then read out the expected digest (the digest comparison being done elsewhere)? Is that something that will be supported by a future hardware asymmetric key subtype?
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ drivers/char/random.c  | 1 +
+ drivers/hv/vmbus_drv.c | 3 +++
+ 2 files changed, 4 insertions(+)
 
-After the verify operation the output will be copied to the user,
-and the user needs to verify it.
-
-> 
-> verify_signature() ends up calling public_key_verify_signature(), which currently expects to get both the digest and signature as input and returns an error if verification fails. The output of crypto_akcipher_verify() is discarded before public_key_verify_signature() returns so nothing ends up in req->dst to read from the socket.
-> 
-> ALG_OP_VERIFY should behave the same whether using ALG_SET_PUBKEY or ALG_SET_PUBKEY_ID, and they aren't right now.
-> 
-> If sig.digest is 0, verify_signature() could return the expected digest in the sig structure and skip the digest comparison it currently does. Then that data could be packaged up in req as if crypto_akcipher_verify() had been called. I don't know if this change confuses the semantics of verify_signature() too much, maybe a new function is required with all the requisite plumbing to the asymmetric key subtype.
-> 
-
-We need to copy output to the user to verify because we don't have it.
-That will be consistent for both ALG_SET_PUBKEY and ALG_SET_PUBKEY_ID.
-Thanks for your comments and sorry for the delayed response. I'll will send v7 soon.
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index ef89c0e..ac74716 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -948,6 +948,7 @@ void add_interrupt_randomness(int irq, int irq_flags)
+ 	/* award one bit for the contents of the fast pool */
+ 	credit_entropy_bits(r, credit + 1);
+ }
++EXPORT_SYMBOL_GPL(add_interrupt_randomness);
+ 
+ #ifdef CONFIG_BLOCK
+ void add_disk_randomness(struct gendisk *disk)
+diff --git a/drivers/hv/vmbus_drv.c b/drivers/hv/vmbus_drv.c
+index 952f20f..e82f7e1 100644
+--- a/drivers/hv/vmbus_drv.c
++++ b/drivers/hv/vmbus_drv.c
+@@ -42,6 +42,7 @@
+ #include <linux/screen_info.h>
+ #include <linux/kdebug.h>
+ #include <linux/efi.h>
++#include <linux/random.h>
+ #include "hyperv_vmbus.h"
+ 
+ static struct acpi_device  *hv_acpi_dev;
+@@ -806,6 +807,8 @@ static void vmbus_isr(void)
+ 		else
+ 			tasklet_schedule(hv_context.msg_dpc[cpu]);
+ 	}
++
++	add_interrupt_randomness(HYPERVISOR_CALLBACK_VECTOR, 0);
+ }
+ 
+ 
 -- 
-TS
+2.7.2
