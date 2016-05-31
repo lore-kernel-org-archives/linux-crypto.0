@@ -1,60 +1,221 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/4] hw rng support for NSP SoC
-Date: Tue, 31 May 2016 18:19:34 +0800
-Message-ID: <20160531101934.GM15376@gondor.apana.org.au>
-References: <1464343841-29504-1-git-send-email-yendapally.reddy@broadcom.com>
+From: Harsh Jain <harshjain.prof@gmail.com>
+Subject: Re: Test AEAD/authenc algorithms from userspace
+Date: Tue, 31 May 2016 16:28:14 +0530
+Message-ID: <CAFXBA==PsTepbhPeBMsb1YyKx12B8ie5KC7VF=8pwCSBFJgfgg@mail.gmail.com>
+References: <CAFXBA=kStufh3TDe=+qQYmd2tNCj9hgXLUKBeoZHBs2VxRBRbQ@mail.gmail.com>
+	<2892187.M1JfTODgdh@tauon.atsec.com>
+	<CAFXBA=mfw3tcftwo9nEihJHVKQzdRVg3HXJOkn8CT5VtYNxbxQ@mail.gmail.com>
+	<3164476.NJZyJLbx96@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>,
-	Stephen Warren <swarren@wwwdotorg.org>,
-	Lee Jones <lee@kernel.org>, Eric Anholt <eric@anholt.net>,
-	Russell King <linux@arm.linux.org.uk>,
-	Ray Jui <rjui@broadcom.com>,
-	Scott Branden <sbranden@broadcom.com>,
-	Jon Mason <jonmason@broadcom.com>,
-	Matt Mackall <mpm@selenic.com>,
-	Daniel Thompson <daniel.thompson@linaro.org>,
-	Kieran Bingham <kieranbingham@gmail.com>,
-	Pankaj Dev <pankaj.dev@st.com>,
-	Richard Weinberger <richard@nod.at>, noltari@gmail.com,
-	Joshua Henderson <joshua.henderson@microchip.com>,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	bcm-kernel-feedback-list@broadcom.com, linux-crypto@vger.ke
-To: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1464343841-29504-1-git-send-email-yendapally.reddy@broadcom.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-oi0-f51.google.com ([209.85.218.51]:34160 "EHLO
+	mail-oi0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751841AbcEaK6P (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 31 May 2016 06:58:15 -0400
+Received: by mail-oi0-f51.google.com with SMTP id e72so19006271oib.1
+        for <linux-crypto@vger.kernel.org>; Tue, 31 May 2016 03:58:15 -0700 (PDT)
+In-Reply-To: <3164476.NJZyJLbx96@tauon.atsec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 27, 2016 at 06:10:37AM -0400, Yendapally Reddy Dhananjaya Reddy wrote:
-> This patchset contains the hw random number generator support for the
-> Broadcom's NSP SoC. The block is similar to the block available in
-> bcm2835 with different default interrupt mask value. Due to lack of
-> documentation, I cannot confirm the interrupt mask register details
-> in bcm2835. In an effort to not break the existing functionality of
-> bcm2835, I used a different compatible string to mask the interrupt
-> for NSP SoC. Please let me know. Also supported providing requested
-> number of random numbers instead of static size of four bytes.
-> 
-> The first patch contains the documentation changes and the second patch
-> contains the support for rng available in NSP SoC. The third patch
-> contains the device tree changes for NSP SoC. The fourth patch contains
-> the support for reading requested number of random numbers.
-> 
-> This patch set has been tested on NSP bcm958625HR board.
-> This patch set is based on v4.6.0-rc1 and is available from github
-> repo: https://github.com/Broadcom/cygnus-linux.git
-> branch: nsp-rng-v2
-> 
-> Changes since v1
+Hi Stephen,
 
-All applied.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Yes ,It's for Hash. The available API in library for hash update
+"_kcapi_md_update" uses "MSG_MORE" flag always set. It will not
+trigger driver's digest/finup implementation. We need something like
+that
+
+ _kcapi_common_accept()
+send(handle->opfd, buffer, len, 0); ==> flag = 0.
+
+It will execute digest callback of selected tfm from User
+Space.(init->digest) Similarly
+
+_kcapi_common_accept()
+send(handle->opfd, buffer, len, MSG_MORE);
+send(handle->opfd, buffer, len, 0);
+
+It will execute finup callback of selected tfm. (init->update->finup).
+
+In that way we can test all callbacks from userspace. In future if you
+feel this use case important. You can add API's to implement this.
+
+
+Regards
+Harsh Jain
+
+regards
+Harsh Jain
+
+
+
+
+
+
+regards
+Harsh Jain
+
+On Tue, May 31, 2016 at 2:51 PM, Stephan Mueller <smueller@chronox.de> wrote:
+> Am Dienstag, 31. Mai 2016, 14:45:27 schrieb Harsh Jain:
+>
+> Hi Harsh,
+>
+>> Hi,
+>>
+>> Thanks Stephen, I will check the same.1 suggestion for kcapi tool. Add
+>> some switch cases in tool to test digest and finup path of crypto
+>> driver. Current implementation triggers only init/update/final.
+>
+> You mean for hashes? I guess the following is what you refer to? This logic is
+> even found for the other cipher types (symmetric algos, AEAD ciphers). See the
+> documentation on stream vs one-shot use cases.
+>
+> /**
+>  * kcapi_md_init() - initialize cipher handle
+>  * @handle: cipher handle filled during the call - output
+>  * @ciphername: kernel crypto API cipher name as specified in
+>  *             /proc/crypto - input
+>  * @flags: flags specifying the type of cipher handle
+>  *
+>  * This function provides the initialization of a (keyed) message digest
+> handle
+>  * and establishes the connection to the kernel.
+>  *
+>  * Return: 0 upon success; ENOENT - algorithm not available;
+>  *         -EOPNOTSUPP - AF_ALG family not available;
+>  *         -EINVAL - accept syscall failed
+>  *         -ENOMEM - cipher handle cannot be allocated
+>  */
+> int kcapi_md_init(struct kcapi_handle **handle, const char *ciphername,
+>                   uint32_t flags);
+>
+> /**
+>  * kcapi_md_update() - message digest update function (stream)
+>  * @handle: cipher handle - input
+>  * @buffer: holding the data to add to the message digest - input
+>  * @len: buffer length - input
+>  *
+>  * Return: 0 upon success;
+>  *         < 0 in case of error
+>  */
+> int32_t kcapi_md_update(struct kcapi_handle *handle,
+>                         const uint8_t *buffer, uint32_t len);
+>
+> /**
+>  * kcapi_md_final() - message digest finalization function (stream)
+>  * @handle: cipher handle - input
+>  * @buffer: filled with the message digest - output
+>  * @len: buffer length - input
+>  *
+>  * Return: size of message digest upon success;
+>  *         -EIO - data cannot be obtained;
+>  *         -ENOMEM - buffer is too small for the complete message digest,
+>  *         the buffer is filled with the truncated message digest
+>  */
+> int32_t kcapi_md_final(struct kcapi_handle *handle,
+>                        uint8_t *buffer, uint32_t len);
+>
+>
+> The test/kcapi tool is a crude test tool that I use for my regression testing.
+> It is not intended for anything else.
+>>
+>>
+>> Regards
+>> Harsh Jain
+>>
+>> On Tue, May 31, 2016 at 2:29 PM, Stephan Mueller <smueller@chronox.de>
+> wrote:
+>> > Am Dienstag, 31. Mai 2016, 14:10:20 schrieb Harsh Jain:
+>> >
+>> > Hi Harsh,
+>> >
+>> >> Hi,
+>> >>
+>> >> You means to say like this
+>> >>
+>> >> ./kcapi -x 2 -e -c "authenc(hmac(sha1),cbc(aes))" -p
+>> >> 48981da18e4bb9ef7e2e3162d16b19108b19050f66582cb7f7e4b6c873819b71 -k
+>> >> 8d7dd9b0170ce0b5f2f8e1aa768e01e91da8bfc67fd486d081b28254c99eb423 -i
+>> >> 7fbc02ebf5b93322329df9bfccb635af -a afcd7202d621e06ca53b70c2bdff7fb2
+>> >> -l 16f4a3eacfbdadd3b1a17117b1d67ffc1f1e21efbbc6d83724a8c296e3bb8cda0c44
+>> >>
+>> >> It gives following error with kernel 4.5.2
+>> >> Symmetric cipher setkey failed
+>> >> Failed to invoke testing
+>> >
+>> > Please see testmgr.h for usage (especially the key encoding):
+>> >
+>> > invocation:
+>> > ./kcapi -x 2 -e -c "authenc(hmac(sha1),cbc(aes))" -p
+>> > 53696e676c6520626c6f636b206d7367 -k
+>> > 0800010000000010000000000000000000000000000000000000000006a9214036b8a15b51
+>> > 2e03d534120006 -i 3dafba429d9eb430b422da802c9fac41 -a
+>> > 3dafba429d9eb430b422da802c9fac41 -l 20
+>> >
+>> > return:
+>> > e353779c1079aeb82708942dbe77181a1b13cbaf895ee12c13c52ea3cceddcb50371a206
+>> >
+>> > This is the first test of hmac_sha1_aes_cbc_enc_tv_temp (RFC3601 case 1).
+>> > Note, the input string of "Single block msg" was converted to hex
+>> > 53696e676c6520626c6f636b206d7367 as my tool always treats all input data
+>> > as
+>> > hex data.
+>> >
+>> >> Regards
+>> >> Harsh Jain
+>> >>
+>> >> On Tue, May 31, 2016 at 12:35 PM, Stephan Mueller <smueller@chronox.de>
+>> >
+>> > wrote:
+>> >> > Am Dienstag, 31. Mai 2016, 12:31:16 schrieb Harsh Jain:
+>> >> >
+>> >> > Hi Harsh,
+>> >> >
+>> >> >> Hi All,
+>> >> >>
+>> >> >> How can we open socket of type "authenc(hmac(sha256),cbc(aes))" from
+>> >> >> userspace program.I check libkcapi library. It has test programs for
+>> >> >> GCM/CCM. There are 3 types of approaches to Authenticated Encryption,
+>> >> >> Which of them is supported in crypto framework.
+>> >> >>
+>> >> >> 1) Encrypt-then-MAC (EtM)
+>> >> >>
+>> >> >>      The plaintext is first encrypted, then a MAC is produced based on
+>> >> >>
+>> >> >> the resulting ciphertext. The ciphertext and its MAC are sent
+>> >> >> together.
+>> >> >> 2) Encrypt-and-MAC (E&M)
+>> >> >>
+>> >> >>      A MAC is produced based on the plaintext, and the plaintext is
+>> >> >>
+>> >> >> encrypted without the MAC. The plaintext's MAC and the ciphertext are
+>> >> >> sent together.
+>> >> >>
+>> >> >> 3) MAC-then-Encrypt (MtE)
+>> >> >>
+>> >> >>      A MAC is produced based on the plaintext, then the plaintext and
+>> >> >>
+>> >> >> MAC are together encrypted to produce a ciphertext based on both. The
+>> >> >> ciphertext (containing an encrypted MAC) is sent.
+>> >> >
+>> >> > The cipher types you mention refer to the implementation of authenc().
+>> >> > IIRC, authenc implements EtM as this is mandated by IPSEC.
+>> >> >
+>> >> > When you use libkcapi, you should simply be able to use your cipher
+>> >> > name
+>> >> > with the AEAD API. I.e. use the examples you see for CCM or GCM and use
+>> >> > those with the chosen authenc() cipher. Do you experience any issues?
+>> >> >
+>> >> > Ciao
+>> >> > Stephan
+>> >
+>> > Ciao
+>> > Stephan
+>
+>
+> Ciao
+> Stephan
