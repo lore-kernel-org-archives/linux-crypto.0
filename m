@@ -1,70 +1,73 @@
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [PATCH] KEYS: Add optional key derivation parameters for DH
-Date: Tue, 31 May 2016 09:25:46 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1605310912390.4028@mjmartin-mac01.local>
-References: <20160526165741.2634-1-mathew.j.martineau@linux.intel.com> <23038.1464293450@warthog.procyon.org.uk>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH v2 0/4] hw rng support for NSP SoC
+Date: Tue, 31 May 2016 10:09:39 -0700
+Message-ID: <574DC553.4030009@gmail.com>
+References: <1464343841-29504-1-git-send-email-yendapally.reddy@broadcom.com>
+ <20160531101934.GM15376@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	smueller@chronox.de, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>,
+	Stephen Warren <swarren@wwwdotorg.org>,
+	Lee Jones <lee@kernel.org>, Eric Anholt <eric@anholt.net>,
+	Russell King <linux@arm.linux.org.uk>,
+	Ray Jui <rjui@broadcom.com>,
+	Scott Branden <sbranden@broadcom.com>,
+	Jon Mason <jonmason@broadcom.com>,
+	Matt Mackall <mpm@selenic.com>,
+	Daniel Thompson <daniel.thompson@linaro.org>,
+	Kieran Bingham <kieranbingham@gmail.com>,
+	Pankaj Dev <pankaj.dev@st.com>,
+	Richard Weinberger <richard@nod.at>, noltari@gmail.com,
+	Joshua Henderson <joshua.henderson@microchip.com>,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com, linux-crypto@vger.ke
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Yendapally Reddy Dhananjaya Reddy
+	<yendapally.reddy@broadcom.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:4117 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755154AbcEaQZs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 31 May 2016 12:25:48 -0400
-In-Reply-To: <23038.1464293450@warthog.procyon.org.uk>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:34231 "EHLO
+	mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750744AbcEaRJo (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 31 May 2016 13:09:44 -0400
+In-Reply-To: <20160531101934.GM15376@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 26 May 2016, David Howells wrote:
-
-> Mat Martineau <mathew.j.martineau@linux.intel.com> wrote:
->
->> +struct keyctl_kdf_params {
->> +	char *name;
->> +	__u8 reserved[32]; /* Reserved for future use, must be 0 */
->> +};
->> +
->>  #endif /*  _LINUX_KEYCTL_H */
->> diff --git a/security/keys/compat.c b/security/keys/compat.c
->> index c8783b3..36c80bf 100644
->> --- a/security/keys/compat.c
->> +++ b/security/keys/compat.c
->> @@ -134,7 +134,7 @@ COMPAT_SYSCALL_DEFINE5(keyctl, u32, option,
+On 05/31/2016 03:19 AM, Herbert Xu wrote:
+> On Fri, May 27, 2016 at 06:10:37AM -0400, Yendapally Reddy Dhananjaya Reddy wrote:
+>> This patchset contains the hw random number generator support for the
+>> Broadcom's NSP SoC. The block is similar to the block available in
+>> bcm2835 with different default interrupt mask value. Due to lack of
+>> documentation, I cannot confirm the interrupt mask register details
+>> in bcm2835. In an effort to not break the existing functionality of
+>> bcm2835, I used a different compatible string to mask the interrupt
+>> for NSP SoC. Please let me know. Also supported providing requested
+>> number of random numbers instead of static size of four bytes.
 >>
->>  	case KEYCTL_DH_COMPUTE:
->>  		return keyctl_dh_compute(compat_ptr(arg2), compat_ptr(arg3),
->> -					 arg4);
->> +					 arg4, compat_ptr(arg5));
->
-> Given the new structure above, this won't work.  The problem is that on a
-> 64-bit system the kernel expects 'name' to be a 64-bit pointer, but if we're
-> in the compat handler, we have a 32-bit userspace's idea of the struct - in
-> which 'name' is a 31-bit (s390x) or a 32-bit pointer without any padding.
->
-> So in compat code you can't just pass the user pointer direct through to
-> keyctl_dh_compute().  You need to supply a compat_keyctl_kdf_params struct and
-> translator code.
+>> The first patch contains the documentation changes and the second patch
+>> contains the support for rng available in NSP SoC. The third patch
+>> contains the device tree changes for NSP SoC. The fourth patch contains
+>> the support for reading requested number of random numbers.
+>>
+>> This patch set has been tested on NSP bcm958625HR board.
+>> This patch set is based on v4.6.0-rc1 and is available from github
+>> repo: https://github.com/Broadcom/cygnus-linux.git
+>> branch: nsp-rng-v2
+>>
+>> Changes since v1
+> 
+> All applied.
 
-Since none of the members of the structure were accessed, I thought the 
-simple conversion was adequate for the null check and was deferring the 
-real compat handling until the rest of the structure was known. I should 
-have explained that in a comment.
+FYI, ARM Device Tree patches usually go via ARM SoC pull requests, so it
+is best if this is planned in advance. Can you make sure you document
+that there could be a merge conflict in your pull request to Linus?
 
-> What I would recommend you do at the moment is to mark the syscall argument as
-> "reserved, must be 0" and deal with the implementation in the next merge
-> window.
-
-Yeah, there's not much value in defining the keyctl_kdf_params struct and 
-then not using it. Should have kept it simple.
-
-Thanks to you and Stephan for updating the patch and moving things along.
-
-
-Regards,
-
---
-Mat Martineau
-Intel OTC
+Thanks
+-- 
+Florian
