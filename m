@@ -1,73 +1,78 @@
-From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH v2 0/4] hw rng support for NSP SoC
-Date: Tue, 31 May 2016 10:09:39 -0700
-Message-ID: <574DC553.4030009@gmail.com>
-References: <1464343841-29504-1-git-send-email-yendapally.reddy@broadcom.com>
- <20160531101934.GM15376@gondor.apana.org.au>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH v6 6/6] crypto: AF_ALG - add support for key_id
+Date: Tue, 31 May 2016 10:44:03 -0700
+Message-ID: <304aa8f1-ef22-3f2d-53e5-3c020f7ceb40@intel.com>
+References: <20160515041645.15888.94903.stgit@tstruk-mobl1>
+ <20160515041719.15888.27170.stgit@tstruk-mobl1>
+ <alpine.OSX.2.20.1605251640370.12130@mjmartin-mac01.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>,
-	Stephen Warren <swarren@wwwdotorg.org>,
-	Lee Jones <lee@kernel.org>, Eric Anholt <eric@anholt.net>,
-	Russell King <linux@arm.linux.org.uk>,
-	Ray Jui <rjui@broadcom.com>,
-	Scott Branden <sbranden@broadcom.com>,
-	Jon Mason <jonmason@broadcom.com>,
-	Matt Mackall <mpm@selenic.com>,
-	Daniel Thompson <daniel.thompson@linaro.org>,
-	Kieran Bingham <kieranbingham@gmail.com>,
-	Pankaj Dev <pankaj.dev@st.com>,
-	Richard Weinberger <richard@nod.at>, noltari@gmail.com,
-	Joshua Henderson <joshua.henderson@microchip.com>,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	bcm-kernel-feedback-list@broadcom.com, linux-crypto@vger.ke
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Yendapally Reddy Dhananjaya Reddy
-	<yendapally.reddy@broadcom.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:34231 "EHLO
-	mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750744AbcEaRJo (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 31 May 2016 13:09:44 -0400
-In-Reply-To: <20160531101934.GM15376@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: dhowells@redhat.com, herbert@gondor.apana.org.au,
+	smueller@chronox.de, linux-api@vger.kernel.org,
+	marcel@holtmann.org, linux-kernel@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dwmw2@infradead.org, davem@davemloft.net
+To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <alpine.OSX.2.20.1605251640370.12130@mjmartin-mac01.local>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 05/31/2016 03:19 AM, Herbert Xu wrote:
-> On Fri, May 27, 2016 at 06:10:37AM -0400, Yendapally Reddy Dhananjaya Reddy wrote:
->> This patchset contains the hw random number generator support for the
->> Broadcom's NSP SoC. The block is similar to the block available in
->> bcm2835 with different default interrupt mask value. Due to lack of
->> documentation, I cannot confirm the interrupt mask register details
->> in bcm2835. In an effort to not break the existing functionality of
->> bcm2835, I used a different compatible string to mask the interrupt
->> for NSP SoC. Please let me know. Also supported providing requested
->> number of random numbers instead of static size of four bytes.
->>
->> The first patch contains the documentation changes and the second patch
->> contains the support for rng available in NSP SoC. The third patch
->> contains the device tree changes for NSP SoC. The fourth patch contains
->> the support for reading requested number of random numbers.
->>
->> This patch set has been tested on NSP bcm958625HR board.
->> This patch set is based on v4.6.0-rc1 and is available from github
->> repo: https://github.com/Broadcom/cygnus-linux.git
->> branch: nsp-rng-v2
->>
->> Changes since v1
+Hi Mat,
+On 05/25/2016 05:45 PM, Mat Martineau wrote:
 > 
-> All applied.
+> On Sat, 14 May 2016, Tadeusz Struk wrote:
+> 
+>> diff --git a/crypto/algif_akcipher.c b/crypto/algif_akcipher.c
+>> index e00793d..6733df1 100644
+>> --- a/crypto/algif_akcipher.c
+>> +++ b/crypto/algif_akcipher.c
+>> +static int asym_key_verify(const struct key *key, struct akcipher_request *req)
+>> +{
+>> +    struct public_key_signature sig;
+>> +    char *src = NULL, *in;
+>> +    int ret;
+>> +
+>> +    if (!sg_is_last(req->src)) {
+>> +        src = kmalloc(req->src_len, GFP_KERNEL);
+>> +        if (!src)
+>> +            return -ENOMEM;
+>> +        scatterwalk_map_and_copy(src, req->src, 0, req->src_len, 0);
+>> +        in = src;
+>> +    } else {
+>> +        in = sg_virt(req->src);
+>> +    }
+>> +    sig.pkey_algo = "rsa";
+>> +    sig.encoding = "pkcs1";
+>> +    /* Need to find a way to pass the hash param */
+> 
+> Are you referring to sig.digest here? It looks like you will hit a BUG_ON() in public_key_verify_signature() if sig.digest is 0. However, sig.digest is unlikely to be 0 because the struct is not cleared - should fix this, since public_key_verify_signature() will try to follow that random pointer.
+> 
 
-FYI, ARM Device Tree patches usually go via ARM SoC pull requests, so it
-is best if this is planned in advance. Can you make sure you document
-that there could be a merge conflict in your pull request to Linus?
+Right, I need to have a local buffer for the digest here.
 
-Thanks
+>> +    sig.hash_algo = "sha1";
+>> +    sig.digest_size = 20;
+>> +    sig.s_size = req->src_len;
+>> +    sig.s = src;
+>> +    ret = verify_signature(key, NULL, &sig);
+> 
+> Is the idea to write the signature to the socket, and then read out the expected digest (the digest comparison being done elsewhere)? Is that something that will be supported by a future hardware asymmetric key subtype?
+
+After the verify operation the output will be copied to the user,
+and the user needs to verify it.
+
+> 
+> verify_signature() ends up calling public_key_verify_signature(), which currently expects to get both the digest and signature as input and returns an error if verification fails. The output of crypto_akcipher_verify() is discarded before public_key_verify_signature() returns so nothing ends up in req->dst to read from the socket.
+> 
+> ALG_OP_VERIFY should behave the same whether using ALG_SET_PUBKEY or ALG_SET_PUBKEY_ID, and they aren't right now.
+> 
+> If sig.digest is 0, verify_signature() could return the expected digest in the sig structure and skip the digest comparison it currently does. Then that data could be packaged up in req as if crypto_akcipher_verify() had been called. I don't know if this change confuses the semantics of verify_signature() too much, maybe a new function is required with all the requisite plumbing to the asymmetric key subtype.
+> 
+
+We need to copy output to the user to verify because we don't have it.
+That will be consistent for both ALG_SET_PUBKEY and ALG_SET_PUBKEY_ID.
+Thanks for your comments and sorry for the delayed response. I'll will send v7 soon.
 -- 
-Florian
+TS
