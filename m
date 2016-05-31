@@ -1,40 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v5 2/3] crypto: kpp - Add DH software implementation
-Date: Tue, 31 May 2016 14:52:56 +0800
-Message-ID: <20160531065256.GB13948@gondor.apana.org.au>
-References: <1462830041-7582-1-git-send-email-salvatore.benedetto@intel.com>
- <1462830041-7582-3-git-send-email-salvatore.benedetto@intel.com>
+From: Harsh Jain <harshjain.prof@gmail.com>
+Subject: Test AEAD/authenc algorithms from userspace
+Date: Tue, 31 May 2016 12:31:16 +0530
+Message-ID: <CAFXBA=kStufh3TDe=+qQYmd2tNCj9hgXLUKBeoZHBs2VxRBRbQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Content-Type: text/plain; charset=UTF-8
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48073 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751283AbcEaGxD (ORCPT
+Received: from mail-oi0-f54.google.com ([209.85.218.54]:34170 "EHLO
+	mail-oi0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751778AbcEaHBR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 31 May 2016 02:53:03 -0400
-Content-Disposition: inline
-In-Reply-To: <1462830041-7582-3-git-send-email-salvatore.benedetto@intel.com>
+	Tue, 31 May 2016 03:01:17 -0400
+Received: by mail-oi0-f54.google.com with SMTP id e72so14144598oib.1
+        for <linux-crypto@vger.kernel.org>; Tue, 31 May 2016 00:01:17 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 09, 2016 at 10:40:40PM +0100, Salvatore Benedetto wrote:
->
-> +static int dh_set_params(struct crypto_kpp *tfm, void *buffer,
-> +			 unsigned int len)
-> +{
-> +	struct dh_ctx *ctx = dh_get_ctx(tfm);
-> +	struct dh_params *params = (struct dh_params *)buffer;
-> +
-> +	if (unlikely(!buffer || !len))
-> +		return -EINVAL;
+Hi All,
 
-What's the point of len? It's never checked anywhere apart from
-this non-zero check which is pointless.  Just get rid of it.
+How can we open socket of type "authenc(hmac(sha256),cbc(aes))" from
+userspace program.I check libkcapi library. It has test programs for
+GCM/CCM. There are 3 types of approaches to Authenticated Encryption,
+Which of them is supported in crypto framework.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1) Encrypt-then-MAC (EtM)
+     The plaintext is first encrypted, then a MAC is produced based on
+the resulting ciphertext. The ciphertext and its MAC are sent
+together.
+2) Encrypt-and-MAC (E&M)
+     A MAC is produced based on the plaintext, and the plaintext is
+encrypted without the MAC. The plaintext's MAC and the ciphertext are
+sent together.
+
+3) MAC-then-Encrypt (MtE)
+     A MAC is produced based on the plaintext, then the plaintext and
+MAC are together encrypted to produce a ciphertext based on both. The
+ciphertext (containing an encrypted MAC) is sent.
+
+
+Regards
+Harsh Jain
