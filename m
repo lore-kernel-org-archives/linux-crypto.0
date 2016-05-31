@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v4 5/5] random: add interrupt callback to VMBus IRQ handler
-Date: Tue, 31 May 2016 20:39:59 +0200
-Message-ID: <1989711.xkQFMZuXrz@positron.chronox.de>
+Subject: [PATCH v4 2/5] random: conditionally compile code depending on LRNG
+Date: Tue, 31 May 2016 20:38:01 +0200
+Message-ID: <2868682.u9Xh3cHh31@positron.chronox.de>
 References: <1668650.acZVSyjHlL@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -14,57 +14,118 @@ Cc: Ted Tso <tytso@mit.edu>, Andi Kleen <andi@firstfloor.org>,
 	George Spelvin <linux@horizon.com>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:35436 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755329AbcEaSmm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 31 May 2016 14:42:42 -0400
 In-Reply-To: <1668650.acZVSyjHlL@positron.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The Hyper-V Linux Integration Services use the VMBus implementation for
-communication with the Hypervisor. VMBus registers its own interrupt
-handler that completely bypasses the common Linux interrupt handling.
-This implies that the interrupt entropy collector is not triggered.
+When selecting the LRNG for compilation, disable the legacy /dev/random
+implementation.
 
-This patch adds the interrupt entropy collection callback into the VMBus
-interrupt handler function.
+The LRNG is a drop-in replacement for the legacy /dev/random which
+implements the same in-kernel and user space API. Only the hooks of
+/dev/random into other parts of the kernel need to be disabled.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/char/random.c  | 1 +
- drivers/hv/vmbus_drv.c | 3 +++
- 2 files changed, 4 insertions(+)
+ drivers/char/random.c  | 8 ++++++++
+ include/linux/genhd.h  | 5 +++++
+ include/linux/random.h | 7 ++++++-
+ 3 files changed, 19 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index ef89c0e..ac74716 100644
+index 0158d3b..ef89c0e 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -948,6 +948,7 @@ void add_interrupt_randomness(int irq, int irq_flags)
- 	/* award one bit for the contents of the fast pool */
- 	credit_entropy_bits(r, credit + 1);
- }
-+EXPORT_SYMBOL_GPL(add_interrupt_randomness);
+@@ -268,6 +268,8 @@
+ #include <asm/irq_regs.h>
+ #include <asm/io.h>
  
- #ifdef CONFIG_BLOCK
- void add_disk_randomness(struct gendisk *disk)
-diff --git a/drivers/hv/vmbus_drv.c b/drivers/hv/vmbus_drv.c
-index 952f20f..e82f7e1 100644
---- a/drivers/hv/vmbus_drv.c
-+++ b/drivers/hv/vmbus_drv.c
-@@ -42,6 +42,7 @@
- #include <linux/screen_info.h>
- #include <linux/kdebug.h>
- #include <linux/efi.h>
-+#include <linux/random.h>
- #include "hyperv_vmbus.h"
- 
- static struct acpi_device  *hv_acpi_dev;
-@@ -806,6 +807,8 @@ static void vmbus_isr(void)
- 		else
- 			tasklet_schedule(hv_context.msg_dpc[cpu]);
- 	}
++#ifndef CONFIG_CRYPTO_LRNG
 +
-+	add_interrupt_randomness(HYPERVISOR_CALLBACK_VECTOR, 0);
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/random.h>
+ 
+@@ -1621,6 +1623,7 @@ SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
+ 	}
+ 	return urandom_read(NULL, buf, count, NULL);
+ }
++#endif	/* CONFIG_CRYPTO_LRNG */
+ 
+ /********************************************************************
+  *
+@@ -1628,6 +1631,7 @@ SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
+  *
+  ********************************************************************/
+ 
++#ifndef CONFIG_CRYPTO_LRNG
+ #ifdef CONFIG_SYSCTL
+ 
+ #include <linux/sysctl.h>
+@@ -1765,6 +1769,8 @@ struct ctl_table random_table[] = {
+ };
+ #endif 	/* CONFIG_SYSCTL */
+ 
++#endif	/* CONFIG_CRYPTO_LRNG */
++
+ static u32 random_int_secret[MD5_MESSAGE_BYTES / 4] ____cacheline_aligned;
+ 
+ int random_int_secret_init(void)
+@@ -1840,6 +1846,7 @@ randomize_range(unsigned long start, unsigned long end, unsigned long len)
+ 	return PAGE_ALIGN(get_random_int() % range + start);
  }
  
++#ifndef CONFIG_CRYPTO_LRNG
+ /* Interface for in-kernel drivers of true hardware RNGs.
+  * Those devices may produce endless random bits and will be throttled
+  * when our pool is full.
+@@ -1859,3 +1866,4 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
+ 	credit_entropy_bits(poolp, entropy);
+ }
+ EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
++#endif	/* CONFIG_CRYPTO_LRNG */
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 359a8e4..24cfb99 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -433,8 +433,13 @@ extern void disk_flush_events(struct gendisk *disk, unsigned int mask);
+ extern unsigned int disk_clear_events(struct gendisk *disk, unsigned int mask);
  
+ /* drivers/char/random.c */
++#ifdef CONFIG_CRYPTO_LRNG
++#define add_disk_randomness(disk) do {} while (0)
++#define rand_initialize_disk(disk) do {} while (0)
++#else
+ extern void add_disk_randomness(struct gendisk *disk);
+ extern void rand_initialize_disk(struct gendisk *disk);
++#endif
+ 
+ static inline sector_t get_start_sect(struct block_device *bdev)
+ {
+diff --git a/include/linux/random.h b/include/linux/random.h
+index e47e533..8773dfc 100644
+--- a/include/linux/random.h
++++ b/include/linux/random.h
+@@ -17,10 +17,15 @@ struct random_ready_callback {
+ 	struct module *owner;
+ };
+ 
+-extern void add_device_randomness(const void *, unsigned int);
+ extern void add_input_randomness(unsigned int type, unsigned int code,
+ 				 unsigned int value);
+ extern void add_interrupt_randomness(int irq, int irq_flags);
++#ifdef CONFIG_CRYPTO_LRNG
++#define add_device_randomness(buf, nbytes) do {} while (0)
++#else	/* CONFIG_CRYPTO_LRNG */
++extern void add_device_randomness(const void *, unsigned int);
++#define lrng_irq_process()
++#endif	/* CONFIG_CRYPTO_LRNG */
+ 
+ extern void get_random_bytes(void *buf, int nbytes);
+ extern int add_random_ready_callback(struct random_ready_callback *rdy);
 -- 
 2.7.2
