@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v4 4/5] crypto: LRNG - enable compile
-Date: Tue, 31 May 2016 20:39:23 +0200
-Message-ID: <3200381.4OGOeXfrff@positron.chronox.de>
+Subject: [PATCH v4 1/5] crypto: DRBG - externalize DRBG functions for LRNG
+Date: Tue, 31 May 2016 20:37:35 +0200
+Message-ID: <1727532.koGhzUTtM4@positron.chronox.de>
 References: <1668650.acZVSyjHlL@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -19,46 +19,80 @@ In-Reply-To: <1668650.acZVSyjHlL@positron.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add LRNG compilation support.
+This patch allows several DRBG functions to be called by the LRNG kernel
+code paths outside the drbg.c file.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/Kconfig  | 10 ++++++++++
- crypto/Makefile |  1 +
- 2 files changed, 11 insertions(+)
+ crypto/drbg.c         | 11 +++++------
+ include/crypto/drbg.h |  7 +++++++
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 1d33beb..9aaf96c 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1588,6 +1588,16 @@ config CRYPTO_JITTERENTROPY
- 	  random numbers. This Jitterentropy RNG registers with
- 	  the kernel crypto API and can be used by any caller.
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 0a3538f..c339a2e 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -113,7 +113,7 @@
+  * the SHA256 / AES 256 over other ciphers. Thus, the favored
+  * DRBGs are the latest entries in this array.
+  */
+-static const struct drbg_core drbg_cores[] = {
++struct drbg_core drbg_cores[] = {
+ #ifdef CONFIG_CRYPTO_DRBG_CTR
+ 	{
+ 		.flags = DRBG_CTR | DRBG_STRENGTH128,
+@@ -205,7 +205,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
+  * Return: normalized strength in *bytes* value or 32 as default
+  *	   to counter programming errors
+  */
+-static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
++unsigned short drbg_sec_strength(drbg_flag_t flags)
+ {
+ 	switch (flags & DRBG_STRENGTH_MASK) {
+ 	case DRBG_STRENGTH128:
+@@ -1140,7 +1140,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ }
  
-+config CRYPTO_LRNG
-+	bool "Linux Random Number Generator"
-+	select CRYPTO_DRBG_MENU
-+	help
-+	  The Linux Random Number Generator (LRNG) is the replacement
-+	  of the legacy /dev/random provided with drivers/char/random.c.
-+	  It generates entropy from different noise sources and
-+	  delivers significant entropy during boot. The LRNG only
-+	  works with the presence of a high-resolution timer.
+ /* Free all substructures in a DRBG state without the DRBG state structure */
+-static inline void drbg_dealloc_state(struct drbg_state *drbg)
++void drbg_dealloc_state(struct drbg_state *drbg)
+ {
+ 	if (!drbg)
+ 		return;
+@@ -1159,7 +1159,7 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+  * Allocate all sub-structures for a DRBG state.
+  * The DRBG state structure must already be allocated.
+  */
+-static inline int drbg_alloc_state(struct drbg_state *drbg)
++int drbg_alloc_state(struct drbg_state *drbg)
+ {
+ 	int ret = -ENOMEM;
+ 	unsigned int sb_size = 0;
+@@ -1682,8 +1682,7 @@ static int drbg_kcapi_sym(struct drbg_state *drbg, const unsigned char *key,
+  *
+  * return: flags
+  */
+-static inline void drbg_convert_tfm_core(const char *cra_driver_name,
+-					 int *coreref, bool *pr)
++void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool *pr)
+ {
+ 	int i = 0;
+ 	size_t start = 0;
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index d961b2b..d24ec22 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -268,4 +268,11 @@ enum drbg_prefixes {
+ 	DRBG_PREFIX3
+ };
+ 
++extern int drbg_alloc_state(struct drbg_state *drbg);
++extern void drbg_dealloc_state(struct drbg_state *drbg);
++extern void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref,
++				  bool *pr);
++extern struct drbg_core drbg_cores[];
++extern unsigned short drbg_sec_strength(drbg_flag_t flags);
 +
- config CRYPTO_USER_API
- 	tristate
- 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 4f4ef7e..7f91c8e 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -114,6 +114,7 @@ obj-$(CONFIG_CRYPTO_DRBG) += drbg.o
- obj-$(CONFIG_CRYPTO_JITTERENTROPY) += jitterentropy_rng.o
- CFLAGS_jitterentropy.o = -O0
- jitterentropy_rng-y := jitterentropy.o jitterentropy-kcapi.o
-+obj-$(CONFIG_CRYPTO_LRNG) += lrng.o
- obj-$(CONFIG_CRYPTO_TEST) += tcrypt.o
- obj-$(CONFIG_CRYPTO_GHASH) += ghash-generic.o
- obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
+ #endif /* _DRBG_H */
 -- 
 2.7.2
