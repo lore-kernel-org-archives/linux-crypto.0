@@ -1,82 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH stable 3.16+] crypto: s5p-sss - Fix missed interrupts
- when working with 8 kB blocks
-Date: Tue, 31 May 2016 10:15:36 +0800
-Message-ID: <20160531021536.GA11762@gondor.apana.org.au>
-References: <1464602968-7526-1-git-send-email-k.kozlowski@samsung.com>
+Subject: Re: [PATCH v5 1/3] crypto: Key-agreement Protocol Primitives API
+ (KPP)
+Date: Tue, 31 May 2016 14:42:10 +0800
+Message-ID: <20160531064210.GA13948@gondor.apana.org.au>
+References: <1462830041-7582-1-git-send-email-salvatore.benedetto@intel.com>
+ <1462830041-7582-2-git-send-email-salvatore.benedetto@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: stable@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+Cc: linux-crypto@vger.kernel.org
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48069 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:36814 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1162202AbcEaCPm (ORCPT
+	with ESMTP id S1751405AbcEaGmT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 30 May 2016 22:15:42 -0400
+	Tue, 31 May 2016 02:42:19 -0400
 Content-Disposition: inline
-In-Reply-To: <1464602968-7526-1-git-send-email-k.kozlowski@samsung.com>
+In-Reply-To: <1462830041-7582-2-git-send-email-salvatore.benedetto@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 30, 2016 at 12:09:28PM +0200, Krzysztof Kozlowski wrote:
-> commit 79152e8d085fd64484afd473ef6830b45518acba upstream.
-> 
-> The tcrypt testing module on Exynos5422-based Odroid XU3/4 board failed on
-> testing 8 kB size blocks:
-> 
-> 	$ sudo modprobe tcrypt sec=1 mode=500
-> 	testing speed of async ecb(aes) (ecb-aes-s5p) encryption
-> 	test 0 (128 bit key, 16 byte blocks): 21971 operations in 1 seconds (351536 bytes)
-> 	test 1 (128 bit key, 64 byte blocks): 21731 operations in 1 seconds (1390784 bytes)
-> 	test 2 (128 bit key, 256 byte blocks): 21932 operations in 1 seconds (5614592 bytes)
-> 	test 3 (128 bit key, 1024 byte blocks): 21685 operations in 1 seconds (22205440 bytes)
-> 	test 4 (128 bit key, 8192 byte blocks):
-> 
-> This was caused by a race issue of missed BRDMA_DONE ("Block cipher
-> Receiving DMA") interrupt. Device starts processing the data in DMA mode
-> immediately after setting length of DMA block: receiving (FCBRDMAL) or
-> transmitting (FCBTDMAL). The driver sets these lengths from interrupt
-> handler through s5p_set_dma_indata() function (or xxx_setdata()).
-> 
-> However the interrupt handler was first dealing with receive buffer
-> (dma-unmap old, dma-map new, set receive block length which starts the
-> operation), then with transmit buffer and finally was clearing pending
-> interrupts (FCINTPEND). Because of the time window between setting
-> receive buffer length and clearing pending interrupts, the operation on
-> receive buffer could end already and driver would miss new interrupt.
-> 
-> User manual for Exynos5422 confirms in example code that setting DMA
-> block lengths should be the last operation.
-> 
-> The tcrypt hang could be also observed in following blocked-task dmesg:
-> 
-> INFO: task modprobe:258 blocked for more than 120 seconds.
->       Not tainted 4.6.0-rc4-next-20160419-00005-g9eac8b7b7753-dirty #42
-> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> modprobe        D c06b09d8     0   258    256 0x00000000
-> [<c06b09d8>] (__schedule) from [<c06b0f24>] (schedule+0x40/0xac)
-> [<c06b0f24>] (schedule) from [<c06b49f8>] (schedule_timeout+0x124/0x178)
-> [<c06b49f8>] (schedule_timeout) from [<c06b17fc>] (wait_for_common+0xb8/0x144)
-> [<c06b17fc>] (wait_for_common) from [<bf0013b8>] (test_acipher_speed+0x49c/0x740 [tcrypt])
-> [<bf0013b8>] (test_acipher_speed [tcrypt]) from [<bf003e8c>] (do_test+0x2240/0x30ec [tcrypt])
-> [<bf003e8c>] (do_test [tcrypt]) from [<bf008048>] (tcrypt_mod_init+0x48/0xa4 [tcrypt])
-> [<bf008048>] (tcrypt_mod_init [tcrypt]) from [<c010177c>] (do_one_initcall+0x3c/0x16c)
-> [<c010177c>] (do_one_initcall) from [<c0191ff0>] (do_init_module+0x5c/0x1ac)
-> [<c0191ff0>] (do_init_module) from [<c0185610>] (load_module+0x1a30/0x1d08)
-> [<c0185610>] (load_module) from [<c0185ab0>] (SyS_finit_module+0x8c/0x98)
-> [<c0185ab0>] (SyS_finit_module) from [<c01078c0>] (ret_fast_syscall+0x0/0x3c)
-> 
-> Fixes: a49e490c7a8a ("crypto: s5p-sss - add S5PV210 advanced crypto engine support")
-> Cc: <stable@vger.kernel.org> # 3.16+
-> Signed-off-by: Krzysztof Kozlowski <k.kozlowski@samsung.com>
-> Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> [k.kozlowski: Backport to v3.16]
+On Mon, May 09, 2016 at 10:40:39PM +0100, Salvatore Benedetto wrote:
+> Add key-agreement protocol primitives (kpp) API which allows to
+> implement primitives required by protocols such as DH and ECDH.
+> The API is composed mainly by the following functions
+>  * set_params() - It allows the user to set the parameters known to
+>    both parties involved in the key-agreement session
+>  * set_secret() - It allows the user to set his secret, also
+>    referred to as his private key
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Why can't we just have one function, set_secret or better yet setkey?
+
+>  * generate_public_key() - It generates the public key to be sent to
+>    the other counterpart involved in the key-agreement session. The
+>    function has to be called after set_params() and set_secret()
+>  * generate_secret() - It generates the shared secret for the session
+
+Ditto, we only need one operation and that is multiplication by the
+secret.
+
+I'm OK with you keeping them separate for kpp users so that they
+don't have to explicitly provide G but please ensure that drivers
+only have to implement one of them.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
