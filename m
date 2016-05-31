@@ -1,53 +1,69 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: Test AEAD/authenc algorithms from userspace
-Date: Tue, 31 May 2016 09:05:33 +0200
-Message-ID: <2943969.IiWKeGvEyD@tauon.atsec.com>
-References: <CAFXBA=kStufh3TDe=+qQYmd2tNCj9hgXLUKBeoZHBs2VxRBRbQ@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: rsa - return raw integers for the ASN.1 parser
+Date: Tue, 31 May 2016 15:11:06 +0800
+Message-ID: <20160531071106.GA14223@gondor.apana.org.au>
+References: <1463065233-13452-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Harsh Jain <harshjain.prof@gmail.com>
+To: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:35162 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751462AbcEaHFh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 31 May 2016 03:05:37 -0400
-In-Reply-To: <CAFXBA=kStufh3TDe=+qQYmd2tNCj9hgXLUKBeoZHBs2VxRBRbQ@mail.gmail.com>
+Received: from helcar.hengli.com.au ([209.40.204.226]:56917 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755313AbcEaHiC (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 31 May 2016 03:38:02 -0400
+Content-Disposition: inline
+In-Reply-To: <1463065233-13452-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 31. Mai 2016, 12:31:16 schrieb Harsh Jain:
+On Thu, May 12, 2016 at 06:00:33PM +0300, Tudor Ambarus wrote:
+>
+>  int rsa_get_n(void *context, size_t hdrlen, unsigned char tag,
+>  	      const void *value, size_t vlen)
+>  {
+>  	struct rsa_key *key = context;
+> +	const char *ptr = value;
+> +	int ret;
+>  
+> -	key->n = mpi_read_raw_data(value, vlen);
+> -
+> -	if (!key->n)
+> -		return -ENOMEM;
+> +	while (!*ptr && vlen) {
+> +		ptr++;
+> +		vlen--;
+> +	}
+>  
+>  	/* In FIPS mode only allow key size 2K & 3K */
+> -	if (fips_enabled && (mpi_get_size(key->n) != 256 &&
+> -			     mpi_get_size(key->n) != 384)) {
+> +	if (fips_enabled && (vlen != 256 && vlen != 384)) {
+>  		pr_err("RSA: key size not allowed in FIPS mode\n");
+> -		mpi_free(key->n);
+> -		key->n = NULL;
+>  		return -EINVAL;
+>  	}
+> +	/* invalid key size provided */
+> +	ret = rsa_check_key_length(vlen << 3);
+> +	if (ret)
+> +		return ret;
+> +
+> +	key->n = kzalloc(vlen, key->flags);
+> +	if (!key->n)
+> +		return -ENOMEM;
+> +
 
-Hi Harsh,
+The helper shouldn't be copying it at all.
 
-> Hi All,
-> 
-> How can we open socket of type "authenc(hmac(sha256),cbc(aes))" from
-> userspace program.I check libkcapi library. It has test programs for
-> GCM/CCM. There are 3 types of approaches to Authenticated Encryption,
-> Which of them is supported in crypto framework.
-> 
-> 1) Encrypt-then-MAC (EtM)
->      The plaintext is first encrypted, then a MAC is produced based on
-> the resulting ciphertext. The ciphertext and its MAC are sent
-> together.
-> 2) Encrypt-and-MAC (E&M)
->      A MAC is produced based on the plaintext, and the plaintext is
-> encrypted without the MAC. The plaintext's MAC and the ciphertext are
-> sent together.
-> 
-> 3) MAC-then-Encrypt (MtE)
->      A MAC is produced based on the plaintext, then the plaintext and
-> MAC are together encrypted to produce a ciphertext based on both. The
-> ciphertext (containing an encrypted MAC) is sent.
+Just return the raw key as is and then the caller can copy it
+or MPI parse it, etc.
 
-The cipher types you mention refer to the implementation of authenc(). IIRC, 
-authenc implements EtM as this is mandated by IPSEC.
+The helper should just do the parsing and nothing else.
 
-When you use libkcapi, you should simply be able to use your cipher name with 
-the AEAD API. I.e. use the examples you see for CCM or GCM and use those with 
-the chosen authenc() cipher. Do you experience any issues?
-
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
