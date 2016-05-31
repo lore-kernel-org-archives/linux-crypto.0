@@ -1,29 +1,39 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH] KEYS: Add placeholder for KDF usage with DH
-Date: Tue, 31 May 2016 10:37:19 +0100
-Message-ID: <26983.1464687439@warthog.procyon.org.uk>
-References: <9470.1464302447@warthog.procyon.org.uk>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/6] crypto: talitos - making mapping helpers more generic
+Date: Tue, 31 May 2016 17:46:51 +0800
+Message-ID: <20160531094651.GA15187@gondor.apana.org.au>
+References: <cover.1464330501.git.christophe.leroy@c-s.fr>
+ <26474a2b44e69a0dbff43dbeed030ab5adef81db.1464330501.git.christophe.leroy@c-s.fr>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com,
-	Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org
-To: jmorris@namei.org
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <9470.1464302447@warthog.procyon.org.uk>
-Content-ID: <26982.1464687439.1@warthog.procyon.org.uk>
-Sender: owner-linux-security-module@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Kim Phillips <kim.phillips@arm.com>,
+	David S Miller <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-crypto@vger.kernel.org
+To: Christophe Leroy <christophe.leroy@c-s.fr>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:55199 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755162AbcEaJra (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 31 May 2016 05:47:30 -0400
+Content-Disposition: inline
+In-Reply-To: <26474a2b44e69a0dbff43dbeed030ab5adef81db.1464330501.git.christophe.leroy@c-s.fr>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi James,
+On Fri, May 27, 2016 at 11:32:36AM +0200, Christophe Leroy wrote:
+>
+> +	sg_count = sg_to_link_tbl_offset(src, sg_count, offset, len,
+> +					 &edesc->link_tbl[tbl_off])
+> +	if (sg_count == 1) {
+> +		/* Only one segment now, so no link tbl needed*/
+> +		copy_talitos_ptr(ptr, &edesc->link_tbl[tbl_off], is_sec1);
+> +		return sg_count;
+> +	}
 
-> Could you pass this along to Linus as soon as possible, please?  This
-> alters a new keyctl function added in the current merge window to allow for
-> a future extension planned for the next merge window.
-
-Is this likely to go to Linus before -rc2?  If not, we'll need to do things
-differently.
-
-David
+This patch doesn't build.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
