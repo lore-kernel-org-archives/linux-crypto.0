@@ -1,43 +1,55 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] lib/mpi: mpi_read_raw_data(): purge redundant
- clearing of nbits
-Date: Tue, 31 May 2016 18:18:52 +0800
-Message-ID: <20160531101852.GK15376@gondor.apana.org.au>
-References: <1464260732-4446-1-git-send-email-nicstange@gmail.com>
+Subject: Re: [PATCH 0/5] refactor mpi_read_from_buffer()
+Date: Tue, 31 May 2016 18:19:09 +0800
+Message-ID: <20160531101909.GL15376@gondor.apana.org.au>
+References: <1464297595-24032-1-git-send-email-nicstange@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
+Cc: David Howells <dhowells@redhat.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
 	Michal Marek <mmarek@suse.com>, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 To: Nicolai Stange <nicstange@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:58750 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:55041 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750865AbcEaKS7 (ORCPT
+	with ESMTP id S1751284AbcEaKTT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 31 May 2016 06:18:59 -0400
+	Tue, 31 May 2016 06:19:19 -0400
 Content-Disposition: inline
-In-Reply-To: <1464260732-4446-1-git-send-email-nicstange@gmail.com>
+In-Reply-To: <1464297595-24032-1-git-send-email-nicstange@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 26, 2016 at 01:05:31PM +0200, Nicolai Stange wrote:
-> In mpi_read_raw_data(), unsigned nbits is calculated as follows:
+On Thu, May 26, 2016 at 11:19:50PM +0200, Nicolai Stange wrote:
+> mpi_read_from_buffer() and mpi_read_raw_data() do almost the same and share a
+> fair amount of common code.
 > 
->  nbits = nbytes * 8;
+> This patchset attempts to rewrite mpi_read_from_buffer() in order to implement
+> it in terms of mpi_read_raw_data().
 > 
-> and redundantly cleared later on if nbytes == 0:
+> The patches 1 and 3, i.e.
+>   "lib/mpi: mpi_read_from_buffer(): return error code"
+> and
+>   "lib/mpi: mpi_read_from_buffer(): return -EINVAL upon too short buffer"
+> do the groundwork in that they move any error detection unique to
+> mpi_read_from_buffer() out of the data handling loop.
 > 
->   if (nbytes > 0)
->     ...
->   else
->     nbits = 0;
+> The patches 2 and 4, that is
+>   "lib/digsig: digsig_verify_rsa(): return -EINVAL if modulo length is zero"
+> and
+>   "lib/mpi: mpi_read_from_buffer(): sanitize short buffer printk"
+> are not strictly necessary for the refactoring: they cleanup some minor oddities
+> related to error handling I came across.
 > 
-> Purge this redundant clearing for the sake of clarity.
+> Finally, the last patch in this series,
+>   "lib/mpi: refactor mpi_read_from_buffer() in terms of mpi_read_raw_data()"
+> actually does what this series is all about.
 > 
-> Signed-off-by: Nicolai Stange <nicstange@gmail.com>
+> 
+> Applicable to linux-next-20160325.
 
-Both applied.
+All applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
