@@ -1,7 +1,7 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCH 04/28] crypto: omap: do not call dmaengine_terminate_all
-Date: Wed, 1 Jun 2016 11:56:05 +0300
-Message-ID: <1464771389-10640-5-git-send-email-t-kristo@ti.com>
+Subject: [PATCH 03/28] crypto: omap-sham: change queue size from 1 to 10
+Date: Wed, 1 Jun 2016 11:56:04 +0300
+Message-ID: <1464771389-10640-4-git-send-email-t-kristo@ti.com>
 References: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,50 +11,35 @@ To: <linux-omap@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 	<tony@atomide.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:43107 "EHLO comal.ext.ti.com"
+Received: from comal.ext.ti.com ([198.47.26.152]:43108 "EHLO comal.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757840AbcFAI5m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	id S1757680AbcFAI5m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
 	Wed, 1 Jun 2016 04:57:42 -0400
 In-Reply-To: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Lokesh Vutla <lokeshvutla@ti.com>
+Change crypto queue size from 1 to 10 for omap SHA driver. This should
+allow clients to enqueue requests more effectively to avoid serializing
+whole crypto sequences, giving extra performance.
 
-The extra call to dmaengine_terminate_all is not needed, as the DMA
-is not running at this point. This improves performance slightly.
-
-Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-aes.c  | 2 --
- drivers/crypto/omap-sham.c | 1 -
- 2 files changed, 3 deletions(-)
+ drivers/crypto/omap-sham.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 4a0e6a5..8178632 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -528,8 +528,6 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
- 
- 	omap_aes_dma_stop(dd);
- 
--	dmaengine_terminate_all(dd->dma_lch_in);
--	dmaengine_terminate_all(dd->dma_lch_out);
- 
- 	return 0;
- }
 diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 71eac5c..287bc43 100644
+index bd0258f..71eac5c 100644
 --- a/drivers/crypto/omap-sham.c
 +++ b/drivers/crypto/omap-sham.c
-@@ -805,7 +805,6 @@ static int omap_sham_update_dma_stop(struct omap_sham_dev *dd)
- {
- 	struct omap_sham_reqctx *ctx = ahash_request_ctx(dd->req);
+@@ -173,7 +173,7 @@ struct omap_sham_ctx {
+ 	struct omap_sham_hmac_ctx base[0];
+ };
  
--	dmaengine_terminate_all(dd->dma_lch);
+-#define OMAP_SHAM_QUEUE_LENGTH	1
++#define OMAP_SHAM_QUEUE_LENGTH	10
  
- 	if (ctx->flags & BIT(FLAGS_SG)) {
- 		dma_unmap_sg(dd->dev, ctx->sg, 1, DMA_TO_DEVICE);
+ struct omap_sham_algs_info {
+ 	struct ahash_alg	*algs_list;
 -- 
 1.9.1
