@@ -1,7 +1,7 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCH 16/28] ARM: DRA7: hwmod: Add data for DES IP
-Date: Wed, 1 Jun 2016 12:04:42 +0300
-Message-ID: <1464771882-11100-1-git-send-email-t-kristo@ti.com>
+Subject: [PATCH 17/28] ARM: DRA7: hwmod: Add data for AES IP
+Date: Wed, 1 Jun 2016 12:06:24 +0300
+Message-ID: <1464771984-11140-1-git-send-email-t-kristo@ti.com>
 References: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,87 +10,113 @@ To: <linux-omap@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 	<tony@atomide.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:43469 "EHLO comal.ext.ti.com"
+Received: from arroyo.ext.ti.com ([198.47.19.12]:51130 "EHLO arroyo.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751197AbcFAJFb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 1 Jun 2016 05:05:31 -0400
+	id S1752489AbcFAJHM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 1 Jun 2016 05:07:12 -0400
 In-Reply-To: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Joel Fernandes <joelf@ti.com>
 
-DRA7 SoC contains DES crypto hardware accelerator. Add hwmod data for
+DRA7 SoC contains AES crypto hardware accelerator. Add hwmod data for
 this IP so that it can be utilized by crypto frameworks.
 
 Signed-off-by: Joel Fernandes <joelf@ti.com>
 Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+[t-kristo@ti.com: squash in support for both AES1 and AES2 cores]
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- arch/arm/mach-omap2/omap_hwmod_7xx_data.c | 37 +++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ arch/arm/mach-omap2/omap_hwmod_7xx_data.c | 62 +++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
 
 diff --git a/arch/arm/mach-omap2/omap_hwmod_7xx_data.c b/arch/arm/mach-omap2/omap_hwmod_7xx_data.c
-index d0e7e525..13e4ea2 100644
+index 13e4ea2..ceb1b42 100644
 --- a/arch/arm/mach-omap2/omap_hwmod_7xx_data.c
 +++ b/arch/arm/mach-omap2/omap_hwmod_7xx_data.c
-@@ -2541,6 +2541,34 @@ static struct omap_hwmod dra7xx_uart10_hwmod = {
- 	},
+@@ -690,6 +690,50 @@ static struct omap_hwmod dra7xx_dss_hdmi_hwmod = {
+ 	.parent_hwmod	= &dra7xx_dss_hwmod,
  };
  
-+/* DES (the 'P' (public) device) */
-+static struct omap_hwmod_class_sysconfig dra7xx_des_sysc = {
-+	.rev_offs	= 0x0030,
-+	.sysc_offs	= 0x0034,
-+	.syss_offs	= 0x0038,
++/* AES (the 'P' (public) device) */
++static struct omap_hwmod_class_sysconfig dra7xx_aes_sysc = {
++	.rev_offs	= 0x0080,
++	.sysc_offs	= 0x0084,
++	.syss_offs	= 0x0088,
 +	.sysc_flags	= SYSS_HAS_RESET_STATUS,
 +};
 +
-+static struct omap_hwmod_class dra7xx_des_hwmod_class = {
-+	.name	= "des",
-+	.sysc	= &dra7xx_des_sysc,
++static struct omap_hwmod_class dra7xx_aes_hwmod_class = {
++	.name	= "aes",
++	.sysc	= &dra7xx_aes_sysc,
++	.rev	= 2,
 +};
 +
-+/* DES */
-+static struct omap_hwmod dra7xx_des_hwmod = {
-+	.name		= "des",
-+	.class		= &dra7xx_des_hwmod_class,
++/* AES1 */
++static struct omap_hwmod dra7xx_aes1_hwmod = {
++	.name		= "aes1",
++	.class		= &dra7xx_aes_hwmod_class,
 +	.clkdm_name	= "l4sec_clkdm",
 +	.main_clk	= "l3_iclk_div",
 +	.prcm = {
 +		.omap4 = {
-+			.clkctrl_offs = DRA7XX_CM_L4SEC_DES3DES_CLKCTRL_OFFSET,
-+			.context_offs = DRA7XX_RM_L4SEC_DES3DES_CONTEXT_OFFSET,
++			.clkctrl_offs = DRA7XX_CM_L4SEC_AES1_CLKCTRL_OFFSET,
++			.context_offs = DRA7XX_RM_L4SEC_AES1_CONTEXT_OFFSET,
++			.modulemode   = MODULEMODE_HWCTRL,
++		},
++	},
++};
++
++/* AES2 */
++static struct omap_hwmod dra7xx_aes2_hwmod = {
++	.name		= "aes2",
++	.class		= &dra7xx_aes_hwmod_class,
++	.clkdm_name	= "l4sec_clkdm",
++	.main_clk	= "l3_iclk_div",
++	.prcm = {
++		.omap4 = {
++			.clkctrl_offs = DRA7XX_CM_L4SEC_AES2_CLKCTRL_OFFSET,
++			.context_offs = DRA7XX_RM_L4SEC_AES2_CONTEXT_OFFSET,
 +			.modulemode   = MODULEMODE_HWCTRL,
 +		},
 +	},
 +};
 +
  /*
-  * 'usb_otg_ss' class
+  * 'elm' class
   *
-@@ -3683,6 +3711,14 @@ static struct omap_hwmod_ocp_if dra7xx_l4_per2__uart7 = {
+@@ -2988,6 +3032,22 @@ static struct omap_hwmod_ocp_if dra7xx_l3_main_1__hdmi = {
  	.user		= OCP_USER_MPU | OCP_USER_SDMA,
  };
  
-+/* l4_per1 -> des */
-+static struct omap_hwmod_ocp_if dra7xx_l4_per1__des = {
-+	.master		= &dra7xx_l4_per1_hwmod,
-+	.slave		= &dra7xx_des_hwmod,
++/* l3_main_1 -> aes1 */
++static struct omap_hwmod_ocp_if dra7xx_l3_main_1__aes1 = {
++	.master		= &dra7xx_l3_main_1_hwmod,
++	.slave		= &dra7xx_aes1_hwmod,
 +	.clk		= "l3_iclk_div",
 +	.user		= OCP_USER_MPU | OCP_USER_SDMA,
 +};
 +
- /* l4_per2 -> uart8 */
- static struct omap_hwmod_ocp_if dra7xx_l4_per2__uart8 = {
++/* l3_main_1 -> aes2 */
++static struct omap_hwmod_ocp_if dra7xx_l3_main_1__aes2 = {
++	.master		= &dra7xx_l3_main_1_hwmod,
++	.slave		= &dra7xx_aes2_hwmod,
++	.clk		= "l3_iclk_div",
++	.user		= OCP_USER_MPU | OCP_USER_SDMA,
++};
++
+ /* l4_per2 -> mcasp1 */
+ static struct omap_hwmod_ocp_if dra7xx_l4_per2__mcasp1 = {
  	.master		= &dra7xx_l4_per2_hwmod,
-@@ -3916,6 +3952,7 @@ static struct omap_hwmod_ocp_if *dra7xx_hwmod_ocp_ifs[] __initdata = {
- 	&dra7xx_l4_per2__uart8,
- 	&dra7xx_l4_per2__uart9,
- 	&dra7xx_l4_wkup__uart10,
-+	&dra7xx_l4_per1__des,
- 	&dra7xx_l4_per3__usb_otg_ss1,
- 	&dra7xx_l4_per3__usb_otg_ss2,
- 	&dra7xx_l4_per3__usb_otg_ss3,
+@@ -3877,6 +3937,8 @@ static struct omap_hwmod_ocp_if *dra7xx_hwmod_ocp_ifs[] __initdata = {
+ 	&dra7xx_l3_main_1__dss,
+ 	&dra7xx_l3_main_1__dispc,
+ 	&dra7xx_l3_main_1__hdmi,
++	&dra7xx_l3_main_1__aes1,
++	&dra7xx_l3_main_1__aes2,
+ 	&dra7xx_l4_per1__elm,
+ 	&dra7xx_l4_wkup__gpio1,
+ 	&dra7xx_l4_per1__gpio2,
 -- 
 1.9.1
