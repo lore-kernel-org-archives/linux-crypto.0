@@ -1,7 +1,7 @@
 From: Baolin Wang <baolin.wang@linaro.org>
-Subject: [RFC v3 1/4] block: Introduce blk_bio_map_sg() to map one bio
-Date: Wed,  1 Jun 2016 12:58:04 +0800
-Message-ID: <2f0f6811938dafd14c6c7b1dbe8fbabfdcbb19c1.1464756501.git.baolin.wang@linaro.org>
+Subject: [RFC v3 2/4] crypto: Introduce CRYPTO_ALG_BULK flag
+Date: Wed,  1 Jun 2016 12:58:05 +0800
+Message-ID: <47e9ddd8c9ea9ad9e29c8cb027d19d8459ea1479.1464756501.git.baolin.wang@linaro.org>
 References: <cover.1464756501.git.baolin.wang@linaro.org>
 Cc: ebiggers3@gmail.com, js1304@gmail.com, tadeusz.struk@intel.com,
 	smueller@chronox.de, standby24x7@gmail.com, shli@kernel.org,
@@ -14,103 +14,75 @@ Cc: ebiggers3@gmail.com, js1304@gmail.com, tadeusz.struk@intel.com,
 To: axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
 	dm-devel@redhat.com, herbert@gondor.apana.org.au,
 	davem@davemloft.net
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f176.google.com ([209.85.192.176]:36608 "EHLO
+	mail-pf0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756857AbcFAE6x (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 1 Jun 2016 00:58:53 -0400
+Received: by mail-pf0-f176.google.com with SMTP id f144so7153763pfa.3
+        for <linux-crypto@vger.kernel.org>; Tue, 31 May 2016 21:58:52 -0700 (PDT)
 In-Reply-To: <cover.1464756501.git.baolin.wang@linaro.org>
 In-Reply-To: <cover.1464756501.git.baolin.wang@linaro.org>
 References: <cover.1464756501.git.baolin.wang@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-In dm-crypt, it need to map one bio to scatterlist for improving the
-hardware engine encryption efficiency. Thus this patch introduces the
-blk_bio_map_sg() function to map one bio with scatterlists.
+Now some cipher hardware engines prefer to handle bulk block rather than one
+sector (512 bytes) created by dm-crypt, cause these cipher engines can handle
+the intermediate values (IV) by themselves in one bulk block. This means we
+can increase the size of the request by merging request rather than always 512
+bytes and thus increase the hardware engine processing speed.
 
-For avoiding the duplicated code in __blk_bios_map_sg() function, add
-one parameter to distinguish bio map or request map.
+So introduce 'CRYPTO_ALG_BULK' flag to indicate this cipher can support bulk
+mode.
 
 Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
 ---
- block/blk-merge.c      |   36 +++++++++++++++++++++++++++++++-----
- include/linux/blkdev.h |    2 ++
- 2 files changed, 33 insertions(+), 5 deletions(-)
+ include/crypto/skcipher.h |    7 +++++++
+ include/linux/crypto.h    |    6 ++++++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 2613531..badae44 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -376,7 +376,7 @@ new_segment:
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 0f987f5..d89d29a 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -519,5 +519,12 @@ static inline void skcipher_request_set_crypt(
+ 	req->iv = iv;
+ }
  
- static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
- 			     struct scatterlist *sglist,
--			     struct scatterlist **sg)
-+			     struct scatterlist **sg, bool single_bio)
- {
- 	struct bio_vec bvec, bvprv = { NULL };
- 	struct bvec_iter iter;
-@@ -408,13 +408,39 @@ single_segment:
- 		return 1;
- 	}
- 
--	for_each_bio(bio)
-+	if (!single_bio) {
-+		for_each_bio(bio)
-+			bio_for_each_segment(bvec, bio, iter)
-+				__blk_segment_map_sg(q, &bvec, sglist, &bvprv,
-+						     sg, &nsegs, &cluster);
-+	} else {
- 		bio_for_each_segment(bvec, bio, iter)
--			__blk_segment_map_sg(q, &bvec, sglist, &bvprv, sg,
--					     &nsegs, &cluster);
-+			__blk_segment_map_sg(q, &bvec, sglist, &bvprv,
-+					     sg, &nsegs, &cluster);
-+	}
++static inline unsigned int skcipher_is_bulk_mode(struct crypto_skcipher *sk_tfm)
++{
++	struct crypto_tfm *tfm = crypto_skcipher_tfm(sk_tfm);
 +
-+	return nsegs;
++	return crypto_tfm_alg_bulk(tfm);
 +}
 +
-+/*
-+ * Map a bio to scatterlist, return number of sg entries setup. Caller must
-+ * make sure sg can hold bio segments entries.
-+ */
-+int blk_bio_map_sg(struct request_queue *q, struct bio *bio,
-+		   struct scatterlist *sglist)
-+{
-+	struct scatterlist *sg = NULL;
-+	int nsegs = 0;
-+
-+	if (bio)
-+		nsegs = __blk_bios_map_sg(q, bio, sglist, &sg, true);
-+
-+	if (sg)
-+		sg_mark_end(sg);
+ #endif	/* _CRYPTO_SKCIPHER_H */
  
- 	return nsegs;
- }
-+EXPORT_SYMBOL(blk_bio_map_sg);
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 6e28c89..a315487 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -63,6 +63,7 @@
+ #define CRYPTO_ALG_DEAD			0x00000020
+ #define CRYPTO_ALG_DYING		0x00000040
+ #define CRYPTO_ALG_ASYNC		0x00000080
++#define CRYPTO_ALG_BULK			0x00000100
  
  /*
-  * map a request to scatterlist, return number of sg entries setup. Caller
-@@ -427,7 +453,7 @@ int blk_rq_map_sg(struct request_queue *q, struct request *rq,
- 	int nsegs = 0;
+  * Set this bit if and only if the algorithm requires another algorithm of
+@@ -623,6 +624,11 @@ static inline u32 crypto_tfm_alg_type(struct crypto_tfm *tfm)
+ 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_TYPE_MASK;
+ }
  
- 	if (rq->bio)
--		nsegs = __blk_bios_map_sg(q, rq->bio, sglist, &sg);
-+		nsegs = __blk_bios_map_sg(q, rq->bio, sglist, &sg, false);
- 
- 	if (unlikely(rq->cmd_flags & REQ_COPY_USER) &&
- 	    (blk_rq_bytes(rq) & q->dma_pad_mask)) {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1fd8fdf..5868062 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1013,6 +1013,8 @@ extern void blk_queue_write_cache(struct request_queue *q, bool enabled, bool fu
- extern struct backing_dev_info *blk_get_backing_dev_info(struct block_device *bdev);
- 
- extern int blk_rq_map_sg(struct request_queue *, struct request *, struct scatterlist *);
-+extern int blk_bio_map_sg(struct request_queue *q, struct bio *bio,
-+			  struct scatterlist *sglist);
- extern void blk_dump_rq_flags(struct request *, char *);
- extern long nr_blockdev_pages(void);
- 
++static inline unsigned int crypto_tfm_alg_bulk(struct crypto_tfm *tfm)
++{
++	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_BULK;
++}
++
+ static inline unsigned int crypto_tfm_alg_blocksize(struct crypto_tfm *tfm)
+ {
+ 	return tfm->__crt_alg->cra_blocksize;
 -- 
 1.7.9.5
