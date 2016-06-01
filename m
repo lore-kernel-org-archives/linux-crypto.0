@@ -1,115 +1,71 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCH 02/28] crypto: omap-sham: Don't idle/start SHA device between Encrypt operations
-Date: Wed, 1 Jun 2016 11:56:03 +0300
-Message-ID: <1464771389-10640-3-git-send-email-t-kristo@ti.com>
+Subject: [PATCH 01/28] crypto: omap-aes: Fix registration of algorithms
+Date: Wed, 1 Jun 2016 11:56:02 +0300
+Message-ID: <1464771389-10640-2-git-send-email-t-kristo@ti.com>
 References: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-arm-kernel@lists.infradead.org>, <lokeshvutla@ti.com>,
-	Tero Kristo <t-kristo@ti.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: lokeshvutla@ti.com, Tero Kristo <t-kristo@ti.com>,
+ linux-arm-kernel@lists.infradead.org
 To: <linux-omap@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<tony@atomide.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:43111 "EHLO comal.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757941AbcFAI5o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 1 Jun 2016 04:57:44 -0400
+ <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <tony@atomide.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
 From: Lokesh Vutla <lokeshvutla@ti.com>
 
-Calling runtime PM API for every block causes serious perf hit to
-crypto operations that are done on a long buffer.
-As crypto is performed on a page boundary, encrypting large buffers can
-cause a series of crypto operations divided by page. The runtime PM API
-is also called those many times.
-
-We call runtime_pm_get_sync only at beginning on the session (cra_init)
-and runtime_pm_put at the end. This result in upto a 50% speedup.
-This doesn't make the driver to keep the system awake as runtime get/put
-is only called during a crypto session which completes usually quickly.
+Algorithms can be registered only once. So skip registration of
+algorithms if already registered (i.e. in case we have two AES cores
+in the system.)
 
 Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-sham.c | 27 +++++++++++++++++----------
- 1 file changed, 17 insertions(+), 10 deletions(-)
+ drivers/crypto/omap-aes.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 6eefaa2..bd0258f 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -360,14 +360,6 @@ static void omap_sham_copy_ready_hash(struct ahash_request *req)
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index ce174d3..4a0e6a5 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -1185,17 +1185,19 @@ static int omap_aes_probe(struct platform_device *pdev)
+ 	spin_unlock(&list_lock);
  
- static int omap_sham_hw_init(struct omap_sham_dev *dd)
- {
--	int err;
--
--	err = pm_runtime_get_sync(dd->dev);
--	if (err < 0) {
--		dev_err(dd->dev, "failed to get sync: %d\n", err);
--		return err;
--	}
--
- 	if (!test_bit(FLAGS_INIT, &dd->flags)) {
- 		set_bit(FLAGS_INIT, &dd->flags);
- 		dd->err = 0;
-@@ -999,8 +991,6 @@ static void omap_sham_finish_req(struct ahash_request *req, int err)
- 	dd->flags &= ~(BIT(FLAGS_BUSY) | BIT(FLAGS_FINAL) | BIT(FLAGS_CPU) |
- 			BIT(FLAGS_DMA_READY) | BIT(FLAGS_OUTPUT_READY));
+ 	for (i = 0; i < dd->pdata->algs_info_size; i++) {
+-		for (j = 0; j < dd->pdata->algs_info[i].size; j++) {
+-			algp = &dd->pdata->algs_info[i].algs_list[j];
++		if (!dd->pdata->algs_info[i].registered) {
++			for (j = 0; j < dd->pdata->algs_info[i].size; j++) {
++				algp = &dd->pdata->algs_info[i].algs_list[j];
  
--	pm_runtime_put(dd->dev);
--
- 	if (req->base.complete)
- 		req->base.complete(&req->base, err);
+-			pr_debug("reg alg: %s\n", algp->cra_name);
+-			INIT_LIST_HEAD(&algp->cra_list);
++				pr_debug("reg alg: %s\n", algp->cra_name);
++				INIT_LIST_HEAD(&algp->cra_list);
  
-@@ -1239,6 +1229,7 @@ static int omap_sham_cra_init_alg(struct crypto_tfm *tfm, const char *alg_base)
- {
- 	struct omap_sham_ctx *tctx = crypto_tfm_ctx(tfm);
- 	const char *alg_name = crypto_tfm_alg_name(tfm);
-+	struct omap_sham_dev *dd;
+-			err = crypto_register_alg(algp);
+-			if (err)
+-				goto err_algs;
++				err = crypto_register_alg(algp);
++				if (err)
++					goto err_algs;
  
- 	/* Allocate a fallback and abort if it failed. */
- 	tctx->fallback = crypto_alloc_shash(alg_name, 0,
-@@ -1266,6 +1257,13 @@ static int omap_sham_cra_init_alg(struct crypto_tfm *tfm, const char *alg_base)
- 
+-			dd->pdata->algs_info[i].registered++;
++				dd->pdata->algs_info[i].registered++;
++			}
+ 		}
  	}
  
-+	spin_lock_bh(&sham.lock);
-+	list_for_each_entry(dd, &sham.dev_list, list) {
-+		break;
-+	}
-+	spin_unlock_bh(&sham.lock);
-+
-+	pm_runtime_get_sync(dd->dev);
- 	return 0;
- }
- 
-@@ -1307,6 +1305,7 @@ static int omap_sham_cra_sha512_init(struct crypto_tfm *tfm)
- static void omap_sham_cra_exit(struct crypto_tfm *tfm)
- {
- 	struct omap_sham_ctx *tctx = crypto_tfm_ctx(tfm);
-+	struct omap_sham_dev *dd;
- 
- 	crypto_free_shash(tctx->fallback);
- 	tctx->fallback = NULL;
-@@ -1315,6 +1314,14 @@ static void omap_sham_cra_exit(struct crypto_tfm *tfm)
- 		struct omap_sham_hmac_ctx *bctx = tctx->base;
- 		crypto_free_shash(bctx->shash);
- 	}
-+
-+	spin_lock_bh(&sham.lock);
-+	list_for_each_entry(dd, &sham.dev_list, list) {
-+		break;
-+	}
-+	spin_unlock_bh(&sham.lock);
-+
-+	pm_runtime_get_sync(dd->dev);
- }
- 
- static struct ahash_alg algs_sha1_md5[] = {
 -- 
 1.9.1
