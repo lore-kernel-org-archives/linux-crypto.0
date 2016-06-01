@@ -1,45 +1,60 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: (none)
-Date: Wed, 1 Jun 2016 15:05:49 +0800
-Message-ID: <20160601070549.GA380@gondor.apana.org.au>
-References: <20160601045943.GA31881@gondor.apana.org.au>
- <3022334.qkucHDndN1@tauon.atsec.com>
- <20160601061947.GA32424@gondor.apana.org.au>
- <CAH8yC8==HPONkYSoPaa9E0b4+SKnbPEPeQatBUqc_HzJbD8DAA@mail.gmail.com>
+From: Tero Kristo <t-kristo@ti.com>
+Subject: [PATCH 04/28] crypto: omap: do not call dmaengine_terminate_all
+Date: Wed, 1 Jun 2016 11:56:05 +0300
+Message-ID: <1464771389-10640-5-git-send-email-t-kristo@ti.com>
+References: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Jeffrey Walton <noloader@gmail.com>
+Content-Type: text/plain
+Cc: <linux-arm-kernel@lists.infradead.org>, <lokeshvutla@ti.com>,
+	Tero Kristo <t-kristo@ti.com>
+To: <linux-omap@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<tony@atomide.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55016 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752209AbcFAHFx (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 1 Jun 2016 03:05:53 -0400
-Content-Disposition: inline
-In-Reply-To: <CAH8yC8==HPONkYSoPaa9E0b4+SKnbPEPeQatBUqc_HzJbD8DAA@mail.gmail.com>
+Received: from comal.ext.ti.com ([198.47.26.152]:43107 "EHLO comal.ext.ti.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757840AbcFAI5m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 1 Jun 2016 04:57:42 -0400
+In-Reply-To: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 01, 2016 at 02:59:21AM -0400, Jeffrey Walton wrote:
-> 
-> $ cat /proc/modules | egrep -i '(via|padlock|rng)'
-> padlock_sha 16384 0 - Live 0x00000000
-> padlock_aes 16384 0 - Live 0x00000000
-> via_cputemp 16384 0 - Live 0x00000000
-> hwmon_vid 16384 1 via_cputemp, Live 0x00000000
-> via_rng 16384 0 - Live 0x00000000
-> i2c_viapro 16384 0 - Live 0x00000000
-> pata_via 16384 0 - Live 0x00000000
-> sata_via 16384 2 - Live 0x00000000
+From: Lokesh Vutla <lokeshvutla@ti.com>
 
-OK, by default hwrng entropy is not fed into /dev/random.
+The extra call to dmaengine_terminate_all is not needed, as the DMA
+is not running at this point. This improves performance slightly.
 
-You need to enable it by hand by setting default_quality on the
-rng-core module to a non-zero value.
+Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+Signed-off-by: Tero Kristo <t-kristo@ti.com>
+---
+ drivers/crypto/omap-aes.c  | 2 --
+ drivers/crypto/omap-sham.c | 1 -
+ 2 files changed, 3 deletions(-)
 
-Cheers,
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 4a0e6a5..8178632 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -528,8 +528,6 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
+ 
+ 	omap_aes_dma_stop(dd);
+ 
+-	dmaengine_terminate_all(dd->dma_lch_in);
+-	dmaengine_terminate_all(dd->dma_lch_out);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 71eac5c..287bc43 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -805,7 +805,6 @@ static int omap_sham_update_dma_stop(struct omap_sham_dev *dd)
+ {
+ 	struct omap_sham_reqctx *ctx = ahash_request_ctx(dd->req);
+ 
+-	dmaengine_terminate_all(dd->dma_lch);
+ 
+ 	if (ctx->flags & BIT(FLAGS_SG)) {
+ 		dma_unmap_sg(dd->dev, ctx->sg, 1, DMA_TO_DEVICE);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
