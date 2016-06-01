@@ -1,8 +1,9 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCH 19/28] ARM: DRA7: hwmod: Add data for RNG IP
-Date: Wed, 1 Jun 2016 12:06:40 +0300
-Message-ID: <1464772000-11216-1-git-send-email-t-kristo@ti.com>
+Subject: [PATCH 21/28] ARM: AM43xx: hwmod: Add data for DES
+Date: Wed, 1 Jun 2016 12:06:39 +0300
+Message-ID: <1464772006-11254-2-git-send-email-t-kristo@ti.com>
 References: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
+ <1464772006-11254-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-arm-kernel@lists.infradead.org>, <lokeshvutla@ti.com>
@@ -10,88 +11,95 @@ To: <linux-omap@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 	<tony@atomide.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:43590 "EHLO comal.ext.ti.com"
+Received: from comal.ext.ti.com ([198.47.26.152]:43601 "EHLO comal.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757587AbcFAJH0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 1 Jun 2016 05:07:26 -0400
-In-Reply-To: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
+	id S1757573AbcFAJHm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 1 Jun 2016 05:07:42 -0400
+In-Reply-To: <1464772006-11254-1-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Joel Fernandes <joelf@ti.com>
+From: Lokesh Vutla <lokeshvutla@ti.com>
 
-DRA7 SoC contains hardware random number generator. Add hwmod data for
-this IP so that it can be utilized.
+AM43xx SoC contains DES crypto hardware accelerator. Add hwmod data for
+this IP so that it can be utilized by crypto frameworks.
 
-Signed-off-by: Joel Fernandes <joelf@ti.com>
 Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
-[t-kristo@ti.com: squashed the RNG hwmod IP flag fixes from Lokesh,
-                  squashed the HS chip fix from Daniel Allred]
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- arch/arm/mach-omap2/omap_hwmod_7xx_data.c | 36 +++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ arch/arm/mach-omap2/omap_hwmod_43xx_data.c | 33 ++++++++++++++++++++++++++++++
+ arch/arm/mach-omap2/prcm43xx.h             |  1 +
+ 2 files changed, 34 insertions(+)
 
-diff --git a/arch/arm/mach-omap2/omap_hwmod_7xx_data.c b/arch/arm/mach-omap2/omap_hwmod_7xx_data.c
-index 8932619..0508067 100644
---- a/arch/arm/mach-omap2/omap_hwmod_7xx_data.c
-+++ b/arch/arm/mach-omap2/omap_hwmod_7xx_data.c
-@@ -2641,6 +2641,34 @@ static struct omap_hwmod dra7xx_des_hwmod = {
+diff --git a/arch/arm/mach-omap2/omap_hwmod_43xx_data.c b/arch/arm/mach-omap2/omap_hwmod_43xx_data.c
+index 97fd399..b54eeaa 100644
+--- a/arch/arm/mach-omap2/omap_hwmod_43xx_data.c
++++ b/arch/arm/mach-omap2/omap_hwmod_43xx_data.c
+@@ -463,6 +463,31 @@ static struct omap_hwmod am43xx_adc_tsc_hwmod = {
  	},
  };
  
-+/* rng */
-+static struct omap_hwmod_class_sysconfig dra7xx_rng_sysc = {
-+	.rev_offs       = 0x1fe0,
-+	.sysc_offs      = 0x1fe4,
-+	.sysc_flags     = SYSC_HAS_AUTOIDLE | SYSC_HAS_SIDLEMODE,
-+	.idlemodes      = SIDLE_FORCE | SIDLE_NO,
-+	.sysc_fields    = &omap_hwmod_sysc_type1,
++static struct omap_hwmod_class_sysconfig am43xx_des_sysc = {
++	.rev_offs	= 0x30,
++	.sysc_offs	= 0x34,
++	.syss_offs	= 0x38,
++	.sysc_flags	= SYSS_HAS_RESET_STATUS,
 +};
 +
-+static struct omap_hwmod_class dra7xx_rng_hwmod_class = {
-+	.name           = "rng",
-+	.sysc           = &dra7xx_rng_sysc,
++static struct omap_hwmod_class am43xx_des_hwmod_class = {
++	.name		= "des",
++	.sysc		= &am43xx_des_sysc,
 +};
 +
-+static struct omap_hwmod dra7xx_rng_hwmod = {
-+	.name           = "rng",
-+	.class          = &dra7xx_rng_hwmod_class,
-+	.flags		= HWMOD_SWSUP_SIDLE,
-+	.clkdm_name     = "l4sec_clkdm",
-+	.prcm = {
-+		.omap4 = {
-+			.clkctrl_offs = DRA7XX_CM_L4SEC_RNG_CLKCTRL_OFFSET,
-+			.context_offs = DRA7XX_RM_L4SEC_RNG_CONTEXT_OFFSET,
-+			.modulemode   = MODULEMODE_HWCTRL,
++static struct omap_hwmod am43xx_des_hwmod = {
++	.name		= "des",
++	.class		= &am43xx_des_hwmod_class,
++	.clkdm_name	= "l3_clkdm",
++	.main_clk	= "l3_gclk",
++	.prcm		= {
++		.omap4	= {
++			.clkctrl_offs	= AM43XX_CM_PER_DES_CLKCTRL_OFFSET,
++			.modulemode	= MODULEMODE_SWCTRL,
 +		},
 +	},
 +};
 +
- /*
-  * 'usb_otg_ss' class
-  *
-@@ -3839,6 +3867,13 @@ static struct omap_hwmod_ocp_if dra7xx_l4_wkup__uart10 = {
- 	.user		= OCP_USER_MPU | OCP_USER_SDMA,
+ /* dss */
+ 
+ static struct omap_hwmod am43xx_dss_core_hwmod = {
+@@ -912,6 +937,13 @@ static struct omap_hwmod_ocp_if am43xx_l4_ls__vpfe1 = {
+ 	.user           = OCP_USER_MPU | OCP_USER_SDMA,
  };
  
-+/* l4_per1 -> rng */
-+static struct omap_hwmod_ocp_if dra7xx_l4_per1__rng = {
-+	.master         = &dra7xx_l4_per1_hwmod,
-+	.slave          = &dra7xx_rng_hwmod,
-+	.user           = OCP_USER_MPU,
++static struct omap_hwmod_ocp_if am43xx_l3_main__des = {
++	.master		= &am33xx_l3_main_hwmod,
++	.slave		= &am43xx_des_hwmod,
++	.clk		= "l3_gclk",
++	.user		= OCP_USER_MPU,
 +};
 +
- /* l4_per3 -> usb_otg_ss1 */
- static struct omap_hwmod_ocp_if dra7xx_l4_per3__usb_otg_ss1 = {
- 	.master		= &dra7xx_l4_per3_hwmod,
-@@ -4069,6 +4104,7 @@ static struct omap_hwmod_ocp_if *dra7xx_hwmod_ocp_ifs[] __initdata = {
- /* GP-only hwmod links */
- static struct omap_hwmod_ocp_if *dra7xx_gp_hwmod_ocp_ifs[] __initdata = {
- 	&dra7xx_l4_wkup__timer12,
-+	&dra7xx_l4_per1__rng,
- 	NULL,
- };
- 
+ static struct omap_hwmod_ocp_if *am43xx_hwmod_ocp_ifs[] __initdata = {
+ 	&am33xx_l4_wkup__synctimer,
+ 	&am43xx_l4_ls__timer8,
+@@ -1004,6 +1036,7 @@ static struct omap_hwmod_ocp_if *am43xx_hwmod_ocp_ifs[] __initdata = {
+ 	&am33xx_cpgmac0__mdio,
+ 	&am33xx_l3_main__sha0,
+ 	&am33xx_l3_main__aes0,
++	&am43xx_l3_main__des,
+ 	&am43xx_l4_ls__ocp2scp0,
+ 	&am43xx_l4_ls__ocp2scp1,
+ 	&am43xx_l3_s__usbotgss0,
+diff --git a/arch/arm/mach-omap2/prcm43xx.h b/arch/arm/mach-omap2/prcm43xx.h
+index 7c34c44e..593482e 100644
+--- a/arch/arm/mach-omap2/prcm43xx.h
++++ b/arch/arm/mach-omap2/prcm43xx.h
+@@ -132,6 +132,7 @@
+ #define AM43XX_CM_PER_OCMCRAM_CLKCTRL_OFFSET		0x0050
+ #define AM43XX_CM_PER_SHA0_CLKCTRL_OFFSET		0x0058
+ #define AM43XX_CM_PER_AES0_CLKCTRL_OFFSET		0x0028
++#define AM43XX_CM_PER_DES_CLKCTRL_OFFSET		0x0030
+ #define AM43XX_CM_PER_TIMER8_CLKCTRL_OFFSET		0x0560
+ #define AM43XX_CM_PER_TIMER9_CLKCTRL_OFFSET		0x0568
+ #define AM43XX_CM_PER_TIMER10_CLKCTRL_OFFSET		0x0570
 -- 
 1.9.1
