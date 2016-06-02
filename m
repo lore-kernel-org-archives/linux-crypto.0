@@ -1,42 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC v2 2/3] crypto: Introduce CRYPTO_ALG_BULK flag
-Date: Thu, 2 Jun 2016 16:26:06 +0800
-Message-ID: <20160602082606.GA15226@gondor.apana.org.au>
-References: <cover.1464346333.git.baolin.wang@linaro.org>
- <47e9ddd8c9ea9ad9e29c8cb027d19d8459ea1479.1464346333.git.baolin.wang@linaro.org>
+Subject: Re: [PATCH v2 1/2] crypto: engine: permit to enqueue ashash_request
+Date: Thu, 2 Jun 2016 16:32:59 +0800
+Message-ID: <20160602083258.GB15226@gondor.apana.org.au>
+References: <1464615122-16685-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1464615122-16685-2-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
-	dm-devel@redhat.com, davem@davemloft.net, ebiggers3@gmail.com,
-	js1304@gmail.com, tadeusz.struk@intel.com, smueller@chronox.de,
-	standby24x7@gmail.com, shli@kernel.org, dan.j.williams@intel.com,
-	martin.petersen@oracle.com, sagig@mellanox.com,
-	kent.overstreet@gmail.com, keith.busch@intel.com, tj@kernel.org,
-	ming.lei@canonical.com, broonie@kernel.org, arnd@arndb.de,
-	linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Baolin Wang <baolin.wang@linaro.org>
+Cc: davem@davemloft.net, baolin.wang@linaro.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <47e9ddd8c9ea9ad9e29c8cb027d19d8459ea1479.1464346333.git.baolin.wang@linaro.org>
+In-Reply-To: <1464615122-16685-2-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, May 27, 2016 at 07:11:23PM +0800, Baolin Wang wrote:
-> Now some cipher hardware engines prefer to handle bulk block rather than one
-> sector (512 bytes) created by dm-crypt, cause these cipher engines can handle
-> the intermediate values (IV) by themselves in one bulk block. This means we
-> can increase the size of the request by merging request rather than always 512
-> bytes and thus increase the hardware engine processing speed.
+On Mon, May 30, 2016 at 03:32:01PM +0200, LABBE Corentin wrote:
+> The current crypto engine allow only ablkcipher_request to be enqueued.
+> Thus denying any use of it for hardware that also handle hash algo.
 > 
-> So introduce 'CRYPTO_ALG_BULK' flag to indicate this cipher can support bulk
-> mode.
+> This patch convert all ablkcipher_request references to the
+> more general crypto_async_request.
 > 
-> Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
+> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 
-I think a better aproach would be to explicitly move the IV generation
-into the crypto API, similar to how we handle IPsec.  Once you do
-that then every algorithm can be handled through the bulk interface.
+First of all your patches break bisection which is unacceptable.
+
+Secondly you should not be casting generic requests to a specific type.
+
+Assuming a single engine only has to deal with one type of requests,
+what you could do is to create a separate engine type for each
+crypto type that you want to support.
 
 Cheers,
 -- 
