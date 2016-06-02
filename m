@@ -1,42 +1,170 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [RFC] DRBG: which shall be default?
-Date: Thu, 02 Jun 2016 14:06:55 +0200
-Message-ID: <1580741.tpUX5Z7OKy@tauon.atsec.com>
-References: <1664837.3VbqQRUZed@positron.chronox.de> <3243059.jE1At2qco9@tauon.atsec.com> <20160602094211.GA16489@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v5 7/9] crypto: acomp - add support for 842 via scomp
+Date: Thu,  2 Jun 2016 13:29:01 +0100
+Message-ID: <1464870543-5988-8-git-send-email-giovanni.cabiddu@intel.com>
+References: <1464870543-5988-1-git-send-email-giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:35708 "EHLO mail.eperm.de"
+Received: from mga11.intel.com ([192.55.52.93]:31755 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750854AbcFBMG7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Jun 2016 08:06:59 -0400
-In-Reply-To: <20160602094211.GA16489@gondor.apana.org.au>
+	id S1753147AbcFBM3N (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jun 2016 08:29:13 -0400
+In-Reply-To: <1464870543-5988-1-git-send-email-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 2. Juni 2016, 17:42:11 schrieb Herbert Xu:
+This patch implements an scomp backend for the 842 compression algorithm.
+This way, 842 is exposed through the acomp api.
 
-Hi Herbert,
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ crypto/842.c   |   82 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ crypto/Kconfig |    1 +
+ 2 files changed, 80 insertions(+), 3 deletions(-)
 
-> On Thu, Jun 02, 2016 at 11:31:22AM +0200, Stephan Mueller wrote:
-> > The skcipher API, however, wants to encrypt an entire input data stream.
-> > That means the skcipher API requires the length of the input data stream
-> > to generate an equally sized output data stream. But that is not what we
-> > have here -- there is no input data. I.e. the skcipher API invokes the
-> > CTR mode for the stream cipher and performs the final XOR of the CTR
-> > stream with the input data.
-> 
-> Just use an input stream of zeros.
-
-I am working on it. During the analysis, I saw, however, that the DRBG 
-increments the counter before the encryption whereas the the CTR mode 
-increments it after the encryption.
-
-I could of course adjust the handling in the code, but this would be a real 
-hack IMHO.
-
-Ciao
-Stephan
+diff --git a/crypto/842.c b/crypto/842.c
+index 98e387e..a954ed3 100644
+--- a/crypto/842.c
++++ b/crypto/842.c
+@@ -31,11 +31,46 @@
+ #include <linux/module.h>
+ #include <linux/crypto.h>
+ #include <linux/sw842.h>
++#include <crypto/internal/scompress.h>
+ 
+ struct crypto842_ctx {
+-	char wmem[SW842_MEM_COMPRESS];	/* working memory for compress */
++	void *wmem;	/* working memory for compress */
+ };
+ 
++static void *crypto842_alloc_ctx(struct crypto_scomp *tfm)
++{
++	void *ctx;
++
++	ctx = kmalloc(SW842_MEM_COMPRESS, GFP_KERNEL);
++	if (!ctx)
++		return ERR_PTR(-ENOMEM);
++
++	return ctx;
++}
++
++static int crypto842_init(struct crypto_tfm *tfm)
++{
++	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	ctx->wmem = crypto842_alloc_ctx(NULL);
++	if (IS_ERR(ctx->wmem))
++		return -ENOMEM;
++
++	return 0;
++}
++
++static void crypto842_free_ctx(struct crypto_scomp *tfm, void *ctx)
++{
++	kfree(ctx);
++}
++
++static void crypto842_exit(struct crypto_tfm *tfm)
++{
++	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	crypto842_free_ctx(NULL, ctx->wmem);
++}
++
+ static int crypto842_compress(struct crypto_tfm *tfm,
+ 			      const u8 *src, unsigned int slen,
+ 			      u8 *dst, unsigned int *dlen)
+@@ -45,6 +80,13 @@ static int crypto842_compress(struct crypto_tfm *tfm,
+ 	return sw842_compress(src, slen, dst, dlen, ctx->wmem);
+ }
+ 
++static int crypto842_scompress(struct crypto_scomp *tfm,
++			       const u8 *src, unsigned int slen,
++			       u8 *dst, unsigned int *dlen, void *ctx)
++{
++	return sw842_compress(src, slen, dst, dlen, ctx);
++}
++
+ static int crypto842_decompress(struct crypto_tfm *tfm,
+ 				const u8 *src, unsigned int slen,
+ 				u8 *dst, unsigned int *dlen)
+@@ -52,27 +94,61 @@ static int crypto842_decompress(struct crypto_tfm *tfm,
+ 	return sw842_decompress(src, slen, dst, dlen);
+ }
+ 
++static int crypto842_sdecompress(struct crypto_scomp *tfm,
++				 const u8 *src, unsigned int slen,
++				 u8 *dst, unsigned int *dlen, void *ctx)
++{
++	return sw842_decompress(src, slen, dst, dlen);
++}
++
+ static struct crypto_alg alg = {
+ 	.cra_name		= "842",
+ 	.cra_driver_name	= "842-generic",
+ 	.cra_priority		= 100,
+ 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
+-	.cra_ctxsize		= sizeof(struct crypto842_ctx),
+ 	.cra_module		= THIS_MODULE,
++	.cra_init		= crypto842_init,
++	.cra_exit		= crypto842_exit,
+ 	.cra_u			= { .compress = {
+ 	.coa_compress		= crypto842_compress,
+ 	.coa_decompress		= crypto842_decompress } }
+ };
+ 
++static struct scomp_alg scomp = {
++	.alloc_ctx		= crypto842_alloc_ctx,
++	.free_ctx		= crypto842_free_ctx,
++	.compress		= crypto842_scompress,
++	.decompress		= crypto842_sdecompress,
++	.base			= {
++		.cra_name	= "842",
++		.cra_driver_name = "842-scomp",
++		.cra_priority	 = 100,
++		.cra_module	 = THIS_MODULE,
++	}
++};
++
+ static int __init crypto842_mod_init(void)
+ {
+-	return crypto_register_alg(&alg);
++	int ret;
++
++	ret = crypto_register_alg(&alg);
++	if (ret)
++		return ret;
++
++	ret = crypto_register_scomp(&scomp);
++	if (ret) {
++		crypto_unregister_alg(&alg);
++		return ret;
++	}
++
++	return ret;
+ }
+ module_init(crypto842_mod_init);
+ 
+ static void __exit crypto842_mod_exit(void)
+ {
+ 	crypto_unregister_alg(&alg);
++	crypto_unregister_scomp(&scomp);
+ }
+ module_exit(crypto842_mod_exit);
+ 
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 59570da..09c88ba 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1522,6 +1522,7 @@ config CRYPTO_LZO
+ config CRYPTO_842
+ 	tristate "842 compression algorithm"
+ 	select CRYPTO_ALGAPI
++	select CRYPTO_ACOMP2
+ 	select 842_COMPRESS
+ 	select 842_DECOMPRESS
+ 	help
+-- 
+1.7.4.1
