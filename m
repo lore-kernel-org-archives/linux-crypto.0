@@ -1,55 +1,39 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH v2 1/2] crypto: engine: permit to enqueue ashash_request
-Date: Thu, 2 Jun 2016 11:38:35 +0200
-Message-ID: <20160602093835.GB2521@Red>
-References: <1464615122-16685-1-git-send-email-clabbe.montjoie@gmail.com>
- <1464615122-16685-2-git-send-email-clabbe.montjoie@gmail.com>
- <20160602083258.GB15226@gondor.apana.org.au>
- <20160602091213.GA2521@Red>
- <20160602091940.GB16160@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC] DRBG: which shall be default?
+Date: Thu, 2 Jun 2016 17:42:11 +0800
+Message-ID: <20160602094211.GA16489@gondor.apana.org.au>
+References: <1664837.3VbqQRUZed@positron.chronox.de>
+ <1972759.dI50hI8gdY@tauon.atsec.com>
+ <20160602084012.GC15226@gondor.apana.org.au>
+ <3243059.jE1At2qco9@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, baolin.wang@linaro.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:38431 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932331AbcFBJmT (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jun 2016 05:42:19 -0400
 Content-Disposition: inline
-In-Reply-To: <20160602091940.GB16160@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <3243059.jE1At2qco9@tauon.atsec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 02, 2016 at 05:19:40PM +0800, Herbert Xu wrote:
-> On Thu, Jun 02, 2016 at 11:12:13AM +0200, LABBE Corentin wrote:
-> > On Thu, Jun 02, 2016 at 04:32:59PM +0800, Herbert Xu wrote:
-> > > On Mon, May 30, 2016 at 03:32:01PM +0200, LABBE Corentin wrote:
-> > > > The current crypto engine allow only ablkcipher_request to be enqueued.
-> > > > Thus denying any use of it for hardware that also handle hash algo.
-> > > > 
-> > > > This patch convert all ablkcipher_request references to the
-> > > > more general crypto_async_request.
-> > > > 
-> > > > Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-> > > 
-> > > First of all your patches break bisection which is unacceptable.
-> > > 
-> > 
-> > How do I break bisection ?
-> 
-> Because the kernel won't compile after your first patch.
-> 
-> Either do it as one single patch or use the more elaborate "new
-> interafce" + "switchover" + "delete old interface" ritual.
-> 
+On Thu, Jun 02, 2016 at 11:31:22AM +0200, Stephan Mueller wrote:
+>
+> The skcipher API, however, wants to encrypt an entire input data stream. That 
+> means the skcipher API requires the length of the input data stream to 
+> generate an equally sized output data stream. But that is not what we have 
+> here -- there is no input data. I.e. the skcipher API invokes the CTR mode for 
+> the stream cipher and performs the final XOR of the CTR stream with the input 
+> data.
 
-Since my patch is small and easy (and only one client is modified), do you mind if I choose the first one ?
+Just use an input stream of zeros.
 
-> > So, if my hwcrypto can handle hash and ciphers, I need to have two engine and each crypt_one_request()/hash_one_request()
-> > need to lock the engine.
-> > Having only one engine that handle all types permit to avoid this locking.
-> 
-> OK then we should add some type-checking as you suggested.  What
-> I don't want is just blind casting by the user of crypto_engine.
-
-I will add this type checking on my patch against omap-aes/des.
-
-Regards
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
