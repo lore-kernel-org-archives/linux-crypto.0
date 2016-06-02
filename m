@@ -1,36 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/2] crypto: engine: permit to enqueue ashash_request
-Date: Thu, 2 Jun 2016 16:32:59 +0800
-Message-ID: <20160602083258.GB15226@gondor.apana.org.au>
-References: <1464615122-16685-1-git-send-email-clabbe.montjoie@gmail.com>
- <1464615122-16685-2-git-send-email-clabbe.montjoie@gmail.com>
+Subject: Re: [RFC] DRBG: which shall be default?
+Date: Thu, 2 Jun 2016 16:40:12 +0800
+Message-ID: <20160602084012.GC15226@gondor.apana.org.au>
+References: <1664837.3VbqQRUZed@positron.chronox.de>
+ <1972759.dI50hI8gdY@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, baolin.wang@linaro.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:54765 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932143AbcFBIkR (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jun 2016 04:40:17 -0400
 Content-Disposition: inline
-In-Reply-To: <1464615122-16685-2-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1972759.dI50hI8gdY@tauon.atsec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 30, 2016 at 03:32:01PM +0200, LABBE Corentin wrote:
-> The current crypto engine allow only ablkcipher_request to be enqueued.
-> Thus denying any use of it for hardware that also handle hash algo.
-> 
-> This patch convert all ablkcipher_request references to the
-> more general crypto_async_request.
-> 
-> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+On Tue, May 31, 2016 at 01:23:21PM +0200, Stephan Mueller wrote:
+>
+> Hence my question: shall we leave the HMAC DRBG as default or shall we use the 
+> CTR DRBG as default?
 
-First of all your patches break bisection which is unacceptable.
+I don't really care one way or another.
 
-Secondly you should not be casting generic requests to a specific type.
-
-Assuming a single engine only has to deal with one type of requests,
-what you could do is to create a separate engine type for each
-crypto type that you want to support.
+BTW why did you use the crypto_cipher aes interface instead of
+the crypto_skcipher ctr(aes) interface which would likely make
+your code run many orders-of-magnitude faster, especially with
+aesni-intel?
 
 Cheers,
 -- 
