@@ -1,56 +1,38 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/4] dt-bindings: rng: Northstar Plus SoC rng bindings
-Date: Thu, 2 Jun 2016 09:06:48 +0800
-Message-ID: <20160602010648.GA3171@gondor.apana.org.au>
-References: <CAL2FKYkSnf1Lc9d=S_7ipgySprTX9Zu=sMSmRnDDtBLcrz2X=Q@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Rob Herring <robh@kernel.org>, Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>,
-	Stephen Warren <swarren@wwwdotorg.org>,
-	Lee Jones <lee@kernel.org>, Eric Anholt <eric@anholt.net>,
-	Russell King <linux@arm.linux.org.uk>,
-	Ray Jui <rjui@broadcom.com>,
-	Scott Branden <sbranden@broadcom.com>,
-	Jon Mason <jonmason@broadcom.com>,
-	Matt Mackall <mpm@selenic.com>,
-	Daniel Thompson <daniel.thompson@linaro.org>,
-	Kieran Bingham <kieranbingham@gmail.com>,
-	Pankaj Dev <pankaj.dev@st.com>,
-	Richard Weinberger <richard@nod.at>,
-	=?iso-8859-1?Q?=C1lvaro_Fern=E1ndez?= Rojas <noltari@gmail.com>,
-	Joshua Henderson <joshua.henderson@microchip.com>,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	BCM Kernel Feed
-To: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAL2FKYkSnf1Lc9d=S_7ipgySprTX9Zu=sMSmRnDDtBLcrz2X=Q@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Geliang Tang <geliangtang@gmail.com>
+Subject: [PATCH] crypto: skcipher - remove unused header cpumask.h
+Date: Thu,  2 Jun 2016 13:48:38 +0800
+Message-ID: <40677731b6e82e34c6f1f5b6d9456c6ed4c93234.1464844992.git.geliangtang@gmail.com>
+Cc: Geliang Tang <geliangtang@gmail.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f65.google.com ([209.85.220.65]:35932 "EHLO
+	mail-pa0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751452AbcFBFsv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jun 2016 01:48:51 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 01, 2016 at 08:34:11PM +0530, Yendapally Reddy Dhananjaya Reddy wrote:
-> On Wed, Jun 1, 2016 at 8:17 PM, Rob Herring <robh@kernel.org> wrote:
-> > On Fri, May 27, 2016 at 06:10:38AM -0400, Yendapally Reddy Dhananjaya Reddy wrote:
-> >> Document the bindings used by Northstar Plus(NSP) SoC random number
-> >> generator.
-> >>
-> >> Signed-off-by: Yendapally Reddy Dhananjaya Reddy <yendapally.reddy@broadcom.com>
-> >> Acked-by: Eric Anholt <eric@anholt.net>
-> >
-> > You missed my ack...
-> 
-> Sorry Rob. I missed it.
-> 
-> Herbert,
-> 
-> Can i send the v3 patch set with the ack added.
+Remove unused header cpumask.h from crypto/ablkcipher.c.
 
-It's too late.  Your patches have already been applied.
+Signed-off-by: Geliang Tang <geliangtang@gmail.com>
+---
+ crypto/ablkcipher.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
+index e5b5721..6b80516 100644
+--- a/crypto/ablkcipher.c
++++ b/crypto/ablkcipher.c
+@@ -14,7 +14,6 @@
+  */
+ 
+ #include <crypto/internal/skcipher.h>
+-#include <linux/cpumask.h>
+ #include <linux/err.h>
+ #include <linux/kernel.h>
+ #include <linux/rtnetlink.h>
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
