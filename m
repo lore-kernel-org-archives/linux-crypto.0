@@ -1,57 +1,53 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/2] crypto: engine: permit to enqueue ashash_request
-Date: Thu, 2 Jun 2016 17:19:40 +0800
-Message-ID: <20160602091940.GB16160@gondor.apana.org.au>
-References: <1464615122-16685-1-git-send-email-clabbe.montjoie@gmail.com>
- <1464615122-16685-2-git-send-email-clabbe.montjoie@gmail.com>
- <20160602083258.GB15226@gondor.apana.org.au>
- <20160602091213.GA2521@Red>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [RFC] DRBG: which shall be default?
+Date: Thu, 02 Jun 2016 11:31:22 +0200
+Message-ID: <3243059.jE1At2qco9@tauon.atsec.com>
+References: <1664837.3VbqQRUZed@positron.chronox.de> <1972759.dI50hI8gdY@tauon.atsec.com> <20160602084012.GC15226@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, baolin.wang@linaro.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:56640 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932164AbcFBJTu (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Jun 2016 05:19:50 -0400
-Content-Disposition: inline
-In-Reply-To: <20160602091213.GA2521@Red>
+Received: from mail.eperm.de ([89.247.134.16]:35698 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932391AbcFBJbZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jun 2016 05:31:25 -0400
+In-Reply-To: <20160602084012.GC15226@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 02, 2016 at 11:12:13AM +0200, LABBE Corentin wrote:
-> On Thu, Jun 02, 2016 at 04:32:59PM +0800, Herbert Xu wrote:
-> > On Mon, May 30, 2016 at 03:32:01PM +0200, LABBE Corentin wrote:
-> > > The current crypto engine allow only ablkcipher_request to be enqueued.
-> > > Thus denying any use of it for hardware that also handle hash algo.
-> > > 
-> > > This patch convert all ablkcipher_request references to the
-> > > more general crypto_async_request.
-> > > 
-> > > Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-> > 
-> > First of all your patches break bisection which is unacceptable.
-> > 
+Am Donnerstag, 2. Juni 2016, 16:40:12 schrieb Herbert Xu:
+
+Hi Herbert,
+
+> On Tue, May 31, 2016 at 01:23:21PM +0200, Stephan Mueller wrote:
+> > Hence my question: shall we leave the HMAC DRBG as default or shall we use
+> > the CTR DRBG as default?
 > 
-> How do I break bisection ?
+> I don't really care one way or another.
+> 
+> BTW why did you use the crypto_cipher aes interface instead of
+> the crypto_skcipher ctr(aes) interface which would likely make
+> your code run many orders-of-magnitude faster, especially with
+> aesni-intel?
 
-Because the kernel won't compile after your first patch.
+I considered such approach, but the crux is the following: for the CTR DRBG 
+generate function, our state is 16 bytes (i.e. the AES block length). Out of 
+those 16 bytes, we generate the random number by encrypting that block, 
+incrementing the block by one and encrypt it again. In essence what we do here 
+is the stream cipher part of the CTR mode which generates the data stream we 
+use to XOR the input data with.
 
-Either do it as one single patch or use the more elaborate "new
-interafce" + "switchover" + "delete old interface" ritual.
+The skcipher API, however, wants to encrypt an entire input data stream. That 
+means the skcipher API requires the length of the input data stream to 
+generate an equally sized output data stream. But that is not what we have 
+here -- there is no input data. I.e. the skcipher API invokes the CTR mode for 
+the stream cipher and performs the final XOR of the CTR stream with the input 
+data.
 
-> So, if my hwcrypto can handle hash and ciphers, I need to have two engine and each crypt_one_request()/hash_one_request()
-> need to lock the engine.
-> Having only one engine that handle all types permit to avoid this locking.
+Currently I would not see a way how to access the CTR mode stream cipher part 
+only via the skcipher API.
 
-OK then we should add some type-checking as you suggested.  What
-I don't want is just blind casting by the user of crypto_engine.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
