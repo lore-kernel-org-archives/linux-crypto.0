@@ -1,170 +1,195 @@
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v5 7/9] crypto: acomp - add support for 842 via scomp
-Date: Thu,  2 Jun 2016 13:29:01 +0100
-Message-ID: <1464870543-5988-8-git-send-email-giovanni.cabiddu@intel.com>
+Subject: [PATCH v5 6/9] crypto: acomp - add support for lz4hc via scomp
+Date: Thu,  2 Jun 2016 13:29:00 +0100
+Message-ID: <1464870543-5988-7-git-send-email-giovanni.cabiddu@intel.com>
 References: <1464870543-5988-1-git-send-email-giovanni.cabiddu@intel.com>
 Cc: linux-crypto@vger.kernel.org,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:31755 "EHLO mga11.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:16035 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753147AbcFBM3N (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Jun 2016 08:29:13 -0400
+	id S1753147AbcFBM3K (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jun 2016 08:29:10 -0400
 In-Reply-To: <1464870543-5988-1-git-send-email-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch implements an scomp backend for the 842 compression algorithm.
-This way, 842 is exposed through the acomp api.
+This patch implements an scomp backend for the lz4hc compression algorithm.
+This way, lz4hc is exposed through the acomp api.
 
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- crypto/842.c   |   82 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
  crypto/Kconfig |    1 +
- 2 files changed, 80 insertions(+), 3 deletions(-)
+ crypto/lz4hc.c |   92 +++++++++++++++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 83 insertions(+), 10 deletions(-)
 
-diff --git a/crypto/842.c b/crypto/842.c
-index 98e387e..a954ed3 100644
---- a/crypto/842.c
-+++ b/crypto/842.c
-@@ -31,11 +31,46 @@
- #include <linux/module.h>
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 114d43b..59570da 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1539,6 +1539,7 @@ config CRYPTO_LZ4
+ config CRYPTO_LZ4HC
+ 	tristate "LZ4HC compression algorithm"
+ 	select CRYPTO_ALGAPI
++	select CRYPTO_ACOMP2
+ 	select LZ4HC_COMPRESS
+ 	select LZ4_DECOMPRESS
+ 	help
+diff --git a/crypto/lz4hc.c b/crypto/lz4hc.c
+index a1d3b5b..75ffc4a 100644
+--- a/crypto/lz4hc.c
++++ b/crypto/lz4hc.c
+@@ -22,37 +22,53 @@
  #include <linux/crypto.h>
- #include <linux/sw842.h>
+ #include <linux/vmalloc.h>
+ #include <linux/lz4.h>
 +#include <crypto/internal/scompress.h>
  
- struct crypto842_ctx {
--	char wmem[SW842_MEM_COMPRESS];	/* working memory for compress */
-+	void *wmem;	/* working memory for compress */
+ struct lz4hc_ctx {
+ 	void *lz4hc_comp_mem;
  };
  
-+static void *crypto842_alloc_ctx(struct crypto_scomp *tfm)
++static void *lz4hc_alloc_ctx(struct crypto_scomp *tfm)
 +{
 +	void *ctx;
 +
-+	ctx = kmalloc(SW842_MEM_COMPRESS, GFP_KERNEL);
++	ctx = vmalloc(LZ4HC_MEM_COMPRESS);
 +	if (!ctx)
 +		return ERR_PTR(-ENOMEM);
 +
 +	return ctx;
 +}
 +
-+static int crypto842_init(struct crypto_tfm *tfm)
-+{
-+	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	ctx->wmem = crypto842_alloc_ctx(NULL);
-+	if (IS_ERR(ctx->wmem))
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+static void crypto842_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+{
-+	kfree(ctx);
-+}
-+
-+static void crypto842_exit(struct crypto_tfm *tfm)
-+{
-+	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	crypto842_free_ctx(NULL, ctx->wmem);
-+}
-+
- static int crypto842_compress(struct crypto_tfm *tfm,
- 			      const u8 *src, unsigned int slen,
- 			      u8 *dst, unsigned int *dlen)
-@@ -45,6 +80,13 @@ static int crypto842_compress(struct crypto_tfm *tfm,
- 	return sw842_compress(src, slen, dst, dlen, ctx->wmem);
+ static int lz4hc_init(struct crypto_tfm *tfm)
+ {
+ 	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	ctx->lz4hc_comp_mem = vmalloc(LZ4HC_MEM_COMPRESS);
+-	if (!ctx->lz4hc_comp_mem)
++	ctx->lz4hc_comp_mem = lz4hc_alloc_ctx(NULL);
++	if (IS_ERR(ctx->lz4hc_comp_mem))
+ 		return -ENOMEM;
+ 
+ 	return 0;
  }
  
-+static int crypto842_scompress(struct crypto_scomp *tfm,
-+			       const u8 *src, unsigned int slen,
-+			       u8 *dst, unsigned int *dlen, void *ctx)
++static void lz4hc_free_ctx(struct crypto_scomp *tfm, void *ctx)
 +{
-+	return sw842_compress(src, slen, dst, dlen, ctx);
++	vfree(ctx);
 +}
 +
- static int crypto842_decompress(struct crypto_tfm *tfm,
- 				const u8 *src, unsigned int slen,
- 				u8 *dst, unsigned int *dlen)
-@@ -52,27 +94,61 @@ static int crypto842_decompress(struct crypto_tfm *tfm,
- 	return sw842_decompress(src, slen, dst, dlen);
+ static void lz4hc_exit(struct crypto_tfm *tfm)
+ {
+ 	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	vfree(ctx->lz4hc_comp_mem);
++	lz4hc_free_ctx(NULL, ctx->lz4hc_comp_mem);
  }
  
-+static int crypto842_sdecompress(struct crypto_scomp *tfm,
-+				 const u8 *src, unsigned int slen,
-+				 u8 *dst, unsigned int *dlen, void *ctx)
+-static int lz4hc_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+-			    unsigned int slen, u8 *dst, unsigned int *dlen)
++static int __lz4hc_compress_crypto(const u8 *src, unsigned int slen,
++				   u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	size_t tmp_len = *dlen;
+ 	int err;
+ 
+-	err = lz4hc_compress(src, slen, dst, &tmp_len, ctx->lz4hc_comp_mem);
++	err = lz4hc_compress(src, slen, dst, &tmp_len, ctx);
+ 
+ 	if (err < 0)
+ 		return -EINVAL;
+@@ -61,8 +77,25 @@ static int lz4hc_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ 	return 0;
+ }
+ 
+-static int lz4hc_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
+-			      unsigned int slen, u8 *dst, unsigned int *dlen)
++static int lz4hc_scompress(struct crypto_scomp *tfm, const u8 *src,
++			   unsigned int slen, u8 *dst, unsigned int *dlen,
++			   void *ctx)
 +{
-+	return sw842_decompress(src, slen, dst, dlen);
++	return __lz4hc_compress_crypto(src, slen, dst, dlen, ctx);
 +}
 +
- static struct crypto_alg alg = {
- 	.cra_name		= "842",
- 	.cra_driver_name	= "842-generic",
- 	.cra_priority		= 100,
++static int lz4hc_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
++				 unsigned int slen, u8 *dst,
++				 unsigned int *dlen)
++{
++	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	return __lz4hc_compress_crypto(src, slen, dst, dlen,
++					ctx->lz4hc_comp_mem);
++}
++
++static int __lz4hc_decompress_crypto(const u8 *src, unsigned int slen,
++				     u8 *dst, unsigned int *dlen, void *ctx)
+ {
+ 	int err;
+ 	size_t tmp_len = *dlen;
+@@ -76,6 +109,20 @@ static int lz4hc_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ 	return err;
+ }
+ 
++static int lz4hc_sdecompress(struct crypto_scomp *tfm, const u8 *src,
++			     unsigned int slen, u8 *dst, unsigned int *dlen,
++			     void *ctx)
++{
++	return __lz4hc_decompress_crypto(src, slen, dst, dlen, NULL);
++}
++
++static int lz4hc_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
++				   unsigned int slen, u8 *dst,
++				   unsigned int *dlen)
++{
++	return __lz4hc_decompress_crypto(src, slen, dst, dlen, NULL);
++}
++
+ static struct crypto_alg alg_lz4hc = {
+ 	.cra_name		= "lz4hc",
  	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
--	.cra_ctxsize		= sizeof(struct crypto842_ctx),
- 	.cra_module		= THIS_MODULE,
-+	.cra_init		= crypto842_init,
-+	.cra_exit		= crypto842_exit,
- 	.cra_u			= { .compress = {
- 	.coa_compress		= crypto842_compress,
- 	.coa_decompress		= crypto842_decompress } }
+@@ -89,14 +136,39 @@ static struct crypto_alg alg_lz4hc = {
+ 	.coa_decompress		= lz4hc_decompress_crypto } }
  };
  
 +static struct scomp_alg scomp = {
-+	.alloc_ctx		= crypto842_alloc_ctx,
-+	.free_ctx		= crypto842_free_ctx,
-+	.compress		= crypto842_scompress,
-+	.decompress		= crypto842_sdecompress,
++	.alloc_ctx		= lz4hc_alloc_ctx,
++	.free_ctx		= lz4hc_free_ctx,
++	.compress		= lz4hc_scompress,
++	.decompress		= lz4hc_sdecompress,
 +	.base			= {
-+		.cra_name	= "842",
-+		.cra_driver_name = "842-scomp",
-+		.cra_priority	 = 100,
++		.cra_name	= "lz4hc",
++		.cra_driver_name = "lz4hc-scomp",
 +		.cra_module	 = THIS_MODULE,
 +	}
 +};
 +
- static int __init crypto842_mod_init(void)
+ static int __init lz4hc_mod_init(void)
  {
--	return crypto_register_alg(&alg);
+-	return crypto_register_alg(&alg_lz4hc);
 +	int ret;
 +
-+	ret = crypto_register_alg(&alg);
++	ret = crypto_register_alg(&alg_lz4hc);
 +	if (ret)
 +		return ret;
 +
 +	ret = crypto_register_scomp(&scomp);
 +	if (ret) {
-+		crypto_unregister_alg(&alg);
++		crypto_unregister_alg(&alg_lz4hc);
 +		return ret;
 +	}
 +
 +	return ret;
  }
- module_init(crypto842_mod_init);
  
- static void __exit crypto842_mod_exit(void)
+ static void __exit lz4hc_mod_fini(void)
  {
- 	crypto_unregister_alg(&alg);
+ 	crypto_unregister_alg(&alg_lz4hc);
 +	crypto_unregister_scomp(&scomp);
  }
- module_exit(crypto842_mod_exit);
  
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 59570da..09c88ba 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1522,6 +1522,7 @@ config CRYPTO_LZO
- config CRYPTO_842
- 	tristate "842 compression algorithm"
- 	select CRYPTO_ALGAPI
-+	select CRYPTO_ACOMP2
- 	select 842_COMPRESS
- 	select 842_DECOMPRESS
- 	help
+ module_init(lz4hc_mod_init);
 -- 
 1.7.4.1
