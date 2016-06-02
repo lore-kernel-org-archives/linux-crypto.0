@@ -1,9 +1,8 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 3/4] crypto: kdf - SP800-108 Key Derivation Function
-Date: Thu, 2 Jun 2016 16:55:26 +0800
-Message-ID: <20160602085526.GA15919@gondor.apana.org.au>
+Subject: Re: [PATCH v2 0/4] crypto: Key Derivation Function (SP800-108)
+Date: Thu, 2 Jun 2016 16:56:37 +0800
+Message-ID: <20160602085637.GB15919@gondor.apana.org.au>
 References: <17649236.piPdUxUzaM@positron.chronox.de>
- <4593825.q48Y9K9RSZ@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
@@ -11,33 +10,40 @@ Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
 	keyrings@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47695 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:55027 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751274AbcFBIzg (ORCPT
+	with ESMTP id S1751274AbcFBI4p (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Jun 2016 04:55:36 -0400
+	Thu, 2 Jun 2016 04:56:45 -0400
 Content-Disposition: inline
-In-Reply-To: <4593825.q48Y9K9RSZ@positron.chronox.de>
+In-Reply-To: <17649236.piPdUxUzaM@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 31, 2016 at 01:52:32PM +0200, Stephan Mueller wrote:
->
-> + * NOTE: Technically you can use one buffer for holding the label_context and
-> + *	 the outbuf in the example above. Howerver, multiple rounds of the
-> + *	 KDF are to be expected with the input must always be the same.
-> + *	 The first round would replace the input in case of one buffer, and the
-> + *	 KDF would calculate a cryptographically strong result which, however,
-> + *	 is not portable to other KDF implementations! Thus, always use
-> + *	 different buffers for the label_context and the outbuf. A safe
-> + *	 in-place operation can only be done when only one round of the KDF
-> + *	 is executed (i.e. the size of the requested buffer is equal to the
-> + *	 digestsize of the used MAC).
+On Tue, May 31, 2016 at 01:50:57PM +0200, Stephan Mueller wrote:
+> Hi,
+> 
+> this patch set implements all three key derivation functions defined in
+> SP800-108.
+> 
+> The implementation is provided as a template for random number generators,
+> since a KDF can be considered a form of deterministic RNG where the key
+> material is used as a seed.
+> 
+> With the KDF implemented as a template, all types of keyed hashes can be
+> utilized, including HMAC and CMAC. The testmgr tests are derived from
+> publicly available test vectors from NIST.
+> 
+> The KDF are all tested with a complete round of CAVS testing on 32 and 64 bit.
+> 
+> The patch set introduces an extension to the kernel crypto API in the first
+> patch by adding a template handling for random number generators based on the
+> same logic as for keyed hashes.
 
-Why don't you put the result in a temporary buffer and then copy
-it? These things are tiny, right?
+When you resubmit these patches please actually add a user.  I'm not
+going to add new algorithms with no users.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
