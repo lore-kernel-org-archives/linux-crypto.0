@@ -1,33 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/2] crypto: engine: permit to enqueue ashash_request
-Date: Thu, 2 Jun 2016 17:42:54 +0800
-Message-ID: <20160602094254.GB16489@gondor.apana.org.au>
-References: <1464615122-16685-1-git-send-email-clabbe.montjoie@gmail.com>
- <1464615122-16685-2-git-send-email-clabbe.montjoie@gmail.com>
- <20160602083258.GB15226@gondor.apana.org.au>
- <20160602091213.GA2521@Red>
- <20160602091940.GB16160@gondor.apana.org.au>
- <20160602093835.GB2521@Red>
+Subject: Re: [PATCH v7 1/3] crypto: Key-agreement Protocol Primitives API
+ (KPP)
+Date: Thu, 2 Jun 2016 17:44:03 +0800
+Message-ID: <20160602094403.GA16560@gondor.apana.org.au>
+References: <1464708983-61664-1-git-send-email-salvatore.benedetto@intel.com>
+ <1464708983-61664-2-git-send-email-salvatore.benedetto@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, baolin.wang@linaro.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:34948 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932344AbcFBJoI (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Jun 2016 05:44:08 -0400
 Content-Disposition: inline
-In-Reply-To: <20160602093835.GB2521@Red>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1464708983-61664-2-git-send-email-salvatore.benedetto@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 02, 2016 at 11:38:35AM +0200, LABBE Corentin wrote:
->
-> Since my patch is small and easy (and only one client is modified), do you mind if I choose the first one ?
+On Tue, May 31, 2016 at 04:36:21PM +0100, Salvatore Benedetto wrote:
+> Add key-agreement protocol primitives (kpp) API which allows to
+> implement primitives required by protocols such as DH and ECDH.
+> The API is composed mainly by the following functions
+>  * set_params() - It allows the user to set the parameters known to
+>    both parties involved in the key-agreement session
+>  * set_secret() - It allows the user to set his secret, also
+>    referred to as his private key
+>  * generate_public_key() - It generates the public key to be sent to
+>    the other counterpart involved in the key-agreement session. The
+>    function has to be called after set_params() and set_secret()
+>  * generate_secret() - It generates the shared secret for the session
+> 
+> Other functions such as init() and exit() are provided for allowing
+> cryptographic hardware to be inizialized properly before use
+> 
+> Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
 
-Sure.
-
-> I will add this type checking on my patch against omap-aes/des.
-
-Thanks,
+You totally ignored my comments about this patch in the round v5.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
