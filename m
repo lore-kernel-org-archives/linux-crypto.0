@@ -1,77 +1,73 @@
-From: "Dey, Megha" <megha.dey@intel.com>
-Subject: RE: [PATCH 2/2] crypto : async implementation for sha1-mb
-Date: Fri, 3 Jun 2016 02:51:14 +0000
-Message-ID: <C440BA31B54DCD4AAC682D2365C8FEE703C52D94@ORSMSX111.amr.corp.intel.com>
-References: <1464730941-8847-1-git-send-email-megha.dey@intel.com>
- <1464730941-8847-3-git-send-email-megha.dey@intel.com>
- <20160602103331.GA16969@gondor.apana.org.au>
- <1464888020.9394.6.camel@megha-Z97X-UD7-TH>
- <20160603003310.GA27765@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: authenc methods vs FIPS in light of unencrypted associated data
+Date: Fri, 03 Jun 2016 08:42:31 +0200
+Message-ID: <2641743.LA46gJhHTE@tauon.atsec.com>
+References: <20160602160104.GK18490@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Yu, Fenghua" <fenghua.yu@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Transfer-Encoding: 7Bit
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Marcus Meissner <meissner@suse.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:12817 "EHLO mga02.intel.com"
+Received: from mail.eperm.de ([89.247.134.16]:35780 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750905AbcFCCvU convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Jun 2016 22:51:20 -0400
-In-Reply-To: <20160603003310.GA27765@gondor.apana.org.au>
-Content-Language: en-US
+	id S1751138AbcFCGmf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 3 Jun 2016 02:42:35 -0400
+In-Reply-To: <20160602160104.GK18490@suse.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Am Donnerstag, 2. Juni 2016, 18:01:04 schrieb Marcus Meissner:
 
+Hi Marcus, Herbert
 
------Original Message-----
-From: Herbert Xu [mailto:herbert@gondor.apana.org.au] 
-Sent: Thursday, June 2, 2016 5:33 PM
-To: Dey, Megha <megha.dey@intel.com>
-Cc: tim.c.chen@linux.intel.com; davem@davemloft.net; linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Yu, Fenghua <fenghua.yu@intel.com>
-Subject: Re: [PATCH 2/2] crypto : async implementation for sha1-mb
+> Hi,
+> 
+> In February I already tagged some authenc ciphers for FIPS compatibility.
+> 
+> I currently revisit this to get testmgr running all the tests in strict FIPS
+> mode.
+> 
+> The authenc() class is troublesome.
+> 
+> There is a HASH + ENC part of this method, but you can also add associated
+> data, which is not encrypted. (using the ctx->null cipher in
+> crypto/authenc.c)
+> 
+> But in FIPS mode the crypto_authenc_init_tfm does:
+> 
+> 	null = crypto_get_default_null_skcipher();
+> 
+> which results in error, as the crypto_alloc_blkcipher("ecb(cipher_null)", 0,
+> 0); results in failure due to "ecb(cipher_null)" not FIPS compliant.
+> 
+> How to handle this?
+> 
+> I think GCM also does not encrypt, just hashes, the associated data, it just
+> does copy the content itself and does not use a virtual cipher.
 
-On Thu, Jun 02, 2016 at 10:20:20AM -0700, Megha Dey wrote:
->
-> > > @@ -439,17 +444,18 @@ static int mcryptd_hash_finup_enqueue(struct 
-> > > ahash_request *req)  static void mcryptd_hash_digest(struct 
-> > > crypto_async_request *req_async, int err)  {
-> > >  	struct mcryptd_hash_ctx *ctx = crypto_tfm_ctx(req_async->tfm);
-> > > -	struct crypto_shash *child = ctx->child;
-> > > +	struct crypto_ahash *child = ctx->child;
-> > >  	struct ahash_request *req = ahash_request_cast(req_async);
-> > >  	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
-> > > -	struct shash_desc *desc = &rctx->desc;
-> > > +	struct ahash_request *desc = &rctx->areq;
-> > > +	struct crypto_async_request *base = &desc->base;
-> > >  
-> > >  	if (unlikely(err == -EINPROGRESS))
-> > >  		goto out;
-> > > +	base->tfm = &child->base;
-> > > +	base->flags = CRYPTO_TFM_REQ_MAY_SLEEP;  /* check this again */
-> > 
-> > You should not be touching crypto_async_request directly.  Use the 
-> > proper ahash interface to set the child request.
-> > 
-> Herbert, Could you please clarify?
-> In the earlier code we had a async_request which is now replaced by 
-> crypto_async_request. Do you want a new async_request to be used?
-> Do you think we shouldn't be setting the members of the 
-> crypto_ahash_request directly, but use some other interface to do the 
-> same for us?
+This issue points to a more pervasive issue in how the fips_allowed flag is 
+handled. In combined ciphers, the use of individual components separately from 
+the combined cipher may not be allowed in FIPS mode. However, the use of the 
+combined cipher is allowed.
 
-You already have an ahash_request here.  So you should be doing
+For example, GCM is an allowed cipher, but ghash is not. To make GCM usable, 
+the fips_allowed flag is set for ghash which would allow a user to use ghash 
+directly outside GCM, which is not allowed.
 
-ahash_request_set_tfm(...)
-ahash_request_set_callback(...)
+Therefore, the fips_allowed flag should only be evaluated for the cipher the 
+user invokes. If that cipher employs sub-ordinate ciphers, the fips_allowed 
+flag is not enforced any more. The idea would be that when fips_allowed is set 
+for a cipher, it implies that this cipher with all its sub-ordinate ciphers is 
+allowed even when those individual ciphers would be allowed.
 
->ok,done!
-Thanks,
---
-Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Herbert, when using crypto_spawn_*, is there a flag set by the crypto API that 
+the to-be-instantiated cipher is invoked by the kernel crypto API instead of 
+by a user? I would assume that the INTERNAL flag could be of relevance here. 
+If that INTERNAL flag is set, I think that the function alg_test could be 
+changed such that if the INTERNAL flag is set, the fips_allowed flag is not 
+enforced.
+
+Ciao
+Stephan
