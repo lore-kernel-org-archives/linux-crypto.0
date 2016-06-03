@@ -1,35 +1,39 @@
 From: Neil Armstrong <narmstrong@baylibre.com>
-Subject: [PATCH 0/3] hw_random: Add Amlogic Meson SoCs Random Genenerator driver
-Date: Fri,  3 Jun 2016 10:46:58 +0200
-Message-ID: <1464943621-18278-1-git-send-email-narmstrong@baylibre.com>
+Subject: [PATCH 3/3] ARM64: dts: meson-gxbb: Add Hardware Random Generator node
+Date: Fri,  3 Jun 2016 10:47:01 +0200
+Message-ID: <1464943621-18278-4-git-send-email-narmstrong@baylibre.com>
+References: <1464943621-18278-1-git-send-email-narmstrong@baylibre.com>
 Cc: Neil Armstrong <narmstrong@baylibre.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
 To: Matt Mackall <mpm@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1464943621-18278-1-git-send-email-narmstrong@baylibre.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add support for the Amlogic Meson SoCs Hardware Random generator as a hw_random char driver.
-The generator is a single 32bit wide register.
-Also adds the Meson GXBB SoC DTSI node and corresponding DT bindings.
+Signed-off-by: Neil Armstrong <narmstrong@baylibre.com>
+---
+ arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Neil Armstrong (3):
-  char: hw_random: Add Amlogic Meson Hardware Random Generator
-  dt-bindings: hwrng: Add Amlogic Meson Hardware Random Generator
-    bindings
-  ARM64: dts: meson-gxbb: Add Hardware Random Generator node
-
- .../devicetree/bindings/rng/amlogic,meson-rng.txt  |  14 +++
- arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi        |   5 +
- drivers/char/hw_random/Kconfig                     |  13 +++
- drivers/char/hw_random/Makefile                    |   1 +
- drivers/char/hw_random/meson-rng.c                 | 128 +++++++++++++++++++++
- 5 files changed, 161 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
- create mode 100644 drivers/char/hw_random/meson-rng.c
-
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+index 832815d..8353621 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+@@ -167,6 +167,11 @@
+ 			};
+ 		};
+ 
++		rng {
++			compatible = "amlogic,meson-rng";
++			reg = <0x0 0xc8834000 0x0 0x4>;
++		};
++
+ 		apb: apb@d0000000 {
+ 			compatible = "simple-bus";
+ 			reg = <0x0 0xd0000000 0x0 0x200000>;
 -- 
 2.7.0
