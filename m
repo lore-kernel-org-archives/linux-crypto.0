@@ -1,7 +1,7 @@
 From: Neil Armstrong <narmstrong@baylibre.com>
-Subject: [PATCH 3/3] ARM64: dts: meson-gxbb: Add Hardware Random Generator node
-Date: Fri,  3 Jun 2016 10:47:01 +0200
-Message-ID: <1464943621-18278-4-git-send-email-narmstrong@baylibre.com>
+Subject: [PATCH 2/3] dt-bindings: hwrng: Add Amlogic Meson Hardware Random Generator bindings
+Date: Fri,  3 Jun 2016 10:47:00 +0200
+Message-ID: <1464943621-18278-3-git-send-email-narmstrong@baylibre.com>
 References: <1464943621-18278-1-git-send-email-narmstrong@baylibre.com>
 Cc: Neil Armstrong <narmstrong@baylibre.com>,
 	linux-arm-kernel@lists.infradead.org,
@@ -16,24 +16,29 @@ List-Id: linux-crypto.vger.kernel.org
 
 Signed-off-by: Neil Armstrong <narmstrong@baylibre.com>
 ---
- arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi | 5 +++++
- 1 file changed, 5 insertions(+)
+ .../devicetree/bindings/rng/amlogic,meson-rng.txt          | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
 
-diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
-index 832815d..8353621 100644
---- a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
-+++ b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
-@@ -167,6 +167,11 @@
- 			};
- 		};
- 
-+		rng {
-+			compatible = "amlogic,meson-rng";
-+			reg = <0x0 0xc8834000 0x0 0x4>;
-+		};
+diff --git a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
+new file mode 100644
+index 0000000..202f2d0
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
+@@ -0,0 +1,14 @@
++Amlogic Meson Random number generator
++=====================================
 +
- 		apb: apb@d0000000 {
- 			compatible = "simple-bus";
- 			reg = <0x0 0xd0000000 0x0 0x200000>;
++Required properties:
++
++- compatible : should be "amlogic,meson-rng"
++- reg : Specifies base physical address and size of the registers.
++
++Example:
++
++rng {
++        compatible = "amlogic,meson-rng";
++        reg = <0x0 0xc8834000 0x0 0x4>;
++};
 -- 
 2.7.0
