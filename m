@@ -1,51 +1,32 @@
-From: Jens Axboe <axboe@kernel.dk>
-Subject: Re: [RFC v2 1/3] block: Introduce blk_bio_map_sg() to map one bio
-Date: Fri, 3 Jun 2016 08:38:40 -0600
-Message-ID: <57519670.6050306@kernel.dk>
-References: <cover.1464346333.git.baolin.wang@linaro.org>
- <2f0f6811938dafd14c6c7b1dbe8fbabfdcbb19c1.1464346333.git.baolin.wang@linaro.org>
+From: Gadre Nayan <gadrenayan@gmail.com>
+Subject: Unable to decrypt message
+Date: Sat, 4 Jun 2016 15:51:47 +0530
+Message-ID: <CAKJ7aR4cxqoDQXvcULgwrQyok7fbi_Cq4jTL8x=WZwd03YEbCg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: ebiggers3@gmail.com, js1304@gmail.com, tadeusz.struk@intel.com,
-	smueller@chronox.de, standby24x7@gmail.com, shli@kernel.org,
-	dan.j.williams@intel.com, martin.petersen@oracle.com,
-	sagig@mellanox.com, kent.overstreet@gmail.com,
-	keith.busch@intel.com, tj@kernel.org, ming.lei@canonical.com,
-	broonie@kernel.org, arnd@arndb.de, linux-crypto@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Baolin Wang <baolin.wang@linaro.org>, agk@redhat.com,
-	snitzer@redhat.com, dm-devel@redhat.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <2f0f6811938dafd14c6c7b1dbe8fbabfdcbb19c1.1464346333.git.baolin.wang@linaro.org>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-it0-f65.google.com ([209.85.214.65]:34849 "EHLO
+	mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750809AbcFDK2D (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 4 Jun 2016 06:28:03 -0400
+Received: by mail-it0-f65.google.com with SMTP id z123so1247771itg.2
+        for <linux-crypto@vger.kernel.org>; Sat, 04 Jun 2016 03:28:02 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 05/27/2016 05:11 AM, Baolin Wang wrote:
-> +/*
-> + * Map a bio to scatterlist, return number of sg entries setup. Caller must
-> + * make sure sg can hold bio segments entries.
-> + */
-> +int blk_bio_map_sg(struct request_queue *q, struct bio *bio,
-> +		   struct scatterlist *sglist)
-> +{
-> +	struct scatterlist *sg = NULL;
-> +	int nsegs = 0;
-> +
-> +	if (bio)
-> +		nsegs = __blk_bios_map_sg(q, bio, sglist, &sg, true);
-> +
-> +	if (sg)
-> +		sg_mark_end(sg);
+Hi,
 
-Put that if (sg) inside the if (bio) section, 'sg' isn't going to be
-non-NULL outside of that.
+I am trying to encrypt decrypt data over the wire. On the receiver
+side I have a pre-routing hook where I get reference to my encrypted
+data and apply decryption using the skcipher api's, however I am
+unable to get the same data back.
 
-Additionally, who would call this with a NULL bio? That seems odd, I'd
-get rid of that check completely.
+My algo is same on both ends "cbc(aes)" and using CRYPTO_ALG_ASYNC ,
+key is also same (content and size).
 
--- 
-Jens Axboe
+Should the Initialization vector also be the same. Since I am
+generating iv random bytes on both ends.
 
+Thanks
