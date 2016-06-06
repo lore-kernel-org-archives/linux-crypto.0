@@ -1,65 +1,41 @@
-From: Baolin Wang <baolin.wang@linaro.org>
-Subject: Re: [RFC v2 1/3] block: Introduce blk_bio_map_sg() to map one bio
-Date: Mon, 6 Jun 2016 13:04:17 +0800
-Message-ID: <CAMz4kuL6PFANg=f0t7mCAk=CqJisdmZyxcUqWf8ZUj0mRLQrXQ@mail.gmail.com>
-References: <cover.1464346333.git.baolin.wang@linaro.org> <2f0f6811938dafd14c6c7b1dbe8fbabfdcbb19c1.1464346333.git.baolin.wang@linaro.org>
- <57519670.6050306@kernel.dk>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: Re: [PATCH 2/6] crypto: talitos - making mapping helpers more generic
+Date: Mon, 6 Jun 2016 09:03:14 +0200
+Message-ID: <1be7c6f6-8885-d008-f47b-9e7f290e0c37@c-s.fr>
+References: <cover.1464330501.git.christophe.leroy@c-s.fr>
+ <26474a2b44e69a0dbff43dbeed030ab5adef81db.1464330501.git.christophe.leroy@c-s.fr>
+ <20160531094651.GA15187@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Alasdair G Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	"open list:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>,
-	Eric Biggers <ebiggers3@gmail.com>,
-	Joonsoo Kim <js1304@gmail.com>, tadeusz.struk@intel.com,
-	smueller@chronox.de, Masanari Iida <standby24x7@gmail.com>,
-	Shaohua Li <shli@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	Keith Busch <keith.busch@intel.com>, Tejun Heo <tj@kernel.org>,
-	Ming Lei <ming.lei@canonical.com>,
-	Mark Brown <broonie@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-	"open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
-	<linux-raid@vger.kernel.org>, LKML <linux-ke
-To: Jens Axboe <axboe@kernel.dk>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <57519670.6050306@kernel.dk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=windows-1252;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Kim Phillips <kim.phillips@arm.com>,
+	David S Miller <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from pegase1.c-s.fr ([93.17.236.30]:57690 "EHLO pegase1.c-s.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751279AbcFFHDR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 6 Jun 2016 03:03:17 -0400
+In-Reply-To: <20160531094651.GA15187@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 3 June 2016 at 22:38, Jens Axboe <axboe@kernel.dk> wrote:
-> On 05/27/2016 05:11 AM, Baolin Wang wrote:
->>
->> +/*
->> + * Map a bio to scatterlist, return number of sg entries setup. Caller
->> must
->> + * make sure sg can hold bio segments entries.
->> + */
->> +int blk_bio_map_sg(struct request_queue *q, struct bio *bio,
->> +                  struct scatterlist *sglist)
->> +{
->> +       struct scatterlist *sg = NULL;
->> +       int nsegs = 0;
->> +
->> +       if (bio)
->> +               nsegs = __blk_bios_map_sg(q, bio, sglist, &sg, true);
->> +
->> +       if (sg)
->> +               sg_mark_end(sg);
->
->
-> Put that if (sg) inside the if (bio) section, 'sg' isn't going to be
-> non-NULL outside of that.
->
-> Additionally, who would call this with a NULL bio? That seems odd, I'd
-> get rid of that check completely.
 
-OK. I'll fix these in next version. Thanks for your comments.
 
--- 
-Baolin.wang
-Best Regards
+Le 31/05/2016 =E0 11:46, Herbert Xu a =E9crit :
+> On Fri, May 27, 2016 at 11:32:36AM +0200, Christophe Leroy wrote:
+>> +	sg_count =3D sg_to_link_tbl_offset(src, sg_count, offset, len,
+>> +					 &edesc->link_tbl[tbl_off])
+>> +	if (sg_count =3D=3D 1) {
+>> +		/* Only one segment now, so no link tbl needed*/
+>> +		copy_talitos_ptr(ptr, &edesc->link_tbl[tbl_off], is_sec1);
+>> +		return sg_count;
+>> +	}
+> This patch doesn't build.
+Oops, I was too quick on doing the cosmetic modifications requested by=20
+the checkpatch script.
+Sorry for that, I will submit a new version this week
+
+Christophe
