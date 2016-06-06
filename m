@@ -1,41 +1,46 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: Re: [PATCH 2/6] crypto: talitos - making mapping helpers more generic
-Date: Mon, 6 Jun 2016 09:03:14 +0200
-Message-ID: <1be7c6f6-8885-d008-f47b-9e7f290e0c37@c-s.fr>
-References: <cover.1464330501.git.christophe.leroy@c-s.fr>
- <26474a2b44e69a0dbff43dbeed030ab5adef81db.1464330501.git.christophe.leroy@c-s.fr>
- <20160531094651.GA15187@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252;
-	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Kim Phillips <kim.phillips@arm.com>,
-	David S Miller <davem@davemloft.net>,
+Subject: [PATCH v2 5/7] crypto: talitos - sg_to_link_tbl() not used anymore,
+ remove it
+Date: Mon,  6 Jun 2016 13:20:42 +0200 (CEST)
+Message-ID: <7db7c030af80d42c06a4900de317ca7afe6258c3.1464390096.git.christophe.leroy@c-s.fr>
+References: <cover.1464390094.git.christophe.leroy@c-s.fr>
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
 	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Kim Phillips <kim.phillips@arm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David S Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:57690 "EHLO pegase1.c-s.fr"
+Received: from pegase1.c-s.fr ([93.17.236.30]:33298 "EHLO pegase1.c-s.fr"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751279AbcFFHDR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 6 Jun 2016 03:03:17 -0400
-In-Reply-To: <20160531094651.GA15187@gondor.apana.org.au>
+	id S1750956AbcFFNDk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 6 Jun 2016 09:03:40 -0400
+In-Reply-To: <cover.1464390094.git.christophe.leroy@c-s.fr>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+---
+ drivers/crypto/talitos.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-
-Le 31/05/2016 =E0 11:46, Herbert Xu a =E9crit :
-> On Fri, May 27, 2016 at 11:32:36AM +0200, Christophe Leroy wrote:
->> +	sg_count =3D sg_to_link_tbl_offset(src, sg_count, offset, len,
->> +					 &edesc->link_tbl[tbl_off])
->> +	if (sg_count =3D=3D 1) {
->> +		/* Only one segment now, so no link tbl needed*/
->> +		copy_talitos_ptr(ptr, &edesc->link_tbl[tbl_off], is_sec1);
->> +		return sg_count;
->> +	}
-> This patch doesn't build.
-Oops, I was too quick on doing the cosmetic modifications requested by=20
-the checkpatch script.
-Sorry for that, I will submit a new version this week
-
-Christophe
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 4ff03c3..ff8cf39 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1111,14 +1111,6 @@ next:
+ 	return count;
+ }
+ 
+-static inline int sg_to_link_tbl(struct scatterlist *sg, int sg_count,
+-				 int cryptlen,
+-				 struct talitos_ptr *link_tbl_ptr)
+-{
+-	return sg_to_link_tbl_offset(sg, sg_count, 0, cryptlen,
+-				     link_tbl_ptr);
+-}
+-
+ int talitos_sg_map(struct device *dev, struct scatterlist *src,
+ 		   unsigned int len, struct talitos_edesc *edesc,
+ 		   struct talitos_ptr *ptr,
+-- 
+2.1.0
