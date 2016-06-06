@@ -1,36 +1,32 @@
-From: Jeffrey Walton <noloader@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: Unable to decrypt message
-Date: Sat, 4 Jun 2016 16:59:07 -0400
-Message-ID: <CAH8yC8mexX6p5_pifk_iAV_DYCD8po1gWSJBr=pbE+MSDNcrmQ@mail.gmail.com>
+Date: Mon, 6 Jun 2016 12:17:36 +0800
+Message-ID: <20160606041736.GA19710@gondor.apana.org.au>
 References: <CAKJ7aR4cxqoDQXvcULgwrQyok7fbi_Cq4jTL8x=WZwd03YEbCg@mail.gmail.com>
-Reply-To: noloader@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
 To: Gadre Nayan <gadrenayan@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f44.google.com ([209.85.214.44]:38596 "EHLO
-	mail-it0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750997AbcFDU7J (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:46960 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752805AbcFFERk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 4 Jun 2016 16:59:09 -0400
-Received: by mail-it0-f44.google.com with SMTP id i65so9266363ith.1
-        for <linux-crypto@vger.kernel.org>; Sat, 04 Jun 2016 13:59:08 -0700 (PDT)
+	Mon, 6 Jun 2016 00:17:40 -0400
+Content-Disposition: inline
 In-Reply-To: <CAKJ7aR4cxqoDQXvcULgwrQyok7fbi_Cq4jTL8x=WZwd03YEbCg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> I am trying to encrypt decrypt data over the wire. On the receiver
-> side I have a pre-routing hook where I get reference to my encrypted
-> data and apply decryption using the skcipher api's, however I am
-> unable to get the same data back.
+Gadre Nayan <gadrenayan@gmail.com> wrote:
 >
-> My algo is same on both ends "cbc(aes)" and using CRYPTO_ALG_ASYNC ,
-> key is also same (content and size).
+> Should the Initialization vector also be the same. Since I am
+> generating iv random bytes on both ends.
 
-Depends on a number of things... But in general, the first thing to do
-is find the self tests and run them. Finding the self tests may not be
-that easy For example, afalg async tests are at
-http://github.com/tstruk/afalg_async_test.
+Yes the IV must be the same at both ends.
 
-Jeff
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
