@@ -1,55 +1,302 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v2 6/7] crypto: talitos - implement cra_priority
-Date: Mon,  6 Jun 2016 13:20:44 +0200 (CEST)
-Message-ID: <64efb120bc8109f0d8f0f665c4b64d0a5d705f37.1464390096.git.christophe.leroy@c-s.fr>
+Subject: [PATCH v2 2/7] crypto: talitos - move mapping helpers before IPSEC
+ functions
+Date: Mon,  6 Jun 2016 13:20:36 +0200 (CEST)
+Message-ID: <7a625141dd94440aa6285346e7b7c033772358fb.1464390095.git.christophe.leroy@c-s.fr>
 References: <cover.1464390094.git.christophe.leroy@c-s.fr>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-crypto@vger.kernel.org
 To: Kim Phillips <kim.phillips@arm.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, David S Miller <davem@davemloft.net>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David S Miller <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <cover.1464390094.git.christophe.leroy@c-s.fr>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-U0VDMSBkb2Vzbid0IGhhdmUgSVBTRUNfRVNQIGRlc2NyaXB0b3IgdHlwZSBidXQgaXQgaXMgYWJs
-ZSB0byBwZXJmb3JtCklQU0VDIHVzaW5nIEhNQUNfU05PT1BfTk9fQUZFVSwgd2hpY2ggaXMgYWxz
-byBleGlzdGluZyBvbiBTRUMyCkluIG9yZGVyIHRvIGJlIGFibGUgdG8gZGVmaW5lIGRlc2NyaXB0
-b3JzIHRlbXBsYXRlcyBmb3IgU0VDMSB3aXRob3V0CmJyZWFraW5nIFNFQzIrLCB3ZSBoYXZlIHRv
-IGdpdmUgbG93ZXIgcHJpb3JpdHkgdG8gSE1BQ19TTk9PUF9OT19BRkVVCnNvIHRoYXQgU0VDMisg
-c2VsZWN0cyBJUFNFQ19FU1AgYW5kIG5vdCBITUFDX1NOT09QX05PX0FGRVUgd2hpY2ggaXMKbGVz
-cyBwZXJmb3JtYW50LgoKVGhpcyBpcyBkb25lIGJ5IGFkZGluZyBhIHByaW9yaXR5IGZpZWxkIGlu
-IHRoZSB0ZW1wbGF0ZS4gSWYgdGhlIGZpZWxkCmlzIDAsIHdlIHVzZSB0aGUgZGVmYXVsdCBwcmlv
-cml0eSwgb3RoZXJ3aXNlIHdlIHVzZWQgdGhlIG9uZSBpbiB0aGUKZmllbGQuCgpTaWduZWQtb2Zm
-LWJ5OiBDaHJpc3RvcGhlIExlcm95IDxjaHJpc3RvcGhlLmxlcm95QGMtcy5mcj4KLS0tCiBkcml2
-ZXJzL2NyeXB0by90YWxpdG9zLmMgfCA2ICsrKysrLQogMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0
-aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5cHRvL3RhbGl0
-b3MuYyBiL2RyaXZlcnMvY3J5cHRvL3RhbGl0b3MuYwppbmRleCBmZjhjZjM5Li5kZmQzYTkzIDEw
-MDY0NAotLS0gYS9kcml2ZXJzL2NyeXB0by90YWxpdG9zLmMKKysrIGIvZHJpdmVycy9jcnlwdG8v
-dGFsaXRvcy5jCkBAIC0yMTIwLDYgKzIxMjAsNyBAQCBzdGF0aWMgaW50IGFoYXNoX3NldGtleShz
-dHJ1Y3QgY3J5cHRvX2FoYXNoICp0Zm0sIGNvbnN0IHU4ICprZXksCiAKIHN0cnVjdCB0YWxpdG9z
-X2FsZ190ZW1wbGF0ZSB7CiAJdTMyIHR5cGU7CisJdTMyIHByaW9yaXR5OwogCXVuaW9uIHsKIAkJ
-c3RydWN0IGNyeXB0b19hbGcgY3J5cHRvOwogCQlzdHJ1Y3QgYWhhc2hfYWxnIGhhc2g7CkBAIC0y
-ODk3LDcgKzI4OTgsMTAgQEAgc3RhdGljIHN0cnVjdCB0YWxpdG9zX2NyeXB0b19hbGcgKnRhbGl0
-b3NfYWxnX2FsbG9jKHN0cnVjdCBkZXZpY2UgKmRldiwKIAl9CiAKIAlhbGctPmNyYV9tb2R1bGUg
-PSBUSElTX01PRFVMRTsKLQlhbGctPmNyYV9wcmlvcml0eSA9IFRBTElUT1NfQ1JBX1BSSU9SSVRZ
-OworCWlmICh0X2FsZy0+YWxndC5wcmlvcml0eSkKKwkJYWxnLT5jcmFfcHJpb3JpdHkgPSB0X2Fs
-Zy0+YWxndC5wcmlvcml0eTsKKwllbHNlCisJCWFsZy0+Y3JhX3ByaW9yaXR5ID0gVEFMSVRPU19D
-UkFfUFJJT1JJVFk7CiAJYWxnLT5jcmFfYWxpZ25tYXNrID0gMDsKIAlhbGctPmNyYV9jdHhzaXpl
-ID0gc2l6ZW9mKHN0cnVjdCB0YWxpdG9zX2N0eCk7CiAJYWxnLT5jcmFfZmxhZ3MgfD0gQ1JZUFRP
-X0FMR19LRVJOX0RSSVZFUl9PTkxZOwotLSAKMi4xLjAKCl9fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4cHBjLWRldiBtYWlsaW5nIGxpc3QKTGludXhw
-cGMtZGV2QGxpc3RzLm96bGFicy5vcmcKaHR0cHM6Ly9saXN0cy5vemxhYnMub3JnL2xpc3RpbmZv
-L2xpbnV4cHBjLWRldg==
+In order to be able to use the mapping/unmapping helpers for IPSEC
+it needs to be move upper in the file
+
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+---
+ drivers/crypto/talitos.c | 244 +++++++++++++++++++++++------------------------
+ 1 file changed, 122 insertions(+), 122 deletions(-)
+
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index a92aa37..beb369e 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -926,6 +926,33 @@ static void talitos_sg_unmap(struct device *dev,
+ 		dma_unmap_sg(dev, src, src_nents, DMA_BIDIRECTIONAL);
+ }
+ 
++static void unmap_sg_talitos_ptr(struct device *dev, struct scatterlist *src,
++				 struct scatterlist *dst, unsigned int len,
++				 struct talitos_edesc *edesc)
++{
++	struct talitos_private *priv = dev_get_drvdata(dev);
++	bool is_sec1 = has_ftr_sec1(priv);
++
++	if (is_sec1) {
++		if (!edesc->src_nents) {
++			dma_unmap_sg(dev, src, 1,
++				     dst != src ? DMA_TO_DEVICE
++						: DMA_BIDIRECTIONAL);
++		}
++		if (dst && edesc->dst_nents) {
++			dma_sync_single_for_device(dev,
++						   edesc->dma_link_tbl + len,
++						   len, DMA_FROM_DEVICE);
++			sg_copy_from_buffer(dst, edesc->dst_nents ? : 1,
++					    edesc->buf + len, len);
++		} else if (dst && dst != src) {
++			dma_unmap_sg(dev, dst, 1, DMA_FROM_DEVICE);
++		}
++	} else {
++		talitos_sg_unmap(dev, edesc, src, dst);
++	}
++}
++
+ static void ipsec_esp_unmap(struct device *dev,
+ 			    struct talitos_edesc *edesc,
+ 			    struct aead_request *areq)
+@@ -1083,6 +1110,101 @@ static inline int sg_to_link_tbl(struct scatterlist *sg, int sg_count,
+ 				     link_tbl_ptr);
+ }
+ 
++int map_sg_in_talitos_ptr(struct device *dev, struct scatterlist *src,
++			  unsigned int len, struct talitos_edesc *edesc,
++			  enum dma_data_direction dir, struct talitos_ptr *ptr)
++{
++	int sg_count;
++	struct talitos_private *priv = dev_get_drvdata(dev);
++	bool is_sec1 = has_ftr_sec1(priv);
++
++	to_talitos_ptr_len(ptr, len, is_sec1);
++
++	if (is_sec1) {
++		sg_count = edesc->src_nents ? : 1;
++
++		if (sg_count == 1) {
++			dma_map_sg(dev, src, 1, dir);
++			to_talitos_ptr(ptr, sg_dma_address(src), is_sec1);
++		} else {
++			sg_copy_to_buffer(src, sg_count, edesc->buf, len);
++			to_talitos_ptr(ptr, edesc->dma_link_tbl, is_sec1);
++			dma_sync_single_for_device(dev, edesc->dma_link_tbl,
++						   len, DMA_TO_DEVICE);
++		}
++	} else {
++		to_talitos_ptr_ext_set(ptr, 0, is_sec1);
++
++		sg_count = dma_map_sg(dev, src, edesc->src_nents ? : 1, dir);
++
++		if (sg_count == 1) {
++			to_talitos_ptr(ptr, sg_dma_address(src), is_sec1);
++		} else {
++			sg_count = sg_to_link_tbl(src, sg_count, len,
++						  &edesc->link_tbl[0]);
++			if (sg_count > 1) {
++				to_talitos_ptr(ptr, edesc->dma_link_tbl, 0);
++				to_talitos_ptr_ext_or(ptr, DESC_PTR_LNKTBL_JUMP,
++						      0);
++				dma_sync_single_for_device(dev,
++							   edesc->dma_link_tbl,
++							   edesc->dma_len,
++							   DMA_BIDIRECTIONAL);
++			} else {
++				/* Only one segment now, so no link tbl needed*/
++				to_talitos_ptr(ptr, sg_dma_address(src),
++					       is_sec1);
++			}
++		}
++	}
++	return sg_count;
++}
++
++void map_sg_out_talitos_ptr(struct device *dev, struct scatterlist *dst,
++			    unsigned int len, struct talitos_edesc *edesc,
++			    enum dma_data_direction dir,
++			    struct talitos_ptr *ptr, int sg_count)
++{
++	struct talitos_private *priv = dev_get_drvdata(dev);
++	bool is_sec1 = has_ftr_sec1(priv);
++
++	if (dir != DMA_NONE)
++		sg_count = dma_map_sg(dev, dst, edesc->dst_nents ? : 1, dir);
++
++	to_talitos_ptr_len(ptr, len, is_sec1);
++
++	if (is_sec1) {
++		if (sg_count == 1) {
++			if (dir != DMA_NONE)
++				dma_map_sg(dev, dst, 1, dir);
++			to_talitos_ptr(ptr, sg_dma_address(dst), is_sec1);
++		} else {
++			to_talitos_ptr(ptr, edesc->dma_link_tbl + len, is_sec1);
++			dma_sync_single_for_device(dev,
++						   edesc->dma_link_tbl + len,
++						   len, DMA_FROM_DEVICE);
++		}
++	} else {
++		to_talitos_ptr_ext_set(ptr, 0, is_sec1);
++
++		if (sg_count == 1) {
++			to_talitos_ptr(ptr, sg_dma_address(dst), is_sec1);
++		} else {
++			struct talitos_ptr *link_tbl_ptr =
++				&edesc->link_tbl[edesc->src_nents + 1];
++
++			to_talitos_ptr(ptr, edesc->dma_link_tbl +
++					    (edesc->src_nents + 1) *
++					     sizeof(struct talitos_ptr), 0);
++			to_talitos_ptr_ext_or(ptr, DESC_PTR_LNKTBL_JUMP, 0);
++			sg_to_link_tbl(dst, sg_count, len, link_tbl_ptr);
++			dma_sync_single_for_device(dev, edesc->dma_link_tbl,
++						   edesc->dma_len,
++						   DMA_BIDIRECTIONAL);
++		}
++	}
++}
++
+ /*
+  * fill in and submit ipsec_esp descriptor
+  */
+@@ -1420,33 +1542,6 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *cipher,
+ 	return 0;
+ }
+ 
+-static void unmap_sg_talitos_ptr(struct device *dev, struct scatterlist *src,
+-				 struct scatterlist *dst, unsigned int len,
+-				 struct talitos_edesc *edesc)
+-{
+-	struct talitos_private *priv = dev_get_drvdata(dev);
+-	bool is_sec1 = has_ftr_sec1(priv);
+-
+-	if (is_sec1) {
+-		if (!edesc->src_nents) {
+-			dma_unmap_sg(dev, src, 1,
+-				     dst != src ? DMA_TO_DEVICE
+-						: DMA_BIDIRECTIONAL);
+-		}
+-		if (dst && edesc->dst_nents) {
+-			dma_sync_single_for_device(dev,
+-						   edesc->dma_link_tbl + len,
+-						   len, DMA_FROM_DEVICE);
+-			sg_copy_from_buffer(dst, edesc->dst_nents ? : 1,
+-					    edesc->buf + len, len);
+-		} else if (dst && dst != src) {
+-			dma_unmap_sg(dev, dst, 1, DMA_FROM_DEVICE);
+-		}
+-	} else {
+-		talitos_sg_unmap(dev, edesc, src, dst);
+-	}
+-}
+-
+ static void common_nonsnoop_unmap(struct device *dev,
+ 				  struct talitos_edesc *edesc,
+ 				  struct ablkcipher_request *areq)
+@@ -1478,101 +1573,6 @@ static void ablkcipher_done(struct device *dev,
+ 	areq->base.complete(&areq->base, err);
+ }
+ 
+-int map_sg_in_talitos_ptr(struct device *dev, struct scatterlist *src,
+-			  unsigned int len, struct talitos_edesc *edesc,
+-			  enum dma_data_direction dir, struct talitos_ptr *ptr)
+-{
+-	int sg_count;
+-	struct talitos_private *priv = dev_get_drvdata(dev);
+-	bool is_sec1 = has_ftr_sec1(priv);
+-
+-	to_talitos_ptr_len(ptr, len, is_sec1);
+-
+-	if (is_sec1) {
+-		sg_count = edesc->src_nents ? : 1;
+-
+-		if (sg_count == 1) {
+-			dma_map_sg(dev, src, 1, dir);
+-			to_talitos_ptr(ptr, sg_dma_address(src), is_sec1);
+-		} else {
+-			sg_copy_to_buffer(src, sg_count, edesc->buf, len);
+-			to_talitos_ptr(ptr, edesc->dma_link_tbl, is_sec1);
+-			dma_sync_single_for_device(dev, edesc->dma_link_tbl,
+-						   len, DMA_TO_DEVICE);
+-		}
+-	} else {
+-		to_talitos_ptr_ext_set(ptr, 0, is_sec1);
+-
+-		sg_count = dma_map_sg(dev, src, edesc->src_nents ? : 1, dir);
+-
+-		if (sg_count == 1) {
+-			to_talitos_ptr(ptr, sg_dma_address(src), is_sec1);
+-		} else {
+-			sg_count = sg_to_link_tbl(src, sg_count, len,
+-						  &edesc->link_tbl[0]);
+-			if (sg_count > 1) {
+-				to_talitos_ptr(ptr, edesc->dma_link_tbl, 0);
+-				to_talitos_ptr_ext_or(ptr, DESC_PTR_LNKTBL_JUMP,
+-						      0);
+-				dma_sync_single_for_device(dev,
+-							   edesc->dma_link_tbl,
+-							   edesc->dma_len,
+-							   DMA_BIDIRECTIONAL);
+-			} else {
+-				/* Only one segment now, so no link tbl needed*/
+-				to_talitos_ptr(ptr, sg_dma_address(src),
+-					       is_sec1);
+-			}
+-		}
+-	}
+-	return sg_count;
+-}
+-
+-void map_sg_out_talitos_ptr(struct device *dev, struct scatterlist *dst,
+-			    unsigned int len, struct talitos_edesc *edesc,
+-			    enum dma_data_direction dir,
+-			    struct talitos_ptr *ptr, int sg_count)
+-{
+-	struct talitos_private *priv = dev_get_drvdata(dev);
+-	bool is_sec1 = has_ftr_sec1(priv);
+-
+-	if (dir != DMA_NONE)
+-		sg_count = dma_map_sg(dev, dst, edesc->dst_nents ? : 1, dir);
+-
+-	to_talitos_ptr_len(ptr, len, is_sec1);
+-
+-	if (is_sec1) {
+-		if (sg_count == 1) {
+-			if (dir != DMA_NONE)
+-				dma_map_sg(dev, dst, 1, dir);
+-			to_talitos_ptr(ptr, sg_dma_address(dst), is_sec1);
+-		} else {
+-			to_talitos_ptr(ptr, edesc->dma_link_tbl + len, is_sec1);
+-			dma_sync_single_for_device(dev,
+-						   edesc->dma_link_tbl + len,
+-						   len, DMA_FROM_DEVICE);
+-		}
+-	} else {
+-		to_talitos_ptr_ext_set(ptr, 0, is_sec1);
+-
+-		if (sg_count == 1) {
+-			to_talitos_ptr(ptr, sg_dma_address(dst), is_sec1);
+-		} else {
+-			struct talitos_ptr *link_tbl_ptr =
+-				&edesc->link_tbl[edesc->src_nents + 1];
+-
+-			to_talitos_ptr(ptr, edesc->dma_link_tbl +
+-					    (edesc->src_nents + 1) *
+-					     sizeof(struct talitos_ptr), 0);
+-			to_talitos_ptr_ext_or(ptr, DESC_PTR_LNKTBL_JUMP, 0);
+-			sg_to_link_tbl(dst, sg_count, len, link_tbl_ptr);
+-			dma_sync_single_for_device(dev, edesc->dma_link_tbl,
+-						   edesc->dma_len,
+-						   DMA_BIDIRECTIONAL);
+-		}
+-	}
+-}
+-
+ static int common_nonsnoop(struct talitos_edesc *edesc,
+ 			   struct ablkcipher_request *areq,
+ 			   void (*callback) (struct device *dev,
+-- 
+2.1.0
