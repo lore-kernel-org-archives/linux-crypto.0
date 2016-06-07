@@ -1,88 +1,62 @@
-From: Tero Kristo <t-kristo@ti.com>
-Subject: Re: [PATCH 02/28] crypto: omap-sham: Don't idle/start SHA device
- between Encrypt operations
-Date: Tue, 7 Jun 2016 14:52:36 +0300
-Message-ID: <5756B584.2000900@ti.com>
-References: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
- <1464771389-10640-3-git-send-email-t-kristo@ti.com> <574EB091.6040001@ti.com>
- <574F69D8.1010809@ti.com> <20160607100837.GA30875@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Grygorii Strashko <grygorii.strashko@ti.com>,
-	<linux-omap@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<davem@davemloft.net>, <tony@atomide.com>,
-	<linux-arm-kernel@lists.infradead.org>, <lokeshvutla@ti.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Dave Gerlach <d-gerlach@ti.com>
+From: Baolin Wang <baolin.wang@linaro.org>
+Subject: [RFC v4 0/4] Introduce the bulk mode method when sending request to crypto layer
+Date: Tue,  7 Jun 2016 20:17:03 +0800
+Message-ID: <cover.1465301616.git.baolin.wang@linaro.org>
+Cc: ebiggers3@gmail.com, js1304@gmail.com, tadeusz.struk@intel.com,
+	smueller@chronox.de, standby24x7@gmail.com, shli@kernel.org,
+	dan.j.williams@intel.com, martin.petersen@oracle.com,
+	sagig@mellanox.com, kent.overstreet@gmail.com,
+	keith.busch@intel.com, tj@kernel.org, ming.lei@canonical.com,
+	broonie@kernel.org, arnd@arndb.de, linux-crypto@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+	linux-kernel@vger.kernel.org, baolin.wang@linaro.org
+To: axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
+	dm-devel@redhat.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from arroyo.ext.ti.com ([198.47.19.12]:44310 "EHLO arroyo.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754542AbcFGLxv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Jun 2016 07:53:51 -0400
-In-Reply-To: <20160607100837.GA30875@gondor.apana.org.au>
+Received: from mail-pf0-f178.google.com ([209.85.192.178]:33107 "EHLO
+	mail-pf0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751778AbcFGMRz (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 7 Jun 2016 08:17:55 -0400
+Received: by mail-pf0-f178.google.com with SMTP id y124so17950741pfy.0
+        for <linux-crypto@vger.kernel.org>; Tue, 07 Jun 2016 05:17:55 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 07/06/16 13:08, Herbert Xu wrote:
-> On Wed, Jun 01, 2016 at 06:03:52PM -0500, Dave Gerlach wrote:
->> On 06/01/2016 04:53 AM, Grygorii Strashko wrote:
->>> On 06/01/2016 11:56 AM, Tero Kristo wrote:
->>>> From: Lokesh Vutla <lokeshvutla@ti.com>
->>>>
->>>> Calling runtime PM API for every block causes serious perf hit to
->>>> crypto operations that are done on a long buffer.
->>>> As crypto is performed on a page boundary, encrypting large buffers can
->>>> cause a series of crypto operations divided by page. The runtime PM API
->>>> is also called those many times.
->>>>
->>>> We call runtime_pm_get_sync only at beginning on the session (cra_init)
->>>> and runtime_pm_put at the end. This result in upto a 50% speedup.
->>>> This doesn't make the driver to keep the system awake as runtime get/put
->>>> is only called during a crypto session which completes usually quickly.
->>>>
->>>> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
->>>> Signed-off-by: Tero Kristo <t-kristo@ti.com>
->>>> ---
->>>>   drivers/crypto/omap-sham.c | 27 +++++++++++++++++----------
->>>>   1 file changed, 17 insertions(+), 10 deletions(-)
->>>>
->>>> diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
->>>> index 6eefaa2..bd0258f 100644
->>>> --- a/drivers/crypto/omap-sham.c
->>>> +++ b/drivers/crypto/omap-sham.c
->>>> @@ -360,14 +360,6 @@ static void omap_sham_copy_ready_hash(struct
->>>> ahash_request *req)
->>>>
->>>>   static int omap_sham_hw_init(struct omap_sham_dev *dd)
->>>>   {
->>>> -    int err;
->>>> -
->>>> -    err = pm_runtime_get_sync(dd->dev);
->>>> -    if (err < 0) {
->>>> -        dev_err(dd->dev, "failed to get sync: %d\n", err);
->>>> -        return err;
->>>> -    }
->>>> -
->>
->> Would it be worth it to investigate a pm_runtime autosuspend
->> approach rather than knocking runtime PM out here completely? I am
->> not clear if the overhead is coming from the pm_runtime calls
->> themselves or the actual idling of the IP, but if it's the idling of
->> the IP causing the slowdown, with a large enough autosuspend_delay
->> we don't actually sleep between each block but after a long enough
->> period of idle time we would actually suspend.
->
-> Indeed, I think this patch is bogus.  cra_init is associated
-> with the tfm object which is usually long-lived.  So doing power
-> management there makes no sense.
->
-> Cheers,
->
+This patchset will check if the cipher can support bulk mode, then dm-crypt
+will handle different ways to send requests to crypto layer according to
+cipher mode. For bulk mode, we can use sg table to map the whole bio and
+send all scatterlists of one bio to crypto engine to encrypt or decrypt,
+which can improve the hardware engine's efficiency.
 
-I can investigate this further, but I believe this patch itself gave a 
-noticeable performance boost.
+Changes since v3:
+ - Some optimization for blk_bio_map_sg() function.
 
-This is an optimization anyway, and not critical for functionality.
+Changes since v2:
+ - Add one cipher user with CRYPTO_ALG_BULK flag to support bulk mode.
+ - Add one atomic variable to avoid the sg table race.
 
--Tero
+Changes since v1:
+ - Refactor the blk_bio_map_sg() function to avoid duplicated code.
+ - Move the sg table allocation to crypt_ctr_cipher() function to avoid memory
+ allocation in the IO path.
+ - Remove the crypt_sg_entry() function.
+ - Other optimization.
+
+Baolin Wang (4):
+  block: Introduce blk_bio_map_sg() to map one bio
+  crypto: Introduce CRYPTO_ALG_BULK flag
+  md: dm-crypt: Introduce the bulk mode method when sending request
+  crypto: Add the CRYPTO_ALG_BULK flag for ecb(aes) cipher
+
+ block/blk-merge.c         |   19 ++++++
+ drivers/crypto/omap-aes.c |    2 +-
+ drivers/md/dm-crypt.c     |  159 ++++++++++++++++++++++++++++++++++++++++++++-
+ include/crypto/skcipher.h |    7 ++
+ include/linux/blkdev.h    |    2 +
+ include/linux/crypto.h    |    6 ++
+ 6 files changed, 193 insertions(+), 2 deletions(-)
+
+-- 
+1.7.9.5
