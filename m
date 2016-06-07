@@ -1,530 +1,771 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v3] crypto: rsa - return raw integers for the ASN.1 parser
-Date: Tue, 07 Jun 2016 16:33:17 +0200
-Message-ID: <4389374.qHp8yZtTYB@tauon.atsec.com>
-References: <1465309269-2214-1-git-send-email-tudor-dan.ambarus@nxp.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:35978 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754979AbcFGOdV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Jun 2016 10:33:21 -0400
-In-Reply-To: <1465309269-2214-1-git-send-email-tudor-dan.ambarus@nxp.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Megha Dey <megha.dey@intel.com>
+Subject: [PATCH] crypto : async implementation for sha1-mb
+Date: Tue,  7 Jun 2016 11:14:42 -0700
+Message-ID: <1465323282-2235-1-git-send-email-megha.dey@intel.com>
+Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	megha.dey@intel.com, fenghua.yu@intel.com,
+	Megha Dey <megha.dey@linux.intel.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Dienstag, 7. Juni 2016, 17:21:09 schrieb Tudor Ambarus:
+From: Megha Dey <megha.dey@linux.intel.com>
 
-Hi Tudor,
+Herbert wants the sha1-mb algorithm to have an async implementation:
+https://lkml.org/lkml/2016/4/5/286.
+Currently, sha1-mb uses an async interface for the outer algorithm
+and a sync interface for the inner algorithm. This patch introduces
+a async interface for even the inner algorithm.
 
-> Return the raw key with no other processing so that the caller
-> can copy it or MPI parse it, etc.
-> 
-> The scope is to have only one ANS.1 parser for all RSA
-> implementations.
-> 
-> Update the RSA software implementation so that it does
-> the MPI conversion on top.
-> 
-> Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-> ---
->  crypto/rsa.c                  | 119 ++++++++++++++++++++++++++-------------
-> crypto/rsa_helper.c           | 128
-> +++++++++++++++++++++--------------------- include/crypto/internal/rsa.h | 
-> 22 ++++++--
->  3 files changed, 161 insertions(+), 108 deletions(-)
-> 
-> diff --git a/crypto/rsa.c b/crypto/rsa.c
-> index 77d737f..ea78d61 100644
-> --- a/crypto/rsa.c
-> +++ b/crypto/rsa.c
-> @@ -14,12 +14,24 @@
->  #include <crypto/internal/akcipher.h>
->  #include <crypto/akcipher.h>
->  #include <crypto/algapi.h>
-> +#include <linux/mpi.h>
-> +
-> +struct rsa_mpi_key {
-> +	MPI n;
-> +	MPI e;
-> +	MPI d;
-> +};
-> +
-> +struct rsa_ctx {
-> +	struct rsa_key key;
-> +	struct rsa_mpi_key mpi_key;
-> +};
-> 
->  /*
->   * RSAEP function [RFC3447 sec 5.1.1]
->   * c = m^e mod n;
->   */
-> -static int _rsa_enc(const struct rsa_key *key, MPI c, MPI m)
-> +static int _rsa_enc(const struct rsa_mpi_key *key, MPI c, MPI m)
->  {
->  	/* (1) Validate 0 <= m < n */
->  	if (mpi_cmp_ui(m, 0) < 0 || mpi_cmp(m, key->n) >= 0)
-> @@ -33,7 +45,7 @@ static int _rsa_enc(const struct rsa_key *key, MPI c, MPI
-> m) * RSADP function [RFC3447 sec 5.1.2]
->   * m = c^d mod n;
->   */
-> -static int _rsa_dec(const struct rsa_key *key, MPI m, MPI c)
-> +static int _rsa_dec(const struct rsa_mpi_key *key, MPI m, MPI c)
->  {
->  	/* (1) Validate 0 <= c < n */
->  	if (mpi_cmp_ui(c, 0) < 0 || mpi_cmp(c, key->n) >= 0)
-> @@ -47,7 +59,7 @@ static int _rsa_dec(const struct rsa_key *key, MPI m, MPI
-> c) * RSASP1 function [RFC3447 sec 5.2.1]
->   * s = m^d mod n
->   */
-> -static int _rsa_sign(const struct rsa_key *key, MPI s, MPI m)
-> +static int _rsa_sign(const struct rsa_mpi_key *key, MPI s, MPI m)
->  {
->  	/* (1) Validate 0 <= m < n */
->  	if (mpi_cmp_ui(m, 0) < 0 || mpi_cmp(m, key->n) >= 0)
-> @@ -61,7 +73,7 @@ static int _rsa_sign(const struct rsa_key *key, MPI s, MPI
-> m) * RSAVP1 function [RFC3447 sec 5.2.2]
->   * m = s^e mod n;
->   */
-> -static int _rsa_verify(const struct rsa_key *key, MPI m, MPI s)
-> +static int _rsa_verify(const struct rsa_mpi_key *key, MPI m, MPI s)
->  {
->  	/* (1) Validate 0 <= s < n */
->  	if (mpi_cmp_ui(s, 0) < 0 || mpi_cmp(s, key->n) >= 0)
-> @@ -71,15 +83,17 @@ static int _rsa_verify(const struct rsa_key *key, MPI m,
-> MPI s) return mpi_powm(m, s, key->e, key->n);
->  }
-> 
-> -static inline struct rsa_key *rsa_get_key(struct crypto_akcipher *tfm)
-> +static inline struct rsa_mpi_key *rsa_get_key(struct crypto_akcipher *tfm)
->  {
-> -	return akcipher_tfm_ctx(tfm);
-> +	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-> +
-> +	return &ctx->mpi_key;
->  }
-> 
->  static int rsa_enc(struct akcipher_request *req)
->  {
->  	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-> -	const struct rsa_key *pkey = rsa_get_key(tfm);
-> +	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
->  	MPI m, c = mpi_alloc(0);
->  	int ret = 0;
->  	int sign;
-> @@ -118,7 +132,7 @@ err_free_c:
->  static int rsa_dec(struct akcipher_request *req)
->  {
->  	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-> -	const struct rsa_key *pkey = rsa_get_key(tfm);
-> +	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
->  	MPI c, m = mpi_alloc(0);
->  	int ret = 0;
->  	int sign;
-> @@ -156,7 +170,7 @@ err_free_m:
->  static int rsa_sign(struct akcipher_request *req)
->  {
->  	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-> -	const struct rsa_key *pkey = rsa_get_key(tfm);
-> +	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
->  	MPI m, s = mpi_alloc(0);
->  	int ret = 0;
->  	int sign;
-> @@ -195,7 +209,7 @@ err_free_s:
->  static int rsa_verify(struct akcipher_request *req)
->  {
->  	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-> -	const struct rsa_key *pkey = rsa_get_key(tfm);
-> +	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
->  	MPI s, m = mpi_alloc(0);
->  	int ret = 0;
->  	int sign;
-> @@ -233,67 +247,94 @@ err_free_m:
->  	return ret;
->  }
-> 
-> -static int rsa_check_key_length(unsigned int len)
-> +static void rsa_free_mpi_key(struct rsa_mpi_key *key)
->  {
-> -	switch (len) {
-> -	case 512:
-> -	case 1024:
-> -	case 1536:
-> -	case 2048:
-> -	case 3072:
-> -	case 4096:
-> -		return 0;
-> -	}
-> -
-> -	return -EINVAL;
-> +	mpi_free(key->d);
-> +	mpi_free(key->e);
-> +	mpi_free(key->n);
-> +	key->d = NULL;
-> +	key->e = NULL;
-> +	key->n = NULL;
->  }
-> 
->  static int rsa_set_pub_key(struct crypto_akcipher *tfm, const void *key,
->  			   unsigned int keylen)
->  {
-> -	struct rsa_key *pkey = akcipher_tfm_ctx(tfm);
-> +	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-> +	struct rsa_key *pkey = &ctx->key;
-> +	struct rsa_mpi_key *mpi_key = &ctx->mpi_key;
->  	int ret;
-> 
-> +	/* Free the old MPI key if any */
-> +	rsa_free_mpi_key(mpi_key);
-> +
->  	ret = rsa_parse_pub_key(pkey, key, keylen);
->  	if (ret)
->  		return ret;
-> 
-> -	if (rsa_check_key_length(mpi_get_size(pkey->n) << 3)) {
-> -		rsa_free_key(pkey);
-> -		ret = -EINVAL;
-> -	}
-> -	return ret;
-> +	mpi_key->e = mpi_read_raw_data(pkey->e, pkey->e_sz);
-> +	if (!mpi_key->e)
-> +		goto err;
-> +
-> +	mpi_key->n = mpi_read_raw_data(pkey->n, pkey->n_sz);
-> +	if (!mpi_key->n)
-> +		goto err;
-> +
-> +	return 0;
-> +
-> +err:
-> +	rsa_free_mpi_key(mpi_key);
-> +	return -ENOMEM;
->  }
-> 
->  static int rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
->  			    unsigned int keylen)
->  {
-> -	struct rsa_key *pkey = akcipher_tfm_ctx(tfm);
-> +	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-> +	struct rsa_key *pkey = &ctx->key;
-> +	struct rsa_mpi_key *mpi_key = &ctx->mpi_key;
->  	int ret;
-> 
-> +	/* Free the old MPI key if any */
-> +	rsa_free_mpi_key(mpi_key);
-> +
->  	ret = rsa_parse_priv_key(pkey, key, keylen);
->  	if (ret)
->  		return ret;
-> 
-> -	if (rsa_check_key_length(mpi_get_size(pkey->n) << 3)) {
-> -		rsa_free_key(pkey);
-> -		ret = -EINVAL;
-> -	}
-> -	return ret;
-> +	mpi_key->d = mpi_read_raw_data(pkey->d, pkey->n_sz);
-> +	if (!mpi_key->d)
-> +		goto err;
-> +
-> +	mpi_key->e = mpi_read_raw_data(pkey->e, pkey->e_sz);
-> +	if (!mpi_key->e)
-> +		goto err;
-> +
-> +	mpi_key->n = mpi_read_raw_data(pkey->n, pkey->n_sz);
-> +	if (!mpi_key->n)
-> +		goto err;
-> +
-> +	return 0;
-> +
-> +err:
-> +	rsa_free_mpi_key(mpi_key);
-> +	return -ENOMEM;
->  }
-> 
->  static int rsa_max_size(struct crypto_akcipher *tfm)
->  {
-> -	struct rsa_key *pkey = akcipher_tfm_ctx(tfm);
-> +	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-> +	struct rsa_key *pkey = &ctx->key;
-> 
-> -	return pkey->n ? mpi_get_size(pkey->n) : -EINVAL;
-> +	return pkey->n ? pkey->n_sz : -EINVAL;
->  }
-> 
->  static void rsa_exit_tfm(struct crypto_akcipher *tfm)
->  {
-> -	struct rsa_key *pkey = akcipher_tfm_ctx(tfm);
-> +	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-> +	struct rsa_mpi_key *mpi_key = &ctx->mpi_key;
-> 
-> -	rsa_free_key(pkey);
-> +	rsa_free_mpi_key(mpi_key);
->  }
-> 
->  static struct akcipher_alg rsa = {
-> @@ -310,7 +351,7 @@ static struct akcipher_alg rsa = {
->  		.cra_driver_name = "rsa-generic",
->  		.cra_priority = 100,
->  		.cra_module = THIS_MODULE,
-> -		.cra_ctxsize = sizeof(struct rsa_key),
-> +		.cra_ctxsize = sizeof(struct rsa_ctx),
->  	},
->  };
-> 
-> diff --git a/crypto/rsa_helper.c b/crypto/rsa_helper.c
-> index d226f48..f0677b7 100644
-> --- a/crypto/rsa_helper.c
-> +++ b/crypto/rsa_helper.c
-> @@ -18,24 +18,50 @@
->  #include "rsapubkey-asn1.h"
->  #include "rsaprivkey-asn1.h"
-> 
-> +static int rsa_check_key_length(unsigned int len)
-> +{
-> +	switch (len) {
-> +	case 512:
-> +	case 1024:
-> +	case 1536:
-> +	case 2048:
-> +	case 3072:
-> +	case 4096:
-> +		return 0;
-> +	}
-> +
-> +	return -EINVAL;
-> +}
-> +
->  int rsa_get_n(void *context, size_t hdrlen, unsigned char tag,
->  	      const void *value, size_t vlen)
->  {
->  	struct rsa_key *key = context;
-> +	const u8 *ptr = value;
-> +	int ret;
-> 
-> -	key->n = mpi_read_raw_data(value, vlen);
-> +	while (!*ptr && vlen) {
-> +		ptr++;
-> +		vlen--;
-> +	}
+Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
+Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+---
+ arch/x86/crypto/sha-mb/sha1_mb.c | 187 ++++++++++++++++++++++-----------------
+ crypto/mcryptd.c                 | 122 +++++++++++--------------
+ include/crypto/internal/hash.h   |  12 +--
+ include/crypto/mcryptd.h         |   8 +-
+ 4 files changed, 166 insertions(+), 163 deletions(-)
 
-As you do this operation 3 times, isn't an inline better here?
-
-> 
-> -	if (!key->n)
-> -		return -ENOMEM;
-> +	/* invalid key provided */
-> +	if (!ptr)
-> +		return -EINVAL;
-
-Hm, you check the pointer here, but you dereference it already above. So, I 
-guess you want to move that check to the beginning of the function?
-> 
->  	/* In FIPS mode only allow key size 2K & 3K */
-> -	if (fips_enabled && (mpi_get_size(key->n) != 256 &&
-> -			     mpi_get_size(key->n) != 384)) {
-> +	if (fips_enabled && (vlen != 256 && vlen != 384)) {
->  		pr_err("RSA: key size not allowed in FIPS mode\n");
-> -		mpi_free(key->n);
-> -		key->n = NULL;
->  		return -EINVAL;
->  	}
-> +	/* invalid key size provided */
-> +	ret = rsa_check_key_length(vlen << 3);
-> +	if (ret)
-> +		return ret;
-> +
-> +	key->n = ptr;
-> +	key->n_sz = vlen;
-> +
->  	return 0;
->  }
-> 
-> @@ -43,11 +69,19 @@ int rsa_get_e(void *context, size_t hdrlen, unsigned
-> char tag, const void *value, size_t vlen)
->  {
->  	struct rsa_key *key = context;
-> +	const u8 *ptr = value;
-> +
-> +	while (!*ptr && vlen) {
-> +		ptr++;
-> +		vlen--;
-> +	}
-
-No NULL check for ptr? Is it always guaranteed that there is no NULL 
-considering that this may be exposed to user space?
-> 
-> -	key->e = mpi_read_raw_data(value, vlen);
-> +	/* invalid key provided */
-> +	if (!ptr || !key->n_sz || !vlen || vlen > key->n_sz)
-> +		return -EINVAL;
-
-Ah, here we have that check -- again, I would assume it should move up.
-> 
-> -	if (!key->e)
-> -		return -ENOMEM;
-> +	key->e = ptr;
-> +	key->e_sz = vlen;
-> 
->  	return 0;
->  }
-> @@ -56,47 +90,33 @@ int rsa_get_d(void *context, size_t hdrlen, unsigned
-> char tag, const void *value, size_t vlen)
->  {
->  	struct rsa_key *key = context;
-> +	const u8 *ptr = value;
-> 
-> -	key->d = mpi_read_raw_data(value, vlen);
-> +	while (!*ptr && vlen) {
-> +		ptr++;
-> +		vlen--;
-> +	}
-
-Same here.
-> 
-> -	if (!key->d)
-> -		return -ENOMEM;
-> +	/* invalid key provided */
-> +	if (!ptr || !key->n_sz || !vlen || vlen > key->n_sz)
-> +		return -EINVAL;
-> 
->  	/* In FIPS mode only allow key size 2K & 3K */
-> -	if (fips_enabled && (mpi_get_size(key->d) != 256 &&
-> -			     mpi_get_size(key->d) != 384)) {
-> +	if (fips_enabled && (vlen != 256 && vlen != 384)) {
->  		pr_err("RSA: key size not allowed in FIPS mode\n");
-> -		mpi_free(key->d);
-> -		key->d = NULL;
->  		return -EINVAL;
->  	}
-> -	return 0;
-> -}
-> 
-> -static void free_mpis(struct rsa_key *key)
-> -{
-> -	mpi_free(key->n);
-> -	mpi_free(key->e);
-> -	mpi_free(key->d);
-> -	key->n = NULL;
-> -	key->e = NULL;
-> -	key->d = NULL;
-> -}
-> +	key->d = ptr;
-> +	key->d_sz = vlen;
-> 
-> -/**
-> - * rsa_free_key() - frees rsa key allocated by rsa_parse_key()
-> - *
-> - * @rsa_key:	struct rsa_key key representation
-> - */
-> -void rsa_free_key(struct rsa_key *key)
-> -{
-> -	free_mpis(key);
-> +	return 0;
->  }
-> -EXPORT_SYMBOL_GPL(rsa_free_key);
-> 
->  /**
-> - * rsa_parse_pub_key() - extracts an rsa public key from BER encoded buffer
-> - *			 and stores it in the provided struct rsa_key
-> + * rsa_parse_pub_key() - decodes the BER encoded buffer and stores in the
-> + *                       provided struct rsa_key, pointers to the raw key
-> as is, + *                       so that the caller can copy it or MPI
-> parse it, etc. *
->   * @rsa_key:	struct rsa_key key representation
->   * @key:	key in BER format
-> @@ -107,23 +127,15 @@ EXPORT_SYMBOL_GPL(rsa_free_key);
->  int rsa_parse_pub_key(struct rsa_key *rsa_key, const void *key,
->  		      unsigned int key_len)
->  {
-> -	int ret;
-> -
-> -	free_mpis(rsa_key);
-> -	ret = asn1_ber_decoder(&rsapubkey_decoder, rsa_key, key, key_len);
-> -	if (ret < 0)
-> -		goto error;
-> -
-> -	return 0;
-> -error:
-> -	free_mpis(rsa_key);
-> -	return ret;
-> +	return asn1_ber_decoder(&rsapubkey_decoder, rsa_key, key, key_len);
->  }
->  EXPORT_SYMBOL_GPL(rsa_parse_pub_key);
-> 
->  /**
-> - * rsa_parse_pub_key() - extracts an rsa private key from BER encoded
-> buffer - *			 and stores it in the provided struct rsa_key
-> + * rsa_parse_priv_key() - decodes the BER encoded buffer and stores in the
-> + *                        provided struct rsa_key, pointers to the raw key
-> + *                        as is, so that the caller can copy it or MPI
-> parse it, + *                        etc.
->   *
->   * @rsa_key:	struct rsa_key key representation
->   * @key:	key in BER format
-> @@ -134,16 +146,6 @@ EXPORT_SYMBOL_GPL(rsa_parse_pub_key);
->  int rsa_parse_priv_key(struct rsa_key *rsa_key, const void *key,
->  		       unsigned int key_len)
->  {
-> -	int ret;
-> -
-> -	free_mpis(rsa_key);
-> -	ret = asn1_ber_decoder(&rsaprivkey_decoder, rsa_key, key, key_len);
-> -	if (ret < 0)
-> -		goto error;
-> -
-> -	return 0;
-> -error:
-> -	free_mpis(rsa_key);
-> -	return ret;
-> +	return asn1_ber_decoder(&rsaprivkey_decoder, rsa_key, key, key_len);
->  }
->  EXPORT_SYMBOL_GPL(rsa_parse_priv_key);
-> diff --git a/include/crypto/internal/rsa.h b/include/crypto/internal/rsa.h
-> index c7585bd..d6c042a 100644
-> --- a/include/crypto/internal/rsa.h
-> +++ b/include/crypto/internal/rsa.h
-> @@ -12,12 +12,24 @@
->   */
->  #ifndef _RSA_HELPER_
->  #define _RSA_HELPER_
-> -#include <linux/mpi.h>
-> +#include <linux/types.h>
-> 
-> +/**
-> + * rsa_key - RSA key structure
-> + * @n           : RSA modulus raw byte stream
-> + * @e           : RSA public exponent raw byte stream
-> + * @d           : RSA private exponent raw byte stream
-> + * @n_sz        : length in bytes of RSA modulus n
-> + * @e_sz        : length in bytes of RSA public exponent
-> + * @d_sz        : length in bytes of RSA private exponent
-> + */
->  struct rsa_key {
-> -	MPI n;
-> -	MPI e;
-> -	MPI d;
-> +	const u8 *n;
-> +	const u8 *e;
-> +	const u8 *d;
-> +	size_t n_sz;
-> +	size_t e_sz;
-> +	size_t d_sz;
->  };
-> 
->  int rsa_parse_pub_key(struct rsa_key *rsa_key, const void *key,
-> @@ -26,7 +38,5 @@ int rsa_parse_pub_key(struct rsa_key *rsa_key, const void
-> *key, int rsa_parse_priv_key(struct rsa_key *rsa_key, const void *key,
->  		       unsigned int key_len);
-> 
-> -void rsa_free_key(struct rsa_key *rsa_key);
-> -
->  extern struct crypto_template rsa_pkcs1pad_tmpl;
->  #endif
-
-
-Ciao
-Stephan
+diff --git a/arch/x86/crypto/sha-mb/sha1_mb.c b/arch/x86/crypto/sha-mb/sha1_mb.c
+index 0a46491..c76d1ba 100644
+--- a/arch/x86/crypto/sha-mb/sha1_mb.c
++++ b/arch/x86/crypto/sha-mb/sha1_mb.c
+@@ -80,10 +80,10 @@ struct sha1_mb_ctx {
+ static inline struct mcryptd_hash_request_ctx
+ 		*cast_hash_to_mcryptd_ctx(struct sha1_hash_ctx *hash_ctx)
+ {
+-	struct shash_desc *desc;
++	struct ahash_request *areq;
+ 
+-	desc = container_of((void *) hash_ctx, struct shash_desc, __ctx);
+-	return container_of(desc, struct mcryptd_hash_request_ctx, desc);
++	areq = container_of((void *) hash_ctx, struct ahash_request, __ctx);
++	return container_of(areq, struct mcryptd_hash_request_ctx, areq);
+ }
+ 
+ static inline struct ahash_request
+@@ -93,7 +93,7 @@ static inline struct ahash_request
+ }
+ 
+ static void req_ctx_init(struct mcryptd_hash_request_ctx *rctx,
+-				struct shash_desc *desc)
++				struct ahash_request *areq)
+ {
+ 	rctx->flag = HASH_UPDATE;
+ }
+@@ -375,9 +375,9 @@ static struct sha1_hash_ctx *sha1_ctx_mgr_flush(struct sha1_ctx_mgr *mgr)
+ 	}
+ }
+ 
+-static int sha1_mb_init(struct shash_desc *desc)
++static int sha1_mb_init(struct ahash_request *areq)
+ {
+-	struct sha1_hash_ctx *sctx = shash_desc_ctx(desc);
++	struct sha1_hash_ctx *sctx = ahash_request_ctx(areq);
+ 
+ 	hash_ctx_init(sctx);
+ 	sctx->job.result_digest[0] = SHA1_H0;
+@@ -395,7 +395,7 @@ static int sha1_mb_init(struct shash_desc *desc)
+ static int sha1_mb_set_results(struct mcryptd_hash_request_ctx *rctx)
+ {
+ 	int	i;
+-	struct	sha1_hash_ctx *sctx = shash_desc_ctx(&rctx->desc);
++	struct	sha1_hash_ctx *sctx = ahash_request_ctx(&rctx->areq);
+ 	__be32	*dst = (__be32 *) rctx->out;
+ 
+ 	for (i = 0; i < 5; ++i)
+@@ -427,7 +427,7 @@ static int sha_finish_walk(struct mcryptd_hash_request_ctx **ret_rctx,
+ 
+ 		}
+ 		sha_ctx = (struct sha1_hash_ctx *)
+-						shash_desc_ctx(&rctx->desc);
++						ahash_request_ctx(&rctx->areq);
+ 		kernel_fpu_begin();
+ 		sha_ctx = sha1_ctx_mgr_submit(cstate->mgr, sha_ctx,
+ 						rctx->walk.data, nbytes, flag);
+@@ -519,11 +519,10 @@ static void sha1_mb_add_list(struct mcryptd_hash_request_ctx *rctx,
+ 	mcryptd_arm_flusher(cstate, delay);
+ }
+ 
+-static int sha1_mb_update(struct shash_desc *desc, const u8 *data,
+-			  unsigned int len)
++static int sha1_mb_update(struct ahash_request *areq)
+ {
+ 	struct mcryptd_hash_request_ctx *rctx =
+-		container_of(desc, struct mcryptd_hash_request_ctx, desc);
++		container_of(areq, struct mcryptd_hash_request_ctx, areq);
+ 	struct mcryptd_alg_cstate *cstate =
+ 				this_cpu_ptr(sha1_mb_alg_state.alg_cstate);
+ 
+@@ -539,7 +538,7 @@ static int sha1_mb_update(struct shash_desc *desc, const u8 *data,
+ 	}
+ 
+ 	/* need to init context */
+-	req_ctx_init(rctx, desc);
++	req_ctx_init(rctx, areq);
+ 
+ 	nbytes = crypto_ahash_walk_first(req, &rctx->walk);
+ 
+@@ -552,7 +551,7 @@ static int sha1_mb_update(struct shash_desc *desc, const u8 *data,
+ 		rctx->flag |= HASH_DONE;
+ 
+ 	/* submit */
+-	sha_ctx = (struct sha1_hash_ctx *) shash_desc_ctx(desc);
++	sha_ctx = (struct sha1_hash_ctx *) ahash_request_ctx(areq);
+ 	sha1_mb_add_list(rctx, cstate);
+ 	kernel_fpu_begin();
+ 	sha_ctx = sha1_ctx_mgr_submit(cstate->mgr, sha_ctx, rctx->walk.data,
+@@ -579,11 +578,10 @@ done:
+ 	return ret;
+ }
+ 
+-static int sha1_mb_finup(struct shash_desc *desc, const u8 *data,
+-			     unsigned int len, u8 *out)
++static int sha1_mb_finup(struct ahash_request *areq)
+ {
+ 	struct mcryptd_hash_request_ctx *rctx =
+-		container_of(desc, struct mcryptd_hash_request_ctx, desc);
++		container_of(areq, struct mcryptd_hash_request_ctx, areq);
+ 	struct mcryptd_alg_cstate *cstate =
+ 				this_cpu_ptr(sha1_mb_alg_state.alg_cstate);
+ 
+@@ -598,7 +596,7 @@ static int sha1_mb_finup(struct shash_desc *desc, const u8 *data,
+ 	}
+ 
+ 	/* need to init context */
+-	req_ctx_init(rctx, desc);
++	req_ctx_init(rctx, areq);
+ 
+ 	nbytes = crypto_ahash_walk_first(req, &rctx->walk);
+ 
+@@ -611,11 +609,10 @@ static int sha1_mb_finup(struct shash_desc *desc, const u8 *data,
+ 		rctx->flag |= HASH_DONE;
+ 		flag = HASH_LAST;
+ 	}
+-	rctx->out = out;
+ 
+ 	/* submit */
+ 	rctx->flag |= HASH_FINAL;
+-	sha_ctx = (struct sha1_hash_ctx *) shash_desc_ctx(desc);
++	sha_ctx = (struct sha1_hash_ctx *) ahash_request_ctx(areq);
+ 	sha1_mb_add_list(rctx, cstate);
+ 
+ 	kernel_fpu_begin();
+@@ -641,10 +638,10 @@ done:
+ 	return ret;
+ }
+ 
+-static int sha1_mb_final(struct shash_desc *desc, u8 *out)
++static int sha1_mb_final(struct ahash_request *areq)
+ {
+ 	struct mcryptd_hash_request_ctx *rctx =
+-		container_of(desc, struct mcryptd_hash_request_ctx, desc);
++		container_of(areq, struct mcryptd_hash_request_ctx, areq);
+ 	struct mcryptd_alg_cstate *cstate =
+ 				this_cpu_ptr(sha1_mb_alg_state.alg_cstate);
+ 
+@@ -659,12 +656,11 @@ static int sha1_mb_final(struct shash_desc *desc, u8 *out)
+ 	}
+ 
+ 	/* need to init context */
+-	req_ctx_init(rctx, desc);
++	req_ctx_init(rctx, areq);
+ 
+-	rctx->out = out;
+ 	rctx->flag |= HASH_DONE | HASH_FINAL;
+ 
+-	sha_ctx = (struct sha1_hash_ctx *) shash_desc_ctx(desc);
++	sha_ctx = (struct sha1_hash_ctx *) ahash_request_ctx(areq);
+ 	/* flag HASH_FINAL and 0 data size */
+ 	sha1_mb_add_list(rctx, cstate);
+ 	kernel_fpu_begin();
+@@ -691,48 +687,98 @@ done:
+ 	return ret;
+ }
+ 
+-static int sha1_mb_export(struct shash_desc *desc, void *out)
++static int sha1_mb_export(struct ahash_request *areq, void *out)
+ {
+-	struct sha1_hash_ctx *sctx = shash_desc_ctx(desc);
++	struct sha1_hash_ctx *sctx = ahash_request_ctx(areq);
+ 
+ 	memcpy(out, sctx, sizeof(*sctx));
+ 
+ 	return 0;
+ }
+ 
+-static int sha1_mb_import(struct shash_desc *desc, const void *in)
++static int sha1_mb_import(struct ahash_request *areq, const void *in)
+ {
+-	struct sha1_hash_ctx *sctx = shash_desc_ctx(desc);
++	struct sha1_hash_ctx *sctx = ahash_request_ctx(areq);
+ 
+ 	memcpy(sctx, in, sizeof(*sctx));
+ 
+ 	return 0;
+ }
+ 
++static int sha1_mb_async_init_tfm(struct crypto_tfm *tfm)
++{
++	struct mcryptd_ahash *mcryptd_tfm;
++	struct sha1_mb_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct mcryptd_hash_ctx *mctx;
+ 
+-static struct shash_alg sha1_mb_shash_alg = {
+-	.digestsize	=	SHA1_DIGEST_SIZE,
++	mcryptd_tfm = mcryptd_alloc_ahash("__intel_sha1-mb",
++						CRYPTO_ALG_INTERNAL,
++						CRYPTO_ALG_INTERNAL);
++	if (IS_ERR(mcryptd_tfm))
++		return PTR_ERR(mcryptd_tfm);
++	mctx = crypto_ahash_ctx(&mcryptd_tfm->base);
++	mctx->alg_state = &sha1_mb_alg_state;
++	ctx->mcryptd_tfm = mcryptd_tfm;
++	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
++				sizeof(struct ahash_request) +
++				crypto_ahash_reqsize(&mcryptd_tfm->base));
++
++	return 0;
++}
++
++static void sha1_mb_async_exit_tfm(struct crypto_tfm *tfm)
++{
++	struct sha1_mb_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	mcryptd_free_ahash(ctx->mcryptd_tfm);
++}
++
++static int sha1_mb_areq_init_tfm(struct crypto_tfm *tfm)
++{
++	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
++				sizeof(struct ahash_request) +
++				sizeof(struct sha1_hash_ctx));
++
++	return 0;
++}
++
++static void sha1_mb_areq_exit_tfm(struct crypto_tfm *tfm)
++{
++	struct sha1_mb_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	mcryptd_free_ahash(ctx->mcryptd_tfm);
++}
++
++static struct ahash_alg sha1_mb_areq_alg = {
+ 	.init		=	sha1_mb_init,
+ 	.update		=	sha1_mb_update,
+ 	.final		=	sha1_mb_final,
+ 	.finup		=	sha1_mb_finup,
+ 	.export		=	sha1_mb_export,
+ 	.import		=	sha1_mb_import,
+-	.descsize	=	sizeof(struct sha1_hash_ctx),
+-	.statesize	=	sizeof(struct sha1_hash_ctx),
+-	.base		=	{
+-		.cra_name	 = "__sha1-mb",
+-		.cra_driver_name = "__intel_sha1-mb",
+-		.cra_priority	 = 100,
+-		/*
+-		 * use ASYNC flag as some buffers in multi-buffer
+-		 * algo may not have completed before hashing thread sleep
+-		 */
+-		.cra_flags	 = CRYPTO_ALG_TYPE_SHASH | CRYPTO_ALG_ASYNC |
+-				   CRYPTO_ALG_INTERNAL,
+-		.cra_blocksize	 = SHA1_BLOCK_SIZE,
+-		.cra_module	 = THIS_MODULE,
+-		.cra_list	 = LIST_HEAD_INIT(sha1_mb_shash_alg.base.cra_list),
++	.halg		=	{
++		.digestsize	=	SHA1_DIGEST_SIZE,
++		.statesize	=	sizeof(struct sha1_hash_ctx),
++		.base		=	{
++			.cra_name	 = "__sha1-mb",
++			.cra_driver_name = "__intel_sha1-mb",
++			.cra_priority	 = 100,
++			/*
++			 * use ASYNC flag as some buffers in multi-buffer
++			 * algo may not have completed before hashing thread
++			 * sleep
++			 */
++			.cra_flags	= CRYPTO_ALG_TYPE_AHASH |
++						CRYPTO_ALG_ASYNC |
++						CRYPTO_ALG_INTERNAL,
++			.cra_blocksize	= SHA1_BLOCK_SIZE,
++			.cra_module	= THIS_MODULE,
++			.cra_list	= LIST_HEAD_INIT
++					(sha1_mb_areq_alg.halg.base.cra_list),
++			.cra_init	= sha1_mb_areq_init_tfm,
++			.cra_exit	= sha1_mb_areq_exit_tfm,
++			.cra_ctxsize	= sizeof(struct sha1_hash_ctx),
++		}
+ 	}
+ };
+ 
+@@ -817,46 +863,19 @@ static int sha1_mb_async_import(struct ahash_request *req, const void *in)
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 	struct sha1_mb_ctx *ctx = crypto_ahash_ctx(tfm);
+ 	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
+-	struct crypto_shash *child = mcryptd_ahash_child(mcryptd_tfm);
++	struct crypto_ahash *child = mcryptd_ahash_child(mcryptd_tfm);
+ 	struct mcryptd_hash_request_ctx *rctx;
+-	struct shash_desc *desc;
++	struct ahash_request *areq;
+ 
+ 	memcpy(mcryptd_req, req, sizeof(*req));
+ 	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
+ 	rctx = ahash_request_ctx(mcryptd_req);
+-	desc = &rctx->desc;
+-	desc->tfm = child;
+-	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
+-
+-	return crypto_ahash_import(mcryptd_req, in);
+-}
+-
+-static int sha1_mb_async_init_tfm(struct crypto_tfm *tfm)
+-{
+-	struct mcryptd_ahash *mcryptd_tfm;
+-	struct sha1_mb_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct mcryptd_hash_ctx *mctx;
++	areq = &rctx->areq;
+ 
+-	mcryptd_tfm = mcryptd_alloc_ahash("__intel_sha1-mb",
+-					  CRYPTO_ALG_INTERNAL,
+-					  CRYPTO_ALG_INTERNAL);
+-	if (IS_ERR(mcryptd_tfm))
+-		return PTR_ERR(mcryptd_tfm);
+-	mctx = crypto_ahash_ctx(&mcryptd_tfm->base);
+-	mctx->alg_state = &sha1_mb_alg_state;
+-	ctx->mcryptd_tfm = mcryptd_tfm;
+-	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
+-				 sizeof(struct ahash_request) +
+-				 crypto_ahash_reqsize(&mcryptd_tfm->base));
+-
+-	return 0;
+-}
+-
+-static void sha1_mb_async_exit_tfm(struct crypto_tfm *tfm)
+-{
+-	struct sha1_mb_ctx *ctx = crypto_tfm_ctx(tfm);
++	ahash_request_set_tfm(areq, child);
++	ahash_request_set_callback(areq, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+ 
+-	mcryptd_free_ahash(ctx->mcryptd_tfm);
++	return crypto_ahash_import(mcryptd_req, in);
+ }
+ 
+ static struct ahash_alg sha1_mb_async_alg = {
+@@ -874,11 +893,13 @@ static struct ahash_alg sha1_mb_async_alg = {
+ 			.cra_name               = "sha1",
+ 			.cra_driver_name        = "sha1_mb",
+ 			.cra_priority           = 200,
+-			.cra_flags              = CRYPTO_ALG_TYPE_AHASH | CRYPTO_ALG_ASYNC,
++			.cra_flags              = CRYPTO_ALG_TYPE_AHASH |
++							CRYPTO_ALG_ASYNC,
+ 			.cra_blocksize          = SHA1_BLOCK_SIZE,
+ 			.cra_type               = &crypto_ahash_type,
+ 			.cra_module             = THIS_MODULE,
+-			.cra_list               = LIST_HEAD_INIT(sha1_mb_async_alg.halg.base.cra_list),
++			.cra_list               = LIST_HEAD_INIT
++					(sha1_mb_async_alg.halg.base.cra_list),
+ 			.cra_init               = sha1_mb_async_init_tfm,
+ 			.cra_exit               = sha1_mb_async_exit_tfm,
+ 			.cra_ctxsize		= sizeof(struct sha1_mb_ctx),
+@@ -965,7 +986,7 @@ static int __init sha1_mb_mod_init(void)
+ 	}
+ 	sha1_mb_alg_state.flusher = &sha1_mb_flusher;
+ 
+-	err = crypto_register_shash(&sha1_mb_shash_alg);
++	err = crypto_register_ahash(&sha1_mb_areq_alg);
+ 	if (err)
+ 		goto err2;
+ 	err = crypto_register_ahash(&sha1_mb_async_alg);
+@@ -975,7 +996,7 @@ static int __init sha1_mb_mod_init(void)
+ 
+ 	return 0;
+ err1:
+-	crypto_unregister_shash(&sha1_mb_shash_alg);
++	crypto_unregister_ahash(&sha1_mb_areq_alg);
+ err2:
+ 	for_each_possible_cpu(cpu) {
+ 		cpu_state = per_cpu_ptr(sha1_mb_alg_state.alg_cstate, cpu);
+@@ -991,7 +1012,7 @@ static void __exit sha1_mb_mod_fini(void)
+ 	struct mcryptd_alg_cstate *cpu_state;
+ 
+ 	crypto_unregister_ahash(&sha1_mb_async_alg);
+-	crypto_unregister_shash(&sha1_mb_shash_alg);
++	crypto_unregister_ahash(&sha1_mb_areq_alg);
+ 	for_each_possible_cpu(cpu) {
+ 		cpu_state = per_cpu_ptr(sha1_mb_alg_state.alg_cstate, cpu);
+ 		kfree(cpu_state->mgr);
+diff --git a/crypto/mcryptd.c b/crypto/mcryptd.c
+index c4eb9da..3173ee8 100644
+--- a/crypto/mcryptd.c
++++ b/crypto/mcryptd.c
+@@ -41,7 +41,7 @@ struct mcryptd_flush_list {
+ static struct mcryptd_flush_list __percpu *mcryptd_flist;
+ 
+ struct hashd_instance_ctx {
+-	struct crypto_shash_spawn spawn;
++	struct crypto_ahash_spawn spawn;
+ 	struct mcryptd_queue *queue;
+ };
+ 
+@@ -272,18 +272,18 @@ static int mcryptd_hash_init_tfm(struct crypto_tfm *tfm)
+ {
+ 	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
+ 	struct hashd_instance_ctx *ictx = crypto_instance_ctx(inst);
+-	struct crypto_shash_spawn *spawn = &ictx->spawn;
++	struct crypto_ahash_spawn *spawn = &ictx->spawn;
+ 	struct mcryptd_hash_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct crypto_shash *hash;
++	struct crypto_ahash *hash;
+ 
+-	hash = crypto_spawn_shash(spawn);
++	hash = crypto_spawn_ahash(spawn);
+ 	if (IS_ERR(hash))
+ 		return PTR_ERR(hash);
+ 
+ 	ctx->child = hash;
+ 	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
+ 				 sizeof(struct mcryptd_hash_request_ctx) +
+-				 crypto_shash_descsize(hash));
++				 crypto_ahash_reqsize(hash));
+ 	return 0;
+ }
+ 
+@@ -291,21 +291,21 @@ static void mcryptd_hash_exit_tfm(struct crypto_tfm *tfm)
+ {
+ 	struct mcryptd_hash_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	crypto_free_shash(ctx->child);
++	crypto_free_ahash(ctx->child);
+ }
+ 
+ static int mcryptd_hash_setkey(struct crypto_ahash *parent,
+ 				   const u8 *key, unsigned int keylen)
+ {
+ 	struct mcryptd_hash_ctx *ctx   = crypto_ahash_ctx(parent);
+-	struct crypto_shash *child = ctx->child;
++	struct crypto_ahash *child = ctx->child;
+ 	int err;
+ 
+-	crypto_shash_clear_flags(child, CRYPTO_TFM_REQ_MASK);
+-	crypto_shash_set_flags(child, crypto_ahash_get_flags(parent) &
++	crypto_ahash_clear_flags(child, CRYPTO_TFM_REQ_MASK);
++	crypto_ahash_set_flags(child, crypto_ahash_get_flags(parent) &
+ 				      CRYPTO_TFM_REQ_MASK);
+-	err = crypto_shash_setkey(child, key, keylen);
+-	crypto_ahash_set_flags(parent, crypto_shash_get_flags(child) &
++	err = crypto_ahash_setkey(child, key, keylen);
++	crypto_ahash_set_flags(parent, crypto_ahash_get_flags(child) &
+ 				       CRYPTO_TFM_RES_MASK);
+ 	return err;
+ }
+@@ -331,20 +331,21 @@ static int mcryptd_hash_enqueue(struct ahash_request *req,
+ static void mcryptd_hash_init(struct crypto_async_request *req_async, int err)
+ {
+ 	struct mcryptd_hash_ctx *ctx = crypto_tfm_ctx(req_async->tfm);
+-	struct crypto_shash *child = ctx->child;
++	struct crypto_ahash *child = ctx->child;
+ 	struct ahash_request *req = ahash_request_cast(req_async);
+ 	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
+-	struct shash_desc *desc = &rctx->desc;
++	struct ahash_request *desc = &rctx->areq;
+ 
+ 	if (unlikely(err == -EINPROGRESS))
+ 		goto out;
+ 
+-	desc->tfm = child;
+-	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
++	ahash_request_set_tfm(desc, child);
++	ahash_request_set_callback(desc, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+ 
+-	err = crypto_shash_init(desc);
++	err = crypto_ahash_init(desc);
+ 
+ 	req->base.complete = rctx->complete;
++	rctx->out = req->result;
+ 
+ out:
+ 	local_bh_disable();
+@@ -365,7 +366,8 @@ static void mcryptd_hash_update(struct crypto_async_request *req_async, int err)
+ 	if (unlikely(err == -EINPROGRESS))
+ 		goto out;
+ 
+-	err = shash_ahash_mcryptd_update(req, &rctx->desc);
++	rctx->out = req->result;
++	err = ahash_mcryptd_update(&rctx->areq);
+ 	if (err) {
+ 		req->base.complete = rctx->complete;
+ 		goto out;
+@@ -391,7 +393,8 @@ static void mcryptd_hash_final(struct crypto_async_request *req_async, int err)
+ 	if (unlikely(err == -EINPROGRESS))
+ 		goto out;
+ 
+-	err = shash_ahash_mcryptd_final(req, &rctx->desc);
++	rctx->out = req->result;
++	err = ahash_mcryptd_final(&rctx->areq);
+ 	if (err) {
+ 		req->base.complete = rctx->complete;
+ 		goto out;
+@@ -416,8 +419,8 @@ static void mcryptd_hash_finup(struct crypto_async_request *req_async, int err)
+ 
+ 	if (unlikely(err == -EINPROGRESS))
+ 		goto out;
+-
+-	err = shash_ahash_mcryptd_finup(req, &rctx->desc);
++	rctx->out = req->result;
++	err = ahash_mcryptd_finup(&rctx->areq);
+ 
+ 	if (err) {
+ 		req->base.complete = rctx->complete;
+@@ -439,18 +442,19 @@ static int mcryptd_hash_finup_enqueue(struct ahash_request *req)
+ static void mcryptd_hash_digest(struct crypto_async_request *req_async, int err)
+ {
+ 	struct mcryptd_hash_ctx *ctx = crypto_tfm_ctx(req_async->tfm);
+-	struct crypto_shash *child = ctx->child;
++	struct crypto_ahash *child = ctx->child;
+ 	struct ahash_request *req = ahash_request_cast(req_async);
+ 	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
+-	struct shash_desc *desc = &rctx->desc;
++	struct ahash_request *desc = &rctx->areq;
+ 
+ 	if (unlikely(err == -EINPROGRESS))
+ 		goto out;
+ 
+-	desc->tfm = child;
+-	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;  /* check this again */
++	ahash_request_set_tfm(desc, child);
++	ahash_request_set_callback(desc, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+ 
+-	err = shash_ahash_mcryptd_digest(req, desc);
++	rctx->out = req->result;
++	err = ahash_mcryptd_digest(desc);
+ 
+ 	if (err) {
+ 		req->base.complete = rctx->complete;
+@@ -473,14 +477,14 @@ static int mcryptd_hash_export(struct ahash_request *req, void *out)
+ {
+ 	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
+ 
+-	return crypto_shash_export(&rctx->desc, out);
++	return crypto_ahash_export(&rctx->areq, out);
+ }
+ 
+ static int mcryptd_hash_import(struct ahash_request *req, const void *in)
+ {
+ 	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
+ 
+-	return crypto_shash_import(&rctx->desc, in);
++	return crypto_ahash_import(&rctx->areq, in);
+ }
+ 
+ static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
+@@ -488,7 +492,7 @@ static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
+ {
+ 	struct hashd_instance_ctx *ctx;
+ 	struct ahash_instance *inst;
+-	struct shash_alg *salg;
++	struct hash_alg_common *halg;
+ 	struct crypto_alg *alg;
+ 	u32 type = 0;
+ 	u32 mask = 0;
+@@ -496,11 +500,11 @@ static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
+ 
+ 	mcryptd_check_internal(tb, &type, &mask);
+ 
+-	salg = shash_attr_alg(tb[1], type, mask);
+-	if (IS_ERR(salg))
+-		return PTR_ERR(salg);
++	halg = ahash_attr_alg(tb[1], type, mask);
++	if (IS_ERR(halg))
++		return PTR_ERR(halg);
+ 
+-	alg = &salg->base;
++	alg = &halg->base;
+ 	pr_debug("crypto: mcryptd hash alg: %s\n", alg->cra_name);
+ 	inst = mcryptd_alloc_instance(alg, ahash_instance_headroom(),
+ 					sizeof(*ctx));
+@@ -511,7 +515,7 @@ static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
+ 	ctx = ahash_instance_ctx(inst);
+ 	ctx->queue = queue;
+ 
+-	err = crypto_init_shash_spawn(&ctx->spawn, salg,
++	err = crypto_init_ahash_spawn(&ctx->spawn, halg,
+ 				      ahash_crypto_instance(inst));
+ 	if (err)
+ 		goto out_free_inst;
+@@ -521,8 +525,8 @@ static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
+ 		type |= CRYPTO_ALG_INTERNAL;
+ 	inst->alg.halg.base.cra_flags = type;
+ 
+-	inst->alg.halg.digestsize = salg->digestsize;
+-	inst->alg.halg.statesize = salg->statesize;
++	inst->alg.halg.digestsize = halg->digestsize;
++	inst->alg.halg.statesize = halg->statesize;
+ 	inst->alg.halg.base.cra_ctxsize = sizeof(struct mcryptd_hash_ctx);
+ 
+ 	inst->alg.halg.base.cra_init = mcryptd_hash_init_tfm;
+@@ -539,7 +543,7 @@ static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
+ 
+ 	err = ahash_register_instance(tmpl, inst);
+ 	if (err) {
+-		crypto_drop_shash(&ctx->spawn);
++		crypto_drop_ahash(&ctx->spawn);
+ out_free_inst:
+ 		kfree(inst);
+ 	}
+@@ -575,7 +579,7 @@ static void mcryptd_free(struct crypto_instance *inst)
+ 
+ 	switch (inst->alg.cra_flags & CRYPTO_ALG_TYPE_MASK) {
+ 	case CRYPTO_ALG_TYPE_AHASH:
+-		crypto_drop_shash(&hctx->spawn);
++		crypto_drop_ahash(&hctx->spawn);
+ 		kfree(ahash_instance(inst));
+ 		return;
+ 	default:
+@@ -612,55 +616,38 @@ struct mcryptd_ahash *mcryptd_alloc_ahash(const char *alg_name,
+ }
+ EXPORT_SYMBOL_GPL(mcryptd_alloc_ahash);
+ 
+-int shash_ahash_mcryptd_digest(struct ahash_request *req,
+-			       struct shash_desc *desc)
++int ahash_mcryptd_digest(struct ahash_request *desc)
+ {
+ 	int err;
+ 
+-	err = crypto_shash_init(desc) ?:
+-	      shash_ahash_mcryptd_finup(req, desc);
++	err = crypto_ahash_init(desc) ?:
++	      ahash_mcryptd_finup(desc);
+ 
+ 	return err;
+ }
+-EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_digest);
+ 
+-int shash_ahash_mcryptd_update(struct ahash_request *req,
+-			       struct shash_desc *desc)
++int ahash_mcryptd_update(struct ahash_request *desc)
+ {
+-	struct crypto_shash *tfm = desc->tfm;
+-	struct shash_alg *shash = crypto_shash_alg(tfm);
+-
+ 	/* alignment is to be done by multi-buffer crypto algorithm if needed */
+ 
+-	return shash->update(desc, NULL, 0);
++	return crypto_ahash_update(desc);
+ }
+-EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_update);
+ 
+-int shash_ahash_mcryptd_finup(struct ahash_request *req,
+-			      struct shash_desc *desc)
++int ahash_mcryptd_finup(struct ahash_request *desc)
+ {
+-	struct crypto_shash *tfm = desc->tfm;
+-	struct shash_alg *shash = crypto_shash_alg(tfm);
+-
+ 	/* alignment is to be done by multi-buffer crypto algorithm if needed */
+ 
+-	return shash->finup(desc, NULL, 0, req->result);
++	return crypto_ahash_finup(desc);
+ }
+-EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_finup);
+ 
+-int shash_ahash_mcryptd_final(struct ahash_request *req,
+-			      struct shash_desc *desc)
++int ahash_mcryptd_final(struct ahash_request *desc)
+ {
+-	struct crypto_shash *tfm = desc->tfm;
+-	struct shash_alg *shash = crypto_shash_alg(tfm);
+-
+ 	/* alignment is to be done by multi-buffer crypto algorithm if needed */
+ 
+-	return shash->final(desc, req->result);
++	return crypto_ahash_final(desc);
+ }
+-EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_final);
+ 
+-struct crypto_shash *mcryptd_ahash_child(struct mcryptd_ahash *tfm)
++struct crypto_ahash *mcryptd_ahash_child(struct mcryptd_ahash *tfm)
+ {
+ 	struct mcryptd_hash_ctx *ctx = crypto_ahash_ctx(&tfm->base);
+ 
+@@ -668,12 +655,12 @@ struct crypto_shash *mcryptd_ahash_child(struct mcryptd_ahash *tfm)
+ }
+ EXPORT_SYMBOL_GPL(mcryptd_ahash_child);
+ 
+-struct shash_desc *mcryptd_shash_desc(struct ahash_request *req)
++struct ahash_request *mcryptd_ahash_desc(struct ahash_request *req)
+ {
+ 	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
+-	return &rctx->desc;
++	return &rctx->areq;
+ }
+-EXPORT_SYMBOL_GPL(mcryptd_shash_desc);
++EXPORT_SYMBOL_GPL(mcryptd_ahash_desc);
+ 
+ void mcryptd_free_ahash(struct mcryptd_ahash *tfm)
+ {
+@@ -681,7 +668,6 @@ void mcryptd_free_ahash(struct mcryptd_ahash *tfm)
+ }
+ EXPORT_SYMBOL_GPL(mcryptd_free_ahash);
+ 
+-
+ static int __init mcryptd_init(void)
+ {
+ 	int err, cpu;
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index 49dae16..1d4f365 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -114,14 +114,10 @@ int shash_ahash_update(struct ahash_request *req, struct shash_desc *desc);
+ int shash_ahash_finup(struct ahash_request *req, struct shash_desc *desc);
+ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc);
+ 
+-int shash_ahash_mcryptd_update(struct ahash_request *req,
+-			       struct shash_desc *desc);
+-int shash_ahash_mcryptd_final(struct ahash_request *req,
+-			      struct shash_desc *desc);
+-int shash_ahash_mcryptd_finup(struct ahash_request *req,
+-			      struct shash_desc *desc);
+-int shash_ahash_mcryptd_digest(struct ahash_request *req,
+-			       struct shash_desc *desc);
++int ahash_mcryptd_update(struct ahash_request *desc);
++int ahash_mcryptd_final(struct ahash_request *desc);
++int ahash_mcryptd_finup(struct ahash_request *desc);
++int ahash_mcryptd_digest(struct ahash_request *desc);
+ 
+ int crypto_init_shash_ops_async(struct crypto_tfm *tfm);
+ 
+diff --git a/include/crypto/mcryptd.h b/include/crypto/mcryptd.h
+index c23ee1f..4a53c0d 100644
+--- a/include/crypto/mcryptd.h
++++ b/include/crypto/mcryptd.h
+@@ -39,7 +39,7 @@ struct mcryptd_instance_ctx {
+ };
+ 
+ struct mcryptd_hash_ctx {
+-	struct crypto_shash *child;
++	struct crypto_ahash *child;
+ 	struct mcryptd_alg_state *alg_state;
+ };
+ 
+@@ -59,13 +59,13 @@ struct mcryptd_hash_request_ctx {
+ 	struct crypto_hash_walk walk;
+ 	u8 *out;
+ 	int flag;
+-	struct shash_desc desc;
++	struct ahash_request areq;
+ };
+ 
+ struct mcryptd_ahash *mcryptd_alloc_ahash(const char *alg_name,
+ 					u32 type, u32 mask);
+-struct crypto_shash *mcryptd_ahash_child(struct mcryptd_ahash *tfm);
+-struct shash_desc *mcryptd_shash_desc(struct ahash_request *req);
++struct crypto_ahash *mcryptd_ahash_child(struct mcryptd_ahash *tfm);
++struct ahash_request *mcryptd_ahash_desc(struct ahash_request *req);
+ void mcryptd_free_ahash(struct mcryptd_ahash *tfm);
+ void mcryptd_flusher(struct work_struct *work);
+ 
+-- 
+1.9.1
