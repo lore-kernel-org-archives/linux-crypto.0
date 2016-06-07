@@ -1,57 +1,85 @@
-From: "Dey, Megha" <megha.dey@intel.com>
-Subject: RE: [PATCH V2 2/2] crypto : async implementation for sha1-mb
-Date: Tue, 7 Jun 2016 18:10:14 +0000
-Message-ID: <C440BA31B54DCD4AAC682D2365C8FEE703C662A9@ORSMSX111.amr.corp.intel.com>
-References: <1464922430-26976-1-git-send-email-megha.dey@intel.com>
- <1464922430-26976-3-git-send-email-megha.dey@intel.com>
- <20160607103515.GB325@gondor.apana.org.au>
+From: Bhaktipriya Shridhar <bhaktipriya96@gmail.com>
+Subject: [PATCH] crypto: qat: Remove deprecated create_workqueue
+Date: Wed, 8 Jun 2016 02:47:47 +0530
+Message-ID: <20160607211746.GA17667@Karyakshetra>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Yu, Fenghua" <fenghua.yu@intel.com>,
-	"Megha Dey" <megha.dey@linux.intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:6498 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1422842AbcFGSKQ convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Jun 2016 14:10:16 -0400
-In-Reply-To: <20160607103515.GB325@gondor.apana.org.au>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Tejun Heo <tj@kernel.org>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Julia Lawall <Julia.Lawall@lip6.fr>,
+	Conor McLoughlin <conor.mcloughlin@intel.com>,
+	Pingchao Yang <pingchao.yang@intel.com>,
+	Ahsan Atta <ahsan.atta@intel.com>,
+	John Griffin <john.griffin@intel.com>,
+	Wu Fengguang <fengguang.wu@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+alloc_workqueue replaces deprecated create_workqueue().
 
+The workqueue device_reset_wq has workitem &reset_data->reset_work per
+adf_reset_dev_data. The workqueue  pf2vf_resp_wq is a workqueue for
+PF2VF responses has workitem &pf2vf_resp->pf2vf_resp_work per pf2vf_resp.
+The workqueue adf_vf_stop_wq is used to call adf_dev_stop()
+asynchronously.
 
------Original Message-----
-From: Herbert Xu [mailto:herbert@gondor.apana.org.au] 
-Sent: Tuesday, June 7, 2016 3:35 AM
-To: Dey, Megha <megha.dey@intel.com>
-Cc: tim.c.chen@linux.intel.com; davem@davemloft.net; linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Yu, Fenghua <fenghua.yu@intel.com>; Megha Dey <megha.dey@linux.intel.com>
-Subject: Re: [PATCH V2 2/2] crypto : async implementation for sha1-mb
+Dedicated workqueues have been used in all cases since the workitems
+on the workqueues are involved in operation of crypto which can be used in
+the IO path which is depended upon during memory reclaim. Hence,
+WQ_MEM_RECLAIM has been set to gurantee forward progress under memory
+pressure.
+Since there are only a fixed number of work items, explicit concurrency
+limit is unnecessary.
 
-On Thu, Jun 02, 2016 at 07:53:50PM -0700, Megha Dey wrote:
->
-> +	struct ahash_alg *shash = crypto_ahash_alg(tfm);
->  
->  	/* alignment is to be done by multi-buffer crypto algorithm if 
-> needed */
->  
-> -	return shash->finup(desc, NULL, 0, req->result);
-> +	return shash->finup(desc);
+Signed-off-by: Bhaktipriya Shridhar <bhaktipriya96@gmail.com>
+---
+ drivers/crypto/qat/qat_common/adf_aer.c    | 3 ++-
+ drivers/crypto/qat/qat_common/adf_sriov.c  | 2 +-
+ drivers/crypto/qat/qat_common/adf_vf_isr.c | 2 +-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
 
-You're still poking in the guts of the API.  Now that it's a real ahash you don't need to do that.
+diff --git a/drivers/crypto/qat/qat_common/adf_aer.c b/drivers/crypto/qat/qat_common/adf_aer.c
+index b40d9c8..7bfb57f 100644
+--- a/drivers/crypto/qat/qat_common/adf_aer.c
++++ b/drivers/crypto/qat/qat_common/adf_aer.c
+@@ -243,7 +243,8 @@ EXPORT_SYMBOL_GPL(adf_disable_aer);
 
-Just do crypto_ahash_finup.  That way you don't need to export crypto_ahsh_alg either.
+ int adf_init_aer(void)
+ {
+-	device_reset_wq = create_workqueue("qat_device_reset_wq");
++	device_reset_wq = alloc_workqueue("qat_device_reset_wq",
++					  WQ_MEM_RECLAIM, 0);
+ 	return !device_reset_wq ? -EFAULT : 0;
+ }
 
-> I have made these changes and re-sent the patch.
+diff --git a/drivers/crypto/qat/qat_common/adf_sriov.c b/drivers/crypto/qat/qat_common/adf_sriov.c
+index 4a526e2..9320ae1 100644
+--- a/drivers/crypto/qat/qat_common/adf_sriov.c
++++ b/drivers/crypto/qat/qat_common/adf_sriov.c
+@@ -292,7 +292,7 @@ EXPORT_SYMBOL_GPL(adf_sriov_configure);
+ int __init adf_init_pf_wq(void)
+ {
+ 	/* Workqueue for PF2VF responses */
+-	pf2vf_resp_wq = create_workqueue("qat_pf2vf_resp_wq");
++	pf2vf_resp_wq = alloc_workqueue("qat_pf2vf_resp_wq", WQ_MEM_RECLAIM, 0);
 
-Thanks,
---
-Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ 	return !pf2vf_resp_wq ? -ENOMEM : 0;
+ }
+diff --git a/drivers/crypto/qat/qat_common/adf_vf_isr.c b/drivers/crypto/qat/qat_common/adf_vf_isr.c
+index aa689ca..bf99e11 100644
+--- a/drivers/crypto/qat/qat_common/adf_vf_isr.c
++++ b/drivers/crypto/qat/qat_common/adf_vf_isr.c
+@@ -321,7 +321,7 @@ EXPORT_SYMBOL_GPL(adf_vf_isr_resource_alloc);
+
+ int __init adf_init_vf_wq(void)
+ {
+-	adf_vf_stop_wq = create_workqueue("adf_vf_stop_wq");
++	adf_vf_stop_wq = alloc_workqueue("adf_vf_stop_wq", WQ_MEM_RECLAIM, 0);
+
+ 	return !adf_vf_stop_wq ? -EFAULT : 0;
+ }
