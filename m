@@ -1,7 +1,8 @@
 From: Baolin Wang <baolin.wang@linaro.org>
-Subject: [RFC v4 0/4] Introduce the bulk mode method when sending request to crypto layer
-Date: Tue,  7 Jun 2016 20:17:03 +0800
-Message-ID: <cover.1465301616.git.baolin.wang@linaro.org>
+Subject: [RFC v4 2/4] crypto: Introduce CRYPTO_ALG_BULK flag
+Date: Tue,  7 Jun 2016 20:17:05 +0800
+Message-ID: <238ce3d506051c863300b90720c3e103175747cc.1465301616.git.baolin.wang@linaro.org>
+References: <cover.1465301616.git.baolin.wang@linaro.org>
 Cc: ebiggers3@gmail.com, js1304@gmail.com, tadeusz.struk@intel.com,
 	smueller@chronox.de, standby24x7@gmail.com, shli@kernel.org,
 	dan.j.williams@intel.com, martin.petersen@oracle.com,
@@ -13,50 +14,69 @@ Cc: ebiggers3@gmail.com, js1304@gmail.com, tadeusz.struk@intel.com,
 To: axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
 	dm-devel@redhat.com, herbert@gondor.apana.org.au,
 	davem@davemloft.net
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f178.google.com ([209.85.192.178]:33107 "EHLO
-	mail-pf0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751778AbcFGMRz (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Jun 2016 08:17:55 -0400
-Received: by mail-pf0-f178.google.com with SMTP id y124so17950741pfy.0
-        for <linux-crypto@vger.kernel.org>; Tue, 07 Jun 2016 05:17:55 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-raid-owner@vger.kernel.org>
+In-Reply-To: <cover.1465301616.git.baolin.wang@linaro.org>
+In-Reply-To: <cover.1465301616.git.baolin.wang@linaro.org>
+References: <cover.1465301616.git.baolin.wang@linaro.org>
+Sender: linux-raid-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patchset will check if the cipher can support bulk mode, then dm-crypt
-will handle different ways to send requests to crypto layer according to
-cipher mode. For bulk mode, we can use sg table to map the whole bio and
-send all scatterlists of one bio to crypto engine to encrypt or decrypt,
-which can improve the hardware engine's efficiency.
+Now some cipher hardware engines prefer to handle bulk block rather than one
+sector (512 bytes) created by dm-crypt, cause these cipher engines can handle
+the intermediate values (IV) by themselves in one bulk block. This means we
+can increase the size of the request by merging request rather than always 512
+bytes and thus increase the hardware engine processing speed.
 
-Changes since v3:
- - Some optimization for blk_bio_map_sg() function.
+So introduce 'CRYPTO_ALG_BULK' flag to indicate this cipher can support bulk
+mode.
 
-Changes since v2:
- - Add one cipher user with CRYPTO_ALG_BULK flag to support bulk mode.
- - Add one atomic variable to avoid the sg table race.
+Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
+---
+ include/crypto/skcipher.h |    7 +++++++
+ include/linux/crypto.h    |    6 ++++++
+ 2 files changed, 13 insertions(+)
 
-Changes since v1:
- - Refactor the blk_bio_map_sg() function to avoid duplicated code.
- - Move the sg table allocation to crypt_ctr_cipher() function to avoid memory
- allocation in the IO path.
- - Remove the crypt_sg_entry() function.
- - Other optimization.
-
-Baolin Wang (4):
-  block: Introduce blk_bio_map_sg() to map one bio
-  crypto: Introduce CRYPTO_ALG_BULK flag
-  md: dm-crypt: Introduce the bulk mode method when sending request
-  crypto: Add the CRYPTO_ALG_BULK flag for ecb(aes) cipher
-
- block/blk-merge.c         |   19 ++++++
- drivers/crypto/omap-aes.c |    2 +-
- drivers/md/dm-crypt.c     |  159 ++++++++++++++++++++++++++++++++++++++++++++-
- include/crypto/skcipher.h |    7 ++
- include/linux/blkdev.h    |    2 +
- include/linux/crypto.h    |    6 ++
- 6 files changed, 193 insertions(+), 2 deletions(-)
-
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 0f987f5..d89d29a 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -519,5 +519,12 @@ static inline void skcipher_request_set_crypt(
+ 	req->iv = iv;
+ }
+ 
++static inline unsigned int skcipher_is_bulk_mode(struct crypto_skcipher *sk_tfm)
++{
++	struct crypto_tfm *tfm = crypto_skcipher_tfm(sk_tfm);
++
++	return crypto_tfm_alg_bulk(tfm);
++}
++
+ #endif	/* _CRYPTO_SKCIPHER_H */
+ 
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 6e28c89..a315487 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -63,6 +63,7 @@
+ #define CRYPTO_ALG_DEAD			0x00000020
+ #define CRYPTO_ALG_DYING		0x00000040
+ #define CRYPTO_ALG_ASYNC		0x00000080
++#define CRYPTO_ALG_BULK			0x00000100
+ 
+ /*
+  * Set this bit if and only if the algorithm requires another algorithm of
+@@ -623,6 +624,11 @@ static inline u32 crypto_tfm_alg_type(struct crypto_tfm *tfm)
+ 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_TYPE_MASK;
+ }
+ 
++static inline unsigned int crypto_tfm_alg_bulk(struct crypto_tfm *tfm)
++{
++	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_BULK;
++}
++
+ static inline unsigned int crypto_tfm_alg_blocksize(struct crypto_tfm *tfm)
+ {
+ 	return tfm->__crt_alg->cra_blocksize;
 -- 
 1.7.9.5
+
