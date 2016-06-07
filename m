@@ -1,38 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH V2 1/2] crypto: sha1-mb - stylistic cleanup
-Date: Tue, 7 Jun 2016 18:44:24 +0800
-Message-ID: <20160607104424.GA485@gondor.apana.org.au>
-References: <1464922430-26976-1-git-send-email-megha.dey@intel.com>
- <1464922430-26976-2-git-send-email-megha.dey@intel.com>
+Subject: Re: [PATCH 01/28] crypto: omap-aes: Fix registration of algorithms
+Date: Tue, 7 Jun 2016 18:48:21 +0800
+Message-ID: <20160607104821.GA520@gondor.apana.org.au>
+References: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
+ <1464771389-10640-2-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	fenghua.yu@intel.com, Megha Dey <megha.dey@linux.intel.com>
-To: Megha Dey <megha.dey@intel.com>
+Cc: linux-omap@vger.kernel.org, linux-crypto@vger.kernel.org,
+	davem@davemloft.net, tony@atomide.com,
+	linux-arm-kernel@lists.infradead.org, lokeshvutla@ti.com
+To: Tero Kristo <t-kristo@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41743 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:42543 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932155AbcFGKop (ORCPT
+	with ESMTP id S1755232AbcFGKsh (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Jun 2016 06:44:45 -0400
+	Tue, 7 Jun 2016 06:48:37 -0400
 Content-Disposition: inline
-In-Reply-To: <1464922430-26976-2-git-send-email-megha.dey@intel.com>
+In-Reply-To: <1464771389-10640-2-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 02, 2016 at 07:53:49PM -0700, Megha Dey wrote:
-> From: Megha Dey <megha.dey@linux.intel.com>
+On Wed, Jun 01, 2016 at 11:56:02AM +0300, Tero Kristo wrote:
+> From: Lokesh Vutla <lokeshvutla@ti.com>
 > 
-> Currently there are several checkpatch warnings in the sha1_mb.c file:
-> 'WARNING: line over 80 characters' in the sha1_mb.c file. Also, the
-> syntax of some multi-line comments are not correct. This patch fixes
-> these issues.
+> Algorithms can be registered only once. So skip registration of
+> algorithms if already registered (i.e. in case we have two AES cores
+> in the system.)
 > 
-> Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+> Signed-off-by: Tero Kristo <t-kristo@ti.com>
 
-This has already been applied.  Please don't send it agin.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
