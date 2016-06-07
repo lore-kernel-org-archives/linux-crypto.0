@@ -1,509 +1,68 @@
 From: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-Subject: [PATCH v3] crypto: rsa - return raw integers for the ASN.1 parser
-Date: Tue, 7 Jun 2016 17:21:09 +0300
-Message-ID: <1465309269-2214-1-git-send-email-tudor-dan.ambarus@nxp.com>
+Subject: [PATCH v7 0/3] crypto: caam - add support for RSA algorithm
+Date: Tue, 7 Jun 2016 17:24:40 +0300
+Message-ID: <1465309483-2703-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>,
+Cc: <linux-crypto@vger.kernel.org>, <horia.geanta@nxp.com>,
 	Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0093.outbound.protection.outlook.com ([157.56.111.93]:64760
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+Received: from mail-by2on0061.outbound.protection.outlook.com ([207.46.100.61]:6180
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754501AbcFGOVY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Jun 2016 10:21:24 -0400
+	id S1754747AbcFGOYy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 7 Jun 2016 10:24:54 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Return the raw key with no other processing so that the caller
-can copy it or MPI parse it, etc.
+Depends on:
+[PATCH v3] crypto: rsa - return raw integers for the ASN.1 parser
 
-The scope is to have only one ANS.1 parser for all RSA
-implementations.
+Changes in v7:
+- sync with ASN.1 parser
 
-Update the RSA software implementation so that it does
-the MPI conversion on top.
+Changes in v6:
+- write descriptor PDB fields with inline append
+- move Protocol Data Block (pdb) structures to pdb.h
+- move setting of PDB fields in new functions
+- unmap sec4_sg_dma on done callback
+- remove redundant clean code on error path
+- fix doc typos
 
-Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
----
- crypto/rsa.c                  | 119 ++++++++++++++++++++++++++-------------
- crypto/rsa_helper.c           | 128 +++++++++++++++++++++---------------------
- include/crypto/internal/rsa.h |  22 ++++++--
- 3 files changed, 161 insertions(+), 108 deletions(-)
+Changes in v5:
+- sync with ASN.1 parser
 
-diff --git a/crypto/rsa.c b/crypto/rsa.c
-index 77d737f..ea78d61 100644
---- a/crypto/rsa.c
-+++ b/crypto/rsa.c
-@@ -14,12 +14,24 @@
- #include <crypto/internal/akcipher.h>
- #include <crypto/akcipher.h>
- #include <crypto/algapi.h>
-+#include <linux/mpi.h>
-+
-+struct rsa_mpi_key {
-+	MPI n;
-+	MPI e;
-+	MPI d;
-+};
-+
-+struct rsa_ctx {
-+	struct rsa_key key;
-+	struct rsa_mpi_key mpi_key;
-+};
- 
- /*
-  * RSAEP function [RFC3447 sec 5.1.1]
-  * c = m^e mod n;
-  */
--static int _rsa_enc(const struct rsa_key *key, MPI c, MPI m)
-+static int _rsa_enc(const struct rsa_mpi_key *key, MPI c, MPI m)
- {
- 	/* (1) Validate 0 <= m < n */
- 	if (mpi_cmp_ui(m, 0) < 0 || mpi_cmp(m, key->n) >= 0)
-@@ -33,7 +45,7 @@ static int _rsa_enc(const struct rsa_key *key, MPI c, MPI m)
-  * RSADP function [RFC3447 sec 5.1.2]
-  * m = c^d mod n;
-  */
--static int _rsa_dec(const struct rsa_key *key, MPI m, MPI c)
-+static int _rsa_dec(const struct rsa_mpi_key *key, MPI m, MPI c)
- {
- 	/* (1) Validate 0 <= c < n */
- 	if (mpi_cmp_ui(c, 0) < 0 || mpi_cmp(c, key->n) >= 0)
-@@ -47,7 +59,7 @@ static int _rsa_dec(const struct rsa_key *key, MPI m, MPI c)
-  * RSASP1 function [RFC3447 sec 5.2.1]
-  * s = m^d mod n
-  */
--static int _rsa_sign(const struct rsa_key *key, MPI s, MPI m)
-+static int _rsa_sign(const struct rsa_mpi_key *key, MPI s, MPI m)
- {
- 	/* (1) Validate 0 <= m < n */
- 	if (mpi_cmp_ui(m, 0) < 0 || mpi_cmp(m, key->n) >= 0)
-@@ -61,7 +73,7 @@ static int _rsa_sign(const struct rsa_key *key, MPI s, MPI m)
-  * RSAVP1 function [RFC3447 sec 5.2.2]
-  * m = s^e mod n;
-  */
--static int _rsa_verify(const struct rsa_key *key, MPI m, MPI s)
-+static int _rsa_verify(const struct rsa_mpi_key *key, MPI m, MPI s)
- {
- 	/* (1) Validate 0 <= s < n */
- 	if (mpi_cmp_ui(s, 0) < 0 || mpi_cmp(s, key->n) >= 0)
-@@ -71,15 +83,17 @@ static int _rsa_verify(const struct rsa_key *key, MPI m, MPI s)
- 	return mpi_powm(m, s, key->e, key->n);
- }
- 
--static inline struct rsa_key *rsa_get_key(struct crypto_akcipher *tfm)
-+static inline struct rsa_mpi_key *rsa_get_key(struct crypto_akcipher *tfm)
- {
--	return akcipher_tfm_ctx(tfm);
-+	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+
-+	return &ctx->mpi_key;
- }
- 
- static int rsa_enc(struct akcipher_request *req)
- {
- 	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
--	const struct rsa_key *pkey = rsa_get_key(tfm);
-+	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
- 	MPI m, c = mpi_alloc(0);
- 	int ret = 0;
- 	int sign;
-@@ -118,7 +132,7 @@ err_free_c:
- static int rsa_dec(struct akcipher_request *req)
- {
- 	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
--	const struct rsa_key *pkey = rsa_get_key(tfm);
-+	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
- 	MPI c, m = mpi_alloc(0);
- 	int ret = 0;
- 	int sign;
-@@ -156,7 +170,7 @@ err_free_m:
- static int rsa_sign(struct akcipher_request *req)
- {
- 	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
--	const struct rsa_key *pkey = rsa_get_key(tfm);
-+	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
- 	MPI m, s = mpi_alloc(0);
- 	int ret = 0;
- 	int sign;
-@@ -195,7 +209,7 @@ err_free_s:
- static int rsa_verify(struct akcipher_request *req)
- {
- 	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
--	const struct rsa_key *pkey = rsa_get_key(tfm);
-+	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
- 	MPI s, m = mpi_alloc(0);
- 	int ret = 0;
- 	int sign;
-@@ -233,67 +247,94 @@ err_free_m:
- 	return ret;
- }
- 
--static int rsa_check_key_length(unsigned int len)
-+static void rsa_free_mpi_key(struct rsa_mpi_key *key)
- {
--	switch (len) {
--	case 512:
--	case 1024:
--	case 1536:
--	case 2048:
--	case 3072:
--	case 4096:
--		return 0;
--	}
--
--	return -EINVAL;
-+	mpi_free(key->d);
-+	mpi_free(key->e);
-+	mpi_free(key->n);
-+	key->d = NULL;
-+	key->e = NULL;
-+	key->n = NULL;
- }
- 
- static int rsa_set_pub_key(struct crypto_akcipher *tfm, const void *key,
- 			   unsigned int keylen)
- {
--	struct rsa_key *pkey = akcipher_tfm_ctx(tfm);
-+	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct rsa_key *pkey = &ctx->key;
-+	struct rsa_mpi_key *mpi_key = &ctx->mpi_key;
- 	int ret;
- 
-+	/* Free the old MPI key if any */
-+	rsa_free_mpi_key(mpi_key);
-+
- 	ret = rsa_parse_pub_key(pkey, key, keylen);
- 	if (ret)
- 		return ret;
- 
--	if (rsa_check_key_length(mpi_get_size(pkey->n) << 3)) {
--		rsa_free_key(pkey);
--		ret = -EINVAL;
--	}
--	return ret;
-+	mpi_key->e = mpi_read_raw_data(pkey->e, pkey->e_sz);
-+	if (!mpi_key->e)
-+		goto err;
-+
-+	mpi_key->n = mpi_read_raw_data(pkey->n, pkey->n_sz);
-+	if (!mpi_key->n)
-+		goto err;
-+
-+	return 0;
-+
-+err:
-+	rsa_free_mpi_key(mpi_key);
-+	return -ENOMEM;
- }
- 
- static int rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
- 			    unsigned int keylen)
- {
--	struct rsa_key *pkey = akcipher_tfm_ctx(tfm);
-+	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct rsa_key *pkey = &ctx->key;
-+	struct rsa_mpi_key *mpi_key = &ctx->mpi_key;
- 	int ret;
- 
-+	/* Free the old MPI key if any */
-+	rsa_free_mpi_key(mpi_key);
-+
- 	ret = rsa_parse_priv_key(pkey, key, keylen);
- 	if (ret)
- 		return ret;
- 
--	if (rsa_check_key_length(mpi_get_size(pkey->n) << 3)) {
--		rsa_free_key(pkey);
--		ret = -EINVAL;
--	}
--	return ret;
-+	mpi_key->d = mpi_read_raw_data(pkey->d, pkey->n_sz);
-+	if (!mpi_key->d)
-+		goto err;
-+
-+	mpi_key->e = mpi_read_raw_data(pkey->e, pkey->e_sz);
-+	if (!mpi_key->e)
-+		goto err;
-+
-+	mpi_key->n = mpi_read_raw_data(pkey->n, pkey->n_sz);
-+	if (!mpi_key->n)
-+		goto err;
-+
-+	return 0;
-+
-+err:
-+	rsa_free_mpi_key(mpi_key);
-+	return -ENOMEM;
- }
- 
- static int rsa_max_size(struct crypto_akcipher *tfm)
- {
--	struct rsa_key *pkey = akcipher_tfm_ctx(tfm);
-+	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct rsa_key *pkey = &ctx->key;
- 
--	return pkey->n ? mpi_get_size(pkey->n) : -EINVAL;
-+	return pkey->n ? pkey->n_sz : -EINVAL;
- }
- 
- static void rsa_exit_tfm(struct crypto_akcipher *tfm)
- {
--	struct rsa_key *pkey = akcipher_tfm_ctx(tfm);
-+	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct rsa_mpi_key *mpi_key = &ctx->mpi_key;
- 
--	rsa_free_key(pkey);
-+	rsa_free_mpi_key(mpi_key);
- }
- 
- static struct akcipher_alg rsa = {
-@@ -310,7 +351,7 @@ static struct akcipher_alg rsa = {
- 		.cra_driver_name = "rsa-generic",
- 		.cra_priority = 100,
- 		.cra_module = THIS_MODULE,
--		.cra_ctxsize = sizeof(struct rsa_key),
-+		.cra_ctxsize = sizeof(struct rsa_ctx),
- 	},
- };
- 
-diff --git a/crypto/rsa_helper.c b/crypto/rsa_helper.c
-index d226f48..f0677b7 100644
---- a/crypto/rsa_helper.c
-+++ b/crypto/rsa_helper.c
-@@ -18,24 +18,50 @@
- #include "rsapubkey-asn1.h"
- #include "rsaprivkey-asn1.h"
- 
-+static int rsa_check_key_length(unsigned int len)
-+{
-+	switch (len) {
-+	case 512:
-+	case 1024:
-+	case 1536:
-+	case 2048:
-+	case 3072:
-+	case 4096:
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
- int rsa_get_n(void *context, size_t hdrlen, unsigned char tag,
- 	      const void *value, size_t vlen)
- {
- 	struct rsa_key *key = context;
-+	const u8 *ptr = value;
-+	int ret;
- 
--	key->n = mpi_read_raw_data(value, vlen);
-+	while (!*ptr && vlen) {
-+		ptr++;
-+		vlen--;
-+	}
- 
--	if (!key->n)
--		return -ENOMEM;
-+	/* invalid key provided */
-+	if (!ptr)
-+		return -EINVAL;
- 
- 	/* In FIPS mode only allow key size 2K & 3K */
--	if (fips_enabled && (mpi_get_size(key->n) != 256 &&
--			     mpi_get_size(key->n) != 384)) {
-+	if (fips_enabled && (vlen != 256 && vlen != 384)) {
- 		pr_err("RSA: key size not allowed in FIPS mode\n");
--		mpi_free(key->n);
--		key->n = NULL;
- 		return -EINVAL;
- 	}
-+	/* invalid key size provided */
-+	ret = rsa_check_key_length(vlen << 3);
-+	if (ret)
-+		return ret;
-+
-+	key->n = ptr;
-+	key->n_sz = vlen;
-+
- 	return 0;
- }
- 
-@@ -43,11 +69,19 @@ int rsa_get_e(void *context, size_t hdrlen, unsigned char tag,
- 	      const void *value, size_t vlen)
- {
- 	struct rsa_key *key = context;
-+	const u8 *ptr = value;
-+
-+	while (!*ptr && vlen) {
-+		ptr++;
-+		vlen--;
-+	}
- 
--	key->e = mpi_read_raw_data(value, vlen);
-+	/* invalid key provided */
-+	if (!ptr || !key->n_sz || !vlen || vlen > key->n_sz)
-+		return -EINVAL;
- 
--	if (!key->e)
--		return -ENOMEM;
-+	key->e = ptr;
-+	key->e_sz = vlen;
- 
- 	return 0;
- }
-@@ -56,47 +90,33 @@ int rsa_get_d(void *context, size_t hdrlen, unsigned char tag,
- 	      const void *value, size_t vlen)
- {
- 	struct rsa_key *key = context;
-+	const u8 *ptr = value;
- 
--	key->d = mpi_read_raw_data(value, vlen);
-+	while (!*ptr && vlen) {
-+		ptr++;
-+		vlen--;
-+	}
- 
--	if (!key->d)
--		return -ENOMEM;
-+	/* invalid key provided */
-+	if (!ptr || !key->n_sz || !vlen || vlen > key->n_sz)
-+		return -EINVAL;
- 
- 	/* In FIPS mode only allow key size 2K & 3K */
--	if (fips_enabled && (mpi_get_size(key->d) != 256 &&
--			     mpi_get_size(key->d) != 384)) {
-+	if (fips_enabled && (vlen != 256 && vlen != 384)) {
- 		pr_err("RSA: key size not allowed in FIPS mode\n");
--		mpi_free(key->d);
--		key->d = NULL;
- 		return -EINVAL;
- 	}
--	return 0;
--}
- 
--static void free_mpis(struct rsa_key *key)
--{
--	mpi_free(key->n);
--	mpi_free(key->e);
--	mpi_free(key->d);
--	key->n = NULL;
--	key->e = NULL;
--	key->d = NULL;
--}
-+	key->d = ptr;
-+	key->d_sz = vlen;
- 
--/**
-- * rsa_free_key() - frees rsa key allocated by rsa_parse_key()
-- *
-- * @rsa_key:	struct rsa_key key representation
-- */
--void rsa_free_key(struct rsa_key *key)
--{
--	free_mpis(key);
-+	return 0;
- }
--EXPORT_SYMBOL_GPL(rsa_free_key);
- 
- /**
-- * rsa_parse_pub_key() - extracts an rsa public key from BER encoded buffer
-- *			 and stores it in the provided struct rsa_key
-+ * rsa_parse_pub_key() - decodes the BER encoded buffer and stores in the
-+ *                       provided struct rsa_key, pointers to the raw key as is,
-+ *                       so that the caller can copy it or MPI parse it, etc.
-  *
-  * @rsa_key:	struct rsa_key key representation
-  * @key:	key in BER format
-@@ -107,23 +127,15 @@ EXPORT_SYMBOL_GPL(rsa_free_key);
- int rsa_parse_pub_key(struct rsa_key *rsa_key, const void *key,
- 		      unsigned int key_len)
- {
--	int ret;
--
--	free_mpis(rsa_key);
--	ret = asn1_ber_decoder(&rsapubkey_decoder, rsa_key, key, key_len);
--	if (ret < 0)
--		goto error;
--
--	return 0;
--error:
--	free_mpis(rsa_key);
--	return ret;
-+	return asn1_ber_decoder(&rsapubkey_decoder, rsa_key, key, key_len);
- }
- EXPORT_SYMBOL_GPL(rsa_parse_pub_key);
- 
- /**
-- * rsa_parse_pub_key() - extracts an rsa private key from BER encoded buffer
-- *			 and stores it in the provided struct rsa_key
-+ * rsa_parse_priv_key() - decodes the BER encoded buffer and stores in the
-+ *                        provided struct rsa_key, pointers to the raw key
-+ *                        as is, so that the caller can copy it or MPI parse it,
-+ *                        etc.
-  *
-  * @rsa_key:	struct rsa_key key representation
-  * @key:	key in BER format
-@@ -134,16 +146,6 @@ EXPORT_SYMBOL_GPL(rsa_parse_pub_key);
- int rsa_parse_priv_key(struct rsa_key *rsa_key, const void *key,
- 		       unsigned int key_len)
- {
--	int ret;
--
--	free_mpis(rsa_key);
--	ret = asn1_ber_decoder(&rsaprivkey_decoder, rsa_key, key, key_len);
--	if (ret < 0)
--		goto error;
--
--	return 0;
--error:
--	free_mpis(rsa_key);
--	return ret;
-+	return asn1_ber_decoder(&rsaprivkey_decoder, rsa_key, key, key_len);
- }
- EXPORT_SYMBOL_GPL(rsa_parse_priv_key);
-diff --git a/include/crypto/internal/rsa.h b/include/crypto/internal/rsa.h
-index c7585bd..d6c042a 100644
---- a/include/crypto/internal/rsa.h
-+++ b/include/crypto/internal/rsa.h
-@@ -12,12 +12,24 @@
-  */
- #ifndef _RSA_HELPER_
- #define _RSA_HELPER_
--#include <linux/mpi.h>
-+#include <linux/types.h>
- 
-+/**
-+ * rsa_key - RSA key structure
-+ * @n           : RSA modulus raw byte stream
-+ * @e           : RSA public exponent raw byte stream
-+ * @d           : RSA private exponent raw byte stream
-+ * @n_sz        : length in bytes of RSA modulus n
-+ * @e_sz        : length in bytes of RSA public exponent
-+ * @d_sz        : length in bytes of RSA private exponent
-+ */
- struct rsa_key {
--	MPI n;
--	MPI e;
--	MPI d;
-+	const u8 *n;
-+	const u8 *e;
-+	const u8 *d;
-+	size_t n_sz;
-+	size_t e_sz;
-+	size_t d_sz;
- };
- 
- int rsa_parse_pub_key(struct rsa_key *rsa_key, const void *key,
-@@ -26,7 +38,5 @@ int rsa_parse_pub_key(struct rsa_key *rsa_key, const void *key,
- int rsa_parse_priv_key(struct rsa_key *rsa_key, const void *key,
- 		       unsigned int key_len);
- 
--void rsa_free_key(struct rsa_key *rsa_key);
--
- extern struct crypto_template rsa_pkcs1pad_tmpl;
- #endif
+Changes in v4:
+- sync with ASN.1 parser
+
+Changes in v3:
+- sync with ASN.1 parser
+
+Changes in v2:
+- fix memory leaks on error path
+- rename struct akcipher_alg rsa to caam_rsa
+
+Tudor Ambarus (3):
+  crypto: scatterwak - Add scatterwalk_sg_copychunks
+  crypto: scatterwalk - export scatterwalk_pagedone
+  crypto: caam - add support for RSA algorithm
+
+ crypto/scatterwalk.c              |  31 +-
+ drivers/crypto/caam/Kconfig       |  12 +
+ drivers/crypto/caam/Makefile      |   4 +
+ drivers/crypto/caam/caampkc.c     | 637 ++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/caam/caampkc.h     |  72 +++++
+ drivers/crypto/caam/compat.h      |   3 +
+ drivers/crypto/caam/desc.h        |   2 +
+ drivers/crypto/caam/desc_constr.h |   7 +
+ drivers/crypto/caam/pdb.h         |  51 ++-
+ drivers/crypto/caam/pkc_desc.c    |  36 +++
+ include/crypto/scatterwalk.h      |   4 +
+ 11 files changed, 856 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/crypto/caam/caampkc.c
+ create mode 100644 drivers/crypto/caam/caampkc.h
+ create mode 100644 drivers/crypto/caam/pkc_desc.c
+
 -- 
 1.8.3.1
