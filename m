@@ -1,967 +1,530 @@
-From: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-Subject: [PATCH 3/3] crypto: caam - add support for RSA algorithm
-Date: Tue, 7 Jun 2016 17:24:43 +0300
-Message-ID: <1465309483-2703-4-git-send-email-tudor-dan.ambarus@nxp.com>
-References: <1465309483-2703-1-git-send-email-tudor-dan.ambarus@nxp.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v3] crypto: rsa - return raw integers for the ASN.1 parser
+Date: Tue, 07 Jun 2016 16:33:17 +0200
+Message-ID: <4389374.qHp8yZtTYB@tauon.atsec.com>
+References: <1465309269-2214-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>, <horia.geanta@nxp.com>,
-	Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-To: <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0060.outbound.protection.outlook.com ([157.56.111.60]:52076
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1755211AbcFGOY7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Jun 2016 10:24:59 -0400
-In-Reply-To: <1465309483-2703-1-git-send-email-tudor-dan.ambarus@nxp.com>
+Received: from mail.eperm.de ([89.247.134.16]:35978 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754979AbcFGOdV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 7 Jun 2016 10:33:21 -0400
+In-Reply-To: <1465309269-2214-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add RSA support to caam driver.
+Am Dienstag, 7. Juni 2016, 17:21:09 schrieb Tudor Ambarus:
 
-Coauthored-by: Yashpal Dutta <yashpal.dutta@freescale.com>
+Hi Tudor,
 
-Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
----
- drivers/crypto/caam/Kconfig       |  12 +
- drivers/crypto/caam/Makefile      |   4 +
- drivers/crypto/caam/caampkc.c     | 637 ++++++++++++++++++++++++++++++++++++++
- drivers/crypto/caam/caampkc.h     |  72 +++++
- drivers/crypto/caam/compat.h      |   3 +
- drivers/crypto/caam/desc.h        |   2 +
- drivers/crypto/caam/desc_constr.h |   7 +
- drivers/crypto/caam/pdb.h         |  51 ++-
- drivers/crypto/caam/pkc_desc.c    |  36 +++
- 9 files changed, 823 insertions(+), 1 deletion(-)
- create mode 100644 drivers/crypto/caam/caampkc.c
- create mode 100644 drivers/crypto/caam/caampkc.h
- create mode 100644 drivers/crypto/caam/pkc_desc.c
+> Return the raw key with no other processing so that the caller
+> can copy it or MPI parse it, etc.
+> 
+> The scope is to have only one ANS.1 parser for all RSA
+> implementations.
+> 
+> Update the RSA software implementation so that it does
+> the MPI conversion on top.
+> 
+> Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+> ---
+>  crypto/rsa.c                  | 119 ++++++++++++++++++++++++++-------------
+> crypto/rsa_helper.c           | 128
+> +++++++++++++++++++++--------------------- include/crypto/internal/rsa.h | 
+> 22 ++++++--
+>  3 files changed, 161 insertions(+), 108 deletions(-)
+> 
+> diff --git a/crypto/rsa.c b/crypto/rsa.c
+> index 77d737f..ea78d61 100644
+> --- a/crypto/rsa.c
+> +++ b/crypto/rsa.c
+> @@ -14,12 +14,24 @@
+>  #include <crypto/internal/akcipher.h>
+>  #include <crypto/akcipher.h>
+>  #include <crypto/algapi.h>
+> +#include <linux/mpi.h>
+> +
+> +struct rsa_mpi_key {
+> +	MPI n;
+> +	MPI e;
+> +	MPI d;
+> +};
+> +
+> +struct rsa_ctx {
+> +	struct rsa_key key;
+> +	struct rsa_mpi_key mpi_key;
+> +};
+> 
+>  /*
+>   * RSAEP function [RFC3447 sec 5.1.1]
+>   * c = m^e mod n;
+>   */
+> -static int _rsa_enc(const struct rsa_key *key, MPI c, MPI m)
+> +static int _rsa_enc(const struct rsa_mpi_key *key, MPI c, MPI m)
+>  {
+>  	/* (1) Validate 0 <= m < n */
+>  	if (mpi_cmp_ui(m, 0) < 0 || mpi_cmp(m, key->n) >= 0)
+> @@ -33,7 +45,7 @@ static int _rsa_enc(const struct rsa_key *key, MPI c, MPI
+> m) * RSADP function [RFC3447 sec 5.1.2]
+>   * m = c^d mod n;
+>   */
+> -static int _rsa_dec(const struct rsa_key *key, MPI m, MPI c)
+> +static int _rsa_dec(const struct rsa_mpi_key *key, MPI m, MPI c)
+>  {
+>  	/* (1) Validate 0 <= c < n */
+>  	if (mpi_cmp_ui(c, 0) < 0 || mpi_cmp(c, key->n) >= 0)
+> @@ -47,7 +59,7 @@ static int _rsa_dec(const struct rsa_key *key, MPI m, MPI
+> c) * RSASP1 function [RFC3447 sec 5.2.1]
+>   * s = m^d mod n
+>   */
+> -static int _rsa_sign(const struct rsa_key *key, MPI s, MPI m)
+> +static int _rsa_sign(const struct rsa_mpi_key *key, MPI s, MPI m)
+>  {
+>  	/* (1) Validate 0 <= m < n */
+>  	if (mpi_cmp_ui(m, 0) < 0 || mpi_cmp(m, key->n) >= 0)
+> @@ -61,7 +73,7 @@ static int _rsa_sign(const struct rsa_key *key, MPI s, MPI
+> m) * RSAVP1 function [RFC3447 sec 5.2.2]
+>   * m = s^e mod n;
+>   */
+> -static int _rsa_verify(const struct rsa_key *key, MPI m, MPI s)
+> +static int _rsa_verify(const struct rsa_mpi_key *key, MPI m, MPI s)
+>  {
+>  	/* (1) Validate 0 <= s < n */
+>  	if (mpi_cmp_ui(s, 0) < 0 || mpi_cmp(s, key->n) >= 0)
+> @@ -71,15 +83,17 @@ static int _rsa_verify(const struct rsa_key *key, MPI m,
+> MPI s) return mpi_powm(m, s, key->e, key->n);
+>  }
+> 
+> -static inline struct rsa_key *rsa_get_key(struct crypto_akcipher *tfm)
+> +static inline struct rsa_mpi_key *rsa_get_key(struct crypto_akcipher *tfm)
+>  {
+> -	return akcipher_tfm_ctx(tfm);
+> +	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
+> +
+> +	return &ctx->mpi_key;
+>  }
+> 
+>  static int rsa_enc(struct akcipher_request *req)
+>  {
+>  	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+> -	const struct rsa_key *pkey = rsa_get_key(tfm);
+> +	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
+>  	MPI m, c = mpi_alloc(0);
+>  	int ret = 0;
+>  	int sign;
+> @@ -118,7 +132,7 @@ err_free_c:
+>  static int rsa_dec(struct akcipher_request *req)
+>  {
+>  	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+> -	const struct rsa_key *pkey = rsa_get_key(tfm);
+> +	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
+>  	MPI c, m = mpi_alloc(0);
+>  	int ret = 0;
+>  	int sign;
+> @@ -156,7 +170,7 @@ err_free_m:
+>  static int rsa_sign(struct akcipher_request *req)
+>  {
+>  	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+> -	const struct rsa_key *pkey = rsa_get_key(tfm);
+> +	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
+>  	MPI m, s = mpi_alloc(0);
+>  	int ret = 0;
+>  	int sign;
+> @@ -195,7 +209,7 @@ err_free_s:
+>  static int rsa_verify(struct akcipher_request *req)
+>  {
+>  	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+> -	const struct rsa_key *pkey = rsa_get_key(tfm);
+> +	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
+>  	MPI s, m = mpi_alloc(0);
+>  	int ret = 0;
+>  	int sign;
+> @@ -233,67 +247,94 @@ err_free_m:
+>  	return ret;
+>  }
+> 
+> -static int rsa_check_key_length(unsigned int len)
+> +static void rsa_free_mpi_key(struct rsa_mpi_key *key)
+>  {
+> -	switch (len) {
+> -	case 512:
+> -	case 1024:
+> -	case 1536:
+> -	case 2048:
+> -	case 3072:
+> -	case 4096:
+> -		return 0;
+> -	}
+> -
+> -	return -EINVAL;
+> +	mpi_free(key->d);
+> +	mpi_free(key->e);
+> +	mpi_free(key->n);
+> +	key->d = NULL;
+> +	key->e = NULL;
+> +	key->n = NULL;
+>  }
+> 
+>  static int rsa_set_pub_key(struct crypto_akcipher *tfm, const void *key,
+>  			   unsigned int keylen)
+>  {
+> -	struct rsa_key *pkey = akcipher_tfm_ctx(tfm);
+> +	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
+> +	struct rsa_key *pkey = &ctx->key;
+> +	struct rsa_mpi_key *mpi_key = &ctx->mpi_key;
+>  	int ret;
+> 
+> +	/* Free the old MPI key if any */
+> +	rsa_free_mpi_key(mpi_key);
+> +
+>  	ret = rsa_parse_pub_key(pkey, key, keylen);
+>  	if (ret)
+>  		return ret;
+> 
+> -	if (rsa_check_key_length(mpi_get_size(pkey->n) << 3)) {
+> -		rsa_free_key(pkey);
+> -		ret = -EINVAL;
+> -	}
+> -	return ret;
+> +	mpi_key->e = mpi_read_raw_data(pkey->e, pkey->e_sz);
+> +	if (!mpi_key->e)
+> +		goto err;
+> +
+> +	mpi_key->n = mpi_read_raw_data(pkey->n, pkey->n_sz);
+> +	if (!mpi_key->n)
+> +		goto err;
+> +
+> +	return 0;
+> +
+> +err:
+> +	rsa_free_mpi_key(mpi_key);
+> +	return -ENOMEM;
+>  }
+> 
+>  static int rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
+>  			    unsigned int keylen)
+>  {
+> -	struct rsa_key *pkey = akcipher_tfm_ctx(tfm);
+> +	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
+> +	struct rsa_key *pkey = &ctx->key;
+> +	struct rsa_mpi_key *mpi_key = &ctx->mpi_key;
+>  	int ret;
+> 
+> +	/* Free the old MPI key if any */
+> +	rsa_free_mpi_key(mpi_key);
+> +
+>  	ret = rsa_parse_priv_key(pkey, key, keylen);
+>  	if (ret)
+>  		return ret;
+> 
+> -	if (rsa_check_key_length(mpi_get_size(pkey->n) << 3)) {
+> -		rsa_free_key(pkey);
+> -		ret = -EINVAL;
+> -	}
+> -	return ret;
+> +	mpi_key->d = mpi_read_raw_data(pkey->d, pkey->n_sz);
+> +	if (!mpi_key->d)
+> +		goto err;
+> +
+> +	mpi_key->e = mpi_read_raw_data(pkey->e, pkey->e_sz);
+> +	if (!mpi_key->e)
+> +		goto err;
+> +
+> +	mpi_key->n = mpi_read_raw_data(pkey->n, pkey->n_sz);
+> +	if (!mpi_key->n)
+> +		goto err;
+> +
+> +	return 0;
+> +
+> +err:
+> +	rsa_free_mpi_key(mpi_key);
+> +	return -ENOMEM;
+>  }
+> 
+>  static int rsa_max_size(struct crypto_akcipher *tfm)
+>  {
+> -	struct rsa_key *pkey = akcipher_tfm_ctx(tfm);
+> +	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
+> +	struct rsa_key *pkey = &ctx->key;
+> 
+> -	return pkey->n ? mpi_get_size(pkey->n) : -EINVAL;
+> +	return pkey->n ? pkey->n_sz : -EINVAL;
+>  }
+> 
+>  static void rsa_exit_tfm(struct crypto_akcipher *tfm)
+>  {
+> -	struct rsa_key *pkey = akcipher_tfm_ctx(tfm);
+> +	struct rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
+> +	struct rsa_mpi_key *mpi_key = &ctx->mpi_key;
+> 
+> -	rsa_free_key(pkey);
+> +	rsa_free_mpi_key(mpi_key);
+>  }
+> 
+>  static struct akcipher_alg rsa = {
+> @@ -310,7 +351,7 @@ static struct akcipher_alg rsa = {
+>  		.cra_driver_name = "rsa-generic",
+>  		.cra_priority = 100,
+>  		.cra_module = THIS_MODULE,
+> -		.cra_ctxsize = sizeof(struct rsa_key),
+> +		.cra_ctxsize = sizeof(struct rsa_ctx),
+>  	},
+>  };
+> 
+> diff --git a/crypto/rsa_helper.c b/crypto/rsa_helper.c
+> index d226f48..f0677b7 100644
+> --- a/crypto/rsa_helper.c
+> +++ b/crypto/rsa_helper.c
+> @@ -18,24 +18,50 @@
+>  #include "rsapubkey-asn1.h"
+>  #include "rsaprivkey-asn1.h"
+> 
+> +static int rsa_check_key_length(unsigned int len)
+> +{
+> +	switch (len) {
+> +	case 512:
+> +	case 1024:
+> +	case 1536:
+> +	case 2048:
+> +	case 3072:
+> +	case 4096:
+> +		return 0;
+> +	}
+> +
+> +	return -EINVAL;
+> +}
+> +
+>  int rsa_get_n(void *context, size_t hdrlen, unsigned char tag,
+>  	      const void *value, size_t vlen)
+>  {
+>  	struct rsa_key *key = context;
+> +	const u8 *ptr = value;
+> +	int ret;
+> 
+> -	key->n = mpi_read_raw_data(value, vlen);
+> +	while (!*ptr && vlen) {
+> +		ptr++;
+> +		vlen--;
+> +	}
 
-diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index 5652a53..44449ba 100644
---- a/drivers/crypto/caam/Kconfig
-+++ b/drivers/crypto/caam/Kconfig
-@@ -99,6 +99,18 @@ config CRYPTO_DEV_FSL_CAAM_AHASH_API
- 	  To compile this as a module, choose M here: the module
- 	  will be called caamhash.
- 
-+config CRYPTO_DEV_FSL_CAAM_PKC_API
-+        tristate "Register public key cryptography implementations with Crypto API"
-+        depends on CRYPTO_DEV_FSL_CAAM && CRYPTO_DEV_FSL_CAAM_JR
-+        default y
-+        select CRYPTO_RSA
-+        help
-+          Selecting this will allow SEC Public key support for RSA.
-+          Supported cryptographic primitives: encryption, decryption,
-+          signature and verification.
-+          To compile this as a module, choose M here: the module
-+          will be called caam_pkc.
-+
- config CRYPTO_DEV_FSL_CAAM_RNG_API
- 	tristate "Register caam device for hwrng API"
- 	depends on CRYPTO_DEV_FSL_CAAM && CRYPTO_DEV_FSL_CAAM_JR
-diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
-index 550758a..399ad55 100644
---- a/drivers/crypto/caam/Makefile
-+++ b/drivers/crypto/caam/Makefile
-@@ -5,11 +5,15 @@ ifeq ($(CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG), y)
- 	EXTRA_CFLAGS := -DDEBUG
- endif
- 
-+ccflags-y += -I$(srctree)/crypto
-+
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM) += caam.o
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_JR) += caam_jr.o
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API) += caamalg.o
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
-+obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API) += caam_pkc.o
- 
- caam-objs := ctrl.o
- caam_jr-objs := jr.o key_gen.o error.o
-+caam_pkc-y := caampkc.o pkc_desc.o
-diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
-new file mode 100644
-index 0000000..38a004d
---- /dev/null
-+++ b/drivers/crypto/caam/caampkc.c
-@@ -0,0 +1,637 @@
-+/*
-+ * caam - Freescale FSL CAAM support for Public Key Cryptography
-+ *
-+ * Copyright 2016 Freescale Semiconductor, Inc.
-+ *
-+ * There is no Shared Descriptor for PKC so that the Job Descriptor must carry
-+ * all the desired key parameters, input and output pointers.
-+ */
-+#include "compat.h"
-+#include "regs.h"
-+#include "intern.h"
-+#include "jr.h"
-+#include "error.h"
-+#include "desc_constr.h"
-+#include "sg_sw_sec4.h"
-+#include "caampkc.h"
-+#include "rsapubkey-asn1.h"
-+#include "rsaprivkey-asn1.h"
-+
-+#define DESC_RSA_PUB_LEN	(2 * CAAM_CMD_SZ + sizeof(struct rsa_pub_pdb))
-+#define DESC_RSA_PRIV_F1_LEN	(2 * CAAM_CMD_SZ + \
-+				 sizeof(struct rsa_priv_f1_pdb))
-+
-+static void rsa_io_unmap(struct device *dev, struct rsa_edesc *edesc,
-+			 struct akcipher_request *req)
-+{
-+	dma_unmap_sg(dev, req->dst, edesc->dst_nents, DMA_FROM_DEVICE);
-+	dma_unmap_sg(dev, req->src, edesc->src_nents, DMA_TO_DEVICE);
-+
-+	if (edesc->sec4_sg_bytes)
-+		dma_unmap_single(dev, edesc->sec4_sg_dma, edesc->sec4_sg_bytes,
-+				 DMA_TO_DEVICE);
-+}
-+
-+static void rsa_pub_unmap(struct device *dev, struct rsa_edesc *edesc,
-+			  struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct caam_rsa_key *key = &ctx->key;
-+	struct rsa_pub_pdb *pdb = &edesc->pdb.pub;
-+
-+	dma_unmap_single(dev, pdb->n_dma, key->n_sz, DMA_TO_DEVICE);
-+	dma_unmap_single(dev, pdb->e_dma, key->e_sz, DMA_TO_DEVICE);
-+}
-+
-+static void rsa_priv_f1_unmap(struct device *dev, struct rsa_edesc *edesc,
-+			      struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct caam_rsa_key *key = &ctx->key;
-+	struct rsa_priv_f1_pdb *pdb = &edesc->pdb.priv_f1;
-+
-+	dma_unmap_single(dev, pdb->n_dma, key->n_sz, DMA_TO_DEVICE);
-+	dma_unmap_single(dev, pdb->d_dma, key->n_sz, DMA_TO_DEVICE);
-+}
-+
-+static size_t skip_to_nonzero(u8 *ptr, size_t nbytes)
-+{
-+	size_t nr_zeros = 0;
-+
-+	while (!(*ptr) && nbytes) {
-+		nbytes--;
-+		ptr++;
-+		nr_zeros++;
-+	}
-+
-+	return nr_zeros;
-+}
-+
-+static size_t scatterwalk_skip_zeros(struct scatter_walk *walk, size_t nbytes)
-+{
-+	size_t len_this_page, nr_zeros, cnt = 0;
-+	u8 *vaddr, *ptr;
-+
-+	for (;;) {
-+		nr_zeros = 0;
-+		len_this_page = scatterwalk_pagelen(walk);
-+
-+		if (len_this_page > nbytes)
-+			len_this_page = nbytes;
-+
-+		vaddr = scatterwalk_map(walk);
-+		ptr = vaddr;
-+		nr_zeros = skip_to_nonzero(ptr, len_this_page);
-+		scatterwalk_unmap(vaddr);
-+
-+		/* count total number of zeros */
-+		cnt += nr_zeros;
-+
-+		/* advance scatterwalk to the nonzero data */
-+		scatterwalk_advance(walk, nr_zeros);
-+
-+		if (nr_zeros < len_this_page || nbytes == len_this_page)
-+			break;
-+
-+		nbytes -= len_this_page;
-+
-+		scatterwalk_pagedone(walk, 0, 1);
-+	}
-+
-+	return cnt;
-+}
-+
-+/*
-+ * This function drops the leading zeros and copies the data to the initial
-+ * pointer so that it can be freed later on. Returns the updated data length.
-+ */
-+static size_t drop_leading_zeros(struct scatterlist *sg, size_t nbytes)
-+{
-+	struct scatter_walk walk_src, walk_dst;
-+	size_t nr_zeros = 0;
-+
-+	scatterwalk_start(&walk_src, sg);
-+	nr_zeros = scatterwalk_skip_zeros(&walk_src, nbytes);
-+
-+	if (nr_zeros) {
-+		nbytes = nbytes - nr_zeros;
-+
-+		scatterwalk_start(&walk_dst, sg);
-+		scatterwalk_sg_copychunks(&walk_dst, &walk_src, nbytes);
-+		scatterwalk_done(&walk_dst, 0, 0);
-+	}
-+
-+	scatterwalk_done(&walk_src, 0, 0);
-+
-+	return nbytes;
-+}
-+
-+/* RSA Job Completion handler */
-+static void rsa_pub_done(struct device *dev, u32 *desc, u32 err, void *context)
-+{
-+	struct akcipher_request *req = context;
-+	struct rsa_edesc *edesc;
-+
-+	if (err)
-+		caam_jr_strstatus(dev, err);
-+
-+	/*
-+	 * RSA's output is expected to be a big integer. Drop the leading
-+	 * zeros since they are not meaningful in the world of numbers.
-+	 */
-+	req->dst_len = drop_leading_zeros(req->dst, req->dst_len);
-+
-+	edesc = container_of(desc, struct rsa_edesc, hw_desc[0]);
-+
-+	rsa_pub_unmap(dev, edesc, req);
-+	rsa_io_unmap(dev, edesc, req);
-+	kfree(edesc);
-+
-+	akcipher_request_complete(req, err);
-+}
-+
-+static void rsa_priv_f1_done(struct device *dev, u32 *desc, u32 err,
-+			     void *context)
-+{
-+	struct akcipher_request *req = context;
-+	struct rsa_edesc *edesc;
-+
-+	if (err)
-+		caam_jr_strstatus(dev, err);
-+
-+	/*
-+	 * RSA's output is expected to be a big integer. Drop the leading
-+	 * zeros since they are not meaningful in the world of numbers.
-+	 */
-+	req->dst_len = drop_leading_zeros(req->dst, req->dst_len);
-+
-+	edesc = container_of(desc, struct rsa_edesc, hw_desc[0]);
-+
-+	rsa_priv_f1_unmap(dev, edesc, req);
-+	rsa_io_unmap(dev, edesc, req);
-+	kfree(edesc);
-+
-+	akcipher_request_complete(req, err);
-+}
-+
-+static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
-+					 size_t desclen)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct device *dev = ctx->dev;
-+	struct rsa_edesc *edesc;
-+	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
-+		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
-+	int sgc;
-+	int sec4_sg_index, sec4_sg_len = 0, sec4_sg_bytes;
-+	int src_nents, dst_nents;
-+
-+	src_nents = sg_nents_for_len(req->src, req->src_len);
-+	dst_nents = sg_nents_for_len(req->dst, req->dst_len);
-+
-+	if (src_nents > 1)
-+		sec4_sg_len = src_nents;
-+	if (dst_nents > 1)
-+		sec4_sg_len += dst_nents;
-+
-+	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
-+
-+	/* allocate space for base edesc, hw desc commands and link tables */
-+	edesc = kzalloc(sizeof(*edesc) + desclen + sec4_sg_bytes,
-+			GFP_DMA | flags);
-+	if (!edesc)
-+		return ERR_PTR(-ENOMEM);
-+
-+	sgc = dma_map_sg(dev, req->src, src_nents, DMA_TO_DEVICE);
-+	if (unlikely(!sgc)) {
-+		dev_err(dev, "unable to map source\n");
-+		goto src_fail;
-+	}
-+
-+	sgc = dma_map_sg(dev, req->dst, dst_nents, DMA_FROM_DEVICE);
-+	if (unlikely(!sgc)) {
-+		dev_err(dev, "unable to map destination\n");
-+		goto dst_fail;
-+	}
-+
-+	edesc->sec4_sg = (void *)edesc + sizeof(*edesc) + desclen;
-+
-+	sec4_sg_index = 0;
-+	if (src_nents > 1) {
-+		sg_to_sec4_sg_last(req->src, src_nents, edesc->sec4_sg, 0);
-+		sec4_sg_index += src_nents;
-+	}
-+	if (dst_nents > 1)
-+		sg_to_sec4_sg_last(req->dst, dst_nents,
-+				   edesc->sec4_sg + sec4_sg_index, 0);
-+
-+	/* Save nents for later use in Job Descriptor */
-+	edesc->src_nents = src_nents;
-+	edesc->dst_nents = dst_nents;
-+
-+	if (!sec4_sg_bytes)
-+		return edesc;
-+
-+	edesc->sec4_sg_dma = dma_map_single(dev, edesc->sec4_sg,
-+					    sec4_sg_bytes, DMA_TO_DEVICE);
-+	if (dma_mapping_error(dev, edesc->sec4_sg_dma)) {
-+		dev_err(dev, "unable to map S/G table\n");
-+		goto sec4_sg_fail;
-+	}
-+
-+	edesc->sec4_sg_bytes = sec4_sg_bytes;
-+
-+	return edesc;
-+
-+sec4_sg_fail:
-+	dma_unmap_sg(dev, req->dst, dst_nents, DMA_FROM_DEVICE);
-+dst_fail:
-+	dma_unmap_sg(dev, req->src, src_nents, DMA_TO_DEVICE);
-+src_fail:
-+	kfree(edesc);
-+	return ERR_PTR(-ENOMEM);
-+}
-+
-+static int set_rsa_pub_pdb(struct akcipher_request *req,
-+			   struct rsa_edesc *edesc)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct caam_rsa_key *key = &ctx->key;
-+	struct device *dev = ctx->dev;
-+	struct rsa_pub_pdb *pdb = &edesc->pdb.pub;
-+	int sec4_sg_index = 0;
-+
-+	pdb->n_dma = dma_map_single(dev, key->n, key->n_sz, DMA_TO_DEVICE);
-+	if (dma_mapping_error(dev, pdb->n_dma)) {
-+		dev_err(dev, "Unable to map RSA modulus memory\n");
-+		return -ENOMEM;
-+	}
-+
-+	pdb->e_dma = dma_map_single(dev, key->e, key->e_sz, DMA_TO_DEVICE);
-+	if (dma_mapping_error(dev, pdb->e_dma)) {
-+		dev_err(dev, "Unable to map RSA public exponent memory\n");
-+		dma_unmap_single(dev, pdb->n_dma, key->n_sz, DMA_TO_DEVICE);
-+		return -ENOMEM;
-+	}
-+
-+	if (edesc->src_nents > 1) {
-+		pdb->sgf |= RSA_PDB_SGF_F;
-+		pdb->f_dma = edesc->sec4_sg_dma;
-+		sec4_sg_index += edesc->src_nents;
-+	} else {
-+		pdb->f_dma = sg_dma_address(req->src);
-+	}
-+
-+	if (edesc->dst_nents > 1) {
-+		pdb->sgf |= RSA_PDB_SGF_G;
-+		pdb->g_dma = edesc->sec4_sg_dma +
-+			     sec4_sg_index * sizeof(struct sec4_sg_entry);
-+	} else {
-+		pdb->g_dma = sg_dma_address(req->dst);
-+	}
-+
-+	pdb->sgf |= (key->e_sz << RSA_PDB_E_SHIFT) | key->n_sz;
-+	pdb->f_len = req->src_len;
-+
-+	return 0;
-+}
-+
-+static int set_rsa_priv_f1_pdb(struct akcipher_request *req,
-+			       struct rsa_edesc *edesc)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct caam_rsa_key *key = &ctx->key;
-+	struct device *dev = ctx->dev;
-+	struct rsa_priv_f1_pdb *pdb = &edesc->pdb.priv_f1;
-+	int sec4_sg_index = 0;
-+
-+	pdb->n_dma = dma_map_single(dev, key->n, key->n_sz, DMA_TO_DEVICE);
-+	if (dma_mapping_error(dev, pdb->n_dma)) {
-+		dev_err(dev, "Unable to map modulus memory\n");
-+		return -ENOMEM;
-+	}
-+
-+	pdb->d_dma = dma_map_single(dev, key->d, key->n_sz, DMA_TO_DEVICE);
-+	if (dma_mapping_error(dev, pdb->d_dma)) {
-+		dev_err(dev, "Unable to map RSA private exponent memory\n");
-+		dma_unmap_single(dev, pdb->n_dma, key->n_sz, DMA_TO_DEVICE);
-+		return -ENOMEM;
-+	}
-+
-+	if (edesc->src_nents > 1) {
-+		pdb->sgf |= RSA_PRIV_PDB_SGF_G;
-+		pdb->g_dma = edesc->sec4_sg_dma;
-+		sec4_sg_index += edesc->src_nents;
-+	} else {
-+		pdb->g_dma = sg_dma_address(req->src);
-+	}
-+
-+	if (edesc->dst_nents > 1) {
-+		pdb->sgf |= RSA_PRIV_PDB_SGF_F;
-+		pdb->f_dma = edesc->sec4_sg_dma +
-+			     sec4_sg_index * sizeof(struct sec4_sg_entry);
-+	} else {
-+		pdb->f_dma = sg_dma_address(req->dst);
-+	}
-+
-+	pdb->sgf |= (key->n_sz << RSA_PDB_D_SHIFT) | key->n_sz;
-+
-+	return 0;
-+}
-+
-+static int caam_rsa_enc(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct caam_rsa_key *key = &ctx->key;
-+	struct device *jrdev = ctx->dev;
-+	struct rsa_edesc *edesc;
-+	int ret;
-+
-+	if (unlikely(!key->n || !key->e))
-+		return -EINVAL;
-+
-+	if (req->dst_len < key->n_sz) {
-+		req->dst_len = key->n_sz;
-+		dev_err(jrdev, "Output buffer length less than parameter n\n");
-+		return -EOVERFLOW;
-+	}
-+
-+	/* Allocate extended descriptor */
-+	edesc = rsa_edesc_alloc(req, DESC_RSA_PUB_LEN);
-+	if (IS_ERR(edesc))
-+		return PTR_ERR(edesc);
-+
-+	/* Set RSA Encrypt Protocol Data Block */
-+	ret = set_rsa_pub_pdb(req, edesc);
-+	if (ret)
-+		goto init_fail;
-+
-+	/* Initialize Job Descriptor */
-+	init_rsa_pub_desc(edesc->hw_desc, &edesc->pdb.pub);
-+
-+	ret = caam_jr_enqueue(jrdev, edesc->hw_desc, rsa_pub_done, req);
-+	if (!ret)
-+		return -EINPROGRESS;
-+
-+	rsa_pub_unmap(jrdev, edesc, req);
-+
-+init_fail:
-+	rsa_io_unmap(jrdev, edesc, req);
-+	kfree(edesc);
-+	return ret;
-+}
-+
-+static int caam_rsa_dec(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct caam_rsa_key *key = &ctx->key;
-+	struct device *jrdev = ctx->dev;
-+	struct rsa_edesc *edesc;
-+	int ret;
-+
-+	if (unlikely(!key->n || !key->d))
-+		return -EINVAL;
-+
-+	if (req->dst_len < key->n_sz) {
-+		req->dst_len = key->n_sz;
-+		dev_err(jrdev, "Output buffer length less than parameter n\n");
-+		return -EOVERFLOW;
-+	}
-+
-+	/* Allocate extended descriptor */
-+	edesc = rsa_edesc_alloc(req, DESC_RSA_PRIV_F1_LEN);
-+	if (IS_ERR(edesc))
-+		return PTR_ERR(edesc);
-+
-+	/* Set RSA Decrypt Protocol Data Block - Private Key Form #1 */
-+	ret = set_rsa_priv_f1_pdb(req, edesc);
-+	if (ret)
-+		goto init_fail;
-+
-+	/* Initialize Job Descriptor */
-+	init_rsa_priv_f1_desc(edesc->hw_desc, &edesc->pdb.priv_f1);
-+
-+	ret = caam_jr_enqueue(jrdev, edesc->hw_desc, rsa_priv_f1_done, req);
-+	if (!ret)
-+		return -EINPROGRESS;
-+
-+	rsa_priv_f1_unmap(jrdev, edesc, req);
-+
-+init_fail:
-+	rsa_io_unmap(jrdev, edesc, req);
-+	kfree(edesc);
-+	return ret;
-+}
-+
-+static void caam_rsa_free_key(struct caam_rsa_key *key)
-+{
-+	kzfree(key->d);
-+	kfree(key->e);
-+	kfree(key->n);
-+	key->d = NULL;
-+	key->e = NULL;
-+	key->n = NULL;
-+	key->d_sz = 0;
-+	key->e_sz = 0;
-+	key->n_sz = 0;
-+}
-+
-+static int caam_rsa_set_pub_key(struct crypto_akcipher *tfm, const void *key,
-+				unsigned int keylen)
-+{
-+	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct rsa_key *raw_key = &ctx->raw_key;
-+	struct caam_rsa_key *rsa_key = &ctx->key;
-+	int ret;
-+
-+	/* Free the old RSA key if any */
-+	caam_rsa_free_key(rsa_key);
-+
-+	ret = rsa_parse_pub_key(raw_key, key, keylen);
-+	if (ret)
-+		return ret;
-+
-+	/* Copy key in DMA zone */
-+	rsa_key->e = kzalloc(raw_key->e_sz, GFP_DMA | GFP_KERNEL);
-+	if (!rsa_key->e)
-+		goto err;
-+
-+	rsa_key->n = kzalloc(raw_key->n_sz, GFP_DMA | GFP_KERNEL);
-+	if (!rsa_key->n)
-+		goto err;
-+
-+	rsa_key->e_sz = raw_key->e_sz;
-+	rsa_key->n_sz = raw_key->n_sz;
-+	memcpy(rsa_key->e, raw_key->e, raw_key->e_sz);
-+	memcpy(rsa_key->n, raw_key->n, raw_key->n_sz);
-+
-+	return 0;
-+err:
-+	caam_rsa_free_key(rsa_key);
-+	return -ENOMEM;
-+}
-+
-+static int caam_rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
-+				 unsigned int keylen)
-+{
-+	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct rsa_key *raw_key = &ctx->raw_key;
-+	struct caam_rsa_key *rsa_key = &ctx->key;
-+	int ret;
-+
-+	/* Free the old RSA key if any */
-+	caam_rsa_free_key(rsa_key);
-+
-+	ret = rsa_parse_priv_key(raw_key, key, keylen);
-+	if (ret)
-+		return ret;
-+
-+	/* Copy key in DMA zone */
-+	rsa_key->d = kzalloc(raw_key->d_sz, GFP_DMA | GFP_KERNEL);
-+	if (!rsa_key->d)
-+		goto err;
-+
-+	rsa_key->e = kzalloc(raw_key->e_sz, GFP_DMA | GFP_KERNEL);
-+	if (!rsa_key->e)
-+		goto err;
-+
-+	rsa_key->n = kzalloc(raw_key->n_sz, GFP_DMA | GFP_KERNEL);
-+	if (!rsa_key->n)
-+		goto err;
-+
-+	rsa_key->d_sz = raw_key->d_sz;
-+	rsa_key->e_sz = raw_key->e_sz;
-+	rsa_key->n_sz = raw_key->n_sz;
-+	memcpy(rsa_key->d, raw_key->d, raw_key->d_sz);
-+	memcpy(rsa_key->e, raw_key->e, raw_key->e_sz);
-+	memcpy(rsa_key->n, raw_key->n, raw_key->n_sz);
-+
-+	return 0;
-+
-+err:
-+	caam_rsa_free_key(rsa_key);
-+	return -ENOMEM;
-+}
-+
-+static int caam_rsa_max_size(struct crypto_akcipher *tfm)
-+{
-+	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct caam_rsa_key *key = &ctx->key;
-+
-+	return (key->n) ? key->n_sz : -EINVAL;
-+}
-+
-+/* Per session pkc's driver context creation function */
-+static int caam_rsa_init_tfm(struct crypto_akcipher *tfm)
-+{
-+	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+
-+	ctx->dev = caam_jr_alloc();
-+
-+	if (IS_ERR(ctx->dev)) {
-+		dev_err(ctx->dev, "Job Ring Device allocation for transform failed\n");
-+		return PTR_ERR(ctx->dev);
-+	}
-+
-+	return 0;
-+}
-+
-+/* Per session pkc's driver context cleanup function */
-+static void caam_rsa_exit_tfm(struct crypto_akcipher *tfm)
-+{
-+	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct caam_rsa_key *key = &ctx->key;
-+
-+	caam_rsa_free_key(key);
-+	caam_jr_free(ctx->dev);
-+}
-+
-+static struct akcipher_alg caam_rsa = {
-+	.encrypt = caam_rsa_enc,
-+	.decrypt = caam_rsa_dec,
-+	.sign = caam_rsa_dec,
-+	.verify = caam_rsa_enc,
-+	.set_pub_key = caam_rsa_set_pub_key,
-+	.set_priv_key = caam_rsa_set_priv_key,
-+	.max_size = caam_rsa_max_size,
-+	.init = caam_rsa_init_tfm,
-+	.exit = caam_rsa_exit_tfm,
-+	.base = {
-+		.cra_name = "rsa",
-+		.cra_driver_name = "rsa-caam",
-+		.cra_priority = 3000,
-+		.cra_module = THIS_MODULE,
-+		.cra_ctxsize = sizeof(struct caam_rsa_ctx),
-+	},
-+};
-+
-+/* Public Key Cryptography module initialization handler */
-+static int __init caam_pkc_init(void)
-+{
-+	struct device_node *dev_node;
-+	struct platform_device *pdev;
-+	struct device *ctrldev;
-+	struct caam_drv_private *priv;
-+	u32 cha_inst, pk_inst;
-+	int err;
-+
-+	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
-+	if (!dev_node) {
-+		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
-+		if (!dev_node)
-+			return -ENODEV;
-+	}
-+
-+	pdev = of_find_device_by_node(dev_node);
-+	if (!pdev) {
-+		of_node_put(dev_node);
-+		return -ENODEV;
-+	}
-+
-+	ctrldev = &pdev->dev;
-+	priv = dev_get_drvdata(ctrldev);
-+	of_node_put(dev_node);
-+
-+	/*
-+	 * If priv is NULL, it's probably because the caam driver wasn't
-+	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
-+	 */
-+	if (!priv)
-+		return -ENODEV;
-+
-+	/* Determine public key hardware accelerator presence. */
-+	cha_inst = rd_reg32(&priv->ctrl->perfmon.cha_num_ls);
-+	pk_inst = (cha_inst & CHA_ID_LS_PK_MASK) >> CHA_ID_LS_PK_SHIFT;
-+
-+	/* Do not register algorithms if PKHA is not present. */
-+	if (!pk_inst)
-+		return -ENODEV;
-+
-+	err = crypto_register_akcipher(&caam_rsa);
-+	if (err)
-+		dev_warn(ctrldev, "%s alg registration failed\n",
-+			 caam_rsa.base.cra_driver_name);
-+	else
-+		dev_info(ctrldev, "caam pkc algorithms registered in /proc/crypto\n");
-+
-+	return err;
-+}
-+
-+static void __exit caam_pkc_exit(void)
-+{
-+	crypto_unregister_akcipher(&caam_rsa);
-+}
-+
-+module_init(caam_pkc_init);
-+module_exit(caam_pkc_exit);
-+
-+MODULE_LICENSE("Dual BSD/GPL");
-+MODULE_DESCRIPTION("FSL CAAM support for PKC functions of crypto API");
-+MODULE_AUTHOR("Freescale Semiconductor");
-diff --git a/drivers/crypto/caam/caampkc.h b/drivers/crypto/caam/caampkc.h
-new file mode 100644
-index 0000000..a9bed48
---- /dev/null
-+++ b/drivers/crypto/caam/caampkc.h
-@@ -0,0 +1,72 @@
-+/*
-+ * caam - Freescale FSL CAAM support for Public Key Cryptography descriptors
-+ *
-+ * Copyright 2016 Freescale Semiconductor, Inc.
-+ *
-+ * There is no Shared Descriptor for PKC so that the Job Descriptor must carry
-+ * all the desired key parameters, input and output pointers.
-+ */
-+
-+#ifndef _PKC_DESC_H_
-+#define _PKC_DESC_H_
-+#include "compat.h"
-+#include "pdb.h"
-+
-+/**
-+ * caam_rsa_key - CAAM RSA key structure. Keys are allocated in DMA zone.
-+ * @n           : RSA modulus raw byte stream
-+ * @e           : RSA public exponent raw byte stream
-+ * @d           : RSA private exponent raw byte stream
-+ * @n_sz        : length in bytes of RSA modulus n
-+ * @e_sz        : length in bytes of RSA public exponent
-+ * @d_sz        : length in bytes of RSA private exponent
-+ */
-+struct caam_rsa_key {
-+	u8 *n;
-+	u8 *e;
-+	u8 *d;
-+	size_t n_sz;
-+	size_t e_sz;
-+	size_t d_sz;
-+};
-+
-+/**
-+ * caam_rsa_ctx - per session context.
-+ * @raw_key     : raw RSA key parsed by the ASN.1 decoder
-+ * @key         : CAAM RSA key in DMA zone
-+ * @dev         : device structure
-+ */
-+struct caam_rsa_ctx {
-+	struct rsa_key raw_key;
-+	struct caam_rsa_key key;
-+	struct device *dev;
-+};
-+
-+/**
-+ * rsa_edesc - s/w-extended rsa descriptor
-+ * @src_nents     : number of segments in input scatterlist
-+ * @dst_nents     : number of segments in output scatterlist
-+ * @sec4_sg_bytes : length of h/w link table
-+ * @sec4_sg_dma   : dma address of h/w link table
-+ * @sec4_sg       : pointer to h/w link table
-+ * @pdb           : specific RSA Protocol Data Block (PDB)
-+ * @hw_desc       : descriptor followed by link tables if any
-+ */
-+struct rsa_edesc {
-+	int src_nents;
-+	int dst_nents;
-+	int sec4_sg_bytes;
-+	dma_addr_t sec4_sg_dma;
-+	struct sec4_sg_entry *sec4_sg;
-+	union {
-+		struct rsa_pub_pdb pub;
-+		struct rsa_priv_f1_pdb priv_f1;
-+	} pdb;
-+	u32 hw_desc[];
-+};
-+
-+/* Descriptor construction primitives. */
-+void init_rsa_pub_desc(u32 *desc, struct rsa_pub_pdb *pdb);
-+void init_rsa_priv_f1_desc(u32 *desc, struct rsa_priv_f1_pdb *pdb);
-+
-+#endif
-diff --git a/drivers/crypto/caam/compat.h b/drivers/crypto/caam/compat.h
-index b6955ec..7149cd2 100644
---- a/drivers/crypto/caam/compat.h
-+++ b/drivers/crypto/caam/compat.h
-@@ -35,8 +35,11 @@
- #include <crypto/md5.h>
- #include <crypto/internal/aead.h>
- #include <crypto/authenc.h>
-+#include <crypto/akcipher.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/internal/hash.h>
-+#include <crypto/internal/rsa.h>
-+#include <crypto/internal/akcipher.h>
- 
- #endif /* !defined(CAAM_COMPAT_H) */
-diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
-index 1e93c6a..7e5c027 100644
---- a/drivers/crypto/caam/desc.h
-+++ b/drivers/crypto/caam/desc.h
-@@ -454,6 +454,8 @@ struct sec4_sg_entry {
- #define OP_PCLID_PUBLICKEYPAIR	(0x14 << OP_PCLID_SHIFT)
- #define OP_PCLID_DSASIGN	(0x15 << OP_PCLID_SHIFT)
- #define OP_PCLID_DSAVERIFY	(0x16 << OP_PCLID_SHIFT)
-+#define OP_PCLID_RSAENC_PUBKEY  (0x18 << OP_PCLID_SHIFT)
-+#define OP_PCLID_RSADEC_PRVKEY  (0x19 << OP_PCLID_SHIFT)
- 
- /* Assuming OP_TYPE = OP_TYPE_DECAP_PROTOCOL/ENCAP_PROTOCOL */
- #define OP_PCLID_IPSEC		(0x01 << OP_PCLID_SHIFT)
-diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
-index 98d07de..3ff47b9 100644
---- a/drivers/crypto/caam/desc_constr.h
-+++ b/drivers/crypto/caam/desc_constr.h
-@@ -74,6 +74,13 @@ static inline void init_job_desc(u32 *desc, u32 options)
- 	init_desc(desc, CMD_DESC_HDR | options);
- }
- 
-+static inline void init_job_desc_pdb(u32 *desc, u32 options, size_t pdb_bytes)
-+{
-+	u32 pdb_len = (pdb_bytes + CAAM_CMD_SZ - 1) / CAAM_CMD_SZ;
-+
-+	init_job_desc(desc, (((pdb_len + 1) << HDR_START_IDX_SHIFT)) | options);
-+}
-+
- static inline void append_ptr(u32 *desc, dma_addr_t ptr)
- {
- 	dma_addr_t *offset = (dma_addr_t *)desc_end(desc);
-diff --git a/drivers/crypto/caam/pdb.h b/drivers/crypto/caam/pdb.h
-index 3a87c0c..d0a5db2 100644
---- a/drivers/crypto/caam/pdb.h
-+++ b/drivers/crypto/caam/pdb.h
-@@ -1,12 +1,13 @@
- /*
-  * CAAM Protocol Data Block (PDB) definition header file
-  *
-- * Copyright 2008-2012 Freescale Semiconductor, Inc.
-+ * Copyright 2008-2016 Freescale Semiconductor, Inc.
-  *
-  */
- 
- #ifndef CAAM_PDB_H
- #define CAAM_PDB_H
-+#include "compat.h"
- 
- /*
-  * PDB- IPSec ESP Header Modification Options
-@@ -399,4 +400,52 @@ struct dsa_verify_pdb {
- 	u8 *ab; /* only used if ECC processing */
- };
- 
-+/* RSA Protocol Data Block */
-+#define RSA_PDB_SGF_SHIFT       28
-+#define RSA_PDB_E_SHIFT         12
-+#define RSA_PDB_E_MASK          (0xFFF << RSA_PDB_E_SHIFT)
-+#define RSA_PDB_D_SHIFT         12
-+#define RSA_PDB_D_MASK          (0xFFF << RSA_PDB_D_SHIFT)
-+
-+#define RSA_PDB_SGF_F           (0x8 << RSA_PDB_SGF_SHIFT)
-+#define RSA_PDB_SGF_G           (0x4 << RSA_PDB_SGF_SHIFT)
-+#define RSA_PRIV_PDB_SGF_F      (0x4 << RSA_PDB_SGF_SHIFT)
-+#define RSA_PRIV_PDB_SGF_G      (0x8 << RSA_PDB_SGF_SHIFT)
-+
-+#define RSA_PRIV_KEY_FRM_1      0
-+
-+/**
-+ * RSA Encrypt Protocol Data Block
-+ * @sgf: scatter-gather field
-+ * @f_dma: dma address of input data
-+ * @g_dma: dma address of encrypted output data
-+ * @n_dma: dma address of RSA modulus
-+ * @e_dma: dma address of RSA public exponent
-+ * @f_len: length in octets of the input data
-+ */
-+struct rsa_pub_pdb {
-+	u32		sgf;
-+	dma_addr_t	f_dma;
-+	dma_addr_t	g_dma;
-+	dma_addr_t	n_dma;
-+	dma_addr_t	e_dma;
-+	u32		f_len;
-+} __packed;
-+
-+/**
-+ * RSA Decrypt PDB - Private Key Form #1
-+ * @sgf: scatter-gather field
-+ * @g_dma: dma address of encrypted input data
-+ * @f_dma: dma address of output data
-+ * @n_dma: dma address of RSA modulus
-+ * @d_dma: dma address of RSA private exponent
-+ */
-+struct rsa_priv_f1_pdb {
-+	u32		sgf;
-+	dma_addr_t	g_dma;
-+	dma_addr_t	f_dma;
-+	dma_addr_t	n_dma;
-+	dma_addr_t	d_dma;
-+} __packed;
-+
- #endif
-diff --git a/drivers/crypto/caam/pkc_desc.c b/drivers/crypto/caam/pkc_desc.c
-new file mode 100644
-index 0000000..4e4183e
---- /dev/null
-+++ b/drivers/crypto/caam/pkc_desc.c
-@@ -0,0 +1,36 @@
-+/*
-+ * caam - Freescale FSL CAAM support for Public Key Cryptography descriptors
-+ *
-+ * Copyright 2016 Freescale Semiconductor, Inc.
-+ *
-+ * There is no Shared Descriptor for PKC so that the Job Descriptor must carry
-+ * all the desired key parameters, input and output pointers.
-+ */
-+#include "caampkc.h"
-+#include "desc_constr.h"
-+
-+/* Descriptor for RSA Public operation */
-+void init_rsa_pub_desc(u32 *desc, struct rsa_pub_pdb *pdb)
-+{
-+	init_job_desc_pdb(desc, 0, sizeof(*pdb));
-+	append_cmd(desc, pdb->sgf);
-+	append_ptr(desc, pdb->f_dma);
-+	append_ptr(desc, pdb->g_dma);
-+	append_ptr(desc, pdb->n_dma);
-+	append_ptr(desc, pdb->e_dma);
-+	append_cmd(desc, pdb->f_len);
-+	append_operation(desc, OP_TYPE_UNI_PROTOCOL | OP_PCLID_RSAENC_PUBKEY);
-+}
-+
-+/* Descriptor for RSA Private operation - Private Key Form #1 */
-+void init_rsa_priv_f1_desc(u32 *desc, struct rsa_priv_f1_pdb *pdb)
-+{
-+	init_job_desc_pdb(desc, 0, sizeof(*pdb));
-+	append_cmd(desc, pdb->sgf);
-+	append_ptr(desc, pdb->g_dma);
-+	append_ptr(desc, pdb->f_dma);
-+	append_ptr(desc, pdb->n_dma);
-+	append_ptr(desc, pdb->d_dma);
-+	append_operation(desc, OP_TYPE_UNI_PROTOCOL | OP_PCLID_RSADEC_PRVKEY |
-+			 RSA_PRIV_KEY_FRM_1);
-+}
--- 
-1.8.3.1
+As you do this operation 3 times, isn't an inline better here?
+
+> 
+> -	if (!key->n)
+> -		return -ENOMEM;
+> +	/* invalid key provided */
+> +	if (!ptr)
+> +		return -EINVAL;
+
+Hm, you check the pointer here, but you dereference it already above. So, I 
+guess you want to move that check to the beginning of the function?
+> 
+>  	/* In FIPS mode only allow key size 2K & 3K */
+> -	if (fips_enabled && (mpi_get_size(key->n) != 256 &&
+> -			     mpi_get_size(key->n) != 384)) {
+> +	if (fips_enabled && (vlen != 256 && vlen != 384)) {
+>  		pr_err("RSA: key size not allowed in FIPS mode\n");
+> -		mpi_free(key->n);
+> -		key->n = NULL;
+>  		return -EINVAL;
+>  	}
+> +	/* invalid key size provided */
+> +	ret = rsa_check_key_length(vlen << 3);
+> +	if (ret)
+> +		return ret;
+> +
+> +	key->n = ptr;
+> +	key->n_sz = vlen;
+> +
+>  	return 0;
+>  }
+> 
+> @@ -43,11 +69,19 @@ int rsa_get_e(void *context, size_t hdrlen, unsigned
+> char tag, const void *value, size_t vlen)
+>  {
+>  	struct rsa_key *key = context;
+> +	const u8 *ptr = value;
+> +
+> +	while (!*ptr && vlen) {
+> +		ptr++;
+> +		vlen--;
+> +	}
+
+No NULL check for ptr? Is it always guaranteed that there is no NULL 
+considering that this may be exposed to user space?
+> 
+> -	key->e = mpi_read_raw_data(value, vlen);
+> +	/* invalid key provided */
+> +	if (!ptr || !key->n_sz || !vlen || vlen > key->n_sz)
+> +		return -EINVAL;
+
+Ah, here we have that check -- again, I would assume it should move up.
+> 
+> -	if (!key->e)
+> -		return -ENOMEM;
+> +	key->e = ptr;
+> +	key->e_sz = vlen;
+> 
+>  	return 0;
+>  }
+> @@ -56,47 +90,33 @@ int rsa_get_d(void *context, size_t hdrlen, unsigned
+> char tag, const void *value, size_t vlen)
+>  {
+>  	struct rsa_key *key = context;
+> +	const u8 *ptr = value;
+> 
+> -	key->d = mpi_read_raw_data(value, vlen);
+> +	while (!*ptr && vlen) {
+> +		ptr++;
+> +		vlen--;
+> +	}
+
+Same here.
+> 
+> -	if (!key->d)
+> -		return -ENOMEM;
+> +	/* invalid key provided */
+> +	if (!ptr || !key->n_sz || !vlen || vlen > key->n_sz)
+> +		return -EINVAL;
+> 
+>  	/* In FIPS mode only allow key size 2K & 3K */
+> -	if (fips_enabled && (mpi_get_size(key->d) != 256 &&
+> -			     mpi_get_size(key->d) != 384)) {
+> +	if (fips_enabled && (vlen != 256 && vlen != 384)) {
+>  		pr_err("RSA: key size not allowed in FIPS mode\n");
+> -		mpi_free(key->d);
+> -		key->d = NULL;
+>  		return -EINVAL;
+>  	}
+> -	return 0;
+> -}
+> 
+> -static void free_mpis(struct rsa_key *key)
+> -{
+> -	mpi_free(key->n);
+> -	mpi_free(key->e);
+> -	mpi_free(key->d);
+> -	key->n = NULL;
+> -	key->e = NULL;
+> -	key->d = NULL;
+> -}
+> +	key->d = ptr;
+> +	key->d_sz = vlen;
+> 
+> -/**
+> - * rsa_free_key() - frees rsa key allocated by rsa_parse_key()
+> - *
+> - * @rsa_key:	struct rsa_key key representation
+> - */
+> -void rsa_free_key(struct rsa_key *key)
+> -{
+> -	free_mpis(key);
+> +	return 0;
+>  }
+> -EXPORT_SYMBOL_GPL(rsa_free_key);
+> 
+>  /**
+> - * rsa_parse_pub_key() - extracts an rsa public key from BER encoded buffer
+> - *			 and stores it in the provided struct rsa_key
+> + * rsa_parse_pub_key() - decodes the BER encoded buffer and stores in the
+> + *                       provided struct rsa_key, pointers to the raw key
+> as is, + *                       so that the caller can copy it or MPI
+> parse it, etc. *
+>   * @rsa_key:	struct rsa_key key representation
+>   * @key:	key in BER format
+> @@ -107,23 +127,15 @@ EXPORT_SYMBOL_GPL(rsa_free_key);
+>  int rsa_parse_pub_key(struct rsa_key *rsa_key, const void *key,
+>  		      unsigned int key_len)
+>  {
+> -	int ret;
+> -
+> -	free_mpis(rsa_key);
+> -	ret = asn1_ber_decoder(&rsapubkey_decoder, rsa_key, key, key_len);
+> -	if (ret < 0)
+> -		goto error;
+> -
+> -	return 0;
+> -error:
+> -	free_mpis(rsa_key);
+> -	return ret;
+> +	return asn1_ber_decoder(&rsapubkey_decoder, rsa_key, key, key_len);
+>  }
+>  EXPORT_SYMBOL_GPL(rsa_parse_pub_key);
+> 
+>  /**
+> - * rsa_parse_pub_key() - extracts an rsa private key from BER encoded
+> buffer - *			 and stores it in the provided struct rsa_key
+> + * rsa_parse_priv_key() - decodes the BER encoded buffer and stores in the
+> + *                        provided struct rsa_key, pointers to the raw key
+> + *                        as is, so that the caller can copy it or MPI
+> parse it, + *                        etc.
+>   *
+>   * @rsa_key:	struct rsa_key key representation
+>   * @key:	key in BER format
+> @@ -134,16 +146,6 @@ EXPORT_SYMBOL_GPL(rsa_parse_pub_key);
+>  int rsa_parse_priv_key(struct rsa_key *rsa_key, const void *key,
+>  		       unsigned int key_len)
+>  {
+> -	int ret;
+> -
+> -	free_mpis(rsa_key);
+> -	ret = asn1_ber_decoder(&rsaprivkey_decoder, rsa_key, key, key_len);
+> -	if (ret < 0)
+> -		goto error;
+> -
+> -	return 0;
+> -error:
+> -	free_mpis(rsa_key);
+> -	return ret;
+> +	return asn1_ber_decoder(&rsaprivkey_decoder, rsa_key, key, key_len);
+>  }
+>  EXPORT_SYMBOL_GPL(rsa_parse_priv_key);
+> diff --git a/include/crypto/internal/rsa.h b/include/crypto/internal/rsa.h
+> index c7585bd..d6c042a 100644
+> --- a/include/crypto/internal/rsa.h
+> +++ b/include/crypto/internal/rsa.h
+> @@ -12,12 +12,24 @@
+>   */
+>  #ifndef _RSA_HELPER_
+>  #define _RSA_HELPER_
+> -#include <linux/mpi.h>
+> +#include <linux/types.h>
+> 
+> +/**
+> + * rsa_key - RSA key structure
+> + * @n           : RSA modulus raw byte stream
+> + * @e           : RSA public exponent raw byte stream
+> + * @d           : RSA private exponent raw byte stream
+> + * @n_sz        : length in bytes of RSA modulus n
+> + * @e_sz        : length in bytes of RSA public exponent
+> + * @d_sz        : length in bytes of RSA private exponent
+> + */
+>  struct rsa_key {
+> -	MPI n;
+> -	MPI e;
+> -	MPI d;
+> +	const u8 *n;
+> +	const u8 *e;
+> +	const u8 *d;
+> +	size_t n_sz;
+> +	size_t e_sz;
+> +	size_t d_sz;
+>  };
+> 
+>  int rsa_parse_pub_key(struct rsa_key *rsa_key, const void *key,
+> @@ -26,7 +38,5 @@ int rsa_parse_pub_key(struct rsa_key *rsa_key, const void
+> *key, int rsa_parse_priv_key(struct rsa_key *rsa_key, const void *key,
+>  		       unsigned int key_len);
+> 
+> -void rsa_free_key(struct rsa_key *rsa_key);
+> -
+>  extern struct crypto_template rsa_pkcs1pad_tmpl;
+>  #endif
+
+
+Ciao
+Stephan
