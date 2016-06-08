@@ -1,148 +1,38 @@
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [PATCH v6 3/6] crypto: AF_ALG -- add asymmetric cipher
- interface
-Date: Tue, 7 Jun 2016 17:28:07 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1606071719170.9891@mjmartin-mac01.local>
-References: <20160515041645.15888.94903.stgit@tstruk-mobl1> <20160515041701.15888.53830.stgit@tstruk-mobl1>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH 0/2] hwrng: chaoskey - Add support for Araneus Alea I USB
+ RNG
+Date: Wed, 8 Jun 2016 08:49:55 +0800
+Message-ID: <20160608004954.GA11545@gondor.apana.org.au>
+References: <1464952388-2405-1-git-send-email-bob.ham@collabora.com>
+ <20160607105345.GE520@gondor.apana.org.au>
+ <20160607220311.GB4744@kroah.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>, dhowells@redhat.com,
-	herbert@gondor.apana.org.au, linux-api@vger.kernel.org,
-	marcel@holtmann.org, linux-kernel@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dwmw2@infradead.org, davem@davemloft.net
-To: smueller@chronox.de
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:42015 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752826AbcFHA2K (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Jun 2016 20:28:10 -0400
-In-Reply-To: <20160515041701.15888.53830.stgit@tstruk-mobl1>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Bob Ham <bob.ham-ZGY8ohtN/8qB+jHODAdFcQ@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Keith Packard <keithp-aN4HjG94KOLQT0dZR+AlfA@public.gmane.org>,
+	Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+	Clemens Ladisch <clemens-P6GI/4k7KOmELgA04lAiVw@public.gmane.org>
+To: Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>
+Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20160607220311.GB4744-U8xfFu+wG4EAvxtiuMwx3w@public.gmane.org>
+Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-
-Stephan,
-
-On Sat, 14 May 2016, Tadeusz Struk wrote:
-
-> From: Stephan Mueller <smueller@chronox.de>
+On Tue, Jun 07, 2016 at 03:03:11PM -0700, Greg KH wrote:
 >
-> This patch adds the user space interface for asymmetric ciphers. The
-> interface allows the use of sendmsg as well as vmsplice to provide data.
->
-> This version has been rebased on top of 4.6 and a few chackpatch issues
-> have been fixed.
->
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
-> ---
-> diff --git a/crypto/algif_akcipher.c b/crypto/algif_akcipher.c
-> new file mode 100644
-> index 0000000..6342b6e
-> --- /dev/null
-> +++ b/crypto/algif_akcipher.c
-> +
-> +static int akcipher_recvmsg(struct socket *sock, struct msghdr *msg,
-> +			    size_t ignored, int flags)
-> +{
-> +	struct sock *sk = sock->sk;
-> +	struct alg_sock *ask = alg_sk(sk);
-> +	struct akcipher_ctx *ctx = ask->private;
-> +	struct akcipher_sg_list *sgl = &ctx->tsgl;
-> +	unsigned int i = 0;
-> +	int err;
-> +	unsigned long used = 0;
-> +	size_t usedpages = 0;
-> +	unsigned int cnt = 0;
-> +
-> +	/* Limit number of IOV blocks to be accessed below */
-> +	if (msg->msg_iter.nr_segs > ALG_MAX_PAGES)
-> +		return -ENOMSG;
-> +
-> +	lock_sock(sk);
-> +
-> +	if (ctx->more) {
-> +		err = akcipher_wait_for_data(sk, flags);
-> +		if (err)
-> +			goto unlock;
-> +	}
-> +
-> +	used = ctx->used;
-> +
-> +	/* convert iovecs of output buffers into scatterlists */
-> +	while (iov_iter_count(&msg->msg_iter)) {
-> +		/* make one iovec available as scatterlist */
-> +		err = af_alg_make_sg(&ctx->rsgl[cnt], &msg->msg_iter,
-> +				     iov_iter_count(&msg->msg_iter));
-> +		if (err < 0)
-> +			goto unlock;
-> +		usedpages += err;
-> +		/* chain the new scatterlist with previous one */
-> +		if (cnt)
-> +			af_alg_link_sg(&ctx->rsgl[cnt - 1], &ctx->rsgl[cnt]);
-> +
-> +		iov_iter_advance(&msg->msg_iter, err);
-> +		cnt++;
-> +	}
-> +
-> +	/* ensure output buffer is sufficiently large */
-> +	if (usedpages < akcipher_calcsize(ctx)) {
-> +		err = -EMSGSIZE;
-> +		goto unlock;
-> +	}
+> Ok, but usually drivers/usb/misc/ patches go through my tree :)
 
-Why is the size of the output buffer enforced here instead of depending on 
-the algorithm implementation?
+Sorry.  But I do wonder whether this driver should be moved as
+it is just an hwrng device like every other driver under hw_random,
+except for the fact that it happens to be a USB physical device.
 
-Thanks,
-
-Mat
-
-
-> +	sg_mark_end(sgl->sg + sgl->cur - 1);
-> +
-> +	akcipher_request_set_crypt(&ctx->req, sgl->sg, ctx->rsgl[0].sg, used,
-> +				   usedpages);
-> +	switch (ctx->op) {
-> +	case ALG_OP_VERIFY:
-> +		err = crypto_akcipher_verify(&ctx->req);
-> +		break;
-> +	case ALG_OP_SIGN:
-> +		err = crypto_akcipher_sign(&ctx->req);
-> +		break;
-> +	case ALG_OP_ENCRYPT:
-> +		err = crypto_akcipher_encrypt(&ctx->req);
-> +		break;
-> +	case ALG_OP_DECRYPT:
-> +		err = crypto_akcipher_decrypt(&ctx->req);
-> +		break;
-> +	default:
-> +		err = -EFAULT;
-> +		goto unlock;
-> +	}
-> +
-> +	err = af_alg_wait_for_completion(err, &ctx->completion);
-> +
-> +	if (err) {
-> +		/* EBADMSG implies a valid cipher operation took place */
-> +		if (err == -EBADMSG)
-> +			akcipher_put_sgl(sk);
-> +		goto unlock;
-> +	}
-> +
-> +	akcipher_put_sgl(sk);
-> +
-> +unlock:
-> +	for (i = 0; i < cnt; i++)
-> +		af_alg_free_sg(&ctx->rsgl[i]);
-> +
-> +	akcipher_wmem_wakeup(sk);
-> +	release_sock(sk);
-> +
-> +	return err ? err : ctx->req.dst_len;
-> +}
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 --
-Mat Martineau
-Intel OTC
+To unsubscribe from this list: send the line "unsubscribe linux-usb" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
