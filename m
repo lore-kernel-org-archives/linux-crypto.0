@@ -1,57 +1,86 @@
-From: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
-Subject: RE: [PATCH v3] crypto: rsa - return raw integers for the ASN.1 parser
-Date: Wed, 8 Jun 2016 10:20:16 +0000
-Message-ID: <AMSPR04MB536483CBE33C06138511C79B85E0@AMSPR04MB536.eurprd04.prod.outlook.com>
-References: <1465309269-2214-1-git-send-email-tudor-dan.ambarus@nxp.com>
- <4389374.qHp8yZtTYB@tauon.atsec.com>
+From: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Subject: Re: [PATCH v5 1/3] crypto: Key-agreement Protocol Primitives API
+ (KPP)
+Date: Wed, 8 Jun 2016 12:45:47 +0100
+Message-ID: <20160608114547.GA26661@sbenedet-virtual-machine>
+References: <1462830041-7582-1-git-send-email-salvatore.benedetto@intel.com>
+ <1462830041-7582-2-git-send-email-salvatore.benedetto@intel.com>
+ <20160531064210.GA13948@gondor.apana.org.au>
+ <309B30E91F5E2846B79BD9AA9711D031930814@IRSMSX102.ger.corp.intel.com>
+ <20160608025451.GB12283@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-am1on0092.outbound.protection.outlook.com ([157.56.112.92]:54112
-	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753574AbcFHKxQ convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Jun 2016 06:53:16 -0400
-In-Reply-To: <4389374.qHp8yZtTYB@tauon.atsec.com>
-Content-Language: en-US
+Received: from mga01.intel.com ([192.55.52.88]:17097 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753651AbcFHMPk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 Jun 2016 08:15:40 -0400
+Content-Disposition: inline
+In-Reply-To: <20160608025451.GB12283@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Stephan,
-
-> >  int rsa_get_n(void *context, size_t hdrlen, unsigned char tag,
-> >  	      const void *value, size_t vlen)
-> >  {
-> >  	struct rsa_key *key = context;
-> > +	const u8 *ptr = value;
-> > +	int ret;
+On Wed, Jun 08, 2016 at 10:54:51AM +0800, Herbert Xu wrote:
+> On Thu, Jun 02, 2016 at 12:06:48PM +0000, Benedetto, Salvatore wrote:
 > >
-> > -	key->n = mpi_read_raw_data(value, vlen);
-> > +	while (!*ptr && vlen) {
-> > +		ptr++;
-> > +		vlen--;
-> > +	}
+> > Off the top of my head, with ECDH when the user gets a EGAIN, he wants
+> > to reset the secret key only, not the params.
 > 
-> As you do this operation 3 times, isn't an inline better here?
+> I don't see any performance benefit in changing one and not the
+> other.  Besides, you could always check the params in the algo
+> and only update if necessary.
+>
 
-Actually this operation makes sense only for n to determine its length.
-I will remove the while from rsa_get_e/d. 
+I'm OK with merging set_params and set_key and allow the user to
+pass either both, or only the key in which case params previously
+set are reused, although I don't see any particular benefit with this.
 
+> > > >  * generate_public_key() - It generates the public key to be sent to
+> > > >    the other counterpart involved in the key-agreement session. The
+> > > >    function has to be called after set_params() and set_secret()
+> > > >  * generate_secret() - It generates the shared secret for the session
+> > > 
+> > > Ditto, we only need one operation and that is multiplication by the secret.
+> > 
+> > Sorry, but I don't understand your point.
+> > We do always need one math operation with different params.
 > 
-> >
-> > -	if (!key->n)
-> > -		return -ENOMEM;
-> > +	/* invalid key provided */
-> > +	if (!ptr)
-> > +		return -EINVAL;
+> Look at your actual implementations of DH and ECDH, they are the
+> same except for the multiplicand, which is fixed to G for the
+> public key.
 > 
-> Hm, you check the pointer here, but you dereference it already above. So, I
-> guess you want to move that check to the beginning of the function?
+> Now you could argue that having to reparse G every time could be
+> bad for performance, but that's easily fixed by making the case
+> of a zero-length input value an implicit request to use G.
+> 
+> Even better, just drop G from the params and you won't need to
+> reparse it or do anything special.
+> 
+> The point of all this is to make the lives of future driver authors
+> simpler, the less they have to do the less that could go wrong.
 
-Sure. Thank you for reviewing!
-ta
+I really would like to keep the interface as it is because it's
+very clear what each function does. I'm OK with remapping both
+function to the same one, and if src is zero, g/G will be used.
+
+Keep in mind that while for DH g is always provided by the user,
+for ECDH G is a public value which we already have and I don't see
+why the user should pass that.
+
+Having said that, are you OK with as far as the interface goes
+to only merge set_param and set_key, and keeping the rest as it is?
+For the implementation of DH and ECDH I'll merge the two operations
+functions into one as you suggested. If so, I'll send a new version.
+
+Thanks for your inputs.
+
+Regards,
+Salvatore
+
+> Cheers,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
