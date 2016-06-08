@@ -1,97 +1,195 @@
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v6 0/8] crypto: asynchronous compression api
-Date: Wed,  8 Jun 2016 09:16:50 +0100
-Message-ID: <1465373818-29720-1-git-send-email-giovanni.cabiddu@intel.com>
+Subject: [PATCH v6 5/8] crypto: acomp - add support for lz4hc via scomp
+Date: Wed,  8 Jun 2016 09:16:55 +0100
+Message-ID: <1465373818-29720-6-git-send-email-giovanni.cabiddu@intel.com>
+References: <1465373818-29720-1-git-send-email-giovanni.cabiddu@intel.com>
 Cc: linux-crypto@vger.kernel.org,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:2660 "EHLO mga03.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:53789 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756018AbcFHIRF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Jun 2016 04:17:05 -0400
+	id S1756055AbcFHIRM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 Jun 2016 04:17:12 -0400
+In-Reply-To: <1465373818-29720-1-git-send-email-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The following patch set introduces acomp, a generic asynchronous
-(de)compression api with support for SG lists.
-We propose a new crypto type called crypto_acomp_type, a new struct acomp_alg
-and struct crypto_acomp, together with number of helper functions to register
-acomp type algorithms and allocate tfm instances.
-This interface will allow the following operations:
+This patch implements an scomp backend for the lz4hc compression algorithm.
+This way, lz4hc is exposed through the acomp api.
 
-    int (*compress)(struct acomp_req *req);
-    int (*decompress)(struct acomp_req *req);
-
-Together with acomp we propose a new driver-side interface, scomp, which
-handles compression implementations which use linear buffers. We converted all
-compression algorithms available in LKCF to use this interface so that those
-algorithms will be accessible through the acomp api.
-
-Changes in v6:
-    - changed acomp_request_alloc prototype by removing gfp parameter,
-      acomp_request_alloc will always use GFP_KERNEL
-
-Changes in v5:
-    - removed qdecompress api, no longer needed
-    - removed produced and consumed counters in acomp_req
-    - added crypto_has_acomp function 
-
-Changes in v4:
-    - added qdecompress api, a front-end for decompression algorithms which
-      do not need additional vmalloc work space
-
-Changes in v3:
-    - added driver-side scomp interface
-    - provided support for lzo, lz4, lz4hc, 842, deflate compression algorithms
-      via the acomp api (through scomp)
-    - extended testmgr to support acomp
-    - removed extended acomp api for supporting deflate algorithm parameters
-      (will be enhanced and re-proposed in future)
-Note that (2) to (7) are a rework of Joonsoo Kim's scomp patches.
-
-Changes in v2:
-    - added compression and decompression request sizes in acomp_alg
-      in order to enable noctx support
-    - extended api with helpers to allocate compression and
-      decompression requests
-
-Changes from initial submit:
-    - added consumed and produced fields to acomp_req
-    - extended api to support configuration of deflate compressors
-
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
-Giovanni Cabiddu (8):
-  crypto: add asynchronous compression api
-  crypto: add driver-side scomp interface
-  crypto: acomp - add support for lzo via scomp
-  crypto: acomp - add support for lz4 via scomp
-  crypto: acomp - add support for lz4hc via scomp
-  crypto: acomp - add support for 842 via scomp
-  crypto: acomp - add support for deflate via scomp
-  crypto: acomp - update testmgr with support for acomp
+ crypto/Kconfig |    1 +
+ crypto/lz4hc.c |   92 +++++++++++++++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 83 insertions(+), 10 deletions(-)
 
- crypto/842.c                        |   82 +++++++++++-
- crypto/Kconfig                      |   15 ++
- crypto/Makefile                     |    3 +
- crypto/acompress.c                  |  163 ++++++++++++++++++++++
- crypto/crypto_user.c                |   21 +++
- crypto/deflate.c                    |  111 ++++++++++++++--
- crypto/lz4.c                        |   91 +++++++++++--
- crypto/lz4hc.c                      |   92 +++++++++++--
- crypto/lzo.c                        |   97 +++++++++++--
- crypto/scompress.c                  |  252 ++++++++++++++++++++++++++++++++++
- crypto/testmgr.c                    |  158 ++++++++++++++++++++--
- include/crypto/acompress.h          |  253 +++++++++++++++++++++++++++++++++++
- include/crypto/internal/acompress.h |   81 +++++++++++
- include/crypto/internal/scompress.h |  134 ++++++++++++++++++
- include/linux/crypto.h              |    3 +
- 15 files changed, 1495 insertions(+), 61 deletions(-)
- create mode 100644 crypto/acompress.c
- create mode 100644 crypto/scompress.c
- create mode 100644 include/crypto/acompress.h
- create mode 100644 include/crypto/internal/acompress.h
- create mode 100644 include/crypto/internal/scompress.h
-
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 114d43b..59570da 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1539,6 +1539,7 @@ config CRYPTO_LZ4
+ config CRYPTO_LZ4HC
+ 	tristate "LZ4HC compression algorithm"
+ 	select CRYPTO_ALGAPI
++	select CRYPTO_ACOMP2
+ 	select LZ4HC_COMPRESS
+ 	select LZ4_DECOMPRESS
+ 	help
+diff --git a/crypto/lz4hc.c b/crypto/lz4hc.c
+index a1d3b5b..75ffc4a 100644
+--- a/crypto/lz4hc.c
++++ b/crypto/lz4hc.c
+@@ -22,37 +22,53 @@
+ #include <linux/crypto.h>
+ #include <linux/vmalloc.h>
+ #include <linux/lz4.h>
++#include <crypto/internal/scompress.h>
+ 
+ struct lz4hc_ctx {
+ 	void *lz4hc_comp_mem;
+ };
+ 
++static void *lz4hc_alloc_ctx(struct crypto_scomp *tfm)
++{
++	void *ctx;
++
++	ctx = vmalloc(LZ4HC_MEM_COMPRESS);
++	if (!ctx)
++		return ERR_PTR(-ENOMEM);
++
++	return ctx;
++}
++
+ static int lz4hc_init(struct crypto_tfm *tfm)
+ {
+ 	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	ctx->lz4hc_comp_mem = vmalloc(LZ4HC_MEM_COMPRESS);
+-	if (!ctx->lz4hc_comp_mem)
++	ctx->lz4hc_comp_mem = lz4hc_alloc_ctx(NULL);
++	if (IS_ERR(ctx->lz4hc_comp_mem))
+ 		return -ENOMEM;
+ 
+ 	return 0;
+ }
+ 
++static void lz4hc_free_ctx(struct crypto_scomp *tfm, void *ctx)
++{
++	vfree(ctx);
++}
++
+ static void lz4hc_exit(struct crypto_tfm *tfm)
+ {
+ 	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	vfree(ctx->lz4hc_comp_mem);
++	lz4hc_free_ctx(NULL, ctx->lz4hc_comp_mem);
+ }
+ 
+-static int lz4hc_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+-			    unsigned int slen, u8 *dst, unsigned int *dlen)
++static int __lz4hc_compress_crypto(const u8 *src, unsigned int slen,
++				   u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	size_t tmp_len = *dlen;
+ 	int err;
+ 
+-	err = lz4hc_compress(src, slen, dst, &tmp_len, ctx->lz4hc_comp_mem);
++	err = lz4hc_compress(src, slen, dst, &tmp_len, ctx);
+ 
+ 	if (err < 0)
+ 		return -EINVAL;
+@@ -61,8 +77,25 @@ static int lz4hc_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ 	return 0;
+ }
+ 
+-static int lz4hc_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
+-			      unsigned int slen, u8 *dst, unsigned int *dlen)
++static int lz4hc_scompress(struct crypto_scomp *tfm, const u8 *src,
++			   unsigned int slen, u8 *dst, unsigned int *dlen,
++			   void *ctx)
++{
++	return __lz4hc_compress_crypto(src, slen, dst, dlen, ctx);
++}
++
++static int lz4hc_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
++				 unsigned int slen, u8 *dst,
++				 unsigned int *dlen)
++{
++	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	return __lz4hc_compress_crypto(src, slen, dst, dlen,
++					ctx->lz4hc_comp_mem);
++}
++
++static int __lz4hc_decompress_crypto(const u8 *src, unsigned int slen,
++				     u8 *dst, unsigned int *dlen, void *ctx)
+ {
+ 	int err;
+ 	size_t tmp_len = *dlen;
+@@ -76,6 +109,20 @@ static int lz4hc_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ 	return err;
+ }
+ 
++static int lz4hc_sdecompress(struct crypto_scomp *tfm, const u8 *src,
++			     unsigned int slen, u8 *dst, unsigned int *dlen,
++			     void *ctx)
++{
++	return __lz4hc_decompress_crypto(src, slen, dst, dlen, NULL);
++}
++
++static int lz4hc_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
++				   unsigned int slen, u8 *dst,
++				   unsigned int *dlen)
++{
++	return __lz4hc_decompress_crypto(src, slen, dst, dlen, NULL);
++}
++
+ static struct crypto_alg alg_lz4hc = {
+ 	.cra_name		= "lz4hc",
+ 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
+@@ -89,14 +136,39 @@ static struct crypto_alg alg_lz4hc = {
+ 	.coa_decompress		= lz4hc_decompress_crypto } }
+ };
+ 
++static struct scomp_alg scomp = {
++	.alloc_ctx		= lz4hc_alloc_ctx,
++	.free_ctx		= lz4hc_free_ctx,
++	.compress		= lz4hc_scompress,
++	.decompress		= lz4hc_sdecompress,
++	.base			= {
++		.cra_name	= "lz4hc",
++		.cra_driver_name = "lz4hc-scomp",
++		.cra_module	 = THIS_MODULE,
++	}
++};
++
+ static int __init lz4hc_mod_init(void)
+ {
+-	return crypto_register_alg(&alg_lz4hc);
++	int ret;
++
++	ret = crypto_register_alg(&alg_lz4hc);
++	if (ret)
++		return ret;
++
++	ret = crypto_register_scomp(&scomp);
++	if (ret) {
++		crypto_unregister_alg(&alg_lz4hc);
++		return ret;
++	}
++
++	return ret;
+ }
+ 
+ static void __exit lz4hc_mod_fini(void)
+ {
+ 	crypto_unregister_alg(&alg_lz4hc);
++	crypto_unregister_scomp(&scomp);
+ }
+ 
+ module_init(lz4hc_mod_init);
 -- 
 1.7.4.1
