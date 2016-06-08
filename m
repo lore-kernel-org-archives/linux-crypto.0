@@ -1,46 +1,57 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [RFC] DRBG: which shall be default?
-Date: Wed, 08 Jun 2016 11:32:03 +0200
-Message-ID: <2061639.Fd5tNFoguQ@positron.chronox.de>
-References: <1664837.3VbqQRUZed@positron.chronox.de> <2066130.uIxle5Vnoa@tauon.atsec.com> <20160608091500.GA14329@gondor.apana.org.au>
+From: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
+Subject: RE: [PATCH v3] crypto: rsa - return raw integers for the ASN.1 parser
+Date: Wed, 8 Jun 2016 10:20:16 +0000
+Message-ID: <AMSPR04MB536483CBE33C06138511C79B85E0@AMSPR04MB536.eurprd04.prod.outlook.com>
+References: <1465309269-2214-1-git-send-email-tudor-dan.ambarus@nxp.com>
+ <4389374.qHp8yZtTYB@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-To: tadeusz.struk@intel.com
+Content-Transfer-Encoding: 8BIT
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:36064 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1423822AbcFHJcH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Jun 2016 05:32:07 -0400
-In-Reply-To: <20160608091500.GA14329@gondor.apana.org.au>
+Received: from mail-am1on0092.outbound.protection.outlook.com ([157.56.112.92]:54112
+	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753574AbcFHKxQ convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 Jun 2016 06:53:16 -0400
+In-Reply-To: <4389374.qHp8yZtTYB@tauon.atsec.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 8. Juni 2016, 17:15:00 schrieb Herbert Xu:
+Hi Stephan,
 
-Hi Herbert, Tadeusz,
-
-> On Wed, Jun 08, 2016 at 11:07:42AM +0200, Stephan Mueller wrote:
-> > No, it does not:
-> > 
-> > #ifdef CONFIG_X86_64
+> >  int rsa_get_n(void *context, size_t hdrlen, unsigned char tag,
+> >  	      const void *value, size_t vlen)
+> >  {
+> >  	struct rsa_key *key = context;
+> > +	const u8 *ptr = value;
+> > +	int ret;
+> >
+> > -	key->n = mpi_read_raw_data(value, vlen);
+> > +	while (!*ptr && vlen) {
+> > +		ptr++;
+> > +		vlen--;
+> > +	}
 > 
-> Well there is no fundamental reason why we can't do it on 32-bit.
-> Even if we just did the counter increment in C this would still
-> beat ctr(aes-aesni) by many orders of magnitude.
+> As you do this operation 3 times, isn't an inline better here?
 
-I would think that the performance boost on 64 bit should warrant an official 
-patch set.
+Actually this operation makes sense only for n to determine its length.
+I will remove the while from rsa_get_e/d. 
+
 > 
-> So if you really care about the performance on x86-32 then perhaps
-> you should send a patch to implement ctr-aes-aesni for it.
+> >
+> > -	if (!key->n)
+> > -		return -ENOMEM;
+> > +	/* invalid key provided */
+> > +	if (!ptr)
+> > +		return -EINVAL;
+> 
+> Hm, you check the pointer here, but you dereference it already above. So, I
+> guess you want to move that check to the beginning of the function?
 
-Maybe Intel can shed some light on this:
-
-Tadeusz, can you please help me understand why the ctr-aes-aesni is only 
-defined for 64 bit?
-
-Thanks
-Stephan
+Sure. Thank you for reviewing!
+ta
