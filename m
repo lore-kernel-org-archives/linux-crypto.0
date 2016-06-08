@@ -1,67 +1,54 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v6 3/6] crypto: AF_ALG -- add asymmetric cipher interface
-Date: Wed, 08 Jun 2016 07:31:14 +0200
-Message-ID: <6401187.24v903AfyY@tauon.atsec.com>
-References: <20160515041645.15888.94903.stgit@tstruk-mobl1> <20160515041701.15888.53830.stgit@tstruk-mobl1> <alpine.OSX.2.20.1606071719170.9891@mjmartin-mac01.local>
+Subject: Re: [RFC] DRBG: which shall be default?
+Date: Wed, 08 Jun 2016 09:56:42 +0200
+Message-ID: <7330387.0ZS018HYJD@positron.chronox.de>
+References: <1664837.3VbqQRUZed@positron.chronox.de> <1580741.tpUX5Z7OKy@tauon.atsec.com> <20160608024140.GA12283@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>, dhowells@redhat.com,
-	herbert@gondor.apana.org.au, linux-api@vger.kernel.org,
-	marcel@holtmann.org, linux-kernel@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dwmw2@infradead.org, davem@davemloft.net
-To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:36036 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:36048 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1161600AbcFHFbT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Jun 2016 01:31:19 -0400
-In-Reply-To: <alpine.OSX.2.20.1606071719170.9891@mjmartin-mac01.local>
+	id S932526AbcFHH4p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 Jun 2016 03:56:45 -0400
+In-Reply-To: <20160608024140.GA12283@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 7. Juni 2016, 17:28:07 schrieb Mat Martineau:
+Am Mittwoch, 8. Juni 2016, 10:41:40 schrieb Herbert Xu:
 
-Hi Mat,
+Hi Herbert,
 
-> > +	used = ctx->used;
-> > +
-> > +	/* convert iovecs of output buffers into scatterlists */
-> > +	while (iov_iter_count(&msg->msg_iter)) {
-> > +		/* make one iovec available as scatterlist */
-> > +		err = af_alg_make_sg(&ctx->rsgl[cnt], &msg->msg_iter,
-> > +				     iov_iter_count(&msg->msg_iter));
-> > +		if (err < 0)
-> > +			goto unlock;
-> > +		usedpages += err;
-> > +		/* chain the new scatterlist with previous one */
-> > +		if (cnt)
-> > +			af_alg_link_sg(&ctx->rsgl[cnt - 1], &ctx->rsgl[cnt]);
-> > +
-> > +		iov_iter_advance(&msg->msg_iter, err);
-> > +		cnt++;
-> > +	}
-> > +
-> > +	/* ensure output buffer is sufficiently large */
-> > +	if (usedpages < akcipher_calcsize(ctx)) {
-> > +		err = -EMSGSIZE;
-> > +		goto unlock;
-> > +	}
+> On Thu, Jun 02, 2016 at 02:06:55PM +0200, Stephan Mueller wrote:
+> > I am working on it. During the analysis, I saw, however, that the DRBG
+> > increments the counter before the encryption whereas the the CTR mode
+> > increments it after the encryption.
+> > 
+> > I could of course adjust the handling in the code, but this would be a
+> > real
+> > hack IMHO.
 > 
-> Why is the size of the output buffer enforced here instead of depending on
-> the algorithm implementation?
+> Changing the order of increment is equivalent to changing the IV, no?
 
-akcipher_calcsize calls crypto_akcipher_maxsize to get the maximum size the 
-algorithm generates as output during its operation.
+I finally got it working. All I needed to do is to add a crypto_inc(V) after a 
+recalculation of V.
 
-The code ensures that the caller provided at least that amount of memory for 
-the kernel to store its data in. This check therefore is present to ensure the 
-kernel does not overstep memory boundaries in user space.
+The performance with ctr-aes-aesni on 64 bit is as follows -- I used my LRNG 
+implementation for testing for which I already have performance measurements:
 
-What is your concern?
+- generating smaller lengths (I tested up to 128 bytes) of random numbers 
+(which is the vast majority of random numbers to be generated), the 
+performance is even worse by 10 to 15%
 
-Thanks
+- generating larger lengths (tested with 4096 bytes) of random numbers, the 
+performance increases by 3%
+
+Using ctr(aes-aesni) on 32 bit, the numbers are generally worse by 5 to 10%.
+
+So, with these numbers, I would conclude that switching to the CTR mode is not 
+worthwhile.
 
 Ciao
 Stephan
