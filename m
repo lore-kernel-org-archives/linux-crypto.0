@@ -1,55 +1,103 @@
-From: Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH] crypto: ux500: memmove the right size
-Date: Wed,  8 Jun 2016 14:56:39 +0200
-Message-ID: <1465390599-20605-1-git-send-email-linus.walleij@linaro.org>
-Cc: David Binderman <linuxdev.baldrick@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Joakim Bech <joakim.bech@linaro.org>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lf0-f45.google.com ([209.85.215.45]:35142 "EHLO
-	mail-lf0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161222AbcFHM5A (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Jun 2016 08:57:00 -0400
-Received: by mail-lf0-f45.google.com with SMTP id u74so5172181lff.2
-        for <linux-crypto@vger.kernel.org>; Wed, 08 Jun 2016 05:56:59 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Anatoly Pugachev <matorola@gmail.com>
+Subject: [sparc] niagara2 cpu, opcodes not available message?
+Date: Wed, 8 Jun 2016 20:30:40 +0300
+Message-ID: <CADxRZqwr9=9ZsrFR_8iC+f1Z=hSPi7Saj3uxB2=YmH42sVf6pQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: debian-sparc <debian-sparc@lists.debian.org>,
+	linux-crypto@vger.kernel.org
+To: sparclinux@vger.kernel.org
+Return-path: <sparclinux-owner@vger.kernel.org>
+Sender: sparclinux-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The hash buffer is really HASH_BLOCK_SIZE bytes, someone
-must have thought that memmove takes n*u32 words by mistake.
-Tests work as good/bad as before after this patch.
+Hello!
 
-Cc: Joakim Bech <joakim.bech@linaro.org>
-Reported-by: David Binderman <linuxdev.baldrick@gmail.com>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/crypto/ux500/hash/hash_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Can someone please tell, why do we get a bunch of the following
+messages on niagara2 cpu hardware (SPARC Enterprise T5120, T5220,
+T5140, and T5240 servers)
 
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 574e87c7f2b8..9acccad26928 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -781,7 +781,7 @@ static int hash_process_data(struct hash_device_data *device_data,
- 						&device_data->state);
- 				memmove(req_ctx->state.buffer,
- 					device_data->state.buffer,
--					HASH_BLOCK_SIZE / sizeof(u32));
-+					HASH_BLOCK_SIZE);
- 				if (ret) {
- 					dev_err(device_data->dev,
- 						"%s: hash_resume_state() failed!\n",
-@@ -832,7 +832,7 @@ static int hash_process_data(struct hash_device_data *device_data,
- 
- 			memmove(device_data->state.buffer,
- 				req_ctx->state.buffer,
--				HASH_BLOCK_SIZE / sizeof(u32));
-+				HASH_BLOCK_SIZE);
- 			if (ret) {
- 				dev_err(device_data->dev, "%s: hash_save_state() failed!\n",
- 					__func__);
--- 
-2.4.11
+Asking, because I see the following lines on kernel boot (removing
+first field boot time stamp in cut):
+
+mator@nvg5120:~/linux-sparc-boot-logs/t5120$ grep opcode
+dmesg-4.7.0-rc2+.log  | cut -f2- -d' ' | sort | uniq -c
+      4 aes_sparc64: sparc64 aes opcodes not available.
+      7 camellia_sparc64: sparc64 camellia opcodes not available.
+     37 crc32c_sparc64: sparc64 crc32c opcode not available.
+      5 des_sparc64: sparc64 des opcodes not available.
+      4 md5_sparc64: sparc64 md5 opcode not available.
+      1 sha1_sparc64: sparc64 sha1 opcode not available.
+      2 sha256_sparc64: sparc64 sha256 opcode not available.
+      3 sha512_sparc64: sparc64 sha512 opcode not available.
+
+But linux kernel sources ( linux-2.6/arch/sparc/kernel/setup_64.c )
+define crypto_hwcaps only for CPUs with the following capabilities:
+
+static const char *crypto_hwcaps[] = {
+        "aes", "des", "kasumi", "camellia", "md5", "sha1", "sha256",
+        "sha512", "mpmul", "montmul", "montsqr", "crc32c",
+};
+
+and we don't have them in niagara2 cpu CAPS:
+
+mator@nvg5120:~/linux-sparc-boot-logs/t5120$ grep CAPS dmesg-4.7.0-rc2+.log
+[    0.000000] CPU CAPS: [flush,stbar,swap,muldiv,v9,blkinit,n2,mul32]
+[    0.000000] CPU CAPS: [div32,v8plus,popc,vis,vis2,ASIBlkInit]
+
+mator@nvg5120:~/linux-sparc-boot-logs/t5120$ egrep '^cpu|pmu' /proc/cpuinfo
+cpu             : UltraSparc T2 (Niagara2)
+pmu             : niagara2
+cpucaps         :
+flush,stbar,swap,muldiv,v9,blkinit,n2,mul32,div32,v8plus,popc,vis,vis2,ASIBlkInit
+
+
+compare, for example, with sparc CPU which support crypto (T5 cpu,
+landau is machine name):
+
+mator@landau:~$ grep CAPS dmesg-4.6.1.txt
+[    0.000000] CPU CAPS: [flush,stbar,swap,muldiv,v9,blkinit,n2,mul32]
+[    0.000000] CPU CAPS: [div32,v8plus,popc,vis,vis2,ASIBlkInit,fmaf,vis3]
+[    0.000000] CPU CAPS: [hpc,ima,pause,cbcond,aes,des,kasumi,camellia]
+[    0.000000] CPU CAPS: [md5,sha1,sha256,sha512,mpmul,montmul,montsqr,crc32c]
+
+mator@landau:~$ egrep '^cpu|pmu' /proc/cpuinfo
+cpu             : UltraSparc T5 (Niagara5)
+pmu             : niagara5
+cpucaps         :
+flush,stbar,swap,muldiv,v9,blkinit,n2,mul32,div32,v8plus,popc,vis,vis2,ASIBlkInit,fmaf,vis3,hpc,ima,pause,cbcond,aes,des,kasumi,camellia,md5,sha1,sha256,sha512,mpmul,montmul,montsqr,crc32c
+
+mator@landau:~$ grep opcode dmesg-4.6.1.txt
+[8537574.887049] aes_sparc64: Using sparc64 aes opcodes optimized AES
+implementation
+[8537574.887611] crc32c_sparc64: Using sparc64 crc32c opcode optimized
+CRC32C implementation
+[8537576.577455] sha1_sparc64: Using sparc64 sha1 opcode optimized
+SHA-1 implementation
+[8537576.578928] sha256_sparc64: Using sparc64 sha256 opcode optimized
+SHA-256/SHA-224 implementation
+[8537576.580908] sha512_sparc64: Using sparc64 sha512 opcode optimized
+SHA-512/SHA-384 implementation
+[8537576.582964] md5_sparc64: Using sparc64 md5 opcode optimized MD5
+implementation
+[8537576.596984] des_sparc64: Using sparc64 des opcodes optimized DES
+implementation
+[8537576.600503] camellia_sparc64: Using sparc64 camellia opcodes
+optimized CAMELLIA implementation
+
+
+I don't understand why niagara2 cpu getting HWCAP_SPARC_CRYPTO flag if
+it does not support it.
+Can we probably remove this functionality/messages from niagara2 cpus,
+if it does not support it anyway?
+
+mator@nvg5120:~$ lsmod | grep -c sparc64
+0
+
+mator@landau:~$ lsmod | grep -c sparc64
+9
+
+
+
+
+Thanks.
