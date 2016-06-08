@@ -1,7 +1,7 @@
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v6 7/8] crypto: acomp - add support for deflate via scomp
-Date: Wed,  8 Jun 2016 09:16:57 +0100
-Message-ID: <1465373818-29720-8-git-send-email-giovanni.cabiddu@intel.com>
+Subject: [PATCH v6 6/8] crypto: acomp - add support for 842 via scomp
+Date: Wed,  8 Jun 2016 09:16:56 +0100
+Message-ID: <1465373818-29720-7-git-send-email-giovanni.cabiddu@intel.com>
 References: <1465373818-29720-1-git-send-email-giovanni.cabiddu@intel.com>
 Cc: linux-crypto@vger.kernel.org,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
@@ -9,186 +9,126 @@ To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from mga09.intel.com ([134.134.136.24]:44212 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756151AbcFHIRN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Jun 2016 04:17:13 -0400
+	id S1756062AbcFHIRM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 Jun 2016 04:17:12 -0400
 In-Reply-To: <1465373818-29720-1-git-send-email-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch implements an scomp backend for the deflate compression
-algorithm. This way, deflate is exposed through the acomp api.
+This patch implements an scomp backend for the 842 compression algorithm.
+This way, 842 is exposed through the acomp api.
 
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- crypto/Kconfig   |    1 +
- crypto/deflate.c |  111 +++++++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 102 insertions(+), 10 deletions(-)
+ crypto/842.c   |   82 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ crypto/Kconfig |    1 +
+ 2 files changed, 80 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 09c88ba..b617c5d 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1502,6 +1502,7 @@ comment "Compression"
- config CRYPTO_DEFLATE
- 	tristate "Deflate compression algorithm"
- 	select CRYPTO_ALGAPI
-+	select CRYPTO_ACOMP2
- 	select ZLIB_INFLATE
- 	select ZLIB_DEFLATE
- 	help
-diff --git a/crypto/deflate.c b/crypto/deflate.c
-index 95d8d37..f942cb3 100644
---- a/crypto/deflate.c
-+++ b/crypto/deflate.c
-@@ -32,6 +32,7 @@
- #include <linux/interrupt.h>
- #include <linux/mm.h>
- #include <linux/net.h>
+diff --git a/crypto/842.c b/crypto/842.c
+index 98e387e..a954ed3 100644
+--- a/crypto/842.c
++++ b/crypto/842.c
+@@ -31,11 +31,46 @@
+ #include <linux/module.h>
+ #include <linux/crypto.h>
+ #include <linux/sw842.h>
 +#include <crypto/internal/scompress.h>
  
- #define DEFLATE_DEF_LEVEL		Z_DEFAULT_COMPRESSION
- #define DEFLATE_DEF_WINBITS		11
-@@ -101,9 +102,8 @@ static void deflate_decomp_exit(struct deflate_ctx *ctx)
- 	vfree(ctx->decomp_stream.workspace);
- }
+ struct crypto842_ctx {
+-	char wmem[SW842_MEM_COMPRESS];	/* working memory for compress */
++	void *wmem;	/* working memory for compress */
+ };
  
--static int deflate_init(struct crypto_tfm *tfm)
-+static int __deflate_init(void *ctx)
- {
--	struct deflate_ctx *ctx = crypto_tfm_ctx(tfm);
- 	int ret;
- 
- 	ret = deflate_comp_init(ctx);
-@@ -116,19 +116,55 @@ out:
- 	return ret;
- }
- 
--static void deflate_exit(struct crypto_tfm *tfm)
-+static void *deflate_alloc_ctx(struct crypto_scomp *tfm)
++static void *crypto842_alloc_ctx(struct crypto_scomp *tfm)
 +{
-+	struct deflate_ctx *ctx;
-+	int ret;
++	void *ctx;
 +
-+	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
++	ctx = kmalloc(SW842_MEM_COMPRESS, GFP_KERNEL);
 +	if (!ctx)
 +		return ERR_PTR(-ENOMEM);
-+
-+	ret = __deflate_init(ctx);
-+	if (ret) {
-+		kfree(ctx);
-+		return ERR_PTR(ret);
-+	}
 +
 +	return ctx;
 +}
 +
-+static int deflate_init(struct crypto_tfm *tfm)
- {
- 	struct deflate_ctx *ctx = crypto_tfm_ctx(tfm);
- 
-+	return __deflate_init(ctx);
++static int crypto842_init(struct crypto_tfm *tfm)
++{
++	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	ctx->wmem = crypto842_alloc_ctx(NULL);
++	if (IS_ERR(ctx->wmem))
++		return -ENOMEM;
++
++	return 0;
 +}
 +
-+static void __deflate_exit(void *ctx)
++static void crypto842_free_ctx(struct crypto_scomp *tfm, void *ctx)
 +{
- 	deflate_comp_exit(ctx);
- 	deflate_decomp_exit(ctx);
++	kfree(ctx);
++}
++
++static void crypto842_exit(struct crypto_tfm *tfm)
++{
++	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	crypto842_free_ctx(NULL, ctx->wmem);
++}
++
+ static int crypto842_compress(struct crypto_tfm *tfm,
+ 			      const u8 *src, unsigned int slen,
+ 			      u8 *dst, unsigned int *dlen)
+@@ -45,6 +80,13 @@ static int crypto842_compress(struct crypto_tfm *tfm,
+ 	return sw842_compress(src, slen, dst, dlen, ctx->wmem);
  }
  
--static int deflate_compress(struct crypto_tfm *tfm, const u8 *src,
--			    unsigned int slen, u8 *dst, unsigned int *dlen)
-+static void deflate_free_ctx(struct crypto_scomp *tfm, void *ctx)
++static int crypto842_scompress(struct crypto_scomp *tfm,
++			       const u8 *src, unsigned int slen,
++			       u8 *dst, unsigned int *dlen, void *ctx)
 +{
-+	__deflate_exit(ctx);
-+	kzfree(ctx);
++	return sw842_compress(src, slen, dst, dlen, ctx);
 +}
 +
-+static void deflate_exit(struct crypto_tfm *tfm)
-+{
-+	struct deflate_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	__deflate_exit(ctx);
-+}
-+
-+static int __deflate_compress(const u8 *src, unsigned int slen,
-+			      u8 *dst, unsigned int *dlen, void *ctx)
- {
- 	int ret = 0;
--	struct deflate_ctx *dctx = crypto_tfm_ctx(tfm);
-+	struct deflate_ctx *dctx = ctx;
- 	struct z_stream_s *stream = &dctx->comp_stream;
- 
- 	ret = zlib_deflateReset(stream);
-@@ -153,12 +189,27 @@ out:
- 	return ret;
+ static int crypto842_decompress(struct crypto_tfm *tfm,
+ 				const u8 *src, unsigned int slen,
+ 				u8 *dst, unsigned int *dlen)
+@@ -52,27 +94,61 @@ static int crypto842_decompress(struct crypto_tfm *tfm,
+ 	return sw842_decompress(src, slen, dst, dlen);
  }
  
--static int deflate_decompress(struct crypto_tfm *tfm, const u8 *src,
--			      unsigned int slen, u8 *dst, unsigned int *dlen)
-+static int deflate_compress(struct crypto_tfm *tfm, const u8 *src,
-+			    unsigned int slen, u8 *dst, unsigned int *dlen)
++static int crypto842_sdecompress(struct crypto_scomp *tfm,
++				 const u8 *src, unsigned int slen,
++				 u8 *dst, unsigned int *dlen, void *ctx)
 +{
-+	struct deflate_ctx *dctx = crypto_tfm_ctx(tfm);
-+
-+	return __deflate_compress(src, slen, dst, dlen, dctx);
-+}
-+
-+static int deflate_scompress(struct crypto_scomp *tfm, const u8 *src,
-+			     unsigned int slen, u8 *dst, unsigned int *dlen,
-+			     void *ctx)
-+{
-+	return __deflate_compress(src, slen, dst, dlen, ctx);
-+}
-+
-+static int __deflate_decompress(const u8 *src, unsigned int slen,
-+				u8 *dst, unsigned int *dlen, void *ctx)
- {
- 
- 	int ret = 0;
--	struct deflate_ctx *dctx = crypto_tfm_ctx(tfm);
-+	struct deflate_ctx *dctx = ctx;
- 	struct z_stream_s *stream = &dctx->decomp_stream;
- 
- 	ret = zlib_inflateReset(stream);
-@@ -194,6 +245,21 @@ out:
- 	return ret;
- }
- 
-+static int deflate_decompress(struct crypto_tfm *tfm, const u8 *src,
-+			      unsigned int slen, u8 *dst, unsigned int *dlen)
-+{
-+	struct deflate_ctx *dctx = crypto_tfm_ctx(tfm);
-+
-+	return __deflate_decompress(src, slen, dst, dlen, dctx);
-+}
-+
-+static int deflate_sdecompress(struct crypto_scomp *tfm, const u8 *src,
-+			       unsigned int slen, u8 *dst, unsigned int *dlen,
-+			       void *ctx)
-+{
-+	return __deflate_decompress(src, slen, dst, dlen, ctx);
++	return sw842_decompress(src, slen, dst, dlen);
 +}
 +
  static struct crypto_alg alg = {
- 	.cra_name		= "deflate",
+ 	.cra_name		= "842",
+ 	.cra_driver_name	= "842-generic",
+ 	.cra_priority		= 100,
  	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
-@@ -206,14 +272,39 @@ static struct crypto_alg alg = {
- 	.coa_decompress  	= deflate_decompress } }
+-	.cra_ctxsize		= sizeof(struct crypto842_ctx),
+ 	.cra_module		= THIS_MODULE,
++	.cra_init		= crypto842_init,
++	.cra_exit		= crypto842_exit,
+ 	.cra_u			= { .compress = {
+ 	.coa_compress		= crypto842_compress,
+ 	.coa_decompress		= crypto842_decompress } }
  };
  
 +static struct scomp_alg scomp = {
-+	.alloc_ctx		= deflate_alloc_ctx,
-+	.free_ctx		= deflate_free_ctx,
-+	.compress		= deflate_scompress,
-+	.decompress		= deflate_sdecompress,
++	.alloc_ctx		= crypto842_alloc_ctx,
++	.free_ctx		= crypto842_free_ctx,
++	.compress		= crypto842_scompress,
++	.decompress		= crypto842_sdecompress,
 +	.base			= {
-+		.cra_name	= "deflate",
-+		.cra_driver_name = "deflate-scomp",
++		.cra_name	= "842",
++		.cra_driver_name = "842-scomp",
++		.cra_priority	 = 100,
 +		.cra_module	 = THIS_MODULE,
 +	}
 +};
 +
- static int __init deflate_mod_init(void)
+ static int __init crypto842_mod_init(void)
  {
 -	return crypto_register_alg(&alg);
 +	int ret;
@@ -205,13 +145,26 @@ index 95d8d37..f942cb3 100644
 +
 +	return ret;
  }
+ module_init(crypto842_mod_init);
  
- static void __exit deflate_mod_fini(void)
+ static void __exit crypto842_mod_exit(void)
  {
  	crypto_unregister_alg(&alg);
 +	crypto_unregister_scomp(&scomp);
  }
+ module_exit(crypto842_mod_exit);
  
- module_init(deflate_mod_init);
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 59570da..09c88ba 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1522,6 +1522,7 @@ config CRYPTO_LZO
+ config CRYPTO_842
+ 	tristate "842 compression algorithm"
+ 	select CRYPTO_ALGAPI
++	select CRYPTO_ACOMP2
+ 	select 842_COMPRESS
+ 	select 842_DECOMPRESS
+ 	help
 -- 
 1.7.4.1
