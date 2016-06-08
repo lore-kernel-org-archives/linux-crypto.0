@@ -1,43 +1,62 @@
-From: Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>
-Subject: Re: [PATCH 0/2] hwrng: chaoskey - Add support for Araneus Alea I USB
- RNG
-Date: Tue, 7 Jun 2016 18:34:10 -0700
-Message-ID: <20160608013410.GA22850@kroah.com>
-References: <1464952388-2405-1-git-send-email-bob.ham@collabora.com>
- <20160607105345.GE520@gondor.apana.org.au>
- <20160607220311.GB4744@kroah.com>
- <20160608004954.GA11545@gondor.apana.org.au>
+From: Baolin Wang <baolin.wang@linaro.org>
+Subject: Re: [RFC v4 2/4] crypto: Introduce CRYPTO_ALG_BULK flag
+Date: Wed, 8 Jun 2016 10:00:56 +0800
+Message-ID: <CAMz4kuLsAyo7pO3VhCV9QdyHJ8njc6dfvORf55Nc_JTDVR-inQ@mail.gmail.com>
+References: <cover.1465301616.git.baolin.wang@linaro.org> <238ce3d506051c863300b90720c3e103175747cc.1465301616.git.baolin.wang@linaro.org>
+ <20160607141613.GA2237@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Bob Ham <bob.ham-ZGY8ohtN/8qB+jHODAdFcQ@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Keith Packard <keithp-aN4HjG94KOLQT0dZR+AlfA@public.gmane.org>,
-	Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-	Clemens Ladisch <clemens-P6GI/4k7KOmELgA04lAiVw@public.gmane.org>
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20160608004954.GA11545-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Cc: Jens Axboe <axboe@kernel.dk>, Alasdair G Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	"open list:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>,
+	David Miller <davem@davemloft.net>,
+	Eric Biggers <ebiggers3@gmail.com>,
+	Joonsoo Kim <js1304@gmail.com>, tadeusz.struk@intel.com,
+	smueller@chronox.de, Masanari Iida <standby24x7@gmail.com>,
+	Shaohua Li <shli@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Sagi Grimberg <sagig@mellanox.com>,
+	Kent Overstreet <kent.overstreet@gmail.com>,
+	Keith Busch <keith.busch@intel.com>, Tejun Heo <tj@kernel.org>,
+	Ming Lei <ming.lei@canonical.com>,
+	Mark Brown <broonie@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+	"open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+	<linux-raid@vger.kernel.org>, LKML <linux-kernel@vger.ker
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-raid-owner@vger.kernel.org>
+In-Reply-To: <20160607141613.GA2237@gondor.apana.org.au>
+Sender: linux-raid-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jun 08, 2016 at 08:49:55AM +0800, Herbert Xu wrote:
-> On Tue, Jun 07, 2016 at 03:03:11PM -0700, Greg KH wrote:
-> >
-> > Ok, but usually drivers/usb/misc/ patches go through my tree :)
-> 
-> Sorry.  But I do wonder whether this driver should be moved as
-> it is just an hwrng device like every other driver under hw_random,
-> except for the fact that it happens to be a USB physical device.
+Hi Herbert,
 
-That's fine with me, but it uses the usb misc device major number,
-unlike other hw_random drivers, so that might get messy.
+On 7 June 2016 at 22:16, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Tue, Jun 07, 2016 at 08:17:05PM +0800, Baolin Wang wrote:
+>> Now some cipher hardware engines prefer to handle bulk block rather than one
+>> sector (512 bytes) created by dm-crypt, cause these cipher engines can handle
+>> the intermediate values (IV) by themselves in one bulk block. This means we
+>> can increase the size of the request by merging request rather than always 512
+>> bytes and thus increase the hardware engine processing speed.
+>>
+>> So introduce 'CRYPTO_ALG_BULK' flag to indicate this cipher can support bulk
+>> mode.
+>>
+>> Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
+>
+> Nack.  As I said before, please do it using explicit IV generators
+> like we do for IPsec.
 
-It's your call...
+OK. I would like to try your suggestion. Thanks.
 
-thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
-greg k-h
---
-To unsubscribe from this list: send the line "unsubscribe linux-usb" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+-- 
+Baolin.wang
+Best Regards
