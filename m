@@ -1,46 +1,203 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] DRBG: which shall be default?
-Date: Wed, 8 Jun 2016 16:00:55 +0800
-Message-ID: <20160608080055.GA13686@gondor.apana.org.au>
-References: <1664837.3VbqQRUZed@positron.chronox.de>
- <1580741.tpUX5Z7OKy@tauon.atsec.com>
- <20160608024140.GA12283@gondor.apana.org.au>
- <7330387.0ZS018HYJD@positron.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v6 3/8] crypto: acomp - add support for lzo via scomp
+Date: Wed,  8 Jun 2016 09:16:53 +0100
+Message-ID: <1465373818-29720-4-git-send-email-giovanni.cabiddu@intel.com>
+References: <1465373818-29720-1-git-send-email-giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:33717 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754999AbcFHIA7 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Jun 2016 04:00:59 -0400
-Content-Disposition: inline
-In-Reply-To: <7330387.0ZS018HYJD@positron.chronox.de>
+Received: from mga04.intel.com ([192.55.52.120]:10619 "EHLO mga04.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755921AbcFHIRF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 Jun 2016 04:17:05 -0400
+In-Reply-To: <1465373818-29720-1-git-send-email-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 08, 2016 at 09:56:42AM +0200, Stephan Mueller wrote:
->
-> The performance with ctr-aes-aesni on 64 bit is as follows -- I used my LRNG 
-> implementation for testing for which I already have performance measurements:
-> 
-> - generating smaller lengths (I tested up to 128 bytes) of random numbers 
-> (which is the vast majority of random numbers to be generated), the 
-> performance is even worse by 10 to 15%
-> 
-> - generating larger lengths (tested with 4096 bytes) of random numbers, the 
-> performance increases by 3%
-> 
-> Using ctr(aes-aesni) on 32 bit, the numbers are generally worse by 5 to 10%.
+This patch implements an scomp backend for the lzo compression algorithm.
+This way, lzo is exposed through the acomp api.
 
-ctr(aes-aesni) is not the same thing as ctr-aes-aesni, the former
-being just another way of doing what you were doing.  So did you
-actually test the real optimised version which is ctr-aes-aesni?
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ crypto/Kconfig |    1 +
+ crypto/lzo.c   |   97 +++++++++++++++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 83 insertions(+), 15 deletions(-)
 
-Thanks,
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 24fef55..08075c1 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1513,6 +1513,7 @@ config CRYPTO_DEFLATE
+ config CRYPTO_LZO
+ 	tristate "LZO compression algorithm"
+ 	select CRYPTO_ALGAPI
++	select CRYPTO_ACOMP2
+ 	select LZO_COMPRESS
+ 	select LZO_DECOMPRESS
+ 	help
+diff --git a/crypto/lzo.c b/crypto/lzo.c
+index c3f3dd9..168df78 100644
+--- a/crypto/lzo.c
++++ b/crypto/lzo.c
+@@ -22,40 +22,55 @@
+ #include <linux/vmalloc.h>
+ #include <linux/mm.h>
+ #include <linux/lzo.h>
++#include <crypto/internal/scompress.h>
+ 
+ struct lzo_ctx {
+ 	void *lzo_comp_mem;
+ };
+ 
++static void *lzo_alloc_ctx(struct crypto_scomp *tfm)
++{
++	void *ctx;
++
++	ctx = kmalloc(LZO1X_MEM_COMPRESS, GFP_KERNEL | __GFP_NOWARN);
++	if (!ctx)
++		ctx = vmalloc(LZO1X_MEM_COMPRESS);
++	if (!ctx)
++		return ERR_PTR(-ENOMEM);
++
++	return ctx;
++}
++
+ static int lzo_init(struct crypto_tfm *tfm)
+ {
+ 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	ctx->lzo_comp_mem = kmalloc(LZO1X_MEM_COMPRESS,
+-				    GFP_KERNEL | __GFP_NOWARN);
+-	if (!ctx->lzo_comp_mem)
+-		ctx->lzo_comp_mem = vmalloc(LZO1X_MEM_COMPRESS);
+-	if (!ctx->lzo_comp_mem)
++	ctx->lzo_comp_mem = lzo_alloc_ctx(NULL);
++	if (IS_ERR(ctx->lzo_comp_mem))
+ 		return -ENOMEM;
+ 
+ 	return 0;
+ }
+ 
++static void lzo_free_ctx(struct crypto_scomp *tfm, void *ctx)
++{
++	kvfree(ctx);
++}
++
+ static void lzo_exit(struct crypto_tfm *tfm)
+ {
+ 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	kvfree(ctx->lzo_comp_mem);
++	lzo_free_ctx(NULL, ctx->lzo_comp_mem);
+ }
+ 
+-static int lzo_compress(struct crypto_tfm *tfm, const u8 *src,
+-			    unsigned int slen, u8 *dst, unsigned int *dlen)
++static int __lzo_compress(const u8 *src, unsigned int slen,
++			  u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	size_t tmp_len = *dlen; /* size_t(ulong) <-> uint on 64 bit */
+ 	int err;
+ 
+-	err = lzo1x_1_compress(src, slen, dst, &tmp_len, ctx->lzo_comp_mem);
++	err = lzo1x_1_compress(src, slen, dst, &tmp_len, ctx);
+ 
+ 	if (err != LZO_E_OK)
+ 		return -EINVAL;
+@@ -64,8 +79,23 @@ static int lzo_compress(struct crypto_tfm *tfm, const u8 *src,
+ 	return 0;
+ }
+ 
+-static int lzo_decompress(struct crypto_tfm *tfm, const u8 *src,
+-			      unsigned int slen, u8 *dst, unsigned int *dlen)
++static int lzo_compress(struct crypto_tfm *tfm, const u8 *src,
++			unsigned int slen, u8 *dst, unsigned int *dlen)
++{
++	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	return __lzo_compress(src, slen, dst, dlen, ctx->lzo_comp_mem);
++}
++
++static int lzo_scompress(struct crypto_scomp *tfm, const u8 *src,
++			 unsigned int slen, u8 *dst, unsigned int *dlen,
++			 void *ctx)
++{
++	return __lzo_compress(src, slen, dst, dlen, ctx);
++}
++
++static int __lzo_decompress(const u8 *src, unsigned int slen,
++			    u8 *dst, unsigned int *dlen)
+ {
+ 	int err;
+ 	size_t tmp_len = *dlen; /* size_t(ulong) <-> uint on 64 bit */
+@@ -77,7 +107,19 @@ static int lzo_decompress(struct crypto_tfm *tfm, const u8 *src,
+ 
+ 	*dlen = tmp_len;
+ 	return 0;
++}
+ 
++static int lzo_decompress(struct crypto_tfm *tfm, const u8 *src,
++			  unsigned int slen, u8 *dst, unsigned int *dlen)
++{
++	return __lzo_decompress(src, slen, dst, dlen);
++}
++
++static int lzo_sdecompress(struct crypto_scomp *tfm, const u8 *src,
++			   unsigned int slen, u8 *dst, unsigned int *dlen,
++			   void *ctx)
++{
++	return __lzo_decompress(src, slen, dst, dlen);
+ }
+ 
+ static struct crypto_alg alg = {
+@@ -88,18 +130,43 @@ static struct crypto_alg alg = {
+ 	.cra_init		= lzo_init,
+ 	.cra_exit		= lzo_exit,
+ 	.cra_u			= { .compress = {
+-	.coa_compress 		= lzo_compress,
+-	.coa_decompress  	= lzo_decompress } }
++	.coa_compress		= lzo_compress,
++	.coa_decompress		= lzo_decompress } }
++};
++
++static struct scomp_alg scomp = {
++	.alloc_ctx		= lzo_alloc_ctx,
++	.free_ctx		= lzo_free_ctx,
++	.compress		= lzo_scompress,
++	.decompress		= lzo_sdecompress,
++	.base			= {
++		.cra_name	= "lzo",
++		.cra_driver_name = "lzo-scomp",
++		.cra_module	 = THIS_MODULE,
++	}
+ };
+ 
+ static int __init lzo_mod_init(void)
+ {
+-	return crypto_register_alg(&alg);
++	int ret;
++
++	ret = crypto_register_alg(&alg);
++	if (ret)
++		return ret;
++
++	ret = crypto_register_scomp(&scomp);
++	if (ret) {
++		crypto_unregister_alg(&alg);
++		return ret;
++	}
++
++	return ret;
+ }
+ 
+ static void __exit lzo_mod_fini(void)
+ {
+ 	crypto_unregister_alg(&alg);
++	crypto_unregister_scomp(&scomp);
+ }
+ 
+ module_init(lzo_mod_init);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.4.1
