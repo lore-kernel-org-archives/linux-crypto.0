@@ -1,41 +1,76 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [sparc] niagara2 cpu, opcodes not available message?
-Date: Wed, 08 Jun 2016 11:33:48 -0700 (PDT)
-Message-ID: <20160608.113348.1609018295943976971.davem@davemloft.net>
-References: <CADxRZqwr9=9ZsrFR_8iC+f1Z=hSPi7Saj3uxB2=YmH42sVf6pQ@mail.gmail.com>
+From: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Subject: Re: [PATCH v6 3/6] crypto: AF_ALG -- add asymmetric cipher
+ interface
+Date: Wed, 8 Jun 2016 12:14:49 -0700 (PDT)
+Message-ID: <alpine.OSX.2.20.1606081135160.16651@mjmartin-mac01.local>
+References: <20160515041645.15888.94903.stgit@tstruk-mobl1> <20160515041701.15888.53830.stgit@tstruk-mobl1> <alpine.OSX.2.20.1606071719170.9891@mjmartin-mac01.local> <6401187.24v903AfyY@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: sparclinux@vger.kernel.org, debian-sparc@lists.debian.org,
-	linux-crypto@vger.kernel.org
-To: matorola@gmail.com
-Return-path: <sparclinux-owner@vger.kernel.org>
-In-Reply-To: <CADxRZqwr9=9ZsrFR_8iC+f1Z=hSPi7Saj3uxB2=YmH42sVf6pQ@mail.gmail.com>
-Sender: sparclinux-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>, dhowells@redhat.com,
+	herbert@gondor.apana.org.au, linux-api@vger.kernel.org,
+	marcel@holtmann.org, linux-kernel@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dwmw2@infradead.org, davem@davemloft.net
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <6401187.24v903AfyY@tauon.atsec.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Anatoly Pugachev <matorola@gmail.com>
-Date: Wed, 8 Jun 2016 20:30:40 +0300
 
-> Can someone please tell, why do we get a bunch of the following
-> messages on niagara2 cpu hardware (SPARC Enterprise T5120, T5220,
-> T5140, and T5240 servers)
-> 
-> Asking, because I see the following lines on kernel boot (removing
-> first field boot time stamp in cut):
-> 
-> mator@nvg5120:~/linux-sparc-boot-logs/t5120$ grep opcode
-> dmesg-4.7.0-rc2+.log  | cut -f2- -d' ' | sort | uniq -c
->       4 aes_sparc64: sparc64 aes opcodes not available.
->       7 camellia_sparc64: sparc64 camellia opcodes not available.
->      37 crc32c_sparc64: sparc64 crc32c opcode not available.
->       5 des_sparc64: sparc64 des opcodes not available.
->       4 md5_sparc64: sparc64 md5 opcode not available.
->       1 sha1_sparc64: sparc64 sha1 opcode not available.
->       2 sha256_sparc64: sparc64 sha256 opcode not available.
->       3 sha512_sparc64: sparc64 sha512 opcode not available.
+On Wed, 8 Jun 2016, Stephan Mueller wrote:
 
-Because the drivers unconditionally try to load, check the CPU capabilites
-and emit the log message if the cpu caps aren't present.
+> Am Dienstag, 7. Juni 2016, 17:28:07 schrieb Mat Martineau:
+>
+> Hi Mat,
+>
+>>> +	used = ctx->used;
+>>> +
+>>> +	/* convert iovecs of output buffers into scatterlists */
+>>> +	while (iov_iter_count(&msg->msg_iter)) {
+>>> +		/* make one iovec available as scatterlist */
+>>> +		err = af_alg_make_sg(&ctx->rsgl[cnt], &msg->msg_iter,
+>>> +				     iov_iter_count(&msg->msg_iter));
+>>> +		if (err < 0)
+>>> +			goto unlock;
+>>> +		usedpages += err;
+>>> +		/* chain the new scatterlist with previous one */
+>>> +		if (cnt)
+>>> +			af_alg_link_sg(&ctx->rsgl[cnt - 1], &ctx->rsgl[cnt]);
+>>> +
+>>> +		iov_iter_advance(&msg->msg_iter, err);
+>>> +		cnt++;
+>>> +	}
+>>> +
+>>> +	/* ensure output buffer is sufficiently large */
+>>> +	if (usedpages < akcipher_calcsize(ctx)) {
+>>> +		err = -EMSGSIZE;
+>>> +		goto unlock;
+>>> +	}
+>>
+>> Why is the size of the output buffer enforced here instead of depending on
+>> the algorithm implementation?
+>
+> akcipher_calcsize calls crypto_akcipher_maxsize to get the maximum size the
+> algorithm generates as output during its operation.
+>
+> The code ensures that the caller provided at least that amount of memory for
+> the kernel to store its data in. This check therefore is present to ensure the
+> kernel does not overstep memory boundaries in user space.
 
-I don't see what the problem is, everying is working as designed.
+Yes, it's understood that the userspace buffer length must not be 
+exceeded. But dst_len is part of the akcipher_request struct, so why does 
+it need to be checked *here* when it is also checked later?
+
+> What is your concern?
+
+Userspace must allocate larger buffers than it knows are necessary for 
+expected results.
+
+It looks like the software rsa implementation handles shorter output 
+buffers ok (mpi_write_to_sgl will return EOVERFLOW if the the buffer is 
+too small), however I see at least one hardware rsa driver that requires 
+the output buffer to be the maximum size. But this inconsistency might be 
+best addressed within the software cipher or drivers rather than in 
+recvmsg.
