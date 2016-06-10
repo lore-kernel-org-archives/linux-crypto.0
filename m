@@ -1,71 +1,43 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH v6 3/6] crypto: AF_ALG -- add asymmetric cipher interface
-Date: Fri, 10 Jun 2016 07:42:00 -0700
-Message-ID: <dbcb97e0-35c0-7e6e-9351-d90a0d945bab@intel.com>
-References: <20160515041645.15888.94903.stgit@tstruk-mobl1>
- <1499283.NSekfIF0FQ@tauon.atsec.com>
- <alpine.OSX.2.20.1606091126420.21471@mjmartin-mac01.local>
- <3072103.TY3EQcF1Bz@tauon.atsec.com>
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH v3 1/1] crypto: engine: permit to enqueue ashash_request
+Date: Fri, 10 Jun 2016 16:43:09 +0200
+Message-ID: <20160610144309.GA25816@Red>
+References: <1464873212-15426-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1464873212-15426-2-git-send-email-clabbe.montjoie@gmail.com>
+ <20160607103139.GA325@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: dhowells@redhat.com, herbert@gondor.apana.org.au,
-	linux-api@vger.kernel.org, marcel@holtmann.org,
-	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, dwmw2@infradead.org,
-	davem@davemloft.net
-To: Stephan Mueller <smueller@chronox.de>,
-	Mat Martineau <mathew.j.martineau@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, baolin.wang@linaro.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <3072103.TY3EQcF1Bz@tauon.atsec.com>
+Content-Disposition: inline
+In-Reply-To: <20160607103139.GA325@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 06/09/2016 11:36 AM, Stephan Mueller wrote:
-> Am Donnerstag, 9. Juni 2016, 11:27:13 schrieb Mat Martineau:
+On Tue, Jun 07, 2016 at 06:31:39PM +0800, Herbert Xu wrote:
+> On Thu, Jun 02, 2016 at 03:13:32PM +0200, LABBE Corentin wrote:
+> >
+> >  static int omap_aes_prepare_req(struct crypto_engine *engine,
+> > -				struct ablkcipher_request *req)
+> > +				struct crypto_async_request *areq)
+> >  {
+> > +	struct ablkcipher_request *req = ablkcipher_request_cast(areq);
 > 
-> Hi Mat, Tadeusz,
+> You're still doing casting in the driver.
 > 
->> On Thu, 9 Jun 2016, Stephan Mueller wrote:
->>> Am Donnerstag, 9. Juni 2016, 11:18:04 schrieb Mat Martineau:
->>>
->>> Hi Mat,
->>>
->>>>> Or is your concern that the user space interface restricts things too
->>>>> much
->>>>> and thus prevents a valid use case?
->>>>
->>>> The latter - my primary concern is the constraint this places on
->>>> userspace
->>>> by forcing larger buffer sizes than might be necessary for the operation.
->>>> struct akcipher_request has separate members for src_len and dst_len, and
->>>> dst_len is documented as needing "to be at least as big as the expected
->>>> result depending on the operation". Not the maximum result, the expected
->>>> result. It's also documented that the cipher will generate an error if
->>>> dst_len is insufficient and update the value with the required size.
->>>>
->>>> I'm updating some userspace TLS code that worked with an earlier,
->>>> unmerged
->>>> patch set for AF_ALG akcipher (from last year). The read calls with
->>>> shorter buffers were the main porting problem.
->>>
->>> I see -- are you proposing to drop that check entirely?
->>
->> Yes.
+> I want this to be moved into the crypto engine API.  There should
+> be separate function pointers for each request type.
 > 
-> Ok, after checking the code again, I think that dropping that sanity check 
-> should be ok given that this length is part of the akcipher API.
-> 
-> Tadeusz, as you are currently managing that patch set, would you re-spin it 
-> with the following check removed?
-> 
-> +     if (usedpages < akcipher_calcsize(ctx)) {
-> +             err = -EMSGSIZE;
-> +             goto unlock;
-> +     }
-> 
+> Thanks,
+> -- 
 
-Ok, I'll update the patch.
-Thanks,
--- 
-TS
+So I need to split do_one_request to cipher_one_request/hash_one_request.
+Same with prepare_request to prepare_hash_request/prepare_cipher_request.
+With the choice of each function done in crypto_engine.c.
+
+Since this modification need to add <crypto/hash.h> to algapi.h, I think it is necessary to move all crypto engine stuff to crypto/engine.h
+Do you agree ?
+
+Regards
