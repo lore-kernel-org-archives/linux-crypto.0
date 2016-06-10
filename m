@@ -1,34 +1,71 @@
-From: Tony Lindgren <tony@atomide.com>
-Subject: Re: [PATCH 23/28] ARM: dts: DRA7: Add DT node for DES IP
-Date: Fri, 10 Jun 2016 04:38:37 -0700
-Message-ID: <20160610113836.GF22406@atomide.com>
-References: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
- <1464772006-11254-1-git-send-email-t-kristo@ti.com>
- <1464772006-11254-4-git-send-email-t-kristo@ti.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH v6 3/6] crypto: AF_ALG -- add asymmetric cipher interface
+Date: Fri, 10 Jun 2016 07:42:00 -0700
+Message-ID: <dbcb97e0-35c0-7e6e-9351-d90a0d945bab@intel.com>
+References: <20160515041645.15888.94903.stgit@tstruk-mobl1>
+ <1499283.NSekfIF0FQ@tauon.atsec.com>
+ <alpine.OSX.2.20.1606091126420.21471@mjmartin-mac01.local>
+ <3072103.TY3EQcF1Bz@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-omap@vger.kernel.org, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-arm-kernel@lists.infradead.org, lokeshvutla@ti.com
-To: Tero Kristo <t-kristo@ti.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from muru.com ([72.249.23.125]:55994 "EHLO muru.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752188AbcFJLik (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 10 Jun 2016 07:38:40 -0400
-Content-Disposition: inline
-In-Reply-To: <1464772006-11254-4-git-send-email-t-kristo@ti.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: dhowells@redhat.com, herbert@gondor.apana.org.au,
+	linux-api@vger.kernel.org, marcel@holtmann.org,
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, dwmw2@infradead.org,
+	davem@davemloft.net
+To: Stephan Mueller <smueller@chronox.de>,
+	Mat Martineau <mathew.j.martineau@linux.intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <3072103.TY3EQcF1Bz@tauon.atsec.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-* Tero Kristo <t-kristo@ti.com> [160601 02:09]:
-> From: Joel Fernandes <joelf@ti.com>
+On 06/09/2016 11:36 AM, Stephan Mueller wrote:
+> Am Donnerstag, 9. Juni 2016, 11:27:13 schrieb Mat Martineau:
 > 
-> DRA7xx SoCs have a DES3DES IP. Add DT data for the same.
+> Hi Mat, Tadeusz,
+> 
+>> On Thu, 9 Jun 2016, Stephan Mueller wrote:
+>>> Am Donnerstag, 9. Juni 2016, 11:18:04 schrieb Mat Martineau:
+>>>
+>>> Hi Mat,
+>>>
+>>>>> Or is your concern that the user space interface restricts things too
+>>>>> much
+>>>>> and thus prevents a valid use case?
+>>>>
+>>>> The latter - my primary concern is the constraint this places on
+>>>> userspace
+>>>> by forcing larger buffer sizes than might be necessary for the operation.
+>>>> struct akcipher_request has separate members for src_len and dst_len, and
+>>>> dst_len is documented as needing "to be at least as big as the expected
+>>>> result depending on the operation". Not the maximum result, the expected
+>>>> result. It's also documented that the cipher will generate an error if
+>>>> dst_len is insufficient and update the value with the required size.
+>>>>
+>>>> I'm updating some userspace TLS code that worked with an earlier,
+>>>> unmerged
+>>>> patch set for AF_ALG akcipher (from last year). The read calls with
+>>>> shorter buffers were the main porting problem.
+>>>
+>>> I see -- are you proposing to drop that check entirely?
+>>
+>> Yes.
+> 
+> Ok, after checking the code again, I think that dropping that sanity check 
+> should be ok given that this length is part of the akcipher API.
+> 
+> Tadeusz, as you are currently managing that patch set, would you re-spin it 
+> with the following check removed?
+> 
+> +     if (usedpages < akcipher_calcsize(ctx)) {
+> +             err = -EMSGSIZE;
+> +             goto unlock;
+> +     }
+> 
 
-Are these dts changes safe to apply separately or do they
-cause issues like extra warnings during boot?
-
-Regards,
-
-Tony
+Ok, I'll update the patch.
+Thanks,
+-- 
+TS
