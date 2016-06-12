@@ -1,44 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 1/1] crypto: engine: permit to enqueue ashash_request
-Date: Sun, 12 Jun 2016 19:01:01 +0800
-Message-ID: <20160612110101.GA883@gondor.apana.org.au>
-References: <1464873212-15426-1-git-send-email-clabbe.montjoie@gmail.com>
- <1464873212-15426-2-git-send-email-clabbe.montjoie@gmail.com>
- <20160607103139.GA325@gondor.apana.org.au>
- <20160610144309.GA25816@Red>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: CTR mode: Kconfig cyclic dependency
+Date: Sun, 12 Jun 2016 13:05:14 +0200
+Message-ID: <2056366.RZreOqocPk@positron.chronox.de>
+References: <1465466750.NsZ2X8r4WP@positron.chronox.de> <20160612105828.GB807@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, baolin.wang@linaro.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:40590 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751117AbcFLLBN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 12 Jun 2016 07:01:13 -0400
-Content-Disposition: inline
-In-Reply-To: <20160610144309.GA25816@Red>
+Received: from mail.eperm.de ([89.247.134.16]:36306 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752017AbcFLLFR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 12 Jun 2016 07:05:17 -0400
+In-Reply-To: <20160612105828.GB807@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jun 10, 2016 at 04:43:09PM +0200, LABBE Corentin wrote:
->
-> So I need to split do_one_request to cipher_one_request/hash_one_request.
-> Same with prepare_request to prepare_hash_request/prepare_cipher_request.
-> With the choice of each function done in crypto_engine.c.
+Am Sonntag, 12. Juni 2016, 18:58:28 schrieb Herbert Xu:
 
-Yes.  As a general rule we should make sure that the API exposed
-to driver authors is strongly typed so that they don't have to do
-casts at all.
+Hi Herbert,
 
-> Since this modification need to add <crypto/hash.h> to algapi.h, I think it is necessary to move all crypto engine stuff to crypto/engine.h
-> Do you agree ?
+> On Thu, Jun 09, 2016 at 11:07:06AM +0200, Stephan Mueller wrote:
+> > during the finalization of my patch set for converting the CTR DRBG over
+> > to
+> > CTR AES, I ran into a Kconfig problem. Maybe you have an idea how to
+> > resolve it.
+> 
+> Once I finish the skcipher conversion CTR will no longer need SEQIV.
+> If it's stopping your work right now I think you can just kill the
+> SEQIV selection by CTR right now since the only user IPsec doesn't
+> select CTR anyway.
 
-That sounds like a good idea.
+For now, I use depends on just to ensure a basic consistency. I think I can 
+wait for your skcipher conversion.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks.
+
+Ciao
+Stephan
