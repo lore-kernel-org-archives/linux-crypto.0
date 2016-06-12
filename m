@@ -1,54 +1,36 @@
-From: Tejun Heo <tj@kernel.org>
-Subject: Re: [PATCH] crypto: qat: Remove deprecated create_workqueue
-Date: Sat, 11 Jun 2016 17:46:21 -0500
-Message-ID: <20160611224621.GB31708@htj.duckdns.org>
-References: <20160607211746.GA17667@Karyakshetra>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: CTR mode: Kconfig cyclic dependency
+Date: Sun, 12 Jun 2016 18:58:28 +0800
+Message-ID: <20160612105828.GB807@gondor.apana.org.au>
+References: <1465466750.NsZ2X8r4WP@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Julia Lawall <Julia.Lawall@lip6.fr>,
-	Conor McLoughlin <conor.mcloughlin@intel.com>,
-	Pingchao Yang <pingchao.yang@intel.com>,
-	Ahsan Atta <ahsan.atta@intel.com>,
-	John Griffin <john.griffin@intel.com>,
-	Wu Fengguang <fengguang.wu@intel.com>, qat-linux@intel.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Bhaktipriya Shridhar <bhaktipriya96@gmail.com>
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f196.google.com ([209.85.223.196]:33509 "EHLO
-	mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751849AbcFKWqa (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:44764 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750827AbcFLK6e (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 11 Jun 2016 18:46:30 -0400
+	Sun, 12 Jun 2016 06:58:34 -0400
 Content-Disposition: inline
-In-Reply-To: <20160607211746.GA17667@Karyakshetra>
+In-Reply-To: <1465466750.NsZ2X8r4WP@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 08, 2016 at 02:47:47AM +0530, Bhaktipriya Shridhar wrote:
-> alloc_workqueue replaces deprecated create_workqueue().
+On Thu, Jun 09, 2016 at 11:07:06AM +0200, Stephan Mueller wrote:
 > 
-> The workqueue device_reset_wq has workitem &reset_data->reset_work per
-> adf_reset_dev_data. The workqueue  pf2vf_resp_wq is a workqueue for
-> PF2VF responses has workitem &pf2vf_resp->pf2vf_resp_work per pf2vf_resp.
-> The workqueue adf_vf_stop_wq is used to call adf_dev_stop()
-> asynchronously.
-> 
-> Dedicated workqueues have been used in all cases since the workitems
-> on the workqueues are involved in operation of crypto which can be used in
-> the IO path which is depended upon during memory reclaim. Hence,
-> WQ_MEM_RECLAIM has been set to gurantee forward progress under memory
-> pressure.
-> Since there are only a fixed number of work items, explicit concurrency
-> limit is unnecessary.
-> 
-> Signed-off-by: Bhaktipriya Shridhar <bhaktipriya96@gmail.com>
+> during the finalization of my patch set for converting the CTR DRBG over to 
+> CTR AES, I ran into a Kconfig problem. Maybe you have an idea how to resolve 
+> it.
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Once I finish the skcipher conversion CTR will no longer need SEQIV.
+If it's stopping your work right now I think you can just kill the
+SEQIV selection by CTR right now since the only user IPsec doesn't
+select CTR anyway.
 
-Thanks.
-
+Cheers,
 -- 
-tejun
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
