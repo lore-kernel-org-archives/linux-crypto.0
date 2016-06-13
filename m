@@ -1,681 +1,713 @@
 From: Salvatore Benedetto <salvatore.benedetto@intel.com>
-Subject: [PATCH v8 1/3] crypto: Key-agreement Protocol Primitives API (KPP)
-Date: Mon, 13 Jun 2016 22:55:46 +0100
-Message-ID: <1465854948-9084-2-git-send-email-salvatore.benedetto@intel.com>
+Subject: [PATCH v8 2/3] crypto: kpp - Add DH software implementation
+Date: Mon, 13 Jun 2016 22:55:47 +0100
+Message-ID: <1465854948-9084-3-git-send-email-salvatore.benedetto@intel.com>
 References: <1465854948-9084-1-git-send-email-salvatore.benedetto@intel.com>
 Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:38750 "EHLO mga04.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:42919 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753649AbcFMV4L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Jun 2016 17:56:11 -0400
+	id S1753726AbcFMV4S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 13 Jun 2016 17:56:18 -0400
 In-Reply-To: <1465854948-9084-1-git-send-email-salvatore.benedetto@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add key-agreement protocol primitives (kpp) API which allows to
-implement primitives required by protocols such as DH and ECDH.
-The API is composed mainly by the following functions
- * set_secret() - It allows the user to set his secret, also
-   referred to as his private key, along with the parameters
-   known to both parties involved in the key-agreement session.
- * generate_public_key() - It generates the public key to be sent to
-   the other counterpart involved in the key-agreement session. The
-   function has to be called after set_params() and set_secret()
- * generate_secret() - It generates the shared secret for the session
-
-Other functions such as init() and exit() are provided for allowing
-cryptographic hardware to be inizialized properly before use
+ * Implement MPI based Diffie-Hellman under kpp API
+ * Test provided uses data generad by OpenSSL
 
 Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
 ---
- crypto/Kconfig                  |  10 ++
- crypto/Makefile                 |   1 +
- crypto/crypto_user.c            |  20 +++
- crypto/kpp.c                    | 123 ++++++++++++++++
- include/crypto/internal/kpp.h   |  64 +++++++++
- include/crypto/kpp.h            | 310 ++++++++++++++++++++++++++++++++++++++++
- include/linux/crypto.h          |   1 +
- include/uapi/linux/cryptouser.h |   5 +
- 8 files changed, 534 insertions(+)
- create mode 100644 crypto/kpp.c
- create mode 100644 include/crypto/internal/kpp.h
- create mode 100644 include/crypto/kpp.h
+ crypto/Kconfig      |   8 ++
+ crypto/Makefile     |   2 +
+ crypto/dh.c         | 189 +++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.c    | 157 +++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.h    | 208 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/crypto/dh.h |  25 +++++++
+ 6 files changed, 589 insertions(+)
+ create mode 100644 crypto/dh.c
+ create mode 100644 include/crypto/dh.h
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 1d33beb..0bd6d7f 100644
+index 0bd6d7f..4190e0d 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -93,6 +93,15 @@ config CRYPTO_AKCIPHER
- 	select CRYPTO_AKCIPHER2
- 	select CRYPTO_ALGAPI
+@@ -111,6 +111,14 @@ config CRYPTO_RSA
+ 	help
+ 	  Generic implementation of the RSA public key algorithm.
  
-+config CRYPTO_KPP2
-+	tristate
-+	select CRYPTO_ALGAPI2
++config CRYPTO_DH
++	tristate "Diffie-Hellman algorithm"
++	select CRYPTO_KPP
++	select MPILIB
++	help
++	  Generic implementation of the Diffie-Hellman algorithm.
 +
-+config CRYPTO_KPP
-+	tristate
-+	select CRYPTO_ALGAPI
-+	select CRYPTO_KPP2
 +
- config CRYPTO_RSA
- 	tristate "RSA algorithm"
- 	select CRYPTO_AKCIPHER
-@@ -115,6 +124,7 @@ config CRYPTO_MANAGER2
- 	select CRYPTO_HASH2
- 	select CRYPTO_BLKCIPHER2
- 	select CRYPTO_AKCIPHER2
-+	select CRYPTO_KPP2
- 
- config CRYPTO_USER
- 	tristate "Userspace cryptographic algorithm configuration"
+ config CRYPTO_MANAGER
+ 	tristate "Cryptographic algorithm manager"
+ 	select CRYPTO_MANAGER2
 diff --git a/crypto/Makefile b/crypto/Makefile
-index 4f4ef7e..5b60890 100644
+index 5b60890..101f8fd 100644
 --- a/crypto/Makefile
 +++ b/crypto/Makefile
-@@ -30,6 +30,7 @@ crypto_hash-y += shash.o
- obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
- 
+@@ -32,6 +32,8 @@ obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
  obj-$(CONFIG_CRYPTO_AKCIPHER2) += akcipher.o
-+obj-$(CONFIG_CRYPTO_KPP2) += kpp.o
+ obj-$(CONFIG_CRYPTO_KPP2) += kpp.o
  
++obj-$(CONFIG_CRYPTO_DH) += dh.o
++
  $(obj)/rsapubkey-asn1.o: $(obj)/rsapubkey-asn1.c $(obj)/rsapubkey-asn1.h
  $(obj)/rsaprivkey-asn1.o: $(obj)/rsaprivkey-asn1.c $(obj)/rsaprivkey-asn1.h
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index f71960d..e7a0a9d 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -28,6 +28,7 @@
- #include <crypto/internal/skcipher.h>
- #include <crypto/internal/rng.h>
+ clean-files += rsapubkey-asn1.c rsapubkey-asn1.h
+diff --git a/crypto/dh.c b/crypto/dh.c
+new file mode 100644
+index 0000000..7d29056
+--- /dev/null
++++ b/crypto/dh.c
+@@ -0,0 +1,189 @@
++/*  Diffie-Hellman Key Agreement Method [RFC2631]
++ *
++ * Copyright (c) 2016, Intel Corporation
++ * Authors: Salvatore Benedetto <salvatore.benedetto@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public Licence
++ * as published by the Free Software Foundation; either version
++ * 2 of the Licence, or (at your option) any later version.
++ */
++
++#include <linux/module.h>
++#include <crypto/internal/kpp.h>
++#include <crypto/kpp.h>
++#include <crypto/dh.h>
++#include <linux/mpi.h>
++
++struct dh_ctx {
++	MPI p;
++	MPI g;
++	MPI xa;
++};
++
++static inline void dh_clear_params(struct dh_ctx *ctx)
++{
++	mpi_free(ctx->p);
++	mpi_free(ctx->g);
++	ctx->p = NULL;
++	ctx->g = NULL;
++}
++
++static void dh_free_ctx(struct dh_ctx *ctx)
++{
++	dh_clear_params(ctx);
++	mpi_free(ctx->xa);
++	ctx->xa = NULL;
++}
++
++/*
++ * If base is g we compute the public key
++ *	ya = g^xa mod p; [RFC2631 sec 2.1.1]
++ * else if base if the counterpart public key we compute the shared secret
++ *	ZZ = yb^xa mod p; [RFC2631 sec 2.1.1]
++ */
++static int _compute_val(const struct dh_ctx *ctx, MPI base, MPI val)
++{
++	/* val = base^xa mod p */
++	return mpi_powm(val, base, ctx->xa, ctx->p);
++}
++
++static inline struct dh_ctx *dh_get_ctx(struct crypto_kpp *tfm)
++{
++	return kpp_tfm_ctx(tfm);
++}
++
++static int dh_check_params_length(unsigned int p_len)
++{
++	return (p_len < 1536) ? -EINVAL : 0;
++}
++
++static int dh_set_params(struct dh_ctx *ctx, struct dh *params)
++{
++	if (unlikely(!params->p || !params->g))
++		return -EINVAL;
++
++	if (dh_check_params_length(params->p_size << 3))
++		return -EINVAL;
++
++	ctx->p = mpi_read_raw_data(params->p, params->p_size);
++	if (!ctx->p)
++		return -EINVAL;
++
++	ctx->g = mpi_read_raw_data(params->g, params->g_size);
++	if (!ctx->g) {
++		mpi_free(ctx->p);
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int dh_set_secret(struct crypto_kpp *tfm, void *buffer)
++{
++	struct dh_ctx *ctx = dh_get_ctx(tfm);
++	struct dh *params = (struct dh *)buffer;
++
++	if (unlikely(!buffer))
++		return -EINVAL;
++
++	if (dh_set_params(ctx, params) < 0)
++		return -EINVAL;
++
++	ctx->xa = mpi_read_raw_data(params->key, params->key_size);
++	if (!ctx->xa) {
++		dh_clear_params(ctx);
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int dh_compute_value(struct kpp_request *req)
++{
++	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
++	struct dh_ctx *ctx = dh_get_ctx(tfm);
++	MPI base, val = mpi_alloc(0);
++	int ret = 0;
++	int sign;
++
++	if (!val)
++		return -ENOMEM;
++
++	if (unlikely(!ctx->xa)) {
++		ret = -EINVAL;
++		goto err_free_val;
++	}
++
++	if (req->src) {
++		base = mpi_read_raw_from_sgl(req->src, req->src_len);
++		if (!base) {
++			ret = EINVAL;
++			goto err_free_val;
++		}
++	} else {
++		base = ctx->g;
++	}
++
++	ret = _compute_val(ctx, base, val);
++	if (ret)
++		goto err_free_base;
++
++	ret = mpi_write_to_sgl(val, req->dst, &req->dst_len, &sign);
++	if (ret)
++		goto err_free_base;
++
++	if (sign < 0)
++		ret = -EBADMSG;
++err_free_base:
++	if (req->src)
++		mpi_free(base);
++err_free_val:
++	mpi_free(val);
++	return ret;
++}
++
++static int dh_max_size(struct crypto_kpp *tfm)
++{
++	struct dh_ctx *ctx = dh_get_ctx(tfm);
++
++	return mpi_get_size(ctx->p);
++}
++
++static void dh_exit_tfm(struct crypto_kpp *tfm)
++{
++	struct dh_ctx *ctx = dh_get_ctx(tfm);
++
++	dh_free_ctx(ctx);
++}
++
++static struct kpp_alg dh = {
++	.set_secret = dh_set_secret,
++	.generate_public_key = dh_compute_value,
++	.compute_shared_secret = dh_compute_value,
++	.max_size = dh_max_size,
++	.exit = dh_exit_tfm,
++	.base = {
++		.cra_name = "dh",
++		.cra_driver_name = "dh-generic",
++		.cra_priority = 100,
++		.cra_module = THIS_MODULE,
++		.cra_ctxsize = sizeof(struct dh_ctx),
++	},
++};
++
++static int dh_init(void)
++{
++	return crypto_register_kpp(&dh);
++}
++
++static void dh_exit(void)
++{
++	crypto_unregister_kpp(&dh);
++}
++
++module_init(dh_init);
++module_exit(dh_exit);
++MODULE_ALIAS_CRYPTO("dh");
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("DH generic algorithm");
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index c727fb0..d3de362 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -32,6 +32,8 @@
+ #include <crypto/rng.h>
+ #include <crypto/drbg.h>
  #include <crypto/akcipher.h>
 +#include <crypto/kpp.h>
++#include <crypto/dh.h>
  
  #include "internal.h"
  
-@@ -126,6 +127,21 @@ nla_put_failure:
- 	return -EMSGSIZE;
- }
- 
-+static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	struct crypto_report_kpp rkpp;
-+
-+	strncpy(rkpp.type, "kpp", sizeof(rkpp.type));
-+
-+	if (nla_put(skb, CRYPTOCFGA_REPORT_KPP,
-+		    sizeof(struct crypto_report_kpp), &rkpp))
-+		goto nla_put_failure;
-+	return 0;
-+
-+nla_put_failure:
-+	return -EMSGSIZE;
-+}
-+
- static int crypto_report_one(struct crypto_alg *alg,
- 			     struct crypto_user_alg *ualg, struct sk_buff *skb)
- {
-@@ -176,6 +192,10 @@ static int crypto_report_one(struct crypto_alg *alg,
- 			goto nla_put_failure;
- 
- 		break;
-+	case CRYPTO_ALG_TYPE_KPP:
-+		if (crypto_report_kpp(skb, alg))
-+			goto nla_put_failure;
-+		break;
- 	}
- 
- out:
-diff --git a/crypto/kpp.c b/crypto/kpp.c
-new file mode 100644
-index 0000000..d36ce05
---- /dev/null
-+++ b/crypto/kpp.c
-@@ -0,0 +1,123 @@
-+/*
-+ * Key-agreement Protocol Primitives (KPP)
-+ *
-+ * Copyright (c) 2016, Intel Corporation
-+ * Authors: Salvatore Benedetto <salvatore.benedetto@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+#include <linux/errno.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/seq_file.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/crypto.h>
-+#include <crypto/algapi.h>
-+#include <linux/cryptouser.h>
-+#include <net/netlink.h>
-+#include <crypto/kpp.h>
-+#include <crypto/internal/kpp.h>
-+#include "internal.h"
-+
-+#ifdef CONFIG_NET
-+static int crypto_kpp_report(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	struct crypto_report_kpp rkpp;
-+
-+	strncpy(rkpp.type, "kpp", sizeof(rkpp.type));
-+
-+	if (nla_put(skb, CRYPTOCFGA_REPORT_KPP,
-+		    sizeof(struct crypto_report_kpp), &rkpp))
-+		goto nla_put_failure;
-+	return 0;
-+
-+nla_put_failure:
-+	return -EMSGSIZE;
-+}
-+#else
-+static int crypto_kpp_report(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	return -ENOSYS;
-+}
-+#endif
-+
-+static void crypto_kpp_show(struct seq_file *m, struct crypto_alg *alg)
-+	__attribute__ ((unused));
-+
-+static void crypto_kpp_show(struct seq_file *m, struct crypto_alg *alg)
-+{
-+	seq_puts(m, "type         : kpp\n");
-+}
-+
-+static void crypto_kpp_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_kpp *kpp = __crypto_kpp_tfm(tfm);
-+	struct kpp_alg *alg = crypto_kpp_alg(kpp);
-+
-+	alg->exit(kpp);
-+}
-+
-+static int crypto_kpp_init_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_kpp *kpp = __crypto_kpp_tfm(tfm);
-+	struct kpp_alg *alg = crypto_kpp_alg(kpp);
-+
-+	if (alg->exit)
-+		kpp->base.exit = crypto_kpp_exit_tfm;
-+
-+	if (alg->init)
-+		return alg->init(kpp);
-+
-+	return 0;
-+}
-+
-+static const struct crypto_type crypto_kpp_type = {
-+	.extsize = crypto_alg_extsize,
-+	.init_tfm = crypto_kpp_init_tfm,
-+#ifdef CONFIG_PROC_FS
-+	.show = crypto_kpp_show,
-+#endif
-+	.report = crypto_kpp_report,
-+	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
-+	.maskset = CRYPTO_ALG_TYPE_MASK,
-+	.type = CRYPTO_ALG_TYPE_KPP,
-+	.tfmsize = offsetof(struct crypto_kpp, base),
-+};
-+
-+struct crypto_kpp *crypto_alloc_kpp(const char *alg_name, u32 type, u32 mask)
-+{
-+	return crypto_alloc_tfm(alg_name, &crypto_kpp_type, type, mask);
-+}
-+EXPORT_SYMBOL_GPL(crypto_alloc_kpp);
-+
-+static void kpp_prepare_alg(struct kpp_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
-+
-+	base->cra_type = &crypto_kpp_type;
-+	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
-+	base->cra_flags |= CRYPTO_ALG_TYPE_KPP;
-+}
-+
-+int crypto_register_kpp(struct kpp_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
-+
-+	kpp_prepare_alg(alg);
-+	return crypto_register_alg(base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_register_kpp);
-+
-+void crypto_unregister_kpp(struct kpp_alg *alg)
-+{
-+	crypto_unregister_alg(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_unregister_kpp);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Key-agreement Protocol Primitives");
-diff --git a/include/crypto/internal/kpp.h b/include/crypto/internal/kpp.h
-new file mode 100644
-index 0000000..ad3acf3
---- /dev/null
-+++ b/include/crypto/internal/kpp.h
-@@ -0,0 +1,64 @@
-+/*
-+ * Key-agreement Protocol Primitives (KPP)
-+ *
-+ * Copyright (c) 2016, Intel Corporation
-+ * Authors: Salvatore Benedetto <salvatore.benedetto@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+#ifndef _CRYPTO_KPP_INT_H
-+#define _CRYPTO_KPP_INT_H
-+#include <crypto/kpp.h>
-+#include <crypto/algapi.h>
-+
-+/*
-+ * Transform internal helpers.
-+ */
-+static inline void *kpp_request_ctx(struct kpp_request *req)
-+{
-+	return req->__ctx;
-+}
-+
-+static inline void *kpp_tfm_ctx(struct crypto_kpp *tfm)
-+{
-+	return tfm->base.__crt_ctx;
-+}
-+
-+static inline void kpp_request_complete(struct kpp_request *req, int err)
-+{
-+	req->base.complete(&req->base, err);
-+}
-+
-+static inline const char *kpp_alg_name(struct crypto_kpp *tfm)
-+{
-+	return crypto_kpp_tfm(tfm)->__crt_alg->cra_name;
-+}
-+
-+/**
-+ * crypto_register_kpp() -- Register key-agreement protocol primitives algorithm
-+ *
-+ * Function registers an implementation of a key-agreement protocol primitive
-+ * algorithm
-+ *
-+ * @alg:	algorithm definition
-+ *
-+ * Return: zero on success; error code in case of error
-+ */
-+int crypto_register_kpp(struct kpp_alg *alg);
-+
-+/**
-+ * crypto_unregister_kpp() -- Unregister key-agreement protocol primitive
-+ * algorithm
-+ *
-+ * Function unregisters an implementation of a key-agreement protocol primitive
-+ * algorithm
-+ *
-+ * @alg:	algorithm definition
-+ */
-+void crypto_unregister_kpp(struct kpp_alg *alg);
-+
-+#endif
-diff --git a/include/crypto/kpp.h b/include/crypto/kpp.h
-new file mode 100644
-index 0000000..90436d0
---- /dev/null
-+++ b/include/crypto/kpp.h
-@@ -0,0 +1,310 @@
-+/*
-+ * Key-agreement Protocol Primitives (KPP)
-+ *
-+ * Copyright (c) 2016, Intel Corporation
-+ * Authors: Salvatore Benedetto <salvatore.benedetto@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+
-+#ifndef _CRYPTO_KPP_
-+#define _CRYPTO_KPP_
-+#include <linux/crypto.h>
-+
-+/**
-+ * struct kpp_request
-+ *
-+ * @base:	Common attributes for async crypto requests
-+ * @src:	Source data
-+ * @dst:	Destination data
-+ * @src_len:	Size of the input buffer
-+ * @dst_len:	Size of the output buffer. It needs to be at least
-+ *		as big as the expected result depending	on the operation
-+ *		After operation it will be updated with the actual size of the
-+ *		result. In case of error where the dst sgl size was insufficient,
-+ *		it will be updated to the size required for the operation.
-+ * @__ctx:	Start of private context data
-+ */
-+struct kpp_request {
-+	struct crypto_async_request base;
-+	struct scatterlist *src;
-+	struct scatterlist *dst;
-+	unsigned int src_len;
-+	unsigned int dst_len;
-+	void *__ctx[] CRYPTO_MINALIGN_ATTR;
-+};
-+
-+/**
-+ * struct crypto_kpp - user-instantiated object which encapsulate
-+ * algorithms and core processing logic
-+ *
-+ * @base:	Common crypto API algorithm data structure
-+ */
-+struct crypto_kpp {
-+	struct crypto_tfm base;
-+};
-+
-+/**
-+ * struct kpp_alg - generic key-agreement protocol primitives
-+ *
-+ * @set_secret:		Function invokes the protocol specific function to
-+ *			store the secret private key along with parameters.
-+ *			The implementation knows how to decode thie buffer
-+ * @generate_public_key: Function generate the public key to be sent to the
-+ *			counterpart. In case of error, where output is not big
-+ *			enough req->dst_len will be updated to the size
-+ *			required
-+ * @compute_shared_secret: Function compute the shared secret as defined by
-+ *			the algorithm. The result is given back to the user.
-+ *			In case of error, where output is not big enough,
-+ *			req->dst_len will be updated to the size required
-+ * @max_size:		Function returns the size of the output buffer
-+ * @init:		Initialize the object. This is called only once at
-+ *			instantiation time. In case the cryptographic hardware
-+ *			needs to be initialized. Software fallback should be
-+ *			put in place here.
-+ * @exit:		Undo everything @init did.
-+ *
-+ * @reqsize:		Request context size required by algorithm
-+ *			implementation
-+ * @base		Common crypto API algorithm data structure
-+ */
-+struct kpp_alg {
-+	int (*set_secret)(struct crypto_kpp *tfm, void *buffer);
-+	int (*generate_public_key)(struct kpp_request *req);
-+	int (*compute_shared_secret)(struct kpp_request *req);
-+
-+	int (*max_size)(struct crypto_kpp *tfm);
-+
-+	int (*init)(struct crypto_kpp *tfm);
-+	void (*exit)(struct crypto_kpp *tfm);
-+
-+	unsigned int reqsize;
-+	struct crypto_alg base;
-+};
-+
-+/**
-+ * DOC: Generic Key-agreement Protocol Primitevs API
-+ *
-+ * The KPP API is used with the algorithm type
-+ * CRYPTO_ALG_TYPE_KPP (listed as type "kpp" in /proc/crypto)
-+ */
-+
-+/**
-+ * crypto_alloc_kpp() - allocate KPP tfm handle
-+ * @alg_name: is the name of the kpp algorithm (e.g. "dh", "ecdh")
-+ * @type: specifies the type of the algorithm
-+ * @mask: specifies the mask for the algorithm
-+ *
-+ * Allocate a handle for kpp algorithm. The returned struct crypto_kpp
-+ * is requeried for any following API invocation
-+ *
-+ * Return: allocated handle in case of success; IS_ERR() is true in case of
-+ *	   an error, PTR_ERR() returns the error code.
-+ */
-+struct crypto_kpp *crypto_alloc_kpp(const char *alg_name, u32 type, u32 mask);
-+
-+static inline struct crypto_tfm *crypto_kpp_tfm(struct crypto_kpp *tfm)
-+{
-+	return &tfm->base;
-+}
-+
-+static inline struct kpp_alg *__crypto_kpp_alg(struct crypto_alg *alg)
-+{
-+	return container_of(alg, struct kpp_alg, base);
-+}
-+
-+static inline struct crypto_kpp *__crypto_kpp_tfm(struct crypto_tfm *tfm)
-+{
-+	return container_of(tfm, struct crypto_kpp, base);
-+}
-+
-+static inline struct kpp_alg *crypto_kpp_alg(struct crypto_kpp *tfm)
-+{
-+	return __crypto_kpp_alg(crypto_kpp_tfm(tfm)->__crt_alg);
-+}
-+
-+static inline unsigned int crypto_kpp_reqsize(struct crypto_kpp *tfm)
-+{
-+	return crypto_kpp_alg(tfm)->reqsize;
-+}
-+
-+static inline void kpp_request_set_tfm(struct kpp_request *req,
-+				       struct crypto_kpp *tfm)
-+{
-+	req->base.tfm = crypto_kpp_tfm(tfm);
-+}
-+
-+static inline struct crypto_kpp *crypto_kpp_reqtfm(struct kpp_request *req)
-+{
-+	return __crypto_kpp_tfm(req->base.tfm);
-+}
-+
-+/**
-+ * crypto_free_kpp() - free KPP tfm handle
-+ *
-+ * @tfm: KPP tfm handle allocated with crypto_alloc_kpp()
-+ */
-+static inline void crypto_free_kpp(struct crypto_kpp *tfm)
-+{
-+	crypto_destroy_tfm(tfm, crypto_kpp_tfm(tfm));
-+}
-+
-+/**
-+ * kpp_request_alloc() - allocates kpp request
-+ *
-+ * @tfm:	KPP tfm handle allocated with crypto_alloc_kpp()
-+ * @gfp:	allocation flags
-+ *
-+ * Return: allocated handle in case of success or NULL in case of an error.
-+ */
-+static inline struct kpp_request *kpp_request_alloc(struct crypto_kpp *tfm,
-+						    gfp_t gfp)
-+{
-+	struct kpp_request *req;
-+
-+	req = kmalloc(sizeof(*req) + crypto_kpp_reqsize(tfm), gfp);
-+	if (likely(req))
-+		kpp_request_set_tfm(req, tfm);
-+
-+	return req;
-+}
-+
-+/**
-+ * kpp_request_free() - zeroize and free kpp request
-+ *
-+ * @req:	request to free
-+ */
-+static inline void kpp_request_free(struct kpp_request *req)
-+{
-+	kzfree(req);
-+}
-+
-+/**
-+ * kpp_request_set_callback() - Sets an asynchronous callback.
-+ *
-+ * Callback will be called when an asynchronous operation on a given
-+ * request is finished.
-+ *
-+ * @req:	request that the callback will be set for
-+ * @flgs:	specify for instance if the operation may backlog
-+ * @cmpl:	callback which will be called
-+ * @data:	private data used by the caller
-+ */
-+static inline void kpp_request_set_callback(struct kpp_request *req,
-+					    u32 flgs,
-+					    crypto_completion_t cmpl,
-+					    void *data)
-+{
-+	req->base.complete = cmpl;
-+	req->base.data = data;
-+	req->base.flags = flgs;
-+}
-+
-+/**
-+ * kpp_request_set_input() - Sets input buffer
-+ *
-+ * Sets parameters required by generate_public_key
-+ *
-+ * @req:	kpp request
-+ * @input:	ptr to input scatter list
-+ * @input_len:	size of the input scatter list
-+ */
-+static inline void kpp_request_set_input(struct kpp_request *req,
-+					 struct scatterlist *input,
-+					 unsigned int input_len)
-+{
-+	req->src = input;
-+	req->src_len = input_len;
-+}
-+
-+/**
-+ * kpp_request_set_output() - Sets output buffer
-+ *
-+ * Sets parameters required by kpp operation
-+ *
-+ * @req:	kpp request
-+ * @output:	ptr to output scatter list
-+ * @output_len:	size of the output scatter list
-+ */
-+static inline void kpp_request_set_output(struct kpp_request *req,
-+					  struct scatterlist *output,
-+					  unsigned int output_len)
-+{
-+	req->dst = output;
-+	req->dst_len = output_len;
-+}
-+
-+/**
-+ * crypto_kpp_set_secret() - Invoke kpp operation
-+ *
-+ * Function invokes the specific kpp operation for a given alg.
-+ *
-+ * @tfm:	tfm handle
-+ *
-+ * Return: zero on success; error code in case of error
-+ */
-+static inline int crypto_kpp_set_secret(struct crypto_kpp *tfm, void *buffer)
-+{
-+	struct kpp_alg *alg = crypto_kpp_alg(tfm);
-+
-+	return alg->set_secret(tfm, buffer);
-+}
-+
-+/**
-+ * crypto_kpp_generate_public_key() - Invoke kpp operation
-+ *
-+ * Function invokes the specific kpp operation for generating the public part
-+ * for a given kpp algorithm
-+ *
-+ * @req:	kpp key request
-+ *
-+ * Return: zero on success; error code in case of error
-+ */
-+static inline int crypto_kpp_generate_public_key(struct kpp_request *req)
-+{
-+	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
-+	struct kpp_alg *alg = crypto_kpp_alg(tfm);
-+
-+	return alg->generate_public_key(req);
-+}
-+
-+/**
-+ * crypto_kpp_compute_shared_secret() - Invoke kpp operation
-+ *
-+ * Function invokes the specific kpp operation for computing the shared secret
-+ * for a given kpp algorithm.
-+ *
-+ * @req:	kpp key request
-+ *
-+ * Return: zero on success; error code in case of error
-+ */
-+static inline int crypto_kpp_compute_shared_secret(struct kpp_request *req)
-+{
-+	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
-+	struct kpp_alg *alg = crypto_kpp_alg(tfm);
-+
-+	return alg->compute_shared_secret(req);
-+}
-+
-+/**
-+ * crypto_kpp_maxsize() - Get len for output buffer
-+ *
-+ * Function returns the output buffer size required
-+ *
-+ * @tfm:	KPP tfm handle allocated with crypto_alloc_kpp()
-+ *
-+ * Return: minimum len for output buffer or error code if key hasn't been set
-+ */
-+static inline int crypto_kpp_maxsize(struct crypto_kpp *tfm)
-+{
-+	struct kpp_alg *alg = crypto_kpp_alg(tfm);
-+
-+	return alg->max_size(tfm);
-+}
-+
-+#endif
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index d844cbc..992cfc2 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -48,6 +48,7 @@
- #define CRYPTO_ALG_TYPE_BLKCIPHER	0x00000004
- #define CRYPTO_ALG_TYPE_ABLKCIPHER	0x00000005
- #define CRYPTO_ALG_TYPE_GIVCIPHER	0x00000006
-+#define CRYPTO_ALG_TYPE_KPP		0x00000008
- #define CRYPTO_ALG_TYPE_RNG		0x0000000c
- #define CRYPTO_ALG_TYPE_AKCIPHER	0x0000000d
- #define CRYPTO_ALG_TYPE_DIGEST		0x0000000e
-diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
-index 2e67bb6..79b5ded 100644
---- a/include/uapi/linux/cryptouser.h
-+++ b/include/uapi/linux/cryptouser.h
-@@ -45,6 +45,7 @@ enum crypto_attr_type_t {
- 	CRYPTOCFGA_REPORT_RNG,		/* struct crypto_report_rng */
- 	CRYPTOCFGA_REPORT_CIPHER,	/* struct crypto_report_cipher */
- 	CRYPTOCFGA_REPORT_AKCIPHER,	/* struct crypto_report_akcipher */
-+	CRYPTOCFGA_REPORT_KPP,		/* struct crypto_report_kpp */
- 	__CRYPTOCFGA_MAX
- 
- #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
-@@ -107,5 +108,9 @@ struct crypto_report_akcipher {
- 	char type[CRYPTO_MAX_NAME];
+@@ -120,6 +122,11 @@ struct akcipher_test_suite {
+ 	unsigned int count;
  };
  
-+struct crypto_report_kpp {
-+	char type[CRYPTO_MAX_NAME];
++struct kpp_test_suite {
++	struct kpp_testvec_dh *vecs;
++	unsigned int count;
 +};
 +
- #define CRYPTO_REPORT_MAXSIZE (sizeof(struct crypto_user_alg) + \
- 			       sizeof(struct crypto_report_blkcipher))
+ struct alg_test_desc {
+ 	const char *alg;
+ 	int (*test)(const struct alg_test_desc *desc, const char *driver,
+@@ -134,6 +141,7 @@ struct alg_test_desc {
+ 		struct cprng_test_suite cprng;
+ 		struct drbg_test_suite drbg;
+ 		struct akcipher_test_suite akcipher;
++		struct kpp_test_suite kpp;
+ 	} suite;
+ };
+ 
+@@ -1777,6 +1785,145 @@ static int alg_test_drbg(const struct alg_test_desc *desc, const char *driver,
+ 
+ }
+ 
++static int do_test_dh(struct crypto_kpp *tfm, struct kpp_testvec_dh *vec)
++{
++	struct kpp_request *req;
++	void *input_buf = NULL;
++	void *output_buf = NULL;
++	struct tcrypt_result result;
++	unsigned int out_len_max;
++	int err = -ENOMEM;
++	struct scatterlist src, dst;
++	struct dh p;
++
++	req = kpp_request_alloc(tfm, GFP_KERNEL);
++	if (!req)
++		return err;
++
++	init_completion(&result.completion);
++
++	/* Set p,g */
++	p.p = vec->p;
++	p.g = vec->g;
++	p.p_size = vec->p_size;
++	p.g_size = vec->g_size;
++	/* Set A private Key */
++	p.key = vec->xa;
++	p.key_size = vec->xa_size;
++	err = crypto_kpp_set_secret(tfm, (void *)&p);
++	if (err)
++		goto free_req;
++
++	out_len_max = crypto_kpp_maxsize(tfm);
++	output_buf = kzalloc(out_len_max, GFP_KERNEL);
++	if (!output_buf) {
++		err = -ENOMEM;
++		goto free_req;
++	}
++
++	/* Use g as base */
++	kpp_request_set_input(req, NULL, 0);
++	sg_init_one(&dst, output_buf, out_len_max);
++	kpp_request_set_output(req, &dst, out_len_max);
++	kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				 tcrypt_complete, &result);
++
++	/* Compute A public key = g^xa mod p */
++	err = wait_async_op(&result, crypto_kpp_generate_public_key(req));
++	if (err) {
++		pr_err("alg: dh: generate public key test failed. err %d\n", err);
++		goto free_output;
++	}
++	/* Verify calculated public key */
++	if (memcmp(vec->expected_ya, sg_virt(req->dst), vec->expected_ya_size)) {
++		pr_err("alg: dh: generate public key test failed. Invalid output\n");
++		err = -EINVAL;
++		goto free_output;
++	}
++
++	/* Calculate shared secret key by using counter part public key. */
++	input_buf = kzalloc(vec->yb_size, GFP_KERNEL);
++	if (!input_buf) {
++		err = -ENOMEM;
++		goto free_output;
++	}
++
++	memcpy(input_buf, vec->yb, vec->yb_size);
++	sg_init_one(&src, input_buf, vec->yb_size);
++	sg_init_one(&dst, output_buf, out_len_max);
++	kpp_request_set_input(req, &src, vec->yb_size);
++	kpp_request_set_output(req, &dst, out_len_max);
++	kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				 tcrypt_complete, &result);
++	err = wait_async_op(&result, crypto_kpp_compute_shared_secret(req));
++	if (err) {
++		pr_err("alg: dh: compute shard secret test failed. err %d\n", err);
++		goto free_all;
++	}
++	/*
++	 * verify shared secret from which the user will derive
++	 * secret key by executing whatever hash it has chosen
++	 */
++	if (memcmp(vec->expected_ss, sg_virt(req->dst),
++		   vec->expected_ss_size)) {
++		pr_err("alg: dh: compute shared secret test failed. Invalid output\n");
++		err = -EINVAL;
++	}
++
++free_all:
++	kfree(input_buf);
++free_output:
++	kfree(output_buf);
++free_req:
++	kpp_request_free(req);
++	return err;
++}
++
++static int test_dh(struct crypto_kpp *tfm, struct kpp_testvec_dh *vecs,
++		   unsigned int tcount)
++{
++	int ret, i;
++
++	for (i = 0; i < tcount; i++) {
++		ret = do_test_dh(tfm, vecs++);
++		if (ret) {
++			pr_err("alg: dh: test failed on vector %d, err=%d\n",
++			       i + 1, ret);
++			return ret;
++		}
++	}
++	return 0;
++}
++
++static int test_kpp(struct crypto_kpp *tfm, const char *alg,
++		    struct kpp_testvec_dh *vecs, unsigned int tcount)
++{
++	if (strncmp(alg, "dh", 2) == 0)
++		return test_dh(tfm, vecs, tcount);
++
++	return 0;
++}
++
++static int alg_test_kpp(const struct alg_test_desc *desc, const char *driver,
++			u32 type, u32 mask)
++{
++	struct crypto_kpp *tfm;
++	int err = 0;
++
++	tfm = crypto_alloc_kpp(driver, type | CRYPTO_ALG_INTERNAL, mask);
++	if (IS_ERR(tfm)) {
++		pr_err("alg: kpp: Failed to load tfm for %s: %ld\n",
++		       driver, PTR_ERR(tfm));
++		return PTR_ERR(tfm);
++	}
++	if (desc->suite.kpp.vecs)
++		err = test_kpp(tfm, desc->alg, desc->suite.kpp.vecs,
++			       desc->suite.kpp.count);
++
++	crypto_free_kpp(tfm);
++	return err;
++}
++
+ static int do_test_rsa(struct crypto_akcipher *tfm,
+ 		       struct akcipher_testvec *vecs)
+ {
+@@ -2729,6 +2876,16 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "dh",
++		.test = alg_test_kpp,
++		.fips_allowed = 1,
++		.suite = {
++			.kpp = {
++				.vecs = dh_tv_template,
++				.count = DH_TEST_VECTORS
++			}
++		}
++	}, {
+ 		.alg = "digest_null",
+ 		.test = alg_test_null,
+ 	}, {
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 487ec88..e9c34c7 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -133,6 +133,21 @@ struct akcipher_testvec {
+ 	bool public_key_vec;
+ };
+ 
++struct kpp_testvec_dh {
++	unsigned char *p;
++	unsigned char *g;
++	unsigned char *xa;
++	unsigned char *yb;
++	unsigned char *expected_ya;
++	unsigned char *expected_ss;
++	unsigned short p_size;
++	unsigned short g_size;
++	unsigned short xa_size;
++	unsigned short yb_size;
++	unsigned short expected_ya_size;
++	unsigned short expected_ss_size;
++};
++
+ static char zeroed_string[48];
+ 
+ /*
+@@ -330,6 +345,199 @@ static struct akcipher_testvec rsa_tv_template[] = {
+ 	}
+ };
+ 
++#define DH_TEST_VECTORS 2
++
++struct kpp_testvec_dh dh_tv_template[] = {
++	{
++	.p =
++	"\xb9\x36\x3a\xf1\x82\x1f\x60\xd3\x22\x47\xb8\xbc\x2d\x22\x6b\x81"
++	"\x7f\xe8\x20\x06\x09\x23\x73\x49\x9a\x59\x8b\x35\x25\xf8\x31\xbc"
++	"\x7d\xa8\x1c\x9d\x56\x0d\x1a\xf7\x4b\x4f\x96\xa4\x35\x77\x6a\x89"
++	"\xab\x42\x00\x49\x21\x71\xed\x28\x16\x1d\x87\x5a\x10\xa7\x9c\x64"
++	"\x94\xd4\x87\x3d\x28\xef\x44\xfe\x4b\xe2\xb4\x15\x8c\x82\xa6\xf3"
++	"\x50\x5f\xa8\xe8\xa2\x60\xe7\x00\x86\x78\x05\xd4\x78\x19\xa1\x98"
++	"\x62\x4e\x4a\x00\x78\x56\x96\xe6\xcf\xd7\x10\x1b\x74\x5d\xd0\x26"
++	"\x61\xdb\x6b\x32\x09\x51\xd8\xa5\xfd\x54\x16\x71\x01\xb3\x39\xe6"
++	"\x4e\x69\xb1\xd7\x06\x8f\xd6\x1e\xdc\x72\x25\x26\x74\xc8\x41\x06"
++	"\x5c\xd1\x26\x5c\xb0\x2f\xf9\x59\x13\xc1\x2a\x0f\x78\xea\x7b\xf7"
++	"\xbd\x59\xa0\x90\x1d\xfc\x33\x5b\x4c\xbf\x05\x9c\x3a\x3f\x69\xa2"
++	"\x45\x61\x4e\x10\x6a\xb3\x17\xc5\x68\x30\xfb\x07\x5f\x34\xc6\xfb"
++	"\x73\x07\x3c\x70\xf6\xae\xe7\x72\x84\xc3\x18\x81\x8f\xe8\x11\x1f"
++	"\x3d\x83\x83\x01\x2a\x14\x73\xbf\x32\x32\x2e\xc9\x4d\xdb\x2a\xca"
++	"\xee\x71\xf9\xda\xad\xe8\x82\x0b\x4d\x0c\x1f\xb6\x1d\xef\x00\x67"
++	"\x74\x3d\x95\xe0\xb7\xc4\x30\x8a\x24\x87\x12\x47\x27\x70\x0d\x73",
++	.g = "\x02",
++	.xa =
++	"\x44\xc1\x48\x36\xa7\x2b\x6f\x4e\x43\x03\x68\xad\x31\x00\xda\xf3"
++	"\x2a\x01\xa8\x32\x63\x5f\x89\x32\x1f\xdf\x4c\xa1\x6a\xbc\x10\x15"
++	"\x90\x35\xc9\x26\x41\xdf\x7b\xaa\x56\x56\x3d\x85\x44\xb5\xc0\x8e"
++	"\x37\x83\x06\x50\xb3\x5f\x0e\x28\x2c\xd5\x46\x15\xe3\xda\x7d\x74"
++	"\x87\x13\x91\x4f\xd4\x2d\xf6\xc7\x5e\x14\x2c\x11\xc2\x26\xb4\x3a"
++	"\xe3\xb2\x36\x20\x11\x3b\x22\xf2\x06\x65\x66\xe2\x57\x58\xf8\x22"
++	"\x1a\x94\xbd\x2b\x0e\x8c\x55\xad\x61\x23\x45\x2b\x19\x1e\x63\x3a"
++	"\x13\x61\xe3\xa0\x79\x70\x3e\x6d\x98\x32\xbc\x7f\x82\xc3\x11\xd8"
++	"\xeb\x53\xb5\xfc\xb5\xd5\x3c\x4a\xea\x92\x3e\x01\xce\x15\x65\xd4"
++	"\xaa\x85\xc1\x11\x90\x83\x31\x6e\xfe\xe7\x7f\x7d\xed\xab\xf9\x29"
++	"\xf8\xc7\xf1\x68\xc6\xb7\xe4\x1f\x2f\x28\xa0\xc9\x1a\x50\x64\x29"
++	"\x4b\x01\x6d\x1a\xda\x46\x63\x21\x07\x40\x8c\x8e\x4c\x6f\xb5\xe5"
++	"\x12\xf3\xc2\x1b\x48\x27\x5e\x27\x01\xb1\xaa\xed\x68\x9b\x83\x18"
++	"\x8f\xb1\xeb\x1f\x04\xd1\x3c\x79\xed\x4b\xf7\x0a\x33\xdc\xe0\xc6"
++	"\xd8\x02\x51\x59\x00\x74\x30\x07\x4c\x2d\xac\xe4\x13\xf1\x80\xf0"
++	"\xce\xfa\xff\xa9\xce\x29\x46\xdd\x9d\xad\xd1\xc3\xc6\x58\x1a\x63",
++	.yb =
++	"\x2a\x67\x5c\xfd\x63\x5d\xc0\x97\x0a\x8b\xa2\x1f\xf8\x8a\xcb\x54"
++	"\xca\x2f\xd3\x49\x3f\x01\x8e\x87\xfe\xcc\x94\xa0\x3e\xd4\x26\x79"
++	"\x9a\x94\x3c\x11\x81\x58\x5c\x60\x3d\xf5\x98\x90\x89\x64\x62\x1f"
++	"\xbd\x05\x6d\x2b\xcd\x84\x40\x9b\x4a\x1f\xe0\x19\xf1\xca\x20\xb3"
++	"\x4e\xa0\x4f\x15\xcc\xa5\xfe\xa5\xb4\xf5\x0b\x18\x7a\x5a\x37\xaa"
++	"\x58\x00\x19\x7f\xe2\xa3\xd9\x1c\x44\x57\xcc\xde\x2e\xc1\x38\xea"
++	"\xeb\xe3\x90\x40\xc4\x6c\xf7\xcd\xe9\x22\x50\x71\xf5\x7c\xdb\x37"
++	"\x0e\x80\xc3\xed\x7e\xb1\x2b\x2f\xbe\x71\xa6\x11\xa5\x9d\xf5\x39"
++	"\xf1\xa2\xe5\x85\xbc\x25\x91\x4e\x84\x8d\x26\x9f\x4f\xe6\x0f\xa6"
++	"\x2b\x6b\xf9\x0d\xaf\x6f\xbb\xfa\x2d\x79\x15\x31\x57\xae\x19\x60"
++	"\x22\x0a\xf5\xfd\x98\x0e\xbf\x5d\x49\x75\x58\x37\xbc\x7f\xf5\x21"
++	"\x56\x1e\xd5\xb3\x50\x0b\xca\x96\xf3\xd1\x3f\xb3\x70\xa8\x6d\x63"
++	"\x48\xfb\x3d\xd7\x29\x91\x45\xb5\x48\xcd\xb6\x78\x30\xf2\x3f\x1e"
++	"\xd6\x22\xd6\x35\x9b\xf9\x1f\x85\xae\xab\x4b\xd7\xe0\xc7\x86\x67"
++	"\x3f\x05\x7f\xa6\x0d\x2f\x0d\xbf\x53\x5f\x4d\x2c\x6d\x5e\x57\x40"
++	"\x30\x3a\x23\x98\xf9\xb4\x32\xf5\x32\x83\xdd\x0b\xae\x33\x97\x2f",
++	.expected_ya =
++	"\x5c\x24\xdf\xeb\x5b\x4b\xf8\xc5\xef\x39\x48\x82\xe0\x1e\x62\xee"
++	"\x8a\xae\xdf\x93\x6c\x2b\x16\x95\x92\x16\x3f\x16\x7b\x75\x03\x85"
++	"\xd9\xf1\x69\xc2\x14\x87\x45\xfc\xa4\x19\xf6\xf0\xa4\xf3\xec\xd4"
++	"\x6c\x5c\x03\x3b\x94\xc2\x2f\x92\xe4\xce\xb3\xe4\x72\xe8\x17\xe6"
++	"\x23\x7e\x00\x01\x09\x59\x13\xbf\xc1\x2f\x99\xa9\x07\xaa\x02\x23"
++	"\x4a\xca\x39\x4f\xbc\xec\x0f\x27\x4f\x19\x93\x6c\xb9\x30\x52\xfd"
++	"\x2b\x9d\x86\xf1\x06\x1e\xb6\x56\x27\x4a\xc9\x8a\xa7\x8a\x48\x5e"
++	"\xb5\x60\xcb\xdf\xff\x03\x26\x10\xbf\x90\x8f\x46\x60\xeb\x9b\x9a"
++	"\xd6\x6f\x44\x91\x03\x92\x18\x2c\x96\x5e\x40\x19\xfb\xf4\x4f\x3a"
++	"\x02\x7b\xaf\xcc\x22\x20\x79\xb9\xf8\x9f\x8f\x85\x6b\xec\x44\xbb"
++	"\xe6\xa8\x8e\xb1\xe8\x2c\xee\x64\xee\xf8\xbd\x00\xf3\xe2\x2b\x93"
++	"\xcd\xe7\xc4\xdf\xc9\x19\x46\xfe\xb6\x07\x73\xc1\x8a\x64\x79\x26"
++	"\xe7\x30\xad\x2a\xdf\xe6\x8f\x59\xf5\x81\xbf\x4a\x29\x91\xe7\xb7"
++	"\xcf\x48\x13\x27\x75\x79\x40\xd9\xd6\x32\x52\x4e\x6a\x86\xae\x6f"
++	"\xc2\xbf\xec\x1f\xc2\x69\xb2\xb6\x59\xe5\xa5\x17\xa4\x77\xb7\x62"
++	"\x46\xde\xe8\xd2\x89\x78\x9a\xef\xa3\xb5\x8f\x26\xec\x80\xda\x39",
++	.expected_ss =
++	"\x8f\xf3\xac\xa2\xea\x22\x11\x5c\x45\x65\x1a\x77\x75\x2e\xcf\x46"
++	"\x23\x14\x1e\x67\x53\x4d\x35\xb0\x38\x1d\x4e\xb9\x41\x9a\x21\x24"
++	"\x6e\x9f\x40\xfe\x90\x51\xb1\x06\xa4\x7b\x87\x17\x2f\xe7\x5e\x22"
++	"\xf0\x7b\x54\x84\x0a\xac\x0a\x90\xd2\xd7\xe8\x7f\xe7\xe3\x30\x75"
++	"\x01\x1f\x24\x75\x56\xbe\xcc\x8d\x1e\x68\x0c\x41\x72\xd3\xfa\xbb"
++	"\xe5\x9c\x60\xc7\x28\x77\x0c\xbe\x89\xab\x08\xd6\x21\xe7\x2e\x1a"
++	"\x58\x7a\xca\x4f\x22\xf3\x2b\x30\xfd\xf4\x98\xc1\xa3\xf8\xf6\xcc"
++	"\xa9\xe4\xdb\x5b\xee\xd5\x5c\x6f\x62\x4c\xd1\x1a\x02\x2a\x23\xe4"
++	"\xb5\x57\xf3\xf9\xec\x04\x83\x54\xfe\x08\x5e\x35\xac\xfb\xa8\x09"
++	"\x82\x32\x60\x11\xb2\x16\x62\x6b\xdf\xda\xde\x9c\xcb\x63\x44\x6c"
++	"\x59\x26\x6a\x8f\xb0\x24\xcb\xa6\x72\x48\x1e\xeb\xe0\xe1\x09\x44"
++	"\xdd\xee\x66\x6d\x84\xcf\xa5\xc1\xb8\x36\x74\xd3\x15\x96\xc3\xe4"
++	"\xc6\x5a\x4d\x23\x97\x0c\x5c\xcb\xa9\xf5\x29\xc2\x0e\xff\x93\x82"
++	"\xd3\x34\x49\xad\x64\xa6\xb1\xc0\x59\x28\x75\x60\xa7\x8a\xb0\x11"
++	"\x56\x89\x42\x74\x11\xf5\xf6\x5e\x6f\x16\x54\x6a\xb1\x76\x4d\x50"
++	"\x8a\x68\xc1\x5b\x82\xb9\x0d\x00\x32\x50\xed\x88\x87\x48\x92\x17",
++	.p_size = 256,
++	.g_size = 1,
++	.xa_size = 256,
++	.yb_size = 256,
++	.expected_ya_size = 256,
++	.expected_ss_size = 256,
++	},
++	{
++	.p =
++	"\xb9\x36\x3a\xf1\x82\x1f\x60\xd3\x22\x47\xb8\xbc\x2d\x22\x6b\x81"
++	"\x7f\xe8\x20\x06\x09\x23\x73\x49\x9a\x59\x8b\x35\x25\xf8\x31\xbc"
++	"\x7d\xa8\x1c\x9d\x56\x0d\x1a\xf7\x4b\x4f\x96\xa4\x35\x77\x6a\x89"
++	"\xab\x42\x00\x49\x21\x71\xed\x28\x16\x1d\x87\x5a\x10\xa7\x9c\x64"
++	"\x94\xd4\x87\x3d\x28\xef\x44\xfe\x4b\xe2\xb4\x15\x8c\x82\xa6\xf3"
++	"\x50\x5f\xa8\xe8\xa2\x60\xe7\x00\x86\x78\x05\xd4\x78\x19\xa1\x98"
++	"\x62\x4e\x4a\x00\x78\x56\x96\xe6\xcf\xd7\x10\x1b\x74\x5d\xd0\x26"
++	"\x61\xdb\x6b\x32\x09\x51\xd8\xa5\xfd\x54\x16\x71\x01\xb3\x39\xe6"
++	"\x4e\x69\xb1\xd7\x06\x8f\xd6\x1e\xdc\x72\x25\x26\x74\xc8\x41\x06"
++	"\x5c\xd1\x26\x5c\xb0\x2f\xf9\x59\x13\xc1\x2a\x0f\x78\xea\x7b\xf7"
++	"\xbd\x59\xa0\x90\x1d\xfc\x33\x5b\x4c\xbf\x05\x9c\x3a\x3f\x69\xa2"
++	"\x45\x61\x4e\x10\x6a\xb3\x17\xc5\x68\x30\xfb\x07\x5f\x34\xc6\xfb"
++	"\x73\x07\x3c\x70\xf6\xae\xe7\x72\x84\xc3\x18\x81\x8f\xe8\x11\x1f"
++	"\x3d\x83\x83\x01\x2a\x14\x73\xbf\x32\x32\x2e\xc9\x4d\xdb\x2a\xca"
++	"\xee\x71\xf9\xda\xad\xe8\x82\x0b\x4d\x0c\x1f\xb6\x1d\xef\x00\x67"
++	"\x74\x3d\x95\xe0\xb7\xc4\x30\x8a\x24\x87\x12\x47\x27\x70\x0d\x73",
++	.g = "\x02",
++	.xa =
++	"\x4d\x75\xa8\x6e\xba\x23\x3a\x0c\x63\x56\xc8\xc9\x5a\xa7\xd6\x0e"
++	"\xed\xae\x40\x78\x87\x47\x5f\xe0\xa7\x7b\xba\x84\x88\x67\x4e\xe5"
++	"\x3c\xcc\x5c\x6a\xe7\x4a\x20\xec\xbe\xcb\xf5\x52\x62\x9f\x37\x80"
++	"\x0c\x72\x7b\x83\x66\xa4\xf6\x7f\x95\x97\x1c\x6a\x5c\x7e\xf1\x67"
++	"\x37\xb3\x93\x39\x3d\x0b\x55\x35\xd9\xe5\x22\x04\x9f\xf8\xc1\x04"
++	"\xce\x13\xa5\xac\xe1\x75\x05\xd1\x2b\x53\xa2\x84\xef\xb1\x18\xf4"
++	"\x66\xdd\xea\xe6\x24\x69\x5a\x49\xe0\x7a\xd8\xdf\x1b\xb7\xf1\x6d"
++	"\x9b\x50\x2c\xc8\x1c\x1c\xa3\xb4\x37\xfb\x66\x3f\x67\x71\x73\xa9"
++	"\xff\x5f\xd9\xa2\x25\x6e\x25\x1b\x26\x54\xbf\x0c\xc6\xdb\xea\x0a"
++	"\x52\x6c\x16\x7c\x27\x68\x15\x71\x58\x73\x9d\xe6\xc2\x80\xaa\x97"
++	"\x31\x66\xfb\xa6\xfb\xfd\xd0\x9c\x1d\xbe\x81\x48\xf5\x9a\x32\xf1"
++	"\x69\x62\x18\x78\xae\x72\x36\xe6\x94\x27\xd1\xff\x18\x4f\x28\x6a"
++	"\x16\xbd\x6a\x60\xee\xe5\xf9\x6d\x16\xe4\xb8\xa6\x41\x9b\x23\x7e"
++	"\xf7\x9d\xd1\x1d\x03\x15\x66\x3a\xcf\xb6\x2c\x13\x96\x2c\x52\x21"
++	"\xe4\x2d\x48\x7a\x8a\x5d\xb2\x88\xed\x98\x61\x79\x8b\x6a\x1e\x5f"
++	"\xd0\x8a\x2d\x99\x5a\x2b\x0f\xbc\xef\x53\x8f\x32\xc1\xa2\x99\x26",
++	.yb =
++	"\x99\x4d\xd9\x01\x84\x8e\x4a\x5b\xb8\xa5\x64\x8c\x6c\x00\x5c\x0e"
++	"\x1e\x1b\xee\x5d\x9f\x53\xe3\x16\x70\x01\xed\xbf\x4f\x14\x36\x6e"
++	"\xe4\x43\x45\x43\x49\xcc\xb1\xb0\x2a\xc0\x6f\x22\x55\x42\x17\x94"
++	"\x18\x83\xd7\x2a\x5c\x51\x54\xf8\x4e\x7c\x10\xda\x76\x68\x57\x77"
++	"\x1e\x62\x03\x30\x04\x7b\x4c\x39\x9c\x54\x01\x54\xec\xef\xb3\x55"
++	"\xa4\xc0\x24\x6d\x3d\xbd\xcc\x46\x5b\x00\x96\xc7\xea\x93\xd1\x3f"
++	"\xf2\x6a\x72\xe3\xf2\xc1\x92\x24\x5b\xda\x48\x70\x2c\xa9\x59\x97"
++	"\x19\xb1\xd6\x54\xb3\x9c\x2e\xb0\x63\x07\x9b\x5e\xac\xb5\xf2\xb1"
++	"\x5b\xf8\xf3\xd7\x2d\x37\x9b\x68\x6c\xf8\x90\x07\xbc\x37\x9a\xa5"
++	"\xe2\x91\x12\x25\x47\x77\xe3\x3d\xb2\x95\x69\x44\x0b\x91\x1e\xaf"
++	"\x7c\x8c\x7c\x34\x41\x6a\xab\x60\x6e\xc6\x52\xec\x7e\x94\x0a\x37"
++	"\xec\x98\x90\xdf\x3f\x02\xbd\x23\x52\xdd\xd9\xe5\x31\x80\x74\x25"
++	"\xb6\xd2\xd3\xcc\xd5\xcc\x6d\xf9\x7e\x4d\x78\xab\x77\x51\xfa\x77"
++	"\x19\x94\x49\x8c\x05\xd4\x75\xed\xd2\xb3\x64\x57\xe0\x52\x99\xc0"
++	"\x83\xe3\xbb\x5e\x2b\xf1\xd2\xc0\xb1\x37\x36\x0b\x7c\xb5\x63\x96"
++	"\x8e\xde\x04\x23\x11\x95\x62\x11\x9a\xce\x6f\x63\xc8\xd5\xd1\x8f",
++	.expected_ya =
++	"\x90\x89\xe4\x82\xd6\x0a\xcf\x1a\xae\xce\x1b\x66\xa7\x19\x71\x18"
++	"\x8f\x95\x4b\x5b\x80\x45\x4a\x5a\x43\x99\x4d\x37\xcf\xa3\xa7\x28"
++	"\x9c\xc7\x73\xf1\xb2\x17\xf6\x99\xe3\x6b\x56\xcb\x3e\x35\x60\x7d"
++	"\x65\xc7\x84\x6b\x3e\x60\xee\xcd\xd2\x70\xe7\xc9\x32\x1c\xf0\xb4"
++	"\xf9\x52\xd9\x88\x75\xfd\x40\x2c\xa7\xbe\x19\x1c\x0a\xae\x93\xe1"
++	"\x71\xc7\xcd\x4f\x33\x5c\x10\x7d\x39\x56\xfc\x73\x84\xb2\x67\xc3"
++	"\x77\x26\x20\x97\x2b\xf8\x13\x43\x93\x9c\x9a\xa4\x08\xc7\x34\x83"
++	"\xe6\x98\x61\xe7\x16\x30\x2c\xb1\xdb\x2a\xb2\xcc\xc3\x02\xa5\x3c"
++	"\x71\x50\x14\x83\xc7\xbb\xa4\xbe\x98\x1b\xfe\xcb\x43\xe9\x97\x62"
++	"\xd6\xf0\x8c\xcb\x1c\xba\x1e\xa8\xa6\xa6\x50\xfc\x85\x7d\x47\xbf"
++	"\xf4\x3e\x23\xd3\x5f\xb2\x71\x3e\x40\x94\xaa\x87\x83\x2c\x6c\x8e"
++	"\x60\xfd\xdd\xf7\xf4\x76\x03\xd3\x1d\xec\x18\x51\xa3\xf2\x44\x1a"
++	"\x3f\xb4\x7c\x18\x0d\x68\x65\x92\x54\x0d\x2d\x81\x16\xf1\x84\x66"
++	"\x89\x92\xd0\x1a\x5e\x1f\x42\x46\x5b\xe5\x83\x86\x80\xd9\xcd\x3a"
++	"\x5a\x2f\xb9\x59\x9b\xe4\x43\x84\x64\xf3\x09\x1a\x0a\xa2\x64\x0f"
++	"\x77\x4e\x8d\x8b\xe6\x88\xd1\xfc\xaf\x8f\xdf\x1d\xbc\x31\xb3\xbd",
++	.expected_ss =
++	"\x34\xc3\x35\x14\x88\x46\x26\x23\x97\xbb\xdd\x28\x5c\x94\xf6\x47"
++	"\xca\xb3\x19\xaf\xca\x44\x9b\xc2\x7d\x89\xfd\x96\x14\xfd\x6d\x58"
++	"\xd8\xc4\x6b\x61\x2a\x0d\xf2\x36\x45\xc8\xe4\xa4\xed\x81\x53\x81"
++	"\x66\x1e\xe0\x5a\xb1\x78\x2d\x0b\x5c\xb4\xd1\xfc\x90\xc6\x9c\xdb"
++	"\x5a\x30\x0b\x14\x7d\xbe\xb3\x7d\xb1\xb2\x76\x3c\x6c\xef\x74\x6b"
++	"\xe7\x1f\x64\x0c\xab\x65\xe1\x76\x5c\x3d\x83\xb5\x8a\xfb\xaf\x0f"
++	"\xf2\x06\x14\x8f\xa0\xf6\xc1\x89\x78\xf2\xba\x72\x73\x3c\xf7\x76"
++	"\x21\x67\xbc\x24\x31\xb8\x09\x65\x0f\x0c\x02\x32\x4a\x98\x14\xfc"
++	"\x72\x2c\x25\x60\x68\x5f\x2f\x30\x1e\x5b\xf0\x3b\xd1\xa2\x87\xa0"
++	"\x54\xdf\xdb\xc0\xee\x0a\x0f\x47\xc9\x90\x20\x2c\xf9\xe3\x52\xad"
++	"\x27\x65\x8d\x54\x8d\xa8\xa1\xf3\xed\x15\xd4\x94\x28\x90\x31\x93"
++	"\x1b\xc0\x51\xbb\x43\x5d\x76\x3b\x1d\x2a\x71\x50\xea\x5d\x48\x94"
++	"\x7f\x6f\xf1\x48\xdb\x30\xe5\xae\x64\x79\xd9\x7a\xdb\xc6\xff\xd8"
++	"\x5e\x5a\x64\xbd\xf6\x85\x04\xe8\x28\x6a\xac\xef\xce\x19\x8e\x9a"
++	"\xfe\x75\xc0\x27\x69\xe3\xb3\x7b\x21\xa7\xb1\x16\xa4\x85\x23\xee"
++	"\xb0\x1b\x04\x6e\xbd\xab\x16\xde\xfd\x86\x6b\xa9\x95\xd7\x0b\xfd",
++	.p_size = 256,
++	.g_size = 1,
++	.xa_size = 256,
++	.yb_size = 256,
++	.expected_ya_size = 256,
++	.expected_ss_size = 256,
++	}
++};
++
+ /*
+  * MD4 test vectors from RFC1320
+  */
+diff --git a/include/crypto/dh.h b/include/crypto/dh.h
+new file mode 100644
+index 0000000..a190ed4
+--- /dev/null
++++ b/include/crypto/dh.h
+@@ -0,0 +1,25 @@
++/*
++ * Diffie-Hellman params to be used with kpp API
++ *
++ * Copyright (c) 2016, Intel Corporation
++ * Authors: Salvatore Benedetto <salvatore.benedetto@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++#ifndef _CRYPTO_DH_
++#define _CRYPTO_DH_
++
++struct dh {
++	void *key;
++	void *p;
++	void *g;
++	unsigned int key_size;
++	unsigned int p_size;
++	unsigned int g_size;
++};
++
++#endif
 -- 
 2.7.4
