@@ -1,72 +1,72 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 5/7] random: replace non-blocking pool with a Chacha20-based CRNG
-Date: Mon, 13 Jun 2016 20:00:33 +0200
-Message-ID: <5058147.V85lyiaTYe@positron.chronox.de>
-References: <1465832919-11316-1-git-send-email-tytso@mit.edu> <1465832919-11316-6-git-send-email-tytso@mit.edu>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH 5/7] random: replace non-blocking pool with a
+ Chacha20-based CRNG
+Date: Mon, 13 Jun 2016 15:03:58 -0400
+Message-ID: <20160613190358.GA2633@thunk.org>
+References: <1465832919-11316-1-git-send-email-tytso@mit.edu>
+ <1465832919-11316-6-git-send-email-tytso@mit.edu>
+ <5058147.V85lyiaTYe@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=us-ascii
 Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
 	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
 	andi@firstfloor.org, sandyinchina@gmail.com, jsd@av8n.com,
 	hpa@zytor.com
-To: Theodore Ts'o <tytso@mit.edu>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:36372 "EHLO mail.eperm.de"
+Received: from imap.thunk.org ([74.207.234.97]:45924 "EHLO imap.thunk.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1161026AbcFMSAg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Jun 2016 14:00:36 -0400
-In-Reply-To: <1465832919-11316-6-git-send-email-tytso@mit.edu>
+	id S1422948AbcFMTEM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 13 Jun 2016 15:04:12 -0400
+Content-Disposition: inline
+In-Reply-To: <5058147.V85lyiaTYe@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 13. Juni 2016, 11:48:37 schrieb Theodore Ts'o:
+On Mon, Jun 13, 2016 at 08:00:33PM +0200, Stephan Mueller wrote:
+> 
+> 1. The ChaCha20 is seeded with 256 bits (let us assume it is full entropy)
+> 
+> 2. The ChaCha20 block operation shuffles the 256 bits of entropy over the 512 
+> bit state -- already here we see that after shuffling, the entropy to bit 
+> ratio fell from (256 bits of entropy / 256 data bits) to (256 bits of entropy 
+> / 512 data bits).
+> 
+> 3. The code above directly returns the output of the ChaCha20 round to the 
+> caller. Considering the discussion in step 2, I would assume that the entropy 
+> content of the output size is cut in half.
 
-Hi Theodore,
+This is a CSRNG, not an entropy pool.  One could make the same
+argument about an AES Counter based DRBG.  So you could start with an
+256 AES key, and then after you return ENCRYPT(AES_KEY, COUNTER++),
+you've "halved" the entropy in the AES CTR-DRBG state.  Oh, noes!!!
 
->  /*
-> @@ -1254,15 +1423,26 @@ static ssize_t extract_entropy_user(struct
-> entropy_store *r, void __user *buf, */
->  void get_random_bytes(void *buf, int nbytes)
->  {
-> +	__u8 tmp[CHACHA20_BLOCK_SIZE];
-> +
->  #if DEBUG_RANDOM_BOOT > 0
-> -	if (unlikely(nonblocking_pool.initialized == 0))
-> +	if (!crng_ready())
->  		printk(KERN_NOTICE "random: %pF get_random_bytes called "
-> -		       "with %d bits of entropy available\n",
-> -		       (void *) _RET_IP_,
-> -		       nonblocking_pool.entropy_total);
-> +		       "with crng_init = %d\n", (void *) _RET_IP_, crng_init);
->  #endif
->  	trace_get_random_bytes(nbytes, _RET_IP_);
-> -	extract_entropy(&nonblocking_pool, buf, nbytes, 0, 0);
-> +
-> +	while (nbytes >= CHACHA20_BLOCK_SIZE) {
-> +		extract_crng(buf);
-> +		buf += CHACHA20_BLOCK_SIZE;
-> +		nbytes -= CHACHA20_BLOCK_SIZE;
-> +	}
-> +
-> +	if (nbytes > 0) {
-> +		extract_crng(tmp);
-> +		memcpy(buf, tmp, nbytes);
-> +		memzero_explicit(tmp, nbytes);
-> +	}
+The reason why I don't view this as a problem is because we're
+assuming that the cipher algorithm is secure.  With /dev/urandom we
+were always emitting more bytes than we had entropy available, because
+not blocking was considered more important.  Previously we were
+relying on the security of SHA-1.  With AES CTR-DRBG, you rely on the
+security with AES.  With this patch, we're relying on the security of
+Chacha20.  Given that this is being used in TLS for more and more
+mobile connections, I'm comfortable with that choice.
 
-What is your take on the following issue:
+For someone who doesn't trust the security of our underlying
+algorithms, and want to trust solely in the correctness of our entropy
+estimation algorithms, they can always use /dev/random.
 
-1. The ChaCha20 is seeded with 256 bits (let us assume it is full entropy)
 
-2. The ChaCha20 block operation shuffles the 256 bits of entropy over the 512 
-bit state -- already here we see that after shuffling, the entropy to bit 
-ratio fell from (256 bits of entropy / 256 data bits) to (256 bits of entropy 
-/ 512 data bits).
+So to be clear about what we're doing, ChaCha20 uses as its internal
+state 16 bytes of constant, followed by 32 bytes of key, followed by
+16 bytes of counter.  It is a stream cipher where each successive
+block in the keystream is generated by bumping the counter, and
+encryption is done by XOR'ing the keystream with the plaintext.
 
-3. The code above directly returns the output of the ChaCha20 round to the 
-caller. Considering the discussion in step 2, I would assume that the entropy 
-content of the output size is cut in half.
+If you ignore the backtracking protection introduced in patch 7/7 in
+this series (which uses unreleased portions of the previous keystream
+to mutate the key for future CRNG outputs), what we're doing is using
+the keystream as the output for the CRNG/CSRNG, and morally, this is
+no different from a CTR-DRBG as defined in SP 800-90A.
 
-Ciao
-Stephan
+Cheers,
+
+						- Ted
