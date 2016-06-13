@@ -1,41 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: vmx: Fix ABI detection
-Date: Mon, 13 Jun 2016 20:30:21 +0800
-Message-ID: <20160613123021.GC8583@gondor.apana.org.au>
-References: <1465541223-17537-1-git-send-email-anton@ozlabs.org>
+Subject: Re: [PATCH v2 0/3] hw_random: Add Amlogic Meson SoCs Random
+ Generator driver
+Date: Mon, 13 Jun 2016 20:31:09 +0800
+Message-ID: <20160613123109.GA8674@gondor.apana.org.au>
+References: <1465546915-24229-1-git-send-email-narmstrong@baylibre.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: pfsmorigo@linux.vnet.ibm.com, benh@kernel.crashing.org,
-	paulus@samba.org, mpe@ellerman.id.au, davem@davemloft.net,
-	strosake@austin.ibm.com, linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-To: Anton Blanchard <anton@ozlabs.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:58420 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S964822AbcFMMa7 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Jun 2016 08:30:59 -0400
+Cc: Matt Mackall <mpm@selenic.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Neil Armstrong <narmstrong@baylibre.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1465541223-17537-1-git-send-email-anton@ozlabs.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1465546915-24229-1-git-send-email-narmstrong@baylibre.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jun 10, 2016 at 04:47:02PM +1000, Anton Blanchard wrote:
-> From: Anton Blanchard <anton@samba.org>
+On Fri, Jun 10, 2016 at 10:21:52AM +0200, Neil Armstrong wrote:
+> Add support for the Amlogic Meson SoCs Hardware Random generator as a hw_random char driver.
+> The generator is a single 32bit wide register.
+> Also adds the Meson GXBB SoC DTSI node and corresponding DT bindings.
 > 
-> When calling ppc-xlate.pl, we pass it either linux-ppc64 or
-> linux-ppc64le. The script however was expecting linux64le, a result
-> of its OpenSSL origins. This means we aren't obeying the ppc64le
-> ABIv2 rules.
+> Changes since v1 at http://lkml.kernel.org/r/1464943621-18278-1-git-send-email-narmstrong@baylibre.com :
+> - change to depend on ARCH_MESON || COMPILE_TEST
+> - check buffer max size in read
 > 
-> Fix this by checking for linux-ppc64le.
-> 
-> Fixes: 5ca55738201c ("crypto: vmx - comply with ABIs that specify vrsave as reserved.")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Anton Blanchard <anton@samba.org>
+> Neil Armstrong (3):
+>   char: hw_random: Add Amlogic Meson Hardware Random Generator
+>   dt-bindings: hwrng: Add Amlogic Meson Hardware Random Generator
+>     bindings
+>   ARM64: dts: meson-gxbb: Add Hardware Random Generator node
 
-Both applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
