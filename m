@@ -1,67 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v6 2/8] crypto: add driver-side scomp interface
-Date: Mon, 13 Jun 2016 16:56:12 +0800
-Message-ID: <20160613085612.GA7333@gondor.apana.org.au>
-References: <1465373818-29720-1-git-send-email-giovanni.cabiddu@intel.com>
- <1465373818-29720-3-git-send-email-giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH v5 1/3] crypto: Key-agreement Protocol Primitives API
+ (KPP)
+Date: Mon, 13 Jun 2016 16:59:39 +0800
+Message-ID: <20160613085939.GA7420@gondor.apana.org.au>
+References: <1462830041-7582-1-git-send-email-salvatore.benedetto@intel.com>
+ <1462830041-7582-2-git-send-email-salvatore.benedetto@intel.com>
+ <20160531064210.GA13948@gondor.apana.org.au>
+ <309B30E91F5E2846B79BD9AA9711D031930814@IRSMSX102.ger.corp.intel.com>
+ <20160608025451.GB12283@gondor.apana.org.au>
+ <20160608114547.GA26661@sbenedet-virtual-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41660 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:49022 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161007AbcFMI4U (ORCPT
+	with ESMTP id S933300AbcFMI7n (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Jun 2016 04:56:20 -0400
+	Mon, 13 Jun 2016 04:59:43 -0400
 Content-Disposition: inline
-In-Reply-To: <1465373818-29720-3-git-send-email-giovanni.cabiddu@intel.com>
+In-Reply-To: <20160608114547.GA26661@sbenedet-virtual-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 08, 2016 at 09:16:52AM +0100, Giovanni Cabiddu wrote:
+On Wed, Jun 08, 2016 at 12:45:47PM +0100, Salvatore Benedetto wrote:
 >
-> +static void *scomp_map(struct scatterlist *sg, unsigned int len,
-> +		       gfp_t gfp_flags)
-> +{
-> +	void *buf;
-> +
-> +	if (sg_is_last(sg))
-> +		return kmap_atomic(sg_page(sg)) + sg->offset;
+> Having said that, are you OK with as far as the interface goes
+> to only merge set_param and set_key, and keeping the rest as it is?
+> For the implementation of DH and ECDH I'll merge the two operations
+> functions into one as you suggested. If so, I'll send a new version.
 
-This doesn't work, because kmap_atomic maps a single page only
-bug an SG entry can be a super-page, e.g., a set of contiguous
-pages.
+Yes you're right.  We can always just share the code underneath.
 
-> +	buf = kmalloc(len, gfp_flags);
-
-The backup path is also very unlikely to work because we'll be
-hitting this with 64K sizes and this just won't work with a 4K
-page size.
-
-So up until now we've getting around this 64K issue with vmalloc,
-and then we try to conserve the precious vmalloc resource by using
-per-cpu allocation.
-
-This totally breaks down once you go to DMA, where an SG list is
-required.  Unfortunately, this means that there is no easy way
-to linearise the data for our software implementations.
-
-There is no easy way out I'm afraid.  I think we'll have to bite
-the bullet and refit our software algos so that they handle SG
-lists.
-
-Not only will this solve the problem at hand, it'll also mean that
-acomp users will never have to do vmalloc so it's a win-win.  It
-also means that we won't need the scomp interface at all.
-
-This does bring up another question of who should be allocating the
-output memory.  Up until now it has been up to the user to do so.
-However, if our algos can actually handle SG lists then I think it
-should be fairly easy to make them do the allocation instead.  What
-do you think?
-
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
