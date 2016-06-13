@@ -1,122 +1,77 @@
 From: Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH 7/7] random: add backtracking protection to the CRNG
-Date: Mon, 13 Jun 2016 11:48:39 -0400
-Message-ID: <1465832919-11316-8-git-send-email-tytso@mit.edu>
-References: <1465832919-11316-1-git-send-email-tytso@mit.edu>
+Subject: [PATCH-v4 0/7] random: replace urandom pool with a CRNG
+Date: Mon, 13 Jun 2016 11:48:32 -0400
+Message-ID: <1465832919-11316-1-git-send-email-tytso@mit.edu>
 Cc: linux-crypto@vger.kernel.org, smueller@chronox.de,
 	herbert@gondor.apana.org.au, andi@firstfloor.org,
 	sandyinchina@gmail.com, jsd@av8n.com, hpa@zytor.com,
 	Theodore Ts'o <tytso@mit.edu>
 To: Linux Kernel Developers List <linux-kernel@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:45048 "EHLO imap.thunk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1424296AbcFMPt2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Jun 2016 11:49:28 -0400
-In-Reply-To: <1465832919-11316-1-git-send-email-tytso@mit.edu>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Signed-off-by: Theodore Ts'o <tytso@mit.edu>
----
- drivers/char/random.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 49 insertions(+), 5 deletions(-)
+I plan to push this set of changes in the next merge window.  Last
+call for comments....
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index d640865..963a6a9 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -436,7 +436,8 @@ static int crng_init = 0;
- #define crng_ready() (likely(crng_init > 0))
- static void _extract_crng(struct crng_state *crng,
- 			  __u8 out[CHACHA20_BLOCK_SIZE]);
--static void extract_crng(__u8 out[CHACHA20_BLOCK_SIZE]);
-+static void _crng_backtrack_protect(struct crng_state *crng,
-+				    __u8 tmp[CHACHA20_BLOCK_SIZE], int used);
- static void process_random_ready_list(void);
- 
- /**********************************************************************
-@@ -826,8 +827,11 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
- 		num = extract_entropy(r, &buf, 32, 16, 0);
- 		if (num == 0)
- 			return;
--	} else
-+	} else {
- 		_extract_crng(&primary_crng, buf.block);
-+		_crng_backtrack_protect(&primary_crng, buf.block,
-+					CHACHA20_KEY_SIZE);
-+	}
- 	spin_lock_irqsave(&primary_crng.lock, flags);
- 	for (i = 0; i < 8; i++) {
- 		unsigned long	rv;
-@@ -889,9 +893,46 @@ static void extract_crng(__u8 out[CHACHA20_BLOCK_SIZE])
- 	_extract_crng(crng, out);
- }
- 
-+/*
-+ * Use the leftover bytes from the CRNG block output (if there is
-+ * enough) to mutate the CRNG key to provide backtracking protection.
-+ */
-+static void _crng_backtrack_protect(struct crng_state *crng,
-+				    __u8 tmp[CHACHA20_BLOCK_SIZE], int used)
-+{
-+	unsigned long	flags;
-+	__u32		*s, *d;
-+	int		i;
-+
-+	used = round_up(used, sizeof(__u32));
-+	if (used + CHACHA20_KEY_SIZE > CHACHA20_BLOCK_SIZE) {
-+		extract_crng(tmp);
-+		used = 0;
-+	}
-+	spin_lock_irqsave(&crng->lock, flags);
-+	s = (__u32 *) &tmp[used];
-+	d = &crng->state[4];
-+	for (i=0; i < 8; i++)
-+		*d++ ^= *s++;
-+	spin_unlock_irqrestore(&crng->lock, flags);
-+}
-+
-+static void crng_backtrack_protect(__u8 tmp[CHACHA20_BLOCK_SIZE], int used)
-+{
-+	struct crng_state *crng = NULL;
-+
-+#ifdef CONFIG_NUMA
-+	if (crng_node_pool)
-+		crng = crng_node_pool[numa_node_id()];
-+	if (crng == NULL)
-+#endif
-+		crng = &primary_crng;
-+	_crng_backtrack_protect(crng, tmp, used);
-+}
-+
- static ssize_t extract_crng_user(void __user *buf, size_t nbytes)
- {
--	ssize_t ret = 0, i;
-+	ssize_t ret = 0, i = CHACHA20_BLOCK_SIZE;
- 	__u8 tmp[CHACHA20_BLOCK_SIZE];
- 	int large_request = (nbytes > 256);
- 
-@@ -916,6 +957,7 @@ static ssize_t extract_crng_user(void __user *buf, size_t nbytes)
- 		buf += i;
- 		ret += i;
- 	}
-+	crng_backtrack_protect(tmp, i);
- 
- 	/* Wipe data just written to memory */
- 	memzero_explicit(tmp, sizeof(tmp));
-@@ -1473,8 +1515,10 @@ void get_random_bytes(void *buf, int nbytes)
- 	if (nbytes > 0) {
- 		extract_crng(tmp);
- 		memcpy(buf, tmp, nbytes);
--		memzero_explicit(tmp, nbytes);
--	}
-+		crng_backtrack_protect(tmp, nbytes);
-+	} else
-+		crng_backtrack_protect(tmp, CHACHA20_BLOCK_SIZE);
-+	memzero_explicit(tmp, sizeof(tmp));
- }
- EXPORT_SYMBOL(get_random_bytes);
- 
+By using a CRNG to replace the urandom pool, we can more quickly
+initialized the random number generator used for getrandom(2) and
+/dev/urandom.  On bare metal hardware this tends to get initialized
+before the devices are finished being probed.  We use a more
+aggressive accounting for entropy accounting initially, and then fall
+back to the original slower/more conservative entropy accounting
+scheme.
+
+We will also use a hardware rng (such as virtio-rng), if available to
+initialize the getrandom(2) / /dev/urandom entropy pool.
+
+In addition, on NUMA systems we make the CRNG state per-NUMA socket, to
+address the NUMA locking contention problem which Andi Kleen has been
+complaining about.  I'm not entirely sure this will work well on the
+crazy big SGI systems, but they are rare.  Whether they are rarer than
+abusive userspace programs that are continuously pounding /dev/urandom
+is unclear.  If necessary we can make a config option to turn off the
+per-NUMA socket hack if it proves to be problematic.
+
+Eric Biggers (1):
+  random: properly align get_random_int_hash
+
+Stephan Mueller (1):
+  random: add interrupt callback to VMBus IRQ handler
+
+Theodore Ts'o (5):
+  random: initialize the non-blocking pool via
+    add_hwgenerator_randomness()
+  random: print a warning for the first ten uninitialized random users
+  random: replace non-blocking pool with a Chacha20-based CRNG
+  random: make /dev/urandom scalable for silly userspace programs
+  random: add backtracking protection to the CRNG
+
+Changes since -v3:
+ * Use a hardware rng (e.g., virtio-rng) if possible to initialize the
+   getrandom/urandom pool if available
+ * Print up to 10 warnings for uninitialized /dev/urandom reads, not just one
+ * Back out experiment to block /dev/urandom reads, since this will
+   break too many distributions or other user space setups (including
+   Python 3.5.2 and Debian Stretch's systemd-crontab-generator)
+ * Mark bug fixes for stable kernel backports
+
+Changes since -v2:
+  * Rebased to v4.7-rc1
+  * Improved/reworked CRNG reseeding and backtracking protection
+  * Preseed the CRNG state from system data
+  * Added fix to properly align the get_random_int_hash[] array
+
+ crypto/chacha20_generic.c |  61 ------
+ drivers/char/random.c     | 465 +++++++++++++++++++++++++++++++++++++---------
+ drivers/hv/vmbus_drv.c    |   3 +
+ include/crypto/chacha20.h |   1 +
+ lib/Makefile              |   2 +-
+ lib/chacha20.c            |  79 ++++++++
+ 6 files changed, 457 insertions(+), 154 deletions(-)
+ create mode 100644 lib/chacha20.c
+
+git://git.kernel.org/pub/scm/linux/kernel/git/tytso/random.git  1d6e2eda6f60
+
 -- 
 2.5.0
