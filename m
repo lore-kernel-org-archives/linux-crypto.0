@@ -1,47 +1,53 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 2/4] crypto: DRBG - use aligned buffers
-Date: Mon, 13 Jun 2016 12:10:03 +0200
-Message-ID: <2604191.AVFi5UBCGh@tauon.atsec.com>
-References: <3932580.AnntHTzK82@positron.chronox.de> <1525370.lyuSIsxrou@positron.chronox.de> <20160613093714.GA7634@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: qat: Remove deprecated create_workqueue
+Date: Mon, 13 Jun 2016 20:29:31 +0800
+Message-ID: <20160613122931.GA8583@gondor.apana.org.au>
+References: <20160607211746.GA17667@Karyakshetra>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Julia Lawall <Julia.Lawall@lip6.fr>,
+	Conor McLoughlin <conor.mcloughlin@intel.com>,
+	Pingchao Yang <pingchao.yang@intel.com>,
+	Ahsan Atta <ahsan.atta@intel.com>,
+	John Griffin <john.griffin@intel.com>,
+	Wu Fengguang <fengguang.wu@intel.com>,
+	Tejun Heo <tj@kernel.org>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Bhaktipriya Shridhar <bhaktipriya96@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:36340 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S964862AbcFMKK2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Jun 2016 06:10:28 -0400
-In-Reply-To: <20160613093714.GA7634@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:35146 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S965065AbcFMM34 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 13 Jun 2016 08:29:56 -0400
+Content-Disposition: inline
+In-Reply-To: <20160607211746.GA17667@Karyakshetra>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 13. Juni 2016, 17:37:14 schrieb Herbert Xu:
-
-Hi Herbert,
-
-> On Fri, Jun 10, 2016 at 07:56:57AM +0200, Stephan Mueller wrote:
-> > Hardware cipher implementation may require aligned buffers. All buffers
-> > that potentially are processed with a cipher are now aligned.
-> > 
-> > At the time of the allocation of the memory, we have not yet allocated
-> > the cipher implementations. Hence, we cannot obtain the alignmask for
-> > the used cipher yet. Therefore, the DRBG code uses an alignment which
-> > should satisfy all cipher implementations.
+On Wed, Jun 08, 2016 at 02:47:47AM +0530, Bhaktipriya Shridhar wrote:
+> alloc_workqueue replaces deprecated create_workqueue().
 > 
-> Why not change it so that you allocate these buffers after you
-> have obtained the tfm object? An alignment of 8 doesn't work for
-> padlock at least, but then again the padlock driver doesn't support
-> CTR so it's no big deal.
+> The workqueue device_reset_wq has workitem &reset_data->reset_work per
+> adf_reset_dev_data. The workqueue  pf2vf_resp_wq is a workqueue for
+> PF2VF responses has workitem &pf2vf_resp->pf2vf_resp_work per pf2vf_resp.
+> The workqueue adf_vf_stop_wq is used to call adf_dev_stop()
+> asynchronously.
 > 
-> I think if you are going to worry about alignment then let's do it
-> properly and use the actual alignment required.
-
-Will do.
+> Dedicated workqueues have been used in all cases since the workitems
+> on the workqueues are involved in operation of crypto which can be used in
+> the IO path which is depended upon during memory reclaim. Hence,
+> WQ_MEM_RECLAIM has been set to gurantee forward progress under memory
+> pressure.
+> Since there are only a fixed number of work items, explicit concurrency
+> limit is unnecessary.
 > 
-> Cheers,
+> Signed-off-by: Bhaktipriya Shridhar <bhaktipriya96@gmail.com>
 
-
-Ciao
-Stephan
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
