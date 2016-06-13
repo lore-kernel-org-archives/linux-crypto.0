@@ -1,46 +1,96 @@
-From: "Dey, Megha" <megha.dey@intel.com>
-Subject: RE: [PATCH] crypto : async implementation for sha1-mb
-Date: Mon, 13 Jun 2016 19:10:26 +0000
-Message-ID: <C440BA31B54DCD4AAC682D2365C8FEE703CABA2C@ORSMSX111.amr.corp.intel.com>
-References: <1465323282-2235-1-git-send-email-megha.dey@intel.com>
- <20160613082202.GA7148@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Yu, Fenghua" <fenghua.yu@intel.com>,
-	"Megha Dey" <megha.dey@linux.intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160613082202.GA7148@gondor.apana.org.au>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Subject: [PATCH v8 0/3] Key-agreement Protocol Primitives (KPP) API
+Date: Mon, 13 Jun 2016 22:55:45 +0100
+Message-ID: <1465854948-9084-1-git-send-email-salvatore.benedetto@intel.com>
+Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:41370 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753649AbcFMV4B (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 13 Jun 2016 17:56:01 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
+
+Hi Herb,
+
+the following patchset introduces a new API for abstracting key-agreement
+protocols such as DH and ECDH. It provides the primitives required for implementing
+the protocol, thus the name KPP (Key-agreement Protocol Primitives).
+
+Regards,
+Salvatore
+
+Changed from v7:
+* API change: merge set_param and set_key to set_key. Params and private
+  key are now provided together. Params have always to be provided.
+* Merge generate_public_key and compute_shared_secret into compute_val.
+  API stay as it is
+* Add ecc_is_key_valid to validate private key when set. Now that params
+  and key are set together we can validate the key right away. Before the
+  check was deferred to generate_public_key.
+
+Changes from v6:
+* Remove len parameter from crypto_kpp_set_params. Adjust rest of code
+  accordingly
+* Remove the while loop in ecdh_make_pub_key as the private key is fixed and
+  iterating is pointless. EAGAIN is now to returned to make the user aware
+  that he needs to regenerate/reset the private key
+
+Changes from v5:
+* Fix ecdh loading in fips mode.
+
+Changes from v4:
+* If fips_enabled is set allow only P256 (or higher) as Stephan suggested
+* Pass ndigits as argument to ecdh_make_pub_key and ecdh_shared_secret
+  so that VLA can be used like in the rest of the module
+
+Changes from v3:
+* Move curve ID definition to public header ecdh.h as users need to
+  have access to those ids when selecting the curve
+
+Changes from v2:
+* Add support for ECDH (curve P192 and P256). I reused the ecc module
+  already present in net/bluetooth and extended it in order to select
+  different curves at runtime. Code for P192 was taken from tinycrypt.
+
+Changes from v1:
+* Change check in dh_check_params_length based on Stephan review
 
 
+Salvatore Benedetto (3):
+  crypto: Key-agreement Protocol Primitives API (KPP)
+  crypto: kpp - Add DH software implementation
+  crypto: kpp - Add ECDH software support
 
------Original Message-----
-From: Herbert Xu [mailto:herbert@gondor.apana.org.au] 
-Sent: Monday, June 13, 2016 1:22 AM
-To: Dey, Megha <megha.dey@intel.com>
-Cc: tim.c.chen@linux.intel.com; davem@davemloft.net; linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Yu, Fenghua <fenghua.yu@intel.com>; Megha Dey <megha.dey@linux.intel.com>
-Subject: Re: [PATCH] crypto : async implementation for sha1-mb
+ crypto/Kconfig                  |   23 +
+ crypto/Makefile                 |    6 +
+ crypto/crypto_user.c            |   20 +
+ crypto/dh.c                     |  189 ++++++++
+ crypto/ecc.c                    | 1022 +++++++++++++++++++++++++++++++++++++++
+ crypto/ecc.h                    |   83 ++++
+ crypto/ecc_curve_defs.h         |   57 +++
+ crypto/ecdh.c                   |  151 ++++++
+ crypto/kpp.c                    |  123 +++++
+ crypto/testmgr.c                |  274 +++++++++++
+ crypto/testmgr.h                |  286 +++++++++++
+ include/crypto/dh.h             |   25 +
+ include/crypto/ecdh.h           |   26 +
+ include/crypto/internal/kpp.h   |   64 +++
+ include/crypto/kpp.h            |  310 ++++++++++++
+ include/linux/crypto.h          |    1 +
+ include/uapi/linux/cryptouser.h |    5 +
+ 17 files changed, 2665 insertions(+)
+ create mode 100644 crypto/dh.c
+ create mode 100644 crypto/ecc.c
+ create mode 100644 crypto/ecc.h
+ create mode 100644 crypto/ecc_curve_defs.h
+ create mode 100644 crypto/ecdh.c
+ create mode 100644 crypto/kpp.c
+ create mode 100644 include/crypto/dh.h
+ create mode 100644 include/crypto/ecdh.h
+ create mode 100644 include/crypto/internal/kpp.h
+ create mode 100644 include/crypto/kpp.h
 
-On Tue, Jun 07, 2016 at 11:14:42AM -0700, Megha Dey wrote:
->
-> -	desc->tfm = child;
-> -	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
-> +	ahash_request_set_tfm(desc, child);
-> +	ahash_request_set_callback(desc, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, 
-> +NULL);
-
-Why are the callbacks set to NULL/NULL? The child is async so you should have a valid callback function here.
-
-Instead of continuing to do the broken callback handling outside of the API (i.e., rctx->complete) please use the API mechanism that is provided for this purpose.
-
-> In the current implementation, the inner algorithm is called directly, and we use the outer algorithm's callback. We do not use the callback in inner algorithm. We are actually calling the child functions directly and the child is using the parent's call back function. Probably I can add a comment before the set callback function.. will this be ok?
-
-Thanks,
+-- 
+2.7.4
