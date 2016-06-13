@@ -1,55 +1,69 @@
-From: Kevin Hilman <khilman@baylibre.com>
-Subject: Re: [PATCH v2 0/3] hw_random: Add Amlogic Meson SoCs Random Generator driver
-Date: Mon, 13 Jun 2016 15:10:28 -0700
-Message-ID: <m2wplsviy3.fsf@baylibre.com>
-References: <1465546915-24229-1-git-send-email-narmstrong@baylibre.com>
-	<20160613123109.GA8674@gondor.apana.org.au>
+From: Andrew Zaborowski <balrogg@googlemail.com>
+Subject: Re: [PATCH v6 3/6] crypto: AF_ALG -- add asymmetric cipher interface
+Date: Tue, 14 Jun 2016 00:16:11 +0200
+Message-ID: <CAOq732J6J9b0NWuELRs7udiO7mApybfxjFaYX_UVdqHR+9Fvrw@mail.gmail.com>
+References: <20160515041645.15888.94903.stgit@tstruk-mobl1>
+ <20160515041701.15888.53830.stgit@tstruk-mobl1> <alpine.OSX.2.20.1606071719170.9891@mjmartin-mac01.local>
+ <6401187.24v903AfyY@tauon.atsec.com> <alpine.OSX.2.20.1606081135160.16651@mjmartin-mac01.local>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Neil Armstrong <narmstrong@baylibre.com>,
-	linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Matt Mackall <mpm@selenic.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Cc: Stephan Mueller <smueller@chronox.de>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	David Howells <dhowells@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-api@vger.kernel.org, marcel@holtmann.org,
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	David Woodhouse <dwmw2@infradead.org>, davem@davemloft.net
+To: Mat Martineau <mathew.j.martineau@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f43.google.com ([209.85.220.43]:32897 "EHLO
-	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1423768AbcFMWKb (ORCPT
+Received: from mail-vk0-f66.google.com ([209.85.213.66]:35931 "EHLO
+	mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751992AbcFMWQN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Jun 2016 18:10:31 -0400
-Received: by mail-pa0-f43.google.com with SMTP id b13so27161194pat.0
-        for <linux-crypto@vger.kernel.org>; Mon, 13 Jun 2016 15:10:30 -0700 (PDT)
-In-Reply-To: <20160613123109.GA8674@gondor.apana.org.au> (Herbert Xu's message
-	of "Mon, 13 Jun 2016 20:31:09 +0800")
+	Mon, 13 Jun 2016 18:16:13 -0400
+In-Reply-To: <alpine.OSX.2.20.1606081135160.16651@mjmartin-mac01.local>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+Hi,
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
-
-> On Fri, Jun 10, 2016 at 10:21:52AM +0200, Neil Armstrong wrote:
->> Add support for the Amlogic Meson SoCs Hardware Random generator as a hw_random char driver.
->> The generator is a single 32bit wide register.
->> Also adds the Meson GXBB SoC DTSI node and corresponding DT bindings.
->> 
->> Changes since v1 at http://lkml.kernel.org/r/1464943621-18278-1-git-send-email-narmstrong@baylibre.com :
->> - change to depend on ARCH_MESON || COMPILE_TEST
->> - check buffer max size in read
->> 
->> Neil Armstrong (3):
->>   char: hw_random: Add Amlogic Meson Hardware Random Generator
->>   dt-bindings: hwrng: Add Amlogic Meson Hardware Random Generator
->>     bindings
->>   ARM64: dts: meson-gxbb: Add Hardware Random Generator node
+On 8 June 2016 at 21:14, Mat Martineau
+<mathew.j.martineau@linux.intel.com> wrote:
+> On Wed, 8 Jun 2016, Stephan Mueller wrote:
+>> What is your concern?
+> Userspace must allocate larger buffers than it knows are necessary for
+> expected results.
 >
-> All applied.  Thanks.
+> It looks like the software rsa implementation handles shorter output buffers
+> ok (mpi_write_to_sgl will return EOVERFLOW if the the buffer is too small),
+> however I see at least one hardware rsa driver that requires the output
+> buffer to be the maximum size. But this inconsistency might be best
+> addressed within the software cipher or drivers rather than in recvmsg.
 
-Could you take just the driver please?
+Should the hardware drivers fix this instead?  I've looked at the qat
+and caam drivers, they both require the destination buffer size to be
+the key size and in both cases there would be no penalty for dropping
+this requirement as far as I see.  Both do a memmove if the result
+ends up being shorter than key size.  In case the caller knows it is
+expecting a specific output size, the driver will have to use a self
+allocated buffer + a memcpy in those same cases where it would later
+use memmove instead.  Alternatively the sg passed to dma_map_sg can be
+prepended with a dummy segment the right size to save the memcpy.
 
-Due to lots of other activity in the DT, I'd prefer to send the DT &
-bindings though the arm-soc (via the amlogic tree.)
+akcipher.h only says:
+@dst_len: Size of the output buffer. It needs to be at least as big as
+the expected result depending on the operation
 
-Thanks,
+Note that for random input data the memmove will be done about 1 in
+256 times but with PKCS#1 padding the signature always has a leading
+zero.
 
-Kevin
+Requiring buffers bigger than needed makes the added work of dropping
+the zero bytes from the sglist and potentially re-adding them in the
+client difficult to justify.  RSA doing this sets a precedent for a
+future pkcs1pad (or other algorithm) implementation to do the same
+thing and a portable client having to always know the key size and use
+key-sized buffers.
+
+Best regards
