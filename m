@@ -1,38 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/3] hw_random: Add Amlogic Meson SoCs Random
- Generator driver
-Date: Tue, 14 Jun 2016 18:33:06 +0800
-Message-ID: <20160614103306.GA20732@gondor.apana.org.au>
-References: <1465546915-24229-1-git-send-email-narmstrong@baylibre.com>
- <20160613123109.GA8674@gondor.apana.org.au>
- <m2wplsviy3.fsf@baylibre.com>
+Subject: Re: [PATCH v4] crypto: rsa - return raw integers for the ASN.1 parser
+Date: Tue, 14 Jun 2016 19:20:16 +0800
+Message-ID: <20160614112016.GB20732@gondor.apana.org.au>
+References: <1465827173-16916-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Neil Armstrong <narmstrong@baylibre.com>,
-	linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Matt Mackall <mpm@selenic.com>
-To: Kevin Hilman <khilman@baylibre.com>
+Cc: smueller@chronox.de, linux-crypto@vger.kernel.org
+To: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:43341 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:47365 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751326AbcFNKdO (ORCPT
+	with ESMTP id S1751879AbcFNLUg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Jun 2016 06:33:14 -0400
+	Tue, 14 Jun 2016 07:20:36 -0400
 Content-Disposition: inline
-In-Reply-To: <m2wplsviy3.fsf@baylibre.com>
+In-Reply-To: <1465827173-16916-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 13, 2016 at 03:10:28PM -0700, Kevin Hilman wrote:
-> Could you take just the driver please?
-> 
-> Due to lots of other activity in the DT, I'd prefer to send the DT &
-> bindings though the arm-soc (via the amlogic tree.)
+On Mon, Jun 13, 2016 at 05:12:53PM +0300, Tudor Ambarus wrote:
+> +
+> +struct rsa_ctx {
+> +	struct rsa_key key;
 
-OK I will back out these two patches.
+This isn't necessary and worse it may lead to bugs in future.
+The raw keys will be invalid as soon as the setkey functions
+return.
 
-Cheers,
+So just store it on the stack.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
