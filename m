@@ -1,40 +1,64 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto : async implementation for sha1-mb
-Date: Tue, 14 Jun 2016 12:34:10 +0800
-Message-ID: <20160614043410.GA18257@gondor.apana.org.au>
-References: <1465323282-2235-1-git-send-email-megha.dey@intel.com>
- <20160613082202.GA7148@gondor.apana.org.au>
- <C440BA31B54DCD4AAC682D2365C8FEE703CABA2C@ORSMSX111.amr.corp.intel.com>
+From: Neil Armstrong <narmstrong@baylibre.com>
+Subject: Re: [PATCH v2 3/3] ARM64: dts: meson-gxbb: Add Hardware Random
+ Generator node
+Date: Tue, 14 Jun 2016 06:59:16 +0200
+Message-ID: <575F8F24.5000803@baylibre.com>
+References: <1465546915-24229-1-git-send-email-narmstrong@baylibre.com>
+ <1465546915-24229-4-git-send-email-narmstrong@baylibre.com>
+ <m2ziqoviz0.fsf@baylibre.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Yu, Fenghua" <fenghua.yu@intel.com>,
-	Megha Dey <megha.dey@linux.intel.com>
-To: "Dey, Megha" <megha.dey@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48326 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750939AbcFNEei (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Jun 2016 00:34:38 -0400
-Content-Disposition: inline
-In-Reply-To: <C440BA31B54DCD4AAC682D2365C8FEE703CABA2C@ORSMSX111.amr.corp.intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org
+To: Kevin Hilman <khilman@baylibre.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <m2ziqoviz0.fsf@baylibre.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jun 13, 2016 at 07:10:26PM +0000, Dey, Megha wrote:
->
-> > In the current implementation, the inner algorithm is called directly, and we use the outer algorithm's callback. We do not use the callback in inner algorithm. We are actually calling the child functions directly and the child is using the parent's call back function. Probably I can add a comment before the set callback function.. will this be ok?
+On 06/14/2016 12:09 AM, Kevin Hilman wrote:
+> Hi Neil,
+> 
+> Neil Armstrong <narmstrong@baylibre.com> writes:
+> 
+>> Signed-off-by: Neil Armstrong <narmstrong@baylibre.com>
+>> ---
+>>  arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+>> index 832815d..8353621 100644
+>> --- a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+>> +++ b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+>> @@ -167,6 +167,11 @@
+>>  			};
+>>  		};
+>>  
+>> +		rng {
+>> +			compatible = "amlogic,meson-rng";
+>> +			reg = <0x0 0xc8834000 0x0 0x4>;
+>> +		};
+> 
+> This should be under the periphs bus, with an offset of 0x0 instead of
+> at the top level.
+> 
+> See the for-next branch in the linux-amlogic tree[1] which has separate
+> busses for periphs and hiu.
 
-No this is a hack and you should not do that.
+Yes, It was introduced lately.
 
-You can of course set the inner request's callback to that of the outer request.
+Herbert,
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I'll repost this patch separately to arm-soc directly rebased on [1].
+
+Thanks,
+Neil
+
+> Kevin
+> 
+> [1] git://git.kernel.org/pub/scm/linux/kernel/git/khilman/linux-amlogic.git
+> 
