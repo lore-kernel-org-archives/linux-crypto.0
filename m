@@ -1,65 +1,98 @@
-From: "Benedetto, Salvatore" <salvatore.benedetto@intel.com>
-Subject: RE: [PATCH v8 1/3] crypto: Key-agreement Protocol Primitives API
- (KPP)
-Date: Tue, 14 Jun 2016 14:36:54 +0000
-Message-ID: <309B30E91F5E2846B79BD9AA9711D031933C15@IRSMSX102.ger.corp.intel.com>
-References: <1465854948-9084-1-git-send-email-salvatore.benedetto@intel.com>
- <1465854948-9084-2-git-send-email-salvatore.benedetto@intel.com>
- <20160614113430.GA21063@gondor.apana.org.au>
+From: Mat Martineau <mathew.j.martineau-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+Subject: Re: [PATCH v6 3/6] crypto: AF_ALG -- add asymmetric cipher
+ interface
+Date: Tue, 14 Jun 2016 10:22:15 -0700 (PDT)
+Message-ID: <alpine.OSX.2.20.1606140952080.13500@animeshb-mobl.amr.corp.intel.com>
+References: <20160515041645.15888.94903.stgit@tstruk-mobl1> <20160515041701.15888.53830.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"Benedetto, Salvatore" <salvatore.benedetto@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:56313 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750762AbcFNOha convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Jun 2016 10:37:30 -0400
-In-Reply-To: <20160614113430.GA21063@gondor.apana.org.au>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Cc: Tadeusz Struk <tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org
+To: smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20160515041701.15888.53830.stgit@tstruk-mobl1>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
 
-> -----Original Message-----
-> From: Herbert Xu [mailto:herbert@gondor.apana.org.au]
-> Sent: Tuesday, June 14, 2016 12:35 PM
-> To: Benedetto, Salvatore <salvatore.benedetto@intel.com>
-> Cc: linux-crypto@vger.kernel.org
-> Subject: Re: [PATCH v8 1/3] crypto: Key-agreement Protocol Primitives API
-> (KPP)
-> 
-> On Mon, Jun 13, 2016 at 10:55:46PM +0100, Salvatore Benedetto wrote:
-> >
-> > +struct kpp_alg {
-> > +	int (*set_secret)(struct crypto_kpp *tfm, void *buffer);
-> 
-> Sorry I think we need to change this.  Leaving this with no type checking
-> between the user and the driver is a recipe for disaster.
-> 
-> I think the easiest solution is to use either BER encoding like rsa.c or netlink
-> encoding like authenc.c.
+Stephan,
+
+On Sat, 14 May 2016, Tadeusz Struk wrote:
+
+> From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
 >
+> This patch adds the user space interface for asymmetric ciphers. The
+> interface allows the use of sendmsg as well as vmsplice to provide data.
+>
+> This version has been rebased on top of 4.6 and a few chackpatch issues
+> have been fixed.
+>
+> Signed-off-by: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+> ---
+> crypto/algif_akcipher.c |  542 +++++++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 542 insertions(+)
+> create mode 100644 crypto/algif_akcipher.c
+>
+> diff --git a/crypto/algif_akcipher.c b/crypto/algif_akcipher.c
+> new file mode 100644
+> index 0000000..6342b6e
+> --- /dev/null
+> +++ b/crypto/algif_akcipher.c
+> +
+> +static int akcipher_sendmsg(struct socket *sock, struct msghdr *msg,
+> +			    size_t size)
+> +{
+> +	struct sock *sk = sock->sk;
+> +	struct alg_sock *ask = alg_sk(sk);
+> +	struct akcipher_ctx *ctx = ask->private;
+> +	struct akcipher_sg_list *sgl = &ctx->tsgl;
+> +	struct af_alg_control con = {};
+> +	long copied = 0;
+> +	int op = 0;
+> +	bool init = 0;
+> +	int err;
+> +
+> +	if (msg->msg_controllen) {
+> +		err = af_alg_cmsg_send(msg, &con);
+> +		if (err)
+> +			return err;
+> +
+> +		init = 1;
+> +		switch (con.op) {
+> +		case ALG_OP_VERIFY:
+> +		case ALG_OP_SIGN:
+> +		case ALG_OP_ENCRYPT:
+> +		case ALG_OP_DECRYPT:
+> +			op = con.op;
+> +			break;
+> +		default:
+> +			return -EINVAL;
+> +		}
+> +	}
+> +
+> +	lock_sock(sk);
+> +	if (!ctx->more && ctx->used)
+> +		goto unlock;
 
-My very first patch used PKCS3 and there were some objections to that.
-https://patchwork.kernel.org/patch/8311881/
- 
-Both Bluetooth or keyctl KEYCTL_DH_COMPUTE would have to first pack the
-key to whatever format we choose and I don't see that very convinient. We
-only want to provide the acceleration here, without bounding the user to a
-certain key format.
- 
- akcipher is different as PKCS1 is a recognized standard for RSA keys.
- 
- Please don't get me wrong, it's not much of an issue for me to respin the
- patchset and change that to PKCS3 for example, but I see no harm in leaving
- it as it is and moving the key check format to whatever upper layer is using us
- (like BT and keyctl). Just more work for who is using the API.
- 
- Could you reconsider that?
- 
- Thanks,
- Salvatore
+err might be uninitialised at this goto. Should it be set to something 
+like -EALREADY to indicate that data is already queued for a different 
+crypto op?
+
+<snip>
+
+> +unlock:
+> +	akcipher_data_wakeup(sk);
+> +	release_sock(sk);
+> +
+> +	return err ?: copied;
+> +}
+
+Regards,
+
+--
+Mat Martineau
+Intel OTC
