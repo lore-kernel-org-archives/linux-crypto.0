@@ -1,46 +1,38 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: gcm - Filter out async ghash if necessary
-Date: Wed, 15 Jun 2016 22:27:05 +0800
-Message-ID: <20160615142705.GA18474@gondor.apana.org.au>
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: select on non-existing Kconfig option CRC32C
+Date: Wed, 15 Jun 2016 07:40:37 -0700
+Message-ID: <576168E5.9020009@infradead.org>
+References: <5761275B.4010508@fau.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:33741 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932370AbcFOO1I (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Jun 2016 10:27:08 -0400
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: Martin Schwidefsky <schwidefsky@de.ibm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel <linux-kernel@vger.kernel.org>
+To: Andreas Ziegler <andreas.ziegler@fau.de>,
+	Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <5761275B.4010508@fau.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-As it is if you ask for a sync gcm you may actually end up with
-an async one because it does not filter out async implementations
-of ghash.
+On 06/15/16 03:00, Andreas Ziegler wrote:
+> Hi Hendrik,
+> 
+> your patch "s390/crc32-vx: add crypto API module for optimized CRC-32
+> algorithms" showed up in linux-next today (next-20160615) as commit 	364148e0b195.
+> 
+> The patch defines the Kconfig option CRYPTO_CRC32_S390 which 'select's CRC32C.
+> However, this should probably have been CRYPTO_CRC32C, as CRC32C does not exist.
+> Should I prepare a trivial patch to fix this up or would you like to do that on
+> your side?
+> 
+> I found this issue by comparing yesterday's tree and today's tree using
+> 'scripts/checkkconfigsymbols -f -d next-20160614..next-20160615'.
 
-This patch fixes this by adding the necessary filter when looking
-for ghash.
+or should it select CRC32 or LIBCRC32C?  (probably not the LIB... one)
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/gcm.c b/crypto/gcm.c
-index bec329b..917b8fb 100644
---- a/crypto/gcm.c
-+++ b/crypto/gcm.c
-@@ -639,7 +639,9 @@ static int crypto_gcm_create_common(struct crypto_template *tmpl,
- 
- 	ghash_alg = crypto_find_alg(ghash_name, &crypto_ahash_type,
- 				    CRYPTO_ALG_TYPE_HASH,
--				    CRYPTO_ALG_TYPE_AHASH_MASK);
-+				    CRYPTO_ALG_TYPE_AHASH_MASK |
-+				    crypto_requires_sync(algt->type,
-+							 algt->mask));
- 	if (IS_ERR(ghash_alg))
- 		return PTR_ERR(ghash_alg);
- 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+~Randy
