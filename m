@@ -1,57 +1,83 @@
-From: Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
-Subject: Re: select on non-existing Kconfig option CRC32C
-Date: Wed, 15 Jun 2016 16:41:53 +0200
-Message-ID: <20160615144153.GB4700@linux.vnet.ibm.com>
-References: <5761275B.4010508@fau.de>
+From: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+Subject: [PATCH v8 1/3] crypto: scatterwak - Add scatterwalk_sg_copychunks
+Date: Wed, 15 Jun 2016 17:52:42 +0300
+Message-ID: <1466002364-16945-2-git-send-email-tudor-dan.ambarus@nxp.com>
+References: <1466002364-16945-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Hendrik Brueckner <brueckner@linux.vnet.ibm.com>,
-	Martin Schwidefsky <schwidefsky@de.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel <linux-kernel@vger.kernel.org>
-To: Andreas Ziegler <andreas.ziegler@fau.de>
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <horia.geanta@nxp.com>,
+	Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33102 "EHLO
-	mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753241AbcFOOmA (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Jun 2016 10:42:00 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id u5FEdQMe005673
-	for <linux-crypto@vger.kernel.org>; Wed, 15 Jun 2016 10:41:59 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 23jswb9vy8-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Wed, 15 Jun 2016 10:41:59 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <brueckner@linux.vnet.ibm.com>;
-	Wed, 15 Jun 2016 15:41:57 +0100
-Content-Disposition: inline
-In-Reply-To: <5761275B.4010508@fau.de>
+Received: from mail-bn1bon0067.outbound.protection.outlook.com ([157.56.111.67]:63530
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S932740AbcFOOwy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 15 Jun 2016 10:52:54 -0400
+In-Reply-To: <1466002364-16945-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Andreas,
+This patch adds the function scatterwalk_sg_copychunks which writes
+a chunk of data from a scatterwalk to another scatterwalk.
+It will be used by caam driver to remove the leading zeros
+for the output data of the RSA algorithm, after the computation completes.
 
-On Wed, Jun 15, 2016 at 12:00:59PM +0200, Andreas Ziegler wrote:
-> 
-> your patch "s390/crc32-vx: add crypto API module for optimized CRC-32
-> algorithms" showed up in linux-next today (next-20160615) as commit 	364148e0b195.
-> 
-> The patch defines the Kconfig option CRYPTO_CRC32_S390 which 'select's CRC32C.
-> However, this should probably have been CRYPTO_CRC32C, as CRC32C does not exist.
+Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+---
+ crypto/scatterwalk.c         | 26 ++++++++++++++++++++++++++
+ include/crypto/scatterwalk.h |  2 ++
+ 2 files changed, 28 insertions(+)
 
-Thanks for informing me.  Actually, the crc32-vx driver requires the
-__crc32c_le() function which is available by selecting CONFIG_CRC32. There is
-no need for CRYPTO_CRC32C.  So this can be safely removed.
-
-> Should I prepare a trivial patch to fix this up or would you like to do that on
-> your side?
-
-Martin have already corrected the patch.
-
-Thanks and kind regards,
-  Hendrik
+diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
+index ea5815c..bc3222d 100644
+--- a/crypto/scatterwalk.c
++++ b/crypto/scatterwalk.c
+@@ -125,6 +125,32 @@ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
+ }
+ EXPORT_SYMBOL_GPL(scatterwalk_map_and_copy);
+ 
++void scatterwalk_sg_copychunks(struct scatter_walk *dest,
++			       struct scatter_walk *src, size_t nbytes)
++{
++	for (;;) {
++		unsigned int len_this_page = scatterwalk_pagelen(dest);
++		u8 *vaddr;
++
++		if (len_this_page > nbytes)
++			len_this_page = nbytes;
++
++		vaddr = scatterwalk_map(dest);
++		scatterwalk_copychunks(vaddr, src, len_this_page, 0);
++		scatterwalk_unmap(vaddr);
++
++		scatterwalk_advance(dest, len_this_page);
++
++		if (nbytes == len_this_page)
++			break;
++
++		nbytes -= len_this_page;
++
++		scatterwalk_pagedone(dest, 0, 1);
++	}
++}
++EXPORT_SYMBOL_GPL(scatterwalk_sg_copychunks);
++
+ int scatterwalk_bytes_sglen(struct scatterlist *sg, int num_bytes)
+ {
+ 	int offset = 0, n = 0;
+diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
+index 35f99b6..8b799c5 100644
+--- a/include/crypto/scatterwalk.h
++++ b/include/crypto/scatterwalk.h
+@@ -86,6 +86,8 @@ static inline void scatterwalk_unmap(void *vaddr)
+ void scatterwalk_start(struct scatter_walk *walk, struct scatterlist *sg);
+ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
+ 			    size_t nbytes, int out);
++void scatterwalk_sg_copychunks(struct scatter_walk *dest,
++			       struct scatter_walk *src, size_t nbytes);
+ void *scatterwalk_map(struct scatter_walk *walk);
+ void scatterwalk_done(struct scatter_walk *walk, int out, int more);
+ 
+-- 
+1.8.3.1
