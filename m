@@ -1,77 +1,57 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v4 0/5] /dev/random - a new approach
-Date: Wed, 15 Jun 2016 18:58:50 +0200
-Message-ID: <6137456.oZ1CFC9kFY@positron.chronox.de>
-References: <1466007463.20087.11.camel@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Andi Kleen <andi@firstfloor.org>, sandyinchina@gmail.com,
-	Jason Cooper <cryptography@lakedaemon.net>,
-	John Denker <jsd@av8n.com>,
-	"H. Peter Anvin" <hpa@linux.intel.com>,
-	Joe Perches <joe@perches.com>, Pavel Machek <pavel@ucw.cz>,
-	George Spelvin <linux@horizon.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: David =?utf-8?B?SmHFoWE=?= <djasa@redhat.com>
+From: Romain Perier <romain.perier@free-electrons.com>
+Subject: [PATCH 0/7] Chain crypto requests together at the DMA level
+Date: Wed, 15 Jun 2016 21:15:27 +0200
+Message-ID: <1466018134-10779-1-git-send-email-romain.perier@free-electrons.com>
+Cc: Gregory Clement <gregory.clement@free-electrons.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Russell King <linux@arm.linux.org.uk>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Arnaud Ebalard <arno@natisbad.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:36568 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752578AbcFOQ6y convert rfc822-to-8bit (ORCPT
+Received: from down.free-electrons.com ([37.187.137.238]:52748 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750751AbcFOTQf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Jun 2016 12:58:54 -0400
-In-Reply-To: <1466007463.20087.11.camel@redhat.com>
+	Wed, 15 Jun 2016 15:16:35 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 15. Juni 2016, 18:17:43 schrieb David Ja=C5=A1a:
+The Cryptographic Engines and Security Accelerators (CESA) supports
+the TDMA chained mode support. When this mode is enabled and crypto
+requests are chained at the DMA level, multiple crypto requests can be
+handled by the hardware engine without requiring any software
+intervention. This approach limits the number of interrupts generated
+by the engines thus improving its throughput and making the whole system
+behave nicely under heavy crypto load.
 
-Hi David,
+Benchmarking results with dmcrypt
+=================================
+		I/O read	I/O write
+Before		81.7 MB/s	31.7 MB/s
+After		129  MB/s	39.8 MB/s
 
-> Hello Stephan,
->=20
-> Did you consider blocking urandom output or returning error until
-> initialized? Given the speed of initialization you report, it shouldn=
-'t
-> break any userspace apps while making sure that nobody uses predictab=
-le
-> pseudoranom numbers.
-
-My LRNG will definitely touch the beginning of the initramfs booting un=
-til it=20
-is fully seeded. As these days the initramfs is driven by systemd which=
- always=20
-pulls from /dev/urandom, we cannot block as this would block systemd. I=
-n Ted's=20
-last patch, he mentioned that he tried to make /dev/urandom block which=
- caused=20
-user space pain.
-
-But if you use the getrandom system call, it works like /dev/urandom bu=
-t=20
-blocks until the DRBG behind /dev/urandom is fully initialized.
->=20
-> I was considering asking for patch (or even trying to write it myself=
-)
-> to make current urandom block/fail when not initialized but that woul=
-d
-> surely have to be off by default over "never break userspace" rule (e=
-ven
-> if it means way too easy security problem with both random and urando=
-m).
-> Properties of your urandom implementation makes this point moot and i=
-t
-> could make the random/urandom wars over.
-
-That patch unfortunately will not work. But if you are interested in th=
-at=20
-blocking /dev/urandom behavior for your application, use getrandom.
-
->=20
-> Best Regards,
->=20
-> David Ja=C5=A1a
+Improvement	+57.8 %		+25.5 %
 
 
-Ciao
-Stephan
+
+Romain Perier (7):
+  crypto: marvell: Add a macro constant for the size of the crypto queue
+  crypto: marvell: Check engine is not already running when enabling a
+    req
+  crypto: marvell: Copy IV vectors by DMA transfers for acipher requests
+  crypto: marvell: Moving the tdma chain out of mv_cesa_tdma_req
+  crypto: marvell: Adding a complete operation for async requests
+  crypto: marvell: Adding load balancing between engines
+  crypto: marvell: Add support for chaining crypto requests in TDMA mode
+
+ drivers/crypto/marvell/cesa.c   | 142 ++++++++++++++++++++++++++++++----------
+ drivers/crypto/marvell/cesa.h   | 103 +++++++++++++++++++++++------
+ drivers/crypto/marvell/cipher.c | 141 +++++++++++++++++++++++----------------
+ drivers/crypto/marvell/hash.c   | 126 +++++++++++++++++------------------
+ drivers/crypto/marvell/tdma.c   | 120 +++++++++++++++++++++++++++++++--
+ 5 files changed, 452 insertions(+), 180 deletions(-)
+
+-- 
+2.7.4
