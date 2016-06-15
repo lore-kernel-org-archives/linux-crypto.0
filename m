@@ -1,50 +1,38 @@
-From: Neil Armstrong <narmstrong-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>
-Subject: [RESEND PATCH 1/2] dt-bindings: hwrng: Add Amlogic Meson Hardware Random Generator bindings
-Date: Wed, 15 Jun 2016 12:01:45 +0200
-Message-ID: <1465984906-17840-2-git-send-email-narmstrong@baylibre.com>
-References: <1465984906-17840-1-git-send-email-narmstrong@baylibre.com>
-Cc: Neil Armstrong <narmstrong-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-amlogic-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1465984906-17840-1-git-send-email-narmstrong-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Andreas Ziegler <andreas.ziegler@fau.de>
+Subject: select on non-existing Kconfig option CRC32C
+Date: Wed, 15 Jun 2016 12:00:59 +0200
+Message-ID: <5761275B.4010508@fau.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Martin Schwidefsky <schwidefsky@de.ibm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel <linux-kernel@vger.kernel.org>
+To: Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx-rz-1.rrze.uni-erlangen.de ([131.188.11.20]:45299 "EHLO
+	mx-rz-1.rrze.uni-erlangen.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750976AbcFOKIs (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 15 Jun 2016 06:08:48 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Acked-by: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Signed-off-by: Neil Armstrong <narmstrong-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>
----
- .../devicetree/bindings/rng/amlogic,meson-rng.txt          | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
+Hi Hendrik,
 
-diff --git a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
-new file mode 100644
-index 0000000..202f2d0
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
-@@ -0,0 +1,14 @@
-+Amlogic Meson Random number generator
-+=====================================
-+
-+Required properties:
-+
-+- compatible : should be "amlogic,meson-rng"
-+- reg : Specifies base physical address and size of the registers.
-+
-+Example:
-+
-+rng {
-+        compatible = "amlogic,meson-rng";
-+        reg = <0x0 0xc8834000 0x0 0x4>;
-+};
--- 
-2.7.0
+your patch "s390/crc32-vx: add crypto API module for optimized CRC-32
+algorithms" showed up in linux-next today (next-20160615) as commit 	364148e0b195.
 
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+The patch defines the Kconfig option CRYPTO_CRC32_S390 which 'select's CRC32C.
+However, this should probably have been CRYPTO_CRC32C, as CRC32C does not exist.
+Should I prepare a trivial patch to fix this up or would you like to do that on
+your side?
+
+I found this issue by comparing yesterday's tree and today's tree using
+'scripts/checkkconfigsymbols -f -d next-20160614..next-20160615'.
+
+Best regards,
+
+Andreas
