@@ -1,61 +1,45 @@
-From: Gregory CLEMENT <gregory.clement@free-electrons.com>
-Subject: Re: [PATCH 3/7] crypto: marvell: Copy IV vectors by DMA transfers for acipher requests
-Date: Thu, 16 Jun 2016 10:32:05 +0200
-Message-ID: <87oa71bkl6.fsf@free-electrons.com>
-References: <1466018134-10779-1-git-send-email-romain.perier@free-electrons.com>
-	<1466018134-10779-4-git-send-email-romain.perier@free-electrons.com>
-	<20160615220716.6ad3b856@bbrezillon>
-	<5762636A.2020800@free-electrons.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] crypto: caam: fix misspelled upper_32_bits
+Date: Thu, 16 Jun 2016 11:05:46 +0200
+Message-ID: <20160616090609.1041337-1-arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@arndb.de>,
 	"David S. Miller" <davem@davemloft.net>,
-	Russell King <linux@arm.linux.org.uk>,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Romain Perier <romain.perier@free-electrons.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:38480 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751683AbcFPIcH (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 Jun 2016 04:32:07 -0400
-In-Reply-To: <5762636A.2020800@free-electrons.com> (Romain Perier's message of
-	"Thu, 16 Jun 2016 10:29:30 +0200")
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	=?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Romain,
- 
- On jeu., juin 16 2016, Romain Perier <romain.perier@free-electrons.com> wrote:
+An endianess fix mistakenly used higher_32_bits() instead of
+upper_32_bits(), and that doesn't exist:
 
->
->>> diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
->>> index 74071e4..74b84bd 100644
->>> --- a/drivers/crypto/marvell/cesa.h
->>> +++ b/drivers/crypto/marvell/cesa.h
->>> @@ -275,6 +275,7 @@ struct mv_cesa_op_ctx {
->>>   #define CESA_TDMA_DUMMY				0
->>>   #define CESA_TDMA_DATA				1
->>>   #define CESA_TDMA_OP				2
->>> +#define CESA_TDMA_IV				4
->>
->> Should be 3 and not 4: TDMA_TYPE is an enum, not a bit field.
->
-> Ok
->
->>
->> Sometime it's better to offend the < 80 characters rule than doing
->> funky stuff ;).
->
-> I just wanted to make checkpatch happy :D
+drivers/crypto/caam/desc_constr.h: In function 'append_ptr':
+drivers/crypto/caam/desc_constr.h:84:75: error: implicit declaration of function 'higher_32_bits' [-Werror=implicit-function-declaration]
+  *offset = cpu_to_caam_dma(ptr);
 
-In this case you can use a temporary variable.
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Fixes: 261ea058f016 ("crypto: caam - handle core endianness != caam endianness")
+---
+ drivers/crypto/caam/regs.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 8c766cf9202c..b3c5016f6458 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -183,10 +183,10 @@ static inline u64 rd_reg64(void __iomem *reg)
+ #ifdef CONFIG_SOC_IMX7D
+ #define cpu_to_caam_dma(value) \
+ 		(((u64)cpu_to_caam32(lower_32_bits(value)) << 32) | \
+-		 (u64)cpu_to_caam32(higher_32_bits(value)))
++		  (u64)cpu_to_caam32(upper_32_bits(value)))
+ #define caam_dma_to_cpu(value) \
+ 		(((u64)caam32_to_cpu(lower_32_bits(value)) << 32) | \
+-		 (u64)caam32_to_cpu(higher_32_bits(value)))
++		  (u64)caam32_to_cpu(upper_32_bits(value)))
+ #else
+ #define cpu_to_caam_dma(value) cpu_to_caam64(value)
+ #define caam_dma_to_cpu(value) caam64_to_cpu(value)
 -- 
-Gregory Clement, Free Electrons
-Kernel, drivers, real-time and embedded Linux
-development, consulting, training and support.
-http://free-electrons.com
+2.9.0
