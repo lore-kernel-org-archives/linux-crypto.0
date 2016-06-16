@@ -1,61 +1,118 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v6 3/6] crypto: AF_ALG -- add asymmetric cipher interface
-Date: Thu, 16 Jun 2016 10:05:48 +0200
-Message-ID: <10863259.oUiAus9m9y@positron.chronox.de>
-References: <20160515041645.15888.94903.stgit@tstruk-mobl1> <1759070.fi90mrsgKn@positron.chronox.de> <CAOq732+ZyjD2Wv3Pt7x+jfurvgVq5pcUA--+G6VQM5t861n-fQ@mail.gmail.com>
+From: Romain Perier <romain.perier@free-electrons.com>
+Subject: Re: [PATCH 2/7] crypto: marvell: Check engine is not already running
+ when enabling a req
+Date: Thu, 16 Jun 2016 10:18:45 +0200
+Message-ID: <576260E5.2000402@free-electrons.com>
+References: <1466018134-10779-1-git-send-email-romain.perier@free-electrons.com>
+ <1466018134-10779-3-git-send-email-romain.perier@free-electrons.com>
+ <20160615213709.3a060ff4@bbrezillon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-api@vger.kernel.org, marcel@holtmann.org,
-	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	David Woodhouse <dwmw2@infradead.org>, davem@davemloft.net
-To: Andrew Zaborowski <balrogg@googlemail.com>
+Content-Type: text/plain; charset=windows-1252;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Arnaud Ebalard <arno@natisbad.org>,
+	Gregory Clement <gregory.clement@free-electrons.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Russell King <linux@arm.linux.org.uk>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Boris Brezillon <boris.brezillon@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:36624 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751323AbcFPIFw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 Jun 2016 04:05:52 -0400
-In-Reply-To: <CAOq732+ZyjD2Wv3Pt7x+jfurvgVq5pcUA--+G6VQM5t861n-fQ@mail.gmail.com>
+Received: from down.free-electrons.com ([37.187.137.238]:38098 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751246AbcFPIS6 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 16 Jun 2016 04:18:58 -0400
+In-Reply-To: <20160615213709.3a060ff4@bbrezillon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 14. Juni 2016, 09:42:34 schrieb Andrew Zaborowski:
+Hello,
 
-Hi Andrew,
+Le 15/06/2016 21:37, Boris Brezillon a =E9crit :
+>
+> "
+> Add a BUG_ON() call when the driver tries to launch a crypto request
+> while the engine is still processing the previous one. This replaces
+> a silent system hang by a verbose kernel panic with the associated
+> backtrace to let the user know that something went wrong in the CESA
+> driver.
+> "
 
-> > 
-> > I think we have agreed on dropping the length enforcement at the interface
-> > level.
-> 
-> Separately from this there's a problem with the user being unable to
-> know if the algorithm is going to fail because of destination buffer
-> size != key size (including kernel users).  For RSA, the qat
-> implementation will fail while the software implementation won't.  For
-> pkcs1pad(...) there's currently just one implementation but the user
-> can't assume that.
+thanks
 
-If I understand your issue correctly, my initial code requiring the caller to 
-provide sufficient memory would have covered the issue, right? If so, we seem 
-to have implementations which can handle shorter buffer sizes and some which 
-do not. Should a caller really try to figure the right buffer size out? Why 
-not requiring a mandatory buffer size and be done with it? I.e. what is the 
-gain to allow shorter buffer sizes (as pointed out by Mat)? So, bottom line, I 
-am wondering whether we should keep the algif_akcipher code to require a 
-minimum buffer size.
+>
+>> ---
+>>   drivers/crypto/marvell/cipher.c | 2 ++
+>>   drivers/crypto/marvell/hash.c   | 2 ++
+>>   drivers/crypto/marvell/tdma.c   | 2 ++
+>>   3 files changed, 6 insertions(+)
+>>
+>> diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvel=
+l/cipher.c
+>> index dcf1fce..8d0fabb 100644
+>> --- a/drivers/crypto/marvell/cipher.c
+>> +++ b/drivers/crypto/marvell/cipher.c
+>> @@ -106,6 +106,8 @@ static void mv_cesa_ablkcipher_std_step(struct a=
+blkcipher_request *req)
+>>
+>>   	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACCEL0_DONE);
+>>   	writel_relaxed(CESA_SA_CFG_PARA_DIS, engine->regs + CESA_SA_CFG);
+>> +	BUG_ON(readl(engine->regs + CESA_SA_CMD)
+>> +				  & CESA_SA_CMD_EN_CESA_SA_ACCL0);
+>
+> Nit: please put the '&' operator at the end of the first line and
+> align CESA_SA_CMD_EN_CESA_SA_ACCL0 on the open parenthesis.
 
-If there is really a good argument to allow shorter buffers, then I guess we 
-need an in-kernel API call (which should be reported to user space) which 
-gives us the smallest usable buffer size. I guess that call would only be 
-valid after a setkey operation as the output size depends on the key size. 
-Instead of inventing a complete new API call, shouldn't the call 
-crypto_akcipher_maxsize() be converted for this purpose? I requested that API 
-call during the time the akcipher API was developed explicitly for getting the 
-minimum buffer size the caller needs to provide.
+Arf, ok I will fix this.
 
-Ciao
-Stephan
+>
+> 	BUG_ON(readl(engine->regs + CESA_SA_CMD) &
+> 	       CESA_SA_CMD_EN_CESA_SA_ACCL0);
+>
+>>   	writel(CESA_SA_CMD_EN_CESA_SA_ACCL0, engine->regs + CESA_SA_CMD);
+>>   }
+>>
+>> diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/=
+hash.c
+>> index 7ca2e0f..0fae351 100644
+>> --- a/drivers/crypto/marvell/hash.c
+>> +++ b/drivers/crypto/marvell/hash.c
+>> @@ -237,6 +237,8 @@ static void mv_cesa_ahash_std_step(struct ahash_=
+request *req)
+>>
+>>   	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACCEL0_DONE);
+>>   	writel_relaxed(CESA_SA_CFG_PARA_DIS, engine->regs + CESA_SA_CFG);
+>> +	BUG_ON(readl(engine->regs + CESA_SA_CMD)
+>> +				  & CESA_SA_CMD_EN_CESA_SA_ACCL0);
+>
+> Ditto.
+
+ack
+
+>
+>>   	writel(CESA_SA_CMD_EN_CESA_SA_ACCL0, engine->regs + CESA_SA_CMD);
+>>   }
+>>
+>> diff --git a/drivers/crypto/marvell/tdma.c b/drivers/crypto/marvell/=
+tdma.c
+>> index 7642798..d493714 100644
+>> --- a/drivers/crypto/marvell/tdma.c
+>> +++ b/drivers/crypto/marvell/tdma.c
+>> @@ -53,6 +53,8 @@ void mv_cesa_dma_step(struct mv_cesa_tdma_req *dre=
+q)
+>>   		       engine->regs + CESA_SA_CFG);
+>>   	writel_relaxed(dreq->chain.first->cur_dma,
+>>   		       engine->regs + CESA_TDMA_NEXT_ADDR);
+>> +	BUG_ON(readl(engine->regs + CESA_SA_CMD)
+>> +				  & CESA_SA_CMD_EN_CESA_SA_ACCL0);
+>
+> Ditto.
+ack
+
+Regards,
+Romain
+--=20
+Romain Perier, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
