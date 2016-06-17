@@ -1,11 +1,8 @@
 From: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Subject: [PATCH v2 1/2] Crypto: Add SHA-3 hash algorithm
-Date: Fri, 17 Jun 2016 10:30:35 +0530
-Message-ID: <1466139636-19779-2-git-send-email-raveendra.padasalagi@broadcom.com>
+Subject: [PATCH v2 2/2] Crypto: Add SHA-3 Test's in tcrypt
+Date: Fri, 17 Jun 2016 10:30:36 +0530
+Message-ID: <1466139636-19779-3-git-send-email-raveendra.padasalagi@broadcom.com>
 References: <1466139636-19779-1-git-send-email-raveendra.padasalagi@broadcom.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=y
-Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Jon Mason <jonmason@broadcom.com>,
 	Florian Fainelli <f.fainelli@gmail.com>,
 	Anup Patel <anup.patel@broadcom.com>,
@@ -13,420 +10,296 @@ Cc: Jon Mason <jonmason@broadcom.com>,
 	Scott Branden <sbranden@broadcom.com>,
 	Pramod Kumar <pramod.kumar@broadcom.com>,
 	bcm-kernel-feedback-list@broadcom.com,
-	Jeff Garzik <jeff@garzik.org>,
-	Jeff Garzik <jgarzik@redhat.com>,
 	Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f175.google.com ([209.85.192.175]:32890 "EHLO
-	mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755177AbcFQFA0 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Jun 2016 01:00:26 -0400
-Received: by mail-pf0-f175.google.com with SMTP id i123so23153537pfg.0
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Jun 2016 22:00:25 -0700 (PDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1466139636-19779-1-git-send-email-raveendra.padasalagi@broadcom.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-=46rom: Jeff Garzik <jeff@garzik.org>
+Added support for SHA-3 algorithm test's
+in tcrypt module and related test vectors.
 
-This patch adds the implementation of SHA3 algorithm
-in software and it's based on original implementation
-pushed in patch https://lwn.net/Articles/518415/ with
-additional changes to match the padding rules specified
-in SHA-3 specification.
-
-Signed-off-by: Jeff Garzik <jgarzik@redhat.com>
 Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
 ---
- crypto/Kconfig        |  10 ++
- crypto/Makefile       |   1 +
- crypto/sha3_generic.c | 300 ++++++++++++++++++++++++++++++++++++++++++=
-++++++++
- include/crypto/sha3.h |  29 +++++
- 4 files changed, 340 insertions(+)
- create mode 100644 crypto/sha3_generic.c
- create mode 100644 include/crypto/sha3.h
+ crypto/tcrypt.c  |  53 ++++++++++++++++++++++-
+ crypto/testmgr.c |  40 ++++++++++++++++++
+ crypto/testmgr.h | 125 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 217 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 1d33beb..83ee8cb 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -750,6 +750,16 @@ config CRYPTO_SHA512_SPARC64
- 	  SHA-512 secure hash standard (DFIPS 180-2) implemented
- 	  using sparc64 crypto instructions, when available.
-=20
-+config CRYPTO_SHA3
-+	tristate "SHA3 digest algorithm"
-+	select CRYPTO_HASH
-+	help
-+	  SHA-3 secure hash standard (DFIPS 202). It's based on
-+	  cryptographic sponge function family called Keccak.
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 579dce0..4675459 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -72,7 +72,8 @@ static char *check[] = {
+ 	"cast6", "arc4", "michael_mic", "deflate", "crc32c", "tea", "xtea",
+ 	"khazad", "wp512", "wp384", "wp256", "tnepres", "xeta",  "fcrypt",
+ 	"camellia", "seed", "salsa20", "rmd128", "rmd160", "rmd256", "rmd320",
+-	"lzo", "cts", "zlib", NULL
++	"lzo", "cts", "zlib", "sha3-224", "sha3-256", "sha3-384", "sha3-512",
++	NULL
+ };
+ 
+ struct tcrypt_result {
+@@ -1284,6 +1285,22 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
+ 		ret += tcrypt_test("crct10dif");
+ 		break;
+ 
++	case 48:
++		ret += tcrypt_test("sha3-224");
++		break;
 +
-+	  References:
-+	  http://keccak.noekeon.org/
++	case 49:
++		ret += tcrypt_test("sha3-256");
++		break;
 +
- config CRYPTO_TGR192
- 	tristate "Tiger digest algorithms"
- 	select CRYPTO_HASH
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 4f4ef7e..0b82c47 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -61,6 +61,7 @@ obj-$(CONFIG_CRYPTO_RMD320) +=3D rmd320.o
- obj-$(CONFIG_CRYPTO_SHA1) +=3D sha1_generic.o
- obj-$(CONFIG_CRYPTO_SHA256) +=3D sha256_generic.o
- obj-$(CONFIG_CRYPTO_SHA512) +=3D sha512_generic.o
-+obj-$(CONFIG_CRYPTO_SHA3) +=3D sha3_generic.o
- obj-$(CONFIG_CRYPTO_WP512) +=3D wp512.o
- obj-$(CONFIG_CRYPTO_TGR192) +=3D tgr192.o
- obj-$(CONFIG_CRYPTO_GF128MUL) +=3D gf128mul.o
-diff --git a/crypto/sha3_generic.c b/crypto/sha3_generic.c
-new file mode 100644
-index 0000000..6226439
---- /dev/null
-+++ b/crypto/sha3_generic.c
-@@ -0,0 +1,300 @@
-+/*
-+ * Cryptographic API.
-+ *
-+ * SHA-3, as specified in
-+ * http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
-+ *
-+ * SHA-3 code by Jeff Garzik <jeff@garzik.org>
-+ *
-+ * This program is free software; you can redistribute it and/or modif=
-y it
-+ * under the terms of the GNU General Public License as published by t=
-he Free
-+ * Software Foundation; either version 2 of the License, or (at your o=
-ption)=E2=80=A2
-+ * any later version.
-+ *
-+ */
-+#include <crypto/internal/hash.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/types.h>
-+#include <crypto/sha3.h>
-+#include <asm/byteorder.h>
++	case 50:
++		ret += tcrypt_test("sha3-384");
++		break;
 +
-+#define KECCAK_ROUNDS 24
++	case 51:
++		ret += tcrypt_test("sha3-512");
++		break;
 +
-+#define ROTL64(x, y) (((x) << (y)) | ((x) >> (64 - (y))))
+ 	case 100:
+ 		ret += tcrypt_test("hmac(md5)");
+ 		break;
+@@ -1691,6 +1708,22 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
+ 		test_hash_speed("poly1305", sec, poly1305_speed_template);
+ 		if (mode > 300 && mode < 400) break;
+ 
++	case 322:
++		test_hash_speed("sha3-224", sec, generic_hash_speed_template);
++		if (mode > 300 && mode < 400) break;
 +
-+static const u64 keccakf_rndc[24] =3D {
-+	0x0000000000000001, 0x0000000000008082, 0x800000000000808a,
-+	0x8000000080008000, 0x000000000000808b, 0x0000000080000001,
-+	0x8000000080008081, 0x8000000000008009, 0x000000000000008a,
-+	0x0000000000000088, 0x0000000080008009, 0x000000008000000a,
-+	0x000000008000808b, 0x800000000000008b, 0x8000000000008089,
-+	0x8000000000008003, 0x8000000000008002, 0x8000000000000080,
-+	0x000000000000800a, 0x800000008000000a, 0x8000000080008081,
-+	0x8000000000008080, 0x0000000080000001, 0x8000000080008008
-+};
++	case 323:
++		test_hash_speed("sha3-256", sec, generic_hash_speed_template);
++		if (mode > 300 && mode < 400) break;
 +
-+static const int keccakf_rotc[24] =3D {
-+	1,  3,  6,  10, 15, 21, 28, 36, 45, 55, 2,  14,
-+	27, 41, 56, 8,  25, 43, 62, 18, 39, 61, 20, 44
-+};
++	case 324:
++		test_hash_speed("sha3-384", sec, generic_hash_speed_template);
++		if (mode > 300 && mode < 400) break;
 +
-+static const int keccakf_piln[24] =3D {
-+	10, 7,  11, 17, 18, 3, 5,  16, 8,  21, 24, 4,
-+	15, 23, 19, 13, 12, 2, 20, 14, 22, 9,  6,  1
-+};
++	case 325:
++		test_hash_speed("sha3-512", sec, generic_hash_speed_template);
++		if (mode > 300 && mode < 400) break;
 +
-+/* update the state with given number of rounds */
+ 	case 399:
+ 		break;
+ 
+@@ -1770,6 +1803,24 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
+ 		test_ahash_speed("rmd320", sec, generic_hash_speed_template);
+ 		if (mode > 400 && mode < 500) break;
+ 
++	case 418:
++		test_ahash_speed("sha3-224", sec, generic_hash_speed_template);
++		if (mode > 400 && mode < 500) break;
 +
-+static void keccakf(u64 st[25])
-+{
-+	int i, j, round;
-+	u64 t, bc[5];
++	case 419:
++		test_ahash_speed("sha3-256", sec, generic_hash_speed_template);
++		if (mode > 400 && mode < 500) break;
 +
-+	for (round =3D 0; round < KECCAK_ROUNDS; round++) {
++	case 420:
++		test_ahash_speed("sha3-384", sec, generic_hash_speed_template);
++		if (mode > 400 && mode < 500) break;
 +
-+		/* Theta */
-+		for (i =3D 0; i < 5; i++)
-+			bc[i] =3D st[i] ^ st[i + 5] ^ st[i + 10] ^ st[i + 15]
-+				^ st[i + 20];
 +
-+		for (i =3D 0; i < 5; i++) {
-+			t =3D bc[(i + 4) % 5] ^ ROTL64(bc[(i + 1) % 5], 1);
-+			for (j =3D 0; j < 25; j +=3D 5)
-+				st[j + i] ^=3D t;
++	case 421:
++		test_ahash_speed("sha3-512", sec, generic_hash_speed_template);
++		if (mode > 400 && mode < 500) break;
++
++
+ 	case 499:
+ 		break;
+ 
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index c727fb0..b773a56 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -3659,6 +3659,46 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "sha3-224",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = {
++				.vecs = sha3_224_tv_template,
++				.count = SHA3_224_TEST_VECTORS
++			}
 +		}
-+
-+		/* Rho Pi */
-+		t =3D st[1];
-+		for (i =3D 0; i < 24; i++) {
-+			j =3D keccakf_piln[i];
-+			bc[0] =3D st[j];
-+			st[j] =3D ROTL64(t, keccakf_rotc[i]);
-+			t =3D bc[0];
++	}, {
++		.alg = "sha3-256",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = {
++				.vecs = sha3_256_tv_template,
++				.count = SHA3_256_TEST_VECTORS
++			}
 +		}
-+
-+		/* Chi */
-+		for (j =3D 0; j < 25; j +=3D 5) {
-+			for (i =3D 0; i < 5; i++)
-+				bc[i] =3D st[j + i];
-+			for (i =3D 0; i < 5; i++)
-+				st[j + i] ^=3D (~bc[(i + 1) % 5]) &
-+					     bc[(i + 2) % 5];
++	}, {
++		.alg = "sha3-384",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = {
++				.vecs = sha3_384_tv_template,
++				.count = SHA3_384_TEST_VECTORS
++			}
 +		}
-+
-+		/* Iota */
-+		st[0] ^=3D keccakf_rndc[round];
-+	}
-+}
-+
-+static void sha3_init(struct sha3_state *sctx, unsigned int digest_sz)
-+{
-+	memset(sctx, 0, sizeof(*sctx));
-+	sctx->md_len =3D digest_sz;
-+	sctx->rsiz =3D 200 - 2 * digest_sz;
-+	sctx->rsizw =3D sctx->rsiz / 8;
-+}
-+
-+static int sha3_224_init(struct shash_desc *desc)
-+{
-+	struct sha3_state *sctx =3D shash_desc_ctx(desc);
-+
-+	sha3_init(sctx, SHA3_224_DIGEST_SIZE);
-+	return 0;
-+}
-+
-+static int sha3_256_init(struct shash_desc *desc)
-+{
-+	struct sha3_state *sctx =3D shash_desc_ctx(desc);
-+
-+	sha3_init(sctx, SHA3_256_DIGEST_SIZE);
-+	return 0;
-+}
-+
-+static int sha3_384_init(struct shash_desc *desc)
-+{
-+	struct sha3_state *sctx =3D shash_desc_ctx(desc);
-+
-+	sha3_init(sctx, SHA3_384_DIGEST_SIZE);
-+	return 0;
-+}
-+
-+static int sha3_512_init(struct shash_desc *desc)
-+{
-+	struct sha3_state *sctx =3D shash_desc_ctx(desc);
-+
-+	sha3_init(sctx, SHA3_512_DIGEST_SIZE);
-+	return 0;
-+}
-+
-+static int sha3_update(struct shash_desc *desc, const u8 *data,
-+		       unsigned int len)
-+{
-+	struct sha3_state *sctx =3D shash_desc_ctx(desc);
-+	unsigned int done;
-+	const u8 *src;
-+
-+	done =3D 0;
-+	src =3D data;
-+
-+	if ((sctx->partial + len) > (sctx->rsiz - 1)) {
-+		if (sctx->partial) {
-+			done =3D -sctx->partial;
-+			memcpy(sctx->buf + sctx->partial, data,
-+			       done + sctx->rsiz);
-+			src =3D sctx->buf;
++	}, {
++		.alg = "sha3-512",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = {
++				.vecs = sha3_512_tv_template,
++				.count = SHA3_512_TEST_VECTORS
++			}
 +		}
-+
-+		do {
-+			unsigned int i;
-+
-+			for (i =3D 0; i < sctx->rsizw; i++)
-+				sctx->st[i] ^=3D ((u64 *) src)[i];
-+			keccakf(sctx->st);
-+
-+			done +=3D sctx->rsiz;
-+			src =3D data + done;
-+		} while (done + (sctx->rsiz - 1) < len);
-+
-+		sctx->partial =3D 0;
-+	}
-+	memcpy(sctx->buf + sctx->partial, src, len - done);
-+	sctx->partial +=3D (len - done);
-+
-+	return 0;
-+}
-+
-+static int sha3_final(struct shash_desc *desc, u8 *out)
-+{
-+	struct sha3_state *sctx =3D shash_desc_ctx(desc);
-+	unsigned int i, inlen =3D sctx->partial;
-+
-+	sctx->buf[inlen++] =3D 0x06;
-+	memset(sctx->buf + inlen, 0, sctx->rsiz - inlen);
-+	sctx->buf[sctx->rsiz - 1] |=3D 0x80;
-+
-+	for (i =3D 0; i < sctx->rsizw; i++)
-+		sctx->st[i] ^=3D ((u64 *) sctx->buf)[i];
-+
-+	keccakf(sctx->st);
-+
-+	for (i =3D 0; i < sctx->rsizw; i++)
-+		sctx->st[i] =3D cpu_to_le64(sctx->st[i]);
-+
-+	memcpy(out, sctx->st, sctx->md_len);
-+
-+	memset(sctx, 0, sizeof(*sctx));
-+	return 0;
-+}
-+
-+static struct shash_alg sha3_224 =3D {
-+	.digestsize	=3D	SHA3_224_DIGEST_SIZE,
-+	.init		=3D	sha3_224_init,
-+	.update		=3D	sha3_update,
-+	.final		=3D	sha3_final,
-+	.descsize	=3D	sizeof(struct sha3_state),
-+	.base		=3D	{
-+		.cra_name	=3D	"sha3-224",
-+		.cra_driver_name =3D	"sha3-224-generic",
-+		.cra_flags	=3D	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=3D	SHA3_224_BLOCK_SIZE,
-+		.cra_module	=3D	THIS_MODULE,
-+	}
++	}, {
+ 		.alg = "sha384",
+ 		.test = alg_test_hash,
+ 		.fips_allowed = 1,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 487ec88..b70e3c9 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -376,6 +376,131 @@ static struct hash_testvec md4_tv_template [] = {
+ 	},
+ };
+ 
++#define SHA3_224_TEST_VECTORS	3
++static struct hash_testvec sha3_224_tv_template[] = {
++	{
++		.plaintext = "",
++		.digest	= "\x6b\x4e\x03\x42\x36\x67\xdb\xb7"
++				"\x3b\x6e\x15\x45\x4f\x0e\xb1\xab"
++				"\xd4\x59\x7f\x9a\x1b\x07\x8e\x3f"
++				"\x5b\x5a\x6b\xc7",
++	}, {
++		.plaintext = "a",
++		.psize	= 1,
++		.digest	= "\x9e\x86\xff\x69\x55\x7c\xa9\x5f"
++				"\x40\x5f\x08\x12\x69\x68\x5b\x38"
++				"\xe3\xa8\x19\xb3\x09\xee\x94\x2f"
++				"\x48\x2b\x6a\x8b",
++	}, {
++		.plaintext = "abcdbcdecdefdefgefghfghighijhijkijkl"
++				"jklmklmnlmnomnopnopq",
++		.psize	= 56,
++		.digest	= "\x8a\x24\x10\x8b\x15\x4a\xda\x21"
++				"\xc9\xfd\x55\x74\x49\x44\x79\xba"
++				"\x5c\x7e\x7a\xb7\x6e\xf2\x64\xea"
++				"\xd0\xfc\xce\x33",
++	},
 +};
 +
-+static struct shash_alg sha3_256 =3D {
-+	.digestsize	=3D	SHA3_256_DIGEST_SIZE,
-+	.init		=3D	sha3_256_init,
-+	.update		=3D	sha3_update,
-+	.final		=3D	sha3_final,
-+	.descsize	=3D	sizeof(struct sha3_state),
-+	.base		=3D	{
-+		.cra_name	=3D	"sha3-256",
-+		.cra_driver_name =3D	"sha3-256-generic",
-+		.cra_flags	=3D	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=3D	SHA3_256_BLOCK_SIZE,
-+		.cra_module	=3D	THIS_MODULE,
-+	}
++#define SHA3_256_TEST_VECTORS	3
++static struct hash_testvec sha3_256_tv_template[] = {
++	{
++		.plaintext = "",
++		.digest	= "\xa7\xff\xc6\xf8\xbf\x1e\xd7\x66"
++				"\x51\xc1\x47\x56\xa0\x61\xd6\x62"
++				"\xf5\x80\xff\x4d\xe4\x3b\x49\xfa"
++				"\x82\xd8\x0a\x4b\x80\xf8\x43\x4a",
++	}, {
++		.plaintext = "a",
++		.psize	= 1,
++		.digest	= "\x80\x08\x4b\xf2\xfb\xa0\x24\x75"
++				"\x72\x6f\xeb\x2c\xab\x2d\x82\x15"
++				"\xea\xb1\x4b\xc6\xbd\xd8\xbf\xb2"
++				"\xc8\x15\x12\x57\x03\x2e\xcd\x8b",
++	}, {
++		.plaintext = "abcdbcdecdefdefgefghfghighijhijkijkl"
++			     "jklmklmnlmnomnopnopq",
++		.psize	= 56,
++		.digest	= "\x41\xc0\xdb\xa2\xa9\xd6\x24\x08"
++				"\x49\x10\x03\x76\xa8\x23\x5e\x2c"
++				"\x82\xe1\xb9\x99\x8a\x99\x9e\x21"
++				"\xdb\x32\xdd\x97\x49\x6d\x33\x76",
++	},
 +};
 +
-+static struct shash_alg sha3_384 =3D {
-+	.digestsize	=3D	SHA3_384_DIGEST_SIZE,
-+	.init		=3D	sha3_384_init,
-+	.update		=3D	sha3_update,
-+	.final		=3D	sha3_final,
-+	.descsize	=3D	sizeof(struct sha3_state),
-+	.base		=3D	{
-+		.cra_name	=3D	"sha3-384",
-+		.cra_driver_name =3D	"sha3-384-generic",
-+		.cra_flags	=3D	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=3D	SHA3_384_BLOCK_SIZE,
-+		.cra_module	=3D	THIS_MODULE,
-+	}
++
++#define SHA3_384_TEST_VECTORS	3
++static struct hash_testvec sha3_384_tv_template[] = {
++	{
++		.plaintext = "",
++		.digest	= "\x0c\x63\xa7\x5b\x84\x5e\x4f\x7d"
++				"\x01\x10\x7d\x85\x2e\x4c\x24\x85"
++				"\xc5\x1a\x50\xaa\xaa\x94\xfc\x61"
++				"\x99\x5e\x71\xbb\xee\x98\x3a\x2a"
++				"\xc3\x71\x38\x31\x26\x4a\xdb\x47"
++				"\xfb\x6b\xd1\xe0\x58\xd5\xf0\x04",
++	}, {
++		.plaintext = "a",
++		.psize	= 1,
++		.digest	= "\x18\x15\xf7\x74\xf3\x20\x49\x1b"
++				"\x48\x56\x9e\xfe\xc7\x94\xd2\x49"
++				"\xee\xb5\x9a\xae\x46\xd2\x2b\xf7"
++				"\x7d\xaf\xe2\x5c\x5e\xdc\x28\xd7"
++				"\xea\x44\xf9\x3e\xe1\x23\x4a\xa8"
++				"\x8f\x61\xc9\x19\x12\xa4\xcc\xd9",
++	}, {
++		.plaintext = "abcdbcdecdefdefgefghfghighijhijkijkl"
++			     "jklmklmnlmnomnopnopq",
++		.psize	= 56,
++		.digest	= "\x99\x1c\x66\x57\x55\xeb\x3a\x4b"
++				"\x6b\xbd\xfb\x75\xc7\x8a\x49\x2e"
++				"\x8c\x56\xa2\x2c\x5c\x4d\x7e\x42"
++				"\x9b\xfd\xbc\x32\xb9\xd4\xad\x5a"
++				"\xa0\x4a\x1f\x07\x6e\x62\xfe\xa1"
++				"\x9e\xef\x51\xac\xd0\x65\x7c\x22",
++	},
 +};
 +
-+static struct shash_alg sha3_512 =3D {
-+	.digestsize	=3D	SHA3_512_DIGEST_SIZE,
-+	.init		=3D	sha3_512_init,
-+	.update		=3D	sha3_update,
-+	.final		=3D	sha3_final,
-+	.descsize	=3D	sizeof(struct sha3_state),
-+	.base		=3D	{
-+		.cra_name	=3D	"sha3-512",
-+		.cra_driver_name =3D	"sha3-512-generic",
-+		.cra_flags	=3D	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=3D	SHA3_512_BLOCK_SIZE,
-+		.cra_module	=3D	THIS_MODULE,
-+	}
++
++#define SHA3_512_TEST_VECTORS	3
++static struct hash_testvec sha3_512_tv_template[] = {
++	{
++		.plaintext = "",
++		.digest	= "\xa6\x9f\x73\xcc\xa2\x3a\x9a\xc5"
++				"\xc8\xb5\x67\xdc\x18\x5a\x75\x6e"
++				"\x97\xc9\x82\x16\x4f\xe2\x58\x59"
++				"\xe0\xd1\xdc\xc1\x47\x5c\x80\xa6"
++				"\x15\xb2\x12\x3a\xf1\xf5\xf9\x4c"
++				"\x11\xe3\xe9\x40\x2c\x3a\xc5\x58"
++				"\xf5\x00\x19\x9d\x95\xb6\xd3\xe3"
++				"\x01\x75\x85\x86\x28\x1d\xcd\x26",
++	}, {
++		.plaintext = "a",
++		.psize	= 1,
++		.digest	= "\x69\x7f\x2d\x85\x61\x72\xcb\x83"
++				"\x09\xd6\xb8\xb9\x7d\xac\x4d\xe3"
++				"\x44\xb5\x49\xd4\xde\xe6\x1e\xdf"
++				"\xb4\x96\x2d\x86\x98\xb7\xfa\x80"
++				"\x3f\x4f\x93\xff\x24\x39\x35\x86"
++				"\xe2\x8b\x5b\x95\x7a\xc3\xd1\xd3"
++				"\x69\x42\x0c\xe5\x33\x32\x71\x2f"
++				"\x99\x7b\xd3\x36\xd0\x9a\xb0\x2a",
++	}, {
++		.plaintext = "abcdbcdecdefdefgefghfghighijhijkijkl"
++			     "jklmklmnlmnomnopnopq",
++		.psize	= 56,
++		.digest	= "\x04\xa3\x71\xe8\x4e\xcf\xb5\xb8"
++				"\xb7\x7c\xb4\x86\x10\xfc\xa8\x18"
++				"\x2d\xd4\x57\xce\x6f\x32\x6a\x0f"
++				"\xd3\xd7\xec\x2f\x1e\x91\x63\x6d"
++				"\xee\x69\x1f\xbe\x0c\x98\x53\x02"
++				"\xba\x1b\x0d\x8d\xc7\x8c\x08\x63"
++				"\x46\xb5\x33\xb4\x9c\x03\x0d\x99"
++				"\xa2\x7d\xaf\x11\x39\xd6\xe7\x5e",
++	},
 +};
 +
-+static int __init sha3_generic_mod_init(void)
-+{
-+	int ret;
 +
-+	ret =3D crypto_register_shash(&sha3_224);
-+	if (ret < 0)
-+		goto err_out;
-+	ret =3D crypto_register_shash(&sha3_256);
-+	if (ret < 0)
-+		goto err_out_224;
-+	ret =3D crypto_register_shash(&sha3_384);
-+	if (ret < 0)
-+		goto err_out_256;
-+	ret =3D crypto_register_shash(&sha3_512);
-+	if (ret < 0)
-+		goto err_out_384;
-+
-+	return 0;
-+
-+err_out_384:
-+	crypto_unregister_shash(&sha3_384);
-+err_out_256:
-+	crypto_unregister_shash(&sha3_256);
-+err_out_224:
-+	crypto_unregister_shash(&sha3_224);
-+err_out:
-+	return ret;
-+}
-+
-+static void __exit sha3_generic_mod_fini(void)
-+{
-+	crypto_unregister_shash(&sha3_224);
-+	crypto_unregister_shash(&sha3_256);
-+	crypto_unregister_shash(&sha3_384);
-+	crypto_unregister_shash(&sha3_512);
-+}
-+
-+module_init(sha3_generic_mod_init);
-+module_exit(sha3_generic_mod_fini);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("SHA-3 Secure Hash Algorithm");
-+
-+MODULE_ALIAS_CRYPTO("sha3-224");
-+MODULE_ALIAS_CRYPTO("sha3-224-generic");
-+MODULE_ALIAS_CRYPTO("sha3-256");
-+MODULE_ALIAS_CRYPTO("sha3-256-generic");
-+MODULE_ALIAS_CRYPTO("sha3-384");
-+MODULE_ALIAS_CRYPTO("sha3-384-generic");
-+MODULE_ALIAS_CRYPTO("sha3-512");
-+MODULE_ALIAS_CRYPTO("sha3-512-generic");
-diff --git a/include/crypto/sha3.h b/include/crypto/sha3.h
-new file mode 100644
-index 0000000..f4c9f68
---- /dev/null
-+++ b/include/crypto/sha3.h
-@@ -0,0 +1,29 @@
-+/*
-+ * Common values for SHA-3 algorithms
-+ */
-+#ifndef __CRYPTO_SHA3_H__
-+#define __CRYPTO_SHA3_H__
-+
-+#define SHA3_224_DIGEST_SIZE	(224 / 8)
-+#define SHA3_224_BLOCK_SIZE	(200 - 2 * SHA3_224_DIGEST_SIZE)
-+
-+#define SHA3_256_DIGEST_SIZE	(256 / 8)
-+#define SHA3_256_BLOCK_SIZE	(200 - 2 * SHA3_256_DIGEST_SIZE)
-+
-+#define SHA3_384_DIGEST_SIZE	(384 / 8)
-+#define SHA3_384_BLOCK_SIZE	(200 - 2 * SHA3_384_DIGEST_SIZE)
-+
-+#define SHA3_512_DIGEST_SIZE	(512 / 8)
-+#define SHA3_512_BLOCK_SIZE	(200 - 2 * SHA3_512_DIGEST_SIZE)
-+
-+struct sha3_state {
-+	u64		st[25];
-+	unsigned int	md_len;
-+	unsigned int	rsiz;
-+	unsigned int	rsizw;
-+
-+	unsigned int	partial;
-+	u8		buf[SHA3_224_BLOCK_SIZE];
-+};
-+
-+#endif
---=20
+ /*
+  * MD5 test vectors from RFC1321
+  */
+-- 
 1.9.1
