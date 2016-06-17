@@ -1,118 +1,105 @@
-From: David =?UTF-8?Q?Ja=C5=A1a?= <djasa@redhat.com>
-Subject: Re: [PATCH v4 0/5] /dev/random - a new approach
-Date: Fri, 17 Jun 2016 15:56:13 +0200
-Message-ID: <1466171773.20087.66.camel@redhat.com>
-References: <1466007463.20087.11.camel@redhat.com>
-	 <6137456.oZ1CFC9kFY@positron.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Andi Kleen <andi@firstfloor.org>, sandyinchina@gmail.com,
-	Jason Cooper <cryptography@lakedaemon.net>,
-	John Denker <jsd@av8n.com>,
-	"H. Peter Anvin" <hpa@linux.intel.com>,
-	Joe Perches <joe@perches.com>, Pavel Machek <pavel@ucw.cz>,
-	George Spelvin <linux@horizon.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+From: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Subject: [PATCH v9 0/3] Key-agreement Protocol Primitives (KPP) API
+Date: Fri, 17 Jun 2016 15:37:42 +0100
+Message-ID: <1466174265-4546-1-git-send-email-salvatore.benedetto@intel.com>
+Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:58689 "EHLO mx1.redhat.com"
+Received: from mga04.intel.com ([192.55.52.120]:8795 "EHLO mga04.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753428AbcFQN4Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Jun 2016 09:56:25 -0400
-In-Reply-To: <6137456.oZ1CFC9kFY@positron.chronox.de>
+	id S1751070AbcFQOiA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 17 Jun 2016 10:38:00 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Stephan,
+Hi Herb,
 
-thank you for your thorough reply,
+the following patchset introduces a new API for abstracting key-agreement
+protocols such as DH and ECDH. It provides the primitives required for implementing
+the protocol, thus the name KPP (Key-agreement Protocol Primitives).
 
-On St, 2016-06-15 at 18:58 +0200, Stephan Mueller wrote:
-> Am Mittwoch, 15. Juni 2016, 18:17:43 schrieb David Ja=C5=A1a:
->=20
-> Hi David,
->=20
-> > Hello Stephan,
-> >=20
-> > Did you consider blocking urandom output or returning error until
-> > initialized? Given the speed of initialization you report, it shoul=
-dn't
-> > break any userspace apps while making sure that nobody uses predict=
-able
-> > pseudoranom numbers.
->=20
-> My LRNG will definitely touch the beginning of the initramfs booting =
-until it=20
-> is fully seeded. As these days the initramfs is driven by systemd whi=
-ch always=20
-> pulls from /dev/urandom, we cannot block as this would block systemd.=
- In Ted's=20
-> last patch, he mentioned that he tried to make /dev/urandom block whi=
-ch caused=20
-> user space pain.
+Regards,
+Salvatore
 
-I was thinking along the lines that "almost every important package
-supports FreeBSD as well where they have to handle the condition so
-option to switch to Rather Break Than Generate Weak Keys would be nice"
-- but I didn't expect that systemd could be a roadblock here. :-/
+Changes from v8:
+* set_secret accept a buffer packed and prefixed with a tiny header of
+  2 fields: type and len. Each kpp type define its own type and provide
+  helper for user (encoder) and drivers (decoder)
 
-I was also thinking of little devices where OpenWRT or proprietary
-Linux-based systems run that ended up with predictable keys way too
-ofter (or as in OpenWRT's case, with cumbersome tutorials how to
-generate keys elsewhere).
+Changed from v7:
+* API change: merge set_param and set_key to set_key. Params and private
+  key are now provided together. Params have always to be provided.
+* Merge generate_public_key and compute_shared_secret into compute_val.
+  API stay as it is
+* Add ecc_is_key_valid to validate private key when set. Now that params
+  and key are set together we can validate the key right away. Before the
+  check was deferred to generate_public_key.
 
->=20
-> But if you use the getrandom system call, it works like /dev/urandom =
-but=20
-> blocks until the DRBG behind /dev/urandom is fully initialized.
-> >=20
-> > I was considering asking for patch (or even trying to write it myse=
-lf)
-> > to make current urandom block/fail when not initialized but that wo=
-uld
-> > surely have to be off by default over "never break userspace" rule =
-(even
-> > if it means way too easy security problem with both random and uran=
-dom).
-> > Properties of your urandom implementation makes this point moot and=
- it
-> > could make the random/urandom wars over.
->=20
-> That patch unfortunately will not work. But if you are interested in =
-that=20
-> blocking /dev/urandom behavior for your application, use getrandom.
->=20
+Changes from v6:
+* Remove len parameter from crypto_kpp_set_params. Adjust rest of code
+  accordingly
+* Remove the while loop in ecdh_make_pub_key as the private key is fixed and
+  iterating is pointless. EAGAIN is now to returned to make the user aware
+  that he needs to regenerate/reset the private key
 
-I'm QA with a touch of sysadmin so the numbers of apps to fix is large
-and I don't have neither control over the projects nor abilities to
-patch them all myself. :)
+Changes from v5:
+* Fix ecdh loading in fips mode.
 
-> >=20
-> > Best Regards,
-> >=20
-> > David Ja=C5=A1a
->=20
->=20
-> Ciao
-> Stephan
+Changes from v4:
+* If fips_enabled is set allow only P256 (or higher) as Stephan suggested
+* Pass ndigits as argument to ecdh_make_pub_key and ecdh_shared_secret
+  so that VLA can be used like in the rest of the module
 
-BTW when looking at an old BSI's issue with Linux urandom that Jarod
-Wilson tried to solve with this series:
-https://www.spinics.net/lists/linux-crypto/msg06113.html
-I was thinking:
-1) wouldn't it help for large urandom consumers if kernel created a DRB=
-G
-instance for each of them? It would likely enhance performance and solv=
-e
-BSI's concern of predicting what numbers could other urandom consumers
-obtain at cost of memory footprint
-and then, after reading paper associated with this series:
-2) did you evaluate use of intermediate DRBG fed by primary generator t=
-o
-instantiate per-node DRBG's? It would allow initialization of all
-secondary DRBGs right after primary generator initialization.
+Changes from v3:
+* Move curve ID definition to public header ecdh.h as users need to
+  have access to those ids when selecting the curve
 
-Cheers,
+Changes from v2:
+* Add support for ECDH (curve P192 and P256). I reused the ecc module
+  already present in net/bluetooth and extended it in order to select
+  different curves at runtime. Code for P192 was taken from tinycrypt.
 
-David
+Changes from v1:
+* Change check in dh_check_params_length based on Stephan review
+
+
+Salvatore Benedetto (3):
+  crypto: Key-agreement Protocol Primitives API (KPP)
+  crypto: kpp - Add DH software implementation
+  crypto: kpp - Add ECDH software support
+
+ crypto/Kconfig                  |   23 +
+ crypto/Makefile                 |    9 +
+ crypto/crypto_user.c            |   20 +
+ crypto/dh.c                     |  189 ++++++++
+ crypto/dh_helper.c              |   84 ++++
+ crypto/ecc.c                    | 1018 +++++++++++++++++++++++++++++++++++++++
+ crypto/ecc.h                    |   83 ++++
+ crypto/ecc_curve_defs.h         |   57 +++
+ crypto/ecdh.c                   |  151 ++++++
+ crypto/ecdh_helper.c            |   75 +++
+ crypto/kpp.c                    |  123 +++++
+ crypto/testmgr.c                |  362 ++++++++++++++
+ crypto/testmgr.h                |  286 +++++++++++
+ include/crypto/dh.h             |   29 ++
+ include/crypto/ecdh.h           |   30 ++
+ include/crypto/internal/kpp.h   |   64 +++
+ include/crypto/kpp.h            |  330 +++++++++++++
+ include/linux/crypto.h          |    1 +
+ include/uapi/linux/cryptouser.h |    5 +
+ 19 files changed, 2939 insertions(+)
+ create mode 100644 crypto/dh.c
+ create mode 100644 crypto/dh_helper.c
+ create mode 100644 crypto/ecc.c
+ create mode 100644 crypto/ecc.h
+ create mode 100644 crypto/ecc_curve_defs.h
+ create mode 100644 crypto/ecdh.c
+ create mode 100644 crypto/ecdh_helper.c
+ create mode 100644 crypto/kpp.c
+ create mode 100644 include/crypto/dh.h
+ create mode 100644 include/crypto/ecdh.h
+ create mode 100644 include/crypto/internal/kpp.h
+ create mode 100644 include/crypto/kpp.h
+
+-- 
+2.7.4
