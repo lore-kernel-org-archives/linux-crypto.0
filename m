@@ -1,10 +1,10 @@
 From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH v2 07/10] crypto: marvell: Move SRAM I/O operations to
- step functions
-Date: Fri, 17 Jun 2016 15:16:49 +0200
-Message-ID: <20160617151649.632139d3@bbrezillon>
+Subject: Re: [PATCH v2 08/10] crypto: marvell: Add load balancing between
+ engines
+Date: Fri, 17 Jun 2016 15:22:21 +0200
+Message-ID: <20160617152221.636efa28@bbrezillon>
 References: <1466162649-29911-1-git-send-email-romain.perier@free-electrons.com>
-	<1466162649-29911-8-git-send-email-romain.perier@free-electrons.com>
+	<1466162649-29911-9-git-send-email-romain.perier@free-electrons.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -16,108 +16,61 @@ Cc: Arnaud Ebalard <arno@natisbad.org>,
 	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 To: Romain Perier <romain.perier@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:52158 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:52323 "EHLO
 	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752668AbcFQNQv (ORCPT
+	with ESMTP id S1753559AbcFQNWX (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Jun 2016 09:16:51 -0400
-In-Reply-To: <1466162649-29911-8-git-send-email-romain.perier@free-electrons.com>
+	Fri, 17 Jun 2016 09:22:23 -0400
+In-Reply-To: <1466162649-29911-9-git-send-email-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 17 Jun 2016 13:24:06 +0200
+On Fri, 17 Jun 2016 13:24:07 +0200
 Romain Perier <romain.perier@free-electrons.com> wrote:
 
-> Currently the crypto requests were sent to engines sequentially.
-> This commit moves the SRAM I/O operations from the prepare to the step
-> functions. It provides flexibility for future works and allow to prepare
-> a request while the engine is running.
+> This commits adds support for fine grained load balancing on
+> multi-engine IPs. The engine is pre-selected based on its current load
+> and on the weight of the crypto request that is about to be processed.
+> The global crypto queue is also moved to each engine. These changes are
+> required to allow chaining crypto requests at the DMA level. By using
+> a crypto queue per engine, we make sure that we keep the state of the
+> tdma chain synchronized with the crypto queue. We also reduce contention
+> on 'cesa_dev->lock' and improve parallelism.
 > 
 > Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
-
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-
 > ---
->  drivers/crypto/marvell/cipher.c |  6 +++---
->  drivers/crypto/marvell/hash.c   | 18 +++++++++---------
->  2 files changed, 12 insertions(+), 12 deletions(-)
 > 
-> diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
-> index 175ce76..79d4175 100644
-> --- a/drivers/crypto/marvell/cipher.c
-> +++ b/drivers/crypto/marvell/cipher.c
-> @@ -89,6 +89,9 @@ static void mv_cesa_ablkcipher_std_step(struct ablkcipher_request *req)
->  	size_t  len = min_t(size_t, req->nbytes - sreq->offset,
->  			    CESA_SA_SRAM_PAYLOAD_SIZE);
+> Changes in v2:
+> 
+>   - Reworded the commit message
+>   - Moved the code about SRAM I/O operations from this commit to
+>     a separated commit (see PATCH 07/10).
+> 
+>  drivers/crypto/marvell/cesa.c   | 30 ++++++++++------------
+>  drivers/crypto/marvell/cesa.h   | 29 +++++++++++++++++----
+>  drivers/crypto/marvell/cipher.c | 57 ++++++++++++++++++-----------------------
+>  drivers/crypto/marvell/hash.c   | 50 ++++++++++++++----------------------
+>  4 files changed, 82 insertions(+), 84 deletions(-)
+> 
+> diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
+> index af96426..f9e6688 100644
+> --- a/drivers/crypto/marvell/cesa.c
+> +++ b/drivers/crypto/marvell/cesa.c
+> @@ -45,11 +45,9 @@ static void mv_cesa_dequeue_req_unlocked(struct mv_cesa_engine *engine)
+
+This function should be renamed mv_cesa_dequeue_req_locked(). I see
+you're doing it in patch 9, but it should be done here.
+
+>  	struct crypto_async_request *req, *backlog;
+>  	struct mv_cesa_ctx *ctx;
 >  
-> +	mv_cesa_adjust_op(engine, &sreq->op);
-> +	memcpy_toio(engine->sram, &sreq->op, sizeof(sreq->op));
-> +
->  	len = sg_pcopy_to_buffer(req->src, creq->src_nents,
->  				 engine->sram + CESA_SA_DATA_SRAM_OFFSET,
->  				 len, sreq->offset);
-> @@ -177,12 +180,9 @@ mv_cesa_ablkcipher_std_prepare(struct ablkcipher_request *req)
->  {
->  	struct mv_cesa_ablkcipher_req *creq = ablkcipher_request_ctx(req);
->  	struct mv_cesa_ablkcipher_std_req *sreq = &creq->std;
-> -	struct mv_cesa_engine *engine = creq->base.engine;
+> -	spin_lock_bh(&cesa_dev->lock);
+> -	backlog = crypto_get_backlog(&cesa_dev->queue);
+> -	req = crypto_dequeue_request(&cesa_dev->queue);
+> +	backlog = crypto_get_backlog(&engine->queue);
+> +	req = crypto_dequeue_request(&engine->queue);
+>  	engine->req = req;
+> -	spin_unlock_bh(&cesa_dev->lock);
 >  
->  	sreq->size = 0;
->  	sreq->offset = 0;
-> -	mv_cesa_adjust_op(engine, &sreq->op);
-> -	memcpy_toio(engine->sram, &sreq->op, sizeof(sreq->op));
->  }
->  
->  static inline void mv_cesa_ablkcipher_prepare(struct crypto_async_request *req,
-> diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-> index 09665a7..e1f8acd 100644
-> --- a/drivers/crypto/marvell/hash.c
-> +++ b/drivers/crypto/marvell/hash.c
-> @@ -162,6 +162,15 @@ static void mv_cesa_ahash_std_step(struct ahash_request *req)
->  	unsigned int new_cache_ptr = 0;
->  	u32 frag_mode;
->  	size_t  len;
-> +	unsigned int digsize;
-> +	int i;
-> +
-> +	mv_cesa_adjust_op(engine, &creq->op_tmpl);
-> +	memcpy_toio(engine->sram, &creq->op_tmpl, sizeof(creq->op_tmpl));
-> +
-> +	digsize = crypto_ahash_digestsize(crypto_ahash_reqtfm(req));
-> +	for (i = 0; i < digsize / 4; i++)
-> +		writel_relaxed(creq->state[i], engine->regs + CESA_IVDIG(i));
->  
->  	if (creq->cache_ptr)
->  		memcpy_toio(engine->sram + CESA_SA_DATA_SRAM_OFFSET,
-> @@ -265,11 +274,8 @@ static void mv_cesa_ahash_std_prepare(struct ahash_request *req)
->  {
->  	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
->  	struct mv_cesa_ahash_std_req *sreq = &creq->req.std;
-> -	struct mv_cesa_engine *engine = creq->base.engine;
->  
->  	sreq->offset = 0;
-> -	mv_cesa_adjust_op(engine, &creq->op_tmpl);
-> -	memcpy_toio(engine->sram, &creq->op_tmpl, sizeof(creq->op_tmpl));
->  }
->  
->  static void mv_cesa_ahash_step(struct crypto_async_request *req)
-> @@ -336,8 +342,6 @@ static void mv_cesa_ahash_prepare(struct crypto_async_request *req,
->  {
->  	struct ahash_request *ahashreq = ahash_request_cast(req);
->  	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
-> -	unsigned int digsize;
-> -	int i;
->  
->  	creq->base.engine = engine;
->  
-> @@ -345,10 +349,6 @@ static void mv_cesa_ahash_prepare(struct crypto_async_request *req,
->  		mv_cesa_ahash_dma_prepare(ahashreq);
->  	else
->  		mv_cesa_ahash_std_prepare(ahashreq);
-> -
-> -	digsize = crypto_ahash_digestsize(crypto_ahash_reqtfm(ahashreq));
-> -	for (i = 0; i < digsize / 4; i++)
-> -		writel_relaxed(creq->state[i], engine->regs + CESA_IVDIG(i));
->  }
->  
->  static void mv_cesa_ahash_req_cleanup(struct crypto_async_request *req)
+>  	if (!req)
+>  		return;
