@@ -1,66 +1,42 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 1/2] Crypto: Add SHA-3 hash algorithm
-Date: Thu, 16 Jun 2016 18:24:20 +0200
-Message-ID: <1469618.GoqEiobQFD@positron.chronox.de>
-References: <1465983719-8313-1-git-send-email-raveendra.padasalagi@broadcom.com> <1704146.ryraC2p2Bb@tauon.atsec.com> <CAAFb_vqubPdy4g0NsM02JaUN-YL8V17kYbVMHWSTv9CByZ3XRA@mail.gmail.com>
+From: Andrew Zaborowski <balrogg@googlemail.com>
+Subject: Re: [PATCH v6 3/6] crypto: AF_ALG -- add asymmetric cipher interface
+Date: Fri, 17 Jun 2016 02:39:39 +0200
+Message-ID: <CAOq732Lgh=Nca4_7QaN4F1ddSg-AX919_un4wSxyv5gU0PvqQw@mail.gmail.com>
+References: <20160515041645.15888.94903.stgit@tstruk-mobl1>
+ <10863259.oUiAus9m9y@positron.chronox.de> <CAOq732KFLoeBz2-fkEbbW1ixf9rAQEJcWh3WK_mbB5jQGYYe6w@mail.gmail.com>
+ <1696434.oCKeAI3Bfp@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jon Mason <jonmason@broadcom.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Anup Patel <anup.patel@broadcom.com>,
-	Ray Jui <rjui@broadcom.com>,
-	Scott Branden <sbranden@broadcom.com>,
-	Pramod Kumar <pramod.kumar@broadcom.com>,
-	bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
-	Jeff Garzik <jeff@garzik.org>, Jeff Garzik <jgarzik@redhat.com>
-To: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:36680 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753976AbcFPQY2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 Jun 2016 12:24:28 -0400
-In-Reply-To: <CAAFb_vqubPdy4g0NsM02JaUN-YL8V17kYbVMHWSTv9CByZ3XRA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	David Howells <dhowells@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-api@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	David Woodhouse <dwmw2@infradead.org>, davem@davemloft.net
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1696434.oCKeAI3Bfp@tauon.atsec.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 16. Juni 2016, 21:39:17 schrieb Raveendra Padasalagi:
+Hi Stephan,
 
-Hi Raveendra,
+On 16 June 2016 at 17:38, Stephan Mueller <smueller@chronox.de> wrote:
+>> This isn't an issue with AF_ALG, I should have changed the subject
+>> line perhaps.  In this case it's an inconsistency between some
+>> implementations and the documentation (header comment).  It affects
+>> users accessing the cipher through AF_ALG but also directly.
+>
+> As I want to send a new version of the algif_akcipher shortly now (hoping for
+> an inclusion into 4.8), is there anything you see that I should prepare for
+> regarding this issue? I.e. do you forsee a potential fix that would change the
+> API or ABI of algif_akcipher?
 
-> I need some clarification to address your comment
-> 
-> "Shouldn't there be a priority here?"
-> 
-> What I know regarding priority value for an algorithm
-> is higher the priority value it will be get selected for execution.
-> 
-> For example, let's say for software implementation of the algorithm if
-> priority value
-> is specified as 100 and hardware driver implementation of the same
-> algorithm uses
-> the priority value of 300 then hardware algo is what selected for execution.
-> 
-> I just had a look at priority value specified for other hash
-> algorithm's and none of the
-> software implementation specify any value, So it will be 0.
-> 
-> I think it's okay to not to specify any priority value for software
-> implementation,
-> as hardware implementation can use non zero value if it needs higher
-> priority.
-> 
-> What's your opinion ?
+No, as far as I understand algif_akcipher will do the right thing now
+if the algorithm does the right thing.  It's only the two RSA drivers
+that would need to align with the software RSA in what buffer length
+they accept.
 
-You are fully correct.
-
-To be in line with the other hashes, maybe let us leave it at 0. I was 
-thinking about "backend" ciphers that should never ever be selected (like the 
-Intel AES-NI examples) which should have a lower prio than any other cipher. 
-But then, they have unique cra_names, so it does not really matter :-)
-
-Ciao
-Stephan
+Best regards
