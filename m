@@ -1,48 +1,67 @@
-From: Horia Ioan Geanta Neag <horia.geanta@nxp.com>
-Subject: Re: [PATCH] crypto: caam - replace deprecated EXTRA_CFLAGS
-Date: Fri, 17 Jun 2016 12:22:54 +0000
-Message-ID: <AM2PR04MB06732356E090D3647FAFB1D698570@AM2PR04MB0673.eurprd04.prod.outlook.com>
-References: <1466083975-27054-1-git-send-email-tudor-dan.ambarus@nxp.com>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: Re: [PATCH v2 01/10] crypto: marvell: Add a macro constant for the
+ size of the crypto queue
+Date: Fri, 17 Jun 2016 14:37:34 +0200
+Message-ID: <20160617143734.315acaef@bbrezillon>
+References: <1466162649-29911-1-git-send-email-romain.perier@free-electrons.com>
+	<1466162649-29911-2-git-send-email-romain.perier@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-2
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Arnaud Ebalard <arno@natisbad.org>,
+	Gregory Clement <gregory.clement@free-electrons.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Russell King <linux@arm.linux.org.uk>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Romain Perier <romain.perier@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-am1on0061.outbound.protection.outlook.com ([157.56.112.61]:65479
-	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753534AbcFQMW6 convert rfc822-to-8bit (ORCPT
+Received: from down.free-electrons.com ([37.187.137.238]:50605 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753085AbcFQMhq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Jun 2016 08:22:58 -0400
-Content-Language: en-US
+	Fri, 17 Jun 2016 08:37:46 -0400
+In-Reply-To: <1466162649-29911-2-git-send-email-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 6/16/2016 4:33 PM, Tudor Ambarus wrote:
-> EXTRA_CFLAGS is still supported but its usage is deprecated.
->=20
-> Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+On Fri, 17 Jun 2016 13:24:00 +0200
+Romain Perier <romain.perier@free-electrons.com> wrote:
 
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>
+> Adding a macro constant to be used for the size of the crypto queue,
+> instead of using a numeric value directly. It will be easier to
+> maintain in case we add more than one crypto queue of the same size.
+> 
+> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
+
+You forgot
+
+Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 
 > ---
->  drivers/crypto/caam/Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makef=
-ile
-> index 399ad55..3e9d3e1 100644
-> --- a/drivers/crypto/caam/Makefile
-> +++ b/drivers/crypto/caam/Makefile
-> @@ -2,7 +2,7 @@
->  # Makefile for the CAAM backend and dependent components
->  #
->  ifeq ($(CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG), y)
-> -	EXTRA_CFLAGS :=3D -DDEBUG
-> +	ccflags-y :=3D -DDEBUG
->  endif
-> =20
->  ccflags-y +=3D -I$(srctree)/crypto
->=20
+>  drivers/crypto/marvell/cesa.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/marvell/cesa.c
+> b/drivers/crypto/marvell/cesa.c index 056a754..fb403e1 100644
+> --- a/drivers/crypto/marvell/cesa.c
+> +++ b/drivers/crypto/marvell/cesa.c
+> @@ -31,6 +31,9 @@
+>  
+>  #include "cesa.h"
+>  
+> +/* Limit of the crypto queue before reaching the backlog */
+> +#define CESA_CRYPTO_DEFAULT_MAX_QLEN 50
+> +
+>  static int allhwsupport = !IS_ENABLED(CONFIG_CRYPTO_DEV_MV_CESA);
+>  module_param_named(allhwsupport, allhwsupport, int, 0444);
+>  MODULE_PARM_DESC(allhwsupport, "Enable support for all hardware
+> (even it if overlaps with the mv_cesa driver)"); @@ -416,7 +419,7 @@
+> static int mv_cesa_probe(struct platform_device *pdev) return -ENOMEM;
+>  
+>  	spin_lock_init(&cesa->lock);
+> -	crypto_init_queue(&cesa->queue, 50);
+> +	crypto_init_queue(&cesa->queue,
+> CESA_CRYPTO_DEFAULT_MAX_QLEN); res =
+> platform_get_resource_byname(pdev, IORESOURCE_MEM, "regs");
+> cesa->regs = devm_ioremap_resource(dev, res); if (IS_ERR(cesa->regs))
