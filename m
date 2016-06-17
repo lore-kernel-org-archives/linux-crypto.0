@@ -1,8 +1,7 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH v2 01/10] crypto: marvell: Add a macro constant for the size of the crypto queue
-Date: Fri, 17 Jun 2016 13:24:00 +0200
-Message-ID: <1466162649-29911-2-git-send-email-romain.perier@free-electrons.com>
-References: <1466162649-29911-1-git-send-email-romain.perier@free-electrons.com>
+Subject: [PATCH v2 00/10] Chain crypto requests together at the DMA level
+Date: Fri, 17 Jun 2016 13:23:59 +0200
+Message-ID: <1466162649-29911-1-git-send-email-romain.perier@free-electrons.com>
 Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -11,46 +10,49 @@ Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 To: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Arnaud Ebalard <arno@natisbad.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:47963 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:47959 "EHLO
 	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754792AbcFQLYd (ORCPT
+	with ESMTP id S1753128AbcFQLYd (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Fri, 17 Jun 2016 07:24:33 -0400
-In-Reply-To: <1466162649-29911-1-git-send-email-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Adding a macro constant to be used for the size of the crypto queue,
-instead of using a numeric value directly. It will be easier to
-maintain in case we add more than one crypto queue of the same size.
+The Cryptographic Engines and Security Accelerators (CESA) supports
+the TDMA chained mode support. When this mode is enabled and crypto
+requests are chained at the DMA level, multiple crypto requests can be
+handled by the hardware engine without requiring any software
+intervention. This approach limits the number of interrupts generated
+by the engines thus improving its throughput and making the whole system
+behave nicely under heavy crypto load.
 
-Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
----
- drivers/crypto/marvell/cesa.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Benchmarking results with dmcrypt
+=================================
+		I/O read	I/O write
+Before		81.7 MB/s	31.7 MB/s
+After		129  MB/s	39.8 MB/s
 
-diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-index 056a754..fb403e1 100644
---- a/drivers/crypto/marvell/cesa.c
-+++ b/drivers/crypto/marvell/cesa.c
-@@ -31,6 +31,9 @@
- 
- #include "cesa.h"
- 
-+/* Limit of the crypto queue before reaching the backlog */
-+#define CESA_CRYPTO_DEFAULT_MAX_QLEN 50
-+
- static int allhwsupport = !IS_ENABLED(CONFIG_CRYPTO_DEV_MV_CESA);
- module_param_named(allhwsupport, allhwsupport, int, 0444);
- MODULE_PARM_DESC(allhwsupport, "Enable support for all hardware (even it if overlaps with the mv_cesa driver)");
-@@ -416,7 +419,7 @@ static int mv_cesa_probe(struct platform_device *pdev)
- 		return -ENOMEM;
- 
- 	spin_lock_init(&cesa->lock);
--	crypto_init_queue(&cesa->queue, 50);
-+	crypto_init_queue(&cesa->queue, CESA_CRYPTO_DEFAULT_MAX_QLEN);
- 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "regs");
- 	cesa->regs = devm_ioremap_resource(dev, res);
- 	if (IS_ERR(cesa->regs))
+Improvement	+57.8 %		+25.5 %
+
+Romain Perier (10):
+  crypto: marvell: Add a macro constant for the size of the crypto queue
+  crypto: marvell: Check engine is not already running when enabling a
+    req
+  crypto: marvell: Fix wrong type check in dma functions
+  crypto: marvell: Copy IV vectors by DMA transfers for acipher requests
+  crypto: marvell: Move tdma chain out of mv_cesa_tdma_req and remove it
+  crypto: marvell: Add a complete operation for async requests
+  crypto: marvell: Move SRAM I/O operations to step functions
+  crypto: marvell: Add load balancing between engines
+  crypto: marvell: Add support for chaining crypto requests in TDMA mode
+  crypto: marvell: Increase the size of the crypto queue
+
+ drivers/crypto/marvell/cesa.c   | 142 +++++++++++++++++++++++++++---------
+ drivers/crypto/marvell/cesa.h   | 120 +++++++++++++++++++++---------
+ drivers/crypto/marvell/cipher.c | 157 ++++++++++++++++++++++++----------------
+ drivers/crypto/marvell/hash.c   | 150 ++++++++++++++++++--------------------
+ drivers/crypto/marvell/tdma.c   | 132 +++++++++++++++++++++++++++++++--
+ 5 files changed, 483 insertions(+), 218 deletions(-)
+
 -- 
 2.7.4
