@@ -1,42 +1,87 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [patch] crypto: drbg - fix an error code in drbg_init_sym_kernel()
-Date: Fri, 17 Jun 2016 11:23 +0200
-Message-ID: <1997601.iEDOaUsuK2@tauon.atsec.com>
-References: <20160617091618.GC25609@mwanda> <1774858.Ao0ox7E6zA@tauon.atsec.com>
+From: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+Subject: RE: [PATCH v2 0/2] Add SHA-3 algorithm and test vectors.
+Date: Fri, 17 Jun 2016 14:57:25 +0530
+Message-ID: <db62151731c0dd07e0d35e4a96efc690@mail.gmail.com>
+References: <1466139636-19779-1-git-send-email-raveendra.padasalagi@broadcom.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=UTF-8
+Cc: Jon Mason <jonmason@broadcom.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Anup Patel <anup.patel@broadcom.com>,
+	Ray Jui <rjui@broadcom.com>,
+	Scott Branden <sbranden@broadcom.com>,
+	Pramod Kumar <pramod.kumar@broadcom.com>,
+	bcm-kernel-feedback-list@broadcom.com
+To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
+	Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1774858.Ao0ox7E6zA@tauon.atsec.com>
+In-Reply-To: <1466139636-19779-1-git-send-email-raveendra.padasalagi@broadcom.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 17. Juni 2016, 11:19:58 schrieb Stephan Mueller:
+++ Stephan Mueller
 
-Hi Stephan,
-
-> Am Freitag, 17. Juni 2016, 12:16:19 schrieb Dan Carpenter:
-> 
-> Hi Dan,
-> 
-> > We accidentally return PTR_ERR(NULL) which is success but we should
-> > return -ENOMEM.
-> > 
-> > Fixes: 355912852115 ('crypto: drbg - use CTR AES instead of ECB AES')
-> > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> 
-> Acked-by: Stephan Mueller <smueller@chronox.de>
-> 
-> That points to an error in the documentation of skcipher_request_alloc.
-
-Apologies, that documentation issue has already been fixed in the 
-cryptodev-2.6 tree. I was looking at the vanilla 4.6 tree for the 
-documentation while I was preparing my patch.
-
-Ciao
-Stephan
+Regards,
+Raveendra
+> -----Original Message-----
+> From: Raveendra Padasalagi [mailto:raveendra.padasalagi@broadcom.com]
+> Sent: 17 June 2016 10:31
+> To: Herbert Xu; David S. Miller; linux-crypto@vger.kernel.org; linux-
+> kernel@vger.kernel.org
+> Cc: Jon Mason; Florian Fainelli; Anup Patel; Ray Jui; Scott Branden;
+Pramod
+> Kumar; bcm-kernel-feedback-list@broadcom.com; Raveendra Padasalagi
+> Subject: [PATCH v2 0/2] Add SHA-3 algorithm and test vectors.
+>
+> This patchset adds the implementation of SHA-3 algorithm in software and
+it's
+> based on original implementation pushed in patch
+> https://lwn.net/Articles/518415/ with additional changes to match the
+padding
+> rules specified in SHA-3 specification.
+>
+> This patchset also includes changes in tcrypt module to add support for
+SHA-3
+> algorithms test and related test vectors for basic testing.
+>
+> Broadcom Secure Processing Unit-2(SPU-2) engine supports offloading of
+SHA-3
+> operations in hardware, in order to add SHA-3 support in SPU-2 driver we
+> needed to have the software implementation and test framework in place.
+>
+> The patchset is based on v4.7-rc1 tag and its tested on Broadcom
+NorthStar2
+> SoC.
+>
+> The patch set can be fetched from iproc-sha3-v2 branch of
+> https://github.com/Broadcom/arm64-linux.git
+>
+> Changes since v1:
+>  - Renamed MODULE_ALIAS to MODULE_ALIAS_CRYPTO
+>  - Added aliases for below cra_driver_name's
+>    sha3-224-generic
+>    sha3-256-generic
+>    sha3-384-generic
+>    sha3-512-generic
+>
+> Jeff Garzik (1):
+>   Crypto: Add SHA-3 hash algorithm
+>
+> Raveendra Padasalagi (1):
+>   Crypto: Add SHA-3 Test's in tcrypt
+>
+>  crypto/Kconfig        |  10 ++
+>  crypto/Makefile       |   1 +
+>  crypto/sha3_generic.c | 300
+> ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  crypto/tcrypt.c       |  53 ++++++++-
+>  crypto/testmgr.c      |  40 +++++++
+>  crypto/testmgr.h      | 125 +++++++++++++++++++++
+>  include/crypto/sha3.h |  29 +++++
+>  7 files changed, 557 insertions(+), 1 deletion(-)  create mode 100644
+> crypto/sha3_generic.c  create mode 100644 include/crypto/sha3.h
+>
+> --
+> 1.9.1
