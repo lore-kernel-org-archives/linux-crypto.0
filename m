@@ -1,62 +1,143 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: use timespec64 for jent_get_nstime
-Date: Sat, 18 Jun 2016 10:16:59 +0200
-Message-ID: <1639786.8E0M9GixOz@positron.chronox.de>
-References: <20160617155952.1021006-1-arnd@arndb.de>
+Subject: Re: [PATCH v4 0/5] /dev/random - a new approach
+Date: Sat, 18 Jun 2016 10:21:16 +0200
+Message-ID: <1883152.WnWCHsqf2W@positron.chronox.de>
+References: <1466007463.20087.11.camel@redhat.com> <6137456.oZ1CFC9kFY@positron.chronox.de> <1466171773.20087.66.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- Alexander Kuleshov <kuleshovmail@gmail.com>, y2038@lists.linaro.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Kees Cook <keescook@chromium.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <y2038-bounces@lists.linaro.org>
-In-Reply-To: <20160617155952.1021006-1-arnd@arndb.de>
-List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
-List-Archive: <http://lists.linaro.org/pipermail/y2038/>
-List-Post: <mailto:y2038@lists.linaro.org>
-List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
-List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=subscribe>
-Errors-To: y2038-bounces@lists.linaro.org
-Sender: "Y2038" <y2038-bounces@lists.linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Andi Kleen <andi@firstfloor.org>, sandyinchina@gmail.com,
+	Jason Cooper <cryptography@lakedaemon.net>,
+	John Denker <jsd@av8n.com>,
+	"H. Peter Anvin" <hpa@linux.intel.com>,
+	Joe Perches <joe@perches.com>, Pavel Machek <pavel@ucw.cz>,
+	George Spelvin <linux@horizon.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: David =?utf-8?B?SmHFoWE=?= <djasa@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1466171773.20087.66.camel@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-QW0gRnJlaXRhZywgMTcuIEp1bmkgMjAxNiwgMTc6NTk6NDEgc2NocmllYiBBcm5kIEJlcmdtYW5u
-OgoKSGkgQXJuZCwKCj4gVGhlIGplbnRfZ2V0X25zdGltZSgpIGZ1bmN0aW9uIHVzZXMgX19nZXRu
-c3RpbWVvZmRheSgpIHRvIGdldAo+IHNvbWV0aGluZyBzaW1pbGFyIHRvIGEgNjQtYml0IG5hbm9z
-ZWNvbmQgY291bnRlci4gQXMgd2Ugd2FudAo+IHRvIGdldCByaWQgb2Ygc3RydWN0IHRpbWVzcGVj
-IHRvIGZpeCB0aGUgeTIwMzggb3ZlcmZsb3csCj4gdGhpcyBwYXRjaCBjaGFuZ2VzIHRoZSBjb2Rl
-IHRvIHVzZSBfX2dldG5zdGltZW9mZGF5NjQoKQo+IGluc3RlYWQsIHdoaWNoIHJldHVybnMgYSB0
-aW1lc3BlYzY0IHN0cnVjdHVyZS4KPiAKPiBOb3RoaW5nIGNoYW5nZXMgYWJvdXQgdGhlIGFsZ29y
-aXRobSwgYnV0IGl0IGxvb2tzIGxpa2UgaXQKPiBtaWdodCBiZSBiZXR0ZXIgdG8gdXNlCj4gCj4g
-ICpvdXQgPSB0cy50dl9zZWMgKiBOU0VDX1BFUl9TRUMgKyB0cy50dl9uc2VjOwo+IAo+IG9yIGV2
-ZW4KPiAKPiAgKm91dCA9IGt0aW1lX2dldF9yYXdfZmFzdF9ucygpOwo+IAo+IHRvIGdldCBhbiBh
-Y3R1YWwgbmFub3NlY29uZCB2YWx1ZSBhbmQgYXZvaWQgdGhlIHByZWRpY3RhYmxlCj4gaml0dGVy
-IHRoYXQgaGFwcGVucyBhdCB0aGUgZW5kIG9mIGEgc2Vjb25kLiBDaGVja2luZyB3aGV0aGVyCj4g
-b3Igbm90IHRoaXMgd291bGQgYmUgZ29vZCBuZWVkcyBpbnZlc3RpZ2F0aW9uIGJ5IHNvbWVvbmUg
-d2hvCj4gdW5kZXJzdGFuZHMgdGhlIGNvZGUgYmV0dGVyIHRoYW4gbWUuCgpJIHdpbGwgdGVzdCBp
-dC4KPiAKPiBTaWduZWQtb2ZmLWJ5OiBBcm5kIEJlcmdtYW5uIDxhcm5kQGFybmRiLmRlPgo+IC0t
-LQo+ICBjcnlwdG8vaml0dGVyZW50cm9weS1rY2FwaS5jIHwgNiArKysrLS0KPiAgMSBmaWxlIGNo
-YW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKPiAKPiBkaWZmIC0tZ2l0IGEv
-Y3J5cHRvL2ppdHRlcmVudHJvcHkta2NhcGkuYyBiL2NyeXB0by9qaXR0ZXJlbnRyb3B5LWtjYXBp
-LmMKPiBpbmRleCA1OTdjZWRkMzUzMWMuLjgyYWM0NGVmZjIwZCAxMDA2NDQKPiAtLS0gYS9jcnlw
-dG8vaml0dGVyZW50cm9weS1rY2FwaS5jCj4gKysrIGIvY3J5cHRvL2ppdHRlcmVudHJvcHkta2Nh
-cGkuYwo+IEBAIC04OSw3ICs4OSw3IEBAIHZvaWQgamVudF9tZW1jcHkodm9pZCAqZGVzdCwgY29u
-c3Qgdm9pZCAqc3JjLCB1bnNpZ25lZCBpbnQKPiBuKQo+IAo+ICB2b2lkIGplbnRfZ2V0X25zdGlt
-ZShfX3U2NCAqb3V0KQo+ICB7Cj4gLQlzdHJ1Y3QgdGltZXNwZWMgdHM7Cj4gKwlzdHJ1Y3QgdGlt
-ZXNwZWM2NCB0czsKPiAgCV9fdTY0IHRtcCA9IDA7Cj4gCj4gIAl0bXAgPSByYW5kb21fZ2V0X2Vu
-dHJvcHkoKTsKPiBAQCAtOTgsOSArOTgsMTEgQEAgdm9pZCBqZW50X2dldF9uc3RpbWUoX191NjQg
-Km91dCkKPiAgCSAqIElmIHJhbmRvbV9nZXRfZW50cm9weSBkb2VzIG5vdCByZXR1cm4gYSB2YWx1
-ZSAod2hpY2ggaXMgcG9zc2libGUgCm9uLAo+ICAJICogZm9yIGV4YW1wbGUsIE1JUFMpLCBpbnZv
-a2UgX19nZXRuc3RpbWVvZmRheQo+ICAJICogaG9waW5nIHRoYXQgdGhlcmUgYXJlIHRpbWVycyB3
-ZSBjYW4gd29yayB3aXRoLgo+ICsJICoKPiArCSAqIHNob3VsZCB3ZSBoYXZlIGEgX19rdGltZV9n
-ZXRfbnMoKSBpbnN0ZWFkPwo+ICAJICovCj4gIAlpZiAoKDAgPT0gdG1wKSAmJgo+IC0JICAgKDAg
-PT0gX19nZXRuc3RpbWVvZmRheSgmdHMpKSkgewo+ICsJICAgKDAgPT0gX19nZXRuc3RpbWVvZmRh
-eTY0KCZ0cykpKSB7Cj4gIAkJdG1wID0gdHMudHZfc2VjOwo+ICAJCXRtcCA9IHRtcCA8PCAzMjsK
-PiAgCQl0bXAgPSB0bXAgfCB0cy50dl9uc2VjOwoKCkNpYW8KU3RlcGhhbgpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpZMjAzOCBtYWlsaW5nIGxpc3QKWTIw
-MzhAbGlzdHMubGluYXJvLm9yZwpodHRwczovL2xpc3RzLmxpbmFyby5vcmcvbWFpbG1hbi9saXN0
-aW5mby95MjAzOAo=
+Am Freitag, 17. Juni 2016, 15:56:13 schrieb David Ja=C5=A1a:
+
+Hi David,
+
+> Hi Stephan,
+>=20
+> thank you for your thorough reply,
+>=20
+> On St, 2016-06-15 at 18:58 +0200, Stephan Mueller wrote:
+> > Am Mittwoch, 15. Juni 2016, 18:17:43 schrieb David Ja=C5=A1a:
+> >=20
+> > Hi David,
+> >=20
+> > > Hello Stephan,
+> > >=20
+> > > Did you consider blocking urandom output or returning error until
+> > > initialized? Given the speed of initialization you report, it sho=
+uldn't
+> > > break any userspace apps while making sure that nobody uses predi=
+ctable
+> > > pseudoranom numbers.
+> >=20
+> > My LRNG will definitely touch the beginning of the initramfs bootin=
+g until
+> > it is fully seeded. As these days the initramfs is driven by system=
+d
+> > which always pulls from /dev/urandom, we cannot block as this would=
+ block
+> > systemd. In Ted's last patch, he mentioned that he tried to make
+> > /dev/urandom block which caused user space pain.
+>=20
+> I was thinking along the lines that "almost every important package
+> supports FreeBSD as well where they have to handle the condition so
+> option to switch to Rather Break Than Generate Weak Keys would be nic=
+e"
+> - but I didn't expect that systemd could be a roadblock here. :-/
+>=20
+> I was also thinking of little devices where OpenWRT or proprietary
+> Linux-based systems run that ended up with predictable keys way too
+> ofter (or as in OpenWRT's case, with cumbersome tutorials how to
+> generate keys elsewhere).
+
+I have some ideas on how to handle that issue -- let me run some tests =
+and I=20
+will report back.
+>=20
+> > But if you use the getrandom system call, it works like /dev/urando=
+m but
+> > blocks until the DRBG behind /dev/urandom is fully initialized.
+> >=20
+> > > I was considering asking for patch (or even trying to write it my=
+self)
+> > > to make current urandom block/fail when not initialized but that =
+would
+> > > surely have to be off by default over "never break userspace" rul=
+e (even
+> > > if it means way too easy security problem with both random and ur=
+andom).
+> > > Properties of your urandom implementation makes this point moot a=
+nd it
+> > > could make the random/urandom wars over.
+> >=20
+> > That patch unfortunately will not work. But if you are interested i=
+n that
+> > blocking /dev/urandom behavior for your application, use getrandom.
+>=20
+> I'm QA with a touch of sysadmin so the numbers of apps to fix is larg=
+e
+> and I don't have neither control over the projects nor abilities to
+> patch them all myself. :)
+
+Sure, I can understand that :-)
+>=20
+> > > Best Regards,
+> > >=20
+> > > David Ja=C5=A1a
+> >=20
+> > Ciao
+> > Stephan
+>=20
+> BTW when looking at an old BSI's issue with Linux urandom that Jarod
+> Wilson tried to solve with this series:
+> https://www.spinics.net/lists/linux-crypto/msg06113.html
+> I was thinking:
+> 1) wouldn't it help for large urandom consumers if kernel created a D=
+RBG
+> instance for each of them? It would likely enhance performance and so=
+lve
+> BSI's concern of predicting what numbers could other urandom consumer=
+s
+> obtain at cost of memory footprint
+
+That issue is partly solved with my patch set: I have one DRBG per NUMA=
+ node=20
+where all DRBG instances are equally treated. Surely that patch could b=
+e=20
+expanded on a per-CPU instance. But let us try to use the per-NUMA=20
+implementation and see whether that helps.
+
+Besides, the legacy /dev/urandom delivers about 12 MB/s on my system wh=
+ereas=20
+the DRBG delivers more than 800MB/s. So, we have quite some performance=
+=20
+improvement.
+
+Note, Ted's patch has a similar implementation.
+
+> and then, after reading paper associated with this series:
+> 2) did you evaluate use of intermediate DRBG fed by primary generator=
+ to
+> instantiate per-node DRBG's? It would allow initialization of all
+> secondary DRBGs right after primary generator initialization.
+
+That is exactly what I do.
+>=20
+> Cheers,
+>=20
+> David
+
+
+Ciao
+Stephan
