@@ -1,131 +1,142 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v5 2/7] random: conditionally compile code depending on LRNG
-Date: Sun, 19 Jun 2016 17:59:36 +0200
-Message-ID: <2953766.bb5Wa2eVDN@positron.chronox.de>
-References: <2754489.L1QYabbYUc@positron.chronox.de>
+Subject: [PATCH v5 0/7] /dev/random - a new approach
+Date: Sun, 19 Jun 2016 17:58:41 +0200
+Message-ID: <2754489.L1QYabbYUc@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Theodore Tso <tytso@mit.edu>, Andi Kleen <andi@firstfloor.org>,
-	sandyinchina@gmail.com, Jason Cooper <cryptography@lakedaemon.net>,
+Cc: Andi Kleen <andi@firstfloor.org>, sandyinchina@gmail.com,
+	Jason Cooper <cryptography@lakedaemon.net>,
 	John Denker <jsd@av8n.com>,
 	"H. Peter Anvin" <hpa@linux.intel.com>,
 	Joe Perches <joe@perches.com>, Pavel Machek <pavel@ucw.cz>,
 	George Spelvin <linux@horizon.com>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: herbert@gondor.apana.org.au
+To: herbert@gondor.apana.org.au, Theodore Tso <tytso@mit.edu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:37252 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:37276 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751284AbcFSQHF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	id S1751310AbcFSQHF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
 	Sun, 19 Jun 2016 12:07:05 -0400
-In-Reply-To: <2754489.L1QYabbYUc@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When selecting the LRNG for compilation, disable the legacy /dev/random
-implementation.
+Hi Herbert, Ted,
 
-The LRNG is a drop-in replacement for the legacy /dev/random which
-implements the same in-kernel and user space API. Only the hooks of
-/dev/random into other parts of the kernel need to be disabled.
+The following patch set provides a different approach to /dev/random which
+I call Linux Random Number Generator (LRNG) to collect entropy within the Linux
+kernel. The main improvements compared to the legacy /dev/random is to provide
+sufficient entropy during boot time as well as in virtual environments and when
+using SSDs. A secondary design goal is to limit the impact of the entropy
+collection on massive parallel systems and also allow the use accelerated
+cryptographic primitives. Also, all steps of the entropic data processing are
+testable. Finally massive performance improvements are visible at /dev/urandom
+and get_random_bytes.
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- drivers/char/random.c  | 8 ++++++++
- include/linux/genhd.h  | 5 +++++
- include/linux/random.h | 7 ++++++-
- 3 files changed, 19 insertions(+), 1 deletion(-)
+The design and implementation is driven by a set of goals described in [1]
+that the LRNG completely implements. Furthermore, [1] includes a
+comparison with RNG design suggestions such as SP800-90B, SP800-90C, and
+AIS20/31.
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 0158d3b..ef89c0e 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -268,6 +268,8 @@
- #include <asm/irq_regs.h>
- #include <asm/io.h>
- 
-+#ifndef CONFIG_CRYPTO_LRNG
-+
- #define CREATE_TRACE_POINTS
- #include <trace/events/random.h>
- 
-@@ -1621,6 +1623,7 @@ SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
- 	}
- 	return urandom_read(NULL, buf, count, NULL);
- }
-+#endif	/* CONFIG_CRYPTO_LRNG */
- 
- /********************************************************************
-  *
-@@ -1628,6 +1631,7 @@ SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
-  *
-  ********************************************************************/
- 
-+#ifndef CONFIG_CRYPTO_LRNG
- #ifdef CONFIG_SYSCTL
- 
- #include <linux/sysctl.h>
-@@ -1765,6 +1769,8 @@ struct ctl_table random_table[] = {
- };
- #endif 	/* CONFIG_SYSCTL */
- 
-+#endif	/* CONFIG_CRYPTO_LRNG */
-+
- static u32 random_int_secret[MD5_MESSAGE_BYTES / 4] ____cacheline_aligned;
- 
- int random_int_secret_init(void)
-@@ -1840,6 +1846,7 @@ randomize_range(unsigned long start, unsigned long end, unsigned long len)
- 	return PAGE_ALIGN(get_random_int() % range + start);
- }
- 
-+#ifndef CONFIG_CRYPTO_LRNG
- /* Interface for in-kernel drivers of true hardware RNGs.
-  * Those devices may produce endless random bits and will be throttled
-  * when our pool is full.
-@@ -1859,3 +1866,4 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
- 	credit_entropy_bits(poolp, entropy);
- }
- EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
-+#endif	/* CONFIG_CRYPTO_LRNG */
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 359a8e4..24cfb99 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -433,8 +433,13 @@ extern void disk_flush_events(struct gendisk *disk, unsigned int mask);
- extern unsigned int disk_clear_events(struct gendisk *disk, unsigned int mask);
- 
- /* drivers/char/random.c */
-+#ifdef CONFIG_CRYPTO_LRNG
-+#define add_disk_randomness(disk) do {} while (0)
-+#define rand_initialize_disk(disk) do {} while (0)
-+#else
- extern void add_disk_randomness(struct gendisk *disk);
- extern void rand_initialize_disk(struct gendisk *disk);
-+#endif
- 
- static inline sector_t get_start_sect(struct block_device *bdev)
- {
-diff --git a/include/linux/random.h b/include/linux/random.h
-index e47e533..8773dfc 100644
---- a/include/linux/random.h
-+++ b/include/linux/random.h
-@@ -17,10 +17,15 @@ struct random_ready_callback {
- 	struct module *owner;
- };
- 
--extern void add_device_randomness(const void *, unsigned int);
- extern void add_input_randomness(unsigned int type, unsigned int code,
- 				 unsigned int value);
- extern void add_interrupt_randomness(int irq, int irq_flags);
-+#ifdef CONFIG_CRYPTO_LRNG
-+#define add_device_randomness(buf, nbytes) do {} while (0)
-+#else	/* CONFIG_CRYPTO_LRNG */
-+extern void add_device_randomness(const void *, unsigned int);
-+#define lrng_irq_process()
-+#endif	/* CONFIG_CRYPTO_LRNG */
- 
- extern void get_random_bytes(void *buf, int nbytes);
- extern int add_random_ready_callback(struct random_ready_callback *rdy);
+Changes v5:
+* fix treating LRNG_POOL_SIZE_BITS as entropy value in lrng_get_pool
+* use CTR DRBG with AES256 as default due to its superior speed -- on X86_64
+  executing within a KVM I get read speeds of up to 850 MB/s now. When using a
+  fake NUMA system with 4 nodes on 4 CPUs, I still get up to 430 MB/s read speed
+  with four parallel reads. Note, this patch applies to the current
+  cryptodev-2.6 tree.
+* simplify lrng_get_arch
+* use DRBG security strengths as defined in SP800-57 section 5.6.1
+* add security strength to /proc/sys/kernel/random/lrng_type
+* add ChaCha20 DRNG: in case the kernel crypto API is not compiled, the ChaCha20
+  DRNG with the SHA-1 C implementations are used to drive the cryptographic part
+  of the LRNG.The ChaCha20 RNG is described in [1]. I analyzed it with a user
+  space version of it.
+* Editorial changes requested by checkpatch.pl
+
+Changes v4:
+* port to 4.7-rc1
+* Use classical twisted LFSR approach to collect entropic data as requested by
+  George Spelvin. The LFSR is based on a primitive and irreducible polynomial
+  whose taps are not too close to the location the current byte is mixed in.
+  Primitive polynomials for other entropy pool sizes are offered in the code.
+* The reading of the entropy pool is performed with a hash. The hash can be
+  specified at compile time. The pre-defined hashes are the same as used for
+  the DRBG type (e.g. a SHA256 Hash DRBG implies the use of SHA-256, an AES256
+  CTR DRBG implies the use of CMAC-AES).
+* Addition of the example defines for a CTR DRBG with AES128 which can be
+  enabled during compile time.
+* Entropy estimate: one bit of entropy per interrupt. In case a system does
+  not have a high-resolution timer, apply 1/10th bit of entropy per interrupt.
+  The interrupt estimates can be changed arbitrarily at compile time.
+* Use kmalloc_node for the per-NUMA node secondary DRBGs.
+* Add boot time entropy tests discussed in section 3.4.3 [1].
+* Align all buffers that are processed by the kernel crypto API to an 8 byte
+  boundary. This boundary covers all currently existing cipher implementations.
+
+Changes v3:
+* Convert debug printk to pr_debug as suggested by Joe Perches
+* Add missing \n as suggested by Joe Perches
+* Do not mix in struck IRQ measurements as requested by Pavel Machek
+* Add handling logic for systems without high-res timer as suggested by Pavel
+  Machek -- it uses ideas from the add_interrupt_randomness of the legacy
+  /dev/random implementation
+* add per NUMA node secondary DRBGs as suggested by Andi Kleen -- the
+  explanation of how the logic works is given in section 2.1.1 of my
+  documentation [1], especially how the initial seeding is performed.
+
+Changes v2:
+* Removal of the Jitter RNG fast noise source as requested by Ted
+* Addition of processing of add_input_randomness as suggested by Ted
+* Update documentation and testing in [1] to cover the updates
+* Addition of a SystemTap script to test add_input_randomness
+* To clarify the question whether sufficient entropy is present during boot
+  I added one more test in 3.3.1 [1] which demonstrates the providing of
+  sufficient entropy during initialization. In the worst case of no fast noise
+  sources, in the worst case of a virtual machine with only very few hardware
+  devices, the testing shows that the secondary DRBG is fully seeded with 256
+  bits of entropy before user space injects the random data obtained
+  during shutdown of the previous boot (i.e. the requirement phrased by the
+  legacy /dev/random implementation). As the writing of the random data into
+  /dev/random by user space will happen before any cryptographic service
+  is initialized in user space, this test demonstrates that sufficient
+  entropy is already present in the LRNG at the time user space requires it
+  for seeding cryptographic daemons. Note, this test result was obtained
+  for different architectures, such as x86 64 bit, x86 32 bit, ARM 32 bit and
+  MIPS 32 bit.
+
+[1] http://www.chronox.de/lrng/doc/lrng.pdf
+
+[2] http://www.chronox.de/lrng.html
+
+Stephan Mueller (7):
+  crypto: DRBG - externalize DRBG functions for LRNG
+  random: conditionally compile code depending on LRNG
+  crypto: Linux Random Number Generator
+  crypto: LRNG - enable compile
+  random: add interrupt callback to VMBus IRQ handler
+  crypto: isolate the chacha20_block function
+  crypto: LRNG - add ChaCha20 support
+
+ crypto/Kconfig            |   15 +
+ crypto/Makefile           |    8 +
+ crypto/chacha20_block.c   |   79 ++
+ crypto/chacha20_generic.c |   61 --
+ crypto/drbg.c             |   11 +-
+ crypto/lrng_base.c        | 1942 +++++++++++++++++++++++++++++++++++++++++++++
+ crypto/lrng_kcapi.c       |  167 ++++
+ crypto/lrng_standalone.c  |  218 +++++
+ drivers/char/random.c     |    9 +
+ drivers/hv/vmbus_drv.c    |    3 +
+ include/crypto/chacha20.h |    1 +
+ include/crypto/drbg.h     |    7 +
+ include/linux/genhd.h     |    5 +
+ include/linux/random.h    |    7 +-
+ 14 files changed, 2465 insertions(+), 68 deletions(-)
+ create mode 100644 crypto/chacha20_block.c
+ create mode 100644 crypto/lrng_base.c
+ create mode 100644 crypto/lrng_kcapi.c
+ create mode 100644 crypto/lrng_standalone.c
+
 -- 
 2.5.5
