@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v5 1/7] crypto: DRBG - externalize DRBG functions for LRNG
-Date: Sun, 19 Jun 2016 17:59:06 +0200
-Message-ID: <2484496.z7aQN9ACGl@positron.chronox.de>
+Subject: [PATCH v5 2/7] random: conditionally compile code depending on LRNG
+Date: Sun, 19 Jun 2016 17:59:36 +0200
+Message-ID: <2953766.bb5Wa2eVDN@positron.chronox.de>
 References: <2754489.L1QYabbYUc@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -15,88 +15,117 @@ Cc: Theodore Tso <tytso@mit.edu>, Andi Kleen <andi@firstfloor.org>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:37254 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:37252 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751300AbcFSQHF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	id S1751284AbcFSQHF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
 	Sun, 19 Jun 2016 12:07:05 -0400
 In-Reply-To: <2754489.L1QYabbYUc@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch allows several DRBG functions to be called by the LRNG kernel
-code paths outside the drbg.c file.
+When selecting the LRNG for compilation, disable the legacy /dev/random
+implementation.
+
+The LRNG is a drop-in replacement for the legacy /dev/random which
+implements the same in-kernel and user space API. Only the hooks of
+/dev/random into other parts of the kernel need to be disabled.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/drbg.c         | 11 +++++------
- include/crypto/drbg.h |  7 +++++++
- 2 files changed, 12 insertions(+), 6 deletions(-)
+ drivers/char/random.c  | 8 ++++++++
+ include/linux/genhd.h  | 5 +++++
+ include/linux/random.h | 7 ++++++-
+ 3 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index ded8638..6f968e3 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -113,7 +113,7 @@
-  * the SHA256 / AES 256 over other ciphers. Thus, the favored
-  * DRBGs are the latest entries in this array.
-  */
--static const struct drbg_core drbg_cores[] = {
-+const struct drbg_core drbg_cores[] = {
- #ifdef CONFIG_CRYPTO_DRBG_CTR
- 	{
- 		.flags = DRBG_CTR | DRBG_STRENGTH128,
-@@ -205,7 +205,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
-  * Return: normalized strength in *bytes* value or 32 as default
-  *	   to counter programming errors
-  */
--static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
-+unsigned short drbg_sec_strength(drbg_flag_t flags)
- {
- 	switch (flags & DRBG_STRENGTH_MASK) {
- 	case DRBG_STRENGTH128:
-@@ -1128,7 +1128,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 0158d3b..ef89c0e 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -268,6 +268,8 @@
+ #include <asm/irq_regs.h>
+ #include <asm/io.h>
+ 
++#ifndef CONFIG_CRYPTO_LRNG
++
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/random.h>
+ 
+@@ -1621,6 +1623,7 @@ SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
+ 	}
+ 	return urandom_read(NULL, buf, count, NULL);
+ }
++#endif	/* CONFIG_CRYPTO_LRNG */
+ 
+ /********************************************************************
+  *
+@@ -1628,6 +1631,7 @@ SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
+  *
+  ********************************************************************/
+ 
++#ifndef CONFIG_CRYPTO_LRNG
+ #ifdef CONFIG_SYSCTL
+ 
+ #include <linux/sysctl.h>
+@@ -1765,6 +1769,8 @@ struct ctl_table random_table[] = {
+ };
+ #endif 	/* CONFIG_SYSCTL */
+ 
++#endif	/* CONFIG_CRYPTO_LRNG */
++
+ static u32 random_int_secret[MD5_MESSAGE_BYTES / 4] ____cacheline_aligned;
+ 
+ int random_int_secret_init(void)
+@@ -1840,6 +1846,7 @@ randomize_range(unsigned long start, unsigned long end, unsigned long len)
+ 	return PAGE_ALIGN(get_random_int() % range + start);
  }
  
- /* Free all substructures in a DRBG state without the DRBG state structure */
--static inline void drbg_dealloc_state(struct drbg_state *drbg)
-+void drbg_dealloc_state(struct drbg_state *drbg)
++#ifndef CONFIG_CRYPTO_LRNG
+ /* Interface for in-kernel drivers of true hardware RNGs.
+  * Those devices may produce endless random bits and will be throttled
+  * when our pool is full.
+@@ -1859,3 +1866,4 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
+ 	credit_entropy_bits(poolp, entropy);
+ }
+ EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
++#endif	/* CONFIG_CRYPTO_LRNG */
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 359a8e4..24cfb99 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -433,8 +433,13 @@ extern void disk_flush_events(struct gendisk *disk, unsigned int mask);
+ extern unsigned int disk_clear_events(struct gendisk *disk, unsigned int mask);
+ 
+ /* drivers/char/random.c */
++#ifdef CONFIG_CRYPTO_LRNG
++#define add_disk_randomness(disk) do {} while (0)
++#define rand_initialize_disk(disk) do {} while (0)
++#else
+ extern void add_disk_randomness(struct gendisk *disk);
+ extern void rand_initialize_disk(struct gendisk *disk);
++#endif
+ 
+ static inline sector_t get_start_sect(struct block_device *bdev)
  {
- 	if (!drbg)
- 		return;
-@@ -1147,7 +1147,7 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
-  * Allocate all sub-structures for a DRBG state.
-  * The DRBG state structure must already be allocated.
-  */
--static inline int drbg_alloc_state(struct drbg_state *drbg)
-+int drbg_alloc_state(struct drbg_state *drbg)
- {
- 	int ret = -ENOMEM;
- 	unsigned int sb_size = 0;
-@@ -1781,8 +1781,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
-  *
-  * return: flags
-  */
--static inline void drbg_convert_tfm_core(const char *cra_driver_name,
--					 int *coreref, bool *pr)
-+void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool *pr)
- {
- 	int i = 0;
- 	size_t start = 0;
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index 61580b1..1755d07 100644
---- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -280,4 +280,11 @@ enum drbg_prefixes {
- 	DRBG_PREFIX3
+diff --git a/include/linux/random.h b/include/linux/random.h
+index e47e533..8773dfc 100644
+--- a/include/linux/random.h
++++ b/include/linux/random.h
+@@ -17,10 +17,15 @@ struct random_ready_callback {
+ 	struct module *owner;
  };
  
-+extern int drbg_alloc_state(struct drbg_state *drbg);
-+extern void drbg_dealloc_state(struct drbg_state *drbg);
-+extern void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref,
-+				  bool *pr);
-+extern const struct drbg_core drbg_cores[];
-+extern unsigned short drbg_sec_strength(drbg_flag_t flags);
-+
- #endif /* _DRBG_H */
+-extern void add_device_randomness(const void *, unsigned int);
+ extern void add_input_randomness(unsigned int type, unsigned int code,
+ 				 unsigned int value);
+ extern void add_interrupt_randomness(int irq, int irq_flags);
++#ifdef CONFIG_CRYPTO_LRNG
++#define add_device_randomness(buf, nbytes) do {} while (0)
++#else	/* CONFIG_CRYPTO_LRNG */
++extern void add_device_randomness(const void *, unsigned int);
++#define lrng_irq_process()
++#endif	/* CONFIG_CRYPTO_LRNG */
+ 
+ extern void get_random_bytes(void *buf, int nbytes);
+ extern int add_random_ready_callback(struct random_ready_callback *rdy);
 -- 
 2.5.5
