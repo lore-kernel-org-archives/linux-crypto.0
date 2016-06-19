@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v5 6/7] crypto: isolate the chacha20_block function
-Date: Sun, 19 Jun 2016 18:01:48 +0200
-Message-ID: <2028708.VAINmYoSqU@positron.chronox.de>
+Subject: [PATCH v5 1/7] crypto: DRBG - externalize DRBG functions for LRNG
+Date: Sun, 19 Jun 2016 17:59:06 +0200
+Message-ID: <2484496.z7aQN9ACGl@positron.chronox.de>
 References: <2754489.L1QYabbYUc@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -14,227 +14,89 @@ Cc: Theodore Tso <tytso@mit.edu>, Andi Kleen <andi@firstfloor.org>,
 	George Spelvin <linux@horizon.com>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:37254 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751300AbcFSQHF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 19 Jun 2016 12:07:05 -0400
 In-Reply-To: <2754489.L1QYabbYUc@positron.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The chacha20_block function is extracted into its separate C file to
-allow it to be used by other callers.
+This patch allows several DRBG functions to be called by the LRNG kernel
+code paths outside the drbg.c file.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/Kconfig            |  4 +++
- crypto/Makefile           |  1 +
- crypto/chacha20_block.c   | 79 +++++++++++++++++++++++++++++++++++++++++++++++
- crypto/chacha20_generic.c | 61 ------------------------------------
- include/crypto/chacha20.h |  1 +
- 5 files changed, 85 insertions(+), 61 deletions(-)
- create mode 100644 crypto/chacha20_block.c
+ crypto/drbg.c         | 11 +++++------
+ include/crypto/drbg.h |  7 +++++++
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 772d430..2822c0f 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1224,9 +1224,13 @@ config CRYPTO_SALSA20_X86_64
- 	  The Salsa20 stream cipher algorithm is designed by Daniel J.
- 	  Bernstein <djb@cr.yp.to>. See <http://cr.yp.to/snuffle.html>
- 
-+config CRYPTO_CHACHA20_BLOCK
-+	bool
-+
- config CRYPTO_CHACHA20
- 	tristate "ChaCha20 cipher algorithm"
- 	select CRYPTO_BLKCIPHER
-+	select CRYPTO_CHACHA20_BLOCK
- 	help
- 	  ChaCha20 cipher algorithm, RFC7539.
- 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index f013fac..1b4cc35 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -97,6 +97,7 @@ obj-$(CONFIG_CRYPTO_ANUBIS) += anubis.o
- obj-$(CONFIG_CRYPTO_SEED) += seed.o
- obj-$(CONFIG_CRYPTO_SALSA20) += salsa20_generic.o
- obj-$(CONFIG_CRYPTO_CHACHA20) += chacha20_generic.o
-+obj-$(CONFIG_CRYPTO_CHACHA20_BLOCK) += chacha20_block.o
- obj-$(CONFIG_CRYPTO_POLY1305) += poly1305_generic.o
- obj-$(CONFIG_CRYPTO_DEFLATE) += deflate.o
- obj-$(CONFIG_CRYPTO_MICHAEL_MIC) += michael_mic.o
-diff --git a/crypto/chacha20_block.c b/crypto/chacha20_block.c
-new file mode 100644
-index 0000000..610b391
---- /dev/null
-+++ b/crypto/chacha20_block.c
-@@ -0,0 +1,79 @@
-+/*
-+ * ChaCha20 256-bit cipher algorithm, RFC7539
-+ *
-+ * Copyright (C) 2015 Martin Willi
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/export.h>
-+#include <linux/bitops.h>
-+#include <linux/cryptohash.h>
-+#include <asm/unaligned.h>
-+#include <crypto/chacha20.h>
-+
-+static inline u32 rotl32(u32 v, u8 n)
-+{
-+	return (v << n) | (v >> (sizeof(v) * 8 - n));
-+}
-+
-+void chacha20_block(u32 *state, void *stream)
-+{
-+	u32 x[16], *out = stream;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(x); i++)
-+		x[i] = state[i];
-+
-+	for (i = 0; i < 20; i += 2) {
-+		x[0]  += x[4];    x[12] = rotl32(x[12] ^ x[0],  16);
-+		x[1]  += x[5];    x[13] = rotl32(x[13] ^ x[1],  16);
-+		x[2]  += x[6];    x[14] = rotl32(x[14] ^ x[2],  16);
-+		x[3]  += x[7];    x[15] = rotl32(x[15] ^ x[3],  16);
-+
-+		x[8]  += x[12];   x[4]  = rotl32(x[4]  ^ x[8],  12);
-+		x[9]  += x[13];   x[5]  = rotl32(x[5]  ^ x[9],  12);
-+		x[10] += x[14];   x[6]  = rotl32(x[6]  ^ x[10], 12);
-+		x[11] += x[15];   x[7]  = rotl32(x[7]  ^ x[11], 12);
-+
-+		x[0]  += x[4];    x[12] = rotl32(x[12] ^ x[0],   8);
-+		x[1]  += x[5];    x[13] = rotl32(x[13] ^ x[1],   8);
-+		x[2]  += x[6];    x[14] = rotl32(x[14] ^ x[2],   8);
-+		x[3]  += x[7];    x[15] = rotl32(x[15] ^ x[3],   8);
-+
-+		x[8]  += x[12];   x[4]  = rotl32(x[4]  ^ x[8],   7);
-+		x[9]  += x[13];   x[5]  = rotl32(x[5]  ^ x[9],   7);
-+		x[10] += x[14];   x[6]  = rotl32(x[6]  ^ x[10],  7);
-+		x[11] += x[15];   x[7]  = rotl32(x[7]  ^ x[11],  7);
-+
-+		x[0]  += x[5];    x[15] = rotl32(x[15] ^ x[0],  16);
-+		x[1]  += x[6];    x[12] = rotl32(x[12] ^ x[1],  16);
-+		x[2]  += x[7];    x[13] = rotl32(x[13] ^ x[2],  16);
-+		x[3]  += x[4];    x[14] = rotl32(x[14] ^ x[3],  16);
-+
-+		x[10] += x[15];   x[5]  = rotl32(x[5]  ^ x[10], 12);
-+		x[11] += x[12];   x[6]  = rotl32(x[6]  ^ x[11], 12);
-+		x[8]  += x[13];   x[7]  = rotl32(x[7]  ^ x[8],  12);
-+		x[9]  += x[14];   x[4]  = rotl32(x[4]  ^ x[9],  12);
-+
-+		x[0]  += x[5];    x[15] = rotl32(x[15] ^ x[0],   8);
-+		x[1]  += x[6];    x[12] = rotl32(x[12] ^ x[1],   8);
-+		x[2]  += x[7];    x[13] = rotl32(x[13] ^ x[2],   8);
-+		x[3]  += x[4];    x[14] = rotl32(x[14] ^ x[3],   8);
-+
-+		x[10] += x[15];   x[5]  = rotl32(x[5]  ^ x[10],  7);
-+		x[11] += x[12];   x[6]  = rotl32(x[6]  ^ x[11],  7);
-+		x[8]  += x[13];   x[7]  = rotl32(x[7]  ^ x[8],   7);
-+		x[9]  += x[14];   x[4]  = rotl32(x[4]  ^ x[9],   7);
-+	}
-+
-+	for (i = 0; i < ARRAY_SIZE(x); i++)
-+		out[i] = cpu_to_le32(x[i] + state[i]);
-+
-+	state[12]++;
-+}
-+EXPORT_SYMBOL(chacha20_block);
-diff --git a/crypto/chacha20_generic.c b/crypto/chacha20_generic.c
-index da9c899..1cab831 100644
---- a/crypto/chacha20_generic.c
-+++ b/crypto/chacha20_generic.c
-@@ -15,72 +15,11 @@
- #include <linux/module.h>
- #include <crypto/chacha20.h>
- 
--static inline u32 rotl32(u32 v, u8 n)
--{
--	return (v << n) | (v >> (sizeof(v) * 8 - n));
--}
--
- static inline u32 le32_to_cpuvp(const void *p)
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index ded8638..6f968e3 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -113,7 +113,7 @@
+  * the SHA256 / AES 256 over other ciphers. Thus, the favored
+  * DRBGs are the latest entries in this array.
+  */
+-static const struct drbg_core drbg_cores[] = {
++const struct drbg_core drbg_cores[] = {
+ #ifdef CONFIG_CRYPTO_DRBG_CTR
+ 	{
+ 		.flags = DRBG_CTR | DRBG_STRENGTH128,
+@@ -205,7 +205,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
+  * Return: normalized strength in *bytes* value or 32 as default
+  *	   to counter programming errors
+  */
+-static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
++unsigned short drbg_sec_strength(drbg_flag_t flags)
  {
- 	return le32_to_cpup(p);
+ 	switch (flags & DRBG_STRENGTH_MASK) {
+ 	case DRBG_STRENGTH128:
+@@ -1128,7 +1128,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
  }
  
--static void chacha20_block(u32 *state, void *stream)
--{
--	u32 x[16], *out = stream;
--	int i;
--
--	for (i = 0; i < ARRAY_SIZE(x); i++)
--		x[i] = state[i];
--
--	for (i = 0; i < 20; i += 2) {
--		x[0]  += x[4];    x[12] = rotl32(x[12] ^ x[0],  16);
--		x[1]  += x[5];    x[13] = rotl32(x[13] ^ x[1],  16);
--		x[2]  += x[6];    x[14] = rotl32(x[14] ^ x[2],  16);
--		x[3]  += x[7];    x[15] = rotl32(x[15] ^ x[3],  16);
--
--		x[8]  += x[12];   x[4]  = rotl32(x[4]  ^ x[8],  12);
--		x[9]  += x[13];   x[5]  = rotl32(x[5]  ^ x[9],  12);
--		x[10] += x[14];   x[6]  = rotl32(x[6]  ^ x[10], 12);
--		x[11] += x[15];   x[7]  = rotl32(x[7]  ^ x[11], 12);
--
--		x[0]  += x[4];    x[12] = rotl32(x[12] ^ x[0],   8);
--		x[1]  += x[5];    x[13] = rotl32(x[13] ^ x[1],   8);
--		x[2]  += x[6];    x[14] = rotl32(x[14] ^ x[2],   8);
--		x[3]  += x[7];    x[15] = rotl32(x[15] ^ x[3],   8);
--
--		x[8]  += x[12];   x[4]  = rotl32(x[4]  ^ x[8],   7);
--		x[9]  += x[13];   x[5]  = rotl32(x[5]  ^ x[9],   7);
--		x[10] += x[14];   x[6]  = rotl32(x[6]  ^ x[10],  7);
--		x[11] += x[15];   x[7]  = rotl32(x[7]  ^ x[11],  7);
--
--		x[0]  += x[5];    x[15] = rotl32(x[15] ^ x[0],  16);
--		x[1]  += x[6];    x[12] = rotl32(x[12] ^ x[1],  16);
--		x[2]  += x[7];    x[13] = rotl32(x[13] ^ x[2],  16);
--		x[3]  += x[4];    x[14] = rotl32(x[14] ^ x[3],  16);
--
--		x[10] += x[15];   x[5]  = rotl32(x[5]  ^ x[10], 12);
--		x[11] += x[12];   x[6]  = rotl32(x[6]  ^ x[11], 12);
--		x[8]  += x[13];   x[7]  = rotl32(x[7]  ^ x[8],  12);
--		x[9]  += x[14];   x[4]  = rotl32(x[4]  ^ x[9],  12);
--
--		x[0]  += x[5];    x[15] = rotl32(x[15] ^ x[0],   8);
--		x[1]  += x[6];    x[12] = rotl32(x[12] ^ x[1],   8);
--		x[2]  += x[7];    x[13] = rotl32(x[13] ^ x[2],   8);
--		x[3]  += x[4];    x[14] = rotl32(x[14] ^ x[3],   8);
--
--		x[10] += x[15];   x[5]  = rotl32(x[5]  ^ x[10],  7);
--		x[11] += x[12];   x[6]  = rotl32(x[6]  ^ x[11],  7);
--		x[8]  += x[13];   x[7]  = rotl32(x[7]  ^ x[8],   7);
--		x[9]  += x[14];   x[4]  = rotl32(x[4]  ^ x[9],   7);
--	}
--
--	for (i = 0; i < ARRAY_SIZE(x); i++)
--		out[i] = cpu_to_le32(x[i] + state[i]);
--
--	state[12]++;
--}
--
- static void chacha20_docrypt(u32 *state, u8 *dst, const u8 *src,
- 			     unsigned int bytes)
+ /* Free all substructures in a DRBG state without the DRBG state structure */
+-static inline void drbg_dealloc_state(struct drbg_state *drbg)
++void drbg_dealloc_state(struct drbg_state *drbg)
  {
-diff --git a/include/crypto/chacha20.h b/include/crypto/chacha20.h
-index 274bbae..20d20f68 100644
---- a/include/crypto/chacha20.h
-+++ b/include/crypto/chacha20.h
-@@ -16,6 +16,7 @@ struct chacha20_ctx {
- 	u32 key[8];
+ 	if (!drbg)
+ 		return;
+@@ -1147,7 +1147,7 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+  * Allocate all sub-structures for a DRBG state.
+  * The DRBG state structure must already be allocated.
+  */
+-static inline int drbg_alloc_state(struct drbg_state *drbg)
++int drbg_alloc_state(struct drbg_state *drbg)
+ {
+ 	int ret = -ENOMEM;
+ 	unsigned int sb_size = 0;
+@@ -1781,8 +1781,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+  *
+  * return: flags
+  */
+-static inline void drbg_convert_tfm_core(const char *cra_driver_name,
+-					 int *coreref, bool *pr)
++void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool *pr)
+ {
+ 	int i = 0;
+ 	size_t start = 0;
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index 61580b1..1755d07 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -280,4 +280,11 @@ enum drbg_prefixes {
+ 	DRBG_PREFIX3
  };
  
-+void chacha20_block(u32 *state, void *stream);
- void crypto_chacha20_init(u32 *state, struct chacha20_ctx *ctx, u8 *iv);
- int crypto_chacha20_setkey(struct crypto_tfm *tfm, const u8 *key,
- 			   unsigned int keysize);
++extern int drbg_alloc_state(struct drbg_state *drbg);
++extern void drbg_dealloc_state(struct drbg_state *drbg);
++extern void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref,
++				  bool *pr);
++extern const struct drbg_core drbg_cores[];
++extern unsigned short drbg_sec_strength(drbg_flag_t flags);
++
+ #endif /* _DRBG_H */
 -- 
 2.5.5
