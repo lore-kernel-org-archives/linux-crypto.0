@@ -1,71 +1,40 @@
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH v5 0/7] /dev/random - a new approach
-Date: Mon, 20 Jun 2016 10:27:40 +0200
-Message-ID: <20160620082740.GA10238@amd>
-References: <2754489.L1QYabbYUc@positron.chronox.de>
- <20160619193614.GA26146@amd>
- <3817952.8FvMDE0Kc7@tauon.atsec.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v8 1/3] crypto: scatterwak - Add scatterwalk_sg_copychunks
+Date: Mon, 20 Jun 2016 18:54:49 +0800
+Message-ID: <20160620105449.GA10464@gondor.apana.org.au>
+References: <1466002364-16945-1-git-send-email-tudor-dan.ambarus@nxp.com>
+ <1466002364-16945-2-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, Theodore Tso <tytso@mit.edu>,
-	Andi Kleen <andi@firstfloor.org>, sandyinchina@gmail.com,
-	Jason Cooper <cryptography@lakedaemon.net>,
-	John Denker <jsd@av8n.com>,
-	"H. Peter Anvin" <hpa@linux.intel.com>,
-	Joe Perches <joe@perches.com>,
-	George Spelvin <linux@horizon.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, horia.geanta@nxp.com
+To: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:58790 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752434AbcFTK4s (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 20 Jun 2016 06:56:48 -0400
 Content-Disposition: inline
-In-Reply-To: <3817952.8FvMDE0Kc7@tauon.atsec.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1466002364-16945-2-git-send-email-tudor-dan.ambarus@nxp.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi!
-
-> > On Sun 2016-06-19 17:58:41, Stephan Mueller wrote:
-> > > Hi Herbert, Ted,
-> > > 
-> > > The following patch set provides a different approach to /dev/random which
-> > > I call Linux Random Number Generator (LRNG) to collect entropy within the
-> > > Linux kernel. The main improvements compared to the legacy /dev/random is
-> > > to provide sufficient entropy during boot time as well as in virtual
-> > > environments and when using SSDs. A secondary design goal is to limit the
-> > > impact of the entropy collection on massive parallel systems and also
-> > > allow the use accelerated cryptographic primitives. Also, all steps of
-> > > the entropic data processing are testable. Finally massive performance
-> > > improvements are visible at /dev/urandom and get_random_bytes.
-> > 
-> > Dunno. It is very similar to existing rng, AFAICT. And at the very
-> > least, constants in existing RNG could be tuned to provide "entropy at
-> > the boot time".
+On Wed, Jun 15, 2016 at 05:52:42PM +0300, Tudor Ambarus wrote:
+> This patch adds the function scatterwalk_sg_copychunks which writes
+> a chunk of data from a scatterwalk to another scatterwalk.
+> It will be used by caam driver to remove the leading zeros
+> for the output data of the RSA algorithm, after the computation completes.
 > 
-> The key differences and thus my main concerns I have with the current design 
-> are the following items. If we would change them, it is an intrusive change. 
-> As of now, I have not seen that intrusive changes were accepted. This led me 
-> to develop a competing algorithm.
+> Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 
-Well, intrusive changes are hard to do, but replacing whole subsystems
-is even harder -- and rightly so.
+Not only does dropping leading zeroes lead to questions about
+information leaks, but it makes every one of our RSA drivers
+look crap.
 
-> - There was a debate around my approach assuming one bit of entropy per 
-> received IRQ. I am really wondering about that discussion when there is a much 
-> bigger "forcast" problem with the legacy /dev/random: how can we credit HIDs 
-> up to 11 bits of entropy when the user (a potential adversary) triggers these 
-> events? I am sure I would be shot down with such an approach if I would 
-> deliver that with a new implementation.
+So I'm going to change this and make it not skip leading zeroes.
 
-Well, if you can demonstrate 11 bits is too much, go ahead... I'm sure
-that is rather easy to adjust.
-
-But I believe that 1) user is not normally an adversary and 2) the
-best thing for him to do would still be "pressing nothing". It will be
-hard to press keys (etc) with great enough precision...
-
-Best regards,
-									Pavel
-
+Thanks,
 -- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
