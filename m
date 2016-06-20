@@ -1,47 +1,36 @@
-From: "Benedetto, Salvatore" <salvatore.benedetto@intel.com>
-Subject: RE: [PATCH v9 2/3] crypto: kpp - Add DH software implementation
-Date: Mon, 20 Jun 2016 11:44:43 +0000
-Message-ID: <309B30E91F5E2846B79BD9AA9711D03193588B@IRSMSX102.ger.corp.intel.com>
-References: <1466174265-4546-1-git-send-email-salvatore.benedetto@intel.com>
- <1466174265-4546-3-git-send-email-salvatore.benedetto@intel.com>
- <20160620111310.GA10601@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [patch] crypto: drbg - fix an error code in
+ drbg_init_sym_kernel()
+Date: Mon, 20 Jun 2016 19:35:35 +0800
+Message-ID: <20160620113535.GE10773@gondor.apana.org.au>
+References: <20160617091618.GC25609@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"Benedetto, Salvatore" <salvatore.benedetto@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Stephan Mueller <smueller@chronox.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:33549 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751913AbcFTLtE convert rfc822-to-8bit (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:54602 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753898AbcFTMEH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Jun 2016 07:49:04 -0400
-In-Reply-To: <20160620111310.GA10601@gondor.apana.org.au>
-Content-Language: en-US
+	Mon, 20 Jun 2016 08:04:07 -0400
+Content-Disposition: inline
+In-Reply-To: <20160617091618.GC25609@mwanda>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
-
-> -----Original Message-----
-> From: Herbert Xu [mailto:herbert@gondor.apana.org.au]
-> Sent: Monday, June 20, 2016 12:13 PM
-> To: Benedetto, Salvatore <salvatore.benedetto@intel.com>
-> Cc: linux-crypto@vger.kernel.org
-> Subject: Re: [PATCH v9 2/3] crypto: kpp - Add DH software implementation
+On Fri, Jun 17, 2016 at 12:16:19PM +0300, Dan Carpenter wrote:
+> We accidentally return PTR_ERR(NULL) which is success but we should
+> return -ENOMEM.
 > 
-> On Fri, Jun 17, 2016 at 03:37:44PM +0100, Salvatore Benedetto wrote:
-> >
-> > +int crypto_dh_encode_key(char *buf, unsigned int len, const struct dh
-> > +*params) {
-> > +	struct kpp_secret *secret = (struct kpp_secret *)buf;
-> 
-> You can't do that.  The memory under buf may not be aligned so you need to
-> copy it.
+> Fixes: 355912852115 ('crypto: drbg - use CTR AES instead of ECB AES')
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-OK, I'll fix that and send a new version unless you have other comments.
-
-Thanks for reviewing.
-
-Salvatore
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
