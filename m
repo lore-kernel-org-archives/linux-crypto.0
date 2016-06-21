@@ -1,71 +1,103 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: Jitter RNG - use ktime_get_raw_ns as
-	fallback
-Date: Tue, 21 Jun 2016 20:05:59 +0200
-Message-ID: <8242305.3NQCWfJAlD@positron.chronox.de>
+From: John Stultz <john.stultz@linaro.org>
+Subject: Re: [PATCH] crypto: Jitter RNG - use ktime_get_raw_ns as fallback
+Date: Tue, 21 Jun 2016 11:11:42 -0700
+Message-ID: <CALAqxLU6-=r8z9dVF5PQCzps-Y4SWcXMd_=QDgZuYj7Dij5whg@mail.gmail.com>
+References: <8242305.3NQCWfJAlD@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
- Alexander Kuleshov <kuleshovmail@gmail.com>,
- y2038 Mailman List <y2038@lists.linaro.org>, linux-kernel@vger.kernel.org,
- John Stultz <john.stultz@linaro.org>, linux-crypto@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>
-To: herbert@gondor.apana.org.au
-Return-path: <y2038-bounces@lists.linaro.org>
-List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
-List-Archive: <http://lists.linaro.org/pipermail/y2038/>
-List-Post: <mailto:y2038@lists.linaro.org>
-List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
-List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=subscribe>
-Errors-To: y2038-bounces@lists.linaro.org
-Sender: "Y2038" <y2038-bounces@lists.linaro.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Alexander Kuleshov <kuleshovmail@gmail.com>,
+	y2038 Mailman List <y2038@lists.linaro.org>,
+	lkml <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Kees Cook <keescook@chromium.org>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ob0-f175.google.com ([209.85.214.175]:33676 "EHLO
+	mail-ob0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750978AbcFUSLn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 21 Jun 2016 14:11:43 -0400
+Received: by mail-ob0-f175.google.com with SMTP id xn17so34474460obc.0
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Jun 2016 11:11:43 -0700 (PDT)
+In-Reply-To: <8242305.3NQCWfJAlD@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-QXMgcGFydCBvZiB0aGUgWTIwMzggZGV2ZWxvcG1lbnQsIF9fZ2V0bnN0aW1lb2ZkYXkgaXMgbm90
-IHN1cHBvc2VkIHRvIGJlCnVzZWQgYW55IG1vcmUuIEl0IGlzIG5vdyByZXBsYWNlZCB3aXRoIGt0
-aW1lX2dldF9yYXdfbnMuIEFsYmVpdAprdGltZV9nZXRfcmF3X25zIGlzIG1vbm90b25pYyBjb21w
-YXJlZCB0byBfX2dldG5zdGltZW9mZGF5LCB0aGlzCmRpZmZlcmVuY2UgaXMgaXJyZWxldmFudCBh
-cyB0aGUgSml0dGVyIFJORyB1c2VzIHRoZSB0aW1lIHN0YW1wIHRvCm1lYXN1cmUgdGhlIGV4ZWN1
-dGlvbiB0aW1lIG9mIGEgZ2l2ZW4gY29kZSBwYXRoIGFuZCB0cmllcyB0byBkZXRlY3QKdmFyaWF0
-aW9ucyBpbiB0aGUgZXhlY3V0aW9uIHRpbWUuIFRoZXJlZm9yZSwgdGhlIG9ubHkgcmVxdWlyZW1l
-bnQgdGhlCkppdHRlciBSTkcgaGFzLCBpcyBhIHN1ZmZpY2llbnQgaGlnaCByZXNvbHV0aW9uIHRv
-IGRldGVjdCB0aGVzZQp2YXJpYXRpb25zLgoKVGhlIGNoYW5nZSB3YXMgdGVzdGVkIG9uIHg4NiB0
-byBzaG93IGFuIGlkZW50aWNhbCBiZWhhdmlvciBhcyBSRFRTQy4gVGhlCnVzZWQgdGVzdCBjb2Rl
-IHNpbXBseSBtZWFzdXJlcyB0aGUgZXhlY3V0aW9uIHRpbWUgb2YgdGhlIGhlYXJ0IG9mIHRoZQpS
-Tkc6CgoJamVudF9nZXRfbnN0aW1lKCZ0aW1lKTsKCWplbnRfbWVtYWNjZXNzKGVjLCBtaW4pOwoJ
-amVudF9mb2xkX3RpbWUoTlVMTCwgdGltZSwgJmZvbGRlZCwgbWluKTsKCWplbnRfZ2V0X25zdGlt
-ZSgmdGltZTIpOwoJcmV0dXJuICgodGltZTIgLSB0aW1lKSk7CgpTaWduZWQtb2ZmLWJ5OiBTdGVw
-aGFuIE11ZWxsZXIgPHNtdWVsbGVyQGNocm9ub3guZGU+Ci0tLQogY3J5cHRvL2ppdHRlcmVudHJv
-cHkta2NhcGkuYyB8IDIzICsrKysrKysrKysrKysrLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwg
-MTQgaW5zZXJ0aW9ucygrKSwgOSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9jcnlwdG8vaml0
-dGVyZW50cm9weS1rY2FwaS5jIGIvY3J5cHRvL2ppdHRlcmVudHJvcHkta2NhcGkuYwppbmRleCA1
-OTdjZWRkLi42OWEyOTg4IDEwMDY0NAotLS0gYS9jcnlwdG8vaml0dGVyZW50cm9weS1rY2FwaS5j
-CisrKyBiL2NyeXB0by9qaXR0ZXJlbnRyb3B5LWtjYXBpLmMKQEAgLTg3LDI0ICs4NywyOSBAQCB2
-b2lkIGplbnRfbWVtY3B5KHZvaWQgKmRlc3QsIGNvbnN0IHZvaWQgKnNyYywgdW5zaWduZWQgaW50
-IG4pCiAJbWVtY3B5KGRlc3QsIHNyYywgbik7CiB9CiAKKy8qCisgKiBPYnRhaW4gYSBoaWdoLXJl
-c29sdXRpb24gdGltZSBzdGFtcCB2YWx1ZS4gVGhlIHRpbWUgc3RhbXAgaXMgdXNlZCB0byBtZWFz
-dXJlCisgKiB0aGUgZXhlY3V0aW9uIHRpbWUgb2YgYSBnaXZlbiBjb2RlIHBhdGggYW5kIGl0cyB2
-YXJpYXRpb25zLiBIZW5jZSwgdGhlIHRpbWUKKyAqIHN0YW1wIG11c3QgaGF2ZSBhIHN1ZmZpY2ll
-bnRseSBoaWdoIHJlc29sdXRpb24uIEl0IGlzIHZhbGlkIGlmIHRoZSB0aW1lCisgKiBydW5zIGJh
-Y2t3YXJkcyBmb3Igc2hvcnQgcGVyaW9kIG9mIHRpbWUgYXMgdGhlIFJORyBjb2RlIGlzIGFibGUg
-aGFuZGxlIHRoYXQuCisgKgorICogTm90ZSwgaWYgdGhlIGZ1bmN0aW9uIHJldHVybnMgemVybyBi
-ZWNhdXNlIGEgZ2l2ZW4gYXJjaGl0ZWN0dXJlIGRvZXMgbm90CisgKiBpbXBsZW1lbnQgYSBoaWdo
-LXJlc29sdXRpb24gdGltZSBzdGFtcCwgdGhlIFJORyBjb2RlJ3MgcnVudGltZSB0ZXN0CisgKiB3
-aWxsIGRldGVjdCBpdCBhbmQgd2lsbCBub3QgcHJvZHVjZSBvdXRwdXQuCisgKi8KIHZvaWQgamVu
-dF9nZXRfbnN0aW1lKF9fdTY0ICpvdXQpCiB7Ci0Jc3RydWN0IHRpbWVzcGVjIHRzOwogCV9fdTY0
-IHRtcCA9IDA7CiAKIAl0bXAgPSByYW5kb21fZ2V0X2VudHJvcHkoKTsKIAogCS8qCi0JICogSWYg
-cmFuZG9tX2dldF9lbnRyb3B5IGRvZXMgbm90IHJldHVybiBhIHZhbHVlICh3aGljaCBpcyBwb3Nz
-aWJsZSBvbiwKLQkgKiBmb3IgZXhhbXBsZSwgTUlQUyksIGludm9rZSBfX2dldG5zdGltZW9mZGF5
-CisJICogSWYgcmFuZG9tX2dldF9lbnRyb3B5IGRvZXMgbm90IHJldHVybiBhIHZhbHVlLCBpLmUu
-IGl0IGlzIG5vdAorCSAqIGltcGxlbWVudGVkIGZvciBhIGdpdmVuIGFyY2hpdGVjdHVyZSwgaW52
-b2tlIGt0aW1lX2dldF9yYXdfbnMKIAkgKiBob3BpbmcgdGhhdCB0aGVyZSBhcmUgdGltZXJzIHdl
-IGNhbiB3b3JrIHdpdGguCiAJICovCi0JaWYgKCgwID09IHRtcCkgJiYKLQkgICAoMCA9PSBfX2dl
-dG5zdGltZW9mZGF5KCZ0cykpKSB7Ci0JCXRtcCA9IHRzLnR2X3NlYzsKLQkJdG1wID0gdG1wIDw8
-IDMyOwotCQl0bXAgPSB0bXAgfCB0cy50dl9uc2VjOwotCX0KKwlpZiAodG1wID09IDApCisJCXRt
-cCA9IGt0aW1lX2dldF9yYXdfbnMoKTsKIAogCSpvdXQgPSB0bXA7CiB9Ci0tIAoyLjUuNQoKCl9f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fClkyMDM4IG1haWxp
-bmcgbGlzdApZMjAzOEBsaXN0cy5saW5hcm8ub3JnCmh0dHBzOi8vbGlzdHMubGluYXJvLm9yZy9t
-YWlsbWFuL2xpc3RpbmZvL3kyMDM4Cg==
+On Tue, Jun 21, 2016 at 11:05 AM, Stephan Mueller <smueller@chronox.de> wrote:
+> As part of the Y2038 development, __getnstimeofday is not supposed to be
+> used any more. It is now replaced with ktime_get_raw_ns. Albeit
+> ktime_get_raw_ns is monotonic compared to __getnstimeofday, this
+> difference is irrelevant as the Jitter RNG uses the time stamp to
+> measure the execution time of a given code path and tries to detect
+> variations in the execution time. Therefore, the only requirement the
+> Jitter RNG has, is a sufficient high resolution to detect these
+> variations.
+>
+> The change was tested on x86 to show an identical behavior as RDTSC. The
+> used test code simply measures the execution time of the heart of the
+> RNG:
+>
+>         jent_get_nstime(&time);
+>         jent_memaccess(ec, min);
+>         jent_fold_time(NULL, time, &folded, min);
+>         jent_get_nstime(&time2);
+>         return ((time2 - time));
+>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> ---
+>  crypto/jitterentropy-kcapi.c | 23 ++++++++++++++---------
+>  1 file changed, 14 insertions(+), 9 deletions(-)
+>
+> diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+> index 597cedd..69a2988 100644
+> --- a/crypto/jitterentropy-kcapi.c
+> +++ b/crypto/jitterentropy-kcapi.c
+> @@ -87,24 +87,29 @@ void jent_memcpy(void *dest, const void *src, unsigned int n)
+>         memcpy(dest, src, n);
+>  }
+>
+> +/*
+> + * Obtain a high-resolution time stamp value. The time stamp is used to measure
+> + * the execution time of a given code path and its variations. Hence, the time
+> + * stamp must have a sufficiently high resolution. It is valid if the time
+> + * runs backwards for short period of time as the RNG code is able handle that.
+> + *
+> + * Note, if the function returns zero because a given architecture does not
+> + * implement a high-resolution time stamp, the RNG code's runtime test
+> + * will detect it and will not produce output.
+> + */
+>  void jent_get_nstime(__u64 *out)
+>  {
+> -       struct timespec ts;
+>         __u64 tmp = 0;
+>
+>         tmp = random_get_entropy();
+>
+>         /*
+> -        * If random_get_entropy does not return a value (which is possible on,
+> -        * for example, MIPS), invoke __getnstimeofday
+> +        * If random_get_entropy does not return a value, i.e. it is not
+> +        * implemented for a given architecture, invoke ktime_get_raw_ns
+>          * hoping that there are timers we can work with.
+>          */
+> -       if ((0 == tmp) &&
+> -          (0 == __getnstimeofday(&ts))) {
+> -               tmp = ts.tv_sec;
+> -               tmp = tmp << 32;
+> -               tmp = tmp | ts.tv_nsec;
+> -       }
+> +       if (tmp == 0)
+> +               tmp = ktime_get_raw_ns();
+
+
+I don't see in the above an explanation of *why* you're using
+ktime_get_raw_ns() instead of ktime_get_ns().
+
+Also the bit about time running backwards being ok is confusing since
+you're not using the "fast" accessor where that would be a risk.
+
+thanks
+-john
