@@ -1,46 +1,65 @@
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH v4 0/5] /dev/random - a new approach
-Date: Tue, 21 Jun 2016 15:42:40 +0200
-Message-ID: <20160621134240.GA8086@amd>
-References: <1466007463.20087.11.camel@redhat.com>
- <3381856.qSaz1KcX2Z@positron.chronox.de>
- <f22f4cd6-8198-71a0-9b79-9f10070758f3@gmail.com>
- <8999970.pstTbGZv5G@positron.chronox.de>
- <6b8c8f6a-862a-3e7c-e950-75cd93cdc1f7@gmail.com>
+From: John Stultz <john.stultz@linaro.org>
+Subject: Re: [PATCH] crypto: use timespec64 for jent_get_nstime
+Date: Tue, 21 Jun 2016 09:22:31 -0700
+Message-ID: <CALAqxLWan2_2HhChvq+fXKpP8CyURwj-ccdnmfEve4LTOza=mg@mail.gmail.com>
+References: <20160617155952.1021006-1-arnd@arndb.de>
+ <10630099.jHjGp8aIto@positron.chronox.de>
+ <3776557.os2uYrMn6M@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Stephan Mueller <smueller@chronox.de>,
-	Theodore Ts'o <tytso@mit.edu>,
-	David =?utf-8?B?SmHFoWE=?= <djasa@redhat.com>,
-	Andi Kleen <andi@firstfloor.org>, sandyinchina@gmail.com,
-	Jason Cooper <cryptography@lakedaemon.net>,
-	John Denker <jsd@av8n.com>,
-	"H. Peter Anvin" <hpa@linux.intel.com>,
-	Joe Perches <joe@perches.com>,
-	George Spelvin <linux@horizon.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: "Austin S. Hemmelgarn" <ahferroin7@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <6b8c8f6a-862a-3e7c-e950-75cd93cdc1f7@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ Alexander Kuleshov <kuleshovmail@gmail.com>,
+ Stephan Mueller <smueller@chronox.de>, lkml <linux-kernel@vger.kernel.org>,
+ y2038 Mailman List <y2038@lists.linaro.org>, linux-crypto@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Kees Cook <keescook@chromium.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <y2038-bounces@lists.linaro.org>
+In-Reply-To: <3776557.os2uYrMn6M@wuerfel>
+List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
+ <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
+List-Archive: <http://lists.linaro.org/pipermail/y2038/>
+List-Post: <mailto:y2038@lists.linaro.org>
+List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
+List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
+ <mailto:y2038-request@lists.linaro.org?subject=subscribe>
+Errors-To: y2038-bounces@lists.linaro.org
+Sender: "Y2038" <y2038-bounces@lists.linaro.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Hi!
-
-> 6. You have a significant lack of data regarding embedded systems, which is
-> one of the two biggest segments of Linux's market share.  You list no
-> results for any pre-ARMv6 systems (Linux still runs on and is regularly used
-> on ARMv4 CPU's, and it's worth also pointing out that the values on
-> the
-
-Feel free to contribute more test results.
-
-I mean... you can't expect every person who wants to improve something
-in linux to test on everything in the world... can you?
-
-								Pavel
-
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+T24gVHVlLCBKdW4gMjEsIDIwMTYgYXQgMTozMiBBTSwgQXJuZCBCZXJnbWFubiA8YXJuZEBhcm5k
+Yi5kZT4gd3JvdGU6Cj4gT24gVHVlc2RheSwgSnVuZSAyMSwgMjAxNiA4OjIwOjEwIEFNIENFU1Qg
+U3RlcGhhbiBNdWVsbGVyIHdyb3RlOgo+PiBBbSBGcmVpdGFnLCAxNy4gSnVuaSAyMDE2LCAxNzo1
+OTo0MSBzY2hyaWViIEFybmQgQmVyZ21hbm46Cj4+Cj4gQ29tcGFyZWQgdG8gdGhlIHByZXZpb3Vz
+IF9fZ2V0bnN0aW1lb2ZkYXkoKSwgdGhlIGRpZmZlcmVuY2UgaXMKPgo+IC0gdXNpbmcgIm1vbm90
+b25pYyIgdGltZWJhc2UgaW5zdGVhZCBvZiAicmVhbCIsIHNvIHRoZSB6ZXJvIHRpbWUKPiAgIGlz
+IHdoZW4gdGhlIHN5c3RlbSBib290ZWQgcmF0aGVyIHRoYW4gSmFuIDEgMTk3MAoKSSBoYXZlbid0
+IGxvb2tlZCBhdCB0aGUgZGV0YWlscyBvZiB0aGUgY2FsbGluZyBjb2RlLCBidXQgSSdkIHdvcnJ5
+IGZvcgpjcnlwdG8gdXNlcywgZXNwZWNpYWxseSBpZiBpdHMgYmVpbmcgdXNlZCBmb3IgZW50cm9w
+eSBjb2xsZWN0aW9uLAp1c2luZyB0aGUgbW9ub3RvbmljIGNsb2NrIGluc3RlYWQgb2YgdGhlIHJl
+YWx0aW1lIGNsb2NrIG1pZ2h0IGJlCnByb2JsZW1hdGljLgoKPiAtICJyYXciIG1lYW5zIHdlIGRv
+bid0IGhvbm9yIHVwZGF0ZXMgZm9yIHRoZSByYXRlIGJhc2VkIG9uIG50cCwKPiAgIHdoaWNoIGlz
+IHByb2JhYmx5IGJldHRlciBhcyB0aGUgbnRwIHN0YXRlIG1pZ2h0IGJlIG9ic2VydmFibGUKPiAg
+IG92ZXIgdGhlIG5ldCAoaXQgcHJvYmFibHkgZG9lc24ndCBtYXR0ZXIsIGJ1dCBpdCBjYW4ndCBo
+dXJ0KQoKU28uLi4gdGhpcyBmZWVscyBsaWtlIGEgdmVyeSB2YWd1ZSBleHBsYW5hdGlvbiwgYW5k
+IHRoZSBsYWNrIG9mCmZyZXF1ZW5jeSBjb3JyZWN0aW9uIGhlcmUgcHJvYmFibHkgbmVlZCBhIHJl
+YWxseSBnb29kIGNvbW1lbnQuIEtlZXBpbmcKbXVsdGlwbGUgdGltZSBkb21haW5zIGlzIHVzdWFs
+bHkgYXNraW5nIGZvciB0cm91YmxlLCBidXQgd2UgYWRkZWQgdGhlCk1PTk9UT05JQ19SQVcgY2xv
+Y2sgdG8gYWRkcmVzcyBhIGZldyBjYXNlcyB3aGVyZSBwZW9wbGUgcmVhbGx5IHdhbnRlZAphbiBh
+YnN0cmFjdCBoYXJkd2FyZSBjb3VudGVyLCB3aGljaCB3YXMgdW5hZmZlY3RlZCBieSBmcmVxdWVu
+Y3kKY29ycmVjdGlvbnMuIEknZCByZWFsbHkgbWFrZSBzdXJlIGl0cyBjbGVhciB3aHkgdGhpcyBp
+cyB3aGF0IHlvdSB3YW50CnZzIHRoZSBzdGFuZGFyZCBzeXN0ZW0gdGltZSBkb21haW4gc28gd2Ug
+ZG9uJ3QgcnVuIGludG8gcHJvYmxlbXMKdW5kZXJzdGFuZGluZyBpdCBsYXRlci4KCj4gLSAiZmFz
+dCIgbWVhbnMgdGhhdCBpbiB2ZXJ5IHJhcmUgY2FzZXMsIHRoZSB0aW1lIG1pZ2h0IGFwcGVhcgo+
+ICAgdG8gZ28gYmFja3dhcmRzIChpdCBwcm9iYWJseSBjYW4ndCBoYXBwZW4gaGVyZSBiZWNhdXNl
+IHlvdSBhcmUgbm90Cj4gICBjYWxsZWQgaW4gYW4gTk1JKS4KCiJmYXN0IiByZWFsbHkgbWVhbnMg
+InNhZmUtZm9yLW5taSB3cnQgdG8gbG9ja2luZyIuICBUaGUgdHJhZGVvZmYgYmVpbmcKdGhhdCB3
+aGVuIGZyZXF1ZW5jeSBhZGp1c3RtZW50cyBvY2N1ciwgYW5kIGlmIHlvdXIgY29kZSBpcyBkZWxh
+eWVkLAp5b3UgbWlnaHQgc2VlIHRpbWUgZ28gYmFja3dhcmRzIGJ5IGEgc21hbGwgYW1vdW50LiBU
+aGlzIGFsbG93cwp0cmFjaW5nL3NjaGVkIGNvZGUgKG9yIG90aGVyIGNvZGUgY2FsbGVkIGZyb20g
+Tk1JKSAgdG8gbm90IGhhdmUgdG8KZHVwbGljYXRlIHRoZSB0aW1la2VlcGluZyBpbmZyYXN0cnVj
+dHVyZS4KCkkgdGhpbmsgd2l0aG91dCBhIG11Y2ggYmV0dGVyIGV4cGxhbmF0aW9uLCB1c2luZyB0
+aGUgImZhc3QiIG1ldGhvZAppc24ndCByZWFsbHkgd2FycmFudGVkIGhlcmUuCgp0aGFua3MKLWpv
+aG4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KWTIwMzgg
+bWFpbGluZyBsaXN0ClkyMDM4QGxpc3RzLmxpbmFyby5vcmcKaHR0cHM6Ly9saXN0cy5saW5hcm8u
+b3JnL21haWxtYW4vbGlzdGluZm8veTIwMzgK
