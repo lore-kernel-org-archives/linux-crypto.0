@@ -1,51 +1,80 @@
-From: John Stultz <john.stultz@linaro.org>
-Subject: Re: [PATCH] crypto: Jitter RNG - use ktime_get_raw_ns as
-	fallback
-Date: Tue, 21 Jun 2016 12:05:06 -0700
-Message-ID: <CALAqxLW-TKy2CpTst=AtJY8JNGYg_WB0MxTU3Kf4J6ijKCtBVA@mail.gmail.com>
-References: <8242305.3NQCWfJAlD@positron.chronox.de>
- <CALAqxLU6-=r8z9dVF5PQCzps-Y4SWcXMd_=QDgZuYj7Dij5whg@mail.gmail.com>
- <1724645.8YjKaqazLv@positron.chronox.de>
+From: "Austin S. Hemmelgarn" <ahferroin7@gmail.com>
+Subject: Re: [PATCH v4 0/5] /dev/random - a new approach
+Date: Tue, 21 Jun 2016 15:31:07 -0400
+Message-ID: <e7ab11a3-8bc5-ac3f-4034-87f5a8835b02@gmail.com>
+References: <1466007463.20087.11.camel@redhat.com>
+ <1526644.Bum3kD6iTD@tauon.atsec.com>
+ <5d1a9ce4-a2e5-4ec7-9ca8-22d75281025f@gmail.com>
+ <1900555.p3fYFz9p7D@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
- Alexander Kuleshov <kuleshovmail@gmail.com>,
- y2038 Mailman List <y2038@lists.linaro.org>,
- lkml <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Kees Cook <keescook@chromium.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Theodore Ts'o <tytso@mit.edu>,
+	=?UTF-8?Q?David_Ja=c5=a1a?= <djasa@redhat.com>,
+	Andi Kleen <andi@firstfloor.org>, sandyinchina@gmail.com,
+	Jason Cooper <cryptography@lakedaemon.net>,
+	John Denker <jsd@av8n.com>,
+	"H. Peter Anvin" <hpa@linux.intel.com>,
+	Joe Perches <joe@perches.com>, Pavel Machek <pavel@ucw.cz>,
+	George Spelvin <linux@horizon.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
-Return-path: <y2038-bounces@lists.linaro.org>
-In-Reply-To: <1724645.8YjKaqazLv@positron.chronox.de>
-List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
-List-Archive: <http://lists.linaro.org/pipermail/y2038/>
-List-Post: <mailto:y2038@lists.linaro.org>
-List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
-List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=subscribe>
-Errors-To: y2038-bounces@lists.linaro.org
-Sender: "Y2038" <y2038-bounces@lists.linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1900555.p3fYFz9p7D@positron.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gVHVlLCBKdW4gMjEsIDIwMTYgYXQgMTE6NDkgQU0sIFN0ZXBoYW4gTXVlbGxlciA8c211ZWxs
-ZXJAY2hyb25veC5kZT4gd3JvdGU6Cj4gQW0gRGllbnN0YWcsIDIxLiBKdW5pIDIwMTYsIDExOjEx
-OjQyIHNjaHJpZWIgSm9obiBTdHVsdHo6Cj4KPiBIaSBKb2huLAo+Cj4+IEkgZG9uJ3Qgc2VlIGlu
-IHRoZSBhYm92ZSBhbiBleHBsYW5hdGlvbiBvZiAqd2h5KiB5b3UncmUgdXNpbmcKPj4ga3RpbWVf
-Z2V0X3Jhd19ucygpIGluc3RlYWQgb2Yga3RpbWVfZ2V0X25zKCkuCj4KPiBDb3VsZCB5b3UgaGVs
-cCBtZSB1bmRlcnN0YW5kIHdoYXQgdGhlIGRpZmZlcmVuY2UgaXMgb3IgcG9pbnQgbWUgdG8gc29t
-ZQo+IGRvY3VtZW50YXRpb24/IEkgdW5kZXJzdG9vZCB0aGF0IHdlIG9ubHkgdGFsa2VkIGFib3V0
-IHRoZSBfcmF3IHZhcmlhbnQuCgpVc2luZyBzcGVjaWFsaXplZCBpbnRlcmZhY2VzIHdpdGggc3Vi
-dGxlIHNlbWFudGljcyB3L28gdW5kZXJzdGFuZGluZwp0aGVtIGlzIHNvcnQgb2YgbXkgY29uY2Vy
-biBoZXJlLgoKVGhlcmUgYXJlIHJlYXNvbnMgd2h5IHlvdSBtaWdodCB3YW50IHRvIHVzZSB0aGUg
-a3RpbWVfZ2V0X3Jhd19ucygpCmludGVyZmFjZSBvdmVyIGt0aW1lX2dldF9ucygpLCBidXQgdGhl
-eSBoYXZlIG5vdCBiZWVuIG1hZGUgY2xlYXIgaW4KdGhlIGNvbW1lbnQuIEFybmQgZGlzY3Vzc2Vk
-IHNvbWUgcG90ZW50aWFsIGNvbmNlcm5zIHRoYXQgdGhlIGZyZXEKYWRqdXN0bWVudCBkb25lIGJ5
-IG50cCBtaWdodCBiZSBzb21ld2hhdCBwcmVkaWN0YWJsZS9jb250cm9sbGVkIGJ5CnJlbW90ZSBw
-YXJ0aWVzLCB3aGljaCBjb3VsZCBoYXZlIHNvbWUgZWZmZWN0IGluIHRoZSBjYWxjdWxhdGlvbi4g
-VGhhdApmZWVscyBhIGxpdHRsZSBvdmVybHkgdmFndWUgdG8gbWUsIGJ1dCBJJ20gbm8gY3J5cHRv
-IGV4cGVydCwgc28gaWYKdGhhdCBpcyBhIHJlYXNvbmFibGUgY29uY2VybiwgdGhlbiBpdCBzaG91
-bGQgYmUgYSBjb25zY2lvdXMgYW5kCmRvY3VtZW50ZWQgZGVjaXNpb24uCgp0aGFua3MKLWpvaG4K
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KWTIwMzggbWFp
-bGluZyBsaXN0ClkyMDM4QGxpc3RzLmxpbmFyby5vcmcKaHR0cHM6Ly9saXN0cy5saW5hcm8ub3Jn
-L21haWxtYW4vbGlzdGluZm8veTIwMzgK
+On 2016-06-21 14:04, Stephan Mueller wrote:
+> Am Dienstag, 21. Juni 2016, 13:51:15 schrieb Austin S. Hemmelgarn:
+>>>> 6. You have a significant lack of data regarding embedded systems, which
+>>>> is one of the two biggest segments of Linux's market share.  You list no
+>>>> results for any pre-ARMv6 systems (Linux still runs on and is regularly
+>>>> used on ARMv4 CPU's, and it's worth also pointing out that the values on
+>>>> the ARMv6 systems are themselves below average), any MIPS systems other
+>>>> than 24k and 4k (which is not a good representation of modern embedded
+>>>> usage), any SPARC CPU's other than UltraSPARC (ideally you should have
+>>>> results on at least a couple of LEON systems as well), no tight-embedded
+>>>> PPC chips (PPC 440 processors are very widely used, as are the 7xx and
+>>>> 970 families, and Freescale's e series), and only one set of results for
+>>>> a tight-embedded x86 CPU (the Via Nano, you should ideally also have
+>>>> results on things like an Intel Quark).  Overall, your test system
+>>>> selection is not entirely representative of actual Linux usage (yeah,
+>>>> ther'es a lot of x86 servers out there running Linux, there's at least
+>>>> as many embedded systems running it too though, even without including
+>>>> Android).
+>>>
+>>> Perfectly valid argument. But I programmed that RNG as a hobby -- I do not
+>>> have the funds to buy all devices there are.
+>>
+>> I'm not complaining as much about the lack of data for such devices as I
+>> am about you stating that it will work fine for such devices when you
+>> have so little data to support those claims.  Many of the devices you
+>
+> Little data, interesting statement for results on 200+ systems including all
+> major CPU arches all showing information leading in the same directions.
+
+Let me try rephrasing this to make it a bit clearer:
+1. You have lots of data on server systems.
+2. You have a significant amount of data on desktop/workstation type 
+systems.
+3. You have very little data on embedded systems.
+
+and here are your arguments:
+A. This works well on server systems.
+B. This works well on desktop systems.
+C. This works well on embedded systems.
+
+Arguments A and B are substantiated directly by points 1 and 2. 
+Argument C is not substantiated thoroughly because of point 3.
+My complaint is about argument C given point 3.
+
+I'm not saying you have insufficient data to support argument A or B, 
+only that you have insufficient data to support argument C.
+
+Android barely counts as an embedded system anymore, as many Android 
+phones can outperform most inexpensive desktop and laptop systems, and 
+even some rather expensive laptops.  This leaves the only systems that 
+can be assumed without further information to be representative of 
+embedded boards to be the ones running Genode, and possibly the MIPS 
+systems, which is a total of about 10 results out of hundreds for 
+servers and desktops/workstations.
