@@ -1,92 +1,90 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [Y2038] [PATCH] crypto: use timespec64 for jent_get_nstime
-Date: Tue, 21 Jun 2016 18:34:01 +0200
-Message-ID: <2575012.qQ3uE1GZEQ@tauon.atsec.com>
-References: <20160617155952.1021006-1-arnd@arndb.de> <3776557.os2uYrMn6M@wuerfel> <CALAqxLWan2_2HhChvq+fXKpP8CyURwj-ccdnmfEve4LTOza=mg@mail.gmail.com>
+From: John Stultz <john.stultz@linaro.org>
+Subject: Re: [PATCH] crypto: use timespec64 for jent_get_nstime
+Date: Tue, 21 Jun 2016 09:47:23 -0700
+Message-ID: <CALAqxLXTxM=Rt01_wOpbiYQByVMQ6rO1mazR1BAMRF_uxNHY6A@mail.gmail.com>
+References: <20160617155952.1021006-1-arnd@arndb.de>
+ <3776557.os2uYrMn6M@wuerfel>
+ <CALAqxLWan2_2HhChvq+fXKpP8CyURwj-ccdnmfEve4LTOza=mg@mail.gmail.com>
+ <2575012.qQ3uE1GZEQ@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Alexander Kuleshov <kuleshovmail@gmail.com>,
-	y2038 Mailman List <y2038@lists.linaro.org>,
-	lkml <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Kees Cook <keescook@chromium.org>
-To: John Stultz <john.stultz@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:37668 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751853AbcFUQeH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 21 Jun 2016 12:34:07 -0400
-In-Reply-To: <CALAqxLWan2_2HhChvq+fXKpP8CyURwj-ccdnmfEve4LTOza=mg@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
+ Alexander Kuleshov <kuleshovmail@gmail.com>,
+ y2038 Mailman List <y2038@lists.linaro.org>,
+ lkml <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Kees Cook <keescook@chromium.org>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <y2038-bounces@lists.linaro.org>
+In-Reply-To: <2575012.qQ3uE1GZEQ@tauon.atsec.com>
+List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
+ <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
+List-Archive: <http://lists.linaro.org/pipermail/y2038/>
+List-Post: <mailto:y2038@lists.linaro.org>
+List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
+List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
+ <mailto:y2038-request@lists.linaro.org?subject=subscribe>
+Errors-To: y2038-bounces@lists.linaro.org
+Sender: "Y2038" <y2038-bounces@lists.linaro.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Am Dienstag, 21. Juni 2016, 09:22:31 schrieb John Stultz:
-
-Hi John,
-
-> On Tue, Jun 21, 2016 at 1:32 AM, Arnd Bergmann <arnd@arndb.de> wrote:
-> > On Tuesday, June 21, 2016 8:20:10 AM CEST Stephan Mueller wrote:
-> >> Am Freitag, 17. Juni 2016, 17:59:41 schrieb Arnd Bergmann:
-> > Compared to the previous __getnstimeofday(), the difference is
-> > 
-> > - using "monotonic" timebase instead of "real", so the zero time
-> > 
-> >   is when the system booted rather than Jan 1 1970
-> 
-> I haven't looked at the details of the calling code, but I'd worry for
-> crypto uses, especially if its being used for entropy collection,
-> using the monotonic clock instead of the realtime clock might be
-> problematic.
-
-Funnily it does not seem like that. All tests that I have conducted show that 
-monotonic clocks behave equally as realtime clocks, because the uncertainty 
-lies in the execution time of a set of instructions. All we need to do is to 
-measure it with a timer that has a resolution that allows detecting these 
-variations.
-> 
-> > - "raw" means we don't honor updates for the rate based on ntp,
-> > 
-> >   which is probably better as the ntp state might be observable
-> >   over the net (it probably doesn't matter, but it can't hurt)
-> 
-> So... this feels like a very vague explanation, and the lack of
-> frequency correction here probably need a really good comment. Keeping
-> multiple time domains is usually asking for trouble, but we added the
-> MONOTONIC_RAW clock to address a few cases where people really wanted
-> an abstract hardware counter, which was unaffected by frequency
-> corrections. I'd really make sure its clear why this is what you want
-> vs the standard system time domain so we don't run into problems
-> understanding it later.
-
-Perfect, that is what I would be interested in.
-> 
-> > - "fast" means that in very rare cases, the time might appear
-> > 
-> >   to go backwards (it probably can't happen here because you are not
-> >   called in an NMI).
-> 
-> "fast" really means "safe-for-nmi wrt to locking".  The tradeoff being
-> that when frequency adjustments occur, and if your code is delayed,
-> you might see time go backwards by a small amount. This allows
-
-My code would not see that as an issue.
-
-> tracing/sched code (or other code called from NMI)  to not have to
-> duplicate the timekeeping infrastructure.
-> 
-> I think without a much better explanation, using the "fast" method
-> isn't really warranted here.
-
-Thanks a lot. With that, I would think that the proposed ktime_get_raw_fast_ns 
-is good for use, which is supported with testing on my system.
-> 
-> thanks
-> -john
-
-
-Ciao
-Stephan
+T24gVHVlLCBKdW4gMjEsIDIwMTYgYXQgOTozNCBBTSwgU3RlcGhhbiBNdWVsbGVyIDxzbXVlbGxl
+ckBjaHJvbm94LmRlPiB3cm90ZToKPiBBbSBEaWVuc3RhZywgMjEuIEp1bmkgMjAxNiwgMDk6MjI6
+MzEgc2NocmllYiBKb2huIFN0dWx0ejoKPgo+IEhpIEpvaG4sCj4KPj4gT24gVHVlLCBKdW4gMjEs
+IDIwMTYgYXQgMTozMiBBTSwgQXJuZCBCZXJnbWFubiA8YXJuZEBhcm5kYi5kZT4gd3JvdGU6Cj4+
+ID4gT24gVHVlc2RheSwgSnVuZSAyMSwgMjAxNiA4OjIwOjEwIEFNIENFU1QgU3RlcGhhbiBNdWVs
+bGVyIHdyb3RlOgo+PiA+PiBBbSBGcmVpdGFnLCAxNy4gSnVuaSAyMDE2LCAxNzo1OTo0MSBzY2hy
+aWViIEFybmQgQmVyZ21hbm46Cj4+ID4gQ29tcGFyZWQgdG8gdGhlIHByZXZpb3VzIF9fZ2V0bnN0
+aW1lb2ZkYXkoKSwgdGhlIGRpZmZlcmVuY2UgaXMKPj4gPgo+PiA+IC0gdXNpbmcgIm1vbm90b25p
+YyIgdGltZWJhc2UgaW5zdGVhZCBvZiAicmVhbCIsIHNvIHRoZSB6ZXJvIHRpbWUKPj4gPgo+PiA+
+ICAgaXMgd2hlbiB0aGUgc3lzdGVtIGJvb3RlZCByYXRoZXIgdGhhbiBKYW4gMSAxOTcwCj4+Cj4+
+IEkgaGF2ZW4ndCBsb29rZWQgYXQgdGhlIGRldGFpbHMgb2YgdGhlIGNhbGxpbmcgY29kZSwgYnV0
+IEknZCB3b3JyeSBmb3IKPj4gY3J5cHRvIHVzZXMsIGVzcGVjaWFsbHkgaWYgaXRzIGJlaW5nIHVz
+ZWQgZm9yIGVudHJvcHkgY29sbGVjdGlvbiwKPj4gdXNpbmcgdGhlIG1vbm90b25pYyBjbG9jayBp
+bnN0ZWFkIG9mIHRoZSByZWFsdGltZSBjbG9jayBtaWdodCBiZQo+PiBwcm9ibGVtYXRpYy4KPgo+
+IEZ1bm5pbHkgaXQgZG9lcyBub3Qgc2VlbSBsaWtlIHRoYXQuIEFsbCB0ZXN0cyB0aGF0IEkgaGF2
+ZSBjb25kdWN0ZWQgc2hvdyB0aGF0Cj4gbW9ub3RvbmljIGNsb2NrcyBiZWhhdmUgZXF1YWxseSBh
+cyByZWFsdGltZSBjbG9ja3MsIGJlY2F1c2UgdGhlIHVuY2VydGFpbnR5Cj4gbGllcyBpbiB0aGUg
+ZXhlY3V0aW9uIHRpbWUgb2YgYSBzZXQgb2YgaW5zdHJ1Y3Rpb25zLiBBbGwgd2UgbmVlZCB0byBk
+byBpcyB0bwo+IG1lYXN1cmUgaXQgd2l0aCBhIHRpbWVyIHRoYXQgaGFzIGEgcmVzb2x1dGlvbiB0
+aGF0IGFsbG93cyBkZXRlY3RpbmcgdGhlc2UKPiB2YXJpYXRpb25zLgoKT2suIElmIHlvdSdyZSBv
+bmx5IHVzaW5nIGl0IGZvciBpbnRlcnZhbCBtZWFzdXJlbWVudHMsIHRoZW4gZWl0aGVyIHdheQpz
+aG91bGRuJ3QgbWF0dGVyLiBJIGp1c3Qgd2FudGVkIHRvIG1ha2Ugc3VyZSB0aGUgZW50cm9weSB3
+YXNuJ3QgY29taW5nCmZyb20gdGhlIGFjdHVhbCB0aW1lLgoKCj4+ID4gLSAicmF3IiBtZWFucyB3
+ZSBkb24ndCBob25vciB1cGRhdGVzIGZvciB0aGUgcmF0ZSBiYXNlZCBvbiBudHAsCj4+ID4KPj4g
+PiAgIHdoaWNoIGlzIHByb2JhYmx5IGJldHRlciBhcyB0aGUgbnRwIHN0YXRlIG1pZ2h0IGJlIG9i
+c2VydmFibGUKPj4gPiAgIG92ZXIgdGhlIG5ldCAoaXQgcHJvYmFibHkgZG9lc24ndCBtYXR0ZXIs
+IGJ1dCBpdCBjYW4ndCBodXJ0KQo+Pgo+PiBTby4uLiB0aGlzIGZlZWxzIGxpa2UgYSB2ZXJ5IHZh
+Z3VlIGV4cGxhbmF0aW9uLCBhbmQgdGhlIGxhY2sgb2YKPj4gZnJlcXVlbmN5IGNvcnJlY3Rpb24g
+aGVyZSBwcm9iYWJseSBuZWVkIGEgcmVhbGx5IGdvb2QgY29tbWVudC4gS2VlcGluZwo+PiBtdWx0
+aXBsZSB0aW1lIGRvbWFpbnMgaXMgdXN1YWxseSBhc2tpbmcgZm9yIHRyb3VibGUsIGJ1dCB3ZSBh
+ZGRlZCB0aGUKPj4gTU9OT1RPTklDX1JBVyBjbG9jayB0byBhZGRyZXNzIGEgZmV3IGNhc2VzIHdo
+ZXJlIHBlb3BsZSByZWFsbHkgd2FudGVkCj4+IGFuIGFic3RyYWN0IGhhcmR3YXJlIGNvdW50ZXIs
+IHdoaWNoIHdhcyB1bmFmZmVjdGVkIGJ5IGZyZXF1ZW5jeQo+PiBjb3JyZWN0aW9ucy4gSSdkIHJl
+YWxseSBtYWtlIHN1cmUgaXRzIGNsZWFyIHdoeSB0aGlzIGlzIHdoYXQgeW91IHdhbnQKPj4gdnMg
+dGhlIHN0YW5kYXJkIHN5c3RlbSB0aW1lIGRvbWFpbiBzbyB3ZSBkb24ndCBydW4gaW50byBwcm9i
+bGVtcwo+PiB1bmRlcnN0YW5kaW5nIGl0IGxhdGVyLgo+Cj4gUGVyZmVjdCwgdGhhdCBpcyB3aGF0
+IEkgd291bGQgYmUgaW50ZXJlc3RlZCBpbi4KCkJ1dCBkb2N1bWVudGluZyAqd2h5KiBjbGVhcmx5
+IGlzIHRoZSB0aGluZyBJJ2QgdmVyeSBzdHJvbmdseSBzdWdnZXN0LgpJZiB3ZSBuZWVkIHRvIG1h
+a2Ugc29tZSBzbGlnaHQgc2VtYW50aWMgY2hhbmdlIGZvciB3aGF0ZXZlciByZWFzb24sIEkKZG9u
+J3Qgd2FudCBmb2xrcyB3b3JyaWVkICJ3ZSBjYW4ndCBkbyB0aGF0IGJlY2F1c2UgdGhlIGNyeXB0
+byBjb2RlIGlzCnVzaW5nIGl0IGZvciB2b29kb28iLgoKCj4+ID4gLSAiZmFzdCIgbWVhbnMgdGhh
+dCBpbiB2ZXJ5IHJhcmUgY2FzZXMsIHRoZSB0aW1lIG1pZ2h0IGFwcGVhcgo+PiA+Cj4+ID4gICB0
+byBnbyBiYWNrd2FyZHMgKGl0IHByb2JhYmx5IGNhbid0IGhhcHBlbiBoZXJlIGJlY2F1c2UgeW91
+IGFyZSBub3QKPj4gPiAgIGNhbGxlZCBpbiBhbiBOTUkpLgo+Pgo+PiAiZmFzdCIgcmVhbGx5IG1l
+YW5zICJzYWZlLWZvci1ubWkgd3J0IHRvIGxvY2tpbmciLiAgVGhlIHRyYWRlb2ZmIGJlaW5nCj4+
+IHRoYXQgd2hlbiBmcmVxdWVuY3kgYWRqdXN0bWVudHMgb2NjdXIsIGFuZCBpZiB5b3VyIGNvZGUg
+aXMgZGVsYXllZCwKPj4geW91IG1pZ2h0IHNlZSB0aW1lIGdvIGJhY2t3YXJkcyBieSBhIHNtYWxs
+IGFtb3VudC4gVGhpcyBhbGxvd3MKPgo+IE15IGNvZGUgd291bGQgbm90IHNlZSB0aGF0IGFzIGFu
+IGlzc3VlLgo+Cj4+IHRyYWNpbmcvc2NoZWQgY29kZSAob3Igb3RoZXIgY29kZSBjYWxsZWQgZnJv
+bSBOTUkpICB0byBub3QgaGF2ZSB0bwo+PiBkdXBsaWNhdGUgdGhlIHRpbWVrZWVwaW5nIGluZnJh
+c3RydWN0dXJlLgo+Pgo+PiBJIHRoaW5rIHdpdGhvdXQgYSBtdWNoIGJldHRlciBleHBsYW5hdGlv
+biwgdXNpbmcgdGhlICJmYXN0IiBtZXRob2QKPj4gaXNuJ3QgcmVhbGx5IHdhcnJhbnRlZCBoZXJl
+Lgo+Cj4gVGhhbmtzIGEgbG90LiBXaXRoIHRoYXQsIEkgd291bGQgdGhpbmsgdGhhdCB0aGUgcHJv
+cG9zZWQga3RpbWVfZ2V0X3Jhd19mYXN0X25zCj4gaXMgZ29vZCBmb3IgdXNlLCB3aGljaCBpcyBz
+dXBwb3J0ZWQgd2l0aCB0ZXN0aW5nIG9uIG15IHN5c3RlbS4KClNvLi4gYWdhaW4sIEknZCBhdm9p
+ZCB1c2luZyB0aGUgImZhc3QiIGFjY2Vzc29yIHVubGVzcyB0aGVyZSBpcyBhCmNsZWFyIG5lZWQg
+b3Igb2J2aW91cyBiZW5lZml0LiBXaGljaCBzaG91bGQgYmUgZG9jdW1lbnRlZC4KCnRoYW5rcwot
+am9obgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpZMjAz
+OCBtYWlsaW5nIGxpc3QKWTIwMzhAbGlzdHMubGluYXJvLm9yZwpodHRwczovL2xpc3RzLmxpbmFy
+by5vcmcvbWFpbG1hbi9saXN0aW5mby95MjAzOAo=
