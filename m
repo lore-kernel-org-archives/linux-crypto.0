@@ -1,62 +1,75 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [Y2038] [PATCH] crypto: Jitter RNG - use ktime_get_raw_ns as fallback
-Date: Tue, 21 Jun 2016 21:37:03 +0200
-Message-ID: <4528708.L2m6px9Mjb@wuerfel>
-References: <8242305.3NQCWfJAlD@positron.chronox.de> <1724645.8YjKaqazLv@positron.chronox.de> <CALAqxLW-TKy2CpTst=AtJY8JNGYg_WB0MxTU3Kf4J6ijKCtBVA@mail.gmail.com>
+From: John Stultz <john.stultz@linaro.org>
+Subject: Re: [PATCH] crypto: Jitter RNG - use ktime_get_raw_ns as
+	fallback
+Date: Tue, 21 Jun 2016 12:38:08 -0700
+Message-ID: <CALAqxLX+N7dW5QhK8Geyze75RyR-6+5bwskwYEimqKxaSth58w@mail.gmail.com>
+References: <8242305.3NQCWfJAlD@positron.chronox.de>
+ <1724645.8YjKaqazLv@positron.chronox.de>
+ <CALAqxLW-TKy2CpTst=AtJY8JNGYg_WB0MxTU3Kf4J6ijKCtBVA@mail.gmail.com>
+ <4528708.L2m6px9Mjb@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: John Stultz <john.stultz@linaro.org>,
-	Stephan Mueller <smueller@chronox.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Alexander Kuleshov <kuleshovmail@gmail.com>,
-	lkml <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Kees Cook <keescook@chromium.org>
-To: y2038@lists.linaro.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CALAqxLW-TKy2CpTst=AtJY8JNGYg_WB0MxTU3Kf4J6ijKCtBVA@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ Alexander Kuleshov <kuleshovmail@gmail.com>,
+ y2038 Mailman List <y2038@lists.linaro.org>,
+ lkml <linux-kernel@vger.kernel.org>, Stephan Mueller <smueller@chronox.de>,
+ linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Kees Cook <keescook@chromium.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <y2038-bounces@lists.linaro.org>
+In-Reply-To: <4528708.L2m6px9Mjb@wuerfel>
+List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
+ <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
+List-Archive: <http://lists.linaro.org/pipermail/y2038/>
+List-Post: <mailto:y2038@lists.linaro.org>
+List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
+List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
+ <mailto:y2038-request@lists.linaro.org?subject=subscribe>
+Errors-To: y2038-bounces@lists.linaro.org
+Sender: "Y2038" <y2038-bounces@lists.linaro.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Tuesday, June 21, 2016 12:05:06 PM CEST John Stultz wrote:
-> On Tue, Jun 21, 2016 at 11:49 AM, Stephan Mueller <smueller@chronox.de> wrote:
-> > Am Dienstag, 21. Juni 2016, 11:11:42 schrieb John Stultz:
-> >
-> > Hi John,
-> >
-> >> I don't see in the above an explanation of *why* you're using
-> >> ktime_get_raw_ns() instead of ktime_get_ns().
-> >
-> > Could you help me understand what the difference is or point me to some
-> > documentation? I understood that we only talked about the _raw variant.
-> 
-> Using specialized interfaces with subtle semantics w/o understanding
-> them is sort of my concern here.
-> 
-> There are reasons why you might want to use the ktime_get_raw_ns()
-> interface over ktime_get_ns(), but they have not been made clear in
-> the comment. Arnd discussed some potential concerns that the freq
-> adjustment done by ntp might be somewhat predictable/controlled by
-> remote parties, which could have some effect in the calculation. That
-> feels a little overly vague to me, but I'm no crypto expert, so if
-> that is a reasonable concern, then it should be a conscious and
-> documented decision.
-
-My original patch changed __getnstimeofday() to __getnstimeofday64(),
-which kept the original semantics of not warning in case the clock
-source is suspended (which is the only different to the normal
-getnstimeofday{,64}().
-
-I did the patch a while time ago along with a number of other patches
-that I never sent out until last week, so I don't remember the
-reasoning for suggesting ktime_get_raw_fast_ns() over ktime_get_raw_ns(),
-but I sure wanted to keep the non-warning behavior, and ktime_get_ns()
-warns on timekeeping_suspended() while the other two don't.
-
-If we don't care about the non-warning aspect, ktime_get_ns() makes
-most sense here, and the original code should probably have used
-getnstimeofday() as well.
-
-	Arnd
+T24gVHVlLCBKdW4gMjEsIDIwMTYgYXQgMTI6MzcgUE0sIEFybmQgQmVyZ21hbm4gPGFybmRAYXJu
+ZGIuZGU+IHdyb3RlOgo+IE9uIFR1ZXNkYXksIEp1bmUgMjEsIDIwMTYgMTI6MDU6MDYgUE0gQ0VT
+VCBKb2huIFN0dWx0eiB3cm90ZToKPj4gT24gVHVlLCBKdW4gMjEsIDIwMTYgYXQgMTE6NDkgQU0s
+IFN0ZXBoYW4gTXVlbGxlciA8c211ZWxsZXJAY2hyb25veC5kZT4gd3JvdGU6Cj4+ID4gQW0gRGll
+bnN0YWcsIDIxLiBKdW5pIDIwMTYsIDExOjExOjQyIHNjaHJpZWIgSm9obiBTdHVsdHo6Cj4+ID4K
+Pj4gPiBIaSBKb2huLAo+PiA+Cj4+ID4+IEkgZG9uJ3Qgc2VlIGluIHRoZSBhYm92ZSBhbiBleHBs
+YW5hdGlvbiBvZiAqd2h5KiB5b3UncmUgdXNpbmcKPj4gPj4ga3RpbWVfZ2V0X3Jhd19ucygpIGlu
+c3RlYWQgb2Yga3RpbWVfZ2V0X25zKCkuCj4+ID4KPj4gPiBDb3VsZCB5b3UgaGVscCBtZSB1bmRl
+cnN0YW5kIHdoYXQgdGhlIGRpZmZlcmVuY2UgaXMgb3IgcG9pbnQgbWUgdG8gc29tZQo+PiA+IGRv
+Y3VtZW50YXRpb24/IEkgdW5kZXJzdG9vZCB0aGF0IHdlIG9ubHkgdGFsa2VkIGFib3V0IHRoZSBf
+cmF3IHZhcmlhbnQuCj4+Cj4+IFVzaW5nIHNwZWNpYWxpemVkIGludGVyZmFjZXMgd2l0aCBzdWJ0
+bGUgc2VtYW50aWNzIHcvbyB1bmRlcnN0YW5kaW5nCj4+IHRoZW0gaXMgc29ydCBvZiBteSBjb25j
+ZXJuIGhlcmUuCj4+Cj4+IFRoZXJlIGFyZSByZWFzb25zIHdoeSB5b3UgbWlnaHQgd2FudCB0byB1
+c2UgdGhlIGt0aW1lX2dldF9yYXdfbnMoKQo+PiBpbnRlcmZhY2Ugb3ZlciBrdGltZV9nZXRfbnMo
+KSwgYnV0IHRoZXkgaGF2ZSBub3QgYmVlbiBtYWRlIGNsZWFyIGluCj4+IHRoZSBjb21tZW50LiBB
+cm5kIGRpc2N1c3NlZCBzb21lIHBvdGVudGlhbCBjb25jZXJucyB0aGF0IHRoZSBmcmVxCj4+IGFk
+anVzdG1lbnQgZG9uZSBieSBudHAgbWlnaHQgYmUgc29tZXdoYXQgcHJlZGljdGFibGUvY29udHJv
+bGxlZCBieQo+PiByZW1vdGUgcGFydGllcywgd2hpY2ggY291bGQgaGF2ZSBzb21lIGVmZmVjdCBp
+biB0aGUgY2FsY3VsYXRpb24uIFRoYXQKPj4gZmVlbHMgYSBsaXR0bGUgb3Zlcmx5IHZhZ3VlIHRv
+IG1lLCBidXQgSSdtIG5vIGNyeXB0byBleHBlcnQsIHNvIGlmCj4+IHRoYXQgaXMgYSByZWFzb25h
+YmxlIGNvbmNlcm4sIHRoZW4gaXQgc2hvdWxkIGJlIGEgY29uc2Npb3VzIGFuZAo+PiBkb2N1bWVu
+dGVkIGRlY2lzaW9uLgo+Cj4gTXkgb3JpZ2luYWwgcGF0Y2ggY2hhbmdlZCBfX2dldG5zdGltZW9m
+ZGF5KCkgdG8gX19nZXRuc3RpbWVvZmRheTY0KCksCj4gd2hpY2gga2VwdCB0aGUgb3JpZ2luYWwg
+c2VtYW50aWNzIG9mIG5vdCB3YXJuaW5nIGluIGNhc2UgdGhlIGNsb2NrCj4gc291cmNlIGlzIHN1
+c3BlbmRlZCAod2hpY2ggaXMgdGhlIG9ubHkgZGlmZmVyZW50IHRvIHRoZSBub3JtYWwKPiBnZXRu
+c3RpbWVvZmRheXssNjR9KCkuCj4KPiBJIGRpZCB0aGUgcGF0Y2ggYSB3aGlsZSB0aW1lIGFnbyBh
+bG9uZyB3aXRoIGEgbnVtYmVyIG9mIG90aGVyIHBhdGNoZXMKPiB0aGF0IEkgbmV2ZXIgc2VudCBv
+dXQgdW50aWwgbGFzdCB3ZWVrLCBzbyBJIGRvbid0IHJlbWVtYmVyIHRoZQo+IHJlYXNvbmluZyBm
+b3Igc3VnZ2VzdGluZyBrdGltZV9nZXRfcmF3X2Zhc3RfbnMoKSBvdmVyIGt0aW1lX2dldF9yYXdf
+bnMoKSwKPiBidXQgSSBzdXJlIHdhbnRlZCB0byBrZWVwIHRoZSBub24td2FybmluZyBiZWhhdmlv
+ciwgYW5kIGt0aW1lX2dldF9ucygpCj4gd2FybnMgb24gdGltZWtlZXBpbmdfc3VzcGVuZGVkKCkg
+d2hpbGUgdGhlIG90aGVyIHR3byBkb24ndC4KClJpZ2h0LiBCdXQgdGhpcyBjb2RlIGlzbid0IGNh
+bGxlZCBpbiBsYXRlIHN1c3BlbmQgb3IgZWFybHkgcmVzdW1lIGlzIGl0PwoKCj4gSWYgd2UgZG9u
+J3QgY2FyZSBhYm91dCB0aGUgbm9uLXdhcm5pbmcgYXNwZWN0LCBrdGltZV9nZXRfbnMoKSBtYWtl
+cwo+IG1vc3Qgc2Vuc2UgaGVyZSwgYW5kIHRoZSBvcmlnaW5hbCBjb2RlIHNob3VsZCBwcm9iYWJs
+eSBoYXZlIHVzZWQKPiBnZXRuc3RpbWVvZmRheSgpIGFzIHdlbGwuCgpUaGlzIGlzIHdoYXQgSSBz
+dXNwZWN0IGFzIHdlbGwuICBCdXQgYWdhaW4sIEkgZG9uJ3QgbWluZCBpZiBmb2xrcyB1c2UKdGhl
+IHNwZWNpYWxpemVkIGludGVyZmFjZXMsIGFzIGxvbmcgYXMgdGhleSBkb2N1bWVudCBhIGNsZWFy
+IHJlYXNvbgpmb3IgaXQuIEVzcGVjaWFsbHkgZm9yIHRoaW5ncyBsaWtlIGNyeXB0byB3aGVyZSBp
+bnR1aXRpb24gaXNuJ3QgYWx3YXlzCnRoZSBiZXN0IGd1aWRlLgoKdGhhbmtzCi1qb2huCl9fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fClkyMDM4IG1haWxpbmcg
+bGlzdApZMjAzOEBsaXN0cy5saW5hcm8ub3JnCmh0dHBzOi8vbGlzdHMubGluYXJvLm9yZy9tYWls
+bWFuL2xpc3RpbmZvL3kyMDM4Cg==
