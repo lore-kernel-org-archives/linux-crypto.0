@@ -1,57 +1,58 @@
-From: Tero Kristo <t-kristo@ti.com>
-Subject: Re: [PATCH 23/28] ARM: dts: DRA7: Add DT node for DES IP
-Date: Tue, 21 Jun 2016 20:56:15 +0300
-Message-ID: <57697FBF.7020709@ti.com>
-References: <1464771389-10640-1-git-send-email-t-kristo@ti.com>
- <1464772006-11254-1-git-send-email-t-kristo@ti.com>
- <1464772006-11254-4-git-send-email-t-kristo@ti.com>
- <20160610113836.GF22406@atomide.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v4 0/5] /dev/random - a new approach
+Date: Tue, 21 Jun 2016 20:05:01 +0200
+Message-ID: <6920965.KzCBF1o6NP@positron.chronox.de>
+References: <1466007463.20087.11.camel@redhat.com> <6038462.HIH9pGNYO7@positron.chronox.de> <9a0a80fb-779e-b708-990e-1627ec03b1b7@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <linux-omap@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<linux-arm-kernel@lists.infradead.org>, <lokeshvutla@ti.com>
-To: Tony Lindgren <tony@atomide.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from devils.ext.ti.com ([198.47.26.153]:36019 "EHLO
-	devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750978AbcFUR4o (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 21 Jun 2016 13:56:44 -0400
-In-Reply-To: <20160610113836.GF22406@atomide.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Tomas Mraz <tmraz@redhat.com>, Theodore Ts'o <tytso@mit.edu>,
+	David =?utf-8?B?SmHFoWE=?= <djasa@redhat.com>,
+	Andi Kleen <andi@firstfloor.org>, sandyinchina@gmail.com,
+	Jason Cooper <cryptography@lakedaemon.net>,
+	John Denker <jsd@av8n.com>,
+	"H. Peter Anvin" <hpa@linux.intel.com>,
+	Joe Perches <joe@perches.com>, Pavel Machek <pavel@ucw.cz>,
+	George Spelvin <linux@horizon.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Austin S. Hemmelgarn" <ahferroin7@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <9a0a80fb-779e-b708-990e-1627ec03b1b7@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 10/06/16 14:38, Tony Lindgren wrote:
-> * Tero Kristo <t-kristo@ti.com> [160601 02:09]:
->> From: Joel Fernandes <joelf@ti.com>
->>
->> DRA7xx SoCs have a DES3DES IP. Add DT data for the same.
->
-> Are these dts changes safe to apply separately or do they
-> cause issues like extra warnings during boot?
+Am Dienstag, 21. Juni 2016, 13:54:13 schrieb Austin S. Hemmelgarn:
 
-DTS changes are fine to merge as is separately, some crypto 
-functionality might not work properly though (well, the support is 
-somewhat broken on am43xx/dra7 anyways.) I just gave the kernel a boot 
-test with am43xx/dra7 platforms with the DT data only applied, and that 
-part worked fine.
+Hi Austin,
 
-I noticed that if you merge the hwmod changes before you have the DTS 
-data though, you will get some extra boot warnings of the following kind 
-on am43xx/dra7:
+> On 2016-06-21 13:23, Stephan Mueller wrote:
+> > Am Dienstag, 21. Juni 2016, 13:18:33 schrieb Austin S. Hemmelgarn:
+> > 
+> > Hi Austin,
+> > 
+> >>> You have to trust the host for anything, not just for the entropy in
+> >>> timings. This is completely invalid argument unless you can present a
+> >>> method that one guest can manipulate timings in other guest in such a
+> >>> way that _removes_ the inherent entropy from the host.
+> >> 
+> >> When dealing with almost any type 2 hypervisor, it is fully possible for
+> >> a user other than the one running the hypervisor to manipulate
+> >> scheduling such that entropy is reduced.  This does not imply that the
+> > 
+> > Please re-read the document: Jitter RNG does not rest on scheduling.
+> 
+> If you are running inside a VM, your interrupt timings depend on the
 
-<snip>
-[    0.315623] omap_hwmod: aes1: no dt node
-[    0.315631] ------------[ cut here ]------------
-[    0.315656] WARNING: CPU: 0 PID: 1 at 
-arch/arm/mach-omap2/omap_hwmod.c:2497 _init+0x1d0/0x41c
-[    0.315663] omap_hwmod: aes1: doesn't have mpu register target base
-<snip>
+The RNG does not rest on interrupts either.
 
-Do you want to pick-up the DTS changes from this revision of series as 
-is or shall I repost those also? I think the series would require a 
-re-ordering of posting the DTS changes before the hwmod data.
+> hpyervisor's scheduling, period.  You may not directly rely on
+> scheduling from the OS you are running on, but if you are doing anything
+> timing related in a VM, you are at the mercy of the scheduling used by
+> the hypervisor and whatever host OS that may be running on.
+> 
+> In the attack I"m describing, the malicious user is not manipulating the
+> guest OS's scheduling, they are manipulating the host system's scheduling.
 
--Tero
+
+Ciao
+Stephan
