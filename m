@@ -1,34 +1,56 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 0/5] crypto: Fix IPsec reordering caused by cryptd
-Date: Tue, 21 Jun 2016 16:53:21 +0800
-Message-ID: <20160621085321.GA21044@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Raj Ammanur <rammanur@arista.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+From: Ben Dooks <ben.dooks@codethink.co.uk>
+Subject: [[PATCH v2] 11/11] hwrng: exynos - fixup IO accesors
+Date: Tue, 21 Jun 2016 11:20:32 +0100
+Message-ID: <1466504432-24187-12-git-send-email-ben.dooks@codethink.co.uk>
+References: <1466504432-24187-1-git-send-email-ben.dooks@codethink.co.uk>
+Cc: linux-kernel@lists.codethink.co.uk,
+	Ben Dooks <ben.dooks@codethink.co.uk>,
+	Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org
+To: matthew.leach@codethink.co.uk, k.kozlowski@samsung.com,
+	linux-samsung-soc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60796 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750885AbcFUIyW (ORCPT
+Received: from 82-70-136-246.dsl.in-addr.zen.co.uk ([82.70.136.246]:49312 "EHLO
+	rainbowdash.ducie.codethink.co.uk" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751564AbcFUKUo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 21 Jun 2016 04:54:22 -0400
-Content-Disposition: inline
+	Tue, 21 Jun 2016 06:20:44 -0400
+In-Reply-To: <1466504432-24187-1-git-send-email-ben.dooks@codethink.co.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi:
+The __raw IO functions are not endian safe, so use the readl_relaxed
+and writel_relaxed versions of these.
 
-I finally got around to working on this.  I quickly gave up on the
-notion of hijacking the queued requests as we may end up overwhelming
-our caller.
+Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+---
+CC: Matt Mackall <mpm@selenic.com>
+CC: Krzysztof Kozlowski <k.kozlowski@samsung.com>
+CC: linux-crypto@vger.kernel.org
+CC: linux-arm-kernel@lists.infradead.org
+CC: linux-samsung-soc@vger.kernel.org
+---
+ drivers/char/hw_random/exynos-rng.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-So the solution is the obvious one of using cryptd as long as there
-are requests queued there belonging to the same tfm.  This is
-totally untested so please tread carefully.
-
-Thanks,
+diff --git a/drivers/char/hw_random/exynos-rng.c b/drivers/char/hw_random/exynos-rng.c
+index ed44561..23d3585 100644
+--- a/drivers/char/hw_random/exynos-rng.c
++++ b/drivers/char/hw_random/exynos-rng.c
+@@ -45,12 +45,12 @@ struct exynos_rng {
+ 
+ static u32 exynos_rng_readl(struct exynos_rng *rng, u32 offset)
+ {
+-	return	__raw_readl(rng->mem + offset);
++	return	readl_relaxed(rng->mem + offset);
+ }
+ 
+ static void exynos_rng_writel(struct exynos_rng *rng, u32 val, u32 offset)
+ {
+-	__raw_writel(val, rng->mem + offset);
++	writel_relaxed(val, rng->mem + offset);
+ }
+ 
+ static int exynos_rng_configure(struct exynos_rng *exynos_rng)
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.8.1
