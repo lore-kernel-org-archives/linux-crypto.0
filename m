@@ -1,75 +1,46 @@
-From: John Stultz <john.stultz@linaro.org>
-Subject: Re: [PATCH] crypto: Jitter RNG - use ktime_get_raw_ns as
-	fallback
-Date: Tue, 21 Jun 2016 12:38:08 -0700
-Message-ID: <CALAqxLX+N7dW5QhK8Geyze75RyR-6+5bwskwYEimqKxaSth58w@mail.gmail.com>
-References: <8242305.3NQCWfJAlD@positron.chronox.de>
- <1724645.8YjKaqazLv@positron.chronox.de>
- <CALAqxLW-TKy2CpTst=AtJY8JNGYg_WB0MxTU3Kf4J6ijKCtBVA@mail.gmail.com>
- <4528708.L2m6px9Mjb@wuerfel>
+From: Amanda Clark <amandac@switchways.com>
+Subject: RV Owners Email List
+Date: Tue, 21 Jun 2016 15:08:20 -0400
+Message-ID: <75cb02ed-492d-5d89-0994-17ec9bdf34aa@switchways.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- Alexander Kuleshov <kuleshovmail@gmail.com>,
- y2038 Mailman List <y2038@lists.linaro.org>,
- lkml <linux-kernel@vger.kernel.org>, Stephan Mueller <smueller@chronox.de>,
- linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Kees Cook <keescook@chromium.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <y2038-bounces@lists.linaro.org>
-In-Reply-To: <4528708.L2m6px9Mjb@wuerfel>
-List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
-List-Archive: <http://lists.linaro.org/pipermail/y2038/>
-List-Post: <mailto:y2038@lists.linaro.org>
-List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
-List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=subscribe>
-Errors-To: y2038-bounces@lists.linaro.org
-Sender: "Y2038" <y2038-bounces@lists.linaro.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f43.google.com ([209.85.220.43]:34605 "EHLO
+	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750701AbcFUUGm (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 21 Jun 2016 16:06:42 -0400
+Received: by mail-pa0-f43.google.com with SMTP id bz2so9248498pad.1
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Jun 2016 13:06:42 -0700 (PDT)
+Received: from [127.0.0.1] ([103.6.157.158])
+        by smtp.gmail.com with ESMTPSA id 7sm68492686pfa.28.2016.06.21.13.00.19
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 21 Jun 2016 13:00:20 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-T24gVHVlLCBKdW4gMjEsIDIwMTYgYXQgMTI6MzcgUE0sIEFybmQgQmVyZ21hbm4gPGFybmRAYXJu
-ZGIuZGU+IHdyb3RlOgo+IE9uIFR1ZXNkYXksIEp1bmUgMjEsIDIwMTYgMTI6MDU6MDYgUE0gQ0VT
-VCBKb2huIFN0dWx0eiB3cm90ZToKPj4gT24gVHVlLCBKdW4gMjEsIDIwMTYgYXQgMTE6NDkgQU0s
-IFN0ZXBoYW4gTXVlbGxlciA8c211ZWxsZXJAY2hyb25veC5kZT4gd3JvdGU6Cj4+ID4gQW0gRGll
-bnN0YWcsIDIxLiBKdW5pIDIwMTYsIDExOjExOjQyIHNjaHJpZWIgSm9obiBTdHVsdHo6Cj4+ID4K
-Pj4gPiBIaSBKb2huLAo+PiA+Cj4+ID4+IEkgZG9uJ3Qgc2VlIGluIHRoZSBhYm92ZSBhbiBleHBs
-YW5hdGlvbiBvZiAqd2h5KiB5b3UncmUgdXNpbmcKPj4gPj4ga3RpbWVfZ2V0X3Jhd19ucygpIGlu
-c3RlYWQgb2Yga3RpbWVfZ2V0X25zKCkuCj4+ID4KPj4gPiBDb3VsZCB5b3UgaGVscCBtZSB1bmRl
-cnN0YW5kIHdoYXQgdGhlIGRpZmZlcmVuY2UgaXMgb3IgcG9pbnQgbWUgdG8gc29tZQo+PiA+IGRv
-Y3VtZW50YXRpb24/IEkgdW5kZXJzdG9vZCB0aGF0IHdlIG9ubHkgdGFsa2VkIGFib3V0IHRoZSBf
-cmF3IHZhcmlhbnQuCj4+Cj4+IFVzaW5nIHNwZWNpYWxpemVkIGludGVyZmFjZXMgd2l0aCBzdWJ0
-bGUgc2VtYW50aWNzIHcvbyB1bmRlcnN0YW5kaW5nCj4+IHRoZW0gaXMgc29ydCBvZiBteSBjb25j
-ZXJuIGhlcmUuCj4+Cj4+IFRoZXJlIGFyZSByZWFzb25zIHdoeSB5b3UgbWlnaHQgd2FudCB0byB1
-c2UgdGhlIGt0aW1lX2dldF9yYXdfbnMoKQo+PiBpbnRlcmZhY2Ugb3ZlciBrdGltZV9nZXRfbnMo
-KSwgYnV0IHRoZXkgaGF2ZSBub3QgYmVlbiBtYWRlIGNsZWFyIGluCj4+IHRoZSBjb21tZW50LiBB
-cm5kIGRpc2N1c3NlZCBzb21lIHBvdGVudGlhbCBjb25jZXJucyB0aGF0IHRoZSBmcmVxCj4+IGFk
-anVzdG1lbnQgZG9uZSBieSBudHAgbWlnaHQgYmUgc29tZXdoYXQgcHJlZGljdGFibGUvY29udHJv
-bGxlZCBieQo+PiByZW1vdGUgcGFydGllcywgd2hpY2ggY291bGQgaGF2ZSBzb21lIGVmZmVjdCBp
-biB0aGUgY2FsY3VsYXRpb24uIFRoYXQKPj4gZmVlbHMgYSBsaXR0bGUgb3Zlcmx5IHZhZ3VlIHRv
-IG1lLCBidXQgSSdtIG5vIGNyeXB0byBleHBlcnQsIHNvIGlmCj4+IHRoYXQgaXMgYSByZWFzb25h
-YmxlIGNvbmNlcm4sIHRoZW4gaXQgc2hvdWxkIGJlIGEgY29uc2Npb3VzIGFuZAo+PiBkb2N1bWVu
-dGVkIGRlY2lzaW9uLgo+Cj4gTXkgb3JpZ2luYWwgcGF0Y2ggY2hhbmdlZCBfX2dldG5zdGltZW9m
-ZGF5KCkgdG8gX19nZXRuc3RpbWVvZmRheTY0KCksCj4gd2hpY2gga2VwdCB0aGUgb3JpZ2luYWwg
-c2VtYW50aWNzIG9mIG5vdCB3YXJuaW5nIGluIGNhc2UgdGhlIGNsb2NrCj4gc291cmNlIGlzIHN1
-c3BlbmRlZCAod2hpY2ggaXMgdGhlIG9ubHkgZGlmZmVyZW50IHRvIHRoZSBub3JtYWwKPiBnZXRu
-c3RpbWVvZmRheXssNjR9KCkuCj4KPiBJIGRpZCB0aGUgcGF0Y2ggYSB3aGlsZSB0aW1lIGFnbyBh
-bG9uZyB3aXRoIGEgbnVtYmVyIG9mIG90aGVyIHBhdGNoZXMKPiB0aGF0IEkgbmV2ZXIgc2VudCBv
-dXQgdW50aWwgbGFzdCB3ZWVrLCBzbyBJIGRvbid0IHJlbWVtYmVyIHRoZQo+IHJlYXNvbmluZyBm
-b3Igc3VnZ2VzdGluZyBrdGltZV9nZXRfcmF3X2Zhc3RfbnMoKSBvdmVyIGt0aW1lX2dldF9yYXdf
-bnMoKSwKPiBidXQgSSBzdXJlIHdhbnRlZCB0byBrZWVwIHRoZSBub24td2FybmluZyBiZWhhdmlv
-ciwgYW5kIGt0aW1lX2dldF9ucygpCj4gd2FybnMgb24gdGltZWtlZXBpbmdfc3VzcGVuZGVkKCkg
-d2hpbGUgdGhlIG90aGVyIHR3byBkb24ndC4KClJpZ2h0LiBCdXQgdGhpcyBjb2RlIGlzbid0IGNh
-bGxlZCBpbiBsYXRlIHN1c3BlbmQgb3IgZWFybHkgcmVzdW1lIGlzIGl0PwoKCj4gSWYgd2UgZG9u
-J3QgY2FyZSBhYm91dCB0aGUgbm9uLXdhcm5pbmcgYXNwZWN0LCBrdGltZV9nZXRfbnMoKSBtYWtl
-cwo+IG1vc3Qgc2Vuc2UgaGVyZSwgYW5kIHRoZSBvcmlnaW5hbCBjb2RlIHNob3VsZCBwcm9iYWJs
-eSBoYXZlIHVzZWQKPiBnZXRuc3RpbWVvZmRheSgpIGFzIHdlbGwuCgpUaGlzIGlzIHdoYXQgSSBz
-dXNwZWN0IGFzIHdlbGwuICBCdXQgYWdhaW4sIEkgZG9uJ3QgbWluZCBpZiBmb2xrcyB1c2UKdGhl
-IHNwZWNpYWxpemVkIGludGVyZmFjZXMsIGFzIGxvbmcgYXMgdGhleSBkb2N1bWVudCBhIGNsZWFy
-IHJlYXNvbgpmb3IgaXQuIEVzcGVjaWFsbHkgZm9yIHRoaW5ncyBsaWtlIGNyeXB0byB3aGVyZSBp
-bnR1aXRpb24gaXNuJ3QgYWx3YXlzCnRoZSBiZXN0IGd1aWRlLgoKdGhhbmtzCi1qb2huCl9fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fClkyMDM4IG1haWxpbmcg
-bGlzdApZMjAzOEBsaXN0cy5saW5hcm8ub3JnCmh0dHBzOi8vbGlzdHMubGluYXJvLm9yZy9tYWls
-bWFuL2xpc3RpbmZvL3kyMDM4Cg==
+
+Hi,
+
+I am Amanda,
+
+Would you be interested in acquiring an email list of  "Moms Email List" from USA?
+
+We have data for Mortgage Email List, New Homeowner Email List, Online Shoppers List, Travelers Email List and many more. Choose the best one that meets your need. We provide you with current and active contact on every list. Take advantage of that, let your marketing efforts be fruitful.
+
+Each record in the list Contact Name( First, Middle, Last Name), Direct Mailing Address ( Address, City, State, Zip Code), List Type, Source, IP Address, and Email Address.
+
+All the contacts are opt-in verified, 100% permission based and can be used for unlimited multi-channel marketing.
+
+Please let me know your thoughts towards Moms Email List.
+
+Best Regards,
+Amanda Clark
+
+
+---
+This email has been checked for viruses by Avast antivirus software.
+https://www.avast.com/antivirus
