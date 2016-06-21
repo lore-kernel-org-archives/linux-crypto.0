@@ -1,82 +1,105 @@
-From: Arnd Bergmann <arnd@arndb.de>
+From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: [PATCH] crypto: use timespec64 for jent_get_nstime
-Date: Tue, 21 Jun 2016 10:32:23 +0200
-Message-ID: <3776557.os2uYrMn6M@wuerfel>
-References: <20160617155952.1021006-1-arnd@arndb.de>
- <10630099.jHjGp8aIto@positron.chronox.de>
+Date: Tue, 21 Jun 2016 10:39:19 +0200
+Message-ID: <2181960.PFpL2PhZMt@tauon.atsec.com>
+References: <20160617155952.1021006-1-arnd@arndb.de> <10630099.jHjGp8aIto@positron.chronox.de> <3776557.os2uYrMn6M@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- Alexander Kuleshov <kuleshovmail@gmail.com>, y2038@lists.linaro.org,
- linux-kernel@vger.kernel.org, John Stultz <john.stultz@linaro.org>,
- linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Kees Cook <keescook@chromium.org>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <y2038-bounces@lists.linaro.org>
-In-Reply-To: <10630099.jHjGp8aIto@positron.chronox.de>
-List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
-List-Archive: <http://lists.linaro.org/pipermail/y2038/>
-List-Post: <mailto:y2038@lists.linaro.org>
-List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
-List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=subscribe>
-Errors-To: y2038-bounces@lists.linaro.org
-Sender: "Y2038" <y2038-bounces@lists.linaro.org>
+	"David S. Miller" <davem@davemloft.net>, y2038@lists.linaro.org,
+	Kees Cook <keescook@chromium.org>,
+	Alexander Kuleshov <kuleshovmail@gmail.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	John Stultz <john.stultz@linaro.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <3776557.os2uYrMn6M@wuerfel>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gVHVlc2RheSwgSnVuZSAyMSwgMjAxNiA4OjIwOjEwIEFNIENFU1QgU3RlcGhhbiBNdWVsbGVy
-IHdyb3RlOgo+IEFtIEZyZWl0YWcsIDE3LiBKdW5pIDIwMTYsIDE3OjU5OjQxIHNjaHJpZWIgQXJu
-ZCBCZXJnbWFubjoKPiAKPiBIaSBBcm5kLAo+IAo+ID4gVGhlIGplbnRfZ2V0X25zdGltZSgpIGZ1
-bmN0aW9uIHVzZXMgX19nZXRuc3RpbWVvZmRheSgpIHRvIGdldAo+ID4gc29tZXRoaW5nIHNpbWls
-YXIgdG8gYSA2NC1iaXQgbmFub3NlY29uZCBjb3VudGVyLiBBcyB3ZSB3YW50Cj4gPiB0byBnZXQg
-cmlkIG9mIHN0cnVjdCB0aW1lc3BlYyB0byBmaXggdGhlIHkyMDM4IG92ZXJmbG93LAo+ID4gdGhp
-cyBwYXRjaCBjaGFuZ2VzIHRoZSBjb2RlIHRvIHVzZSBfX2dldG5zdGltZW9mZGF5NjQoKQo+ID4g
-aW5zdGVhZCwgd2hpY2ggcmV0dXJucyBhIHRpbWVzcGVjNjQgc3RydWN0dXJlLgo+ID4gCj4gPiBO
-b3RoaW5nIGNoYW5nZXMgYWJvdXQgdGhlIGFsZ29yaXRobSwgYnV0IGl0IGxvb2tzIGxpa2UgaXQK
-PiA+IG1pZ2h0IGJlIGJldHRlciB0byB1c2UKPiA+IAo+ID4gICpvdXQgPSB0cy50dl9zZWMgKiBO
-U0VDX1BFUl9TRUMgKyB0cy50dl9uc2VjOwo+ID4gCj4gPiBvciBldmVuCj4gPiAKPiA+ICAqb3V0
-ID0ga3RpbWVfZ2V0X3Jhd19mYXN0X25zKCk7Cj4gCj4gSSB0ZXN0ZWQga3RpbWVfZ2V0X3Jhd19m
-YXN0X25zIGFuZCBpdCB3b3JrcyBwZXJmZWN0bHkgd2VsbCBmb3IgdGhlIHVzZSBjYXNlLCAKPiBp
-LmUuIHRoZSBSTkcgYmVoYXZpb3IgaXMgaW5kaXN0aW5ndWlzaGFibGUgZnJvbSBSRFRTQyBvbiB4
-ODYuCj4gCj4gV2hpY2ggdGltZSBzb3VyY2UgaXMgdXNlZCBmb3IgdGhpcyBmdW5jdGlvbj8gSSBh
-bSB3b25kZXJpbmcgYWJvdXQgCj4gYXJjaGl0ZWN0dXJlcyBvdGhlciB0aGFuIFg4Ni4KCihhZGRp
-bmcgSm9obiBTdHVsdHogdG8gQ2MsIGhlIGNhbiBjb3JyZWN0IG1lIGlmIEkgc2F5IHNvbWV0aGlu
-ZyB3cm9uZykKCkFsbCBrdGltZV9nZXRfKiBhbmQgKmdldCp0aW1lb2ZkYXkoKSBmdW5jdGlvbnMg
-dXNlIHRoZSBzYW1lIGNsb2Nrc291cmNlLAp3aGljaCBpcyBjb25maWd1cmFibGUgYW5kIHBpY2tl
-ZCBmcm9tIHRoZSBhdmFpbGFibGUgY2xvY2tzb3VyY2VzLAp1c2luZyBhIGNvbWJpbmF0aW9uIG9m
-IHJlbGlhYmlsaXR5LCBsYXRlbmN5IGZvciByZWFkaW5nIGFuZCBhY2N1cmFjeS4KCkNvbXBhcmVk
-IHRvIHRoZSBwcmV2aW91cyBfX2dldG5zdGltZW9mZGF5KCksIHRoZSBkaWZmZXJlbmNlIGlzCgot
-IHVzaW5nICJtb25vdG9uaWMiIHRpbWViYXNlIGluc3RlYWQgb2YgInJlYWwiLCBzbyB0aGUgemVy
-byB0aW1lCiAgaXMgd2hlbiB0aGUgc3lzdGVtIGJvb3RlZCByYXRoZXIgdGhhbiBKYW4gMSAxOTcw
-Ci0gInJhdyIgbWVhbnMgd2UgZG9uJ3QgaG9ub3IgdXBkYXRlcyBmb3IgdGhlIHJhdGUgYmFzZWQg
-b24gbnRwLAogIHdoaWNoIGlzIHByb2JhYmx5IGJldHRlciBhcyB0aGUgbnRwIHN0YXRlIG1pZ2h0
-IGJlIG9ic2VydmFibGUKICBvdmVyIHRoZSBuZXQgKGl0IHByb2JhYmx5IGRvZXNuJ3QgbWF0dGVy
-LCBidXQgaXQgY2FuJ3QgaHVydCkKLSAiZmFzdCIgbWVhbnMgdGhhdCBpbiB2ZXJ5IHJhcmUgY2Fz
-ZXMsIHRoZSB0aW1lIG1pZ2h0IGFwcGVhcgogIHRvIGdvIGJhY2t3YXJkcyAoaXQgcHJvYmFibHkg
-Y2FuJ3QgaGFwcGVuIGhlcmUgYmVjYXVzZSB5b3UgYXJlIG5vdAogIGNhbGxlZCBpbiBhbiBOTUkp
-LgoKVGhlcmUgbWF5IGJlIG90aGVyIGNsb2Nrc291cmNlcyBpbiB0aGUgc3lzdGVtIHRoYXQgYXJl
-IG1vcmUgYXBwcm9wcmlhdGUKZm9yIHRoZSBwdXJwb3NlIG9mIGplbnRfZ2V0X25zdGltZSgpLCBi
-dXQgSSBkb24ndCB0aGluayB3ZSBoYXZlIGEgd2F5Cm9mIGV4cG9zaW5nIHRoZW0gYXQgdGhlIG1v
-bWVudCwgYmVjYXVzZSB3ZSBoYXZlIG5vdCBuZWVkZWQgaXQgaW4gdGhlCnBhc3QuCgpJIGFzc3Vt
-ZSB3aGF0IHlvdSB3YW50IGlzIHRoZSBoaWdoZXN0LXJlc29sdXRpb24gY2xvY2tzb3VyY2UsIGFu
-ZAp5b3UgZG9uJ3QgcmVhbGx5IGNhcmUgYWJvdXQgCgo+IE5vdGUsIHRoaXMgZnVuY3Rpb24gaXMg
-dXNlZCBhcyBhIGZhbGxiYWNrIHdoZW4gcmFuZG9tX2dldF9lbnRyb3B5IGlzIG5vdCAKPiBpbXBs
-ZW1lbnRlZC4gSW4gYWRkaXRpb24gdGhlIEppdHRlciBSTkcgaGFzIGFuIG9ubGluZSBoZWFsdGgg
-dGVzdCB3aGljaCB3aWxsIAo+IGNhdGNoIHRoZSBmYWlsdXJlIG9mIHRoZSB0aW1lIHN0YW1wIG9w
-ZXJhdGlvbi4gSGVuY2UsIGV2ZW4gaWYgdGhpcyBmdW5jdGlvbiAKPiBtYXkgbm90IGJlIHN1aXRh
-YmxlIG9uIG9uZSBvciB0aGUgb3RoZXIgYXJjaCwgaXQgc2hvdWxkIG5vdCBodXJ0IHRob3VnaC4K
-Ck9rLiBGb3IgdGhlIEFSTSBhcmNoaXRlY3R1cmUsIEkgdGhpbmsgbW9zdCAobWF5YmUgYWxsKSBv
-ZiB0aGUgbW9kZXJuIEFSTXY3CnBsYXRmb3JtcyBoYXZlIGVpdGhlciBhbiBhcmNoaXRlY3RlZCAi
-Z2xvYmFsIHRpbWVyIiBvciBoYXZlIHRoZWlyIG93bgpyZXBsYWNlbWVudCwgd2hpbGUgdGhlIG1h
-am9yaXR5IG9mIHRoZSBvbGRlciBBUk12NC92NS92NiBtYWNoaW5lcyBkb24ndApoYXZlIG9uZS4K
-Ckhvd2V2ZXIsIHRoZXJlIGFyZSBzb21lIG1hY2hpbmVzIHRoYXQgaW1wbGVtZW50ICJzY2hlZF9j
-bG9jayIgYnV0IGRvbid0CmltcGxlbWVudCBnZXRfY3ljbGVzICh3aGljaCBpcyB0aGUgZGVmYXVs
-dCBmb3IgcmFuZG9tX2dldF9lbnRyb3B5KCkpLgoKSXQncyBwb3NzaWJsZSB0aGF0IHRoZXJlIGFy
-ZSBjYXNlcyB3aGVyZSBpdCdzIGJldHRlciB0byBjYWxsIHNjaGVkX2Nsb2NrKCkKdGhhbiBrdGlt
-ZV9nZXRfcmF3X2Zhc3RfbnMoKSBhcyBhIGZhbGxiYWNrLCB0aG91Z2ggSSBjb3VsZCBub3QgZmlu
-ZApzcGVjaWZpYyBleGFtcGxlcyBzbyBmYXIuCgoJQXJuZApfX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fXwpZMjAzOCBtYWlsaW5nIGxpc3QKWTIwMzhAbGlzdHMu
-bGluYXJvLm9yZwpodHRwczovL2xpc3RzLmxpbmFyby5vcmcvbWFpbG1hbi9saXN0aW5mby95MjAz
-OAo=
+Am Dienstag, 21. Juni 2016, 10:32:23 schrieb Arnd Bergmann:
+
+Hi Arnd,
+
+> On Tuesday, June 21, 2016 8:20:10 AM CEST Stephan Mueller wrote:
+> > Am Freitag, 17. Juni 2016, 17:59:41 schrieb Arnd Bergmann:
+> > 
+> > Hi Arnd,
+> > 
+> > > The jent_get_nstime() function uses __getnstimeofday() to get
+> > > something similar to a 64-bit nanosecond counter. As we want
+> > > to get rid of struct timespec to fix the y2038 overflow,
+> > > this patch changes the code to use __getnstimeofday64()
+> > > instead, which returns a timespec64 structure.
+> > > 
+> > > Nothing changes about the algorithm, but it looks like it
+> > > might be better to use
+> > > 
+> > >  *out = ts.tv_sec * NSEC_PER_SEC + ts.tv_nsec;
+> > > 
+> > > or even
+> > > 
+> > >  *out = ktime_get_raw_fast_ns();
+> > 
+> > I tested ktime_get_raw_fast_ns and it works perfectly well for the use
+> > case, i.e. the RNG behavior is indistinguishable from RDTSC on x86.
+> > 
+> > Which time source is used for this function? I am wondering about
+> > architectures other than X86.
+> 
+> (adding John Stultz to Cc, he can correct me if I say something wrong)
+> 
+> All ktime_get_* and *get*timeofday() functions use the same clocksource,
+> which is configurable and picked from the available clocksources,
+> using a combination of reliability, latency for reading and accuracy.
+> 
+> Compared to the previous __getnstimeofday(), the difference is
+> 
+> - using "monotonic" timebase instead of "real", so the zero time
+>   is when the system booted rather than Jan 1 1970
+> - "raw" means we don't honor updates for the rate based on ntp,
+>   which is probably better as the ntp state might be observable
+>   over the net (it probably doesn't matter, but it can't hurt)
+> - "fast" means that in very rare cases, the time might appear
+>   to go backwards (it probably can't happen here because you are not
+>   called in an NMI).
+
+Thank you for the explanation.
+> 
+> There may be other clocksources in the system that are more appropriate
+> for the purpose of jent_get_nstime(), but I don't think we have a way
+> of exposing them at the moment, because we have not needed it in the
+> past.
+> 
+> I assume what you want is the highest-resolution clocksource, and
+> you don't really care about
+
+Correct, all I need is a high-res clocksource.
+> 
+> > Note, this function is used as a fallback when random_get_entropy is not
+> > implemented. In addition the Jitter RNG has an online health test which
+> > will catch the failure of the time stamp operation. Hence, even if this
+> > function may not be suitable on one or the other arch, it should not hurt
+> > though.
+> Ok. For the ARM architecture, I think most (maybe all) of the modern ARMv7
+> platforms have either an architected "global timer" or have their own
+> replacement, while the majority of the older ARMv4/v5/v6 machines don't
+> have one.
+> 
+> However, there are some machines that implement "sched_clock" but don't
+> implement get_cycles (which is the default for random_get_entropy()).
+> 
+> It's possible that there are cases where it's better to call sched_clock()
+> than ktime_get_raw_fast_ns() as a fallback, though I could not find
+> specific examples so far.
+
+Given your explanation above, considering that the RNG would scream in the 
+kernel log when the timer is too coarse and the fact that we have not had bug 
+reports on this issue, I would think that a replacement call that is equal to 
+the old __getnstimeofday is fine.
+
+Do you want to update your patch or shall I hand in the patch?
+
+Ciao
+Stephan
