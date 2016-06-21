@@ -1,42 +1,56 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v9 2/3] crypto: kpp - Add DH software implementation
-Date: Tue, 21 Jun 2016 07:49:00 +0800
-Message-ID: <20160620234900.GA18131@gondor.apana.org.au>
-References: <1466174265-4546-1-git-send-email-salvatore.benedetto@intel.com>
- <1466174265-4546-3-git-send-email-salvatore.benedetto@intel.com>
- <20160620111524.GB10601@gondor.apana.org.au>
- <309B30E91F5E2846B79BD9AA9711D03193586D@IRSMSX102.ger.corp.intel.com>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH v5 0/7] /dev/random - a new approach
+Date: Tue, 21 Jun 2016 01:12:55 -0400
+Message-ID: <20160621051255.GG9848@thunk.org>
+References: <20160620184403.21972.qmail@ns.sciencehorizons.net>
+ <10477997.AvJKPRy4pc@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "Benedetto, Salvatore" <salvatore.benedetto@intel.com>
+Cc: George Spelvin <linux@sciencehorizons.net>, andi@firstfloor.org,
+	cryptography@lakedaemon.net, herbert@gondor.apana.org.au,
+	hpa@linux.intel.com, joe@perches.com, jsd@av8n.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux@horizon.com, pavel@ucw.cz, sandyinchina@gmail.com
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:42833 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752754AbcFUAeK (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Jun 2016 20:34:10 -0400
+Received: from imap.thunk.org ([74.207.234.97]:52418 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751123AbcFUFNs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 21 Jun 2016 01:13:48 -0400
 Content-Disposition: inline
-In-Reply-To: <309B30E91F5E2846B79BD9AA9711D03193586D@IRSMSX102.ger.corp.intel.com>
+In-Reply-To: <10477997.AvJKPRy4pc@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 20, 2016 at 11:43:28AM +0000, Benedetto, Salvatore wrote:
->
-> > While you're at it, it would be nice if you could make the encoded format
-> > little-endian, that way we can make test vectors for all kpp algorithms use
-> > the same format.
-> > 
+On Mon, Jun 20, 2016 at 09:00:49PM +0200, Stephan Mueller wrote:
 > 
-> The input format is the same for DH and ECDH.
-> Only the software implementation of ECC requires little-endian format.
+> The time stamp maintenance is the exact cause for the correlation: one HID 
+> event triggers:
+> 
+> - add_interrupt_randomness which takes high-res time stamp, Jiffies and some 
+> pointers
+> 
+> - add_input_randomness which takes high-res time stamp, Jiffies and HID event 
+> value
+> 
+> The same applies to disk events. My suggestion is to get rid of the double 
+> counting of time stamps for one event.
+> 
+> And I guess I do not need to stress that correlation of data that is supposed 
+> to be entropic is not good :-)
 
-What I mean is to get rid of the DH-specific code in testmgr.c
-and directly encode the secret into the test vector rather than
-calling the helper.
+What is your concern, specifically?  If it is in the entropy
+accounting, there is more entropy in HID event interrupts, so I don't
+think adding the extra 1/64th bit of entropy is going to be problematic.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+If it is that there are two timestamps that are closely correleated
+being added into the pool, the add_interrupt_randomness() path is
+going to mix that timestamp with the interrupt timings from 63 other
+interrupts before it is mixed into the input pool, while the
+add_input_randomness() mixes it directly into the pool.  So if you
+think there is a way this could be leveraged into attack, please give
+specifics --- but I think we're on pretty solid ground here.
+
+Cheers,
+
+						- Ted
