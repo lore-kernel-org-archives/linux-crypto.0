@@ -1,47 +1,45 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: use timespec64 for jent_get_nstime
-Date: Tue, 21 Jun 2016 19:16:15 +0200
-Message-ID: <2228716.yrSLSS60Ke@tauon.atsec.com>
-References: <20160617155952.1021006-1-arnd@arndb.de>
- <12040808.ISNuLM4SqW@tauon.atsec.com>
- <CALAqxLV4qmY8hhzYjQ8+Mx-Tb5WKP1RUQd4JLUnoZRndKTM9og@mail.gmail.com>
+From: "Austin S. Hemmelgarn" <ahferroin7@gmail.com>
+Subject: Re: [PATCH v4 0/5] /dev/random - a new approach
+Date: Tue, 21 Jun 2016 13:17:41 -0400
+Message-ID: <a54e6010-0c19-8adf-89b7-419e3aac30e2@gmail.com>
+References: <1466007463.20087.11.camel@redhat.com>
+ <3381856.qSaz1KcX2Z@positron.chronox.de>
+ <f22f4cd6-8198-71a0-9b79-9f10070758f3@gmail.com>
+ <8999970.pstTbGZv5G@positron.chronox.de>
+ <6b8c8f6a-862a-3e7c-e950-75cd93cdc1f7@gmail.com> <20160621134240.GA8086@amd>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
- Alexander Kuleshov <kuleshovmail@gmail.com>,
- y2038 Mailman List <y2038@lists.linaro.org>,
- lkml <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Kees Cook <keescook@chromium.org>
-To: John Stultz <john.stultz@linaro.org>
-Return-path: <y2038-bounces@lists.linaro.org>
-In-Reply-To: <CALAqxLV4qmY8hhzYjQ8+Mx-Tb5WKP1RUQd4JLUnoZRndKTM9og@mail.gmail.com>
-List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
-List-Archive: <http://lists.linaro.org/pipermail/y2038/>
-List-Post: <mailto:y2038@lists.linaro.org>
-List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
-List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=subscribe>
-Errors-To: y2038-bounces@lists.linaro.org
-Sender: "Y2038" <y2038-bounces@lists.linaro.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Stephan Mueller <smueller@chronox.de>,
+	Theodore Ts'o <tytso@mit.edu>,
+	=?UTF-8?Q?David_Ja=c5=a1a?= <djasa@redhat.com>,
+	Andi Kleen <andi@firstfloor.org>, sandyinchina@gmail.com,
+	Jason Cooper <cryptography@lakedaemon.net>,
+	John Denker <jsd@av8n.com>,
+	"H. Peter Anvin" <hpa@linux.intel.com>,
+	Joe Perches <joe@perches.com>,
+	George Spelvin <linux@horizon.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Pavel Machek <pavel@ucw.cz>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20160621134240.GA8086@amd>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-QW0gRGllbnN0YWcsIDIxLiBKdW5pIDIwMTYsIDEwOjEyOjI0IHNjaHJpZWIgSm9obiBTdHVsdHo6
-CgpIaSBKb2huLAo+IAo+IFNvIHRoaXMgaXMgZGVmaW5pdGVseSBtb3JlIGNsZWFyIHRoZW4gd2hh
-dCB3YXMgZGVzY3JpYmVkIGVhcmxpZXIsIGFuZAo+IHdvcnJpZXMgbWUgYmVjYXVzZSBvbiBtYW55
-IHg4NiBtYWNoaW5lcyAodGhvdWdoIGZld2VyIEkgZ3Vlc3MgdGhlc2UKPiBkYXlzIHRoZW4gaW4g
-dGhlIHBhc3QpIHRoZSBjbG9ja3NvdXJjZSB3aWxsIG9mdGVuIG5vdCBiZSB0aGUgVFNDIChhbmQK
-PiBoYXZlIGxvd2VyIHJlc29sdXRpb24pLgoKUGxlYXNlIG5vdGUsIHRoZSB1c2Ugb2YgdGhlIGt0
-aW1lX2dldF9yYXdfbnMoKSBpcyAqb25seSogdXNlZCBhcyBhIGZhbGxiYWNrIG9uIAphcmNoaXRl
-Y3R1cmVzIHdoZXJlIHJhbmRvbV9nZXRfZW50cm9weSAvIGdldF9jeWNsZXMgaXMgbm90IGltcGxl
-bWVudGVkLgoKU28sIG9uIFg4NiBhbmQgb24gbWFueSBvdGhlciBhcmNoZXMsIHRoaXMgZnVuY3Rp
-b24gY2FsbCB3aWxsIG5ldmVyIGJlIAp0cmlnZ2VyZWQuCgouLi4KPiAKPiBCdXQgcGxlYXNlIGp1
-c3QgbWFrZSBzdXJlIHRoZSByZWFzb24gd2h5IHlvdSdyZSB1c2luZyB0aGF0IHNwZWNpZmljCj4g
-aW50ZXJmYWNlIGlzIGNsZWFybHkgZG9jdW1lbnRlZCBpbiB0aGUgY29kZSBzbyB3ZSBkb24ndCBo
-YXZlIHRvIGxhdGVyCj4gcmV2ZXJzZSBlbmdpbmVlciB0aGUgaW50ZW50LgoKV2lsbCBkby4KCkBB
-cm5kOiBJIHdvdWxkIHByZXBhcmUgYSBwYXRjaCB0aGVuIHVzaW5nIGt0aW1lX2dldF9yYXdfbnMg
-YW5kIHByb3ZpZGluZyBhIApnb29kIGRvY3VtZW50YXRpb24gaW4gdGhlIGNvZGUuCgpDaWFvClN0
-ZXBoYW4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KWTIw
-MzggbWFpbGluZyBsaXN0ClkyMDM4QGxpc3RzLmxpbmFyby5vcmcKaHR0cHM6Ly9saXN0cy5saW5h
-cm8ub3JnL21haWxtYW4vbGlzdGluZm8veTIwMzgK
+On 2016-06-21 09:42, Pavel Machek wrote:
+> Hi!
+>
+>> 6. You have a significant lack of data regarding embedded systems, which is
+>> one of the two biggest segments of Linux's market share.  You list no
+>> results for any pre-ARMv6 systems (Linux still runs on and is regularly used
+>> on ARMv4 CPU's, and it's worth also pointing out that the values on
+>> the
+>
+> Feel free to contribute more test results.
+>
+> I mean... you can't expect every person who wants to improve something
+> in linux to test on everything in the world... can you?
+>
+I was commenting less on the lack of results for such systems than on 
+attempts to make statements about such systems based on a data-set that 
+lacks information about such systems.
