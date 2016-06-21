@@ -1,54 +1,226 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v5 0/7] /dev/random - a new approach
-Date: Tue, 21 Jun 2016 09:32:13 +0200
-Message-ID: <24059874.5WizEqNrfz@tauon.atsec.com>
-References: <2754489.L1QYabbYUc@positron.chronox.de> <1639356.ozYDPrS7jM@tauon.atsec.com> <CAJU7zaJFCty9CQZwzY3_N2Rx91mh-FhJd8Us+akHpTzCc5CjZw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Theodore Ts'o <tytso@mit.edu>, Pavel Machek <pavel@ucw.cz>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andi Kleen <andi@firstfloor.org>,
-	Sandy Harris <sandyinchina@gmail.com>,
-	Jason Cooper <cryptography@lakedaemon.net>,
-	John Denker <jsd@av8n.com>,
-	"H. Peter Anvin" <hpa@linux.intel.com>,
-	Joe Perches <joe@perches.com>,
-	George Spelvin <linux@horizon.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+From: Romain Perier <romain.perier@free-electrons.com>
+Subject: [PATCH v3 04/10] crypto: marvell: Copy IV vectors by DMA transfers for acipher requests
+Date: Tue, 21 Jun 2016 10:08:34 +0200
+Message-ID: <1466496520-28806-5-git-send-email-romain.perier@free-electrons.com>
+References: <1466496520-28806-1-git-send-email-romain.perier@free-electrons.com>
+Cc: Gregory Clement <gregory.clement@free-electrons.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Russell King <linux@arm.linux.org.uk>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Arnaud Ebalard <arno@natisbad.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:37582 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932341AbcFUHcU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 21 Jun 2016 03:32:20 -0400
-In-Reply-To: <CAJU7zaJFCty9CQZwzY3_N2Rx91mh-FhJd8Us+akHpTzCc5CjZw@mail.gmail.com>
+Received: from down.free-electrons.com ([37.187.137.238]:50137 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753812AbcFUIJa (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 21 Jun 2016 04:09:30 -0400
+In-Reply-To: <1466496520-28806-1-git-send-email-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 21. Juni 2016, 09:12:07 schrieb Nikos Mavrogiannopoulos:
+Add a TDMA descriptor at the end of the request for copying the
+output IV vector via a DMA transfer. This is a good way for offloading
+as much as processing as possible to the DMA and the crypto engine.
+This is also required for processing multiple cipher requests
+in chained mode, otherwise the content of the IV vector would be
+overwritten by the last processed request.
 
-Hi Nikos,
+Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
+Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+---
 
-> On Mon, Jun 20, 2016 at 5:43 PM, Stephan Mueller <smueller@chronox.de> 
-wrote:
-> >> Personally, I don't really use /dev/random, nor would I recommend it
-> >> for most application programmers.  At this point, getrandom(2) really
-> >> is the preferred interface unless you have some very specialized
-> >> needs.
-> > 
-> > I fully agree. But there are use cases for /dev/random, notably as a seed
-> > source for other DRNG.
-> 
-> Is that really the case? I believe all DRNG's use /dev/urandom anyway
-> for seeding since they cannot afford indeterminate blocking. It would
-> be a gain for everyone if /dev/random was the same as /dev/urandom in
-> Linux.
+Changes in v3:
+  - Fixed coding style issues
 
-For standard approaches, this is true. But there are regulations, notably in 
-the German realm, /dev/random shall be used, at least partially (see AIS 
-20/31).
+Changes in v2:
+  - Reworded the commit message, the term 'asynchronously' was
+    ambigous
+  - Changed the value of CESA_TDMA_IV from 4 to 3
+  - Adding missing blank lines
+  - Rewrote the function mv_cesa_ablkcipher_process to something more
+    readable.
+  - Fixed a bug about how the type of a TDMA operation was tested in
+    mv_cesa_dma_cleanup and mv_cesa_dma_prepare, I created a separated
+    commit for that (see PATCH 03/10)
+  - Renamed variables in mv_cesa_dma_add_iv_op
+  - Removed the flag CESA_TDMA_DATA from mv_cesa_dma_add_iv_op (not
+    needed)
 
-Ciao
-Stephan
+ drivers/crypto/marvell/cesa.c   |  4 ++++
+ drivers/crypto/marvell/cesa.h   |  5 +++++
+ drivers/crypto/marvell/cipher.c | 31 ++++++++++++++++++++++---------
+ drivers/crypto/marvell/tdma.c   | 29 +++++++++++++++++++++++++++++
+ 4 files changed, 60 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
+index fb403e1..93700cd 100644
+--- a/drivers/crypto/marvell/cesa.c
++++ b/drivers/crypto/marvell/cesa.c
+@@ -312,6 +312,10 @@ static int mv_cesa_dev_dma_init(struct mv_cesa_dev *cesa)
+ 	if (!dma->padding_pool)
+ 		return -ENOMEM;
+ 
++	dma->iv_pool = dmam_pool_create("cesa_iv", dev, 16, 1, 0);
++	if (!dma->iv_pool)
++		return -ENOMEM;
++
+ 	cesa->dma = dma;
+ 
+ 	return 0;
+diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
+index 74071e4..685a627 100644
+--- a/drivers/crypto/marvell/cesa.h
++++ b/drivers/crypto/marvell/cesa.h
+@@ -275,6 +275,7 @@ struct mv_cesa_op_ctx {
+ #define CESA_TDMA_DUMMY				0
+ #define CESA_TDMA_DATA				1
+ #define CESA_TDMA_OP				2
++#define CESA_TDMA_IV				3
+ 
+ /**
+  * struct mv_cesa_tdma_desc - TDMA descriptor
+@@ -390,6 +391,7 @@ struct mv_cesa_dev_dma {
+ 	struct dma_pool *op_pool;
+ 	struct dma_pool *cache_pool;
+ 	struct dma_pool *padding_pool;
++	struct dma_pool *iv_pool;
+ };
+ 
+ /**
+@@ -790,6 +792,9 @@ mv_cesa_tdma_desc_iter_init(struct mv_cesa_tdma_chain *chain)
+ 	memset(chain, 0, sizeof(*chain));
+ }
+ 
++int mv_cesa_dma_add_iv_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
++			  u32 size, u32 flags, gfp_t gfp_flags);
++
+ struct mv_cesa_op_ctx *mv_cesa_dma_add_op(struct mv_cesa_tdma_chain *chain,
+ 					const struct mv_cesa_op_ctx *op_templ,
+ 					bool skip_ctx,
+diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
+index ec23609..908be86 100644
+--- a/drivers/crypto/marvell/cipher.c
++++ b/drivers/crypto/marvell/cipher.c
+@@ -118,6 +118,7 @@ static int mv_cesa_ablkcipher_std_process(struct ablkcipher_request *req,
+ 	struct mv_cesa_ablkcipher_std_req *sreq = &creq->req.std;
+ 	struct mv_cesa_engine *engine = sreq->base.engine;
+ 	size_t len;
++	unsigned int ivsize;
+ 
+ 	len = sg_pcopy_from_buffer(req->dst, creq->dst_nents,
+ 				   engine->sram + CESA_SA_DATA_SRAM_OFFSET,
+@@ -127,6 +128,10 @@ static int mv_cesa_ablkcipher_std_process(struct ablkcipher_request *req,
+ 	if (sreq->offset < req->nbytes)
+ 		return -EINPROGRESS;
+ 
++	ivsize = crypto_ablkcipher_ivsize(crypto_ablkcipher_reqtfm(req));
++	memcpy_fromio(req->info,
++		      engine->sram + CESA_SA_CRYPT_IV_SRAM_OFFSET, ivsize);
++
+ 	return 0;
+ }
+ 
+@@ -135,21 +140,20 @@ static int mv_cesa_ablkcipher_process(struct crypto_async_request *req,
+ {
+ 	struct ablkcipher_request *ablkreq = ablkcipher_request_cast(req);
+ 	struct mv_cesa_ablkcipher_req *creq = ablkcipher_request_ctx(ablkreq);
+-	struct mv_cesa_ablkcipher_std_req *sreq = &creq->req.std;
+-	struct mv_cesa_engine *engine = sreq->base.engine;
++	struct mv_cesa_tdma_req *dreq;
++	unsigned int ivsize;
+ 	int ret;
+ 
+-	if (creq->req.base.type == CESA_DMA_REQ)
+-		ret = mv_cesa_dma_process(&creq->req.dma, status);
+-	else
+-		ret = mv_cesa_ablkcipher_std_process(ablkreq, status);
++	if (creq->req.base.type == CESA_STD_REQ)
++		return mv_cesa_ablkcipher_std_process(ablkreq, status);
+ 
++	ret = mv_cesa_dma_process(&creq->req.dma, status);
+ 	if (ret)
+ 		return ret;
+ 
+-	memcpy_fromio(ablkreq->info,
+-		      engine->sram + CESA_SA_CRYPT_IV_SRAM_OFFSET,
+-		      crypto_ablkcipher_ivsize(crypto_ablkcipher_reqtfm(ablkreq)));
++	dreq = &creq->req.dma;
++	ivsize = crypto_ablkcipher_ivsize(crypto_ablkcipher_reqtfm(ablkreq));
++	memcpy_fromio(ablkreq->info, dreq->chain.last->data, ivsize);
+ 
+ 	return 0;
+ }
+@@ -302,6 +306,7 @@ static int mv_cesa_ablkcipher_dma_req_init(struct ablkcipher_request *req,
+ 	struct mv_cesa_tdma_chain chain;
+ 	bool skip_ctx = false;
+ 	int ret;
++	unsigned int ivsize;
+ 
+ 	dreq->base.type = CESA_DMA_REQ;
+ 	dreq->chain.first = NULL;
+@@ -360,6 +365,14 @@ static int mv_cesa_ablkcipher_dma_req_init(struct ablkcipher_request *req,
+ 
+ 	} while (mv_cesa_ablkcipher_req_iter_next_op(&iter));
+ 
++	/* Add output data for IV */
++	ivsize = crypto_ablkcipher_ivsize(crypto_ablkcipher_reqtfm(req));
++	ret = mv_cesa_dma_add_iv_op(&chain, CESA_SA_CRYPT_IV_SRAM_OFFSET,
++				    ivsize, CESA_TDMA_SRC_IN_SRAM, flags);
++
++	if (ret)
++		goto err_free_tdma;
++
+ 	dreq->chain = chain;
+ 
+ 	return 0;
+diff --git a/drivers/crypto/marvell/tdma.c b/drivers/crypto/marvell/tdma.c
+index de8c253..01dda58 100644
+--- a/drivers/crypto/marvell/tdma.c
++++ b/drivers/crypto/marvell/tdma.c
+@@ -69,6 +69,9 @@ void mv_cesa_dma_cleanup(struct mv_cesa_tdma_req *dreq)
+ 		if (type == CESA_TDMA_OP)
+ 			dma_pool_free(cesa_dev->dma->op_pool, tdma->op,
+ 				      le32_to_cpu(tdma->src));
++		else if (type == CESA_TDMA_IV)
++			dma_pool_free(cesa_dev->dma->iv_pool, tdma->data,
++				      le32_to_cpu(tdma->dst));
+ 
+ 		tdma = tdma->next;
+ 		dma_pool_free(cesa_dev->dma->tdma_desc_pool, old_tdma,
+@@ -121,6 +124,32 @@ mv_cesa_dma_add_desc(struct mv_cesa_tdma_chain *chain, gfp_t flags)
+ 	return new_tdma;
+ }
+ 
++int mv_cesa_dma_add_iv_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
++			  u32 size, u32 flags, gfp_t gfp_flags)
++{
++
++	struct mv_cesa_tdma_desc *tdma;
++	u8 *iv;
++	dma_addr_t dma_handle;
++
++	tdma = mv_cesa_dma_add_desc(chain, gfp_flags);
++	if (IS_ERR(tdma))
++		return PTR_ERR(tdma);
++
++	iv = dma_pool_alloc(cesa_dev->dma->iv_pool, flags, &dma_handle);
++	if (!iv)
++		return -ENOMEM;
++
++	tdma->byte_cnt = cpu_to_le32(size | BIT(31));
++	tdma->src = src;
++	tdma->dst = cpu_to_le32(dma_handle);
++	tdma->data = iv;
++
++	flags &= (CESA_TDMA_DST_IN_SRAM | CESA_TDMA_SRC_IN_SRAM);
++	tdma->flags = flags | CESA_TDMA_IV;
++	return 0;
++}
++
+ struct mv_cesa_op_ctx *mv_cesa_dma_add_op(struct mv_cesa_tdma_chain *chain,
+ 					const struct mv_cesa_op_ctx *op_templ,
+ 					bool skip_ctx,
+-- 
+2.7.4
