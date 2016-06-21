@@ -1,66 +1,92 @@
-From: "Austin S. Hemmelgarn" <ahferroin7@gmail.com>
-Subject: Re: [PATCH v5 0/7] /dev/random - a new approach
-Date: Tue, 21 Jun 2016 12:03:56 -0400
-Message-ID: <e2612733-f3c1-bdc0-5822-3f20c44fe781@gmail.com>
-References: <2754489.L1QYabbYUc@positron.chronox.de>
- <1639356.ozYDPrS7jM@tauon.atsec.com>
- <CAJU7zaJFCty9CQZwzY3_N2Rx91mh-FhJd8Us+akHpTzCc5CjZw@mail.gmail.com>
- <24059874.5WizEqNrfz@tauon.atsec.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [Y2038] [PATCH] crypto: use timespec64 for jent_get_nstime
+Date: Tue, 21 Jun 2016 18:34:01 +0200
+Message-ID: <2575012.qQ3uE1GZEQ@tauon.atsec.com>
+References: <20160617155952.1021006-1-arnd@arndb.de> <3776557.os2uYrMn6M@wuerfel> <CALAqxLWan2_2HhChvq+fXKpP8CyURwj-ccdnmfEve4LTOza=mg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Theodore Ts'o <tytso@mit.edu>, Pavel Machek <pavel@ucw.cz>,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Arnd Bergmann <arnd@arndb.de>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andi Kleen <andi@firstfloor.org>,
-	Sandy Harris <sandyinchina@gmail.com>,
-	Jason Cooper <cryptography@lakedaemon.net>,
-	John Denker <jsd@av8n.com>,
-	"H. Peter Anvin" <hpa@linux.intel.com>,
-	Joe Perches <joe@perches.com>,
-	George Spelvin <linux@horizon.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>,
-	Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <24059874.5WizEqNrfz@tauon.atsec.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Alexander Kuleshov <kuleshovmail@gmail.com>,
+	y2038 Mailman List <y2038@lists.linaro.org>,
+	lkml <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Kees Cook <keescook@chromium.org>
+To: John Stultz <john.stultz@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:37668 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751853AbcFUQeH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 21 Jun 2016 12:34:07 -0400
+In-Reply-To: <CALAqxLWan2_2HhChvq+fXKpP8CyURwj-ccdnmfEve4LTOza=mg@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 2016-06-21 03:32, Stephan Mueller wrote:
-> Am Dienstag, 21. Juni 2016, 09:12:07 schrieb Nikos Mavrogiannopoulos:
->
-> Hi Nikos,
->
->> On Mon, Jun 20, 2016 at 5:43 PM, Stephan Mueller <smueller@chronox.de>
-> wrote:
->>>> Personally, I don't really use /dev/random, nor would I recommend it
->>>> for most application programmers.  At this point, getrandom(2) really
->>>> is the preferred interface unless you have some very specialized
->>>> needs.
->>>
->>> I fully agree. But there are use cases for /dev/random, notably as a seed
->>> source for other DRNG.
->>
->> Is that really the case? I believe all DRNG's use /dev/urandom anyway
->> for seeding since they cannot afford indeterminate blocking. It would
->> be a gain for everyone if /dev/random was the same as /dev/urandom in
->> Linux.
->
-> For standard approaches, this is true. But there are regulations, notably in
-> the German realm, /dev/random shall be used, at least partially (see AIS
-> 20/31).
-Which just goes to show how utterly stupid some people who write laws 
-and regulations are.  Saying specifically that '/dev/random shall be 
-used' does not enforce any improvement of entrophic value in the data at 
-all, it just coincidentally improves the theoretical quality of the data 
-because of how Linux and some legacy UNIX systems are designed.  This 
-'regulation' already provides zero benefit other than a placebo effect 
-on at least OpenBSD, FreeBSD, and I'm pretty certain most other BSD 
-derivatives, as /dev/random and /dev/urandom point to the same thing 
-there (on OpenBSD it's an arcfour based drbg, FreeBSD does similar but 
-uses a CSPRNG called Fortuna), and while I'm not certain, I believe AIX 
-does likewise (although they use a design based on yarrow).
+Am Dienstag, 21. Juni 2016, 09:22:31 schrieb John Stultz:
 
-On top of that though, just because some poorly thought out standard 
-requires it's usage doesn't mean we have to work based on that.
+Hi John,
+
+> On Tue, Jun 21, 2016 at 1:32 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> > On Tuesday, June 21, 2016 8:20:10 AM CEST Stephan Mueller wrote:
+> >> Am Freitag, 17. Juni 2016, 17:59:41 schrieb Arnd Bergmann:
+> > Compared to the previous __getnstimeofday(), the difference is
+> > 
+> > - using "monotonic" timebase instead of "real", so the zero time
+> > 
+> >   is when the system booted rather than Jan 1 1970
+> 
+> I haven't looked at the details of the calling code, but I'd worry for
+> crypto uses, especially if its being used for entropy collection,
+> using the monotonic clock instead of the realtime clock might be
+> problematic.
+
+Funnily it does not seem like that. All tests that I have conducted show that 
+monotonic clocks behave equally as realtime clocks, because the uncertainty 
+lies in the execution time of a set of instructions. All we need to do is to 
+measure it with a timer that has a resolution that allows detecting these 
+variations.
+> 
+> > - "raw" means we don't honor updates for the rate based on ntp,
+> > 
+> >   which is probably better as the ntp state might be observable
+> >   over the net (it probably doesn't matter, but it can't hurt)
+> 
+> So... this feels like a very vague explanation, and the lack of
+> frequency correction here probably need a really good comment. Keeping
+> multiple time domains is usually asking for trouble, but we added the
+> MONOTONIC_RAW clock to address a few cases where people really wanted
+> an abstract hardware counter, which was unaffected by frequency
+> corrections. I'd really make sure its clear why this is what you want
+> vs the standard system time domain so we don't run into problems
+> understanding it later.
+
+Perfect, that is what I would be interested in.
+> 
+> > - "fast" means that in very rare cases, the time might appear
+> > 
+> >   to go backwards (it probably can't happen here because you are not
+> >   called in an NMI).
+> 
+> "fast" really means "safe-for-nmi wrt to locking".  The tradeoff being
+> that when frequency adjustments occur, and if your code is delayed,
+> you might see time go backwards by a small amount. This allows
+
+My code would not see that as an issue.
+
+> tracing/sched code (or other code called from NMI)  to not have to
+> duplicate the timekeeping infrastructure.
+> 
+> I think without a much better explanation, using the "fast" method
+> isn't really warranted here.
+
+Thanks a lot. With that, I would think that the proposed ktime_get_raw_fast_ns 
+is good for use, which is supported with testing on my system.
+> 
+> thanks
+> -john
+
+
+Ciao
+Stephan
