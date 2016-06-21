@@ -1,65 +1,101 @@
-From: John Stultz <john.stultz@linaro.org>
-Subject: Re: [PATCH] crypto: use timespec64 for jent_get_nstime
-Date: Tue, 21 Jun 2016 09:22:31 -0700
-Message-ID: <CALAqxLWan2_2HhChvq+fXKpP8CyURwj-ccdnmfEve4LTOza=mg@mail.gmail.com>
-References: <20160617155952.1021006-1-arnd@arndb.de>
- <10630099.jHjGp8aIto@positron.chronox.de>
- <3776557.os2uYrMn6M@wuerfel>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v5 0/7] /dev/random - a new approach
+Date: Tue, 21 Jun 2016 18:28:40 +0200
+Message-ID: <183335903.ioesrD1Ugf@tauon.atsec.com>
+References: <2754489.L1QYabbYUc@positron.chronox.de> <24059874.5WizEqNrfz@tauon.atsec.com> <e2612733-f3c1-bdc0-5822-3f20c44fe781@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- Alexander Kuleshov <kuleshovmail@gmail.com>,
- Stephan Mueller <smueller@chronox.de>, lkml <linux-kernel@vger.kernel.org>,
- y2038 Mailman List <y2038@lists.linaro.org>, linux-crypto@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Kees Cook <keescook@chromium.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <y2038-bounces@lists.linaro.org>
-In-Reply-To: <3776557.os2uYrMn6M@wuerfel>
-List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
-List-Archive: <http://lists.linaro.org/pipermail/y2038/>
-List-Post: <mailto:y2038@lists.linaro.org>
-List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
-List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=subscribe>
-Errors-To: y2038-bounces@lists.linaro.org
-Sender: "Y2038" <y2038-bounces@lists.linaro.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Nikos Mavrogiannopoulos <nmav@gnutls.org>,
+	Theodore Ts'o <tytso@mit.edu>, Pavel Machek <pavel@ucw.cz>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Andi Kleen <andi@firstfloor.org>,
+	Sandy Harris <sandyinchina@gmail.com>,
+	Jason Cooper <cryptography@lakedaemon.net>,
+	John Denker <jsd@av8n.com>,
+	"H. Peter Anvin" <hpa@linux.intel.com>,
+	Joe Perches <joe@perches.com>,
+	George Spelvin <linux@horizon.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: "Austin S. Hemmelgarn" <ahferroin7@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <e2612733-f3c1-bdc0-5822-3f20c44fe781@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gVHVlLCBKdW4gMjEsIDIwMTYgYXQgMTozMiBBTSwgQXJuZCBCZXJnbWFubiA8YXJuZEBhcm5k
-Yi5kZT4gd3JvdGU6Cj4gT24gVHVlc2RheSwgSnVuZSAyMSwgMjAxNiA4OjIwOjEwIEFNIENFU1Qg
-U3RlcGhhbiBNdWVsbGVyIHdyb3RlOgo+PiBBbSBGcmVpdGFnLCAxNy4gSnVuaSAyMDE2LCAxNzo1
-OTo0MSBzY2hyaWViIEFybmQgQmVyZ21hbm46Cj4+Cj4gQ29tcGFyZWQgdG8gdGhlIHByZXZpb3Vz
-IF9fZ2V0bnN0aW1lb2ZkYXkoKSwgdGhlIGRpZmZlcmVuY2UgaXMKPgo+IC0gdXNpbmcgIm1vbm90
-b25pYyIgdGltZWJhc2UgaW5zdGVhZCBvZiAicmVhbCIsIHNvIHRoZSB6ZXJvIHRpbWUKPiAgIGlz
-IHdoZW4gdGhlIHN5c3RlbSBib290ZWQgcmF0aGVyIHRoYW4gSmFuIDEgMTk3MAoKSSBoYXZlbid0
-IGxvb2tlZCBhdCB0aGUgZGV0YWlscyBvZiB0aGUgY2FsbGluZyBjb2RlLCBidXQgSSdkIHdvcnJ5
-IGZvcgpjcnlwdG8gdXNlcywgZXNwZWNpYWxseSBpZiBpdHMgYmVpbmcgdXNlZCBmb3IgZW50cm9w
-eSBjb2xsZWN0aW9uLAp1c2luZyB0aGUgbW9ub3RvbmljIGNsb2NrIGluc3RlYWQgb2YgdGhlIHJl
-YWx0aW1lIGNsb2NrIG1pZ2h0IGJlCnByb2JsZW1hdGljLgoKPiAtICJyYXciIG1lYW5zIHdlIGRv
-bid0IGhvbm9yIHVwZGF0ZXMgZm9yIHRoZSByYXRlIGJhc2VkIG9uIG50cCwKPiAgIHdoaWNoIGlz
-IHByb2JhYmx5IGJldHRlciBhcyB0aGUgbnRwIHN0YXRlIG1pZ2h0IGJlIG9ic2VydmFibGUKPiAg
-IG92ZXIgdGhlIG5ldCAoaXQgcHJvYmFibHkgZG9lc24ndCBtYXR0ZXIsIGJ1dCBpdCBjYW4ndCBo
-dXJ0KQoKU28uLi4gdGhpcyBmZWVscyBsaWtlIGEgdmVyeSB2YWd1ZSBleHBsYW5hdGlvbiwgYW5k
-IHRoZSBsYWNrIG9mCmZyZXF1ZW5jeSBjb3JyZWN0aW9uIGhlcmUgcHJvYmFibHkgbmVlZCBhIHJl
-YWxseSBnb29kIGNvbW1lbnQuIEtlZXBpbmcKbXVsdGlwbGUgdGltZSBkb21haW5zIGlzIHVzdWFs
-bHkgYXNraW5nIGZvciB0cm91YmxlLCBidXQgd2UgYWRkZWQgdGhlCk1PTk9UT05JQ19SQVcgY2xv
-Y2sgdG8gYWRkcmVzcyBhIGZldyBjYXNlcyB3aGVyZSBwZW9wbGUgcmVhbGx5IHdhbnRlZAphbiBh
-YnN0cmFjdCBoYXJkd2FyZSBjb3VudGVyLCB3aGljaCB3YXMgdW5hZmZlY3RlZCBieSBmcmVxdWVu
-Y3kKY29ycmVjdGlvbnMuIEknZCByZWFsbHkgbWFrZSBzdXJlIGl0cyBjbGVhciB3aHkgdGhpcyBp
-cyB3aGF0IHlvdSB3YW50CnZzIHRoZSBzdGFuZGFyZCBzeXN0ZW0gdGltZSBkb21haW4gc28gd2Ug
-ZG9uJ3QgcnVuIGludG8gcHJvYmxlbXMKdW5kZXJzdGFuZGluZyBpdCBsYXRlci4KCj4gLSAiZmFz
-dCIgbWVhbnMgdGhhdCBpbiB2ZXJ5IHJhcmUgY2FzZXMsIHRoZSB0aW1lIG1pZ2h0IGFwcGVhcgo+
-ICAgdG8gZ28gYmFja3dhcmRzIChpdCBwcm9iYWJseSBjYW4ndCBoYXBwZW4gaGVyZSBiZWNhdXNl
-IHlvdSBhcmUgbm90Cj4gICBjYWxsZWQgaW4gYW4gTk1JKS4KCiJmYXN0IiByZWFsbHkgbWVhbnMg
-InNhZmUtZm9yLW5taSB3cnQgdG8gbG9ja2luZyIuICBUaGUgdHJhZGVvZmYgYmVpbmcKdGhhdCB3
-aGVuIGZyZXF1ZW5jeSBhZGp1c3RtZW50cyBvY2N1ciwgYW5kIGlmIHlvdXIgY29kZSBpcyBkZWxh
-eWVkLAp5b3UgbWlnaHQgc2VlIHRpbWUgZ28gYmFja3dhcmRzIGJ5IGEgc21hbGwgYW1vdW50LiBU
-aGlzIGFsbG93cwp0cmFjaW5nL3NjaGVkIGNvZGUgKG9yIG90aGVyIGNvZGUgY2FsbGVkIGZyb20g
-Tk1JKSAgdG8gbm90IGhhdmUgdG8KZHVwbGljYXRlIHRoZSB0aW1la2VlcGluZyBpbmZyYXN0cnVj
-dHVyZS4KCkkgdGhpbmsgd2l0aG91dCBhIG11Y2ggYmV0dGVyIGV4cGxhbmF0aW9uLCB1c2luZyB0
-aGUgImZhc3QiIG1ldGhvZAppc24ndCByZWFsbHkgd2FycmFudGVkIGhlcmUuCgp0aGFua3MKLWpv
-aG4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KWTIwMzgg
-bWFpbGluZyBsaXN0ClkyMDM4QGxpc3RzLmxpbmFyby5vcmcKaHR0cHM6Ly9saXN0cy5saW5hcm8u
-b3JnL21haWxtYW4vbGlzdGluZm8veTIwMzgK
+Am Dienstag, 21. Juni 2016, 12:03:56 schrieb Austin S. Hemmelgarn:
+
+Hi Austin,
+
+> On 2016-06-21 03:32, Stephan Mueller wrote:
+> > Am Dienstag, 21. Juni 2016, 09:12:07 schrieb Nikos Mavrogiannopoulos:
+> > 
+> > Hi Nikos,
+> > 
+> >> On Mon, Jun 20, 2016 at 5:43 PM, Stephan Mueller <smueller@chronox.de>
+> > 
+> > wrote:
+> >>>> Personally, I don't really use /dev/random, nor would I recommend it
+> >>>> for most application programmers.  At this point, getrandom(2) really
+> >>>> is the preferred interface unless you have some very specialized
+> >>>> needs.
+> >>> 
+> >>> I fully agree. But there are use cases for /dev/random, notably as a
+> >>> seed
+> >>> source for other DRNG.
+> >> 
+> >> Is that really the case? I believe all DRNG's use /dev/urandom anyway
+> >> for seeding since they cannot afford indeterminate blocking. It would
+> >> be a gain for everyone if /dev/random was the same as /dev/urandom in
+> >> Linux.
+> > 
+> > For standard approaches, this is true. But there are regulations, notably
+> > in the German realm, /dev/random shall be used, at least partially (see
+> > AIS 20/31).
+> 
+> Which just goes to show how utterly stupid some people who write laws
+> and regulations are.  Saying specifically that '/dev/random shall be
+> used' does not enforce any improvement of entrophic value in the data at
+> all, it just coincidentally improves the theoretical quality of the data
+> because of how Linux and some legacy UNIX systems are designed.  This
+> 'regulation' already provides zero benefit other than a placebo effect
+> on at least OpenBSD, FreeBSD, and I'm pretty certain most other BSD
+> derivatives, as /dev/random and /dev/urandom point to the same thing
+> there (on OpenBSD it's an arcfour based drbg, FreeBSD does similar but
+> uses a CSPRNG called Fortuna), and while I'm not certain, I believe AIX
+> does likewise (although they use a design based on yarrow).
+
+It is NOT utterly stupid, you should listen to the reasons. The core reason is 
+explained with the following analogy:
+
+/dev/urandom, for a short period of time, operates as a DRNG. For the sake of 
+discussion, let us assume that it is a DRNG which is, for the sake of 
+discussion, seeded with 256 bits of entropy.
+
+Now, you pull 256 bits out of it, you have 256 bits of entropy.
+
+You pull again 256 bit out of it -- what entropy do you have? You do NOT have 
+*again* 256 bits of entropy. All you can say is the entire generated 512 bits 
+have collectively 256 bits of entropy. And so on and so forth.
+
+Now, if you want to say that your newly spawned DRNG is seeded with X amount 
+of entropy, the DRNG nature of /dev/urandom makes such a statement a 
+challenge. The easy way out of the challenge is to use /dev/random (I am aware 
+of the fact that the DRNG has a computational strength, but it is not, well, 
+entropy).
+
+In addition, when using /dev/urandom, you have to show that at the time you 
+seed the DRNG, it is fully seeded. That is a challenge at boot time - a 
+challenge this entire thread revolves around. Yes, getrandom(2) is the way 
+out, but not everybody uses it. Again, /dev/random does NOT have this 
+challenge.
+> 
+> On top of that though, just because some poorly thought out standard
+> requires it's usage doesn't mean we have to work based on that.
+
+I cannot concur.
+
+
+Ciao
+Stephan
