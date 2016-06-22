@@ -1,46 +1,38 @@
-From: Andy Lutomirski <luto@amacapital.net>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 Subject: Re: Doing crypto in small stack buffers (bluetooth vs vmalloc-stack
  crash, etc)
-Date: Tue, 21 Jun 2016 17:52:23 -0700
-Message-ID: <CALCETrUnzasc+c5Dxmw+g6U07dTNU4RF0ug1bHj8j2en+7Xj1A@mail.gmail.com>
+Date: Wed, 22 Jun 2016 08:42:14 +0800
+Message-ID: <20160622004214.GA27134@gondor.apana.org.au>
 References: <CALCETrVJzzKkRsSbgsUmVd_+ArKEgoRSVdG1tVp7CXzFoPyVgA@mail.gmail.com>
- <20160622004214.GA27134@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Andy Lutomirski <luto@kernel.org>, linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f46.google.com ([209.85.213.46]:36093 "EHLO
-	mail-vk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750890AbcFVA6A (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 21 Jun 2016 20:58:00 -0400
-Received: by mail-vk0-f46.google.com with SMTP id u64so42850908vkf.3
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Jun 2016 17:58:00 -0700 (PDT)
-In-Reply-To: <20160622004214.GA27134@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Johan Hedberg <johan.hedberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Gustavo Padovan <gustavo-THi1TnShQwVAfugRpC6u6w@public.gmane.org>,
+	Marcel Holtmann <marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+To: Andy Lutomirski <luto-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Return-path: <linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <CALCETrVJzzKkRsSbgsUmVd_+ArKEgoRSVdG1tVp7CXzFoPyVgA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jun 21, 2016 at 5:42 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Tue, Jun 21, 2016 at 10:43:40AM -0700, Andy Lutomirski wrote:
->>
->> Is there a straightforward way that bluetooth and, potentially, other
->> drivers can just do synchronous crypto in a small buffer specified by
->> its virtual address?  The actual cryptography part of the crypto code
->> already works this way, but I can't find an API for it.
+On Tue, Jun 21, 2016 at 10:43:40AM -0700, Andy Lutomirski wrote:
 >
-> Yes, single block users should use crypto_cipher_encrypt_one, an
-> example would be drivers/md/dm-crypt.c.
->
+> Is there a straightforward way that bluetooth and, potentially, other
+> drivers can just do synchronous crypto in a small buffer specified by
+> its virtual address?  The actual cryptography part of the crypto code
+> already works this way, but I can't find an API for it.
 
-Aha!  I expected something like that to exist, but I couldn't find it.
-I'll change the two offenders I've found so far to use it.
+Yes, single block users should use crypto_cipher_encrypt_one, an
+example would be drivers/md/dm-crypt.c.
 
---Andy
+Cheers,
+-- 
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
