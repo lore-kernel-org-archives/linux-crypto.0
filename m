@@ -1,20 +1,19 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 02/10] crypto: marvell: Check engine is not already
- running when enabling a req
-Date: Wed, 22 Jun 2016 18:33:24 +0800
-Message-ID: <20160622103324.GA30918@gondor.apana.org.au>
-References: <1466496520-28806-3-git-send-email-romain.perier@free-electrons.com>
+Subject: Re: [[PATCH v2] 11/11] hwrng: exynos - fixup IO accesors
+Date: Wed, 22 Jun 2016 18:37:05 +0800
+Message-ID: <20160622103705.GA30967@gondor.apana.org.au>
+References: <1466504432-24187-12-git-send-email-ben.dooks@codethink.co.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: thomas.petazzoni@free-electrons.com, boris.brezillon@free-electrons.com,
- linux@arm.linux.org.uk, arno@natisbad.org, linux-crypto@vger.kernel.org,
- gregory.clement@free-electrons.com, davem@davemloft.net,
+Cc: linux-kernel@lists.codethink.co.uk, k.kozlowski@samsung.com,
+ linux-samsung-soc@vger.kernel.org, matthew.leach@codethink.co.uk,
+ ben.dooks@codethink.co.uk, linux-crypto@vger.kernel.org, mpm@selenic.com,
  linux-arm-kernel@lists.infradead.org
-To: Romain Perier <romain.perier@free-electrons.com>
+To: Ben Dooks <ben.dooks@codethink.co.uk>
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <1466496520-28806-3-git-send-email-romain.perier@free-electrons.com>
+In-Reply-To: <1466504432-24187-12-git-send-email-ben.dooks@codethink.co.uk>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -26,18 +25,15 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Romain Perier <romain.perier@free-electrons.com> wrote:
-> Add a BUG_ON() call when the driver tries to launch a crypto request
-> while the engine is still processing the previous one. This replaces
-> a silent system hang by a verbose kernel panic with the associated
-> backtrace to let the user know that something went wrong in the CESA
-> driver.
+Ben Dooks <ben.dooks@codethink.co.uk> wrote:
+> The __raw IO functions are not endian safe, so use the readl_relaxed
+> and writel_relaxed versions of these.
+> 
+> Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
 
-Hmm, so how can this happen? If it is triggerable then we better
-try to recover from it more gracefully.  If it is not triggerable
-then why bother?
+This patch has already been merged.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
