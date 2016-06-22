@@ -1,699 +1,95 @@
-From: Salvatore Benedetto <salvatore.benedetto@intel.com>
-Subject: [PATCH v11 1/3] crypto: Key-agreement Protocol Primitives API (KPP)
-Date: Wed, 22 Jun 2016 17:49:13 +0100
-Message-ID: <1466614155-24840-2-git-send-email-salvatore.benedetto@intel.com>
-References: <1466614155-24840-1-git-send-email-salvatore.benedetto@intel.com>
-Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:61718 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751781AbcFVQt2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jun 2016 12:49:28 -0400
-In-Reply-To: <1466614155-24840-1-git-send-email-salvatore.benedetto@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v2] crypto: Jitter RNG - use ktime_get_ns as fallback
+Date: Wed, 22 Jun 2016 19:26:06 +0200
+Message-ID: <2249326.PVY2Dy3CIm@positron.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Alexander Kuleshov <kuleshovmail@gmail.com>,
+	y2038 Mailman List <y2038@lists.linaro.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Kees Cook <keescook@chromium.org>
+To: herbert@gondor.apana.org.au, John Stultz <john.stultz@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add key-agreement protocol primitives (kpp) API which allows to
-implement primitives required by protocols such as DH and ECDH.
-The API is composed mainly by the following functions
- * set_secret() - It allows the user to set his secret, also
-   referred to as his private key, along with the parameters
-   known to both parties involved in the key-agreement session.
- * generate_public_key() - It generates the public key to be sent to
-   the other counterpart involved in the key-agreement session. The
-   function has to be called after set_params() and set_secret()
- * generate_secret() - It generates the shared secret for the session
+Hi John, Herbert,
 
-Other functions such as init() and exit() are provided for allowing
-cryptographic hardware to be inizialized properly before use
+Changes v2: use ktime_get_ns instead of ktime_get_raw_ns
 
-Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
+The testing was re-performed and indicate no difference to the previous testing.
+
+Ciao
+Stephan
+
+---8<---
+
+As part of the Y2038 development, __getnstimeofday is not supposed to be
+used any more. It is now replaced with ktime_get_ns. The Jitter RNG uses
+the time stamp to measure the execution time of a given code path and
+tries to detect variations in the execution time. Therefore, the only
+requirement the Jitter RNG has, is a sufficient high resolution to
+detect these variations.
+
+The change was tested on x86 to show an identical behavior as RDTSC. The
+used test code simply measures the execution time of the heart of the
+RNG:
+
+        jent_get_nstime(&time);
+        jent_memaccess(ec, min);
+        jent_fold_time(NULL, time, &folded, min);
+        jent_get_nstime(&time2);
+        return ((time2 - time));
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/Kconfig                  |  10 ++
- crypto/Makefile                 |   1 +
- crypto/crypto_user.c            |  20 +++
- crypto/kpp.c                    | 123 +++++++++++++++
- include/crypto/internal/kpp.h   |  64 ++++++++
- include/crypto/kpp.h            | 328 ++++++++++++++++++++++++++++++++++++++++
- include/linux/crypto.h          |   1 +
- include/uapi/linux/cryptouser.h |   5 +
- 8 files changed, 552 insertions(+)
- create mode 100644 crypto/kpp.c
- create mode 100644 include/crypto/internal/kpp.h
- create mode 100644 include/crypto/kpp.h
+ crypto/jitterentropy-kcapi.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 6881d1a..e72c427 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -93,6 +93,15 @@ config CRYPTO_AKCIPHER
- 	select CRYPTO_AKCIPHER2
- 	select CRYPTO_ALGAPI
- 
-+config CRYPTO_KPP2
-+	tristate
-+	select CRYPTO_ALGAPI2
-+
-+config CRYPTO_KPP
-+	tristate
-+	select CRYPTO_ALGAPI
-+	select CRYPTO_KPP2
-+
- config CRYPTO_RSA
- 	tristate "RSA algorithm"
- 	select CRYPTO_AKCIPHER
-@@ -115,6 +124,7 @@ config CRYPTO_MANAGER2
- 	select CRYPTO_HASH2
- 	select CRYPTO_BLKCIPHER2
- 	select CRYPTO_AKCIPHER2
-+	select CRYPTO_KPP2
- 
- config CRYPTO_USER
- 	tristate "Userspace cryptographic algorithm configuration"
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 0b82c47..07b0f51 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -30,6 +30,7 @@ crypto_hash-y += shash.o
- obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
- 
- obj-$(CONFIG_CRYPTO_AKCIPHER2) += akcipher.o
-+obj-$(CONFIG_CRYPTO_KPP2) += kpp.o
- 
- $(obj)/rsapubkey-asn1.o: $(obj)/rsapubkey-asn1.c $(obj)/rsapubkey-asn1.h
- $(obj)/rsaprivkey-asn1.o: $(obj)/rsaprivkey-asn1.c $(obj)/rsaprivkey-asn1.h
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index f71960d..e7a0a9d 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -28,6 +28,7 @@
- #include <crypto/internal/skcipher.h>
- #include <crypto/internal/rng.h>
- #include <crypto/akcipher.h>
-+#include <crypto/kpp.h>
- 
- #include "internal.h"
- 
-@@ -126,6 +127,21 @@ nla_put_failure:
- 	return -EMSGSIZE;
+diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+index 597cedd..be1577c 100644
+--- a/crypto/jitterentropy-kcapi.c
++++ b/crypto/jitterentropy-kcapi.c
+@@ -87,24 +87,28 @@ void jent_memcpy(void *dest, const void *src, unsigned int n)
+ 	memcpy(dest, src, n);
  }
  
-+static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	struct crypto_report_kpp rkpp;
-+
-+	strncpy(rkpp.type, "kpp", sizeof(rkpp.type));
-+
-+	if (nla_put(skb, CRYPTOCFGA_REPORT_KPP,
-+		    sizeof(struct crypto_report_kpp), &rkpp))
-+		goto nla_put_failure;
-+	return 0;
-+
-+nla_put_failure:
-+	return -EMSGSIZE;
-+}
-+
- static int crypto_report_one(struct crypto_alg *alg,
- 			     struct crypto_user_alg *ualg, struct sk_buff *skb)
++/*
++ * Obtain a high-resolution time stamp value. The time stamp is used to measure
++ * the execution time of a given code path and its variations. Hence, the time
++ * stamp must have a sufficiently high resolution.
++ *
++ * Note, if the function returns zero because a given architecture does not
++ * implement a high-resolution time stamp, the RNG code's runtime test
++ * will detect it and will not produce output.
++ */
+ void jent_get_nstime(__u64 *out)
  {
-@@ -176,6 +192,10 @@ static int crypto_report_one(struct crypto_alg *alg,
- 			goto nla_put_failure;
+-	struct timespec ts;
+ 	__u64 tmp = 0;
  
- 		break;
-+	case CRYPTO_ALG_TYPE_KPP:
-+		if (crypto_report_kpp(skb, alg))
-+			goto nla_put_failure;
-+		break;
- 	}
+ 	tmp = random_get_entropy();
  
- out:
-diff --git a/crypto/kpp.c b/crypto/kpp.c
-new file mode 100644
-index 0000000..d36ce05
---- /dev/null
-+++ b/crypto/kpp.c
-@@ -0,0 +1,123 @@
-+/*
-+ * Key-agreement Protocol Primitives (KPP)
-+ *
-+ * Copyright (c) 2016, Intel Corporation
-+ * Authors: Salvatore Benedetto <salvatore.benedetto@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+#include <linux/errno.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/seq_file.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/crypto.h>
-+#include <crypto/algapi.h>
-+#include <linux/cryptouser.h>
-+#include <net/netlink.h>
-+#include <crypto/kpp.h>
-+#include <crypto/internal/kpp.h>
-+#include "internal.h"
-+
-+#ifdef CONFIG_NET
-+static int crypto_kpp_report(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	struct crypto_report_kpp rkpp;
-+
-+	strncpy(rkpp.type, "kpp", sizeof(rkpp.type));
-+
-+	if (nla_put(skb, CRYPTOCFGA_REPORT_KPP,
-+		    sizeof(struct crypto_report_kpp), &rkpp))
-+		goto nla_put_failure;
-+	return 0;
-+
-+nla_put_failure:
-+	return -EMSGSIZE;
-+}
-+#else
-+static int crypto_kpp_report(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	return -ENOSYS;
-+}
-+#endif
-+
-+static void crypto_kpp_show(struct seq_file *m, struct crypto_alg *alg)
-+	__attribute__ ((unused));
-+
-+static void crypto_kpp_show(struct seq_file *m, struct crypto_alg *alg)
-+{
-+	seq_puts(m, "type         : kpp\n");
-+}
-+
-+static void crypto_kpp_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_kpp *kpp = __crypto_kpp_tfm(tfm);
-+	struct kpp_alg *alg = crypto_kpp_alg(kpp);
-+
-+	alg->exit(kpp);
-+}
-+
-+static int crypto_kpp_init_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_kpp *kpp = __crypto_kpp_tfm(tfm);
-+	struct kpp_alg *alg = crypto_kpp_alg(kpp);
-+
-+	if (alg->exit)
-+		kpp->base.exit = crypto_kpp_exit_tfm;
-+
-+	if (alg->init)
-+		return alg->init(kpp);
-+
-+	return 0;
-+}
-+
-+static const struct crypto_type crypto_kpp_type = {
-+	.extsize = crypto_alg_extsize,
-+	.init_tfm = crypto_kpp_init_tfm,
-+#ifdef CONFIG_PROC_FS
-+	.show = crypto_kpp_show,
-+#endif
-+	.report = crypto_kpp_report,
-+	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
-+	.maskset = CRYPTO_ALG_TYPE_MASK,
-+	.type = CRYPTO_ALG_TYPE_KPP,
-+	.tfmsize = offsetof(struct crypto_kpp, base),
-+};
-+
-+struct crypto_kpp *crypto_alloc_kpp(const char *alg_name, u32 type, u32 mask)
-+{
-+	return crypto_alloc_tfm(alg_name, &crypto_kpp_type, type, mask);
-+}
-+EXPORT_SYMBOL_GPL(crypto_alloc_kpp);
-+
-+static void kpp_prepare_alg(struct kpp_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
-+
-+	base->cra_type = &crypto_kpp_type;
-+	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
-+	base->cra_flags |= CRYPTO_ALG_TYPE_KPP;
-+}
-+
-+int crypto_register_kpp(struct kpp_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
-+
-+	kpp_prepare_alg(alg);
-+	return crypto_register_alg(base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_register_kpp);
-+
-+void crypto_unregister_kpp(struct kpp_alg *alg)
-+{
-+	crypto_unregister_alg(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_unregister_kpp);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Key-agreement Protocol Primitives");
-diff --git a/include/crypto/internal/kpp.h b/include/crypto/internal/kpp.h
-new file mode 100644
-index 0000000..ad3acf3
---- /dev/null
-+++ b/include/crypto/internal/kpp.h
-@@ -0,0 +1,64 @@
-+/*
-+ * Key-agreement Protocol Primitives (KPP)
-+ *
-+ * Copyright (c) 2016, Intel Corporation
-+ * Authors: Salvatore Benedetto <salvatore.benedetto@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+#ifndef _CRYPTO_KPP_INT_H
-+#define _CRYPTO_KPP_INT_H
-+#include <crypto/kpp.h>
-+#include <crypto/algapi.h>
-+
-+/*
-+ * Transform internal helpers.
-+ */
-+static inline void *kpp_request_ctx(struct kpp_request *req)
-+{
-+	return req->__ctx;
-+}
-+
-+static inline void *kpp_tfm_ctx(struct crypto_kpp *tfm)
-+{
-+	return tfm->base.__crt_ctx;
-+}
-+
-+static inline void kpp_request_complete(struct kpp_request *req, int err)
-+{
-+	req->base.complete(&req->base, err);
-+}
-+
-+static inline const char *kpp_alg_name(struct crypto_kpp *tfm)
-+{
-+	return crypto_kpp_tfm(tfm)->__crt_alg->cra_name;
-+}
-+
-+/**
-+ * crypto_register_kpp() -- Register key-agreement protocol primitives algorithm
-+ *
-+ * Function registers an implementation of a key-agreement protocol primitive
-+ * algorithm
-+ *
-+ * @alg:	algorithm definition
-+ *
-+ * Return: zero on success; error code in case of error
-+ */
-+int crypto_register_kpp(struct kpp_alg *alg);
-+
-+/**
-+ * crypto_unregister_kpp() -- Unregister key-agreement protocol primitive
-+ * algorithm
-+ *
-+ * Function unregisters an implementation of a key-agreement protocol primitive
-+ * algorithm
-+ *
-+ * @alg:	algorithm definition
-+ */
-+void crypto_unregister_kpp(struct kpp_alg *alg);
-+
-+#endif
-diff --git a/include/crypto/kpp.h b/include/crypto/kpp.h
-new file mode 100644
-index 0000000..4fa897f
---- /dev/null
-+++ b/include/crypto/kpp.h
-@@ -0,0 +1,328 @@
-+/*
-+ * Key-agreement Protocol Primitives (KPP)
-+ *
-+ * Copyright (c) 2016, Intel Corporation
-+ * Authors: Salvatore Benedetto <salvatore.benedetto@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+
-+#ifndef _CRYPTO_KPP_
-+#define _CRYPTO_KPP_
-+#include <linux/crypto.h>
-+
-+/**
-+ * struct kpp_request
-+ *
-+ * @base:	Common attributes for async crypto requests
-+ * @src:	Source data
-+ * @dst:	Destination data
-+ * @src_len:	Size of the input buffer
-+ * @dst_len:	Size of the output buffer. It needs to be at least
-+ *		as big as the expected result depending	on the operation
-+ *		After operation it will be updated with the actual size of the
-+ *		result. In case of error where the dst sgl size was insufficient,
-+ *		it will be updated to the size required for the operation.
-+ * @__ctx:	Start of private context data
-+ */
-+struct kpp_request {
-+	struct crypto_async_request base;
-+	struct scatterlist *src;
-+	struct scatterlist *dst;
-+	unsigned int src_len;
-+	unsigned int dst_len;
-+	void *__ctx[] CRYPTO_MINALIGN_ATTR;
-+};
-+
-+/**
-+ * struct crypto_kpp - user-instantiated object which encapsulate
-+ * algorithms and core processing logic
-+ *
-+ * @base:	Common crypto API algorithm data structure
-+ */
-+struct crypto_kpp {
-+	struct crypto_tfm base;
-+};
-+
-+/**
-+ * struct kpp_alg - generic key-agreement protocol primitives
-+ *
-+ * @set_secret:		Function invokes the protocol specific function to
-+ *			store the secret private key along with parameters.
-+ *			The implementation knows how to decode thie buffer
-+ * @generate_public_key: Function generate the public key to be sent to the
-+ *			counterpart. In case of error, where output is not big
-+ *			enough req->dst_len will be updated to the size
-+ *			required
-+ * @compute_shared_secret: Function compute the shared secret as defined by
-+ *			the algorithm. The result is given back to the user.
-+ *			In case of error, where output is not big enough,
-+ *			req->dst_len will be updated to the size required
-+ * @max_size:		Function returns the size of the output buffer
-+ * @init:		Initialize the object. This is called only once at
-+ *			instantiation time. In case the cryptographic hardware
-+ *			needs to be initialized. Software fallback should be
-+ *			put in place here.
-+ * @exit:		Undo everything @init did.
-+ *
-+ * @reqsize:		Request context size required by algorithm
-+ *			implementation
-+ * @base		Common crypto API algorithm data structure
-+ */
-+struct kpp_alg {
-+	int (*set_secret)(struct crypto_kpp *tfm, void *buffer,
-+			  unsigned int len);
-+	int (*generate_public_key)(struct kpp_request *req);
-+	int (*compute_shared_secret)(struct kpp_request *req);
-+
-+	int (*max_size)(struct crypto_kpp *tfm);
-+
-+	int (*init)(struct crypto_kpp *tfm);
-+	void (*exit)(struct crypto_kpp *tfm);
-+
-+	unsigned int reqsize;
-+	struct crypto_alg base;
-+};
-+
-+/**
-+ * DOC: Generic Key-agreement Protocol Primitevs API
-+ *
-+ * The KPP API is used with the algorithm type
-+ * CRYPTO_ALG_TYPE_KPP (listed as type "kpp" in /proc/crypto)
-+ */
-+
-+/**
-+ * crypto_alloc_kpp() - allocate KPP tfm handle
-+ * @alg_name: is the name of the kpp algorithm (e.g. "dh", "ecdh")
-+ * @type: specifies the type of the algorithm
-+ * @mask: specifies the mask for the algorithm
-+ *
-+ * Allocate a handle for kpp algorithm. The returned struct crypto_kpp
-+ * is requeried for any following API invocation
-+ *
-+ * Return: allocated handle in case of success; IS_ERR() is true in case of
-+ *	   an error, PTR_ERR() returns the error code.
-+ */
-+struct crypto_kpp *crypto_alloc_kpp(const char *alg_name, u32 type, u32 mask);
-+
-+static inline struct crypto_tfm *crypto_kpp_tfm(struct crypto_kpp *tfm)
-+{
-+	return &tfm->base;
-+}
-+
-+static inline struct kpp_alg *__crypto_kpp_alg(struct crypto_alg *alg)
-+{
-+	return container_of(alg, struct kpp_alg, base);
-+}
-+
-+static inline struct crypto_kpp *__crypto_kpp_tfm(struct crypto_tfm *tfm)
-+{
-+	return container_of(tfm, struct crypto_kpp, base);
-+}
-+
-+static inline struct kpp_alg *crypto_kpp_alg(struct crypto_kpp *tfm)
-+{
-+	return __crypto_kpp_alg(crypto_kpp_tfm(tfm)->__crt_alg);
-+}
-+
-+static inline unsigned int crypto_kpp_reqsize(struct crypto_kpp *tfm)
-+{
-+	return crypto_kpp_alg(tfm)->reqsize;
-+}
-+
-+static inline void kpp_request_set_tfm(struct kpp_request *req,
-+				       struct crypto_kpp *tfm)
-+{
-+	req->base.tfm = crypto_kpp_tfm(tfm);
-+}
-+
-+static inline struct crypto_kpp *crypto_kpp_reqtfm(struct kpp_request *req)
-+{
-+	return __crypto_kpp_tfm(req->base.tfm);
-+}
-+
-+/**
-+ * crypto_free_kpp() - free KPP tfm handle
-+ *
-+ * @tfm: KPP tfm handle allocated with crypto_alloc_kpp()
-+ */
-+static inline void crypto_free_kpp(struct crypto_kpp *tfm)
-+{
-+	crypto_destroy_tfm(tfm, crypto_kpp_tfm(tfm));
-+}
-+
-+/**
-+ * kpp_request_alloc() - allocates kpp request
-+ *
-+ * @tfm:	KPP tfm handle allocated with crypto_alloc_kpp()
-+ * @gfp:	allocation flags
-+ *
-+ * Return: allocated handle in case of success or NULL in case of an error.
-+ */
-+static inline struct kpp_request *kpp_request_alloc(struct crypto_kpp *tfm,
-+						    gfp_t gfp)
-+{
-+	struct kpp_request *req;
-+
-+	req = kmalloc(sizeof(*req) + crypto_kpp_reqsize(tfm), gfp);
-+	if (likely(req))
-+		kpp_request_set_tfm(req, tfm);
-+
-+	return req;
-+}
-+
-+/**
-+ * kpp_request_free() - zeroize and free kpp request
-+ *
-+ * @req:	request to free
-+ */
-+static inline void kpp_request_free(struct kpp_request *req)
-+{
-+	kzfree(req);
-+}
-+
-+/**
-+ * kpp_request_set_callback() - Sets an asynchronous callback.
-+ *
-+ * Callback will be called when an asynchronous operation on a given
-+ * request is finished.
-+ *
-+ * @req:	request that the callback will be set for
-+ * @flgs:	specify for instance if the operation may backlog
-+ * @cmpl:	callback which will be called
-+ * @data:	private data used by the caller
-+ */
-+static inline void kpp_request_set_callback(struct kpp_request *req,
-+					    u32 flgs,
-+					    crypto_completion_t cmpl,
-+					    void *data)
-+{
-+	req->base.complete = cmpl;
-+	req->base.data = data;
-+	req->base.flags = flgs;
-+}
-+
-+/**
-+ * kpp_request_set_input() - Sets input buffer
-+ *
-+ * Sets parameters required by generate_public_key
-+ *
-+ * @req:	kpp request
-+ * @input:	ptr to input scatter list
-+ * @input_len:	size of the input scatter list
-+ */
-+static inline void kpp_request_set_input(struct kpp_request *req,
-+					 struct scatterlist *input,
-+					 unsigned int input_len)
-+{
-+	req->src = input;
-+	req->src_len = input_len;
-+}
-+
-+/**
-+ * kpp_request_set_output() - Sets output buffer
-+ *
-+ * Sets parameters required by kpp operation
-+ *
-+ * @req:	kpp request
-+ * @output:	ptr to output scatter list
-+ * @output_len:	size of the output scatter list
-+ */
-+static inline void kpp_request_set_output(struct kpp_request *req,
-+					  struct scatterlist *output,
-+					  unsigned int output_len)
-+{
-+	req->dst = output;
-+	req->dst_len = output_len;
-+}
-+
-+enum {
-+	CRYPTO_KPP_SECRET_TYPE_UNKNOWN,
-+};
-+
-+/**
-+ * struct kpp_secret - small header for packing secret buffer
-+ *
-+ * @type:	define type of secret. Each kpp type will define its own
-+ * @len:	specify the len of the secret, include the header, that
-+ *		follows the struct
-+ */
-+struct kpp_secret {
-+	unsigned short type;
-+	unsigned short len;
-+};
-+
-+/**
-+ * crypto_kpp_set_secret() - Invoke kpp operation
-+ *
-+ * Function invokes the specific kpp operation for a given alg.
-+ *
-+ * @tfm:	tfm handle
-+ *
-+ * Return: zero on success; error code in case of error
-+ */
-+static inline int crypto_kpp_set_secret(struct crypto_kpp *tfm, void *buffer,
-+					unsigned int len)
-+{
-+	struct kpp_alg *alg = crypto_kpp_alg(tfm);
-+
-+	return alg->set_secret(tfm, buffer, len);
-+}
-+
-+/**
-+ * crypto_kpp_generate_public_key() - Invoke kpp operation
-+ *
-+ * Function invokes the specific kpp operation for generating the public part
-+ * for a given kpp algorithm
-+ *
-+ * @req:	kpp key request
-+ *
-+ * Return: zero on success; error code in case of error
-+ */
-+static inline int crypto_kpp_generate_public_key(struct kpp_request *req)
-+{
-+	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
-+	struct kpp_alg *alg = crypto_kpp_alg(tfm);
-+
-+	return alg->generate_public_key(req);
-+}
-+
-+/**
-+ * crypto_kpp_compute_shared_secret() - Invoke kpp operation
-+ *
-+ * Function invokes the specific kpp operation for computing the shared secret
-+ * for a given kpp algorithm.
-+ *
-+ * @req:	kpp key request
-+ *
-+ * Return: zero on success; error code in case of error
-+ */
-+static inline int crypto_kpp_compute_shared_secret(struct kpp_request *req)
-+{
-+	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
-+	struct kpp_alg *alg = crypto_kpp_alg(tfm);
-+
-+	return alg->compute_shared_secret(req);
-+}
-+
-+/**
-+ * crypto_kpp_maxsize() - Get len for output buffer
-+ *
-+ * Function returns the output buffer size required
-+ *
-+ * @tfm:	KPP tfm handle allocated with crypto_alloc_kpp()
-+ *
-+ * Return: minimum len for output buffer or error code if key hasn't been set
-+ */
-+static inline int crypto_kpp_maxsize(struct crypto_kpp *tfm)
-+{
-+	struct kpp_alg *alg = crypto_kpp_alg(tfm);
-+
-+	return alg->max_size(tfm);
-+}
-+
-+#endif
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index d844cbc..992cfc2 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -48,6 +48,7 @@
- #define CRYPTO_ALG_TYPE_BLKCIPHER	0x00000004
- #define CRYPTO_ALG_TYPE_ABLKCIPHER	0x00000005
- #define CRYPTO_ALG_TYPE_GIVCIPHER	0x00000006
-+#define CRYPTO_ALG_TYPE_KPP		0x00000008
- #define CRYPTO_ALG_TYPE_RNG		0x0000000c
- #define CRYPTO_ALG_TYPE_AKCIPHER	0x0000000d
- #define CRYPTO_ALG_TYPE_DIGEST		0x0000000e
-diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
-index 2e67bb6..79b5ded 100644
---- a/include/uapi/linux/cryptouser.h
-+++ b/include/uapi/linux/cryptouser.h
-@@ -45,6 +45,7 @@ enum crypto_attr_type_t {
- 	CRYPTOCFGA_REPORT_RNG,		/* struct crypto_report_rng */
- 	CRYPTOCFGA_REPORT_CIPHER,	/* struct crypto_report_cipher */
- 	CRYPTOCFGA_REPORT_AKCIPHER,	/* struct crypto_report_akcipher */
-+	CRYPTOCFGA_REPORT_KPP,		/* struct crypto_report_kpp */
- 	__CRYPTOCFGA_MAX
+ 	/*
+-	 * If random_get_entropy does not return a value (which is possible on,
+-	 * for example, MIPS), invoke __getnstimeofday
++	 * If random_get_entropy does not return a value, i.e. it is not
++	 * implemented for a given architecture, use a clock source.
+ 	 * hoping that there are timers we can work with.
+ 	 */
+-	if ((0 == tmp) &&
+-	   (0 == __getnstimeofday(&ts))) {
+-		tmp = ts.tv_sec;
+-		tmp = tmp << 32;
+-		tmp = tmp | ts.tv_nsec;
+-	}
++	if (tmp == 0)
++		tmp = ktime_get_ns();
  
- #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
-@@ -107,5 +108,9 @@ struct crypto_report_akcipher {
- 	char type[CRYPTO_MAX_NAME];
- };
- 
-+struct crypto_report_kpp {
-+	char type[CRYPTO_MAX_NAME];
-+};
-+
- #define CRYPTO_REPORT_MAXSIZE (sizeof(struct crypto_user_alg) + \
- 			       sizeof(struct crypto_report_blkcipher))
+ 	*out = tmp;
+ }
 -- 
-2.7.4
+2.5.5
