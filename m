@@ -1,7 +1,7 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCHv2 23/27] ARM: DRA7: hwmod: Add data for SHA IP
-Date: Wed, 22 Jun 2016 16:23:56 +0300
-Message-ID: <1466601840-18486-24-git-send-email-t-kristo@ti.com>
+Subject: [PATCHv2 12/27] crypto: engine: avoid unnecessary context switches
+Date: Wed, 22 Jun 2016 16:23:45 +0300
+Message-ID: <1466601840-18486-13-git-send-email-t-kristo@ti.com>
 References: <1466601840-18486-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,86 +10,75 @@ To: <linux-omap@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<tony@atomide.com>, <herbert@gondor.apana.org.au>,
 	<davem@davemloft.net>, <lokeshvutla@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:41247 "EHLO comal.ext.ti.com"
+Received: from arroyo.ext.ti.com ([198.47.19.12]:57940 "EHLO arroyo.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751287AbcFVN0D (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jun 2016 09:26:03 -0400
+	id S1752333AbcFVNZ0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Jun 2016 09:25:26 -0400
 In-Reply-To: <1466601840-18486-1-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Lokesh Vutla <lokeshvutla@ti.com>
+Crypto engine will now hi-jack the currently running thread for executing
+crypto functionality. Only if we are not running a thread (in interrupt
+context) the kthread will be scheduled.
 
-DRA7 SoC contains SHA crypto hardware accelerator. Add hwmod data for
-this IP so that it can be utilized by crypto frameworks.
+This will improve performance of crypto operations using crypto engine.
 
-Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- arch/arm/mach-omap2/omap_hwmod_7xx_data.c | 37 +++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ crypto/crypto_engine.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm/mach-omap2/omap_hwmod_7xx_data.c b/arch/arm/mach-omap2/omap_hwmod_7xx_data.c
-index ceb1b42..8932619 100644
---- a/arch/arm/mach-omap2/omap_hwmod_7xx_data.c
-+++ b/arch/arm/mach-omap2/omap_hwmod_7xx_data.c
-@@ -734,6 +734,34 @@ static struct omap_hwmod dra7xx_aes2_hwmod = {
- 	},
- };
+diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
+index a55c82d..aac5870 100644
+--- a/crypto/crypto_engine.c
++++ b/crypto/crypto_engine.c
+@@ -136,6 +136,14 @@ static void crypto_pump_work(struct kthread_work *work)
+ 	crypto_pump_requests(engine, true);
+ }
  
-+/* sha0 HIB2 (the 'P' (public) device) */
-+static struct omap_hwmod_class_sysconfig dra7xx_sha0_sysc = {
-+	.rev_offs	= 0x100,
-+	.sysc_offs	= 0x110,
-+	.syss_offs	= 0x114,
-+	.sysc_flags	= SYSS_HAS_RESET_STATUS,
-+};
++static void queue_pump_work(struct crypto_engine *engine)
++{
++	if (in_interrupt())
++		queue_kthread_work(&engine->kworker, &engine->pump_requests);
++	else
++		crypto_pump_requests(engine, true);
++}
 +
-+static struct omap_hwmod_class dra7xx_sha0_hwmod_class = {
-+	.name		= "sham",
-+	.sysc		= &dra7xx_sha0_sysc,
-+	.rev		= 2,
-+};
-+
-+struct omap_hwmod dra7xx_sha0_hwmod = {
-+	.name		= "sham",
-+	.class		= &dra7xx_sha0_hwmod_class,
-+	.clkdm_name	= "l4sec_clkdm",
-+	.main_clk	= "l3_iclk_div",
-+	.prcm		= {
-+		.omap4 = {
-+			.clkctrl_offs = DRA7XX_CM_L4SEC_SHA2MD51_CLKCTRL_OFFSET,
-+			.context_offs = DRA7XX_RM_L4SEC_SHA2MD51_CONTEXT_OFFSET,
-+			.modulemode   = MODULEMODE_HWCTRL,
-+		},
-+	},
-+};
-+
- /*
-  * 'elm' class
-  *
-@@ -3048,6 +3076,14 @@ static struct omap_hwmod_ocp_if dra7xx_l3_main_1__aes2 = {
- 	.user		= OCP_USER_MPU | OCP_USER_SDMA,
- };
+ /**
+  * crypto_transfer_request - transfer the new request into the engine queue
+  * @engine: the hardware engine
+@@ -156,10 +164,11 @@ int crypto_transfer_request(struct crypto_engine *engine,
  
-+/* l3_main_1 -> sha0 */
-+static struct omap_hwmod_ocp_if dra7xx_l3_main_1__sha0 = {
-+	.master		= &dra7xx_l3_main_1_hwmod,
-+	.slave		= &dra7xx_sha0_hwmod,
-+	.clk		= "l3_iclk_div",
-+	.user		= OCP_USER_MPU | OCP_USER_SDMA,
-+};
+ 	ret = ablkcipher_enqueue_request(&engine->queue, req);
+ 
++	spin_unlock_irqrestore(&engine->queue_lock, flags);
 +
- /* l4_per2 -> mcasp1 */
- static struct omap_hwmod_ocp_if dra7xx_l4_per2__mcasp1 = {
- 	.master		= &dra7xx_l4_per2_hwmod,
-@@ -3939,6 +3975,7 @@ static struct omap_hwmod_ocp_if *dra7xx_hwmod_ocp_ifs[] __initdata = {
- 	&dra7xx_l3_main_1__hdmi,
- 	&dra7xx_l3_main_1__aes1,
- 	&dra7xx_l3_main_1__aes2,
-+	&dra7xx_l3_main_1__sha0,
- 	&dra7xx_l4_per1__elm,
- 	&dra7xx_l4_wkup__gpio1,
- 	&dra7xx_l4_per1__gpio2,
+ 	if (!engine->busy && need_pump)
+-		queue_kthread_work(&engine->kworker, &engine->pump_requests);
++		queue_pump_work(engine);
+ 
+-	spin_unlock_irqrestore(&engine->queue_lock, flags);
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(crypto_transfer_request);
+@@ -210,7 +219,7 @@ void crypto_finalize_request(struct crypto_engine *engine,
+ 
+ 	req->base.complete(&req->base, err);
+ 
+-	queue_kthread_work(&engine->kworker, &engine->pump_requests);
++	queue_pump_work(engine);
+ }
+ EXPORT_SYMBOL_GPL(crypto_finalize_request);
+ 
+@@ -234,7 +243,7 @@ int crypto_engine_start(struct crypto_engine *engine)
+ 	engine->running = true;
+ 	spin_unlock_irqrestore(&engine->queue_lock, flags);
+ 
+-	queue_kthread_work(&engine->kworker, &engine->pump_requests);
++	queue_pump_work(engine);
+ 
+ 	return 0;
+ }
 -- 
 1.9.1
