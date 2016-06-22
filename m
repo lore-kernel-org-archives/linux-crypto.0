@@ -1,54 +1,66 @@
-From: "Benedetto, Salvatore" <salvatore.benedetto@intel.com>
-Subject: RE: [PATCH v10 2/3] crypto: kpp - Add DH software implementation
-Date: Wed, 22 Jun 2016 10:06:32 +0000
-Message-ID: <309B30E91F5E2846B79BD9AA9711D0319367A3@IRSMSX102.ger.corp.intel.com>
-References: <1466541931-2875-1-git-send-email-salvatore.benedetto@intel.com>
- <1466541931-2875-3-git-send-email-salvatore.benedetto@intel.com>
- <20160622005115.GB27134@gondor.apana.org.au>
- <309B30E91F5E2846B79BD9AA9711D03193664C@IRSMSX102.ger.corp.intel.com>
- <20160622064047.GA29318@gondor.apana.org.au>
- <309B30E91F5E2846B79BD9AA9711D0319366BB@IRSMSX102.ger.corp.intel.com>
- <20160622100341.GA30383@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"Benedetto, Salvatore" <salvatore.benedetto@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 5/8] crypto: rsa-pkcs1pad - Remove bogus page splitting
+Date: Wed, 22 Jun 2016 18:16:55 +0800
+Message-ID: <E1bFfDL-0007z7-I8@gondolin.me.apana.org.au>
+References: <20160622101432.GA30454@gondor.apana.org.au>
+To: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
+	Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:9907 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751742AbcFVKSt convert rfc822-to-8bit (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:57805 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751077AbcFVKeu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jun 2016 06:18:49 -0400
-In-Reply-To: <20160622100341.GA30383@gondor.apana.org.au>
-Content-Language: en-US
+	Wed, 22 Jun 2016 06:34:50 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+The helper pkcs1pad_sg_set_buf tries to split a buffer that crosses
+a page boundary into two SG entries.  This is unnecessary.  This
+patch removes that.
 
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-> -----Original Message-----
-> From: Herbert Xu [mailto:herbert@gondor.apana.org.au]
-> Sent: Wednesday, June 22, 2016 11:04 AM
-> To: Benedetto, Salvatore <salvatore.benedetto@intel.com>
-> Cc: linux-crypto@vger.kernel.org
-> Subject: Re: [PATCH v10 2/3] crypto: kpp - Add DH software implementation
-> 
-> On Wed, Jun 22, 2016 at 08:18:42AM +0000, Benedetto, Salvatore wrote:
-> >
-> > If I have to pack the secret into a bytestream, where do you expect
-> > the endianness of the sizes to be handled? If I understood you
-> > correctly I'll pack them in little endian, but when decoding I have to
-> > take that into account. Wouldn't that result in pointless endianness
-> management in the decode functions?
-> 
-> It is not pointless if it means that we can have a single test function like most
-> other types.
+ crypto/rsa-pkcs1pad.c |   19 +++++--------------
+ 1 file changed, 5 insertions(+), 14 deletions(-)
 
-It is pointless because it will only be used for the testmanager.
-I can merge the test functions but I'll still have two set_secret functions
-based on the alg value. Would that be enough for you?
-
-Regards,
-Salvatore 
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index 5c1c78e..d9baefb 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -103,7 +103,7 @@ struct pkcs1pad_inst_ctx {
+ struct pkcs1pad_request {
+ 	struct akcipher_request child_req;
+ 
+-	struct scatterlist in_sg[3], out_sg[2];
++	struct scatterlist in_sg[2], out_sg[1];
+ 	uint8_t *in_buf, *out_buf;
+ };
+ 
+@@ -163,19 +163,10 @@ static int pkcs1pad_get_max_size(struct crypto_akcipher *tfm)
+ static void pkcs1pad_sg_set_buf(struct scatterlist *sg, void *buf, size_t len,
+ 		struct scatterlist *next)
+ {
+-	int nsegs = next ? 1 : 0;
+-
+-	if (offset_in_page(buf) + len <= PAGE_SIZE) {
+-		nsegs += 1;
+-		sg_init_table(sg, nsegs);
+-		sg_set_buf(sg, buf, len);
+-	} else {
+-		nsegs += 2;
+-		sg_init_table(sg, nsegs);
+-		sg_set_buf(sg + 0, buf, PAGE_SIZE - offset_in_page(buf));
+-		sg_set_buf(sg + 1, buf + PAGE_SIZE - offset_in_page(buf),
+-				offset_in_page(buf) + len - PAGE_SIZE);
+-	}
++	int nsegs = next ? 2 : 1;
++
++	sg_init_table(sg, nsegs);
++	sg_set_buf(sg, buf, len);
+ 
+ 	if (next)
+ 		sg_chain(sg, nsegs, next);
