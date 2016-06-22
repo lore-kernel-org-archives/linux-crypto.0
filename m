@@ -1,7 +1,7 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCHv2 14/27] crypto: omap-des: fix crypto engine initialization order
-Date: Wed, 22 Jun 2016 16:23:47 +0300
-Message-ID: <1466601840-18486-15-git-send-email-t-kristo@ti.com>
+Subject: [PATCHv2 25/27] ARM: OMAP: DRA7xx: Make L4SEC clock domain SWSUP only
+Date: Wed, 22 Jun 2016 16:23:58 +0300
+Message-ID: <1466601840-18486-26-git-send-email-t-kristo@ti.com>
 References: <1466601840-18486-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,77 +10,48 @@ To: <linux-omap@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<tony@atomide.com>, <herbert@gondor.apana.org.au>,
 	<davem@davemloft.net>, <lokeshvutla@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from arroyo.ext.ti.com ([198.47.19.12]:57948 "EHLO arroyo.ext.ti.com"
+Received: from comal.ext.ti.com ([198.47.26.152]:41264 "EHLO comal.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752308AbcFVNZZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jun 2016 09:25:25 -0400
+	id S1752523AbcFVN0E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Jun 2016 09:26:04 -0400
 In-Reply-To: <1466601840-18486-1-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The crypto engine must be initialized before registering algorithms,
-otherwise the test manager will crash as it attempts to execute
-tests for the algos while they are being registered.
+From: Joel Fernandes <joelf@ti.com>
 
-Fixes: f1b77aaca85a ("crypto: omap-des - Integrate with the crypto engine framework")
+Using HWSUP for l4sec clock domain is causing warnings in HWMOD code for
+DRA7. Based on some observations, once the clock domain goes into an IDLE
+state (because of no activity etc), the IDLEST for the module goes to '0x2'
+value which means Interface IDLE condition. So far so go, however once the
+MODULEMODE is set to disabled for the particular IP, the IDLEST for the
+module should go to '0x3', per the HW AUTO IDLE protocol. However this is
+not observed and there is no reason per the protocl for the transition to
+not happen. This could potentially be a bug in the HW AUTO state-machine.
+
+Work around for this is to use SWSUP only for the particular clockdomain.
+With this all the transitions of IDLEST happen correctly and warnings
+don't occur.
+
+Signed-off-by: Joel Fernandes <joelf@ti.com>
+Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-des.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+ arch/arm/mach-omap2/clockdomains7xx_data.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
-index e4c87bc..f5bf0d1 100644
---- a/drivers/crypto/omap-des.c
-+++ b/drivers/crypto/omap-des.c
-@@ -1079,6 +1079,17 @@ static int omap_des_probe(struct platform_device *pdev)
- 	list_add_tail(&dd->list, &dev_list);
- 	spin_unlock(&list_lock);
+diff --git a/arch/arm/mach-omap2/clockdomains7xx_data.c b/arch/arm/mach-omap2/clockdomains7xx_data.c
+index ef9ed36..6c67965 100644
+--- a/arch/arm/mach-omap2/clockdomains7xx_data.c
++++ b/arch/arm/mach-omap2/clockdomains7xx_data.c
+@@ -409,7 +409,7 @@ static struct clockdomain l4sec_7xx_clkdm = {
+ 	.dep_bit	  = DRA7XX_L4SEC_STATDEP_SHIFT,
+ 	.wkdep_srcs	  = l4sec_wkup_sleep_deps,
+ 	.sleepdep_srcs	  = l4sec_wkup_sleep_deps,
+-	.flags		  = CLKDM_CAN_HWSUP_SWSUP,
++	.flags		  = CLKDM_CAN_SWSUP,
+ };
  
-+	/* Initialize des crypto engine */
-+	dd->engine = crypto_engine_alloc_init(dev, 1);
-+	if (!dd->engine)
-+		goto err_engine;
-+
-+	dd->engine->prepare_request = omap_des_prepare_req;
-+	dd->engine->crypt_one_request = omap_des_crypt_req;
-+	err = crypto_engine_start(dd->engine);
-+	if (err)
-+		goto err_engine;
-+
- 	for (i = 0; i < dd->pdata->algs_info_size; i++) {
- 		for (j = 0; j < dd->pdata->algs_info[i].size; j++) {
- 			algp = &dd->pdata->algs_info[i].algs_list[j];
-@@ -1094,27 +1105,18 @@ static int omap_des_probe(struct platform_device *pdev)
- 		}
- 	}
- 
--	/* Initialize des crypto engine */
--	dd->engine = crypto_engine_alloc_init(dev, 1);
--	if (!dd->engine)
--		goto err_algs;
--
--	dd->engine->prepare_request = omap_des_prepare_req;
--	dd->engine->crypt_one_request = omap_des_crypt_req;
--	err = crypto_engine_start(dd->engine);
--	if (err)
--		goto err_engine;
--
- 	return 0;
- 
--err_engine:
--	crypto_engine_exit(dd->engine);
- err_algs:
- 	for (i = dd->pdata->algs_info_size - 1; i >= 0; i--)
- 		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--)
- 			crypto_unregister_alg(
- 					&dd->pdata->algs_info[i].algs_list[j]);
- 
-+err_engine:
-+	if (dd->engine)
-+		crypto_engine_exit(dd->engine);
-+
- 	omap_des_dma_cleanup(dd);
- err_irq:
- 	tasklet_kill(&dd->done_task);
+ static struct clockdomain l3main1_7xx_clkdm = {
 -- 
 1.9.1
