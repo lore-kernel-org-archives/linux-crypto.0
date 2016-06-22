@@ -1,39 +1,135 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: rsa - Do not gratuitously drop leading zeroes
-Date: Wed, 22 Jun 2016 18:14:32 +0800
-Message-ID: <20160622101432.GA30454@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
-	Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 1/8] crypto: testmgr - Allow leading zeros in RSA
+Date: Wed, 22 Jun 2016 18:16:51 +0800
+Message-ID: <E1bFfDH-0007xn-6o@gondolin.me.apana.org.au>
+References: <20160622101432.GA30454@gondor.apana.org.au>
 To: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
 	Tadeusz Struk <tadeusz.struk@intel.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
+	Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:39340 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:48425 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752491AbcFVMeW (ORCPT
+	with ESMTP id S1751925AbcFVMeL (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jun 2016 08:34:22 -0400
-Content-Disposition: inline
+	Wed, 22 Jun 2016 08:34:11 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This was prompted by the caam RSA submission where a lot of work
-was done just to strip the RSA output of leading zeroes.  This is
-in fact completely pointless because the only user of RSA in the
-kernel then promptly puts them back.
+This patch allows RSA implementations to produce output with
+leading zeroes.  testmgr will skip leading zeroes when comparing
+the output.
 
-This patch series resolves this madness by simply leaving any
-leading zeroes in place.  Note that we're not requiring authors
-to add leading zeroes, even though that is encouraged if it is
-easy to do.  In practice you'd only run into this every 2^32 or
-2^64 operations so please don't overdo it.
+This patch also tries to make the RSA test function generic enough
+to potentially handle other akcipher algorithms.
 
-I've also taken the opportunity to cleanup the pkcs1pad code.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ crypto/testmgr.c |   51 ++++++++++++++++++++++++---------------------------
+ 1 file changed, 24 insertions(+), 27 deletions(-)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index b773a56..f4982da 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1777,8 +1777,8 @@ static int alg_test_drbg(const struct alg_test_desc *desc, const char *driver,
+ 
+ }
+ 
+-static int do_test_rsa(struct crypto_akcipher *tfm,
+-		       struct akcipher_testvec *vecs)
++static int test_akcipher_one(struct crypto_akcipher *tfm,
++			     struct akcipher_testvec *vecs)
+ {
+ 	char *xbuf[XBUFSIZE];
+ 	struct akcipher_request *req;
+@@ -1829,17 +1829,18 @@ static int do_test_rsa(struct crypto_akcipher *tfm,
+ 	/* Run RSA encrypt - c = m^e mod n;*/
+ 	err = wait_async_op(&result, crypto_akcipher_encrypt(req));
+ 	if (err) {
+-		pr_err("alg: rsa: encrypt test failed. err %d\n", err);
++		pr_err("alg: akcipher: encrypt test failed. err %d\n", err);
+ 		goto free_all;
+ 	}
+ 	if (req->dst_len != vecs->c_size) {
+-		pr_err("alg: rsa: encrypt test failed. Invalid output len\n");
++		pr_err("alg: akcipher: encrypt test failed. Invalid output len\n");
+ 		err = -EINVAL;
+ 		goto free_all;
+ 	}
+ 	/* verify that encrypted message is equal to expected */
+ 	if (memcmp(vecs->c, outbuf_enc, vecs->c_size)) {
+-		pr_err("alg: rsa: encrypt test failed. Invalid output\n");
++		pr_err("alg: akcipher: encrypt test failed. Invalid output\n");
++		hexdump(outbuf_enc, vecs->c_size);
+ 		err = -EINVAL;
+ 		goto free_all;
+ 	}
+@@ -1867,18 +1868,22 @@ static int do_test_rsa(struct crypto_akcipher *tfm,
+ 	/* Run RSA decrypt - m = c^d mod n;*/
+ 	err = wait_async_op(&result, crypto_akcipher_decrypt(req));
+ 	if (err) {
+-		pr_err("alg: rsa: decrypt test failed. err %d\n", err);
++		pr_err("alg: akcipher: decrypt test failed. err %d\n", err);
+ 		goto free_all;
+ 	}
+ 	out_len = req->dst_len;
+-	if (out_len != vecs->m_size) {
+-		pr_err("alg: rsa: decrypt test failed. Invalid output len\n");
++	if (out_len < vecs->m_size) {
++		pr_err("alg: akcipher: decrypt test failed. "
++		       "Invalid output len %u\n", out_len);
+ 		err = -EINVAL;
+ 		goto free_all;
+ 	}
+ 	/* verify that decrypted message is equal to the original msg */
+-	if (memcmp(vecs->m, outbuf_dec, vecs->m_size)) {
+-		pr_err("alg: rsa: decrypt test failed. Invalid output\n");
++	if (memchr_inv(outbuf_dec, 0, out_len - vecs->m_size) ||
++	    memcmp(vecs->m, outbuf_dec + out_len - vecs->m_size,
++		   vecs->m_size)) {
++		pr_err("alg: akcipher: decrypt test failed. Invalid output\n");
++		hexdump(outbuf_dec, out_len);
+ 		err = -EINVAL;
+ 	}
+ free_all:
+@@ -1891,28 +1896,20 @@ free_xbuf:
+ 	return err;
+ }
+ 
+-static int test_rsa(struct crypto_akcipher *tfm, struct akcipher_testvec *vecs,
+-		    unsigned int tcount)
++static int test_akcipher(struct crypto_akcipher *tfm, const char *alg,
++			 struct akcipher_testvec *vecs, unsigned int tcount)
+ {
+ 	int ret, i;
+ 
+ 	for (i = 0; i < tcount; i++) {
+-		ret = do_test_rsa(tfm, vecs++);
+-		if (ret) {
+-			pr_err("alg: rsa: test failed on vector %d, err=%d\n",
+-			       i + 1, ret);
+-			return ret;
+-		}
+-	}
+-	return 0;
+-}
+-
+-static int test_akcipher(struct crypto_akcipher *tfm, const char *alg,
+-			 struct akcipher_testvec *vecs, unsigned int tcount)
+-{
+-	if (strncmp(alg, "rsa", 3) == 0)
+-		return test_rsa(tfm, vecs, tcount);
++		ret = test_akcipher_one(tfm, vecs++);
++		if (!ret)
++			continue;
+ 
++		pr_err("alg: akcipher: test failed on vector %d, err=%d\n",
++		       i + 1, ret);
++		return ret;
++	}
+ 	return 0;
+ }
+ 
