@@ -1,60 +1,63 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCHv2 05/27] crypto: omap-sham: avoid executing tasklet where not
- needed
-Date: Wed, 22 Jun 2016 16:23:38 +0300
-Message-ID: <1466601840-18486-6-git-send-email-t-kristo@ti.com>
+Subject: [PATCHv2 19/27] ARM: dts: AM43xx: clk: Add RNG clk node
+Date: Wed, 22 Jun 2016 16:23:52 +0300
+Message-ID: <1466601840-18486-20-git-send-email-t-kristo@ti.com>
 References: <1466601840-18486-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain
+Cc: <linux-arm-kernel@lists.infradead.org>
 To: <linux-omap@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
- <tony@atomide.com>, <herbert@gondor.apana.org.au>,
- <davem@davemloft.net>, <lokeshvutla@ti.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+	<tony@atomide.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <lokeshvutla@ti.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from bear.ext.ti.com ([198.47.19.11]:36786 "EHLO bear.ext.ti.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752457AbcFVNZl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Jun 2016 09:25:41 -0400
 In-Reply-To: <1466601840-18486-1-git-send-email-t-kristo@ti.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Some of the call paths of OMAP SHA driver can avoid executing the next
-step of the crypto queue under tasklet; instead, execute the next step
-directly via function call. This avoids a costly round-trip via the
-scheduler giving a slight performance boost.
+From: Lokesh Vutla <lokeshvutla@ti.com>
 
-Signed-off-by: Tero Kristo <t-kristo@ti.com>
+Add clk node for RNG module.
+
+Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
 ---
- drivers/crypto/omap-sham.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/arm/boot/dts/am43xx-clocks.dtsi | 8 ++++++++
+ drivers/clk/ti/clk-43xx.c            | 1 +
+ 2 files changed, 9 insertions(+)
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 6247887..84a0027 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -242,6 +242,8 @@ static struct omap_sham_drv sham = {
- 	.lock = __SPIN_LOCK_UNLOCKED(sham.lock),
- };
+diff --git a/arch/arm/boot/dts/am43xx-clocks.dtsi b/arch/arm/boot/dts/am43xx-clocks.dtsi
+index 7630ba1..d1d73b7 100644
+--- a/arch/arm/boot/dts/am43xx-clocks.dtsi
++++ b/arch/arm/boot/dts/am43xx-clocks.dtsi
+@@ -104,6 +104,14 @@
+ 		clock-div = <1>;
+ 	};
  
-+static void omap_sham_done_task(unsigned long data);
++	rng_fck: rng_fck {
++		#clock-cells = <0>;
++		compatible = "fixed-factor-clock";
++		clocks = <&sys_clkin_ck>;
++		clock-mult = <1>;
++		clock-div = <1>;
++	};
 +
- static inline u32 omap_sham_read(struct omap_sham_dev *dd, u32 offset)
- {
- 	return __raw_readl(dd->io_base + offset);
-@@ -1007,7 +1009,7 @@ static void omap_sham_finish_req(struct ahash_request *req, int err)
- 		req->base.complete(&req->base, err);
- 
- 	/* handle new request */
--	tasklet_schedule(&dd->done_task);
-+	omap_sham_done_task((unsigned long)dd);
- }
- 
- static int omap_sham_handle_queue(struct omap_sham_dev *dd,
+ 	ehrpwm0_tbclk: ehrpwm0_tbclk@664 {
+ 		#clock-cells = <0>;
+ 		compatible = "ti,gate-clock";
+diff --git a/drivers/clk/ti/clk-43xx.c b/drivers/clk/ti/clk-43xx.c
+index 097fc90..3f157a4 100644
+--- a/drivers/clk/ti/clk-43xx.c
++++ b/drivers/clk/ti/clk-43xx.c
+@@ -58,6 +58,7 @@ static struct ti_dt_clk am43xx_clks[] = {
+ 	DT_CLK(NULL, "smartreflex1_fck", "smartreflex1_fck"),
+ 	DT_CLK(NULL, "sha0_fck", "sha0_fck"),
+ 	DT_CLK(NULL, "aes0_fck", "aes0_fck"),
++	DT_CLK(NULL, "rng_fck", "rng_fck"),
+ 	DT_CLK(NULL, "timer1_fck", "timer1_fck"),
+ 	DT_CLK(NULL, "timer2_fck", "timer2_fck"),
+ 	DT_CLK(NULL, "timer3_fck", "timer3_fck"),
 -- 
 1.9.1
