@@ -1,7 +1,7 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 4/8] crypto: rsa-pkcs1pad - Require hash to be present
-Date: Wed, 22 Jun 2016 18:16:54 +0800
-Message-ID: <E1bFfDK-0007yq-FV@gondolin.me.apana.org.au>
+Subject: [PATCH 2/8] crypto: rsa - Generate fixed-length output
+Date: Wed, 22 Jun 2016 18:16:52 +0800
+Message-ID: <E1bFfDI-0007yI-9c@gondolin.me.apana.org.au>
 References: <20160622101432.GA30454@gondor.apana.org.au>
 To: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
 	Tadeusz Struk <tadeusz.struk@intel.com>,
@@ -9,213 +9,181 @@ To: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
 	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
 	Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:59678 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:50784 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751667AbcFVMeP (ORCPT
+	with ESMTP id S1752491AbcFVMe0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jun 2016 08:34:15 -0400
+	Wed, 22 Jun 2016 08:34:26 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The only user of rsa-pkcs1pad always uses the hash so there is
-no reason to support the case of not having a hash.
+Every implementation of RSA that we have naturally generates
+output with leading zeroes.  The one and only user of RSA,
+pkcs1pad wants to have those leading zeroes in place, in fact
+because they are currently absent it has to write those zeroes
+itself.
 
-This patch also changes the digest info lookup so that it is
-only done once during template instantiation rather than on each
-operation.
+So we shouldn't be stripping leading zeroes in the first place.
+In fact this patch makes rsa-generic produce output with fixed
+length so that pkcs1pad does not need to do any extra work.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/rsa-pkcs1pad.c |   83 ++++++++++++++++++--------------------------------
- 1 file changed, 30 insertions(+), 53 deletions(-)
+ crypto/rsa.c        |    8 +++----
+ include/linux/mpi.h |    2 -
+ lib/mpi/mpicoder.c  |   55 ++++++++++++++++++++++++----------------------------
+ 3 files changed, 31 insertions(+), 34 deletions(-)
 
-diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index ead8dc0..5c1c78e 100644
---- a/crypto/rsa-pkcs1pad.c
-+++ b/crypto/rsa-pkcs1pad.c
-@@ -92,13 +92,12 @@ static const struct rsa_asn1_template *rsa_lookup_asn1(const char *name)
+diff --git a/crypto/rsa.c b/crypto/rsa.c
+index dc692d4..4c280b6 100644
+--- a/crypto/rsa.c
++++ b/crypto/rsa.c
+@@ -108,7 +108,7 @@ static int rsa_enc(struct akcipher_request *req)
+ 	if (ret)
+ 		goto err_free_m;
  
- struct pkcs1pad_ctx {
- 	struct crypto_akcipher *child;
--	const char *hash_name;
- 	unsigned int key_size;
- };
+-	ret = mpi_write_to_sgl(c, req->dst, &req->dst_len, &sign);
++	ret = mpi_write_to_sgl(c, req->dst, req->dst_len, &sign);
+ 	if (ret)
+ 		goto err_free_m;
  
- struct pkcs1pad_inst_ctx {
- 	struct crypto_akcipher_spawn spawn;
--	const char *hash_name;
-+	const struct rsa_asn1_template *digest_info;
- };
+@@ -147,7 +147,7 @@ static int rsa_dec(struct akcipher_request *req)
+ 	if (ret)
+ 		goto err_free_c;
  
- struct pkcs1pad_request {
-@@ -416,20 +415,16 @@ static int pkcs1pad_sign(struct akcipher_request *req)
- 	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
- 	struct pkcs1pad_ctx *ctx = akcipher_tfm_ctx(tfm);
- 	struct pkcs1pad_request *req_ctx = akcipher_request_ctx(req);
--	const struct rsa_asn1_template *digest_info = NULL;
-+	struct akcipher_instance *inst = akcipher_alg_instance(tfm);
-+	struct pkcs1pad_inst_ctx *ictx = akcipher_instance_ctx(inst);
-+	const struct rsa_asn1_template *digest_info = ictx->digest_info;
- 	int err;
- 	unsigned int ps_end, digest_size = 0;
+-	ret = mpi_write_to_sgl(m, req->dst, &req->dst_len, &sign);
++	ret = mpi_write_to_sgl(m, req->dst, req->dst_len, &sign);
+ 	if (ret)
+ 		goto err_free_c;
  
- 	if (!ctx->key_size)
- 		return -EINVAL;
+@@ -185,7 +185,7 @@ static int rsa_sign(struct akcipher_request *req)
+ 	if (ret)
+ 		goto err_free_m;
  
--	if (ctx->hash_name) {
--		digest_info = rsa_lookup_asn1(ctx->hash_name);
--		if (!digest_info)
--			return -EINVAL;
--
--		digest_size = digest_info->size;
--	}
-+	digest_size = digest_info->size;
+-	ret = mpi_write_to_sgl(s, req->dst, &req->dst_len, &sign);
++	ret = mpi_write_to_sgl(s, req->dst, req->dst_len, &sign);
+ 	if (ret)
+ 		goto err_free_m;
  
- 	if (req->src_len + digest_size > ctx->key_size - 11)
- 		return -EOVERFLOW;
-@@ -462,10 +457,8 @@ static int pkcs1pad_sign(struct akcipher_request *req)
- 	memset(req_ctx->in_buf + 1, 0xff, ps_end - 1);
- 	req_ctx->in_buf[ps_end] = 0x00;
+@@ -226,7 +226,7 @@ static int rsa_verify(struct akcipher_request *req)
+ 	if (ret)
+ 		goto err_free_s;
  
--	if (digest_info) {
--		memcpy(req_ctx->in_buf + ps_end + 1, digest_info->data,
--		       digest_info->size);
--	}
-+	memcpy(req_ctx->in_buf + ps_end + 1, digest_info->data,
-+	       digest_info->size);
+-	ret = mpi_write_to_sgl(m, req->dst, &req->dst_len, &sign);
++	ret = mpi_write_to_sgl(m, req->dst, req->dst_len, &sign);
+ 	if (ret)
+ 		goto err_free_s;
  
- 	pkcs1pad_sg_set_buf(req_ctx->in_sg, req_ctx->in_buf,
- 			ctx->key_size - 1 - req->src_len, req->src);
-@@ -499,7 +492,9 @@ static int pkcs1pad_verify_complete(struct akcipher_request *req, int err)
- 	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
- 	struct pkcs1pad_ctx *ctx = akcipher_tfm_ctx(tfm);
- 	struct pkcs1pad_request *req_ctx = akcipher_request_ctx(req);
--	const struct rsa_asn1_template *digest_info;
-+	struct akcipher_instance *inst = akcipher_alg_instance(tfm);
-+	struct pkcs1pad_inst_ctx *ictx = akcipher_instance_ctx(inst);
-+	const struct rsa_asn1_template *digest_info = ictx->digest_info;
- 	unsigned int pos;
+diff --git a/include/linux/mpi.h b/include/linux/mpi.h
+index f219559..1cc5ffb 100644
+--- a/include/linux/mpi.h
++++ b/include/linux/mpi.h
+@@ -80,7 +80,7 @@ void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign);
+ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
+ 		    int *sign);
+ void *mpi_get_secure_buffer(MPI a, unsigned *nbytes, int *sign);
+-int mpi_write_to_sgl(MPI a, struct scatterlist *sg, unsigned *nbytes,
++int mpi_write_to_sgl(MPI a, struct scatterlist *sg, unsigned nbytes,
+ 		     int *sign);
  
- 	if (err == -EOVERFLOW)
-@@ -527,17 +522,11 @@ static int pkcs1pad_verify_complete(struct akcipher_request *req, int err)
- 		goto done;
- 	pos++;
- 
--	if (ctx->hash_name) {
--		digest_info = rsa_lookup_asn1(ctx->hash_name);
--		if (!digest_info)
--			goto done;
-+	if (memcmp(req_ctx->out_buf + pos, digest_info->data,
-+		   digest_info->size))
-+		goto done;
- 
--		if (memcmp(req_ctx->out_buf + pos, digest_info->data,
--			   digest_info->size))
--			goto done;
--
--		pos += digest_info->size;
--	}
-+	pos += digest_info->size;
- 
- 	err = 0;
- 
-@@ -626,12 +615,11 @@ static int pkcs1pad_init_tfm(struct crypto_akcipher *tfm)
- 	struct pkcs1pad_ctx *ctx = akcipher_tfm_ctx(tfm);
- 	struct crypto_akcipher *child_tfm;
- 
--	child_tfm = crypto_spawn_akcipher(akcipher_instance_ctx(inst));
-+	child_tfm = crypto_spawn_akcipher(&ictx->spawn);
- 	if (IS_ERR(child_tfm))
- 		return PTR_ERR(child_tfm);
- 
- 	ctx->child = child_tfm;
--	ctx->hash_name = ictx->hash_name;
- 	return 0;
- }
- 
-@@ -648,12 +636,12 @@ static void pkcs1pad_free(struct akcipher_instance *inst)
- 	struct crypto_akcipher_spawn *spawn = &ctx->spawn;
- 
- 	crypto_drop_akcipher(spawn);
--	kfree(ctx->hash_name);
- 	kfree(inst);
- }
- 
- static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
+ #define log_mpidump g10_log_mpidump
+diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
+index 823cf5f..7150e5c 100644
+--- a/lib/mpi/mpicoder.c
++++ b/lib/mpi/mpicoder.c
+@@ -237,16 +237,13 @@ EXPORT_SYMBOL_GPL(mpi_get_buffer);
+  * @a:		a multi precision integer
+  * @sgl:	scatterlist to write to. Needs to be at least
+  *		mpi_get_size(a) long.
+- * @nbytes:	in/out param - it has the be set to the maximum number of
+- *		bytes that can be written to sgl. This has to be at least
+- *		the size of the integer a. On return it receives the actual
+- *		length of the data written on success or the data that would
+- *		be written if buffer was too small.
++ * @nbytes:	the number of bytes to write.  Leading bytes will be
++ *		filled with zero.
+  * @sign:	if not NULL, it will be set to the sign of a.
+  *
+  * Return:	0 on success or error code in case of error
+  */
+-int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
++int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned nbytes,
+ 		     int *sign)
  {
-+	const struct rsa_asn1_template *digest_info;
- 	struct crypto_attr_type *algt;
- 	struct akcipher_instance *inst;
- 	struct pkcs1pad_inst_ctx *ctx;
-@@ -676,7 +664,11 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	u8 *p, *p2;
+@@ -258,43 +255,44 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
+ #error please implement for this limb size.
+ #endif
+ 	unsigned int n = mpi_get_size(a);
+-	int i, x, y = 0, lzeros, buf_len;
+-
+-	if (!nbytes)
+-		return -EINVAL;
++	int i, x, buf_len;
  
- 	hash_name = crypto_attr_alg_name(tb[2]);
- 	if (IS_ERR(hash_name))
--		hash_name = NULL;
-+		return PTR_ERR(hash_name);
-+
-+	digest_info = rsa_lookup_asn1(hash_name);
-+	if (!digest_info)
-+		return -EINVAL;
+ 	if (sign)
+ 		*sign = a->sign;
  
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
- 	if (!inst)
-@@ -684,7 +676,7 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
- 
- 	ctx = akcipher_instance_ctx(inst);
- 	spawn = &ctx->spawn;
--	ctx->hash_name = hash_name ? kstrdup(hash_name, GFP_KERNEL) : NULL;
-+	ctx->digest_info = digest_info;
- 
- 	crypto_set_spawn(&spawn->base, akcipher_crypto_instance(inst));
- 	err = crypto_grab_akcipher(spawn, rsa_alg_name, 0,
-@@ -696,27 +688,14 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
- 
- 	err = -ENAMETOOLONG;
- 
--	if (!hash_name) {
--		if (snprintf(inst->alg.base.cra_name,
--			     CRYPTO_MAX_ALG_NAME, "pkcs1pad(%s)",
--			     rsa_alg->base.cra_name) >=
--					CRYPTO_MAX_ALG_NAME ||
--		    snprintf(inst->alg.base.cra_driver_name,
--			     CRYPTO_MAX_ALG_NAME, "pkcs1pad(%s)",
--			     rsa_alg->base.cra_driver_name) >=
--					CRYPTO_MAX_ALG_NAME)
-+	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
-+		     "pkcs1pad(%s,%s)", rsa_alg->base.cra_name, hash_name) >=
-+	    CRYPTO_MAX_ALG_NAME ||
-+	    snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
-+		     "pkcs1pad(%s,%s)",
-+		     rsa_alg->base.cra_driver_name, hash_name) >=
-+	    CRYPTO_MAX_ALG_NAME)
- 		goto out_drop_alg;
--	} else {
--		if (snprintf(inst->alg.base.cra_name,
--			     CRYPTO_MAX_ALG_NAME, "pkcs1pad(%s,%s)",
--			     rsa_alg->base.cra_name, hash_name) >=
--				CRYPTO_MAX_ALG_NAME ||
--		    snprintf(inst->alg.base.cra_driver_name,
--			     CRYPTO_MAX_ALG_NAME, "pkcs1pad(%s,%s)",
--			     rsa_alg->base.cra_driver_name, hash_name) >=
--					CRYPTO_MAX_ALG_NAME)
--		goto out_free_hash;
+-	lzeros = count_lzeros(a);
+-
+-	if (*nbytes < n - lzeros) {
+-		*nbytes = n - lzeros;
++	if (nbytes < n)
+ 		return -EOVERFLOW;
 -	}
  
- 	inst->alg.base.cra_flags = rsa_alg->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = rsa_alg->base.cra_priority;
-@@ -738,12 +717,10 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
+-	*nbytes = n - lzeros;
+ 	buf_len = sgl->length;
+ 	p2 = sg_virt(sgl);
  
- 	err = akcipher_register_instance(tmpl, inst);
- 	if (err)
--		goto out_free_hash;
-+		goto out_drop_alg;
+-	for (i = a->nlimbs - 1 - lzeros / BYTES_PER_MPI_LIMB,
+-			lzeros %= BYTES_PER_MPI_LIMB;
+-		i >= 0; i--) {
++	while (nbytes > n) {
++		if (!buf_len) {
++			sgl = sg_next(sgl);
++			if (!sgl)
++				return -EINVAL;
++			buf_len = sgl->length;
++			p2 = sg_virt(sgl);
++		}
++
++		i = min_t(unsigned, nbytes - n, buf_len);
++		memset(p2, 0, i);
++		p2 += i;
++		buf_len -= i;
++		nbytes -= i;
++	}
++
++	for (i = a->nlimbs - 1; i >= 0; i--) {
+ #if BYTES_PER_MPI_LIMB == 4
+-		alimb = cpu_to_be32(a->d[i]);
++		alimb = a->d[i] ? cpu_to_be32(a->d[i]) : 0;
+ #elif BYTES_PER_MPI_LIMB == 8
+-		alimb = cpu_to_be64(a->d[i]);
++		alimb = a->d[i] ? cpu_to_be64(a->d[i]) : 0;
+ #else
+ #error please implement for this limb size.
+ #endif
+-		if (lzeros) {
+-			y = lzeros;
+-			lzeros = 0;
+-		}
+-
+-		p = (u8 *)&alimb + y;
++		p = (u8 *)&alimb;
  
+-		for (x = 0; x < sizeof(alimb) - y; x++) {
++		for (x = 0; x < sizeof(alimb); x++) {
+ 			if (!buf_len) {
+ 				sgl = sg_next(sgl);
+ 				if (!sgl)
+@@ -305,7 +303,6 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
+ 			*p2++ = *p++;
+ 			buf_len--;
+ 		}
+-		y = 0;
+ 	}
  	return 0;
- 
--out_free_hash:
--	kfree(ctx->hash_name);
- out_drop_alg:
- 	crypto_drop_akcipher(spawn);
- out_free_inst:
+ }
