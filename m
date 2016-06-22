@@ -1,85 +1,60 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCHv2 13/27] crypto: omap-aes: fix crypto engine initialization order
-Date: Wed, 22 Jun 2016 16:23:46 +0300
-Message-ID: <1466601840-18486-14-git-send-email-t-kristo@ti.com>
+Subject: [PATCHv2 05/27] crypto: omap-sham: avoid executing tasklet where not
+ needed
+Date: Wed, 22 Jun 2016 16:23:38 +0300
+Message-ID: <1466601840-18486-6-git-send-email-t-kristo@ti.com>
 References: <1466601840-18486-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-arm-kernel@lists.infradead.org
 To: <linux-omap@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<tony@atomide.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <lokeshvutla@ti.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:41161 "EHLO comal.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752389AbcFVNZ3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jun 2016 09:25:29 -0400
+ <tony@atomide.com>, <herbert@gondor.apana.org.au>,
+ <davem@davemloft.net>, <lokeshvutla@ti.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <1466601840-18486-1-git-send-email-t-kristo@ti.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-The crypto engine must be initialized before registering algorithms,
-otherwise the test manager will crash as it attempts to execute
-tests for the algos while they are being registered.
+Some of the call paths of OMAP SHA driver can avoid executing the next
+step of the crypto queue under tasklet; instead, execute the next step
+directly via function call. This avoids a costly round-trip via the
+scheduler giving a slight performance boost.
 
-Fixes: 0529900a01cb ("crypto: omap-aes - Support crypto engine framework")
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-aes.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+ drivers/crypto/omap-sham.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 867e56a..2d0978a 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -1204,6 +1204,17 @@ static int omap_aes_probe(struct platform_device *pdev)
- 	list_add_tail(&dd->list, &dev_list);
- 	spin_unlock(&list_lock);
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 6247887..84a0027 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -242,6 +242,8 @@ static struct omap_sham_drv sham = {
+ 	.lock = __SPIN_LOCK_UNLOCKED(sham.lock),
+ };
  
-+	/* Initialize crypto engine */
-+	dd->engine = crypto_engine_alloc_init(dev, 1);
-+	if (!dd->engine)
-+		goto err_engine;
++static void omap_sham_done_task(unsigned long data);
 +
-+	dd->engine->prepare_request = omap_aes_prepare_req;
-+	dd->engine->crypt_one_request = omap_aes_crypt_req;
-+	err = crypto_engine_start(dd->engine);
-+	if (err)
-+		goto err_engine;
-+
- 	for (i = 0; i < dd->pdata->algs_info_size; i++) {
- 		if (!dd->pdata->algs_info[i].registered) {
- 			for (j = 0; j < dd->pdata->algs_info[i].size; j++) {
-@@ -1221,26 +1232,17 @@ static int omap_aes_probe(struct platform_device *pdev)
- 		}
- 	}
+ static inline u32 omap_sham_read(struct omap_sham_dev *dd, u32 offset)
+ {
+ 	return __raw_readl(dd->io_base + offset);
+@@ -1007,7 +1009,7 @@ static void omap_sham_finish_req(struct ahash_request *req, int err)
+ 		req->base.complete(&req->base, err);
  
--	/* Initialize crypto engine */
--	dd->engine = crypto_engine_alloc_init(dev, 1);
--	if (!dd->engine)
--		goto err_algs;
--
--	dd->engine->prepare_request = omap_aes_prepare_req;
--	dd->engine->crypt_one_request = omap_aes_crypt_req;
--	err = crypto_engine_start(dd->engine);
--	if (err)
--		goto err_engine;
--
- 	return 0;
--err_engine:
--	crypto_engine_exit(dd->engine);
- err_algs:
- 	for (i = dd->pdata->algs_info_size - 1; i >= 0; i--)
- 		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--)
- 			crypto_unregister_alg(
- 					&dd->pdata->algs_info[i].algs_list[j]);
+ 	/* handle new request */
+-	tasklet_schedule(&dd->done_task);
++	omap_sham_done_task((unsigned long)dd);
+ }
  
-+err_engine:
-+	if (dd->engine)
-+		crypto_engine_exit(dd->engine);
-+
- 	omap_aes_dma_cleanup(dd);
- err_irq:
- 	tasklet_kill(&dd->done_task);
+ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
 -- 
 1.9.1
