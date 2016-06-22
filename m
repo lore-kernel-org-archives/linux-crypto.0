@@ -1,54 +1,49 @@
-From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH] crypto: user - re-add size check for CRYPTO_MSG_GETALG
-Date: Wed, 22 Jun 2016 20:29:37 +0200
-Message-ID: <1466620177-10998-1-git-send-email-minipli@googlemail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] crypto: user - re-add size check for CRYPTO_MSG_GETALG
+Date: Wed, 22 Jun 2016 21:03:19 +0200
+Message-ID: <1700839.z4KCsoVT9C@positron.chronox.de>
+References: <1466620177-10998-1-git-send-email-minipli@googlemail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org,
-	Mathias Krause <minipli@googlemail.com>,
 	Steffen Klassert <steffen.klassert@secunet.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:35900 "EHLO
-	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751673AbcFVSaN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jun 2016 14:30:13 -0400
-Received: by mail-wm0-f68.google.com with SMTP id c82so3821132wme.3
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Jun 2016 11:30:12 -0700 (PDT)
+Received: from mail.eperm.de ([89.247.134.16]:37992 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751307AbcFVTD1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Jun 2016 15:03:27 -0400
+In-Reply-To: <1466620177-10998-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Commit 9aa867e46565 ("crypto: user - Add CRYPTO_MSG_DELRNG")
-accidentally removed the minimum size check for CRYPTO_MSG_GETALG
-netlink messages. This allows userland to send a truncated
-CRYPTO_MSG_GETALG message as short as a netlink header only making
-crypto_report() operate on uninitialized memory by accessing data
-beyond the end of the netlink message.
+Am Mittwoch, 22. Juni 2016, 20:29:37 schrieb Mathias Krause:
 
-Fix this be re-adding the minimum required size of CRYPTO_MSG_GETALG
-messages to the crypto_msg_min[] array.
+Hi Mathias,
 
-Fixes: 9aa867e46565 ("crypto: user - Add CRYPTO_MSG_DELRNG")
-Cc: stable@vger.kernel.org	# v4.2
-Signed-off-by: Mathias Krause <minipli@googlemail.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
----
-This should go on top of crypto-2.6/master.
+> Commit 9aa867e46565 ("crypto: user - Add CRYPTO_MSG_DELRNG")
+> accidentally removed the minimum size check for CRYPTO_MSG_GETALG
+> netlink messages. This allows userland to send a truncated
+> CRYPTO_MSG_GETALG message as short as a netlink header only making
+> crypto_report() operate on uninitialized memory by accessing data
+> beyond the end of the netlink message.
+> 
+> Fix this be re-adding the minimum required size of CRYPTO_MSG_GETALG
+> messages to the crypto_msg_min[] array.
 
- crypto/crypto_user.c |    1 +
- 1 file changed, 1 insertion(+)
+I was playing with the adding of the GETALG value as you did to track down the 
+issue fixed with eed1e1afd8d542d9644534c1b712599b5d680007 ("crypto: user - no 
+parsing of CRYPTO_MSG_GETALG") in the cryptodev-2.6 tree.
 
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index 43fe85f20d57..7097a3395b25 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -455,6 +455,7 @@ static const int crypto_msg_min[CRYPTO_NR_MSGTYPES] = {
- 	[CRYPTO_MSG_NEWALG	- CRYPTO_MSG_BASE] = MSGSIZE(crypto_user_alg),
- 	[CRYPTO_MSG_DELALG	- CRYPTO_MSG_BASE] = MSGSIZE(crypto_user_alg),
- 	[CRYPTO_MSG_UPDATEALG	- CRYPTO_MSG_BASE] = MSGSIZE(crypto_user_alg),
-+	[CRYPTO_MSG_GETALG	- CRYPTO_MSG_BASE] = MSGSIZE(crypto_user_alg),
- 	[CRYPTO_MSG_DELRNG	- CRYPTO_MSG_BASE] = 0,
- };
- 
--- 
-1.7.10.4
+It did not occur to me that it fixes another bug. Yet, with this addition, it 
+would be possible to revert the patch eed1e1afd8d542d9644534c1b712599b5d680007 
+as your patch fixes the issue too. But my fix can also stay as it does not 
+hurt either.
+
+What is your take on that?
+
+Ciao
+Stephan
