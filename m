@@ -1,67 +1,67 @@
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [PATCH v6 3/6] crypto: AF_ALG -- add asymmetric cipher
- interface
-Date: Wed, 22 Jun 2016 15:45:38 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1606221515040.16377@mjmartin-mac01.local>
-References: <20160515041645.15888.94903.stgit@tstruk-mobl1> <1499283.NSekfIF0FQ@tauon.atsec.com> <alpine.OSX.2.20.1606091126420.21471@mjmartin-mac01.local> <3072103.TY3EQcF1Bz@tauon.atsec.com> <dbcb97e0-35c0-7e6e-9351-d90a0d945bab@intel.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: Doing crypto in small stack buffers (bluetooth vs vmalloc-stack
+ crash, etc)
+Date: Wed, 22 Jun 2016 16:45:46 -0700
+Message-ID: <CALCETrXJAvtty-zrjZR0URyT92rMZ4HhiTLtd4r5CzFjZOj=-Q@mail.gmail.com>
+References: <CALCETrVJzzKkRsSbgsUmVd_+ArKEgoRSVdG1tVp7CXzFoPyVgA@mail.gmail.com>
+ <20160622004214.GA27134@gondor.apana.org.au> <CALCETrUnzasc+c5Dxmw+g6U07dTNU4RF0ug1bHj8j2en+7Xj1A@mail.gmail.com>
+ <CALCETrUWyNz91WO6O3dNb+YELeZy5q4+oTo6dLRR67P2WvBB8g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	dhowells@redhat.com, herbert@gondor.apana.org.au,
-	linux-api@vger.kernel.org, marcel@holtmann.org,
-	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, dwmw2@infradead.org,
-	davem@davemloft.net
-To: Tadeusz Struk <tadeusz.struk@intel.com>,
-	Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:52356 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751764AbcFVWqp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jun 2016 18:46:45 -0400
-In-Reply-To: <dbcb97e0-35c0-7e6e-9351-d90a0d945bab@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Andy Lutomirski <luto@kernel.org>, linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CALCETrUWyNz91WO6O3dNb+YELeZy5q4+oTo6dLRR67P2WvBB8g@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-
-Stephan and Tadeusz,
-
-On Fri, 10 Jun 2016, Tadeusz Struk wrote:
-
-> On 06/09/2016 11:36 AM, Stephan Mueller wrote:
->> Am Donnerstag, 9. Juni 2016, 11:27:13 schrieb Mat Martineau:
+On Wed, Jun 22, 2016 at 2:48 PM, Andy Lutomirski <luto@amacapital.net> wrote:
+> On Tue, Jun 21, 2016 at 5:52 PM, Andy Lutomirski <luto@amacapital.net> wrote:
+>> On Tue, Jun 21, 2016 at 5:42 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>>> On Tue, Jun 21, 2016 at 10:43:40AM -0700, Andy Lutomirski wrote:
+>>>>
+>>>> Is there a straightforward way that bluetooth and, potentially, other
+>>>> drivers can just do synchronous crypto in a small buffer specified by
+>>>> its virtual address?  The actual cryptography part of the crypto code
+>>>> already works this way, but I can't find an API for it.
+>>>
+>>> Yes, single block users should use crypto_cipher_encrypt_one, an
+>>> example would be drivers/md/dm-crypt.c.
+>>>
 >>
->> Hi Mat, Tadeusz,
->>
->> Ok, after checking the code again, I think that dropping that sanity check
->> should be ok given that this length is part of the akcipher API.
->>
->> Tadeusz, as you are currently managing that patch set, would you re-spin it
->> with the following check removed?
->>
->> +     if (usedpages < akcipher_calcsize(ctx)) {
->> +             err = -EMSGSIZE;
->> +             goto unlock;
->> +     }
+>> Aha!  I expected something like that to exist, but I couldn't find it.
+>> I'll change the two offenders I've found so far to use it.
 >>
 >
-> Ok, I'll update the patch.
+> Before I do this, can you explain what the difference is between
+> crypto_cipher and crypto_skcipher?  net/bluetooth/smp.c currently uses
+> crypto_alloc_skcipher, which you added in:
+>
+> commit 71af2f6bb22a4bf42663e10f1d8913d4967ed07f
+> Author: Herbert Xu <herbert@gondor.apana.org.au>
+> Date:   Sun Jan 24 21:18:30 2016 +0800
+>
+>     Bluetooth: Use skcipher and hash
+>
+> Am I just supposed to replace "skcipher" with "cipher" everywhere?
 
-Thanks, that helps (especially with pkcs1pad).
+It looks like I'm supposed to that and to use "aes" instead of "ebc(aes)".
 
-This brings me to another proposal for read buffer sizing: AF_ALG akcipher 
-can guarantee that partial reads (where the read buffer is shorter than 
-the output of the crypto op) will work using the same semantics as 
-SOCK_DGRAM/SOCK_SEQPACKET. With those sockets, as much data as will fit is 
-copied in to the read buffer and the remainder is discarded.
+*However*, the other offender I've found (net/rxrpc/rxkad.c) uses
+"pcbc(fcrypt)", which doesn't appear to be usable with this API.  Is
+there no way to say "I want synchronous crypto on this VA range" using
+the skcipher API?
 
-I realize there's a performance and memory tradeoff, since the crypto 
-algorithm needs a sufficiently large output buffer that would have to be 
-created by AF_ALG akcipher. The user could manage that tradeoff by 
-providing a larger buffer (typically key_size?) if it wants to avoid 
-allocating and copying intermediate buffers inside the kernel.
+--Andy
 
 
---
-Mat Martineau
-Intel OTC
+-- 
+Andy Lutomirski
+AMA Capital Management, LLC
