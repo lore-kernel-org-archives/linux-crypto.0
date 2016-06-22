@@ -1,42 +1,96 @@
-From: Ben Dooks <ben.dooks@codethink.co.uk>
-Subject: Re: [[PATCH v2] 11/11] hwrng: exynos - fixup IO accesors
-Date: Wed, 22 Jun 2016 12:53:33 +0100
-Message-ID: <82412f2a-bd8b-6ff4-9887-901d248398a4@codethink.co.uk>
-References: <20160622103705.GA30967@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@lists.codethink.co.uk, k.kozlowski@samsung.com,
- linux-samsung-soc@vger.kernel.org, matthew.leach@codethink.co.uk,
- linux-crypto@vger.kernel.org, mpm@selenic.com,
- linux-arm-kernel@lists.infradead.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20160622103705.GA30967@gondor.apana.org.au>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 6/8] crypto: rsa-pkcs1pad - Always use GFP_KERNEL
+Date: Wed, 22 Jun 2016 18:16:56 +0800
+Message-ID: <E1bFfDM-0007zO-L8@gondolin.me.apana.org.au>
+References: <20160622101432.GA30454@gondor.apana.org.au>
+To: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
+	Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:47728 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752522AbcFVMEO (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Jun 2016 08:04:14 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 22/06/16 11:37, Herbert Xu wrote:
-> Ben Dooks <ben.dooks@codethink.co.uk> wrote:
->> The __raw IO functions are not endian safe, so use the readl_relaxed
->> and writel_relaxed versions of these.
->>
->> Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
-> 
-> This patch has already been merged.
-> 
-> Cheers,
+We don't currently support using akcipher in atomic contexts,
+so GFP_KERNEL should always be used.
 
-Apologies, only meant to repost the core patches.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
--- 
-Ben Dooks				http://www.codethink.co.uk/
-Senior Engineer				Codethink - Providing Genius
+ crypto/rsa-pkcs1pad.c |   22 ++++++----------------
+ 1 file changed, 6 insertions(+), 16 deletions(-)
+
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index d9baefb..db19284 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -260,8 +260,7 @@ static int pkcs1pad_encrypt(struct akcipher_request *req)
+ 	req_ctx->child_req.dst_len = ctx->key_size;
+ 
+ 	req_ctx->in_buf = kmalloc(ctx->key_size - 1 - req->src_len,
+-			(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-			GFP_KERNEL : GFP_ATOMIC);
++				  GFP_KERNEL);
+ 	if (!req_ctx->in_buf)
+ 		return -ENOMEM;
+ 
+@@ -274,9 +273,7 @@ static int pkcs1pad_encrypt(struct akcipher_request *req)
+ 	pkcs1pad_sg_set_buf(req_ctx->in_sg, req_ctx->in_buf,
+ 			ctx->key_size - 1 - req->src_len, req->src);
+ 
+-	req_ctx->out_buf = kmalloc(ctx->key_size,
+-			(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-			GFP_KERNEL : GFP_ATOMIC);
++	req_ctx->out_buf = kmalloc(ctx->key_size, GFP_KERNEL);
+ 	if (!req_ctx->out_buf) {
+ 		kfree(req_ctx->in_buf);
+ 		return -ENOMEM;
+@@ -379,9 +376,7 @@ static int pkcs1pad_decrypt(struct akcipher_request *req)
+ 	req_ctx->child_req.dst = req_ctx->out_sg;
+ 	req_ctx->child_req.dst_len = ctx->key_size ;
+ 
+-	req_ctx->out_buf = kmalloc(ctx->key_size,
+-			(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-			GFP_KERNEL : GFP_ATOMIC);
++	req_ctx->out_buf = kmalloc(ctx->key_size, GFP_KERNEL);
+ 	if (!req_ctx->out_buf)
+ 		return -ENOMEM;
+ 
+@@ -438,8 +433,7 @@ static int pkcs1pad_sign(struct akcipher_request *req)
+ 	req_ctx->child_req.dst_len = ctx->key_size;
+ 
+ 	req_ctx->in_buf = kmalloc(ctx->key_size - 1 - req->src_len,
+-			(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-			GFP_KERNEL : GFP_ATOMIC);
++				  GFP_KERNEL);
+ 	if (!req_ctx->in_buf)
+ 		return -ENOMEM;
+ 
+@@ -454,9 +448,7 @@ static int pkcs1pad_sign(struct akcipher_request *req)
+ 	pkcs1pad_sg_set_buf(req_ctx->in_sg, req_ctx->in_buf,
+ 			ctx->key_size - 1 - req->src_len, req->src);
+ 
+-	req_ctx->out_buf = kmalloc(ctx->key_size,
+-			(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-			GFP_KERNEL : GFP_ATOMIC);
++	req_ctx->out_buf = kmalloc(ctx->key_size, GFP_KERNEL);
+ 	if (!req_ctx->out_buf) {
+ 		kfree(req_ctx->in_buf);
+ 		return -ENOMEM;
+@@ -577,9 +569,7 @@ static int pkcs1pad_verify(struct akcipher_request *req)
+ 	req_ctx->child_req.dst = req_ctx->out_sg;
+ 	req_ctx->child_req.dst_len = ctx->key_size;
+ 
+-	req_ctx->out_buf = kmalloc(ctx->key_size,
+-			(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-			GFP_KERNEL : GFP_ATOMIC);
++	req_ctx->out_buf = kmalloc(ctx->key_size, GFP_KERNEL);
+ 	if (!req_ctx->out_buf)
+ 		return -ENOMEM;
+ 
