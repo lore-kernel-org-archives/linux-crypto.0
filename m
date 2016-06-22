@@ -1,38 +1,46 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v10 2/3] crypto: kpp - Add DH software implementation
-Date: Wed, 22 Jun 2016 08:51:15 +0800
-Message-ID: <20160622005115.GB27134@gondor.apana.org.au>
-References: <1466541931-2875-1-git-send-email-salvatore.benedetto@intel.com>
- <1466541931-2875-3-git-send-email-salvatore.benedetto@intel.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: Doing crypto in small stack buffers (bluetooth vs vmalloc-stack
+ crash, etc)
+Date: Tue, 21 Jun 2016 17:52:23 -0700
+Message-ID: <CALCETrUnzasc+c5Dxmw+g6U07dTNU4RF0ug1bHj8j2en+7Xj1A@mail.gmail.com>
+References: <CALCETrVJzzKkRsSbgsUmVd_+ArKEgoRSVdG1tVp7CXzFoPyVgA@mail.gmail.com>
+ <20160622004214.GA27134@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: Andy Lutomirski <luto@kernel.org>, linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:43248 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751516AbcFVAvT (ORCPT
+Received: from mail-vk0-f46.google.com ([209.85.213.46]:36093 "EHLO
+	mail-vk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750890AbcFVA6A (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 21 Jun 2016 20:51:19 -0400
-Content-Disposition: inline
-In-Reply-To: <1466541931-2875-3-git-send-email-salvatore.benedetto@intel.com>
+	Tue, 21 Jun 2016 20:58:00 -0400
+Received: by mail-vk0-f46.google.com with SMTP id u64so42850908vkf.3
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Jun 2016 17:58:00 -0700 (PDT)
+In-Reply-To: <20160622004214.GA27134@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 21, 2016 at 09:45:30PM +0100, Salvatore Benedetto wrote:
+On Tue, Jun 21, 2016 at 5:42 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Tue, Jun 21, 2016 at 10:43:40AM -0700, Andy Lutomirski wrote:
+>>
+>> Is there a straightforward way that bluetooth and, potentially, other
+>> drivers can just do synchronous crypto in a small buffer specified by
+>> its virtual address?  The actual cryptography part of the crypto code
+>> already works this way, but I can't find an API for it.
 >
-> +
-> +static int test_dh(struct crypto_kpp *tfm, struct kpp_testvec_dh *vecs,
-> +		   unsigned int tcount)
-> +{
-> +	int ret, i;
+> Yes, single block users should use crypto_cipher_encrypt_one, an
+> example would be drivers/md/dm-crypt.c.
+>
 
-Please make the kpp test function generic.  I'm trying to kill
-the RSA-specific test function right now and I don't want to have
-to do this again.
+Aha!  I expected something like that to exist, but I couldn't find it.
+I'll change the two offenders I've found so far to use it.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--Andy
