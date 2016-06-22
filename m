@@ -1,39 +1,60 @@
-From: Andrzej Zaborowski <andrew.zaborowski@intel.com>
-Subject: Re: [PATCH 4/8] crypto: rsa-pkcs1pad - Require hash to be present
-Date: Wed, 22 Jun 2016 15:20:51 +0200
-Message-ID: <CAOq732+p7M5Cn2mPnbN3H3tkxvjf_UkKqQSR+eceBp4-CJYh-w@mail.gmail.com>
-References: <20160622101432.GA30454@gondor.apana.org.au> <E1bFfDK-0007yq-FV@gondolin.me.apana.org.au>
+From: Tero Kristo <t-kristo@ti.com>
+Subject: [PATCHv2 03/27] crypto: omap: do not call dmaengine_terminate_all
+Date: Wed, 22 Jun 2016 16:23:36 +0300
+Message-ID: <1466601840-18486-4-git-send-email-t-kristo@ti.com>
+References: <1466601840-18486-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
-	Stephan Mueller <smueller@chronox.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain
+Cc: <linux-arm-kernel@lists.infradead.org>
+To: <linux-omap@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<tony@atomide.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <lokeshvutla@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f67.google.com ([209.85.213.67]:35566 "EHLO
-	mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751000AbcFVNUw (ORCPT
+Received: from devils.ext.ti.com ([198.47.26.153]:50548 "EHLO
+	devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751905AbcFVNZI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jun 2016 09:20:52 -0400
-Received: by mail-vk0-f67.google.com with SMTP id t7so7747881vkf.2
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Jun 2016 06:20:52 -0700 (PDT)
-In-Reply-To: <E1bFfDK-0007yq-FV@gondolin.me.apana.org.au>
+	Wed, 22 Jun 2016 09:25:08 -0400
+In-Reply-To: <1466601840-18486-1-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+From: Lokesh Vutla <lokeshvutla@ti.com>
 
-On 22 June 2016 at 12:16, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> The only user of rsa-pkcs1pad always uses the hash so there is
-> no reason to support the case of not having a hash.
+The extra call to dmaengine_terminate_all is not needed, as the DMA
+is not running at this point. This improves performance slightly.
 
-We use pkcs1pad with AF_ALG to implement lightweight TLS.  TLS
-versions < 1.2 use a non-standard hash so we'd have to move the PKCS#1
-padding back to userspace if this is changed.
+Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+Signed-off-by: Tero Kristo <t-kristo@ti.com>
+---
+ drivers/crypto/omap-aes.c  | 2 --
+ drivers/crypto/omap-sham.c | 1 -
+ 2 files changed, 3 deletions(-)
 
-The remaining patches make sense, I think there was some reason there
-were those PAGE_SIZE checks in every operation but it's probably no
-longer valid.
-
-Best regards
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 4a0e6a5..8178632 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -528,8 +528,6 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
+ 
+ 	omap_aes_dma_stop(dd);
+ 
+-	dmaengine_terminate_all(dd->dma_lch_in);
+-	dmaengine_terminate_all(dd->dma_lch_out);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 2b0a1bd..fd3cac3 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -815,7 +815,6 @@ static int omap_sham_update_dma_stop(struct omap_sham_dev *dd)
+ {
+ 	struct omap_sham_reqctx *ctx = ahash_request_ctx(dd->req);
+ 
+-	dmaengine_terminate_all(dd->dma_lch);
+ 
+ 	if (ctx->flags & BIT(FLAGS_SG)) {
+ 		dma_unmap_sg(dd->dev, ctx->sg, 1, DMA_TO_DEVICE);
+-- 
+1.9.1
