@@ -1,38 +1,54 @@
-From: John Stultz <john.stultz@linaro.org>
-Subject: Re: [PATCH v2] crypto: Jitter RNG - use ktime_get_ns as
-	fallback
-Date: Wed, 22 Jun 2016 10:59:52 -0700
-Message-ID: <CALAqxLVgouX=6upL+W=LZnwQy4Kcw3avxKmpP5xo41biOG5+zQ@mail.gmail.com>
-References: <2249326.PVY2Dy3CIm@positron.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
- Alexander Kuleshov <kuleshovmail@gmail.com>,
- y2038 Mailman List <y2038@lists.linaro.org>,
- lkml <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Kees Cook <keescook@chromium.org>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <y2038-bounces@lists.linaro.org>
-In-Reply-To: <2249326.PVY2Dy3CIm@positron.chronox.de>
-List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
-List-Archive: <http://lists.linaro.org/pipermail/y2038/>
-List-Post: <mailto:y2038@lists.linaro.org>
-List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
-List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=subscribe>
-Errors-To: y2038-bounces@lists.linaro.org
-Sender: "Y2038" <y2038-bounces@lists.linaro.org>
-List-Id: linux-crypto.vger.kernel.org
+From: Mathias Krause <minipli@googlemail.com>
+Subject: [PATCH] crypto: user - re-add size check for CRYPTO_MSG_GETALG
+Date: Wed, 22 Jun 2016 20:29:37 +0200
+Message-ID: <1466620177-10998-1-git-send-email-minipli@googlemail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Mathias Krause <minipli@googlemail.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:35900 "EHLO
+	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751673AbcFVSaN (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Jun 2016 14:30:13 -0400
+Received: by mail-wm0-f68.google.com with SMTP id c82so3821132wme.3
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Jun 2016 11:30:12 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-T24gV2VkLCBKdW4gMjIsIDIwMTYgYXQgMTA6MjYgQU0sIFN0ZXBoYW4gTXVlbGxlciA8c211ZWxs
-ZXJAY2hyb25veC5kZT4gd3JvdGU6Cj4gSGkgSm9obiwgSGVyYmVydCwKPgo+IENoYW5nZXMgdjI6
-IHVzZSBrdGltZV9nZXRfbnMgaW5zdGVhZCBvZiBrdGltZV9nZXRfcmF3X25zCj4KPiBUaGUgdGVz
-dGluZyB3YXMgcmUtcGVyZm9ybWVkIGFuZCBpbmRpY2F0ZSBubyBkaWZmZXJlbmNlIHRvIHRoZSBw
-cmV2aW91cyB0ZXN0aW5nLgoKVGhhbmtzIGZvciBmb2xsb3dpbmcgdGhyb3VnaCBvbiB0aGlzLiBU
-aGlzIHZlcnNpb24gYWRkcmVzc2VzIG15CmNvbmNlcm5zIGFib3V0IHVzaW5nIHNwZWNpYWxpemVk
-IHRpbWUgYWNjZXNzb3JzIHdpdGhvdXQgY2xlYXIKcmF0aW9uYWwuCgp0aGFua3MKLWpvaG4KX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KWTIwMzggbWFpbGlu
-ZyBsaXN0ClkyMDM4QGxpc3RzLmxpbmFyby5vcmcKaHR0cHM6Ly9saXN0cy5saW5hcm8ub3JnL21h
-aWxtYW4vbGlzdGluZm8veTIwMzgK
+Commit 9aa867e46565 ("crypto: user - Add CRYPTO_MSG_DELRNG")
+accidentally removed the minimum size check for CRYPTO_MSG_GETALG
+netlink messages. This allows userland to send a truncated
+CRYPTO_MSG_GETALG message as short as a netlink header only making
+crypto_report() operate on uninitialized memory by accessing data
+beyond the end of the netlink message.
+
+Fix this be re-adding the minimum required size of CRYPTO_MSG_GETALG
+messages to the crypto_msg_min[] array.
+
+Fixes: 9aa867e46565 ("crypto: user - Add CRYPTO_MSG_DELRNG")
+Cc: stable@vger.kernel.org	# v4.2
+Signed-off-by: Mathias Krause <minipli@googlemail.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+---
+This should go on top of crypto-2.6/master.
+
+ crypto/crypto_user.c |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
+index 43fe85f20d57..7097a3395b25 100644
+--- a/crypto/crypto_user.c
++++ b/crypto/crypto_user.c
+@@ -455,6 +455,7 @@ static const int crypto_msg_min[CRYPTO_NR_MSGTYPES] = {
+ 	[CRYPTO_MSG_NEWALG	- CRYPTO_MSG_BASE] = MSGSIZE(crypto_user_alg),
+ 	[CRYPTO_MSG_DELALG	- CRYPTO_MSG_BASE] = MSGSIZE(crypto_user_alg),
+ 	[CRYPTO_MSG_UPDATEALG	- CRYPTO_MSG_BASE] = MSGSIZE(crypto_user_alg),
++	[CRYPTO_MSG_GETALG	- CRYPTO_MSG_BASE] = MSGSIZE(crypto_user_alg),
+ 	[CRYPTO_MSG_DELRNG	- CRYPTO_MSG_BASE] = 0,
+ };
+ 
+-- 
+1.7.10.4
