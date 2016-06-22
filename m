@@ -1,72 +1,62 @@
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [PATCH 4/8] crypto: rsa-pkcs1pad - Require hash to be present
-Date: Wed, 22 Jun 2016 08:39:09 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1606220813200.16013@mjmartin-mac01.local>
-References: <20160622101432.GA30454@gondor.apana.org.au> <E1bFfDK-0007yq-FV@gondolin.me.apana.org.au> <CAOq732+p7M5Cn2mPnbN3H3tkxvjf_UkKqQSR+eceBp4-CJYh-w@mail.gmail.com> <20160622140225.GA315@gondor.apana.org.au> <576A9E64.2020209@gmail.com>
- <20160622142050.GA540@gondor.apana.org.au> <576AA0F4.2020605@gmail.com> <20160622143341.GA747@gondor.apana.org.au>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH v6 2/8] crypto: add driver-side scomp interface
+Date: Wed, 22 Jun 2016 16:53:50 +0100
+Message-ID: <20160622155350.GA22247@sivswdev01.ir.intel.com>
+References: <1465373818-29720-1-git-send-email-giovanni.cabiddu@intel.com>
+ <1465373818-29720-3-git-send-email-giovanni.cabiddu@intel.com>
+ <20160613085612.GA7333@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-Cc: Denis Kenzior <denkenz@gmail.com>,
-	Andrzej Zaborowski <andrew.zaborowski@intel.com>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	Mat Martineau <mathew.j.martineau@linux.intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, dhowells@redhat.com
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:56792 "EHLO mga09.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:38092 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752651AbcFVPjQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jun 2016 11:39:16 -0400
-In-Reply-To: <20160622143341.GA747@gondor.apana.org.au>
+	id S1752472AbcFVPyY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Jun 2016 11:54:24 -0400
+Content-Disposition: inline
+In-Reply-To: <20160613085612.GA7333@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Mon, Jun 13, 2016 at 04:56:12PM +0800, Herbert Xu wrote:
+> The backup path is also very unlikely to work because we'll be
+> hitting this with 64K sizes and this just won't work with a 4K
+> page size.
+Is scatterwalk_map_and_copy broken?
 
-Herbert,
+> So up until now we've getting around this 64K issue with vmalloc,
+> and then we try to conserve the precious vmalloc resource by using
+> per-cpu allocation.
+I don't clearly understand what is the issue.
+Can you please give me more details?
 
-On Wed, 22 Jun 2016, Herbert Xu wrote:
+> This totally breaks down once you go to DMA, where an SG list is
+> required. 
+scomp backends should be used only for software implementations. 
+A driver backend which needs DMA should plug into acomp.
 
-> On Wed, Jun 22, 2016 at 09:30:12AM -0500, Denis Kenzior wrote:
->>
->> We live on the bleeding edge :)
->>
->> I realize that these features are not upstream yet, but that doesn't
->> mean that we can't influence / see the direction that the kernel is
->> taking and act accordingly.
->>
->> We'd like to have both pkcs1pad + hash, and simple pkcs1pad go
->> upstream.  That will make our job in userspace much easier.  Andrew
->> submitted pkcs1pad transform to the kernel specifically so we could
->> get rid of this logic in our userspace code.  So please consider
->> leaving both versions for upstream inclusion.
->
-> Sorry but the crypto API isn't a repository for general algorithms.
-> It's first and foremost a place for algorithms that we use in the
-> kernel.
->
-> The user-space interface (if we ever add one for akcipher, right now
-> there are strong objections against it) is mainly there to allow
-> access to hardware accelerators.  So I'm afraid I cannot keep the
-> hashless pkcs1pad until such a time that either we have a kernel
-> user for it or there is a piece of hardware implementing it.
+> Unfortunately, this means that there is no easy way
+> to linearise the data for our software implementations.
+> 
+> There is no easy way out I'm afraid.  I think we'll have to bite
+> the bullet and refit our software algos so that they handle SG
+> lists.
+Although feasible, I think it wouldn't be an easy job.
 
-David Howells has a keyctl patch set in progress that makes use of 
-pkcs1pad, with or without a hash:
-
-https://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/commit/?h=keys-asym-keyctl&id=6fe3b4aa7df524f4867868b01d4cb4345b1bf2de
-
-Please leave the non-hash code in, or consider deferring this patch until 
-we can also discuss the issue at the upcoming security summit. We've been 
-having a lot of trouble getting agreement on userspace access to 
-asymmetric ciphers and I think we could make some progress with in-person 
-discussion. (Mailing list discussion is also important because not 
-everyone concerned can attend the summit)
-
+> Not only will this solve the problem at hand, it'll also mean that
+> acomp users will never have to do vmalloc so it's a win-win.  It
+> also means that we won't need the scomp interface at all.
+> 
+> This does bring up another question of who should be allocating the
+> output memory.  Up until now it has been up to the user to do so.
+> However, if our algos can actually handle SG lists then I think it
+> should be fairly easy to make them do the allocation instead.  What
+> do you think?
+I would prefer the user of the api to allocate and manage the output
+memory.
 
 Thanks,
 
---
-Mat Martineau
-Intel OTC
+-- 
+Giovanni
