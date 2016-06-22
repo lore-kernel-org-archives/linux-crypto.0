@@ -1,7 +1,7 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCHv2 25/27] ARM: OMAP: DRA7xx: Make L4SEC clock domain SWSUP only
-Date: Wed, 22 Jun 2016 16:23:58 +0300
-Message-ID: <1466601840-18486-26-git-send-email-t-kristo@ti.com>
+Subject: [PATCHv2 15/27] ARM: dts: DRA7: Add DT node for DES IP
+Date: Wed, 22 Jun 2016 16:23:48 +0300
+Message-ID: <1466601840-18486-16-git-send-email-t-kristo@ti.com>
 References: <1466601840-18486-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,48 +10,44 @@ To: <linux-omap@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<tony@atomide.com>, <herbert@gondor.apana.org.au>,
 	<davem@davemloft.net>, <lokeshvutla@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:41264 "EHLO comal.ext.ti.com"
+Received: from arroyo.ext.ti.com ([198.47.19.12]:57954 "EHLO arroyo.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752523AbcFVN0E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jun 2016 09:26:04 -0400
+	id S1752311AbcFVNZ2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Jun 2016 09:25:28 -0400
 In-Reply-To: <1466601840-18486-1-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Joel Fernandes <joelf@ti.com>
 
-Using HWSUP for l4sec clock domain is causing warnings in HWMOD code for
-DRA7. Based on some observations, once the clock domain goes into an IDLE
-state (because of no activity etc), the IDLEST for the module goes to '0x2'
-value which means Interface IDLE condition. So far so go, however once the
-MODULEMODE is set to disabled for the particular IP, the IDLEST for the
-module should go to '0x3', per the HW AUTO IDLE protocol. However this is
-not observed and there is no reason per the protocl for the transition to
-not happen. This could potentially be a bug in the HW AUTO state-machine.
-
-Work around for this is to use SWSUP only for the particular clockdomain.
-With this all the transitions of IDLEST happen correctly and warnings
-don't occur.
+DRA7xx SoCs have a DES3DES IP. Add DT data for the same.
 
 Signed-off-by: Joel Fernandes <joelf@ti.com>
-Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
-Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- arch/arm/mach-omap2/clockdomains7xx_data.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/boot/dts/dra7.dtsi | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/arch/arm/mach-omap2/clockdomains7xx_data.c b/arch/arm/mach-omap2/clockdomains7xx_data.c
-index ef9ed36..6c67965 100644
---- a/arch/arm/mach-omap2/clockdomains7xx_data.c
-+++ b/arch/arm/mach-omap2/clockdomains7xx_data.c
-@@ -409,7 +409,7 @@ static struct clockdomain l4sec_7xx_clkdm = {
- 	.dep_bit	  = DRA7XX_L4SEC_STATDEP_SHIFT,
- 	.wkdep_srcs	  = l4sec_wkup_sleep_deps,
- 	.sleepdep_srcs	  = l4sec_wkup_sleep_deps,
--	.flags		  = CLKDM_CAN_HWSUP_SWSUP,
-+	.flags		  = CLKDM_CAN_SWSUP,
- };
+diff --git a/arch/arm/boot/dts/dra7.dtsi b/arch/arm/boot/dts/dra7.dtsi
+index e007401..959f99b 100644
+--- a/arch/arm/boot/dts/dra7.dtsi
++++ b/arch/arm/boot/dts/dra7.dtsi
+@@ -1743,6 +1743,17 @@
+ 				clock-names = "fck", "sys_clk";
+ 			};
+ 		};
++
++		des: des@480a5000 {
++			compatible = "ti,omap4-des";
++			ti,hwmods = "des";
++			reg = <0x480a5000 0xa0>;
++			interrupts = <GIC_SPI 77 IRQ_TYPE_LEVEL_HIGH>;
++			dmas = <&sdma_xbar 117>, <&sdma_xbar 116>;
++			dma-names = "tx", "rx";
++			clocks = <&l3_iclk_div>;
++			clock-names = "fck";
++		};
+ 	};
  
- static struct clockdomain l3main1_7xx_clkdm = {
+ 	thermal_zones: thermal-zones {
 -- 
 1.9.1
