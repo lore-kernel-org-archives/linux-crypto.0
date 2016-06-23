@@ -1,48 +1,93 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v6 2/8] crypto: add driver-side scomp interface
-Date: Thu, 23 Jun 2016 18:50:34 +0800
-Message-ID: <20160623105034.GA10475@gondor.apana.org.au>
-References: <1465373818-29720-1-git-send-email-giovanni.cabiddu@intel.com>
- <1465373818-29720-3-git-send-email-giovanni.cabiddu@intel.com>
- <20160613085612.GA7333@gondor.apana.org.au>
- <20160622155350.GA22247@sivswdev01.ir.intel.com>
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH 0/8] KEYS: keyctl operations for asymmetric keys
+Date: Thu, 23 Jun 2016 14:47:26 +0100
+Message-ID: <146668964650.2880.17571426835045239156.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47772 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751616AbcFWKuk (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Jun 2016 06:50:40 -0400
-Content-Disposition: inline
-In-Reply-To: <20160622155350.GA22247@sivswdev01.ir.intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: dhowells@redhat.com, linux-security-module@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: mathew.j.martineau@linux.intel.com, dwmw2@infradead.org,
+	tadeusz.struk@intel.com
+Return-path: <linux-security-module-owner@vger.kernel.org>
+Sender: owner-linux-security-module@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jun 22, 2016 at 04:53:50PM +0100, Giovanni Cabiddu wrote:
-> On Mon, Jun 13, 2016 at 04:56:12PM +0800, Herbert Xu wrote:
-> > The backup path is also very unlikely to work because we'll be
-> > hitting this with 64K sizes and this just won't work with a 4K
-> > page size.
-> Is scatterwalk_map_and_copy broken?
 
-No that's not the problem.  The problem is that you can't kmalloc
-64K of memory.  kmalloc requires physically contiguous memory and
-you cannot rely on having 64K of contiguous memory.
+Here's a set of patches that provides keyctl access for asymmetric keys,
+including a query function, and functions to do encryption, decryption,
+signature creation and signature verification.
 
-> > This totally breaks down once you go to DMA, where an SG list is
-> > required. 
-> scomp backends should be used only for software implementations. 
-> A driver backend which needs DMA should plug into acomp.
+I've added a PKCS#8 asymmetric key parser so that you can load an RSA private
+key into the kernel.  Currently only DER-encoded and unencrypted PKCS#8 is
+supported.  Encryption and verification can use a public key from an X.509
+cert, but signing and decryption require a private key, though encryption and
+verification can use that too.
 
-What I'm saying is that the current strategy of using vmalloc
-memory as input/output buffers cannot possibly work with acomp
-since you cannot do DMA over vmalloc memory.
+Example usage:
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	j=`openssl pkcs8 -in private_key.pem -topk8 -nocrypt -outform DER | \
+	    keyctl padd asymmetric foo @s`
+	echo -n abcdefghijklmnopqrst >/tmp/data
+	keyctl pkey_encrypt $j /tmp/data enc=pkcs1 >/tmp/enc
+	keyctl pkey_decrypt $j /tmp/enc enc=pkcs1 >/tmp/dec
+	cmp /tmp/data /tmp/dec
+	keyctl pkey_sign $j /tmp/data enc=pkcs1 hash=sha1 >/tmp/sig
+	keyctl pkey_verify $j /tmp/data /tmp/sig enc=pkcs1 hash=sha1
+
+Changes:
+
+ (*) I've taken out the password parameters for the moment as there isn't
+     yet a subtype that uses them.  I have, however, left space in the
+     keyctl UAPI to add them back later.
+
+The kernel patches can be found here also:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-asym-keyctl
+
+The keyutils changes needed can be found here:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/keyutils.git/log/?h=pkey
+
+David
+---
+David Howells (8):
+      KEYS: Provide key type operations for asymmetric key ops
+      KEYS: Provide keyctls to drive the new key type ops for asymmetric keys
+      KEYS: Provide missing asymmetric key subops for new key type ops
+      KEYS: Make the X.509 and PKCS7 parsers supply the sig encoding type
+      KEYS: Provide software public key query function
+      KEYS: Allow the public_key struct to hold a private key
+      KEYS: Implement encrypt, decrypt and sign for software asymmetric key
+      KEYS: Implement PKCS#8 RSA Private Key parser
+
+
+ Documentation/crypto/asymmetric-keys.txt  |   26 ++
+ Documentation/security/keys.txt           |  217 +++++++++++++++++++
+ crypto/asymmetric_keys/Kconfig            |   10 +
+ crypto/asymmetric_keys/Makefile           |   13 +
+ crypto/asymmetric_keys/asymmetric_keys.h  |    3 
+ crypto/asymmetric_keys/asymmetric_type.c  |   59 +++++
+ crypto/asymmetric_keys/pkcs7_parser.c     |    1 
+ crypto/asymmetric_keys/pkcs8.asn1         |   24 ++
+ crypto/asymmetric_keys/pkcs8_parser.c     |  184 +++++++++++++++++
+ crypto/asymmetric_keys/public_key.c       |  195 ++++++++++++++++--
+ crypto/asymmetric_keys/signature.c        |   95 +++++++++
+ crypto/asymmetric_keys/x509_cert_parser.c |   21 +-
+ include/crypto/public_key.h               |   14 +
+ include/keys/asymmetric-subtype.h         |    9 +
+ include/linux/key-type.h                  |   11 +
+ include/linux/keyctl.h                    |   46 ++++
+ include/uapi/linux/keyctl.h               |   30 +++
+ security/keys/Makefile                    |    1 
+ security/keys/compat.c                    |   18 ++
+ security/keys/internal.h                  |   39 ++++
+ security/keys/keyctl.c                    |   24 ++
+ security/keys/keyctl_pkey.c               |  323 +++++++++++++++++++++++++++++
+ 22 files changed, 1319 insertions(+), 44 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/pkcs8.asn1
+ create mode 100644 crypto/asymmetric_keys/pkcs8_parser.c
+ create mode 100644 include/linux/keyctl.h
+ create mode 100644 security/keys/keyctl_pkey.c
+
