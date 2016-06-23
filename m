@@ -1,77 +1,52 @@
-From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 6/8] KEYS: Allow the public_key struct to hold a private key
- [ver #2]
-Date: Thu, 23 Jun 2016 14:48:20 +0100
-Message-ID: <146668970008.2977.12780304253593497810.stgit@warthog.procyon.org.uk>
-References: <146668965425.2977.13357101274301968911.stgit@warthog.procyon.org.uk>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] crypto: user - re-add size check for CRYPTO_MSG_GETALG
+Date: Thu, 23 Jun 2016 16:46:26 +0200
+Message-ID: <2228963.xKdNI3on4m@tauon.atsec.com>
+References: <1466620177-10998-1-git-send-email-minipli@googlemail.com> <20160623104357.GA10350@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: dhowells@redhat.com, linux-security-module@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: mathew.j.martineau@linux.intel.com, dwmw2@infradead.org,
-	tadeusz.struk@intel.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <146668965425.2977.13357101274301968911.stgit@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Mathias Krause <minipli@googlemail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:38072 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750874AbcFWOqd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 23 Jun 2016 10:46:33 -0400
+In-Reply-To: <20160623104357.GA10350@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Put a flag in the public_key struct to indicate if the structure is holding
-a private key.  The private key must be held ASN.1 encoded in the format
-specified in RFC 3447 A.1.2.  This is the form required by crypto/rsa.c.
+Am Donnerstag, 23. Juni 2016, 18:43:57 schrieb Herbert Xu:
 
-The software encryption subtype's verification and query functions then
-need to select the appropriate crypto function to set the key.
+Hi Herbert,
 
-Signed-off-by: David Howells <dhowells@redhat.com>
----
+> On Wed, Jun 22, 2016 at 08:29:37PM +0200, Mathias Krause wrote:
+> > Commit 9aa867e46565 ("crypto: user - Add CRYPTO_MSG_DELRNG")
+> > accidentally removed the minimum size check for CRYPTO_MSG_GETALG
+> > netlink messages. This allows userland to send a truncated
+> > CRYPTO_MSG_GETALG message as short as a netlink header only making
+> > crypto_report() operate on uninitialized memory by accessing data
+> > beyond the end of the netlink message.
+> > 
+> > Fix this be re-adding the minimum required size of CRYPTO_MSG_GETALG
+> > messages to the crypto_msg_min[] array.
+> > 
+> > Fixes: 9aa867e46565 ("crypto: user - Add CRYPTO_MSG_DELRNG")
+> > Cc: stable@vger.kernel.org	# v4.2
+> > Signed-off-by: Mathias Krause <minipli@googlemail.com>
+> > Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> > ---
+> > This should go on top of crypto-2.6/master.
+> 
+> Patch applied to crypto.  Thanks!
 
- crypto/asymmetric_keys/public_key.c |   14 ++++++++++++--
- include/crypto/public_key.h         |    1 +
- 2 files changed, 13 insertions(+), 2 deletions(-)
+Please revert my patch eed1e1afd8d542d9644534c1b712599b5d680007 as requested 
+by Matthias.
 
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index a48a47a1dff0..a29ca01a41a0 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -113,7 +113,12 @@ static int software_key_query(const struct kernel_pkey_params *params,
- 	if (IS_ERR(tfm))
- 		return PTR_ERR(tfm);
- 
--	ret = crypto_akcipher_set_pub_key(tfm, pkey->key, pkey->keylen);
-+	if (pkey->key_is_private)
-+		ret = crypto_akcipher_set_priv_key(tfm,
-+						   pkey->key, pkey->keylen);
-+	else
-+		ret = crypto_akcipher_set_pub_key(tfm,
-+						  pkey->key, pkey->keylen);
- 	if (ret < 0)
- 		goto error_free_tfm;
- 
-@@ -184,7 +189,12 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	if (!req)
- 		goto error_free_tfm;
- 
--	ret = crypto_akcipher_set_pub_key(tfm, pkey->key, pkey->keylen);
-+	if (pkey->key_is_private)
-+		ret = crypto_akcipher_set_priv_key(tfm,
-+						   pkey->key, pkey->keylen);
-+	else
-+		ret = crypto_akcipher_set_pub_key(tfm,
-+						  pkey->key, pkey->keylen);
- 	if (ret)
- 		goto error_free_req;
- 
-diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
-index c46140d3729c..c5e569b2a73e 100644
---- a/include/crypto/public_key.h
-+++ b/include/crypto/public_key.h
-@@ -25,6 +25,7 @@
- struct public_key {
- 	void *key;
- 	u32 keylen;
-+	bool key_is_private;
- 	const char *id_type;
- 	const char *pkey_algo;
- };
+
+Ciao
+Stephan
