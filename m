@@ -1,47 +1,51 @@
-From: Scott Branden <scott.branden@broadcom.com>
-Subject: Re: [PATCH 0/3] hw_random: bcm2835: Add support for Broadcom BCM5301x
-Date: Wed, 22 Jun 2016 17:55:09 -0700
-Message-ID: <576B336D.1000308@broadcom.com>
-References: <1466641623-3491-1-git-send-email-f.fainelli@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 4/8] crypto: rsa-pkcs1pad - Require hash to be present
+Date: Thu, 23 Jun 2016 09:27:20 +0800
+Message-ID: <20160623012720.GA7143@gondor.apana.org.au>
+References: <20160622101432.GA30454@gondor.apana.org.au>
+ <E1bFfDK-0007yq-FV@gondolin.me.apana.org.au>
+ <CAOq732+p7M5Cn2mPnbN3H3tkxvjf_UkKqQSR+eceBp4-CJYh-w@mail.gmail.com>
+ <20160622140225.GA315@gondor.apana.org.au>
+ <576A9E64.2020209@gmail.com>
+ <20160622142050.GA540@gondor.apana.org.au>
+ <576AA0F4.2020605@gmail.com>
+ <20160622143341.GA747@gondor.apana.org.au>
+ <alpine.OSX.2.20.1606220813200.16013@mjmartin-mac01.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: yendapally.reddy@broadcom.com, herbert@gondor.apana.org.au,
-	eric@anholt.net, bcm-kernel-feedback-list@broadcom.com,
-	devicetre@vger.kernel.org, hauke@hauke-m.de, zajec5@gmail.com,
-	mpm@selenic.com, linux-arm-kernel@lists.infradead.org
-To: Florian Fainelli <f.fainelli@gmail.com>,
-	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: dhowells@redhat.com, Denis Kenzior <denkenz@gmail.com>,
+	Andrzej Zaborowski <andrew.zaborowski@intel.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
+	Stephan Mueller <smueller@chronox.de>
+To: Mat Martineau <mathew.j.martineau@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f54.google.com ([209.85.220.54]:33898 "EHLO
-	mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750953AbcFWAzR (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:37609 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750978AbcFWB1a (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jun 2016 20:55:17 -0400
-Received: by mail-pa0-f54.google.com with SMTP id bz2so21677297pad.1
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Jun 2016 17:55:17 -0700 (PDT)
-In-Reply-To: <1466641623-3491-1-git-send-email-f.fainelli@gmail.com>
+	Wed, 22 Jun 2016 21:27:30 -0400
+Content-Disposition: inline
+In-Reply-To: <alpine.OSX.2.20.1606220813200.16013@mjmartin-mac01.local>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Patch series looks good.
+On Wed, Jun 22, 2016 at 08:39:09AM -0700, Mat Martineau wrote:
+>
+> David Howells has a keyctl patch set in progress that makes use of
+> pkcs1pad, with or without a hash:
+> 
+> https://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/commit/?h=keys-asym-keyctl&id=6fe3b4aa7df524f4867868b01d4cb4345b1bf2de
 
-Acked-by: Scott Branden <scott.branden@broadcom.com>
+I'm sorry but I'm not going to allow arbitrary software algorithms
+to be exported to userspace like this.
 
-On 16-06-22 05:27 PM, Florian Fainelli wrote:
-> Hi all,
->
-> This patch series adds support for the Broadcom BCM5301x SoCs random number
-> generator which is the same block as the one found in NSP and BCM2835.
->
-> Florian Fainelli (3):
->    Documentation: devicetree: bindings: Add BCM5301x binding
->    hw_random: bcm2835: Add support for Broadcom BCM5301x
->    ARM: dts: BCM5301x: Add RNG Device Tree node
->
->   Documentation/devicetree/bindings/rng/brcm,bcm2835.txt | 3 ++-
->   arch/arm/boot/dts/bcm5301x.dtsi                        | 5 +++++
->   drivers/char/hw_random/Kconfig                         | 2 +-
->   drivers/char/hw_random/bcm2835-rng.c                   | 1 +
->   4 files changed, 9 insertions(+), 2 deletions(-)
->
+As I said, if we have a legitimate kernel user or a real hardware
+implementation I'll reconsider this.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
