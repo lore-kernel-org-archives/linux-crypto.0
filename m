@@ -1,44 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: user - re-add size check for CRYPTO_MSG_GETALG
-Date: Thu, 23 Jun 2016 18:43:57 +0800
-Message-ID: <20160623104357.GA10350@gondor.apana.org.au>
-References: <1466620177-10998-1-git-send-email-minipli@googlemail.com>
+Subject: Re: [PATCH v11 0/3] Key-agreement Protocol Primitives (KPP) API
+Date: Thu, 23 Jun 2016 18:44:30 +0800
+Message-ID: <20160623104430.GB10350@gondor.apana.org.au>
+References: <1466614155-24840-1-git-send-email-salvatore.benedetto@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>
-To: Mathias Krause <minipli@googlemail.com>
+Cc: linux-crypto@vger.kernel.org
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:40034 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:52659 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751665AbcFWKoI (ORCPT
+	with ESMTP id S1751616AbcFWKof (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Jun 2016 06:44:08 -0400
+	Thu, 23 Jun 2016 06:44:35 -0400
 Content-Disposition: inline
-In-Reply-To: <1466620177-10998-1-git-send-email-minipli@googlemail.com>
+In-Reply-To: <1466614155-24840-1-git-send-email-salvatore.benedetto@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 22, 2016 at 08:29:37PM +0200, Mathias Krause wrote:
-> Commit 9aa867e46565 ("crypto: user - Add CRYPTO_MSG_DELRNG")
-> accidentally removed the minimum size check for CRYPTO_MSG_GETALG
-> netlink messages. This allows userland to send a truncated
-> CRYPTO_MSG_GETALG message as short as a netlink header only making
-> crypto_report() operate on uninitialized memory by accessing data
-> beyond the end of the netlink message.
+On Wed, Jun 22, 2016 at 05:49:12PM +0100, Salvatore Benedetto wrote:
+> Hi Herb,
 > 
-> Fix this be re-adding the minimum required size of CRYPTO_MSG_GETALG
-> messages to the crypto_msg_min[] array.
+> the following patchset introduces a new API for abstracting key-agreement
+> protocols such as DH and ECDH. It provides the primitives required for implementing
+> the protocol, thus the name KPP (Key-agreement Protocol Primitives).
 > 
-> Fixes: 9aa867e46565 ("crypto: user - Add CRYPTO_MSG_DELRNG")
-> Cc: stable@vger.kernel.org	# v4.2
-> Signed-off-by: Mathias Krause <minipli@googlemail.com>
-> Cc: Steffen Klassert <steffen.klassert@secunet.com>
-> ---
-> This should go on top of crypto-2.6/master.
+> Regards,
+> Salvatore
+> 
+> Changes from v10:
+> * Remove all DH/ECDH code from testmgr. Secret is now encoded both
+>   in little and big endian in the testvector
 
-Patch applied to crypto.  Thanks!
+All applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
