@@ -1,58 +1,105 @@
-From: Andy Lutomirski <luto@amacapital.net>
-Subject: Re: Doing crypto in small stack buffers (bluetooth vs vmalloc-stack
- crash, etc)
-Date: Thu, 23 Jun 2016 15:11:00 -0700
-Message-ID: <CALCETrWRyai42BbQ213TzmZ9KwQhAD2eEoeCeR+6NPSC4O4BZg@mail.gmail.com>
-References: <CALCETrVJzzKkRsSbgsUmVd_+ArKEgoRSVdG1tVp7CXzFoPyVgA@mail.gmail.com>
- <20160622004214.GA27134@gondor.apana.org.au> <CALCETrUnzasc+c5Dxmw+g6U07dTNU4RF0ug1bHj8j2en+7Xj1A@mail.gmail.com>
- <CALCETrUWyNz91WO6O3dNb+YELeZy5q4+oTo6dLRR67P2WvBB8g@mail.gmail.com>
- <CALCETrXJAvtty-zrjZR0URyT92rMZ4HhiTLtd4r5CzFjZOj=-Q@mail.gmail.com>
- <20160623034825.GB7819@gondor.apana.org.au> <20160623064137.GA8958@gondor.apana.org.au>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH v8 0/6] crypto: algif - add akcipher
+Date: Thu, 23 Jun 2016 15:55:26 -0700
+Message-ID: <146672252642.23101.15972023870303797249.stgit@tstruk-mobl1.ra.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Andy Lutomirski <luto@kernel.org>, linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Network Development <netdev@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, tadeusz.struk@intel.com,
+	smueller@chronox.de, linux-api@vger.kernel.org,
+	marcel@holtmann.org, mathew.j.martineau@linux.intel.com,
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, dwmw2@infradead.org,
+	davem@davemloft.net
+To: dhowells@redhat.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f48.google.com ([209.85.213.48]:33137 "EHLO
-	mail-vk0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752130AbcFWWLV (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Jun 2016 18:11:21 -0400
-Received: by mail-vk0-f48.google.com with SMTP id d185so126615086vkg.0
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jun 2016 15:11:20 -0700 (PDT)
-In-Reply-To: <20160623064137.GA8958@gondor.apana.org.au>
+Received: from mga14.intel.com ([192.55.52.115]:64696 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751287AbcFWWz1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 23 Jun 2016 18:55:27 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 22, 2016 at 11:41 PM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> On Thu, Jun 23, 2016 at 11:48:25AM +0800, Herbert Xu wrote:
->>
->> No we never had such an API in the kernel.  However, I see that
->> rxkad does some pretty silly things and we should be able to avoid
->> using the stack in pretty much all cases.  Let me try to come up with
->> something.
->
-> Here it is:
->
-> ---8<---
-> Subject: rxrpc: Avoid using stack memory in SG lists in rxkad
+First four patches are a resend algif_akcipher from
+Stephan Mueller, with minor changes after rebase on top of 4.7-rc1.
 
-Looks reasonable to me.  Unless anyone tells me otherwise, my plan is
-to queue it in my virtually-mapped stack series and to ask Ingo to
-apply it via -tip.
+The next three patches add support for keys stored in system
+keyring subsystem.
 
-If it went in via the networking tree, that would work as well, but it
-would introduce a bisectability problem.
+First patch adds algif_akcipher nokey hadlers.
 
-Thanks!
+Second patch adds generic sign, verify, encrypt, decrypt accessors
+functions to the asymmetric key type. These will be defined by
+asymmetric subtypes, similarly to how public_key currently defines
+the verify_signature function.
 
---Andy
+Third patch adds support for ALG_SET_KEY_ID and ALG_SET_PUBKEY_ID
+commands to AF_ALG and setkeyid operation to the af_alg_type struct.
+If the keyid is used then the afalg layer acquires the key for the
+keyring subsystem and uses the new asymmetric accessor functions
+instead of akcipher api. The asymmetric subtypes can use akcipher
+api internally.
+
+Patches are generate against:
+http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-next
+
+v8 hanges:
+- copy the result to user for verify after the signature_verify
+  operation. Before only the return code was checked, but not the
+  actual data. Reported by Mat Martineau
+- remove the constrain on the output buffer size as requested by
+  Mat Martineau
+- ifx uninitialize variable issue, reported by Mat Martineau
+
+v7 changes:
+- update to reflect changes in kernel_pkey_params struct
+
+v6 changes:
+- rabased on top of
+http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-asym-keyctl
+
+v5 changes:
+- drop public key changes and use new version provided by David
+
+v4 changes:
+- don't use internal public_key struct in af_alg.
+- add generic accessor functions to asymmetric key type, which take
+  the generic struct key type and resolve the specific subtype internally
+
+v3 changes:
+- include Stephan's patches (rebased on 4.6-rc1)
+- add algif_akcipher nokey hadlers
+- add public_key info struct to public_key and helper query functions
+- add a check if a key is a software accessible key on af_alg, and
+  return -ENOKEY if it isn't
+
+v2 changes:
+- pass the original skcipher request in ablkcipher.base.data instead of
+  casting it back from the ablkcipher request.
+- rename _req to base_req
+- dropped 3/3
+
+---
+
+Stephan Mueller (4):
+      crypto: AF_ALG -- add sign/verify API
+      crypto: AF_ALG -- add setpubkey setsockopt call
+      crypto: AF_ALG -- add asymmetric cipher interface
+      crypto: algif_akcipher - enable compilation
+
+Tadeusz Struk (2):
+      crypto: algif_akcipher - add ops_nokey
+      crypto: AF_ALG - add support for key_id
+
+
+ crypto/Kconfig              |    9 
+ crypto/Makefile             |    1 
+ crypto/af_alg.c             |   28 +
+ crypto/algif_akcipher.c     |  878 +++++++++++++++++++++++++++++++++++++++++++
+ include/crypto/if_alg.h     |    2 
+ include/uapi/linux/if_alg.h |    5 
+ 6 files changed, 918 insertions(+), 5 deletions(-)
+ create mode 100644 crypto/algif_akcipher.c
+
+--
+TS
