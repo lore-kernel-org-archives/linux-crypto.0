@@ -1,36 +1,38 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/3] hw_random: bcm2835: Add support for Broadcom BCM5301x
-Date: Fri, 24 Jun 2016 21:31:22 +0800
-Message-ID: <20160624133122.GC21111@gondor.apana.org.au>
-References: <1466641623-3491-1-git-send-email-f.fainelli@gmail.com>
- <1466641623-3491-3-git-send-email-f.fainelli@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, yendapally.reddy@broadcom.com,
-	eric@anholt.net, bcm-kernel-feedback-list@broadcom.com,
-	devicetre@vger.kernel.org, hauke@hauke-m.de, zajec5@gmail.com,
-	mpm@selenic.com, linux-arm-kernel@lists.infradead.org
-To: Florian Fainelli <f.fainelli@gmail.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] MAINTAINERS: update maintainer for qat
+Date: Fri, 24 Jun 2016 07:01:33 -0700
+Message-ID: <1466776893-27788-1-git-send-email-tadeusz.struk@intel.com>
+Cc: linux-crypto@vger.kernel.org,
+	Tadeusz Struk <tadeusz.struk@intel.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:42445 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751784AbcFXNbl (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 24 Jun 2016 09:31:41 -0400
-Content-Disposition: inline
-In-Reply-To: <1466641623-3491-3-git-send-email-f.fainelli@gmail.com>
+Received: from mga02.intel.com ([134.134.136.20]:1164 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751505AbcFXOBx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 24 Jun 2016 10:01:53 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 22, 2016 at 05:27:02PM -0700, Florian Fainelli wrote:
-> The Broadcom BCM5301x SoCs (Northstar) utilize the same random number
-> generator peripheral as Northstar Plus and BCM2835, but just like the
-> NSP SoC, we need to enable the interrupt.
-> 
-> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+Add Giovanni and Salvatore who will take over the qat maintenance.
 
-Patch applied.
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ MAINTAINERS | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f4a9c13..5d813a3 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -9292,7 +9292,8 @@ L:	rtc-linux@googlegroups.com
+ S:	Maintained
+ 
+ QAT DRIVER
+-M:	Tadeusz Struk <tadeusz.struk@intel.com>
++M:	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
++M:	Salvatore Benedetto <salvatore.benedetto@intel.com>
+ L:	qat-linux@intel.com
+ S:	Supported
+ F:	drivers/crypto/qat/
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.7.4
