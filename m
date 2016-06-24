@@ -1,9 +1,8 @@
 From: Nishanth Menon <nm@ti.com>
-Subject: [PATCH] hwrng: OMAP: Fix assumption that runtime_get_sync will always
- succeed
-Date: Fri, 24 Jun 2016 11:50:40 -0500
-Message-ID: <1466787040-26184-2-git-send-email-nm@ti.com>
-References: <1466787040-26184-1-git-send-email-nm@ti.com>
+Subject: [PATCH V2] hwrng: OMAP: Fix assumption that runtime_get_sync will
+ always succeed
+Date: Fri, 24 Jun 2016 11:50:39 -0500
+Message-ID: <1466787040-26184-1-git-send-email-nm@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -13,7 +12,6 @@ Cc: Nishanth Menon <nm@ti.com>, Paul Walmsley <paul@pwsan.com>,
 To: Herbert Xu <herbert@gondor.apana.org.au>, Matt Mackall <mpm@selenic.com>,
  Deepak Saxena <dsaxena@plexity.net>
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1466787040-26184-1-git-send-email-nm@ti.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -51,18 +49,23 @@ Fixes: 665d92fa85b5 ("hwrng: OMAP: convert to use runtime PM")
 Cc: Paul Walmsley <paul@pwsan.com>
 Signed-off-by: Nishanth Menon <nm@ti.com>
 ---
+Changes in V2:
+	- Added runtime_put_noidle when get_sync fails to ensure proper refcounting
 
+V1: https://patchwork.kernel.org/patch/9197855/
+
+Patch based on: next-20160624
 Issue seen with next-20160624
 Full crash log: http://pastebin.ubuntu.com/17801376/
 
- drivers/char/hw_random/omap-rng.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ drivers/char/hw_random/omap-rng.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-index 8a1432e8bb80..f30a1870cb64 100644
+index 8a1432e8bb80..01d4be2c354b 100644
 --- a/drivers/char/hw_random/omap-rng.c
 +++ b/drivers/char/hw_random/omap-rng.c
-@@ -384,7 +384,11 @@ static int omap_rng_probe(struct platform_device *pdev)
+@@ -384,7 +384,12 @@ static int omap_rng_probe(struct platform_device *pdev)
  	}
  
  	pm_runtime_enable(&pdev->dev);
@@ -70,12 +73,13 @@ index 8a1432e8bb80..f30a1870cb64 100644
 +	ret = pm_runtime_get_sync(&pdev->dev);
 +	if (ret) {
 +		dev_err(&pdev->dev, "Failed to runtime_get device: %d\n", ret);
++		pm_runtime_put_noidle(&pdev->dev);
 +		goto err_ioremap;
 +	}
  
  	ret = (dev->of_node) ? of_get_omap_rng_device_details(priv, pdev) :
  				get_omap_rng_device_details(priv);
-@@ -435,8 +439,14 @@ static int __maybe_unused omap_rng_suspend(struct device *dev)
+@@ -435,8 +440,15 @@ static int __maybe_unused omap_rng_suspend(struct device *dev)
  static int __maybe_unused omap_rng_resume(struct device *dev)
  {
  	struct omap_rng_dev *priv = dev_get_drvdata(dev);
@@ -84,6 +88,7 @@ index 8a1432e8bb80..f30a1870cb64 100644
 +	ret = pm_runtime_get_sync(dev);
 +	if (ret) {
 +		dev_err(dev, "Failed to runtime_get device: %d\n", ret);
++		pm_runtime_put_noidle(dev);
 +		return ret;
 +	}
  
