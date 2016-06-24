@@ -1,39 +1,34 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: crypto: rsa - Do not gratuitously drop leading zeroes
-Date: Fri, 24 Jun 2016 09:27:12 +0200
-Message-ID: <733379976.TmXhNiYQ9x@positron.chronox.de>
-References: <20160622101432.GA30454@gondor.apana.org.au>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH 0/5] crypto: Fix IPsec reordering caused by cryptd
+Date: Fri, 24 Jun 2016 10:29:34 +0200
+Message-ID: <20160624082934.GR7698@gauss.secunet.com>
+References: <20160621085321.GA21044@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+Cc: Raj Ammanur <rammanur@arista.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:38120 "EHLO mail.eperm.de"
+Received: from a.mx.secunet.com ([62.96.220.36]:54502 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750959AbcFXH1P (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 24 Jun 2016 03:27:15 -0400
-In-Reply-To: <20160622101432.GA30454@gondor.apana.org.au>
+	id S1751624AbcFXI3i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 24 Jun 2016 04:29:38 -0400
+Content-Disposition: inline
+In-Reply-To: <20160621085321.GA21044@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 22. Juni 2016, 18:14:32 schrieb Herbert Xu:
+On Tue, Jun 21, 2016 at 04:53:21PM +0800, Herbert Xu wrote:
+> Hi:
+> 
+> I finally got around to working on this.  I quickly gave up on the
+> notion of hijacking the queued requests as we may end up overwhelming
+> our caller.
+> 
+> So the solution is the obvious one of using cryptd as long as there
+> are requests queued there belonging to the same tfm.  This is
+> totally untested so please tread carefully.
 
-Hi Herbert,
-
-Something breaks with this patch set in public_key_verify_signature
-
-I get tons of these:
-
-[    1.838720] PKCS#7 signature not signed with a trusted key
-
-
-Furthermore, my CAVS testing with public_key_verify_signature always EINVAL.
-
-SigGen using the kernel crypto API interfaces work though.
-
-Ciao
-Stephan
+Thanks for the patches!
+I've tested them today and observed no problems with it,
+so looks good :)
