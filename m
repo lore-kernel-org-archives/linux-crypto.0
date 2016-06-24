@@ -1,34 +1,47 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH 5/8] KEYS: Provide software public key query function [ver #2]
-Date: Fri, 24 Jun 2016 13:06:02 +0100
-Message-ID: <7446.1466769962@warthog.procyon.org.uk>
-References: <20160624100215.GA19150@gondor.apana.org.au>
+From: Gary R Hook <ghook@amd.com>
+Subject: Re: Encryption output buffer description in algif_aead.c file
+Date: Fri, 24 Jun 2016 07:44:49 -0500
+Message-ID: <576D2B41.40801@amd.com>
+References: <CAFXBA==72cGgAGMjKu7_yCiFuROVYZ4L5s_V5kfrVF=dT=pPkw@mail.gmail.com>
+ <3088643.1BKRPXOEZ9@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com,
-	Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	dwmw2@infradead.org, tadeusz.struk@intel.com,
-	linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	James Morris <jmorris@namei.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160624100215.GA19150@gondor.apana.org.au>
-Content-ID: <7445.1466769962.1@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>,
+	Harsh Jain <harshjain.prof@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn1on0095.outbound.protection.outlook.com ([157.56.110.95]:11712
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751834AbcFXMpE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 24 Jun 2016 08:45:04 -0400
+In-Reply-To: <3088643.1BKRPXOEZ9@tauon.atsec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On 06/24/2016 07:01 AM, Stephan Mueller wrote:
+> Am Freitag, 24. Juni 2016, 17:24:02 schrieb Harsh Jain:
+>
+> Hi Harsh,
+>
+>
+>> 379          * The memory structure for cipher operation has the following
+>> 380          * structure:
+>> 381          *      AEAD encryption input:  assoc data || plaintext
+>> 382          *      AEAD encryption output: cipherntext || auth tag
+>> 383          *      AEAD decryption input:  assoc data || ciphertext || auth
+>> tag 384          *      AEAD decryption output: plaintext
+>
+> Right, it returns AAD prepended to the stated output. Do you want to provide a
+> patch?
 
-> IOW exporting the raw RSA might make sense because the key may
-> not be visible to user-space, or that the RSA might be implemented
-> in hardware offload, but there is no sane reason to export pkcs1pad.
+If testmgr.c is any model, the caller is expected to populate the 
+destination
+buffer with the AAD. Is my understanding correct? And should this 
+comment clarify
+that point: i.e. the length of the destination is the sum of the lengths 
+of the
+aad + ciphertext + tag?
 
-The problem is that if I'm to produce consistency with, say, the TPM
-interface, then I have to deal in wrapped/padded data - leastways as far as I
-can tell from reading the docs.
-
-David
+Gary
