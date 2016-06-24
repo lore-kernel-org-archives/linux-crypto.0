@@ -1,7 +1,7 @@
 From: Megha Dey <megha.dey@intel.com>
-Subject: [PATCH 4/7] crypto: sha256-mb - Algorithm data structures
-Date: Thu, 23 Jun 2016 18:40:45 -0700
-Message-ID: <1466732448-27856-5-git-send-email-megha.dey@intel.com>
+Subject: [PATCH 1/7] crypto: sha256-mb - SHA256 multibuffer job manager and glue code
+Date: Thu, 23 Jun 2016 18:40:42 -0700
+Message-ID: <1466732448-27856-2-git-send-email-megha.dey@intel.com>
 References: <1466732448-27856-1-git-send-email-megha.dey@intel.com>
 Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -13,31 +13,63 @@ In-Reply-To: <1466732448-27856-1-git-send-email-megha.dey@intel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch introduces the data structures and prototypes of
-functions needed for computing SHA256 hash using multi-buffer.
-Included are the structures of the multi-buffer SHA256 job,
-job scheduler in C and x86 assembly.
+This patch introduces the multi-buffer job manager which is responsible for
+submitting scatter-gather buffers from several SHA256 jobs to the
+multi-buffer algorithm. It also contains the flush routine to that's
+called by the crypto daemon to complete the job when no new jobs arrive
+before the deadline of maximum latency of a SHA256 crypto job.
+
+The SHA256 multi-buffer crypto algorithm is defined and initialized in
+this patch.
 
 Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
 Reviewed-by: Fenghua Yu <fenghua.yu@intel.com>
 Reviewed-by: Tim Chen <tim.c.chen@linux.intel.com>
 ---
- arch/x86/crypto/sha256-mb/sha256_mb_ctx.h          | 136 +++++++++
- arch/x86/crypto/sha256-mb/sha256_mb_mgr.h          | 108 ++++++++
- .../crypto/sha256-mb/sha256_mb_mgr_datastruct.S    | 304 +++++++++++++++++++++
- 3 files changed, 548 insertions(+)
- create mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_ctx.h
- create mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_mgr.h
- create mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_mgr_datastruct.S
+ arch/x86/crypto/Makefile              |    1 +
+ arch/x86/crypto/sha256-mb/Makefile    |   11 +
+ arch/x86/crypto/sha256-mb/sha256_mb.c | 1027 +++++++++++++++++++++++++++++++++
+ 3 files changed, 1039 insertions(+)
+ create mode 100644 arch/x86/crypto/sha256-mb/Makefile
+ create mode 100644 arch/x86/crypto/sha256-mb/sha256_mb.c
 
-diff --git a/arch/x86/crypto/sha256-mb/sha256_mb_ctx.h b/arch/x86/crypto/sha256-mb/sha256_mb_ctx.h
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index b9b912a..aafff22 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -50,6 +50,7 @@ ifeq ($(avx2_supported),yes)
+ 	obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX2_X86_64) += camellia-aesni-avx2.o
+ 	obj-$(CONFIG_CRYPTO_SERPENT_AVX2_X86_64) += serpent-avx2.o
+ 	obj-$(CONFIG_CRYPTO_SHA1_MB) += sha-mb/
++	obj-$(CONFIG_CRYPTO_SHA256_MB) += sha256-mb/
+ endif
+ 
+ aes-i586-y := aes-i586-asm_32.o aes_glue.o
+diff --git a/arch/x86/crypto/sha256-mb/Makefile b/arch/x86/crypto/sha256-mb/Makefile
 new file mode 100644
-index 0000000..edd252b
+index 0000000..41089e7
 --- /dev/null
-+++ b/arch/x86/crypto/sha256-mb/sha256_mb_ctx.h
-@@ -0,0 +1,136 @@
++++ b/arch/x86/crypto/sha256-mb/Makefile
+@@ -0,0 +1,11 @@
++#
++# Arch-specific CryptoAPI modules.
++#
++
++avx2_supported := $(call as-instr,vpgatherdd %ymm0$(comma)(%eax$(comma)%ymm1\
++                                $(comma)4)$(comma)%ymm2,yes,no)
++ifeq ($(avx2_supported),yes)
++	obj-$(CONFIG_CRYPTO_SHA256_MB) += sha256-mb.o
++	sha256-mb-y := sha256_mb.o sha256_mb_mgr_flush_avx2.o \
++	     sha256_mb_mgr_init_avx2.o sha256_mb_mgr_submit_avx2.o sha256_x8_avx2.o
++endif
+diff --git a/arch/x86/crypto/sha256-mb/sha256_mb.c b/arch/x86/crypto/sha256-mb/sha256_mb.c
+new file mode 100644
+index 0000000..d1c1045
+--- /dev/null
++++ b/arch/x86/crypto/sha256-mb/sha256_mb.c
+@@ -0,0 +1,1027 @@
 +/*
-+ * Header file for multi buffer SHA256 context
++ * Multi buffer SHA256 algorithm Glue Code
 + *
 + * This file is provided under a dual BSD/GPLv2 license.  When using or
 + * redistributing this file, you may do so under either license.
@@ -89,512 +121,979 @@ index 0000000..edd252b
 + * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 + */
 +
-+#ifndef _SHA_MB_CTX_INTERNAL_H
-+#define _SHA_MB_CTX_INTERNAL_H
++#define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
 +
-+#include "sha256_mb_mgr.h"
-+
-+#define HASH_UPDATE          0x00
-+#define HASH_FIRST           0x01
-+#define HASH_LAST            0x02
-+#define HASH_ENTIRE          0x03
-+#define HASH_DONE	     0x04
-+#define HASH_FINAL	     0x08
-+
-+#define HASH_CTX_STS_IDLE       0x00
-+#define HASH_CTX_STS_PROCESSING 0x01
-+#define HASH_CTX_STS_LAST       0x02
-+#define HASH_CTX_STS_COMPLETE   0x04
-+
-+enum hash_ctx_error {
-+	HASH_CTX_ERROR_NONE               =  0,
-+	HASH_CTX_ERROR_INVALID_FLAGS      = -1,
-+	HASH_CTX_ERROR_ALREADY_PROCESSING = -2,
-+	HASH_CTX_ERROR_ALREADY_COMPLETED  = -3,
-+
-+#ifdef HASH_CTX_DEBUG
-+	HASH_CTX_ERROR_DEBUG_DIGEST_MISMATCH = -4,
-+#endif
-+};
-+
-+
-+#define hash_ctx_user_data(ctx)  ((ctx)->user_data)
-+#define hash_ctx_digest(ctx)     ((ctx)->job.result_digest)
-+#define hash_ctx_processing(ctx) ((ctx)->status & HASH_CTX_STS_PROCESSING)
-+#define hash_ctx_complete(ctx)   ((ctx)->status == HASH_CTX_STS_COMPLETE)
-+#define hash_ctx_status(ctx)     ((ctx)->status)
-+#define hash_ctx_error(ctx)      ((ctx)->error)
-+#define hash_ctx_init(ctx) \
-+	do { \
-+		(ctx)->error = HASH_CTX_ERROR_NONE; \
-+		(ctx)->status = HASH_CTX_STS_COMPLETE; \
-+	} while (0)
-+
-+
-+/* Hash Constants and Typedefs */
-+#define SHA256_DIGEST_LENGTH        8
-+#define SHA256_LOG2_BLOCK_SIZE        6
-+
-+#define SHA256_PADLENGTHFIELD_SIZE    8
-+
-+#ifdef SHA_MB_DEBUG
-+#define assert(expr) \
-+do { \
-+	if (unlikely(!(expr))) { \
-+		printk(KERN_ERR "Assertion failed! %s,%s,%s,line=%d\n", \
-+		#expr, __FILE__, __func__, __LINE__); \
-+	} \
-+} while (0)
-+#else
-+#define assert(expr) do {} while (0)
-+#endif
-+
-+struct sha256_ctx_mgr {
-+	struct sha256_mb_mgr mgr;
-+};
-+
-+/* typedef struct sha256_ctx_mgr sha256_ctx_mgr; */
-+
-+struct sha256_hash_ctx {
-+	/* Must be at struct offset 0 */
-+	struct job_sha256       job;
-+	/* status flag */
-+	int status;
-+	/* error flag */
-+	int error;
-+
-+	uint32_t	total_length;
-+	const void	*incoming_buffer;
-+	uint32_t	incoming_buffer_length;
-+	uint8_t		partial_block_buffer[SHA256_BLOCK_SIZE * 2];
-+	uint32_t	partial_block_buffer_length;
-+	void		*user_data;
-+};
-+
-+#endif
-diff --git a/arch/x86/crypto/sha256-mb/sha256_mb_mgr.h b/arch/x86/crypto/sha256-mb/sha256_mb_mgr.h
-new file mode 100644
-index 0000000..b01ae40
---- /dev/null
-+++ b/arch/x86/crypto/sha256-mb/sha256_mb_mgr.h
-@@ -0,0 +1,108 @@
-+/*
-+ * Header file for multi buffer SHA256 algorithm manager
-+ *
-+ * This file is provided under a dual BSD/GPLv2 license.  When using or
-+ * redistributing this file, you may do so under either license.
-+ *
-+ * GPL LICENSE SUMMARY
-+ *
-+ *  Copyright(c) 2016 Intel Corporation.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of version 2 of the GNU General Public License as
-+ *  published by the Free Software Foundation.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but
-+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  General Public License for more details.
-+ *
-+ *  Contact Information:
-+ *	Megha Dey <megha.dey@linux.intel.com>
-+ *
-+ *  BSD LICENSE
-+ *
-+ *  Copyright(c) 2016 Intel Corporation.
-+ *
-+ *  Redistribution and use in source and binary forms, with or without
-+ *  modification, are permitted provided that the following conditions
-+ *  are met:
-+ *
-+ *    * Redistributions of source code must retain the above copyright
-+ *      notice, this list of conditions and the following disclaimer.
-+ *    * Redistributions in binary form must reproduce the above copyright
-+ *      notice, this list of conditions and the following disclaimer in
-+ *      the documentation and/or other materials provided with the
-+ *      distribution.
-+ *    * Neither the name of Intel Corporation nor the names of its
-+ *      contributors may be used to endorse or promote products derived
-+ *      from this software without specific prior written permission.
-+ *
-+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ */
-+#ifndef __SHA_MB_MGR_H
-+#define __SHA_MB_MGR_H
-+
++#include <crypto/internal/hash.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/mm.h>
++#include <linux/cryptohash.h>
 +#include <linux/types.h>
++#include <linux/list.h>
++#include <crypto/scatterwalk.h>
++#include <crypto/sha.h>
++#include <crypto/mcryptd.h>
++#include <crypto/crypto_wq.h>
++#include <asm/byteorder.h>
++#include <linux/hardirq.h>
++#include <asm/fpu/api.h>
++#include "sha256_mb_ctx.h"
 +
-+#define NUM_SHA256_DIGEST_WORDS 8
++#define FLUSH_INTERVAL 1000 /* in usec */
 +
-+enum job_sts {	STS_UNKNOWN = 0,
-+		STS_BEING_PROCESSED = 1,
-+		STS_COMPLETED = 2,
-+		STS_INTERNAL_ERROR = 3,
-+		STS_ERROR = 4
++static struct mcryptd_alg_state sha256_mb_alg_state;
++
++struct sha256_mb_ctx {
++	struct mcryptd_ahash *mcryptd_tfm;
 +};
 +
-+struct job_sha256 {
-+	u8	*buffer;
-+	u32	len;
-+	u32	result_digest[NUM_SHA256_DIGEST_WORDS] __aligned(32);
-+	enum	job_sts status;
-+	void	*user_data;
-+};
++static inline struct mcryptd_hash_request_ctx
++		*cast_hash_to_mcryptd_ctx(struct sha256_hash_ctx *hash_ctx)
++{
++	struct ahash_request *areq;
 +
-+/* SHA256 out-of-order scheduler */
++	areq = container_of((void *) hash_ctx, struct ahash_request, __ctx);
++	return container_of(areq, struct mcryptd_hash_request_ctx, areq);
++}
 +
-+/* typedef uint32_t sha8_digest_array[8][8]; */
++static inline struct ahash_request
++		*cast_mcryptd_ctx_to_req(struct mcryptd_hash_request_ctx *ctx)
++{
++	return container_of((void *) ctx, struct ahash_request, __ctx);
++}
 +
-+struct sha256_args_x8 {
-+	uint32_t	digest[8][8];
-+	uint8_t		*data_ptr[8];
-+};
++static void req_ctx_init(struct mcryptd_hash_request_ctx *rctx,
++				struct ahash_request *areq)
++{
++	rctx->flag = HASH_UPDATE;
++}
 +
-+struct sha256_lane_data {
-+	struct job_sha256 *job_in_lane;
-+};
++static asmlinkage void (*sha256_job_mgr_init)(struct sha256_mb_mgr *state);
++static asmlinkage struct job_sha256* (*sha256_job_mgr_submit)
++			(struct sha256_mb_mgr *state, struct job_sha256 *job);
++static asmlinkage struct job_sha256* (*sha256_job_mgr_flush)
++			(struct sha256_mb_mgr *state);
++static asmlinkage struct job_sha256* (*sha256_job_mgr_get_comp_job)
++			(struct sha256_mb_mgr *state);
 +
-+struct sha256_mb_mgr {
-+	struct sha256_args_x8 args;
++inline void sha256_init_digest(uint32_t *digest)
++{
++	static const uint32_t initial_digest[SHA256_DIGEST_LENGTH] = {
++				SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
++				SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7};
++	memcpy(digest, initial_digest, sizeof(initial_digest));
++}
 +
-+	uint32_t lens[8];
++inline uint32_t sha256_pad(uint8_t padblock[SHA256_BLOCK_SIZE * 2],
++			 uint32_t total_len)
++{
++	uint32_t i = total_len & (SHA256_BLOCK_SIZE - 1);
 +
-+	/* each byte is index (0...7) of unused lanes */
-+	uint64_t unused_lanes;
-+	/* byte 4 is set to FF as a flag */
-+	struct sha256_lane_data ldata[8];
-+};
++	memset(&padblock[i], 0, SHA256_BLOCK_SIZE);
++	padblock[i] = 0x80;
 +
++	i += ((SHA256_BLOCK_SIZE - 1) &
++	      (0 - (total_len + SHA256_PADLENGTHFIELD_SIZE + 1)))
++	     + 1 + SHA256_PADLENGTHFIELD_SIZE;
 +
-+#define SHA256_MB_MGR_NUM_LANES_AVX2 8
-+
-+void sha256_mb_mgr_init_avx2(struct sha256_mb_mgr *state);
-+struct job_sha256 *sha256_mb_mgr_submit_avx2(struct sha256_mb_mgr *state,
-+					 struct job_sha256 *job);
-+struct job_sha256 *sha256_mb_mgr_flush_avx2(struct sha256_mb_mgr *state);
-+struct job_sha256 *sha256_mb_mgr_get_comp_job_avx2(struct sha256_mb_mgr *state);
-+
-+#endif
-diff --git a/arch/x86/crypto/sha256-mb/sha256_mb_mgr_datastruct.S b/arch/x86/crypto/sha256-mb/sha256_mb_mgr_datastruct.S
-new file mode 100644
-index 0000000..5c377ba
---- /dev/null
-+++ b/arch/x86/crypto/sha256-mb/sha256_mb_mgr_datastruct.S
-@@ -0,0 +1,304 @@
-+/*
-+ * Header file for multi buffer SHA256 algorithm data structure
-+ *
-+ * This file is provided under a dual BSD/GPLv2 license.  When using or
-+ * redistributing this file, you may do so under either license.
-+ *
-+ * GPL LICENSE SUMMARY
-+ *
-+ * Copyright(c) 2016 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of version 2 of the GNU General Public License as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License for more details.
-+ *
-+ * Contact Information:
-+ *     Megha Dey <megha.dey@linux.intel.com>
-+ *
-+ * BSD LICENSE
-+ *
-+ * Copyright(c) 2016 Intel Corporation.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *
-+ *   * Redistributions of source code must retain the above copyright
-+ *     notice, this list of conditions and the following disclaimer.
-+ *   * Redistributions in binary form must reproduce the above copyright
-+ *     notice, this list of conditions and the following disclaimer in
-+ *     the documentation and/or other materials provided with the
-+ *     distribution.
-+ *   * Neither the name of Intel Corporation nor the names of its
-+ *     contributors may be used to endorse or promote products derived
-+ *     from this software without specific prior written permission.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ */
-+
-+# Macros for defining data structures
-+
-+# Usage example
-+
-+#START_FIELDS	# JOB_AES
-+###	name		size	align
-+#FIELD	_plaintext,	8,	8	# pointer to plaintext
-+#FIELD	_ciphertext,	8,	8	# pointer to ciphertext
-+#FIELD	_IV,		16,	8	# IV
-+#FIELD	_keys,		8,	8	# pointer to keys
-+#FIELD	_len,		4,	4	# length in bytes
-+#FIELD	_status,	4,	4	# status enumeration
-+#FIELD	_user_data,	8,	8	# pointer to user data
-+#UNION  _union,         size1,  align1, \
-+#	                size2,  align2, \
-+#	                size3,  align3, \
-+#	                ...
-+#END_FIELDS
-+#%assign _JOB_AES_size	_FIELD_OFFSET
-+#%assign _JOB_AES_align	_STRUCT_ALIGN
-+
-+#########################################################################
-+
-+# Alternate "struc-like" syntax:
-+#	STRUCT job_aes2
-+#	RES_Q	.plaintext,	1
-+#	RES_Q	.ciphertext, 	1
-+#	RES_DQ	.IV,		1
-+#	RES_B	.nested,	_JOB_AES_SIZE, _JOB_AES_ALIGN
-+#	RES_U	.union,		size1, align1, \
-+#				size2, align2, \
-+#				...
-+#	ENDSTRUCT
-+#	# Following only needed if nesting
-+#	%assign job_aes2_size	_FIELD_OFFSET
-+#	%assign job_aes2_align	_STRUCT_ALIGN
-+#
-+# RES_* macros take a name, a count and an optional alignment.
-+# The count in in terms of the base size of the macro, and the
-+# default alignment is the base size.
-+# The macros are:
-+# Macro    Base size
-+# RES_B	    1
-+# RES_W	    2
-+# RES_D     4
-+# RES_Q     8
-+# RES_DQ   16
-+# RES_Y    32
-+# RES_Z    64
-+#
-+# RES_U defines a union. It's arguments are a name and two or more
-+# pairs of "size, alignment"
-+#
-+# The two assigns are only needed if this structure is being nested
-+# within another. Even if the assigns are not done, one can still use
-+# STRUCT_NAME_size as the size of the structure.
-+#
-+# Note that for nesting, you still need to assign to STRUCT_NAME_size.
-+#
-+# The differences between this and using "struc" directly are that each
-+# type is implicitly aligned to its natural length (although this can be
-+# over-ridden with an explicit third parameter), and that the structure
-+# is padded at the end to its overall alignment.
-+#
-+
-+#########################################################################
-+
-+#ifndef _DATASTRUCT_ASM_
-+#define _DATASTRUCT_ASM_
-+
-+#define SZ8			8*SHA256_DIGEST_WORD_SIZE
-+#define ROUNDS			64*SZ8
-+#define PTR_SZ                  8
-+#define SHA256_DIGEST_WORD_SIZE 4
-+#define MAX_SHA256_LANES        8
-+#define SHA256_DIGEST_WORDS 8
-+#define SHA256_DIGEST_ROW_SIZE  (MAX_SHA256_LANES * SHA256_DIGEST_WORD_SIZE)
-+#define SHA256_DIGEST_SIZE      (SHA256_DIGEST_ROW_SIZE * SHA256_DIGEST_WORDS)
-+#define SHA256_BLK_SZ           64
-+
-+# START_FIELDS
-+.macro START_FIELDS
-+ _FIELD_OFFSET = 0
-+ _STRUCT_ALIGN = 0
-+.endm
-+
-+# FIELD name size align
-+.macro FIELD name size align
-+ _FIELD_OFFSET = (_FIELD_OFFSET + (\align) - 1) & (~ ((\align)-1))
-+ \name	= _FIELD_OFFSET
-+ _FIELD_OFFSET = _FIELD_OFFSET + (\size)
-+.if (\align > _STRUCT_ALIGN)
-+ _STRUCT_ALIGN = \align
-+.endif
-+.endm
-+
-+# END_FIELDS
-+.macro END_FIELDS
-+ _FIELD_OFFSET = (_FIELD_OFFSET + _STRUCT_ALIGN-1) & (~ (_STRUCT_ALIGN-1))
-+.endm
-+
-+########################################################################
-+
-+.macro STRUCT p1
-+START_FIELDS
-+.struc \p1
-+.endm
-+
-+.macro ENDSTRUCT
-+ tmp = _FIELD_OFFSET
-+ END_FIELDS
-+ tmp = (_FIELD_OFFSET - %%tmp)
-+.if (tmp > 0)
-+	.lcomm	tmp
-+.endif
-+.endstruc
-+.endm
-+
-+## RES_int name size align
-+.macro RES_int p1 p2 p3
-+ name = \p1
-+ size = \p2
-+ align = .\p3
-+
-+ _FIELD_OFFSET = (_FIELD_OFFSET + (align) - 1) & (~ ((align)-1))
-+.align align
-+.lcomm name size
-+ _FIELD_OFFSET = _FIELD_OFFSET + (size)
-+.if (align > _STRUCT_ALIGN)
-+ _STRUCT_ALIGN = align
-+.endif
-+.endm
-+
-+# macro RES_B name, size [, align]
-+.macro RES_B _name, _size, _align=1
-+RES_int _name _size _align
-+.endm
-+
-+# macro RES_W name, size [, align]
-+.macro RES_W _name, _size, _align=2
-+RES_int _name 2*(_size) _align
-+.endm
-+
-+# macro RES_D name, size [, align]
-+.macro RES_D _name, _size, _align=4
-+RES_int _name 4*(_size) _align
-+.endm
-+
-+# macro RES_Q name, size [, align]
-+.macro RES_Q _name, _size, _align=8
-+RES_int _name 8*(_size) _align
-+.endm
-+
-+# macro RES_DQ name, size [, align]
-+.macro RES_DQ _name, _size, _align=16
-+RES_int _name 16*(_size) _align
-+.endm
-+
-+# macro RES_Y name, size [, align]
-+.macro RES_Y _name, _size, _align=32
-+RES_int _name 32*(_size) _align
-+.endm
-+
-+# macro RES_Z name, size [, align]
-+.macro RES_Z _name, _size, _align=64
-+RES_int _name 64*(_size) _align
-+.endm
-+
++#if SHA256_PADLENGTHFIELD_SIZE == 16
++	*((uint64_t *) &padblock[i - 16]) = 0;
 +#endif
 +
++	*((uint64_t *) &padblock[i - 8]) = cpu_to_be64(total_len << 3);
 +
-+########################################################################
-+#### Define SHA256 Out Of Order Data Structures
-+########################################################################
++	/* Number of extra blocks to hash */
++	return i >> SHA256_LOG2_BLOCK_SIZE;
++}
 +
-+START_FIELDS    # LANE_DATA
-+###     name            size    align
-+FIELD   _job_in_lane,   8,      8       # pointer to job object
-+END_FIELDS
++static struct sha256_hash_ctx
++		*sha256_ctx_mgr_resubmit(struct sha256_ctx_mgr *mgr,
++					struct sha256_hash_ctx *ctx)
++{
++	while (ctx) {
++		if (ctx->status & HASH_CTX_STS_COMPLETE) {
++			/* Clear PROCESSING bit */
++			ctx->status = HASH_CTX_STS_COMPLETE;
++			return ctx;
++		}
 +
-+ _LANE_DATA_size = _FIELD_OFFSET
-+ _LANE_DATA_align = _STRUCT_ALIGN
++		/*
++		 * If the extra blocks are empty, begin hashing what remains
++		 * in the user's buffer.
++		 */
++		if (ctx->partial_block_buffer_length == 0 &&
++		    ctx->incoming_buffer_length) {
 +
-+########################################################################
++			const void *buffer = ctx->incoming_buffer;
++			uint32_t len = ctx->incoming_buffer_length;
++			uint32_t copy_len;
 +
-+START_FIELDS    # SHA256_ARGS_X4
-+###     name            size    align
-+FIELD   _digest,        4*8*8,  4       # transposed digest
-+FIELD   _data_ptr,      8*8,    8       # array of pointers to data
-+END_FIELDS
++			/*
++			 * Only entire blocks can be hashed.
++			 * Copy remainder to extra blocks buffer.
++			 */
++			copy_len = len & (SHA256_BLOCK_SIZE-1);
 +
-+ _SHA256_ARGS_X4_size  =  _FIELD_OFFSET
-+ _SHA256_ARGS_X4_align = _STRUCT_ALIGN
-+ _SHA256_ARGS_X8_size  =	_FIELD_OFFSET
-+ _SHA256_ARGS_X8_align =	_STRUCT_ALIGN
++			if (copy_len) {
++				len -= copy_len;
++				memcpy(ctx->partial_block_buffer,
++				       ((const char *) buffer + len),
++				       copy_len);
++				ctx->partial_block_buffer_length = copy_len;
++			}
 +
-+#######################################################################
++			ctx->incoming_buffer_length = 0;
 +
-+START_FIELDS    # MB_MGR
-+###     name            size    align
-+FIELD   _args,          _SHA256_ARGS_X4_size, _SHA256_ARGS_X4_align
-+FIELD   _lens,          4*8,    8
-+FIELD   _unused_lanes,  8,      8
-+FIELD   _ldata,         _LANE_DATA_size*8, _LANE_DATA_align
-+END_FIELDS
++			/* len should be a multiple of the block size now */
++			assert((len % SHA256_BLOCK_SIZE) == 0);
 +
-+ _MB_MGR_size  =  _FIELD_OFFSET
-+ _MB_MGR_align =  _STRUCT_ALIGN
++			/* Set len to the number of blocks to be hashed */
++			len >>= SHA256_LOG2_BLOCK_SIZE;
 +
-+_args_digest   =     _args + _digest
-+_args_data_ptr =     _args + _data_ptr
++			if (len) {
 +
-+#######################################################################
++				ctx->job.buffer = (uint8_t *) buffer;
++				ctx->job.len = len;
++				ctx = (struct sha256_hash_ctx *)
++				sha256_job_mgr_submit(&mgr->mgr, &ctx->job);
++				continue;
++			}
++		}
 +
-+START_FIELDS    #STACK_FRAME
-+###     name            size    align
-+FIELD   _data,		16*SZ8,   1       # transposed digest
-+FIELD   _digest,         8*SZ8,   1       # array of pointers to data
-+FIELD   _ytmp,           4*SZ8,   1
-+FIELD   _rsp,            8,       1
-+END_FIELDS
++		/*
++		 * If the extra blocks are not empty, then we are
++		 * either on the last block(s) or we need more
++		 * user input before continuing.
++		 */
++		if (ctx->status & HASH_CTX_STS_LAST) {
 +
-+ _STACK_FRAME_size  =  _FIELD_OFFSET
-+ _STACK_FRAME_align =  _STRUCT_ALIGN
++			uint8_t *buf = ctx->partial_block_buffer;
++			uint32_t n_extra_blocks =
++				sha256_pad(buf, ctx->total_length);
 +
-+#######################################################################
++			ctx->status = (HASH_CTX_STS_PROCESSING |
++				       HASH_CTX_STS_COMPLETE);
++			ctx->job.buffer = buf;
++			ctx->job.len = (uint32_t) n_extra_blocks;
++			ctx = (struct sha256_hash_ctx *)
++				sha256_job_mgr_submit(&mgr->mgr, &ctx->job);
++			continue;
++		}
 +
-+########################################################################
-+#### Define constants
-+########################################################################
++		ctx->status = HASH_CTX_STS_IDLE;
++		return ctx;
++	}
 +
-+#define STS_UNKNOWN             0
-+#define STS_BEING_PROCESSED     1
-+#define STS_COMPLETED           2
++	return NULL;
++}
 +
-+########################################################################
-+#### Define JOB_SHA256 structure
-+########################################################################
++static struct sha256_hash_ctx
++		*sha256_ctx_mgr_get_comp_ctx(struct sha256_ctx_mgr *mgr)
++{
++	/*
++	 * If get_comp_job returns NULL, there are no jobs complete.
++	 * If get_comp_job returns a job, verify that it is safe to return to
++	 * the user. If it is not ready, resubmit the job to finish processing.
++	 * If sha256_ctx_mgr_resubmit returned a job, it is ready to be
++	 * returned. Otherwise, all jobs currently being managed by the
++	 * hash_ctx_mgr still need processing.
++	 */
++	struct sha256_hash_ctx *ctx;
 +
-+START_FIELDS    # JOB_SHA256
++	ctx = (struct sha256_hash_ctx *) sha256_job_mgr_get_comp_job(&mgr->mgr);
++	return sha256_ctx_mgr_resubmit(mgr, ctx);
++}
 +
-+###     name                            size    align
-+FIELD   _buffer,                        8,      8       # pointer to buffer
-+FIELD   _len,                           8,      8       # length in bytes
-+FIELD   _result_digest,                 8*4,    32      # Digest (output)
-+FIELD   _status,                        4,      4
-+FIELD   _user_data,                     8,      8
-+END_FIELDS
++static void sha256_ctx_mgr_init(struct sha256_ctx_mgr *mgr)
++{
++	sha256_job_mgr_init(&mgr->mgr);
++}
 +
-+ _JOB_SHA256_size = _FIELD_OFFSET
-+ _JOB_SHA256_align = _STRUCT_ALIGN
++static struct sha256_hash_ctx *sha256_ctx_mgr_submit(struct sha256_ctx_mgr *mgr,
++					  struct sha256_hash_ctx *ctx,
++					  const void *buffer,
++					  uint32_t len,
++					  int flags)
++{
++	if (flags & (~HASH_ENTIRE)) {
++		/* User should not pass anything other than FIRST, UPDATE
++		 * or LAST
++		 */
++		ctx->error = HASH_CTX_ERROR_INVALID_FLAGS;
++		return ctx;
++	}
++
++	if (ctx->status & HASH_CTX_STS_PROCESSING) {
++		/* Cannot submit to a currently processing job. */
++		ctx->error = HASH_CTX_ERROR_ALREADY_PROCESSING;
++		return ctx;
++	}
++
++	if ((ctx->status & HASH_CTX_STS_COMPLETE) && !(flags & HASH_FIRST)) {
++		/* Cannot update a finished job. */
++		ctx->error = HASH_CTX_ERROR_ALREADY_COMPLETED;
++		return ctx;
++	}
++
++	if (flags & HASH_FIRST) {
++		/* Init digest */
++		sha256_init_digest(ctx->job.result_digest);
++
++		/* Reset byte counter */
++		ctx->total_length = 0;
++
++		/* Clear extra blocks */
++		ctx->partial_block_buffer_length = 0;
++	}
++
++	/* If we made it here, there was no error during this call to submit */
++	ctx->error = HASH_CTX_ERROR_NONE;
++
++	/* Store buffer ptr info from user */
++	ctx->incoming_buffer = buffer;
++	ctx->incoming_buffer_length = len;
++
++	/* Store the user's request flags and mark this ctx as currently
++	 * being processed.
++	 */
++	ctx->status = (flags & HASH_LAST) ?
++			(HASH_CTX_STS_PROCESSING | HASH_CTX_STS_LAST) :
++			HASH_CTX_STS_PROCESSING;
++
++	/* Advance byte counter */
++	ctx->total_length += len;
++
++	/*
++	 * If there is anything currently buffered in the extra blocks,
++	 * append to it until it contains a whole block.
++	 * Or if the user's buffer contains less than a whole block,
++	 * append as much as possible to the extra block.
++	 */
++	if ((ctx->partial_block_buffer_length) | (len < SHA256_BLOCK_SIZE)) {
++		/* Compute how many bytes to copy from user buffer into
++		 * extra block
++		 */
++		uint32_t copy_len = SHA256_BLOCK_SIZE -
++					ctx->partial_block_buffer_length;
++		if (len < copy_len)
++			copy_len = len;
++
++		if (copy_len) {
++			/* Copy and update relevant pointers and counters */
++			memcpy(
++		&ctx->partial_block_buffer[ctx->partial_block_buffer_length],
++				buffer, copy_len);
++
++			ctx->partial_block_buffer_length += copy_len;
++			ctx->incoming_buffer = (const void *)
++					((const char *)buffer + copy_len);
++			ctx->incoming_buffer_length = len - copy_len;
++		}
++
++		/* The extra block should never contain more than 1 block */
++		assert(ctx->partial_block_buffer_length <= SHA256_BLOCK_SIZE);
++
++		/* If the extra block buffer contains exactly 1 block,
++		 * it can be hashed.
++		 */
++		if (ctx->partial_block_buffer_length >= SHA256_BLOCK_SIZE) {
++			ctx->partial_block_buffer_length = 0;
++
++			ctx->job.buffer = ctx->partial_block_buffer;
++			ctx->job.len = 1;
++			ctx = (struct sha256_hash_ctx *)
++				sha256_job_mgr_submit(&mgr->mgr, &ctx->job);
++		}
++	}
++
++	return sha256_ctx_mgr_resubmit(mgr, ctx);
++}
++
++static struct sha256_hash_ctx *sha256_ctx_mgr_flush(struct sha256_ctx_mgr *mgr)
++{
++	struct sha256_hash_ctx *ctx;
++
++	while (1) {
++		ctx = (struct sha256_hash_ctx *)
++					sha256_job_mgr_flush(&mgr->mgr);
++
++		/* If flush returned 0, there are no more jobs in flight. */
++		if (!ctx)
++			return NULL;
++
++		/*
++		 * If flush returned a job, resubmit the job to finish
++		 * processing.
++		 */
++		ctx = sha256_ctx_mgr_resubmit(mgr, ctx);
++
++		/*
++		 * If sha256_ctx_mgr_resubmit returned a job, it is ready to
++		 * be returned. Otherwise, all jobs currently being managed by
++		 * the sha256_ctx_mgr still need processing. Loop.
++		 */
++		if (ctx)
++			return ctx;
++	}
++}
++
++static int sha256_mb_init(struct ahash_request *areq)
++{
++	struct sha256_hash_ctx *sctx = ahash_request_ctx(areq);
++
++	hash_ctx_init(sctx);
++	sctx->job.result_digest[0] = SHA256_H0;
++	sctx->job.result_digest[1] = SHA256_H1;
++	sctx->job.result_digest[2] = SHA256_H2;
++	sctx->job.result_digest[3] = SHA256_H3;
++	sctx->job.result_digest[4] = SHA256_H4;
++	sctx->job.result_digest[5] = SHA256_H5;
++	sctx->job.result_digest[6] = SHA256_H6;
++	sctx->job.result_digest[7] = SHA256_H7;
++	sctx->total_length = 0;
++	sctx->partial_block_buffer_length = 0;
++	sctx->status = HASH_CTX_STS_IDLE;
++
++	return 0;
++}
++
++static int sha256_mb_set_results(struct mcryptd_hash_request_ctx *rctx)
++{
++	int	i;
++	struct	sha256_hash_ctx *sctx = ahash_request_ctx(&rctx->areq);
++	__be32	*dst = (__be32 *) rctx->out;
++
++	for (i = 0; i < 8; ++i)
++		dst[i] = cpu_to_be32(sctx->job.result_digest[i]);
++
++	return 0;
++}
++
++static int sha_finish_walk(struct mcryptd_hash_request_ctx **ret_rctx,
++			struct mcryptd_alg_cstate *cstate, bool flush)
++{
++	int	flag = HASH_UPDATE;
++	int	nbytes, err = 0;
++	struct mcryptd_hash_request_ctx *rctx = *ret_rctx;
++	struct sha256_hash_ctx *sha_ctx;
++
++	/* more work ? */
++	while (!(rctx->flag & HASH_DONE)) {
++		nbytes = crypto_ahash_walk_done(&rctx->walk, 0);
++		if (nbytes < 0) {
++			err = nbytes;
++			goto out;
++		}
++		/* check if the walk is done */
++		if (crypto_ahash_walk_last(&rctx->walk)) {
++			rctx->flag |= HASH_DONE;
++			if (rctx->flag & HASH_FINAL)
++				flag |= HASH_LAST;
++
++		}
++		sha_ctx = (struct sha256_hash_ctx *)
++						ahash_request_ctx(&rctx->areq);
++		kernel_fpu_begin();
++		sha_ctx = sha256_ctx_mgr_submit(cstate->mgr, sha_ctx,
++						rctx->walk.data, nbytes, flag);
++		if (!sha_ctx) {
++			if (flush)
++				sha_ctx = sha256_ctx_mgr_flush(cstate->mgr);
++		}
++		kernel_fpu_end();
++		if (sha_ctx)
++			rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++		else {
++			rctx = NULL;
++			goto out;
++		}
++	}
++
++	/* copy the results */
++	if (rctx->flag & HASH_FINAL)
++		sha256_mb_set_results(rctx);
++
++out:
++	*ret_rctx = rctx;
++	return err;
++}
++
++static int sha_complete_job(struct mcryptd_hash_request_ctx *rctx,
++			    struct mcryptd_alg_cstate *cstate,
++			    int err)
++{
++	struct ahash_request *req = cast_mcryptd_ctx_to_req(rctx);
++	struct sha256_hash_ctx *sha_ctx;
++	struct mcryptd_hash_request_ctx *req_ctx;
++	int ret;
++
++	/* remove from work list */
++	spin_lock(&cstate->work_lock);
++	list_del(&rctx->waiter);
++	spin_unlock(&cstate->work_lock);
++
++	if (irqs_disabled())
++		rctx->complete(&req->base, err);
++	else {
++		local_bh_disable();
++		rctx->complete(&req->base, err);
++		local_bh_enable();
++	}
++
++	/* check to see if there are other jobs that are done */
++	sha_ctx = sha256_ctx_mgr_get_comp_ctx(cstate->mgr);
++	while (sha_ctx) {
++		req_ctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++		ret = sha_finish_walk(&req_ctx, cstate, false);
++		if (req_ctx) {
++			spin_lock(&cstate->work_lock);
++			list_del(&req_ctx->waiter);
++			spin_unlock(&cstate->work_lock);
++
++			req = cast_mcryptd_ctx_to_req(req_ctx);
++			if (irqs_disabled())
++				rctx->complete(&req->base, ret);
++			else {
++				local_bh_disable();
++				rctx->complete(&req->base, ret);
++				local_bh_enable();
++			}
++		}
++		sha_ctx = sha256_ctx_mgr_get_comp_ctx(cstate->mgr);
++	}
++
++	return 0;
++}
++
++static void sha256_mb_add_list(struct mcryptd_hash_request_ctx *rctx,
++			     struct mcryptd_alg_cstate *cstate)
++{
++	unsigned long next_flush;
++	unsigned long delay = usecs_to_jiffies(FLUSH_INTERVAL);
++
++	/* initialize tag */
++	rctx->tag.arrival = jiffies;    /* tag the arrival time */
++	rctx->tag.seq_num = cstate->next_seq_num++;
++	next_flush = rctx->tag.arrival + delay;
++	rctx->tag.expire = next_flush;
++
++	spin_lock(&cstate->work_lock);
++	list_add_tail(&rctx->waiter, &cstate->work_list);
++	spin_unlock(&cstate->work_lock);
++
++	mcryptd_arm_flusher(cstate, delay);
++}
++
++static int sha256_mb_update(struct ahash_request *areq)
++{
++	struct mcryptd_hash_request_ctx *rctx =
++		container_of(areq, struct mcryptd_hash_request_ctx, areq);
++	struct mcryptd_alg_cstate *cstate =
++				this_cpu_ptr(sha256_mb_alg_state.alg_cstate);
++
++	struct ahash_request *req = cast_mcryptd_ctx_to_req(rctx);
++	struct sha256_hash_ctx *sha_ctx;
++	int ret = 0, nbytes;
++
++	/* sanity check */
++	if (rctx->tag.cpu != smp_processor_id()) {
++		pr_err("mcryptd error: cpu clash\n");
++		goto done;
++	}
++
++	/* need to init context */
++	req_ctx_init(rctx, areq);
++
++	nbytes = crypto_ahash_walk_first(req, &rctx->walk);
++
++	if (nbytes < 0) {
++		ret = nbytes;
++		goto done;
++	}
++
++	if (crypto_ahash_walk_last(&rctx->walk))
++		rctx->flag |= HASH_DONE;
++
++	/* submit */
++	sha_ctx = (struct sha256_hash_ctx *) ahash_request_ctx(areq);
++	sha256_mb_add_list(rctx, cstate);
++	kernel_fpu_begin();
++	sha_ctx = sha256_ctx_mgr_submit(cstate->mgr, sha_ctx, rctx->walk.data,
++							nbytes, HASH_UPDATE);
++	kernel_fpu_end();
++
++	/* check if anything is returned */
++	if (!sha_ctx)
++		return -EINPROGRESS;
++
++	if (sha_ctx->error) {
++		ret = sha_ctx->error;
++		rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++		goto done;
++	}
++
++	rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++	ret = sha_finish_walk(&rctx, cstate, false);
++
++	if (!rctx)
++		return -EINPROGRESS;
++done:
++	sha_complete_job(rctx, cstate, ret);
++	return ret;
++}
++
++static int sha256_mb_finup(struct ahash_request *areq)
++{
++	struct mcryptd_hash_request_ctx *rctx =
++		container_of(areq, struct mcryptd_hash_request_ctx, areq);
++	struct mcryptd_alg_cstate *cstate =
++				this_cpu_ptr(sha256_mb_alg_state.alg_cstate);
++
++	struct ahash_request *req = cast_mcryptd_ctx_to_req(rctx);
++	struct sha256_hash_ctx *sha_ctx;
++	int ret = 0, flag = HASH_UPDATE, nbytes;
++
++	/* sanity check */
++	if (rctx->tag.cpu != smp_processor_id()) {
++		pr_err("mcryptd error: cpu clash\n");
++		goto done;
++	}
++
++	/* need to init context */
++	req_ctx_init(rctx, areq);
++
++	nbytes = crypto_ahash_walk_first(req, &rctx->walk);
++
++	if (nbytes < 0) {
++		ret = nbytes;
++		goto done;
++	}
++
++	if (crypto_ahash_walk_last(&rctx->walk)) {
++		rctx->flag |= HASH_DONE;
++		flag = HASH_LAST;
++	}
++
++	/* submit */
++	rctx->flag |= HASH_FINAL;
++	sha_ctx = (struct sha256_hash_ctx *) ahash_request_ctx(areq);
++	sha256_mb_add_list(rctx, cstate);
++
++	kernel_fpu_begin();
++	sha_ctx = sha256_ctx_mgr_submit(cstate->mgr, sha_ctx, rctx->walk.data,
++								nbytes, flag);
++	kernel_fpu_end();
++
++	/* check if anything is returned */
++	if (!sha_ctx)
++		return -EINPROGRESS;
++
++	if (sha_ctx->error) {
++		ret = sha_ctx->error;
++		goto done;
++	}
++
++	rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++	ret = sha_finish_walk(&rctx, cstate, false);
++	if (!rctx)
++		return -EINPROGRESS;
++done:
++	sha_complete_job(rctx, cstate, ret);
++	return ret;
++}
++
++static int sha256_mb_final(struct ahash_request *areq)
++{
++	struct mcryptd_hash_request_ctx *rctx =
++			container_of(areq, struct mcryptd_hash_request_ctx,
++			areq);
++	struct mcryptd_alg_cstate *cstate =
++				this_cpu_ptr(sha256_mb_alg_state.alg_cstate);
++
++	struct sha256_hash_ctx *sha_ctx;
++	int ret = 0;
++	u8 data;
++
++	/* sanity check */
++	if (rctx->tag.cpu != smp_processor_id()) {
++		pr_err("mcryptd error: cpu clash\n");
++		goto done;
++	}
++
++	/* need to init context */
++	req_ctx_init(rctx, areq);
++
++	rctx->flag |= HASH_DONE | HASH_FINAL;
++
++	sha_ctx = (struct sha256_hash_ctx *) ahash_request_ctx(areq);
++	/* flag HASH_FINAL and 0 data size */
++	sha256_mb_add_list(rctx, cstate);
++	kernel_fpu_begin();
++	sha_ctx = sha256_ctx_mgr_submit(cstate->mgr, sha_ctx, &data, 0,
++								HASH_LAST);
++	kernel_fpu_end();
++
++	/* check if anything is returned */
++	if (!sha_ctx)
++		return -EINPROGRESS;
++
++	if (sha_ctx->error) {
++		ret = sha_ctx->error;
++		rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++		goto done;
++	}
++
++	rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++	ret = sha_finish_walk(&rctx, cstate, false);
++	if (!rctx)
++		return -EINPROGRESS;
++done:
++	sha_complete_job(rctx, cstate, ret);
++	return ret;
++}
++
++static int sha256_mb_export(struct ahash_request *areq, void *out)
++{
++	struct sha256_hash_ctx *sctx = ahash_request_ctx(areq);
++
++	memcpy(out, sctx, sizeof(*sctx));
++
++	return 0;
++}
++
++static int sha256_mb_import(struct ahash_request *areq, const void *in)
++{
++	struct sha256_hash_ctx *sctx = ahash_request_ctx(areq);
++
++	memcpy(sctx, in, sizeof(*sctx));
++
++	return 0;
++}
++
++static int sha256_mb_async_init_tfm(struct crypto_tfm *tfm)
++{
++	struct mcryptd_ahash *mcryptd_tfm;
++	struct sha256_mb_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct mcryptd_hash_ctx *mctx;
++
++	mcryptd_tfm = mcryptd_alloc_ahash("__intel_sha256-mb",
++						CRYPTO_ALG_INTERNAL,
++						CRYPTO_ALG_INTERNAL);
++	if (IS_ERR(mcryptd_tfm))
++		return PTR_ERR(mcryptd_tfm);
++	mctx = crypto_ahash_ctx(&mcryptd_tfm->base);
++	mctx->alg_state = &sha256_mb_alg_state;
++	ctx->mcryptd_tfm = mcryptd_tfm;
++	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
++				sizeof(struct ahash_request) +
++				crypto_ahash_reqsize(&mcryptd_tfm->base));
++
++	return 0;
++}
++
++static void sha256_mb_async_exit_tfm(struct crypto_tfm *tfm)
++{
++	struct sha256_mb_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	mcryptd_free_ahash(ctx->mcryptd_tfm);
++}
++
++static int sha256_mb_areq_init_tfm(struct crypto_tfm *tfm)
++{
++	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
++				sizeof(struct ahash_request) +
++				sizeof(struct sha256_hash_ctx));
++
++	return 0;
++}
++
++static void sha256_mb_areq_exit_tfm(struct crypto_tfm *tfm)
++{
++	struct sha256_mb_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	mcryptd_free_ahash(ctx->mcryptd_tfm);
++}
++
++static struct ahash_alg sha256_mb_areq_alg = {
++	.init		=	sha256_mb_init,
++	.update		=	sha256_mb_update,
++	.final		=	sha256_mb_final,
++	.finup		=	sha256_mb_finup,
++	.export		=	sha256_mb_export,
++	.import		=	sha256_mb_import,
++	.halg		=	{
++	.digestsize	=	SHA256_DIGEST_SIZE,
++	.statesize	=	sizeof(struct sha256_hash_ctx),
++		.base		=	{
++			.cra_name	 = "__sha256-mb",
++			.cra_driver_name = "__intel_sha256-mb",
++			.cra_priority	 = 100,
++			/*
++			 * use ASYNC flag as some buffers in multi-buffer
++			 * algo may not have completed before hashing thread
++			 * sleep
++			 */
++			.cra_flags	= CRYPTO_ALG_TYPE_AHASH |
++						CRYPTO_ALG_ASYNC |
++						CRYPTO_ALG_INTERNAL,
++			.cra_blocksize	= SHA256_BLOCK_SIZE,
++			.cra_module	= THIS_MODULE,
++			.cra_list	= LIST_HEAD_INIT
++					(sha256_mb_areq_alg.halg.base.cra_list),
++			.cra_init	= sha256_mb_areq_init_tfm,
++			.cra_exit	= sha256_mb_areq_exit_tfm,
++			.cra_ctxsize	= sizeof(struct sha256_hash_ctx),
++		}
++	}
++};
++
++static int sha256_mb_async_init(struct ahash_request *req)
++{
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct sha256_mb_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
++	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
++
++	memcpy(mcryptd_req, req, sizeof(*req));
++	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	return crypto_ahash_init(mcryptd_req);
++}
++
++static int sha256_mb_async_update(struct ahash_request *req)
++{
++	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
++
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct sha256_mb_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
++
++	memcpy(mcryptd_req, req, sizeof(*req));
++	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	return crypto_ahash_update(mcryptd_req);
++}
++
++static int sha256_mb_async_finup(struct ahash_request *req)
++{
++	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
++
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct sha256_mb_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
++
++	memcpy(mcryptd_req, req, sizeof(*req));
++	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	return crypto_ahash_finup(mcryptd_req);
++}
++
++static int sha256_mb_async_final(struct ahash_request *req)
++{
++	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
++
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct sha256_mb_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
++
++	memcpy(mcryptd_req, req, sizeof(*req));
++	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	return crypto_ahash_final(mcryptd_req);
++}
++
++static int sha256_mb_async_digest(struct ahash_request *req)
++{
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct sha256_mb_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
++	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
++
++	memcpy(mcryptd_req, req, sizeof(*req));
++	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	return crypto_ahash_digest(mcryptd_req);
++}
++
++static int sha256_mb_async_export(struct ahash_request *req, void *out)
++{
++	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct sha256_mb_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
++
++	memcpy(mcryptd_req, req, sizeof(*req));
++	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	return crypto_ahash_export(mcryptd_req, out);
++}
++
++static int sha256_mb_async_import(struct ahash_request *req, const void *in)
++{
++	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct sha256_mb_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
++	struct crypto_ahash *child = mcryptd_ahash_child(mcryptd_tfm);
++	struct mcryptd_hash_request_ctx *rctx;
++	struct ahash_request *areq;
++
++	memcpy(mcryptd_req, req, sizeof(*req));
++	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	rctx = ahash_request_ctx(mcryptd_req);
++	areq = &rctx->areq;
++
++	ahash_request_set_tfm(areq, child);
++	ahash_request_set_callback(areq, CRYPTO_TFM_REQ_MAY_SLEEP,
++					rctx->complete, req);
++
++	return crypto_ahash_import(mcryptd_req, in);
++}
++
++static struct ahash_alg sha256_mb_async_alg = {
++	.init           = sha256_mb_async_init,
++	.update         = sha256_mb_async_update,
++	.final          = sha256_mb_async_final,
++	.finup          = sha256_mb_async_finup,
++	.export         = sha256_mb_async_export,
++	.import         = sha256_mb_async_import,
++	.digest         = sha256_mb_async_digest,
++	.halg = {
++		.digestsize     = SHA256_DIGEST_SIZE,
++		.statesize      = sizeof(struct sha256_hash_ctx),
++		.base = {
++			.cra_name               = "sha256",
++			.cra_driver_name        = "sha256_mb",
++			.cra_priority           = 200,
++			.cra_flags              = CRYPTO_ALG_TYPE_AHASH |
++							CRYPTO_ALG_ASYNC,
++			.cra_blocksize          = SHA256_BLOCK_SIZE,
++			.cra_type               = &crypto_ahash_type,
++			.cra_module             = THIS_MODULE,
++			.cra_list               = LIST_HEAD_INIT
++				(sha256_mb_async_alg.halg.base.cra_list),
++			.cra_init               = sha256_mb_async_init_tfm,
++			.cra_exit               = sha256_mb_async_exit_tfm,
++			.cra_ctxsize		= sizeof(struct sha256_mb_ctx),
++			.cra_alignmask		= 0,
++		},
++	},
++};
++
++static unsigned long sha256_mb_flusher(struct mcryptd_alg_cstate *cstate)
++{
++	struct mcryptd_hash_request_ctx *rctx;
++	unsigned long cur_time;
++	unsigned long next_flush = 0;
++	struct sha256_hash_ctx *sha_ctx;
++
++
++	cur_time = jiffies;
++
++	while (!list_empty(&cstate->work_list)) {
++		rctx = list_entry(cstate->work_list.next,
++				struct mcryptd_hash_request_ctx, waiter);
++		if (time_before(cur_time, rctx->tag.expire))
++			break;
++		kernel_fpu_begin();
++		sha_ctx = (struct sha256_hash_ctx *)
++					sha256_ctx_mgr_flush(cstate->mgr);
++		kernel_fpu_end();
++		if (!sha_ctx) {
++			pr_err("sha256_mb error: nothing got"
++					" flushed for non-empty list\n");
++			break;
++		}
++		rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++		sha_finish_walk(&rctx, cstate, true);
++		sha_complete_job(rctx, cstate, 0);
++	}
++
++	if (!list_empty(&cstate->work_list)) {
++		rctx = list_entry(cstate->work_list.next,
++				struct mcryptd_hash_request_ctx, waiter);
++		/* get the hash context and then flush time */
++		next_flush = rctx->tag.expire;
++		mcryptd_arm_flusher(cstate, get_delay(next_flush));
++	}
++	return next_flush;
++}
++
++static int __init sha256_mb_mod_init(void)
++{
++
++	int cpu;
++	int err;
++	struct mcryptd_alg_cstate *cpu_state;
++
++	/* check for dependent cpu features */
++	if (!boot_cpu_has(X86_FEATURE_AVX2) ||
++	    !boot_cpu_has(X86_FEATURE_BMI2))
++		return -ENODEV;
++
++	/* initialize multibuffer structures */
++	sha256_mb_alg_state.alg_cstate = alloc_percpu
++						(struct mcryptd_alg_cstate);
++
++	sha256_job_mgr_init = sha256_mb_mgr_init_avx2;
++	sha256_job_mgr_submit = sha256_mb_mgr_submit_avx2;
++	sha256_job_mgr_flush = sha256_mb_mgr_flush_avx2;
++	sha256_job_mgr_get_comp_job = sha256_mb_mgr_get_comp_job_avx2;
++
++	if (!sha256_mb_alg_state.alg_cstate)
++		return -ENOMEM;
++	for_each_possible_cpu(cpu) {
++		cpu_state = per_cpu_ptr(sha256_mb_alg_state.alg_cstate, cpu);
++		cpu_state->next_flush = 0;
++		cpu_state->next_seq_num = 0;
++		cpu_state->flusher_engaged = false;
++		INIT_DELAYED_WORK(&cpu_state->flush, mcryptd_flusher);
++		cpu_state->cpu = cpu;
++		cpu_state->alg_state = &sha256_mb_alg_state;
++		cpu_state->mgr = kzalloc(sizeof(struct sha256_ctx_mgr),
++					GFP_KERNEL);
++		if (!cpu_state->mgr)
++			goto err2;
++		sha256_ctx_mgr_init(cpu_state->mgr);
++		INIT_LIST_HEAD(&cpu_state->work_list);
++		spin_lock_init(&cpu_state->work_lock);
++	}
++	sha256_mb_alg_state.flusher = &sha256_mb_flusher;
++
++	err = crypto_register_ahash(&sha256_mb_areq_alg);
++	if (err)
++		goto err2;
++	err = crypto_register_ahash(&sha256_mb_async_alg);
++	if (err)
++		goto err1;
++
++
++	return 0;
++err1:
++	crypto_unregister_ahash(&sha256_mb_areq_alg);
++err2:
++	for_each_possible_cpu(cpu) {
++		cpu_state = per_cpu_ptr(sha256_mb_alg_state.alg_cstate, cpu);
++		kfree(cpu_state->mgr);
++	}
++	free_percpu(sha256_mb_alg_state.alg_cstate);
++	return -ENODEV;
++}
++
++static void __exit sha256_mb_mod_fini(void)
++{
++	int cpu;
++	struct mcryptd_alg_cstate *cpu_state;
++
++	crypto_unregister_ahash(&sha256_mb_async_alg);
++	crypto_unregister_ahash(&sha256_mb_areq_alg);
++	for_each_possible_cpu(cpu) {
++		cpu_state = per_cpu_ptr(sha256_mb_alg_state.alg_cstate, cpu);
++		kfree(cpu_state->mgr);
++	}
++	free_percpu(sha256_mb_alg_state.alg_cstate);
++}
++
++module_init(sha256_mb_mod_init);
++module_exit(sha256_mb_mod_fini);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("SHA256 Secure Hash Algorithm, multi buffer accelerated");
++
++MODULE_ALIAS_CRYPTO("sha256");
 -- 
 1.9.1
