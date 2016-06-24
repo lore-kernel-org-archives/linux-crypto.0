@@ -1,55 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v6 2/8] crypto: add driver-side scomp interface
-Date: Fri, 24 Jun 2016 17:26:43 +0800
-Message-ID: <20160624092643.GA18935@gondor.apana.org.au>
-References: <1465373818-29720-1-git-send-email-giovanni.cabiddu@intel.com>
- <1465373818-29720-3-git-send-email-giovanni.cabiddu@intel.com>
- <20160613085612.GA7333@gondor.apana.org.au>
- <20160622155350.GA22247@sivswdev01.ir.intel.com>
- <20160623105034.GA10475@gondor.apana.org.au>
- <20160624083728.GA15549@sivswdev01.ir.intel.com>
+Subject: Re: crypto: rsa - Do not gratuitously drop leading zeroes
+Date: Fri, 24 Jun 2016 17:30:17 +0800
+Message-ID: <20160624093017.GB18935@gondor.apana.org.au>
+References: <20160622101432.GA30454@gondor.apana.org.au>
+ <733379976.TmXhNiYQ9x@positron.chronox.de>
+ <20160624084147.GB18603@gondor.apana.org.au>
+ <1513733.zSFupaElV5@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:59215 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:51542 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751001AbcFXJ0s (ORCPT
+	with ESMTP id S1751719AbcFXJa1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 24 Jun 2016 05:26:48 -0400
+	Fri, 24 Jun 2016 05:30:27 -0400
 Content-Disposition: inline
-In-Reply-To: <20160624083728.GA15549@sivswdev01.ir.intel.com>
+In-Reply-To: <1513733.zSFupaElV5@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jun 24, 2016 at 09:37:28AM +0100, Giovanni Cabiddu wrote:
->
-> I'll remove scomp and refit the software algos to plug into acomp
-> directly.
-> Would it be admissible if software algos implementations will vmalloc
-> the source and the destination buffers for linearizing the scatter gather
-> lists and will operate on those?
+On Fri, Jun 24, 2016 at 11:23:06AM +0200, Stephan Mueller wrote:
+> 
+> Patch 2 introduces the bug.
+> 
+> Note, with patch 2, there is also a compile warning with crypto/dh.c.
 
-Hmm, I guess we can still keep scomp and use vmalloc until someone
-spends the effort and optimises each algorithm to make them use acomp
-directly.
+Oh I see.  It's a conflict with the kpp stuff that didn't exist
+when I wrote this.
 
-So I'd still like to move the allocation down into the algorithm.
-That way IPsec no longer needs to keep around a 64K buffer when
-the average packet size is less than a page.
+Let me respin the patches on top of kpp.
 
-What we can do for legacy scomp algorithms is to keep a per-cpu
-cache of 64K scratch buffers allocated using vmalloc.  Obviously
-this means that if the output size exceeds 64K then we will fail
-the operation.  But I don't really see an option besides optimising
-the algorithm to use acomp.
-
-IOW let's move the memory allocation logic of IPComp into the scomp
-layer.  Before we do that we should also make sure that no other
-users of crypto compress needs output sizes in excess of 64K.
-
-Cheers,
+Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
