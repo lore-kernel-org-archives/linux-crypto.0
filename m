@@ -1,33 +1,34 @@
-From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH v8 0/6] crypto: algif - add akcipher
-Date: Fri, 24 Jun 2016 08:07:46 +0200
-Message-ID: <9244921.hMLs59jgKA@tauon.atsec.com>
-References: <146672252642.23101.15972023870303797249.stgit@tstruk-mobl1.ra.intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [cryptodev:master 79/79] (.text+0x330de0): multiple definition
+ of `ecdh_shared_secret'
+Date: Fri, 24 Jun 2016 14:10:12 +0800
+Message-ID: <20160624061012.GA16850@gondor.apana.org.au>
+References: <201606240302.rtIGIxRf%fengguang.wu@intel.com>
+ <20160624060649.GA21165@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org,
-	mathew.j.martineau-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org
-To: Tadeusz Struk <tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <146672252642.23101.15972023870303797249.stgit-mEAvsCHCuLl9qtVHHdszJa2pdiUAq4bhAL8bYrjMMd8@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: kbuild test robot <fengguang.wu@intel.com>,
+	linux-crypto@vger.kernel.org
+To: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:49795 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750927AbcFXGKR (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 24 Jun 2016 02:10:17 -0400
+Content-Disposition: inline
+In-Reply-To: <20160624060649.GA21165@localhost>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 23. Juni 2016, 15:55:26 schrieb Tadeusz Struk:
+On Fri, Jun 24, 2016 at 07:06:49AM +0100, Salvatore Benedetto wrote:
+>
+> can you squash the following patch?
 
-Hi Tadeusz,
+No, please prune anything that we don't use from ecc.c.
 
-> First four patches are a resend algif_akcipher from
-> Stephan Mueller, with minor changes after rebase on top of 4.7-rc1.
-
-The first four patches:
-
-Acked-by: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-
-
-Ciao
-Stephan
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
