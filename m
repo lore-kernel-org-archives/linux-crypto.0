@@ -1,38 +1,48 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH] MAINTAINERS: update maintainer for qat
-Date: Fri, 24 Jun 2016 07:01:33 -0700
-Message-ID: <1466776893-27788-1-git-send-email-tadeusz.struk@intel.com>
-Cc: linux-crypto@vger.kernel.org,
-	Tadeusz Struk <tadeusz.struk@intel.com>
-To: herbert@gondor.apana.org.au
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: crypto: rsa - Do not gratuitously drop leading zeroes
+Date: Fri, 24 Jun 2016 22:28:14 +0800
+Message-ID: <20160624142814.GA21730@gondor.apana.org.au>
+References: <20160622101432.GA30454@gondor.apana.org.au>
+ <1f2459d0-aea9-f595-18f6-854177f0eb8d@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
+	Stephan Mueller <smueller@chronox.de>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:1164 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751505AbcFXOBx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 24 Jun 2016 10:01:53 -0400
+Received: from helcar.hengli.com.au ([209.40.204.226]:49630 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751265AbcFXO2W (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 24 Jun 2016 10:28:22 -0400
+Content-Disposition: inline
+In-Reply-To: <1f2459d0-aea9-f595-18f6-854177f0eb8d@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add Giovanni and Salvatore who will take over the qat maintenance.
+On Thu, Jun 23, 2016 at 08:25:05AM -0700, Tadeusz Struk wrote:
+> 
+> The reason why mpi_write_to_sgl() strips the leading zeros is only
+> because we said that it needs to work in the same way as the
+> mpi_read_buffer(), which does remove it for whatever reason.
+> So should we now change the mpi_read_buffer() as well?
 
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
- MAINTAINERS | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Didn't we add mpi_read_buffer specifically for akcipher before
+we switched over to SGs? If nobody is using it we should just
+delete it.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f4a9c13..5d813a3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9292,7 +9292,8 @@ L:	rtc-linux@googlegroups.com
- S:	Maintained
- 
- QAT DRIVER
--M:	Tadeusz Struk <tadeusz.struk@intel.com>
-+M:	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-+M:	Salvatore Benedetto <salvatore.benedetto@intel.com>
- L:	qat-linux@intel.com
- S:	Supported
- F:	drivers/crypto/qat/
+> We also need to change the qat rsa implementation because it does remove
+> zeros as well, but it will be very easy to do.
+
+The way it's done with my patches you don't have to do the conversion
+right away because it'll cope with either stripping or not stripping
+leading zeroes.  But yes it should simplify the code in qat so please
+send in patches when you have time.
+
+Thanks,
 -- 
-2.7.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
