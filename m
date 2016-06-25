@@ -1,90 +1,227 @@
 From: kbuild test robot <fengguang.wu@intel.com>
-Subject: [cryptodev:master 84/87] security/keys/big_key.c:118:1: warning:
- 'big_key_crypt' uses dynamic stack allocation
-Date: Sat, 25 Jun 2016 09:56:21 +0800
-Message-ID: <201606250919.aNn5qEbb%fengguang.wu@intel.com>
+Subject: [cryptodev:master 87/87] crypto/ecc.c:1018:1: warning:
+ 'crypto_ecdh_shared_secret' uses dynamic stack allocation
+Date: Sat, 25 Jun 2016 10:37:02 +0800
+Message-ID: <201606251000.IQtM0p6E%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="envbJBWh7q8WU6mo"
+Content-Type: multipart/mixed; boundary="J/dobhs11T7y2rNN"
 Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
 To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:6044 "EHLO mga02.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:60130 "EHLO mga03.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751037AbcFYB4z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 24 Jun 2016 21:56:55 -0400
+	id S1751463AbcFYChi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 24 Jun 2016 22:37:38 -0400
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
---envbJBWh7q8WU6mo
+--J/dobhs11T7y2rNN
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
 head:   8f44df154de79a61b0e86734f51737b8cccf8dfe
-commit: d56d72c6a0612be14ccb455c92886d2cb102c2ab [84/87] KEYS: Use skcipher for big keys
+commit: 8f44df154de79a61b0e86734f51737b8cccf8dfe [87/87] crypto: ecdh - make ecdh_shared_secret unique
 config: s390-allyesconfig (attached as .config)
 compiler: s390x-linux-gnu-gcc (Debian 5.3.1-8) 5.3.1 20160205
 reproduce:
         wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        git checkout d56d72c6a0612be14ccb455c92886d2cb102c2ab
+        git checkout 8f44df154de79a61b0e86734f51737b8cccf8dfe
         # save the attached .config to linux build tree
         make.cross ARCH=s390 
 
 All warnings (new ones prefixed by >>):
 
-   security/keys/big_key.c: In function 'big_key_crypt':
->> security/keys/big_key.c:118:1: warning: 'big_key_crypt' uses dynamic stack allocation
+   crypto/ecc.c: In function 'vli_mmod_fast':
+   crypto/ecc.c:532:1: warning: 'vli_mmod_fast' uses dynamic stack allocation
+    }
+    ^
+   crypto/ecc.c: In function 'vli_mod_square_fast':
+   crypto/ecc.c:552:1: warning: 'vli_mod_square_fast' uses dynamic stack allocation
+    }
+    ^
+   crypto/ecc.c: In function 'vli_mod_mult_fast':
+   crypto/ecc.c:542:1: warning: 'vli_mod_mult_fast' uses dynamic stack allocation
+    }
+    ^
+   crypto/ecc.c: In function 'xycz_add_c':
+   crypto/ecc.c:840:1: warning: 'xycz_add_c' uses dynamic stack allocation
+    }
+    ^
+   crypto/ecc.c: In function 'xycz_add':
+   crypto/ecc.c:783:1: warning: 'xycz_add' uses dynamic stack allocation
+    }
+    ^
+   crypto/ecc.c: In function 'apply_z':
+   crypto/ecc.c:719:1: warning: 'apply_z' uses dynamic stack allocation
+    }
+    ^
+   crypto/ecc.c: In function 'ecc_point_mult.isra.0':
+   crypto/ecc.c:895:1: warning: 'ecc_point_mult.isra.0' uses dynamic stack allocation
+    }
+    ^
+   crypto/ecc.c: In function 'ecdh_make_pub_key':
+   crypto/ecc.c:967:1: warning: 'ecdh_make_pub_key' uses dynamic stack allocation
+    }
+    ^
+   crypto/ecc.c: In function 'crypto_ecdh_shared_secret':
+>> crypto/ecc.c:1018:1: warning: 'crypto_ecdh_shared_secret' uses dynamic stack allocation
     }
     ^
 
-vim +/big_key_crypt +118 security/keys/big_key.c
+vim +/crypto_ecdh_shared_secret +1018 crypto/ecc.c
 
-d56d72c6 Herbert Xu         2016-06-22  102  	skcipher_request_set_tfm(req, big_key_skcipher);
-d56d72c6 Herbert Xu         2016-06-22  103  	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
-d56d72c6 Herbert Xu         2016-06-22  104  				      NULL, NULL);
-13100a72 Kirill Marinushkin 2016-04-12  105  
-13100a72 Kirill Marinushkin 2016-04-12  106  	sg_init_one(&sgio, data, datalen);
-d56d72c6 Herbert Xu         2016-06-22  107  	skcipher_request_set_crypt(req, &sgio, &sgio, datalen, NULL);
-13100a72 Kirill Marinushkin 2016-04-12  108  
-13100a72 Kirill Marinushkin 2016-04-12  109  	if (op == BIG_KEY_ENC)
-d56d72c6 Herbert Xu         2016-06-22  110  		ret = crypto_skcipher_encrypt(req);
-13100a72 Kirill Marinushkin 2016-04-12  111  	else
-d56d72c6 Herbert Xu         2016-06-22  112  		ret = crypto_skcipher_decrypt(req);
-d56d72c6 Herbert Xu         2016-06-22  113  
-d56d72c6 Herbert Xu         2016-06-22  114  	skcipher_request_zero(req);
-13100a72 Kirill Marinushkin 2016-04-12  115  
-13100a72 Kirill Marinushkin 2016-04-12  116  error:
-13100a72 Kirill Marinushkin 2016-04-12  117  	return ret;
-13100a72 Kirill Marinushkin 2016-04-12 @118  }
-13100a72 Kirill Marinushkin 2016-04-12  119  
-13100a72 Kirill Marinushkin 2016-04-12  120  /*
-002edaf7 David Howells      2014-07-18  121   * Preparse a big key
-ab3c3587 David Howells      2013-09-24  122   */
-002edaf7 David Howells      2014-07-18  123  int big_key_preparse(struct key_preparsed_payload *prep)
-ab3c3587 David Howells      2013-09-24  124  {
-146aa8b1 David Howells      2015-10-21  125  	struct path *path = (struct path *)&prep->payload.data[big_key_path];
-ab3c3587 David Howells      2013-09-24  126  	struct file *file;
+3c4b2390 Salvatore Benedetto 2016-06-22   889  	xycz_add(rx[nb], ry[nb], rx[1 - nb], ry[1 - nb], curve_prime, ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22   890  
+3c4b2390 Salvatore Benedetto 2016-06-22   891  	apply_z(rx[0], ry[0], z, curve_prime, ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22   892  
+3c4b2390 Salvatore Benedetto 2016-06-22   893  	vli_set(result->x, rx[0], ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22   894  	vli_set(result->y, ry[0], ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22  @895  }
+3c4b2390 Salvatore Benedetto 2016-06-22   896  
+3c4b2390 Salvatore Benedetto 2016-06-22   897  static inline void ecc_swap_digits(const u64 *in, u64 *out,
+3c4b2390 Salvatore Benedetto 2016-06-22   898  				   unsigned int ndigits)
+3c4b2390 Salvatore Benedetto 2016-06-22   899  {
+3c4b2390 Salvatore Benedetto 2016-06-22   900  	int i;
+3c4b2390 Salvatore Benedetto 2016-06-22   901  
+3c4b2390 Salvatore Benedetto 2016-06-22   902  	for (i = 0; i < ndigits; i++)
+3c4b2390 Salvatore Benedetto 2016-06-22   903  		out[i] = __swab64(in[ndigits - 1 - i]);
+3c4b2390 Salvatore Benedetto 2016-06-22   904  }
+3c4b2390 Salvatore Benedetto 2016-06-22   905  
+3c4b2390 Salvatore Benedetto 2016-06-22   906  int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+3c4b2390 Salvatore Benedetto 2016-06-22   907  		     const u8 *private_key, unsigned int private_key_len)
+3c4b2390 Salvatore Benedetto 2016-06-22   908  {
+3c4b2390 Salvatore Benedetto 2016-06-22   909  	int nbytes;
+3c4b2390 Salvatore Benedetto 2016-06-22   910  	const struct ecc_curve *curve = ecc_get_curve(curve_id);
+3c4b2390 Salvatore Benedetto 2016-06-22   911  
+3c4b2390 Salvatore Benedetto 2016-06-22   912  	if (!private_key)
+3c4b2390 Salvatore Benedetto 2016-06-22   913  		return -EINVAL;
+3c4b2390 Salvatore Benedetto 2016-06-22   914  
+3c4b2390 Salvatore Benedetto 2016-06-22   915  	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+3c4b2390 Salvatore Benedetto 2016-06-22   916  
+3c4b2390 Salvatore Benedetto 2016-06-22   917  	if (private_key_len != nbytes)
+3c4b2390 Salvatore Benedetto 2016-06-22   918  		return -EINVAL;
+3c4b2390 Salvatore Benedetto 2016-06-22   919  
+3c4b2390 Salvatore Benedetto 2016-06-22   920  	if (vli_is_zero((const u64 *)&private_key[0], ndigits))
+3c4b2390 Salvatore Benedetto 2016-06-22   921  		return -EINVAL;
+3c4b2390 Salvatore Benedetto 2016-06-22   922  
+3c4b2390 Salvatore Benedetto 2016-06-22   923  	/* Make sure the private key is in the range [1, n-1]. */
+3c4b2390 Salvatore Benedetto 2016-06-22   924  	if (vli_cmp(curve->n, (const u64 *)&private_key[0], ndigits) != 1)
+3c4b2390 Salvatore Benedetto 2016-06-22   925  		return -EINVAL;
+3c4b2390 Salvatore Benedetto 2016-06-22   926  
+3c4b2390 Salvatore Benedetto 2016-06-22   927  	return 0;
+3c4b2390 Salvatore Benedetto 2016-06-22   928  }
+3c4b2390 Salvatore Benedetto 2016-06-22   929  
+3c4b2390 Salvatore Benedetto 2016-06-22   930  int ecdh_make_pub_key(unsigned int curve_id, unsigned int ndigits,
+3c4b2390 Salvatore Benedetto 2016-06-22   931  		      const u8 *private_key, unsigned int private_key_len,
+3c4b2390 Salvatore Benedetto 2016-06-22   932  		      u8 *public_key, unsigned int public_key_len)
+3c4b2390 Salvatore Benedetto 2016-06-22   933  {
+3c4b2390 Salvatore Benedetto 2016-06-22   934  	int ret = 0;
+3c4b2390 Salvatore Benedetto 2016-06-22   935  	struct ecc_point *pk;
+3c4b2390 Salvatore Benedetto 2016-06-22   936  	u64 priv[ndigits];
+3c4b2390 Salvatore Benedetto 2016-06-22   937  	unsigned int nbytes;
+3c4b2390 Salvatore Benedetto 2016-06-22   938  	const struct ecc_curve *curve = ecc_get_curve(curve_id);
+3c4b2390 Salvatore Benedetto 2016-06-22   939  
+3c4b2390 Salvatore Benedetto 2016-06-22   940  	if (!private_key || !curve) {
+3c4b2390 Salvatore Benedetto 2016-06-22   941  		ret = -EINVAL;
+3c4b2390 Salvatore Benedetto 2016-06-22   942  		goto out;
+3c4b2390 Salvatore Benedetto 2016-06-22   943  	}
+3c4b2390 Salvatore Benedetto 2016-06-22   944  
+3c4b2390 Salvatore Benedetto 2016-06-22   945  	ecc_swap_digits((const u64 *)private_key, priv, ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22   946  
+3c4b2390 Salvatore Benedetto 2016-06-22   947  	pk = ecc_alloc_point(ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22   948  	if (!pk) {
+3c4b2390 Salvatore Benedetto 2016-06-22   949  		ret = -ENOMEM;
+3c4b2390 Salvatore Benedetto 2016-06-22   950  		goto out;
+3c4b2390 Salvatore Benedetto 2016-06-22   951  	}
+3c4b2390 Salvatore Benedetto 2016-06-22   952  
+3c4b2390 Salvatore Benedetto 2016-06-22   953  	ecc_point_mult(pk, &curve->g, priv, NULL, curve->p, ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22   954  	if (ecc_point_is_zero(pk)) {
+3c4b2390 Salvatore Benedetto 2016-06-22   955  		ret = -EAGAIN;
+3c4b2390 Salvatore Benedetto 2016-06-22   956  		goto err_free_point;
+3c4b2390 Salvatore Benedetto 2016-06-22   957  	}
+3c4b2390 Salvatore Benedetto 2016-06-22   958  
+3c4b2390 Salvatore Benedetto 2016-06-22   959  	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+3c4b2390 Salvatore Benedetto 2016-06-22   960  	ecc_swap_digits(pk->x, (u64 *)public_key, ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22   961  	ecc_swap_digits(pk->y, (u64 *)&public_key[nbytes], ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22   962  
+3c4b2390 Salvatore Benedetto 2016-06-22   963  err_free_point:
+3c4b2390 Salvatore Benedetto 2016-06-22   964  	ecc_free_point(pk);
+3c4b2390 Salvatore Benedetto 2016-06-22   965  out:
+3c4b2390 Salvatore Benedetto 2016-06-22   966  	return ret;
+3c4b2390 Salvatore Benedetto 2016-06-22   967  }
+3c4b2390 Salvatore Benedetto 2016-06-22   968  
+8f44df15 Stephen Rothwell    2016-06-24   969  int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
+3c4b2390 Salvatore Benedetto 2016-06-22   970  		       const u8 *private_key, unsigned int private_key_len,
+3c4b2390 Salvatore Benedetto 2016-06-22   971  		       const u8 *public_key, unsigned int public_key_len,
+3c4b2390 Salvatore Benedetto 2016-06-22   972  		       u8 *secret, unsigned int secret_len)
+3c4b2390 Salvatore Benedetto 2016-06-22   973  {
+3c4b2390 Salvatore Benedetto 2016-06-22   974  	int ret = 0;
+3c4b2390 Salvatore Benedetto 2016-06-22   975  	struct ecc_point *product, *pk;
+3c4b2390 Salvatore Benedetto 2016-06-22   976  	u64 priv[ndigits];
+3c4b2390 Salvatore Benedetto 2016-06-22   977  	u64 rand_z[ndigits];
+3c4b2390 Salvatore Benedetto 2016-06-22   978  	unsigned int nbytes;
+3c4b2390 Salvatore Benedetto 2016-06-22   979  	const struct ecc_curve *curve = ecc_get_curve(curve_id);
+3c4b2390 Salvatore Benedetto 2016-06-22   980  
+3c4b2390 Salvatore Benedetto 2016-06-22   981  	if (!private_key || !public_key || !curve) {
+3c4b2390 Salvatore Benedetto 2016-06-22   982  		ret = -EINVAL;
+3c4b2390 Salvatore Benedetto 2016-06-22   983  		goto out;
+3c4b2390 Salvatore Benedetto 2016-06-22   984  	}
+3c4b2390 Salvatore Benedetto 2016-06-22   985  
+3c4b2390 Salvatore Benedetto 2016-06-22   986  	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+3c4b2390 Salvatore Benedetto 2016-06-22   987  
+3c4b2390 Salvatore Benedetto 2016-06-22   988  	get_random_bytes(rand_z, nbytes);
+3c4b2390 Salvatore Benedetto 2016-06-22   989  
+3c4b2390 Salvatore Benedetto 2016-06-22   990  	pk = ecc_alloc_point(ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22   991  	if (!pk) {
+3c4b2390 Salvatore Benedetto 2016-06-22   992  		ret = -ENOMEM;
+3c4b2390 Salvatore Benedetto 2016-06-22   993  		goto out;
+3c4b2390 Salvatore Benedetto 2016-06-22   994  	}
+3c4b2390 Salvatore Benedetto 2016-06-22   995  
+3c4b2390 Salvatore Benedetto 2016-06-22   996  	product = ecc_alloc_point(ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22   997  	if (!product) {
+3c4b2390 Salvatore Benedetto 2016-06-22   998  		ret = -ENOMEM;
+3c4b2390 Salvatore Benedetto 2016-06-22   999  		goto err_alloc_product;
+3c4b2390 Salvatore Benedetto 2016-06-22  1000  	}
+3c4b2390 Salvatore Benedetto 2016-06-22  1001  
+3c4b2390 Salvatore Benedetto 2016-06-22  1002  	ecc_swap_digits((const u64 *)public_key, pk->x, ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22  1003  	ecc_swap_digits((const u64 *)&public_key[nbytes], pk->y, ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22  1004  	ecc_swap_digits((const u64 *)private_key, priv, ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22  1005  
+3c4b2390 Salvatore Benedetto 2016-06-22  1006  	ecc_point_mult(product, pk, priv, rand_z, curve->p, ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22  1007  
+3c4b2390 Salvatore Benedetto 2016-06-22  1008  	ecc_swap_digits(product->x, (u64 *)secret, ndigits);
+3c4b2390 Salvatore Benedetto 2016-06-22  1009  
+3c4b2390 Salvatore Benedetto 2016-06-22  1010  	if (ecc_point_is_zero(product))
+3c4b2390 Salvatore Benedetto 2016-06-22  1011  		ret = -EFAULT;
+3c4b2390 Salvatore Benedetto 2016-06-22  1012  
+3c4b2390 Salvatore Benedetto 2016-06-22  1013  	ecc_free_point(product);
+3c4b2390 Salvatore Benedetto 2016-06-22  1014  err_alloc_product:
+3c4b2390 Salvatore Benedetto 2016-06-22  1015  	ecc_free_point(pk);
+3c4b2390 Salvatore Benedetto 2016-06-22  1016  out:
+3c4b2390 Salvatore Benedetto 2016-06-22  1017  	return ret;
+3c4b2390 Salvatore Benedetto 2016-06-22 @1018  }
 
-:::::: The code at line 118 was first introduced by commit
-:::::: 13100a72f40f5748a04017e0ab3df4cf27c809ef Security: Keys: Big keys stored encrypted
+:::::: The code at line 1018 was first introduced by commit
+:::::: 3c4b23901a0c766879dff680cd6bdab47bcdbbd2 crypto: ecdh - Add ECDH software support
 
-:::::: TO: Kirill Marinushkin <k.marinushkin@gmail.com>
-:::::: CC: David Howells <dhowells@redhat.com>
+:::::: TO: Salvatore Benedetto <salvatore.benedetto@intel.com>
+:::::: CC: Herbert Xu <herbert@gondor.apana.org.au>
 
 ---
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---envbJBWh7q8WU6mo
+--J/dobhs11T7y2rNN
 Content-Type: application/octet-stream
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICLLjbVcAAy5jb25maWcAlFxLd+O4jt73r/CpnsXM4nbl1e6umZMFJVE2ryVRJVJ2ko1O
+H4sICGbtbVcAAy5jb25maWcAlFxLd+O4jt73r/CpnsXM4nbl1e6umZMFJVE2ryVRJVJ2ko1O
 KuWqzrmpuCZx+nb/+wGoF/iQXNOLrggfSIEgCAIg5Z9/+nnB3o6Hb/fHx4f7p6e/F1/3z/uX
 ++P+8+LL49P+fxaJXBRSL3gi9C/AnD0+v/31/vXyw9ni6pfffjn7x8vD+WKzf3nePy3iw/OX
 x69v0Prx8PzTzz/FskjFqsnz+vrv/uFOFrxJcjZS4rJuIviXF4lgxUjPZLxJeNmouixlpUdA
@@ -859,4 +996,4 @@ frmVASSshrCipvwR8cMgU0oi3eQGvK9L0BdYsJ6Ral1h6HMIDnbnREdF0vapKDvc4wxTjuNs
 xBNPXsA6oerHvoIFTFwYStdmFXfUmX6d1m0HpBsRRoC1DJZgm7ELpfOrhReDG+f/Ay0YGYUM
 nAIA
 
---envbJBWh7q8WU6mo--
+--J/dobhs11T7y2rNN--
