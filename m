@@ -1,39 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 5/8] KEYS: Provide software public key query function
- [ver #2]
-Date: Sat, 25 Jun 2016 09:37:59 +0800
-Message-ID: <20160625013759.GA25613@gondor.apana.org.au>
-References: <20160624100215.GA19150@gondor.apana.org.au>
- <7446.1466769962@warthog.procyon.org.uk>
+Subject: Re: crypto: rsa - Do not gratuitously drop leading zeroes
+Date: Sat, 25 Jun 2016 09:44:54 +0800
+Message-ID: <20160625014454.GA25805@gondor.apana.org.au>
+References: <20160622101432.GA30454@gondor.apana.org.au>
+ <1f2459d0-aea9-f595-18f6-854177f0eb8d@intel.com>
+ <20160624142814.GA21730@gondor.apana.org.au>
+ <1e8d942b-a549-b8a7-58d0-19c375597cfb@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	dwmw2@infradead.org, tadeusz.struk@intel.com,
-	linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	James Morris <jmorris@namei.org>
-To: David Howells <dhowells@redhat.com>
+Cc: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
+	Stephan Mueller <smueller@chronox.de>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:40924 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:53174 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751037AbcFYBiS (ORCPT
+	with ESMTP id S1751037AbcFYBpB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 24 Jun 2016 21:38:18 -0400
+	Fri, 24 Jun 2016 21:45:01 -0400
 Content-Disposition: inline
-In-Reply-To: <7446.1466769962@warthog.procyon.org.uk>
+In-Reply-To: <1e8d942b-a549-b8a7-58d0-19c375597cfb@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jun 24, 2016 at 01:06:02PM +0100, David Howells wrote:
-> 
-> The problem is that if I'm to produce consistency with, say, the TPM
-> interface, then I have to deal in wrapped/padded data - leastways as far as I
-> can tell from reading the docs.
+On Fri, Jun 24, 2016 at 08:25:02AM -0700, Tadeusz Struk wrote:
+> Yes, but now mpi_get_buffer() calls mpi_read_buffer() and it is also
+> used by security/keys/dh.c
 
-So the TPM device is accessed through the same interface? Where is
-the code for it?
+It appears to be using mpi_read_buffer gratuitously.  It should
+simply use mpi_get_buffer.
 
 Thanks,
 -- 
