@@ -1,81 +1,77 @@
 From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH 5/7] random: replace non-blocking pool with a
- Chacha20-based CRNG
-Date: Sun, 26 Jun 2016 20:47:43 +0200
-Message-ID: <20160626184743.GA11162@amd>
+Subject: Re: [PATCH 7/7] random: add backtracking protection to the CRNG
+Date: Sun, 26 Jun 2016 20:47:53 +0200
+Message-ID: <20160626184753.GB11162@amd>
 References: <1465832919-11316-1-git-send-email-tytso@mit.edu>
- <1465832919-11316-6-git-send-email-tytso@mit.edu>
- <20160615145908.GA18866@gondor.apana.org.au>
- <20160619231827.GB9848@thunk.org>
+ <1465832919-11316-8-git-send-email-tytso@mit.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Theodore Ts'o <tytso@mit.edu>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
+Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
 	linux-crypto@vger.kernel.org, smueller@chronox.de,
-	andi@firstfloor.org, sandyinchina@gmail.com, jsd@av8n.com,
-	hpa@zytor.com
+	herbert@gondor.apana.org.au, andi@firstfloor.org,
+	sandyinchina@gmail.com, jsd@av8n.com, hpa@zytor.com
+To: Theodore Ts'o <tytso@mit.edu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:42402 "EHLO
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:42406 "EHLO
 	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751265AbcFZSrs (ORCPT
+	with ESMTP id S1751858AbcFZSr5 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 26 Jun 2016 14:47:48 -0400
+	Sun, 26 Jun 2016 14:47:57 -0400
 Content-Disposition: inline
-In-Reply-To: <20160619231827.GB9848@thunk.org>
+In-Reply-To: <1465832919-11316-8-git-send-email-tytso@mit.edu>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi!
+On Mon 2016-06-13 11:48:39, Theodore Ts'o wrote:
+> Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+> ---
+>  drivers/char/random.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 49 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/char/random.c b/drivers/char/random.c
+> index d640865..963a6a9 100644
+> --- a/drivers/char/random.c
+> +++ b/drivers/char/random.c
+> @@ -436,7 +436,8 @@ static int crng_init = 0;
+>  #define crng_ready() (likely(crng_init > 0))
+>  static void _extract_crng(struct crng_state *crng,
+>  			  __u8 out[CHACHA20_BLOCK_SIZE]);
+> -static void extract_crng(__u8 out[CHACHA20_BLOCK_SIZE]);
+> +static void _crng_backtrack_protect(struct crng_state *crng,
+> +				    __u8 tmp[CHACHA20_BLOCK_SIZE], int used);
+>  static void process_random_ready_list(void);
 
-> Yes, I understand the argument that the networking stack is now
-> requiring the crypto layer --- but not all IOT devices may necessarily
-> require the IP stack (they might be using some alternate wireless
-> communications stack) and I'd much rather not make things worse.
-> 
-> 
-> The final thing is that it's not at all clear that the accelerated
-> implementation is all that important anyway.  Consider the following
-> two results using the unaccelerated ChaCha20:
-> 
-> % dd if=/dev/urandom bs=4M count=32 of=/dev/null
-> 32+0 records in
-> 32+0 records out
-> 134217728 bytes (134 MB, 128 MiB) copied, 1.18647 s, 113 MB/s
-> 
-> % dd if=/dev/urandom bs=32 count=4194304 of=/dev/null
-> 4194304+0 records in
-> 4194304+0 records out
-> 134217728 bytes (134 MB, 128 MiB) copied, 7.08294 s, 18.9 MB/s
-> 
-> So in both cases, we are reading 128M from the CRNG.  In the first
-> case, we see the sort of speed we would get if we were using the CRNG
-> for some illegitimate, such as "dd if=/dev/urandom of=/dev/sdX bs=4M"
-> (because they were too lazy to type "apt-get install nwipe").
-> 
-> In the second case, we see the use of /dev/urandom in a much more
-> reasonable, proper, real-world use case for /de/urandom, which is some
-> userspace process needing a 256 bit session key for a TLS connection,
-> or some such.  In this case, we see that the other overheads of
-> providing the anti-backtracking protection, system call overhead,
-> etc., completely dominate the speed of the core crypto primitive.
-> 
-> So even if the AVX optimized is 100% faster than the generic version,
-> it would change the time needed to create a 256 byte session key from
-> 1.68 microseconds to 1.55 microseconds.  And this is ignoring the
+You can do u8 and u32 in the code, we know we are in kernel.
 
-Ok, so lets say I'm writing some TLS server, and I know that traffic
-is currently heavy because it was heavy in last 5 minutes. Would it
-make sense for me to request 128M of randomness from /dev/urandom, and
-then use that internally, to avoid the syscall overhead?
+> +/*
+> + * Use the leftover bytes from the CRNG block output (if there is
+> + * enough) to mutate the CRNG key to provide backtracking protection.
+> + */
+> +static void _crng_backtrack_protect(struct crng_state *crng,
+> +				    __u8 tmp[CHACHA20_BLOCK_SIZE], int used)
+> +{
+> +	unsigned long	flags;
+> +	__u32		*s, *d;
+> +	int		i;
+> +
+> +	used = round_up(used, sizeof(__u32));
+> +	if (used + CHACHA20_KEY_SIZE > CHACHA20_BLOCK_SIZE) {
+> +		extract_crng(tmp);
+> +		used = 0;
+> +	}
+> +	spin_lock_irqsave(&crng->lock, flags);
+> +	s = (__u32 *) &tmp[used];
+> +	d = &crng->state[4];
+> +	for (i=0; i < 8; i++)
+> +		*d++ ^= *s++;
+> +	spin_unlock_irqrestore(&crng->lock, flags);
+> +}
 
-Ok, maybe 128M is a bit much because by requesting that much in single
-request i'd turn urandom into PRNG, but perhaps 1MB block makes sense?
+You are basically trying to turn CRNG into one way hash function here,
+right? Do you have any explanation that it has the required
+properties?
 
-And I guess even requesting 128M would make sense, as kernel can
-select best crypto implementation for CRNG, and I'd prefer to avoid
-that code in my application as it is hardware-specific...
-
+Thanks,
 									Pavel
 -- 
 (english) http://www.livejournal.com/~pavelmachek
