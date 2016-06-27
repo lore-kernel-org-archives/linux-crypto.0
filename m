@@ -1,52 +1,63 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH 7/7] random: add backtracking protection to the CRNG
-Date: Sun, 26 Jun 2016 19:05:47 -0400
-Message-ID: <20160626230547.GD7132@thunk.org>
-References: <1465832919-11316-1-git-send-email-tytso@mit.edu>
- <1465832919-11316-8-git-send-email-tytso@mit.edu>
- <20160626184753.GB11162@amd>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.7
+Date: Mon, 27 Jun 2016 14:28:19 +0800
+Message-ID: <20160627062819.GA6284@gondor.apana.org.au>
+References: <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150415033951.GA1406@gondor.apana.org.au>
+ <20150622084457.GA7806@gondor.apana.org.au>
+ <20150831135655.GA2694@gondor.apana.org.au>
+ <20151102080427.GA8465@gondor.apana.org.au>
+ <20160111101450.GA24044@gondor.apana.org.au>
+ <20160122101828.GA15966@gondor.apana.org.au>
+ <20160513055902.GA13595@gondor.apana.org.au>
+ <20160520084105.GA3959@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, smueller@chronox.de,
-	herbert@gondor.apana.org.au, andi@firstfloor.org,
-	sandyinchina@gmail.com, jsd@av8n.com, hpa@zytor.com
-To: Pavel Machek <pavel@ucw.cz>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:34256 "EHLO imap.thunk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751550AbcFZXFz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 26 Jun 2016 19:05:55 -0400
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20160626184753.GB11162@amd>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20160520084105.GA3959@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Jun 26, 2016 at 08:47:53PM +0200, Pavel Machek wrote:
-> 
-> You are basically trying to turn CRNG into one way hash function here,
-> right? Do you have any explanation that it has the required
-> properties?
+Hi Linus:
 
-Well, not really.  A CRNG has the property that if you generate a
-series of outputs: O_N-1, O_N, O_N+1, etc., knowledge of O_N does not
-give you any special knowledge with respect to O_N+1 or O_N-1.
+This push fixes the following issue:
 
-The anti-backtracking protection means that when we generate O_N, we
-use O_N+1 to mutate the state used for the CRNG; specifically, we are
-XOR'ing O_N+1 into the state.  Now let's suppose that state gets
-exposed.  Even if you know O_N, that's not going to let you know
-O_N+1, so knowledge of the exposed state post XOR with O_N+1 isn't
-going to help you get back the original state.
+- Missing length check for user-space GETALG request.
+- Bogus memmove length in ux500 driver.
+- Incorrect priority setting for vmx driver.
+- Incorrect ABI selection for vmx driver.
 
-More generally, if we assume ChaCha20 is secure, that means that you
-can't derive the key even if you have known plaintext.  The output of
-the CRNG is basically the keystream --- what you have after you XOR
-the ciphertext with the plaintext.  If ChaCha20 is secure, knowledge
-of large portions of the keystream should not help you determine the
-key, which means is why knowledge of O_N-1, O_N, won't help you derive
-either (a) the state of CRNG, aka the ChaCha20 key, or (b) O_N+1.
 
-Cheers,
+Please pull from
 
-						- Ted
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Anton Blanchard (2):
+      crypto: vmx - Fix ABI detection
+      crypto: vmx - Increase priority of aes-cbc cipher
+
+Linus Walleij (1):
+      crypto: ux500 - memmove the right size
+
+Mathias Krause (1):
+      crypto: user - re-add size check for CRYPTO_MSG_GETALG
+
+ crypto/crypto_user.c                  |    1 +
+ drivers/crypto/ux500/hash/hash_core.c |    4 ++--
+ drivers/crypto/vmx/aes_cbc.c          |    2 +-
+ drivers/crypto/vmx/aes_ctr.c          |    2 +-
+ drivers/crypto/vmx/ppc-xlate.pl       |    2 +-
+ 5 files changed, 6 insertions(+), 5 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
