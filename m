@@ -1,105 +1,55 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/7] crypto: SHA256 multibuffer implementation
-Date: Mon, 27 Jun 2016 17:04:55 +0800
-Message-ID: <20160627090455.GA7140@gondor.apana.org.au>
-References: <1466732448-27856-1-git-send-email-megha.dey@intel.com>
+Subject: Re: [PATCH V2] hwrng: OMAP: Fix assumption that runtime_get_sync
+ will always succeed
+Date: Mon, 27 Jun 2016 17:05:37 +0800
+Message-ID: <20160627090537.GC7140@gondor.apana.org.au>
+References: <1466787040-26184-1-git-send-email-nm@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	fenghua.yu@intel.com, Megha Dey <megha.dey@linux.intel.com>
-To: Megha Dey <megha.dey@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Matt Mackall <mpm@selenic.com>,
+	Deepak Saxena <dsaxena@plexity.net>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	s-anna@ti.com, Paul Walmsley <paul@pwsan.com>
+To: Nishanth Menon <nm@ti.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1466732448-27856-1-git-send-email-megha.dey@intel.com>
+In-Reply-To: <1466787040-26184-1-git-send-email-nm@ti.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 23, 2016 at 06:40:41PM -0700, Megha Dey wrote:
-> From: Megha Dey <megha.dey@linux.intel.com>
->=20
-> In this patch series, we introduce the multi-buffer crypto algorithm =
-on
-> x86_64 and apply it to SHA256 hash computation.  The multi-buffer tec=
-hnique
-> takes advantage of the 8 data lanes in the AVX2 registers and allows
-> computation to be performed on data from multiple jobs in parallel.
-> This allows us to parallelize computations when data inter-dependency=
- in
-> a single crypto job prevents us to fully parallelize our computations=
-=2E
-> The algorithm can be extended to other hashing and encryption schemes
-> in the future.
->=20
-> On multi-buffer SHA256 computation with AVX2, we see throughput incre=
-ase
-> up to 2.2x over the existing x86_64 single buffer AVX2 algorithm.
->=20
-> The multi-buffer crypto algorithm is described in the following paper=
-:
-> Processing Multiple Buffers in Parallel to Increase Performance on
-> Intel=AE Architecture Processors
-> http://www.intel.com/content/www/us/en/communications/communications-=
-ia-multi-buffer-paper.html
->=20
-> The outline of the algorithm is sketched below:
-> Any driver requesting the crypto service will place an async
-> crypto request on the workqueue.  The multi-buffer crypto daemon will
-> pull request from work queue and put each request in an empty data la=
-ne
-> for multi-buffer crypto computation.  When all the empty lanes are fi=
-lled,
-> computation will commence on the jobs in parallel and the job with th=
-e
-> shortest remaining buffer will get completed and be returned.  To pre=
-vent
-> prolonged stall when there is no new jobs arriving, we will flush a c=
-rypto
-> job if it has not been completed after a maximum allowable delay.
->=20
-> To accommodate the fragmented nature of scatter-gather, we will keep
-> submitting the next scatter-buffer fragment for a job for multi-buffe=
-r
-> computation until a job is completed and no more buffer fragments rem=
-ain.
-> At that time we will pull a new job to fill the now empty data slot.
-> We call a get_completed_job function to check whether there are other
-> jobs that have been completed when we job when we have no new job arr=
-ival
-> to prevent extraneous delay in returning any completed jobs.
->=20
-> The multi-buffer algorithm should be used for cases where crypto jobs
-> submissions are at a reasonable high rate.  For low crypto job submis=
-sion
-> rate, this algorithm will not be beneficial. The reason is at low rat=
-e,
-> we do not fill out the data lanes before the maximum allowable latenc=
-y,
-> we will be flushing the jobs instead of processing them with all the
-> data lanes full.  We will miss the benefit of parallel computation,
-> and adding delay to the processing of the crypto job at the same time=
-=2E
-> Some tuning of the maximum latency parameter may be needed to get the
-> best performance.
->=20
-> Note that the tcrypt SHA256 speed test, we wait for a previous job to
-> be completed before submitting a new job.  Hence this is not a valid
-> test for multi-buffer algorithm as it requires multiple outstanding j=
-obs
-> submitted to fill the all data lanes to be effective (i.e. 8 outstand=
-ing
-> jobs for the AVX2 case). An updated version of the tcrypt test is als=
-o
-> included which would contain a more appropriate test for this scenari=
-o.
->=20
-> As this is the first algorithm in the kernel's crypto library
-> that we have tried to use multi-buffer optimizations, feedbacks
-> and testings will be much appreciated.
+On Fri, Jun 24, 2016 at 11:50:39AM -0500, Nishanth Menon wrote:
+> pm_runtime_get_sync does return a error value that must be checked for
+> error conditions, else, due to various reasons, the device maynot be
+> enabled and the system will crash due to lack of clock to the hardware
+> module.
+> 
+> Before:
+> 12.562784] [00000000] *pgd=fe193835
+> 12.562792] Internal error: : 1406 [#1] SMP ARM
+> [...]
+> 12.562864] CPU: 1 PID: 241 Comm: modprobe Not tainted 4.7.0-rc4-next-20160624 #2
+> 12.562867] Hardware name: Generic DRA74X (Flattened Device Tree)
+> 12.562872] task: ed51f140 ti: ed44c000 task.ti: ed44c000
+> 12.562886] PC is at omap4_rng_init+0x20/0x84 [omap_rng]
+> 12.562899] LR is at set_current_rng+0xc0/0x154 [rng_core]
+> [...]
+> 
+> After the proper checks:
+> [   94.366705] omap_rng 48090000.rng: _od_fail_runtime_resume: FIXME:
+> missing hwmod/omap_dev info
+> [   94.375767] omap_rng 48090000.rng: Failed to runtime_get device -19
+> [   94.382351] omap_rng 48090000.rng: initialization failed.
+> 
+> Fixes: 665d92fa85b5 ("hwrng: OMAP: convert to use runtime PM")
+> Cc: Paul Walmsley <paul@pwsan.com>
+> Signed-off-by: Nishanth Menon <nm@ti.com>
+> ---
+> Changes in V2:
+> 	- Added runtime_put_noidle when get_sync fails to ensure proper refcounting
 
-All applied.  Thanks.
---=20
+Patch applied.  Thanks.
+-- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
