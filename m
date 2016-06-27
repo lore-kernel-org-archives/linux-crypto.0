@@ -1,56 +1,32 @@
-From: Megha Dey <megha.dey@intel.com>
-Subject: [PATCH 2/6] crypto: sha512-mb - Enable SHA512 multibuffer support
-Date: Mon, 27 Jun 2016 10:20:05 -0700
-Message-ID: <1467048009-2826-3-git-send-email-megha.dey@intel.com>
-References: <1467048009-2826-1-git-send-email-megha.dey@intel.com>
-Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	megha.dey@intel.com, fenghua.yu@intel.com,
-	Megha Dey <megha.dey@linux.intel.com>
-To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1467048009-2826-1-git-send-email-megha.dey@intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH 3/3] ARM: dts: BCM5301x: Add RNG Device Tree node
+Date: Mon, 27 Jun 2016 11:21:47 -0700
+Message-ID: <57716EBB.9070803@gmail.com>
+References: <1466641623-3491-1-git-send-email-f.fainelli@gmail.com>
+ <1466641623-3491-4-git-send-email-f.fainelli@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: yendapally.reddy@broadcom.com, herbert@gondor.apana.org.au,
+	eric@anholt.net, bcm-kernel-feedback-list@broadcom.com,
+	devicetre@vger.kernel.org, hauke@hauke-m.de, zajec5@gmail.com,
+	mpm@selenic.com, linux-arm-kernel@lists.infradead.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:35927 "EHLO
+	mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751638AbcF0SVu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 27 Jun 2016 14:21:50 -0400
+In-Reply-To: <1466641623-3491-4-git-send-email-f.fainelli@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Megha Dey <megha.dey@linux.intel.com>
+On 06/22/2016 05:27 PM, Florian Fainelli wrote:
+> Add the DT node for the random number generator peripheral.
+> 
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 
-Add the config CRYPTO_SHA512_MB which will enable the computation
-using the SHA512 multi-buffer algorithm.
-
-Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
-Reviewed-by: Fenghua Yu <fenghua.yu@intel.com>
-Reviewed-by: Tim Chen <tim.c.chen@linux.intel.com>
----
- crypto/Kconfig | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index d8cc0f0..62fcbb9 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -720,6 +720,22 @@ config CRYPTO_SHA256_MB
- 	  lanes remain unfilled, a flush operation will be initiated to
- 	  process the crypto jobs, adding a slight latency.
- 
-+config CRYPTO_SHA512_MB
-+        tristate "SHA512 digest algorithm (x86_64 Multi-Buffer, Experimental)"
-+        depends on X86 && 64BIT
-+        select CRYPTO_SHA512
-+        select CRYPTO_HASH
-+        select CRYPTO_MCRYPTD
-+        help
-+          SHA-512 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
-+          using multi-buffer technique.  This algorithm computes on
-+          multiple data lanes concurrently with SIMD instructions for
-+          better throughput.  It should not be enabled by default but
-+          used when there is significant amount of work to keep the keep
-+          the data lanes filled to get performance benefit.  If the data
-+          lanes remain unfilled, a flush operation will be initiated to
-+          process the crypto jobs, adding a slight latency.
-+
- config CRYPTO_SHA256
- 	tristate "SHA224 and SHA256 digest algorithm"
- 	select CRYPTO_HASH
+Applied
 -- 
-1.9.1
+Florian
