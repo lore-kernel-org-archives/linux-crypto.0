@@ -1,53 +1,52 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v6 2/8] crypto: add driver-side scomp interface
-Date: Tue, 28 Jun 2016 15:51:08 +0800
-Message-ID: <20160628075108.GA15610@gondor.apana.org.au>
-References: <1465373818-29720-1-git-send-email-giovanni.cabiddu@intel.com>
- <1465373818-29720-3-git-send-email-giovanni.cabiddu@intel.com>
- <20160613085612.GA7333@gondor.apana.org.au>
- <20160622155350.GA22247@sivswdev01.ir.intel.com>
- <20160623105034.GA10475@gondor.apana.org.au>
- <20160624083728.GA15549@sivswdev01.ir.intel.com>
- <20160624092643.GA18935@gondor.apana.org.au>
- <20160628074141.GA7321@sivswdev01.ir.intel.com>
+Subject: Re: [PATCH] crypto: ux500: do not build with -O0
+Date: Tue, 28 Jun 2016 16:36:46 +0800
+Message-ID: <20160628083646.GA15985@gondor.apana.org.au>
+References: <20160627091809.1349621-1-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, weigang.li@intel.com
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51465 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:46020 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750704AbcF1HvO (ORCPT
+	with ESMTP id S1751862AbcF1Ig6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Jun 2016 03:51:14 -0400
+	Tue, 28 Jun 2016 04:36:58 -0400
 Content-Disposition: inline
-In-Reply-To: <20160628074141.GA7321@sivswdev01.ir.intel.com>
+In-Reply-To: <20160627091809.1349621-1-arnd@arndb.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 28, 2016 at 08:41:42AM +0100, Giovanni Cabiddu wrote:
->
-> Are you suggesting a different cache of scratch buffers for every
-> algorithm implementation or a shared cache shared across all legacy
-> scomp algorithms?
+On Mon, Jun 27, 2016 at 11:17:40AM +0200, Arnd Bergmann wrote:
+> The ARM allmodconfig build currently warngs because of the
+> ux500 crypto driver not working well with the jump label
+> implementation that we started using for dynamic debug, which
+> breaks building with 'gcc -O0':
+> 
+> In file included from /git/arm-soc/include/linux/jump_label.h:105:0,
+>                  from /git/arm-soc/include/linux/dynamic_debug.h:5,
+>                  from /git/arm-soc/include/linux/printk.h:289,
+>                  from /git/arm-soc/include/linux/kernel.h:13,
+>                  from /git/arm-soc/include/linux/clk.h:16,
+>                  from /git/arm-soc/drivers/crypto/ux500/hash/hash_core.c:16:
+> /git/arm-soc/arch/arm/include/asm/jump_label.h: In function 'hash_set_dma_transfer':
+> /git/arm-soc/arch/arm/include/asm/jump_label.h:13:7: error: asm operand 0 probably doesn't match constraints [-Werror]
+>   asm_volatile_goto("1:\n\t"
+> 
+> Turning off compiler optimizations has never really been supported
+> here, and it's only used when debugging the driver. I have not found
+> a good reason for doing this here, other than a misguided attempt
+> to produce more readable assembly output. Also, the driver is only
+> used in obsolete hardware that almost certainly nobody will spend
+> time debugging any more.
+> 
+> This just removes the -O0 flag from the compiler options.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-One that's shared for every scomp algorithm.
-
-> Would it be ok 128K instead?
-> We are proposing to use the acomp API from BTRFS. Limiting the size
-> of the source and destination buffers to 64K would not work since
-> BTRFS usually compresses 128KB. 
-> Here is the RFC sent by Weigang to the BTFS list:
-> http://www.spinics.net/lists/linux-btrfs/msg56648.html
-
-While I don't see any big differences between 64K and 128K, I have
-noticed that btrfs is already doing partial decompression on a
-page-by-page basis, which is the most optimal setup.
-
-So whatever we do for this conversion we should make sure that
-btrfs does not regress into using vmalloc.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
