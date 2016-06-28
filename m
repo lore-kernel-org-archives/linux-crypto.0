@@ -1,40 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Doing crypto in small stack buffers (bluetooth vs vmalloc-stack
- crash, etc)
-Date: Tue, 28 Jun 2016 20:42:41 +0800
-Message-ID: <20160628124241.GA17940@gondor.apana.org.au>
-References: <20160628123743.7960.qmail@ns.sciencehorizons.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: luto@amacapital.net, linux-bluetooth@vger.kernel.org,
-	linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-To: George Spelvin <linux@sciencehorizons.net>
+From: "George Spelvin" <linux@sciencehorizons.net>
+Subject: Re: Doing crypto in small stack buffers (bluetooth vs vmalloc-stack crash, etc)
+Date: 28 Jun 2016 09:23:01 -0400
+Message-ID: <20160628132301.11479.qmail@ns.sciencehorizons.net>
+References: <20160628124241.GA17940@gondor.apana.org.au>
+Cc: linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org,
+	luto@amacapital.net, netdev@vger.kernel.org
+To: herbert@gondor.apana.org.au, linux@sciencehorizons.net
 Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20160628123743.7960.qmail@ns.sciencehorizons.net>
+In-Reply-To: <20160628124241.GA17940@gondor.apana.org.au>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jun 28, 2016 at 08:37:43AM -0400, George Spelvin wrote:
-> Just a note, crypto/cts.c also does a lot of sg_set_buf() in stack buffers.
-> 
-> I have a local patch (appended, if anyone wants) to reduce the wasteful
-> amount of buffer space it uses (from 7 to 3 blocks on encrypt, from
-> 6 to 3 blocks on decrypt), but it would take some rework to convert to
-> crypto_cipher_encrypt_one() or avoid stack buffers entirely.
+Herbert Xu wrote:
+> I'm currently working on cts and I'm removing the stack usage
+> altogether by having it operate on the src/dst SG lists only.
 
-I'm currently working on cts and I'm removing the stack usage
-altogether by having it operate on the src/dst SG lists only.
+Wow, I should see how you do that.  I couldn't get it below 3
+blocks of temporary, and the dst SG list only gives you
+one and a half.
 
-It's part of the skcipher conversion though so it'll have to go
-through the crypto tree.
+> BTW, the only cts user in our tree appears to be implementing
+> CTS all over again and is only calling the crypto API cts for
+> the last two blocks.  Someone should fix that.
 
-BTW, the only cts user in our tree appears to be implementing
-CTS all over again and is only calling the crypto API cts for
-the last two blocks.  Someone should fix that.
+Hint taken.  Although I'm having a hard time finding that only user
+amidst all the drivers thinking it means Clear To Send or (for HDMI)
+Cycle Time Stamp.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Um...the uses in fs/crypto/keyinfo.c and fs/ext4/crypto_key.c
+don't seem to do anything untoward.
+
+Is net/sunrpc/auth_gss/gss_krb5_mech.c doing something odd?
+
+
+I have a request of you: like Andy, I find the crypto layer an
+impenetrable thicket of wrapper structures.  I'm not suggesting there
+aren't reasons for it, but it's extremely hard to infer those reasons by
+looking at the code.  If I were to draft a (hilariously wrong) overview
+document, would you be willing to edit it into correctness?
