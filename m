@@ -1,40 +1,49 @@
-From: "George Spelvin" <linux@sciencehorizons.net>
-Subject: Re: Doing crypto in small stack buffers (bluetooth vs vmalloc-stack crash, etc)
-Date: 28 Jun 2016 09:23:01 -0400
-Message-ID: <20160628132301.11479.qmail@ns.sciencehorizons.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Doing crypto in small stack buffers (bluetooth vs vmalloc-stack
+ crash, etc)
+Date: Tue, 28 Jun 2016 21:30:50 +0800
+Message-ID: <20160628133050.GA18468@gondor.apana.org.au>
 References: <20160628124241.GA17940@gondor.apana.org.au>
+ <20160628132301.11479.qmail@ns.sciencehorizons.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org,
 	luto@amacapital.net, netdev@vger.kernel.org
-To: herbert@gondor.apana.org.au, linux@sciencehorizons.net
+To: George Spelvin <linux@sciencehorizons.net>
 Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20160628124241.GA17940@gondor.apana.org.au>
+Content-Disposition: inline
+In-Reply-To: <20160628132301.11479.qmail@ns.sciencehorizons.net>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Herbert Xu wrote:
-> I'm currently working on cts and I'm removing the stack usage
-> altogether by having it operate on the src/dst SG lists only.
+On Tue, Jun 28, 2016 at 09:23:01AM -0400, George Spelvin wrote:
+> 
+> Wow, I should see how you do that.  I couldn't get it below 3
+> blocks of temporary, and the dst SG list only gives you
+> one and a half.
 
-Wow, I should see how you do that.  I couldn't get it below 3
-blocks of temporary, and the dst SG list only gives you
-one and a half.
+I don't mean that I'm using no temporary buffers at all, just
+that the actual crypto only operates on the SG lists.  I'm still
+doing the xoring and stitching in temp buffers.  I just counted
+and I'm using three blocks like you.
 
-> BTW, the only cts user in our tree appears to be implementing
-> CTS all over again and is only calling the crypto API cts for
-> the last two blocks.  Someone should fix that.
+> Is net/sunrpc/auth_gss/gss_krb5_mech.c doing something odd?
 
-Hint taken.  Although I'm having a hard time finding that only user
-amidst all the drivers thinking it means Clear To Send or (for HDMI)
-Cycle Time Stamp.
+Yes gss_krb5_crypto.c is the one.
 
-Um...the uses in fs/crypto/keyinfo.c and fs/ext4/crypto_key.c
-don't seem to do anything untoward.
+> I have a request of you: like Andy, I find the crypto layer an
+> impenetrable thicket of wrapper structures.  I'm not suggesting there
+> aren't reasons for it, but it's extremely hard to infer those reasons by
+> looking at the code.  If I were to draft a (hilariously wrong) overview
+> document, would you be willing to edit it into correctness?
 
-Is net/sunrpc/auth_gss/gss_krb5_mech.c doing something odd?
+We have actually gained quite a bit of documentation recently.
+Have you looked at Documentation/DocBook/crypto-API.tmpl?
 
+More is always welcome of course.
 
-I have a request of you: like Andy, I find the crypto layer an
-impenetrable thicket of wrapper structures.  I'm not suggesting there
-aren't reasons for it, but it's extremely hard to infer those reasons by
-looking at the code.  If I were to draft a (hilariously wrong) overview
-document, would you be willing to edit it into correctness?
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
