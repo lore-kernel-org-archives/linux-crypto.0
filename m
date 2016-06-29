@@ -1,217 +1,113 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 9/28] crypto: ccm - Use skcipher
-Date: Wed, 29 Jun 2016 18:03:55 +0800
-Message-ID: <E1bICLb-0006t8-07@gondolin.me.apana.org.au>
+Subject: [PATCH 14/28] KEYS: Use skcipher for big keys
+Date: Wed, 29 Jun 2016 18:04:00 +0800
+Message-ID: <E1bICLg-0006uV-Fd@gondolin.me.apana.org.au>
 References: <20160629100223.GA26260@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:43012 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:44032 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751482AbcF2KD6 (ORCPT
+	with ESMTP id S1751858AbcF2KEF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Jun 2016 06:03:58 -0400
+	Wed, 29 Jun 2016 06:04:05 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1bICLb-0005Gu-77
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2016 20:03:55 +1000
+	id 1bICLg-0005JG-Jg
+	for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2016 20:04:00 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch converts ccm to use the new skcipher interface as opposed
-to ablkcipher.
+This patch replaces use of the obsolete blkcipher with skcipher.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/ccm.c |   70 +++++++++++++++++++++++++++++------------------------------
- 1 file changed, 35 insertions(+), 35 deletions(-)
+ security/keys/big_key.c |   30 ++++++++++++++++++------------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
 
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index cc31ea4..3d924cd 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -28,7 +28,7 @@ struct ccm_instance_ctx {
+diff --git a/security/keys/big_key.c b/security/keys/big_key.c
+index 9e443fc..c0b3030 100644
+--- a/security/keys/big_key.c
++++ b/security/keys/big_key.c
+@@ -18,6 +18,7 @@
+ #include <keys/user-type.h>
+ #include <keys/big_key-type.h>
+ #include <crypto/rng.h>
++#include <crypto/skcipher.h>
  
- struct crypto_ccm_ctx {
- 	struct crypto_cipher *cipher;
--	struct crypto_ablkcipher *ctr;
-+	struct crypto_skcipher *ctr;
- };
+ /*
+  * Layout of key payload words.
+@@ -74,7 +75,7 @@ static const char big_key_alg_name[] = "ecb(aes)";
+  * Crypto algorithms for big_key data encryption
+  */
+ static struct crypto_rng *big_key_rng;
+-static struct crypto_blkcipher *big_key_blkcipher;
++static struct crypto_skcipher *big_key_skcipher;
  
- struct crypto_rfc4309_ctx {
-@@ -50,7 +50,7 @@ struct crypto_ccm_req_priv_ctx {
- 	u32 flags;
- 	struct scatterlist src[3];
- 	struct scatterlist dst[3];
--	struct ablkcipher_request abreq;
-+	struct skcipher_request skreq;
- };
- 
- static inline struct crypto_ccm_req_priv_ctx *crypto_ccm_reqctx(
-@@ -83,15 +83,15 @@ static int crypto_ccm_setkey(struct crypto_aead *aead, const u8 *key,
- 			     unsigned int keylen)
+ /*
+  * Generate random key to encrypt big_key data
+@@ -91,22 +92,26 @@ static int big_key_crypt(enum big_key_op op, u8 *data, size_t datalen, u8 *key)
  {
- 	struct crypto_ccm_ctx *ctx = crypto_aead_ctx(aead);
--	struct crypto_ablkcipher *ctr = ctx->ctr;
-+	struct crypto_skcipher *ctr = ctx->ctr;
- 	struct crypto_cipher *tfm = ctx->cipher;
- 	int err = 0;
+ 	int ret = -EINVAL;
+ 	struct scatterlist sgio;
+-	struct blkcipher_desc desc;
++	SKCIPHER_REQUEST_ON_STACK(req, big_key_skcipher);
  
--	crypto_ablkcipher_clear_flags(ctr, CRYPTO_TFM_REQ_MASK);
--	crypto_ablkcipher_set_flags(ctr, crypto_aead_get_flags(aead) &
--				    CRYPTO_TFM_REQ_MASK);
--	err = crypto_ablkcipher_setkey(ctr, key, keylen);
--	crypto_aead_set_flags(aead, crypto_ablkcipher_get_flags(ctr) &
-+	crypto_skcipher_clear_flags(ctr, CRYPTO_TFM_REQ_MASK);
-+	crypto_skcipher_set_flags(ctr, crypto_aead_get_flags(aead) &
-+				       CRYPTO_TFM_REQ_MASK);
-+	err = crypto_skcipher_setkey(ctr, key, keylen);
-+	crypto_aead_set_flags(aead, crypto_skcipher_get_flags(ctr) &
- 			      CRYPTO_TFM_RES_MASK);
- 	if (err)
- 		goto out;
-@@ -347,7 +347,7 @@ static int crypto_ccm_encrypt(struct aead_request *req)
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct crypto_ccm_ctx *ctx = crypto_aead_ctx(aead);
- 	struct crypto_ccm_req_priv_ctx *pctx = crypto_ccm_reqctx(req);
--	struct ablkcipher_request *abreq = &pctx->abreq;
-+	struct skcipher_request *skreq = &pctx->skreq;
- 	struct scatterlist *dst;
- 	unsigned int cryptlen = req->cryptlen;
- 	u8 *odata = pctx->odata;
-@@ -366,11 +366,11 @@ static int crypto_ccm_encrypt(struct aead_request *req)
- 	if (req->src != req->dst)
- 		dst = pctx->dst;
+-	if (crypto_blkcipher_setkey(big_key_blkcipher, key, ENC_KEY_SIZE)) {
++	if (crypto_skcipher_setkey(big_key_skcipher, key, ENC_KEY_SIZE)) {
+ 		ret = -EAGAIN;
+ 		goto error;
+ 	}
  
--	ablkcipher_request_set_tfm(abreq, ctx->ctr);
--	ablkcipher_request_set_callback(abreq, pctx->flags,
--					crypto_ccm_encrypt_done, req);
--	ablkcipher_request_set_crypt(abreq, pctx->src, dst, cryptlen + 16, iv);
--	err = crypto_ablkcipher_encrypt(abreq);
-+	skcipher_request_set_tfm(skreq, ctx->ctr);
-+	skcipher_request_set_callback(skreq, pctx->flags,
-+				      crypto_ccm_encrypt_done, req);
-+	skcipher_request_set_crypt(skreq, pctx->src, dst, cryptlen + 16, iv);
-+	err = crypto_skcipher_encrypt(skreq);
- 	if (err)
- 		return err;
+-	desc.flags = 0;
+-	desc.tfm = big_key_blkcipher;
++	skcipher_request_set_tfm(req, big_key_skcipher);
++	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
++				      NULL, NULL);
  
-@@ -407,7 +407,7 @@ static int crypto_ccm_decrypt(struct aead_request *req)
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct crypto_ccm_ctx *ctx = crypto_aead_ctx(aead);
- 	struct crypto_ccm_req_priv_ctx *pctx = crypto_ccm_reqctx(req);
--	struct ablkcipher_request *abreq = &pctx->abreq;
-+	struct skcipher_request *skreq = &pctx->skreq;
- 	struct scatterlist *dst;
- 	unsigned int authsize = crypto_aead_authsize(aead);
- 	unsigned int cryptlen = req->cryptlen;
-@@ -429,11 +429,11 @@ static int crypto_ccm_decrypt(struct aead_request *req)
- 	if (req->src != req->dst)
- 		dst = pctx->dst;
+ 	sg_init_one(&sgio, data, datalen);
++	skcipher_request_set_crypt(req, &sgio, &sgio, datalen, NULL);
  
--	ablkcipher_request_set_tfm(abreq, ctx->ctr);
--	ablkcipher_request_set_callback(abreq, pctx->flags,
--					crypto_ccm_decrypt_done, req);
--	ablkcipher_request_set_crypt(abreq, pctx->src, dst, cryptlen + 16, iv);
--	err = crypto_ablkcipher_decrypt(abreq);
-+	skcipher_request_set_tfm(skreq, ctx->ctr);
-+	skcipher_request_set_callback(skreq, pctx->flags,
-+				      crypto_ccm_decrypt_done, req);
-+	skcipher_request_set_crypt(skreq, pctx->src, dst, cryptlen + 16, iv);
-+	err = crypto_skcipher_decrypt(skreq);
- 	if (err)
- 		return err;
+ 	if (op == BIG_KEY_ENC)
+-		ret = crypto_blkcipher_encrypt(&desc, &sgio, &sgio, datalen);
++		ret = crypto_skcipher_encrypt(req);
+ 	else
+-		ret = crypto_blkcipher_decrypt(&desc, &sgio, &sgio, datalen);
++		ret = crypto_skcipher_decrypt(req);
++
++	skcipher_request_zero(req);
  
-@@ -454,7 +454,7 @@ static int crypto_ccm_init_tfm(struct crypto_aead *tfm)
- 	struct ccm_instance_ctx *ictx = aead_instance_ctx(inst);
- 	struct crypto_ccm_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct crypto_cipher *cipher;
--	struct crypto_ablkcipher *ctr;
-+	struct crypto_skcipher *ctr;
- 	unsigned long align;
- 	int err;
+ error:
+ 	return ret;
+@@ -140,7 +145,7 @@ int big_key_preparse(struct key_preparsed_payload *prep)
+ 		 *
+ 		 * File content is stored encrypted with randomly generated key.
+ 		 */
+-		size_t enclen = ALIGN(datalen, crypto_blkcipher_blocksize(big_key_blkcipher));
++		size_t enclen = ALIGN(datalen, crypto_skcipher_blocksize(big_key_skcipher));
  
-@@ -462,7 +462,7 @@ static int crypto_ccm_init_tfm(struct crypto_aead *tfm)
- 	if (IS_ERR(cipher))
- 		return PTR_ERR(cipher);
+ 		/* prepare aligned data to encrypt */
+ 		data = kmalloc(enclen, GFP_KERNEL);
+@@ -288,7 +293,7 @@ long big_key_read(const struct key *key, char __user *buffer, size_t buflen)
+ 		struct file *file;
+ 		u8 *data;
+ 		u8 *enckey = (u8 *)key->payload.data[big_key_data];
+-		size_t enclen = ALIGN(datalen, crypto_blkcipher_blocksize(big_key_blkcipher));
++		size_t enclen = ALIGN(datalen, crypto_skcipher_blocksize(big_key_skcipher));
  
--	ctr = crypto_spawn_skcipher(&ictx->ctr);
-+	ctr = crypto_spawn_skcipher2(&ictx->ctr);
- 	err = PTR_ERR(ctr);
- 	if (IS_ERR(ctr))
- 		goto err_free_cipher;
-@@ -475,7 +475,7 @@ static int crypto_ccm_init_tfm(struct crypto_aead *tfm)
- 	crypto_aead_set_reqsize(
- 		tfm,
- 		align + sizeof(struct crypto_ccm_req_priv_ctx) +
--		crypto_ablkcipher_reqsize(ctr));
-+		crypto_skcipher_reqsize(ctr));
+ 		data = kmalloc(enclen, GFP_KERNEL);
+ 		if (!data)
+@@ -359,9 +364,10 @@ static int __init big_key_crypto_init(void)
+ 		goto error;
  
- 	return 0;
- 
-@@ -489,7 +489,7 @@ static void crypto_ccm_exit_tfm(struct crypto_aead *tfm)
- 	struct crypto_ccm_ctx *ctx = crypto_aead_ctx(tfm);
- 
- 	crypto_free_cipher(ctx->cipher);
--	crypto_free_ablkcipher(ctx->ctr);
-+	crypto_free_skcipher(ctx->ctr);
- }
- 
- static void crypto_ccm_free(struct aead_instance *inst)
-@@ -509,7 +509,7 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
- {
- 	struct crypto_attr_type *algt;
- 	struct aead_instance *inst;
--	struct crypto_alg *ctr;
-+	struct skcipher_alg *ctr;
- 	struct crypto_alg *cipher;
- 	struct ccm_instance_ctx *ictx;
- 	int err;
-@@ -544,37 +544,37 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
- 		goto err_free_inst;
- 
- 	crypto_set_skcipher_spawn(&ictx->ctr, aead_crypto_instance(inst));
--	err = crypto_grab_skcipher(&ictx->ctr, ctr_name, 0,
--				   crypto_requires_sync(algt->type,
--							algt->mask));
-+	err = crypto_grab_skcipher2(&ictx->ctr, ctr_name, 0,
-+				    crypto_requires_sync(algt->type,
-+							 algt->mask));
- 	if (err)
- 		goto err_drop_cipher;
- 
--	ctr = crypto_skcipher_spawn_alg(&ictx->ctr);
-+	ctr = crypto_spawn_skcipher_alg(&ictx->ctr);
- 
- 	/* Not a stream cipher? */
- 	err = -EINVAL;
--	if (ctr->cra_blocksize != 1)
-+	if (ctr->base.cra_blocksize != 1)
- 		goto err_drop_ctr;
- 
- 	/* We want the real thing! */
--	if (ctr->cra_ablkcipher.ivsize != 16)
-+	if (crypto_skcipher_alg_ivsize(ctr) != 16)
- 		goto err_drop_ctr;
- 
- 	err = -ENAMETOOLONG;
- 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
--		     "ccm_base(%s,%s)", ctr->cra_driver_name,
-+		     "ccm_base(%s,%s)", ctr->base.cra_driver_name,
- 		     cipher->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
- 		goto err_drop_ctr;
- 
- 	memcpy(inst->alg.base.cra_name, full_name, CRYPTO_MAX_ALG_NAME);
- 
--	inst->alg.base.cra_flags = ctr->cra_flags & CRYPTO_ALG_ASYNC;
-+	inst->alg.base.cra_flags = ctr->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = (cipher->cra_priority +
--				       ctr->cra_priority) / 2;
-+				       ctr->base.cra_priority) / 2;
- 	inst->alg.base.cra_blocksize = 1;
- 	inst->alg.base.cra_alignmask = cipher->cra_alignmask |
--				       ctr->cra_alignmask |
-+				       ctr->base.cra_alignmask |
- 				       (__alignof__(u32) - 1);
- 	inst->alg.ivsize = 16;
- 	inst->alg.maxauthsize = 16;
+ 	/* init block cipher */
+-	big_key_blkcipher = crypto_alloc_blkcipher(big_key_alg_name, 0, 0);
+-	if (IS_ERR(big_key_blkcipher)) {
+-		big_key_blkcipher = NULL;
++	big_key_skcipher = crypto_alloc_skcipher(big_key_alg_name,
++						 0, CRYPTO_ALG_ASYNC);
++	if (IS_ERR(big_key_skcipher)) {
++		big_key_skcipher = NULL;
+ 		ret = -EFAULT;
+ 		goto error;
+ 	}
