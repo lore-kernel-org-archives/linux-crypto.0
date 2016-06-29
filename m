@@ -1,7 +1,7 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v3 PATCH 7/8] crypto: rsa-pkcs1pad - Move key size check to setkey
-Date: Wed, 29 Jun 2016 18:29:19 +0800
-Message-ID: <E1bICkB-00073t-FM@gondolin.me.apana.org.au>
+Subject: [v3 PATCH 6/8] crypto: rsa-pkcs1pad - Always use GFP_KERNEL
+Date: Wed, 29 Jun 2016 18:29:18 +0800
+Message-ID: <E1bICkA-00073c-Be@gondolin.me.apana.org.au>
 References: <20160629102649.GA26987@gondor.apana.org.au>
 To: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
 	Tadeusz Struk <tadeusz.struk@intel.com>,
@@ -12,131 +12,88 @@ To: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
 	Denis Kenzior <denkenz@gmail.com>,
 	Salvatore Benedetto <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:50965 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:39135 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751505AbcF2K3W (ORCPT
+	with ESMTP id S1751489AbcF2K3V (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Jun 2016 06:29:22 -0400
+	Wed, 29 Jun 2016 06:29:21 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Rather than repeatedly checking the key size on each operation,
-we should be checking it once when the key is set.
+We don't currently support using akcipher in atomic contexts,
+so GFP_KERNEL should always be used.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/rsa-pkcs1pad.c |   56 +++++++++++++++++++++++---------------------------
- 1 file changed, 26 insertions(+), 30 deletions(-)
+ crypto/rsa-pkcs1pad.c |   22 ++++++----------------
+ 1 file changed, 6 insertions(+), 16 deletions(-)
 
 diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index db19284..ebd8514 100644
+index d9baefb..db19284 100644
 --- a/crypto/rsa-pkcs1pad.c
 +++ b/crypto/rsa-pkcs1pad.c
-@@ -111,40 +111,48 @@ static int pkcs1pad_set_pub_key(struct crypto_akcipher *tfm, const void *key,
- 		unsigned int keylen)
- {
- 	struct pkcs1pad_ctx *ctx = akcipher_tfm_ctx(tfm);
--	int err, size;
-+	int err;
-+
-+	ctx->key_size = 0;
+@@ -260,8 +260,7 @@ static int pkcs1pad_encrypt(struct akcipher_request *req)
+ 	req_ctx->child_req.dst_len = ctx->key_size;
  
- 	err = crypto_akcipher_set_pub_key(ctx->child, key, keylen);
-+	if (err)
-+		return err;
+ 	req_ctx->in_buf = kmalloc(ctx->key_size - 1 - req->src_len,
+-			(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-			GFP_KERNEL : GFP_ATOMIC);
++				  GFP_KERNEL);
+ 	if (!req_ctx->in_buf)
+ 		return -ENOMEM;
  
--	if (!err) {
--		/* Find out new modulus size from rsa implementation */
--		size = crypto_akcipher_maxsize(ctx->child);
-+	/* Find out new modulus size from rsa implementation */
-+	err = crypto_akcipher_maxsize(ctx->child);
-+	if (err < 0)
-+		return err;
+@@ -274,9 +273,7 @@ static int pkcs1pad_encrypt(struct akcipher_request *req)
+ 	pkcs1pad_sg_set_buf(req_ctx->in_sg, req_ctx->in_buf,
+ 			ctx->key_size - 1 - req->src_len, req->src);
  
--		ctx->key_size = size > 0 ? size : 0;
--		if (size <= 0)
--			err = size;
--	}
-+	if (err > PAGE_SIZE)
-+		return -ENOTSUPP;
+-	req_ctx->out_buf = kmalloc(ctx->key_size,
+-			(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-			GFP_KERNEL : GFP_ATOMIC);
++	req_ctx->out_buf = kmalloc(ctx->key_size, GFP_KERNEL);
+ 	if (!req_ctx->out_buf) {
+ 		kfree(req_ctx->in_buf);
+ 		return -ENOMEM;
+@@ -379,9 +376,7 @@ static int pkcs1pad_decrypt(struct akcipher_request *req)
+ 	req_ctx->child_req.dst = req_ctx->out_sg;
+ 	req_ctx->child_req.dst_len = ctx->key_size ;
  
--	return err;
-+	ctx->key_size = err;
-+	return 0;
- }
+-	req_ctx->out_buf = kmalloc(ctx->key_size,
+-			(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-			GFP_KERNEL : GFP_ATOMIC);
++	req_ctx->out_buf = kmalloc(ctx->key_size, GFP_KERNEL);
+ 	if (!req_ctx->out_buf)
+ 		return -ENOMEM;
  
- static int pkcs1pad_set_priv_key(struct crypto_akcipher *tfm, const void *key,
- 		unsigned int keylen)
- {
- 	struct pkcs1pad_ctx *ctx = akcipher_tfm_ctx(tfm);
--	int err, size;
-+	int err;
-+
-+	ctx->key_size = 0;
+@@ -438,8 +433,7 @@ static int pkcs1pad_sign(struct akcipher_request *req)
+ 	req_ctx->child_req.dst_len = ctx->key_size;
  
- 	err = crypto_akcipher_set_priv_key(ctx->child, key, keylen);
-+	if (err)
-+		return err;
+ 	req_ctx->in_buf = kmalloc(ctx->key_size - 1 - req->src_len,
+-			(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-			GFP_KERNEL : GFP_ATOMIC);
++				  GFP_KERNEL);
+ 	if (!req_ctx->in_buf)
+ 		return -ENOMEM;
  
--	if (!err) {
--		/* Find out new modulus size from rsa implementation */
--		size = crypto_akcipher_maxsize(ctx->child);
-+	/* Find out new modulus size from rsa implementation */
-+	err = crypto_akcipher_maxsize(ctx->child);
-+	if (err < 0)
-+		return err;
+@@ -454,9 +448,7 @@ static int pkcs1pad_sign(struct akcipher_request *req)
+ 	pkcs1pad_sg_set_buf(req_ctx->in_sg, req_ctx->in_buf,
+ 			ctx->key_size - 1 - req->src_len, req->src);
  
--		ctx->key_size = size > 0 ? size : 0;
--		if (size <= 0)
--			err = size;
--	}
-+	if (err > PAGE_SIZE)
-+		return -ENOTSUPP;
+-	req_ctx->out_buf = kmalloc(ctx->key_size,
+-			(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-			GFP_KERNEL : GFP_ATOMIC);
++	req_ctx->out_buf = kmalloc(ctx->key_size, GFP_KERNEL);
+ 	if (!req_ctx->out_buf) {
+ 		kfree(req_ctx->in_buf);
+ 		return -ENOMEM;
+@@ -577,9 +569,7 @@ static int pkcs1pad_verify(struct akcipher_request *req)
+ 	req_ctx->child_req.dst = req_ctx->out_sg;
+ 	req_ctx->child_req.dst_len = ctx->key_size;
  
--	return err;
-+	ctx->key_size = err;
-+	return 0;
- }
+-	req_ctx->out_buf = kmalloc(ctx->key_size,
+-			(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-			GFP_KERNEL : GFP_ATOMIC);
++	req_ctx->out_buf = kmalloc(ctx->key_size, GFP_KERNEL);
+ 	if (!req_ctx->out_buf)
+ 		return -ENOMEM;
  
- static int pkcs1pad_get_max_size(struct crypto_akcipher *tfm)
-@@ -247,9 +255,6 @@ static int pkcs1pad_encrypt(struct akcipher_request *req)
- 		return -EOVERFLOW;
- 	}
- 
--	if (ctx->key_size > PAGE_SIZE)
--		return -ENOTSUPP;
--
- 	/*
- 	 * Replace both input and output to add the padding in the input and
- 	 * the potential missing leading zeros in the output.
-@@ -367,9 +372,6 @@ static int pkcs1pad_decrypt(struct akcipher_request *req)
- 	if (!ctx->key_size || req->src_len != ctx->key_size)
- 		return -EINVAL;
- 
--	if (ctx->key_size > PAGE_SIZE)
--		return -ENOTSUPP;
--
- 	/* Reuse input buffer, output to a new buffer */
- 	req_ctx->child_req.src = req->src;
- 	req_ctx->child_req.src_len = req->src_len;
-@@ -420,9 +422,6 @@ static int pkcs1pad_sign(struct akcipher_request *req)
- 		return -EOVERFLOW;
- 	}
- 
--	if (ctx->key_size > PAGE_SIZE)
--		return -ENOTSUPP;
--
- 	/*
- 	 * Replace both input and output to add the padding in the input and
- 	 * the potential missing leading zeros in the output.
-@@ -560,9 +559,6 @@ static int pkcs1pad_verify(struct akcipher_request *req)
- 	if (!ctx->key_size || req->src_len < ctx->key_size)
- 		return -EINVAL;
- 
--	if (ctx->key_size > PAGE_SIZE)
--		return -ENOTSUPP;
--
- 	/* Reuse input buffer, output to a new buffer */
- 	req_ctx->child_req.src = req->src;
- 	req_ctx->child_req.src_len = req->src_len;
