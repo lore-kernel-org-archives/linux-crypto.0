@@ -1,29 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] Remove redundant sg_init_table call.
-Date: Wed, 29 Jun 2016 18:18:39 +0800
-Message-ID: <20160629101839.GA26917@gondor.apana.org.au>
-References: <1467140083-4910-1-git-send-email-harshjain.prof@gmail.com>
+Subject: [v3 PATCH 0/8] crypto: rsa - Do not gratuitously drop leading zeroes
+Date: Wed, 29 Jun 2016 18:26:49 +0800
+Message-ID: <20160629102649.GA26987@gondor.apana.org.au>
+References: <20160622101432.GA30454@gondor.apana.org.au>
+ <20160629095655.GA26056@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, harshjain32@gmail.com
-To: Harsh Jain <harshjain.prof@gmail.com>
+Cc: Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
+	Stephan Mueller <smueller@chronox.de>,
+	Mat Martineau <mathew.j.martineau@linux.intel.com>,
+	Denis Kenzior <denkenz@gmail.com>,
+	Salvatore Benedetto <salvatore.benedetto@intel.com>
+To: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:35763 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:51902 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750995AbcF2KSo (ORCPT
+	with ESMTP id S1751169AbcF2K06 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Jun 2016 06:18:44 -0400
+	Wed, 29 Jun 2016 06:26:58 -0400
 Content-Disposition: inline
-In-Reply-To: <1467140083-4910-1-git-send-email-harshjain.prof@gmail.com>
+In-Reply-To: <20160629095655.GA26056@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 29, 2016 at 12:24:43AM +0530, Harsh Jain wrote:
-> Remove redundant sg_init_table call. scatterwalk_ffwd doing the same.
-> 
-> Signed-off-by: Harsh Jain <harshjain.prof@gmail.com>
+Hi:
 
-Patch applied.  Thanks.
+This was prompted by the caam RSA submission where a lot of work
+was done just to strip the RSA output of leading zeroes.  This is
+in fact completely pointless because the only user of RSA in the
+kernel then promptly puts them back.
+
+This patch series resolves this madness by simply leaving any
+leading zeroes in place.  Note that we're not requiring authors
+to add leading zeroes, even though that is encouraged if it is
+easy to do.  In practice you'd only run into this every 2^32 or
+2^64 operations so please don't overdo it.
+
+I've also taken the opportunity to cleanup the pkcs1pad code.
+
+v2 fixes the newly added dh to use the new MPI SG interface.
+v3 adds a patch that went AWOL in v2.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
