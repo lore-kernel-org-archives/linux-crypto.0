@@ -1,41 +1,25 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [patch] crypto: sha256-mb - cleanup a || vs | typo
-Date: Wed, 29 Jun 2016 17:42:42 +0300
-Message-ID: <20160629144242.GE22818@mwanda>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [patch] crypto: tcrypt - add a missing tab
+Date: Wed, 29 Jun 2016 22:43:36 +0800
+Message-ID: <20160629144336.GA29198@gondor.apana.org.au>
+References: <20160629144130.GC22818@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Megha Dey <megha.dey@intel.com>,
-	"Wang, Rui Y" <rui.y.wang@intel.com>,
-	Denys Vlasenko <dvlasenk@redhat.com>,
-	Xiaodong Liu <xiaodong.liu@intel.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>
 Return-path: <kernel-janitors-owner@vger.kernel.org>
 Content-Disposition: inline
+In-Reply-To: <20160629144130.GC22818@mwanda>
 Sender: kernel-janitors-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-|| and | behave basically the same here but || is intended.  It causes a
-static checker warning to mix up bitwise and logical operations.
+On Wed, Jun 29, 2016 at 05:41:30PM +0300, Dan Carpenter wrote:
+> The "goto out;" line isn't indented far enough.
+> 
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-
-diff --git a/arch/x86/crypto/sha256-mb/sha256_mb.c b/arch/x86/crypto/sha256-mb/sha256_mb.c
-index c9d5dcc..4ec895a 100644
---- a/arch/x86/crypto/sha256-mb/sha256_mb.c
-+++ b/arch/x86/crypto/sha256-mb/sha256_mb.c
-@@ -299,7 +299,7 @@ static struct sha256_hash_ctx *sha256_ctx_mgr_submit(struct sha256_ctx_mgr *mgr,
- 	 * Or if the user's buffer contains less than a whole block,
- 	 * append as much as possible to the extra block.
- 	 */
--	if ((ctx->partial_block_buffer_length) | (len < SHA256_BLOCK_SIZE)) {
-+	if ((ctx->partial_block_buffer_length) || (len < SHA256_BLOCK_SIZE)) {
- 		/* Compute how many bytes to copy from user buffer into
- 		 * extra block
- 		 */
+Sorry, but this has already been fixed :)
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
