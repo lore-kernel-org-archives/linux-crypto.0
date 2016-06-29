@@ -1,7 +1,7 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v3 PATCH 2/8] crypto: rsa - Generate fixed-length output
-Date: Wed, 29 Jun 2016 18:29:13 +0800
-Message-ID: <E1bICk5-00072W-Td@gondolin.me.apana.org.au>
+Subject: [v3 PATCH 3/8] lib/mpi: Do not do sg_virt
+Date: Wed, 29 Jun 2016 18:29:15 +0800
+Message-ID: <E1bICk7-00072n-17@gondolin.me.apana.org.au>
 References: <20160629102649.GA26987@gondor.apana.org.au>
 To: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
 	Tadeusz Struk <tadeusz.struk@intel.com>,
@@ -12,183 +12,198 @@ To: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
 	Denis Kenzior <denkenz@gmail.com>,
 	Salvatore Benedetto <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:33520 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:56749 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751334AbcF2K3S (ORCPT
+	with ESMTP id S1751308AbcF2K3S (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Wed, 29 Jun 2016 06:29:18 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Every implementation of RSA that we have naturally generates
-output with leading zeroes.  The one and only user of RSA,
-pkcs1pad wants to have those leading zeroes in place, in fact
-because they are currently absent it has to write those zeroes
-itself.
+Currently the mpi SG helpers use sg_virt which is completely
+broken.  It happens to work with normal kernel memory but will
+fail with anything that is not linearly mapped.
 
-So we shouldn't be stripping leading zeroes in the first place.
-In fact this patch makes rsa-generic produce output with fixed
-length so that pkcs1pad does not need to do any extra work.
-
-This patch also changes DH to use the new interface.
+This patch fixes this by using the SG iterator helpers.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/rsa.c        |    8 +++----
- include/linux/mpi.h |    2 -
- lib/mpi/mpicoder.c  |   55 ++++++++++++++++++++++++----------------------------
- 3 files changed, 31 insertions(+), 34 deletions(-)
+ lib/mpi/mpicoder.c |   86 ++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 50 insertions(+), 36 deletions(-)
 
-diff --git a/crypto/rsa.c b/crypto/rsa.c
-index dc692d4..4c280b6 100644
---- a/crypto/rsa.c
-+++ b/crypto/rsa.c
-@@ -108,7 +108,7 @@ static int rsa_enc(struct akcipher_request *req)
- 	if (ret)
- 		goto err_free_m;
- 
--	ret = mpi_write_to_sgl(c, req->dst, &req->dst_len, &sign);
-+	ret = mpi_write_to_sgl(c, req->dst, req->dst_len, &sign);
- 	if (ret)
- 		goto err_free_m;
- 
-@@ -147,7 +147,7 @@ static int rsa_dec(struct akcipher_request *req)
- 	if (ret)
- 		goto err_free_c;
- 
--	ret = mpi_write_to_sgl(m, req->dst, &req->dst_len, &sign);
-+	ret = mpi_write_to_sgl(m, req->dst, req->dst_len, &sign);
- 	if (ret)
- 		goto err_free_c;
- 
-@@ -185,7 +185,7 @@ static int rsa_sign(struct akcipher_request *req)
- 	if (ret)
- 		goto err_free_m;
- 
--	ret = mpi_write_to_sgl(s, req->dst, &req->dst_len, &sign);
-+	ret = mpi_write_to_sgl(s, req->dst, req->dst_len, &sign);
- 	if (ret)
- 		goto err_free_m;
- 
-@@ -226,7 +226,7 @@ static int rsa_verify(struct akcipher_request *req)
- 	if (ret)
- 		goto err_free_s;
- 
--	ret = mpi_write_to_sgl(m, req->dst, &req->dst_len, &sign);
-+	ret = mpi_write_to_sgl(m, req->dst, req->dst_len, &sign);
- 	if (ret)
- 		goto err_free_s;
- 
-diff --git a/include/linux/mpi.h b/include/linux/mpi.h
-index f219559..1cc5ffb 100644
---- a/include/linux/mpi.h
-+++ b/include/linux/mpi.h
-@@ -80,7 +80,7 @@ void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign);
- int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
- 		    int *sign);
- void *mpi_get_secure_buffer(MPI a, unsigned *nbytes, int *sign);
--int mpi_write_to_sgl(MPI a, struct scatterlist *sg, unsigned *nbytes,
-+int mpi_write_to_sgl(MPI a, struct scatterlist *sg, unsigned nbytes,
- 		     int *sign);
- 
- #define log_mpidump g10_log_mpidump
 diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index 823cf5f..7150e5c 100644
+index 7150e5c..c6272ae 100644
 --- a/lib/mpi/mpicoder.c
 +++ b/lib/mpi/mpicoder.c
-@@ -237,16 +237,13 @@ EXPORT_SYMBOL_GPL(mpi_get_buffer);
-  * @a:		a multi precision integer
-  * @sgl:	scatterlist to write to. Needs to be at least
-  *		mpi_get_size(a) long.
-- * @nbytes:	in/out param - it has the be set to the maximum number of
-- *		bytes that can be written to sgl. This has to be at least
-- *		the size of the integer a. On return it receives the actual
-- *		length of the data written on success or the data that would
-- *		be written if buffer was too small.
-+ * @nbytes:	the number of bytes to write.  Leading bytes will be
-+ *		filled with zero.
-  * @sign:	if not NULL, it will be set to the sign of a.
-  *
-  * Return:	0 on success or error code in case of error
-  */
--int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
-+int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned nbytes,
- 		     int *sign)
- {
- 	u8 *p, *p2;
-@@ -258,43 +255,44 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
+@@ -21,6 +21,7 @@
+ #include <linux/bitops.h>
+ #include <linux/count_zeros.h>
+ #include <linux/byteorder/generic.h>
++#include <linux/scatterlist.h>
+ #include <linux/string.h>
+ #include "mpi-internal.h"
+ 
+@@ -255,7 +256,9 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned nbytes,
  #error please implement for this limb size.
  #endif
  	unsigned int n = mpi_get_size(a);
--	int i, x, y = 0, lzeros, buf_len;
--
--	if (!nbytes)
--		return -EINVAL;
-+	int i, x, buf_len;
++	struct sg_mapping_iter miter;
+ 	int i, x, buf_len;
++	int nents;
  
  	if (sign)
  		*sign = a->sign;
- 
--	lzeros = count_lzeros(a);
--
--	if (*nbytes < n - lzeros) {
--		*nbytes = n - lzeros;
-+	if (nbytes < n)
+@@ -263,23 +266,27 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned nbytes,
+ 	if (nbytes < n)
  		return -EOVERFLOW;
--	}
  
--	*nbytes = n - lzeros;
- 	buf_len = sgl->length;
- 	p2 = sg_virt(sgl);
+-	buf_len = sgl->length;
+-	p2 = sg_virt(sgl);
++	nents = sg_nents_for_len(sgl, nbytes);
++	if (nents < 0)
++		return -EINVAL;
  
--	for (i = a->nlimbs - 1 - lzeros / BYTES_PER_MPI_LIMB,
--			lzeros %= BYTES_PER_MPI_LIMB;
--		i >= 0; i--) {
-+	while (nbytes > n) {
-+		if (!buf_len) {
-+			sgl = sg_next(sgl);
-+			if (!sgl)
-+				return -EINVAL;
-+			buf_len = sgl->length;
-+			p2 = sg_virt(sgl);
-+		}
-+
-+		i = min_t(unsigned, nbytes - n, buf_len);
-+		memset(p2, 0, i);
-+		p2 += i;
-+		buf_len -= i;
-+		nbytes -= i;
-+	}
-+
-+	for (i = a->nlimbs - 1; i >= 0; i--) {
- #if BYTES_PER_MPI_LIMB == 4
--		alimb = cpu_to_be32(a->d[i]);
-+		alimb = a->d[i] ? cpu_to_be32(a->d[i]) : 0;
- #elif BYTES_PER_MPI_LIMB == 8
--		alimb = cpu_to_be64(a->d[i]);
-+		alimb = a->d[i] ? cpu_to_be64(a->d[i]) : 0;
- #else
- #error please implement for this limb size.
- #endif
--		if (lzeros) {
--			y = lzeros;
--			lzeros = 0;
+-	while (nbytes > n) {
+-		if (!buf_len) {
+-			sgl = sg_next(sgl);
+-			if (!sgl)
+-				return -EINVAL;
+-			buf_len = sgl->length;
+-			p2 = sg_virt(sgl);
 -		}
--
--		p = (u8 *)&alimb + y;
-+		p = (u8 *)&alimb;
++	sg_miter_start(&miter, sgl, nents, SG_MITER_ATOMIC | SG_MITER_TO_SG);
++	sg_miter_next(&miter);
++	buf_len = miter.length;
++	p2 = miter.addr;
  
--		for (x = 0; x < sizeof(alimb) - y; x++) {
-+		for (x = 0; x < sizeof(alimb); x++) {
- 			if (!buf_len) {
- 				sgl = sg_next(sgl);
- 				if (!sgl)
-@@ -305,7 +303,6 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned *nbytes,
- 			*p2++ = *p++;
- 			buf_len--;
- 		}
--		y = 0;
++	while (nbytes > n) {
+ 		i = min_t(unsigned, nbytes - n, buf_len);
+ 		memset(p2, 0, i);
+ 		p2 += i;
+-		buf_len -= i;
+ 		nbytes -= i;
++
++		buf_len -= i;
++		if (!buf_len) {
++			sg_miter_next(&miter);
++			buf_len = miter.length;
++			p2 = miter.addr;
++		}
  	}
+ 
+ 	for (i = a->nlimbs - 1; i >= 0; i--) {
+@@ -293,17 +300,16 @@ int mpi_write_to_sgl(MPI a, struct scatterlist *sgl, unsigned nbytes,
+ 		p = (u8 *)&alimb;
+ 
+ 		for (x = 0; x < sizeof(alimb); x++) {
+-			if (!buf_len) {
+-				sgl = sg_next(sgl);
+-				if (!sgl)
+-					return -EINVAL;
+-				buf_len = sgl->length;
+-				p2 = sg_virt(sgl);
+-			}
+ 			*p2++ = *p++;
+-			buf_len--;
++			if (!--buf_len) {
++				sg_miter_next(&miter);
++				buf_len = miter.length;
++				p2 = miter.addr;
++			}
+ 		}
+ 	}
++
++	sg_miter_stop(&miter);
  	return 0;
  }
+ EXPORT_SYMBOL_GPL(mpi_write_to_sgl);
+@@ -323,19 +329,23 @@ EXPORT_SYMBOL_GPL(mpi_write_to_sgl);
+  */
+ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
+ {
+-	struct scatterlist *sg;
+-	int x, i, j, z, lzeros, ents;
++	struct sg_mapping_iter miter;
+ 	unsigned int nbits, nlimbs;
++	int x, j, z, lzeros, ents;
++	unsigned int len;
++	const u8 *buff;
+ 	mpi_limb_t a;
+ 	MPI val = NULL;
+ 
+-	lzeros = 0;
+-	ents = sg_nents(sgl);
++	ents = sg_nents_for_len(sgl, nbytes);
++	if (ents < 0)
++		return NULL;
+ 
+-	for_each_sg(sgl, sg, ents, i) {
+-		const u8 *buff = sg_virt(sg);
+-		int len = sg->length;
++	sg_miter_start(&miter, sgl, ents, SG_MITER_ATOMIC | SG_MITER_FROM_SG);
+ 
++	lzeros = 0;
++	len = 0;
++	while (nbytes > 0) {
+ 		while (len && !*buff) {
+ 			lzeros++;
+ 			len--;
+@@ -345,12 +355,14 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
+ 		if (len && *buff)
+ 			break;
+ 
+-		ents--;
++		sg_miter_next(&miter);
++		buff = miter.addr;
++		len = miter.length;
++
+ 		nbytes -= lzeros;
+ 		lzeros = 0;
+ 	}
+ 
+-	sgl = sg;
+ 	nbytes -= lzeros;
+ 	nbits = nbytes * 8;
+ 	if (nbits > MAX_EXTERN_MPI_BITS) {
+@@ -359,8 +371,7 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
+ 	}
+ 
+ 	if (nbytes > 0)
+-		nbits -= count_leading_zeros(*(u8 *)(sg_virt(sgl) + lzeros)) -
+-			(BITS_PER_LONG - 8);
++		nbits -= count_leading_zeros(*buff) - (BITS_PER_LONG - 8);
+ 
+ 	nlimbs = DIV_ROUND_UP(nbytes, BYTES_PER_MPI_LIMB);
+ 	val = mpi_alloc(nlimbs);
+@@ -379,21 +390,24 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
+ 	z = BYTES_PER_MPI_LIMB - nbytes % BYTES_PER_MPI_LIMB;
+ 	z %= BYTES_PER_MPI_LIMB;
+ 
+-	for_each_sg(sgl, sg, ents, i) {
+-		const u8 *buffer = sg_virt(sg) + lzeros;
+-		int len = sg->length - lzeros;
+-
++	for (;;) {
+ 		for (x = 0; x < len; x++) {
+ 			a <<= 8;
+-			a |= *buffer++;
++			a |= *buff++;
+ 			if (((z + x + 1) % BYTES_PER_MPI_LIMB) == 0) {
+ 				val->d[j--] = a;
+ 				a = 0;
+ 			}
+ 		}
+ 		z += x;
+-		lzeros = 0;
++
++		if (!sg_miter_next(&miter))
++			break;
++
++		buff = miter.addr;
++		len = miter.length;
+ 	}
++
+ 	return val;
+ }
+ EXPORT_SYMBOL_GPL(mpi_read_raw_from_sgl);
