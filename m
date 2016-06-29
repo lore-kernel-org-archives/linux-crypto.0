@@ -1,35 +1,41 @@
 From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [patch] crypto: tcrypt - add a missing tab
-Date: Wed, 29 Jun 2016 17:41:30 +0300
-Message-ID: <20160629144130.GC22818@mwanda>
+Subject: [patch] crypto: sha256-mb - cleanup a || vs | typo
+Date: Wed, 29 Jun 2016 17:42:42 +0300
+Message-ID: <20160629144242.GE22818@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Megha Dey <megha.dey@intel.com>,
+	"Wang, Rui Y" <rui.y.wang@intel.com>,
+	Denys Vlasenko <dvlasenk@redhat.com>,
+	Xiaodong Liu <xiaodong.liu@intel.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:17554 "EHLO
-	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752245AbcF2OmW (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Jun 2016 10:42:22 -0400
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The "goto out;" line isn't indented far enough.
+|| and | behave basically the same here but || is intended.  It causes a
+static checker warning to mix up bitwise and logical operations.
 
 Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 6ef7815..117f19e 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -629,7 +629,7 @@ static void test_mb_ahash_speed(const char *algo, unsigned int sec,
- 			printk(KERN_ERR
- 				"template (%u) too big for tvmem (%lu)\n",
- 					speed[i].blen, TVMEMSIZE * PAGE_SIZE);
--		goto out;
-+			goto out;
- 		}
- 
- 		if (speed[i].klen)
+diff --git a/arch/x86/crypto/sha256-mb/sha256_mb.c b/arch/x86/crypto/sha256-mb/sha256_mb.c
+index c9d5dcc..4ec895a 100644
+--- a/arch/x86/crypto/sha256-mb/sha256_mb.c
++++ b/arch/x86/crypto/sha256-mb/sha256_mb.c
+@@ -299,7 +299,7 @@ static struct sha256_hash_ctx *sha256_ctx_mgr_submit(struct sha256_ctx_mgr *mgr,
+ 	 * Or if the user's buffer contains less than a whole block,
+ 	 * append as much as possible to the extra block.
+ 	 */
+-	if ((ctx->partial_block_buffer_length) | (len < SHA256_BLOCK_SIZE)) {
++	if ((ctx->partial_block_buffer_length) || (len < SHA256_BLOCK_SIZE)) {
+ 		/* Compute how many bytes to copy from user buffer into
+ 		 * extra block
+ 		 */
