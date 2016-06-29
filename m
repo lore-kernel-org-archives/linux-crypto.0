@@ -1,139 +1,108 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 13/28] crypto: aesni - Use crypto_cipher to derive rfc4106 subkey
-Date: Wed, 29 Jun 2016 18:03:59 +0800
-Message-ID: <E1bICLf-0006uE-B5@gondolin.me.apana.org.au>
+Subject: [PATCH 18/28] crypto: qce - Use skcipher for fallback
+Date: Wed, 29 Jun 2016 18:04:04 +0800
+Message-ID: <E1bICLk-0006vb-QO@gondolin.me.apana.org.au>
 References: <20160629100223.GA26260@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:53929 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:36971 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751858AbcF2KED (ORCPT
+	with ESMTP id S1751858AbcF2KEI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Jun 2016 06:04:03 -0400
+	Wed, 29 Jun 2016 06:04:08 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1bICLf-0005Iu-Gr
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2016 20:03:59 +1000
+	id 1bICLk-0005Kt-UD
+	for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2016 20:04:04 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Currently aesni uses an async ctr(aes) to derive the rfc4106
-subkey, which was presumably copied over from the generic rfc4106
-code.  Over there it's done that way because we already have a
-ctr(aes) spawn.  But it is simply overkill for aesni since we
-have to go get a ctr(aes) from scratch anyway.
-
-This patch simplifies the subkey derivation by using a straight
-aes cipher instead.
+This patch replaces use of the obsolete ablkcipher with skcipher.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- arch/x86/crypto/aesni-intel_glue.c |   76 +++++--------------------------------
- 1 file changed, 11 insertions(+), 65 deletions(-)
+ drivers/crypto/qce/ablkcipher.c |   27 ++++++++++++++++-----------
+ drivers/crypto/qce/cipher.h     |    2 +-
+ 2 files changed, 17 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 9e15572e..0ab5ee1 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -59,17 +59,6 @@ struct aesni_rfc4106_gcm_ctx {
- 	u8 nonce[4];
+diff --git a/drivers/crypto/qce/ablkcipher.c b/drivers/crypto/qce/ablkcipher.c
+index dbcbbe2..b04b42f 100644
+--- a/drivers/crypto/qce/ablkcipher.c
++++ b/drivers/crypto/qce/ablkcipher.c
+@@ -15,8 +15,8 @@
+ #include <linux/interrupt.h>
+ #include <linux/types.h>
+ #include <crypto/aes.h>
+-#include <crypto/algapi.h>
+ #include <crypto/des.h>
++#include <crypto/internal/skcipher.h>
+ 
+ #include "cipher.h"
+ 
+@@ -189,7 +189,7 @@ static int qce_ablkcipher_setkey(struct crypto_ablkcipher *ablk, const u8 *key,
+ 	memcpy(ctx->enc_key, key, keylen);
+ 	return 0;
+ fallback:
+-	ret = crypto_ablkcipher_setkey(ctx->fallback, key, keylen);
++	ret = crypto_skcipher_setkey(ctx->fallback, key, keylen);
+ 	if (!ret)
+ 		ctx->enc_keylen = keylen;
+ 	return ret;
+@@ -212,10 +212,16 @@ static int qce_ablkcipher_crypt(struct ablkcipher_request *req, int encrypt)
+ 
+ 	if (IS_AES(rctx->flags) && ctx->enc_keylen != AES_KEYSIZE_128 &&
+ 	    ctx->enc_keylen != AES_KEYSIZE_256) {
+-		ablkcipher_request_set_tfm(req, ctx->fallback);
+-		ret = encrypt ? crypto_ablkcipher_encrypt(req) :
+-				crypto_ablkcipher_decrypt(req);
+-		ablkcipher_request_set_tfm(req, __crypto_ablkcipher_cast(tfm));
++		SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
++
++		skcipher_request_set_tfm(subreq, ctx->fallback);
++		skcipher_request_set_callback(subreq, req->base.flags,
++					      NULL, NULL);
++		skcipher_request_set_crypt(subreq, req->src, req->dst,
++					   req->nbytes, req->info);
++		ret = encrypt ? crypto_skcipher_encrypt(subreq) :
++				crypto_skcipher_decrypt(subreq);
++		skcipher_request_zero(subreq);
+ 		return ret;
+ 	}
+ 
+@@ -239,10 +245,9 @@ static int qce_ablkcipher_init(struct crypto_tfm *tfm)
+ 	memset(ctx, 0, sizeof(*ctx));
+ 	tfm->crt_ablkcipher.reqsize = sizeof(struct qce_cipher_reqctx);
+ 
+-	ctx->fallback = crypto_alloc_ablkcipher(crypto_tfm_alg_name(tfm),
+-						CRYPTO_ALG_TYPE_ABLKCIPHER,
+-						CRYPTO_ALG_ASYNC |
+-						CRYPTO_ALG_NEED_FALLBACK);
++	ctx->fallback = crypto_alloc_skcipher(crypto_tfm_alg_name(tfm), 0,
++					      CRYPTO_ALG_ASYNC |
++					      CRYPTO_ALG_NEED_FALLBACK);
+ 	if (IS_ERR(ctx->fallback))
+ 		return PTR_ERR(ctx->fallback);
+ 
+@@ -253,7 +258,7 @@ static void qce_ablkcipher_exit(struct crypto_tfm *tfm)
+ {
+ 	struct qce_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	crypto_free_ablkcipher(ctx->fallback);
++	crypto_free_skcipher(ctx->fallback);
+ }
+ 
+ struct qce_ablkcipher_def {
+diff --git a/drivers/crypto/qce/cipher.h b/drivers/crypto/qce/cipher.h
+index 5c6a5f8..2b0278b 100644
+--- a/drivers/crypto/qce/cipher.h
++++ b/drivers/crypto/qce/cipher.h
+@@ -22,7 +22,7 @@
+ struct qce_cipher_ctx {
+ 	u8 enc_key[QCE_MAX_KEY_SIZE];
+ 	unsigned int enc_keylen;
+-	struct crypto_ablkcipher *fallback;
++	struct crypto_skcipher *fallback;
  };
  
--struct aesni_gcm_set_hash_subkey_result {
--	int err;
--	struct completion completion;
--};
--
--struct aesni_hash_subkey_req_data {
--	u8 iv[16];
--	struct aesni_gcm_set_hash_subkey_result result;
--	struct scatterlist sg;
--};
--
- struct aesni_lrw_ctx {
- 	struct lrw_table_ctx lrw_table;
- 	u8 raw_aes_ctx[sizeof(struct crypto_aes_ctx) + AESNI_ALIGN - 1];
-@@ -809,71 +798,28 @@ static void rfc4106_exit(struct crypto_aead *aead)
- 	cryptd_free_aead(*ctx);
- }
- 
--static void
--rfc4106_set_hash_subkey_done(struct crypto_async_request *req, int err)
--{
--	struct aesni_gcm_set_hash_subkey_result *result = req->data;
--
--	if (err == -EINPROGRESS)
--		return;
--	result->err = err;
--	complete(&result->completion);
--}
--
- static int
- rfc4106_set_hash_subkey(u8 *hash_subkey, const u8 *key, unsigned int key_len)
- {
--	struct crypto_ablkcipher *ctr_tfm;
--	struct ablkcipher_request *req;
--	int ret = -EINVAL;
--	struct aesni_hash_subkey_req_data *req_data;
-+	struct crypto_cipher *tfm;
-+	int ret;
- 
--	ctr_tfm = crypto_alloc_ablkcipher("ctr(aes)", 0, 0);
--	if (IS_ERR(ctr_tfm))
--		return PTR_ERR(ctr_tfm);
-+	tfm = crypto_alloc_cipher("aes", 0, 0);
-+	if (IS_ERR(tfm))
-+		return PTR_ERR(tfm);
- 
--	ret = crypto_ablkcipher_setkey(ctr_tfm, key, key_len);
-+	ret = crypto_cipher_setkey(tfm, key, key_len);
- 	if (ret)
--		goto out_free_ablkcipher;
--
--	ret = -ENOMEM;
--	req = ablkcipher_request_alloc(ctr_tfm, GFP_KERNEL);
--	if (!req)
--		goto out_free_ablkcipher;
--
--	req_data = kmalloc(sizeof(*req_data), GFP_KERNEL);
--	if (!req_data)
--		goto out_free_request;
--
--	memset(req_data->iv, 0, sizeof(req_data->iv));
-+		goto out_free_cipher;
- 
- 	/* Clear the data in the hash sub key container to zero.*/
- 	/* We want to cipher all zeros to create the hash sub key. */
- 	memset(hash_subkey, 0, RFC4106_HASH_SUBKEY_SIZE);
- 
--	init_completion(&req_data->result.completion);
--	sg_init_one(&req_data->sg, hash_subkey, RFC4106_HASH_SUBKEY_SIZE);
--	ablkcipher_request_set_tfm(req, ctr_tfm);
--	ablkcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
--					CRYPTO_TFM_REQ_MAY_BACKLOG,
--					rfc4106_set_hash_subkey_done,
--					&req_data->result);
--
--	ablkcipher_request_set_crypt(req, &req_data->sg,
--		&req_data->sg, RFC4106_HASH_SUBKEY_SIZE, req_data->iv);
--
--	ret = crypto_ablkcipher_encrypt(req);
--	if (ret == -EINPROGRESS || ret == -EBUSY) {
--		ret = wait_for_completion_interruptible
--			(&req_data->result.completion);
--		if (!ret)
--			ret = req_data->result.err;
--	}
--	kfree(req_data);
--out_free_request:
--	ablkcipher_request_free(req);
--out_free_ablkcipher:
--	crypto_free_ablkcipher(ctr_tfm);
-+	crypto_cipher_encrypt_one(tfm, hash_subkey, hash_subkey);
-+
-+out_free_cipher:
-+	crypto_free_cipher(tfm);
- 	return ret;
- }
- 
+ /**
