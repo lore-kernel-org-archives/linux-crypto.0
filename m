@@ -1,62 +1,45 @@
-From: Harsh Jain <harshjain.prof@gmail.com>
-Subject: [PATCH] Remove redundant sg_init_table call.
-Date: Wed, 29 Jun 2016 00:24:43 +0530
-Message-ID: <1467140083-4910-1-git-send-email-harshjain.prof@gmail.com>
-Cc: harshjain32@gmail.com, Harsh Jain <harshjain.prof@gmail.com>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Doing crypto in small stack buffers (bluetooth vs vmalloc-stack
+ crash, etc)
+Date: Wed, 29 Jun 2016 10:20:49 +0800
+Message-ID: <20160629022049.GA23390@gondor.apana.org.au>
+References: <20160628133050.GA18468@gondor.apana.org.au>
+ <20160628143212.17215.qmail@ns.sciencehorizons.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org,
+	luto@amacapital.net, netdev@vger.kernel.org
+To: George Spelvin <linux@sciencehorizons.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f68.google.com ([209.85.220.68]:34487 "EHLO
-	mail-pa0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752353AbcF1TMn (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:50308 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752449AbcF2CVT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Jun 2016 15:12:43 -0400
-Received: by mail-pa0-f68.google.com with SMTP id us13so2345108pab.1
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Jun 2016 12:12:42 -0700 (PDT)
+	Tue, 28 Jun 2016 22:21:19 -0400
+Content-Disposition: inline
+In-Reply-To: <20160628143212.17215.qmail@ns.sciencehorizons.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Remove redundant sg_init_table call. scatterwalk_ffwd doing the same.
+On Tue, Jun 28, 2016 at 10:32:12AM -0400, George Spelvin wrote:
+> 
+> - struct crypto_instance
+> - struct crypto_spawn
+> - struct crypto_blkcipher
+> - struct blkcipher_desc
+> - More on the context structures returned by crypto_tfm_ctx
 
-Signed-off-by: Harsh Jain <harshjain.prof@gmail.com>
----
- crypto/authenc.c |    7 +------
- 1 files changed, 1 insertions(+), 6 deletions(-)
+blkcipher is obsolete and will be removed soon.  So if you are
+going to write this then please document skcipher instead.
 
-diff --git a/crypto/authenc.c b/crypto/authenc.c
-index 55a354d..c7cc11d 100644
---- a/crypto/authenc.c
-+++ b/crypto/authenc.c
-@@ -206,7 +206,6 @@ static int crypto_authenc_encrypt(struct aead_request *req)
- 	struct scatterlist *src, *dst;
- 	int err;
- 
--	sg_init_table(areq_ctx->src, 2);
- 	src = scatterwalk_ffwd(areq_ctx->src, req->src, req->assoclen);
- 	dst = src;
- 
-@@ -215,7 +214,6 @@ static int crypto_authenc_encrypt(struct aead_request *req)
- 		if (err)
- 			return err;
- 
--		sg_init_table(areq_ctx->dst, 2);
- 		dst = scatterwalk_ffwd(areq_ctx->dst, req->dst, req->assoclen);
- 	}
- 
-@@ -251,14 +249,11 @@ static int crypto_authenc_decrypt_tail(struct aead_request *req,
- 	if (crypto_memneq(ihash, ahreq->result, authsize))
- 		return -EBADMSG;
- 
--	sg_init_table(areq_ctx->src, 2);
- 	src = scatterwalk_ffwd(areq_ctx->src, req->src, req->assoclen);
- 	dst = src;
- 
--	if (req->src != req->dst) {
--		sg_init_table(areq_ctx->dst, 2);
-+	if (req->src != req->dst)
- 		dst = scatterwalk_ffwd(areq_ctx->dst, req->dst, req->assoclen);
--	}
- 
- 	ablkcipher_request_set_tfm(abreq, ctx->enc);
- 	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
+> Also not mentioned in the documentation is that some algorithms *do*
+> have different implementations depending on key size.  SHA-2 is the
+> classic example.
+
+What do you mean by that? SHA has no keying at all.
+
+Cheers,
 -- 
-1.7.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
