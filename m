@@ -1,538 +1,272 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 3/28] crypto: skcipher - Add low-level skcipher interface
-Date: Wed, 29 Jun 2016 18:03:48 +0800
-Message-ID: <E1bICLU-0006rU-9w@gondolin.me.apana.org.au>
+Subject: [PATCH 6/28] crypto: authenc - Use skcipher
+Date: Wed, 29 Jun 2016 18:03:51 +0800
+Message-ID: <E1bICLX-0006sJ-LU@gondolin.me.apana.org.au>
 References: <20160629100223.GA26260@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51128 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:34093 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751482AbcF2KDw (ORCPT
+	with ESMTP id S1751830AbcF2KDz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Jun 2016 06:03:52 -0400
+	Wed, 29 Jun 2016 06:03:55 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1bICLU-0005FB-EF
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2016 20:03:48 +1000
+	id 1bICLX-0005Fb-PF
+	for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2016 20:03:51 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch allows skcipher algorithms and instances to be created
-and registered with the crypto API.  They are accessible through
-the top-level skcipher interface, along with ablkcipher/blkcipher
-algorithms and instances.
+This patch converts authenc to use the new skcipher interface as
+opposed to ablkcipher.
+
+It also fixes a little bug where if a sync version of authenc
+is requested we may still end up using an async ahash.  This should
+have no effect as none of the authenc users can request for a
+sync authenc.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/skcipher.c                  |  192 +++++++++++++++++++++++++++++++++++--
- include/crypto/internal/skcipher.h |   87 ++++++++++++++++
- include/crypto/skcipher.h          |   97 ++++++++++++++++++
- include/linux/crypto.h             |    1 
- 4 files changed, 370 insertions(+), 7 deletions(-)
+ crypto/authenc.c |  106 ++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 55 insertions(+), 51 deletions(-)
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 69230e9..fa86a55 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -16,7 +16,11 @@
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index f22b2e7..5b80d08 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -32,8 +32,8 @@ struct authenc_instance_ctx {
  
- #include <crypto/internal/skcipher.h>
- #include <linux/bug.h>
-+#include <linux/cryptouser.h>
- #include <linux/module.h>
-+#include <linux/rtnetlink.h>
-+#include <linux/seq_file.h>
-+#include <net/netlink.h>
+ struct crypto_authenc_ctx {
+ 	struct crypto_ahash *auth;
+-	struct crypto_ablkcipher *enc;
+-	struct crypto_blkcipher *null;
++	struct crypto_skcipher *enc;
++	struct crypto_skcipher *null;
+ };
  
- #include "internal.h"
+ struct authenc_request_ctx {
+@@ -83,7 +83,7 @@ static int crypto_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
+ {
+ 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
+ 	struct crypto_ahash *auth = ctx->auth;
+-	struct crypto_ablkcipher *enc = ctx->enc;
++	struct crypto_skcipher *enc = ctx->enc;
+ 	struct crypto_authenc_keys keys;
+ 	int err = -EINVAL;
  
-@@ -25,10 +29,11 @@ static unsigned int crypto_skcipher_extsize(struct crypto_alg *alg)
- 	if (alg->cra_type == &crypto_blkcipher_type)
- 		return sizeof(struct crypto_blkcipher *);
+@@ -100,11 +100,11 @@ static int crypto_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
+ 	if (err)
+ 		goto out;
  
--	BUG_ON(alg->cra_type != &crypto_ablkcipher_type &&
--	       alg->cra_type != &crypto_givcipher_type);
-+	if (alg->cra_type == &crypto_ablkcipher_type ||
-+	    alg->cra_type == &crypto_givcipher_type)
-+		return sizeof(struct crypto_ablkcipher *);
+-	crypto_ablkcipher_clear_flags(enc, CRYPTO_TFM_REQ_MASK);
+-	crypto_ablkcipher_set_flags(enc, crypto_aead_get_flags(authenc) &
+-					 CRYPTO_TFM_REQ_MASK);
+-	err = crypto_ablkcipher_setkey(enc, keys.enckey, keys.enckeylen);
+-	crypto_aead_set_flags(authenc, crypto_ablkcipher_get_flags(enc) &
++	crypto_skcipher_clear_flags(enc, CRYPTO_TFM_REQ_MASK);
++	crypto_skcipher_set_flags(enc, crypto_aead_get_flags(authenc) &
++				       CRYPTO_TFM_REQ_MASK);
++	err = crypto_skcipher_setkey(enc, keys.enckey, keys.enckeylen);
++	crypto_aead_set_flags(authenc, crypto_skcipher_get_flags(enc) &
+ 				       CRYPTO_TFM_RES_MASK);
  
--	return sizeof(struct crypto_ablkcipher *);
-+	return crypto_alg_extsize(alg);
+ out:
+@@ -184,12 +184,15 @@ static int crypto_authenc_copy_assoc(struct aead_request *req)
+ {
+ 	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
+ 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
+-	struct blkcipher_desc desc = {
+-		.tfm = ctx->null,
+-	};
++	SKCIPHER_REQUEST_ON_STACK(skreq, ctx->null);
+ 
+-	return crypto_blkcipher_encrypt(&desc, req->dst, req->src,
+-					req->assoclen);
++	skcipher_request_set_tfm(skreq, ctx->null);
++	skcipher_request_set_callback(skreq, aead_request_flags(req),
++				      NULL, NULL);
++	skcipher_request_set_crypt(skreq, req->src, req->dst, req->assoclen,
++				   NULL);
++
++	return crypto_skcipher_encrypt(skreq);
  }
  
- static int skcipher_setkey_blkcipher(struct crypto_skcipher *tfm,
-@@ -216,26 +221,117 @@ static int crypto_init_skcipher_ops_ablkcipher(struct crypto_tfm *tfm)
+ static int crypto_authenc_encrypt(struct aead_request *req)
+@@ -199,10 +202,10 @@ static int crypto_authenc_encrypt(struct aead_request *req)
+ 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
+ 	struct authenc_instance_ctx *ictx = aead_instance_ctx(inst);
+ 	struct authenc_request_ctx *areq_ctx = aead_request_ctx(req);
+-	struct crypto_ablkcipher *enc = ctx->enc;
++	struct crypto_skcipher *enc = ctx->enc;
+ 	unsigned int cryptlen = req->cryptlen;
+-	struct ablkcipher_request *abreq = (void *)(areq_ctx->tail +
+-						    ictx->reqoff);
++	struct skcipher_request *skreq = (void *)(areq_ctx->tail +
++						  ictx->reqoff);
+ 	struct scatterlist *src, *dst;
+ 	int err;
+ 
+@@ -219,12 +222,12 @@ static int crypto_authenc_encrypt(struct aead_request *req)
+ 		dst = scatterwalk_ffwd(areq_ctx->dst, req->dst, req->assoclen);
+ 	}
+ 
+-	ablkcipher_request_set_tfm(abreq, enc);
+-	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
+-					crypto_authenc_encrypt_done, req);
+-	ablkcipher_request_set_crypt(abreq, src, dst, cryptlen, req->iv);
++	skcipher_request_set_tfm(skreq, enc);
++	skcipher_request_set_callback(skreq, aead_request_flags(req),
++				      crypto_authenc_encrypt_done, req);
++	skcipher_request_set_crypt(skreq, src, dst, cryptlen, req->iv);
+ 
+-	err = crypto_ablkcipher_encrypt(abreq);
++	err = crypto_skcipher_encrypt(skreq);
+ 	if (err)
+ 		return err;
+ 
+@@ -240,8 +243,8 @@ static int crypto_authenc_decrypt_tail(struct aead_request *req,
+ 	struct authenc_instance_ctx *ictx = aead_instance_ctx(inst);
+ 	struct authenc_request_ctx *areq_ctx = aead_request_ctx(req);
+ 	struct ahash_request *ahreq = (void *)(areq_ctx->tail + ictx->reqoff);
+-	struct ablkcipher_request *abreq = (void *)(areq_ctx->tail +
+-						    ictx->reqoff);
++	struct skcipher_request *skreq = (void *)(areq_ctx->tail +
++						  ictx->reqoff);
+ 	unsigned int authsize = crypto_aead_authsize(authenc);
+ 	u8 *ihash = ahreq->result + authsize;
+ 	struct scatterlist *src, *dst;
+@@ -260,13 +263,13 @@ static int crypto_authenc_decrypt_tail(struct aead_request *req,
+ 		dst = scatterwalk_ffwd(areq_ctx->dst, req->dst, req->assoclen);
+ 	}
+ 
+-	ablkcipher_request_set_tfm(abreq, ctx->enc);
+-	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
+-					req->base.complete, req->base.data);
+-	ablkcipher_request_set_crypt(abreq, src, dst,
+-				     req->cryptlen - authsize, req->iv);
++	skcipher_request_set_tfm(skreq, ctx->enc);
++	skcipher_request_set_callback(skreq, aead_request_flags(req),
++				      req->base.complete, req->base.data);
++	skcipher_request_set_crypt(skreq, src, dst,
++				   req->cryptlen - authsize, req->iv);
+ 
+-	return crypto_ablkcipher_decrypt(abreq);
++	return crypto_skcipher_decrypt(skreq);
+ }
+ 
+ static void authenc_verify_ahash_done(struct crypto_async_request *areq,
+@@ -318,20 +321,20 @@ static int crypto_authenc_init_tfm(struct crypto_aead *tfm)
+ 	struct authenc_instance_ctx *ictx = aead_instance_ctx(inst);
+ 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct crypto_ahash *auth;
+-	struct crypto_ablkcipher *enc;
+-	struct crypto_blkcipher *null;
++	struct crypto_skcipher *enc;
++	struct crypto_skcipher *null;
+ 	int err;
+ 
+ 	auth = crypto_spawn_ahash(&ictx->auth);
+ 	if (IS_ERR(auth))
+ 		return PTR_ERR(auth);
+ 
+-	enc = crypto_spawn_skcipher(&ictx->enc);
++	enc = crypto_spawn_skcipher2(&ictx->enc);
+ 	err = PTR_ERR(enc);
+ 	if (IS_ERR(enc))
+ 		goto err_free_ahash;
+ 
+-	null = crypto_get_default_null_skcipher();
++	null = crypto_get_default_null_skcipher2();
+ 	err = PTR_ERR(null);
+ 	if (IS_ERR(null))
+ 		goto err_free_skcipher;
+@@ -347,13 +350,13 @@ static int crypto_authenc_init_tfm(struct crypto_aead *tfm)
+ 		max_t(unsigned int,
+ 		      crypto_ahash_reqsize(auth) +
+ 		      sizeof(struct ahash_request),
+-		      sizeof(struct ablkcipher_request) +
+-		      crypto_ablkcipher_reqsize(enc)));
++		      sizeof(struct skcipher_request) +
++		      crypto_skcipher_reqsize(enc)));
+ 
  	return 0;
+ 
+ err_free_skcipher:
+-	crypto_free_ablkcipher(enc);
++	crypto_free_skcipher(enc);
+ err_free_ahash:
+ 	crypto_free_ahash(auth);
+ 	return err;
+@@ -364,8 +367,8 @@ static void crypto_authenc_exit_tfm(struct crypto_aead *tfm)
+ 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(tfm);
+ 
+ 	crypto_free_ahash(ctx->auth);
+-	crypto_free_ablkcipher(ctx->enc);
+-	crypto_put_default_null_skcipher();
++	crypto_free_skcipher(ctx->enc);
++	crypto_put_default_null_skcipher2();
  }
  
-+static void crypto_skcipher_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_skcipher *skcipher = __crypto_skcipher_cast(tfm);
-+	struct skcipher_alg *alg = crypto_skcipher_alg(skcipher);
-+
-+	alg->exit(skcipher);
-+}
-+
- static int crypto_skcipher_init_tfm(struct crypto_tfm *tfm)
- {
-+	struct crypto_skcipher *skcipher = __crypto_skcipher_cast(tfm);
-+	struct skcipher_alg *alg = crypto_skcipher_alg(skcipher);
-+
- 	if (tfm->__crt_alg->cra_type == &crypto_blkcipher_type)
- 		return crypto_init_skcipher_ops_blkcipher(tfm);
+ static void crypto_authenc_free(struct aead_instance *inst)
+@@ -384,7 +387,7 @@ static int crypto_authenc_create(struct crypto_template *tmpl,
+ 	struct aead_instance *inst;
+ 	struct hash_alg_common *auth;
+ 	struct crypto_alg *auth_base;
+-	struct crypto_alg *enc;
++	struct skcipher_alg *enc;
+ 	struct authenc_instance_ctx *ctx;
+ 	const char *enc_name;
+ 	int err;
+@@ -422,38 +425,39 @@ static int crypto_authenc_create(struct crypto_template *tmpl,
+ 		goto err_free_inst;
  
--	BUG_ON(tfm->__crt_alg->cra_type != &crypto_ablkcipher_type &&
--	       tfm->__crt_alg->cra_type != &crypto_givcipher_type);
-+	if (tfm->__crt_alg->cra_type == &crypto_ablkcipher_type ||
-+	    tfm->__crt_alg->cra_type == &crypto_givcipher_type)
-+		return crypto_init_skcipher_ops_ablkcipher(tfm);
-+
-+	skcipher->setkey = alg->setkey;
-+	skcipher->encrypt = alg->encrypt;
-+	skcipher->decrypt = alg->decrypt;
-+	skcipher->ivsize = alg->ivsize;
-+	skcipher->keysize = alg->max_keysize;
-+
-+	if (alg->exit)
-+		skcipher->base.exit = crypto_skcipher_exit_tfm;
+ 	crypto_set_skcipher_spawn(&ctx->enc, aead_crypto_instance(inst));
+-	err = crypto_grab_skcipher(&ctx->enc, enc_name, 0,
+-				   crypto_requires_sync(algt->type,
+-							algt->mask));
++	err = crypto_grab_skcipher2(&ctx->enc, enc_name, 0,
++				    crypto_requires_sync(algt->type,
++							 algt->mask));
+ 	if (err)
+ 		goto err_drop_auth;
  
--	return crypto_init_skcipher_ops_ablkcipher(tfm);
-+	if (alg->init)
-+		return alg->init(skcipher);
-+
-+	return 0;
-+}
-+
-+static void crypto_skcipher_free_instance(struct crypto_instance *inst)
-+{
-+	struct skcipher_instance *skcipher =
-+		container_of(inst, struct skcipher_instance, s.base);
-+
-+	skcipher->free(skcipher);
-+}
-+
-+static void crypto_skcipher_show(struct seq_file *m, struct crypto_alg *alg)
-+	__attribute__ ((unused));
-+static void crypto_skcipher_show(struct seq_file *m, struct crypto_alg *alg)
-+{
-+	struct skcipher_alg *skcipher = container_of(alg, struct skcipher_alg,
-+						     base);
-+
-+	seq_printf(m, "type         : skcipher\n");
-+	seq_printf(m, "async        : %s\n",
-+		   alg->cra_flags & CRYPTO_ALG_ASYNC ?  "yes" : "no");
-+	seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
-+	seq_printf(m, "min keysize  : %u\n", skcipher->min_keysize);
-+	seq_printf(m, "max keysize  : %u\n", skcipher->max_keysize);
-+	seq_printf(m, "ivsize       : %u\n", skcipher->ivsize);
- }
+-	enc = crypto_skcipher_spawn_alg(&ctx->enc);
++	enc = crypto_spawn_skcipher_alg(&ctx->enc);
  
-+#ifdef CONFIG_NET
-+static int crypto_skcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	struct crypto_report_blkcipher rblkcipher;
-+	struct skcipher_alg *skcipher = container_of(alg, struct skcipher_alg,
-+						     base);
-+
-+	strncpy(rblkcipher.type, "skcipher", sizeof(rblkcipher.type));
-+	strncpy(rblkcipher.geniv, "<none>", sizeof(rblkcipher.geniv));
-+
-+	rblkcipher.blocksize = alg->cra_blocksize;
-+	rblkcipher.min_keysize = skcipher->min_keysize;
-+	rblkcipher.max_keysize = skcipher->max_keysize;
-+	rblkcipher.ivsize = skcipher->ivsize;
-+
-+	if (nla_put(skb, CRYPTOCFGA_REPORT_BLKCIPHER,
-+		    sizeof(struct crypto_report_blkcipher), &rblkcipher))
-+		goto nla_put_failure;
-+	return 0;
-+
-+nla_put_failure:
-+	return -EMSGSIZE;
-+}
-+#else
-+static int crypto_skcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	return -ENOSYS;
-+}
-+#endif
-+
- static const struct crypto_type crypto_skcipher_type2 = {
- 	.extsize = crypto_skcipher_extsize,
- 	.init_tfm = crypto_skcipher_init_tfm,
-+	.free = crypto_skcipher_free_instance,
-+#ifdef CONFIG_PROC_FS
-+	.show = crypto_skcipher_show,
-+#endif
-+	.report = crypto_skcipher_report,
- 	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
- 	.maskset = CRYPTO_ALG_TYPE_BLKCIPHER_MASK,
--	.type = CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.type = CRYPTO_ALG_TYPE_SKCIPHER,
- 	.tfmsize = offsetof(struct crypto_skcipher, base),
- };
+ 	ctx->reqoff = ALIGN(2 * auth->digestsize + auth_base->cra_alignmask,
+ 			    auth_base->cra_alignmask + 1);
  
-+int crypto_grab_skcipher2(struct crypto_skcipher_spawn *spawn,
-+			  const char *name, u32 type, u32 mask)
-+{
-+	spawn->base.frontend = &crypto_skcipher_type2;
-+	return crypto_grab_spawn(&spawn->base, name, type, mask);
-+}
-+EXPORT_SYMBOL_GPL(crypto_grab_skcipher2);
-+
- struct crypto_skcipher *crypto_alloc_skcipher(const char *alg_name,
- 					      u32 type, u32 mask)
- {
-@@ -243,5 +339,87 @@ struct crypto_skcipher *crypto_alloc_skcipher(const char *alg_name,
- }
- EXPORT_SYMBOL_GPL(crypto_alloc_skcipher);
+ 	err = -ENAMETOOLONG;
+ 	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
+-		     "authenc(%s,%s)", auth_base->cra_name, enc->cra_name) >=
++		     "authenc(%s,%s)", auth_base->cra_name,
++		     enc->base.cra_name) >=
+ 	    CRYPTO_MAX_ALG_NAME)
+ 		goto err_drop_enc;
  
-+int crypto_has_skcipher2(const char *alg_name, u32 type, u32 mask)
-+{
-+	return crypto_type_has_alg(alg_name, &crypto_skcipher_type2,
-+				   type, mask);
-+}
-+EXPORT_SYMBOL_GPL(crypto_has_skcipher2);
-+
-+static int skcipher_prepare_alg(struct skcipher_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
-+
-+	if (alg->ivsize > PAGE_SIZE / 8)
-+		return -EINVAL;
-+
-+	base->cra_type = &crypto_skcipher_type2;
-+	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
-+	base->cra_flags |= CRYPTO_ALG_TYPE_SKCIPHER;
-+
-+	return 0;
-+}
-+
-+int crypto_register_skcipher(struct skcipher_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
-+	int err;
-+
-+	err = skcipher_prepare_alg(alg);
-+	if (err)
-+		return err;
-+
-+	return crypto_register_alg(base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_register_skcipher);
-+
-+void crypto_unregister_skcipher(struct skcipher_alg *alg)
-+{
-+	crypto_unregister_alg(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_unregister_skcipher);
-+
-+int crypto_register_skciphers(struct skcipher_alg *algs, int count)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i < count; i++) {
-+		ret = crypto_register_skcipher(&algs[i]);
-+		if (ret)
-+			goto err;
-+	}
-+
-+	return 0;
-+
-+err:
-+	for (--i; i >= 0; --i)
-+		crypto_unregister_skcipher(&algs[i]);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(crypto_register_skciphers);
-+
-+void crypto_unregister_skciphers(struct skcipher_alg *algs, int count)
-+{
-+	int i;
-+
-+	for (i = count - 1; i >= 0; --i)
-+		crypto_unregister_skcipher(&algs[i]);
-+}
-+EXPORT_SYMBOL_GPL(crypto_unregister_skciphers);
-+
-+int skcipher_register_instance(struct crypto_template *tmpl,
-+			   struct skcipher_instance *inst)
-+{
-+	int err;
-+
-+	err = skcipher_prepare_alg(&inst->alg);
-+	if (err)
-+		return err;
-+
-+	return crypto_register_instance(tmpl, skcipher_crypto_instance(inst));
-+}
-+EXPORT_SYMBOL_GPL(skcipher_register_instance);
-+
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Symmetric key cipher type");
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index 2cf7a61..ce6619c 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -19,12 +19,46 @@
+ 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+ 		     "authenc(%s,%s)", auth_base->cra_driver_name,
+-		     enc->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
++		     enc->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
+ 		goto err_drop_enc;
  
- struct rtattr;
+-	inst->alg.base.cra_flags = (auth_base->cra_flags | enc->cra_flags) &
+-				   CRYPTO_ALG_ASYNC;
+-	inst->alg.base.cra_priority = enc->cra_priority * 10 +
++	inst->alg.base.cra_flags = (auth_base->cra_flags |
++				    enc->base.cra_flags) & CRYPTO_ALG_ASYNC;
++	inst->alg.base.cra_priority = enc->base.cra_priority * 10 +
+ 				      auth_base->cra_priority;
+-	inst->alg.base.cra_blocksize = enc->cra_blocksize;
++	inst->alg.base.cra_blocksize = enc->base.cra_blocksize;
+ 	inst->alg.base.cra_alignmask = auth_base->cra_alignmask |
+-				       enc->cra_alignmask;
++				       enc->base.cra_alignmask;
+ 	inst->alg.base.cra_ctxsize = sizeof(struct crypto_authenc_ctx);
  
-+struct skcipher_instance {
-+	void (*free)(struct skcipher_instance *inst);
-+	union {
-+		struct {
-+			char head[offsetof(struct skcipher_alg, base)];
-+			struct crypto_instance base;
-+		} s;
-+		struct skcipher_alg alg;
-+	};
-+};
-+
- struct crypto_skcipher_spawn {
- 	struct crypto_spawn base;
- };
+-	inst->alg.ivsize = enc->cra_ablkcipher.ivsize;
++	inst->alg.ivsize = crypto_skcipher_alg_ivsize(enc);
+ 	inst->alg.maxauthsize = auth->digestsize;
  
- extern const struct crypto_type crypto_givcipher_type;
- 
-+static inline struct crypto_instance *skcipher_crypto_instance(
-+	struct skcipher_instance *inst)
-+{
-+	return &inst->s.base;
-+}
-+
-+static inline struct skcipher_instance *skcipher_alg_instance(
-+	struct crypto_skcipher *skcipher)
-+{
-+	return container_of(crypto_skcipher_alg(skcipher),
-+			    struct skcipher_instance, alg);
-+}
-+
-+static inline void *skcipher_instance_ctx(struct skcipher_instance *inst)
-+{
-+	return crypto_instance_ctx(skcipher_crypto_instance(inst));
-+}
-+
-+static inline void skcipher_request_complete(struct skcipher_request *req, int err)
-+{
-+	req->base.complete(&req->base, err);
-+}
-+
- static inline void crypto_set_skcipher_spawn(
- 	struct crypto_skcipher_spawn *spawn, struct crypto_instance *inst)
- {
-@@ -33,6 +67,8 @@ static inline void crypto_set_skcipher_spawn(
- 
- int crypto_grab_skcipher(struct crypto_skcipher_spawn *spawn, const char *name,
- 			 u32 type, u32 mask);
-+int crypto_grab_skcipher2(struct crypto_skcipher_spawn *spawn,
-+			  const char *name, u32 type, u32 mask);
- 
- struct crypto_alg *crypto_lookup_skcipher(const char *name, u32 type, u32 mask);
- 
-@@ -47,6 +83,12 @@ static inline struct crypto_alg *crypto_skcipher_spawn_alg(
- 	return spawn->base.alg;
- }
- 
-+static inline struct skcipher_alg *crypto_spawn_skcipher_alg(
-+	struct crypto_skcipher_spawn *spawn)
-+{
-+	return container_of(spawn->base.alg, struct skcipher_alg, base);
-+}
-+
- static inline struct crypto_ablkcipher *crypto_spawn_skcipher(
- 	struct crypto_skcipher_spawn *spawn)
- {
-@@ -55,6 +97,25 @@ static inline struct crypto_ablkcipher *crypto_spawn_skcipher(
- 				 crypto_skcipher_mask(0)));
- }
- 
-+static inline struct crypto_skcipher *crypto_spawn_skcipher2(
-+	struct crypto_skcipher_spawn *spawn)
-+{
-+	return crypto_spawn_tfm2(&spawn->base);
-+}
-+
-+static inline void crypto_skcipher_set_reqsize(
-+	struct crypto_skcipher *skcipher, unsigned int reqsize)
-+{
-+	skcipher->reqsize = reqsize;
-+}
-+
-+int crypto_register_skcipher(struct skcipher_alg *alg);
-+void crypto_unregister_skcipher(struct skcipher_alg *alg);
-+int crypto_register_skciphers(struct skcipher_alg *algs, int count);
-+void crypto_unregister_skciphers(struct skcipher_alg *algs, int count);
-+int skcipher_register_instance(struct crypto_template *tmpl,
-+			       struct skcipher_instance *inst);
-+
- int skcipher_null_givencrypt(struct skcipher_givcrypt_request *req);
- int skcipher_null_givdecrypt(struct skcipher_givcrypt_request *req);
- const char *crypto_default_geniv(const struct crypto_alg *alg);
-@@ -122,5 +183,31 @@ static inline u32 skcipher_request_flags(struct skcipher_request *req)
- 	return req->base.flags;
- }
- 
-+static inline unsigned int crypto_skcipher_alg_min_keysize(
-+	struct skcipher_alg *alg)
-+{
-+	if ((alg->base.cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-+	    CRYPTO_ALG_TYPE_BLKCIPHER)
-+		return alg->base.cra_blkcipher.min_keysize;
-+
-+	if (alg->base.cra_ablkcipher.encrypt)
-+		return alg->base.cra_ablkcipher.min_keysize;
-+
-+	return alg->min_keysize;
-+}
-+
-+static inline unsigned int crypto_skcipher_alg_max_keysize(
-+	struct skcipher_alg *alg)
-+{
-+	if ((alg->base.cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-+	    CRYPTO_ALG_TYPE_BLKCIPHER)
-+		return alg->base.cra_blkcipher.max_keysize;
-+
-+	if (alg->base.cra_ablkcipher.encrypt)
-+		return alg->base.cra_ablkcipher.max_keysize;
-+
-+	return alg->max_keysize;
-+}
-+
- #endif	/* _CRYPTO_INTERNAL_SKCIPHER_H */
- 
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index 0f987f5..6055ff2 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -65,6 +65,72 @@ struct crypto_skcipher {
- 	struct crypto_tfm base;
- };
- 
-+/**
-+ * struct skcipher_alg - symmetric key cipher definition
-+ * @min_keysize: Minimum key size supported by the transformation. This is the
-+ *		 smallest key length supported by this transformation algorithm.
-+ *		 This must be set to one of the pre-defined values as this is
-+ *		 not hardware specific. Possible values for this field can be
-+ *		 found via git grep "_MIN_KEY_SIZE" include/crypto/
-+ * @max_keysize: Maximum key size supported by the transformation. This is the
-+ *		 largest key length supported by this transformation algorithm.
-+ *		 This must be set to one of the pre-defined values as this is
-+ *		 not hardware specific. Possible values for this field can be
-+ *		 found via git grep "_MAX_KEY_SIZE" include/crypto/
-+ * @setkey: Set key for the transformation. This function is used to either
-+ *	    program a supplied key into the hardware or store the key in the
-+ *	    transformation context for programming it later. Note that this
-+ *	    function does modify the transformation context. This function can
-+ *	    be called multiple times during the existence of the transformation
-+ *	    object, so one must make sure the key is properly reprogrammed into
-+ *	    the hardware. This function is also responsible for checking the key
-+ *	    length for validity. In case a software fallback was put in place in
-+ *	    the @cra_init call, this function might need to use the fallback if
-+ *	    the algorithm doesn't support all of the key sizes.
-+ * @encrypt: Encrypt a scatterlist of blocks. This function is used to encrypt
-+ *	     the supplied scatterlist containing the blocks of data. The crypto
-+ *	     API consumer is responsible for aligning the entries of the
-+ *	     scatterlist properly and making sure the chunks are correctly
-+ *	     sized. In case a software fallback was put in place in the
-+ *	     @cra_init call, this function might need to use the fallback if
-+ *	     the algorithm doesn't support all of the key sizes. In case the
-+ *	     key was stored in transformation context, the key might need to be
-+ *	     re-programmed into the hardware in this function. This function
-+ *	     shall not modify the transformation context, as this function may
-+ *	     be called in parallel with the same transformation object.
-+ * @decrypt: Decrypt a single block. This is a reverse counterpart to @encrypt
-+ *	     and the conditions are exactly the same.
-+ * @init: Initialize the cryptographic transformation object. This function
-+ *	  is used to initialize the cryptographic transformation object.
-+ *	  This function is called only once at the instantiation time, right
-+ *	  after the transformation context was allocated. In case the
-+ *	  cryptographic hardware has some special requirements which need to
-+ *	  be handled by software, this function shall check for the precise
-+ *	  requirement of the transformation and put any software fallbacks
-+ *	  in place.
-+ * @exit: Deinitialize the cryptographic transformation object. This is a
-+ *	  counterpart to @init, used to remove various changes set in
-+ *	  @init.
-+ * @ivsize: IV size applicable for transformation. The consumer must provide an
-+ *	    IV of exactly that size to perform the encrypt or decrypt operation.
-+ *
-+ * All fields except @ivsize are mandatory and must be filled.
-+ */
-+struct skcipher_alg {
-+	int (*setkey)(struct crypto_skcipher *tfm, const u8 *key,
-+	              unsigned int keylen);
-+	int (*encrypt)(struct skcipher_request *req);
-+	int (*decrypt)(struct skcipher_request *req);
-+	int (*init)(struct crypto_skcipher *tfm);
-+	void (*exit)(struct crypto_skcipher *tfm);
-+
-+	unsigned int min_keysize;
-+	unsigned int max_keysize;
-+	unsigned int ivsize;
-+
-+	struct crypto_alg base;
-+};
-+
- #define SKCIPHER_REQUEST_ON_STACK(name, tfm) \
- 	char __##name##_desc[sizeof(struct skcipher_request) + \
- 		crypto_skcipher_reqsize(tfm)] CRYPTO_MINALIGN_ATTR; \
-@@ -231,12 +297,43 @@ static inline int crypto_has_skcipher(const char *alg_name, u32 type,
- 			      crypto_skcipher_mask(mask));
- }
- 
-+/**
-+ * crypto_has_skcipher2() - Search for the availability of an skcipher.
-+ * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
-+ *	      skcipher
-+ * @type: specifies the type of the skcipher
-+ * @mask: specifies the mask for the skcipher
-+ *
-+ * Return: true when the skcipher is known to the kernel crypto API; false
-+ *	   otherwise
-+ */
-+int crypto_has_skcipher2(const char *alg_name, u32 type, u32 mask);
-+
- static inline const char *crypto_skcipher_driver_name(
- 	struct crypto_skcipher *tfm)
- {
- 	return crypto_tfm_alg_driver_name(crypto_skcipher_tfm(tfm));
- }
- 
-+static inline struct skcipher_alg *crypto_skcipher_alg(
-+	struct crypto_skcipher *tfm)
-+{
-+	return container_of(crypto_skcipher_tfm(tfm)->__crt_alg,
-+			    struct skcipher_alg, base);
-+}
-+
-+static inline unsigned int crypto_skcipher_alg_ivsize(struct skcipher_alg *alg)
-+{
-+	if ((alg->base.cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-+	    CRYPTO_ALG_TYPE_BLKCIPHER)
-+		return alg->base.cra_blkcipher.ivsize;
-+
-+	if (alg->base.cra_ablkcipher.encrypt)
-+		return alg->base.cra_ablkcipher.ivsize;
-+
-+	return alg->ivsize;
-+}
-+
- /**
-  * crypto_skcipher_ivsize() - obtain IV size
-  * @tfm: cipher handle
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 992cfc2..37a652d 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -47,6 +47,7 @@
- #define CRYPTO_ALG_TYPE_AEAD		0x00000003
- #define CRYPTO_ALG_TYPE_BLKCIPHER	0x00000004
- #define CRYPTO_ALG_TYPE_ABLKCIPHER	0x00000005
-+#define CRYPTO_ALG_TYPE_SKCIPHER	0x00000005
- #define CRYPTO_ALG_TYPE_GIVCIPHER	0x00000006
- #define CRYPTO_ALG_TYPE_KPP		0x00000008
- #define CRYPTO_ALG_TYPE_RNG		0x0000000c
+ 	inst->alg.init = crypto_authenc_init_tfm;
