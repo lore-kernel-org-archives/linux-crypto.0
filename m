@@ -1,232 +1,153 @@
-From: Salvatore Benedetto <salvatore.benedetto@intel.com>
-Subject: [PATCH] crypto: qat - Switch to new rsa_helper functions
-Date: Thu, 30 Jun 2016 17:59:07 +0100
-Message-ID: <1467305947-4666-1-git-send-email-salvatore.benedetto@intel.com>
-Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+From: Megha Dey <megha.dey@linux.intel.com>
+Subject: Re: crypto: tcrypt - Do not bail on EINPROGRESS in multibuffer hash
+ test
+Date: Thu, 30 Jun 2016 10:36:10 -0700
+Message-ID: <1467308170.3969.1.camel@megha-Z97X-UD7-TH>
+References: <1467098587-1038-2-git-send-email-k.kozlowski@samsung.com>
+	 <20160628084138.GD15985@gondor.apana.org.au> <57723A08.1010704@samsung.com>
+	 <20160628095511.GA16644@gondor.apana.org.au>
+	 <CAJKOXPexSTvfPtEhaSFQ5-igtE0DbgnVeOPzFPkXaSv5r+vZHw@mail.gmail.com>
+	 <20160628123352.GA17844@gondor.apana.org.au> <577383CA.1040204@samsung.com>
+	 <20160629081905.GA25215@gondor.apana.org.au> <57738697.1050401@samsung.com>
+	 <1467222356.4247.4.camel@megha-Z97X-UD7-TH>
+	 <20160630030013.GA535@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Krzysztof Kozlowski <k.kozlowski@samsung.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Fenghua Yu <fenghua.yu@intel.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:50908 "EHLO mga09.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:35425 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752527AbcF3RCo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Jun 2016 13:02:44 -0400
+	id S1751523AbcF3Rg6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 30 Jun 2016 13:36:58 -0400
+In-Reply-To: <20160630030013.GA535@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Drop all asn1 related code in qat and use the new rsa_helper
-functions rsa_parse_[pub|priv]_key for parsing the key
+On Thu, 2016-06-30 at 11:00 +0800, Herbert Xu wrote:
+> On Wed, Jun 29, 2016 at 10:45:56AM -0700, Megha Dey wrote:
+> > I tested the latest cryptodev tree on my haswell machine and this is
+> > what I see:
+> > [   40.402834] modprobe tcrypt mode=422
+> > [   40.403105] testing speed of multibuffer sha1 (sha1_mb)
+> > [   40.403108] test  0 (   16 byte blocks,   16 bytes per update,   1
+> > updates):  32271 cycles/operation,  252 cycles/byte
+> > [   40.403118] At least one hashing failed ret=-115
+> > [   43.218712] modprobe tcrypt mode=423
+> > [   43.218712] testing speed of multibuffer sha256 (sha256_mb)
+> > [   43.218715] test  0 (   16 byte blocks,   16 bytes per update,   1
+> > updates): 106965 cycles/operation,  835 cycles/byte
+> > [   43.218747] At least one hashing failed ret=-115
+> > [   45.346657] modprobe tcrypt mode=424
+> > [   45.346657] testing speed of multibuffer sha512 (sha512_mb)
+> > [   45.346660] test  0 (   16 byte blocks,   16 bytes per update,   1
+> > updates):  43179 cycles/operation,  337 cycles/byte
+> > [   45.346673] At least one hashing failed ret=-115
+> > 
+> > Don't think this is expected, is it?
+> 
+> No that's not right.  Does this patch fix it?
+> 
+yes, it fixes it. This is my output:
 
-Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
----
- crypto/testmgr.c                                  |  1 +
- drivers/crypto/qat/Kconfig                        |  2 +-
- drivers/crypto/qat/qat_common/Makefile            | 10 -----
- drivers/crypto/qat/qat_common/qat_asym_algs.c     | 49 +++++++++--------------
- drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1 | 11 -----
- drivers/crypto/qat/qat_common/qat_rsapubkey.asn1  |  4 --
- 6 files changed, 22 insertions(+), 55 deletions(-)
- delete mode 100644 drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1
- delete mode 100644 drivers/crypto/qat/qat_common/qat_rsapubkey.asn1
+testing speed of multibuffer sha1 (sha1_mb)
+[   31.342538] test  0 (   16 byte blocks,   16 bytes per update,   1
+updates):
+31614 cycles/operation,  246 cycles/byte
+[   31.342549] test  2 (   64 byte blocks,   64 bytes per update,   1
+updates):
+10893 cycles/operation,   21 cycles/byte
+[   31.342553] test  5 (  256 byte blocks,  256 bytes per update,   1
+updates):
+11043 cycles/operation,    5 cycles/byte
+[   31.342557] test  8 ( 1024 byte blocks, 1024 bytes per update,   1
+updates):
+17355 cycles/operation,    2 cycles/byte
+[   31.342562] test 12 ( 2048 byte blocks, 2048 bytes per update,   1
+updates):
+26328 cycles/operation,    1 cycles/byte
+[   31.342570] test 16 ( 4096 byte blocks, 4096 bytes per update,   1
+updates):
+43833 cycles/operation,    1 cycles/byte
+[   31.342584] test 21 ( 8192 byte blocks, 8192 bytes per update,   1
+updates):
+81141 cycles/operation,    1 cycles/byte
+[   44.700088]
+[   44.700088] testing speed of multibuffer sha256 (sha256_mb)
+[   44.700091] test  0 (   16 byte blocks,   16 bytes per update,   1
+updates):
+116874 cycles/operation,  913 cycles/byte
+[   44.700126] test  2 (   64 byte blocks,   64 bytes per update,   1
+updates):
+60894 cycles/operation,  118 cycles/byte
+[   44.700144] test  5 (  256 byte blocks,  256 bytes per update,   1
+updates):
+15366 cycles/operation,    7 cycles/byte
+[   44.700149] test  8 ( 1024 byte blocks, 1024 bytes per update,   1
+updates):
+29130 cycles/operation,    3 cycles/byte
+[   44.700158] test 12 ( 2048 byte blocks, 2048 bytes per update,   1
+updates):
+48561 cycles/operation,    2 cycles/byte
+[   44.700173] test 16 ( 4096 byte blocks, 4096 bytes per update,   1
+updates):
+119697 cycles/operation,    3 cycles/byte
+[   44.700207] test 21 ( 8192 byte blocks, 8192 bytes per update,   1
+updates):
+164163 cycles/operation,    2 cycles/byte
+[   66.309608]
+[   66.309608] testing speed of multibuffer sha512 (sha512_mb)
+[   66.309623] test  0 (   16 byte blocks,   16 bytes per update,   1
+updates):
+301050 cycles/operation, 2351 cycles/byte
+[   66.309717] test  2 (   64 byte blocks,   64 bytes per update,   1
+updates):
+115416 cycles/operation,  225 cycles/byte
+[   66.309757] test  5 (  256 byte blocks,  256 bytes per update,   1
+updates):
+175068 cycles/operation,   85 cycles/byte
+[   66.309814] test  8 ( 1024 byte blocks, 1024 bytes per update,   1
+updates):
+354834 cycles/operation,   43 cycles/byte
+[   66.309920] test 12 ( 2048 byte blocks, 2048 bytes per update,   1
+updates):
+599814 cycles/operation,   36 cycles/byte
+[   66.310096] test 16 ( 4096 byte blocks, 4096 bytes per update,   1
+updates):
+585666 cycles/operation,   17 cycles/byte
+[   66.310263] test 21 ( 8192 byte blocks, 8192 bytes per update,   1
+updates):
+1057770 cycles/operation,   16 cycles/byte
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 537fdc3..b52a81c 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1941,6 +1941,7 @@ static int do_test_rsa(struct crypto_akcipher *tfm,
- 	if (err)
- 		goto free_req;
- 
-+	err = -ENOMEM;
- 	out_len_max = crypto_akcipher_maxsize(tfm);
- 	outbuf_enc = kzalloc(out_len_max, GFP_KERNEL);
- 	if (!outbuf_enc)
-diff --git a/drivers/crypto/qat/Kconfig b/drivers/crypto/qat/Kconfig
-index 85b44e5..571d04d 100644
---- a/drivers/crypto/qat/Kconfig
-+++ b/drivers/crypto/qat/Kconfig
-@@ -5,11 +5,11 @@ config CRYPTO_DEV_QAT
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_AKCIPHER
- 	select CRYPTO_HMAC
-+	select CRYPTO_RSA
- 	select CRYPTO_SHA1
- 	select CRYPTO_SHA256
- 	select CRYPTO_SHA512
- 	select FW_LOADER
--	select ASN1
- 
- config CRYPTO_DEV_QAT_DH895xCC
- 	tristate "Support for Intel(R) DH895xCC"
-diff --git a/drivers/crypto/qat/qat_common/Makefile b/drivers/crypto/qat/qat_common/Makefile
-index 6d74b91..92fb6ff 100644
---- a/drivers/crypto/qat/qat_common/Makefile
-+++ b/drivers/crypto/qat/qat_common/Makefile
-@@ -1,11 +1,3 @@
--$(obj)/qat_rsapubkey-asn1.o: $(obj)/qat_rsapubkey-asn1.c \
--			     $(obj)/qat_rsapubkey-asn1.h
--$(obj)/qat_rsaprivkey-asn1.o: $(obj)/qat_rsaprivkey-asn1.c \
--			      $(obj)/qat_rsaprivkey-asn1.h
--
--clean-files += qat_rsapubkey-asn1.c qat_rsapubkey-asn1.h
--clean-files += qat_rsaprivkey-asn1.c qat_rsaprivkey-asn1.h
--
- obj-$(CONFIG_CRYPTO_DEV_QAT) += intel_qat.o
- intel_qat-objs := adf_cfg.o \
- 	adf_isr.o \
-@@ -19,8 +11,6 @@ intel_qat-objs := adf_cfg.o \
- 	adf_hw_arbiter.o \
- 	qat_crypto.o \
- 	qat_algs.o \
--	qat_rsapubkey-asn1.o \
--	qat_rsaprivkey-asn1.o \
- 	qat_asym_algs.o \
- 	qat_uclo.o \
- 	qat_hal.o
-diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-index 05f49d4..04b0ef8 100644
---- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-@@ -52,8 +52,6 @@
- #include <linux/dma-mapping.h>
- #include <linux/fips.h>
- #include <crypto/scatterwalk.h>
--#include "qat_rsapubkey-asn1.h"
--#include "qat_rsaprivkey-asn1.h"
- #include "icp_qat_fw_pke.h"
- #include "adf_accel_devices.h"
- #include "adf_transport.h"
-@@ -502,10 +500,8 @@ unmap_src:
- 	return ret;
- }
- 
--int qat_rsa_get_n(void *context, size_t hdrlen, unsigned char tag,
--		  const void *value, size_t vlen)
-+int qat_rsa_set_n(struct qat_rsa_ctx *ctx, const char *value, size_t vlen)
- {
--	struct qat_rsa_ctx *ctx = context;
- 	struct qat_crypto_instance *inst = ctx->inst;
- 	struct device *dev = &GET_DEV(inst->accel_dev);
- 	const char *ptr = value;
-@@ -518,11 +514,6 @@ int qat_rsa_get_n(void *context, size_t hdrlen, unsigned char tag,
- 
- 	ctx->key_sz = vlen;
- 	ret = -EINVAL;
--	/* In FIPS mode only allow key size 2K & 3K */
--	if (fips_enabled && (ctx->key_sz != 256 && ctx->key_sz != 384)) {
--		pr_err("QAT: RSA: key size not allowed in FIPS mode\n");
--		goto err;
--	}
- 	/* invalid key size provided */
- 	if (!qat_rsa_enc_fn_id(ctx->key_sz))
- 		goto err;
-@@ -540,10 +531,8 @@ err:
- 	return ret;
- }
- 
--int qat_rsa_get_e(void *context, size_t hdrlen, unsigned char tag,
--		  const void *value, size_t vlen)
-+int qat_rsa_set_e(struct qat_rsa_ctx *ctx, const char *value, size_t vlen)
- {
--	struct qat_rsa_ctx *ctx = context;
- 	struct qat_crypto_instance *inst = ctx->inst;
- 	struct device *dev = &GET_DEV(inst->accel_dev);
- 	const char *ptr = value;
-@@ -559,18 +548,15 @@ int qat_rsa_get_e(void *context, size_t hdrlen, unsigned char tag,
- 	}
- 
- 	ctx->e = dma_zalloc_coherent(dev, ctx->key_sz, &ctx->dma_e, GFP_KERNEL);
--	if (!ctx->e) {
--		ctx->e = NULL;
-+	if (!ctx->e)
- 		return -ENOMEM;
--	}
-+
- 	memcpy(ctx->e + (ctx->key_sz - vlen), ptr, vlen);
- 	return 0;
- }
- 
--int qat_rsa_get_d(void *context, size_t hdrlen, unsigned char tag,
--		  const void *value, size_t vlen)
-+int qat_rsa_set_d(struct qat_rsa_ctx *ctx, const char *value, size_t vlen)
- {
--	struct qat_rsa_ctx *ctx = context;
- 	struct qat_crypto_instance *inst = ctx->inst;
- 	struct device *dev = &GET_DEV(inst->accel_dev);
- 	const char *ptr = value;
-@@ -585,12 +571,6 @@ int qat_rsa_get_d(void *context, size_t hdrlen, unsigned char tag,
- 	if (!ctx->key_sz || !vlen || vlen > ctx->key_sz)
- 		goto err;
- 
--	/* In FIPS mode only allow key size 2K & 3K */
--	if (fips_enabled && (vlen != 256 && vlen != 384)) {
--		pr_err("QAT: RSA: key size not allowed in FIPS mode\n");
--		goto err;
--	}
--
- 	ret = -ENOMEM;
- 	ctx->d = dma_zalloc_coherent(dev, ctx->key_sz, &ctx->dma_d, GFP_KERNEL);
- 	if (!ctx->d)
-@@ -608,6 +588,7 @@ static int qat_rsa_setkey(struct crypto_akcipher *tfm, const void *key,
- {
- 	struct qat_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
- 	struct device *dev = &GET_DEV(ctx->inst->accel_dev);
-+	struct rsa_key rsa_key;
- 	int ret;
- 
- 	/* Free the old key if any */
-@@ -625,13 +606,23 @@ static int qat_rsa_setkey(struct crypto_akcipher *tfm, const void *key,
- 	ctx->d = NULL;
- 
- 	if (private)
--		ret = asn1_ber_decoder(&qat_rsaprivkey_decoder, ctx, key,
--				       keylen);
-+		ret = rsa_parse_priv_key(&rsa_key, key, keylen);
- 	else
--		ret = asn1_ber_decoder(&qat_rsapubkey_decoder, ctx, key,
--				       keylen);
-+		ret = rsa_parse_pub_key(&rsa_key, key, keylen);
-+	if (ret < 0)
-+		goto free;
-+
-+	ret = qat_rsa_set_n(ctx, rsa_key.n, rsa_key.n_sz);
- 	if (ret < 0)
- 		goto free;
-+	ret = qat_rsa_set_e(ctx, rsa_key.e, rsa_key.e_sz);
-+	if (ret < 0)
-+		goto free;
-+	if (private) {
-+		ret = qat_rsa_set_d(ctx, rsa_key.d, rsa_key.d_sz);
-+		if (ret < 0)
-+			goto free;
-+	}
- 
- 	if (!ctx->n || !ctx->e) {
- 		/* invalid key provided */
-diff --git a/drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1 b/drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1
-deleted file mode 100644
-index f0066ad..0000000
---- a/drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1
-+++ /dev/null
-@@ -1,11 +0,0 @@
--RsaPrivKey ::= SEQUENCE {
--	version		INTEGER,
--	n		INTEGER ({ qat_rsa_get_n }),
--	e		INTEGER ({ qat_rsa_get_e }),
--	d		INTEGER ({ qat_rsa_get_d }),
--	prime1		INTEGER,
--	prime2		INTEGER,
--	exponent1	INTEGER,
--	exponent2	INTEGER,
--	coefficient	INTEGER
--}
-diff --git a/drivers/crypto/qat/qat_common/qat_rsapubkey.asn1 b/drivers/crypto/qat/qat_common/qat_rsapubkey.asn1
-deleted file mode 100644
-index bd667b3..0000000
---- a/drivers/crypto/qat/qat_common/qat_rsapubkey.asn1
-+++ /dev/null
-@@ -1,4 +0,0 @@
--RsaPubKey ::= SEQUENCE {
--	n INTEGER ({ qat_rsa_get_n }),
--	e INTEGER ({ qat_rsa_get_e })
--}
--- 
-2.7.4
+> Thanks!
+> 
+> ---8<---
+> The multibuffer hash speed test is incorrectly bailing because
+> of an EINPROGRESS return value.  This patch fixes it by setting
+> ret to zero if it is equal to -EINPROGRESS.
+> 
+> Reported-by: Megha Dey <megha.dey@linux.intel.com>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+> index 8a91dc3..202cfa1 100644
+> --- a/crypto/tcrypt.c
+> +++ b/crypto/tcrypt.c
+> @@ -655,8 +486,10 @@ static void test_mb_ahash_speed(const char *algo, unsigned int sec,
+>  
+>  		for (k = 0; k < 8; k++) {
+>  			ret = crypto_ahash_digest(data[k].req);
+> -			if (ret == -EINPROGRESS)
+> +			if (ret == -EINPROGRESS) {
+> +				ret = 0;
+>  				continue;
+> +			}
+>  
+>  			if (ret)
+>  				break;
