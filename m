@@ -1,77 +1,516 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [patch] crypto: sha256-mb - cleanup a || vs | typo
-Date: Fri, 1 Jul 2016 01:16:54 +0300
-Message-ID: <20160630221654.GE32301@mwanda>
-References: <20160629144242.GE22818@mwanda>
- <8538242a-eab7-127e-e47e-26027fee4f6d@zytor.com>
- <1467319339.22178.256.camel@linux.intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+From: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+Subject: [PATCH] Crypto:Add HMAC-SHA3 test modes and test vectors
+Date: Fri,  1 Jul 2016 11:16:54 +0530
+Message-ID: <1467352014-6929-1-git-send-email-raveendra.padasalagi@broadcom.com>
+Cc: Jeff Garzik <jeff@garzik.org>, Jon Mason <jonmason@broadcom.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Anup Patel <anup.patel@broadcom.com>,
+	Ray Jui <rjui@broadcom.com>,
+	Scott Branden <sbranden@broadcom.com>,
+	Pramod Kumar <pramod.kumar@broadcom.com>,
+	bcm-kernel-feedback-list@broadcom.com,
+	Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-	Megha Dey <megha.dey@intel.com>,
-	"Wang, Rui Y" <rui.y.wang@intel.com>,
-	Denys Vlasenko <dvlasenk@redhat.com>,
-	Xiaodong Liu <xiaodong.liu@intel.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1467319339.22178.256.camel@linux.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Stephan Mueller <smueller@chronox.de>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f182.google.com ([209.85.192.182]:36297 "EHLO
+	mail-pf0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751426AbcGAFyd (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 1 Jul 2016 01:54:33 -0400
+Received: by mail-pf0-f182.google.com with SMTP id t190so36985464pfb.3
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Jun 2016 22:54:33 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 30, 2016 at 01:42:19PM -0700, Tim Chen wrote:
-> On Wed, 2016-06-29 at 10:05 -0700, H. Peter Anvin wrote:
-> > On 06/29/16 07:42, Dan Carpenter wrote:
-> > >=20
-> > > >=20
-> > > > >=20
-> > > > > and | behave basically the same here but || is intended.=A0=A0=
-It causes a
-> > > static checker warning to mix up bitwise and logical operations.
-> > >=20
-> > > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> > >=20
-> > > diff --git a/arch/x86/crypto/sha256-mb/sha256_mb.c b/arch/x86/cry=
-pto/sha256-mb/sha256_mb.c
-> > > index c9d5dcc..4ec895a 100644
-> > > --- a/arch/x86/crypto/sha256-mb/sha256_mb.c
-> > > +++ b/arch/x86/crypto/sha256-mb/sha256_mb.c
-> > > @@ -299,7 +299,7 @@ static struct sha256_hash_ctx *sha256_ctx_mgr=
-_submit(struct sha256_ctx_mgr *mgr,
-> > > =A0	=A0* Or if the user's buffer contains less than a whole block=
-,
-> > > =A0	=A0* append as much as possible to the extra block.
-> > > =A0	=A0*/
-> > > -	if ((ctx->partial_block_buffer_length) | (len < SHA256_BLOCK_SI=
-ZE)) {
-> > > +	if ((ctx->partial_block_buffer_length) || (len < SHA256_BLOCK_S=
-IZE)) {
-> > > =A0		/* Compute how many bytes to copy from user buffer into
-> > > =A0		=A0* extra block
-> > > =A0		=A0*/
-> > >=20
-> > As far as I know the | was an intentional optimization, so you may =
-way
-> > to look at the generated code.
-> >=20
-> > 	-hpa
-> >=20
->=20
-> Yes, this is an intentional optimization. =A0Is there any scenario wh=
-ere things may
-> break with the compiler?
+This patch adds HMAC-SHA3 test modes in tcrypt module
+and related test vectors.
 
-No.  I'm going to remove the warning from the static checker like I sai=
-d
-earlier.  It should only complain for && vs & typos, || vs | is
-harmless.
+Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+---
+ crypto/tcrypt.c  |  16 +++
+ crypto/testmgr.c |  40 ++++++
+ crypto/testmgr.h | 388 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 444 insertions(+)
 
-regards,
-dan carpenter
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 579dce0..1ad7ffe 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -1328,6 +1328,22 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
+ 		ret += tcrypt_test("hmac(crc32)");
+ 		break;
+ 
++	case 111:
++		ret += tcrypt_test("hmac(sha3-224)");
++		break;
++
++	case 112:
++		ret += tcrypt_test("hmac(sha3-256)");
++		break;
++
++	case 113:
++		ret += tcrypt_test("hmac(sha3-384)");
++		break;
++
++	case 114:
++		ret += tcrypt_test("hmac(sha3-512)");
++		break;
++
+ 	case 150:
+ 		ret += tcrypt_test("ansi_cprng");
+ 		break;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index c727fb0..0f93036 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -3249,6 +3249,46 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "hmac(sha3-224)",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = {
++				.vecs = hmac_sha3_224_tv_template,
++				.count = HMAC_SHA3_224_TEST_VECTORS
++			}
++		}
++	}, {
++		.alg = "hmac(sha3-256)",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = {
++				.vecs = hmac_sha3_256_tv_template,
++				.count = HMAC_SHA3_256_TEST_VECTORS
++			}
++		}
++	}, {
++		.alg = "hmac(sha3-384)",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = {
++				.vecs = hmac_sha3_384_tv_template,
++				.count = HMAC_SHA3_384_TEST_VECTORS
++			}
++		}
++	}, {
++		.alg = "hmac(sha3-512)",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = {
++				.vecs = hmac_sha3_512_tv_template,
++				.count = HMAC_SHA3_512_TEST_VECTORS
++			}
++		}
++	}, {
+ 		.alg = "hmac(sha384)",
+ 		.test = alg_test_hash,
+ 		.fips_allowed = 1,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 487ec88..0cee15c 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -3246,6 +3246,394 @@ static struct hash_testvec hmac_sha512_tv_template[] = {
+ 	},
+ };
+ 
++#define HMAC_SHA3_224_TEST_VECTORS	4
++
++static struct hash_testvec hmac_sha3_224_tv_template[] = {
++	{
++		.key	= "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
++			  "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
++			  "\x0b\x0b\x0b\x0b",
++		.ksize	= 20,
++		.plaintext = "Hi There",
++		.psize	= 8,
++		.digest	= "\x3b\x16\x54\x6b\xbc\x7b\xe2\x70"
++			  "\x6a\x03\x1d\xca\xfd\x56\x37\x3d"
++			  "\x98\x84\x36\x76\x41\xd8\xc5\x9a"
++			  "\xf3\xc8\x60\xf7",
++	}, {
++		.key	= "Jefe",
++		.ksize	= 4,
++		.plaintext = "what do ya want for nothing?",
++		.psize	= 28,
++		.digest	= "\x7f\xdb\x8d\xd8\x8b\xd2\xf6\x0d"
++			  "\x1b\x79\x86\x34\xad\x38\x68\x11"
++			  "\xc2\xcf\xc8\x5b\xfa\xf5\xd5\x2b"
++			  "\xba\xce\x5e\x66",
++		.np	= 4,
++		.tap	= { 7, 7, 7, 7 }
++	}, {
++		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa",
++		.ksize	= 131,
++		.plaintext = "Test Using Large"
++			   "r Than Block-Siz"
++			   "e Key - Hash Key"
++			   " First",
++		.psize	= 54,
++		.digest = "\xb4\xa1\xf0\x4c\x00\x28\x7a\x9b"
++			  "\x7f\x60\x75\xb3\x13\xd2\x79\xb8"
++			  "\x33\xbc\x8f\x75\x12\x43\x52\xd0"
++			  "\x5f\xb9\x99\x5f",
++	}, {
++		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa",
++		.ksize	= 131,
++		.plaintext =
++			  "This is a test u"
++			  "sing a larger th"
++			  "an block-size ke"
++			  "y and a larger t"
++			  "han block-size d"
++			  "ata. The key nee"
++			  "ds to be hashed "
++			  "before being use"
++			  "d by the HMAC al"
++			  "gorithm.",
++		.psize	= 152,
++		.digest	= "\x05\xd8\xcd\x6d\x00\xfa\xea\x8d"
++			  "\x1e\xb6\x8a\xde\x28\x73\x0b\xbd"
++			  "\x3c\xba\xb6\x92\x9f\x0a\x08\x6b"
++			  "\x29\xcd\x62\xa0",
++	},
++};
++
++#define HMAC_SHA3_256_TEST_VECTORS	4
++
++static struct hash_testvec hmac_sha3_256_tv_template[] = {
++	{
++		.key	= "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
++			  "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
++			  "\x0b\x0b\x0b\x0b",
++		.ksize	= 20,
++		.plaintext = "Hi There",
++		.psize	= 8,
++		.digest	= "\xba\x85\x19\x23\x10\xdf\xfa\x96"
++			  "\xe2\xa3\xa4\x0e\x69\x77\x43\x51"
++			  "\x14\x0b\xb7\x18\x5e\x12\x02\xcd"
++			  "\xcc\x91\x75\x89\xf9\x5e\x16\xbb",
++	}, {
++		.key	= "Jefe",
++		.ksize	= 4,
++		.plaintext = "what do ya want for nothing?",
++		.psize	= 28,
++		.digest	= "\xc7\xd4\x07\x2e\x78\x88\x77\xae"
++			  "\x35\x96\xbb\xb0\xda\x73\xb8\x87"
++			  "\xc9\x17\x1f\x93\x09\x5b\x29\x4a"
++			  "\xe8\x57\xfb\xe2\x64\x5e\x1b\xa5",
++		.np	= 4,
++		.tap	= { 7, 7, 7, 7 }
++	}, {
++		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa",
++		.ksize	= 131,
++		.plaintext = "Test Using Large"
++			   "r Than Block-Siz"
++			   "e Key - Hash Key"
++			   " First",
++		.psize	= 54,
++		.digest = "\xed\x73\xa3\x74\xb9\x6c\x00\x52"
++			  "\x35\xf9\x48\x03\x2f\x09\x67\x4a"
++			  "\x58\xc0\xce\x55\x5c\xfc\x1f\x22"
++			  "\x3b\x02\x35\x65\x60\x31\x2c\x3b",
++	}, {
++		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa",
++		.ksize	= 131,
++		.plaintext =
++			  "This is a test u"
++			  "sing a larger th"
++			  "an block-size ke"
++			  "y and a larger t"
++			  "han block-size d"
++			  "ata. The key nee"
++			  "ds to be hashed "
++			  "before being use"
++			  "d by the HMAC al"
++			  "gorithm.",
++		.psize	= 152,
++		.digest	= "\x65\xc5\xb0\x6d\x4c\x3d\xe3\x2a"
++			  "\x7a\xef\x87\x63\x26\x1e\x49\xad"
++			  "\xb6\xe2\x29\x3e\xc8\xe7\xc6\x1e"
++			  "\x8d\xe6\x17\x01\xfc\x63\xe1\x23",
++	},
++};
++
++#define HMAC_SHA3_384_TEST_VECTORS	4
++
++static struct hash_testvec hmac_sha3_384_tv_template[] = {
++	{
++		.key	= "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
++			  "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
++			  "\x0b\x0b\x0b\x0b",
++		.ksize	= 20,
++		.plaintext = "Hi There",
++		.psize	= 8,
++		.digest	= "\x68\xd2\xdc\xf7\xfd\x4d\xdd\x0a"
++			  "\x22\x40\xc8\xa4\x37\x30\x5f\x61"
++			  "\xfb\x73\x34\xcf\xb5\xd0\x22\x6e"
++			  "\x1b\xc2\x7d\xc1\x0a\x2e\x72\x3a"
++			  "\x20\xd3\x70\xb4\x77\x43\x13\x0e"
++			  "\x26\xac\x7e\x3d\x53\x28\x86\xbd",
++	}, {
++		.key	= "Jefe",
++		.ksize	= 4,
++		.plaintext = "what do ya want for nothing?",
++		.psize	= 28,
++		.digest	= "\xf1\x10\x1f\x8c\xbf\x97\x66\xfd"
++			  "\x67\x64\xd2\xed\x61\x90\x3f\x21"
++			  "\xca\x9b\x18\xf5\x7c\xf3\xe1\xa2"
++			  "\x3c\xa1\x35\x08\xa9\x32\x43\xce"
++			  "\x48\xc0\x45\xdc\x00\x7f\x26\xa2"
++			  "\x1b\x3f\x5e\x0e\x9d\xf4\xc2\x0a",
++		.np	= 4,
++		.tap	= { 7, 7, 7, 7 }
++	}, {
++		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa",
++		.ksize	= 131,
++		.plaintext = "Test Using Large"
++			   "r Than Block-Siz"
++			   "e Key - Hash Key"
++			   " First",
++		.psize	= 54,
++		.digest = "\x0f\xc1\x95\x13\xbf\x6b\xd8\x78"
++			  "\x03\x70\x16\x70\x6a\x0e\x57\xbc"
++			  "\x52\x81\x39\x83\x6b\x9a\x42\xc3"
++			  "\xd4\x19\xe4\x98\xe0\xe1\xfb\x96"
++			  "\x16\xfd\x66\x91\x38\xd3\x3a\x11"
++			  "\x05\xe0\x7c\x72\xb6\x95\x3b\xcc",
++	}, {
++		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa",
++		.ksize	= 131,
++		.plaintext =
++			  "This is a test u"
++			  "sing a larger th"
++			  "an block-size ke"
++			  "y and a larger t"
++			  "han block-size d"
++			  "ata. The key nee"
++			  "ds to be hashed "
++			  "before being use"
++			  "d by the HMAC al"
++			  "gorithm.",
++		.psize	= 152,
++		.digest	= "\x02\x6f\xdf\x6b\x50\x74\x1e\x37"
++			  "\x38\x99\xc9\xf7\xd5\x40\x6d\x4e"
++			  "\xb0\x9f\xc6\x66\x56\x36\xfc\x1a"
++			  "\x53\x00\x29\xdd\xf5\xcf\x3c\xa5"
++			  "\xa9\x00\xed\xce\x01\xf5\xf6\x1e"
++			  "\x2f\x40\x8c\xdf\x2f\xd3\xe7\xe8",
++	},
++};
++
++#define HMAC_SHA3_512_TEST_VECTORS	4
++
++static struct hash_testvec hmac_sha3_512_tv_template[] = {
++	{
++		.key	= "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
++			  "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
++			  "\x0b\x0b\x0b\x0b",
++		.ksize	= 20,
++		.plaintext = "Hi There",
++		.psize	= 8,
++		.digest	= "\xeb\x3f\xbd\x4b\x2e\xaa\xb8\xf5"
++			  "\xc5\x04\xbd\x3a\x41\x46\x5a\xac"
++			  "\xec\x15\x77\x0a\x7c\xab\xac\x53"
++			  "\x1e\x48\x2f\x86\x0b\x5e\xc7\xba"
++			  "\x47\xcc\xb2\xc6\xf2\xaf\xce\x8f"
++			  "\x88\xd2\x2b\x6d\xc6\x13\x80\xf2"
++			  "\x3a\x66\x8f\xd3\x88\x8b\xb8\x05"
++			  "\x37\xc0\xa0\xb8\x64\x07\x68\x9e",
++	}, {
++		.key	= "Jefe",
++		.ksize	= 4,
++		.plaintext = "what do ya want for nothing?",
++		.psize	= 28,
++		.digest	= "\x5a\x4b\xfe\xab\x61\x66\x42\x7c"
++			  "\x7a\x36\x47\xb7\x47\x29\x2b\x83"
++			  "\x84\x53\x7c\xdb\x89\xaf\xb3\xbf"
++			  "\x56\x65\xe4\xc5\xe7\x09\x35\x0b"
++			  "\x28\x7b\xae\xc9\x21\xfd\x7c\xa0"
++			  "\xee\x7a\x0c\x31\xd0\x22\xa9\x5e"
++			  "\x1f\xc9\x2b\xa9\xd7\x7d\xf8\x83"
++			  "\x96\x02\x75\xbe\xb4\xe6\x20\x24",
++		.np	= 4,
++		.tap	= { 7, 7, 7, 7 }
++	}, {
++		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa",
++		.ksize	= 131,
++		.plaintext = "Test Using Large"
++			   "r Than Block-Siz"
++			   "e Key - Hash Key"
++			   " First",
++		.psize	= 54,
++		.digest = "\x00\xf7\x51\xa9\xe5\x06\x95\xb0"
++			  "\x90\xed\x69\x11\xa4\xb6\x55\x24"
++			  "\x95\x1c\xdc\x15\xa7\x3a\x5d\x58"
++			  "\xbb\x55\x21\x5e\xa2\xcd\x83\x9a"
++			  "\xc7\x9d\x2b\x44\xa3\x9b\xaf\xab"
++			  "\x27\xe8\x3f\xde\x9e\x11\xf6\x34"
++			  "\x0b\x11\xd9\x91\xb1\xb9\x1b\xf2"
++			  "\xee\xe7\xfc\x87\x24\x26\xc3\xa4",
++	}, {
++		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xaa\xaa\xaa",
++		.ksize	= 131,
++		.plaintext =
++			  "This is a test u"
++			  "sing a larger th"
++			  "an block-size ke"
++			  "y and a larger t"
++			  "han block-size d"
++			  "ata. The key nee"
++			  "ds to be hashed "
++			  "before being use"
++			  "d by the HMAC al"
++			  "gorithm.",
++		.psize	= 152,
++		.digest	= "\x38\xa4\x56\xa0\x04\xbd\x10\xd3"
++			  "\x2c\x9a\xb8\x33\x66\x84\x11\x28"
++			  "\x62\xc3\xdb\x61\xad\xcc\xa3\x18"
++			  "\x29\x35\x5e\xaf\x46\xfd\x5c\x73"
++			  "\xd0\x6a\x1f\x0d\x13\xfe\xc9\xa6"
++			  "\x52\xfb\x38\x11\xb5\x77\xb1\xb1"
++			  "\xd1\xb9\x78\x9f\x97\xae\x5b\x83"
++			  "\xc6\xf4\x4d\xfc\xf1\xd6\x7e\xba",
++	},
++};
++
+ /*
+  * Poly1305 test vectors from RFC7539 A.3.
+  */
+-- 
+1.9.1
