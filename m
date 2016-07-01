@@ -1,90 +1,175 @@
 From: kbuild test robot <fengguang.wu@intel.com>
-Subject: [cryptodev:master 116/131] drivers/crypto/qce/ablkcipher.c:229:1:
- warning: 'qce_ablkcipher_crypt' uses dynamic stack allocation
-Date: Sat, 2 Jul 2016 07:35:57 +0800
-Message-ID: <201607020754.QPdw4PKc%fengguang.wu@intel.com>
+Subject: [cryptodev:master 118/131] arch/s390/crypto/aes_s390.c:271:1:
+ warning: 'fallback_blk_dec' uses dynamic stack allocation
+Date: Sat, 2 Jul 2016 07:50:40 +0800
+Message-ID: <201607020735.XSymZkwu%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="6TrnltStXW4iwmi0"
+Content-Type: multipart/mixed; boundary="2oS5YaxWCcQjTEyO"
 Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
 To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:32571 "EHLO mga09.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:60975 "EHLO mga03.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752296AbcGAXgf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 1 Jul 2016 19:36:35 -0400
+	id S1752457AbcGAXwG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 1 Jul 2016 19:52:06 -0400
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
---6TrnltStXW4iwmi0
+--2oS5YaxWCcQjTEyO
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
 head:   98eca72fa04a9bbf28dba95efaec5aa95588fe23
-commit: 2d20ce070d3b78f0974408ef648223967d0efb0a [116/131] crypto: qce - Use skcipher for fallback
+commit: 64e26807bb93b4accaa395d98e118ab893cac074 [118/131] crypto: s390/aes - Use skcipher for fallback
 config: s390-allyesconfig (attached as .config)
 compiler: s390x-linux-gnu-gcc (Debian 5.3.1-8) 5.3.1 20160205
 reproduce:
         wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        git checkout 2d20ce070d3b78f0974408ef648223967d0efb0a
+        git checkout 64e26807bb93b4accaa395d98e118ab893cac074
         # save the attached .config to linux build tree
         make.cross ARCH=s390 
 
 All warnings (new ones prefixed by >>):
 
-   drivers/crypto/qce/ablkcipher.c: In function 'qce_ablkcipher_crypt':
->> drivers/crypto/qce/ablkcipher.c:229:1: warning: 'qce_ablkcipher_crypt' uses dynamic stack allocation
+   arch/s390/crypto/aes_s390.c: In function 'fallback_blk_dec':
+>> arch/s390/crypto/aes_s390.c:271:1: warning: 'fallback_blk_dec' uses dynamic stack allocation
+    }
+    ^
+   arch/s390/crypto/aes_s390.c: In function 'ecb_aes_encrypt':
+>> arch/s390/crypto/aes_s390.c:355:1: warning: 'ecb_aes_encrypt' uses dynamic stack allocation
+    }
+    ^
+   arch/s390/crypto/aes_s390.c: In function 'cbc_aes_encrypt':
+>> arch/s390/crypto/aes_s390.c:496:1: warning: 'cbc_aes_encrypt' uses dynamic stack allocation
+    }
+    ^
+   arch/s390/crypto/aes_s390.c: In function 'xts_aes_decrypt':
+>> arch/s390/crypto/aes_s390.c:703:1: warning: 'xts_aes_decrypt' uses dynamic stack allocation
+    }
+    ^
+   arch/s390/crypto/aes_s390.c: In function 'xts_aes_encrypt':
+>> arch/s390/crypto/aes_s390.c:689:1: warning: 'xts_aes_encrypt' uses dynamic stack allocation
     }
     ^
 
-vim +/qce_ablkcipher_crypt +229 drivers/crypto/qce/ablkcipher.c
+vim +/fallback_blk_dec +271 arch/s390/crypto/aes_s390.c
 
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  213  	if (IS_AES(rctx->flags) && ctx->enc_keylen != AES_KEYSIZE_128 &&
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  214  	    ctx->enc_keylen != AES_KEYSIZE_256) {
-2d20ce070 Herbert Xu        2016-06-29  215  		SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
-2d20ce070 Herbert Xu        2016-06-29  216  
-2d20ce070 Herbert Xu        2016-06-29  217  		skcipher_request_set_tfm(subreq, ctx->fallback);
-2d20ce070 Herbert Xu        2016-06-29  218  		skcipher_request_set_callback(subreq, req->base.flags,
-2d20ce070 Herbert Xu        2016-06-29  219  					      NULL, NULL);
-2d20ce070 Herbert Xu        2016-06-29  220  		skcipher_request_set_crypt(subreq, req->src, req->dst,
-2d20ce070 Herbert Xu        2016-06-29  221  					   req->nbytes, req->info);
-2d20ce070 Herbert Xu        2016-06-29  222  		ret = encrypt ? crypto_skcipher_encrypt(subreq) :
-2d20ce070 Herbert Xu        2016-06-29  223  				crypto_skcipher_decrypt(subreq);
-2d20ce070 Herbert Xu        2016-06-29  224  		skcipher_request_zero(subreq);
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  225  		return ret;
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  226  	}
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  227  
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  228  	return tmpl->qce->async_req_enqueue(tmpl->qce, &req->base);
-ec8f5d8f6 Stanimir Varbanov 2014-06-25 @229  }
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  230  
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  231  static int qce_ablkcipher_encrypt(struct ablkcipher_request *req)
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  232  {
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  233  	return qce_ablkcipher_crypt(req, 1);
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  234  }
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  235  
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  236  static int qce_ablkcipher_decrypt(struct ablkcipher_request *req)
-ec8f5d8f6 Stanimir Varbanov 2014-06-25  237  {
+64e26807 Herbert Xu         2016-06-29  265  	skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
+b0c3e75d Sebastian Siewior  2007-12-01  266  
+64e26807 Herbert Xu         2016-06-29  267  	ret = crypto_skcipher_decrypt(req);
+b0c3e75d Sebastian Siewior  2007-12-01  268  
+64e26807 Herbert Xu         2016-06-29  269  	skcipher_request_zero(req);
+b0c3e75d Sebastian Siewior  2007-12-01  270  	return ret;
+b0c3e75d Sebastian Siewior  2007-12-01 @271  }
+b0c3e75d Sebastian Siewior  2007-12-01  272  
+b0c3e75d Sebastian Siewior  2007-12-01  273  static int fallback_blk_enc(struct blkcipher_desc *desc,
+b0c3e75d Sebastian Siewior  2007-12-01  274  		struct scatterlist *dst, struct scatterlist *src,
+b0c3e75d Sebastian Siewior  2007-12-01  275  		unsigned int nbytes)
+b0c3e75d Sebastian Siewior  2007-12-01  276  {
+b0c3e75d Sebastian Siewior  2007-12-01  277  	unsigned int ret;
+64e26807 Herbert Xu         2016-06-29  278  	struct crypto_blkcipher *tfm = desc->tfm;
+64e26807 Herbert Xu         2016-06-29  279  	struct s390_aes_ctx *sctx = crypto_blkcipher_ctx(tfm);
+64e26807 Herbert Xu         2016-06-29  280  	SKCIPHER_REQUEST_ON_STACK(req, sctx->fallback.blk);
+b0c3e75d Sebastian Siewior  2007-12-01  281  
+64e26807 Herbert Xu         2016-06-29  282  	skcipher_request_set_tfm(req, sctx->fallback.blk);
+64e26807 Herbert Xu         2016-06-29  283  	skcipher_request_set_callback(req, desc->flags, NULL, NULL);
+64e26807 Herbert Xu         2016-06-29  284  	skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
+b0c3e75d Sebastian Siewior  2007-12-01  285  
+64e26807 Herbert Xu         2016-06-29  286  	ret = crypto_skcipher_encrypt(req);
+b0c3e75d Sebastian Siewior  2007-12-01  287  	return ret;
+b0c3e75d Sebastian Siewior  2007-12-01  288  }
+b0c3e75d Sebastian Siewior  2007-12-01  289  
+a9e62fad Herbert Xu         2006-08-21  290  static int ecb_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+a9e62fad Herbert Xu         2006-08-21  291  			   unsigned int key_len)
+a9e62fad Herbert Xu         2006-08-21  292  {
+a9e62fad Herbert Xu         2006-08-21  293  	struct s390_aes_ctx *sctx = crypto_tfm_ctx(tfm);
+b0c3e75d Sebastian Siewior  2007-12-01  294  	int ret;
+b0c3e75d Sebastian Siewior  2007-12-01  295  
+b0c3e75d Sebastian Siewior  2007-12-01  296  	ret = need_fallback(key_len);
+b0c3e75d Sebastian Siewior  2007-12-01  297  	if (ret > 0) {
+b0c3e75d Sebastian Siewior  2007-12-01  298  		sctx->key_len = key_len;
+b0c3e75d Sebastian Siewior  2007-12-01  299  		return setkey_fallback_blk(tfm, in_key, key_len);
+b0c3e75d Sebastian Siewior  2007-12-01  300  	}
+a9e62fad Herbert Xu         2006-08-21  301  
+a9e62fad Herbert Xu         2006-08-21  302  	switch (key_len) {
+a9e62fad Herbert Xu         2006-08-21  303  	case 16:
+c7d4d259 Martin Schwidefsky 2016-03-17  304  		sctx->enc = CPACF_KM_AES_128_ENC;
+c7d4d259 Martin Schwidefsky 2016-03-17  305  		sctx->dec = CPACF_KM_AES_128_DEC;
+a9e62fad Herbert Xu         2006-08-21  306  		break;
+a9e62fad Herbert Xu         2006-08-21  307  	case 24:
+c7d4d259 Martin Schwidefsky 2016-03-17  308  		sctx->enc = CPACF_KM_AES_192_ENC;
+c7d4d259 Martin Schwidefsky 2016-03-17  309  		sctx->dec = CPACF_KM_AES_192_DEC;
+a9e62fad Herbert Xu         2006-08-21  310  		break;
+a9e62fad Herbert Xu         2006-08-21  311  	case 32:
+c7d4d259 Martin Schwidefsky 2016-03-17  312  		sctx->enc = CPACF_KM_AES_256_ENC;
+c7d4d259 Martin Schwidefsky 2016-03-17  313  		sctx->dec = CPACF_KM_AES_256_DEC;
+a9e62fad Herbert Xu         2006-08-21  314  		break;
+a9e62fad Herbert Xu         2006-08-21  315  	}
+a9e62fad Herbert Xu         2006-08-21  316  
+a9e62fad Herbert Xu         2006-08-21  317  	return aes_set_key(tfm, in_key, key_len);
+a9e62fad Herbert Xu         2006-08-21  318  }
+a9e62fad Herbert Xu         2006-08-21  319  
+a9e62fad Herbert Xu         2006-08-21  320  static int ecb_aes_crypt(struct blkcipher_desc *desc, long func, void *param,
+a9e62fad Herbert Xu         2006-08-21  321  			 struct blkcipher_walk *walk)
+a9e62fad Herbert Xu         2006-08-21  322  {
+a9e62fad Herbert Xu         2006-08-21  323  	int ret = blkcipher_walk_virt(desc, walk);
+a9e62fad Herbert Xu         2006-08-21  324  	unsigned int nbytes;
+a9e62fad Herbert Xu         2006-08-21  325  
+a9e62fad Herbert Xu         2006-08-21  326  	while ((nbytes = walk->nbytes)) {
+a9e62fad Herbert Xu         2006-08-21  327  		/* only use complete blocks */
+a9e62fad Herbert Xu         2006-08-21  328  		unsigned int n = nbytes & ~(AES_BLOCK_SIZE - 1);
+a9e62fad Herbert Xu         2006-08-21  329  		u8 *out = walk->dst.virt.addr;
+a9e62fad Herbert Xu         2006-08-21  330  		u8 *in = walk->src.virt.addr;
+a9e62fad Herbert Xu         2006-08-21  331  
+c7d4d259 Martin Schwidefsky 2016-03-17  332  		ret = cpacf_km(func, param, out, in, n);
+36eb2caa Jan Glauber        2012-10-26  333  		if (ret < 0 || ret != n)
+36eb2caa Jan Glauber        2012-10-26  334  			return -EIO;
+a9e62fad Herbert Xu         2006-08-21  335  
+a9e62fad Herbert Xu         2006-08-21  336  		nbytes &= AES_BLOCK_SIZE - 1;
+a9e62fad Herbert Xu         2006-08-21  337  		ret = blkcipher_walk_done(desc, walk, nbytes);
+a9e62fad Herbert Xu         2006-08-21  338  	}
+a9e62fad Herbert Xu         2006-08-21  339  
+a9e62fad Herbert Xu         2006-08-21  340  	return ret;
+a9e62fad Herbert Xu         2006-08-21  341  }
+a9e62fad Herbert Xu         2006-08-21  342  
+a9e62fad Herbert Xu         2006-08-21  343  static int ecb_aes_encrypt(struct blkcipher_desc *desc,
+a9e62fad Herbert Xu         2006-08-21  344  			   struct scatterlist *dst, struct scatterlist *src,
+a9e62fad Herbert Xu         2006-08-21  345  			   unsigned int nbytes)
+a9e62fad Herbert Xu         2006-08-21  346  {
+a9e62fad Herbert Xu         2006-08-21  347  	struct s390_aes_ctx *sctx = crypto_blkcipher_ctx(desc->tfm);
+a9e62fad Herbert Xu         2006-08-21  348  	struct blkcipher_walk walk;
+a9e62fad Herbert Xu         2006-08-21  349  
+b0c3e75d Sebastian Siewior  2007-12-01  350  	if (unlikely(need_fallback(sctx->key_len)))
+b0c3e75d Sebastian Siewior  2007-12-01  351  		return fallback_blk_enc(desc, dst, src, nbytes);
+b0c3e75d Sebastian Siewior  2007-12-01  352  
+a9e62fad Herbert Xu         2006-08-21  353  	blkcipher_walk_init(&walk, dst, src, nbytes);
+a9e62fad Herbert Xu         2006-08-21  354  	return ecb_aes_crypt(desc, sctx->enc, sctx->key, &walk);
+a9e62fad Herbert Xu         2006-08-21 @355  }
+a9e62fad Herbert Xu         2006-08-21  356  
+a9e62fad Herbert Xu         2006-08-21  357  static int ecb_aes_decrypt(struct blkcipher_desc *desc,
+a9e62fad Herbert Xu         2006-08-21  358  			   struct scatterlist *dst, struct scatterlist *src,
 
-:::::: The code at line 229 was first introduced by commit
-:::::: ec8f5d8f6f76b939f662d6e83041abecabef0a34 crypto: qce - Qualcomm crypto engine driver
+:::::: The code at line 271 was first introduced by commit
+:::::: b0c3e75d857f3785a4b274e26b1c0b2327580dda [CRYPTO] aes_s390: Add fallback driver
 
-:::::: TO: Stanimir Varbanov <svarbanov@mm-sol.com>
+:::::: TO: Sebastian Siewior <sebastian@breakpoint.cc>
 :::::: CC: Herbert Xu <herbert@gondor.apana.org.au>
 
 ---
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---6TrnltStXW4iwmi0
+--2oS5YaxWCcQjTEyO
 Content-Type: application/octet-stream
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICOX9dlcAAy5jb25maWcAlFxLd+O4jt73r/CpnsXM4nbl1e6umZMFJVE2ryVRJVJ2ko1O
+H4sICFEBd1cAAy5jb25maWcAlFxLd+O4jt73r/CpnsXM4nbl1e6umZMFJVE2ryVRJVJ2ko1O
 KuWqzrmpuCZx+nb/+wGoF/iQXNOLrggfSIEgCAIg5Z9/+nnB3o6Hb/fHx4f7p6e/F1/3z/uX
 ++P+8+LL49P+fxaJXBRSL3gi9C/AnD0+v/31/vXyw9ni6pfffjn7x8vD+WKzf3nePy3iw/OX
 x69v0Prx8PzTzz/FskjFqsnz+vrv/uFOFrxJcjZS4rJuIviXF4lgxUjPZLxJeNmouixlpUdA
@@ -859,4 +944,4 @@ frmVASSshrCipvwR8cMgU0oi3eQGvK9L0BdYsJ6Ral1h6HMIDnbnREdF0vapKDvc4wxTjuNs
 xBNPXsA6oerHvoIFTFwYStdmFXfUmX6d1m0HpBsRRoC1DJZgm7ELpfOrhReDG+f/Ay0YGYUM
 nAIA
 
---6TrnltStXW4iwmi0--
+--2oS5YaxWCcQjTEyO--
