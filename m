@@ -1,55 +1,109 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: qat - Switch to new rsa_helper functions
-Date: Fri, 1 Jul 2016 18:08:50 +0800
-Message-ID: <20160701100850.GA13758@gondor.apana.org.au>
-References: <1467305947-4666-1-git-send-email-salvatore.benedetto@intel.com>
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [patch] crypto: sha256-mb - cleanup a || vs | typo
+Date: Fri, 1 Jul 2016 12:13:30 +0200
+Message-ID: <20160701101329.GA3833@gmail.com>
+References: <20160629144242.GE22818@mwanda>
+ <8538242a-eab7-127e-e47e-26027fee4f6d@zytor.com>
+ <1467319339.22178.256.camel@linux.intel.com>
+ <20160701075559.GA11902@gmail.com>
+ <20160701092806.GA13424@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Tim Chen <tim.c.chen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Dan Carpenter <dan.carpenter@oracle.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+	Megha Dey <megha.dey@intel.com>,
+	"Wang, Rui Y" <rui.y.wang@intel.com>,
+	Denys Vlasenko <dvlasenk@redhat.com>,
+	Xiaodong Liu <xiaodong.liu@intel.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Peter Zijlstra <a.p.zijlstra@chello.nl>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52551 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752151AbcGAKJE (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:36171 "EHLO
+	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752065AbcGALMC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 1 Jul 2016 06:09:04 -0400
+	Fri, 1 Jul 2016 07:12:02 -0400
 Content-Disposition: inline
-In-Reply-To: <1467305947-4666-1-git-send-email-salvatore.benedetto@intel.com>
+In-Reply-To: <20160701092806.GA13424@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 30, 2016 at 05:59:07PM +0100, Salvatore Benedetto wrote:
-> Drop all asn1 related code in qat and use the new rsa_helper
-> functions rsa_parse_[pub|priv]_key for parsing the key
-> 
-> Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
-> ---
->  crypto/testmgr.c                                  |  1 +
->  drivers/crypto/qat/Kconfig                        |  2 +-
->  drivers/crypto/qat/qat_common/Makefile            | 10 -----
->  drivers/crypto/qat/qat_common/qat_asym_algs.c     | 49 +++++++++--------------
->  drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1 | 11 -----
->  drivers/crypto/qat/qat_common/qat_rsapubkey.asn1  |  4 --
->  6 files changed, 22 insertions(+), 55 deletions(-)
->  delete mode 100644 drivers/crypto/qat/qat_common/qat_rsaprivkey.asn1
->  delete mode 100644 drivers/crypto/qat/qat_common/qat_rsapubkey.asn1
-> 
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index 537fdc3..b52a81c 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -1941,6 +1941,7 @@ static int do_test_rsa(struct crypto_akcipher *tfm,
->  	if (err)
->  		goto free_req;
->  
-> +	err = -ENOMEM;
->  	out_len_max = crypto_akcipher_maxsize(tfm);
->  	outbuf_enc = kzalloc(out_len_max, GFP_KERNEL);
->  	if (!outbuf_enc)
 
-This should go into a separate patch.  Please also rebase it on
-my RSA patch series and do_test_rsa no longer exists.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+* Herbert Xu <herbert@gondor.apana.org.au> wrote:
+
+> On Fri, Jul 01, 2016 at 09:55:59AM +0200, Ingo Molnar wrote:
+> >
+> > Plus:
+> >=20
+> > > > > =A0		/* Compute how many bytes to copy from user buffer into
+> > > > > =A0		=A0* extra block
+> > > > > =A0		=A0*/
+> >=20
+> > please use the customary (multi-line) comment style:
+>=20
+> This is the customary comment style of the networking stack and
+> the crypto API.  So please don't change it.
+
+Guys, do you even read your own code??
+
+That 'standard' is not being enforced consistently at all. Even in this=
+ very=20
+series there's an example of that weird comment not being followed:
+
++++ b/arch/x86/crypto/sha1-mb/sha1_mb.c
+@@ -304,7 +304,7 @@ static struct sha1_hash_ctx *sha1_ctx_mgr_submit(st=
+ruct sha1_ctx_mgr *mgr,
+                /*
+                 * Compute how many bytes to copy from user buffer into
+                 * extra block
+
+See how this comment block uses the standard coding style, while the ne=
+xt patch=20
+has this weird coding style:
+
+-       if ((ctx->partial_block_buffer_length) | (len < SHA256_BLOCK_SI=
+ZE)) {
++       if ((ctx->partial_block_buffer_length) || (len < SHA256_BLOCK_S=
+IZE)) {
+                /* Compute how many bytes to copy from user buffer into
+                 * extra block
+                 */
+
+The networking code's "exceptionalism" regarding the standard comment s=
+tyle is=20
+super distracting and in this particular example it resulted in:
+
+ - inconsistent comment styles next to each other,
+ - the questionable '|' pattern hiding right next to:
+ - pointless parantheses around the (ctx->partial_block_buffer_length),
+ - which field name is also a misnomer.
+
+So anyone doing security review of that weird '|' pattern first has to =
+figure out=20
+whether the 4 ugly code patterns amount to a security problem or not...
+
+One thing that is more harmful that any of the coding styles: the incon=
+sistent=20
+coding style used by this code.
+
+Btw., as a historic reference, there is nothing sacred about the 'netwo=
+rking=20
+comments coding style': I was there (way too many years ago) when that =
+comment=20
+style was introduced by Alan Cox's first TCP/IP code drop, and it was l=
+ittle more=20
+than just a random inconsistency that people are now treating as gospel=
+=2E..
+
+Thanks,
+
+	Ingo
