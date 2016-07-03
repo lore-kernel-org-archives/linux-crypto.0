@@ -1,41 +1,36 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [v4 PATCH 0/8] crypto: rsa - Do not gratuitously drop leading zeroes
-Date: Sun, 03 Jul 2016 07:57:23 +0200
-Message-ID: <22585426.Z0tGqdKB0k@positron.chronox.de>
-References: <20160622101432.GA30454@gondor.apana.org.au> <1997039.xp5G17Zq2C@positron.chronox.de> <20160703024611.GA24340@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [v9 PATCH] crypto: caam - add support for RSA algorithm
+Date: Sun, 3 Jul 2016 15:43:58 +0800
+Message-ID: <20160703074358.GA25820@gondor.apana.org.au>
+References: <1467387085-12212-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
-	Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	Denis Kenzior <denkenz@gmail.com>,
-	Salvatore Benedetto <salvatore.benedetto@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, horia.geanta@nxp.com
+To: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:38634 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750798AbcGCF5d (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 3 Jul 2016 01:57:33 -0400
-In-Reply-To: <20160703024611.GA24340@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:45680 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750849AbcGCHoE (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 3 Jul 2016 03:44:04 -0400
+Content-Disposition: inline
+In-Reply-To: <1467387085-12212-1-git-send-email-tudor-dan.ambarus@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Sonntag, 3. Juli 2016, 10:46:11 CEST schrieb Herbert Xu:
+On Fri, Jul 01, 2016 at 06:31:25PM +0300, Tudor Ambarus wrote:
+> Add RSA support to caam driver.
+> 
+> Initial author is Yashpal Dutta <yashpal.dutta@freescale.com>.
+> 
+> Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 
-Hi Herbert,
+Sorry, but this doesn't build:
 
-> On Sat, Jul 02, 2016 at 07:55:59PM +0200, Stephan Mueller wrote:
-> > I re-tested that patch set and I still see the same issues as before,
-> > namely
-> > that sigver does not work:
-> Oops, somehow I conflated this problem with KPP.  Does this patch
-> fix it for you?
-
-Yes, that patch fixes the module signature check issue and the CAVS test shows 
-a pass as well.
-
-Ciao
-Stephan
+  CC [M]  drivers/crypto/caam/caampkc.o
+../drivers/crypto/caam/caampkc.c:17:28: fatal error: rsapubkey-asn1.h: No such file or directory
+compilation terminated.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
