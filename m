@@ -1,41 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] Crypto:Add HMAC-SHA3 test modes and test vectors
-Date: Sun, 3 Jul 2016 10:47:50 +0800
-Message-ID: <20160703024750.GB24581@gondor.apana.org.au>
-References: <1467352014-6929-1-git-send-email-raveendra.padasalagi@broadcom.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [v4 PATCH 0/8] crypto: rsa - Do not gratuitously drop leading zeroes
+Date: Sun, 03 Jul 2016 07:57:23 +0200
+Message-ID: <22585426.Z0tGqdKB0k@positron.chronox.de>
+References: <20160622101432.GA30454@gondor.apana.org.au> <1997039.xp5G17Zq2C@positron.chronox.de> <20160703024611.GA24340@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jeff Garzik <jeff@garzik.org>,
-	Jon Mason <jonmason@broadcom.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Anup Patel <anup.patel@broadcom.com>,
-	Ray Jui <rjui@broadcom.com>,
-	Scott Branden <sbranden@broadcom.com>,
-	Pramod Kumar <pramod.kumar@broadcom.com>,
-	bcm-kernel-feedback-list@broadcom.com
-To: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Andrzej Zaborowski <andrew.zaborowski@intel.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
+	Mat Martineau <mathew.j.martineau@linux.intel.com>,
+	Denis Kenzior <denkenz@gmail.com>,
+	Salvatore Benedetto <salvatore.benedetto@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:40205 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752658AbcGCCr6 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 2 Jul 2016 22:47:58 -0400
-Content-Disposition: inline
-In-Reply-To: <1467352014-6929-1-git-send-email-raveendra.padasalagi@broadcom.com>
+Received: from mail.eperm.de ([89.247.134.16]:38634 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750798AbcGCF5d (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 3 Jul 2016 01:57:33 -0400
+In-Reply-To: <20160703024611.GA24340@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 01, 2016 at 11:16:54AM +0530, Raveendra Padasalagi wrote:
-> This patch adds HMAC-SHA3 test modes in tcrypt module
-> and related test vectors.
-> 
-> Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+Am Sonntag, 3. Juli 2016, 10:46:11 CEST schrieb Herbert Xu:
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hi Herbert,
+
+> On Sat, Jul 02, 2016 at 07:55:59PM +0200, Stephan Mueller wrote:
+> > I re-tested that patch set and I still see the same issues as before,
+> > namely
+> > that sigver does not work:
+> Oops, somehow I conflated this problem with KPP.  Does this patch
+> fix it for you?
+
+Yes, that patch fixes the module signature check issue and the CAVS test shows 
+a pass as well.
+
+Ciao
+Stephan
