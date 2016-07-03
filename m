@@ -1,30 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: omap-sham - increase cra_proirity to 400
-Date: Sun, 3 Jul 2016 10:47:30 +0800
-Message-ID: <20160703024730.GA24581@gondor.apana.org.au>
-References: <1467216696-8014-1-git-send-email-b-liu@ti.com>
+Subject: Re: [PATCH] Crypto:Add HMAC-SHA3 test modes and test vectors
+Date: Sun, 3 Jul 2016 10:47:50 +0800
+Message-ID: <20160703024750.GB24581@gondor.apana.org.au>
+References: <1467352014-6929-1-git-send-email-raveendra.padasalagi@broadcom.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Tero Kristo <t-kristo@ti.com>
-To: Bin Liu <b-liu@ti.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Stephan Mueller <smueller@chronox.de>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jeff Garzik <jeff@garzik.org>,
+	Jon Mason <jonmason@broadcom.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Anup Patel <anup.patel@broadcom.com>,
+	Ray Jui <rjui@broadcom.com>,
+	Scott Branden <sbranden@broadcom.com>,
+	Pramod Kumar <pramod.kumar@broadcom.com>,
+	bcm-kernel-feedback-list@broadcom.com
+To: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51706 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:40205 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751480AbcGCCrf (ORCPT
+	with ESMTP id S1752658AbcGCCr6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 2 Jul 2016 22:47:35 -0400
+	Sat, 2 Jul 2016 22:47:58 -0400
 Content-Disposition: inline
-In-Reply-To: <1467216696-8014-1-git-send-email-b-liu@ti.com>
+In-Reply-To: <1467352014-6929-1-git-send-email-raveendra.padasalagi@broadcom.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 29, 2016 at 11:11:36AM -0500, Bin Liu wrote:
-> Some software alg has cra_priority as higher as 300, so increase
-> omap-sham priority to 400 to ensure it is on top of any software alg.
+On Fri, Jul 01, 2016 at 11:16:54AM +0530, Raveendra Padasalagi wrote:
+> This patch adds HMAC-SHA3 test modes in tcrypt module
+> and related test vectors.
 > 
-> Signed-off-by: Bin Liu <b-liu@ti.com>
+> Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
 
 Patch applied.  Thanks.
 -- 
