@@ -1,63 +1,41 @@
-From: Amitoj Kaur Chawla <amitoj1606@gmail.com>
-Subject: [PATCH] crypto: bfin_crc: Simplify use of devm_ioremap_resource
-Date: Mon, 4 Jul 2016 18:30:21 +0530
-Message-ID: <20160704130021.GA16839@amitoj-Inspiron-3542>
+From: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
+Subject: RE: [v9 PATCH] crypto: caam - add support for RSA algorithm
+Date: Mon, 4 Jul 2016 08:43:29 +0000
+Message-ID: <AMSPR04MB53644E0E1B8E6C1412D6F11B8380@AMSPR04MB536.eurprd04.prod.outlook.com>
+References: <1467387085-12212-1-git-send-email-tudor-dan.ambarus@nxp.com>
+ <20160703074358.GA25820@gondor.apana.org.au>
+ <AMSPR04MB5360073EB4B1C100F155FCFB8380@AMSPR04MB536.eurprd04.prod.outlook.com>
+ <20160704083612.GA31386@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: julia.lawall@lip6.fr
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"Horia Ioan Geanta Neag" <horia.geanta@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f67.google.com ([209.85.220.67]:32911 "EHLO
-	mail-pa0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753614AbcGDNA0 (ORCPT
+Received: from mail-db5eur01on0066.outbound.protection.outlook.com ([104.47.2.66]:40658
+	"EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753025AbcGDNSQ convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Jul 2016 09:00:26 -0400
-Content-Disposition: inline
+	Mon, 4 Jul 2016 09:18:16 -0400
+In-Reply-To: <20160704083612.GA31386@gondor.apana.org.au>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Remove unneeded error handling on the result of a call to
-platform_get_resource when the value is passed to
-devm_ioremap_resource.
-
-The Coccinelle semantic patch that makes this change is as follows:
-
-// <smpl>
-@@
-expression pdev,res,n,e,e1;
-expression ret != 0;
-identifier l;
-@@
-
-- res = platform_get_resource(pdev, IORESOURCE_MEM, n);
-  ... when != res
-- if (res == NULL) { ... \(goto l;\|return ret;\) }
-  ... when != res
-+ res = platform_get_resource(pdev, IORESOURCE_MEM, n);
-  e = devm_ioremap_resource(e1, res);
-// </smpl>
-
-Signed-off-by: Amitoj Kaur Chawla <amitoj1606@gmail.com>
----
- drivers/crypto/bfin_crc.c | 5 -----
- 1 file changed, 5 deletions(-)
-
-diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
-index 95b7396..10db7df 100644
---- a/drivers/crypto/bfin_crc.c
-+++ b/drivers/crypto/bfin_crc.c
-@@ -588,11 +588,6 @@ static int bfin_crypto_crc_probe(struct platform_device *pdev)
- 	crypto_init_queue(&crc->queue, CRC_CCRYPTO_QUEUE_LENGTH);
  
- 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
--	if (res == NULL) {
--		dev_err(&pdev->dev, "Cannot get IORESOURCE_MEM\n");
--		return -ENOENT;
--	}
--
- 	crc->regs = devm_ioremap_resource(dev, res);
- 	if (IS_ERR((void *)crc->regs)) {
- 		dev_err(&pdev->dev, "Cannot map CRC IO\n");
--- 
-1.9.1
+> Perhaps you have a dirty tree that still has the asn header file
+> in the caam subdirectory?
+> 
+> I don't see how this can possibly work on a clean tree since you
+> got rid of all the ASN stuff from the caam driver.
+
+The tree looks good. I made 'make mrproper' and 'make clean' before
+building the image. I've double checked on other machine too.
+
+Maybe we use different .configs. Can you please try to reproduce
+the bug and indicate the .config used?
+
+Thanks,
+ta
