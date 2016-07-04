@@ -1,77 +1,52 @@
-From: Segher Boessenkool <segher@kernel.crashing.org>
-Subject: Re: [PATCH 2/2] crypto: powerpc: Add POWER8 optimised crc32c
-Date: Mon, 4 Jul 2016 00:57:44 -0500
-Message-ID: <20160704055744.GA31609@gate.crashing.org>
-References: <1467325185-21091-1-git-send-email-anton@ozlabs.org> <1467325185-21091-2-git-send-email-anton@ozlabs.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [v9 PATCH] crypto: caam - add support for RSA algorithm
+Date: Mon, 4 Jul 2016 16:36:12 +0800
+Message-ID: <20160704083612.GA31386@gondor.apana.org.au>
+References: <1467387085-12212-1-git-send-email-tudor-dan.ambarus@nxp.com>
+ <20160703074358.GA25820@gondor.apana.org.au>
+ <AMSPR04MB5360073EB4B1C100F155FCFB8380@AMSPR04MB536.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
-To: Anton Blanchard <anton@ozlabs.org>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Horia Ioan Geanta Neag <horia.geanta@nxp.com>
+To: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:45690 "EHLO gate.crashing.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751323AbcGDF6S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Jul 2016 01:58:18 -0400
+Received: from helcar.hengli.com.au ([209.40.204.226]:36367 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753270AbcGDIgQ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 4 Jul 2016 04:36:16 -0400
 Content-Disposition: inline
-In-Reply-To: <1467325185-21091-2-git-send-email-anton@ozlabs.org>
+In-Reply-To: <AMSPR04MB5360073EB4B1C100F155FCFB8380@AMSPR04MB536.eurprd04.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Anton,
+On Mon, Jul 04, 2016 at 08:32:44AM +0000, Tudor-Dan Ambarus wrote:
+> Hi Herbert,
+> 
+> > Sorry, but this doesn't build:
+> > 
+> >   CC [M]  drivers/crypto/caam/caampkc.o
+> > ../drivers/crypto/caam/caampkc.c:17:28: fatal error: rsapubkey-asn1.h: No
+> > such file or directory
+> > compilation terminated.
+> 
+> I can't reproduce it. I tried on powerpc, arm and x86 (even if caam is not
+> present for x86). I've successfully built caampkc as built-in or
+> as a module for powerpc and arm.
+> 
+> I use git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+> on latest master branch (27710b8ea3defcbd7d340dbd0423d911b4eb7c4f)
+> with my commit on top of it.
 
-On Fri, Jul 01, 2016 at 08:19:45AM +1000, Anton Blanchard wrote:
-> +#ifdef BYTESWAP_DATA
-> +	addis	r3,r2,.byteswap_constant@toc@ha
-> +	addi	r3,r3,.byteswap_constant@toc@l
-> +
-> +	lvx	byteswap,0,r3
-> +	addi	r3,r3,16
-> +#endif
+Perhaps you have a dirty tree that still has the asn header file
+in the caam subdirectory?
 
-You already have r0=0, so you can just do
+I don't see how this can possibly work on a clean tree since you
+got rid of all the ASN stuff from the caam driver.
 
-	lvsr byteswap,0,r0
-	vnot byteswap,byteswap
-
-(the top bits of the permute vector bytes aren't used after all).
-
-Or if you find that distasteful,
-
-	lvsl byteswap,0,r0
-	vspltisb v0,15
-	vxor byteswap,byteswap,v0
-
-Btw, the value in r3 isn't used after this, that last addi is useless?
-
-> +	/*
-> +	 * The reflected version of Barrett reduction. Instead of bit
-> +	 * reflecting our data (which is expensive to do), we bit reflect our
-> +	 * constants and our algorithm, which means the intermediate data in
-> +	 * our vector registers goes from 0-63 instead of 63-0. We can reflect
-> +	 * the algorithm because we don't carry in mod 2 arithmetic.
-> +	 */
-
-Expensive?  Ha!
-
-	vgbbd v0,v0
-	vperm v0,v0,v0,byteswap
-	vgbbd v0,v0
-	vperm v0,v0,v0,byteswap
-	vsldoi v0,v0,v0,8
-
-(or fold these last two together, needs another constant though).
-
-> +	lvx	v0,0,r4
-> +	lvx	v16,0,r3
-> +	VPERM(v0,v0,v16,byteswap)
-> +	vxor	v0,v0,v8	/* xor in initial value */
-> +	VPMSUMW(v0,v0,v16)
-> +	bdz	.Lv0
-
-That VPERM looks strange...  You probably want v0 instead of v16.  Not
-that it matters here.
-
-
-Segher
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
