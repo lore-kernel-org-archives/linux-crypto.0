@@ -1,53 +1,35 @@
-From: Cristian Stoica <cristian.stoica@nxp.com>
-Subject: Re: [v9 PATCH] crypto: caam - add support for RSA algorithm
-Date: Mon, 4 Jul 2016 09:06:19 +0000
-Message-ID: <AM4PR0401MB1876BEAE53531C7CE64128D7E7380@AM4PR0401MB1876.eurprd04.prod.outlook.com>
-References: <1467387085-12212-1-git-send-email-tudor-dan.ambarus@nxp.com>
- <20160703074358.GA25820@gondor.apana.org.au>
- <AMSPR04MB5360073EB4B1C100F155FCFB8380@AMSPR04MB536.eurprd04.prod.outlook.com>
- <20160704083612.GA31386@gondor.apana.org.au>
- <AMSPR04MB53644E0E1B8E6C1412D6F11B8380@AMSPR04MB536.eurprd04.prod.outlook.com>,<20160704084606.GA31460@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Why null skcipher to copy AAD data?
+Date: Tue, 5 Jul 2016 13:03:56 +0800
+Message-ID: <20160705050355.GA5724@gondor.apana.org.au>
+References: <CAFXBA==GZRefGrLxjYtNbViPEyasdvbbHwJ4hS+swtVfSR=HQA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"Horia Ioan Geanta Neag" <horia.geanta@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Harsh Jain <harshjain.prof@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-db5eur01on0065.outbound.protection.outlook.com ([104.47.2.65]:61430
-	"EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750734AbcGDQjL convert rfc822-to-8bit (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:42898 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754204AbcGEFEA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Jul 2016 12:39:11 -0400
-In-Reply-To: <20160704084606.GA31460@gondor.apana.org.au>
-Content-Language: en-US
+	Tue, 5 Jul 2016 01:04:00 -0400
+Content-Disposition: inline
+In-Reply-To: <CAFXBA==GZRefGrLxjYtNbViPEyasdvbbHwJ4hS+swtVfSR=HQA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+Harsh Jain <harshjain.prof@gmail.com> wrote:
+> 
+> Why we need null skcipher to copy AAD from src to dst buffer. We can
+> do the same with some function,who can copy data from src sg list to
+> dst sg list.
 
-I've tried the following builds and both fail:
+Well first of all we don't have such a function, and even if
+you took the trouble of actually writing one would it really
+be that much faster than using the null skcipher?
 
-make mrproper
-make defconfig
-make drivers/crypto/qat/qat_common/qat_asym_algs.o
-....
-drivers/crypto/qat/qat_common/qat_asym_algs.c:55:32: fatal error: qat_rsapubkey-asn1.h: No such file or directory
- #include "qat_rsapubkey-asn1.h"
-
-
-make mrproper
-make defconfig
-make drivers/crypto/caam/caampkc.o
-...
-drivers/crypto/caam/caampkc.c:17:28: fatal error: rsapubkey-asn1.h: No such file or directory
- #include "rsapubkey-asn1.h"
-
-
-Is there an expectation of building these modules as described above without using make config or  make menuconfig to properly set the dependencies?
-
-Thanks for your time,
-
-Cristian S.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
