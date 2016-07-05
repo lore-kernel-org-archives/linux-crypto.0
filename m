@@ -1,29 +1,50 @@
-From: "flitkin13@gmail.com" <flitkin13@gmail.com>
-Subject: =?windows-1251?B?x+Tw4OLx8uLz6fLlISDC4PEg6O3y5fDl8fP+?=
-	=?windows-1251?B?8iDq6+jl7fLx6ujlIOHg5/sg5ODt7fv1PyDE?=
-	=?windows-1251?B?wCAtIM3F0iDv8Oj46+jy5SDt4CBlbWFpbDog?=
-	=?windows-1251?B?YWJ1cm92NTJAZ21haWwuY29tIFNreXBlOiBw?=
-	=?windows-1251?B?cm9kYXdlejM4OSDP8Oj46+XsIO/u5PDu4e3u?=
-	=?windows-1251?B?8fLoIQ==?=
-Date: Mon, 4 Jul 2016 19:16:08 +0600
-Message-ID: <0401B7E4EF3B15A67A7F368A9EF2688A@mgahkxx>
-Reply-To: "flitkin13@gmail.com" <aburov52@gmail.com>
+From: "Mcloughlin, Conor" <conor.mcloughlin@intel.com>
+Subject: RE: [PATCH] Enable slice hang handling for C3X and C6X devices.
+Date: Tue, 5 Jul 2016 11:04:34 +0000
+Message-ID: <CE2E46B8F68C4948A08D2E78E3D946C11C4DC7B2@IRSMSX104.ger.corp.intel.com>
+References: <1467709627-26551-1-git-send-email-conor.mcloughlin@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="windows-1251";
-	reply-type=original
-Content-Transfer-Encoding: base64
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [114.6.130.201] ([114.6.130.201]:49024 "EHLO
-	pubapps1.isatmobex.indosat.com" rhost-flags-FAIL-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752103AbcGEKhc (ORCPT
+Received: from mga04.intel.com ([192.55.52.120]:14789 "EHLO mga04.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932792AbcGELEh convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Jul 2016 06:37:32 -0400
+	Tue, 5 Jul 2016 07:04:37 -0400
+In-Reply-To: <1467709627-26551-1-git-send-email-conor.mcloughlin@intel.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-x+Tw4OLx8uLz6fLlISDC4PEg6O3y5fDl8fP+8iDq6+jl7fLx6ujlIOHg5/sg5ODt7fv1PyDEwCAt
-IM3F0iDv8Oj46+jy5SDt4CBlbWFpbDogYWJ1cm92NTJAZ21haWwuY29tIFNreXBlOiBwcm9kYXdl
-ejM4OSDP8Oj46+XsIO/u5PDu4e3u8fLoIQ0K
+
+
+> -----Original Message-----
+> From: Mcloughlin, Conor
+> Sent: Tuesday, July 5, 2016 10:07 AM
+> To: linux-crypto@vger.kernel.org
+> Cc: Mcloughlin, Conor <conor.mcloughlin@intel.com>
+> Subject: [PATCH] Enable slice hang handling for C3X and C6X devices.
+> 
+> If the QAT device fails to respond to a command, a watchdog
+> timer triggers an interrupt. This event is reported and the
+> the interrupt cleared. A separate watchdog register is used
+> for sym and asym crypto.
+> 
+> Signed-off-by: Conor McLoughlin <conor.mcloughlin@intel.com>
+
+Please ignore this patch. It depends on other functionality that has not yet been submitted.
+
+
+--------------------------------------------------------------
+Intel Research and Development Ireland Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+
+
+This e-mail and any attachments may contain confidential material for the sole
+use of the intended recipient(s). Any review or distribution by others is
+strictly prohibited. If you are not the intended recipient, please contact the
+sender and delete all copies.
