@@ -1,57 +1,47 @@
-From: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
-Subject: AEAD: Having separate underlying cipher handle for each request
-Date: Tue, 5 Jul 2016 13:44:05 +0200
-Message-ID: <CAAUqJDvY9x+iOkH_vNQS9+qV+ONkbfgprOKFGcRXNe2788JnBA@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/2] crypto: powerpc: Add POWER8 optimised crc32c
+Date: Tue, 5 Jul 2016 23:14:15 +0800
+Message-ID: <20160705151415.GA8117@gondor.apana.org.au>
+References: <1467325185-21091-1-git-send-email-anton@ozlabs.org>
+ <1467325185-21091-2-git-send-email-anton@ozlabs.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au,
+	davem@davemloft.net, linuxppc-dev@lists.ozlabs.org,
+	linux-crypto@vger.kernel.org
+To: Anton Blanchard <anton@ozlabs.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f53.google.com ([209.85.218.53]:35544 "EHLO
-	mail-oi0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933021AbcGELoN convert rfc822-to-8bit (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:36701 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754573AbcGEPOk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Jul 2016 07:44:13 -0400
-Received: by mail-oi0-f53.google.com with SMTP id r2so225546479oih.2
-        for <linux-crypto@vger.kernel.org>; Tue, 05 Jul 2016 04:44:07 -0700 (PDT)
+	Tue, 5 Jul 2016 11:14:40 -0400
+Content-Disposition: inline
+In-Reply-To: <1467325185-21091-2-git-send-email-anton@ozlabs.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Fri, Jul 01, 2016 at 08:19:45AM +1000, Anton Blanchard wrote:
+> From: Anton Blanchard <anton@samba.org>
+> 
+> Use the vector polynomial multiply-sum instructions in POWER8 to
+> speed up crc32c.
+> 
+> This is just over 41x faster than the slice-by-8 method that it
+> replaces. Measurements on a 4.1 GHz POWER8 show it sustaining
+> 52 GiB/sec.
+> 
+> A simple btrfs write performance test:
+> 
+>     dd if=/dev/zero of=/mnt/tmpfile bs=1M count=4096
+>     sync
+> 
+> is over 3.7x faster.
+> 
+> Signed-off-by: Anton Blanchard <anton@samba.org>
 
-I'm trying to experimentally implement the GCM-SIV AEAD algorithm from
-[1] for the Linux crypto API and I've ran into a problem...
-
-Basically, the encryption/decryption process starts by deriving a
-so-called "record-encryption key" from the nonce (by encrypting it
-using another key) and this key is then used to encrypt the plaintext
-in CTR mode and to encrypt the final authentication tag (otherwise it
-works similarly to GCM).
-
-Since the API is asynchronous and multiple requests can be executed in
-parallel over a single cipher handle (according to [2]), I need to
-have a separate underlying cipher handle for each AEAD request.
-
-Now this is a problem, because aead_request has no init/destroy
-mechanism where I could allocate/free the cipher handle, which means I
-would have to do this inside the encrypt/decrypt function. AFAIK,
-allocating with GFP_KERNEL inside encrypt/decrypt functions is
-problematic, as they may be called from an atomic context.
-
-Besides, it seems that also the crypto_*_setkey functions are not
-guaranteed to be atomic [3], and I will need to call such function
-either way... OTOH, the CTR mode/AES driver should not really need to
-allocate any memory there, so this may be tolerable...
-
-Does anyone have any ideas how to deal with this?
-
-BTW, for justification of deriving the key from the nonce see section
-9 of [1]. I don't really like the design decision, but there seems to
-be no better way to achieve the same property...
-
-Thanks,
-Ondrej Mosn=C3=A1=C4=8Dek
-
-[1] https://tools.ietf.org/html/draft-irtf-cfrg-gcmsiv-01
-[2] https://www.kernel.org/doc/htmldocs/crypto-API/ch05s03.html
-[3] https://www.spinics.net/lists/linux-crypto/msg17733.html
+Both patches applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
