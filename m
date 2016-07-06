@@ -1,39 +1,43 @@
-From: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
-Subject: Re: AEAD: Having separate underlying cipher handle for each request
-Date: Wed, 6 Jul 2016 15:10:00 +0200
-Message-ID: <CAAUqJDstRjwNYqxAJpkF1HpbpzuTNXgubRtUYaPWiqa6WrhUbQ@mail.gmail.com>
-References: <CAAUqJDvY9x+iOkH_vNQS9+qV+ONkbfgprOKFGcRXNe2788JnBA@mail.gmail.com>
- <20160706063149.GA14106@gondor.apana.org.au>
+From: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Subject: Re: DH & KDF
+Date: Wed, 6 Jul 2016 10:27:10 -0700 (PDT)
+Message-ID: <alpine.OSX.2.20.1607061021430.2149@mjmartin-mac01.local>
+References: <47344115.AvlVGsj60Z@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Cc: David Howells <dhowells@redhat.com>,
+	Mat Martineau <mathew.j.martineau@linux.intel.com>,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f42.google.com ([209.85.218.42]:33833 "EHLO
-	mail-oi0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751895AbcGFNKB (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 6 Jul 2016 09:10:01 -0400
-Received: by mail-oi0-f42.google.com with SMTP id s66so269383096oif.1
-        for <linux-crypto@vger.kernel.org>; Wed, 06 Jul 2016 06:10:01 -0700 (PDT)
-In-Reply-To: <20160706063149.GA14106@gondor.apana.org.au>
+Received: from mga01.intel.com ([192.55.52.88]:35121 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752150AbcGFR1M (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 6 Jul 2016 13:27:12 -0400
+In-Reply-To: <47344115.AvlVGsj60Z@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-2016-07-06 8:31 GMT+02:00, Herbert Xu <herbert@gondor.apana.org.au>:
-> Well you're pretty much screwed as far as performance is concerned.
-> So just postpone all processing to process context and allocate a new
-> tfm for each request.
 
-Yeah, I guess that's the only way then...
+Stephan -
 
-Thanks,
-Ondrej
+On Sat, 2 Jul 2016, Stephan Mueller wrote:
 
+> I am currently working on adding the KDF support to the DH key service. The
+> plan is to make it consistent with SP800-56A section 5.8.1 and yet open enough
+> to allow other use cases with other KDFs.
 >
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->
+> Is there already a test tool that already exercises the DH logic that I can
+> use to test my extension?
+
+There are DH tests in the 'next' branch for keyutils:
+
+https://git.kernel.org/cgit/linux/kernel/git/dhowells/keyutils.git/log/?h=next
+
+An additional patch (waiting for review) is also required ("TEST: Use 
+correct variable when checking for DH functionality"). I'll forward that 
+to you.
+
+--
+Mat Martineau
+Intel OTC
