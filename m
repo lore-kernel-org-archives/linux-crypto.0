@@ -1,66 +1,40 @@
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [PATCH v8 6/6] crypto: AF_ALG - add support for key_id
-Date: Wed, 6 Jul 2016 12:38:56 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1607061211410.2149@mjmartin-mac01.local>
-References: <146672252642.23101.15972023870303797249.stgit@tstruk-mobl1.ra.intel.com> <146672255872.23101.10938182451423661314.stgit@tstruk-mobl1.ra.intel.com> <alpine.OSX.2.20.1606291104130.37168@mjmartin-mac01.local>
- <e011a955-70c1-0419-9e2d-dea75d319da3@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	dhowells@redhat.com, herbert@gondor.apana.org.au,
-	smueller@chronox.de, linux-api@vger.kernel.org,
-	marcel@holtmann.org, linux-kernel@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dwmw2@infradead.org, davem@davemloft.net
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+From: Masanari Iida <standby24x7@gmail.com>
+Subject: [PATCH] [linux-next] crypto: doc- Fix double words "the the" in crypto-API.tmpl
+Date: Thu,  7 Jul 2016 21:58:16 +0900
+Message-ID: <20160707125816.4411-1-standby24x7@gmail.com>
+Cc: Masanari Iida <standby24x7@gmail.com>
+To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:54313 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932290AbcGFTi6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 6 Jul 2016 15:38:58 -0400
-In-Reply-To: <e011a955-70c1-0419-9e2d-dea75d319da3@intel.com>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:34451 "EHLO
+	mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750899AbcGGM6W (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 7 Jul 2016 08:58:22 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+This patch fix double words "the the" in crypto-API.tmpl.
 
-On Tue, 5 Jul 2016, Tadeusz Struk wrote:
+Signed-off-by: Masanari Iida <standby24x7@gmail.com>
+---
+ Documentation/DocBook/crypto-API.tmpl | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> Hi Mat,
-> On 06/29/2016 11:43 AM, Mat Martineau wrote:
->>> +    ret = verify_signature(key, &sig);
->>> +    if (!ret) {
->>> +        req->dst_len = sizeof(digest);
->>
->> I think you fixed the BUG_ON() problem but there's still an issue with
->> the handling of the digest. Check the use of sig->digest in
->> public_key_verify_signature(), it's an input not an output. Right now it
->> looks like 20 uninitialized bytes are compared with the computed digest
->> within verify_signature, and then the unintialized bytes are copied to
->> req->dst here.
->>
->> With some modifications to public_key_verify_signature you could get the
->> digest you need, but I'm not sure if verification with a hardware key
->> (like a key in a TPM) can or can not provide the digest needed. Maybe
->> this is why the verify_signature hook in struct asymmetric_key_subtype
->> is optional.
->>
->>> +        scatterwalk_map_and_copy(digest, req->dst, 0, req->dst_len, 1);
->>> +    }
->
-> So it looks like the only thing that we need to return to the user in
-> this case is the return code. Do you agree?
-
-The way verify_signature is implemented today, the only output is the 
-return code. For verify, maybe no read is required (just sendmsg() and 
-check the return code).
-
-But this isn't the extent of the problem: verify_signature needs both the 
-signature to be verified and the expected hash as inputs. How is the 
-expected hash provided? Would you include it as a cmsg header?
-ALG_OP_VERIFY should have consistent inputs and outputs whether the key 
-was set with ALG_SET_KEY_ID or ALG_SET_KEY.
-
-
---
-Mat Martineau
-Intel OTC
+diff --git a/Documentation/DocBook/crypto-API.tmpl b/Documentation/DocBook/crypto-API.tmpl
+index d55dc5a39bad..fb2a1526f6ec 100644
+--- a/Documentation/DocBook/crypto-API.tmpl
++++ b/Documentation/DocBook/crypto-API.tmpl
+@@ -440,8 +440,8 @@
+      The type flag specifies the type of the cipher algorithm.
+      The caller usually provides a 0 when the caller wants the
+      default handling. Otherwise, the caller may provide the
+-     following selections which match the the aforementioned
+-     cipher types:
++     following selections which match the aforementioned cipher
++     types:
+     </para>
+ 
+     <itemizedlist>
+-- 
+2.9.0.243.g5c589a7
