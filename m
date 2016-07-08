@@ -1,61 +1,54 @@
-From: Salvatore Benedetto <salvatore.benedetto@intel.com>
-Subject: [PATCH] crypto: qat - Stop dropping leading zeros from RSA output
-Date: Thu,  7 Jul 2016 15:52:17 +0100
-Message-ID: <1467903137-2110-1-git-send-email-salvatore.benedetto@intel.com>
-Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:20469 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752060AbcGGOwX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 7 Jul 2016 10:52:23 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH v8 6/6] crypto: AF_ALG - add support for key_id
+Date: Fri, 8 Jul 2016 08:21:58 -0700
+Message-ID: <783d7868-6aae-40da-5df6-6e41ca2284fc@intel.com>
+References: <146672252642.23101.15972023870303797249.stgit@tstruk-mobl1.ra.intel.com>
+ <146672255872.23101.10938182451423661314.stgit@tstruk-mobl1.ra.intel.com>
+ <alpine.OSX.2.20.1606291104130.37168@mjmartin-mac01.local>
+ <e011a955-70c1-0419-9e2d-dea75d319da3@intel.com>
+ <alpine.OSX.2.20.1607061211410.2149@mjmartin-mac01.local>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: dhowells@redhat.com, herbert@gondor.apana.org.au,
+	smueller@chronox.de, linux-api@vger.kernel.org,
+	marcel@holtmann.org, linux-kernel@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dwmw2@infradead.org, davem@davemloft.net
+To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <alpine.OSX.2.20.1607061211410.2149@mjmartin-mac01.local>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-There is not need to drop leading zeros from the RSA output
-operations results.
+Hi Mat,
+On 07/06/2016 12:38 PM, Mat Martineau wrote:
+>> So it looks like the only thing that we need to return to the user in
+>> this case is the return code. Do you agree?
+> 
+> The way verify_signature is implemented today, the only output is the
+> return code. For verify, maybe no read is required (just sendmsg() and
+> check the return code).
+> 
+> But this isn't the extent of the problem: verify_signature needs both
+> the signature to be verified and the expected hash as inputs. How is the
+> expected hash provided? Would you include it as a cmsg header?
+> ALG_OP_VERIFY should have consistent inputs and outputs whether the key
+> was set with ALG_SET_KEY_ID or ALG_SET_KEY.
 
-Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
----
- drivers/crypto/qat/qat_common/qat_asym_algs.c | 20 --------------------
- 1 file changed, 20 deletions(-)
-
-diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-index 3d56fb8..0d35dca 100644
---- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-@@ -571,32 +571,12 @@ static void qat_rsa_cb(struct icp_qat_fw_pke_resp *resp)
- 
- 	areq->dst_len = req->ctx.rsa->key_sz;
- 	if (req->dst_align) {
--		char *ptr = req->dst_align;
--
--		while (!(*ptr) && areq->dst_len) {
--			areq->dst_len--;
--			ptr++;
--		}
--
--		if (areq->dst_len != req->ctx.rsa->key_sz)
--			memmove(req->dst_align, ptr, areq->dst_len);
--
- 		scatterwalk_map_and_copy(req->dst_align, areq->dst, 0,
- 					 areq->dst_len, 1);
- 
- 		dma_free_coherent(dev, req->ctx.rsa->key_sz, req->dst_align,
- 				  req->out.rsa.enc.c);
- 	} else {
--		char *ptr = sg_virt(areq->dst);
--
--		while (!(*ptr) && areq->dst_len) {
--			areq->dst_len--;
--			ptr++;
--		}
--
--		if (sg_virt(areq->dst) != ptr && areq->dst_len)
--			memmove(sg_virt(areq->dst), ptr, areq->dst_len);
--
- 		dma_unmap_single(dev, req->out.rsa.enc.c, req->ctx.rsa->key_sz,
- 				 DMA_FROM_DEVICE);
- 	}
+The signature of verify_signature() is quite different from the other
+new public key handlers, i.e. create_signature(), encrypt_blob(), and
+decrypt_blob(). For verify_signature() we need the following parameters:
+encrypted src, hash function to use, expected digest.
+The expected digest could be optional if we would modify the
+verify_signature() to return the decrypted buffer.
+I think the best solution for now would be to just return -ENOPROTOOPT
+for verify_signature in SET_KEY_ID mode.
+All the four operations will be supported in the SET_KEY mode and
+all but verify_signature() will be supported in the SET_KEY_ID mode.
+This can added later if we will find a way to pass all parameters in a
+consistent way. What do you think? If you are ok with that I will send a
+new version soon.
+Thanks,
 -- 
-2.7.4
+TS
