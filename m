@@ -1,35 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/3] chcr: Support for Chelsio's Crypto Hardware
-Date: Tue, 12 Jul 2016 16:35:52 +0800
-Message-ID: <20160712083552.GA29994@gondor.apana.org.au>
-References: <1468261688-24525-1-git-send-email-yeshaswi@chelsio.com>
- <1468261688-24525-3-git-send-email-yeshaswi@chelsio.com>
+Subject: Re: [PATCH 3/3] crypto: Added Chelsio Menu to the Kconfig file
+Date: Tue, 12 Jul 2016 16:44:54 +0800
+Message-ID: <20160712084454.GA30073@gondor.apana.org.au>
+References: <1468261688-24525-4-git-send-email-yeshaswi@chelsio.com>
+ <201607120334.VOPyqMzK%fengguang.wu@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: hariprasad@chelsio.com, netdev@vger.kernel.org,
+Cc: Yeshaswi M R Gowda <yeshaswi@chelsio.com>, kbuild-all@01.org,
+	hariprasad@chelsio.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, davem@davemloft.net,
 	linux-crypto@vger.kernel.org, jlulla@chelsio.com,
 	atul.gupta@chelsio.com, harsh@chelsio.com
-To: Yeshaswi M R Gowda <yeshaswi@chelsio.com>
+To: kbuild test robot <lkp@intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1468261688-24525-3-git-send-email-yeshaswi@chelsio.com>
+In-Reply-To: <201607120334.VOPyqMzK%fengguang.wu@intel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jul 11, 2016 at 11:28:07AM -0700, Yeshaswi M R Gowda wrote:
->
-> +	u_ctx = ULD_CTX(ctx);
-> +	if (cxgb4_is_crypto_q_full(u_ctx->lldi.ports[0], ctx->tx_channel_id))
-> +		return -EBUSY;
+On Tue, Jul 12, 2016 at 03:30:41AM +0800, kbuild test robot wrote:
+> Hi,
+> 
+> [auto build test WARNING on net-next/master]
+> [also build test WARNING on v4.7-rc7 next-20160711]
+> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 
-You cannot just return -EBUSY.  If the request has the MAY_BACKLOG
-bit set, it must be queued regardless, but you should return -EBUSY
-in order to throttle the user and then call the completion function
-with -EINPROGRESS once the queue can accept more requests from the
-user.
+Yeshaswi, please fix these warnings/errors even though they're
+compile-only.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
