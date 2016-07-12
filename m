@@ -1,326 +1,244 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 6/30] crypto: ctr - Use skcipher in rfc3686
-Date: Tue, 12 Jul 2016 13:17:37 +0800
-Message-ID: <E1bMq4f-0007PQ-3W@gondolin.me.apana.org.au>
+Subject: [PATCH 9/30] crypto: chacha20poly1305 - Use skcipher
+Date: Tue, 12 Jul 2016 13:17:40 +0800
+Message-ID: <E1bMq4i-0007QF-HE@gondolin.me.apana.org.au>
 References: <20160712051554.GA28324@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:59481 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:43153 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753129AbcGLFRk (ORCPT
+	with ESMTP id S932566AbcGLFRo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jul 2016 01:17:40 -0400
+	Tue, 12 Jul 2016 01:17:44 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1bMq4f-0004Yc-7m
-	for <linux-crypto@vger.kernel.org>; Tue, 12 Jul 2016 15:17:37 +1000
+	id 1bMq4i-0004Zt-Ph
+	for <linux-crypto@vger.kernel.org>; Tue, 12 Jul 2016 15:17:40 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch converts rfc3686 to use the new skcipher interface as
-opposed to ablkcipher.
+This patch converts chacha20poly1305 to use the new skcipher
+interface as opposed to ablkcipher.
+
+It also fixes a buglet where we may end up with an async poly1305
+when the user asks for a async algorithm.  This shouldn't be a
+problem yet as there aren't any async implementations of poly1305
+out there.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/ctr.c |  183 ++++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 94 insertions(+), 89 deletions(-)
+ crypto/chacha20poly1305.c |   89 +++++++++++++++++++++++-----------------------
+ 1 file changed, 46 insertions(+), 43 deletions(-)
 
-diff --git a/crypto/ctr.c b/crypto/ctr.c
-index 2386f73..ff4d21e 100644
---- a/crypto/ctr.c
-+++ b/crypto/ctr.c
-@@ -26,13 +26,13 @@ struct crypto_ctr_ctx {
+diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
+index 7b6b935..e899ef5 100644
+--- a/crypto/chacha20poly1305.c
++++ b/crypto/chacha20poly1305.c
+@@ -31,7 +31,7 @@ struct chachapoly_instance_ctx {
  };
  
- struct crypto_rfc3686_ctx {
--	struct crypto_ablkcipher *child;
-+	struct crypto_skcipher *child;
- 	u8 nonce[CTR_RFC3686_NONCE_SIZE];
+ struct chachapoly_ctx {
+-	struct crypto_ablkcipher *chacha;
++	struct crypto_skcipher *chacha;
+ 	struct crypto_ahash *poly;
+ 	/* key bytes we use for the ChaCha20 IV */
+ 	unsigned int saltlen;
+@@ -53,7 +53,7 @@ struct poly_req {
+ struct chacha_req {
+ 	u8 iv[CHACHA20_IV_SIZE];
+ 	struct scatterlist src[1];
+-	struct ablkcipher_request req; /* must be last member */
++	struct skcipher_request req; /* must be last member */
  };
  
- struct crypto_rfc3686_req_ctx {
- 	u8 iv[CTR_RFC3686_BLOCK_SIZE];
--	struct ablkcipher_request subreq CRYPTO_MINALIGN_ATTR;
-+	struct skcipher_request subreq CRYPTO_MINALIGN_ATTR;
- };
+ struct chachapoly_req_ctx {
+@@ -144,12 +144,12 @@ static int chacha_decrypt(struct aead_request *req)
+ 		dst = scatterwalk_ffwd(rctx->dst, req->dst, req->assoclen);
+ 	}
  
- static int crypto_ctr_setkey(struct crypto_tfm *parent, const u8 *key,
-@@ -249,11 +249,11 @@ static struct crypto_template crypto_ctr_tmpl = {
- 	.module = THIS_MODULE,
- };
+-	ablkcipher_request_set_callback(&creq->req, aead_request_flags(req),
+-					chacha_decrypt_done, req);
+-	ablkcipher_request_set_tfm(&creq->req, ctx->chacha);
+-	ablkcipher_request_set_crypt(&creq->req, src, dst,
+-				     rctx->cryptlen, creq->iv);
+-	err = crypto_ablkcipher_decrypt(&creq->req);
++	skcipher_request_set_callback(&creq->req, aead_request_flags(req),
++				      chacha_decrypt_done, req);
++	skcipher_request_set_tfm(&creq->req, ctx->chacha);
++	skcipher_request_set_crypt(&creq->req, src, dst,
++				   rctx->cryptlen, creq->iv);
++	err = crypto_skcipher_decrypt(&creq->req);
+ 	if (err)
+ 		return err;
  
--static int crypto_rfc3686_setkey(struct crypto_ablkcipher *parent,
-+static int crypto_rfc3686_setkey(struct crypto_skcipher *parent,
- 				 const u8 *key, unsigned int keylen)
- {
--	struct crypto_rfc3686_ctx *ctx = crypto_ablkcipher_ctx(parent);
--	struct crypto_ablkcipher *child = ctx->child;
-+	struct crypto_rfc3686_ctx *ctx = crypto_skcipher_ctx(parent);
-+	struct crypto_skcipher *child = ctx->child;
- 	int err;
+@@ -393,13 +393,13 @@ static int poly_genkey(struct aead_request *req)
  
- 	/* the nonce is stored in bytes at end of key */
-@@ -265,173 +265,178 @@ static int crypto_rfc3686_setkey(struct crypto_ablkcipher *parent,
+ 	chacha_iv(creq->iv, req, 0);
  
- 	keylen -= CTR_RFC3686_NONCE_SIZE;
+-	ablkcipher_request_set_callback(&creq->req, aead_request_flags(req),
+-					poly_genkey_done, req);
+-	ablkcipher_request_set_tfm(&creq->req, ctx->chacha);
+-	ablkcipher_request_set_crypt(&creq->req, creq->src, creq->src,
+-				     POLY1305_KEY_SIZE, creq->iv);
++	skcipher_request_set_callback(&creq->req, aead_request_flags(req),
++				      poly_genkey_done, req);
++	skcipher_request_set_tfm(&creq->req, ctx->chacha);
++	skcipher_request_set_crypt(&creq->req, creq->src, creq->src,
++				   POLY1305_KEY_SIZE, creq->iv);
  
--	crypto_ablkcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
--	crypto_ablkcipher_set_flags(child, crypto_ablkcipher_get_flags(parent) &
+-	err = crypto_ablkcipher_decrypt(&creq->req);
++	err = crypto_skcipher_decrypt(&creq->req);
+ 	if (err)
+ 		return err;
+ 
+@@ -433,12 +433,12 @@ static int chacha_encrypt(struct aead_request *req)
+ 		dst = scatterwalk_ffwd(rctx->dst, req->dst, req->assoclen);
+ 	}
+ 
+-	ablkcipher_request_set_callback(&creq->req, aead_request_flags(req),
+-					chacha_encrypt_done, req);
+-	ablkcipher_request_set_tfm(&creq->req, ctx->chacha);
+-	ablkcipher_request_set_crypt(&creq->req, src, dst,
+-				     req->cryptlen, creq->iv);
+-	err = crypto_ablkcipher_encrypt(&creq->req);
++	skcipher_request_set_callback(&creq->req, aead_request_flags(req),
++				      chacha_encrypt_done, req);
++	skcipher_request_set_tfm(&creq->req, ctx->chacha);
++	skcipher_request_set_crypt(&creq->req, src, dst,
++				   req->cryptlen, creq->iv);
++	err = crypto_skcipher_encrypt(&creq->req);
+ 	if (err)
+ 		return err;
+ 
+@@ -500,13 +500,13 @@ static int chachapoly_setkey(struct crypto_aead *aead, const u8 *key,
+ 	keylen -= ctx->saltlen;
+ 	memcpy(ctx->salt, key + keylen, ctx->saltlen);
+ 
+-	crypto_ablkcipher_clear_flags(ctx->chacha, CRYPTO_TFM_REQ_MASK);
+-	crypto_ablkcipher_set_flags(ctx->chacha, crypto_aead_get_flags(aead) &
 -				    CRYPTO_TFM_REQ_MASK);
--	err = crypto_ablkcipher_setkey(child, key, keylen);
--	crypto_ablkcipher_set_flags(parent, crypto_ablkcipher_get_flags(child) &
--				    CRYPTO_TFM_RES_MASK);
-+	crypto_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_skcipher_set_flags(child, crypto_skcipher_get_flags(parent) &
-+					 CRYPTO_TFM_REQ_MASK);
-+	err = crypto_skcipher_setkey(child, key, keylen);
-+	crypto_skcipher_set_flags(parent, crypto_skcipher_get_flags(child) &
-+					  CRYPTO_TFM_RES_MASK);
++	crypto_skcipher_clear_flags(ctx->chacha, CRYPTO_TFM_REQ_MASK);
++	crypto_skcipher_set_flags(ctx->chacha, crypto_aead_get_flags(aead) &
++					       CRYPTO_TFM_REQ_MASK);
  
+-	err = crypto_ablkcipher_setkey(ctx->chacha, key, keylen);
+-	crypto_aead_set_flags(aead, crypto_ablkcipher_get_flags(ctx->chacha) &
+-			      CRYPTO_TFM_RES_MASK);
++	err = crypto_skcipher_setkey(ctx->chacha, key, keylen);
++	crypto_aead_set_flags(aead, crypto_skcipher_get_flags(ctx->chacha) &
++				    CRYPTO_TFM_RES_MASK);
  	return err;
  }
  
--static int crypto_rfc3686_crypt(struct ablkcipher_request *req)
-+static int crypto_rfc3686_crypt(struct skcipher_request *req)
- {
--	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
--	struct crypto_rfc3686_ctx *ctx = crypto_ablkcipher_ctx(tfm);
--	struct crypto_ablkcipher *child = ctx->child;
--	unsigned long align = crypto_ablkcipher_alignmask(tfm);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_rfc3686_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_skcipher *child = ctx->child;
-+	unsigned long align = crypto_skcipher_alignmask(tfm);
- 	struct crypto_rfc3686_req_ctx *rctx =
--		(void *)PTR_ALIGN((u8 *)ablkcipher_request_ctx(req), align + 1);
--	struct ablkcipher_request *subreq = &rctx->subreq;
-+		(void *)PTR_ALIGN((u8 *)skcipher_request_ctx(req), align + 1);
-+	struct skcipher_request *subreq = &rctx->subreq;
- 	u8 *iv = rctx->iv;
- 
- 	/* set up counter block */
- 	memcpy(iv, ctx->nonce, CTR_RFC3686_NONCE_SIZE);
--	memcpy(iv + CTR_RFC3686_NONCE_SIZE, req->info, CTR_RFC3686_IV_SIZE);
-+	memcpy(iv + CTR_RFC3686_NONCE_SIZE, req->iv, CTR_RFC3686_IV_SIZE);
- 
- 	/* initialize counter portion of counter block */
- 	*(__be32 *)(iv + CTR_RFC3686_NONCE_SIZE + CTR_RFC3686_IV_SIZE) =
- 		cpu_to_be32(1);
- 
--	ablkcipher_request_set_tfm(subreq, child);
--	ablkcipher_request_set_callback(subreq, req->base.flags,
--					req->base.complete, req->base.data);
--	ablkcipher_request_set_crypt(subreq, req->src, req->dst, req->nbytes,
--				     iv);
-+	skcipher_request_set_tfm(subreq, child);
-+	skcipher_request_set_callback(subreq, req->base.flags,
-+				      req->base.complete, req->base.data);
-+	skcipher_request_set_crypt(subreq, req->src, req->dst,
-+				   req->cryptlen, iv);
- 
--	return crypto_ablkcipher_encrypt(subreq);
-+	return crypto_skcipher_encrypt(subreq);
- }
- 
--static int crypto_rfc3686_init_tfm(struct crypto_tfm *tfm)
-+static int crypto_rfc3686_init_tfm(struct crypto_skcipher *tfm)
- {
--	struct crypto_instance *inst = (void *)tfm->__crt_alg;
--	struct crypto_skcipher_spawn *spawn = crypto_instance_ctx(inst);
--	struct crypto_rfc3686_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct crypto_ablkcipher *cipher;
-+	struct skcipher_instance *inst = skcipher_alg_instance(tfm);
-+	struct crypto_skcipher_spawn *spawn = skcipher_instance_ctx(inst);
-+	struct crypto_rfc3686_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_skcipher *cipher;
+@@ -524,7 +524,7 @@ static int chachapoly_init(struct crypto_aead *tfm)
+ 	struct aead_instance *inst = aead_alg_instance(tfm);
+ 	struct chachapoly_instance_ctx *ictx = aead_instance_ctx(inst);
+ 	struct chachapoly_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct crypto_ablkcipher *chacha;
++	struct crypto_skcipher *chacha;
+ 	struct crypto_ahash *poly;
  	unsigned long align;
-+	unsigned int reqsize;
  
--	cipher = crypto_spawn_skcipher(spawn);
-+	cipher = crypto_spawn_skcipher2(spawn);
- 	if (IS_ERR(cipher))
- 		return PTR_ERR(cipher);
+@@ -532,7 +532,7 @@ static int chachapoly_init(struct crypto_aead *tfm)
+ 	if (IS_ERR(poly))
+ 		return PTR_ERR(poly);
  
- 	ctx->child = cipher;
+-	chacha = crypto_spawn_skcipher(&ictx->chacha);
++	chacha = crypto_spawn_skcipher2(&ictx->chacha);
+ 	if (IS_ERR(chacha)) {
+ 		crypto_free_ahash(poly);
+ 		return PTR_ERR(chacha);
+@@ -548,8 +548,8 @@ static int chachapoly_init(struct crypto_aead *tfm)
+ 		tfm,
+ 		align + offsetof(struct chachapoly_req_ctx, u) +
+ 		max(offsetof(struct chacha_req, req) +
+-		    sizeof(struct ablkcipher_request) +
+-		    crypto_ablkcipher_reqsize(chacha),
++		    sizeof(struct skcipher_request) +
++		    crypto_skcipher_reqsize(chacha),
+ 		    offsetof(struct poly_req, req) +
+ 		    sizeof(struct ahash_request) +
+ 		    crypto_ahash_reqsize(poly)));
+@@ -562,7 +562,7 @@ static void chachapoly_exit(struct crypto_aead *tfm)
+ 	struct chachapoly_ctx *ctx = crypto_aead_ctx(tfm);
  
--	align = crypto_tfm_alg_alignmask(tfm);
-+	align = crypto_skcipher_alignmask(tfm);
- 	align &= ~(crypto_tfm_ctx_alignment() - 1);
--	tfm->crt_ablkcipher.reqsize = align +
--		sizeof(struct crypto_rfc3686_req_ctx) +
--		crypto_ablkcipher_reqsize(cipher);
-+	reqsize = align + sizeof(struct crypto_rfc3686_req_ctx) +
-+		  crypto_skcipher_reqsize(cipher);
-+	crypto_skcipher_set_reqsize(tfm, reqsize);
- 
- 	return 0;
+ 	crypto_free_ahash(ctx->poly);
+-	crypto_free_ablkcipher(ctx->chacha);
++	crypto_free_skcipher(ctx->chacha);
  }
  
--static void crypto_rfc3686_exit_tfm(struct crypto_tfm *tfm)
-+static void crypto_rfc3686_exit_tfm(struct crypto_skcipher *tfm)
- {
--	struct crypto_rfc3686_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_rfc3686_ctx *ctx = crypto_skcipher_ctx(tfm);
-+
-+	crypto_free_skcipher(ctx->child);
-+}
- 
--	crypto_free_ablkcipher(ctx->child);
-+static void crypto_rfc3686_free(struct skcipher_instance *inst)
-+{
-+	struct crypto_skcipher_spawn *spawn = skcipher_instance_ctx(inst);
-+
-+	crypto_drop_skcipher(spawn);
-+	kfree(inst);
- }
- 
--static struct crypto_instance *crypto_rfc3686_alloc(struct rtattr **tb)
-+static int crypto_rfc3686_create(struct crypto_template *tmpl,
-+				 struct rtattr **tb)
+ static void chachapoly_free(struct aead_instance *inst)
+@@ -579,7 +579,7 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
  {
  	struct crypto_attr_type *algt;
--	struct crypto_instance *inst;
--	struct crypto_alg *alg;
-+	struct skcipher_instance *inst;
-+	struct skcipher_alg *alg;
- 	struct crypto_skcipher_spawn *spawn;
- 	const char *cipher_name;
- 	int err;
+ 	struct aead_instance *inst;
+-	struct crypto_alg *chacha;
++	struct skcipher_alg *chacha;
+ 	struct crypto_alg *poly;
+ 	struct hash_alg_common *poly_hash;
+ 	struct chachapoly_instance_ctx *ctx;
+@@ -605,7 +605,9 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
  
- 	algt = crypto_get_attr_type(tb);
- 	if (IS_ERR(algt))
--		return ERR_CAST(algt);
-+		return PTR_ERR(algt);
+ 	poly = crypto_find_alg(poly_name, &crypto_ahash_type,
+ 			       CRYPTO_ALG_TYPE_HASH,
+-			       CRYPTO_ALG_TYPE_AHASH_MASK);
++			       CRYPTO_ALG_TYPE_AHASH_MASK |
++			       crypto_requires_sync(algt->type,
++						    algt->mask));
+ 	if (IS_ERR(poly))
+ 		return PTR_ERR(poly);
  
--	if ((algt->type ^ CRYPTO_ALG_TYPE_BLKCIPHER) & algt->mask)
--		return ERR_PTR(-EINVAL);
-+	if ((algt->type ^ CRYPTO_ALG_TYPE_SKCIPHER) & algt->mask)
-+		return -EINVAL;
+@@ -623,20 +625,20 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
+ 		goto err_free_inst;
  
- 	cipher_name = crypto_attr_alg_name(tb[1]);
- 	if (IS_ERR(cipher_name))
--		return ERR_CAST(cipher_name);
-+		return PTR_ERR(cipher_name);
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
- 	if (!inst)
--		return ERR_PTR(-ENOMEM);
-+		return -ENOMEM;
- 
--	spawn = crypto_instance_ctx(inst);
-+	spawn = skcipher_instance_ctx(inst);
- 
--	crypto_set_skcipher_spawn(spawn, inst);
--	err = crypto_grab_skcipher(spawn, cipher_name, 0,
+ 	crypto_set_skcipher_spawn(&ctx->chacha, aead_crypto_instance(inst));
+-	err = crypto_grab_skcipher(&ctx->chacha, chacha_name, 0,
 -				   crypto_requires_sync(algt->type,
 -							algt->mask));
-+	crypto_set_skcipher_spawn(spawn, skcipher_crypto_instance(inst));
-+	err = crypto_grab_skcipher2(spawn, cipher_name, 0,
++	err = crypto_grab_skcipher2(&ctx->chacha, chacha_name, 0,
 +				    crypto_requires_sync(algt->type,
 +							 algt->mask));
  	if (err)
- 		goto err_free_inst;
+ 		goto err_drop_poly;
  
--	alg = crypto_skcipher_spawn_alg(spawn);
-+	alg = crypto_spawn_skcipher_alg(spawn);
+-	chacha = crypto_skcipher_spawn_alg(&ctx->chacha);
++	chacha = crypto_spawn_skcipher_alg(&ctx->chacha);
  
- 	/* We only support 16-byte blocks. */
  	err = -EINVAL;
--	if (alg->cra_ablkcipher.ivsize != CTR_RFC3686_BLOCK_SIZE)
-+	if (crypto_skcipher_alg_ivsize(alg) != CTR_RFC3686_BLOCK_SIZE)
- 		goto err_drop_spawn;
- 
+ 	/* Need 16-byte IV size, including Initial Block Counter value */
+-	if (chacha->cra_ablkcipher.ivsize != CHACHA20_IV_SIZE)
++	if (crypto_skcipher_alg_ivsize(chacha) != CHACHA20_IV_SIZE)
+ 		goto out_drop_chacha;
  	/* Not a stream cipher? */
--	if (alg->cra_blocksize != 1)
-+	if (alg->base.cra_blocksize != 1)
- 		goto err_drop_spawn;
+-	if (chacha->cra_blocksize != 1)
++	if (chacha->base.cra_blocksize != 1)
+ 		goto out_drop_chacha;
  
  	err = -ENAMETOOLONG;
--	if (snprintf(inst->alg.cra_name, CRYPTO_MAX_ALG_NAME, "rfc3686(%s)",
--		     alg->cra_name) >= CRYPTO_MAX_ALG_NAME)
-+	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
-+		     "rfc3686(%s)", alg->base.cra_name) >= CRYPTO_MAX_ALG_NAME)
- 		goto err_drop_spawn;
--	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
--		     "rfc3686(%s)", alg->cra_driver_name) >=
--			CRYPTO_MAX_ALG_NAME)
-+	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
-+		     "rfc3686(%s)", alg->base.cra_driver_name) >=
-+	    CRYPTO_MAX_ALG_NAME)
- 		goto err_drop_spawn;
+@@ -645,20 +647,21 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
+ 		     poly_name) >= CRYPTO_MAX_ALG_NAME)
+ 		goto out_drop_chacha;
+ 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+-		     "%s(%s,%s)", name, chacha->cra_driver_name,
++		     "%s(%s,%s)", name, chacha->base.cra_driver_name,
+ 		     poly->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
+ 		goto out_drop_chacha;
  
--	inst->alg.cra_priority = alg->cra_priority;
--	inst->alg.cra_blocksize = 1;
--	inst->alg.cra_alignmask = alg->cra_alignmask;
-+	inst->alg.base.cra_priority = alg->base.cra_priority;
-+	inst->alg.base.cra_blocksize = 1;
-+	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
- 
--	inst->alg.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
--			      (alg->cra_flags & CRYPTO_ALG_ASYNC);
--	inst->alg.cra_type = &crypto_ablkcipher_type;
-+	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
- 
--	inst->alg.cra_ablkcipher.ivsize = CTR_RFC3686_IV_SIZE;
--	inst->alg.cra_ablkcipher.min_keysize =
--		alg->cra_ablkcipher.min_keysize + CTR_RFC3686_NONCE_SIZE;
--	inst->alg.cra_ablkcipher.max_keysize =
--		alg->cra_ablkcipher.max_keysize + CTR_RFC3686_NONCE_SIZE;
-+	inst->alg.ivsize = CTR_RFC3686_IV_SIZE;
-+	inst->alg.chunksize = crypto_skcipher_alg_chunksize(alg);
-+	inst->alg.min_keysize = crypto_skcipher_alg_min_keysize(alg) +
-+				CTR_RFC3686_NONCE_SIZE;
-+	inst->alg.max_keysize = crypto_skcipher_alg_max_keysize(alg) +
-+				CTR_RFC3686_NONCE_SIZE;
- 
--	inst->alg.cra_ablkcipher.geniv = "seqiv";
-+	inst->alg.setkey = crypto_rfc3686_setkey;
-+	inst->alg.encrypt = crypto_rfc3686_crypt;
-+	inst->alg.decrypt = crypto_rfc3686_crypt;
- 
--	inst->alg.cra_ablkcipher.setkey = crypto_rfc3686_setkey;
--	inst->alg.cra_ablkcipher.encrypt = crypto_rfc3686_crypt;
--	inst->alg.cra_ablkcipher.decrypt = crypto_rfc3686_crypt;
-+	inst->alg.base.cra_ctxsize = sizeof(struct crypto_rfc3686_ctx);
- 
--	inst->alg.cra_ctxsize = sizeof(struct crypto_rfc3686_ctx);
-+	inst->alg.init = crypto_rfc3686_init_tfm;
-+	inst->alg.exit = crypto_rfc3686_exit_tfm;
- 
--	inst->alg.cra_init = crypto_rfc3686_init_tfm;
--	inst->alg.cra_exit = crypto_rfc3686_exit_tfm;
-+	inst->free = crypto_rfc3686_free;
- 
--	return inst;
-+	err = skcipher_register_instance(tmpl, inst);
-+	if (err)
-+		goto err_drop_spawn;
-+
-+out:
-+	return err;
- 
- err_drop_spawn:
- 	crypto_drop_skcipher(spawn);
- err_free_inst:
- 	kfree(inst);
--	return ERR_PTR(err);
--}
--
--static void crypto_rfc3686_free(struct crypto_instance *inst)
--{
--	struct crypto_skcipher_spawn *spawn = crypto_instance_ctx(inst);
--
--	crypto_drop_skcipher(spawn);
--	kfree(inst);
-+	goto out;
- }
- 
- static struct crypto_template crypto_rfc3686_tmpl = {
- 	.name = "rfc3686",
--	.alloc = crypto_rfc3686_alloc,
--	.free = crypto_rfc3686_free,
-+	.create = crypto_rfc3686_create,
- 	.module = THIS_MODULE,
- };
- 
+-	inst->alg.base.cra_flags = (chacha->cra_flags | poly->cra_flags) &
++	inst->alg.base.cra_flags = (chacha->base.cra_flags | poly->cra_flags) &
+ 				   CRYPTO_ALG_ASYNC;
+-	inst->alg.base.cra_priority = (chacha->cra_priority +
++	inst->alg.base.cra_priority = (chacha->base.cra_priority +
+ 				       poly->cra_priority) / 2;
+ 	inst->alg.base.cra_blocksize = 1;
+-	inst->alg.base.cra_alignmask = chacha->cra_alignmask |
++	inst->alg.base.cra_alignmask = chacha->base.cra_alignmask |
+ 				       poly->cra_alignmask;
+ 	inst->alg.base.cra_ctxsize = sizeof(struct chachapoly_ctx) +
+ 				     ctx->saltlen;
+ 	inst->alg.ivsize = ivsize;
++	inst->alg.chunksize = crypto_skcipher_alg_chunksize(chacha);
+ 	inst->alg.maxauthsize = POLY1305_DIGEST_SIZE;
+ 	inst->alg.init = chachapoly_init;
+ 	inst->alg.exit = chachapoly_exit;
