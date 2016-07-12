@@ -1,51 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 24/30] crypto: scatterwalk - Fix test in scatterwalk_done
-Date: Tue, 12 Jul 2016 13:17:57 +0800
-Message-ID: <E1bMq4z-0007UM-8Q@gondolin.me.apana.org.au>
+Subject: [PATCH 25/30] crypto: scatterwalk - Remove unnecessary advance in scatterwalk_pagedone
+Date: Tue, 12 Jul 2016 13:17:58 +0800
+Message-ID: <E1bMq50-0007Ud-Bt@gondolin.me.apana.org.au>
 References: <20160712051554.GA28324@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60421 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:60768 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750972AbcGLFR7 (ORCPT
+	with ESMTP id S1753197AbcGLFSC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jul 2016 01:17:59 -0400
+	Tue, 12 Jul 2016 01:18:02 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1bMq4z-0004h2-DP
-	for <linux-crypto@vger.kernel.org>; Tue, 12 Jul 2016 15:17:57 +1000
+	id 1bMq50-0004hO-Gv
+	for <linux-crypto@vger.kernel.org>; Tue, 12 Jul 2016 15:17:58 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When there is more data to be processed, the current test in
-scatterwalk_done may prevent us from calling pagedone even when
-we should.
+The offset advance in scatterwalk_pagedone not only is unnecessary,
+but it was also buggy when it was needed by scatterwalk_copychunks.
+As the latter has long ago been fixed to call scatterwalk_advance
+directly, we can remove this unnecessary offset adjustment.
 
-In particular, if we're on an SG entry spanning multiple pages
-where the last page is not a full page, we will incorrectly skip
-calling pagedone on the second last page.
-
-This patch fixes this by adding a separate test for whether we've
-reached the end of a page.
-
-Cc: stable@vger.kernel.org
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/scatterwalk.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ crypto/scatterwalk.c |    8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
 diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
-index e124ce2..52aae29 100644
+index 52aae29..2ec5368 100644
 --- a/crypto/scatterwalk.c
 +++ b/crypto/scatterwalk.c
-@@ -72,7 +72,8 @@ static void scatterwalk_pagedone(struct scatter_walk *walk, int out,
+@@ -62,12 +62,8 @@ static void scatterwalk_pagedone(struct scatter_walk *walk, int out,
+ 			flush_dcache_page(page);
+ 	}
+ 
+-	if (more) {
+-		walk->offset += PAGE_SIZE - 1;
+-		walk->offset &= PAGE_MASK;
+-		if (walk->offset >= walk->sg->offset + walk->sg->length)
+-			scatterwalk_start(walk, sg_next(walk->sg));
+-	}
++	if (more && walk->offset >= walk->sg->offset + walk->sg->length)
++		scatterwalk_start(walk, sg_next(walk->sg));
+ }
  
  void scatterwalk_done(struct scatter_walk *walk, int out, int more)
- {
--	if (!(scatterwalk_pagelen(walk) & (PAGE_SIZE - 1)) || !more)
-+	if (!more || walk->offset >= walk->sg->offset + walk->sg->length ||
-+	    !(walk->offset & (PAGE_SIZE - 1)))
- 		scatterwalk_pagedone(walk, out, more);
- }
- EXPORT_SYMBOL_GPL(scatterwalk_done);
