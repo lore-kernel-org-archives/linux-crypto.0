@@ -1,75 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 21/30] crypto: scatterwalk - Remove scatterwalk_bytes_sglen
-Date: Tue, 12 Jul 2016 13:17:53 +0800
-Message-ID: <E1bMq4v-0007TX-VP@gondolin.me.apana.org.au>
+Subject: [PATCH 23/30] crypto: api - Optimise away crypto_yield when hard preemption is on
+Date: Tue, 12 Jul 2016 13:17:56 +0800
+Message-ID: <E1bMq4y-0007U5-5U@gondolin.me.apana.org.au>
 References: <20160712051554.GA28324@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:58197 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:57715 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750972AbcGLFR4 (ORCPT
+	with ESMTP id S1753197AbcGLFR6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jul 2016 01:17:56 -0400
+	Tue, 12 Jul 2016 01:17:58 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1bMq4w-0004fX-8X
-	for <linux-crypto@vger.kernel.org>; Tue, 12 Jul 2016 15:17:54 +1000
+	id 1bMq4y-0004gX-9y
+	for <linux-crypto@vger.kernel.org>; Tue, 12 Jul 2016 15:17:56 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch removes the now unused scatterwalk_bytes_sglen.  Anyone
-using this out-of-tree should switch over to sg_nents_for_len.
+When hard preemption is enabled there is no need to explicitly
+call crypto_yield.  This patch eliminates it if that is the case.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/scatterwalk.c         |   22 ----------------------
- include/crypto/scatterwalk.h |    2 --
- 2 files changed, 24 deletions(-)
+ include/crypto/algapi.h |    2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
-index ea5815c..03ca4ae 100644
---- a/crypto/scatterwalk.c
-+++ b/crypto/scatterwalk.c
-@@ -125,28 +125,6 @@ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 0483f65..8637cdf 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -442,8 +442,10 @@ static inline int crypto_memneq(const void *a, const void *b, size_t size)
+ 
+ static inline void crypto_yield(u32 flags)
+ {
++#if !defined(CONFIG_PREEMPT) || defined(CONFIG_PREEMPT_VOLUNTARY)
+ 	if (flags & CRYPTO_TFM_REQ_MAY_SLEEP)
+ 		cond_resched();
++#endif
  }
- EXPORT_SYMBOL_GPL(scatterwalk_map_and_copy);
  
--int scatterwalk_bytes_sglen(struct scatterlist *sg, int num_bytes)
--{
--	int offset = 0, n = 0;
--
--	/* num_bytes is too small */
--	if (num_bytes < sg->length)
--		return -1;
--
--	do {
--		offset += sg->length;
--		n++;
--		sg = sg_next(sg);
--
--		/* num_bytes is too large */
--		if (unlikely(!sg && (num_bytes < offset)))
--			return -1;
--	} while (sg && (num_bytes > offset));
--
--	return n;
--}
--EXPORT_SYMBOL_GPL(scatterwalk_bytes_sglen);
--
- struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
- 				     struct scatterlist *src,
- 				     unsigned int len)
-diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index 35f99b6..7e1a336 100644
---- a/include/crypto/scatterwalk.h
-+++ b/include/crypto/scatterwalk.h
-@@ -92,8 +92,6 @@ void scatterwalk_done(struct scatter_walk *walk, int out, int more);
- void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
- 			      unsigned int start, unsigned int nbytes, int out);
- 
--int scatterwalk_bytes_sglen(struct scatterlist *sg, int num_bytes);
--
- struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
- 				     struct scatterlist *src,
- 				     unsigned int len);
+ #endif	/* _CRYPTO_ALGAPI_H */
