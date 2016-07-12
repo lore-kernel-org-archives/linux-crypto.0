@@ -1,80 +1,140 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 11/30] crypto: aead - Add skcipher null for IV generators
-Date: Tue, 12 Jul 2016 13:17:42 +0800
-Message-ID: <E1bMq4k-0007Qn-SQ@gondolin.me.apana.org.au>
+Subject: [PATCH 15/30] crypto: null - Remove default null blkcipher
+Date: Tue, 12 Jul 2016 13:17:47 +0800
+Message-ID: <E1bMq4p-0007Rt-8L@gondolin.me.apana.org.au>
 References: <20160712051554.GA28324@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51824 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:48889 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932566AbcGLFRp (ORCPT
+	with ESMTP id S932725AbcGLFRu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jul 2016 01:17:45 -0400
+	Tue, 12 Jul 2016 01:17:50 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1bMq4l-0004at-0W
-	for <linux-crypto@vger.kernel.org>; Tue, 12 Jul 2016 15:17:43 +1000
+	id 1bMq4p-0004cn-En
+	for <linux-crypto@vger.kernel.org>; Tue, 12 Jul 2016 15:17:47 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds an skcipher null object alongside the existing
-null blkcipher so that IV generators using it can switch over
-to skcipher.
+The default null blkcipher is no longer used and can now be removed.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/aead.c                   |   10 +++++++++-
- include/crypto/internal/geniv.h |    1 +
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ crypto/crypto_null.c  |   49 ++++++-------------------------------------------
+ include/crypto/null.h |   14 +++++++++++---
+ 2 files changed, 17 insertions(+), 46 deletions(-)
 
-diff --git a/crypto/aead.c b/crypto/aead.c
-index b155cbc..a5d9a83 100644
---- a/crypto/aead.c
-+++ b/crypto/aead.c
-@@ -294,10 +294,15 @@ int aead_init_geniv(struct crypto_aead *aead)
- 	if (err)
- 		goto out;
+diff --git a/crypto/crypto_null.c b/crypto/crypto_null.c
+index c3f6839..20ff2c7 100644
+--- a/crypto/crypto_null.c
++++ b/crypto/crypto_null.c
+@@ -26,10 +26,8 @@
+ #include <linux/string.h>
  
-+	ctx->sknull = crypto_get_default_null_skcipher2();
-+	err = PTR_ERR(ctx->sknull);
-+	if (IS_ERR(ctx->sknull))
-+		goto out;
+ static DEFINE_MUTEX(crypto_default_null_skcipher_lock);
+-static struct crypto_blkcipher *crypto_default_null_skcipher;
++static struct crypto_skcipher *crypto_default_null_skcipher;
+ static int crypto_default_null_skcipher_refcnt;
+-static struct crypto_skcipher *crypto_default_null_skcipher2;
+-static int crypto_default_null_skcipher2_refcnt;
+ 
+ static int null_compress(struct crypto_tfm *tfm, const u8 *src,
+ 			 unsigned int slen, u8 *dst, unsigned int *dlen)
+@@ -155,15 +153,16 @@ MODULE_ALIAS_CRYPTO("compress_null");
+ MODULE_ALIAS_CRYPTO("digest_null");
+ MODULE_ALIAS_CRYPTO("cipher_null");
+ 
+-struct crypto_blkcipher *crypto_get_default_null_skcipher(void)
++struct crypto_skcipher *crypto_get_default_null_skcipher(void)
+ {
+-	struct crypto_blkcipher *tfm;
++	struct crypto_skcipher *tfm;
+ 
+ 	mutex_lock(&crypto_default_null_skcipher_lock);
+ 	tfm = crypto_default_null_skcipher;
+ 
+ 	if (!tfm) {
+-		tfm = crypto_alloc_blkcipher("ecb(cipher_null)", 0, 0);
++		tfm = crypto_alloc_skcipher("ecb(cipher_null)",
++					    0, CRYPTO_ALG_ASYNC);
+ 		if (IS_ERR(tfm))
+ 			goto unlock;
+ 
+@@ -183,49 +182,13 @@ void crypto_put_default_null_skcipher(void)
+ {
+ 	mutex_lock(&crypto_default_null_skcipher_lock);
+ 	if (!--crypto_default_null_skcipher_refcnt) {
+-		crypto_free_blkcipher(crypto_default_null_skcipher);
++		crypto_free_skcipher(crypto_default_null_skcipher);
+ 		crypto_default_null_skcipher = NULL;
+ 	}
+ 	mutex_unlock(&crypto_default_null_skcipher_lock);
+ }
+ EXPORT_SYMBOL_GPL(crypto_put_default_null_skcipher);
+ 
+-struct crypto_skcipher *crypto_get_default_null_skcipher2(void)
+-{
+-	struct crypto_skcipher *tfm;
+-
+-	mutex_lock(&crypto_default_null_skcipher_lock);
+-	tfm = crypto_default_null_skcipher2;
+-
+-	if (!tfm) {
+-		tfm = crypto_alloc_skcipher("ecb(cipher_null)",
+-					    0, CRYPTO_ALG_ASYNC);
+-		if (IS_ERR(tfm))
+-			goto unlock;
+-
+-		crypto_default_null_skcipher2 = tfm;
+-	}
+-
+-	crypto_default_null_skcipher2_refcnt++;
+-
+-unlock:
+-	mutex_unlock(&crypto_default_null_skcipher_lock);
+-
+-	return tfm;
+-}
+-EXPORT_SYMBOL_GPL(crypto_get_default_null_skcipher2);
+-
+-void crypto_put_default_null_skcipher2(void)
+-{
+-	mutex_lock(&crypto_default_null_skcipher_lock);
+-	if (!--crypto_default_null_skcipher2_refcnt) {
+-		crypto_free_skcipher(crypto_default_null_skcipher2);
+-		crypto_default_null_skcipher2 = NULL;
+-	}
+-	mutex_unlock(&crypto_default_null_skcipher_lock);
+-}
+-EXPORT_SYMBOL_GPL(crypto_put_default_null_skcipher2);
+-
+ static int __init crypto_null_mod_init(void)
+ {
+ 	int ret = 0;
+diff --git a/include/crypto/null.h b/include/crypto/null.h
+index dda87cb..3f0c59fb 100644
+--- a/include/crypto/null.h
++++ b/include/crypto/null.h
+@@ -8,9 +8,17 @@
+ #define NULL_DIGEST_SIZE	0
+ #define NULL_IV_SIZE		0
+ 
+-struct crypto_blkcipher *crypto_get_default_null_skcipher(void);
++struct crypto_skcipher *crypto_get_default_null_skcipher(void);
+ void crypto_put_default_null_skcipher(void);
+-struct crypto_skcipher *crypto_get_default_null_skcipher2(void);
+-void crypto_put_default_null_skcipher2(void);
 +
- 	ctx->null = crypto_get_default_null_skcipher();
- 	err = PTR_ERR(ctx->null);
- 	if (IS_ERR(ctx->null))
--		goto out;
-+		goto drop_sknull;
++static inline struct crypto_skcipher *crypto_get_default_null_skcipher2(void)
++{
++	return crypto_get_default_null_skcipher();
++}
++
++static inline void crypto_put_default_null_skcipher2(void)
++{
++	crypto_put_default_null_skcipher();
++}
  
- 	child = crypto_spawn_aead(aead_instance_ctx(inst));
- 	err = PTR_ERR(child);
-@@ -315,6 +320,8 @@ out:
- 
- drop_null:
- 	crypto_put_default_null_skcipher();
-+drop_sknull:
-+	crypto_put_default_null_skcipher2();
- 	goto out;
- }
- EXPORT_SYMBOL_GPL(aead_init_geniv);
-@@ -325,6 +332,7 @@ void aead_exit_geniv(struct crypto_aead *tfm)
- 
- 	crypto_free_aead(ctx->child);
- 	crypto_put_default_null_skcipher();
-+	crypto_put_default_null_skcipher2();
- }
- EXPORT_SYMBOL_GPL(aead_exit_geniv);
- 
-diff --git a/include/crypto/internal/geniv.h b/include/crypto/internal/geniv.h
-index 5933363..e8447c9 100644
---- a/include/crypto/internal/geniv.h
-+++ b/include/crypto/internal/geniv.h
-@@ -21,6 +21,7 @@ struct aead_geniv_ctx {
- 	spinlock_t lock;
- 	struct crypto_aead *child;
- 	struct crypto_blkcipher *null;
-+	struct crypto_skcipher *sknull;
- 	u8 salt[] __attribute__ ((aligned(__alignof__(u32))));
- };
- 
+ #endif
