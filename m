@@ -1,42 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 5/6] crypto: img-hash - Add support for export and import
-Date: Tue, 12 Jul 2016 15:49:29 +0800
-Message-ID: <20160712074929.GA29737@gondor.apana.org.au>
-References: <1468229616-3888-6-git-send-email-will.thomas@imgtec.com>
+Subject: Re: [PATCH 2/3] chcr: Support for Chelsio's Crypto Hardware
+Date: Tue, 12 Jul 2016 16:35:52 +0800
+Message-ID: <20160712083552.GA29994@gondor.apana.org.au>
+References: <1468261688-24525-1-git-send-email-yeshaswi@chelsio.com>
+ <1468261688-24525-3-git-send-email-yeshaswi@chelsio.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, james.hartley@imgtec.com
-To: Will Thomas <will.thomas@imgtec.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54869 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750760AbcGLHtc (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jul 2016 03:49:32 -0400
+Cc: hariprasad@chelsio.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, jlulla@chelsio.com,
+	atul.gupta@chelsio.com, harsh@chelsio.com
+To: Yeshaswi M R Gowda <yeshaswi@chelsio.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1468229616-3888-6-git-send-email-will.thomas@imgtec.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1468261688-24525-3-git-send-email-yeshaswi@chelsio.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Will Thomas <will.thomas@imgtec.com> wrote:
+On Mon, Jul 11, 2016 at 11:28:07AM -0700, Yeshaswi M R Gowda wrote:
 >
-> @@ -714,9 +740,12 @@ static struct ahash_alg img_algs[] = {
->                .update = img_hash_update,
->                .final = img_hash_final,
->                .finup = img_hash_finup,
-> +               .export = img_hash_export,
-> +               .import = img_hash_import,
->                .digest = img_hash_digest,
->                .halg = {
->                        .digestsize = MD5_DIGEST_SIZE,
-> +                       .statesize = sizeof(struct md5_state),
+> +	u_ctx = ULD_CTX(ctx);
+> +	if (cxgb4_is_crypto_q_full(u_ctx->lldi.ports[0], ctx->tx_channel_id))
+> +		return -EBUSY;
 
-This is wrong.  The fallback state size is not guaranteed to be
-the same as the generic MD5.  I suppose the easiest fix is to
-explicitly request for md5-generic/sha1-generic/etc. when you
-allocate the fallback.
+You cannot just return -EBUSY.  If the request has the MAY_BACKLOG
+bit set, it must be queued regardless, but you should return -EBUSY
+in order to throttle the user and then call the completion function
+with -EINPROGRESS once the queue can accept more requests from the
+user.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
