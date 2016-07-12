@@ -1,60 +1,160 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 22/30] crypto: scatterwalk - Add no-copy support to copychunks
-Date: Tue, 12 Jul 2016 13:17:55 +0800
-Message-ID: <E1bMq4x-0007To-2W@gondolin.me.apana.org.au>
+Subject: [PATCH 29/30] crypto: aes-ce-ccm - Use skcipher walk interface
+Date: Tue, 12 Jul 2016 13:18:02 +0800
+Message-ID: <E1bMq54-0007Vj-SY@gondolin.me.apana.org.au>
 References: <20160712051554.GA28324@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:59173 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:47617 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932981AbcGLFSM (ORCPT
+	with ESMTP id S932725AbcGLFSG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jul 2016 01:18:12 -0400
+	Tue, 12 Jul 2016 01:18:06 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1bMq4x-0004g2-9M
-	for <linux-crypto@vger.kernel.org>; Tue, 12 Jul 2016 15:17:55 +1000
+	id 1bMq55-0004jX-1V
+	for <linux-crypto@vger.kernel.org>; Tue, 12 Jul 2016 15:18:03 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The function ablkcipher_done_slow is pretty much identical to
-scatterwalk_copychunks except that it doesn't actually copy as
-the processing hasn't been completed yet.
-
-This patch allows scatterwalk_copychunks to be used in this case
-by specifying out == 2.
+This patch makes use of the new skcipher walk interface instead of
+the obsolete blkcipher walk interface.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/scatterwalk.c |   10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ arch/arm64/crypto/aes-ce-ccm-glue.c |   50 +++++++++---------------------------
+ 1 file changed, 13 insertions(+), 37 deletions(-)
 
-diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
-index 03ca4ae..e124ce2 100644
---- a/crypto/scatterwalk.c
-+++ b/crypto/scatterwalk.c
-@@ -87,9 +87,11 @@ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
- 		if (len_this_page > nbytes)
- 			len_this_page = nbytes;
+diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
+index f4bf2f2..d4f3568 100644
+--- a/arch/arm64/crypto/aes-ce-ccm-glue.c
++++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
+@@ -11,9 +11,9 @@
+ #include <asm/neon.h>
+ #include <asm/unaligned.h>
+ #include <crypto/aes.h>
+-#include <crypto/algapi.h>
+ #include <crypto/scatterwalk.h>
+ #include <crypto/internal/aead.h>
++#include <crypto/internal/skcipher.h>
+ #include <linux/module.h>
  
--		vaddr = scatterwalk_map(walk);
--		memcpy_dir(buf, vaddr, len_this_page, out);
--		scatterwalk_unmap(vaddr);
-+		if (out != 2) {
-+			vaddr = scatterwalk_map(walk);
-+			memcpy_dir(buf, vaddr, len_this_page, out);
-+			scatterwalk_unmap(vaddr);
-+		}
+ #include "aes-ce-setkey.h"
+@@ -149,12 +149,7 @@ static int ccm_encrypt(struct aead_request *req)
+ {
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = crypto_aead_ctx(aead);
+-	struct blkcipher_desc desc = { .info = req->iv };
+-	struct blkcipher_walk walk;
+-	struct scatterlist srcbuf[2];
+-	struct scatterlist dstbuf[2];
+-	struct scatterlist *src;
+-	struct scatterlist *dst;
++	struct skcipher_walk walk;
+ 	u8 __aligned(8) mac[AES_BLOCK_SIZE];
+ 	u8 buf[AES_BLOCK_SIZE];
+ 	u32 len = req->cryptlen;
+@@ -172,27 +167,19 @@ static int ccm_encrypt(struct aead_request *req)
+ 	/* preserve the original iv for the final round */
+ 	memcpy(buf, req->iv, AES_BLOCK_SIZE);
  
- 		scatterwalk_advance(walk, len_this_page);
+-	src = scatterwalk_ffwd(srcbuf, req->src, req->assoclen);
+-	dst = src;
+-	if (req->src != req->dst)
+-		dst = scatterwalk_ffwd(dstbuf, req->dst, req->assoclen);
+-
+-	blkcipher_walk_init(&walk, dst, src, len);
+-	err = blkcipher_aead_walk_virt_block(&desc, &walk, aead,
+-					     AES_BLOCK_SIZE);
++	err = skcipher_walk_aead(&walk, req, true);
  
-@@ -99,7 +101,7 @@ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
- 		buf += len_this_page;
- 		nbytes -= len_this_page;
+ 	while (walk.nbytes) {
+ 		u32 tail = walk.nbytes % AES_BLOCK_SIZE;
  
--		scatterwalk_pagedone(walk, out, 1);
-+		scatterwalk_pagedone(walk, out & 1, 1);
+-		if (walk.nbytes == len)
++		if (walk.nbytes == walk.total)
+ 			tail = 0;
+ 
+ 		ce_aes_ccm_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				   walk.nbytes - tail, ctx->key_enc,
+ 				   num_rounds(ctx), mac, walk.iv);
+ 
+-		len -= walk.nbytes - tail;
+-		err = blkcipher_walk_done(&desc, &walk, tail);
++		err = skcipher_walk_done(&walk, tail);
  	}
- }
- EXPORT_SYMBOL_GPL(scatterwalk_copychunks);
+ 	if (!err)
+ 		ce_aes_ccm_final(mac, buf, ctx->key_enc, num_rounds(ctx));
+@@ -203,7 +190,7 @@ static int ccm_encrypt(struct aead_request *req)
+ 		return err;
+ 
+ 	/* copy authtag to end of dst */
+-	scatterwalk_map_and_copy(mac, dst, req->cryptlen,
++	scatterwalk_map_and_copy(mac, req->dst, req->assoclen + req->cryptlen,
+ 				 crypto_aead_authsize(aead), 1);
+ 
+ 	return 0;
+@@ -214,12 +201,7 @@ static int ccm_decrypt(struct aead_request *req)
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = crypto_aead_ctx(aead);
+ 	unsigned int authsize = crypto_aead_authsize(aead);
+-	struct blkcipher_desc desc = { .info = req->iv };
+-	struct blkcipher_walk walk;
+-	struct scatterlist srcbuf[2];
+-	struct scatterlist dstbuf[2];
+-	struct scatterlist *src;
+-	struct scatterlist *dst;
++	struct skcipher_walk walk;
+ 	u8 __aligned(8) mac[AES_BLOCK_SIZE];
+ 	u8 buf[AES_BLOCK_SIZE];
+ 	u32 len = req->cryptlen - authsize;
+@@ -237,27 +219,19 @@ static int ccm_decrypt(struct aead_request *req)
+ 	/* preserve the original iv for the final round */
+ 	memcpy(buf, req->iv, AES_BLOCK_SIZE);
+ 
+-	src = scatterwalk_ffwd(srcbuf, req->src, req->assoclen);
+-	dst = src;
+-	if (req->src != req->dst)
+-		dst = scatterwalk_ffwd(dstbuf, req->dst, req->assoclen);
+-
+-	blkcipher_walk_init(&walk, dst, src, len);
+-	err = blkcipher_aead_walk_virt_block(&desc, &walk, aead,
+-					     AES_BLOCK_SIZE);
++	err = skcipher_walk_aead(&walk, req, true);
+ 
+ 	while (walk.nbytes) {
+ 		u32 tail = walk.nbytes % AES_BLOCK_SIZE;
+ 
+-		if (walk.nbytes == len)
++		if (walk.nbytes == walk.total)
+ 			tail = 0;
+ 
+ 		ce_aes_ccm_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				   walk.nbytes - tail, ctx->key_enc,
+ 				   num_rounds(ctx), mac, walk.iv);
+ 
+-		len -= walk.nbytes - tail;
+-		err = blkcipher_walk_done(&desc, &walk, tail);
++		err = skcipher_walk_done(&walk, tail);
+ 	}
+ 	if (!err)
+ 		ce_aes_ccm_final(mac, buf, ctx->key_enc, num_rounds(ctx));
+@@ -268,7 +242,8 @@ static int ccm_decrypt(struct aead_request *req)
+ 		return err;
+ 
+ 	/* compare calculated auth tag with the stored one */
+-	scatterwalk_map_and_copy(buf, src, req->cryptlen - authsize,
++	scatterwalk_map_and_copy(buf, req->src,
++				 req->assoclen + req->cryptlen - authsize,
+ 				 authsize, 0);
+ 
+ 	if (crypto_memneq(mac, buf, authsize))
+@@ -287,6 +262,7 @@ static struct aead_alg ccm_aes_alg = {
+ 		.cra_module		= THIS_MODULE,
+ 	},
+ 	.ivsize		= AES_BLOCK_SIZE,
++	.chunksize	= AES_BLOCK_SIZE,
+ 	.maxauthsize	= AES_BLOCK_SIZE,
+ 	.setkey		= ccm_setkey,
+ 	.setauthsize	= ccm_setauthsize,
