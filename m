@@ -1,20 +1,73 @@
-From: "Quick Loans" <info121@quickloans.com>
-Subject: Loan Offer
-Date: Wed, 13 Jul 2016 06:11:26 +0530
-Message-ID: <20160713004233.7B39B1B402F3__28469.8498355739$1468411706$gmane$org@mail.fundacionhomi.org.co>
-Reply-To: quickloanss@foxmail.com
+From: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+Subject: Re: [PATCH 1/2] crypto: vmx - Adding asm subroutines for XTS
+Date: Wed, 13 Jul 2016 10:34:27 -0300
+Message-ID: <20160713133427.GA20432@dublin>
+References: <1468264060-22769-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
+ <20160712093705.6f0fde7a@canb.auug.org.au>
+ <8737nep7a8.fsf@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: Recipients <info121@quickloans.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx.fundacionhomi.org.co ([190.24.138.68]:58198 "EHLO
-	mx.fundacionhomi.org.co" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751058AbcGMMH5 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 Jul 2016 08:07:57 -0400
-Content-Description: Mail message body
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+ Stephen Rothwell <sfr@canb.auug.org.au>,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org,
+ Paul Mackerras <paulus@samba.org>,
+ "open list:IBM Power VMX Cryptographic instructions"
+ <linux-crypto@vger.kernel.org>,
+ "open list:LINUX FOR POWERPC 32-BIT AND 64-BIT"
+ <linuxppc-dev@lists.ozlabs.org>, "David S. Miller" <davem@davemloft.net>
+To: Stewart Smith <stewart@linux.vnet.ibm.com>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Content-Disposition: inline
+In-Reply-To: <8737nep7a8.fsf@linux.vnet.ibm.com>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Instant cash Loan with same day payout on all kinds of Loan are available at Quick Financial Home were loan is offered at 2% per annul. Email: quickloanss@foxmail.com
+V2VkLCBKdWwgMTMsIDIwMTYgYXQgMDE6MDU6MDNQTSArMTAwMCwgU3Rld2FydCBTbWl0aCB3cm90
+ZToKPiBTdGVwaGVuIFJvdGh3ZWxsIDxzZnJAY2FuYi5hdXVnLm9yZy5hdT4gd3JpdGVzOgo+ID4g
+T24gTW9uLCAxMSBKdWwgMjAxNiAxNjowNzozOSAtMDMwMCBQYXVsbyBGbGFiaWFubyBTbW9yaWdv
+IDxwZnNtb3JpZ29AbGludXgudm5ldC5pYm0uY29tPiB3cm90ZToKPiA+Pgo+ID4+IGRpZmYgLS1n
+aXQgYS9kcml2ZXJzL2NyeXB0by92bXgvYWVzcDgtcHBjLnBsIGIvZHJpdmVycy9jcnlwdG8vdm14
+L2Flc3A4LXBwYy5wbAo+ID4+IGluZGV4IDIyODA1MzkuLjgxM2ZmY2MgMTAwNjQ0Cj4gPj4gLS0t
+IGEvZHJpdmVycy9jcnlwdG8vdm14L2Flc3A4LXBwYy5wbAo+ID4+ICsrKyBiL2RyaXZlcnMvY3J5
+cHRvL3ZteC9hZXNwOC1wcGMucGwKPiA+PiBAQCAtMSw0ICsxLDExIEBACj4gPj4gLSMhL3Vzci9i
+aW4vZW52IHBlcmwKPiA+PiArIyEgL3Vzci9iaW4vZW52IHBlcmwKPiA+PiArIyBDb3B5cmlnaHQg
+MjAxNC0yMDE2IFRoZSBPcGVuU1NMIFByb2plY3QgQXV0aG9ycy4gQWxsIFJpZ2h0cyBSZXNlcnZl
+ZC4KPiA+PiArIwo+ID4+ICsjIExpY2Vuc2VkIHVuZGVyIHRoZSBPcGVuU1NMIGxpY2Vuc2UgKHRo
+ZSAiTGljZW5zZSIpLiAgWW91IG1heSBub3QgdXNlCj4gPj4gKyMgdGhpcyBmaWxlIGV4Y2VwdCBp
+biBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuICBZb3UgY2FuIG9idGFpbiBhIGNvcHkKPiA+
+PiArIyBpbiB0aGUgZmlsZSBMSUNFTlNFIGluIHRoZSBzb3VyY2UgZGlzdHJpYnV0aW9uIG9yIGF0
+Cj4gPj4gKyMgaHR0cHM6Ly93d3cub3BlbnNzbC5vcmcvc291cmNlL2xpY2Vuc2UuaHRtbAo+ID4K
+PiA+IFNvLCBJIGFzc3VtZSB0aGF0IHRoaXMgbGljZW5zZSBpcyBjb21wYXRpYmxlIHdpdGggdGhl
+IEdQTHYyPwoKQW5keSByZWxlYXNlZCB0aGlzIGNvZGUgdW5kZXIgdGhlIGNyeXB0b2dhbXMgbGlj
+ZW5zZToKCiMgPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT0KIyBXcml0dGVuIGJ5IEFuZHkgUG9seWFrb3YgPGFwcHJvQG9w
+ZW5zc2wub3JnPiBmb3IgdGhlIE9wZW5TU0wKIyBwcm9qZWN0LiBUaGUgbW9kdWxlIGlzLCBob3dl
+dmVyLCBkdWFsIGxpY2Vuc2VkIHVuZGVyIE9wZW5TU0wgYW5kCiMgQ1JZUFRPR0FNUyBsaWNlbnNl
+cyBkZXBlbmRpbmcgb24gd2hlcmUgeW91IG9idGFpbiBpdC4gRm9yIGZ1cnRoZXIKIyBkZXRhaWxz
+IHNlZSBodHRwOi8vd3d3Lm9wZW5zc2wub3JnL35hcHByby9jcnlwdG9nYW1zLy4KIyA9PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PQoKVGhlIGxpY2Vuc2UgaXMgR1BMIGNvbXBhdGlibGU6CgpBTFRFUk5BVElWRUxZLCBwcm92
+aWRlZCB0aGF0IHRoaXMgbm90aWNlIGlzIHJldGFpbmVkIGluIGZ1bGwsIHRoaXMKcHJvZHVjdCBt
+YXkgYmUgZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIHRlcm1zIG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJs
+aWMKTGljZW5zZSAoR1BMKSwgaW4gd2hpY2ggY2FzZSB0aGUgcHJvdmlzaW9ucyBvZiB0aGUgR1BM
+IGFwcGx5IElOU1RFQUQgT0YKdGhvc2UgZ2l2ZW4gYWJvdmUuCgo+IAo+IGh0dHBzOi8vcGVvcGxl
+Lmdub21lLm9yZy9+bWFya21jL29wZW5zc2wtYW5kLXRoZS1ncGwuaHRtbCBoYXMgYW4KPiBleHBs
+YW5hdGlvbiBhbmQgcG9pbnRzIHRvOgo+IGh0dHBzOi8vd3d3Lm9wZW5zc2wub3JnL2RvY3MvZmFx
+Lmh0bWwjTEVHQUwyCj4gCj4gd2hpY2ggbWFrZXMgaXQgYW55dGhpbmcgYnV0IGNsZWFyZXIuCj4g
+Cj4gaXQgYXBwZWFycyB0aGUgYW5zd2VyIGlzICJwcm9iYWJseSBub3QsIHVubGVzcyB5b3UgaGF2
+ZSBhbiBleHBsaWNpdAo+IGV4ZW1wdGlvbiBpbiB5b3VyIGxpY2Vuc2UiCj4gCj4gLS0gCj4gU3Rl
+d2FydCBTbWl0aAo+IE9QQUwgQXJjaGl0ZWN0LCBJQk0uCgotLSAKUGF1bG8gRmxhYmlhbm8gU21v
+cmlnbwpJQk0gTGludXggVGVjaG5vbG9neSBDZW50ZXIKCl9fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4cHBjLWRldiBtYWlsaW5nIGxpc3QKTGludXhw
+cGMtZGV2QGxpc3RzLm96bGFicy5vcmcKaHR0cHM6Ly9saXN0cy5vemxhYnMub3JnL2xpc3RpbmZv
+L2xpbnV4cHBjLWRldg==
