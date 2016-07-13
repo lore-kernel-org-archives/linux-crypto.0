@@ -1,40 +1,74 @@
-From: Will Thomas <will.thomas@imgtec.com>
-Subject: Re: [PATCH 2/6] crypto: img-hash - Fix hash request context
-Date: Wed, 13 Jul 2016 15:45:15 +0100
-Message-ID: <578653FB.1020809@imgtec.com>
-References: <20160712074300.GA29696@gondor.apana.org.au>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [PATCH 1/2] crypto: vmx - Adding asm subroutines for XTS
+Date: Thu, 14 Jul 2016 01:11:58 +1000
+Message-ID: <20160714011158.46c386f4@canb.auug.org.au>
+References: <1468264060-22769-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
+ <20160712093705.6f0fde7a@canb.auug.org.au>
+ <8737nep7a8.fsf@linux.vnet.ibm.com> <20160713133427.GA20432@dublin>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:45530 "EHLO
-	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752355AbcGMOpX (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 Jul 2016 10:45:23 -0400
-In-Reply-To: <20160712074300.GA29696@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Stewart Smith <stewart@linux.vnet.ibm.com>,
+ "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org,
+ Paul Mackerras <paulus@samba.org>, "open
+ list:IBM Power VMX Cryptographic instructions" <linux-crypto@vger.kernel.org>,
+ "open list:LINUX FOR POWERPC 32-BIT AND
+ 64-BIT" <linuxppc-dev@lists.ozlabs.org>,
+ "David S. Miller" <davem@davemloft.net>
+To: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <20160713133427.GA20432@dublin>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On 12/07/16 08:43, Herbert Xu wrote:
-> Will Thomas <will.thomas@imgtec.com> wrote:
->> Move 0 length buffer to end of structure to stop overwriting
->> fallback request data. This doesn't cause a bug itself as the
->> buffer is never used alongside the fallback but should be
->> changed.
->>
->> Signed-off-by: Will Thomas <will.thomas@imgtec.com>
->> Reviewed-by: James Hartley <james.hartley@imgtec.com>
-> 
-> This points out another bug, the fallback can have its own ctx
-> following the request.
-> 
-> So the set_reqsize call needs to be adjusted to take that into
-> account.
-
-Will be an additional patch in v2 to fix this.
-
-Thanks,
-Will
+SGkgUGF1bG8sCgpPbiBXZWQsIDEzIEp1bCAyMDE2IDEwOjM0OjI3IC0wMzAwIFBhdWxvIEZsYWJp
+YW5vIFNtb3JpZ28gPHBmc21vcmlnb0BsaW51eC52bmV0LmlibS5jb20+IHdyb3RlOgo+Cj4gV2Vk
+LCBKdWwgMTMsIDIwMTYgYXQgMDE6MDU6MDNQTSArMTAwMCwgU3Rld2FydCBTbWl0aCB3cm90ZToK
+PiA+IFN0ZXBoZW4gUm90aHdlbGwgPHNmckBjYW5iLmF1dWcub3JnLmF1PiB3cml0ZXM6ICAKPiA+
+ID4gT24gTW9uLCAxMSBKdWwgMjAxNiAxNjowNzozOSAtMDMwMCBQYXVsbyBGbGFiaWFubyBTbW9y
+aWdvIDxwZnNtb3JpZ29AbGludXgudm5ldC5pYm0uY29tPiB3cm90ZTogIAo+ID4gPj4KPiA+ID4+
+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by92bXgvYWVzcDgtcHBjLnBsIGIvZHJpdmVycy9j
+cnlwdG8vdm14L2Flc3A4LXBwYy5wbAo+ID4gPj4gaW5kZXggMjI4MDUzOS4uODEzZmZjYyAxMDA2
+NDQKPiA+ID4+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL3ZteC9hZXNwOC1wcGMucGwKPiA+ID4+ICsr
+KyBiL2RyaXZlcnMvY3J5cHRvL3ZteC9hZXNwOC1wcGMucGwKPiA+ID4+IEBAIC0xLDQgKzEsMTEg
+QEAKPiA+ID4+IC0jIS91c3IvYmluL2VudiBwZXJsCj4gPiA+PiArIyEgL3Vzci9iaW4vZW52IHBl
+cmwKPiA+ID4+ICsjIENvcHlyaWdodCAyMDE0LTIwMTYgVGhlIE9wZW5TU0wgUHJvamVjdCBBdXRo
+b3JzLiBBbGwgUmlnaHRzIFJlc2VydmVkLgo+ID4gPj4gKyMKPiA+ID4+ICsjIExpY2Vuc2VkIHVu
+ZGVyIHRoZSBPcGVuU1NMIGxpY2Vuc2UgKHRoZSAiTGljZW5zZSIpLiAgWW91IG1heSBub3QgdXNl
+Cj4gPiA+PiArIyB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5z
+ZS4gIFlvdSBjYW4gb2J0YWluIGEgY29weQo+ID4gPj4gKyMgaW4gdGhlIGZpbGUgTElDRU5TRSBp
+biB0aGUgc291cmNlIGRpc3RyaWJ1dGlvbiBvciBhdAo+ID4gPj4gKyMgaHR0cHM6Ly93d3cub3Bl
+bnNzbC5vcmcvc291cmNlL2xpY2Vuc2UuaHRtbCAgCj4gPiA+Cj4gPiA+IFNvLCBJIGFzc3VtZSB0
+aGF0IHRoaXMgbGljZW5zZSBpcyBjb21wYXRpYmxlIHdpdGggdGhlIEdQTHYyPyAgCj4gCj4gQW5k
+eSByZWxlYXNlZCB0aGlzIGNvZGUgdW5kZXIgdGhlIGNyeXB0b2dhbXMgbGljZW5zZToKPiAKPiAj
+ID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09Cj4gIyBXcml0dGVuIGJ5IEFuZHkgUG9seWFrb3YgPGFwcHJvQG9wZW5zc2wu
+b3JnPiBmb3IgdGhlIE9wZW5TU0wKPiAjIHByb2plY3QuIFRoZSBtb2R1bGUgaXMsIGhvd2V2ZXIs
+IGR1YWwgbGljZW5zZWQgdW5kZXIgT3BlblNTTCBhbmQKPiAjIENSWVBUT0dBTVMgbGljZW5zZXMg
+ZGVwZW5kaW5nIG9uIHdoZXJlIHlvdSBvYnRhaW4gaXQuIEZvciBmdXJ0aGVyCj4gIyBkZXRhaWxz
+IHNlZSBodHRwOi8vd3d3Lm9wZW5zc2wub3JnL35hcHByby9jcnlwdG9nYW1zLy4KPiAjID09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09CgpZZWFoLCB0aGlzIGxpY2Vuc2Ugc3RhdGVtZW50IGlzIGFscmVhZHkgaW4gdGhlIGZp
+bGUgYmVpbmcgcGF0Y2hlZCwgc28Kd2h5IGlzIHRoZSBhYm92ZSBsaWNlbnNlIChhbmQgQ29weXJp
+Z2h0IG5vdGljZSkgYmVpbmcgYWRkZWQgYWJvdmUgdGhlCmV4aXN0aW5nIG9uZT8KCj4gVGhlIGxp
+Y2Vuc2UgaXMgR1BMIGNvbXBhdGlibGU6CgpHb29kLCB0aGFua3MuCgo+IEFMVEVSTkFUSVZFTFks
+IHByb3ZpZGVkIHRoYXQgdGhpcyBub3RpY2UgaXMgcmV0YWluZWQgaW4gZnVsbCwgdGhpcwo+IHBy
+b2R1Y3QgbWF5IGJlIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdlbmVy
+YWwgUHVibGljCj4gTGljZW5zZSAoR1BMKSwgaW4gd2hpY2ggY2FzZSB0aGUgcHJvdmlzaW9ucyBv
+ZiB0aGUgR1BMIGFwcGx5IElOU1RFQUQgT0YKPiB0aG9zZSBnaXZlbiBhYm92ZS4KCldoaWNoIGlz
+IG5vdCBpbiB0aGlzIGZpbGUgb3IgdGhlIHBhdGNoLCBidXQgcHJlc3VtYWJseSBpbiB0aGUgcmVm
+ZXJyZWQKdG8gd2ViIHBhZ2UuCgpPZiBjb3Vyc2UsIEkgYW0gbm90IGEgbGF3eWVyIDotKQotLSAK
+Q2hlZXJzLApTdGVwaGVuIFJvdGh3ZWxsCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fCkxpbnV4cHBjLWRldiBtYWlsaW5nIGxpc3QKTGludXhwcGMtZGV2QGxp
+c3RzLm96bGFicy5vcmcKaHR0cHM6Ly9saXN0cy5vemxhYnMub3JnL2xpc3RpbmZvL2xpbnV4cHBj
+LWRldg==
