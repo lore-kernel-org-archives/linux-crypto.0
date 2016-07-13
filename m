@@ -1,85 +1,22 @@
-From: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
-Subject: Re: [PATCH 1/2] crypto: vmx - Adding asm subroutines for XTS
-Date: Wed, 13 Jul 2016 13:02:09 -0300
-Message-ID: <20160713160209.GB20432@dublin>
-References: <1468264060-22769-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
- <20160712093705.6f0fde7a@canb.auug.org.au>
- <8737nep7a8.fsf@linux.vnet.ibm.com> <20160713133427.GA20432@dublin>
- <20160714011158.46c386f4@canb.auug.org.au>
+From: Financial Service <bambang.prasodjo@customs.go.id>
+Subject: Fast Loans
+Date: Wed, 13 Jul 2016 17:57:43 +0530
+Message-ID: <20160713122828.0A8001BC8EA4__23536.4212924198$1468440425$gmane$org@mail.customs.go.id>
+Reply-To: m_rajeshkumar@aol.co.uk
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Stewart Smith <stewart@linux.vnet.ibm.com>,
- "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org,
- Paul Mackerras <paulus@samba.org>,
- "open list:IBM Power VMX Cryptographic instructions"
- <linux-crypto@vger.kernel.org>,
- "open list:LINUX FOR POWERPC 32-BIT AND 64-BIT"
- <linuxppc-dev@lists.ozlabs.org>, "David S. Miller" <davem@davemloft.net>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-Content-Disposition: inline
-In-Reply-To: <20160714011158.46c386f4@canb.auug.org.au>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: Recipients <bambang.prasodjo@customs.go.id>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.customs.go.id ([202.61.126.135]:33488 "EHLO
+	mail.customs.go.id" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751431AbcGMUGP convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 13 Jul 2016 16:06:15 -0400
+Content-Description: Mail message body
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-VGh1LCBKdWwgMTQsIDIwMTYgYXQgMDE6MTE6NThBTSArMTAwMCwgU3RlcGhlbiBSb3Rod2VsbCB3
-cm90ZToKPiBIaSBQYXVsbywKPiAKPiBPbiBXZWQsIDEzIEp1bCAyMDE2IDEwOjM0OjI3IC0wMzAw
-IFBhdWxvIEZsYWJpYW5vIFNtb3JpZ28gPHBmc21vcmlnb0BsaW51eC52bmV0LmlibS5jb20+IHdy
-b3RlOgo+ID4KPiA+IFdlZCwgSnVsIDEzLCAyMDE2IGF0IDAxOjA1OjAzUE0gKzEwMDAsIFN0ZXdh
-cnQgU21pdGggd3JvdGU6Cj4gPiA+IFN0ZXBoZW4gUm90aHdlbGwgPHNmckBjYW5iLmF1dWcub3Jn
-LmF1PiB3cml0ZXM6ICAKPiA+ID4gPiBPbiBNb24sIDExIEp1bCAyMDE2IDE2OjA3OjM5IC0wMzAw
-IFBhdWxvIEZsYWJpYW5vIFNtb3JpZ28gPHBmc21vcmlnb0BsaW51eC52bmV0LmlibS5jb20+IHdy
-b3RlOiAgCj4gPiA+ID4+Cj4gPiA+ID4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by92bXgv
-YWVzcDgtcHBjLnBsIGIvZHJpdmVycy9jcnlwdG8vdm14L2Flc3A4LXBwYy5wbAo+ID4gPiA+PiBp
-bmRleCAyMjgwNTM5Li44MTNmZmNjIDEwMDY0NAo+ID4gPiA+PiAtLS0gYS9kcml2ZXJzL2NyeXB0
-by92bXgvYWVzcDgtcHBjLnBsCj4gPiA+ID4+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL3ZteC9hZXNw
-OC1wcGMucGwKPiA+ID4gPj4gQEAgLTEsNCArMSwxMSBAQAo+ID4gPiA+PiAtIyEvdXNyL2Jpbi9l
-bnYgcGVybAo+ID4gPiA+PiArIyEgL3Vzci9iaW4vZW52IHBlcmwKPiA+ID4gPj4gKyMgQ29weXJp
-Z2h0IDIwMTQtMjAxNiBUaGUgT3BlblNTTCBQcm9qZWN0IEF1dGhvcnMuIEFsbCBSaWdodHMgUmVz
-ZXJ2ZWQuCj4gPiA+ID4+ICsjCj4gPiA+ID4+ICsjIExpY2Vuc2VkIHVuZGVyIHRoZSBPcGVuU1NM
-IGxpY2Vuc2UgKHRoZSAiTGljZW5zZSIpLiAgWW91IG1heSBub3QgdXNlCj4gPiA+ID4+ICsjIHRo
-aXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLiAgWW91IGNhbiBv
-YnRhaW4gYSBjb3B5Cj4gPiA+ID4+ICsjIGluIHRoZSBmaWxlIExJQ0VOU0UgaW4gdGhlIHNvdXJj
-ZSBkaXN0cmlidXRpb24gb3IgYXQKPiA+ID4gPj4gKyMgaHR0cHM6Ly93d3cub3BlbnNzbC5vcmcv
-c291cmNlL2xpY2Vuc2UuaHRtbCAgCj4gPiA+ID4KPiA+ID4gPiBTbywgSSBhc3N1bWUgdGhhdCB0
-aGlzIGxpY2Vuc2UgaXMgY29tcGF0aWJsZSB3aXRoIHRoZSBHUEx2Mj8gIAo+ID4gCj4gPiBBbmR5
-IHJlbGVhc2VkIHRoaXMgY29kZSB1bmRlciB0aGUgY3J5cHRvZ2FtcyBsaWNlbnNlOgo+ID4gCj4g
-PiAjID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09Cj4gPiAjIFdyaXR0ZW4gYnkgQW5keSBQb2x5YWtvdiA8YXBwcm9Ab3Bl
-bnNzbC5vcmc+IGZvciB0aGUgT3BlblNTTAo+ID4gIyBwcm9qZWN0LiBUaGUgbW9kdWxlIGlzLCBo
-b3dldmVyLCBkdWFsIGxpY2Vuc2VkIHVuZGVyIE9wZW5TU0wgYW5kCj4gPiAjIENSWVBUT0dBTVMg
-bGljZW5zZXMgZGVwZW5kaW5nIG9uIHdoZXJlIHlvdSBvYnRhaW4gaXQuIEZvciBmdXJ0aGVyCj4g
-PiAjIGRldGFpbHMgc2VlIGh0dHA6Ly93d3cub3BlbnNzbC5vcmcvfmFwcHJvL2NyeXB0b2dhbXMv
-Lgo+ID4gIyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PQo+IAo+IFllYWgsIHRoaXMgbGljZW5zZSBzdGF0ZW1lbnQgaXMg
-YWxyZWFkeSBpbiB0aGUgZmlsZSBiZWluZyBwYXRjaGVkLCBzbwo+IHdoeSBpcyB0aGUgYWJvdmUg
-bGljZW5zZSAoYW5kIENvcHlyaWdodCBub3RpY2UpIGJlaW5nIGFkZGVkIGFib3ZlIHRoZQo+IGV4
-aXN0aW5nIG9uZT8KCmFlc3A4LXBwYy5wbCBmcm9tIExpbnV4IGlzIGFsbW9zdCB0aGUgc2FtZSBh
-cyB0aGUgb25lIGZyb20gT3BlblNTTCBhbmQgd2UgZG8KdGhhdCBzbyB3ZSBjYW4ga2VlcCBpdCB1
-cGRhdGVkIG9uIGJvdGggcHJvamVjdHMuClRoZSBhYm92ZSBsaWNlbnNlIGxpbmVzIHdlcmUgYWRk
-ZWQgdG8gYWxsIHBsIGZpbGVzIGluIE9wZW5TU0wgc28gaXQgZW5kZWQgdXAKaGVyZSBidXQgc2lu
-Y2UgdGhlIGF1dGhvciBwdWJsaXNoZWQgaXQgYXMgY3J5cHRvZ2FtcyB0b28gd2UgYXJlIG9rLgoK
-PiAKPiA+IFRoZSBsaWNlbnNlIGlzIEdQTCBjb21wYXRpYmxlOgo+IAo+IEdvb2QsIHRoYW5rcy4K
-PiAKPiA+IEFMVEVSTkFUSVZFTFksIHByb3ZpZGVkIHRoYXQgdGhpcyBub3RpY2UgaXMgcmV0YWlu
-ZWQgaW4gZnVsbCwgdGhpcwo+ID4gcHJvZHVjdCBtYXkgYmUgZGlzdHJpYnV0ZWQgdW5kZXIgdGhl
-IHRlcm1zIG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMKPiA+IExpY2Vuc2UgKEdQTCksIGluIHdo
-aWNoIGNhc2UgdGhlIHByb3Zpc2lvbnMgb2YgdGhlIEdQTCBhcHBseSBJTlNURUFEIE9GCj4gPiB0
-aG9zZSBnaXZlbiBhYm92ZS4KPiAKPiBXaGljaCBpcyBub3QgaW4gdGhpcyBmaWxlIG9yIHRoZSBw
-YXRjaCwgYnV0IHByZXN1bWFibHkgaW4gdGhlIHJlZmVycmVkCj4gdG8gd2ViIHBhZ2UuCgpZZXMs
-IHRoYXQgY29tbWVudCBpcyBmcm9tIHRoZSB1cmwgcG9pbnRlZCBpbiB0aGUgY29kZS4KCj4gCj4g
-T2YgY291cnNlLCBJIGFtIG5vdCBhIGxhd3llciA6LSkKPiAtLSAKPiBDaGVlcnMsCj4gU3RlcGhl
-biBSb3Rod2VsbAo+IAoKLS0gClBhdWxvIEZsYWJpYW5vIFNtb3JpZ28KSUJNIExpbnV4IFRlY2hu
-b2xvZ3kgQ2VudGVyCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXwpMaW51eHBwYy1kZXYgbWFpbGluZyBsaXN0CkxpbnV4cHBjLWRldkBsaXN0cy5vemxhYnMu
-b3JnCmh0dHBzOi8vbGlzdHMub3psYWJzLm9yZy9saXN0aW5mby9saW51eHBwYy1kZXY=
+Hae lainaa 3% vastaus t=E4h=E4n viestiin lis=E4tietoja
+
+Apply for a loan at 3% reply to this Email for more Info
