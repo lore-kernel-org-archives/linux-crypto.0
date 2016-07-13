@@ -1,33 +1,69 @@
-From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [PATCH 1/2] crypto: vmx - Adding asm subroutines for XTS
-Date: Tue, 12 Jul 2016 16:19:42 +0000
-Message-ID: <063D6719AE5E284EB5DD2968C1650D6D5F4F62C4@AcuExch.aculab.com>
-References: <1468264060-22769-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
+From: Stewart Smith <stewart@linux.vnet.ibm.com>
+Subject: Re: [PATCH 1/2] crypto: vmx - Adding asm subroutines for XTS
+Date: Wed, 13 Jul 2016 13:05:03 +1000
+Message-ID: <8737nep7a8.fsf@linux.vnet.ibm.com>
+References: <1468264060-22769-1-git-send-email-pfsmorigo@linux.vnet.ibm.com> <20160712093705.6f0fde7a@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain
 Cc: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Paul Mackerras <paulus@samba.org>,
-	"open list:IBM Power VMX Cryptographic instructions"
+	linux-kernel@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
+	"open list\:IBM Power VMX Cryptographic instructions"
 	<linux-crypto@vger.kernel.org>,
-	"open list:LINUX FOR POWERPC 32-BIT AND 64-BIT"
+	"open list\:LINUX FOR POWERPC 32-BIT AND 64-BIT"
 	<linuxppc-dev@lists.ozlabs.org>,
 	"David S. Miller" <davem@davemloft.net>
-To: 'Paulo Flabiano Smorigo' <pfsmorigo@linux.vnet.ibm.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1468264060-22769-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Stephen Rothwell <sfr@canb.auug.org.au>,
+	Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11359 "EHLO
+	mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1750816AbcGMDFx (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Jul 2016 23:05:53 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id u6D33b47042647
+	for <linux-crypto@vger.kernel.org>; Tue, 12 Jul 2016 23:05:42 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 24567bk93r-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Tue, 12 Jul 2016 23:05:42 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <stewart@linux.vnet.ibm.com>;
+	Tue, 12 Jul 2016 21:05:41 -0600
+In-Reply-To: <20160712093705.6f0fde7a@canb.auug.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-RnJvbTogUGF1bG8gRmxhYmlhbm8gU21vcmlnbw0KPiBTZW50OiAxMSBKdWx5IDIwMTYgMjA6MDgN
-Cj4gDQo+IFRoaXMgcGF0Y2ggYWRkIFhUUyBzdWJyb3V0aW5lcyB1c2luZyBWTVgtY3J5cHRvIGRy
-aXZlci4NCj4gDQo+IEl0IGdpdmVzIGEgYm9vc3Qgb2YgMjAgdGltZXMgdXNpbmcgWFRTLg0KPiAN
-Cj4gVGhlc2UgY29kZSBoYXMgYmVlbiBhZG9wdGVkIGZyb20gT3BlblNTTCBwcm9qZWN0IGluIGNv
-bGxhYm9yYXRpb24NCj4gd2l0aCB0aGUgb3JpZ2luYWwgYXV0aG9yIChBbmR5IFBvbHlha292IDxh
-cHByb0BvcGVuc3NsLm9yZz4pLg0KDQpZZXAsIHR5cGljYWwgb3BlbnNzbCBjb2RlLiAxMDAwKyBs
-aW5lcyBvZiB1bmNvbW1lbnRlZCBpbXBlbmV0cmFibGUgYXNzZW1ibGVyLg0KVGhlcmUgaXMgMCBj
-aGFuY2Ugb2YgYW55b25lIGV2ZXIgY2hlY2tpbmcgdGhpcyBkb2VzIHdoYXQgaXQgc2hvdWxkLg0K
-DQoJRGF2aWQNCg0K
+Stephen Rothwell <sfr@canb.auug.org.au> writes:
+> On Mon, 11 Jul 2016 16:07:39 -0300 Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com> wrote:
+>>
+>> diff --git a/drivers/crypto/vmx/aesp8-ppc.pl b/drivers/crypto/vmx/aesp8-ppc.pl
+>> index 2280539..813ffcc 100644
+>> --- a/drivers/crypto/vmx/aesp8-ppc.pl
+>> +++ b/drivers/crypto/vmx/aesp8-ppc.pl
+>> @@ -1,4 +1,11 @@
+>> -#!/usr/bin/env perl
+>> +#! /usr/bin/env perl
+>> +# Copyright 2014-2016 The OpenSSL Project Authors. All Rights Reserved.
+>> +#
+>> +# Licensed under the OpenSSL license (the "License").  You may not use
+>> +# this file except in compliance with the License.  You can obtain a copy
+>> +# in the file LICENSE in the source distribution or at
+>> +# https://www.openssl.org/source/license.html
+>
+> So, I assume that this license is compatible with the GPLv2?
+
+https://people.gnome.org/~markmc/openssl-and-the-gpl.html has an
+explanation and points to:
+https://www.openssl.org/docs/faq.html#LEGAL2
+
+which makes it anything but clearer.
+
+it appears the answer is "probably not, unless you have an explicit
+exemption in your license"
+
+-- 
+Stewart Smith
+OPAL Architect, IBM.
