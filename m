@@ -1,62 +1,55 @@
-From: Dave Young <dyoung@redhat.com>
-Subject: Re: [V2][PATCH 2/2] pefile: Fix the failure of calculation for digest
-Date: Thu, 14 Jul 2016 10:18:34 +0800
-Message-ID: <20160714021834.GC3798@dhcp-128-65.nay.redhat.com>
-References: <1468416937-21237-2-git-send-email-jia.zhang@windriver.com>
+From: Balbir Singh <bsingharora@gmail.com>
+Subject: Re: [PATCH 0/2] Automatically load the vmx_crypto module if supported
+Date: Thu, 14 Jul 2016 13:34:49 +1000
+Message-ID: <20160714033449.GB18277@balbir.ozlabs.ibm.com>
+References: <1468388840-12068-1-git-send-email-alastair@au1.ibm.com>
+ <1468389299.4705.26.camel@au1.ibm.com>
+Reply-To: bsingharora@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: dhowells@redhat.com, kexec@lists.infradead.org, vgoyal@redhat.com,
-	bhe@redhat.com, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org
-To: Lans Zhang <jia.zhang@windriver.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: mpe@ellerman.id.au, benh@kernel.crashing.org, paulus@samba.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Alastair D'Silva <alastair@au1.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42236 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750950AbcGNCSk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 Jul 2016 22:18:40 -0400
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:36071 "EHLO
+	mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751058AbcGNDe6 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 13 Jul 2016 23:34:58 -0400
 Content-Disposition: inline
-In-Reply-To: <1468416937-21237-2-git-send-email-jia.zhang@windriver.com>
+In-Reply-To: <1468389299.4705.26.camel@au1.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Cc crypto list
+On Wed, Jul 13, 2016 at 03:54:59PM +1000, Alastair D'Silva wrote:
+> On Wed, 2016-07-13 at 15:47 +1000, alastair@au1.ibm.com wrote:
+> > From: Alastair D'Silva <alastair@d-silva.org>
+> > > This series allows the vmx_crypto module to be detected and
+> > automatically
+> > loaded via UDEV if the CPU supports the vector crypto feature.
+> > > Alastair D'Silva (2):
+> > =A0 powerpc: Add module autoloading based on CPU features
+> > =A0 crypto: vmx - Convert to CPU feature based module autoloading
+> > > =A0arch/powerpc/Kconfig=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0|=A0=A01 +
+> > =A0arch/powerpc/include/asm/cpufeature.h | 70
+> > +++++++++++++++++++++++++++++++++++
+> > =A0drivers/crypto/vmx/Kconfig=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0|=A0=
+=A02 +-
+> > =A0drivers/crypto/vmx/vmx.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+|=A0=A06 +--
+> > =A04 files changed, 74 insertions(+), 5 deletions(-)
+> > =A0create mode 100644 arch/powerpc/include/asm/cpufeature.h
+>=20
+> Please ignore the following:
+> =A0 [PATCH 1/2] Allow drivers to be autoloaded.
+> =A0 [PATCH 2/2] Automatically load the vmx_crypto module if supported=
+=2E
+>
 
-On 07/13/16 at 09:35pm, Lans Zhang wrote:
-> The commit e68503bd68 forgot to set digest_len and thus cause the following
-> error reported by kexec when launching a crash kernel:
-> "kexec_file_load failed: Bad message"
-> 
-> Fixes: e68503bd68 (KEYS: Generalise system_verify_data() to provide access to internal content)
-> Signed-off-by: Lans Zhang <jia.zhang@windriver.com>
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: Dave Young <dyoung@redhat.com>
-> Cc: Baoquan He <bhe@redhat.com>
-> Cc: Vivek Goyal <vgoyal@redhat.com>
-> ---
->  crypto/asymmetric_keys/mscode_parser.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/crypto/asymmetric_keys/mscode_parser.c b/crypto/asymmetric_keys/mscode_parser.c
-> index 6a76d5c..9492e1c 100644
-> --- a/crypto/asymmetric_keys/mscode_parser.c
-> +++ b/crypto/asymmetric_keys/mscode_parser.c
-> @@ -124,5 +124,10 @@ int mscode_note_digest(void *context, size_t hdrlen,
->  	struct pefile_context *ctx = context;
->  
->  	ctx->digest = kmemdup(value, vlen, GFP_KERNEL);
-> -	return ctx->digest ? 0 : -ENOMEM;
-> +	if (!ctx->digest)
-> +		return -ENOMEM;
-> +
-> +	ctx->digest_len = vlen;
-> +
-> +	return 0;
->  }
-> -- 
-> 1.9.1
-> 
-> 
-> _______________________________________________
-> kexec mailing list
-> kexec@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kexec
+Do you want to repost the series?
+
+Balbir=20
