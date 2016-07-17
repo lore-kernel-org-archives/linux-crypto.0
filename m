@@ -1,27 +1,58 @@
 From: David Howells <dhowells@redhat.com>
-Subject: Re: [V2][PATCH 1/2] PKCS#7: Fix kernel panic when referring to the empty AuthorityKeyIdentifier
-Date: Sun, 17 Jul 2016 23:58:41 +0100
-Message-ID: <31800.1468796321@warthog.procyon.org.uk>
-References: <57898E6A.5080101@windriver.com> <1468416937-21237-1-git-send-email-jia.zhang@windriver.com> <3760.1468594137@warthog.procyon.org.uk>
+Subject: [PATCH 0/3] KEYS: Miscellaneous fixes
+Date: Mon, 18 Jul 2016 00:10:32 +0100
+Message-ID: <146879703192.32133.3670984393495441516.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, bhe@redhat.com, vgoyal@redhat.com,
-	kexec@lists.infradead.org, linux-crypto@vger.kernel.org
-To: Lans Zhang <jia.zhang@windriver.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: dhowells@redhat.com, keyring@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: jmorris@namei.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:53783 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:55972 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751198AbcGQW6o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 17 Jul 2016 18:58:44 -0400
-In-Reply-To: <57898E6A.5080101@windriver.com>
-Content-ID: <31799.1468796321.1@warthog.procyon.org.uk>
+	id S1751216AbcGQXKe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 17 Jul 2016 19:10:34 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Lans Zhang <jia.zhang@windriver.com> wrote:
 
-> Let me know if I need to add this comment to commit header.
+Hi James,
 
-I've done that.
+Here are three miscellaneous fixes:
+
+ (1) Fix a panic in some debugging code in PKCS#7.  This can only happen by
+     explicitly inserting a #define DEBUG into the code.
+
+ (2) Fix the calculation of the digest length in the PE file parser.  This
+     causes a failure where there should be a success.
+
+ (3) Fix the case where an X.509 cert can be added as an asymmetric key to
+     a trusted keyring with no trust restriction if no AKID is supplied.
+
+Bugs (1) and (2) aren't particularly problematic, but (3) allows a security
+check to be bypassed.  Bug (3) is added since the 4.6 kernel.
+
+The patches can be found here also:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-fixes
+
+at tag:
+
+	keys-fixes-20160718
 
 David
+---
+Lans Zhang (2):
+      PKCS#7: Fix panic when referring to the empty AKID when DEBUG defined
+      pefile: Fix the failure of calculation for digest
+
+Mat Martineau (1):
+      KEYS: Fix for erroneous trust of incorrectly signed X.509 certs
+
+
+ crypto/asymmetric_keys/mscode_parser.c |    7 ++++++-
+ crypto/asymmetric_keys/pkcs7_verify.c  |    2 +-
+ crypto/asymmetric_keys/restrict.c      |    2 +-
+ 3 files changed, 8 insertions(+), 3 deletions(-)
