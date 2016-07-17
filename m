@@ -1,58 +1,95 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 0/3] KEYS: Miscellaneous fixes
-Date: Mon, 18 Jul 2016 00:10:32 +0100
-Message-ID: <146879703192.32133.3670984393495441516.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 1/3] PKCS#7: Fix panic when referring to the empty AKID when
+ DEBUG defined
+Date: Mon, 18 Jul 2016 00:10:39 +0100
+Message-ID: <146879703931.32133.13429521209506593362.stgit@warthog.procyon.org.uk>
+References: <146879703192.32133.3670984393495441516.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: dhowells@redhat.com, keyring@vger.kernel.org,
+Cc: keyring@vger.kernel.org, Lans Zhang <jia.zhang@windriver.com>,
+	Baoquan He <bhe@redhat.com>, kexec@lists.infradead.org,
+	linux-kernel@vger.kernel.org, dhowells@redhat.com,
 	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+	linux-crypto@vger.kernel.org, Dave Young <dyoung@redhat.com>,
+	Vivek Goyal <vgoyal@redhat.com>
 To: jmorris@namei.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:55972 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751216AbcGQXKe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 17 Jul 2016 19:10:34 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <146879703192.32133.3670984393495441516.stgit@warthog.procyon.org.uk>
+Sender: owner-linux-security-module@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+From: Lans Zhang <jia.zhang@windriver.com>
 
-Hi James,
+This fix resolves the following kernel panic if an empty or missing
+AuthorityKeyIdentifier is encountered and DEBUG is defined in
+pkcs7_verify.c.
 
-Here are three miscellaneous fixes:
+[  459.041989] PKEY: <==public_key_verify_signature() = 0
+[  459.041993] PKCS7: Verified signature 1
+[  459.041995] PKCS7: ==> pkcs7_verify_sig_chain()
+[  459.041999] PKCS7: verify Sample DB Certificate for SCP: 01
+[  459.042002] PKCS7: - issuer Sample KEK Certificate for SCP
+[  459.042014] BUG: unable to handle kernel NULL pointer dereference at           (null)
+[  459.042135] IP: [<ffffffff813e7b4c>] pkcs7_verify+0x72c/0x7f0
+[  459.042217] PGD 739e6067 PUD 77719067 PMD 0
+[  459.042286] Oops: 0000 [#1] PREEMPT SMP
+[  459.042328] Modules linked in:
+[  459.042368] CPU: 0 PID: 474 Comm: kexec Not tainted 4.7.0-rc7-WR8.0.0.0_standard+ #18
+[  459.042462] Hardware name: To be filled by O.E.M. To be filled by O.E.M./Aptio CRB, BIOS 5.6.5 10/09/2014
+[  459.042586] task: ffff880073a50000 ti: ffff8800738e8000 task.ti: ffff8800738e8000
+[  459.042675] RIP: 0010:[<ffffffff813e7b4c>]  [<ffffffff813e7b4c>] pkcs7_verify+0x72c/0x7f0
+[  459.042784] RSP: 0018:ffff8800738ebd58  EFLAGS: 00010246
+[  459.042845] RAX: 0000000000000000 RBX: ffff880076b7da80 RCX: 0000000000000006
+[  459.042929] RDX: 0000000000000001 RSI: ffffffff81c85001 RDI: ffffffff81ca00a9
+[  459.043014] RBP: ffff8800738ebd98 R08: 0000000000000400 R09: ffff8800788a304c
+[  459.043098] R10: 0000000000000000 R11: 00000000000060ca R12: ffff8800769a2bc0
+[  459.043182] R13: ffff880077358300 R14: 0000000000000000 R15: ffff8800769a2dc0
+[  459.043268] FS:  00007f24cc741700(0000) GS:ffff880074e00000(0000) knlGS:0000000000000000
+[  459.043365] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  459.043431] CR2: 0000000000000000 CR3: 0000000073a36000 CR4: 00000000001006f0
+[  459.043514] Stack:
+[  459.043530]  0000000000000000 ffffffbf00000020 31ffffff813e68b0 0000000000000002
+[  459.043644]  ffff8800769a2bc0 0000000000000000 00000000007197b8 0000000000000002
+[  459.043756]  ffff8800738ebdd8 ffffffff81153fb1 0000000000000000 0000000000000000
+[  459.043869] Call Trace:
+[  459.043898]  [<ffffffff81153fb1>] verify_pkcs7_signature+0x61/0x140
+[  459.043974]  [<ffffffff813e7f0b>] verify_pefile_signature+0x2cb/0x830
+[  459.044052]  [<ffffffff813e8470>] ? verify_pefile_signature+0x830/0x830
+[  459.044134]  [<ffffffff81048e25>] bzImage64_verify_sig+0x15/0x20
+[  459.046332]  [<ffffffff81046e09>] arch_kexec_kernel_verify_sig+0x29/0x40
+[  459.048552]  [<ffffffff810f10e4>] SyS_kexec_file_load+0x1f4/0x6c0
+[  459.050768]  [<ffffffff81050e36>] ? __do_page_fault+0x1b6/0x550
+[  459.052996]  [<ffffffff8199241f>] entry_SYSCALL_64_fastpath+0x17/0x93
+[  459.055242] Code: e8 0a d6 ff ff 85 c0 0f 88 7a fb ff ff 4d 39 fd 4d 89 7d 08 74 45 4d 89 fd e9 14 fe ff ff 4d 8b 76 08 31 c0 48 c7 c7 a9 00 ca 81 <41> 0f b7 36 49 8d 56 02 e8 d0 91 d6 ff 4d 8b 3c 24 4d 85 ff 0f
+[  459.060535] RIP  [<ffffffff813e7b4c>] pkcs7_verify+0x72c/0x7f0
+[  459.063040]  RSP <ffff8800738ebd58>
+[  459.065456] CR2: 0000000000000000
+[  459.075998] ---[ end trace c15f0e897cda28dc ]---
 
- (1) Fix a panic in some debugging code in PKCS#7.  This can only happen by
-     explicitly inserting a #define DEBUG into the code.
-
- (2) Fix the calculation of the digest length in the PE file parser.  This
-     causes a failure where there should be a success.
-
- (3) Fix the case where an X.509 cert can be added as an asymmetric key to
-     a trusted keyring with no trust restriction if no AKID is supplied.
-
-Bugs (1) and (2) aren't particularly problematic, but (3) allows a security
-check to be bypassed.  Bug (3) is added since the 4.6 kernel.
-
-The patches can be found here also:
-
-	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-fixes
-
-at tag:
-
-	keys-fixes-20160718
-
-David
+Signed-off-by: Lans Zhang <jia.zhang@windriver.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+Cc: Dave Young <dyoung@redhat.com>
+Cc: Baoquan He <bhe@redhat.com>
+Cc: Vivek Goyal <vgoyal@redhat.com>
+cc: linux-crypto@vger.kernel.org
+cc: kexec@lists.infradead.org
 ---
-Lans Zhang (2):
-      PKCS#7: Fix panic when referring to the empty AKID when DEBUG defined
-      pefile: Fix the failure of calculation for digest
 
-Mat Martineau (1):
-      KEYS: Fix for erroneous trust of incorrectly signed X.509 certs
+ crypto/asymmetric_keys/pkcs7_verify.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index 44b746e9df1b..2ffd69769466 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -227,7 +227,7 @@ static int pkcs7_verify_sig_chain(struct pkcs7_message *pkcs7,
+ 				if (asymmetric_key_id_same(p->id, auth))
+ 					goto found_issuer_check_skid;
+ 			}
+-		} else {
++		} else if (sig->auth_ids[1]) {
+ 			auth = sig->auth_ids[1];
+ 			pr_debug("- want %*phN\n", auth->len, auth->data);
+ 			for (p = pkcs7->certs; p; p = p->next) {
 
- crypto/asymmetric_keys/mscode_parser.c |    7 ++++++-
- crypto/asymmetric_keys/pkcs7_verify.c  |    2 +-
- crypto/asymmetric_keys/restrict.c      |    2 +-
- 3 files changed, 8 insertions(+), 3 deletions(-)
