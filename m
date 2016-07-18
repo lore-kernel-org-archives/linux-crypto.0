@@ -1,90 +1,84 @@
 From: kbuild test robot <fengguang.wu@intel.com>
-Subject: [cryptodev:master 147/175] DocBook: include/crypto/skcipher.h:135:
- warning: No description found for parameter 'base'
-Date: Mon, 18 Jul 2016 20:25:17 +0800
-Message-ID: <201607182016.m8f2psvQ%fengguang.wu@intel.com>
+Subject: [cryptodev:master 163/175] DocBook: include/linux/crypto.h:1:
+ warning: no structured comments found
+Date: Mon, 18 Jul 2016 21:15:32 +0800
+Message-ID: <201607182125.LuRYG303%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="C7zPtVaVf+AK4Oqc"
+Content-Type: multipart/mixed; boundary="gKMricLos+KVdGMg"
+Content-Transfer-Encoding: 8bit
 Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
 To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:34833 "EHLO mga11.intel.com"
+Received: from mga04.intel.com ([192.55.52.120]:52995 "EHLO mga04.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751557AbcGRM0f (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 18 Jul 2016 08:26:35 -0400
+	id S1751370AbcGRNQw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 18 Jul 2016 09:16:52 -0400
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
---C7zPtVaVf+AK4Oqc
-Content-Type: text/plain; charset=us-ascii
+--gKMricLos+KVdGMg
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
 head:   c6335cbb0486f09b4c2ae86e84bf87efd667afa6
-commit: 4e6c3df4d729f85997cbf276bfa8ffd8579b8e77 [147/175] crypto: skcipher - Add low-level skcipher interface
+commit: 3a01d0ee2b991c8c267620e63a4ab47cd8c30cc4 [163/175] crypto: skcipher - Remove top-level givcipher interface
 reproduce: make htmldocs
 
 All warnings (new ones prefixed by >>):
 
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
->> include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+   include/crypto/skcipher.h:135: warning: No description found for parameter 'base'
+>> include/linux/crypto.h:1: warning: no structured comments found
+       Was looking for 'crypto_alloc_ablkcipher'.
 
-vim +/base +135 include/crypto/skcipher.h
+vim +1 include/linux/crypto.h
 
-   119	 * All fields except @ivsize are mandatory and must be filled.
-   120	 */
-   121	struct skcipher_alg {
-   122		int (*setkey)(struct crypto_skcipher *tfm, const u8 *key,
-   123		              unsigned int keylen);
-   124		int (*encrypt)(struct skcipher_request *req);
-   125		int (*decrypt)(struct skcipher_request *req);
-   126		int (*init)(struct crypto_skcipher *tfm);
-   127		void (*exit)(struct crypto_skcipher *tfm);
-   128	
-   129		unsigned int min_keysize;
-   130		unsigned int max_keysize;
-   131		unsigned int ivsize;
-   132		unsigned int chunksize;
-   133	
-   134		struct crypto_alg base;
- > 135	};
-   136	
-   137	#define SKCIPHER_REQUEST_ON_STACK(name, tfm) \
-   138		char __##name##_desc[sizeof(struct skcipher_request) + \
-   139			crypto_skcipher_reqsize(tfm)] CRYPTO_MINALIGN_ATTR; \
-   140		struct skcipher_request *name = (void *)__##name##_desc
-   141	
-   142	static inline struct crypto_ablkcipher *skcipher_givcrypt_reqtfm(
-   143		struct skcipher_givcrypt_request *req)
+^1da177e Linus Torvalds        2005-04-16 @1  /*
+^1da177e Linus Torvalds        2005-04-16  2   * Scatterlist Cryptographic API.
+^1da177e Linus Torvalds        2005-04-16  3   *
+^1da177e Linus Torvalds        2005-04-16  4   * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
+^1da177e Linus Torvalds        2005-04-16  5   * Copyright (c) 2002 David S. Miller (davem@redhat.com)
+5cb1454b Herbert Xu            2005-11-05  6   * Copyright (c) 2005 Herbert Xu <herbert@gondor.apana.org.au>
+^1da177e Linus Torvalds        2005-04-16  7   *
+^1da177e Linus Torvalds        2005-04-16  8   * Portions derived from Cryptoapi, by Alexander Kjeldaas <astor@fast.no>
+18735dd8 John Anthony Kazos Jr 2007-10-19  9   * and Nettle, by Niels Möller.
+
+:::::: The code at line 1 was first introduced by commit
+:::::: 1da177e4c3f41524e886b7f1b8a0c1fc7321cac2 Linux-2.6.12-rc2
+
+:::::: TO: Linus Torvalds <torvalds@ppc970.osdl.org>
+:::::: CC: Linus Torvalds <torvalds@ppc970.osdl.org>
 
 ---
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---C7zPtVaVf+AK4Oqc
+--gKMricLos+KVdGMg
 Content-Type: application/octet-stream
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICG3GjFcAAy5jb25maWcAjFxbc9s4sn7fX8HKnoeZqpOb7XgzdcoPEAiKGBEEQ4CS7BeW
+H4sICL/UjFcAAy5jb25maWcAjFxbc9s4sn7fX8HKnoeZqpOb7XgzdcoPEAiKGBEEQ4CS7BeW
 RqYT1diSV5eZ5N+fBkCKt4YyWzW1MboB4tKXrxsN/ftf/w7I6bh7WR0369Xz84/ga7Wt9qtj
 9Rg8bZ6r/wtCGaRSByzk+h0wJ5vt6fv7zfXn2+Dm3X/efXi7X38MZtV+Wz0HdLd92nw9Qe/N
 bvuvfwM3lWnEp+XtzYTrYHMItrtjcKiO/6rbl59vy+urux+dv9s/eKp0XlDNZVqGjMqQ5S1R
@@ -203,4 +197,4 @@ uRpd615rY/mBBHTJM/jwPLtcpIZfExE2FhJZCV3x+yqA8M0khVF0lkS/0DzhmZQKB/0/R5Jg
 WLpjZkKtcKvneOaxP6CacATqlf5gJ2mDozZllrlDGFZDFhitdlNNTD+UPjnC/zE57TJYswvl
 RiAZFJ4wTfmPG5JnFJW3BjKZBM7pU/N7bnCfOzEl8zi4vPS0QgH4DwztPDdLWgAA
 
---C7zPtVaVf+AK4Oqc--
+--gKMricLos+KVdGMg--
