@@ -1,55 +1,39 @@
-From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 3/3] KEYS: Fix for erroneous trust of incorrectly signed
- X.509 certs
-Date: Mon, 18 Jul 2016 00:10:55 +0100
-Message-ID: <146879705531.32133.1521913202035295780.stgit@warthog.procyon.org.uk>
-References: <146879703192.32133.3670984393495441516.stgit@warthog.procyon.org.uk>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 5/6] crypto: img-hash - Add support for export and import
+Date: Mon, 18 Jul 2016 14:13:49 +0800
+Message-ID: <20160718061349.GA12163@gondor.apana.org.au>
+References: <20160712074929.GA29737@gondor.apana.org.au>
+ <578649C2.801@imgtec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: keyring@vger.kernel.org, Petko Manolov <petkan@mip-labs.com>,
-	Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	linux-kernel@vger.kernel.org, dhowells@redhat.com,
-	linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org
-To: jmorris@namei.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <146879703192.32133.3670984393495441516.stgit@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, james.hartley@imgtec.com
+To: Will Thomas <will.thomas@imgtec.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:43027 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750732AbcGRGNy (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 18 Jul 2016 02:13:54 -0400
+Content-Disposition: inline
+In-Reply-To: <578649C2.801@imgtec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
+On Wed, Jul 13, 2016 at 03:01:38PM +0100, Will Thomas wrote:
+> 
+> I don't see any other drivers explicitly requesting a fallback
+> driver by name. Anyways, should this be done using  "sha1-generic"
 
-Arbitrary X.509 certificates without authority key identifiers (AKIs)
-can be added to "trusted" keyrings, including IMA or EVM certs loaded
-from the filesystem. Signature verification is currently bypassed for
-certs without AKIs.
+The problem is that you're relying on the fallback to implement
+import/export.  So if the fallback changes, then your algorithm
+parameters will change which is not allowed.
 
-Trusted keys were recently refactored, and this bug is not present in
-4.6.
+> in the crypto_alloc_ahash call when setting up the fallback tfm?
 
-restrict_link_by_signature should return -ENOKEY (no matching parent
-certificate found) if the certificate being evaluated has no AKIs,
-instead of bypassing signature checks and returning 0 (new certificate
-accepted).
+Yes that should be sufficient.
 
-Reported-by: Petko Manolov <petkan@mip-labs.com>
-Signed-off-by: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
----
-
- crypto/asymmetric_keys/restrict.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
-index ac4bddf669de..19d1afb9890f 100644
---- a/crypto/asymmetric_keys/restrict.c
-+++ b/crypto/asymmetric_keys/restrict.c
-@@ -87,7 +87,7 @@ int restrict_link_by_signature(struct key *trust_keyring,
- 
- 	sig = payload->data[asym_auth];
- 	if (!sig->auth_ids[0] && !sig->auth_ids[1])
--		return 0;
-+		return -ENOKEY;
- 
- 	if (ca_keyid && !asymmetric_key_id_partial(sig->auth_ids[1], ca_keyid))
- 		return -EPERM;
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
