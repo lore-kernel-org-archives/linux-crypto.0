@@ -1,60 +1,50 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH] crypto: marvell: Fix wrong flag used for GFP in
- mv_cesa_dma_add_iv_op
-Date: Mon, 18 Jul 2016 12:00:57 +0200
-Message-ID: <20160718120057.3acbfc95@bbrezillon>
-References: <1468834344-14160-1-git-send-email-romain.perier@free-electrons.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH] crypto: testmgr - Print akcipher algorithm name
+Date: Mon, 18 Jul 2016 18:20:10 +0800
+Message-ID: <20160718102010.GA13711@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Arnaud Ebalard <arno@natisbad.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Gregory Clement <gregory.clement@free-electrons.com>
-To: Romain Perier <romain.perier@free-electrons.com>
+Content-Type: text/plain; charset=us-ascii
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:37329 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751426AbcGRKA7 (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:36035 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751459AbcGRKUT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 18 Jul 2016 06:00:59 -0400
-In-Reply-To: <1468834344-14160-1-git-send-email-romain.perier@free-electrons.com>
+	Mon, 18 Jul 2016 06:20:19 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 18 Jul 2016 11:32:24 +0200
-Romain Perier <romain.perier@free-electrons.com> wrote:
+When an akcipher test fails, we don't know which algorithm failed
+because the name is not printed.  This patch fixes this.
 
-> Use the parameter 'gfp_flags' instead of 'flag' as second argument of
-> dma_pool_alloc(). The parameter 'flag' is for the TDMA descriptor, its
-> content has no sense for the allocator.
-> 
-> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-
-Herbert, can you add the following line when applying then patch?
-
-Fixes: bac8e805a30d ("crypto: marvell - Copy IV vectors by DMA transfers for acipher requests")
-
-> ---
->  drivers/crypto/marvell/tdma.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/marvell/tdma.c b/drivers/crypto/marvell/tdma.c
-> index 942f4b6..51a631d 100644
-> --- a/drivers/crypto/marvell/tdma.c
-> +++ b/drivers/crypto/marvell/tdma.c
-> @@ -223,7 +223,7 @@ int mv_cesa_dma_add_iv_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
->  	if (IS_ERR(tdma))
->  		return PTR_ERR(tdma);
->  
-> -	iv = dma_pool_alloc(cesa_dev->dma->iv_pool, flags, &dma_handle);
-> +	iv = dma_pool_alloc(cesa_dev->dma->iv_pool, gfp_flags, &dma_handle);
->  	if (!iv)
->  		return -ENOMEM;
->  
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 769cc2a..5c9d5a5 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2034,6 +2034,8 @@ free_xbuf:
+ static int test_akcipher(struct crypto_akcipher *tfm, const char *alg,
+ 			 struct akcipher_testvec *vecs, unsigned int tcount)
+ {
++	const char *algo =
++		crypto_tfm_alg_driver_name(crypto_akcipher_tfm(tfm));
+ 	int ret, i;
+ 
+ 	for (i = 0; i < tcount; i++) {
+@@ -2041,8 +2043,8 @@ static int test_akcipher(struct crypto_akcipher *tfm, const char *alg,
+ 		if (!ret)
+ 			continue;
+ 
+-		pr_err("alg: akcipher: test failed on vector %d, err=%d\n",
+-		       i + 1, ret);
++		pr_err("alg: akcipher: test %d failed for %s, err=%d\n",
++		       i + 1, algo, ret);
+ 		return ret;
+ 	}
+ 	return 0;
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
