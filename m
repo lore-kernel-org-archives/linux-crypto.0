@@ -1,46 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: rsa-pkcs1pad - Fix akcipher request allocation
-Date: Mon, 18 Jul 2016 18:23:14 +0800
-Message-ID: <20160718102314.GB13780@gondor.apana.org.au>
-References: <1468491905-2597-1-git-send-email-salvatore.benedetto@intel.com>
- <bed68e2b-6397-1663-606c-6f19695d94ed@gmail.com>
+Subject: Re: [PATCH 0/2] Automatically load the vmx_crypto module if supported
+Date: Mon, 18 Jul 2016 18:22:53 +0800
+Message-ID: <20160718102253.GA13780@gondor.apana.org.au>
+References: <1468388840-12068-1-git-send-email-alastair@au1.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Salvatore Benedetto <salvatore.benedetto@intel.com>,
-	davem@davemloft.net, andrew.zaborowski@intel.com,
-	linux-crypto@vger.kernel.org
-To: Tadeusz Struk <tstruk@gmail.com>
+Cc: mpe@ellerman.id.au, benh@kernel.crashing.org, paulus@samba.org,
+	davem@davemloft.net, linuxppc-dev@lists.ozlabs.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Alastair D'Silva <alastair@d-silva.org>
+To: alastair@au1.ibm.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:57215 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:58747 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751522AbcGRKXc (ORCPT
+	with ESMTP id S1751549AbcGRKXh (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 18 Jul 2016 06:23:32 -0400
+	Mon, 18 Jul 2016 06:23:37 -0400
 Content-Disposition: inline
-In-Reply-To: <bed68e2b-6397-1663-606c-6f19695d94ed@gmail.com>
+In-Reply-To: <1468388840-12068-1-git-send-email-alastair@au1.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 14, 2016 at 08:39:18PM -0700, Tadeusz Struk wrote:
-> Hi Salvatore,
-> On 07/14/2016 03:25 AM, Salvatore Benedetto wrote:
-> > Embedding the akcipher_request in pkcs1pad_request don't take
-> > into account the context space required by the akcipher object.
+On Wed, Jul 13, 2016 at 03:47:16PM +1000, alastair@au1.ibm.com wrote:
+> From: Alastair D'Silva <alastair@d-silva.org>
 > 
-> I think we do take into account the sub request context. See line 675.
-> The only thing that is wrong is that the child_req should be at
-> the end of the structure. This is build tested only.
+> This series allows the vmx_crypto module to be detected and automatically
+> loaded via UDEV if the CPU supports the vector crypto feature.
 > 
-> ---8<---
-> From: Tadeusz Struk <tadeusz.struk@intel.com>
-> Subject: [PATCH] crypto: rsa-pkcs1pad - fix rsa-pkcs1pad request struct
-> 
-> To allow for child request context the struct akcipher_request child_req
-> needs to be at the end of the structure.
-> 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> Alastair D'Silva (2):
+>   powerpc: Add module autoloading based on CPU features
+>   crypto: vmx - Convert to CPU feature based module autoloading
 
-Patch applied.  Thanks.
+Both patches applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
