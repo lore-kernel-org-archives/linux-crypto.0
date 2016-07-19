@@ -1,7 +1,7 @@
 From: Michael Ellerman <mpe@ellerman.id.au>
 Subject: Re: [PATCH 1/2] powerpc: Add module autoloading based on CPU features
 Date: Tue, 19 Jul 2016 11:04:01 +1000
-Message-ID: <10675.9225870066$1468890394@news.gmane.org>
+Message-ID: <13156.102030962$1468890422@news.gmane.org>
 References: <1468388840-12068-1-git-send-email-alastair@au1.ibm.com>
  <1468388840-12068-3-git-send-email-alastair@au1.ibm.com>
 Mime-Version: 1.0
@@ -11,7 +11,7 @@ Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org, paulus@samba.org,
  linux-crypto@vger.kernel.org, Alastair D'Silva <alastair@d-silva.org>,
  linuxppc-dev@lists.ozlabs.org, davem@davemloft.net
 To: alastair@au1.ibm.com
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Return-path: <linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org>
 In-Reply-To: <1468388840-12068-3-git-send-email-alastair@au1.ibm.com>
 List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
  <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
@@ -20,9 +20,9 @@ List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
 List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
 List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
  <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Errors-To: linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org
 Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+ <linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org>
 List-Id: linux-crypto.vger.kernel.org
 
 YWxhc3RhaXJAYXUxLmlibS5jb20gd3JpdGVzOgoKPiBkaWZmIC0tZ2l0IGEvYXJjaC9wb3dlcnBj
