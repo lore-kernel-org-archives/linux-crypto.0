@@ -1,76 +1,43 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [patch] crypto: sha256-mb - cleanup a || vs | typo
-Date: Mon, 18 Jul 2016 15:12:31 -0700
-Message-ID: <1468879951.9191.100.camel@linux.intel.com>
-References: <20160629144242.GE22818@mwanda>
-	 <8538242a-eab7-127e-e47e-26027fee4f6d@zytor.com>
-	 <1467319339.22178.256.camel@linux.intel.com>
-	 <20160701075559.GA11902@gmail.com>
-	 <20160701092806.GA13424@gondor.apana.org.au>
-	 <20160701101329.GA3833@gmail.com> <20160708162803.GA29111@linux.intel.com>
-	 <20160708164502.GA3064@gondor.apana.org.au>
-	 <CA+55aFyQYJerovMsSoSKS7PessZBr4vNp-3QUUwhqk4A4_jcbg@mail.gmail.com>
-	 <20160718085905.GA5701@amd>
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH 0/2] Automatically load the vmx_crypto module if supported
+Date: Tue, 19 Jul 2016 11:01:55 +1000
+Message-ID: <45292.7706567154$1468890178@news.gmane.org>
+References: <1468388840-12068-1-git-send-email-alastair@au1.ibm.com>
+ <20160718102253.GA13780@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Ingo Molnar <mingo@kernel.org>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Dan Carpenter <dan.carpenter@oracle.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	the arch/x86 maintainers <x86@kernel.org>,
-	Megha Dey <megha.dey@intel.com>,
-	"Wang, Rui Y" <rui.y.wang@intel.com>,
-	Denys Vlasenko <dvlasenk@redhat.com>,
-	Xiaodong Liu <xiaodong.liu@intel.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	kernel-janitors <kernel-janitors@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Peter Zijlstra <a.p.zijlstra@chello.nl>
-To: Pavel Machek <pavel@ucw.cz>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-In-Reply-To: <20160718085905.GA5701@amd>
-Sender: kernel-janitors-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: linux-kernel@vger.kernel.org, paulus@samba.org,
+ linux-crypto@vger.kernel.org, Alastair D'Silva <alastair@d-silva.org>,
+ linuxppc-dev@lists.ozlabs.org, davem@davemloft.net
+To: Herbert Xu <herbert@gondor.apana.org.au>, alastair@au1.ibm.com
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <20160718102253.GA13780@gondor.apana.org.au>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, 2016-07-18 at 10:59 +0200, Pavel Machek wrote:
-> On Fri 2016-07-08 10:19:26, Linus Torvalds wrote:
-> >=20
-> > [ rare comment rant. I think I'll do this once, and then ignore the=
- discussion ]
-> >=20
-> > On Fri, Jul 8, 2016 at 9:45 AM, Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
-> > >=20
-> > >=20
-> > > Nack.=C2=A0=C2=A0As I said the commenting style in the crypto API=
- is the
-> > > same as the network stack.=C2=A0=C2=A0So unless we decide to chan=
-ge both
-> > > please stick to the current style.
-> > Can we please get rid of the brain-damaged stupid networking commen=
-t
-> > syntax style, PLEASE?
-> Please? :-). Having different comment styles between networking and
-> the rest is confusing.
->=20
-> And yes, this uglyness is documented for net/ and drivers/net/, but
-> not for crypto/, so at the very least Documentation/CodingStyle shoul=
-d
-> be updated.
->=20
-> 									Pavel
-
-The cleanup patch has already been merged. =C2=A0Thanks.
-
-Tim
---
-To unsubscribe from this list: send the line "unsubscribe kernel-janito=
-rs" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+SGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PiB3cml0ZXM6Cgo+IE9uIFdl
+ZCwgSnVsIDEzLCAyMDE2IGF0IDAzOjQ3OjE2UE0gKzEwMDAsIGFsYXN0YWlyQGF1MS5pYm0uY29t
+IHdyb3RlOgo+PiBGcm9tOiBBbGFzdGFpciBEJ1NpbHZhIDxhbGFzdGFpckBkLXNpbHZhLm9yZz4K
+Pj4gCj4+IFRoaXMgc2VyaWVzIGFsbG93cyB0aGUgdm14X2NyeXB0byBtb2R1bGUgdG8gYmUgZGV0
+ZWN0ZWQgYW5kIGF1dG9tYXRpY2FsbHkKPj4gbG9hZGVkIHZpYSBVREVWIGlmIHRoZSBDUFUgc3Vw
+cG9ydHMgdGhlIHZlY3RvciBjcnlwdG8gZmVhdHVyZS4KPj4gCj4+IEFsYXN0YWlyIEQnU2lsdmEg
+KDIpOgo+PiAgIHBvd2VycGM6IEFkZCBtb2R1bGUgYXV0b2xvYWRpbmcgYmFzZWQgb24gQ1BVIGZl
+YXR1cmVzCj4+ICAgY3J5cHRvOiB2bXggLSBDb252ZXJ0IHRvIENQVSBmZWF0dXJlIGJhc2VkIG1v
+ZHVsZSBhdXRvbG9hZGluZwo+Cj4gQm90aCBwYXRjaGVzIGFwcGxpZWQuICBUaGFua3MuCgpIaSBI
+ZXJiZXJ0LAoKQ2FuIHlvdSBwbGVhc2UgYXNrIGZvciBhbiBhY2sgYmVmb3JlIG1lcmdpbmcgYXJj
+aCBwYXRjaGVzPwoKVGhhdCdzIGEgNzAgbGluZSBwb3dlcnBjIHBhdGNoIGFuZCBhIDYgbGluZSBj
+cnlwdG8gcGF0Y2guIEl0IGhhcyBubwpyZXZpZXdzIGFuZCBubyBhY2tzLiBJIHdvdWxkIGhhdmUg
+cHJlZmVycmVkIGl0IGlmIHdlIGNvdWxkIHRha2UgaXQgdmlhCnRoZSBwb3dlcnBjIHRyZWUuCgpj
+aGVlcnMKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGlu
+dXhwcGMtZGV2IG1haWxpbmcgbGlzdApMaW51eHBwYy1kZXZAbGlzdHMub3psYWJzLm9yZwpodHRw
+czovL2xpc3RzLm96bGFicy5vcmcvbGlzdGluZm8vbGludXhwcGMtZGV2
