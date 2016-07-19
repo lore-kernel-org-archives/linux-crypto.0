@@ -1,48 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: marvell: Fix wrong flag used for GFP in
- mv_cesa_dma_add_iv_op
-Date: Tue, 19 Jul 2016 15:44:53 +0800
-Message-ID: <20160719074452.GA22473@gondor.apana.org.au>
-References: <20160718120057.3acbfc95@bbrezillon>
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH 0/2] Automatically load the vmx_crypto module if supported
+Date: Tue, 19 Jul 2016 19:13:24 +1000
+Message-ID: <10065.6168106527$1468919680@news.gmane.org>
+References: <1468388840-12068-1-git-send-email-alastair@au1.ibm.com>
+ <20160718102253.GA13780@gondor.apana.org.au>
+ <87fur6phj0.fsf@@concordia.ellerman.id.au>
+ <20160719035939.GA20847@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: romain.perier@free-electrons.com, arno@natisbad.org,
-	davem@davemloft.net, linux-crypto@vger.kernel.org,
-	thomas.petazzoni@free-electrons.com, jason@lakedaemon.net,
-	andrew@lunn.ch, sebastian.hesselbarth@gmail.com,
-	gregory.clement@free-electrons.com
-To: Boris Brezillon <boris.brezillon@free-electrons.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41244 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752477AbcGSHpD (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Jul 2016 03:45:03 -0400
-Content-Disposition: inline
-In-Reply-To: <20160718120057.3acbfc95@bbrezillon>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: alastair@au1.ibm.com, linux-kernel@vger.kernel.org, paulus@samba.org,
+ linux-crypto@vger.kernel.org, Alastair D'Silva <alastair@d-silva.org>,
+ linuxppc-dev@lists.ozlabs.org, davem@davemloft.net
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <20160719035939.GA20847@gondor.apana.org.au>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Boris Brezillon <boris.brezillon@free-electrons.com> wrote:
-> On Mon, 18 Jul 2016 11:32:24 +0200
-> Romain Perier <romain.perier@free-electrons.com> wrote:
-> 
->> Use the parameter 'gfp_flags' instead of 'flag' as second argument of
->> dma_pool_alloc(). The parameter 'flag' is for the TDMA descriptor, its
->> content has no sense for the allocator.
->> 
->> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
-> 
-> Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-> 
-> Herbert, can you add the following line when applying then patch?
-> 
-> Fixes: bac8e805a30d ("crypto: marvell - Copy IV vectors by DMA transfers for acipher requests")
-
-Patch applied with the fixes tag.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+SGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PiB3cml0ZXM6Cgo+IE9uIFR1
+ZSwgSnVsIDE5LCAyMDE2IGF0IDExOjAxOjU1QU0gKzEwMDAsIE1pY2hhZWwgRWxsZXJtYW4gd3Jv
+dGU6Cj4+Cj4+IENhbiB5b3UgcGxlYXNlIGFzayBmb3IgYW4gYWNrIGJlZm9yZSBtZXJnaW5nIGFy
+Y2ggcGF0Y2hlcz8KPj4gCj4+IFRoYXQncyBhIDcwIGxpbmUgcG93ZXJwYyBwYXRjaCBhbmQgYSA2
+IGxpbmUgY3J5cHRvIHBhdGNoLiBJdCBoYXMgbm8KPj4gcmV2aWV3cyBhbmQgbm8gYWNrcy4gSSB3
+b3VsZCBoYXZlIHByZWZlcnJlZCBpdCBpZiB3ZSBjb3VsZCB0YWtlIGl0IHZpYQo+PiB0aGUgcG93
+ZXJwYyB0cmVlLgo+Cj4gU29ycnksIEknbGwgZGVsZXRlIHRoZW0gZnJvbSB0aGUgY3J5cHRvIHRy
+ZWUuCgpUaGFua3MuCgpJJ2xsIGFzc3VtZSBwYXRjaCAyIGhhcyB5b3VyIGFjayA6KQoKY2hlZXJz
+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4cHBj
+LWRldiBtYWlsaW5nIGxpc3QKTGludXhwcGMtZGV2QGxpc3RzLm96bGFicy5vcmcKaHR0cHM6Ly9s
+aXN0cy5vemxhYnMub3JnL2xpc3RpbmZvL2xpbnV4cHBjLWRldg==
