@@ -1,40 +1,40 @@
-From: Michael Ellerman <mpe@ellerman.id.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 0/2] Automatically load the vmx_crypto module if supported
-Date: Tue, 19 Jul 2016 19:13:24 +1000
-Message-ID: <28452.9801727787$1468919712@news.gmane.org>
+Date: Tue, 19 Jul 2016 17:52:39 +0800
+Message-ID: <20160719095239.GA24167@gondor.apana.org.au>
 References: <1468388840-12068-1-git-send-email-alastair@au1.ibm.com>
  <20160718102253.GA13780@gondor.apana.org.au>
  <87fur6phj0.fsf@@concordia.ellerman.id.au>
  <20160719035939.GA20847@gondor.apana.org.au>
+ <87poqa9eiz.fsf@@concordia.ellerman.id.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: alastair@au1.ibm.com, linux-kernel@vger.kernel.org, paulus@samba.org,
- linux-crypto@vger.kernel.org, Alastair D'Silva <alastair@d-silva.org>,
- linuxppc-dev@lists.ozlabs.org, davem@davemloft.net
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <20160719035939.GA20847@gondor.apana.org.au>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: alastair@au1.ibm.com, benh@kernel.crashing.org, paulus@samba.org,
+	davem@davemloft.net, linuxppc-dev@lists.ozlabs.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Alastair D'Silva <alastair@d-silva.org>
+To: Michael Ellerman <mpe@ellerman.id.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:33168 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752408AbcGSJxP (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 19 Jul 2016 05:53:15 -0400
+Content-Disposition: inline
+In-Reply-To: <87poqa9eiz.fsf@@concordia.ellerman.id.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-SGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PiB3cml0ZXM6Cgo+IE9uIFR1
-ZSwgSnVsIDE5LCAyMDE2IGF0IDExOjAxOjU1QU0gKzEwMDAsIE1pY2hhZWwgRWxsZXJtYW4gd3Jv
-dGU6Cj4+Cj4+IENhbiB5b3UgcGxlYXNlIGFzayBmb3IgYW4gYWNrIGJlZm9yZSBtZXJnaW5nIGFy
-Y2ggcGF0Y2hlcz8KPj4gCj4+IFRoYXQncyBhIDcwIGxpbmUgcG93ZXJwYyBwYXRjaCBhbmQgYSA2
-IGxpbmUgY3J5cHRvIHBhdGNoLiBJdCBoYXMgbm8KPj4gcmV2aWV3cyBhbmQgbm8gYWNrcy4gSSB3
-b3VsZCBoYXZlIHByZWZlcnJlZCBpdCBpZiB3ZSBjb3VsZCB0YWtlIGl0IHZpYQo+PiB0aGUgcG93
-ZXJwYyB0cmVlLgo+Cj4gU29ycnksIEknbGwgZGVsZXRlIHRoZW0gZnJvbSB0aGUgY3J5cHRvIHRy
-ZWUuCgpUaGFua3MuCgpJJ2xsIGFzc3VtZSBwYXRjaCAyIGhhcyB5b3VyIGFjayA6KQoKY2hlZXJz
-Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4cHBj
-LWRldiBtYWlsaW5nIGxpc3QKTGludXhwcGMtZGV2QGxpc3RzLm96bGFicy5vcmcKaHR0cHM6Ly9s
-aXN0cy5vemxhYnMub3JnL2xpc3RpbmZvL2xpbnV4cHBjLWRldg==
+On Tue, Jul 19, 2016 at 07:13:24PM +1000, Michael Ellerman wrote:
+>
+> I'll assume patch 2 has your ack :)
+
+Sure,
+
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
