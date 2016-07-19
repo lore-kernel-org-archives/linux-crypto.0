@@ -1,7 +1,7 @@
 From: Michael Ellerman <mpe@ellerman.id.au>
 Subject: Re: [PATCH 0/2] Automatically load the vmx_crypto module if supported
 Date: Tue, 19 Jul 2016 11:01:55 +1000
-Message-ID: <45292.7706567154$1468890178@news.gmane.org>
+Message-ID: <12150.2678528943$1468890194@news.gmane.org>
 References: <1468388840-12068-1-git-send-email-alastair@au1.ibm.com>
  <20160718102253.GA13780@gondor.apana.org.au>
 Mime-Version: 1.0
@@ -11,7 +11,7 @@ Cc: linux-kernel@vger.kernel.org, paulus@samba.org,
  linux-crypto@vger.kernel.org, Alastair D'Silva <alastair@d-silva.org>,
  linuxppc-dev@lists.ozlabs.org, davem@davemloft.net
 To: Herbert Xu <herbert@gondor.apana.org.au>, alastair@au1.ibm.com
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Return-path: <linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org>
 In-Reply-To: <20160718102253.GA13780@gondor.apana.org.au>
 List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
  <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
@@ -20,9 +20,9 @@ List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
 List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
 List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
  <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Errors-To: linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org
 Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+ <linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org>
 List-Id: linux-crypto.vger.kernel.org
 
 SGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PiB3cml0ZXM6Cgo+IE9uIFdl
