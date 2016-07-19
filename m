@@ -1,40 +1,48 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] Automatically load the vmx_crypto module if supported
-Date: Tue, 19 Jul 2016 11:59:39 +0800
-Message-ID: <20160719035939.GA20847@gondor.apana.org.au>
-References: <1468388840-12068-1-git-send-email-alastair@au1.ibm.com>
- <20160718102253.GA13780@gondor.apana.org.au>
- <87fur6phj0.fsf@@concordia.ellerman.id.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: alastair@au1.ibm.com, benh@kernel.crashing.org, paulus@samba.org,
-	davem@davemloft.net, linuxppc-dev@lists.ozlabs.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Alastair D'Silva <alastair@d-silva.org>
-To: Michael Ellerman <mpe@ellerman.id.au>
+From: alastair@au1.ibm.com
+Subject: [PATCH V2 0/2] Automatically load the vmx_crypto module if supported
+Date: Tue, 19 Jul 2016 14:03:51 +1000
+Message-ID: <1468901033-28996-1-git-send-email-alastair@au1.ibm.com>
+Cc: benh@kernel.crashing.org, paulus@samba.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Alastair D'Silva" <alastair@d-silva.org>
+To: mpe@ellerman.id.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:39846 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750825AbcGSEA2 (ORCPT
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41202 "EHLO
+	mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1750722AbcGSEEx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Jul 2016 00:00:28 -0400
-Content-Disposition: inline
-In-Reply-To: <87fur6phj0.fsf@@concordia.ellerman.id.au>
+	Tue, 19 Jul 2016 00:04:53 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id u6J43lqh063231
+	for <linux-crypto@vger.kernel.org>; Tue, 19 Jul 2016 00:04:52 -0400
+Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2496h5s562-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Tue, 19 Jul 2016 00:04:51 -0400
+Received: from localhost
+	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <alastair@au1.ibm.com>;
+	Tue, 19 Jul 2016 14:04:48 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 19, 2016 at 11:01:55AM +1000, Michael Ellerman wrote:
->
-> Can you please ask for an ack before merging arch patches?
-> 
-> That's a 70 line powerpc patch and a 6 line crypto patch. It has no
-> reviews and no acks. I would have preferred it if we could take it via
-> the powerpc tree.
+From: Alastair D'Silva <alastair@d-silva.org>
 
-Sorry, I'll delete them from the crypto tree.
+This series allows the vmx_crypto module to be detected and automatically
+loaded via UDEV if the CPU supports the vector crypto feature.
 
-Cheers,
+Alastair D'Silva (2):
+  powerpc: Add module autoloading based on CPU features
+  crypto: vmx - Convert to CPU feature based module autoloading
+
+ arch/powerpc/Kconfig                  |  1 +
+ arch/powerpc/include/asm/cpufeature.h | 70 +++++++++++++++++++++++++++++++++++
+ drivers/crypto/vmx/Kconfig            |  2 +-
+ drivers/crypto/vmx/vmx.c              |  6 +--
+ 4 files changed, 74 insertions(+), 5 deletions(-)
+ create mode 100644 arch/powerpc/include/asm/cpufeature.h
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.7.4
