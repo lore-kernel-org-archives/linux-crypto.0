@@ -1,44 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/2] crypto: vmx - Adding asm subroutines for XTS
-Date: Tue, 19 Jul 2016 15:40:07 +0800
-Message-ID: <20160719074007.GA22394@gondor.apana.org.au>
-References: <1468855586-848-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
+Subject: Re: [PATCH] crypto: marvell: Fix wrong flag used for GFP in
+ mv_cesa_dma_add_iv_op
+Date: Tue, 19 Jul 2016 15:44:53 +0800
+Message-ID: <20160719074452.GA22473@gondor.apana.org.au>
+References: <20160718120057.3acbfc95@bbrezillon>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
-	"Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Paul Mackerras <paulus@samba.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"open list:IBM Power VMX Cryptographic instructions"
-	<linux-crypto@vger.kernel.org>,
-	"open list:LINUX FOR POWERPC (32-BIT AND 64-BIT)"
-	<linuxppc-dev@lists.ozlabs.org>
-To: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+Cc: romain.perier@free-electrons.com, arno@natisbad.org,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	thomas.petazzoni@free-electrons.com, jason@lakedaemon.net,
+	andrew@lunn.ch, sebastian.hesselbarth@gmail.com,
+	gregory.clement@free-electrons.com
+To: Boris Brezillon <boris.brezillon@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:35063 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:41244 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751959AbcGSHkg (ORCPT
+	with ESMTP id S1752477AbcGSHpD (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Jul 2016 03:40:36 -0400
+	Tue, 19 Jul 2016 03:45:03 -0400
 Content-Disposition: inline
-In-Reply-To: <1468855586-848-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
+In-Reply-To: <20160718120057.3acbfc95@bbrezillon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 18, 2016 at 12:26:25PM -0300, Paulo Flabiano Smorigo wrote:
-> This patch add XTS subroutines using VMX-crypto driver.
+Boris Brezillon <boris.brezillon@free-electrons.com> wrote:
+> On Mon, 18 Jul 2016 11:32:24 +0200
+> Romain Perier <romain.perier@free-electrons.com> wrote:
 > 
-> It gives a boost of 20 times using XTS.
+>> Use the parameter 'gfp_flags' instead of 'flag' as second argument of
+>> dma_pool_alloc(). The parameter 'flag' is for the TDMA descriptor, its
+>> content has no sense for the allocator.
+>> 
+>> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
 > 
-> These code has been adopted from OpenSSL project in collaboration
-> with the original author (Andy Polyakov <appro@openssl.org>).
+> Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 > 
-> Signed-off-by: Leonidas S. Barbosa <leosilva@linux.vnet.ibm.com>
-> Signed-off-by: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+> Herbert, can you add the following line when applying then patch?
+> 
+> Fixes: bac8e805a30d ("crypto: marvell - Copy IV vectors by DMA transfers for acipher requests")
 
-Both patches applied.  Thanks.
+Patch applied with the fixes tag.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
