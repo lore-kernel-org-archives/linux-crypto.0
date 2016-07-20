@@ -1,47 +1,36 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [Patch-V2 2/3] chcr: Support for Chelsio's Crypto Hardware
-Date: Tue, 19 Jul 2016 21:15:22 -0700 (PDT)
-Message-ID: <20160719.211522.465417746785662817.davem@davemloft.net>
-References: <1468906935-6770-1-git-send-email-yeshaswi@chelsio.com>
-	<1468906935-6770-3-git-send-email-yeshaswi@chelsio.com>
+From: David Laight <David.Laight@ACULAB.COM>
+Subject: RE: [PATCH] crypto: vmx - Ignore generated files
+Date: Wed, 20 Jul 2016 13:15:14 +0000
+Message-ID: <063D6719AE5E284EB5DD2968C1650D6D5F4FE8AB@AcuExch.aculab.com>
+References: <1468935388-6489-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: hariprasad@chelsio.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	jlulla@chelsio.ccom, harsh@chelsio.com, atul.gupta@chelsio.com,
-	herbert@gondor.apana.org.au
-To: yeshaswi@chelsio.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1468906935-6770-3-git-send-email-yeshaswi@chelsio.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Paul Mackerras <paulus@samba.org>,
+	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+	"open list:LINUX FOR POWERPC 32-BIT AND 64-BIT"
+	<linuxppc-dev@lists.ozlabs.org>,
+	"David S. Miller" <davem@davemloft.net>
+To: 'Paulo Flabiano Smorigo' <pfsmorigo@linux.vnet.ibm.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp-out4.electric.net ([192.162.216.183]:56033 "EHLO
+	smtp-out4.electric.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752284AbcGTNRF (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 20 Jul 2016 09:17:05 -0400
+In-Reply-To: <1468935388-6489-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Yeshaswi M R Gowda <yeshaswi@chelsio.com>
-Date: Mon, 18 Jul 2016 22:42:14 -0700
-
-> +config CRYPTO_DEV_CHELSIO
-> +	tristate "Chelsio Crypto Co-processor Driver"
-> +	depends on PCI && NETDEVICES && ETHERNET
-> +	select CRYPTO_SHA1
-> +	select CRYPTO_SHA256
-> +	select CRYPTO_SHA512
-> +	select NET_VENDOR_CHELSIO
-> +	select CHELSIO_T4
-
-The user shouldn't have to know about the technical details about
-how this chip is physically implemented.
-
-It's therefore not reasonable to require an ethernet driver to be
-enabled to use the crypto engine.
-
-Also, selecting Kconfig symbol X does not recursively enable the
-"select" statement(s) of symbol X nor does it check symbol X's
-dependencies.
-
-This is really one big huge dependency mess, and I think you have
-to split out the core of the T4 driver into a driver subtype
-agnostic library or similar to make this work properly.
-
-Don't just shoehorn this stuff into the ethernet driver.  Round
-peg, square hole.
+RnJvbTogIFBhdWxvIEZsYWJpYW5vIFNtb3JpZ28NCj4gU2VudDogMTkgSnVseSAyMDE2IDE0OjM2
+DQo+IElnbm9yZSBhc3NlbWJseSBmaWxlcyBnZW5lcmF0ZWQgYnkgdGhlIHBlcmwgc2NyaXB0Lg0K
+Li4uDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by92bXgvLmdpdGlnbm9yZSBiL2RyaXZl
+cnMvY3J5cHRvL3ZteC8uZ2l0aWdub3JlDQo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+IGluZGV4
+IDAwMDAwMDAuLmFmNGE3Y2UNCj4gLS0tIC9kZXYvbnVsbA0KPiArKysgYi9kcml2ZXJzL2NyeXB0
+by92bXgvLmdpdGlnbm9yZQ0KPiBAQCAtMCwwICsxLDIgQEANCj4gK2Flc3A4LXBwYy5TDQo+ICtn
+aGFzaHA4LXBwYy5TDQoNClNob3VsZG4ndCB0aGUgZ2VuZXJhdGVkIGZpbGVzIGJlIHdyaXR0ZW4g
+dG8gdGhlIG9iamVjdCB0cmVlPw0KDQpJIHdvdWxkIGhvcGUgdGhlIGxpbnV4IGtlcm5lbCBidWls
+ZHMgZnJvbSBhIHJlYWRvbmx5IHNvdXJjZSB0cmVlLg0KDQoJRGF2aWQNCg0K
