@@ -1,36 +1,61 @@
-From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [PATCH] crypto: vmx - Ignore generated files
-Date: Wed, 20 Jul 2016 13:15:14 +0000
-Message-ID: <063D6719AE5E284EB5DD2968C1650D6D5F4FE8AB@AcuExch.aculab.com>
-References: <1468935388-6489-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: linux-next: build failure after merge of the crypto tree
+Date: Wed, 20 Jul 2016 22:32:50 +0800
+Message-ID: <20160720143250.GA3323@gondor.apana.org.au>
+References: <20160720174634.53bad636@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Paul Mackerras <paulus@samba.org>,
-	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-	"open list:LINUX FOR POWERPC 32-BIT AND 64-BIT"
-	<linuxppc-dev@lists.ozlabs.org>,
-	"David S. Miller" <davem@davemloft.net>
-To: 'Paulo Flabiano Smorigo' <pfsmorigo@linux.vnet.ibm.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp-out4.electric.net ([192.162.216.183]:56033 "EHLO
-	smtp-out4.electric.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752284AbcGTNRF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 Jul 2016 09:17:05 -0400
-In-Reply-To: <1468935388-6489-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
+	"Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Return-path: <linux-next-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20160720174634.53bad636@canb.auug.org.au>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-RnJvbTogIFBhdWxvIEZsYWJpYW5vIFNtb3JpZ28NCj4gU2VudDogMTkgSnVseSAyMDE2IDE0OjM2
-DQo+IElnbm9yZSBhc3NlbWJseSBmaWxlcyBnZW5lcmF0ZWQgYnkgdGhlIHBlcmwgc2NyaXB0Lg0K
-Li4uDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by92bXgvLmdpdGlnbm9yZSBiL2RyaXZl
-cnMvY3J5cHRvL3ZteC8uZ2l0aWdub3JlDQo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+IGluZGV4
-IDAwMDAwMDAuLmFmNGE3Y2UNCj4gLS0tIC9kZXYvbnVsbA0KPiArKysgYi9kcml2ZXJzL2NyeXB0
-by92bXgvLmdpdGlnbm9yZQ0KPiBAQCAtMCwwICsxLDIgQEANCj4gK2Flc3A4LXBwYy5TDQo+ICtn
-aGFzaHA4LXBwYy5TDQoNClNob3VsZG4ndCB0aGUgZ2VuZXJhdGVkIGZpbGVzIGJlIHdyaXR0ZW4g
-dG8gdGhlIG9iamVjdCB0cmVlPw0KDQpJIHdvdWxkIGhvcGUgdGhlIGxpbnV4IGtlcm5lbCBidWls
-ZHMgZnJvbSBhIHJlYWRvbmx5IHNvdXJjZSB0cmVlLg0KDQoJRGF2aWQNCg0K
+On Wed, Jul 20, 2016 at 05:46:34PM +1000, Stephen Rothwell wrote:
+> Hi all,
+> 
+> After merging the dax-misc tree, today's linux-next build (powerpc
+> allyesconfig) failed like this:
+> 
+> drivers/crypto/vmx/aesp8-ppc.S: Assembler messages:
+> drivers/crypto/vmx/aesp8-ppc.S:2036: Error: symbol `.aes_p8_xts_decrypt' is already defined
+> 
+> Caused by commit
+> 
+>   11c6e16ee13a ("crypto: vmx - Adding asm subroutines for XTS")
+> 
+> I have reverted that commit (and commit c07f5d3da643 ("crypto: vmx -
+> Adding support for XTS")) for today.
+
+Thanks Stephen.  I think this patch should fix it.
+
+---8<---
+Subject: crypto: vmx - Fix aes_p8_xts_decrypt build failure
+
+We use _GLOBAL so there is no need to do the manual alignment,
+in fact it causes a build failure.
+
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/drivers/crypto/vmx/aesp8-ppc.pl b/drivers/crypto/vmx/aesp8-ppc.pl
+index 813ffcc..0b4a293 100644
+--- a/drivers/crypto/vmx/aesp8-ppc.pl
++++ b/drivers/crypto/vmx/aesp8-ppc.pl
+@@ -2125,8 +2125,6 @@ Lxts_enc_ret:
+ .size	.${prefix}_xts_encrypt,.-.${prefix}_xts_encrypt
+ 
+ .globl	.${prefix}_xts_decrypt
+-.align	5
+-.${prefix}_xts_decrypt:
+ 	mr		$inp,r3				# reassign
+ 	li		r3,-1
+ 	${UCMP}i	$len,16
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
