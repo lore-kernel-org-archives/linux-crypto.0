@@ -1,58 +1,68 @@
-From: Quentin Lambert <lambert.quentin@gmail.com>
-Subject: [PATCH 2/2] crypto: ixp4xx - Add missing npe_c release in error branches
-Date: Fri, 22 Jul 2016 15:32:41 +0200
-Message-ID: <20160722133242.21916-2-lambert.quentin@gmail.com>
-References: <20160722133242.21916-1-lambert.quentin@gmail.com>
-Cc: kernel-janitors@vger.kernel.org,
-	Quentin Lambert <lambert.quentin@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160722133242.21916-1-lambert.quentin@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Romain Perier <romain.perier@free-electrons.com>
+Subject: [PATCH] crypto: marvell - Update cache with input sg only when it is unmapped
+Date: Fri, 22 Jul 2016 15:46:24 +0200
+Message-ID: <1469195184-4700-1-git-send-email-romain.perier@free-electrons.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Gregory Clement <gregory.clement@free-electrons.com>
+To: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Arnaud Ebalard <arno@natisbad.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from down.free-electrons.com ([37.187.137.238]:46474 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753803AbcGVNqd (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 22 Jul 2016 09:46:33 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Most error branches following the call to npe_request contain a call to
-npe_request. This patch add a call to npe_release to error branches
-following the call to npe_request that do not have it.
+So far, the cache of the ahash requests was updated from the 'complete'
+operation. This complete operation is called from mv_cesa_tdma_process
+before the cleanup operation, which means that the content of req->src
+can be read and copied when it is still mapped. This commit fixes the
+issue by moving this cache update from mv_cesa_ahash_complete to
+mv_cesa_ahash_req_cleanup, so the copy is done once the sglist is
+unmapped.
 
-This issue was found with Hector.
-
-Signed-off-by: Quentin Lambert <lambert.quentin@gmail.com>
+Fixes: 1bf6682cb31d ("crypto: marvell - Add a complete operation for..")
+Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
 ---
- If I am right in thinking that these call to npe_release are missing, another
- solution would be to jump to err since the rest of the code does it.
+ drivers/crypto/marvell/hash.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
- drivers/crypto/ixp4xx_crypto.c |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -448,7 +448,7 @@ static int init_ixp_crypto(struct device
- 	if (!npe_running(npe_c)) {
- 		ret = npe_load_firmware(npe_c, npe_name(npe_c), dev);
- 		if (ret)
--			return ret;
-+			goto npe_release;
- 		if (npe_recv_message(npe_c, msg, "STATUS_MSG"))
- 			goto npe_error;
- 	} else {
-@@ -472,7 +472,8 @@ static int init_ixp_crypto(struct device
- 	default:
- 		printk(KERN_ERR "Firmware of %s lacks crypto support\n",
- 			npe_name(npe_c));
--		return -ENODEV;
-+		ret = -ENODEV;
-+		goto npe_release;
- 	}
- 	/* buffer_pool will also be used to sometimes store the hmac,
- 	 * so assure it is large enough
-@@ -511,6 +512,7 @@ npe_error:
- err:
- 	dma_pool_destroy(ctx_pool);
- 	dma_pool_destroy(buffer_pool);
-+npe_release:
- 	npe_release(npe_c);
- 	return ret;
+diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
+index c35912b..82e0f4e6 100644
+--- a/drivers/crypto/marvell/hash.c
++++ b/drivers/crypto/marvell/hash.c
+@@ -315,12 +315,6 @@ static void mv_cesa_ahash_complete(struct crypto_async_request *req)
+ 	for (i = 0; i < digsize / 4; i++)
+ 		creq->state[i] = readl_relaxed(engine->regs + CESA_IVDIG(i));
+ 
+-	if (creq->cache_ptr)
+-		sg_pcopy_to_buffer(ahashreq->src, creq->src_nents,
+-				   creq->cache,
+-				   creq->cache_ptr,
+-				   ahashreq->nbytes - creq->cache_ptr);
+-
+ 	if (creq->last_req) {
+ 		/*
+ 		 * Hardware's MD5 digest is in little endian format, but
+@@ -365,6 +359,12 @@ static void mv_cesa_ahash_req_cleanup(struct crypto_async_request *req)
+ 		mv_cesa_ahash_last_cleanup(ahashreq);
+ 
+ 	mv_cesa_ahash_cleanup(ahashreq);
++
++	if (creq->cache_ptr)
++		sg_pcopy_to_buffer(ahashreq->src, creq->src_nents,
++				   creq->cache,
++				   creq->cache_ptr,
++				   ahashreq->nbytes - creq->cache_ptr);
  }
+ 
+ static const struct mv_cesa_req_ops mv_cesa_ahash_req_ops = {
+-- 
+2.8.1
