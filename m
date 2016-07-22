@@ -1,65 +1,20 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH] crypto: marvell - Don't chain at DMA level when backlog
- is disabled
-Date: Fri, 22 Jul 2016 15:22:55 +0200
-Message-ID: <20160722152255.3847cfde@bbrezillon>
-References: <1469191255-17443-1-git-send-email-romain.perier@free-electrons.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Arnaud Ebalard <arno@natisbad.org>,
+From: Quentin Lambert <lambert.quentin@gmail.com>
+Subject: [PATCH 0/2] Fix a resource release omission in error handling code
+Date: Fri, 22 Jul 2016 15:32:40 +0200
+Message-ID: <20160722133242.21916-1-lambert.quentin@gmail.com>
+Cc: kernel-janitors@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Gregory Clement <gregory.clement@free-electrons.com>
-To: Romain Perier <romain.perier@free-electrons.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:45879 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753495AbcGVNW6 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Jul 2016 09:22:58 -0400
-In-Reply-To: <1469191255-17443-1-git-send-email-romain.perier@free-electrons.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, 22 Jul 2016 14:40:55 +0200
-Romain Perier <romain.perier@free-electrons.com> wrote:
+The first patch is a style fix, the second add calls to npe_release.
+The reason for me thinking that they are necessary is that every other branches
+leading to an error return are calling this function.
 
-> The flag CRYPTO_TFM_REQ_MAY_BACKLOG is optional and can be set from the
-> user to put requests into the backlog queue when the main cryptographic
-> queue is full. Before calling mv_cesa_tdma_chain we must check the value
-> of the return status to be sure that the current request has been
-> correctly queued or added to the backlog.
-> 
-> Fixes: 85030c5168f1 ("crypto: marvell - Add support for chaining...")
-> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
-
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-
-> ---
->  drivers/crypto/marvell/cesa.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-> index e373cc6..d64af86 100644
-> --- a/drivers/crypto/marvell/cesa.c
-> +++ b/drivers/crypto/marvell/cesa.c
-> @@ -180,10 +180,11 @@ int mv_cesa_queue_req(struct crypto_async_request *req,
->  	struct mv_cesa_engine *engine = creq->engine;
->  
->  	spin_lock_bh(&engine->lock);
-> -	if (mv_cesa_req_get_type(creq) == CESA_DMA_REQ)
-> -		mv_cesa_tdma_chain(engine, creq);
-> -
->  	ret = crypto_enqueue_request(&engine->queue, req);
-> +	if ((mv_cesa_req_get_type(creq) == CESA_DMA_REQ) &&
-> +	    (ret == -EINPROGRESS ||
-> +	    (ret == -EBUSY && req->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
-> +		mv_cesa_tdma_chain(engine, creq);
->  	spin_unlock_bh(&engine->lock);
->  
->  	if (ret != -EINPROGRESS)
+---
+ drivers/crypto/ixp4xx_crypto.c |    9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+---
