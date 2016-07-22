@@ -1,50 +1,33 @@
-From: Harsh Jain <harshjain.prof@gmail.com>
-Subject: Re: Max data limit for AEAD operation
-Date: Fri, 22 Jul 2016 10:15:41 +0530
-Message-ID: <CAFXBA=mGmKYULfSVgxfiep+_6B0H692En0ajmEdvtqYwxmMq2w@mail.gmail.com>
-References: <CAFXBA==j+6fGuWrjNroGWnnBc13ev+6EB2Ae7SnwAVVxjTWBrw@mail.gmail.com>
- <20160722044019.GA17416@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Michael Ellerman <patch-notifications@ellerman.id.au>
+Subject: Re: [V2, 2/2] crypto: vmx - Convert to CPU feature based module autoloading
+Date: Fri, 22 Jul 2016 15:50:42 +1000 (AEST)
+Message-ID: <3rwfrf67mVz9t0j@ozlabs.org>
+References: <1468901033-28996-3-git-send-email-alastair@au1.ibm.com>
+Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
+	paulus@samba.org, linux-crypto@vger.kernel.org,
+	Alastair D'Silva <alastair@d-silva.org>,
+	linuxppc-dev@lists.ozlabs.org, davem@davemloft.net
+To: Alastair D'Silva <alastair@au1.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f50.google.com ([209.85.218.50]:36412 "EHLO
-	mail-oi0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751152AbcGVEpm (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Jul 2016 00:45:42 -0400
-Received: by mail-oi0-f50.google.com with SMTP id w18so147691564oiw.3
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2016 21:45:42 -0700 (PDT)
-In-Reply-To: <20160722044019.GA17416@gondor.apana.org.au>
+Received: from ozlabs.org ([103.22.144.67]:53992 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751382AbcGVFuo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 22 Jul 2016 01:50:44 -0400
+In-Reply-To: <1468901033-28996-3-git-send-email-alastair@au1.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Tue, 2016-19-07 at 04:03:53 UTC, Alastair D'Silva wrote:
+> From: Alastair D'Silva <alastair@d-silva.org>
+> 
+> This patch utilises the GENERIC_CPU_AUTOPROBE infrastructure
+> to automatically load the vmx_crypto module if the CPU supports
+> it.
+> 
+> Signed-off-by: Alastair D'Silva <alastair@d-silva.org>
 
-Thank for reply. As such I don't have any use case. But the use case I
-can think of is AEAD operation on large file using AF_ALG interface.
-If user tried this he/she will get invalid TAG value.
+Applied to powerpc next, thanks.
 
+https://git.kernel.org/powerpc/c/ccf5c442a1b82bf74105d72416
 
-Regards
-Harsh Jain
-
-On Fri, Jul 22, 2016 at 10:10 AM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> Harsh Jain <harshjain.prof@gmail.com> wrote:
->>
->> There is maximum limit of data which crypto user can send(in encrypt)
->> to get TAG in AEAD operations. We do not have update/final like
->> implementation for AEAD algo's. why is this so?
->
-> Because our users haven't needed it so far.  Also algorithms like CCM
-> cannot support such an operation.
->
-> If you have a valid use case for it then I'll consider it.
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+cheers
