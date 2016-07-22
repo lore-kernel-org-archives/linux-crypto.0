@@ -1,69 +1,47 @@
-From: Paul Gortmaker <paul.gortmaker@windriver.com>
-Subject: Re: [PATCH] crypto: x86/glue_helper make bool
-Date: Thu, 21 Jul 2016 19:13:44 -0400
-Message-ID: <20160721231344.GJ21225@windriver.com>
-References: <1469139180-26863-1-git-send-email-mcgrof@kernel.org>
- <20160721230111.GI21225@windriver.com>
- <20160721230607.GA5537@wotan.suse.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.7
+Date: Fri, 22 Jul 2016 11:39:01 +0800
+Message-ID: <20160722033900.GA16972@gondor.apana.org.au>
+References: <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150415033951.GA1406@gondor.apana.org.au>
+ <20150622084457.GA7806@gondor.apana.org.au>
+ <20150831135655.GA2694@gondor.apana.org.au>
+ <20151102080427.GA8465@gondor.apana.org.au>
+ <20160111101450.GA24044@gondor.apana.org.au>
+ <20160122101828.GA15966@gondor.apana.org.au>
+ <20160513055902.GA13595@gondor.apana.org.au>
+ <20160520084105.GA3959@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <lkp@01.org>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail1.windriver.com ([147.11.146.13]:37642 "EHLO
-	mail1.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751427AbcGUXNt (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 21 Jul 2016 19:13:49 -0400
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20160721230607.GA5537@wotan.suse.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20160520084105.GA3959@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-[Re: [PATCH] crypto: x86/glue_helper make bool] On 22/07/2016 (Fri 01:06) Luis R. Rodriguez wrote:
+Hi Linus:
 
-> On Thu, Jul 21, 2016 at 07:01:11PM -0400, Paul Gortmaker wrote:
-> > [[PATCH] crypto: x86/glue_helper make bool] On 21/07/2016 (Thu 15:13) Luis R. Rodriguez wrote:
-> > 
-> > > Paul's changes to remove MODULE_LICENSE() out of the x86 glue_helper
-> > > causes a kernel with CONFIG_CRYPTO_GLUE_HELPER_X86=m to taint since
-> > > it now detects the license is missing if you try to build the driver
-> > > as a module, log below.
-> > 
-> > Reported and fixed two days ago ; the fix went out in yesterday's
-> > linux-next via the tip tree.
-> > 
-> > https://lkml.kernel.org/r/20160719144243.GK21225@windriver.com
-> > 
-> > I fixed it by restoring the license, since making it bool might break
-> > existing use cases,
-> 
-> How so?
+This push fixes a sporadic build failure in the qat driver.
 
-In the now deleted text, you wrote:
 
-      Fix this by removing the module option for it via Kconfig as it
-      cannot be a module.
+Please pull from
 
-      glue_helper: module license 'unspecified' taints kernel.
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-The 2nd line of output clearly contradicts your 1st line stating it
-cannot be a module.   It clearly was a module, and loaded, and tainted
-the kernel because it had no license.
 
-As for use cases, there can be many that could break. Someone with a
-kernel that just fit in flash, now ends up with glue_helper builtin, and
-their kernel won't fit anymore.
+Jan Stancek (1):
+      crypto: qat - make qat_asym_algs.o depend on asn1 headers
 
-Or someone has a script that manually ran "modprobe glue_helper" at
-startup along with other specifically chosen modules.  Now that step
-will fail.
+ drivers/crypto/qat/qat_common/Makefile |    1 +
+ 1 file changed, 1 insertion(+)
 
-As I said, I don't want to be introducing runtime changes in an audit
-for unnecessary module.h instances.
-
-Paul.
---
-> 
->   Luis
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
