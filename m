@@ -1,68 +1,52 @@
-From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH] crypto: marvell - Update cache with input sg only when it is unmapped
-Date: Fri, 22 Jul 2016 15:46:24 +0200
-Message-ID: <1469195184-4700-1-git-send-email-romain.perier@free-electrons.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Gregory Clement <gregory.clement@free-electrons.com>
-To: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:46474 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753803AbcGVNqd (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Jul 2016 09:46:33 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.7
+Date: Sat, 23 Jul 2016 11:10:57 +0800
+Message-ID: <20160723031057.GA25061@gondor.apana.org.au>
+References: <20150214094328.GA7457@gondor.apana.org.au>
+ <20150415033951.GA1406@gondor.apana.org.au>
+ <20150622084457.GA7806@gondor.apana.org.au>
+ <20150831135655.GA2694@gondor.apana.org.au>
+ <20151102080427.GA8465@gondor.apana.org.au>
+ <20160111101450.GA24044@gondor.apana.org.au>
+ <20160122101828.GA15966@gondor.apana.org.au>
+ <20160513055902.GA13595@gondor.apana.org.au>
+ <20160520084105.GA3959@gondor.apana.org.au>
+ <20160722033900.GA16972@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20160722033900.GA16972@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-So far, the cache of the ahash requests was updated from the 'complete'
-operation. This complete operation is called from mv_cesa_tdma_process
-before the cleanup operation, which means that the content of req->src
-can be read and copied when it is still mapped. This commit fixes the
-issue by moving this cache update from mv_cesa_ahash_complete to
-mv_cesa_ahash_req_cleanup, so the copy is done once the sglist is
-unmapped.
+Hi Linus:
 
-Fixes: 1bf6682cb31d ("crypto: marvell - Add a complete operation for..")
-Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
----
- drivers/crypto/marvell/hash.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+This push fixes a sporadic build failure in the qat driver as well
+as a memory corruption bug in rsa-pkcs1pad.
 
-diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-index c35912b..82e0f4e6 100644
---- a/drivers/crypto/marvell/hash.c
-+++ b/drivers/crypto/marvell/hash.c
-@@ -315,12 +315,6 @@ static void mv_cesa_ahash_complete(struct crypto_async_request *req)
- 	for (i = 0; i < digsize / 4; i++)
- 		creq->state[i] = readl_relaxed(engine->regs + CESA_IVDIG(i));
- 
--	if (creq->cache_ptr)
--		sg_pcopy_to_buffer(ahashreq->src, creq->src_nents,
--				   creq->cache,
--				   creq->cache_ptr,
--				   ahashreq->nbytes - creq->cache_ptr);
--
- 	if (creq->last_req) {
- 		/*
- 		 * Hardware's MD5 digest is in little endian format, but
-@@ -365,6 +359,12 @@ static void mv_cesa_ahash_req_cleanup(struct crypto_async_request *req)
- 		mv_cesa_ahash_last_cleanup(ahashreq);
- 
- 	mv_cesa_ahash_cleanup(ahashreq);
-+
-+	if (creq->cache_ptr)
-+		sg_pcopy_to_buffer(ahashreq->src, creq->src_nents,
-+				   creq->cache,
-+				   creq->cache_ptr,
-+				   ahashreq->nbytes - creq->cache_ptr);
- }
- 
- static const struct mv_cesa_req_ops mv_cesa_ahash_req_ops = {
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Herbert Xu (1):
+      crypto: rsa-pkcs1pad - fix rsa-pkcs1pad request struct
+
+Jan Stancek (1):
+      crypto: qat - make qat_asym_algs.o depend on asn1 headers
+
+ crypto/rsa-pkcs1pad.c                  |    4 ++--
+ drivers/crypto/qat/qat_common/Makefile |    1 +
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+Thanks,
 -- 
-2.8.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
