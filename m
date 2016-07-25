@@ -1,78 +1,50 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH] crypto: marvell - Update cache with input sg only when
- it is unmapped
-Date: Mon, 25 Jul 2016 14:33:39 +0200
-Message-ID: <20160725143339.53f747f6@bbrezillon>
-References: <1469195184-4700-1-git-send-email-romain.perier@free-electrons.com>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [GIT PULL] /dev/random driver changes for 4.8
+Date: Mon, 25 Jul 2016 10:24:07 -0400
+Message-ID: <20160725142407.GG10966@thunk.org>
+References: <20160725064424.GA29098@thunk.org>
+ <20160725171515.737d61ae@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Arnaud Ebalard <arno@natisbad.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Gregory Clement <gregory.clement@free-electrons.com>
-To: Romain Perier <romain.perier@free-electrons.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Stephen Rothwell <sfr@canb.auug.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:59883 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751292AbcGYMdm (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Jul 2016 08:33:42 -0400
-In-Reply-To: <1469195184-4700-1-git-send-email-romain.perier@free-electrons.com>
+Received: from imap.thunk.org ([74.207.234.97]:41598 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752141AbcGYOYM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Jul 2016 10:24:12 -0400
+Content-Disposition: inline
+In-Reply-To: <20160725171515.737d61ae@canb.auug.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 22 Jul 2016 15:46:24 +0200
-Romain Perier <romain.perier@free-electrons.com> wrote:
-
-> So far, the cache of the ahash requests was updated from the 'complete'
-> operation. This complete operation is called from mv_cesa_tdma_process
-> before the cleanup operation, which means that the content of req->src
-> can be read and copied when it is still mapped. This commit fixes the
-> issue by moving this cache update from mv_cesa_ahash_complete to
-> mv_cesa_ahash_req_cleanup, so the copy is done once the sglist is
-> unmapped.
+On Mon, Jul 25, 2016 at 05:15:15PM +1000, Stephen Rothwell wrote:
+> Hi Ted,
 > 
-> Fixes: 1bf6682cb31d ("crypto: marvell - Add a complete operation for..")
-> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
-
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-
-> ---
->  drivers/crypto/marvell/hash.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+> On Mon, 25 Jul 2016 02:44:24 -0400 Theodore Ts'o <tytso@mit.edu> wrote:
+> >
+> > The following changes since commit 1a695a905c18548062509178b98bc91e67510864:
+> > 
+> >   Linux 4.7-rc1 (2016-05-29 09:29:24 -0700)
+> > 
+> > are available in the git repository at:
+> > 
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/tytso/random.git tags/random_for_linus
+> > 
+> > for you to fetch changes up to 86a574de4590ffe6fd3f3ca34cdcf655a78e36ec:
+> > 
+> >   random: strengthen input validation for RNDADDTOENTCNT (2016-07-03 17:09:33 -0400)
 > 
-> diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-> index c35912b..82e0f4e6 100644
-> --- a/drivers/crypto/marvell/hash.c
-> +++ b/drivers/crypto/marvell/hash.c
-> @@ -315,12 +315,6 @@ static void mv_cesa_ahash_complete(struct crypto_async_request *req)
->  	for (i = 0; i < digsize / 4; i++)
->  		creq->state[i] = readl_relaxed(engine->regs + CESA_IVDIG(i));
->  
-> -	if (creq->cache_ptr)
-> -		sg_pcopy_to_buffer(ahashreq->src, creq->src_nents,
-> -				   creq->cache,
-> -				   creq->cache_ptr,
-> -				   ahashreq->nbytes - creq->cache_ptr);
-> -
->  	if (creq->last_req) {
->  		/*
->  		 * Hardware's MD5 digest is in little endian format, but
-> @@ -365,6 +359,12 @@ static void mv_cesa_ahash_req_cleanup(struct crypto_async_request *req)
->  		mv_cesa_ahash_last_cleanup(ahashreq);
->  
->  	mv_cesa_ahash_cleanup(ahashreq);
-> +
-> +	if (creq->cache_ptr)
-> +		sg_pcopy_to_buffer(ahashreq->src, creq->src_nents,
-> +				   creq->cache,
-> +				   creq->cache_ptr,
-> +				   ahashreq->nbytes - creq->cache_ptr);
->  }
->  
->  static const struct mv_cesa_req_ops mv_cesa_ahash_req_ops = {
+> Of course none of this has been in linux-next since the random tree was
+> dropped in March because it had not been updated for more than a year at
+> that point.
+> 
+> However, at least half of these look like bug fixes (cced to stable).
+> 
+> Should I reinstate the random tree to linux-next?
+
+Yes, please do.  It was getting zero-day checks, and I assumed it was
+in linux-next; I should have checked, though.
+
+							- Ted
