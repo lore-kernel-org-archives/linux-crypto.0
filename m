@@ -1,44 +1,39 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] DH support: add KDF handling support
-Date: Wed, 27 Jul 2016 11:11:53 +0200
-Message-ID: <9486547.FUb4ORn15o@tauon.atsec.com>
-References: <alpine.OSX.2.20.1607141618170.69287@istotlan-mobl1.amr.corp.intel.com> <1954976.nIU2Zma9Rk@tauon.atsec.com> <9263.1469606131@warthog.procyon.org.uk>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [GIT PULL] /dev/random driver changes for 4.8
+Date: Wed, 27 Jul 2016 09:12:37 -0400
+Message-ID: <20160727131237.GF9284@thunk.org>
+References: <20160725064424.GA29098@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:33812 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753285AbcG0JL4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 Jul 2016 05:11:56 -0400
-In-Reply-To: <9263.1469606131@warthog.procyon.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20160725064424.GA29098@thunk.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 27. Juli 2016, 08:55:31 CEST schrieb David Howells:
-
-Hi David,
-
-> Mat Martineau <mathew.j.martineau@linux.intel.com> wrote:
-> > > Though, shall I stuff the wrapper code back into the existing dh_compute
-> > > functions or can I leave them as separate functions?
-> > 
-> > I'm not sure. In the existing code there's one keyctl wrapper per keyctl
-> > command. A combined wrapper would need some extra logic to decide whether
-> > kdfparams is passed in or not, which is different from existing code.
+On Mon, Jul 25, 2016 at 02:44:24AM -0400, Theodore Ts'o wrote:
+> The following changes since commit 1a695a905c18548062509178b98bc91e67510864:
 > 
-> You shouldn't change the existing keyctl wrappers.  Feel free to add another
-> one with extra arguments.
-
-I created dh_compute_kdf and dh_compute_kdf_oi where the latter takes the 
-other information from STDIN.
+>   Linux 4.7-rc1 (2016-05-29 09:29:24 -0700)
 > 
-> David
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/tytso/random.git tags/random_for_linus
+> 
+> for you to fetch changes up to 86a574de4590ffe6fd3f3ca34cdcf655a78e36ec:
+> 
+>   random: strengthen input validation for RNDADDTOENTCNT (2016-07-03 17:09:33 -0400)
 
+Hi Linus,
 
+Are you planning on pulling the random tree this cycle?  I'm not sure
+if you wanted to let it soak for a few days in linux-next, or whether
+you want to wait another full release cycle, given that the random
+tree had gotten dropped from linux-next some time ago without my
+realizing it.  (The code has actually been soaking for 1.5 releases,
+since I wanted to give it lots of soak time, but of course, it would
+have been more helpful if it actually was in linux-next.  Sigh...)
 
-Ciao
-Stephan
+     	       	       	     	      	  - Ted
