@@ -1,8 +1,7 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 08/10] crypto: ccp - Add support for the RNG in a version 5
- CCP
-Date: Tue, 26 Jul 2016 19:10:31 -0500
-Message-ID: <20160727001031.24944.90779.stgit@taos>
+Subject: [PATCH 10/10] crypto: ccp - Enable use of the additional CCP
+Date: Tue, 26 Jul 2016 19:10:49 -0500
+Message-ID: <20160727001049.24944.13728.stgit@taos>
 References: <20160727000652.24944.44919.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -11,131 +10,140 @@ Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
 	<davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0078.outbound.protection.outlook.com ([104.47.41.78]:43648
-	"EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+Received: from mail-bn3nam01on0059.outbound.protection.outlook.com ([104.47.33.59]:38042
+	"EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751583AbcG0A0g (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jul 2016 20:26:36 -0400
+	id S1751583AbcG0A0q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Jul 2016 20:26:46 -0400
 In-Reply-To: <20160727000652.24944.44919.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+A second CCP is available, identical to the first, with
+its ownn PCI ID. Make it available for use by the crypto
+subsystem, as well as for DMA activity and random
+number generation.
+
+This device is not pre-configured at at boot time. The
+driver must configure it (during the probe) for use.
+
+
 Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/ccp-dev-v3.c |   13 ++++---------
- drivers/crypto/ccp/ccp-dev-v5.c |    7 +++++++
- drivers/crypto/ccp/ccp-dev.c    |   23 +++++++++++++++++++++++
- drivers/crypto/ccp/ccp-dev.h    |    2 ++
- 4 files changed, 36 insertions(+), 9 deletions(-)
+ drivers/crypto/ccp/ccp-dev-v5.c |   37 ++++++++++++++++++++++++++++++++++++-
+ drivers/crypto/ccp/ccp-dev.h    |    8 ++++++++
+ drivers/crypto/ccp/ccp-pci.c    |    2 ++
+ 3 files changed, 46 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index ff2d2a4..578522d 100644
---- a/drivers/crypto/ccp/ccp-dev-v3.c
-+++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -432,14 +432,9 @@ static int ccp_init(struct ccp_device *ccp)
- 	dev_dbg(dev, "Registering device...\n");
- 	ccp_add_device(ccp);
- 
--	/* Register the RNG */
--	ccp->hwrng.name = ccp->rngname;
--	ccp->hwrng.read = ccp_trng_read;
--	ret = hwrng_register(&ccp->hwrng);
--	if (ret) {
--		dev_err(dev, "error registering hwrng (%d)\n", ret);
-+	ret = ccp_register_rng(ccp);
-+	if (ret)
- 		goto e_kthread;
--	}
- 
- 	/* Register the DMA engine support */
- 	ret = ccp_dmaengine_register(ccp);
-@@ -449,7 +444,7 @@ static int ccp_init(struct ccp_device *ccp)
- 	return 0;
- 
- e_hwrng:
--	hwrng_unregister(&ccp->hwrng);
-+	ccp_unregister_rng(ccp);
- 
- e_kthread:
- 	for (i = 0; i < ccp->cmd_q_count; i++)
-@@ -475,7 +470,7 @@ static void ccp_destroy(struct ccp_device *ccp)
- 	ccp_dmaengine_unregister(ccp);
- 
- 	/* Unregister the RNG */
--	hwrng_unregister(&ccp->hwrng);
-+	ccp_unregister_rng(ccp);
- 
- 	/* Remove this device from the list of available units */
- 	ccp_del_device(ccp);
 diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index 16dad96..ddce220 100644
+index 4086714..f499e34 100644
 --- a/drivers/crypto/ccp/ccp-dev-v5.c
 +++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -828,6 +828,10 @@ static int ccp5_init(struct ccp_device *ccp)
- 	/* Put this on the unit list to make it available */
- 	ccp_add_device(ccp);
- 
-+	ret = ccp_register_rng(ccp);
-+	if (ret)
+@@ -835,7 +835,7 @@ static int ccp5_init(struct ccp_device *ccp)
+ 	/* Register the DMA engine support */
+ 	ret = ccp_dmaengine_register(ccp);
+ 	if (ret)
+-		goto e_hwrng;
 +		goto e_kthread;
-+
+ 
  	return 0;
  
- e_kthread:
-@@ -852,6 +856,9 @@ static void ccp5_destroy(struct ccp_device *ccp)
- 	struct ccp_cmd *cmd;
- 	unsigned int i;
- 
-+	/* Unregister the RNG */
-+	ccp_unregister_rng(ccp);
-+
- 	/* Remove this device from the list of available units first */
- 	ccp_del_device(ccp);
- 
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index 6b44730..38a98d8 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -119,6 +119,29 @@ void ccp_del_device(struct ccp_device *ccp)
- 	write_unlock_irqrestore(&ccp_unit_lock, flags);
+@@ -952,6 +952,33 @@ static void ccp5_config(struct ccp_device *ccp)
+ 	iowrite32(0x00001249, ccp->io_regs + CMD5_REQID_CONFIG_OFFSET);
  }
  
-+
-+
-+int ccp_register_rng(struct ccp_device *ccp)
++static void ccp5other_config(struct ccp_device *ccp)
 +{
-+	int ret = 0;
++	int i;
++	u32 rnd;
 +
-+	dev_dbg(ccp->dev, "Registering RNG...\n");
-+	/* Register an RNG */
-+	ccp->hwrng.name = ccp->rngname;
-+	ccp->hwrng.read = ccp_trng_read;
-+	ret = hwrng_register(&ccp->hwrng);
-+	if (ret)
-+		dev_err(ccp->dev, "error registering hwrng (%d)\n", ret);
++	/* We own all of the queues on the NTB CCP */
 +
-+	return ret;
++	iowrite32(0x00012D57, ccp->io_regs + CMD5_TRNG_CTL_OFFSET);
++	iowrite32(0x00000003, ccp->io_regs + CMD5_CONFIG_0_OFFSET);
++	for (i = 0; i < 12; i++) {
++		rnd = ioread32(ccp->io_regs + TRNG_OUT_REG);
++		iowrite32(rnd, ccp->io_regs + CMD5_AES_MASK_OFFSET);
++	}
++
++	iowrite32(0x0000001F, ccp->io_regs + CMD5_QUEUE_MASK_OFFSET);
++	iowrite32(0x00005B6D, ccp->io_regs + CMD5_QUEUE_PRIO_OFFSET);
++	iowrite32(0x00000000, ccp->io_regs + CMD5_CMD_TIMEOUT_OFFSET);
++
++	iowrite32(0x3FFFFFFF, ccp->io_regs + LSB_PRIVATE_MASK_LO_OFFSET);
++	iowrite32(0x000003FF, ccp->io_regs + LSB_PRIVATE_MASK_HI_OFFSET);
++
++	iowrite32(0x00108823, ccp->io_regs + CMD5_CLK_GATE_CTL_OFFSET);
++
++	ccp5_config(ccp);
 +}
 +
-+void ccp_unregister_rng(struct ccp_device *ccp)
-+{
-+	if (ccp->hwrng.name)
-+		hwrng_unregister(&ccp->hwrng);
-+}
++/* Version 5 adds some function, but is essentially the same as v5 */
+ static const struct ccp_actions ccp5_actions = {
+ 	.aes = ccp5_perform_aes,
+ 	.xts_aes = ccp5_perform_xts_aes,
+@@ -974,3 +1001,11 @@ struct ccp_vdata ccpv5 = {
+ 	.bar = 2,
+ 	.offset = 0x0,
+ };
 +
- static struct ccp_device *ccp_get_device(void)
- {
- 	unsigned long flags;
++struct ccp_vdata ccpv5other = {
++	.version = CCP_VERSION(5, 0),
++	.setup = ccp5other_config,
++	.perform = &ccp5_actions,
++	.bar = 2,
++	.offset = 0x0,
++};
 diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index 5ff4a73..d04bd61 100644
+index d04bd61..ebc9365 100644
 --- a/drivers/crypto/ccp/ccp-dev.h
 +++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -601,6 +601,8 @@ int ccp_trng_read(struct hwrng *rng, void *data, size_t max, bool wait);
+@@ -63,7 +63,9 @@
  
- int ccp_run_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd);
+ /* ------------------------ CCP Version 5 Specifics ------------------------ */
+ #define CMD5_QUEUE_MASK_OFFSET		0x00
++#define	CMD5_QUEUE_PRIO_OFFSET		0x04
+ #define CMD5_REQID_CONFIG_OFFSET	0x08
++#define	CMD5_CMD_TIMEOUT_OFFSET		0x10
+ #define LSB_PUBLIC_MASK_LO_OFFSET	0x18
+ #define LSB_PUBLIC_MASK_HI_OFFSET	0x1C
+ #define LSB_PRIVATE_MASK_LO_OFFSET	0x20
+@@ -83,6 +85,11 @@
+ #define CMD5_Q_ABORT_BASE		0x0114
+ #define CMD5_Q_AX_CACHE_BASE		0x0118
  
-+int ccp_register_rng(struct ccp_device *ccp);
-+void ccp_unregister_rng(struct ccp_device *ccp);
- int ccp_dmaengine_register(struct ccp_device *ccp);
- void ccp_dmaengine_unregister(struct ccp_device *ccp);
++#define	CMD5_CONFIG_0_OFFSET		0x6000
++#define	CMD5_TRNG_CTL_OFFSET		0x6008
++#define	CMD5_AES_MASK_OFFSET		0x6010
++#define	CMD5_CLK_GATE_CTL_OFFSET	0x603C
++
+ /* Address offset between two virtual queue registers */
+ #define CMD5_Q_STATUS_INCR		0x1000
  
+@@ -634,5 +641,6 @@ struct ccp_vdata {
+ 
+ extern	struct ccp_vdata ccpv3;
+ extern	struct ccp_vdata ccpv5;
++extern	struct ccp_vdata ccpv5other;
+ 
+ #endif
+diff --git a/drivers/crypto/ccp/ccp-pci.c b/drivers/crypto/ccp/ccp-pci.c
+index 064e20f..239cbf2 100644
+--- a/drivers/crypto/ccp/ccp-pci.c
++++ b/drivers/crypto/ccp/ccp-pci.c
+@@ -232,6 +232,7 @@ static int ccp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 
+ 	if (ccp->vdata->setup)
+ 		ccp->vdata->setup(ccp);
++
+ 	ret = ccp->vdata->perform->init(ccp);
+ 	if (ret)
+ 		goto e_iomap;
+@@ -325,6 +326,7 @@ static int ccp_pci_resume(struct pci_dev *pdev)
+ static const struct pci_device_id ccp_pci_table[] = {
+ 	{ PCI_VDEVICE(AMD, 0x1537), (kernel_ulong_t)&ccpv3 },
+ 	{ PCI_VDEVICE(AMD, 0x1456), (kernel_ulong_t)&ccpv5 },
++	{ PCI_VDEVICE(AMD, 0x1468), (kernel_ulong_t)&ccpv5other },
+ 	/* Last entry must be zero */
+ 	{ 0, }
+ };
