@@ -1,7 +1,8 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 03/10] crypto: ccp - Refactoring: symbol cleanup
-Date: Tue, 26 Jul 2016 19:09:40 -0500
-Message-ID: <20160727000940.24944.16466.stgit@taos>
+Subject: [PATCH 07/10] crypto: ccp - Let a v5 CCP provide the same function
+ as v3
+Date: Tue, 26 Jul 2016 19:10:21 -0500
+Message-ID: <20160727001021.24944.69144.stgit@taos>
 References: <20160727000652.24944.44919.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,136 +11,50 @@ Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
 	<davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0056.outbound.protection.outlook.com ([104.47.36.56]:7296
-	"EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-dm3nam03on0076.outbound.protection.outlook.com ([104.47.41.76]:42544
+	"EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1756926AbcG0AYV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jul 2016 20:24:21 -0400
+	id S1752319AbcG0AY4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Jul 2016 20:24:56 -0400
 In-Reply-To: <20160727000652.24944.44919.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Form and use of the local storage block in the CCP is
-particular to the device version. Much of the code that
-accesses the storage block can treat it as a virtual
-resource, and will under go some renaming. Device-specific
-access to the memory will be moved into device file.
-Service functions will be added to the actions
-structure.
+Enable equivalent function on a v5 CCP. Add support for a
+version 5 CCP which enables AES/XTS/SHA services. Also,
+more work on the data structures to virtualize
+functionality.
 
 
 Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/ccp-dev-v3.c |   32 ++---
- drivers/crypto/ccp/ccp-dev.c    |    7 +
- drivers/crypto/ccp/ccp-dev.h    |   43 +++---
- drivers/crypto/ccp/ccp-ops.c    |  266 ++++++++++++++++++++-------------------
- 4 files changed, 175 insertions(+), 173 deletions(-)
+ drivers/crypto/ccp/Makefile         |    1 
+ drivers/crypto/ccp/ccp-crypto-sha.c |   18 +
+ drivers/crypto/ccp/ccp-dev-v3.c     |   28 +
+ drivers/crypto/ccp/ccp-dev-v5.c     |  961 +++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/ccp-dev.h        |  164 ++++++
+ drivers/crypto/ccp/ccp-ops.c        |  279 +++++++---
+ drivers/crypto/ccp/ccp-pci.c        |    6 
+ include/linux/ccp.h                 |    3 
+ 8 files changed, 1340 insertions(+), 120 deletions(-)
+ create mode 100644 drivers/crypto/ccp/ccp-dev-v5.c
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index 1a94d2e..19eafb8 100644
---- a/drivers/crypto/ccp/ccp-dev-v3.c
-+++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -100,10 +100,10 @@ static int ccp_perform_aes(struct ccp_op *op)
- 		| (op->u.aes.type << REQ1_AES_TYPE_SHIFT)
- 		| (op->u.aes.mode << REQ1_AES_MODE_SHIFT)
- 		| (op->u.aes.action << REQ1_AES_ACTION_SHIFT)
--		| (op->ksb_key << REQ1_KEY_KSB_SHIFT);
-+		| (op->sb_key << REQ1_KEY_KSB_SHIFT);
- 	cr[1] = op->src.u.dma.length - 1;
- 	cr[2] = ccp_addr_lo(&op->src.u.dma);
--	cr[3] = (op->ksb_ctx << REQ4_KSB_SHIFT)
-+	cr[3] = (op->sb_ctx << REQ4_KSB_SHIFT)
- 		| (CCP_MEMTYPE_SYSTEM << REQ4_MEMTYPE_SHIFT)
- 		| ccp_addr_hi(&op->src.u.dma);
- 	cr[4] = ccp_addr_lo(&op->dst.u.dma);
-@@ -130,10 +130,10 @@ static int ccp_perform_xts_aes(struct ccp_op *op)
- 	cr[0] = (CCP_ENGINE_XTS_AES_128 << REQ1_ENGINE_SHIFT)
- 		| (op->u.xts.action << REQ1_AES_ACTION_SHIFT)
- 		| (op->u.xts.unit_size << REQ1_XTS_AES_SIZE_SHIFT)
--		| (op->ksb_key << REQ1_KEY_KSB_SHIFT);
-+		| (op->sb_key << REQ1_KEY_KSB_SHIFT);
- 	cr[1] = op->src.u.dma.length - 1;
- 	cr[2] = ccp_addr_lo(&op->src.u.dma);
--	cr[3] = (op->ksb_ctx << REQ4_KSB_SHIFT)
-+	cr[3] = (op->sb_ctx << REQ4_KSB_SHIFT)
- 		| (CCP_MEMTYPE_SYSTEM << REQ4_MEMTYPE_SHIFT)
- 		| ccp_addr_hi(&op->src.u.dma);
- 	cr[4] = ccp_addr_lo(&op->dst.u.dma);
-@@ -159,7 +159,7 @@ static int ccp_perform_sha(struct ccp_op *op)
- 		| REQ1_INIT;
- 	cr[1] = op->src.u.dma.length - 1;
- 	cr[2] = ccp_addr_lo(&op->src.u.dma);
--	cr[3] = (op->ksb_ctx << REQ4_KSB_SHIFT)
-+	cr[3] = (op->sb_ctx << REQ4_KSB_SHIFT)
- 		| (CCP_MEMTYPE_SYSTEM << REQ4_MEMTYPE_SHIFT)
- 		| ccp_addr_hi(&op->src.u.dma);
- 
-@@ -182,11 +182,11 @@ static int ccp_perform_rsa(struct ccp_op *op)
- 	/* Fill out the register contents for REQ1 through REQ6 */
- 	cr[0] = (CCP_ENGINE_RSA << REQ1_ENGINE_SHIFT)
- 		| (op->u.rsa.mod_size << REQ1_RSA_MOD_SIZE_SHIFT)
--		| (op->ksb_key << REQ1_KEY_KSB_SHIFT)
-+		| (op->sb_key << REQ1_KEY_KSB_SHIFT)
- 		| REQ1_EOM;
- 	cr[1] = op->u.rsa.input_len - 1;
- 	cr[2] = ccp_addr_lo(&op->src.u.dma);
--	cr[3] = (op->ksb_ctx << REQ4_KSB_SHIFT)
-+	cr[3] = (op->sb_ctx << REQ4_KSB_SHIFT)
- 		| (CCP_MEMTYPE_SYSTEM << REQ4_MEMTYPE_SHIFT)
- 		| ccp_addr_hi(&op->src.u.dma);
- 	cr[4] = ccp_addr_lo(&op->dst.u.dma);
-@@ -216,10 +216,10 @@ static int ccp_perform_passthru(struct ccp_op *op)
- 			| ccp_addr_hi(&op->src.u.dma);
- 
- 		if (op->u.passthru.bit_mod != CCP_PASSTHRU_BITWISE_NOOP)
--			cr[3] |= (op->ksb_key << REQ4_KSB_SHIFT);
-+			cr[3] |= (op->sb_key << REQ4_KSB_SHIFT);
- 	} else {
--		cr[2] = op->src.u.ksb * CCP_KSB_BYTES;
--		cr[3] = (CCP_MEMTYPE_KSB << REQ4_MEMTYPE_SHIFT);
-+		cr[2] = op->src.u.sb * CCP_SB_BYTES;
-+		cr[3] = (CCP_MEMTYPE_SB << REQ4_MEMTYPE_SHIFT);
- 	}
- 
- 	if (op->dst.type == CCP_MEMTYPE_SYSTEM) {
-@@ -227,8 +227,8 @@ static int ccp_perform_passthru(struct ccp_op *op)
- 		cr[5] = (CCP_MEMTYPE_SYSTEM << REQ6_MEMTYPE_SHIFT)
- 			| ccp_addr_hi(&op->dst.u.dma);
- 	} else {
--		cr[4] = op->dst.u.ksb * CCP_KSB_BYTES;
--		cr[5] = (CCP_MEMTYPE_KSB << REQ6_MEMTYPE_SHIFT);
-+		cr[4] = op->dst.u.sb * CCP_SB_BYTES;
-+		cr[5] = (CCP_MEMTYPE_SB << REQ6_MEMTYPE_SHIFT);
- 	}
- 
- 	if (op->eom)
-@@ -322,9 +322,9 @@ static int ccp_init(struct ccp_device *ccp)
- 		cmd_q->dma_pool = dma_pool;
- 
- 		/* Reserve 2 KSB regions for the queue */
--		cmd_q->ksb_key = KSB_START + ccp->ksb_start++;
--		cmd_q->ksb_ctx = KSB_START + ccp->ksb_start++;
--		ccp->ksb_count -= 2;
-+		cmd_q->sb_key = KSB_START + ccp->sb_start++;
-+		cmd_q->sb_ctx = KSB_START + ccp->sb_start++;
-+		ccp->sb_count -= 2;
- 
- 		/* Preset some register values and masks that are queue
- 		 * number dependent
-@@ -376,7 +376,7 @@ static int ccp_init(struct ccp_device *ccp)
- 	}
- 
- 	/* Initialize the queues used to wait for KSB space and suspend */
--	init_waitqueue_head(&ccp->ksb_queue);
-+	init_waitqueue_head(&ccp->sb_queue);
- 	init_waitqueue_head(&ccp->suspend_queue);
- 
- 	/* Create a kthread for each queue */
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index 87b9f2b..9c8cfbb 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
+diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+index ee4d274..346ceb8 100644
+--- a/drivers/crypto/ccp/Makefile
++++ b/drivers/crypto/ccp/Makefile
+@@ -2,6 +2,7 @@ obj-$(CONFIG_CRYPTO_DEV_CCP_DD) += ccp.o
+ ccp-objs := ccp-dev.o \
+ 	    ccp-ops.o \
+ 	    ccp-dev-v3.o \
++	    ccp-dev-v5.o \
+ 	    ccp-platform.o \
+ 	    ccp-dmaengine.o
+ ccp-$(CONFIG_PCI) += ccp-pci.o
+diff --git a/drivers/crypto/ccp/ccp-crypto-sha.c b/drivers/crypto/ccp/ccp-crypto-sha.c
+index 8f36af6..84a652b 100644
+--- a/drivers/crypto/ccp/ccp-crypto-sha.c
++++ b/drivers/crypto/ccp/ccp-crypto-sha.c
 @@ -4,6 +4,7 @@
   * Copyright (C) 2013,2016 Advanced Micro Devices, Inc.
   *
@@ -148,789 +63,1835 @@ index 87b9f2b..9c8cfbb 100644
   *
   * This program is free software; you can redistribute it and/or modify
   * it under the terms of the GNU General Public License version 2 as
-@@ -397,9 +398,9 @@ struct ccp_device *ccp_alloc_struct(struct device *dev)
+@@ -134,7 +135,22 @@ static int ccp_do_sha_update(struct ahash_request *req, unsigned int nbytes,
+ 	rctx->cmd.engine = CCP_ENGINE_SHA;
+ 	rctx->cmd.u.sha.type = rctx->type;
+ 	rctx->cmd.u.sha.ctx = &rctx->ctx_sg;
+-	rctx->cmd.u.sha.ctx_len = sizeof(rctx->ctx);
++
++	switch (rctx->type) {
++	case CCP_SHA_TYPE_1:
++		rctx->cmd.u.sha.ctx_len = SHA1_DIGEST_SIZE;
++		break;
++	case CCP_SHA_TYPE_224:
++		rctx->cmd.u.sha.ctx_len = SHA224_DIGEST_SIZE;
++		break;
++	case CCP_SHA_TYPE_256:
++		rctx->cmd.u.sha.ctx_len = SHA256_DIGEST_SIZE;
++		break;
++	default:
++		/* Should never get here */
++		break;
++	}
++
+ 	rctx->cmd.u.sha.src = sg;
+ 	rctx->cmd.u.sha.src_len = rctx->hash_cnt;
+ 	rctx->cmd.u.sha.opad = ctx->u.sha.key_len ?
+diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
+index 02c8c95..ff2d2a4 100644
+--- a/drivers/crypto/ccp/ccp-dev-v3.c
++++ b/drivers/crypto/ccp/ccp-dev-v3.c
+@@ -405,6 +405,7 @@ static int ccp_init(struct ccp_device *ccp)
+ 	init_waitqueue_head(&ccp->sb_queue);
+ 	init_waitqueue_head(&ccp->suspend_queue);
  
- 	spin_lock_init(&ccp->cmd_lock);
- 	mutex_init(&ccp->req_mutex);
--	mutex_init(&ccp->ksb_mutex);
--	ccp->ksb_count = KSB_COUNT;
--	ccp->ksb_start = 0;
-+	mutex_init(&ccp->sb_mutex);
-+	ccp->sb_count = KSB_COUNT;
-+	ccp->sb_start = 0;
++	dev_dbg(dev, "Starting threads...\n");
+ 	/* Create a kthread for each queue */
+ 	for (i = 0; i < ccp->cmd_q_count; i++) {
+ 		struct task_struct *kthread;
+@@ -424,6 +425,13 @@ static int ccp_init(struct ccp_device *ccp)
+ 		wake_up_process(kthread);
+ 	}
  
- 	ccp->ord = ccp_increment_unit_ordinal();
- 	snprintf(ccp->name, MAX_CCP_NAME_LEN, "ccp-%u", ccp->ord);
++	dev_dbg(dev, "Enabling interrupts...\n");
++	/* Enable interrupts */
++	iowrite32(qim, ccp->io_regs + IRQ_MASK_REG);
++
++	dev_dbg(dev, "Registering device...\n");
++	ccp_add_device(ccp);
++
+ 	/* Register the RNG */
+ 	ccp->hwrng.name = ccp->rngname;
+ 	ccp->hwrng.read = ccp_trng_read;
+@@ -438,11 +446,6 @@ static int ccp_init(struct ccp_device *ccp)
+ 	if (ret)
+ 		goto e_hwrng;
+ 
+-	ccp_add_device(ccp);
+-
+-	/* Enable interrupts */
+-	iowrite32(qim, ccp->io_regs + IRQ_MASK_REG);
+-
+ 	return 0;
+ 
+ e_hwrng:
+@@ -468,7 +471,13 @@ static void ccp_destroy(struct ccp_device *ccp)
+ 	struct ccp_cmd *cmd;
+ 	unsigned int qim, i;
+ 
+-	/* Remove this device from the list of available units first */
++	/* Unregister the DMA engine */
++	ccp_dmaengine_unregister(ccp);
++
++	/* Unregister the RNG */
++	hwrng_unregister(&ccp->hwrng);
++
++	/* Remove this device from the list of available units */
+ 	ccp_del_device(ccp);
+ 
+ 	/* Build queue interrupt mask (two interrupt masks per queue) */
+@@ -488,12 +497,6 @@ static void ccp_destroy(struct ccp_device *ccp)
+ 	}
+ 	iowrite32(qim, ccp->io_regs + IRQ_STATUS_REG);
+ 
+-	/* Unregister the DMA engine */
+-	ccp_dmaengine_unregister(ccp);
+-
+-	/* Unregister the RNG */
+-	hwrng_unregister(&ccp->hwrng);
+-
+ 	/* Stop the queue kthreads */
+ 	for (i = 0; i < ccp->cmd_q_count; i++)
+ 		if (ccp->cmd_q[i].kthread)
+@@ -570,6 +573,7 @@ static const struct ccp_actions ccp3_actions = {
+ 
+ struct ccp_vdata ccpv3 = {
+ 	.version = CCP_VERSION(3, 0),
++	.setup = NULL,
+ 	.perform = &ccp3_actions,
+ 	.bar = 2,
+ 	.offset = 0x20000,
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+new file mode 100644
+index 0000000..16dad96
+--- /dev/null
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -0,0 +1,961 @@
++/*
++ * AMD Cryptographic Coprocessor (CCP) driver
++ *
++ * Copyright (C) 2016 Advanced Micro Devices, Inc.
++ *
++ * Author: Gary R Hook <gary.hook@amd.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/pci.h>
++#include <linux/kthread.h>
++#include <linux/dma-mapping.h>
++#include <linux/interrupt.h>
++#include <linux/compiler.h>
++#include <linux/ccp.h>
++
++#include "ccp-dev.h"
++
++static u32 ccp_lsb_alloc(struct ccp_cmd_queue *cmd_q, unsigned int count)
++{
++	struct ccp_device *ccp;
++	int start;
++
++	/* First look at the map for the queue */
++	if (cmd_q->lsb >= 0) {
++		start = (u32)bitmap_find_next_zero_area(cmd_q->lsbmap,
++							LSB_SIZE,
++							0, count, 0);
++		if (start < LSB_SIZE) {
++			bitmap_set(cmd_q->lsbmap, start, count);
++			return start + cmd_q->lsb * LSB_SIZE;
++		}
++	}
++
++	/* No joy; try to get an entry from the shared blocks */
++	ccp = cmd_q->ccp;
++	for (;;) {
++		mutex_lock(&ccp->sb_mutex);
++
++		start = (u32)bitmap_find_next_zero_area(ccp->lsbmap,
++							MAX_LSB_CNT * LSB_SIZE,
++							0,
++							count, 0);
++		if (start <= MAX_LSB_CNT * LSB_SIZE) {
++			bitmap_set(ccp->lsbmap, start, count);
++
++			mutex_unlock(&ccp->sb_mutex);
++			return start * LSB_ITEM_SIZE;
++		}
++
++		ccp->sb_avail = 0;
++
++		mutex_unlock(&ccp->sb_mutex);
++
++		/* Wait for KSB entries to become available */
++		if (wait_event_interruptible(ccp->sb_queue, ccp->sb_avail))
++			return 0;
++	}
++}
++
++static void ccp_lsb_free(struct ccp_cmd_queue *cmd_q, unsigned int start,
++			 unsigned int count)
++{
++	int lsbno = start / LSB_SIZE;
++
++	if (!start)
++		return;
++
++	if (cmd_q->lsb == lsbno) {
++		/* An entry from the private LSB */
++		bitmap_clear(cmd_q->lsbmap, start % LSB_SIZE, count);
++	} else {
++		/* From the shared LSBs */
++		struct ccp_device *ccp = cmd_q->ccp;
++
++		mutex_lock(&ccp->sb_mutex);
++		bitmap_clear(ccp->lsbmap, start, count);
++		ccp->sb_avail = 1;
++		mutex_unlock(&ccp->sb_mutex);
++		wake_up_interruptible_all(&ccp->sb_queue);
++	}
++}
++
++/* CCP version 5: Union to define the function field (cmd_reg1/dword0) */
++union ccp_function {
++	struct {
++		u16 size:7;
++		u16 encrypt:1;
++		u16 mode:5;
++		u16 type:2;
++	} aes;
++	struct {
++		u16 size:7;
++		u16 encrypt:1;
++		u16 rsvd:5;
++		u16 type:2;
++	} aes_xts;
++	struct {
++		u16 rsvd1:10;
++		u16 type:4;
++		u16 rsvd2:1;
++	} sha;
++	struct {
++		u16 mode:3;
++		u16 size:12;
++	} rsa;
++	struct {
++		u16 byteswap:2;
++		u16 bitwise:3;
++		u16 reflect:2;
++		u16 rsvd:8;
++	} pt;
++	struct  {
++		u16 rsvd:13;
++	} zlib;
++	struct {
++		u16 size:10;
++		u16 type:2;
++		u16 mode:3;
++	} ecc;
++	u16 raw;
++};
++
++#define	CCP_AES_SIZE(p)		((p)->aes.size)
++#define	CCP_AES_ENCRYPT(p)	((p)->aes.encrypt)
++#define	CCP_AES_MODE(p)		((p)->aes.mode)
++#define	CCP_AES_TYPE(p)		((p)->aes.type)
++#define	CCP_XTS_SIZE(p)		((p)->aes_xts.size)
++#define	CCP_XTS_ENCRYPT(p)	((p)->aes_xts.encrypt)
++#define	CCP_SHA_TYPE(p)		((p)->sha.type)
++#define	CCP_RSA_SIZE(p)		((p)->rsa.size)
++#define	CCP_PT_BYTESWAP(p)	((p)->pt.byteswap)
++#define	CCP_PT_BITWISE(p)	((p)->pt.bitwise)
++#define	CCP_ECC_MODE(p)		((p)->ecc.mode)
++#define	CCP_ECC_AFFINE(p)	((p)->ecc.one)
++
++/* Word 0 */
++#define CCP5_CMD_DW0(p)		((p)->dw0)
++#define CCP5_CMD_SOC(p)		(CCP5_CMD_DW0(p).soc)
++#define CCP5_CMD_IOC(p)		(CCP5_CMD_DW0(p).ioc)
++#define CCP5_CMD_INIT(p)	(CCP5_CMD_DW0(p).init)
++#define CCP5_CMD_EOM(p)		(CCP5_CMD_DW0(p).eom)
++#define CCP5_CMD_FUNCTION(p)	(CCP5_CMD_DW0(p).function)
++#define CCP5_CMD_ENGINE(p)	(CCP5_CMD_DW0(p).engine)
++#define CCP5_CMD_PROT(p)	(CCP5_CMD_DW0(p).prot)
++
++/* Word 1 */
++#define CCP5_CMD_DW1(p)		((p)->length)
++#define CCP5_CMD_LEN(p)		(CCP5_CMD_DW1(p))
++
++/* Word 2 */
++#define CCP5_CMD_DW2(p)		((p)->src_lo)
++#define CCP5_CMD_SRC_LO(p)	(CCP5_CMD_DW2(p))
++
++/* Word 3 */
++#define CCP5_CMD_DW3(p)		((p)->dw3)
++#define CCP5_CMD_SRC_MEM(p)	((p)->dw3.src_mem)
++#define CCP5_CMD_SRC_HI(p)	((p)->dw3.src_hi)
++#define CCP5_CMD_LSB_ID(p)	((p)->dw3.lsb_cxt_id)
++#define CCP5_CMD_FIX_SRC(p)	((p)->dw3.fixed)
++
++/* Words 4/5 */
++#define CCP5_CMD_DW4(p)		((p)->dw4)
++#define CCP5_CMD_DST_LO(p)	(CCP5_CMD_DW4(p).dst_lo)
++#define CCP5_CMD_DW5(p)		((p)->dw5.fields.dst_hi)
++#define CCP5_CMD_DST_HI(p)	(CCP5_CMD_DW5(p))
++#define CCP5_CMD_DST_MEM(p)	((p)->dw5.fields.dst_mem)
++#define CCP5_CMD_FIX_DST(p)	((p)->dw5.fields.fixed)
++#define CCP5_CMD_SHA_LO(p)	((p)->dw4.sha_len_lo)
++#define CCP5_CMD_SHA_HI(p)	((p)->dw5.sha_len_hi)
++
++/* Word 6/7 */
++#define CCP5_CMD_DW6(p)		((p)->key_lo)
++#define CCP5_CMD_KEY_LO(p)	(CCP5_CMD_DW6(p))
++#define CCP5_CMD_DW7(p)		((p)->dw7)
++#define CCP5_CMD_KEY_HI(p)	((p)->dw7.key_hi)
++#define CCP5_CMD_KEY_MEM(p)	((p)->dw7.key_mem)
++
++static inline u32 low_address(unsigned long addr)
++{
++	return (u64)addr & 0x0ffffffff;
++}
++
++static inline u32 high_address(unsigned long addr)
++{
++	return ((u64)addr >> 32) & 0x00000ffff;
++}
++
++static unsigned int ccp5_get_free_slots(struct ccp_cmd_queue *cmd_q)
++{
++	unsigned int head_idx, n;
++	u32 head_lo, queue_start;
++
++	queue_start = low_address(cmd_q->qdma_tail);
++	head_lo = ioread32(cmd_q->reg_head_lo);
++	head_idx = (head_lo - queue_start) / sizeof(struct ccp5_desc);
++
++	n = head_idx + COMMANDS_PER_QUEUE - cmd_q->qidx - 1;
++
++	return n % COMMANDS_PER_QUEUE; /* Always one unused spot */
++}
++
++static int ccp5_do_cmd(struct ccp5_desc *desc,
++		       struct ccp_cmd_queue *cmd_q)
++{
++	u32 *mP;
++	__le32 *dP;
++	u32 tail;
++	int	i;
++	int ret = 0;
++
++	if (CCP5_CMD_SOC(desc)) {
++		CCP5_CMD_IOC(desc) = 1;
++		CCP5_CMD_SOC(desc) = 0;
++	}
++	mutex_lock(&cmd_q->q_mutex);
++
++	mP = (u32 *) &cmd_q->qbase[cmd_q->qidx];
++	dP = (__le32 *) desc;
++	for (i = 0; i < 8; i++)
++		mP[i] = cpu_to_le32(dP[i]); /* handle endianness */
++
++	cmd_q->qidx = (cmd_q->qidx + 1) % COMMANDS_PER_QUEUE;
++
++	/* The data used by this command must be flushed to memory */
++	wmb();
++
++	/* Write the new tail address back to the queue register */
++	tail = low_address(cmd_q->qdma_tail + cmd_q->qidx * Q_DESC_SIZE);
++	iowrite32(tail, cmd_q->reg_tail_lo);
++
++	/* Turn the queue back on using our cached control register */
++	iowrite32(cmd_q->qcontrol | CMD5_Q_RUN, cmd_q->reg_control);
++	mutex_unlock(&cmd_q->q_mutex);
++
++	if (CCP5_CMD_IOC(desc)) {
++		/* Wait for the job to complete */
++		ret = wait_event_interruptible(cmd_q->int_queue,
++					       cmd_q->int_rcvd);
++		if (ret || cmd_q->cmd_error) {
++			/* A version 5 device doesn't use Job IDs... */
++			if (!ret)
++				ret = -EIO;
++		}
++		cmd_q->int_rcvd = 0;
++	}
++
++	return 0;
++}
++
++static int ccp5_perform_aes(struct ccp_op *op)
++{
++	struct ccp5_desc desc;
++	union ccp_function function;
++	u32 key_addr = op->sb_key * LSB_ITEM_SIZE;
++
++	/* Zero out all the fields of the command desc */
++	memset(&desc, 0, Q_DESC_SIZE);
++
++	CCP5_CMD_ENGINE(&desc) = CCP_ENGINE_AES;
++
++	CCP5_CMD_SOC(&desc) = op->soc;
++	CCP5_CMD_IOC(&desc) = 1;
++	CCP5_CMD_INIT(&desc) = op->init;
++	CCP5_CMD_EOM(&desc) = op->eom;
++	CCP5_CMD_PROT(&desc) = 0;
++
++	function.raw = 0;
++	CCP_AES_ENCRYPT(&function) = op->u.aes.action;
++	CCP_AES_MODE(&function) = op->u.aes.mode;
++	CCP_AES_TYPE(&function) = op->u.aes.type;
++	if (op->u.aes.mode == CCP_AES_MODE_CFB)
++		CCP_AES_SIZE(&function) = 0x7f;
++
++	CCP5_CMD_FUNCTION(&desc) = function.raw;
++
++	CCP5_CMD_LEN(&desc) = op->src.u.dma.length;
++
++	CCP5_CMD_SRC_LO(&desc) = ccp_addr_lo(&op->src.u.dma);
++	CCP5_CMD_SRC_HI(&desc) = ccp_addr_hi(&op->src.u.dma);
++	CCP5_CMD_SRC_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++
++	CCP5_CMD_DST_LO(&desc) = ccp_addr_lo(&op->dst.u.dma);
++	CCP5_CMD_DST_HI(&desc) = ccp_addr_hi(&op->dst.u.dma);
++	CCP5_CMD_DST_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++
++	CCP5_CMD_KEY_LO(&desc) = lower_32_bits(key_addr);
++	CCP5_CMD_KEY_HI(&desc) = 0;
++	CCP5_CMD_KEY_MEM(&desc) = CCP_MEMTYPE_SB;
++	CCP5_CMD_LSB_ID(&desc) = op->sb_ctx;
++
++	return ccp5_do_cmd(&desc, op->cmd_q);
++}
++
++static int ccp5_perform_xts_aes(struct ccp_op *op)
++{
++	struct ccp5_desc desc;
++	union ccp_function function;
++	u32 key_addr = op->sb_key * LSB_ITEM_SIZE;
++
++	/* Zero out all the fields of the command desc */
++	memset(&desc, 0, Q_DESC_SIZE);
++
++	CCP5_CMD_ENGINE(&desc) = CCP_ENGINE_XTS_AES_128;
++
++	CCP5_CMD_SOC(&desc) = op->soc;
++	CCP5_CMD_IOC(&desc) = 1;
++	CCP5_CMD_INIT(&desc) = op->init;
++	CCP5_CMD_EOM(&desc) = op->eom;
++	CCP5_CMD_PROT(&desc) = 0;
++
++	function.raw = 0;
++	CCP_XTS_ENCRYPT(&function) = op->u.xts.action;
++	CCP_XTS_SIZE(&function) = op->u.xts.unit_size;
++	CCP5_CMD_FUNCTION(&desc) = function.raw;
++
++	CCP5_CMD_LEN(&desc) = op->src.u.dma.length;
++
++	CCP5_CMD_SRC_LO(&desc) = ccp_addr_lo(&op->src.u.dma);
++	CCP5_CMD_SRC_HI(&desc) = ccp_addr_hi(&op->src.u.dma);
++	CCP5_CMD_SRC_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++
++	CCP5_CMD_DST_LO(&desc) = ccp_addr_lo(&op->dst.u.dma);
++	CCP5_CMD_DST_HI(&desc) = ccp_addr_hi(&op->dst.u.dma);
++	CCP5_CMD_DST_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++
++	CCP5_CMD_KEY_LO(&desc) = lower_32_bits(key_addr);
++	CCP5_CMD_KEY_HI(&desc) =  0;
++	CCP5_CMD_KEY_MEM(&desc) = CCP_MEMTYPE_SB;
++	CCP5_CMD_LSB_ID(&desc) = op->sb_ctx;
++
++	return ccp5_do_cmd(&desc, op->cmd_q);
++}
++
++static int ccp5_perform_sha(struct ccp_op *op)
++{
++	struct ccp5_desc desc;
++	union ccp_function function;
++
++	/* Zero out all the fields of the command desc */
++	memset(&desc, 0, Q_DESC_SIZE);
++
++	CCP5_CMD_ENGINE(&desc) = CCP_ENGINE_SHA;
++
++	CCP5_CMD_SOC(&desc) = op->soc;
++	CCP5_CMD_IOC(&desc) = 1;
++	CCP5_CMD_INIT(&desc) = 1;
++	CCP5_CMD_EOM(&desc) = op->eom;
++	CCP5_CMD_PROT(&desc) = 0;
++
++	function.raw = 0;
++	CCP_SHA_TYPE(&function) = op->u.sha.type;
++	CCP5_CMD_FUNCTION(&desc) = function.raw;
++
++	CCP5_CMD_LEN(&desc) = op->src.u.dma.length;
++
++	CCP5_CMD_SRC_LO(&desc) = ccp_addr_lo(&op->src.u.dma);
++	CCP5_CMD_SRC_HI(&desc) = ccp_addr_hi(&op->src.u.dma);
++	CCP5_CMD_SRC_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++
++	CCP5_CMD_LSB_ID(&desc) = op->sb_ctx;
++
++	if (op->eom) {
++		CCP5_CMD_SHA_LO(&desc) = lower_32_bits(op->u.sha.msg_bits);
++		CCP5_CMD_SHA_HI(&desc) = upper_32_bits(op->u.sha.msg_bits);
++	} else {
++		CCP5_CMD_SHA_LO(&desc) = 0;
++		CCP5_CMD_SHA_HI(&desc) = 0;
++	}
++
++	return ccp5_do_cmd(&desc, op->cmd_q);
++}
++
++static int ccp5_perform_rsa(struct ccp_op *op)
++{
++	struct ccp5_desc desc;
++	union ccp_function function;
++
++	/* Zero out all the fields of the command desc */
++	memset(&desc, 0, Q_DESC_SIZE);
++
++	CCP5_CMD_ENGINE(&desc) = CCP_ENGINE_RSA;
++
++	CCP5_CMD_SOC(&desc) = op->soc;
++	CCP5_CMD_IOC(&desc) = 1;
++	CCP5_CMD_INIT(&desc) = 0;
++	CCP5_CMD_EOM(&desc) = 1;
++	CCP5_CMD_PROT(&desc) = 0;
++
++	function.raw = 0;
++	CCP_RSA_SIZE(&function) = op->u.rsa.mod_size;
++	CCP5_CMD_FUNCTION(&desc) = function.raw;
++
++	CCP5_CMD_LEN(&desc) = op->u.rsa.input_len;
++
++	/* Source is from external memory */
++	CCP5_CMD_SRC_LO(&desc) = ccp_addr_lo(&op->src.u.dma);
++	CCP5_CMD_SRC_HI(&desc) = ccp_addr_hi(&op->src.u.dma);
++	CCP5_CMD_SRC_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++
++	/* Destination is in external memory */
++	CCP5_CMD_DST_LO(&desc) = ccp_addr_lo(&op->dst.u.dma);
++	CCP5_CMD_DST_HI(&desc) = ccp_addr_hi(&op->dst.u.dma);
++	CCP5_CMD_DST_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++
++	/* Key (Exponent) is in external memory */
++	CCP5_CMD_KEY_LO(&desc) = ccp_addr_lo(&op->exp.u.dma);
++	CCP5_CMD_KEY_HI(&desc) = ccp_addr_hi(&op->exp.u.dma);
++	CCP5_CMD_KEY_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++
++	return ccp5_do_cmd(&desc, op->cmd_q);
++}
++
++static int ccp5_perform_passthru(struct ccp_op *op)
++{
++	struct ccp5_desc desc;
++	union ccp_function function;
++	struct ccp_dma_info *saddr = &op->src.u.dma;
++	struct ccp_dma_info *daddr = &op->dst.u.dma;
++
++	memset(&desc, 0, Q_DESC_SIZE);
++
++	CCP5_CMD_ENGINE(&desc) = CCP_ENGINE_PASSTHRU;
++
++	CCP5_CMD_SOC(&desc) = 0;
++	CCP5_CMD_IOC(&desc) = 1;
++	CCP5_CMD_INIT(&desc) = 0;
++	CCP5_CMD_EOM(&desc) = op->eom;
++	CCP5_CMD_PROT(&desc) = 0;
++
++	function.raw = 0;
++	CCP_PT_BYTESWAP(&function) = op->u.passthru.byte_swap;
++	CCP_PT_BITWISE(&function) = op->u.passthru.bit_mod;
++	CCP5_CMD_FUNCTION(&desc) = function.raw;
++
++	/* Length of source data is always 256 bytes */
++	if (op->src.type == CCP_MEMTYPE_SYSTEM)
++		CCP5_CMD_LEN(&desc) = saddr->length;
++	else
++		CCP5_CMD_LEN(&desc) = daddr->length;
++
++	if (op->src.type == CCP_MEMTYPE_SYSTEM) {
++		CCP5_CMD_SRC_LO(&desc) = ccp_addr_lo(&op->src.u.dma);
++		CCP5_CMD_SRC_HI(&desc) = ccp_addr_hi(&op->src.u.dma);
++		CCP5_CMD_SRC_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++
++		if (op->u.passthru.bit_mod != CCP_PASSTHRU_BITWISE_NOOP)
++			CCP5_CMD_LSB_ID(&desc) = op->sb_key;
++	} else {
++		u32 key_addr = op->src.u.sb * CCP_SB_BYTES;
++
++		CCP5_CMD_SRC_LO(&desc) = lower_32_bits(key_addr);
++		CCP5_CMD_SRC_HI(&desc) = 0;
++		CCP5_CMD_SRC_MEM(&desc) = CCP_MEMTYPE_SB;
++	}
++
++	if (op->dst.type == CCP_MEMTYPE_SYSTEM) {
++		CCP5_CMD_DST_LO(&desc) = ccp_addr_lo(&op->dst.u.dma);
++		CCP5_CMD_DST_HI(&desc) = ccp_addr_hi(&op->dst.u.dma);
++		CCP5_CMD_DST_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++	} else {
++		u32 key_addr = op->dst.u.sb * CCP_SB_BYTES;
++
++		CCP5_CMD_DST_LO(&desc) = lower_32_bits(key_addr);
++		CCP5_CMD_DST_HI(&desc) = 0;
++		CCP5_CMD_DST_MEM(&desc) = CCP_MEMTYPE_SB;
++	}
++
++	return ccp5_do_cmd(&desc, op->cmd_q);
++}
++
++static int ccp5_perform_ecc(struct ccp_op *op)
++{
++	struct ccp5_desc desc;
++	union ccp_function function;
++
++	/* Zero out all the fields of the command desc */
++	memset(&desc, 0, Q_DESC_SIZE);
++
++	CCP5_CMD_ENGINE(&desc) = CCP_ENGINE_ECC;
++
++	CCP5_CMD_SOC(&desc) = 0;
++	CCP5_CMD_IOC(&desc) = 1;
++	CCP5_CMD_INIT(&desc) = 0;
++	CCP5_CMD_EOM(&desc) = 1;
++	CCP5_CMD_PROT(&desc) = 0;
++
++	function.raw = 0;
++	function.ecc.mode = op->u.ecc.function;
++	CCP5_CMD_FUNCTION(&desc) = function.raw;
++
++	CCP5_CMD_LEN(&desc) = op->src.u.dma.length;
++
++	CCP5_CMD_SRC_LO(&desc) = ccp_addr_lo(&op->src.u.dma);
++	CCP5_CMD_SRC_HI(&desc) = ccp_addr_hi(&op->src.u.dma);
++	CCP5_CMD_SRC_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++
++	CCP5_CMD_DST_LO(&desc) = ccp_addr_lo(&op->dst.u.dma);
++	CCP5_CMD_DST_HI(&desc) = ccp_addr_hi(&op->dst.u.dma);
++	CCP5_CMD_DST_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++
++	return ccp5_do_cmd(&desc, op->cmd_q);
++}
++
++static int ccp_find_lsb_regions(struct ccp_cmd_queue *cmd_q, u64 status)
++{
++	int q_mask = 1 << cmd_q->id;
++	int queues = 0;
++	int j;
++
++	/* Build a bit mask to know which LSBs this queue has access to.
++	 * Don't bother with segment 0 as it has special privileges.
++	 */
++	for (j = 1; j < MAX_LSB_CNT; j++) {
++		if (status & q_mask)
++			bitmap_set(cmd_q->lsbmask, j, 1);
++		status >>= LSB_REGION_WIDTH;
++	}
++	queues = bitmap_weight(cmd_q->lsbmask, MAX_LSB_CNT);
++	dev_info(cmd_q->ccp->dev, "Queue %d can access %d LSB regions\n",
++		 cmd_q->id, queues);
++
++	return queues ? 0 : -EINVAL;
++}
++
++
++static int ccp_find_and_assign_lsb_to_q(struct ccp_device *ccp,
++					int lsb_cnt, int n_lsbs,
++					unsigned long *lsb_pub)
++{
++	DECLARE_BITMAP(qlsb, MAX_LSB_CNT);
++	int bitno;
++	int qlsb_wgt;
++	int i;
++
++	/* For each queue:
++	 * If the count of potential LSBs available to a queue matches the
++	 * ordinal given to us in lsb_cnt:
++	 * Copy the mask of possible LSBs for this queue into "qlsb";
++	 * For each bit in qlsb, see if the corresponding bit in the
++	 * aggregation mask is set; if so, we have a match.
++	 *     If we have a match, clear the bit in the aggregation to
++	 *     mark it as no longer available.
++	 *     If there is no match, clear the bit in qlsb and keep looking.
++	 */
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		struct ccp_cmd_queue *cmd_q = &ccp->cmd_q[i];
++
++		qlsb_wgt = bitmap_weight(cmd_q->lsbmask, MAX_LSB_CNT);
++
++		if (qlsb_wgt == lsb_cnt) {
++			bitmap_copy(qlsb, cmd_q->lsbmask, MAX_LSB_CNT);
++
++			bitno = find_first_bit(qlsb, MAX_LSB_CNT);
++			while (bitno < MAX_LSB_CNT) {
++				if (test_bit(bitno, lsb_pub)) {
++					/* We found an available LSB
++					 * that this queue can access
++					 */
++					cmd_q->lsb = bitno;
++					bitmap_clear(lsb_pub, bitno, 1);
++					dev_info(ccp->dev,
++						 "Queue %d gets LSB %d\n",
++						 i, bitno);
++					break;
++				}
++				bitmap_clear(qlsb, bitno, 1);
++				bitno = find_first_bit(qlsb, MAX_LSB_CNT);
++			}
++			if (bitno >= MAX_LSB_CNT)
++				return -EINVAL;
++			n_lsbs--;
++		}
++	}
++	return n_lsbs;
++}
++
++/* For each queue, from the most- to least-constrained:
++ * find an LSB that can be assigned to the queue. If there are N queues that
++ * can only use M LSBs, where N > M, fail; otherwise, every queue will get a
++ * dedicated LSB. Remaining LSB regions become a shared resource.
++ * If we have fewer LSBs than queues, all LSB regions become shared resources.
++ */
++static int ccp_assign_lsbs(struct ccp_device *ccp)
++{
++	DECLARE_BITMAP(lsb_pub, MAX_LSB_CNT);
++	DECLARE_BITMAP(qlsb, MAX_LSB_CNT);
++	int n_lsbs = 0;
++	int bitno;
++	int i, lsb_cnt;
++	int rc = 0;
++
++	bitmap_zero(lsb_pub, MAX_LSB_CNT);
++
++	/* Create an aggregate bitmap to get a total count of available LSBs */
++	for (i = 0; i < ccp->cmd_q_count; i++)
++		bitmap_or(lsb_pub,
++			  lsb_pub, ccp->cmd_q[i].lsbmask,
++			  MAX_LSB_CNT);
++
++	n_lsbs = bitmap_weight(lsb_pub, MAX_LSB_CNT);
++
++	if (n_lsbs >= ccp->cmd_q_count) {
++		/* We have enough LSBS to give every queue a private LSB.
++		 * Brute force search to start with the queues that are more
++		 * constrained in LSB choice. When an LSB is privately
++		 * assigned, it is removed from the public mask.
++		 * This is an ugly N squared algorithm with some optimization.
++		 */
++		for (lsb_cnt = 1;
++		     n_lsbs && (lsb_cnt <= MAX_LSB_CNT);
++		     lsb_cnt++) {
++			rc = ccp_find_and_assign_lsb_to_q(ccp, lsb_cnt, n_lsbs,
++							  lsb_pub);
++			if (rc < 0)
++				return -EINVAL;
++			n_lsbs = rc;
++		}
++	}
++
++	rc = 0;
++	/* What's left of the LSBs, according to the public mask, now become
++	 * shared. Any zero bits in the lsb_pub mask represent an LSB region
++	 * that can't be used as a shared resource, so mark the LSB slots for
++	 * them as "in use".
++	 */
++	bitmap_copy(qlsb, lsb_pub, MAX_LSB_CNT);
++
++	bitno = find_first_zero_bit(qlsb, MAX_LSB_CNT);
++	while (bitno < MAX_LSB_CNT) {
++		bitmap_set(ccp->lsbmap, bitno * LSB_SIZE, LSB_SIZE);
++		bitmap_set(qlsb, bitno, 1);
++		bitno = find_first_zero_bit(qlsb, MAX_LSB_CNT);
++	}
++
++	return rc;
++}
++
++static int ccp5_init(struct ccp_device *ccp)
++{
++	struct device *dev = ccp->dev;
++	struct ccp_cmd_queue *cmd_q;
++	struct dma_pool *dma_pool;
++	char dma_pool_name[MAX_DMAPOOL_NAME_LEN];
++	unsigned int qmr, qim, i;
++	u64 status;
++	u32 status_lo, status_hi;
++	int ret;
++
++	/* Find available queues */
++	qim = 0;
++	qmr = ioread32(ccp->io_regs + Q_MASK_REG);
++	for (i = 0; i < MAX_HW_QUEUES; i++) {
++
++		if (!(qmr & (1 << i)))
++			continue;
++
++		/* Allocate a dma pool for this queue */
++		snprintf(dma_pool_name, sizeof(dma_pool_name), "%s_q%d",
++			 ccp->name, i);
++		dma_pool = dma_pool_create(dma_pool_name, dev,
++					   CCP_DMAPOOL_MAX_SIZE,
++					   CCP_DMAPOOL_ALIGN, 0);
++		if (!dma_pool) {
++			dev_err(dev, "unable to allocate dma pool\n");
++			ret = -ENOMEM;
++		}
++
++		cmd_q = &ccp->cmd_q[ccp->cmd_q_count];
++		ccp->cmd_q_count++;
++
++		cmd_q->ccp = ccp;
++		cmd_q->id = i;
++		cmd_q->dma_pool = dma_pool;
++		mutex_init(&cmd_q->q_mutex);
++
++		/* Page alignment satisfies our needs for N <= 128 */
++		BUILD_BUG_ON(COMMANDS_PER_QUEUE > 128);
++		cmd_q->qsize = Q_SIZE(Q_DESC_SIZE);
++		cmd_q->qbase = dma_zalloc_coherent(dev, cmd_q->qsize,
++						   &cmd_q->qbase_dma,
++						   GFP_KERNEL);
++		if (!cmd_q->qbase) {
++			dev_err(dev, "unable to allocate command queue\n");
++			ret = -ENOMEM;
++			goto e_pool;
++		}
++
++		cmd_q->qidx = 0;
++		/* Preset some register values and masks that are queue
++		 * number dependent
++		 */
++		cmd_q->reg_control = ccp->io_regs +
++				     CMD5_Q_STATUS_INCR * (i + 1);
++		cmd_q->reg_tail_lo = cmd_q->reg_control + CMD5_Q_TAIL_LO_BASE;
++		cmd_q->reg_head_lo = cmd_q->reg_control + CMD5_Q_HEAD_LO_BASE;
++		cmd_q->reg_int_enable = cmd_q->reg_control +
++					CMD5_Q_INT_ENABLE_BASE;
++		cmd_q->reg_interrupt_status = cmd_q->reg_control +
++					      CMD5_Q_INTERRUPT_STATUS_BASE;
++		cmd_q->reg_status = cmd_q->reg_control + CMD5_Q_STATUS_BASE;
++		cmd_q->reg_int_status = cmd_q->reg_control +
++					CMD5_Q_INT_STATUS_BASE;
++		cmd_q->reg_dma_status = cmd_q->reg_control +
++					CMD5_Q_DMA_STATUS_BASE;
++		cmd_q->reg_dma_read_status = cmd_q->reg_control +
++					     CMD5_Q_DMA_READ_STATUS_BASE;
++		cmd_q->reg_dma_write_status = cmd_q->reg_control +
++					      CMD5_Q_DMA_WRITE_STATUS_BASE;
++
++		init_waitqueue_head(&cmd_q->int_queue);
++
++		dev_dbg(dev, "queue #%u available\n", i);
++	}
++	if (ccp->cmd_q_count == 0) {
++		dev_notice(dev, "no command queues available\n");
++		ret = -EIO;
++		goto e_pool;
++	}
++	dev_notice(dev, "%u command queues available\n", ccp->cmd_q_count);
++
++	/* Turn off the queues and disable interrupts until ready */
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		cmd_q = &ccp->cmd_q[i];
++
++		cmd_q->qcontrol = 0; /* Start with nothing */
++		iowrite32(cmd_q->qcontrol, cmd_q->reg_control);
++
++		/* Disable the interrupts */
++		iowrite32(0x00, cmd_q->reg_int_enable);
++		ioread32(cmd_q->reg_int_status);
++		ioread32(cmd_q->reg_status);
++
++		/* Clear the interrupts */
++		iowrite32(ALL_INTERRUPTS, cmd_q->reg_interrupt_status);
++	}
++
++	dev_dbg(dev, "Requesting an IRQ...\n");
++	/* Request an irq */
++	ret = ccp->get_irq(ccp);
++	if (ret) {
++		dev_err(dev, "unable to allocate an IRQ\n");
++		goto e_pool;
++	}
++
++	/* Initialize the queue used to suspend */
++	init_waitqueue_head(&ccp->suspend_queue);
++
++	dev_dbg(dev, "Loading LSB map...\n");
++	/* Copy the private LSB mask to the public registers */
++	status_lo = ioread32(ccp->io_regs + LSB_PRIVATE_MASK_LO_OFFSET);
++	status_hi = ioread32(ccp->io_regs + LSB_PRIVATE_MASK_HI_OFFSET);
++	iowrite32(status_lo, ccp->io_regs + LSB_PUBLIC_MASK_LO_OFFSET);
++	iowrite32(status_hi, ccp->io_regs + LSB_PUBLIC_MASK_HI_OFFSET);
++	status = ((u64)status_hi<<30) | (u64)status_lo;
++
++	dev_dbg(dev, "Configuring virtual queues...\n");
++	/* Configure size of each virtual queue accessible to host */
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		u32 dma_addr_lo;
++		u32 dma_addr_hi;
++
++		cmd_q = &ccp->cmd_q[i];
++
++		cmd_q->qcontrol &= ~(CMD5_Q_SIZE << CMD5_Q_SHIFT);
++		cmd_q->qcontrol |= QUEUE_SIZE_VAL << CMD5_Q_SHIFT;
++
++		cmd_q->qdma_tail = cmd_q->qbase_dma;
++		dma_addr_lo = low_address(cmd_q->qdma_tail);
++		iowrite32((u32)dma_addr_lo, cmd_q->reg_tail_lo);
++		iowrite32((u32)dma_addr_lo, cmd_q->reg_head_lo);
++
++		dma_addr_hi = high_address(cmd_q->qdma_tail);
++		cmd_q->qcontrol |= (dma_addr_hi << 16);
++		iowrite32(cmd_q->qcontrol, cmd_q->reg_control);
++
++		/* Find the LSB regions accessible to the queue */
++		ccp_find_lsb_regions(cmd_q, status);
++		cmd_q->lsb = -1; /* Unassigned value */
++	}
++
++	dev_dbg(dev, "Assigning LSBs...\n");
++	ret = ccp_assign_lsbs(ccp);
++	if (ret) {
++		dev_err(dev, "Unable to assign LSBs (%d)\n", ret);
++		goto e_irq;
++	}
++
++	/* Optimization: pre-allocate LSB slots for each queue */
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		ccp->cmd_q[i].sb_key = ccp_lsb_alloc(&ccp->cmd_q[i], 2);
++		ccp->cmd_q[i].sb_ctx = ccp_lsb_alloc(&ccp->cmd_q[i], 2);
++	}
++
++	dev_dbg(dev, "Starting threads...\n");
++	/* Create a kthread for each queue */
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		struct task_struct *kthread;
++
++		cmd_q = &ccp->cmd_q[i];
++
++		kthread = kthread_create(ccp_cmd_queue_thread, cmd_q,
++					 "%s-q%u", ccp->name, cmd_q->id);
++		if (IS_ERR(kthread)) {
++			dev_err(dev, "error creating queue thread (%ld)\n",
++				PTR_ERR(kthread));
++			ret = PTR_ERR(kthread);
++			goto e_kthread;
++		}
++
++		cmd_q->kthread = kthread;
++		wake_up_process(kthread);
++	}
++
++	dev_dbg(dev, "Enabling interrupts...\n");
++	/* Enable interrupts */
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		cmd_q = &ccp->cmd_q[i];
++		iowrite32(ALL_INTERRUPTS, cmd_q->reg_int_enable);
++	}
++
++	dev_dbg(dev, "Registering device...\n");
++	/* Put this on the unit list to make it available */
++	ccp_add_device(ccp);
++
++	return 0;
++
++e_kthread:
++	for (i = 0; i < ccp->cmd_q_count; i++)
++		if (ccp->cmd_q[i].kthread)
++			kthread_stop(ccp->cmd_q[i].kthread);
++
++e_irq:
++	ccp->free_irq(ccp);
++
++e_pool:
++	for (i = 0; i < ccp->cmd_q_count; i++)
++		dma_pool_destroy(ccp->cmd_q[i].dma_pool);
++
++	return ret;
++}
++
++static void ccp5_destroy(struct ccp_device *ccp)
++{
++	struct device *dev = ccp->dev;
++	struct ccp_cmd_queue *cmd_q;
++	struct ccp_cmd *cmd;
++	unsigned int i;
++
++	/* Remove this device from the list of available units first */
++	ccp_del_device(ccp);
++
++	/* Disable and clear interrupts */
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		cmd_q = &ccp->cmd_q[i];
++
++		/* Turn off the run bit */
++		iowrite32(cmd_q->qcontrol & ~CMD5_Q_RUN, cmd_q->reg_control);
++
++		/* Disable the interrupts */
++		iowrite32(ALL_INTERRUPTS, cmd_q->reg_interrupt_status);
++
++		/* Clear the interrupt status */
++		iowrite32(0x00, cmd_q->reg_int_enable);
++		ioread32(cmd_q->reg_int_status);
++		ioread32(cmd_q->reg_status);
++	}
++
++	/* Stop the queue kthreads */
++	for (i = 0; i < ccp->cmd_q_count; i++)
++		if (ccp->cmd_q[i].kthread)
++			kthread_stop(ccp->cmd_q[i].kthread);
++
++	ccp->free_irq(ccp);
++
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		cmd_q = &ccp->cmd_q[i];
++		dma_free_coherent(dev, cmd_q->qsize, cmd_q->qbase,
++				  cmd_q->qbase_dma);
++	}
++
++	/* Flush the cmd and backlog queue */
++	while (!list_empty(&ccp->cmd)) {
++		/* Invoke the callback directly with an error code */
++		cmd = list_first_entry(&ccp->cmd, struct ccp_cmd, entry);
++		list_del(&cmd->entry);
++		cmd->callback(cmd->data, -ENODEV);
++	}
++	while (!list_empty(&ccp->backlog)) {
++		/* Invoke the callback directly with an error code */
++		cmd = list_first_entry(&ccp->backlog, struct ccp_cmd, entry);
++		list_del(&cmd->entry);
++		cmd->callback(cmd->data, -ENODEV);
++	}
++}
++
++static irqreturn_t ccp5_irq_handler(int irq, void *data)
++{
++	struct device *dev = data;
++	struct ccp_device *ccp = dev_get_drvdata(dev);
++	u32 status;
++	unsigned int i;
++
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		struct ccp_cmd_queue *cmd_q = &ccp->cmd_q[i];
++
++		status = ioread32(cmd_q->reg_interrupt_status);
++
++		if (status) {
++			cmd_q->int_status = status;
++			cmd_q->q_status = ioread32(cmd_q->reg_status);
++			cmd_q->q_int_status = ioread32(cmd_q->reg_int_status);
++
++			/* On error, only save the first error value */
++			if ((status & INT_ERROR) && !cmd_q->cmd_error)
++				cmd_q->cmd_error = CMD_Q_ERROR(cmd_q->q_status);
++
++			cmd_q->int_rcvd = 1;
++
++			/* Acknowledge the interrupt and wake the kthread */
++			iowrite32(ALL_INTERRUPTS, cmd_q->reg_interrupt_status);
++			wake_up_interruptible(&cmd_q->int_queue);
++		}
++	}
++
++	return IRQ_HANDLED;
++}
++
++static void ccp5_config(struct ccp_device *ccp)
++{
++	/* Public side */
++	iowrite32(0x00001249, ccp->io_regs + CMD5_REQID_CONFIG_OFFSET);
++}
++
++static const struct ccp_actions ccp5_actions = {
++	.aes = ccp5_perform_aes,
++	.xts_aes = ccp5_perform_xts_aes,
++	.sha = ccp5_perform_sha,
++	.rsa = ccp5_perform_rsa,
++	.passthru = ccp5_perform_passthru,
++	.ecc = ccp5_perform_ecc,
++	.sballoc = ccp_lsb_alloc,
++	.sbfree = ccp_lsb_free,
++	.init = ccp5_init,
++	.destroy = ccp5_destroy,
++	.get_free_slots = ccp5_get_free_slots,
++	.irqhandler = ccp5_irq_handler,
++};
++
++struct ccp_vdata ccpv5 = {
++	.version = CCP_VERSION(5, 0),
++	.setup = ccp5_config,
++	.perform = &ccp5_actions,
++	.bar = 2,
++	.offset = 0x0,
++};
 diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index 46d3ef3..1e30568 100644
+index de90702..5ff4a73 100644
 --- a/drivers/crypto/ccp/ccp-dev.h
 +++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -111,8 +111,7 @@
- #define KSB_START			77
- #define KSB_END				127
- #define KSB_COUNT			(KSB_END - KSB_START + 1)
--#define CCP_KSB_BITS			256
--#define CCP_KSB_BYTES			32
-+#define CCP_SB_BITS			256
+@@ -61,7 +61,62 @@
+ #define CMD_Q_ERROR(__qs)		((__qs) & 0x0000003f)
+ #define CMD_Q_DEPTH(__qs)		(((__qs) >> 12) & 0x0000000f)
+ 
+-/****** REQ0 Related Values ******/
++/* ------------------------ CCP Version 5 Specifics ------------------------ */
++#define CMD5_QUEUE_MASK_OFFSET		0x00
++#define CMD5_REQID_CONFIG_OFFSET	0x08
++#define LSB_PUBLIC_MASK_LO_OFFSET	0x18
++#define LSB_PUBLIC_MASK_HI_OFFSET	0x1C
++#define LSB_PRIVATE_MASK_LO_OFFSET	0x20
++#define LSB_PRIVATE_MASK_HI_OFFSET	0x24
++
++#define CMD5_Q_CONTROL_BASE		0x0000
++#define CMD5_Q_TAIL_LO_BASE		0x0004
++#define CMD5_Q_HEAD_LO_BASE		0x0008
++#define CMD5_Q_INT_ENABLE_BASE		0x000C
++#define CMD5_Q_INTERRUPT_STATUS_BASE	0x0010
++
++#define CMD5_Q_STATUS_BASE		0x0100
++#define CMD5_Q_INT_STATUS_BASE		0x0104
++#define CMD5_Q_DMA_STATUS_BASE		0x0108
++#define CMD5_Q_DMA_READ_STATUS_BASE	0x010C
++#define CMD5_Q_DMA_WRITE_STATUS_BASE	0x0110
++#define CMD5_Q_ABORT_BASE		0x0114
++#define CMD5_Q_AX_CACHE_BASE		0x0118
++
++/* Address offset between two virtual queue registers */
++#define CMD5_Q_STATUS_INCR		0x1000
++
++/* Bit masks */
++#define CMD5_Q_RUN			0x1
++#define CMD5_Q_HALT			0x2
++#define CMD5_Q_MEM_LOCATION		0x4
++#define CMD5_Q_SIZE			0x1F
++#define CMD5_Q_SHIFT			3
++#define COMMANDS_PER_QUEUE		16
++#define QUEUE_SIZE_VAL			((ffs(COMMANDS_PER_QUEUE) - 2) & \
++					  CMD5_Q_SIZE)
++#define Q_PTR_MASK			(2 << (QUEUE_SIZE_VAL + 5) - 1)
++#define Q_DESC_SIZE			sizeof(struct ccp5_desc)
++#define Q_SIZE(n)			(COMMANDS_PER_QUEUE*(n))
++
++#define INT_COMPLETION			0x1
++#define INT_ERROR			0x2
++#define INT_QUEUE_STOPPED		0x4
++#define ALL_INTERRUPTS			(INT_COMPLETION| \
++					 INT_ERROR| \
++					 INT_QUEUE_STOPPED)
++
++#define LSB_REGION_WIDTH		5
++#define MAX_LSB_CNT			8
++
++#define LSB_SIZE			16
++#define LSB_ITEM_SIZE			32
++#define PLSB_MAP_SIZE			(LSB_SIZE)
++#define SLSB_MAP_SIZE			(MAX_LSB_CNT * LSB_SIZE)
++
++#define LSB_ENTRY_NUMBER(LSB_ADDR)	(LSB_ADDR / LSB_ITEM_SIZE)
++
++/* ------------------------ CCP Version 3 Specifics ------------------------ */
+ #define REQ0_WAIT_FOR_WRITE		0x00000004
+ #define REQ0_INT_ON_COMPLETE		0x00000002
+ #define REQ0_STOP_ON_COMPLETE		0x00000001
+@@ -115,6 +170,8 @@
  
  #define CCP_JOBID_MASK			0x0000003f
  
-@@ -121,19 +120,19 @@
- 
- #define CCP_REVERSE_BUF_SIZE		64
- 
--#define CCP_AES_KEY_KSB_COUNT		1
--#define CCP_AES_CTX_KSB_COUNT		1
-+#define CCP_AES_KEY_SB_COUNT		1
-+#define CCP_AES_CTX_SB_COUNT		1
- 
--#define CCP_XTS_AES_KEY_KSB_COUNT	1
--#define CCP_XTS_AES_CTX_KSB_COUNT	1
-+#define CCP_XTS_AES_KEY_SB_COUNT	1
-+#define CCP_XTS_AES_CTX_SB_COUNT	1
- 
--#define CCP_SHA_KSB_COUNT		1
-+#define CCP_SHA_SB_COUNT		1
- 
- #define CCP_RSA_MAX_WIDTH		4096
- 
- #define CCP_PASSTHRU_BLOCKSIZE		256
- #define CCP_PASSTHRU_MASKSIZE		32
--#define CCP_PASSTHRU_KSB_COUNT		1
-+#define CCP_PASSTHRU_SB_COUNT		1
- 
- #define CCP_ECC_MODULUS_BYTES		48      /* 384-bits */
- #define CCP_ECC_MAX_OPERANDS		6
-@@ -145,6 +144,8 @@
- #define CCP_ECC_RESULT_OFFSET		60
- #define CCP_ECC_RESULT_SUCCESS		0x0001
- 
-+#define CCP_SB_BYTES			32
++/* ------------------------ General CCP Defines ------------------------ */
 +
- struct ccp_op;
+ #define CCP_DMAPOOL_MAX_SIZE		64
+ #define CCP_DMAPOOL_ALIGN		BIT(5)
  
- /* Structure for computation functions that are device-specific */
-@@ -215,9 +216,9 @@ struct ccp_cmd_queue {
+@@ -149,6 +206,7 @@
+ struct ccp_op;
+ struct ccp_device;
+ struct ccp_cmd;
++struct ccp_fns;
+ 
+ struct ccp_dma_cmd {
+ 	struct list_head entry;
+@@ -192,10 +250,30 @@ struct ccp_cmd_queue {
  	/* Queue dma pool */
  	struct dma_pool *dma_pool;
  
--	/* Queue reserved KSB regions */
--	u32 ksb_key;
--	u32 ksb_ctx;
-+	/* Per-queue reserved storage block(s) */
-+	u32 sb_key;
-+	u32 sb_ctx;
++	/* Queue base address (not neccessarily aligned)*/
++	struct ccp5_desc *qbase;
++
++	/* Aligned queue start address (per requirement) */
++	struct mutex q_mutex ____cacheline_aligned;
++	unsigned int qidx;
++
++	/* Version 5 has different requirements for queue memory */
++	unsigned int qsize;
++	dma_addr_t qbase_dma;
++	dma_addr_t qdma_tail;
++
+ 	/* Per-queue reserved storage block(s) */
+ 	u32 sb_key;
+ 	u32 sb_ctx;
  
++	/* Bitmap of LSBs that can be accessed by this queue */
++	DECLARE_BITMAP(lsbmask, MAX_LSB_CNT);
++	/* Private LSB that is assigned to this queue, or -1 if none.
++	 * Bitmap for my private LSB, unused otherwise
++	 */
++	unsigned int lsb;
++	DECLARE_BITMAP(lsbmap, PLSB_MAP_SIZE);
++
  	/* Queue processing thread */
  	struct task_struct *kthread;
-@@ -313,12 +314,12 @@ struct ccp_device {
- 	 * to avoid allocation contention.  This will reserve at most 10 KSB
- 	 * entries, leaving 40 KSB entries available for dynamic allocation.
- 	 */
--	struct mutex ksb_mutex ____cacheline_aligned;
--	DECLARE_BITMAP(ksb, KSB_COUNT);
--	wait_queue_head_t ksb_queue;
--	unsigned int ksb_avail;
--	unsigned int ksb_count;
--	u32 ksb_start;
-+	struct mutex sb_mutex ____cacheline_aligned;
-+	DECLARE_BITMAP(sb, KSB_COUNT);
-+	wait_queue_head_t sb_queue;
-+	unsigned int sb_avail;
-+	unsigned int sb_count;
-+	u32 sb_start;
+ 	unsigned int active;
+@@ -209,8 +287,17 @@ struct ccp_cmd_queue {
+ 	u32 int_err;
  
+ 	/* Register addresses for queue */
++	void __iomem *reg_control;
++	void __iomem *reg_tail_lo;
++	void __iomem *reg_head_lo;
++	void __iomem *reg_int_enable;
++	void __iomem *reg_interrupt_status;
+ 	void __iomem *reg_status;
+ 	void __iomem *reg_int_status;
++	void __iomem *reg_dma_status;
++	void __iomem *reg_dma_read_status;
++	void __iomem *reg_dma_write_status;
++	u32 qcontrol; /* Cached control register */
+ 
+ 	/* Status values from job */
+ 	u32 int_status;
+@@ -306,6 +393,9 @@ struct ccp_device {
+ 	unsigned int sb_count;
+ 	u32 sb_start;
+ 
++	/* Bitmap of shared LSBs, if any */
++	DECLARE_BITMAP(lsbmap, SLSB_MAP_SIZE);
++
  	/* Suspend support */
  	unsigned int suspending;
-@@ -330,7 +331,7 @@ struct ccp_device {
- 
- enum ccp_memtype {
- 	CCP_MEMTYPE_SYSTEM = 0,
--	CCP_MEMTYPE_KSB,
-+	CCP_MEMTYPE_SB,
+ 	wait_queue_head_t suspend_queue;
+@@ -320,6 +410,7 @@ enum ccp_memtype {
  	CCP_MEMTYPE_LOCAL,
  	CCP_MEMTYPE__LAST,
  };
-@@ -374,7 +375,7 @@ struct ccp_mem {
- 	enum ccp_memtype type;
++#define	CCP_MEMTYPE_LSB	CCP_MEMTYPE_KSB
+ 
+ struct ccp_dma_info {
+ 	dma_addr_t address;
+@@ -407,6 +498,7 @@ struct ccp_op {
+ 
+ 	struct ccp_mem src;
+ 	struct ccp_mem dst;
++	struct ccp_mem exp;
+ 
  	union {
- 		struct ccp_dma_info dma;
--		u32 ksb;
-+		u32 sb;
+ 		struct ccp_aes_op aes;
+@@ -416,6 +508,7 @@ struct ccp_op {
+ 		struct ccp_passthru_op passthru;
+ 		struct ccp_ecc_op ecc;
  	} u;
++	struct ccp_mem key;
  };
  
-@@ -414,8 +415,8 @@ struct ccp_op {
- 	u32 jobid;
- 	u32 ioc;
- 	u32 soc;
--	u32 ksb_key;
--	u32 ksb_ctx;
-+	u32 sb_key;
-+	u32 sb_ctx;
- 	u32 init;
- 	u32 eom;
+ static inline u32 ccp_addr_lo(struct ccp_dma_info *info)
+@@ -428,6 +521,70 @@ static inline u32 ccp_addr_hi(struct ccp_dma_info *info)
+ 	return upper_32_bits(info->address + info->offset) & 0x0000ffff;
+ }
  
++/**
++ * descriptor for version 5 CPP commands
++ * 8 32-bit words:
++ * word 0: function; engine; control bits
++ * word 1: length of source data
++ * word 2: low 32 bits of source pointer
++ * word 3: upper 16 bits of source pointer; source memory type
++ * word 4: low 32 bits of destination pointer
++ * word 5: upper 16 bits of destination pointer; destination memory type
++ * word 6: low 32 bits of key pointer
++ * word 7: upper 16 bits of key pointer; key memory type
++ */
++struct dword0 {
++	__le32 soc:1;
++	__le32 ioc:1;
++	__le32 rsvd1:1;
++	__le32 init:1;
++	__le32 eom:1;		/* AES/SHA only */
++	__le32 function:15;
++	__le32 engine:4;
++	__le32 prot:1;
++	__le32 rsvd2:7;
++};
++
++struct dword3 {
++	__le32 src_hi:16;
++	__le32 src_mem:2;
++	__le32 lsb_cxt_id:8;
++	__le32 rsvd1:5;
++	__le32 fixed:1;
++};
++
++union dword4 {
++	__le32 dst_lo;		/* NON-SHA	*/
++	__le32 sha_len_lo;	/* SHA		*/
++};
++
++union dword5 {
++	struct {
++		__le32 dst_hi:16;
++		__le32 dst_mem:2;
++		__le32 rsvd1:13;
++		__le32 fixed:1;
++	} fields;
++	__le32 sha_len_hi;
++};
++
++struct dword7 {
++	__le32 key_hi:16;
++	__le32 key_mem:2;
++	__le32 rsvd1:14;
++};
++
++struct ccp5_desc {
++	struct dword0 dw0;
++	__le32 length;
++	__le32 src_lo;
++	struct dword3 dw3;
++	union dword4 dw4;
++	union dword5 dw5;
++	__le32 key_lo;
++	struct dword7 dw7;
++};
++
+ int ccp_pci_init(void);
+ void ccp_pci_exit(void);
+ 
+@@ -466,13 +623,14 @@ struct ccp_actions {
+ 
+ /* Structure to hold CCP version-specific values */
+ struct ccp_vdata {
+-	unsigned int version;
+-	int (*init)(struct ccp_device *);
++	const unsigned int version;
++	void (*setup)(struct ccp_device *);
+ 	const struct ccp_actions *perform;
+ 	const unsigned int bar;
+ 	const unsigned int offset;
+ };
+ 
+ extern	struct ccp_vdata ccpv3;
++extern	struct ccp_vdata ccpv5;
+ 
+ #endif
 diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index d102477..2c2890a 100644
+index fdab0ae..50fae44 100644
 --- a/drivers/crypto/ccp/ccp-ops.c
 +++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -46,25 +46,25 @@ static u32 ccp_alloc_ksb(struct ccp_device *ccp, unsigned int count)
- 	int start;
+@@ -21,26 +21,29 @@
+ #include "ccp-dev.h"
  
- 	for (;;) {
--		mutex_lock(&ccp->ksb_mutex);
-+		mutex_lock(&ccp->sb_mutex);
+ /* SHA initial context values */
+-static const __be32 ccp_sha1_init[CCP_SHA_CTXSIZE / sizeof(__be32)] = {
++static const __be32 ccp_sha1_init[SHA1_DIGEST_SIZE / sizeof(__be32)] = {
+ 	cpu_to_be32(SHA1_H0), cpu_to_be32(SHA1_H1),
+ 	cpu_to_be32(SHA1_H2), cpu_to_be32(SHA1_H3),
+-	cpu_to_be32(SHA1_H4), 0, 0, 0,
++	cpu_to_be32(SHA1_H4),
+ };
  
--		start = (u32)bitmap_find_next_zero_area(ccp->ksb,
--							ccp->ksb_count,
--							ccp->ksb_start,
-+		start = (u32)bitmap_find_next_zero_area(ccp->sb,
-+							ccp->sb_count,
-+							ccp->sb_start,
- 							count, 0);
--		if (start <= ccp->ksb_count) {
--			bitmap_set(ccp->ksb, start, count);
-+		if (start <= ccp->sb_count) {
-+			bitmap_set(ccp->sb, start, count);
+-static const __be32 ccp_sha224_init[CCP_SHA_CTXSIZE / sizeof(__be32)] = {
++static const __be32 ccp_sha224_init[SHA256_DIGEST_SIZE / sizeof(__be32)] = {
+ 	cpu_to_be32(SHA224_H0), cpu_to_be32(SHA224_H1),
+ 	cpu_to_be32(SHA224_H2), cpu_to_be32(SHA224_H3),
+ 	cpu_to_be32(SHA224_H4), cpu_to_be32(SHA224_H5),
+ 	cpu_to_be32(SHA224_H6), cpu_to_be32(SHA224_H7),
+ };
  
--			mutex_unlock(&ccp->ksb_mutex);
-+			mutex_unlock(&ccp->sb_mutex);
- 			break;
- 		}
+-static const __be32 ccp_sha256_init[CCP_SHA_CTXSIZE / sizeof(__be32)] = {
++static const __be32 ccp_sha256_init[SHA256_DIGEST_SIZE / sizeof(__be32)] = {
+ 	cpu_to_be32(SHA256_H0), cpu_to_be32(SHA256_H1),
+ 	cpu_to_be32(SHA256_H2), cpu_to_be32(SHA256_H3),
+ 	cpu_to_be32(SHA256_H4), cpu_to_be32(SHA256_H5),
+ 	cpu_to_be32(SHA256_H6), cpu_to_be32(SHA256_H7),
+ };
  
--		ccp->ksb_avail = 0;
-+		ccp->sb_avail = 0;
- 
--		mutex_unlock(&ccp->ksb_mutex);
-+		mutex_unlock(&ccp->sb_mutex);
- 
- 		/* Wait for KSB entries to become available */
--		if (wait_event_interruptible(ccp->ksb_queue, ccp->ksb_avail))
-+		if (wait_event_interruptible(ccp->sb_queue, ccp->sb_avail))
- 			return 0;
- 	}
- 
-@@ -77,15 +77,15 @@ static void ccp_free_ksb(struct ccp_device *ccp, unsigned int start,
- 	if (!start)
- 		return;
- 
--	mutex_lock(&ccp->ksb_mutex);
-+	mutex_lock(&ccp->sb_mutex);
- 
--	bitmap_clear(ccp->ksb, start - KSB_START, count);
-+	bitmap_clear(ccp->sb, start - KSB_START, count);
- 
--	ccp->ksb_avail = 1;
-+	ccp->sb_avail = 1;
- 
--	mutex_unlock(&ccp->ksb_mutex);
-+	mutex_unlock(&ccp->sb_mutex);
- 
--	wake_up_interruptible_all(&ccp->ksb_queue);
-+	wake_up_interruptible_all(&ccp->sb_queue);
- }
- 
++#define	CCP_NEW_JOBID(ccp)	((ccp->vdata->version == CCP_VERSION(3, 0)) ? \
++					ccp_gen_jobid(ccp) : 0)
++
  static u32 ccp_gen_jobid(struct ccp_device *ccp)
-@@ -232,7 +232,7 @@ static int ccp_reverse_set_dm_area(struct ccp_dm_workarea *wa,
- 				   unsigned int len, unsigned int se_len,
- 				   bool sign_extend)
  {
--	unsigned int nbytes, sg_offset, dm_offset, ksb_len, i;
-+	unsigned int nbytes, sg_offset, dm_offset, sb_len, i;
- 	u8 buffer[CCP_REVERSE_BUF_SIZE];
- 
- 	if (WARN_ON(se_len > sizeof(buffer)))
-@@ -242,21 +242,21 @@ static int ccp_reverse_set_dm_area(struct ccp_dm_workarea *wa,
- 	dm_offset = 0;
- 	nbytes = len;
- 	while (nbytes) {
--		ksb_len = min_t(unsigned int, nbytes, se_len);
--		sg_offset -= ksb_len;
-+		sb_len = min_t(unsigned int, nbytes, se_len);
-+		sg_offset -= sb_len;
- 
--		scatterwalk_map_and_copy(buffer, sg, sg_offset, ksb_len, 0);
--		for (i = 0; i < ksb_len; i++)
--			wa->address[dm_offset + i] = buffer[ksb_len - i - 1];
-+		scatterwalk_map_and_copy(buffer, sg, sg_offset, sb_len, 0);
-+		for (i = 0; i < sb_len; i++)
-+			wa->address[dm_offset + i] = buffer[sb_len - i - 1];
- 
--		dm_offset += ksb_len;
--		nbytes -= ksb_len;
-+		dm_offset += sb_len;
-+		nbytes -= sb_len;
- 
--		if ((ksb_len != se_len) && sign_extend) {
-+		if ((sb_len != se_len) && sign_extend) {
- 			/* Must sign-extend to nearest sign-extend length */
- 			if (wa->address[dm_offset - 1] & 0x80)
- 				memset(wa->address + dm_offset, 0xff,
--				       se_len - ksb_len);
-+				       se_len - sb_len);
- 		}
- 	}
- 
-@@ -267,22 +267,22 @@ static void ccp_reverse_get_dm_area(struct ccp_dm_workarea *wa,
- 				    struct scatterlist *sg,
- 				    unsigned int len)
- {
--	unsigned int nbytes, sg_offset, dm_offset, ksb_len, i;
-+	unsigned int nbytes, sg_offset, dm_offset, sb_len, i;
- 	u8 buffer[CCP_REVERSE_BUF_SIZE];
- 
- 	sg_offset = 0;
- 	dm_offset = len;
- 	nbytes = len;
- 	while (nbytes) {
--		ksb_len = min_t(unsigned int, nbytes, sizeof(buffer));
--		dm_offset -= ksb_len;
-+		sb_len = min_t(unsigned int, nbytes, sizeof(buffer));
-+		dm_offset -= sb_len;
- 
--		for (i = 0; i < ksb_len; i++)
--			buffer[ksb_len - i - 1] = wa->address[dm_offset + i];
--		scatterwalk_map_and_copy(buffer, sg, sg_offset, ksb_len, 1);
-+		for (i = 0; i < sb_len; i++)
-+			buffer[sb_len - i - 1] = wa->address[dm_offset + i];
-+		scatterwalk_map_and_copy(buffer, sg, sg_offset, sb_len, 1);
- 
--		sg_offset += ksb_len;
--		nbytes -= ksb_len;
-+		sg_offset += sb_len;
-+		nbytes -= sb_len;
- 	}
- }
- 
-@@ -450,9 +450,9 @@ static void ccp_process_data(struct ccp_data *src, struct ccp_data *dst,
- 	}
- }
- 
--static int ccp_copy_to_from_ksb(struct ccp_cmd_queue *cmd_q,
--				struct ccp_dm_workarea *wa, u32 jobid, u32 ksb,
--				u32 byte_swap, bool from)
-+static int ccp_copy_to_from_sb(struct ccp_cmd_queue *cmd_q,
-+			       struct ccp_dm_workarea *wa, u32 jobid, u32 sb,
-+			       u32 byte_swap, bool from)
- {
- 	struct ccp_op op;
- 
-@@ -464,8 +464,8 @@ static int ccp_copy_to_from_ksb(struct ccp_cmd_queue *cmd_q,
- 
- 	if (from) {
- 		op.soc = 1;
--		op.src.type = CCP_MEMTYPE_KSB;
--		op.src.u.ksb = ksb;
-+		op.src.type = CCP_MEMTYPE_SB;
-+		op.src.u.sb = sb;
- 		op.dst.type = CCP_MEMTYPE_SYSTEM;
- 		op.dst.u.dma.address = wa->dma.address;
- 		op.dst.u.dma.length = wa->length;
-@@ -473,8 +473,8 @@ static int ccp_copy_to_from_ksb(struct ccp_cmd_queue *cmd_q,
- 		op.src.type = CCP_MEMTYPE_SYSTEM;
- 		op.src.u.dma.address = wa->dma.address;
- 		op.src.u.dma.length = wa->length;
--		op.dst.type = CCP_MEMTYPE_KSB;
--		op.dst.u.ksb = ksb;
-+		op.dst.type = CCP_MEMTYPE_SB;
-+		op.dst.u.sb = sb;
- 	}
- 
- 	op.u.passthru.byte_swap = byte_swap;
-@@ -482,18 +482,18 @@ static int ccp_copy_to_from_ksb(struct ccp_cmd_queue *cmd_q,
- 	return cmd_q->ccp->vdata->perform->passthru(&op);
- }
- 
--static int ccp_copy_to_ksb(struct ccp_cmd_queue *cmd_q,
--			   struct ccp_dm_workarea *wa, u32 jobid, u32 ksb,
--			   u32 byte_swap)
-+static int ccp_copy_to_sb(struct ccp_cmd_queue *cmd_q,
-+			  struct ccp_dm_workarea *wa, u32 jobid, u32 sb,
-+			  u32 byte_swap)
- {
--	return ccp_copy_to_from_ksb(cmd_q, wa, jobid, ksb, byte_swap, false);
-+	return ccp_copy_to_from_sb(cmd_q, wa, jobid, sb, byte_swap, false);
- }
- 
--static int ccp_copy_from_ksb(struct ccp_cmd_queue *cmd_q,
--			     struct ccp_dm_workarea *wa, u32 jobid, u32 ksb,
--			     u32 byte_swap)
-+static int ccp_copy_from_sb(struct ccp_cmd_queue *cmd_q,
-+			    struct ccp_dm_workarea *wa, u32 jobid, u32 sb,
-+			    u32 byte_swap)
- {
--	return ccp_copy_to_from_ksb(cmd_q, wa, jobid, ksb, byte_swap, true);
-+	return ccp_copy_to_from_sb(cmd_q, wa, jobid, sb, byte_swap, true);
- }
- 
- static int ccp_run_aes_cmac_cmd(struct ccp_cmd_queue *cmd_q,
-@@ -528,54 +528,54 @@ static int ccp_run_aes_cmac_cmd(struct ccp_cmd_queue *cmd_q,
- 			return -EINVAL;
- 	}
- 
--	BUILD_BUG_ON(CCP_AES_KEY_KSB_COUNT != 1);
--	BUILD_BUG_ON(CCP_AES_CTX_KSB_COUNT != 1);
-+	BUILD_BUG_ON(CCP_AES_KEY_SB_COUNT != 1);
-+	BUILD_BUG_ON(CCP_AES_CTX_SB_COUNT != 1);
- 
+ 	return atomic_inc_return(&ccp->current_id) & CCP_JOBID_MASK;
+@@ -487,7 +490,7 @@ static int ccp_run_aes_cmac_cmd(struct ccp_cmd_queue *cmd_q,
  	ret = -EIO;
  	memset(&op, 0, sizeof(op));
  	op.cmd_q = cmd_q;
- 	op.jobid = ccp_gen_jobid(cmd_q->ccp);
--	op.ksb_key = cmd_q->ksb_key;
--	op.ksb_ctx = cmd_q->ksb_ctx;
-+	op.sb_key = cmd_q->sb_key;
-+	op.sb_ctx = cmd_q->sb_ctx;
+-	op.jobid = ccp_gen_jobid(cmd_q->ccp);
++	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
+ 	op.sb_key = cmd_q->sb_key;
+ 	op.sb_ctx = cmd_q->sb_ctx;
  	op.init = 1;
- 	op.u.aes.type = aes->type;
- 	op.u.aes.mode = aes->mode;
- 	op.u.aes.action = aes->action;
- 
--	/* All supported key sizes fit in a single (32-byte) KSB entry
-+	/* All supported key sizes fit in a single (32-byte) SB entry
- 	 * and must be in little endian format. Use the 256-bit byte
- 	 * swap passthru option to convert from big endian to little
- 	 * endian.
- 	 */
- 	ret = ccp_init_dm_workarea(&key, cmd_q,
--				   CCP_AES_KEY_KSB_COUNT * CCP_KSB_BYTES,
-+				   CCP_AES_KEY_SB_COUNT * CCP_SB_BYTES,
- 				   DMA_TO_DEVICE);
- 	if (ret)
- 		return ret;
- 
--	dm_offset = CCP_KSB_BYTES - aes->key_len;
-+	dm_offset = CCP_SB_BYTES - aes->key_len;
- 	ccp_set_dm_area(&key, dm_offset, aes->key, 0, aes->key_len);
--	ret = ccp_copy_to_ksb(cmd_q, &key, op.jobid, op.ksb_key,
--			      CCP_PASSTHRU_BYTESWAP_256BIT);
-+	ret = ccp_copy_to_sb(cmd_q, &key, op.jobid, op.sb_key,
-+			     CCP_PASSTHRU_BYTESWAP_256BIT);
- 	if (ret) {
- 		cmd->engine_error = cmd_q->cmd_error;
- 		goto e_key;
- 	}
- 
--	/* The AES context fits in a single (32-byte) KSB entry and
-+	/* The AES context fits in a single (32-byte) SB entry and
- 	 * must be in little endian format. Use the 256-bit byte swap
- 	 * passthru option to convert from big endian to little endian.
- 	 */
- 	ret = ccp_init_dm_workarea(&ctx, cmd_q,
--				   CCP_AES_CTX_KSB_COUNT * CCP_KSB_BYTES,
-+				   CCP_AES_CTX_SB_COUNT * CCP_SB_BYTES,
- 				   DMA_BIDIRECTIONAL);
- 	if (ret)
- 		goto e_key;
- 
--	dm_offset = CCP_KSB_BYTES - AES_BLOCK_SIZE;
-+	dm_offset = CCP_SB_BYTES - AES_BLOCK_SIZE;
- 	ccp_set_dm_area(&ctx, dm_offset, aes->iv, 0, aes->iv_len);
--	ret = ccp_copy_to_ksb(cmd_q, &ctx, op.jobid, op.ksb_ctx,
--			      CCP_PASSTHRU_BYTESWAP_256BIT);
-+	ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
-+			     CCP_PASSTHRU_BYTESWAP_256BIT);
- 	if (ret) {
- 		cmd->engine_error = cmd_q->cmd_error;
- 		goto e_ctx;
-@@ -593,9 +593,9 @@ static int ccp_run_aes_cmac_cmd(struct ccp_cmd_queue *cmd_q,
- 			op.eom = 1;
- 
- 			/* Push the K1/K2 key to the CCP now */
--			ret = ccp_copy_from_ksb(cmd_q, &ctx, op.jobid,
--						op.ksb_ctx,
--						CCP_PASSTHRU_BYTESWAP_256BIT);
-+			ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid,
-+					       op.sb_ctx,
-+					       CCP_PASSTHRU_BYTESWAP_256BIT);
- 			if (ret) {
- 				cmd->engine_error = cmd_q->cmd_error;
- 				goto e_src;
-@@ -603,8 +603,8 @@ static int ccp_run_aes_cmac_cmd(struct ccp_cmd_queue *cmd_q,
- 
- 			ccp_set_dm_area(&ctx, 0, aes->cmac_key, 0,
- 					aes->cmac_key_len);
--			ret = ccp_copy_to_ksb(cmd_q, &ctx, op.jobid, op.ksb_ctx,
--					      CCP_PASSTHRU_BYTESWAP_256BIT);
-+			ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
-+					     CCP_PASSTHRU_BYTESWAP_256BIT);
- 			if (ret) {
- 				cmd->engine_error = cmd_q->cmd_error;
- 				goto e_src;
-@@ -623,15 +623,15 @@ static int ccp_run_aes_cmac_cmd(struct ccp_cmd_queue *cmd_q,
- 	/* Retrieve the AES context - convert from LE to BE using
- 	 * 32-byte (256-bit) byteswapping
- 	 */
--	ret = ccp_copy_from_ksb(cmd_q, &ctx, op.jobid, op.ksb_ctx,
--				CCP_PASSTHRU_BYTESWAP_256BIT);
-+	ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
-+			       CCP_PASSTHRU_BYTESWAP_256BIT);
- 	if (ret) {
- 		cmd->engine_error = cmd_q->cmd_error;
- 		goto e_src;
- 	}
- 
- 	/* ...but we only need AES_BLOCK_SIZE bytes */
--	dm_offset = CCP_KSB_BYTES - AES_BLOCK_SIZE;
-+	dm_offset = CCP_SB_BYTES - AES_BLOCK_SIZE;
- 	ccp_get_dm_area(&ctx, dm_offset, aes->iv, 0, aes->iv_len);
- 
- e_src:
-@@ -681,56 +681,56 @@ static int ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 			return -EINVAL;
- 	}
- 
--	BUILD_BUG_ON(CCP_AES_KEY_KSB_COUNT != 1);
--	BUILD_BUG_ON(CCP_AES_CTX_KSB_COUNT != 1);
-+	BUILD_BUG_ON(CCP_AES_KEY_SB_COUNT != 1);
-+	BUILD_BUG_ON(CCP_AES_CTX_SB_COUNT != 1);
- 
+@@ -640,7 +643,7 @@ static int ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
  	ret = -EIO;
  	memset(&op, 0, sizeof(op));
  	op.cmd_q = cmd_q;
- 	op.jobid = ccp_gen_jobid(cmd_q->ccp);
--	op.ksb_key = cmd_q->ksb_key;
--	op.ksb_ctx = cmd_q->ksb_ctx;
-+	op.sb_key = cmd_q->sb_key;
-+	op.sb_ctx = cmd_q->sb_ctx;
+-	op.jobid = ccp_gen_jobid(cmd_q->ccp);
++	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
+ 	op.sb_key = cmd_q->sb_key;
+ 	op.sb_ctx = cmd_q->sb_ctx;
  	op.init = (aes->mode == CCP_AES_MODE_ECB) ? 0 : 1;
- 	op.u.aes.type = aes->type;
- 	op.u.aes.mode = aes->mode;
- 	op.u.aes.action = aes->action;
- 
--	/* All supported key sizes fit in a single (32-byte) KSB entry
-+	/* All supported key sizes fit in a single (32-byte) SB entry
- 	 * and must be in little endian format. Use the 256-bit byte
- 	 * swap passthru option to convert from big endian to little
- 	 * endian.
- 	 */
- 	ret = ccp_init_dm_workarea(&key, cmd_q,
--				   CCP_AES_KEY_KSB_COUNT * CCP_KSB_BYTES,
-+				   CCP_AES_KEY_SB_COUNT * CCP_SB_BYTES,
- 				   DMA_TO_DEVICE);
- 	if (ret)
- 		return ret;
- 
--	dm_offset = CCP_KSB_BYTES - aes->key_len;
-+	dm_offset = CCP_SB_BYTES - aes->key_len;
- 	ccp_set_dm_area(&key, dm_offset, aes->key, 0, aes->key_len);
--	ret = ccp_copy_to_ksb(cmd_q, &key, op.jobid, op.ksb_key,
--			      CCP_PASSTHRU_BYTESWAP_256BIT);
-+	ret = ccp_copy_to_sb(cmd_q, &key, op.jobid, op.sb_key,
-+			     CCP_PASSTHRU_BYTESWAP_256BIT);
- 	if (ret) {
- 		cmd->engine_error = cmd_q->cmd_error;
- 		goto e_key;
- 	}
- 
--	/* The AES context fits in a single (32-byte) KSB entry and
-+	/* The AES context fits in a single (32-byte) SB entry and
- 	 * must be in little endian format. Use the 256-bit byte swap
- 	 * passthru option to convert from big endian to little endian.
- 	 */
- 	ret = ccp_init_dm_workarea(&ctx, cmd_q,
--				   CCP_AES_CTX_KSB_COUNT * CCP_KSB_BYTES,
-+				   CCP_AES_CTX_SB_COUNT * CCP_SB_BYTES,
- 				   DMA_BIDIRECTIONAL);
- 	if (ret)
+@@ -679,7 +682,7 @@ static int ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
  		goto e_key;
  
  	if (aes->mode != CCP_AES_MODE_ECB) {
- 		/* Load the AES context - conver to LE */
--		dm_offset = CCP_KSB_BYTES - AES_BLOCK_SIZE;
-+		dm_offset = CCP_SB_BYTES - AES_BLOCK_SIZE;
+-		/* Load the AES context - conver to LE */
++		/* Load the AES context - convert to LE */
+ 		dm_offset = CCP_SB_BYTES - AES_BLOCK_SIZE;
  		ccp_set_dm_area(&ctx, dm_offset, aes->iv, 0, aes->iv_len);
--		ret = ccp_copy_to_ksb(cmd_q, &ctx, op.jobid, op.ksb_ctx,
--				      CCP_PASSTHRU_BYTESWAP_256BIT);
-+		ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
-+				     CCP_PASSTHRU_BYTESWAP_256BIT);
- 		if (ret) {
- 			cmd->engine_error = cmd_q->cmd_error;
- 			goto e_ctx;
-@@ -786,15 +786,15 @@ static int ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 		/* Retrieve the AES context - convert from LE to BE using
- 		 * 32-byte (256-bit) byteswapping
- 		 */
--		ret = ccp_copy_from_ksb(cmd_q, &ctx, op.jobid, op.ksb_ctx,
--					CCP_PASSTHRU_BYTESWAP_256BIT);
-+		ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
-+				       CCP_PASSTHRU_BYTESWAP_256BIT);
- 		if (ret) {
- 			cmd->engine_error = cmd_q->cmd_error;
- 			goto e_dst;
- 		}
- 
- 		/* ...but we only need AES_BLOCK_SIZE bytes */
--		dm_offset = CCP_KSB_BYTES - AES_BLOCK_SIZE;
-+		dm_offset = CCP_SB_BYTES - AES_BLOCK_SIZE;
- 		ccp_get_dm_area(&ctx, dm_offset, aes->iv, 0, aes->iv_len);
- 	}
- 
-@@ -858,53 +858,53 @@ static int ccp_run_xts_aes_cmd(struct ccp_cmd_queue *cmd_q,
- 	if (!xts->key || !xts->iv || !xts->src || !xts->dst)
- 		return -EINVAL;
- 
--	BUILD_BUG_ON(CCP_XTS_AES_KEY_KSB_COUNT != 1);
--	BUILD_BUG_ON(CCP_XTS_AES_CTX_KSB_COUNT != 1);
-+	BUILD_BUG_ON(CCP_XTS_AES_KEY_SB_COUNT != 1);
-+	BUILD_BUG_ON(CCP_XTS_AES_CTX_SB_COUNT != 1);
- 
+ 		ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
+@@ -817,7 +820,7 @@ static int ccp_run_xts_aes_cmd(struct ccp_cmd_queue *cmd_q,
  	ret = -EIO;
  	memset(&op, 0, sizeof(op));
  	op.cmd_q = cmd_q;
- 	op.jobid = ccp_gen_jobid(cmd_q->ccp);
--	op.ksb_key = cmd_q->ksb_key;
--	op.ksb_ctx = cmd_q->ksb_ctx;
-+	op.sb_key = cmd_q->sb_key;
-+	op.sb_ctx = cmd_q->sb_ctx;
+-	op.jobid = ccp_gen_jobid(cmd_q->ccp);
++	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
+ 	op.sb_key = cmd_q->sb_key;
+ 	op.sb_ctx = cmd_q->sb_ctx;
  	op.init = 1;
- 	op.u.xts.action = xts->action;
- 	op.u.xts.unit_size = xts->unit_size;
+@@ -936,98 +939,154 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	struct ccp_dm_workarea ctx;
+ 	struct ccp_data src;
+ 	struct ccp_op op;
++	unsigned int ioffset, ooffset;
++	unsigned int digest_size;
++	int sb_count;
++	const void *init;
++	u64 block_size;
++	int ctx_size;
+ 	int ret;
  
--	/* All supported key sizes fit in a single (32-byte) KSB entry
-+	/* All supported key sizes fit in a single (32-byte) SB entry
- 	 * and must be in little endian format. Use the 256-bit byte
- 	 * swap passthru option to convert from big endian to little
- 	 * endian.
- 	 */
- 	ret = ccp_init_dm_workarea(&key, cmd_q,
--				   CCP_XTS_AES_KEY_KSB_COUNT * CCP_KSB_BYTES,
-+				   CCP_XTS_AES_KEY_SB_COUNT * CCP_SB_BYTES,
- 				   DMA_TO_DEVICE);
- 	if (ret)
- 		return ret;
+-	if (sha->ctx_len != CCP_SHA_CTXSIZE)
++	switch (sha->type) {
++	case CCP_SHA_TYPE_1:
++		if (sha->ctx_len < SHA1_DIGEST_SIZE)
++			return -EINVAL;
++		block_size = SHA1_BLOCK_SIZE;
++		break;
++	case CCP_SHA_TYPE_224:
++		if (sha->ctx_len < SHA224_DIGEST_SIZE)
++			return -EINVAL;
++		block_size = SHA224_BLOCK_SIZE;
++		break;
++	case CCP_SHA_TYPE_256:
++		if (sha->ctx_len < SHA256_DIGEST_SIZE)
++			return -EINVAL;
++		block_size = SHA256_BLOCK_SIZE;
++		break;
++	default:
+ 		return -EINVAL;
++	}
  
--	dm_offset = CCP_KSB_BYTES - AES_KEYSIZE_128;
-+	dm_offset = CCP_SB_BYTES - AES_KEYSIZE_128;
- 	ccp_set_dm_area(&key, dm_offset, xts->key, 0, xts->key_len);
- 	ccp_set_dm_area(&key, 0, xts->key, dm_offset, xts->key_len);
--	ret = ccp_copy_to_ksb(cmd_q, &key, op.jobid, op.ksb_key,
--			      CCP_PASSTHRU_BYTESWAP_256BIT);
-+	ret = ccp_copy_to_sb(cmd_q, &key, op.jobid, op.sb_key,
-+			     CCP_PASSTHRU_BYTESWAP_256BIT);
- 	if (ret) {
- 		cmd->engine_error = cmd_q->cmd_error;
- 		goto e_key;
- 	}
- 
--	/* The AES context fits in a single (32-byte) KSB entry and
-+	/* The AES context fits in a single (32-byte) SB entry and
- 	 * for XTS is already in little endian format so no byte swapping
- 	 * is needed.
- 	 */
- 	ret = ccp_init_dm_workarea(&ctx, cmd_q,
--				   CCP_XTS_AES_CTX_KSB_COUNT * CCP_KSB_BYTES,
-+				   CCP_XTS_AES_CTX_SB_COUNT * CCP_SB_BYTES,
- 				   DMA_BIDIRECTIONAL);
- 	if (ret)
- 		goto e_key;
- 
- 	ccp_set_dm_area(&ctx, 0, xts->iv, 0, xts->iv_len);
--	ret = ccp_copy_to_ksb(cmd_q, &ctx, op.jobid, op.ksb_ctx,
--			      CCP_PASSTHRU_BYTESWAP_NOOP);
-+	ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
-+			     CCP_PASSTHRU_BYTESWAP_NOOP);
- 	if (ret) {
- 		cmd->engine_error = cmd_q->cmd_error;
- 		goto e_ctx;
-@@ -950,15 +950,15 @@ static int ccp_run_xts_aes_cmd(struct ccp_cmd_queue *cmd_q,
- 	/* Retrieve the AES context - convert from LE to BE using
- 	 * 32-byte (256-bit) byteswapping
- 	 */
--	ret = ccp_copy_from_ksb(cmd_q, &ctx, op.jobid, op.ksb_ctx,
--				CCP_PASSTHRU_BYTESWAP_256BIT);
-+	ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
-+			       CCP_PASSTHRU_BYTESWAP_256BIT);
- 	if (ret) {
- 		cmd->engine_error = cmd_q->cmd_error;
- 		goto e_dst;
- 	}
- 
- 	/* ...but we only need AES_BLOCK_SIZE bytes */
--	dm_offset = CCP_KSB_BYTES - AES_BLOCK_SIZE;
-+	dm_offset = CCP_SB_BYTES - AES_BLOCK_SIZE;
- 	ccp_get_dm_area(&ctx, dm_offset, xts->iv, 0, xts->iv_len);
- 
- e_dst:
-@@ -1036,21 +1036,21 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	if (!sha->src)
+ 	if (!sha->ctx)
  		return -EINVAL;
  
--	BUILD_BUG_ON(CCP_SHA_KSB_COUNT != 1);
-+	BUILD_BUG_ON(CCP_SHA_SB_COUNT != 1);
+-	if (!sha->final && (sha->src_len & (CCP_SHA_BLOCKSIZE - 1)))
++	if (!sha->final && (sha->src_len & (block_size - 1)))
+ 		return -EINVAL;
+ 
+-	if (!sha->src_len) {
+-		const u8 *sha_zero;
++	/* The version 3 device can't handle zero-length input */
++	if (cmd_q->ccp->vdata->version == CCP_VERSION(3, 0)) {
+ 
+-		/* Not final, just return */
+-		if (!sha->final)
+-			return 0;
++		if (!sha->src_len) {
++			unsigned int digest_len;
++			const u8 *sha_zero;
+ 
+-		/* CCP can't do a zero length sha operation so the caller
+-		 * must buffer the data.
+-		 */
+-		if (sha->msg_bits)
+-			return -EINVAL;
++			/* Not final, just return */
++			if (!sha->final)
++				return 0;
+ 
+-		/* The CCP cannot perform zero-length sha operations so the
+-		 * caller is required to buffer data for the final operation.
+-		 * However, a sha operation for a message with a total length
+-		 * of zero is valid so known values are required to supply
+-		 * the result.
+-		 */
+-		switch (sha->type) {
+-		case CCP_SHA_TYPE_1:
+-			sha_zero = sha1_zero_message_hash;
+-			break;
+-		case CCP_SHA_TYPE_224:
+-			sha_zero = sha224_zero_message_hash;
+-			break;
+-		case CCP_SHA_TYPE_256:
+-			sha_zero = sha256_zero_message_hash;
+-			break;
+-		default:
+-			return -EINVAL;
+-		}
++			/* CCP can't do a zero length sha operation so the
++			 * caller must buffer the data.
++			 */
++			if (sha->msg_bits)
++				return -EINVAL;
+ 
+-		scatterwalk_map_and_copy((void *)sha_zero, sha->ctx, 0,
+-					 sha->ctx_len, 1);
++			/* The CCP cannot perform zero-length sha operations
++			 * so the caller is required to buffer data for the
++			 * final operation. However, a sha operation for a
++			 * message with a total length of zero is valid so
++			 * known values are required to supply the result.
++			 */
++			switch (sha->type) {
++			case CCP_SHA_TYPE_1:
++				sha_zero = sha1_zero_message_hash;
++				digest_len = SHA1_DIGEST_SIZE;
++				break;
++			case CCP_SHA_TYPE_224:
++				sha_zero = sha224_zero_message_hash;
++				digest_len = SHA224_DIGEST_SIZE;
++				break;
++			case CCP_SHA_TYPE_256:
++				sha_zero = sha256_zero_message_hash;
++				digest_len = SHA256_DIGEST_SIZE;
++				break;
++			default:
++				return -EINVAL;
++			}
+ 
+-		return 0;
++			scatterwalk_map_and_copy((void *)sha_zero, sha->ctx, 0,
++						 digest_len, 1);
++
++			return 0;
++		}
+ 	}
+ 
+-	if (!sha->src)
+-		return -EINVAL;
++	/* Set variables used throughout */
++	switch (sha->type) {
++	case CCP_SHA_TYPE_1:
++		digest_size = SHA1_DIGEST_SIZE;
++		init = (void *) ccp_sha1_init;
++		ctx_size = SHA1_DIGEST_SIZE;
++		sb_count = 1;
++		if (cmd_q->ccp->vdata->version != CCP_VERSION(3, 0))
++			ooffset = ioffset = CCP_SB_BYTES - SHA1_DIGEST_SIZE;
++		else
++			ooffset = ioffset = 0;
++		break;
++	case CCP_SHA_TYPE_224:
++		digest_size = SHA224_DIGEST_SIZE;
++		init = (void *) ccp_sha224_init;
++		ctx_size = SHA256_DIGEST_SIZE;
++		sb_count = 1;
++		ioffset = 0;
++		if (cmd_q->ccp->vdata->version != CCP_VERSION(3, 0))
++			ooffset = CCP_SB_BYTES - SHA224_DIGEST_SIZE;
++		else
++			ooffset = 0;
++		break;
++	case CCP_SHA_TYPE_256:
++		digest_size = SHA256_DIGEST_SIZE;
++		init = (void *) ccp_sha256_init;
++		ctx_size = SHA256_DIGEST_SIZE;
++		sb_count = 1;
++		ooffset = ioffset = 0;
++		break;
++	default:
++		ret = -EINVAL;
++		goto e_data;
++	}
+ 
+-	BUILD_BUG_ON(CCP_SHA_SB_COUNT != 1);
++	/* For zero-length plaintext the src pointer is ignored;
++	 * otherwise both parts must be valid
++	 */
++	if (sha->src_len && !sha->src)
++		return -EINVAL;
  
  	memset(&op, 0, sizeof(op));
  	op.cmd_q = cmd_q;
- 	op.jobid = ccp_gen_jobid(cmd_q->ccp);
--	op.ksb_ctx = cmd_q->ksb_ctx;
-+	op.sb_ctx = cmd_q->sb_ctx;
+-	op.jobid = ccp_gen_jobid(cmd_q->ccp);
+-	op.sb_ctx = cmd_q->sb_ctx;
++	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
++	op.sb_ctx = cmd_q->sb_ctx; /* Pre-allocated */
  	op.u.sha.type = sha->type;
  	op.u.sha.msg_bits = sha->msg_bits;
  
--	/* The SHA context fits in a single (32-byte) KSB entry and
-+	/* The SHA context fits in a single (32-byte) SB entry and
- 	 * must be in little endian format. Use the 256-bit byte swap
- 	 * passthru option to convert from big endian to little endian.
- 	 */
- 	ret = ccp_init_dm_workarea(&ctx, cmd_q,
--				   CCP_SHA_KSB_COUNT * CCP_KSB_BYTES,
-+				   CCP_SHA_SB_COUNT * CCP_SB_BYTES,
+-	/* The SHA context fits in a single (32-byte) SB entry and
+-	 * must be in little endian format. Use the 256-bit byte swap
+-	 * passthru option to convert from big endian to little endian.
+-	 */
+-	ret = ccp_init_dm_workarea(&ctx, cmd_q,
+-				   CCP_SHA_SB_COUNT * CCP_SB_BYTES,
++	ret = ccp_init_dm_workarea(&ctx, cmd_q, sb_count * CCP_SB_BYTES,
  				   DMA_BIDIRECTIONAL);
  	if (ret)
  		return ret;
-@@ -1077,8 +1077,8 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 		ccp_set_dm_area(&ctx, 0, sha->ctx, 0, sha->ctx_len);
+-
+ 	if (sha->first) {
+-		const __be32 *init;
+-
+ 		switch (sha->type) {
+ 		case CCP_SHA_TYPE_1:
+-			init = ccp_sha1_init;
+-			break;
+ 		case CCP_SHA_TYPE_224:
+-			init = ccp_sha224_init;
+-			break;
+ 		case CCP_SHA_TYPE_256:
+-			init = ccp_sha256_init;
++			memcpy(ctx.address + ioffset, init, ctx_size);
+ 			break;
+ 		default:
+ 			ret = -EINVAL;
+ 			goto e_ctx;
+ 		}
+-		memcpy(ctx.address, init, CCP_SHA_CTXSIZE);
+ 	} else {
+-		ccp_set_dm_area(&ctx, 0, sha->ctx, 0, sha->ctx_len);
++		/* Restore the context */
++		ccp_set_dm_area(&ctx, 0, sha->ctx, 0,
++				sb_count * CCP_SB_BYTES);
  	}
  
--	ret = ccp_copy_to_ksb(cmd_q, &ctx, op.jobid, op.ksb_ctx,
--			      CCP_PASSTHRU_BYTESWAP_256BIT);
-+	ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
-+			     CCP_PASSTHRU_BYTESWAP_256BIT);
- 	if (ret) {
- 		cmd->engine_error = cmd_q->cmd_error;
+ 	ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
+@@ -1037,24 +1096,33 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
  		goto e_ctx;
-@@ -1107,8 +1107,8 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	}
+ 
+-	/* Send data to the CCP SHA engine */
+-	ret = ccp_init_data(&src, cmd_q, sha->src, sha->src_len,
+-			    CCP_SHA_BLOCKSIZE, DMA_TO_DEVICE);
+-	if (ret)
+-		goto e_ctx;
++	if (sha->src) {
++		/* Send data to the CCP SHA engine; block_size is set above */
++		ret = ccp_init_data(&src, cmd_q, sha->src, sha->src_len,
++				    block_size, DMA_TO_DEVICE);
++		if (ret)
++			goto e_ctx;
+ 
+-	while (src.sg_wa.bytes_left) {
+-		ccp_prepare_data(&src, NULL, &op, CCP_SHA_BLOCKSIZE, false);
+-		if (sha->final && !src.sg_wa.bytes_left)
+-			op.eom = 1;
++		while (src.sg_wa.bytes_left) {
++			ccp_prepare_data(&src, NULL, &op, block_size, false);
++			if (sha->final && !src.sg_wa.bytes_left)
++				op.eom = 1;
++
++			ret = cmd_q->ccp->vdata->perform->sha(&op);
++			if (ret) {
++				cmd->engine_error = cmd_q->cmd_error;
++				goto e_data;
++			}
+ 
++			ccp_process_data(&src, NULL, &op);
++		}
++	} else {
++		op.eom = 1;
+ 		ret = cmd_q->ccp->vdata->perform->sha(&op);
+ 		if (ret) {
+ 			cmd->engine_error = cmd_q->cmd_error;
+ 			goto e_data;
+ 		}
+-
+-		ccp_process_data(&src, NULL, &op);
+ 	}
+ 
  	/* Retrieve the SHA context - convert from LE to BE using
- 	 * 32-byte (256-bit) byteswapping to BE
- 	 */
--	ret = ccp_copy_from_ksb(cmd_q, &ctx, op.jobid, op.ksb_ctx,
--				CCP_PASSTHRU_BYTESWAP_256BIT);
-+	ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
-+			       CCP_PASSTHRU_BYTESWAP_256BIT);
- 	if (ret) {
- 		cmd->engine_error = cmd_q->cmd_error;
+@@ -1067,32 +1135,31 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
  		goto e_data;
-@@ -1191,7 +1191,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	struct ccp_dm_workarea exp, src;
- 	struct ccp_data dst;
+ 	}
+ 
+-	ccp_get_dm_area(&ctx, 0, sha->ctx, 0, sha->ctx_len);
+-
+-	if (sha->final && sha->opad) {
+-		/* HMAC operation, recursively perform final SHA */
+-		struct ccp_cmd hmac_cmd;
+-		struct scatterlist sg;
+-		u64 block_size, digest_size;
+-		u8 *hmac_buf;
+-
++	if (sha->final) {
++		/* Finishing up, so get the digest */
+ 		switch (sha->type) {
+ 		case CCP_SHA_TYPE_1:
+-			block_size = SHA1_BLOCK_SIZE;
+-			digest_size = SHA1_DIGEST_SIZE;
+-			break;
+ 		case CCP_SHA_TYPE_224:
+-			block_size = SHA224_BLOCK_SIZE;
+-			digest_size = SHA224_DIGEST_SIZE;
+-			break;
+ 		case CCP_SHA_TYPE_256:
+-			block_size = SHA256_BLOCK_SIZE;
+-			digest_size = SHA256_DIGEST_SIZE;
++			ccp_get_dm_area(&ctx, ooffset,
++					sha->ctx, 0,
++					digest_size);
+ 			break;
+ 		default:
+ 			ret = -EINVAL;
+-			goto e_data;
++			goto e_ctx;
+ 		}
++	} else {
++		/* Stash the context */
++		ccp_get_dm_area(&ctx, 0, sha->ctx, 0,
++				sb_count * CCP_SB_BYTES);
++	}
++
++	if (sha->final && sha->opad) {
++		/* HMAC operation, recursively perform final SHA */
++		struct ccp_cmd hmac_cmd;
++		struct scatterlist sg;
++		u8 *hmac_buf;
+ 
+ 		if (sha->opad_len != block_size) {
+ 			ret = -EINVAL;
+@@ -1107,7 +1174,18 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		sg_init_one(&sg, hmac_buf, block_size + digest_size);
+ 
+ 		scatterwalk_map_and_copy(hmac_buf, sha->opad, 0, block_size, 0);
+-		memcpy(hmac_buf + block_size, ctx.address, digest_size);
++		switch (sha->type) {
++		case CCP_SHA_TYPE_1:
++		case CCP_SHA_TYPE_224:
++		case CCP_SHA_TYPE_256:
++			memcpy(hmac_buf + block_size,
++			       ctx.address + ooffset,
++			       digest_size);
++			break;
++		default:
++			ret = -EINVAL;
++			goto e_ctx;
++		}
+ 
+ 		memset(&hmac_cmd, 0, sizeof(hmac_cmd));
+ 		hmac_cmd.engine = CCP_ENGINE_SHA;
+@@ -1130,7 +1208,8 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	}
+ 
+ e_data:
+-	ccp_free_data(&src, cmd_q);
++	if (sha->src)
++		ccp_free_data(&src, cmd_q);
+ 
+ e_ctx:
+ 	ccp_dm_free(&ctx);
+@@ -1261,7 +1340,7 @@ static int ccp_run_passthru_cmd(struct ccp_cmd_queue *cmd_q,
  	struct ccp_op op;
--	unsigned int ksb_count, i_len, o_len;
-+	unsigned int sb_count, i_len, o_len;
- 	int ret;
+ 	bool in_place = false;
+ 	unsigned int i;
+-	int ret;
++	int ret = 0;
  
- 	if (rsa->key_size > CCP_RSA_MAX_WIDTH)
-@@ -1209,16 +1209,16 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	o_len = ((rsa->key_size + 255) / 256) * 32;
- 	i_len = o_len * 2;
- 
--	ksb_count = o_len / CCP_KSB_BYTES;
-+	sb_count = o_len / CCP_SB_BYTES;
+ 	if (!pt->final && (pt->src_len & (CCP_PASSTHRU_BLOCKSIZE - 1)))
+ 		return -EINVAL;
+@@ -1280,7 +1359,7 @@ static int ccp_run_passthru_cmd(struct ccp_cmd_queue *cmd_q,
  
  	memset(&op, 0, sizeof(op));
  	op.cmd_q = cmd_q;
- 	op.jobid = ccp_gen_jobid(cmd_q->ccp);
--	op.ksb_key = ccp_alloc_ksb(cmd_q->ccp, ksb_count);
--	if (!op.ksb_key)
-+	op.sb_key = ccp_alloc_ksb(cmd_q->ccp, sb_count);
-+	if (!op.sb_key)
- 		return -EIO;
+-	op.jobid = ccp_gen_jobid(cmd_q->ccp);
++	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
  
--	/* The RSA exponent may span multiple (32-byte) KSB entries and must
-+	/* The RSA exponent may span multiple (32-byte) SB entries and must
- 	 * be in little endian format. Reverse copy each 32-byte chunk
- 	 * of the exponent (En chunk to E0 chunk, E(n-1) chunk to E1 chunk)
- 	 * and each byte within that chunk and do not perform any byte swap
-@@ -1226,14 +1226,14 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	 */
- 	ret = ccp_init_dm_workarea(&exp, cmd_q, o_len, DMA_TO_DEVICE);
- 	if (ret)
--		goto e_ksb;
-+		goto e_sb;
+ 	if (pt->bit_mod != CCP_PASSTHRU_BITWISE_NOOP) {
+ 		/* Load the mask */
+@@ -1469,7 +1548,7 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
  
- 	ret = ccp_reverse_set_dm_area(&exp, rsa->exp, rsa->exp_len,
--				      CCP_KSB_BYTES, false);
-+				      CCP_SB_BYTES, false);
- 	if (ret)
- 		goto e_exp;
--	ret = ccp_copy_to_ksb(cmd_q, &exp, op.jobid, op.ksb_key,
--			      CCP_PASSTHRU_BYTESWAP_NOOP);
-+	ret = ccp_copy_to_sb(cmd_q, &exp, op.jobid, op.sb_key,
-+			     CCP_PASSTHRU_BYTESWAP_NOOP);
- 	if (ret) {
- 		cmd->engine_error = cmd_q->cmd_error;
- 		goto e_exp;
-@@ -1248,12 +1248,12 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 		goto e_exp;
+ 	memset(&op, 0, sizeof(op));
+ 	op.cmd_q = cmd_q;
+-	op.jobid = ccp_gen_jobid(cmd_q->ccp);
++	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
  
- 	ret = ccp_reverse_set_dm_area(&src, rsa->mod, rsa->mod_len,
--				      CCP_KSB_BYTES, false);
-+				      CCP_SB_BYTES, false);
- 	if (ret)
+ 	/* Concatenate the modulus and the operands. Both the modulus and
+ 	 * the operands must be in little endian format.  Since the input
+@@ -1594,7 +1673,7 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 
+ 	memset(&op, 0, sizeof(op));
+ 	op.cmd_q = cmd_q;
+-	op.jobid = ccp_gen_jobid(cmd_q->ccp);
++	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
+ 
+ 	/* Concatenate the modulus and the operands. Both the modulus and
+ 	 * the operands must be in little endian format.  Since the input
+@@ -1632,7 +1711,7 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
  		goto e_src;
- 	src.address += o_len;	/* Adjust the address for the copy operation */
- 	ret = ccp_reverse_set_dm_area(&src, rsa->src, rsa->src_len,
--				      CCP_KSB_BYTES, false);
-+				      CCP_SB_BYTES, false);
- 	if (ret)
- 		goto e_src;
- 	src.address -= o_len;	/* Reset the address to original value */
-@@ -1292,8 +1292,8 @@ e_src:
- e_exp:
- 	ccp_dm_free(&exp);
+ 	src.address += CCP_ECC_OPERAND_SIZE;
  
--e_ksb:
--	ccp_free_ksb(cmd_q->ccp, op.ksb_key, ksb_count);
-+e_sb:
-+	ccp_free_ksb(cmd_q->ccp, op.sb_key, sb_count);
+-	/* Set the first point Z coordianate to 1 */
++	/* Set the first point Z coordinate to 1 */
+ 	*src.address = 0x01;
+ 	src.address += CCP_ECC_OPERAND_SIZE;
  
- 	return ret;
+@@ -1651,7 +1730,7 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 			goto e_src;
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+ 
+-		/* Set the second point Z coordianate to 1 */
++		/* Set the second point Z coordinate to 1 */
+ 		*src.address = 0x01;
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+ 	} else {
+diff --git a/drivers/crypto/ccp/ccp-pci.c b/drivers/crypto/ccp/ccp-pci.c
+index 072bced..064e20f 100644
+--- a/drivers/crypto/ccp/ccp-pci.c
++++ b/drivers/crypto/ccp/ccp-pci.c
+@@ -141,10 +141,11 @@ static void ccp_free_irqs(struct ccp_device *ccp)
+ 			free_irq(ccp_pci->msix[ccp_pci->msix_count].vector,
+ 				 dev);
+ 		pci_disable_msix(pdev);
+-	} else {
++	} else if (ccp->irq) {
+ 		free_irq(ccp->irq, dev);
+ 		pci_disable_msi(pdev);
+ 	}
++	ccp->irq = 0;
  }
-@@ -1322,7 +1322,7 @@ static int ccp_run_passthru_cmd(struct ccp_cmd_queue *cmd_q,
- 			return -EINVAL;
- 	}
  
--	BUILD_BUG_ON(CCP_PASSTHRU_KSB_COUNT != 1);
-+	BUILD_BUG_ON(CCP_PASSTHRU_SB_COUNT != 1);
+ static int ccp_find_mmio_area(struct ccp_device *ccp)
+@@ -229,6 +230,8 @@ static int ccp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
  
- 	memset(&op, 0, sizeof(op));
- 	op.cmd_q = cmd_q;
-@@ -1330,18 +1330,18 @@ static int ccp_run_passthru_cmd(struct ccp_cmd_queue *cmd_q,
+ 	dev_set_drvdata(dev, ccp);
  
- 	if (pt->bit_mod != CCP_PASSTHRU_BITWISE_NOOP) {
- 		/* Load the mask */
--		op.ksb_key = cmd_q->ksb_key;
-+		op.sb_key = cmd_q->sb_key;
++	if (ccp->vdata->setup)
++		ccp->vdata->setup(ccp);
+ 	ret = ccp->vdata->perform->init(ccp);
+ 	if (ret)
+ 		goto e_iomap;
+@@ -321,6 +324,7 @@ static int ccp_pci_resume(struct pci_dev *pdev)
  
- 		ret = ccp_init_dm_workarea(&mask, cmd_q,
--					   CCP_PASSTHRU_KSB_COUNT *
--					   CCP_KSB_BYTES,
-+					   CCP_PASSTHRU_SB_COUNT *
-+					   CCP_SB_BYTES,
- 					   DMA_TO_DEVICE);
- 		if (ret)
- 			return ret;
+ static const struct pci_device_id ccp_pci_table[] = {
+ 	{ PCI_VDEVICE(AMD, 0x1537), (kernel_ulong_t)&ccpv3 },
++	{ PCI_VDEVICE(AMD, 0x1456), (kernel_ulong_t)&ccpv5 },
+ 	/* Last entry must be zero */
+ 	{ 0, }
+ };
+diff --git a/include/linux/ccp.h b/include/linux/ccp.h
+index 7c2bb27..a765333 100644
+--- a/include/linux/ccp.h
++++ b/include/linux/ccp.h
+@@ -238,9 +238,6 @@ struct ccp_xts_aes_engine {
+ };
  
- 		ccp_set_dm_area(&mask, 0, pt->mask, 0, pt->mask_len);
--		ret = ccp_copy_to_ksb(cmd_q, &mask, op.jobid, op.ksb_key,
--				      CCP_PASSTHRU_BYTESWAP_NOOP);
-+		ret = ccp_copy_to_sb(cmd_q, &mask, op.jobid, op.sb_key,
-+				     CCP_PASSTHRU_BYTESWAP_NOOP);
- 		if (ret) {
- 			cmd->engine_error = cmd_q->cmd_error;
- 			goto e_mask;
-@@ -1449,7 +1449,7 @@ static int ccp_run_passthru_nomap_cmd(struct ccp_cmd_queue *cmd_q,
- 			return -EINVAL;
- 	}
- 
--	BUILD_BUG_ON(CCP_PASSTHRU_KSB_COUNT != 1);
-+	BUILD_BUG_ON(CCP_PASSTHRU_SB_COUNT != 1);
- 
- 	memset(&op, 0, sizeof(op));
- 	op.cmd_q = cmd_q;
-@@ -1457,13 +1457,13 @@ static int ccp_run_passthru_nomap_cmd(struct ccp_cmd_queue *cmd_q,
- 
- 	if (pt->bit_mod != CCP_PASSTHRU_BITWISE_NOOP) {
- 		/* Load the mask */
--		op.ksb_key = cmd_q->ksb_key;
-+		op.sb_key = cmd_q->sb_key;
- 
- 		mask.length = pt->mask_len;
- 		mask.dma.address = pt->mask;
- 		mask.dma.length = pt->mask_len;
- 
--		ret = ccp_copy_to_ksb(cmd_q, &mask, op.jobid, op.ksb_key,
-+		ret = ccp_copy_to_sb(cmd_q, &mask, op.jobid, op.sb_key,
- 				     CCP_PASSTHRU_BYTESWAP_NOOP);
- 		if (ret) {
- 			cmd->engine_error = cmd_q->cmd_error;
+ /***** SHA engine *****/
+-#define CCP_SHA_BLOCKSIZE               SHA256_BLOCK_SIZE
+-#define CCP_SHA_CTXSIZE                 SHA256_DIGEST_SIZE
+-
+ /**
+  * ccp_sha_type - type of SHA operation
+  *
