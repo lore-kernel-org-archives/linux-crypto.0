@@ -1,7 +1,8 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 05/10] crypto: ccp - Refactor code supporting the CCP's RNG
-Date: Tue, 26 Jul 2016 19:10:02 -0500
-Message-ID: <20160727001002.24944.7042.stgit@taos>
+Subject: [PATCH 06/10] crypto: ccp - Refactor code to enable checks for
+ queue space.
+Date: Tue, 26 Jul 2016 19:10:13 -0500
+Message-ID: <20160727001013.24944.95785.stgit@taos>
 References: <20160727000652.24944.44919.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,150 +11,82 @@ Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
 	<davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0071.outbound.protection.outlook.com ([104.47.34.71]:38339
-	"EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-dm3nam03on0086.outbound.protection.outlook.com ([104.47.41.86]:48339
+	"EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1756964AbcG0AY7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jul 2016 20:24:59 -0400
+	id S1757175AbcG0AZ0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Jul 2016 20:25:26 -0400
 In-Reply-To: <20160727000652.24944.44919.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Make the RNG support code common (where possible) in
-preparation for adding a v5 device.
+Available queue space is used to decide (by counting free slots)
+if we have to put a command on hold or if it can be sent
+to the engine immediately.
 
 
 Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/ccp-dev-v3.c |   51 ++++++++-------------------------------
- drivers/crypto/ccp/ccp-dev.c    |   28 +++++++++++++++++++++
+ drivers/crypto/ccp/ccp-dev-v3.c |    8 +++++++-
  drivers/crypto/ccp/ccp-dev.h    |    1 +
- 3 files changed, 40 insertions(+), 40 deletions(-)
+ drivers/crypto/ccp/ccp-ops.c    |    2 +-
+ 3 files changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index 5b06599..373ac4f 100644
+index 373ac4f..02c8c95 100644
 --- a/drivers/crypto/ccp/ccp-dev-v3.c
 +++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -307,35 +307,6 @@ static int ccp_perform_ecc(struct ccp_op *op)
- 	return ccp_do_cmd(op, cr, ARRAY_SIZE(cr));
+@@ -70,6 +70,11 @@ static void ccp_free_ksb(struct ccp_cmd_queue *cmd_q, unsigned int start,
+ 	wake_up_interruptible_all(&ccp->sb_queue);
  }
  
--static int ccp_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
--{
--	struct ccp_device *ccp = container_of(rng, struct ccp_device, hwrng);
--	u32 trng_value;
--	int len = min_t(int, sizeof(trng_value), max);
--
--	/*
--	 * Locking is provided by the caller so we can update device
--	 * hwrng-related fields safely
--	 */
--	trng_value = ioread32(ccp->io_regs + TRNG_OUT_REG);
--	if (!trng_value) {
--		/* Zero is returned if not data is available or if a
--		 * bad-entropy error is present. Assume an error if
--		 * we exceed TRNG_RETRIES reads of zero.
--		 */
--		if (ccp->hwrng_retries++ > TRNG_RETRIES)
--			return -EIO;
--
--		return 0;
--	}
--
--	/* Reset the counter and save the rng value */
--	ccp->hwrng_retries = 0;
--	memcpy(data, &trng_value, len);
--
--	return len;
--}
--
- static int ccp_init(struct ccp_device *ccp)
- {
- 	struct device *dev = ccp->dev;
-@@ -495,17 +466,6 @@ static void ccp_destroy(struct ccp_device *ccp)
- 	/* Remove this device from the list of available units first */
- 	ccp_del_device(ccp);
- 
--	/* Unregister the DMA engine */
--	ccp_dmaengine_unregister(ccp);
--
--	/* Unregister the RNG */
--	hwrng_unregister(&ccp->hwrng);
--
--	/* Stop the queue kthreads */
--	for (i = 0; i < ccp->cmd_q_count; i++)
--		if (ccp->cmd_q[i].kthread)
--			kthread_stop(ccp->cmd_q[i].kthread);
--
- 	/* Build queue interrupt mask (two interrupt masks per queue) */
- 	qim = 0;
- 	for (i = 0; i < ccp->cmd_q_count; i++) {
-@@ -523,6 +483,17 @@ static void ccp_destroy(struct ccp_device *ccp)
- 	}
- 	iowrite32(qim, ccp->io_regs + IRQ_STATUS_REG);
- 
-+	/* Unregister the DMA engine */
-+	ccp_dmaengine_unregister(ccp);
-+
-+	/* Unregister the RNG */
-+	hwrng_unregister(&ccp->hwrng);
-+
-+	/* Stop the queue kthreads */
-+	for (i = 0; i < ccp->cmd_q_count; i++)
-+		if (ccp->cmd_q[i].kthread)
-+			kthread_stop(ccp->cmd_q[i].kthread);
-+
- 	ccp->free_irq(ccp);
- 
- 	for (i = 0; i < ccp->cmd_q_count; i++)
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index 9c8cfbb..6b44730 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -409,6 +409,34 @@ struct ccp_device *ccp_alloc_struct(struct device *dev)
- 	return ccp;
- }
- 
-+int ccp_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
++static unsigned int ccp_get_free_slots(struct ccp_cmd_queue *cmd_q)
 +{
-+	struct ccp_device *ccp = container_of(rng, struct ccp_device, hwrng);
-+	u32 trng_value;
-+	int len = min_t(int, sizeof(trng_value), max);
-+
-+	/* Locking is provided by the caller so we can update device
-+	 * hwrng-related fields safely
-+	 */
-+	trng_value = ioread32(ccp->io_regs + TRNG_OUT_REG);
-+	if (!trng_value) {
-+		/* Zero is returned if not data is available or if a
-+		 * bad-entropy error is present. Assume an error if
-+		 * we exceed TRNG_RETRIES reads of zero.
-+		 */
-+		if (ccp->hwrng_retries++ > TRNG_RETRIES)
-+			return -EIO;
-+
-+		return 0;
-+	}
-+
-+	/* Reset the counter and save the rng value */
-+	ccp->hwrng_retries = 0;
-+	memcpy(data, &trng_value, len);
-+
-+	return len;
++	return CMD_Q_DEPTH(ioread32(cmd_q->reg_status));
 +}
 +
- #ifdef CONFIG_PM
- bool ccp_queues_suspended(struct ccp_device *ccp)
+ static int ccp_do_cmd(struct ccp_op *op, u32 *cr, unsigned int cr_count)
  {
+ 	struct ccp_cmd_queue *cmd_q = op->cmd_q;
+@@ -357,7 +362,7 @@ static int ccp_init(struct ccp_device *ccp)
+ 		cmd_q->int_ok = 1 << (i * 2);
+ 		cmd_q->int_err = 1 << ((i * 2) + 1);
+ 
+-		cmd_q->free_slots = CMD_Q_DEPTH(ioread32(cmd_q->reg_status));
++		cmd_q->free_slots = ccp_get_free_slots(cmd_q);
+ 
+ 		init_waitqueue_head(&cmd_q->int_queue);
+ 
+@@ -559,6 +564,7 @@ static const struct ccp_actions ccp3_actions = {
+ 	.sbfree = ccp_free_ksb,
+ 	.init = ccp_init,
+ 	.destroy = ccp_destroy,
++	.get_free_slots = ccp_get_free_slots,
+ 	.irqhandler = ccp_irq_handler,
+ };
+ 
 diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index 4e38a61..0c44c5e0 100644
+index 0c44c5e0..de90702 100644
 --- a/drivers/crypto/ccp/ccp-dev.h
 +++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -440,6 +440,7 @@ void ccp_del_device(struct ccp_device *ccp);
- struct ccp_device *ccp_alloc_struct(struct device *dev);
- bool ccp_queues_suspended(struct ccp_device *ccp);
- int ccp_cmd_queue_thread(void *data);
-+int ccp_trng_read(struct hwrng *rng, void *data, size_t max, bool wait);
+@@ -458,6 +458,7 @@ struct ccp_actions {
+ 	u32 (*sballoc)(struct ccp_cmd_queue *, unsigned int);
+ 	void (*sbfree)(struct ccp_cmd_queue *, unsigned int,
+ 			       unsigned int);
++	unsigned int (*get_free_slots)(struct ccp_cmd_queue *);
+ 	int (*init)(struct ccp_device *);
+ 	void (*destroy)(struct ccp_device *);
+ 	irqreturn_t (*irqhandler)(int, void *);
+diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+index bd9eb1d..fdab0ae 100644
+--- a/drivers/crypto/ccp/ccp-ops.c
++++ b/drivers/crypto/ccp/ccp-ops.c
+@@ -1765,7 +1765,7 @@ int ccp_run_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	cmd->engine_error = 0;
+ 	cmd_q->cmd_error = 0;
+ 	cmd_q->int_rcvd = 0;
+-	cmd_q->free_slots = CMD_Q_DEPTH(ioread32(cmd_q->reg_status));
++	cmd_q->free_slots = cmd_q->ccp->vdata->perform->get_free_slots(cmd_q);
  
- int ccp_run_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd);
- 
+ 	switch (cmd->engine) {
+ 	case CCP_ENGINE_AES:
