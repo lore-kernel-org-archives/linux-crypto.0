@@ -1,149 +1,33 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 10/10] crypto: ccp - Enable use of the additional CCP
-Date: Tue, 26 Jul 2016 19:10:49 -0500
-Message-ID: <20160727001049.24944.13728.stgit@taos>
-References: <20160727000652.24944.44919.stgit@taos>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH] DH support: add KDF handling support
+Date: Wed, 27 Jul 2016 08:55:31 +0100
+Message-ID: <9263.1469606131@warthog.procyon.org.uk>
+References: <alpine.OSX.2.20.1607141618170.69287@istotlan-mobl1.amr.corp.intel.com> <4161793.TTVXSVQtZL@positron.chronox.de> <1652054.TS73CfBaWe@positron.chronox.de> <alpine.OSX.2.20.1607131520480.52983@mjmartin-mac01.local> <1954976.nIU2Zma9Rk@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, Stephan Mueller <smueller@chronox.de>,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Mat Martineau <mathew.j.martineau@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0059.outbound.protection.outlook.com ([104.47.33.59]:38042
-	"EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751583AbcG0A0q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jul 2016 20:26:46 -0400
-In-Reply-To: <20160727000652.24944.44919.stgit@taos>
+Received: from mx1.redhat.com ([209.132.183.28]:60858 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751561AbcG0Hze (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 27 Jul 2016 03:55:34 -0400
+In-Reply-To: <alpine.OSX.2.20.1607141618170.69287@istotlan-mobl1.amr.corp.intel.com>
+Content-ID: <9262.1469606131.1@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-A second CCP is available, identical to the first, with
-its ownn PCI ID. Make it available for use by the crypto
-subsystem, as well as for DMA activity and random
-number generation.
+Mat Martineau <mathew.j.martineau@linux.intel.com> wrote:
 
-This device is not pre-configured at at boot time. The
-driver must configure it (during the probe) for use.
+> > Though, shall I stuff the wrapper code back into the existing dh_compute
+> > functions or can I leave them as separate functions?
+> 
+> I'm not sure. In the existing code there's one keyctl wrapper per keyctl
+> command. A combined wrapper would need some extra logic to decide whether
+> kdfparams is passed in or not, which is different from existing code.
 
+You shouldn't change the existing keyctl wrappers.  Feel free to add another
+one with extra arguments.
 
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
----
- drivers/crypto/ccp/ccp-dev-v5.c |   37 ++++++++++++++++++++++++++++++++++++-
- drivers/crypto/ccp/ccp-dev.h    |    8 ++++++++
- drivers/crypto/ccp/ccp-pci.c    |    2 ++
- 3 files changed, 46 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index 4086714..f499e34 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -835,7 +835,7 @@ static int ccp5_init(struct ccp_device *ccp)
- 	/* Register the DMA engine support */
- 	ret = ccp_dmaengine_register(ccp);
- 	if (ret)
--		goto e_hwrng;
-+		goto e_kthread;
- 
- 	return 0;
- 
-@@ -952,6 +952,33 @@ static void ccp5_config(struct ccp_device *ccp)
- 	iowrite32(0x00001249, ccp->io_regs + CMD5_REQID_CONFIG_OFFSET);
- }
- 
-+static void ccp5other_config(struct ccp_device *ccp)
-+{
-+	int i;
-+	u32 rnd;
-+
-+	/* We own all of the queues on the NTB CCP */
-+
-+	iowrite32(0x00012D57, ccp->io_regs + CMD5_TRNG_CTL_OFFSET);
-+	iowrite32(0x00000003, ccp->io_regs + CMD5_CONFIG_0_OFFSET);
-+	for (i = 0; i < 12; i++) {
-+		rnd = ioread32(ccp->io_regs + TRNG_OUT_REG);
-+		iowrite32(rnd, ccp->io_regs + CMD5_AES_MASK_OFFSET);
-+	}
-+
-+	iowrite32(0x0000001F, ccp->io_regs + CMD5_QUEUE_MASK_OFFSET);
-+	iowrite32(0x00005B6D, ccp->io_regs + CMD5_QUEUE_PRIO_OFFSET);
-+	iowrite32(0x00000000, ccp->io_regs + CMD5_CMD_TIMEOUT_OFFSET);
-+
-+	iowrite32(0x3FFFFFFF, ccp->io_regs + LSB_PRIVATE_MASK_LO_OFFSET);
-+	iowrite32(0x000003FF, ccp->io_regs + LSB_PRIVATE_MASK_HI_OFFSET);
-+
-+	iowrite32(0x00108823, ccp->io_regs + CMD5_CLK_GATE_CTL_OFFSET);
-+
-+	ccp5_config(ccp);
-+}
-+
-+/* Version 5 adds some function, but is essentially the same as v5 */
- static const struct ccp_actions ccp5_actions = {
- 	.aes = ccp5_perform_aes,
- 	.xts_aes = ccp5_perform_xts_aes,
-@@ -974,3 +1001,11 @@ struct ccp_vdata ccpv5 = {
- 	.bar = 2,
- 	.offset = 0x0,
- };
-+
-+struct ccp_vdata ccpv5other = {
-+	.version = CCP_VERSION(5, 0),
-+	.setup = ccp5other_config,
-+	.perform = &ccp5_actions,
-+	.bar = 2,
-+	.offset = 0x0,
-+};
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index d04bd61..ebc9365 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -63,7 +63,9 @@
- 
- /* ------------------------ CCP Version 5 Specifics ------------------------ */
- #define CMD5_QUEUE_MASK_OFFSET		0x00
-+#define	CMD5_QUEUE_PRIO_OFFSET		0x04
- #define CMD5_REQID_CONFIG_OFFSET	0x08
-+#define	CMD5_CMD_TIMEOUT_OFFSET		0x10
- #define LSB_PUBLIC_MASK_LO_OFFSET	0x18
- #define LSB_PUBLIC_MASK_HI_OFFSET	0x1C
- #define LSB_PRIVATE_MASK_LO_OFFSET	0x20
-@@ -83,6 +85,11 @@
- #define CMD5_Q_ABORT_BASE		0x0114
- #define CMD5_Q_AX_CACHE_BASE		0x0118
- 
-+#define	CMD5_CONFIG_0_OFFSET		0x6000
-+#define	CMD5_TRNG_CTL_OFFSET		0x6008
-+#define	CMD5_AES_MASK_OFFSET		0x6010
-+#define	CMD5_CLK_GATE_CTL_OFFSET	0x603C
-+
- /* Address offset between two virtual queue registers */
- #define CMD5_Q_STATUS_INCR		0x1000
- 
-@@ -634,5 +641,6 @@ struct ccp_vdata {
- 
- extern	struct ccp_vdata ccpv3;
- extern	struct ccp_vdata ccpv5;
-+extern	struct ccp_vdata ccpv5other;
- 
- #endif
-diff --git a/drivers/crypto/ccp/ccp-pci.c b/drivers/crypto/ccp/ccp-pci.c
-index 064e20f..239cbf2 100644
---- a/drivers/crypto/ccp/ccp-pci.c
-+++ b/drivers/crypto/ccp/ccp-pci.c
-@@ -232,6 +232,7 @@ static int ccp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- 	if (ccp->vdata->setup)
- 		ccp->vdata->setup(ccp);
-+
- 	ret = ccp->vdata->perform->init(ccp);
- 	if (ret)
- 		goto e_iomap;
-@@ -325,6 +326,7 @@ static int ccp_pci_resume(struct pci_dev *pdev)
- static const struct pci_device_id ccp_pci_table[] = {
- 	{ PCI_VDEVICE(AMD, 0x1537), (kernel_ulong_t)&ccpv3 },
- 	{ PCI_VDEVICE(AMD, 0x1456), (kernel_ulong_t)&ccpv5 },
-+	{ PCI_VDEVICE(AMD, 0x1468), (kernel_ulong_t)&ccpv5other },
- 	/* Last entry must be zero */
- 	{ 0, }
- };
+David
