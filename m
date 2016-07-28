@@ -1,9 +1,9 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: marvell - Fix memory leaks in TDMA chain for
- cipher requests
-Date: Thu, 28 Jul 2016 13:18:59 +0800
-Message-ID: <20160728051859.GA636@gondor.apana.org.au>
-References: <1469191239-17296-1-git-send-email-romain.perier@free-electrons.com>
+Subject: Re: [PATCH] crypto: marvell - Don't chain at DMA level when backlog
+ is disabled
+Date: Thu, 28 Jul 2016 13:19:46 +0800
+Message-ID: <20160728051946.GA656@gondor.apana.org.au>
+References: <1469191255-17443-1-git-send-email-romain.perier@free-electrons.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: boris.brezillon@free-electrons.com, arno@natisbad.org,
@@ -13,23 +13,24 @@ Cc: boris.brezillon@free-electrons.com, arno@natisbad.org,
 	gregory.clement@free-electrons.com
 To: Romain Perier <romain.perier@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47537 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:57464 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751361AbcG1FTc (ORCPT
+	with ESMTP id S1751361AbcG1FTv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Jul 2016 01:19:32 -0400
+	Thu, 28 Jul 2016 01:19:51 -0400
 Content-Disposition: inline
-In-Reply-To: <1469191239-17296-1-git-send-email-romain.perier@free-electrons.com>
+In-Reply-To: <1469191255-17443-1-git-send-email-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Romain Perier <romain.perier@free-electrons.com> wrote:
-> So far in mv_cesa_ablkcipher_dma_req_init, if an error is thrown while
-> the tdma chain is built there is a memory leak. This issue exists
-> because the chain is assigned later at the end of the function, so the
-> cleanup function is called with the wrong version of the chain.
+> The flag CRYPTO_TFM_REQ_MAY_BACKLOG is optional and can be set from the
+> user to put requests into the backlog queue when the main cryptographic
+> queue is full. Before calling mv_cesa_tdma_chain we must check the value
+> of the return status to be sure that the current request has been
+> correctly queued or added to the backlog.
 > 
-> Fixes: db509a45339f ("crypto: marvell/cesa - add TDMA support")
+> Fixes: 85030c5168f1 ("crypto: marvell - Add support for chaining...")
 > Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
 
 Patch applied.  Thanks.
