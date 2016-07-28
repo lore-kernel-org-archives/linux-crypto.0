@@ -1,60 +1,62 @@
-From: Nicolai Stange <nicstange@gmail.com>
-Subject: Re: lib/mpi: BUG: sleeping function called from invalid context on next-20160726
-Date: Thu, 28 Jul 2016 09:40:17 +0200
-Message-ID: <87invqp5we.fsf@gmail.com>
-References: <87d1lyiygu.fsf@gmail.com>
-	<20160728052917.GA811@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Nicolai Stange <nicstange@gmail.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160728052917.GA811@gondor.apana.org.au> (Herbert Xu's message
-	of "Thu, 28 Jul 2016 13:29:17 +0800")
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Romain Perier <romain.perier@free-electrons.com>
+Subject: [PATCH] crypto: marvell: Don't copy IV vectors from the _process op for ciphers
+Date: Thu, 28 Jul 2016 11:59:43 +0200
+Message-ID: <1469699983-21370-1-git-send-email-romain.perier@free-electrons.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Gregory Clement <gregory.clement@free-electrons.com>
+To: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Arnaud Ebalard <arno@natisbad.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from down.free-electrons.com ([37.187.137.238]:49690 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752056AbcG1J7z (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 28 Jul 2016 05:59:55 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
+The IV output vectors should only be copied from the _complete operation
+and not from the _process operation, i.e only from the operation that is
+designed to copy the result of the request to the right location. This
+copy is already done in the _complete operation, so this commit removes
+the duplicated code in the _process op.
 
-> On Wed, Jul 27, 2016 at 11:05:05PM +0200, Nicolai Stange wrote:
->> 
->> with linux-next-20160726, I get this:
->> 
->>  BUG: sleeping function called from invalid context at /mnt/scratch/nic/linux-next/mm/slab.h:388
->
-> Does this patch help?
+Fixes: 3610d6cd5231 ("crypto: marvell - Add a complete...")
+Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
+---
+ drivers/crypto/marvell/cipher.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
-Yes, works like a charm now!
-
-
->> I would have sent a patch, but there is another point which puzzles me
->> in mpi_read_raw_from_sgl():
->> 
->>   [...]
->>   const u8 *buff;
->>   [...]
->>   sg_miter_start(&miter, sgl, ents, SG_MITER_ATOMIC | SG_MITER_FROM_SG);
->> 
->>   lzeros = 0;
->>   len = 0;
->>   while (nbytes > 0) {
->>   	while (len && !*buff) {
->>   		lzeros++;
->>   		len--;
->>   		buff++;
->>   	}
->> 
->> 
->> Thus, buff isn't initialized before its first use? Or am I misreading
->> something here?
->
-> On the first entry len is zero therefore we will go to the end of the
-> loop and initialise buff.
-
-Hah! Thanks, although being obvious, I didn't see this...
-
-
-Thanks,
-
-Nicolai
+diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
+index 8391aba..d19dc96 100644
+--- a/drivers/crypto/marvell/cipher.c
++++ b/drivers/crypto/marvell/cipher.c
+@@ -139,20 +139,11 @@ static int mv_cesa_ablkcipher_process(struct crypto_async_request *req,
+ 	struct ablkcipher_request *ablkreq = ablkcipher_request_cast(req);
+ 	struct mv_cesa_ablkcipher_req *creq = ablkcipher_request_ctx(ablkreq);
+ 	struct mv_cesa_req *basereq = &creq->base;
+-	unsigned int ivsize;
+-	int ret;
+ 
+ 	if (mv_cesa_req_get_type(basereq) == CESA_STD_REQ)
+ 		return mv_cesa_ablkcipher_std_process(ablkreq, status);
+ 
+-	ret = mv_cesa_dma_process(basereq, status);
+-	if (ret)
+-		return ret;
+-
+-	ivsize = crypto_ablkcipher_ivsize(crypto_ablkcipher_reqtfm(ablkreq));
+-	memcpy_fromio(ablkreq->info, basereq->chain.last->data, ivsize);
+-
+-	return 0;
++	return mv_cesa_dma_process(basereq, status);
+ }
+ 
+ static void mv_cesa_ablkcipher_step(struct crypto_async_request *req)
+-- 
+2.8.1
