@@ -1,121 +1,75 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: getrandom waits for a long time when /dev/random is insufficiently read from
-Date: Fri, 29 Jul 2016 15:12:30 +0200
-Message-ID: <2622345.NpnZjxROFX@tauon.atsec.com>
-References: <20160728180732.12d38880@alex-desktop> <CAJU7zaL8G28chcwEEYAquApm2ncPaBjKky4UPaWVy=6B+-rsCA@mail.gmail.com> <20160729090345.798c3e6f.alex_y_xu@yahoo.ca>
+From: Alex Xu <alex_y_xu@yahoo.ca>
+Subject: Re: getrandom waits for a long time when /dev/random is
+ insufficiently read from
+Date: Fri, 29 Jul 2016 10:14:07 -0400
+Message-ID: <20160729101407.03123327.alex_y_xu@yahoo.ca>
+References: <20160728180732.12d38880@alex-desktop>
+	<CAJU7zaL8G28chcwEEYAquApm2ncPaBjKky4UPaWVy=6B+-rsCA@mail.gmail.com>
+	<20160729090345.798c3e6f.alex_y_xu@yahoo.ca>
+	<2622345.NpnZjxROFX@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Nikos Mavrogiannopoulos <nmav@gnutls.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	virtualization@lists.linux-foundation.org
-To: Alex Xu <alex_y_xu@yahoo.ca>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:33868 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751365AbcG2NMf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Jul 2016 09:12:35 -0400
-In-Reply-To: <20160729090345.798c3e6f.alex_y_xu@yahoo.ca>
+Received: from nm29-vm1.bullet.mail.bf1.yahoo.com ([98.139.213.144]:59696 "EHLO
+	nm29-vm1.bullet.mail.bf1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753000AbcG2OOM (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Jul 2016 10:14:12 -0400
+In-Reply-To: <2622345.NpnZjxROFX@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 29. Juli 2016, 09:03:45 CEST schrieb Alex Xu:
-
-Hi Alex,
-
-> On Fri, 29 Jul 2016 12:24:27 +0200
+On Fri, 29 Jul 2016 15:12:30 +0200
+Stephan Mueller <smueller@chronox.de> wrote as excerpted:
+> Am Freitag, 29. Juli 2016, 09:03:45 CEST schrieb Alex Xu:
+> > In my opinion, assuming I am not doing something terribly wrong,
+> > this constitutes a bug in the kernel's handling of getrandom calls
+> > at boot, possibly only when the primary source of entropy is
+> > virtio.  
 > 
-> Nikos Mavrogiannopoulos <nmav@gnutls.org> wrote:
-> > On Fri, Jul 29, 2016 at 7:40 AM, Stephan Mueller
-> > 
-> > <smueller@chronox.de> wrote:
-> > > And finally, you have a coding error that is very very common but
-> > > fatal when reading from /dev/random: you do not account for short
-> > > reads which implies that your loop continues even in the case of
-> > > short reads.
-> > > 
-> > > Fix your code with something like the following:
-> > > int read_random(char *buf, size_t buflen)
-> > > {
-> > > 
-> > >         int fd = 0;
-> > >         ssize_t ret = 0;
-> > >         size_t len = 0;
-> > >         
-> > >         fd = open("/dev/random", O_RDONLY|O_CLOEXEC);
-> > >         if(0 > fd)
-> > >         
-> > >                 return fd;
-> > >         
-> > >         do {
-> > >         
-> > >                 ret = read(fd, (buf + len), (buflen - len));
-> > >                 if (0 < ret)
-> > >                 
-> > >                         len += ret;
-> > >         
-> > >         } while ((0 < ret || EINTR == errno || ERESTART == errno)
-> > >         
-> > >                  && buflen > len);
-> > 
-> > Unless there is a documentation error, the same is required when using
-> > getrandom(). It can also return short as well as to be interrupted.
-> > 
-> > regards,
-> > Nikos
+> Nope, I do not think that this is true:
 > 
-> I am aware that (according to the documentation) both random(4) and
-> getrandom(2) may not return the full size of the read. However, that is
-> (as far as I know) not relevant to the point that I am making.
+> - /dev/random returns one byte for one byte of entropy received, but
+> it has a lower limit of 64 bits
 > 
-> What I am saying is that based on my understanding of random(4) and
-> getrandom(2), at boot, given the same buffer size, reading
-> from /dev/random should have the same behavior as calling getrandom
-> passing no flags.
-
-/dev/random can return after at least 64 bits received in the input_pool 
-whereas getrandom waits for 128 bits.
+> - getrandom behaves like /dev/urandom (i.e. nonblocking) except
+> during boot where it waits until the RNG has collected 128 bits
+> before operating like a DRNG that is seeded once in a while when
+> entropy comes in.
 > 
-> The buffer size can also be set to 1 with similar results, but the
-> iteration number for success must be then increased to a large number.
-> IME 30 worked consistently while 29 hung; your results may vary.
 > 
-> The interesting thing is though, if GRND_RANDOM is passed to getrandom,
-> then it does not hang and returns 1 byte immediately (whether or not
-> GRND_NONBLOCK is set).
+> Ciao
+> Stephan
 
-Sure, because there is one byte in the input_pool at the time user space 
-boots. Note again, /dev/random waits until having 64 bits.
+I don't follow. Assuming you are correct and this is the issue, then
+reading 128 bits (16 bytes) from /dev/random should "exhaust the
+supply" and then both reads from /dev/random and calling getrandom
+should block.
 
-> 
-> 1, 2..29: reads all return 1 byte, getrandom pauses for 90-110 secs then
-> returns 1 byte
-> 30+: reads all return 1 byte, getrandom immediately returns 1 byte
-> -r 0: getrandom immediately returns 1 byte
-> -r 1, -r 2, -r 128, -r 256: reads all return 1 byte, getrandom
-> immediately returns 1 byte
-> 
-I would say that this is expected.
+That, however, is not the behavior I observed, which is that reading
+any amount from /dev/random will never block (since it is fed
+from /dev/urandom on the host side) whereas calling getrandom will
+always block unless /dev/random is read from first.
 
-> Moving the open and close calls outside of the loop produces the same
-> results. Writing 4096 bytes to /dev/urandom also has no effect.
+Moreover, as long as virtio-rng is available (and fed
+from /dev/urandom), /proc/sys/kernel/random/entropy_avail is always 961
+immediately after booting, which is more than enough to satisfy a
+one-byte read. After reading 1 byte, the estimate decreases to 896 or
+897, but after reading 29 more bytes it increases to 1106.
 
-Sure, it does not update the input_pool. Only the IOCTL can update the 
-input_pool from user space.
-> 
-> In my opinion, assuming I am not doing something terribly wrong, this
-> constitutes a bug in the kernel's handling of getrandom calls at boot,
-> possibly only when the primary source of entropy is virtio.
+Again, these observations are consistent with the conjecture that the
+issue arises since virtio-rng is a "pull" source of entropy whereas
+most other methods (e.g. interrupt timing) are "push" sources. I
+suspect that a similar issue occurs if RDRAND is the only source of
+entropy.
 
-Nope, I do not think that this is true:
-
-- /dev/random returns one byte for one byte of entropy received, but it has a 
-lower limit of 64 bits
-
-- getrandom behaves like /dev/urandom (i.e. nonblocking) except during boot 
-where it waits until the RNG has collected 128 bits before operating like a 
-DRNG that is seeded once in a while when entropy comes in.
-
-
-Ciao
-Stephan
+I also tried running rngd in the guest which resolved the issue but
+seems entirely stupid to me, even moreso since
+http://rhelblog.redhat.com/2015/03/09/red-hat-enterprise-linux-virtual-machines-access-to-random-numbers-made-easy/
+says that "The use of rngd is now not required and the guest kernel
+itself fetches entropy from the host when the available entropy falls
+below a specific threshold.".
