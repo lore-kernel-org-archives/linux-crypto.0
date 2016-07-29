@@ -1,66 +1,70 @@
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [PATCH 2/8] KEYS: Provide keyctls to drive the new key type ops
- for asymmetric keys [ver #2]
-Date: Thu, 28 Jul 2016 16:21:34 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1607281535550.15062@mjmartin-mac01.local>
-References: <146668965425.2977.13357101274301968911.stgit@warthog.procyon.org.uk> <146668966955.2977.16073224235350760987.stgit@warthog.procyon.org.uk>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: getrandom waits for a long time when /dev/random is insufficiently read from
+Date: Fri, 29 Jul 2016 07:40:02 +0200
+Message-ID: <2481163.nONN48TG9I@tauon.atsec.com>
+References: <20160728180732.12d38880@alex-desktop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Cc: dwmw2@infradead.org, tadeusz.struk@intel.com,
-	linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org,
+	virtualization@lists.linux-foundation.org
+To: Alex Xu <alex_y_xu@yahoo.ca>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:31544 "EHLO mga01.intel.com"
+Received: from mail.eperm.de ([89.247.134.16]:33846 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751147AbcG1XVh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Jul 2016 19:21:37 -0400
-In-Reply-To: <146668966955.2977.16073224235350760987.stgit@warthog.procyon.org.uk>
+	id S1750752AbcG2FkH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Jul 2016 01:40:07 -0400
+In-Reply-To: <20160728180732.12d38880@alex-desktop>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Am Donnerstag, 28. Juli 2016, 18:07:32 CEST schrieb Alex Xu:
 
-On Thu, 23 Jun 2016, David Howells wrote:
+Hi Alex,
 
-> diff --git a/include/uapi/linux/keyctl.h b/include/uapi/linux/keyctl.h
-> index 8ac2c5fbc8fc..93ebd25b1427 100644
-> --- a/include/uapi/linux/keyctl.h
-> +++ b/include/uapi/linux/keyctl.h
-> @@ -60,6 +60,11 @@
-> #define KEYCTL_INVALIDATE		21	/* invalidate a key */
-> #define KEYCTL_GET_PERSISTENT		22	/* get a user's persistent keyring */
-> #define KEYCTL_DH_COMPUTE		23	/* Compute Diffie-Hellman values */
-> +#define KEYCTL_PKEY_QUERY		24	/* Query public key parameters */
-> +#define KEYCTL_PKEY_ENCRYPT		25	/* Encrypt a blob using a public key */
-> +#define KEYCTL_PKEY_DECRYPT		26	/* Decrypt a blob using a public key */
-> +#define KEYCTL_PKEY_SIGN		27	/* Create a public key signature */
-> +#define KEYCTL_PKEY_VERIFY		28	/* Verify a public key signature */
->
-> /* keyctl structures */
-> struct keyctl_dh_params {
-> @@ -73,4 +78,24 @@ struct keyctl_dh_params {
-> #define KEYCTL_SUPPORTS_SIGN		0x04
-> #define KEYCTL_SUPPORTS_VERIFY		0x08
->
-> +struct keyctl_pkey_query {
-> +	__u32		supported_ops;	/* Which ops are supported */
-> +	__u32		key_size;	/* Size of the key in bits */
-> +	__u16		max_data_size;	/* Maximum size of raw data to sign in bytes */
-> +	__u16		max_sig_size;	/* Maximum size of signature in bytes */
-> +	__u16		max_enc_size;	/* Maximum size of encrypted blob in bytes */
-> +	__u16		max_dec_size;	/* Maximum size of decrypted blob in bytes */
-> +	__u32		__spare[10];
-> +};
+> Linux 4.6, also tried 4.7, qemu 2.6, using this C program:
 
-It would also be useful to return pkey_algo so userspace can see which 
-algorithm is in use for the given public key. The public key algorithm is 
-printed in /proc/keys, but is not returned by KEYCTL_PKEY_QUERY or 
-KEYCTL_DESCRIBE.
+I am not sure what problem you are referring to, but that is an expected 
+behavior.
 
-Does it make sense to add the information from key->type->describe() to 
-KEYCTL_PKEY_QUERY or KEYCTL_DESCRIBE? Or add something new like 
-KEYCTL_DESCRIBE_TYPE?
+You get partial reads when reading from /dev/random with a minimum of 64 
+bits. On the other hand getrandom(2) is woken up after the input_pool 
+received 128 bits of entropy.
 
---
-Mat Martineau
-Intel OTC
+In you strace you see that after reading 16 bytes from /dev/random, the 
+getrandom unblocks and starts delivering.
+
+Note, in virtualized environments the current Linux /dev/random 
+implementation collects massively less entropy compared to a bare-metal 
+system. Hence the long wait time of your 90 to 100 secs until getrandom 
+unblocks.
+
+Besides, even without reading from /dev/random, your getrandom will wait that 
+long.
+
+And finally, you have a coding error that is very very common but fatal when 
+reading from /dev/random: you do not account for short reads which implies 
+that your loop continues even in the case of short reads.
+
+Fix your code with something like the following:
+
+int read_random(char *buf, size_t buflen)
+{
+        int fd = 0;
+        ssize_t ret = 0;
+        size_t len = 0;
+
+        fd = open("/dev/random", O_RDONLY|O_CLOEXEC);
+        if(0 > fd)
+                return fd;
+        do {
+                ret = read(fd, (buf + len), (buflen - len));
+                if (0 < ret)
+                        len += ret;
+        } while ((0 < ret || EINTR == errno || ERESTART == errno)
+                 && buflen > len);
+
+...
+
+Ciao
+Stephan
