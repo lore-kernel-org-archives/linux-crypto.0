@@ -1,70 +1,81 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: getrandom waits for a long time when /dev/random is insufficiently read from
-Date: Fri, 29 Jul 2016 07:40:02 +0200
-Message-ID: <2481163.nONN48TG9I@tauon.atsec.com>
-References: <20160728180732.12d38880@alex-desktop>
+From: <yanjiang.jin@windriver.com>
+Subject: [PATCH] crypto/testmgr.c: fix !x==y confusion
+Date: Fri, 29 Jul 2016 16:32:09 +0800
+Message-ID: <1469781129-24304-1-git-send-email-yanjiang.jin@windriver.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org,
-	virtualization@lists.linux-foundation.org
-To: Alex Xu <alex_y_xu@yahoo.ca>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:33846 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750752AbcG2FkH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Jul 2016 01:40:07 -0400
-In-Reply-To: <20160728180732.12d38880@alex-desktop>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<jinyanjiang@gmail.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 28. Juli 2016, 18:07:32 CEST schrieb Alex Xu:
+From: Yanjiang Jin <yanjiang.jin@windriver.com>
 
-Hi Alex,
+"if (!ret == template[i].fail)" is confusing to compilers (gcc5):
 
-> Linux 4.6, also tried 4.7, qemu 2.6, using this C program:
+crypto/testmgr.c: In function '__test_aead':
+crypto/testmgr.c:531:12: warning: logical not is only applied to the
+left hand side of comparison [-Wlogical-not-parentheses]
+   if (!ret == template[i].fail) {
+            ^
 
-I am not sure what problem you are referring to, but that is an expected 
-behavior.
+Let there be 'if (template[i].fail == !ret) '.
 
-You get partial reads when reading from /dev/random with a minimum of 64 
-bits. On the other hand getrandom(2) is woken up after the input_pool 
-received 128 bits of entropy.
+Signed-off-by: Yanjiang Jin <yanjiang.jin@windriver.com>
+---
+ crypto/testmgr.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-In you strace you see that after reading 16 bytes from /dev/random, the 
-getrandom unblocks and starts delivering.
-
-Note, in virtualized environments the current Linux /dev/random 
-implementation collects massively less entropy compared to a bare-metal 
-system. Hence the long wait time of your 90 to 100 secs until getrandom 
-unblocks.
-
-Besides, even without reading from /dev/random, your getrandom will wait that 
-long.
-
-And finally, you have a coding error that is very very common but fatal when 
-reading from /dev/random: you do not account for short reads which implies 
-that your loop continues even in the case of short reads.
-
-Fix your code with something like the following:
-
-int read_random(char *buf, size_t buflen)
-{
-        int fd = 0;
-        ssize_t ret = 0;
-        size_t len = 0;
-
-        fd = open("/dev/random", O_RDONLY|O_CLOEXEC);
-        if(0 > fd)
-                return fd;
-        do {
-                ret = read(fd, (buf + len), (buflen - len));
-                if (0 < ret)
-                        len += ret;
-        } while ((0 < ret || EINTR == errno || ERESTART == errno)
-                 && buflen > len);
-
-...
-
-Ciao
-Stephan
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 5c9d5a5..c2a8bd3 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -665,7 +665,7 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
+ 		memcpy(key, template[i].key, template[i].klen);
+ 
+ 		ret = crypto_aead_setkey(tfm, key, template[i].klen);
+-		if (!ret == template[i].fail) {
++		if (template[i].fail == !ret) {
+ 			pr_err("alg: aead%s: setkey failed on test %d for %s: flags=%x\n",
+ 			       d, j, algo, crypto_aead_get_flags(tfm));
+ 			goto out;
+@@ -770,7 +770,7 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
+ 		memcpy(key, template[i].key, template[i].klen);
+ 
+ 		ret = crypto_aead_setkey(tfm, key, template[i].klen);
+-		if (!ret == template[i].fail) {
++		if (template[i].fail == !ret) {
+ 			pr_err("alg: aead%s: setkey failed on chunk test %d for %s: flags=%x\n",
+ 			       d, j, algo, crypto_aead_get_flags(tfm));
+ 			goto out;
+@@ -1023,7 +1023,7 @@ static int test_cipher(struct crypto_cipher *tfm, int enc,
+ 
+ 		ret = crypto_cipher_setkey(tfm, template[i].key,
+ 					   template[i].klen);
+-		if (!ret == template[i].fail) {
++		if (template[i].fail == !ret) {
+ 			printk(KERN_ERR "alg: cipher: setkey failed "
+ 			       "on test %d for %s: flags=%x\n", j,
+ 			       algo, crypto_cipher_get_flags(tfm));
+@@ -1133,7 +1133,7 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
+ 
+ 		ret = crypto_skcipher_setkey(tfm, template[i].key,
+ 					     template[i].klen);
+-		if (!ret == template[i].fail) {
++		if (template[i].fail == !ret) {
+ 			pr_err("alg: skcipher%s: setkey failed on test %d for %s: flags=%x\n",
+ 			       d, j, algo, crypto_skcipher_get_flags(tfm));
+ 			goto out;
+@@ -1211,7 +1211,7 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
+ 
+ 		ret = crypto_skcipher_setkey(tfm, template[i].key,
+ 					     template[i].klen);
+-		if (!ret == template[i].fail) {
++		if (template[i].fail == !ret) {
+ 			pr_err("alg: skcipher%s: setkey failed on chunk test %d for %s: flags=%x\n",
+ 			       d, j, algo, crypto_skcipher_get_flags(tfm));
+ 			goto out;
+-- 
+1.9.1
