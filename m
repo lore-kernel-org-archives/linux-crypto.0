@@ -1,32 +1,51 @@
-From: Sandy Harris <sandyinchina@gmail.com>
-Subject: Fwd: maxwell RNG
-Date: Sun, 31 Jul 2016 20:47:06 -0400
-Message-ID: <CACXcFmnvXBVjx6GNE9JSUZTgT4JXhUzU_y2HZaYFOhhmhTLxKg@mail.gmail.com>
-References: <CACXcFmmX=+hjwOM1voVh7dwcXyoek0KSPse=REEMDKa7LRHf9w@mail.gmail.com>
+From: Nicolas Brunie <nbrunie@kalray.eu>
+Subject: Re: a few questions on AF_ALG specification (AEAD,
+ socket/connection, ...)
+Date: Mon, 1 Aug 2016 11:14:07 +0200 (CEST)
+Message-ID: <706562074.101482886.1470042847657.JavaMail.zimbra@kalray.eu>
+References: <57974E05.3030502@kalray.eu> <2101527.nPISZxk4jO@tauon.atsec.com> <429e56bc-4ae9-a682-63a4-b34a38295abc@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: "Theodore Ts'o" <tytso@mit.edu>, John Denker <jsd@av8n.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Cc: Stephan Mueller <smueller@chronox.de>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f54.google.com ([209.85.213.54]:34955 "EHLO
-	mail-vk0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750805AbcHAArI (ORCPT
+Received: from zimbra1.kalray.eu ([92.103.151.219]:42206 "EHLO
+	zimbra1.kalray.eu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751132AbcHAJYl convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 31 Jul 2016 20:47:08 -0400
-Received: by mail-vk0-f54.google.com with SMTP id w127so89082536vkh.2
-        for <linux-crypto@vger.kernel.org>; Sun, 31 Jul 2016 17:47:08 -0700 (PDT)
-In-Reply-To: <CACXcFmmX=+hjwOM1voVh7dwcXyoek0KSPse=REEMDKa7LRHf9w@mail.gmail.com>
+	Mon, 1 Aug 2016 05:24:41 -0400
+In-Reply-To: <429e56bc-4ae9-a682-63a4-b34a38295abc@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Version 2 of my maxwell(8) rng is now at:
-https://github.com/sandy-harris/maxwell
+Hi,
+  In my understanding, a socket is the file descriptor given as argument to a bind call and a connection is the file descriptor returned by an accept call. 
 
-It is a fairly simple program to gather entropy from timer
-fluctuations & feed results into the Linux random(4) device. Small
---only 600 lines so reasonably easy to audit -- cheap & effective.
+NB
 
-It has not changed much since the original (2012) release. The main
-changes now are a new interface (cleaner command-line option set) and
-a variety of cleanups to both code & documentation.
+
+
+----- Mail original -----
+De: "Tadeusz Struk" <tadeusz.struk@intel.com>
+À: "Stephan Mueller" <smueller@chronox.de>, "Nicolas Brunie" <nicolas.brunie@kalray.eu>
+Cc: "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>
+Envoyé: Mardi 26 Juillet 2016 16:37:51
+Objet: Re: a few questions on AF_ALG specification (AEAD, socket/connection, ...)
+
+Hi,
+On 07/26/2016 04:54 AM, Stephan Mueller wrote:
+>> > Is it true that the key (defined via setsockopt) is common to all the
+>> > connections but the IV (defined through message control header) is
+>> > specific to each connection ?
+> Yes.
+
+I think that's not correct. Please define a "connection".
+If you think of connections as separate sockets, then you can
+have different keys for each socket. The difference is that
+you set a key per each socket once, and you send IV for each
+operation (encrypt/decrypt).
+Thanks,
+-- 
+TS
