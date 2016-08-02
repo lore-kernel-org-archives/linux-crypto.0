@@ -1,20 +1,26 @@
 From: Baole Ni <baolex.ni@intel.com>
-Subject: [PATCH 0100/1285] Replace numeric parameter like 0444 with macro
-Date: Tue,  2 Aug 2016 18:40:40 +0800
-Message-ID: <20160802104040.20423-1-baolex.ni@intel.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mpm@selenic.com, herbert@gondor.apana.org.au, jslaby@suse.cz,
-	peter@korsgaard.com, lee.jones@linaro.org,
-	chuansheng.liu@intel.com, baolex.ni@intel.com
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
-	gregkh@linuxfoundation.org, hpa@zytor.com, x86@kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:61961 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753947AbcHBLTR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Aug 2016 07:19:17 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Subject: [PATCH 0130/1285] Replace numeric parameter like 0444 with macro
+Date: Tue,  2 Aug 2016 18:42:56 +0800
+Message-ID: <20160802104256.22416-1-baolex.ni@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: peter@korsgaard.com, linux-kernel@vger.kernel.org, baolex.ni@intel.com,
+ linux-crypto@vger.kernel.org, chuansheng.liu@intel.com, lee.jones@linaro.org,
+ linux-arm-kernel@lists.infradead.org
+To: jamie@jamieiles.com, herbert@gondor.apana.org.au, davem@davemloft.net,
+ hpa@zytor.com, x86@kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
 I find that the developers often just specified the numeric value
 when calling a macro which is defined with a parameter for access permission.
@@ -25,25 +31,21 @@ thus, I suggest replacing the numeric parameter with the macro.
 Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
 Signed-off-by: Baole Ni <baolex.ni@intel.com>
 ---
- drivers/char/hw_random/core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/picoxcell_crypto.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 9203f2d..09dce37 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -63,10 +63,10 @@ static u8 *rng_buffer, *rng_fillbuf;
- static unsigned short current_quality;
- static unsigned short default_quality; /* = 0; default to "off" */
+diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
+index 3b1c7ec..e535d10 100644
+--- a/drivers/crypto/picoxcell_crypto.c
++++ b/drivers/crypto/picoxcell_crypto.c
+@@ -1224,7 +1224,7 @@ static ssize_t spacc_stat_irq_thresh_store(struct device *dev,
  
--module_param(current_quality, ushort, 0644);
-+module_param(current_quality, ushort, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- MODULE_PARM_DESC(current_quality,
- 		 "current hwrng entropy estimation per mill");
--module_param(default_quality, ushort, 0644);
-+module_param(default_quality, ushort, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- MODULE_PARM_DESC(default_quality,
- 		 "default entropy content of hwrng per mill");
+ 	return len;
+ }
+-static DEVICE_ATTR(stat_irq_thresh, 0644, spacc_stat_irq_thresh_show,
++static DEVICE_ATTR(stat_irq_thresh, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH, spacc_stat_irq_thresh_show,
+ 		   spacc_stat_irq_thresh_store);
  
+ static struct spacc_alg ipsec_engine_algs[] = {
 -- 
 2.9.2
