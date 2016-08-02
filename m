@@ -1,11 +1,11 @@
 From: Baole Ni <baolex.ni@intel.com>
-Subject: [PATCH 0129/1285] Replace numeric parameter like 0444 with macro
-Date: Tue,  2 Aug 2016 18:42:52 +0800
-Message-ID: <20160802104252.22350-1-baolex.ni@intel.com>
+Subject: [PATCH 0127/1285] Replace numeric parameter like 0444 with macro
+Date: Tue,  2 Aug 2016 18:42:42 +0800
+Message-ID: <20160802104242.22217-1-baolex.ni@intel.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	chuansheng.liu@intel.com, baolex.ni@intel.com, jslaby@suse.cz,
 	peter@korsgaard.com, lee.jones@linaro.org
-To: boris.brezillon@free-electrons.com, arno@natisbad.org,
+To: thomas.lendacky@amd.com, gary.hook@amd.com,
 	herbert@gondor.apana.org.au, davem@davemloft.net, hpa@zytor.com,
 	x86@kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
@@ -21,21 +21,26 @@ thus, I suggest replacing the numeric parameter with the macro.
 Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
 Signed-off-by: Baole Ni <baolex.ni@intel.com>
 ---
- drivers/crypto/marvell/cesa.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/ccp/ccp-crypto-main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-index e8ef9fd..5edbcc4 100644
---- a/drivers/crypto/marvell/cesa.c
-+++ b/drivers/crypto/marvell/cesa.c
-@@ -32,7 +32,7 @@
- #include "cesa.h"
+diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
+index e0380e5..34e130c 100644
+--- a/drivers/crypto/ccp/ccp-crypto-main.c
++++ b/drivers/crypto/ccp/ccp-crypto-main.c
+@@ -26,11 +26,11 @@ MODULE_VERSION("1.0.0");
+ MODULE_DESCRIPTION("AMD Cryptographic Coprocessor crypto API support");
  
- static int allhwsupport = !IS_ENABLED(CONFIG_CRYPTO_DEV_MV_CESA);
--module_param_named(allhwsupport, allhwsupport, int, 0444);
-+module_param_named(allhwsupport, allhwsupport, int, S_IRUSR | S_IRGRP | S_IROTH);
- MODULE_PARM_DESC(allhwsupport, "Enable support for all hardware (even it if overlaps with the mv_cesa driver)");
+ static unsigned int aes_disable;
+-module_param(aes_disable, uint, 0444);
++module_param(aes_disable, uint, S_IRUSR | S_IRGRP | S_IROTH);
+ MODULE_PARM_DESC(aes_disable, "Disable use of AES - any non-zero value");
  
- struct mv_cesa_dev *cesa_dev;
+ static unsigned int sha_disable;
+-module_param(sha_disable, uint, 0444);
++module_param(sha_disable, uint, S_IRUSR | S_IRGRP | S_IROTH);
+ MODULE_PARM_DESC(sha_disable, "Disable use of SHA - any non-zero value");
+ 
+ /* List heads for the supported algorithms */
 -- 
 2.9.2
