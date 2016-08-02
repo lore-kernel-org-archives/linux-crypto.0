@@ -1,58 +1,94 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.8
-Date: Mon, 1 Aug 2016 17:58:21 +0800
-Message-ID: <20160801095821.GA1260@gondor.apana.org.au>
-References: <20140804130339.GA1178@gondor.apana.org.au>
- <20141007131826.GA29688@gondor.apana.org.au>
- <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150415033951.GA1406@gondor.apana.org.au>
- <20150622084457.GA7806@gondor.apana.org.au>
- <20150831135655.GA2694@gondor.apana.org.au>
- <20151102080427.GA8465@gondor.apana.org.au>
- <20160111101450.GA24044@gondor.apana.org.au>
- <20160122101828.GA15966@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+From: Baole Ni <baolex.ni@intel.com>
+Subject: [PATCH 0020/1285] Replace numeric parameter like 0444 with macro
+Date: Tue,  2 Aug 2016 18:34:49 +0800
+Message-ID: <20160802103449.15093-1-baolex.ni@intel.com>
+Cc: linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org, chuansheng.liu@intel.com,
+	baolex.ni@intel.com
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20160122101828.GA15966@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+I find that the developers often just specified the numeric value
+when calling a macro which is defined with a parameter for access permission.
+As we know, these numeric value for access permission have had the corresponding macro,
+and that using macro can improve the robustness and readability of the code,
+thus, I suggest replacing the numeric parameter with the macro.
 
-This push fixes a number of regressions in the marvell cesa driver
-caused by the chaining work, and a regression in lib/mpi that
-leads to a GFP_KERNEL allocation with preemption disabled.
+Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
+Signed-off-by: Baole Ni <baolex.ni@intel.com>
+---
+ arch/s390/crypto/prng.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Herbert Xu (1):
-      lib/mpi: Fix SG miter leak
-
-Romain Perier (4):
-      crypto: marvell - Fix memory leaks in TDMA chain for cipher requests
-      crypto: marvell - Don't chain at DMA level when backlog is disabled
-      crypto: marvell - Update cache with input sg only when it is unmapped
-      crypto: marvell - Don't copy IV vectors from the _process op for ciphers
-
- drivers/crypto/marvell/cesa.c   |    7 ++++---
- drivers/crypto/marvell/cipher.c |   25 +++++++------------------
- drivers/crypto/marvell/hash.c   |   12 ++++++------
- lib/mpi/mpicoder.c              |   14 +++++++-------
- 4 files changed, 24 insertions(+), 34 deletions(-)
-
-Thanks,
+diff --git a/arch/s390/crypto/prng.c b/arch/s390/crypto/prng.c
+index 41527b1..dc2342e 100644
+--- a/arch/s390/crypto/prng.c
++++ b/arch/s390/crypto/prng.c
+@@ -678,7 +678,7 @@ static ssize_t prng_chunksize_show(struct device *dev,
+ {
+ 	return snprintf(buf, PAGE_SIZE, "%u\n", prng_chunk_size);
+ }
+-static DEVICE_ATTR(chunksize, 0444, prng_chunksize_show, NULL);
++static DEVICE_ATTR(chunksize, S_IRUSR | S_IRGRP | S_IROTH, prng_chunksize_show, NULL);
+ 
+ /* counter attribute (ro) */
+ static ssize_t prng_counter_show(struct device *dev,
+@@ -697,7 +697,7 @@ static ssize_t prng_counter_show(struct device *dev,
+ 
+ 	return snprintf(buf, PAGE_SIZE, "%llu\n", counter);
+ }
+-static DEVICE_ATTR(byte_counter, 0444, prng_counter_show, NULL);
++static DEVICE_ATTR(byte_counter, S_IRUSR | S_IRGRP | S_IROTH, prng_counter_show, NULL);
+ 
+ /* errorflag attribute (ro) */
+ static ssize_t prng_errorflag_show(struct device *dev,
+@@ -706,7 +706,7 @@ static ssize_t prng_errorflag_show(struct device *dev,
+ {
+ 	return snprintf(buf, PAGE_SIZE, "%d\n", prng_errorflag);
+ }
+-static DEVICE_ATTR(errorflag, 0444, prng_errorflag_show, NULL);
++static DEVICE_ATTR(errorflag, S_IRUSR | S_IRGRP | S_IROTH, prng_errorflag_show, NULL);
+ 
+ /* mode attribute (ro) */
+ static ssize_t prng_mode_show(struct device *dev,
+@@ -718,7 +718,7 @@ static ssize_t prng_mode_show(struct device *dev,
+ 	else
+ 		return snprintf(buf, PAGE_SIZE, "SHA512\n");
+ }
+-static DEVICE_ATTR(mode, 0444, prng_mode_show, NULL);
++static DEVICE_ATTR(mode, S_IRUSR | S_IRGRP | S_IROTH, prng_mode_show, NULL);
+ 
+ /* reseed attribute (w) */
+ static ssize_t prng_reseed_store(struct device *dev,
+@@ -732,7 +732,7 @@ static ssize_t prng_reseed_store(struct device *dev,
+ 
+ 	return count;
+ }
+-static DEVICE_ATTR(reseed, 0200, NULL, prng_reseed_store);
++static DEVICE_ATTR(reseed, S_IWUSR, NULL, prng_reseed_store);
+ 
+ /* reseed limit attribute (rw) */
+ static ssize_t prng_reseed_limit_show(struct device *dev,
+@@ -762,7 +762,7 @@ static ssize_t prng_reseed_limit_store(struct device *dev,
+ 
+ 	return count;
+ }
+-static DEVICE_ATTR(reseed_limit, 0644,
++static DEVICE_ATTR(reseed_limit, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH,
+ 		   prng_reseed_limit_show, prng_reseed_limit_store);
+ 
+ /* strength attribute (ro) */
+@@ -772,7 +772,7 @@ static ssize_t prng_strength_show(struct device *dev,
+ {
+ 	return snprintf(buf, PAGE_SIZE, "256\n");
+ }
+-static DEVICE_ATTR(strength, 0444, prng_strength_show, NULL);
++static DEVICE_ATTR(strength, S_IRUSR | S_IRGRP | S_IROTH, prng_strength_show, NULL);
+ 
+ static struct attribute *prng_sha512_dev_attrs[] = {
+ 	&dev_attr_errorflag.attr,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.9.2
