@@ -1,11 +1,12 @@
 From: Baole Ni <baolex.ni@intel.com>
-Subject: [PATCH 0128/1285] Replace numeric parameter like 0444 with macro
-Date: Tue,  2 Aug 2016 18:42:47 +0800
-Message-ID: <20160802104247.22284-1-baolex.ni@intel.com>
+Subject: [PATCH 0129/1285] Replace numeric parameter like 0444 with macro
+Date: Tue,  2 Aug 2016 18:42:52 +0800
+Message-ID: <20160802104252.22350-1-baolex.ni@intel.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	chuansheng.liu@intel.com, baolex.ni@intel.com, jslaby@suse.cz,
 	peter@korsgaard.com, lee.jones@linaro.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net, hpa@zytor.com,
+To: boris.brezillon@free-electrons.com, arno@natisbad.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net, hpa@zytor.com,
 	x86@kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
@@ -20,21 +21,21 @@ thus, I suggest replacing the numeric parameter with the macro.
 Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
 Signed-off-by: Baole Ni <baolex.ni@intel.com>
 ---
- drivers/crypto/hifn_795x.c | 2 +-
+ drivers/crypto/marvell/cesa.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index eee2c7e..dfcaa29 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -33,7 +33,7 @@
- #include <crypto/des.h>
+diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
+index e8ef9fd..5edbcc4 100644
+--- a/drivers/crypto/marvell/cesa.c
++++ b/drivers/crypto/marvell/cesa.c
+@@ -32,7 +32,7 @@
+ #include "cesa.h"
  
- static char hifn_pll_ref[sizeof("extNNN")] = "ext";
--module_param_string(hifn_pll_ref, hifn_pll_ref, sizeof(hifn_pll_ref), 0444);
-+module_param_string(hifn_pll_ref, hifn_pll_ref, sizeof(hifn_pll_ref), S_IRUSR | S_IRGRP | S_IROTH);
- MODULE_PARM_DESC(hifn_pll_ref,
- 		 "PLL reference clock (pci[freq] or ext[freq], default ext)");
+ static int allhwsupport = !IS_ENABLED(CONFIG_CRYPTO_DEV_MV_CESA);
+-module_param_named(allhwsupport, allhwsupport, int, 0444);
++module_param_named(allhwsupport, allhwsupport, int, S_IRUSR | S_IRGRP | S_IROTH);
+ MODULE_PARM_DESC(allhwsupport, "Enable support for all hardware (even it if overlaps with the mv_cesa driver)");
  
+ struct mv_cesa_dev *cesa_dev;
 -- 
 2.9.2
