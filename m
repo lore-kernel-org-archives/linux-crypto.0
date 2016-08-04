@@ -1,182 +1,93 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCHv3 09/11] crypto: omap-aes: Add fallback support
-Date: Thu, 4 Aug 2016 13:28:44 +0300
-Message-ID: <1470306526-27219-10-git-send-email-t-kristo@ti.com>
+Subject: [PATCHv3 01/11] crypto: omap-sham: avoid executing tasklet where not
+ needed
+Date: Thu, 4 Aug 2016 13:28:36 +0300
+Message-ID: <1470306526-27219-2-git-send-email-t-kristo@ti.com>
 References: <1470306526-27219-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-arm-kernel@lists.infradead.org>
-To: <herbert@gondor.apana.org.au>, <lokeshvutla@ti.com>,
-	<davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-	<tony@atomide.com>, <linux-omap@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bear.ext.ti.com ([198.47.19.11]:55224 "EHLO bear.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755382AbcHDKaV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Aug 2016 06:30:21 -0400
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-arm-kernel@lists.infradead.org
+To: <herbert@gondor.apana.org.au>, <lokeshvutla@ti.com>, <davem@davemloft.net>,
+ <linux-crypto@vger.kernel.org>, <tony@atomide.com>,
+ <linux-omap@vger.kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <1470306526-27219-1-git-send-email-t-kristo@ti.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Lokesh Vutla <lokeshvutla@ti.com>
+Some of the call paths of OMAP SHA driver can avoid executing the next
+step of the crypto queue under tasklet; instead, execute the next step
+directly via function call. This avoids a costly round-trip via the
+scheduler giving a slight performance boost.
 
-As setting up the DMA operations is quite costly, add software fallback
-support for requests smaller than 200 bytes. This change gives some 10%
-extra performance in ipsec use case.
-
-Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
-[t-kristo@ti.com: udpated against latest upstream, to use skcipher mainly]
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/Kconfig    |  3 +++
- drivers/crypto/omap-aes.c | 53 +++++++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 52 insertions(+), 4 deletions(-)
+ drivers/crypto/omap-sham.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 1af94e2..19ee6ee 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -318,6 +318,9 @@ config CRYPTO_DEV_OMAP_AES
- 	select CRYPTO_AES
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_ENGINE
-+	select CRYPTO_CBC
-+	select CRYPTO_ECB
-+	select CRYPTO_CTR
- 	help
- 	  OMAP processors have AES module accelerator. Select this if you
- 	  want to use the OMAP module for AES algorithms.
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 3cf7b8f..6ba4f70 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -35,7 +35,7 @@
- #include <linux/interrupt.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/aes.h>
--#include <crypto/algapi.h>
-+#include <crypto/internal/skcipher.h>
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 7fe4eef..fd50005 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1005,9 +1005,6 @@ static void omap_sham_finish_req(struct ahash_request *req, int err)
  
- #define DST_MAXBURST			4
- #define DMA_MIN				(DST_MAXBURST * sizeof(u32))
-@@ -105,6 +105,7 @@ struct omap_aes_ctx {
- 	int		keylen;
- 	u32		key[AES_KEYSIZE_256 / sizeof(u32)];
- 	unsigned long	flags;
-+	struct crypto_skcipher	*fallback;
- };
+ 	if (req->base.complete)
+ 		req->base.complete(&req->base, err);
+-
+-	/* handle new request */
+-	tasklet_schedule(&dd->done_task);
+ }
  
- struct omap_aes_reqctx {
-@@ -701,11 +702,29 @@ static int omap_aes_crypt(struct ablkcipher_request *req, unsigned long mode)
- 			crypto_ablkcipher_reqtfm(req));
- 	struct omap_aes_reqctx *rctx = ablkcipher_request_ctx(req);
- 	struct omap_aes_dev *dd;
-+	int ret;
+ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
+@@ -1018,6 +1015,7 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
+ 	unsigned long flags;
+ 	int err = 0, ret = 0;
  
- 	pr_debug("nbytes: %d, enc: %d, cbc: %d\n", req->nbytes,
- 		  !!(mode & FLAGS_ENCRYPT),
- 		  !!(mode & FLAGS_CBC));
- 
-+	if (req->nbytes < 200) {
-+		SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
++retry:
+ 	spin_lock_irqsave(&dd->lock, flags);
+ 	if (req)
+ 		ret = ahash_enqueue_request(&dd->queue, req);
+@@ -1061,11 +1059,19 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
+ 		err = omap_sham_final_req(dd);
+ 	}
+ err1:
+-	if (err != -EINPROGRESS)
++	dev_dbg(dd->dev, "exit, err: %d\n", err);
 +
-+		skcipher_request_set_tfm(subreq, ctx->fallback);
-+		skcipher_request_set_callback(subreq, req->base.flags, NULL,
-+					      NULL);
-+		skcipher_request_set_crypt(subreq, req->src, req->dst,
-+					   req->nbytes, req->info);
-+
-+		if (mode & FLAGS_ENCRYPT)
-+			ret = crypto_skcipher_encrypt(subreq);
-+		else
-+			ret = crypto_skcipher_decrypt(subreq);
-+
-+		skcipher_request_zero(subreq);
-+		return ret;
++	if (err != -EINPROGRESS) {
+ 		/* done_task will not finish it, so do it here */
+ 		omap_sham_finish_req(req, err);
++		req = NULL;
+ 
+-	dev_dbg(dd->dev, "exit, err: %d\n", err);
++		/*
++		 * Execute next request immediately if there is anything
++		 * in queue.
++		 */
++		goto retry;
 +	}
- 	dd = omap_aes_find_dev(ctx);
- 	if (!dd)
- 		return -ENODEV;
-@@ -721,6 +740,7 @@ static int omap_aes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
- 			   unsigned int keylen)
- {
- 	struct omap_aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
-+	int ret;
  
- 	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_192 &&
- 		   keylen != AES_KEYSIZE_256)
-@@ -731,6 +751,14 @@ static int omap_aes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
- 	memcpy(ctx->key, key, keylen);
- 	ctx->keylen = keylen;
- 
-+	crypto_skcipher_clear_flags(ctx->fallback, CRYPTO_TFM_REQ_MASK);
-+	crypto_skcipher_set_flags(ctx->fallback, tfm->base.crt_flags &
-+						 CRYPTO_TFM_REQ_MASK);
+ 	return ret;
+ }
+@@ -1653,6 +1659,10 @@ finish:
+ 	dev_dbg(dd->dev, "update done: err: %d\n", err);
+ 	/* finish curent request */
+ 	omap_sham_finish_req(dd->req, err);
 +
-+	ret = crypto_skcipher_setkey(ctx->fallback, key, keylen);
-+	if (!ret)
-+		return 0;
-+
- 	return 0;
++	/* If we are not busy, process next req */
++	if (!test_bit(FLAGS_BUSY, &dd->flags))
++		omap_sham_handle_queue(dd, NULL);
  }
  
-@@ -766,6 +794,17 @@ static int omap_aes_ctr_decrypt(struct ablkcipher_request *req)
- 
- static int omap_aes_cra_init(struct crypto_tfm *tfm)
- {
-+	const char *name = crypto_tfm_alg_name(tfm);
-+	const u32 flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK;
-+	struct omap_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_skcipher *blk;
-+
-+	blk = crypto_alloc_skcipher(name, 0, flags);
-+	if (IS_ERR(blk))
-+		return PTR_ERR(blk);
-+
-+	ctx->fallback = blk;
-+
- 	tfm->crt_ablkcipher.reqsize = sizeof(struct omap_aes_reqctx);
- 
- 	return 0;
-@@ -773,6 +812,12 @@ static int omap_aes_cra_init(struct crypto_tfm *tfm)
- 
- static void omap_aes_cra_exit(struct crypto_tfm *tfm)
- {
-+	struct omap_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	if (ctx->fallback)
-+		crypto_free_skcipher(ctx->fallback);
-+
-+	ctx->fallback = NULL;
- }
- 
- /* ********************** ALGS ************************************ */
-@@ -784,7 +829,7 @@ static struct crypto_alg algs_ecb_cbc[] = {
- 	.cra_priority		= 300,
- 	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
- 				  CRYPTO_ALG_KERN_DRIVER_ONLY |
--				  CRYPTO_ALG_ASYNC,
-+				  CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct omap_aes_ctx),
- 	.cra_alignmask		= 0,
-@@ -806,7 +851,7 @@ static struct crypto_alg algs_ecb_cbc[] = {
- 	.cra_priority		= 300,
- 	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
- 				  CRYPTO_ALG_KERN_DRIVER_ONLY |
--				  CRYPTO_ALG_ASYNC,
-+				  CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct omap_aes_ctx),
- 	.cra_alignmask		= 0,
-@@ -832,7 +877,7 @@ static struct crypto_alg algs_ctr[] = {
- 	.cra_priority		= 300,
- 	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
- 				  CRYPTO_ALG_KERN_DRIVER_ONLY |
--				  CRYPTO_ALG_ASYNC,
-+				  CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct omap_aes_ctx),
- 	.cra_alignmask		= 0,
+ static irqreturn_t omap_sham_irq_common(struct omap_sham_dev *dd)
 -- 
 1.9.1
