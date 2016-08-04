@@ -1,551 +1,430 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v4 3/4] crypto: kdf - SP800-108 Key Derivation Function
-Date: Thu, 04 Aug 2016 20:40:53 +0200
-Message-ID: <3247629.PtH0Pi2ydk@positron.chronox.de>
-References: <2239809.KsND40bFeW@positron.chronox.de> <1908905.sE4dlalNOn@positron.chronox.de>
+Subject: [PATCH v2] KEYS: add SP800-56A KDF support for DH
+Date: Thu, 04 Aug 2016 20:38:08 +0200
+Message-ID: <2239809.KsND40bFeW@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Mat Martineau <mathew.j.martineau@linux.intel.com>,
+	David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:33974 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:33990 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754182AbcHDSl7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Aug 2016 14:41:59 -0400
-In-Reply-To: <1908905.sE4dlalNOn@positron.chronox.de>
+	id S1758870AbcHDSmB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 4 Aug 2016 14:42:01 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The SP800-108 compliant Key Derivation Function is implemented as a
-random number generator considering that it behaves like a deterministic
-RNG.
+Hi Mat,
 
-All three KDF types specified in SP800-108 are implemented.
+the following code addresses all your comments as discussed.
 
-The code comments provide details about how to invoke the different KDF
-types.
+In addition, this code is now complete: it contains an extension
+to the documentation as well as the compat code. The compat
+code was tested successfully with compiling the user space tool
+with -m32 after applying the patch from David ensuring the
+invocation of the keyctl compat syscall.
+
+Ciao
+Stephan
+
+---8<----
+
+SP800-56A defines the use of DH with key derivation function based on a
+counter. The input to the KDF is defined as (DH shared secret || other
+information). The value for the "other information" is to be provided by
+the caller.
+
+The KDF is provided by the kernel crypto API. The SP800-56A KDF is equal
+to the SP800-108 counter KDF. However, the caller is allowed to specify
+the KDF type that he wants to use to derive the key material allowing
+the use of the other KDFs provided with the kernel crypto API.
+
+As the KDF implements the proper truncation of the DH shared secret to
+the requested size, this patch fills the caller buffer up to its size.
+
+The patch is tested with a new test added to the keyutils user space
+code which uses a CAVS test vector testing the compliance with
+SP800-56A.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/kdf.c | 508 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 508 insertions(+)
- create mode 100644 crypto/kdf.c
+ Documentation/security/keys.txt |  35 +++++++++---
+ include/linux/compat.h          |   7 +++
+ include/uapi/linux/keyctl.h     |   7 +++
+ security/keys/Kconfig           |   1 +
+ security/keys/compat.c          |  34 +++++++++++-
+ security/keys/dh.c              | 119 ++++++++++++++++++++++++++++++++++++----
+ security/keys/internal.h        |   9 ++-
+ security/keys/keyctl.c          |   2 +-
+ 8 files changed, 189 insertions(+), 25 deletions(-)
 
-diff --git a/crypto/kdf.c b/crypto/kdf.c
-new file mode 100644
-index 0000000..6f9f082
---- /dev/null
-+++ b/crypto/kdf.c
-@@ -0,0 +1,508 @@
-+/*
-+ * Copyright (C) 2016, Stephan Mueller <smueller@chronox.de>
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, and the entire permission notice in its entirety,
-+ *    including the disclaimer of warranties.
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in the
-+ *    documentation and/or other materials provided with the distribution.
-+ * 3. The name of the author may not be used to endorse or promote
-+ *    products derived from this software without specific prior
-+ *    written permission.
-+ *
-+ * ALTERNATIVELY, this product may be distributed under the terms of
-+ * the GNU General Public License, in which case the provisions of the GPL2
-+ * are required INSTEAD OF the above restrictions.  (This clause is
-+ * necessary due to a potential bad interaction between the GPL and
-+ * the restrictions contained in a BSD-style copyright.)
-+ *
-+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
-+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
-+ * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
-+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-+ * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-+ * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
-+ * DAMAGE.
-+ */
+diff --git a/Documentation/security/keys.txt b/Documentation/security/keys.txt
+index 3849814..29fc036 100644
+--- a/Documentation/security/keys.txt
++++ b/Documentation/security/keys.txt
+@@ -827,7 +827,7 @@ The keyctl syscall functions are:
+ 
+        long keyctl(KEYCTL_DH_COMPUTE, struct keyctl_dh_params *params,
+ 		   char *buffer, size_t buflen,
+-		   void *reserved);
++		   struct keyctl_kdf_params *kdf);
+ 
+      The params struct contains serial numbers for three keys:
+ 
+@@ -844,18 +844,37 @@ The keyctl syscall functions are:
+      public key.  If the base is the remote public key, the result is
+      the shared secret.
+ 
+-     The reserved argument must be set to NULL.
++     If the parameter kdf is NULL, the following applies:
+ 
+-     The buffer length must be at least the length of the prime, or zero.
++	 - The buffer length must be at least the length of the prime, or zero.
+ 
+-     If the buffer length is nonzero, the length of the result is
+-     returned when it is successfully calculated and copied in to the
+-     buffer. When the buffer length is zero, the minimum required
+-     buffer length is returned.
++	 - If the buffer length is nonzero, the length of the result is
++	   returned when it is successfully calculated and copied in to the
++	   buffer. When the buffer length is zero, the minimum required
++	   buffer length is returned.
 +
-+/*
-+ * For performing a KDF operation, the following input is required
-+ * from the caller:
-+ *
-+ *	* Keying material to be used to derive the new keys from
-+ *	  (denoted as Ko in SP800-108)
-+ *	* Label -- a free form binary string
-+ *	* Context -- a free form binary string
-+ *
-+ * The KDF is implemented as a random number generator.
-+ *
-+ * The Ko keying material is to be provided with the initialization of the KDF
-+ * "random number generator", i.e. with the crypto_rng_reset function.
-+ *
-+ * The Label and Context concatenated string is provided when obtaining random
-+ * numbers, i.e. with the crypto_rng_generate function. The caller must format
-+ * the free-form Label || Context input as deemed necessary for the given
-+ * purpose. Note, SP800-108 mandates that the Label and Context are separated
-+ * by a 0x00 byte, i.e. the caller shall provide the input as
-+ * Label || 0x00 || Context when trying to be compliant to SP800-108. For
-+ * the feedback KDF, an IV is required as documented below.
-+ *
-+ * Example without proper error handling:
-+ *	char *keying_material = "\x00\x11\x22\x33\x44\x55\x66\x77";
-+ *	char *label_context = "\xde\xad\xbe\xef\x00\xde\xad\xbe\xef";
-+ *	kdf = crypto_alloc_rng(name, 0, 0);
-+ *	crypto_rng_reset(kdf, keying_material, 8);
-+ *	crypto_rng_generate(kdf, label_context, 9, outbuf, outbuflen);
-+ *
-+ * NOTE: In-place cipher operations are not supported.
-+ */
++     The kdf parameter allows the caller to apply a key derivation function
++     (KDF) on the Diffie-Hellman computation where only the result
++     of the KDF is returned to the caller. The KDF is characterized with
++     struct keyctl_kdf_params as follows:
 +
-+#include <linux/module.h>
-+#include <crypto/rng.h>
-+#include <crypto/internal/rng.h>
-+#include <crypto/hash.h>
-+#include <crypto/internal/hash.h>
++	 - char *kdfname specifies the NULL terminated string identifying
++	   the KDF function used from the kernel crypto API. As of now,
++	   only non-keyed KDFs are supported, such as kdf_ctr(sha256),
++	   kdf_fb(sha1) or kdf_dpi(sha512). The use of kdf_ctr() complies
++	   with SP800-56A.
 +
-+struct crypto_kdf_ctx {
-+	struct shash_desc shash;
-+	char ctx[];
++	 - char *otherinfo specifies the OtherInfo string as documented in
++	   SP800-56A section 5.8.1.2. The length of the buffer is given with
++	   otherinfolen. The format of OtherInfo is defined by the caller.
++	   The otherinfo pointer may be NULL if no OtherInfo shall be used.
+ 
+      This function will return error EOPNOTSUPP if the key type is not
+      supported, error ENOKEY if the key could not be found, or error
+-     EACCES if the key is not readable by the caller.
++     EACCES if the key is not readable by the caller. In addition, the
++     function will return EMSGSIZE when the parameter kdf is non-NULL
++     and either the buffer length or the OtherInfo length exceeds the
++     allowed length.
+ 
+ ===============
+ KERNEL SERVICES
+diff --git a/include/linux/compat.h b/include/linux/compat.h
+index f964ef7..00f348f 100644
+--- a/include/linux/compat.h
++++ b/include/linux/compat.h
+@@ -295,6 +295,13 @@ struct compat_old_sigaction {
+ };
+ #endif
+ 
++struct compat_keyctl_kdf_params {
++	compat_uptr_t kdfname;
++	compat_uptr_t otherinfo;
++	__u32 otherinfolen;
++	__u32 __spare[8];
 +};
 +
-+/* convert 32 bit integer into its string representation */
-+static inline void crypto_kw_cpu_to_be32(u32 val, u8 *buf)
-+{
-+	__be32 *a = (__be32 *)buf;
+ struct compat_statfs;
+ struct compat_statfs64;
+ struct compat_old_linux_dirent;
+diff --git a/include/uapi/linux/keyctl.h b/include/uapi/linux/keyctl.h
+index 86eddd6..0abe048 100644
+--- a/include/uapi/linux/keyctl.h
++++ b/include/uapi/linux/keyctl.h
+@@ -68,4 +68,11 @@ struct keyctl_dh_params {
+ 	__s32 base;
+ };
+ 
++struct keyctl_kdf_params {
++	char *kdfname;
++	char *otherinfo;
++	__u32 otherinfolen;
++	__u32 __spare[8];
++};
 +
-+	*a = cpu_to_be32(val);
+ #endif /*  _LINUX_KEYCTL_H */
+diff --git a/security/keys/Kconfig b/security/keys/Kconfig
+index f826e87..56491fe 100644
+--- a/security/keys/Kconfig
++++ b/security/keys/Kconfig
+@@ -90,6 +90,7 @@ config KEY_DH_OPERATIONS
+        bool "Diffie-Hellman operations on retained keys"
+        depends on KEYS
+        select MPILIB
++       select CRYPTO_KDF
+        help
+ 	 This option provides support for calculating Diffie-Hellman
+ 	 public keys and shared secrets using values stored as keys
+diff --git a/security/keys/compat.c b/security/keys/compat.c
+index 36c80bf..7a7d48a 100644
+--- a/security/keys/compat.c
++++ b/security/keys/compat.c
+@@ -48,6 +48,35 @@ static long compat_keyctl_instantiate_key_iov(
+ 	return ret;
+ }
+ 
++#ifdef CONFIG_KEY_DH_OPERATIONS
++static long compat_keyctl_dh_compute(struct keyctl_dh_params __user *params,
++				char __user *buffer, size_t buflen,
++				struct compat_keyctl_kdf_params __user *kdf)
++{
++	struct keyctl_kdf_params kdfcopy;
++	struct compat_keyctl_kdf_params compat_kdfcopy;
++
++	if (!kdf)
++		return __keyctl_dh_compute(params, buffer, buflen, NULL);
++
++	if (copy_from_user(&compat_kdfcopy, kdf, sizeof(compat_kdfcopy)) != 0)
++		return -EFAULT;
++
++	kdfcopy.kdfname = compat_ptr(compat_kdfcopy.kdfname);
++	kdfcopy.otherinfo = compat_ptr(compat_kdfcopy.otherinfo);
++	kdfcopy.otherinfolen = compat_kdfcopy.otherinfolen;
++
++	return __keyctl_dh_compute(params, buffer, buflen, &kdfcopy);
 +}
-+
-+/*
-+ * Implementation of the KDF in double pipeline iteration mode according with
-+ * counter to SP800-108 section 5.3.
-+ *
-+ * The caller must provide Label || 0x00 || Context in src. This src pointer
-+ * may also be NULL if the caller wishes not to provide anything.
-+ */
-+static int crypto_kdf_dpi_random(struct crypto_rng *rng,
-+				 const u8 *src, unsigned int slen,
-+				 u8 *dst, unsigned int dlen)
++#else
++static long compat_keyctl_dh_compute(struct keyctl_dh_params __user *params,
++				     char __user *buffer, size_t buflen,
++				     struct keyctl_kdf_params __user *kdf)
 +{
-+	struct crypto_kdf_ctx *ctx = crypto_tfm_ctx(crypto_rng_tfm(rng));
-+	struct shash_desc *desc = &ctx->shash;
-+	unsigned int h = crypto_shash_digestsize(desc->tfm);
-+	unsigned int alignmask = crypto_shash_alignmask(desc->tfm);
-+	int err = 0;
-+	u8 *dst_orig = dst;
-+	u8 Aiblock[h + alignmask];
-+	u8 *Ai = PTR_ALIGN((u8 *)Aiblock, alignmask + 1);
-+	u32 i = 1;
-+	u8 iteration[sizeof(u32)];
++	return -EOPNOTSUPP
++}
++#endif
 +
-+	memset(Ai, 0, h);
+ /*
+  * The key control system call, 32-bit compatibility version for 64-bit archs
+  *
+@@ -133,8 +162,9 @@ COMPAT_SYSCALL_DEFINE5(keyctl, u32, option,
+ 		return keyctl_get_persistent(arg2, arg3);
+ 
+ 	case KEYCTL_DH_COMPUTE:
+-		return keyctl_dh_compute(compat_ptr(arg2), compat_ptr(arg3),
+-					 arg4, compat_ptr(arg5));
++		return compat_keyctl_dh_compute(compat_ptr(arg2),
++						compat_ptr(arg3),
++						arg4, compat_ptr(arg5));
+ 
+ 	default:
+ 		return -EOPNOTSUPP;
+diff --git a/security/keys/dh.c b/security/keys/dh.c
+index 531ed2e..6a3dea9 100644
+--- a/security/keys/dh.c
++++ b/security/keys/dh.c
+@@ -77,9 +77,44 @@ error:
+ 	return ret;
+ }
+ 
+-long keyctl_dh_compute(struct keyctl_dh_params __user *params,
+-		       char __user *buffer, size_t buflen,
+-		       void __user *reserved)
++static int keyctl_dh_compute_kdf(struct crypto_rng *tfm,
++				 char __user *buffer, size_t buflen,
++				 uint8_t *kbuf, size_t kbuflen)
++{
++	uint8_t *outbuf = NULL;
++	int ret;
 +
-+	while (dlen) {
-+		/* Calculate A(i) */
-+		if (dst == dst_orig && src && slen)
-+			/* 5.3 step 4 and 5.a */
-+			err = crypto_shash_digest(desc, src, slen, Ai);
-+		else
-+			/* 5.3 step 5.a */
-+			err = crypto_shash_digest(desc, Ai, h, Ai);
-+		if (err)
-+			goto err;
++#if 0
++	/* we do not support HMAC currently */
++	ret = crypto_rng_reset(tfm, xx, xxlen);
++	if (ret) {
++		crypto_free_rng(tfm);
++		goto error5;
++	}
++#endif
 +
-+		/* Calculate K(i) -- step 5.b */
-+		err = crypto_shash_init(desc);
-+		if (err)
-+			goto err;
-+
-+		err = crypto_shash_update(desc, Ai, h);
-+		if (err)
-+			goto err;
-+
-+		crypto_kw_cpu_to_be32(i, iteration);
-+		err = crypto_shash_update(desc, iteration, sizeof(u32));
-+		if (err)
-+			goto err;
-+		if (src && slen) {
-+			err = crypto_shash_update(desc, src, slen);
-+			if (err)
-+				goto err;
-+		}
-+
-+		if (dlen < h) {
-+			u8 tmpbuffer[h];
-+
-+			err = crypto_shash_final(desc, tmpbuffer);
-+			if (err)
-+				goto err;
-+			memcpy(dst, tmpbuffer, dlen);
-+			memzero_explicit(tmpbuffer, h);
-+			goto ret;
-+		} else {
-+			err = crypto_shash_final(desc, dst);
-+			if (err)
-+				goto err;
-+			dlen -= h;
-+			dst += h;
-+			i++;
-+		}
++	outbuf = kmalloc(buflen, GFP_KERNEL);
++	if (!outbuf) {
++		ret = -ENOMEM;
++		goto err;
 +	}
 +
-+err:
-+	memzero_explicit(dst_orig, dlen);
-+ret:
-+	memzero_explicit(Ai, h);
-+	return err;
-+}
++	ret = crypto_rng_generate(tfm, kbuf, kbuflen, outbuf, buflen);
++	if (ret)
++		goto err;
 +
-+/*
-+ * Implementation of the KDF in feedback mode with a non-NULL IV and with
-+ * counter according to SP800-108 section 5.2. The IV is supplied with src
-+ * and must be equal to the digestsize of the used cipher.
-+ *
-+ * In addition, the caller must provide Label || 0x00 || Context in src. This
-+ * src pointer must not be NULL as the IV is required. The ultimate format of
-+ * the src pointer is IV || Label || 0x00 || Context where the length of the
-+ * IV is equal to the output size of the PRF.
-+ */
-+static int crypto_kdf_fb_random(struct crypto_rng *rng,
-+				const u8 *src, unsigned int slen,
-+				u8 *dst, unsigned int dlen)
-+{
-+	struct crypto_kdf_ctx *ctx = crypto_tfm_ctx(crypto_rng_tfm(rng));
-+	struct shash_desc *desc = &ctx->shash;
-+	unsigned int h = crypto_shash_digestsize(desc->tfm);
-+	int err = 0;
-+	u8 *dst_orig = dst;
-+	const u8 *label;
-+	unsigned int labellen = 0;
-+	u32 i = 1;
-+	u8 iteration[sizeof(u32)];
-+
-+	/* require the presence of an IV */
-+	if (!src || slen < h)
-+		return -EINVAL;
-+
-+	/* calculate the offset of the label / context data */
-+	label = src + h;
-+	labellen = slen - h;
-+
-+	while (dlen) {
-+		err = crypto_shash_init(desc);
-+		if (err)
-+			goto err;
-+
-+		/*
-+		 * Feedback mode applies to all rounds except first which uses
-+		 * the IV.
-+		 */
-+		if (dst_orig == dst)
-+			err = crypto_shash_update(desc, src, h);
-+		else
-+			err = crypto_shash_update(desc, dst - h, h);
-+		if (err)
-+			goto err;
-+
-+		crypto_kw_cpu_to_be32(i, iteration);
-+		err = crypto_shash_update(desc, iteration, sizeof(u32));
-+		if (err)
-+			goto err;
-+		if (labellen) {
-+			err = crypto_shash_update(desc, label, labellen);
-+			if (err)
-+				goto err;
-+		}
-+
-+		if (dlen < h) {
-+			u8 tmpbuffer[h];
-+
-+			err = crypto_shash_final(desc, tmpbuffer);
-+			if (err)
-+				goto err;
-+			memcpy(dst, tmpbuffer, dlen);
-+			memzero_explicit(tmpbuffer, h);
-+			return 0;
-+		} else {
-+			err = crypto_shash_final(desc, dst);
-+			if (err)
-+				goto err;
-+			dlen -= h;
-+			dst += h;
-+			i++;
-+		}
-+	}
-+
-+	return 0;
++	ret = buflen;
++	if (copy_to_user(buffer, outbuf, buflen) != 0)
++		ret = -EFAULT;
 +
 +err:
-+	memzero_explicit(dst_orig, dlen);
-+	return err;
++	kzfree(outbuf);
++	return ret;
 +}
 +
-+/*
-+ * Implementation of the KDF in counter mode according to SP800-108 section 5.1
-+ * as well as SP800-56A section 5.8.1 (Single-step KDF).
-+ *
-+ * SP800-108:
-+ * The caller must provide Label || 0x00 || Context in src. This src pointer
-+ * may also be NULL if the caller wishes not to provide anything.
-+ *
-+ * SP800-56A:
-+ * The key provided for the HMAC during the crypto_rng_reset shall NOT be the
-+ * shared secret from the DH operation, but an independently generated key.
-+ * The src pointer is defined as Z || other info where Z is the shared secret
-+ * from DH and other info is an arbitrary string (see SP800-56A section
-+ * 5.8.1.2).
-+ */
-+static int crypto_kdf_ctr_random(struct crypto_rng *rng,
-+				 const u8 *src, unsigned int slen,
-+				 u8 *dst, unsigned int dlen)
-+{
-+	struct crypto_kdf_ctx *ctx = crypto_tfm_ctx(crypto_rng_tfm(rng));
-+	struct shash_desc *desc = &ctx->shash;
-+	unsigned int h = crypto_shash_digestsize(desc->tfm);
-+	int err = 0;
-+	u8 *dst_orig = dst;
-+	u32 i = 1;
-+	u8 iteration[sizeof(u32)];
++long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
++			 char __user *buffer, size_t buflen,
++			 struct keyctl_kdf_params *kdfcopy)
+ {
+ 	long ret;
+ 	MPI base, private, prime, result;
+@@ -88,6 +123,7 @@ long keyctl_dh_compute(struct keyctl_dh_params __user *params,
+ 	uint8_t *kbuf;
+ 	ssize_t keylen;
+ 	size_t resultlen;
++	struct crypto_rng *tfm = NULL;
+ 
+ 	if (!params || (!buffer && buflen)) {
+ 		ret = -EINVAL;
+@@ -98,12 +134,36 @@ long keyctl_dh_compute(struct keyctl_dh_params __user *params,
+ 		goto out;
+ 	}
+ 
+-	if (reserved) {
+-		ret = -EINVAL;
+-		goto out;
++	if (kdfcopy) {
++		char *kdfname;
 +
-+	while (dlen) {
-+		err = crypto_shash_init(desc);
-+		if (err)
-+			goto err;
-+
-+		crypto_kw_cpu_to_be32(i, iteration);
-+		err = crypto_shash_update(desc, iteration, sizeof(u32));
-+		if (err)
-+			goto err;
-+
-+		if (src && slen) {
-+			err = crypto_shash_update(desc, src, slen);
-+			if (err)
-+				goto err;
++		if (buflen > KEYCTL_KDF_MAX_OUTPUTLEN ||
++		    kdfcopy->otherinfolen > KEYCTL_KDF_MAX_STRING_LEN) {
++			ret = -EMSGSIZE;
++			goto out;
 +		}
 +
-+		if (dlen < h) {
-+			u8 tmpbuffer[h];
-+
-+			err = crypto_shash_final(desc, tmpbuffer);
-+			if (err)
-+				goto err;
-+			memcpy(dst, tmpbuffer, dlen);
-+			memzero_explicit(tmpbuffer, h);
-+			return 0;
-+		} else {
-+			err = crypto_shash_final(desc, dst);
-+			if (err)
-+				goto err;
-+
-+			dlen -= h;
-+			dst += h;
-+			i++;
++		/* get KDF name string */
++		kdfname = strndup_user(kdfcopy->kdfname, CRYPTO_MAX_ALG_NAME);
++		if (IS_ERR(kdfname)) {
++			ret = PTR_ERR(kdfname);
++			goto out;
 +		}
-+	}
 +
-+	return 0;
-+
-+err:
-+	memzero_explicit(dst_orig, dlen);
-+	return err;
-+}
-+
-+/*
-+ * The seeding of the KDF allows to set a key which must be at least
-+ * digestsize long.
-+ */
-+static int crypto_kdf_seed(struct crypto_rng *rng,
-+			   const u8 *seed, unsigned int slen)
-+{
-+	struct crypto_kdf_ctx *ctx = crypto_tfm_ctx(crypto_rng_tfm(rng));
-+	unsigned int ds = crypto_shash_digestsize(ctx->shash.tfm);
-+
-+	/* Check according to SP800-108 section 7.2 */
-+	if (ds > slen)
-+		return -EINVAL;
-+
++		/* allocate KDF from the kernel crypto API */
++		tfm = crypto_alloc_rng(kdfname, 0, 0);
++		kfree(kdfname);
++		if (IS_ERR(tfm)) {
++			ret = PTR_ERR(tfm);
++			goto out;
++		}
+ 	}
+ 
+-	keylen = mpi_from_key(pcopy.prime, buflen, &prime);
 +	/*
-+	 * We require that we operate on a MAC -- if we do not operate on a
-+	 * MAC, this function returns an error.
++	 * If the caller requests postprocessing with a KDF, allow an
++	 * arbitrary output buffer size since the KDF ensures proper truncation.
 +	 */
-+	return crypto_shash_setkey(ctx->shash.tfm, seed, slen);
-+}
-+
-+static int crypto_kdf_init_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
-+	struct crypto_shash_spawn *spawn = crypto_instance_ctx(inst);
-+	struct crypto_kdf_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_shash *hash;
-+
-+	hash = crypto_spawn_shash(spawn);
-+	if (IS_ERR(hash))
-+		return PTR_ERR(hash);
-+
-+	ctx->shash.tfm = hash;
-+
-+	return 0;
-+}
-+
-+static void crypto_kdf_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_kdf_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	crypto_free_shash(ctx->shash.tfm);
-+}
-+
-+static void crypto_kdf_free(struct rng_instance *inst)
-+{
-+	crypto_drop_spawn(rng_instance_ctx(inst));
-+	kfree(inst);
-+}
-+
-+static int crypto_kdf_alloc_common(struct crypto_template *tmpl,
-+				   struct rtattr **tb,
-+				   const u8 *name,
-+				   int (*generate)(struct crypto_rng *tfm,
-+						   const u8 *src,
-+						   unsigned int slen,
-+						   u8 *dst, unsigned int dlen))
-+{
-+	struct rng_instance *inst;
-+	struct crypto_alg *alg;
-+	struct shash_alg *salg;
-+	int err;
-+	unsigned int ds, ss;
-+
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_RNG);
-+	if (err)
-+		return err;
-+
-+	salg = shash_attr_alg(tb[1], 0, 0);
-+	if (IS_ERR(salg))
-+		return PTR_ERR(salg);
-+
-+	ds = salg->digestsize;
-+	ss = salg->statesize;
-+	alg = &salg->base;
-+
-+	inst = rng_alloc_instance(name, alg);
-+	err = PTR_ERR(inst);
-+	if (IS_ERR(inst))
-+		goto out_put_alg;
-+
-+	err = crypto_init_shash_spawn(rng_instance_ctx(inst), salg,
-+				      rng_crypto_instance(inst));
-+	if (err)
-+		goto out_free_inst;
-+
-+	inst->alg.base.cra_priority	= alg->cra_priority;
-+	inst->alg.base.cra_blocksize	= alg->cra_blocksize;
-+	inst->alg.base.cra_alignmask	= alg->cra_alignmask;
-+
-+	inst->alg.generate		= generate;
-+	inst->alg.seed			= crypto_kdf_seed;
-+	inst->alg.seedsize		= ds;
-+
-+	inst->alg.base.cra_init		= crypto_kdf_init_tfm;
-+	inst->alg.base.cra_exit		= crypto_kdf_exit_tfm;
-+	inst->alg.base.cra_ctxsize	= ALIGN(sizeof(struct crypto_kdf_ctx) +
-+					  ss * 2, crypto_tfm_ctx_alignment());
-+
-+	inst->free			= crypto_kdf_free;
-+
-+	err = rng_register_instance(tmpl, inst);
-+
-+	if (err) {
-+out_free_inst:
-+		crypto_kdf_free(inst);
++	keylen = mpi_from_key(pcopy.prime, kdfcopy ? SIZE_MAX : buflen, &prime);
+ 	if (keylen < 0 || !prime) {
+ 		/* buflen == 0 may be used to query the required buffer size,
+ 		 * which is the prime key length.
+@@ -133,12 +193,25 @@ long keyctl_dh_compute(struct keyctl_dh_params __user *params,
+ 		goto error3;
+ 	}
+ 
+-	kbuf = kmalloc(resultlen, GFP_KERNEL);
++	/* allocate space for DH shared secret and SP800-56A otherinfo */
++	kbuf = kmalloc(kdfcopy ? (resultlen + kdfcopy->otherinfolen) : resultlen,
++		       GFP_KERNEL);
+ 	if (!kbuf) {
+ 		ret = -ENOMEM;
+ 		goto error4;
+ 	}
+ 
++	/*
++	 * Concatenate SP800-56A otherinfo past DH shared secret -- the
++	 * input to the KDF is (DH shared secret || otherinfo)
++	 */
++	if (kdfcopy && kdfcopy->otherinfo &&
++	    copy_from_user(kbuf + resultlen, kdfcopy->otherinfo,
++			   kdfcopy->otherinfolen) != 0) {
++		ret = -EFAULT;
++		goto error5;
 +	}
 +
-+out_put_alg:
-+	crypto_mod_put(alg);
-+	return err;
-+}
-+
-+static int crypto_kdf_ctr_create(struct crypto_template *tmpl,
-+				 struct rtattr **tb)
-+{
-+	return crypto_kdf_alloc_common(tmpl, tb, "kdf_ctr",
-+				       crypto_kdf_ctr_random);
-+}
-+
-+static struct crypto_template crypto_kdf_ctr_tmpl = {
-+	.name = "kdf_ctr",
-+	.create = crypto_kdf_ctr_create,
-+	.module = THIS_MODULE,
-+};
-+
-+static int crypto_kdf_fb_create(struct crypto_template *tmpl,
-+				struct rtattr **tb) {
-+	return crypto_kdf_alloc_common(tmpl, tb, "kdf_fb",
-+				       crypto_kdf_fb_random);
-+}
-+
-+static struct crypto_template crypto_kdf_fb_tmpl = {
-+	.name = "kdf_fb",
-+	.create = crypto_kdf_fb_create,
-+	.module = THIS_MODULE,
-+};
-+
-+static int crypto_kdf_dpi_create(struct crypto_template *tmpl,
-+				 struct rtattr **tb) {
-+	return crypto_kdf_alloc_common(tmpl, tb, "kdf_dpi",
-+				       crypto_kdf_dpi_random);
-+}
-+
-+static struct crypto_template crypto_kdf_dpi_tmpl = {
-+	.name = "kdf_dpi",
-+	.create = crypto_kdf_dpi_create,
-+	.module = THIS_MODULE,
-+};
-+
-+static int __init crypto_kdf_init(void)
-+{
-+	int err = crypto_register_template(&crypto_kdf_ctr_tmpl);
-+
-+	if (err)
-+		return err;
-+
-+	err = crypto_register_template(&crypto_kdf_fb_tmpl);
-+	if (err) {
-+		crypto_unregister_template(&crypto_kdf_ctr_tmpl);
-+		return err;
+ 	ret = do_dh(result, base, private, prime);
+ 	if (ret)
+ 		goto error5;
+@@ -147,12 +220,17 @@ long keyctl_dh_compute(struct keyctl_dh_params __user *params,
+ 	if (ret != 0)
+ 		goto error5;
+ 
+-	ret = nbytes;
+-	if (copy_to_user(buffer, kbuf, nbytes) != 0)
+-		ret = -EFAULT;
++	if (kdfcopy) {
++		ret = keyctl_dh_compute_kdf(tfm, buffer, buflen, kbuf,
++					    resultlen + kdfcopy->otherinfolen);
++	} else {
++		ret = nbytes;
++		if (copy_to_user(buffer, kbuf, nbytes) != 0)
++			ret = -EFAULT;
 +	}
+ 
+ error5:
+-	kfree(kbuf);
++	kzfree(kbuf);
+ error4:
+ 	mpi_free(result);
+ error3:
+@@ -162,5 +240,22 @@ error2:
+ error1:
+ 	mpi_free(prime);
+ out:
++	if (tfm)
++		crypto_free_rng(tfm);
+ 	return ret;
+ }
 +
-+	err = crypto_register_template(&crypto_kdf_dpi_tmpl);
-+	if (err) {
-+		crypto_unregister_template(&crypto_kdf_ctr_tmpl);
-+		crypto_unregister_template(&crypto_kdf_fb_tmpl);
-+	}
-+	return err;
-+}
-+
-+static void __exit crypto_kdf_exit(void)
++long keyctl_dh_compute(struct keyctl_dh_params __user *params,
++		       char __user *buffer, size_t buflen,
++		       struct keyctl_kdf_params __user *kdf)
 +{
-+	crypto_unregister_template(&crypto_kdf_ctr_tmpl);
-+	crypto_unregister_template(&crypto_kdf_fb_tmpl);
-+	crypto_unregister_template(&crypto_kdf_dpi_tmpl);
++	struct keyctl_kdf_params kdfcopy;
++
++	if (!kdf)
++		return __keyctl_dh_compute(params, buffer, buflen, NULL);
++
++	if (copy_from_user(&kdfcopy, kdf, sizeof(kdfcopy)) != 0)
++		return -EFAULT;
++
++	return __keyctl_dh_compute(params, buffer, buflen, &kdfcopy);
 +}
-+
-+module_init(crypto_kdf_init);
-+module_exit(crypto_kdf_exit);
-+
-+MODULE_LICENSE("Dual BSD/GPL");
-+MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
-+MODULE_DESCRIPTION("Key Derivation Function according to SP800-108 and SP800-56A");
-+MODULE_ALIAS_CRYPTO("kdf_ctr");
-+MODULE_ALIAS_CRYPTO("kdf_fb");
-+MODULE_ALIAS_CRYPTO("kdf_dpi");
+diff --git a/security/keys/internal.h b/security/keys/internal.h
+index a705a7d..9014af3 100644
+--- a/security/keys/internal.h
++++ b/security/keys/internal.h
+@@ -259,12 +259,17 @@ static inline long keyctl_get_persistent(uid_t uid, key_serial_t destring)
+ #endif
+ 
+ #ifdef CONFIG_KEY_DH_OPERATIONS
++#include <crypto/rng.h>
+ extern long keyctl_dh_compute(struct keyctl_dh_params __user *, char __user *,
+-			      size_t, void __user *);
++			      size_t, struct keyctl_kdf_params __user *);
++extern long __keyctl_dh_compute(struct keyctl_dh_params __user *, char __user *,
++				size_t, struct keyctl_kdf_params *);
++#define KEYCTL_KDF_MAX_OUTPUTLEN	1024	/* max length of KDF output */
++#define KEYCTL_KDF_MAX_STRING_LEN	64	/* maximum length of strings */
+ #else
+ static inline long keyctl_dh_compute(struct keyctl_dh_params __user *params,
+ 				     char __user *buffer, size_t buflen,
+-				     void __user *reserved)
++				     struct keyctl_kdf_params __user *kdf)
+ {
+ 	return -EOPNOTSUPP;
+ }
+diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
+index d580ad0..b106898 100644
+--- a/security/keys/keyctl.c
++++ b/security/keys/keyctl.c
+@@ -1689,7 +1689,7 @@ SYSCALL_DEFINE5(keyctl, int, option, unsigned long, arg2, unsigned long, arg3,
+ 	case KEYCTL_DH_COMPUTE:
+ 		return keyctl_dh_compute((struct keyctl_dh_params __user *) arg2,
+ 					 (char __user *) arg3, (size_t) arg4,
+-					 (void __user *) arg5);
++					 (struct keyctl_kdf_params __user *) arg5);
+ 
+ 	default:
+ 		return -EOPNOTSUPP;
 -- 
 2.7.4
