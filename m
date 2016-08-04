@@ -1,54 +1,60 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 2/2] crypto: caam - defer aead_set_sh_desc in case of zero authsize
-Date: Thu, 4 Aug 2016 20:02:47 +0300
-Message-ID: <1470330167-31534-3-git-send-email-horia.geanta@nxp.com>
-References: <1470330167-31534-1-git-send-email-horia.geanta@nxp.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v4 4/4] crypto: kdf - enable compilation
+Date: Thu, 04 Aug 2016 20:41:22 +0200
+Message-ID: <11579304.Ct112BsY3h@positron.chronox.de>
+References: <2239809.KsND40bFeW@positron.chronox.de> <1908905.sE4dlalNOn@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Mat Martineau <mathew.j.martineau@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0072.outbound.protection.outlook.com ([104.47.42.72]:8352
-	"EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1758682AbcHDRgr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Aug 2016 13:36:47 -0400
-In-Reply-To: <1470330167-31534-1-git-send-email-horia.geanta@nxp.com>
+Received: from mail.eperm.de ([89.247.134.16]:33972 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758834AbcHDSl6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 4 Aug 2016 14:41:58 -0400
+In-Reply-To: <1908905.sE4dlalNOn@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-To be able to generate shared descriptors for AEAD, the authentication size
-needs to be known. However, there is no imposed order of calling .setkey,
-.setauthsize callbacks.
+Include KDF into Kconfig and Makefile for compilation.
 
-Thus, in case authentication size is not known at .setkey time, defer it
-until .setauthsize is called.
-
-The authsize != 0 check was incorrectly removed when converting the driver
-to the new AEAD interface.
-
-Cc: <stable@vger.kernel.org> # 4.3+
-Fixes: 479bcc7c5b9e ("crypto: caam - Convert authenc to new AEAD interface")
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/crypto/caam/caamalg.c | 3 +++
- 1 file changed, 3 insertions(+)
+ crypto/Kconfig  | 7 +++++++
+ crypto/Makefile | 1 +
+ 2 files changed, 8 insertions(+)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index e356005a7212..6dc597126b79 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -441,6 +441,9 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 			       OP_ALG_AAI_CTR_MOD128);
- 	const bool is_rfc3686 = alg->caam.rfc3686;
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index a9377be..91ef2a6 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -372,6 +372,13 @@ config CRYPTO_KEYWRAP
+ 	  Support for key wrapping (NIST SP800-38F / RFC3394) without
+ 	  padding.
  
-+	if (!ctx->authsize)
-+		return 0;
++config CRYPTO_KDF
++	tristate "Key Derivation Function (SP800-108)"
++	select CRYPTO_RNG
++	help
++	  Support for KDF compliant to SP800-108. All three types of
++	  KDF specified in SP800-108 are implemented.
 +
- 	/* NULL encryption / decryption */
- 	if (!ctx->enckeylen)
- 		return aead_null_set_sh_desc(aead);
+ comment "Hash modes"
+ 
+ config CRYPTO_CMAC
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 99cc64a..9022280 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -80,6 +80,7 @@ obj-$(CONFIG_CRYPTO_LRW) += lrw.o
+ obj-$(CONFIG_CRYPTO_XTS) += xts.o
+ obj-$(CONFIG_CRYPTO_CTR) += ctr.o
+ obj-$(CONFIG_CRYPTO_KEYWRAP) += keywrap.o
++obj-$(CONFIG_CRYPTO_KDF) += kdf.o
+ obj-$(CONFIG_CRYPTO_GCM) += gcm.o
+ obj-$(CONFIG_CRYPTO_CCM) += ccm.o
+ obj-$(CONFIG_CRYPTO_CHACHA20POLY1305) += chacha20poly1305.o
 -- 
-2.4.4
+2.7.4
