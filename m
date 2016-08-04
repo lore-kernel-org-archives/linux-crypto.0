@@ -1,93 +1,129 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCHv3 01/11] crypto: omap-sham: avoid executing tasklet where not
- needed
-Date: Thu, 4 Aug 2016 13:28:36 +0300
-Message-ID: <1470306526-27219-2-git-send-email-t-kristo@ti.com>
+Subject: [PATCHv3 07/11] crypto: omap-aes: use runtime_pm autosuspend for clock handling
+Date: Thu, 4 Aug 2016 13:28:42 +0300
+Message-ID: <1470306526-27219-8-git-send-email-t-kristo@ti.com>
 References: <1470306526-27219-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-arm-kernel@lists.infradead.org
-To: <herbert@gondor.apana.org.au>, <lokeshvutla@ti.com>, <davem@davemloft.net>,
- <linux-crypto@vger.kernel.org>, <tony@atomide.com>,
- <linux-omap@vger.kernel.org>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain
+Cc: <linux-arm-kernel@lists.infradead.org>
+To: <herbert@gondor.apana.org.au>, <lokeshvutla@ti.com>,
+	<davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+	<tony@atomide.com>, <linux-omap@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from devils.ext.ti.com ([198.47.26.153]:50515 "EHLO
+	devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754374AbcHDKaV (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 4 Aug 2016 06:30:21 -0400
 In-Reply-To: <1470306526-27219-1-git-send-email-t-kristo@ti.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Some of the call paths of OMAP SHA driver can avoid executing the next
-step of the crypto queue under tasklet; instead, execute the next step
-directly via function call. This avoids a costly round-trip via the
-scheduler giving a slight performance boost.
+Calling runtime PM API at the cra_init/exit is bad for power management
+purposes, as the lifetime for a CRA can be very long. Instead, use
+pm_runtime autosuspend approach for handling the device clocks. Clocks
+are enabled when they are actually required, and autosuspend disables
+these if they have not been used for a sufficiently long time period.
+By default, the timeout value is 1 second.
 
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-sham.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ drivers/crypto/omap-aes.c | 43 ++++++++++++++++---------------------------
+ 1 file changed, 16 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 7fe4eef..fd50005 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -1005,9 +1005,6 @@ static void omap_sham_finish_req(struct ahash_request *req, int err)
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 4ab53a6..f443042 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -85,6 +85,8 @@
+ #define AES_REG_IRQ_DATA_OUT           BIT(2)
+ #define DEFAULT_TIMEOUT		(5*HZ)
  
- 	if (req->base.complete)
- 		req->base.complete(&req->base, err);
--
--	/* handle new request */
--	tasklet_schedule(&dd->done_task);
- }
++#define DEFAULT_AUTOSUSPEND_DELAY	1000
++
+ #define FLAGS_MODE_MASK		0x000f
+ #define FLAGS_ENCRYPT		BIT(0)
+ #define FLAGS_CBC		BIT(1)
+@@ -238,11 +240,19 @@ static void omap_aes_write_n(struct omap_aes_dev *dd, u32 offset,
  
- static int omap_sham_handle_queue(struct omap_sham_dev *dd,
-@@ -1018,6 +1015,7 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
- 	unsigned long flags;
- 	int err = 0, ret = 0;
- 
-+retry:
- 	spin_lock_irqsave(&dd->lock, flags);
- 	if (req)
- 		ret = ahash_enqueue_request(&dd->queue, req);
-@@ -1061,11 +1059,19 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
- 		err = omap_sham_final_req(dd);
+ static int omap_aes_hw_init(struct omap_aes_dev *dd)
+ {
++	int err;
++
+ 	if (!(dd->flags & FLAGS_INIT)) {
+ 		dd->flags |= FLAGS_INIT;
+ 		dd->err = 0;
  	}
- err1:
--	if (err != -EINPROGRESS)
-+	dev_dbg(dd->dev, "exit, err: %d\n", err);
-+
-+	if (err != -EINPROGRESS) {
- 		/* done_task will not finish it, so do it here */
- 		omap_sham_finish_req(req, err);
-+		req = NULL;
  
--	dev_dbg(dd->dev, "exit, err: %d\n", err);
-+		/*
-+		 * Execute next request immediately if there is anything
-+		 * in queue.
-+		 */
-+		goto retry;
++	err = pm_runtime_get_sync(dd->dev);
++	if (err < 0) {
++		dev_err(dd->dev, "failed to get sync: %d\n", err);
++		return err;
 +	}
- 
- 	return ret;
- }
-@@ -1653,6 +1659,10 @@ finish:
- 	dev_dbg(dd->dev, "update done: err: %d\n", err);
- 	/* finish curent request */
- 	omap_sham_finish_req(dd->req, err);
 +
-+	/* If we are not busy, process next req */
-+	if (!test_bit(FLAGS_BUSY, &dd->flags))
-+		omap_sham_handle_queue(dd, NULL);
+ 	return 0;
  }
  
- static irqreturn_t omap_sham_irq_common(struct omap_sham_dev *dd)
+@@ -520,6 +530,9 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
+ 	pr_debug("err: %d\n", err);
+ 
+ 	crypto_finalize_request(dd->engine, req, err);
++
++	pm_runtime_mark_last_busy(dd->dev);
++	pm_runtime_put_autosuspend(dd->dev);
+ }
+ 
+ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
+@@ -761,23 +774,6 @@ static int omap_aes_ctr_decrypt(struct ablkcipher_request *req)
+ 
+ static int omap_aes_cra_init(struct crypto_tfm *tfm)
+ {
+-	struct omap_aes_dev *dd = NULL;
+-	int err;
+-
+-	/* Find AES device, currently picks the first device */
+-	spin_lock_bh(&list_lock);
+-	list_for_each_entry(dd, &dev_list, list) {
+-		break;
+-	}
+-	spin_unlock_bh(&list_lock);
+-
+-	err = pm_runtime_get_sync(dd->dev);
+-	if (err < 0) {
+-		dev_err(dd->dev, "%s: failed to get_sync(%d)\n",
+-			__func__, err);
+-		return err;
+-	}
+-
+ 	tfm->crt_ablkcipher.reqsize = sizeof(struct omap_aes_reqctx);
+ 
+ 	return 0;
+@@ -785,16 +781,6 @@ static int omap_aes_cra_init(struct crypto_tfm *tfm)
+ 
+ static void omap_aes_cra_exit(struct crypto_tfm *tfm)
+ {
+-	struct omap_aes_dev *dd = NULL;
+-
+-	/* Find AES device, currently picks the first device */
+-	spin_lock_bh(&list_lock);
+-	list_for_each_entry(dd, &dev_list, list) {
+-		break;
+-	}
+-	spin_unlock_bh(&list_lock);
+-
+-	pm_runtime_put_sync(dd->dev);
+ }
+ 
+ /* ********************** ALGS ************************************ */
+@@ -1140,6 +1126,9 @@ static int omap_aes_probe(struct platform_device *pdev)
+ 	}
+ 	dd->phys_base = res.start;
+ 
++	pm_runtime_use_autosuspend(dev);
++	pm_runtime_set_autosuspend_delay(dev, DEFAULT_AUTOSUSPEND_DELAY);
++
+ 	pm_runtime_enable(dev);
+ 	err = pm_runtime_get_sync(dev);
+ 	if (err < 0) {
 -- 
 1.9.1
