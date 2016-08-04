@@ -1,41 +1,86 @@
-From: Anton Blanchard <anton@samba.org>
-Subject: Re: [PATCH] crypto: crc32c-vpmsum - Convert to CPU feature based
- module autoloading
-Date: Thu, 4 Aug 2016 20:26:01 +1000
-Message-ID: <20160804202601.12aa879e@kryten>
-References: <1470292695-9829-1-git-send-email-anton@ozlabs.org>
- <87lh0dexp3.fsf@concordia.ellerman.id.au>
+From: Tero Kristo <t-kristo@ti.com>
+Subject: [PATCHv3 03/11] crypto: omap-sham: implement context export/import
+ APIs
+Date: Thu, 4 Aug 2016 13:28:38 +0300
+Message-ID: <1470306526-27219-4-git-send-email-t-kristo@ti.com>
+References: <1470306526-27219-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, paulus@samba.org, linux-crypto@vger.kernel.org,
- alastair@d-silva.org, linuxppc-dev@lists.ozlabs.org, davem@davemloft.net
-To: Michael Ellerman <mpe@ellerman.id.au>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <87lh0dexp3.fsf@concordia.ellerman.id.au>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Cc: linux-arm-kernel@lists.infradead.org
+To: <herbert@gondor.apana.org.au>, <lokeshvutla@ti.com>, <davem@davemloft.net>,
+ <linux-crypto@vger.kernel.org>, <tony@atomide.com>,
+ <linux-omap@vger.kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1470306526-27219-1-git-send-email-t-kristo@ti.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Michael,
+Context export/import are now required for ahash algorithms due to
+required support in algif_hash. Implement these for OMAP SHA driver,
+saving and restoring the internal state of the driver.
 
-> Is VEC_CRYPTO the right feature?
-> 
-> That's new power8 crypto stuff.
+Signed-off-by: Tero Kristo <t-kristo@ti.com>
+---
+ drivers/crypto/omap-sham.c | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
 
-The vpmsum* instructions are part of the same pipeline as the vcipher*
-instructions, introduced in POWER8.
-
-> I thought this only used VMX? (but I haven't looked closely)
-
-Yes, vcipher* and vpmsum* are VMX instructions.
-
-Anton
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 6e53944..aa71e61 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1379,6 +1379,27 @@ exit_unlock:
+ 	return ret;
+ }
+ 
++static int omap_sham_export(struct ahash_request *req, void *out)
++{
++	struct omap_sham_reqctx *rctx = ahash_request_ctx(req);
++
++	while (omap_sham_flush(req) == -EINPROGRESS)
++		msleep(10);
++
++	memcpy(out, rctx, sizeof(*rctx) + SHA512_BLOCK_SIZE);
++
++	return 0;
++}
++
++static int omap_sham_import(struct ahash_request *req, const void *in)
++{
++	struct omap_sham_reqctx *rctx = ahash_request_ctx(req);
++
++	memcpy(rctx, in, sizeof(*rctx) + SHA512_BLOCK_SIZE);
++
++	return 0;
++}
++
+ static struct ahash_alg algs_sha1_md5[] = {
+ {
+ 	.init		= omap_sham_init,
+@@ -2037,8 +2058,14 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 
+ 	for (i = 0; i < dd->pdata->algs_info_size; i++) {
+ 		for (j = 0; j < dd->pdata->algs_info[i].size; j++) {
+-			err = crypto_register_ahash(
+-					&dd->pdata->algs_info[i].algs_list[j]);
++			struct ahash_alg *alg;
++
++			alg = &dd->pdata->algs_info[i].algs_list[j];
++			alg->export = omap_sham_export;
++			alg->import = omap_sham_import;
++			alg->halg.statesize = sizeof(struct omap_sham_reqctx) +
++				SHA512_BLOCK_SIZE;
++			err = crypto_register_ahash(alg);
+ 			if (err)
+ 				goto err_algs;
+ 
+-- 
+1.9.1
