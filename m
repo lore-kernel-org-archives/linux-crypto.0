@@ -1,19 +1,19 @@
 From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [PATCH v2] KEYS: add SP800-56A KDF support for DH
-Date: Thu, 4 Aug 2016 13:41:58 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1608041258050.55029@mjmartin-mac01.local>
-References: <2239809.KsND40bFeW@positron.chronox.de>
+Subject: Re: [PATCH v2] DH support: add KDF handling support
+Date: Thu, 4 Aug 2016 13:57:27 -0700 (PDT)
+Message-ID: <alpine.OSX.2.20.1608041346090.55029@mjmartin-mac01.local>
+References: <2239809.KsND40bFeW@positron.chronox.de> <2313703.12yUpncF2W@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; format=flowed; charset=US-ASCII
 Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
 	linux-crypto@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:65004 "EHLO mga09.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:18540 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934199AbcHDUmA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Aug 2016 16:42:00 -0400
-In-Reply-To: <2239809.KsND40bFeW@positron.chronox.de>
+	id S965892AbcHDU5a (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 4 Aug 2016 16:57:30 -0400
+In-Reply-To: <2313703.12yUpncF2W@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -22,450 +22,305 @@ Stephan,
 
 On Thu, 4 Aug 2016, Stephan Mueller wrote:
 
-> Hi Mat,
+> Hi Mat, David,
 >
-> the following code addresses all your comments as discussed.
+> this patch covers all comments you raised. I also added a man page
+> for the new API calls.
 >
-> In addition, this code is now complete: it contains an extension
-> to the documentation as well as the compat code. The compat
-> code was tested successfully with compiling the user space tool
-> with -m32 after applying the patch from David ensuring the
-> invocation of the keyctl compat syscall.
+> ---8<---
 >
-> Ciao
-> Stephan
+> Add the interface logic to support DH with KDF handling support.
 >
-> ---8<----
+> The dh_compute code now allows the following options:
 >
-> SP800-56A defines the use of DH with key derivation function based on a
-> counter. The input to the KDF is defined as (DH shared secret || other
-> information). The value for the "other information" is to be provided by
-> the caller.
+> - no KDF support / output of raw DH shared secret:
+>  dh_compute <private> <prime> <base>
 >
-> The KDF is provided by the kernel crypto API. The SP800-56A KDF is equal
-> to the SP800-108 counter KDF. However, the caller is allowed to specify
-> the KDF type that he wants to use to derive the key material allowing
-> the use of the other KDFs provided with the kernel crypto API.
+> - KDF support without "other information" string:
+>  dh_compute_kdf <private> <prime> <base> <output length> <KDF type>
 >
-> As the KDF implements the proper truncation of the DH shared secret to
-> the requested size, this patch fills the caller buffer up to its size.
+> - KDF support with "other information string:
+>  dh_compute_kdf_oi <private> <prime> <base> <output length> <KDF type>
+>    where the OI string is provided on STDIN.
 >
-> The patch is tested with a new test added to the keyutils user space
-> code which uses a CAVS test vector testing the compliance with
-> SP800-56A.
+> The test to verify the code is based on a test vector used for the CAVS
+> testing of SP800-56A.
 >
 > Signed-off-by: Stephan Mueller <smueller@chronox.de>
 > ---
-> Documentation/security/keys.txt |  35 +++++++++---
-> include/linux/compat.h          |   7 +++
-> include/uapi/linux/keyctl.h     |   7 +++
-> security/keys/Kconfig           |   1 +
-> security/keys/compat.c          |  34 +++++++++++-
-> security/keys/dh.c              | 119 ++++++++++++++++++++++++++++++++++++----
-> security/keys/internal.h        |   9 ++-
-> security/keys/keyctl.c          |   2 +-
-> 8 files changed, 189 insertions(+), 25 deletions(-)
->
-> diff --git a/Documentation/security/keys.txt b/Documentation/security/keys.txt
-> index 3849814..29fc036 100644
-> --- a/Documentation/security/keys.txt
-> +++ b/Documentation/security/keys.txt
-> @@ -827,7 +827,7 @@ The keyctl syscall functions are:
->
->        long keyctl(KEYCTL_DH_COMPUTE, struct keyctl_dh_params *params,
-> 		   char *buffer, size_t buflen,
-> -		   void *reserved);
-> +		   struct keyctl_kdf_params *kdf);
->
->      The params struct contains serial numbers for three keys:
->
-> @@ -844,18 +844,37 @@ The keyctl syscall functions are:
->      public key.  If the base is the remote public key, the result is
->      the shared secret.
->
-> -     The reserved argument must be set to NULL.
-> +     If the parameter kdf is NULL, the following applies:
->
-> -     The buffer length must be at least the length of the prime, or zero.
-> +	 - The buffer length must be at least the length of the prime, or zero.
->
-> -     If the buffer length is nonzero, the length of the result is
-> -     returned when it is successfully calculated and copied in to the
-> -     buffer. When the buffer length is zero, the minimum required
-> -     buffer length is returned.
-> +	 - If the buffer length is nonzero, the length of the result is
-> +	   returned when it is successfully calculated and copied in to the
-> +	   buffer. When the buffer length is zero, the minimum required
-> +	   buffer length is returned.
-> +
-> +     The kdf parameter allows the caller to apply a key derivation function
-> +     (KDF) on the Diffie-Hellman computation where only the result
-> +     of the KDF is returned to the caller. The KDF is characterized with
-> +     struct keyctl_kdf_params as follows:
-> +
-> +	 - char *kdfname specifies the NULL terminated string identifying
+> Makefile                                 |   1 +
+> keyctl.c                                 | 125 +++++++++++++++++++++++
+> keyutils.c                               |  44 ++++++++
+> keyutils.h                               |  15 +++
+> man/keyctl_dh_compute_kdf.3              | 143 ++++++++++++++++++++++++++
+> tests/keyctl/dh_compute/valid/runtest.sh | 168 +++++++++++++++++++++++++++++++
+> tests/toolbox.inc.sh                     |  44 ++++++++
+> version.lds                              |   2 +
+> 8 files changed, 542 insertions(+)
+> create mode 100644 man/keyctl_dh_compute_kdf.3
 
-Change "NULL" to "NUL". NULL refers to a zero pointer, NUL refers to the 
-'\0' character.
-
-> +	   the KDF function used from the kernel crypto API. As of now,
-> +	   only non-keyed KDFs are supported, such as kdf_ctr(sha256),
-> +	   kdf_fb(sha1) or kdf_dpi(sha512). The use of kdf_ctr() complies
-> +	   with SP800-56A.
+> diff --git a/keyutils.c b/keyutils.c
+> index 2a69304..0da640c 100644
+> --- a/keyutils.c
+> +++ b/keyutils.c
+> @@ -244,6 +244,20 @@ long keyctl_dh_compute(key_serial_t private, key_serial_t prime,
+> 	return keyctl(KEYCTL_DH_COMPUTE, &params, buffer, buflen, 0);
+> }
+>
+> +long keyctl_dh_compute_kdf(key_serial_t private, key_serial_t prime,
+> +			   key_serial_t base, char *kdfname, char *otherinfo,
+> +			   size_t otherinfolen, char *buffer, size_t buflen)
+> +{
+> +	struct keyctl_dh_params params = { .private = private,
+> +					   .prime = prime,
+> +					   .base = base };
+> +	struct keyctl_kdf_params kdfparams = { .kdfname = kdfname,
+> +					       .otherinfo = otherinfo,
+> +					       .otherinfolen = otherinfolen };
 > +
-> +	 - char *otherinfo specifies the OtherInfo string as documented in
-
-I suggest calling it "OtherInfo data" rather than a "string", which 
-implies a NUL-terminated C string.
-
-> +	   SP800-56A section 5.8.1.2. The length of the buffer is given with
-> +	   otherinfolen. The format of OtherInfo is defined by the caller.
-> +	   The otherinfo pointer may be NULL if no OtherInfo shall be used.
->
->      This function will return error EOPNOTSUPP if the key type is not
->      supported, error ENOKEY if the key could not be found, or error
-> -     EACCES if the key is not readable by the caller.
-> +     EACCES if the key is not readable by the caller. In addition, the
-> +     function will return EMSGSIZE when the parameter kdf is non-NULL
-> +     and either the buffer length or the OtherInfo length exceeds the
-> +     allowed length.
->
-> ===============
-> KERNEL SERVICES
-> diff --git a/include/linux/compat.h b/include/linux/compat.h
-> index f964ef7..00f348f 100644
-> --- a/include/linux/compat.h
-> +++ b/include/linux/compat.h
-> @@ -295,6 +295,13 @@ struct compat_old_sigaction {
-> };
-> #endif
->
-> +struct compat_keyctl_kdf_params {
-> +	compat_uptr_t kdfname;
-> +	compat_uptr_t otherinfo;
-> +	__u32 otherinfolen;
-> +	__u32 __spare[8];
-> +};
+> +	return keyctl(KEYCTL_DH_COMPUTE, &params, buffer, buflen, &kdfparams);
+> +}
 > +
-> struct compat_statfs;
-> struct compat_statfs64;
-> struct compat_old_linux_dirent;
-> diff --git a/include/uapi/linux/keyctl.h b/include/uapi/linux/keyctl.h
-> index 86eddd6..0abe048 100644
-> --- a/include/uapi/linux/keyctl.h
-> +++ b/include/uapi/linux/keyctl.h
-> @@ -68,4 +68,11 @@ struct keyctl_dh_params {
-> 	__s32 base;
+> /*****************************************************************************/
+> /*
+>  * fetch key description into an allocated buffer
+> @@ -386,6 +400,36 @@ int keyctl_dh_compute_alloc(key_serial_t private, key_serial_t prime,
+> }
+>
+> /*
+> + * fetch DH computation results processed by a KDF into an
+> + * allocated buffer
+> + * - resulting buffer has an extra NUL added to the end
+> + * - returns count (not including extraneous NUL)
+> + */
+
+I don't think this function should be added. Since genlen is known, the 
+caller can handle all of the memory management and call 
+keyctl_dh_compute_kdf itself. Other _alloc functions do something extra, 
+like ask the kernel how big of a buffer is needed.
+
+> +int keyctl_dh_compute_kdf_alloc(key_serial_t private, key_serial_t prime,
+> +				key_serial_t base, size_t genlen, char *kdfname,
+> +				char *otherinfo, size_t otherinfolen,
+> +				void **_buffer)
+> +{
+> +	char *buf;
+> +	int ret;
+> +
+> +	buf = malloc(genlen + 1);
+> +	if (!buf)
+> +		return -1;
+> +
+> +	ret = keyctl_dh_compute_kdf(private, prime, base, kdfname, otherinfo,
+> +				    otherinfolen, buf, genlen);
+> +	if (ret < 0) {
+> +		free(buf);
+> +		return -1;
+> +	}
+> +
+> +	buf[ret] = 0;
+> +	*_buffer = buf;
+> +	return ret;
+> +}
+> +
+> +/*
+>  * Depth-first recursively apply a function over a keyring tree
+>  */
+> static int recursive_key_scan_aux(key_serial_t parent, key_serial_t key,
+> diff --git a/keyutils.h b/keyutils.h
+> index b321aa8..d5abd92 100644
+> --- a/keyutils.h
+> +++ b/keyutils.h
+> @@ -108,6 +108,13 @@ struct keyctl_dh_params {
+> 	key_serial_t base;
 > };
 >
 > +struct keyctl_kdf_params {
 > +	char *kdfname;
 > +	char *otherinfo;
-> +	__u32 otherinfolen;
-> +	__u32 __spare[8];
+> +	uint32_t otherinfolen;
+> +	uint32_t __spare[8];
 > +};
 > +
-> #endif /*  _LINUX_KEYCTL_H */
-> diff --git a/security/keys/Kconfig b/security/keys/Kconfig
-> index f826e87..56491fe 100644
-> --- a/security/keys/Kconfig
-> +++ b/security/keys/Kconfig
-> @@ -90,6 +90,7 @@ config KEY_DH_OPERATIONS
->        bool "Diffie-Hellman operations on retained keys"
->        depends on KEYS
->        select MPILIB
-> +       select CRYPTO_KDF
->        help
-> 	 This option provides support for calculating Diffie-Hellman
-> 	 public keys and shared secrets using values stored as keys
-> diff --git a/security/keys/compat.c b/security/keys/compat.c
-> index 36c80bf..7a7d48a 100644
-> --- a/security/keys/compat.c
-> +++ b/security/keys/compat.c
-> @@ -48,6 +48,35 @@ static long compat_keyctl_instantiate_key_iov(
-> 	return ret;
-> }
->
-> +#ifdef CONFIG_KEY_DH_OPERATIONS
-
-See chapter 20 of https://www.kernel.org/doc/Documentation/CodingStyle, 
-preprocessor conditionals are advised against in .c files.
-
-You can put the function prototype and stub implementation in internal.h, 
-and move the function to compat_dh.c. Then the Makefile should only build 
-compat_dh.c if both relevant config options are set (look for "compat-obj" 
-in other Makefiles).
-
-> +static long compat_keyctl_dh_compute(struct keyctl_dh_params __user *params,
-> +				char __user *buffer, size_t buflen,
-> +				struct compat_keyctl_kdf_params __user *kdf)
-> +{
-> +	struct keyctl_kdf_params kdfcopy;
-> +	struct compat_keyctl_kdf_params compat_kdfcopy;
-> +
-> +	if (!kdf)
-> +		return __keyctl_dh_compute(params, buffer, buflen, NULL);
-> +
-> +	if (copy_from_user(&compat_kdfcopy, kdf, sizeof(compat_kdfcopy)) != 0)
-> +		return -EFAULT;
-> +
-> +	kdfcopy.kdfname = compat_ptr(compat_kdfcopy.kdfname);
-> +	kdfcopy.otherinfo = compat_ptr(compat_kdfcopy.otherinfo);
-> +	kdfcopy.otherinfolen = compat_kdfcopy.otherinfolen;
-> +
-> +	return __keyctl_dh_compute(params, buffer, buflen, &kdfcopy);
-> +}
-> +#else
-> +static long compat_keyctl_dh_compute(struct keyctl_dh_params __user *params,
-> +				     char __user *buffer, size_t buflen,
-> +				     struct keyctl_kdf_params __user *kdf)
-> +{
-> +	return -EOPNOTSUPP
-> +}
-> +#endif
-> +
 > /*
->  * The key control system call, 32-bit compatibility version for 64-bit archs
->  *
-> @@ -133,8 +162,9 @@ COMPAT_SYSCALL_DEFINE5(keyctl, u32, option,
-> 		return keyctl_get_persistent(arg2, arg3);
+>  * syscall wrappers
+>  */
+> @@ -163,6 +170,10 @@ extern long keyctl_invalidate(key_serial_t id);
+> extern long keyctl_get_persistent(uid_t uid, key_serial_t id);
+> extern long keyctl_dh_compute(key_serial_t private, key_serial_t prime,
+> 			      key_serial_t base, char *buffer, size_t buflen);
+> +extern long keyctl_dh_compute_kdf(key_serial_t private, key_serial_t prime,
+> +				  key_serial_t base, char *kdfname,
+> +				  char *otherinfo, size_t otherinfolen,
+> +				  char *buffer, size_t buflen);
 >
-> 	case KEYCTL_DH_COMPUTE:
-> -		return keyctl_dh_compute(compat_ptr(arg2), compat_ptr(arg3),
-> -					 arg4, compat_ptr(arg5));
-> +		return compat_keyctl_dh_compute(compat_ptr(arg2),
-> +						compat_ptr(arg3),
-> +						arg4, compat_ptr(arg5));
+> /*
+>  * utilities
+> @@ -172,6 +183,10 @@ extern int keyctl_read_alloc(key_serial_t id, void **_buffer);
+> extern int keyctl_get_security_alloc(key_serial_t id, char **_buffer);
+> extern int keyctl_dh_compute_alloc(key_serial_t private, key_serial_t prime,
+> 				   key_serial_t base, void **_buffer);
+> +extern int keyctl_dh_compute_kdf_alloc(key_serial_t private, key_serial_t prime,
+> +				       key_serial_t base, size_t genlen,
+> +				       char *kdfname, char *otherinfo,
+> +				       size_t otherinfolen, void **_buffer);
 >
-> 	default:
-> 		return -EOPNOTSUPP;
-> diff --git a/security/keys/dh.c b/security/keys/dh.c
-> index 531ed2e..6a3dea9 100644
-> --- a/security/keys/dh.c
-> +++ b/security/keys/dh.c
-> @@ -77,9 +77,44 @@ error:
-> 	return ret;
-> }
->
-> -long keyctl_dh_compute(struct keyctl_dh_params __user *params,
-> -		       char __user *buffer, size_t buflen,
-> -		       void __user *reserved)
-> +static int keyctl_dh_compute_kdf(struct crypto_rng *tfm,
-> +				 char __user *buffer, size_t buflen,
-> +				 uint8_t *kbuf, size_t kbuflen)
-> +{
-> +	uint8_t *outbuf = NULL;
-> +	int ret;
-> +
-> +#if 0W
+> typedef int (*recursive_key_scanner_t)(key_serial_t parent, key_serial_t key,
+> 				       char *desc, int desc_len, void *data);
+> diff --git a/man/keyctl_dh_compute_kdf.3 b/man/keyctl_dh_compute_kdf.3
+> new file mode 100644
+> index 0000000..06e2b29
+> --- /dev/null
+> +++ b/man/keyctl_dh_compute_kdf.3
 
-Need to remove these conditional lines.
+My vote is to include this content in keyctl_dh_compute.3 instead of 
+adding a separate man page.
 
-> +	/* we do not support HMAC currently */
-> +	ret = crypto_rng_reset(tfm, xx, xxlen);
-> +	if (ret) {
-> +		crypto_free_rng(tfm);
-> +		goto error5;
-> +	}
-> +#endif
-> +
-> +	outbuf = kmalloc(buflen, GFP_KERNEL);
-> +	if (!outbuf) {
-> +		ret = -ENOMEM;
-> +		goto err;
-> +	}
-> +
-> +	ret = crypto_rng_generate(tfm, kbuf, kbuflen, outbuf, buflen);
-> +	if (ret)
-> +		goto err;
-> +
-> +	ret = buflen;
-> +	if (copy_to_user(buffer, outbuf, buflen) != 0)
-> +		ret = -EFAULT;
-> +
-> +err:
-> +	kzfree(outbuf);
-> +	return ret;
-> +}
-> +
-> +long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
-> +			 char __user *buffer, size_t buflen,
-> +			 struct keyctl_kdf_params *kdfcopy)
-> {
-> 	long ret;
-> 	MPI base, private, prime, result;
-> @@ -88,6 +123,7 @@ long keyctl_dh_compute(struct keyctl_dh_params __user *params,
-> 	uint8_t *kbuf;
-> 	ssize_t keylen;
-> 	size_t resultlen;
-> +	struct crypto_rng *tfm = NULL;
->
-> 	if (!params || (!buffer && buflen)) {
-> 		ret = -EINVAL;
-> @@ -98,12 +134,36 @@ long keyctl_dh_compute(struct keyctl_dh_params __user *params,
-> 		goto out;
-> 	}
->
-> -	if (reserved) {
-> -		ret = -EINVAL;
-> -		goto out;
-> +	if (kdfcopy) {
-> +		char *kdfname;
-> +
-> +		if (buflen > KEYCTL_KDF_MAX_OUTPUTLEN ||
-> +		    kdfcopy->otherinfolen > KEYCTL_KDF_MAX_STRING_LEN) {
-> +			ret = -EMSGSIZE;
-> +			goto out;
-> +		}
-> +
-> +		/* get KDF name string */
-> +		kdfname = strndup_user(kdfcopy->kdfname, CRYPTO_MAX_ALG_NAME);
-> +		if (IS_ERR(kdfname)) {
-> +			ret = PTR_ERR(kdfname);
-> +			goto out;
-> +		}
-> +
-> +		/* allocate KDF from the kernel crypto API */
-> +		tfm = crypto_alloc_rng(kdfname, 0, 0);
-> +		kfree(kdfname);
-> +		if (IS_ERR(tfm)) {
-> +			ret = PTR_ERR(tfm);
-> +			goto out;
-> +		}
-> 	}
->
-> -	keylen = mpi_from_key(pcopy.prime, buflen, &prime);
-> +	/*
-> +	 * If the caller requests postprocessing with a KDF, allow an
-> +	 * arbitrary output buffer size since the KDF ensures proper truncation.
-> +	 */
-> +	keylen = mpi_from_key(pcopy.prime, kdfcopy ? SIZE_MAX : buflen, &prime);
-> 	if (keylen < 0 || !prime) {
-> 		/* buflen == 0 may be used to query the required buffer size,
-> 		 * which is the prime key length.
-> @@ -133,12 +193,25 @@ long keyctl_dh_compute(struct keyctl_dh_params __user *params,
-> 		goto error3;
-> 	}
->
-> -	kbuf = kmalloc(resultlen, GFP_KERNEL);
-> +	/* allocate space for DH shared secret and SP800-56A otherinfo */
-> +	kbuf = kmalloc(kdfcopy ? (resultlen + kdfcopy->otherinfolen) : resultlen,
-> +		       GFP_KERNEL);
-> 	if (!kbuf) {
-> 		ret = -ENOMEM;
-> 		goto error4;
-> 	}
->
-> +	/*
-> +	 * Concatenate SP800-56A otherinfo past DH shared secret -- the
-> +	 * input to the KDF is (DH shared secret || otherinfo)
-> +	 */
-> +	if (kdfcopy && kdfcopy->otherinfo &&
-> +	    copy_from_user(kbuf + resultlen, kdfcopy->otherinfo,
-> +			   kdfcopy->otherinfolen) != 0) {
-> +		ret = -EFAULT;
-> +		goto error5;
-> +	}
-> +
-> 	ret = do_dh(result, base, private, prime);
-> 	if (ret)
-> 		goto error5;
-> @@ -147,12 +220,17 @@ long keyctl_dh_compute(struct keyctl_dh_params __user *params,
-> 	if (ret != 0)
-> 		goto error5;
->
-> -	ret = nbytes;
-> -	if (copy_to_user(buffer, kbuf, nbytes) != 0)
-> -		ret = -EFAULT;
-> +	if (kdfcopy) {
-> +		ret = keyctl_dh_compute_kdf(tfm, buffer, buflen, kbuf,
-> +					    resultlen + kdfcopy->otherinfolen);
-> +	} else {
-> +		ret = nbytes;
-> +		if (copy_to_user(buffer, kbuf, nbytes) != 0)
-> +			ret = -EFAULT;
-> +	}
->
-> error5:
-> -	kfree(kbuf);
-> +	kzfree(kbuf);
-> error4:
-> 	mpi_free(result);
-> error3:
-> @@ -162,5 +240,22 @@ error2:
-> error1:
-> 	mpi_free(prime);
-> out:
-> +	if (tfm)
-> +		crypto_free_rng(tfm);
-> 	return ret;
-> }
-> +
-> +long keyctl_dh_compute(struct keyctl_dh_params __user *params,
-> +		       char __user *buffer, size_t buflen,
-> +		       struct keyctl_kdf_params __user *kdf)
-> +{
-> +	struct keyctl_kdf_params kdfcopy;
-> +
-> +	if (!kdf)
-> +		return __keyctl_dh_compute(params, buffer, buflen, NULL);
-> +
-> +	if (copy_from_user(&kdfcopy, kdf, sizeof(kdfcopy)) != 0)
-> +		return -EFAULT;
-> +
-> +	return __keyctl_dh_compute(params, buffer, buflen, &kdfcopy);
+> @@ -0,0 +1,143 @@
+> +.\"
+> +.\" Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
+> +.\" Copyright (C) 2016 Intel Corporation. All rights reserved.
+> +.\"
+> +.\" This program is free software; you can redistribute it and/or
+> +.\" modify it under the terms of the GNU General Public License
+> +.\" as published by the Free Software Foundation; either version
+> +.\" 2 of the License, or (at your option) any later version.
+> +.\"
+> +.TH KEYCTL_DH_COMPUTE 3 "26 Jul 2016" Linux "Linux Key Management Calls"
+> +.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+> +.SH NAME
+> +keyctl_dh_compute_kdf \- Derive key from a Diffie-Hellman shared secret
+> +.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+> +.SH SYNOPSIS
+> +.nf
+> +.B #include <keyutils.h>
+> +.sp
+> +.BI "long keyctl_dh_compute_kdf(key_serial_t " private ", key_serial_t " prime ,
+> +.BI "key_serial_t " base ", char *" kdfname ", char *" otherinfo ",
+> +.BI "size_t " otherinfolen ", char *" buffer ", size_t " buflen ");"
+> +.sp
+> +.BI "long keyctl_dh_compute_kdf_alloc(key_serial_t " private,
+> +.BI "key_serial_t " prime ", key_serial_t " base ", size_t " genlen ",
+> +.BI "char *" kdfname ", "char *" otherinfo ", size_t " otherinfolen ",
+> +.BI "void **" _buffer ");"
+> +.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+> +.SH DESCRIPTION
+> +.BR keyctl_dh_compute_kdf ()
+> +derives a key from a Diffie-Hellman shared secret according to the protocol
+> +specified in SP800-56A.
+> +.P
+> +For the Diffie-Hellman computation, the following algorithm is used::
+> +.IP
+> +.I base
+> +^
+> +.I private
+> +( mod
+> +.I prime
+> +)
+> +.P
+> +To implement the protocol of SP800-56A
+> +.I base
+> +is a key containing the remote public key to compute the Diffie-Hellman
+> +shared secret. That shared secret is post-processed with a key derivation
+> +function.
+> +.P
+> +.IR base ", " private ", and " prime
+> +must all refer to
+> +.BR user -type
+> +keys containing the parameters for the computation.  Each of these keys must
+> +grant the caller
+> +.B read
+> +permission in order for them to be used.
+> +.P
+> +The
+> +.I kdfname
+> +specifies the Linux kernel crypto API name for a key derivation function
+> +using a non-keyed hash, such as kdf_ctr(sha256). Using the counter KDF function
+> +specified with kdf_ctr() makes the key derivation compliant to SP800-56A.
+> +The
+> +.I kdfname
+> +must be a NULL terminated string.
+> +.P
+> +Following the specification of SP800-56A section 5.8.1.2 the
+> +.I otherinfo
+> +parameter may be provided. The format of the OtherInfo field is defined
+> +by the caller. The caller may also specify NULL as a valid argument when
+> +no OtherInfo data shall be processed. The length of the
+> +.I otherinfo
+> +parameter is specified with
+> +.I otherinfolen
+> +and is restricted to a maximum length by the kernel.
+> +.P
+> +The KDF returns the requested number of bytes specified with the
+> +.I genlen
+> +or the
+> +.I buflen
+> +parameter depending on the invoked function.
+> +.P
+> +.I buffer
+> +and
+> +.I buflen
+> +specify the buffer into which the computed result will be placed.
+> +.P
+> +.BR keyctl_dh_compute_kdf_alloc ()
+> +is similar to
+> +.BR keyctl_dh_compute_kdf ()
+> +except that it allocates a buffer with the size of
+> +.I genlen
+> +to hold the payload data and places the data in it. If successful, a pointer
+> +to the buffer is placed in
+> +.IR *_buffer .
+> +The caller must free the buffer.
+> +.P
+> +.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+> +.SH RETURN VALUE
+> +On success
+> +.BR keyctl_dh_compute_kdf ()
+> +returns the amount of data placed into the buffer when
+> +.I buflen
+> +is non-zero.
+> +.P
+> +On success
+> +.BR keyctl_dh_compute_kdf_alloc ()
+> +returns the amount of data in the buffer.
+> +.P
+> +On error, both functions set errno to an appropriate code and return the value
+> +.BR -1 .
+> +.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+> +.SH ERRORS
+> +.TP
+> +.B ENOKEY
+> +One of the keys specified is invalid or not readable.
+> +.TP
+> +.B EINVAL
+> +The buffer pointer is invalid or buflen is too small.
+> +.TP
+> +.B EOPNOTSUPP
+> +One of the keys was not a valid user key.
+> +.TP
+> +.B EMSGSIZE
+> +The size of either
+> +.I otherinfolen
+> +or
+> +.I buflen
+> +is too big.
+> +.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+> +.SH LINKING
+> +This is a library function that can be found in
+> +.IR libkeyutils .
+> +When linking,
+> +.B -lkeyutils
+> +should be specified to the linker.
+> +.\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+> +.SH SEE ALSO
+> +.BR keyctl (1),
+> +.br
+> +.BR keyctl (2),
+> +.br
+> +.BR keyctl (3),
+> +.br
+> +.BR keyutils (7)
 
-I'd find this more readable if there was one call to __keyctl_dh_compute.
-
-> +}
-> diff --git a/security/keys/internal.h b/security/keys/internal.h
-> index a705a7d..9014af3 100644
-> --- a/security/keys/internal.h
-> +++ b/security/keys/internal.h
-> @@ -259,12 +259,17 @@ static inline long keyctl_get_persistent(uid_t uid, key_serial_t destring)
-> #endif
->
-> #ifdef CONFIG_KEY_DH_OPERATIONS
-> +#include <crypto/rng.h>
-> extern long keyctl_dh_compute(struct keyctl_dh_params __user *, char __user *,
-> -			      size_t, void __user *);
-> +			      size_t, struct keyctl_kdf_params __user *);
-> +extern long __keyctl_dh_compute(struct keyctl_dh_params __user *, char __user *,
-> +				size_t, struct keyctl_kdf_params *);
-> +#define KEYCTL_KDF_MAX_OUTPUTLEN	1024	/* max length of KDF output */
-
-KEYCTL_KDF_MAX_OUTPUT_LEN
-                      ^
-for consistency?
-
-> +#define KEYCTL_KDF_MAX_STRING_LEN	64	/* maximum length of strings */
-
-Since this applies only to otherinfo (binary bytes, not a C string), 
-avoid "STRING"/"strings".
-
-> #else
-> static inline long keyctl_dh_compute(struct keyctl_dh_params __user *params,
-> 				     char __user *buffer, size_t buflen,
-> -				     void __user *reserved)
-> +				     struct keyctl_kdf_params __user *kdf)
-> {
-> 	return -EOPNOTSUPP;
-> }
-> diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
-> index d580ad0..b106898 100644
-> --- a/security/keys/keyctl.c
-> +++ b/security/keys/keyctl.c
-> @@ -1689,7 +1689,7 @@ SYSCALL_DEFINE5(keyctl, int, option, unsigned long, arg2, unsigned long, arg3,
-> 	case KEYCTL_DH_COMPUTE:
-> 		return keyctl_dh_compute((struct keyctl_dh_params __user *) arg2,
-> 					 (char __user *) arg3, (size_t) arg4,
-> -					 (void __user *) arg5);
-> +					 (struct keyctl_kdf_params __user *) arg5);
->
-> 	default:
-> 		return -EOPNOTSUPP;
-
-Regards,
 --
 Mat Martineau
 Intel OTC
