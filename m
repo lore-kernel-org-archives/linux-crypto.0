@@ -1,31 +1,58 @@
-From: lujiatong <support@xinnet.com>
-Subject: =?UTF-8?B?5r6z6Zeo6YeR5rKZ6ZuG5Zui77yM55S15a2Q5ri46Im6562J5oKo5p2l5oiY?=  =?UTF-8?B?77yM6LCB5piv55yf5q2j55qE5omT4oCc6JmO4oCd6Iux6ZuE77yBKEFEKQ==?=
-Date: Fri, 05 Aug 2016 17:51:23 +0200
-Message-ID: <20160805155123.8DB54126B7B@fhf16.ecritel.net>
+From: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Subject: Re: [PATCH v2] KEYS: add SP800-56A KDF support for DH
+Date: Fri, 5 Aug 2016 09:08:59 -0700 (PDT)
+Message-ID: <alpine.OSX.2.20.1608050858270.69454@mjmartin-mac01.local>
+References: <2239809.KsND40bFeW@positron.chronox.de> <alpine.OSX.2.20.1608041258050.55029@mjmartin-mac01.local> <7993056.4BOhkDi2U3@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fhf16.ecritel.net ([213.218.148.27]:47949 "HELO
-	fhf16.ecritel.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1422681AbcHEQAW convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Aug 2016 12:00:22 -0400
-Content-Disposition: inline
+Received: from mga09.intel.com ([134.134.136.24]:36748 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1759807AbcHEQJC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 5 Aug 2016 12:09:02 -0400
+In-Reply-To: <7993056.4BOhkDi2U3@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
-Ce message vous a été envoyé parce que "lujiatong <support@xinnet.com>" pense que vous trouverez la page "Sondage" www.hopital.fr intéressante.
+On Fri, 5 Aug 2016, Stephan Mueller wrote:
 
-Lien vers la page:
-http://www.hopital.fr/Media/Sondage/Sondage3
+> Am Donnerstag, 4. August 2016, 13:41:58 CEST schrieb Mat Martineau:
+>
+> Hi Mat,
+>
+>>> +
+>>> +long keyctl_dh_compute(struct keyctl_dh_params __user *params,
+>>> +		       char __user *buffer, size_t buflen,
+>>> +		       struct keyctl_kdf_params __user *kdf)
+>>> +{
+>>> +	struct keyctl_kdf_params kdfcopy;
+>>> +
+>>> +	if (!kdf)
+>>> +		return __keyctl_dh_compute(params, buffer, buflen, NULL);
+>>> +
+>>> +	if (copy_from_user(&kdfcopy, kdf, sizeof(kdfcopy)) != 0)
+>>> +		return -EFAULT;
+>>> +
+>>> +	return __keyctl_dh_compute(params, buffer, buflen, &kdfcopy);
+>>
+>> I'd find this more readable if there was one call to __keyctl_dh_compute.
+>
+> When trying to implement it, I think that it would even be more confusing,
+> because we need a conditional in any case. Do you like
+>
+> return __keyctl_dh_compute(params, buffer, buflen, (kdf) ? &kdfcopy : NULL);
+>
+> better than the already presented code? Besides, this would now imply that we
+> have two conditionals instead of one.
 
-Commentaire par "lujiatong <support@xinnet.com>":
-【澳门金沙集团】诚信品牌，大额无忧：http://www.688595.com/?linux-crypto@vger.kernel.org ，
-★2016年澳门金沙集团，全面改版，支付宝，微信担保存款1元可游戏，入款即送1%，享天天返水1.8％{直接提款}，24小时任意取款，全部0手续费。
-澳门金沙集团-全球最大博彩公司，以信誉为基础，诚信为招牌！
-我们的优惠没有高利贷那么高，但是资金一定像瑞士银行一样安全！
-------------------------------------------
-                    贪婪是最真实的贫穷，满足是最真实的财富。
+Another approach that uses one conditional is to add a struct 
+keyctl_kdf_params* variable and assign it in the conditional block. Maybe 
+that's not much of a win, it's up to you.
+
+--
+Mat Martineau
+Intel OTC
