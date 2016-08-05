@@ -1,51 +1,43 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2] KEYS: add SP800-56A KDF support for DH
-Date: Fri, 05 Aug 2016 09:10:35 +0200
-Message-ID: <7993056.4BOhkDi2U3@positron.chronox.de>
-References: <2239809.KsND40bFeW@positron.chronox.de> <alpine.OSX.2.20.1608041258050.55029@mjmartin-mac01.local>
+From: Will Thomas <will.thomas@imgtec.com>
+Subject: [PATCH v2 1/7] crypto: img-hash - Fix null pointer exception
+Date: Fri, 5 Aug 2016 14:00:14 +0100
+Message-ID: <1470402020-10774-2-git-send-email-will.thomas@imgtec.com>
+References: <1470402020-10774-1-git-send-email-will.thomas@imgtec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>,
+	Will Thomas <will.thomas@imgtec.com>
+To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34024 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1030361AbcHEHKt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Aug 2016 03:10:49 -0400
-In-Reply-To: <alpine.OSX.2.20.1608041258050.55029@mjmartin-mac01.local>
+Received: from mailapp01.imgtec.com ([195.59.15.196]:30965 "EHLO
+	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759662AbcHENIM (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 5 Aug 2016 09:08:12 -0400
+In-Reply-To: <1470402020-10774-1-git-send-email-will.thomas@imgtec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 4. August 2016, 13:41:58 CEST schrieb Mat Martineau:
+Sporadic null pointer exceptions came from here. Fix them.
 
-Hi Mat,
+Signed-off-by: Will Thomas <will.thomas@imgtec.com>
+Reviewed-by: James Hartley <james.hartley@imgtec.com>
+---
+ drivers/crypto/img-hash.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > +
-> > +long keyctl_dh_compute(struct keyctl_dh_params __user *params,
-> > +		       char __user *buffer, size_t buflen,
-> > +		       struct keyctl_kdf_params __user *kdf)
-> > +{
-> > +	struct keyctl_kdf_params kdfcopy;
-> > +
-> > +	if (!kdf)
-> > +		return __keyctl_dh_compute(params, buffer, buflen, NULL);
-> > +
-> > +	if (copy_from_user(&kdfcopy, kdf, sizeof(kdfcopy)) != 0)
-> > +		return -EFAULT;
-> > +
-> > +	return __keyctl_dh_compute(params, buffer, buflen, &kdfcopy);
-> 
-> I'd find this more readable if there was one call to __keyctl_dh_compute.
-
-When trying to implement it, I think that it would even be more confusing, 
-because we need a conditional in any case. Do you like
-
-return __keyctl_dh_compute(params, buffer, buflen, (kdf) ? &kdfcopy : NULL);
-
-better than the already presented code? Besides, this would now imply that we 
-have two conditionals instead of one.
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+index 68e8aa9..e5c941b 100644
+--- a/drivers/crypto/img-hash.c
++++ b/drivers/crypto/img-hash.c
+@@ -361,7 +361,7 @@ static void img_hash_dma_task(unsigned long d)
+ 	size_t nbytes, bleft, wsend, len, tbc;
+ 	struct scatterlist tsg;
+ 
+-	if (!ctx->sg)
++	if (!hdev->req || !ctx->sg)
+ 		return;
+ 
+ 	addr = sg_virt(ctx->sg);
+-- 
+2.1.4
