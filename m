@@ -1,28 +1,31 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2] KEYS: add SP800-56A KDF support for DH
-Date: Fri, 05 Aug 2016 08:12:59 +0200
-Message-ID: <3421337.d0qRjIXnjl@positron.chronox.de>
-References: <2239809.KsND40bFeW@positron.chronox.de> <alpine.OSX.2.20.1608041258050.55029@mjmartin-mac01.local>
+From: baliaoyu <brainwit@box839.bluehost.com>
+Subject: =?UTF-8?B?5r6z6Zeo6YeR5rKZ6ZuG5Zui77yM55yf5Lq65aix5LmQIDHlhYPotbcg5Y+N?=  =?UTF-8?B?5rC0MS44JeaXoOS4iumZkO+8gShBRCk=?=
+Date: Fri, 05 Aug 2016 08:39:20 +0200
+Message-ID: <20160805063920.EF16B10BB5B@fhf16.ecritel.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34018 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S965694AbcHEGNC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Aug 2016 02:13:02 -0400
-In-Reply-To: <alpine.OSX.2.20.1608041258050.55029@mjmartin-mac01.local>
+Received: from fhf16.ecritel.net ([213.218.148.27]:36685 "HELO
+	fhf16.ecritel.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1753012AbcHEGpL convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 5 Aug 2016 02:45:11 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 4. August 2016, 13:41:58 CEST schrieb Mat Martineau:
 
-Hi Mat,
+Ce message vous a été envoyé parce que "baliaoyu <brainwit@box839.bluehost.com>" pense que vous trouverez la page "Sondage" www.hopital.fr intéressante.
 
-I will take care of your comments in the next iteration.
+Lien vers la page:
+http://www.hopital.fr/Media/Sondage/Sondage3
 
-Ciao
-Stephan
+Commentaire par "baliaoyu <brainwit@box839.bluehost.com>":
+5年前，由澳门金沙城实体赌场注资的线上娱乐城澳门金沙集团迎来第一位用户，5年来，澳门金沙集团用户不断增长，诚信铸就了今天！
+不以优惠诱惑，仅靠信誉长存。真正公平、公正、公开的波音大盘！
+怕黑庄，请上澳门金沙集团。网银、支付宝、微信担保存款，最低一元！
+【澳门金沙集团】入款即送1.2%，天天返水1.8％{直接提款}大额无忧：http://www.688595.com/?linux-crypto@vger.kernel.org
+------------------------------------------
+                    期望决定表现,表现决定结果。
