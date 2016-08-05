@@ -1,64 +1,31 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [RFC][PATCH] RANDOM: ATH9K RNG delivers zero bits of entropy
-Date: Fri, 05 Aug 2016 17:08:14 +0200
-Message-ID: <34197429.2CvoIfft9B@positron.chronox.de>
+From: lujiatong <support@xinnet.com>
+Subject: =?UTF-8?B?5r6z6Zeo6YeR5rKZ6ZuG5Zui77yM55S15a2Q5ri46Im6562J5oKo5p2l5oiY?=  =?UTF-8?B?77yM6LCB5piv55yf5q2j55qE5omT4oCc6JmO4oCd6Iux6ZuE77yBKEFEKQ==?=
+Date: Fri, 05 Aug 2016 17:51:23 +0200
+Message-ID: <20160805155123.8DB54126B7B@fhf16.ecritel.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	ath9k-devel@qca.qualcomm.com, linux-wireless@vger.kernel.org,
-	ath9k-devel@lists.ath9k.org, Kalle Valo <kvalo@codeaurora.org>
-To: Ted Tso <tytso@mit.edu>, herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34042 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759865AbcHEPIW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Aug 2016 11:08:22 -0400
+Received: from fhf16.ecritel.net ([213.218.148.27]:47949 "HELO
+	fhf16.ecritel.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1422681AbcHEQAW convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 5 Aug 2016 12:00:22 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Ted, Herbert,
 
-I sent a question to the ATH9K RNG some time ago to the developers.
-See https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg19115.html
+Ce message vous a été envoyé parce que "lujiatong <support@xinnet.com>" pense que vous trouverez la page "Sondage" www.hopital.fr intéressante.
 
-I have not yet received a word and I think this issue should be resolved.
+Lien vers la page:
+http://www.hopital.fr/Media/Sondage/Sondage3
 
-Thanks
-Stephan
-
----8<---
-
-The ATH9K driver implements an RNG which is completely bypassing the
-standard Linux HW generator logic.
-
-The RNG may or may not deliver entropy. Considering the conservative
-approach in treating entropy with respect to non-auditable sources, this
-patch changes the delivered entropy value to zero. The RNG still feeds
-data into the input_pool but it is assumed to have no entropy.
-
-When the ATH9K RNG changes to use the HW RNG framework, it may re-enable
-the entropy estimation considering that a user can change that value at
-boot and runtime.
-
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- drivers/net/wireless/ath/ath9k/rng.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/net/wireless/ath/ath9k/rng.c b/drivers/net/wireless/ath/ath9k/rng.c
-index d38e50f..d63dc48 100644
---- a/drivers/net/wireless/ath/ath9k/rng.c
-+++ b/drivers/net/wireless/ath/ath9k/rng.c
-@@ -92,8 +92,7 @@ static int ath9k_rng_kthread(void *data)
- 		fail_stats = 0;
- 
- 		/* sleep until entropy bits under write_wakeup_threshold */
--		add_hwgenerator_randomness((void *)rng_buf, bytes_read,
--					   ATH9K_RNG_ENTROPY(bytes_read));
-+		add_hwgenerator_randomness((void *)rng_buf, bytes_read, 0);
- 	}
- 
- 	kfree(rng_buf);
--- 
-2.7.4
+Commentaire par "lujiatong <support@xinnet.com>":
+【澳门金沙集团】诚信品牌，大额无忧：http://www.688595.com/?linux-crypto@vger.kernel.org ，
+★2016年澳门金沙集团，全面改版，支付宝，微信担保存款1元可游戏，入款即送1%，享天天返水1.8％{直接提款}，24小时任意取款，全部0手续费。
+澳门金沙集团-全球最大博彩公司，以信誉为基础，诚信为招牌！
+我们的优惠没有高利贷那么高，但是资金一定像瑞士银行一样安全！
+------------------------------------------
+                    贪婪是最真实的贫穷，满足是最真实的财富。
