@@ -1,31 +1,65 @@
-From: jipuwen <104news@ms1.104.com.tw>
-Subject: =?UTF-8?B?5r6z6Zeo6YeR5rKZ6ZuG5Zui5YWo55CD5pyA5aSn5Y2a5b2p5YWs5Y+477yM?=  =?UTF-8?B?5oiR5Lus5LiA55u06KKr5qih5Lu/77yM5L2G5LuO5pyq6KKr6LaF6LaKKEFE?=  =?UTF-8?B?Ke+8gQ==?=
-Date: Sat, 06 Aug 2016 07:38:48 +0200
-Message-ID: <20160806053848.63BCC10E037@fhf16.ecritel.net>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v2] RANDOM: ATH9K RNG delivers zero bits of entropy
+Date: Sun, 07 Aug 2016 11:36:05 +0200
+Message-ID: <1654172.XfclnXhRmn@positron.chronox.de>
+References: <34197429.2CvoIfft9B@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, ath9k-devel@qca.qualcomm.com,
+	linux-wireless@vger.kernel.org, ath9k-devel@lists.ath9k.org,
+	Kalle Valo <kvalo@codeaurora.org>,
+	Jason Cooper <jason@lakedaemon.net>
+To: Ted Tso <tytso@mit.edu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fhf16.ecritel.net ([213.218.148.27]:38686 "HELO
-	fhf16.ecritel.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1751059AbcHFWFX convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 6 Aug 2016 18:05:23 -0400
-Content-Disposition: inline
+Received: from mail.eperm.de ([89.247.134.16]:34212 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751501AbcHGJgN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 7 Aug 2016 05:36:13 -0400
+In-Reply-To: <34197429.2CvoIfft9B@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+The ATH9K driver implements an RNG which is completely bypassing the
+standard Linux HW generator logic.
 
-Ce message vous a été envoyé parce que "jipuwen <104news@ms1.104.com.tw>" pense que vous trouverez la page "Sondage" www.hopital.fr intéressante.
+The RNG may or may not deliver entropy. Considering the conservative
+approach in treating entropy with respect to non-auditable sources, this
+patch changes the delivered entropy value to zero. The RNG still feeds
+data into the input_pool but it is assumed to have no entropy.
 
-Lien vers la page:
-http://www.hopital.fr/Media/Sondage/Sondage3
+When the ATH9K RNG changes to use the HW RNG framework, it may re-enable
+the entropy estimation considering that a user can change that value at
+boot and runtime.
 
-Commentaire par "jipuwen <104news@ms1.104.com.tw>":
-我们提供您喜爱的各种体育赛事（DOTA、泰拳、FI赛车、百家乐，牛牛，……现场真人视讯娱乐、各类彩票、六合彩赔率48倍、电子游艺等好玩游戏哦。澳门金沙集团专注于玩家的体验度，款即送1.2%红利无上限，还享天天返水1.8％{直接提款}，贴心回馈，惊喜连连！ 
-澳门金沙集团，一家只注重于信誉的公司。
-中国地图版本一寸都不能少。爱中国爱金沙集团！
-老牌网站，大额无忧：http://www.688595.com/?linux-crypto@vger.kernel.org
-------------------------------------------
-                    可能一个人说你不服气，两个人说你不服气，很多人在说的时候，你要反省，一定是自己出了一些问题。
+Reviewed-by: Jason Cooper <jason@lakedaemon.net>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ drivers/net/wireless/ath/ath9k/rng.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/net/wireless/ath/ath9k/rng.c b/drivers/net/wireless/ath/ath9k/rng.c
+index d38e50f..1ed8338 100644
+--- a/drivers/net/wireless/ath/ath9k/rng.c
++++ b/drivers/net/wireless/ath/ath9k/rng.c
+@@ -22,7 +22,6 @@
+ #include "ar9003_phy.h"
+ 
+ #define ATH9K_RNG_BUF_SIZE	320
+-#define ATH9K_RNG_ENTROPY(x)	(((x) * 8 * 320) >> 10) /* quality: 320/1024 */
+ 
+ static int ath9k_rng_data_read(struct ath_softc *sc, u32 *buf, u32 buf_size)
+ {
+@@ -92,8 +91,7 @@ static int ath9k_rng_kthread(void *data)
+ 		fail_stats = 0;
+ 
+ 		/* sleep until entropy bits under write_wakeup_threshold */
+-		add_hwgenerator_randomness((void *)rng_buf, bytes_read,
+-					   ATH9K_RNG_ENTROPY(bytes_read));
++		add_hwgenerator_randomness((void *)rng_buf, bytes_read, 0);
+ 	}
+ 
+ 	kfree(rng_buf);
+-- 
+2.7.4
