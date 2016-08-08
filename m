@@ -1,34 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: crc32c-vpmsum - Convert to CPU feature based
- module autoloading
-Date: Mon, 8 Aug 2016 23:22:09 +0800
-Message-ID: <20160808152209.GA31540@gondor.apana.org.au>
-References: <87y44biu7s.fsf@concordia.ellerman.id.au>
+Subject: Re: [PATCH] crypto: sha3 - Add missing ULL suffixes for 64-bit
+ constants
+Date: Tue, 9 Aug 2016 00:06:28 +0800
+Message-ID: <20160808160628.GA32116@gondor.apana.org.au>
+References: <1470245823-21090-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: anton@samba.org, anton@ozlabs.org, benh@kernel.crashing.org,
-	paulus@samba.org, davem@davemloft.net, alastair@d-silva.org,
-	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
-To: Michael Ellerman <mpe@ellerman.id.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36618 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751473AbcHHPWm (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Aug 2016 11:22:42 -0400
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Jeff Garzik <jeff@garzik.org>,
+	Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <87y44biu7s.fsf@concordia.ellerman.id.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1470245823-21090-1-git-send-email-geert@linux-m68k.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Michael Ellerman <mpe@ellerman.id.au> wrote:
->
-> This is actually an arch/powerpc patch, so I'll merge it unless Herbert
-> objects.
+On Wed, Aug 03, 2016 at 07:37:03PM +0200, Geert Uytterhoeven wrote:
+> On 32-bit (e.g. with m68k-linux-gnu-gcc-4.1):
+> 
+>     crypto/sha3_generic.c:27: warning: integer constant is too large for ‘long’ type
+>     crypto/sha3_generic.c:28: warning: integer constant is too large for ‘long’ type
+>     crypto/sha3_generic.c:29: warning: integer constant is too large for ‘long’ type
+>     crypto/sha3_generic.c:29: warning: integer constant is too large for ‘long’ type
+>     crypto/sha3_generic.c:31: warning: integer constant is too large for ‘long’ type
+>     crypto/sha3_generic.c:31: warning: integer constant is too large for ‘long’ type
+>     crypto/sha3_generic.c:32: warning: integer constant is too large for ‘long’ type
+>     crypto/sha3_generic.c:32: warning: integer constant is too large for ‘long’ type
+>     crypto/sha3_generic.c:32: warning: integer constant is too large for ‘long’ type
+>     crypto/sha3_generic.c:33: warning: integer constant is too large for ‘long’ type
+>     crypto/sha3_generic.c:33: warning: integer constant is too large for ‘long’ type
+>     crypto/sha3_generic.c:34: warning: integer constant is too large for ‘long’ type
+>     crypto/sha3_generic.c:34: warning: integer constant is too large for ‘long’ type
+> 
+> Fixes: 53964b9ee63b7075 ("crypto: sha3 - Add SHA-3 hash algorithm")
+> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-It's fine with me.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
