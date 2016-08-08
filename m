@@ -1,71 +1,64 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: AF_ALG broken?
-Date: Mon, 08 Aug 2016 20:30:32 +0200
-Message-ID: <5217898.dpPNhAO3PW@tauon.atsec.com>
-References: <20160808164427.GB1041@n2100.armlinux.org.uk> <5469036.jmYhrDdAzD@positron.chronox.de>
+From: Jason Cooper <jason@lakedaemon.net>
+Subject: Re: [PATCH v2] RANDOM: ATH9K RNG delivers zero bits of entropy
+Date: Mon, 8 Aug 2016 22:04:52 +0000
+Message-ID: <20160808220452.GA2013@io.lakedaemon.net>
+References: <34197429.2CvoIfft9B@positron.chronox.de>
+ <1654172.XfclnXhRmn@positron.chronox.de>
+ <657897b90b8344eeab10d7a0f604988d@aptaiexm02f.ap.qualcomm.com>
+ <1830987.VF9l4XmGxv@tauon.atsec.com>
+ <20160808172930.GD4511@io.lakedaemon.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=us-ascii
+Cc: "Pan, Miaoqing" <miaoqing@qti.qualcomm.com>,
+	Ted Tso <tytso@mit.edu>,
+	"Sepehrdad, Pouyan" <pouyans@qti.qualcomm.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	ath9k-devel <ath9k-devel@qca.qualcomm.com>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"ath9k-devel@lists.ath9k.org" <ath9k-devel@lists.ath9k.org>,
+	Kalle Valo <kvalo@codeaurora.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34246 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752143AbcHHSaf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Aug 2016 14:30:35 -0400
-In-Reply-To: <5469036.jmYhrDdAzD@positron.chronox.de>
+Received: from outbound1a.ore.mailhop.org ([54.213.22.21]:11219 "EHLO
+	outbound1a.ore.mailhop.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752291AbcHHWE6 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 8 Aug 2016 18:04:58 -0400
+Content-Disposition: inline
+In-Reply-To: <20160808172930.GD4511@io.lakedaemon.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 8. August 2016, 20:18:32 CEST schrieb Stephan Mueller:
-
 Hi Stephan,
 
-> Am Montag, 8. August 2016, 17:44:27 CEST schrieb Russell King - ARM Linux:
+On Mon, Aug 08, 2016 at 05:29:30PM +0000, Jason Cooper wrote:
+> On Mon, Aug 08, 2016 at 08:41:36AM +0200, Stephan Mueller wrote:
+...
+> > If you think that this patch is a challenge because your driver starts to 
+> > spin, please help and offer another solution.
 > 
-> Hi Russell,
+> Well, I don't buy the reasoning listed above for not using the hwrng
+> framework.  Interrupt timings were never designed to be a source of entropy
+> either.  We need to grab it where ever we can find it, especially on
+> embedded systems.  Documentation/hw_random.txt even says:
 > 
-> > Hi,
-> > 
-> > When trying to use the openssl AF_ALG module with 4.8-rc1 with imx
-> > caam, I get this:
-> > 
-> > $ OPENSSL_CONF=/shared/crypto/openssl-imx.cnf strace openssl dgst -md5
-> > </bin/bash ...
-> > socket(PF_ALG, SOCK_SEQPACKET, 0)       = 3
-> > close(3)                                = 0
-> > socket(PF_ALG, SOCK_SEQPACKET, 0)       = 3
-> > bind(3, {sa_family=AF_ALG, sa_data="hash\0\0\0\0\0\0\0\0\0\0"}, 88) = 0
-> > accept(3, 0, NULL)                      = 4
-> > fstat64(0, {st_mode=S_IFREG|0755, st_size=666864, ...}) = 0
-> > mmap2(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0)
-> > =
-> > 0xb6fab000 read(0,
-> > "\177ELF\1\1\1\0\0\0\0\0\0\0\0\0\2\0(\0\1\0\0\0\21'\2\0004\0\0\0"...,
-> > 8192)
-> > = 8192 send(4,
-> > "\177ELF\1\1\1\0\0\0\0\0\0\0\0\0\2\0(\0\1\0\0\0\21'\2\0004\0\0\0"...,
-> > 8192,
-> > MSG_MORE) = -1 ENOKEY (Required key not available)
-> > 
-> > This used to work, so something in the kernel AF_ALG API has changed
-> > which has broken userspace.  Any ideas what's up, or where to look?
+> """
+> This data is NOT CHECKED by any fitness tests, and could potentially be
+> bogus (if the hardware is faulty or has been tampered with).
+> """
 > 
-> This seems to be the the change added by Herbert to fix a security issue.
-> This caused a similar stirr in the cryptsetup user space tool.
-> 
-> I guess you are affected by 6de62f15b581f920ade22d758f4c338311c2f0d4
+> I really don't think there's a problem with adding these sorts of
+> sources under char/hw_random/.  I think the only thing we would be
+> concerned about, other than the already addressed entropy estimation,
+> would be constraining the data rate.
 
-Just to be clear: the settings on the tfmfd must be completed before an 
-accept(). If make an operation on the tfmfd after the accept call, you get 
-the ENOKEY.
+Further research yields char/hw_random/timeriomem-rng.c
 
-This was my change to the issue:
+It could use an update to ->read() vice data_{present,read}(), but it's
+functionally exactly what the ath9k rng is doing. :)
 
-https://github.com/smuellerDD/libkcapi/commit/
-1d6c3b1b540caea784a95b1ca6e2cf38c174f585
+thx,
 
-Ciao
-Stephan
+Jason.
