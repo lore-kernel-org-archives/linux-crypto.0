@@ -1,108 +1,43 @@
-From: Jason Cooper <jason@lakedaemon.net>
-Subject: Re: [PATCH v2] RANDOM: ATH9K RNG delivers zero bits of entropy
-Date: Mon, 8 Aug 2016 17:29:30 +0000
-Message-ID: <20160808172930.GD4511@io.lakedaemon.net>
-References: <34197429.2CvoIfft9B@positron.chronox.de>
- <1654172.XfclnXhRmn@positron.chronox.de>
- <657897b90b8344eeab10d7a0f604988d@aptaiexm02f.ap.qualcomm.com>
- <1830987.VF9l4XmGxv@tauon.atsec.com>
+From: Jeffrey Walton <noloader@gmail.com>
+Subject: Re: AF_ALG broken?
+Date: Mon, 8 Aug 2016 13:47:33 -0400
+Message-ID: <CAH8yC8nFhMCfXpdrcz1bJDPfbMHRGQpkV6yOZ7gy4yRHJwXkWw@mail.gmail.com>
+References: <20160808164427.GB1041@n2100.armlinux.org.uk>
+Reply-To: noloader@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "Pan, Miaoqing" <miaoqing@qti.qualcomm.com>,
-	Ted Tso <tytso@mit.edu>,
-	"Sepehrdad, Pouyan" <pouyans@qti.qualcomm.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	ath9k-devel <ath9k-devel@qca.qualcomm.com>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	"ath9k-devel@lists.ath9k.org" <ath9k-devel@lists.ath9k.org>,
-	Kalle Valo <kvalo@codeaurora.org>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1830987.VF9l4XmGxv@tauon.atsec.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-crypto@vger.kernel.org
+To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-io0-f169.google.com ([209.85.223.169]:36536 "EHLO
+	mail-io0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752336AbcHHRre (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 8 Aug 2016 13:47:34 -0400
+Received: by mail-io0-f169.google.com with SMTP id b62so364504745iod.3
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Aug 2016 10:47:34 -0700 (PDT)
+In-Reply-To: <20160808164427.GB1041@n2100.armlinux.org.uk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Stephan, Miaoqing Pan,
+> When trying to use the openssl AF_ALG module with 4.8-rc1 with imx
+> caam, I get this:
+>
+> $ OPENSSL_CONF=/shared/crypto/openssl-imx.cnf strace openssl dgst -md5 </bin/bash
+> ...
+> socket(PF_ALG, SOCK_SEQPACKET, 0)       = 3
+> close(3)                                = 0
+> socket(PF_ALG, SOCK_SEQPACKET, 0)       = 3
+> bind(3, {sa_family=AF_ALG, sa_data="hash\0\0\0\0\0\0\0\0\0\0"}, 88) = 0
+> accept(3, 0, NULL)                      = 4
+> fstat64(0, {st_mode=S_IFREG|0755, st_size=666864, ...}) = 0
+> mmap2(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0xb6fab000
+> read(0, "\177ELF\1\1\1\0\0\0\0\0\0\0\0\0\2\0(\0\1\0\0\0\21'\2\0004\0\0\0"..., 8192) = 8192
+> send(4, "\177ELF\1\1\1\0\0\0\0\0\0\0\0\0\2\0(\0\1\0\0\0\21'\2\0004\0\0\0"..., 8192, MSG_MORE) = -1 ENOKEY (Required key not available)
 
-On Mon, Aug 08, 2016 at 08:41:36AM +0200, Stephan Mueller wrote:
-> Am Montag, 8. August 2016, 02:03:36 CEST schrieb Pan, Miaoqing:
-> > The entropy was evaluated by crypto expert,  the analysis report show the
-> > ADC with at least 10bits and up to 22 bits of min-entropy for a 32 bits
-> > value, we conservatively assume the min-entropy is 10 bits out of 32 bits,
-> > so that's why set entropy quality  to  320/1024 = 10/32.
+As far as I know from testing on x86, it has never worked as expected.
+I believe you have to use 'sendto' and 'recvfrom' because 'send' and
+'recv' use default structures, and they configure the object
+incorrectly.
 
-Ok, so the relevant commit is:
-
-  ed14dc0af7cce ath9k: feeding entropy in kernel from ADC capture
-
-Which refers to a previous commit:
-
-  6301566e0b2d ath9k: export HW random number generator
-
-> > Also we have explained in the commit message why can't use the HW
-> > RNG framework.
-
->From ed14dc0af7cce:
-
-"""
-Since ADC was not designed to be a dedicated HW RNG, we do not want to
-bind it to /dev/hwrng framework directly.
-"""
-
-> Where is the description of the RNG, where is the test implementation? 
-> > 
-> > Otherwise, your patch will cause high CPU load,  as continuously read ADC
-> > data if entropy bits under write_wakeup_threshold.
-> 
-> The issue is that although you may have analyzed it, others are unable to 
-> measure the quality of the RNG and assess the design as well as the 
-> implementation of the RNG. This RNG is the only implementation of a hardware 
-> RNG that per default and without being able to change it at runtime injects 
-> data into the input_pool where the noise source cannot be audited. Note, even 
-> other respected RNG noise sources like the Intel RDRAND will not feed into /
-> dev/random per default in a way that dominates all other noise sources.
-> 
-> I would like to be able to deactivate that noise source to the extent that it 
-> does not cause /dev/random to unblock. The reason is that your noise source 
-> starts to dominate all other noise sources.
-
-I think the short-term problem here is the config logic:
-
-config ATH9K_HWRNG
-       bool "Random number generator support"
-       depends on ATH9K && (HW_RANDOM = y || HW_RANDOM = ATH9K)
-       default y
-
-If you have *any* hwrngs you want to use and you have an ath9k card
-(HW_RANDOM = y and ATH9K != n), you get the behavior Stephan is pointing
-out.
-
-Short term, we should just default no here.
-
-> If you think that this patch is a challenge because your driver starts to 
-> spin, please help and offer another solution.
-
-Well, I don't buy the reasoning listed above for not using the hwrng
-framework.  Interrupt timings were never designed to be a source of entropy
-either.  We need to grab it where ever we can find it, especially on
-embedded systems.  Documentation/hw_random.txt even says:
-
-"""
-This data is NOT CHECKED by any fitness tests, and could potentially be
-bogus (if the hardware is faulty or has been tampered with).
-"""
-
-I really don't think there's a problem with adding these sorts of
-sources under char/hw_random/.  I think the only thing we would be
-concerned about, other than the already addressed entropy estimation,
-would be constraining the data rate.
-
-Is ath9k the only wireless card that exposes ADC registers?  What about
-sound cards?
-
-thx,
-
-Jason.
+Jeff
