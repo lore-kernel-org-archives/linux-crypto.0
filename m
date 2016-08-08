@@ -1,44 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: sha3 - Add missing ULL suffixes for 64-bit
- constants
-Date: Tue, 9 Aug 2016 00:06:28 +0800
-Message-ID: <20160808160628.GA32116@gondor.apana.org.au>
-References: <1470245823-21090-1-git-send-email-geert@linux-m68k.org>
+Subject: Re: [PATCH 0/2] crypto: caam - authenc fixes
+Date: Tue, 9 Aug 2016 00:06:46 +0800
+Message-ID: <20160808160646.GB32116@gondor.apana.org.au>
+References: <1470330167-31534-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Cc: Jeff Garzik <jeff@garzik.org>,
-	Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:38743 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752642AbcHHQGu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 8 Aug 2016 12:06:50 -0400
 Content-Disposition: inline
-In-Reply-To: <1470245823-21090-1-git-send-email-geert@linux-m68k.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1470330167-31534-1-git-send-email-horia.geanta@nxp.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Aug 03, 2016 at 07:37:03PM +0200, Geert Uytterhoeven wrote:
-> On 32-bit (e.g. with m68k-linux-gnu-gcc-4.1):
+On Thu, Aug 04, 2016 at 08:02:45PM +0300, Horia Geantă wrote:
+> The first patch fixes a few typos in the encrypt shared descriptor
+> used by echainiv(authenc) algorithms.
 > 
->     crypto/sha3_generic.c:27: warning: integer constant is too large for ‘long’ type
->     crypto/sha3_generic.c:28: warning: integer constant is too large for ‘long’ type
->     crypto/sha3_generic.c:29: warning: integer constant is too large for ‘long’ type
->     crypto/sha3_generic.c:29: warning: integer constant is too large for ‘long’ type
->     crypto/sha3_generic.c:31: warning: integer constant is too large for ‘long’ type
->     crypto/sha3_generic.c:31: warning: integer constant is too large for ‘long’ type
->     crypto/sha3_generic.c:32: warning: integer constant is too large for ‘long’ type
->     crypto/sha3_generic.c:32: warning: integer constant is too large for ‘long’ type
->     crypto/sha3_generic.c:32: warning: integer constant is too large for ‘long’ type
->     crypto/sha3_generic.c:33: warning: integer constant is too large for ‘long’ type
->     crypto/sha3_generic.c:33: warning: integer constant is too large for ‘long’ type
->     crypto/sha3_generic.c:34: warning: integer constant is too large for ‘long’ type
->     crypto/sha3_generic.c:34: warning: integer constant is too large for ‘long’ type
+> Second patch fixes the case when .setkey is called before .setauthsize,
+> avoiding creating authenc descriptors with zero authsize.
 > 
-> Fixes: 53964b9ee63b7075 ("crypto: sha3 - Add SHA-3 hash algorithm")
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Both patches are also being sent to -stable for v4.3+ kernels.
 
-Patch applied.  Thanks.
+Both patches applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
