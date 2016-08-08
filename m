@@ -1,43 +1,39 @@
-From: Jeffrey Walton <noloader@gmail.com>
-Subject: Re: AF_ALG broken?
-Date: Mon, 8 Aug 2016 13:47:33 -0400
-Message-ID: <CAH8yC8nFhMCfXpdrcz1bJDPfbMHRGQpkV6yOZ7gy4yRHJwXkWw@mail.gmail.com>
-References: <20160808164427.GB1041@n2100.armlinux.org.uk>
-Reply-To: noloader@gmail.com
+From: Fabio Estevam <festevam@gmail.com>
+Subject: Re: [PATCH 00/11] Further iMX CAAM updates
+Date: Mon, 8 Aug 2016 14:36:51 -0300
+Message-ID: <CAOMZO5C0_bCcxPV8NWcBmc8-bGb8SMU2c4E+Mv7LLUJbGy-Apw@mail.gmail.com>
+References: <20160808170400.GC1041@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org
+Cc: Fabio Estevam <fabio.estevam@freescale.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, horia.geanta@nxp.com
 To: Russell King - ARM Linux <linux@armlinux.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f169.google.com ([209.85.223.169]:36536 "EHLO
-	mail-io0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752336AbcHHRre (ORCPT
+Received: from mail-ua0-f193.google.com ([209.85.217.193]:35216 "EHLO
+	mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752634AbcHHRvH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Aug 2016 13:47:34 -0400
-Received: by mail-io0-f169.google.com with SMTP id b62so364504745iod.3
-        for <linux-crypto@vger.kernel.org>; Mon, 08 Aug 2016 10:47:34 -0700 (PDT)
-In-Reply-To: <20160808164427.GB1041@n2100.armlinux.org.uk>
+	Mon, 8 Aug 2016 13:51:07 -0400
+Received: by mail-ua0-f193.google.com with SMTP id 109so5373883uat.2
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Aug 2016 10:51:06 -0700 (PDT)
+In-Reply-To: <20160808170400.GC1041@n2100.armlinux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> When trying to use the openssl AF_ALG module with 4.8-rc1 with imx
-> caam, I get this:
+Hi Russell,
+
+On Mon, Aug 8, 2016 at 2:04 PM, Russell King - ARM Linux
+<linux@armlinux.org.uk> wrote:
+> This is a re-post (with hopefully bugs fixed from December's review).
+> Untested, because AF_ALG appears to be broken in 4.8-rc1.  Maybe
+> someone can provide some hints how to test using tcrypt please?
 >
-> $ OPENSSL_CONF=/shared/crypto/openssl-imx.cnf strace openssl dgst -md5 </bin/bash
-> ...
-> socket(PF_ALG, SOCK_SEQPACKET, 0)       = 3
-> close(3)                                = 0
-> socket(PF_ALG, SOCK_SEQPACKET, 0)       = 3
-> bind(3, {sa_family=AF_ALG, sa_data="hash\0\0\0\0\0\0\0\0\0\0"}, 88) = 0
-> accept(3, 0, NULL)                      = 4
-> fstat64(0, {st_mode=S_IFREG|0755, st_size=666864, ...}) = 0
-> mmap2(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0xb6fab000
-> read(0, "\177ELF\1\1\1\0\0\0\0\0\0\0\0\0\2\0(\0\1\0\0\0\21'\2\0004\0\0\0"..., 8192) = 8192
-> send(4, "\177ELF\1\1\1\0\0\0\0\0\0\0\0\0\2\0(\0\1\0\0\0\21'\2\0004\0\0\0"..., 8192, MSG_MORE) = -1 ENOKEY (Required key not available)
+> Here are further imx-caam updates that I've had since before the
+> previous merge window.  Please review and (I guess) if Freescale
+> folk can provide acks etc that would be nice.  Thanks.
 
-As far as I know from testing on x86, it has never worked as expected.
-I believe you have to use 'sendto' and 'recvfrom' because 'send' and
-'recv' use default structures, and they configure the object
-incorrectly.
+I am adding Horia on Cc, who is familiar with the caam driver.
 
-Jeff
+Thanks
