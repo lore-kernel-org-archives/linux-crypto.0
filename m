@@ -1,7 +1,7 @@
 From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 06/11] crypto: caam: ensure that we clean up after an error
-Date: Mon, 08 Aug 2016 18:04:58 +0100
-Message-ID: <E1bWnz0-0002Vu-30@rmk-PC.armlinux.org.uk>
+Subject: [PATCH 07/11] crypto: caam: check and use dma_map_sg() return code
+Date: Mon, 08 Aug 2016 18:05:03 +0100
+Message-ID: <E1bWnz5-0002W0-7O@rmk-PC.armlinux.org.uk>
 References: <20160808170400.GC1041@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -11,342 +11,346 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 To: Fabio Estevam <fabio.estevam@freescale.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:57491 "EHLO
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:57496 "EHLO
 	pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752343AbcHHRFD (ORCPT
+	with ESMTP id S1752189AbcHHRFK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Aug 2016 13:05:03 -0400
+	Mon, 8 Aug 2016 13:05:10 -0400
 In-Reply-To: <20160808170400.GC1041@n2100.armlinux.org.uk>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Ensure that we clean up allocations and DMA mappings after encountering
-an error rather than just giving up and leaking memory and resources.
+Strictly, dma_map_sg() may coalesce SG entries, but in practise on iMX
+hardware, this will never happen.  However, dma_map_sg() can fail, and
+we completely fail to check its return value.  So, fix this properly.
+
+Arrange the code to map the scatterlist early, so we know how many
+scatter table entries to allocate, and then fill them in.  This allows
+us to keep relatively simple error cleanup paths.
 
 Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 ---
- drivers/crypto/caam/caamhash.c | 132 ++++++++++++++++++++++++-----------------
- 1 file changed, 79 insertions(+), 53 deletions(-)
+ drivers/crypto/caam/caamhash.c | 138 ++++++++++++++++++++++++++++++-----------
+ 1 file changed, 103 insertions(+), 35 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index d2129be43bf1..e1925bf3a7cc 100644
+index e1925bf3a7cc..a639183d0115 100644
 --- a/drivers/crypto/caam/caamhash.c
 +++ b/drivers/crypto/caam/caamhash.c
-@@ -829,7 +829,7 @@ static int ahash_update_ctx(struct ahash_request *req)
- 		ret = ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len,
- 					 edesc->sec4_sg, DMA_BIDIRECTIONAL);
- 		if (ret)
--			return ret;
-+			goto err;
+@@ -187,15 +187,6 @@ static inline dma_addr_t buf_map_to_sec4_sg(struct device *jrdev,
+ 	return buf_dma;
+ }
  
- 		state->buf_dma = try_buf_map_to_sec4_sg(jrdev,
- 							edesc->sec4_sg + 1,
-@@ -860,7 +860,8 @@ static int ahash_update_ctx(struct ahash_request *req)
- 						     DMA_TO_DEVICE);
- 		if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
- 			dev_err(jrdev, "unable to map S/G table\n");
--			return -ENOMEM;
-+			ret = -ENOMEM;
-+			goto err;
+-/* Map req->src and put it in link table */
+-static inline void src_map_to_sec4_sg(struct device *jrdev,
+-				      struct scatterlist *src, int src_nents,
+-				      struct sec4_sg_entry *sec4_sg)
+-{
+-	dma_map_sg(jrdev, src, src_nents, DMA_TO_DEVICE);
+-	sg_to_sec4_sg_last(src, src_nents, sec4_sg, 0);
+-}
+-
+ /*
+  * Only put buffer in link table if it contains data, which is possible,
+  * since a buffer has previously been used, and needs to be unmapped,
+@@ -791,7 +782,7 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 	int in_len = *buflen + req->nbytes, to_hash;
+ 	u32 *sh_desc = ctx->sh_desc_update, *desc;
+ 	dma_addr_t ptr = ctx->sh_desc_update_dma;
+-	int src_nents, sec4_sg_bytes, sec4_sg_src_index;
++	int src_nents, mapped_nents, sec4_sg_bytes, sec4_sg_src_index;
+ 	struct ahash_edesc *edesc;
+ 	int ret = 0;
+ 	int sh_len;
+@@ -807,8 +798,20 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 			dev_err(jrdev, "Invalid number of src SG.\n");
+ 			return src_nents;
  		}
- 
- 		append_seq_in_ptr(desc, edesc->sec4_sg_dma, ctx->ctx_len +
-@@ -875,13 +876,10 @@ static int ahash_update_ctx(struct ahash_request *req)
- #endif
- 
- 		ret = caam_jr_enqueue(jrdev, desc, ahash_done_bi, req);
--		if (!ret) {
--			ret = -EINPROGRESS;
--		} else {
--			ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len,
--					   DMA_BIDIRECTIONAL);
--			kfree(edesc);
--		}
-+		if (ret)
-+			goto err;
 +
-+		ret = -EINPROGRESS;
- 	} else if (*next_buflen) {
- 		scatterwalk_map_and_copy(buf + *buflen, req->src, 0,
- 					 req->nbytes, 0);
-@@ -897,6 +895,11 @@ static int ahash_update_ctx(struct ahash_request *req)
- #endif
- 
- 	return ret;
++		if (src_nents) {
++			mapped_nents = dma_map_sg(jrdev, req->src, src_nents,
++						  DMA_TO_DEVICE);
++			if (!mapped_nents) {
++				dev_err(jrdev, "unable to DMA map source\n");
++				return -ENOMEM;
++			}
++		} else {
++			mapped_nents = 0;
++		}
 +
-+ err:
-+	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, DMA_BIDIRECTIONAL);
-+	kfree(edesc);
-+	return ret;
- }
+ 		sec4_sg_src_index = 1 + (*buflen ? 1 : 0);
+-		sec4_sg_bytes = (sec4_sg_src_index + src_nents) *
++		sec4_sg_bytes = (sec4_sg_src_index + mapped_nents) *
+ 				 sizeof(struct sec4_sg_entry);
  
- static int ahash_final_ctx(struct ahash_request *req)
-@@ -939,7 +942,7 @@ static int ahash_final_ctx(struct ahash_request *req)
- 	ret = ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len,
- 				 edesc->sec4_sg, DMA_TO_DEVICE);
- 	if (ret)
--		return ret;
-+		goto err;
- 
- 	state->buf_dma = try_buf_map_to_sec4_sg(jrdev, edesc->sec4_sg + 1,
- 						buf, state->buf_dma, buflen,
-@@ -951,7 +954,8 @@ static int ahash_final_ctx(struct ahash_request *req)
- 					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
- 		dev_err(jrdev, "unable to map S/G table\n");
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto err;
- 	}
- 
- 	append_seq_in_ptr(desc, edesc->sec4_sg_dma, ctx->ctx_len + buflen,
-@@ -961,7 +965,8 @@ static int ahash_final_ctx(struct ahash_request *req)
- 						digestsize);
- 	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
- 		dev_err(jrdev, "unable to map dst\n");
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto err;
- 	}
- 
- #ifdef DEBUG
-@@ -970,13 +975,14 @@ static int ahash_final_ctx(struct ahash_request *req)
- #endif
- 
- 	ret = caam_jr_enqueue(jrdev, desc, ahash_done_ctx_src, req);
--	if (!ret) {
--		ret = -EINPROGRESS;
--	} else {
--		ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
--		kfree(edesc);
--	}
-+	if (ret)
-+		goto err;
- 
-+	return -EINPROGRESS;
-+
-+err:
-+	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
-+	kfree(edesc);
- 	return ret;
- }
- 
-@@ -1027,7 +1033,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 	ret = ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len,
- 				 edesc->sec4_sg, DMA_TO_DEVICE);
- 	if (ret)
--		return ret;
-+		goto err;
- 
- 	state->buf_dma = try_buf_map_to_sec4_sg(jrdev, edesc->sec4_sg + 1,
- 						buf, state->buf_dma, buflen,
-@@ -1040,7 +1046,8 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
- 		dev_err(jrdev, "unable to map S/G table\n");
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto err;
- 	}
- 
- 	append_seq_in_ptr(desc, edesc->sec4_sg_dma, ctx->ctx_len +
-@@ -1050,7 +1057,8 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 						digestsize);
- 	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
- 		dev_err(jrdev, "unable to map dst\n");
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto err;
- 	}
- 
- #ifdef DEBUG
-@@ -1059,13 +1067,14 @@ static int ahash_finup_ctx(struct ahash_request *req)
- #endif
- 
- 	ret = caam_jr_enqueue(jrdev, desc, ahash_done_ctx_src, req);
--	if (!ret) {
--		ret = -EINPROGRESS;
--	} else {
--		ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
--		kfree(edesc);
--	}
-+	if (ret)
-+		goto err;
- 
-+	return -EINPROGRESS;
-+
-+err:
-+	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
-+	kfree(edesc);
- 	return ret;
- }
- 
-@@ -1117,6 +1126,8 @@ static int ahash_digest(struct ahash_request *req)
- 					    sec4_sg_bytes, DMA_TO_DEVICE);
- 		if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
- 			dev_err(jrdev, "unable to map S/G table\n");
-+			ahash_unmap(jrdev, edesc, req, digestsize);
-+			kfree(edesc);
+ 		/*
+@@ -820,6 +823,7 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 		if (!edesc) {
+ 			dev_err(jrdev,
+ 				"could not allocate extended descriptor\n");
++			dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
  			return -ENOMEM;
  		}
- 		src_dma = edesc->sec4_sg_dma;
-@@ -1131,6 +1142,8 @@ static int ahash_digest(struct ahash_request *req)
- 						digestsize);
- 	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
- 		dev_err(jrdev, "unable to map dst\n");
-+		ahash_unmap(jrdev, edesc, req, digestsize);
-+		kfree(edesc);
+ 
+@@ -836,9 +840,10 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 							buf, state->buf_dma,
+ 							*buflen, last_buflen);
+ 
+-		if (src_nents) {
+-			src_map_to_sec4_sg(jrdev, req->src, src_nents,
+-					   edesc->sec4_sg + sec4_sg_src_index);
++		if (mapped_nents) {
++			sg_to_sec4_sg_last(req->src, mapped_nents,
++					   edesc->sec4_sg + sec4_sg_src_index,
++					   0);
+ 			if (*next_buflen)
+ 				scatterwalk_map_and_copy(next_buf, req->src,
+ 							 to_hash - *buflen,
+@@ -1001,7 +1006,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 	u32 *sh_desc = ctx->sh_desc_finup, *desc;
+ 	dma_addr_t ptr = ctx->sh_desc_finup_dma;
+ 	int sec4_sg_bytes, sec4_sg_src_index;
+-	int src_nents;
++	int src_nents, mapped_nents;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct ahash_edesc *edesc;
+ 	int ret = 0;
+@@ -1012,14 +1017,27 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 		dev_err(jrdev, "Invalid number of src SG.\n");
+ 		return src_nents;
+ 	}
++
++	if (src_nents) {
++		mapped_nents = dma_map_sg(jrdev, req->src, src_nents,
++					  DMA_TO_DEVICE);
++		if (!mapped_nents) {
++			dev_err(jrdev, "unable to DMA map source\n");
++			return -ENOMEM;
++		}
++	} else {
++		mapped_nents = 0;
++	}
++
+ 	sec4_sg_src_index = 1 + (buflen ? 1 : 0);
+-	sec4_sg_bytes = (sec4_sg_src_index + src_nents) *
++	sec4_sg_bytes = (sec4_sg_src_index + mapped_nents) *
+ 			 sizeof(struct sec4_sg_entry);
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+ 	edesc = kzalloc(sizeof(*edesc) + sec4_sg_bytes, GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(jrdev, "could not allocate extended descriptor\n");
++		dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
  		return -ENOMEM;
  	}
  
-@@ -1183,6 +1196,8 @@ static int ahash_final_no_ctx(struct ahash_request *req)
- 	state->buf_dma = dma_map_single(jrdev, buf, buflen, DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, state->buf_dma)) {
- 		dev_err(jrdev, "unable to map src\n");
-+		ahash_unmap(jrdev, edesc, req, digestsize);
-+		kfree(edesc);
+@@ -1039,8 +1057,8 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 						buf, state->buf_dma, buflen,
+ 						last_buflen);
+ 
+-	src_map_to_sec4_sg(jrdev, req->src, src_nents, edesc->sec4_sg +
+-			   sec4_sg_src_index);
++	sg_to_sec4_sg_last(req->src, mapped_nents,
++			   edesc->sec4_sg + sec4_sg_src_index, 0);
+ 
+ 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
+@@ -1088,7 +1106,7 @@ static int ahash_digest(struct ahash_request *req)
+ 	u32 *sh_desc = ctx->sh_desc_digest, *desc;
+ 	dma_addr_t ptr = ctx->sh_desc_digest_dma;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+-	int src_nents, sec4_sg_bytes;
++	int src_nents, mapped_nents, sec4_sg_bytes;
+ 	dma_addr_t src_dma;
+ 	struct ahash_edesc *edesc;
+ 	int ret = 0;
+@@ -1100,9 +1118,20 @@ static int ahash_digest(struct ahash_request *req)
+ 		dev_err(jrdev, "Invalid number of src SG.\n");
+ 		return src_nents;
+ 	}
+-	dma_map_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
+-	if (src_nents > 1)
+-		sec4_sg_bytes = src_nents * sizeof(struct sec4_sg_entry);
++
++	if (src_nents) {
++		mapped_nents = dma_map_sg(jrdev, req->src, src_nents,
++					  DMA_TO_DEVICE);
++		if (!mapped_nents) {
++			dev_err(jrdev, "unable to map source for DMA\n");
++			return -ENOMEM;
++		}
++	} else {
++		mapped_nents = 0;
++	}
++
++	if (mapped_nents > 1)
++		sec4_sg_bytes = mapped_nents * sizeof(struct sec4_sg_entry);
+ 	else
+ 		sec4_sg_bytes = 0;
+ 
+@@ -1110,6 +1139,7 @@ static int ahash_digest(struct ahash_request *req)
+ 	edesc = kzalloc(sizeof(*edesc) + sec4_sg_bytes, GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(jrdev, "could not allocate extended descriptor\n");
++		dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
  		return -ENOMEM;
  	}
  
-@@ -1192,6 +1207,8 @@ static int ahash_final_no_ctx(struct ahash_request *req)
- 						digestsize);
- 	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
- 		dev_err(jrdev, "unable to map dst\n");
-+		ahash_unmap(jrdev, edesc, req, digestsize);
-+		kfree(edesc);
- 		return -ENOMEM;
- 	}
- 	edesc->src_nents = 0;
-@@ -1285,14 +1302,15 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 						    DMA_TO_DEVICE);
+@@ -1121,7 +1151,7 @@ static int ahash_digest(struct ahash_request *req)
+ 	init_job_desc_shared(desc, ptr, sh_len, HDR_SHARE_DEFER | HDR_REVERSE);
+ 
+ 	if (src_nents > 1) {
+-		sg_to_sec4_sg_last(req->src, src_nents, edesc->sec4_sg, 0);
++		sg_to_sec4_sg_last(req->src, mapped_nents, edesc->sec4_sg, 0);
+ 		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
  		if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
- 			dev_err(jrdev, "unable to map S/G table\n");
--			return -ENOMEM;
-+			ret = -ENOMEM;
-+			goto err;
+@@ -1244,7 +1274,7 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 	int *next_buflen = state->current_buf ? &state->buflen_0 :
+ 			   &state->buflen_1;
+ 	int in_len = *buflen + req->nbytes, to_hash;
+-	int sec4_sg_bytes, src_nents;
++	int sec4_sg_bytes, src_nents, mapped_nents;
+ 	struct ahash_edesc *edesc;
+ 	u32 *desc, *sh_desc = ctx->sh_desc_update_first;
+ 	dma_addr_t ptr = ctx->sh_desc_update_first_dma;
+@@ -1261,7 +1291,19 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 			dev_err(jrdev, "Invalid number of src SG.\n");
+ 			return src_nents;
+ 		}
+-		sec4_sg_bytes = (1 + src_nents) *
++
++		if (src_nents) {
++			mapped_nents = dma_map_sg(jrdev, req->src, src_nents,
++						  DMA_TO_DEVICE);
++			if (!mapped_nents) {
++				dev_err(jrdev, "unable to DMA map source\n");
++				return -ENOMEM;
++			}
++		} else {
++			mapped_nents = 0;
++		}
++
++		sec4_sg_bytes = (1 + mapped_nents) *
+ 				sizeof(struct sec4_sg_entry);
+ 
+ 		/*
+@@ -1273,6 +1315,7 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 		if (!edesc) {
+ 			dev_err(jrdev,
+ 				"could not allocate extended descriptor\n");
++			dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
+ 			return -ENOMEM;
  		}
  
- 		append_seq_in_ptr(desc, edesc->sec4_sg_dma, to_hash, LDST_SGF);
+@@ -1282,8 +1325,9 @@ static int ahash_update_no_ctx(struct ahash_request *req)
  
- 		ret = map_seq_out_ptr_ctx(desc, jrdev, state, ctx->ctx_len);
- 		if (ret)
--			return ret;
-+			goto err;
- 
- #ifdef DEBUG
- 		print_hex_dump(KERN_ERR, "jobdesc@"__stringify(__LINE__)": ",
-@@ -1301,16 +1319,13 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- #endif
- 
- 		ret = caam_jr_enqueue(jrdev, desc, ahash_done_ctx_dst, req);
--		if (!ret) {
--			ret = -EINPROGRESS;
--			state->update = ahash_update_ctx;
--			state->finup = ahash_finup_ctx;
--			state->final = ahash_final_ctx;
--		} else {
--			ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len,
--					DMA_TO_DEVICE);
--			kfree(edesc);
--		}
-+		if (ret)
-+			goto err;
+ 		state->buf_dma = buf_map_to_sec4_sg(jrdev, edesc->sec4_sg,
+ 						    buf, *buflen);
+-		src_map_to_sec4_sg(jrdev, req->src, src_nents,
+-				   edesc->sec4_sg + 1);
++		sg_to_sec4_sg_last(req->src, mapped_nents,
++				   edesc->sec4_sg + 1, 0);
 +
-+		ret = -EINPROGRESS;
-+		state->update = ahash_update_ctx;
-+		state->finup = ahash_finup_ctx;
-+		state->final = ahash_final_ctx;
- 	} else if (*next_buflen) {
- 		scatterwalk_map_and_copy(buf + *buflen, req->src, 0,
- 					 req->nbytes, 0);
-@@ -1326,6 +1341,11 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- #endif
- 
- 	return ret;
+ 		if (*next_buflen) {
+ 			scatterwalk_map_and_copy(next_buf, req->src,
+ 						 to_hash - *buflen,
+@@ -1363,7 +1407,7 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 			  state->buflen_1;
+ 	u32 *sh_desc = ctx->sh_desc_digest, *desc;
+ 	dma_addr_t ptr = ctx->sh_desc_digest_dma;
+-	int sec4_sg_bytes, sec4_sg_src_index, src_nents;
++	int sec4_sg_bytes, sec4_sg_src_index, src_nents, mapped_nents;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct ahash_edesc *edesc;
+ 	int sh_len;
+@@ -1374,14 +1418,27 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 		dev_err(jrdev, "Invalid number of src SG.\n");
+ 		return src_nents;
+ 	}
 +
-+err:
-+	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, DMA_TO_DEVICE);
-+	kfree(edesc);
-+	return ret;
- }
++	if (src_nents) {
++		mapped_nents = dma_map_sg(jrdev, req->src, src_nents,
++					  DMA_TO_DEVICE);
++		if (!mapped_nents) {
++			dev_err(jrdev, "unable to DMA map source\n");
++			return -ENOMEM;
++		}
++	} else {
++		mapped_nents = 0;
++	}
++
+ 	sec4_sg_src_index = 2;
+-	sec4_sg_bytes = (sec4_sg_src_index + src_nents) *
++	sec4_sg_bytes = (sec4_sg_src_index + mapped_nents) *
+ 			 sizeof(struct sec4_sg_entry);
  
- /* submit ahash finup if it the first job descriptor after update */
-@@ -1382,6 +1402,8 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+ 	edesc = kzalloc(sizeof(*edesc) + sec4_sg_bytes, GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(jrdev, "could not allocate extended descriptor\n");
++		dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
+ 		return -ENOMEM;
+ 	}
+ 
+@@ -1396,7 +1453,7 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 						state->buf_dma, buflen,
+ 						last_buflen);
+ 
+-	src_map_to_sec4_sg(jrdev, req->src, src_nents, edesc->sec4_sg + 1);
++	sg_to_sec4_sg_last(req->src, mapped_nents, edesc->sec4_sg + 1, 0);
+ 
+ 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
  					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
- 		dev_err(jrdev, "unable to map S/G table\n");
-+		ahash_unmap(jrdev, edesc, req, digestsize);
-+		kfree(edesc);
- 		return -ENOMEM;
- 	}
- 
-@@ -1392,6 +1414,8 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 						digestsize);
- 	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
- 		dev_err(jrdev, "unable to map dst\n");
-+		ahash_unmap(jrdev, edesc, req, digestsize);
-+		kfree(edesc);
- 		return -ENOMEM;
- 	}
- 
-@@ -1476,7 +1500,8 @@ static int ahash_update_first(struct ahash_request *req)
- 							    DMA_TO_DEVICE);
- 			if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
- 				dev_err(jrdev, "unable to map S/G table\n");
--				return -ENOMEM;
-+				ret = -ENOMEM;
-+				goto err;
- 			}
- 			src_dma = edesc->sec4_sg_dma;
- 			options = LDST_SGF;
-@@ -1498,7 +1523,7 @@ static int ahash_update_first(struct ahash_request *req)
- 
- 		ret = map_seq_out_ptr_ctx(desc, jrdev, state, ctx->ctx_len);
- 		if (ret)
--			return ret;
-+			goto err;
- 
- #ifdef DEBUG
- 		print_hex_dump(KERN_ERR, "jobdesc@"__stringify(__LINE__)": ",
-@@ -1506,18 +1531,14 @@ static int ahash_update_first(struct ahash_request *req)
- 			       desc_bytes(desc), 1);
- #endif
- 
--		ret = caam_jr_enqueue(jrdev, desc, ahash_done_ctx_dst,
--				      req);
--		if (!ret) {
--			ret = -EINPROGRESS;
--			state->update = ahash_update_ctx;
--			state->finup = ahash_finup_ctx;
--			state->final = ahash_final_ctx;
--		} else {
--			ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len,
--					DMA_TO_DEVICE);
--			kfree(edesc);
--		}
-+		ret = caam_jr_enqueue(jrdev, desc, ahash_done_ctx_dst, req);
-+		if (ret)
-+			goto err;
+@@ -1450,7 +1507,7 @@ static int ahash_update_first(struct ahash_request *req)
+ 	int to_hash;
+ 	u32 *sh_desc = ctx->sh_desc_update_first, *desc;
+ 	dma_addr_t ptr = ctx->sh_desc_update_first_dma;
+-	int sec4_sg_bytes, src_nents;
++	int sec4_sg_bytes, src_nents, mapped_nents;
+ 	dma_addr_t src_dma;
+ 	u32 options;
+ 	struct ahash_edesc *edesc;
+@@ -1468,9 +1525,19 @@ static int ahash_update_first(struct ahash_request *req)
+ 			dev_err(jrdev, "Invalid number of src SG.\n");
+ 			return src_nents;
+ 		}
+-		dma_map_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
+-		if (src_nents > 1)
+-			sec4_sg_bytes = src_nents *
 +
-+		ret = -EINPROGRESS;
-+		state->update = ahash_update_ctx;
-+		state->finup = ahash_finup_ctx;
-+		state->final = ahash_final_ctx;
- 	} else if (*next_buflen) {
- 		state->update = ahash_update_no_ctx;
- 		state->finup = ahash_finup_no_ctx;
-@@ -1532,6 +1553,11 @@ static int ahash_update_first(struct ahash_request *req)
- #endif
++		if (src_nents) {
++			mapped_nents = dma_map_sg(jrdev, req->src, src_nents,
++						  DMA_TO_DEVICE);
++			if (!mapped_nents) {
++				dev_err(jrdev, "unable to map source for DMA\n");
++				return -ENOMEM;
++			}
++		} else {
++			mapped_nents = 0;
++		}
++		if (mapped_nents > 1)
++			sec4_sg_bytes = mapped_nents *
+ 					sizeof(struct sec4_sg_entry);
+ 		else
+ 			sec4_sg_bytes = 0;
+@@ -1484,6 +1551,7 @@ static int ahash_update_first(struct ahash_request *req)
+ 		if (!edesc) {
+ 			dev_err(jrdev,
+ 				"could not allocate extended descriptor\n");
++			dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
+ 			return -ENOMEM;
+ 		}
  
- 	return ret;
-+
-+err:
-+	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, DMA_TO_DEVICE);
-+	kfree(edesc);
-+	return ret;
- }
+@@ -1492,7 +1560,7 @@ static int ahash_update_first(struct ahash_request *req)
+ 		edesc->dst_dma = 0;
  
- static int ahash_finup_first(struct ahash_request *req)
+ 		if (src_nents > 1) {
+-			sg_to_sec4_sg_last(req->src, src_nents,
++			sg_to_sec4_sg_last(req->src, mapped_nents,
+ 					   edesc->sec4_sg, 0);
+ 			edesc->sec4_sg_dma = dma_map_single(jrdev,
+ 							    edesc->sec4_sg,
 -- 
 2.1.0
