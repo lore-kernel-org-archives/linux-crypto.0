@@ -1,7 +1,7 @@
 From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 10/11] crypto: caam: add ahash_edesc_add_src()
-Date: Mon, 08 Aug 2016 18:05:19 +0100
-Message-ID: <E1bWnzL-0002WL-As@rmk-PC.armlinux.org.uk>
+Subject: [PATCH 11/11] crypto: caam: get rid of tasklet
+Date: Mon, 08 Aug 2016 18:05:24 +0100
+Message-ID: <E1bWnzQ-0002WR-W0@rmk-PC.armlinux.org.uk>
 References: <20160808170400.GC1041@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -11,268 +11,122 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 To: Fabio Estevam <fabio.estevam@freescale.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:57510 "EHLO
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:57514 "EHLO
 	pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752240AbcHHRFZ (ORCPT
+	with ESMTP id S1752240AbcHHRFa (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Aug 2016 13:05:25 -0400
+	Mon, 8 Aug 2016 13:05:30 -0400
 In-Reply-To: <20160808170400.GC1041@n2100.armlinux.org.uk>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add a helper to map the source scatterlist into the descriptor.
+Threaded interrupts can perform the function of the tasklet, and much
+more safely too - without races when trying to take the tasklet and
+interrupt down on device removal.
+
+With the old code, there is a window where we call tasklet_kill().  If
+the interrupt handler happens to be running on a different CPU, and
+subsequently calls tasklet_schedule(), the tasklet will be re-scheduled
+for execution.
+
+Switching to a hardirq/threadirq combination implementation avoids this,
+and it also means generic code deals with the teardown sequencing of the
+threaded and non-threaded parts.
 
 Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 ---
- drivers/crypto/caam/caamhash.c | 137 +++++++++++++++++------------------------
- 1 file changed, 57 insertions(+), 80 deletions(-)
+ drivers/crypto/caam/intern.h |  1 -
+ drivers/crypto/caam/jr.c     | 25 +++++++++----------------
+ 2 files changed, 9 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 9c3e74e4088e..ea284e3909ef 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -789,6 +789,41 @@ static struct ahash_edesc *ahash_edesc_alloc(struct caam_hash_ctx *ctx,
- 	return edesc;
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index e2bcacc1a921..5d4c05074a5c 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -41,7 +41,6 @@ struct caam_drv_private_jr {
+ 	struct device		*dev;
+ 	int ridx;
+ 	struct caam_job_ring __iomem *rregs;	/* JobR's register space */
+-	struct tasklet_struct irqtask;
+ 	int irq;			/* One per queue */
+ 
+ 	/* Number of scatterlist crypt transforms active on the JobR */
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index a81f551ac222..320228875e9a 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -73,8 +73,6 @@ static int caam_jr_shutdown(struct device *dev)
+ 
+ 	ret = caam_reset_hw_jr(dev);
+ 
+-	tasklet_kill(&jrp->irqtask);
+-
+ 	/* Release interrupt */
+ 	free_irq(jrp->irq, dev);
+ 
+@@ -130,7 +128,7 @@ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
+ 
+ 	/*
+ 	 * Check the output ring for ready responses, kick
+-	 * tasklet if jobs done.
++	 * the threaded irq if jobs done.
+ 	 */
+ 	irqstate = rd_reg32(&jrp->rregs->jrintstatus);
+ 	if (!irqstate)
+@@ -152,18 +150,13 @@ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
+ 	/* Have valid interrupt at this point, just ACK and trigger */
+ 	wr_reg32(&jrp->rregs->jrintstatus, irqstate);
+ 
+-	preempt_disable();
+-	tasklet_schedule(&jrp->irqtask);
+-	preempt_enable();
+-
+-	return IRQ_HANDLED;
++	return IRQ_WAKE_THREAD;
  }
  
-+static int ahash_edesc_add_src(struct caam_hash_ctx *ctx,
-+			       struct ahash_edesc *edesc,
-+			       struct ahash_request *req, int nents,
-+			       unsigned int first_sg,
-+			       unsigned int first_bytes, size_t to_hash)
-+{
-+	dma_addr_t src_dma;
-+	u32 options;
-+
-+	if (nents > 1 || first_sg) {
-+		struct sec4_sg_entry *sg = edesc->sec4_sg;
-+		unsigned int sgsize = sizeof(*sg) * (first_sg + nents);
-+
-+		sg_to_sec4_sg_last(req->src, nents, sg + first_sg, 0);
-+
-+		src_dma = dma_map_single(ctx->jrdev, sg, sgsize, DMA_TO_DEVICE);
-+		if (dma_mapping_error(ctx->jrdev, src_dma)) {
-+			dev_err(ctx->jrdev, "unable to map S/G table\n");
-+			return -ENOMEM;
-+		}
-+
-+		edesc->sec4_sg_bytes = sgsize;
-+		edesc->sec4_sg_dma = src_dma;
-+		options = LDST_SGF;
-+	} else {
-+		src_dma = sg_dma_address(req->src);
-+		options = 0;
-+	}
-+
-+	append_seq_in_ptr(edesc->hw_desc, src_dma, first_bytes + to_hash,
-+			  options);
-+
-+	return 0;
-+}
-+
- /* submit update job descriptor */
- static int ahash_update_ctx(struct ahash_request *req)
+-/* Deferred service handler, run as interrupt-fired tasklet */
+-static void caam_jr_dequeue(unsigned long devarg)
++static irqreturn_t caam_jr_threadirq(int irq, void *st_dev)
  {
-@@ -1018,7 +1053,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 	int last_buflen = state->current_buf ? state->buflen_0 :
- 			  state->buflen_1;
- 	u32 *desc;
--	int sec4_sg_bytes, sec4_sg_src_index;
-+	int sec4_sg_src_index;
- 	int src_nents, mapped_nents;
- 	int digestsize = crypto_ahash_digestsize(ahash);
- 	struct ahash_edesc *edesc;
-@@ -1042,8 +1077,6 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 	}
+ 	int hw_idx, sw_idx, i, head, tail;
+-	struct device *dev = (struct device *)devarg;
++	struct device *dev = st_dev;
+ 	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+ 	void (*usercall)(struct device *dev, u32 *desc, u32 status, void *arg);
+ 	u32 *userdesc, userstatus;
+@@ -237,6 +230,8 @@ static void caam_jr_dequeue(unsigned long devarg)
  
- 	sec4_sg_src_index = 1 + (buflen ? 1 : 0);
--	sec4_sg_bytes = (sec4_sg_src_index + mapped_nents) *
--			 sizeof(struct sec4_sg_entry);
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
- 	edesc = ahash_edesc_alloc(ctx, sec4_sg_src_index + mapped_nents,
-@@ -1057,7 +1090,6 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 	desc = edesc->hw_desc;
- 
- 	edesc->src_nents = src_nents;
--	edesc->sec4_sg_bytes = sec4_sg_bytes;
- 
- 	ret = ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len,
- 				 edesc->sec4_sg, DMA_TO_DEVICE);
-@@ -1068,19 +1100,11 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 						buf, state->buf_dma, buflen,
- 						last_buflen);
- 
--	sg_to_sec4_sg_last(req->src, mapped_nents,
--			   edesc->sec4_sg + sec4_sg_src_index, 0);
--
--	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
--					    sec4_sg_bytes, DMA_TO_DEVICE);
--	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
--		dev_err(jrdev, "unable to map S/G table\n");
--		ret = -ENOMEM;
-+	ret = ahash_edesc_add_src(ctx, edesc, req, mapped_nents,
-+				  sec4_sg_src_index, ctx->ctx_len + buflen,
-+				  req->nbytes);
-+	if (ret)
- 		goto err;
--	}
--
--	append_seq_in_ptr(desc, edesc->sec4_sg_dma, ctx->ctx_len +
--			       buflen + req->nbytes, LDST_SGF);
- 
- 	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
- 						digestsize);
-@@ -1116,11 +1140,9 @@ static int ahash_digest(struct ahash_request *req)
- 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
- 	u32 *desc;
- 	int digestsize = crypto_ahash_digestsize(ahash);
--	int src_nents, mapped_nents, sec4_sg_bytes;
--	dma_addr_t src_dma;
-+	int src_nents, mapped_nents;
- 	struct ahash_edesc *edesc;
- 	int ret = 0;
--	u32 options;
- 
- 	src_nents = sg_nents_for_len(req->src, req->nbytes);
- 	if (src_nents < 0) {
-@@ -1139,11 +1161,6 @@ static int ahash_digest(struct ahash_request *req)
- 		mapped_nents = 0;
- 	}
- 
--	if (mapped_nents > 1)
--		sec4_sg_bytes = mapped_nents * sizeof(struct sec4_sg_entry);
--	else
--		sec4_sg_bytes = 0;
--
- 	/* allocate space for base edesc and hw desc commands, link tables */
- 	edesc = ahash_edesc_alloc(ctx, mapped_nents > 1 ? mapped_nents : 0,
- 				  ctx->sh_desc_digest, ctx->sh_desc_digest_dma,
-@@ -1153,28 +1170,17 @@ static int ahash_digest(struct ahash_request *req)
- 		return -ENOMEM;
- 	}
- 
--	edesc->sec4_sg_bytes = sec4_sg_bytes;
- 	edesc->src_nents = src_nents;
- 
--	desc = edesc->hw_desc;
--
--	if (src_nents > 1) {
--		sg_to_sec4_sg_last(req->src, mapped_nents, edesc->sec4_sg, 0);
--		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
--					    sec4_sg_bytes, DMA_TO_DEVICE);
--		if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
--			dev_err(jrdev, "unable to map S/G table\n");
--			ahash_unmap(jrdev, edesc, req, digestsize);
--			kfree(edesc);
--			return -ENOMEM;
--		}
--		src_dma = edesc->sec4_sg_dma;
--		options = LDST_SGF;
--	} else {
--		src_dma = sg_dma_address(req->src);
--		options = 0;
-+	ret = ahash_edesc_add_src(ctx, edesc, req, mapped_nents, 0, 0,
-+				  req->nbytes);
-+	if (ret) {
-+		ahash_unmap(jrdev, edesc, req, digestsize);
-+		kfree(edesc);
-+		return ret;
- 	}
--	append_seq_in_ptr(desc, src_dma, req->nbytes, options);
+ 	/* reenable / unmask IRQs */
+ 	clrsetbits_32(&jrp->rregs->rconfig_lo, JRCFG_IMSK, 0);
 +
-+	desc = edesc->hw_desc;
++	return IRQ_HANDLED;
+ }
  
- 	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
- 						digestsize);
-@@ -1447,20 +1453,15 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 						state->buf_dma, buflen,
- 						last_buflen);
+ /**
+@@ -394,11 +389,10 @@ static int caam_jr_init(struct device *dev)
  
--	sg_to_sec4_sg_last(req->src, mapped_nents, edesc->sec4_sg + 1, 0);
+ 	jrp = dev_get_drvdata(dev);
+ 
+-	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);
 -
--	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
--					    sec4_sg_bytes, DMA_TO_DEVICE);
--	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
-+	ret = ahash_edesc_add_src(ctx, edesc, req, mapped_nents, 1, buflen,
-+				  req->nbytes);
-+	if (ret) {
- 		dev_err(jrdev, "unable to map S/G table\n");
- 		ahash_unmap(jrdev, edesc, req, digestsize);
- 		kfree(edesc);
- 		return -ENOMEM;
- 	}
+ 	/* Connect job ring interrupt handler. */
+-	error = request_irq(jrp->irq, caam_jr_interrupt, IRQF_SHARED,
+-			    dev_name(dev), dev);
++	error = request_threaded_irq(jrp->irq, caam_jr_interrupt,
++				     caam_jr_threadirq, IRQF_SHARED,
++				     dev_name(dev), dev);
+ 	if (error) {
+ 		dev_err(dev, "can't connect JobR %d interrupt (%d)\n",
+ 			jrp->ridx, jrp->irq);
+@@ -460,7 +454,6 @@ static int caam_jr_init(struct device *dev)
+ out_free_irq:
+ 	free_irq(jrp->irq, dev);
+ out_kill_deq:
+-	tasklet_kill(&jrp->irqtask);
+ 	return error;
+ }
  
--	append_seq_in_ptr(desc, edesc->sec4_sg_dma, buflen +
--			       req->nbytes, LDST_SGF);
--
- 	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
- 						digestsize);
- 	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
-@@ -1500,9 +1501,7 @@ static int ahash_update_first(struct ahash_request *req)
- 		&state->buflen_1 : &state->buflen_0;
- 	int to_hash;
- 	u32 *desc;
--	int sec4_sg_bytes, src_nents, mapped_nents;
--	dma_addr_t src_dma;
--	u32 options;
-+	int src_nents, mapped_nents;
- 	struct ahash_edesc *edesc;
- 	int ret = 0;
- 
-@@ -1528,11 +1527,6 @@ static int ahash_update_first(struct ahash_request *req)
- 		} else {
- 			mapped_nents = 0;
- 		}
--		if (mapped_nents > 1)
--			sec4_sg_bytes = mapped_nents *
--					sizeof(struct sec4_sg_entry);
--		else
--			sec4_sg_bytes = 0;
- 
- 		/*
- 		 * allocate space for base edesc and hw desc commands,
-@@ -1549,27 +1543,12 @@ static int ahash_update_first(struct ahash_request *req)
- 		}
- 
- 		edesc->src_nents = src_nents;
--		edesc->sec4_sg_bytes = sec4_sg_bytes;
- 		edesc->dst_dma = 0;
- 
--		if (src_nents > 1) {
--			sg_to_sec4_sg_last(req->src, mapped_nents,
--					   edesc->sec4_sg, 0);
--			edesc->sec4_sg_dma = dma_map_single(jrdev,
--							    edesc->sec4_sg,
--							    sec4_sg_bytes,
--							    DMA_TO_DEVICE);
--			if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
--				dev_err(jrdev, "unable to map S/G table\n");
--				ret = -ENOMEM;
--				goto err;
--			}
--			src_dma = edesc->sec4_sg_dma;
--			options = LDST_SGF;
--		} else {
--			src_dma = sg_dma_address(req->src);
--			options = 0;
--		}
-+		ret = ahash_edesc_add_src(ctx, edesc, req, mapped_nents, 0, 0,
-+					  to_hash);
-+		if (ret)
-+			goto err;
- 
- 		if (*next_buflen)
- 			scatterwalk_map_and_copy(next_buf, req->src, to_hash,
-@@ -1577,8 +1556,6 @@ static int ahash_update_first(struct ahash_request *req)
- 
- 		desc = edesc->hw_desc;
- 
--		append_seq_in_ptr(desc, src_dma, to_hash, options);
--
- 		ret = map_seq_out_ptr_ctx(desc, jrdev, state, ctx->ctx_len);
- 		if (ret)
- 			goto err;
 -- 
 2.1.0
