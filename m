@@ -1,63 +1,81 @@
-From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH 2/2] ath9k: disable RNG by default
-Date: Tue, 09 Aug 2016 09:14:30 +0200
-Message-ID: <4627645.oz3l49ICL3@tauon.atsec.com>
-References: <1470726147-30095-1-git-send-email-miaoqing@codeaurora.org> <1470726147-30095-2-git-send-email-miaoqing@codeaurora.org>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: AF_ALG broken?
+Date: Tue, 9 Aug 2016 08:27:17 +0100
+Message-ID: <20160809072717.GG1041@n2100.armlinux.org.uk>
+References: <20160808181117.GD1041@n2100.armlinux.org.uk>
+ <20160809031820.GA4142@gondor.apana.org.au>
+ <20160809070859.GF1041@n2100.armlinux.org.uk>
+ <20160809071402.GA5466@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: kvalo-A+ZNKFmMK5xy9aJCnZT0Uw@public.gmane.org, linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	ath9k-devel-A+ZNKFmMK5xy9aJCnZT0Uw@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, pouyans-Rm6X0d1/PG5y9aJCnZT0Uw@public.gmane.org
-To: miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org
-Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1470726147-30095-2-git-send-email-miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: noloader@gmail.com, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:34019 "EHLO
+	pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750810AbcHIH1Y (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Aug 2016 03:27:24 -0400
+Content-Disposition: inline
+In-Reply-To: <20160809071402.GA5466@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 9. August 2016, 15:02:27 CEST schrieb miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org:
-
-Hi Miaoqing,
-
-> From: Miaoqing Pan <miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+On Tue, Aug 09, 2016 at 03:14:02PM +0800, Herbert Xu wrote:
+> On Tue, Aug 09, 2016 at 08:08:59AM +0100, Russell King - ARM Linux wrote:
+> > 
+> > I thought I gave the commands and link to your example code.  The
+> > openssl case is md5, though sha* also gives the same result.  Your
+> > example code was sha1 iirc.  I guess none of these would be using
+> > HMAC - the openssl cases used to give results compatible with the
+> > md5sum/ sha1sum etc userspace commands.
+> > 
+> > /proc/crypto:
+> > 
+> > name         : md5
+> > driver       : md5-caam
 > 
-> ath9k RNG will dominates all the noise sources from the real HW
-> RNG, disable it by default. But we strongly recommand to enable
-> it if the system without HW RNG, especially on embedded systems.
-> 
-> Signed-off-by: Miaoqing Pan <miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+> Right, caam is providing a setkey function for md5, which leads the
+> API to think that a key is required.  We should fix it so that setkey
+> is only set for the HMAC-variant.
 
-As a short term solution:
+Thanks, that works nicely again, and passes my tests.
 
-Acked-by: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+8<====
+From: Russell King <rmk+kernel@armlinux.org.uk>
+Subject: [PATCH] crypto: caam - fix non-hmac hashes
 
-But as Jason outlined, there should be nothing that prevents using this code 
-with the HW Random framework. This framework also has logic to limit the rate 
-of injection and allows the setting of the entropy threshold at runtime.
+Since 6de62f15b581 ("crypto: algif_hash - Require setkey before
+accept(2)"), the AF_ALG interface requires userspace to provide a key
+to any algorithm that has a setkey method.  However, the non-HMAC
+algorithms are not keyed, so setting a key is unnecessary.
 
-> ---
->  drivers/net/wireless/ath/ath9k/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/wireless/ath/ath9k/Kconfig
-> b/drivers/net/wireless/ath/ath9k/Kconfig index f68cb00..8f231c6 100644
-> --- a/drivers/net/wireless/ath/ath9k/Kconfig
-> +++ b/drivers/net/wireless/ath/ath9k/Kconfig
-> @@ -180,7 +180,7 @@ config ATH9K_HTC_DEBUGFS
->  config ATH9K_HWRNG
->  	bool "Random number generator support"
->  	depends on ATH9K && (HW_RANDOM = y || HW_RANDOM = ATH9K)
-> -	default y
-> +	default n
->  	---help---
->  	  This option incorporates the ADC register output as a source of
->  	  randomness into Linux entropy pool (/dev/urandom and /dev/random)
+Fix this by removing the setkey method from the non-keyed hash
+algorithms.
 
+Fixes: 6de62f15b581 ("crypto: algif_hash - Require setkey before accept(2)")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+---
+ drivers/crypto/caam/caamhash.c | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index ea284e3909ef..9d7fc9ec0b7e 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1950,6 +1950,7 @@ caam_hash_alloc(struct caam_hash_template *template,
+ 			 template->name);
+ 		snprintf(alg->cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
+ 			 template->driver_name);
++		t_alg->ahash_alg.setkey = NULL;
+ 	}
+ 	alg->cra_module = THIS_MODULE;
+ 	alg->cra_init = caam_hash_cra_init;
+-- 
+2.1.0
 
-Ciao
-Stephan
---
-To unsubscribe from this list: send the line "unsubscribe linux-wireless" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
