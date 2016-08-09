@@ -1,37 +1,32 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/7] Various fixes for the cesa driver
-Date: Tue, 9 Aug 2016 19:05:36 +0800
-Message-ID: <20160809110536.GA7361@gondor.apana.org.au>
-References: <1470733400-23621-1-git-send-email-romain.perier@free-electrons.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: thomas.petazzoni@free-electrons.com, boris.brezillon@free-electrons.com,
- linux@arm.linux.org.uk, arno@natisbad.org, linux-crypto@vger.kernel.org,
- gregory.clement@free-electrons.com, davem@davemloft.net,
- linux-arm-kernel@lists.infradead.org
-To: Romain Perier <romain.perier@free-electrons.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <1470733400-23621-1-git-send-email-romain.perier@free-electrons.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+From: Michael Ellerman <patch-notifications@ellerman.id.au>
+Subject: Re: crypto: crc32c-vpmsum - Convert to CPU feature based module autoloading
+Date: Tue,  9 Aug 2016 21:26:35 +1000 (AEST)
+Message-ID: <3s7sRv1923z9t1n@ozlabs.org>
+References: <1470292695-9829-1-git-send-email-anton@ozlabs.org>
+Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+	alastair@d-silva.org
+To: Anton Blanchard <anton@ozlabs.org>, benh@kernel.crashing.org,
+	paulus@samba.org, herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ozlabs.org ([103.22.144.67]:35596 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752272AbcHIL0g (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Aug 2016 07:26:36 -0400
+In-Reply-To: <1470292695-9829-1-git-send-email-anton@ozlabs.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Romain Perier <romain.perier@free-electrons.com> wrote:
-> This patches series contains various fixes for ahash requests, dma
-> operations and an important fixe in the core of the driver (cesa.c). It
-> also includes some code cleanups.
+On Thu, 2016-04-08 at 06:38:15 UTC, Anton Blanchard wrote:
+> From: Anton Blanchard <anton@samba.org>
+> 
+> This patch utilises the GENERIC_CPU_AUTOPROBE infrastructure
+> to automatically load the crc32c-vpmsum module if the CPU supports
+> it.
+> 
+> Signed-off-by: Anton Blanchard <anton@samba.org>
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Applied to powerpc fixes, thanks.
+
+https://git.kernel.org/powerpc/c/d2cf5be07ff7c7cde8bef8551a
+
+cheers
