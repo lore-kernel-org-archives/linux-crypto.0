@@ -1,38 +1,54 @@
-From: Jason Cooper <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>
-Subject: Re: [PATCH 2/2] ath9k: disable RNG by default
-Date: Tue, 9 Aug 2016 17:48:24 +0000
-Message-ID: <20160809174824.GD2013@io.lakedaemon.net>
-References: <1470726147-30095-1-git-send-email-miaoqing@codeaurora.org>
- <1470726147-30095-2-git-send-email-miaoqing@codeaurora.org>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: FIPS mode: modprobe: ERROR: could not insert 'drbg'
+Date: Tue, 09 Aug 2016 19:52:46 +0200
+Message-ID: <2671088.6l5BeQPtPO@positron.chronox.de>
+References: <D3CF7065.28F3%tsarangi@trustwave.com> <1699099.iu8Xr4xQ6X@tauon.atsec.com> <D3CF7805.2937%tsarangi@trustwave.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kvalo-A+ZNKFmMK5xy9aJCnZT0Uw@public.gmane.org, linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	ath9k-devel-A+ZNKFmMK5xy9aJCnZT0Uw@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org, pouyans-Rm6X0d1/PG5y9aJCnZT0Uw@public.gmane.org
-To: miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org
-Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1470726147-30095-2-git-send-email-miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Tapas Sarangi <TSarangi@trustwave.com>, herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:34420 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932312AbcHIRww convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Aug 2016 13:52:52 -0400
+In-Reply-To: <D3CF7805.2937%tsarangi@trustwave.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 09, 2016 at 03:02:27PM +0800, miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org wrote:
-> From: Miaoqing Pan <miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Am Dienstag, 9. August 2016, 17:11:09 CEST schrieb Tapas Sarangi:
+
+Hi Tapas, Herbert,
+
+> Hi Stephan,
 > 
-> ath9k RNG will dominates all the noise sources from the real HW
-> RNG, disable it by default. But we strongly recommand to enable
-> it if the system without HW RNG, especially on embedded systems.
+> Thanks. I have already tried that. ‘drbg’ module is loaded fine in a
+> non-fips mode. Here are output from some commands.
+
+There is something strange going on. I have to compile the DRBG statically. 
+When booting the kernel with fips=1 (of course after changing the key size to 
+2k or 3k in certs/x509.genkey), the DRBG does not show up in /proc/crypto nor 
+can I find testmgr entries about the DRBG.
+
+When I reboot the kernel without fips=1, all works as expected.
+
+When I create a copy of the drbg.c code and have it compiled as a module to 
+ensure it is signed, I can insmod it and the testmgr successfully tests it.
+
+Note, with fips=1, my kernel crashes randomly somewhere in the elf loading 
+code -- I guess it is because there is no stdrng.
+
 > 
-> Signed-off-by: Miaoqing Pan <miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+> I see that at some point you had a patch to use CONFIG_CRYPTO_LRNG. I am
+> not using that, could that be a problem ?
 
-Until we get the hw_random/get_device_randomness question sorted...
+Nope, this LRNG is something completely different -- it is my proposal to 
+replace the current /dev/random and /dev/urandom implementation as documented 
+in [1].
 
-Reviewed-by: Jason Cooper <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>
+[1] http://www.chronox.de/lrng.html
 
-thx,
-
-Jason.
---
-To unsubscribe from this list: send the line "unsubscribe linux-wireless" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Ciao
+Stephan
