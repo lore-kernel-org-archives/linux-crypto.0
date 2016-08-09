@@ -1,56 +1,136 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH v2] RANDOM: ATH9K RNG delivers zero bits of entropy
-Date: Tue, 9 Aug 2016 07:56:22 -0400
-Message-ID: <20160809115622.GG9515@thunk.org>
-References: <34197429.2CvoIfft9B@positron.chronox.de>
- <1654172.XfclnXhRmn@positron.chronox.de>
- <657897b90b8344eeab10d7a0f604988d@aptaiexm02f.ap.qualcomm.com>
- <1830987.VF9l4XmGxv@tauon.atsec.com>
- <20160808172930.GD4511@io.lakedaemon.net>
- <99963d34acea47bbacb3ca73b18fed9f@aptaiexm02f.ap.qualcomm.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v5 1/4] crypto: add template handling for RNGs
+Date: Tue, 09 Aug 2016 14:27:52 +0200
+Message-ID: <3571594.WdO7tYTEu9@positron.chronox.de>
+References: <2808589.gm6f519sFh@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jason Cooper <jason@lakedaemon.net>,
-	Stephan Mueller <smueller@chronox.de>,
-	"Sepehrdad, Pouyan" <pouyans@qti.qualcomm.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	ath9k-devel <ath9k-devel@qca.qualcomm.com>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	"ath9k-devel@lists.ath9k.org" <ath9k-devel@lists.ath9k.org>,
-	Kalle Valo <kvalo@codeaurora.org>
-To: "Pan, Miaoqing" <miaoqing@qti.qualcomm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <99963d34acea47bbacb3ca73b18fed9f@aptaiexm02f.ap.qualcomm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: mathew.j.martineau@linux.intel.com, dhowells@redhat.com,
+	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:34372 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752522AbcHIM3G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Aug 2016 08:29:06 -0400
+In-Reply-To: <2808589.gm6f519sFh@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 09, 2016 at 06:30:03AM +0000, Pan, Miaoqing wrote:
-> Agree with Jason's point, also understand Stephan's concern.  The
-> date rate can be roughly estimated by 'cat /dev/random |rngtest -c
-> 1000', the average speed is 1111.294Kibits/s. I will sent the patch
-> to disable ath9k RNG by default.
+This patch adds the ability to register templates for RNGs. RNGs are
+"meta" mechanisms using raw cipher primitives. Thus, RNGs can now be
+implemented as templates to allow the complete flexibility the kernel
+crypto API provides.
 
-If the ATH9K is generating some random amount of data, but you don't
-know how random, and you're gathering it opportunistically --- for
-example, suppose a wireless driver gets the radio's signal strength
-through the normal course of its operation, and while there might not
-be that much randomness for someone who can observe the exact details
-of how the phone is positioned in the room --- but for which the
-analyst sitting in Fort Meade won't know whether or not the phone is
-on the desk, or in a knapsack under the table, the right interface to
-use is:
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/rng.c                  | 44 +++++++++++++++++++++++++++++++++++++++++++
+ include/crypto/internal/rng.h | 26 +++++++++++++++++++++++++
+ 2 files changed, 70 insertions(+)
 
-   void add_device_randomness(const void *buf, unsigned int size);
-	
-This won't increase the entropy count, but if you have the bit of
-potential randomness "for free", you might as well contribute it to
-the entropy pool.  If it turns out that the chip was manufactured in
-China, and the MSS has backdoored it out the wazoo, it won't do any
-harm --- where as using the hwrng framework would be disastrous.
-
-Cheerfs,
-
-						- Ted
+diff --git a/crypto/rng.c b/crypto/rng.c
+index b81cffb..a4ee894 100644
+--- a/crypto/rng.c
++++ b/crypto/rng.c
+@@ -63,6 +63,25 @@ static int crypto_rng_init_tfm(struct crypto_tfm *tfm)
+ 	return 0;
+ }
+ 
++static inline struct rng_alg *__crypto_rng_alg(struct crypto_alg *alg)
++{
++	return container_of(alg, struct rng_alg, base);
++}
++
++static inline struct rng_instance *rng_instance(
++	struct crypto_instance *inst)
++{
++	return container_of(__crypto_rng_alg(&inst->alg),
++			    struct rng_instance, alg);
++}
++
++static void crypto_rng_free_instance(struct crypto_instance *inst)
++{
++	struct rng_instance *rng = rng_instance(inst);
++
++	rng->free(rng);
++}
++
+ static unsigned int seedsize(struct crypto_alg *alg)
+ {
+ 	struct rng_alg *ralg = container_of(alg, struct rng_alg, base);
+@@ -105,6 +124,7 @@ static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
+ static const struct crypto_type crypto_rng_type = {
+ 	.extsize = crypto_alg_extsize,
+ 	.init_tfm = crypto_rng_init_tfm,
++	.free = crypto_rng_free_instance,
+ #ifdef CONFIG_PROC_FS
+ 	.show = crypto_rng_show,
+ #endif
+@@ -232,5 +252,29 @@ void crypto_unregister_rngs(struct rng_alg *algs, int count)
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_rngs);
+ 
++static int rng_prepare_alg(struct rng_alg *alg)
++{
++	struct crypto_alg *base = &alg->base;
++
++	base->cra_type = &crypto_rng_type;
++	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
++	base->cra_flags |= CRYPTO_ALG_TYPE_RNG;
++
++	return 0;
++}
++
++int rng_register_instance(struct crypto_template *tmpl,
++			  struct rng_instance *inst)
++{
++	int err;
++
++	err = rng_prepare_alg(&inst->alg);
++	if (err)
++		return err;
++
++	return crypto_register_instance(tmpl, rng_crypto_instance(inst));
++}
++EXPORT_SYMBOL_GPL(rng_register_instance);
++
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Random Number Generator");
+diff --git a/include/crypto/internal/rng.h b/include/crypto/internal/rng.h
+index a52ef34..aeaf58f 100644
+--- a/include/crypto/internal/rng.h
++++ b/include/crypto/internal/rng.h
+@@ -42,4 +42,30 @@ static inline void crypto_rng_set_entropy(struct crypto_rng *tfm,
+ 	crypto_rng_alg(tfm)->set_ent(tfm, data, len);
+ }
+ 
++struct rng_instance {
++	void (*free)(struct rng_instance *inst);
++	struct rng_alg alg;
++};
++
++static inline struct rng_instance *rng_alloc_instance(
++	const char *name, struct crypto_alg *alg)
++{
++	return crypto_alloc_instance2(name, alg,
++			      sizeof(struct rng_instance) - sizeof(*alg));
++}
++
++static inline struct crypto_instance *rng_crypto_instance(
++	struct rng_instance *inst)
++{
++	return container_of(&inst->alg.base, struct crypto_instance, alg);
++}
++
++static inline void *rng_instance_ctx(struct rng_instance *inst)
++{
++	return crypto_instance_ctx(rng_crypto_instance(inst));
++}
++
++int rng_register_instance(struct crypto_template *tmpl,
++			  struct rng_instance *inst);
++
+ #endif
+-- 
+2.7.4
