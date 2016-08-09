@@ -1,31 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam - avoid kernel warnings on probe failure
-Date: Tue, 9 Aug 2016 19:03:32 +0800
-Message-ID: <20160809110332.GG7099@gondor.apana.org.au>
-References: <E1bX1UI-0006vt-K7@rmk-PC.armlinux.org.uk>
+Subject: Re: [PATCH 0/7] Various fixes for the cesa driver
+Date: Tue, 9 Aug 2016 19:05:36 +0800
+Message-ID: <20160809110536.GA7361@gondor.apana.org.au>
+References: <1470733400-23621-1-git-send-email-romain.perier@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Fabio Estevam <fabio.estevam@freescale.com>, horia.geanta@nxp.com,
-	linux-crypto@vger.kernel.org
-To: Russell King <rmk+kernel@armlinux.org.uk>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:42691 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751605AbcHILDr (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 07:03:47 -0400
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: thomas.petazzoni@free-electrons.com, boris.brezillon@free-electrons.com,
+ linux@arm.linux.org.uk, arno@natisbad.org, linux-crypto@vger.kernel.org,
+ gregory.clement@free-electrons.com, davem@davemloft.net,
+ linux-arm-kernel@lists.infradead.org
+To: Romain Perier <romain.perier@free-electrons.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <E1bX1UI-0006vt-K7@rmk-PC.armlinux.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1470733400-23621-1-git-send-email-romain.perier@free-electrons.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 09, 2016 at 08:30:10AM +0100, Russell King wrote:
-> While debugging setkey issues, the following warnings were found while
-> trying to reinsert the caam module.  Fix this by avoiding the duplicated
-> cleanup in the probe path after caam_remove(), which has already cleaned
-> up the resources.
+Romain Perier <romain.perier@free-electrons.com> wrote:
+> This patches series contains various fixes for ahash requests, dma
+> operations and an important fixe in the core of the driver (cesa.c). It
+> also includes some code cleanups.
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
