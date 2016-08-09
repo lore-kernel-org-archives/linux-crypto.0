@@ -1,43 +1,79 @@
-From: Stephan Mueller <smueller@chronox.de>
+From: Tapas Sarangi <TSarangi@trustwave.com>
 Subject: Re: FIPS mode: modprobe: ERROR: could not insert 'drbg'
-Date: Tue, 09 Aug 2016 19:05:50 +0200
-Message-ID: <1699099.iu8Xr4xQ6X@tauon.atsec.com>
+Date: Tue, 9 Aug 2016 17:11:09 +0000
+Message-ID: <D3CF7805.2937%tsarangi@trustwave.com>
 References: <D3CF7065.28F3%tsarangi@trustwave.com>
+ <1699099.iu8Xr4xQ6X@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="euc-kr"
+Content-Transfer-Encoding: base64
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Tapas Sarangi <TSarangi@trustwave.com>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34414 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932213AbcHIRFx convert rfc822-to-8bit (ORCPT
+Received: from seg-node-elk-03.trustwave.com ([204.13.202.190]:1806 "EHLO
+	seg-node-elk-03.trustwave.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751865AbcHIRLN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 13:05:53 -0400
-In-Reply-To: <D3CF7065.28F3%tsarangi@trustwave.com>
+	Tue, 9 Aug 2016 13:11:13 -0400
+In-Reply-To: <1699099.iu8Xr4xQ6X@tauon.atsec.com>
+Content-Language: en-US
+Content-ID: <5F8A8F102CD53B4987A6773B4DE5FFC6@namprd07.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 9. August 2016, 16:34:59 CEST schrieb Tapas Sarangi:
-
-Hi Tapas,
-
-> Hi Stephan,
-> 
-> Following up from the other thread:
-> 
-> While trying to boot in FIPS mode, kernel panics with the following
-> message. So far, I don¹t have success to get more information about which
-> module or symbol is causing this. I haven¹t found any errors or warnings
-> in kernel compilation. It boots fine in a non-fips mode.
-> 
-> I am also pasting the CRYPTO related configs that I have enabled (See
-> below).
-
-I do not see the issue immediately. Could you boot without fips=1 and do a 
-modprobe drbg ?
-
-I am also testing fips=1 now.
-
-Ciao
-Stephan
+SGkgU3RlcGhhbiwNCg0KVGhhbmtzLiBJIGhhdmUgYWxyZWFkeSB0cmllZCB0aGF0LiChrmRyYmeh
+ryBtb2R1bGUgaXMgbG9hZGVkIGZpbmUgaW4gYQ0Kbm9uLWZpcHMgbW9kZS4gSGVyZSBhcmUgb3V0
+cHV0IGZyb20gc29tZSBjb21tYW5kcy4NCg0KSSBzZWUgdGhhdCBhdCBzb21lIHBvaW50IHlvdSBo
+YWQgYSBwYXRjaCB0byB1c2UgQ09ORklHX0NSWVBUT19MUk5HLiBJIGFtDQpub3QgdXNpbmcgdGhh
+dCwgY291bGQgdGhhdCBiZSBhIHByb2JsZW0gPw0KDQotVGFwYXMNCg0KDQpbcm9vdEBsb2NhbGhv
+c3Qgfl0jIG1vZHByb2JlIGRyYmcNCltyb290QGxvY2FsaG9zdCB+XSMgZWNobyAkPw0KMA0KDQpb
+cm9vdEBsb2NhbGhvc3Qgfl0jIGRtZXNnIHwgdGFpbCAtNQ0KWyAgICAzLjYzNjE3NF0gbmZfY29u
+bnRyYWNrIHZlcnNpb24gMC41LjAgKDcxNjggYnVja2V0cywgMjg2NzIgbWF4KQ0KWyAgICAzLjcz
+ODY0NV0gTkVUOiBSZWdpc3RlcmVkIHByb3RvY29sIGZhbWlseSAxMA0KWyAgICAzLjc0MzAwNF0g
+aXA2X3RhYmxlczogKEMpIDIwMDAtMjAwNiBOZXRmaWx0ZXIgQ29yZSBUZWFtDQpbICAgIDMuNzcz
+Mzg0XSBpbnB1dDogSW1FeFBTLzIgQllEIFRvdWNoUGFkIGFzDQovZGV2aWNlcy9wbGF0Zm9ybS9p
+ODA0Mi9zZXJpbzEvaW5wdXQvaW5wdXQzDQpbICAgIDMuNzc2ODAzXSBtb3VzZWRldjogUFMvMiBt
+b3VzZSBkZXZpY2UgY29tbW9uIGZvciBhbGwgbWljZQ0KDQpbcm9vdEBsb2NhbGhvc3Qgfl0jIGxz
+bW9kIHwgZ3JlcCBkcmJnDQpkcmJnICAgICAgICAgICAgICAgICAgIDE0MTQ3ICAxDQoNCltyb290
+QGxvY2FsaG9zdCB+XSMgbW9kaW5mbyBkcmJnDQpmaWxlbmFtZTogICAgICAgL2xpYi9tb2R1bGVz
+LzQuNy4wLTEudG9zMl81L2tlcm5lbC9jcnlwdG8vZHJiZy5rby5neg0KYWxpYXM6ICAgICAgICAg
+IGNyeXB0by1zdGRybmcNCmFsaWFzOiAgICAgICAgICBzdGRybmcNCmRlc2NyaXB0aW9uOiAgICBO
+SVNUIFNQODAwLTkwQSBEZXRlcm1pbmlzdGljIFJhbmRvbSBCaXQgR2VuZXJhdG9yIChEUkJHKQ0K
+dXNpbmcgZm9sbG93aW5nIGNvcmVzOiBITUFDDQphdXRob3I6ICAgICAgICAgU3RlcGhhbiBNdWVs
+bGVyIDxzbXVlbGxlckBjaHJvbm94LmRlPg0KbGljZW5zZTogICAgICAgIEdQTA0KYWxpYXM6ICAg
+ICAgICAgIGNyeXB0by1kcmJnX25vcHJfaG1hY19zaGExDQphbGlhczogICAgICAgICAgZHJiZ19u
+b3ByX2htYWNfc2hhMQ0KYWxpYXM6ICAgICAgICAgIGNyeXB0by1kcmJnX3ByX2htYWNfc2hhMQ0K
+YWxpYXM6ICAgICAgICAgIGRyYmdfcHJfaG1hY19zaGExDQphbGlhczogICAgICAgICAgY3J5cHRv
+LWRyYmdfbm9wcl9obWFjX3NoYTI1Ng0KYWxpYXM6ICAgICAgICAgIGRyYmdfbm9wcl9obWFjX3No
+YTI1Ng0KYWxpYXM6ICAgICAgICAgIGNyeXB0by1kcmJnX3ByX2htYWNfc2hhMjU2DQphbGlhczog
+ICAgICAgICAgZHJiZ19wcl9obWFjX3NoYTI1Ng0KYWxpYXM6ICAgICAgICAgIGNyeXB0by1kcmJn
+X25vcHJfaG1hY19zaGEzODQNCmFsaWFzOiAgICAgICAgICBkcmJnX25vcHJfaG1hY19zaGEzODQN
+CmFsaWFzOiAgICAgICAgICBjcnlwdG8tZHJiZ19wcl9obWFjX3NoYTM4NA0KYWxpYXM6ICAgICAg
+ICAgIGRyYmdfcHJfaG1hY19zaGEzODQNCmFsaWFzOiAgICAgICAgICBjcnlwdG8tZHJiZ19ub3By
+X2htYWNfc2hhNTEyDQphbGlhczogICAgICAgICAgZHJiZ19ub3ByX2htYWNfc2hhNTEyDQphbGlh
+czogICAgICAgICAgY3J5cHRvLWRyYmdfcHJfaG1hY19zaGE1MTINCmFsaWFzOiAgICAgICAgICBk
+cmJnX3ByX2htYWNfc2hhNTEyDQpkZXBlbmRzOg0KaW50cmVlOiAgICAgICAgIFkNCnZlcm1hZ2lj
+OiAgICAgICA0LjcuMC0xLnRvczJfNSBTTVAgbW9kX3VubG9hZCBtb2R2ZXJzaW9ucw0KDQoNCg0K
+DQoNCg0KDQpPbiA4LzkvMTYsIDEyOjA1IFBNLCAiU3RlcGhhbiBNdWVsbGVyIiA8c211ZWxsZXJA
+Y2hyb25veC5kZT4gd3JvdGU6DQoNCj5BbSBEaWVuc3RhZywgOS4gQXVndXN0IDIwMTYsIDE2OjM0
+OjU5IENFU1Qgc2NocmllYiBUYXBhcyBTYXJhbmdpOg0KPg0KPkhpIFRhcGFzLA0KPg0KPj4gSGkg
+U3RlcGhhbiwNCj4+DQo+PiBGb2xsb3dpbmcgdXAgZnJvbSB0aGUgb3RoZXIgdGhyZWFkOg0KPj4N
+Cj4+IFdoaWxlIHRyeWluZyB0byBib290IGluIEZJUFMgbW9kZSwga2VybmVsIHBhbmljcyB3aXRo
+IHRoZSBmb2xsb3dpbmcNCj4+IG1lc3NhZ2UuIFNvIGZhciwgSSBkb26p9nQgaGF2ZSBzdWNjZXNz
+IHRvIGdldCBtb3JlIGluZm9ybWF0aW9uIGFib3V0DQo+PndoaWNoDQo+PiBtb2R1bGUgb3Igc3lt
+Ym9sIGlzIGNhdXNpbmcgdGhpcy4gSSBoYXZlbqn2dCBmb3VuZCBhbnkgZXJyb3JzIG9yIHdhcm5p
+bmdzDQo+PiBpbiBrZXJuZWwgY29tcGlsYXRpb24uIEl0IGJvb3RzIGZpbmUgaW4gYSBub24tZmlw
+cyBtb2RlLg0KPj4NCj4+IEkgYW0gYWxzbyBwYXN0aW5nIHRoZSBDUllQVE8gcmVsYXRlZCBjb25m
+aWdzIHRoYXQgSSBoYXZlIGVuYWJsZWQgKFNlZQ0KPj4gYmVsb3cpLg0KPg0KPkkgZG8gbm90IHNl
+ZSB0aGUgaXNzdWUgaW1tZWRpYXRlbHkuIENvdWxkIHlvdSBib290IHdpdGhvdXQgZmlwcz0xIGFu
+ZCBkbw0KPmENCj5tb2Rwcm9iZSBkcmJnID8NCj4NCj5JIGFtIGFsc28gdGVzdGluZyBmaXBzPTEg
+bm93Lg0KPg0KPkNpYW8NCj5TdGVwaGFuDQoNCg0KX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX18NCg0KVGhpcyB0cmFuc21pc3Npb24gbWF5IGNvbnRhaW4gaW5mb3JtYXRpb24gdGhhdCBp
+cyBwcml2aWxlZ2VkLCBjb25maWRlbnRpYWwsIGFuZC9vciBleGVtcHQgZnJvbSBkaXNjbG9zdXJl
+IHVuZGVyIGFwcGxpY2FibGUgbGF3LiBJZiB5b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBp
+ZW50LCB5b3UgYXJlIGhlcmVieSBub3RpZmllZCB0aGF0IGFueSBkaXNjbG9zdXJlLCBjb3B5aW5n
+LCBkaXN0cmlidXRpb24sIG9yIHVzZSBvZiB0aGUgaW5mb3JtYXRpb24gY29udGFpbmVkIGhlcmVp
+biAoaW5jbHVkaW5nIGFueSByZWxpYW5jZSB0aGVyZW9uKSBpcyBzdHJpY3RseSBwcm9oaWJpdGVk
+LiBJZiB5b3UgcmVjZWl2ZWQgdGhpcyB0cmFuc21pc3Npb24gaW4gZXJyb3IsIHBsZWFzZSBpbW1l
+ZGlhdGVseSBjb250YWN0IHRoZSBzZW5kZXIgYW5kIGRlc3Ryb3kgdGhlIG1hdGVyaWFsIGluIGl0
+cyBlbnRpcmV0eSwgd2hldGhlciBpbiBlbGVjdHJvbmljIG9yIGhhcmQgY29weSBmb3JtYXQuDQo=
