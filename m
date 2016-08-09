@@ -1,7 +1,7 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH 3/7] crypto: marvell: turn mv_cesa_ahash_init() into a function returning void
-Date: Tue,  9 Aug 2016 11:03:16 +0200
-Message-ID: <1470733400-23621-4-git-send-email-romain.perier@free-electrons.com>
+Subject: [PATCH 5/7] crypto: marvell - Update transformation context for each dequeued req
+Date: Tue,  9 Aug 2016 11:03:18 +0200
+Message-ID: <1470733400-23621-6-git-send-email-romain.perier@free-electrons.com>
 References: <1470733400-23621-1-git-send-email-romain.perier@free-electrons.com>
 Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
@@ -11,46 +11,44 @@ Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 To: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Arnaud Ebalard <arno@natisbad.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:39673 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:39689 "EHLO
 	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752150AbcHIJDi (ORCPT
+	with ESMTP id S1752185AbcHIJDj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 05:03:38 -0400
+	Tue, 9 Aug 2016 05:03:39 -0400
 In-Reply-To: <1470733400-23621-1-git-send-email-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+So far, sub part of mv_cesa_int was responsible of dequeuing complete
+requests, then call the 'cleanup' operation on these reqs and call the
+crypto api callback 'complete'. The problem is that the transformation
+context 'ctx' is retrieved only once before the while loop. Which means
+that the wrong 'cleanup' operation might be called on the wrong type of
+cesa requests, it can lead to memory corruptions with this message:
 
-The mv_cesa_ahash_init() function always returns 0, and the return
-value is anyway never checked. Turn it into a function returning void.
+marvell-cesa f1090000.crypto: dma_pool_free cesa_padding, 5a5a5a5a/5a5a5a5a (bad dma)
 
-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+This commit fixes the issue, by updating the transformation context for
+each dequeued cesa request.
+
+Fixes: commit 85030c5168f1 ("crypto: marvell - Add support for chai...")
+Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
 ---
- drivers/crypto/marvell/hash.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/crypto/marvell/cesa.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-index 0d7f5f9..7291664 100644
---- a/drivers/crypto/marvell/hash.c
-+++ b/drivers/crypto/marvell/hash.c
-@@ -374,7 +374,7 @@ static const struct mv_cesa_req_ops mv_cesa_ahash_req_ops = {
- 	.complete = mv_cesa_ahash_complete,
- };
+diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
+index d64af86..37dadb2 100644
+--- a/drivers/crypto/marvell/cesa.c
++++ b/drivers/crypto/marvell/cesa.c
+@@ -166,6 +166,7 @@ static irqreturn_t mv_cesa_int(int irq, void *priv)
+ 			if (!req)
+ 				break;
  
--static int mv_cesa_ahash_init(struct ahash_request *req,
-+static void mv_cesa_ahash_init(struct ahash_request *req,
- 			      struct mv_cesa_op_ctx *tmpl, bool algo_le)
- {
- 	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
-@@ -390,8 +390,6 @@ static int mv_cesa_ahash_init(struct ahash_request *req,
- 	creq->op_tmpl = *tmpl;
- 	creq->len = 0;
- 	creq->algo_le = algo_le;
--
--	return 0;
- }
- 
- static inline int mv_cesa_ahash_cra_init(struct crypto_tfm *tfm)
++			ctx = crypto_tfm_ctx(req->tfm);
+ 			mv_cesa_complete_req(ctx, req, 0);
+ 		}
+ 	}
 -- 
 2.8.1
