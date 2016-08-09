@@ -1,72 +1,55 @@
-From: Tapas Sarangi <TSarangi@trustwave.com>
+From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: RSA key size not allowed in FIPS
-Date: Tue, 9 Aug 2016 14:54:12 +0000
-Message-ID: <D3CF580A.2891%tsarangi@trustwave.com>
-References: <D3CF4E8C.2883%tsarangi@trustwave.com>
- <2825660.AnRQGUh0XD@tauon.atsec.com> <D3CF5455.2887%tsarangi@trustwave.com>
+Date: Tue, 09 Aug 2016 16:55:52 +0200
+Message-ID: <21317106.O9C0GvNNQc@positron.chronox.de>
+References: <D3CF4E8C.2883%tsarangi@trustwave.com> <2825660.AnRQGUh0XD@tauon.atsec.com> <D3CF5455.2887%tsarangi@trustwave.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="euc-kr"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
+To: Tapas Sarangi <TSarangi@trustwave.com>, dhowells@redhat.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from seg-node-elk-02.trustwave.com ([204.13.202.189]:14889 "EHLO
-	seg-node-elk-02.trustwave.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751688AbcHIOyR (ORCPT
+Received: from mail.eperm.de ([89.247.134.16]:34404 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932194AbcHIO4A convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 10:54:17 -0400
+	Tue, 9 Aug 2016 10:56:00 -0400
 In-Reply-To: <D3CF5455.2887%tsarangi@trustwave.com>
-Content-Language: en-US
-Content-ID: <08483075C5F0624887C579FF612FBA65@namprd07.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-TG9va2luZyBhdCB0aGUga2VybmVsIGNvbXBpbGF0aW9uIGxvZywgaXQgc2VlbXMgdG8gYmUgZ2Vu
-ZXJhdGluZyBhIDRrDQooNDA5NiBiaXRzKSBwcml2YXRlIGtleSwgYWx0aG91Z2ggSSBhbSBzcGVj
-aWZ5aW5nDQpDT05GSUdfTU9EVUxFX1NJR19IQVNIPaGwc2hhMjU2obEuIEhvdyBjYW4gSSBnZW5l
-cmF0ZSBSU0Ega2V5IHRoYXQgaXMgd2l0aGluDQoyay0zayBiaXRzID8NCg0KSGVyZSBpcyBhIHNu
-aXBwZXQgZnJvbSB0aGUgY29tcGlsYXRpb24gbG9nOg0KDQojIyMgTm93IGdlbmVyYXRpbmcgYW4g
-WC41MDkga2V5IHBhaXIgdG8gYmUgdXNlZCBmb3Igc2lnbmluZyBtb2R1bGVzLg0KIyMjDQojIyMg
-SWYgdGhpcyB0YWtlcyBhIGxvbmcgdGltZSwgeW91IG1pZ2h0IHdpc2ggdG8gcnVuIHJuZ2QgaW4g
-dGhlDQojIyMgYmFja2dyb3VuZCB0byBrZWVwIHRoZSBzdXBwbHkgb2YgZW50cm9weSB0b3BwZWQg
-dXAuICBJdA0KIyMjIG5lZWRzIHRvIGJlIHJ1biBhcyByb290LCBhbmQgdXNlcyBhIGhhcmR3YXJl
-IHJhbmRvbQ0KIyMjIG51bWJlciBnZW5lcmF0b3IgaWYgb25lIGlzIGF2YWlsYWJsZS4NCiMjIw0K
-R2VuZXJhdGluZyBhIDQwOTYgYml0IFJTQSBwcml2YXRlIGtleQ0KDQpUaGFua3MgYSBsb3QuDQot
-VGFwYXMNCg0KDQoNCg0KDQpPbiA4LzkvMTYsIDk6MzkgQU0sICJUYXBhcyBTYXJhbmdpIiA8VFNh
-cmFuZ2lAdHJ1c3R3YXZlLmNvbT4gd3JvdGU6DQoNCj5IaSBTdGVwaGFuLA0KPg0KPklmIEkgdW5k
-ZXJzdGFuZCB0aGlzIGNvcnJlY3RseSwgdGhpcyAoQ09ORklHX01PRFVMRV9TSUdfSEFTSD2hsHNo
-YTI1NiIpDQo+dGVsbHMgYWJvdXQgdGhlIGtleSBzaXplIHVzZWQuDQo+SSBhbSB1c2luZyChsHNo
-YTI1NqGxLiBJbml0aWFsbHksIEkgd2FzIHVzaW5nIKGwc2hhNTEyobEgd2hpY2ggSSB0aG91Z2h0
-IGNvdWxkDQo+YmUgY2F1c2luZyBwcm9ibGVtLCBidXQgSSBhbSBnZXR0aW5nIHNhbWUgZXJyb3Ig
-d2hlbiBjaGFuZ2UgaXQgdG8NCj6hsHNoYTI1NqGxLg0KPg0KPltyb290QGxvY2FsaG9zdCB+XSMg
-Z3JlcCBNT0RVTEVfU0lHIC9ib290L2NvbmZpZy00LjcuMC0xLnRvczJfNQ0KPg0KPkNPTkZJR19N
-T0RVTEVfU0lHPXkNCj4jIENPTkZJR19NT0RVTEVfU0lHX0ZPUkNFIGlzIG5vdCBzZXQNCj5DT05G
-SUdfTU9EVUxFX1NJR19BTEw9eQ0KPiMgQ09ORklHX01PRFVMRV9TSUdfU0hBMSBpcyBub3Qgc2V0
-DQo+IyBDT05GSUdfTU9EVUxFX1NJR19TSEEyMjQgaXMgbm90IHNldA0KPkNPTkZJR19NT0RVTEVf
-U0lHX1NIQTI1Nj15DQo+IyBDT05GSUdfTU9EVUxFX1NJR19TSEEzODQgaXMgbm90IHNldA0KPiMg
-Q09ORklHX01PRFVMRV9TSUdfU0hBNTEyIGlzIG5vdCBzZXQNCj5DT05GSUdfTU9EVUxFX1NJR19I
-QVNIPSJzaGEyNTYiDQo+Q09ORklHX01PRFVMRV9TSUdfS0VZPSJjZXJ0cy9zaWduaW5nX2tleS5w
-ZW0iDQo+DQo+VGhhbmtzDQo+DQo+DQo+LVRhcGFzDQo+DQo+DQo+T24gOC85LzE2LCA5OjI5IEFN
-LCAiU3RlcGhhbiBNdWVsbGVyIiA8c211ZWxsZXJAY2hyb25veC5kZT4gd3JvdGU6DQo+DQo+PkFt
-IERpZW5zdGFnLCA5LiBBdWd1c3QgMjAxNiwgMTQ6MTA6MzMgQ0VTVCBzY2hyaWViIFRhcGFzIFNh
-cmFuZ2k6DQo+Pg0KPj5IaSBUYXBhcywNCj4+DQo+Pj4gSGVsbG8sDQo+Pj4NCj4+PiBJIGFtIHVz
-aW5nIHZhbmlsbGEga2VybmVsLTQuNyBzb3VyY2UuIEl0IGNyYXNoZXMgd2l0aCB0aGUgZm9sbG93
-aW5nDQo+Pj53aGVuDQo+Pj4gYm9vdGVkIHdpdGggqfhmaXBzPTEgYm9vdD0vZGV2L3NkYTGp9yBv
-cHRpb24gYXQgdGhlIGtlcm5lbCBjb21tYW5kIGxpbmUNCj4+PiBhcmd1bWVudC4NCj4+DQo+PlRo
-ZSBrZXJuZWwgb25seSBhbGxvd3MgMmsgYW5kIDNrIFJTQSBrZXlzIGluIEZJUFMgbW9kZS4gUGxl
-YXNlIGNoZWNrIHlvdXINCj4+UlNBDQo+PmtleSB1c2VkIGZvciBzaWduYXR1cmVzLg0KPj4NCj4+
-ICAgICAgICAgICAgICAgIC8qIEluIEZJUFMgbW9kZSBvbmx5IGFsbG93IGtleSBzaXplIDJLICYg
-M0sgKi8NCj4+ICAgICAgICAgICAgICAgIGlmIChuX3N6ICE9IDI1NiAmJiBuX3N6ICE9IDM4NCkg
-ew0KPj4gICAgICAgICAgICAgICAgICAgICAgICBwcl9lcnIoIlJTQToga2V5IHNpemUgbm90IGFs
-bG93ZWQgaW4gRklQUw0KPj5tb2RlXG4iKTsNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgcmV0
-dXJuIC1FSU5WQUw7DQo+PiAgICAgICAgICAgICAgICB9DQo+Pg0KPj5DaWFvDQo+PlN0ZXBoYW4N
-Cj4NCg0KDQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KDQpUaGlzIHRyYW5zbWlz
-c2lvbiBtYXkgY29udGFpbiBpbmZvcm1hdGlvbiB0aGF0IGlzIHByaXZpbGVnZWQsIGNvbmZpZGVu
-dGlhbCwgYW5kL29yIGV4ZW1wdCBmcm9tIGRpc2Nsb3N1cmUgdW5kZXIgYXBwbGljYWJsZSBsYXcu
-IElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQsIHlvdSBhcmUgaGVyZWJ5IG5v
-dGlmaWVkIHRoYXQgYW55IGRpc2Nsb3N1cmUsIGNvcHlpbmcsIGRpc3RyaWJ1dGlvbiwgb3IgdXNl
-IG9mIHRoZSBpbmZvcm1hdGlvbiBjb250YWluZWQgaGVyZWluIChpbmNsdWRpbmcgYW55IHJlbGlh
-bmNlIHRoZXJlb24pIGlzIHN0cmljdGx5IHByb2hpYml0ZWQuIElmIHlvdSByZWNlaXZlZCB0aGlz
-IHRyYW5zbWlzc2lvbiBpbiBlcnJvciwgcGxlYXNlIGltbWVkaWF0ZWx5IGNvbnRhY3QgdGhlIHNl
-bmRlciBhbmQgZGVzdHJveSB0aGUgbWF0ZXJpYWwgaW4gaXRzIGVudGlyZXR5LCB3aGV0aGVyIGlu
-IGVsZWN0cm9uaWMgb3IgaGFyZCBjb3B5IGZvcm1hdC4NCg==
+Am Dienstag, 9. August 2016, 14:39:03 CEST schrieb Tapas Sarangi:
+
+Hi Tapas, David,
+
+> Hi Stephan,
+> 
+> If I understand this correctly, this (CONFIG_MODULE_SIG_HASH=“sha256")
+> tells about the key size used.
+> I am using “sha256”. Initially, I was using “sha512” which I thought could
+> be causing problem, but I am getting same error when change it to
+> “sha256”.
+> 
+> [root@localhost ~]# grep MODULE_SIG /boot/config-4.7.0-1.tos2_5
+> 
+> CONFIG_MODULE_SIG=y
+> # CONFIG_MODULE_SIG_FORCE is not set
+> CONFIG_MODULE_SIG_ALL=y
+> # CONFIG_MODULE_SIG_SHA1 is not set
+> # CONFIG_MODULE_SIG_SHA224 is not set
+> CONFIG_MODULE_SIG_SHA256=y
+> # CONFIG_MODULE_SIG_SHA384 is not set
+> # CONFIG_MODULE_SIG_SHA512 is not set
+> CONFIG_MODULE_SIG_HASH="sha256"
+> CONFIG_MODULE_SIG_KEY="certs/signing_key.pem"
+
+It is rather the question how signing_key.pem is generated.
+
+Do you have the file certs/x509.genkey? If yes, what is the default_bits 
+value?
+
+David, the x509.genkey file seems to generate a 4k RSA key per default. This 
+will cause a panic with fips=1 as only 2k and 3k keys are allowed.
+
+Ciao
+Stephan
