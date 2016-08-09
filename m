@@ -1,35 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: powerpc - CRYPT_CRC32C_VPMSUM should depend
- on ALTIVEC
-Date: Tue, 9 Aug 2016 18:36:25 +0800
-Message-ID: <20160809103625.GB6934@gondor.apana.org.au>
-References: <1470696375-22023-1-git-send-email-mpe@ellerman.id.au>
+Subject: Re: [PATCH 0/2] Fix a resource release omission in error handling
+ code
+Date: Tue, 9 Aug 2016 18:59:05 +0800
+Message-ID: <20160809105905.GA7099@gondor.apana.org.au>
+References: <20160722133242.21916-1-lambert.quentin@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org,
-	Anton Blanchard <anton@samba.org>
-To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+To: Quentin Lambert <lambert.quentin@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54325 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:48926 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752565AbcHIKgc (ORCPT
+	with ESMTP id S1752297AbcHIK7P (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 06:36:32 -0400
+	Tue, 9 Aug 2016 06:59:15 -0400
 Content-Disposition: inline
-In-Reply-To: <1470696375-22023-1-git-send-email-mpe@ellerman.id.au>
+In-Reply-To: <20160722133242.21916-1-lambert.quentin@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 09, 2016 at 08:46:15AM +1000, Michael Ellerman wrote:
-> The optimised crc32c implementation depends on VMX (aka. Altivec)
-> instructions, so the kernel must be built with Altivec support in order
-> for the crc32c code to build.
-> 
-> Fixes: 6dd7a82cc54e ("crypto: powerpc - Add POWER8 optimised crc32c")
-> Acked-by: Anton Blanchard <anton@samba.org>
-> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+On Fri, Jul 22, 2016 at 03:32:40PM +0200, Quentin Lambert wrote:
+> The first patch is a style fix, the second add calls to npe_release.
+> The reason for me thinking that they are necessary is that every other branches
+> leading to an error return are calling this function.
 
-Patch applied.  Thanks.
+Both patches applied.  BTW, your patches came in the wrong order.
+Please send them in the correct order next time.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
