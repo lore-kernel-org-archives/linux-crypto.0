@@ -1,41 +1,55 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH 2/2] ath9k: disable RNG by default
-Date: Tue, 9 Aug 2016 17:17:55 +0800
-Message-ID: <20160809091755.GA6370@gondor.apana.org.au>
-References: <1470726147-30095-1-git-send-email-miaoqing@codeaurora.org>
- <4731753.YZZKimtrHM@tauon.atsec.com>
- <20160809085858.GA6172@gondor.apana.org.au>
- <2569442.q63FVBJjUH@tauon.atsec.com>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: AF_ALG zero-size hash fails
+Date: Tue, 9 Aug 2016 10:18:34 +0100
+Message-ID: <20160809091834.GH1041@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "Pan, Miaoqing" <miaoqing-Rm6X0d1/PG5y9aJCnZT0Uw@public.gmane.org>,
-	Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-	"miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org" <miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>,
-	"Valo, Kalle" <kvalo-A+ZNKFmMK5xy9aJCnZT0Uw@public.gmane.org>,
-	"linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	ath9k-devel <ath9k-devel-A+ZNKFmMK5xy9aJCnZT0Uw@public.gmane.org>,
-	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org" <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>,
-	"Sepehrdad, Pouyan" <pouyans-Rm6X0d1/PG5y9aJCnZT0Uw@public.gmane.org>
-To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: noloader@gmail.com, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:34671 "EHLO
+	pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932166AbcHIJSn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Aug 2016 05:18:43 -0400
 Content-Disposition: inline
-In-Reply-To: <2569442.q63FVBJjUH-gNvIQDDl/k7Ia13z/PHSgg@public.gmane.org>
-Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 09, 2016 at 11:02:58AM +0200, Stephan Mueller wrote:
-> 
-> But shouldn't the default of the rngd then be adjusted a bit?
+Hi,
 
-Please elaborate.
+While testing AF_ALG with openssl af-alg-rr, I've found that:
 
-Thanks,
+OPENSSL_CONF=/shared/crypto/openssl-imx.cnf openssl dgst -sha1 </dev/null
+
+fails with a zero hash result:
+
+socket(PF_ALG, SOCK_SEQPACKET, 0)       = 3
+close(3)                                = 0
+socket(PF_ALG, SOCK_SEQPACKET, 0)       = 3
+bind(3, {sa_family=AF_ALG, sa_data="hash\0\0\0\0\0\0\0\0\0\0"}, 88) = 0
+accept(3, 0, NULL)                      = 4
+fstat64(0, {st_mode=S_IFCHR|0666, st_rdev=makedev(1, 3), ...}) = 0
+ioctl(0, SNDCTL_TMR_TIMEBASE or SNDRV_TIMER_IOCTL_NEXT_DEVICE or TCGETS, 0xbed50d5c) = -1 ENOTTY (Inappropriate ioctl for device)
+mmap2(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0xb6fe4000
+read(0, "", 8192)                       = 0
+read(4, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 20) = 20
+close(4)                                = 0
+close(3)                                = 0
+
+tested with the Freescale CAAM driver with SHA1 and MD5 hashes, and
+the ARM SHA1 shash implementation.  Should there at least be a single
+write to the socket (of zero size) in this case, or should the kernel
+return the correct hash on the first read without a preceding
+write/send?
+
+I don't think this is a regression afaik - it's been around for some
+time (at least from when I first started to poke at the ARM crypto
+stuff around v4.2 or v4.3 time.)
+
+Thanks.
+
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe linux-wireless" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
