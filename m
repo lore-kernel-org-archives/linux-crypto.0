@@ -1,43 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: AF_ALG broken?
-Date: Tue, 9 Aug 2016 18:35:49 +0800
-Message-ID: <20160809103549.GA6934@gondor.apana.org.au>
-References: <20160808181117.GD1041@n2100.armlinux.org.uk>
- <20160809031820.GA4142@gondor.apana.org.au>
- <20160809070859.GF1041@n2100.armlinux.org.uk>
- <20160809071402.GA5466@gondor.apana.org.au>
- <20160809072717.GG1041@n2100.armlinux.org.uk>
+Subject: Re: [PATCH v2] crypto: powerpc - CRYPT_CRC32C_VPMSUM should depend
+ on ALTIVEC
+Date: Tue, 9 Aug 2016 18:36:25 +0800
+Message-ID: <20160809103625.GB6934@gondor.apana.org.au>
+References: <1470696375-22023-1-git-send-email-mpe@ellerman.id.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: noloader@gmail.com, linux-crypto@vger.kernel.org
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org,
+	Anton Blanchard <anton@samba.org>
+To: Michael Ellerman <mpe@ellerman.id.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38445 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:54325 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751414AbcHIKf5 (ORCPT
+	with ESMTP id S1752565AbcHIKgc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 06:35:57 -0400
+	Tue, 9 Aug 2016 06:36:32 -0400
 Content-Disposition: inline
-In-Reply-To: <20160809072717.GG1041@n2100.armlinux.org.uk>
+In-Reply-To: <1470696375-22023-1-git-send-email-mpe@ellerman.id.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 09, 2016 at 08:27:17AM +0100, Russell King - ARM Linux wrote:
->
-> From: Russell King <rmk+kernel@armlinux.org.uk>
-> Subject: [PATCH] crypto: caam - fix non-hmac hashes
+On Tue, Aug 09, 2016 at 08:46:15AM +1000, Michael Ellerman wrote:
+> The optimised crc32c implementation depends on VMX (aka. Altivec)
+> instructions, so the kernel must be built with Altivec support in order
+> for the crc32c code to build.
 > 
-> Since 6de62f15b581 ("crypto: algif_hash - Require setkey before
-> accept(2)"), the AF_ALG interface requires userspace to provide a key
-> to any algorithm that has a setkey method.  However, the non-HMAC
-> algorithms are not keyed, so setting a key is unnecessary.
-> 
-> Fix this by removing the setkey method from the non-keyed hash
-> algorithms.
-> 
-> Fixes: 6de62f15b581 ("crypto: algif_hash - Require setkey before accept(2)")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> Fixes: 6dd7a82cc54e ("crypto: powerpc - Add POWER8 optimised crc32c")
+> Acked-by: Anton Blanchard <anton@samba.org>
+> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
 
 Patch applied.  Thanks.
 -- 
