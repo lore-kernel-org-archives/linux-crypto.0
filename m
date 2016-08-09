@@ -1,44 +1,63 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: AF_ALG broken?
-Date: Tue, 9 Aug 2016 15:14:02 +0800
-Message-ID: <20160809071402.GA5466@gondor.apana.org.au>
-References: <20160808181117.GD1041@n2100.armlinux.org.uk>
- <20160809031820.GA4142@gondor.apana.org.au>
- <20160809070859.GF1041@n2100.armlinux.org.uk>
+From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Subject: Re: [PATCH 2/2] ath9k: disable RNG by default
+Date: Tue, 09 Aug 2016 09:14:30 +0200
+Message-ID: <4627645.oz3l49ICL3@tauon.atsec.com>
+References: <1470726147-30095-1-git-send-email-miaoqing@codeaurora.org> <1470726147-30095-2-git-send-email-miaoqing@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: noloader@gmail.com, linux-crypto@vger.kernel.org
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51824 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751152AbcHIHOG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 03:14:06 -0400
-Content-Disposition: inline
-In-Reply-To: <20160809070859.GF1041@n2100.armlinux.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: kvalo-A+ZNKFmMK5xy9aJCnZT0Uw@public.gmane.org, linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	ath9k-devel-A+ZNKFmMK5xy9aJCnZT0Uw@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, pouyans-Rm6X0d1/PG5y9aJCnZT0Uw@public.gmane.org
+To: miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org
+Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1470726147-30095-2-git-send-email-miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 09, 2016 at 08:08:59AM +0100, Russell King - ARM Linux wrote:
-> 
-> I thought I gave the commands and link to your example code.  The
-> openssl case is md5, though sha* also gives the same result.  Your
-> example code was sha1 iirc.  I guess none of these would be using
-> HMAC - the openssl cases used to give results compatible with the
-> md5sum/ sha1sum etc userspace commands.
-> 
-> /proc/crypto:
-> 
-> name         : md5
-> driver       : md5-caam
+Am Dienstag, 9. August 2016, 15:02:27 CEST schrieb miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org:
 
-Right, caam is providing a setkey function for md5, which leads the
-API to think that a key is required.  We should fix it so that setkey
-is only set for the HMAC-variant.
+Hi Miaoqing,
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> From: Miaoqing Pan <miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+> 
+> ath9k RNG will dominates all the noise sources from the real HW
+> RNG, disable it by default. But we strongly recommand to enable
+> it if the system without HW RNG, especially on embedded systems.
+> 
+> Signed-off-by: Miaoqing Pan <miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+
+As a short term solution:
+
+Acked-by: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+
+But as Jason outlined, there should be nothing that prevents using this code 
+with the HW Random framework. This framework also has logic to limit the rate 
+of injection and allows the setting of the entropy threshold at runtime.
+
+> ---
+>  drivers/net/wireless/ath/ath9k/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/wireless/ath/ath9k/Kconfig
+> b/drivers/net/wireless/ath/ath9k/Kconfig index f68cb00..8f231c6 100644
+> --- a/drivers/net/wireless/ath/ath9k/Kconfig
+> +++ b/drivers/net/wireless/ath/ath9k/Kconfig
+> @@ -180,7 +180,7 @@ config ATH9K_HTC_DEBUGFS
+>  config ATH9K_HWRNG
+>  	bool "Random number generator support"
+>  	depends on ATH9K && (HW_RANDOM = y || HW_RANDOM = ATH9K)
+> -	default y
+> +	default n
+>  	---help---
+>  	  This option incorporates the ADC register output as a source of
+>  	  randomness into Linux entropy pool (/dev/urandom and /dev/random)
+
+
+
+Ciao
+Stephan
+--
+To unsubscribe from this list: send the line "unsubscribe linux-wireless" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
