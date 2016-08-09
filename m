@@ -1,87 +1,83 @@
-From: Jason Cooper <jason@lakedaemon.net>
-Subject: Re: [PATCH v2] RANDOM: ATH9K RNG delivers zero bits of entropy
-Date: Tue, 9 Aug 2016 14:04:44 +0000
-Message-ID: <20160809140444.GB2013@io.lakedaemon.net>
-References: <34197429.2CvoIfft9B@positron.chronox.de>
- <1654172.XfclnXhRmn@positron.chronox.de>
- <657897b90b8344eeab10d7a0f604988d@aptaiexm02f.ap.qualcomm.com>
- <1830987.VF9l4XmGxv@tauon.atsec.com>
- <20160808172930.GD4511@io.lakedaemon.net>
- <99963d34acea47bbacb3ca73b18fed9f@aptaiexm02f.ap.qualcomm.com>
- <20160809115622.GG9515@thunk.org>
+From: Tapas Sarangi <TSarangi@trustwave.com>
+Subject: RSA key size not allowed in FIPS
+Date: Tue, 9 Aug 2016 14:10:33 +0000
+Message-ID: <D3CF4E8C.2883%tsarangi@trustwave.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Theodore Ts'o <tytso@mit.edu>,
-	"Pan, Miaoqing" <miaoqing@qti.qualcomm.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	"Sepehrdad, Pouyan" <pouyans@qti.qualcomm.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	ath9k-devel <ath9k-devel@qca.qualcomm.com>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	"ath9k-devel@lists.ath9k.org" <ath9k-devel@lists.ath9k.org>,
-	Kalle Valo <kvalo@codeaurora.org>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from outbound1a.ore.mailhop.org ([54.213.22.21]:56570 "EHLO
-	outbound1a.ore.mailhop.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932697AbcHIOEt (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 10:04:49 -0400
-Content-Disposition: inline
-In-Reply-To: <20160809115622.GG9515@thunk.org>
+Received: from seg-node-chi-03.trustwave.com ([204.13.200.31]:19352 "EHLO
+	seg-node-chi-03.trustwave.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752711AbcHIOZi convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Aug 2016 10:25:38 -0400
+Content-Language: en-US
+Content-ID: <61BEB30B992E6245B34181F0D82B60F5@namprd07.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Ted,
+Hello,
 
-On Tue, Aug 09, 2016 at 07:56:22AM -0400, Theodore Ts'o wrote:
-> On Tue, Aug 09, 2016 at 06:30:03AM +0000, Pan, Miaoqing wrote:
-> > Agree with Jason's point, also understand Stephan's concern.  The
-> > date rate can be roughly estimated by 'cat /dev/random |rngtest -c
-> > 1000', the average speed is 1111.294Kibits/s. I will sent the patch
-> > to disable ath9k RNG by default.
-> 
-> If the ATH9K is generating some random amount of data, but you don't
-> know how random, and you're gathering it opportunistically --- for
-> example, suppose a wireless driver gets the radio's signal strength
-> through the normal course of its operation, and while there might not
-> be that much randomness for someone who can observe the exact details
-> of how the phone is positioned in the room --- but for which the
-> analyst sitting in Fort Meade won't know whether or not the phone is
-> on the desk, or in a knapsack under the table, the right interface to
-> use is:
-> 
->    void add_device_randomness(const void *buf, unsigned int size);
-> 	
-> This won't increase the entropy count, but if you have the bit of
-> potential randomness "for free", you might as well contribute it to
-> the entropy pool.  If it turns out that the chip was manufactured in
-> China, and the MSS has backdoored it out the wazoo, it won't do any
-> harm --- where as using the hwrng framework would be disastrous.
+I am using vanilla kernel-4.7 source. It crashes with the following when
+booted with ³fips=1 boot=/dev/sda1² option at the kernel command line
+argument.
 
-Ok, I get that.  However, we have Documentation/hw_random.txt saying:
+[    0.642411] RSA: key size not allowed in FIPS mode
+[    0.643099] Problem loading in-kernel X.509 certificate (-22)
+[    0.800524] BUG: unable to handle kernel NULL pointer dereference at
+0000000000000068
+[    0.803075] IP: [<ffffffff811e1ad7>] kernfs_find_ns+0x17/0xf0
+[    0.804111] PGD 0
+[    0.804111] Oops: 0000 [#1] SMP
+[    0.804111] Modules linked in:
+[    0.804111] CPU: 0 PID: 6 Comm: kworker/u2:0 Tainted: G        W
+4.7.0-1.tos2_5 #1
+[    0.804111] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.8.2-20150714_191134- 04/01/2014
+[    0.804111] Workqueue: events_unbound async_run_entry_fn
+[    0.804111] task: ffff88003e214100 ti: ffff88003e264000 task.ti:
+ffff88003e264000
+[    0.804111] RIP: 0010:[<ffffffff811e1ad7>]  [<ffffffff811e1ad7>]
+kernfs_find_ns+0x17/0xf0
+[    0.804111] RSP: 0018:ffff88003e267868  EFLAGS: 00010282
+[    0.804111] RAX: ffff88003e214100 RBX: 0000000000000000 RCX:
+ffff88003e264008
+[    0.804111] RDX: 0000000000000000 RSI: ffffffff8166bb80 RDI:
+0000000000000000
+[    0.804111] RBP: ffff88003e267898 R08: 0000000000000000 R09:
+ffffffff8166bb80
+[    0.804111] R10: 00000000000c6000 R11: 0000000000000001 R12:
+ffffffff8166bb80
+[    0.804111] R13: 0000000000000000 R14: ffffffff8173048a R15:
+ffff88003b17b1a0
+[    0.804111] FS:  0000000000000000(0000) GS:ffff88003fc00000(0000)
+knlGS:0000000000000000
+[    0.804111] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    0.804111] CR2: 0000000000000068 CR3: 0000000001806000 CR4:
+00000000000406f0
+[    0.804111] Stack:
+[    0.804111]  ffff88003e267898 0000000000000000 ffff880000000001
+0000000000000000
+[    0.804111]  ffffffff8166bb80 0000000000000000 ffff88003e2678c8
+ffffffff811e1e77
+[    0.804111]  0000000000000096 ffffffff81873d40 ffff88003b152828
+0000000000000005
+[    0.804111] Call Trace:
+[    0.804111]  [<ffffffff811e1e77>] kernfs_find_and_get_ns+0x37/0x60
+[    0.804111]  [<ffffffff811e5c58>] sysfs_unmerge_group+0x18/0x60
+[    0.804111]  [<ffffffff8139c187>] dpm_sysfs_remove+0x27/0x60
 
-  This data is NOT CHECKED by any fitness tests, and could potentially be
-  bogus (if the hardware is faulty or has been tampered with).  Data is
-  only output if the hardware "has-data" flag is set, but nevertheless a
-  security-conscious person would run fitness tests on the data before
-  assuming it is truly random.
 
-Which I would read as "Don't assume 1 bit read from /dev/hwrng equals 1
-bit of entropy."  Which runs counter to Stephan's reading of the rngd
-code.
 
-And then we have drivers like timeriomem-rng.c that appear to be
-spitting out the raw 32bit register value of $SOC's timer.
+Thanks for any suggestion.
+-Tapas
+Ps : I could not send any attachment, is it possible to send attachment to
+this mailing list ?
 
-Thankfully, most hw_random drivers don't set the quality.  So unless the
-user sets the default_quality param, it's zero.
 
-iiuc, Ted, you're saying using the hw_random framework would be
-disasterous because despite most drivers having a default quality of 0,
-rngd assumes 1 bit of entropy for every bit read?
 
-thx,
 
-Jason.
+________________________________
+
+This transmission may contain information that is privileged, confidential, and/or exempt from disclosure under applicable law. If you are not the intended recipient, you are hereby notified that any disclosure, copying, distribution, or use of the information contained herein (including any reliance thereon) is strictly prohibited. If you received this transmission in error, please immediately contact the sender and destroy the material in its entirety, whether in electronic or hard copy format.
