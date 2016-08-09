@@ -1,25 +1,59 @@
-From: Gary R Hook <ghook@amd.com>
+From: Tapas Sarangi <TSarangi@trustwave.com>
 Subject: Re: RSA key size not allowed in FIPS
-Date: Tue, 9 Aug 2016 09:36:39 -0500
-Message-ID: <85238b66-476a-e0aa-ba59-d5b020f5d68b@amd.com>
+Date: Tue, 9 Aug 2016 14:39:03 +0000
+Message-ID: <D3CF5455.2887%tsarangi@trustwave.com>
 References: <D3CF4E8C.2883%tsarangi@trustwave.com>
+ <2825660.AnRQGUh0XD@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="euc-kr"
+Content-Transfer-Encoding: base64
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0061.outbound.protection.outlook.com ([104.47.32.61]:3136
-	"EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752686AbcHIOgp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 10:36:45 -0400
-In-Reply-To: <D3CF4E8C.2883%tsarangi@trustwave.com>
+Received: from seg-node-elk-03.trustwave.com ([204.13.202.190]:16296 "EHLO
+	seg-node-elk-03.trustwave.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752147AbcHIOjH (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Aug 2016 10:39:07 -0400
+In-Reply-To: <2825660.AnRQGUh0XD@tauon.atsec.com>
+Content-Language: en-US
+Content-ID: <904729BB0C5B4F459E055D5EF785A506@namprd07.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/09/2016 09:10 AM, Tapas Sarangi wrote:
-
-> Ps : I could not send any attachment, is it possible to send attachment to
-> this mailing list ?
-
-Pretty sure that's frowned upon.
+SGkgU3RlcGhhbiwNCg0KSWYgSSB1bmRlcnN0YW5kIHRoaXMgY29ycmVjdGx5LCB0aGlzIChDT05G
+SUdfTU9EVUxFX1NJR19IQVNIPaGwc2hhMjU2IikNCnRlbGxzIGFib3V0IHRoZSBrZXkgc2l6ZSB1
+c2VkLg0KSSBhbSB1c2luZyChsHNoYTI1NqGxLiBJbml0aWFsbHksIEkgd2FzIHVzaW5nIKGwc2hh
+NTEyobEgd2hpY2ggSSB0aG91Z2h0IGNvdWxkDQpiZSBjYXVzaW5nIHByb2JsZW0sIGJ1dCBJIGFt
+IGdldHRpbmcgc2FtZSBlcnJvciB3aGVuIGNoYW5nZSBpdCB0bw0KobBzaGEyNTahsS4NCg0KW3Jv
+b3RAbG9jYWxob3N0IH5dIyBncmVwIE1PRFVMRV9TSUcgL2Jvb3QvY29uZmlnLTQuNy4wLTEudG9z
+Ml81DQoNCkNPTkZJR19NT0RVTEVfU0lHPXkNCiMgQ09ORklHX01PRFVMRV9TSUdfRk9SQ0UgaXMg
+bm90IHNldA0KQ09ORklHX01PRFVMRV9TSUdfQUxMPXkNCiMgQ09ORklHX01PRFVMRV9TSUdfU0hB
+MSBpcyBub3Qgc2V0DQojIENPTkZJR19NT0RVTEVfU0lHX1NIQTIyNCBpcyBub3Qgc2V0DQpDT05G
+SUdfTU9EVUxFX1NJR19TSEEyNTY9eQ0KIyBDT05GSUdfTU9EVUxFX1NJR19TSEEzODQgaXMgbm90
+IHNldA0KIyBDT05GSUdfTU9EVUxFX1NJR19TSEE1MTIgaXMgbm90IHNldA0KQ09ORklHX01PRFVM
+RV9TSUdfSEFTSD0ic2hhMjU2Ig0KQ09ORklHX01PRFVMRV9TSUdfS0VZPSJjZXJ0cy9zaWduaW5n
+X2tleS5wZW0iDQoNClRoYW5rcw0KDQoNCi1UYXBhcw0KDQoNCk9uIDgvOS8xNiwgOToyOSBBTSwg
+IlN0ZXBoYW4gTXVlbGxlciIgPHNtdWVsbGVyQGNocm9ub3guZGU+IHdyb3RlOg0KDQo+QW0gRGll
+bnN0YWcsIDkuIEF1Z3VzdCAyMDE2LCAxNDoxMDozMyBDRVNUIHNjaHJpZWIgVGFwYXMgU2FyYW5n
+aToNCj4NCj5IaSBUYXBhcywNCj4NCj4+IEhlbGxvLA0KPj4NCj4+IEkgYW0gdXNpbmcgdmFuaWxs
+YSBrZXJuZWwtNC43IHNvdXJjZS4gSXQgY3Jhc2hlcyB3aXRoIHRoZSBmb2xsb3dpbmcgd2hlbg0K
+Pj4gYm9vdGVkIHdpdGggqfhmaXBzPTEgYm9vdD0vZGV2L3NkYTGp9yBvcHRpb24gYXQgdGhlIGtl
+cm5lbCBjb21tYW5kIGxpbmUNCj4+IGFyZ3VtZW50Lg0KPg0KPlRoZSBrZXJuZWwgb25seSBhbGxv
+d3MgMmsgYW5kIDNrIFJTQSBrZXlzIGluIEZJUFMgbW9kZS4gUGxlYXNlIGNoZWNrIHlvdXINCj5S
+U0ENCj5rZXkgdXNlZCBmb3Igc2lnbmF0dXJlcy4NCj4NCj4gICAgICAgICAgICAgICAgLyogSW4g
+RklQUyBtb2RlIG9ubHkgYWxsb3cga2V5IHNpemUgMksgJiAzSyAqLw0KPiAgICAgICAgICAgICAg
+ICBpZiAobl9zeiAhPSAyNTYgJiYgbl9zeiAhPSAzODQpIHsNCj4gICAgICAgICAgICAgICAgICAg
+ICAgICBwcl9lcnIoIlJTQToga2V5IHNpemUgbm90IGFsbG93ZWQgaW4gRklQUw0KPm1vZGVcbiIp
+Ow0KPiAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiAgICAgICAgICAg
+ICAgICB9DQo+DQo+Q2lhbw0KPlN0ZXBoYW4NCg0KDQpfX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXw0KDQpUaGlzIHRyYW5zbWlzc2lvbiBtYXkgY29udGFpbiBpbmZvcm1hdGlvbiB0aGF0
+IGlzIHByaXZpbGVnZWQsIGNvbmZpZGVudGlhbCwgYW5kL29yIGV4ZW1wdCBmcm9tIGRpc2Nsb3N1
+cmUgdW5kZXIgYXBwbGljYWJsZSBsYXcuIElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNp
+cGllbnQsIHlvdSBhcmUgaGVyZWJ5IG5vdGlmaWVkIHRoYXQgYW55IGRpc2Nsb3N1cmUsIGNvcHlp
+bmcsIGRpc3RyaWJ1dGlvbiwgb3IgdXNlIG9mIHRoZSBpbmZvcm1hdGlvbiBjb250YWluZWQgaGVy
+ZWluIChpbmNsdWRpbmcgYW55IHJlbGlhbmNlIHRoZXJlb24pIGlzIHN0cmljdGx5IHByb2hpYml0
+ZWQuIElmIHlvdSByZWNlaXZlZCB0aGlzIHRyYW5zbWlzc2lvbiBpbiBlcnJvciwgcGxlYXNlIGlt
+bWVkaWF0ZWx5IGNvbnRhY3QgdGhlIHNlbmRlciBhbmQgZGVzdHJveSB0aGUgbWF0ZXJpYWwgaW4g
+aXRzIGVudGlyZXR5LCB3aGV0aGVyIGluIGVsZWN0cm9uaWMgb3IgaGFyZCBjb3B5IGZvcm1hdC4N
+Cg==
