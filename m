@@ -1,53 +1,51 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 2/2] ath9k: disable RNG by default
-Date: Tue, 09 Aug 2016 11:02:58 +0200
-Message-ID: <2569442.q63FVBJjUH@tauon.atsec.com>
-References: <1470726147-30095-1-git-send-email-miaoqing@codeaurora.org> <4731753.YZZKimtrHM@tauon.atsec.com> <20160809085858.GA6172@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "Pan, Miaoqing" <miaoqing@qti.qualcomm.com>,
-	Matt Mackall <mpm@selenic.com>,
-	"miaoqing@codeaurora.org" <miaoqing@codeaurora.org>,
-	"Valo, Kalle" <kvalo@qca.qualcomm.com>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	ath9k-devel <ath9k-devel@qca.qualcomm.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"jason@lakedaemon.net" <jason@lakedaemon.net>,
-	"Sepehrdad, Pouyan" <pouyans@qti.qualcomm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Romain Perier <romain.perier@free-electrons.com>
+Subject: [PATCH 1/7] crypto: marvell: be explicit about destination in mv_cesa_dma_add_op()
+Date: Tue,  9 Aug 2016 11:03:14 +0200
+Message-ID: <1470733400-23621-2-git-send-email-romain.perier@free-electrons.com>
+References: <1470733400-23621-1-git-send-email-romain.perier@free-electrons.com>
+Cc: Gregory Clement <gregory.clement@free-electrons.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Russell King <linux@arm.linux.org.uk>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Arnaud Ebalard <arno@natisbad.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34288 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751914AbcHIJDC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 05:03:02 -0400
-In-Reply-To: <20160809085858.GA6172@gondor.apana.org.au>
+Received: from down.free-electrons.com ([37.187.137.238]:39659 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751220AbcHIJDi (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Aug 2016 05:03:38 -0400
+In-Reply-To: <1470733400-23621-1-git-send-email-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 9. August 2016, 16:58:58 CEST schrieb Herbert Xu:
+From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 
-Hi Herbert,
+The mv_cesa_dma_add_op() function builds a mv_cesa_tdma_desc structure
+to copy the operation description to the SRAM, but doesn't explicitly
+initialize the destination of the copy. It works fine because the
+operatin description must be copied at the beginning of the SRAM, and
+the mv_cesa_tdma_desc structure is initialized to zero when
+allocated. However, it is somewhat confusing to not have a destination
+defined.
 
-> On Tue, Aug 09, 2016 at 10:07:29AM +0200, Stephan Mueller wrote:
-> > Herbert, Matt, should such noise sources be added to the HW random
-> > framework? The thing is that the in-kernel HW random to input_pool link
-> > per default uses a more conservative entropy estimate than the user space
-> > rngd. I would think that the in-kernel link would appropriate for that
-> > rng. But the user space rngd tool with its default behavior is not really
-> > suited here.
-> 
-> Yes hwrng would be the best fit, with a quality of zero to be safe.
-> 
-> Contrary to the quoted thread, there is no need to whiten the output
-> /dev/hw_random.  It was always meant to go through some intermediate
-> processing such as rngd before it is used.
+Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+---
+ drivers/crypto/marvell/tdma.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-But shouldn't the default of the rngd then be adjusted a bit?
-> 
-> Cheers,
-
-
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/marvell/tdma.c b/drivers/crypto/marvell/tdma.c
+index 86a065b..9fd7a5f 100644
+--- a/drivers/crypto/marvell/tdma.c
++++ b/drivers/crypto/marvell/tdma.c
+@@ -261,6 +261,7 @@ struct mv_cesa_op_ctx *mv_cesa_dma_add_op(struct mv_cesa_tdma_chain *chain,
+ 	tdma->op = op;
+ 	tdma->byte_cnt = cpu_to_le32(size | BIT(31));
+ 	tdma->src = cpu_to_le32(dma_handle);
++	tdma->dst = CESA_SA_CFG_SRAM_OFFSET;
+ 	tdma->flags = CESA_TDMA_DST_IN_SRAM | CESA_TDMA_OP;
+ 
+ 	return op;
+-- 
+2.8.1
