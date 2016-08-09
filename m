@@ -1,65 +1,83 @@
 From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [PATCH v3] DH support: add KDF handling support
-Date: Tue, 9 Aug 2016 15:38:43 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1608091536470.24354@mjmartin-mac01.local>
-References: <2239809.KsND40bFeW@positron.chronox.de> <2313703.12yUpncF2W@positron.chronox.de> <3715151.LOyK4NLlGi@positron.chronox.de>
+Subject: Re: [PATCH v3] KEYS: add SP800-56A KDF support for DH
+Date: Tue, 9 Aug 2016 15:48:00 -0700 (PDT)
+Message-ID: <alpine.OSX.2.20.1608091546100.24354@mjmartin-mac01.local>
+References: <2239809.KsND40bFeW@positron.chronox.de> <2623005.lF82gu89UT@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII; format=flowed
 Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
 	linux-crypto@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:47479 "EHLO mga02.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:33128 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932485AbcHIWj0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 18:39:26 -0400
-In-Reply-To: <3715151.LOyK4NLlGi@positron.chronox.de>
+	id S932461AbcHIWsC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Aug 2016 18:48:02 -0400
+In-Reply-To: <2623005.lF82gu89UT@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
 On Sat, 6 Aug 2016, Stephan Mueller wrote:
 
-> diff --git a/man/keyctl_dh_compute.3 b/man/keyctl_dh_compute.3
-> index b06d39e..92d358f 100644
-> --- a/man/keyctl_dh_compute.3
-> +++ b/man/keyctl_dh_compute.3
-> @@ -11,6 +11,8 @@
-> .\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-> .SH NAME
-> keyctl_dh_compute \- Compute a Diffie-Hellman shared secret or public key
-> +.br
-> +keyctl_dh_compute_kdf \- Derive key from a Diffie-Hellman shared secret
-> .\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-> .SH SYNOPSIS
-> .nf
-> @@ -21,6 +23,10 @@ keyctl_dh_compute \- Compute a Diffie-Hellman shared secret or public key
-> .sp
-> .BI "long keyctl_dh_compute_alloc(key_serial_t " private,
-> .BI "key_serial_t " prime ", key_serial_t " base ", void **" _buffer ");"
-> +.sp
-> +.BI "long keyctl_dh_compute_kdf(key_serial_t " private ", key_serial_t " prime ,
-> +.BI "key_serial_t " base ", char *" kdfname ", char *" otherinfo ",
-> +.BI "size_t " otherinfolen ", char *" buffer ", size_t " buflen ");"
-> .\"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-> .SH DESCRIPTION
-> .BR keyctl_dh_compute ()
-> @@ -64,6 +70,49 @@ places the data in it.  If successful, a pointer to the buffer is placed in
-> .IR *_buffer .
-> The caller must free the buffer.
-> .P
-> +.BR keyctl_dh_compute_kdf ()
-> +derives a key from a Diffie-Hellman shared secret according to the protocol
-> +specified in SP800-56A. The Diffie-Hellman computation is based on the same
-> +primitives as discussed
-> +for
-> +.BR keyctl_dy_compute ().
+> diff --git a/security/keys/internal.h b/security/keys/internal.h
+> index a705a7d..7659b52 100644
+> --- a/security/keys/internal.h
+> +++ b/security/keys/internal.h
+> @@ -259,15 +259,32 @@ static inline long keyctl_get_persistent(uid_t uid, key_serial_t destring)
+> #endif
+>
+> #ifdef CONFIG_KEY_DH_OPERATIONS
+> +#include <crypto/rng.h>
+> +#include <linux/compat.h>
 
-Minor typo: dy->dh
+These may belong at the top of the file, even if they are only used when 
+CONFIG_KEY_DH_OPERATIONS is defined.
 
+> extern long keyctl_dh_compute(struct keyctl_dh_params __user *, char __user *,
+> -			      size_t, void __user *);
+> +			      size_t, struct keyctl_kdf_params __user *);
+> +extern long __keyctl_dh_compute(struct keyctl_dh_params __user *, char __user *,
+> +				size_t, struct keyctl_kdf_params *);
+> +extern long compat_keyctl_dh_compute(struct keyctl_dh_params __user *params,
+> +				char __user *buffer, size_t buflen,
+> +				struct compat_keyctl_kdf_params __user *kdf);
+> +#define KEYCTL_KDF_MAX_OUTPUT_LEN	1024	/* max length of KDF output */
+> +#define KEYCTL_KDF_MAX_OI_LEN		64	/* max length of otherinfo */
+> #else
+> static inline long keyctl_dh_compute(struct keyctl_dh_params __user *params,
+> 				     char __user *buffer, size_t buflen,
+> -				     void __user *reserved)
+> +				     struct keyctl_kdf_params __user *kdf)
+> {
+> 	return -EOPNOTSUPP;
+> }
+> +
+> +static inline long compat_keyctl_dh_compute(
+> +				struct keyctl_dh_params __user *params,
+> +				char __user *buffer, size_t buflen,
+> +				struct keyctl_kdf_params __user *kdf)
+> +{
+> +	return -EOPNOTSUPP
+> +}
+> #endif
+>
+> /*
+> diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
+> index d580ad0..b106898 100644
+> --- a/security/keys/keyctl.c
+> +++ b/security/keys/keyctl.c
+> @@ -1689,7 +1689,7 @@ SYSCALL_DEFINE5(keyctl, int, option, unsigned long, arg2, unsigned long, arg3,
+> 	case KEYCTL_DH_COMPUTE:
+> 		return keyctl_dh_compute((struct keyctl_dh_params __user *) arg2,
+> 					 (char __user *) arg3, (size_t) arg4,
+> -					 (void __user *) arg5);
+> +					 (struct keyctl_kdf_params __user *) arg5);
+>
+> 	default:
+> 		return -EOPNOTSUPP;
 
 Regards,
-
 --
 Mat Martineau
 Intel OTC
