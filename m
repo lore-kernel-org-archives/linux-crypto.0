@@ -1,50 +1,57 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 2/2] ath9k: disable RNG by default
-Date: Tue, 09 Aug 2016 12:06:32 +0200
-Message-ID: <11316081.S4pPZmZMrt@tauon.atsec.com>
-References: <1470726147-30095-1-git-send-email-miaoqing@codeaurora.org> <12791731.pG3fmEhvyp@tauon.atsec.com> <20160809095657.GB6618@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCHv3 03/11] crypto: omap-sham: implement context
+ export/import APIs
+Date: Tue, 9 Aug 2016 18:06:33 +0800
+Message-ID: <20160809100633.GA6751@gondor.apana.org.au>
+References: <1470306526-27219-1-git-send-email-t-kristo@ti.com>
+ <1470306526-27219-4-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "Pan, Miaoqing" <miaoqing@qti.qualcomm.com>,
-	Matt Mackall <mpm@selenic.com>,
-	"miaoqing@codeaurora.org" <miaoqing@codeaurora.org>,
-	"Valo, Kalle" <kvalo@qca.qualcomm.com>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	ath9k-devel <ath9k-devel@qca.qualcomm.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"jason@lakedaemon.net" <jason@lakedaemon.net>,
-	"Sepehrdad, Pouyan" <pouyans@qti.qualcomm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: lokeshvutla@ti.com, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, tony@atomide.com,
+	linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Tero Kristo <t-kristo@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34334 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932179AbcHIKGg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 06:06:36 -0400
-In-Reply-To: <20160809095657.GB6618@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:58626 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932150AbcHIKGw (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Aug 2016 06:06:52 -0400
+Content-Disposition: inline
+In-Reply-To: <1470306526-27219-4-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 9. August 2016, 17:56:57 CEST schrieb Herbert Xu:
-
-Hi Herbert,
-
-> On Tue, Aug 09, 2016 at 11:56:08AM +0200, Stephan Mueller wrote:
-> > Am Dienstag, 9. August 2016, 17:46:56 CEST schrieb Herbert Xu:
-> > 
-> > Hi Herbert,
-> > 
-> > > You're supposed to tweak the quality of the input.  In any case,
-> > 
-> > How is that tweak supposed to happen? The rngd does not allow changing the
-> > amount of read data relative to the assumed entropy.
+On Thu, Aug 04, 2016 at 01:28:38PM +0300, Tero Kristo wrote:
+> Context export/import are now required for ahash algorithms due to
+> required support in algif_hash. Implement these for OMAP SHA driver,
+> saving and restoring the internal state of the driver.
 > 
-> Hmm, I guess it depends on your distro.  Some do.
+> Signed-off-by: Tero Kristo <t-kristo@ti.com>
+> ---
+>  drivers/crypto/omap-sham.c | 31 +++++++++++++++++++++++++++++--
+>  1 file changed, 29 insertions(+), 2 deletions(-)
 > 
-> Cheers,
+> diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+> index 6e53944..aa71e61 100644
+> --- a/drivers/crypto/omap-sham.c
+> +++ b/drivers/crypto/omap-sham.c
+> @@ -1379,6 +1379,27 @@ exit_unlock:
+>  	return ret;
+>  }
+>  
+> +static int omap_sham_export(struct ahash_request *req, void *out)
+> +{
+> +	struct omap_sham_reqctx *rctx = ahash_request_ctx(req);
+> +
+> +	while (omap_sham_flush(req) == -EINPROGRESS)
+> +		msleep(10);
 
-RHEL 7 and Fedora do not adjust it. So, shall we consider those rng-tools then 
-broken (at least in those large distros)?
+Do we really need this? You must not call export until the previous
+operation has completed.
 
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
