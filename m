@@ -1,44 +1,46 @@
 From: miaoqing@codeaurora.org
-Subject: [PATCH 1/2] ath9k: change entropy formula for easier understanding
-Date: Tue,  9 Aug 2016 15:02:26 +0800
-Message-ID: <1470726147-30095-1-git-send-email-miaoqing@codeaurora.org>
+Subject: [PATCH 2/2] ath9k: disable RNG by default
+Date: Tue,  9 Aug 2016 15:02:27 +0800
+Message-ID: <1470726147-30095-2-git-send-email-miaoqing@codeaurora.org>
+References: <1470726147-30095-1-git-send-email-miaoqing@codeaurora.org>
 Cc: linux-wireless@vger.kernel.org, ath9k-devel@qca.qualcomm.com,
 	linux-crypto@vger.kernel.org, smueller@chronox.de,
 	jason@lakedaemon.net, pouyans@qti.qualcomm.com,
 	Miaoqing Pan <miaoqing@codeaurora.org>
 To: kvalo@qca.qualcomm.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.codeaurora.org ([198.145.29.96]:33158 "EHLO
+Received: from smtp.codeaurora.org ([198.145.29.96]:33180 "EHLO
 	smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751220AbcHIHCj (ORCPT
+	with ESMTP id S1751654AbcHIHCq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 03:02:39 -0400
+	Tue, 9 Aug 2016 03:02:46 -0400
+In-Reply-To: <1470726147-30095-1-git-send-email-miaoqing@codeaurora.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Miaoqing Pan <miaoqing@codeaurora.org>
 
-The quality of ADC entropy is 10 bits of min-entropy for
-a 32-bit value, change '(((x) * 8 * 320) >> 10)' to
-'(((x) * 8 * 10) >> 5)' for easier understanding.
+ath9k RNG will dominates all the noise sources from the real HW
+RNG, disable it by default. But we strongly recommand to enable
+it if the system without HW RNG, especially on embedded systems.
 
 Signed-off-by: Miaoqing Pan <miaoqing@codeaurora.org>
 ---
- drivers/net/wireless/ath/ath9k/rng.c | 2 +-
+ drivers/net/wireless/ath/ath9k/Kconfig | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/wireless/ath/ath9k/rng.c b/drivers/net/wireless/ath/ath9k/rng.c
-index d38e50f..568b1c6 100644
---- a/drivers/net/wireless/ath/ath9k/rng.c
-+++ b/drivers/net/wireless/ath/ath9k/rng.c
-@@ -22,7 +22,7 @@
- #include "ar9003_phy.h"
- 
- #define ATH9K_RNG_BUF_SIZE	320
--#define ATH9K_RNG_ENTROPY(x)	(((x) * 8 * 320) >> 10) /* quality: 320/1024 */
-+#define ATH9K_RNG_ENTROPY(x)	(((x) * 8 * 10) >> 5) /* quality: 10/32 */
- 
- static int ath9k_rng_data_read(struct ath_softc *sc, u32 *buf, u32 buf_size)
- {
+diff --git a/drivers/net/wireless/ath/ath9k/Kconfig b/drivers/net/wireless/ath/ath9k/Kconfig
+index f68cb00..8f231c6 100644
+--- a/drivers/net/wireless/ath/ath9k/Kconfig
++++ b/drivers/net/wireless/ath/ath9k/Kconfig
+@@ -180,7 +180,7 @@ config ATH9K_HTC_DEBUGFS
+ config ATH9K_HWRNG
+ 	bool "Random number generator support"
+ 	depends on ATH9K && (HW_RANDOM = y || HW_RANDOM = ATH9K)
+-	default y
++	default n
+ 	---help---
+ 	  This option incorporates the ADC register output as a source of
+ 	  randomness into Linux entropy pool (/dev/urandom and /dev/random)
 -- 
 1.9.1
