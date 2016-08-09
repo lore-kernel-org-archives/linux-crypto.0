@@ -1,81 +1,135 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: AF_ALG broken?
-Date: Tue, 9 Aug 2016 08:27:17 +0100
-Message-ID: <20160809072717.GG1041@n2100.armlinux.org.uk>
-References: <20160808181117.GD1041@n2100.armlinux.org.uk>
- <20160809031820.GA4142@gondor.apana.org.au>
- <20160809070859.GF1041@n2100.armlinux.org.uk>
- <20160809071402.GA5466@gondor.apana.org.au>
+From: Russell King <rmk+kernel@armlinux.org.uk>
+Subject: [PATCH] crypto: caam - avoid kernel warnings on probe failure
+Date: Tue, 09 Aug 2016 08:30:10 +0100
+Message-ID: <E1bX1UI-0006vt-K7@rmk-PC.armlinux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: noloader@gmail.com, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Fabio Estevam <fabio.estevam@freescale.com>,
+	horia.geanta@nxp.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:34019 "EHLO
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:34043 "EHLO
 	pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750810AbcHIH1Y (ORCPT
+	with ESMTP id S1751194AbcHIHbF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Aug 2016 03:27:24 -0400
+	Tue, 9 Aug 2016 03:31:05 -0400
 Content-Disposition: inline
-In-Reply-To: <20160809071402.GA5466@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 09, 2016 at 03:14:02PM +0800, Herbert Xu wrote:
-> On Tue, Aug 09, 2016 at 08:08:59AM +0100, Russell King - ARM Linux wrote:
-> > 
-> > I thought I gave the commands and link to your example code.  The
-> > openssl case is md5, though sha* also gives the same result.  Your
-> > example code was sha1 iirc.  I guess none of these would be using
-> > HMAC - the openssl cases used to give results compatible with the
-> > md5sum/ sha1sum etc userspace commands.
-> > 
-> > /proc/crypto:
-> > 
-> > name         : md5
-> > driver       : md5-caam
-> 
-> Right, caam is providing a setkey function for md5, which leads the
-> API to think that a key is required.  We should fix it so that setkey
-> is only set for the HMAC-variant.
+While debugging setkey issues, the following warnings were found while
+trying to reinsert the caam module.  Fix this by avoiding the duplicated
+cleanup in the probe path after caam_remove(), which has already cleaned
+up the resources.
 
-Thanks, that works nicely again, and passes my tests.
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 2346 at /home/rmk/git/linux-rmk/mm/vmalloc.c:1490 __vunmap+0xcc/0xf4
+Trying to vfree() nonexistent vm area (f2400000)
+Modules linked in: caam(+) cbc rfcomm bnep bluetooth nfsd em28xx_rc si2157 si2168 em28xx_dvb uvcvideo snd_soc_imx_sgtl5000 em28xx snd_soc_imx_spdif tveeprom snd_soc_fsl_asoc_card snd_soc_imx_audmux snd_soc_sgtl5000 imx_sdma imx2_wdt coda v4l2_mem2mem videobuf2_dma_contig snd_soc_fsl_ssi rc_cec snd_soc_fsl_spdif imx_pcm_dma videobuf2_vmalloc videobuf2_memops imx_thermal dw_hdmi_ahb_audio dw_hdmi_cec etnaviv fuse rc_pinnacle_pctv_hd [last unloaded: caam]
+CPU: 0 PID: 2346 Comm: modprobe Tainted: G        W       4.8.0-rc1+ #2014
+Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
+Backtrace:
+[<c0013bb0>] (dump_backtrace) from [<c0013d4c>] (show_stack+0x18/0x1c)
+[<c0013d34>] (show_stack) from [<c0357c00>] (dump_stack+0xa4/0xdc)
+[<c0357b5c>] (dump_stack) from [<c002e650>] (__warn+0xdc/0x108)
+[<c002e574>] (__warn) from [<c002e734>] (warn_slowpath_fmt+0x40/0x48)
+[<c002e6f8>] (warn_slowpath_fmt) from [<c0151708>] (__vunmap+0xcc/0xf4)
+[<c015163c>] (__vunmap) from [<c015177c>] (vunmap+0x4c/0x54)
+[<c0151730>] (vunmap) from [<c001f48c>] (__iounmap+0x2c/0x30)
+[<c001f460>] (__iounmap) from [<c001f118>] (iounmap+0x1c/0x20)
+[<c001f0fc>] (iounmap) from [<bf247ae4>] (caam_probe+0x3dc/0x1498 [caam])
+[<bf247708>] (caam_probe [caam]) from [<c042da8c>] (platform_drv_probe+0x58/0xb8)
+[<c042da34>] (platform_drv_probe) from [<c042bb4c>] (driver_probe_device+0x1fc/0x2b8)
+[<c042b950>] (driver_probe_device) from [<c042bcc4>] (__driver_attach+0xbc/0xc0) r10:00000000 r8:bf24b000 r7:00000000 r6:ef215844 r5:bf2490c4 r4:ef215810
+[<c042bc08>] (__driver_attach) from [<c0429f14>] (bus_for_each_dev+0x5c/0x90)
+[<c0429eb8>] (bus_for_each_dev) from [<c042b358>] (driver_attach+0x24/0x28)
+[<c042b334>] (driver_attach) from [<c042b058>] (bus_add_driver+0xf4/0x200)
+[<c042af64>] (bus_add_driver) from [<c042cadc>] (driver_register+0x80/0xfc)
+[<c042ca5c>] (driver_register) from [<c042d960>] (__platform_driver_register+0x48/0x4c)
+[<c042d918>] (__platform_driver_register) from [<bf24b018>] (caam_driver_init+0x18/0x24 [caam])
+[<bf24b000>] (caam_driver_init [caam]) from [<c00098ac>] (do_one_initcall+0x44/0x178)
+[<c0009868>] (do_one_initcall) from [<c010e034>] (do_init_module+0x68/0x1d8)
+[<c010dfcc>] (do_init_module) from [<c00c8fbc>] (load_module+0x1974/0x20b0)
+[<c00c7648>] (load_module) from [<c00c98d0>] (SyS_finit_module+0x94/0xa0)
+[<c00c983c>] (SyS_finit_module) from [<c000fda0>] (ret_fast_syscall+0x0/0x1c)
+---[ end trace 34e3370d88bb1786 ]---
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 2346 at /home/rmk/git/linux-rmk/drivers/clk/clk.c:594 clk_core_disable+0xe4/0x26c
+Modules linked in: caam(+) cbc rfcomm bnep bluetooth nfsd em28xx_rc si2157 si2168 em28xx_dvb uvcvideo snd_soc_imx_sgtl5000 em28xx snd_soc_imx_spdif tveeprom snd_soc_fsl_asoc_card snd_soc_imx_audmux snd_soc_sgtl5000 imx_sdma imx2_wdt coda v4l2_mem2mem videobuf2_dma_contig snd_soc_fsl_ssi rc_cec snd_soc_fsl_spdif imx_pcm_dma videobuf2_vmalloc videobuf2_memops imx_thermal dw_hdmi_ahb_audio dw_hdmi_cec etnaviv fuse rc_pinnacle_pctv_hd [last unloaded: caam]
+CPU: 0 PID: 2346 Comm: modprobe Tainted: G        W       4.8.0-rc1+ #2014
+Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
+Backtrace:
+[<c0013bb0>] (dump_backtrace) from [<c0013d4c>] (show_stack+0x18/0x1c)
+[<c0013d34>] (show_stack) from [<c0357c00>] (dump_stack+0xa4/0xdc)
+[<c0357b5c>] (dump_stack) from [<c002e650>] (__warn+0xdc/0x108)
+[<c002e574>] (__warn) from [<c002e6a4>] (warn_slowpath_null+0x28/0x30)
+[<c002e67c>] (warn_slowpath_null) from [<c05b113c>] (clk_core_disable+0xe4/0x26c)
+[<c05b1058>] (clk_core_disable) from [<c05b2e3c>] (clk_core_disable_lock+0x20/0x2c)
+[<c05b2e1c>] (clk_core_disable_lock) from [<c05b2e6c>] (clk_disable+0x24/0x28)
+[<c05b2e48>] (clk_disable) from [<bf247b04>] (caam_probe+0x3fc/0x1498 [caam])
+[<bf247708>] (caam_probe [caam]) from [<c042da8c>] (platform_drv_probe+0x58/0xb8)
+[<c042da34>] (platform_drv_probe) from [<c042bb4c>] (driver_probe_device+0x1fc/0x2b8)
+[<c042b950>] (driver_probe_device) from [<c042bcc4>] (__driver_attach+0xbc/0xc0) r10:00000000 r8:bf24b000 r7:00000000 r6:ef215844 r5:bf2490c4 r4:ef215810
+[<c042bc08>] (__driver_attach) from [<c0429f14>] (bus_for_each_dev+0x5c/0x90)
+[<c0429eb8>] (bus_for_each_dev) from [<c042b358>] (driver_attach+0x24/0x28)
+[<c042b334>] (driver_attach) from [<c042b058>] (bus_add_driver+0xf4/0x200)
+[<c042af64>] (bus_add_driver) from [<c042cadc>] (driver_register+0x80/0xfc)
+[<c042ca5c>] (driver_register) from [<c042d960>] (__platform_driver_register+0x48/0x4c)
+[<c042d918>] (__platform_driver_register) from [<bf24b018>] (caam_driver_init+0x18/0x24 [caam])
+[<bf24b000>] (caam_driver_init [caam]) from [<c00098ac>] (do_one_initcall+0x44/0x178)
+[<c0009868>] (do_one_initcall) from [<c010e034>] (do_init_module+0x68/0x1d8)
+[<c010dfcc>] (do_init_module) from [<c00c8fbc>] (load_module+0x1974/0x20b0)
+[<c00c7648>] (load_module) from [<c00c98d0>] (SyS_finit_module+0x94/0xa0)
+[<c00c983c>] (SyS_finit_module) from [<c000fda0>] (ret_fast_syscall+0x0/0x1c)
+---[ end trace 34e3370d88bb1787 ]---
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 2346 at /home/rmk/git/linux-rmk/drivers/clk/clk.c:476 clk_core_unprepare+0x204/0x388
+Modules linked in: caam(+) cbc rfcomm bnep bluetooth nfsd em28xx_rc si2157 si2168 em28xx_dvb uvcvideo snd_soc_imx_sgtl5000 em28xx snd_soc_imx_spdif tveeprom snd_soc_fsl_asoc_card snd_soc_imx_audmux snd_soc_sgtl5000 imx_sdma imx2_wdt coda v4l2_mem2mem videobuf2_dma_contig snd_soc_fsl_ssi rc_cec snd_soc_fsl_spdif imx_pcm_dma videobuf2_vmalloc videobuf2_memops imx_thermal dw_hdmi_ahb_audio dw_hdmi_cec etnaviv fuse rc_pinnacle_pctv_hd [last unloaded: caam]
+CPU: 0 PID: 2346 Comm: modprobe Tainted: G        W       4.8.0-rc1+ #2014
+Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
+Backtrace:
+[<c0013bb0>] (dump_backtrace) from [<c0013d4c>] (show_stack+0x18/0x1c)
+[<c0013d34>] (show_stack) from [<c0357c00>] (dump_stack+0xa4/0xdc)
+[<c0357b5c>] (dump_stack) from [<c002e650>] (__warn+0xdc/0x108)
+[<c002e574>] (__warn) from [<c002e6a4>] (warn_slowpath_null+0x28/0x30)
+[<c002e67c>] (warn_slowpath_null) from [<c05b0834>] (clk_core_unprepare+0x204/0x388)
+[<c05b0630>] (clk_core_unprepare) from [<c05b4c0c>] (clk_unprepare+0x2c/0x34)
+[<c05b4be0>] (clk_unprepare) from [<bf247b0c>] (caam_probe+0x404/0x1498 [caam])
+[<bf247708>] (caam_probe [caam]) from [<c042da8c>] (platform_drv_probe+0x58/0xb8)
+[<c042da34>] (platform_drv_probe) from [<c042bb4c>] (driver_probe_device+0x1fc/0x2b8)
+[<c042b950>] (driver_probe_device) from [<c042bcc4>] (__driver_attach+0xbc/0xc0) r10:00000000 r8:bf24b000 r7:00000000 r6:ef215844 r5:bf2490c4 r4:ef215810
+[<c042bc08>] (__driver_attach) from [<c0429f14>] (bus_for_each_dev+0x5c/0x90)
+[<c0429eb8>] (bus_for_each_dev) from [<c042b358>] (driver_attach+0x24/0x28)
+[<c042b334>] (driver_attach) from [<c042b058>] (bus_add_driver+0xf4/0x200)
+[<c042af64>] (bus_add_driver) from [<c042cadc>] (driver_register+0x80/0xfc)
+[<c042ca5c>] (driver_register) from [<c042d960>] (__platform_driver_register+0x48/0x4c)
+[<c042d918>] (__platform_driver_register) from [<bf24b018>] (caam_driver_init+0x18/0x24 [caam])
+[<bf24b000>] (caam_driver_init [caam]) from [<c00098ac>] (do_one_initcall+0x44/0x178)
+[<c0009868>] (do_one_initcall) from [<c010e034>] (do_init_module+0x68/0x1d8)
+[<c010dfcc>] (do_init_module) from [<c00c8fbc>] (load_module+0x1974/0x20b0)
+[<c00c7648>] (load_module) from [<c00c98d0>] (SyS_finit_module+0x94/0xa0)
+[<c00c983c>] (SyS_finit_module) from [<c000fda0>] (ret_fast_syscall+0x0/0x1c)
+---[ end trace 34e3370d88bb1788 ]---
 
-8<====
-From: Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH] crypto: caam - fix non-hmac hashes
-
-Since 6de62f15b581 ("crypto: algif_hash - Require setkey before
-accept(2)"), the AF_ALG interface requires userspace to provide a key
-to any algorithm that has a setkey method.  However, the non-HMAC
-algorithms are not keyed, so setting a key is unnecessary.
-
-Fix this by removing the setkey method from the non-keyed hash
-algorithms.
-
-Fixes: 6de62f15b581 ("crypto: algif_hash - Require setkey before accept(2)")
-Cc: <stable@vger.kernel.org>
 Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 ---
- drivers/crypto/caam/caamhash.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/caam/ctrl.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index ea284e3909ef..9d7fc9ec0b7e 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -1950,6 +1950,7 @@ caam_hash_alloc(struct caam_hash_template *template,
- 			 template->name);
- 		snprintf(alg->cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
- 			 template->driver_name);
-+		t_alg->ahash_alg.setkey = NULL;
- 	}
- 	alg->cra_module = THIS_MODULE;
- 	alg->cra_init = caam_hash_cra_init;
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 0ec112ee5204..f4c044f5bcb2 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -826,6 +826,8 @@ static int caam_probe(struct platform_device *pdev)
+ 
+ caam_remove:
+ 	caam_remove(pdev);
++	return ret;
++
+ iounmap_ctrl:
+ 	iounmap(ctrl);
+ disable_caam_emi_slow:
 -- 
 2.1.0
-
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
