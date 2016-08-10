@@ -1,50 +1,33 @@
-From: David Howells <dhowells@redhat.com>
-Subject: How best to {en,de}crypt between sk_buff and iov_iter?
-Date: Wed, 10 Aug 2016 10:12:12 +0100
-Message-ID: <9009.1470820332@warthog.procyon.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: dhowells@redhat.com, viro@zeniv.linux.org.uk
-To: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-Return-path: <netdev-owner@vger.kernel.org>
-Content-ID: <9008.1470820332.1@warthog.procyon.org.uk>
-Sender: netdev-owner@vger.kernel.org
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: [PATCH] crypto: fix a little typo
+Date: Wed, 10 Aug 2016 11:29:33 +0200
+Message-ID: <1470821373-8228-1-git-send-email-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	LABBE Corentin <clabbe.montjoie@gmail.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Is there a good way to encrypt data held in an iov_iter directly into an
-sk_buff and decrypt data held in an sk_buff back into an iov_iter?
+The sentence 'Based on' is misspelled, respell it.
 
-What I would like to avoid is:
+Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+---
+ crypto/xts.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- (a) Invoking skb_cow_data() to potentially take an unnecessary copy of the
-     data I shouldn't need to change, but I need to do this to decrypt in
-     place.
-
- (b) Having to copy the unencrypted data between the sk_buff and the iov_iter
-     when the crypto process ought to get me a free copy.
-
-One problem, though, is that I might not be able to do drain/fill a complete
-sk_buff in a single operation because the iov_iter might not give me sufficient
-bufferage/data to do that, so it may take multiple operations.  However, since
-I'm using an skcipher, I think it should be fine to call
-crypto_skcipher_encrypt() multiple times on the same skcipher.
-
-I can see a couple of alternatives:
-
- (1) Duplicate skb_copy_datagram_iter(), give it an initialised
-     skcipher_request and let it set the crypto parameters for each block it
-     transfers.  copy_to_iter() would then need to be replaced with something
-     that sets up an sglist each time from the iov.
-
-     Something similar would need doing for skb_copy_datagram_from_iter().
-
- (2) Create an sglist for the skb and one for the iov_iter and encrypt/decrypt
-     between them.  Unfortunately, if the iov_iter is a userspace reference
-     then this would mean pinning userspace pages.
-
- (3) Add an {en,de}crypt-to-iov_iter capability to the crypto layer.  I'm not
-     sure how well this would work for hardware support, though.  I think we'd
-     come back to pinning userspace pages.
-
-David
+diff --git a/crypto/xts.c b/crypto/xts.c
+index 26ba583..305343f 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -5,7 +5,7 @@
+  *
+  * Copyright (c) 2007 Rik Snel <rsnel@cube.dyndns.org>
+  *
+- * Based om ecb.c
++ * Based on ecb.c
+  * Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
+  *
+  * This program is free software; you can redistribute it and/or modify it
+-- 
+2.7.3
