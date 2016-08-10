@@ -1,77 +1,61 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH 5/6] crypto: sun4i-ss: Always use sun4i_tfm_ctx for storing pointer to dev ss
-Date: Wed, 10 Aug 2016 11:45:33 +0200
-Message-ID: <1470822334-20672-5-git-send-email-clabbe.montjoie@gmail.com>
-References: <1470822334-20672-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	LABBE Corentin <clabbe.montjoie@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-	maxime.ripard@free-electrons.com, wens@csie.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1470822334-20672-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Gary R Hook <ghook@amd.com>
+Subject: Re: [cryptodev:master 17/45] drivers/crypto/ccp/ccp-dev-v5.c:838:3:
+ error: label 'e_hwrng' used but not defined
+Date: Wed, 10 Aug 2016 11:48:25 -0500
+Message-ID: <2e640792-3d6a-f24e-8295-363a9553f00e@amd.com>
+References: <201608102355.WhiXil4y%fengguang.wu@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-sn1nam02on0053.outbound.protection.outlook.com ([104.47.36.53]:1440
+	"EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751335AbcHJSUh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 10 Aug 2016 14:20:37 -0400
+In-Reply-To: <201608102355.WhiXil4y%fengguang.wu@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The dev *ss is stored both in sun4i_tfm_ctx and sun4i_req_ctx.
-Since this pointer will never be changed during tfm life, it is better
-to remove it from sun4i_req_ctx.
+A patch for this will be submitted shortly.
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
----
- drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 13 +++++++++++--
- drivers/crypto/sunxi-ss/sun4i-ss.h      |  1 -
- 2 files changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-index 60031e0..2ee3b59 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-@@ -20,6 +20,15 @@
- 
- int sun4i_hash_crainit(struct crypto_tfm *tfm)
- {
-+	struct sun4i_tfm_ctx *op = crypto_tfm_ctx(tfm);
-+	struct ahash_alg *alg = __crypto_ahash_alg(tfm->__crt_alg);
-+	struct sun4i_ss_alg_template *algt;
-+
-+	memset(op, 0, sizeof(struct sun4i_tfm_ctx));
-+
-+	algt = container_of(alg, struct sun4i_ss_alg_template, alg.hash);
-+	op->ss = algt->ss;
-+
- 	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
- 				 sizeof(struct sun4i_req_ctx));
- 	return 0;
-@@ -36,7 +45,6 @@ int sun4i_hash_init(struct ahash_request *areq)
- 	memset(op, 0, sizeof(struct sun4i_req_ctx));
- 
- 	algt = container_of(alg, struct sun4i_ss_alg_template, alg.hash);
--	op->ss = algt->ss;
- 	op->mode = algt->mode;
- 
- 	return 0;
-@@ -168,8 +176,9 @@ int sun4i_hash(struct ahash_request *areq)
- 	 */
- 
- 	struct sun4i_req_ctx *op = ahash_request_ctx(areq);
--	struct sun4i_ss_ctx *ss = op->ss;
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-+	struct sun4i_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
-+	struct sun4i_ss_ctx *ss = tfmctx->ss;
- 	unsigned int in_i = 0; /* advancement in the current SG */
- 	unsigned int end;
- 	/*
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss.h b/drivers/crypto/sunxi-ss/sun4i-ss.h
-index ece5a1c..f04c0f8 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss.h
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss.h
-@@ -163,7 +163,6 @@ struct sun4i_req_ctx {
- 	u32 hash[5]; /* for storing SS_IVx register */
- 	char buf[64];
- 	unsigned int len;
--	struct sun4i_ss_ctx *ss;
- 	int flags;
- };
- 
--- 
-2.7.3
+On 08/10/2016 10:30 AM, kbuild test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> head:   47856204146ba6fd0f198dbb23c4ed7ad1c3fd99
+> commit: 99d90b2ebd8b327c0c496798db99009b30c70945 [17/45] crypto: ccp - Enable DMA service on a v5 CCP
+> config: i386-randconfig-h1-08102150 (attached as .config)
+> compiler: gcc-6 (Debian 6.1.1-9) 6.1.1 20160705
+> reproduce:
+>         git checkout 99d90b2ebd8b327c0c496798db99009b30c70945
+>         # save the attached .config to linux build tree
+>         make ARCH=i386
+>
+> Note: the cryptodev/master HEAD 47856204146ba6fd0f198dbb23c4ed7ad1c3fd99 builds fine.
+>       It only hurts bisectibility.
+>
+> All errors (new ones prefixed by >>):
+>
+>    drivers/crypto/ccp/ccp-dev-v5.c: In function 'ccp5_init':
+>>> drivers/crypto/ccp/ccp-dev-v5.c:838:3: error: label 'e_hwrng' used but not defined
+>       goto e_hwrng;
+>       ^~~~
+>
+> vim +/e_hwrng +838 drivers/crypto/ccp/ccp-dev-v5.c
+>
+>    832		if (ret)
+>    833			goto e_kthread;
+>    834	
+>    835		/* Register the DMA engine support */
+>    836		ret = ccp_dmaengine_register(ccp);
+>    837		if (ret)
+>  > 838			goto e_hwrng;
+>    839	
+>    840		return 0;
+>    841	
+>
+> ---
+> 0-DAY kernel test infrastructure                Open Source Technology Center
+> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+>
