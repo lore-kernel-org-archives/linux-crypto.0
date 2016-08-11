@@ -1,122 +1,62 @@
-From: Tapas Sarangi <TSarangi@trustwave.com>
-Subject: Re: [PATCH] crypto: XTS - remove test that will fail in FIPS mode
-Date: Thu, 11 Aug 2016 19:42:54 +0000
-Message-ID: <D3D23ED9.2F9C%tsarangi@trustwave.com>
-References: <D3CF7065.28F3%tsarangi@trustwave.com>
- <6079382.fWeFLzBGfE@positron.chronox.de>
- <D3CFBBE7.2B1D%tsarangi@trustwave.com>
- <3590892.3HIz2aNZPY@positron.chronox.de>
- <D3D10E85.2F74%tsarangi@trustwave.com>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH v6 0/5] /dev/random - a new approach
+Date: Thu, 11 Aug 2016 17:36:32 -0400
+Message-ID: <20160811213632.GL10626@thunk.org>
+References: <4723196.TTQvcXsLCG@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="euc-kr"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, sandyinchina@gmail.com,
+	Jason Cooper <cryptography@lakedaemon.net>,
+	John Denker <jsd@av8n.com>,
+	"H. Peter Anvin" <hpa@linux.intel.com>,
+	Joe Perches <joe@perches.com>, Pavel Machek <pavel@ucw.cz>,
+	George Spelvin <linux@horizon.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from seg-node-chi-01.trustwave.com ([204.13.200.29]:8483 "EHLO
-	seg-node-chi-01.trustwave.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750909AbcHKTm7 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Aug 2016 15:42:59 -0400
-In-Reply-To: <D3D10E85.2F74%tsarangi@trustwave.com>
-Content-Language: en-US
-Content-ID: <05E014555D3EE24BBF94FE44825D8094@namprd07.prod.outlook.com>
+Received: from imap.thunk.org ([74.207.234.97]:46354 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932203AbcHKVgt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 11 Aug 2016 17:36:49 -0400
+Content-Disposition: inline
+In-Reply-To: <4723196.TTQvcXsLCG@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-SGkgU3RlcGhhbiwNCg0KQW55IG90aGVyIGlkZWFzIGFib3V0IHRoaXMgcHJvYmxlbSA/IFNpbmNl
-IFhUUyBpcyBub3QgYW1vbmdzdCB0aGUNCnNlbGYtdGVzdHMgYXMgeW91IG9ic2VydmVkLCBpcyBp
-dCBzYWZlIHRvIGRpc2FibGUgLmZpcHNfYWxsb3dlZCBmb3INCnh0cyhhZXMpIGluIHRlc3RtZ3Iu
-YyA/DQoNClRoYW5rcw0KLVRhcGFzDQoNCg0KT24gOC8xMC8xNiwgNTowOCBQTSwgIlRhcGFzIFNh
-cmFuZ2kiIDxUU2FyYW5naUB0cnVzdHdhdmUuY29tPiB3cm90ZToNCg0KPkhpIFN0ZXBoYW4sDQo+
-DQo+VGhhbmtzLiBTb3JyeSBmb3IgYSBsYXRlIHJlcGx5IHRvIHRoaXMuDQo+DQo+SSBkaWQgdGVz
-dCB5b3VyIHBhdGNoIGZvciB0ZXN0bWdyLmggd2l0aCB0aGUgdmFuaWxsYSBrZXJuZWwgNC43IHNv
-dXJjZS4NCj5UaGlzIGRvZXNuqfZ0IHNvbHZlIHRoZSB4dHMoYWVzKSBzZWxmLXRlc3QgZmFpbHVy
-ZSBpbiBGSVBTIG1vZGUuIEkgZ2V0IHRoZQ0KPmV4YWN0IHNhbWUgZXJyb3IgYXMgYmVmb3JlLg0K
-Pg0KPlRoYW5rcw0KPi1UYXBhcw0KPg0KPg0KPg0KPg0KPg0KPg0KPg0KPk9uIDgvMTAvMTYsIDEy
-OjQ5IEFNLCAiU3RlcGhhbiBNdWVsbGVyIiA8c211ZWxsZXJAY2hyb25veC5kZT4gd3JvdGU6DQo+
-DQo+PkhpIFRhcGFzLCBIZXJiZXJ0LA0KPj4NCj4+VGFwYXM6IHRoaXMgcGF0Y2ggc2hvdWxkIGZp
-eCBpdC4gQ2FuIHlvdSBwbGVhc2UgdGVzdD8NCj4+DQo+PkhlcmJlcnQ6IFRoZSByZWFzb24gd2h5
-IEkgaGF2ZSB0byBjYXVnaHQgdGhpcyBpc3N1ZSBpbiBteSB0ZXN0cyBpcyB0aGUNCj4+Zm9sbG93
-aW5nOiBJIGNvbXBpbGUgeHRzLWFlcy1hZXNuaSBzdGF0aWNhbGx5IGFzIHlvdSBjYW4gc2VlIGJl
-bG93LiBUaGUNCj4+c2VsZiB0ZXN0IGlzIG1hcmtlZCBhcyBwYXNzZWQsIGFsdGhvdWdoIHRoZXJl
-IGlzIG5vIFhUUyB0ZXN0IHBlcmZvcm1lZC4NCj4+V2hlbiB5b3UgYm9vdCBpbiBGSVBTIG1vZGUs
-IHRoZSB0ZXN0bWdyIHByaW50cyBvdXQgYWxsIHRlc3RzLiBCdXQgWFRTIGlzDQo+Pm5vdCBhbW9u
-ZyB0aGVtLiBEbyB5b3UgaGF2ZSBhbiBpZGVhIHdoeSB0aGF0IGhhcHBlbnM/DQo+Pg0KPj5uYW1l
-ICAgICAgICAgOiB4dHMoYWVzKQ0KPj5kcml2ZXIgICAgICAgOiB4dHMtYWVzLWFlc25pDQo+Pm1v
-ZHVsZSAgICAgICA6IGtlcm5lbA0KPj5wcmlvcml0eSAgICAgOiA0MDANCj4+cmVmY250ICAgICAg
-IDogMQ0KPj5zZWxmdGVzdCAgICAgOiBwYXNzZWQNCj4+aW50ZXJuYWwgICAgIDogbm8NCj4+dHlw
-ZSAgICAgICAgIDogYWJsa2NpcGhlcg0KPj5hc3luYyAgICAgICAgOiB5ZXMNCj4+YmxvY2tzaXpl
-ICAgIDogMTYNCj4+bWluIGtleXNpemUgIDogMzINCj4+bWF4IGtleXNpemUgIDogNjQNCj4+aXZz
-aXplICAgICAgIDogMTYNCj4+Z2VuaXYgICAgICAgIDogPGRlZmF1bHQ+DQo+Pg0KPj4tLS04PC0t
-LQ0KPj4NCj4+SW4gRklQUyBtb2RlLCBzZXR0aW5nIFhUUyBrZXlzIHdoZXJlIHRoZSBBRVMga2V5
-IGlzIGlkZW50aWNhbCB0byB0aGUNCj4+dHdlYWsga2V5IGlzIGZvcmJpZGRlbi4gVGh1cywgdGhl
-IHNlbGYgdGVzdCB3aXRoIHN1Y2ggcHJvcGVydHkgd2lsbCBmYWlsDQo+PmluIEZJUFMgbW9kZS4N
-Cj4+DQo+PkFzIHdlIGhhdmUgb3RoZXIgdGVzdHMgYXZhaWxhYmxlIGZvciBYVFMsIHRoaXMgcGF0
-Y2ggc2ltcGx5IHJlbW92ZXMgdGhlDQo+Pm9mZmVuZGluZyB0ZXN0IHZlY3RvcnMuDQo+Pg0KPj5S
-ZXBvcnRlZC1ieTogVGFwYXMgU2FyYW5naSA8VFNhcmFuZ2lAdHJ1c3R3YXZlLmNvbT4NCj4+U2ln
-bmVkLW9mZi1ieTogU3RlcGhhbiBNdWVsbGVyIDxzbXVlbGxlckBjaHJvbm94LmRlPg0KPj4tLS0N
-Cj4+IGNyeXB0by90ZXN0bWdyLmggfCAzNiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0NCj4+IDEgZmlsZSBjaGFuZ2VkLCAzNiBkZWxldGlvbnMoLSkNCj4+DQo+PmRpZmYgLS1n
-aXQgYS9jcnlwdG8vdGVzdG1nci5oIGIvY3J5cHRvL3Rlc3RtZ3IuaA0KPj5pbmRleCBhY2I2YmJm
-Li5lNGI1OGY1IDEwMDY0NA0KPj4tLS0gYS9jcnlwdG8vdGVzdG1nci5oDQo+PisrKyBiL2NyeXB0
-by90ZXN0bWdyLmgNCj4+QEAgLTEwMTc5LDI0ICsxMDE3OSw2IEBAIHN0YXRpYyBzdHJ1Y3QgY2lw
-aGVyX3Rlc3R2ZWMNCj4+dGZfbHJ3X2RlY190dl90ZW1wbGF0ZVtdID0gew0KPj4gc3RhdGljIHN0
-cnVjdCBjaXBoZXJfdGVzdHZlYyB0Zl94dHNfZW5jX3R2X3RlbXBsYXRlW10gPSB7DQo+PiAgICAg
-IC8qIEdlbmVyYXRlZCBmcm9tIEFFUy1YVFMgdGVzdCB2ZWN0b3JzICovDQo+PiB7DQo+Pi0gICAg
-ICAgICAgICAgLmtleSAgICA9ICJceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMCINCj4+
-LSAgICAgICAgICAgICAgICAgICAgICAgIlx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAw
-Ig0KPj4tICAgICAgICAgICAgICAgICAgICAgICAiXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgw
-MFx4MDAiDQo+Pi0gICAgICAgICAgICAgICAgICAgICAgICJceDAwXHgwMFx4MDBceDAwXHgwMFx4
-MDBceDAwXHgwMCIsDQo+Pi0gICAgICAgICAgICAgLmtsZW4gICA9IDMyLA0KPj4tICAgICAgICAg
-ICAgIC5pdiAgICAgPSAiXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDAiDQo+Pi0gICAg
-ICAgICAgICAgICAgICAgICAgICJceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMCIsDQo+
-Pi0gICAgICAgICAgICAgLmlucHV0ICA9ICJceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgw
-MCINCj4+LSAgICAgICAgICAgICAgICAgICAgICAgIlx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4
-MDBceDAwIg0KPj4tICAgICAgICAgICAgICAgICAgICAgICAiXHgwMFx4MDBceDAwXHgwMFx4MDBc
-eDAwXHgwMFx4MDAiDQo+Pi0gICAgICAgICAgICAgICAgICAgICAgICJceDAwXHgwMFx4MDBceDAw
-XHgwMFx4MDBceDAwXHgwMCIsDQo+Pi0gICAgICAgICAgICAgLmlsZW4gICA9IDMyLA0KPj4tICAg
-ICAgICAgICAgIC5yZXN1bHQgPSAiXHg0Ylx4YzlceDQ0XHg0YVx4MTFceGEzXHhlZlx4YWMiDQo+
-Pi0gICAgICAgICAgICAgICAgICAgICAgICJceDMwXHg3NFx4ZTRceDQ0XHg1Mlx4NzdceDk3XHg0
-MyINCj4+LSAgICAgICAgICAgICAgICAgICAgICAgIlx4YTdceDYwXHhiMlx4NDVceDJlXHhmOVx4
-MDBceDkwIg0KPj4tICAgICAgICAgICAgICAgICAgICAgICAiXHg5Zlx4YWFceGZkXHg4OVx4NmVc
-eDlkXHg0YVx4ZTAiLA0KPj4tICAgICAgICAgICAgIC5ybGVuICAgPSAzMiwNCj4+LSAgICAgfSwg
-ew0KPj4gICAgICAgICAgICAgIC5rZXkgICAgPSAiXHgxMVx4MTFceDExXHgxMVx4MTFceDExXHgx
-MVx4MTEiDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICJceDExXHgxMVx4MTFceDExXHgxMVx4
-MTFceDExXHgxMSINCj4+ICAgICAgICAgICAgICAgICAgICAgICAgIlx4MjJceDIyXHgyMlx4MjJc
-eDIyXHgyMlx4MjJceDIyIg0KPj5AQCAtMTA1MjIsMjQgKzEwNTA0LDYgQEAgc3RhdGljIHN0cnVj
-dCBjaXBoZXJfdGVzdHZlYw0KPj50Zl94dHNfZGVjX3R2X3RlbXBsYXRlW10gPSB7DQo+PiAgICAg
-IC8qIEdlbmVyYXRlZCBmcm9tIEFFUy1YVFMgdGVzdCB2ZWN0b3JzICovDQo+PiAgICAgIC8qIHNh
-bWUgYXMgZW5jIHZlY3RvcnMgd2l0aCBpbnB1dCBhbmQgcmVzdWx0IHJldmVyc2VkICovDQo+PiAg
-ICAgIHsNCj4+LSAgICAgICAgICAgICAua2V5ICAgID0gIlx4MDBceDAwXHgwMFx4MDBceDAwXHgw
-MFx4MDBceDAwIg0KPj4tICAgICAgICAgICAgICAgICAgICAgICAiXHgwMFx4MDBceDAwXHgwMFx4
-MDBceDAwXHgwMFx4MDAiDQo+Pi0gICAgICAgICAgICAgICAgICAgICAgICJceDAwXHgwMFx4MDBc
-eDAwXHgwMFx4MDBceDAwXHgwMCINCj4+LSAgICAgICAgICAgICAgICAgICAgICAgIlx4MDBceDAw
-XHgwMFx4MDBceDAwXHgwMFx4MDBceDAwIiwNCj4+LSAgICAgICAgICAgICAua2xlbiAgID0gMzIs
-DQo+Pi0gICAgICAgICAgICAgLml2ICAgICA9ICJceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAw
-XHgwMCINCj4+LSAgICAgICAgICAgICAgICAgICAgICAgIlx4MDBceDAwXHgwMFx4MDBceDAwXHgw
-MFx4MDBceDAwIiwNCj4+LSAgICAgICAgICAgICAuaW5wdXQgID0gIlx4NGJceGM5XHg0NFx4NGFc
-eDExXHhhM1x4ZWZceGFjIg0KPj4tICAgICAgICAgICAgICAgICAgICAgICAiXHgzMFx4NzRceGU0
-XHg0NFx4NTJceDc3XHg5N1x4NDMiDQo+Pi0gICAgICAgICAgICAgICAgICAgICAgICJceGE3XHg2
-MFx4YjJceDQ1XHgyZVx4ZjlceDAwXHg5MCINCj4+LSAgICAgICAgICAgICAgICAgICAgICAgIlx4
-OWZceGFhXHhmZFx4ODlceDZlXHg5ZFx4NGFceGUwIiwNCj4+LSAgICAgICAgICAgICAuaWxlbiAg
-ID0gMzIsDQo+Pi0gICAgICAgICAgICAgLnJlc3VsdCA9ICJceDAwXHgwMFx4MDBceDAwXHgwMFx4
-MDBceDAwXHgwMCINCj4+LSAgICAgICAgICAgICAgICAgICAgICAgIlx4MDBceDAwXHgwMFx4MDBc
-eDAwXHgwMFx4MDBceDAwIg0KPj4tICAgICAgICAgICAgICAgICAgICAgICAiXHgwMFx4MDBceDAw
-XHgwMFx4MDBceDAwXHgwMFx4MDAiDQo+Pi0gICAgICAgICAgICAgICAgICAgICAgICJceDAwXHgw
-MFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMCIsDQo+Pi0gICAgICAgICAgICAgLnJsZW4gICA9IDMy
-LA0KPj4tICAgICB9LCB7DQo+PiAgICAgICAgICAgICAgLmtleSAgICA9ICJceDExXHgxMVx4MTFc
-eDExXHgxMVx4MTFceDExXHgxMSINCj4+ICAgICAgICAgICAgICAgICAgICAgICAgIlx4MTFceDEx
-XHgxMVx4MTFceDExXHgxMVx4MTFceDExIg0KPj4gICAgICAgICAgICAgICAgICAgICAgICAiXHgy
-Mlx4MjJceDIyXHgyMlx4MjJceDIyXHgyMlx4MjIiDQo+Pi0tDQo+PjIuNy40DQo+Pg0KPj4NCj4N
-Cg0KDQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KDQpUaGlzIHRyYW5zbWlzc2lv
-biBtYXkgY29udGFpbiBpbmZvcm1hdGlvbiB0aGF0IGlzIHByaXZpbGVnZWQsIGNvbmZpZGVudGlh
-bCwgYW5kL29yIGV4ZW1wdCBmcm9tIGRpc2Nsb3N1cmUgdW5kZXIgYXBwbGljYWJsZSBsYXcuIElm
-IHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQsIHlvdSBhcmUgaGVyZWJ5IG5vdGlm
-aWVkIHRoYXQgYW55IGRpc2Nsb3N1cmUsIGNvcHlpbmcsIGRpc3RyaWJ1dGlvbiwgb3IgdXNlIG9m
-IHRoZSBpbmZvcm1hdGlvbiBjb250YWluZWQgaGVyZWluIChpbmNsdWRpbmcgYW55IHJlbGlhbmNl
-IHRoZXJlb24pIGlzIHN0cmljdGx5IHByb2hpYml0ZWQuIElmIHlvdSByZWNlaXZlZCB0aGlzIHRy
-YW5zbWlzc2lvbiBpbiBlcnJvciwgcGxlYXNlIGltbWVkaWF0ZWx5IGNvbnRhY3QgdGhlIHNlbmRl
-ciBhbmQgZGVzdHJveSB0aGUgbWF0ZXJpYWwgaW4gaXRzIGVudGlyZXR5LCB3aGV0aGVyIGluIGVs
-ZWN0cm9uaWMgb3IgaGFyZCBjb3B5IGZvcm1hdC4NCg==
+On Thu, Aug 11, 2016 at 02:24:21PM +0200, Stephan Mueller wrote:
+> 
+> The following patch set provides a different approach to /dev/random which
+> I call Linux Random Number Generator (LRNG) to collect entropy within the Linux
+> kernel. The main improvements compared to the legacy /dev/random is to provide
+> sufficient entropy during boot time as well as in virtual environments and when
+> using SSDs. A secondary design goal is to limit the impact of the entropy
+> collection on massive parallel systems and also allow the use accelerated
+> cryptographic primitives. Also, all steps of the entropic data processing are
+> testable. Finally massive performance improvements are visible at /dev/urandom
+> and get_random_bytes.
+> 
+> The design and implementation is driven by a set of goals described in [1]
+> that the LRNG completely implements. Furthermore, [1] includes a
+> comparison with RNG design suggestions such as SP800-90B, SP800-90C, and
+> AIS20/31.
+
+Given the changes that have landed in Linus's tree for 4.8, how many
+of the design goals for your LRNG are still left not yet achieved?
+
+Reading the paper, you are still claiming huge performance
+improvements over getrandomm and /dev/urandom.  With the use of the
+ChaCha20 (and given that you added a ChaCha20 DRBG as well), it's not
+clear this is still an advantage over what we currently have.
+
+As far as whether or not you can gather enough entropy at boot time,
+what we're really talking about how how much entropy we want to assume
+can be gathered from interrupt timings, since what you do in your code
+is not all that different from what the current random driver is
+doing.  So it's pretty easy to turn a knob and say, "hey presto, we
+can get all of the entropy we need before userspace starts!"  But
+justifying this is much harder, and using statistical tests isn't
+really sufficient as far as I'm concerned.
+
+Cheers,
+
+						- Ted
