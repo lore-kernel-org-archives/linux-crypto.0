@@ -1,98 +1,97 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v6 1/5] crypto: DRBG - externalize DRBG functions for LRNG
-Date: Thu, 11 Aug 2016 14:24:53 +0200
-Message-ID: <13755614.BUcme8tBrn@positron.chronox.de>
-References: <4723196.TTQvcXsLCG@positron.chronox.de>
+From: Jason Cooper <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>
+Subject: Re: [PATCH 2/2] ath9k: disable RNG by default
+Date: Thu, 11 Aug 2016 13:14:24 +0000
+Message-ID: <20160811131424.GI2013@io.lakedaemon.net>
+References: <1470726147-30095-1-git-send-email-miaoqing@codeaurora.org>
+ <1526134.1iUazSISyZ@positron.chronox.de>
+ <c0951e085764481d8d85637734e2e14b@aptaiexm02f.ap.qualcomm.com>
+ <4321952.1nMxxDi7Wz@positron.chronox.de>
+ <1e8e88ad7de64c528f08c75ff9176ab8@aptaiexm02f.ap.qualcomm.com>
+ <389c3c1fdde2447aacf31a8b4aadfc08@aptaiexm02f.ap.qualcomm.com>
+ <20160810132449.GH2013@io.lakedaemon.net>
+ <14a3879458f3bfc36068c2e8294ca448@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Ted Tso <tytso@mit.edu>, sandyinchina@gmail.com,
-	Jason Cooper <cryptography@lakedaemon.net>,
-	John Denker <jsd@av8n.com>,
-	"H. Peter Anvin" <hpa@linux.intel.com>,
-	Joe Perches <joe@perches.com>, Pavel Machek <pavel@ucw.cz>,
-	George Spelvin <linux@horizon.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <4723196.TTQvcXsLCG@positron.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "Pan, Miaoqing" <miaoqing-Rm6X0d1/PG5y9aJCnZT0Uw@public.gmane.org>,
+	Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+	"Valo, Kalle" <kvalo-A+ZNKFmMK5xy9aJCnZT0Uw@public.gmane.org>,
+	linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	ath9k-devel <ath9k-devel-A+ZNKFmMK5xy9aJCnZT0Uw@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"Sepehrdad, Pouyan" <pouyans-Rm6X0d1/PG5y9aJCnZT0Uw@public.gmane.org>
+To: miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org
+Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <14a3879458f3bfc36068c2e8294ca448-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch allows several DRBG functions to be called by the LRNG kernel
-code paths outside the drbg.c file.
+On Thu, Aug 11, 2016 at 10:54:11AM +0800, miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org wrote:
+> On 2016-08-10 21:24, Jason Cooper wrote:
+> >The fact is, barring userspace expectations of /dev/hwrng, hw_random is
+> >the appropriate place for it.  It's not a devicetree blob, mac address,
+> >or pci config space.  Which are things we feed in once for the heck of
+> >it.  This is a *continuous* source or questionable quality.
+> >
+> >I'm seriously considering putting this and timeriomem-rng into a
+> >subdirectory under hw_random/, maybe environ/.  Anything in there gets
+> >quality=0 for default, and *doesn't* contribute to /dev/hwrng.
+> >
+> >Regardless which path we take, I think we should include 'adc' in the
+> >name.  I've heard countless times about "Atheros cards come with an rng
+> >on board". :-/
+> 
+> If I understand correctly, you want to bind the ADC source to
+> /dev/hwrng, and then change rng-tools to set the entropy to zero in
+> the ioctl call ?  There are two major problems with that approach,
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c         | 11 +++++------
- include/crypto/drbg.h |  7 +++++++
- 2 files changed, 12 insertions(+), 6 deletions(-)
+Nope.  I want to leverage the hwrng framework to facilitate feeding the
+*kernel* entropy pools like all the other hwrngs do currently.  The
+difference for *environmental* sources is that when userspace read()s
+from /dev/hwrng, they will *not* contribute.
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index f752da3..42084c2 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -113,7 +113,7 @@
-  * the SHA256 / AES 256 over other ciphers. Thus, the favored
-  * DRBGs are the latest entries in this array.
-  */
--static const struct drbg_core drbg_cores[] = {
-+const struct drbg_core drbg_cores[] = {
- #ifdef CONFIG_CRYPTO_DRBG_CTR
- 	{
- 		.flags = DRBG_CTR | DRBG_STRENGTH128,
-@@ -205,7 +205,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
-  * Return: normalized strength in *bytes* value or 32 as default
-  *	   to counter programming errors
-  */
--static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
-+unsigned short drbg_sec_strength(drbg_flag_t flags)
- {
- 	switch (flags & DRBG_STRENGTH_MASK) {
- 	case DRBG_STRENGTH128:
-@@ -1128,7 +1128,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- }
- 
- /* Free all substructures in a DRBG state without the DRBG state structure */
--static inline void drbg_dealloc_state(struct drbg_state *drbg)
-+void drbg_dealloc_state(struct drbg_state *drbg)
- {
- 	if (!drbg)
- 		return;
-@@ -1147,7 +1147,7 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
-  * Allocate all sub-structures for a DRBG state.
-  * The DRBG state structure must already be allocated.
-  */
--static inline int drbg_alloc_state(struct drbg_state *drbg)
-+int drbg_alloc_state(struct drbg_state *drbg)
- {
- 	int ret = -ENOMEM;
- 	unsigned int sb_size = 0;
-@@ -1781,8 +1781,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
-  *
-  * return: flags
-  */
--static inline void drbg_convert_tfm_core(const char *cra_driver_name,
--					 int *coreref, bool *pr)
-+void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool *pr)
- {
- 	int i = 0;
- 	size_t start = 0;
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index 61580b1..1755d07 100644
---- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -280,4 +280,11 @@ enum drbg_prefixes {
- 	DRBG_PREFIX3
- };
- 
-+extern int drbg_alloc_state(struct drbg_state *drbg);
-+extern void drbg_dealloc_state(struct drbg_state *drbg);
-+extern void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref,
-+				  bool *pr);
-+extern const struct drbg_core drbg_cores[];
-+extern unsigned short drbg_sec_strength(drbg_flag_t flags);
-+
- #endif /* _DRBG_H */
--- 
-2.7.4
+If the environmental sources are the only sources, then no /dev/hwrng
+should appear.
+
+> 1) We already tried once before to bind our solution to /dev/hwrng,
+> and got so much complaints. The conclusion was that maybe we know that
+> the output of /dev/hwrng does not have perfect entropy, but a normal
+> user does not know and will misuse it. You mentioned in
+> https://www.kernel.org/doc/Documentation/hw_random.txt we have
+> 
+> "This data is NOT CHECKED by any
+> 	fitness tests, and could potentially be bogus (if the
+> 	hardware is faulty or has been tampered with).  Data is only
+> 	output if the hardware "has-data" flag is set, but nevertheless
+> 	a security-conscious person would run fitness tests on the
+> 	data before assuming it is truly random."
+> 
+> But this is not enough to convince upstream to switch to /dev/hwrng.
+> I think the concern of users misusing the solution is a very valid
+> concern.
+
+Agreed.
+
+> 2) If we set the entropy to zero in rng-tools, we cannot tolerate the
+> load.  Rng-tools is not a timer-based solution. Similar to our
+> solution, it is based on
+> /proc/sys/kernel/random/write_wakeup_threshold. If we do not increase
+> the entropy counter, rng-tools keep writing into the pool, and both
+> rng-tools and WiFi chip will be overloaded.
+
+That's why I propose a change to the hwrng framework to permit noise
+sources while not wiring them up to feed /dev/hwrng.  timeriomem-rng
+should have the same problem ath9k-rng does.
+
+Basically, if it wasn't designed to be an rng, it shouldn't be wired up
+to /dev/hwrng.
+
+thx,
+
+Jason.
+--
+To unsubscribe from this list: send the line "unsubscribe linux-wireless" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
