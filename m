@@ -1,39 +1,29 @@
 From: Xiaodong Liu <xiaodong.liu@intel.com>
-Subject: [PATCH] crypto: fix ctx pointer and digest copy in sha256-mb
-Date: Fri, 12 Aug 2016 06:24:42 -0400
-Message-ID: <1470997482-118327-1-git-send-email-xiaodong.liu@intel.com>
+Subject: [PATCH] crypto: fix ctx pointer in sha512-mb
+Date: Fri, 12 Aug 2016 06:28:31 -0400
+Message-ID: <1470997711-118507-1-git-send-email-xiaodong.liu@intel.com>
 Cc: linux-crypto@vger.kernel.org, tim.c.chen@linux.intel.com,
 	megha.dey@intel.com, linux-kernel@vger.kernel.org,
 	Xiaodong Liu <xiaodong.liu@intel.com>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:19463 "EHLO mga01.intel.com"
+Received: from mga14.intel.com ([192.55.52.115]:52163 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751356AbcHLJfh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 12 Aug 2016 05:35:37 -0400
+	id S1751529AbcHLJjX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 12 Aug 2016 05:39:23 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-1. fix ctx pointer
-Use req_ctx which is the ctx for the next job that have
-been completed in the lanes instead of the first
-completed job rctx, whose completion could have been
-called and released.
-2. fix digest copy
-Use XMM register to copy another 16 bytes sha256 digest
-instead of a regular register.
-
 Signed-off-by: Xiaodong Liu <xiaodong.liu@intel.com>
 ---
- arch/x86/crypto/sha256-mb/sha256_mb.c                | 4 ++--
- arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S | 7 ++++---
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ arch/x86/crypto/sha512-mb/sha512_mb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/crypto/sha256-mb/sha256_mb.c b/arch/x86/crypto/sha256-mb/sha256_mb.c
-index 89fa85e..6f97fb3 100644
---- a/arch/x86/crypto/sha256-mb/sha256_mb.c
-+++ b/arch/x86/crypto/sha256-mb/sha256_mb.c
-@@ -485,10 +485,10 @@ static int sha_complete_job(struct mcryptd_hash_request_ctx *rctx,
+diff --git a/arch/x86/crypto/sha512-mb/sha512_mb.c b/arch/x86/crypto/sha512-mb/sha512_mb.c
+index f4cf5b7..d210174 100644
+--- a/arch/x86/crypto/sha512-mb/sha512_mb.c
++++ b/arch/x86/crypto/sha512-mb/sha512_mb.c
+@@ -497,10 +497,10 @@ static int sha_complete_job(struct mcryptd_hash_request_ctx *rctx,
  
  			req = cast_mcryptd_ctx_to_req(req_ctx);
  			if (irqs_disabled())
@@ -46,27 +36,5 @@ index 89fa85e..6f97fb3 100644
  				local_bh_enable();
  			}
  		}
-diff --git a/arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S b/arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S
-index b691da9..a78a069 100644
---- a/arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S
-+++ b/arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S
-@@ -265,13 +265,14 @@ ENTRY(sha256_mb_mgr_get_comp_job_avx2)
- 	vpinsrd	$1, _args_digest+1*32(state, idx, 4), %xmm0, %xmm0
- 	vpinsrd	$2, _args_digest+2*32(state, idx, 4), %xmm0, %xmm0
- 	vpinsrd	$3, _args_digest+3*32(state, idx, 4), %xmm0, %xmm0
--	movl	_args_digest+4*32(state, idx, 4), tmp2_w
-+	vmovd   _args_digest(state , idx, 4) , %xmm0
- 	vpinsrd	$1, _args_digest+5*32(state, idx, 4), %xmm1, %xmm1
- 	vpinsrd	$2, _args_digest+6*32(state, idx, 4), %xmm1, %xmm1
- 	vpinsrd	$3, _args_digest+7*32(state, idx, 4), %xmm1, %xmm1
- 
--	vmovdqu	%xmm0, _result_digest(job_rax)
--	movl	tmp2_w, _result_digest+1*16(job_rax)
-+        vmovdqu %xmm0, _result_digest(job_rax)
-+        offset =  (_result_digest + 1*16)
-+        vmovdqu %xmm1, offset(job_rax)
- 
- 	pop	%rbx
- 
 -- 
 1.9.1
