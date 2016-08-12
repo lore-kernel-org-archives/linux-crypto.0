@@ -1,46 +1,36 @@
-From: Wei Yongjun <weiyj.lk@gmail.com>
-Subject: [PATCH -next] crypto: ccp - Fix non static symbol warning
-Date: Fri, 12 Aug 2016 00:00:09 +0000
-Message-ID: <1470960009-17784-1-git-send-email-weiyj.lk@gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] crypto: XTS - remove test that will fail in FIPS mode
+Date: Fri, 12 Aug 2016 10:43:35 +0200
+Message-ID: <43267171.xBbHY8HyGv@tauon.atsec.com>
+References: <D3CF7065.28F3%tsarangi@trustwave.com> <D3D10E85.2F74%tsarangi@trustwave.com> <D3D23ED9.2F9C%tsarangi@trustwave.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyj.lk@gmail.com>, linux-crypto@vger.kernel.org
-To: Tom Lendacky <thomas.lendacky@amd.com>,
-	Gary Hook <gary.hook@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Tapas Sarangi <TSarangi@trustwave.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f66.google.com ([209.85.220.66]:33369 "EHLO
-	mail-pa0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751590AbcHLAAR (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Aug 2016 20:00:17 -0400
-Received: by mail-pa0-f66.google.com with SMTP id vy10so494331pac.0
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Aug 2016 17:00:16 -0700 (PDT)
+Received: from mail.eperm.de ([89.247.134.16]:35118 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752096AbcHLIni (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 12 Aug 2016 04:43:38 -0400
+In-Reply-To: <D3D23ED9.2F9C%tsarangi@trustwave.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fixes the following sparse warning:
+Am Donnerstag, 11. August 2016, 19:42:54 CEST schrieb Tapas Sarangi:
 
-drivers/crypto/ccp/ccp-dev.c:62:14: warning:
- symbol 'ccp_increment_unit_ordinal' was not declared. Should it be static?
+Hi Tapas,
 
-Signed-off-by: Wei Yongjun <weiyj.lk@gmail.com>
----
- drivers/crypto/ccp/ccp-dev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Hi Stephan,
+> 
+> Any other ideas about this problem ? Since XTS is not amongst the
+> self-tests as you observed, is it safe to disable .fips_allowed for
+> xts(aes) in testmgr.c ?
 
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index 38a98d8..5d36eef 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -59,7 +59,7 @@ static struct ccp_device *ccp_rr;
- 
- /* Ever-increasing value to produce unique unit numbers */
- static atomic_t ccp_unit_ordinal;
--unsigned int ccp_increment_unit_ordinal(void)
-+static unsigned int ccp_increment_unit_ordinal(void)
- {
- 	return atomic_inc_return(&ccp_unit_ordinal);
- }
+If you do that, none of your XTS implementations will be allowed and work in 
+FIPS mode. The thing is that I cannot reproduce the issue (yet). I am still 
+looking.
+
+Ciao
+Stephan
