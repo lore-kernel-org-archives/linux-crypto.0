@@ -1,38 +1,35 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v5 3/4] crypto: kdf - SP800-108 Key Derivation Function
-Date: Tue, 16 Aug 2016 17:26:56 +0800
-Message-ID: <20160816092656.GA26928@gondor.apana.org.au>
-References: <2808589.gm6f519sFh@positron.chronox.de>
- <11427544.kWdLX5BMAt@tauon.atsec.com>
- <20160816091347.GA26733@gondor.apana.org.au>
- <1605606.kqFagSqufY@tauon.atsec.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: RSA key size not allowed in FIPS
+Date: Tue, 16 Aug 2016 11:33:14 +0200
+Message-ID: <2453784.ib1sbOJlK4@tauon.atsec.com>
+References: <D3CF4E8C.2883%tsarangi@trustwave.com> <D3CF5455.2887%tsarangi@trustwave.com> <21317106.O9C0GvNNQc@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: mathew.j.martineau@linux.intel.com, dhowells@redhat.com,
-	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: dhowells@redhat.com,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Tapas Sarangi <TSarangi@trustwave.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38132 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753507AbcHPJ1G (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Aug 2016 05:27:06 -0400
-Content-Disposition: inline
-In-Reply-To: <1605606.kqFagSqufY@tauon.atsec.com>
+Received: from mail.eperm.de ([89.247.134.16]:36466 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752187AbcHPJdR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 16 Aug 2016 05:33:17 -0400
+In-Reply-To: <21317106.O9C0GvNNQc@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 16, 2016 at 11:25:33AM +0200, Stephan Mueller wrote:
->> I was thinking of the DRBG implementation: decouple it from the underlying 
-> ciphers. Though, I am not fully sure that will work as there are several 
-> specific settings that depend on the underlying ciphers (e.g. the state of a 
-> Hash DRBG with SHA-256 is 444 bits whereas a Hash DRBG with SHA-512 has 888 
-> bits).
+Am Dienstag, 9. August 2016, 16:55:52 CEST schrieb Stephan Mueller:
 
-The only reason DRBG is in crypto is because it implements stdrng.
+Hi Tapas, David,
+> 
+> David, the x509.genkey file seems to generate a 4k RSA key per default. This
+> will cause a panic with fips=1 as only 2k and 3k keys are allowed.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Just yesterday, a new ruling came out from NIST allowing any key size >= 2048 
+provided that at least either 2048 or 3072 is a usable key size to allow CAVS 
+testing.
+
+I will send a patch that changes this in the code.
+
+Thanks
+Stephan
