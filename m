@@ -1,35 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: fix ctx pointer and digest copy in sha256-mb
-Date: Tue, 16 Aug 2016 17:52:52 +0800
-Message-ID: <20160816095252.GD27042@gondor.apana.org.au>
-References: <1470997482-118327-1-git-send-email-xiaodong.liu@intel.com>
+Subject: Re: [PATCH] crypto: DRBG: do not call drbg_instantiate in healt test
+Date: Tue, 16 Aug 2016 17:49:42 +0800
+Message-ID: <20160816094942.GA27104@gondor.apana.org.au>
+References: <6079382.fWeFLzBGfE@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, tim.c.chen@linux.intel.com,
-	megha.dey@intel.com, linux-kernel@vger.kernel.org
-To: Xiaodong Liu <xiaodong.liu@intel.com>
+Cc: TSarangi@trustwave.com, linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:59533 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:60254 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753204AbcHPJxE (ORCPT
+	with ESMTP id S1752253AbcHPJuh (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Aug 2016 05:53:04 -0400
+	Tue, 16 Aug 2016 05:50:37 -0400
 Content-Disposition: inline
-In-Reply-To: <1470997482-118327-1-git-send-email-xiaodong.liu@intel.com>
+In-Reply-To: <6079382.fWeFLzBGfE@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 12, 2016 at 06:24:42AM -0400, Xiaodong Liu wrote:
-> 1. fix ctx pointer
-> Use req_ctx which is the ctx for the next job that have
-> been completed in the lanes instead of the first
-> completed job rctx, whose completion could have been
-> called and released.
-> 2. fix digest copy
-> Use XMM register to copy another 16 bytes sha256 digest
-> instead of a regular register.
+Stephan Mueller <smueller@chronox.de> wrote:
+> Am Dienstag, 9. August 2016, 19:52:46 CEST schrieb Stephan Mueller:
 > 
-> Signed-off-by: Xiaodong Liu <xiaodong.liu@intel.com>
+> Hi Tapas,
+> 
+> I think I found the issue. Can you please test the attached patch?
+> 
+> ---8<---
+> 
+> When calling the DRBG health test in FIPS mode, the Jitter RNG is not
+> yet present in the kernel crypto API which will cause the instantiation
+> to fail and thus the health test to fail.
+> 
+> As the health tests cover the enforcement of various thresholds, invoke
+> the functions that are supposed to enforce the thresholds directly.
+> 
+> This patch also saves precious seed.
+> 
+> Reported-by: Tapas Sarangi <TSarangi@trustwave.com>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
 Patch applied.  Thanks.
 -- 
