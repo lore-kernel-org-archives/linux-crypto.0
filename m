@@ -1,149 +1,75 @@
-From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH 1/2] crypto: marvell - Use an unique pool to copy results of requests
-Date: Thu, 18 Aug 2016 14:12:13 +0200
-Message-ID: <1471522334-24839-2-git-send-email-romain.perier@free-electrons.com>
-References: <1471522334-24839-1-git-send-email-romain.perier@free-electrons.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Gregory Clement <gregory.clement@free-electrons.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Russell King <linux@arm.linux.org.uk>,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:47526 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752429AbcHRMOJ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Aug 2016 08:14:09 -0400
-In-Reply-To: <1471522334-24839-1-git-send-email-romain.perier@free-electrons.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Daniel Thompson <daniel.thompson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH] Add Ingenic JZ4780 hardware RNG driver
+Date: Thu, 18 Aug 2016 13:19:59 +0100
+Message-ID: <291974d6-1398-716f-3c76-662a7616eb6b@linaro.org>
+References: <1471448151-20850-1-git-send-email-prasannatsmkumar@gmail.com>
+ <92a00062-9a87-0053-2c99-17bd1a304a4a@gmail.com>
+ <CANc+2y55ZCkauwKNtuuCxLx-WOtm8z+A_EBKsYSjEUdc+ZbZTQ@mail.gmail.com>
+ <20160818115300.GA6621@Red>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	Ralf Baechle <ralf-6z/3iImG2C8G8FEW9MqTrA@public.gmane.org>, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org, Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, mchehab-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	Guenter Roeck <linux-0h96xk9xTtrk1uMJSBkQmQ@public.gmane.org>,
+	boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org, harvey.hunt-1AXoQHu6uovQT0dZR+AlfA@public.gmane.org,
+	alex.smith-1AXoQHu6uovQT0dZR+AlfA@public.gmane.org, Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	kieran-7hKh/agyDeatmTQ+vhA3Yw@public.gmane.org, Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	joshua.henderson-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org, yendapally.reddy-dY08KVG/lbpWk0Htik3J/w@public.gmane.org,
+	narmstrong-rdvid1DuHRBWk0Htik3J/w@public.gmane.org, wangkefeng.wang-hv44wF8Li93QT0dZR+AlfA@public.gmane.org,
+	Christian Lamparter <chunkeey-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>,
+	=?UTF-8?Q?=c3=81lvaro_Fern=c3=a1ndez_Rojas?= <noltari-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, pankaj.dev-qxv4g6HH51o@public.gmane.org,
+	Mathieu Poirier <mathieu.poirier-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	linux-
+To: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20160818115300.GA6621@Red>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-So far, we used a dedicated dma pool to copy the result of outer IV for
-cipher requests. Instead of using a dma pool per outer data, we prefer
-use a common dma pool that contains the part of the SRAM that is likely
-to be used by the 'complete' operation, later. In this way, any type of
-result can be retrieved by DMA for cipher or ahash requests.
+On 18/08/16 12:53, LABBE Corentin wrote:
+> On Thu, Aug 18, 2016 at 10:44:18AM +0530, PrasannaKumar Muralidharan wrote:
+>>>> +static int jz4780_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+>>>> +{
+>>>> +     struct jz4780_rng *jz4780_rng = container_of(rng, struct jz4780_rng,
+>>>> +                                                     rng);
+>>>> +     u32 *data = buf;
+>>>> +     *data = jz4780_rng_readl(jz4780_rng, REG_RNG_DATA);
+>>>> +     return 4;
+>>>> +}
+>>>
+>>> If max is less than 4, its bad
+>>
+>> Data will be 4 bytes.
+>>
+>
+> No, according to comment in include/linux/hw_random.h "drivers can fill up to max bytes of data"
+> So you cannot write more than max bytes without risking buffer overflow.
+>
+> And if max > 4, hwrng client need to recall your read function.
+> The better example I found is tpm_get_random() in drivers/char/tpm/tpm-interface.c for handling both problem.
 
-Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
----
- drivers/crypto/marvell/cesa.c   |  4 ++--
- drivers/crypto/marvell/cesa.h   |  6 +++---
- drivers/crypto/marvell/cipher.c |  2 +-
- drivers/crypto/marvell/tdma.c   | 16 ++++++++--------
- 4 files changed, 14 insertions(+), 14 deletions(-)
+Right now the core code will never actually ask a RNG driver for <4 
+bytes so perhaps it would be better to update the comment in 
+include/linux/hw_random.h !
 
-diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-index 37dadb2..4d308ad 100644
---- a/drivers/crypto/marvell/cesa.c
-+++ b/drivers/crypto/marvell/cesa.c
-@@ -375,8 +375,8 @@ static int mv_cesa_dev_dma_init(struct mv_cesa_dev *cesa)
- 	if (!dma->padding_pool)
- 		return -ENOMEM;
- 
--	dma->iv_pool = dmam_pool_create("cesa_iv", dev, 16, 1, 0);
--	if (!dma->iv_pool)
-+	dma->result_pool = dmam_pool_create("cesa_result", dev, 96, 1, 0);
-+	if (!dma->result_pool)
- 		return -ENOMEM;
- 
- 	cesa->dma = dma;
-diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
-index e423d33..3be1aa3 100644
---- a/drivers/crypto/marvell/cesa.h
-+++ b/drivers/crypto/marvell/cesa.h
-@@ -277,7 +277,7 @@ struct mv_cesa_op_ctx {
- #define CESA_TDMA_DUMMY				0
- #define CESA_TDMA_DATA				1
- #define CESA_TDMA_OP				2
--#define CESA_TDMA_IV				3
-+#define CESA_TDMA_RESULT			3
- 
- /**
-  * struct mv_cesa_tdma_desc - TDMA descriptor
-@@ -393,7 +393,7 @@ struct mv_cesa_dev_dma {
- 	struct dma_pool *op_pool;
- 	struct dma_pool *cache_pool;
- 	struct dma_pool *padding_pool;
--	struct dma_pool *iv_pool;
-+	struct dma_pool *result_pool;
- };
- 
- /**
-@@ -839,7 +839,7 @@ mv_cesa_tdma_desc_iter_init(struct mv_cesa_tdma_chain *chain)
- 	memset(chain, 0, sizeof(*chain));
- }
- 
--int mv_cesa_dma_add_iv_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
-+int mv_cesa_dma_add_result_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
- 			  u32 size, u32 flags, gfp_t gfp_flags);
- 
- struct mv_cesa_op_ctx *mv_cesa_dma_add_op(struct mv_cesa_tdma_chain *chain,
-diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
-index d19dc96..bd575b1 100644
---- a/drivers/crypto/marvell/cipher.c
-+++ b/drivers/crypto/marvell/cipher.c
-@@ -373,7 +373,7 @@ static int mv_cesa_ablkcipher_dma_req_init(struct ablkcipher_request *req,
- 
- 	/* Add output data for IV */
- 	ivsize = crypto_ablkcipher_ivsize(crypto_ablkcipher_reqtfm(req));
--	ret = mv_cesa_dma_add_iv_op(&basereq->chain, CESA_SA_CRYPT_IV_SRAM_OFFSET,
-+	ret = mv_cesa_dma_add_result_op(&basereq->chain, CESA_SA_CRYPT_IV_SRAM_OFFSET,
- 				    ivsize, CESA_TDMA_SRC_IN_SRAM, flags);
- 
- 	if (ret)
-diff --git a/drivers/crypto/marvell/tdma.c b/drivers/crypto/marvell/tdma.c
-index 9fd7a5f..499a1d3 100644
---- a/drivers/crypto/marvell/tdma.c
-+++ b/drivers/crypto/marvell/tdma.c
-@@ -69,8 +69,8 @@ void mv_cesa_dma_cleanup(struct mv_cesa_req *dreq)
- 		if (type == CESA_TDMA_OP)
- 			dma_pool_free(cesa_dev->dma->op_pool, tdma->op,
- 				      le32_to_cpu(tdma->src));
--		else if (type == CESA_TDMA_IV)
--			dma_pool_free(cesa_dev->dma->iv_pool, tdma->data,
-+		else if (type == CESA_TDMA_RESULT)
-+			dma_pool_free(cesa_dev->dma->result_pool, tdma->data,
- 				      le32_to_cpu(tdma->dst));
- 
- 		tdma = tdma->next;
-@@ -209,29 +209,29 @@ mv_cesa_dma_add_desc(struct mv_cesa_tdma_chain *chain, gfp_t flags)
- 	return new_tdma;
- }
- 
--int mv_cesa_dma_add_iv_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
-+int mv_cesa_dma_add_result_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
- 			  u32 size, u32 flags, gfp_t gfp_flags)
- {
- 
- 	struct mv_cesa_tdma_desc *tdma;
--	u8 *iv;
-+	u8 *result;
- 	dma_addr_t dma_handle;
- 
- 	tdma = mv_cesa_dma_add_desc(chain, gfp_flags);
- 	if (IS_ERR(tdma))
- 		return PTR_ERR(tdma);
- 
--	iv = dma_pool_alloc(cesa_dev->dma->iv_pool, gfp_flags, &dma_handle);
--	if (!iv)
-+	result = dma_pool_alloc(cesa_dev->dma->result_pool, gfp_flags, &dma_handle);
-+	if (!result)
- 		return -ENOMEM;
- 
- 	tdma->byte_cnt = cpu_to_le32(size | BIT(31));
- 	tdma->src = src;
- 	tdma->dst = cpu_to_le32(dma_handle);
--	tdma->data = iv;
-+	tdma->data = result;
- 
- 	flags &= (CESA_TDMA_DST_IN_SRAM | CESA_TDMA_SRC_IN_SRAM);
--	tdma->flags = flags | CESA_TDMA_IV;
-+	tdma->flags = flags | CESA_TDMA_RESULT;
- 	return 0;
- }
- 
--- 
-2.8.1
+For devices with 32-bit RNG registers the extra code to handle a special 
+case that doesn't actually exist is a waste.
+
+There are 14 drivers in drivers/char/hw_random that support the ->read() 
+interface but only three of these actually support max == 1 (existing 
+accepted behavior varies between return 0, return 2, return 4 and return 
+-EIO).
+
+
+Daniel.
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
