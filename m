@@ -1,47 +1,46 @@
-From: Wei Yongjun <weiyj.lk@gmail.com>
-Subject: [PATCH -next] crypto: fix missing unlock on error in sun4i_hash()
-Date: Thu, 18 Aug 2016 22:42:10 +0000
-Message-ID: <1471560130-5265-1-git-send-email-weiyj.lk@gmail.com>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH] Add Ingenic JZ4780 hardware RNG driver
+Date: Thu, 18 Aug 2016 19:59:44 -0500
+Message-ID: <20160819005944.GA1711@rob-hp-laptop>
+References: <1471448151-20850-1-git-send-email-prasannatsmkumar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyj.lk@gmail.com>, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- Maxime Ripard <maxime.ripard@free-electrons.com>,
- Chen-Yu Tsai <wens@csie.org>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Cc: mpm@selenic.com, herbert@gondor.apana.org.au, mark.rutland@arm.com,
+        ralf@linux-mips.org, davem@davemloft.net, geert@linux-m68k.org,
+        akpm@linux-foundation.org, gregkh@linuxfoundation.org,
+        mchehab@kernel.org, linux@roeck-us.net,
+        boris.brezillon@free-electrons.com, harvey.hunt@imgtec.com,
+        alex.smith@imgtec.com, daniel.thompson@linaro.org,
+        lee.jones@linaro.org, f.fainelli@gmail.com, kieran@ksquared.org.uk,
+        krzk@kernel.org, joshua.henderson@microchip.com,
+        yendapally.reddy@broadcom.com, narmstrong@baylibre.com,
+        wangkefeng.wang@huawei.com, chunkeey@googlemail.com,
+        noltari@gmail.com, linus.walleij@linaro.org, pankaj.dev@st.com,
+        mathieu.poirier@linaro.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mips@linux-mips.org
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1471448151-20850-1-git-send-email-prasannatsmkumar@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add the missing unlock before return from function sun4i_hash()
-in the error handling case.
+On Wed, Aug 17, 2016 at 09:05:51PM +0530, PrasannaKumar Muralidharan wrote:
+> This patch adds support for hardware random number generator present in
+> JZ4780 SoC.
+> 
+> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+> ---
+>  .../devicetree/bindings/rng/ingenic,jz4780-rng.txt |  12 +++
 
-Fixes: 477d9b2e591b ("crypto: sun4i-ss - unify update/final function")
-Signed-off-by: Wei Yongjun <weiyj.lk@gmail.com>
----
- drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 1 +
- 1 file changed, 1 insertion(+)
+Acked-by: Rob Herring <robh@kernel.org>
 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-index 2ee3b59..de66f47 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-@@ -245,6 +245,7 @@ int sun4i_hash(struct ahash_request *areq)
- 		if (end > areq->nbytes || areq->nbytes - end > 63) {
- 			dev_err(ss->dev, "ERROR: Bound error %u %u\n",
- 				end, areq->nbytes);
-+			spin_unlock(&ss->slock);
- 			return -EINVAL;
- 		}
- 	} else {
+>  MAINTAINERS                                        |   5 +
+>  arch/mips/boot/dts/ingenic/jz4780.dtsi             |   7 +-
+>  drivers/char/hw_random/Kconfig                     |  14 +++
+>  drivers/char/hw_random/Makefile                    |   1 +
+>  drivers/char/hw_random/jz4780-rng.c                | 105 +++++++++++++++++++++
+>  6 files changed, 143 insertions(+), 1 deletion(-)
+>  create mode 100644 Documentation/devicetree/bindings/rng/ingenic,jz4780-rng.txt
+>  create mode 100644 drivers/char/hw_random/jz4780-rng.c
