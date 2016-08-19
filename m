@@ -1,38 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: David Miller <davem@davemloft.net>
 Subject: Re: [PATCHv3 net-next 0/4] crypto/chcr: Add support for Chelsio
  Crypto Driver
-Date: Fri, 19 Aug 2016 14:15:43 +0800
-Message-ID: <20160819061543.GA20764@gondor.apana.org.au>
+Date: Fri, 19 Aug 2016 00:01:16 -0700 (PDT)
+Message-ID: <20160819.000116.1320950130682073656.davem@davemloft.net>
 References: <1471417386-14026-1-git-send-email-hariprasad@chelsio.com>
- <20160818.231101.728993368913367217.davem@davemloft.net>
+        <20160818.231101.728993368913367217.davem@davemloft.net>
+        <20160819061543.GA20764@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Cc: hariprasad@chelsio.com, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, atul.gupta@chelsio.com,
         yeshaswi@chelsio.com, jlulla@chelsio.com, harsh@chelsio.com
-To: David Miller <davem@davemloft.net>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54853 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753835AbcHSGPq (ORCPT
+Received: from shards.monkeyblade.net ([184.105.139.130]:42699 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754035AbcHSHBS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Aug 2016 02:15:46 -0400
-Content-Disposition: inline
-In-Reply-To: <20160818.231101.728993368913367217.davem@davemloft.net>
+        Fri, 19 Aug 2016 03:01:18 -0400
+In-Reply-To: <20160819061543.GA20764@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 18, 2016 at 11:11:01PM -0700, David Miller wrote:
-> From: Hariprasad Shenai <hariprasad@chelsio.com>
-> Date: Wed, 17 Aug 2016 12:33:02 +0530
-> 
-> > This patch series adds support for Chelsio Crypto driver. 
-> 
-> Herbert, what do you want to do with this?  I can push it via
-> net-next if you like.
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Date: Fri, 19 Aug 2016 14:15:43 +0800
 
-Sure thing, the crypto part looks good to me.  Thanks Dave!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> On Thu, Aug 18, 2016 at 11:11:01PM -0700, David Miller wrote:
+>> From: Hariprasad Shenai <hariprasad@chelsio.com>
+>> Date: Wed, 17 Aug 2016 12:33:02 +0530
+>> 
+>> > This patch series adds support for Chelsio Crypto driver. 
+>> 
+>> Herbert, what do you want to do with this?  I can push it via
+>> net-next if you like.
+> 
+> Sure thing, the crypto part looks good to me.  Thanks Dave!
+
+Great, done.
