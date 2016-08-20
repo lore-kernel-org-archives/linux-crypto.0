@@ -1,82 +1,58 @@
-From: Wei Yongjun <weiyj.lk@gmail.com>
-Subject: [PATCH -next] crypto: drbg - fix error return code
-Date: Sat, 20 Aug 2016 15:06:51 +0000
-Message-ID: <1471705611-19309-1-git-send-email-weiyj.lk@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyj.lk@gmail.com>, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Stephan Mueller <smueller@chronox.de>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: [PATCH] hw_random: omap3-rom-rng.c: Remove obsoleted functions
+Date: Sat, 20 Aug 2016 21:31:06 +0530
+Message-ID: <1471708866-1423-1-git-send-email-prasannatsmkumar@gmail.com>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+To: linux-crypto@vger.kernel.org, aaro.koskinen@iki.fi,
+        mpm@selenic.com, herbert@gondor.apana.org.au,
+        linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:36773 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752765AbcHTPG5 (ORCPT
+Received: from mail-pa0-f68.google.com ([209.85.220.68]:33961 "EHLO
+        mail-pa0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753142AbcHTQEF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 20 Aug 2016 11:06:57 -0400
-Received: by mail-pf0-f196.google.com with SMTP id y134so3173653pfg.3
-        for <linux-crypto@vger.kernel.org>; Sat, 20 Aug 2016 08:06:57 -0700 (PDT)
+        Sat, 20 Aug 2016 12:04:05 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix to return a negative error code from the error handling
-case instead of 0.
+Remove omap3_rom_rng_data_present method as it was returning 1 always.
+Use .read callback instead of .data_read callback. This avoids use of
+obsolete callbacks.
 
-Signed-off-by: Wei Yongjun <weiyj.lk@gmail.com>
+This patch is not tested with hardware as I don't have access to it.
+
+Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 ---
- crypto/drbg.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ drivers/char/hw_random/omap3-rom-rng.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index edf3ce0..fb33f7d 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1178,12 +1178,16 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
- 		goto err;
+diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
+index 8da14f1..37a58d7 100644
+--- a/drivers/char/hw_random/omap3-rom-rng.c
++++ b/drivers/char/hw_random/omap3-rom-rng.c
+@@ -71,12 +71,7 @@ static int omap3_rom_rng_get_random(void *buf, unsigned int count)
+ 	return 0;
+ }
  
- 	drbg->Vbuf = kmalloc(drbg_statelen(drbg) + ret, GFP_KERNEL);
--	if (!drbg->Vbuf)
-+	if (!drbg->Vbuf) {
-+		ret = -ENOMEM;
- 		goto fini;
-+	}
- 	drbg->V = PTR_ALIGN(drbg->Vbuf, ret + 1);
- 	drbg->Cbuf = kmalloc(drbg_statelen(drbg) + ret, GFP_KERNEL);
--	if (!drbg->Cbuf)
-+	if (!drbg->Cbuf) {
-+		ret = -ENOMEM;
- 		goto fini;
-+	}
- 	drbg->C = PTR_ALIGN(drbg->Cbuf, ret + 1);
- 	/* scratchpad is only generated for CTR and Hash */
- 	if (drbg->core->flags & DRBG_HMAC)
-@@ -1199,8 +1203,10 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
- 
- 	if (0 < sb_size) {
- 		drbg->scratchpadbuf = kzalloc(sb_size + ret, GFP_KERNEL);
--		if (!drbg->scratchpadbuf)
-+		if (!drbg->scratchpadbuf) {
-+			ret = -ENOMEM;
- 			goto fini;
-+		}
- 		drbg->scratchpad = PTR_ALIGN(drbg->scratchpadbuf, ret + 1);
- 	}
- 
-@@ -1999,7 +2005,7 @@ static int __init drbg_init(void)
+-static int omap3_rom_rng_data_present(struct hwrng *rng, int wait)
+-{
+-	return 1;
+-}
+-
+-static int omap3_rom_rng_data_read(struct hwrng *rng, u32 *data)
++static int omap3_rom_rng_read(struct hwrng *rng, void *data, size_t max, bool w)
  {
- 	unsigned int i = 0; /* pointer to drbg_algs */
- 	unsigned int j = 0; /* pointer to drbg_cores */
--	int ret = -EFAULT;
-+	int ret;
+ 	int r;
  
- 	ret = drbg_healthcheck_sanity();
- 	if (ret)
-@@ -2009,7 +2015,7 @@ static int __init drbg_init(void)
- 		pr_info("DRBG: Cannot register all DRBG types"
- 			"(slots needed: %zu, slots available: %zu)\n",
- 			ARRAY_SIZE(drbg_cores) * 2, ARRAY_SIZE(drbg_algs));
--		return ret;
-+		return -EFAULT;
- 	}
+@@ -88,8 +83,7 @@ static int omap3_rom_rng_data_read(struct hwrng *rng, u32 *data)
  
- 	/*
+ static struct hwrng omap3_rom_rng_ops = {
+ 	.name		= "omap3-rom",
+-	.data_present	= omap3_rom_rng_data_present,
+-	.data_read	= omap3_rom_rng_data_read,
++	.read		= omap3_rom_rng_read,
+ };
+ 
+ static int omap3_rom_rng_probe(struct platform_device *pdev)
+-- 
+2.5.0
