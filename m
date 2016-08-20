@@ -1,52 +1,82 @@
 From: Wei Yongjun <weiyj.lk@gmail.com>
-Subject: [PATCH -next v2] crypto: sun4i-ss - fix missing unlock on error in sun4i_hash()
-Date: Sat, 20 Aug 2016 10:48:53 +0000
-Message-ID: <1471690133-24396-1-git-send-email-weiyj.lk@gmail.com>
-References: <1471560130-5265-1-git-send-email-weiyj.lk@gmail.com>
+Subject: [PATCH -next] crypto: drbg - fix error return code
+Date: Sat, 20 Aug 2016 15:06:51 +0000
+Message-ID: <1471705611-19309-1-git-send-email-weiyj.lk@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyj.lk@gmail.com>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Maxime Ripard <maxime.ripard@free-electrons.com>,
-        Chen-Yu Tsai <wens@csie.org>
+Cc: Wei Yongjun <weiyj.lk@gmail.com>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f65.google.com ([209.85.220.65]:34408 "EHLO
-        mail-pa0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751824AbcHTKtH (ORCPT
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:36773 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752765AbcHTPG5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 20 Aug 2016 06:49:07 -0400
-Received: by mail-pa0-f65.google.com with SMTP id hh10so4810725pac.1
-        for <linux-crypto@vger.kernel.org>; Sat, 20 Aug 2016 03:49:07 -0700 (PDT)
-In-Reply-To: <1471560130-5265-1-git-send-email-weiyj.lk@gmail.com>
+        Sat, 20 Aug 2016 11:06:57 -0400
+Received: by mail-pf0-f196.google.com with SMTP id y134so3173653pfg.3
+        for <linux-crypto@vger.kernel.org>; Sat, 20 Aug 2016 08:06:57 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add the missing unlock before return from function sun4i_hash()
-in the error handling case.
+Fix to return a negative error code from the error handling
+case instead of 0.
 
-Fixes: 477d9b2e591b ("crypto: sun4i-ss - unify update/final function")
 Signed-off-by: Wei Yongjun <weiyj.lk@gmail.com>
 ---
-v1 -> v2: goto release_ss as LABBE Corentin's suggestion
----
- drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ crypto/drbg.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-index 2ee3b59..1afeb8e 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-@@ -245,7 +245,8 @@ int sun4i_hash(struct ahash_request *areq)
- 		if (end > areq->nbytes || areq->nbytes - end > 63) {
- 			dev_err(ss->dev, "ERROR: Bound error %u %u\n",
- 				end, areq->nbytes);
--			return -EINVAL;
-+			err = -EINVAL;
-+			goto release_ss;
- 		}
- 	} else {
- 		/* Since we have the flag final, we can go up to modulo 4 */
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index edf3ce0..fb33f7d 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1178,12 +1178,16 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
+ 		goto err;
+ 
+ 	drbg->Vbuf = kmalloc(drbg_statelen(drbg) + ret, GFP_KERNEL);
+-	if (!drbg->Vbuf)
++	if (!drbg->Vbuf) {
++		ret = -ENOMEM;
+ 		goto fini;
++	}
+ 	drbg->V = PTR_ALIGN(drbg->Vbuf, ret + 1);
+ 	drbg->Cbuf = kmalloc(drbg_statelen(drbg) + ret, GFP_KERNEL);
+-	if (!drbg->Cbuf)
++	if (!drbg->Cbuf) {
++		ret = -ENOMEM;
+ 		goto fini;
++	}
+ 	drbg->C = PTR_ALIGN(drbg->Cbuf, ret + 1);
+ 	/* scratchpad is only generated for CTR and Hash */
+ 	if (drbg->core->flags & DRBG_HMAC)
+@@ -1199,8 +1203,10 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
+ 
+ 	if (0 < sb_size) {
+ 		drbg->scratchpadbuf = kzalloc(sb_size + ret, GFP_KERNEL);
+-		if (!drbg->scratchpadbuf)
++		if (!drbg->scratchpadbuf) {
++			ret = -ENOMEM;
+ 			goto fini;
++		}
+ 		drbg->scratchpad = PTR_ALIGN(drbg->scratchpadbuf, ret + 1);
+ 	}
+ 
+@@ -1999,7 +2005,7 @@ static int __init drbg_init(void)
+ {
+ 	unsigned int i = 0; /* pointer to drbg_algs */
+ 	unsigned int j = 0; /* pointer to drbg_cores */
+-	int ret = -EFAULT;
++	int ret;
+ 
+ 	ret = drbg_healthcheck_sanity();
+ 	if (ret)
+@@ -2009,7 +2015,7 @@ static int __init drbg_init(void)
+ 		pr_info("DRBG: Cannot register all DRBG types"
+ 			"(slots needed: %zu, slots available: %zu)\n",
+ 			ARRAY_SIZE(drbg_cores) * 2, ARRAY_SIZE(drbg_algs));
+-		return ret;
++		return -EFAULT;
+ 	}
+ 
+ 	/*
