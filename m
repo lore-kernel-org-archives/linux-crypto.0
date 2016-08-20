@@ -1,312 +1,172 @@
-From: Corentin LABBE <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH 2/2] hwrng: thunderx: Add Cavium HWRNG driver for ThunderX
- SoC.
-Date: Sat, 20 Aug 2016 07:41:31 +0200
-Message-ID: <5650aa14-e163-13d8-2704-5f949c67cb26@gmail.com>
-References: <1471645933-3643-1-git-send-email-okhaliq@caviumnetworks.com>
- <1471645933-3643-3-git-send-email-okhaliq@caviumnetworks.com>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: Re: [PATCH 1/2] crypto: marvell - Use an unique pool to copy
+ results of requests
+Date: Sat, 20 Aug 2016 08:26:27 +0200
+Message-ID: <20160820082627.70a4cb55@bbrezillon>
+References: <1471522334-24839-1-git-send-email-romain.perier@free-electrons.com>
+        <1471522334-24839-2-git-send-email-romain.perier@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-To: Omer Khaliq <okhaliq@caviumnetworks.com>,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@vger.kernel.org,
-        bhelgaas@google.com, mpm@selenic.com, herbert@gondor.apana.org.au,
-        Ananth.Jasty@cavium.com, david.daney@cavium.com
-Return-path: <linux-pci-owner@vger.kernel.org>
-In-Reply-To: <1471645933-3643-3-git-send-email-okhaliq@caviumnetworks.com>
-Sender: linux-pci-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Arnaud Ebalard <arno@natisbad.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gregory Clement <gregory.clement@free-electrons.com>,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        Russell King <linux@arm.linux.org.uk>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Romain Perier <romain.perier@free-electrons.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from down.free-electrons.com ([37.187.137.238]:43437 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751164AbcHTG1C (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 20 Aug 2016 02:27:02 -0400
+In-Reply-To: <1471522334-24839-2-git-send-email-romain.perier@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hello
+Hi Romain,
 
-I have some minor comments below
+On Thu, 18 Aug 2016 14:12:13 +0200
+Romain Perier <romain.perier@free-electrons.com> wrote:
 
-On 20/08/2016 00:32, Omer Khaliq wrote:
-> The Cavium ThunderX SoC has a hardware random number generator.
-> This driver provides support using the HWRNG framework.
+> So far, we used a dedicated dma pool to copy the result of outer IV for
+> cipher requests. Instead of using a dma pool per outer data, we prefer
+> use a common dma pool that contains the part of the SRAM that is likely
+> to be used by the 'complete' operation, later. In this way, any type of
+> result can be retrieved by DMA for cipher or ahash requests.
+
+Can't we just re-use the op_pool (and drop the cesa_iv/result pool)? It
+may be suboptimal in term of memory usage, but adding more pools also
+adds some overhead.
+
 > 
-> Signed-off-by: Omer Khaliq <okhaliq@caviumnetworks.com>
-> Signed-off-by: Ananth Jasty <Ananth.Jasty@cavium.com>
-> Acked-by: David Daney <david.daney@cavium.com>
+> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
 > ---
->  drivers/char/hw_random/Kconfig         |  13 +++++
->  drivers/char/hw_random/Makefile        |   1 +
->  drivers/char/hw_random/cavium-rng-vf.c | 102 ++++++++++++++++++++++++++++++++
->  drivers/char/hw_random/cavium-rng.c    | 103 +++++++++++++++++++++++++++++++++
->  4 files changed, 219 insertions(+)
->  create mode 100644 drivers/char/hw_random/cavium-rng-vf.c
->  create mode 100644 drivers/char/hw_random/cavium-rng.c
+>  drivers/crypto/marvell/cesa.c   |  4 ++--
+>  drivers/crypto/marvell/cesa.h   |  6 +++---
+>  drivers/crypto/marvell/cipher.c |  2 +-
+>  drivers/crypto/marvell/tdma.c   | 16 ++++++++--------
+>  4 files changed, 14 insertions(+), 14 deletions(-)
 > 
-> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> index 56ad5a5..fb9c7ad 100644
-> --- a/drivers/char/hw_random/Kconfig
-> +++ b/drivers/char/hw_random/Kconfig
-> @@ -410,6 +410,19 @@ config HW_RANDOM_MESON
+> diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
+> index 37dadb2..4d308ad 100644
+> --- a/drivers/crypto/marvell/cesa.c
+> +++ b/drivers/crypto/marvell/cesa.c
+> @@ -375,8 +375,8 @@ static int mv_cesa_dev_dma_init(struct mv_cesa_dev *cesa)
+>  	if (!dma->padding_pool)
+>  		return -ENOMEM;
 >  
->  	  If unsure, say Y.
+> -	dma->iv_pool = dmam_pool_create("cesa_iv", dev, 16, 1, 0);
+> -	if (!dma->iv_pool)
+> +	dma->result_pool = dmam_pool_create("cesa_result", dev, 96, 1, 0);
+
+It's better to use a sizeof(xxx) here to avoid bugs if the context size
+grows.
+
+The rest looks good.
+
+Thanks,
+
+Boris
+
+> +	if (!dma->result_pool)
+>  		return -ENOMEM;
 >  
-> +config HW_RANDOM_CAVIUM
-> +       tristate "Cavium ThunderX Random Number Generator support"
-> +       depends on HW_RANDOM && PCI && (ARM64 || (COMPILE_TEST && 64BIT))
-> +       default HW_RANDOM
-> +       ---help---
-> +         This driver provides kernel-side support for the Random Number
-> +         Generator hardware found on Cavium SoCs.
-> +
-> +         To compile this driver as a module, choose M here: the
-> +         module will be called cavium_rng.
-> +
-> +         If unsure, say Y.
-> +
->  endif # HW_RANDOM
+>  	cesa->dma = dma;
+> diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
+> index e423d33..3be1aa3 100644
+> --- a/drivers/crypto/marvell/cesa.h
+> +++ b/drivers/crypto/marvell/cesa.h
+> @@ -277,7 +277,7 @@ struct mv_cesa_op_ctx {
+>  #define CESA_TDMA_DUMMY				0
+>  #define CESA_TDMA_DATA				1
+>  #define CESA_TDMA_OP				2
+> -#define CESA_TDMA_IV				3
+> +#define CESA_TDMA_RESULT			3
 >  
->  config UML_RANDOM
-> diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-> index 04bb0b0..5f52b1e 100644
-> --- a/drivers/char/hw_random/Makefile
-> +++ b/drivers/char/hw_random/Makefile
-> @@ -35,3 +35,4 @@ obj-$(CONFIG_HW_RANDOM_XGENE) += xgene-rng.o
->  obj-$(CONFIG_HW_RANDOM_STM32) += stm32-rng.o
->  obj-$(CONFIG_HW_RANDOM_PIC32) += pic32-rng.o
->  obj-$(CONFIG_HW_RANDOM_MESON) += meson-rng.o
-> +obj-$(CONFIG_HW_RANDOM_CAVIUM) += cavium-rng.o cavium-rng-vf.o
-> diff --git a/drivers/char/hw_random/cavium-rng-vf.c b/drivers/char/hw_random/cavium-rng-vf.c
-> new file mode 100644
-> index 0000000..8e80bce
-> --- /dev/null
-> +++ b/drivers/char/hw_random/cavium-rng-vf.c
-> @@ -0,0 +1,102 @@
-> +/*
-> + * Hardware Random Number Generator support for Cavium, Inc.
-> + * Thunder processor family.
-> + *
-> + * This file is subject to the terms and conditions of the GNU General Public
-> + * License.  See the file "COPYING" in the main directory of this archive
-> + * for more details.
-> + *
-> + * Copyright (C) 2016 Cavium, Inc.
-> + */
-> +#include <linux/module.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/device.h>
-> +#include <linux/hw_random.h>
-> +#include <linux/io.h>
-> +#include <linux/pci_ids.h>
-> +#include <linux/gfp.h>
-> +#include <linux/pci.h>
-> +#include <linux/init.h>
-
-Please alphabetize headers, and check if there are necessary, clearly platform_device.h is unnecessary.
-
-> +
-> +struct cavium_rng {
-> +	struct hwrng ops;
-> +	void __iomem *result;
-> +};
-> +
-> +/* Read data from the RNG unit */
-> +static int cavium_rng_read(struct hwrng *rng, void *dat, size_t max, bool wait)
-> +{
-> +	struct cavium_rng *p = container_of(rng, struct cavium_rng, ops);
-> +	unsigned int size = max;
-> +
-> +	while (size >= 8) {
-> +		*((u64 *)dat) = readq(p->result);
-> +		size -= 8;
-> +		dat += 8;
-> +	}
-> +	while (size > 0) {
-> +		*((u8 *)dat) = readb(p->result);
-> +		size--;
-> +		dat++;
-> +	}
-> +	return max;
-> +}
-> +
-> +/* Map Cavium RNG to an HWRNG object */
-> +static int cavium_rng_probe_vf(struct	pci_dev		*pdev,
-> +			 const struct	pci_device_id	*id)
-> +{
-> +	struct	cavium_rng *rng;
-> +	int	ret;
-> +
-> +	rng = devm_kzalloc(&pdev->dev, sizeof(*rng), GFP_KERNEL);
-> +	if (!rng)
-> +		return -ENOMEM;
-> +
-> +	/* Map the RNG result */
-> +	rng->result = pcim_iomap(pdev, 0, 0);
-> +	if (!rng->result) {
-> +		dev_err(&pdev->dev, "Error iomap failed retrieving result.\n");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	rng->ops.name    = "cavium rng";
-> +	rng->ops.read    = cavium_rng_read;
-> +	rng->ops.quality = 1000;
-> +
-> +	pci_set_drvdata(pdev, rng);
-> +
-> +	ret = hwrng_register(&rng->ops);
-> +	if (ret) {
-> +		dev_err(&pdev->dev, "Error registering device as HWRNG.\n");
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +/* Remove the VF */
-> +void  cavium_rng_remove_vf(struct pci_dev *pdev)
-> +{
-> +	struct cavium_rng *rng;
-> +
-> +	rng = pci_get_drvdata(pdev);
-> +	hwrng_unregister(&rng->ops);
-> +}
-> +
-> +static const struct pci_device_id cavium_rng_vf_id_table[] = {
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, 0xa033), 0, 0, 0},
-> +	{0,},
-> +};
-> +MODULE_DEVICE_TABLE(pci, cavium_rng_vf_id_table);
-> +
-> +static struct pci_driver cavium_rng_vf_driver = {
-> +	.name		= "cavium_rng_vf",
-> +	.id_table	= cavium_rng_vf_id_table,
-> +	.probe		= cavium_rng_probe_vf,
-> +	.remove		= cavium_rng_remove_vf,
-> +};
-> +module_pci_driver(cavium_rng_vf_driver);
-> +
-> +MODULE_AUTHOR("Omer Khaliq");
-
-You could add your email address.
-
-> +MODULE_LICENSE("GPL");
-> diff --git a/drivers/char/hw_random/cavium-rng.c b/drivers/char/hw_random/cavium-rng.c
-> new file mode 100644
-> index 0000000..7f09ee4
-> --- /dev/null
-> +++ b/drivers/char/hw_random/cavium-rng.c
-> @@ -0,0 +1,103 @@
-> +/*
-> + * Hardware Random Number Generator support for Cavium Inc.
-> + * Thunder processor family.
-> + *
-> + * This file is subject to the terms and conditions of the GNU General Public
-> + * License.  See the file "COPYING" in the main directory of this archive
-> + * for more details.
-> + *
-> + * Copyright (C) 2016 Cavium, Inc.
-> + */
-> +
-> +#include <linux/module.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/device.h>
-> +#include <linux/hw_random.h>
-> +#include <linux/io.h>
-> +#include <linux/pci_ids.h>
-> +#include <linux/gfp.h>
-> +#include <linux/pci.h>
-> +#include <linux/init.h>
-> +#include <linux/pci-ats.h>
-
-Same comment for headers
-
-> +
-> +#define THUNDERX_RNM_ENT_EN     0x1
-> +#define THUNDERX_RNM_RNG_EN     0x2
-> +
-> +struct cavium_rng_pf {
-> +	void __iomem *control_status;
-> +};
-> +
-> +
-
-Do you have run checkpatch.pl ?
-No more than one blank line.
-
-> +/* Enable the RNG hardware and activate the VF */
-> +static int cavium_rng_probe(struct pci_dev *pdev,
-> +				 const struct pci_device_id *id)
-> +{
-> +	struct	cavium_rng_pf *rng;
-> +	int	iov_err;
-> +
-> +
-
-Same problem
-
-> +	rng = devm_kzalloc(&pdev->dev, sizeof(*rng), GFP_KERNEL);
-> +	if (!rng)
-> +		return -ENOMEM;
-> +
-> +	/*Map the RNG control */
-> +	rng->control_status = pcim_iomap(pdev, 0, 0);
-> +	if (!rng->control_status) {
-> +		dev_err(&pdev->dev,
-> +			"Error iomap failed retrieving control_status.\n");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	/* Enable the RNG hardware and entropy source */
-> +	writeq(THUNDERX_RNM_RNG_EN | THUNDERX_RNM_ENT_EN,
-> +		rng->control_status);
-> +
-> +	pci_set_drvdata(pdev, rng);
-> +
-> +	/* Fix for improper link id reported for cn88XX */
-> +	if (pdev->subsystem_device == 0xa118)
-> +		pci_sriov_fdl_override(pdev, pdev->devfn);
-> +
-> +	/* Enable the Cavium RNG as a VF */
-> +	iov_err = pci_enable_sriov(pdev, 1);
-> +	if (iov_err != 0) {
-> +		dev_err(&pdev->dev,
-> +			"Error initializing RNG virtual function,(%i).\n",
-> +			iov_err);
-> +		return iov_err;
-
-You return without disabling the RNG
-
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +/* Disable VF and RNG Hardware */
-> +void  cavium_rng_remove(struct pci_dev *pdev)
-> +{
-> +	struct cavium_rng_pf *rng;
-> +
-> +	rng = pci_get_drvdata(pdev);
-> +
-> +	/* Remove the VF */
-> +	pci_disable_sriov(pdev);
-> +
-> +	/* Disable the RNG hardware and entropy source */
-> +	writeq(0, rng->control_status);
-> +}
-> +
-> +static const struct pci_device_id cavium_rng_pf_id_table[] = {
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, 0xa018), 0, 0, 0}, /* Thunder RNM */
-> +	{0,},
-> +};
-> +
-> +MODULE_DEVICE_TABLE(pci, cavium_rng_pf_id_table);
-> +
-> +static struct pci_driver cavium_rng_pf_driver = {
-> +	.name		= "cavium_rng_pf",
-> +	.id_table	= cavium_rng_pf_id_table,
-> +	.probe		= cavium_rng_probe,
-> +	.remove		= cavium_rng_remove,
-> +};
-> +
-> +module_pci_driver(cavium_rng_pf_driver);
-> +MODULE_AUTHOR("Omer Khaliq");
-> +MODULE_LICENSE("GPL");
-> 
-
-Regards
+>  /**
+>   * struct mv_cesa_tdma_desc - TDMA descriptor
+> @@ -393,7 +393,7 @@ struct mv_cesa_dev_dma {
+>  	struct dma_pool *op_pool;
+>  	struct dma_pool *cache_pool;
+>  	struct dma_pool *padding_pool;
+> -	struct dma_pool *iv_pool;
+> +	struct dma_pool *result_pool;
+>  };
+>  
+>  /**
+> @@ -839,7 +839,7 @@ mv_cesa_tdma_desc_iter_init(struct mv_cesa_tdma_chain *chain)
+>  	memset(chain, 0, sizeof(*chain));
+>  }
+>  
+> -int mv_cesa_dma_add_iv_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
+> +int mv_cesa_dma_add_result_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
+>  			  u32 size, u32 flags, gfp_t gfp_flags);
+>  
+>  struct mv_cesa_op_ctx *mv_cesa_dma_add_op(struct mv_cesa_tdma_chain *chain,
+> diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
+> index d19dc96..bd575b1 100644
+> --- a/drivers/crypto/marvell/cipher.c
+> +++ b/drivers/crypto/marvell/cipher.c
+> @@ -373,7 +373,7 @@ static int mv_cesa_ablkcipher_dma_req_init(struct ablkcipher_request *req,
+>  
+>  	/* Add output data for IV */
+>  	ivsize = crypto_ablkcipher_ivsize(crypto_ablkcipher_reqtfm(req));
+> -	ret = mv_cesa_dma_add_iv_op(&basereq->chain, CESA_SA_CRYPT_IV_SRAM_OFFSET,
+> +	ret = mv_cesa_dma_add_result_op(&basereq->chain, CESA_SA_CRYPT_IV_SRAM_OFFSET,
+>  				    ivsize, CESA_TDMA_SRC_IN_SRAM, flags);
+>  
+>  	if (ret)
+> diff --git a/drivers/crypto/marvell/tdma.c b/drivers/crypto/marvell/tdma.c
+> index 9fd7a5f..499a1d3 100644
+> --- a/drivers/crypto/marvell/tdma.c
+> +++ b/drivers/crypto/marvell/tdma.c
+> @@ -69,8 +69,8 @@ void mv_cesa_dma_cleanup(struct mv_cesa_req *dreq)
+>  		if (type == CESA_TDMA_OP)
+>  			dma_pool_free(cesa_dev->dma->op_pool, tdma->op,
+>  				      le32_to_cpu(tdma->src));
+> -		else if (type == CESA_TDMA_IV)
+> -			dma_pool_free(cesa_dev->dma->iv_pool, tdma->data,
+> +		else if (type == CESA_TDMA_RESULT)
+> +			dma_pool_free(cesa_dev->dma->result_pool, tdma->data,
+>  				      le32_to_cpu(tdma->dst));
+>  
+>  		tdma = tdma->next;
+> @@ -209,29 +209,29 @@ mv_cesa_dma_add_desc(struct mv_cesa_tdma_chain *chain, gfp_t flags)
+>  	return new_tdma;
+>  }
+>  
+> -int mv_cesa_dma_add_iv_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
+> +int mv_cesa_dma_add_result_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
+>  			  u32 size, u32 flags, gfp_t gfp_flags)
+>  {
+>  
+>  	struct mv_cesa_tdma_desc *tdma;
+> -	u8 *iv;
+> +	u8 *result;
+>  	dma_addr_t dma_handle;
+>  
+>  	tdma = mv_cesa_dma_add_desc(chain, gfp_flags);
+>  	if (IS_ERR(tdma))
+>  		return PTR_ERR(tdma);
+>  
+> -	iv = dma_pool_alloc(cesa_dev->dma->iv_pool, gfp_flags, &dma_handle);
+> -	if (!iv)
+> +	result = dma_pool_alloc(cesa_dev->dma->result_pool, gfp_flags, &dma_handle);
+> +	if (!result)
+>  		return -ENOMEM;
+>  
+>  	tdma->byte_cnt = cpu_to_le32(size | BIT(31));
+>  	tdma->src = src;
+>  	tdma->dst = cpu_to_le32(dma_handle);
+> -	tdma->data = iv;
+> +	tdma->data = result;
+>  
+>  	flags &= (CESA_TDMA_DST_IN_SRAM | CESA_TDMA_SRC_IN_SRAM);
+> -	tdma->flags = flags | CESA_TDMA_IV;
+> +	tdma->flags = flags | CESA_TDMA_RESULT;
+>  	return 0;
+>  }
+>  
