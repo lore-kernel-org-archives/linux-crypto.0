@@ -1,58 +1,33 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: [PATCH] hw_random: omap3-rom-rng.c: Remove obsoleted functions
-Date: Sat, 20 Aug 2016 21:31:06 +0530
-Message-ID: <1471708866-1423-1-git-send-email-prasannatsmkumar@gmail.com>
-Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-To: linux-crypto@vger.kernel.org, aaro.koskinen@iki.fi,
-        mpm@selenic.com, herbert@gondor.apana.org.au,
-        linux-kernel@vger.kernel.org
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH -next] crypto: drbg - fix error return code
+Date: Sat, 20 Aug 2016 21:13:26 +0200
+Message-ID: <16945364.yku3VmKOzu@positron.chronox.de>
+References: <1471705611-19309-1-git-send-email-weiyj.lk@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+To: Wei Yongjun <weiyj.lk@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f68.google.com ([209.85.220.68]:33961 "EHLO
-        mail-pa0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753142AbcHTQEF (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 20 Aug 2016 12:04:05 -0400
+Received: from mail.eperm.de ([89.247.134.16]:37138 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751510AbcHTTNe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 20 Aug 2016 15:13:34 -0400
+In-Reply-To: <1471705611-19309-1-git-send-email-weiyj.lk@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Remove omap3_rom_rng_data_present method as it was returning 1 always.
-Use .read callback instead of .data_read callback. This avoids use of
-obsolete callbacks.
+Am Samstag, 20. August 2016, 15:06:51 CEST schrieb Wei Yongjun:
 
-This patch is not tested with hardware as I don't have access to it.
+Hi Wei,
 
-Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
----
- drivers/char/hw_random/omap3-rom-rng.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+> Fix to return a negative error code from the error handling
+> case instead of 0.
+> 
+> Signed-off-by: Wei Yongjun <weiyj.lk@gmail.com>
 
-diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
-index 8da14f1..37a58d7 100644
---- a/drivers/char/hw_random/omap3-rom-rng.c
-+++ b/drivers/char/hw_random/omap3-rom-rng.c
-@@ -71,12 +71,7 @@ static int omap3_rom_rng_get_random(void *buf, unsigned int count)
- 	return 0;
- }
- 
--static int omap3_rom_rng_data_present(struct hwrng *rng, int wait)
--{
--	return 1;
--}
--
--static int omap3_rom_rng_data_read(struct hwrng *rng, u32 *data)
-+static int omap3_rom_rng_read(struct hwrng *rng, void *data, size_t max, bool w)
- {
- 	int r;
- 
-@@ -88,8 +83,7 @@ static int omap3_rom_rng_data_read(struct hwrng *rng, u32 *data)
- 
- static struct hwrng omap3_rom_rng_ops = {
- 	.name		= "omap3-rom",
--	.data_present	= omap3_rom_rng_data_present,
--	.data_read	= omap3_rom_rng_data_read,
-+	.read		= omap3_rom_rng_read,
- };
- 
- static int omap3_rom_rng_probe(struct platform_device *pdev)
--- 
-2.5.0
+Acked-by: Stephan Mueller <smueller@chronox.de>
+
+Ciao
+Stephan
