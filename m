@@ -1,72 +1,44 @@
-From: Jeffrey Walton <noloader@gmail.com>
-Subject: Entropy sources (was: /dev/random - a new approach)
-Date: Sun, 21 Aug 2016 01:37:29 -0400
-Message-ID: <CAH8yC8nZyAZT2OiRXgT=CBfQ4RSw-E1uZaQvKuQZ9BDYuPmGvA@mail.gmail.com>
-Reply-To: noloader@gmail.com
+From: Robert David <clarkraymond377@gmail.com>
+Subject: Attention Beneficially
+Date: Sun, 21 Aug 2016 06:38:45 +0000 (UTC)
+Message-ID: <855696991.417467.1471761525032__19118.4282572523$1471762204$gmane$org@mail.yahoo.com>
+References: <855696991.417467.1471761525032.ref@mail.yahoo.com>
+Reply-To: Robert David <dhlservicesbenindhl@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: "H. Peter Anvin" <hpa@linux.intel.com>
+Content-Transfer-Encoding: 7bit
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f195.google.com ([209.85.223.195]:36800 "EHLO
-        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751573AbcHUFhb (ORCPT
+Received: from nm33-vm0.bullet.mail.ne1.yahoo.com ([98.138.229.64]:57633 "EHLO
+        nm33-vm0.bullet.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751676AbcHUGt4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Aug 2016 01:37:31 -0400
+        Sun, 21 Aug 2016 02:49:56 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 19, 2016 at 1:20 PM, H. Peter Anvin <hpa@linux.intel.com> wrote:
-> On 08/18/16 22:56, Herbert Xu wrote:
->> On Thu, Aug 18, 2016 at 10:49:47PM -0400, Theodore Ts'o wrote:
->>>
->>> That really depends on the system.  We can't assume that people are
->>> using systems with a 100Hz clock interrupt.  More often than not
->>> people are using tickless kernels these days.  That's actually the
->>> problem with changing /dev/urandom to block until things are
->>> initialized.
->>
->> Couldn't we disable tickless until urandom has been seeded? In fact
->> perhaps we should accelerate the timer interrupt rate until it has
->> been seeded?
->>
->
-> The biggest problem there is that the timer interrupt adds *no* entropy
-> unless there is a source of asynchronicity in the system.  On PCs,
-> traditionally the timer has been run from a completely different crystal
-> (14.31818 MHz) than the CPU, which is the ideal situation, but if they
-> are run off the same crystal and run in lockstep, there is very little
-> if anything there.  On some systems, the timer may even *be* the only
-> source of time, and the entropy truly is zero.
 
-It seems like a networked computer should have an abundance on entropy
-available from the network stack. Every common case I can come up with
-includes a networked computer. If a handheld is outside of coverage,
-then it probably does not have the randomness demands because it can't
-communicate (i.e., TCP sequence numbers, key agreement, etc).
 
-In fact, there are at least two papers that use bits from the network stack:
+Attention Beneficially
 
-* When Good Randomness Goes Bad: Virtual Machine Reset Vulnerabilities
-and Hedging Deployed Cryptography,
-http://pages.cs.wisc.edu/~rist/papers/sslhedge.pdf
-* When Virtual is Harder than Real: Security Challenges in Virtual
-Machine Based Computing Environments,
-http://www.usenix.org/legacy/event/hotos05/final_papers/full_papers/garfinkel/garfinkel.pdf
 
-As IoT gains traction the entropy available locally should increase
-because these devices are chatty. I also expect gossip protocols to
-play more of a role in the future. A network based attacker cannot
-possibly monitor every conversation, especially when devices pair and
-form adhoc networks. The network attacker probably won't see the
-traffic on a local LAN segment either for headless servers.
+WESTERN UNION
 
-When using network bits, it seems like the remaining problem is
-extracting the entropy. I think Krawczyk (et al) have done a lot of
-work in this area:
+This is very urgent Our Operation manager has sent your first payment of $5000.00 to you. Here is what we need from you to complete the
+transfer, Your Name, Your Address,A Copy Of Your ID and Your Telephone Number: Noted That Only Fee Request from You Is to
+Reactivate Transfer Files which is Sum Of $65Only, No More Fee again after that.
+Western Union Agent: Mr. Peterson Godwin
+Direct phone line is: + 229 98782817
+E-mail ::(westernunion8087@gmail.com)
 
-* Leftover Hash Lemma, Revisited, http://eprint.iacr.org/2011/088.pdf
-* Cryptographic Extraction and Key Derivation: The HKDF Scheme,
-http://eprint.iacr.org/2010/264.pdf
+Bellow is your first payment for $5000usd sent today in your name.
+Sender Name: Mr. 
+MTCN: 
+Question
+Answer
+Amount Sent: $5000.00
 
-Jeff
+You can use this link to confirm the payment,
+
+Best Regards,
+Mr.Joseph Ezo
