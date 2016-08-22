@@ -1,8 +1,8 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v1 01/28] kvm: svm: Add support for additional SVM NPF
- error codes
-Date: Mon, 22 Aug 2016 19:23:44 -0400
-Message-ID: <147190822443.9523.7814744422402462127.stgit__43469.155036337$1471909238$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v1 09/28] x86/efi: Access EFI data as encrypted when SEV
+ is active
+Date: Mon, 22 Aug 2016 19:25:25 -0400
+Message-ID: <147190832511.9523.10850626471583956499.stgit__14603.2141209163$1471909246$gmane$org@brijesh-build-machine>
 References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -23,135 +23,76 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <mathieu.desnoyers@efficios.com>, <devel@linuxdriverproject.org>,
         <tglx@linutronix.de>, <mchehab@kernel.or
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0044.outbound.protection.outlook.com ([104.47.37.44]:53664
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+Received: from mail-co1nam03on0081.outbound.protection.outlook.com ([104.47.40.81]:58142
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1756876AbcHVXj0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Aug 2016 19:39:26 -0400
+        id S1756969AbcHVXkc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Aug 2016 19:40:32 -0400
 In-Reply-To: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-AMD hardware adds two additional bits to aid in nested page fault handling.
-
-Bit 32 - NPF occurred while translating the guest's final physical address
-Bit 33 - NPF occurred while translating the guest page tables
-
-The guest page tables fault indicator can be used as an aid for nested
-virtualization. Using V0 for the host, V1 for the first level guest and
-V2 for the second level guest, when both V1 and V2 are using nested paging
-there are currently a number of unnecessary instruction emulations. When
-V2 is launched shadow paging is used in V1 for the nested tables of V2. As
-a result, KVM marks these pages as RO in the host nested page tables. When
-V2 exits and we resume V1, these pages are still marked RO.
-
-Every nested walk for a guest page table is treated as a user-level write
-access and this causes a lot of NPFs because the V1 page tables are marked
-RO in the V0 nested tables. While executing V1, when these NPFs occur KVM
-sees a write to a read-only page, emulates the V1 instruction and unprotects
-the page (marking it RW). This patch looks for cases where we get a NPF due
-to a guest page table walk where the page was marked RO. It immediately
-unprotects the page and resumes the guest, leading to far fewer instruction
-emulations when nested virtualization is used.
+EFI data is encrypted when the kernel is run under SEV. Update the
+page table references to be sure the EFI memory areas are accessed
+encrypted.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/include/asm/kvm_host.h |   11 ++++++++++-
- arch/x86/kvm/mmu.c              |   20 ++++++++++++++++++--
- arch/x86/kvm/svm.c              |    2 +-
- 3 files changed, 29 insertions(+), 4 deletions(-)
+ arch/x86/platform/efi/efi_64.c |   14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c51c1cb..3f05d36 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -191,6 +191,8 @@ enum {
- #define PFERR_RSVD_BIT 3
- #define PFERR_FETCH_BIT 4
- #define PFERR_PK_BIT 5
-+#define PFERR_GUEST_FINAL_BIT 32
-+#define PFERR_GUEST_PAGE_BIT 33
+diff --git a/arch/x86/platform/efi/efi_64.c b/arch/x86/platform/efi/efi_64.c
+index 0871ea4..98363f3 100644
+--- a/arch/x86/platform/efi/efi_64.c
++++ b/arch/x86/platform/efi/efi_64.c
+@@ -213,7 +213,7 @@ void efi_sync_low_kernel_mappings(void)
  
- #define PFERR_PRESENT_MASK (1U << PFERR_PRESENT_BIT)
- #define PFERR_WRITE_MASK (1U << PFERR_WRITE_BIT)
-@@ -198,6 +200,13 @@ enum {
- #define PFERR_RSVD_MASK (1U << PFERR_RSVD_BIT)
- #define PFERR_FETCH_MASK (1U << PFERR_FETCH_BIT)
- #define PFERR_PK_MASK (1U << PFERR_PK_BIT)
-+#define PFERR_GUEST_FINAL_MASK (1ULL << PFERR_GUEST_FINAL_BIT)
-+#define PFERR_GUEST_PAGE_MASK (1ULL << PFERR_GUEST_PAGE_BIT)
-+
-+#define PFERR_NESTED_GUEST_PAGE (PFERR_GUEST_PAGE_MASK |	\
-+				 PFERR_USER_MASK |		\
-+				 PFERR_WRITE_MASK |		\
-+				 PFERR_PRESENT_MASK)
- 
- /* apic attention bits */
- #define KVM_APIC_CHECK_VAPIC	0
-@@ -1203,7 +1212,7 @@ void kvm_vcpu_deactivate_apicv(struct kvm_vcpu *vcpu);
- 
- int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
- 
--int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t gva, u32 error_code,
-+int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t gva, u64 error_code,
- 		       void *insn, int insn_len);
- void kvm_mmu_invlpg(struct kvm_vcpu *vcpu, gva_t gva);
- void kvm_mmu_new_cr3(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index a7040f4..3b47a5d 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -4512,7 +4512,7 @@ static void make_mmu_pages_available(struct kvm_vcpu *vcpu)
- 	kvm_mmu_commit_zap_page(vcpu->kvm, &invalid_list);
- }
- 
--int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t cr2, u32 error_code,
-+int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t cr2, u64 error_code,
- 		       void *insn, int insn_len)
+ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
  {
- 	int r, emulation_type = EMULTYPE_RETRY;
-@@ -4531,12 +4531,28 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t cr2, u32 error_code,
- 			return r;
- 	}
+-	unsigned long pfn, text;
++	unsigned long pfn, text, flags;
+ 	efi_memory_desc_t *md;
+ 	struct page *page;
+ 	unsigned npages;
+@@ -230,6 +230,10 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
+ 	efi_scratch.efi_pgt = (pgd_t *)__sme_pa(efi_pgd);
+ 	pgd = efi_pgd;
  
--	r = vcpu->arch.mmu.page_fault(vcpu, cr2, error_code, false);
-+	r = vcpu->arch.mmu.page_fault(vcpu, cr2, lower_32_bits(error_code),
-+				      false);
- 	if (r < 0)
- 		return r;
- 	if (!r)
++	flags = _PAGE_NX | _PAGE_RW;
++	if (sev_active)
++		flags |= _PAGE_ENC;
++
+ 	/*
+ 	 * It can happen that the physical address of new_memmap lands in memory
+ 	 * which is not mapped in the EFI page table. Therefore we need to go
+@@ -237,7 +241,7 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
+ 	 * phys_efi_set_virtual_address_map().
+ 	 */
+ 	pfn = pa_memmap >> PAGE_SHIFT;
+-	if (kernel_map_pages_in_pgd(pgd, pfn, pa_memmap, num_pages, _PAGE_NX | _PAGE_RW)) {
++	if (kernel_map_pages_in_pgd(pgd, pfn, pa_memmap, num_pages, flags)) {
+ 		pr_err("Error ident-mapping new memmap (0x%lx)!\n", pa_memmap);
  		return 1;
+ 	}
+@@ -302,6 +306,9 @@ static void __init __map_region(efi_memory_desc_t *md, u64 va)
+ 	if (!(md->attribute & EFI_MEMORY_WB))
+ 		flags |= _PAGE_PCD;
  
-+	/*
-+	 * Before emulating the instruction, check if the error code
-+	 * was due to a RO violation while translating the guest page.
-+	 * This can occur when using nested virtualization with nested
-+	 * paging in both guests. If true, we simply unprotect the page
-+	 * and resume the guest.
-+	 *
-+	 * Note: AMD only (since it supports the PFERR_GUEST_PAGE_MASK used
-+	 *       in PFERR_NEXT_GUEST_PAGE)
-+	 */
-+	if (error_code == PFERR_NESTED_GUEST_PAGE) {
-+		kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(cr2));
-+		return 1;
-+	}
++	if (sev_active)
++		flags |= _PAGE_ENC;
 +
- 	if (mmio_info_in_cache(vcpu, cr2, direct))
- 		emulation_type = 0;
- emulate:
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 1e6b84b..d8b9c8c 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -1935,7 +1935,7 @@ static void svm_set_dr7(struct kvm_vcpu *vcpu, unsigned long value)
- static int pf_interception(struct vcpu_svm *svm)
- {
- 	u64 fault_address = svm->vmcb->control.exit_info_2;
--	u32 error_code;
-+	u64 error_code;
- 	int r = 1;
+ 	pfn = md->phys_addr >> PAGE_SHIFT;
+ 	if (kernel_map_pages_in_pgd(pgd, pfn, va, md->num_pages, flags))
+ 		pr_warn("Error mapping PA 0x%llx -> VA 0x%llx!\n",
+@@ -426,6 +433,9 @@ void __init efi_runtime_update_mappings(void)
+ 			(md->type != EFI_RUNTIME_SERVICES_CODE))
+ 			pf |= _PAGE_RW;
  
- 	switch (svm->apf_reason) {
++		if (sev_active)
++			pf |= _PAGE_ENC;
++
+ 		/* Update the 1:1 mapping */
+ 		pfn = md->phys_addr >> PAGE_SHIFT;
+ 		if (kernel_map_pages_in_pgd(pgd, pfn, md->phys_addr, md->num_pages, pf))
