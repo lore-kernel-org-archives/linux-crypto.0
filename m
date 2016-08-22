@@ -1,8 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v1 04/28] x86: Secure Encrypted Virtualization (SEV)
- support
-Date: Mon, 22 Aug 2016 19:24:19 -0400
-Message-ID: <147190825949.9523.11406635622434950066.stgit__15258.8529549123$1471909804$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v1 12/28] x86: DMA support for SEV memory encryption
+Date: Mon, 22 Aug 2016 19:26:02 -0400
+Message-ID: <147190836254.9523.17071309814378405604.stgit__4649.86898373372$1471909846$gmane$org@brijesh-build-machine>
 References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -23,10 +22,10 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <mathieu.desnoyers@efficios.com>, <devel@linuxdriverproject.org>,
         <tglx@linutronix.de>, <mchehab@kernel.or
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0054.outbound.protection.outlook.com ([104.47.42.54]:58815
+Received: from mail-by2nam03on0048.outbound.protection.outlook.com ([104.47.42.48]:45664
         "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754177AbcHVXtv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1754221AbcHVXtv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 22 Aug 2016 19:49:51 -0400
 In-Reply-To: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
@@ -34,71 +33,81 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Provide support for Secure Encyrpted Virtualization (SEV). This initial
-support defines the SEV active flag in order for the kernel to determine
-if it is running with SEV active or not.
+DMA access to memory mapped as encrypted while SEV is active can not be
+encrypted during device write or decrypted during device read. In order
+for DMA to properly work when SEV is active, the swiotlb bounce buffers
+must be used.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/include/asm/mem_encrypt.h |    3 +++
- arch/x86/kernel/mem_encrypt.S      |    8 ++++++++
- arch/x86/kernel/x8664_ksyms_64.c   |    1 +
- 3 files changed, 12 insertions(+)
+ arch/x86/mm/mem_encrypt.c |   48 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/arch/x86/include/asm/mem_encrypt.h b/arch/x86/include/asm/mem_encrypt.h
-index e395729..9c592d1 100644
---- a/arch/x86/include/asm/mem_encrypt.h
-+++ b/arch/x86/include/asm/mem_encrypt.h
-@@ -20,6 +20,7 @@
- #ifdef CONFIG_AMD_MEM_ENCRYPT
- 
- extern unsigned long sme_me_mask;
-+extern unsigned int sev_active;
- 
- u8 sme_get_me_loss(void);
- 
-@@ -50,6 +51,8 @@ void swiotlb_set_mem_dec(void *vaddr, unsigned long size);
- 
- #define sme_me_mask		0UL
- 
-+#define sev_active		0
+diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
+index 1154353..ce6e3ea 100644
+--- a/arch/x86/mm/mem_encrypt.c
++++ b/arch/x86/mm/mem_encrypt.c
+@@ -173,8 +173,52 @@ void __init sme_early_init(void)
+ 	/* Update the protection map with memory encryption mask */
+ 	for (i = 0; i < ARRAY_SIZE(protection_map); i++)
+ 		protection_map[i] = __pgprot(pgprot_val(protection_map[i]) | sme_me_mask);
 +
- static inline u8 sme_get_me_loss(void)
++	if (sev_active)
++		swiotlb_force = 1;
+ }
+ 
++static void *sme_alloc(struct device *dev, size_t size, dma_addr_t *dma_handle,
++		       gfp_t gfp, unsigned long attrs)
++{
++	void *vaddr;
++
++	vaddr = x86_swiotlb_alloc_coherent(dev, size, dma_handle, gfp, attrs);
++	if (!vaddr)
++		return NULL;
++
++	/* Clear the SME encryption bit for DMA use */
++	sme_set_mem_dec(vaddr, size);
++
++	/* Remove the encryption bit from the DMA address */
++	*dma_handle &= ~sme_me_mask;
++
++	return vaddr;
++}
++
++static void sme_free(struct device *dev, size_t size, void *vaddr,
++		     dma_addr_t dma_handle, unsigned long attrs)
++{
++	/* Set the SME encryption bit for re-use as encrypted */
++	sme_set_mem_enc(vaddr, size);
++
++	x86_swiotlb_free_coherent(dev, size, vaddr, dma_handle, attrs);
++}
++
++static struct dma_map_ops sme_dma_ops = {
++	.alloc                  = sme_alloc,
++	.free                   = sme_free,
++	.map_page               = swiotlb_map_page,
++	.unmap_page             = swiotlb_unmap_page,
++	.map_sg                 = swiotlb_map_sg_attrs,
++	.unmap_sg               = swiotlb_unmap_sg_attrs,
++	.sync_single_for_cpu    = swiotlb_sync_single_for_cpu,
++	.sync_single_for_device = swiotlb_sync_single_for_device,
++	.sync_sg_for_cpu        = swiotlb_sync_sg_for_cpu,
++	.sync_sg_for_device     = swiotlb_sync_sg_for_device,
++	.mapping_error          = swiotlb_dma_mapping_error,
++};
++
+ /* Architecture __weak replacement functions */
+ void __init mem_encrypt_init(void)
  {
- 	return 0;
-diff --git a/arch/x86/kernel/mem_encrypt.S b/arch/x86/kernel/mem_encrypt.S
-index bf9f6a9..6a8cd18 100644
---- a/arch/x86/kernel/mem_encrypt.S
-+++ b/arch/x86/kernel/mem_encrypt.S
-@@ -96,6 +96,10 @@ ENDPROC(sme_enable)
+@@ -184,6 +228,10 @@ void __init mem_encrypt_init(void)
+ 	/* Make SWIOTLB use an unencrypted DMA area */
+ 	swiotlb_clear_encryption();
  
- ENTRY(sme_encrypt_kernel)
- #ifdef CONFIG_AMD_MEM_ENCRYPT
-+	/* If SEV is active then the kernel is already encrypted */
-+	cmpl	$0, sev_active(%rip)
-+	jnz	.Lencrypt_exit
++	/* Use SEV DMA operations if SEV is active */
++	if (sev_active)
++		dma_ops = &sme_dma_ops;
 +
- 	/* If SME is not active then no need to encrypt the kernel */
- 	cmpq	$0, sme_me_mask(%rip)
- 	jz	.Lencrypt_exit
-@@ -334,6 +338,10 @@ sme_me_loss:
- 	.byte	0x00
- 	.align	8
+ 	pr_info("memory encryption active\n");
+ }
  
-+ENTRY(sev_active)
-+	.word	0x00000000
-+	.align	8
-+
- mem_encrypt_enable_option:
- 	.asciz "mem_encrypt=on"
- 	.align	8
-diff --git a/arch/x86/kernel/x8664_ksyms_64.c b/arch/x86/kernel/x8664_ksyms_64.c
-index 651c4c8..14bfc0b 100644
---- a/arch/x86/kernel/x8664_ksyms_64.c
-+++ b/arch/x86/kernel/x8664_ksyms_64.c
-@@ -88,4 +88,5 @@ EXPORT_SYMBOL(___preempt_schedule_notrace);
- #ifdef CONFIG_AMD_MEM_ENCRYPT
- EXPORT_SYMBOL_GPL(sme_me_mask);
- EXPORT_SYMBOL_GPL(sme_get_me_loss);
-+EXPORT_SYMBOL_GPL(sev_active);
- #endif
