@@ -1,7 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v1 24/28] KVM: SVM: add SEV_LAUNCH_FINISH command
-Date: Mon, 22 Aug 2016 19:28:59 -0400
-Message-ID: <147190853894.9523.16890031242057232592.stgit__466.749692759727$1471908578$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v1 27/28] KVM: SVM: add KVM_SEV_DEBUG_ENCRYPT command
+Date: Mon, 22 Aug 2016 19:29:35 -0400
+Message-ID: <147190857531.9523.10196506226671736370.stgit@brijesh-build-machine>
 References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -22,116 +22,138 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <mathieu.desnoyers@efficios.com>, <devel@linuxdriverproject.org>,
         <tglx@linutronix.de>, <mchehab@kernel.or
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0064.outbound.protection.outlook.com ([104.47.38.64]:22364
+Received: from mail-bl2nam02on0078.outbound.protection.outlook.com ([104.47.38.78]:32289
         "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753111AbcHVX3I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Aug 2016 19:29:08 -0400
+        id S932578AbcHVX3o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Aug 2016 19:29:44 -0400
 In-Reply-To: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The command is used for finializing the guest launch into SEV mode.
+The command encrypts a region of guest memory for debugging purposes.
 
-For more information see [1], section 6.3
+For more information see [1], section 7.2
 
 [1] http://support.amd.com/TechDocs/55766_SEV-KM%20API_Spec.pdf
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/kvm/svm.c |   78 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
+ arch/x86/kvm/svm.c |  100 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 100 insertions(+)
 
 diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index c78bdc6..60cc0f7 100644
+index b383bc7..4af195d 100644
 --- a/arch/x86/kvm/svm.c
 +++ b/arch/x86/kvm/svm.c
-@@ -5497,6 +5497,79 @@ err_1:
+@@ -5684,6 +5684,101 @@ err_1:
  	return ret;
  }
-  
-+static int sev_launch_finish(struct kvm *kvm,
-+			     struct kvm_sev_launch_finish __user *argp,
-+			     int *psp_ret)
+ 
++static int sev_dbg_encrypt(struct kvm *kvm,
++			   struct kvm_sev_dbg_encrypt __user *argp,
++			   int *psp_ret)
 +{
-+	int i, ret;
-+	void *mask = NULL;
-+	int buffer_len, len;
-+	struct kvm_vcpu *vcpu;
-+	struct psp_data_launch_finish *finish;
-+	struct kvm_sev_launch_finish params;
++	void *data;
++	int len, ret, d_off;
++	struct page **inpages;
++	struct psp_data_dbg *encrypt;
++	struct kvm_sev_dbg_encrypt debug;
++	unsigned long src_addr, dst_addr;
 +
 +	if (!kvm_sev_guest())
-+		return -EINVAL;
++		return -ENOTTY;
 +
-+	/* Get the parameters from the user */
-+	if (copy_from_user(&params, argp, sizeof(*argp)))
++	if (copy_from_user(&debug, argp, sizeof(*argp)))
 +		return -EFAULT;
 +
-+	buffer_len = sizeof(*finish) + (sizeof(u64) * params.vcpu_count);
-+	finish = kzalloc(buffer_len, GFP_KERNEL);
-+	if (!finish)
++	if (debug.length > PAGE_SIZE)
++		return -EINVAL;
++
++	len = debug.length;
++	src_addr = debug.src_addr;
++	dst_addr = debug.dst_addr;
++
++	inpages = kzalloc(1 * sizeof(struct page *), GFP_KERNEL);
++	if (!inpages)
 +		return -ENOMEM;
 +
-+	/* copy the vcpu mask from user */
-+	if (params.vcpu_mask_length && params.vcpu_mask_addr) {
-+		ret = -ENOMEM;
-+		mask = (void *) get_zeroed_page(GFP_KERNEL);
-+		if (!mask)
-+			goto err_1;
++	/* pin the guest destination virtual address */
++	down_read(&current->mm->mmap_sem);
++	ret = get_user_pages(dst_addr, 1, 1, 0, inpages, NULL);
++	up_read(&current->mm->mmap_sem);
++	if (ret < 0)
++		goto err_1;
 +
-+		len = min_t(size_t, PAGE_SIZE, params.vcpu_mask_length);
-+		ret = -EFAULT;
-+		if (copy_from_user(mask, (uint8_t*)params.vcpu_mask_addr, len))
-+			goto err_2;
-+		finish->vcpus.state_mask_addr = __psp_pa(mask);
-+	}
-+
-+	finish->handle = kvm_sev_handle();
-+	finish->hdr.buffer_len = buffer_len;
-+	finish->vcpus.state_count = params.vcpu_count;
-+	finish->vcpus.state_length = params.vcpu_length;
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		finish->vcpus.state_addr[i] =
-+					to_svm(vcpu)->vmcb_pa | sme_me_mask;
-+		if (i == params.vcpu_count)
-+			break;
-+	}
-+
-+	/* launch finish */
-+	ret = psp_guest_launch_finish(finish, psp_ret);
-+	if (ret) {
-+		printk(KERN_ERR "SEV: LAUNCH_FINISH ret=%d (%#010x)\n",
-+			ret, *psp_ret);
++	encrypt = kzalloc(sizeof(*encrypt), GFP_KERNEL);
++	if (!encrypt)
 +		goto err_2;
++
++	data = (void *) get_zeroed_page(GFP_KERNEL);
++	if (!data)
++		goto err_3;
++
++	encrypt->hdr.buffer_len = sizeof(*encrypt);
++	encrypt->handle = kvm_sev_handle();
++
++	if ((len & 15) || (dst_addr & 15)) {
++		/* if destination address and length are not 16-byte
++		 * aligned then:
++		 * a) decrypt destination page into temporary buffer
++		 * b) copy source data into temporary buffer at correct offset
++		 * c) encrypt temporary buffer
++		 */
++		ret = __sev_dbg_decrypt_page(kvm, dst_addr, data, psp_ret);
++		if (ret)
++			goto err_4;
++
++		d_off = dst_addr & (PAGE_SIZE - 1);
++		ret = -EFAULT;
++		if (copy_from_user(data + d_off,
++					(uint8_t *)debug.src_addr, len))
++			goto err_4;
++
++		encrypt->length = PAGE_SIZE;
++		encrypt->src_addr = __pa(data) | sme_me_mask;
++		encrypt->dst_addr =  __sev_page_pa(inpages[0]);
++	} else {
++		if (copy_from_user(data, (uint8_t *)debug.src_addr, len))
++			goto err_4;
++
++		d_off = dst_addr & (PAGE_SIZE - 1);
++		encrypt->length = len;
++		encrypt->src_addr = __pa(data) | sme_me_mask;
++		encrypt->dst_addr = __sev_page_pa(inpages[0]);
++		encrypt->dst_addr += d_off;
 +	}
 +
-+	/* Iterate through each vcpus and set SEV KVM_SEV_FEATURE bit in
-+	 * KVM_CPUID_FEATURE to indicate that SEV is enabled on this vcpu
-+	 */
-+	kvm_for_each_vcpu(i, vcpu, kvm)
-+		svm_cpuid_update(vcpu);
++	ret = psp_dbg_encrypt(encrypt, psp_ret);
++	if (ret)
++		printk(KERN_ERR "SEV: DEBUG_ENCRYPT: [%#lx=>%#lx+%#x] "
++			"%d (%#010x)\n",src_addr, dst_addr, len,
++			ret, *psp_ret);
 +
-+	/* copy the measurement for user */
-+	if (copy_to_user(argp->measurement, finish->measurement, 32))
-+		ret = -EFAULT;
-+
++err_4:
++	free_page((unsigned long)data);
++err_3:
++	kfree(encrypt);
 +err_2:
-+	free_page((unsigned long)mask);
++	release_pages(inpages, 1, 0);
 +err_1:
-+	kfree(finish);
++	kfree(inpages);
++
 +	return ret;
 +}
 +
  static int amd_sev_issue_cmd(struct kvm *kvm,
  			     struct kvm_sev_issue_cmd __user *user_data)
  {
-@@ -5517,6 +5590,11 @@ static int amd_sev_issue_cmd(struct kvm *kvm,
+@@ -5719,6 +5814,11 @@ static int amd_sev_issue_cmd(struct kvm *kvm,
  					&arg.ret_code);
  		break;
  	}
-+	case KVM_SEV_LAUNCH_FINISH: {
-+		r = sev_launch_finish(kvm, (void *)arg.opaque,
++	case KVM_SEV_DBG_ENCRYPT: {
++		r = sev_dbg_encrypt(kvm, (void *)arg.opaque,
 +					&arg.ret_code);
 +		break;
 +	}
