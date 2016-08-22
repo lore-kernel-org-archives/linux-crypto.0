@@ -1,185 +1,237 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v1 00/28] x86: Secure Encrypted Virtualization (AMD)
-Date: Mon, 22 Aug 2016 19:21:52 -0400
-Message-ID: <147190811185.9268.8427842212955719186.stgit@brijesh-build-machine>
+Subject: [RFC PATCH v1 21/28] KVM: introduce KVM_SEV_ISSUE_CMD ioctl
+Date: Mon, 22 Aug 2016 19:28:17 -0400
+Message-ID: <147190849706.9523.17127624683768628621.stgit__2461.02315509251$1471908548$gmane$org@brijesh-build-machine>
+References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-To: <kvm@vger.kernel.org>, <rkrcmar@redhat.com>, <matt@codeblueprint.co.uk>,
-	<linus.walleij@linaro.org>, <linux-mm@kvack.org>,
-	<paul.gortmaker@windriver.com>, <hpa@zytor.com>, <dan.j.williams@intel.com>,
-	<aarcange@redhat.com>, <sfr@canb.auug.org.au>,
-	<andriy.shevchenko@linux.intel.com>, <herbert@gondor.apana.org.au>,
-	<bhe@redhat.com>, <xemul@parallels.com>, <joro@8bytes.org>, <x86@kernel.org>,
-	<mingo@redhat.com>, <labbott@fedoraproject.org--to=linux-efi>,
-	<msalter@redhat.com>, <ross.zwisler@linux.intel.com>, <bp@suse.de>,
-	<dyoung@redhat.com>, <thomas.lendacky@amd.com>, <jroedel@suse.de>,
-	<keescook@chromium.org>, <toshi.kani@hpe.com>,
-	<mathieu.desnoyers@efficios.com>, <devel@linuxdriverproject.org>,
-	<tglx@linutronix.de>, <mchehab@kernel.org>, <iamjoonsoo.kim@lge.com>,
-	<simon.guinot@sequanux.org>, <tony.luck@intel.com>,
-	<alexandre.bounine@idt.com>, <kuleshovmail@gmail.com>,
-	<
-Return-path: <owner-linux-mm@kvack.org>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
+        <brijesh.singh@amd.com>, <kvm@vger.kernel.org>,
+        <rkrcmar@redhat.com>, <matt@codeblueprint.co.uk>,
+        <linus.walleij@linaro.org>, <linux-mm@kvack.org>,
+        <paul.gortmaker@windriver.com>, <hpa@zytor.com>,
+        <dan.j.williams@intel.com>, <aarcange@redhat.com>,
+        <sfr@canb.auug.org.au>, <andriy.shevchenko@linux.intel.com>,
+        <herbert@gondor.apana.org.au>, <bhe@redhat.com>,
+        <xemul@parallels.com>, <joro@8bytes.org>, <x86@kernel.org>,
+        <mingo@redhat.com>, <msalter@redhat.com>,
+        <ross.zwisler@linux.intel.com>, <bp@suse.de>, <dyoung@redhat.com>,
+        <thomas.lendacky@amd.com>, <jroedel@suse.de>,
+        <keescook@chromium.org>, <toshi.kani@hpe.com>,
+        <mathieu.desnoyers@efficios.com>, <devel@linuxdriverproject.org>,
+        <tglx@linutronix.de>, <mchehab@kernel.or
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-cys01nam02on0047.outbound.protection.outlook.com ([104.47.37.47]:59383
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S932193AbcHVX20 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Aug 2016 19:28:26 -0400
+In-Reply-To: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This RFC series provides support for AMD's new Secure Encrypted 
-Virtualization (SEV) feature. This RFC is build upon Secure Memory 
-Encryption (SME) RFC.
+The ioctl will be used by qemu to issue the Secure Encrypted
+Virtualization (SEV) guest commands to transition a guest into
+into SEV-enabled mode.
 
-SEV is an extension to the AMD-V architecture which supports running 
-multiple VMs under the control of a hypervisor. When enabled, SEV 
-hardware tags all code and data with its VM ASID which indicates which 
-VM the data originated from or is intended for. This tag is kept with 
-the data at all times when inside the SOC, and prevents that data from 
-being used by anyone other than the owner. While the tag protects VM 
-data inside the SOC, AES with 128 bit encryption protects data outside 
-the SOC. When data leaves or enters the SOC, it is encrypted/decrypted 
-respectively by hardware with a key based on the associated tag.
+a typical usage:
 
-SEV guest VMs have the concept of private and shared memory.  Private memory
-is encrypted with the  guest-specific key, while shared memory may be encrypted
-with hypervisor key.  Certain types of memory (namely instruction pages and
-guest page tables) are always treated as private memory by the hardware.
-For data memory, SEV guest VMs can choose which pages they would like to
-be private. The choice is done using the standard CPU page tables using
-the C-bit, and is fully controlled by the guest. Due to security reasons
-all the DMA operations inside the  guest must be performed on shared pages
-(C-bit clear).  Note that since C-bit is only controllable by the guest OS
-when it is operating in 64-bit or 32-bit PAE mode, in all other modes the
-SEV hardware forces the C-bit to a 1.
+struct kvm_sev_launch_start start;
+struct kvm_sev_issue_cmd data;
 
-SEV is designed to protect guest VMs from a benign but vulnerable
-(i.e. not fully malicious) hypervisor. In particular, it reduces the attack
-surface of guest VMs and can prevent certain types of VM-escape bugs
-(e.g. hypervisor read-anywhere) from being used to steal guest data.
+data.cmd = KVM_SEV_LAUNCH_START;
+data.opaque = &start;
 
-The RFC series also includes a crypto driver (psp.ko) which communicates
-with SEV firmware that runs within the AMD secure processor provides a
-secure key management interfaces. The hypervisor uses this interface to 
-enable SEV for secure guest and perform common hypervisor activities
-such as launching, running, snapshotting , migrating and debugging a 
-guest. A new ioctl (KVM_SEV_ISSUE_CMD) is introduced which will enable
-Qemu to send commands to the SEV firmware during guest life cycle.
+ret = ioctl(fd, KVM_SEV_ISSUE_CMD, &data);
 
-The RFC series also includes patches required in guest OS to enable SEV 
-feature. A guest OS can check SEV support by calling KVM_FEATURE cpuid 
-instruction.
+On SEV command failure, data.ret_code will contain the firmware error code.
 
-The following links provide additional details:
-
-AMD Memory Encryption whitepaper:
- 
-http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
-
-AMD64 Architecture Programmer's Manual:
-    http://support.amd.com/TechDocs/24593.pdf
-    SME is section 7.10
-    SEV is section 15.34
-
-Secure Encrypted Virutualization Key Management:
-http://support.amd.com/TechDocs/55766_SEV-KM API_Spec.pdf
-
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
+ arch/x86/include/asm/kvm_host.h |    3 +
+ arch/x86/kvm/x86.c              |   13 ++++
+ include/uapi/linux/kvm.h        |  125 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 141 insertions(+)
 
-TODO:
-- send qemu/seabios RFC's on respective mailing list
-- integrate the psp driver with CCP driver (they share the PCI id's)
-- add SEV guest migration command support
-- add SEV snapshotting command support
-- determine how to do ioremap of physical memory with mem encryption enabled
-  (e.g acpi tables)
-- determine how to share the guest memory with hypervisor for to support
-  pvclock driver
-
-Brijesh Singh (11):
-      crypto: add AMD Platform Security Processor driver
-      KVM: SVM: prepare to reserve asid for SEV guest
-      KVM: SVM: prepare for SEV guest management API support
-      KVM: introduce KVM_SEV_ISSUE_CMD ioctl
-      KVM: SVM: add SEV launch start command
-      KVM: SVM: add SEV launch update command
-      KVM: SVM: add SEV_LAUNCH_FINISH command
-      KVM: SVM: add KVM_SEV_GUEST_STATUS command
-      KVM: SVM: add KVM_SEV_DEBUG_DECRYPT command
-      KVM: SVM: add KVM_SEV_DEBUG_ENCRYPT command
-      KVM: SVM: add command to query SEV API version
-
-Tom Lendacky (17):
-      kvm: svm: Add support for additional SVM NPF error codes
-      kvm: svm: Add kvm_fast_pio_in support
-      kvm: svm: Use the hardware provided GPA instead of page walk
-      x86: Secure Encrypted Virtualization (SEV) support
-      KVM: SVM: prepare for new bit definition in nested_ctl
-      KVM: SVM: Add SEV feature definitions to KVM
-      x86: Do not encrypt memory areas if SEV is enabled
-      Access BOOT related data encrypted with SEV active
-      x86/efi: Access EFI data as encrypted when SEV is active
-      x86: Change early_ioremap to early_memremap for BOOT data
-      x86: Don't decrypt trampoline area if SEV is active
-      x86: DMA support for SEV memory encryption
-      iommu/amd: AMD IOMMU support for SEV
-      x86: Don't set the SME MSR bit when SEV is active
-      x86: Unroll string I/O when SEV is active
-      x86: Add support to determine if running with SEV enabled
-      KVM: SVM: Enable SEV by setting the SEV_ENABLE cpu feature
-
-
- arch/x86/boot/compressed/Makefile      |    2 
- arch/x86/boot/compressed/head_64.S     |   19 +
- arch/x86/boot/compressed/mem_encrypt.S |  123 ++++
- arch/x86/include/asm/io.h              |   26 +
- arch/x86/include/asm/kvm_emulate.h     |    3 
- arch/x86/include/asm/kvm_host.h        |   27 +
- arch/x86/include/asm/mem_encrypt.h     |    3 
- arch/x86/include/asm/svm.h             |    3 
- arch/x86/include/uapi/asm/hyperv.h     |    4 
- arch/x86/include/uapi/asm/kvm_para.h   |    4 
- arch/x86/kernel/acpi/boot.c            |    4 
- arch/x86/kernel/head64.c               |    4 
- arch/x86/kernel/mem_encrypt.S          |   44 ++
- arch/x86/kernel/mpparse.c              |   10 
- arch/x86/kernel/setup.c                |    7 
- arch/x86/kernel/x8664_ksyms_64.c       |    1 
- arch/x86/kvm/cpuid.c                   |    4 
- arch/x86/kvm/mmu.c                     |   20 +
- arch/x86/kvm/svm.c                     |  906 ++++++++++++++++++++++++++++++++
- arch/x86/kvm/x86.c                     |   73 +++
- arch/x86/mm/ioremap.c                  |    7 
- arch/x86/mm/mem_encrypt.c              |   50 ++
- arch/x86/platform/efi/efi_64.c         |   14 
- arch/x86/realmode/init.c               |   11 
- drivers/crypto/Kconfig                 |   11 
- drivers/crypto/Makefile                |    1 
- drivers/crypto/psp/Kconfig             |    8 
- drivers/crypto/psp/Makefile            |    3 
- drivers/crypto/psp/psp-dev.c           |  220 ++++++++
- drivers/crypto/psp/psp-dev.h           |   95 +++
- drivers/crypto/psp/psp-ops.c           |  454 ++++++++++++++++
- drivers/crypto/psp/psp-pci.c           |  376 +++++++++++++
- drivers/sfi/sfi_core.c                 |    6 
- include/linux/ccp-psp.h                |  833 +++++++++++++++++++++++++++++
- include/uapi/linux/Kbuild              |    1 
- include/uapi/linux/ccp-psp.h           |  182 ++++++
- include/uapi/linux/kvm.h               |  125 ++++
- 37 files changed, 3643 insertions(+), 41 deletions(-)
- create mode 100644 arch/x86/boot/compressed/mem_encrypt.S
- create mode 100644 drivers/crypto/psp/Kconfig
- create mode 100644 drivers/crypto/psp/Makefile
- create mode 100644 drivers/crypto/psp/psp-dev.c
- create mode 100644 drivers/crypto/psp/psp-dev.h
- create mode 100644 drivers/crypto/psp/psp-ops.c
- create mode 100644 drivers/crypto/psp/psp-pci.c
- create mode 100644 include/linux/ccp-psp.h
- create mode 100644 include/uapi/linux/ccp-psp.h
-
--- 
-
-Brijesh Singh
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 9b885fc..a94e37d 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1040,6 +1040,9 @@ struct kvm_x86_ops {
+ 	void (*cancel_hv_timer)(struct kvm_vcpu *vcpu);
+ 
+ 	void (*setup_mce)(struct kvm_vcpu *vcpu);
++
++	int (*sev_issue_cmd)(struct kvm *kvm,
++			     struct kvm_sev_issue_cmd __user *argp);
+ };
+ 
+ struct kvm_arch_async_pf {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d6f2f4b..0c0adad 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3820,6 +3820,15 @@ split_irqchip_unlock:
+ 	return r;
+ }
+ 
++static int kvm_vm_ioctl_sev_issue_cmd(struct kvm *kvm,
++				      struct kvm_sev_issue_cmd __user *argp)
++{
++	if (kvm_x86_ops->sev_issue_cmd)
++		return kvm_x86_ops->sev_issue_cmd(kvm, argp);
++
++	return -ENOTTY;
++}
++
+ long kvm_arch_vm_ioctl(struct file *filp,
+ 		       unsigned int ioctl, unsigned long arg)
+ {
+@@ -4085,6 +4094,10 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 		r = kvm_vm_ioctl_enable_cap(kvm, &cap);
+ 		break;
+ 	}
++	case KVM_SEV_ISSUE_CMD: {
++		r = kvm_vm_ioctl_sev_issue_cmd(kvm, argp);
++		break;
++	}
+ 	default:
+ 		r = kvm_vm_ioctl_assigned_device(kvm, ioctl, arg);
+ 	}
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 300ef25..72c18c3 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1274,6 +1274,131 @@ struct kvm_s390_ucas_mapping {
+ /* Available with KVM_CAP_X86_SMM */
+ #define KVM_SMI                   _IO(KVMIO,   0xb7)
+ 
++/* Secure Encrypted Virtualization mode */
++enum sev_cmd {
++	KVM_SEV_LAUNCH_START = 0,
++	KVM_SEV_LAUNCH_UPDATE,
++	KVM_SEV_LAUNCH_FINISH,
++	KVM_SEV_GUEST_STATUS,
++	KVM_SEV_DBG_DECRYPT,
++	KVM_SEV_DBG_ENCRYPT,
++	KVM_SEV_RECEIVE_START,
++	KVM_SEV_RECEIVE_UPDATE,
++	KVM_SEV_RECEIVE_FINISH,
++	KVM_SEV_SEND_START,
++	KVM_SEV_SEND_UPDATE,
++	KVM_SEV_SEND_FINISH,
++	KVM_SEV_API_VERSION,
++	KVM_SEV_NR_MAX,
++};
++
++struct kvm_sev_issue_cmd {
++	__u32 cmd;
++	__u64 opaque;
++	__u32 ret_code;
++};
++
++struct kvm_sev_launch_start {
++	__u32 handle;
++	__u32 flags;
++	__u32 policy;
++	__u8 nonce[16];
++	__u8 dh_pub_qx[32];
++	__u8 dh_pub_qy[32];
++};
++
++struct kvm_sev_launch_update {
++	__u64	address;
++	__u32	length;
++};
++
++struct kvm_sev_launch_finish {
++	__u32 vcpu_count;
++	__u32 vcpu_length;
++	__u64 vcpu_mask_addr;
++	__u32 vcpu_mask_length;
++	__u8  measurement[32];
++};
++
++struct kvm_sev_guest_status {
++	__u32 policy;
++	__u32 state;
++};
++
++struct kvm_sev_dbg_decrypt {
++	__u64 src_addr;
++	__u64 dst_addr;
++	__u32 length;
++};
++
++struct kvm_sev_dbg_encrypt {
++	__u64 src_addr;
++	__u64 dst_addr;
++	__u32 length;
++};
++
++struct kvm_sev_receive_start {
++	__u32 handle;
++	__u32 flags;
++	__u32 policy;
++	__u8 policy_meas[32];
++	__u8 wrapped_tek[24];
++	__u8 wrapped_tik[24];
++	__u8 ten[16];
++	__u8 dh_pub_qx[32];
++	__u8 dh_pub_qy[32];
++	__u8 nonce[16];
++};
++
++struct kvm_sev_receive_update {
++	__u8 iv[16];
++	__u64 address;
++	__u32 length;
++};
++
++struct kvm_sev_receive_finish {
++	__u8 measurement[32];
++};
++
++struct kvm_sev_send_start {
++	__u8 nonce[16];
++	__u32 policy;
++	__u8 policy_meas[32];
++	__u8 wrapped_tek[24];
++	__u8 wrapped_tik[24];
++	__u8 ten[16];
++	__u8 iv[16];
++	__u32 flags;
++	__u8 api_major;
++	__u8 api_minor;
++	__u32 serial;
++	__u8 dh_pub_qx[32];
++	__u8 dh_pub_qy[32];
++	__u8 pek_sig_r[32];
++	__u8 pek_sig_s[32];
++	__u8 cek_sig_r[32];
++	__u8 cek_sig_s[32];
++	__u8 cek_pub_qx[32];
++	__u8 cek_pub_qy[32];
++	__u8 ask_sig_r[32];
++	__u8 ask_sig_s[32];
++	__u32 ncerts;
++	__u32 cert_length;
++	__u64 certs_addr;
++};
++
++struct kvm_sev_send_update {
++	__u32 length;
++	__u64 src_addr;
++	__u64 dst_addr;
++};
++
++struct kvm_sev_send_finish {
++	__u8 measurement[32];
++};
++
++#define KVM_SEV_ISSUE_CMD	_IOWR(KVMIO, 0xb8, struct kvm_sev_issue_cmd)
++
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+ #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+ #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
