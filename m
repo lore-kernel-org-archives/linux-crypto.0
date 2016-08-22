@@ -1,43 +1,45 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH 6/7] random: make /dev/urandom scalable for silly
- userspace programs
-Date: Sun, 21 Aug 2016 07:36:52 -0400
-Message-ID: <20160821113652.y7r3uhdxymcon2zx@thunk.org>
-References: <1465832919-11316-1-git-send-email-tytso@mit.edu>
- <1465832919-11316-7-git-send-email-tytso@mit.edu>
- <CABSDX40G2V9w-OfGU7xP06V5qkreq89CmdaJDc89b-2EskhCQg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, smueller@chronox.de,
-        herbert@gondor.apana.org.au, andi@firstfloor.org,
-        sandyinchina@gmail.com, jsd@av8n.com, hpa@zytor.com
-To: Jan Varho <jan.varho@gmail.com>
+From: Fabio Estevam <festevam@gmail.com>
+Subject: [PATCH] crypto: mxc-scc - check clk_prepare_enable() error
+Date: Sun, 21 Aug 2016 23:37:27 -0300
+Message-ID: <1471833447-11446-1-git-send-email-festevam@gmail.com>
+Cc: s.trumtrar@pengutronix.de, linux-crypto@vger.kernel.org,
+        Fabio Estevam <fabio.estevam@nxp.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:49380 "EHLO imap.thunk.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751694AbcHULhr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Aug 2016 07:37:47 -0400
-Content-Disposition: inline
-In-Reply-To: <CABSDX40G2V9w-OfGU7xP06V5qkreq89CmdaJDc89b-2EskhCQg@mail.gmail.com>
+Received: from mail-qk0-f196.google.com ([209.85.220.196]:36237 "EHLO
+        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753501AbcHVCiG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 21 Aug 2016 22:38:06 -0400
+Received: by mail-qk0-f196.google.com with SMTP id v123so7796686qkh.3
+        for <linux-crypto@vger.kernel.org>; Sun, 21 Aug 2016 19:38:06 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Aug 21, 2016 at 12:53:15PM +0300, Jan Varho wrote:
-> On Mon, Jun 13, 2016 at 6:48 PM, Theodore Ts'o <tytso@mit.edu> wrote:
-> > +static inline void maybe_reseed_primary_crng(void)
-> > +{
-> > +       if (crng_init > 2 &&
-> > +           time_after(jiffies, primary_crng.init_time + CRNG_RESEED_INTERVAL))
-> > +               crng_reseed(&primary_crng, &input_pool);
-> > +}
-> 
-> Is the above function (which is now in 4.8-rc2) supposed to do
-> something? It seems to have no callers and the maximum value of
-> crng_init is 2.
+From: Fabio Estevam <fabio.estevam@nxp.com>
 
-It's dead code.  Its function got moved into _extra_crng(), and you're
-right, these days crng_init never gets above 2.  Thanks for pointing
-that out.  I'll take it out as a cleanup patch.
+clk_prepare_enable() may fail, so we should better check its return
+value and propagate it in the case of failure.
 
-     	   	     	       	 	 - Ted
+Signed-off-by: Fabio Estevam <fabio.estevam@nxp.com>
+---
+ drivers/crypto/mxc-scc.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/mxc-scc.c b/drivers/crypto/mxc-scc.c
+index ff383ef..ee4be1b0 100644
+--- a/drivers/crypto/mxc-scc.c
++++ b/drivers/crypto/mxc-scc.c
+@@ -668,7 +668,9 @@ static int mxc_scc_probe(struct platform_device *pdev)
+ 		return PTR_ERR(scc->clk);
+ 	}
+ 
+-	clk_prepare_enable(scc->clk);
++	ret = clk_prepare_enable(scc->clk);
++	if (ret)
++		return ret;
+ 
+ 	/* clear error status register */
+ 	writel(0x0, scc->base + SCC_SCM_ERROR_STATUS);
+-- 
+1.9.1
