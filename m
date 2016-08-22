@@ -1,8 +1,8 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v1 03/28] kvm: svm: Use the hardware provided GPA
- instead of page walk
-Date: Mon, 22 Aug 2016 19:24:07 -0400
-Message-ID: <147190824754.9523.13923968456167130181.stgit__25312.3562819839$1471909219$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v1 01/28] kvm: svm: Add support for additional SVM NPF
+ error codes
+Date: Mon, 22 Aug 2016 19:23:44 -0400
+Message-ID: <147190822443.9523.7814744422402462127.stgit__43469.155036337$1471909238$gmane$org@brijesh-build-machine>
 References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -23,108 +23,135 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <mathieu.desnoyers@efficios.com>, <devel@linuxdriverproject.org>,
         <tglx@linutronix.de>, <mchehab@kernel.or
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0059.outbound.protection.outlook.com ([104.47.41.59]:2944
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+Received: from mail-cys01nam02on0044.outbound.protection.outlook.com ([104.47.37.44]:53664
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1756869AbcHVXjX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Aug 2016 19:39:23 -0400
+        id S1756876AbcHVXj0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Aug 2016 19:39:26 -0400
 In-Reply-To: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-When a guest causes a NPF which requires emulation, KVM sometimes walks
-the guest page tables to translate the GVA to a GPA. This is unnecessary
-most of the time on AMD hardware since the hardware provides the GPA in
-EXITINFO2.
+AMD hardware adds two additional bits to aid in nested page fault handling.
 
-The only exception cases involve string operations involving rep or
-operations that use two memory locations. With rep, the GPA will only be
-the value of the initial NPF and with dual memory locations we won't know
-which memory address was translated into EXITINFO2.
+Bit 32 - NPF occurred while translating the guest's final physical address
+Bit 33 - NPF occurred while translating the guest page tables
+
+The guest page tables fault indicator can be used as an aid for nested
+virtualization. Using V0 for the host, V1 for the first level guest and
+V2 for the second level guest, when both V1 and V2 are using nested paging
+there are currently a number of unnecessary instruction emulations. When
+V2 is launched shadow paging is used in V1 for the nested tables of V2. As
+a result, KVM marks these pages as RO in the host nested page tables. When
+V2 exits and we resume V1, these pages are still marked RO.
+
+Every nested walk for a guest page table is treated as a user-level write
+access and this causes a lot of NPFs because the V1 page tables are marked
+RO in the V0 nested tables. While executing V1, when these NPFs occur KVM
+sees a write to a read-only page, emulates the V1 instruction and unprotects
+the page (marking it RW). This patch looks for cases where we get a NPF due
+to a guest page table walk where the page was marked RO. It immediately
+unprotects the page and resumes the guest, leading to far fewer instruction
+emulations when nested virtualization is used.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/include/asm/kvm_emulate.h |    3 +++
- arch/x86/include/asm/kvm_host.h    |    3 +++
- arch/x86/kvm/svm.c                 |    2 ++
- arch/x86/kvm/x86.c                 |   17 ++++++++++++++++-
- 4 files changed, 24 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm_host.h |   11 ++++++++++-
+ arch/x86/kvm/mmu.c              |   20 ++++++++++++++++++--
+ arch/x86/kvm/svm.c              |    2 +-
+ 3 files changed, 29 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
-index e9cd7be..2d1ac09 100644
---- a/arch/x86/include/asm/kvm_emulate.h
-+++ b/arch/x86/include/asm/kvm_emulate.h
-@@ -344,6 +344,9 @@ struct x86_emulate_ctxt {
- 	struct read_cache mem_read;
- };
- 
-+/* String operation identifier (matches the definition in emulate.c) */
-+#define CTXT_STRING_OP	(1 << 13)
-+
- /* Repeat String Operation Prefix */
- #define REPE_PREFIX	0xf3
- #define REPNE_PREFIX	0xf2
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c38f878..b1dd673 100644
+index c51c1cb..3f05d36 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -667,6 +667,9 @@ struct kvm_vcpu_arch {
+@@ -191,6 +191,8 @@ enum {
+ #define PFERR_RSVD_BIT 3
+ #define PFERR_FETCH_BIT 4
+ #define PFERR_PK_BIT 5
++#define PFERR_GUEST_FINAL_BIT 32
++#define PFERR_GUEST_PAGE_BIT 33
  
- 	int pending_ioapic_eoi;
- 	int pending_external_vector;
+ #define PFERR_PRESENT_MASK (1U << PFERR_PRESENT_BIT)
+ #define PFERR_WRITE_MASK (1U << PFERR_WRITE_BIT)
+@@ -198,6 +200,13 @@ enum {
+ #define PFERR_RSVD_MASK (1U << PFERR_RSVD_BIT)
+ #define PFERR_FETCH_MASK (1U << PFERR_FETCH_BIT)
+ #define PFERR_PK_MASK (1U << PFERR_PK_BIT)
++#define PFERR_GUEST_FINAL_MASK (1ULL << PFERR_GUEST_FINAL_BIT)
++#define PFERR_GUEST_PAGE_MASK (1ULL << PFERR_GUEST_PAGE_BIT)
 +
-+	/* GPA available (AMD only) */
-+	bool gpa_available;
- };
++#define PFERR_NESTED_GUEST_PAGE (PFERR_GUEST_PAGE_MASK |	\
++				 PFERR_USER_MASK |		\
++				 PFERR_WRITE_MASK |		\
++				 PFERR_PRESENT_MASK)
  
- struct kvm_lpage_info {
+ /* apic attention bits */
+ #define KVM_APIC_CHECK_VAPIC	0
+@@ -1203,7 +1212,7 @@ void kvm_vcpu_deactivate_apicv(struct kvm_vcpu *vcpu);
+ 
+ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
+ 
+-int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t gva, u32 error_code,
++int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t gva, u64 error_code,
+ 		       void *insn, int insn_len);
+ void kvm_mmu_invlpg(struct kvm_vcpu *vcpu, gva_t gva);
+ void kvm_mmu_new_cr3(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index a7040f4..3b47a5d 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -4512,7 +4512,7 @@ static void make_mmu_pages_available(struct kvm_vcpu *vcpu)
+ 	kvm_mmu_commit_zap_page(vcpu->kvm, &invalid_list);
+ }
+ 
+-int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t cr2, u32 error_code,
++int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t cr2, u64 error_code,
+ 		       void *insn, int insn_len)
+ {
+ 	int r, emulation_type = EMULTYPE_RETRY;
+@@ -4531,12 +4531,28 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t cr2, u32 error_code,
+ 			return r;
+ 	}
+ 
+-	r = vcpu->arch.mmu.page_fault(vcpu, cr2, error_code, false);
++	r = vcpu->arch.mmu.page_fault(vcpu, cr2, lower_32_bits(error_code),
++				      false);
+ 	if (r < 0)
+ 		return r;
+ 	if (!r)
+ 		return 1;
+ 
++	/*
++	 * Before emulating the instruction, check if the error code
++	 * was due to a RO violation while translating the guest page.
++	 * This can occur when using nested virtualization with nested
++	 * paging in both guests. If true, we simply unprotect the page
++	 * and resume the guest.
++	 *
++	 * Note: AMD only (since it supports the PFERR_GUEST_PAGE_MASK used
++	 *       in PFERR_NEXT_GUEST_PAGE)
++	 */
++	if (error_code == PFERR_NESTED_GUEST_PAGE) {
++		kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(cr2));
++		return 1;
++	}
++
+ 	if (mmio_info_in_cache(vcpu, cr2, direct))
+ 		emulation_type = 0;
+ emulate:
 diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index fd5a9a8..9b2de7c 100644
+index 1e6b84b..d8b9c8c 100644
 --- a/arch/x86/kvm/svm.c
 +++ b/arch/x86/kvm/svm.c
-@@ -4055,6 +4055,8 @@ static int handle_exit(struct kvm_vcpu *vcpu)
+@@ -1935,7 +1935,7 @@ static void svm_set_dr7(struct kvm_vcpu *vcpu, unsigned long value)
+ static int pf_interception(struct vcpu_svm *svm)
+ {
+ 	u64 fault_address = svm->vmcb->control.exit_info_2;
+-	u32 error_code;
++	u64 error_code;
+ 	int r = 1;
  
- 	trace_kvm_exit(exit_code, vcpu, KVM_ISA_SVM);
- 
-+	vcpu->arch.gpa_available = (exit_code == SVM_EXIT_NPF);
-+
- 	if (!is_cr_intercept(svm, INTERCEPT_CR0_WRITE))
- 		vcpu->arch.cr0 = svm->vmcb->save.cr0;
- 	if (npt_enabled)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 78295b0..d6f2f4b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4382,7 +4382,19 @@ static int vcpu_mmio_gva_to_gpa(struct kvm_vcpu *vcpu, unsigned long gva,
- 		return 1;
- 	}
- 
--	*gpa = vcpu->arch.walk_mmu->gva_to_gpa(vcpu, gva, access, exception);
-+	/*
-+	 * If the exit was due to a NPF we may already have a GPA.
-+	 * If the GPA is present, use it to avoid the GVA to GPA table
-+	 * walk. Note, this cannot be used on string operations since
-+	 * string operation using rep will only have the initial GPA
-+	 * from when the NPF occurred.
-+	 */
-+	if (vcpu->arch.gpa_available &&
-+	    !(vcpu->arch.emulate_ctxt.d & CTXT_STRING_OP))
-+		*gpa = exception->address;
-+	else
-+		*gpa = vcpu->arch.walk_mmu->gva_to_gpa(vcpu, gva, access,
-+						       exception);
- 
- 	if (*gpa == UNMAPPED_GVA)
- 		return -1;
-@@ -5504,6 +5516,9 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
- 	}
- 
- restart:
-+	/* Save the faulting GPA (cr2) in the address field */
-+	ctxt->exception.address = cr2;
-+
- 	r = x86_emulate_insn(ctxt);
- 
- 	if (r == EMULATION_INTERCEPTED)
+ 	switch (svm->apf_reason) {
