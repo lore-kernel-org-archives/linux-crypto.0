@@ -1,8 +1,8 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v1 10/28] x86: Change early_ioremap to early_memremap
- for BOOT data
-Date: Mon, 22 Aug 2016 19:25:38 -0400
-Message-ID: <147190833861.9523.18034166650487702869.stgit__49244.2541443326$1471910452$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v1 11/28] x86: Don't decrypt trampoline area if SEV is
+ active
+Date: Mon, 22 Aug 2016 19:25:51 -0400
+Message-ID: <147190835102.9523.9786544054464015663.stgit__42481.2495163225$1471910452$gmane$org@brijesh-build-machine>
 References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -26,109 +26,41 @@ Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from mail-by2nam01on0044.outbound.protection.outlook.com ([104.47.34.44]:60832
         "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1756458AbcHVX7y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Aug 2016 19:59:54 -0400
+        id S1755358AbcHVX7w (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Aug 2016 19:59:52 -0400
 In-Reply-To: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
+When Secure Encrypted Virtualization is active instruction fetches are
+always interpreted as being from encrypted memory so the trampoline area
+must remain encrypted when SEV is active.
+
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/kernel/acpi/boot.c |    4 ++--
- arch/x86/kernel/mpparse.c   |   10 +++++-----
- drivers/sfi/sfi_core.c      |    6 +++---
- 3 files changed, 10 insertions(+), 10 deletions(-)
+ arch/x86/realmode/init.c |    9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kernel/acpi/boot.c b/arch/x86/kernel/acpi/boot.c
-index 1ad5fe2..4622ea2 100644
---- a/arch/x86/kernel/acpi/boot.c
-+++ b/arch/x86/kernel/acpi/boot.c
-@@ -120,7 +120,7 @@ char *__init __acpi_map_table(unsigned long phys, unsigned long size)
- 	if (!phys || !size)
- 		return NULL;
- 
--	return early_ioremap(phys, size);
-+	return early_memremap(phys, size, BOOT_DATA);
- }
- 
- void __init __acpi_unmap_table(char *map, unsigned long size)
-@@ -128,7 +128,7 @@ void __init __acpi_unmap_table(char *map, unsigned long size)
- 	if (!map || !size)
- 		return;
- 
--	early_iounmap(map, size);
-+	early_memunmap(map, size);
- }
- 
- #ifdef CONFIG_X86_LOCAL_APIC
-diff --git a/arch/x86/kernel/mpparse.c b/arch/x86/kernel/mpparse.c
-index 0f8d204..04def9f 100644
---- a/arch/x86/kernel/mpparse.c
-+++ b/arch/x86/kernel/mpparse.c
-@@ -436,9 +436,9 @@ static unsigned long __init get_mpc_size(unsigned long physptr)
- 	struct mpc_table *mpc;
- 	unsigned long size;
- 
--	mpc = early_ioremap(physptr, PAGE_SIZE);
-+	mpc = early_memremap(physptr, PAGE_SIZE, BOOT_DATA);
- 	size = mpc->length;
--	early_iounmap(mpc, PAGE_SIZE);
-+	early_memunmap(mpc, PAGE_SIZE);
- 	apic_printk(APIC_VERBOSE, "  mpc: %lx-%lx\n", physptr, physptr + size);
- 
- 	return size;
-@@ -450,7 +450,7 @@ static int __init check_physptr(struct mpf_intel *mpf, unsigned int early)
- 	unsigned long size;
- 
- 	size = get_mpc_size(mpf->physptr);
--	mpc = early_ioremap(mpf->physptr, size);
-+	mpc = early_memremap(mpf->physptr, size, BOOT_DATA);
+diff --git a/arch/x86/realmode/init.c b/arch/x86/realmode/init.c
+index c3edb49..f3207e5 100644
+--- a/arch/x86/realmode/init.c
++++ b/arch/x86/realmode/init.c
+@@ -138,10 +138,13 @@ static void __init set_real_mode_permissions(void)
  	/*
- 	 * Read the physical hardware table.  Anything here will
- 	 * override the defaults.
-@@ -461,10 +461,10 @@ static int __init check_physptr(struct mpf_intel *mpf, unsigned int early)
- #endif
- 		pr_err("BIOS bug, MP table errors detected!...\n");
- 		pr_cont("... disabling SMP support. (tell your hw vendor)\n");
--		early_iounmap(mpc, size);
-+		early_memunmap(mpc, size);
- 		return -1;
- 	}
--	early_iounmap(mpc, size);
-+	early_memunmap(mpc, size);
+ 	 * If memory encryption is active, the trampoline area will need to
+ 	 * be in non-encrypted memory in order to bring up other processors
+-	 * successfully.
++	 * successfully. This only applies to SME, SEV requires the trampoline
++	 * to be encrypted.
+ 	 */
+-	sme_early_mem_dec(__pa(base), size);
+-	sme_set_mem_dec(base, size);
++	if (!sev_active) {
++		sme_early_mem_dec(__pa(base), size);
++		sme_set_mem_dec(base, size);
++	}
  
- 	if (early)
- 		return -1;
-diff --git a/drivers/sfi/sfi_core.c b/drivers/sfi/sfi_core.c
-index 296db7a..3078d35 100644
---- a/drivers/sfi/sfi_core.c
-+++ b/drivers/sfi/sfi_core.c
-@@ -92,7 +92,7 @@ static struct sfi_table_simple *syst_va __read_mostly;
- static u32 sfi_use_ioremap __read_mostly;
- 
- /*
-- * sfi_un/map_memory calls early_ioremap/iounmap which is a __init function
-+ * sfi_un/map_memory calls early_memremap/memunmap which is a __init function
-  * and introduces section mismatch. So use __ref to make it calm.
-  */
- static void __iomem * __ref sfi_map_memory(u64 phys, u32 size)
-@@ -103,7 +103,7 @@ static void __iomem * __ref sfi_map_memory(u64 phys, u32 size)
- 	if (sfi_use_ioremap)
- 		return ioremap_cache(phys, size);
- 	else
--		return early_ioremap(phys, size);
-+		return early_memremap(phys, size, BOOT_DATA);
- }
- 
- static void __ref sfi_unmap_memory(void __iomem *virt, u32 size)
-@@ -114,7 +114,7 @@ static void __ref sfi_unmap_memory(void __iomem *virt, u32 size)
- 	if (sfi_use_ioremap)
- 		iounmap(virt);
- 	else
--		early_iounmap(virt, size);
-+		early_memunmap(virt, size);
- }
- 
- static void sfi_print_table_header(unsigned long long pa,
+ 	set_memory_nx((unsigned long) base, size >> PAGE_SHIFT);
+ 	set_memory_ro((unsigned long) base, ro_size >> PAGE_SHIFT);
