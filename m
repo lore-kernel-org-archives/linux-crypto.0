@@ -1,7 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v1 25/28] KVM: SVM: add KVM_SEV_GUEST_STATUS command
-Date: Mon, 22 Aug 2016 19:29:09 -0400
-Message-ID: <147190854977.9523.2458628974170220401.stgit__14403.8943727084$1471908604$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v1 28/28] KVM: SVM: add command to query SEV API version
+Date: Mon, 22 Aug 2016 19:29:46 -0400
+Message-ID: <147190858654.9523.6224226679168122395.stgit__3879.28374480016$1471908633$gmane$org@brijesh-build-machine>
 References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -22,66 +22,43 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <mathieu.desnoyers@efficios.com>, <devel@linuxdriverproject.org>,
         <tglx@linutronix.de>, <mchehab@kernel.or
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0042.outbound.protection.outlook.com ([104.47.37.42]:12384
+Received: from mail-cys01nam02on0064.outbound.protection.outlook.com ([104.47.37.64]:36177
         "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932578AbcHVX3W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Aug 2016 19:29:22 -0400
+        id S932578AbcHVXaB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Aug 2016 19:30:01 -0400
 In-Reply-To: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The command is used to query the SEV guest status.
-
-For more information see [1], section 6.10
-
-[1] http://support.amd.com/TechDocs/55766_SEV-KM%20API_Spec.pdf
-
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/kvm/svm.c |   41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ arch/x86/kvm/svm.c |   23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
 diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 60cc0f7..63e7d15 100644
+index 4af195d..88b8f89 100644
 --- a/arch/x86/kvm/svm.c
 +++ b/arch/x86/kvm/svm.c
-@@ -5570,6 +5570,42 @@ err_1:
+@@ -5779,6 +5779,25 @@ err_1:
  	return ret;
  }
  
-+static int sev_guest_status(struct kvm *kvm,
-+			    struct kvm_sev_guest_status __user *argp,
-+			    int *psp_ret)
++static int sev_api_version(int *psp_ret)
 +{
 +	int ret;
-+	struct kvm_sev_guest_status params;
-+	struct psp_data_guest_status *status;
-+
-+	if (!kvm_sev_guest())
-+		return -ENOTTY;
-+
-+	if (copy_from_user(&params, argp, sizeof(*argp)))
-+		return -EFAULT;
++	struct psp_data_status *status;
 +
 +	status = kzalloc(sizeof(*status), GFP_KERNEL);
 +	if (!status)
 +		return -ENOMEM;
 +
-+	status->hdr.buffer_len = sizeof(*status);
-+	status->handle = kvm_sev_handle();
-+	ret = psp_guest_status(status, psp_ret);
-+	if (ret) {
-+		printk(KERN_ERR "SEV: GUEST_STATUS ret=%d (%#010x)\n",
-+			ret, *psp_ret);
-+		goto err_1;
-+	}
-+	params.policy = status->policy;
-+	params.state = status->state;
++	ret = psp_platform_status(status, psp_ret);
++	if (ret)
++		goto err;
 +
-+	if (copy_to_user(argp, &params, sizeof(*argp)))
-+		ret = -EFAULT;
-+err_1:
++	ret = (status->api_major << 8) | status->api_minor;
++err:
 +	kfree(status);
 +	return ret;
 +}
@@ -89,13 +66,12 @@ index 60cc0f7..63e7d15 100644
  static int amd_sev_issue_cmd(struct kvm *kvm,
  			     struct kvm_sev_issue_cmd __user *user_data)
  {
-@@ -5595,6 +5631,11 @@ static int amd_sev_issue_cmd(struct kvm *kvm,
+@@ -5819,6 +5838,10 @@ static int amd_sev_issue_cmd(struct kvm *kvm,
  					&arg.ret_code);
  		break;
  	}
-+	case KVM_SEV_GUEST_STATUS: {
-+		r = sev_guest_status(kvm, (void *)arg.opaque,
-+					&arg.ret_code);
++	case KVM_SEV_API_VERSION: {
++		r = sev_api_version(&arg.ret_code);
 +		break;
 +	}
  	default:
