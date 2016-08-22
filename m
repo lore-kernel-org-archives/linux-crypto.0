@@ -1,45 +1,89 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: [PATCH] crypto: mxc-scc - check clk_prepare_enable() error
-Date: Sun, 21 Aug 2016 23:37:27 -0300
-Message-ID: <1471833447-11446-1-git-send-email-festevam@gmail.com>
-Cc: s.trumtrar@pengutronix.de, linux-crypto@vger.kernel.org,
-        Fabio Estevam <fabio.estevam@nxp.com>
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qk0-f196.google.com ([209.85.220.196]:36237 "EHLO
-        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753501AbcHVCiG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Aug 2016 22:38:06 -0400
-Received: by mail-qk0-f196.google.com with SMTP id v123so7796686qkh.3
-        for <linux-crypto@vger.kernel.org>; Sun, 21 Aug 2016 19:38:06 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Bjorn Helgaas <helgaas@kernel.org>
+Subject: Re: [PATCH 1/2] PCI/IOV: Add function to allow Function Dependency
+ Link override.
+Date: Mon, 22 Aug 2016 09:36:37 -0500
+Message-ID: <20160822143637.GA18628@localhost>
+References: <1471645933-3643-1-git-send-email-okhaliq@caviumnetworks.com>
+ <1471645933-3643-2-git-send-email-okhaliq@caviumnetworks.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@vger.kernel.org,
+        bhelgaas@google.com, mpm@selenic.com, herbert@gondor.apana.org.au,
+        Ananth.Jasty@cavium.com, david.daney@cavium.com
+To: Omer Khaliq <okhaliq@caviumnetworks.com>
+Return-path: <linux-pci-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1471645933-3643-2-git-send-email-okhaliq@caviumnetworks.com>
+Sender: linux-pci-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Fabio Estevam <fabio.estevam@nxp.com>
+Hi David & Omer,
 
-clk_prepare_enable() may fail, so we should better check its return
-value and propagate it in the case of failure.
+On Fri, Aug 19, 2016 at 03:32:12PM -0700, Omer Khaliq wrote:
+> From: David Daney <david.daney@cavium.com>
+> 
+> Some hardware presents an incorrect SR-IOV Function Dependency Link,
+> add a function to allow this to be overridden in the PF driver for
+> such devices.
+> 
+> Signed-off-by: David Daney <david.daney@cavium.com>
+> Signed-off-by: Omer Khaliq <okhaliq@caviumnetworks.com>
+> ---
+>  drivers/pci/iov.c   | 14 ++++++++++++++
+>  include/linux/pci.h |  1 +
+>  2 files changed, 15 insertions(+)
+> 
+> diff --git a/drivers/pci/iov.c b/drivers/pci/iov.c
+> index 2194b44..81f0672 100644
+> --- a/drivers/pci/iov.c
+> +++ b/drivers/pci/iov.c
+> @@ -640,6 +640,20 @@ int pci_enable_sriov(struct pci_dev *dev, int nr_virtfn)
+>  EXPORT_SYMBOL_GPL(pci_enable_sriov);
+>  
+>  /**
+> + * pci_sriov_fdl_override - fix incorrect Function Dependency Link
+> + * @dev: the PCI device
+> + * @fdl: the corrected Function Dependency Link value
+> + *
+> + * For hardware presenting an incorrect Function Dependency Link in
+> + * the SR-IOV Extended Capability, allow a driver to override it.
+> + */
+> +void pci_sriov_fdl_override(struct pci_dev *dev, u8 fdl)
+> +{
+> +	dev->sriov->link = fdl;
+> +}
+> +EXPORT_SYMBOL_GPL(pci_sriov_fdl_override);
 
-Signed-off-by: Fabio Estevam <fabio.estevam@nxp.com>
----
- drivers/crypto/mxc-scc.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+We usually use quirks to work around problems in config space.  That's
+a nice mechanism because we don't have to add new PCI core interfaces
+and it makes it clear that we're working around a hardware problem.
 
-diff --git a/drivers/crypto/mxc-scc.c b/drivers/crypto/mxc-scc.c
-index ff383ef..ee4be1b0 100644
---- a/drivers/crypto/mxc-scc.c
-+++ b/drivers/crypto/mxc-scc.c
-@@ -668,7 +668,9 @@ static int mxc_scc_probe(struct platform_device *pdev)
- 		return PTR_ERR(scc->clk);
- 	}
- 
--	clk_prepare_enable(scc->clk);
-+	ret = clk_prepare_enable(scc->clk);
-+	if (ret)
-+		return ret;
- 
- 	/* clear error status register */
- 	writel(0x0, scc->base + SCC_SCM_ERROR_STATUS);
--- 
-1.9.1
+Can you use a quirk here?  We allocate dev->sriov in the
+pci_init_capabilities() path, so it looks like a pci_fixup_final quirk
+should work.
+
+> +
+> +/**
+>   * pci_disable_sriov - disable the SR-IOV capability
+>   * @dev: the PCI device
+>   */
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index 2599a98..da8a5b3 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -1823,6 +1823,7 @@ int pci_num_vf(struct pci_dev *dev);
+>  int pci_vfs_assigned(struct pci_dev *dev);
+>  int pci_sriov_set_totalvfs(struct pci_dev *dev, u16 numvfs);
+>  int pci_sriov_get_totalvfs(struct pci_dev *dev);
+> +void pci_sriov_fdl_override(struct pci_dev *dev, u8 fdl);
+>  resource_size_t pci_iov_resource_size(struct pci_dev *dev, int resno);
+>  #else
+>  static inline int pci_iov_virtfn_bus(struct pci_dev *dev, int id)
+> -- 
+> 1.9.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-pci" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
