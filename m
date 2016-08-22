@@ -1,8 +1,8 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v1 09/28] x86/efi: Access EFI data as encrypted when SEV
- is active
-Date: Mon, 22 Aug 2016 19:25:25 -0400
-Message-ID: <147190832511.9523.10850626471583956499.stgit__14603.2141209163$1471909246$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v1 07/28] x86: Do not encrypt memory areas if SEV is
+ enabled
+Date: Mon, 22 Aug 2016 19:24:59 -0400
+Message-ID: <147190829935.9523.3097284272847092359.stgit__26153.2400073067$1471909274$gmane$org@brijesh-build-machine>
 References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -23,76 +23,65 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <mathieu.desnoyers@efficios.com>, <devel@linuxdriverproject.org>,
         <tglx@linutronix.de>, <mchehab@kernel.or
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-co1nam03on0081.outbound.protection.outlook.com ([104.47.40.81]:58142
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam01on0067.outbound.protection.outlook.com ([104.47.34.67]:40788
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1756969AbcHVXkc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Aug 2016 19:40:32 -0400
+        id S1755634AbcHVXlB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Aug 2016 19:41:01 -0400
 In-Reply-To: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-EFI data is encrypted when the kernel is run under SEV. Update the
-page table references to be sure the EFI memory areas are accessed
-encrypted.
+When running under SEV, some memory areas that were originally not
+encrypted under SME are already encrypted. In these situations do not
+attempt to encrypt them.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/platform/efi/efi_64.c |   14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ arch/x86/kernel/head64.c |    4 ++--
+ arch/x86/kernel/setup.c  |    7 ++++---
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/platform/efi/efi_64.c b/arch/x86/platform/efi/efi_64.c
-index 0871ea4..98363f3 100644
---- a/arch/x86/platform/efi/efi_64.c
-+++ b/arch/x86/platform/efi/efi_64.c
-@@ -213,7 +213,7 @@ void efi_sync_low_kernel_mappings(void)
+diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+index 358d7bc..4a15def 100644
+--- a/arch/x86/kernel/head64.c
++++ b/arch/x86/kernel/head64.c
+@@ -114,7 +114,7 @@ static void __init create_unencrypted_mapping(void *address, unsigned long size)
+ 	unsigned long physaddr = (unsigned long)address - __PAGE_OFFSET;
+ 	pmdval_t pmd_flags, pmd;
  
- int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
+-	if (!sme_me_mask)
++	if (!sme_me_mask || sev_active)
+ 		return;
+ 
+ 	/* Clear the encryption mask from the early_pmd_flags */
+@@ -165,7 +165,7 @@ static void __init __clear_mapping(unsigned long address)
+ 
+ static void __init clear_mapping(void *address, unsigned long size)
  {
--	unsigned long pfn, text;
-+	unsigned long pfn, text, flags;
- 	efi_memory_desc_t *md;
- 	struct page *page;
- 	unsigned npages;
-@@ -230,6 +230,10 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
- 	efi_scratch.efi_pgt = (pgd_t *)__sme_pa(efi_pgd);
- 	pgd = efi_pgd;
+-	if (!sme_me_mask)
++	if (!sme_me_mask || sev_active)
+ 		return;
  
-+	flags = _PAGE_NX | _PAGE_RW;
-+	if (sev_active)
-+		flags |= _PAGE_ENC;
-+
+ 	do {
+diff --git a/arch/x86/kernel/setup.c b/arch/x86/kernel/setup.c
+index cec8a63..9c10383 100644
+--- a/arch/x86/kernel/setup.c
++++ b/arch/x86/kernel/setup.c
+@@ -380,10 +380,11 @@ static void __init reserve_initrd(void)
+ 
  	/*
- 	 * It can happen that the physical address of new_memmap lands in memory
- 	 * which is not mapped in the EFI page table. Therefore we need to go
-@@ -237,7 +241,7 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
- 	 * phys_efi_set_virtual_address_map().
+ 	 * This memory is marked encrypted by the kernel but the ramdisk
+-	 * was loaded in the clear by the bootloader, so make sure that
+-	 * the ramdisk image is encrypted.
++	 * was loaded in the clear by the bootloader (unless SEV is active),
++	 * so make sure that the ramdisk image is encrypted.
  	 */
- 	pfn = pa_memmap >> PAGE_SHIFT;
--	if (kernel_map_pages_in_pgd(pgd, pfn, pa_memmap, num_pages, _PAGE_NX | _PAGE_RW)) {
-+	if (kernel_map_pages_in_pgd(pgd, pfn, pa_memmap, num_pages, flags)) {
- 		pr_err("Error ident-mapping new memmap (0x%lx)!\n", pa_memmap);
- 		return 1;
- 	}
-@@ -302,6 +306,9 @@ static void __init __map_region(efi_memory_desc_t *md, u64 va)
- 	if (!(md->attribute & EFI_MEMORY_WB))
- 		flags |= _PAGE_PCD;
+-	sme_early_mem_enc(ramdisk_image, ramdisk_end - ramdisk_image);
++	if (!sev_active)
++		sme_early_mem_enc(ramdisk_image, ramdisk_end - ramdisk_image);
  
-+	if (sev_active)
-+		flags |= _PAGE_ENC;
-+
- 	pfn = md->phys_addr >> PAGE_SHIFT;
- 	if (kernel_map_pages_in_pgd(pgd, pfn, va, md->num_pages, flags))
- 		pr_warn("Error mapping PA 0x%llx -> VA 0x%llx!\n",
-@@ -426,6 +433,9 @@ void __init efi_runtime_update_mappings(void)
- 			(md->type != EFI_RUNTIME_SERVICES_CODE))
- 			pf |= _PAGE_RW;
+ 	initrd_start = 0;
  
-+		if (sev_active)
-+			pf |= _PAGE_ENC;
-+
- 		/* Update the 1:1 mapping */
- 		pfn = md->phys_addr >> PAGE_SHIFT;
- 		if (kernel_map_pages_in_pgd(pgd, pfn, md->phys_addr, md->num_pages, pf))
