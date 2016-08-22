@@ -1,7 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v1 21/28] KVM: introduce KVM_SEV_ISSUE_CMD ioctl
-Date: Mon, 22 Aug 2016 19:28:17 -0400
-Message-ID: <147190849706.9523.17127624683768628621.stgit__2461.02315509251$1471908548$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v1 23/28] KVM: SVM: add SEV launch update command
+Date: Mon, 22 Aug 2016 19:28:44 -0400
+Message-ID: <147190852423.9523.11936794196855765674.stgit__1840.66901351816$1471908551$gmane$org@brijesh-build-machine>
 References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -22,216 +22,181 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <mathieu.desnoyers@efficios.com>, <devel@linuxdriverproject.org>,
         <tglx@linutronix.de>, <mchehab@kernel.or
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0047.outbound.protection.outlook.com ([104.47.37.47]:59383
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+Received: from mail-co1nam03on0064.outbound.protection.outlook.com ([104.47.40.64]:43139
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932193AbcHVX20 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Aug 2016 19:28:26 -0400
+        id S1753111AbcHVX25 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Aug 2016 19:28:57 -0400
 In-Reply-To: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The ioctl will be used by qemu to issue the Secure Encrypted
-Virtualization (SEV) guest commands to transition a guest into
-into SEV-enabled mode.
+The command is used for encrypting guest memory region.
 
-a typical usage:
+For more information see [1], section 6.2
 
-struct kvm_sev_launch_start start;
-struct kvm_sev_issue_cmd data;
-
-data.cmd = KVM_SEV_LAUNCH_START;
-data.opaque = &start;
-
-ret = ioctl(fd, KVM_SEV_ISSUE_CMD, &data);
-
-On SEV command failure, data.ret_code will contain the firmware error code.
+[1] http://support.amd.com/TechDocs/55766_SEV-KM%20API_Spec.pdf
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/kvm_host.h |    3 +
- arch/x86/kvm/x86.c              |   13 ++++
- include/uapi/linux/kvm.h        |  125 +++++++++++++++++++++++++++++++++++++++
- 3 files changed, 141 insertions(+)
+ arch/x86/kvm/svm.c |  126 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 126 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 9b885fc..a94e37d 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1040,6 +1040,9 @@ struct kvm_x86_ops {
- 	void (*cancel_hv_timer)(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 0b6da4a..c78bdc6 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -35,6 +35,8 @@
+ #include <linux/trace_events.h>
+ #include <linux/slab.h>
+ #include <linux/ccp-psp.h>
++#include <linux/pagemap.h>
++#include <linux/swap.h>
  
- 	void (*setup_mce)(struct kvm_vcpu *vcpu);
+ #include <asm/apic.h>
+ #include <asm/perf_event.h>
+@@ -263,6 +265,8 @@ static unsigned long *sev_asid_bitmap;
+ #define svm_sev_guest()		(svm->vcpu.kvm->arch.sev_info.handle)
+ #define svm_sev_ref_count()	(svm->vcpu.kvm->arch.sev_info.ref_count)
+ 
++#define __sev_page_pa(x) ((page_to_pfn(x) << PAGE_SHIFT) | sme_me_mask)
 +
-+	int (*sev_issue_cmd)(struct kvm *kvm,
-+			     struct kvm_sev_issue_cmd __user *argp);
- };
- 
- struct kvm_arch_async_pf {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d6f2f4b..0c0adad 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3820,6 +3820,15 @@ split_irqchip_unlock:
- 	return r;
+ static int sev_asid_new(void);
+ static void sev_asid_free(int asid);
+ static void sev_deactivate_handle(unsigned int handle);
+@@ -5376,6 +5380,123 @@ err_1:
+ 	return ret;
  }
  
-+static int kvm_vm_ioctl_sev_issue_cmd(struct kvm *kvm,
-+				      struct kvm_sev_issue_cmd __user *argp)
++static int sev_pre_update(struct page **pages, unsigned long uaddr, int npages)
 +{
-+	if (kvm_x86_ops->sev_issue_cmd)
-+		return kvm_x86_ops->sev_issue_cmd(kvm, argp);
++	int pinned;
 +
-+	return -ENOTTY;
++	/* pin the user virtual address */
++	down_read(&current->mm->mmap_sem);
++	pinned = get_user_pages(uaddr, npages, 1, 0, pages, NULL);
++	up_read(&current->mm->mmap_sem);
++	if (pinned != npages) {
++		printk(KERN_ERR "SEV: failed to pin  %d pages (got %d)\n",
++				npages, pinned);
++		goto err;
++	}
++
++	return 0;
++err:
++	if (pinned > 0)
++		release_pages(pages, pinned, 0);
++	return 1;
 +}
 +
- long kvm_arch_vm_ioctl(struct file *filp,
- 		       unsigned int ioctl, unsigned long arg)
++static int sev_launch_update(struct kvm *kvm,
++			     struct kvm_sev_launch_update __user *arg,
++			     int *psp_ret)
++{
++	int first, last;
++	struct page **inpages;
++	int ret, nr_pages;
++	unsigned long uaddr, ulen;
++	int i, buffer_len, len, offset;
++	struct kvm_sev_launch_update params;
++	struct psp_data_launch_update *update;
++
++	/* Get the parameters from the user */
++	if (copy_from_user(&params, arg, sizeof(*arg)))
++		return -EFAULT;
++
++	uaddr = params.address;
++	ulen = params.length;
++
++	/* Get number of pages */
++	first = (uaddr & PAGE_MASK) >> PAGE_SHIFT;
++	last = ((uaddr + ulen - 1) & PAGE_MASK) >> PAGE_SHIFT;
++	nr_pages = (last - first + 1);
++
++	/* allocate the buffers */
++	buffer_len = sizeof(*update);
++	update = kzalloc(buffer_len, GFP_KERNEL);
++	if (!update)
++		return -ENOMEM;
++
++	ret = -ENOMEM;
++	inpages = kzalloc(nr_pages * sizeof(struct page *), GFP_KERNEL);
++	if (!inpages)
++		goto err_1;
++
++	ret = sev_pre_update(inpages, uaddr, nr_pages);
++	if (ret)
++		goto err_2;
++
++	/* the array of pages returned by get_user_pages() is a page-aligned
++	 * memory. Since the user buffer is probably not page-aligned, we need
++	 * to calculate the offset within a page for first update entry.
++	 */
++	offset = uaddr & (PAGE_SIZE - 1);
++	len = min_t(size_t, (PAGE_SIZE - offset), ulen);
++	ulen -= len;
++
++	/* update first page -
++	 * special care need to be taken for the first page because we might
++	 * be dealing with offset within the page
++	 */
++	update->hdr.buffer_len = buffer_len;
++	update->handle = kvm_sev_handle();
++	update->length = len;
++	update->address = __sev_page_pa(inpages[0]) + offset;
++	clflush_cache_range(page_address(inpages[0]), PAGE_SIZE);
++	ret = psp_guest_launch_update(update, 5, psp_ret);
++	if (ret) {
++		printk(KERN_ERR "SEV: LAUNCH_UPDATE addr %#llx len %d "
++				"ret=%d (%#010x)\n", update->address,
++				update->length, ret, *psp_ret);
++		goto err_3;
++	}
++
++	/* update remaining pages */
++	for (i = 1; i < nr_pages; i++) {
++
++		len = min_t(size_t, PAGE_SIZE, ulen);
++		ulen -= len;
++		update->length = len;
++		update->address = __sev_page_pa(inpages[i]);
++		clflush_cache_range(page_address(inpages[i]), PAGE_SIZE);
++
++		ret = psp_guest_launch_update(update, 5, psp_ret);
++		if (ret) {
++			printk(KERN_ERR "SEV: LAUNCH_UPDATE addr %#llx len %d "
++				"ret=%d (%#010x)\n", update->address,
++				update->length, ret, *psp_ret);
++			goto err_3;
++		}
++	}
++
++err_3:
++	/* mark pages dirty */
++	for (i = 0; i < nr_pages; i++) {
++		set_page_dirty_lock(inpages[i]);
++		mark_page_accessed(inpages[i]);
++	}
++	release_pages(inpages, nr_pages, 0);
++err_2:
++	kfree(inpages);
++err_1:
++	kfree(update);
++	return ret;
++}
++ 
+ static int amd_sev_issue_cmd(struct kvm *kvm,
+ 			     struct kvm_sev_issue_cmd __user *user_data)
  {
-@@ -4085,6 +4094,10 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		r = kvm_vm_ioctl_enable_cap(kvm, &cap);
+@@ -5391,6 +5512,11 @@ static int amd_sev_issue_cmd(struct kvm *kvm,
+ 					&arg.ret_code);
  		break;
  	}
-+	case KVM_SEV_ISSUE_CMD: {
-+		r = kvm_vm_ioctl_sev_issue_cmd(kvm, argp);
++	case KVM_SEV_LAUNCH_UPDATE: {
++		r = sev_launch_update(kvm, (void *)arg.opaque,
++					&arg.ret_code);
 +		break;
 +	}
  	default:
- 		r = kvm_vm_ioctl_assigned_device(kvm, ioctl, arg);
+ 		break;
  	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 300ef25..72c18c3 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1274,6 +1274,131 @@ struct kvm_s390_ucas_mapping {
- /* Available with KVM_CAP_X86_SMM */
- #define KVM_SMI                   _IO(KVMIO,   0xb7)
- 
-+/* Secure Encrypted Virtualization mode */
-+enum sev_cmd {
-+	KVM_SEV_LAUNCH_START = 0,
-+	KVM_SEV_LAUNCH_UPDATE,
-+	KVM_SEV_LAUNCH_FINISH,
-+	KVM_SEV_GUEST_STATUS,
-+	KVM_SEV_DBG_DECRYPT,
-+	KVM_SEV_DBG_ENCRYPT,
-+	KVM_SEV_RECEIVE_START,
-+	KVM_SEV_RECEIVE_UPDATE,
-+	KVM_SEV_RECEIVE_FINISH,
-+	KVM_SEV_SEND_START,
-+	KVM_SEV_SEND_UPDATE,
-+	KVM_SEV_SEND_FINISH,
-+	KVM_SEV_API_VERSION,
-+	KVM_SEV_NR_MAX,
-+};
-+
-+struct kvm_sev_issue_cmd {
-+	__u32 cmd;
-+	__u64 opaque;
-+	__u32 ret_code;
-+};
-+
-+struct kvm_sev_launch_start {
-+	__u32 handle;
-+	__u32 flags;
-+	__u32 policy;
-+	__u8 nonce[16];
-+	__u8 dh_pub_qx[32];
-+	__u8 dh_pub_qy[32];
-+};
-+
-+struct kvm_sev_launch_update {
-+	__u64	address;
-+	__u32	length;
-+};
-+
-+struct kvm_sev_launch_finish {
-+	__u32 vcpu_count;
-+	__u32 vcpu_length;
-+	__u64 vcpu_mask_addr;
-+	__u32 vcpu_mask_length;
-+	__u8  measurement[32];
-+};
-+
-+struct kvm_sev_guest_status {
-+	__u32 policy;
-+	__u32 state;
-+};
-+
-+struct kvm_sev_dbg_decrypt {
-+	__u64 src_addr;
-+	__u64 dst_addr;
-+	__u32 length;
-+};
-+
-+struct kvm_sev_dbg_encrypt {
-+	__u64 src_addr;
-+	__u64 dst_addr;
-+	__u32 length;
-+};
-+
-+struct kvm_sev_receive_start {
-+	__u32 handle;
-+	__u32 flags;
-+	__u32 policy;
-+	__u8 policy_meas[32];
-+	__u8 wrapped_tek[24];
-+	__u8 wrapped_tik[24];
-+	__u8 ten[16];
-+	__u8 dh_pub_qx[32];
-+	__u8 dh_pub_qy[32];
-+	__u8 nonce[16];
-+};
-+
-+struct kvm_sev_receive_update {
-+	__u8 iv[16];
-+	__u64 address;
-+	__u32 length;
-+};
-+
-+struct kvm_sev_receive_finish {
-+	__u8 measurement[32];
-+};
-+
-+struct kvm_sev_send_start {
-+	__u8 nonce[16];
-+	__u32 policy;
-+	__u8 policy_meas[32];
-+	__u8 wrapped_tek[24];
-+	__u8 wrapped_tik[24];
-+	__u8 ten[16];
-+	__u8 iv[16];
-+	__u32 flags;
-+	__u8 api_major;
-+	__u8 api_minor;
-+	__u32 serial;
-+	__u8 dh_pub_qx[32];
-+	__u8 dh_pub_qy[32];
-+	__u8 pek_sig_r[32];
-+	__u8 pek_sig_s[32];
-+	__u8 cek_sig_r[32];
-+	__u8 cek_sig_s[32];
-+	__u8 cek_pub_qx[32];
-+	__u8 cek_pub_qy[32];
-+	__u8 ask_sig_r[32];
-+	__u8 ask_sig_s[32];
-+	__u32 ncerts;
-+	__u32 cert_length;
-+	__u64 certs_addr;
-+};
-+
-+struct kvm_sev_send_update {
-+	__u32 length;
-+	__u64 src_addr;
-+	__u64 dst_addr;
-+};
-+
-+struct kvm_sev_send_finish {
-+	__u8 measurement[32];
-+};
-+
-+#define KVM_SEV_ISSUE_CMD	_IOWR(KVMIO, 0xb8, struct kvm_sev_issue_cmd)
-+
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
- #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
