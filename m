@@ -1,7 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v1 19/28] KVM: SVM: prepare to reserve asid for SEV guest
-Date: Mon, 22 Aug 2016 19:27:45 -0400
-Message-ID: <147190846546.9523.8365293594479732082.stgit__44233.8971574374$1471910618$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v1 26/28] KVM: SVM: add KVM_SEV_DEBUG_DECRYPT command
+Date: Mon, 22 Aug 2016 19:29:24 -0400
+Message-ID: <147190856410.9523.15450446725026208803.stgit__44260.9473401264$1471910682$gmane$org@brijesh-build-machine>
 References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -22,50 +22,124 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <mathieu.desnoyers@efficios.com>, <devel@linuxdriverproject.org>,
         <tglx@linutronix.de>, <mchehab@kernel.or
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0088.outbound.protection.outlook.com ([104.47.32.88]:55566
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam03on0083.outbound.protection.outlook.com ([104.47.42.83]:6464
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752800AbcHWADL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Aug 2016 20:03:11 -0400
+        id S1751980AbcHWAEb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Aug 2016 20:04:31 -0400
 In-Reply-To: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In current implementation, asid allocation starts from 1, this patch
-adds a min_asid variable in svm_vcpu structure to allow starting asid
-from something other than 1.
+The command decrypts a page of guest memory for debugging purposes.
+
+For more information see [1], section 7.1
+
+[1] http://support.amd.com/TechDocs/55766_SEV-KM%20API_Spec.pdf
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/kvm/svm.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/x86/kvm/svm.c |   83 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 83 insertions(+)
 
 diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 211be94..f010b23 100644
+index 63e7d15..b383bc7 100644
 --- a/arch/x86/kvm/svm.c
 +++ b/arch/x86/kvm/svm.c
-@@ -470,6 +470,7 @@ struct svm_cpu_data {
- 	u64 asid_generation;
- 	u32 max_asid;
- 	u32 next_asid;
-+	u32 min_asid;
- 	struct kvm_ldttss_desc *tss_desc;
+@@ -5606,6 +5606,84 @@ err_1:
+ 	return ret;
+ }
  
- 	struct page *save_area;
-@@ -726,6 +727,7 @@ static int svm_hardware_enable(void)
- 	sd->asid_generation = 1;
- 	sd->max_asid = cpuid_ebx(SVM_CPUID_FUNC) - 1;
- 	sd->next_asid = sd->max_asid + 1;
-+	sd->min_asid = 1;
- 
- 	native_store_gdt(&gdt_descr);
- 	gdt = (struct desc_struct *)gdt_descr.address;
-@@ -1887,7 +1889,7 @@ static void new_asid(struct vcpu_svm *svm, struct svm_cpu_data *sd)
++static int __sev_dbg_decrypt_page(struct kvm *kvm, unsigned long src,
++				  void *dst, int *psp_ret)
++{
++	int ret, pinned;
++	struct page **inpages;
++	struct psp_data_dbg *decrypt;
++
++	decrypt = kzalloc(sizeof(*decrypt), GFP_KERNEL);
++	if (!decrypt)
++		return -ENOMEM;
++
++	ret = -ENOMEM;
++	inpages = kzalloc(1 * sizeof(struct page *), GFP_KERNEL);
++	if (!inpages)
++		goto err_1;
++
++	/* pin the user virtual address */
++	ret = -EFAULT;
++	down_read(&current->mm->mmap_sem);
++	pinned = get_user_pages(src, 1, 1, 0, inpages, NULL);
++	up_read(&current->mm->mmap_sem);
++	if (pinned < 0)
++		goto err_2;
++
++	decrypt->hdr.buffer_len = sizeof(*decrypt);
++	decrypt->handle = kvm_sev_handle();
++	decrypt->dst_addr = __pa(dst) | sme_me_mask;
++	decrypt->src_addr = __sev_page_pa(inpages[0]);
++	decrypt->length = PAGE_SIZE;
++
++	ret = psp_dbg_decrypt(decrypt, psp_ret);
++	if (ret)
++		printk(KERN_ERR "SEV: DEBUG_DECRYPT %d (%#010x)\n",
++				ret, *psp_ret);
++	release_pages(inpages, 1, 0);
++err_2:
++	kfree(inpages);
++err_1:
++	kfree(decrypt);
++	return ret;
++}
++
++static int sev_dbg_decrypt(struct kvm *kvm,
++			   struct kvm_sev_dbg_decrypt __user *argp,
++			   int *psp_ret)
++{
++	void *data;
++	int ret, offset, len;
++	struct kvm_sev_dbg_decrypt debug;
++
++	if (!kvm_sev_guest())
++		return -ENOTTY;
++
++	if (copy_from_user(&debug, argp, sizeof(*argp)))
++		return -EFAULT;
++
++	if (debug.length > PAGE_SIZE)
++		return -EINVAL;
++
++	data = (void *) get_zeroed_page(GFP_KERNEL);
++	if (!data)
++		return -ENOMEM;
++
++	/* decrypt one page */
++	ret = __sev_dbg_decrypt_page(kvm, debug.src_addr, data, psp_ret);
++	if (ret)
++		goto err_1;
++
++	/* we have decrypted full page but copy request length */
++	offset = debug.src_addr & (PAGE_SIZE - 1);
++	len = min_t(size_t, (PAGE_SIZE - offset), debug.length);
++	if (copy_to_user((uint8_t *)debug.dst_addr, data + offset, len))
++		ret = -EFAULT;
++err_1:
++	free_page((unsigned long)data);
++	return ret;
++}
++
+ static int amd_sev_issue_cmd(struct kvm *kvm,
+ 			     struct kvm_sev_issue_cmd __user *user_data)
  {
- 	if (sd->next_asid > sd->max_asid) {
- 		++sd->asid_generation;
--		sd->next_asid = 1;
-+		sd->next_asid = sd->min_asid;
- 		svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ALL_ASID;
+@@ -5636,6 +5714,11 @@ static int amd_sev_issue_cmd(struct kvm *kvm,
+ 					&arg.ret_code);
+ 		break;
  	}
- 
++	case KVM_SEV_DBG_DECRYPT: {
++		r = sev_dbg_decrypt(kvm, (void *)arg.opaque,
++					&arg.ret_code);
++		break;
++	}
+ 	default:
+ 		break;
+ 	}
