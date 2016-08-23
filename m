@@ -1,45 +1,59 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH V2 linux-next] hwrng: update Freescale i.MX RNGA Random Number Generator
-Date: Tue, 23 Aug 2016 14:27:36 +0200
-Message-ID: <5512149.8JX5d16kGe@wuerfel>
-References: <1471376985-7791-1-git-send-email-fabf@skynet.be>
+From: Corentin LABBE <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH -next v2] crypto: sun4i-ss - fix missing unlock on error
+ in sun4i_hash()
+Date: Tue, 23 Aug 2016 15:54:46 +0200
+Message-ID: <ef5d41ec-132c-324f-7bb0-841911699ab5@gmail.com>
+References: <1471560130-5265-1-git-send-email-weiyj.lk@gmail.com>
+ <1471690133-24396-1-git-send-email-weiyj.lk@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Matt Mackall <mpm@selenic.com>,
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Wei Yongjun <weiyj.lk@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Fabian Frederick <fabf@skynet.be>
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Ripard <maxime.ripard@free-electrons.com>,
+        Chen-Yu Tsai <wens@csie.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.131]:58688 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753386AbcHWM2m (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:33704 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752059AbcHWNyu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Aug 2016 08:28:42 -0400
-In-Reply-To: <1471376985-7791-1-git-send-email-fabf@skynet.be>
+        Tue, 23 Aug 2016 09:54:50 -0400
+Received: by mail-wm0-f68.google.com with SMTP id o80so18291931wme.0
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Aug 2016 06:54:50 -0700 (PDT)
+In-Reply-To: <1471690133-24396-1-git-send-email-weiyj.lk@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tuesday, August 16, 2016 9:49:45 PM CEST Fabian Frederick wrote:
-> We can directly depend on SOC_IMX31 since commit c9ee94965dce
-> ("ARM: imx: deconstruct mxc_rnga initialization")
+On 20/08/2016 12:48, Wei Yongjun wrote:
+> Add the missing unlock before return from function sun4i_hash()
+> in the error handling case.
 > 
-> Since that commit, CONFIG_HW_RANDOM_MXC_RNGA could not be switched on
-> with unknown symbol ARCH_HAS_RNGA and mxc-rnga.o can't be generated with
-> ARCH=arm make M=drivers/char/hw_random
-> Previously, HW_RANDOM_MXC_RNGA required ARCH_HAS_RNGA
-> which was based on IMX_HAVE_PLATFORM_MXC_RNGA  && ARCH_MXC.
-> IMX_HAVE_PLATFORM_MXC_RNGA  was based on SOC_IMX31.
-> 
-> Fixes: c9ee94965dce ("ARM: imx: deconstruct mxc_rnga initialization")
-> Signed-off-by: Fabian Frederick <fabf@skynet.be>
+> Fixes: 477d9b2e591b ("crypto: sun4i-ss - unify update/final function")
+> Signed-off-by: Wei Yongjun <weiyj.lk@gmail.com>
 > ---
-> -Cc to linux-crypto (suggested by Herbert Xu)
-> -Adding "Fixes:" (suggested by Arnd Bergmann)
-> -This patch appeared in 4.8-rc1 (not in stable yet)
-> -Improving patch description
+> v1 -> v2: goto release_ss as LABBE Corentin's suggestion
+> ---
+>  drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+> index 2ee3b59..1afeb8e 100644
+> --- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+> +++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+> @@ -245,7 +245,8 @@ int sun4i_hash(struct ahash_request *areq)
+>  		if (end > areq->nbytes || areq->nbytes - end > 63) {
+>  			dev_err(ss->dev, "ERROR: Bound error %u %u\n",
+>  				end, areq->nbytes);
+> -			return -EINVAL;
+> +			err = -EINVAL;
+> +			goto release_ss;
+>  		}
+>  	} else {
+>  		/* Since we have the flag final, we can go up to modulo 4 */
 > 
 
-Thanks for fixing my mistake!
+Acked-by: Corentin LABBE <clabbe.montjoie@gmail.com>
 
-Acked-by: Arnd Bergmann <arnd@arndb.de>
+Thanks
