@@ -1,55 +1,41 @@
-From: Stefan Wahren <stefan.wahren@i2se.com>
-Subject: crypto: mxs-dcp: do not call blocking ops when !TASK_RUNNING;
- state=1
-Date: Tue, 23 Aug 2016 22:38:23 +0200 (CEST)
-Message-ID: <140047983.403523.225ddbfe-fd96-4f9b-a2b9-e0173af882ba.open-xchange@email.1und1.de>
+From: Michael McKay <mmckay@vmware.com>
+Subject: Problems with cbc(aes) and do_alg0test()
+Date: Tue, 23 Aug 2016 22:44:39 +0000
+Message-ID: <1887F274-344C-4810-B2DD-DD6551CC4980@vmware.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, Fabio Estevam <fabio.estevam@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.134]:58335 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755734AbcHWUif (ORCPT
+Received: from ex13-edg-ou-002.vmware.com ([208.91.0.190]:12054 "EHLO
+        EX13-EDG-OU-002.vmware.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1753619AbcHWWpA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Aug 2016 16:38:35 -0400
+        Tue, 23 Aug 2016 18:45:00 -0400
+Received: from EX13-CAS-005.vmware.com (ex13-cas-005.vmware.com [10.113.191.55])
+        by sc9-mailhost1.vmware.com (Postfix) with ESMTP id 8FAF1186B1
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Aug 2016 15:44:42 -0700 (PDT)
+Content-Language: en-US
+Content-ID: <AF185860A866DB43BEA8A0201A4E443A@namprd05.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
-
-i'm using a iMX233-OLinuXino board and i get the following warning during boot
-with 4.8.0-rc2-next-20160819:
-
-[    2.450000] ------------[ cut here ]------------
-[    2.450000] WARNING: CPU: 0 PID: 42 at kernel/sched/core.c:7602
-__might_sleep+0x8c/0xa0
-[    2.470000] do not call blocking ops when !TASK_RUNNING; state=1 set at
-[<c048f730>] dcp_chan_thread_aes+0x24/0x664
-[    2.480000] Modules linked in:
-[    2.480000] CPU: 0 PID: 42 Comm: mxs_dcp_chan/ae Not tainted
-4.8.0-rc2-next-20160819-dirty #2
-[    2.490000] mxs-dcp 80028000.dcp: Failed to register sha1 hash!
-[    2.500000] Hardware name: Freescale MXS (Device Tree)
-[    2.510000] [<c00100a4>] (unwind_backtrace) from [<c000e088>]
-(show_stack+0x10/0x14)
-[    2.520000] [<c000e088>] (show_stack) from [<c001ce8c>] (__warn+0xd8/0x100)
-[    2.530000] [<c001ce8c>] (__warn) from [<c001cf5c>]
-(warn_slowpath_fmt+0x38/0x48)
-[    2.540000] [<c001cf5c>] (warn_slowpath_fmt) from [<c00479dc>]
-(__might_sleep+0x8c/0xa0)
-[    2.540000] [<c00479dc>] (__might_sleep) from [<c05dd24c>]
-(mutex_lock_nested+0x24/0x39c)
-[    2.550000] [<c05dd24c>] (mutex_lock_nested) from [<c048f760>]
-(dcp_chan_thread_aes+0x54/0x664)
-[    2.560000] [<c048f760>] (dcp_chan_thread_aes) from [<c0040574>]
-(kthread+0xd0/0xf0)
-[    2.580000] [<c0040574>] (kthread) from [<c000a36c>]
-(ret_from_fork+0x14/0x28)
-[    2.590000] ---[ end trace e2182161e464af25 ]---
-
-What would be the right fix for this issue?
-
-Regards
-Stefan
+V2UgYXJlIHdyaXRpbmcgYSBkZXZpY2UgZHJpdmVyIHdpdGgga2VybmVsIHYzLjE0LCBhbmQgdHJ5
+aW5nIHRvIGVuY3J5cHQgc29tZSBkYXRhIHVzaW5nIHRoZSBMaW51eCBrZXJuZWwgYWxnb3JpdGht
+IOKAnGNiYyhhZXMp4oCdLiBPdXIgL3Byb2MvY3J5cHRvIHNob3dzIHRoZSBmb2xsb3dpbmcgaXMg
+bG9hZGVkOiBkcml2ZXIg4oCcY2JjLWFlcy1hZXNuaeKAnSwgbW9kdWxlIOKAnGFlc25pX2ludGVs
+4oCdLCBhbmQgdHlwZSDigJxhYmxrY2lwaGVy4oCdLiBCdXQgY3J5cHRvX2hhc19hbGcoKSBnaXZl
+cyB1cyBhbiBlcnJvciBpbmRpY2F0aW5nIHRoZSBhbGdvIGlzIG5vdCBsb2FkZWQuIFNvIGtub3dp
+bmcgd2UgaGF2ZSB0aGUgYWxnbyBzdHJpbmcgY29ycmVjdCwgbW9zdCBsaWtlbHkgdGhlIHByb2Js
+ZW0gaXMgd2l0aCB0aGUgdHdvIG90aGVyIGlucHV0IHZhcmlhYmxlczogbWFzayBvciB0eXBlLg0K
+IA0KU2luY2UgQUVTTkkgaXMgaW4gdXNlLCB3ZSBoYXZlIGEgZGVjZW50IGd1ZXNzIGF0IHRoZSB0
+eXBlcyBieSBsb29raW5nIGF0IHRoZSAuY3JhX2ZsYWdzIGZpZWxkIGluIGFlbnNpLUludGVsX2ds
+dWUuYyAod2hpY2ggaGFzIOKAnENSWVBUT19BTEdfVFlQRV9BQkxLQ0lQSEVSIHwgQ1JZUFRPX0FM
+R19BU1lOQ+KAnSkuIFRoYXQgbGVhdmVzIGp1c3QgYSBmZXcgbWFzayBmaWVsZHMgdG8gZ3Vlc3Mg
+YXQsIGJ1dCBDUllQVE9fQUxHX1RZUEVfQkxLQ0lQSEVSX01BU0sgYW5kIENSWVBUT19BTEdfVFlQ
+RV9NQVNLIGRvbuKAmXQgd29yayAobm90IGRvZXMgT1LigJlpbmcgdGhlbSB0b2dldGhlcikuIA0K
+DQpXaGF0IGFyZSB0aGUgY29ycmVjdCBtYXNrIGFuZCB0eXBlIHZhbHVlcyBmb3IgQUVTTkksIGFu
+ZCBjYW4geW91IHBvaW50IG1lIHRvIGFueSBkb2N1bWVudGF0aW9uPyBXaGF0IGVsc2UgbWlnaHQg
+d2UgYmUgZG9pbmcgd3Jvbmc/IElzIC9wcm9jL2NyeXB0byBnaXZpbmcgdXMgcmVsZXZhbnQgaW5m
+b3JtYXRpb24/IFRoYW5rcywNCg0KTWljaGFlbCBNY0theQ0KbW1ja2F5QHZtd2FyZS5jb20NCg0K
+DQo=
