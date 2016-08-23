@@ -1,54 +1,49 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH v1 18/28] crypto: add AMD Platform Security Processor
- driver
-Date: Tue, 23 Aug 2016 15:14:58 +0800
-Message-ID: <20160823071458.GC392@gondor.apana.org.au>
-References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
- <147190844204.9523.14931918358168729826.stgit@brijesh-build-machine>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH] crypto: FIPS - allow RSA keys >= 2048 bits
+Date: Tue, 23 Aug 2016 10:09:32 +0200
+Message-ID: <3300015.Y5nlQbUkhj@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: simon.guinot@sequanux.org, linux-efi@vger.kernel.org,
-	kvm@vger.kernel.org, rkrcmar@redhat.com, matt@codeblueprint.co.uk,
-	linus.walleij@linaro.org, linux-mm@kvack.org,
-	paul.gortmaker@windriver.com, hpa@zytor.com,
-	dan.j.williams@intel.com, aarcange@redhat.com, sfr@canb.auug.org.au,
-	andriy.shevchenko@linux.intel.com, bhe@redhat.com,
-	xemul@parallels.com, joro@8bytes.org, x86@kernel.org,
-	mingo@redhat.com, msalter@redhat.com, ross.zwisler@linux.intel.com,
-	bp@suse.de, dyoung@redhat.com, thomas.lendacky@amd.com,
-	jroedel@suse.de, keescook@chromium.org, toshi.kani@hpe.com,
-	mathieu.desnoyers@efficios.com, devel@linuxdriverproject.org,
-	tglx@linutronix.de, mchehab@kernel.org, iamjoonsoo.kim@lge.com,
-	labbott@fedoraproject.org, tony.luck@intel.com,
-	alexandre.bounine@idt.com, kuleshovmail@gmail.com,
-	linux-kernel@vger.kernel.org, mcgrof@kernel.org,
-	linux-crypto@vger.kernel.org, pbonzin
-To: Brijesh Singh <brijesh.singh@amd.com>
-Return-path: <owner-linux-mm@kvack.org>
-Content-Disposition: inline
-In-Reply-To: <147190844204.9523.14931918358168729826.stgit@brijesh-build-machine>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:37254 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756613AbcHWITb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Aug 2016 04:19:31 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 22, 2016 at 07:27:22PM -0400, Brijesh Singh wrote:
-> The driver to communicate with Secure Encrypted Virtualization (SEV)
-> firmware running within the AMD secure processor providing a secure key
-> management interface for SEV guests.
-> 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+With a public notification, NIST now allows the use of RSA keys with a
+modulus >= 2048 bits. The new rule allows any modulus size >= 2048 bits
+provided that either 2048 or 3072 bits are supported at least so that
+the entire RSA implementation can be CAVS tested.
 
-This driver doesn't seem to hook into the Crypto API at all, is
-there any reason why it should be in drivers/crypto?
+This patch fixes the inability to boot the kernel in FIPS mode, because
+certs/x509.genkey defines a 4096 bit RSA key per default. This key causes
+the RSA signature verification to fail in FIPS mode without the patch
+below.
 
-Thanks,
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/rsa_helper.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/rsa_helper.c b/crypto/rsa_helper.c
+index 4df6451..0b66dc8 100644
+--- a/crypto/rsa_helper.c
++++ b/crypto/rsa_helper.c
+@@ -35,8 +35,8 @@ int rsa_get_n(void *context, size_t hdrlen, unsigned char tag,
+ 			n_sz--;
+ 		}
+ 
+-		/* In FIPS mode only allow key size 2K & 3K */
+-		if (n_sz != 256 && n_sz != 384) {
++		/* In FIPS mode only allow key size 2K and higher */
++		if (n_sz < 256) {
+ 			pr_err("RSA: key size not allowed in FIPS mode\n");
+ 			return -EINVAL;
+ 		}
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+2.7.4
