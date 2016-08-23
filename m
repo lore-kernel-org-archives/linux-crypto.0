@@ -1,50 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.8
-Date: Tue, 23 Aug 2016 17:51:30 +0800
-Message-ID: <20160823095130.GA26653@gondor.apana.org.au>
-References: <20141007131826.GA29688@gondor.apana.org.au>
- <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150415033951.GA1406@gondor.apana.org.au>
- <20150622084457.GA7806@gondor.apana.org.au>
- <20150831135655.GA2694@gondor.apana.org.au>
- <20151102080427.GA8465@gondor.apana.org.au>
- <20160111101450.GA24044@gondor.apana.org.au>
- <20160122101828.GA15966@gondor.apana.org.au>
- <20160801095821.GA1260@gondor.apana.org.au>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH V2 linux-next] hwrng: update Freescale i.MX RNGA Random Number Generator
+Date: Tue, 23 Aug 2016 14:27:36 +0200
+Message-ID: <5512149.8JX5d16kGe@wuerfel>
+References: <1471376985-7791-1-git-send-email-fabf@skynet.be>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20160801095821.GA1260@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Fabian Frederick <fabf@skynet.be>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mout.kundenserver.de ([212.227.126.131]:58688 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753386AbcHWM2m (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Aug 2016 08:28:42 -0400
+In-Reply-To: <1471376985-7791-1-git-send-email-fabf@skynet.be>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Tuesday, August 16, 2016 9:49:45 PM CEST Fabian Frederick wrote:
+> We can directly depend on SOC_IMX31 since commit c9ee94965dce
+> ("ARM: imx: deconstruct mxc_rnga initialization")
+> 
+> Since that commit, CONFIG_HW_RANDOM_MXC_RNGA could not be switched on
+> with unknown symbol ARCH_HAS_RNGA and mxc-rnga.o can't be generated with
+> ARCH=arm make M=drivers/char/hw_random
+> Previously, HW_RANDOM_MXC_RNGA required ARCH_HAS_RNGA
+> which was based on IMX_HAVE_PLATFORM_MXC_RNGA  && ARCH_MXC.
+> IMX_HAVE_PLATFORM_MXC_RNGA  was based on SOC_IMX31.
+> 
+> Fixes: c9ee94965dce ("ARM: imx: deconstruct mxc_rnga initialization")
+> Signed-off-by: Fabian Frederick <fabf@skynet.be>
+> ---
+> -Cc to linux-crypto (suggested by Herbert Xu)
+> -Adding "Fixes:" (suggested by Arnd Bergmann)
+> -This patch appeared in 4.8-rc1 (not in stable yet)
+> -Improving patch description
+> 
 
-This push fixes a number of memory corruption bugs in the newly
-added sha256-mb/sha256-mb code.
+Thanks for fixing my mistake!
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Xiaodong Liu (2):
-      crypto: sha256-mb - fix ctx pointer and digest copy
-      crypto: sha512-mb - fix ctx pointer
-
- arch/x86/crypto/sha256-mb/sha256_mb.c                |    4 ++--
- arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S |    7 ++++---
- arch/x86/crypto/sha512-mb/sha512_mb.c                |    4 ++--
- 3 files changed, 8 insertions(+), 7 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Acked-by: Arnd Bergmann <arnd@arndb.de>
