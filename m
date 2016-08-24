@@ -1,39 +1,58 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH] crypto: rockchip - use devm_add_action_or_reset()
-Date: Wed, 24 Aug 2016 21:19:01 +0800
-Message-ID: <20160824131901.GD4039@gondor.apana.org.au>
-References: <1471964334-27060-1-git-send-email-sudipm.mukherjee@gmail.com>
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH 3/5] hwrng: amd: Be consitent with the driver name
+Date: Wed, 24 Aug 2016 15:51:22 +0200
+Message-ID: <20160824135122.GC29212@Red>
+References: <1471614177-12380-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1471614177-12380-3-git-send-email-clabbe.montjoie@gmail.com>
+ <20160824105811.GA2120@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Heiko Stuebner <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-To: Sudip Mukherjee <sudipm.mukherjee-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: mpm@selenic.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1471964334-27060-1-git-send-email-sudipm.mukherjee-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-rockchip>,
- <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-rockchip/>
-List-Post: <mailto:linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Help: <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-rockchip>,
- <mailto:linux-rockchip-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
-Sender: "Linux-rockchip" <linux-rockchip-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-Errors-To: linux-rockchip-bounces+glpar-linux-rockchip=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+In-Reply-To: <20160824105811.GA2120@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 23, 2016 at 08:28:54PM +0530, Sudip Mukherjee wrote:
-> If devm_add_action() fails we are explicitly calling the cleanup to free
-> the resources allocated.  Lets use the helper devm_add_action_or_reset()
-> and return directly in case of error, as we know that the cleanup function
-> has been already called by the helper if there was any error.
+On Wed, Aug 24, 2016 at 06:58:11PM +0800, Herbert Xu wrote:
+> On Fri, Aug 19, 2016 at 03:42:55PM +0200, LABBE Corentin wrote:
+> > The driver name is displayed each time differently.
+> > This patch make use of the same name everywhere.
+> > 
+> > Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+> > ---
+> >  drivers/char/hw_random/amd-rng.c | 13 ++++++-------
+> >  1 file changed, 6 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
+> > index d0042f5..d0a806a 100644
+> > --- a/drivers/char/hw_random/amd-rng.c
+> > +++ b/drivers/char/hw_random/amd-rng.c
+> > @@ -31,7 +31,7 @@
+> >  #include <linux/delay.h>
+> >  #include <asm/io.h>
+> >  
+> > -#define PFX	KBUILD_MODNAME ": "
+> > +#define DRV_NAME "AMD768-HWRNG"
+> >  
+> >  /*
+> >   * Data for PCI driver interface
+> > @@ -98,7 +98,7 @@ static void amd_rng_cleanup(struct hwrng *rng)
+> >  }
+> >  
+> >  static struct hwrng amd_rng = {
+> > -	.name		= "amd",
+> > +	.name		= DRV_NAME,
 > 
-> Signed-off-by: Sudip Mukherjee <sudip.mukherjee-4yDnlxn2s6sWdaTGBSpHTA@public.gmane.org>
+> Hmm, this changes a sysfs-exported name which has the potential
+> to break user-space.  So I think you'd need to a stronger argument
+> to do it other than just cleaning it up.
+> 
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+amd is really really too generic.
+
+But if you still NACK that (and I understand perfectly why), I will update my series.
+
+Regards
