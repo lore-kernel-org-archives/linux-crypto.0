@@ -1,60 +1,64 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/5] hwrng: amd: Be consitent with the driver name
-Date: Wed, 24 Aug 2016 18:58:11 +0800
-Message-ID: <20160824105811.GA2120@gondor.apana.org.au>
-References: <1471614177-12380-1-git-send-email-clabbe.montjoie@gmail.com>
- <1471614177-12380-3-git-send-email-clabbe.montjoie@gmail.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [RFC PATCH v1 18/28] crypto: add AMD Platform Security Processor
+ driver
+Date: Wed, 24 Aug 2016 07:02:26 -0500
+Message-ID: <a5180201-7a44-2148-26ba-4e06bbfd4e3a@amd.com>
+References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
+ <147190844204.9523.14931918358168729826.stgit@brijesh-build-machine>
+ <20160823071458.GC392@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: mpm@selenic.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36234 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755246AbcHXK6j (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Aug 2016 06:58:39 -0400
-Content-Disposition: inline
-In-Reply-To: <1471614177-12380-3-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Cc: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <rkrcmar@redhat.com>, <matt@codeblueprint.co.uk>,
+	<linus.walleij@linaro.org>, <linux-mm@kvack.org>,
+	<paul.gortmaker@windriver.com>, <hpa@zytor.com>, <dan.j.williams@intel.com>,
+	<aarcange@redhat.com>, <sfr@canb.auug.org.au>,
+	<andriy.shevchenko@linux.intel.com>, <bhe@redhat.com>, <xemul@parallels.com>,
+	<joro@8bytes.org>, <x86@kernel.org>, <mingo@redhat.com>,
+	<msalter@redhat.com>, <ross.zwisler@linux.intel.com>, <bp@suse.de>,
+	<dyoung@redhat.com>, <jroedel@suse.de>, <keescook@chromium.org>,
+	<toshi.kani@hpe.com>, <mathieu.desnoyers@efficios.com>,
+	<devel@linuxdriverproject.org>, <tglx@linutronix.de>, <mchehab@kernel.org>,
+	<iamjoonsoo.kim@lge.com>, <labbott@fedoraproject.org>, <tony.luck@intel.com>,
+	<alexandre.bounine@idt.com>, <kuleshovmail@gmail.com>,
+	<linux-kernel@vger.kernel.org>, <mcgrof@kerne
+To: Herbert Xu <herbert@gondor.apana.org.au>, Brijesh Singh
+	<brijesh.singh@amd.com>
+Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <20160823071458.GC392@gondor.apana.org.au>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 19, 2016 at 03:42:55PM +0200, LABBE Corentin wrote:
-> The driver name is displayed each time differently.
-> This patch make use of the same name everywhere.
+
+
+On 08/23/2016 02:14 AM, Herbert Xu wrote:
+> On Mon, Aug 22, 2016 at 07:27:22PM -0400, Brijesh Singh wrote:
+>> The driver to communicate with Secure Encrypted Virtualization (SEV)
+>> firmware running within the AMD secure processor providing a secure key
+>> management interface for SEV guests.
+>>
+>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-> ---
->  drivers/char/hw_random/amd-rng.c | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
+> This driver doesn't seem to hook into the Crypto API at all, is
+> there any reason why it should be in drivers/crypto?
+
+Yes, this needs to be cleaned up.  The PSP and the CCP share the same
+PCI id, so this has to be integrated with the CCP. It could either
+be moved into the drivers/crypto/ccp directory or both the psp and
+ccp device specific support can be moved somewhere else leaving just
+the ccp crypto API related files in drivers/crypto/ccp.
+
+Thanks,
+Tom
+
 > 
-> diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
-> index d0042f5..d0a806a 100644
-> --- a/drivers/char/hw_random/amd-rng.c
-> +++ b/drivers/char/hw_random/amd-rng.c
-> @@ -31,7 +31,7 @@
->  #include <linux/delay.h>
->  #include <asm/io.h>
->  
-> -#define PFX	KBUILD_MODNAME ": "
-> +#define DRV_NAME "AMD768-HWRNG"
->  
->  /*
->   * Data for PCI driver interface
-> @@ -98,7 +98,7 @@ static void amd_rng_cleanup(struct hwrng *rng)
->  }
->  
->  static struct hwrng amd_rng = {
-> -	.name		= "amd",
-> +	.name		= DRV_NAME,
+> Thanks,
+> 
 
-Hmm, this changes a sysfs-exported name which has the potential
-to break user-space.  So I think you'd need to a stronger argument
-to do it other than just cleaning it up.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
