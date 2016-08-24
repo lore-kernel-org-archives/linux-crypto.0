@@ -1,58 +1,42 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH 3/5] hwrng: amd: Be consitent with the driver name
-Date: Wed, 24 Aug 2016 15:51:22 +0200
-Message-ID: <20160824135122.GC29212@Red>
-References: <1471614177-12380-1-git-send-email-clabbe.montjoie@gmail.com>
- <1471614177-12380-3-git-send-email-clabbe.montjoie@gmail.com>
- <20160824105811.GA2120@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH -next] chcr: Fix non static symbol warning
+Date: Wed, 24 Aug 2016 21:06:51 +0800
+Message-ID: <20160824130651.GB2120@gondor.apana.org.au>
+References: <1471882278-25777-1-git-send-email-weiyj.lk@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: mpm@selenic.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Hariprasad Shenai <hariprasad@chelsio.com>,
+        Atul Gupta <atul.gupta@chelsio.com>,
+        Wei Yongjun <weiyongjun1@huawei.com>,
+        linux-crypto@vger.kernel.org
+To: Wei Yongjun <weiyj.lk@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:59177 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756020AbcHXOFH (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Aug 2016 10:05:07 -0400
 Content-Disposition: inline
-In-Reply-To: <20160824105811.GA2120@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1471882278-25777-1-git-send-email-weiyj.lk@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Aug 24, 2016 at 06:58:11PM +0800, Herbert Xu wrote:
-> On Fri, Aug 19, 2016 at 03:42:55PM +0200, LABBE Corentin wrote:
-> > The driver name is displayed each time differently.
-> > This patch make use of the same name everywhere.
-> > 
-> > Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-> > ---
-> >  drivers/char/hw_random/amd-rng.c | 13 ++++++-------
-> >  1 file changed, 6 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
-> > index d0042f5..d0a806a 100644
-> > --- a/drivers/char/hw_random/amd-rng.c
-> > +++ b/drivers/char/hw_random/amd-rng.c
-> > @@ -31,7 +31,7 @@
-> >  #include <linux/delay.h>
-> >  #include <asm/io.h>
-> >  
-> > -#define PFX	KBUILD_MODNAME ": "
-> > +#define DRV_NAME "AMD768-HWRNG"
-> >  
-> >  /*
-> >   * Data for PCI driver interface
-> > @@ -98,7 +98,7 @@ static void amd_rng_cleanup(struct hwrng *rng)
-> >  }
-> >  
-> >  static struct hwrng amd_rng = {
-> > -	.name		= "amd",
-> > +	.name		= DRV_NAME,
+On Mon, Aug 22, 2016 at 04:11:18PM +0000, Wei Yongjun wrote:
+> From: Wei Yongjun <weiyongjun1@huawei.com>
 > 
-> Hmm, this changes a sysfs-exported name which has the potential
-> to break user-space.  So I think you'd need to a stronger argument
-> to do it other than just cleaning it up.
+> Fixes the following sparse warning:
 > 
+> drivers/crypto/chelsio/chcr_algo.c:593:5: warning:
+>  symbol 'cxgb4_is_crypto_q_full' was not declared. Should it be static?
+> 
+> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 
-amd is really really too generic.
+Please repost this to netdev as the chelsio patches were applied
+in the net tree.
 
-But if you still NACK that (and I understand perfectly why), I will update my series.
-
-Regards
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
