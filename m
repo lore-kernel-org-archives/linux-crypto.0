@@ -1,32 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto/xor: skip speed test if the xor function is
- selected automatically
-Date: Wed, 24 Aug 2016 21:17:07 +0800
-Message-ID: <20160824131707.GA4016@gondor.apana.org.au>
-References: <1471609170-18816-1-git-send-email-schwidefsky@de.ibm.com>
+Subject: Re: [PATCH] hw_random: omap3-rom-rng.c: Remove obsoleted functions
+Date: Wed, 24 Aug 2016 21:17:41 +0800
+Message-ID: <20160824131741.GA4039@gondor.apana.org.au>
+References: <1471708866-1423-1-git-send-email-prasannatsmkumar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        schwidefsky@de.ibm.com
-To: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Cc: linux-crypto@vger.kernel.org, aaro.koskinen@iki.fi,
+        mpm@selenic.com, linux-kernel@vger.kernel.org
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:57194 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:37072 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754455AbcHXNRN (ORCPT
+        with ESMTP id S1754455AbcHXNSA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Aug 2016 09:17:13 -0400
+        Wed, 24 Aug 2016 09:18:00 -0400
 Content-Disposition: inline
-In-Reply-To: <1471609170-18816-1-git-send-email-schwidefsky@de.ibm.com>
+In-Reply-To: <1471708866-1423-1-git-send-email-prasannatsmkumar@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Martin Schwidefsky <schwidefsky@de.ibm.com> wrote:
-> If the architecture selected the xor function with XOR_SELECT_TEMPLATE
-> the speed result of the do_xor_speed benchmark is of limited value.
-> The speed measurement increases the bootup time a little, which can
-> makes a difference for kernels used in container like virtual machines.
+On Sat, Aug 20, 2016 at 09:31:06PM +0530, PrasannaKumar Muralidharan wrote:
+> Remove omap3_rom_rng_data_present method as it was returning 1 always.
+> Use .read callback instead of .data_read callback. This avoids use of
+> obsolete callbacks.
 > 
-> Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+> This patch is not tested with hardware as I don't have access to it.
+> 
+> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 
 Patch applied.  Thanks.
 -- 
