@@ -1,38 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] hw_random: Improve description of the ->read() interface
-Date: Wed, 24 Aug 2016 21:13:24 +0800
-Message-ID: <20160824131324.GB3850@gondor.apana.org.au>
-References: <1471523841-30469-1-git-send-email-daniel.thompson@linaro.org>
+Subject: Re: [PATCH] crypto: qat - fix aes-xts key sizes
+Date: Wed, 24 Aug 2016 21:13:44 +0800
+Message-ID: <20160824131344.GC3850@gondor.apana.org.au>
+References: <1471546416-7164-1-git-send-email-giovanni.cabiddu@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, patches@linaro.org,
-        linaro-kernel@lists.linaro.org,
-        LABBE Corentin <clabbe.montjoie@gmail.com>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-To: Daniel Thompson <daniel.thompson@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:51674 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753889AbcHXNOB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Aug 2016 09:14:01 -0400
 Content-Disposition: inline
-In-Reply-To: <1471523841-30469-1-git-send-email-daniel.thompson@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1471546416-7164-1-git-send-email-giovanni.cabiddu@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 18, 2016 at 01:37:21PM +0100, Daniel Thompson wrote:
-> Currently, very few RNG drivers support single byte reads using the
-> ->read() interface. Of the 14 drivers in drivers/char/hw_random that
-> support this interface only three of these actually support max == 1.
-> The other behaviours vary between return 0, return 2, return 4 and return
-> -EIO).
+On Thu, Aug 18, 2016 at 07:53:36PM +0100, Giovanni Cabiddu wrote:
+> Increase value of supported key sizes for qat_aes_xts.
+> aes-xts keys consists of keys of equal size concatenated.
 > 
-> This is not a problem in practice because the core hw_random code never
-> performs a read shorter than 16 bytes. The documentation for this function
-> already contrains the alignment of the buffer pointer, so let's also
-> guarantee that the buffer is at least as large as its alignment.
-> 
-> This constraint is intended to be the weakest guarantee neccessary to
-> allow driver writers to safely simplify their code.
-> 
-> Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
+> Reported-by: Wenqian Yu <wenqian.yu@intel.com>
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
 Patch applied.  Thanks.
 -- 
