@@ -1,64 +1,46 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [RFC PATCH v1 18/28] crypto: add AMD Platform Security Processor
- driver
-Date: Wed, 24 Aug 2016 07:02:26 -0500
-Message-ID: <a5180201-7a44-2148-26ba-4e06bbfd4e3a@amd.com>
-References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
- <147190844204.9523.14931918358168729826.stgit@brijesh-build-machine>
- <20160823071458.GC392@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH V2 linux-next] hwrng: update Freescale i.MX RNGA Random
+ Number Generator
+Date: Wed, 24 Aug 2016 21:13:06 +0800
+Message-ID: <20160824131306.GA3850@gondor.apana.org.au>
+References: <1471376985-7791-1-git-send-email-fabf@skynet.be>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Cc: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <rkrcmar@redhat.com>, <matt@codeblueprint.co.uk>,
-	<linus.walleij@linaro.org>, <linux-mm@kvack.org>,
-	<paul.gortmaker@windriver.com>, <hpa@zytor.com>, <dan.j.williams@intel.com>,
-	<aarcange@redhat.com>, <sfr@canb.auug.org.au>,
-	<andriy.shevchenko@linux.intel.com>, <bhe@redhat.com>, <xemul@parallels.com>,
-	<joro@8bytes.org>, <x86@kernel.org>, <mingo@redhat.com>,
-	<msalter@redhat.com>, <ross.zwisler@linux.intel.com>, <bp@suse.de>,
-	<dyoung@redhat.com>, <jroedel@suse.de>, <keescook@chromium.org>,
-	<toshi.kani@hpe.com>, <mathieu.desnoyers@efficios.com>,
-	<devel@linuxdriverproject.org>, <tglx@linutronix.de>, <mchehab@kernel.org>,
-	<iamjoonsoo.kim@lge.com>, <labbott@fedoraproject.org>, <tony.luck@intel.com>,
-	<alexandre.bounine@idt.com>, <kuleshovmail@gmail.com>,
-	<linux-kernel@vger.kernel.org>, <mcgrof@kerne
-To: Herbert Xu <herbert@gondor.apana.org.au>, Brijesh Singh
-	<brijesh.singh@amd.com>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <20160823071458.GC392@gondor.apana.org.au>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org
+To: Fabian Frederick <fabf@skynet.be>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:45933 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753188AbcHXNN0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Aug 2016 09:13:26 -0400
+Content-Disposition: inline
+In-Reply-To: <1471376985-7791-1-git-send-email-fabf@skynet.be>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-
-
-On 08/23/2016 02:14 AM, Herbert Xu wrote:
-> On Mon, Aug 22, 2016 at 07:27:22PM -0400, Brijesh Singh wrote:
->> The driver to communicate with Secure Encrypted Virtualization (SEV)
->> firmware running within the AMD secure processor providing a secure key
->> management interface for SEV guests.
->>
->> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+On Tue, Aug 16, 2016 at 09:49:45PM +0200, Fabian Frederick wrote:
+> We can directly depend on SOC_IMX31 since commit c9ee94965dce
+> ("ARM: imx: deconstruct mxc_rnga initialization")
 > 
-> This driver doesn't seem to hook into the Crypto API at all, is
-> there any reason why it should be in drivers/crypto?
-
-Yes, this needs to be cleaned up.  The PSP and the CCP share the same
-PCI id, so this has to be integrated with the CCP. It could either
-be moved into the drivers/crypto/ccp directory or both the psp and
-ccp device specific support can be moved somewhere else leaving just
-the ccp crypto API related files in drivers/crypto/ccp.
-
-Thanks,
-Tom
-
+> Since that commit, CONFIG_HW_RANDOM_MXC_RNGA could not be switched on
+> with unknown symbol ARCH_HAS_RNGA and mxc-rnga.o can't be generated with
+> ARCH=arm make M=drivers/char/hw_random
+> Previously, HW_RANDOM_MXC_RNGA required ARCH_HAS_RNGA
+> which was based on IMX_HAVE_PLATFORM_MXC_RNGA  && ARCH_MXC.
+> IMX_HAVE_PLATFORM_MXC_RNGA  was based on SOC_IMX31.
 > 
-> Thanks,
-> 
+> Fixes: c9ee94965dce ("ARM: imx: deconstruct mxc_rnga initialization")
+> Signed-off-by: Fabian Frederick <fabf@skynet.be>
+> ---
+> -Cc to linux-crypto (suggested by Herbert Xu)
+> -Adding "Fixes:" (suggested by Arnd Bergmann)
+> -This patch appeared in 4.8-rc1 (not in stable yet)
+> -Improving patch description
 
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
