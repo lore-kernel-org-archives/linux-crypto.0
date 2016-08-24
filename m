@@ -1,41 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH -next] chcr: Fix non static symbol warning
-Date: Wed, 24 Aug 2016 21:06:51 +0800
-Message-ID: <20160824130651.GB2120@gondor.apana.org.au>
-References: <1471882278-25777-1-git-send-email-weiyj.lk@gmail.com>
+Subject: Re: [PATCH] crypto: FIPS - allow RSA keys >= 2048 bits
+Date: Wed, 24 Aug 2016 21:18:26 +0800
+Message-ID: <20160824131826.GC4039@gondor.apana.org.au>
+References: <3300015.Y5nlQbUkhj@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Hariprasad Shenai <hariprasad@chelsio.com>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Wei Yongjun <weiyongjun1@huawei.com>,
-        linux-crypto@vger.kernel.org
-To: Wei Yongjun <weiyj.lk@gmail.com>
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:59177 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:59985 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756020AbcHXOFH (ORCPT
+        with ESMTP id S1754094AbcHXOd6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Aug 2016 10:05:07 -0400
+        Wed, 24 Aug 2016 10:33:58 -0400
 Content-Disposition: inline
-In-Reply-To: <1471882278-25777-1-git-send-email-weiyj.lk@gmail.com>
+In-Reply-To: <3300015.Y5nlQbUkhj@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 22, 2016 at 04:11:18PM +0000, Wei Yongjun wrote:
-> From: Wei Yongjun <weiyongjun1@huawei.com>
+On Tue, Aug 23, 2016 at 10:09:32AM +0200, Stephan Mueller wrote:
+> With a public notification, NIST now allows the use of RSA keys with a
+> modulus >= 2048 bits. The new rule allows any modulus size >= 2048 bits
+> provided that either 2048 or 3072 bits are supported at least so that
+> the entire RSA implementation can be CAVS tested.
 > 
-> Fixes the following sparse warning:
+> This patch fixes the inability to boot the kernel in FIPS mode, because
+> certs/x509.genkey defines a 4096 bit RSA key per default. This key causes
+> the RSA signature verification to fail in FIPS mode without the patch
+> below.
 > 
-> drivers/crypto/chelsio/chcr_algo.c:593:5: warning:
->  symbol 'cxgb4_is_crypto_q_full' was not declared. Should it be static?
-> 
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-Please repost this to netdev as the chelsio patches were applied
-in the net tree.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
