@@ -1,64 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/5] hwrng: amd: Be consitent with the driver name
-Date: Thu, 25 Aug 2016 12:19:19 +0800
-Message-ID: <20160825041919.GA9906@gondor.apana.org.au>
-References: <1471614177-12380-1-git-send-email-clabbe.montjoie@gmail.com>
- <1471614177-12380-3-git-send-email-clabbe.montjoie@gmail.com>
- <20160824105811.GA2120@gondor.apana.org.au>
- <20160824135122.GC29212@Red>
+Subject: Re: [PATCH] crypto: vmx -  fix null dereference in p8_aes_xts_crypt
+Date: Thu, 25 Aug 2016 13:56:35 +0800
+Message-ID: <20160825055635.GA10607@gondor.apana.org.au>
+References: <1472024080.3313.20.camel@TP420>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: mpm@selenic.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, leosilva@linux.vnet.ibm.com,
+        pfsmorigo@linux.vnet.ibm.com
+To: Li Zhong <zhong@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:52351 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757548AbcHYF4j (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Aug 2016 01:56:39 -0400
 Content-Disposition: inline
-In-Reply-To: <20160824135122.GC29212@Red>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1472024080.3313.20.camel@TP420>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Aug 24, 2016 at 03:51:22PM +0200, LABBE Corentin wrote:
-> On Wed, Aug 24, 2016 at 06:58:11PM +0800, Herbert Xu wrote:
-> > On Fri, Aug 19, 2016 at 03:42:55PM +0200, LABBE Corentin wrote:
-> > > The driver name is displayed each time differently.
-> > > This patch make use of the same name everywhere.
-> > > 
-> > > Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-> > > ---
-> > >  drivers/char/hw_random/amd-rng.c | 13 ++++++-------
-> > >  1 file changed, 6 insertions(+), 7 deletions(-)
-> > > 
-> > > diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
-> > > index d0042f5..d0a806a 100644
-> > > --- a/drivers/char/hw_random/amd-rng.c
-> > > +++ b/drivers/char/hw_random/amd-rng.c
-> > > @@ -31,7 +31,7 @@
-> > >  #include <linux/delay.h>
-> > >  #include <asm/io.h>
-> > >  
-> > > -#define PFX	KBUILD_MODNAME ": "
-> > > +#define DRV_NAME "AMD768-HWRNG"
-> > >  
-> > >  /*
-> > >   * Data for PCI driver interface
-> > > @@ -98,7 +98,7 @@ static void amd_rng_cleanup(struct hwrng *rng)
-> > >  }
-> > >  
-> > >  static struct hwrng amd_rng = {
-> > > -	.name		= "amd",
-> > > +	.name		= DRV_NAME,
-> > 
-> > Hmm, this changes a sysfs-exported name which has the potential
-> > to break user-space.  So I think you'd need to a stronger argument
-> > to do it other than just cleaning it up.
-> > 
+On Wed, Aug 24, 2016 at 03:34:40PM +0800, Li Zhong wrote:
+> walk.iv is not assigned a value in blkcipher_walk_init. It makes iv uninitialized.
+> It is possibly a null value(as shown below), which is then used by aes_p8_encrypt. 
 > 
-> amd is really really too generic.
+> This patch moves iv = walk.iv after blkcipher_walk_virt, in which walk.iv is set.
+>  
+> [17856.268050] Unable to handle kernel paging request for data at address 0x00000000
+> [17856.268212] Faulting instruction address: 0xd000000002ff04bc
+> 7:mon> t
+> [link register   ] d000000002ff47b8 p8_aes_xts_crypt+0x168/0x2a0 [vmx_crypto]   (938)
+> [c000000013b77960] d000000002ff4794 p8_aes_xts_crypt+0x144/0x2a0 [vmx_crypto] (unreliable)
+> [c000000013b77a70] c000000000544d64 skcipher_decrypt_blkcipher+0x64/0x80
+> [c000000013b77ac0] d000000003c0175c crypt_convert+0x53c/0x620 [dm_crypt]
+> [c000000013b77ba0] d000000003c043fc kcryptd_crypt+0x3cc/0x440 [dm_crypt]
+> [c000000013b77c50] c0000000000f3070 process_one_work+0x1e0/0x590
+> [c000000013b77ce0] c0000000000f34c8 worker_thread+0xa8/0x660
+> [c000000013b77d80] c0000000000fc0b0 kthread+0x110/0x130
+> [c000000013b77e30] c0000000000098f0 ret_from_kernel_thread+0x5c/0x6c
+> 
+> Signed-off-by: Li Zhong <zhong@linux.vnet.ibm.com>
 
-Well this would have been a good reason to change it before it
-went into the kernel.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
