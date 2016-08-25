@@ -1,105 +1,34 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: FIPS - allow tests to be disabled in FIPS mode
-Date: Thu, 25 Aug 2016 15:15:01 +0200
-Message-ID: <1685622.m1phZymvbe@positron.chronox.de>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH] hwrng: pasemi_rng.c: Migrate to managed API
+Date: Thu, 25 Aug 2016 18:55:00 +0530
+Message-ID: <CANc+2y4JqGRXCLUEpMo8EB8thW5jsweh0Lg2VjuvpNgSR-AwMA@mail.gmail.com>
+References: <1472124856-12767-1-git-send-email-prasannatsmkumar@gmail.com> <20160825121546.GA25650@Red>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org,
-        Tapas Sarangi <TSarangi@trustwave.com>
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=UTF-8
+Cc: olof@lixom.net, mpm@selenic.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:37300 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933433AbcHYNPq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Aug 2016 09:15:46 -0400
+Received: from mail-yw0-f195.google.com ([209.85.161.195]:36655 "EHLO
+        mail-yw0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932312AbcHYNZB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Aug 2016 09:25:01 -0400
+In-Reply-To: <20160825121546.GA25650@Red>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In FIPS mode, additional restrictions may apply. If these restrictions
-are violated, the kernel will panic(). This patch allows test vectors
-for symmetric ciphers to be marked as to be skipped in FIPS mode.
+> I will propose to use devm_ioremap_resource() instead for removing this hardcoded 0x100, but i cannot find any user of this driver in any dts. (And so cannot check that this 0x100 is given in any DT resource node)
+>
+> Is this normal ?
 
-Together with the patch, the XTS test vectors where the AES key is
-identical to the tweak key is disabled in FIPS mode. This test vector
-violates the FIPS requirement that both keys must be different.
+I wanted to use devm_ioremap_resource but could not find DT entry
+required for this driver in any of the .dts files. So did not change
+that. I could not find any dts/dtsi for this platform. So I assume
+that the dtb is not present in the kernel, dtb is supplied by the
+bootloader. I may be wrong in this. Can anyone confirm this?
 
-Reported-by: Tapas Sarangi <TSarangi@trustwave.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/testmgr.c | 9 +++++++++
- crypto/testmgr.h | 4 ++++
- 2 files changed, 13 insertions(+)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index c2a8bd3..0b01c3d 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1008,6 +1008,9 @@ static int test_cipher(struct crypto_cipher *tfm, int enc,
- 		if (template[i].np)
- 			continue;
- 
-+		if (fips_enabled && template[i].fips_skip)
-+			continue;
-+
- 		j++;
- 
- 		ret = -EINVAL;
-@@ -1112,6 +1115,9 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
- 		if (template[i].np && !template[i].also_non_np)
- 			continue;
- 
-+		if (fips_enabled && template[i].fips_skip)
-+			continue;
-+
- 		if (template[i].iv)
- 			memcpy(iv, template[i].iv, ivsize);
- 		else
-@@ -1198,6 +1204,9 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
- 		if (!template[i].np)
- 			continue;
- 
-+		if (fips_enabled && template[i].fips_skip)
-+			continue;
-+
- 		if (template[i].iv)
- 			memcpy(iv, template[i].iv, ivsize);
- 		else
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index acb6bbf..e64a4ef 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -59,6 +59,7 @@ struct hash_testvec {
-  * @tap:	How to distribute data in @np SGs
-  * @also_non_np: 	if set to 1, the test will be also done without
-  * 			splitting data in @np SGs
-+ * @fips_skip:	Skip the test vector in FIPS mode
-  */
- 
- struct cipher_testvec {
-@@ -75,6 +76,7 @@ struct cipher_testvec {
- 	unsigned char klen;
- 	unsigned short ilen;
- 	unsigned short rlen;
-+	bool fips_skip;
- };
- 
- struct aead_testvec {
-@@ -18224,6 +18226,7 @@ static struct cipher_testvec aes_xts_enc_tv_template[] = {
- 			  "\x00\x00\x00\x00\x00\x00\x00\x00"
- 			  "\x00\x00\x00\x00\x00\x00\x00\x00",
- 		.klen   = 32,
-+		.fips_skip = 1,
- 		.iv     = "\x00\x00\x00\x00\x00\x00\x00\x00"
- 			  "\x00\x00\x00\x00\x00\x00\x00\x00",
- 		.input  = "\x00\x00\x00\x00\x00\x00\x00\x00"
-@@ -18566,6 +18569,7 @@ static struct cipher_testvec aes_xts_dec_tv_template[] = {
- 			  "\x00\x00\x00\x00\x00\x00\x00\x00"
- 			  "\x00\x00\x00\x00\x00\x00\x00\x00",
- 		.klen   = 32,
-+		.fips_skip = 1,
- 		.iv     = "\x00\x00\x00\x00\x00\x00\x00\x00"
- 			  "\x00\x00\x00\x00\x00\x00\x00\x00",
- 		.input = "\x91\x7c\xf6\x9e\xbd\x68\xb2\xec"
--- 
-2.7.4
+Regards,
+PrasannaKumar
