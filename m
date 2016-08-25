@@ -1,34 +1,39 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH] hwrng: pasemi_rng.c: Migrate to managed API
-Date: Thu, 25 Aug 2016 18:55:00 +0530
-Message-ID: <CANc+2y4JqGRXCLUEpMo8EB8thW5jsweh0Lg2VjuvpNgSR-AwMA@mail.gmail.com>
-References: <1472124856-12767-1-git-send-email-prasannatsmkumar@gmail.com> <20160825121546.GA25650@Red>
+From: Jason Cooper <jason@lakedaemon.net>
+Subject: Re: [PATCH v2 5/5] hwrng: amd: Rework of the amd768-hwrng driver
+Date: Thu, 25 Aug 2016 14:56:38 +0000
+Message-ID: <20160825145638.GD10637@io.lakedaemon.net>
+References: <1472127395-32195-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1472127395-32195-6-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: olof@lixom.net, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: mpm@selenic.com, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yw0-f195.google.com ([209.85.161.195]:36655 "EHLO
-        mail-yw0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932312AbcHYNZB (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Aug 2016 09:25:01 -0400
-In-Reply-To: <20160825121546.GA25650@Red>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1472127395-32195-6-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-> I will propose to use devm_ioremap_resource() instead for removing this hardcoded 0x100, but i cannot find any user of this driver in any dts. (And so cannot check that this 0x100 is given in any DT resource node)
->
-> Is this normal ?
+Hi Corentin,
 
-I wanted to use devm_ioremap_resource but could not find DT entry
-required for this driver in any of the .dts files. So did not change
-that. I could not find any dts/dtsi for this platform. So I assume
-that the dtb is not present in the kernel, dtb is supplied by the
-bootloader. I may be wrong in this. Can anyone confirm this?
+On Thu, Aug 25, 2016 at 02:16:35PM +0200, LABBE Corentin wrote:
+> This patch convert the hwrng interface used by amd768-rng to its new API
+> by replacing data_read()/data_present() by read().
+> 
+> Furthermore, Instead of having two global variable, it's better to use a
+> private struct. This will permit to remove amd_pdev variable.
+> 
+> Finally, Instead of accessing hw directly via pmbase, it's better to
+> access after ioport_map() via ioread32/iowrite32.
 
-Regards,
-PrasannaKumar
+I was going to recommend a better $subject line, but now I see why it's
+vague. :(  I would recommend breaking this patch up into three:
+
+  hwrng: amd - Access hardware via ioread32/iowrite32
+  hwrng: amd - Replace global variable with private struct
+  hwrng: amd - Convert to new hwrng read() API
+
+thx,
+
+Jason.
