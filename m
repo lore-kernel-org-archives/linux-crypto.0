@@ -1,72 +1,65 @@
-From: Stefan Wahren <stefan.wahren@i2se.com>
-Subject: Re: crypto: mxs-dcp: do not call blocking ops when !TASK_RUNNING;
- state=1
-Date: Thu, 25 Aug 2016 06:44:25 +0200 (CEST)
-Message-ID: <539610224.17415.b37ed0be-b9b4-4de6-871e-3fc62b44240e.open-xchange@email.1und1.de>
-References: <140047983.403523.225ddbfe-fd96-4f9b-a2b9-e0173af882ba.open-xchange@email.1und1.de>
- <CAOMZO5DWBoVYfK67faj_i=YVUGE3aODCs0-s3-rbDjy7Y3ckFg@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 3/5] hwrng: amd: Be consitent with the driver name
+Date: Thu, 25 Aug 2016 12:19:19 +0800
+Message-ID: <20160825041919.GA9906@gondor.apana.org.au>
+References: <1471614177-12380-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1471614177-12380-3-git-send-email-clabbe.montjoie@gmail.com>
+ <20160824105811.GA2120@gondor.apana.org.au>
+ <20160824135122.GC29212@Red>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Fabio Estevam <fabio.estevam@nxp.com>,
-        =?UTF-8?Q?Marek_Va=C5=A1ut?= <marex@denx.de>
-To: Fabio Estevam <festevam@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.135]:61849 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752541AbcHYEvS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Aug 2016 00:51:18 -0400
-In-Reply-To: <CAOMZO5DWBoVYfK67faj_i=YVUGE3aODCs0-s3-rbDjy7Y3ckFg@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: mpm@selenic.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20160824135122.GC29212@Red>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Fabio,
+On Wed, Aug 24, 2016 at 03:51:22PM +0200, LABBE Corentin wrote:
+> On Wed, Aug 24, 2016 at 06:58:11PM +0800, Herbert Xu wrote:
+> > On Fri, Aug 19, 2016 at 03:42:55PM +0200, LABBE Corentin wrote:
+> > > The driver name is displayed each time differently.
+> > > This patch make use of the same name everywhere.
+> > > 
+> > > Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+> > > ---
+> > >  drivers/char/hw_random/amd-rng.c | 13 ++++++-------
+> > >  1 file changed, 6 insertions(+), 7 deletions(-)
+> > > 
+> > > diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
+> > > index d0042f5..d0a806a 100644
+> > > --- a/drivers/char/hw_random/amd-rng.c
+> > > +++ b/drivers/char/hw_random/amd-rng.c
+> > > @@ -31,7 +31,7 @@
+> > >  #include <linux/delay.h>
+> > >  #include <asm/io.h>
+> > >  
+> > > -#define PFX	KBUILD_MODNAME ": "
+> > > +#define DRV_NAME "AMD768-HWRNG"
+> > >  
+> > >  /*
+> > >   * Data for PCI driver interface
+> > > @@ -98,7 +98,7 @@ static void amd_rng_cleanup(struct hwrng *rng)
+> > >  }
+> > >  
+> > >  static struct hwrng amd_rng = {
+> > > -	.name		= "amd",
+> > > +	.name		= DRV_NAME,
+> > 
+> > Hmm, this changes a sysfs-exported name which has the potential
+> > to break user-space.  So I think you'd need to a stronger argument
+> > to do it other than just cleaning it up.
+> > 
+> 
+> amd is really really too generic.
 
-> Fabio Estevam <festevam@gmail.com> hat am 25. August 2016 um 00:52
-> geschrieben:
-> 
-> 
-> Hi Stefan,
-> 
-> On Tue, Aug 23, 2016 at 5:38 PM, Stefan Wahren <stefan.wahren@i2se.com> wrote:
-> > Hi,
-> >
-> > i'm using a iMX233-OLinuXino board and i get the following warning during
-> > boot
-> > with 4.8.0-rc2-next-20160819:
-> >
-> > [    2.450000] ------------[ cut here ]------------
-> > [    2.450000] WARNING: CPU: 0 PID: 42 at kernel/sched/core.c:7602
-> > __might_sleep+0x8c/0xa0
-> > [    2.470000] do not call blocking ops when !TASK_RUNNING; state=1 set at
-> > [<c048f730>] dcp_chan_thread_aes+0x24/0x664
-> 
-> Did you select any debug option to observe such messages?
+Well this would have been a good reason to change it before it
+went into the kernel.
 
-yes, it's CONFIG_DEBUG_ATOMIC_SLEEP. After a short web search i found this lwn
-article [1].
-I will try the suggested solution.
-
-Regards
-Stefan
-
-[1] - https://lwn.net/Articles/628628/
-
-> 
-> The kernelci boot log does not show this problem on a imx23-olinuxino
-> running linux-next:
-> https://storage.kernelci.org/next/next-20160824/arm-mxs_defconfig/lab-pengutronix/boot-imx23-olinuxino.html
-> 
-> We still have the errors below:
-> 
-> [    4.400000] mxs-dcp 80028000.dcp: Failed to register sha1 hash!
-> [    4.410000] mxs-dcp: probe of 80028000.dcp failed with error -22
-> 
-> ,but that's a different issue.
-> 
-> Regards,
-> 
-> Fabio Estevam
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
