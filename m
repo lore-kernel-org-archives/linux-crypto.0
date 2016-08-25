@@ -1,48 +1,53 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: Problems with cbc(aes) and do_alg0test()
-Date: Thu, 25 Aug 2016 02:45:01 +0200
-Message-ID: <1510671.Z01xXXj6zB@positron.chronox.de>
-References: <1887F274-344C-4810-B2DD-DD6551CC4980@vmware.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH -next] chcr: Fix non static symbol warning
+Date: Thu, 25 Aug 2016 12:22:24 +0800
+Message-ID: <20160825042224.GC9906@gondor.apana.org.au>
+References: <1471882278-25777-1-git-send-email-weiyj.lk@gmail.com>
+ <20160824130651.GB2120@gondor.apana.org.au>
+ <06364d6b-bc23-26dd-df2f-9a7ec165674a@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Michael McKay <mmckay@vmware.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Hariprasad Shenai <hariprasad@chelsio.com>,
+        Atul Gupta <atul.gupta@chelsio.com>,
+        Wei Yongjun <weiyongjun1@huawei.com>,
+        linux-crypto@vger.kernel.org
+To: Wei Yongjun <weiyj.lk@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:37294 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751530AbcHYGEx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Aug 2016 02:04:53 -0400
-In-Reply-To: <1887F274-344C-4810-B2DD-DD6551CC4980@vmware.com>
+Received: from helcar.hengli.com.au ([209.40.204.226]:55828 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753994AbcHYHDx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Aug 2016 03:03:53 -0400
+Content-Disposition: inline
+In-Reply-To: <06364d6b-bc23-26dd-df2f-9a7ec165674a@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 23. August 2016, 22:44:39 CEST schrieb Michael McKay:
+On Wed, Aug 24, 2016 at 10:50:24PM +0800, Wei Yongjun wrote:
+> Hi Herbert,
+> 
+> On 08/24/2016 09:06 PM, Herbert Xu wrote:
+> > On Mon, Aug 22, 2016 at 04:11:18PM +0000, Wei Yongjun wrote:
+> >> From: Wei Yongjun <weiyongjun1@huawei.com>
+> >>
+> >> Fixes the following sparse warning:
+> >>
+> >> drivers/crypto/chelsio/chcr_algo.c:593:5: warning:
+> >>  symbol 'cxgb4_is_crypto_q_full' was not declared. Should it be static?
+> >>
+> >> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+> > Please repost this to netdev as the chelsio patches were applied
+> > in the net tree.
+> 
+> This file only exists in net-next, not in netdev.
+> http://git.kernel.org/cgit/linux/kernel/git/davem/net.git/tree/drivers/crypto/chelsio/chcr_algo.c
+> show not found.
 
-Hi Michael,
+I meant the netdev mailing list.
 
-> We are writing a device driver with kernel v3.14, and trying to encrypt some
-> data using the Linux kernel algorithm “cbc(aes)”. Our /proc/crypto shows
-> the following is loaded: driver “cbc-aes-aesni”, module “aesni_intel”, and
-> type “ablkcipher”. But crypto_has_alg() gives us an error indicating the
-> algo is not loaded. So knowing we have the algo string correct, most likely
-> the problem is with the two other input variables: mask or type.
- 
-> Since AESNI is in use, we have a decent guess at the types by looking at the
-> .cra_flags field in aensi-Intel_glue.c (which has
-> “CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC”). That leaves just a few
-> mask fields to guess at, but CRYPTO_ALG_TYPE_BLKCIPHER_MASK and
-> CRYPTO_ALG_TYPE_MASK don’t work (not does OR’ing them together). 
- 
-> What are the correct mask and type values for AESNI, and can you point me to
-> any documentation? What else might we be doing wrong? Is /proc/crypto
-> giving us relevant information? Thanks,
-
-You can only use the cbc-aes-aesni code with the ablkcipher API. Using it with 
-the blkcipher API will not work.
-
-So, a simple crypto_alloc_ablkcipher("cbc-aes-aesni", 0, 0) should work. If 
-not, what is the return code?
-
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
