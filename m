@@ -1,62 +1,82 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: mxs-dcp: do not call blocking ops when !TASK_RUNNING;
- state=1
-Date: Thu, 25 Aug 2016 17:02:30 +0800
-Message-ID: <20160825090230.GA11590@gondor.apana.org.au>
-References: <140047983.403523.225ddbfe-fd96-4f9b-a2b9-e0173af882ba.open-xchange@email.1und1.de>
- <CAOMZO5DWBoVYfK67faj_i=YVUGE3aODCs0-s3-rbDjy7Y3ckFg@mail.gmail.com>
- <539610224.17415.b37ed0be-b9b4-4de6-871e-3fc62b44240e.open-xchange@email.1und1.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Fabio Estevam <festevam@gmail.com>, linux-crypto@vger.kernel.org,
-        Fabio Estevam <fabio.estevam@nxp.com>,
-        Marek =?utf-8?B?VmHFoXV0?= <marex@denx.de>
-To: Stefan Wahren <stefan.wahren@i2se.com>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: [PATCH] hwrng: pasemi_rng.c: Migrate to managed API
+Date: Thu, 25 Aug 2016 17:04:16 +0530
+Message-ID: <1472124856-12767-1-git-send-email-prasannatsmkumar@gmail.com>
+Cc: prasannatsmkumar@gmail.com
+To: olof@lixom.net, mpm@selenic.com, herbert@gondor.apana.org.au,
+        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:43092 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757887AbcHYJCj (ORCPT
+Received: from mail-pa0-f67.google.com ([209.85.220.67]:35679 "EHLO
+        mail-pa0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933184AbcHYLee (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Aug 2016 05:02:39 -0400
-Content-Disposition: inline
-In-Reply-To: <539610224.17415.b37ed0be-b9b4-4de6-871e-3fc62b44240e.open-xchange@email.1und1.de>
+        Thu, 25 Aug 2016 07:34:34 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 25, 2016 at 06:44:25AM +0200, Stefan Wahren wrote:
-> Hi Fabio,
-> 
-> > Fabio Estevam <festevam@gmail.com> hat am 25. August 2016 um 00:52
-> > geschrieben:
-> > 
-> > 
-> > Hi Stefan,
-> > 
-> > On Tue, Aug 23, 2016 at 5:38 PM, Stefan Wahren <stefan.wahren@i2se.com> wrote:
-> > > Hi,
-> > >
-> > > i'm using a iMX233-OLinuXino board and i get the following warning during
-> > > boot
-> > > with 4.8.0-rc2-next-20160819:
-> > >
-> > > [    2.450000] ------------[ cut here ]------------
-> > > [    2.450000] WARNING: CPU: 0 PID: 42 at kernel/sched/core.c:7602
-> > > __might_sleep+0x8c/0xa0
-> > > [    2.470000] do not call blocking ops when !TASK_RUNNING; state=1 set at
-> > > [<c048f730>] dcp_chan_thread_aes+0x24/0x664
-> > 
-> > Did you select any debug option to observe such messages?
-> 
-> yes, it's CONFIG_DEBUG_ATOMIC_SLEEP. After a short web search i found this lwn
-> article [1].
-> I will try the suggested solution.
+Use devm_ioremap and devm_hwrng_register instead of ioremap and
+hwrng_register. This removes unregistering and error handling code.
 
-The problem is that the driver is setting the task state too early.
-In fact, there is no reason why it should be using a kthread at all.
-Someone should convert this over to a work queue.
+This patch is not tested with hardware as I don't have access to it.
 
-Cheers,
+Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+---
+ drivers/char/hw_random/pasemi-rng.c | 26 +++-----------------------
+ 1 file changed, 3 insertions(+), 23 deletions(-)
+
+diff --git a/drivers/char/hw_random/pasemi-rng.c b/drivers/char/hw_random/pasemi-rng.c
+index 699b725..0f03397 100644
+--- a/drivers/char/hw_random/pasemi-rng.c
++++ b/drivers/char/hw_random/pasemi-rng.c
+@@ -100,37 +100,18 @@ static int rng_probe(struct platform_device *ofdev)
+ 	void __iomem *rng_regs;
+ 	struct device_node *rng_np = ofdev->dev.of_node;
+ 	struct resource res;
+-	int err = 0;
+ 
+-	err = of_address_to_resource(rng_np, 0, &res);
+-	if (err)
++	if (of_address_to_resource(rng_np, 0, &res))
+ 		return -ENODEV;
+ 
+-	rng_regs = ioremap(res.start, 0x100);
+-
++	rng_regs = devm_ioremap(&ofdev->dev, res.start, 0x100);
+ 	if (!rng_regs)
+ 		return -ENOMEM;
+ 
+ 	pasemi_rng.priv = (unsigned long)rng_regs;
+ 
+ 	pr_info("Registering PA Semi RNG\n");
+-
+-	err = hwrng_register(&pasemi_rng);
+-
+-	if (err)
+-		iounmap(rng_regs);
+-
+-	return err;
+-}
+-
+-static int rng_remove(struct platform_device *dev)
+-{
+-	void __iomem *rng_regs = (void __iomem *)pasemi_rng.priv;
+-
+-	hwrng_unregister(&pasemi_rng);
+-	iounmap(rng_regs);
+-
+-	return 0;
++	return devm_hwrng_register(&ofdev->dev, &pasemi_rng);
+ }
+ 
+ static const struct of_device_id rng_match[] = {
+@@ -146,7 +127,6 @@ static struct platform_driver rng_driver = {
+ 		.of_match_table = rng_match,
+ 	},
+ 	.probe		= rng_probe,
+-	.remove		= rng_remove,
+ };
+ 
+ module_platform_driver(rng_driver);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.5.0
