@@ -1,48 +1,67 @@
-From: "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: Entropy sources
-Date: Thu, 25 Aug 2016 17:20:57 -0700
-Message-ID: <5d672be5-6234-6bb7-fc2d-ee680742628c@zytor.com>
-References: <CAH8yC8nZyAZT2OiRXgT=CBfQ4RSw-E1uZaQvKuQZ9BDYuPmGvA@mail.gmail.com>
- <f57f675f-a914-4c72-f32a-4091e547905f@zytor.com>
- <CACXcFmk8DWOxu+=J3i06bSvEW3tp_O2cxHLGdCuXTJROZ=hysA@mail.gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: sha1_mb broken
+Date: Fri, 26 Aug 2016 03:15:06 +0200
+Message-ID: <1939675.7gNnqUbNs6@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Jeffrey Walton <noloader@gmail.com>, linux-crypto@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>
-To: Sandy Harris <sandyinchina@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CACXcFmk8DWOxu+=J3i06bSvEW3tp_O2cxHLGdCuXTJROZ=hysA@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:37304 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753133AbcHZBPs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Aug 2016 21:15:48 -0400
+Received: from positron.chronox.de (unknown [173.243.43.210])
+        by mail.eperm.de (Postfix) with ESMTPA id BE8B2181A7C7
+        for <linux-crypto@vger.kernel.org>; Fri, 26 Aug 2016 03:15:07 +0200 (CEST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/25/16 16:35, Sandy Harris wrote:
-> On Thu, Aug 25, 2016 at 5:30 PM, H. Peter Anvin <hpa@zytor.com> wrote:
-> 
->> The network stack is a good source of entropy, *once it is online*.
->> However, the most serious case is while the machine is still booting,
->> when the network will not have enabled yet.
->>
->>         -hpa
-> 
-> One possible solution is at:
-> https://github.com/sandy-harris/maxwell
-> 
-> A small (< 700 lines) daemon that gets entropy from timer imprecision
-> and variations in time for arithmetic (cache misses, interrupts, etc.)
-> and pumps it into /dev/random. Make it the first userspace program
-> started and all should be covered. Directory above includes a PDF doc
-> with detailed rationale and some discussion of alternate solutions.
-> 
-> Of course if you are dealing with a system-on-a-chip or low-end
-> embedded CPU & the timer is really inadequate, this will not work
-> well. Conceivably well enough, but we could not know that without
-> detailed analysis for each chip in question.
-> 
+Hi,
 
-A lot of this is exactly the same thing /dev/random already does in
-kernel space.  I have already in the past expressed skepticism toward
-this approach, because a lot of the analysis done has simply been bogus.
+I tried to execute tests with sha1_mb.
 
-	-hpa
+The execution simply stalls when invoking a digest operation -- i.e. the 
+digest operation does not finish. After some time after invoking the hashing 
+operation, the following log appears (note, the kccavs_* functions are my test 
+code; that test code works perfectly well with all other hash 
+implementations):
+
+[  140.426026] INFO: rcu_sched detected stalls on CPUs/tasks:
+[  140.426719] 	2-...: (1 GPs behind) idle=9c3/140000000000000/0 
+softirq=2680/2707 fqs=14762 
+[  140.427024] 	(detected by 0, t=60002 jiffies, g=655, c=654, q=35)
+[  140.427024] Task dump for CPU 2:
+[  140.427024] cavs_driver     R  running task        0   945    862 
+0x00000008
+[  140.427024]  ffffffff9b78d965 ffffa527b8bfa640 ffffa527bb505940 
+ffffa52775c20c50
+[  140.427024]  ffffa527bc300000 ffffa527b93d2a80 ffffa527bb857e00 
+ffffa527bc2ffd78
+[  140.427024]  ffffa527b93d2ac8 ffffa527bc2ffcc0 ffffffff9b78dfc8 
+ffffa527bc2ffd70
+[  140.427024] Call Trace:
+[  140.427024]  [<ffffffff9b78d965>] ? __schedule+0x245/0x690
+[  140.427024]  [<ffffffff9b78dfc8>] ? preempt_schedule_common+0x18/0x30
+[  140.427024]  [<ffffffff9b791a68>] ? _raw_spin_lock_irq+0x28/0x30
+[  140.427024]  [<ffffffff9b78ed98>] ? wait_for_completion_interruptible
++0x28/0x180
+[  140.427024]  [<ffffffffc028541c>] ? sha1_mb_async_digest+0x6c/0x70 
+[sha1_mb]
+[  140.427024]  [<ffffffff9b3b1129>] ? crypto_ahash_op+0x29/0x70
+[  140.427024]  [<ffffffffc0270148>] ? kccavs_test_ahash+0x198/0x2b0 
+[kcapi_cavs]
+[  140.427024]  [<ffffffffc026e20a>] ? kccavs_data_read+0xda/0x160 
+[kcapi_cavs]
+[  140.427024]  [<ffffffff9b370964>] ? full_proxy_read+0x54/0x90
+[  140.427024]  [<ffffffff9b208088>] ? __vfs_read+0x28/0x110
+[  140.427024]  [<ffffffff9b38a2c0>] ? security_file_permission+0xa0/0xc0
+[  140.427024]  [<ffffffff9b20850e>] ? rw_verify_area+0x4e/0xb0
+[  140.427024]  [<ffffffff9b208606>] ? vfs_read+0x96/0x130
+[  140.427024]  [<ffffffff9b2099f6>] ? SyS_read+0x46/0xa0
+[  140.427024]  [<ffffffff9b791cb6>] ? entry_SYSCALL_64_fastpath+0x1e/0xa8
+
+
+
+Ciao
+Stephan
