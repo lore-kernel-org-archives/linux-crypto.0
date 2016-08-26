@@ -1,53 +1,55 @@
-From: Jason Cooper <jason@lakedaemon.net>
-Subject: Re: [PATCH v2 5/5] hwrng: amd: Rework of the amd768-hwrng driver
-Date: Fri, 26 Aug 2016 13:29:55 +0000
-Message-ID: <20160826132955.GF10637@io.lakedaemon.net>
-References: <1472127395-32195-1-git-send-email-clabbe.montjoie@gmail.com>
- <1472127395-32195-6-git-send-email-clabbe.montjoie@gmail.com>
- <20160825145638.GD10637@io.lakedaemon.net>
- <20160826083802.GA32290@Red>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH] crypto: caam - fix IV loading for authenc (giv)decryption
+Date: Fri, 26 Aug 2016 17:13:42 +0300
+Message-ID: <1472220822-18888-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: mpm@selenic.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20160826083802.GA32290@Red>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: <linux-crypto@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn3nam01on0080.outbound.protection.outlook.com ([104.47.33.80]:19872
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751884AbcHZOOM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Aug 2016 10:14:12 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Corentin,
+For algorithms that implement IV generators before the crypto ops,
+the IV needed for decryption is initially located in req->src
+scatterlist, not in req->iv.
+aead_givdecrypt() is updated to put the IV in place.
 
-On Fri, Aug 26, 2016 at 10:38:02AM +0200, LABBE Corentin wrote:
-> On Thu, Aug 25, 2016 at 02:56:38PM +0000, Jason Cooper wrote:
-> > On Thu, Aug 25, 2016 at 02:16:35PM +0200, LABBE Corentin wrote:
-> > > This patch convert the hwrng interface used by amd768-rng to its new API
-> > > by replacing data_read()/data_present() by read().
-> > > 
-> > > Furthermore, Instead of having two global variable, it's better to use a
-> > > private struct. This will permit to remove amd_pdev variable.
-> > > 
-> > > Finally, Instead of accessing hw directly via pmbase, it's better to
-> > > access after ioport_map() via ioread32/iowrite32.
-> > 
-> > I was going to recommend a better $subject line, but now I see why it's
-> > vague. :(  I would recommend breaking this patch up into three:
-> > 
-> >   hwrng: amd - Access hardware via ioread32/iowrite32
-> >   hwrng: amd - Replace global variable with private struct
-> >   hwrng: amd - Convert to new hwrng read() API
-> > 
-> 
-> That was my first idea, but believed that it wasnt worth it.
+Cc: <stable@vger.kernel.org> # 4.3+
+Fixes: 479bcc7c5b9e ("crypto: caam - Convert authenc to new AEAD interface")
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
 
-When working with crypto/rng code, I'm a firm believer in moving
-cautiously and deliberately. :-)
+Herbert, as you suggested, aead_givdecrypt() is now setting the IV.
 
-> Anyway I will do it.
+In terms of optimizations, would it be safe to assume all "geniv" authenc
+algorithms - {echainiv, seqiv}(authenc) - get assoc,iv,ciphertext in
+req->src for decryption?
+The idea would be to avoid copying IV into req->iv and instruct
+the crypto engine to access it directly from req->src scatterlist.
 
-Thanks!
+ drivers/crypto/caam/caamalg.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-thx,
-
-Jason.
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 6dc597126b79..78be2bea1273 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -2545,6 +2545,7 @@ static int aead_givdecrypt(struct aead_request *req)
+ 	if (req->cryptlen < ivsize)
+ 		return -EINVAL;
+ 
++	scatterwalk_map_and_copy(req->iv, req->src, req->assoclen, ivsize, 0);
+ 	req->cryptlen -= ivsize;
+ 	req->assoclen += ivsize;
+ 
+-- 
+2.4.4
