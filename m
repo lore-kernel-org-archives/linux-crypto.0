@@ -1,39 +1,80 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH -next v2] chcr: Fix non static symbol warning
-Date: Fri, 26 Aug 2016 22:42:19 +0800
-Message-ID: <20160826144219.GA22232@gondor.apana.org.au>
-References: <1471882278-25777-1-git-send-email-weiyj.lk@gmail.com>
- <1472221268-25123-1-git-send-email-weiyj.lk@gmail.com>
+Subject: crypto: xor - Fix warning when XOR_SELECT_TEMPLATE is unset
+Date: Fri, 26 Aug 2016 23:19:39 +0800
+Message-ID: <20160826151938.GA22619@gondor.apana.org.au>
+References: <20160825113824.61ca7364@canb.auug.org.au>
+ <20160825082010.5523ae6f@mschwide>
+ <20160825074701.GA11175@gondor.apana.org.au>
+ <20160825211411.08858397@canb.auug.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Hariprasad Shenai <hariprasad@chelsio.com>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Wei Yongjun <weiyongjun1@huawei.com>,
-        linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-To: Wei Yongjun <weiyj.lk@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48074 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751640AbcHZOmw (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Aug 2016 10:42:52 -0400
+Cc: Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1472221268-25123-1-git-send-email-weiyj.lk@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20160825211411.08858397@canb.auug.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 26, 2016 at 02:21:08PM +0000, Wei Yongjun wrote:
-> From: Wei Yongjun <weiyongjun1@huawei.com>
+On Thu, Aug 25, 2016 at 09:14:11PM +1000, Stephen Rothwell wrote:
+>
+> That looks fine to me.  An alternative might be to have:
 > 
-> Fixes the following sparse warning:
+> #ifndef XOR_SELECT_TEMPLATE
+> #define XOR_SELECT_TEMPLATE(x)	(x)
+> #endif
 > 
-> drivers/crypto/chelsio/chcr_algo.c:593:5: warning:
->  symbol 'cxgb4_is_crypto_q_full' was not declared. Should it be static?
-> 
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+> near the top of the file.  That gets the #ifdef out of the code flow
+> and serves as some hint that such a thing can be defined by arch header
+> files.
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Good idea.  Thanks Stephen.
+
+---8<---
+This patch fixes an unused label warning triggered when the macro
+XOR_SELECT_TEMPLATE is not set.
+
+Fixes: 39457acda913 ("crypto: xor - skip speed test if the xor...")
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Suggested-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/xor.c b/crypto/xor.c
+index b8975d9..263af9f 100644
+--- a/crypto/xor.c
++++ b/crypto/xor.c
+@@ -24,6 +24,10 @@
+ #include <linux/preempt.h>
+ #include <asm/xor.h>
+ 
++#ifndef XOR_SELECT_TEMPLATE
++#define XOR_SELECT_TEMPLATE(x) (x)
++#endif
++
+ /* The xor routines to use.  */
+ static struct xor_block_template *active_template;
+ 
+@@ -109,17 +113,14 @@ calibrate_xor_blocks(void)
+ 	void *b1, *b2;
+ 	struct xor_block_template *f, *fastest;
+ 
+-	fastest = NULL;
++	fastest = XOR_SELECT_TEMPLATE(NULL);
+ 
+-#ifdef XOR_SELECT_TEMPLATE
+-	fastest = XOR_SELECT_TEMPLATE(fastest);
+ 	if (fastest) {
+ 		printk(KERN_INFO "xor: automatically using best "
+ 				 "checksumming function   %-10s\n",
+ 		       fastest->name);
+ 		goto out;
+ 	}
+-#endif
+ 
+ 	/*
+ 	 * Note: Since the memory is not actually used for _anything_ but to
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
