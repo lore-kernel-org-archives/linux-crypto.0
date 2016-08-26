@@ -1,46 +1,35 @@
-From: Wei Yongjun <weiyj.lk@gmail.com>
-Subject: [PATCH -next v2] chcr: Fix non static symbol warning
-Date: Fri, 26 Aug 2016 14:21:08 +0000
-Message-ID: <1472221268-25123-1-git-send-email-weiyj.lk@gmail.com>
-References: <1471882278-25777-1-git-send-email-weiyj.lk@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: caam - fix IV loading for authenc (giv)decryption
+Date: Fri, 26 Aug 2016 22:39:56 +0800
+Message-ID: <20160826143956.GF20096@gondor.apana.org.au>
+References: <1472220822-18888-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyongjun1@huawei.com>, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Hariprasad Shenai <hariprasad@chelsio.com>,
-        Atul Gupta <atul.gupta@chelsio.com>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <1471882278-25777-1-git-send-email-weiyj.lk@gmail.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:44299 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751625AbcHZOkC (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Aug 2016 10:40:02 -0400
+Content-Disposition: inline
+In-Reply-To: <1472220822-18888-1-git-send-email-horia.geanta@nxp.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Wei Yongjun <weiyongjun1@huawei.com>
+On Fri, Aug 26, 2016 at 05:13:42PM +0300, Horia Geantă wrote:
+> 
+> In terms of optimizations, would it be safe to assume all "geniv" authenc
+> algorithms - {echainiv, seqiv}(authenc) - get assoc,iv,ciphertext in
+> req->src for decryption?
 
-Fixes the following sparse warning:
+Yes.  They all get the raw IPsec packet, apart from the ESN munging.
 
-drivers/crypto/chelsio/chcr_algo.c:593:5: warning:
- symbol 'cxgb4_is_crypto_q_full' was not declared. Should it be static?
-
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
----
-v1 -> v2: cc netdev maillist
----
- drivers/crypto/chelsio/chcr_algo.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index ad8e353..e4ddb92 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -590,7 +590,7 @@ badkey_err:
- 	return -EINVAL;
- }
- 
--int cxgb4_is_crypto_q_full(struct net_device *dev, unsigned int idx)
-+static int cxgb4_is_crypto_q_full(struct net_device *dev, unsigned int idx)
- {
- 	int ret = 0;
- 	struct sge_ofld_txq *q;
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
