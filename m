@@ -1,55 +1,46 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH] crypto: caam - fix IV loading for authenc (giv)decryption
-Date: Fri, 26 Aug 2016 17:13:42 +0300
-Message-ID: <1472220822-18888-1-git-send-email-horia.geanta@nxp.com>
+From: Wei Yongjun <weiyj.lk@gmail.com>
+Subject: [PATCH -next v2] chcr: Fix non static symbol warning
+Date: Fri, 26 Aug 2016 14:21:08 +0000
+Message-ID: <1472221268-25123-1-git-send-email-weiyj.lk@gmail.com>
+References: <1471882278-25777-1-git-send-email-weiyj.lk@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0080.outbound.protection.outlook.com ([104.47.33.80]:19872
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751884AbcHZOOM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Aug 2016 10:14:12 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Wei Yongjun <weiyongjun1@huawei.com>, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Hariprasad Shenai <hariprasad@chelsio.com>,
+        Atul Gupta <atul.gupta@chelsio.com>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <1471882278-25777-1-git-send-email-weiyj.lk@gmail.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-For algorithms that implement IV generators before the crypto ops,
-the IV needed for decryption is initially located in req->src
-scatterlist, not in req->iv.
-aead_givdecrypt() is updated to put the IV in place.
+From: Wei Yongjun <weiyongjun1@huawei.com>
 
-Cc: <stable@vger.kernel.org> # 4.3+
-Fixes: 479bcc7c5b9e ("crypto: caam - Convert authenc to new AEAD interface")
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+Fixes the following sparse warning:
+
+drivers/crypto/chelsio/chcr_algo.c:593:5: warning:
+ symbol 'cxgb4_is_crypto_q_full' was not declared. Should it be static?
+
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 ---
+v1 -> v2: cc netdev maillist
+---
+ drivers/crypto/chelsio/chcr_algo.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Herbert, as you suggested, aead_givdecrypt() is now setting the IV.
-
-In terms of optimizations, would it be safe to assume all "geniv" authenc
-algorithms - {echainiv, seqiv}(authenc) - get assoc,iv,ciphertext in
-req->src for decryption?
-The idea would be to avoid copying IV into req->iv and instruct
-the crypto engine to access it directly from req->src scatterlist.
-
- drivers/crypto/caam/caamalg.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 6dc597126b79..78be2bea1273 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -2545,6 +2545,7 @@ static int aead_givdecrypt(struct aead_request *req)
- 	if (req->cryptlen < ivsize)
- 		return -EINVAL;
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index ad8e353..e4ddb92 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -590,7 +590,7 @@ badkey_err:
+ 	return -EINVAL;
+ }
  
-+	scatterwalk_map_and_copy(req->iv, req->src, req->assoclen, ivsize, 0);
- 	req->cryptlen -= ivsize;
- 	req->assoclen += ivsize;
- 
--- 
-2.4.4
+-int cxgb4_is_crypto_q_full(struct net_device *dev, unsigned int idx)
++static int cxgb4_is_crypto_q_full(struct net_device *dev, unsigned int idx)
+ {
+ 	int ret = 0;
+ 	struct sge_ofld_txq *q;
