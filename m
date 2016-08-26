@@ -1,7 +1,7 @@
 From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH v3 8/8] hwrng: amd: Convert to new hwrng read() API
-Date: Fri, 26 Aug 2016 13:11:36 +0200
-Message-ID: <1472209896-17197-9-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH v3 7/8] hwrng: amd: Access hardware via ioread32/iowrite32
+Date: Fri, 26 Aug 2016 13:11:35 +0200
+Message-ID: <1472209896-17197-8-git-send-email-clabbe.montjoie@gmail.com>
 References: <1472209896-17197-1-git-send-email-clabbe.montjoie@gmail.com>
 Cc: linux-kernel@vger.kernel.org,
         LABBE Corentin <clabbe.montjoie@gmail.com>
@@ -12,82 +12,105 @@ In-Reply-To: <1472209896-17197-1-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch convert the hwrng interface used by amd768-rng to its new API
-by replacing data_read()/data_present() by read().
+Instead of accessing hw directly via pmbase, it's better to
+access after ioport_map() via ioread32/iowrite32.
 
 Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 ---
- drivers/char/hw_random/amd-rng.c | 47 ++++++++++++++++++++++++----------------
- 1 file changed, 28 insertions(+), 19 deletions(-)
+ drivers/char/hw_random/amd-rng.c | 31 +++++++++++++++++++++++++------
+ 1 file changed, 25 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
-index bfa14b9..9959c76 100644
+index 4ef94e9..bfa14b9 100644
 --- a/drivers/char/hw_random/amd-rng.c
 +++ b/drivers/char/hw_random/amd-rng.c
-@@ -58,27 +58,37 @@ struct amd768_priv {
+@@ -32,6 +32,11 @@
+ 
+ #define DRV_NAME "AMD768-HWRNG"
+ 
++#define RNGDATA		0x00
++#define RNGDONE		0x04
++#define PMBASE_OFFSET	0xF0
++#define PMBASE_SIZE	8
++
+ /*
+  * Data for PCI driver interface
+  *
+@@ -48,6 +53,7 @@ static const struct pci_device_id pci_tbl[] = {
+ MODULE_DEVICE_TABLE(pci, pci_tbl);
+ 
+ struct amd768_priv {
++	void __iomem *iobase;
+ 	struct pci_dev *pcidev;
  	u32 pmbase;
  };
+@@ -58,7 +64,7 @@ static int amd_rng_data_present(struct hwrng *rng, int wait)
+ 	int data, i;
  
--static int amd_rng_data_present(struct hwrng *rng, int wait)
-+static int amd_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+ 	for (i = 0; i < 20; i++) {
+-		data = !!(inl(priv->pmbase + 0xF4) & 1);
++		data = !!(ioread32(priv->iobase + RNGDONE) & 1);
+ 		if (data || !wait)
+ 			break;
+ 		udelay(10);
+@@ -70,7 +76,7 @@ static int amd_rng_data_read(struct hwrng *rng, u32 *data)
  {
-+	u32 *data = buf;
  	struct amd768_priv *priv = (struct amd768_priv *)rng->priv;
--	int data, i;
--
--	for (i = 0; i < 20; i++) {
--		data = !!(ioread32(priv->iobase + RNGDONE) & 1);
--		if (data || !wait)
--			break;
--		udelay(10);
-+	size_t read = 0;
-+	/* We will wait at maximum one time per read */
-+	int timeout = max / 4 + 1;
-+
-+	/*
-+	 * RNG data is available when RNGDONE is set to 1
-+	 * New random numbers are generated approximately 128 microseconds
-+	 * after RNGDATA is read
-+	 */
-+	while (read < max) {
-+		if (ioread32(priv->iobase + RNGDONE) == 0) {
-+			if (wait) {
-+				/* Delay given by datasheet */
-+				usleep_range(128, 196);
-+				if (timeout-- == 0)
-+					return read;
-+			} else {
-+				return 0;
-+			}
-+		} else {
-+			*data = ioread32(priv->iobase + RNGDATA);
-+			data++;
-+			read += 4;
-+		}
- 	}
--	return data;
--}
--
--static int amd_rng_data_read(struct hwrng *rng, u32 *data)
--{
--	struct amd768_priv *priv = (struct amd768_priv *)rng->priv;
--
--	*data = ioread32(priv->iobase + RNGDATA);
  
--	return 4;
-+	return read;
+-	*data = inl(priv->pmbase + 0xF0);
++	*data = ioread32(priv->iobase + RNGDATA);
+ 
+ 	return 4;
  }
+@@ -138,12 +144,20 @@ found:
+ 	if (!priv)
+ 		return -ENOMEM;
  
- static int amd_rng_init(struct hwrng *rng)
-@@ -111,8 +121,7 @@ static struct hwrng amd_rng = {
- 	.name		= "amd",
- 	.init		= amd_rng_init,
- 	.cleanup	= amd_rng_cleanup,
--	.data_present	= amd_rng_data_present,
--	.data_read	= amd_rng_data_read,
-+	.read		= amd_rng_read,
- };
+-	if (!request_region(pmbase + 0xF0, 8, DRV_NAME)) {
++	if (!request_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE, DRV_NAME)) {
+ 		dev_err(&pdev->dev, DRV_NAME " region 0x%x already in use!\n",
+ 			pmbase + 0xF0);
+ 		err = -EBUSY;
+ 		goto out;
+ 	}
++
++	priv->iobase = ioport_map(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
++	if (!priv->iobase) {
++		pr_err(DRV_NAME "Cannot map ioport\n");
++		err = -EINVAL;
++		goto err_iomap;
++	}
++
+ 	amd_rng.priv = (unsigned long)priv;
+ 	priv->pmbase = pmbase;
+ 	priv->pcidev = pdev;
+@@ -152,11 +166,14 @@ found:
+ 	err = hwrng_register(&amd_rng);
+ 	if (err) {
+ 		pr_err(DRV_NAME " registering failed (%d)\n", err);
+-		release_region(pmbase + 0xF0, 8);
+-		goto out;
++		goto err_hwrng;
+ 	}
+ 	return 0;
  
- static int __init mod_init(void)
++err_hwrng:
++	ioport_unmap(priv->iobase);
++err_iomap:
++	release_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
+ out:
+ 	kfree(priv);
+ 	return err;
+@@ -170,7 +187,9 @@ static void __exit mod_exit(void)
+ 
+ 	hwrng_unregister(&amd_rng);
+ 
+-	release_region(priv->pmbase + 0xF0, 8);
++	ioport_unmap(priv->iobase);
++
++	release_region(priv->pmbase + PMBASE_OFFSET, PMBASE_SIZE);
+ 
+ 	kfree(priv);
+ }
 -- 
 2.7.3
