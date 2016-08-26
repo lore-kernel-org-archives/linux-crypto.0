@@ -1,71 +1,44 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH v3 1/8] hwrng: amd: Fix style problem with blank line
-Date: Fri, 26 Aug 2016 13:11:29 +0200
-Message-ID: <1472209896-17197-2-git-send-email-clabbe.montjoie@gmail.com>
-References: <1472209896-17197-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-kernel@vger.kernel.org,
-        LABBE Corentin <clabbe.montjoie@gmail.com>
-To: mpm@selenic.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1472209896-17197-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Horia Ioan Geanta Neag <horia.geanta@nxp.com>
+Subject: caam - IV source for IPsec decryption
+Date: Fri, 26 Aug 2016 07:40:21 +0000
+Message-ID: <DB4PR04MB084720B85622B302C48D307798EC0@DB4PR04MB0847.eurprd04.prod.outlook.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-he1eur01on0084.outbound.protection.outlook.com ([104.47.0.84]:42524
+        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753336AbcHZLOj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Aug 2016 07:14:39 -0400
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Some blank line are unncessary, and one is missing after declaration.
-This patch fix thoses style problems.
-
-Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
----
- drivers/char/hw_random/amd-rng.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
-
-diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
-index 48f6a83..45b7965 100644
---- a/drivers/char/hw_random/amd-rng.c
-+++ b/drivers/char/hw_random/amd-rng.c
-@@ -31,10 +31,8 @@
- #include <linux/delay.h>
- #include <asm/io.h>
- 
--
- #define PFX	KBUILD_MODNAME ": "
- 
--
- /*
-  * Data for PCI driver interface
-  *
-@@ -52,7 +50,6 @@ MODULE_DEVICE_TABLE(pci, pci_tbl);
- 
- static struct pci_dev *amd_pdev;
- 
--
- static int amd_rng_data_present(struct hwrng *rng, int wait)
- {
- 	u32 pmbase = (u32)rng->priv;
-@@ -100,7 +97,6 @@ static void amd_rng_cleanup(struct hwrng *rng)
- 	pci_write_config_byte(amd_pdev, 0x40, rnen);
- }
- 
--
- static struct hwrng amd_rng = {
- 	.name		= "amd",
- 	.init		= amd_rng_init,
-@@ -109,7 +105,6 @@ static struct hwrng amd_rng = {
- 	.data_read	= amd_rng_data_read,
- };
- 
--
- static int __init mod_init(void)
- {
- 	int err = -ENODEV;
-@@ -157,6 +152,7 @@ out:
- static void __exit mod_exit(void)
- {
- 	u32 pmbase = (unsigned long)amd_rng.priv;
-+
- 	release_region(pmbase + 0xF0, 8);
- 	hwrng_unregister(&amd_rng);
- }
--- 
-2.7.3
+Herbert,=0A=
+=0A=
+Commits=0A=
+7021b2e1cddd "esp4: Switch to new AEAD interface"=0A=
+000ae7b2690e "esp6: Switch to new AEAD interface"=0A=
+removed the following:=0A=
+	/* Get ivec. This can be wrong, check against another impls. */=0A=
+	iv =3D esph->enc_data;=0A=
+from IPsec decryption - esp{4,6}_input(),=0A=
+so the IV in req->iv received by the implementer is no longer valid.=0A=
+=0A=
+Thus, the load of IV in caam driver - caamalg.c, init_authenc_job():=0A=
+        if (ivsize && (is_rfc3686 || !(alg->caam.geniv && encrypt)))=0A=
+                append_load_as_imm(desc, req->iv, ivsize,=0A=
+                                   LDST_CLASS_1_CCB |=0A=
+                                   LDST_SRCDST_BYTE_CONTEXT |=0A=
+                                   (ivoffset << LDST_OFFSET_SHIFT));=0A=
+is not suited for case mentioned above.=0A=
+=0A=
+Instead, the IV should be read from the req->src scatterlist=0A=
+(which consists of assoc data, iv, ciphertext).=0A=
+Please let me know if this is accurate, so I could prepare a fix.=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
