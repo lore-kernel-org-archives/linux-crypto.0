@@ -1,67 +1,42 @@
-From: Jason Cooper <jason@lakedaemon.net>
-Subject: Re: [PATCH v3 6/8] hwrng: amd: Replace global variable with private
- struct
-Date: Sat, 27 Aug 2016 15:36:15 +0000
-Message-ID: <20160827153615.GN10637@io.lakedaemon.net>
-References: <1472209896-17197-1-git-send-email-clabbe.montjoie@gmail.com>
- <1472209896-17197-7-git-send-email-clabbe.montjoie@gmail.com>
- <20160827144331.GK10637@io.lakedaemon.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: mpm@selenic.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20160827144331.GK10637@io.lakedaemon.net>
-Sender: linux-kernel-owner@vger.kernel.org
+From: PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH v2 0/4] hw_random: Add driver for Ingenic JZ4780 SoC RNG
+Date: Sat, 27 Aug 2016 23:44:53 +0530
+Message-ID: <1472321697-3094-1-git-send-email-prasannatsmkumar@gmail.com>
+To: mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+        mark.rutland-5wv7dgnIgG8@public.gmane.org, ralf-6z/3iImG2C8G8FEW9MqTrA@public.gmane.org,
+        gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org, boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
+        harvey.hunt-1AXoQHu6uovQT0dZR+AlfA@public.gmane.org, prarit-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+        joshua.henderson-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org, narmstrong-rdvid1DuHRBWk0Htik3J/w@public.gmane.org,
+        linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-mips-6z/3iImG2C8G8FEW9MqTrA@public.gmane.org
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Aug 27, 2016 at 02:43:31PM +0000, Jason Cooper wrote:
-> Hi Corentin,
-> 
-> On Fri, Aug 26, 2016 at 01:11:34PM +0200, LABBE Corentin wrote:
-> > Instead of having two global variable, it's better to use a
-> > private struct. This will permit to remove amd_pdev variable
-> > 
-> > Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-> > ---
-> >  drivers/char/hw_random/amd-rng.c | 57 ++++++++++++++++++++++++++--------------
-> >  1 file changed, 38 insertions(+), 19 deletions(-)
-> > 
-> > diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
-> > index 383e197..4ef94e9 100644
-> > --- a/drivers/char/hw_random/amd-rng.c
-> > +++ b/drivers/char/hw_random/amd-rng.c
-> > @@ -47,15 +47,18 @@ static const struct pci_device_id pci_tbl[] = {
-> >  };
-> >  MODULE_DEVICE_TABLE(pci, pci_tbl);
-> >  
-> > -static struct pci_dev *amd_pdev;
-> > +struct amd768_priv {
-> > +	struct pci_dev *pcidev;
-> > +	u32 pmbase;
-> > +};
-> >  
-> >  static int amd_rng_data_present(struct hwrng *rng, int wait)
-> >  {
-> > -	u32 pmbase = (u32)rng->priv;
-> > +	struct amd768_priv *priv = (struct amd768_priv *)rng->priv;
-> 
-> Please remove unnecessary casts...
+This is the v2 patch series that adds support for random number generator
+present in Ingenic JZ4780 SoC.
 
-Hmm, I was assuming that, like other places in the tree, that priv was
-declared void*.  However, it's unsigned long in hw_random.h.
+Patch 1: Add device tree bindings for RNG in JZ4780 SoC.
+Patch 2: Add Ingenic JZ4780 hardware RNG driver.
+Patch 3: Add RNG to jz4780.dtsi.
+Patch 4: Enable RNG in ci20_defconfig
 
-And, it looks like all users cast it.  Either to a struct, or to a void
-__iomem *.
+PrasannaKumar Muralidharan (4):
+  hw_random: jz4780-rng: Add devicetree bindings for RNG in JZ4780 SoC
+  hw_random: jz4780-rng: Add Ingenic JZ4780 hardware RNG driver
+  hw_random: jz4780-rng: Add RNG node to jz4780.dtsi
+  hw_random: jz4780-rng: Enable hardware RNG in CI20 defconfig
 
-So ignore what I said in my previous email.  You can add my reviewed-by
-without change.
+ Documentation/devicetree/bindings/rng/ingenic,jz4780-rng.txt |   12 +
+ MAINTAINERS                                                  |    5 
+ arch/mips/boot/dts/ingenic/jz4780.dtsi                       |    7 
+ arch/mips/configs/ci20_defconfig                             |    4 
+ drivers/char/hw_random/Kconfig                               |   14 +
+ drivers/char/hw_random/Makefile                              |    1 
+ drivers/char/hw_random/jz4780-rng.c                          |  102 +++++++++++
+ 7 files changed, 143 insertions(+), 2 deletions(-)
 
-It does look like /priv/ s/unsigned long/void */ would be a great
-cleanup.
-
-thx,
-
-Jason.
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
