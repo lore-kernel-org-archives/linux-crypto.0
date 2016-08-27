@@ -1,44 +1,42 @@
-From: Horia Ioan Geanta Neag <horia.geanta@nxp.com>
-Subject: caam - IV source for IPsec decryption
-Date: Thu, 25 Aug 2016 16:12:35 +0000
-Message-ID: <DB4PR04MB0847411DA278511045969E6998ED0@DB4PR04MB0847.eurprd04.prod.outlook.com>
+From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Subject: Re: Git bisected regression for ipsec/aead
+Date: Sat, 27 Aug 2016 06:13:11 -0400
+Message-ID: <20160827101311.GU28329@oracle.com>
+References: <20160819192124.GF25320@oracle.com>
+ <20160825084951.GA11496@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, joshua.a.hay@intel.com,
+        steffen.klassert@secunet.com
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-db5eur01on0083.outbound.protection.outlook.com ([104.47.2.83]:48192
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751223AbcHZTLl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Aug 2016 15:11:41 -0400
-Content-Language: en-US
+Received: from aserp1040.oracle.com ([141.146.126.69]:26837 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750825AbcH0KO0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 27 Aug 2016 06:14:26 -0400
+Content-Disposition: inline
+In-Reply-To: <20160825084951.GA11496@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert,=0A=
-=0A=
-Commits=0A=
-7021b2e1cddd "esp4: Switch to new AEAD interface"=0A=
-000ae7b2690e "esp6: Switch to new AEAD interface"=0A=
-removed the following:=0A=
-	/* Get ivec. This can be wrong, check against another impls. */=0A=
-	iv =3D esph->enc_data;=0A=
-from IPsec decryption - esp{4,6}_input(),=0A=
-so the IV in req->iv received by the implementer is no longer valid.=0A=
-=0A=
-Thus, the load of IV in caam driver - caamalg.c, init_authenc_job():=0A=
-        if (ivsize && (is_rfc3686 || !(alg->caam.geniv && encrypt)))=0A=
-                append_load_as_imm(desc, req->iv, ivsize,=0A=
-                                   LDST_CLASS_1_CCB |=0A=
-                                   LDST_SRCDST_BYTE_CONTEXT |=0A=
-                                   (ivoffset << LDST_OFFSET_SHIFT));=0A=
-is not suited for case mentioned above.=0A=
-=0A=
-Instead, the IV should be read from the req->src scatterlist=0A=
-(which consists of assoc data, iv, ciphertext).=0A=
-Please let me know if this is accurate, so I could prepare a fix.=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+On (08/25/16 16:49), Herbert Xu wrote:
+> 
+> On Fri, Aug 19, 2016 at 03:21:24PM -0400, Sowmini Varadhan wrote:
+> >    7271b33cb87e80f3a416fb031ad3ca87f0bea80a is the first bad commit
+
+> This bisection doesn't make much sense as this patch just causes
+> cryptd to be used a little more more frequently.  But it does
+> point the finger at cryptd.
+
+On additional testing, I think this might be related to some
+subtle race/timing issue so that git-bisect may not necessarily
+be able to pin-point the correct bad-commit: if I add a few 
+printks in other parts of the IPsec stack (and change the timing), 
+the problem does not reproduce. Let me try to collect more data
+on this. 
+
+Meanwhile, if you can see some bug in the commit above, then
+it probably makes sense to fix it upstream anyway.
+
+--Sowmini
