@@ -1,47 +1,57 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v2 4/4] hw_random: jz4780-rng: Enable hardware RNG in CI20 defconfig
-Date: Sat, 27 Aug 2016 23:44:57 +0530
-Message-ID: <1472321697-3094-5-git-send-email-prasannatsmkumar@gmail.com>
-References: <1472321697-3094-1-git-send-email-prasannatsmkumar@gmail.com>
-Cc: PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-        mark.rutland-5wv7dgnIgG8@public.gmane.org, ralf-6z/3iImG2C8G8FEW9MqTrA@public.gmane.org,
-        gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org, boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
-        harvey.hunt-1AXoQHu6uovQT0dZR+AlfA@public.gmane.org, prarit-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-        joshua.henderson-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org, narmstrong-rdvid1DuHRBWk0Htik3J/w@public.gmane.org,
-        linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-mips-6z/3iImG2C8G8FEW9MqTrA@public.gmane.org
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1472321697-3094-1-git-send-email-prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: [PATCH] Use devm_hwrng_register instead of hwrng_register
+Date: Sun, 28 Aug 2016 14:19:12 +0530
+Message-ID: <1472374152-19319-1-git-send-email-prasannatsmkumar@gmail.com>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+To: mpm@selenic.com, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f66.google.com ([209.85.220.66]:35110 "EHLO
+        mail-pa0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751075AbcH1It5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 28 Aug 2016 04:49:57 -0400
+Received: by mail-pa0-f66.google.com with SMTP id cf3so7136573pad.2
+        for <linux-crypto@vger.kernel.org>; Sun, 28 Aug 2016 01:49:57 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch enables the usage of RNG in MIPS Creator CI20 default config.
+By using devm_hwrng_register instead of hwrng_register the .remove
+callback in platform_driver can be removed. This reduces a few lines in
+code.
 
-Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 ---
- arch/mips/configs/ci20_defconfig | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/char/hw_random/tx4939-rng.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
-diff --git a/arch/mips/configs/ci20_defconfig b/arch/mips/configs/ci20_defconfig
-index bf164fe..51a47a4 100644
---- a/arch/mips/configs/ci20_defconfig
-+++ b/arch/mips/configs/ci20_defconfig
-@@ -88,7 +88,9 @@ CONFIG_SERIAL_8250_NR_UARTS=5
- CONFIG_SERIAL_8250_RUNTIME_UARTS=5
- CONFIG_SERIAL_8250_INGENIC=y
- CONFIG_SERIAL_OF_PLATFORM=y
--# CONFIG_HW_RANDOM is not set
-+CONFIG_HW_RANDOM=y
-+# CONFIG_HW_RANDOM_TIMERIOMEM is not set
-+CONFIG_HW_RANDOM_JZ4780=y
- CONFIG_I2C=y
- CONFIG_I2C_JZ4780=y
- CONFIG_GPIO_SYSFS=y
+diff --git a/drivers/char/hw_random/tx4939-rng.c b/drivers/char/hw_random/tx4939-rng.c
+index a7b6949..1093583 100644
+--- a/drivers/char/hw_random/tx4939-rng.c
++++ b/drivers/char/hw_random/tx4939-rng.c
+@@ -144,22 +144,13 @@ static int __init tx4939_rng_probe(struct platform_device *dev)
+ 	}
+ 
+ 	platform_set_drvdata(dev, rngdev);
+-	return hwrng_register(&rngdev->rng);
+-}
+-
+-static int __exit tx4939_rng_remove(struct platform_device *dev)
+-{
+-	struct tx4939_rng *rngdev = platform_get_drvdata(dev);
+-
+-	hwrng_unregister(&rngdev->rng);
+-	return 0;
++	return devm_hwrng_register(&dev->dev, &rngdev->rng);
+ }
+ 
+ static struct platform_driver tx4939_rng_driver = {
+ 	.driver		= {
+ 		.name	= "tx4939-rng",
+ 	},
+-	.remove = tx4939_rng_remove,
+ };
+ 
+ module_platform_driver_probe(tx4939_rng_driver, tx4939_rng_probe);
 -- 
 2.5.0
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
