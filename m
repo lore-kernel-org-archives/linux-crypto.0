@@ -1,313 +1,79 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH v3] crypto: caam - fix IV loading for authenc (giv)decryption
-Date: Mon, 29 Aug 2016 14:52:14 +0300
-Message-ID: <1472471534-9544-1-git-send-email-horia.geanta@nxp.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - fix constants table DMA
+Date: Mon, 29 Aug 2016 13:28:31 +0100
+Message-ID: <1472473711-611-1-git-send-email-giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org,
+        Maksim Lukoshkov <maksim.lukoshkov@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0051.outbound.protection.outlook.com ([104.47.42.51]:41380
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1756887AbcH2Lwh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Aug 2016 07:52:37 -0400
+Received: from mga03.intel.com ([134.134.136.65]:42403 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932211AbcH2M2x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Aug 2016 08:28:53 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-For algorithms that implement IV generators before the crypto ops,
-the IV needed for decryption is initially located in req->src
-scatterlist, not in req->iv.
+From: Maksim Lukoshkov <maksim.lukoshkov@intel.com>
 
-Avoid copying the IV into req->iv by modifying the (givdecrypt)
-descriptors to load it directly from req->src.
-aead_givdecrypt() is no longer needed and goes away.
+Copy const_tab array into DMA-able memory (accesible by qat hw).
 
-Cc: <stable@vger.kernel.org> # 4.3+
-Fixes: 479bcc7c5b9e ("crypto: caam - Convert authenc to new AEAD interface")
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Maksim Lukoshkov <maksim.lukoshkov@intel.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/caam/caamalg.c | 77 +++++++++++++++++++++----------------------
- 1 file changed, 37 insertions(+), 40 deletions(-)
+ drivers/crypto/qat/qat_common/adf_admin.c |   20 ++++++++++++--------
+ 1 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 6dc597126b79..b3044219772c 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -556,7 +556,10 @@ skip_enc:
+diff --git a/drivers/crypto/qat/qat_common/adf_admin.c b/drivers/crypto/qat/qat_common/adf_admin.c
+index ce7c462..3744b22 100644
+--- a/drivers/crypto/qat/qat_common/adf_admin.c
++++ b/drivers/crypto/qat/qat_common/adf_admin.c
+@@ -146,6 +146,7 @@ struct adf_admin_comms {
+ 	dma_addr_t phy_addr;
+ 	dma_addr_t const_tbl_addr;
+ 	void *virt_addr;
++	void *virt_tbl_addr;
+ 	void __iomem *mailbox_addr;
+ 	struct mutex lock;	/* protects adf_admin_comms struct */
+ };
+@@ -251,17 +252,19 @@ int adf_init_admin_comms(struct adf_accel_dev *accel_dev)
+ 		return -ENOMEM;
+ 	}
  
- 	/* Read and write assoclen bytes */
- 	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
--	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
-+	if (alg->caam.geniv)
-+		append_math_add_imm_u32(desc, VARSEQOUTLEN, REG3, IMM, ivsize);
-+	else
-+		append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
- 
- 	/* Skip assoc data */
- 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
-@@ -565,6 +568,14 @@ skip_enc:
- 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_MSG |
- 			     KEY_VLF);
- 
-+	if (alg->caam.geniv) {
-+		append_seq_load(desc, ivsize, LDST_CLASS_1_CCB |
-+				LDST_SRCDST_BYTE_CONTEXT |
-+				(ctx1_iv_off << LDST_OFFSET_SHIFT));
-+		append_move(desc, MOVE_SRC_CLASS1CTX | MOVE_DEST_CLASS2INFIFO |
-+			    (ctx1_iv_off << MOVE_OFFSET_SHIFT) | ivsize);
-+	}
+-	admin->const_tbl_addr = dma_map_single(&GET_DEV(accel_dev),
+-					       (void *) const_tab, 1024,
+-					       DMA_TO_DEVICE);
+-
+-	if (unlikely(dma_mapping_error(&GET_DEV(accel_dev),
+-				       admin->const_tbl_addr))) {
++	admin->virt_tbl_addr = dma_zalloc_coherent(&GET_DEV(accel_dev),
++						   PAGE_SIZE,
++						   &admin->const_tbl_addr,
++						   GFP_KERNEL);
++	if (!admin->virt_tbl_addr) {
++		dev_err(&GET_DEV(accel_dev), "Failed to allocate const_tbl\n");
+ 		dma_free_coherent(&GET_DEV(accel_dev), PAGE_SIZE,
+ 				  admin->virt_addr, admin->phy_addr);
+ 		kfree(admin);
+ 		return -ENOMEM;
+ 	}
 +
- 	/* Load Counter into CONTEXT1 reg */
- 	if (is_rfc3686)
- 		append_load_imm_u32(desc, be32_to_cpu(1), LDST_IMM |
-@@ -2150,7 +2161,7 @@ static void init_authenc_job(struct aead_request *req,
++	memcpy(admin->virt_tbl_addr, const_tab, sizeof(const_tab));
+ 	reg_val = (u64)admin->phy_addr;
+ 	ADF_CSR_WR(csr, ADF_DH895XCC_ADMINMSGUR_OFFSET, reg_val >> 32);
+ 	ADF_CSR_WR(csr, ADF_DH895XCC_ADMINMSGLR_OFFSET, reg_val);
+@@ -282,9 +285,10 @@ void adf_exit_admin_comms(struct adf_accel_dev *accel_dev)
+ 	if (admin->virt_addr)
+ 		dma_free_coherent(&GET_DEV(accel_dev), PAGE_SIZE,
+ 				  admin->virt_addr, admin->phy_addr);
++	if (admin->virt_tbl_addr)
++		dma_free_coherent(&GET_DEV(accel_dev), PAGE_SIZE,
++				  admin->virt_tbl_addr, admin->const_tbl_addr);
  
- 	init_aead_job(req, edesc, all_contig, encrypt);
- 
--	if (ivsize && (is_rfc3686 || !(alg->caam.geniv && encrypt)))
-+	if (ivsize && ((is_rfc3686 && encrypt) || !alg->caam.geniv))
- 		append_load_as_imm(desc, req->iv, ivsize,
- 				   LDST_CLASS_1_CCB |
- 				   LDST_SRCDST_BYTE_CONTEXT |
-@@ -2537,20 +2548,6 @@ static int aead_decrypt(struct aead_request *req)
- 	return ret;
- }
- 
--static int aead_givdecrypt(struct aead_request *req)
--{
--	struct crypto_aead *aead = crypto_aead_reqtfm(req);
--	unsigned int ivsize = crypto_aead_ivsize(aead);
--
--	if (req->cryptlen < ivsize)
--		return -EINVAL;
--
--	req->cryptlen -= ivsize;
--	req->assoclen += ivsize;
--
--	return aead_decrypt(req);
--}
--
- /*
-  * allocate and map the ablkcipher extended descriptor for ablkcipher
-  */
-@@ -3210,7 +3207,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = AES_BLOCK_SIZE,
- 			.maxauthsize = MD5_DIGEST_SIZE,
- 		},
-@@ -3256,7 +3253,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = AES_BLOCK_SIZE,
- 			.maxauthsize = SHA1_DIGEST_SIZE,
- 		},
-@@ -3302,7 +3299,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = AES_BLOCK_SIZE,
- 			.maxauthsize = SHA224_DIGEST_SIZE,
- 		},
-@@ -3348,7 +3345,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = AES_BLOCK_SIZE,
- 			.maxauthsize = SHA256_DIGEST_SIZE,
- 		},
-@@ -3394,7 +3391,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = AES_BLOCK_SIZE,
- 			.maxauthsize = SHA384_DIGEST_SIZE,
- 		},
-@@ -3440,7 +3437,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = AES_BLOCK_SIZE,
- 			.maxauthsize = SHA512_DIGEST_SIZE,
- 		},
-@@ -3486,7 +3483,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = MD5_DIGEST_SIZE,
- 		},
-@@ -3534,7 +3531,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA1_DIGEST_SIZE,
- 		},
-@@ -3582,7 +3579,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA224_DIGEST_SIZE,
- 		},
-@@ -3630,7 +3627,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA256_DIGEST_SIZE,
- 		},
-@@ -3678,7 +3675,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA384_DIGEST_SIZE,
- 		},
-@@ -3726,7 +3723,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA512_DIGEST_SIZE,
- 		},
-@@ -3772,7 +3769,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = DES_BLOCK_SIZE,
- 			.maxauthsize = MD5_DIGEST_SIZE,
- 		},
-@@ -3818,7 +3815,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = DES_BLOCK_SIZE,
- 			.maxauthsize = SHA1_DIGEST_SIZE,
- 		},
-@@ -3864,7 +3861,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = DES_BLOCK_SIZE,
- 			.maxauthsize = SHA224_DIGEST_SIZE,
- 		},
-@@ -3910,7 +3907,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = DES_BLOCK_SIZE,
- 			.maxauthsize = SHA256_DIGEST_SIZE,
- 		},
-@@ -3956,7 +3953,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = DES_BLOCK_SIZE,
- 			.maxauthsize = SHA384_DIGEST_SIZE,
- 		},
-@@ -4002,7 +3999,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = DES_BLOCK_SIZE,
- 			.maxauthsize = SHA512_DIGEST_SIZE,
- 		},
-@@ -4051,7 +4048,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = CTR_RFC3686_IV_SIZE,
- 			.maxauthsize = MD5_DIGEST_SIZE,
- 		},
-@@ -4102,7 +4099,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = CTR_RFC3686_IV_SIZE,
- 			.maxauthsize = SHA1_DIGEST_SIZE,
- 		},
-@@ -4153,7 +4150,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = CTR_RFC3686_IV_SIZE,
- 			.maxauthsize = SHA224_DIGEST_SIZE,
- 		},
-@@ -4204,7 +4201,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = CTR_RFC3686_IV_SIZE,
- 			.maxauthsize = SHA256_DIGEST_SIZE,
- 		},
-@@ -4255,7 +4252,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = CTR_RFC3686_IV_SIZE,
- 			.maxauthsize = SHA384_DIGEST_SIZE,
- 		},
-@@ -4306,7 +4303,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
- 			.encrypt = aead_encrypt,
--			.decrypt = aead_givdecrypt,
-+			.decrypt = aead_decrypt,
- 			.ivsize = CTR_RFC3686_IV_SIZE,
- 			.maxauthsize = SHA512_DIGEST_SIZE,
- 		},
+-	dma_unmap_single(&GET_DEV(accel_dev), admin->const_tbl_addr, 1024,
+-			 DMA_TO_DEVICE);
+ 	mutex_destroy(&admin->lock);
+ 	kfree(admin);
+ 	accel_dev->admin = NULL;
 -- 
-2.4.4
+1.7.4.1
