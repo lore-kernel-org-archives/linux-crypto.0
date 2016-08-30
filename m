@@ -1,45 +1,39 @@
-From: Darren Stevens <darren@stevens-zone.net>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 Subject: Re: hwrng: pasemi_rng.c: Migrate to managed API
-Date: Mon, 29 Aug 2016 18:52:15 +0100 (BST)
-Message-ID: <48b8455031e.651d5701@auth.smtp.1and1.co.uk>
+Date: Tue, 30 Aug 2016 12:46:32 +0530
+Message-ID: <CANc+2y64+ECEh0GwQU4qQrEtsFjjbmaRJYt1t=J1Q3nT6TG6sA@mail.gmail.com>
 References: <1472124856-12767-1-git-send-email-prasannatsmkumar@gmail.com>
- <20160825121546.GA25650@Red>
- <CANc+2y4JqGRXCLUEpMo8EB8thW5jsweh0Lg2VjuvpNgSR-AwMA@mail.gmail.com>
+ <20160825121546.GA25650@Red> <CANc+2y4JqGRXCLUEpMo8EB8thW5jsweh0Lg2VjuvpNgSR-AwMA@mail.gmail.com>
+ <48b8455031e.651d5701@auth.smtp.1and1.co.uk>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
 Cc: LABBE Corentin <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         mpm@selenic.com, olof@lixom.net, linuxppc-dev@lists.ozlabs.org
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.187]:54868 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752808AbcH2Sxg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Aug 2016 14:53:36 -0400
-In-Reply-To: <CANc+2y4JqGRXCLUEpMo8EB8thW5jsweh0Lg2VjuvpNgSR-AwMA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Darren Stevens <darren@stevens-zone.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <48b8455031e.651d5701@auth.smtp.1and1.co.uk>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello PrasannaKumar
+Hi Darren,
 
-On 25/08/2016, PrasannaKumar Muralidharan wrote:
->> I will propose to use devm_ioremap_resource() instead for removing this
->> hardcoded 0x100, but i cannot find any user of this driver in any dts.
->> (And so cannot check that this 0x100 is given in any DT resource node)
+>> I wanted to use devm_ioremap_resource but could not find DT entry
+>> required for this driver in any of the .dts files. So did not change
+>> that. I could not find any dts/dtsi for this platform. So I assume
+>> that the dtb is not present in the kernel, dtb is supplied by the
+>> bootloader. I may be wrong in this. Can anyone confirm this?
 >
->> Is this normal ?
->
-> I wanted to use devm_ioremap_resource but could not find DT entry
-> required for this driver in any of the .dts files. So did not change
-> that. I could not find any dts/dtsi for this platform. So I assume
-> that the dtb is not present in the kernel, dtb is supplied by the
-> bootloader. I may be wrong in this. Can anyone confirm this?
+> On mine (Amigaone X1000) that is correct, we boot linux with a vmlinux file,
+> and the bootloader (CFE) passes a fixed dtb. I think it is possible to dump
+> the tree from inside CFE, if it would help I can invetigate?
 
-On mine (Amigaone X1000) that is correct, we boot linux with a vmlinux file,
-and the bootloader (CFE) passes a fixed dtb. I think it is possible to dump
-the tree from inside CFE, if it would help I can invetigate?
+I don't know if it is possible to get dts from dtb even if you manage
+to extract devicetree blob from your system.
 
-Regards
-Darren
+Labbe, Do you know anyway to get dts from dtb? Is this step really
+required to remove 0x100 value for this patch given that the value was
+present here for years? If extracting dtb and converting dtb to dts is
+easy and not time consuming, I am in favour of finding a way to remove
+hard coded value.
