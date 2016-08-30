@@ -1,71 +1,41 @@
-From: Corentin LABBE <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH 4/4] crypto: qce: If total text size is zero, return
- pre-computed digest
-Date: Tue, 30 Aug 2016 18:02:42 +0200
-Message-ID: <7f71762d-f570-e4d4-723c-fc2dc821ab6e@gmail.com>
-References: <20160830155353.19500-1-voker57@gmail.com>
- <20160830155353.19500-5-voker57@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, andy.gross@linaro.org,
-        david.brown@linaro.org, linux-arm-msm@vger.kernel.org,
-        linux-soc@vger.kernel.org
-To: Iaroslav Gridin <voker57@gmail.com>, herbert@gondor.apana.org.au
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - fix incorrect accelerator mask for C3X devices
+Date: Tue, 30 Aug 2016 18:56:00 +0100
+Message-ID: <1472579760-3698-1-git-send-email-giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org,
+        Maksim Lukoshkov <maksim.lukoshkov@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:33984 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755847AbcH3QCq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Aug 2016 12:02:46 -0400
-In-Reply-To: <20160830155353.19500-5-voker57@gmail.com>
+Received: from mga03.intel.com ([134.134.136.65]:20911 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1758403AbcH3R4I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Aug 2016 13:56:08 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 30/08/2016 17:53, Iaroslav Gridin wrote:
-> From: Voker57 <voker57@gmail.com>
-> 
-> If total data amount to hash is zero, we cannot submit it to QCE,
-> since it locks up on zero-sized updates. So, return pre-computed
-> SHA256/SHA1 hash.
-> Signed-off-by: Iaroslav Gridin <voker57@gmail.com>
-> ---
->  drivers/crypto/qce/sha.c | 27 ++++++++++++++++++++++++---
->  1 file changed, 24 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-> index f199f28..c627b5d 100644
-> --- a/drivers/crypto/qce/sha.c
-> +++ b/drivers/crypto/qce/sha.c
-> @@ -80,6 +80,7 @@ static int qce_ahash_async_req_handle(struct crypto_async_request *async_req)
->  	struct qce_sha_ctx *ctx = crypto_tfm_ctx(async_req->tfm);
->  	struct qce_alg_template *tmpl = to_ahash_tmpl(async_req->tfm);
->  	struct qce_device *qce = tmpl->qce;
-> +	unsigned int digestsize = crypto_ahash_digestsize(crypto_ahash_reqtfm(req));
->  	unsigned long flags = rctx->flags;
->  	int ret;
->  
-> @@ -91,6 +92,29 @@ static int qce_ahash_async_req_handle(struct crypto_async_request *async_req)
->  		rctx->authklen = AES_KEYSIZE_128;
->  	}
->  
-> +	if (!req->nbytes) {
-> +		/* Only way that can happen is if total size of digest is zero
-> +		 * So since QCE gets stuck on zero-sized texts, we return
-> +		 * pre-calculated hash
-> +		 */
-> +		if (digestsize == SHA1_DIGEST_SIZE) {
-> +			memcpy(rctx->digest,
-> +			       "\xda\x39\xa3\xee\x5e\x6b\x4b\x0d\x32\x55\xbf\xef\x95\x60\x18\x90\xaf\xd8\x07\x09",
-> +			       SHA1_DIGEST_SIZE);
-> +		} else if (digestsize == SHA256_DIGEST_SIZE) {
-> +			memcpy(rctx->digest,
-> +			       "\xe3\xb0\xc4\x42\x98\xfc\x1c\x14\x9a\xfb\xf4\xc8\x99\x6f\xb9\x24\x27\xae\x41\xe4\x64\x9b\x93\x4c\xa4\x95\x99\x1b\x78\x52\xb8\x55",
-> +			       SHA256_DIGEST_SIZE);
+From: Maksim Lukoshkov <maksim.lukoshkov@intel.com>
 
-Hello
+Fix incorrect value of ADF_C3XXX_ACCELERATORS_MASK.
 
-You could use sha1_zero_message_hash/sha256_zero_message_hash declared in crypto/sha.h
+Signed-off-by: Maksim Lukoshkov <maksim.lukoshkov@intel.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Regards
+diff --git a/drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.h b/drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.h
+index 2f2681d..afc9a0a 100644
+--- a/drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.h
++++ b/drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.h
+@@ -55,7 +55,7 @@
+ #define ADF_C3XXX_MAX_ACCELERATORS 3
+ #define ADF_C3XXX_MAX_ACCELENGINES 6
+ #define ADF_C3XXX_ACCELERATORS_REG_OFFSET 16
+-#define ADF_C3XXX_ACCELERATORS_MASK 0x3
++#define ADF_C3XXX_ACCELERATORS_MASK 0x7
+ #define ADF_C3XXX_ACCELENGINES_MASK 0x3F
+ #define ADF_C3XXX_ETR_MAX_BANKS 16
+ #define ADF_C3XXX_SMIAPF0_MASK_OFFSET (0x3A000 + 0x28)
+-- 
+1.7.4.1
