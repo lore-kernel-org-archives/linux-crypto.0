@@ -1,33 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/2] HWRNG/PCI: Add driver for Cavium Thunder RNG
-Date: Wed, 31 Aug 2016 23:17:45 +0800
-Message-ID: <20160831151745.GA28366@gondor.apana.org.au>
-References: <1471994835-2423-1-git-send-email-okhaliq@caviumnetworks.com>
+Subject: Re: [PATCH] crypto: FIPS - allow tests to be disabled in FIPS mode
+Date: Wed, 31 Aug 2016 23:18:07 +0800
+Message-ID: <20160831151807.GB28366@gondor.apana.org.au>
+References: <1685622.m1phZymvbe@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        bhelgaas@google.com, mpm@selenic.com, Ananth.Jasty@cavium.com,
-        David.Daney@cavium.com, clabbe.montjoie@gmail.com
-To: Omer Khaliq <okhaliq@caviumnetworks.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+        Tapas Sarangi <TSarangi@trustwave.com>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:38628 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933887AbcHaPSL (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 31 Aug 2016 11:18:11 -0400
 Content-Disposition: inline
-In-Reply-To: <1471994835-2423-1-git-send-email-okhaliq@caviumnetworks.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1685622.m1phZymvbe@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 23, 2016 at 04:27:13PM -0700, Omer Khaliq wrote:
-> There is a hardware error rendering the FDL field incorrect for the some
-> Thunder RNG devices. The first patch adds a PCI quirk to fix the problem.
+On Thu, Aug 25, 2016 at 03:15:01PM +0200, Stephan Mueller wrote:
+> In FIPS mode, additional restrictions may apply. If these restrictions
+> are violated, the kernel will panic(). This patch allows test vectors
+> for symmetric ciphers to be marked as to be skipped in FIPS mode.
 > 
-> The second patch adds the driver.
+> Together with the patch, the XTS test vectors where the AES key is
+> identical to the tweak key is disabled in FIPS mode. This test vector
+> violates the FIPS requirement that both keys must be different.
 > 
-> Changes from v1:
-> 	Use PCI quirks as advised.
-> 	Removed unecessary headers
-> 	Format changes as advised
+> Reported-by: Tapas Sarangi <TSarangi@trustwave.com>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
