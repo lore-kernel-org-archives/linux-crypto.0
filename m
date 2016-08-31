@@ -1,34 +1,34 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: qat - fix constants table DMA
-Date: Wed, 31 Aug 2016 23:19:28 +0800
-Message-ID: <20160831151928.GH28366@gondor.apana.org.au>
-References: <1472473711-611-1-git-send-email-giovanni.cabiddu@intel.com>
+From: John williams <terezaintrovini@gmail.com>
+Subject: Dear Sir/Madam
+Date: Wed, 31 Aug 2016 07:14:29 -1200
+Message-ID: <CACw7J-VJ40Ow6K3SHeak-EhhtR69S=C833dja4rgrA572-ig4g__16687.4280469075$1472670885$gmane$org@mail.gmail.com>
+Reply-To: william-john92@hotmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        Maksim Lukoshkov <maksim.lukoshkov@intel.com>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Content-Type: text/plain; charset=UTF-8
+To: undisclosed-recipients:;
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51702 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965041AbcHaPTd (ORCPT
+Received: from mail-yw0-f193.google.com ([209.85.161.193]:35690 "EHLO
+        mail-yw0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752879AbcHaTOa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Aug 2016 11:19:33 -0400
-Content-Disposition: inline
-In-Reply-To: <1472473711-611-1-git-send-email-giovanni.cabiddu@intel.com>
+        Wed, 31 Aug 2016 15:14:30 -0400
+Received: by mail-yw0-f193.google.com with SMTP id r9so2314092ywg.2
+        for <linux-crypto@vger.kernel.org>; Wed, 31 Aug 2016 12:14:30 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 29, 2016 at 01:28:31PM +0100, Giovanni Cabiddu wrote:
-> From: Maksim Lukoshkov <maksim.lukoshkov@intel.com>
-> 
-> Copy const_tab array into DMA-able memory (accesible by qat hw).
-> 
-> Signed-off-by: Maksim Lukoshkov <maksim.lukoshkov@intel.com>
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-
-Patch applied.  Thanks.
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+
+Dear Sir/Madam, we would like to see your company latest catalogs.
+Your early reply is highly appreciated.
+Thank You !
+Best Regards,
+Mr. John williams
+(Purchasing Manager)
+*****************************************************
+Trade Company limited.
+2755 lake pine path apt 122,
+St Joseph, Trade Square Centre MI United States
+Telephone: +1 (248) 854 5480
+E-mail: william-john92@hotmail.com
