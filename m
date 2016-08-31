@@ -1,37 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: FIPS - allow tests to be disabled in FIPS mode
-Date: Wed, 31 Aug 2016 23:18:07 +0800
-Message-ID: <20160831151807.GB28366@gondor.apana.org.au>
-References: <1685622.m1phZymvbe@positron.chronox.de>
+Subject: Re: [PATCH v3 0/8] hwrng: amd: rework of the amd hwrng driver
+Date: Wed, 31 Aug 2016 23:18:35 +0800
+Message-ID: <20160831151835.GD28366@gondor.apana.org.au>
+References: <1472209896-17197-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        Tapas Sarangi <TSarangi@trustwave.com>
-To: Stephan Mueller <smueller@chronox.de>
+Cc: mpm@selenic.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38628 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:58162 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933887AbcHaPSL (ORCPT
+        with ESMTP id S933887AbcHaPSh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Aug 2016 11:18:11 -0400
+        Wed, 31 Aug 2016 11:18:37 -0400
 Content-Disposition: inline
-In-Reply-To: <1685622.m1phZymvbe@positron.chronox.de>
+In-Reply-To: <1472209896-17197-1-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 25, 2016 at 03:15:01PM +0200, Stephan Mueller wrote:
-> In FIPS mode, additional restrictions may apply. If these restrictions
-> are violated, the kernel will panic(). This patch allows test vectors
-> for symmetric ciphers to be marked as to be skipped in FIPS mode.
-> 
-> Together with the patch, the XTS test vectors where the AES key is
-> identical to the tweak key is disabled in FIPS mode. This test vector
-> violates the FIPS requirement that both keys must be different.
-> 
-> Reported-by: Tapas Sarangi <TSarangi@trustwave.com>
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+On Fri, Aug 26, 2016 at 01:11:28PM +0200, LABBE Corentin wrote:
+> Changes since v2:
+>  - split the latest patch in 4
+> Changes since v1:
+>  - Keep the hwrng name as "amd"
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
