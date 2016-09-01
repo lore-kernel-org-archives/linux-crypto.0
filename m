@@ -1,57 +1,50 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: hwrng: pasemi_rng.c: Migrate to managed API
-Date: Thu, 1 Sep 2016 12:29:47 +0530
-Message-ID: <CANc+2y5jJ9GNg10ob3o7CLqzLqt9+oH8vU_RmEUjAfDdwOft9A@mail.gmail.com>
-References: <1472124856-12767-1-git-send-email-prasannatsmkumar@gmail.com>
- <20160825121546.GA25650@Red> <CANc+2y4JqGRXCLUEpMo8EB8thW5jsweh0Lg2VjuvpNgSR-AwMA@mail.gmail.com>
- <48b8455031e.651d5701@auth.smtp.1and1.co.uk> <CANc+2y64+ECEh0GwQU4qQrEtsFjjbmaRJYt1t=J1Q3nT6TG6sA@mail.gmail.com>
- <48bab268a61.66716f37@auth.smtp.1and1.co.uk>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCHv3 03/11] crypto: omap-sham: implement context
+ export/import APIs
+Date: Thu, 1 Sep 2016 15:19:58 +0800
+Message-ID: <20160901071958.GA2076@gondor.apana.org.au>
+References: <1470306526-27219-1-git-send-email-t-kristo@ti.com>
+ <1470306526-27219-4-git-send-email-t-kristo@ti.com>
+ <20160809100633.GA6751@gondor.apana.org.au>
+ <d828fca9-a97a-7722-c4cb-24e07816cbc4@ti.com>
+ <20160901033320.GA650@gondor.apana.org.au>
+ <60a5ed40-5552-3ec8-fa21-7e6fb8213fc3@ti.com>
+ <20160901061630.GB650@gondor.apana.org.au>
+ <70468d4d-9f26-1bad-ace1-4b7c5cf43b52@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-kernel@vger.kernel.org,
-        LABBE Corentin <clabbe.montjoie@gmail.com>,
-        linux-crypto@vger.kernel.org, mpm@selenic.com, olof@lixom.net,
-        linuxppc-dev@lists.ozlabs.org
-To: Darren Stevens <darren@stevens-zone.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <48bab268a61.66716f37@auth.smtp.1and1.co.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: lokeshvutla@ti.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, tony@atomide.com,
+        linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Tero Kristo <t-kristo@ti.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:42346 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751146AbcIAHUQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Sep 2016 03:20:16 -0400
+Content-Disposition: inline
+In-Reply-To: <70468d4d-9f26-1bad-ace1-4b7c5cf43b52@ti.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-> I didn't explain well, There is a CFE command 'show devtree' here's the
-> relevant bits (I Hope)
+On Thu, Sep 01, 2016 at 09:56:06AM +0300, Tero Kristo wrote:
+>
+> Hmm, looking at the driver, sham_update returns 0 immediately if it
+> just caches data. In a sense, the update is not completed at this
+> point. Are you saying this is illegal and can't be done?
 
-This is much simple than I expected.
+Once you call the completion function (and returning zero from
+the update itself is equivalent to calling the completion function)
+the hardware must not touch the request anymore.
 
-> [CFE ]CFE> show devtree
-> [/]
->  | #interrupt-cells                 val   0x00000002
->  | #address-cells                   val   0x00000002
->  | #size-cells                      val   0x00000002
->
-> ...[snip]...
->
->    [sdc@fc000000]
->     | name                          str   'sdc'
->     | device_type                   str   'sdc'
->     | #address-cells                val   0x00000001
->     | #size-cells                   val   0x00000001
->     | compatible                    str   '1682m-sdc' 'pasemi,pwrficient-sdc'
-> 'pasemi,sdc'
->     | reg                           cell  00000000 FC000000 00000000 00800000
->
-> ...[snip]...
->
->       [rng@fc105000]
->        | name                       str   'rng'
->        | device_type                str   'rng'
->        | compatible                 str   '1682m-rng' 'pasemi,pwrficient-rng'
-> 'pasemi,rng'
->        | reg                        cell  FC105000 00001000
->
+> From my understanding, valid results are expected from the driver
+> only after ->final is called.
 
-Device tree provided by CFE has the size. I will send another patch
-which uses devm_ioremap_resource().
+That's because you never implemented export/import :)
 
-Appreciate your help. Thank you :).
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
