@@ -1,51 +1,89 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 3/3] crypto: cryptd - initialize child shash_desc on import
-Date: Thu,  1 Sep 2016 14:25:43 +0100
-Message-ID: <1472736343-15305-4-git-send-email-ard.biesheuvel@linaro.org>
-References: <1472736343-15305-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Subject: Re: [PATCH 1/2] crypto: arm/ghash-ce - add missing async import/export
+Date: Thu, 1 Sep 2016 16:14:22 +0100
+Message-ID: <CAKv+Gu8yEDbQS651Q3-GbQw+AwJfqvH1WHKa-LUE4=43NwyWSw@mail.gmail.com>
+References: <1472469594-27315-1-git-send-email-ard.biesheuvel@linaro.org>
+ <20160831144135.GB26616@gondor.apana.org.au> <CAKv+Gu8tr3kq9gYpJjNeKvt-PDsnBUb1FZqxOeNBfuF+J6hCzA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f45.google.com ([74.125.82.45]:35843 "EHLO
-        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754953AbcIAN1V (ORCPT
+Received: from mail-it0-f49.google.com ([209.85.214.49]:35020 "EHLO
+        mail-it0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755416AbcIAPOY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Sep 2016 09:27:21 -0400
-Received: by mail-wm0-f45.google.com with SMTP id c133so78461736wmd.1
-        for <linux-crypto@vger.kernel.org>; Thu, 01 Sep 2016 06:27:20 -0700 (PDT)
-In-Reply-To: <1472736343-15305-1-git-send-email-ard.biesheuvel@linaro.org>
+        Thu, 1 Sep 2016 11:14:24 -0400
+Received: by mail-it0-f49.google.com with SMTP id e124so108474142ith.0
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Sep 2016 08:14:23 -0700 (PDT)
+In-Reply-To: <CAKv+Gu8tr3kq9gYpJjNeKvt-PDsnBUb1FZqxOeNBfuF+J6hCzA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When calling .import() on a cryptd ahash_request, the structure members
-that describe the child transform in the shash_desc need to be initialized
-like they are when calling .init()
+On 1 September 2016 at 14:19, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> On 31 August 2016 at 15:41, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>> On Mon, Aug 29, 2016 at 12:19:53PM +0100, Ard Biesheuvel wrote:
+>>> Since commit 8996eafdcbad ("crypto: ahash - ensure statesize is non-zero"),
+>>> all ahash drivers are required to implement import()/export(), and must have
+>>> a non-zero statesize. Fix this for the ARM Crypto Extensions GHASH
+>>> implementation.
+>>>
+>>> Fixes: 8996eafdcbad ("crypto: ahash - ensure statesize is non-zero")
+>>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>>> ---
+>>>  arch/arm/crypto/ghash-ce-glue.c | 26 ++++++++++++++++++++++++++
+>>>  1 file changed, 26 insertions(+)
+>>>
+>>> diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-glue.c
+>>> index 1568cb5cd870..212aaa715fdb 100644
+>>> --- a/arch/arm/crypto/ghash-ce-glue.c
+>>> +++ b/arch/arm/crypto/ghash-ce-glue.c
+>>> @@ -220,6 +220,29 @@ static int ghash_async_digest(struct ahash_request *req)
+>>>       }
+>>>  }
+>>>
+>>> +static int ghash_async_import(struct ahash_request *req, const void *in)
+>>> +{
+>>> +     struct ahash_request *cryptd_req = ahash_request_ctx(req);
+>>> +     struct shash_desc *desc = cryptd_shash_desc(cryptd_req);
+>>> +     struct ghash_desc_ctx *dctx = shash_desc_ctx(desc);
+>>> +
+>>> +     ghash_async_init(req);
+>>
+>> Is this really needed?
+>>
+>
+> Actually, yes, and more. I could not find in the documentation whether
+> the .import() hook requires .init() to be called first, but based on
+> the test case in testmgr.c, it appears that is not the case.
+>
+> This means that the stuff that occurs in .init() to establish the
+> relation between this desc and its child transform needs to be copied
+> here as well. In fact, the only way I could make this work is by
+> adding it to cryptd's import() routines as well, otherwise the test
+> crashes reliably.
+>
+>>> +     *dctx = *(const struct ghash_desc_ctx *)in;
+>>
+>> I'd prefer to call the underlying shash import/export functions
+>> like we do in cryptd.
+>>
+>
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- crypto/cryptd.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+I managed to track down why this issue seems specific to ARM (i.e.,
+why it does not affect the x86 clmul-ni driver as well)
 
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index cf8037a87b2d..510a25f6ee37 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -631,9 +631,14 @@ static int cryptd_hash_export(struct ahash_request *req, void *out)
- 
- static int cryptd_hash_import(struct ahash_request *req, const void *in)
- {
--	struct cryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	struct cryptd_hash_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct shash_desc *desc = cryptd_shash_desc(req);
-+
-+	desc->tfm = ctx->child;
-+	desc->flags = req->base.flags;
- 
--	return crypto_shash_import(&rctx->desc, in);
-+	return crypto_shash_import(desc, in);
- }
- 
- static int cryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
--- 
-2.7.4
+The culprit appears to be that the .cra_name of the internal shash is
+"ghash", (and not "__ghash" like in the x86 case) which causes the
+test code to run the test on not only the public ahash, but also on
+the internal cryptd() encapsulated shash, and also on the internal
+shash itself.
+
+However, that does not answer the question whether .init() must be
+called before .import() [which the test code does not do]. If not,
+then please disregard my v2, and I will followup with a patch that
+renames ghash to __ghash (but .import() will still require the .init()
+bits as well). Given that these internal shashes/ahashes are in fact
+callable, and calling .import() will result in a crash, I suppose
+duplicating some of the init() code in .import() makes sense
+regardless.
