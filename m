@@ -1,26 +1,81 @@
 From: Quentin Lambert <lambert.quentin@gmail.com>
-Subject: [PATCH 0/2][RESEND] add omitted release in qat_common
-Date: Fri,  2 Sep 2016 16:43:57 +0200
-Message-ID: <20160902144400.31216-1-lambert.quentin@gmail.com>
-References: <20160902143759.31125-1-lambert.quentin@gmail.com>
-Cc: kernel-janitors@vger.kernel.org
+Subject: [PATCH 1/2][RESEND] crypto: qat - introduces a variable to handle error codes
+Date: Fri,  2 Sep 2016 16:43:58 +0200
+Message-ID: <20160902144400.31216-2-lambert.quentin@gmail.com>
+References: <20160902144400.31216-1-lambert.quentin@gmail.com>
+Cc: kernel-janitors@vger.kernel.org,
+        Quentin Lambert <lambert.quentin@gmail.com>
 To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Salvatore Benedetto <salvatore.benedetto@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Quentin Lambert <lambert.quentin@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160902143759.31125-1-lambert.quentin@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:35882 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932274AbcIBOoM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Sep 2016 10:44:12 -0400
+In-Reply-To: <20160902144400.31216-1-lambert.quentin@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The first patch introduces a variable to handle different error codes and be
-able to reuse the same clean up code. The second add an omitted release by
-jumping to the clean code having set the returned value to the proper error
-code.
+Most error code used to jump to a label that lead to a "return -EFAULT"
+statement. This patch introduces a variable that stores the error code
+so that other error branches can use the same label to exit.
+
+Signed-off-by: Quentin Lambert <lambert.quentin@gmail.com>
 
 ---
- drivers/crypto/qat/qat_common/qat_uclo.c |   16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
----
+ drivers/crypto/qat/qat_common/qat_uclo.c |   13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+--- a/drivers/crypto/qat/qat_common/qat_uclo.c
++++ b/drivers/crypto/qat/qat_common/qat_uclo.c
+@@ -966,6 +966,7 @@ static int qat_uclo_parse_uof_obj(struct
+ {
+ 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
+ 	unsigned int ae;
++	int ret;
+ 
+ 	obj_handle->uword_buf = kcalloc(UWORD_CPYBUF_SIZE, sizeof(uint64_t),
+ 					GFP_KERNEL);
+@@ -987,29 +988,35 @@ static int qat_uclo_parse_uof_obj(struct
+ 	    !qat_uclo_map_str_table(obj_handle->obj_hdr, ICP_QAT_UOF_STRT,
+ 				    &obj_handle->str_table)) {
+ 		pr_err("QAT: UOF doesn't have effective images\n");
++		ret = -EFAULT;
+ 		goto out_err;
+ 	}
+ 	obj_handle->uimage_num =
+ 		qat_uclo_map_uimage(obj_handle, obj_handle->ae_uimage,
+ 				    ICP_QAT_UCLO_MAX_AE * ICP_QAT_UCLO_MAX_CTX);
+-	if (!obj_handle->uimage_num)
++	if (!obj_handle->uimage_num) {
++		ret = -EFAULT;
+ 		goto out_err;
++	}
+ 	if (qat_uclo_map_ae(handle, handle->hal_handle->ae_max_num)) {
+ 		pr_err("QAT: Bad object\n");
++		ret = -EFAULT;
+ 		goto out_check_uof_aemask_err;
+ 	}
+ 	qat_uclo_init_uword_num(handle);
+ 	qat_uclo_map_initmem_table(&obj_handle->encap_uof_obj,
+ 				   &obj_handle->init_mem_tab);
+-	if (qat_uclo_set_ae_mode(handle))
++	if (qat_uclo_set_ae_mode(handle)) {
++		ret = -EFAULT;
+ 		goto out_check_uof_aemask_err;
++	}
+ 	return 0;
+ out_check_uof_aemask_err:
+ 	for (ae = 0; ae < obj_handle->uimage_num; ae++)
+ 		kfree(obj_handle->ae_uimage[ae].page);
+ out_err:
+ 	kfree(obj_handle->uword_buf);
+-	return -EFAULT;
++	return ret;
+ }
+ 
+ static int qat_uclo_map_suof_file_hdr(struct icp_qat_fw_loader_handle *handle,
