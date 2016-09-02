@@ -1,7 +1,7 @@
 From: Quentin Lambert <lambert.quentin@gmail.com>
-Subject: [PATCH 1/2][RESEND] crypto: qat - introduces a variable to handle error codes
-Date: Fri,  2 Sep 2016 16:43:58 +0200
-Message-ID: <20160902144400.31216-2-lambert.quentin@gmail.com>
+Subject: [PATCH 2/2] crypto: qat - fix resource release omissions
+Date: Fri,  2 Sep 2016 16:43:59 +0200
+Message-ID: <20160902144400.31216-3-lambert.quentin@gmail.com>
 References: <20160902144400.31216-1-lambert.quentin@gmail.com>
 Cc: kernel-janitors@vger.kernel.org,
         Quentin Lambert <lambert.quentin@gmail.com>
@@ -10,72 +10,31 @@ To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, qat-linux@intel.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:35882 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932274AbcIBOoM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Sep 2016 10:44:12 -0400
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 In-Reply-To: <20160902144400.31216-1-lambert.quentin@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Most error code used to jump to a label that lead to a "return -EFAULT"
-statement. This patch introduces a variable that stores the error code
-so that other error branches can use the same label to exit.
+In certain cases qat_uclo_parse_uof_obj used to return with an error code
+before releasing all resources. This patch add a jump to the appropriate label
+ensuring that the resources are properly released before returning.
+
+This issue was found with Hector.
 
 Signed-off-by: Quentin Lambert <lambert.quentin@gmail.com>
-
 ---
- drivers/crypto/qat/qat_common/qat_uclo.c |   13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ drivers/crypto/qat/qat_common/qat_uclo.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 --- a/drivers/crypto/qat/qat_common/qat_uclo.c
 +++ b/drivers/crypto/qat/qat_common/qat_uclo.c
-@@ -966,6 +966,7 @@ static int qat_uclo_parse_uof_obj(struct
- {
- 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
- 	unsigned int ae;
-+	int ret;
- 
- 	obj_handle->uword_buf = kcalloc(UWORD_CPYBUF_SIZE, sizeof(uint64_t),
- 					GFP_KERNEL);
-@@ -987,29 +988,35 @@ static int qat_uclo_parse_uof_obj(struct
- 	    !qat_uclo_map_str_table(obj_handle->obj_hdr, ICP_QAT_UOF_STRT,
- 				    &obj_handle->str_table)) {
- 		pr_err("QAT: UOF doesn't have effective images\n");
-+		ret = -EFAULT;
- 		goto out_err;
+@@ -981,7 +981,8 @@ static int qat_uclo_parse_uof_obj(struct
+ 			(PID_MINOR_REV & handle->hal_handle->revision_id);
+ 	if (qat_uclo_check_uof_compat(obj_handle)) {
+ 		pr_err("QAT: UOF incompatible\n");
+-		return -EINVAL;
++		ret = -EINVAL;
++		goto out_err;
  	}
- 	obj_handle->uimage_num =
- 		qat_uclo_map_uimage(obj_handle, obj_handle->ae_uimage,
- 				    ICP_QAT_UCLO_MAX_AE * ICP_QAT_UCLO_MAX_CTX);
--	if (!obj_handle->uimage_num)
-+	if (!obj_handle->uimage_num) {
-+		ret = -EFAULT;
- 		goto out_err;
-+	}
- 	if (qat_uclo_map_ae(handle, handle->hal_handle->ae_max_num)) {
- 		pr_err("QAT: Bad object\n");
-+		ret = -EFAULT;
- 		goto out_check_uof_aemask_err;
- 	}
- 	qat_uclo_init_uword_num(handle);
- 	qat_uclo_map_initmem_table(&obj_handle->encap_uof_obj,
- 				   &obj_handle->init_mem_tab);
--	if (qat_uclo_set_ae_mode(handle))
-+	if (qat_uclo_set_ae_mode(handle)) {
-+		ret = -EFAULT;
- 		goto out_check_uof_aemask_err;
-+	}
- 	return 0;
- out_check_uof_aemask_err:
- 	for (ae = 0; ae < obj_handle->uimage_num; ae++)
- 		kfree(obj_handle->ae_uimage[ae].page);
- out_err:
- 	kfree(obj_handle->uword_buf);
--	return -EFAULT;
-+	return ret;
- }
- 
- static int qat_uclo_map_suof_file_hdr(struct icp_qat_fw_loader_handle *handle,
+ 	obj_handle->ustore_phy_size = ICP_QAT_UCLO_MAX_USTORE;
+ 	if (!obj_handle->obj_hdr->file_buff ||
