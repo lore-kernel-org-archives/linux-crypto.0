@@ -1,40 +1,30 @@
 From: Quentin Lambert <lambert.quentin@gmail.com>
-Subject: [PATCH 2/2] crypto: qat - fix resource release omissions
-Date: Fri,  2 Sep 2016 16:43:59 +0200
-Message-ID: <20160902144400.31216-3-lambert.quentin@gmail.com>
+Subject: [PATCH v2 0/2] add omitted release in qat_common
+Date: Fri,  2 Sep 2016 16:47:51 +0200
+Message-ID: <20160902144753.31334-1-lambert.quentin@gmail.com>
 References: <20160902144400.31216-1-lambert.quentin@gmail.com>
-Cc: kernel-janitors@vger.kernel.org,
-        Quentin Lambert <lambert.quentin@gmail.com>
+Cc: kernel-janitors@vger.kernel.org
 To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Salvatore Benedetto <salvatore.benedetto@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Quentin Lambert <lambert.quentin@gmail.com>
 Return-path: <kernel-janitors-owner@vger.kernel.org>
 In-Reply-To: <20160902144400.31216-1-lambert.quentin@gmail.com>
 Sender: kernel-janitors-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In certain cases qat_uclo_parse_uof_obj used to return with an error code
-before releasing all resources. This patch add a jump to the appropriate label
-ensuring that the resources are properly released before returning.
+The first patch introduces a variable to handle different error codes and be
+able to reuse the same clean up code. The second add an omitted release by
+jumping to the clean code having set the returned value to the proper error
+code.
 
-This issue was found with Hector.
+-changes since v1
+I failed to send the first version properly and it was missing a proper commit
+message, just ignore it.
 
-Signed-off-by: Quentin Lambert <lambert.quentin@gmail.com>
 ---
- drivers/crypto/qat/qat_common/qat_uclo.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
---- a/drivers/crypto/qat/qat_common/qat_uclo.c
-+++ b/drivers/crypto/qat/qat_common/qat_uclo.c
-@@ -981,7 +981,8 @@ static int qat_uclo_parse_uof_obj(struct
- 			(PID_MINOR_REV & handle->hal_handle->revision_id);
- 	if (qat_uclo_check_uof_compat(obj_handle)) {
- 		pr_err("QAT: UOF incompatible\n");
--		return -EINVAL;
-+		ret = -EINVAL;
-+		goto out_err;
- 	}
- 	obj_handle->ustore_phy_size = ICP_QAT_UCLO_MAX_USTORE;
- 	if (!obj_handle->obj_hdr->file_buff ||
+ drivers/crypto/qat/qat_common/qat_uclo.c |   16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+---
