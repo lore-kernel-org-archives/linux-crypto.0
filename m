@@ -1,58 +1,57 @@
-From: Eric Wheeler <dm-devel@lists.ewheeler.net>
-Subject: dm-crypt: flush crypt_queue on suspend? on REQ_FLUSH?
-Date: Fri, 2 Sep 2016 15:13:47 -0700 (PDT)
-Message-ID: <alpine.LRH.2.11.1609021430390.5413@mail.ewheeler.net>
-Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: linux-crypto@vger.kernel.org, linux-block@vger.kernel.org
-To: dm-devel@redhat.com
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] crypto: mv_cesa: remove NO_IRQ reference
+Date: Sat,  3 Sep 2016 01:26:40 +0200
+Message-ID: <20160902232648.2119621-1-arnd@arndb.de>
+Cc: Romain Perier <romain.perier@free-electrons.com>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx.ewheeler.net ([66.155.3.69]:56607 "EHLO mail.ewheeler.net"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751765AbcIBWNt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Sep 2016 18:13:49 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:51801 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752666AbcIBX0q (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Sep 2016 19:26:46 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello all,
+Drivers should not use NO_IRQ, as we are trying to get rid of that.
+In this case, the call to irq_of_parse_and_map() is both wrong
+(as it returns '0' on failure, not NO_IRQ) and unnecessary
+(as platform_get_irq() does the same thing)
 
-We have a KVM => dm-crypt => dm-thin stack in and a snapshot may have 
-partially completed queued IO out-of-order.  EXT4 is giving errors like 
-this after mounting a snapshot, but only on files recently modified near 
-the snapshot time.  This might imply out-of-order writes since, 
-presumably, the ext4 journal would handle deletions in journal order and 
-snapshots should be safe at any time:
+This removes the call to irq_of_parse_and_map() and checks for
+the error code correctly.
 
-	kernel: EXT4-fs error (device dm-2): ext4_lookup:1441: inode #1196093: comm rsync: deleted inode referenced: 1188710 
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/crypto/mv_cesa.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-Notably, the ext4 error did not present prior to the snapshot.  We have 
-rsync logs from hours before that didn't report this message, but all 
-later rsyncs do.
+It would be good if someone could test this on a machine that boots
+from DT to ensure the conversion was correct.
 
-Perhaps related, or perhaps not, crypt_map() notes the following:
-	1914          * If bio is REQ_FLUSH or REQ_DISCARD, just bypass crypt queues.
-	1915          * - for REQ_FLUSH device-mapper core ensures that no IO is in-flight
-	1916          * - for REQ_DISCARD caller must use flush if IO ordering matters
-
-However, crypt_map returns DM_MAPIO_SUBMITTED after calling 
-kcryptd_queue_crypt(io) which processes asynchronously on 
-cc->crypto_queue.  In crypt_ctr(), alloc_workqueue sets max_active to 
-num_online_cpus() unless 'same_cpu_crypt' is set in the dm table (mine is 
-not), so if I understand correctly, completion could happen out of order 
-with CPUs >1.
-
-Does the dm stack know that the bio (dm_crypt_io) hasn't been completed 
-even though it was put on a work queue?  If so, I would like to understand 
-that dm bio-tracking mechanism, so please point me at documentation or 
-code.
-
-If not, then does crypt_map() need a workqueue_flush(cc->crypto_queue) on 
-REQ_FLUSH?  
-
-I'm new to the dm-crypt code, so please educate me if I'm missing 
-something here.
-
-Thank you for your help!
-
---
-Eric Wheeler
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+index e6b658faef63..104e9ce9400a 100644
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -1091,11 +1091,8 @@ static int mv_probe(struct platform_device *pdev)
+ 
+ 	cp->max_req_size = cp->sram_size - SRAM_CFG_SPACE;
+ 
+-	if (pdev->dev.of_node)
+-		irq = irq_of_parse_and_map(pdev->dev.of_node, 0);
+-	else
+-		irq = platform_get_irq(pdev, 0);
+-	if (irq < 0 || irq == NO_IRQ) {
++	irq = platform_get_irq(pdev, 0);
++	if (irq < 0) {
+ 		ret = irq;
+ 		goto err;
+ 	}
+-- 
+2.9.0
