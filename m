@@ -1,60 +1,33 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH] crypto: mv_cesa: remove NO_IRQ reference
-Date: Sat, 3 Sep 2016 08:54:27 +0200
-Message-ID: <20160903085427.1e0285de@bbrezillon>
-References: <20160902232648.2119621-1-arnd@arndb.de>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: Who will copy the AAD data to dest. buffer
+Date: Sat, 03 Sep 2016 15:19:56 +0200
+Message-ID: <1533189.TBPDS8NbvI@positron.chronox.de>
+References: <CAFXBA=m-Ued+9EGmfwa210cm6HZGxN3P-g_Fsapzcw+a3FKdZw@mail.gmail.com> <20160902144203.GA13135@gondor.apana.org.au> <CAFXBA=ndKKGhfQdWtRuAAQdeBCeoKyS6-obExPHFjBsrj4OjXw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Romain Perier <romain.perier@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160902232648.2119621-1-arnd@arndb.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        linux-crypto@vger.kernel.org
+To: Harsh Jain <harshjain.prof@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:37364 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751091AbcICNUI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 3 Sep 2016 09:20:08 -0400
+In-Reply-To: <CAFXBA=ndKKGhfQdWtRuAAQdeBCeoKyS6-obExPHFjBsrj4OjXw@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat,  3 Sep 2016 01:26:40 +0200
-Arnd Bergmann <arnd@arndb.de> wrote:
+Am Samstag, 3. September 2016, 10:45:08 CEST schrieb Harsh Jain:
 
-> Drivers should not use NO_IRQ, as we are trying to get rid of that.
-> In this case, the call to irq_of_parse_and_map() is both wrong
-> (as it returns '0' on failure, not NO_IRQ) and unnecessary
-> (as platform_get_irq() does the same thing)
-> 
-> This removes the call to irq_of_parse_and_map() and checks for
-> the error code correctly.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Hi Harsh,
 
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+> Thanks Herbert for clarification. It means Libkcapi documentation
+> needs update of chapter  "Aead Cipher API".
 
-> ---
->  drivers/crypto/mv_cesa.c | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-> It would be good if someone could test this on a machine that boots
-> from DT to ensure the conversion was correct.
-> 
-> diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-> index e6b658faef63..104e9ce9400a 100644
-> --- a/drivers/crypto/mv_cesa.c
-> +++ b/drivers/crypto/mv_cesa.c
-> @@ -1091,11 +1091,8 @@ static int mv_probe(struct platform_device *pdev)
->  
->  	cp->max_req_size = cp->sram_size - SRAM_CFG_SPACE;
->  
-> -	if (pdev->dev.of_node)
-> -		irq = irq_of_parse_and_map(pdev->dev.of_node, 0);
-> -	else
-> -		irq = platform_get_irq(pdev, 0);
-> -	if (irq < 0 || irq == NO_IRQ) {
-> +	irq = platform_get_irq(pdev, 0);
-> +	if (irq < 0) {
->  		ret = irq;
->  		goto err;
->  	}
+Fixed, I will release a new version shortly.
+
+Thanks for the pointer.
+
+Ciao
+Stephan
