@@ -1,57 +1,39 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] crypto: mv_cesa: remove NO_IRQ reference
-Date: Sat,  3 Sep 2016 01:26:40 +0200
-Message-ID: <20160902232648.2119621-1-arnd@arndb.de>
-Cc: Romain Perier <romain.perier@free-electrons.com>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:51801 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752666AbcIBX0q (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Sep 2016 19:26:46 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Baoyou Xie <baoyou.xie@linaro.org>
+Subject: [PATCH] crypto: caam: add missing header dependencies
+Date: Sat,  3 Sep 2016 11:29:30 +0800
+Message-ID: <1472873370-18589-1-git-send-email-baoyou.xie@linaro.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        baoyou.xie@linaro.org, xie.baoyou@zte.com.cn
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        horia.geanta@nxp.com, srinivas.kandagatla@linaro.org,
+        alexandru.porosanu@nxp.com, arnd@arndb.de
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Drivers should not use NO_IRQ, as we are trying to get rid of that.
-In this case, the call to irq_of_parse_and_map() is both wrong
-(as it returns '0' on failure, not NO_IRQ) and unnecessary
-(as platform_get_irq() does the same thing)
+We get 1 warning when building kernel with W=1:
+drivers/crypto/caam/ctrl.c:398:5: warning: no previous prototype for 'caam_get_era' [-Wmissing-prototypes]
 
-This removes the call to irq_of_parse_and_map() and checks for
-the error code correctly.
+In fact, this function is declared in drivers/crypto/caam/ctrl.h
+and be exported, thus can be refrenced by modules, so this patch 
+adds missing header dependencies.
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Baoyou Xie <baoyou.xie@linaro.org>
 ---
- drivers/crypto/mv_cesa.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ drivers/crypto/caam/ctrl.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-It would be good if someone could test this on a machine that boots
-from DT to ensure the conversion was correct.
-
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index e6b658faef63..104e9ce9400a 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -1091,11 +1091,8 @@ static int mv_probe(struct platform_device *pdev)
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 0ec112e..46e72ed 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -14,6 +14,7 @@
+ #include "jr.h"
+ #include "desc_constr.h"
+ #include "error.h"
++#include "ctrl.h"
  
- 	cp->max_req_size = cp->sram_size - SRAM_CFG_SPACE;
- 
--	if (pdev->dev.of_node)
--		irq = irq_of_parse_and_map(pdev->dev.of_node, 0);
--	else
--		irq = platform_get_irq(pdev, 0);
--	if (irq < 0 || irq == NO_IRQ) {
-+	irq = platform_get_irq(pdev, 0);
-+	if (irq < 0) {
- 		ret = irq;
- 		goto err;
- 	}
+ bool caam_little_end;
+ EXPORT_SYMBOL(caam_little_end);
 -- 
-2.9.0
+2.7.4
