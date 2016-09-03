@@ -1,59 +1,85 @@
-From: Harsh Jain <harshjain.prof@gmail.com>
-Subject: Re: Who will copy the AAD data to dest. buffer
-Date: Sat, 3 Sep 2016 10:45:08 +0530
-Message-ID: <CAFXBA=ndKKGhfQdWtRuAAQdeBCeoKyS6-obExPHFjBsrj4OjXw@mail.gmail.com>
-References: <CAFXBA=m-Ued+9EGmfwa210cm6HZGxN3P-g_Fsapzcw+a3FKdZw@mail.gmail.com>
- <20160902144203.GA13135@gondor.apana.org.au>
+From: Eric Wheeler <dm-devel@lists.ewheeler.net>
+Subject: Re: [dm-devel] dm-crypt: flush crypt_queue on suspend? on
+ REQ_FLUSH?
+Date: Fri, 2 Sep 2016 23:26:50 -0700 (PDT)
+Message-ID: <alpine.LRH.2.11.1609022303170.5413@mail.ewheeler.net>
+References: <alpine.LRH.2.11.1609021430390.5413@mail.ewheeler.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org, Stephan Mueller <smueller@chronox.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: linux-block@vger.kernel.org, linux-crypto@vger.kernel.org
+To: dm-devel@redhat.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f42.google.com ([209.85.218.42]:36774 "EHLO
-        mail-oi0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751468AbcICFPJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Sep 2016 01:15:09 -0400
-Received: by mail-oi0-f42.google.com with SMTP id w78so341714oie.3
-        for <linux-crypto@vger.kernel.org>; Fri, 02 Sep 2016 22:15:09 -0700 (PDT)
-In-Reply-To: <20160902144203.GA13135@gondor.apana.org.au>
+Received: from mx.ewheeler.net ([66.155.3.69]:43250 "EHLO mail.ewheeler.net"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751057AbcICG0w (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 3 Sep 2016 02:26:52 -0400
+In-Reply-To: <alpine.LRH.2.11.1609021430390.5413@mail.ewheeler.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Thanks Herbert for clarification. It means Libkcapi documentation
-needs update of chapter  "Aead Cipher API".
-
-Regards
-Harsh Jain
-
-
-
-On Fri, Sep 2, 2016 at 8:12 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Fri, Sep 02, 2016 at 08:05:04PM +0530, Harsh Jain wrote:
->> Hi Herbert,
->>
->> Is copy of AAD data to destination buffer when dst != src is mandatory
->> requirements for crypto drivers or we can skip this copy. Actually I
->> am bit confused, In following link Stephen had mentioned caller will
->> memcpy the AAD to destination buffer but authenc.c also copies the AAD
->> to dest. buffer.
->>
->> http://www.chronox.de/libkcapi/html/ch02s02.html
+On Fri, 2 Sep 2016, Eric Wheeler wrote:
+> We have a KVM => dm-crypt => dm-thin stack and a snapshot may have 
+> partially completed queued IO out-of-order.  EXT4 is giving errors like 
+> this after mounting a snapshot, but only on files recently modified near 
+> the snapshot time.  This might imply out-of-order writes since, 
+> presumably, the ext4 journal would handle deletions in journal order and 
+> snapshots should be safe at any time:
+> 
+> 	kernel: EXT4-fs error (device dm-2): ext4_lookup:1441: inode #1196093: comm rsync: deleted inode referenced: 1188710 
+> 
+> Notably, the ext4 error did not present prior to the snapshot.  We have 
+> rsync logs from hours before that didn't report this message, but all 
+> later rsyncs do.
+> 
+> Perhaps related, or perhaps not, crypt_map() notes the following:
+> 	1914          * If bio is REQ_FLUSH or REQ_DISCARD, just bypass crypt queues.
+> 	1915          * - for REQ_FLUSH device-mapper core ensures that no IO is in-flight
+> 	1916          * - for REQ_DISCARD caller must use flush if IO ordering matters
+> 
+> However, crypt_map returns DM_MAPIO_SUBMITTED after calling 
+> kcryptd_queue_crypt(io) which processes asynchronously on 
+> cc->crypto_queue.  In crypt_ctr(), alloc_workqueue sets max_active to 
+> num_online_cpus() unless 'same_cpu_crypt' is set in the dm table (mine is 
+> not), so if I understand correctly, completion could happen out of order 
+> with CPUs >1.
+> 
+> Does the dm stack know that the bio (dm_crypt_io) hasn't been completed 
+> [since] it was put on a work queue [and then a write_thread]?  If so, I 
+> would like to understand that dm bio-tracking mechanism, so please point 
+> me at documentation or code.
+> 
+> If not, then does crypt_map() need a workqueue_flush(cc->crypto_queue) on 
+> REQ_FLUSH?  
 >
-> It has to be copied if src != dst.
->
->> Secondly When AAD data remains unchanged in AEAD encryption/decryption
->> operations. Why we copy the same data to destination buffer?
->
-> This greatly simplifies the implementation of the AEAD algorithms
-> because we can throw away src and use the dst only.  For example,
-> authenc hashes the AAD and ciphertext.  If we didn't force the
-> copy it would have to hash them separately, meaning the use of
-> the slow init/update/final interface.  With the copy it can use
-> the digest interface.
->
-> Cheers,
+> I'm new to the dm-crypt code, so please educate me if I'm missing 
+> something here.
+
+On second look, simply adding workqueue_flush isn't enough since I've not 
+set 'submit_from_crypt_cpus'; it's the cc->write_thread's job to get the 
+bio's submitted via kcryptd_io_write() after pulling them from a red-black 
+tree that kcryptd_crypt_write_io_submit() inserted into.  Is the red-black 
+tree guaranteed to pop off in order, or at least to flush in order when a 
+REQ_FLUSH comes through?
+
+If not, then I think this means I need to set both 'same_cpu_crypt' 
+(DM_CRYPT_SAME_CPU) and 'submit_from_crypt_cpus' (DM_CRYPT_NO_OFFLOAD) to 
+guarantee ordering by restricting the workqueue to serial work 
+(DM_CRYPT_SAME_CPU) and force immediate generic_make_request inside 
+kcryptd_crypt_write_io_submit (DM_CRYPT_NO_OFFLOAD) instead of queuing to 
+the cc->write_thread.
+
+Your thoughts?
+
+-Eric
+
+ 
+> Thank you for your help!
+> 
 > --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Eric Wheeler
+> 
+> --
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://www.redhat.com/mailman/listinfo/dm-devel
+> 
