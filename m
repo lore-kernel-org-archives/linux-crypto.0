@@ -1,77 +1,78 @@
-From: Ananth Jasty <ajasty@caviumnetworks.com>
-Subject: Re: [cryptodev:master 65/80] drivers/pci/quirks.c:843:6: error: 'struct pci_dev' has no member named 'sriov'
-Date: Sat, 3 Sep 2016 18:40:27 -0700
-Message-ID: <59722569-EC4C-4A31-AB54-B6BF9B8B7A5C@caviumnetworks.com>
-References: <201609040817.Rs5sdqia%fengguang.wu@intel.com>
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: Ananth Jasty <Ananth.Jasty@cavium.com>, <kbuild-all@01.org>,
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Omer Khaliq <okhaliq@caviumnetworks.com>
-To: kbuild test robot <fengguang.wu@intel.com>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: [PATCH] hwrng: core - Allocate memory during module init
+Date: Sun,  4 Sep 2016 13:59:38 +0530
+Message-ID: <1472977778-23996-1-git-send-email-prasannatsmkumar@gmail.com>
+Cc: prasannatsmkumar@gmail.com
+To: mpm@selenic.com, herbert@gondor.apana.org.au, jslaby@suse.cz,
+        peter@korsgaard.com, lee.jones@linaro.org,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0074.outbound.protection.outlook.com ([104.47.34.74]:60000
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750785AbcIDCQE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Sep 2016 22:16:04 -0400
-In-Reply-To: <201609040817.Rs5sdqia%fengguang.wu@intel.com>
+Received: from mail-pa0-f66.google.com ([209.85.220.66]:36176 "EHLO
+        mail-pa0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752003AbcIDIcK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Sep 2016 04:32:10 -0400
+Received: by mail-pa0-f66.google.com with SMTP id ez1so7672878pab.3
+        for <linux-crypto@vger.kernel.org>; Sun, 04 Sep 2016 01:30:30 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-As this fix is purely SRIOV related, an ifdef guard for SRIOV support =
-should be sufficient to prevent this header dependency.
+In core rng_buffer and rng_fillbuf is allocated in hwrng_register only
+once and it is freed during module exit. This patch moves allocating
+rng_buffer and rng_fillbuf from hwrng_register to rng core's init. This
+avoids checking whether rng_buffer and rng_fillbuf was allocated from
+every hwrng_register call. Also moving them to module init makes it
+explicit that it is freed in module exit.
 
-Ananth
+Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+---
+ drivers/char/hw_random/core.c | 27 +++++++++++----------------
+ 1 file changed, 11 insertions(+), 16 deletions(-)
 
-On Sep 3, 2016, at 5:16 PM, kbuild test robot <fengguang.wu@intel.com> =
-wrote:
-
-> tree:   =
-https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git =
-master
-> head:   10faa8c0d6c3b22466f97713a9533824a2ea1c57
-> commit: 21b5b8eebbae427d7d890b7dd1e43a63aca7c26c [65/80] PCI: quirk =
-fixup for cavium invalid sriov link value.
-> config: arm64-kexec_dev_defconfig (attached as .config)
-> compiler: aarch64-linux-gnu-gcc (Debian 5.4.0-6) 5.4.0 20160609
-> reproduce:
->        wget =
-https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/=
-make.cross -O ~/bin/make.cross
->        chmod +x ~/bin/make.cross
->        git checkout 21b5b8eebbae427d7d890b7dd1e43a63aca7c26c
->        # save the attached .config to linux build tree
->        make.cross ARCH=3Darm64=20
->=20
-> All errors (new ones prefixed by >>):
->=20
->   drivers/pci/quirks.c: In function 'quirk_cavium_sriov_rnm_link':
->>> drivers/pci/quirks.c:843:6: error: 'struct pci_dev' has no member =
-named 'sriov'
->      dev->sriov->link =3D dev->devfn;
->         ^
->=20
-> vim +843 drivers/pci/quirks.c
->=20
->   837	#ifdef CONFIG_ARM64
->   838=09
->   839	static void quirk_cavium_sriov_rnm_link(struct pci_dev *dev)
->   840	{
->   841		/* Fix for improper SRIOV configuration on Cavium cn88xx =
- RNM device */
->   842		if (dev->subsystem_device =3D=3D 0xa118)
->> 843			dev->sriov->link =3D dev->devfn;
->   844	}
->   845	DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_CAVIUM, 0xa018, =
-quirk_cavium_sriov_rnm_link);
->   846	#endif
->=20
-> ---
-> 0-DAY kernel test infrastructure                Open Source Technology =
-Center
-> https://lists.01.org/pipermail/kbuild-all                   Intel =
-Corporation
-> <.config.gz>
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 9203f2d..ec6846b 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -449,22 +449,6 @@ int hwrng_register(struct hwrng *rng)
+ 		goto out;
+ 
+ 	mutex_lock(&rng_mutex);
+-
+-	/* kmalloc makes this safe for virt_to_page() in virtio_rng.c */
+-	err = -ENOMEM;
+-	if (!rng_buffer) {
+-		rng_buffer = kmalloc(rng_buffer_size(), GFP_KERNEL);
+-		if (!rng_buffer)
+-			goto out_unlock;
+-	}
+-	if (!rng_fillbuf) {
+-		rng_fillbuf = kmalloc(rng_buffer_size(), GFP_KERNEL);
+-		if (!rng_fillbuf) {
+-			kfree(rng_buffer);
+-			goto out_unlock;
+-		}
+-	}
+-
+ 	/* Must not register two RNGs with the same name. */
+ 	err = -EEXIST;
+ 	list_for_each_entry(tmp, &rng_list, list) {
+@@ -573,6 +557,17 @@ EXPORT_SYMBOL_GPL(devm_hwrng_unregister);
+ 
+ static int __init hwrng_modinit(void)
+ {
++	/* kmalloc makes this safe for virt_to_page() in virtio_rng.c */
++	rng_buffer = kmalloc(rng_buffer_size(), GFP_KERNEL);
++	if (!rng_buffer)
++		return -ENOMEM;
++
++	rng_fillbuf = kmalloc(rng_buffer_size(), GFP_KERNEL);
++	if (!rng_fillbuf) {
++		kfree(rng_buffer);
++		return -ENOMEM;
++	}
++
+ 	return register_miscdev();
+ }
+ 
+-- 
+2.5.0
