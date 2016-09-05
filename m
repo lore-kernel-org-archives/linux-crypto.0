@@ -1,53 +1,52 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: arm/ghash-ce - add missing async
- import/export
-Date: Mon, 5 Sep 2016 17:41:09 +0800
-Message-ID: <20160905094109.GA30927@gondor.apana.org.au>
-References: <1472469594-27315-1-git-send-email-ard.biesheuvel@linaro.org>
- <20160831144135.GB26616@gondor.apana.org.au>
- <CAKv+Gu8tr3kq9gYpJjNeKvt-PDsnBUb1FZqxOeNBfuF+J6hCzA@mail.gmail.com>
- <CAKv+Gu8yEDbQS651Q3-GbQw+AwJfqvH1WHKa-LUE4=43NwyWSw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] crypto: arm/ghash: change internal cra_name to "__ghash"
+Date: Mon,  5 Sep 2016 12:58:44 +0100
+Message-ID: <1473076724-2725-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48872 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932413AbcIEJlP (ORCPT
+Received: from mail-wm0-f48.google.com ([74.125.82.48]:38821 "EHLO
+        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755790AbcIEL7F (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Sep 2016 05:41:15 -0400
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu8yEDbQS651Q3-GbQw+AwJfqvH1WHKa-LUE4=43NwyWSw@mail.gmail.com>
+        Mon, 5 Sep 2016 07:59:05 -0400
+Received: by mail-wm0-f48.google.com with SMTP id 1so135159912wmz.1
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Sep 2016 04:59:04 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 01, 2016 at 04:14:22PM +0100, Ard Biesheuvel wrote:
->
-> The culprit appears to be that the .cra_name of the internal shash is
-> "ghash", (and not "__ghash" like in the x86 case) which causes the
-> test code to run the test on not only the public ahash, but also on
-> the internal cryptd() encapsulated shash, and also on the internal
-> shash itself.
+The fact that the internal synchrous hash implementation is called
+"ghash" like the publicly visible one is causing the testmgr code
+to misidentify it as an algorithm that requires testing at boottime.
+So rename it to "__ghash" to prevent this.
 
-Hmm that's not good.  The test code is not meant to process these
-internal algorithms.  I recently added a check to automatically
-filter out internal algorithms when testing.  But we should still
-change its name to __ghash just to avoid confusion.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
 
-> However, that does not answer the question whether .init() must be
-> called before .import() [which the test code does not do]. If not,
-> then please disregard my v2, and I will followup with a patch that
-> renames ghash to __ghash (but .import() will still require the .init()
-> bits as well). Given that these internal shashes/ahashes are in fact
-> callable, and calling .import() will result in a crash, I suppose
-> duplicating some of the init() code in .import() makes sense
-> regardless.
+Hi Herbert,
 
-Right.  This is definitely a bug and I will take your patches.
+This one should be able to go on top of the 3-pieces series I sent you
+last week.
 
 Thanks,
+Ard.
+
+
+ arch/arm/crypto/ghash-ce-glue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-glue.c
+index b88364aa149a..7546b3c02466 100644
+--- a/arch/arm/crypto/ghash-ce-glue.c
++++ b/arch/arm/crypto/ghash-ce-glue.c
+@@ -138,7 +138,7 @@ static struct shash_alg ghash_alg = {
+ 	.setkey			= ghash_setkey,
+ 	.descsize		= sizeof(struct ghash_desc_ctx),
+ 	.base			= {
+-		.cra_name	= "ghash",
++		.cra_name	= "__ghash",
+ 		.cra_driver_name = "__driver-ghash-ce",
+ 		.cra_priority	= 0,
+ 		.cra_flags	= CRYPTO_ALG_TYPE_SHASH | CRYPTO_ALG_INTERNAL,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.7.4
