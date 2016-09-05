@@ -1,51 +1,50 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 4.8
-Date: Mon, 5 Sep 2016 17:33:18 +0800
-Message-ID: <20160905093318.GA30895@gondor.apana.org.au>
-References: <20141007131826.GA29688@gondor.apana.org.au>
- <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150415033951.GA1406@gondor.apana.org.au>
- <20150622084457.GA7806@gondor.apana.org.au>
- <20150831135655.GA2694@gondor.apana.org.au>
- <20151102080427.GA8465@gondor.apana.org.au>
- <20160111101450.GA24044@gondor.apana.org.au>
- <20160122101828.GA15966@gondor.apana.org.au>
- <20160801095821.GA1260@gondor.apana.org.au>
+Subject: Re: [PATCH 1/2] crypto: arm/ghash-ce - add missing async
+ import/export
+Date: Mon, 5 Sep 2016 17:41:09 +0800
+Message-ID: <20160905094109.GA30927@gondor.apana.org.au>
+References: <1472469594-27315-1-git-send-email-ard.biesheuvel@linaro.org>
+ <20160831144135.GB26616@gondor.apana.org.au>
+ <CAKv+Gu8tr3kq9gYpJjNeKvt-PDsnBUb1FZqxOeNBfuF+J6hCzA@mail.gmail.com>
+ <CAKv+Gu8yEDbQS651Q3-GbQw+AwJfqvH1WHKa-LUE4=43NwyWSw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:48872 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932413AbcIEJlP (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Sep 2016 05:41:15 -0400
 Content-Disposition: inline
-In-Reply-To: <20160801095821.GA1260@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <CAKv+Gu8yEDbQS651Q3-GbQw+AwJfqvH1WHKa-LUE4=43NwyWSw@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Thu, Sep 01, 2016 at 04:14:22PM +0100, Ard Biesheuvel wrote:
+>
+> The culprit appears to be that the .cra_name of the internal shash is
+> "ghash", (and not "__ghash" like in the x86 case) which causes the
+> test code to run the test on not only the public ahash, but also on
+> the internal cryptd() encapsulated shash, and also on the internal
+> shash itself.
 
-This push fixes a regression in the cryptd code that breaks certain
-accelerated AED algorithms as well as an older regression in the
-caam driver that breaks IPsec.
+Hmm that's not good.  The test code is not meant to process these
+internal algorithms.  I recently added a check to automatically
+filter out internal algorithms when testing.  But we should still
+change its name to __ghash just to avoid confusion.
 
+> However, that does not answer the question whether .init() must be
+> called before .import() [which the test code does not do]. If not,
+> then please disregard my v2, and I will followup with a patch that
+> renames ghash to __ghash (but .import() will still require the .init()
+> bits as well). Given that these internal shashes/ahashes are in fact
+> callable, and calling .import() will result in a crash, I suppose
+> duplicating some of the init() code in .import() makes sense
+> regardless.
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Herbert Xu (1):
-      crypto: cryptd - Use correct tfm object for AEAD tracking
-
-Horia Geantă (1):
-      crypto: caam - fix IV loading for authenc (giv)decryption
-
- crypto/cryptd.c               |    3 +-
- drivers/crypto/caam/caamalg.c |   77 ++++++++++++++++++++---------------------
- 2 files changed, 39 insertions(+), 41 deletions(-)
+Right.  This is definitely a bug and I will take your patches.
 
 Thanks,
 -- 
