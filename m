@@ -1,7 +1,7 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH 9/9] arm64: dts: marvell: add TRNG description for Armada 8K CP
-Date: Tue,  6 Sep 2016 17:38:57 +0200
-Message-ID: <20160906153857.5503-10-romain.perier@free-electrons.com>
+Subject: [PATCH 7/9] hwrng: omap - Don't prefix the probe message with OMAP
+Date: Tue,  6 Sep 2016 17:38:55 +0200
+Message-ID: <20160906153857.5503-8-romain.perier@free-electrons.com>
 References: <20160906153857.5503-1-romain.perier@free-electrons.com>
 Cc: Gregory Clement <gregory.clement@free-electrons.com>,
         Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
@@ -17,61 +17,40 @@ Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 To: dsaxena@plexity.net, mpm@selenic.com,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:59330 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:59308 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S933628AbcIFPk3 (ORCPT
+        with ESMTP id S933412AbcIFPkU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Sep 2016 11:40:29 -0400
+        Tue, 6 Sep 2016 11:40:20 -0400
 In-Reply-To: <20160906153857.5503-1-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This commits adds the devicetree description of the SafeXcel IP-76 TRNG
-found in the two Armada CP110.
+So far, this driver was only used for OMAP SoCs. However, if a device
+variant is added for an IP block that has nothing to do with the OMAP
+platform, the message "OMAP Random Number Generator Ver" is displayed
+anyway. Instead of hardcoding "OMAP" into this message, we decide to
+only display "Random Number Generator". As dev_info is already
+pre-pending the message with the name of the device, we have enough
+informations.
 
 Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
 ---
- arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi | 8 ++++++++
- arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi  | 8 ++++++++
- 2 files changed, 16 insertions(+)
+ drivers/char/hw_random/omap-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
-index da31bbb..aaffa24 100644
---- a/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
-+++ b/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
-@@ -164,6 +164,14 @@
- 				clocks = <&cpm_syscon0 1 21>;
- 				status = "disabled";
- 			};
-+
-+			cpm_trng: trng@760000 {
-+				compatible = "marvell,armada-8k-rng", "inside-secure,safexcel-eip76";
-+				reg = <0x760000 0x7d>;
-+				interrupts = <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
-+				clocks = <&cpm_syscon0 1 25>;
-+				status = "okay";
-+			};
- 		};
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index 6a3aaad..f1dcdb3 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -392,7 +392,7 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		goto err_register;
  
- 		cpm_pcie0: pcie@f2600000 {
-diff --git a/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
-index 6ff1201..216de12 100644
---- a/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
-+++ b/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
-@@ -164,6 +164,14 @@
- 				clocks = <&cps_syscon0 1 21>;
- 				status = "disabled";
- 			};
-+
-+			cps_trng: trng@760000 {
-+				compatible = "marvell,armada-8k-rng", "inside-secure,safexcel-eip76";
-+				reg = <0x760000 0x7d>;
-+				interrupts = <GIC_SPI 312 IRQ_TYPE_LEVEL_HIGH>;
-+				clocks = <&cps_syscon0 1 25>;
-+				status = "okay";
-+			};
- 		};
+-	dev_info(&pdev->dev, "OMAP Random Number Generator ver. %02x\n",
++	dev_info(&pdev->dev, "Random Number Generator ver. %02x\n",
+ 		 omap_rng_read(priv, RNG_REV_REG));
  
- 		cps_pcie0: pcie@f4600000 {
+ 	return 0;
 -- 
 2.9.3
