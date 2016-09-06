@@ -1,7 +1,7 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH 6/9] hwrng: omap - Add support for 128-bit output of data
-Date: Tue,  6 Sep 2016 17:38:54 +0200
-Message-ID: <20160906153857.5503-7-romain.perier@free-electrons.com>
+Subject: [PATCH 5/9] hwrng: omap - Remove global definition of hwrng
+Date: Tue,  6 Sep 2016 17:38:53 +0200
+Message-ID: <20160906153857.5503-6-romain.perier@free-electrons.com>
 References: <20160906153857.5503-1-romain.perier@free-electrons.com>
 Cc: Gregory Clement <gregory.clement@free-electrons.com>,
         Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
@@ -17,72 +17,87 @@ Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 To: dsaxena@plexity.net, mpm@selenic.com,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:59298 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:59271 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S933412AbcIFPkP (ORCPT
+        with ESMTP id S933357AbcIFPkJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Sep 2016 11:40:15 -0400
+        Tue, 6 Sep 2016 11:40:09 -0400
 In-Reply-To: <20160906153857.5503-1-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-So far, this driver only supports up to 64 bits of output data generated
-by an RNG. Some IP blocks, like the SafeXcel IP-76 supports up to 128
-bits of output data. This commits renames registers descriptions
-OUTPUT_L_REG and OUTPUT_H_REG to OUTPUT_0_REG and OUPUT_1_REG,
-respectively. It also adds two new values to the enumeration of existing
-registers: OUTPUT_2_REG and OUTPUT_3_REG.
+The omap-rng driver currently assumes that there will only ever be a
+single instance of an RNG device. For this reason, there is a statically
+allocated struct hwrng, with a fixed name. However, registering two
+struct hwrng with the same isn't accepted by the RNG framework, so we
+need to switch to a dynamically allocated struct hwrng, each using a
+different name. Then, we define the name of this hwrng to "dev_name(dev)",
+so the name of the data structure is unique per device.
 
 Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
 ---
- drivers/char/hw_random/omap-rng.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ drivers/char/hw_random/omap-rng.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-index f9a99b2..6a3aaad 100644
+index 171c3e8..f9a99b2 100644
 --- a/drivers/char/hw_random/omap-rng.c
 +++ b/drivers/char/hw_random/omap-rng.c
-@@ -65,8 +65,10 @@
- #define OMAP4_RNG_OUTPUT_SIZE			0x8
- 
- enum {
--	RNG_OUTPUT_L_REG = 0,
--	RNG_OUTPUT_H_REG,
-+	RNG_OUTPUT_0_REG = 0,
-+	RNG_OUTPUT_1_REG,
-+	RNG_OUTPUT_2_REG,
-+	RNG_OUTPUT_3_REG,
- 	RNG_STATUS_REG,
- 	RNG_INTMASK_REG,
- 	RNG_INTACK_REG,
-@@ -82,7 +84,7 @@ enum {
+@@ -127,6 +127,7 @@ struct omap_rng_dev {
+ 	void __iomem			*base;
+ 	struct device			*dev;
+ 	const struct omap_rng_pdata	*pdata;
++	struct hwrng rng;
  };
  
- static const u16 reg_map_omap2[] = {
--	[RNG_OUTPUT_L_REG]	= 0x0,
-+	[RNG_OUTPUT_0_REG]	= 0x0,
- 	[RNG_STATUS_REG]	= 0x4,
- 	[RNG_CONFIG_REG]	= 0x28,
- 	[RNG_REV_REG]		= 0x3c,
-@@ -90,8 +92,8 @@ static const u16 reg_map_omap2[] = {
- };
+ static inline u32 omap_rng_read(struct omap_rng_dev *priv, u16 reg)
+@@ -179,12 +180,6 @@ static void omap_rng_cleanup(struct hwrng *rng)
+ 	priv->pdata->cleanup(priv);
+ }
  
- static const u16 reg_map_omap4[] = {
--	[RNG_OUTPUT_L_REG]	= 0x0,
--	[RNG_OUTPUT_H_REG]	= 0x4,
-+	[RNG_OUTPUT_0_REG]	= 0x0,
-+	[RNG_OUTPUT_1_REG]	= 0x4,
- 	[RNG_STATUS_REG]	= 0x8,
- 	[RNG_INTMASK_REG]	= 0xc,
- 	[RNG_INTACK_REG]	= 0x10,
-@@ -155,7 +157,7 @@ static int omap_rng_do_read(struct hwrng *rng, void *data, size_t max,
- 	if (!priv->pdata->data_present(priv))
- 		return 0;
+-static struct hwrng omap_rng_ops = {
+-	.name		= "omap",
+-	.read 		= omap_rng_do_read,
+-	.init		= omap_rng_init,
+-	.cleanup	= omap_rng_cleanup,
+-};
  
--	memcpy_fromio(data, priv->base + priv->pdata->regs[RNG_OUTPUT_L_REG],
-+	memcpy_fromio(data, priv->base + priv->pdata->regs[RNG_OUTPUT_0_REG],
- 		      priv->pdata->data_size);
+ static inline u32 omap2_rng_data_present(struct omap_rng_dev *priv)
+ {
+@@ -357,7 +352,11 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 	if (!priv)
+ 		return -ENOMEM;
  
- 	if (priv->pdata->regs[RNG_INTACK_REG])
+-	omap_rng_ops.priv = (unsigned long)priv;
++	priv->rng.read = omap_rng_do_read;
++	priv->rng.init = omap_rng_init;
++	priv->rng.cleanup = omap_rng_cleanup;
++
++	priv->rng.priv = (unsigned long)priv;
+ 	platform_set_drvdata(pdev, priv);
+ 	priv->dev = dev;
+ 
+@@ -368,6 +367,12 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 		goto err_ioremap;
+ 	}
+ 
++	priv->rng.name = devm_kstrdup(dev, dev_name(dev), GFP_KERNEL);
++	if (!priv->rng.name) {
++		ret = -ENOMEM;
++		goto err_register;
++	}
++
+ 	pm_runtime_enable(&pdev->dev);
+ 	ret = pm_runtime_get_sync(&pdev->dev);
+ 	if (ret) {
+@@ -381,7 +386,7 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		goto err_ioremap;
+ 
+-	ret = devm_hwrng_register(dev, &omap_rng_ops);
++	ret = devm_hwrng_register(dev, &priv->rng);
+ 	if (ret)
+ 		goto err_register;
+ 
 -- 
 2.9.3
