@@ -1,52 +1,41 @@
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH][V2] s390/crypto: initialize ret to nbytes to avoid returning garbage value
-Date: Tue,  6 Sep 2016 08:25:13 +0100
-Message-ID: <20160906072513.7210-1-colin.king@canonical.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: [PATCH] hwrng: pasemi-rng - Use linux/io.h instead of asm/io.h
+Date: Tue,  6 Sep 2016 13:58:39 +0530
+Message-ID: <1473150519-30931-1-git-send-email-prasannatsmkumar@gmail.com>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+To: olof@lixom.net, linuxppc-dev@lists.ozlabs.org,
+        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        mpm@selenic.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:43728 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932140AbcIFH0n (ORCPT
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:34317 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754313AbcIFI3C (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Sep 2016 03:26:43 -0400
+        Tue, 6 Sep 2016 04:29:02 -0400
+Received: by mail-pf0-f195.google.com with SMTP id g202so11059884pfb.1
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Sep 2016 01:28:57 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+Checkpatch.pl warns about usage of asm/io.h. Use linux/io.h instead.
 
-Static analysis with cppcheck detected that ret is not initialized
-and hence garbage is potentially being returned in the case where
-prng_data->ppnows.reseed_counter <= prng_reseed_limit.
-
-Thanks to Martin Schwidefsky for spotting a mistake in my original
-fix.
-
-Fixes: 0177db01adf26cf9 ("s390/crypto: simplify return code handling")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 ---
- arch/s390/crypto/prng.c | 2 +-
+ drivers/char/hw_random/pasemi-rng.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/s390/crypto/prng.c b/arch/s390/crypto/prng.c
-index 79e3a1f..5592df9 100644
---- a/arch/s390/crypto/prng.c
-+++ b/arch/s390/crypto/prng.c
-@@ -412,7 +412,7 @@ static int prng_sha512_reseed(void)
+diff --git a/drivers/char/hw_random/pasemi-rng.c b/drivers/char/hw_random/pasemi-rng.c
+index b4e32f7..545df48 100644
+--- a/drivers/char/hw_random/pasemi-rng.c
++++ b/drivers/char/hw_random/pasemi-rng.c
+@@ -26,7 +26,7 @@
+ #include <linux/delay.h>
+ #include <linux/of_address.h>
+ #include <linux/of_platform.h>
+-#include <asm/io.h>
++#include <linux/io.h>
  
- static int prng_sha512_generate(u8 *buf, size_t nbytes)
- {
--	int ret;
-+	int ret = nbytes;
- 
- 	/* reseed needed ? */
- 	if (prng_data->ppnows.reseed_counter > prng_reseed_limit) {
+ #define SDCRNG_CTL_REG			0x00
+ #define   SDCRNG_CTL_FVLD_M		0x0000f000
 -- 
-2.9.3
+2.5.0
