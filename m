@@ -1,8 +1,7 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH 1/9] dt-bindings: Add vendor prefix for INSIDE Secure
-Date: Tue,  6 Sep 2016 17:38:49 +0200
-Message-ID: <20160906153857.5503-2-romain.perier@free-electrons.com>
-References: <20160906153857.5503-1-romain.perier@free-electrons.com>
+Subject: [PATCH 0/9] Add support for SafeXcel IP-76 to OMAP RNG
+Date: Tue,  6 Sep 2016 17:38:48 +0200
+Message-ID: <20160906153857.5503-1-romain.perier@free-electrons.com>
 Cc: Gregory Clement <gregory.clement@free-electrons.com>,
         Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
         Romain Perier <romain.perier@free-electrons.com>,
@@ -17,34 +16,40 @@ Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 To: dsaxena@plexity.net, mpm@selenic.com,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:59248 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:59243 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1753121AbcIFPkE (ORCPT
+        with ESMTP id S1752962AbcIFPkD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Sep 2016 11:40:04 -0400
-In-Reply-To: <20160906153857.5503-1-romain.perier@free-electrons.com>
+        Tue, 6 Sep 2016 11:40:03 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This commits adds a vendor for the company INSIDE Secure.
-See https://www.insidesecure.com, for more details.
+The driver omap-rng has a lot of similarity with the IP block SafeXcel
+IP-76. A lot of registers are the same and the way that the driver works
+is very closed the description of the TRNG EIP76 in its datasheet.
 
-Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
----
- Documentation/devicetree/bindings/vendor-prefixes.txt | 1 +
- 1 file changed, 1 insertion(+)
+This series refactorize the driver, add support for generating bigger
+output random data and add a device variant for SafeXcel IP-76, found
+in Armada 8K.
 
-diff --git a/Documentation/devicetree/bindings/vendor-prefixes.txt b/Documentation/devicetree/bindings/vendor-prefixes.txt
-index 1992aa9..6a5e872 100644
---- a/Documentation/devicetree/bindings/vendor-prefixes.txt
-+++ b/Documentation/devicetree/bindings/vendor-prefixes.txt
-@@ -132,6 +132,7 @@ infineon Infineon Technologies
- inforce	Inforce Computing
- ingenic	Ingenic Semiconductor
- innolux	Innolux Corporation
-+inside-secure	INSIDE Secure
- intel	Intel Corporation
- intercontrol	Inter Control Group
- invensense	InvenSense Inc.
+Romain Perier (9):
+  dt-bindings: Add vendor prefix for INSIDE Secure
+  dt-bindings: omap-rng: Document SafeXcel IP-76 device variant
+  hwrng: omap - Switch to non-obsolete read API implementation
+  hwrng: omap - Use the managed device resource API for registration
+  hwrng: omap - Remove global definition of hwrng
+  hwrng: omap - Add support for 128-bit output of data
+  hwrng: omap - Don't prefix the probe message with OMAP
+  hwrng: omap - Add device variant for SafeXcel IP-76 found in Armada 8K
+  arm64: dts: marvell: add TRNG description for Armada 8K CP
+
+ Documentation/devicetree/bindings/rng/omap_rng.txt |  14 +-
+ .../devicetree/bindings/vendor-prefixes.txt        |   1 +
+ .../boot/dts/marvell/armada-cp110-master.dtsi      |   8 ++
+ .../arm64/boot/dts/marvell/armada-cp110-slave.dtsi |   8 ++
+ drivers/char/hw_random/Kconfig                     |   2 +-
+ drivers/char/hw_random/omap-rng.c                  | 159 +++++++++++++++------
+ 6 files changed, 145 insertions(+), 47 deletions(-)
+
 -- 
 2.9.3
