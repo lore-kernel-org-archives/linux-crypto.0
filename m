@@ -1,56 +1,67 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: echainiv not working as supposed to be?
-Date: Wed, 7 Sep 2016 00:08:10 +0800
-Message-ID: <20160906160810.GA10311@gondor.apana.org.au>
-References: <CA+rthh9_=PsJgZDtfoHQsaFZ2fH2hz4w_sbhn8fnx7a3LOatXQ@mail.gmail.com>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH 4/9] hwrng: omap - Use the managed device resource API for registration
+Date: Tue, 6 Sep 2016 22:01:39 +0530
+Message-ID: <CANc+2y6LeOqSy37x=vXaLPkGM3C5Wh6Yq11ybO+-0DU19wLBUQ@mail.gmail.com>
+References: <20160906153857.5503-1-romain.perier@free-electrons.com> <20160906153857.5503-5-romain.perier@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Mathias Krause <minipli@googlemail.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: dsaxena@plexity.net, mpm@selenic.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gregory Clement <gregory.clement@free-electrons.com>,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        Nadav Haklai <nadavh@marvell.com>,
+        Omri Itach <omrii@marvell.com>,
+        Shadi Ammouri <shadi@marvell.com>,
+        Yahuda Yitschak <yehuday@marvell.com>,
+        Hanna Hawa <hannah@marvell.com>,
+        Neta Zur Hershkovits <neta@marvell.com>,
+        Igal Liberman <igall@marvell.com>,
+        Marcin Wojtas <mw@semihalf.com>, linux-crypto@vger.kernel.org
+To: Romain Perier <romain.perier@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41966 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932286AbcIFQIX (ORCPT
+Received: from mail-yw0-f193.google.com ([209.85.161.193]:33589 "EHLO
+        mail-yw0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753676AbcIFQbk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Sep 2016 12:08:23 -0400
-Content-Disposition: inline
-In-Reply-To: <CA+rthh9_=PsJgZDtfoHQsaFZ2fH2hz4w_sbhn8fnx7a3LOatXQ@mail.gmail.com>
+        Tue, 6 Sep 2016 12:31:40 -0400
+Received: by mail-yw0-f193.google.com with SMTP id g192so4980410ywh.0
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Sep 2016 09:31:40 -0700 (PDT)
+In-Reply-To: <20160906153857.5503-5-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Sep 06, 2016 at 02:24:59PM +0200, Mathias Krause wrote:
-> 
-> For each request it XORs the salt into the provided IV (req->iv). For
-> ESP the provided IV is the sequence number or, at least, parts of it.
-> The thus modified IV gets written into the *destination* buffer
-> (req->dst) which might be a different buffer than the source buffer
-> (not in the ESP case, though, as it passes the same sg for src and
-> dst). Afterwards, the per-cpu IV gets copied over into req->iv,
-> effectively overwriting the generated XORed value. Then the inner
-> crypto request gets initiated which may finish synchronously or
-> asynchronously. Either way, the per-cpu IV gets updated with the new
-> value from subreq->iv, which should be equal to req->iv in the normal
-> case.
+> Use devm_hwrng_register instead of hwrng_register. It avoids the need
+> to handle unregistration explicitly from the remove function.
+>
+> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
+> ---
+>  drivers/char/hw_random/omap-rng.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>
+> diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+> index d47b24d..171c3e8 100644
+> --- a/drivers/char/hw_random/omap-rng.c
+> +++ b/drivers/char/hw_random/omap-rng.c
+> @@ -381,7 +381,7 @@ static int omap_rng_probe(struct platform_device *pdev)
+>         if (ret)
+>                 goto err_ioremap;
+>
+> -       ret = hwrng_register(&omap_rng_ops);
+> +       ret = devm_hwrng_register(dev, &omap_rng_ops);
+>         if (ret)
+>                 goto err_register;
+>
+> @@ -402,8 +402,6 @@ static int omap_rng_remove(struct platform_device *pdev)
+>  {
+>         struct omap_rng_dev *priv = platform_get_drvdata(pdev);
+>
+> -       hwrng_unregister(&omap_rng_ops);
+> -
+>         priv->pdata->cleanup(priv);
+>
+>         pm_runtime_put_sync(&pdev->dev);
+> --
 
-I think your description is basically correct.  However, you seem
-to be missing the fact that the real IV (i.e., the IV transmitted
-over the wire) is the first block of the encrypted ciphertext.
-
-IOW the per-cpu IV is never sent over the wire.  It's only used
-to encrypt the first block of the ciphertext, which becomes the
-actual IV.
-
-> So, should echainiv use a per-context per-cpu array instead that --
-> for simplicity -- gets initialised with random bytes and will be
-> updated as it's now, just not with a single global per-cpu array, but
-> a per-context one?
-
-As I said, the per-cpu IV is never seen by anyone so there is no
-need to make it per-tfm.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+If devm_hwrng_register is used hwrng_unregister will be called after
+pm_runtime_disable is called. If RNG device is in use calling
+omap_rng_remove may not work properly.
