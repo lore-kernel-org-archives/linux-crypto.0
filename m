@@ -1,7 +1,8 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH 0/9] Add support for SafeXcel IP-76 to OMAP RNG
-Date: Tue,  6 Sep 2016 17:38:48 +0200
-Message-ID: <20160906153857.5503-1-romain.perier@free-electrons.com>
+Subject: [PATCH 2/9] dt-bindings: omap-rng: Document SafeXcel IP-76 device variant
+Date: Tue,  6 Sep 2016 17:38:50 +0200
+Message-ID: <20160906153857.5503-3-romain.perier@free-electrons.com>
+References: <20160906153857.5503-1-romain.perier@free-electrons.com>
 Cc: Gregory Clement <gregory.clement@free-electrons.com>,
         Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
         Romain Perier <romain.perier@free-electrons.com>,
@@ -16,40 +17,60 @@ Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 To: dsaxena@plexity.net, mpm@selenic.com,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:59243 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:59260 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752962AbcIFPkD (ORCPT
+        with ESMTP id S1753121AbcIFPkH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Sep 2016 11:40:03 -0400
+        Tue, 6 Sep 2016 11:40:07 -0400
+In-Reply-To: <20160906153857.5503-1-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The driver omap-rng has a lot of similarity with the IP block SafeXcel
-IP-76. A lot of registers are the same and the way that the driver works
-is very closed the description of the TRNG EIP76 in its datasheet.
+This commits add missing fields in the documentation that are used
+by the new device variant. It also includes DT example to show how
+the variant should be used.
 
-This series refactorize the driver, add support for generating bigger
-output random data and add a device variant for SafeXcel IP-76, found
-in Armada 8K.
+Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
+---
+ Documentation/devicetree/bindings/rng/omap_rng.txt | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-Romain Perier (9):
-  dt-bindings: Add vendor prefix for INSIDE Secure
-  dt-bindings: omap-rng: Document SafeXcel IP-76 device variant
-  hwrng: omap - Switch to non-obsolete read API implementation
-  hwrng: omap - Use the managed device resource API for registration
-  hwrng: omap - Remove global definition of hwrng
-  hwrng: omap - Add support for 128-bit output of data
-  hwrng: omap - Don't prefix the probe message with OMAP
-  hwrng: omap - Add device variant for SafeXcel IP-76 found in Armada 8K
-  arm64: dts: marvell: add TRNG description for Armada 8K CP
-
- Documentation/devicetree/bindings/rng/omap_rng.txt |  14 +-
- .../devicetree/bindings/vendor-prefixes.txt        |   1 +
- .../boot/dts/marvell/armada-cp110-master.dtsi      |   8 ++
- .../arm64/boot/dts/marvell/armada-cp110-slave.dtsi |   8 ++
- drivers/char/hw_random/Kconfig                     |   2 +-
- drivers/char/hw_random/omap-rng.c                  | 159 +++++++++++++++------
- 6 files changed, 145 insertions(+), 47 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/rng/omap_rng.txt b/Documentation/devicetree/bindings/rng/omap_rng.txt
+index 6a62acd..4714772 100644
+--- a/Documentation/devicetree/bindings/rng/omap_rng.txt
++++ b/Documentation/devicetree/bindings/rng/omap_rng.txt
+@@ -1,4 +1,4 @@
+-OMAP SoC HWRNG Module
++OMAP SoC and Inside-Secure HWRNG Module
+ 
+ Required properties:
+ 
+@@ -6,11 +6,13 @@ Required properties:
+   RNG versions:
+   - "ti,omap2-rng" for OMAP2.
+   - "ti,omap4-rng" for OMAP4, OMAP5 and AM33XX.
++  - "inside-secure,safexcel-eip76" for SoCs with EIP76 IP block
+   Note that these two versions are incompatible.
+ - ti,hwmods: Name of the hwmod associated with the RNG module
+ - reg : Offset and length of the register set for the module
+ - interrupts : the interrupt number for the RNG module.
+-		Only used for "ti,omap4-rng".
++		Used for "ti,omap4-rng" and "inside-secure,safexcel-eip76"
++- clocks: the trng clock source
+ 
+ Example:
+ /* AM335x */
+@@ -20,3 +22,11 @@ rng: rng@48310000 {
+ 	reg = <0x48310000 0x2000>;
+ 	interrupts = <111>;
+ };
++
++/* SafeXcel IP-76 */
++trng: rng@f2760000 {
++	compatible = "inside-secure,safexcel-eip76";
++	reg = <0xf2760000 0x7d>;
++	interrupts = <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
++	clocks = <&cpm_syscon0 1 25>;
++};
 -- 
 2.9.3
