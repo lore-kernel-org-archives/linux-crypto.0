@@ -1,7 +1,7 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH 5/9] hwrng: omap - Remove global definition of hwrng
-Date: Tue,  6 Sep 2016 17:38:53 +0200
-Message-ID: <20160906153857.5503-6-romain.perier@free-electrons.com>
+Subject: [PATCH 9/9] arm64: dts: marvell: add TRNG description for Armada 8K CP
+Date: Tue,  6 Sep 2016 17:38:57 +0200
+Message-ID: <20160906153857.5503-10-romain.perier@free-electrons.com>
 References: <20160906153857.5503-1-romain.perier@free-electrons.com>
 Cc: Gregory Clement <gregory.clement@free-electrons.com>,
         Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
@@ -17,87 +17,61 @@ Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 To: dsaxena@plexity.net, mpm@selenic.com,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:59271 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:59330 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S933357AbcIFPkJ (ORCPT
+        with ESMTP id S933628AbcIFPk3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Sep 2016 11:40:09 -0400
+        Tue, 6 Sep 2016 11:40:29 -0400
 In-Reply-To: <20160906153857.5503-1-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The omap-rng driver currently assumes that there will only ever be a
-single instance of an RNG device. For this reason, there is a statically
-allocated struct hwrng, with a fixed name. However, registering two
-struct hwrng with the same isn't accepted by the RNG framework, so we
-need to switch to a dynamically allocated struct hwrng, each using a
-different name. Then, we define the name of this hwrng to "dev_name(dev)",
-so the name of the data structure is unique per device.
+This commits adds the devicetree description of the SafeXcel IP-76 TRNG
+found in the two Armada CP110.
 
 Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
 ---
- drivers/char/hw_random/omap-rng.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+ arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi | 8 ++++++++
+ arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi  | 8 ++++++++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-index 171c3e8..f9a99b2 100644
---- a/drivers/char/hw_random/omap-rng.c
-+++ b/drivers/char/hw_random/omap-rng.c
-@@ -127,6 +127,7 @@ struct omap_rng_dev {
- 	void __iomem			*base;
- 	struct device			*dev;
- 	const struct omap_rng_pdata	*pdata;
-+	struct hwrng rng;
- };
- 
- static inline u32 omap_rng_read(struct omap_rng_dev *priv, u16 reg)
-@@ -179,12 +180,6 @@ static void omap_rng_cleanup(struct hwrng *rng)
- 	priv->pdata->cleanup(priv);
- }
- 
--static struct hwrng omap_rng_ops = {
--	.name		= "omap",
--	.read 		= omap_rng_do_read,
--	.init		= omap_rng_init,
--	.cleanup	= omap_rng_cleanup,
--};
- 
- static inline u32 omap2_rng_data_present(struct omap_rng_dev *priv)
- {
-@@ -357,7 +352,11 @@ static int omap_rng_probe(struct platform_device *pdev)
- 	if (!priv)
- 		return -ENOMEM;
- 
--	omap_rng_ops.priv = (unsigned long)priv;
-+	priv->rng.read = omap_rng_do_read;
-+	priv->rng.init = omap_rng_init;
-+	priv->rng.cleanup = omap_rng_cleanup;
+diff --git a/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
+index da31bbb..aaffa24 100644
+--- a/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
++++ b/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
+@@ -164,6 +164,14 @@
+ 				clocks = <&cpm_syscon0 1 21>;
+ 				status = "disabled";
+ 			};
 +
-+	priv->rng.priv = (unsigned long)priv;
- 	platform_set_drvdata(pdev, priv);
- 	priv->dev = dev;
++			cpm_trng: trng@760000 {
++				compatible = "marvell,armada-8k-rng", "inside-secure,safexcel-eip76";
++				reg = <0x760000 0x7d>;
++				interrupts = <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&cpm_syscon0 1 25>;
++				status = "okay";
++			};
+ 		};
  
-@@ -368,6 +367,12 @@ static int omap_rng_probe(struct platform_device *pdev)
- 		goto err_ioremap;
- 	}
- 
-+	priv->rng.name = devm_kstrdup(dev, dev_name(dev), GFP_KERNEL);
-+	if (!priv->rng.name) {
-+		ret = -ENOMEM;
-+		goto err_register;
-+	}
+ 		cpm_pcie0: pcie@f2600000 {
+diff --git a/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
+index 6ff1201..216de12 100644
+--- a/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
++++ b/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
+@@ -164,6 +164,14 @@
+ 				clocks = <&cps_syscon0 1 21>;
+ 				status = "disabled";
+ 			};
 +
- 	pm_runtime_enable(&pdev->dev);
- 	ret = pm_runtime_get_sync(&pdev->dev);
- 	if (ret) {
-@@ -381,7 +386,7 @@ static int omap_rng_probe(struct platform_device *pdev)
- 	if (ret)
- 		goto err_ioremap;
++			cps_trng: trng@760000 {
++				compatible = "marvell,armada-8k-rng", "inside-secure,safexcel-eip76";
++				reg = <0x760000 0x7d>;
++				interrupts = <GIC_SPI 312 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&cps_syscon0 1 25>;
++				status = "okay";
++			};
+ 		};
  
--	ret = devm_hwrng_register(dev, &omap_rng_ops);
-+	ret = devm_hwrng_register(dev, &priv->rng);
- 	if (ret)
- 		goto err_register;
- 
+ 		cps_pcie0: pcie@f4600000 {
 -- 
 2.9.3
