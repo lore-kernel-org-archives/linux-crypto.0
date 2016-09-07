@@ -1,33 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/3] crypto: arm and cryptd fixes
-Date: Wed, 7 Sep 2016 21:21:13 +0800
-Message-ID: <20160907132113.GI17176@gondor.apana.org.au>
-References: <1472736343-15305-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: ccp - add missing release in
+ ccp_dmaengine_register
+Date: Wed, 7 Sep 2016 21:21:30 +0800
+Message-ID: <20160907132130.GJ17176@gondor.apana.org.au>
+References: <20160902094853.21376-1-lambert.quentin@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+To: Quentin Lambert <lambert.quentin@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54762 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:51720 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756625AbcIGNVQ (ORCPT
+        with ESMTP id S1753362AbcIGNVm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2016 09:21:16 -0400
+        Wed, 7 Sep 2016 09:21:42 -0400
 Content-Disposition: inline
-In-Reply-To: <1472736343-15305-1-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <20160902094853.21376-1-lambert.quentin@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 01, 2016 at 02:25:40PM +0100, Ard Biesheuvel wrote:
-> Patch #1 fixes a trivial code generation issue on ARM.
+On Fri, Sep 02, 2016 at 11:48:53AM +0200, Quentin Lambert wrote:
+> ccp_dmaengine_register used to return with an error code before
+> releasing all resource. This patch adds a jump to the appropriate label
+> ensuring that the resources are properly released before returning.
 > 
-> Patch #2 and #3 fix the broken GHASH on ARM using the v8 Crypto Extensions
-> pmull.64 instructions. The problem seems to be that it is allowed to call
-> .import() without .init() (at least, that is what the test cases do), but
-> this means that the initialization to tie the shash_desc's to their child
-> transforms needs to execute in the .import() context as well.
+> This issue was found with Hector.
+> 
+> Signed-off-by: Quentin Lambert <lambert.quentin@gmail.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
