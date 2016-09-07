@@ -1,36 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp - add missing release in
- ccp_dmaengine_register
-Date: Wed, 7 Sep 2016 21:21:30 +0800
-Message-ID: <20160907132130.GJ17176@gondor.apana.org.au>
-References: <20160902094853.21376-1-lambert.quentin@gmail.com>
+Subject: Re: [PATCH v2] hwrng: pasemi_rng.c: Migrate to managed API
+Date: Wed, 7 Sep 2016 21:22:10 +0800
+Message-ID: <20160907132210.GL17176@gondor.apana.org.au>
+References: <1473012788-6262-1-git-send-email-prasannatsmkumar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-To: Quentin Lambert <lambert.quentin@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51720 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753362AbcIGNVm (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2016 09:21:42 -0400
+Cc: darren@stevens-zone.net, clabbe.montjoie@gmail.com,
+ linux-crypto@vger.kernel.org, mpm@selenic.com, olof@lixom.net,
+ linuxppc-dev@lists.ozlabs.org
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 Content-Disposition: inline
-In-Reply-To: <20160902094853.21376-1-lambert.quentin@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1473012788-6262-1-git-send-email-prasannatsmkumar@gmail.com>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Sep 02, 2016 at 11:48:53AM +0200, Quentin Lambert wrote:
-> ccp_dmaengine_register used to return with an error code before
-> releasing all resource. This patch adds a jump to the appropriate label
-> ensuring that the resources are properly released before returning.
+On Sun, Sep 04, 2016 at 11:43:08PM +0530, PrasannaKumar Muralidharan wrote:
+> Use devm_ioremap and devm_hwrng_register instead of ioremap and
+> hwrng_register. This removes unregistering and error handling code.
 > 
-> This issue was found with Hector.
+> Changes in v2:
+> Remove hardcoded resource size in ioremap, use resource struct obtained
+> by calling platform_get_resource.
 > 
-> Signed-off-by: Quentin Lambert <lambert.quentin@gmail.com>
+> Removing hardcoded resource size was suggested by LABBE Corentin.
+> 
+> CC: Darren Stevens <darren@stevens-zone.net>
+> 
+> Suggested-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 
 Patch applied.  Thanks.
 -- 
