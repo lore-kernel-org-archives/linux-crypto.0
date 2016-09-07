@@ -1,116 +1,67 @@
-From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH v2 4/8] hwrng: omap - Remove global definition of hwrng
-Date: Wed,  7 Sep 2016 17:57:39 +0200
-Message-ID: <20160907155743.6403-5-romain.perier@free-electrons.com>
-References: <20160907155743.6403-1-romain.perier@free-electrons.com>
-Cc: Gregory Clement <gregory.clement@free-electrons.com>,
-        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-        Romain Perier <romain.perier@free-electrons.com>,
-        Nadav Haklai <nadavh@marvell.com>,
-        Omri Itach <omrii@marvell.com>,
-        Shadi Ammouri <shadi@marvell.com>,
-        Yahuda Yitschak <yehuday@marvell.com>,
-        Hanna Hawa <hannah@marvell.com>,
-        Neta Zur Hershkovits <neta@marvell.com>,
-        Igal Liberman <igall@marvell.com>,
-        Marcin Wojtas <mw@semihalf.com>, linux-crypto@vger.kernel.org
-To: dsaxena@plexity.net, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:42882 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1755270AbcIGP5v (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2016 11:57:51 -0400
-In-Reply-To: <20160907155743.6403-1-romain.perier@free-electrons.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Iaroslav Gridin <voker57@gmail.com>
+Subject: Re: [PATCH] crypto: qce: Initialize core src clock @100Mhz
+Date: Wed, 7 Sep 2016 19:13:22 +0300
+Message-ID: <20160907161321.s6v2bkmq7tezmrwa@localhost>
+References: <20160903164535.1118-1-voker57@gmail.com>
+ <4e509050-6e8e-069c-f00d-eca9a0f3b33d@mm-sol.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        andy.gross@linaro.org, david.brown@linaro.org,
+        linux-arm-msm@vger.kernel.org, linux-soc@vger.kernel.org
+To: Stanimir Varbanov <svarbanov@mm-sol.com>
+Return-path: <linux-arm-msm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <4e509050-6e8e-069c-f00d-eca9a0f3b33d@mm-sol.com>
+Sender: linux-arm-msm-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The omap-rng driver currently assumes that there will only ever be a
-single instance of an RNG device. For this reason, there is a statically
-allocated struct hwrng, with a fixed name. However, registering two
-struct hwrng with the same isn't accepted by the RNG framework, so we
-need to switch to a dynamically allocated struct hwrng, each using a
-different name. Then, we define the name of this hwrng to "dev_name(dev)",
-so the name of the data structure is unique per device.
+On Wed, Sep 07, 2016 at 04:04:01PM +0300, Stanimir Varbanov wrote:
+> Hi Iaroslav,
+> 
+> On 09/03/2016 07:45 PM, Iaroslav Gridin wrote:
+> > Without that, QCE performance is about 2x less.
+> 
+> On which platform? The clock rates are per SoC.
 
-Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
----
+Dragonboard 8074. Should clock rate be moved to its DT?
 
-Changes in v2:
- - Fix the goto label used when there is an error for devm_kstrdup
+> > 
+> > Signed-off-by: Iaroslav Gridin <voker57@gmail.com>
+> > ---
+> >  drivers/crypto/qce/core.c | 18 +++++++++++++++++-
+> >  drivers/crypto/qce/core.h |  2 +-
+> >  2 files changed, 18 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+> > index 0cde513..657354c 100644
+> > --- a/drivers/crypto/qce/core.c
+> > +++ b/drivers/crypto/qce/core.c
+> > @@ -193,6 +193,10 @@ static int qce_crypto_probe(struct platform_device *pdev)
+> >  	if (ret < 0)
+> >  		return ret;
+> >  
+> > +	qce->core_src = devm_clk_get(qce->dev, "core_src");
+> > +	if (IS_ERR(qce->core_src))
+> > +		return PTR_ERR(qce->core_src);
+> > +
+> >  	qce->core = devm_clk_get(qce->dev, "core");
+> >  	if (IS_ERR(qce->core))
+> >  		return PTR_ERR(qce->core);
+> > @@ -205,10 +209,20 @@ static int qce_crypto_probe(struct platform_device *pdev)
+> >  	if (IS_ERR(qce->bus))
+> >  		return PTR_ERR(qce->bus);
+> >  
+> > -	ret = clk_prepare_enable(qce->core);
+> > +	ret = clk_prepare_enable(qce->core_src);
+> >  	if (ret)
+> >  		return ret;
+> >  
+> > +	ret = clk_set_rate(qce->core_src, 100000000);
+> 
+> Could you point me from where you got this number? Also I think you
+> shouldn't be requesting "core_src" it should be a parent of "core" clock
+> in the clock tree. Did you tried to set rate on "core" clock?
 
- drivers/char/hw_random/omap-rng.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-index d47b24d..b20e8d7 100644
---- a/drivers/char/hw_random/omap-rng.c
-+++ b/drivers/char/hw_random/omap-rng.c
-@@ -127,6 +127,7 @@ struct omap_rng_dev {
- 	void __iomem			*base;
- 	struct device			*dev;
- 	const struct omap_rng_pdata	*pdata;
-+	struct hwrng rng;
- };
- 
- static inline u32 omap_rng_read(struct omap_rng_dev *priv, u16 reg)
-@@ -179,12 +180,6 @@ static void omap_rng_cleanup(struct hwrng *rng)
- 	priv->pdata->cleanup(priv);
- }
- 
--static struct hwrng omap_rng_ops = {
--	.name		= "omap",
--	.read 		= omap_rng_do_read,
--	.init		= omap_rng_init,
--	.cleanup	= omap_rng_cleanup,
--};
- 
- static inline u32 omap2_rng_data_present(struct omap_rng_dev *priv)
- {
-@@ -357,7 +352,11 @@ static int omap_rng_probe(struct platform_device *pdev)
- 	if (!priv)
- 		return -ENOMEM;
- 
--	omap_rng_ops.priv = (unsigned long)priv;
-+	priv->rng.read = omap_rng_do_read;
-+	priv->rng.init = omap_rng_init;
-+	priv->rng.cleanup = omap_rng_cleanup;
-+
-+	priv->rng.priv = (unsigned long)priv;
- 	platform_set_drvdata(pdev, priv);
- 	priv->dev = dev;
- 
-@@ -368,6 +367,12 @@ static int omap_rng_probe(struct platform_device *pdev)
- 		goto err_ioremap;
- 	}
- 
-+	priv->rng.name = devm_kstrdup(dev, dev_name(dev), GFP_KERNEL);
-+	if (!priv->rng.name) {
-+		ret = -ENOMEM;
-+		goto err_ioremap;
-+	}
-+
- 	pm_runtime_enable(&pdev->dev);
- 	ret = pm_runtime_get_sync(&pdev->dev);
- 	if (ret) {
-@@ -381,7 +386,7 @@ static int omap_rng_probe(struct platform_device *pdev)
- 	if (ret)
- 		goto err_ioremap;
- 
--	ret = hwrng_register(&omap_rng_ops);
-+	ret = hwrng_register(&priv->rng);
- 	if (ret)
- 		goto err_register;
- 
-@@ -402,7 +407,7 @@ static int omap_rng_remove(struct platform_device *pdev)
- {
- 	struct omap_rng_dev *priv = platform_get_drvdata(pdev);
- 
--	hwrng_unregister(&omap_rng_ops);
-+	hwrng_unregister(&priv->rng);
- 
- 	priv->pdata->cleanup(priv);
- 
--- 
-2.9.3
+Tried it, helps with speed as well.
