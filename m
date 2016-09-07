@@ -1,33 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] char: hw_random: bcm2835: handle of_iomap failures in
- bcm2835 driver
-Date: Wed, 7 Sep 2016 21:19:42 +0800
-Message-ID: <20160907131942.GE17176@gondor.apana.org.au>
-References: <1472490616-9597-1-git-send-email-arvind.yadav.cs@gmail.com>
+Subject: Re: [PATCH] crypto: qat - fix incorrect accelerator mask for C3X
+ devices
+Date: Wed, 7 Sep 2016 21:20:00 +0800
+Message-ID: <20160907132000.GF17176@gondor.apana.org.au>
+References: <1472579760-3698-1-git-send-email-giovanni.cabiddu@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: f.fainelli@gmail.com, rjui@broadcom.com, sbranden@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, lee@kernel.org,
-        eric@anholt.net, yendapally.reddy@broadcom.com,
-        linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        mpm@selenic.com
-To: Arvind Yadav <arvind.yadav.cs@gmail.com>
+Cc: linux-crypto@vger.kernel.org,
+        Maksim Lukoshkov <maksim.lukoshkov@intel.com>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44301 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:58684 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752960AbcIGNUB (ORCPT
+        with ESMTP id S1752960AbcIGNUG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2016 09:20:01 -0400
+        Wed, 7 Sep 2016 09:20:06 -0400
 Content-Disposition: inline
-In-Reply-To: <1472490616-9597-1-git-send-email-arvind.yadav.cs@gmail.com>
+In-Reply-To: <1472579760-3698-1-git-send-email-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 29, 2016 at 10:40:16PM +0530, Arvind Yadav wrote:
-> Check return value of of_iomap and handle errors correctly.
+On Tue, Aug 30, 2016 at 06:56:00PM +0100, Giovanni Cabiddu wrote:
+> From: Maksim Lukoshkov <maksim.lukoshkov@intel.com>
 > 
-> Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
+> Fix incorrect value of ADF_C3XXX_ACCELERATORS_MASK.
+> 
+> Signed-off-by: Maksim Lukoshkov <maksim.lukoshkov@intel.com>
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
 Patch applied.  Thanks.
 -- 
