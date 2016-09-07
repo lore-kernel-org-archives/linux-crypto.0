@@ -1,7 +1,7 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH v2 8/8] arm64: dts: marvell: add TRNG description for Armada 8K CP
-Date: Wed,  7 Sep 2016 17:57:43 +0200
-Message-ID: <20160907155743.6403-9-romain.perier@free-electrons.com>
+Subject: [PATCH v2 4/8] hwrng: omap - Remove global definition of hwrng
+Date: Wed,  7 Sep 2016 17:57:39 +0200
+Message-ID: <20160907155743.6403-5-romain.perier@free-electrons.com>
 References: <20160907155743.6403-1-romain.perier@free-electrons.com>
 Cc: Gregory Clement <gregory.clement@free-electrons.com>,
         Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
@@ -17,61 +17,100 @@ Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 To: dsaxena@plexity.net, mpm@selenic.com,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:42903 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:42882 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1755394AbcIGP5w (ORCPT
+        with ESMTP id S1755270AbcIGP5v (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2016 11:57:52 -0400
+        Wed, 7 Sep 2016 11:57:51 -0400
 In-Reply-To: <20160907155743.6403-1-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This commits adds the devicetree description of the SafeXcel IP-76 TRNG
-found in the two Armada CP110.
+The omap-rng driver currently assumes that there will only ever be a
+single instance of an RNG device. For this reason, there is a statically
+allocated struct hwrng, with a fixed name. However, registering two
+struct hwrng with the same isn't accepted by the RNG framework, so we
+need to switch to a dynamically allocated struct hwrng, each using a
+different name. Then, we define the name of this hwrng to "dev_name(dev)",
+so the name of the data structure is unique per device.
 
 Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
 ---
- arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi | 8 ++++++++
- arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi  | 8 ++++++++
- 2 files changed, 16 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
-index da31bbb..aaffa24 100644
---- a/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
-+++ b/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
-@@ -164,6 +164,14 @@
- 				clocks = <&cpm_syscon0 1 21>;
- 				status = "disabled";
- 			};
-+
-+			cpm_trng: trng@760000 {
-+				compatible = "marvell,armada-8k-rng", "inside-secure,safexcel-eip76";
-+				reg = <0x760000 0x7d>;
-+				interrupts = <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
-+				clocks = <&cpm_syscon0 1 25>;
-+				status = "okay";
-+			};
- 		};
+Changes in v2:
+ - Fix the goto label used when there is an error for devm_kstrdup
+
+ drivers/char/hw_random/omap-rng.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index d47b24d..b20e8d7 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -127,6 +127,7 @@ struct omap_rng_dev {
+ 	void __iomem			*base;
+ 	struct device			*dev;
+ 	const struct omap_rng_pdata	*pdata;
++	struct hwrng rng;
+ };
  
- 		cpm_pcie0: pcie@f2600000 {
-diff --git a/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
-index 6ff1201..216de12 100644
---- a/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
-+++ b/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
-@@ -164,6 +164,14 @@
- 				clocks = <&cps_syscon0 1 21>;
- 				status = "disabled";
- 			};
-+
-+			cps_trng: trng@760000 {
-+				compatible = "marvell,armada-8k-rng", "inside-secure,safexcel-eip76";
-+				reg = <0x760000 0x7d>;
-+				interrupts = <GIC_SPI 312 IRQ_TYPE_LEVEL_HIGH>;
-+				clocks = <&cps_syscon0 1 25>;
-+				status = "okay";
-+			};
- 		};
+ static inline u32 omap_rng_read(struct omap_rng_dev *priv, u16 reg)
+@@ -179,12 +180,6 @@ static void omap_rng_cleanup(struct hwrng *rng)
+ 	priv->pdata->cleanup(priv);
+ }
  
- 		cps_pcie0: pcie@f4600000 {
+-static struct hwrng omap_rng_ops = {
+-	.name		= "omap",
+-	.read 		= omap_rng_do_read,
+-	.init		= omap_rng_init,
+-	.cleanup	= omap_rng_cleanup,
+-};
+ 
+ static inline u32 omap2_rng_data_present(struct omap_rng_dev *priv)
+ {
+@@ -357,7 +352,11 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 	if (!priv)
+ 		return -ENOMEM;
+ 
+-	omap_rng_ops.priv = (unsigned long)priv;
++	priv->rng.read = omap_rng_do_read;
++	priv->rng.init = omap_rng_init;
++	priv->rng.cleanup = omap_rng_cleanup;
++
++	priv->rng.priv = (unsigned long)priv;
+ 	platform_set_drvdata(pdev, priv);
+ 	priv->dev = dev;
+ 
+@@ -368,6 +367,12 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 		goto err_ioremap;
+ 	}
+ 
++	priv->rng.name = devm_kstrdup(dev, dev_name(dev), GFP_KERNEL);
++	if (!priv->rng.name) {
++		ret = -ENOMEM;
++		goto err_ioremap;
++	}
++
+ 	pm_runtime_enable(&pdev->dev);
+ 	ret = pm_runtime_get_sync(&pdev->dev);
+ 	if (ret) {
+@@ -381,7 +386,7 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		goto err_ioremap;
+ 
+-	ret = hwrng_register(&omap_rng_ops);
++	ret = hwrng_register(&priv->rng);
+ 	if (ret)
+ 		goto err_register;
+ 
+@@ -402,7 +407,7 @@ static int omap_rng_remove(struct platform_device *pdev)
+ {
+ 	struct omap_rng_dev *priv = platform_get_drvdata(pdev);
+ 
+-	hwrng_unregister(&omap_rng_ops);
++	hwrng_unregister(&priv->rng);
+ 
+ 	priv->pdata->cleanup(priv);
+ 
 -- 
 2.9.3
