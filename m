@@ -1,43 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] hwrng: pasemi_rng.c: Migrate to managed API
-Date: Wed, 7 Sep 2016 21:22:10 +0800
-Message-ID: <20160907132210.GL17176@gondor.apana.org.au>
-References: <1473012788-6262-1-git-send-email-prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH] crypto: mv_cesa: remove NO_IRQ reference
+Date: Wed, 7 Sep 2016 21:21:48 +0800
+Message-ID: <20160907132148.GK17176@gondor.apana.org.au>
+References: <20160902232648.2119621-1-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: darren@stevens-zone.net, clabbe.montjoie@gmail.com,
- linux-crypto@vger.kernel.org, mpm@selenic.com, olof@lixom.net,
- linuxppc-dev@lists.ozlabs.org
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Cc: Romain Perier <romain.perier@free-electrons.com>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1473012788-6262-1-git-send-email-prasannatsmkumar@gmail.com>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <20160902232648.2119621-1-arnd@arndb.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Sep 04, 2016 at 11:43:08PM +0530, PrasannaKumar Muralidharan wrote:
-> Use devm_ioremap and devm_hwrng_register instead of ioremap and
-> hwrng_register. This removes unregistering and error handling code.
+On Sat, Sep 03, 2016 at 01:26:40AM +0200, Arnd Bergmann wrote:
+> Drivers should not use NO_IRQ, as we are trying to get rid of that.
+> In this case, the call to irq_of_parse_and_map() is both wrong
+> (as it returns '0' on failure, not NO_IRQ) and unnecessary
+> (as platform_get_irq() does the same thing)
 > 
-> Changes in v2:
-> Remove hardcoded resource size in ioremap, use resource struct obtained
-> by calling platform_get_resource.
+> This removes the call to irq_of_parse_and_map() and checks for
+> the error code correctly.
 > 
-> Removing hardcoded resource size was suggested by LABBE Corentin.
-> 
-> CC: Darren Stevens <darren@stevens-zone.net>
-> 
-> Suggested-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
 Patch applied.  Thanks.
 -- 
