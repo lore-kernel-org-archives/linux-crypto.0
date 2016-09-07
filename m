@@ -1,7 +1,7 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH v2 1/8] dt-bindings: Add vendor prefix for INSIDE Secure
-Date: Wed,  7 Sep 2016 17:57:36 +0200
-Message-ID: <20160907155743.6403-2-romain.perier@free-electrons.com>
+Subject: [PATCH v2 8/8] arm64: dts: marvell: add TRNG description for Armada 8K CP
+Date: Wed,  7 Sep 2016 17:57:43 +0200
+Message-ID: <20160907155743.6403-9-romain.perier@free-electrons.com>
 References: <20160907155743.6403-1-romain.perier@free-electrons.com>
 Cc: Gregory Clement <gregory.clement@free-electrons.com>,
         Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
@@ -17,34 +17,61 @@ Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 To: dsaxena@plexity.net, mpm@selenic.com,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:42859 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:42903 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1754520AbcIGP5u (ORCPT
+        with ESMTP id S1755394AbcIGP5w (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2016 11:57:50 -0400
+        Wed, 7 Sep 2016 11:57:52 -0400
 In-Reply-To: <20160907155743.6403-1-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This commits adds a vendor for the company INSIDE Secure.
-See https://www.insidesecure.com, for more details.
+This commits adds the devicetree description of the SafeXcel IP-76 TRNG
+found in the two Armada CP110.
 
 Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
 ---
- Documentation/devicetree/bindings/vendor-prefixes.txt | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi | 8 ++++++++
+ arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi  | 8 ++++++++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/vendor-prefixes.txt b/Documentation/devicetree/bindings/vendor-prefixes.txt
-index 1992aa9..6a5e872 100644
---- a/Documentation/devicetree/bindings/vendor-prefixes.txt
-+++ b/Documentation/devicetree/bindings/vendor-prefixes.txt
-@@ -132,6 +132,7 @@ infineon Infineon Technologies
- inforce	Inforce Computing
- ingenic	Ingenic Semiconductor
- innolux	Innolux Corporation
-+inside-secure	INSIDE Secure
- intel	Intel Corporation
- intercontrol	Inter Control Group
- invensense	InvenSense Inc.
+diff --git a/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
+index da31bbb..aaffa24 100644
+--- a/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
++++ b/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
+@@ -164,6 +164,14 @@
+ 				clocks = <&cpm_syscon0 1 21>;
+ 				status = "disabled";
+ 			};
++
++			cpm_trng: trng@760000 {
++				compatible = "marvell,armada-8k-rng", "inside-secure,safexcel-eip76";
++				reg = <0x760000 0x7d>;
++				interrupts = <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&cpm_syscon0 1 25>;
++				status = "okay";
++			};
+ 		};
+ 
+ 		cpm_pcie0: pcie@f2600000 {
+diff --git a/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
+index 6ff1201..216de12 100644
+--- a/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
++++ b/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
+@@ -164,6 +164,14 @@
+ 				clocks = <&cps_syscon0 1 21>;
+ 				status = "disabled";
+ 			};
++
++			cps_trng: trng@760000 {
++				compatible = "marvell,armada-8k-rng", "inside-secure,safexcel-eip76";
++				reg = <0x760000 0x7d>;
++				interrupts = <GIC_SPI 312 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&cps_syscon0 1 25>;
++				status = "okay";
++			};
+ 		};
+ 
+ 		cps_pcie0: pcie@f4600000 {
 -- 
 2.9.3
