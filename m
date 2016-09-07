@@ -1,20 +1,10 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: Re: [PATCH 4/9] hwrng: omap - Use the managed device resource API for
- registration
-Date: Wed, 7 Sep 2016 17:38:42 +0200
-Message-ID: <57D03482.5060009@free-electrons.com>
-References: <20160906153857.5503-1-romain.perier@free-electrons.com>
- <20160906153857.5503-5-romain.perier@free-electrons.com>
- <CANc+2y6LeOqSy37x=vXaLPkGM3C5Wh6Yq11ybO+-0DU19wLBUQ@mail.gmail.com>
- <57D022F9.2020407@free-electrons.com>
- <CANc+2y5yzMNeHEgf6FfQHiN=-528YZgB3JwVcqa3C-s8s_RCfA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: dsaxena@plexity.net, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gregory Clement <gregory.clement@free-electrons.com>,
+Subject: [PATCH v2 0/8] Add support for SafeXcel IP-76 to OMAP RNG
+Date: Wed,  7 Sep 2016 17:57:35 +0200
+Message-ID: <20160907155743.6403-1-romain.perier@free-electrons.com>
+Cc: Gregory Clement <gregory.clement@free-electrons.com>,
         Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        Romain Perier <romain.perier@free-electrons.com>,
         Nadav Haklai <nadavh@marvell.com>,
         Omri Itach <omrii@marvell.com>,
         Shadi Ammouri <shadi@marvell.com>,
@@ -23,93 +13,46 @@ Cc: dsaxena@plexity.net, mpm@selenic.com,
         Neta Zur Hershkovits <neta@marvell.com>,
         Igal Liberman <igall@marvell.com>,
         Marcin Wojtas <mw@semihalf.com>, linux-crypto@vger.kernel.org
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+To: dsaxena@plexity.net, mpm@selenic.com,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:42221 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:42854 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1754046AbcIGPip (ORCPT
+        with ESMTP id S1751304AbcIGP5u (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2016 11:38:45 -0400
-In-Reply-To: <CANc+2y5yzMNeHEgf6FfQHiN=-528YZgB3JwVcqa3C-s8s_RCfA@mail.gmail.com>
+        Wed, 7 Sep 2016 11:57:50 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+The driver omap-rng has a lot of similarity with the IP block SafeXcel
+IP-76. A lot of registers are the same and the way that the driver works
+is very closed the description of the TRNG EIP76 in its datasheet.
 
+This series refactorize the driver, add support for generating bigger
+output random data and add a device variant for SafeXcel IP-76, found
+in Armada 8K.
 
-Le 07/09/2016 16:45, PrasannaKumar Muralidharan a écrit :
-> On 7 September 2016 at 19:53, Romain Perier
-> <romain.perier@free-electrons.com> wrote:
->> Hello,
->>
->>
->> Le 06/09/2016 18:31, PrasannaKumar Muralidharan a écrit :
->>>>
->>>> Use devm_hwrng_register instead of hwrng_register. It avoids the need
->>>> to handle unregistration explicitly from the remove function.
->>>>
->>>> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
->>>> ---
->>>>    drivers/char/hw_random/omap-rng.c | 4 +---
->>>>    1 file changed, 1 insertion(+), 3 deletions(-)
->>>>
->>>> diff --git a/drivers/char/hw_random/omap-rng.c
->>>> b/drivers/char/hw_random/omap-rng.c
->>>> index d47b24d..171c3e8 100644
->>>> --- a/drivers/char/hw_random/omap-rng.c
->>>> +++ b/drivers/char/hw_random/omap-rng.c
->>>> @@ -381,7 +381,7 @@ static int omap_rng_probe(struct platform_device
->>>> *pdev)
->>>>           if (ret)
->>>>                   goto err_ioremap;
->>>>
->>>> -       ret = hwrng_register(&omap_rng_ops);
->>>> +       ret = devm_hwrng_register(dev, &omap_rng_ops);
->>>>           if (ret)
->>>>                   goto err_register;
->>>>
->>>> @@ -402,8 +402,6 @@ static int omap_rng_remove(struct platform_device
->>>> *pdev)
->>>>    {
->>>>           struct omap_rng_dev *priv = platform_get_drvdata(pdev);
->>>>
->>>> -       hwrng_unregister(&omap_rng_ops);
->>>> -
->>>>           priv->pdata->cleanup(priv);
->>>>
->>>>           pm_runtime_put_sync(&pdev->dev);
->>>> --
->>>
->>>
->>> If devm_hwrng_register is used hwrng_unregister will be called after
->>> pm_runtime_disable is called. If RNG device is in use calling
->>> omap_rng_remove may not work properly.
->>>
->>
->> The case where the remove function is called is if you unbind the driver by
->> hand or you call rmmod while the RNG device is used.
->> I don't think that the kernel will call platform->remove is the device is in
->> use (so /dev/hwrng). I mean the argument that the unregister function is
->> called after pm_runtime_disable is correct, but I don't think that the
->> remove function might be called while the device is in use. There is
->> necessarily a mutual exclusive case between "use the device" and "call the
->> remove function of the device". However, I am open to suggestions.
->
-> The way you explained is good :D. Good point too. But the device is
-> created by hw_random core (hwrng_modinit in core.c) so the device can
-> be in use when omap-rng module is removed. Please feel free to correct
-> me if I am wrong.
+Romain Perier (8):
+  dt-bindings: Add vendor prefix for INSIDE Secure
+  dt-bindings: omap-rng: Document SafeXcel IP-76 device variant
+  hwrng: omap - Switch to non-obsolete read API implementation
+  hwrng: omap - Remove global definition of hwrng
+  hwrng: omap - Add support for 128-bit output of data
+  hwrng: omap - Don't prefix the probe message with OMAP
+  hwrng: omap - Add device variant for SafeXcel IP-76 found in Armada 8K
+  arm64: dts: marvell: add TRNG description for Armada 8K CP
 
-Mhhh, I think that I understood what you meant. The node /dev/hwrng is 
-managed by hw_random core, a read might happen on this node while 
-platform->remove is called... However, if hwrng_unregister is the first 
-function called from platform->remove, the driver is unbinded from the 
-hw_random core atomically (unregister and read cannot happen in the same 
-time because there is a mutex), so the problem does not happen.
-I propose to remove this patch from the series.
+ Documentation/devicetree/bindings/rng/omap_rng.txt |  14 +-
+ .../devicetree/bindings/vendor-prefixes.txt        |   1 +
+ .../boot/dts/marvell/armada-cp110-master.dtsi      |   8 ++
+ .../arm64/boot/dts/marvell/armada-cp110-slave.dtsi |   8 ++
+ drivers/char/hw_random/Kconfig                     |   2 +-
+ drivers/char/hw_random/omap-rng.c                  | 160 +++++++++++++++------
+ 6 files changed, 147 insertions(+), 46 deletions(-)
 
-Thanks!
-Romain
 -- 
-Romain Perier, Free Electrons
-Embedded Linux, Kernel and Android engineering
-http://free-electrons.com
+
+Changes in v2:
+ - Removed the patch introducing device resources managed API for registration
+
+2.9.3
