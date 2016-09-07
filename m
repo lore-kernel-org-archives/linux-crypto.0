@@ -1,48 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCHv3 03/11] crypto: omap-sham: implement context
- export/import APIs
-Date: Wed, 7 Sep 2016 21:29:40 +0800
-Message-ID: <20160907132940.GA17927@gondor.apana.org.au>
-References: <d828fca9-a97a-7722-c4cb-24e07816cbc4@ti.com>
- <20160901033320.GA650@gondor.apana.org.au>
- <60a5ed40-5552-3ec8-fa21-7e6fb8213fc3@ti.com>
- <20160901061630.GB650@gondor.apana.org.au>
- <70468d4d-9f26-1bad-ace1-4b7c5cf43b52@ti.com>
- <20160901071958.GA2076@gondor.apana.org.au>
- <4c45de7f-002c-48b5-c950-f445354adb09@ti.com>
- <20160901073113.GA2232@gondor.apana.org.au>
- <9af173f7-cc94-a92f-80ee-c746d97ab110@ti.com>
- <0e19ed55-f24b-ad98-215b-1eb318193f06@ti.com>
+Subject: Re: [PATCH] crypto: arm/ghash: change internal cra_name to "__ghash"
+Date: Wed, 7 Sep 2016 21:22:26 +0800
+Message-ID: <20160907132226.GM17176@gondor.apana.org.au>
+References: <1473076724-2725-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: lokeshvutla@ti.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, tony@atomide.com,
-        linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Tero Kristo <t-kristo@ti.com>
+Cc: linux-crypto@vger.kernel.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44087 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:47247 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752829AbcIGN3v (ORCPT
+        with ESMTP id S1756625AbcIGOD7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2016 09:29:51 -0400
+        Wed, 7 Sep 2016 10:03:59 -0400
 Content-Disposition: inline
-In-Reply-To: <0e19ed55-f24b-ad98-215b-1eb318193f06@ti.com>
+In-Reply-To: <1473076724-2725-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Sep 05, 2016 at 03:06:05PM +0300, Tero Kristo wrote:
->
-> Additional request, would it be possible for you to check the rest
-> of the series and just ignore patches #2 and #3 for now, the rest
-> don't have any dependencies against these and can be applied cleanly
-> without.
+On Mon, Sep 05, 2016 at 12:58:44PM +0100, Ard Biesheuvel wrote:
+> The fact that the internal synchrous hash implementation is called
+> "ghash" like the publicly visible one is causing the testmgr code
+> to misidentify it as an algorithm that requires testing at boottime.
+> So rename it to "__ghash" to prevent this.
 > 
-> I would like to see these move forward while I figure out how to
-> handle the buffer / export+import...
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Sure I'll review them again.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
