@@ -1,7 +1,8 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH v2 0/8] Add support for SafeXcel IP-76 to OMAP RNG
-Date: Wed,  7 Sep 2016 17:57:35 +0200
-Message-ID: <20160907155743.6403-1-romain.perier@free-electrons.com>
+Subject: [PATCH v2 5/8] hwrng: omap - Add support for 128-bit output of data
+Date: Wed,  7 Sep 2016 17:57:40 +0200
+Message-ID: <20160907155743.6403-6-romain.perier@free-electrons.com>
+References: <20160907155743.6403-1-romain.perier@free-electrons.com>
 Cc: Gregory Clement <gregory.clement@free-electrons.com>,
         Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
         Romain Perier <romain.perier@free-electrons.com>,
@@ -16,43 +17,72 @@ Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 To: dsaxena@plexity.net, mpm@selenic.com,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:42854 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:42893 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751304AbcIGP5u (ORCPT
+        with ESMTP id S1751304AbcIGP5w (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2016 11:57:50 -0400
+        Wed, 7 Sep 2016 11:57:52 -0400
+In-Reply-To: <20160907155743.6403-1-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The driver omap-rng has a lot of similarity with the IP block SafeXcel
-IP-76. A lot of registers are the same and the way that the driver works
-is very closed the description of the TRNG EIP76 in its datasheet.
+So far, this driver only supports up to 64 bits of output data generated
+by an RNG. Some IP blocks, like the SafeXcel IP-76 supports up to 128
+bits of output data. This commits renames registers descriptions
+OUTPUT_L_REG and OUTPUT_H_REG to OUTPUT_0_REG and OUPUT_1_REG,
+respectively. It also adds two new values to the enumeration of existing
+registers: OUTPUT_2_REG and OUTPUT_3_REG.
 
-This series refactorize the driver, add support for generating bigger
-output random data and add a device variant for SafeXcel IP-76, found
-in Armada 8K.
+Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
+---
+ drivers/char/hw_random/omap-rng.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-Romain Perier (8):
-  dt-bindings: Add vendor prefix for INSIDE Secure
-  dt-bindings: omap-rng: Document SafeXcel IP-76 device variant
-  hwrng: omap - Switch to non-obsolete read API implementation
-  hwrng: omap - Remove global definition of hwrng
-  hwrng: omap - Add support for 128-bit output of data
-  hwrng: omap - Don't prefix the probe message with OMAP
-  hwrng: omap - Add device variant for SafeXcel IP-76 found in Armada 8K
-  arm64: dts: marvell: add TRNG description for Armada 8K CP
-
- Documentation/devicetree/bindings/rng/omap_rng.txt |  14 +-
- .../devicetree/bindings/vendor-prefixes.txt        |   1 +
- .../boot/dts/marvell/armada-cp110-master.dtsi      |   8 ++
- .../arm64/boot/dts/marvell/armada-cp110-slave.dtsi |   8 ++
- drivers/char/hw_random/Kconfig                     |   2 +-
- drivers/char/hw_random/omap-rng.c                  | 160 +++++++++++++++------
- 6 files changed, 147 insertions(+), 46 deletions(-)
-
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index b20e8d7..6924da57 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -65,8 +65,10 @@
+ #define OMAP4_RNG_OUTPUT_SIZE			0x8
+ 
+ enum {
+-	RNG_OUTPUT_L_REG = 0,
+-	RNG_OUTPUT_H_REG,
++	RNG_OUTPUT_0_REG = 0,
++	RNG_OUTPUT_1_REG,
++	RNG_OUTPUT_2_REG,
++	RNG_OUTPUT_3_REG,
+ 	RNG_STATUS_REG,
+ 	RNG_INTMASK_REG,
+ 	RNG_INTACK_REG,
+@@ -82,7 +84,7 @@ enum {
+ };
+ 
+ static const u16 reg_map_omap2[] = {
+-	[RNG_OUTPUT_L_REG]	= 0x0,
++	[RNG_OUTPUT_0_REG]	= 0x0,
+ 	[RNG_STATUS_REG]	= 0x4,
+ 	[RNG_CONFIG_REG]	= 0x28,
+ 	[RNG_REV_REG]		= 0x3c,
+@@ -90,8 +92,8 @@ static const u16 reg_map_omap2[] = {
+ };
+ 
+ static const u16 reg_map_omap4[] = {
+-	[RNG_OUTPUT_L_REG]	= 0x0,
+-	[RNG_OUTPUT_H_REG]	= 0x4,
++	[RNG_OUTPUT_0_REG]	= 0x0,
++	[RNG_OUTPUT_1_REG]	= 0x4,
+ 	[RNG_STATUS_REG]	= 0x8,
+ 	[RNG_INTMASK_REG]	= 0xc,
+ 	[RNG_INTACK_REG]	= 0x10,
+@@ -155,7 +157,7 @@ static int omap_rng_do_read(struct hwrng *rng, void *data, size_t max,
+ 	if (!priv->pdata->data_present(priv))
+ 		return 0;
+ 
+-	memcpy_fromio(data, priv->base + priv->pdata->regs[RNG_OUTPUT_L_REG],
++	memcpy_fromio(data, priv->base + priv->pdata->regs[RNG_OUTPUT_0_REG],
+ 		      priv->pdata->data_size);
+ 
+ 	if (priv->pdata->regs[RNG_INTACK_REG])
 -- 
-
-Changes in v2:
- - Removed the patch introducing device resources managed API for registration
-
 2.9.3
