@@ -1,121 +1,33 @@
-From: Romain Perier <romain.perier@free-electrons.com>
-Subject: Re: [PATCH 4/9] hwrng: omap - Use the managed device resource API for
- registration
-Date: Thu, 8 Sep 2016 17:47:13 +0200
-Message-ID: <57D18801.5050901@free-electrons.com>
-References: <20160906153857.5503-1-romain.perier@free-electrons.com>
- <20160906153857.5503-5-romain.perier@free-electrons.com>
- <CANc+2y6LeOqSy37x=vXaLPkGM3C5Wh6Yq11ybO+-0DU19wLBUQ@mail.gmail.com>
- <57D022F9.2020407@free-electrons.com>
- <CANc+2y5yzMNeHEgf6FfQHiN=-528YZgB3JwVcqa3C-s8s_RCfA@mail.gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: BUG in recvmsg using io_submit
+Date: Thu, 08 Sep 2016 17:50:27 +0200
+Message-ID: <3413258.xKvWDEuyhD@tauon.atsec.com>
+References: <2637498.CLV37KecV5@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: dsaxena@plexity.net, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gregory Clement <gregory.clement@free-electrons.com>,
-        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-        Nadav Haklai <nadavh@marvell.com>,
-        Omri Itach <omrii@marvell.com>,
-        Shadi Ammouri <shadi@marvell.com>,
-        Yahuda Yitschak <yehuday@marvell.com>,
-        Hanna Hawa <hannah@marvell.com>,
-        Neta Zur Hershkovits <neta@marvell.com>,
-        Igal Liberman <igall@marvell.com>,
-        Marcin Wojtas <mw@semihalf.com>, linux-crypto@vger.kernel.org
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:33944 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S938625AbcIHPrZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Sep 2016 11:47:25 -0400
-In-Reply-To: <CANc+2y5yzMNeHEgf6FfQHiN=-528YZgB3JwVcqa3C-s8s_RCfA@mail.gmail.com>
+Received: from mail.eperm.de ([89.247.134.16]:47902 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932283AbcIHPud (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Sep 2016 11:50:33 -0400
+In-Reply-To: <2637498.CLV37KecV5@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
-
-Le 07/09/2016 16:45, PrasannaKumar Muralidharan a écrit :
-> On 7 September 2016 at 19:53, Romain Perier
-> <romain.perier@free-electrons.com> wrote:
->> Hello,
->>
->>
->> Le 06/09/2016 18:31, PrasannaKumar Muralidharan a écrit :
->>>>
->>>> Use devm_hwrng_register instead of hwrng_register. It avoids the need
->>>> to handle unregistration explicitly from the remove function.
->>>>
->>>> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
->>>> ---
->>>>    drivers/char/hw_random/omap-rng.c | 4 +---
->>>>    1 file changed, 1 insertion(+), 3 deletions(-)
->>>>
->>>> diff --git a/drivers/char/hw_random/omap-rng.c
->>>> b/drivers/char/hw_random/omap-rng.c
->>>> index d47b24d..171c3e8 100644
->>>> --- a/drivers/char/hw_random/omap-rng.c
->>>> +++ b/drivers/char/hw_random/omap-rng.c
->>>> @@ -381,7 +381,7 @@ static int omap_rng_probe(struct platform_device
->>>> *pdev)
->>>>           if (ret)
->>>>                   goto err_ioremap;
->>>>
->>>> -       ret = hwrng_register(&omap_rng_ops);
->>>> +       ret = devm_hwrng_register(dev, &omap_rng_ops);
->>>>           if (ret)
->>>>                   goto err_register;
->>>>
->>>> @@ -402,8 +402,6 @@ static int omap_rng_remove(struct platform_device
->>>> *pdev)
->>>>    {
->>>>           struct omap_rng_dev *priv = platform_get_drvdata(pdev);
->>>>
->>>> -       hwrng_unregister(&omap_rng_ops);
->>>> -
->>>>           priv->pdata->cleanup(priv);
->>>>
->>>>           pm_runtime_put_sync(&pdev->dev);
->>>> --
->>>
->>>
->>> If devm_hwrng_register is used hwrng_unregister will be called after
->>> pm_runtime_disable is called. If RNG device is in use calling
->>> omap_rng_remove may not work properly.
->>>
->>
->> The case where the remove function is called is if you unbind the driver by
->> hand or you call rmmod while the RNG device is used.
->> I don't think that the kernel will call platform->remove is the device is in
->> use (so /dev/hwrng). I mean the argument that the unregister function is
->> called after pm_runtime_disable is correct, but I don't think that the
->> remove function might be called while the device is in use. There is
->> necessarily a mutual exclusive case between "use the device" and "call the
->> remove function of the device". However, I am open to suggestions.
->
-> The way you explained is good :D. Good point too. But the device is
-> created by hw_random core (hwrng_modinit in core.c) so the device can
-> be in use when omap-rng module is removed. Please feel free to correct
-> me if I am wrong.
->
-> Cheers,
-> PrasannaKumar
->
+Am Donnerstag, 8. September 2016, 04:52:08 CEST schrieb Stephan Mueller:
 
 Hi,
 
-I was wondering something. hwrng_unregister does not check the kref 
-reference counter of the object... so technically if the current 
-rng_device is in use, with or without devm... calling platform->remove 
-will break the driver anyway because hwrng_unregister will unbind the 
-device from /dev/hwrng. What I mean is that I think that we had this 
-issue even without devm_hwrng_register.
+> Hi Herbert,
+> 
+> another one, different than the first report
 
-Herbert, could you confirm ?
+Please note that the error seems to be triggered due to a bad use of the user 
+space interface: When submitting the iov, I told the kernel that iovlen is the 
+size of the buffer instead of the number of iovs.
 
-Romain
--- 
-Romain Perier, Free Electrons
-Embedded Linux, Kernel and Android engineering
-http://free-electrons.com
+Ciao
+Stephan
