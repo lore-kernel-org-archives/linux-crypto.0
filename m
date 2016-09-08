@@ -1,72 +1,60 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Kernel panic - encryption/decryption failed when open file on
- Arm64
-Date: Thu, 8 Sep 2016 20:47:09 +0800
-Message-ID: <20160908124709.GA26586@gondor.apana.org.au>
-References: <57D15BD3.40903@huawei.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, tytso@mit.edu, jaegeuk@kernel.org,
-        nhorman@tuxdriver.com, ard.biesheuvel@linaro.org, mh1@iki.fi,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bintian <bintian.wang@huawei.com>, liushuoran@huawei.com,
-        Huxinwei <huxinwei@huawei.com>, zhangzhibin.zhang@huawei.com
-To: xiakaixu <xiakaixu@huawei.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] crypto: engine: fix linux-next merge conflict
+Date: Thu,  8 Sep 2016 15:57:02 +0200
+Message-ID: <20160908135724.1311726-1-arnd@arndb.de>
+Cc: Petr Mladek <pmladek@suse.com>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47251 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932478AbcIHMrq (ORCPT
+Received: from mout.kundenserver.de ([217.72.192.73]:59944 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754070AbcIHN6M (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Sep 2016 08:47:46 -0400
-Content-Disposition: inline
-In-Reply-To: <57D15BD3.40903@huawei.com>
+        Thu, 8 Sep 2016 09:58:12 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 08, 2016 at 08:38:43PM +0800, xiakaixu wrote:
-> Hi,
-> 
-> I am using the encryption/decryption feature on arm64 board and a kernel
-> panic occurs just when open a file.  As the memory size of the board
-> is limited
-> and there are some page allocation failures before the panic.
-> 
-> Seems it is a kernel bug from the call trace log.
-> 
->     ...
->     - fscrypt_get_encryption_info
->       - get_crypt_info.part.1
->        - validate_user_key.isra.0
->         - derive_aes_gcm_key
->          - crypto_gcm_decrypt
->           - ablk_decrypt
->            - ctr_encrypt
->             - blkcipher_walk_done
->               - blkcipher_walk_next
->                -  __get_free_pages
-> ----------------------------------> page allocation failure
->       ...
->            - aes_ctr_encrypt
-> -----------------------------------------> the input parameter is
-> NULL pointer as the page allocation failure
-> 
-> 
-> The input parameter of function aes_ctr_encrypt() comes from the
-> /struct blkcipher_walk//
-> //walk/, and this variable /walk /is allocated by the function
-> __get_free_pages(). So if this
-> page allocate failed, the input parameter of function
-> aes_ctr_encrypt() will be NULL. The
-> panic will occurs if we don't check the input parameter.
-> 
-> Not sure about this and wish to get your opinions!
+A merge conflict between the akpm-current tree and the crypto tree
+caused a build failure in ARM allmodconfig today:
 
-If the page allocation fails in blkcipher_walk_next it'll simply
-switch over to processing it block by block. so I don't think the
-warning is related to the crash.
+crypto/crypto_engine.c: In function 'crypto_transfer_hash_request':
+crypto/crypto_engine.c:234:3: error: implicit declaration of function 'queue_kthread_work' [-Werror=implicit-function-declaration]
 
-Cheers,
+This adapts the crypto code to the API change.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Fixes: 4cba7cf025f3 ("crypto: engine - permit to enqueue ashash_request")
+Fixes: 8ca76638a2d0 ("kthread: kthread worker API cleanup")
+---
+ crypto/crypto_engine.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
+index 64fcd9ee3e2e..6989ba0046df 100644
+--- a/crypto/crypto_engine.c
++++ b/crypto/crypto_engine.c
+@@ -231,7 +231,7 @@ int crypto_transfer_hash_request(struct crypto_engine *engine,
+ 	ret = ahash_enqueue_request(&engine->queue, req);
+ 
+ 	if (!engine->busy && need_pump)
+-		queue_kthread_work(&engine->kworker, &engine->pump_requests);
++		kthread_queue_work(&engine->kworker, &engine->pump_requests);
+ 
+ 	spin_unlock_irqrestore(&engine->queue_lock, flags);
+ 	return ret;
+@@ -284,7 +284,7 @@ void crypto_finalize_cipher_request(struct crypto_engine *engine,
+ 
+ 	req->base.complete(&req->base, err);
+ 
+-	queue_kthread_work(&engine->kworker, &engine->pump_requests);
++	kthread_queue_work(&engine->kworker, &engine->pump_requests);
+ }
+ EXPORT_SYMBOL_GPL(crypto_finalize_cipher_request);
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.9.0
