@@ -1,105 +1,110 @@
-From: xiakaixu <xiakaixu@huawei.com>
-Subject: Re: Kernel panic - encryption/decryption failed when open file on
- Arm64
-Date: Fri, 9 Sep 2016 12:08:51 +0800
-Message-ID: <57D235D3.9010107@huawei.com>
-References: <57D15BD3.40903@huawei.com>
- <20160908124709.GA26586@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <davem@davemloft.net>, <tytso@mit.edu>, <jaegeuk@kernel.org>,
-        <nhorman@tuxdriver.com>, <ard.biesheuvel@linaro.org>, <mh1@iki.fi>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Bintian <bintian.wang@huawei.com>, <liushuoran@huawei.com>,
-        Huxinwei <huxinwei@huawei.com>, <zhangzhibin.zhang@huawei.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: [PATCH] hwrng: amd-rng - Migrate to managed API
+Date: Fri,  9 Sep 2016 13:28:23 +0530
+Message-ID: <1473407903-12470-1-git-send-email-prasannatsmkumar@gmail.com>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+To: mpm@selenic.com, herbert@gondor.apana.org.au,
+        clabbe.montjoie@gmail.com, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga03-in.huawei.com ([119.145.14.66]:36481 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750710AbcIIEJk (ORCPT
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:34677 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751981AbcIIH7K (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Sep 2016 00:09:40 -0400
-In-Reply-To: <20160908124709.GA26586@gondor.apana.org.au>
+        Fri, 9 Sep 2016 03:59:10 -0400
+Received: by mail-pf0-f196.google.com with SMTP id g202so3647176pfb.1
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Sep 2016 00:59:09 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Sorry for resend this email, just add the linux-crypto@vger.kernel.org
-and linux-kernel@vger.kernel.org.
+Managed API eliminates error handling code, thus reduces several lines
+of code.
 
+Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+---
+ drivers/char/hw_random/amd-rng.c | 48 +++++++++-------------------------------
+ 1 file changed, 11 insertions(+), 37 deletions(-)
 
-Hi,
-
-Firstly, thanks for your reply!
-
-To reproduce this kernel panic, I test the encryption/decryption feature 
-on arm64 board with more memory. Just add the following
-change:
-
-     diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
-     index 0122bec..10ef3f4 100644
-     --- a/crypto/blkcipher.c
-     +++ b/crypto/blkcipher.c
-     @@ -240,6 +240,7 @@ static int blkcipher_walk_next(struct 
-blkcipher_desc *desc,
-                     walk->flags |= BLKCIPHER_WALK_COPY;
-                     if (!walk->page) {
-                             walk->page = (void 
-*)__get_free_page(GFP_ATOMIC);
-     +                      walk->page = NULL;
-                             if (!walk->page)
-                                     n = 0;
-                     }
-
-
-This change just set the walk->page to NULL manually.
-I get the same crash when open file with the above change log. So I 
-think this NULL page failure is not be handled correctly in current code.
-
-Regards
-Kaixu Xia
-
-> On Thu, Sep 08, 2016 at 08:38:43PM +0800, xiakaixu wrote:
->> Hi,
->>
->> I am using the encryption/decryption feature on arm64 board and a kernel
->> panic occurs just when open a file.  As the memory size of the board
->> is limited
->> and there are some page allocation failures before the panic.
->>
->> Seems it is a kernel bug from the call trace log.
->>
->>      ...
->>      - fscrypt_get_encryption_info
->>        - get_crypt_info.part.1
->>         - validate_user_key.isra.0
->>          - derive_aes_gcm_key
->>           - crypto_gcm_decrypt
->>            - ablk_decrypt
->>             - ctr_encrypt
->>              - blkcipher_walk_done
->>                - blkcipher_walk_next
->>                 -  __get_free_pages
->> ----------------------------------> page allocation failure
->>        ...
->>             - aes_ctr_encrypt
->> -----------------------------------------> the input parameter is
->> NULL pointer as the page allocation failure
->>
->>
->> The input parameter of function aes_ctr_encrypt() comes from the
->> /struct blkcipher_walk//
->> //walk/, and this variable /walk /is allocated by the function
->> __get_free_pages(). So if this
->> page allocate failed, the input parameter of function
->> aes_ctr_encrypt() will be NULL. The
->> panic will occurs if we don't check the input parameter.
->>
->> Not sure about this and wish to get your opinions!
->
-> If the page allocation fails in blkcipher_walk_next it'll simply
-> switch over to processing it block by block. so I don't think the
-> warning is related to the crash.
->
-> Cheers,
->
+diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
+index 9959c76..4dbc5aa 100644
+--- a/drivers/char/hw_random/amd-rng.c
++++ b/drivers/char/hw_random/amd-rng.c
+@@ -55,7 +55,6 @@ MODULE_DEVICE_TABLE(pci, pci_tbl);
+ struct amd768_priv {
+ 	void __iomem *iobase;
+ 	struct pci_dev *pcidev;
+-	u32 pmbase;
+ };
+ 
+ static int amd_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+@@ -149,58 +148,33 @@ found:
+ 	if (pmbase == 0)
+ 		return -EIO;
+ 
+-	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
+-	if (!priv)
+-		return -ENOMEM;
++	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
++	if (IS_ERR(priv))
++		return PTR_ERR(priv);
+ 
+-	if (!request_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE, DRV_NAME)) {
++	if (!devm_request_region(&pdev->dev, pmbase + PMBASE_OFFSET,
++				PMBASE_SIZE, DRV_NAME)) {
+ 		dev_err(&pdev->dev, DRV_NAME " region 0x%x already in use!\n",
+ 			pmbase + 0xF0);
+-		err = -EBUSY;
+-		goto out;
++		return -EBUSY;
+ 	}
+ 
+-	priv->iobase = ioport_map(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
+-	if (!priv->iobase) {
++	priv->iobase = devm_ioport_map(&pdev->dev, pmbase + PMBASE_OFFSET,
++			PMBASE_SIZE);
++	if (IS_ERR(priv->iobase)) {
+ 		pr_err(DRV_NAME "Cannot map ioport\n");
+-		err = -EINVAL;
+-		goto err_iomap;
++		return PTR_ERR(priv->iobase);
+ 	}
+ 
+ 	amd_rng.priv = (unsigned long)priv;
+-	priv->pmbase = pmbase;
+ 	priv->pcidev = pdev;
+ 
+ 	pr_info(DRV_NAME " detected\n");
+-	err = hwrng_register(&amd_rng);
+-	if (err) {
+-		pr_err(DRV_NAME " registering failed (%d)\n", err);
+-		goto err_hwrng;
+-	}
+-	return 0;
+-
+-err_hwrng:
+-	ioport_unmap(priv->iobase);
+-err_iomap:
+-	release_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
+-out:
+-	kfree(priv);
+-	return err;
++	return devm_hwrng_register(&pdev->dev, &amd_rng);
+ }
+ 
+ static void __exit mod_exit(void)
+ {
+-	struct amd768_priv *priv;
+-
+-	priv = (struct amd768_priv *)amd_rng.priv;
+-
+-	hwrng_unregister(&amd_rng);
+-
+-	ioport_unmap(priv->iobase);
+-
+-	release_region(priv->pmbase + PMBASE_OFFSET, PMBASE_SIZE);
+-
+-	kfree(priv);
+ }
+ 
+ module_init(mod_init);
+-- 
+2.5.0
