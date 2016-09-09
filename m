@@ -1,110 +1,117 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: [PATCH] hwrng: amd-rng - Migrate to managed API
-Date: Fri,  9 Sep 2016 13:28:23 +0530
-Message-ID: <1473407903-12470-1-git-send-email-prasannatsmkumar@gmail.com>
-Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-To: mpm@selenic.com, herbert@gondor.apana.org.au,
-        clabbe.montjoie@gmail.com, linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:34677 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751981AbcIIH7K (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Sep 2016 03:59:10 -0400
-Received: by mail-pf0-f196.google.com with SMTP id g202so3647176pfb.1
-        for <linux-crypto@vger.kernel.org>; Fri, 09 Sep 2016 00:59:09 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: xiakaixu <xiakaixu@huawei.com>
+Subject: Re: Kernel panic - encryption/decryption failed when open file on
+ Arm64
+Date: Fri, 9 Sep 2016 18:19:36 +0800
+Message-ID: <57D28CB8.4080904@huawei.com>
+References: <57D15BD3.40903@huawei.com>
+ <20160908124709.GA26586@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <davem@davemloft.net>, <tytso@mit.edu>, <jaegeuk@kernel.org>,
+        <nhorman@tuxdriver.com>, <ard.biesheuvel@linaro.org>, <mh1@iki.fi>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Bintian <bintian.wang@huawei.com>, <liushuoran@huawei.com>,
+        Huxinwei <huxinwei@huawei.com>, <zhangzhibin.zhang@huawei.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20160908124709.GA26586@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Managed API eliminates error handling code, thus reduces several lines
-of code.
+Hi,
 
-Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
----
- drivers/char/hw_random/amd-rng.c | 48 +++++++++-------------------------------
- 1 file changed, 11 insertions(+), 37 deletions(-)
+After a deeply research about this crash, seems it is a specific
+bug that only exists in armv8 board. And it occurs in this function
+in arch/arm64/crypto/aes-glue.c.
 
-diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
-index 9959c76..4dbc5aa 100644
---- a/drivers/char/hw_random/amd-rng.c
-+++ b/drivers/char/hw_random/amd-rng.c
-@@ -55,7 +55,6 @@ MODULE_DEVICE_TABLE(pci, pci_tbl);
- struct amd768_priv {
- 	void __iomem *iobase;
- 	struct pci_dev *pcidev;
--	u32 pmbase;
- };
- 
- static int amd_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-@@ -149,58 +148,33 @@ found:
- 	if (pmbase == 0)
- 		return -EIO;
- 
--	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
--	if (!priv)
--		return -ENOMEM;
-+	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
-+	if (IS_ERR(priv))
-+		return PTR_ERR(priv);
- 
--	if (!request_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE, DRV_NAME)) {
-+	if (!devm_request_region(&pdev->dev, pmbase + PMBASE_OFFSET,
-+				PMBASE_SIZE, DRV_NAME)) {
- 		dev_err(&pdev->dev, DRV_NAME " region 0x%x already in use!\n",
- 			pmbase + 0xF0);
--		err = -EBUSY;
--		goto out;
-+		return -EBUSY;
- 	}
- 
--	priv->iobase = ioport_map(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
--	if (!priv->iobase) {
-+	priv->iobase = devm_ioport_map(&pdev->dev, pmbase + PMBASE_OFFSET,
-+			PMBASE_SIZE);
-+	if (IS_ERR(priv->iobase)) {
- 		pr_err(DRV_NAME "Cannot map ioport\n");
--		err = -EINVAL;
--		goto err_iomap;
-+		return PTR_ERR(priv->iobase);
- 	}
- 
- 	amd_rng.priv = (unsigned long)priv;
--	priv->pmbase = pmbase;
- 	priv->pcidev = pdev;
- 
- 	pr_info(DRV_NAME " detected\n");
--	err = hwrng_register(&amd_rng);
--	if (err) {
--		pr_err(DRV_NAME " registering failed (%d)\n", err);
--		goto err_hwrng;
--	}
--	return 0;
--
--err_hwrng:
--	ioport_unmap(priv->iobase);
--err_iomap:
--	release_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
--out:
--	kfree(priv);
--	return err;
-+	return devm_hwrng_register(&pdev->dev, &amd_rng);
- }
- 
- static void __exit mod_exit(void)
- {
--	struct amd768_priv *priv;
--
--	priv = (struct amd768_priv *)amd_rng.priv;
--
--	hwrng_unregister(&amd_rng);
--
--	ioport_unmap(priv->iobase);
--
--	release_region(priv->pmbase + PMBASE_OFFSET, PMBASE_SIZE);
--
--	kfree(priv);
- }
- 
- module_init(mod_init);
--- 
-2.5.0
+static int ctr_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
+                        struct scatterlist *src, unsigned int nbytes)
+{
+        ...
+
+         desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+         blkcipher_walk_init(&walk, dst, src, nbytes);
+         err = blkcipher_walk_virt_block(desc, &walk, AES_BLOCK_SIZE); ---> page allocation failed
+
+	...
+
+         while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {           ----> walk.nbytes = 0, and skip this loop
+                 aes_ctr_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+                                 (u8 *)ctx->key_enc, rounds, blocks, walk.iv,
+                                 first);
+	...
+                 err = blkcipher_walk_done(desc, &walk,
+                                           walk.nbytes % AES_BLOCK_SIZE);
+         }
+         if (nbytes) {                                                 ----> enter this if() statement
+                 u8 *tdst = walk.dst.virt.addr + blocks * AES_BLOCK_SIZE;
+                 u8 *tsrc = walk.src.virt.addr + blocks * AES_BLOCK_SIZE;
+	...
+
+                 aes_ctr_encrypt(tail, tsrc, (u8 *)ctx->key_enc, rounds,  ----> the the sencond input parameter is NULL, so crash...
+                                 blocks, walk.iv, first);
+	...
+         }
+         ...
+}
+
+
+If the page allocation failed in the function blkcipher_walk_virt_block(),
+the variable walk.nbytes = 0, so it will skip the while() loop and enter
+the if(nbytes) statment. But here the varibale tsrc is NULL and it is also
+the sencond input parameter of the function aes_ctr_encrypt()... Kernel Panic...
+
+I have also researched the similar function in other architectures, and
+there if(walk.nbytes) is used, not this if(nbytes) statement in the armv8.
+so I think this armv8 function ctr_encrypt() should deal with the page
+allocation failed situation.
+
+Regards
+Kaixu Xia
+
+
+> On Thu, Sep 08, 2016 at 08:38:43PM +0800, xiakaixu wrote:
+>> Hi,
+>>
+>> I am using the encryption/decryption feature on arm64 board and a kernel
+>> panic occurs just when open a file.  As the memory size of the board
+>> is limited
+>> and there are some page allocation failures before the panic.
+>>
+>> Seems it is a kernel bug from the call trace log.
+>>
+>>      ...
+>>      - fscrypt_get_encryption_info
+>>        - get_crypt_info.part.1
+>>         - validate_user_key.isra.0
+>>          - derive_aes_gcm_key
+>>           - crypto_gcm_decrypt
+>>            - ablk_decrypt
+>>             - ctr_encrypt
+>>              - blkcipher_walk_done
+>>                - blkcipher_walk_next
+>>                 -  __get_free_pages
+>> ----------------------------------> page allocation failure
+>>        ...
+>>             - aes_ctr_encrypt
+>> -----------------------------------------> the input parameter is
+>> NULL pointer as the page allocation failure
+>>
+>>
+>> The input parameter of function aes_ctr_encrypt() comes from the
+>> /struct blkcipher_walk//
+>> //walk/, and this variable /walk /is allocated by the function
+>> __get_free_pages(). So if this
+>> page allocate failed, the input parameter of function
+>> aes_ctr_encrypt() will be NULL. The
+>> panic will occurs if we don't check the input parameter.
+>>
+>> Not sure about this and wish to get your opinions!
+>
+> If the page allocation fails in blkcipher_walk_next it'll simply
+> switch over to processing it block by block. so I don't think the
+> warning is related to the crash.
+>
+> Cheers,
+>
