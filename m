@@ -1,55 +1,46 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: call put_page on used pages only
-Date: Sat, 10 Sep 2016 13:50:09 +0200
-Message-ID: <49118797.WdfLSz7urc@positron.chronox.de>
-References: <8008966.Q0OrxOpoA1@positron.chronox.de>
+From: Wei Yongjun <weiyj.lk@gmail.com>
+Subject: [PATCH -next] hwrng: st - Fix missing clk_disable_unprepare() on error in st_rng_probe()
+Date: Sat, 10 Sep 2016 12:03:42 +0000
+Message-ID: <1473509022-3478-1-git-send-email-weiyj.lk@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Wei Yongjun <weiyongjun1@huawei.com>,
+        linux-arm-kernel@lists.infradead.org, kernel@stlinux.com,
+        linux-crypto@vger.kernel.org
+To: Patrice Chotard <patrice.chotard@st.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47918 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751287AbcIJLuU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 10 Sep 2016 07:50:20 -0400
-In-Reply-To: <8008966.Q0OrxOpoA1@positron.chronox.de>
+Received: from mail-pa0-f65.google.com ([209.85.220.65]:35899 "EHLO
+        mail-pa0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751126AbcIJMDr (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 10 Sep 2016 08:03:47 -0400
+Received: by mail-pa0-f65.google.com with SMTP id ez1so5144373pab.3
+        for <linux-crypto@vger.kernel.org>; Sat, 10 Sep 2016 05:03:47 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+From: Wei Yongjun <weiyongjun1@huawei.com>
 
-This patch fixes the reported BUG reliably that I was able to
-create with my (faulty) libkcapi test code.
+Fix the missing clk_disable_unprepare() before return
+from st_rng_probe() in the error handling case.
 
-However, I am yet unable to pinpoint the code that allocates an
-SG without an associated page that would trigger the BUG.
-
-In any case, if you approve, I would recommend that this patch
-should go to 4.8 and to stable as well.
-
----8<---
-
-Ensure that put_page is only invoked on pages that were used by
-algif_skcipher.
-
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 ---
- crypto/algif_skcipher.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/char/hw_random/st-rng.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index d7acb73..bc36a9a 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -179,7 +179,7 @@ static void skcipher_pull_sgl(struct sock *sk, size_t used, int put)
+diff --git a/drivers/char/hw_random/st-rng.c b/drivers/char/hw_random/st-rng.c
+index 7e8aa6b..938ec10 100644
+--- a/drivers/char/hw_random/st-rng.c
++++ b/drivers/char/hw_random/st-rng.c
+@@ -108,6 +108,7 @@ static int st_rng_probe(struct platform_device *pdev)
+ 	ret = hwrng_register(&ddata->ops);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "Failed to register HW RNG\n");
++		clk_disable_unprepare(clk);
+ 		return ret;
+ 	}
  
- 			if (sg[i].length)
- 				return;
--			if (put)
-+			if (put && page_ref_count(sg_page(sg + i)))
- 				put_page(sg_page(sg + i));
- 			sg_assign_page(sg + i, NULL);
- 		}
--- 
-2.7.4
