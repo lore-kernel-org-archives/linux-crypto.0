@@ -1,101 +1,185 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: Kernel panic - encryption/decryption failed when open file on Arm64
-Date: Fri, 9 Sep 2016 11:56:33 +0100
-Message-ID: <CAKv+Gu8w+BuwxQjOtpnFPHnJNUzq7m0K+KJ8=FG2wHigaB54ng@mail.gmail.com>
-References: <57D15BD3.40903@huawei.com> <20160908124709.GA26586@gondor.apana.org.au>
- <57D28CB8.4080904@huawei.com> <CAKv+Gu9JDCHDteOvgpEg4SJP4OKgM6=euF3pzBcXDJxTt=dAYg@mail.gmail.com>
+From: Santosh Shilimkar <santosh.shilimkar@oracle.com>
+Subject: Re: [PATCH] softirq: fix tasklet_kill() and its users
+Date: Fri, 9 Sep 2016 18:41:24 -0700
+Message-ID: <3a14419b-4814-0e20-9af5-ce7d454867d8@oracle.com>
+References: <1472089950-2724-1-git-send-email-ssantosh@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tadeusz Struk <tadeusz.struk@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        "Theodore Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-        nhorman@tuxdriver.com, mh1@iki.fi,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Bintian <bintian.wang@huawei.com>, liushuoran@huawei.com,
-        Huxinwei <huxinwei@huawei.com>, zhangzhibin.zhang@huawei.com
-To: xiakaixu <xiakaixu@huawei.com>
+        Paul Bolle <pebolle@tiscali.nl>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Salvatore Benedetto <salvatore.benedetto@intel.com>,
+        Karsten Keil <isdn@linux-pingi.de>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>
+To: Santosh Shilimkar <ssantosh@kernel.org>,
+        linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f46.google.com ([209.85.218.46]:36018 "EHLO
-        mail-oi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752956AbcIIK4e (ORCPT
+Received: from userp1040.oracle.com ([156.151.31.81]:18045 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751174AbcIJBme (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Sep 2016 06:56:34 -0400
-Received: by mail-oi0-f46.google.com with SMTP id q188so18443419oia.3
-        for <linux-crypto@vger.kernel.org>; Fri, 09 Sep 2016 03:56:34 -0700 (PDT)
-In-Reply-To: <CAKv+Gu9JDCHDteOvgpEg4SJP4OKgM6=euF3pzBcXDJxTt=dAYg@mail.gmail.com>
+        Fri, 9 Sep 2016 21:42:34 -0400
+In-Reply-To: <1472089950-2724-1-git-send-email-ssantosh@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 9 September 2016 at 11:31, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> On 9 September 2016 at 11:19, xiakaixu <xiakaixu@huawei.com> wrote:
->> Hi,
->>
->> After a deeply research about this crash, seems it is a specific
->> bug that only exists in armv8 board. And it occurs in this function
->> in arch/arm64/crypto/aes-glue.c.
->>
->> static int ctr_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
->>                        struct scatterlist *src, unsigned int nbytes)
->> {
->>        ...
->>
->>         desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
->>         blkcipher_walk_init(&walk, dst, src, nbytes);
->>         err = blkcipher_walk_virt_block(desc, &walk, AES_BLOCK_SIZE); --->
->> page allocation failed
->>
->>         ...
->>
->>         while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {           ---->
->> walk.nbytes = 0, and skip this loop
->>                 aes_ctr_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
->>                                 (u8 *)ctx->key_enc, rounds, blocks, walk.iv,
->>                                 first);
->>         ...
->>                 err = blkcipher_walk_done(desc, &walk,
->>                                           walk.nbytes % AES_BLOCK_SIZE);
->>         }
->>         if (nbytes) {                                                 ---->
->> enter this if() statement
->>                 u8 *tdst = walk.dst.virt.addr + blocks * AES_BLOCK_SIZE;
->>                 u8 *tsrc = walk.src.virt.addr + blocks * AES_BLOCK_SIZE;
->>         ...
->>
->>                 aes_ctr_encrypt(tail, tsrc, (u8 *)ctx->key_enc, rounds,
->> ----> the the sencond input parameter is NULL, so crash...
->>                                 blocks, walk.iv, first);
->>         ...
->>         }
->>         ...
->> }
->>
->>
->> If the page allocation failed in the function blkcipher_walk_virt_block(),
->> the variable walk.nbytes = 0, so it will skip the while() loop and enter
->> the if(nbytes) statment. But here the varibale tsrc is NULL and it is also
->> the sencond input parameter of the function aes_ctr_encrypt()... Kernel
->> Panic...
->>
->> I have also researched the similar function in other architectures, and
->> there if(walk.nbytes) is used, not this if(nbytes) statement in the armv8.
->> so I think this armv8 function ctr_encrypt() should deal with the page
->> allocation failed situation.
->>
+Ping !!
 
-Does this solve your problem?
-
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index 5c888049d061..6b2aa0fd6cd0 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -216,7 +216,7 @@ static int ctr_encrypt(struct blkcipher_desc
-*desc, struct scatterlist *dst,
-                err = blkcipher_walk_done(desc, &walk,
-                                          walk.nbytes % AES_BLOCK_SIZE);
-        }
--       if (nbytes) {
-+       if (walk.nbytes % AES_BLOCK_SIZE) {
-                u8 *tdst = walk.dst.virt.addr + blocks * AES_BLOCK_SIZE;
-                u8 *tsrc = walk.src.virt.addr + blocks * AES_BLOCK_SIZE;
-                u8 __aligned(8) tail[AES_BLOCK_SIZE];
+On 8/24/2016 6:52 PM, Santosh Shilimkar wrote:
+> Semantically the expectation from the tasklet init/kill API
+> should be as below.
+>
+> tasklet_init() == Init and Enable scheduling
+> tasklet_kill() == Disable scheduling and Destroy
+>
+> tasklet_init() API exibit above behavior but not the
+> tasklet_kill(). The tasklet handler can still get scheduled
+> and run even after the tasklet_kill().
+>
+> There are 2, 3 places where drivers are working around
+> this issue by calling tasklet_disable() which will add an
+> usecount and there by avoiding the handlers being called.
+>
+> tasklet_enable/tasklet_disable is a pair API and expected
+> to be used together. Usage of tasklet_disable() *just* to
+> workround tasklet scheduling after kill is probably not the
+> correct and inteded use of the API as done the API.
+> We also happen to see similar issue where in shutdown path
+> the tasklet_handler was getting called even after the
+> tasklet_kill().
+>
+> We fix this be making sure tasklet_kill() does right
+> thing and there by ensuring tasklet handler won't run after
+> tasklet_kil() with very simple change. Patch fixes the tasklet
+> code and also few drivers workarounds.
+>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Tadeusz Struk <tadeusz.struk@intel.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Paul Bolle <pebolle@tiscali.nl>
+> Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Cc: Salvatore Benedetto <salvatore.benedetto@intel.com>
+> Cc: Karsten Keil <isdn@linux-pingi.de>
+> Cc: "Peter Zijlstra (Intel)" <peterz@infradead.org>
+>
+> Signed-off-by: Santosh Shilimkar <ssantosh@kernel.org>
+> ---
+> Removed RFC tag from last post and dropped atmel serial
+> driver which seems to have been fixed in 4.8
+>
+> https://lkml.org/lkml/2016/8/7/7
+>
+>  drivers/crypto/qat/qat_common/adf_isr.c    | 1 -
+>  drivers/crypto/qat/qat_common/adf_sriov.c  | 1 -
+>  drivers/crypto/qat/qat_common/adf_vf_isr.c | 2 --
+>  drivers/isdn/gigaset/interface.c           | 1 -
+>  kernel/softirq.c                           | 7 ++++---
+>  5 files changed, 4 insertions(+), 8 deletions(-)
+>
+> diff --git a/drivers/crypto/qat/qat_common/adf_isr.c b/drivers/crypto/qat/qat_common/adf_isr.c
+> index 06d4901..fd5e900 100644
+> --- a/drivers/crypto/qat/qat_common/adf_isr.c
+> +++ b/drivers/crypto/qat/qat_common/adf_isr.c
+> @@ -296,7 +296,6 @@ static void adf_cleanup_bh(struct adf_accel_dev *accel_dev)
+>  	int i;
+>
+>  	for (i = 0; i < hw_data->num_banks; i++) {
+> -		tasklet_disable(&priv_data->banks[i].resp_handler);
+>  		tasklet_kill(&priv_data->banks[i].resp_handler);
+>  	}
+>  }
+> diff --git a/drivers/crypto/qat/qat_common/adf_sriov.c b/drivers/crypto/qat/qat_common/adf_sriov.c
+> index 9320ae1..bc7c2fa 100644
+> --- a/drivers/crypto/qat/qat_common/adf_sriov.c
+> +++ b/drivers/crypto/qat/qat_common/adf_sriov.c
+> @@ -204,7 +204,6 @@ void adf_disable_sriov(struct adf_accel_dev *accel_dev)
+>  	}
+>
+>  	for (i = 0, vf = accel_dev->pf.vf_info; i < totalvfs; i++, vf++) {
+> -		tasklet_disable(&vf->vf2pf_bh_tasklet);
+>  		tasklet_kill(&vf->vf2pf_bh_tasklet);
+>  		mutex_destroy(&vf->pf2vf_lock);
+>  	}
+> diff --git a/drivers/crypto/qat/qat_common/adf_vf_isr.c b/drivers/crypto/qat/qat_common/adf_vf_isr.c
+> index bf99e11..6e38bff 100644
+> --- a/drivers/crypto/qat/qat_common/adf_vf_isr.c
+> +++ b/drivers/crypto/qat/qat_common/adf_vf_isr.c
+> @@ -191,7 +191,6 @@ static int adf_setup_pf2vf_bh(struct adf_accel_dev *accel_dev)
+>
+>  static void adf_cleanup_pf2vf_bh(struct adf_accel_dev *accel_dev)
+>  {
+> -	tasklet_disable(&accel_dev->vf.pf2vf_bh_tasklet);
+>  	tasklet_kill(&accel_dev->vf.pf2vf_bh_tasklet);
+>  	mutex_destroy(&accel_dev->vf.vf2pf_lock);
+>  }
+> @@ -268,7 +267,6 @@ static void adf_cleanup_bh(struct adf_accel_dev *accel_dev)
+>  {
+>  	struct adf_etr_data *priv_data = accel_dev->transport;
+>
+> -	tasklet_disable(&priv_data->banks[0].resp_handler);
+>  	tasklet_kill(&priv_data->banks[0].resp_handler);
+>  }
+>
+> diff --git a/drivers/isdn/gigaset/interface.c b/drivers/isdn/gigaset/interface.c
+> index 600c79b..2ce63b6 100644
+> --- a/drivers/isdn/gigaset/interface.c
+> +++ b/drivers/isdn/gigaset/interface.c
+> @@ -524,7 +524,6 @@ void gigaset_if_free(struct cardstate *cs)
+>  	if (!drv->have_tty)
+>  		return;
+>
+> -	tasklet_disable(&cs->if_wake_tasklet);
+>  	tasklet_kill(&cs->if_wake_tasklet);
+>  	cs->tty_dev = NULL;
+>  	tty_unregister_device(drv->tty, cs->minor_index);
+> diff --git a/kernel/softirq.c b/kernel/softirq.c
+> index 17caf4b..21397eb 100644
+> --- a/kernel/softirq.c
+> +++ b/kernel/softirq.c
+> @@ -498,7 +498,7 @@ static void tasklet_action(struct softirq_action *a)
+>  		list = list->next;
+>
+>  		if (tasklet_trylock(t)) {
+> -			if (!atomic_read(&t->count)) {
+> +			if (atomic_read(&t->count) == 1) {
+>  				if (!test_and_clear_bit(TASKLET_STATE_SCHED,
+>  							&t->state))
+>  					BUG();
+> @@ -534,7 +534,7 @@ static void tasklet_hi_action(struct softirq_action *a)
+>  		list = list->next;
+>
+>  		if (tasklet_trylock(t)) {
+> -			if (!atomic_read(&t->count)) {
+> +			if (atomic_read(&t->count) == 1) {
+>  				if (!test_and_clear_bit(TASKLET_STATE_SCHED,
+>  							&t->state))
+>  					BUG();
+> @@ -559,7 +559,7 @@ void tasklet_init(struct tasklet_struct *t,
+>  {
+>  	t->next = NULL;
+>  	t->state = 0;
+> -	atomic_set(&t->count, 0);
+> +	atomic_set(&t->count, 1);
+>  	t->func = func;
+>  	t->data = data;
+>  }
+> @@ -576,6 +576,7 @@ void tasklet_kill(struct tasklet_struct *t)
+>  		} while (test_bit(TASKLET_STATE_SCHED, &t->state));
+>  	}
+>  	tasklet_unlock_wait(t);
+> +	atomic_dec(&t->count);
+>  	clear_bit(TASKLET_STATE_SCHED, &t->state);
+>  }
+>  EXPORT_SYMBOL(tasklet_kill);
+>
