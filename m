@@ -1,49 +1,105 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: [PATCH] hwrng: geode-rng - Use linux/io.h instead of asm/io.h
-Date: Sun, 11 Sep 2016 20:54:26 +0530
-Message-ID: <1473607466-25929-1-git-send-email-prasannatsmkumar@gmail.com>
-Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-To: herbert@gondor.apana.org.au, mpm@selenic.com,
-        linux-geode@lists.infradead.org, linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:34332 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751044AbcIKPZN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Sep 2016 11:25:13 -0400
-Received: by mail-pf0-f194.google.com with SMTP id g202so6797439pfb.1
-        for <linux-crypto@vger.kernel.org>; Sun, 11 Sep 2016 08:25:13 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: liushuoran <liushuoran@huawei.com>
+Subject: RE: Kernel panic - encryption/decryption failed when open file on
+ Arm64
+Date: Mon, 12 Sep 2016 02:16:30 +0000
+Message-ID: <00B10D30F2BAA743B48953A4D86C96D54C8A8A@SZXEMI506-MBS.china.huawei.com>
+References: <57D15BD3.40903@huawei.com>
+ <20160908124709.GA26586@gondor.apana.org.au> <57D28CB8.4080904@huawei.com>
+ <CAKv+Gu9JDCHDteOvgpEg4SJP4OKgM6=euF3pzBcXDJxTt=dAYg@mail.gmail.com>
+ <CAKv+Gu8w+BuwxQjOtpnFPHnJNUzq7m0K+KJ8=FG2wHigaB54ng@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Theodore Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
+        "nhorman@tuxdriver.com" <nhorman@tuxdriver.com>,
+        "mh1@iki.fi" <mh1@iki.fi>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Wangbintian <bintian.wang@huawei.com>,
+        Huxinwei <huxinwei@huawei.com>,
+        "zhangzhibin (C)" <zhangzhibin.zhang@huawei.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Xiakaixu <xiakaixu@huawei.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAKv+Gu8w+BuwxQjOtpnFPHnJNUzq7m0K+KJ8=FG2wHigaB54ng@mail.gmail.com>
+Content-Language: zh-CN
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Fix checkpatch.pl warning by changing from asm/io.h to linux/io.h. In
-the mean time arrange the includes in alphabetical order.
-
-Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
----
- drivers/char/hw_random/geode-rng.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/char/hw_random/geode-rng.c b/drivers/char/hw_random/geode-rng.c
-index 79e7482..0cae210 100644
---- a/drivers/char/hw_random/geode-rng.c
-+++ b/drivers/char/hw_random/geode-rng.c
-@@ -24,12 +24,12 @@
-  * warranty of any kind, whether express or implied.
-  */
- 
--#include <linux/module.h>
-+#include <linux/delay.h>
-+#include <linux/hw_random.h>
-+#include <linux/io.h>
- #include <linux/kernel.h>
-+#include <linux/module.h>
- #include <linux/pci.h>
--#include <linux/hw_random.h>
--#include <linux/delay.h>
--#include <asm/io.h>
- 
- #define GEODE_RNG_DATA_REG   0x50
- #define GEODE_RNG_STATUS_REG 0x54
--- 
-2.5.0
+SGkgQXJkLA0KDQpUaGFua3MgZm9yIHRoZSBwcm9tcHQgcmVwbHkuIFdpdGggdGhlIHBhdGNoLCB0
+aGVyZSBpcyBubyBwYW5pYyBhbnltb3JlLiBCdXQgaXQgc2VlbXMgdGhhdCB0aGUgZW5jcnlwdGlv
+bi9kZWNyeXB0aW9uIGlzIG5vdCBzdWNjZXNzZnVsIGFueXdheS4NCg0KQXMgSGVyYmVydCBwb2lu
+dHMgb3V0LCAiSWYgdGhlIHBhZ2UgYWxsb2NhdGlvbiBmYWlscyBpbiBibGtjaXBoZXJfd2Fsa19u
+ZXh0IGl0J2xsIHNpbXBseSBzd2l0Y2ggb3ZlciB0byBwcm9jZXNzaW5nIGl0IGJsb2NrIGJ5IGJs
+b2NrIi4gU28gZG9lcyB0aGF0IG1lYW4gdGhlIGVuY3J5cHRpb24vZGVjcnlwdGlvbiBzaG91bGQg
+YmUgc3VjY2Vzc2Z1bCBldmVuIGlmIHRoZSBwYWdlIGFsbG9jYXRpb24gZmFpbHM/IFBsZWFzZSBj
+b3JyZWN0IG1lIGlmIEkgbWlzdW5kZXJzdGFuZCBhbnl0aGluZy4gVGhhbmtzIGluIGFkdmFuY2Uu
+DQoNClJlZ2FyZHMsDQpTaHVvcmFuDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4g
+RnJvbTogQXJkIEJpZXNoZXV2ZWwgW21haWx0bzphcmQuYmllc2hldXZlbEBsaW5hcm8ub3JnXQ0K
+PiBTZW50OiBGcmlkYXksIFNlcHRlbWJlciAwOSwgMjAxNiA2OjU3IFBNDQo+IFRvOiBYaWFrYWl4
+dQ0KPiBDYzogSGVyYmVydCBYdTsgRGF2aWQgUy4gTWlsbGVyOyBUaGVvZG9yZSBUcydvOyBKYWVn
+ZXVrIEtpbTsNCj4gbmhvcm1hbkB0dXhkcml2ZXIuY29tOyBtaDFAaWtpLmZpOyBsaW51eC1jcnlw
+dG9Admdlci5rZXJuZWwub3JnOw0KPiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBXYW5n
+YmludGlhbjsgbGl1c2h1b3JhbjsgSHV4aW53ZWk7IHpoYW5nemhpYmluDQo+IChDKQ0KPiBTdWJq
+ZWN0OiBSZTogS2VybmVsIHBhbmljIC0gZW5jcnlwdGlvbi9kZWNyeXB0aW9uIGZhaWxlZCB3aGVu
+IG9wZW4gZmlsZSBvbg0KPiBBcm02NA0KPiANCj4gT24gOSBTZXB0ZW1iZXIgMjAxNiBhdCAxMToz
+MSwgQXJkIEJpZXNoZXV2ZWwgPGFyZC5iaWVzaGV1dmVsQGxpbmFyby5vcmc+DQo+IHdyb3RlOg0K
+PiA+IE9uIDkgU2VwdGVtYmVyIDIwMTYgYXQgMTE6MTksIHhpYWthaXh1IDx4aWFrYWl4dUBodWF3
+ZWkuY29tPiB3cm90ZToNCj4gPj4gSGksDQo+ID4+DQo+ID4+IEFmdGVyIGEgZGVlcGx5IHJlc2Vh
+cmNoIGFib3V0IHRoaXMgY3Jhc2gsIHNlZW1zIGl0IGlzIGEgc3BlY2lmaWMNCj4gPj4gYnVnIHRo
+YXQgb25seSBleGlzdHMgaW4gYXJtdjggYm9hcmQuIEFuZCBpdCBvY2N1cnMgaW4gdGhpcyBmdW5j
+dGlvbg0KPiA+PiBpbiBhcmNoL2FybTY0L2NyeXB0by9hZXMtZ2x1ZS5jLg0KPiA+Pg0KPiA+PiBz
+dGF0aWMgaW50IGN0cl9lbmNyeXB0KHN0cnVjdCBibGtjaXBoZXJfZGVzYyAqZGVzYywgc3RydWN0
+IHNjYXR0ZXJsaXN0ICpkc3QsDQo+ID4+ICAgICAgICAgICAgICAgICAgICAgICAgc3RydWN0IHNj
+YXR0ZXJsaXN0ICpzcmMsIHVuc2lnbmVkIGludCBuYnl0ZXMpDQo+ID4+IHsNCj4gPj4gICAgICAg
+IC4uLg0KPiA+Pg0KPiA+PiAgICAgICAgIGRlc2MtPmZsYWdzICY9IH5DUllQVE9fVEZNX1JFUV9N
+QVlfU0xFRVA7DQo+ID4+ICAgICAgICAgYmxrY2lwaGVyX3dhbGtfaW5pdCgmd2FsaywgZHN0LCBz
+cmMsIG5ieXRlcyk7DQo+ID4+ICAgICAgICAgZXJyID0gYmxrY2lwaGVyX3dhbGtfdmlydF9ibG9j
+ayhkZXNjLCAmd2FsaywgQUVTX0JMT0NLX1NJWkUpOw0KPiAtLS0+DQo+ID4+IHBhZ2UgYWxsb2Nh
+dGlvbiBmYWlsZWQNCj4gPj4NCj4gPj4gICAgICAgICAuLi4NCj4gPj4NCj4gPj4gICAgICAgICB3
+aGlsZSAoKGJsb2NrcyA9ICh3YWxrLm5ieXRlcyAvIEFFU19CTE9DS19TSVpFKSkpDQo+IHsgICAg
+ICAgICAgIC0tLS0+DQo+ID4+IHdhbGsubmJ5dGVzID0gMCwgYW5kIHNraXAgdGhpcyBsb29wDQo+
+ID4+ICAgICAgICAgICAgICAgICBhZXNfY3RyX2VuY3J5cHQod2Fsay5kc3QudmlydC5hZGRyLCB3
+YWxrLnNyYy52aXJ0LmFkZHIsDQo+ID4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+KHU4ICopY3R4LT5rZXlfZW5jLCByb3VuZHMsIGJsb2NrcywNCj4gd2Fsay5pdiwNCj4gPj4gICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBmaXJzdCk7DQo+ID4+ICAgICAgICAgLi4uDQo+
+ID4+ICAgICAgICAgICAgICAgICBlcnIgPSBibGtjaXBoZXJfd2Fsa19kb25lKGRlc2MsICZ3YWxr
+LA0KPiA+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB3YWxrLm5i
+eXRlcyAlDQo+IEFFU19CTE9DS19TSVpFKTsNCj4gPj4gICAgICAgICB9DQo+ID4+ICAgICAgICAg
+aWYgKG5ieXRlcykNCj4geyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAtLS0tPg0KPiA+PiBlbnRlciB0aGlzIGlmKCkgc3RhdGVtZW50DQo+ID4+ICAgICAg
+ICAgICAgICAgICB1OCAqdGRzdCA9IHdhbGsuZHN0LnZpcnQuYWRkciArIGJsb2NrcyAqIEFFU19C
+TE9DS19TSVpFOw0KPiA+PiAgICAgICAgICAgICAgICAgdTggKnRzcmMgPSB3YWxrLnNyYy52aXJ0
+LmFkZHIgKyBibG9ja3MgKiBBRVNfQkxPQ0tfU0laRTsNCj4gPj4gICAgICAgICAuLi4NCj4gPj4N
+Cj4gPj4gICAgICAgICAgICAgICAgIGFlc19jdHJfZW5jcnlwdCh0YWlsLCB0c3JjLCAodTggKilj
+dHgtPmtleV9lbmMsIHJvdW5kcywNCj4gPj4gLS0tLT4gdGhlIHRoZSBzZW5jb25kIGlucHV0IHBh
+cmFtZXRlciBpcyBOVUxMLCBzbyBjcmFzaC4uLg0KPiA+PiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIGJsb2Nrcywgd2Fsay5pdiwgZmlyc3QpOw0KPiA+PiAgICAgICAgIC4uLg0KPiA+
+PiAgICAgICAgIH0NCj4gPj4gICAgICAgICAuLi4NCj4gPj4gfQ0KPiA+Pg0KPiA+Pg0KPiA+PiBJ
+ZiB0aGUgcGFnZSBhbGxvY2F0aW9uIGZhaWxlZCBpbiB0aGUgZnVuY3Rpb24gYmxrY2lwaGVyX3dh
+bGtfdmlydF9ibG9jaygpLA0KPiA+PiB0aGUgdmFyaWFibGUgd2Fsay5uYnl0ZXMgPSAwLCBzbyBp
+dCB3aWxsIHNraXAgdGhlIHdoaWxlKCkgbG9vcCBhbmQgZW50ZXINCj4gPj4gdGhlIGlmKG5ieXRl
+cykgc3RhdG1lbnQuIEJ1dCBoZXJlIHRoZSB2YXJpYmFsZSB0c3JjIGlzIE5VTEwgYW5kIGl0IGlz
+IGFsc28NCj4gPj4gdGhlIHNlbmNvbmQgaW5wdXQgcGFyYW1ldGVyIG9mIHRoZSBmdW5jdGlvbiBh
+ZXNfY3RyX2VuY3J5cHQoKS4uLiBLZXJuZWwNCj4gPj4gUGFuaWMuLi4NCj4gPj4NCj4gPj4gSSBo
+YXZlIGFsc28gcmVzZWFyY2hlZCB0aGUgc2ltaWxhciBmdW5jdGlvbiBpbiBvdGhlciBhcmNoaXRl
+Y3R1cmVzLCBhbmQNCj4gPj4gdGhlcmUgaWYod2Fsay5uYnl0ZXMpIGlzIHVzZWQsIG5vdCB0aGlz
+IGlmKG5ieXRlcykgc3RhdGVtZW50IGluIHRoZSBhcm12OC4NCj4gPj4gc28gSSB0aGluayB0aGlz
+IGFybXY4IGZ1bmN0aW9uIGN0cl9lbmNyeXB0KCkgc2hvdWxkIGRlYWwgd2l0aCB0aGUgcGFnZQ0K
+PiA+PiBhbGxvY2F0aW9uIGZhaWxlZCBzaXR1YXRpb24uDQo+ID4+DQo+IA0KPiBEb2VzIHRoaXMg
+c29sdmUgeW91ciBwcm9ibGVtPw0KPiANCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvY3J5cHRv
+L2Flcy1nbHVlLmMgYi9hcmNoL2FybTY0L2NyeXB0by9hZXMtZ2x1ZS5jDQo+IGluZGV4IDVjODg4
+MDQ5ZDA2MS4uNmIyYWEwZmQ2Y2QwIDEwMDY0NA0KPiAtLS0gYS9hcmNoL2FybTY0L2NyeXB0by9h
+ZXMtZ2x1ZS5jDQo+ICsrKyBiL2FyY2gvYXJtNjQvY3J5cHRvL2Flcy1nbHVlLmMNCj4gQEAgLTIx
+Niw3ICsyMTYsNyBAQCBzdGF0aWMgaW50IGN0cl9lbmNyeXB0KHN0cnVjdCBibGtjaXBoZXJfZGVz
+Yw0KPiAqZGVzYywgc3RydWN0IHNjYXR0ZXJsaXN0ICpkc3QsDQo+ICAgICAgICAgICAgICAgICBl
+cnIgPSBibGtjaXBoZXJfd2Fsa19kb25lKGRlc2MsICZ3YWxrLA0KPiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICB3YWxrLm5ieXRlcyAlIEFFU19CTE9DS19TSVpFKTsN
+Cj4gICAgICAgICB9DQo+IC0gICAgICAgaWYgKG5ieXRlcykgew0KPiArICAgICAgIGlmICh3YWxr
+Lm5ieXRlcyAlIEFFU19CTE9DS19TSVpFKSB7DQo+ICAgICAgICAgICAgICAgICB1OCAqdGRzdCA9
+IHdhbGsuZHN0LnZpcnQuYWRkciArIGJsb2NrcyAqIEFFU19CTE9DS19TSVpFOw0KPiAgICAgICAg
+ICAgICAgICAgdTggKnRzcmMgPSB3YWxrLnNyYy52aXJ0LmFkZHIgKyBibG9ja3MgKiBBRVNfQkxP
+Q0tfU0laRTsNCj4gICAgICAgICAgICAgICAgIHU4IF9fYWxpZ25lZCg4KSB0YWlsW0FFU19CTE9D
+S19TSVpFXTsNCg==
