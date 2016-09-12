@@ -1,30 +1,34 @@
-From: Patrice Chotard <patrice.chotard@st.com>
-Subject: Re: [PATCH -next] hwrng: st - Fix missing clk_disable_unprepare() on
- error in st_rng_probe()
-Date: Mon, 12 Sep 2016 09:27:14 +0200
-Message-ID: <f427e4a6-1807-2f32-4a1b-ad3150a17135@st.com>
+From: Peter Griffin <peter.griffin@linaro.org>
+Subject: Re: [STLinux Kernel] [PATCH -next] hwrng: st - Fix missing
+ clk_disable_unprepare() on error in st_rng_probe()
+Date: Mon, 12 Sep 2016 09:31:25 +0100
+Message-ID: <20160912083125.GA20253@griffinp-ThinkPad-X1-Carbon-2nd>
 References: <1473509022-3478-1-git-send-email-weiyj.lk@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyongjun1@huawei.com>,
-        <linux-arm-kernel@lists.infradead.org>, <kernel@stlinux.com>,
-        <linux-crypto@vger.kernel.org>
-To: Wei Yongjun <weiyj.lk@gmail.com>, Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Patrice Chotard <patrice.chotard@st.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Wei Yongjun <weiyongjun1@huawei.com>, kernel@stlinux.com,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
+To: Wei Yongjun <weiyj.lk@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx07-00178001.pphosted.com ([62.209.51.94]:26512 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752088AbcILH2F (ORCPT
+Received: from mail-wm0-f46.google.com ([74.125.82.46]:36205 "EHLO
+        mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750896AbcILIba (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Sep 2016 03:28:05 -0400
+        Mon, 12 Sep 2016 04:31:30 -0400
+Received: by mail-wm0-f46.google.com with SMTP id b187so123312890wme.1
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Sep 2016 01:31:29 -0700 (PDT)
+Content-Disposition: inline
 In-Reply-To: <1473509022-3478-1-git-send-email-weiyj.lk@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Wey
+Hi Wei,
 
-On 09/10/2016 02:03 PM, Wei Yongjun wrote:
+On Sat, 10 Sep 2016, Wei Yongjun wrote:
+
 > From: Wei Yongjun <weiyongjun1@huawei.com>
 > 
 > Fix the missing clk_disable_unprepare() before return
@@ -48,10 +52,5 @@ On 09/10/2016 02:03 PM, Wei Yongjun wrote:
 >  	}
 >  
 > 
-> 
-> 
 
-
-Acked-by: Patrice Chotard <patrice.chotard@st.com>
-
-Thanks
+Acked-by: Peter Griffin <peter.griffin@linaro.org>
