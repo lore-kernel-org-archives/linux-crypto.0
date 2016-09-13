@@ -1,46 +1,105 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: arm/aes-ctr: fix NULL dereference in tail
- processing
-Date: Tue, 13 Sep 2016 20:43:54 +0800
-Message-ID: <20160913124354.GI31835@gondor.apana.org.au>
-References: <1473756533-21078-1-git-send-email-ard.biesheuvel@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        xiakaixu@huawei.com
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v7 0/9] crypto: asynchronous compression api
+Date: Tue, 13 Sep 2016 13:49:32 +0100
+Message-ID: <1473770981-9869-1-git-send-email-giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:35451 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752028AbcIMMoB (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Sep 2016 08:44:01 -0400
-Content-Disposition: inline
-In-Reply-To: <1473756533-21078-1-git-send-email-ard.biesheuvel@linaro.org>
+Received: from mga05.intel.com ([192.55.52.43]:5252 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752217AbcIMMtz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Sep 2016 08:49:55 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Sep 13, 2016 at 09:48:52AM +0100, Ard Biesheuvel wrote:
-> The AES-CTR glue code avoids calling into the blkcipher API for the
-> tail portion of the walk, by comparing the remainder of walk.nbytes
-> modulo AES_BLOCK_SIZE with the residual nbytes, and jumping straight
-> into the tail processing block if they are equal. This tail processing
-> block checks whether nbytes != 0, and does nothing otherwise.
-> 
-> However, in case of an allocation failure in the blkcipher layer, we
-> may enter this code with walk.nbytes == 0, while nbytes > 0. In this
-> case, we should not dereference the source and destination pointers,
-> since they may be NULL. So instead of checking for nbytes != 0, check
-> for (walk.nbytes % AES_BLOCK_SIZE) != 0, which implies the former in
-> non-error conditions.
-> 
-> Fixes: 86464859cc77 ("crypto: arm - AES in ECB/CBC/CTR/XTS modes using ARMv8 Crypto Extensions")
-> Reported-by: xiakaixu <xiakaixu@huawei.com>
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
+The following patch set introduces acomp, a generic asynchronous
+(de)compression api with support for SG lists.
+We propose a new crypto type called crypto_acomp_type, a new struct acomp_alg
+and struct crypto_acomp, together with number of helper functions to register
+acomp type algorithms and allocate tfm instances.
+This interface will allow the following operations:
 
-Both patches applied.  Thanks.
+    int (*compress)(struct acomp_req *req);
+    int (*decompress)(struct acomp_req *req);
+
+Together with acomp we propose a new driver-side interface, scomp, which
+targets legacy synchronous implementation. We converted all compression
+algorithms available in LKCF to use this interface so that those algos will be 
+accessible through the acomp api.
+
+Changes in v7:
+    - removed linearization of SG lists and per-request vmalloc allocations in
+      scomp layer
+    - modified scomp internal API to use SG lists
+    - introduced per-cpu cache of 128K scratch buffers allocated using vmalloc 
+      in legacy scomp algorithms
+
+Changes in v6:
+    - changed acomp_request_alloc prototype by removing gfp parameter. 
+      acomp_request_alloc will always use GFP_KERNEL
+
+Changes in v5:
+    - removed qdecompress api, no longer needed
+    - removed produced and consumed counters in acomp_req
+    - added crypto_has_acomp function 
+
+Changes in v4:
+    - added qdecompress api, a front-end for decompression algorithms which
+      do not need additional vmalloc work space
+
+Changes in v3:
+    - added driver-side scomp interface
+    - provided support for lzo, lz4, lz4hc, 842, deflate compression algorithms
+      via the acomp api (through scomp)
+    - extended testmgr to support acomp
+    - removed extended acomp api for supporting deflate algorithm parameters
+      (will be enhanced and re-proposed in future)
+Note that (2) to (7) are a rework of Joonsoo Kim's scomp patches.
+
+Changes in v2:
+    - added compression and decompression request sizes in acomp_alg
+      in order to enable noctx support
+    - extended api with helpers to allocate compression and
+      decompression requests
+
+Changes from initial submit:
+    - added consumed and produced fields to acomp_req
+    - extended api to support configuration of deflate compressors
+
+--- 
+Giovanni Cabiddu (9):
+  crypto: add asynchronous compression api
+  crypto: add driver-side scomp interface
+  crypto: scomp - add scratch buffers allocator and deallocator
+  crypto: acomp - add support for lzo via scomp
+  crypto: acomp - add support for lz4 via scomp
+  crypto: acomp - add support for lz4hc via scomp
+  crypto: acomp - add support for 842 via scomp
+  crypto: acomp - add support for deflate via scomp
+  crypto: acomp - update testmgr with support for acomp
+
+ crypto/842.c                        |  135 ++++++++++++++++++-
+ crypto/Kconfig                      |   15 ++
+ crypto/Makefile                     |    3 +
+ crypto/acompress.c                  |  163 ++++++++++++++++++++++
+ crypto/crypto_user.c                |   19 +++
+ crypto/deflate.c                    |  166 +++++++++++++++++++++--
+ crypto/lz4.c                        |  147 +++++++++++++++++++--
+ crypto/lz4hc.c                      |  147 +++++++++++++++++++--
+ crypto/lzo.c                        |  146 ++++++++++++++++++--
+ crypto/scompress.c                  |  225 +++++++++++++++++++++++++++++++
+ crypto/testmgr.c                    |  158 ++++++++++++++++++++--
+ include/crypto/acompress.h          |  253 +++++++++++++++++++++++++++++++++++
+ include/crypto/internal/acompress.h |   81 +++++++++++
+ include/crypto/internal/scompress.h |  139 +++++++++++++++++++
+ include/linux/crypto.h              |    3 +
+ 15 files changed, 1742 insertions(+), 58 deletions(-)
+ create mode 100644 crypto/acompress.c
+ create mode 100644 crypto/scompress.c
+ create mode 100644 include/crypto/acompress.h
+ create mode 100644 include/crypto/internal/acompress.h
+ create mode 100644 include/crypto/internal/scompress.h
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.4.1
