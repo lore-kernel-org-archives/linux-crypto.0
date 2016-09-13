@@ -1,32 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 2/2] crypto: qat - fix resource release omissions
-Date: Tue, 13 Sep 2016 20:40:06 +0800
-Message-ID: <20160913124006.GB31835@gondor.apana.org.au>
-References: <20160902144753.31334-1-lambert.quentin@gmail.com>
- <20160902144753.31334-3-lambert.quentin@gmail.com>
- <20160906101851.GA27032@sivswdev01.ir.intel.com>
+Subject: Re: [PATCH v2] hwrng: core - Allocate memory during module init
+Date: Tue, 13 Sep 2016 20:40:36 +0800
+Message-ID: <20160913124036.GC31835@gondor.apana.org.au>
+References: <1473259682-11655-1-git-send-email-prasannatsmkumar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Quentin Lambert <lambert.quentin@gmail.com>,
-        Salvatore Benedetto <salvatore.benedetto@intel.com>,
-        "David S. Miller" <davem@davemloft.net>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, giovanni.cabiddu@gmail.com
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: mpm@selenic.com, lee.jones@linaro.org, jslaby@suse.cz,
+        peter@korsgaard.com, linux-crypto@vger.kernel.org
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:55941 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755289AbcIMMlA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Sep 2016 08:41:00 -0400
 Content-Disposition: inline
-In-Reply-To: <20160906101851.GA27032@sivswdev01.ir.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1473259682-11655-1-git-send-email-prasannatsmkumar@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Sep 06, 2016 at 11:18:51AM +0100, Giovanni Cabiddu wrote:
+On Wed, Sep 07, 2016 at 08:18:02PM +0530, PrasannaKumar Muralidharan wrote:
+> In core rng_buffer and rng_fillbuf is allocated in hwrng_register only
+> once and it is freed during module exit. This patch moves allocating
+> rng_buffer and rng_fillbuf from hwrng_register to rng core's init. This
+> avoids checking whether rng_buffer and rng_fillbuf was allocated from
+> every hwrng_register call. Also moving them to module init makes it
+> explicit that it is freed in module exit.
 > 
-> ---8<---
-> Subject: [PATCH] crypto: qat - fix leak on error path
+> Change in v2:
+> Fix memory leak when register_miscdev fails.
 > 
-> Fix a memory leak in an error path in uc loader.
-> 
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 
 Patch applied.  Thanks.
 -- 
