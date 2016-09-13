@@ -1,45 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3] crypto: only call put_page on referenced and used
- pages
-Date: Tue, 13 Sep 2016 18:08:16 +0800
-Message-ID: <20160913100816.GA30804@gondor.apana.org.au>
-References: <13399079.xub8KL5p6S@positron.chronox.de>
- <1794862.SeMhQgguHO@positron.chronox.de>
+Subject: Re: algif_aead: AIO broken with more than one iocb
+Date: Tue, 13 Sep 2016 18:12:46 +0800
+Message-ID: <20160913101246.GA30851@gondor.apana.org.au>
+References: <6245755.LbXSUvPjJL@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60339 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:44560 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756513AbcIMKI2 (ORCPT
+        with ESMTP id S1756705AbcIMKNB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Sep 2016 06:08:28 -0400
+        Tue, 13 Sep 2016 06:13:01 -0400
 Content-Disposition: inline
-In-Reply-To: <1794862.SeMhQgguHO@positron.chronox.de>
+In-Reply-To: <6245755.LbXSUvPjJL@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Sep 13, 2016 at 10:18:54AM +0200, Stephan Mueller wrote:
-> Am Montag, 12. September 2016, 14:43:45 CEST schrieb Stephan Mueller:
-> 
+On Sun, Sep 11, 2016 at 04:59:19AM +0200, Stephan Mueller wrote:
 > Hi Herbert,
 > 
-> > Hi Herbert,
-> > 
-> > after getting the AIO code working on sendmsg, tried it with vmsplice/splice
-> > and I get a memory corruption. Interestingly, the stack trace is partially
-> > garbled too. Thus, tracking this one down may be a bit of a challenge.
+> The AIO support for algif_aead is broken when submitting more than one iocb. 
+> The break happens in aead_recvmsg_async at the following code:
 > 
-> The issue is a NULL pointer dereference in skcipher_free_async_sgls. The issue is that SGs may not have even a page mapped to them and thus the page entry is NULL.
+>         /* ensure output buffer is sufficiently large */
+>         if (usedpages < outlen)
+>                 goto free;
 > 
-> The following patch fixes the issue and replaces the patch I sent earlier.
+> The reason is that when submitting, say, two iocb, ctx->used contains the 
+> buffer length for two AEAD operations (as expected). However, the recvmsg code 
 
-This patch appears to be papering over a real bug.
+I don't think we should allow that.  We should make it so that you
+must start a recvmsg before you can send data for a new request.
 
-The async path should be exactly the same as the sync path, except
-that we don't wait for completion.  So the question is why are we
-getting this crash here for async but not sync?
+Remember that the async path should be identical to the sync path,
+except that you don't wait for completion.
 
 Cheers,
 -- 
