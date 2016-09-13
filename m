@@ -1,70 +1,53 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v3] crypto: only call put_page on referenced and used pages
-Date: Tue, 13 Sep 2016 10:18:54 +0200
-Message-ID: <1794862.SeMhQgguHO@positron.chronox.de>
-References: <13399079.xub8KL5p6S@positron.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 1/2] crypto: arm/aes-ctr: fix NULL dereference in tail processing
+Date: Tue, 13 Sep 2016 09:48:52 +0100
+Message-ID: <1473756533-21078-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: xiakaixu@huawei.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        linux-arm-kernel@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47942 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752008AbcIMITD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Sep 2016 04:19:03 -0400
-In-Reply-To: <13399079.xub8KL5p6S@positron.chronox.de>
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:37109 "EHLO
+        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755555AbcIMItA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Sep 2016 04:49:00 -0400
+Received: by mail-wm0-f41.google.com with SMTP id c131so99834822wmh.0
+        for <linux-crypto@vger.kernel.org>; Tue, 13 Sep 2016 01:48:59 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 12. September 2016, 14:43:45 CEST schrieb Stephan Mueller:
+The AES-CTR glue code avoids calling into the blkcipher API for the
+tail portion of the walk, by comparing the remainder of walk.nbytes
+modulo AES_BLOCK_SIZE with the residual nbytes, and jumping straight
+into the tail processing block if they are equal. This tail processing
+block checks whether nbytes != 0, and does nothing otherwise.
 
-Hi Herbert,
+However, in case of an allocation failure in the blkcipher layer, we
+may enter this code with walk.nbytes == 0, while nbytes > 0. In this
+case, we should not dereference the source and destination pointers,
+since they may be NULL. So instead of checking for nbytes != 0, check
+for (walk.nbytes % AES_BLOCK_SIZE) != 0, which implies the former in
+non-error conditions.
 
-> Hi Herbert,
-> 
-> after getting the AIO code working on sendmsg, tried it with vmsplice/splice
-> and I get a memory corruption. Interestingly, the stack trace is partially
-> garbled too. Thus, tracking this one down may be a bit of a challenge.
-
-The issue is a NULL pointer dereference in skcipher_free_async_sgls. The issue is that SGs may not have even a page mapped to them and thus the page entry is NULL.
-
-The following patch fixes the issue and replaces the patch I sent earlier.
-
----8<---
-
-For asynchronous operation, SGs are allocated without a page mapped to
-them or with a page that is not used (ref-counted). If the SGL is freed,
-the code must only call put_page for an SG if there was a page assigned
-and ref-counted in the first place.
-
-This fixes a kernel crash when using io_submit with more than one iocb
-using the sendmsg and sendpage (vmsplice/splice) interface
-
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Fixes: 86464859cc77 ("crypto: arm - AES in ECB/CBC/CTR/XTS modes using ARMv8 Crypto Extensions")
+Reported-by: xiakaixu <xiakaixu@huawei.com>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/algif_skcipher.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ arch/arm/crypto/aes-ce-glue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 28556fc..45af0fe 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -86,8 +86,13 @@ static void skcipher_free_async_sgls(struct skcipher_async_req *sreq)
+diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
+index da3c0428507b..aef022a87c53 100644
+--- a/arch/arm/crypto/aes-ce-glue.c
++++ b/arch/arm/crypto/aes-ce-glue.c
+@@ -284,7 +284,7 @@ static int ctr_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
+ 		err = blkcipher_walk_done(desc, &walk,
+ 					  walk.nbytes % AES_BLOCK_SIZE);
  	}
- 	sgl = sreq->tsg;
- 	n = sg_nents(sgl);
--	for_each_sg(sgl, sg, n, i)
--		put_page(sg_page(sg));
-+	for_each_sg(sgl, sg, n, i) {
-+		struct page *page = sg_page(sg);
-+
-+		/* some SGs may not have a page mapped */
-+		if (page && page_ref_count(page))
-+			put_page(page);
-+	}
- 
- 	kfree(sreq->tsg);
- }
+-	if (nbytes) {
++	if (walk.nbytes % AES_BLOCK_SIZE) {
+ 		u8 *tdst = walk.dst.virt.addr + blocks * AES_BLOCK_SIZE;
+ 		u8 *tsrc = walk.src.virt.addr + blocks * AES_BLOCK_SIZE;
+ 		u8 __aligned(8) tail[AES_BLOCK_SIZE];
 -- 
 2.7.4
