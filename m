@@ -1,55 +1,48 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 2/2] crypto: arm64/aes-ctr: fix NULL dereference in tail processing
-Date: Tue, 13 Sep 2016 09:48:53 +0100
-Message-ID: <1473756533-21078-2-git-send-email-ard.biesheuvel@linaro.org>
-References: <1473756533-21078-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: xiakaixu@huawei.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        linux-arm-kernel@lists.infradead.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCHv3 06/11] crypto: omap-des: Fix support for unequal lengths
+Date: Tue, 13 Sep 2016 17:35:06 +0800
+Message-ID: <20160913093506.GA30561@gondor.apana.org.au>
+References: <1470306526-27219-1-git-send-email-t-kristo@ti.com>
+ <1470306526-27219-7-git-send-email-t-kristo@ti.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: lokeshvutla@ti.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, tony@atomide.com,
+        linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Lokesh Vutla <a0131933@ti.com>
+To: Tero Kristo <t-kristo@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f50.google.com ([74.125.82.50]:38227 "EHLO
-        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756474AbcIMItB (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:59409 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755679AbcIMJhG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Sep 2016 04:49:01 -0400
-Received: by mail-wm0-f50.google.com with SMTP id 1so187941171wmz.1
-        for <linux-crypto@vger.kernel.org>; Tue, 13 Sep 2016 01:49:01 -0700 (PDT)
-In-Reply-To: <1473756533-21078-1-git-send-email-ard.biesheuvel@linaro.org>
+        Tue, 13 Sep 2016 05:37:06 -0400
+Content-Disposition: inline
+In-Reply-To: <1470306526-27219-7-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The AES-CTR glue code avoids calling into the blkcipher API for the
-tail portion of the walk, by comparing the remainder of walk.nbytes
-modulo AES_BLOCK_SIZE with the residual nbytes, and jumping straight
-into the tail processing block if they are equal. This tail processing
-block checks whether nbytes != 0, and does nothing otherwise.
+On Thu, Aug 04, 2016 at 01:28:41PM +0300, Tero Kristo wrote:
+> From: Lokesh Vutla <a0131933@ti.com>
+> 
+> For cases where total length of an input SGs is not same as
+> length of the input data for encryption, omap-des driver
+> crashes. This happens in the case when IPsec is trying to use
+> omap-des driver.
+> 
+> To avoid this, we copy all the pages from the input SG list
+> into a contiguous buffer and prepare a single element SG list
+> for this buffer with length as the total bytes to crypt, which is
+> similar thing that is done in case of unaligned lengths.
 
-However, in case of an allocation failure in the blkcipher layer, we
-may enter this code with walk.nbytes == 0, while nbytes > 0. In this
-case, we should not dereference the source and destination pointers,
-since they may be NULL. So instead of checking for nbytes != 0, check
-for (walk.nbytes % AES_BLOCK_SIZE) != 0, which implies the former in
-non-error conditions.
+Ugh, that means copying every single packet, right?
 
-Fixes: 49788fe2a128 ("arm64/crypto: AES-ECB/CBC/CTR/XTS using ARMv8 NEON and Crypto Extensions")
-Reported-by: xiakaixu <xiakaixu@huawei.com>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm64/crypto/aes-glue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So if it's just the SG list that's the problem, why don't you
+copy that instead? That is, allocate a new SG list and set it
+up so that there is no excess data.
 
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index 5c888049d061..6b2aa0fd6cd0 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -216,7 +216,7 @@ static int ctr_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
- 		err = blkcipher_walk_done(desc, &walk,
- 					  walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	if (nbytes) {
-+	if (walk.nbytes % AES_BLOCK_SIZE) {
- 		u8 *tdst = walk.dst.virt.addr + blocks * AES_BLOCK_SIZE;
- 		u8 *tsrc = walk.src.virt.addr + blocks * AES_BLOCK_SIZE;
- 		u8 __aligned(8) tail[AES_BLOCK_SIZE];
+Cheers,
 -- 
-2.7.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
