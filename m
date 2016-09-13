@@ -1,43 +1,51 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: algif_aead: AIO broken with more than one iocb
-Date: Tue, 13 Sep 2016 18:12:46 +0800
-Message-ID: <20160913101246.GA30851@gondor.apana.org.au>
-References: <6245755.LbXSUvPjJL@positron.chronox.de>
+Subject: Crypto Fixes for 4.8
+Date: Tue, 13 Sep 2016 18:35:01 +0800
+Message-ID: <20160913103501.GA30944@gondor.apana.org.au>
+References: <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150415033951.GA1406@gondor.apana.org.au>
+ <20150622084457.GA7806@gondor.apana.org.au>
+ <20150831135655.GA2694@gondor.apana.org.au>
+ <20151102080427.GA8465@gondor.apana.org.au>
+ <20160111101450.GA24044@gondor.apana.org.au>
+ <20160122101828.GA15966@gondor.apana.org.au>
+ <20160801095821.GA1260@gondor.apana.org.au>
+ <20160905093318.GA30895@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44560 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:44047 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756705AbcIMKNB (ORCPT
+        with ESMTP id S1753312AbcIMKfX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Sep 2016 06:13:01 -0400
+        Tue, 13 Sep 2016 06:35:23 -0400
 Content-Disposition: inline
-In-Reply-To: <6245755.LbXSUvPjJL@positron.chronox.de>
+In-Reply-To: <20160905093318.GA30895@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Sep 11, 2016 at 04:59:19AM +0200, Stephan Mueller wrote:
-> Hi Herbert,
-> 
-> The AIO support for algif_aead is broken when submitting more than one iocb. 
-> The break happens in aead_recvmsg_async at the following code:
-> 
->         /* ensure output buffer is sufficiently large */
->         if (usedpages < outlen)
->                 goto free;
-> 
-> The reason is that when submitting, say, two iocb, ctx->used contains the 
-> buffer length for two AEAD operations (as expected). However, the recvmsg code 
+Hi Linus:
 
-I don't think we should allow that.  We should make it so that you
-must start a recvmsg before you can send data for a new request.
+This push fixes a bug in the cryptd code that may lead to crashes.
 
-Remember that the async path should be identical to the sync path,
-except that you don't wait for completion.
 
-Cheers,
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Ard Biesheuvel (1):
+      crypto: cryptd - initialize child shash_desc on import
+
+ crypto/cryptd.c |    9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
