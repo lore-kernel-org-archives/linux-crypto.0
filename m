@@ -1,52 +1,62 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.8
-Date: Tue, 13 Sep 2016 18:35:01 +0800
-Message-ID: <20160913103501.GA30944@gondor.apana.org.au>
-References: <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150415033951.GA1406@gondor.apana.org.au>
- <20150622084457.GA7806@gondor.apana.org.au>
- <20150831135655.GA2694@gondor.apana.org.au>
- <20151102080427.GA8465@gondor.apana.org.au>
- <20160111101450.GA24044@gondor.apana.org.au>
- <20160122101828.GA15966@gondor.apana.org.au>
- <20160801095821.GA1260@gondor.apana.org.au>
- <20160905093318.GA30895@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v3] crypto: only call put_page on referenced and used pages
+Date: Tue, 13 Sep 2016 13:27:34 +0200
+Message-ID: <6581903.GBJMzZudEe@tauon.atsec.com>
+References: <13399079.xub8KL5p6S@positron.chronox.de> <1794862.SeMhQgguHO@positron.chronox.de> <20160913100816.GA30804@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44047 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753312AbcIMKfX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Sep 2016 06:35:23 -0400
-Content-Disposition: inline
-In-Reply-To: <20160905093318.GA30895@gondor.apana.org.au>
+Received: from mail.eperm.de ([89.247.134.16]:47946 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751541AbcIML1j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Sep 2016 07:27:39 -0400
+In-Reply-To: <20160913100816.GA30804@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Am Dienstag, 13. September 2016, 18:08:16 CEST schrieb Herbert Xu:
 
-This push fixes a bug in the cryptd code that may lead to crashes.
+Hi Herbert,
+
+> This patch appears to be papering over a real bug.
+> 
+> The async path should be exactly the same as the sync path, except
+> that we don't wait for completion.  So the question is why are we
+> getting this crash here for async but not sync?
+
+At least one reason is found in skcipher_recvmsg_async with the following code 
+path:
+
+ if (txbufs == tx_nents) {
+                        struct scatterlist *tmp;
+                        int x;
+                        /* Ran out of tx slots in async request
+                         * need to expand */
+                        tmp = kcalloc(tx_nents * 2, sizeof(*tmp),
+                                      GFP_KERNEL);
+                        if (!tmp)
+                                goto free;
+
+                        sg_init_table(tmp, tx_nents * 2);
+                        for (x = 0; x < tx_nents; x++)
+                                sg_set_page(&tmp[x], sg_page(&sreq->tsg[x]),
+                                            sreq->tsg[x].length,
+                                            sreq->tsg[x].offset);
+                        kfree(sreq->tsg);
+                        sreq->tsg = tmp;
+                        tx_nents *= 2;
+                        mark = true;
+                }
 
 
-Please pull from
+==> the code allocates twice the amount of the previously existing memory, 
+copies the existing SGs over, but does not set the remaining SGs to anything. 
+If the caller provides less pages than the number of allocated SGs, some SGs 
+are unset. Hence, the deallocation must not do anything with the yet 
+uninitialized SGs.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Ard Biesheuvel (1):
-      crypto: cryptd - initialize child shash_desc on import
-
- crypto/cryptd.c |    9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
