@@ -1,29 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] hwrng: amd-rng - Migrate to managed API
-Date: Tue, 13 Sep 2016 20:41:10 +0800
-Message-ID: <20160913124110.GD31835@gondor.apana.org.au>
-References: <1473407903-12470-1-git-send-email-prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH -next] hwrng: st - Fix missing clk_disable_unprepare() on
+ error in st_rng_probe()
+Date: Tue, 13 Sep 2016 20:41:28 +0800
+Message-ID: <20160913124128.GE31835@gondor.apana.org.au>
+References: <1473509022-3478-1-git-send-email-weiyj.lk@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: mpm@selenic.com, clabbe.montjoie@gmail.com,
+Cc: Patrice Chotard <patrice.chotard@st.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Wei Yongjun <weiyongjun1@huawei.com>,
+        linux-arm-kernel@lists.infradead.org, kernel@stlinux.com,
         linux-crypto@vger.kernel.org
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+To: Wei Yongjun <weiyj.lk@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55214 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:41914 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751672AbcIMMlS (ORCPT
+        with ESMTP id S1750951AbcIMMm3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Sep 2016 08:41:18 -0400
+        Tue, 13 Sep 2016 08:42:29 -0400
 Content-Disposition: inline
-In-Reply-To: <1473407903-12470-1-git-send-email-prasannatsmkumar@gmail.com>
+In-Reply-To: <1473509022-3478-1-git-send-email-weiyj.lk@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 09, 2016 at 01:28:23PM +0530, PrasannaKumar Muralidharan wrote:
-> Managed API eliminates error handling code, thus reduces several lines
-> of code.
+On Sat, Sep 10, 2016 at 12:03:42PM +0000, Wei Yongjun wrote:
+> From: Wei Yongjun <weiyongjun1@huawei.com>
 > 
-> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+> Fix the missing clk_disable_unprepare() before return
+> from st_rng_probe() in the error handling case.
+> 
+> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 
 Patch applied.  Thanks.
 -- 
