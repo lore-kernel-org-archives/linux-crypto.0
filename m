@@ -1,36 +1,55 @@
-From: Quentin Lambert <lambert.quentin@gmail.com>
-Subject: Re: [PATCH v2 2/2] crypto: qat - fix resource release omissions
-Date: Tue, 13 Sep 2016 14:56:26 +0200
-Message-ID: <878bddf5-9561-a2e9-7f97-323f11a13d54@gmail.com>
-References: <20160902144753.31334-1-lambert.quentin@gmail.com>
- <20160902144753.31334-3-lambert.quentin@gmail.com>
- <20160906101851.GA27032@sivswdev01.ir.intel.com>
- <20160913124006.GB31835@gondor.apana.org.au>
+From: levent demir <levent.demir@inria.fr>
+Subject: [BUG] crypto: atmel-aes - erro when compiling with VERBOSE_DEBUG
+ enable
+Date: Tue, 13 Sep 2016 17:09:38 +0200
+Message-ID: <1473779378.3556.20.camel@inria.fr>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: Salvatore Benedetto <salvatore.benedetto@intel.com>,
-        "David S. Miller" <davem@davemloft.net>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, giovanni.cabiddu@gmail.com
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160913124006.GB31835@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Cyrille Pitchen <cyrille.pitchen@atmel.com>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:20058
+        "EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752971AbcIMPJm (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Sep 2016 11:09:42 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
+
+Hello, 
+
+if you enable VERBOSE_DEBUG and compile you will have the following
+error : 
+
+drivers/crypto/atmel-aes.c:323:5: error: too few arguments to function
+'atmel_aes_reg_name'
+     atmel_aes_reg_name(offset, tmp));
+     ^
+include/linux/device.h:1306:41: note: in definition of macro 'dev_vdbg'
+   dev_printk(KERN_DEBUG, dev, format, ##arg); \
+                                         ^
+drivers/crypto/atmel-aes.c:205:20: note: declared here
+ static const char *atmel_aes_reg_name(u32 offset, char *tmp, size_t sz)
+
+Indeed, in atmel_aes_write function the call to atmel_aes_reg_name
+contains only two arguments instead of 3 : 
+
+atmel_aes_reg_name(offset, tmp));
+
+To fix it, one has to only add the size of tmp as third argument : 
+
+atmel_aes_reg_name(offset, tmp, sizeof(tmp)));
 
 
 
-On 13/09/2016 14:40, Herbert Xu wrote:
-> On Tue, Sep 06, 2016 at 11:18:51AM +0100, Giovanni Cabiddu wrote:
->> ---8<---
->> Subject: [PATCH] crypto: qat - fix leak on error path
->>
->> Fix a memory leak in an error path in uc loader.
->>
->> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Patch applied.  Thanks.
-Sorry, I completly missed Giovanni's message. Good work!
-
-Quentin
+--- atmel-aes.c	2016-09-13 17:01:11.199014981 +0200
++++ atmel-aes-fixed.c	2016-09-13 17:01:54.056389455 +0200
+@@ -317,7 +317,7 @@
+ 		char tmp[16];
+ 
+ 		dev_vdbg(dd->dev, "write 0x%08x into %s\n", value,
+-			 atmel_aes_reg_name(offset, tmp));
++				atmel_aes_reg_name(offset, tmp, sizeof(tmp)));
+ 	}
+ #endif /* VERBOSE_DEBUG */
