@@ -1,91 +1,70 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: Kernel panic - encryption/decryption failed when open file on Arm64
-Date: Tue, 13 Sep 2016 08:56:50 +0100
-Message-ID: <CAKv+Gu9y_UDadH1Qu1b=rRmoagEjHj40Y3OHEredHxP5np_zrQ@mail.gmail.com>
-References: <57D15BD3.40903@huawei.com> <20160908124709.GA26586@gondor.apana.org.au>
- <57D28CB8.4080904@huawei.com> <CAKv+Gu9JDCHDteOvgpEg4SJP4OKgM6=euF3pzBcXDJxTt=dAYg@mail.gmail.com>
- <CAKv+Gu8w+BuwxQjOtpnFPHnJNUzq7m0K+KJ8=FG2wHigaB54ng@mail.gmail.com>
- <00B10D30F2BAA743B48953A4D86C96D54C8A8A@SZXEMI506-MBS.china.huawei.com>
- <CAKv+Gu9jaVyJ4PYsxZfiZXB3Uezr26YWhSyE-g+n6-AuWFcneQ@mail.gmail.com> <20160913064329.GA26933@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v3] crypto: only call put_page on referenced and used pages
+Date: Tue, 13 Sep 2016 10:18:54 +0200
+Message-ID: <1794862.SeMhQgguHO@positron.chronox.de>
+References: <13399079.xub8KL5p6S@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: liushuoran <liushuoran@huawei.com>, Xiakaixu <xiakaixu@huawei.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Theodore Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-        "nhorman@tuxdriver.com" <nhorman@tuxdriver.com>,
-        "mh1@iki.fi" <mh1@iki.fi>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Wangbintian <bintian.wang@huawei.com>,
-        Huxinwei <huxinwei@huawei.com>,
-        "zhangzhibin (C)" <zhangzhibin.zhang@huawei.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160913064329.GA26933@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:47942 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752008AbcIMITD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Sep 2016 04:19:03 -0400
+In-Reply-To: <13399079.xub8KL5p6S@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 13 September 2016 at 07:43, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Mon, Sep 12, 2016 at 06:40:15PM +0100, Ard Biesheuvel wrote:
->>
->> So to me, it seems like we should be taking the blkcipher_next_slow()
->> path, which does a kmalloc() and bails with -ENOMEM if that fails.
->
-> Indeed.  This was broken a long time ago.  It does seem to be
-> fixed in the new skcipher_walk code but here is a patch to fix
-> it for older kernels.
->
-> ---8<---
-> Subject: crypto: skcipher - Fix blkcipher walk OOM crash
->
-> When we need to allocate a temporary blkcipher_walk_next and it
-> fails, the code is supposed to take the slow path of processing
-> the data block by block.  However, due to an unrelated change
-> we instead end up dereferencing the NULL pointer.
->
-> This patch fixes it by moving the unrelated bsize setting out
-> of the way so that we enter the slow path as inteded.
->
-inteNded ^^^
+Am Montag, 12. September 2016, 14:43:45 CEST schrieb Stephan Mueller:
 
-> Fixes: 7607bd8ff03b ("[CRYPTO] blkcipher: Added blkcipher_walk_virt_block")
-> Cc: stable@vger.kernel.org
-> Reported-by: xiakaixu <xiakaixu@huawei.com>
-> Reported-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
+Hi Herbert,
 
-This fixes the issue for me
+> Hi Herbert,
+> 
+> after getting the AIO code working on sendmsg, tried it with vmsplice/splice
+> and I get a memory corruption. Interestingly, the stack trace is partially
+> garbled too. Thus, tracking this one down may be a bit of a challenge.
 
-Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+The issue is a NULL pointer dereference in skcipher_free_async_sgls. The issue is that SGs may not have even a page mapped to them and thus the page entry is NULL.
 
-I will follow up with fixes for the ARM and arm64 CTR code shortly.
+The following patch fixes the issue and replaces the patch I sent earlier.
 
-Thanks,
-Ard.
+---8<---
 
-> diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
-> index 3699995..a832426 100644
-> --- a/crypto/blkcipher.c
-> +++ b/crypto/blkcipher.c
-> @@ -233,6 +233,8 @@ static int blkcipher_walk_next(struct blkcipher_desc *desc,
->                 return blkcipher_walk_done(desc, walk, -EINVAL);
->         }
->
-> +       bsize = min(walk->walk_blocksize, n);
-> +
->         walk->flags &= ~(BLKCIPHER_WALK_SLOW | BLKCIPHER_WALK_COPY |
->                          BLKCIPHER_WALK_DIFF);
->         if (!scatterwalk_aligned(&walk->in, walk->alignmask) ||
-> @@ -245,7 +247,6 @@ static int blkcipher_walk_next(struct blkcipher_desc *desc,
->                 }
->         }
->
-> -       bsize = min(walk->walk_blocksize, n);
->         n = scatterwalk_clamp(&walk->in, n);
->         n = scatterwalk_clamp(&walk->out, n);
->
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+For asynchronous operation, SGs are allocated without a page mapped to
+them or with a page that is not used (ref-counted). If the SGL is freed,
+the code must only call put_page for an SG if there was a page assigned
+and ref-counted in the first place.
+
+This fixes a kernel crash when using io_submit with more than one iocb
+using the sendmsg and sendpage (vmsplice/splice) interface
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/algif_skcipher.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 28556fc..45af0fe 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -86,8 +86,13 @@ static void skcipher_free_async_sgls(struct skcipher_async_req *sreq)
+ 	}
+ 	sgl = sreq->tsg;
+ 	n = sg_nents(sgl);
+-	for_each_sg(sgl, sg, n, i)
+-		put_page(sg_page(sg));
++	for_each_sg(sgl, sg, n, i) {
++		struct page *page = sg_page(sg);
++
++		/* some SGs may not have a page mapped */
++		if (page && page_ref_count(page))
++			put_page(page);
++	}
+ 
+ 	kfree(sreq->tsg);
+ }
+-- 
+2.7.4
