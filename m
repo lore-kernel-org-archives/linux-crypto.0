@@ -1,32 +1,79 @@
-From: Joe Perches <joe@perches.com>
-Subject: Re: [PATCH] crypto: squash lines for simple wrapper functions
-Date: Tue, 13 Sep 2016 19:29:19 -0700
-Message-ID: <1473820159.32273.18.camel@perches.com>
-References: <1473708474-32359-1-git-send-email-yamada.masahiro@socionext.com>
-         <1473709457.11006.31.camel@perches.com>
-         <CAK7LNAQs2KverOhd2rcG96=fZzsE3M5yfkZJ2ojdTU0Xvunb-Q@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAK7LNAQs2KverOhd2rcG96=fZzsE3M5yfkZJ2ojdTU0Xvunb-Q@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Eric Biggers <ebiggers@google.com>
+Subject: [PATCH RESEND] crypto: doc - fix documentation for bulk registration functions
+Date: Wed, 14 Sep 2016 11:56:37 -0700
+Message-ID: <1473879397-110630-1-git-send-email-ebiggers@google.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, Eric Biggers <ebiggers@google.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-doc-owner@vger.kernel.org>
+Sender: linux-doc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, 2016-09-14 at 11:10 +0900, Masahiro Yamada wrote:
-> 2016-09-13 4:44 GMT+09:00 Joe Perches <joe@perches.com>:
-> > On Tue, 2016-09-13 at 04:27 +0900, Masahiro Yamada wrote:
-> > > Remove unneeded variables and assignments.
-> > Was this found by visual inspection or some tool?
-> > If it's via a tool, it's good to mention that in the changelog.
-> I used Coccinelle, but I did not mention it
-> in case somebody may say "then, please provide your semantic patch".
-> As a Coccinelle beginner, I do not want to expose my stupid semantic patch.
+Update the documentation for crypto_register_algs() and
+crypto_unregister_algs() to match the actual behavior.
 
-If you get it "exposed", you'd likely learn something from others
-that would give a few suggestions/tips on how to improve it.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ Documentation/DocBook/crypto-API.tmpl | 38 ++++++++++++++++++++++++-----------
+ 1 file changed, 26 insertions(+), 12 deletions(-)
+
+diff --git a/Documentation/DocBook/crypto-API.tmpl b/Documentation/DocBook/crypto-API.tmpl
+index fb2a152..088b79c 100644
+--- a/Documentation/DocBook/crypto-API.tmpl
++++ b/Documentation/DocBook/crypto-API.tmpl
+@@ -797,7 +797,8 @@ kernel crypto API            |       Caller
+      include/linux/crypto.h and their definition can be seen below.
+      The former function registers a single transformation, while
+      the latter works on an array of transformation descriptions.
+-     The latter is useful when registering transformations in bulk.
++     The latter is useful when registering transformations in bulk,
++     for example when a driver implements multiple transformations.
+     </para>
+ 
+     <programlisting>
+@@ -822,18 +823,31 @@ kernel crypto API            |       Caller
+     </para>
+ 
+     <para>
+-     The bulk registration / unregistration functions require
+-     that struct crypto_alg is an array of count size. These
+-     functions simply loop over that array and register /
+-     unregister each individual algorithm. If an error occurs,
+-     the loop is terminated at the offending algorithm definition.
+-     That means, the algorithms prior to the offending algorithm
+-     are successfully registered. Note, the caller has no way of
+-     knowing which cipher implementations have successfully
+-     registered. If this is important to know, the caller should
+-     loop through the different implementations using the single
+-     instance *_alg functions for each individual implementation.
++     The bulk registration/unregistration functions
++     register/unregister each transformation in the given array of
++     length count.  They handle errors as follows:
+     </para>
++    <itemizedlist>
++     <listitem>
++      <para>
++       crypto_register_algs() succeeds if and only if it
++       successfully registers all the given transformations. If an
++       error occurs partway through, then it rolls back successful
++       registrations before returning the error code. Note that if
++       a driver needs to handle registration errors for individual
++       transformations, then it will need to use the non-bulk
++       function crypto_register_alg() instead.
++      </para>
++     </listitem>
++     <listitem>
++      <para>
++       crypto_unregister_algs() tries to unregister all the given
++       transformations, continuing on error. It logs errors and
++       always returns zero.
++      </para>
++     </listitem>
++    </itemizedlist>
++
+    </sect1>
+ 
+    <sect1><title>Single-Block Symmetric Ciphers [CIPHER]</title>
+-- 
+2.8.0.rc3.226.g39d4020
+
