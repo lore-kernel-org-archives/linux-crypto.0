@@ -1,52 +1,44 @@
-From: Tero Kristo <t-kristo@ti.com>
-Subject: Re: [PATCHv3 06/11] crypto: omap-des: Fix support for unequal lengths
-Date: Thu, 15 Sep 2016 12:15:28 +0300
-Message-ID: <a1b80dda-f344-c09d-4165-bfbd92e669fd@ti.com>
-References: <1470306526-27219-1-git-send-email-t-kristo@ti.com>
- <1470306526-27219-7-git-send-email-t-kristo@ti.com>
- <20160913093506.GA30561@gondor.apana.org.au>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Subject: crypto-caamhash: Fine-tuning for several function implementations
+Date: Thu, 15 Sep 2016 16:36:35 +0200
+Message-ID: <970e9e1b-c1dc-eb28-b380-92c15e9b1961@users.sourceforge.net>
+References: <566ABCD9.1060404@users.sourceforge.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: <lokeshvutla@ti.com>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <tony@atomide.com>,
-        <linux-omap@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Lokesh Vutla <a0131933@ti.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org,
+        Julia Lawall <julia.lawall@lip6.fr>
+To: linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Labbe Corentin <clabbe.montjoie@gmail.com>,
+        Russell King <rmk+kernel@arm.linux.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:47722 "EHLO comal.ext.ti.com"
+Received: from mout.web.de ([212.227.15.3]:53586 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1757554AbcIOJQF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Sep 2016 05:16:05 -0400
-In-Reply-To: <20160913093506.GA30561@gondor.apana.org.au>
+        id S1751681AbcIOOhH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Sep 2016 10:37:07 -0400
+In-Reply-To: <566ABCD9.1060404@users.sourceforge.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 13/09/16 12:35, Herbert Xu wrote:
-> On Thu, Aug 04, 2016 at 01:28:41PM +0300, Tero Kristo wrote:
->> From: Lokesh Vutla <a0131933@ti.com>
->>
->> For cases where total length of an input SGs is not same as
->> length of the input data for encryption, omap-des driver
->> crashes. This happens in the case when IPsec is trying to use
->> omap-des driver.
->>
->> To avoid this, we copy all the pages from the input SG list
->> into a contiguous buffer and prepare a single element SG list
->> for this buffer with length as the total bytes to crypt, which is
->> similar thing that is done in case of unaligned lengths.
->
-> Ugh, that means copying every single packet, right?
->
-> So if it's just the SG list that's the problem, why don't you
-> copy that instead? That is, allocate a new SG list and set it
-> up so that there is no excess data.
->
-> Cheers,
->
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Thu, 15 Sep 2016 16:27:23 +0200
 
-I'll take a look at this. I have this kind of solution in place for the 
-re-worked SHA driver, so can probably re-use it here.
+Some update suggestions were taken into account
+from static source code analysis.
 
--Tero
+Markus Elfring (6):
+  Use kmalloc_array() in ahash_setkey()
+  Rename jump labels in ahash_setkey()
+  Rename a jump label in five functions
+  Return a value directly in caam_hash_cra_init()
+  Delete an unnecessary initialisation in seven functions
+  Move common error handling code in two functions
+
+ drivers/crypto/caam/caamhash.c | 111 +++++++++++++++++++----------------------
+ 1 file changed, 52 insertions(+), 59 deletions(-)
+
+-- 
+2.10.0
