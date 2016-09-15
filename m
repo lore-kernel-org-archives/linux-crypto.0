@@ -1,8 +1,8 @@
 From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH 4/6] crypto-caamhash: Return a value directly in
- caam_hash_cra_init()
-Date: Thu, 15 Sep 2016 16:43:21 +0200
-Message-ID: <6f8877c6-873b-ee9d-596e-2567eed44962@users.sourceforge.net>
+Subject: [PATCH 5/6] crypto-caamhash: Delete an unnecessary initialisation in
+ seven functions
+Date: Thu, 15 Sep 2016 16:44:34 +0200
+Message-ID: <a904a514-57f1-6c1a-4839-6150ddacf960@users.sourceforge.net>
 References: <566ABCD9.1060404@users.sourceforge.net>
  <970e9e1b-c1dc-eb28-b380-92c15e9b1961@users.sourceforge.net>
 Mime-Version: 1.0
@@ -16,47 +16,89 @@ To: linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Labbe Corentin <clabbe.montjoie@gmail.com>,
         Russell King <rmk+kernel@arm.linux.org.uk>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 In-Reply-To: <970e9e1b-c1dc-eb28-b380-92c15e9b1961@users.sourceforge.net>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: kernel-janitors-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Thu, 15 Sep 2016 14:56:12 +0200
+Date: Thu, 15 Sep 2016 15:24:02 +0200
 
-* Return a value at the end without storing it in an intermediate variable.
-
-* Delete the local variable "ret" which became unnecessary with
-  this refactoring.
+The local variable "ret" will be set to an appropriate value a bit later.
+Thus omit the explicit initialisation at the beginning.
 
 Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 ---
- drivers/crypto/caam/caamhash.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ drivers/crypto/caam/caamhash.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 933252f..b1dbc53 100644
+index b1dbc53..adb8b19 100644
 --- a/drivers/crypto/caam/caamhash.c
 +++ b/drivers/crypto/caam/caamhash.c
-@@ -1846,7 +1846,6 @@ static int caam_hash_cra_init(struct crypto_tfm *tfm)
- 					 HASH_MSG_LEN + SHA256_DIGEST_SIZE,
- 					 HASH_MSG_LEN + 64,
- 					 HASH_MSG_LEN + SHA512_DIGEST_SIZE };
+@@ -440,7 +440,7 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, const u8 *key_in,
+ 	u32 *desc;
+ 	struct split_key_result result;
+ 	dma_addr_t src_dma, dst_dma;
 -	int ret = 0;
++	int ret;
  
- 	/*
- 	 * Get a Job ring from Job Ring driver to ensure in-order
-@@ -1866,10 +1865,7 @@ static int caam_hash_cra_init(struct crypto_tfm *tfm)
+ 	desc = kmalloc(CAAM_CMD_SZ * 8 + CAAM_PTR_SZ * 2, GFP_KERNEL | GFP_DMA);
+ 	if (!desc) {
+@@ -517,7 +517,7 @@ static int ahash_setkey(struct crypto_ahash *ahash,
+ 	struct device *jrdev = ctx->jrdev;
+ 	int blocksize = crypto_tfm_alg_blocksize(&ahash->base);
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+-	int ret = 0;
++	int ret;
+ 	u8 *hashed_key = NULL;
  
- 	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
- 				 sizeof(struct caam_hash_state));
--
--	ret = ahash_set_sh_desc(ahash);
--
--	return ret;
-+	return ahash_set_sh_desc(ahash);
- }
+ #ifdef DEBUG
+@@ -975,7 +975,7 @@ static int ahash_final_ctx(struct ahash_request *req)
+ 	int sec4_sg_bytes, sec4_sg_src_index;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct ahash_edesc *edesc;
+-	int ret = 0;
++	int ret;
  
- static void caam_hash_cra_exit(struct crypto_tfm *tfm)
+ 	sec4_sg_src_index = 1 + (buflen ? 1 : 0);
+ 	sec4_sg_bytes = sec4_sg_src_index * sizeof(struct sec4_sg_entry);
+@@ -1055,7 +1055,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 	int src_nents, mapped_nents;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct ahash_edesc *edesc;
+-	int ret = 0;
++	int ret;
+ 
+ 	src_nents = sg_nents_for_len(req->src, req->nbytes);
+ 	if (src_nents < 0) {
+@@ -1139,7 +1139,7 @@ static int ahash_digest(struct ahash_request *req)
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	int src_nents, mapped_nents;
+ 	struct ahash_edesc *edesc;
+-	int ret = 0;
++	int ret;
+ 
+ 	src_nents = sg_nents_for_len(req->src, req->nbytes);
+ 	if (src_nents < 0) {
+@@ -1218,7 +1218,7 @@ static int ahash_final_no_ctx(struct ahash_request *req)
+ 	u32 *desc;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct ahash_edesc *edesc;
+-	int ret = 0;
++	int ret;
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+ 	edesc = ahash_edesc_alloc(ctx, 0, ctx->sh_desc_digest,
+@@ -1408,7 +1408,7 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 	int sec4_sg_bytes, sec4_sg_src_index, src_nents, mapped_nents;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct ahash_edesc *edesc;
+-	int ret = 0;
++	int ret;
+ 
+ 	src_nents = sg_nents_for_len(req->src, req->nbytes);
+ 	if (src_nents < 0) {
 -- 
 2.10.0
+
