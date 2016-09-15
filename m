@@ -1,55 +1,49 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: CONFIG_FIPS without module loading support?
-Date: Thu, 15 Sep 2016 06:58:54 +0200
-Message-ID: <2523179.y8adHMcoDs@tauon.atsec.com>
-References: <CAM5Ud7Pw84GcjpooX_5VfBuRTgU8+HMKkM6GBnD1z=JEw0PkXw@mail.gmail.com> <20160902142208.GA12938@gondor.apana.org.au> <CAM5Ud7OVvjh1WirzLh9YGzTqQn8qG8mNMe9+0rC7Q7E-0K7Yqg@mail.gmail.com>
+From: Stephan Mueller <stephan.mueller@atsec.com>
+Subject: [RFC] revamp fips_allowed flag
+Date: Thu, 15 Sep 2016 07:35:43 +0200
+Message-ID: <1818375.56xtGUSNII@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
 Cc: linux-crypto@vger.kernel.org
-To: NTU <neotheuser@gmail.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47960 "EHLO mail.eperm.de"
+Received: from mail1.atsec.com ([138.201.47.226]:8757 "EHLO mail1.atsec.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751075AbcIOE67 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Sep 2016 00:58:59 -0400
-In-Reply-To: <CAM5Ud7OVvjh1WirzLh9YGzTqQn8qG8mNMe9+0rC7Q7E-0K7Yqg@mail.gmail.com>
+        id S1755693AbcIOFpw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Sep 2016 01:45:52 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 14. September 2016, 19:18:43 CEST schrieb NTU:
+Hi Herbert,
 
-Hi NTU,
+The fips_allowed flag in testmgr.c shall prevent the use of "non-approved" 
+ciphers in FIPS mode.
 
-> Hello,
-> 
-> I've never written a patch before to the official kernel mailing list
-> (that I remember) so please forgive me if I didn't send this in
-> properly. I've generated this using git format-patch HEAD~ --stdout &>
-> kconfig_fix_for_fips.patch and have attached the file in this email,
-> gathering as much as I could from the Documentation/SubmittingPatches
-> page.
+With the current code, the fips_allowed flag is bound to a name a specific 
+cipher is referenced with. With the advent of more complex cipher string names 
+that can be used (for example, consider names like 
+"seqiv(rfc4106(gcm_base(ctr-aes-s390,ghash-generic)))", the authenc ciphers 
+with the two components or even the recently added pkcspad1 algorithm), it 
+seems that the approach in testmgr.c reached its limits. Lately more and more 
+entries in the alg_test_descs array were added purely to have the fips_allowed 
+flag set.
 
-Please read Documentation/SubmittingPatches
-> 
-> Few more things, in the help option for CRYPTO_ANSI_CPRNG, it says it
-> must be enabled if FIPS is selected, but in the dependencies for FIPS,
-> if DRBG is selected, then CRYPTO_ANSI_CPRNG doesn't need to be
-> enabled. Which one is true?
+Wouldn't it be more prudent to move that flag into the crypto_alg and 
+crypto_template data structures so that the flag is checked during the 
+crypto_register_* functions? I.e. if the flag is not set and the FIPS mode is 
+enabled, the cipher is simply not registered?
 
-The latter one. The X9.31 DRNG is not approved in FIPS mode any more.
-> 
-> Secondly, in the help option for CRYPTO_DRBG_MENU, it says that one or
-> more of the DRBG types must be selected. If this is indeed true,
-> shouldn't the options within CRYPTO_DRBG_MENU be converted to
-> choice/endchoice versus just booleans? One selection for
-> CRYPTO_DRBG_HASH, another for CRYPTO_DRBG_CTR, and then a third option
-> for both? Should I submit patches for these as well,
-> feedback/thoughts?
-
-Not sure what you want to gain from it. All that the booleans do is to mark 
-which types of DRBG are to be compliled. The selector whether the DRBG is 
-compiled at all is CRYPTO_DRBG.
+With that, suggestion, the fips_allowed flag is now decoupled from the cipher 
+name. Complex cipher strings would now not be falsely treated as non-approved 
+ciphers any more.
 
 Ciao
 Stephan
+-- 
+atsec information security GmbH, Steinstraße 70, 81667 München, Germany
+P: +49 89 442 49 830 - F: +49 89 442 49 831
+M: +49 172 216 55 78 - HRB: 129439 (Amtsgericht München)
+US: +1 949 545 4096
+GF: Salvatore la Pietra, Staffan Persson
+atsec it security news blog - atsec-information-security.blogspot.com
