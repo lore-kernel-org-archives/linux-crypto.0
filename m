@@ -1,51 +1,45 @@
-From: Horia Geanta Neag <horia.geanta@nxp.com>
-Subject: Re: crypto-caamhash: Fine-tuning for several function implementations
-Date: Thu, 15 Sep 2016 15:30:04 +0000
-Message-ID: <DB4PR04MB08478A32519FC440E476FDEC98F00@DB4PR04MB0847.eurprd04.prod.outlook.com>
-References: <566ABCD9.1060404@users.sourceforge.net>
- <970e9e1b-c1dc-eb28-b380-92c15e9b1961@users.sourceforge.net>
+From: NTU <neotheuser@gmail.com>
+Subject: [PATCH] Fix Kconfig dependencies for FIPS
+Date: Thu, 15 Sep 2016 17:41:32 -0500
+Message-ID: <CAM5Ud7Ph1LR_8F7Pm9x55B9bozuQL+=6NZfVMjPtTPiDswfUHw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
-        Julia Lawall <julia.lawall@lip6.fr>
-To: SF Markus Elfring <elfring@users.sourceforge.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Labbe Corentin <clabbe.montjoie@gmail.com>,
-        Russell King <rmk+kernel@arm.linux.org.uk>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Content-Language: en-US
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-io0-f193.google.com ([209.85.223.193]:36309 "EHLO
+        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751150AbcIOWld (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Sep 2016 18:41:33 -0400
+Received: by mail-io0-f193.google.com with SMTP id z135so400433ioe.3
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Sep 2016 15:41:33 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 9/15/2016 5:37 PM, SF Markus Elfring wrote:=0A=
-> From: Markus Elfring <elfring@users.sourceforge.net>=0A=
-> Date: Thu, 15 Sep 2016 16:27:23 +0200=0A=
-> =0A=
-> Some update suggestions were taken into account=0A=
-> from static source code analysis.=0A=
-> =0A=
-> Markus Elfring (6):=0A=
->   Use kmalloc_array() in ahash_setkey()=0A=
->   Rename jump labels in ahash_setkey()=0A=
->   Rename a jump label in five functions=0A=
->   Return a value directly in caam_hash_cra_init()=0A=
->   Delete an unnecessary initialisation in seven functions=0A=
->   Move common error handling code in two functions=0A=
-> =0A=
->  drivers/crypto/caam/caamhash.c | 111 +++++++++++++++++++----------------=
-------=0A=
->  1 file changed, 52 insertions(+), 59 deletions(-)=0A=
-> =0A=
-Thanks Markus!=0A=
-=0A=
-For patches 2-6:=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-though headline prefix should be changed to "crypto: caam -"=0A=
-=0A=
-Horia=0A=
-=0A=
+Currently FIPS depends on MODULE_SIG, even if MODULES is disabled.
+This change allows the enabling of FIPS without support for modules.
+
+If module loading support is enabled, only then does
+FIPS require MODULE_SIG.
+
+Signed-off-by: Alec Ari <neotheuser@gmail.com>
+---
+ crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 84d7148..fd28805 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -24,7 +24,7 @@ comment "Crypto core or helper"
+ config CRYPTO_FIPS
+     bool "FIPS 200 compliance"
+     depends on (CRYPTO_ANSI_CPRNG || CRYPTO_DRBG) &&
+!CRYPTO_MANAGER_DISABLE_TESTS
+-    depends on MODULE_SIG
++    depends on (MODULE_SIG || !MODULES)
+     help
+       This options enables the fips boot option which is
+       required if you want to system to operate in a FIPS 200
+-- 
+2.7.3
