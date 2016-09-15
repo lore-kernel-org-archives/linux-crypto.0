@@ -1,49 +1,55 @@
-From: Wei Yongjun <weiyj.lk@gmail.com>
-Subject: [PATCH -next] crypto: ccp - use kmem_cache_zalloc instead of kmem_cache_alloc/memset
-Date: Thu, 15 Sep 2016 03:28:04 +0000
-Message-ID: <1473910084-31739-1-git-send-email-weiyj.lk@gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: CONFIG_FIPS without module loading support?
+Date: Thu, 15 Sep 2016 06:58:54 +0200
+Message-ID: <2523179.y8adHMcoDs@tauon.atsec.com>
+References: <CAM5Ud7Pw84GcjpooX_5VfBuRTgU8+HMKkM6GBnD1z=JEw0PkXw@mail.gmail.com> <20160902142208.GA12938@gondor.apana.org.au> <CAM5Ud7OVvjh1WirzLh9YGzTqQn8qG8mNMe9+0rC7Q7E-0K7Yqg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyongjun1@huawei.com>, linux-crypto@vger.kernel.org
-To: Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: NTU <neotheuser@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:35265 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753866AbcIOD2L (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Sep 2016 23:28:11 -0400
-Received: by mail-pf0-f193.google.com with SMTP id z84so1608468pfi.2
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Sep 2016 20:28:11 -0700 (PDT)
+Received: from mail.eperm.de ([89.247.134.16]:47960 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751075AbcIOE67 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Sep 2016 00:58:59 -0400
+In-Reply-To: <CAM5Ud7OVvjh1WirzLh9YGzTqQn8qG8mNMe9+0rC7Q7E-0K7Yqg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Wei Yongjun <weiyongjun1@huawei.com>
+Am Mittwoch, 14. September 2016, 19:18:43 CEST schrieb NTU:
 
-Using kmem_cache_zalloc() instead of kmem_cache_alloc() and memset().
+Hi NTU,
 
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
----
- drivers/crypto/ccp/ccp-dmaengine.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+> Hello,
+> 
+> I've never written a patch before to the official kernel mailing list
+> (that I remember) so please forgive me if I didn't send this in
+> properly. I've generated this using git format-patch HEAD~ --stdout &>
+> kconfig_fix_for_fips.patch and have attached the file in this email,
+> gathering as much as I could from the Documentation/SubmittingPatches
+> page.
 
-diff --git a/drivers/crypto/ccp/ccp-dmaengine.c b/drivers/crypto/ccp/ccp-dmaengine.c
-index ded26f4..2e5a05c 100644
---- a/drivers/crypto/ccp/ccp-dmaengine.c
-+++ b/drivers/crypto/ccp/ccp-dmaengine.c
-@@ -299,12 +299,10 @@ static struct ccp_dma_desc *ccp_alloc_dma_desc(struct ccp_dma_chan *chan,
- {
- 	struct ccp_dma_desc *desc;
- 
--	desc = kmem_cache_alloc(chan->ccp->dma_desc_cache, GFP_NOWAIT);
-+	desc = kmem_cache_zalloc(chan->ccp->dma_desc_cache, GFP_NOWAIT);
- 	if (!desc)
- 		return NULL;
- 
--	memset(desc, 0, sizeof(*desc));
--
- 	dma_async_tx_descriptor_init(&desc->tx_desc, &chan->dma_chan);
- 	desc->tx_desc.flags = flags;
- 	desc->tx_desc.tx_submit = ccp_tx_submit;
+Please read Documentation/SubmittingPatches
+> 
+> Few more things, in the help option for CRYPTO_ANSI_CPRNG, it says it
+> must be enabled if FIPS is selected, but in the dependencies for FIPS,
+> if DRBG is selected, then CRYPTO_ANSI_CPRNG doesn't need to be
+> enabled. Which one is true?
+
+The latter one. The X9.31 DRNG is not approved in FIPS mode any more.
+> 
+> Secondly, in the help option for CRYPTO_DRBG_MENU, it says that one or
+> more of the DRBG types must be selected. If this is indeed true,
+> shouldn't the options within CRYPTO_DRBG_MENU be converted to
+> choice/endchoice versus just booleans? One selection for
+> CRYPTO_DRBG_HASH, another for CRYPTO_DRBG_CTR, and then a third option
+> for both? Should I submit patches for these as well,
+> feedback/thoughts?
+
+Not sure what you want to gain from it. All that the booleans do is to mark 
+which types of DRBG are to be compliled. The selector whether the DRBG is 
+compiled at all is CRYPTO_DRBG.
+
+Ciao
+Stephan
