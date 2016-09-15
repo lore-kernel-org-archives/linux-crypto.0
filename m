@@ -1,49 +1,41 @@
-From: Stephan Mueller <stephan.mueller@atsec.com>
-Subject: [RFC] revamp fips_allowed flag
-Date: Thu, 15 Sep 2016 07:35:43 +0200
-Message-ID: <1818375.56xtGUSNII@tauon.atsec.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC] revamp fips_allowed flag
+Date: Thu, 15 Sep 2016 13:58:08 +0800
+Message-ID: <20160915055808.GA14688@gondor.apana.org.au>
+References: <1818375.56xtGUSNII@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+To: Stephan Mueller <stephan.mueller@atsec.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail1.atsec.com ([138.201.47.226]:8757 "EHLO mail1.atsec.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755693AbcIOFpw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Sep 2016 01:45:52 -0400
+Received: from helcar.hengli.com.au ([209.40.204.226]:53598 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753415AbcIOF60 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Sep 2016 01:58:26 -0400
+Content-Disposition: inline
+In-Reply-To: <1818375.56xtGUSNII@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+On Thu, Sep 15, 2016 at 07:35:43AM +0200, Stephan Mueller wrote:
+>
+> Wouldn't it be more prudent to move that flag into the crypto_alg and 
+> crypto_template data structures so that the flag is checked during the 
+> crypto_register_* functions? I.e. if the flag is not set and the FIPS mode is 
+> enabled, the cipher is simply not registered?
 
-The fips_allowed flag in testmgr.c shall prevent the use of "non-approved" 
-ciphers in FIPS mode.
+The problem with that is then if you have 10 implementations of a
+given algorithm you'd have to change 10 places to modify its FIPS
+status.
 
-With the current code, the fips_allowed flag is bound to a name a specific 
-cipher is referenced with. With the advent of more complex cipher string names 
-that can be used (for example, consider names like 
-"seqiv(rfc4106(gcm_base(ctr-aes-s390,ghash-generic)))", the authenc ciphers 
-with the two components or even the recently added pkcspad1 algorithm), it 
-seems that the approach in testmgr.c reached its limits. Lately more and more 
-entries in the alg_test_descs array were added purely to have the fips_allowed 
-flag set.
+Where's the pain point here? For cases like seqiv where you want to
+say if X is FIPS-allowed then so is seqiv(X) we can certainly add
+some code to testmgr to cater for that instead of listing them
+individually.
 
-Wouldn't it be more prudent to move that flag into the crypto_alg and 
-crypto_template data structures so that the flag is checked during the 
-crypto_register_* functions? I.e. if the flag is not set and the FIPS mode is 
-enabled, the cipher is simply not registered?
-
-With that, suggestion, the fips_allowed flag is now decoupled from the cipher 
-name. Complex cipher strings would now not be falsely treated as non-approved 
-ciphers any more.
-
-Ciao
-Stephan
+Cheers,
 -- 
-atsec information security GmbH, Steinstraße 70, 81667 München, Germany
-P: +49 89 442 49 830 - F: +49 89 442 49 831
-M: +49 172 216 55 78 - HRB: 129439 (Amtsgericht München)
-US: +1 949 545 4096
-GF: Salvatore la Pietra, Staffan Persson
-atsec it security news blog - atsec-information-security.blogspot.com
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
