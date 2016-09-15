@@ -1,8 +1,9 @@
 From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: crypto-caamhash: Fine-tuning for several function implementations
-Date: Thu, 15 Sep 2016 16:36:35 +0200
-Message-ID: <970e9e1b-c1dc-eb28-b380-92c15e9b1961@users.sourceforge.net>
+Subject: [PATCH 1/6] crypto-caamhash: Use kmalloc_array() in ahash_setkey()
+Date: Thu, 15 Sep 2016 16:40:04 +0200
+Message-ID: <4e1bc780-fa00-cfc9-c058-240bb899d701@users.sourceforge.net>
 References: <566ABCD9.1060404@users.sourceforge.net>
+ <970e9e1b-c1dc-eb28-b380-92c15e9b1961@users.sourceforge.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -14,31 +15,44 @@ To: linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Labbe Corentin <clabbe.montjoie@gmail.com>,
         Russell King <rmk+kernel@arm.linux.org.uk>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.15.3]:53586 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751681AbcIOOhH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Sep 2016 10:37:07 -0400
-In-Reply-To: <566ABCD9.1060404@users.sourceforge.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <970e9e1b-c1dc-eb28-b380-92c15e9b1961@users.sourceforge.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Thu, 15 Sep 2016 16:27:23 +0200
+Date: Thu, 15 Sep 2016 11:20:09 +0200
 
-Some update suggestions were taken into account
-from static source code analysis.
+* A multiplication for the size determination of a memory allocation
+  indicated that an array data structure should be processed.
+  Thus use the corresponding function "kmalloc_array".
 
-Markus Elfring (6):
-  Use kmalloc_array() in ahash_setkey()
-  Rename jump labels in ahash_setkey()
-  Rename a jump label in five functions
-  Return a value directly in caam_hash_cra_init()
-  Delete an unnecessary initialisation in seven functions
-  Move common error handling code in two functions
+  This issue was detected by using the Coccinelle software.
 
- drivers/crypto/caam/caamhash.c | 111 +++++++++++++++++++----------------------
- 1 file changed, 52 insertions(+), 59 deletions(-)
+* Replace the specification of a data type by a pointer dereference
+  to make the corresponding size determination a bit safer according to
+  the Linux coding style convention.
 
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+---
+ drivers/crypto/caam/caamhash.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 9d7fc9e..f19df8f 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -525,8 +525,9 @@ static int ahash_setkey(struct crypto_ahash *ahash,
+ #endif
+ 
+ 	if (keylen > blocksize) {
+-		hashed_key = kmalloc(sizeof(u8) * digestsize, GFP_KERNEL |
+-				     GFP_DMA);
++		hashed_key = kmalloc_array(digestsize,
++					   sizeof(*hashed_key),
++					   GFP_KERNEL | GFP_DMA);
+ 		if (!hashed_key)
+ 			return -ENOMEM;
+ 		ret = hash_digest_key(ctx, key, &keylen, hashed_key,
 -- 
 2.10.0
