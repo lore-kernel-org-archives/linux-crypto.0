@@ -1,52 +1,70 @@
-From: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
-Subject: [PATCH] crypto: gcm - Fix IV buffer size in crypto_gcm_setkey
-Date: Fri, 16 Sep 2016 14:07:40 +0200
-Message-ID: <CAAUqJDt=wXHbU1z5f_=r9tuJxUKDZKR1d9AURoDrye+iwnVrKQ@mail.gmail.com>
+From: Romain Perier <romain.perier@free-electrons.com>
+Subject: Re: [PATCH v3 0/8] Add support for SafeXcel IP-76 to OMAP RNG
+Date: Fri, 16 Sep 2016 14:52:42 +0200
+Message-ID: <57DBEB1A.4050602@free-electrons.com>
+References: <20160916100856.31727-1-romain.perier@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: Gregory Clement <gregory.clement@free-electrons.com>,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        Nadav Haklai <nadavh@marvell.com>,
+        Omri Itach <omrii@marvell.com>,
+        Shadi Ammouri <shadi@marvell.com>,
+        Yahuda Yitschak <yehuday@marvell.com>,
+        Hanna Hawa <hannah@marvell.com>,
+        Neta Zur Hershkovits <neta@marvell.com>,
+        Igal Liberman <igall@marvell.com>,
+        Marcin Wojtas <mw@semihalf.com>, linux-crypto@vger.kernel.org
+To: dsaxena@plexity.net, mpm@selenic.com,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f68.google.com ([209.85.218.68]:34099 "EHLO
-        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934741AbcIPMHm (ORCPT
+Received: from down.free-electrons.com ([37.187.137.238]:37416 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S932698AbcIPMwp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2016 08:07:42 -0400
-Received: by mail-oi0-f68.google.com with SMTP id v62so2989918oig.1
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2016 05:07:42 -0700 (PDT)
+        Fri, 16 Sep 2016 08:52:45 -0400
+In-Reply-To: <20160916100856.31727-1-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The cipher block size for GCM is 16 bytes, and thus the CTR transform
-used in crypto_gcm_setkey() will also expect a 16-byte IV. However,
-the code currently reserves only 8 bytes for the IV, causing
-an out-of-bounds access in the CTR transform. This patch fixes
-the issue by setting the size of the IV buffer to 16 bytes.
+Hello,
 
-Fixes: 84c911523020 ("[CRYPTO] gcm: Add support for async ciphers")
-Signed-off-by: Ondrej Mosnacek <omosnacek@gmail.com>
----
-I randomly noticed this while going over igcm.c for an unrelated
-reason. It seems the wrong buffer size never caused any noticeable
-problems (it's been there since 2007), but it should be corrected
-nonetheless...
+Le 16/09/2016 12:08, Romain Perier a écrit :
+> The driver omap-rng has a lot of similarity with the IP block SafeXcel
+> IP-76. A lot of registers are the same and the way that the driver works
+> is very closed the description of the TRNG EIP76 in its datasheet.
+>
+> This series refactorize the driver, add support for generating bigger
+> output random data and add a device variant for SafeXcel IP-76, found
+> in Armada 8K.
+>
+> Romain Perier (8):
+>    dt-bindings: Add vendor prefix for INSIDE Secure
+>    dt-bindings: omap-rng: Document SafeXcel IP-76 device variant
+>    hwrng: omap - Switch to non-obsolete read API implementation
+>    hwrng: omap - Remove global definition of hwrng
+>    hwrng: omap - Add support for 128-bit output of data
+>    hwrng: omap - Don't prefix the probe message with OMAP
+>    hwrng: omap - Add device variant for SafeXcel IP-76 found in Armada 8K
+>    arm64: dts: marvell: add TRNG description for Armada 8K CP
+>
+>   Documentation/devicetree/bindings/rng/omap_rng.txt |  14 +-
+>   .../devicetree/bindings/vendor-prefixes.txt        |   1 +
+>   .../boot/dts/marvell/armada-cp110-master.dtsi      |   8 +
+>   .../arm64/boot/dts/marvell/armada-cp110-slave.dtsi |   8 +
+>   drivers/char/hw_random/Kconfig                     |   2 +-
+>   drivers/char/hw_random/omap-rng.c                  | 162 ++++++++++++++++-----
+>   6 files changed, 152 insertions(+), 43 deletions(-)
+>
 
- crypto/gcm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If possible, I would like to get "Tested-by" tags by the omap guys 
+before this set of patches is merged, to be sure that there are no 
+regressions for the OMAP variant.
 
-diff --git a/crypto/gcm.c b/crypto/gcm.c
-index 70a892e8..f624ac9 100644
---- a/crypto/gcm.c
-+++ b/crypto/gcm.c
-@@ -117,7 +117,7 @@ static int crypto_gcm_setkey(struct crypto_aead
-*aead, const u8 *key,
- 	struct crypto_skcipher *ctr = ctx->ctr;
- 	struct {
- 		be128 hash;
--		u8 iv[8];
-+		u8 iv[16];
-
- 		struct crypto_gcm_setkey_result result;
-
+Thanks,
+Regards,
 -- 
-2.7.4
+Romain Perier, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
