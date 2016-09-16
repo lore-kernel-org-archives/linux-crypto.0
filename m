@@ -1,138 +1,72 @@
-From: Catalin Vasile <cata.vasile@nxp.com>
-Subject: [PATCH] crypto: caam - fix sg dump
-Date: Fri, 16 Sep 2016 12:06:27 +0300
-Message-ID: <1474016787-5792-1-git-send-email-cata.vasile@nxp.com>
+From: Romain Perier <romain.perier@free-electrons.com>
+Subject: Re: [PATCH v2 3/8] hwrng: omap - Switch to non-obsolete read API
+ implementation
+Date: Fri, 16 Sep 2016 12:11:26 +0200
+Message-ID: <57DBC54E.2010102@free-electrons.com>
+References: <20160907155743.6403-1-romain.perier@free-electrons.com>
+ <20160907155743.6403-4-romain.perier@free-electrons.com>
+ <20160913094825.GA30645@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto-owner@vger.kernel.org>, <horia.geanta@nxp.com>,
-        <alexandru.porosanu@nxp.com>, Catalin Vasile <cata.vasile@nxp.com>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: dsaxena@plexity.net, mpm@selenic.com,
+        Gregory Clement <gregory.clement@free-electrons.com>,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        Nadav Haklai <nadavh@marvell.com>,
+        Omri Itach <omrii@marvell.com>,
+        Shadi Ammouri <shadi@marvell.com>,
+        Yahuda Yitschak <yehuday@marvell.com>,
+        Hanna Hawa <hannah@marvell.com>,
+        Neta Zur Hershkovits <neta@marvell.com>,
+        Igal Liberman <igall@marvell.com>,
+        Marcin Wojtas <mw@semihalf.com>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0059.outbound.protection.outlook.com ([104.47.37.59]:51582
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754364AbcIPJVa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2016 05:21:30 -0400
+Received: from down.free-electrons.com ([37.187.137.238]:60795 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1752920AbcIPKLj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Sep 2016 06:11:39 -0400
+In-Reply-To: <20160913094825.GA30645@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Ensure scatterlists have a virtual memory mapping before dumping.
+Hi,
 
-Signed-off-by: Catalin Vasile <cata.vasile@nxp.com>
----
- drivers/crypto/caam/caamalg.c | 65 +++++++++++++++++++++++++++++++++----------
- 1 file changed, 50 insertions(+), 15 deletions(-)
+Le 13/09/2016 11:48, Herbert Xu a écrit :
+> On Wed, Sep 07, 2016 at 05:57:38PM +0200, Romain Perier wrote:
+>> +
+>> +static int omap_rng_do_read(struct hwrng *rng, void *data, size_t max,
+>> +			    bool wait)
+>>   {
+>>   	struct omap_rng_dev *priv;
+>> -	int data, i;
+>>
+>>   	priv = (struct omap_rng_dev *)rng->priv;
+>>
+>> -	for (i = 0; i < 20; i++) {
+>> -		data = priv->pdata->data_present(priv);
+>> -		if (data || !wait)
+>> -			break;
+>> -		/* RNG produces data fast enough (2+ MBit/sec, even
+>> -		 * during "rngtest" loads, that these delays don't
+>> -		 * seem to trigger.  We *could* use the RNG IRQ, but
+>> -		 * that'd be higher overhead ... so why bother?
+>> -		 */
+>> -		udelay(10);
+>
+> So in the wait case you're changing the driver's behaviour.  Instead
+> of waiting for 1us you'll now wait for 1s if there is no data.  Is
+> this what really what you want?
+>
+> Cheers,
+>
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 6dc5971..49f1ea7 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -111,6 +111,41 @@
- #else
- #define debug(format, arg...)
- #endif
-+
-+#ifdef DEBUG
-+#include <linux/highmem.h>
-+
-+static void dbg_dump_sg(const char *level, const char *prefix_str,
-+			int prefix_type, int rowsize, int groupsize,
-+			struct scatterlist *sg, size_t tlen, bool ascii)
-+{
-+	struct scatterlist *it;
-+	size_t len;
-+	void *buf;
-+
-+	for (it = sg; it != NULL && tlen > 0 ; it = sg_next(sg)) {
-+		/*
-+		 * make sure the scatterlist's page
-+		 * has a valid virtual memory mapping
-+		 */
-+		buf = kmap(sg_page(it));
-+
-+		len = min(tlen, it->length);
-+		print_hex_dump(level, prefix_str, prefix_type, rowsize,
-+			       groupsize, sg_virt(it), len, ascii);
-+		tlen -= len;
-+
-+		kunmap(sg_page(it));
-+	}
-+}
-+#else
-+static void dbg_dump_sg(const char *level, const char *prefix_str,
-+			int prefix_type, int rowsize, int groupsize,
-+			struct scatterlist *sg, size_t tlen, bool ascii)
-+{
-+}
-+#endif
-+
- static struct list_head alg_list;
- 
- struct caam_alg_entry {
-@@ -1984,9 +2019,9 @@ static void ablkcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
- 		       edesc->src_nents > 1 ? 100 : ivsize, 1);
--	print_hex_dump(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
--		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
--		       edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
-+	dbg_dump_sg(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
-+		    DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
-+		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
- #endif
- 
- 	ablkcipher_unmap(jrdev, edesc, req);
-@@ -2016,9 +2051,9 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
- 		       ivsize, 1);
--	print_hex_dump(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
--		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
--		       edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
-+	dbg_dump_sg(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
-+		    DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
-+		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
- #endif
- 
- 	ablkcipher_unmap(jrdev, edesc, req);
-@@ -2176,9 +2211,9 @@ static void init_ablkcipher_job(u32 *sh_desc, dma_addr_t ptr,
- 	print_hex_dump(KERN_ERR, "presciv@"__stringify(__LINE__)": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
- 		       ivsize, 1);
--	print_hex_dump(KERN_ERR, "src    @"__stringify(__LINE__)": ",
--		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
--		       edesc->src_nents ? 100 : req->nbytes, 1);
-+	dbg_dump_sg(KERN_ERR, "src    @"__stringify(__LINE__)": ",
-+		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
-+		    edesc->src_nents ? 100 : req->nbytes, 1);
- #endif
- 
- 	len = desc_len(sh_desc);
-@@ -2233,9 +2268,9 @@ static void init_ablkcipher_giv_job(u32 *sh_desc, dma_addr_t ptr,
- 	print_hex_dump(KERN_ERR, "presciv@" __stringify(__LINE__) ": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
- 		       ivsize, 1);
--	print_hex_dump(KERN_ERR, "src    @" __stringify(__LINE__) ": ",
--		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
--		       edesc->src_nents ? 100 : req->nbytes, 1);
-+	dbg_dump_sg(KERN_ERR, "src    @" __stringify(__LINE__) ": ",
-+		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
-+		    edesc->src_nents ? 100 : req->nbytes, 1);
- #endif
- 
- 	len = desc_len(sh_desc);
-@@ -2512,9 +2547,9 @@ static int aead_decrypt(struct aead_request *req)
- 		return PTR_ERR(edesc);
- 
- #ifdef DEBUG
--	print_hex_dump(KERN_ERR, "dec src@"__stringify(__LINE__)": ",
--		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
--		       req->assoclen + req->cryptlen, 1);
-+	dbg_dump_sg(KERN_ERR, "dec src@"__stringify(__LINE__)": ",
-+		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
-+		    req->assoclen + req->cryptlen, 1);
- #endif
- 
- 	/* Create and submit job descriptor*/
+Mhhh, you're right, in this specific case it will add more latency... 
+with busy loop, on average, 20 retries will be enough to have data...
+
+Thanks!
 -- 
-1.8.3.1
+Romain Perier, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
