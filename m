@@ -1,50 +1,82 @@
-From: Wei Yongjun <weiyj.lk@gmail.com>
-Subject: [PATCH -next] hwrng: geode - fix return value check in mod_init()
-Date: Fri, 16 Sep 2016 01:50:01 +0000
-Message-ID: <1473990601-18721-1-git-send-email-weiyj.lk@gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [RFC] revamp fips_allowed flag
+Date: Fri, 16 Sep 2016 07:42:13 +0200
+Message-ID: <9465267.bxih8SxCui@tauon.atsec.com>
+References: <1818375.56xtGUSNII@tauon.atsec.com> <2606890.Z1PDhBGeZR@tauon.atsec.com> <20160915062629.GA14950@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyongjun1@huawei.com>,
-        linux-geode@lists.infradead.org, linux-crypto@vger.kernel.org
-To: Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:36311 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755100AbcIPBuI (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Sep 2016 21:50:08 -0400
-Received: by mail-pf0-f193.google.com with SMTP id n24so2922592pfb.3
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Sep 2016 18:50:08 -0700 (PDT)
+Received: from mail.eperm.de ([89.247.134.16]:47976 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752504AbcIPFmR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Sep 2016 01:42:17 -0400
+In-Reply-To: <20160915062629.GA14950@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Wei Yongjun <weiyongjun1@huawei.com>
+Am Donnerstag, 15. September 2016, 14:26:29 CEST schrieb Herbert Xu:
 
-In case of error, the function devm_ioremap() returns NULL pointer
-not ERR_PTR(). The IS_ERR() test in the return value check should
-be replaced with NULL test.
+Hi Herbert,
 
-Fixes: 6e9b5e76882c ("hwrng: geode - Migrate to managed API")
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
----
- drivers/char/hw_random/geode-rng.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> On Thu, Sep 15, 2016 at 08:23:05AM +0200, Stephan Mueller wrote:
+> > Where shall we draw the line here? Shall that be only for authenc, or
+> > seqiv? Or shall we also consider rfc4106 too, knowing that there are
+> > implementations which provide a full rfc4106 GCM combo (x86 for example).
+> > What about the current pkcspad1 template where we could expect that there
+> > may be entire HW implementations with that?
+> 
+> That's something that only you can tell us :)
 
-diff --git a/drivers/char/hw_random/geode-rng.c b/drivers/char/hw_random/geode-rng.c
-index 0cae210..e7a2459 100644
---- a/drivers/char/hw_random/geode-rng.c
-+++ b/drivers/char/hw_random/geode-rng.c
-@@ -95,8 +95,8 @@ static int __init mod_init(void)
- 				return -ENODEV;
- 
- 			mem = devm_ioremap(&pdev->dev, rng_base, 0x58);
--			if (IS_ERR(mem))
--				return PTR_ERR(mem);
-+			if (!mem)
-+				return -ENOMEM;
- 			geode_rng.priv = (unsigned long)mem;
- 
- 			pr_info("AMD Geode RNG detected\n");
+Well, as a baseline we can say  that:
+
+- with the exception of a few block chaining modes (e.g. xcbc, pcbc, lrw) all 
+templates are allowed in FIPS mode
+
+- almost all "non-approved" ciphers (i.e those that should not have a 
+fips_allowed flag) are due to the raw base cipher (i.e. only SHA1/2, AES and 
+TDES is allowed)
+
+- all compression algos are allowed
+> 
+> For such templates we could move that info into the generic
+> template implementation code and have them declare themselves
+> as such that for any X if X is FIPS allowed then so is T(X).
+> 
+> This info can then be used in testmgr.
+
+I can see that, but I do not believe it makes our life in the testmgr easier. 
+The reason is that in a lot of cases, the template parts (read: block chaining 
+modes) are moved into implementations. The most notable examples are the x86 
+Intel and the S390 CPACF implementations. For those, the template handling 
+code is not triggered and thus we still would need testmgr entries with the 
+block chaining modes.
+
+Considering that we now have RSA in the kernel and that we could expect RSA 
+implementations in hardware (in fact, we already have them), there is another 
+complication: FIPS only allows RSA according to FIPS 186-4 and not according 
+to FIPS 186-2 (ok, the main difference is in key gen, which we do not have). 
+What I want to say here is that with the more complex style ciphers, it may 
+very well be possible that only the respective implementation knows whether it 
+is FIPS compliant.
+
+Thus, I am still thinking that moving the fips_allowed flag into the structs 
+that are evaluated during register time is more helpful. I definitely see that 
+this would imply that all, say, AES implementations need that flag. But IMHO 
+it is a much cleaner solution, because if the register is rejected, the cipher 
+does not show up in /proc/crypto and everybody knows that a particular cipher 
+is not in use.
+
+My particular example is that in one test with FIPS mode enabled, 
+seqiv(rfc4106(gcm-base(...))) was successfully loaded and marked as selftest 
+passed in /proc/crypto. Yet, an allocation of the test failed with ENOENT. 
+Rebooting the system without FIPS mode allowed me to allocate the cipher. As 
+there is no test for this particular cipher name in testmgr, I highly suspect 
+that the allocation code did not find it because somehow there was no test. In 
+any case, it is definitely not clear why that particular cipher name cannot be 
+allocated in FIPS mode given the entries in /proc/crypto.
+
+Ciao
+Stephan
