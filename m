@@ -1,82 +1,138 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] revamp fips_allowed flag
-Date: Fri, 16 Sep 2016 13:56:32 +0800
-Message-ID: <20160916055632.GA23956@gondor.apana.org.au>
-References: <1818375.56xtGUSNII@tauon.atsec.com>
- <2606890.Z1PDhBGeZR@tauon.atsec.com>
- <20160915062629.GA14950@gondor.apana.org.au>
- <9465267.bxih8SxCui@tauon.atsec.com>
+From: Catalin Vasile <cata.vasile@nxp.com>
+Subject: [PATCH] crypto: caam - fix sg dump
+Date: Fri, 16 Sep 2016 12:06:27 +0300
+Message-ID: <1474016787-5792-1-git-send-email-cata.vasile@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain
+Cc: <linux-crypto-owner@vger.kernel.org>, <horia.geanta@nxp.com>,
+        <alexandru.porosanu@nxp.com>, Catalin Vasile <cata.vasile@nxp.com>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:50201 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754064AbcIPF4g (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2016 01:56:36 -0400
-Content-Disposition: inline
-In-Reply-To: <9465267.bxih8SxCui@tauon.atsec.com>
+Received: from mail-cys01nam02on0059.outbound.protection.outlook.com ([104.47.37.59]:51582
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754364AbcIPJVa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Sep 2016 05:21:30 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 16, 2016 at 07:42:13AM +0200, Stephan Mueller wrote:
->
-> > For such templates we could move that info into the generic
-> > template implementation code and have them declare themselves
-> > as such that for any X if X is FIPS allowed then so is T(X).
-> > 
-> > This info can then be used in testmgr.
-> 
-> I can see that, but I do not believe it makes our life in the testmgr easier. 
-> The reason is that in a lot of cases, the template parts (read: block chaining 
-> modes) are moved into implementations. The most notable examples are the x86 
-> Intel and the S390 CPACF implementations. For those, the template handling 
-> code is not triggered and thus we still would need testmgr entries with the 
-> block chaining modes.
+Ensure scatterlists have a virtual memory mapping before dumping.
 
-That's not what I meant.  The template is only responsible for
-providing that info to testmgr.  The actual rule will then apply
-to any cra_name which matches it.  That is, if template T says
-that it is OK under FIPS, then every algorithm of type T(X) will
-be allowed if X is allowed.
+Signed-off-by: Catalin Vasile <cata.vasile@nxp.com>
+---
+ drivers/crypto/caam/caamalg.c | 65 +++++++++++++++++++++++++++++++++----------
+ 1 file changed, 50 insertions(+), 15 deletions(-)
 
-> Considering that we now have RSA in the kernel and that we could expect RSA 
-> implementations in hardware (in fact, we already have them), there is another 
-> complication: FIPS only allows RSA according to FIPS 186-4 and not according 
-> to FIPS 186-2 (ok, the main difference is in key gen, which we do not have). 
-> What I want to say here is that with the more complex style ciphers, it may 
-> very well be possible that only the respective implementation knows whether it 
-> is FIPS compliant.
-
-Please give a concrete example.
-
-> Thus, I am still thinking that moving the fips_allowed flag into the structs 
-> that are evaluated during register time is more helpful. I definitely see that 
-> this would imply that all, say, AES implementations need that flag. But IMHO 
-> it is a much cleaner solution, because if the register is rejected, the cipher 
-> does not show up in /proc/crypto and everybody knows that a particular cipher 
-> is not in use.
-
-That's crazy.  For AES we already have dozens of implementations,
-think about the amount of churn that will occur when one AES
-implementation is obsoleted by FIPS.
-
-> My particular example is that in one test with FIPS mode enabled, 
-> seqiv(rfc4106(gcm-base(...))) was successfully loaded and marked as selftest 
-> passed in /proc/crypto. Yet, an allocation of the test failed with ENOENT. 
-> Rebooting the system without FIPS mode allowed me to allocate the cipher. As 
-> there is no test for this particular cipher name in testmgr, I highly suspect 
-> that the allocation code did not find it because somehow there was no test. In 
-> any case, it is definitely not clear why that particular cipher name cannot be 
-> allocated in FIPS mode given the entries in /proc/crypto.
-
-Sounds like our testmgr dealing with FIPS is buggy.  It probably
-shouldn't mark it as passed.
-
-Cheers,
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 6dc5971..49f1ea7 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -111,6 +111,41 @@
+ #else
+ #define debug(format, arg...)
+ #endif
++
++#ifdef DEBUG
++#include <linux/highmem.h>
++
++static void dbg_dump_sg(const char *level, const char *prefix_str,
++			int prefix_type, int rowsize, int groupsize,
++			struct scatterlist *sg, size_t tlen, bool ascii)
++{
++	struct scatterlist *it;
++	size_t len;
++	void *buf;
++
++	for (it = sg; it != NULL && tlen > 0 ; it = sg_next(sg)) {
++		/*
++		 * make sure the scatterlist's page
++		 * has a valid virtual memory mapping
++		 */
++		buf = kmap(sg_page(it));
++
++		len = min(tlen, it->length);
++		print_hex_dump(level, prefix_str, prefix_type, rowsize,
++			       groupsize, sg_virt(it), len, ascii);
++		tlen -= len;
++
++		kunmap(sg_page(it));
++	}
++}
++#else
++static void dbg_dump_sg(const char *level, const char *prefix_str,
++			int prefix_type, int rowsize, int groupsize,
++			struct scatterlist *sg, size_t tlen, bool ascii)
++{
++}
++#endif
++
+ static struct list_head alg_list;
+ 
+ struct caam_alg_entry {
+@@ -1984,9 +2019,9 @@ static void ablkcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       edesc->src_nents > 1 ? 100 : ivsize, 1);
+-	print_hex_dump(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-		       edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
++	dbg_dump_sg(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
++		    DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
++		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
+ #endif
+ 
+ 	ablkcipher_unmap(jrdev, edesc, req);
+@@ -2016,9 +2051,9 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       ivsize, 1);
+-	print_hex_dump(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-		       edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
++	dbg_dump_sg(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
++		    DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
++		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
+ #endif
+ 
+ 	ablkcipher_unmap(jrdev, edesc, req);
+@@ -2176,9 +2211,9 @@ static void init_ablkcipher_job(u32 *sh_desc, dma_addr_t ptr,
+ 	print_hex_dump(KERN_ERR, "presciv@"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       ivsize, 1);
+-	print_hex_dump(KERN_ERR, "src    @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-		       edesc->src_nents ? 100 : req->nbytes, 1);
++	dbg_dump_sg(KERN_ERR, "src    @"__stringify(__LINE__)": ",
++		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
++		    edesc->src_nents ? 100 : req->nbytes, 1);
+ #endif
+ 
+ 	len = desc_len(sh_desc);
+@@ -2233,9 +2268,9 @@ static void init_ablkcipher_giv_job(u32 *sh_desc, dma_addr_t ptr,
+ 	print_hex_dump(KERN_ERR, "presciv@" __stringify(__LINE__) ": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       ivsize, 1);
+-	print_hex_dump(KERN_ERR, "src    @" __stringify(__LINE__) ": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-		       edesc->src_nents ? 100 : req->nbytes, 1);
++	dbg_dump_sg(KERN_ERR, "src    @" __stringify(__LINE__) ": ",
++		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
++		    edesc->src_nents ? 100 : req->nbytes, 1);
+ #endif
+ 
+ 	len = desc_len(sh_desc);
+@@ -2512,9 +2547,9 @@ static int aead_decrypt(struct aead_request *req)
+ 		return PTR_ERR(edesc);
+ 
+ #ifdef DEBUG
+-	print_hex_dump(KERN_ERR, "dec src@"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-		       req->assoclen + req->cryptlen, 1);
++	dbg_dump_sg(KERN_ERR, "dec src@"__stringify(__LINE__)": ",
++		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
++		    req->assoclen + req->cryptlen, 1);
+ #endif
+ 
+ 	/* Create and submit job descriptor*/
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.3.1
