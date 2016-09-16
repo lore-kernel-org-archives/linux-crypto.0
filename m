@@ -1,7 +1,8 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH v3 0/8] Add support for SafeXcel IP-76 to OMAP RNG
-Date: Fri, 16 Sep 2016 12:08:48 +0200
-Message-ID: <20160916100856.31727-1-romain.perier@free-electrons.com>
+Subject: [PATCH v3 6/8] hwrng: omap - Don't prefix the probe message with OMAP
+Date: Fri, 16 Sep 2016 12:08:54 +0200
+Message-ID: <20160916100856.31727-7-romain.perier@free-electrons.com>
+References: <20160916100856.31727-1-romain.perier@free-electrons.com>
 Cc: Gregory Clement <gregory.clement@free-electrons.com>,
         Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
         Romain Perier <romain.perier@free-electrons.com>,
@@ -16,39 +17,40 @@ Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 To: dsaxena@plexity.net, mpm@selenic.com,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:60826 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:60873 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1754490AbcIPKMH (ORCPT
+        with ESMTP id S1758767AbcIPKMR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2016 06:12:07 -0400
+        Fri, 16 Sep 2016 06:12:17 -0400
+In-Reply-To: <20160916100856.31727-1-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The driver omap-rng has a lot of similarity with the IP block SafeXcel
-IP-76. A lot of registers are the same and the way that the driver works
-is very closed the description of the TRNG EIP76 in its datasheet.
+So far, this driver was only used for OMAP SoCs. However, if a device
+variant is added for an IP block that has nothing to do with the OMAP
+platform, the message "OMAP Random Number Generator Ver" is displayed
+anyway. Instead of hardcoding "OMAP" into this message, we decide to
+only display "Random Number Generator". As dev_info is already
+pre-pending the message with the name of the device, we have enough
+informations.
 
-This series refactorize the driver, add support for generating bigger
-output random data and add a device variant for SafeXcel IP-76, found
-in Armada 8K.
+Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
+---
+ drivers/char/hw_random/omap-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Romain Perier (8):
-  dt-bindings: Add vendor prefix for INSIDE Secure
-  dt-bindings: omap-rng: Document SafeXcel IP-76 device variant
-  hwrng: omap - Switch to non-obsolete read API implementation
-  hwrng: omap - Remove global definition of hwrng
-  hwrng: omap - Add support for 128-bit output of data
-  hwrng: omap - Don't prefix the probe message with OMAP
-  hwrng: omap - Add device variant for SafeXcel IP-76 found in Armada 8K
-  arm64: dts: marvell: add TRNG description for Armada 8K CP
-
- Documentation/devicetree/bindings/rng/omap_rng.txt |  14 +-
- .../devicetree/bindings/vendor-prefixes.txt        |   1 +
- .../boot/dts/marvell/armada-cp110-master.dtsi      |   8 +
- .../arm64/boot/dts/marvell/armada-cp110-slave.dtsi |   8 +
- drivers/char/hw_random/Kconfig                     |   2 +-
- drivers/char/hw_random/omap-rng.c                  | 162 ++++++++++++++++-----
- 6 files changed, 152 insertions(+), 43 deletions(-)
-
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index a84ab49..bbbce16 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -400,7 +400,7 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		goto err_register;
+ 
+-	dev_info(&pdev->dev, "OMAP Random Number Generator ver. %02x\n",
++	dev_info(&pdev->dev, "Random Number Generator ver. %02x\n",
+ 		 omap_rng_read(priv, RNG_REV_REG));
+ 
+ 	return 0;
 -- 
 2.9.3
