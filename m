@@ -1,7 +1,7 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH v3 2/8] dt-bindings: omap-rng: Document SafeXcel IP-76 device variant
-Date: Fri, 16 Sep 2016 12:08:50 +0200
-Message-ID: <20160916100856.31727-3-romain.perier@free-electrons.com>
+Subject: [PATCH v3 4/8] hwrng: omap - Remove global definition of hwrng
+Date: Fri, 16 Sep 2016 12:08:52 +0200
+Message-ID: <20160916100856.31727-5-romain.perier@free-electrons.com>
 References: <20160916100856.31727-1-romain.perier@free-electrons.com>
 Cc: Gregory Clement <gregory.clement@free-electrons.com>,
         Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
@@ -17,60 +17,100 @@ Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 To: dsaxena@plexity.net, mpm@selenic.com,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:60838 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:60859 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1757456AbcIPKMI (ORCPT
+        with ESMTP id S1758324AbcIPKMQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2016 06:12:08 -0400
+        Fri, 16 Sep 2016 06:12:16 -0400
 In-Reply-To: <20160916100856.31727-1-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This commits add missing fields in the documentation that are used
-by the new device variant. It also includes DT example to show how
-the variant should be used.
+The omap-rng driver currently assumes that there will only ever be a
+single instance of an RNG device. For this reason, there is a statically
+allocated struct hwrng, with a fixed name. However, registering two
+struct hwrng with the same isn't accepted by the RNG framework, so we
+need to switch to a dynamically allocated struct hwrng, each using a
+different name. Then, we define the name of this hwrng to "dev_name(dev)",
+so the name of the data structure is unique per device.
 
 Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
 ---
- Documentation/devicetree/bindings/rng/omap_rng.txt | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/rng/omap_rng.txt b/Documentation/devicetree/bindings/rng/omap_rng.txt
-index 6a62acd..4714772 100644
---- a/Documentation/devicetree/bindings/rng/omap_rng.txt
-+++ b/Documentation/devicetree/bindings/rng/omap_rng.txt
-@@ -1,4 +1,4 @@
--OMAP SoC HWRNG Module
-+OMAP SoC and Inside-Secure HWRNG Module
- 
- Required properties:
- 
-@@ -6,11 +6,13 @@ Required properties:
-   RNG versions:
-   - "ti,omap2-rng" for OMAP2.
-   - "ti,omap4-rng" for OMAP4, OMAP5 and AM33XX.
-+  - "inside-secure,safexcel-eip76" for SoCs with EIP76 IP block
-   Note that these two versions are incompatible.
- - ti,hwmods: Name of the hwmod associated with the RNG module
- - reg : Offset and length of the register set for the module
- - interrupts : the interrupt number for the RNG module.
--		Only used for "ti,omap4-rng".
-+		Used for "ti,omap4-rng" and "inside-secure,safexcel-eip76"
-+- clocks: the trng clock source
- 
- Example:
- /* AM335x */
-@@ -20,3 +22,11 @@ rng: rng@48310000 {
- 	reg = <0x48310000 0x2000>;
- 	interrupts = <111>;
+Changes in v2:
+ - Fix the goto label used when there is an error for devm_kstrdup
+
+ drivers/char/hw_random/omap-rng.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index b3f6047..5ea804d 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -127,6 +127,7 @@ struct omap_rng_dev {
+ 	void __iomem			*base;
+ 	struct device			*dev;
+ 	const struct omap_rng_pdata	*pdata;
++	struct hwrng rng;
  };
+ 
+ static inline u32 omap_rng_read(struct omap_rng_dev *priv, u16 reg)
+@@ -187,12 +188,6 @@ static void omap_rng_cleanup(struct hwrng *rng)
+ 	priv->pdata->cleanup(priv);
+ }
+ 
+-static struct hwrng omap_rng_ops = {
+-	.name		= "omap",
+-	.read 		= omap_rng_do_read,
+-	.init		= omap_rng_init,
+-	.cleanup	= omap_rng_cleanup,
+-};
+ 
+ static inline u32 omap2_rng_data_present(struct omap_rng_dev *priv)
+ {
+@@ -365,7 +360,11 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 	if (!priv)
+ 		return -ENOMEM;
+ 
+-	omap_rng_ops.priv = (unsigned long)priv;
++	priv->rng.read = omap_rng_do_read;
++	priv->rng.init = omap_rng_init;
++	priv->rng.cleanup = omap_rng_cleanup;
 +
-+/* SafeXcel IP-76 */
-+trng: rng@f2760000 {
-+	compatible = "inside-secure,safexcel-eip76";
-+	reg = <0xf2760000 0x7d>;
-+	interrupts = <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
-+	clocks = <&cpm_syscon0 1 25>;
-+};
++	priv->rng.priv = (unsigned long)priv;
+ 	platform_set_drvdata(pdev, priv);
+ 	priv->dev = dev;
+ 
+@@ -376,6 +375,12 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 		goto err_ioremap;
+ 	}
+ 
++	priv->rng.name = devm_kstrdup(dev, dev_name(dev), GFP_KERNEL);
++	if (!priv->rng.name) {
++		ret = -ENOMEM;
++		goto err_ioremap;
++	}
++
+ 	pm_runtime_enable(&pdev->dev);
+ 	ret = pm_runtime_get_sync(&pdev->dev);
+ 	if (ret) {
+@@ -389,7 +394,7 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		goto err_ioremap;
+ 
+-	ret = hwrng_register(&omap_rng_ops);
++	ret = hwrng_register(&priv->rng);
+ 	if (ret)
+ 		goto err_register;
+ 
+@@ -410,7 +415,7 @@ static int omap_rng_remove(struct platform_device *pdev)
+ {
+ 	struct omap_rng_dev *priv = platform_get_drvdata(pdev);
+ 
+-	hwrng_unregister(&omap_rng_ops);
++	hwrng_unregister(&priv->rng);
+ 
+ 	priv->pdata->cleanup(priv);
+ 
 -- 
 2.9.3
