@@ -1,70 +1,65 @@
-From: Romain Perier <romain.perier@free-electrons.com>
-Subject: Re: [PATCH v3 0/8] Add support for SafeXcel IP-76 to OMAP RNG
-Date: Fri, 16 Sep 2016 14:52:42 +0200
-Message-ID: <57DBEB1A.4050602@free-electrons.com>
-References: <20160916100856.31727-1-romain.perier@free-electrons.com>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH -next] hwrng: amd - Fix return value check in mod_init()
+Date: Fri, 16 Sep 2016 18:43:16 +0530
+Message-ID: <CANc+2y6C-dgCEO9=zxRDzdzUsfo7MXJWPnvdtfjFzUq2VvAAgA@mail.gmail.com>
+References: <1473990581-18602-1-git-send-email-weiyj.lk@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: Gregory Clement <gregory.clement@free-electrons.com>,
-        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-        Nadav Haklai <nadavh@marvell.com>,
-        Omri Itach <omrii@marvell.com>,
-        Shadi Ammouri <shadi@marvell.com>,
-        Yahuda Yitschak <yehuday@marvell.com>,
-        Hanna Hawa <hannah@marvell.com>,
-        Neta Zur Hershkovits <neta@marvell.com>,
-        Igal Liberman <igall@marvell.com>,
-        Marcin Wojtas <mw@semihalf.com>, linux-crypto@vger.kernel.org
-To: dsaxena@plexity.net, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Cc: Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Corentin LABBE <clabbe.montjoie@gmail.com>,
+        Wei Yongjun <weiyongjun1@huawei.com>,
+        linux-crypto@vger.kernel.org
+To: Wei Yongjun <weiyj.lk@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:37416 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S932698AbcIPMwp (ORCPT
+Received: from mail-yw0-f196.google.com ([209.85.161.196]:33006 "EHLO
+        mail-yw0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756624AbcIPNNS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2016 08:52:45 -0400
-In-Reply-To: <20160916100856.31727-1-romain.perier@free-electrons.com>
+        Fri, 16 Sep 2016 09:13:18 -0400
+Received: by mail-yw0-f196.google.com with SMTP id g192so4430321ywh.0
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2016 06:13:17 -0700 (PDT)
+In-Reply-To: <1473990581-18602-1-git-send-email-weiyj.lk@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+> In case of error, the function devm_kzalloc() or devm_ioport_map()
+> return NULL pointer not ERR_PTR(). The IS_ERR() test in the return
+> value check should be replaced with NULL test.
+>
+> Fixes: 31b2a73c9c5f ("hwrng: amd - Migrate to managed API")
+> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+> ---
+>  drivers/char/hw_random/amd-rng.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
+> index 4dbc5aa..4a99ac7 100644
+> --- a/drivers/char/hw_random/amd-rng.c
+> +++ b/drivers/char/hw_random/amd-rng.c
+> @@ -149,8 +149,8 @@ static int __init mod_init(void)
+>                 return -EIO;
+>
+>         priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
+> -       if (IS_ERR(priv))
+> -               return PTR_ERR(priv);
+> +       if (!priv)
+> +               return -ENOMEM;
+>
+>         if (!devm_request_region(&pdev->dev, pmbase + PMBASE_OFFSET,
+>                                 PMBASE_SIZE, DRV_NAME)) {
+> @@ -161,9 +161,9 @@ static int __init mod_init(void)
+>
+>         priv->iobase = devm_ioport_map(&pdev->dev, pmbase + PMBASE_OFFSET,
+>                         PMBASE_SIZE);
+> -       if (IS_ERR(priv->iobase)) {
+> +       if (!priv->iobase) {
+>                 pr_err(DRV_NAME "Cannot map ioport\n");
+> -               return PTR_ERR(priv->iobase);
+> +               return -ENOMEM;
+>         }
+>
+>         amd_rng.priv = (unsigned long)priv;
+>
 
-Le 16/09/2016 12:08, Romain Perier a écrit :
-> The driver omap-rng has a lot of similarity with the IP block SafeXcel
-> IP-76. A lot of registers are the same and the way that the driver works
-> is very closed the description of the TRNG EIP76 in its datasheet.
->
-> This series refactorize the driver, add support for generating bigger
-> output random data and add a device variant for SafeXcel IP-76, found
-> in Armada 8K.
->
-> Romain Perier (8):
->    dt-bindings: Add vendor prefix for INSIDE Secure
->    dt-bindings: omap-rng: Document SafeXcel IP-76 device variant
->    hwrng: omap - Switch to non-obsolete read API implementation
->    hwrng: omap - Remove global definition of hwrng
->    hwrng: omap - Add support for 128-bit output of data
->    hwrng: omap - Don't prefix the probe message with OMAP
->    hwrng: omap - Add device variant for SafeXcel IP-76 found in Armada 8K
->    arm64: dts: marvell: add TRNG description for Armada 8K CP
->
->   Documentation/devicetree/bindings/rng/omap_rng.txt |  14 +-
->   .../devicetree/bindings/vendor-prefixes.txt        |   1 +
->   .../boot/dts/marvell/armada-cp110-master.dtsi      |   8 +
->   .../arm64/boot/dts/marvell/armada-cp110-slave.dtsi |   8 +
->   drivers/char/hw_random/Kconfig                     |   2 +-
->   drivers/char/hw_random/omap-rng.c                  | 162 ++++++++++++++++-----
->   6 files changed, 152 insertions(+), 43 deletions(-)
->
-
-If possible, I would like to get "Tested-by" tags by the omap guys 
-before this set of patches is merged, to be sure that there are no 
-regressions for the OMAP variant.
-
-Thanks,
-Regards,
--- 
-Romain Perier, Free Electrons
-Embedded Linux, Kernel and Android engineering
-http://free-electrons.com
+My change introduced this issue. Thanks for fixing it.
