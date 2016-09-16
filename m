@@ -1,8 +1,7 @@
 From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH v3 3/8] hwrng: omap - Switch to non-obsolete read API implementation
-Date: Fri, 16 Sep 2016 12:08:51 +0200
-Message-ID: <20160916100856.31727-4-romain.perier@free-electrons.com>
-References: <20160916100856.31727-1-romain.perier@free-electrons.com>
+Subject: [PATCH v3 0/8] Add support for SafeXcel IP-76 to OMAP RNG
+Date: Fri, 16 Sep 2016 12:08:48 +0200
+Message-ID: <20160916100856.31727-1-romain.perier@free-electrons.com>
 Cc: Gregory Clement <gregory.clement@free-electrons.com>,
         Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
         Romain Perier <romain.perier@free-electrons.com>,
@@ -17,108 +16,39 @@ Cc: Gregory Clement <gregory.clement@free-electrons.com>,
 To: dsaxena@plexity.net, mpm@selenic.com,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:60847 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:60826 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752117AbcIPKMJ (ORCPT
+        with ESMTP id S1754490AbcIPKMH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2016 06:12:09 -0400
-In-Reply-To: <20160916100856.31727-1-romain.perier@free-electrons.com>
+        Fri, 16 Sep 2016 06:12:07 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The ".data_present" and ".data_read" operations are marked as OBSOLETE
-in the hwrng API. We have to use the ".read" operation instead. It makes
-the driver simpler and moves the busy loop, that waits until enough data
-is generated, to the read function. We simplify this step by only
-checking the status of the engine, if there is data, we copy the data to
-the output buffer and the amout of copied data is returned to the caller,
-otherwise zero is returned. The hwrng core will re-call the read operation
-as many times as required until enough data has been copied.
+The driver omap-rng has a lot of similarity with the IP block SafeXcel
+IP-76. A lot of registers are the same and the way that the driver works
+is very closed the description of the TRNG EIP76 in its datasheet.
 
-Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
----
+This series refactorize the driver, add support for generating bigger
+output random data and add a device variant for SafeXcel IP-76, found
+in Armada 8K.
 
-Changes in v3:
- - Re-add code for busy loop that waits until enough data is generated. When no
-   data is available, the busy loop is tried several time until the function
-   returns to the hw_random core and then schedule_timeout_interruptible(1) is
-   called. in v2, schedule_timeout_interruptible(1) was called each time data
-   was not available, which added more latency.
+Romain Perier (8):
+  dt-bindings: Add vendor prefix for INSIDE Secure
+  dt-bindings: omap-rng: Document SafeXcel IP-76 device variant
+  hwrng: omap - Switch to non-obsolete read API implementation
+  hwrng: omap - Remove global definition of hwrng
+  hwrng: omap - Add support for 128-bit output of data
+  hwrng: omap - Don't prefix the probe message with OMAP
+  hwrng: omap - Add device variant for SafeXcel IP-76 found in Armada 8K
+  arm64: dts: marvell: add TRNG description for Armada 8K CP
 
- drivers/char/hw_random/omap-rng.c | 41 ++++++++++++++++-----------------------
- 1 file changed, 17 insertions(+), 24 deletions(-)
+ Documentation/devicetree/bindings/rng/omap_rng.txt |  14 +-
+ .../devicetree/bindings/vendor-prefixes.txt        |   1 +
+ .../boot/dts/marvell/armada-cp110-master.dtsi      |   8 +
+ .../arm64/boot/dts/marvell/armada-cp110-slave.dtsi |   8 +
+ drivers/char/hw_random/Kconfig                     |   2 +-
+ drivers/char/hw_random/omap-rng.c                  | 162 ++++++++++++++++-----
+ 6 files changed, 152 insertions(+), 43 deletions(-)
 
-diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-index 01d4be2..b3f6047 100644
---- a/drivers/char/hw_random/omap-rng.c
-+++ b/drivers/char/hw_random/omap-rng.c
-@@ -140,41 +140,35 @@ static inline void omap_rng_write(struct omap_rng_dev *priv, u16 reg,
- 	__raw_writel(val, priv->base + priv->pdata->regs[reg]);
- }
- 
--static int omap_rng_data_present(struct hwrng *rng, int wait)
-+
-+static int omap_rng_do_read(struct hwrng *rng, void *data, size_t max,
-+			    bool wait)
- {
- 	struct omap_rng_dev *priv;
--	int data, i;
-+	int i, present;
- 
- 	priv = (struct omap_rng_dev *)rng->priv;
- 
-+	if (max < priv->pdata->data_size)
-+		return 0;
-+
- 	for (i = 0; i < 20; i++) {
--		data = priv->pdata->data_present(priv);
--		if (data || !wait)
-+		present = priv->pdata->data_present(priv);
-+		if (present || !wait)
- 			break;
--		/* RNG produces data fast enough (2+ MBit/sec, even
--		 * during "rngtest" loads, that these delays don't
--		 * seem to trigger.  We *could* use the RNG IRQ, but
--		 * that'd be higher overhead ... so why bother?
--		 */
-+
- 		udelay(10);
- 	}
--	return data;
--}
--
--static int omap_rng_data_read(struct hwrng *rng, u32 *data)
--{
--	struct omap_rng_dev *priv;
--	u32 data_size, i;
--
--	priv = (struct omap_rng_dev *)rng->priv;
--	data_size = priv->pdata->data_size;
-+	if (!present)
-+		return 0;
- 
--	for (i = 0; i < data_size / sizeof(u32); i++)
--		data[i] = omap_rng_read(priv, RNG_OUTPUT_L_REG + i);
-+	memcpy_fromio(data, priv->base + priv->pdata->regs[RNG_OUTPUT_L_REG],
-+		      priv->pdata->data_size);
- 
- 	if (priv->pdata->regs[RNG_INTACK_REG])
- 		omap_rng_write(priv, RNG_INTACK_REG, RNG_REG_INTACK_RDY_MASK);
--	return data_size;
-+
-+	return priv->pdata->data_size;
- }
- 
- static int omap_rng_init(struct hwrng *rng)
-@@ -195,8 +189,7 @@ static void omap_rng_cleanup(struct hwrng *rng)
- 
- static struct hwrng omap_rng_ops = {
- 	.name		= "omap",
--	.data_present	= omap_rng_data_present,
--	.data_read	= omap_rng_data_read,
-+	.read 		= omap_rng_do_read,
- 	.init		= omap_rng_init,
- 	.cleanup	= omap_rng_cleanup,
- };
 -- 
 2.9.3
