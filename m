@@ -1,65 +1,65 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH -next] hwrng: amd - Fix return value check in mod_init()
-Date: Fri, 16 Sep 2016 18:43:16 +0530
-Message-ID: <CANc+2y6C-dgCEO9=zxRDzdzUsfo7MXJWPnvdtfjFzUq2VvAAgA@mail.gmail.com>
-References: <1473990581-18602-1-git-send-email-weiyj.lk@gmail.com>
+From: Horia Geanta Neag <horia.geanta@nxp.com>
+Subject: Re: [PATCH] crypto: caam - fix sg dump
+Date: Fri, 16 Sep 2016 13:49:43 +0000
+Message-ID: <DB4PR04MB08477BD1439B77894D18381F98F30@DB4PR04MB0847.eurprd04.prod.outlook.com>
+References: <1474016787-5792-1-git-send-email-cata.vasile@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Corentin LABBE <clabbe.montjoie@gmail.com>,
-        Wei Yongjun <weiyongjun1@huawei.com>,
-        linux-crypto@vger.kernel.org
-To: Wei Yongjun <weiyj.lk@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: "linux-crypto-owner@vger.kernel.org"
+        <linux-crypto-owner@vger.kernel.org>,
+        Alexandru Porosanu <alexandru.porosanu@nxp.com>
+To: Cata Vasile <cata.vasile@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yw0-f196.google.com ([209.85.161.196]:33006 "EHLO
-        mail-yw0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756624AbcIPNNS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2016 09:13:18 -0400
-Received: by mail-yw0-f196.google.com with SMTP id g192so4430321ywh.0
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2016 06:13:17 -0700 (PDT)
-In-Reply-To: <1473990581-18602-1-git-send-email-weiyj.lk@gmail.com>
+Received: from mail-eopbgr50059.outbound.protection.outlook.com ([40.107.5.59]:18624
+        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S934882AbcIPOVn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Sep 2016 10:21:43 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> In case of error, the function devm_kzalloc() or devm_ioport_map()
-> return NULL pointer not ERR_PTR(). The IS_ERR() test in the return
-> value check should be replaced with NULL test.
->
-> Fixes: 31b2a73c9c5f ("hwrng: amd - Migrate to managed API")
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-> ---
->  drivers/char/hw_random/amd-rng.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
-> index 4dbc5aa..4a99ac7 100644
-> --- a/drivers/char/hw_random/amd-rng.c
-> +++ b/drivers/char/hw_random/amd-rng.c
-> @@ -149,8 +149,8 @@ static int __init mod_init(void)
->                 return -EIO;
->
->         priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
-> -       if (IS_ERR(priv))
-> -               return PTR_ERR(priv);
-> +       if (!priv)
-> +               return -ENOMEM;
->
->         if (!devm_request_region(&pdev->dev, pmbase + PMBASE_OFFSET,
->                                 PMBASE_SIZE, DRV_NAME)) {
-> @@ -161,9 +161,9 @@ static int __init mod_init(void)
->
->         priv->iobase = devm_ioport_map(&pdev->dev, pmbase + PMBASE_OFFSET,
->                         PMBASE_SIZE);
-> -       if (IS_ERR(priv->iobase)) {
-> +       if (!priv->iobase) {
->                 pr_err(DRV_NAME "Cannot map ioport\n");
-> -               return PTR_ERR(priv->iobase);
-> +               return -ENOMEM;
->         }
->
->         amd_rng.priv = (unsigned long)priv;
->
-
-My change introduced this issue. Thanks for fixing it.
+On 9/16/2016 12:06 PM, Catalin Vasile wrote:=0A=
+> Ensure scatterlists have a virtual memory mapping before dumping.=0A=
+> =0A=
+> Signed-off-by: Catalin Vasile <cata.vasile@nxp.com>=0A=
+> ---=0A=
+>  drivers/crypto/caam/caamalg.c | 65 +++++++++++++++++++++++++++++++++----=
+------=0A=
+>  1 file changed, 50 insertions(+), 15 deletions(-)=0A=
+> =0A=
+> diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.=
+c=0A=
+> index 6dc5971..49f1ea7 100644=0A=
+> --- a/drivers/crypto/caam/caamalg.c=0A=
+> +++ b/drivers/crypto/caam/caamalg.c=0A=
+> @@ -111,6 +111,41 @@=0A=
+>  #else=0A=
+>  #define debug(format, arg...)=0A=
+>  #endif=0A=
+> +=0A=
+> +#ifdef DEBUG=0A=
+> +#include <linux/highmem.h>=0A=
+> +=0A=
+> +static void dbg_dump_sg(const char *level, const char *prefix_str,=0A=
+> +			int prefix_type, int rowsize, int groupsize,=0A=
+> +			struct scatterlist *sg, size_t tlen, bool ascii)=0A=
+> +{=0A=
+> +	struct scatterlist *it;=0A=
+> +	size_t len;=0A=
+> +	void *buf;=0A=
+> +=0A=
+> +	for (it =3D sg; it !=3D NULL && tlen > 0 ; it =3D sg_next(sg)) {=0A=
+> +		/*=0A=
+> +		 * make sure the scatterlist's page=0A=
+> +		 * has a valid virtual memory mapping=0A=
+> +		 */=0A=
+> +		buf =3D kmap(sg_page(it));=0A=
+Even though driver has been updated recently to use threaded irq instead=0A=
+of tasklet, there are still cases when you are not allowed to sleep here.=
+=0A=
+You should check this and use kmap_atomic when needed.=0A=
+=0A=
+Horia=0A=
