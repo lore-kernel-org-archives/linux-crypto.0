@@ -1,46 +1,41 @@
-From: Wei Yongjun <weiyj.lk@gmail.com>
-Subject: [PATCH] crypto: ccp - Fix return value check in ccp_dmaengine_register()
-Date: Sat, 17 Sep 2016 16:01:22 +0000
-Message-ID: <1474128082-14996-1-git-send-email-weiyj.lk@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyongjun1@huawei.com>, linux-crypto@vger.kernel.org
-To: Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:35515 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752434AbcIQQB3 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Sep 2016 12:01:29 -0400
-Received: by mail-pf0-f196.google.com with SMTP id 6so2023739pfl.2
-        for <linux-crypto@vger.kernel.org>; Sat, 17 Sep 2016 09:01:28 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Baoyou Xie <baoyou.xie@linaro.org>
+Subject: [PATCH] crypto: sun4i-ss: mark sun4i_hash() static
+Date: Sun, 18 Sep 2016 20:52:44 +0800
+Message-ID: <1474203164-14884-1-git-send-email-baoyou.xie@linaro.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, arnd@arndb.de, baoyou.xie@linaro.org,
+        xie.baoyou@zte.com.cn
+To: clabbe.montjoie@gmail.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, maxime.ripard@free-electrons.com,
+        wens@csie.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Wei Yongjun <weiyongjun1@huawei.com>
+We get 1 warning when building kernel with W=1:
+drivers/crypto/sunxi-ss/sun4i-ss-hash.c:168:5: warning: no previous prototype for 'sun4i_hash' [-Wmissing-prototypes]
 
-Fix the retrn value check which testing the wrong variable
-in ccp_dmaengine_register().
+In fact, this function is only used in the file in which it is
+declared and don't need a declaration, but can be made static.
+So this patch marks it 'static'.
 
-Fixes: 58ea8abf4904 ("crypto: ccp - Register the CCP as a DMA resource")
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+Signed-off-by: Baoyou Xie <baoyou.xie@linaro.org>
 ---
- drivers/crypto/ccp/ccp-dmaengine.c | 2 +-
+ drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dmaengine.c b/drivers/crypto/ccp/ccp-dmaengine.c
-index 94f77b0..32f645e 100644
---- a/drivers/crypto/ccp/ccp-dmaengine.c
-+++ b/drivers/crypto/ccp/ccp-dmaengine.c
-@@ -650,7 +650,7 @@ int ccp_dmaengine_register(struct ccp_device *ccp)
- 	dma_desc_cache_name = devm_kasprintf(ccp->dev, GFP_KERNEL,
- 					     "%s-dmaengine-desc-cache",
- 					     ccp->name);
--	if (!dma_cmd_cache_name)
-+	if (!dma_desc_cache_name)
- 		return -ENOMEM;
- 	ccp->dma_desc_cache = kmem_cache_create(dma_desc_cache_name,
- 						sizeof(struct ccp_dma_desc),
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+index 1afeb8e..0de2f62 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+@@ -165,7 +165,7 @@ int sun4i_hash_import_sha1(struct ahash_request *areq, const void *in)
+  * write remaining data in op->buf
+  * final state op->len=56
+  */
+-int sun4i_hash(struct ahash_request *areq)
++static int sun4i_hash(struct ahash_request *areq)
+ {
+ 	u32 v, ivmode = 0;
+ 	unsigned int i = 0;
+-- 
+2.7.4
