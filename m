@@ -1,40 +1,57 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH net-next] chcr/cxgb4i/cxgbit/RDMA/cxgb4: Allocate
- resources dynamically for all cxgb4 ULD's
-Date: Mon, 19 Sep 2016 01:38:06 -0400 (EDT)
-Message-ID: <20160919.013806.1060448921542204830.davem@davemloft.net>
-References: <1474080159-14980-1-git-send-email-hariprasad@chelsio.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.8
+Date: Mon, 19 Sep 2016 19:21:30 +0800
+Message-ID: <20160919112130.GA13124@gondor.apana.org.au>
+References: <20141211125119.GA12380@gondor.apana.org.au>
+ <20150214094328.GA7457@gondor.apana.org.au>
+ <20150415033951.GA1406@gondor.apana.org.au>
+ <20150622084457.GA7806@gondor.apana.org.au>
+ <20150831135655.GA2694@gondor.apana.org.au>
+ <20151102080427.GA8465@gondor.apana.org.au>
+ <20160111101450.GA24044@gondor.apana.org.au>
+ <20160122101828.GA15966@gondor.apana.org.au>
+ <20160801095821.GA1260@gondor.apana.org.au>
+ <20160905093318.GA30895@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-crypto@vger.kernel.org, nab@linux-iscsi.org,
-        jejb@linux.vnet.ibm.com, martin.petersen@oracle.com,
-        dledford@redhat.com, herbert@gondor.apana.org.au,
-        varun@chelsio.com, nirranjan@chelsio.com,
-        swise@opengridcomputing.com, atul.gupta@chelsio.com,
-        rahul.lakkireddy@chelsio.com
-To: hariprasad@chelsio.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([184.105.139.130]:53290 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755785AbcISFiM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Sep 2016 01:38:12 -0400
-In-Reply-To: <1474080159-14980-1-git-send-email-hariprasad@chelsio.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20160905093318.GA30895@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Hariprasad Shenai <hariprasad@chelsio.com>
-Date: Sat, 17 Sep 2016 08:12:39 +0530
+Hi Linus:
 
-> Allocate resources dynamically to cxgb4's Upper layer driver's(ULD) like
-> cxgbit, iw_cxgb4 and cxgb4i. Allocate resources when they register with
-> cxgb4 driver and free them while unregistering. All the queues and the
-> interrupts for them will be allocated during ULD probe only and freed
-> during remove.
-> 
-> Signed-off-by: Hariprasad Shenai <hariprasad@chelsio.com>
+This push fixes a potential weakness in IPsec CBC IV generation,
+as well as a number of issues that arose out of an OOM crash on
+ARM with CTR-mode AES.
 
-Applied.
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Ard Biesheuvel (2):
+      crypto: arm/aes-ctr - fix NULL dereference in tail processing
+      crypto: arm64/aes-ctr - fix NULL dereference in tail processing
+
+Herbert Xu (2):
+      crypto: echainiv - Replace chaining with multiplication
+      crypto: skcipher - Fix blkcipher walk OOM crash
+
+ arch/arm/crypto/aes-ce-glue.c |    2 +-
+ arch/arm64/crypto/aes-glue.c  |    2 +-
+ crypto/blkcipher.c            |    3 +-
+ crypto/echainiv.c             |  115 +++++++++--------------------------------
+ 4 files changed, 28 insertions(+), 94 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
