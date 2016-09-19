@@ -1,7 +1,7 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCH 5/8] crypto: omap-sham: change the DMA threshold value to a define
-Date: Mon, 19 Sep 2016 18:22:16 +0300
-Message-ID: <1474298539-23897-6-git-send-email-t-kristo@ti.com>
+Subject: [PATCH 1/8] crypto: omap-sham: add context export/import stubs
+Date: Mon, 19 Sep 2016 18:22:12 +0300
+Message-ID: <1474298539-23897-2-git-send-email-t-kristo@ti.com>
 References: <1474298539-23897-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,48 +10,59 @@ To: <herbert@gondor.apana.org.au>, <lokeshvutla@ti.com>,
         <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
         <linux-omap@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:53481 "EHLO comal.ext.ti.com"
+Received: from bear.ext.ti.com ([198.47.19.11]:51595 "EHLO bear.ext.ti.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932164AbcISPXO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Sep 2016 11:23:14 -0400
+        id S1751257AbcISPXL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Sep 2016 11:23:11 -0400
 In-Reply-To: <1474298539-23897-1-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Currently the threshold value was hardcoded in the driver. Having a define
-for it makes it easier to configure.
+Initially these just return -ENOTSUPP to indicate that they don't
+really do anything yet. Some sort of implementation is required
+for the driver to at least probe.
 
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-sham.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ drivers/crypto/omap-sham.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 8558989..5c95bf9 100644
+index cf9f617c..74653c9 100644
 --- a/drivers/crypto/omap-sham.c
 +++ b/drivers/crypto/omap-sham.c
-@@ -137,6 +137,7 @@
- #define OMAP_ALIGNED		__attribute__((aligned(sizeof(u32))))
+@@ -1340,6 +1340,16 @@ static void omap_sham_cra_exit(struct crypto_tfm *tfm)
+ 	}
+ }
  
- #define BUFLEN			PAGE_SIZE
-+#define OMAP_SHA_DMA_THRESHOLD	256
++static int omap_sham_export(struct ahash_request *req, void *out)
++{
++	return -ENOTSUPP;
++}
++
++static int omap_sham_import(struct ahash_request *req, const void *in)
++{
++	return -ENOTSUPP;
++}
++
+ static struct ahash_alg algs_sha1_md5[] = {
+ {
+ 	.init		= omap_sham_init,
+@@ -1998,8 +2008,13 @@ static int omap_sham_probe(struct platform_device *pdev)
  
- struct omap_sham_dev;
+ 	for (i = 0; i < dd->pdata->algs_info_size; i++) {
+ 		for (j = 0; j < dd->pdata->algs_info[i].size; j++) {
+-			err = crypto_register_ahash(
+-					&dd->pdata->algs_info[i].algs_list[j]);
++			struct ahash_alg *alg;
++
++			alg = &dd->pdata->algs_info[i].algs_list[j];
++			alg->export = omap_sham_export;
++			alg->import = omap_sham_import;
++			alg->halg.statesize = sizeof(struct omap_sham_reqctx);
++			err = crypto_register_ahash(alg);
+ 			if (err)
+ 				goto err_algs;
  
-@@ -1435,10 +1436,11 @@ static int omap_sham_final(struct ahash_request *req)
- 	/*
- 	 * OMAP HW accel works only with buffers >= 9.
- 	 * HMAC is always >= 9 because ipad == block size.
--	 * If buffersize is less than 240, we use fallback SW encoding,
--	 * as using DMA + HW in this case doesn't provide any benefit.
-+	 * If buffersize is less than DMA_THRESHOLD, we use fallback
-+	 * SW encoding, as using DMA + HW in this case doesn't provide
-+	 * any benefit.
- 	 */
--	if (!ctx->digcnt && ctx->bufcnt < 240)
-+	if (!ctx->digcnt && ctx->bufcnt < OMAP_SHA_DMA_THRESHOLD)
- 		return omap_sham_final_shash(req);
- 	else if (ctx->bufcnt)
- 		return omap_sham_enqueue(req, OP_FINAL);
 -- 
 1.9.1
