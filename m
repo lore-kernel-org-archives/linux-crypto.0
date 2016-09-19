@@ -1,57 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.8
-Date: Mon, 19 Sep 2016 19:21:30 +0800
-Message-ID: <20160919112130.GA13124@gondor.apana.org.au>
-References: <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150415033951.GA1406@gondor.apana.org.au>
- <20150622084457.GA7806@gondor.apana.org.au>
- <20150831135655.GA2694@gondor.apana.org.au>
- <20151102080427.GA8465@gondor.apana.org.au>
- <20160111101450.GA24044@gondor.apana.org.au>
- <20160122101828.GA15966@gondor.apana.org.au>
- <20160801095821.GA1260@gondor.apana.org.au>
- <20160905093318.GA30895@gondor.apana.org.au>
+From: Tero Kristo <t-kristo@ti.com>
+Subject: [PATCH 0/8] crypto: omap-sham: convert to sg based data engine
+Date: Mon, 19 Sep 2016 18:22:11 +0300
+Message-ID: <1474298539-23897-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20160905093318.GA30895@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: <linux-arm-kernel@lists.infradead.org>
+To: <herbert@gondor.apana.org.au>, <lokeshvutla@ti.com>,
+        <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+        <linux-omap@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from bear.ext.ti.com ([198.47.19.11]:51596 "EHLO bear.ext.ti.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752020AbcISPXM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Sep 2016 11:23:12 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Hi,
 
-This push fixes a potential weakness in IPsec CBC IV generation,
-as well as a number of issues that arose out of an OOM crash on
-ARM with CTR-mode AES.
+This series converts the omap-sham buffer handling towards a scatterlist
+approach. This avoids the need to have a huge internal buffer within the
+driver, and also allows us to properly implement export/import for the
+driver. I tried splitting up the changes to some sane patches, but this
+was rather difficult due to the fact that this is largely a complete
+rewrite of portions of the driver. Patch #6 is a prime example of this
+being pretty large, but splitting this up would break bisectability.
+Hopefully the patch is still understandable though.
 
+Crypto manager tests work fine at least on omap3/am3/am4/dra7 SoC:s.
+(Something is broken with test farm again and could not try omap2/omap4.)
 
-Please pull from
+Also tested tcrypt SHA performance on DRA7 and it seems to be working
+fine with different buffer sizes.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+My test branch is also available here for interested parties:
+tree: https://github.com/t-kristo/linux-pm.git
+breanch: 4.8-rc1-crypto
 
-
-Ard Biesheuvel (2):
-      crypto: arm/aes-ctr - fix NULL dereference in tail processing
-      crypto: arm64/aes-ctr - fix NULL dereference in tail processing
-
-Herbert Xu (2):
-      crypto: echainiv - Replace chaining with multiplication
-      crypto: skcipher - Fix blkcipher walk OOM crash
-
- arch/arm/crypto/aes-ce-glue.c |    2 +-
- arch/arm64/crypto/aes-glue.c  |    2 +-
- crypto/blkcipher.c            |    3 +-
- crypto/echainiv.c             |  115 +++++++++--------------------------------
- 4 files changed, 28 insertions(+), 94 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-Tero
