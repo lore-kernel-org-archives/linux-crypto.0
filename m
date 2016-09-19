@@ -1,7 +1,7 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCH 4/8] crypto: omap-sham: add support functions for sg based data handling
-Date: Mon, 19 Sep 2016 18:22:15 +0300
-Message-ID: <1474298539-23897-5-git-send-email-t-kristo@ti.com>
+Subject: [PATCH 7/8] crypto: omap-sham: add support for export/import
+Date: Mon, 19 Sep 2016 18:22:18 +0300
+Message-ID: <1474298539-23897-8-git-send-email-t-kristo@ti.com>
 References: <1474298539-23897-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,337 +10,60 @@ To: <herbert@gondor.apana.org.au>, <lokeshvutla@ti.com>,
         <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
         <linux-omap@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bear.ext.ti.com ([198.47.19.11]:51599 "EHLO bear.ext.ti.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932115AbcISPXS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Sep 2016 11:23:18 -0400
+Received: from devils.ext.ti.com ([198.47.26.153]:41256 "EHLO
+        devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752043AbcISPXe (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Sep 2016 11:23:34 -0400
 In-Reply-To: <1474298539-23897-1-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Currently omap-sham uses a huge internal buffer for caching data, and
-pushing this out to the DMA as large chunks. This, unfortunately,
-doesn't work too well with the export/import functionality required
-for ahash algorithms, and must be changed towards more scatterlist
-centric approach.
-
-This patch adds support functions for (mostly) scatterlist based data
-handling. omap_sham_prepare_request() prepares a scatterlist for DMA
-transfer to SHA crypto accelerator. This requires checking the data /
-offset / length alignment of the data, splitting the data to SHA block
-size granularity, and adding any remaining data back to the buffer.
-With this patch, the code doesn't actually go live yet, the support code
-will be taken properly into use with additional patches that modify the
-SHA driver functionality itself.
+Now that the driver has been converted to use scatterlists for data
+handling, add proper implementation for the export/import stubs also.
 
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-sham.c | 263 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 263 insertions(+)
+ drivers/crypto/omap-sham.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 33bea52..8558989 100644
+index 412559e..8eefd79 100644
 --- a/drivers/crypto/omap-sham.c
 +++ b/drivers/crypto/omap-sham.c
-@@ -112,6 +112,8 @@
- #define FLAGS_DMA_READY		6
- #define FLAGS_AUTO_XOR		7
- #define FLAGS_BE32_SHA1		8
-+#define FLAGS_SGS_COPIED	9
-+#define FLAGS_SGS_ALLOCED	10
- /* context flags */
- #define FLAGS_FINUP		16
- #define FLAGS_SG		17
-@@ -151,8 +153,10 @@ struct omap_sham_reqctx {
+@@ -1418,12 +1418,21 @@ static void omap_sham_cra_exit(struct crypto_tfm *tfm)
  
- 	/* walk state */
- 	struct scatterlist	*sg;
-+	struct scatterlist	sgl[2];
- 	struct scatterlist	sgl_tmp;
- 	unsigned int		offset;	/* offset in current sg */
-+	int			sg_len;
- 	unsigned int		total;	/* total request */
- 
- 	u8			buffer[0] OMAP_ALIGNED;
-@@ -223,6 +227,7 @@ struct omap_sham_dev {
- 	struct dma_chan		*dma_lch;
- 	struct tasklet_struct	done_task;
- 	u8			polling_mode;
-+	u8			xmit_buf[BUFLEN];
- 
- 	unsigned long		flags;
- 	struct crypto_queue	queue;
-@@ -626,6 +631,260 @@ static int omap_sham_xmit_dma(struct omap_sham_dev *dd, dma_addr_t dma_addr,
- 	return -EINPROGRESS;
+ static int omap_sham_export(struct ahash_request *req, void *out)
+ {
+-	return -ENOTSUPP;
++	struct omap_sham_reqctx *rctx = ahash_request_ctx(req);
++
++	memcpy(out, rctx, sizeof(*rctx) + rctx->bufcnt);
++
++	return 0;
  }
  
-+static int omap_sham_copy_sg_lists(struct omap_sham_reqctx *ctx,
-+				   struct scatterlist *sg, int bs, int new_len)
-+{
-+	int n = sg_nents(sg);
-+	struct scatterlist *tmp;
-+	int offset = ctx->offset;
-+
-+	if (ctx->bufcnt)
-+		n++;
-+
-+	ctx->sg = kmalloc_array(n, sizeof(*sg), GFP_KERNEL);
-+	if (!ctx->sg)
-+		return -ENOMEM;
-+
-+	sg_init_table(ctx->sg, n);
-+
-+	tmp = ctx->sg;
-+
-+	ctx->sg_len = 0;
-+
-+	if (ctx->bufcnt) {
-+		sg_set_buf(tmp, ctx->dd->xmit_buf, ctx->bufcnt);
-+		tmp = sg_next(tmp);
-+		ctx->sg_len++;
-+	}
-+
-+	while (sg && new_len) {
-+		int len = sg->length - offset;
-+
-+		if (offset) {
-+			offset -= sg->length;
-+			if (offset < 0)
-+				offset = 0;
-+		}
-+
-+		if (new_len < len)
-+			len = new_len;
-+
-+		if (len > 0) {
-+			new_len -= len;
-+			sg_set_page(tmp, sg_page(sg), len, sg->offset);
-+			if (new_len <= 0)
-+				sg_mark_end(tmp);
-+			tmp = sg_next(tmp);
-+			ctx->sg_len++;
-+		}
-+
-+		sg = sg_next(sg);
-+	}
-+
-+	set_bit(FLAGS_SGS_ALLOCED, &ctx->dd->flags);
-+
-+	ctx->bufcnt = 0;
-+
-+	return 0;
-+}
-+
-+static int omap_sham_copy_sgs(struct omap_sham_reqctx *ctx,
-+			      struct scatterlist *sg, int bs, int new_len)
-+{
-+	int pages;
-+	void *buf;
-+	int len;
-+
-+	len = new_len + ctx->bufcnt;
-+
-+	pages = get_order(ctx->total);
-+
-+	buf = (void *)__get_free_pages(GFP_ATOMIC, pages);
-+	if (!buf) {
-+		pr_err("Couldn't allocate pages for unaligned cases.\n");
-+		return -ENOMEM;
-+	}
-+
-+	if (ctx->bufcnt)
-+		memcpy(buf, ctx->dd->xmit_buf, ctx->bufcnt);
-+
-+	scatterwalk_map_and_copy(buf + ctx->bufcnt, sg, ctx->offset,
-+				 ctx->total - ctx->bufcnt, 0);
-+	sg_init_table(ctx->sgl, 1);
-+	sg_set_buf(ctx->sgl, buf, len);
-+	ctx->sg = ctx->sgl;
-+	set_bit(FLAGS_SGS_COPIED, &ctx->dd->flags);
-+	ctx->sg_len = 1;
-+	ctx->bufcnt = 0;
-+	ctx->offset = 0;
-+
-+	return 0;
-+}
-+
-+static int omap_sham_align_sgs(struct scatterlist *sg,
-+			       int nbytes, int bs, bool final,
-+			       struct omap_sham_reqctx *rctx)
-+{
-+	int n = 0;
-+	bool aligned = true;
-+	bool list_ok = true;
-+	struct scatterlist *sg_tmp = sg;
-+	int new_len;
-+	int offset = rctx->offset;
-+
-+	if (!sg || !sg->length || !nbytes)
-+		return 0;
-+
-+	new_len = nbytes;
-+
-+	if (offset)
-+		list_ok = false;
-+
-+	if (final)
-+		new_len = DIV_ROUND_UP(new_len, bs) * bs;
-+	else
-+		new_len = new_len / bs * bs;
-+
-+	while (nbytes > 0 && sg_tmp) {
-+		n++;
-+
-+		if (offset < sg_tmp->length) {
-+			if (!IS_ALIGNED(offset + sg_tmp->offset, 4)) {
-+				aligned = false;
-+				break;
-+			}
-+
-+			if (!IS_ALIGNED(sg_tmp->length - offset, bs)) {
-+				aligned = false;
-+				break;
-+			}
-+		}
-+
-+		if (offset) {
-+			offset -= sg_tmp->length;
-+			if (offset < 0) {
-+				nbytes += offset;
-+				offset = 0;
-+			}
-+		} else {
-+			nbytes -= sg_tmp->length;
-+		}
-+
-+		sg_tmp = sg_next(sg_tmp);
-+
-+		if (nbytes < 0) {
-+			list_ok = false;
-+			break;
-+		}
-+	}
-+
-+	if (!aligned)
-+		return omap_sham_copy_sgs(rctx, sg, bs, new_len);
-+	else if (!list_ok)
-+		return omap_sham_copy_sg_lists(rctx, sg, bs, new_len);
-+
-+	rctx->sg_len = n;
-+	rctx->sg = sg;
-+
-+	return 0;
-+}
-+
-+static int omap_sham_prepare_request(struct ahash_request *req, bool update)
-+{
-+	struct omap_sham_reqctx *rctx = ahash_request_ctx(req);
-+	int bs;
-+	int ret;
-+	int nbytes;
-+	bool final = rctx->flags & BIT(FLAGS_FINUP);
-+	int xmit_len, hash_later;
-+
-+	if (!req)
-+		return 0;
-+
-+	bs = get_block_size(rctx);
-+
-+	if (update)
-+		nbytes = req->nbytes;
-+	else
-+		nbytes = 0;
-+
-+	rctx->total = nbytes + rctx->bufcnt;
-+
-+	if (!rctx->total)
-+		return 0;
-+
-+	if (nbytes && (!IS_ALIGNED(rctx->bufcnt, bs))) {
-+		int len = bs - rctx->bufcnt % bs;
-+
-+		if (len > nbytes)
-+			len = nbytes;
-+		scatterwalk_map_and_copy(rctx->buffer + rctx->bufcnt, req->src,
-+					 0, len, 0);
-+		rctx->bufcnt += len;
-+		nbytes -= len;
-+		rctx->offset = len;
-+	}
-+
-+	if (rctx->bufcnt)
-+		memcpy(rctx->dd->xmit_buf, rctx->buffer, rctx->bufcnt);
-+
-+	ret = omap_sham_align_sgs(req->src, nbytes, bs, final, rctx);
-+	if (ret)
-+		return ret;
-+
-+	xmit_len = rctx->total;
-+
-+	if (!IS_ALIGNED(xmit_len, bs)) {
-+		if (final)
-+			xmit_len = DIV_ROUND_UP(xmit_len, bs) * bs;
-+		else
-+			xmit_len = xmit_len / bs * bs;
-+	}
-+
-+	hash_later = rctx->total - xmit_len;
-+	if (hash_later < 0)
-+		hash_later = 0;
-+
-+	if (rctx->bufcnt && nbytes) {
-+		/* have data from previous operation and current */
-+		sg_init_table(rctx->sgl, 2);
-+		sg_set_buf(rctx->sgl, rctx->dd->xmit_buf, rctx->bufcnt);
-+
-+		sg_chain(rctx->sgl, 2, req->src);
-+
-+		rctx->sg = rctx->sgl;
-+
-+		rctx->sg_len++;
-+	} else if (rctx->bufcnt) {
-+		/* have buffered data only */
-+		sg_init_table(rctx->sgl, 1);
-+		sg_set_buf(rctx->sgl, rctx->dd->xmit_buf, xmit_len);
-+
-+		rctx->sg = rctx->sgl;
-+
-+		rctx->sg_len = 1;
-+	}
-+
-+	if (hash_later) {
-+		if (req->nbytes) {
-+			scatterwalk_map_and_copy(rctx->buffer, req->src,
-+						 req->nbytes - hash_later,
-+						 hash_later, 0);
-+		} else {
-+			memcpy(rctx->buffer, rctx->buffer + xmit_len,
-+			       hash_later);
-+		}
-+		rctx->bufcnt = hash_later;
-+	} else {
-+		rctx->bufcnt = 0;
-+	}
-+
-+	if (!final)
-+		rctx->total = xmit_len;
-+
-+	return 0;
-+}
-+
- static size_t omap_sham_append_buffer(struct omap_sham_reqctx *ctx,
- 				const u8 *data, size_t length)
+ static int omap_sham_import(struct ahash_request *req, const void *in)
  {
-@@ -1040,6 +1299,10 @@ retry:
- 	dd->req = req;
- 	ctx = ahash_request_ctx(req);
- 
-+	err = omap_sham_prepare_request(NULL, ctx->op == OP_UPDATE);
-+	if (err)
-+		goto err1;
+-	return -ENOTSUPP;
++	struct omap_sham_reqctx *rctx = ahash_request_ctx(req);
++	const struct omap_sham_reqctx *ctx_in = in;
 +
- 	dev_dbg(dd->dev, "handling new req, op: %lu, nbytes: %d\n",
- 						ctx->op, req->nbytes);
++	memcpy(rctx, in, sizeof(*rctx) + ctx_in->bufcnt);
++
++	return 0;
+ }
  
+ static struct ahash_alg algs_sha1_md5[] = {
+@@ -2083,7 +2092,8 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 			alg = &dd->pdata->algs_info[i].algs_list[j];
+ 			alg->export = omap_sham_export;
+ 			alg->import = omap_sham_import;
+-			alg->halg.statesize = sizeof(struct omap_sham_reqctx);
++			alg->halg.statesize = sizeof(struct omap_sham_reqctx) +
++					      BUFLEN;
+ 			err = crypto_register_ahash(alg);
+ 			if (err)
+ 				goto err_algs;
 -- 
 1.9.1
