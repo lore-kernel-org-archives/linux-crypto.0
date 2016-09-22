@@ -1,64 +1,90 @@
-From: Borislav Petkov <bp@suse.de>
+From: Tom Lendacky <thomas.lendacky@amd.com>
 Subject: Re: [RFC PATCH v1 09/28] x86/efi: Access EFI data as encrypted when
  SEV is active
-Date: Thu, 22 Sep 2016 19:27:32 +0200
-Message-ID: <20160922172732.egjvbivmf5vmcetk@pd.tnic>
+Date: Thu, 22 Sep 2016 12:46:59 -0500
+Message-ID: <443d06f5-2db5-5107-296f-94fabd209407@amd.com>
 References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
  <147190832511.9523.10850626471583956499.stgit@brijesh-build-machine>
  <20160922143545.3kl7khff6vqk7b2t@pd.tnic>
- <464461b7-1efb-0af1-dd3e-eb919a2578e9@redhat.com>
- <20160922145947.52v42l7p7dl7u3r4@pd.tnic>
- <938ee0cf-85e6-eefa-7df9-9d5e09ed7a9d@redhat.com>
- <20160922170718.34d4ppockeurrg25@pd.tnic>
- <c1a609f0-307e-9c6c-ce33-b562ca5c0624@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-efi@vger.kernel.org, Brijesh Singh <brijesh.singh@amd.com>,
- kvm@vger.kernel.org, rkrcmar@redhat.com, matt@codeblueprint.co.uk,
- linus.walleij@linaro.org, paul.gortmaker@windriver.com, hpa@zytor.com,
- tglx@linutronix.de, aarcange@redhat.com, sfr@canb.auug.org.au,
- mchehab@kernel.org, simon.guinot@sequanux.org, bhe@redhat.com,
- xemul@parallels.com, joro@8bytes.org, x86@kernel.org, mingo@redhat.com,
- msalter@redhat.com, ross.zwisler@linux.intel.com, labbott@fedoraproject.org,
- dyoung@redhat.com, thomas.lendacky@amd.com, jroedel@suse.de,
- keescook@chromium.org, toshi.kani@hpe.com, mathieu.desnoyers@efficios.com,
- dan.j.williams@intel.com, andriy.shevchenko@linux.intel.com,
- akpm@linux-foundation.org, herbert@gondor.apana.org.au, tony.luck@intel.com,
- linux-mm@kvack.org, kuleshovmail@gmail.com, linux-kernel@vger.kernel.org,
- mcgrof@kernel.org, linux-crypto@vger.kernel.org, devel@li
-To: Paolo Bonzini <pbonzini@redhat.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-Content-Disposition: inline
-In-Reply-To: <c1a609f0-307e-9c6c-ce33-b562ca5c0624@redhat.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Transfer-Encoding: 7bit
+Cc: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <rkrcmar@redhat.com>, <matt@codeblueprint.co.uk>,
+	<linus.walleij@linaro.org>, <linux-mm@kvack.org>,
+	<paul.gortmaker@windriver.com>, <hpa@zytor.com>, <dan.j.williams@intel.com>,
+	<aarcange@redhat.com>, <sfr@canb.auug.org.au>,
+	<andriy.shevchenko@linux.intel.com>, <herbert@gondor.apana.org.au>,
+	<bhe@redhat.com>, <xemul@parallels.com>, <joro@8bytes.org>, <x86@kernel.org>,
+	<mingo@redhat.com>, <msalter@redhat.com>, <ross.zwisler@linux.intel.com>,
+	<dyoung@redhat.com>, <jroedel@suse.de>, <keescook@chromium.org>,
+	<toshi.kani@hpe.com>, <mathieu.desnoyers@efficios.com>,
+	<devel@linuxdriverproject.org>, <tglx@linutronix.de>, <mchehab@kernel.org>,
+	<iamjoonsoo.kim@lge.com>, <labbott@fedoraproject.org>, <tony.luck@intel.com>,
+	<alexandre.bounine@idt.com>, <kuleshovmail@gmail.com>,
+	<linux-kernel@vger.kernel.or
+To: Borislav Petkov <bp@suse.de>, Brijesh Singh <brijesh.singh@amd.com>
+Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <20160922143545.3kl7khff6vqk7b2t@pd.tnic>
+Sender: owner-linux-mm@kvack.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gVGh1LCBTZXAgMjIsIDIwMTYgYXQgMDc6MDg6NTBQTSArMDIwMCwgUGFvbG8gQm9uemluaSB3
-cm90ZToKPiBUaGF0J3Mgbm90IGhvdyBJIHJlYWQgaXQuICBJIGp1c3QgZmlndXJlZCB0aGF0IHRo
-ZSBCSU9TIGhhcyBzb21lIG1hZ2ljCj4gdGhpbmdzIGhpZ2ggaW4gdGhlIHBoeXNpY2FsIGFkZHJl
-c3Mgc3BhY2UgYW5kIGlmIHlvdSByZWR1Y2UgdGhlIHBoeXNpY2FsCj4gYWRkcmVzcyBzcGFjZSB0
-aGUgQklPUyAod2hpY2ggaXMgY2FsbGVkIGZyb20gZS5nLiBFRkkgcnVudGltZSBzZXJ2aWNlcykK
-PiB3b3VsZCBoYXZlIHByb2JsZW1zIHdpdGggdGhhdC4KClllYWgsIEkgaGFkIHRvIGFzayBhYm91
-dCB0aGF0IG15c2VsZiBhbmQgVG9tIHdpbGwgaGF2ZSBpdCBleHBsYWluZWQKYmV0dGVyIGluIHRo
-ZSBuZXh0IHZlcnNpb24uCgpUaGUgcmVkdWN0aW9uIGluIHBoeXNpY2FsIGFkZHJlc3Mgc3BhY2Ug
-aGFwcGVucyB3aGVuIFNNRSBlbmFibGVkIGJlY2F1c2UKeW91IG5lZWQgYSBjb3VwbGUgb2YgYml0
-cyBpbiB0aGUgUFRFIHdpdGggd2hpY2ggdG8gc2F5IHdoaWNoIGtleSBoYXMKZW5jcnlwdGVkIHRo
-YXQgcGFnZS4gU28gaXQgaXMgYW4gaW5kZWxpYmxlIHBhcnQgb2YgdGhlIFNNRSBtYWNoaW5lcnku
-CgpCdHcsIHNlY3Rpb24gIjcuMTAgU2VjdXJlIE1lbW9yeSBFbmNyeXB0aW9uIiBoYXMgYW4gaW5p
-dGlhbCB3cml0ZXVwOgoKaHR0cDovL3N1cHBvcnQuYW1kLmNvbS9UZWNoRG9jcy8yNDU5My5wZGYK
-Ck5vdyB0aGF0IEkgc2tpbSBvdmVyIGl0LCBpdCBkb2Vzbid0IG1lbnRpb24gdGhlIEJJT1MgdGhp
-bmcgYnV0IHRoYXQnbGwKYmUgdXBkYXRlZC4KCkhUSC4KCi0tIApSZWdhcmRzL0dydXNzLAogICAg
-Qm9yaXMuCgpTVVNFIExpbnV4IEdtYkgsIEdGOiBGZWxpeCBJbWVuZMO2cmZmZXIsIEphbmUgU21p
-dGhhcmQsIEdyYWhhbSBOb3J0b24sIEhSQiAyMTI4NCAoQUcgTsO8cm5iZXJnKQotLSAKX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KZGV2ZWwgbWFpbGluZyBs
-aXN0CmRldmVsQGxpbnV4ZHJpdmVycHJvamVjdC5vcmcKaHR0cDovL2RyaXZlcmRldi5saW51eGRy
-aXZlcnByb2plY3Qub3JnL21haWxtYW4vbGlzdGluZm8vZHJpdmVyZGV2LWRldmVsCg==
+On 09/22/2016 09:35 AM, Borislav Petkov wrote:
+> On Mon, Aug 22, 2016 at 07:25:25PM -0400, Brijesh Singh wrote:
+>> From: Tom Lendacky <thomas.lendacky@amd.com>
+>>
+>> EFI data is encrypted when the kernel is run under SEV. Update the
+>> page table references to be sure the EFI memory areas are accessed
+>> encrypted.
+>>
+>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+>> ---
+>>  arch/x86/platform/efi/efi_64.c |   14 ++++++++++++--
+>>  1 file changed, 12 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/x86/platform/efi/efi_64.c b/arch/x86/platform/efi/efi_64.c
+>> index 0871ea4..98363f3 100644
+>> --- a/arch/x86/platform/efi/efi_64.c
+>> +++ b/arch/x86/platform/efi/efi_64.c
+>> @@ -213,7 +213,7 @@ void efi_sync_low_kernel_mappings(void)
+>>  
+>>  int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
+>>  {
+>> -	unsigned long pfn, text;
+>> +	unsigned long pfn, text, flags;
+>>  	efi_memory_desc_t *md;
+>>  	struct page *page;
+>>  	unsigned npages;
+>> @@ -230,6 +230,10 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
+>>  	efi_scratch.efi_pgt = (pgd_t *)__sme_pa(efi_pgd);
+>>  	pgd = efi_pgd;
+>>  
+>> +	flags = _PAGE_NX | _PAGE_RW;
+>> +	if (sev_active)
+>> +		flags |= _PAGE_ENC;
+> 
+> So this is confusing me. There's this patch which says EFI data is
+> accessed in the clear:
+> 
+> https://lkml.kernel.org/r/20160822223738.29880.6909.stgit@tlendack-t1.amdoffice.net
+> 
+> but now here it is encrypted when SEV is enabled.
+> 
+> Do you mean, it is encrypted here because we're in the guest kernel?
+
+Yes, the idea is that the SEV guest will be running encrypted from the
+start, including the BIOS/UEFI, and so all of the EFI related data will
+be encrypted.
+
+Thanks,
+Tom
+
+> 
+> Thanks.
+> 
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
