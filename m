@@ -1,47 +1,76 @@
-From: Horia Geanta Neag <horia.geanta@nxp.com>
-Subject: Re: [PATCH v2] crypto: caam - fix sg dump
-Date: Thu, 22 Sep 2016 11:47:49 +0000
-Message-ID: <DB4PR04MB0847AAA0EE82226E33D8155D98C90@DB4PR04MB0847.eurprd04.prod.outlook.com>
-References: <20160922105500.GA6306@gondor.apana.org.au>
+From: levent demir <levent.demir@inria.fr>
+Subject: Re: [BUG] crypto: atmel-aes - erro when compiling with
+ VERBOSE_DEBUG enable
+Date: Thu, 22 Sep 2016 14:45:57 +0200
+Message-ID: <1474548357.12981.19.camel@inria.fr>
+References: <20160922092629.GA5508@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: Cata Vasile <cata.vasile@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-crypto-owner@vger.kernel.org"
-        <linux-crypto-owner@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org, cyrille.pitchen@atmel.com
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-db5eur01on0045.outbound.protection.outlook.com ([104.47.2.45]:30394
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S933377AbcIVLrx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Sep 2016 07:47:53 -0400
-Content-Language: en-US
+Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:44754
+        "EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752263AbcIVMqJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Sep 2016 08:46:09 -0400
+In-Reply-To: <20160922092629.GA5508@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 9/22/2016 1:55 PM, Herbert Xu wrote:=0A=
-> Horia Geanta Neag <horia.geanta@nxp.com> wrote:=0A=
->>=0A=
->>> +=0A=
->>> +static void dbg_dump_sg(const char *level, const char *prefix_str,=0A=
->>> +                       int prefix_type, int rowsize, int groupsize,=0A=
->>> +                        struct scatterlist *sg, size_t tlen, bool asci=
-i,=0A=
->>> +                    bool may_sleep)=0A=
->> may_sleep is no longer needed.=0A=
-> =0A=
-> As I've already applied this patch, please send any improvements=0A=
-> as incremental patches.=0A=
-=0A=
-I am trying to understand the process here...=0A=
-Would adding an official maintainer for the driver avoid applying=0A=
-patches without an ack?=0A=
-(This is not the first time changes are applied without getting a chance=0A=
-to comment. OTOH I admit there were also cases when there was absolute=0A=
-silence.)=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
-=0A=
+Fix debug function call in atmel_aes_write
+
+Signed-off-by: Levent DEMIR <levent.demir@inria.fr>
+---
+ drivers/crypto/atmel-aes.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index e3d40a8..2b0f926 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -317,7 +317,7 @@ static inline void atmel_aes_write(struct
+atmel_aes_dev *dd,
+ 		char tmp[16];
+ 
+ 		dev_vdbg(dd->dev, "write 0x%08x into %s\n", value,
+-			 atmel_aes_reg_name(offset, tmp));
++			atmel_aes_reg_name(offset, tmp, sizeof(tmp)));
+ 	}
+ #endif /* VERBOSE_DEBUG */
+ 
+-- 
+2.5.5
+
+Le jeudi 22 septembre 2016 à 17:26 +0800, Herbert Xu a écrit :
+> levent demir <levent.demir@inria.fr> wrote:
+> > Hello, 
+> > 
+> > if you enable VERBOSE_DEBUG and compile you will have the following
+> > error : 
+> > 
+> > drivers/crypto/atmel-aes.c:323:5: error: too few arguments to function
+> > 'atmel_aes_reg_name'
+> >     atmel_aes_reg_name(offset, tmp));
+> >     ^
+> > include/linux/device.h:1306:41: note: in definition of macro 'dev_vdbg'
+> >   dev_printk(KERN_DEBUG, dev, format, ##arg); \
+> >                                         ^
+> > drivers/crypto/atmel-aes.c:205:20: note: declared here
+> > static const char *atmel_aes_reg_name(u32 offset, char *tmp, size_t sz)
+> > 
+> > Indeed, in atmel_aes_write function the call to atmel_aes_reg_name
+> > contains only two arguments instead of 3 : 
+> > 
+> > atmel_aes_reg_name(offset, tmp));
+> > 
+> > To fix it, one has to only add the size of tmp as third argument : 
+> > 
+> > atmel_aes_reg_name(offset, tmp, sizeof(tmp)));
+> 
+> Thanks for the patch.  In order to apply it, you need to fix the
+> white-space damage as well as add a sign-off.  For details please
+> refer to Documentation/SubmittingPatches.
+> 
+> Cheers,
