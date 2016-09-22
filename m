@@ -1,55 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [BUG] crypto: atmel-aes - erro when compiling with VERBOSE_DEBUG
- enable
-Date: Thu, 22 Sep 2016 17:26:29 +0800
-Message-ID: <20160922092629.GA5508@gondor.apana.org.au>
-References: <1473779378.3556.20.camel@inria.fr>
+Subject: Re: [PATCH RESEND] crypto: doc - fix documentation for bulk
+ registration functions
+Date: Thu, 22 Sep 2016 17:28:50 +0800
+Message-ID: <20160922092850.GA5552@gondor.apana.org.au>
+References: <1473879397-110630-1-git-send-email-ebiggers@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, cyrille.pitchen@atmel.com
-To: levent demir <levent.demir@inria.fr>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, ebiggers@google.com
+To: Eric Biggers <ebiggers@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:35638 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:48237 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753183AbcIVJ0q (ORCPT
+        with ESMTP id S1755979AbcIVJ3D (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Sep 2016 05:26:46 -0400
+        Thu, 22 Sep 2016 05:29:03 -0400
 Content-Disposition: inline
-In-Reply-To: <1473779378.3556.20.camel@inria.fr>
+In-Reply-To: <1473879397-110630-1-git-send-email-ebiggers@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-levent demir <levent.demir@inria.fr> wrote:
-> Hello, 
+Eric Biggers <ebiggers@google.com> wrote:
+> Update the documentation for crypto_register_algs() and
+> crypto_unregister_algs() to match the actual behavior.
 > 
-> if you enable VERBOSE_DEBUG and compile you will have the following
-> error : 
-> 
-> drivers/crypto/atmel-aes.c:323:5: error: too few arguments to function
-> 'atmel_aes_reg_name'
->     atmel_aes_reg_name(offset, tmp));
->     ^
-> include/linux/device.h:1306:41: note: in definition of macro 'dev_vdbg'
->   dev_printk(KERN_DEBUG, dev, format, ##arg); \
->                                         ^
-> drivers/crypto/atmel-aes.c:205:20: note: declared here
-> static const char *atmel_aes_reg_name(u32 offset, char *tmp, size_t sz)
-> 
-> Indeed, in atmel_aes_write function the call to atmel_aes_reg_name
-> contains only two arguments instead of 3 : 
-> 
-> atmel_aes_reg_name(offset, tmp));
-> 
-> To fix it, one has to only add the size of tmp as third argument : 
-> 
-> atmel_aes_reg_name(offset, tmp, sizeof(tmp)));
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Thanks for the patch.  In order to apply it, you need to fix the
-white-space damage as well as add a sign-off.  For details please
-refer to Documentation/SubmittingPatches.
+Your previous submission has already been applied.
 
 Cheers,
--- 
+--
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
