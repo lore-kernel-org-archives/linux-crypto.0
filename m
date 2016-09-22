@@ -1,7 +1,7 @@
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v8 1/8] crypto: add asynchronous compression api
-Date: Thu, 22 Sep 2016 23:44:14 +0100
-Message-ID: <1474584261-25776-2-git-send-email-giovanni.cabiddu@intel.com>
+Subject: [PATCH v8 2/8] crypto: add driver-side scomp interface
+Date: Thu, 22 Sep 2016 23:44:15 +0100
+Message-ID: <1474584261-25776-3-git-send-email-giovanni.cabiddu@intel.com>
 References: <1474584261-25776-1-git-send-email-giovanni.cabiddu@intel.com>
 Cc: linux-crypto@vger.kernel.org,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
@@ -9,82 +9,142 @@ To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from mga09.intel.com ([134.134.136.24]:8646 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933377AbcIVWog (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Sep 2016 18:44:36 -0400
+        id S933377AbcIVWoi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Sep 2016 18:44:38 -0400
 In-Reply-To: <1474584261-25776-1-git-send-email-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add acomp, an asynchronous compression api that uses scatterlist
-buffers
+Add a synchronous back-end (scomp) to acomp. This allows to easily
+expose the already present compression algorithms in LKCF via acomp
 
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- crypto/Kconfig                      |  10 ++
- crypto/Makefile                     |   2 +
- crypto/acompress.c                  | 118 ++++++++++++++++
- crypto/crypto_user.c                |  19 +++
- include/crypto/acompress.h          | 261 ++++++++++++++++++++++++++++++++++++
- include/crypto/internal/acompress.h |  66 +++++++++
- include/linux/crypto.h              |   1 +
- 7 files changed, 477 insertions(+)
- create mode 100644 crypto/acompress.c
- create mode 100644 include/crypto/acompress.h
- create mode 100644 include/crypto/internal/acompress.h
+ crypto/Makefile                     |   1 +
+ crypto/acompress.c                  |  49 +++++-
+ crypto/scompress.c                  | 292 ++++++++++++++++++++++++++++++++++++
+ include/crypto/acompress.h          |  32 ++--
+ include/crypto/internal/acompress.h |  15 ++
+ include/crypto/internal/scompress.h | 136 +++++++++++++++++
+ include/linux/crypto.h              |   2 +
+ 7 files changed, 505 insertions(+), 22 deletions(-)
+ create mode 100644 crypto/scompress.c
+ create mode 100644 include/crypto/internal/scompress.h
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 84d7148..f553f66 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -102,6 +102,15 @@ config CRYPTO_KPP
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_KPP2
- 
-+config CRYPTO_ACOMP2
-+	tristate
-+	select CRYPTO_ALGAPI2
-+
-+config CRYPTO_ACOMP
-+	tristate
-+	select CRYPTO_ALGAPI
-+	select CRYPTO_ACOMP2
-+
- config CRYPTO_RSA
- 	tristate "RSA algorithm"
- 	select CRYPTO_AKCIPHER
-@@ -138,6 +147,7 @@ config CRYPTO_MANAGER2
- 	select CRYPTO_BLKCIPHER2
- 	select CRYPTO_AKCIPHER2
- 	select CRYPTO_KPP2
-+	select CRYPTO_ACOMP2
- 
- config CRYPTO_USER
- 	tristate "Userspace cryptographic algorithm configuration"
 diff --git a/crypto/Makefile b/crypto/Makefile
-index 99cc64a..0933dc6 100644
+index 0933dc6..5c83f3d 100644
 --- a/crypto/Makefile
 +++ b/crypto/Makefile
-@@ -50,6 +50,8 @@ rsa_generic-y += rsa_helper.o
- rsa_generic-y += rsa-pkcs1pad.o
+@@ -51,6 +51,7 @@ rsa_generic-y += rsa-pkcs1pad.o
  obj-$(CONFIG_CRYPTO_RSA) += rsa_generic.o
  
-+obj-$(CONFIG_CRYPTO_ACOMP2) += acompress.o
-+
+ obj-$(CONFIG_CRYPTO_ACOMP2) += acompress.o
++obj-$(CONFIG_CRYPTO_ACOMP2) += scompress.o
+ 
  cryptomgr-y := algboss.o testmgr.o
  
- obj-$(CONFIG_CRYPTO_MANAGER2) += cryptomgr.o
 diff --git a/crypto/acompress.c b/crypto/acompress.c
-new file mode 100644
-index 0000000..f24fef3
---- /dev/null
+index f24fef3..17200b9 100644
+--- a/crypto/acompress.c
 +++ b/crypto/acompress.c
-@@ -0,0 +1,118 @@
+@@ -22,8 +22,11 @@
+ #include <linux/cryptouser.h>
+ #include <net/netlink.h>
+ #include <crypto/internal/acompress.h>
++#include <crypto/internal/scompress.h>
+ #include "internal.h"
+ 
++static const struct crypto_type crypto_acomp_type;
++
+ #ifdef CONFIG_NET
+ static int crypto_acomp_report(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+@@ -67,6 +70,13 @@ static int crypto_acomp_init_tfm(struct crypto_tfm *tfm)
+ 	struct crypto_acomp *acomp = __crypto_acomp_tfm(tfm);
+ 	struct acomp_alg *alg = crypto_acomp_alg(acomp);
+ 
++	if (tfm->__crt_alg->cra_type != &crypto_acomp_type)
++		return crypto_init_scomp_ops_async(tfm);
++
++	acomp->compress = alg->compress;
++	acomp->decompress = alg->decompress;
++	acomp->reqsize = alg->reqsize;
++
+ 	if (alg->exit)
+ 		acomp->base.exit = crypto_acomp_exit_tfm;
+ 
+@@ -76,15 +86,25 @@ static int crypto_acomp_init_tfm(struct crypto_tfm *tfm)
+ 	return 0;
+ }
+ 
++static unsigned int crypto_acomp_extsize(struct crypto_alg *alg)
++{
++	int extsize = crypto_alg_extsize(alg);
++
++	if (alg->cra_type != &crypto_acomp_type)
++		extsize += sizeof(struct crypto_scomp *);
++
++	return extsize;
++}
++
+ static const struct crypto_type crypto_acomp_type = {
+-	.extsize = crypto_alg_extsize,
++	.extsize = crypto_acomp_extsize,
+ 	.init_tfm = crypto_acomp_init_tfm,
+ #ifdef CONFIG_PROC_FS
+ 	.show = crypto_acomp_show,
+ #endif
+ 	.report = crypto_acomp_report,
+ 	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
+-	.maskset = CRYPTO_ALG_TYPE_MASK,
++	.maskset = CRYPTO_ALG_TYPE_ACOMPRESS_MASK,
+ 	.type = CRYPTO_ALG_TYPE_ACOMPRESS,
+ 	.tfmsize = offsetof(struct crypto_acomp, base),
+ };
+@@ -96,6 +116,31 @@ struct crypto_acomp *crypto_alloc_acomp(const char *alg_name, u32 type,
+ }
+ EXPORT_SYMBOL_GPL(crypto_alloc_acomp);
+ 
++struct acomp_req *acomp_request_alloc(struct crypto_acomp *acomp)
++{
++	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp);
++	struct acomp_req *req;
++
++	req = __acomp_request_alloc(acomp);
++	if (req && (tfm->__crt_alg->cra_type != &crypto_acomp_type))
++		return crypto_acomp_scomp_alloc_ctx(req);
++
++	return req;
++}
++EXPORT_SYMBOL_GPL(acomp_request_alloc);
++
++void acomp_request_free(struct acomp_req *req)
++{
++	struct crypto_acomp *acomp = crypto_acomp_reqtfm(req);
++	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp);
++
++	if (tfm->__crt_alg->cra_type != &crypto_acomp_type)
++		crypto_acomp_scomp_free_ctx(req);
++
++	__acomp_request_free(req);
++}
++EXPORT_SYMBOL_GPL(acomp_request_free);
++
+ int crypto_register_acomp(struct acomp_alg *alg)
+ {
+ 	struct crypto_alg *base = &alg->base;
+diff --git a/crypto/scompress.c b/crypto/scompress.c
+new file mode 100644
+index 0000000..a51810f
+--- /dev/null
++++ b/crypto/scompress.c
+@@ -0,0 +1,292 @@
 +/*
-+ * Asynchronous Compression operations
++ * Synchronous Compression operations
 + *
++ * Copyright 2015 LG Electronics Inc.
 + * Copyright (c) 2016, Intel Corporation
-+ * Authors: Weigang Li <weigang.li@intel.com>
-+ *          Giovanni Cabiddu <giovanni.cabiddu@intel.com>
++ * Author: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 + *
 + * This program is free software; you can redistribute it and/or modify it
 + * under the terms of the GNU General Public License as published by the Free
@@ -99,21 +159,30 @@ index 0000000..f24fef3
 +#include <linux/slab.h>
 +#include <linux/string.h>
 +#include <linux/crypto.h>
++#include <linux/vmalloc.h>
 +#include <crypto/algapi.h>
 +#include <linux/cryptouser.h>
 +#include <net/netlink.h>
++#include <crypto/scatterwalk.h>
 +#include <crypto/internal/acompress.h>
++#include <crypto/internal/scompress.h>
 +#include "internal.h"
 +
-+#ifdef CONFIG_NET
-+static int crypto_acomp_report(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	struct crypto_report_comp racomp;
++static const struct crypto_type crypto_scomp_type;
++static void * __percpu *scomp_src_scratches;
++static void * __percpu *scomp_dst_scratches;
++static int scomp_scratch_users;
++static DEFINE_MUTEX(scomp_lock);
 +
-+	strncpy(racomp.type, "acomp", sizeof(racomp.type));
++#ifdef CONFIG_NET
++static int crypto_scomp_report(struct sk_buff *skb, struct crypto_alg *alg)
++{
++	struct crypto_report_comp rscomp;
++
++	strncpy(rscomp.type, "scomp", sizeof(rscomp.type));
 +
 +	if (nla_put(skb, CRYPTOCFGA_REPORT_COMPRESS,
-+		    sizeof(struct crypto_report_comp), &racomp))
++		    sizeof(struct crypto_report_comp), &rscomp))
 +		goto nla_put_failure;
 +	return 0;
 +
@@ -121,132 +190,366 @@ index 0000000..f24fef3
 +	return -EMSGSIZE;
 +}
 +#else
-+static int crypto_acomp_report(struct sk_buff *skb, struct crypto_alg *alg)
++static int crypto_scomp_report(struct sk_buff *skb, struct crypto_alg *alg)
 +{
 +	return -ENOSYS;
 +}
 +#endif
 +
-+static void crypto_acomp_show(struct seq_file *m, struct crypto_alg *alg)
++static void crypto_scomp_show(struct seq_file *m, struct crypto_alg *alg)
 +	__attribute__ ((unused));
 +
-+static void crypto_acomp_show(struct seq_file *m, struct crypto_alg *alg)
++static void crypto_scomp_show(struct seq_file *m, struct crypto_alg *alg)
 +{
-+	seq_puts(m, "type         : acomp\n");
++	seq_puts(m, "type         : scomp\n");
 +}
 +
-+static void crypto_acomp_exit_tfm(struct crypto_tfm *tfm)
++static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
 +{
-+	struct crypto_acomp *acomp = __crypto_acomp_tfm(tfm);
-+	struct acomp_alg *alg = crypto_acomp_alg(acomp);
-+
-+	alg->exit(acomp);
++	return 0;
 +}
 +
-+static int crypto_acomp_init_tfm(struct crypto_tfm *tfm)
++static void crypto_scomp_free_scratches(void * __percpu *scratches)
 +{
-+	struct crypto_acomp *acomp = __crypto_acomp_tfm(tfm);
-+	struct acomp_alg *alg = crypto_acomp_alg(acomp);
++	int i;
 +
-+	if (alg->exit)
-+		acomp->base.exit = crypto_acomp_exit_tfm;
++	if (!scratches)
++		return;
 +
-+	if (alg->init)
-+		return alg->init(acomp);
++	for_each_possible_cpu(i)
++		vfree(*per_cpu_ptr(scratches, i));
++
++	free_percpu(scratches);
++}
++
++static void * __percpu *crypto_scomp_alloc_scratches(void)
++{
++	void * __percpu *scratches;
++	int i;
++
++	scratches = alloc_percpu(void *);
++	if (!scratches)
++		return NULL;
++
++	for_each_possible_cpu(i) {
++		void *scratch;
++
++		scratch = vmalloc_node(SCOMP_SCRATCH_SIZE, cpu_to_node(i));
++		if (!scratch)
++			goto error;
++		*per_cpu_ptr(scratches, i) = scratch;
++	}
++
++	return scratches;
++
++error:
++	crypto_scomp_free_scratches(scratches);
++	return NULL;
++}
++
++static void crypto_scomp_free_all_scratches(void)
++{
++	if (!--scomp_scratch_users) {
++		crypto_scomp_free_scratches(scomp_src_scratches);
++		crypto_scomp_free_scratches(scomp_dst_scratches);
++		scomp_src_scratches = NULL;
++		scomp_dst_scratches = NULL;
++	}
++}
++
++static int crypto_scomp_alloc_all_scratches(void)
++{
++	if (!scomp_scratch_users++) {
++		scomp_src_scratches = crypto_scomp_alloc_scratches();
++		if (!scomp_src_scratches)
++			return -ENOMEM;
++		scomp_dst_scratches = crypto_scomp_alloc_scratches();
++		if (!scomp_dst_scratches)
++			return -ENOMEM;
++	}
++	return 0;
++}
++
++static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
++{
++	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
++	void **tfm_ctx = acomp_tfm_ctx(tfm);
++	struct crypto_scomp *scomp = *tfm_ctx;
++	void **ctx = acomp_request_ctx(req);
++	const int cpu = get_cpu();
++	u8 *scratch_src = *per_cpu_ptr(scomp_src_scratches, cpu);
++	u8 *scratch_dst = *per_cpu_ptr(scomp_dst_scratches, cpu);
++	int ret;
++
++	if (req->slen > SCOMP_SCRATCH_SIZE || req->dlen > SCOMP_SCRATCH_SIZE) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	scatterwalk_map_and_copy(scratch_src, req->src, 0, req->slen, 0);
++	if (dir)
++		ret = crypto_scomp_compress(scomp, scratch_src, req->slen,
++					    scratch_dst, &req->dlen, *ctx);
++	else
++		ret = crypto_scomp_decompress(scomp, scratch_src, req->slen,
++					      scratch_dst, &req->dlen, *ctx);
++	if (!ret)
++		scatterwalk_map_and_copy(scratch_dst, req->dst, 0, req->dlen,
++					 1);
++
++out:
++	put_cpu();
++	return ret;
++}
++
++static int scomp_acomp_compress(struct acomp_req *req)
++{
++	return scomp_acomp_comp_decomp(req, 1);
++}
++
++static int scomp_acomp_decompress(struct acomp_req *req)
++{
++	return scomp_acomp_comp_decomp(req, 0);
++}
++
++static void crypto_exit_scomp_ops_async(struct crypto_tfm *tfm)
++{
++	struct crypto_scomp **ctx = crypto_tfm_ctx(tfm);
++
++	crypto_free_scomp(*ctx);
++}
++
++int crypto_init_scomp_ops_async(struct crypto_tfm *tfm)
++{
++	struct crypto_alg *calg = tfm->__crt_alg;
++	struct crypto_acomp *crt = __crypto_acomp_tfm(tfm);
++	struct crypto_scomp **ctx = crypto_tfm_ctx(tfm);
++	struct crypto_scomp *scomp;
++
++	if (!crypto_mod_get(calg))
++		return -EAGAIN;
++
++	scomp = crypto_create_tfm(calg, &crypto_scomp_type);
++	if (IS_ERR(scomp)) {
++		crypto_mod_put(calg);
++		return PTR_ERR(scomp);
++	}
++
++	*ctx = scomp;
++	tfm->exit = crypto_exit_scomp_ops_async;
++
++	crt->compress = scomp_acomp_compress;
++	crt->decompress = scomp_acomp_decompress;
++	crt->reqsize = sizeof(void *);
 +
 +	return 0;
 +}
 +
-+static const struct crypto_type crypto_acomp_type = {
++struct acomp_req *crypto_acomp_scomp_alloc_ctx(struct acomp_req *req)
++{
++	struct crypto_acomp *acomp = crypto_acomp_reqtfm(req);
++	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp);
++	struct crypto_scomp **tfm_ctx = crypto_tfm_ctx(tfm);
++	struct crypto_scomp *scomp = *tfm_ctx;
++	void *ctx;
++
++	ctx = crypto_scomp_alloc_ctx(scomp);
++	if (IS_ERR(ctx)) {
++		kfree(req);
++		return NULL;
++	}
++
++	*req->__ctx = ctx;
++
++	return req;
++}
++
++void crypto_acomp_scomp_free_ctx(struct acomp_req *req)
++{
++	struct crypto_acomp *acomp = crypto_acomp_reqtfm(req);
++	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp);
++	struct crypto_scomp **tfm_ctx = crypto_tfm_ctx(tfm);
++	struct crypto_scomp *scomp = *tfm_ctx;
++	void *ctx = *req->__ctx;
++
++	if (ctx)
++		crypto_scomp_free_ctx(scomp, ctx);
++}
++
++static const struct crypto_type crypto_scomp_type = {
 +	.extsize = crypto_alg_extsize,
-+	.init_tfm = crypto_acomp_init_tfm,
++	.init_tfm = crypto_scomp_init_tfm,
 +#ifdef CONFIG_PROC_FS
-+	.show = crypto_acomp_show,
++	.show = crypto_scomp_show,
 +#endif
-+	.report = crypto_acomp_report,
++	.report = crypto_scomp_report,
 +	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
 +	.maskset = CRYPTO_ALG_TYPE_MASK,
-+	.type = CRYPTO_ALG_TYPE_ACOMPRESS,
-+	.tfmsize = offsetof(struct crypto_acomp, base),
++	.type = CRYPTO_ALG_TYPE_SCOMPRESS,
++	.tfmsize = offsetof(struct crypto_scomp, base),
 +};
 +
-+struct crypto_acomp *crypto_alloc_acomp(const char *alg_name, u32 type,
-+					u32 mask)
-+{
-+	return crypto_alloc_tfm(alg_name, &crypto_acomp_type, type, mask);
-+}
-+EXPORT_SYMBOL_GPL(crypto_alloc_acomp);
-+
-+int crypto_register_acomp(struct acomp_alg *alg)
++int crypto_register_scomp(struct scomp_alg *alg)
 +{
 +	struct crypto_alg *base = &alg->base;
++	int ret = -ENOMEM;
 +
-+	base->cra_type = &crypto_acomp_type;
++	mutex_lock(&scomp_lock);
++	if (crypto_scomp_alloc_all_scratches())
++		goto error;
++
++	base->cra_type = &crypto_scomp_type;
 +	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
-+	base->cra_flags |= CRYPTO_ALG_TYPE_ACOMPRESS;
++	base->cra_flags |= CRYPTO_ALG_TYPE_SCOMPRESS;
 +
-+	return crypto_register_alg(base);
++	ret = crypto_register_alg(base);
++	if (ret)
++		goto error;
++
++	mutex_unlock(&scomp_lock);
++	return ret;
++
++error:
++	crypto_scomp_free_all_scratches();
++	mutex_unlock(&scomp_lock);
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(crypto_register_acomp);
++EXPORT_SYMBOL_GPL(crypto_register_scomp);
 +
-+int crypto_unregister_acomp(struct acomp_alg *alg)
++int crypto_unregister_scomp(struct scomp_alg *alg)
 +{
-+	return crypto_unregister_alg(&alg->base);
++	int ret;
++
++	mutex_lock(&scomp_lock);
++	ret = crypto_unregister_alg(&alg->base);
++	crypto_scomp_free_all_scratches();
++	mutex_unlock(&scomp_lock);
++
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(crypto_unregister_acomp);
++EXPORT_SYMBOL_GPL(crypto_unregister_scomp);
 +
 +MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Asynchronous compression type");
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index 1c57054..31b488c 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -112,6 +112,21 @@ nla_put_failure:
- 	return -EMSGSIZE;
++MODULE_DESCRIPTION("Synchronous compression type");
+diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+index f4e2f96..93f938d 100644
+--- a/include/crypto/acompress.h
++++ b/include/crypto/acompress.h
+@@ -38,9 +38,15 @@ struct acomp_req {
+  * struct crypto_acomp - user-instantiated objects which encapsulate
+  * algorithms and core processing logic
+  *
+- * @base: Common crypto API algorithm data structure
++ * @compress:   Function performs a compress operation
++ * @decompress: Function performs a de-compress operation
++ * @reqsize:	Context size for (de)compression requests
++ * @base:	Common crypto API algorithm data structure
+  */
+ struct crypto_acomp {
++	int (*compress)(struct acomp_req *req);
++	int (*decompress)(struct acomp_req *req);
++	unsigned int reqsize;
+ 	struct crypto_tfm base;
+ };
+ 
+@@ -119,7 +125,7 @@ static inline struct acomp_alg *crypto_acomp_alg(struct crypto_acomp *tfm)
+ 
+ static inline unsigned int crypto_acomp_reqsize(struct crypto_acomp *tfm)
+ {
+-	return crypto_acomp_alg(tfm)->reqsize;
++	return tfm->reqsize;
  }
  
-+static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+ static inline void acomp_request_set_tfm(struct acomp_req *req,
+@@ -159,26 +165,14 @@ static inline int crypto_has_acomp(const char *alg_name, u32 type, u32 mask)
+  *
+  * Return: allocated handle in case of success or NULL in case of an error.
+  */
+-static inline struct acomp_req *acomp_request_alloc(struct crypto_acomp *tfm)
+-{
+-	struct acomp_req *req;
+-
+-	req = kzalloc(sizeof(*req) + crypto_acomp_reqsize(tfm), GFP_KERNEL);
+-	if (likely(req))
+-		acomp_request_set_tfm(req, tfm);
+-
+-	return req;
+-}
++struct acomp_req *acomp_request_alloc(struct crypto_acomp *tfm);
+ 
+ /**
+  * acomp_request_free() -- zeroize and free asynchronous (de)compression request
+  *
+  * @req: request to free
+  */
+-static inline void acomp_request_free(struct acomp_req *req)
+-{
+-	kzfree(req);
+-}
++void acomp_request_free(struct acomp_req *req);
+ 
+ /**
+  * acomp_request_set_callback() -- Sets an asynchronous callback
+@@ -236,9 +230,8 @@ static inline void acomp_request_set_params(struct acomp_req *req,
+ static inline int crypto_acomp_compress(struct acomp_req *req)
+ {
+ 	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
+-	struct acomp_alg *alg = crypto_acomp_alg(tfm);
+ 
+-	return alg->compress(req);
++	return tfm->compress(req);
+ }
+ 
+ /**
+@@ -253,9 +246,8 @@ static inline int crypto_acomp_compress(struct acomp_req *req)
+ static inline int crypto_acomp_decompress(struct acomp_req *req)
+ {
+ 	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
+-	struct acomp_alg *alg = crypto_acomp_alg(tfm);
+ 
+-	return alg->decompress(req);
++	return tfm->decompress(req);
+ }
+ 
+ #endif
+diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
+index 294f2ee..267afdd5 100644
+--- a/include/crypto/internal/acompress.h
++++ b/include/crypto/internal/acompress.h
+@@ -39,6 +39,21 @@ static inline const char *acomp_alg_name(struct crypto_acomp *tfm)
+ 	return crypto_acomp_tfm(tfm)->__crt_alg->cra_name;
+ }
+ 
++static inline struct acomp_req *__acomp_request_alloc(struct crypto_acomp *tfm)
 +{
-+	struct crypto_report_acomp racomp;
++	struct acomp_req *req;
 +
-+	strncpy(racomp.type, "acomp", sizeof(racomp.type));
-+
-+	if (nla_put(skb, CRYPTOCFGA_REPORT_ACOMPRESS,
-+		    sizeof(struct crypto_report_acomp), &racomp))
-+		goto nla_put_failure;
-+	return 0;
-+
-+nla_put_failure:
-+	return -EMSGSIZE;
++	req = kzalloc(sizeof(*req) + crypto_acomp_reqsize(tfm), GFP_KERNEL);
++	if (likely(req))
++		acomp_request_set_tfm(req, tfm);
++	return req;
 +}
 +
- static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_report_akcipher rakcipher;
-@@ -186,7 +201,11 @@ static int crypto_report_one(struct crypto_alg *alg,
- 			goto nla_put_failure;
- 
- 		break;
-+	case CRYPTO_ALG_TYPE_ACOMPRESS:
-+		if (crypto_report_acomp(skb, alg))
-+			goto nla_put_failure;
- 
-+		break;
- 	case CRYPTO_ALG_TYPE_AKCIPHER:
- 		if (crypto_report_akcipher(skb, alg))
- 			goto nla_put_failure;
-diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
++static inline void __acomp_request_free(struct acomp_req *req)
++{
++	kzfree(req);
++}
++
+ /**
+  * crypto_register_acomp() -- Register asynchronous compression algorithm
+  *
+diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
 new file mode 100644
-index 0000000..f4e2f96
+index 0000000..3fda3c5
 --- /dev/null
-+++ b/include/crypto/acompress.h
-@@ -0,0 +1,261 @@
++++ b/include/crypto/internal/scompress.h
+@@ -0,0 +1,136 @@
 +/*
-+ * Asynchronous Compression operations
++ * Synchronous Compression operations
 + *
++ * Copyright 2015 LG Electronics Inc.
 + * Copyright (c) 2016, Intel Corporation
-+ * Authors: Weigang Li <weigang.li@intel.com>
-+ *          Giovanni Cabiddu <giovanni.cabiddu@intel.com>
++ * Author: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 + *
 + * This program is free software; you can redistribute it and/or modify it
 + * under the terms of the GNU General Public License as published by the Free
@@ -254,42 +557,21 @@ index 0000000..f4e2f96
 + * any later version.
 + *
 + */
-+#ifndef _CRYPTO_ACOMP_H
-+#define _CRYPTO_ACOMP_H
++#ifndef _CRYPTO_SCOMP_INT_H
++#define _CRYPTO_SCOMP_INT_H
 +#include <linux/crypto.h>
 +
-+/**
-+ * struct acomp_req - asynchronous (de)compression request
-+ *
-+ * @base:     Common attributes for asynchronous crypto requests
-+ * @src:      Source Data
-+ * @dst:      Destination data
-+ * @slen:     Size of the input buffer
-+ * @dlen:     Size of the output buffer and number of bytes produced
-+ * @__ctx:    Start of private context data
-+ */
-+struct acomp_req {
-+	struct crypto_async_request base;
-+	struct scatterlist *src;
-+	struct scatterlist *dst;
-+	unsigned int slen;
-+	unsigned int dlen;
-+	void *__ctx[] CRYPTO_MINALIGN_ATTR;
-+};
++#define SCOMP_SCRATCH_SIZE	131072
 +
-+/**
-+ * struct crypto_acomp - user-instantiated objects which encapsulate
-+ * algorithms and core processing logic
-+ *
-+ * @base: Common crypto API algorithm data structure
-+ */
-+struct crypto_acomp {
++struct crypto_scomp {
 +	struct crypto_tfm base;
 +};
 +
 +/**
-+ * struct acomp_alg - asynchronous compression algorithm
++ * struct scomp_alg - synchronous compression algorithm
 + *
++ * @alloc_ctx:	Function allocates algorithm specific context
++ * @free_ctx:	Function frees context allocated with alloc_ctx
 + * @compress:	Function performs a compress operation
 + * @decompress:	Function performs a de-compress operation
 + * @init:	Initialize the cryptographic transformation object.
@@ -303,288 +585,120 @@ index 0000000..f4e2f96
 + * @exit:	Deinitialize the cryptographic transformation object. This is a
 + *		counterpart to @init, used to remove various changes set in
 + *		@init.
-+ *
-+ * @reqsize:	Context size for (de)compression requests
 + * @base:	Common crypto API algorithm data structure
 + */
-+struct acomp_alg {
-+	int (*compress)(struct acomp_req *req);
-+	int (*decompress)(struct acomp_req *req);
-+	int (*init)(struct crypto_acomp *tfm);
-+	void (*exit)(struct crypto_acomp *tfm);
-+	unsigned int reqsize;
++struct scomp_alg {
++	void *(*alloc_ctx)(struct crypto_scomp *tfm);
++	void (*free_ctx)(struct crypto_scomp *tfm, void *ctx);
++	int (*compress)(struct crypto_scomp *tfm, const u8 *src,
++			unsigned int slen, u8 *dst, unsigned int *dlen,
++			void *ctx);
++	int (*decompress)(struct crypto_scomp *tfm, const u8 *src,
++			  unsigned int slen, u8 *dst, unsigned int *dlen,
++			  void *ctx);
 +	struct crypto_alg base;
 +};
 +
-+/**
-+ * DOC: Asynchronous Compression API
-+ *
-+ * The Asynchronous Compression API is used with the algorithms of type
-+ * CRYPTO_ALG_TYPE_ACOMPRESS (listed as type "acomp" in /proc/crypto)
-+ */
++static inline struct scomp_alg *__crypto_scomp_alg(struct crypto_alg *alg)
++{
++	return container_of(alg, struct scomp_alg, base);
++}
 +
-+/**
-+ * crypto_alloc_acomp() -- allocate ACOMPRESS tfm handle
-+ * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
-+ *	      compression algorithm e.g. "deflate"
-+ * @type: specifies the type of the algorithm
-+ * @mask: specifies the mask for the algorithm
-+ *
-+ * Allocate a handle for a compression algorithm. The returned struct
-+ * crypto_acomp is the handle that is required for any subsequent
-+ * API invocation for the compression operations.
-+ *
-+ * Return: allocated handle in case of success; IS_ERR() is true in case
-+ *	   of an error, PTR_ERR() returns the error code.
-+ */
-+struct crypto_acomp *crypto_alloc_acomp(const char *alg_name, u32 type,
-+					u32 mask);
++static inline struct crypto_scomp *__crypto_scomp_tfm(struct crypto_tfm *tfm)
++{
++	return container_of(tfm, struct crypto_scomp, base);
++}
 +
-+static inline struct crypto_tfm *crypto_acomp_tfm(struct crypto_acomp *tfm)
++static inline struct crypto_tfm *crypto_scomp_tfm(struct crypto_scomp *tfm)
 +{
 +	return &tfm->base;
 +}
 +
-+static inline struct acomp_alg *__crypto_acomp_alg(struct crypto_alg *alg)
++static inline void crypto_free_scomp(struct crypto_scomp *tfm)
 +{
-+	return container_of(alg, struct acomp_alg, base);
++	crypto_destroy_tfm(tfm, crypto_scomp_tfm(tfm));
 +}
 +
-+static inline struct crypto_acomp *__crypto_acomp_tfm(struct crypto_tfm *tfm)
++static inline struct scomp_alg *crypto_scomp_alg(struct crypto_scomp *tfm)
 +{
-+	return container_of(tfm, struct crypto_acomp, base);
++	return __crypto_scomp_alg(crypto_scomp_tfm(tfm)->__crt_alg);
 +}
 +
-+static inline struct acomp_alg *crypto_acomp_alg(struct crypto_acomp *tfm)
++static inline void *crypto_scomp_alloc_ctx(struct crypto_scomp *tfm)
 +{
-+	return __crypto_acomp_alg(crypto_acomp_tfm(tfm)->__crt_alg);
++	return crypto_scomp_alg(tfm)->alloc_ctx(tfm);
 +}
 +
-+static inline unsigned int crypto_acomp_reqsize(struct crypto_acomp *tfm)
++static inline void crypto_scomp_free_ctx(struct crypto_scomp *tfm,
++					 void *ctx)
 +{
-+	return crypto_acomp_alg(tfm)->reqsize;
++	return crypto_scomp_alg(tfm)->free_ctx(tfm, ctx);
 +}
 +
-+static inline void acomp_request_set_tfm(struct acomp_req *req,
-+					 struct crypto_acomp *tfm)
++static inline int crypto_scomp_compress(struct crypto_scomp *tfm,
++					const u8 *src, unsigned int slen,
++					u8 *dst, unsigned int *dlen, void *ctx)
 +{
-+	req->base.tfm = crypto_acomp_tfm(tfm);
++	return crypto_scomp_alg(tfm)->compress(tfm, src, slen, dst, dlen, ctx);
 +}
 +
-+static inline struct crypto_acomp *crypto_acomp_reqtfm(struct acomp_req *req)
++static inline int crypto_scomp_decompress(struct crypto_scomp *tfm,
++					  const u8 *src, unsigned int slen,
++					  u8 *dst, unsigned int *dlen,
++					  void *ctx)
 +{
-+	return __crypto_acomp_tfm(req->base.tfm);
++	return crypto_scomp_alg(tfm)->decompress(tfm, src, slen, dst, dlen,
++						 ctx);
 +}
++
++int crypto_init_scomp_ops_async(struct crypto_tfm *tfm);
++struct acomp_req *crypto_acomp_scomp_alloc_ctx(struct acomp_req *req);
++void crypto_acomp_scomp_free_ctx(struct acomp_req *req);
 +
 +/**
-+ * crypto_free_acomp() -- free ACOMPRESS tfm handle
++ * crypto_register_scomp() -- Register synchronous compression algorithm
 + *
-+ * @tfm: ACOMPRESS tfm handle allocated with crypto_alloc_acomp()
-+ */
-+static inline void crypto_free_acomp(struct crypto_acomp *tfm)
-+{
-+	crypto_destroy_tfm(tfm, crypto_acomp_tfm(tfm));
-+}
-+
-+static inline int crypto_has_acomp(const char *alg_name, u32 type, u32 mask)
-+{
-+	type &= ~CRYPTO_ALG_TYPE_MASK;
-+	type |= CRYPTO_ALG_TYPE_ACOMPRESS;
-+	mask |= CRYPTO_ALG_TYPE_MASK;
-+
-+	return crypto_has_alg(alg_name, type, mask);
-+}
-+
-+/**
-+ * acomp_request_alloc() -- allocates asynchronous (de)compression request
-+ *
-+ * @tfm: ACOMPRESS tfm handle allocated with crypto_alloc_acomp()
-+ *
-+ * Return: allocated handle in case of success or NULL in case of an error.
-+ */
-+static inline struct acomp_req *acomp_request_alloc(struct crypto_acomp *tfm)
-+{
-+	struct acomp_req *req;
-+
-+	req = kzalloc(sizeof(*req) + crypto_acomp_reqsize(tfm), GFP_KERNEL);
-+	if (likely(req))
-+		acomp_request_set_tfm(req, tfm);
-+
-+	return req;
-+}
-+
-+/**
-+ * acomp_request_free() -- zeroize and free asynchronous (de)compression request
-+ *
-+ * @req: request to free
-+ */
-+static inline void acomp_request_free(struct acomp_req *req)
-+{
-+	kzfree(req);
-+}
-+
-+/**
-+ * acomp_request_set_callback() -- Sets an asynchronous callback
-+ *
-+ * Callback will be called when an asynchronous operation on a given
-+ * request is finished.
-+ *
-+ * @req:  request that the callback will be set for
-+ * @flgs: specify for instance if the operation may backlog
-+ * @cmlp: callback which will be called
-+ * @data: private data used by the caller
-+ */
-+static inline void acomp_request_set_callback(struct acomp_req *req,
-+					      u32 flgs,
-+					      crypto_completion_t cmpl,
-+					      void *data)
-+{
-+	req->base.complete = cmpl;
-+	req->base.data = data;
-+	req->base.flags = flgs;
-+}
-+
-+/**
-+ * acomp_request_set_params() -- Sets request parameters
-+ *
-+ * Sets parameters required by an acomp operation
-+ *
-+ * @req:  asynchronous compress request
-+ * @src:  pointer to input buffer scatterlist
-+ * @dst:  pointer to output buffer scatterlist
-+ * @slen: size of the input buffer
-+ * @dlen: size of the output buffer
-+ */
-+static inline void acomp_request_set_params(struct acomp_req *req,
-+					    struct scatterlist *src,
-+					    struct scatterlist *dst,
-+					    unsigned int slen,
-+					    unsigned int dlen)
-+{
-+	req->src = src;
-+	req->dst = dst;
-+	req->slen = slen;
-+	req->dlen = dlen;
-+}
-+
-+/**
-+ * crypto_acomp_compress() -- Invoke asynchronous compress operation
-+ *
-+ * Function invokes the asynchronous compress operation
-+ *
-+ * @req: asynchronous compress request
-+ *
-+ * Return: zero on success; error code in case of error
-+ */
-+static inline int crypto_acomp_compress(struct acomp_req *req)
-+{
-+	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
-+	struct acomp_alg *alg = crypto_acomp_alg(tfm);
-+
-+	return alg->compress(req);
-+}
-+
-+/**
-+ * crypto_acomp_decompress() -- Invoke asynchronous decompress operation
-+ *
-+ * Function invokes the asynchronous decompress operation
-+ *
-+ * @req: asynchronous compress request
-+ *
-+ * Return: zero on success; error code in case of error
-+ */
-+static inline int crypto_acomp_decompress(struct acomp_req *req)
-+{
-+	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
-+	struct acomp_alg *alg = crypto_acomp_alg(tfm);
-+
-+	return alg->decompress(req);
-+}
-+
-+#endif
-diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
-new file mode 100644
-index 0000000..294f2ee
---- /dev/null
-+++ b/include/crypto/internal/acompress.h
-@@ -0,0 +1,66 @@
-+/*
-+ * Asynchronous Compression operations
-+ *
-+ * Copyright (c) 2016, Intel Corporation
-+ * Authors: Weigang Li <weigang.li@intel.com>
-+ *          Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+#ifndef _CRYPTO_ACOMP_INT_H
-+#define _CRYPTO_ACOMP_INT_H
-+#include <crypto/acompress.h>
-+
-+/*
-+ * Transform internal helpers.
-+ */
-+static inline void *acomp_request_ctx(struct acomp_req *req)
-+{
-+	return req->__ctx;
-+}
-+
-+static inline void *acomp_tfm_ctx(struct crypto_acomp *tfm)
-+{
-+	return tfm->base.__crt_ctx;
-+}
-+
-+static inline void acomp_request_complete(struct acomp_req *req,
-+					  int err)
-+{
-+	req->base.complete(&req->base, err);
-+}
-+
-+static inline const char *acomp_alg_name(struct crypto_acomp *tfm)
-+{
-+	return crypto_acomp_tfm(tfm)->__crt_alg->cra_name;
-+}
-+
-+/**
-+ * crypto_register_acomp() -- Register asynchronous compression algorithm
-+ *
-+ * Function registers an implementation of an asynchronous
++ * Function registers an implementation of a synchronous
 + * compression algorithm
 + *
-+ * @alg:   algorithm definition
++ * @alg:	algorithm definition
 + *
 + * Return: zero on success; error code in case of error
 + */
-+int crypto_register_acomp(struct acomp_alg *alg);
++int crypto_register_scomp(struct scomp_alg *alg);
 +
 +/**
-+ * crypto_unregister_acomp() -- Unregister asynchronous compression algorithm
++ * crypto_unregister_scomp() -- Unregister synchronous compression algorithm
 + *
-+ * Function unregisters an implementation of an asynchronous
++ * Function unregisters an implementation of a synchronous
 + * compression algorithm
 + *
-+ * @alg:   algorithm definition
++ * @alg:	algorithm definition
 + *
 + * Return: zero on success; error code in case of error
 + */
-+int crypto_unregister_acomp(struct acomp_alg *alg);
++int crypto_unregister_scomp(struct scomp_alg *alg);
 +
 +#endif
 diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 7cee555..dc57a05 100644
+index dc57a05..8348d83 100644
 --- a/include/linux/crypto.h
 +++ b/include/linux/crypto.h
-@@ -50,6 +50,7 @@
- #define CRYPTO_ALG_TYPE_SKCIPHER	0x00000005
+@@ -51,6 +51,7 @@
  #define CRYPTO_ALG_TYPE_GIVCIPHER	0x00000006
  #define CRYPTO_ALG_TYPE_KPP		0x00000008
-+#define CRYPTO_ALG_TYPE_ACOMPRESS	0x0000000a
+ #define CRYPTO_ALG_TYPE_ACOMPRESS	0x0000000a
++#define CRYPTO_ALG_TYPE_SCOMPRESS	0x0000000b
  #define CRYPTO_ALG_TYPE_RNG		0x0000000c
  #define CRYPTO_ALG_TYPE_AKCIPHER	0x0000000d
  #define CRYPTO_ALG_TYPE_DIGEST		0x0000000e
+@@ -61,6 +62,7 @@
+ #define CRYPTO_ALG_TYPE_HASH_MASK	0x0000000e
+ #define CRYPTO_ALG_TYPE_AHASH_MASK	0x0000000e
+ #define CRYPTO_ALG_TYPE_BLKCIPHER_MASK	0x0000000c
++#define CRYPTO_ALG_TYPE_ACOMPRESS_MASK	0x0000000e
+ 
+ #define CRYPTO_ALG_LARVAL		0x00000010
+ #define CRYPTO_ALG_DEAD			0x00000020
 -- 
 2.4.11
