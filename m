@@ -1,36 +1,169 @@
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: BUG: rsa-pkcs1pad decrypt regression in 4.8
-Date: Wed, 21 Sep 2016 16:39:30 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1609211630400.14260@mjmartin-mac01.local>
+From: Catalin Vasile <cata.vasile@nxp.com>
+Subject: [PATCH v2] crypto: caam - fix sg dump
+Date: Thu, 22 Sep 2016 11:57:58 +0300
+Message-ID: <1474534678-10118-1-git-send-email-cata.vasile@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-Cc: smueller@chronox.de
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Content-Type: text/plain
+Cc: <linux-crypto-owner@vger.kernel.org>, <horia.geanta@nxp.com>,
+        "Catalin Vasile" <cata.vasile@nxp.com>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:39100 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932640AbcIUXjb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Sep 2016 19:39:31 -0400
+Received: from mail-sn1nam02on0052.outbound.protection.outlook.com ([104.47.36.52]:16363
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1756237AbcIVI6I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Sep 2016 04:58:08 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Ensure scatterlists have a virtual memory mapping before dumping.
 
-Herbert -
+Signed-off-by: Catalin Vasile <cata.vasile@nxp.com>
+---
+Changes:
+	V2:
+		* resolved issue of sleeping in atomic contexts
+---
+---
+ drivers/crypto/caam/caamalg.c | 79 +++++++++++++++++++++++++++++++++----------
+ 1 file changed, 61 insertions(+), 18 deletions(-)
 
-There was a regression in pkcs1pad signature verification, related to 
-signature verification, that you fixed in commit 27710b8ea3defcb:
-
-https://git.kernel.org/cgit/linux/kernel/git/herbert/crypto-2.6.git/commit/?id=27710b8ea3defcbd7d340dbd0423d911b4eb7c4f
-
-There is a very similar problem in the decrypt operation, which was not 
-adjusted for the leading zero changes. See pkcs1pad_decrypt_complete().
-
-I haven't had a chance to test a fix yet, but with the final 4.8 release 
-coming up very soon I wanted to report the issue.
-
-
-Regards,
-
---
-Mat Martineau
-Intel OTC
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index f1116e7..eb97562 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -111,6 +111,42 @@
+ #else
+ #define debug(format, arg...)
+ #endif
++
++#ifdef DEBUG
++#include <linux/highmem.h>
++
++static void dbg_dump_sg(const char *level, const char *prefix_str,
++			int prefix_type, int rowsize, int groupsize,
++			struct scatterlist *sg, size_t tlen, bool ascii,
++			bool may_sleep)
++{
++	struct scatterlist *it;
++	void *it_page;
++	size_t len;
++	void *buf;
++
++	for (it = sg; it != NULL && tlen > 0 ; it = sg_next(sg)) {
++		/*
++		 * make sure the scatterlist's page
++		 * has a valid virtual memory mapping
++		 */
++		it_page = kmap_atomic(sg_page(it));
++		if (unlikely(!it_page)) {
++			printk(KERN_ERR "dbg_dump_sg: kmap failed\n");
++			return;
++		}
++
++		buf = it_page + it->offset;
++		len = min(tlen, it->length);
++		print_hex_dump(level, prefix_str, prefix_type, rowsize,
++			       groupsize, buf, len, ascii);
++		tlen -= len;
++
++		kunmap_atomic(it_page);
++	}
++}
++#endif
++
+ static struct list_head alg_list;
+ 
+ struct caam_alg_entry {
+@@ -1982,9 +2018,9 @@ static void ablkcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       edesc->src_nents > 1 ? 100 : ivsize, 1);
+-	print_hex_dump(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-		       edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
++	dbg_dump_sg(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
++		    DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
++		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1, true);
+ #endif
+ 
+ 	ablkcipher_unmap(jrdev, edesc, req);
+@@ -2014,9 +2050,9 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       ivsize, 1);
+-	print_hex_dump(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-		       edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
++	dbg_dump_sg(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
++		    DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
++		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1, true);
+ #endif
+ 
+ 	ablkcipher_unmap(jrdev, edesc, req);
+@@ -2171,12 +2207,15 @@ static void init_ablkcipher_job(u32 *sh_desc, dma_addr_t ptr,
+ 	int len, sec4_sg_index = 0;
+ 
+ #ifdef DEBUG
++	bool may_sleep = ((req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
++					      CRYPTO_TFM_REQ_MAY_SLEEP)) != 0);
+ 	print_hex_dump(KERN_ERR, "presciv@"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       ivsize, 1);
+-	print_hex_dump(KERN_ERR, "src    @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-		       edesc->src_nents ? 100 : req->nbytes, 1);
++	printk(KERN_ERR "asked=%d, nbytes%d\n", (int)edesc->src_nents ? 100 : req->nbytes, req->nbytes);
++	dbg_dump_sg(KERN_ERR, "src    @"__stringify(__LINE__)": ",
++		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
++		    edesc->src_nents ? 100 : req->nbytes, 1, may_sleep);
+ #endif
+ 
+ 	len = desc_len(sh_desc);
+@@ -2228,12 +2267,14 @@ static void init_ablkcipher_giv_job(u32 *sh_desc, dma_addr_t ptr,
+ 	int len, sec4_sg_index = 0;
+ 
+ #ifdef DEBUG
++	bool may_sleep = ((req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
++					      CRYPTO_TFM_REQ_MAY_SLEEP)) != 0);
+ 	print_hex_dump(KERN_ERR, "presciv@" __stringify(__LINE__) ": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       ivsize, 1);
+-	print_hex_dump(KERN_ERR, "src    @" __stringify(__LINE__) ": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-		       edesc->src_nents ? 100 : req->nbytes, 1);
++	dbg_dump_sg(KERN_ERR, "src    @" __stringify(__LINE__) ": ",
++		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
++		    edesc->src_nents ? 100 : req->nbytes, 1, may_sleep);
+ #endif
+ 
+ 	len = desc_len(sh_desc);
+@@ -2503,18 +2544,20 @@ static int aead_decrypt(struct aead_request *req)
+ 	u32 *desc;
+ 	int ret = 0;
+ 
++#ifdef DEBUG
++	bool may_sleep = ((req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
++					      CRYPTO_TFM_REQ_MAY_SLEEP)) != 0);
++	dbg_dump_sg(KERN_ERR, "dec src@"__stringify(__LINE__)": ",
++		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
++		    req->assoclen + req->cryptlen, 1, may_sleep);
++#endif
++
+ 	/* allocate extended descriptor */
+ 	edesc = aead_edesc_alloc(req, AUTHENC_DESC_JOB_IO_LEN,
+ 				 &all_contig, false);
+ 	if (IS_ERR(edesc))
+ 		return PTR_ERR(edesc);
+ 
+-#ifdef DEBUG
+-	print_hex_dump(KERN_ERR, "dec src@"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, sg_virt(req->src),
+-		       req->assoclen + req->cryptlen, 1);
+-#endif
+-
+ 	/* Create and submit job descriptor*/
+ 	init_authenc_job(req, edesc, all_contig, false);
+ #ifdef DEBUG
+-- 
+1.8.3.1
