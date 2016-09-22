@@ -1,76 +1,40 @@
-From: levent demir <levent.demir@inria.fr>
-Subject: Re: [BUG] crypto: atmel-aes - erro when compiling with
- VERBOSE_DEBUG enable
-Date: Thu, 22 Sep 2016 14:45:57 +0200
-Message-ID: <1474548357.12981.19.camel@inria.fr>
-References: <20160922092629.GA5508@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: caam - fix sg dump
+Date: Thu, 22 Sep 2016 21:08:52 +0800
+Message-ID: <20160922130851.GA7207@gondor.apana.org.au>
+References: <20160922105500.GA6306@gondor.apana.org.au>
+ <DB4PR04MB0847AAA0EE82226E33D8155D98C90@DB4PR04MB0847.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org, cyrille.pitchen@atmel.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Cata Vasile <cata.vasile@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-crypto-owner@vger.kernel.org"
+        <linux-crypto-owner@vger.kernel.org>
+To: Horia Geanta Neag <horia.geanta@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:44754
-        "EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752263AbcIVMqJ (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:43671 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753595AbcIVNJH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Sep 2016 08:46:09 -0400
-In-Reply-To: <20160922092629.GA5508@gondor.apana.org.au>
+        Thu, 22 Sep 2016 09:09:07 -0400
+Content-Disposition: inline
+In-Reply-To: <DB4PR04MB0847AAA0EE82226E33D8155D98C90@DB4PR04MB0847.eurprd04.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix debug function call in atmel_aes_write
+On Thu, Sep 22, 2016 at 11:47:49AM +0000, Horia Geanta Neag wrote:
+> 
+> I am trying to understand the process here...
+> Would adding an official maintainer for the driver avoid applying
+> patches without an ack?
+> (This is not the first time changes are applied without getting a chance
+> to comment. OTOH I admit there were also cases when there was absolute
+> silence.)
 
-Signed-off-by: Levent DEMIR <levent.demir@inria.fr>
----
- drivers/crypto/atmel-aes.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Sure, it wouldn't hurt.
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index e3d40a8..2b0f926 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -317,7 +317,7 @@ static inline void atmel_aes_write(struct
-atmel_aes_dev *dd,
- 		char tmp[16];
- 
- 		dev_vdbg(dd->dev, "write 0x%08x into %s\n", value,
--			 atmel_aes_reg_name(offset, tmp));
-+			atmel_aes_reg_name(offset, tmp, sizeof(tmp)));
- 	}
- #endif /* VERBOSE_DEBUG */
- 
+Cheers,
 -- 
-2.5.5
-
-Le jeudi 22 septembre 2016 à 17:26 +0800, Herbert Xu a écrit :
-> levent demir <levent.demir@inria.fr> wrote:
-> > Hello, 
-> > 
-> > if you enable VERBOSE_DEBUG and compile you will have the following
-> > error : 
-> > 
-> > drivers/crypto/atmel-aes.c:323:5: error: too few arguments to function
-> > 'atmel_aes_reg_name'
-> >     atmel_aes_reg_name(offset, tmp));
-> >     ^
-> > include/linux/device.h:1306:41: note: in definition of macro 'dev_vdbg'
-> >   dev_printk(KERN_DEBUG, dev, format, ##arg); \
-> >                                         ^
-> > drivers/crypto/atmel-aes.c:205:20: note: declared here
-> > static const char *atmel_aes_reg_name(u32 offset, char *tmp, size_t sz)
-> > 
-> > Indeed, in atmel_aes_write function the call to atmel_aes_reg_name
-> > contains only two arguments instead of 3 : 
-> > 
-> > atmel_aes_reg_name(offset, tmp));
-> > 
-> > To fix it, one has to only add the size of tmp as third argument : 
-> > 
-> > atmel_aes_reg_name(offset, tmp, sizeof(tmp)));
-> 
-> Thanks for the patch.  In order to apply it, you need to fix the
-> white-space damage as well as add a sign-off.  For details please
-> refer to Documentation/SubmittingPatches.
-> 
-> Cheers,
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
