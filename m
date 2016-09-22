@@ -1,61 +1,58 @@
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: BUG: rsa-pkcs1pad decrypt regression in 4.8
-Date: Thu, 22 Sep 2016 08:55:24 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1609220854181.30782@mjmartin-mac01.local>
-References: <alpine.OSX.2.20.1609211630400.14260@mjmartin-mac01.local> <20160922090456.GA5272@gondor.apana.org.au>
+From: Borislav Petkov <bp@suse.de>
+Subject: Re: [RFC PATCH v1 09/28] x86/efi: Access EFI data as encrypted when
+ SEV is active
+Date: Thu, 22 Sep 2016 19:07:18 +0200
+Message-ID: <20160922170718.34d4ppockeurrg25@pd.tnic>
+References: <147190820782.9523.4967724730957229273.stgit@brijesh-build-machine>
+ <147190832511.9523.10850626471583956499.stgit@brijesh-build-machine>
+ <20160922143545.3kl7khff6vqk7b2t@pd.tnic>
+ <464461b7-1efb-0af1-dd3e-eb919a2578e9@redhat.com>
+ <20160922145947.52v42l7p7dl7u3r4@pd.tnic>
+ <938ee0cf-85e6-eefa-7df9-9d5e09ed7a9d@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Cc: linux-crypto@vger.kernel.org, smueller@chronox.de
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:44327 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934518AbcIVPz0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Sep 2016 11:55:26 -0400
-In-Reply-To: <20160922090456.GA5272@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Brijesh Singh <brijesh.singh@amd.com>, thomas.lendacky@amd.com,
+	simon.guinot@sequanux.org, linux-efi@vger.kernel.org,
+	kvm@vger.kernel.org, rkrcmar@redhat.com, matt@codeblueprint.co.uk,
+	linus.walleij@linaro.org, linux-mm@kvack.org,
+	paul.gortmaker@windriver.com, hpa@zytor.com,
+	dan.j.williams@intel.com, aarcange@redhat.com, sfr@canb.auug.org.au,
+	andriy.shevchenko@linux.intel.com, herbert@gondor.apana.org.au,
+	bhe@redhat.com, xemul@parallels.com, joro@8bytes.org,
+	x86@kernel.org, mingo@redhat.com, msalter@redhat.com,
+	ross.zwisler@linux.intel.com, dyoung@redhat.com, jroedel@suse.de,
+	keescook@chromium.org, toshi.kani@hpe.com,
+	mathieu.desnoyers@efficios.com, devel@linuxdriverproject.org,
+	tglx@linutronix.de, mchehab@kernel.org, iamjoonsoo.kim@lge.com,
+	labbott@fedoraproject.org, tony.luck@intel.com,
+	alexandre.bounine@idt.com, kuleshovmail@gmail.com,
+	linux-kernel@vger.kernel.org,
+To: Paolo Bonzini <pbonzini@redhat.com>
+Return-path: <owner-linux-mm@kvack.org>
+Content-Disposition: inline
+In-Reply-To: <938ee0cf-85e6-eefa-7df9-9d5e09ed7a9d@redhat.com>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
+On Thu, Sep 22, 2016 at 05:05:54PM +0200, Paolo Bonzini wrote:
+> Which paragraph?
 
-Herbert -
+"Linux relies on BIOS to set this bit if BIOS has determined that the
+reduction in the physical address space as a result of enabling memory
+encryption..."
 
-On Thu, 22 Sep 2016, Herbert Xu wrote:
+Basically, you can enable SME in the BIOS and you're all set.
 
-> On Wed, Sep 21, 2016 at 04:39:30PM -0700, Mat Martineau wrote:
->>
->> There was a regression in pkcs1pad signature verification, related
->> to signature verification, that you fixed in commit 27710b8ea3defcb:
->>
->> https://git.kernel.org/cgit/linux/kernel/git/herbert/crypto-2.6.git/commit/?id=27710b8ea3defcbd7d340dbd0423d911b4eb7c4f
->>
->> There is a very similar problem in the decrypt operation, which was
->> not adjusted for the leading zero changes. See
->> pkcs1pad_decrypt_complete().
->>
->> I haven't had a chance to test a fix yet, but with the final 4.8
->> release coming up very soon I wanted to report the issue.
->
-> Thanks.  This patch should fix the problem.
->
-> ---8<---
-> crypto: rsa-pkcs1pad - Handle leading zero for decryption
->
-> As the software RSA implementation now produces fixed-length
-> output, we need to eliminate leading zeros in the calling code
-> instead.
->
-> This patch does just that for pkcs1pad decryption while signature
-> verification was fixed in an earlier patch.
->
-> Fixes: 9b45b7bba3d2 ("crypto: rsa - Generate fixed-length output")
-> Reported-by: Mat Martineau <mathew.j.martineau@linux.intel.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
+-- 
+Regards/Gruss,
+    Boris.
 
-This patch does fix the decrypt problem, my tests are now passing. Thank
-you.
-
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+-- 
 
 --
-Mat Martineau
-Intel OTC
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
