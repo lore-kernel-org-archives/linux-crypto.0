@@ -1,48 +1,81 @@
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH v7 4/9] crypto: acomp - add support for lzo via scomp
-Date: Mon, 26 Sep 2016 18:27:04 +0100
-Message-ID: <20160926172704.GA24726@SILVIXA00369791-F22-1>
-References: <1473770981-9869-1-git-send-email-giovanni.cabiddu@intel.com>
- <1473770981-9869-5-git-send-email-giovanni.cabiddu@intel.com>
- <20160920092618.GA20808@gondor.apana.org.au>
- <20160920115140.GA12332@sivswdev01.ir.intel.com>
- <20160922092244.GA5379@gondor.apana.org.au>
- <20160922225425.GA25907@SILVIXA00369791-F22-1>
- <20160923150518.GA20384@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: sha1_mb broken
+Date: Mon, 26 Sep 2016 19:32:00 +0200
+Message-ID: <3264980.mGNQ3Qi0fl@positron.chronox.de>
+References: <1939675.7gNnqUbNs6@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, weigang.li@intel.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: Megha Dey <megha.dey@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:14849 "EHLO mga04.intel.com"
+Received: from mail.eperm.de ([89.247.134.16]:48030 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1161478AbcIZR1G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Sep 2016 13:27:06 -0400
-Content-Disposition: inline
-In-Reply-To: <20160923150518.GA20384@gondor.apana.org.au>
+        id S966639AbcIZRcD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 26 Sep 2016 13:32:03 -0400
+In-Reply-To: <1939675.7gNnqUbNs6@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 23, 2016 at 11:05:18PM +0800, Herbert Xu wrote:
-> When I said acomp layer I'm referring specifically to the algorithm
-> or driver.  As to your last question it would be the caller's
-> responsibility to free that memory.
->
-> The use-case is our oldest user, IPcomp.  Most packets are 1500 bytes
-> max but we have to allocate 64K of memory to cover the worst case.
-> For an algorithm that can deal with SG lists it can easily allocate
-> pages of memory as it goes and place them in an SG list.
-It is clear now. Thanks.
+Am Freitag, 26. August 2016, 03:15:06 CEST schrieb Stephan Mueller:
 
-> Sure if you already have memory allocated then we don't want to
-> force you to allocate it again in the algorithm/driver.  But our
-> interface should allow the memory to be allocated in the driver.
-I think the definition of the acomp interface already allows for this.
-If the destination scatterlist inside the request is NULL, the
-algorithm/driver can allocate pages of memory for the output buffers as
-well as the scatterlist. In this case, the destination length, if not zero,
-could be used to specify the maximum size to allocate.
-What do you think?
+Hi Megha,
 
---
-Giovanni
+> Hi,
+> 
+> I tried to execute tests with sha1_mb.
+
+Have you had a chance to look into this one?
+> 
+> The execution simply stalls when invoking a digest operation -- i.e. the
+> digest operation does not finish. After some time after invoking the hashing
+> operation, the following log appears (note, the kccavs_* functions are my
+> test code; that test code works perfectly well with all other hash
+> implementations):
+> 
+> [  140.426026] INFO: rcu_sched detected stalls on CPUs/tasks:
+> [  140.426719] 	2-...: (1 GPs behind) idle=9c3/140000000000000/0
+> softirq=2680/2707 fqs=14762
+> [  140.427024] 	(detected by 0, t=60002 jiffies, g=655, c=654, q=35)
+> [  140.427024] Task dump for CPU 2:
+> [  140.427024] cavs_driver     R  running task        0   945    862
+> 0x00000008
+> [  140.427024]  ffffffff9b78d965 ffffa527b8bfa640 ffffa527bb505940
+> ffffa52775c20c50
+> [  140.427024]  ffffa527bc300000 ffffa527b93d2a80 ffffa527bb857e00
+> ffffa527bc2ffd78
+> [  140.427024]  ffffa527b93d2ac8 ffffa527bc2ffcc0 ffffffff9b78dfc8
+> ffffa527bc2ffd70
+> [  140.427024] Call Trace:
+> [  140.427024]  [<ffffffff9b78d965>] ? __schedule+0x245/0x690
+> [  140.427024]  [<ffffffff9b78dfc8>] ? preempt_schedule_common+0x18/0x30
+> [  140.427024]  [<ffffffff9b791a68>] ? _raw_spin_lock_irq+0x28/0x30
+> [  140.427024]  [<ffffffff9b78ed98>] ? wait_for_completion_interruptible
+> +0x28/0x180
+> [  140.427024]  [<ffffffffc028541c>] ? sha1_mb_async_digest+0x6c/0x70
+> [sha1_mb]
+> [  140.427024]  [<ffffffff9b3b1129>] ? crypto_ahash_op+0x29/0x70
+> [  140.427024]  [<ffffffffc0270148>] ? kccavs_test_ahash+0x198/0x2b0
+> [kcapi_cavs]
+> [  140.427024]  [<ffffffffc026e20a>] ? kccavs_data_read+0xda/0x160
+> [kcapi_cavs]
+> [  140.427024]  [<ffffffff9b370964>] ? full_proxy_read+0x54/0x90
+> [  140.427024]  [<ffffffff9b208088>] ? __vfs_read+0x28/0x110
+> [  140.427024]  [<ffffffff9b38a2c0>] ? security_file_permission+0xa0/0xc0
+> [  140.427024]  [<ffffffff9b20850e>] ? rw_verify_area+0x4e/0xb0
+> [  140.427024]  [<ffffffff9b208606>] ? vfs_read+0x96/0x130
+> [  140.427024]  [<ffffffff9b2099f6>] ? SyS_read+0x46/0xa0
+> [  140.427024]  [<ffffffff9b791cb6>] ? entry_SYSCALL_64_fastpath+0x1e/0xa8
+> 
+> 
+> 
+> Ciao
+> Stephan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Ciao
+Stephan
