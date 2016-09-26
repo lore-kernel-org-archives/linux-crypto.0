@@ -1,15 +1,15 @@
 From: Megha Dey <megha.dey@linux.intel.com>
-Subject: [PATCH v5 5/7] crypto: AES CBC multi-buffer glue code
-Date: Mon, 26 Sep 2016 10:27:37 -0700
-Message-ID: <1474910859-11713-6-git-send-email-megha.dey@linux.intel.com>
+Subject: [PATCH v5 4/7] crypto: AES CBC by8 encryption
+Date: Mon, 26 Sep 2016 10:27:36 -0700
+Message-ID: <1474910859-11713-5-git-send-email-megha.dey@linux.intel.com>
 References: <1474910859-11713-1-git-send-email-megha.dey@linux.intel.com>
 Cc: linux-crypto@vger.kernel.org, tim.c.chen@linux.intel.com,
         megha.dey@intel.com, Megha Dey <megha.dey@linux.intel.com>
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:22892 "EHLO mga04.intel.com"
+Received: from mga04.intel.com ([192.55.52.120]:45768 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1161424AbcIZRUq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1161636AbcIZRUq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 26 Sep 2016 13:20:46 -0400
 In-Reply-To: <1474910859-11713-1-git-send-email-megha.dey@linux.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
@@ -17,102 +17,28 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 From: Tim Chen <tim.c.chen@linux.intel.com>
 
-This patch introduces the multi-buffer job manager which is responsible
-for submitting scatter-gather buffers from several AES CBC jobs
-to the multi-buffer algorithm. The glue code interfaces with the
-underlying algorithm that handles 8 data streams of AES CBC encryption
-in parallel. AES key expansion and CBC decryption requests are performed
-in a manner similar to the existing AESNI Intel glue driver.
+This patch introduces the assembly routine to do a by8 AES CBC encryption
+in support of the AES CBC multi-buffer implementation.
 
-The outline of the algorithm for AES CBC encryption requests is
-sketched below:
-
-Any driver requesting the crypto service will place an async crypto
-request on the workqueue.  The multi-buffer crypto daemon will pull an
-AES CBC encryption request from work queue and put each request in an
-empty data lane for multi-buffer crypto computation.  When all the empty
-lanes are filled, computation will commence on the jobs in parallel and
-the job with the shortest remaining buffer will get completed and be
-returned. To prevent prolonged stall, when no new jobs arrive, we will
-flush workqueue of jobs after a maximum allowable delay has elapsed.
-
-To accommodate the fragmented nature of scatter-gather, we will keep
-submitting the next scatter-buffer fragment for a job for multi-buffer
-computation until a job is completed and no more buffer fragments remain.
-At that time we will pull a new job to fill the now empty data slot.
-We check with the multibuffer scheduler to see if there are other
-completed jobs to prevent extraneous delay in returning any completed
-jobs.
-
-This multi-buffer algorithm should be used for cases where we get at
-least 8 streams of crypto jobs submitted at a reasonably high rate.
-For low crypto job submission rate and low number of data streams, this
-algorithm will not be beneficial. The reason is at low rate, we do not
-fill out the data lanes before flushing the jobs instead of processing
-them with all the data lanes full.  We will miss the benefit of parallel
-computation, and adding delay to the processing of the crypto job at the
-same time.  Some tuning of the maximum latency parameter may be needed
-to get the best performance.
+It encrypts 8 data streams of the same key size simultaneously.
 
 Originally-by: Chandramouli Narayanan <mouli_7982@yahoo.com>
 Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
 Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 ---
- arch/x86/crypto/Makefile                |   1 +
- arch/x86/crypto/aes-cbc-mb/Makefile     |  22 +
- arch/x86/crypto/aes-cbc-mb/aes_cbc_mb.c | 839 ++++++++++++++++++++++++++++++++
- 3 files changed, 862 insertions(+)
- create mode 100644 arch/x86/crypto/aes-cbc-mb/Makefile
- create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_mb.c
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S | 775 ++++++++++++++++++++++++++++
+ 1 file changed, 775 insertions(+)
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S
 
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index 34b3fa2..cc556a7 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -33,6 +33,7 @@ obj-$(CONFIG_CRYPTO_CRC32_PCLMUL) += crc32-pclmul.o
- obj-$(CONFIG_CRYPTO_SHA256_SSSE3) += sha256-ssse3.o
- obj-$(CONFIG_CRYPTO_SHA512_SSSE3) += sha512-ssse3.o
- obj-$(CONFIG_CRYPTO_CRCT10DIF_PCLMUL) += crct10dif-pclmul.o
-+obj-$(CONFIG_CRYPTO_AES_CBC_MB) += aes-cbc-mb/
- obj-$(CONFIG_CRYPTO_POLY1305_X86_64) += poly1305-x86_64.o
- 
- # These modules require assembler to support AVX.
-diff --git a/arch/x86/crypto/aes-cbc-mb/Makefile b/arch/x86/crypto/aes-cbc-mb/Makefile
+diff --git a/arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S b/arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S
 new file mode 100644
-index 0000000..b642bd8
+index 0000000..2130574
 --- /dev/null
-+++ b/arch/x86/crypto/aes-cbc-mb/Makefile
-@@ -0,0 +1,22 @@
-+#
-+# Arch-specific CryptoAPI modules.
-+#
-+
-+avx_supported := $(call as-instr,vpxor %xmm0$(comma)%xmm0$(comma)%xmm0,yes,no)
-+
-+# we need decryption and key expansion routine symbols
-+# if either AESNI_NI_INTEL or AES_CBC_MB is a module
-+
-+ifeq ($(CONFIG_CRYPTO_AES_NI_INTEL),m)
-+	dec_support := ../aesni-intel_asm.o
-+endif
-+ifeq ($(CONFIG_CRYPTO_AES_CBC_MB),m)
-+	dec_support := ../aesni-intel_asm.o
-+endif
-+
-+ifeq ($(avx_supported),yes)
-+	obj-$(CONFIG_CRYPTO_AES_CBC_MB) += aes-cbc-mb.o
-+	aes-cbc-mb-y := $(dec_support) aes_cbc_mb.o aes_mb_mgr_init.o \
-+			mb_mgr_inorder_x8_asm.o mb_mgr_ooo_x8_asm.o \
-+			aes_cbc_enc_x8.o
-+endif
-diff --git a/arch/x86/crypto/aes-cbc-mb/aes_cbc_mb.c b/arch/x86/crypto/aes-cbc-mb/aes_cbc_mb.c
-new file mode 100644
-index 0000000..190a4fc
---- /dev/null
-+++ b/arch/x86/crypto/aes-cbc-mb/aes_cbc_mb.c
-@@ -0,0 +1,839 @@
++++ b/arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S
+@@ -0,0 +1,775 @@
 +/*
-+ *	Multi buffer AES CBC algorithm glue code
++ *	AES CBC by8 multibuffer optimization (x86_64)
++ *	This file implements 128/192/256 bit AES CBC encryption
 + *
 + *
 + * This file is provided under a dual BSD/GPLv2 license.  When using or
@@ -136,819 +62,754 @@ index 0000000..190a4fc
 + * Sean Gulley <sean.m.gulley@intel.com>
 + * Tim Chen <tim.c.chen@linux.intel.com>
 + * Megha Dey <megha.dey@linux.intel.com>
++ *
++ * BSD LICENSE
++ *
++ * Copyright(c) 2016 Intel Corporation.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * Redistributions of source code must retain the above copyright
++ * notice, this list of conditions and the following disclaimer.
++ * Redistributions in binary form must reproduce the above copyright
++ * notice, this list of conditions and the following disclaimer in
++ * the documentation and/or other materials provided with the
++ * distribution.
++ * Neither the name of Intel Corporation nor the names of its
++ * contributors may be used to endorse or promote products derived
++ * from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
 + */
++#include <linux/linkage.h>
 +
-+#define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
++/* stack size needs to be an odd multiple of 8 for alignment */
 +
-+#include <linux/hardirq.h>
-+#include <linux/types.h>
-+#include <linux/crypto.h>
-+#include <linux/module.h>
-+#include <linux/err.h>
-+#include <crypto/algapi.h>
-+#include <crypto/aes.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/mcryptd.h>
-+#include <crypto/crypto_wq.h>
-+#include <crypto/ctr.h>
-+#include <crypto/b128ops.h>
-+#include <crypto/lrw.h>
-+#include <crypto/xts.h>
-+#include <asm/cpu_device_id.h>
-+#include <asm/fpu/api.h>
-+#include <asm/crypto/aes.h>
-+#include <crypto/ablk_helper.h>
-+#include <crypto/scatterwalk.h>
-+#include <crypto/internal/aead.h>
-+#include <linux/workqueue.h>
-+#include <linux/spinlock.h>
-+#ifdef CONFIG_X86_64
-+#include <asm/crypto/glue_helper.h>
-+#endif
-+#include <asm/simd.h>
++#define AES_KEYSIZE_128        16
++#define AES_KEYSIZE_192        24
++#define AES_KEYSIZE_256        32
 +
-+#include "aes_cbc_mb_ctx.h"
++#define XMM_SAVE_SIZE	16*10
++#define GPR_SAVE_SIZE	8*9
++#define STACK_SIZE	(XMM_SAVE_SIZE + GPR_SAVE_SIZE)
 +
-+#define AESNI_ALIGN	(16)
-+#define AES_BLOCK_MASK	(~(AES_BLOCK_SIZE-1))
-+#define FLUSH_INTERVAL 500 /* in usec */
++#define GPR_SAVE_REG	%rsp
++#define GPR_SAVE_AREA	%rsp + XMM_SAVE_SIZE
++#define LEN_AREA_OFFSET	XMM_SAVE_SIZE + 8*8
++#define LEN_AREA_REG	%rsp
++#define LEN_AREA	%rsp + XMM_SAVE_SIZE + 8*8
 +
-+static struct mcryptd_alg_state cbc_mb_alg_state;
++#define IN_OFFSET	0
++#define OUT_OFFSET	8*8
++#define KEYS_OFFSET	16*8
++#define IV_OFFSET	24*8
 +
-+struct aes_cbc_mb_ctx {
-+	struct mcryptd_ablkcipher *mcryptd_tfm;
-+};
 +
-+static inline struct aes_cbc_mb_mgr_inorder_x8
-+	*get_key_mgr(void *mgr, u32 key_len)
-+{
-+	struct aes_cbc_mb_mgr_inorder_x8 *key_mgr;
++#define IDX	%rax
++#define TMP	%rbx
++#define ARG	%rdi
++#define LEN	%rsi
 +
-+	key_mgr = (struct aes_cbc_mb_mgr_inorder_x8 *) mgr;
-+	/* valid keysize is guranteed to be one of 128/192/256 */
-+	switch (key_len) {
-+	case AES_KEYSIZE_256:
-+		return key_mgr+2;
-+	case AES_KEYSIZE_192:
-+		return key_mgr+1;
-+	case AES_KEYSIZE_128:
-+	default:
-+		return key_mgr;
-+	}
-+}
++#define KEYS0	%r14
++#define KEYS1	%r15
++#define KEYS2	%rbp
++#define KEYS3	%rdx
++#define KEYS4	%rcx
++#define KEYS5	%r8
++#define KEYS6	%r9
++#define KEYS7	%r10
 +
-+/* support code from arch/x86/crypto/aesni-intel_glue.c */
-+static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
-+{
-+	unsigned long addr = (unsigned long)raw_ctx;
-+	unsigned long align = AESNI_ALIGN;
-+	struct crypto_aes_ctx *ret_ctx;
++#define IN0	%r11
++#define IN2	%r12
++#define IN4	%r13
++#define IN6	LEN
 +
-+	if (align <= crypto_tfm_ctx_alignment())
-+		align = 1;
-+	ret_ctx = (struct crypto_aes_ctx *)ALIGN(addr, align);
-+	return ret_ctx;
-+}
++#define XDATA0	%xmm0
++#define XDATA1	%xmm1
++#define XDATA2	%xmm2
++#define XDATA3	%xmm3
++#define XDATA4	%xmm4
++#define XDATA5	%xmm5
++#define XDATA6	%xmm6
++#define XDATA7	%xmm7
 +
-+static struct job_aes_cbc *aes_cbc_job_mgr_submit(
-+	struct aes_cbc_mb_mgr_inorder_x8 *key_mgr, u32 key_len)
-+{
-+	/* valid keysize is guranteed to be one of 128/192/256 */
-+	switch (key_len) {
-+	case AES_KEYSIZE_256:
-+		return aes_cbc_submit_job_inorder_256x8(key_mgr);
-+	case AES_KEYSIZE_192:
-+		return aes_cbc_submit_job_inorder_192x8(key_mgr);
-+	case AES_KEYSIZE_128:
-+	default:
-+		return aes_cbc_submit_job_inorder_128x8(key_mgr);
-+	}
-+}
++#define XKEY0_3	%xmm8
++#define XKEY1_4	%xmm9
++#define XKEY2_5	%xmm10
++#define XKEY3_6	%xmm11
++#define XKEY4_7	%xmm12
++#define XKEY5_8	%xmm13
++#define XKEY6_9	%xmm14
++#define XTMP	%xmm15
 +
-+static inline struct ablkcipher_request *cast_mcryptd_ctx_to_req(
-+	struct mcryptd_ablkcipher_request_ctx *ctx)
-+{
-+	return container_of((void *) ctx, struct ablkcipher_request, __ctx);
-+}
++#define	MOVDQ movdqu /* assume buffers not aligned */
++#define CONCAT(a, b)	a##b
++#define INPUT_REG_SUFX	1	/* IN */
++#define XDATA_REG_SUFX	2	/* XDAT */
++#define KEY_REG_SUFX	3	/* KEY */
++#define XMM_REG_SUFX	4	/* XMM */
 +
 +/*
-+ * Interface functions to the synchronous algorithm with acces
-+ * to the underlying multibuffer AES CBC implementation
++ * To avoid positional parameter errors while compiling
++ * three registers need to be passed
++ */
++.text
++
++.macro pxor2 x, y, z
++	MOVDQ	(\x,\y), XTMP
++	pxor	XTMP, \z
++.endm
++
++.macro inreg n
++	.if (\n == 0)
++		reg_IN = IN0
++	.elseif (\n == 2)
++		reg_IN = IN2
++	.elseif (\n == 4)
++		reg_IN = IN4
++	.elseif (\n == 6)
++		reg_IN = IN6
++	.else
++		error "inreg: incorrect register number"
++	.endif
++.endm
++.macro xdatareg n
++	.if (\n == 0)
++		reg_XDAT = XDATA0
++	.elseif (\n == 1)
++		reg_XDAT = XDATA1
++	.elseif (\n == 2)
++		reg_XDAT = XDATA2
++	.elseif (\n == 3)
++		reg_XDAT = XDATA3
++	.elseif (\n == 4)
++		reg_XDAT = XDATA4
++	.elseif (\n == 5)
++		reg_XDAT = XDATA5
++	.elseif (\n == 6)
++		reg_XDAT = XDATA6
++	.elseif (\n == 7)
++		reg_XDAT = XDATA7
++	.endif
++.endm
++.macro xkeyreg n
++	.if (\n == 0)
++		reg_KEY = KEYS0
++	.elseif (\n == 1)
++		reg_KEY = KEYS1
++	.elseif (\n == 2)
++		reg_KEY = KEYS2
++	.elseif (\n == 3)
++		reg_KEY = KEYS3
++	.elseif (\n == 4)
++		reg_KEY = KEYS4
++	.elseif (\n == 5)
++		reg_KEY = KEYS5
++	.elseif (\n == 6)
++		reg_KEY = KEYS6
++	.elseif (\n == 7)
++		reg_KEY = KEYS7
++	.endif
++.endm
++.macro xmmreg n
++	.if (\n >= 0) && (\n < 16)
++		/* Valid register number */
++		reg_XMM = %xmm\n
++	.else
++		error "xmmreg: incorrect register number"
++	.endif
++.endm
++
++/*
++ * suffix - register suffix
++ * set up the register name using the loop index I
++ */
++.macro define_reg suffix
++.altmacro
++	.if (\suffix == INPUT_REG_SUFX)
++		inreg  %I
++	.elseif (\suffix == XDATA_REG_SUFX)
++		xdatareg  %I
++	.elseif (\suffix == KEY_REG_SUFX)
++		xkeyreg  %I
++	.elseif (\suffix == XMM_REG_SUFX)
++		xmmreg  %I
++	.else
++		error "define_reg: unknown register suffix"
++	.endif
++.noaltmacro
++.endm
++
++/*
++ * aes_cbc_enc_x8 key_len
++ * macro to encode data for 128bit, 192bit and 256bit keys
 + */
 +
-+/* Map the error in request context appropriately */
++.macro aes_cbc_enc_x8 key_len
 +
-+static struct mcryptd_ablkcipher_request_ctx *process_job_sts(
-+		struct job_aes_cbc *job)
-+{
-+	struct mcryptd_ablkcipher_request_ctx *ret_rctx;
++	sub	$STACK_SIZE, %rsp
 +
-+	ret_rctx = (struct mcryptd_ablkcipher_request_ctx *)job->user_data;
++	mov	%rbx, (XMM_SAVE_SIZE + 8*0)(GPR_SAVE_REG)
++	mov	%rbp, (XMM_SAVE_SIZE + 8*3)(GPR_SAVE_REG)
++	mov	%r12, (XMM_SAVE_SIZE + 8*4)(GPR_SAVE_REG)
++	mov	%r13, (XMM_SAVE_SIZE + 8*5)(GPR_SAVE_REG)
++	mov	%r14, (XMM_SAVE_SIZE + 8*6)(GPR_SAVE_REG)
++	mov	%r15, (XMM_SAVE_SIZE + 8*7)(GPR_SAVE_REG)
 +
-+	switch (job->status) {
-+	default:
-+	case STS_COMPLETED:
-+		ret_rctx->error = CBC_CTX_ERROR_NONE;
-+		break;
-+	case STS_BEING_PROCESSED:
-+		ret_rctx->error = -EINPROGRESS;
-+		break;
-+	case STS_INTERNAL_ERROR:
-+	case STS_ERROR:
-+	case STS_UNKNOWN:
-+		/* mark it done with error */
-+		ret_rctx->flag = CBC_DONE;
-+		ret_rctx->error = -EIO;
-+		break;
-+	}
-+	return ret_rctx;
-+}
++	mov	$16, IDX
++	shl	$4, LEN	/* LEN = LEN * 16 */
++	/* LEN is now in terms of bytes */
++	mov	LEN, (LEN_AREA_OFFSET)(LEN_AREA_REG)
 +
-+static struct mcryptd_ablkcipher_request_ctx
-+	*aes_cbc_ctx_mgr_flush(struct aes_cbc_mb_mgr_inorder_x8 *key_mgr)
-+{
-+	struct job_aes_cbc *job;
++	/* Run through storing arguments in IN0,2,4,6 */
++	I = 0
++	.rept 4
++		define_reg	INPUT_REG_SUFX
++		mov	(IN_OFFSET + 8*I)(ARG), reg_IN
++		I = (I + 2)
++	.endr
 +
-+	job = aes_cbc_flush_job_inorder_x8(key_mgr);
-+	if (job)
-+		return process_job_sts(job);
-+	return NULL;
-+}
++	/* load 1 .. 8 blocks of plain text into XDATA0..XDATA7 */
++	I = 0
++	.rept 4
++		mov		(IN_OFFSET + 8*(I+1))(ARG), TMP
++		define_reg	INPUT_REG_SUFX
++		define_reg	XDATA_REG_SUFX
++		/* load first block of plain text */
++		MOVDQ		(reg_IN), reg_XDAT
++		I = (I + 1)
++		define_reg	XDATA_REG_SUFX
++		/* load next block of plain text */
++		MOVDQ		(TMP), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+static struct mcryptd_ablkcipher_request_ctx *aes_cbc_ctx_mgr_submit(
-+	struct aes_cbc_mb_mgr_inorder_x8 *key_mgr,
-+	struct mcryptd_ablkcipher_request_ctx *rctx
-+	)
-+{
-+	struct crypto_aes_ctx *mb_key_ctx;
-+	struct job_aes_cbc *job;
-+	unsigned long src_paddr;
-+	unsigned long dst_paddr;
++	/* Run through XDATA0 .. XDATA7 to perform plaintext XOR IV */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		pxor	(IV_OFFSET + 16*I)(ARG), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+	mb_key_ctx = aes_ctx(crypto_tfm_ctx(rctx->desc.base.tfm));
++	I = 0
++	.rept 8
++		define_reg	KEY_REG_SUFX
++		mov	(KEYS_OFFSET + 8*I)(ARG), reg_KEY
++		I = (I + 1)
++	.endr
 +
-+	/* get job, fill the details and submit */
-+	job = aes_cbc_get_next_job_inorder_x8(key_mgr);
++	I = 0
++	/* 0..7 ARK */
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		pxor	16*0(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+	src_paddr = (page_to_phys(rctx->walk.src.page) + rctx->walk.src.offset);
-+	dst_paddr = (page_to_phys(rctx->walk.dst.page) + rctx->walk.dst.offset);
-+	job->plaintext = phys_to_virt(src_paddr);
-+	job->ciphertext = phys_to_virt(dst_paddr);
-+	if (rctx->flag & CBC_START) {
-+		/* fresh sequence, copy iv from walk buffer initially */
-+		memcpy(&job->iv, rctx->walk.iv, AES_BLOCK_SIZE);
-+		rctx->flag &= ~CBC_START;
-+	} else {
-+		/* For a multi-part sequence, set up the updated IV */
-+		job->iv = rctx->seq_iv;
-+	}
++	I = 0
++		/* 1. ENC */
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*1)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+	job->keys = (u128 *)mb_key_ctx->key_enc;
-+	/* set up updated length from the walk buffers */
-+	job->len = rctx->walk.nbytes & AES_BLOCK_MASK;
-+	/* stow away the req_ctx so we can later check */
-+	job->user_data = (void *)rctx;
-+	job->key_len = mb_key_ctx->key_length;
-+	rctx->job = job;
-+	rctx->error = CBC_CTX_ERROR_NONE;
-+	job = aes_cbc_job_mgr_submit(key_mgr, mb_key_ctx->key_length);
-+	if (job) {
-+		/* we already have the request context stashed in job */
-+		return process_job_sts(job);
-+	}
-+	return NULL;
-+}
++	movdqa		16*3(KEYS0), XKEY0_3	/* load round 3 key */
 +
-+static int cbc_encrypt_finish(struct mcryptd_ablkcipher_request_ctx **ret_rctx,
-+			      struct mcryptd_alg_cstate *cstate,
-+			      bool flush)
-+{
-+	struct mcryptd_ablkcipher_request_ctx *rctx = *ret_rctx;
-+	struct job_aes_cbc *job;
-+	int err = 0;
-+	unsigned int nbytes;
-+	struct crypto_aes_ctx *mb_key_ctx;
-+	struct aes_cbc_mb_mgr_inorder_x8 *key_mgr;
-+	struct ablkcipher_request *req;
++	I = 0
++		/* 2. ENC */
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*2)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
++	movdqa		16*4(KEYS1), XKEY1_4	/* load round 4 key */
 +
-+	mb_key_ctx = aes_ctx(crypto_tfm_ctx(rctx->desc.base.tfm));
-+	key_mgr = get_key_mgr(cstate->mgr, mb_key_ctx->key_length);
++		/* 3. ENC */
++	aesenc		XKEY0_3, XDATA0
++	I = 1
++	.rept 7
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*3)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
 +	/*
-+	 * Some low-level mb job is done. Keep going till done.
-+	 * This loop may process multiple multi part requests
++	 * FIXME:
++	 * why can't we reorder encrypt DATA0..DATA7 and load 5th round?
 +	 */
-+	while (!(rctx->flag & CBC_DONE)) {
-+		/* update bytes and check for more work */
-+		nbytes = rctx->walk.nbytes & (AES_BLOCK_SIZE - 1);
-+		req = cast_mcryptd_ctx_to_req(rctx);
-+		err = ablkcipher_walk_done(req, &rctx->walk, nbytes);
-+		if (err) {
-+			/* done with error */
-+			rctx->flag = CBC_DONE;
-+			rctx->error = err;
-+			goto out;
-+		}
-+		nbytes = rctx->walk.nbytes;
-+		if (!nbytes) {
-+			/* done with successful encryption */
-+			rctx->flag = CBC_DONE;
-+			goto out;
-+		}
-+		/*
-+		 * This is a multi-part job and there is more work to do.
-+		 * From the completed job, copy the running sequence of IV
-+		 * and start the next one in sequence.
-+		 */
-+		job = (struct job_aes_cbc *)rctx->job;
-+		rctx->seq_iv = job->iv;	/* copy the running sequence of iv */
-+		kernel_fpu_begin();
-+		rctx = aes_cbc_ctx_mgr_submit(key_mgr, rctx);
-+		if (!rctx) {
-+			/* multi part job submitted, no completed job. */
-+			if (flush)
-+				rctx = aes_cbc_ctx_mgr_flush(key_mgr);
-+		}
-+		kernel_fpu_end();
-+		if (!rctx) {
-+			/* no completions yet to process further */
-+			break;
-+		}
-+		/* some job finished when we submitted multi part job. */
-+		if (rctx->error) {
-+			/*
-+			 * some request completed with error
-+			 * bail out of chain processing
-+			 */
-+			err = rctx->error;
-+			break;
-+		}
-+		/* we have a valid request context to process further */
-+	}
-+	/* encrypted text is expected to be in out buffer already */
-+out:
-+	/* We came out multi-part processing for some request */
-+	*ret_rctx = rctx;
-+	return err;
-+}
++	aesenc		(16*4)(KEYS0), XDATA0		/* 4. ENC */
++	movdqa		16*5(KEYS2), XKEY2_5		/* load round 5 key */
++	aesenc		XKEY1_4, XDATA1			/* 4. ENC */
 +
-+/* notify the caller of progress ; request still stays in queue */
++	I = 2
++	.rept 6
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*4)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+static void notify_callback(struct mcryptd_ablkcipher_request_ctx *rctx,
-+			    struct mcryptd_alg_cstate *cstate,
-+			    int err)
-+{
-+	struct ablkcipher_request *req = cast_mcryptd_ctx_to_req(rctx);
++	aesenc		(16*5)(KEYS0), XDATA0		/* 5. ENC */
++	aesenc		(16*5)(KEYS1), XDATA1		/* 5. ENC */
++	movdqa		16*6(KEYS3), XKEY3_6		/* load round 6 key */
++	aesenc		XKEY2_5, XDATA2			/* 5. ENC */
++	I = 3
++	.rept 5
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*5)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+	if (irqs_disabled())
-+		rctx->complete(&req->base, err);
-+	else {
-+		local_bh_disable();
-+		rctx->complete(&req->base, err);
-+		local_bh_enable();
-+	}
-+}
++	aesenc		(16*6)(KEYS0), XDATA0		/* 6. ENC */
++	aesenc		(16*6)(KEYS1), XDATA1		/* 6. ENC */
++	aesenc		(16*6)(KEYS2), XDATA2		/* 6. ENC */
++	movdqa		16*7(KEYS4), XKEY4_7		/* load round 7 key */
++	aesenc		XKEY3_6, XDATA3			/* 6. ENC */
 +
-+/* A request that completed is dequeued and the caller is notified */
++	I = 4
++	.rept 4
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*6)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+static void completion_callback(struct mcryptd_ablkcipher_request_ctx *rctx,
-+			    struct mcryptd_alg_cstate *cstate,
-+			    int err)
-+{
-+	struct ablkcipher_request *req = cast_mcryptd_ctx_to_req(rctx);
++	I = 0
++	.rept 4
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*7)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	movdqa		16*8(KEYS5), XKEY5_8		/* load round 8 key */
++	aesenc		XKEY4_7, XDATA4			/* 7. ENC */
++	I = 5
++	.rept 3
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*7)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+       /* remove from work list and invoke completion callback */
-+	spin_lock(&cstate->work_lock);
-+	list_del(&rctx->waiter);
-+	spin_unlock(&cstate->work_lock);
++	I = 0
++	.rept 5
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*8)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	movdqa		16*9(KEYS6), XKEY6_9		/* load round 9 key */
++	aesenc		XKEY5_8, XDATA5			/* 8. ENC */
++	aesenc		16*8(KEYS6), XDATA6		/* 8. ENC */
++	aesenc		16*8(KEYS7), XDATA7		/* 8. ENC */
 +
-+	if (irqs_disabled())
-+		rctx->complete(&req->base, err);
-+	else {
-+		local_bh_disable();
-+		rctx->complete(&req->base, err);
-+		local_bh_enable();
-+	}
-+}
++	I = 0
++	.rept 6
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*9)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	mov		(OUT_OFFSET + 8*0)(ARG), TMP
++	aesenc		XKEY6_9, XDATA6			/* 9. ENC */
++	aesenc		16*9(KEYS7), XDATA7		/* 9. ENC */
 +
-+/* complete a blkcipher request and process any further completions */
++		/* 10. ENC (last for 128bit keys) */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		.if (\key_len == AES_KEYSIZE_128)
++			aesenclast	(16*10)(reg_KEY), reg_XDAT
++		.else
++			aesenc	(16*10)(reg_KEY), reg_XDAT
++		.endif
++		I = (I + 1)
++	.endr
 +
-+static void cbc_complete_job(struct mcryptd_ablkcipher_request_ctx *rctx,
-+			    struct mcryptd_alg_cstate *cstate,
-+			    int err)
-+{
-+	struct job_aes_cbc *job;
-+	int ret;
-+	struct mcryptd_ablkcipher_request_ctx *sctx;
-+	struct crypto_aes_ctx *mb_key_ctx;
-+	struct aes_cbc_mb_mgr_inorder_x8 *key_mgr;
-+	struct ablkcipher_request *req;
++	.if (\key_len != AES_KEYSIZE_128)
++		/* 11. ENC */
++		I = 0
++		.rept 8
++			define_reg	XDATA_REG_SUFX
++			define_reg	KEY_REG_SUFX
++			aesenc	(16*11)(reg_KEY), reg_XDAT
++			I = (I + 1)
++		.endr
 +
-+	req = cast_mcryptd_ctx_to_req(rctx);
-+	ablkcipher_walk_complete(&rctx->walk);
-+	completion_callback(rctx, cstate, err);
++		/* 12. ENC (last for 192bit key) */
++		I = 0
++		.rept 8
++			define_reg	XDATA_REG_SUFX
++			define_reg	KEY_REG_SUFX
++			.if (\key_len == AES_KEYSIZE_192)
++				aesenclast	(16*12)(reg_KEY), reg_XDAT
++			.else
++				aesenc		(16*12)(reg_KEY), reg_XDAT
++			.endif
++			I = (I + 1)
++		.endr
 +
-+	mb_key_ctx = aes_ctx(crypto_tfm_ctx(rctx->desc.base.tfm));
-+	key_mgr = get_key_mgr(cstate->mgr, mb_key_ctx->key_length);
++		/* for 256bit, two more rounds */
++		.if \key_len == AES_KEYSIZE_256
 +
-+	/* check for more completed jobs and process */
-+	while ((job = aes_cbc_get_completed_job_inorder_x8(key_mgr)) != NULL) {
-+		sctx = process_job_sts(job);
-+		if (WARN_ON(sctx == NULL))
-+			return;
-+		ret = sctx->error;
-+		if (!ret) {
-+			/* further process it */
-+			ret = cbc_encrypt_finish(&sctx, cstate, false);
-+		}
-+		if (sctx) {
-+			req = cast_mcryptd_ctx_to_req(sctx);
-+			ablkcipher_walk_complete(&sctx->walk);
-+			completion_callback(sctx, cstate, ret);
-+		}
-+	}
-+}
++			/* 13. ENC */
++			I = 0
++			.rept 8
++				define_reg	XDATA_REG_SUFX
++				define_reg	KEY_REG_SUFX
++				aesenc	(16*13)(reg_KEY), reg_XDAT
++				I = (I + 1)
++			.endr
 +
-+/* Add request to the waiter list. It stays in queue until completion */
++			/* 14. ENC last encode for 256bit key */
++			I = 0
++			.rept 8
++				define_reg	XDATA_REG_SUFX
++				define_reg	KEY_REG_SUFX
++				aesenclast	(16*14)(reg_KEY), reg_XDAT
++				I = (I + 1)
++			.endr
++		.endif
 +
-+static void cbc_mb_add_list(struct mcryptd_ablkcipher_request_ctx *rctx,
-+				struct mcryptd_alg_cstate *cstate)
-+{
-+	unsigned long next_flush;
-+	unsigned long delay = usecs_to_jiffies(FLUSH_INTERVAL);
++	.endif
 +
-+	/* initialize tag */
-+	rctx->tag.arrival = jiffies;    /* tag the arrival time */
-+	rctx->tag.seq_num = cstate->next_seq_num++;
-+	next_flush = rctx->tag.arrival + delay;
-+	rctx->tag.expire = next_flush;
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		MOVDQ	reg_XDAT, (TMP)	/* write back ciphertext */
++		I = (I + 1)
++		.if (I < 8)
++			mov	(OUT_OFFSET + 8*I)(ARG), TMP
++		.endif
++	.endr
 +
-+	spin_lock(&cstate->work_lock);
-+	list_add_tail(&rctx->waiter, &cstate->work_list);
-+	spin_unlock(&cstate->work_lock);
++	cmp		IDX, LEN_AREA_OFFSET(LEN_AREA_REG)
++	je		.Ldone\key_len
 +
-+	mcryptd_arm_flusher(cstate, delay);
-+}
++.Lmain_loop\key_len:
++	mov		(IN_OFFSET + 8*1)(ARG), TMP
++	pxor2		IN0, IDX, XDATA0	/* next block of plain text */
++	pxor2		TMP, IDX, XDATA1	/* next block of plain text */
 +
-+static int mb_aes_cbc_encrypt(struct ablkcipher_request *desc)
-+{
-+	struct mcryptd_ablkcipher_request_ctx *rctx =
-+		container_of(desc, struct mcryptd_ablkcipher_request_ctx, desc);
-+	struct mcryptd_ablkcipher_request_ctx *ret_rctx;
-+	struct mcryptd_alg_cstate *cstate =
-+				this_cpu_ptr(cbc_mb_alg_state.alg_cstate);
-+	int err;
-+	int ret = 0;
-+	struct crypto_aes_ctx *mb_key_ctx;
-+	struct aes_cbc_mb_mgr_inorder_x8 *key_mgr;
-+	struct ablkcipher_request *req;
++	mov		(IN_OFFSET + 8*3)(ARG), TMP
++	pxor2		IN2, IDX, XDATA2	/* next block of plain text */
++	pxor2		TMP, IDX, XDATA3	/* next block of plain text */
 +
-+	mb_key_ctx = aes_ctx(crypto_tfm_ctx(rctx->desc.base.tfm));
-+	key_mgr = get_key_mgr(cstate->mgr, mb_key_ctx->key_length);
++	mov		(IN_OFFSET + 8*5)(ARG), TMP
++	pxor2		IN4, IDX, XDATA4	/* next block of plain text */
++	pxor2		TMP, IDX, XDATA5	/* next block of plain text */
 +
-+	/* sanity check */
-+	if (rctx->tag.cpu != smp_processor_id()) {
-+		/* job not on list yet */
-+		pr_err("mcryptd error: cpu clash\n");
-+		notify_callback(rctx, cstate, -EINVAL);
-+		return 0;
-+	}
++	mov		(IN_OFFSET + 8*7)(ARG), TMP
++	pxor2		IN6, IDX, XDATA6	/* next block of plain text */
++	pxor2		TMP, IDX, XDATA7	/* next block of plain text */
 +
-+	/* a new job, initialize the cbc context and add to worklist */
-+	cbc_ctx_init(rctx, desc->nbytes, CBC_ENCRYPT);
-+	cbc_mb_add_list(rctx, cstate);
++	/* 0. ARK */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		pxor	16*0(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+	req = cast_mcryptd_ctx_to_req(rctx);
-+	ablkcipher_walk_init(&rctx->walk, desc->dst, desc->src, desc->nbytes);
-+	err = ablkcipher_walk_phys(req, &rctx->walk);
-+	if (err || !rctx->walk.nbytes) {
-+		/* terminate this request */
-+		ablkcipher_walk_complete(&rctx->walk);
-+		completion_callback(rctx, cstate, (!err) ? -EINVAL : err);
-+		return 0;
-+	}
-+	/* submit job */
-+	kernel_fpu_begin();
-+	ret_rctx = aes_cbc_ctx_mgr_submit(key_mgr, rctx);
-+	kernel_fpu_end();
++	/* 1. ENC */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*1(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+	if (!ret_rctx) {
-+		/* we submitted a job, but none completed */
-+		/* just notify the caller */
-+		notify_callback(rctx, cstate, -EINPROGRESS);
-+		return 0;
-+	}
-+	/* some job completed */
-+	if (ret_rctx->error) {
-+		/* some job finished with error */
-+		cbc_complete_job(ret_rctx, cstate, ret_rctx->error);
-+		return 0;
-+	}
-+	/* some job finished without error, process it */
-+	ret = cbc_encrypt_finish(&ret_rctx, cstate, false);
-+	if (!ret_rctx) {
-+		/* No completed job yet, notify caller */
-+		notify_callback(rctx, cstate, -EINPROGRESS);
-+		return 0;
-+	}
++	/* 2. ENC */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*2(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+	/* complete the job */
-+	cbc_complete_job(ret_rctx, cstate, ret);
-+	return 0;
-+}
++	/* 3. ENC */
++	aesenc		XKEY0_3, XDATA0		/* 3. ENC */
++	I = 1
++	.rept 7
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*3(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+static int mb_aes_cbc_decrypt(struct ablkcipher_request *desc)
-+{
-+	struct crypto_aes_ctx *aesni_ctx;
-+	struct mcryptd_ablkcipher_request_ctx *rctx =
-+		container_of(desc, struct mcryptd_ablkcipher_request_ctx, desc);
-+	struct ablkcipher_request *req;
-+	bool is_mcryptd_req;
-+	unsigned long src_paddr;
-+	unsigned long dst_paddr;
-+	int err;
++	/* 4. ENC */
++	aesenc		16*4(KEYS0), XDATA0	/* 4. ENC */
++	aesenc		XKEY1_4, XDATA1		/* 4. ENC */
++	I = 2
++	.rept 6
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*4(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+	/* note here whether it is mcryptd req */
-+	is_mcryptd_req = desc->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
-+	req = cast_mcryptd_ctx_to_req(rctx);
-+	aesni_ctx = aes_ctx(crypto_tfm_ctx(desc->base.tfm));
++	/* 5. ENC */
++	aesenc		16*5(KEYS0), XDATA0	/* 5. ENC */
++	aesenc		16*5(KEYS1), XDATA1	/* 5. ENC */
++	aesenc		XKEY2_5, XDATA2		/* 5. ENC */
 +
-+	ablkcipher_walk_init(&rctx->walk, desc->dst, desc->src, desc->nbytes);
-+	err = ablkcipher_walk_phys(req, &rctx->walk);
-+	if (err || !rctx->walk.nbytes)
-+		goto done1;
-+	desc->base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	I = 3
++	.rept 5
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*5(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+	kernel_fpu_begin();
-+	while ((desc->nbytes = rctx->walk.nbytes)) {
-+		src_paddr = (page_to_phys(rctx->walk.src.page) +
-+						rctx->walk.src.offset);
-+		dst_paddr = (page_to_phys(rctx->walk.dst.page) +
-+						rctx->walk.dst.offset);
-+		aesni_cbc_dec(aesni_ctx, phys_to_virt(dst_paddr),
-+					phys_to_virt(src_paddr),
-+					rctx->walk.nbytes & AES_BLOCK_MASK,
-+					rctx->walk.iv);
-+		desc->nbytes &= AES_BLOCK_SIZE - 1;
-+		err = ablkcipher_walk_done(req, &rctx->walk, desc->nbytes);
-+		if (err)
-+			goto done2;
-+	}
-+done2:
-+	kernel_fpu_end();
-+done1:
-+	ablkcipher_walk_complete(&rctx->walk);
-+	if (!is_mcryptd_req) {
-+		/* synchronous request */
-+		return err;
-+	}
-+	/* from mcryptd, we need to callback */
-+	if (irqs_disabled())
-+		rctx->complete(&req->base, err);
-+	else {
-+		local_bh_disable();
-+		rctx->complete(&req->base, err);
-+		local_bh_enable();
-+	}
-+	return 0;
-+}
++	/* 6. ENC */
++	I = 0
++	.rept 3
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*6(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	aesenc		XKEY3_6, XDATA3		/* 6. ENC */
++	I = 4
++	.rept 4
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*6(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+/* use the same common code in aesni to expand key */
++	/* 7. ENC */
++	I = 0
++	.rept 4
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*7(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	aesenc		XKEY4_7, XDATA4		/* 7. ENC */
++	I = 5
++	.rept 3
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*7(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+static int aes_set_key_common(struct crypto_ablkcipher *tfm, void *raw_ctx,
-+			      const u8 *in_key, unsigned int key_len)
-+{
-+	struct crypto_aes_ctx *ctx = aes_ctx(raw_ctx);
-+	u32 *flags = &tfm->base.crt_flags;
-+	int err;
++	/* 8. ENC */
++	I = 0
++	.rept 5
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*8(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	aesenc		XKEY5_8, XDATA5		/* 8. ENC */
++	aesenc		16*8(KEYS6), XDATA6	/* 8. ENC */
++	aesenc		16*8(KEYS7), XDATA7	/* 8. ENC */
 +
-+	if (key_len != AES_KEYSIZE_128 && key_len != AES_KEYSIZE_192 &&
-+	    key_len != AES_KEYSIZE_256) {
-+		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-+		return -EINVAL;
-+	}
++	/* 9. ENC */
++	I = 0
++	.rept 6
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*9(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	mov		(OUT_OFFSET + 8*0)(ARG), TMP
++	aesenc		XKEY6_9, XDATA6		/* 9. ENC */
++	aesenc		16*9(KEYS7), XDATA7	/* 9. ENC */
 +
-+	if (!irq_fpu_usable())
-+		err = crypto_aes_expand_key(ctx, in_key, key_len);
-+	else {
-+		kernel_fpu_begin();
-+		err = aesni_set_key(ctx, in_key, key_len);
-+		kernel_fpu_end();
-+	}
++	/* 10. ENC (last for 128 bit key) */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		.if (\key_len == AES_KEYSIZE_128)
++			aesenclast	16*10(reg_KEY), reg_XDAT
++		.else
++			aesenc	16*10(reg_KEY), reg_XDAT
++		.endif
++		I = (I + 1)
++	.endr
 +
-+	return err;
-+}
++	.if (\key_len != AES_KEYSIZE_128)
++		/* 11. ENC */
++		I = 0
++		.rept 8
++			define_reg	XDATA_REG_SUFX
++			define_reg	KEY_REG_SUFX
++			aesenc	16*11(reg_KEY), reg_XDAT
++			I = (I + 1)
++		.endr
 +
-+static int aes_set_key(struct crypto_ablkcipher *tfm, const u8 *in_key,
-+		       unsigned int key_len)
-+{
-+	return aes_set_key_common(tfm, crypto_ablkcipher_ctx(tfm), in_key,
-+								key_len);
-+}
++		/* 12. last ENC for 192bit key */
++		I = 0
++		.rept 8
++			define_reg	XDATA_REG_SUFX
++			define_reg	KEY_REG_SUFX
++			.if (\key_len == AES_KEYSIZE_192)
++				aesenclast	16*12(reg_KEY), reg_XDAT
++			.else
++				aesenc		16*12(reg_KEY), reg_XDAT
++			.endif
++			I = (I + 1)
++		.endr
 +
-+/* Interface functions to the asynchronous algorithm */
++		.if \key_len == AES_KEYSIZE_256
++			/* for 256bit, two more rounds */
++			/* 13. ENC */
++			I = 0
++			.rept 8
++				define_reg	XDATA_REG_SUFX
++				define_reg	KEY_REG_SUFX
++				aesenc	16*13(reg_KEY), reg_XDAT
++				I = (I + 1)
++			.endr
 +
-+static int cbc_mb_async_ablk_decrypt(struct ablkcipher_request *req)
-+{
-+	struct ablkcipher_request *mcryptd_req = ablkcipher_request_ctx(req);
-+	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
-+	struct aes_cbc_mb_ctx *ctx = crypto_ablkcipher_ctx(tfm);
-+	struct mcryptd_ablkcipher *mcryptd_tfm = ctx->mcryptd_tfm;
-+	struct mcryptd_ablkcipher_request_ctx *rctx;
-+	struct crypto_ablkcipher *child_tfm;
-+	int err;
++			/* 14. last ENC for 256bit key */
++			I = 0
++			.rept 8
++				define_reg	XDATA_REG_SUFX
++				define_reg	KEY_REG_SUFX
++				aesenclast	16*14(reg_KEY), reg_XDAT
++				I = (I + 1)
++			.endr
++		.endif
++	.endif
 +
-+	memcpy(mcryptd_req, req, sizeof(*req));
-+	ablkcipher_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		/* write back cipher text */
++		MOVDQ		reg_XDAT, (TMP , IDX)
++		I = (I + 1)
++		.if (I < 8)
++			mov		(OUT_OFFSET + 8*I)(ARG), TMP
++		.endif
++	.endr
 +
-+	if (!may_use_simd())
-+		/* request sent via mcryptd, completes asynchronously */
-+		return crypto_ablkcipher_decrypt(mcryptd_req);
++	add	$16, IDX
++	cmp	IDX, LEN_AREA_OFFSET(LEN_AREA_REG)
++	jne	.Lmain_loop\key_len
 +
-+	/*
-+	 * Package decryption descriptor in mcryptd req structure
-+	 * and let the child tfm execute the decryption
-+	 * without incurring the cost of mcryptd layers.
-+	 * Request completes synchronously.
-+	 * Multi-buffer technique unnecessary as decrypt is
-+	 * done in parallel.
-+	 */
++.Ldone\key_len:
++	/* update IV */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		movdqa	reg_XDAT, (IV_OFFSET + 16*I)(ARG)
++		I = (I + 1)
++	.endr
 +
-+	rctx = ablkcipher_request_ctx(mcryptd_req);
-+	child_tfm = mcryptd_ablkcipher_child(ctx->mcryptd_tfm);
-+	rctx->desc.base.tfm = crypto_ablkcipher_tfm(child_tfm);
-+	rctx->desc.info = req->info;
-+	rctx->desc.base.flags = 0;
-+	rctx->desc.src = req->src;
-+	rctx->desc.dst = req->dst;
-+	rctx->desc.nbytes = req->nbytes;
++	/* update IN and OUT */
++	movd	LEN_AREA_OFFSET(LEN_AREA_REG), %xmm0
++	pshufd	$0x44, %xmm0, %xmm0
 +
-+	err = crypto_ablkcipher_crt(child_tfm)->decrypt(&rctx->desc);
-+	return err;
-+}
++	I = 1
++	.rept 4
++		define_reg	XMM_REG_SUFX
++		movdqa	(IN_OFFSET + 16*(I-1))(ARG), reg_XMM
++		I = (I + 1)
++	.endr
 +
-+static int cbc_mb_async_ablk_encrypt(struct ablkcipher_request *req)
-+{
-+	struct ablkcipher_request *mcryptd_req = ablkcipher_request_ctx(req);
-+	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
-+	struct aes_cbc_mb_ctx *ctx = crypto_ablkcipher_ctx(tfm);
-+	struct mcryptd_ablkcipher *mcryptd_tfm = ctx->mcryptd_tfm;
++	paddq	%xmm0, %xmm1
++	paddq	%xmm0, %xmm2
++	paddq	%xmm0, %xmm3
++	paddq	%xmm0, %xmm4
 +
-+	/* get the async driver ctx and tfm to package the request */
-+	memcpy(mcryptd_req, req, sizeof(*req));
-+	ablkcipher_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	I = 5
++	.rept 4
++		define_reg	XMM_REG_SUFX
++		movdqa	(OUT_OFFSET + 16*(I-5))(ARG), reg_XMM
++		I = (I + 1)
++	.endr
 +
-+	return crypto_ablkcipher_encrypt(mcryptd_req);
++	I = 1
++	.rept 4
++		define_reg	XMM_REG_SUFX
++		movdqa	reg_XMM, (IN_OFFSET + 16*(I-1))(ARG)
++		I = (I + 1)
++	.endr
 +
-+}
++	paddq	%xmm0, %xmm5
++	paddq	%xmm0, %xmm6
++	paddq	%xmm0, %xmm7
++	paddq	%xmm0, %xmm8
++
++	I = 5
++	.rept 4
++		define_reg	XMM_REG_SUFX
++		movdqa	reg_XMM, (OUT_OFFSET + 16*(I-5))(ARG)
++		I = (I + 1)
++	.endr
++
++	mov	(XMM_SAVE_SIZE + 8*0)(GPR_SAVE_REG), %rbx
++	mov	(XMM_SAVE_SIZE + 8*3)(GPR_SAVE_REG), %rbp
++	mov	(XMM_SAVE_SIZE + 8*4)(GPR_SAVE_REG), %r12
++	mov	(XMM_SAVE_SIZE + 8*5)(GPR_SAVE_REG), %r13
++	mov	(XMM_SAVE_SIZE + 8*6)(GPR_SAVE_REG), %r14
++	mov	(XMM_SAVE_SIZE + 8*7)(GPR_SAVE_REG), %r15
++
++	add	$STACK_SIZE, %rsp
++
++	ret
++.endm
 +
 +/*
-+ * CRYPTO_ALG_ASYNC flag is passed to indicate we have an ablk
-+ * scatter-gather walk.
++ * AES CBC encryption routine supporting 128/192/256 bit keys
++ *
++ * void aes_cbc_enc_128_x8(struct aes_cbc_args_x8 *args, u64 len);
++ * arg 1: rcx : addr of AES_ARGS_x8 structure
++ * arg 2: rdx : len (in units of 16-byte blocks)
++ * void aes_cbc_enc_192_x8(struct aes_cbc_args_x8 *args, u64 len);
++ * arg 1: rcx : addr of aes_cbc_args_x8 structure
++ * arg 2: rdx : len (in units of 16-byte blocks)
++ * void aes_cbc_enc_256_x8(struct aes_cbc_args_x8 *args, u64 len);
++ * arg 1: rcx : addr of aes_cbc_args_x8 structure
++ * arg 2: rdx : len (in units of 16-byte blocks)
 + */
 +
-+static struct crypto_alg aes_cbc_mb_alg = {
-+	.cra_name		= "__cbc-aes-aesni-mb",
-+	.cra_driver_name	= "__driver-cbc-aes-aesni-mb",
-+	.cra_priority		= 100,
-+	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC
-+					| CRYPTO_ALG_INTERNAL,
-+	.cra_blocksize		= AES_BLOCK_SIZE,
-+	.cra_ctxsize		= sizeof(struct crypto_aes_ctx) +
-+				  AESNI_ALIGN - 1,
-+	.cra_alignmask		= 0,
-+	.cra_type		= &crypto_ablkcipher_type,
-+	.cra_module		= THIS_MODULE,
-+	.cra_list		= LIST_HEAD_INIT(aes_cbc_mb_alg.cra_list),
-+	.cra_u = {
-+		.ablkcipher = {
-+			.min_keysize	= AES_MIN_KEY_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.ivsize		= AES_BLOCK_SIZE,
-+			.setkey		= aes_set_key,
-+			.encrypt	= mb_aes_cbc_encrypt,
-+			.decrypt	= mb_aes_cbc_decrypt
-+		},
-+	},
-+};
++ENTRY(aes_cbc_enc_128_x8)
 +
-+static int ablk_cbc_async_init_tfm(struct crypto_tfm *tfm)
-+{
-+	struct mcryptd_ablkcipher *mcryptd_tfm;
-+	struct aes_cbc_mb_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct mcryptd_ablkcipher_ctx *mctx;
++	aes_cbc_enc_x8 AES_KEYSIZE_128
 +
-+	mcryptd_tfm = mcryptd_alloc_ablkcipher(
-+				"__driver-cbc-aes-aesni-mb",
-+				CRYPTO_ALG_INTERNAL, CRYPTO_ALG_INTERNAL);
-+	if (IS_ERR(mcryptd_tfm))
-+		return PTR_ERR(mcryptd_tfm);
-+	mctx = crypto_ablkcipher_ctx(&mcryptd_tfm->base);
-+	mctx->alg_state = &cbc_mb_alg_state;
-+	ctx->mcryptd_tfm = mcryptd_tfm;
-+	tfm->crt_ablkcipher.reqsize = sizeof(struct ablkcipher_request) +
-+		crypto_ablkcipher_reqsize(&mcryptd_tfm->base);
++ENDPROC(aes_cbc_enc_128_x8)
 +
-+	return 0;
++ENTRY(aes_cbc_enc_192_x8)
 +
-+}
++	aes_cbc_enc_x8 AES_KEYSIZE_192
 +
-+static void ablk_cbc_async_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct aes_cbc_mb_ctx *ctx = crypto_tfm_ctx(tfm);
++ENDPROC(aes_cbc_enc_192_x8)
 +
-+	mcryptd_free_ablkcipher(ctx->mcryptd_tfm);
-+}
++ENTRY(aes_cbc_enc_256_x8)
 +
-+/* Asynchronous interface to CBC multibuffer implementation */
++	aes_cbc_enc_x8 AES_KEYSIZE_256
 +
-+static struct crypto_alg aes_cbc_mb_async_alg = {
-+	.cra_name		= "cbc(aes)",
-+	.cra_driver_name	= "cbc-aes-aesni-mb",
-+	.cra_priority		= 450,
-+	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
-+	.cra_blocksize		= AES_BLOCK_SIZE,
-+	.cra_ctxsize		= sizeof(struct aes_cbc_mb_ctx) +
-+				  AESNI_ALIGN - 1,
-+	.cra_alignmask		= 0,
-+	.cra_type		= &crypto_ablkcipher_type,
-+	.cra_module		= THIS_MODULE,
-+	.cra_init		= ablk_cbc_async_init_tfm,
-+	.cra_exit		= ablk_cbc_async_exit_tfm,
-+	.cra_list		= LIST_HEAD_INIT(aes_cbc_mb_async_alg.cra_list),
-+	.cra_u = {
-+		.ablkcipher = {
-+			.min_keysize	= AES_MIN_KEY_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.ivsize		= AES_BLOCK_SIZE,
-+			.setkey		= ablk_set_key,
-+			.encrypt	= cbc_mb_async_ablk_encrypt,
-+			.decrypt	= cbc_mb_async_ablk_decrypt,
-+		},
-+	},
-+};
-+
-+/*
-+ * When there are no new jobs arriving, the multibuffer queue may stall.
-+ * To prevent prolonged stall, the flusher can be invoked to alleviate
-+ * the following conditions:
-+ * a) There are partially completed multi-part crypto jobs after a
-+ * maximum allowable delay
-+ * b) We have exhausted crypto jobs in queue, and the cpu
-+ * does not have other tasks and cpu will become idle otherwise.
-+ */
-+unsigned long cbc_mb_flusher(struct mcryptd_alg_cstate *cstate)
-+{
-+	struct mcryptd_ablkcipher_request_ctx *rctx;
-+	unsigned long cur_time;
-+	unsigned long next_flush = 0;
-+
-+	struct crypto_aes_ctx *mb_key_ctx;
-+	struct aes_cbc_mb_mgr_inorder_x8 *key_mgr;
-+
-+
-+	cur_time = jiffies;
-+
-+	while (!list_empty(&cstate->work_list)) {
-+		rctx = list_entry(cstate->work_list.next,
-+				struct mcryptd_ablkcipher_request_ctx, waiter);
-+		if time_before(cur_time, rctx->tag.expire)
-+			break;
-+
-+		mb_key_ctx = aes_ctx(crypto_tfm_ctx(rctx->desc.base.tfm));
-+		key_mgr = get_key_mgr(cstate->mgr, mb_key_ctx->key_length);
-+
-+		kernel_fpu_begin();
-+		rctx = aes_cbc_ctx_mgr_flush(key_mgr);
-+		kernel_fpu_end();
-+		if (!rctx) {
-+			pr_err("cbc_mb_flusher: nothing got flushed\n");
-+			break;
-+		}
-+		cbc_encrypt_finish(&rctx, cstate, true);
-+		if (rctx)
-+			cbc_complete_job(rctx, cstate, rctx->error);
-+	}
-+
-+	if (!list_empty(&cstate->work_list)) {
-+		rctx = list_entry(cstate->work_list.next,
-+				struct mcryptd_ablkcipher_request_ctx, waiter);
-+		/* get the blkcipher context and then flush time */
-+		next_flush = rctx->tag.expire;
-+		mcryptd_arm_flusher(cstate, get_delay(next_flush));
-+	}
-+	return next_flush;
-+}
-+
-+static int __init aes_cbc_mb_mod_init(void)
-+{
-+
-+	int cpu, i;
-+	int err;
-+	struct mcryptd_alg_cstate *cpu_state;
-+	struct aes_cbc_mb_mgr_inorder_x8 *key_mgr;
-+
-+	/* check for dependent cpu features */
-+	if (!boot_cpu_has(X86_FEATURE_AES)) {
-+		pr_err("aes_cbc_mb_mod_init: no aes support\n");
-+		err = -ENODEV;
-+		goto err1;
-+	}
-+
-+	if (!boot_cpu_has(X86_FEATURE_XMM)) {
-+		pr_err("aes_cbc_mb_mod_init: no xmm support\n");
-+		err = -ENODEV;
-+		goto err1;
-+	}
-+
-+	/* initialize multibuffer structures */
-+
-+	cbc_mb_alg_state.alg_cstate = alloc_percpu(struct mcryptd_alg_cstate);
-+	if (!cbc_mb_alg_state.alg_cstate) {
-+		pr_err("aes_cbc_mb_mod_init: insufficient memory\n");
-+		err = -ENOMEM;
-+		goto err1;
-+	}
-+
-+	for_each_possible_cpu(cpu) {
-+		cpu_state = per_cpu_ptr(cbc_mb_alg_state.alg_cstate, cpu);
-+		cpu_state->next_flush = 0;
-+		cpu_state->next_seq_num = 0;
-+		cpu_state->flusher_engaged = false;
-+		INIT_DELAYED_WORK(&cpu_state->flush, mcryptd_flusher);
-+		cpu_state->cpu = cpu;
-+		cpu_state->alg_state = &cbc_mb_alg_state;
-+		cpu_state->mgr =
-+			(struct aes_cbc_mb_mgr_inorder_x8 *)
-+			kzalloc(3 * sizeof(struct aes_cbc_mb_mgr_inorder_x8),
-+				GFP_KERNEL);
-+		if (!cpu_state->mgr) {
-+			err = -ENOMEM;
-+			goto err2;
-+		}
-+		key_mgr = (struct aes_cbc_mb_mgr_inorder_x8 *) cpu_state->mgr;
-+		/* initialize manager state for 128, 192 and 256 bit keys */
-+		for (i = 0; i < 3; ++i) {
-+			aes_cbc_init_mb_mgr_inorder_x8(key_mgr);
-+			++key_mgr;
-+		}
-+		INIT_LIST_HEAD(&cpu_state->work_list);
-+		spin_lock_init(&cpu_state->work_lock);
-+	}
-+	cbc_mb_alg_state.flusher = &cbc_mb_flusher;
-+
-+	/* register the synchronous mb algo */
-+	err = crypto_register_alg(&aes_cbc_mb_alg);
-+	if (err)
-+		goto err3;
-+
-+	/* register the asynchronous mb algo */
-+	err = crypto_register_alg(&aes_cbc_mb_async_alg);
-+	if (err) {
-+		/* unregister synchronous mb algo */
-+		crypto_unregister_alg(&aes_cbc_mb_alg);
-+		goto err3;
-+	}
-+
-+	pr_info("x86 CBC multibuffer crypto module initialized successfully\n");
-+	return 0; /* module init success */
-+
-+	/* error in algo registration */
-+err3:
-+	for_each_possible_cpu(cpu) {
-+		cpu_state = per_cpu_ptr(cbc_mb_alg_state.alg_cstate, cpu);
-+		kfree(cpu_state->mgr);
-+	}
-+err2:
-+	free_percpu(cbc_mb_alg_state.alg_cstate);
-+err1:
-+	return err;
-+}
-+
-+static void __exit aes_cbc_mb_mod_fini(void)
-+{
-+	int cpu;
-+	struct mcryptd_alg_cstate *cpu_state;
-+
-+	crypto_unregister_alg(&aes_cbc_mb_alg);
-+	crypto_unregister_alg(&aes_cbc_mb_async_alg);
-+
-+	for_each_possible_cpu(cpu) {
-+		cpu_state = per_cpu_ptr(cbc_mb_alg_state.alg_cstate, cpu);
-+		kfree(cpu_state->mgr);
-+	}
-+	free_percpu(cbc_mb_alg_state.alg_cstate);
-+}
-+
-+module_init(aes_cbc_mb_mod_init);
-+module_exit(aes_cbc_mb_mod_fini);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("AES CBC Algorithm, multi buffer accelerated");
-+MODULE_AUTHOR("Tim Chen <tim.c.chen@linux.intel.com");
-+
-+MODULE_ALIAS("aes-cbc-mb");
-+MODULE_ALIAS_CRYPTO("cbc-aes-aesni-mb");
++ENDPROC(aes_cbc_enc_256_x8)
 -- 
 1.9.1
