@@ -1,7 +1,7 @@
 From: Megha Dey <megha.dey@linux.intel.com>
-Subject: [PATCH v5 1/7] crypto: Multi-buffer encryption infrastructure support
-Date: Mon, 26 Sep 2016 10:27:33 -0700
-Message-ID: <1474910859-11713-2-git-send-email-megha.dey@linux.intel.com>
+Subject: [PATCH v5 2/7] crypto: AES CBC multi-buffer data structures
+Date: Mon, 26 Sep 2016 10:27:34 -0700
+Message-ID: <1474910859-11713-3-git-send-email-megha.dey@linux.intel.com>
 References: <1474910859-11713-1-git-send-email-megha.dey@linux.intel.com>
 Cc: linux-crypto@vger.kernel.org, tim.c.chen@linux.intel.com,
         megha.dey@intel.com, Megha Dey <megha.dey@linux.intel.com>
@@ -9,442 +9,682 @@ To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from mga04.intel.com ([192.55.52.120]:45768 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755040AbcIZRUl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Sep 2016 13:20:41 -0400
+        id S1161424AbcIZRUn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 26 Sep 2016 13:20:43 -0400
 In-Reply-To: <1474910859-11713-1-git-send-email-megha.dey@linux.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In this patch, the infrastructure needed to support multibuffer
-encryption implementation is added:
+From: Tim Chen <tim.c.chen@linux.intel.com>
 
-a) Enhance mcryptd daemon to support ablkcipher requests.
-
-b) Update configuration to include multi-buffer encryption build
-support.
-
-For an introduction to the multi-buffer implementation, please see
-http://www.intel.com/content/www/us/en/communications/communications-ia-multi-buffer-paper.html
+This patch introduces the data structures and prototypes of functions
+needed for doing AES CBC encryption using multi-buffer. Included are
+the structures of the multi-buffer AES CBC job, job scheduler in C and
+data structure defines in x86 assembly code.
 
 Originally-by: Chandramouli Narayanan <mouli_7982@yahoo.com>
 Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
 Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 ---
- crypto/Kconfig           |  15 +++
- crypto/mcryptd.c         | 256 +++++++++++++++++++++++++++++++++++++++++++++++
- include/crypto/algapi.h  |  10 ++
- include/crypto/mcryptd.h |  36 +++++++
- 4 files changed, 317 insertions(+)
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_ctx.h    |  97 +++++++++
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_mgr.h    | 132 ++++++++++++
+ arch/x86/crypto/aes-cbc-mb/mb_mgr_datastruct.S | 271 +++++++++++++++++++++++++
+ arch/x86/crypto/aes-cbc-mb/reg_sizes.S         | 126 ++++++++++++
+ 4 files changed, 626 insertions(+)
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_ctx.h
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_mgr.h
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_datastruct.S
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/reg_sizes.S
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 84d7148..e4b684c 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -960,6 +960,21 @@ config CRYPTO_AES_NI_INTEL
- 	  ECB, CBC, LRW, PCBC, XTS. The 64 bit version has additional
- 	  acceleration for CTR.
- 
-+config CRYPTO_AES_CBC_MB
-+	tristate "AES CBC algorithm (x86_64 Multi-Buffer, Experimental)"
-+	depends on X86 && 64BIT
-+	select CRYPTO_ABLK_HELPER
-+	select CRYPTO_MCRYPTD
-+	help
-+	  AES CBC encryption implemented using multi-buffer technique.
-+	  This algorithm computes on multiple data lanes concurrently with
-+	  SIMD instructions for better throughput. It should only be used
-+	  when we expect many concurrent crypto requests to keep all the
-+	  data lanes filled to realize the performance benefit. If the data
-+	  lanes are unfilled, a flush operation will be initiated after some
-+	  delay to process the exisiting crypto jobs, adding some extra
-+	  latency to low load case.
+diff --git a/arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_ctx.h b/arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_ctx.h
+new file mode 100644
+index 0000000..024586b
+--- /dev/null
++++ b/arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_ctx.h
+@@ -0,0 +1,97 @@
++/*
++ *	Header file for multi buffer AES CBC algorithm manager
++ *	that deals with 8 buffers at a time
++ *
++ *
++ * This file is provided under a dual BSD/GPLv2 license.  When using or
++ * redistributing this file, you may do so under either license.
++ *
++ * GPL LICENSE SUMMARY
++ *
++ * Copyright(c) 2016 Intel Corporation.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of version 2 of the GNU General Public License as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * Contact Information:
++ * James Guilford <james.guilford@intel.com>
++ * Sean Gulley <sean.m.gulley@intel.com>
++ * Tim Chen <tim.c.chen@linux.intel.com>
++ * Megha Dey <megha.dey@linux.intel.com>
++ *
++ * BSD LICENSE
++ *
++ * Copyright(c) 2016 Intel Corporation.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * Redistributions of source code must retain the above copyright
++ * notice, this list of conditions and the following disclaimer.
++ * Redistributions in binary form must reproduce the above copyright
++ * notice, this list of conditions and the following disclaimer in
++ * the documentation and/or other materials provided with the
++ * distribution.
++ * Neither the name of Intel Corporation nor the names of its
++ * contributors may be used to endorse or promote products derived
++ * from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ */
++#ifndef __AES_CBC_MB_CTX_H
++#define __AES_CBC_MB_CTX_H
 +
- config CRYPTO_AES_SPARC64
- 	tristate "AES cipher algorithms (SPARC64)"
- 	depends on SPARC64
-diff --git a/crypto/mcryptd.c b/crypto/mcryptd.c
-index 86fb59b..fc65bd3 100644
---- a/crypto/mcryptd.c
-+++ b/crypto/mcryptd.c
-@@ -116,6 +116,26 @@ static int mcryptd_enqueue_request(struct mcryptd_queue *queue,
- 	return err;
- }
- 
-+static int mcryptd_enqueue_blkcipher_request(struct mcryptd_queue *queue,
-+				struct crypto_async_request *request,
-+				struct mcryptd_ablkcipher_request_ctx *rctx)
-+{
-+	int cpu, err;
-+	struct mcryptd_cpu_queue *cpu_queue;
 +
-+	cpu = get_cpu();
-+	cpu_queue = this_cpu_ptr(queue->cpu_queue);
-+	rctx->tag.cpu = cpu;
++#include <linux/types.h>
 +
-+	err = crypto_enqueue_request(&cpu_queue->queue, request);
-+	pr_debug("enqueue request: cpu %d cpu_queue %p request %p\n",
-+		cpu, cpu_queue, request);
-+	queue_work_on(cpu, kcrypto_wq, &cpu_queue->work);
-+	put_cpu();
++#include "aes_cbc_mb_mgr.h"
 +
-+	return err;
-+}
++#define CBC_ENCRYPT	0x01
++#define CBC_DECRYPT	0x02
++#define CBC_START	0x04
++#define CBC_DONE	0x08
 +
- /*
-  * Try to opportunisticlly flush the partially completed jobs if
-  * crypto daemon is the only task running.
-@@ -254,6 +274,132 @@ out_free_inst:
- 	goto out;
- }
- 
-+static int mcryptd_ablkcipher_setkey(struct crypto_ablkcipher *parent,
-+				    const u8 *key, unsigned int keylen)
-+{
-+	struct mcryptd_ablkcipher_ctx *ctx = crypto_ablkcipher_ctx(parent);
-+	struct crypto_ablkcipher *child = ctx->child;
-+	int err;
++#define CBC_CTX_STS_IDLE       0x00
++#define CBC_CTX_STS_PROCESSING 0x01
++#define CBC_CTX_STS_LAST       0x02
++#define CBC_CTX_STS_COMPLETE   0x04
 +
-+	crypto_ablkcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_ablkcipher_set_flags(child, crypto_ablkcipher_get_flags(parent) &
-+						CRYPTO_TFM_REQ_MASK);
-+	err = crypto_ablkcipher_setkey(child, key, keylen);
-+	crypto_ablkcipher_set_flags(parent, crypto_ablkcipher_get_flags(child) &
-+						CRYPTO_TFM_RES_MASK);
-+	return err;
-+}
++enum cbc_ctx_error {
++	CBC_CTX_ERROR_NONE               =  0,
++	CBC_CTX_ERROR_INVALID_FLAGS      = -1,
++	CBC_CTX_ERROR_ALREADY_PROCESSING = -2,
++	CBC_CTX_ERROR_ALREADY_COMPLETED  = -3,
++};
 +
-+static void mcryptd_ablkcipher_crypt(struct ablkcipher_request *req,
-+				  struct crypto_ablkcipher *child,
-+				  int err,
-+				  int (*crypt)(struct ablkcipher_request *desc))
-+{
-+	struct mcryptd_ablkcipher_request_ctx *rctx;
-+	struct ablkcipher_request desc;
++#define cbc_ctx_init(ctx, n_bytes, op) \
++	do { \
++		(ctx)->flag = (op) | CBC_START; \
++		(ctx)->nbytes = (n_bytes); \
++	} while (0)
 +
-+	rctx = ablkcipher_request_ctx(req);
++/* AESNI routines to perform cbc decrypt and key expansion */
 +
-+	if (unlikely(err == -EINPROGRESS))
-+		goto out;
++asmlinkage void aesni_cbc_dec(struct crypto_aes_ctx *ctx, u8 *out,
++			      const u8 *in, unsigned int len, u8 *iv);
++asmlinkage int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
++			     unsigned int key_len);
 +
-+	/* set up the ablkcipher request to work on */
-+	desc.base.tfm = crypto_ablkcipher_tfm(child);
-+	desc.info = req->info;
-+	desc.base.flags = CRYPTO_TFM_REQ_MAY_SLEEP;
-+	desc.dst = req->dst;
-+	desc.src = req->src;
-+	desc.nbytes = req->nbytes;
++#endif /* __AES_CBC_MB_CTX_H */
+diff --git a/arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_mgr.h b/arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_mgr.h
+new file mode 100644
+index 0000000..788180e
+--- /dev/null
++++ b/arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_mgr.h
+@@ -0,0 +1,132 @@
++/*
++ *	Header file for multi buffer AES CBC algorithm manager
++ *	that deals with 8 buffers at a time
++ *
++ *
++ * This file is provided under a dual BSD/GPLv2 license.  When using or
++ * redistributing this file, you may do so under either license.
++ *
++ * GPL LICENSE SUMMARY
++ *
++ * Copyright(c) 2016 Intel Corporation.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of version 2 of the GNU General Public License as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * Contact Information:
++ * James Guilford <james.guilford@intel.com>
++ * Sean Gulley <sean.m.gulley@intel.com>
++ * Tim Chen <tim.c.chen@linux.intel.com>
++ * Megha Dey <megha.dey@linux.intel.com>
++ *
++ * BSD LICENSE
++ *
++ * Copyright(c) 2016 Intel Corporation.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * Redistributions of source code must retain the above copyright
++ * notice, this list of conditions and the following disclaimer.
++ * Redistributions in binary form must reproduce the above copyright
++ * notice, this list of conditions and the following disclaimer in
++ * the documentation and/or other materials provided with the
++ * distribution.
++ * Neither the name of Intel Corporation nor the names of its
++ * contributors may be used to endorse or promote products derived
++ * from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ */
++#ifndef __AES_CBC_MB_MGR_H
++#define __AES_CBC_MB_MGR_H
 +
-+	rctx->desc = desc;
 +
-+	/*
-+	 * pass addr of descriptor stored in the request context
-+	 * so that the callee can get to the request context
-+	 */
-+	err = crypt(&rctx->desc);
-+	if (err) {
-+		req->base.complete = rctx->complete;
-+		goto out;
-+	}
-+	return;
-+
-+out:
-+	local_bh_disable();
-+	rctx->complete(&req->base, err);
-+	local_bh_enable();
-+}
-+
-+static void mcryptd_ablkcipher_encrypt(struct crypto_async_request *req,
-+								int err)
-+{
-+	struct mcryptd_ablkcipher_ctx *ctx = crypto_tfm_ctx(req->tfm);
-+	struct crypto_ablkcipher *child = ctx->child;
-+
-+	mcryptd_ablkcipher_crypt(ablkcipher_request_cast(req), child, err,
-+				crypto_ablkcipher_crt(child)->encrypt);
-+}
-+
-+static void mcryptd_ablkcipher_decrypt(struct crypto_async_request *req,
-+								int err)
-+{
-+	struct mcryptd_ablkcipher_ctx *ctx = crypto_tfm_ctx(req->tfm);
-+	struct crypto_ablkcipher *child = ctx->child;
-+
-+	mcryptd_ablkcipher_crypt(ablkcipher_request_cast(req), child, err,
-+				crypto_ablkcipher_crt(child)->decrypt);
-+}
-+
-+static int mcryptd_ablkcipher_enqueue(struct ablkcipher_request *req,
-+					crypto_completion_t complete)
-+{
-+	struct mcryptd_ablkcipher_request_ctx *rctx =
-+					ablkcipher_request_ctx(req);
-+	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
-+	struct mcryptd_queue *queue;
-+
-+	queue = mcryptd_get_queue(crypto_ablkcipher_tfm(tfm));
-+	rctx->complete = req->base.complete;
-+	req->base.complete = complete;
-+
-+	return mcryptd_enqueue_blkcipher_request(queue, &req->base, rctx);
-+}
-+
-+static int mcryptd_ablkcipher_encrypt_enqueue(struct ablkcipher_request *req)
-+{
-+	return mcryptd_ablkcipher_enqueue(req, mcryptd_ablkcipher_encrypt);
-+}
-+
-+static int mcryptd_ablkcipher_decrypt_enqueue(struct ablkcipher_request *req)
-+{
-+	return mcryptd_ablkcipher_enqueue(req, mcryptd_ablkcipher_decrypt);
-+}
-+
-+static int mcryptd_ablkcipher_init_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
-+	struct mcryptd_instance_ctx *ictx = crypto_instance_ctx(inst);
-+	struct crypto_spawn *spawn = &ictx->spawn;
-+	struct mcryptd_ablkcipher_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_ablkcipher *cipher;
-+
-+	cipher = crypto_spawn_ablkcipher(spawn);
-+	if (IS_ERR(cipher))
-+		return PTR_ERR(cipher);
-+
-+	ctx->child = cipher;
-+	tfm->crt_ablkcipher.reqsize =
-+		sizeof(struct mcryptd_ablkcipher_request_ctx);
-+	return 0;
-+}
-+
-+static void mcryptd_ablkcipher_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct mcryptd_ablkcipher_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	crypto_free_ablkcipher(ctx->child);
-+}
-+
- static inline void mcryptd_check_internal(struct rtattr **tb, u32 *type,
- 					  u32 *mask)
- {
-@@ -268,6 +414,70 @@ static inline void mcryptd_check_internal(struct rtattr **tb, u32 *type,
- 		*mask |= CRYPTO_ALG_INTERNAL;
- }
- 
-+static int mcryptd_create_blkcipher(struct crypto_template *tmpl,
-+				  struct rtattr **tb,
-+				  struct mcryptd_queue *queue)
-+{
-+	struct mcryptd_instance_ctx *ctx;
-+	struct crypto_instance *inst;
-+	struct crypto_alg *alg;
-+	u32 type = CRYPTO_ALG_TYPE_ABLKCIPHER;
-+	u32 mask = CRYPTO_ALG_TYPE_MASK;
-+	int err;
-+
-+	mcryptd_check_internal(tb, &type, &mask);
-+
-+	alg = crypto_get_attr_alg(tb, type, mask);
-+	if (IS_ERR(alg))
-+		return PTR_ERR(alg);
-+
-+	pr_debug("crypto: mcryptd crypto alg: %s\n", alg->cra_name);
-+	inst = mcryptd_alloc_instance(alg, 0, sizeof(*ctx));
-+	err = PTR_ERR(inst);
-+	if (IS_ERR(inst))
-+		goto out_put_alg;
-+
-+	ctx = crypto_instance_ctx(inst);
-+	ctx->queue = queue;
-+
-+	err = crypto_init_spawn(&ctx->spawn, alg, inst,
-+			CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_ASYNC);
-+	if (err)
-+		goto out_free_inst;
-+
-+	type = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC;
-+	if (alg->cra_flags & CRYPTO_ALG_INTERNAL)
-+		type |= CRYPTO_ALG_INTERNAL;
-+	inst->alg.cra_flags = type;
-+	inst->alg.cra_type = &crypto_ablkcipher_type;
-+
-+	inst->alg.cra_ablkcipher.ivsize = alg->cra_blkcipher.ivsize;
-+	inst->alg.cra_ablkcipher.min_keysize = alg->cra_ablkcipher.min_keysize;
-+	inst->alg.cra_ablkcipher.max_keysize = alg->cra_ablkcipher.max_keysize;
-+
-+	inst->alg.cra_ablkcipher.geniv = alg->cra_ablkcipher.geniv;
-+
-+	inst->alg.cra_ctxsize = sizeof(struct mcryptd_ablkcipher_ctx);
-+
-+	inst->alg.cra_init = mcryptd_ablkcipher_init_tfm;
-+	inst->alg.cra_exit = mcryptd_ablkcipher_exit_tfm;
-+
-+	inst->alg.cra_ablkcipher.setkey = mcryptd_ablkcipher_setkey;
-+	inst->alg.cra_ablkcipher.encrypt = mcryptd_ablkcipher_encrypt_enqueue;
-+	inst->alg.cra_ablkcipher.decrypt = mcryptd_ablkcipher_decrypt_enqueue;
-+
-+	err = crypto_register_instance(tmpl, inst);
-+	if (err) {
-+		crypto_drop_spawn(&ctx->spawn);
-+out_free_inst:
-+		kfree(inst);
-+	}
-+
-+out_put_alg:
-+	crypto_mod_put(alg);
-+	return err;
-+}
-+
- static int mcryptd_hash_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
-@@ -558,6 +768,8 @@ static int mcryptd_create(struct crypto_template *tmpl, struct rtattr **tb)
- 		return PTR_ERR(algt);
- 
- 	switch (algt->type & algt->mask & CRYPTO_ALG_TYPE_MASK) {
-+	case CRYPTO_ALG_TYPE_BLKCIPHER:
-+	return mcryptd_create_blkcipher(tmpl, tb, &mqueue);
- 	case CRYPTO_ALG_TYPE_DIGEST:
- 		return mcryptd_create_hash(tmpl, tb, &mqueue);
- 	break;
-@@ -572,6 +784,10 @@ static void mcryptd_free(struct crypto_instance *inst)
- 	struct hashd_instance_ctx *hctx = crypto_instance_ctx(inst);
- 
- 	switch (inst->alg.cra_flags & CRYPTO_ALG_TYPE_MASK) {
-+	case CRYPTO_ALG_TYPE_BLKCIPHER:
-+		crypto_drop_spawn(&ctx->spawn);
-+		kfree(inst);
-+		return;
- 	case CRYPTO_ALG_TYPE_AHASH:
- 		crypto_drop_ahash(&hctx->spawn);
- 		kfree(ahash_instance(inst));
-@@ -589,6 +805,46 @@ static struct crypto_template mcryptd_tmpl = {
- 	.module = THIS_MODULE,
- };
- 
-+struct mcryptd_ablkcipher *mcryptd_alloc_ablkcipher(const char *alg_name,
-+							u32 type, u32 mask)
-+{
-+	char cryptd_alg_name[CRYPTO_MAX_ALG_NAME];
-+	struct crypto_tfm *tfm;
-+
-+	if (snprintf(cryptd_alg_name, CRYPTO_MAX_ALG_NAME,
-+			"mcryptd(%s)", alg_name) >= CRYPTO_MAX_ALG_NAME)
-+		return ERR_PTR(-EINVAL);
-+	type &= ~(CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_GENIV);
-+	type |= CRYPTO_ALG_TYPE_BLKCIPHER;
-+	mask &= ~CRYPTO_ALG_TYPE_MASK;
-+	mask |= (CRYPTO_ALG_GENIV | CRYPTO_ALG_TYPE_BLKCIPHER_MASK);
-+	tfm = crypto_alloc_base(cryptd_alg_name, type, mask);
-+	if (IS_ERR(tfm))
-+		return ERR_CAST(tfm);
-+	if (tfm->__crt_alg->cra_module != THIS_MODULE) {
-+		crypto_free_tfm(tfm);
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	return __mcryptd_ablkcipher_cast(__crypto_ablkcipher_cast(tfm));
-+}
-+EXPORT_SYMBOL_GPL(mcryptd_alloc_ablkcipher);
-+
-+struct crypto_ablkcipher *mcryptd_ablkcipher_child(
-+				struct mcryptd_ablkcipher *tfm)
-+{
-+	struct mcryptd_ablkcipher_ctx *ctx = crypto_ablkcipher_ctx(&tfm->base);
-+
-+	return ctx->child;
-+}
-+EXPORT_SYMBOL_GPL(mcryptd_ablkcipher_child);
-+
-+void mcryptd_free_ablkcipher(struct mcryptd_ablkcipher *tfm)
-+{
-+	crypto_free_ablkcipher(&tfm->base);
-+}
-+EXPORT_SYMBOL_GPL(mcryptd_free_ablkcipher);
-+
- struct mcryptd_ahash *mcryptd_alloc_ahash(const char *alg_name,
- 					u32 type, u32 mask)
- {
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 404e955..fe686a2 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -243,6 +243,15 @@ static inline void *crypto_ablkcipher_ctx(struct crypto_ablkcipher *tfm)
- 	return crypto_tfm_ctx(&tfm->base);
- }
- 
-+static inline struct crypto_ablkcipher *crypto_spawn_ablkcipher(
-+	struct crypto_spawn *spawn)
-+{
-+	u32 type = CRYPTO_ALG_TYPE_ABLKCIPHER;
-+	u32 mask = CRYPTO_ALG_TYPE_MASK;
-+
-+	return __crypto_ablkcipher_cast(crypto_spawn_tfm(spawn, type, mask));
-+}
-+
- static inline void *crypto_ablkcipher_ctx_aligned(struct crypto_ablkcipher *tfm)
- {
- 	return crypto_tfm_ctx_aligned(&tfm->base);
-@@ -289,6 +298,7 @@ static inline void blkcipher_walk_init(struct blkcipher_walk *walk,
- 	walk->in.sg = src;
- 	walk->out.sg = dst;
- 	walk->total = nbytes;
-+	walk->flags = 0;
- }
- 
- static inline void ablkcipher_walk_init(struct ablkcipher_walk *walk,
-diff --git a/include/crypto/mcryptd.h b/include/crypto/mcryptd.h
-index 4a53c0d..aac1312 100644
---- a/include/crypto/mcryptd.h
-+++ b/include/crypto/mcryptd.h
-@@ -13,6 +13,7 @@
- #include <linux/crypto.h>
- #include <linux/kernel.h>
- #include <crypto/hash.h>
++#include <linux/types.h>
++#include <linux/printk.h>
++#include <crypto/aes.h>
 +#include <crypto/b128ops.h>
- 
- struct mcryptd_ahash {
- 	struct crypto_ahash base;
-@@ -95,6 +96,41 @@ struct mcryptd_alg_state {
- 	unsigned long (*flusher)(struct mcryptd_alg_cstate *cstate);
- };
- 
-+struct mcryptd_ablkcipher {
-+	struct crypto_ablkcipher base;
++
++#define MAX_AES_JOBS		128
++
++enum job_sts {
++	STS_UNKNOWN = 0,
++	STS_BEING_PROCESSED = 1,
++	STS_COMPLETED = 2,
++	STS_INTERNAL_ERROR = 3,
++	STS_ERROR = 4
 +};
 +
-+static inline struct mcryptd_ablkcipher *__mcryptd_ablkcipher_cast(
-+	struct crypto_ablkcipher *tfm)
-+{
-+	return (struct mcryptd_ablkcipher *)tfm;
-+}
++/* AES CBC multi buffer in order job structure */
 +
-+/* alg_name should be algorithm to be cryptd-ed */
-+struct mcryptd_ablkcipher *mcryptd_alloc_ablkcipher(const char *alg_name,
-+						u32 type, u32 mask);
-+struct crypto_ablkcipher *mcryptd_ablkcipher_child(
-+	struct mcryptd_ablkcipher *tfm);
-+void mcryptd_free_ablkcipher(struct mcryptd_ablkcipher *tfm);
-+
-+struct mcryptd_ablkcipher_ctx {
-+	struct crypto_ablkcipher *child;
-+	struct mcryptd_alg_state *alg_state;
++struct job_aes_cbc {
++	u8	*plaintext;	/* pointer to plaintext */
++	u8	*ciphertext;	/* pointer to ciphertext */
++	u128	iv;		/* initialization vector */
++	u128	*keys;		/* pointer to keys */
++	u32	len;		/* length in bytes, must be multiple of 16 */
++	enum	job_sts status;	/* status enumeration */
++	void	*user_data;	/* pointer to user data */
++	u32	key_len;	/* key length */
 +};
 +
-+struct mcryptd_ablkcipher_request_ctx {
-+	struct list_head waiter;
-+	crypto_completion_t complete;
-+	struct mcryptd_tag tag;
-+	struct ablkcipher_walk walk;
-+	u8 flag;
-+	int nbytes;
-+	int error;
-+	struct ablkcipher_request desc;
-+	void *job;
-+	u128 seq_iv;    /* running iv of a sequence */
++struct aes_cbc_args_x8 {
++	u8	*arg_in[8];	/* array of 8 pointers to in text */
++	u8	*arg_out[8];	/* array of 8 pointers to out text */
++	u128	*arg_keys[8];	/* array of 8 pointers to keys */
++	u128	arg_iv[8] __aligned(16);	/* array of 8 128-bit IVs */
 +};
 +
- /* return delay in jiffies from current time */
- static inline unsigned long get_delay(unsigned long t)
- {
++struct aes_cbc_mb_mgr_inorder_x8 {
++	struct aes_cbc_args_x8 args;
++	u16 lens[8] __aligned(16);
++	u64 unused_lanes; /* each nibble is index (0...7) of unused lanes */
++	/* nibble 8 is set to F as a flag */
++	struct job_aes_cbc *job_in_lane[8];
++	/* In-order components */
++	u32 earliest_job; /* byte offset, -1 if none */
++	u32 next_job;      /* byte offset */
++	struct job_aes_cbc jobs[MAX_AES_JOBS];
++};
++
++/* define AES CBC multi buffer manager function proto */
++struct job_aes_cbc *aes_cbc_submit_job_inorder_128x8(
++	struct aes_cbc_mb_mgr_inorder_x8 *state);
++struct job_aes_cbc *aes_cbc_submit_job_inorder_192x8(
++	struct aes_cbc_mb_mgr_inorder_x8 *state);
++struct job_aes_cbc *aes_cbc_submit_job_inorder_256x8(
++	struct aes_cbc_mb_mgr_inorder_x8 *state);
++struct job_aes_cbc *aes_cbc_flush_job_inorder_x8(
++	struct aes_cbc_mb_mgr_inorder_x8 *state);
++struct job_aes_cbc *aes_cbc_get_next_job_inorder_x8(
++	struct aes_cbc_mb_mgr_inorder_x8 *state);
++struct job_aes_cbc *aes_cbc_get_completed_job_inorder_x8(
++	struct aes_cbc_mb_mgr_inorder_x8 *state);
++void aes_cbc_init_mb_mgr_inorder_x8(
++	struct aes_cbc_mb_mgr_inorder_x8 *state);
++void aes_cbc_submit_job_ooo_x8(struct aes_cbc_mb_mgr_inorder_x8 *state,
++		struct job_aes_cbc *job);
++void aes_cbc_flush_job_ooo_x8(struct aes_cbc_mb_mgr_inorder_x8 *state);
++void aes_cbc_flush_job_ooo_128x8(struct aes_cbc_mb_mgr_inorder_x8 *state);
++void aes_cbc_flush_job_ooo_192x8(struct aes_cbc_mb_mgr_inorder_x8 *state);
++void aes_cbc_flush_job_ooo_256x8(struct aes_cbc_mb_mgr_inorder_x8 *state);
++
++#endif /* __AES_CBC_MB_MGR_H */
+diff --git a/arch/x86/crypto/aes-cbc-mb/mb_mgr_datastruct.S b/arch/x86/crypto/aes-cbc-mb/mb_mgr_datastruct.S
+new file mode 100644
+index 0000000..6892893
+--- /dev/null
++++ b/arch/x86/crypto/aes-cbc-mb/mb_mgr_datastruct.S
+@@ -0,0 +1,271 @@
++/*
++ *	Header file: Data structure: AES CBC multibuffer optimization
++ *				(x86_64)
++ *
++ * This is the generic header file defining data stuctures for
++ * AES multi-buffer CBC implementation. This file is to be included
++ * by the AES CBC multibuffer scheduler.
++ *
++ * This file is provided under a dual BSD/GPLv2 license.  When using or
++ * redistributing this file, you may do so under either license.
++ *
++ * GPL LICENSE SUMMARY
++ *
++ * Copyright(c) 2016 Intel Corporation.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of version 2 of the GNU General Public License as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * Contact Information:
++ * James Guilford <james.guilford@intel.com>
++ * Sean Gulley <sean.m.gulley@intel.com>
++ * Tim Chen <tim.c.chen@linux.intel.com>
++ * Megha Dey <megha.dey@linux.intel.com>
++ *
++ * BSD LICENSE
++ *
++ * Copyright(c) 2016 Intel Corporation.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * Redistributions of source code must retain the above copyright
++ * notice, this list of conditions and the following disclaimer.
++ * Redistributions in binary form must reproduce the above copyright
++ * notice, this list of conditions and the following disclaimer in
++ * the documentation and/or other materials provided with the
++ * distribution.
++ * Neither the name of Intel Corporation nor the names of its
++ * contributors may be used to endorse or promote products derived
++ * from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ */
++
++/* This is the AES CBC BY8 implementation */
++#define	NBY	8
++
++#define AES_KEYSIZE_128 16
++#define AES_KEYSIZE_192 24
++#define AES_KEYSIZE_256 32
++
++#ifndef _AES_CBC_MB_MGR_DATASTRUCT_ASM_
++#define _AES_CBC_MB_MGR_DATASTRUCT_ASM_
++
++/* Macros for defining data structures */
++
++/* Usage example */
++
++/*
++ * Alternate "struct-like" syntax:
++ *	STRUCT job_aes2
++ *	RES_Q	.plaintext,	1
++ *	RES_Q	.ciphertext,	1
++ *	RES_DQ	.IV,		1
++ *	RES_B	.nested,	_JOB_AES_SIZE, _JOB_AES_ALIGN
++ *	RES_U	.union,		size1, align1, \
++ *				size2, align2, \
++ *				...
++ *	ENDSTRUCT
++ *	; Following only needed if nesting
++ *	%assign job_aes2_size	_FIELD_OFFSET
++ *	%assign job_aes2_align	_STRUCT_ALIGN
++ *
++ * RES_* macros take a name, a count and an optional alignment.
++ * The count in terms of the base size of the macro, and the
++ * default alignment is the base size.
++ * The macros are:
++ * Macro    Base size
++ * RES_B	    1
++ * RES_W	    2
++ * RES_D     4
++ * RES_Q     8
++ * RES_DQ   16
++ * RES_Y    32
++ * RES_Z    64
++ *
++ * RES_U defines a union. It's arguments are a name and two or more
++ * pairs of "size, alignment"
++ *
++ * The two assigns are only needed if this structure is being nested
++ * within another. Even if the assigns are not done, one can still use
++ * STRUCT_NAME_size as the size of the structure.
++ *
++ * Note that for nesting, you still need to assign to STRUCT_NAME_size.
++ *
++ * The differences between this and using "struct" directly are that each
++ * type is implicitly aligned to its natural length (although this can be
++ * over-ridden with an explicit third parameter), and that the structure
++ * is padded at the end to its overall alignment.
++ *
++ */
++
++/* START_FIELDS */
++
++.macro START_FIELDS
++_FIELD_OFFSET	=	0
++_STRUCT_ALIGN	=	0
++.endm
++
++/* FIELD name size align */
++.macro FIELD name, size, align
++
++	_FIELD_OFFSET = (_FIELD_OFFSET + (\align) - 1) & (~ ((\align)-1))
++	\name = _FIELD_OFFSET
++	_FIELD_OFFSET = _FIELD_OFFSET + (\size)
++	.if (\align > _STRUCT_ALIGN)
++		_STRUCT_ALIGN = \align
++	.endif
++.endm
++
++/* END_FIELDS */
++
++.macro END_FIELDS
++	_FIELD_OFFSET = \
++	(_FIELD_OFFSET + _STRUCT_ALIGN-1) & (~ (_STRUCT_ALIGN-1))
++.endm
++
++.macro STRUCT p1
++	START_FIELDS
++	.struct \p1
++.endm
++
++.macro ENDSTRUCT
++	tmp = _FIELD_OFFSET
++	END_FIELDS
++	tmp = (_FIELD_OFFSET - %%tmp)
++	.if (tmp > 0)
++		.lcomm	tmp
++.endif
++.endstruc
++.endm
++
++/* RES_int name size align */
++.macro RES_int p1, p2, p3
++	name = \p1
++	size = \p2
++	align = \p3
++
++	_FIELD_OFFSET = (_FIELD_OFFSET + (align) - 1) & (~ ((align)-1))
++	.align align
++	.lcomm name size
++	_FIELD_OFFSET = _FIELD_OFFSET + (size)
++	.if (align > _STRUCT_ALIGN)
++		_STRUCT_ALIGN = align
++	.endif
++.endm
++
++/* macro RES_B name, size [, align] */
++.macro RES_B _name, _size, _align=1
++	RES_int _name, _size, _align
++.endm
++
++/* macro RES_W name, size [, align] */
++.macro RES_W _name, _size, _align=2
++	RES_int _name, 2*(_size), _align
++.endm
++
++/* macro RES_D name, size [, align] */
++.macro RES_D _name, _size, _align=4
++	RES_int _name, 4*(_size), _align
++.endm
++
++/* macro RES_Q name, size [, align] */
++.macro RES_Q _name, _size, _align=8
++	RES_int _name, 8*(_size), _align
++.endm
++
++/* macro RES_DQ name, size [, align] */
++.macro RES_DQ _name, _size, _align=16
++	RES_int _name, 16*(_size), _align
++.endm
++
++/* macro RES_Y name, size [, align] */
++.macro RES_Y _name, _size, _align=32
++	RES_int _name, 32*(_size), _align
++.endm
++
++/*; macro RES_Z name, size [, align] */
++.macro RES_Z _name, _size, _align=64
++	RES_int _name, 64*(_size), _align
++.endm
++#endif /* _AES_CBC_MB_MGR_DATASTRUCT_ASM_ */
++
++/* Define JOB_AES structure */
++
++START_FIELDS	/* JOB_AES */
++/*	name		size	align	*/
++FIELD	_plaintext,	8,	8	/* pointer to plaintext */
++FIELD	_ciphertext,	8,	8	/* pointer to ciphertext */
++FIELD	_IV,		16,	8	/* IV */
++FIELD	_keys,		8,	8	/* pointer to keys */
++FIELD	_len,		4,	4	/* length in bytes */
++FIELD	_status,	4,	4	/* status enumeration */
++FIELD	_user_data,	8,	8	/* pointer to user data */
++FIELD	_key_len,	4,	8	/* key length */
++
++END_FIELDS
++
++_JOB_AES_size	=	_FIELD_OFFSET
++_JOB_AES_align	=	_STRUCT_ALIGN
++
++START_FIELDS	/* AES_ARGS_XX */
++/*	name		size	align	*/
++FIELD	_arg_in,	8*NBY, 8	/* [] of NBY pointers to in text */
++FIELD	_arg_out,	8*NBY, 8	/* [] of NBY pointers to out text */
++FIELD	_arg_keys,	8*NBY, 8	/* [] of NBY pointers to keys */
++FIELD	_arg_IV,	16*NBY, 16	/* [] of NBY 128-bit IV's */
++
++END_FIELDS
++
++_AES_ARGS_SIZE	=	_FIELD_OFFSET
++_AES_ARGS_ALIGN	=	_STRUCT_ALIGN
++
++START_FIELDS	/* MB_MGR_AES_INORDER_XX */
++/*	name		size	align				*/
++FIELD	_args,		_AES_ARGS_SIZE, _AES_ARGS_ALIGN
++FIELD	_lens,		16,	16	/* lengths */
++FIELD	_unused_lanes,	8,	8
++FIELD	_job_in_lane,	8*NBY,	8	/* [] of NBY pointers to jobs */
++
++FIELD	_earliest_job,	4,	4	/* -1 if none */
++FIELD	_next_job,	4,	4
++FIELD	_jobs,		_JOB_AES_size,	_JOB_AES_align	/*> 8, start of array */
++
++END_FIELDS
++
++/* size is not accurate because the arrays are not represented */
++
++_MB_MGR_AES_INORDER_align	=	_STRUCT_ALIGN
++
++_args_in	=	_args+_arg_in
++_args_out	=	_args+_arg_out
++_args_keys	=	_args+_arg_keys
++_args_IV	=	_args+_arg_IV
++
++
++#define STS_UNKNOWN		0
++#define STS_BEING_PROCESSED	1
++#define STS_COMPLETED		2
++#define STS_INTERNAL_ERROR	3
++#define STS_ERROR		4
++
++#define MAX_AES_JOBS		128
+diff --git a/arch/x86/crypto/aes-cbc-mb/reg_sizes.S b/arch/x86/crypto/aes-cbc-mb/reg_sizes.S
+new file mode 100644
+index 0000000..eeff13c
+--- /dev/null
++++ b/arch/x86/crypto/aes-cbc-mb/reg_sizes.S
+@@ -0,0 +1,126 @@
++/*
++ *	Header file AES CBC multibuffer SSE optimization (x86_64)
++ *
++ *
++ * This file is provided under a dual BSD/GPLv2 license.  When using or
++ * redistributing this file, you may do so under either license.
++ *
++ * GPL LICENSE SUMMARY
++ *
++ * Copyright(c) 2016 Intel Corporation.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of version 2 of the GNU General Public License as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * Contact Information:
++ * James Guilford <james.guilford@intel.com>
++ * Sean Gulley <sean.m.gulley@intel.com>
++ * Tim Chen <tim.c.chen@linux.intel.com>
++ * Megha Dey <megha.dey@linux.intel.com>
++ *
++ * BSD LICENSE
++ *
++ * Copyright(c) 2016 Intel Corporation.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * Redistributions of source code must retain the above copyright
++ * notice, this list of conditions and the following disclaimer.
++ * Redistributions in binary form must reproduce the above copyright
++ * notice, this list of conditions and the following disclaimer in
++ * the documentation and/or other materials provided with the
++ * distribution.
++ * Neither the name of Intel Corporation nor the names of its
++ * contributors may be used to endorse or promote products derived
++ * from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ */
++/* define d and w variants for registers */
++
++#define	raxd	eax
++#define raxw	ax
++#define raxb	al
++
++#define	rbxd	ebx
++#define rbxw	bx
++#define rbxb	bl
++
++#define	rcxd	ecx
++#define rcxw	cx
++#define rcxb	cl
++
++#define	rdxd	edx
++#define rdxw	dx
++#define rdxb	dl
++
++#define	rsid	esi
++#define rsiw	si
++#define rsib	sil
++
++#define	rdid	edi
++#define rdiw	di
++#define rdib	dil
++
++#define	rbpd	ebp
++#define rbpw	bp
++#define rbpb	bpl
++
++#define ymm0x	%xmm0
++#define ymm1x	%xmm1
++#define ymm2x	%xmm2
++#define ymm3x	%xmm3
++#define ymm4x	%xmm4
++#define ymm5x	%xmm5
++#define ymm6x	%xmm6
++#define ymm7x	%xmm7
++#define ymm8x	%xmm8
++#define ymm9x	%xmm9
++#define ymm10x	%xmm10
++#define ymm11x	%xmm11
++#define ymm12x	%xmm12
++#define ymm13x	%xmm13
++#define ymm14x	%xmm14
++#define ymm15x	%xmm15
++
++#define CONCAT(a,b)	a##b
++#define DWORD(reg)	CONCAT(reg, d)
++#define WORD(reg)	CONCAT(reg, w)
++#define BYTE(reg)	CONCAT(reg, b)
++
++#define XWORD(reg)	CONCAT(reg,x)
++
++/* common macros */
++
++/* Generate a label to go to */
++.macro LABEL prefix, num
++\prefix\num\():
++.endm
++
++/*
++ * cond_jump ins, name, suffix
++ * ins - conditional jump instruction to execute
++ * name,suffix - concatenate to form the label to go to
++ */
++.macro cond_jump ins, name, suffix
++	\ins	\name\suffix
++.endm
 -- 
 1.9.1
