@@ -1,38 +1,55 @@
-From: Kalle Valo <kvalo-A+ZNKFmMK5xy9aJCnZT0Uw@public.gmane.org>
-Subject: Re: [1/2] ath9k: change entropy formula for easier understanding
-Date: Tue, 27 Sep 2016 16:53:23 +0200
-Message-ID: <e8039ab4dcaa4f31841456ac2d196c92@euamsexm01a.eu.qualcomm.com>
-References: <1470726147-30095-1-git-send-email-miaoqing@codeaurora.org>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [v2] RANDOM: ATH9K RNG delivers zero bits of entropy
+Date: Tue, 27 Sep 2016 17:17:02 +0200
+Message-ID: <1477295.yC8zZtqI66@tauon.atsec.com>
+References: <1654172.XfclnXhRmn@positron.chronox.de> <2ba03f89daee4f09a88a1238943eb49d@euamsexm01a.eu.qualcomm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <ath9k-devel-A+ZNKFmMK5xy9aJCnZT0Uw@public.gmane.org>,
-        <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>,
-        <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>, <pouyans-Rm6X0d1/PG5y9aJCnZT0Uw@public.gmane.org>,
-        Miaoqing Pan <miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-To: miaoqing pan <miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1470726147-30095-1-git-send-email-miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Ted Tso <tytso@mit.edu>, herbert@gondor.apana.org.au,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        ath9k-devel@qca.qualcomm.com, linux-wireless@vger.kernel.org,
+        ath9k-devel@lists.ath9k.org, Kalle Valo <kvalo@codeaurora.org>,
+        Jason Cooper <jason@lakedaemon.net>
+To: Kalle Valo <kvalo@qca.qualcomm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:48046 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752183AbcI0PRI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 27 Sep 2016 11:17:08 -0400
+In-Reply-To: <2ba03f89daee4f09a88a1238943eb49d@euamsexm01a.eu.qualcomm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-miaoqing pan <miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org> wrote:
-> From: Miaoqing Pan <miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Am Dienstag, 27. September 2016, 16:44:16 CEST schrieb Kalle Valo:
+
+Hi Kalle,
+
+> Stephan Mueller <smueller@chronox.de> wrote:
+> > The ATH9K driver implements an RNG which is completely bypassing the
+> > standard Linux HW generator logic.
+> > 
+> > The RNG may or may not deliver entropy. Considering the conservative
+> > approach in treating entropy with respect to non-auditable sources, this
+> > patch changes the delivered entropy value to zero. The RNG still feeds
+> > data into the input_pool but it is assumed to have no entropy.
+> > 
+> > When the ATH9K RNG changes to use the HW RNG framework, it may re-enable
+> > the entropy estimation considering that a user can change that value at
+> > boot and runtime.
+> > 
+> > Reviewed-by: Jason Cooper <jason@lakedaemon.net>
+> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
 > 
-> The quality of ADC entropy is 10 bits of min-entropy for
-> a 32-bit value, change '(((x) * 8 * 320) >> 10)' to
-> '(((x) * 8 * 10) >> 5)' for easier understanding.
+> Based on the discussion I'm dropping this patch. But the discussion was
+> hard to follow so please let me know if I misunderstood.
+
+I guess the rejection is appropriate, but something needs to be done: 
+add_hwgenerator_randomness should not be used in this scenario.
 > 
-> Signed-off-by: Miaoqing Pan <miaoqing-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+> Patch set to Rejected.
 
-I need some help here, it this patch ok to take or should I drop it? The
-discussion is available from the patchwork link below if someone needs to
-refresh the memory.
 
--- 
-https://patchwork.kernel.org/patch/9270463/
 
-Documentation about submitting wireless patches and checking status
-from patchwork:
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Ciao
+Stephan
