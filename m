@@ -1,41 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v7 4/9] crypto: acomp - add support for lzo via scomp
-Date: Tue, 27 Sep 2016 11:07:01 +0800
-Message-ID: <20160927030701.GA8579@gondor.apana.org.au>
-References: <1473770981-9869-1-git-send-email-giovanni.cabiddu@intel.com>
- <1473770981-9869-5-git-send-email-giovanni.cabiddu@intel.com>
- <20160920092618.GA20808@gondor.apana.org.au>
- <20160920115140.GA12332@sivswdev01.ir.intel.com>
- <20160922092244.GA5379@gondor.apana.org.au>
- <20160922225425.GA25907@SILVIXA00369791-F22-1>
- <20160923150518.GA20384@gondor.apana.org.au>
- <20160926172704.GA24726@SILVIXA00369791-F22-1>
+Subject: Re: [bug] crypto/vmx/p8_ghash memory corruption in 4.8-rc7
+Date: Tue, 27 Sep 2016 11:08:26 +0800
+Message-ID: <20160927030826.GB8579@gondor.apana.org.au>
+References: <450861381.1559123.1474673197124.JavaMail.zimbra@redhat.com>
+ <1655600242.1561022.1474676547316.JavaMail.zimbra@redhat.com>
+ <20160926145934.GA5520@gondor.apana.org.au>
+ <20160926174317.GA21317@gallifrey>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, weigang.li@intel.com
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: Jan Stancek <jstancek@redhat.com>, rui.y.wang@intel.com,
+        mhcerri@linux.vnet.ibm.com, leosilva@linux.vnet.ibm.com,
+        pfsmorigo@linux.vnet.ibm.com, linux-crypto@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+To: Marcelo Cerri <marcelo.cerri@canonical.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52012 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:47942 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752075AbcI0DHI (ORCPT
+        with ESMTP id S1752075AbcI0DIs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Sep 2016 23:07:08 -0400
+        Mon, 26 Sep 2016 23:08:48 -0400
 Content-Disposition: inline
-In-Reply-To: <20160926172704.GA24726@SILVIXA00369791-F22-1>
+In-Reply-To: <20160926174317.GA21317@gallifrey>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Sep 26, 2016 at 06:27:04PM +0100, Giovanni Cabiddu wrote:
->
-> I think the definition of the acomp interface already allows for this.
-> If the destination scatterlist inside the request is NULL, the
-> algorithm/driver can allocate pages of memory for the output buffers as
-> well as the scatterlist. In this case, the destination length, if not zero,
-> could be used to specify the maximum size to allocate.
-> What do you think?
+On Mon, Sep 26, 2016 at 02:43:17PM -0300, Marcelo Cerri wrote:
+> 
+> Wouldn't be enough to provide a pair of import/export functions as the
+> padlock-sha driver does?
 
-Sounds good to me.  We should also add a function to free the
-resulting SG list along with the allocated pages.
+I don't think that will help as ultimately you need to call the
+export function on the fallback and that's what requires the extra
+memory.  In fact very operation involving the fallback will need
+that extra memory too.
 
 Cheers,
 -- 
