@@ -1,55 +1,61 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [v2] RANDOM: ATH9K RNG delivers zero bits of entropy
-Date: Tue, 27 Sep 2016 17:17:02 +0200
-Message-ID: <1477295.yC8zZtqI66@tauon.atsec.com>
-References: <1654172.XfclnXhRmn@positron.chronox.de> <2ba03f89daee4f09a88a1238943eb49d@euamsexm01a.eu.qualcomm.com>
+From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
+Subject: Re: [BUG] crypto: atmel-aes - erro when compiling with VERBOSE_DEBUG
+ enable
+Date: Tue, 27 Sep 2016 18:45:18 +0200
+Message-ID: <de4c3d75-eb4f-f29b-5bde-e2b5ee79c8d9@atmel.com>
+References: <20160922092629.GA5508@gondor.apana.org.au>
+ <1474548357.12981.19.camel@inria.fr>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Ted Tso <tytso@mit.edu>, herbert@gondor.apana.org.au,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        ath9k-devel@qca.qualcomm.com, linux-wireless@vger.kernel.org,
-        ath9k-devel@lists.ath9k.org, Kalle Valo <kvalo@codeaurora.org>,
-        Jason Cooper <jason@lakedaemon.net>
-To: Kalle Valo <kvalo@qca.qualcomm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: <linux-crypto@vger.kernel.org>
+To: levent demir <levent.demir@inria.fr>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:48046 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752183AbcI0PRI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Sep 2016 11:17:08 -0400
-In-Reply-To: <2ba03f89daee4f09a88a1238943eb49d@euamsexm01a.eu.qualcomm.com>
+Received: from eusmtp01.atmel.com ([212.144.249.242]:14216 "EHLO
+        eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933841AbcI0QpW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 27 Sep 2016 12:45:22 -0400
+In-Reply-To: <1474548357.12981.19.camel@inria.fr>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 27. September 2016, 16:44:16 CEST schrieb Kalle Valo:
+Hi Levent,
 
-Hi Kalle,
+there is a typo in the subject line: erroR.
+Also it would be better to start the summary phrase of the subject line with a
+verb:
 
-> Stephan Mueller <smueller@chronox.de> wrote:
-> > The ATH9K driver implements an RNG which is completely bypassing the
-> > standard Linux HW generator logic.
-> > 
-> > The RNG may or may not deliver entropy. Considering the conservative
-> > approach in treating entropy with respect to non-auditable sources, this
-> > patch changes the delivered entropy value to zero. The RNG still feeds
-> > data into the input_pool but it is assumed to have no entropy.
-> > 
-> > When the ATH9K RNG changes to use the HW RNG framework, it may re-enable
-> > the entropy estimation considering that a user can change that value at
-> > boot and runtime.
-> > 
-> > Reviewed-by: Jason Cooper <jason@lakedaemon.net>
-> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
+crypto: atmel-aes: fix compiler error when VERBODE_DEBUG is defined
+
+Le 22/09/2016 à 14:45, levent demir a écrit :
+> Fix debug function call in atmel_aes_write
 > 
-> Based on the discussion I'm dropping this patch. But the discussion was
-> hard to follow so please let me know if I misunderstood.
-
-I guess the rejection is appropriate, but something needs to be done: 
-add_hwgenerator_randomness should not be used in this scenario.
+> Signed-off-by: Levent DEMIR <levent.demir@inria.fr>
+> ---
+>  drivers/crypto/atmel-aes.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Patch set to Rejected.
+> diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+> index e3d40a8..2b0f926 100644
+> --- a/drivers/crypto/atmel-aes.c
+> +++ b/drivers/crypto/atmel-aes.c
+> @@ -317,7 +317,7 @@ static inline void atmel_aes_write(struct
+> atmel_aes_dev *dd,
+>  		char tmp[16];
+>  
+>  		dev_vdbg(dd->dev, "write 0x%08x into %s\n", value,
+> -			 atmel_aes_reg_name(offset, tmp));
+> +			atmel_aes_reg_name(offset, tmp, sizeof(tmp)));
+It looks like a space has been removed.
+
+>  	}
+>  #endif /* VERBOSE_DEBUG */
+>  
+> 
 
 
+Best regards,
 
-Ciao
-Stephan
+Cyrille
