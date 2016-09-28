@@ -1,106 +1,94 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 1/2] crypto: ccp - data structure cleanup
-Date: Wed, 28 Sep 2016 10:49:21 -0500
-Message-ID: <20160928154921.22138.76929.stgit@taos>
+From: Megha Dey <megha.dey@linux.intel.com>
+Subject: Re: sha1_mb broken
+Date: Wed, 28 Sep 2016 10:58:19 -0700
+Message-ID: <1475085499.2490.1.camel@megha-Z97X-UD7-TH>
+References: <1939675.7gNnqUbNs6@positron.chronox.de>
+         <3264980.mGNQ3Qi0fl@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0076.outbound.protection.outlook.com ([104.47.32.76]:62202
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932977AbcI1RV2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Sep 2016 13:21:28 -0400
+Received: from mga11.intel.com ([192.55.52.93]:51429 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751258AbcI1Ruw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Sep 2016 13:50:52 -0400
+In-Reply-To: <3264980.mGNQ3Qi0fl@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Change names of data structure instances; add const
-keyword where appropriate.
+Hi Stephan,
 
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
----
- drivers/crypto/ccp/ccp-dev-v3.c |    2 +-
- drivers/crypto/ccp/ccp-dev-v5.c |    7 +++++--
- drivers/crypto/ccp/ccp-dev.h    |    6 +++---
- drivers/crypto/ccp/ccp-pci.c    |    4 ++--
- 4 files changed, 11 insertions(+), 8 deletions(-)
+Could you give me more info on how I could reproduce this issue on my
+end?
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index 578522d..b6615b1 100644
---- a/drivers/crypto/ccp/ccp-dev-v3.c
-+++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -566,7 +566,7 @@ static const struct ccp_actions ccp3_actions = {
- 	.irqhandler = ccp_irq_handler,
- };
- 
--struct ccp_vdata ccpv3 = {
-+const struct ccp_vdata ccpv3 = {
- 	.version = CCP_VERSION(3, 0),
- 	.setup = NULL,
- 	.perform = &ccp3_actions,
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index 9df1526..a90ca9e 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -839,6 +839,9 @@ static int ccp5_init(struct ccp_device *ccp)
- 
- 	return 0;
- 
-+e_hwrng:
-+	ccp_unregister_rng(ccp);
-+
- e_kthread:
- 	for (i = 0; i < ccp->cmd_q_count; i++)
- 		if (ccp->cmd_q[i].kthread)
-@@ -994,7 +997,7 @@ static const struct ccp_actions ccp5_actions = {
- 	.irqhandler = ccp5_irq_handler,
- };
- 
--struct ccp_vdata ccpv5 = {
-+const struct ccp_vdata ccpv5a = {
- 	.version = CCP_VERSION(5, 0),
- 	.setup = ccp5_config,
- 	.perform = &ccp5_actions,
-@@ -1002,7 +1005,7 @@ struct ccp_vdata ccpv5 = {
- 	.offset = 0x0,
- };
- 
--struct ccp_vdata ccpv5other = {
-+const struct ccp_vdata ccpv5b = {
- 	.version = CCP_VERSION(5, 0),
- 	.setup = ccp5other_config,
- 	.perform = &ccp5_actions,
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index ebc9365..08f58b0 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -639,8 +639,8 @@ struct ccp_vdata {
- 	const unsigned int offset;
- };
- 
--extern	struct ccp_vdata ccpv3;
--extern	struct ccp_vdata ccpv5;
--extern	struct ccp_vdata ccpv5other;
-+extern const struct ccp_vdata ccpv3;
-+extern const struct ccp_vdata ccpv5a;
-+extern const struct ccp_vdata ccpv5b;
- 
- #endif
-diff --git a/drivers/crypto/ccp/ccp-pci.c b/drivers/crypto/ccp/ccp-pci.c
-index 239cbf2..28a9996 100644
---- a/drivers/crypto/ccp/ccp-pci.c
-+++ b/drivers/crypto/ccp/ccp-pci.c
-@@ -325,8 +325,8 @@ static int ccp_pci_resume(struct pci_dev *pdev)
- 
- static const struct pci_device_id ccp_pci_table[] = {
- 	{ PCI_VDEVICE(AMD, 0x1537), (kernel_ulong_t)&ccpv3 },
--	{ PCI_VDEVICE(AMD, 0x1456), (kernel_ulong_t)&ccpv5 },
--	{ PCI_VDEVICE(AMD, 0x1468), (kernel_ulong_t)&ccpv5other },
-+	{ PCI_VDEVICE(AMD, 0x1456), (kernel_ulong_t)&ccpv5a },
-+	{ PCI_VDEVICE(AMD, 0x1468), (kernel_ulong_t)&ccpv5b },
- 	/* Last entry must be zero */
- 	{ 0, }
- };
+Also was this issue there all along? Which is the first kernel version
+where you see this?
+
+Thanks,
+Megha
+
+On Mon, 2016-09-26 at 19:32 +0200, Stephan Mueller wrote:
+> Am Freitag, 26. August 2016, 03:15:06 CEST schrieb Stephan Mueller:
+> 
+> Hi Megha,
+> 
+> > Hi,
+> > 
+> > I tried to execute tests with sha1_mb.
+> 
+> Have you had a chance to look into this one?
+> > 
+> > The execution simply stalls when invoking a digest operation -- i.e. the
+> > digest operation does not finish. After some time after invoking the hashing
+> > operation, the following log appears (note, the kccavs_* functions are my
+> > test code; that test code works perfectly well with all other hash
+> > implementations):
+> > 
+> > [  140.426026] INFO: rcu_sched detected stalls on CPUs/tasks:
+> > [  140.426719] 	2-...: (1 GPs behind) idle=9c3/140000000000000/0
+> > softirq=2680/2707 fqs=14762
+> > [  140.427024] 	(detected by 0, t=60002 jiffies, g=655, c=654, q=35)
+> > [  140.427024] Task dump for CPU 2:
+> > [  140.427024] cavs_driver     R  running task        0   945    862
+> > 0x00000008
+> > [  140.427024]  ffffffff9b78d965 ffffa527b8bfa640 ffffa527bb505940
+> > ffffa52775c20c50
+> > [  140.427024]  ffffa527bc300000 ffffa527b93d2a80 ffffa527bb857e00
+> > ffffa527bc2ffd78
+> > [  140.427024]  ffffa527b93d2ac8 ffffa527bc2ffcc0 ffffffff9b78dfc8
+> > ffffa527bc2ffd70
+> > [  140.427024] Call Trace:
+> > [  140.427024]  [<ffffffff9b78d965>] ? __schedule+0x245/0x690
+> > [  140.427024]  [<ffffffff9b78dfc8>] ? preempt_schedule_common+0x18/0x30
+> > [  140.427024]  [<ffffffff9b791a68>] ? _raw_spin_lock_irq+0x28/0x30
+> > [  140.427024]  [<ffffffff9b78ed98>] ? wait_for_completion_interruptible
+> > +0x28/0x180
+> > [  140.427024]  [<ffffffffc028541c>] ? sha1_mb_async_digest+0x6c/0x70
+> > [sha1_mb]
+> > [  140.427024]  [<ffffffff9b3b1129>] ? crypto_ahash_op+0x29/0x70
+> > [  140.427024]  [<ffffffffc0270148>] ? kccavs_test_ahash+0x198/0x2b0
+> > [kcapi_cavs]
+> > [  140.427024]  [<ffffffffc026e20a>] ? kccavs_data_read+0xda/0x160
+> > [kcapi_cavs]
+> > [  140.427024]  [<ffffffff9b370964>] ? full_proxy_read+0x54/0x90
+> > [  140.427024]  [<ffffffff9b208088>] ? __vfs_read+0x28/0x110
+> > [  140.427024]  [<ffffffff9b38a2c0>] ? security_file_permission+0xa0/0xc0
+> > [  140.427024]  [<ffffffff9b20850e>] ? rw_verify_area+0x4e/0xb0
+> > [  140.427024]  [<ffffffff9b208606>] ? vfs_read+0x96/0x130
+> > [  140.427024]  [<ffffffff9b2099f6>] ? SyS_read+0x46/0xa0
+> > [  140.427024]  [<ffffffff9b791cb6>] ? entry_SYSCALL_64_fastpath+0x1e/0xa8
+> > 
+> > 
+> > 
+> > Ciao
+> > Stephan
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> Ciao
+> Stephan
