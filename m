@@ -1,114 +1,212 @@
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v9 0/8] crypto: asynchronous compression api
-Date: Thu, 29 Sep 2016 11:18:54 +0100
-Message-ID: <1475144342-1157-1-git-send-email-giovanni.cabiddu@intel.com>
+Subject: [PATCH v9 8/8] crypto: acomp - update testmgr with support for acomp
+Date: Thu, 29 Sep 2016 11:19:02 +0100
+Message-ID: <1475144342-1157-9-git-send-email-giovanni.cabiddu@intel.com>
+References: <1475144342-1157-1-git-send-email-giovanni.cabiddu@intel.com>
 Cc: linux-crypto@vger.kernel.org,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:31125 "EHLO mga14.intel.com"
+Received: from mga14.intel.com ([192.55.52.115]:37535 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750877AbcI2KTM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Sep 2016 06:19:12 -0400
+        id S1753958AbcI2KTU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Sep 2016 06:19:20 -0400
+In-Reply-To: <1475144342-1157-1-git-send-email-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The following patch set introduces acomp, a generic asynchronous
-(de)compression api with support for SG lists.
-We propose a new crypto type called crypto_acomp_type, a new struct acomp_alg
-and struct crypto_acomp, together with number of helper functions to register
-acomp type algorithms and allocate tfm instances.
-This interface will allow the following operations:
+Add tests to the test manager for algorithms exposed through acomp.
 
-    int (*compress)(struct acomp_req *req);
-    int (*decompress)(struct acomp_req *req);
-
-Together with acomp we propose a new driver-side interface, scomp, which
-handles compression implementations which use linear buffers. We converted all
-compression algorithms available in LKCF to use this interface so that those
-algorithms will be accessible through the acomp api.
-
-Changes in v9:
-    - extended API to allow acomp layer to allocate (and free) output memory
-      if not provided by the user
-    - extended scomp layer to allocate (and free) output sg list if not
-      provided by the user
-
-Changes in v8:
-    - centralized per-cpu scratch buffers handling in scomp layer
-    - changed scomp internal API to use linear buffer (as in v6)
-
-Changes in v7:
-    - removed linearization of SG lists and per-request vmalloc allocations in
-      scomp layer
-    - modified scomp internal API to use SG lists
-    - introduced per-cpu cache of 128K scratch buffers allocated using vmalloc
-      in legacy scomp algorithms
-
-Changes in v6:
-    - changed acomp_request_alloc prototype by removing gfp parameter.
-      acomp_request_alloc will always use GFP_KERNEL
-
-Changes in v5:
-    - removed qdecompress api, no longer needed
-    - removed produced and consumed counters in acomp_req
-    - added crypto_has_acomp function
-
-Changes in v4:
-    - added qdecompress api, a front-end for decompression algorithms which
-      do not need additional vmalloc work space
-
-Changes in v3:
-    - added driver-side scomp interface
-    - provided support for lzo, lz4, lz4hc, 842, deflate compression algorithms
-      via the acomp api (through scomp)
-    - extended testmgr to support acomp
-    - removed extended acomp api for supporting deflate algorithm parameters
-      (will be enhanced and re-proposed in future)
-Note that (2) to (7) are a rework of Joonsoo Kim's scomp patches.
-
-Changes in v2:
-    - added compression and decompression request sizes in acomp_alg
-      in order to enable noctx support
-    - extended api with helpers to allocate compression and
-      decompression requests
-
-Changes from initial submit:
-    - added consumed and produced fields to acomp_req
-    - extended api to support configuration of deflate compressors
-
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
-Giovanni Cabiddu (8):
-  crypto: add asynchronous compression api
-  crypto: add driver-side scomp interface
-  crypto: acomp - add support for lzo via scomp
-  crypto: acomp - add support for lz4 via scomp
-  crypto: acomp - add support for lz4hc via scomp
-  crypto: acomp - add support for 842 via scomp
-  crypto: acomp - add support for deflate via scomp
-  crypto: acomp - update testmgr with support for acomp
+ crypto/testmgr.c | 158 ++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 145 insertions(+), 13 deletions(-)
 
- crypto/842.c                        |  81 +++++++-
- crypto/Kconfig                      |  15 ++
- crypto/Makefile                     |   3 +
- crypto/acompress.c                  | 169 +++++++++++++++++
- crypto/crypto_user.c                |  19 ++
- crypto/deflate.c                    | 111 ++++++++++-
- crypto/lz4.c                        |  91 ++++++++-
- crypto/lz4hc.c                      |  92 +++++++++-
- crypto/lzo.c                        |  97 ++++++++--
- crypto/scompress.c                  | 356 ++++++++++++++++++++++++++++++++++++
- crypto/testmgr.c                    | 158 ++++++++++++++--
- include/crypto/acompress.h          | 269 +++++++++++++++++++++++++++
- include/crypto/internal/acompress.h |  81 ++++++++
- include/crypto/internal/scompress.h | 136 ++++++++++++++
- include/linux/crypto.h              |   3 +
- 15 files changed, 1621 insertions(+), 60 deletions(-)
- create mode 100644 crypto/acompress.c
- create mode 100644 crypto/scompress.c
- create mode 100644 include/crypto/acompress.h
- create mode 100644 include/crypto/internal/acompress.h
- create mode 100644 include/crypto/internal/scompress.h
-
---
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 0b01c3d..65a2d3d 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -33,6 +33,7 @@
+ #include <crypto/drbg.h>
+ #include <crypto/akcipher.h>
+ #include <crypto/kpp.h>
++#include <crypto/acompress.h>
+ 
+ #include "internal.h"
+ 
+@@ -1439,6 +1440,121 @@ out:
+ 	return ret;
+ }
+ 
++static int test_acomp(struct crypto_acomp *tfm, struct comp_testvec *ctemplate,
++		      struct comp_testvec *dtemplate, int ctcount, int dtcount)
++{
++	const char *algo = crypto_tfm_alg_driver_name(crypto_acomp_tfm(tfm));
++	unsigned int i;
++	char output[COMP_BUF_SIZE];
++	int ret;
++	struct scatterlist src, dst;
++	struct acomp_req *req;
++	struct tcrypt_result result;
++
++	for (i = 0; i < ctcount; i++) {
++		unsigned int dlen = COMP_BUF_SIZE;
++		int ilen = ctemplate[i].inlen;
++
++		memset(output, 0, sizeof(output));
++		init_completion(&result.completion);
++		sg_init_one(&src, ctemplate[i].input, ilen);
++		sg_init_one(&dst, output, dlen);
++
++		req = acomp_request_alloc(tfm);
++		if (!req) {
++			pr_err("alg: acomp: request alloc failed for %s\n",
++			       algo);
++			ret = -ENOMEM;
++			goto out;
++		}
++
++		acomp_request_set_params(req, &src, &dst, ilen, dlen);
++		acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++					   tcrypt_complete, &result);
++
++		ret = wait_async_op(&result, crypto_acomp_compress(req));
++		if (ret) {
++			pr_err("alg: acomp: compression failed on test %d for %s: ret=%d\n",
++			       i + 1, algo, -ret);
++			acomp_request_free(req);
++			goto out;
++		}
++
++		if (req->dlen != ctemplate[i].outlen) {
++			pr_err("alg: acomp: Compression test %d failed for %s: output len = %d\n",
++			       i + 1, algo, req->dlen);
++			ret = -EINVAL;
++			acomp_request_free(req);
++			goto out;
++		}
++
++		if (memcmp(output, ctemplate[i].output, req->dlen)) {
++			pr_err("alg: acomp: Compression test %d failed for %s\n",
++			       i + 1, algo);
++			hexdump(output, req->dlen);
++			ret = -EINVAL;
++			acomp_request_free(req);
++			goto out;
++		}
++
++		acomp_request_free(req);
++	}
++
++	for (i = 0; i < dtcount; i++) {
++		unsigned int dlen = COMP_BUF_SIZE;
++		int ilen = dtemplate[i].inlen;
++
++		memset(output, 0, sizeof(output));
++		init_completion(&result.completion);
++		sg_init_one(&src, dtemplate[i].input, ilen);
++		sg_init_one(&dst, output, dlen);
++
++		req = acomp_request_alloc(tfm);
++		if (!req) {
++			pr_err("alg: acomp: request alloc failed for %s\n",
++			       algo);
++			ret = -ENOMEM;
++			goto out;
++		}
++
++		acomp_request_set_params(req, &src, &dst, ilen, dlen);
++		acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++					   tcrypt_complete, &result);
++
++		ret = wait_async_op(&result, crypto_acomp_decompress(req));
++		if (ret) {
++			pr_err("alg: acomp: decompression failed on test %d for %s: ret=%d\n",
++			       i + 1, algo, -ret);
++			acomp_request_free(req);
++			goto out;
++		}
++
++		if (req->dlen != dtemplate[i].outlen) {
++			pr_err("alg: acomp: Decompression test %d failed for %s: output len = %d\n",
++			       i + 1, algo, req->dlen);
++			ret = -EINVAL;
++			acomp_request_free(req);
++			goto out;
++		}
++
++		if (memcmp(output, dtemplate[i].output, req->dlen)) {
++			pr_err("alg: acomp: Decompression test %d failed for %s\n",
++			       i + 1, algo);
++			hexdump(output, req->dlen);
++			ret = -EINVAL;
++			acomp_request_free(req);
++			goto out;
++		}
++
++		acomp_request_free(req);
++	}
++
++	ret = 0;
++
++out:
++	return ret;
++}
++
+ static int test_cprng(struct crypto_rng *tfm, struct cprng_testvec *template,
+ 		      unsigned int tcount)
+ {
+@@ -1590,22 +1706,38 @@ out:
+ static int alg_test_comp(const struct alg_test_desc *desc, const char *driver,
+ 			 u32 type, u32 mask)
+ {
+-	struct crypto_comp *tfm;
++	struct crypto_comp *comp;
++	struct crypto_acomp *acomp;
+ 	int err;
++	u32 algo_type = type & CRYPTO_ALG_TYPE_ACOMPRESS_MASK;
++
++	if (algo_type == CRYPTO_ALG_TYPE_ACOMPRESS) {
++		acomp = crypto_alloc_acomp(driver, type, mask);
++		if (IS_ERR(acomp)) {
++			pr_err("alg: acomp: Failed to load transform for %s: %ld\n",
++			       driver, PTR_ERR(acomp));
++			return PTR_ERR(acomp);
++		}
++		err = test_acomp(acomp, desc->suite.comp.comp.vecs,
++				 desc->suite.comp.decomp.vecs,
++				 desc->suite.comp.comp.count,
++				 desc->suite.comp.decomp.count);
++		crypto_free_acomp(acomp);
++	} else {
++		comp = crypto_alloc_comp(driver, type, mask);
++		if (IS_ERR(comp)) {
++			pr_err("alg: comp: Failed to load transform for %s: %ld\n",
++			       driver, PTR_ERR(comp));
++			return PTR_ERR(comp);
++		}
+ 
+-	tfm = crypto_alloc_comp(driver, type, mask);
+-	if (IS_ERR(tfm)) {
+-		printk(KERN_ERR "alg: comp: Failed to load transform for %s: "
+-		       "%ld\n", driver, PTR_ERR(tfm));
+-		return PTR_ERR(tfm);
+-	}
+-
+-	err = test_comp(tfm, desc->suite.comp.comp.vecs,
+-			desc->suite.comp.decomp.vecs,
+-			desc->suite.comp.comp.count,
+-			desc->suite.comp.decomp.count);
++		err = test_comp(comp, desc->suite.comp.comp.vecs,
++				desc->suite.comp.decomp.vecs,
++				desc->suite.comp.comp.count,
++				desc->suite.comp.decomp.count);
+ 
+-	crypto_free_comp(tfm);
++		crypto_free_comp(comp);
++	}
+ 	return err;
+ }
+ 
+-- 
 2.4.11
