@@ -1,342 +1,111 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 1/1] crypto: atmel-aes: add support to the XTS mode
-Date: Thu, 29 Sep 2016 19:44:52 +0200
-Message-ID: <1966607.Qs47LuUyHG@tauon.atsec.com>
-References: <4bf386be2805a97c59defcd24ee9fb56f190b901.1475167690.git.cyrille.pitchen@atmel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        nicolas.ferre@atmel.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        levent.demir@inria.fr
-To: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <4bf386be2805a97c59defcd24ee9fb56f190b901.1475167690.git.cyrille.pitchen@atmel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] arm64: add support for SHA256 using NEON instructions
+Date: Thu, 29 Sep 2016 15:51:42 -0700
+Message-ID: <1475189503-9175-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: appro@openssl.org, victor.chong@linaro.org,
+        daniel.thompson@linaro.org, will.deacon@arm.com,
+        catalin.marinas@arm.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f178.google.com ([209.85.192.178]:34534 "EHLO
+        mail-pf0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935356AbcI2Wvt (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Sep 2016 18:51:49 -0400
+Received: by mail-pf0-f178.google.com with SMTP id u78so7935900pfa.1
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Sep 2016 15:51:47 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 29. September 2016, 18:49:07 CEST schrieb Cyrille Pitchen:
+This is a port of the ARMv7 implementation in arch/arm/crypto. For a Cortex-A57
+(r2p1), the performance numbers are listed below. In summary, 40% - 50% speedup
+where it counts, i.e., block sizes over 256 bytes with few updates.
 
-Hi Cyrille,
+testing speed of async sha256 (sha256-generic)
+(   16 byte blocks,   16 bytes x   1 updates): 1379992 ops/s,  22079872 Bps
+(   64 byte blocks,   16 bytes x   4 updates): 633455 ops/s,  40541120 Bps
+(   64 byte blocks,   64 bytes x   1 updates): 738076 ops/s,  47236864 Bps
+(  256 byte blocks,   16 bytes x  16 updates): 234420 ops/s,  60011520 Bps
+(  256 byte blocks,   64 bytes x   4 updates): 293008 ops/s,  75010048 Bps
+(  256 byte blocks,  256 bytes x   1 updates): 309600 ops/s,  79257600 Bps
+( 1024 byte blocks,   16 bytes x  64 updates):  66997 ops/s,  68604928 Bps
+( 1024 byte blocks,  256 bytes x   4 updates):  91912 ops/s,  94117888 Bps
+( 1024 byte blocks, 1024 bytes x   1 updates):  93992 ops/s,  96247808 Bps
+( 2048 byte blocks,   16 bytes x 128 updates):  34385 ops/s,  70420480 Bps
+( 2048 byte blocks,  256 bytes x   8 updates):  47570 ops/s,  97423360 Bps
+( 2048 byte blocks, 1024 bytes x   2 updates):  48557 ops/s,  99444736 Bps
+( 2048 byte blocks, 2048 bytes x   1 updates):  48781 ops/s,  99903488 Bps
+( 4096 byte blocks,   16 bytes x 256 updates):  17401 ops/s,  71274496 Bps
+( 4096 byte blocks,  256 bytes x  16 updates):  24211 ops/s,  99168256 Bps
+( 4096 byte blocks, 1024 bytes x   4 updates):  24720 ops/s, 101253120 Bps
+( 4096 byte blocks, 4096 bytes x   1 updates):  24930 ops/s, 102113280 Bps
+( 8192 byte blocks,   16 bytes x 512 updates):   8738 ops/s,  71581696 Bps
+( 8192 byte blocks,  256 bytes x  32 updates):  12214 ops/s, 100057088 Bps
+( 8192 byte blocks, 1024 bytes x   8 updates):  12474 ops/s, 102187008 Bps
+( 8192 byte blocks, 4096 bytes x   2 updates):  12558 ops/s, 102875136 Bps
+( 8192 byte blocks, 8192 bytes x   1 updates):  12555 ops/s, 102850560 Bps
 
-> This patch adds the xts(aes) algorithm, which is supported from
-> hardware version 0x500 and above (sama5d2x).
-> 
-> Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-> ---
->  drivers/crypto/atmel-aes-regs.h |   4 +
->  drivers/crypto/atmel-aes.c      | 186
-> ++++++++++++++++++++++++++++++++++++++-- 2 files changed, 184
-> insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/crypto/atmel-aes-regs.h
-> b/drivers/crypto/atmel-aes-regs.h index 6c2951bb70b1..0ec04407b533 100644
-> --- a/drivers/crypto/atmel-aes-regs.h
-> +++ b/drivers/crypto/atmel-aes-regs.h
-> @@ -28,6 +28,7 @@
->  #define AES_MR_OPMOD_CFB		(0x3 << 12)
->  #define AES_MR_OPMOD_CTR		(0x4 << 12)
->  #define AES_MR_OPMOD_GCM		(0x5 << 12)
-> +#define AES_MR_OPMOD_XTS		(0x6 << 12)
->  #define AES_MR_LOD				(0x1 << 15)
->  #define AES_MR_CFBS_MASK		(0x7 << 16)
->  #define AES_MR_CFBS_128b		(0x0 << 16)
-> @@ -67,6 +68,9 @@
->  #define AES_CTRR	0x98
->  #define AES_GCMHR(x)	(0x9c + ((x) * 0x04))
-> 
-> +#define AES_TWR(x)	(0xc0 + ((x) * 0x04))
-> +#define AES_ALPHAR(x)	(0xd0 + ((x) * 0x04))
-> +
->  #define AES_HW_VERSION	0xFC
-> 
->  #endif /* __ATMEL_AES_REGS_H__ */
-> diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-> index 1d9e7bd3f377..b14c10e98a06 100644
-> --- a/drivers/crypto/atmel-aes.c
-> +++ b/drivers/crypto/atmel-aes.c
-> @@ -68,6 +68,7 @@
->  #define AES_FLAGS_CFB8		(AES_MR_OPMOD_CFB | AES_MR_CFBS_8b)
->  #define AES_FLAGS_CTR		AES_MR_OPMOD_CTR
->  #define AES_FLAGS_GCM		AES_MR_OPMOD_GCM
-> +#define AES_FLAGS_XTS		AES_MR_OPMOD_XTS
-> 
->  #define AES_FLAGS_MODE_MASK	(AES_FLAGS_OPMODE_MASK |	\
->  				 AES_FLAGS_ENCRYPT |		\
-> @@ -89,6 +90,7 @@ struct atmel_aes_caps {
->  	bool			has_cfb64;
->  	bool			has_ctr32;
->  	bool			has_gcm;
-> +	bool			has_xts;
->  	u32			max_burst_size;
->  };
-> 
-> @@ -135,6 +137,12 @@ struct atmel_aes_gcm_ctx {
->  	atmel_aes_fn_t		ghash_resume;
->  };
-> 
-> +struct atmel_aes_xts_ctx {
-> +	struct atmel_aes_base_ctx	base;
-> +
-> +	u32			key2[AES_KEYSIZE_256 / sizeof(u32)];
-> +};
-> +
->  struct atmel_aes_reqctx {
->  	unsigned long		mode;
->  };
-> @@ -282,6 +290,20 @@ static const char *atmel_aes_reg_name(u32 offset, char
-> *tmp, size_t sz) snprintf(tmp, sz, "GCMHR[%u]", (offset - AES_GCMHR(0)) >>
-> 2);
->  		break;
-> 
-> +	case AES_TWR(0):
-> +	case AES_TWR(1):
-> +	case AES_TWR(2):
-> +	case AES_TWR(3):
-> +		snprintf(tmp, sz, "TWR[%u]", (offset - AES_TWR(0)) >> 2);
-> +		break;
-> +
-> +	case AES_ALPHAR(0):
-> +	case AES_ALPHAR(1):
-> +	case AES_ALPHAR(2):
-> +	case AES_ALPHAR(3):
-> +		snprintf(tmp, sz, "ALPHAR[%u]", (offset - AES_ALPHAR(0)) >> 2);
-> +		break;
-> +
->  	default:
->  		snprintf(tmp, sz, "0x%02x", offset);
->  		break;
-> @@ -453,15 +475,15 @@ static inline int atmel_aes_complete(struct
-> atmel_aes_dev *dd, int err) return err;
->  }
-> 
-> -static void atmel_aes_write_ctrl(struct atmel_aes_dev *dd, bool use_dma,
-> -				 const u32 *iv)
-> +static void atmel_aes_write_ctrl_key(struct atmel_aes_dev *dd, bool
-> use_dma, +				     const u32 *iv, const u32 *key, int keylen)
->  {
->  	u32 valmr = 0;
-> 
->  	/* MR register must be set before IV registers */
-> -	if (dd->ctx->keylen == AES_KEYSIZE_128)
-> +	if (keylen == AES_KEYSIZE_128)
->  		valmr |= AES_MR_KEYSIZE_128;
-> -	else if (dd->ctx->keylen == AES_KEYSIZE_192)
-> +	else if (keylen == AES_KEYSIZE_192)
->  		valmr |= AES_MR_KEYSIZE_192;
->  	else
->  		valmr |= AES_MR_KEYSIZE_256;
-> @@ -478,13 +500,19 @@ static void atmel_aes_write_ctrl(struct atmel_aes_dev
-> *dd, bool use_dma,
-> 
->  	atmel_aes_write(dd, AES_MR, valmr);
-> 
-> -	atmel_aes_write_n(dd, AES_KEYWR(0), dd->ctx->key,
-> -			  SIZE_IN_WORDS(dd->ctx->keylen));
-> +	atmel_aes_write_n(dd, AES_KEYWR(0), key, SIZE_IN_WORDS(keylen));
-> 
->  	if (iv && (valmr & AES_MR_OPMOD_MASK) != AES_MR_OPMOD_ECB)
->  		atmel_aes_write_block(dd, AES_IVR(0), iv);
->  }
-> 
-> +static inline void atmel_aes_write_ctrl(struct atmel_aes_dev *dd, bool
-> use_dma, +					const u32 *iv)
-> +
-> +{
-> +	atmel_aes_write_ctrl_key(dd, use_dma, iv,
-> +				 dd->ctx->key, dd->ctx->keylen);
-> +}
-> 
->  /* CPU transfer */
-> 
-> @@ -1769,6 +1797,139 @@ static struct aead_alg aes_gcm_alg = {
->  };
-> 
-> 
-> +/* xts functions */
-> +
-> +static inline struct atmel_aes_xts_ctx *
-> +atmel_aes_xts_ctx_cast(struct atmel_aes_base_ctx *ctx)
-> +{
-> +	return container_of(ctx, struct atmel_aes_xts_ctx, base);
-> +}
-> +
-> +static int atmel_aes_xts_process_data(struct atmel_aes_dev *dd);
-> +
-> +static int atmel_aes_xts_start(struct atmel_aes_dev *dd)
-> +{
-> +	struct atmel_aes_xts_ctx *ctx = atmel_aes_xts_ctx_cast(dd->ctx);
-> +	struct ablkcipher_request *req = ablkcipher_request_cast(dd->areq);
-> +	struct atmel_aes_reqctx *rctx = ablkcipher_request_ctx(req);
-> +	unsigned long flags;
-> +	int err;
-> +
-> +	atmel_aes_set_mode(dd, rctx);
-> +
-> +	err = atmel_aes_hw_init(dd);
-> +	if (err)
-> +		return atmel_aes_complete(dd, err);
-> +
-> +	/* Compute the tweak value from req->info with ecb(aes). */
-> +	flags = dd->flags;
-> +	dd->flags &= ~AES_FLAGS_MODE_MASK;
-> +	dd->flags |= (AES_FLAGS_ECB | AES_FLAGS_ENCRYPT);
-> +	atmel_aes_write_ctrl_key(dd, false, NULL,
-> +				 ctx->key2, ctx->base.keylen);
-> +	dd->flags = flags;
-> +
-> +	atmel_aes_write_block(dd, AES_IDATAR(0), req->info);
-> +	return atmel_aes_wait_for_data_ready(dd, atmel_aes_xts_process_data);
-> +}
-> +
-> +static int atmel_aes_xts_process_data(struct atmel_aes_dev *dd)
-> +{
-> +	struct ablkcipher_request *req = ablkcipher_request_cast(dd->areq);
-> +	bool use_dma = (req->nbytes >= ATMEL_AES_DMA_THRESHOLD);
-> +	u32 tweak[AES_BLOCK_SIZE / sizeof(u32)];
-> +	static const u32 one[AES_BLOCK_SIZE / sizeof(u32)] = {cpu_to_le32(1), };
-> +	u8 *tweak_bytes = (u8 *)tweak;
-> +	int i;
-> +
-> +	/* Read the computed ciphered tweak value. */
-> +	atmel_aes_read_block(dd, AES_ODATAR(0), tweak);
-> +	/*
-> +	 * Hardware quirk:
-> +	 * the order of the ciphered tweak bytes need to be reverted before
-> +	 * writing them into the ODATARx registers.
-> +	 */
-> +	for (i = 0; i < AES_BLOCK_SIZE/2; ++i) {
-> +		u8 tmp = tweak_bytes[AES_BLOCK_SIZE - 1 - i];
-> +
-> +		tweak_bytes[AES_BLOCK_SIZE - 1 - i] = tweak_bytes[i];
-> +		tweak_bytes[i] = tmp;
-> +	}
-> +
-> +	/* Process the data. */
-> +	atmel_aes_write_ctrl(dd, use_dma, NULL);
-> +	atmel_aes_write_block(dd, AES_TWR(0), tweak);
-> +	atmel_aes_write_block(dd, AES_ALPHAR(0), one);
-> +	if (use_dma)
-> +		return atmel_aes_dma_start(dd, req->src, req->dst, req->nbytes,
-> +					   atmel_aes_transfer_complete);
-> +
-> +	return atmel_aes_cpu_start(dd, req->src, req->dst, req->nbytes,
-> +				   atmel_aes_transfer_complete);
-> +}
-> +
-> +static int atmel_aes_xts_setkey(struct crypto_ablkcipher *tfm, const u8
-> *key, +				unsigned int keylen)
-> +{
-> +	struct atmel_aes_xts_ctx *ctx = crypto_ablkcipher_ctx(tfm);
-> +
-> +	if (keylen != AES_KEYSIZE_128 * 2 &&
-> +	    keylen != AES_KEYSIZE_192 * 2 &&
-> +	    keylen != AES_KEYSIZE_256 * 2) {
-> +		crypto_ablkcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-> +		return -EINVAL;
-> +	}
+testing speed of async sha256 (sha256-neon)
+(   16 byte blocks,   16 bytes x   1 updates): 1802881 ops/s,  28846096 Bps
+(   64 byte blocks,   16 bytes x   4 updates): 744861 ops/s,  47671104 Bps
+(   64 byte blocks,   64 bytes x   1 updates): 1015413 ops/s,  64986432 Bps
+(  256 byte blocks,   16 bytes x  16 updates): 281055 ops/s,  71950080 Bps
+(  256 byte blocks,   64 bytes x   4 updates): 378437 ops/s,  96879872 Bps
+(  256 byte blocks,  256 bytes x   1 updates): 453325 ops/s, 116051200 Bps
+( 1024 byte blocks,   16 bytes x  64 updates):  79809 ops/s,  81724416 Bps
+( 1024 byte blocks,  256 bytes x   4 updates): 131621 ops/s, 134779904 Bps
+( 1024 byte blocks, 1024 bytes x   1 updates): 140708 ops/s, 144084992 Bps
+( 2048 byte blocks,   16 bytes x 128 updates):  40900 ops/s,  83763200 Bps
+( 2048 byte blocks,  256 bytes x   8 updates):  68348 ops/s, 139976704 Bps
+( 2048 byte blocks, 1024 bytes x   2 updates):  72051 ops/s, 147560448 Bps
+( 2048 byte blocks, 2048 bytes x   1 updates):  73358 ops/s, 150237184 Bps
+( 4096 byte blocks,   16 bytes x 256 updates):  20746 ops/s,  84975616 Bps
+( 4096 byte blocks,  256 bytes x  16 updates):  34842 ops/s, 142712832 Bps
+( 4096 byte blocks, 1024 bytes x   4 updates):  36794 ops/s, 150708224 Bps
+( 4096 byte blocks, 4096 bytes x   1 updates):  37422 ops/s, 153280512 Bps
+( 8192 byte blocks,   16 bytes x 512 updates):  10428 ops/s,  85426176 Bps
+( 8192 byte blocks,  256 bytes x  32 updates):  17600 ops/s, 144179200 Bps
+( 8192 byte blocks, 1024 bytes x   8 updates):  18594 ops/s, 152322048 Bps
+( 8192 byte blocks, 4096 bytes x   2 updates):  18858 ops/s, 154484736 Bps
+( 8192 byte blocks, 8192 bytes x   1 updates):  18880 ops/s, 154664960 Bps
 
-Please use xts_check_key as a replacement for this code.
-> +
-> +	memcpy(ctx->base.key, key, keylen/2);
-> +	memcpy(ctx->key2, key + keylen/2, keylen/2);
-> +	ctx->base.keylen = keylen/2;
-> +
-> +	return 0;
-> +}
-> +
-> +static int atmel_aes_xts_encrypt(struct ablkcipher_request *req)
-> +{
-> +	return atmel_aes_crypt(req, AES_FLAGS_XTS | AES_FLAGS_ENCRYPT);
-> +}
-> +
-> +static int atmel_aes_xts_decrypt(struct ablkcipher_request *req)
-> +{
-> +	return atmel_aes_crypt(req, AES_FLAGS_XTS);
-> +}
-> +
-> +static int atmel_aes_xts_cra_init(struct crypto_tfm *tfm)
-> +{
-> +	struct atmel_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
-> +
-> +	tfm->crt_ablkcipher.reqsize = sizeof(struct atmel_aes_reqctx);
-> +	ctx->base.start = atmel_aes_xts_start;
-> +
-> +	return 0;
-> +}
-> +
-> +static struct crypto_alg aes_xts_alg = {
-> +	.cra_name		= "xts(aes)",
-> +	.cra_driver_name	= "atmel-xts-aes",
-> +	.cra_priority		= ATMEL_AES_PRIORITY,
-> +	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
-> +	.cra_blocksize		= AES_BLOCK_SIZE,
-> +	.cra_ctxsize		= sizeof(struct atmel_aes_xts_ctx),
-> +	.cra_alignmask		= 0xf,
-> +	.cra_type		= &crypto_ablkcipher_type,
-> +	.cra_module		= THIS_MODULE,
-> +	.cra_init		= atmel_aes_xts_cra_init,
-> +	.cra_exit		= atmel_aes_cra_exit,
-> +	.cra_u.ablkcipher = {
-> +		.min_keysize	= 2 * AES_MIN_KEY_SIZE,
-> +		.max_keysize	= 2 * AES_MAX_KEY_SIZE,
-> +		.ivsize		= AES_BLOCK_SIZE,
-> +		.setkey		= atmel_aes_xts_setkey,
-> +		.encrypt	= atmel_aes_xts_encrypt,
-> +		.decrypt	= atmel_aes_xts_decrypt,
-> +	}
-> +};
-> +
-> +
->  /* Probe functions */
-> 
->  static int atmel_aes_buff_init(struct atmel_aes_dev *dd)
-> @@ -1877,6 +2038,9 @@ static void atmel_aes_unregister_algs(struct
-> atmel_aes_dev *dd) {
->  	int i;
-> 
-> +	if (dd->caps.has_xts)
-> +		crypto_unregister_alg(&aes_xts_alg);
-> +
->  	if (dd->caps.has_gcm)
->  		crypto_unregister_aead(&aes_gcm_alg);
-> 
-> @@ -1909,8 +2073,16 @@ static int atmel_aes_register_algs(struct
-> atmel_aes_dev *dd) goto err_aes_gcm_alg;
->  	}
-> 
-> +	if (dd->caps.has_xts) {
-> +		err = crypto_register_alg(&aes_xts_alg);
-> +		if (err)
-> +			goto err_aes_xts_alg;
-> +	}
-> +
->  	return 0;
-> 
-> +err_aes_xts_alg:
-> +	crypto_unregister_aead(&aes_gcm_alg);
->  err_aes_gcm_alg:
->  	crypto_unregister_alg(&aes_cfb64_alg);
->  err_aes_cfb64_alg:
-> @@ -1928,6 +2100,7 @@ static void atmel_aes_get_cap(struct atmel_aes_dev
-> *dd) dd->caps.has_cfb64 = 0;
->  	dd->caps.has_ctr32 = 0;
->  	dd->caps.has_gcm = 0;
-> +	dd->caps.has_xts = 0;
->  	dd->caps.max_burst_size = 1;
-> 
->  	/* keep only major version number */
-> @@ -1937,6 +2110,7 @@ static void atmel_aes_get_cap(struct atmel_aes_dev
-> *dd) dd->caps.has_cfb64 = 1;
->  		dd->caps.has_ctr32 = 1;
->  		dd->caps.has_gcm = 1;
-> +		dd->caps.has_xts = 1;
->  		dd->caps.max_burst_size = 4;
->  		break;
->  	case 0x200:
+testing speed of async sha256 (sha256-ce)
+(   16 byte blocks,   16 bytes x   1 updates): 4107417 ops/s,  65718672 Bps
+(   64 byte blocks,   16 bytes x   4 updates): 1418054 ops/s,  90755456 Bps
+(   64 byte blocks,   64 bytes x   1 updates): 3323045 ops/s, 212674880 Bps
+(  256 byte blocks,   16 bytes x  16 updates): 450084 ops/s, 115221504 Bps
+(  256 byte blocks,   64 bytes x   4 updates): 1034376 ops/s, 264800256 Bps
+(  256 byte blocks,  256 bytes x   1 updates): 1798744 ops/s, 460478464 Bps
+( 1024 byte blocks,   16 bytes x  64 updates): 121411 ops/s, 124324864 Bps
+( 1024 byte blocks,  256 bytes x   4 updates): 506086 ops/s, 518232064 Bps
+( 1024 byte blocks, 1024 bytes x   1 updates): 634485 ops/s, 649712640 Bps
+( 2048 byte blocks,   16 bytes x 128 updates):  61520 ops/s, 125992960 Bps
+( 2048 byte blocks,  256 bytes x   8 updates): 266787 ops/s, 546379776 Bps
+( 2048 byte blocks, 1024 bytes x   2 updates): 316910 ops/s, 649031680 Bps
+( 2048 byte blocks, 2048 bytes x   1 updates): 342777 ops/s, 702007296 Bps
+( 4096 byte blocks,   16 bytes x 256 updates):  31003 ops/s, 126988288 Bps
+( 4096 byte blocks,  256 bytes x  16 updates): 138097 ops/s, 565645312 Bps
+( 4096 byte blocks, 1024 bytes x   4 updates): 164319 ops/s, 673050624 Bps
+( 4096 byte blocks, 4096 bytes x   1 updates): 176310 ops/s, 722165760 Bps
+( 8192 byte blocks,   16 bytes x 512 updates):  15566 ops/s, 127516672 Bps
+( 8192 byte blocks,  256 bytes x  32 updates):  69608 ops/s, 570228736 Bps
+( 8192 byte blocks, 1024 bytes x   8 updates):  83682 ops/s, 685522944 Bps
+( 8192 byte blocks, 4096 bytes x   2 updates):  88813 ops/s, 727556096 Bps
+( 8192 byte blocks, 8192 bytes x   1 updates):  88781 ops/s, 727293952 Bps
 
+Ard Biesheuvel (1):
+  crypto: arm64/sha256 - add support for SHA256 using NEON instructions
 
+ arch/arm64/crypto/Kconfig               |   5 +
+ arch/arm64/crypto/Makefile              |  11 +
+ arch/arm64/crypto/sha256-armv4.pl       | 413 +++++++++
+ arch/arm64/crypto/sha256-core.S_shipped | 883 ++++++++++++++++++++
+ arch/arm64/crypto/sha256_neon_glue.c    | 103 +++
+ 5 files changed, 1415 insertions(+)
+ create mode 100644 arch/arm64/crypto/sha256-armv4.pl
+ create mode 100644 arch/arm64/crypto/sha256-core.S_shipped
+ create mode 100644 arch/arm64/crypto/sha256_neon_glue.c
 
-Ciao
-Stephan
+-- 
+2.7.4
