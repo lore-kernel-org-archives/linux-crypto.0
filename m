@@ -1,176 +1,79 @@
-From: "Dey, Megha" <megha.dey@intel.com>
-Subject: RE: sha1_mb broken
-Date: Wed, 28 Sep 2016 22:52:46 +0000
-Message-ID: <C440BA31B54DCD4AAC682D2365C8FEE703CEF203@ORSMSX111.amr.corp.intel.com>
-References: <1939675.7gNnqUbNs6@positron.chronox.de>
- <1475085499.2490.1.camel@megha-Z97X-UD7-TH>
- <1475087147.2490.6.camel@megha-Z97X-UD7-TH>
- <2200246.hBmZe7vJh4@positron.chronox.de>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: sha1_mb broken
+Date: Thu, 29 Sep 2016 07:30:42 +0200
+Message-ID: <9643256.KgnRM79R5B@positron.chronox.de>
+References: <1939675.7gNnqUbNs6@positron.chronox.de> <2200246.hBmZe7vJh4@positron.chronox.de> <C440BA31B54DCD4AAC682D2365C8FEE703CEF203@ORSMSX111.amr.corp.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Content-Type: multipart/mixed; boundary="nextPart21380555.AbM7llkTFi"
+Content-Transfer-Encoding: 7Bit
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>
-To: Stephan Mueller <smueller@chronox.de>
+To: "Dey, Megha" <megha.dey@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:12966 "EHLO mga09.intel.com"
+Received: from mail.eperm.de ([89.247.134.16]:48066 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932369AbcI1Wwt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Sep 2016 18:52:49 -0400
-In-Reply-To: <2200246.hBmZe7vJh4@positron.chronox.de>
-Content-Language: en-US
+        id S1752789AbcI2Faq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Sep 2016 01:30:46 -0400
+In-Reply-To: <C440BA31B54DCD4AAC682D2365C8FEE703CEF203@ORSMSX111.amr.corp.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+This is a multi-part message in MIME format.
 
+--nextPart21380555.AbM7llkTFi
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
------Original Message-----
-From: Stephan Mueller [mailto:smueller@chronox.de] 
-Sent: Wednesday, September 28, 2016 11:46 AM
-To: Dey, Megha <megha.dey@intel.com>
-Cc: linux-crypto@vger.kernel.org; tim.c.chen@linux.intel.com
-Subject: Re: sha1_mb broken
-
-Am Mittwoch, 28. September 2016, 11:25:47 CEST schrieb Megha Dey:
+Am Mittwoch, 28. September 2016, 22:52:46 CEST schrieb Dey, Megha:
 
 Hi Megha,
 
-> Hi Stephan,
-> 
-> There was a bug fix: Commit ID : 0851561d (introduced in 4.6-rc5).
-
-I use the current cryptodev-2.6 tree.
-> 
-> Assuming that you are using an older kernel than this one, maybe we 
-> are issuing the complete with the wrong pointer, so the original 
-> issuer of the request never gets the complete back.
-> 
-> If you are using an older kernel, can you please use the lastest and 
-> let me know if you still see this issue?
-> 
-> Also can you give more info on the test case? Does it issue single 
-> request or multiple requests?
-
-It is a single test with the message "8c899bba" where I expect "ac6d8c4851beacf61c175aed0699053d8f632df8"
-
->> For the message 8c899bba, the expected hash is  not ac6d8c4851beacf61c175aed0699053d8f632df8 but 
-2e2816f6241fef89d78dd7afc926adc03ca94ace. I used this hash value in the existing tcrypt test and the test passes.
-
-I would like to duplicate the test case you are using so that I can have a better look.
-Can you provide the complete code for the test case? The code you sent earlier are missing some structure definitions. I will try to incorporate this test in the tcrypt test suite and try to reproduce this issue.
-
-The code is the following which works with any other hash:
-
-struct kccavs_ahash_def {
-	struct crypto_ahash *tfm;
-	struct ahash_request *req;
-	struct kccavs_tcrypt_res result;
-};
-
-/* Callback function */
-static void kccavs_ahash_cb(struct crypto_async_request *req, int error) {
-	struct kccavs_tcrypt_res *result = req->data;
-
-	if (error == -EINPROGRESS)
-		return;
-	result->err = error;
-	complete(&result->completion);
-	dbg("Encryption finished successfully\n"); }
-
-/* Perform hash */
-static unsigned int kccavs_ahash_op(struct kccavs_ahash_def *ahash) {
-	int rc = 0;
-
-	rc = crypto_ahash_digest(ahash->req);
-
-	switch (rc) {
-	case 0:
-		break;
-	case -EINPROGRESS:
-	case -EBUSY:
-		rc = wait_for_completion_interruptible(&ahash->result.completion);
-		if (!rc && !ahash->result.err) {
-#ifdef OLDASYNC
-			INIT_COMPLETION(aead->result.completion);
-#else
-			reinit_completion(&ahash->result.completion);
-#endif
-			break;
-		}
-	default:
-		dbg("ahash cipher operation returned with %d result"
-		    " %d\n",rc, ahash->result.err);
-		break;
-	}
-	init_completion(&ahash->result.completion);
-
-	return rc;
-}
-
-static int kccavs_test_ahash(size_t nbytes) {
-	int ret;
-	struct crypto_ahash *tfm;
-	struct ahash_request *req = NULL;
-	struct kccavs_ahash_def ahash;
-	struct kccavs_data *data = &kccavs_test->data;
-	struct kccavs_data *key = &kccavs_test->key;
-	unsigned char *digest = NULL;
-	struct scatterlist sg;
-
-	/*
-	 * We explicitly do not check the input buffer as we allow
-	 * an empty string.
-	 */
-
-	/* allocate synchronous hash */
-	tfm = crypto_alloc_ahash(kccavs_test->name, 0, 0);
-	if (IS_ERR(tfm)) {
-		pr_info("could not allocate digest TFM handle for %s\n", kccavs_test-
->name);
-		return PTR_ERR(tfm);
-	}
-
-	digest = kzalloc(crypto_ahash_digestsize(tfm), GFP_KERNEL);
-	if (!digest) {
-		ret = -ENOMEM;
-		goto out;
-	}
-
-	req = ahash_request_alloc(tfm, GFP_KERNEL);
-	if (!req) {
-		pr_info("could not allocate request queue\n");
-		ret = -ENOMEM;
-		goto out;
-	}
-	ahash.tfm = tfm;
-	ahash.req = req;
-
-	if (key->len) {
-		dbg("set key for HMAC\n");
-		ret = crypto_ahash_setkey(tfm, key->data, key->len);
-		if (ret < 0)
-			goto out;
-	}
-
-	sg_init_one(&sg, data->data, data->len);
-	ahash_request_set_crypt(req, &sg, digest, data->len);
-	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-				   kccavs_ahash_cb, &ahash.result);
-
-	ret = kccavs_ahash_op(&ahash);
-	if (!ret) {
-		data->len = crypto_ahash_digestsize(tfm);
-		memcpy(data->data, digest, data->len);
-	}
-
-out:
-	kzfree(digest);
-	if (req)
-		ahash_request_free(req);
-	crypto_free_ahash(tfm);
-	return ret;
-}
-
+see a self contained example code attached.
 
 Ciao
 Stephan
+--nextPart21380555.AbM7llkTFi
+Content-Disposition: attachment; filename="sha1_mb.tar.xz"
+Content-Transfer-Encoding: base64
+Content-Type: application/x-xz-compressed-tar; name="sha1_mb.tar.xz"
+
+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
+
+
+--nextPart21380555.AbM7llkTFi--
