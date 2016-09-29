@@ -1,72 +1,40 @@
-From: liushuoran <liushuoran@huawei.com>
-Subject: Observed a ecryptFS crash
-Date: Thu, 29 Sep 2016 12:29:39 +0000
-Message-ID: <00B10D30F2BAA743B48953A4D86C96D54CB653@SZXEMI506-MBS.china.huawei.com>
+From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
+Subject: [PATCH 1/1] crypto: atmel-aes: fix compiler error when VERBOSE_DEBUG is defined
+Date: Thu, 29 Sep 2016 18:46:57 +0200
+Message-ID: <605a4f64ee501aeaffbd43b7b45fd9b3d997bd7b.1475167206.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "ecryptfs@vger.kernel.org" <ecryptfs@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Yaodongdong <yaodongdong@huawei.com>,
-        Wangbintian <bintian.wang@huawei.com>,
-        yingjindong <yingjindong@huawei.com>,
-        Xiakaixu <xiakaixu@huawei.com>, Yezongbo <yezongbo@huawei.com>,
-        "likan (A)" <likan82@huawei.com>
-To: "tyhicks@canonical.com" <tyhicks@canonical.com>
-Return-path: <ecryptfs-owner@vger.kernel.org>
-Content-Language: zh-CN
-Sender: ecryptfs-owner@vger.kernel.org
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Cyrille Pitchen <cyrille.pitchen@atmel.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <nicolas.ferre@atmel.com>, <levent.demir@inria.fr>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-SGkgVHloaWNrcywNCg0KV2Ugb2JzZXJ2ZWQgYSBlY3J5cHRGUyBjcmFzaCBvY2Nhc2lvbmFsbHkg
-aW4gTGludXgga2VybmVsIDQuMS4xOC4gVGhlIGNhbGwgdHJhY2UgaXMgYXR0YWNoZWQgYmVsb3cu
-IElzIGl0IGEga25vd24gaXNzdWXvvJ8gTG9vayBmb3J3YXJkIHRvIGhlYXJpbmcgZnJvbSB5b3Uu
-IFRoYW5rcyBpbiBhZHZhbmNlIQ0KDQpbMTkzMTQuNTI5NDc5c11bcGlkOjI2OTQsY3B1MyxHQUNf
-RXhlY3V0b3JbMF1dQ2FsbCB0cmFjZToNClsxOTMxNC41Mjk1MTBzXVtwaWQ6MjY5NCxjcHUzLEdB
-Q19FeGVjdXRvclswXV1bPGZmZmZmZmMwMDAwZjM4OTg+XSBkb19yYXdfc3Bpbl9sb2NrKzB4MjAv
-MHgyMDANClsxOTMxNC41Mjk1MTBzXVtwaWQ6MjY5NCxjcHUzLEdBQ19FeGVjdXRvclswXV1bPGZm
-ZmZmZmMwMDEwMzFmYjA+XSBfcmF3X3NwaW5fbG9jaysweDI4LzB4MzQNClsxOTMxNC41Mjk1NDFz
-XVtwaWQ6MjY5NCxjcHUzLEdBQ19FeGVjdXRvclswXV1bPGZmZmZmZmMwMDAzOTA4ZTA+XSBzZWxp
-bnV4X2lub2RlX2ZyZWVfc2VjdXJpdHkrMHgzYy8weDk0DQpbMTkzMTQuNTI5NTQxc11bcGlkOjI2
-OTQsY3B1MyxHQUNfRXhlY3V0b3JbMF1dWzxmZmZmZmZjMDAwMzg2YjA0Pl0gc2VjdXJpdHlfaW5v
-ZGVfZnJlZSsweDJjLzB4MzgNClsxOTMxNC41Mjk1NDFzXVtwaWQ6MjY5NCxjcHUzLEdBQ19FeGVj
-dXRvclswXV1bPGZmZmZmZmMwMDAxZmZmODg+XSBfX2Rlc3Ryb3lfaW5vZGUrMHgyYy8weDE4MA0K
-WzE5MzE0LjUyOTU3MXNdW3BpZDoyNjk0LGNwdTMsR0FDX0V4ZWN1dG9yWzBdXVs8ZmZmZmZmYzAw
-MDIwMTY2MD5dIGRlc3Ryb3lfaW5vZGUrMHgzMC8weGEwDQpbMTkzMTQuNTI5NTcxc11bcGlkOjI2
-OTQsY3B1MyxHQUNfRXhlY3V0b3JbMF1dWzxmZmZmZmZjMDAwMjAxN2Q4Pl0gZXZpY3QrMHgxMDgv
-MHgxYzANClsxOTMxNC41Mjk1NzFzXVtwaWQ6MjY5NCxjcHUzLEdBQ19FeGVjdXRvclswXV1bPGZm
-ZmZmZmMwMDAyMDI1ODg+XSBpcHV0KzB4MTg0LzB4MjU4DQpbMTkzMTQuNTI5NjAyc11bcGlkOjI2
-OTQsY3B1MyxHQUNfRXhlY3V0b3JbMF1dWzxmZmZmZmZjMDAwMmYyN2QwPl0gZWNyeXB0ZnNfZXZp
-Y3RfaW5vZGUrMHgzMC8weDNjDQpbMTkzMTQuNTI5NjAyc11bcGlkOjI2OTQsY3B1MyxHQUNfRXhl
-Y3V0b3JbMF1dWzxmZmZmZmZjMDAwMjAxNzdjPl0gZXZpY3QrMHhhYy8weDFjMA0KWzE5MzE0LjUy
-OTYwMnNdW3BpZDoyNjk0LGNwdTMsR0FDX0V4ZWN1dG9yWzBdXVs8ZmZmZmZmYzAwMDIwMThkND5d
-IGRpc3Bvc2VfbGlzdCsweDQ0LzB4NWMNClsxOTMxNC41Mjk2MzJzXVtwaWQ6MjY5NCxjcHUzLEdB
-Q19FeGVjdXRvclswXV1bPGZmZmZmZmMwMDAyMDJkMjg+XSBldmljdF9pbm9kZXMrMHhjYy8weDEy
-Yw0KWzE5MzE0LjUyOTYzMnNdW3BpZDoyNjk0LGNwdTMsR0FDX0V4ZWN1dG9yWzBdXVs8ZmZmZmZm
-YzAwMDFlNWQwND5dIGdlbmVyaWNfc2h1dGRvd25fc3VwZXIrMHg1OC8weGU0DQpbMTkzMTQuNTI5
-NjMyc11bcGlkOjI2OTQsY3B1MyxHQUNfRXhlY3V0b3JbMF1dWzxmZmZmZmZjMDAwMWU3MTY0Pl0g
-a2lsbF9hbm9uX3N1cGVyKzB4MzAvMHg3NA0KWzE5MzE0LjUyOTY2M3NdW3BpZDoyNjk0LGNwdTMs
-R0FDX0V4ZWN1dG9yWzBdXVs8ZmZmZmZmYzAwMDJmMTZhND5dIGVjcnlwdGZzX2tpbGxfYmxvY2tf
-c3VwZXIrMHgyNC8weDU0DQpbMTkzMTQuNTI5NjYzc11bcGlkOjI2OTQsY3B1MyxHQUNfRXhlY3V0
-b3JbMF1dWzxmZmZmZmZjMDAwMWU2NjkwPl0gZGVhY3RpdmF0ZV9sb2NrZWRfc3VwZXIrMHg2MC8w
-eDhjDQpbMTkzMTQuNTI5NjYzc11bcGlkOjI2OTQsY3B1MyxHQUNfRXhlY3V0b3JbMF1dWzxmZmZm
-ZmZjMDAwMWU2NzU0Pl0gZGVhY3RpdmF0ZV9zdXBlcisweDk4LzB4YTQNClsxOTMxNC41Mjk2OTNz
-XVtwaWQ6MjY5NCxjcHUzLEdBQ19FeGVjdXRvclswXV1bPGZmZmZmZmMwMDAyMDZkNTQ+XSBjbGVh
-bnVwX21udCsweDUwLzB4ZDANClsxOTMxNC41Mjk2OTNzXVtwaWQ6MjY5NCxjcHUzLEdBQ19FeGVj
-dXRvclswXV1bPGZmZmZmZmMwMDAyMDZlNDg+XSBfX2NsZWFudXBfbW50KzB4MjAvMHgyYw0KWzE5
-MzE0LjUyOTY5M3NdW3BpZDoyNjk0LGNwdTMsR0FDX0V4ZWN1dG9yWzBdXVs8ZmZmZmZmYzAwMDBj
-MWJhYz5dIHRhc2tfd29ya19ydW4rMHhiYy8weGY4DQpbMTkzMTQuNTI5NzI0c11bcGlkOjI2OTQs
-Y3B1MyxHQUNfRXhlY3V0b3JbMF1dWzxmZmZmZmZjMDAwMGEzZTk4Pl0gZG9fZXhpdCsweDJkNC8w
-eGExNA0KWzE5MzE0LjUyOTcyNHNdW3BpZDoyNjk0LGNwdTMsR0FDX0V4ZWN1dG9yWzBdXVs8ZmZm
-ZmZmYzAwMDBhNTZhOD5dIGRvX2dyb3VwX2V4aXQrMHg2MC8weGY4DQpbMTkzMTQuNTI5NzI0c11b
-cGlkOjI2OTQsY3B1MyxHQUNfRXhlY3V0b3JbMF1dWzxmZmZmZmZjMDAwMGIyNmFjPl0gZ2V0X3Np
-Z25hbCsweDI4NC8weDU5OA0KWzE5MzE0LjUyOTc1NHNdW3BpZDoyNjk0LGNwdTMsR0FDX0V4ZWN1
-dG9yWzBdXVs8ZmZmZmZmYzAwMDA4OTUwYz5dIGRvX3NpZ25hbCsweDE3MC8weDViOA0KWzE5MzE0
-LjUyOTc1NHNdW3BpZDoyNjk0LGNwdTMsR0FDX0V4ZWN1dG9yWzBdXVs8ZmZmZmZmYzAwMDA4OWJl
-MD5dIGRvX25vdGlmeV9yZXN1bWUrMHg3MC8weDc4DQpbMTkzMTQuNTI5Nzg1c11bcGlkOjI2OTQs
-Y3B1MyxHQUNfRXhlY3V0b3JbMF1dQ29kZTogYWEwMDAzZjMgYWExZTAzZTAgOTdmZTc3MTggNTI4
-OWQ1YTAgKGI5NDAwNjYxKSANClsxOTMxNC41Mjk5MDdzXVtwaWQ6MjY5NCxjcHUzLEdBQ19FeGVj
-dXRvclswXV0tLS1bIGVuZCB0cmFjZSAzODJlNGI2MjY0YjAzNWI1IF0tLS0NClsxOTMxNC41Mjk5
-MDdzXVtwaWQ6MjY5NCxjcHUzLEdBQ19FeGVjdXRvclswXV1LZXJuZWwgcGFuaWMgLSBub3Qgc3lu
-Y2luZzogRmF0YWwgZXhjZXB0aW9uDQoNClJlZ2FyZHMsDQpTaHVvcmFuDQo=
+This patch fixes a compiler error when VERBOSE_DEBUG is defined. Indeed,
+in atmel_aes_write(), the 3rd argument of atmel_aes_reg_name() was
+missing.
+
+Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
+Reported-by: Levent Demir <levent.demir@inria.fr>
+---
+ drivers/crypto/atmel-aes.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index e3d40a8dfffb..1d9e7bd3f377 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -317,7 +317,7 @@ static inline void atmel_aes_write(struct atmel_aes_dev *dd,
+ 		char tmp[16];
+ 
+ 		dev_vdbg(dd->dev, "write 0x%08x into %s\n", value,
+-			 atmel_aes_reg_name(offset, tmp));
++			 atmel_aes_reg_name(offset, tmp, sizeof(tmp)));
+ 	}
+ #endif /* VERBOSE_DEBUG */
+ 
+-- 
+2.7.4
