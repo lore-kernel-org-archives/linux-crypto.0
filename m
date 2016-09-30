@@ -1,87 +1,57 @@
-From: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-Subject: [PATCH v2] crypto: caam - treat SGT address pointer as u64
-Date: Fri, 30 Sep 2016 12:09:39 +0300
-Message-ID: <1475226579-2078-1-git-send-email-tudor-dan.ambarus@nxp.com>
+From: Andy Polyakov <appro@openssl.org>
+Subject: Re: [PATCH] arm64: add support for SHA256 using NEON instructions
+Date: Fri, 30 Sep 2016 12:44:13 +0200
+Message-ID: <a11d5dcc-1681-7e62-c3ac-f2fd53c50f14@openssl.org>
+References: <1475189503-9175-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>,
-        Tudor Ambarus <tudor-dan.ambarus@nxp.com>
-To: <fabio.estevam@nxp.com>, <horia.geanta@nxp.com>,
-        <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0041.outbound.protection.outlook.com ([104.47.37.41]:5332
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932413AbcI3Jnd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Sep 2016 05:43:33 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: catalin.marinas@arm.com, victor.chong@linaro.org, will.deacon@arm.com,
+ daniel.thompson@linaro.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ herbert@gondor.apana.org.au
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1475189503-9175-1-git-send-email-ard.biesheuvel@linaro.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-Even for i.MX, CAAM is able to use address pointers greater than
-32 bits, the address pointer field being interpreted as a double word.
-Enforce u64 address pointer in the sec4_sg_entry struct.
+> This is a port of the ARMv7 implementation in arch/arm/crypto. For a Cortex-A57
+> (r2p1), the performance numbers are listed below. In summary, 40% - 50% speedup
+> where it counts, i.e., block sizes over 256 bytes with few updates.
 
-This patch fixes the SGT address pointer endianness issue for
-32bit platforms where core endianness != caam endianness.
+Cool! Great! Just in case for reference. You compare generic, new NEON
+and hardware-assisted implementations. I assume that first one refers to
+C compiler-generated code. But there is another option, i.e. non-NEON
+assembly. Now to the "for reference" part. The reason for why NEON is
+not utilized in OpenSSL is because it's deemed that it doesn't provide
+"extraordinary" improvement over non-NEON assembly code, especially on
+less sophisticated processors such as Cortex-A53. Note that I'm not
+saying that NEON SHA256 subroutine is not faster, it is, only that it's
+not "extraordinarily" faster in most relevant cases(*). In other words
+it's reckoned that non-NEON assembly provides adequate *all-round*
+performance, taking into consideration that it does it without being
+dependent on optional NEON. Non-NEON assembly should also be interesting
+in kernel context, because there are situations when you can't call NEON
+procedure, be it suggested one or hardware-assisted, which itself relies
+on NEON. And of course another nice quality about SHA2 module in OpenSSL
+is that it emits both SHA256 and SHA512 codes ;-) On related note it
+should be noted that NEON-izing SHA512 on ARM64 makes lesser sense, it's
+bound to provide lesser improvement than SHA256 [if any at all in some
+cases]. This is because in SHA256 you engage 4 lanes of NEON registers,
+while in SHA512 case you have only 2.
 
-Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
----
-v2: Removed mx7d restriction.
-
- drivers/crypto/caam/desc.h       | 6 ------
- drivers/crypto/caam/regs.h       | 8 ++++++++
- drivers/crypto/caam/sg_sw_sec4.h | 2 +-
- 3 files changed, 9 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
-index 26427c1..513b664 100644
---- a/drivers/crypto/caam/desc.h
-+++ b/drivers/crypto/caam/desc.h
-@@ -23,13 +23,7 @@
- #define SEC4_SG_OFFSET_MASK	0x00001fff
- 
- struct sec4_sg_entry {
--#if !defined(CONFIG_ARCH_DMA_ADDR_T_64BIT) && \
--	defined(CONFIG_CRYPTO_DEV_FSL_CAAM_IMX)
--	u32 rsvd1;
--	dma_addr_t ptr;
--#else
- 	u64 ptr;
--#endif /* CONFIG_CRYPTO_DEV_FSL_CAAM_IMX */
- 	u32 len;
- 	u32 bpid_offset;
- };
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index b3c5016..84d2f83 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -196,6 +196,14 @@ static inline u64 rd_reg64(void __iomem *reg)
- #define caam_dma_to_cpu(value) caam32_to_cpu(value)
- #endif /* CONFIG_ARCH_DMA_ADDR_T_64BIT  */
- 
-+#ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
-+#define cpu_to_caam_dma64(value) \
-+		(((u64)cpu_to_caam32(lower_32_bits(value)) << 32) | \
-+		 (u64)cpu_to_caam32(upper_32_bits(value)))
-+#else
-+#define cpu_to_caam_dma64(value) cpu_to_caam64(value)
-+#endif
-+
- /*
-  * jr_outentry
-  * Represents each entry in a JobR output ring
-diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
-index 19dc64f..41cd5a3 100644
---- a/drivers/crypto/caam/sg_sw_sec4.h
-+++ b/drivers/crypto/caam/sg_sw_sec4.h
-@@ -15,7 +15,7 @@ struct sec4_sg_entry;
- static inline void dma_to_sec4_sg_one(struct sec4_sg_entry *sec4_sg_ptr,
- 				      dma_addr_t dma, u32 len, u16 offset)
- {
--	sec4_sg_ptr->ptr = cpu_to_caam_dma(dma);
-+	sec4_sg_ptr->ptr = cpu_to_caam_dma64(dma);
- 	sec4_sg_ptr->len = cpu_to_caam32(len);
- 	sec4_sg_ptr->bpid_offset = cpu_to_caam32(offset & SEC4_SG_OFFSET_MASK);
- #ifdef DEBUG
--- 
-1.8.3.1
+(*) Well, this is also question of priorities. My rationale is that
+there is a lot of Cortex-A53 and A57 phones out there that don't have
+crypto-extensions, I refer to Qualcomm SoCs, where NEON gives less than
+10% improvement [over non-NEON assembly]. Yes, it gives more on X-Gene,
+but X-Gene is not wide-spread, and the rest (including upcoming X-Gene)
+have crypto-extensions, so alternative code path doesn't matter.
