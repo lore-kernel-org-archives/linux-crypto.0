@@ -1,82 +1,115 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] crypto: arm64/sha256 - add support for SHA256 using NEON instructions
-Date: Thu, 29 Sep 2016 16:37:16 -0700
-Message-ID: <CAKv+Gu8J9rHA2opKqHQr74GU6xxwMpaJak1mNpRVpOf=+BZ81w@mail.gmail.com>
-References: <1475189503-9175-1-git-send-email-ard.biesheuvel@linaro.org> <1475189503-9175-2-git-send-email-ard.biesheuvel@linaro.org>
+From: Fontaine david <fontained35@gmail.com>
+Subject: Char.c
+Date: Fri, 30 Sep 2016 10:09:07 +0200
+Message-ID: <CACCXZ7oR7VLh7zLVE4zkbHLBWLgdwht2nf5tQ2sc+8fq-9F_AQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Andy Polyakov <appro@openssl.org>,
-        Victor Chong <victor.chong@linaro.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Will Deacon <will.deacon@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f42.google.com ([209.85.214.42]:36721 "EHLO
-        mail-it0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752523AbcI2XhS (ORCPT
+Received: from mail-vk0-f42.google.com ([209.85.213.42]:33715 "EHLO
+        mail-vk0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750818AbcI3IJI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Sep 2016 19:37:18 -0400
-Received: by mail-it0-f42.google.com with SMTP id u134so14821939itb.1
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Sep 2016 16:37:17 -0700 (PDT)
-In-Reply-To: <1475189503-9175-2-git-send-email-ard.biesheuvel@linaro.org>
+        Fri, 30 Sep 2016 04:09:08 -0400
+Received: by mail-vk0-f42.google.com with SMTP id z126so97326644vkd.0
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Sep 2016 01:09:08 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 29 September 2016 at 15:51, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> This is a port to arm64 of the NEON implementation of SHA256 that lives
-> under arch/arm/crypto.
->
-> Due to the fact that the AArch64 assembler dialect deviates from the
-> 32-bit ARM one in ways that makes sharing code problematic, and given
-> that this version only uses the NEON version whereas the original
-> implementation supports plain ALU assembler, NEON and Crypto Extensions,
-> this code is built from a version sha256-armv4.pl that has been
-> transliterated to the AArch64 NEON dialect.
->
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  arch/arm64/crypto/Kconfig               |   5 +
->  arch/arm64/crypto/Makefile              |  11 +
->  arch/arm64/crypto/sha256-armv4.pl       | 413 +++++++++
->  arch/arm64/crypto/sha256-core.S_shipped | 883 ++++++++++++++++++++
->  arch/arm64/crypto/sha256_neon_glue.c    | 103 +++
->  5 files changed, 1415 insertions(+)
->
-> diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-> index 2cf32e9887e1..d32371198474 100644
-> --- a/arch/arm64/crypto/Kconfig
-> +++ b/arch/arm64/crypto/Kconfig
-> @@ -18,6 +18,11 @@ config CRYPTO_SHA2_ARM64_CE
->         depends on ARM64 && KERNEL_MODE_NEON
->         select CRYPTO_HASH
->
-> +config CRYPTO_SHA2_ARM64_NEON
-> +       tristate "SHA-224/SHA-256 digest algorithm (ARMv8 NEON)"
-> +       depends on ARM64 && KERNEL_MODE_NEON
-> +       select CRYPTO_HASH
-> +
->  config CRYPTO_GHASH_ARM64_CE
->         tristate "GHASH (for GCM chaining mode) using ARMv8 Crypto Extensions"
->         depends on ARM64 && KERNEL_MODE_NEON
-> diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
-> index abb79b3cfcfe..5156ebee0488 100644
-> --- a/arch/arm64/crypto/Makefile
-> +++ b/arch/arm64/crypto/Makefile
-> @@ -29,6 +29,9 @@ aes-ce-blk-y := aes-glue-ce.o aes-ce.o
->  obj-$(CONFIG_CRYPTO_AES_ARM64_NEON_BLK) += aes-neon-blk.o
->  aes-neon-blk-y := aes-glue-neon.o aes-neon.o
->
-> +obj-$(CONFIG_CRYPTO_SHA2_ARM64_NEON) := sha256-neon.o
+Hi Linus:
 
-There is a typo here that I only spotted just now: this should be += not :=
+This push fixes a weakness in random number generation of file random.c.
 
-Herbert, if you're picking this up, could you please fix this at merge
-time? Or do you need me to resend?
+The two polynomials of LFSR used in Linux/drivers/char/random.c are
+P1(X) = x^128 + x^104 + x^76 + x^51 +x^25 + x + 1, for input pool
+P2(X) = x^32 + x^26 + x^19 + x^14 + x^7 + x + 1 , for output pool
 
-Thanks,
-Ard.
+These polynomials Q1(X) = alpha ^3 *(P1(X)-1)+1 and Q2(X) = alpha ^3
+*(P2(X)-1)+1 are not primitive over GF(2^32) where alpha is an
+primitive element of GF(2^32).
+It turns out that periods of LFSR corresponding to these polynomials
+are not optimal, it means that the space of numbers generated by these
+LFSR is not  GF(2^(32*deg(Pi))-1), i=1,2.
+
+As mentioned in the random.c file, these polynomials come from an
+article http://eprint.iacr.org/2012/251.pdf. It is stated in the
+article that these polynomials have periods (2^(32*deg(Pi))-1)/3,
+i=1,2, so not optimal.
+
+We can improve these LFSR choosing these polynomials as primitive and
+therefore increase the space of numbers generated by 3.
+
+The polynomials used in the current implementation of the PRNG and the
+point presented here, do not conclude a practical attack on the PRNG.
+
+After several calculations, we propose here the following polynomials:
+R1(x) = x^128 + x^106 +x^79 + x^51 +x^25 + x+ 1, as new polynomial of input pool
+R2(x) = x^32 + x^27 + x^21 + x^14 + x^7 + x +1, as new polynomial of
+the output pool
+
+So polynomials S1(X) = alpha^4*(R1(X)-1)+1 and S2(X) =
+alpha^4*(R2(X)-1)+1 are primitive on GF(2^32).
+It is very easy to check their primitive with magma. Use the online
+tool (http://magma.maths.usyd.edu.au/calc/) and the following code:
+
+K0:=GF(2);
+P<X> := PolynomialRing(K0);
+K1<a> := ext<K0|X^32+X^26+X^23+X^22+X^16+X^12+X^11+X^10+X^8+X^7+X^5+X^4+X^2+X^1+1>;K1;
+P<t> := PolynomialRing(K1);
+
+R1 :=  t^128 + t^106 + t^79 + t^51 + t^25 + t + 1;
+S1 := a^4*(R1-1)+1;
+
+R2 := t^32 + t^27 + t^21 + t^14 + t^7 + t + 1;
+S2 := a^4*(R2-1)+1;
+
+S1test := Evaluate((1/(t^128))*S1,1/t);S1test;
+> t^128 + a*t^127 + a*t^100 + a*t^74 + a*t^53 + a*t^25 + a
+
+S1test := t^128 + a^4*t^127 + a^4*t^103 + a^4*t^77 + a^4*t^49 + a^4*t^22 + a^4;
+IsPrimitive(S1test);
+> true
+
+S2test := Evaluate((1/(t^32))*S2,1/t);S2test;
+> t^32 + a*t^31 + a*t^24 + a*t^16 + a*t^12 + a*t^6 + a
+
+S2test := t^32 + a^4*t^31 + a^4*t^25 + a^4*t^18 + a^4*t^11 + a^4*t^5 + a^4;
+IsPrimitive(S2test);
+> true
+
+To use these polynomials, the following changes in the random.c file
+should be applied:
+
+olivier@Zebulon:~/Documents/linux-4.7.4/drivers/char$ diff random.c random-new.c
+371,372c371,373
+<        /* x^128 + x^104 + x^76 + x^51 +x^25 + x + 1 */
+<        { S(128),         104,     76,       51,       25,       1 },
+---
+>        /* was: x^128 + x^104 + x^76 + x^51 +x^25 + x + 1 */
+>        /* x^128 + x^106 + x^79 + x^51 +x^25 + x + 1 */
+>        { S(128),         106,     79,       51,       25,       1 },
+374,375c375,377
+<        /* x^32 + x^26 + x^19 + x^14 + x^7 + x + 1 */
+<        { S(32),           26,       19,       14,       7,         1 },
+---
+>        /* was: x^32 + x^26 + x^19 + x^14 + x^7 + x + 1 */
+>        /* x^32 + x^27 + x^21 + x^14 + x^7 + x + 1 */
+>        { S(32),           27,       21,       14,       7,         1 },
+478a481
+> /* was:
+481a485,490
+> */
+> static __u32 const twist_table[16] = {
+>        0x00000000, 0x1db71064, 0x3b6e20c8, 0x26d930ac,
+>         0x76dc4190, 0x6b6b51f4, 0x4db26158, 0x5005713c,
+>         0xedb88320, 0xf00f9344, 0xd6d6a3e8, 0xcb61b38c,
+>         0x9b64c2b0, 0x86d3d2d4, 0xa00ae278, 0xbdbdf21c };
+525c534,536
+<                    r->pool[i] = (w >> 3) ^ twist_table[w & 7];
+---
+>                    /*
+>                   was: r->pool[i] = (w >> 3) ^ twist_table[w & 7];*/
+>                    r->pool[i] = (w >> 4) ^ twist_table[w & 15];
+
+Regards,
+David Fontaine & Olivier Vivolo
