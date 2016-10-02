@@ -1,30 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/2] Minor CCP driver changes
-Date: Sun, 2 Oct 2016 22:41:03 +0800
-Message-ID: <20161002144103.GH18268@gondor.apana.org.au>
-References: <20160928165204.23263.77515.stgit@taos>
+Subject: Re: [PATCH] crypto: arm64/sha256 - add support for SHA256 using NEON
+ instructions
+Date: Sun, 2 Oct 2016 22:46:50 +0800
+Message-ID: <20161002144650.GI18268@gondor.apana.org.au>
+References: <1475189503-9175-1-git-send-email-ard.biesheuvel@linaro.org>
+ <1475189503-9175-2-git-send-email-ard.biesheuvel@linaro.org>
+ <CAKv+Gu8J9rHA2opKqHQr74GU6xxwMpaJak1mNpRVpOf=+BZ81w@mail.gmail.com>
+ <CAKv+Gu_M+FcuDSaGsJYjD96=Q1iXyFDD3KWy=4vUbeLWRgrHJw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
-        davem@davemloft.net
-To: Gary R Hook <gary.hook@amd.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Andy Polyakov <appro@openssl.org>,
+        Victor Chong <victor.chong@linaro.org>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Will Deacon <will.deacon@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:56210 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:45242 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751919AbcJBOlJ (ORCPT
+        with ESMTP id S1750793AbcJBOq7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Oct 2016 10:41:09 -0400
+        Sun, 2 Oct 2016 10:46:59 -0400
 Content-Disposition: inline
-In-Reply-To: <20160928165204.23263.77515.stgit@taos>
+In-Reply-To: <CAKv+Gu_M+FcuDSaGsJYjD96=Q1iXyFDD3KWy=4vUbeLWRgrHJw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 28, 2016 at 11:53:31AM -0500, Gary R Hook wrote:
-> V2: point a goto statement at the correct label
-> 
-> The following series is for miscellaneous small changes.
+On Sat, Oct 01, 2016 at 07:58:56PM -0700, Ard Biesheuvel wrote:
+>
+> Please disregard this patch for now. I will follow up with a more
+> elaborate series for SHA256 on arm64
 
-Both patches applied.  Thanks.
+Thanks for the heads up.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
