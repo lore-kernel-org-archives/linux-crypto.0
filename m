@@ -1,38 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: testmgr - add guard to dst buffer for
- ahash_export
-Date: Sun, 2 Oct 2016 22:37:11 +0800
-Message-ID: <20161002143711.GA18268@gondor.apana.org.au>
-References: <26da11d26bf0d34f9a5896ab9f9540db5be17012.1475072761.git.jstancek@redhat.com>
+Subject: Re: [PATCH] crypto: sunxi-ss: mark sun4i_hash() static
+Date: Sun, 2 Oct 2016 22:37:36 +0800
+Message-ID: <20161002143736.GB18268@gondor.apana.org.au>
+References: <1474691326-15541-1-git-send-email-baoyou.xie@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcelo.cerri@canonical.com
-To: Jan Stancek <jstancek@redhat.com>
+Cc: clabbe.montjoie@gmail.com, davem@davemloft.net,
+        maxime.ripard@free-electrons.com, wens@csie.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, arnd@arndb.de, xie.baoyou@zte.com.cn
+To: Baoyou Xie <baoyou.xie@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41461 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:54823 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750793AbcJBOhS (ORCPT
+        with ESMTP id S1751639AbcJBOiC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Oct 2016 10:37:18 -0400
+        Sun, 2 Oct 2016 10:38:02 -0400
 Content-Disposition: inline
-In-Reply-To: <26da11d26bf0d34f9a5896ab9f9540db5be17012.1475072761.git.jstancek@redhat.com>
+In-Reply-To: <1474691326-15541-1-git-send-email-baoyou.xie@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 28, 2016 at 04:38:37PM +0200, Jan Stancek wrote:
-> Add a guard to 'state' buffer and warn if its consistency after
-> call to crypto_ahash_export() changes, so that any write that
-> goes beyond advertised statesize (and thus causing potential
-> memory corruption [1]) is more visible.
+On Sat, Sep 24, 2016 at 12:28:46PM +0800, Baoyou Xie wrote:
+> We get 1 warning when building kernel with W=1:
+> drivers/crypto/sunxi-ss/sun4i-ss-hash.c:168:5: warning: no previous prototype for 'sun4i_hash' [-Wmissing-prototypes]
 > 
-> [1] https://marc.info/?l=linux-crypto-vger&m=147467656516085
+> In fact, this function is only used in the file in which it is
+> declared and don't need a declaration, but can be made static.
+> So this patch marks it 'static'.
 > 
-> Signed-off-by: Jan Stancek <jstancek@redhat.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: Marcelo Cerri <marcelo.cerri@canonical.com>
+> Signed-off-by: Baoyou Xie <baoyou.xie@linaro.org>
 
-Patch applied.  Thanks.
+This patch has already been applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
