@@ -1,58 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [BUG] crypto: atmel-aes - erro when compiling with VERBOSE_DEBUG
- enable
-Date: Sun, 2 Oct 2016 22:38:58 +0800
-Message-ID: <20161002143858.GE18268@gondor.apana.org.au>
-References: <20160922092629.GA5508@gondor.apana.org.au>
- <1474548357.12981.19.camel@inria.fr>
- <de4c3d75-eb4f-f29b-5bde-e2b5ee79c8d9@atmel.com>
+Subject: Re: [PATCH 0/3] Fix crypto/vmx/p8_ghash memory corruption
+Date: Sun, 2 Oct 2016 22:40:16 +0800
+Message-ID: <20161002144016.GF18268@gondor.apana.org.au>
+References: <1475080931-7926-1-git-send-email-marcelo.cerri@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: levent demir <levent.demir@inria.fr>, linux-crypto@vger.kernel.org
-To: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:37566 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750793AbcJBOjI (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Oct 2016 10:39:08 -0400
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
+        "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        George Wilson <gcwilson@us.ibm.com>
+To: Marcelo Cerri <marcelo.cerri@canonical.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <de4c3d75-eb4f-f29b-5bde-e2b5ee79c8d9@atmel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1475080931-7926-1-git-send-email-marcelo.cerri@canonical.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Sep 27, 2016 at 06:45:18PM +0200, Cyrille Pitchen wrote:
-> Hi Levent,
+On Wed, Sep 28, 2016 at 01:42:08PM -0300, Marcelo Cerri wrote:
+> This series fixes the memory corruption found by Jan Stancek in 4.8-rc7. The
+> problem however also affects previous versions of the driver.
 > 
-> there is a typo in the subject line: erroR.
-> Also it would be better to start the summary phrase of the subject line with a
-> verb:
-> 
-> crypto: atmel-aes: fix compiler error when VERBODE_DEBUG is defined
-> 
-> Le 22/09/2016 à 14:45, levent demir a écrit :
-> > Fix debug function call in atmel_aes_write
-> > 
-> > Signed-off-by: Levent DEMIR <levent.demir@inria.fr>
-> > ---
-> >  drivers/crypto/atmel-aes.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-> > index e3d40a8..2b0f926 100644
-> > --- a/drivers/crypto/atmel-aes.c
-> > +++ b/drivers/crypto/atmel-aes.c
-> > @@ -317,7 +317,7 @@ static inline void atmel_aes_write(struct
-> > atmel_aes_dev *dd,
-> >  		char tmp[16];
-> >  
-> >  		dev_vdbg(dd->dev, "write 0x%08x into %s\n", value,
-> > -			 atmel_aes_reg_name(offset, tmp));
-> > +			atmel_aes_reg_name(offset, tmp, sizeof(tmp)));
-> It looks like a space has been removed.
+> Marcelo Cerri (3):
+>   crypto: ghash-generic - move common definitions to a new header file
+>   crypto: vmx - Fix memory corruption caused by p8_ghash
+>   crypto: vmx - Ensure ghash-generic is enabled
 
-It's been completely mangled by the mailer and cannot be applied.
+Patch 1/2 applied to crypto.  I have changed patch 3 to use select
+instead of depend and have applied it to cryptodev.
+
+Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
