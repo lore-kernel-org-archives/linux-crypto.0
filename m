@@ -1,34 +1,58 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: gcm - Fix IV buffer size in crypto_gcm_setkey
-Date: Sun, 2 Oct 2016 22:38:13 +0800
-Message-ID: <20161002143813.GD18268@gondor.apana.org.au>
-References: <1474620452-7278-1-git-send-email-omosnacek@gmail.com>
+Subject: Re: [BUG] crypto: atmel-aes - erro when compiling with VERBOSE_DEBUG
+ enable
+Date: Sun, 2 Oct 2016 22:38:58 +0800
+Message-ID: <20161002143858.GE18268@gondor.apana.org.au>
+References: <20160922092629.GA5508@gondor.apana.org.au>
+ <1474548357.12981.19.camel@inria.fr>
+ <de4c3d75-eb4f-f29b-5bde-e2b5ee79c8d9@atmel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Ondrej Mosnacek <omosnacek@gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: levent demir <levent.demir@inria.fr>, linux-crypto@vger.kernel.org
+To: Cyrille Pitchen <cyrille.pitchen@atmel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36366 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:37566 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751639AbcJBOiQ (ORCPT
+        with ESMTP id S1750793AbcJBOjI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Oct 2016 10:38:16 -0400
+        Sun, 2 Oct 2016 10:39:08 -0400
 Content-Disposition: inline
-In-Reply-To: <1474620452-7278-1-git-send-email-omosnacek@gmail.com>
+In-Reply-To: <de4c3d75-eb4f-f29b-5bde-e2b5ee79c8d9@atmel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 23, 2016 at 10:47:32AM +0200, Ondrej Mosnacek wrote:
-> The cipher block size for GCM is 16 bytes, and thus the CTR transform
-> used in crypto_gcm_setkey() will also expect a 16-byte IV. However,
-> the code currently reserves only 8 bytes for the IV, causing
-> an out-of-bounds access in the CTR transform. This patch fixes
-> the issue by setting the size of the IV buffer to 16 bytes.
+On Tue, Sep 27, 2016 at 06:45:18PM +0200, Cyrille Pitchen wrote:
+> Hi Levent,
 > 
-> Fixes: 84c911523020 ("[CRYPTO] gcm: Add support for async ciphers")
-> Signed-off-by: Ondrej Mosnacek <omosnacek@gmail.com>
+> there is a typo in the subject line: erroR.
+> Also it would be better to start the summary phrase of the subject line with a
+> verb:
+> 
+> crypto: atmel-aes: fix compiler error when VERBODE_DEBUG is defined
+> 
+> Le 22/09/2016 à 14:45, levent demir a écrit :
+> > Fix debug function call in atmel_aes_write
+> > 
+> > Signed-off-by: Levent DEMIR <levent.demir@inria.fr>
+> > ---
+> >  drivers/crypto/atmel-aes.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+> > index e3d40a8..2b0f926 100644
+> > --- a/drivers/crypto/atmel-aes.c
+> > +++ b/drivers/crypto/atmel-aes.c
+> > @@ -317,7 +317,7 @@ static inline void atmel_aes_write(struct
+> > atmel_aes_dev *dd,
+> >  		char tmp[16];
+> >  
+> >  		dev_vdbg(dd->dev, "write 0x%08x into %s\n", value,
+> > -			 atmel_aes_reg_name(offset, tmp));
+> > +			atmel_aes_reg_name(offset, tmp, sizeof(tmp)));
+> It looks like a space has been removed.
 
-Patch applied.  Thanks.
+It's been completely mangled by the mailer and cannot be applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
