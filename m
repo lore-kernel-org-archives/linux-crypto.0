@@ -1,32 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: sha1-powerpc: little-endian support
-Date: Sun, 2 Oct 2016 22:37:58 +0800
-Message-ID: <20161002143758.GC18268@gondor.apana.org.au>
-References: <1474659116-4689-1-git-send-email-marcelo.cerri@canonical.com>
+Subject: Re: [PATCH v2] crypto: gcm - Fix IV buffer size in crypto_gcm_setkey
+Date: Sun, 2 Oct 2016 22:38:13 +0800
+Message-ID: <20161002143813.GD18268@gondor.apana.org.au>
+References: <1474620452-7278-1-git-send-email-omosnacek@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        George Wilson <gcwilson@us.ibm.com>,
-        Claudio Carvalho <cclaudio@br.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@br.ibm.com>,
-        joy.latten@canonical.com
-To: Marcelo Cerri <marcelo.cerri@canonical.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Ondrej Mosnacek <omosnacek@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:36366 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751639AbcJBOiQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 2 Oct 2016 10:38:16 -0400
 Content-Disposition: inline
-In-Reply-To: <1474659116-4689-1-git-send-email-marcelo.cerri@canonical.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1474620452-7278-1-git-send-email-omosnacek@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 23, 2016 at 04:31:56PM -0300, Marcelo Cerri wrote:
-> The driver does not handle endianness properly when loading the input
-> data.
+On Fri, Sep 23, 2016 at 10:47:32AM +0200, Ondrej Mosnacek wrote:
+> The cipher block size for GCM is 16 bytes, and thus the CTR transform
+> used in crypto_gcm_setkey() will also expect a 16-byte IV. However,
+> the code currently reserves only 8 bytes for the IV, causing
+> an out-of-bounds access in the CTR transform. This patch fixes
+> the issue by setting the size of the IV buffer to 16 bytes.
 > 
-> Signed-off-by: Marcelo Cerri <marcelo.cerri@canonical.com>
+> Fixes: 84c911523020 ("[CRYPTO] gcm: Add support for async ciphers")
+> Signed-off-by: Ondrej Mosnacek <omosnacek@gmail.com>
 
 Patch applied.  Thanks.
 -- 
