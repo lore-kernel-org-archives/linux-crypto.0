@@ -1,97 +1,39 @@
-From: <ccmembership@instituteofcredit.org>
-Subject: 20071 linux-crypto
-Date: Sun, 02 Oct 2016 08:16:42 -0000
-Message-ID: <147539620285.25550.11666673788131548839@plasa.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: testmgr - add guard to dst buffer for
+ ahash_export
+Date: Sun, 2 Oct 2016 22:37:11 +0800
+Message-ID: <20161002143711.GA18268@gondor.apana.org.au>
+References: <26da11d26bf0d34f9a5896ab9f9540db5be17012.1475072761.git.jstancek@redhat.com>
 Mime-Version: 1.0
-Content-Type: application/zip; name="EMAIL_8347552430_linux-crypto.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcelo.cerri@canonical.com
+To: Jan Stancek <jstancek@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out-mta1.plasa.com ([202.134.0.44]:35131 "HELO plasa.com"
-        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-        id S1750953AbcJBIQ4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Oct 2016 04:16:56 -0400
-Content-Disposition: attachment
+Received: from helcar.hengli.com.au ([209.40.204.226]:41461 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750793AbcJBOhS (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 2 Oct 2016 10:37:18 -0400
+Content-Disposition: inline
+In-Reply-To: <26da11d26bf0d34f9a5896ab9f9540db5be17012.1475072761.git.jstancek@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
+On Wed, Sep 28, 2016 at 04:38:37PM +0200, Jan Stancek wrote:
+> Add a guard to 'state' buffer and warn if its consistency after
+> call to crypto_ahash_export() changes, so that any write that
+> goes beyond advertised statesize (and thus causing potential
+> memory corruption [1]) is more visible.
+> 
+> [1] https://marc.info/?l=linux-crypto-vger&m=147467656516085
+> 
+> Signed-off-by: Jan Stancek <jstancek@redhat.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Marcelo Cerri <marcelo.cerri@canonical.com>
+
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
