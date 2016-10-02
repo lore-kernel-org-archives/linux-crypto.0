@@ -1,57 +1,72 @@
-From: Andy Polyakov <appro@openssl.org>
-Subject: Re: [PATCH] arm64: add support for SHA256 using NEON instructions
-Date: Fri, 30 Sep 2016 12:44:13 +0200
-Message-ID: <a11d5dcc-1681-7e62-c3ac-f2fd53c50f14@openssl.org>
-References: <1475189503-9175-1-git-send-email-ard.biesheuvel@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: catalin.marinas@arm.com, victor.chong@linaro.org, will.deacon@arm.com,
- daniel.thompson@linaro.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- herbert@gondor.apana.org.au
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1475189503-9175-1-git-send-email-ard.biesheuvel@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH] padata: add helper function for queue length
+Date: Sun,  2 Oct 2016 03:46:38 +0200
+Message-ID: <20161002014638.8049-1-Jason@zx2c4.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-> This is a port of the ARMv7 implementation in arch/arm/crypto. For a Cortex-A57
-> (r2p1), the performance numbers are listed below. In summary, 40% - 50% speedup
-> where it counts, i.e., block sizes over 256 bytes with few updates.
+Since padata has a maximum number of inflight jobs, currently 1000, it's
+very useful to know how many jobs are currently queued up. This adds a
+simple helper function to expose this information.
 
-Cool! Great! Just in case for reference. You compare generic, new NEON
-and hardware-assisted implementations. I assume that first one refers to
-C compiler-generated code. But there is another option, i.e. non-NEON
-assembly. Now to the "for reference" part. The reason for why NEON is
-not utilized in OpenSSL is because it's deemed that it doesn't provide
-"extraordinary" improvement over non-NEON assembly code, especially on
-less sophisticated processors such as Cortex-A53. Note that I'm not
-saying that NEON SHA256 subroutine is not faster, it is, only that it's
-not "extraordinarily" faster in most relevant cases(*). In other words
-it's reckoned that non-NEON assembly provides adequate *all-round*
-performance, taking into consideration that it does it without being
-dependent on optional NEON. Non-NEON assembly should also be interesting
-in kernel context, because there are situations when you can't call NEON
-procedure, be it suggested one or hardware-assisted, which itself relies
-on NEON. And of course another nice quality about SHA2 module in OpenSSL
-is that it emits both SHA256 and SHA512 codes ;-) On related note it
-should be noted that NEON-izing SHA512 on ARM64 makes lesser sense, it's
-bound to provide lesser improvement than SHA256 [if any at all in some
-cases]. This is because in SHA256 you engage 4 lanes of NEON registers,
-while in SHA512 case you have only 2.
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ include/linux/padata.h |  2 ++
+ kernel/padata.c        | 16 ++++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-(*) Well, this is also question of priorities. My rationale is that
-there is a lot of Cortex-A53 and A57 phones out there that don't have
-crypto-extensions, I refer to Qualcomm SoCs, where NEON gives less than
-10% improvement [over non-NEON assembly]. Yes, it gives more on X-Gene,
-but X-Gene is not wide-spread, and the rest (including upcoming X-Gene)
-have crypto-extensions, so alternative code path doesn't matter.
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index 113ee62..4840ae4 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -3,6 +3,7 @@
+  *
+  * Copyright (C) 2008, 2009 secunet Security Networks AG
+  * Copyright (C) 2008, 2009 Steffen Klassert <steffen.klassert@secunet.com>
++ * Copyright (C) 2016 Jason A. Donenfeld <Jason@zx2c4.com>
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -181,4 +182,5 @@ extern int padata_register_cpumask_notifier(struct padata_instance *pinst,
+ 					    struct notifier_block *nblock);
+ extern int padata_unregister_cpumask_notifier(struct padata_instance *pinst,
+ 					      struct notifier_block *nblock);
++extern int padata_queue_len(struct padata_instance *pinst);
+ #endif
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 9932788..17c1e08 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -5,6 +5,7 @@
+  *
+  * Copyright (C) 2008, 2009 secunet Security Networks AG
+  * Copyright (C) 2008, 2009 Steffen Klassert <steffen.klassert@secunet.com>
++ * Copyright (C) 2016 Jason A. Donenfeld <Jason@zx2c4.com>
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -1039,3 +1040,18 @@ void padata_free(struct padata_instance *pinst)
+ 	kobject_put(&pinst->kobj);
+ }
+ EXPORT_SYMBOL(padata_free);
++
++/**
++ * padata_queue_len - retreive the number of in progress jobs
++ *
++ * @padata_inst: padata instance from which to read the queue size
++ */
++int padata_queue_len(struct padata_instance *pinst)
++{
++	int len;
++	rcu_read_lock_bh();
++	len = atomic_read(&rcu_dereference_bh(pinst->pd)->refcnt);
++	rcu_read_unlock_bh();
++	return len;
++}
++EXPORT_SYMBOL(padata_queue_len);
+-- 
+2.10.0
