@@ -1,72 +1,87 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] padata: add helper function for queue length
-Date: Sun,  2 Oct 2016 03:46:38 +0200
-Message-ID: <20161002014638.8049-1-Jason@zx2c4.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: arm64/sha256 - add support for SHA256 using NEON
+ instructions
+Date: Sat, 1 Oct 2016 19:58:56 -0700
+Message-ID: <CAKv+Gu_M+FcuDSaGsJYjD96=Q1iXyFDD3KWy=4vUbeLWRgrHJw@mail.gmail.com>
+References: <1475189503-9175-1-git-send-email-ard.biesheuvel@linaro.org>
+ <1475189503-9175-2-git-send-email-ard.biesheuvel@linaro.org>
+ <CAKv+Gu8J9rHA2opKqHQr74GU6xxwMpaJak1mNpRVpOf=+BZ81w@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Daniel Thompson <daniel.thompson@linaro.org>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
+ Andy Polyakov <appro@openssl.org>, Victor Chong <victor.chong@linaro.org>
+To: "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <CAKv+Gu8J9rHA2opKqHQr74GU6xxwMpaJak1mNpRVpOf=+BZ81w@mail.gmail.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Since padata has a maximum number of inflight jobs, currently 1000, it's
-very useful to know how many jobs are currently queued up. This adds a
-simple helper function to expose this information.
+On 29 September 2016 at 16:37, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> On 29 September 2016 at 15:51, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>> This is a port to arm64 of the NEON implementation of SHA256 that lives
+>> under arch/arm/crypto.
+>>
+>> Due to the fact that the AArch64 assembler dialect deviates from the
+>> 32-bit ARM one in ways that makes sharing code problematic, and given
+>> that this version only uses the NEON version whereas the original
+>> implementation supports plain ALU assembler, NEON and Crypto Extensions,
+>> this code is built from a version sha256-armv4.pl that has been
+>> transliterated to the AArch64 NEON dialect.
+>>
+>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>> ---
+>>  arch/arm64/crypto/Kconfig               |   5 +
+>>  arch/arm64/crypto/Makefile              |  11 +
+>>  arch/arm64/crypto/sha256-armv4.pl       | 413 +++++++++
+>>  arch/arm64/crypto/sha256-core.S_shipped | 883 ++++++++++++++++++++
+>>  arch/arm64/crypto/sha256_neon_glue.c    | 103 +++
+>>  5 files changed, 1415 insertions(+)
+>>
+>> diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+>> index 2cf32e9887e1..d32371198474 100644
+>> --- a/arch/arm64/crypto/Kconfig
+>> +++ b/arch/arm64/crypto/Kconfig
+>> @@ -18,6 +18,11 @@ config CRYPTO_SHA2_ARM64_CE
+>>         depends on ARM64 && KERNEL_MODE_NEON
+>>         select CRYPTO_HASH
+>>
+>> +config CRYPTO_SHA2_ARM64_NEON
+>> +       tristate "SHA-224/SHA-256 digest algorithm (ARMv8 NEON)"
+>> +       depends on ARM64 && KERNEL_MODE_NEON
+>> +       select CRYPTO_HASH
+>> +
+>>  config CRYPTO_GHASH_ARM64_CE
+>>         tristate "GHASH (for GCM chaining mode) using ARMv8 Crypto Extensions"
+>>         depends on ARM64 && KERNEL_MODE_NEON
+>> diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+>> index abb79b3cfcfe..5156ebee0488 100644
+>> --- a/arch/arm64/crypto/Makefile
+>> +++ b/arch/arm64/crypto/Makefile
+>> @@ -29,6 +29,9 @@ aes-ce-blk-y := aes-glue-ce.o aes-ce.o
+>>  obj-$(CONFIG_CRYPTO_AES_ARM64_NEON_BLK) += aes-neon-blk.o
+>>  aes-neon-blk-y := aes-glue-neon.o aes-neon.o
+>>
+>> +obj-$(CONFIG_CRYPTO_SHA2_ARM64_NEON) := sha256-neon.o
+>
+> There is a typo here that I only spotted just now: this should be += not :=
+>
+> Herbert, if you're picking this up, could you please fix this at merge
+> time? Or do you need me to resend?
+>
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- include/linux/padata.h |  2 ++
- kernel/padata.c        | 16 ++++++++++++++++
- 2 files changed, 18 insertions(+)
-
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index 113ee62..4840ae4 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -3,6 +3,7 @@
-  *
-  * Copyright (C) 2008, 2009 secunet Security Networks AG
-  * Copyright (C) 2008, 2009 Steffen Klassert <steffen.klassert@secunet.com>
-+ * Copyright (C) 2016 Jason A. Donenfeld <Jason@zx2c4.com>
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms and conditions of the GNU General Public License,
-@@ -181,4 +182,5 @@ extern int padata_register_cpumask_notifier(struct padata_instance *pinst,
- 					    struct notifier_block *nblock);
- extern int padata_unregister_cpumask_notifier(struct padata_instance *pinst,
- 					      struct notifier_block *nblock);
-+extern int padata_queue_len(struct padata_instance *pinst);
- #endif
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 9932788..17c1e08 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -5,6 +5,7 @@
-  *
-  * Copyright (C) 2008, 2009 secunet Security Networks AG
-  * Copyright (C) 2008, 2009 Steffen Klassert <steffen.klassert@secunet.com>
-+ * Copyright (C) 2016 Jason A. Donenfeld <Jason@zx2c4.com>
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms and conditions of the GNU General Public License,
-@@ -1039,3 +1040,18 @@ void padata_free(struct padata_instance *pinst)
- 	kobject_put(&pinst->kobj);
- }
- EXPORT_SYMBOL(padata_free);
-+
-+/**
-+ * padata_queue_len - retreive the number of in progress jobs
-+ *
-+ * @padata_inst: padata instance from which to read the queue size
-+ */
-+int padata_queue_len(struct padata_instance *pinst)
-+{
-+	int len;
-+	rcu_read_lock_bh();
-+	len = atomic_read(&rcu_dereference_bh(pinst->pd)->refcnt);
-+	rcu_read_unlock_bh();
-+	return len;
-+}
-+EXPORT_SYMBOL(padata_queue_len);
--- 
-2.10.0
+Please disregard this patch for now. I will follow up with a more
+elaborate series for SHA256 on arm64
