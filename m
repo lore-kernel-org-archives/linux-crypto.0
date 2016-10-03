@@ -1,69 +1,69 @@
-From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: Re: [BUG] crypto: atmel-aes - erro when compiling with VERBOSE_DEBUG
- enable
-Date: Mon, 3 Oct 2016 12:20:32 +0200
-Message-ID: <4a6d15ff-fe3d-c781-8db1-6c11df19334f@atmel.com>
-References: <20160922092629.GA5508@gondor.apana.org.au>
- <1474548357.12981.19.camel@inria.fr>
- <de4c3d75-eb4f-f29b-5bde-e2b5ee79c8d9@atmel.com>
- <20161002143858.GE18268@gondor.apana.org.au>
+From: Marcelo Cerri <marcelo.cerri@canonical.com>
+Subject: Re: [PATCH 0/3] Fix crypto/vmx/p8_ghash memory corruption
+Date: Mon, 3 Oct 2016 09:08:35 -0300
+Message-ID: <20161003120835.GA10133@gallifrey>
+References: <1475080931-7926-1-git-send-email-marcelo.cerri@canonical.com>
+ <20160929065908.653ec5c2@kryten>
+ <20161002144047.GG18268@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 8bit
-Cc: levent demir <levent.demir@inria.fr>,
-        <linux-crypto@vger.kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="mP3DRpeJDSE+ciuQ"
+Cc: Anton Blanchard <anton@samba.org>, linux-crypto@vger.kernel.org,
+        "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+        linux-kernel@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
+        Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
+        George Wilson <gcwilson@us.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org,
+        "David S. Miller" <davem@davemloft.net>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from eusmtp01.atmel.com ([212.144.249.242]:55207 "EHLO
-        eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751581AbcJCKUh (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Oct 2016 06:20:37 -0400
-In-Reply-To: <20161002143858.GE18268@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20161002144047.GG18268@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi all,
 
-Le 02/10/2016 à 16:38, Herbert Xu a écrit :
-> On Tue, Sep 27, 2016 at 06:45:18PM +0200, Cyrille Pitchen wrote:
->> Hi Levent,
->>
->> there is a typo in the subject line: erroR.
->> Also it would be better to start the summary phrase of the subject line with a
->> verb:
->>
->> crypto: atmel-aes: fix compiler error when VERBODE_DEBUG is defined
->>
->> Le 22/09/2016 à 14:45, levent demir a écrit :
->>> Fix debug function call in atmel_aes_write
->>>
->>> Signed-off-by: Levent DEMIR <levent.demir@inria.fr>
->>> ---
->>>  drivers/crypto/atmel-aes.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
->>> index e3d40a8..2b0f926 100644
->>> --- a/drivers/crypto/atmel-aes.c
->>> +++ b/drivers/crypto/atmel-aes.c
->>> @@ -317,7 +317,7 @@ static inline void atmel_aes_write(struct
->>> atmel_aes_dev *dd,
->>>  		char tmp[16];
->>>  
->>>  		dev_vdbg(dd->dev, "write 0x%08x into %s\n", value,
->>> -			 atmel_aes_reg_name(offset, tmp));
->>> +			atmel_aes_reg_name(offset, tmp, sizeof(tmp)));
->> It looks like a space has been removed.
-> 
-> It's been completely mangled by the mailer and cannot be applied.
-> 
-I've sent a new version in this thread:
-https://lkml.org/lkml/2016/9/29/463
+--mP3DRpeJDSE+ciuQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I added a Reported-by tag for Levent but if you want to use a Signed-off-by
-tag instead, it's fine with me!
+Thank you.
 
-Best regards,
+--=20
+Regards,
+Marcelo
 
-Cyrille
+On Sun, Oct 02, 2016 at 10:40:47PM +0800, Herbert Xu wrote:
+> On Thu, Sep 29, 2016 at 06:59:08AM +1000, Anton Blanchard wrote:
+> > Hi Marcelo
+> >=20
+> > > This series fixes the memory corruption found by Jan Stancek in
+> > > 4.8-rc7. The problem however also affects previous versions of the
+> > > driver.
+> >=20
+> > If it affects previous versions, please add the lines in the sign off to
+> > get it into the stable kernels.
+>=20
+> I have added them to patches 1 and 2.  Thanks.
+> --=20
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+--mP3DRpeJDSE+ciuQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAABCAAGBQJX8kpDAAoJEM8aS8c01e1HzKIH/2KZ33BTs6CedA1TllgLIy0u
+go9pOUEObPuC7QRsYLePQhO+zT5qKc4Jp+XIj4JefWaSaMbhuPfCe8SqdCt37IzF
+p8tR295srt2C2Wj6g78emq3zmOtF7ILUTsbyXgsOcIemtyzcrOOJk5ZDJBRXwwqr
+kUGRIqKZb3BF6+lKC95xguEzNQRW+hOhmADQ5Wy46cjnsnEr0RqyJyJDE2c/c6OM
+G0j/zrplPYQfgfa6gbe4uTK243Wi4FZAd8pgsoWEo1Zbj3I7reUScb3SjBqGtuEi
+JjvB40AeY9faY38OEkN2njYuOB0fSC5RUxex/i5XHJBpzYHhl18fKa0yNgj5Qns=
+=h4R7
+-----END PGP SIGNATURE-----
+
+--mP3DRpeJDSE+ciuQ--
