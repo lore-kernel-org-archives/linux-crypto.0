@@ -1,77 +1,74 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: Moving from blkcipher to skcipher
-Date: Mon, 03 Oct 2016 21:22:44 +0200
-Message-ID: <1837285.G4LEF3q2Kz@tauon.atsec.com>
-References: <CA+cSK1134BGVm7FprZcrDxVoU7P33GkJP17itLGvTpc8ECB9zw@mail.gmail.com> <3528786.X6pky90e93@tauon.atsec.com> <CA+cSK116PYracoP=tDhNg_q5+S-JLo+6H3rRAmuORErwW1EM5w@mail.gmail.com>
+From: "Dey, Megha" <megha.dey@intel.com>
+Subject: RE: sha1_mb broken
+Date: Tue, 4 Oct 2016 00:25:07 +0000
+Message-ID: <C440BA31B54DCD4AAC682D2365C8FEE703CEF891@ORSMSX111.amr.corp.intel.com>
+References: <1939675.7gNnqUbNs6@positron.chronox.de>
+ <2200246.hBmZe7vJh4@positron.chronox.de>
+ <C440BA31B54DCD4AAC682D2365C8FEE703CEF203@ORSMSX111.amr.corp.intel.com>
+ <9643256.KgnRM79R5B@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org,
-        Michael Halcrow <mhalcrow@google.com>,
-        Eric Biggers <ebiggers@google.com>
-To: Alex Cope <alexcope@google.com>
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:48104 "EHLO mail.eperm.de"
+Received: from mga05.intel.com ([192.55.52.43]:21304 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753269AbcJCTYu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Oct 2016 15:24:50 -0400
-In-Reply-To: <CA+cSK116PYracoP=tDhNg_q5+S-JLo+6H3rRAmuORErwW1EM5w@mail.gmail.com>
+        id S1751636AbcJDAZN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 3 Oct 2016 20:25:13 -0400
+In-Reply-To: <9643256.KgnRM79R5B@positron.chronox.de>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 3. Oktober 2016, 10:58:03 CEST schrieb Alex Cope:
-
-Hi Alex,
-
-> I was unclear in my initial message. I'm implementing a block cipher
-> mode of operation. I'm hoping there is a another block cipher mode of
-> operation that already uses skcipher, so I can use it as a reference
-> and avoid re-inventing the wheel. In particular, it would be helpful
-> if there is some implementation of a block cipher mode of operation
-> that is directly above the underlying block cipher, like CTR or CBC,
-> rather than something like CTS or rfc3686 which wrap around another
-> block cipher mode of operation.
-
-See gcm.c with the implementation referenced with crypto_gcm_base_tmpl or 
-crypto_gcm_tmpl -- it uses the aead API which is conceptually similar to the 
-skcipher API. And again you see the same concept applied as in the example I 
-provided below. 
-> 
-> On Mon, Oct 3, 2016 at 10:36 AM, Stephan Mueller <smueller@chronox.de> 
-wrote:
-> > Am Montag, 3. Oktober 2016, 10:06:23 CEST schrieb Alex Cope:
-> > 
-> > Hi Alex,
-> > 
-> >> I'm currently working on implementing HEH encryption, and am in the
-> >> process of switching from the blkcipher interface to the skcipher
-> >> interface.  All the examples I have found that use skcipher are
-> >> wrapping another mode of operation I.E. cts in cts(cbc(aes)) rather
-> >> than being directly above the block cipher I.E. ctr in ctr(aes). Are
-> >> there any existing examples of the latter type that I could use as a
-> >> reference? If not, is there an estimate on when that work will be
-> >> available?
-> > 
-> > The issue is that a blkcipher is a synchronous version of the skcipher.
-> > So,
-> > you could easily move from blkcipher to skcipher and just rename the
-> > invoked API, provided you change the initialization to the following
-> > which triggers a synchronous operation:
-> > 
-> > tfm = crypto_alloc_skcipher(kccavs_test->name, 0, CRYPTO_ALG_ASYNC);
-> > 
-> > Note, you can only use ciphers marked as blkcipher or cipher in
-> > /proc/crypto with that.
-> > 
-> > If you want to use all symmetric cipher implementation, you must use the
-> > async skcipher operation which is identical to the previous ablkcipher
-> > API. An example is given in the crypto API documentation, such as http://
-> > www.chronox.de/crypto-API/Code.html#id-1.8.2
-> > 
-> > Ciao
-> > Stephan
 
 
+-----Original Message-----
+From: Stephan Mueller [mailto:smueller@chronox.de] 
+Sent: Wednesday, September 28, 2016 10:31 PM
+To: Dey, Megha <megha.dey@intel.com>
+Cc: linux-crypto@vger.kernel.org; tim.c.chen@linux.intel.com
+Subject: Re: sha1_mb broken
 
+Am Mittwoch, 28. September 2016, 22:52:46 CEST schrieb Dey, Megha:
+
+Hi Megha,
+
+see a self contained example code attached.
+ 
+> Hi Stephan,
+>
+> Your test code initialized the completion structure incorrectly, that led to the missing completion from being received. The init_completion call should be made before the crypto_ahash_digest call. The following change to your test code fixes things. ( I have also fixed what I believe is a typo aead->ahash)
+
+> @@ -74,6 +74,8 @@ static unsigned int kccavs_ahash_op(struct kccavs_ahash_def *ahash)
+> {
+>        int rc = 0;
+>
+> +       init_completion(&ahash->result.completion);
+> +
+>        rc = crypto_ahash_digest(ahash->req);
+>
+>        switch (rc) {
+>@@ -84,7 +86,7 @@ static unsigned int kccavs_ahash_op(struct kccavs_ahash_def *ahash)
+>                rc = wait_for_completion_interruptible(&ahash->result.completion);
+>                if (!rc && !ahash->result.err) {
+> #ifdef OLDASYNC
+> -                       INIT_COMPLETION(aead->result.completion);
+> +                       INIT_COMPLETION(&ahash->result.completion);
+> #else
+>                       reinit_completion(&ahash->result.completion);
+> #endif
+> @@ -95,7 +97,6 @@ static unsigned int kccavs_ahash_op(struct kccavs_ahash_def *ahash)
+>                    " %d\n",rc, ahash->result.err);
+>                break;
+>       }
+> -       init_completion(&ahash->result.completion);
+>
+>     return rc;
+>}
+> This initialization of the completion structure happens correctly in the tcrypt test module used by the kernel, hence I did not come across this issue earlier.
+> Thanks,
+> Megha
 Ciao
 Stephan
