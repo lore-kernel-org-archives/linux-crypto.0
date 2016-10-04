@@ -1,37 +1,56 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: sha1_mb broken
-Date: Tue, 04 Oct 2016 18:27:16 +0200
-Message-ID: <16231020.QQG8JFOdRi@tauon.atsec.com>
-References: <1939675.7gNnqUbNs6@positron.chronox.de> <2176107.gSz0A05ekE@tauon.atsec.com> <1475597322.3916.283.camel@linux.intel.com>
+From: Alec Ari <alec@onelabs.com>
+Subject: [PATCH] Fix Kconfig dependencies for FIPS
+Date: Tue, 04 Oct 2016 19:34:30 -0300
+Message-ID: <07ccbb0be0cfb824a5ee1c03eeca8f36@onelabs.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "Dey, Megha" <megha.dey@intel.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Tim Chen <tim.c.chen@linux.intel.com>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:48120 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754191AbcJDQ1V (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Oct 2016 12:27:21 -0400
-In-Reply-To: <1475597322.3916.283.camel@linux.intel.com>
+Received: from bongo.birch.relay.mailchannels.net ([23.83.209.21]:55223 "EHLO
+        bongo.birch.relay.mailchannels.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751201AbcJDWvj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Oct 2016 18:51:39 -0400
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+        by relay.mailchannels.net (Postfix) with ESMTP id 8160D128411
+        for <linux-crypto@vger.kernel.org>; Tue,  4 Oct 2016 22:34:32 +0000 (UTC)
+Received: from cp11.deluxehosting.com (ip-10-107-69-155.us-west-2.compute.internal [10.107.69.155])
+        by relay.mailchannels.net (Postfix) with ESMTPA id CFFBB126D27
+        for <linux-crypto@vger.kernel.org>; Tue,  4 Oct 2016 22:34:31 +0000 (UTC)
+Received: from [::1] (port=36109 helo=onelabs.com)
+        by cp11.deluxehosting.com with esmtpa (Exim 4.87)
+        (envelope-from <alec@onelabs.com>)
+        id 1brYIA-0001tM-P3
+        for linux-crypto@vger.kernel.org; Tue, 04 Oct 2016 18:34:30 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 4. Oktober 2016, 09:08:42 CEST schrieb Tim Chen:
+Currently FIPS depends on MODULE_SIG, even if MODULES is disabled.
+This change allows the enabling of FIPS without support for modules.
 
-Hi Tim,
+If module loading support is enabled, only then does
+FIPS require MODULE_SIG.
 
-> There is a spin lock protecting the completion's wait_queue on the processes
-> waiting for the completion of the job, and the queue head.  My suspicion is
-> if these structures are not initialized properly, we fail to look up the
-> waiting process in the queue properly to call it.  For the other tested
-> cases, they may not be a true ahash operation in the sense of passing
-> request through the crypto daemon, and have to context switch to let crypto
-> daemon complete the job.  The computation proceeds
-> and returns in the same call chain.
+Signed-off-by: Alec Ari <neotheuser@gmail.com>
+---
+  crypto/Kconfig | 2 +-
+  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks a lot for the clarification.
-
-Ciao
-Stephan
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 84d7148..fd28805 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -24,7 +24,7 @@ comment "Crypto core or helper"
+  config CRYPTO_FIPS
+  	bool "FIPS 200 compliance"
+  	depends on (CRYPTO_ANSI_CPRNG || CRYPTO_DRBG) && 
+!CRYPTO_MANAGER_DISABLE_TESTS
+-	depends on MODULE_SIG
++	depends on (MODULE_SIG || !MODULES)
+  	help
+  	  This options enables the fips boot option which is
+  	  required if you want to system to operate in a FIPS 200
+-- 
+2.7.3
