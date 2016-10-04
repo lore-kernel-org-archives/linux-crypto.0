@@ -1,40 +1,138 @@
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH] crypto: sha1-powerpc: little-endian support
-Date: Tue, 04 Oct 2016 17:23:16 +1100
-Message-ID: <87pong4oq3.fsf@concordia.ellerman.id.au>
-References: <1474659116-4689-1-git-send-email-marcelo.cerri@canonical.com> <20160928131551.GA31082@gallifrey> <20160928132015.GA21312@gondor.apana.org.au> <20160928132718.GB31082@gallifrey>
+From: Marcus Folkesson <marcus.folkesson-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] crypto: caam: add support for iMX6UL
+Date: Tue, 4 Oct 2016 09:32:59 -0400
+Message-ID: <20161004133259.GA30071@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        George Wilson <gcwilson@us.ibm.com>,
-        Claudio Carvalho <cclaudio@br.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@br.ibm.com>,
-        joy.latten@canonical.com, "David S. Miller" <davem@davemloft.net>
-To: Marcelo Cerri <marcelo.cerri@canonical.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160928132718.GB31082@gallifrey>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+        robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, horia.geanta-3arQi8VN3Tc@public.gmane.org,
+        tudor-dan.ambarus-3arQi8VN3Tc@public.gmane.org, marcus.folkesson-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+        alexandru.porosanu-3arQi8VN3Tc@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Marcelo Cerri <marcelo.cerri@canonical.com> writes:
+i.MX6UL does only require three clocks to enable CAAM module.
 
-> [ Unknown signature status ]
-> On Wed, Sep 28, 2016 at 09:20:15PM +0800, Herbert Xu wrote:
->> On Wed, Sep 28, 2016 at 10:15:51AM -0300, Marcelo Cerri wrote:
->> > Hi Herbert,
->> > 
->> > Any thoughts on this one?
->> 
->> Can this patch wait until the next merge window? On the broken
->> platforms it should just fail the self-test, right?
->
-> Yes. It fails on any LE platform (including Ubuntu and RHEL 7.1).
+Signed-off-by: Marcus Folkesson <marcus.folkesson-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ .../devicetree/bindings/crypto/fsl-sec4.txt        | 20 +++++++++++++
+ drivers/crypto/caam/ctrl.c                         | 35 ++++++++++++----------
+ 2 files changed, 40 insertions(+), 15 deletions(-)
 
-How are you testing this? I thought I was running the crypto tests but
-I've never seen this fail.
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+index adeca34..6617e24 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
++++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+@@ -123,6 +123,9 @@ PROPERTIES
+ 
+ 
+ EXAMPLE
++
++i.MX6Q/DL/SX requires four clocks
++
+ 	crypto@300000 {
+ 		compatible = "fsl,sec-v4.0";
+ 		fsl,sec-era = <2>;
+@@ -139,6 +142,23 @@ EXAMPLE
+ 		clock-names = "mem", "aclk", "ipg", "emi_slow";
+ 	};
+ 
++
++i.MX6UL does only require three clocks
++
++	crypto: caam@2140000 {
++		compatible = "fsl,sec-v4.0";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		reg = <0x2140000 0x3c000>;
++		ranges = <0 0x2140000 0x3c000>;
++		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
++
++		clocks = <&clks IMX6UL_CLK_CAAM_MEM>,
++			 <&clks IMX6UL_CLK_CAAM_ACLK>,
++			 <&clks IMX6UL_CLK_CAAM_IPG>;
++		clock-names = "mem", "aclk", "ipg";
++	};
++
+ =====================================================================
+ Job Ring (JR) Node
+ 
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 0ec112e..5abaf37 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -329,8 +329,8 @@ static int caam_remove(struct platform_device *pdev)
+ 	clk_disable_unprepare(ctrlpriv->caam_ipg);
+ 	clk_disable_unprepare(ctrlpriv->caam_mem);
+ 	clk_disable_unprepare(ctrlpriv->caam_aclk);
+-	clk_disable_unprepare(ctrlpriv->caam_emi_slow);
+-
++	if (!of_machine_is_compatible("fsl,imx6ul"))
++		clk_disable_unprepare(ctrlpriv->caam_emi_slow);
+ 	return 0;
+ }
+ 
+@@ -481,14 +481,16 @@ static int caam_probe(struct platform_device *pdev)
+ 	}
+ 	ctrlpriv->caam_aclk = clk;
+ 
+-	clk = caam_drv_identify_clk(&pdev->dev, "emi_slow");
+-	if (IS_ERR(clk)) {
+-		ret = PTR_ERR(clk);
+-		dev_err(&pdev->dev,
+-			"can't identify CAAM emi_slow clk: %d\n", ret);
+-		return ret;
++	if (!of_machine_is_compatible("fsl,imx6ul")) {
++		clk = caam_drv_identify_clk(&pdev->dev, "emi_slow");
++		if (IS_ERR(clk)) {
++			ret = PTR_ERR(clk);
++			dev_err(&pdev->dev,
++				"can't identify CAAM emi_slow clk: %d\n", ret);
++			return ret;
++		}
++		ctrlpriv->caam_emi_slow = clk;
+ 	}
+-	ctrlpriv->caam_emi_slow = clk;
+ 
+ 	ret = clk_prepare_enable(ctrlpriv->caam_ipg);
+ 	if (ret < 0) {
+@@ -509,11 +511,13 @@ static int caam_probe(struct platform_device *pdev)
+ 		goto disable_caam_mem;
+ 	}
+ 
+-	ret = clk_prepare_enable(ctrlpriv->caam_emi_slow);
+-	if (ret < 0) {
+-		dev_err(&pdev->dev, "can't enable CAAM emi slow clock: %d\n",
+-			ret);
+-		goto disable_caam_aclk;
++	if (!of_machine_is_compatible("fsl,imx6ul")) {
++		ret = clk_prepare_enable(ctrlpriv->caam_emi_slow);
++		if (ret < 0) {
++			dev_err(&pdev->dev, "can't enable CAAM emi slow clock: %d\n",
++				ret);
++			goto disable_caam_aclk;
++		}
+ 	}
+ 
+ 	/* Get configuration properties from device tree */
+@@ -829,7 +833,8 @@ caam_remove:
+ iounmap_ctrl:
+ 	iounmap(ctrl);
+ disable_caam_emi_slow:
+-	clk_disable_unprepare(ctrlpriv->caam_emi_slow);
++	if (!of_machine_is_compatible("fsl,imx6ul"))
++		clk_disable_unprepare(ctrlpriv->caam_emi_slow);
+ disable_caam_aclk:
+ 	clk_disable_unprepare(ctrlpriv->caam_aclk);
+ disable_caam_mem:
+-- 
+2.8.0
 
-cheers
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
