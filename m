@@ -1,60 +1,42 @@
-From: Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH v4 0/2] Improve DMA chaining for ahash requests
-Date: Wed,  5 Oct 2016 09:56:31 +0200
-Message-ID: <20161005075633.12711-1-romain.perier@free-electrons.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+From: Matthijs van Duin <matthijsvanduin@gmail.com>
+Subject: Re: [PATCH v3 0/8] Add support for SafeXcel IP-76 to OMAP RNG
+Date: Wed, 5 Oct 2016 22:37:23 +0200
+Message-ID: <CAALWOA-YpczKPVOtMErSj3YBW5yYTVjG+xN+T2GpsED7UDhTYQ@mail.gmail.com>
+References: <20160916100856.31727-1-romain.perier@free-electrons.com>
+ <57DBEB1A.4050602@free-electrons.com> <57E8F1F1.6040906@free-electrons.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: dsaxena@plexity.net, mpm@selenic.com,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
         Gregory Clement <gregory.clement@free-electrons.com>,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
         Nadav Haklai <nadavh@marvell.com>,
-        Ofer Heifetz <oferh@marvell.com>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-To: Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>
+        Omri Itach <omrii@marvell.com>,
+        Shadi Ammouri <shadi@marvell.com>,
+        Yahuda Yitschak <yehuday@marvell.com>,
+        Hanna Hawa <hannah@marvell.com>,
+        Neta Zur Hershkovits <neta@marvell.com>,
+        Igal Liberman <igall@marvell.com>,
+        Marcin Wojtas <mw@semihalf.com>, linux-crypto@vger.kernel.org,
+        "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>
+To: Romain Perier <romain.perier@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:44766 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751980AbcJEH4h (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:32990 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753455AbcJEUhp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Oct 2016 03:56:37 -0400
+        Wed, 5 Oct 2016 16:37:45 -0400
+In-Reply-To: <57E8F1F1.6040906@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This series contain performance improvement regarding ahash requests.
-So far, ahash requests were systematically not chained at the DMA level.
-However, in some case, like this is the case by using IPSec, some ahash
-requests can be processed directly by the engine, and don't have
-intermediaire partial update states.
+>>> The driver omap-rng has a lot of similarity with the IP block SafeXcel
+>>> IP-76. A lot of registers are the same and the way that the driver works
+>>> is very closed the description of the TRNG EIP76 in its datasheet.
 
-This series firstly re-work the way outer IVs are copied from the SRAM
-into the dma pool. To do so, we introduce a common dma pool for all type
-of requests that contains outer results (like IV or digest). Then, for
-ahash requests that can be processed directly by the engine, outer
-results are copied from the SRAM into the common dma pool. These requests
-are then allowed to be chained at the DMA level.
+Specifically the omap rng, at least the version I've examined, is a
+SafeXcel EIP-75a core with a TI wrapper according to my notes. I don't
+remember anymore where I obtained the "a", but the peripheral does
+identify itself as EIP-75 v2.0.0 in the register at offset 0x7c.
 
-
-Benchmarking results with iperf throught IPSec
-==============================================
-		ESP			AH
-
-Before		343 Mbits/s		492 Mbits/s
-After		422 Mbits/s		577 Mbits/s
-Improvement	+23%			+17%
-
-Romain Perier (2):
-  crypto: marvell - Use an unique pool to copy results of requests
-  crypto: marvell - Don't break chain for computable last ahash requests
-
- drivers/crypto/marvell/cesa.c   |  4 ---
- drivers/crypto/marvell/cesa.h   |  5 ++--
- drivers/crypto/marvell/cipher.c |  8 +++--
- drivers/crypto/marvell/hash.c   | 65 +++++++++++++++++++++++++++++++----------
- drivers/crypto/marvell/tdma.c   | 28 +++++++++---------
- 5 files changed, 70 insertions(+), 40 deletions(-)
-
--- 
-2.9.3
+Matthijs
