@@ -1,99 +1,47 @@
-From: Eric Biggers <ebiggers@google.com>
-Subject: [PATCH] crypto: api - Remove no-op exit_ops code
-Date: Fri,  7 Oct 2016 14:13:35 -0700
-Message-ID: <1475874815-136813-2-git-send-email-ebiggers@google.com>
-Cc: linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+From: contact@shofuan.co.jp
+Subject: Re: PEACE BE WITH YOU,
+Date: Thu, 06 Oct 2016 06:37:01 +0200
+Message-ID: <201610060437.u963h2Ms029290@shofuan.co.jp>
+Reply-To: dr.kpyj1958@gmail.com
+Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+To: Recipients <contact@shofuan.co.jp>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f179.google.com ([209.85.192.179]:34656 "EHLO
-        mail-pf0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932452AbcJGVOq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Oct 2016 17:14:46 -0400
-Received: by mail-pf0-f179.google.com with SMTP id e6so28600830pfk.1
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Oct 2016 14:14:46 -0700 (PDT)
+Received: from shofuan.co.jp ([153.122.135.94]:46071 "EHLO shofuan.co.jp"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752532AbcJICEz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 8 Oct 2016 22:04:55 -0400
+Content-Description: Mail message body
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-crypto_exit_cipher_ops() and crypto_exit_compress_ops() are no-ops and
-have been for a long time, so remove them.
+Subject: Can I Trust You In This5 Days Project ?
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Email (     dr.kpyj1958@gmail.com   )
+
+Dear Friend
+
+My name is  ATTORNEY KONO PETER , I really do not mean to waste your time. Considering the fact that this is a £36,000,000.00 British Pounds.deal shear rate 50/50 % and it's bank to bank wire trasaction within Five workind days.
+ 
+I carefully contact you due to many Internet frauds nowadays.but i put my faith in God because all things in life is by risk but don't let me down now or after, This is Mr.Plaviashakunthala Lobo and his family was involved in plan crash 22nd of May 2010 in List of passengers on Air India Express flight that crash  32.Plaviashakunthala Lobo 33. Venishanikola Lobo
+34. Vishalfloid Lobo (child) and all family died without any inheritance or next of kin so i want you to work together with me been an attorney so this is Mr.Plaviashakunthala Lobo account details.
+ 
+Bank name:       Bank of Africa
+Bank Address:    Cotonou Benin Republic
+Account name:    Plavia shakunthala Lobo 
+Account Number:  1103-8022-1351
+Account Balance: £36,000,000.00 British Pounds (GBP)
+Date of deposit: 19th December, 2009
+Account officer : Bashirudeen  Hussam
+
+I was with Mr.Plaviashakunthala Lobo as a legal witness when this money was deposited as fixed deposit in 2009. Since his demise, I have visited this bank three times. Contact the bank and ask for the confirmation of his involvement in the plane crash.check the website:  http://www.thehindu.com/news/national/list-of-passengers-on-air-india-express-flight/article435569.ece
+ 
+Thanks
+ATTORNEY  KONO PETER  
+------------------------------------------
+Disclaimer: This message transmitted with it are confidential and privileged. If you have received it in error, please notify the sender by return e-mail and delete this message from your system. If you are not the intended recipient you are hereby notified that any dissemination, copy or disclosure of this e-mail is strictly prohibited.
+
 ---
- crypto/api.c      | 20 ++------------------
- crypto/cipher.c   |  4 ----
- crypto/compress.c |  4 ----
- crypto/internal.h |  3 ---
- 4 files changed, 2 insertions(+), 29 deletions(-)
-
-diff --git a/crypto/api.c b/crypto/api.c
-index bbc147c..a88729f 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -310,24 +310,8 @@ static void crypto_exit_ops(struct crypto_tfm *tfm)
- {
- 	const struct crypto_type *type = tfm->__crt_alg->cra_type;
- 
--	if (type) {
--		if (tfm->exit)
--			tfm->exit(tfm);
--		return;
--	}
--
--	switch (crypto_tfm_alg_type(tfm)) {
--	case CRYPTO_ALG_TYPE_CIPHER:
--		crypto_exit_cipher_ops(tfm);
--		break;
--
--	case CRYPTO_ALG_TYPE_COMPRESS:
--		crypto_exit_compress_ops(tfm);
--		break;
--
--	default:
--		BUG();
--	}
-+	if (type && tfm->exit)
-+		tfm->exit(tfm);
- }
- 
- static unsigned int crypto_ctxsize(struct crypto_alg *alg, u32 type, u32 mask)
-diff --git a/crypto/cipher.c b/crypto/cipher.c
-index 39541e0..94fa355 100644
---- a/crypto/cipher.c
-+++ b/crypto/cipher.c
-@@ -116,7 +116,3 @@ int crypto_init_cipher_ops(struct crypto_tfm *tfm)
- 
- 	return 0;
- }
--
--void crypto_exit_cipher_ops(struct crypto_tfm *tfm)
--{
--}
-diff --git a/crypto/compress.c b/crypto/compress.c
-index c33f076..f2d5229 100644
---- a/crypto/compress.c
-+++ b/crypto/compress.c
-@@ -42,7 +42,3 @@ int crypto_init_compress_ops(struct crypto_tfm *tfm)
- 
- 	return 0;
- }
--
--void crypto_exit_compress_ops(struct crypto_tfm *tfm)
--{
--}
-diff --git a/crypto/internal.h b/crypto/internal.h
-index 7eefcdb..f073204 100644
---- a/crypto/internal.h
-+++ b/crypto/internal.h
-@@ -76,9 +76,6 @@ struct crypto_alg *crypto_alg_mod_lookup(const char *name, u32 type, u32 mask);
- int crypto_init_cipher_ops(struct crypto_tfm *tfm);
- int crypto_init_compress_ops(struct crypto_tfm *tfm);
- 
--void crypto_exit_cipher_ops(struct crypto_tfm *tfm);
--void crypto_exit_compress_ops(struct crypto_tfm *tfm);
--
- struct crypto_larval *crypto_larval_alloc(const char *name, u32 type, u32 mask);
- void crypto_larval_kill(struct crypto_alg *alg);
- struct crypto_alg *crypto_larval_lookup(const char *name, u32 type, u32 mask);
--- 
-2.8.0.rc3.226.g39d4020
+This email has been checked for viruses by Avast antivirus software.
+https://www.avast.com/antivirus
