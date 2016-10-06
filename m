@@ -1,42 +1,33 @@
-From: Matthijs van Duin <matthijsvanduin@gmail.com>
-Subject: Re: [PATCH v3 0/8] Add support for SafeXcel IP-76 to OMAP RNG
-Date: Wed, 5 Oct 2016 22:37:23 +0200
-Message-ID: <CAALWOA-YpczKPVOtMErSj3YBW5yYTVjG+xN+T2GpsED7UDhTYQ@mail.gmail.com>
-References: <20160916100856.31727-1-romain.perier@free-electrons.com>
- <57DBEB1A.4050602@free-electrons.com> <57E8F1F1.6040906@free-electrons.com>
+From: Horia Geanta Neag <horia.geanta@nxp.com>
+Subject: Re: [PATCH] crypto: caam: add support for iMX6UL
+Date: Thu, 6 Oct 2016 07:12:42 +0000
+Message-ID: <DB4PR04MB0847B2A04A14F1DD08070D1E98C70@DB4PR04MB0847.eurprd04.prod.outlook.com>
+References: <20161004133259.GA30071@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: dsaxena@plexity.net, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gregory Clement <gregory.clement@free-electrons.com>,
-        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-        Nadav Haklai <nadavh@marvell.com>,
-        Omri Itach <omrii@marvell.com>,
-        Shadi Ammouri <shadi@marvell.com>,
-        Yahuda Yitschak <yehuday@marvell.com>,
-        Hanna Hawa <hannah@marvell.com>,
-        Neta Zur Hershkovits <neta@marvell.com>,
-        Igal Liberman <igall@marvell.com>,
-        Marcin Wojtas <mw@semihalf.com>, linux-crypto@vger.kernel.org,
-        "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>
-To: Romain Perier <romain.perier@free-electrons.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:32990 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753455AbcJEUhp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Oct 2016 16:37:45 -0400
-In-Reply-To: <57E8F1F1.6040906@free-electrons.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Marcus Folkesson <marcus.folkesson@gmail.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "mark.rutland@arm.com" <mark.rutland@arm.com>,
+        Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>,
+        Alexandru Porosanu <alexandru.porosanu@nxp.com>,
+        "arnd@arndb.de" <arnd@arndb.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
->>> The driver omap-rng has a lot of similarity with the IP block SafeXcel
->>> IP-76. A lot of registers are the same and the way that the driver works
->>> is very closed the description of the TRNG EIP76 in its datasheet.
-
-Specifically the omap rng, at least the version I've examined, is a
-SafeXcel EIP-75a core with a TI wrapper according to my notes. I don't
-remember anymore where I obtained the "a", but the peripheral does
-identify itself as EIP-75 v2.0.0 in the register at offset 0x7c.
-
-Matthijs
+On 10/4/2016 10:33 AM, Marcus Folkesson wrote:=0A=
+> i.MX6UL does only require three clocks to enable CAAM module.=0A=
+> =0A=
+> Signed-off-by: Marcus Folkesson <marcus.folkesson@gmail.com>=0A=
+Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
+=0A=
