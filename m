@@ -1,60 +1,41 @@
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH] crypto: crypto4xx - Fix size used in dma_free_coherent()
-Date: Fri,  7 Oct 2016 22:36:20 +0200
-Message-ID: <1475872580-14643-1-git-send-email-christophe.jaillet@wanadoo.fr>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+From: Eric Biggers <ebiggers@google.com>
+Subject: [PATCH] crypto: skcipher - Remove unused crypto_lookup_skcipher() declaration
+Date: Fri,  7 Oct 2016 14:13:34 -0700
+Message-ID: <1475874815-136813-1-git-send-email-ebiggers@google.com>
+Cc: linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>
 To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f172.google.com ([209.85.192.172]:34622 "EHLO
+        mail-pf0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933081AbcJGVOf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Oct 2016 17:14:35 -0400
+Received: by mail-pf0-f172.google.com with SMTP id e6so28599158pfk.1
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Oct 2016 14:14:34 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The size used in 'dma_free_coherent()' looks un-initialized here.
-ctx->sa_len is set a few lines below and is apparently not set by the
-caller.
-So use 'size' as in the corresponding 'dma_alloc_coherent()' a few lines
-above.
+The definition of crypto_lookup_skcipher() was already removed in
+commit 3a01d0ee2b99 ("crypto: skcipher - Remove top-level givcipher
+interface").  So the declaration should be removed too.
 
-This has been spotted with coccinelle, using the following script:
-////////////////////
-@r@
-expression x0, x1, y0, y1, z0, z1, t0, t1, ret;
-@@
-
-*   ret = dma_alloc_coherent(x0, y0, z0, t0);
-    ...
-*   dma_free_coherent(x1, y1, ret, t1);
-
-
-@script:python@
-y0 << r.y0;
-y1 << r.y1;
-
-@@
-if y1.find(y0) == -1:
- print "WARNING: sizes look different:  '%s'   vs   '%s'" % (y0, y1)
-////////////////////
-
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/amcc/crypto4xx_core.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ include/crypto/internal/skcipher.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index dae1e39139e9..d10b4ae5e0da 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -135,8 +135,7 @@ int crypto4xx_alloc_sa(struct crypto4xx_ctx *ctx, u32 size)
- 	ctx->sa_out = dma_alloc_coherent(ctx->dev->core_dev->device, size * 4,
- 					 &ctx->sa_out_dma_addr, GFP_ATOMIC);
- 	if (ctx->sa_out == NULL) {
--		dma_free_coherent(ctx->dev->core_dev->device,
--				  ctx->sa_len * 4,
-+		dma_free_coherent(ctx->dev->core_dev->device, size * 4,
- 				  ctx->sa_in, ctx->sa_in_dma_addr);
- 		return -ENOMEM;
- 	}
+diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+index a21a95e..95d2a18 100644
+--- a/include/crypto/internal/skcipher.h
++++ b/include/crypto/internal/skcipher.h
+@@ -74,8 +74,6 @@ static inline int crypto_grab_skcipher2(struct crypto_skcipher_spawn *spawn,
+ 	return crypto_grab_skcipher(spawn, name, type, mask);
+ }
+ 
+-struct crypto_alg *crypto_lookup_skcipher(const char *name, u32 type, u32 mask);
+-
+ static inline void crypto_drop_skcipher(struct crypto_skcipher_spawn *spawn)
+ {
+ 	crypto_drop_spawn(&spawn->base);
 -- 
-2.7.4
-
+2.8.0.rc3.226.g39d4020
