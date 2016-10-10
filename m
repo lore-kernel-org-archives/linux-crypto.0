@@ -1,65 +1,95 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 0/6] crypto: arm64 - big endian fixes
-Date: Mon, 10 Oct 2016 12:26:00 +0100
-Message-ID: <CAKv+Gu9Nj5ccpRpgqg9Ohif4=k5+dAVuP8tKtNEj9_z7BQ_jjQ@mail.gmail.com>
-References: <1476034945-9186-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH] crypto: ccp - change bitfield type to unsigned ints
+Date: Mon, 10 Oct 2016 10:34:24 -0500
+Message-ID: <20161010153424.28762.94016.stgit@taos>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f48.google.com ([209.85.214.48]:37403 "EHLO
-        mail-it0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751387AbcJJL0B (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Oct 2016 07:26:01 -0400
-Received: by mail-it0-f48.google.com with SMTP id z65so67303932itc.0
-        for <linux-crypto@vger.kernel.org>; Mon, 10 Oct 2016 04:26:01 -0700 (PDT)
-In-Reply-To: <1476034945-9186-1-git-send-email-ard.biesheuvel@linaro.org>
+Received: from mail-by2nam01on0051.outbound.protection.outlook.com ([104.47.34.51]:1728
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752920AbcJJQJX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Oct 2016 12:09:23 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 9 October 2016 at 18:42, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> As it turns out, none of the accelerated crypto routines under arch/arm64/crypto
-> currently work, or have ever worked correctly when built for big endian. So this
-> series fixes all of them.
->
-> Each of these patches carries a fixes tag, and could be backported to stable.
-> However, for patches #1 and #5, the fixes tag denotes the oldest commit that the
-> fix is compatible with, not the patch that introduced the algorithm. This is due
-> to the fact that the key schedules are incompatible between generic AES and the
-> arm64 Crypto Extensions implementation (but only when building for big endian)
-> This is not a problem in practice, but it does mean that the AES-CCM and AES in
-> EBC/CBC/CTR/XTS mode implementations before v3.19 require a different fix, i.e.,
-> one that is compatible with the generic AES key schedule generation code (which
-> it currently no longer uses)
->
-> In any case, please apply with cc to stable.
->
+Bit fields are not sensitive to endianness, so use
+a transparent standard data type
 
-Herbert,
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
+---
+ drivers/crypto/ccp/ccp-dev.h |   42 +++++++++++++++++++++---------------------
+ 1 file changed, 21 insertions(+), 21 deletions(-)
 
-I have an additional fix to add to this series, and a couple for
-32-bit ARM as well. They escaped my attention due to this code (in
-algboss.c:250)
-
-/* This piece of crap needs to disappear into per-type test hooks. */
-if (!((type ^ CRYPTO_ALG_TYPE_BLKCIPHER) &
-     CRYPTO_ALG_TYPE_BLKCIPHER_MASK) && !(type & CRYPTO_ALG_GENIV) &&
-   ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-    CRYPTO_ALG_TYPE_BLKCIPHER ? alg->cra_blkcipher.ivsize :
-alg->cra_ablkcipher.ivsize))
-type |= CRYPTO_ALG_TESTED;
-
-This causes cbc(aes), ctr(aes) and xts(aes) to remain untested, unless
-I add CRYPTO_ALG_GENIV to their cra_flags. Is this expected behavior?
-What would be your recommended way to ensure these algos are covered
-by the boottime tests?
-
-Thanks,
-Ard.
+diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
+index da5f4a6..0d996fe 100644
+--- a/drivers/crypto/ccp/ccp-dev.h
++++ b/drivers/crypto/ccp/ccp-dev.h
+@@ -541,23 +541,23 @@ static inline u32 ccp_addr_hi(struct ccp_dma_info *info)
+  * word 7: upper 16 bits of key pointer; key memory type
+  */
+ struct dword0 {
+-	__le32 soc:1;
+-	__le32 ioc:1;
+-	__le32 rsvd1:1;
+-	__le32 init:1;
+-	__le32 eom:1;		/* AES/SHA only */
+-	__le32 function:15;
+-	__le32 engine:4;
+-	__le32 prot:1;
+-	__le32 rsvd2:7;
++	unsigned int soc:1;
++	unsigned int ioc:1;
++	unsigned int rsvd1:1;
++	unsigned int init:1;
++	unsigned int eom:1;		/* AES/SHA only */
++	unsigned int function:15;
++	unsigned int engine:4;
++	unsigned int prot:1;
++	unsigned int rsvd2:7;
+ };
+ 
+ struct dword3 {
+-	__le32 src_hi:16;
+-	__le32 src_mem:2;
+-	__le32 lsb_cxt_id:8;
+-	__le32 rsvd1:5;
+-	__le32 fixed:1;
++	unsigned int  src_hi:16;
++	unsigned int  src_mem:2;
++	unsigned int  lsb_cxt_id:8;
++	unsigned int  rsvd1:5;
++	unsigned int  fixed:1;
+ };
+ 
+ union dword4 {
+@@ -567,18 +567,18 @@ union dword4 {
+ 
+ union dword5 {
+ 	struct {
+-		__le32 dst_hi:16;
+-		__le32 dst_mem:2;
+-		__le32 rsvd1:13;
+-		__le32 fixed:1;
++		unsigned int  dst_hi:16;
++		unsigned int  dst_mem:2;
++		unsigned int  rsvd1:13;
++		unsigned int  fixed:1;
+ 	} fields;
+ 	__le32 sha_len_hi;
+ };
+ 
+ struct dword7 {
+-	__le32 key_hi:16;
+-	__le32 key_mem:2;
+-	__le32 rsvd1:14;
++	unsigned int  key_hi:16;
++	unsigned int  key_mem:2;
++	unsigned int  rsvd1:14;
+ };
+ 
+ struct ccp5_desc {
