@@ -1,113 +1,214 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 1/8] crypto: arm64/aes-ce - fix for big endian
-Date: Tue, 11 Oct 2016 19:15:13 +0100
-Message-ID: <1476209720-21114-2-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 5/8] crypto: arm64/aes-ccm-ce: fix for big endian
+Date: Tue, 11 Oct 2016 19:15:17 +0100
+Message-ID: <1476209720-21114-6-git-send-email-ard.biesheuvel@linaro.org>
 References: <1476209720-21114-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: will.deacon@arm.com, catalin.marinas@arm.com,
         linux@arm.linux.org.uk, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:38602 "EHLO
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:36047 "EHLO
         mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752444AbcJKSQJ (ORCPT
+        with ESMTP id S1752870AbcJKSQJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 11 Oct 2016 14:16:09 -0400
-Received: by mail-wm0-f44.google.com with SMTP id c78so856380wme.1
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Oct 2016 11:15:32 -0700 (PDT)
+Received: by mail-wm0-f44.google.com with SMTP id o81so829544wma.1
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Oct 2016 11:15:43 -0700 (PDT)
 In-Reply-To: <1476209720-21114-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The core AES cipher implementation that uses ARMv8 Crypto Extensions
-instructions erroneously loads the round keys as 64-bit quantities,
-which causes the algorithm to fail when built for big endian. In
-addition, the key schedule generation routine fails to take endianness
-into account as well, when loading the combining the input key with
-the round constants. So fix both issues.
+The AES-CCM implementation that uses ARMv8 Crypto Extensions instructions
+refers to the AES round keys as pairs of 64-bit quantities, which causes
+failures when building the code for big endian. In addition, it byte swaps
+the input counter unconditionally, while this is only required for little
+endian builds. So fix both issues.
 
 Fixes: 12ac3efe74f8 ("arm64/crypto: use crypto instructions to generate AES key schedule")
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/aes-ce-cipher.c | 25 ++++++++++++--------
- 1 file changed, 15 insertions(+), 10 deletions(-)
+ arch/arm64/crypto/aes-ce-ccm-core.S | 53 ++++++++++----------
+ 1 file changed, 27 insertions(+), 26 deletions(-)
 
-diff --git a/arch/arm64/crypto/aes-ce-cipher.c b/arch/arm64/crypto/aes-ce-cipher.c
-index f7bd9bf0bbb3..50d9fe11d0c8 100644
---- a/arch/arm64/crypto/aes-ce-cipher.c
-+++ b/arch/arm64/crypto/aes-ce-cipher.c
-@@ -47,24 +47,24 @@ static void aes_cipher_encrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
- 	kernel_neon_begin_partial(4);
+diff --git a/arch/arm64/crypto/aes-ce-ccm-core.S b/arch/arm64/crypto/aes-ce-ccm-core.S
+index a2a7fbcacc14..3363560c79b7 100644
+--- a/arch/arm64/crypto/aes-ce-ccm-core.S
++++ b/arch/arm64/crypto/aes-ce-ccm-core.S
+@@ -9,6 +9,7 @@
+  */
  
- 	__asm__("	ld1	{v0.16b}, %[in]			;"
--		"	ld1	{v1.2d}, [%[key]], #16		;"
-+		"	ld1	{v1.16b}, [%[key]], #16		;"
- 		"	cmp	%w[rounds], #10			;"
- 		"	bmi	0f				;"
- 		"	bne	3f				;"
- 		"	mov	v3.16b, v1.16b			;"
- 		"	b	2f				;"
- 		"0:	mov	v2.16b, v1.16b			;"
--		"	ld1	{v3.2d}, [%[key]], #16		;"
-+		"	ld1	{v3.16b}, [%[key]], #16		;"
- 		"1:	aese	v0.16b, v2.16b			;"
- 		"	aesmc	v0.16b, v0.16b			;"
--		"2:	ld1	{v1.2d}, [%[key]], #16		;"
-+		"2:	ld1	{v1.16b}, [%[key]], #16		;"
- 		"	aese	v0.16b, v3.16b			;"
- 		"	aesmc	v0.16b, v0.16b			;"
--		"3:	ld1	{v2.2d}, [%[key]], #16		;"
-+		"3:	ld1	{v2.16b}, [%[key]], #16		;"
- 		"	subs	%w[rounds], %w[rounds], #3	;"
- 		"	aese	v0.16b, v1.16b			;"
- 		"	aesmc	v0.16b, v0.16b			;"
--		"	ld1	{v3.2d}, [%[key]], #16		;"
-+		"	ld1	{v3.16b}, [%[key]], #16		;"
- 		"	bpl	1b				;"
- 		"	aese	v0.16b, v2.16b			;"
- 		"	eor	v0.16b, v0.16b, v3.16b		;"
-@@ -92,24 +92,24 @@ static void aes_cipher_decrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
- 	kernel_neon_begin_partial(4);
+ #include <linux/linkage.h>
++#include <asm/assembler.h>
  
- 	__asm__("	ld1	{v0.16b}, %[in]			;"
--		"	ld1	{v1.2d}, [%[key]], #16		;"
-+		"	ld1	{v1.16b}, [%[key]], #16		;"
- 		"	cmp	%w[rounds], #10			;"
- 		"	bmi	0f				;"
- 		"	bne	3f				;"
- 		"	mov	v3.16b, v1.16b			;"
- 		"	b	2f				;"
- 		"0:	mov	v2.16b, v1.16b			;"
--		"	ld1	{v3.2d}, [%[key]], #16		;"
-+		"	ld1	{v3.16b}, [%[key]], #16		;"
- 		"1:	aesd	v0.16b, v2.16b			;"
- 		"	aesimc	v0.16b, v0.16b			;"
--		"2:	ld1	{v1.2d}, [%[key]], #16		;"
-+		"2:	ld1	{v1.16b}, [%[key]], #16		;"
- 		"	aesd	v0.16b, v3.16b			;"
- 		"	aesimc	v0.16b, v0.16b			;"
--		"3:	ld1	{v2.2d}, [%[key]], #16		;"
-+		"3:	ld1	{v2.16b}, [%[key]], #16		;"
- 		"	subs	%w[rounds], %w[rounds], #3	;"
- 		"	aesd	v0.16b, v1.16b			;"
- 		"	aesimc	v0.16b, v0.16b			;"
--		"	ld1	{v3.2d}, [%[key]], #16		;"
-+		"	ld1	{v3.16b}, [%[key]], #16		;"
- 		"	bpl	1b				;"
- 		"	aesd	v0.16b, v2.16b			;"
- 		"	eor	v0.16b, v0.16b, v3.16b		;"
-@@ -173,7 +173,12 @@ int ce_aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
- 		u32 *rki = ctx->key_enc + (i * kwords);
- 		u32 *rko = rki + kwords;
+ 	.text
+ 	.arch	armv8-a+crypto
+@@ -19,7 +20,7 @@
+ 	 */
+ ENTRY(ce_aes_ccm_auth_data)
+ 	ldr	w8, [x3]			/* leftover from prev round? */
+-	ld1	{v0.2d}, [x0]			/* load mac */
++	ld1	{v0.16b}, [x0]			/* load mac */
+ 	cbz	w8, 1f
+ 	sub	w8, w8, #16
+ 	eor	v1.16b, v1.16b, v1.16b
+@@ -31,7 +32,7 @@ ENTRY(ce_aes_ccm_auth_data)
+ 	beq	8f				/* out of input? */
+ 	cbnz	w8, 0b
+ 	eor	v0.16b, v0.16b, v1.16b
+-1:	ld1	{v3.2d}, [x4]			/* load first round key */
++1:	ld1	{v3.16b}, [x4]			/* load first round key */
+ 	prfm	pldl1strm, [x1]
+ 	cmp	w5, #12				/* which key size? */
+ 	add	x6, x4, #16
+@@ -41,17 +42,17 @@ ENTRY(ce_aes_ccm_auth_data)
+ 	mov	v5.16b, v3.16b
+ 	b	4f
+ 2:	mov	v4.16b, v3.16b
+-	ld1	{v5.2d}, [x6], #16		/* load 2nd round key */
++	ld1	{v5.16b}, [x6], #16		/* load 2nd round key */
+ 3:	aese	v0.16b, v4.16b
+ 	aesmc	v0.16b, v0.16b
+-4:	ld1	{v3.2d}, [x6], #16		/* load next round key */
++4:	ld1	{v3.16b}, [x6], #16		/* load next round key */
+ 	aese	v0.16b, v5.16b
+ 	aesmc	v0.16b, v0.16b
+-5:	ld1	{v4.2d}, [x6], #16		/* load next round key */
++5:	ld1	{v4.16b}, [x6], #16		/* load next round key */
+ 	subs	w7, w7, #3
+ 	aese	v0.16b, v3.16b
+ 	aesmc	v0.16b, v0.16b
+-	ld1	{v5.2d}, [x6], #16		/* load next round key */
++	ld1	{v5.16b}, [x6], #16		/* load next round key */
+ 	bpl	3b
+ 	aese	v0.16b, v4.16b
+ 	subs	w2, w2, #16			/* last data? */
+@@ -60,7 +61,7 @@ ENTRY(ce_aes_ccm_auth_data)
+ 	ld1	{v1.16b}, [x1], #16		/* load next input block */
+ 	eor	v0.16b, v0.16b, v1.16b		/* xor with mac */
+ 	bne	1b
+-6:	st1	{v0.2d}, [x0]			/* store mac */
++6:	st1	{v0.16b}, [x0]			/* store mac */
+ 	beq	10f
+ 	adds	w2, w2, #16
+ 	beq	10f
+@@ -79,7 +80,7 @@ ENTRY(ce_aes_ccm_auth_data)
+ 	adds	w7, w7, #1
+ 	bne	9b
+ 	eor	v0.16b, v0.16b, v1.16b
+-	st1	{v0.2d}, [x0]
++	st1	{v0.16b}, [x0]
+ 10:	str	w8, [x3]
+ 	ret
+ ENDPROC(ce_aes_ccm_auth_data)
+@@ -89,27 +90,27 @@ ENDPROC(ce_aes_ccm_auth_data)
+ 	 * 			 u32 rounds);
+ 	 */
+ ENTRY(ce_aes_ccm_final)
+-	ld1	{v3.2d}, [x2], #16		/* load first round key */
+-	ld1	{v0.2d}, [x0]			/* load mac */
++	ld1	{v3.16b}, [x2], #16		/* load first round key */
++	ld1	{v0.16b}, [x0]			/* load mac */
+ 	cmp	w3, #12				/* which key size? */
+ 	sub	w3, w3, #2			/* modified # of rounds */
+-	ld1	{v1.2d}, [x1]			/* load 1st ctriv */
++	ld1	{v1.16b}, [x1]			/* load 1st ctriv */
+ 	bmi	0f
+ 	bne	3f
+ 	mov	v5.16b, v3.16b
+ 	b	2f
+ 0:	mov	v4.16b, v3.16b
+-1:	ld1	{v5.2d}, [x2], #16		/* load next round key */
++1:	ld1	{v5.16b}, [x2], #16		/* load next round key */
+ 	aese	v0.16b, v4.16b
+ 	aesmc	v0.16b, v0.16b
+ 	aese	v1.16b, v4.16b
+ 	aesmc	v1.16b, v1.16b
+-2:	ld1	{v3.2d}, [x2], #16		/* load next round key */
++2:	ld1	{v3.16b}, [x2], #16		/* load next round key */
+ 	aese	v0.16b, v5.16b
+ 	aesmc	v0.16b, v0.16b
+ 	aese	v1.16b, v5.16b
+ 	aesmc	v1.16b, v1.16b
+-3:	ld1	{v4.2d}, [x2], #16		/* load next round key */
++3:	ld1	{v4.16b}, [x2], #16		/* load next round key */
+ 	subs	w3, w3, #3
+ 	aese	v0.16b, v3.16b
+ 	aesmc	v0.16b, v0.16b
+@@ -120,47 +121,47 @@ ENTRY(ce_aes_ccm_final)
+ 	aese	v1.16b, v4.16b
+ 	/* final round key cancels out */
+ 	eor	v0.16b, v0.16b, v1.16b		/* en-/decrypt the mac */
+-	st1	{v0.2d}, [x0]			/* store result */
++	st1	{v0.16b}, [x0]			/* store result */
+ 	ret
+ ENDPROC(ce_aes_ccm_final)
  
-+#ifndef CONFIG_CPU_BIG_ENDIAN
- 		rko[0] = ror32(aes_sub(rki[kwords - 1]), 8) ^ rcon[i] ^ rki[0];
-+#else
-+		rko[0] = rol32(aes_sub(rki[kwords - 1]), 8) ^ (rcon[i] << 24) ^
-+			 rki[0];
-+#endif
- 		rko[1] = rko[0] ^ rki[1];
- 		rko[2] = rko[1] ^ rki[2];
- 		rko[3] = rko[2] ^ rki[3];
+ 	.macro	aes_ccm_do_crypt,enc
+ 	ldr	x8, [x6, #8]			/* load lower ctr */
+-	ld1	{v0.2d}, [x5]			/* load mac */
+-	rev	x8, x8				/* keep swabbed ctr in reg */
++	ld1	{v0.16b}, [x5]			/* load mac */
++CPU_LE(	rev	x8, x8			)	/* keep swabbed ctr in reg */
+ 0:	/* outer loop */
+-	ld1	{v1.1d}, [x6]			/* load upper ctr */
++	ld1	{v1.8b}, [x6]			/* load upper ctr */
+ 	prfm	pldl1strm, [x1]
+ 	add	x8, x8, #1
+ 	rev	x9, x8
+ 	cmp	w4, #12				/* which key size? */
+ 	sub	w7, w4, #2			/* get modified # of rounds */
+ 	ins	v1.d[1], x9			/* no carry in lower ctr */
+-	ld1	{v3.2d}, [x3]			/* load first round key */
++	ld1	{v3.16b}, [x3]			/* load first round key */
+ 	add	x10, x3, #16
+ 	bmi	1f
+ 	bne	4f
+ 	mov	v5.16b, v3.16b
+ 	b	3f
+ 1:	mov	v4.16b, v3.16b
+-	ld1	{v5.2d}, [x10], #16		/* load 2nd round key */
++	ld1	{v5.16b}, [x10], #16		/* load 2nd round key */
+ 2:	/* inner loop: 3 rounds, 2x interleaved */
+ 	aese	v0.16b, v4.16b
+ 	aesmc	v0.16b, v0.16b
+ 	aese	v1.16b, v4.16b
+ 	aesmc	v1.16b, v1.16b
+-3:	ld1	{v3.2d}, [x10], #16		/* load next round key */
++3:	ld1	{v3.16b}, [x10], #16		/* load next round key */
+ 	aese	v0.16b, v5.16b
+ 	aesmc	v0.16b, v0.16b
+ 	aese	v1.16b, v5.16b
+ 	aesmc	v1.16b, v1.16b
+-4:	ld1	{v4.2d}, [x10], #16		/* load next round key */
++4:	ld1	{v4.16b}, [x10], #16		/* load next round key */
+ 	subs	w7, w7, #3
+ 	aese	v0.16b, v3.16b
+ 	aesmc	v0.16b, v0.16b
+ 	aese	v1.16b, v3.16b
+ 	aesmc	v1.16b, v1.16b
+-	ld1	{v5.2d}, [x10], #16		/* load next round key */
++	ld1	{v5.16b}, [x10], #16		/* load next round key */
+ 	bpl	2b
+ 	aese	v0.16b, v4.16b
+ 	aese	v1.16b, v4.16b
+@@ -177,14 +178,14 @@ ENDPROC(ce_aes_ccm_final)
+ 	eor	v0.16b, v0.16b, v2.16b		/* xor mac with pt ^ rk[last] */
+ 	st1	{v1.16b}, [x0], #16		/* write output block */
+ 	bne	0b
+-	rev	x8, x8
+-	st1	{v0.2d}, [x5]			/* store mac */
++CPU_LE(	rev	x8, x8			)
++	st1	{v0.16b}, [x5]			/* store mac */
+ 	str	x8, [x6, #8]			/* store lsb end of ctr (BE) */
+ 5:	ret
+ 
+ 6:	eor	v0.16b, v0.16b, v5.16b		/* final round mac */
+ 	eor	v1.16b, v1.16b, v5.16b		/* final round enc */
+-	st1	{v0.2d}, [x5]			/* store mac */
++	st1	{v0.16b}, [x5]			/* store mac */
+ 	add	w2, w2, #16			/* process partial tail block */
+ 7:	ldrb	w9, [x1], #1			/* get 1 byte of input */
+ 	umov	w6, v1.b[0]			/* get top crypted ctr byte */
 -- 
 2.7.4
