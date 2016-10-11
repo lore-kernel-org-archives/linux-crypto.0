@@ -1,59 +1,122 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 7/8] crypto: arm64/aes-xts-ce: fix for big endian
-Date: Tue, 11 Oct 2016 19:15:19 +0100
-Message-ID: <1476209720-21114-8-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 6/8] crypto: arm64/aes-neon - fix for big endian
+Date: Tue, 11 Oct 2016 19:15:18 +0100
+Message-ID: <1476209720-21114-7-git-send-email-ard.biesheuvel@linaro.org>
 References: <1476209720-21114-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: will.deacon@arm.com, catalin.marinas@arm.com,
         linux@arm.linux.org.uk, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:34913 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752924AbcJKSQJ (ORCPT
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:33096 "EHLO
+        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752885AbcJKSQJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 11 Oct 2016 14:16:09 -0400
-Received: by mail-wm0-f54.google.com with SMTP id f193so834246wmg.0
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Oct 2016 11:15:47 -0700 (PDT)
+Received: by mail-wm0-f52.google.com with SMTP id f193so99199wmg.0
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Oct 2016 11:15:45 -0700 (PDT)
 In-Reply-To: <1476209720-21114-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Emit the XTS tweak literal constants in the appropriate order for a
-single 128-bit scalar literal load.
+The AES implementation using pure NEON instructions relies on the generic
+AES key schedule generation routines, which store the round keys as arrays
+of 32-bit quantities stored in memory using native endianness. This means
+we should refer to these round keys using 4x4 loads rather than 16x1 loads.
+In addition, the ShiftRows tables are loading using a single scalar load,
+which is also affected by endianness, so emit these tables in the correct
+order depending on whether we are building for big endian or not.
 
 Fixes: 49788fe2a128 ("arm64/crypto: AES-ECB/CBC/CTR/XTS using ARMv8 NEON and Crypto Extensions")
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/aes-ce.S    | 1 +
- arch/arm64/crypto/aes-modes.S | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ arch/arm64/crypto/aes-neon.S | 25 ++++++++++++--------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/crypto/aes-ce.S b/arch/arm64/crypto/aes-ce.S
-index 78f3cfe92c08..b46093d567e5 100644
---- a/arch/arm64/crypto/aes-ce.S
-+++ b/arch/arm64/crypto/aes-ce.S
-@@ -10,6 +10,7 @@
+diff --git a/arch/arm64/crypto/aes-neon.S b/arch/arm64/crypto/aes-neon.S
+index b93170e1cc93..85f07ead7c5c 100644
+--- a/arch/arm64/crypto/aes-neon.S
++++ b/arch/arm64/crypto/aes-neon.S
+@@ -9,6 +9,7 @@
   */
  
  #include <linux/linkage.h>
 +#include <asm/assembler.h>
  
- #define AES_ENTRY(func)		ENTRY(ce_ ## func)
- #define AES_ENDPROC(func)	ENDPROC(ce_ ## func)
-diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-index f6e372c528eb..c53dbeae79f2 100644
---- a/arch/arm64/crypto/aes-modes.S
-+++ b/arch/arm64/crypto/aes-modes.S
-@@ -386,7 +386,8 @@ AES_ENDPROC(aes_ctr_encrypt)
+ #define AES_ENTRY(func)		ENTRY(neon_ ## func)
+ #define AES_ENDPROC(func)	ENDPROC(neon_ ## func)
+@@ -83,13 +84,13 @@
  	.endm
  
- .Lxts_mul_x:
--	.word		1, 0, 0x87, 0
-+CPU_LE(	.quad		1, 0x87		)
-+CPU_BE(	.quad		0x87, 1		)
+ 	.macro		do_block, enc, in, rounds, rk, rkp, i
+-	ld1		{v15.16b}, [\rk]
++	ld1		{v15.4s}, [\rk]
+ 	add		\rkp, \rk, #16
+ 	mov		\i, \rounds
+ 1111:	eor		\in\().16b, \in\().16b, v15.16b		/* ^round key */
+ 	tbl		\in\().16b, {\in\().16b}, v13.16b	/* ShiftRows */
+ 	sub_bytes	\in
+-	ld1		{v15.16b}, [\rkp], #16
++	ld1		{v15.4s}, [\rkp], #16
+ 	subs		\i, \i, #1
+ 	beq		2222f
+ 	.if		\enc == 1
+@@ -229,7 +230,7 @@
+ 	.endm
  
- AES_ENTRY(aes_xts_encrypt)
- 	FRAME_PUSH
+ 	.macro		do_block_2x, enc, in0, in1 rounds, rk, rkp, i
+-	ld1		{v15.16b}, [\rk]
++	ld1		{v15.4s}, [\rk]
+ 	add		\rkp, \rk, #16
+ 	mov		\i, \rounds
+ 1111:	eor		\in0\().16b, \in0\().16b, v15.16b	/* ^round key */
+@@ -237,7 +238,7 @@
+ 	sub_bytes_2x	\in0, \in1
+ 	tbl		\in0\().16b, {\in0\().16b}, v13.16b	/* ShiftRows */
+ 	tbl		\in1\().16b, {\in1\().16b}, v13.16b	/* ShiftRows */
+-	ld1		{v15.16b}, [\rkp], #16
++	ld1		{v15.4s}, [\rkp], #16
+ 	subs		\i, \i, #1
+ 	beq		2222f
+ 	.if		\enc == 1
+@@ -254,7 +255,7 @@
+ 	.endm
+ 
+ 	.macro		do_block_4x, enc, in0, in1, in2, in3, rounds, rk, rkp, i
+-	ld1		{v15.16b}, [\rk]
++	ld1		{v15.4s}, [\rk]
+ 	add		\rkp, \rk, #16
+ 	mov		\i, \rounds
+ 1111:	eor		\in0\().16b, \in0\().16b, v15.16b	/* ^round key */
+@@ -266,7 +267,7 @@
+ 	tbl		\in1\().16b, {\in1\().16b}, v13.16b	/* ShiftRows */
+ 	tbl		\in2\().16b, {\in2\().16b}, v13.16b	/* ShiftRows */
+ 	tbl		\in3\().16b, {\in3\().16b}, v13.16b	/* ShiftRows */
+-	ld1		{v15.16b}, [\rkp], #16
++	ld1		{v15.4s}, [\rkp], #16
+ 	subs		\i, \i, #1
+ 	beq		2222f
+ 	.if		\enc == 1
+@@ -306,12 +307,16 @@
+ 	.text
+ 	.align		4
+ .LForward_ShiftRows:
+-	.byte		0x0, 0x5, 0xa, 0xf, 0x4, 0x9, 0xe, 0x3
+-	.byte		0x8, 0xd, 0x2, 0x7, 0xc, 0x1, 0x6, 0xb
++CPU_LE(	.byte		0x0, 0x5, 0xa, 0xf, 0x4, 0x9, 0xe, 0x3	)
++CPU_LE(	.byte		0x8, 0xd, 0x2, 0x7, 0xc, 0x1, 0x6, 0xb	)
++CPU_BE(	.byte		0xb, 0x6, 0x1, 0xc, 0x7, 0x2, 0xd, 0x8	)
++CPU_BE(	.byte		0x3, 0xe, 0x9, 0x4, 0xf, 0xa, 0x5, 0x0	)
+ 
+ .LReverse_ShiftRows:
+-	.byte		0x0, 0xd, 0xa, 0x7, 0x4, 0x1, 0xe, 0xb
+-	.byte		0x8, 0x5, 0x2, 0xf, 0xc, 0x9, 0x6, 0x3
++CPU_LE(	.byte		0x0, 0xd, 0xa, 0x7, 0x4, 0x1, 0xe, 0xb	)
++CPU_LE(	.byte		0x8, 0x5, 0x2, 0xf, 0xc, 0x9, 0x6, 0x3	)
++CPU_BE(	.byte		0x3, 0x6, 0x9, 0xc, 0xf, 0x2, 0x5, 0x8	)
++CPU_BE(	.byte		0xb, 0xe, 0x1, 0x4, 0x7, 0xa, 0xd, 0x0	)
+ 
+ .LForward_Sbox:
+ 	.byte		0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5
 -- 
 2.7.4
