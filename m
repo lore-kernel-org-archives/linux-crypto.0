@@ -1,91 +1,299 @@
-From: <ccwitt.kohl@kabelmail.de>
-Subject: 1620727 linux-crypto
-Date: Thu, 13 Oct 2016 15:25:10 -0000
-Message-ID: <147637231025.30466.9395867720849321957@viacaboip.com.br>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH 2/6] crypto: ccp - Remove unneeded sign-extension support
+Date: Thu, 13 Oct 2016 09:53:00 -0500
+Message-ID: <20161013145300.19759.14061.stgit@taos>
+References: <20161013144542.19759.6924.stgit@taos>
 Mime-Version: 1.0
-Content-Type: application/zip; name="EMAIL_55150318227366_linux-crypto.zip"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 177-127-147-224.viacaboip.com.br ([177.127.147.224]:2492 "HELO
-        viacaboip.com.br" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1753714AbcJMP0A (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Oct 2016 11:26:00 -0400
-Content-Disposition: attachment
+Received: from mail-by2nam03on0072.outbound.protection.outlook.com ([104.47.42.72]:52172
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754424AbcJMP1z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Oct 2016 11:27:55 -0400
+In-Reply-To: <20161013144542.19759.6924.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
-AA==
+The reverse-get/set functions can be simplified by
+eliminating unused code.
+
+
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
+---
+ drivers/crypto/ccp/ccp-ops.c |  145 +++++++++++++++++-------------------------
+ 1 file changed, 59 insertions(+), 86 deletions(-)
+
+diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+index 8fedb14..82cc637 100644
+--- a/drivers/crypto/ccp/ccp-ops.c
++++ b/drivers/crypto/ccp/ccp-ops.c
+@@ -198,62 +198,46 @@ static void ccp_get_dm_area(struct ccp_dm_workarea *wa, unsigned int wa_offset,
+ }
+ 
+ static int ccp_reverse_set_dm_area(struct ccp_dm_workarea *wa,
++				   unsigned int wa_offset,
+ 				   struct scatterlist *sg,
+-				   unsigned int len, unsigned int se_len,
+-				   bool sign_extend)
++				   unsigned int sg_offset,
++				   unsigned int len)
+ {
+-	unsigned int nbytes, sg_offset, dm_offset, sb_len, i;
+-	u8 buffer[CCP_REVERSE_BUF_SIZE];
+-
+-	if (WARN_ON(se_len > sizeof(buffer)))
+-		return -EINVAL;
+-
+-	sg_offset = len;
+-	dm_offset = 0;
+-	nbytes = len;
+-	while (nbytes) {
+-		sb_len = min_t(unsigned int, nbytes, se_len);
+-		sg_offset -= sb_len;
+-
+-		scatterwalk_map_and_copy(buffer, sg, sg_offset, sb_len, 0);
+-		for (i = 0; i < sb_len; i++)
+-			wa->address[dm_offset + i] = buffer[sb_len - i - 1];
+-
+-		dm_offset += sb_len;
+-		nbytes -= sb_len;
+-
+-		if ((sb_len != se_len) && sign_extend) {
+-			/* Must sign-extend to nearest sign-extend length */
+-			if (wa->address[dm_offset - 1] & 0x80)
+-				memset(wa->address + dm_offset, 0xff,
+-				       se_len - sb_len);
+-		}
++	u8 *p, *q;
++
++	ccp_set_dm_area(wa, wa_offset, sg, sg_offset, len);
++
++	p = wa->address + wa_offset;
++	q = p + len - 1;
++	while (p < q) {
++		*p = *p ^ *q;
++		*q = *p ^ *q;
++		*p = *p ^ *q;
++		p++;
++		q--;
+ 	}
+-
+ 	return 0;
+ }
+ 
+ static void ccp_reverse_get_dm_area(struct ccp_dm_workarea *wa,
++				    unsigned int wa_offset,
+ 				    struct scatterlist *sg,
++				    unsigned int sg_offset,
+ 				    unsigned int len)
+ {
+-	unsigned int nbytes, sg_offset, dm_offset, sb_len, i;
+-	u8 buffer[CCP_REVERSE_BUF_SIZE];
+-
+-	sg_offset = 0;
+-	dm_offset = len;
+-	nbytes = len;
+-	while (nbytes) {
+-		sb_len = min_t(unsigned int, nbytes, sizeof(buffer));
+-		dm_offset -= sb_len;
+-
+-		for (i = 0; i < sb_len; i++)
+-			buffer[sb_len - i - 1] = wa->address[dm_offset + i];
+-		scatterwalk_map_and_copy(buffer, sg, sg_offset, sb_len, 1);
+-
+-		sg_offset += sb_len;
+-		nbytes -= sb_len;
++	u8 *p, *q;
++
++	p = wa->address + wa_offset;
++	q = p + len - 1;
++	while (p < q) {
++		*p = *p ^ *q;
++		*q = *p ^ *q;
++		*p = *p ^ *q;
++		p++;
++		q--;
+ 	}
++
++	ccp_get_dm_area(wa, wa_offset, sg, sg_offset, len);
+ }
+ 
+ static void ccp_free_data(struct ccp_data *data, struct ccp_cmd_queue *cmd_q)
+@@ -1294,7 +1278,9 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	struct ccp_data dst;
+ 	struct ccp_op op;
+ 	unsigned int sb_count, i_len, o_len;
+-	int ret;
++	unsigned int dm_offset;
++	int i = 0;
++	int ret = 0;
+ 
+ 	if (rsa->key_size > CCP_RSA_MAX_WIDTH)
+ 		return -EINVAL;
+@@ -1331,8 +1317,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	if (ret)
+ 		goto e_sb;
+ 
+-	ret = ccp_reverse_set_dm_area(&exp, rsa->exp, rsa->exp_len,
+-				      CCP_SB_BYTES, false);
++	ret = ccp_reverse_set_dm_area(&exp, 0, rsa->exp, 0, rsa->exp_len);
+ 	if (ret)
+ 		goto e_exp;
+ 	ret = ccp_copy_to_sb(cmd_q, &exp, op.jobid, op.sb_key,
+@@ -1350,13 +1335,10 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	if (ret)
+ 		goto e_exp;
+ 
+-	ret = ccp_reverse_set_dm_area(&src, rsa->mod, rsa->mod_len,
+-				      CCP_SB_BYTES, false);
++	ret = ccp_reverse_set_dm_area(&src, 0, rsa->mod, 0, rsa->mod_len);
+ 	if (ret)
+ 		goto e_src;
+-	src.address += o_len;	/* Adjust the address for the copy operation */
+-	ret = ccp_reverse_set_dm_area(&src, rsa->src, rsa->src_len,
+-				      CCP_SB_BYTES, false);
++	ret = ccp_reverse_set_dm_area(&src, o_len, rsa->mod, 0, rsa->mod_len);
+ 	if (ret)
+ 		goto e_src;
+ 	src.address -= o_len;	/* Reset the address to original value */
+@@ -1384,7 +1366,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		goto e_dst;
+ 	}
+ 
+-	ccp_reverse_get_dm_area(&dst.dm_wa, rsa->dst, rsa->mod_len);
++	ccp_reverse_get_dm_area(&dst.dm_wa, 0, rsa->dst, 0, rsa->mod_len);
+ 
+ e_dst:
+ 	ccp_free_data(&dst, cmd_q);
+@@ -1636,25 +1618,22 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	save = src.address;
+ 
+ 	/* Copy the ECC modulus */
+-	ret = ccp_reverse_set_dm_area(&src, ecc->mod, ecc->mod_len,
+-				      CCP_ECC_OPERAND_SIZE, false);
++	ret = ccp_reverse_set_dm_area(&src, 0, ecc->mod, 0, ecc->mod_len);
+ 	if (ret)
+ 		goto e_src;
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 	/* Copy the first operand */
+-	ret = ccp_reverse_set_dm_area(&src, ecc->u.mm.operand_1,
+-				      ecc->u.mm.operand_1_len,
+-				      CCP_ECC_OPERAND_SIZE, false);
++	ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.mm.operand_1, 0,
++				      ecc->u.mm.operand_1_len);
+ 	if (ret)
+ 		goto e_src;
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 	if (ecc->function != CCP_ECC_FUNCTION_MINV_384BIT) {
+ 		/* Copy the second operand */
+-		ret = ccp_reverse_set_dm_area(&src, ecc->u.mm.operand_2,
+-					      ecc->u.mm.operand_2_len,
+-					      CCP_ECC_OPERAND_SIZE, false);
++		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.mm.operand_2, 0,
++					      ecc->u.mm.operand_2_len);
+ 		if (ret)
+ 			goto e_src;
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+@@ -1693,7 +1672,8 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	}
+ 
+ 	/* Save the ECC result */
+-	ccp_reverse_get_dm_area(&dst, ecc->u.mm.result, CCP_ECC_MODULUS_BYTES);
++	ccp_reverse_get_dm_area(&dst, 0, ecc->u.mm.result, 0,
++				CCP_ECC_MODULUS_BYTES);
+ 
+ e_dst:
+ 	ccp_dm_free(&dst);
+@@ -1761,22 +1741,19 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	save = src.address;
+ 
+ 	/* Copy the ECC modulus */
+-	ret = ccp_reverse_set_dm_area(&src, ecc->mod, ecc->mod_len,
+-				      CCP_ECC_OPERAND_SIZE, false);
++	ret = ccp_reverse_set_dm_area(&src, 0, ecc->mod, 0, ecc->mod_len);
+ 	if (ret)
+ 		goto e_src;
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 	/* Copy the first point X and Y coordinate */
+-	ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.point_1.x,
+-				      ecc->u.pm.point_1.x_len,
+-				      CCP_ECC_OPERAND_SIZE, false);
++	ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_1.x, 0,
++				      ecc->u.pm.point_1.x_len);
+ 	if (ret)
+ 		goto e_src;
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+-	ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.point_1.y,
+-				      ecc->u.pm.point_1.y_len,
+-				      CCP_ECC_OPERAND_SIZE, false);
++	ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_1.y, 0,
++				      ecc->u.pm.point_1.y_len);
+ 	if (ret)
+ 		goto e_src;
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+@@ -1787,15 +1764,13 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 
+ 	if (ecc->function == CCP_ECC_FUNCTION_PADD_384BIT) {
+ 		/* Copy the second point X and Y coordinate */
+-		ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.point_2.x,
+-					      ecc->u.pm.point_2.x_len,
+-					      CCP_ECC_OPERAND_SIZE, false);
++		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_2.x, 0,
++					      ecc->u.pm.point_2.x_len);
+ 		if (ret)
+ 			goto e_src;
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+-		ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.point_2.y,
+-					      ecc->u.pm.point_2.y_len,
+-					      CCP_ECC_OPERAND_SIZE, false);
++		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_2.y, 0,
++					      ecc->u.pm.point_2.y_len);
+ 		if (ret)
+ 			goto e_src;
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+@@ -1805,19 +1780,17 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+ 	} else {
+ 		/* Copy the Domain "a" parameter */
+-		ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.domain_a,
+-					      ecc->u.pm.domain_a_len,
+-					      CCP_ECC_OPERAND_SIZE, false);
++		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.domain_a, 0,
++					      ecc->u.pm.domain_a_len);
+ 		if (ret)
+ 			goto e_src;
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 		if (ecc->function == CCP_ECC_FUNCTION_PMUL_384BIT) {
+ 			/* Copy the scalar value */
+-			ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.scalar,
+-						      ecc->u.pm.scalar_len,
+-						      CCP_ECC_OPERAND_SIZE,
+-						      false);
++			ret = ccp_reverse_set_dm_area(&src, 0,
++						      ecc->u.pm.scalar, 0,
++						      ecc->u.pm.scalar_len);
+ 			if (ret)
+ 				goto e_src;
+ 			src.address += CCP_ECC_OPERAND_SIZE;
+@@ -1862,10 +1835,10 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	save = dst.address;
+ 
+ 	/* Save the ECC result X and Y coordinates */
+-	ccp_reverse_get_dm_area(&dst, ecc->u.pm.result.x,
++	ccp_reverse_get_dm_area(&dst, 0, ecc->u.pm.result.x, 0,
+ 				CCP_ECC_MODULUS_BYTES);
+ 	dst.address += CCP_ECC_OUTPUT_SIZE;
+-	ccp_reverse_get_dm_area(&dst, ecc->u.pm.result.y,
++	ccp_reverse_get_dm_area(&dst, 0, ecc->u.pm.result.y, 0,
+ 				CCP_ECC_MODULUS_BYTES);
+ 	dst.address += CCP_ECC_OUTPUT_SIZE;
+ 
