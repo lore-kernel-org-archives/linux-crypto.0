@@ -1,293 +1,759 @@
 From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 4/6] crypto: ccp - Add RSA support for a v5 ccp
-Date: Thu, 13 Oct 2016 16:23:00 -0500
-Message-ID: <8e8b29ee-c7ff-1069-05ff-b2815543d1e3@amd.com>
+Subject: Re: [PATCH 5/6] crypto: ccp - Enable support for AES GCM on v5 CCPs
+Date: Thu, 13 Oct 2016 16:54:55 -0500
+Message-ID: <d43818d9-ded1-beca-b61c-357d9e4d44a9@amd.com>
 References: <20161013144542.19759.6924.stgit@taos>
- <20161013145319.19759.70911.stgit@taos>
+ <20161013145331.19759.26881.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 To: Gary R Hook <gary.hook@amd.com>, <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0082.outbound.protection.outlook.com ([104.47.33.82]:52757
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+Received: from mail-sn1nam01on0053.outbound.protection.outlook.com ([104.47.32.53]:62167
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1756869AbcJMVYJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Oct 2016 17:24:09 -0400
-In-Reply-To: <20161013145319.19759.70911.stgit@taos>
+        id S1751050AbcJMWLr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Oct 2016 18:11:47 -0400
+In-Reply-To: <20161013145331.19759.26881.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 On 10/13/2016 09:53 AM, Gary R Hook wrote:
-> Take into account device implementation differences for
-> RSA.
+> A version 5 device provides the primitive commands
+> required for AES GCM. This patch adds support for
+> en/decryption.
 > 
 > Signed-off-by: Gary R Hook <gary.hook@amd.com>
 > ---
->  drivers/crypto/ccp/ccp-crypto-rsa.c |   14 +++--
->  drivers/crypto/ccp/ccp-crypto.h     |    3 -
->  drivers/crypto/ccp/ccp-dev.h        |    2 -
->  drivers/crypto/ccp/ccp-ops.c        |   97 +++++++++++++++++++++++------------
->  4 files changed, 73 insertions(+), 43 deletions(-)
+>  drivers/crypto/ccp/Makefile                |    1 
+>  drivers/crypto/ccp/ccp-crypto-aes-galois.c |  252 +++++++++++++++++++++++++++
+>  drivers/crypto/ccp/ccp-crypto-main.c       |   12 +
+>  drivers/crypto/ccp/ccp-crypto.h            |   14 +
+>  drivers/crypto/ccp/ccp-dev-v5.c            |    2 
+>  drivers/crypto/ccp/ccp-dev.h               |    1 
+>  drivers/crypto/ccp/ccp-ops.c               |  262 ++++++++++++++++++++++++++++
+>  include/linux/ccp.h                        |    9 +
+>  8 files changed, 553 insertions(+)
+>  create mode 100644 drivers/crypto/ccp/ccp-crypto-aes-galois.c
 > 
-> diff --git a/drivers/crypto/ccp/ccp-crypto-rsa.c b/drivers/crypto/ccp/ccp-crypto-rsa.c
-> index 7dab43b..94411de 100644
-> --- a/drivers/crypto/ccp/ccp-crypto-rsa.c
-> +++ b/drivers/crypto/ccp/ccp-crypto-rsa.c
-> @@ -125,7 +125,7 @@ static void ccp_rsa_free_key_bufs(struct ccp_ctx *ctx)
+> diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+> index 23f89b7..fd77225 100644
+> --- a/drivers/crypto/ccp/Makefile
+> +++ b/drivers/crypto/ccp/Makefile
+> @@ -13,4 +13,5 @@ ccp-crypto-objs := ccp-crypto-main.o \
+>  		   ccp-crypto-aes-cmac.o \
+>  		   ccp-crypto-aes-xts.o \
+>  		   ccp-crypto-rsa.o \
+> +		   ccp-crypto-aes-galois.o \
+>  		   ccp-crypto-sha.o
+> diff --git a/drivers/crypto/ccp/ccp-crypto-aes-galois.c b/drivers/crypto/ccp/ccp-crypto-aes-galois.c
+> new file mode 100644
+> index 0000000..5da324f
+> --- /dev/null
+> +++ b/drivers/crypto/ccp/ccp-crypto-aes-galois.c
+> @@ -0,0 +1,252 @@
+> +/*
+> + * AMD Cryptographic Coprocessor (CCP) AES crypto API support
+> + *
+> + * Copyright (C) 2013,2016 Advanced Micro Devices, Inc.
+> + *
+> + * Author: Tom Lendacky <thomas.lendacky@amd.com>
+
+Maybe put your name here...
+
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +
+> +#include <linux/module.h>
+> +#include <linux/sched.h>
+> +#include <linux/delay.h>
+> +#include <linux/scatterlist.h>
+> +#include <linux/crypto.h>
+> +#include <crypto/internal/aead.h>
+> +#include <crypto/algapi.h>
+> +#include <crypto/aes.h>
+> +#include <crypto/ctr.h>
+> +#include <crypto/scatterwalk.h>
+> +#include <linux/delay.h>
+> +
+> +#include "ccp-crypto.h"
+> +
+> +#define	AES_GCM_IVSIZE	12
+> +
+> +static int ccp_aes_gcm_complete(struct crypto_async_request *async_req, int ret)
+> +{
+> +	return ret;
+> +}
+> +
+> +static int ccp_aes_gcm_setkey(struct crypto_aead *tfm, const u8 *key,
+> +			      unsigned int key_len)
+> +{
+> +	struct ccp_ctx *ctx = crypto_aead_ctx(tfm);
+> +
+> +	switch (key_len) {
+> +	case AES_KEYSIZE_128:
+> +		ctx->u.aes.type = CCP_AES_TYPE_128;
+> +		break;
+> +	case AES_KEYSIZE_192:
+> +		ctx->u.aes.type = CCP_AES_TYPE_192;
+> +		break;
+> +	case AES_KEYSIZE_256:
+> +		ctx->u.aes.type = CCP_AES_TYPE_256;
+> +		break;
+> +	default:
+> +		crypto_aead_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+> +		return -EINVAL;
+> +	}
+> +
+> +	ctx->u.aes.mode = CCP_AES_MODE_GCM;
+> +	ctx->u.aes.key_len = key_len;
+> +
+> +	memcpy(ctx->u.aes.key, key, key_len);
+> +	sg_init_one(&ctx->u.aes.key_sg, ctx->u.aes.key, key_len);
+> +
+> +	return 0;
+> +}
+> +
+> +static int ccp_aes_gcm_setauthsize(struct crypto_aead *tfm,
+> +				   unsigned int authsize)
+> +{
+> +	return 0;
+> +}
+> +
+> +static int ccp_aes_gcm_crypt(struct aead_request *req, bool encrypt)
+> +{
+> +	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+> +	struct ccp_ctx *ctx = crypto_aead_ctx(tfm);
+> +	struct ccp_aes_req_ctx *rctx = aead_request_ctx(req);
+> +	struct scatterlist *iv_sg = NULL;
+> +	unsigned int iv_len = 0;
+> +	int i;
+> +	int ret = 0;
+> +
+> +	if (!ctx->u.aes.key_len)
+> +		return -EINVAL;
+> +
+> +	if (ctx->u.aes.mode != CCP_AES_MODE_GCM)
+> +		return -EINVAL;
+> +
+> +	if (!req->iv)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * 5 parts:
+> +	 *   plaintext/ciphertext input
+> +	 *   AAD
+> +	 *   key
+> +	 *   IV
+> +	 *   Destination+tag buffer
+> +	 */
+> +
+> +	/* Copy the IV and initialize a scatterlist */
+> +	memset(rctx->iv, 0, AES_BLOCK_SIZE);
+> +	memcpy(rctx->iv, req->iv, AES_GCM_IVSIZE);
+> +	for (i = 0; i < 3; i++)
+> +		rctx->iv[i + AES_GCM_IVSIZE] = 0;
+
+Is this needed if you did the memset to zero above?
+
+> +	rctx->iv[AES_BLOCK_SIZE - 1] = 1;
+> +	iv_sg = &rctx->iv_sg;
+> +	iv_len = AES_BLOCK_SIZE;
+> +	sg_init_one(iv_sg, rctx->iv, iv_len);
+> +
+> +	/* The AAD + plaintext are concatenated in the src buffer */
+> +	memset(&rctx->cmd, 0, sizeof(rctx->cmd));
+> +	INIT_LIST_HEAD(&rctx->cmd.entry);
+> +	rctx->cmd.engine = CCP_ENGINE_AES;
+> +	rctx->cmd.u.aes.type = ctx->u.aes.type;
+> +	rctx->cmd.u.aes.mode = ctx->u.aes.mode;
+> +	rctx->cmd.u.aes.action =
+> +		(encrypt) ? CCP_AES_ACTION_ENCRYPT : CCP_AES_ACTION_DECRYPT;
+> +	rctx->cmd.u.aes.key = &ctx->u.aes.key_sg;
+> +	rctx->cmd.u.aes.key_len = ctx->u.aes.key_len;
+> +	rctx->cmd.u.aes.iv = iv_sg;
+> +	rctx->cmd.u.aes.iv_len = iv_len;
+> +	rctx->cmd.u.aes.src = req->src;
+> +	rctx->cmd.u.aes.src_len = req->cryptlen;
+> +	rctx->cmd.u.aes.aad_len = req->assoclen;
+> +
+> +	/* The cipher text + the tag are in the dst buffer */
+> +	rctx->cmd.u.aes.dst = req->dst;
+> +
+> +	ret = ccp_crypto_enqueue_request(&req->base, &rctx->cmd);
+> +
+> +	return ret;
+> +}
+> +
+> +static int ccp_aes_gcm_encrypt(struct aead_request *req)
+> +{
+> +	return ccp_aes_gcm_crypt(req, true);
+> +}
+> +
+> +static int ccp_aes_gcm_decrypt(struct aead_request *req)
+> +{
+> +	return ccp_aes_gcm_crypt(req, false);
+> +}
+> +
+> +static int ccp_aes_gcm_cra_init(struct crypto_aead *tfm)
+> +{
+> +	struct ccp_ctx *ctx = crypto_aead_ctx(tfm);
+> +
+> +	ctx->complete = ccp_aes_gcm_complete;
+> +	ctx->u.aes.key_len = 0;
+> +
+> +	crypto_aead_set_reqsize(tfm, sizeof(struct ccp_aes_req_ctx));
+> +
+> +	return 0;
+> +}
+> +
+> +static void ccp_aes_gcm_cra_exit(struct crypto_tfm *tfm)
+> +{
+> +}
+> +
+> +static struct aead_alg ccp_aes_gcm_defaults = {
+> +	.setkey = ccp_aes_gcm_setkey,
+> +	.setauthsize = ccp_aes_gcm_setauthsize,
+> +	.encrypt = ccp_aes_gcm_encrypt,
+> +	.decrypt = ccp_aes_gcm_decrypt,
+> +	.init = ccp_aes_gcm_cra_init,
+> +	.ivsize = AES_GCM_IVSIZE,
+> +	.maxauthsize = AES_BLOCK_SIZE,
+> +	.base = {
+> +		.cra_flags	= CRYPTO_ALG_TYPE_ABLKCIPHER |
+> +				  CRYPTO_ALG_ASYNC |
+> +				  CRYPTO_ALG_KERN_DRIVER_ONLY |
+> +				  CRYPTO_ALG_NEED_FALLBACK,
+> +		.cra_blocksize	= AES_BLOCK_SIZE,
+> +		.cra_ctxsize	= sizeof(struct ccp_ctx),
+> +		.cra_priority	= CCP_CRA_PRIORITY,
+> +		.cra_type	= &crypto_ablkcipher_type,
+> +		.cra_exit	= ccp_aes_gcm_cra_exit,
+> +		.cra_module	= THIS_MODULE,
+> +	},
+> +};
+> +
+> +struct ccp_aes_aead_def {
+> +	enum ccp_aes_mode mode;
+> +	unsigned int version;
+> +	const char *name;
+> +	const char *driver_name;
+> +	unsigned int blocksize;
+> +	unsigned int ivsize;
+> +	struct aead_alg *alg_defaults;
+> +};
+> +
+> +static struct ccp_aes_aead_def aes_aead_algs[] = {
+> +	{
+> +		.mode		= CCP_AES_MODE_GHASH,
+> +		.version	= CCP_VERSION(5, 0),
+> +		.name		= "gcm(aes)",
+> +		.driver_name	= "gcm-aes-ccp",
+> +		.blocksize	= 1,
+> +		.ivsize		= AES_BLOCK_SIZE,
+> +		.alg_defaults	= &ccp_aes_gcm_defaults,
+> +	},
+> +};
+> +
+> +static int ccp_register_aes_aead(struct list_head *head,
+> +				 const struct ccp_aes_aead_def *def)
+> +{
+> +	struct ccp_crypto_aead *ccp_aead;
+> +	struct aead_alg *alg;
+> +	int ret;
+> +
+> +	ccp_aead = kzalloc(sizeof(*ccp_aead), GFP_KERNEL);
+> +	if (!ccp_aead)
+> +		return -ENOMEM;
+> +
+> +	INIT_LIST_HEAD(&ccp_aead->entry);
+> +
+> +	ccp_aead->mode = def->mode;
+> +
+> +	/* Copy the defaults and override as necessary */
+> +	alg = &ccp_aead->alg;
+> +	*alg = *def->alg_defaults;
+> +	snprintf(alg->base.cra_name, CRYPTO_MAX_ALG_NAME, "%s", def->name);
+> +	snprintf(alg->base.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
+> +		 def->driver_name);
+> +	alg->base.cra_blocksize = def->blocksize;
+> +	alg->base.cra_ablkcipher.ivsize = def->ivsize;
+> +
+> +	ret = crypto_register_aead(alg);
+> +	if (ret) {
+> +		pr_err("%s ablkcipher algorithm registration error (%d)\n",
+> +		       alg->base.cra_name, ret);
+> +		kfree(ccp_aead);
+> +		return ret;
+> +	}
+> +
+> +	list_add(&ccp_aead->entry, head);
+> +
+> +	return 0;
+> +}
+> +
+> +int ccp_register_aes_aeads(struct list_head *head)
+> +{
+> +	int i, ret;
+> +	unsigned int ccpversion = ccp_version();
+> +
+> +	for (i = 0; i < ARRAY_SIZE(aes_aead_algs); i++) {
+> +		if (aes_aead_algs[i].version > ccpversion)
+> +			continue;
+> +		ret = ccp_register_aes_aead(head, &aes_aead_algs[i]);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
+> index f3c4c25..103a7b3 100644
+> --- a/drivers/crypto/ccp/ccp-crypto-main.c
+> +++ b/drivers/crypto/ccp/ccp-crypto-main.c
+> @@ -40,6 +40,7 @@ MODULE_PARM_DESC(rsa_disable, "Disable use of RSA - any non-zero value");
+>  /* List heads for the supported algorithms */
+>  static LIST_HEAD(hash_algs);
+>  static LIST_HEAD(cipher_algs);
+> +static LIST_HEAD(aead_algs);
+>  
+>  /* For any tfm, requests for that tfm must be returned on the order
+>   * received.  With multiple queues available, the CCP can process more
+> @@ -339,6 +340,10 @@ static int ccp_register_algs(void)
+>  		ret = ccp_register_aes_xts_algs(&cipher_algs);
+>  		if (ret)
+>  			return ret;
+> +
+> +		ret = ccp_register_aes_aeads(&aead_algs);
+> +		if (ret)
+> +			return ret;
+>  	}
+>  
+>  	if (!sha_disable) {
+> @@ -362,6 +367,7 @@ static void ccp_unregister_algs(void)
+>  {
+>  	struct ccp_crypto_ahash_alg *ahash_alg, *ahash_tmp;
+>  	struct ccp_crypto_ablkcipher_alg *ablk_alg, *ablk_tmp;
+> +	struct ccp_crypto_aead *aead_alg, *aead_tmp;
+>  
+>  	list_for_each_entry_safe(ahash_alg, ahash_tmp, &hash_algs, entry) {
+>  		crypto_unregister_ahash(&ahash_alg->alg);
+> @@ -377,6 +383,12 @@ static void ccp_unregister_algs(void)
+>  
+>  	if (!rsa_disable)
+>  		ccp_unregister_rsa_algs();
+> +
+> +	list_for_each_entry_safe(aead_alg, aead_tmp, &aead_algs, entry) {
+> +		crypto_unregister_aead(&aead_alg->alg);
+> +		list_del(&aead_alg->entry);
+> +		kfree(aead_alg);
+> +	}
 >  }
 >  
->  static int ccp_rsa_setkey(struct crypto_akcipher *tfm, const void *key,
-> -			  unsigned int keylen, bool public)
-> +			  unsigned int keylen, bool private)
->  {
->  	struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
->  	struct rsa_key raw_key;
-> @@ -139,10 +139,10 @@ static int ccp_rsa_setkey(struct crypto_akcipher *tfm, const void *key,
->  	memset(&raw_key, 0, sizeof(raw_key));
->  
->  	/* Code borrowed from crypto/rsa.c */
-> -	if (public)
-> -		ret = rsa_parse_pub_key(&raw_key, key, keylen);
-> -	else
-> +	if (private)
->  		ret = rsa_parse_priv_key(&raw_key, key, keylen);
-> +	else
-> +		ret = rsa_parse_pub_key(&raw_key, key, keylen);
->  	if (ret)
->  		goto e_ret;
->  
-> @@ -169,7 +169,7 @@ static int ccp_rsa_setkey(struct crypto_akcipher *tfm, const void *key,
->  		goto e_nkey;
->  	sg_init_one(&ctx->u.rsa.n_sg, ctx->u.rsa.n_buf, ctx->u.rsa.n_len);
->  
-> -	if (!public) {
-> +	if (private) {
->  		ctx->u.rsa.pkey.d = mpi_read_raw_data(raw_key.d, raw_key.d_sz);
->  		if (!ctx->u.rsa.pkey.d)
->  			goto e_nkey;
-> @@ -196,13 +196,13 @@ e_ret:
->  static int ccp_rsa_setprivkey(struct crypto_akcipher *tfm, const void *key,
->  			      unsigned int keylen)
->  {
-> -	return ccp_rsa_setkey(tfm, key, keylen, false);
-> +	return ccp_rsa_setkey(tfm, key, keylen, true);
->  }
->  
->  static int ccp_rsa_setpubkey(struct crypto_akcipher *tfm, const void *key,
->  			     unsigned int keylen)
->  {
-> -	return ccp_rsa_setkey(tfm, key, keylen, true);
-> +	return ccp_rsa_setkey(tfm, key, keylen, false);
->  }
->  
->  static int ccp_rsa_init_tfm(struct crypto_akcipher *tfm)
+>  static int ccp_crypto_init(void)
 > diff --git a/drivers/crypto/ccp/ccp-crypto.h b/drivers/crypto/ccp/ccp-crypto.h
-> index 4a1d206..c6cf318 100644
+> index c6cf318..b2918f6 100644
 > --- a/drivers/crypto/ccp/ccp-crypto.h
 > +++ b/drivers/crypto/ccp/ccp-crypto.h
-> @@ -138,8 +138,7 @@ struct ccp_aes_cmac_exp_ctx {
->  	u8 buf[AES_BLOCK_SIZE];
+> @@ -19,6 +19,8 @@
+>  #include <linux/ccp.h>
+>  #include <crypto/algapi.h>
+>  #include <crypto/aes.h>
+> +#include <crypto/internal/aead.h>
+> +#include <crypto/aead.h>
+>  #include <crypto/ctr.h>
+>  #include <crypto/hash.h>
+>  #include <crypto/sha.h>
+> @@ -34,6 +36,14 @@ struct ccp_crypto_ablkcipher_alg {
+>  	struct crypto_alg alg;
 >  };
 >  
-> -/*
-> - * SHA-related defines
-> +/* SHA-related defines
-
-Shouldn't be part of this patch.
-
->   * These values must be large enough to accommodate any variant
->   */
->  #define MAX_SHA_CONTEXT_SIZE	SHA512_DIGEST_SIZE
+> +struct ccp_crypto_aead {
+> +	struct list_head entry;
+> +
+> +	u32 mode;
+> +
+> +	struct aead_alg alg;
+> +};
+> +
+>  struct ccp_crypto_ahash_alg {
+>  	struct list_head entry;
+>  
+> @@ -96,6 +106,9 @@ struct ccp_aes_req_ctx {
+>  	struct scatterlist iv_sg;
+>  	u8 iv[AES_BLOCK_SIZE];
+>  
+> +	struct scatterlist tag_sg;
+> +	u8 tag[AES_BLOCK_SIZE];
+> +
+>  	/* Fields used for RFC3686 requests */
+>  	u8 *rfc3686_info;
+>  	u8 rfc3686_iv[AES_BLOCK_SIZE];
+> @@ -234,6 +247,7 @@ struct scatterlist *ccp_crypto_sg_table_add(struct sg_table *table,
+>  int ccp_register_aes_algs(struct list_head *head);
+>  int ccp_register_aes_cmac_algs(struct list_head *head);
+>  int ccp_register_aes_xts_algs(struct list_head *head);
+> +int ccp_register_aes_aeads(struct list_head *head);
+>  int ccp_register_sha_algs(struct list_head *head);
+>  int ccp_register_rsa_algs(void);
+>  void ccp_unregister_rsa_algs(void);
+> diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+> index faf3cb3..dcae391 100644
+> --- a/drivers/crypto/ccp/ccp-dev-v5.c
+> +++ b/drivers/crypto/ccp/ccp-dev-v5.c
+> @@ -279,6 +279,8 @@ static int ccp5_perform_aes(struct ccp_op *op)
+>  	CCP_AES_TYPE(&function) = op->u.aes.type;
+>  	if (op->u.aes.mode == CCP_AES_MODE_CFB)
+>  		CCP_AES_SIZE(&function) = 0x7f;
+> +	if ((op->u.aes.mode == CCP_AES_MODE_GCTR) && op->eom)
+> +		CCP_AES_SIZE(&function) = op->u.aes.size;
+>  
+>  	CCP5_CMD_FUNCTION(&desc) = function.raw;
+>  
 > diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-> index 0d996fe..143f00f 100644
+> index 143f00f..a2214ac 100644
 > --- a/drivers/crypto/ccp/ccp-dev.h
 > +++ b/drivers/crypto/ccp/ccp-dev.h
-> @@ -193,6 +193,7 @@
->  #define CCP_SHA_SB_COUNT		1
->  
->  #define CCP_RSA_MAX_WIDTH		4096
-> +#define CCP5_RSA_MAX_WIDTH		16384
->  
->  #define CCP_PASSTHRU_BLOCKSIZE		256
->  #define CCP_PASSTHRU_MASKSIZE		32
-> @@ -515,7 +516,6 @@ struct ccp_op {
->  		struct ccp_passthru_op passthru;
->  		struct ccp_ecc_op ecc;
->  	} u;
-> -	struct ccp_mem key;
-
-This should probably be part of a cleanup patch.
-
+> @@ -467,6 +467,7 @@ struct ccp_aes_op {
+>  	enum ccp_aes_type type;
+>  	enum ccp_aes_mode mode;
+>  	enum ccp_aes_action action;
+> +	unsigned int size;
 >  };
 >  
->  static inline u32 ccp_addr_lo(struct ccp_dma_info *info)
+>  struct ccp_xts_aes_op {
 > diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-> index 826782d..07b8dfb 100644
+> index 07b8dfb..de28867 100644
 > --- a/drivers/crypto/ccp/ccp-ops.c
 > +++ b/drivers/crypto/ccp/ccp-ops.c
-> @@ -1283,49 +1283,72 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
->  	int i = 0;
->  	int ret = 0;
+> @@ -601,6 +601,265 @@ e_key:
+>  	return ret;
+>  }
 >  
-> -	if (rsa->key_size > CCP_RSA_MAX_WIDTH)
-> -		return -EINVAL;
-> +	if (cmd_q->ccp->vdata->version < CCP_VERSION(4, 0)) {
-> +		if (rsa->key_size > CCP_RSA_MAX_WIDTH)
-> +			return -EINVAL;
+> +static int ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q,
+> +			       struct ccp_cmd *cmd)
+> +{
+> +	struct ccp_aes_engine *aes = &cmd->u.aes;
+> +	struct ccp_dm_workarea key, ctx, final_wa, tag;
+> +	struct ccp_data src, dst;
+> +	struct ccp_data aad;
+> +	struct ccp_op op;
+> +
+> +	unsigned long long *final;
+> +	unsigned int dm_offset;
+> +	unsigned int ilen;
+> +	bool in_place = true; /* Default value */
+> +	int ret;
+> +
+> +	struct scatterlist *p_inp, sg_inp[2];
+> +	struct scatterlist *p_tag, sg_tag[2];
+> +	struct scatterlist *p_outp, sg_outp[2];
+> +	struct scatterlist *p_aad;
+> +
+> +	if (!aes->iv)
+> +		return -EINVAL;
+> +
+> +	if (!((aes->key_len == AES_KEYSIZE_128) ||
+> +		(aes->key_len == AES_KEYSIZE_192) ||
+> +		(aes->key_len == AES_KEYSIZE_256)))
+> +		return -EINVAL;
+> +
+> +	if (!aes->key) /* Gotta have a key SGL */
+> +		return -EINVAL;
+> +
+> +	/* First, decompose the source buffer into AAD & PT,
+> +	 * and the destination buffer into AAD, CT & tag, or
+> +	 * the input into CT & tag.
+> +	 * It is expected that the input and output SGs will
+> +	 * be valid, even if the AAD and input lengths are 0.
+> +	 */
+> +	p_aad = aes->src;
+> +	p_inp = scatterwalk_ffwd(sg_inp, aes->src, aes->aad_len);
+> +	p_outp = scatterwalk_ffwd(sg_outp, aes->dst, aes->aad_len);
+> +	if (aes->action == CCP_AES_ACTION_ENCRYPT) {
+> +		ilen = aes->src_len;
+> +		p_tag = scatterwalk_ffwd(sg_tag, p_outp, ilen);
 > +	} else {
-> +		if (rsa->key_size > CCP5_RSA_MAX_WIDTH)
-> +			return -EINVAL;
+> +		/* Input length for decryption includes tag */
+> +		ilen = aes->src_len - AES_BLOCK_SIZE;
+> +		p_tag = scatterwalk_ffwd(sg_tag, p_inp, ilen);
 > +	}
+> +
+> +	ret = -EIO;
 
-Might be able to actually add the max supported key size to the
-version data and simplify the check here.
+No need to set ret here since it will be overwritten immediately below.
 
->  
->  	if (!rsa->exp || !rsa->mod || !rsa->src || !rsa->dst)
->  		return -EINVAL;
->  
-> -	/* The RSA modulus must precede the message being acted upon, so
-> -	 * it must be copied to a DMA area where the message and the
-> -	 * modulus can be concatenated.  Therefore the input buffer
-> -	 * length required is twice the output buffer length (which
-> -	 * must be a multiple of 256-bits).
-> -	 */
-> -	o_len = ((rsa->key_size + 255) / 256) * 32;
-> -	i_len = o_len * 2;
-> -
-> -	sb_count = o_len / CCP_SB_BYTES;
-> -
->  	memset(&op, 0, sizeof(op));
->  	op.cmd_q = cmd_q;
-> -	op.jobid = ccp_gen_jobid(cmd_q->ccp);
-> -	op.sb_key = cmd_q->ccp->vdata->perform->sballoc(cmd_q, sb_count);
+> +	memset(&op, 0, sizeof(op));
+> +	op.cmd_q = cmd_q;
 > +	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
->  
-> -	if (!op.sb_key)
-> -		return -EIO;
-> +	if (cmd_q->ccp->vdata->version < CCP_VERSION(4, 0)) {
-> +		/* The RSA modulus must precede the message being acted upon, so
-> +		 * it must be copied to a DMA area where the message and the
-> +		 * modulus can be concatenated.  Therefore the input buffer
-> +		 * length required is twice the output buffer length (which
-> +		 * must be a multiple of 256-bits).
-> +		 */
-> +		sb_count = (rsa->key_size + CCP_SB_BYTES - 1) / CCP_SB_BYTES;
-> +		o_len = sb_count * 32; /* bytes */
-> +		i_len = o_len * 2; /* bytes */
+> +	op.sb_key = cmd_q->sb_key; /* Pre-allocated */
+> +	op.sb_ctx = cmd_q->sb_ctx; /* Pre-allocated */
+> +	op.init = 1;
+> +	op.u.aes.type = aes->type;
 > +
-> +		op.sb_key = cmd_q->ccp->vdata->perform->sballoc(cmd_q,
-> +								sb_count);
-> +		if (!op.sb_key)
-> +			return -EIO;
-> +	} else {
-> +		/* A version 5 device allows the key to be in memory */
-> +		o_len = rsa->mod_len;
-> +		i_len = o_len * 2; /* bytes */
-> +		op.sb_key = cmd_q->sb_key;
+> +	/* Copy the key to the LSB */
+> +	ret = ccp_init_dm_workarea(&key, cmd_q,
+> +				   CCP_AES_CTX_SB_COUNT * CCP_SB_BYTES,
+> +				   DMA_TO_DEVICE);
+> +	if (ret)
+> +		return ret;
+> +
+> +	dm_offset = CCP_SB_BYTES - aes->key_len;
+> +	ccp_set_dm_area(&key, dm_offset, aes->key, 0, aes->key_len);
+> +	ret = ccp_copy_to_sb(cmd_q, &key, op.jobid, op.sb_key,
+> +			     CCP_PASSTHRU_BYTESWAP_256BIT);
+> +	if (ret) {
+> +		cmd->engine_error = cmd_q->cmd_error;
+> +		goto e_key;
 > +	}
->  
-> -	/* The RSA exponent may span multiple (32-byte) SB entries and must
-> -	 * be in little endian format. Reverse copy each 32-byte chunk
-> -	 * of the exponent (En chunk to E0 chunk, E(n-1) chunk to E1 chunk)
-> -	 * and each byte within that chunk and do not perform any byte swap
-> -	 * operations on the passthru operation.
-> -	 */
->  	ret = ccp_init_dm_workarea(&exp, cmd_q, o_len, DMA_TO_DEVICE);
->  	if (ret)
->  		goto e_sb;
->  
-> -	ret = ccp_reverse_set_dm_area(&exp, 0, rsa->exp, 0, rsa->exp_len);
-> +	if (rsa->mode == CCP_RSA_ENCRYPT)
-> +		ret = ccp_reverse_set_dm_area(&exp, 0, rsa->exp, 0,
-> +					      rsa->exp_len);
-> +	else
-> +		ret = ccp_reverse_set_dm_area(&exp, 0, rsa->d_sg, 0,
-> +					      rsa->d_len);
-
-This goes with the comment in the previous patch where you just need to
-pass in one of these - the one to be used in the operation.
-
->  	if (ret)
->  		goto e_exp;
-> -	ret = ccp_copy_to_sb(cmd_q, &exp, op.jobid, op.sb_key,
-> -			     CCP_PASSTHRU_BYTESWAP_NOOP);
-> -	if (ret) {
-> -		cmd->engine_error = cmd_q->cmd_error;
-> -		goto e_exp;
 > +
-> +	if (cmd_q->ccp->vdata->version < CCP_VERSION(4, 0)) {
-> +		/* The RSA exponent may span multiple (32-byte) KSB entries and
-> +		 * must be in little endian format. Reverse copy each 32-byte
-> +		 * chunk of the exponent (En chunk to E0 chunk, E(n-1) chunk to
-> +		 * E1 chunk) and each byte within that chunk and do not perform
-> +		 * any byte swap operations on the passthru operation.
-> +		 */
-> +		ret = ccp_copy_to_sb(cmd_q, &exp, op.jobid, op.sb_key,
-> +				     CCP_PASSTHRU_BYTESWAP_NOOP);
-> +		if (ret) {
-> +			cmd->engine_error = cmd_q->cmd_error;
-> +			goto e_exp;
+> +	/* Copy the context (IV) to the LSB.
+> +	 * There is an assumption here that the IV is 96 bits in length, plus
+> +	 * a nonce of 32 bits. If no IV is present, use a zeroed buffer.
+> +	 */
+> +	ret = ccp_init_dm_workarea(&ctx, cmd_q,
+> +				   CCP_AES_CTX_SB_COUNT * CCP_SB_BYTES,
+> +				   DMA_BIDIRECTIONAL);
+> +	if (ret)
+> +		goto e_key;
+> +
+> +	dm_offset = CCP_AES_CTX_SB_COUNT * CCP_SB_BYTES - aes->iv_len;
+> +	ccp_set_dm_area(&ctx, dm_offset, aes->iv, 0, aes->iv_len);
+> +
+> +	ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
+> +			     CCP_PASSTHRU_BYTESWAP_256BIT);
+> +	if (ret) {
+> +		cmd->engine_error = cmd_q->cmd_error;
+> +		goto e_ctx;
+> +	}
+> +
+> +	op.init = 1;
+> +	if (aes->aad_len > 0) {
+> +		/* Step 1: Run a GHASH over the Additional Authenticated Data */
+> +		ret = ccp_init_data(&aad, cmd_q, p_aad, aes->aad_len,
+> +				    AES_BLOCK_SIZE,
+> +				    DMA_TO_DEVICE);
+> +		if (ret)
+> +			goto e_ctx;
+> +
+> +		op.u.aes.mode = CCP_AES_MODE_GHASH;
+> +		op.u.aes.action = CCP_AES_GHASHAAD;
+> +
+> +		while (aad.sg_wa.bytes_left) {
+> +			ccp_prepare_data(&aad, NULL, &op, AES_BLOCK_SIZE, true);
+> +
+> +			ret = cmd_q->ccp->vdata->perform->aes(&op);
+> +			if (ret) {
+> +				cmd->engine_error = cmd_q->cmd_error;
+> +				goto e_aad;
+> +			}
+> +
+> +			ccp_process_data(&aad, NULL, &op);
+> +			op.init = 0;
 > +		}
-> +	} else {
-> +		op.exp.u.dma.address = exp.dma.address;
-> +		op.exp.u.dma.offset = 0;
->  	}
->  
->  	/* Concatenate the modulus and the message. Both the modulus and
-> @@ -1345,7 +1368,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
->  	src.address -= o_len;	/* Reset the address to original value */
->  
->  	/* Prepare the output area for the operation */
-> -	ret = ccp_init_data(&dst, cmd_q, rsa->dst, rsa->mod_len,
-> +	ret = ccp_init_data(&dst, cmd_q, rsa->dst, rsa->dst_len,
->  			    o_len, DMA_FROM_DEVICE);
->  	if (ret)
->  		goto e_src;
-> @@ -1358,7 +1381,10 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
->  	op.dst.u.dma.offset = 0;
->  	op.dst.u.dma.length = o_len;
->  
-> -	op.u.rsa.mod_size = rsa->key_size;
-> +	if (cmd_q->ccp->vdata->version < CCP_VERSION(4, 0))
-> +		op.u.rsa.mod_size = rsa->key_size * 8; /* In bits */
+> +	}
+> +
+> +	op.u.aes.mode = CCP_AES_MODE_GCTR;
+> +	if (aes->action == CCP_AES_ACTION_ENCRYPT)
+> +		op.u.aes.action = CCP_AES_ACTION_ENCRYPT;
 > +	else
-> +		op.u.rsa.mod_size = rsa->key_size;
->  	op.u.rsa.input_len = i_len;
->  
->  	ret = cmd_q->ccp->vdata->perform->rsa(&op);
-> @@ -1366,8 +1392,12 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
->  		cmd->engine_error = cmd_q->cmd_error;
->  		goto e_dst;
->  	}
-> +	/* Return the length of the result, too */
-> +	for (i = o_len; !dst.dm_wa.address[--i]; )
-> +		;
-> +	rsa->d_len = i + 1;
+> +		op.u.aes.action = CCP_AES_ACTION_DECRYPT;
 
-The output length will always be o_len in size.  If the crypto api
-requires the removal of leading zeroes you should do that at the
-ccp crypto api layer.
+Can't you just do op.u.aes.action = aes->action?
+
+> +
+> +	if (ilen > 0) {
+> +		/* Step 2: Run a GCTR over the plaintext */
+> +		in_place = (sg_virt(p_inp) == sg_virt(p_outp)) ? true : false;
+> +
+> +
+
+Extra blank line.
+
+> +		ret = ccp_init_data(&dst, cmd_q, p_outp, ilen,
+> +				    AES_BLOCK_SIZE, DMA_FROM_DEVICE);
+> +		if (ret)
+> +			goto e_src;
+
+I don't think you want this here since you do it again below if
+!in_place.
 
 Thanks,
 Tom
 
+> +
+> +		ret = ccp_init_data(&src, cmd_q, p_inp, ilen,
+> +				    AES_BLOCK_SIZE,
+> +				    in_place ? DMA_BIDIRECTIONAL
+> +					     : DMA_TO_DEVICE);
+> +		if (ret)
+> +			goto e_ctx;
+> +
+> +		if (in_place) {
+> +			dst = src;
+> +		} else {
+> +			ret = ccp_init_data(&dst, cmd_q, p_outp, ilen,
+> +					    AES_BLOCK_SIZE, DMA_FROM_DEVICE);
+> +			if (ret)
+> +				goto e_src;
+> +		}
+> +
+> +		op.soc = 0;
+> +		op.eom = 0;
+> +		op.init = 1;
+> +		while (src.sg_wa.bytes_left) {
+> +			ccp_prepare_data(&src, &dst, &op, AES_BLOCK_SIZE, true);
+> +			if (!src.sg_wa.bytes_left) {
+> +				unsigned int nbytes = aes->src_len
+> +						      % AES_BLOCK_SIZE;
+> +
+> +				if (nbytes) {
+> +					op.eom = 1;
+> +					op.u.aes.size = (nbytes * 8) - 1;
+> +				}
+> +			}
+> +
+> +			ret = cmd_q->ccp->vdata->perform->aes(&op);
+> +			if (ret) {
+> +				cmd->engine_error = cmd_q->cmd_error;
+> +				goto e_dst;
+> +			}
+> +
+> +			ccp_process_data(&src, &dst, &op);
+> +			op.init = 0;
+> +		}
+> +	}
+> +
+> +	/* Step 3: Update the IV portion of the context with the original IV */
+> +	ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
+> +			       CCP_PASSTHRU_BYTESWAP_256BIT);
+> +	if (ret) {
+> +		cmd->engine_error = cmd_q->cmd_error;
+> +		goto e_dst;
+> +	}
+> +
+> +	ccp_set_dm_area(&ctx, dm_offset, aes->iv, 0, aes->iv_len);
+> +
+> +	ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
+> +			     CCP_PASSTHRU_BYTESWAP_256BIT);
+> +	if (ret) {
+> +		cmd->engine_error = cmd_q->cmd_error;
+> +		goto e_dst;
+> +	}
+> +
+> +	/* Step 4: Concatenate the lengths of the AAD and source, and
+> +	 * hash that 16 byte buffer.
+> +	 */
+> +	ret = ccp_init_dm_workarea(&final_wa, cmd_q, AES_BLOCK_SIZE,
+> +				   DMA_BIDIRECTIONAL);
+> +	if (ret)
+> +		goto e_dst;
+> +	final = (unsigned long long *) final_wa.address;
+> +	final[0] = cpu_to_be64(aes->aad_len * 8);
+> +	final[1] = cpu_to_be64(ilen * 8);
+> +
+> +	op.u.aes.mode = CCP_AES_MODE_GHASH;
+> +	op.u.aes.action = CCP_AES_GHASHFINAL;
+> +	op.src.type = CCP_MEMTYPE_SYSTEM;
+> +	op.src.u.dma.address = final_wa.dma.address;
+> +	op.src.u.dma.length = AES_BLOCK_SIZE;
+> +	op.dst.type = CCP_MEMTYPE_SYSTEM;
+> +	op.dst.u.dma.address = final_wa.dma.address;
+> +	op.dst.u.dma.length = AES_BLOCK_SIZE;
+> +	op.eom = 1;
+> +	op.u.aes.size = 0;
+> +	ret = cmd_q->ccp->vdata->perform->aes(&op);
+> +	if (ret)
+> +		goto e_dst;
+> +
+> +	if (aes->action == CCP_AES_ACTION_ENCRYPT) {
+> +		/* Put the ciphered tag after the ciphertext. */
+> +		ccp_get_dm_area(&final_wa, 0, p_tag, 0, AES_BLOCK_SIZE);
+> +	} else {
+> +		/* Does this ciphered tag match the input? */
+> +		ret = ccp_init_dm_workarea(&tag, cmd_q, AES_BLOCK_SIZE,
+> +					   DMA_BIDIRECTIONAL);
+> +		if (ret)
+> +			goto e_tag;
+> +		ccp_set_dm_area(&tag, 0, p_tag, 0, AES_BLOCK_SIZE);
+> +
+> +		ret = memcmp(tag.address, final_wa.address, AES_BLOCK_SIZE);
+> +		ccp_dm_free(&tag);
+> +	}
+> +
+> +e_tag:
+> +	ccp_dm_free(&final_wa);
+> +
+> +e_dst:
+> +	if (aes->src_len && !in_place)
+> +		ccp_free_data(&dst, cmd_q);
+> +
+> +e_src:
+> +	if (aes->src_len)
+> +		ccp_free_data(&src, cmd_q);
+> +
+> +e_aad:
+> +	if (aes->aad_len)
+> +		ccp_free_data(&aad, cmd_q);
+> +
+> +e_ctx:
+> +	ccp_dm_free(&ctx);
+> +
+> +e_key:
+> +	ccp_dm_free(&key);
+> +
+> +	return ret;
+> +}
+> +
+>  static int ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+>  {
+>  	struct ccp_aes_engine *aes = &cmd->u.aes;
+> @@ -614,6 +873,9 @@ static int ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+>  	if (aes->mode == CCP_AES_MODE_CMAC)
+>  		return ccp_run_aes_cmac_cmd(cmd_q, cmd);
 >  
-> -	ccp_reverse_get_dm_area(&dst.dm_wa, 0, rsa->dst, 0, rsa->mod_len);
-> +	ccp_reverse_get_dm_area(&dst.dm_wa, 0, rsa->dst, 0, rsa->d_len);
+> +	if (aes->mode == CCP_AES_MODE_GCM)
+> +		return ccp_run_aes_gcm_cmd(cmd_q, cmd);
+> +
+>  	if (!((aes->key_len == AES_KEYSIZE_128) ||
+>  	      (aes->key_len == AES_KEYSIZE_192) ||
+>  	      (aes->key_len == AES_KEYSIZE_256)))
+> diff --git a/include/linux/ccp.h b/include/linux/ccp.h
+> index d634565..f90f8ba 100644
+> --- a/include/linux/ccp.h
+> +++ b/include/linux/ccp.h
+> @@ -124,6 +124,10 @@ enum ccp_aes_mode {
+>  	CCP_AES_MODE_CFB,
+>  	CCP_AES_MODE_CTR,
+>  	CCP_AES_MODE_CMAC,
+> +	CCP_AES_MODE_GHASH,
+> +	CCP_AES_MODE_GCTR,
+> +	CCP_AES_MODE_GCM,
+> +	CCP_AES_MODE_GMAC,
+>  	CCP_AES_MODE__LAST,
+>  };
 >  
->  e_dst:
->  	ccp_free_data(&dst, cmd_q);
-> @@ -1379,7 +1409,8 @@ e_exp:
->  	ccp_dm_free(&exp);
+> @@ -138,6 +142,9 @@ enum ccp_aes_action {
+>  	CCP_AES_ACTION_ENCRYPT,
+>  	CCP_AES_ACTION__LAST,
+>  };
+> +/* Overloaded field */
+> +#define	CCP_AES_GHASHAAD	CCP_AES_ACTION_DECRYPT
+> +#define	CCP_AES_GHASHFINAL	CCP_AES_ACTION_ENCRYPT
 >  
->  e_sb:
-> -	cmd_q->ccp->vdata->perform->sbfree(cmd_q, op.sb_key, sb_count);
-> +	if (cmd_q->ccp->vdata->version < CCP_VERSION(4, 0))
-> +		cmd_q->ccp->vdata->perform->sbfree(cmd_q, op.sb_key, sb_count);
+>  /**
+>   * struct ccp_aes_engine - CCP AES operation
+> @@ -182,6 +189,8 @@ struct ccp_aes_engine {
+>  	struct scatterlist *cmac_key;	/* K1/K2 cmac key required for
+>  					 * final cmac cmd */
+>  	u32 cmac_key_len;	/* In bytes */
+> +
+> +	u32 aad_len;		/* In bytes */
+>  };
 >  
->  	return ret;
->  }
+>  /***** XTS-AES engine *****/
 > 
