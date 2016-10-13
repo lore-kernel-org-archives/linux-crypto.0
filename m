@@ -1,7 +1,7 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 2/6] crypto: ccp - Remove unneeded sign-extension support
-Date: Thu, 13 Oct 2016 09:53:00 -0500
-Message-ID: <20161013145300.19759.14061.stgit@taos>
+Subject: [PATCH 3/6] crypto: ccp - Add support for RSA on the CCP
+Date: Thu, 13 Oct 2016 09:53:09 -0500
+Message-ID: <20161013145309.19759.18493.stgit@taos>
 References: <20161013144542.19759.6924.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,290 +10,532 @@ Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
         <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0072.outbound.protection.outlook.com ([104.47.42.72]:52172
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-cys01nam02on0084.outbound.protection.outlook.com ([104.47.37.84]:60013
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754424AbcJMP1z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Oct 2016 11:27:55 -0400
+        id S1755116AbcJMP3m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Oct 2016 11:29:42 -0400
 In-Reply-To: <20161013144542.19759.6924.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The reverse-get/set functions can be simplified by
-eliminating unused code.
-
+Wire up the v3 CCP as a cipher provider.
 
 Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/ccp-ops.c |  145 +++++++++++++++++-------------------------
- 1 file changed, 59 insertions(+), 86 deletions(-)
+ drivers/crypto/ccp/Makefile          |    1 
+ drivers/crypto/ccp/ccp-crypto-main.c |   15 ++
+ drivers/crypto/ccp/ccp-crypto-rsa.c  |  258 ++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/ccp-crypto.h      |   24 +++
+ drivers/crypto/ccp/ccp-dev-v3.c      |   38 +++++
+ drivers/crypto/ccp/ccp-ops.c         |    1 
+ include/linux/ccp.h                  |   34 ++++
+ 7 files changed, 370 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/crypto/ccp/ccp-crypto-rsa.c
 
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index 8fedb14..82cc637 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -198,62 +198,46 @@ static void ccp_get_dm_area(struct ccp_dm_workarea *wa, unsigned int wa_offset,
- }
+diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+index 346ceb8..23f89b7 100644
+--- a/drivers/crypto/ccp/Makefile
++++ b/drivers/crypto/ccp/Makefile
+@@ -12,4 +12,5 @@ ccp-crypto-objs := ccp-crypto-main.o \
+ 		   ccp-crypto-aes.o \
+ 		   ccp-crypto-aes-cmac.o \
+ 		   ccp-crypto-aes-xts.o \
++		   ccp-crypto-rsa.o \
+ 		   ccp-crypto-sha.o
+diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
+index e0380e5..f3c4c25 100644
+--- a/drivers/crypto/ccp/ccp-crypto-main.c
++++ b/drivers/crypto/ccp/ccp-crypto-main.c
+@@ -33,6 +33,10 @@ static unsigned int sha_disable;
+ module_param(sha_disable, uint, 0444);
+ MODULE_PARM_DESC(sha_disable, "Disable use of SHA - any non-zero value");
  
- static int ccp_reverse_set_dm_area(struct ccp_dm_workarea *wa,
-+				   unsigned int wa_offset,
- 				   struct scatterlist *sg,
--				   unsigned int len, unsigned int se_len,
--				   bool sign_extend)
-+				   unsigned int sg_offset,
-+				   unsigned int len)
- {
--	unsigned int nbytes, sg_offset, dm_offset, sb_len, i;
--	u8 buffer[CCP_REVERSE_BUF_SIZE];
--
--	if (WARN_ON(se_len > sizeof(buffer)))
--		return -EINVAL;
--
--	sg_offset = len;
--	dm_offset = 0;
--	nbytes = len;
--	while (nbytes) {
--		sb_len = min_t(unsigned int, nbytes, se_len);
--		sg_offset -= sb_len;
--
--		scatterwalk_map_and_copy(buffer, sg, sg_offset, sb_len, 0);
--		for (i = 0; i < sb_len; i++)
--			wa->address[dm_offset + i] = buffer[sb_len - i - 1];
--
--		dm_offset += sb_len;
--		nbytes -= sb_len;
--
--		if ((sb_len != se_len) && sign_extend) {
--			/* Must sign-extend to nearest sign-extend length */
--			if (wa->address[dm_offset - 1] & 0x80)
--				memset(wa->address + dm_offset, 0xff,
--				       se_len - sb_len);
--		}
-+	u8 *p, *q;
++static unsigned int rsa_disable;
++module_param(rsa_disable, uint, 0444);
++MODULE_PARM_DESC(rsa_disable, "Disable use of RSA - any non-zero value");
 +
-+	ccp_set_dm_area(wa, wa_offset, sg, sg_offset, len);
-+
-+	p = wa->address + wa_offset;
-+	q = p + len - 1;
-+	while (p < q) {
-+		*p = *p ^ *q;
-+		*q = *p ^ *q;
-+		*p = *p ^ *q;
-+		p++;
-+		q--;
+ /* List heads for the supported algorithms */
+ static LIST_HEAD(hash_algs);
+ static LIST_HEAD(cipher_algs);
+@@ -343,6 +347,14 @@ static int ccp_register_algs(void)
+ 			return ret;
  	}
--
+ 
++	if (!rsa_disable) {
++		ret = ccp_register_rsa_algs();
++		if (ret) {
++			rsa_disable = 1;
++			return ret;
++		}
++	}
++
  	return 0;
  }
  
- static void ccp_reverse_get_dm_area(struct ccp_dm_workarea *wa,
-+				    unsigned int wa_offset,
- 				    struct scatterlist *sg,
-+				    unsigned int sg_offset,
- 				    unsigned int len)
- {
--	unsigned int nbytes, sg_offset, dm_offset, sb_len, i;
--	u8 buffer[CCP_REVERSE_BUF_SIZE];
--
--	sg_offset = 0;
--	dm_offset = len;
--	nbytes = len;
--	while (nbytes) {
--		sb_len = min_t(unsigned int, nbytes, sizeof(buffer));
--		dm_offset -= sb_len;
--
--		for (i = 0; i < sb_len; i++)
--			buffer[sb_len - i - 1] = wa->address[dm_offset + i];
--		scatterwalk_map_and_copy(buffer, sg, sg_offset, sb_len, 1);
--
--		sg_offset += sb_len;
--		nbytes -= sb_len;
-+	u8 *p, *q;
-+
-+	p = wa->address + wa_offset;
-+	q = p + len - 1;
-+	while (p < q) {
-+		*p = *p ^ *q;
-+		*q = *p ^ *q;
-+		*p = *p ^ *q;
-+		p++;
-+		q--;
+@@ -362,6 +374,9 @@ static void ccp_unregister_algs(void)
+ 		list_del(&ablk_alg->entry);
+ 		kfree(ablk_alg);
  	}
 +
-+	ccp_get_dm_area(wa, wa_offset, sg, sg_offset, len);
++	if (!rsa_disable)
++		ccp_unregister_rsa_algs();
  }
  
- static void ccp_free_data(struct ccp_data *data, struct ccp_cmd_queue *cmd_q)
-@@ -1294,7 +1278,9 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	struct ccp_data dst;
- 	struct ccp_op op;
- 	unsigned int sb_count, i_len, o_len;
--	int ret;
-+	unsigned int dm_offset;
-+	int i = 0;
+ static int ccp_crypto_init(void)
+diff --git a/drivers/crypto/ccp/ccp-crypto-rsa.c b/drivers/crypto/ccp/ccp-crypto-rsa.c
+new file mode 100644
+index 0000000..7dab43b
+--- /dev/null
++++ b/drivers/crypto/ccp/ccp-crypto-rsa.c
+@@ -0,0 +1,258 @@
++/*
++ * AMD Cryptographic Coprocessor (CCP) RSA crypto API support
++ *
++ * Copyright (C) 2016 Advanced Micro Devices, Inc.
++ *
++ * Author: Gary R Hook <gary.hook@amd.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/module.h>
++#include <linux/sched.h>
++#include <linux/mpi.h>
++#include <linux/scatterlist.h>
++#include <linux/crypto.h>
++#include <crypto/algapi.h>
++#include <crypto/internal/akcipher.h>
++#include <crypto/akcipher.h>
++#include <crypto/scatterwalk.h>
++
++#include "ccp-crypto.h"
++
++static inline struct akcipher_request *akcipher_request_cast(
++	struct crypto_async_request *req)
++{
++	return container_of(req, struct akcipher_request, base);
++}
++
++static int ccp_rsa_complete(struct crypto_async_request *async_req, int ret)
++{
++	struct akcipher_request *req = akcipher_request_cast(async_req);
++	struct ccp_rsa_req_ctx *rctx = akcipher_request_ctx(req);
++
++	if (!ret)
++		req->dst_len = rctx->cmd.u.rsa.d_len;
++
++	ret = 0;
++
++	return ret;
++}
++
++static int ccp_rsa_maxsize(struct crypto_akcipher *tfm)
++{
++	return CCP_RSA_MAXMOD;
++}
++
++static int ccp_rsa_crypt(struct akcipher_request *req, bool encrypt)
++{
++	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
++	struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
++	struct ccp_rsa_req_ctx *rctx = akcipher_request_ctx(req);
 +	int ret = 0;
++
++	if (!ctx->u.rsa.pkey.d && !ctx->u.rsa.pkey.e)
++		return -EINVAL;
++
++	memset(&rctx->cmd, 0, sizeof(rctx->cmd));
++	INIT_LIST_HEAD(&rctx->cmd.entry);
++	rctx->cmd.engine = CCP_ENGINE_RSA;
++	rctx->cmd.u.rsa.mode = encrypt ? CCP_RSA_ENCRYPT : CCP_RSA_DECRYPT;
++
++	rctx->cmd.u.rsa.pkey = ctx->u.rsa.pkey;
++	rctx->cmd.u.rsa.key_size = ctx->u.rsa.key_len;
++	rctx->cmd.u.rsa.exp = &ctx->u.rsa.e_sg;
++	rctx->cmd.u.rsa.exp_len = ctx->u.rsa.e_len;
++	rctx->cmd.u.rsa.mod = &ctx->u.rsa.n_sg;
++	rctx->cmd.u.rsa.mod_len = ctx->u.rsa.n_len;
++	if (ctx->u.rsa.pkey.d) {
++		rctx->cmd.u.rsa.d_sg = &ctx->u.rsa.d_sg;
++		rctx->cmd.u.rsa.d_len = ctx->u.rsa.d_len;
++	}
++
++	rctx->cmd.u.rsa.src = req->src;
++	rctx->cmd.u.rsa.src_len = req->src_len;
++	rctx->cmd.u.rsa.dst = req->dst;
++	rctx->cmd.u.rsa.dst_len = req->dst_len;
++
++	ret = ccp_crypto_enqueue_request(&req->base, &rctx->cmd);
++
++	return ret;
++}
++
++static int ccp_rsa_encrypt(struct akcipher_request *req)
++{
++	return ccp_rsa_crypt(req, true);
++}
++
++static int ccp_rsa_decrypt(struct akcipher_request *req)
++{
++	return ccp_rsa_crypt(req, false);
++}
++
++static void ccp_free_mpi_key(struct ccp_rsa_key *key)
++{
++	mpi_free(key->d);
++	key->d = NULL;
++	mpi_free(key->e);
++	key->e = NULL;
++	mpi_free(key->n);
++	key->n = NULL;
++}
++
++static int ccp_check_key_length(unsigned int len)
++{
++	/* In bits */
++	if (len < 8 || len > 16384)
++		return -EINVAL;
++	return 0;
++}
++
++static void ccp_rsa_free_key_bufs(struct ccp_ctx *ctx)
++{
++	/* Clean up old key data */
++	kfree(ctx->u.rsa.e_buf);
++	ctx->u.rsa.e_buf = NULL;
++	ctx->u.rsa.e_len = 0;
++	kfree(ctx->u.rsa.n_buf);
++	ctx->u.rsa.n_buf = NULL;
++	ctx->u.rsa.n_len = 0;
++	kfree(ctx->u.rsa.d_buf);
++	ctx->u.rsa.d_buf = NULL;
++	ctx->u.rsa.d_len = 0;
++}
++
++static int ccp_rsa_setkey(struct crypto_akcipher *tfm, const void *key,
++			  unsigned int keylen, bool public)
++{
++	struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
++	struct rsa_key raw_key;
++	unsigned int n_size;
++	int ret;
++
++	if (!ctx)
++		return -EINVAL;
++
++	ccp_rsa_free_key_bufs(ctx);
++	memset(&raw_key, 0, sizeof(raw_key));
++
++	/* Code borrowed from crypto/rsa.c */
++	if (public)
++		ret = rsa_parse_pub_key(&raw_key, key, keylen);
++	else
++		ret = rsa_parse_priv_key(&raw_key, key, keylen);
++	if (ret)
++		goto e_ret;
++
++	ret = -EINVAL;
++
++	ctx->u.rsa.pkey.e = mpi_read_raw_data(raw_key.e, raw_key.e_sz);
++	if (!ctx->u.rsa.pkey.e)
++		goto e_ret;
++	ctx->u.rsa.e_buf = mpi_get_buffer(ctx->u.rsa.pkey.e,
++					  &ctx->u.rsa.e_len, NULL);
++	if (!ctx->u.rsa.e_buf)
++		goto e_key;
++	sg_init_one(&ctx->u.rsa.e_sg, ctx->u.rsa.e_buf, ctx->u.rsa.e_len);
++
++
++	ctx->u.rsa.pkey.n = mpi_read_raw_data(raw_key.n, raw_key.n_sz);
++	n_size = mpi_get_size(ctx->u.rsa.pkey.n);
++	if (ccp_check_key_length(n_size << 3))
++		goto e_key;
++	ctx->u.rsa.key_len = n_size;
++	ctx->u.rsa.n_buf = mpi_get_buffer(ctx->u.rsa.pkey.n,
++					  &ctx->u.rsa.n_len, NULL);
++	if (!ctx->u.rsa.n_buf)
++		goto e_nkey;
++	sg_init_one(&ctx->u.rsa.n_sg, ctx->u.rsa.n_buf, ctx->u.rsa.n_len);
++
++	if (!public) {
++		ctx->u.rsa.pkey.d = mpi_read_raw_data(raw_key.d, raw_key.d_sz);
++		if (!ctx->u.rsa.pkey.d)
++			goto e_nkey;
++		ctx->u.rsa.d_buf = mpi_get_buffer(ctx->u.rsa.pkey.d,
++						  &ctx->u.rsa.d_len, NULL);
++		if (!ctx->u.rsa.d_buf)
++			goto e_dkey;
++		sg_init_one(&ctx->u.rsa.d_sg, ctx->u.rsa.d_buf,
++			    ctx->u.rsa.d_len);
++	}
++
++	return 0;
++
++e_dkey:
++	kfree(ctx->u.rsa.n_buf);
++e_nkey:
++	kfree(ctx->u.rsa.e_buf);
++e_key:
++	ccp_free_mpi_key(&ctx->u.rsa.pkey);
++e_ret:
++	return ret;
++}
++
++static int ccp_rsa_setprivkey(struct crypto_akcipher *tfm, const void *key,
++			      unsigned int keylen)
++{
++	return ccp_rsa_setkey(tfm, key, keylen, false);
++}
++
++static int ccp_rsa_setpubkey(struct crypto_akcipher *tfm, const void *key,
++			     unsigned int keylen)
++{
++	return ccp_rsa_setkey(tfm, key, keylen, true);
++}
++
++static int ccp_rsa_init_tfm(struct crypto_akcipher *tfm)
++{
++	struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
++
++	ctx->complete = ccp_rsa_complete;
++
++	return 0;
++}
++
++static void ccp_rsa_exit_tfm(struct crypto_akcipher *tfm)
++{
++	struct ccp_ctx *ctx = crypto_tfm_ctx(&tfm->base);
++
++	ccp_rsa_free_key_bufs(ctx);
++}
++
++static struct akcipher_alg rsa = {
++	.encrypt = ccp_rsa_encrypt,
++	.decrypt = ccp_rsa_decrypt,
++	.sign = NULL,
++	.verify = NULL,
++	.set_pub_key = ccp_rsa_setpubkey,
++	.set_priv_key = ccp_rsa_setprivkey,
++	.max_size = ccp_rsa_maxsize,
++	.init = ccp_rsa_init_tfm,
++	.exit = ccp_rsa_exit_tfm,
++	.reqsize = sizeof(struct ccp_rsa_req_ctx),
++	.base = {
++		.cra_name = "rsa",
++		.cra_driver_name = "rsa-ccp",
++		.cra_priority = 100,
++		.cra_module = THIS_MODULE,
++		.cra_ctxsize = sizeof(struct ccp_ctx),
++	},
++};
++
++int ccp_register_rsa_algs(void)
++{
++	int ret;
++
++	/* Register the RSA algorithm in standard mode
++	 * This works for CCP v3 and later
++	 */
++	ret = crypto_register_akcipher(&rsa);
++	return ret;
++}
++
++void ccp_unregister_rsa_algs(void)
++{
++	crypto_unregister_akcipher(&rsa);
++}
+diff --git a/drivers/crypto/ccp/ccp-crypto.h b/drivers/crypto/ccp/ccp-crypto.h
+index ae442ac..4a1d206 100644
+--- a/drivers/crypto/ccp/ccp-crypto.h
++++ b/drivers/crypto/ccp/ccp-crypto.h
+@@ -22,6 +22,7 @@
+ #include <crypto/ctr.h>
+ #include <crypto/hash.h>
+ #include <crypto/sha.h>
++#include <crypto/internal/rsa.h>
  
- 	if (rsa->key_size > CCP_RSA_MAX_WIDTH)
- 		return -EINVAL;
-@@ -1331,8 +1317,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	if (ret)
- 		goto e_sb;
+ #define CCP_CRA_PRIORITY	300
  
--	ret = ccp_reverse_set_dm_area(&exp, rsa->exp, rsa->exp_len,
--				      CCP_SB_BYTES, false);
-+	ret = ccp_reverse_set_dm_area(&exp, 0, rsa->exp, 0, rsa->exp_len);
- 	if (ret)
- 		goto e_exp;
- 	ret = ccp_copy_to_sb(cmd_q, &exp, op.jobid, op.sb_key,
-@@ -1350,13 +1335,10 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	if (ret)
- 		goto e_exp;
+@@ -155,6 +156,26 @@ struct ccp_sha_ctx {
+ 	struct crypto_shash *hmac_tfm;
+ };
  
--	ret = ccp_reverse_set_dm_area(&src, rsa->mod, rsa->mod_len,
--				      CCP_SB_BYTES, false);
-+	ret = ccp_reverse_set_dm_area(&src, 0, rsa->mod, 0, rsa->mod_len);
- 	if (ret)
- 		goto e_src;
--	src.address += o_len;	/* Adjust the address for the copy operation */
--	ret = ccp_reverse_set_dm_area(&src, rsa->src, rsa->src_len,
--				      CCP_SB_BYTES, false);
-+	ret = ccp_reverse_set_dm_area(&src, o_len, rsa->mod, 0, rsa->mod_len);
- 	if (ret)
- 		goto e_src;
- 	src.address -= o_len;	/* Reset the address to original value */
-@@ -1384,7 +1366,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 		goto e_dst;
- 	}
++/***** RSA related defines *****/
++
++struct ccp_rsa_ctx {
++	unsigned int key_len; /* in bytes */
++	struct ccp_rsa_key pkey;
++	struct scatterlist e_sg;
++	u8 *e_buf;
++	unsigned int e_len;
++	struct scatterlist n_sg;
++	u8 *n_buf;
++	unsigned int n_len;
++	struct scatterlist d_sg;
++	u8 *d_buf;
++	unsigned int d_len;
++};
++
++struct ccp_rsa_req_ctx {
++	struct ccp_cmd cmd;
++};
++
+ struct ccp_sha_req_ctx {
+ 	enum ccp_sha_type type;
  
--	ccp_reverse_get_dm_area(&dst.dm_wa, rsa->dst, rsa->mod_len);
-+	ccp_reverse_get_dm_area(&dst.dm_wa, 0, rsa->dst, 0, rsa->mod_len);
+@@ -201,6 +222,7 @@ struct ccp_ctx {
  
- e_dst:
- 	ccp_free_data(&dst, cmd_q);
-@@ -1636,25 +1618,22 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	save = src.address;
+ 	union {
+ 		struct ccp_aes_ctx aes;
++		struct ccp_rsa_ctx rsa;
+ 		struct ccp_sha_ctx sha;
+ 	} u;
+ };
+@@ -214,5 +236,7 @@ int ccp_register_aes_algs(struct list_head *head);
+ int ccp_register_aes_cmac_algs(struct list_head *head);
+ int ccp_register_aes_xts_algs(struct list_head *head);
+ int ccp_register_sha_algs(struct list_head *head);
++int ccp_register_rsa_algs(void);
++void ccp_unregister_rsa_algs(void);
  
- 	/* Copy the ECC modulus */
--	ret = ccp_reverse_set_dm_area(&src, ecc->mod, ecc->mod_len,
--				      CCP_ECC_OPERAND_SIZE, false);
-+	ret = ccp_reverse_set_dm_area(&src, 0, ecc->mod, 0, ecc->mod_len);
- 	if (ret)
- 		goto e_src;
- 	src.address += CCP_ECC_OPERAND_SIZE;
+ #endif
+diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
+index 8d2dbac..75a0978 100644
+--- a/drivers/crypto/ccp/ccp-dev-v3.c
++++ b/drivers/crypto/ccp/ccp-dev-v3.c
+@@ -20,6 +20,43 @@
  
- 	/* Copy the first operand */
--	ret = ccp_reverse_set_dm_area(&src, ecc->u.mm.operand_1,
--				      ecc->u.mm.operand_1_len,
--				      CCP_ECC_OPERAND_SIZE, false);
-+	ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.mm.operand_1, 0,
-+				      ecc->u.mm.operand_1_len);
- 	if (ret)
- 		goto e_src;
- 	src.address += CCP_ECC_OPERAND_SIZE;
+ #include "ccp-dev.h"
  
- 	if (ecc->function != CCP_ECC_FUNCTION_MINV_384BIT) {
- 		/* Copy the second operand */
--		ret = ccp_reverse_set_dm_area(&src, ecc->u.mm.operand_2,
--					      ecc->u.mm.operand_2_len,
--					      CCP_ECC_OPERAND_SIZE, false);
-+		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.mm.operand_2, 0,
-+					      ecc->u.mm.operand_2_len);
- 		if (ret)
- 			goto e_src;
- 		src.address += CCP_ECC_OPERAND_SIZE;
-@@ -1693,7 +1672,8 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	}
++/* CCP version 3: Union to define the function field (cmd_reg1/dword0) */
++union ccp_function {
++	struct {
++		u16 size:7;
++		u16 encrypt:1;
++		u16 mode:3;
++		u16 type:2;
++	} aes;
++	struct {
++		u16 size:7;
++		u16 encrypt:1;
++		u16 rsvd:5;
++	} aes_xts;
++	struct {
++		u16 rsvd1:11;
++		u16 type:2;
++	} sha;
++	struct {
++		u16 size:13;
++	} rsa;
++	struct {
++		u16 byteswap:2;
++		u16 bitwise:3;
++		u16 rsvd:8;
++	} pt;
++	struct  {
++		u16 rsvd:13;
++	} zlib;
++	struct {
++		u16 size:8;
++		u16 mode:3;
++		u16 rsvd1:1;
++		u16 rsvd2:1;
++	} ecc;
++	u16 raw;
++};
++
+ static u32 ccp_alloc_ksb(struct ccp_cmd_queue *cmd_q, unsigned int count)
+ {
+ 	int start;
+@@ -88,6 +125,7 @@ static int ccp_do_cmd(struct ccp_op *op, u32 *cr, unsigned int cr_count)
+ 	 * are actually available, but reading that register resets it
+ 	 * and you could lose some error information.
+ 	 */
++
+ 	cmd_q->free_slots--;
  
- 	/* Save the ECC result */
--	ccp_reverse_get_dm_area(&dst, ecc->u.mm.result, CCP_ECC_MODULUS_BYTES);
-+	ccp_reverse_get_dm_area(&dst, 0, ecc->u.mm.result, 0,
-+				CCP_ECC_MODULUS_BYTES);
+ 	cr0 = (cmd_q->id << REQ0_CMD_Q_SHIFT)
+diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+index 82cc637..826782d 100644
+--- a/drivers/crypto/ccp/ccp-ops.c
++++ b/drivers/crypto/ccp/ccp-ops.c
+@@ -17,6 +17,7 @@
+ #include <linux/interrupt.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/ccp.h>
++#include <linux/delay.h>
  
- e_dst:
- 	ccp_dm_free(&dst);
-@@ -1761,22 +1741,19 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	save = src.address;
+ #include "ccp-dev.h"
  
- 	/* Copy the ECC modulus */
--	ret = ccp_reverse_set_dm_area(&src, ecc->mod, ecc->mod_len,
--				      CCP_ECC_OPERAND_SIZE, false);
-+	ret = ccp_reverse_set_dm_area(&src, 0, ecc->mod, 0, ecc->mod_len);
- 	if (ret)
- 		goto e_src;
- 	src.address += CCP_ECC_OPERAND_SIZE;
+diff --git a/include/linux/ccp.h b/include/linux/ccp.h
+index 1a3e0b5..d634565 100644
+--- a/include/linux/ccp.h
++++ b/include/linux/ccp.h
+@@ -19,7 +19,8 @@
+ #include <linux/list.h>
+ #include <crypto/aes.h>
+ #include <crypto/sha.h>
+-
++#include <linux/mpi.h>
++#include <crypto/internal/rsa.h>
  
- 	/* Copy the first point X and Y coordinate */
--	ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.point_1.x,
--				      ecc->u.pm.point_1.x_len,
--				      CCP_ECC_OPERAND_SIZE, false);
-+	ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_1.x, 0,
-+				      ecc->u.pm.point_1.x_len);
- 	if (ret)
- 		goto e_src;
- 	src.address += CCP_ECC_OPERAND_SIZE;
--	ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.point_1.y,
--				      ecc->u.pm.point_1.y_len,
--				      CCP_ECC_OPERAND_SIZE, false);
-+	ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_1.y, 0,
-+				      ecc->u.pm.point_1.y_len);
- 	if (ret)
- 		goto e_src;
- 	src.address += CCP_ECC_OPERAND_SIZE;
-@@ -1787,15 +1764,13 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ struct ccp_device;
+ struct ccp_cmd;
+@@ -293,6 +294,27 @@ struct ccp_sha_engine {
+ 				 * final sha cmd */
+ };
  
- 	if (ecc->function == CCP_ECC_FUNCTION_PADD_384BIT) {
- 		/* Copy the second point X and Y coordinate */
--		ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.point_2.x,
--					      ecc->u.pm.point_2.x_len,
--					      CCP_ECC_OPERAND_SIZE, false);
-+		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_2.x, 0,
-+					      ecc->u.pm.point_2.x_len);
- 		if (ret)
- 			goto e_src;
- 		src.address += CCP_ECC_OPERAND_SIZE;
--		ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.point_2.y,
--					      ecc->u.pm.point_2.y_len,
--					      CCP_ECC_OPERAND_SIZE, false);
-+		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_2.y, 0,
-+					      ecc->u.pm.point_2.y_len);
- 		if (ret)
- 			goto e_src;
- 		src.address += CCP_ECC_OPERAND_SIZE;
-@@ -1805,19 +1780,17 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 		src.address += CCP_ECC_OPERAND_SIZE;
- 	} else {
- 		/* Copy the Domain "a" parameter */
--		ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.domain_a,
--					      ecc->u.pm.domain_a_len,
--					      CCP_ECC_OPERAND_SIZE, false);
-+		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.domain_a, 0,
-+					      ecc->u.pm.domain_a_len);
- 		if (ret)
- 			goto e_src;
- 		src.address += CCP_ECC_OPERAND_SIZE;
++/**
++ * ccp_rsa_type - mode of RSA operation
++ *
++ * @CCP_RSA_MODE_STD: standard mode
++ */
++enum ccp_rsa_mode {
++	CCP_RSA_ENCRYPT = 0,
++	CCP_RSA_DECRYPT,
++	CCP_RSA__LAST,
++};
++
++struct ccp_rsa_key {
++	MPI e;
++	MPI n;
++	MPI d;
++};
++
++#define	CCP_RSA_MAXMOD	(4 * 1024 / 8)
++#define	CCP5_RSA_MAXMOD	(16 * 1024 / 8)
++#define	CCP5_RSA_MINMOD	(512 / 8)
++
+ /***** RSA engine *****/
+ /**
+  * struct ccp_rsa_engine - CCP RSA operation
+@@ -309,16 +331,26 @@ struct ccp_sha_engine {
+  *   - key_size, exp, exp_len, mod, mod_len, src, dst, src_len
+  */
+ struct ccp_rsa_engine {
++	enum ccp_rsa_mode mode;
+ 	u32 key_size;		/* In bits */
  
- 		if (ecc->function == CCP_ECC_FUNCTION_PMUL_384BIT) {
- 			/* Copy the scalar value */
--			ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.scalar,
--						      ecc->u.pm.scalar_len,
--						      CCP_ECC_OPERAND_SIZE,
--						      false);
-+			ret = ccp_reverse_set_dm_area(&src, 0,
-+						      ecc->u.pm.scalar, 0,
-+						      ecc->u.pm.scalar_len);
- 			if (ret)
- 				goto e_src;
- 			src.address += CCP_ECC_OPERAND_SIZE;
-@@ -1862,10 +1835,10 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	save = dst.address;
++	struct ccp_rsa_key pkey;
++
++/* e */
+ 	struct scatterlist *exp;
+ 	u32 exp_len;		/* In bytes */
  
- 	/* Save the ECC result X and Y coordinates */
--	ccp_reverse_get_dm_area(&dst, ecc->u.pm.result.x,
-+	ccp_reverse_get_dm_area(&dst, 0, ecc->u.pm.result.x, 0,
- 				CCP_ECC_MODULUS_BYTES);
- 	dst.address += CCP_ECC_OUTPUT_SIZE;
--	ccp_reverse_get_dm_area(&dst, ecc->u.pm.result.y,
-+	ccp_reverse_get_dm_area(&dst, 0, ecc->u.pm.result.y, 0,
- 				CCP_ECC_MODULUS_BYTES);
- 	dst.address += CCP_ECC_OUTPUT_SIZE;
++/* n */
+ 	struct scatterlist *mod;
+ 	u32 mod_len;		/* In bytes */
  
++/* d */
++	struct scatterlist *d_sg;
++	unsigned int d_len;
++
+ 	struct scatterlist *src, *dst;
+ 	u32 src_len;		/* In bytes */
++	u32 dst_len;		/* In bytes */
+ };
+ 
+ /***** Passthru engine *****/
