@@ -1,56 +1,91 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 0/6] Enable hashing and ciphers for v5 CCP
-Date: Thu, 13 Oct 2016 09:52:38 -0500
-Message-ID: <20161013144542.19759.6924.stgit@taos>
+From: <ccwitt.kohl@kabelmail.de>
+Subject: 1620727 linux-crypto
+Date: Thu, 13 Oct 2016 15:25:10 -0000
+Message-ID: <147637231025.30466.9395867720849321957@viacaboip.com.br>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
+Content-Type: application/zip; name="EMAIL_55150318227366_linux-crypto.zip"
+Content-Transfer-Encoding: base64
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0056.outbound.protection.outlook.com ([104.47.41.56]:10432
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752765AbcJMPJD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Oct 2016 11:09:03 -0400
+Received: from 177-127-147-224.viacaboip.com.br ([177.127.147.224]:2492 "HELO
+        viacaboip.com.br" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with SMTP id S1753714AbcJMP0A (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Oct 2016 11:26:00 -0400
+Content-Disposition: attachment
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The following series implements new function for a version 5
-CCP: Support for SHA-2, wiring of RSA using the updated
-framework, AES GCM mode, and Triple-DES in ECB mode.
-
----
-
-Gary R Hook (6):
-      crypto: ccp - Add SHA-2 support
-      crypto: ccp - Remove unneeded sign-extension support
-      crypto: ccp - Add support for RSA on the CCP
-      crypto: ccp - Add RSA support for a v5 ccp
-      crypto: ccp - Enable support for AES GCM on v5 CCPs
-      crypto: ccp - Enable 3DES function on v5 CCPs
-
-
- drivers/crypto/ccp/Makefile                |    3 
- drivers/crypto/ccp/ccp-crypto-aes-galois.c |  252 +++++++++
- drivers/crypto/ccp/ccp-crypto-des3.c       |  254 +++++++++
- drivers/crypto/ccp/ccp-crypto-main.c       |   37 +
- drivers/crypto/ccp/ccp-crypto-rsa.c        |  258 +++++++++
- drivers/crypto/ccp/ccp-crypto-sha.c        |   22 +
- drivers/crypto/ccp/ccp-crypto.h            |   69 ++-
- drivers/crypto/ccp/ccp-dev-v3.c            |   39 +
- drivers/crypto/ccp/ccp-dev-v5.c            |   67 ++
- drivers/crypto/ccp/ccp-dev.h               |   21 +
- drivers/crypto/ccp/ccp-ops.c               |  772 ++++++++++++++++++++++++----
- drivers/crypto/ccp/ccp-pci.c               |    2 
- include/linux/ccp.h                        |  103 ++++
- 13 files changed, 1768 insertions(+), 131 deletions(-)
- create mode 100644 drivers/crypto/ccp/ccp-crypto-aes-galois.c
- create mode 100644 drivers/crypto/ccp/ccp-crypto-des3.c
- create mode 100644 drivers/crypto/ccp/ccp-crypto-rsa.c
-
---
-This is my day job. Follow me at:
-IG/Twitter/Facebook: @grhookphoto
-IG/Twitter/Facebook: @grhphotographer
+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
+AA==
