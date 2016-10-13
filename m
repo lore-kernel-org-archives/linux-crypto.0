@@ -1,40 +1,51 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH] crypto: CCP - change type of struct member lsb to signed
-Date: Wed, 12 Oct 2016 08:47:03 -0500
-Message-ID: <20161012134703.15296.24795.stgit@taos>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [bug report] crypto: omap-sham - add support functions for sg based
+ data handling
+Date: Thu, 13 Oct 2016 12:31:47 +0300
+Message-ID: <20161013093147.GA25189@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: t-kristo@ti.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0041.outbound.protection.outlook.com ([104.47.34.41]:44448
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754043AbcJLPW3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Oct 2016 11:22:29 -0400
+Received: from userp1040.oracle.com ([156.151.31.81]:19981 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753077AbcJMJcB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Oct 2016 05:32:01 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The lsb field uses a value of -1 to indicate that it
-is unassigned. Therefore type must be a signed int.
+Hello Tero Kristo,
 
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
----
- drivers/crypto/ccp/ccp-dev.h |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This is a semi-automatic email about new static checker warnings.
 
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index da5f4a6..5afaa53 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -278,7 +278,7 @@ struct ccp_cmd_queue {
- 	/* Private LSB that is assigned to this queue, or -1 if none.
- 	 * Bitmap for my private LSB, unused otherwise
- 	 */
--	unsigned int lsb;
-+	int lsb;
- 	DECLARE_BITMAP(lsbmap, PLSB_MAP_SIZE);
- 
- 	/* Queue processing thread */
+The patch f19de1bc67a0: "crypto: omap-sham - add support functions 
+for sg based data handling" from Sep 19, 2016, leads to the following 
+Smatch complaint:
+
+drivers/crypto/omap-sham.c:808 omap_sham_prepare_request()
+	 warn: variable dereferenced before check 'req' (see line 801)
+
+drivers/crypto/omap-sham.c
+   800	{
+   801		struct omap_sham_reqctx *rctx = ahash_request_ctx(req);
+                                                                  ^^^
+New dereference inside function.
+
+   802		int bs;
+   803		int ret;
+   804		int nbytes;
+   805		bool final = rctx->flags & BIT(FLAGS_FINUP);
+   806		int xmit_len, hash_later;
+   807	
+   808		if (!req)
+                    ^^^^
+New check is too late.
+
+   809			return 0;
+   810	
+
+regards,
+dan carpenter
