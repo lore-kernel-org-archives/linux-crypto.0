@@ -1,186 +1,419 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH v4 2/2] crypto: marvell - Don't break chain for
- computable last ahash requests
-Date: Fri, 14 Oct 2016 12:40:19 +0200
-Message-ID: <20161014124019.2e9a685c@bbrezillon>
-References: <20161005075633.12711-1-romain.perier@free-electrons.com>
-        <20161005075633.12711-3-romain.perier@free-electrons.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 6/6] Add support for AEAD algos.
+Date: Fri, 14 Oct 2016 16:24:09 +0200
+Message-ID: <1610250.DL5oKfbMjq@positron.chronox.de>
+References: <cover.1476263960.git.harsh@chelsio.com> <6a957e083297221dc2810a3efd17f936dad2475e.1476263960.git.harsh@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Arnaud Ebalard <arno@natisbad.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-        Gregory Clement <gregory.clement@free-electrons.com>,
-        Nadav Haklai <nadavh@marvell.com>,
-        Ofer Heifetz <oferh@marvell.com>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-To: Romain Perier <romain.perier@free-electrons.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: dan.carpenter@oracle.com, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, jlulla@chelsio.com,
+        atul.gupta@chelsio.com, yeshaswi@chelsio.com,
+        hariprasad@chelsio.com
+To: Harsh Jain <harsh@chelsio.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:54508 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752758AbcJNKlK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Oct 2016 06:41:10 -0400
-In-Reply-To: <20161005075633.12711-3-romain.perier@free-electrons.com>
+Received: from mail.eperm.de ([89.247.134.16]:49898 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752057AbcJNOYP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Oct 2016 10:24:15 -0400
+In-Reply-To: <6a957e083297221dc2810a3efd17f936dad2475e.1476263960.git.harsh@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed,  5 Oct 2016 09:56:33 +0200
-Romain Perier <romain.perier@free-electrons.com> wrote:
+Am Donnerstag, 13. Oktober 2016, 16:39:39 CEST schrieb Harsh Jain:
 
-> Currently, the driver breaks chain for all kind of hash requests in order to
-> don't override intermediate states of partial ahash updates. However, some final
-> ahash requests can be directly processed by the engine, and so without
-> intermediate state. This is typically the case for most for the HMAC requests
-> processed via IPSec.
+Hi Harsh,
+
+> Add support for following AEAD algos.
+>  GCM,CCM,RFC4106,RFC4309,authenc(hmac(shaXXX),cbc(aes)).
 > 
-> This commits adds a TDMA descriptor to copy context for these of requests
-> into the "op" dma pool, then it allow to chain these requests at the DMA level.
-> The 'complete' operation is also updated to retrieve the MAC digest from the
-> right location.
-> 
-> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
-
-Minor comments below, otherwise it looks good.
-
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-
+> Signed-off-by: Harsh Jain <harsh@chelsio.com>
 > ---
+>  drivers/crypto/chelsio/Kconfig       |    1 +
+>  drivers/crypto/chelsio/chcr_algo.c   | 1466
+> +++++++++++++++++++++++++++++++++- drivers/crypto/chelsio/chcr_algo.h   |  
+> 16 +-
+>  drivers/crypto/chelsio/chcr_core.c   |    8 +-
+>  drivers/crypto/chelsio/chcr_core.h   |    2 -
+>  drivers/crypto/chelsio/chcr_crypto.h |   90 ++-
+>  6 files changed, 1541 insertions(+), 42 deletions(-)
 > 
-> Changes in v4:
->  - Remove the dummy descriptor at the end of the chain, when a TDMA_RESULT
->    is present. So, we re-wrote a bit the code of ahash_complete accordingly.
+> diff --git a/drivers/crypto/chelsio/Kconfig b/drivers/crypto/chelsio/Kconfig
+> index 4ce67fb..3e104f5 100644
+> --- a/drivers/crypto/chelsio/Kconfig
+> +++ b/drivers/crypto/chelsio/Kconfig
+> @@ -4,6 +4,7 @@ config CRYPTO_DEV_CHELSIO
+>  	select CRYPTO_SHA1
+>  	select CRYPTO_SHA256
+>  	select CRYPTO_SHA512
+> +	select CRYPTO_AUTHENC
+>  	---help---
+>  	  The Chelsio Crypto Co-processor driver for T6 adapters.
 > 
-> Changes in v3:
->  - Copy the whole context back to RAM and not just the digest. Also
->    fixed a rebase issue ^^ (whoops)
+> diff --git a/drivers/crypto/chelsio/chcr_algo.c
+> b/drivers/crypto/chelsio/chcr_algo.c index 18385d6..cffc38f 100644
+> --- a/drivers/crypto/chelsio/chcr_algo.c
+> +++ b/drivers/crypto/chelsio/chcr_algo.c
+> @@ -54,6 +54,12 @@
+>  #include <crypto/algapi.h>
+>  #include <crypto/hash.h>
+>  #include <crypto/sha.h>
+> +#include <crypto/authenc.h>
+> +#include <crypto/internal/aead.h>
+> +#include <crypto/null.h>
+> +#include <crypto/internal/skcipher.h>
+> +#include <crypto/aead.h>
+> +#include <crypto/scatterwalk.h>
+>  #include <crypto/internal/hash.h>
 > 
-> Changes in v2:
->  - Replaced BUG_ON by an error
->  - Add a variable "break_chain", with "type" to break the chain
+>  #include "t4fw_api.h"
+> @@ -62,6 +68,11 @@
+>  #include "chcr_algo.h"
+>  #include "chcr_crypto.h"
 > 
->  drivers/crypto/marvell/hash.c | 65 ++++++++++++++++++++++++++++++++-----------
->  1 file changed, 49 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-> index 9f28468..2a92605 100644
-> --- a/drivers/crypto/marvell/hash.c
-> +++ b/drivers/crypto/marvell/hash.c
-> @@ -312,24 +312,40 @@ static void mv_cesa_ahash_complete(struct crypto_async_request *req)
->  	int i;
->  
->  	digsize = crypto_ahash_digestsize(crypto_ahash_reqtfm(ahashreq));
-> -	for (i = 0; i < digsize / 4; i++)
-> -		creq->state[i] = readl_relaxed(engine->regs + CESA_IVDIG(i));
->  
-> -	if (creq->last_req) {
-> +	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ &&
-> +	    (creq->base.chain.last->flags & CESA_TDMA_TYPE_MSK) == CESA_TDMA_RESULT) {
-
-Maybe it's time to create an helper to extract the TDMA desc type (as
-you did for the CESA req type with mv_cesa_req_get_type()).
-
-> +		__le32 *data = NULL;
+> +static inline  struct chcr_aead_ctx *AEAD_CTX(struct chcr_context *ctx)
+> +{
+> +	return ctx->crypto_ctx->aeadctx;
+> +}
 > +
->  		/*
-> -		 * Hardware's MD5 digest is in little endian format, but
-> -		 * SHA in big endian format
-> +		 * Result is already in the correct endianess when the SA is
-> +		 * used
->  		 */
-> -		if (creq->algo_le) {
-> -			__le32 *result = (void *)ahashreq->result;
-> +		data = creq->base.chain.last->op->ctx.hash.hash;
-> +		for (i = 0; i < digsize / 4; i++)
-> +			creq->state[i] = cpu_to_le32(data[i]);
->  
-> -			for (i = 0; i < digsize / 4; i++)
-> -				result[i] = cpu_to_le32(creq->state[i]);
-> -		} else {
-> -			__be32 *result = (void *)ahashreq->result;
-> +		memcpy(ahashreq->result, data, digsize);
+>  static inline struct ablk_ctx *ABLK_CTX(struct chcr_context *ctx)
+>  {
+>  	return ctx->crypto_ctx->ablkctx;
+> @@ -72,6 +83,16 @@ static inline struct hmac_ctx *HMAC_CTX(struct
+> chcr_context *ctx) return ctx->crypto_ctx->hmacctx;
+>  }
+> 
+> +static inline struct chcr_gcm_ctx *GCM_CTX(struct chcr_aead_ctx *gctx)
+> +{
+> +	return gctx->ctx->gcm;
+> +}
+> +
+> +static inline struct chcr_authenc_ctx *AUTHENC_CTX(struct chcr_aead_ctx
+> *gctx) +{
+> +	return gctx->ctx->authenc;
+> +}
+> +
+>  static inline struct uld_ctx *ULD_CTX(struct chcr_context *ctx)
+>  {
+>  	return ctx->dev->u_ctx;
+> @@ -94,12 +115,37 @@ static inline unsigned int sgl_len(unsigned int n)
+>  	return (3 * n) / 2 + (n & 1) + 2;
+>  }
+> 
+> +static void chcr_verify_tag(struct aead_request *req, u8 *input, int *err)
+> +{
+> +	u8 temp[SHA512_DIGEST_SIZE];
+> +	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+> +	int authsize = crypto_aead_authsize(tfm);
+> +	struct cpl_fw6_pld *fw6_pld;
+> +	int cmp = 0;
+> +
+> +	fw6_pld = (struct cpl_fw6_pld *)input;
+> +	if ((get_aead_subtype(tfm) == CRYPTO_ALG_SUB_TYPE_AEAD_RFC4106) ||
+> +	    (get_aead_subtype(tfm) == CRYPTO_ALG_SUB_TYPE_AEAD_GCM)) {
+> +		cmp = memcmp(&fw6_pld->data[2], (fw6_pld + 1), authsize);
 > +	} else {
-> +		for (i = 0; i < digsize / 4; i++)
-> +			creq->state[i] = readl_relaxed(engine->regs +
-> +						       CESA_IVDIG(i));
-> +		if (creq->last_req) {
-> +			/*
-> +			* Hardware's MD5 digest is in little endian format, but
-> +			* SHA in big endian format
-> +			*/
-> +			if (creq->algo_le) {
-> +				__le32 *result = (void *)ahashreq->result;
 > +
-> +				for (i = 0; i < digsize / 4; i++)
-> +					result[i] = cpu_to_le32(creq->state[i]);
-> +			} else {
-> +				__be32 *result = (void *)ahashreq->result;
->  
-> -			for (i = 0; i < digsize / 4; i++)
-> -				result[i] = cpu_to_be32(creq->state[i]);
-> +				for (i = 0; i < digsize / 4; i++)
-> +					result[i] = cpu_to_be32(creq->state[i]);
-> +			}
+> +		sg_pcopy_to_buffer(req->src, sg_nents(req->src), temp,
+> +				authsize, req->assoclen +
+> +				req->cryptlen - authsize);
+
+I am wondering whether the math is correct here in any case. It is permissible 
+that we have an AAD size of 0 and even a zero-sized ciphertext. How is such 
+scenario covered here?
+
+> +		cmp = memcmp(temp, (fw6_pld + 1), authsize);
+
+I would guess in both cases memcmp should be replaced with crypto_memneq
+
+> +	}
+> +	if (cmp)
+> +		*err = -EBADMSG;
+> +	else
+> +		*err = 0;
+
+What do you think about memzero_explicit(tmp)?
+
+> +}
+> +
+>  /*
+>   *	chcr_handle_resp - Unmap the DMA buffers associated with the request
+>   *	@req: crypto request
+>   */
+>  int chcr_handle_resp(struct crypto_async_request *req, unsigned char
+> *input, -		     int error_status)
+> +			 int err)
+>  {
+>  	struct crypto_tfm *tfm = req->tfm;
+>  	struct chcr_context *ctx = crypto_tfm_ctx(tfm);
+> @@ -109,11 +155,27 @@ int chcr_handle_resp(struct crypto_async_request *req,
+> unsigned char *input, unsigned int digestsize, updated_digestsize;
+> 
+>  	switch (tfm->__crt_alg->cra_flags & CRYPTO_ALG_TYPE_MASK) {
+> +	case CRYPTO_ALG_TYPE_AEAD:
+> +		ctx_req.req.aead_req = (struct aead_request *)req;
+> +		ctx_req.ctx.reqctx = aead_request_ctx(ctx_req.req.aead_req);
+> +		dma_unmap_sg(&u_ctx->lldi.pdev->dev, ctx_req.req.aead_req->dst,
+> +			     ctx_req.ctx.reqctx->dst_nents, DMA_FROM_DEVICE);
+> +		if (ctx_req.ctx.reqctx->skb) {
+> +			kfree_skb(ctx_req.ctx.reqctx->skb);
+> +			ctx_req.ctx.reqctx->skb = NULL;
+> +		}
+> +		if (ctx_req.ctx.reqctx->verify == VERIFY_SW) {
+> +			chcr_verify_tag(ctx_req.req.aead_req, input,
+> +					&err);
+> +			ctx_req.ctx.reqctx->verify = VERIFY_HW;
+> +		}
+> +		break;
+> +
+>  	case CRYPTO_ALG_TYPE_BLKCIPHER:
+>  		ctx_req.req.ablk_req = (struct ablkcipher_request *)req;
+>  		ctx_req.ctx.ablk_ctx =
+>  			ablkcipher_request_ctx(ctx_req.req.ablk_req);
+> -		if (!error_status) {
+> +		if (!err) {
+>  			fw6_pld = (struct cpl_fw6_pld *)input;
+>  			memcpy(ctx_req.req.ablk_req->info, &fw6_pld->data[2],
+>  			       AES_BLOCK_SIZE);
+> @@ -154,7 +216,7 @@ int chcr_handle_resp(struct crypto_async_request *req,
+> unsigned char *input, }
+>  		break;
+>  	}
+> -	return 0;
+> +	return err;
+>  }
+> 
+>  /*
+> @@ -380,6 +442,14 @@ static inline int map_writesg_phys_cpl(struct device
+> *dev, return 0;
+>  }
+> 
+> +static inline int get_aead_subtype(struct crypto_aead *aead)
+> +{
+> +	struct aead_alg *alg = crypto_aead_alg(aead);
+> +	struct chcr_alg_template *chcr_crypto_alg =
+> +		container_of(alg, struct chcr_alg_template, alg.aead);
+> +	return chcr_crypto_alg->type & CRYPTO_ALG_SUB_TYPE_MASK;
+> +}
+> +
+>  static inline int get_cryptoalg_subtype(struct crypto_tfm *tfm)
+>  {
+>  	struct crypto_alg *alg = tfm->__crt_alg;
+> @@ -447,7 +517,8 @@ static inline void create_wreq(struct chcr_context *ctx,
+> struct chcr_wr *chcr_req,
+>  			       void *req, struct sk_buff *skb,
+>  			       int kctx_len, int hash_sz,
+> -			       unsigned int phys_dsgl)
+> +			       int is_iv,
+> +			       unsigned int sc_len)
+>  {
+>  	struct uld_ctx *u_ctx = ULD_CTX(ctx);
+>  	int iv_loc = IV_DSGL;
+> @@ -472,7 +543,7 @@ static inline void create_wreq(struct chcr_context *ctx,
+> chcr_req->wreq.cookie = cpu_to_be64((uintptr_t)req);
+>  	chcr_req->wreq.rx_chid_to_rx_q_id =
+>  		FILL_WR_RX_Q_ID(ctx->dev->tx_channel_id, qid,
+> -				(hash_sz) ? IV_NOP : iv_loc);
+> +				is_iv ? iv_loc : IV_NOP);
+> 
+>  	chcr_req->ulptx.cmd_dest = FILL_ULPTX_CMD_DEST(ctx->dev->tx_channel_id);
+>  	chcr_req->ulptx.len = htonl((DIV_ROUND_UP((calc_tx_flits_ofld(skb) * 8),
+> @@ -481,10 +552,7 @@ static inline void create_wreq(struct chcr_context
+> *ctx, chcr_req->sc_imm.cmd_more = FILL_CMD_MORE(immdatalen);
+>  	chcr_req->sc_imm.len = cpu_to_be32(sizeof(struct cpl_tx_sec_pdu) +
+>  				   sizeof(chcr_req->key_ctx) +
+> -				   kctx_len +
+> -				  ((hash_sz) ? DUMMY_BYTES :
+> -				  (sizeof(struct cpl_rx_phys_dsgl) +
+> -				   phys_dsgl)) + immdatalen);
+> +				   kctx_len + sc_len + immdatalen);
+>  }
+> 
+>  /**
+> @@ -582,7 +650,8 @@ static struct sk_buff
+>  	memcpy(reqctx->iv, req->info, ivsize);
+>  	write_buffer_to_skb(skb, &frags, reqctx->iv, ivsize);
+>  	write_sg_to_skb(skb, &frags, req->src, req->nbytes);
+> -	create_wreq(ctx, chcr_req, req, skb, kctx_len, 0, phys_dsgl);
+> +	create_wreq(ctx, chcr_req, req, skb, kctx_len, 0, 1,
+> +			sizeof(struct cpl_rx_phys_dsgl) + phys_dsgl);
+>  	reqctx->skb = skb;
+>  	skb_get(skb);
+>  	return skb;
+> @@ -706,11 +775,11 @@ static int chcr_device_init(struct chcr_context *ctx)
 >  		}
+>  		u_ctx = ULD_CTX(ctx);
+>  		rxq_perchan = u_ctx->lldi.nrxq / u_ctx->lldi.nchan;
+> -		ctx->dev->tx_channel_id = 0;
+>  		rxq_idx = ctx->dev->tx_channel_id * rxq_perchan;
+>  		rxq_idx += id % rxq_perchan;
+>  		spin_lock(&ctx->dev->lock_chcr_dev);
+>  		ctx->tx_channel_id = rxq_idx;
+> +		ctx->dev->tx_channel_id = !ctx->dev->tx_channel_id;
+>  		spin_unlock(&ctx->dev->lock_chcr_dev);
 >  	}
->  
-> @@ -504,6 +520,12 @@ mv_cesa_ahash_dma_last_req(struct mv_cesa_tdma_chain *chain,
->  						CESA_SA_DESC_CFG_LAST_FRAG,
->  				      CESA_SA_DESC_CFG_FRAG_MSK);
->  
-> +		ret = mv_cesa_dma_add_result_op(chain,
-> +						CESA_SA_CFG_SRAM_OFFSET,
-> +						CESA_SA_DATA_SRAM_OFFSET,
-> +						CESA_TDMA_SRC_IN_SRAM, flags);
-> +		if (ret)
-> +			return ERR_PTR(-ENOMEM);
->  		return op;
->  	}
->  
-> @@ -564,6 +586,7 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
->  	struct mv_cesa_op_ctx *op = NULL;
->  	unsigned int frag_len;
->  	int ret;
-> +	u32 type;
->  
->  	basereq->chain.first = NULL;
->  	basereq->chain.last = NULL;
-> @@ -635,7 +658,15 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
->  		goto err_free_tdma;
->  	}
->  
-> -	if (op) {
+>  out:
+> @@ -769,7 +838,7 @@ static inline void chcr_free_shash(struct crypto_shash
+> *base_hash) *	@req - Cipher req base
+>   */
+>  static struct sk_buff *create_hash_wr(struct ahash_request *req,
+> -					    struct hash_wr_param *param)
+> +				      struct hash_wr_param *param)
+>  {
+>  	struct chcr_ahash_req_ctx *req_ctx = ahash_request_ctx(req);
+>  	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+> @@ -840,8 +909,8 @@ static struct sk_buff *create_hash_wr(struct
+> ahash_request *req, if (param->sg_len != 0)
+>  		write_sg_to_skb(skb, &frags, req->src, param->sg_len);
+> 
+> -	create_wreq(ctx, chcr_req, req, skb, kctx_len, hash_size_in_response,
+> -		    0);
+> +	create_wreq(ctx, chcr_req, req, skb, kctx_len, hash_size_in_response, 0,
+> +			DUMMY_BYTES);
+>  	req_ctx->skb = skb;
+>  	skb_get(skb);
+>  	return skb;
+> @@ -1249,6 +1318,1149 @@ static void chcr_hmac_cra_exit(struct crypto_tfm
+> *tfm) }
+>  }
+> 
+> +static int chcr_copy_assoc(struct aead_request *req,
+> +				struct chcr_aead_ctx *ctx)
+> +{
+> +	SKCIPHER_REQUEST_ON_STACK(skreq, ctx->null);
+> +
+> +	skcipher_request_set_tfm(skreq, ctx->null);
+> +	skcipher_request_set_callback(skreq, aead_request_flags(req),
+> +			NULL, NULL);
+> +	skcipher_request_set_crypt(skreq, req->src, req->dst, req->assoclen,
+> +			NULL);
+> +
+> +	return crypto_skcipher_encrypt(skreq);
+> +}
+> +
+> +static unsigned char get_hmac(unsigned int authsize)
+> +{
+> +	switch (authsize) {
+> +	case ICV_8:
+> +		return CHCR_SCMD_HMAC_CTRL_PL1;
+> +	case ICV_10:
+> +		return CHCR_SCMD_HMAC_CTRL_TRUNC_RFC4366;
+> +	case ICV_12:
+> +		return CHCR_SCMD_HMAC_CTRL_IPSEC_96BIT;
+> +	}
+> +	return CHCR_SCMD_HMAC_CTRL_NO_TRUNC;
+> +}
+> +
+> +
+> +static struct sk_buff *create_authenc_wr(struct aead_request *req,
+> +					 unsigned short qid,
+> +					 int size,
+> +					 unsigned short op_type)
+> +{
+> +	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+> +	struct chcr_context *ctx = crypto_aead_ctx(tfm);
+> +	struct uld_ctx *u_ctx = ULD_CTX(ctx);
+> +	struct chcr_aead_ctx *aeadctx = AEAD_CTX(ctx);
+> +	struct chcr_authenc_ctx *actx = AUTHENC_CTX(aeadctx);
+> +	struct chcr_aead_reqctx *reqctx = aead_request_ctx(req);
+> +	struct sk_buff *skb = NULL;
+> +	struct chcr_wr *chcr_req;
+> +	struct cpl_rx_phys_dsgl *phys_cpl;
+> +	struct phys_sge_parm sg_param;
+> +	struct scatterlist *src, *dst;
+> +	struct scatterlist src_sg[2], dst_sg[2];
+> +	unsigned int frags = 0, transhdr_len;
+> +	unsigned int ivsize = crypto_aead_ivsize(tfm), dst_size = 0;
+> +	unsigned int   kctx_len = 0;
+> +	unsigned short stop_offset = 0;
+> +	unsigned int  assoclen = req->assoclen;
+> +	unsigned int  authsize = crypto_aead_authsize(tfm);
+> +	int err = 0;
+> +	int null = 0;
+> +	gfp_t flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL :
+> +		GFP_ATOMIC;
+> +
+> +	if (aeadctx->enckey_len == 0 || (req->cryptlen <= 0))
+> +		goto err;
+> +	src = scatterwalk_ffwd(src_sg, req->src, req->assoclen);
+> +	dst = src;
+> +	if (req->src != req->dst) {
+> +		err = chcr_copy_assoc(req, aeadctx);
+> +		if (err)
+> +			return ERR_PTR(err);
+> +		dst = scatterwalk_ffwd(dst_sg, req->dst, req->assoclen);
+> +	}
+> +	if (get_aead_subtype(tfm) == CRYPTO_ALG_SUB_TYPE_AEAD_NULL) {
+> +		null = 1;
+> +		assoclen = 0;
+> +	}
+> +	reqctx->dst_nents = sg_nents_for_len(dst, req->cryptlen +
+> +					     (op_type ? -authsize : authsize));
+> +	if (reqctx->dst_nents <= 0) {
+> +		pr_err("AUTHENC:Invalid Destination sg entries\n");
+> +		goto err;
+> +	}
+> +	dst_size = get_space_for_phys_dsgl(reqctx->dst_nents);
+> +	kctx_len = (ntohl(KEY_CONTEXT_CTX_LEN_V(aeadctx->key_ctx_hdr)) << 4)
+> +		- sizeof(chcr_req->key_ctx);
+> +	transhdr_len = CIPHER_TRANSHDR_SIZE(kctx_len, dst_size);
+> +	skb = alloc_skb((transhdr_len + sizeof(struct sge_opaque_hdr)), flags);
+> +	if (!skb)
+> +		goto err;
+> +
+> +	/* LLD is going to write the sge hdr. */
+> +	skb_reserve(skb, sizeof(struct sge_opaque_hdr));
+> +
+> +	/* Write WR */
+> +	chcr_req = (struct chcr_wr *) __skb_put(skb, transhdr_len);
+> +	memset(chcr_req, 0, transhdr_len);
+> +
+> +	stop_offset = (op_type == CHCR_ENCRYPT_OP) ? 0 : authsize;
+> +
 > +	/*
-> +	 * If results are copied via DMA, this means that this
-> +	 * request can be directly processed by the engine,
-> +	 * without partial updates. So we can chain it at the
-> +	 * DMA level with other requests.
+> +	 * Input order	is AAD,IV and Payload. where IV should be included as
+> +	 * the part of authdata. All other fields should be filled according
+> +	 * to the hardware spec
 > +	 */
-
-Can you move this comment where it really belongs: when you
-conditionally set the CESA_TDMA_BREAK_CHAIN flag.
-
-> +	type = basereq->chain.last->flags & CESA_TDMA_TYPE_MSK;
+> +	chcr_req->sec_cpl.op_ivinsrtofst =
+> +		FILL_SEC_CPL_OP_IVINSR(ctx->dev->tx_channel_id, 2,
+> +				       (ivsize ? (assoclen + 1) : 0));
+> +	chcr_req->sec_cpl.pldlen = htonl(assoclen + ivsize + req->cryptlen);
+> +	chcr_req->sec_cpl.aadstart_cipherstop_hi = FILL_SEC_CPL_CIPHERSTOP_HI(
+> +					assoclen ? 1 : 0, assoclen,
+> +					assoclen + ivsize + 1,
+> +					(stop_offset & 0x1F0) >> 4);
+> +	chcr_req->sec_cpl.cipherstop_lo_authinsert = FILL_SEC_CPL_AUTHINSERT(
+> +					stop_offset & 0xF,
+> +					null ? 0 : assoclen + ivsize + 1,
+> +					stop_offset, stop_offset);
+> +	chcr_req->sec_cpl.seqno_numivs = FILL_SEC_CPL_SCMD0_SEQNO(op_type,
+> +					(op_type == CHCR_ENCRYPT_OP) ? 1 : 0,
+> +					CHCR_SCMD_CIPHER_MODE_AES_CBC,
+> +					actx->auth_mode, aeadctx->hmac_ctrl,
+> +					ivsize >> 1);
+> +	chcr_req->sec_cpl.ivgen_hdrlen =  FILL_SEC_CPL_IVGEN_HDRLEN(0, 0, 1,
+> +					 0, 1, dst_size);
 > +
-> +	if (op && type != CESA_TDMA_RESULT) {
->  		/* Add dummy desc to wait for crypto operation end */
->  		ret = mv_cesa_dma_add_dummy_end(&basereq->chain, flags);
->  		if (ret)
-> @@ -648,8 +679,10 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
->  	else
->  		creq->cache_ptr = 0;
->  
-> -	basereq->chain.last->flags |= (CESA_TDMA_END_OF_REQ |
-> -				       CESA_TDMA_BREAK_CHAIN);
-> +	basereq->chain.last->flags |= CESA_TDMA_END_OF_REQ;
+> +	chcr_req->key_ctx.ctx_hdr = aeadctx->key_ctx_hdr;
+> +	if (op_type == CHCR_ENCRYPT_OP)
+> +		memcpy(chcr_req->key_ctx.key, aeadctx->key,
+> +		       aeadctx->enckey_len);
+> +	else
+> +		memcpy(chcr_req->key_ctx.key, actx->dec_rrkey,
+> +		       aeadctx->enckey_len);
 > +
-> +	if (type != CESA_TDMA_RESULT)
-> +		basereq->chain.last->flags |= CESA_TDMA_BREAK_CHAIN;
->  
->  	return 0;
->  
+> +	memcpy(chcr_req->key_ctx.key + (DIV_ROUND_UP(aeadctx->enckey_len, 16) <<
+> +					4), actx->h_iopad, kctx_len -
+> +				(DIV_ROUND_UP(aeadctx->enckey_len, 16) << 4));
+> +
+> +	phys_cpl = (struct cpl_rx_phys_dsgl *)((u8 *)(chcr_req + 1) + kctx_len);
+> +	sg_param.nents = reqctx->dst_nents;
+> +	sg_param.obsize = req->cryptlen + (op_type ? -authsize : authsize);
+
+Just like above: is it ensured that we cannot have negative results here in 
+case cryptlen is less than authsize?
+
+
+Ciao
+Stephan
