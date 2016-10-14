@@ -1,144 +1,186 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 2/6] crypto: ccp - Remove unneeded sign-extension support
-Date: Thu, 13 Oct 2016 14:57:29 -0500
-Message-ID: <540d7690-1a2b-173c-3a54-99c24ee1935f@amd.com>
-References: <20161013144542.19759.6924.stgit@taos>
- <20161013145300.19759.14061.stgit@taos>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: Re: [PATCH v4 2/2] crypto: marvell - Don't break chain for
+ computable last ahash requests
+Date: Fri, 14 Oct 2016 12:40:19 +0200
+Message-ID: <20161014124019.2e9a685c@bbrezillon>
+References: <20161005075633.12711-1-romain.perier@free-electrons.com>
+        <20161005075633.12711-3-romain.perier@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-To: Gary R Hook <gary.hook@amd.com>, <linux-crypto@vger.kernel.org>
+Cc: Arnaud Ebalard <arno@natisbad.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Gregory Clement <gregory.clement@free-electrons.com>,
+        Nadav Haklai <nadavh@marvell.com>,
+        Ofer Heifetz <oferh@marvell.com>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+To: Romain Perier <romain.perier@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0079.outbound.protection.outlook.com ([104.47.42.79]:21017
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753761AbcJNDfO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Oct 2016 23:35:14 -0400
-In-Reply-To: <20161013145300.19759.14061.stgit@taos>
+Received: from down.free-electrons.com ([37.187.137.238]:54508 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1752758AbcJNKlK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Oct 2016 06:41:10 -0400
+In-Reply-To: <20161005075633.12711-3-romain.perier@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/13/2016 09:53 AM, Gary R Hook wrote:
-> The reverse-get/set functions can be simplified by
-> eliminating unused code.
+On Wed,  5 Oct 2016 09:56:33 +0200
+Romain Perier <romain.perier@free-electrons.com> wrote:
+
+> Currently, the driver breaks chain for all kind of hash requests in order to
+> don't override intermediate states of partial ahash updates. However, some final
+> ahash requests can be directly processed by the engine, and so without
+> intermediate state. This is typically the case for most for the HMAC requests
+> processed via IPSec.
 > 
+> This commits adds a TDMA descriptor to copy context for these of requests
+> into the "op" dma pool, then it allow to chain these requests at the DMA level.
+> The 'complete' operation is also updated to retrieve the MAC digest from the
+> right location.
 > 
-> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
+
+Minor comments below, otherwise it looks good.
+
+Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+
 > ---
->  drivers/crypto/ccp/ccp-ops.c |  145 +++++++++++++++++-------------------------
->  1 file changed, 59 insertions(+), 86 deletions(-)
 > 
-> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-> index 8fedb14..82cc637 100644
-> --- a/drivers/crypto/ccp/ccp-ops.c
-> +++ b/drivers/crypto/ccp/ccp-ops.c
-> @@ -198,62 +198,46 @@ static void ccp_get_dm_area(struct ccp_dm_workarea *wa, unsigned int wa_offset,
->  }
+> Changes in v4:
+>  - Remove the dummy descriptor at the end of the chain, when a TDMA_RESULT
+>    is present. So, we re-wrote a bit the code of ahash_complete accordingly.
+> 
+> Changes in v3:
+>  - Copy the whole context back to RAM and not just the digest. Also
+>    fixed a rebase issue ^^ (whoops)
+> 
+> Changes in v2:
+>  - Replaced BUG_ON by an error
+>  - Add a variable "break_chain", with "type" to break the chain
+> 
+>  drivers/crypto/marvell/hash.c | 65 ++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 49 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
+> index 9f28468..2a92605 100644
+> --- a/drivers/crypto/marvell/hash.c
+> +++ b/drivers/crypto/marvell/hash.c
+> @@ -312,24 +312,40 @@ static void mv_cesa_ahash_complete(struct crypto_async_request *req)
+>  	int i;
 >  
->  static int ccp_reverse_set_dm_area(struct ccp_dm_workarea *wa,
-> +				   unsigned int wa_offset,
->  				   struct scatterlist *sg,
-> -				   unsigned int len, unsigned int se_len,
-> -				   bool sign_extend)
-> +				   unsigned int sg_offset,
-> +				   unsigned int len)
->  {
-> -	unsigned int nbytes, sg_offset, dm_offset, sb_len, i;
-> -	u8 buffer[CCP_REVERSE_BUF_SIZE];
-> -
-> -	if (WARN_ON(se_len > sizeof(buffer)))
-> -		return -EINVAL;
-> -
-> -	sg_offset = len;
-> -	dm_offset = 0;
-> -	nbytes = len;
-> -	while (nbytes) {
-> -		sb_len = min_t(unsigned int, nbytes, se_len);
-> -		sg_offset -= sb_len;
-> -
-> -		scatterwalk_map_and_copy(buffer, sg, sg_offset, sb_len, 0);
-> -		for (i = 0; i < sb_len; i++)
-> -			wa->address[dm_offset + i] = buffer[sb_len - i - 1];
-> -
-> -		dm_offset += sb_len;
-> -		nbytes -= sb_len;
-> -
-> -		if ((sb_len != se_len) && sign_extend) {
-> -			/* Must sign-extend to nearest sign-extend length */
-> -			if (wa->address[dm_offset - 1] & 0x80)
-> -				memset(wa->address + dm_offset, 0xff,
-> -				       se_len - sb_len);
-> -		}
-> +	u8 *p, *q;
+>  	digsize = crypto_ahash_digestsize(crypto_ahash_reqtfm(ahashreq));
+> -	for (i = 0; i < digsize / 4; i++)
+> -		creq->state[i] = readl_relaxed(engine->regs + CESA_IVDIG(i));
+>  
+> -	if (creq->last_req) {
+> +	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ &&
+> +	    (creq->base.chain.last->flags & CESA_TDMA_TYPE_MSK) == CESA_TDMA_RESULT) {
+
+Maybe it's time to create an helper to extract the TDMA desc type (as
+you did for the CESA req type with mv_cesa_req_get_type()).
+
+> +		__le32 *data = NULL;
 > +
-> +	ccp_set_dm_area(wa, wa_offset, sg, sg_offset, len);
+>  		/*
+> -		 * Hardware's MD5 digest is in little endian format, but
+> -		 * SHA in big endian format
+> +		 * Result is already in the correct endianess when the SA is
+> +		 * used
+>  		 */
+> -		if (creq->algo_le) {
+> -			__le32 *result = (void *)ahashreq->result;
+> +		data = creq->base.chain.last->op->ctx.hash.hash;
+> +		for (i = 0; i < digsize / 4; i++)
+> +			creq->state[i] = cpu_to_le32(data[i]);
+>  
+> -			for (i = 0; i < digsize / 4; i++)
+> -				result[i] = cpu_to_le32(creq->state[i]);
+> -		} else {
+> -			__be32 *result = (void *)ahashreq->result;
+> +		memcpy(ahashreq->result, data, digsize);
+> +	} else {
+> +		for (i = 0; i < digsize / 4; i++)
+> +			creq->state[i] = readl_relaxed(engine->regs +
+> +						       CESA_IVDIG(i));
+> +		if (creq->last_req) {
+> +			/*
+> +			* Hardware's MD5 digest is in little endian format, but
+> +			* SHA in big endian format
+> +			*/
+> +			if (creq->algo_le) {
+> +				__le32 *result = (void *)ahashreq->result;
 > +
-> +	p = wa->address + wa_offset;
-> +	q = p + len - 1;
-> +	while (p < q) {
-> +		*p = *p ^ *q;
-> +		*q = *p ^ *q;
-> +		*p = *p ^ *q;
-> +		p++;
-> +		q--;
+> +				for (i = 0; i < digsize / 4; i++)
+> +					result[i] = cpu_to_le32(creq->state[i]);
+> +			} else {
+> +				__be32 *result = (void *)ahashreq->result;
+>  
+> -			for (i = 0; i < digsize / 4; i++)
+> -				result[i] = cpu_to_be32(creq->state[i]);
+> +				for (i = 0; i < digsize / 4; i++)
+> +					result[i] = cpu_to_be32(creq->state[i]);
+> +			}
+>  		}
 >  	}
-> -
+>  
+> @@ -504,6 +520,12 @@ mv_cesa_ahash_dma_last_req(struct mv_cesa_tdma_chain *chain,
+>  						CESA_SA_DESC_CFG_LAST_FRAG,
+>  				      CESA_SA_DESC_CFG_FRAG_MSK);
+>  
+> +		ret = mv_cesa_dma_add_result_op(chain,
+> +						CESA_SA_CFG_SRAM_OFFSET,
+> +						CESA_SA_DATA_SRAM_OFFSET,
+> +						CESA_TDMA_SRC_IN_SRAM, flags);
+> +		if (ret)
+> +			return ERR_PTR(-ENOMEM);
+>  		return op;
+>  	}
+>  
+> @@ -564,6 +586,7 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
+>  	struct mv_cesa_op_ctx *op = NULL;
+>  	unsigned int frag_len;
+>  	int ret;
+> +	u32 type;
+>  
+>  	basereq->chain.first = NULL;
+>  	basereq->chain.last = NULL;
+> @@ -635,7 +658,15 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
+>  		goto err_free_tdma;
+>  	}
+>  
+> -	if (op) {
+> +	/*
+> +	 * If results are copied via DMA, this means that this
+> +	 * request can be directly processed by the engine,
+> +	 * without partial updates. So we can chain it at the
+> +	 * DMA level with other requests.
+> +	 */
+
+Can you move this comment where it really belongs: when you
+conditionally set the CESA_TDMA_BREAK_CHAIN flag.
+
+> +	type = basereq->chain.last->flags & CESA_TDMA_TYPE_MSK;
+> +
+> +	if (op && type != CESA_TDMA_RESULT) {
+>  		/* Add dummy desc to wait for crypto operation end */
+>  		ret = mv_cesa_dma_add_dummy_end(&basereq->chain, flags);
+>  		if (ret)
+> @@ -648,8 +679,10 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
+>  	else
+>  		creq->cache_ptr = 0;
+>  
+> -	basereq->chain.last->flags |= (CESA_TDMA_END_OF_REQ |
+> -				       CESA_TDMA_BREAK_CHAIN);
+> +	basereq->chain.last->flags |= CESA_TDMA_END_OF_REQ;
+> +
+> +	if (type != CESA_TDMA_RESULT)
+> +		basereq->chain.last->flags |= CESA_TDMA_BREAK_CHAIN;
+>  
 >  	return 0;
->  }
 >  
->  static void ccp_reverse_get_dm_area(struct ccp_dm_workarea *wa,
-> +				    unsigned int wa_offset,
->  				    struct scatterlist *sg,
-> +				    unsigned int sg_offset,
->  				    unsigned int len)
->  {
-> -	unsigned int nbytes, sg_offset, dm_offset, sb_len, i;
-> -	u8 buffer[CCP_REVERSE_BUF_SIZE];
-> -
-> -	sg_offset = 0;
-> -	dm_offset = len;
-> -	nbytes = len;
-> -	while (nbytes) {
-> -		sb_len = min_t(unsigned int, nbytes, sizeof(buffer));
-> -		dm_offset -= sb_len;
-> -
-> -		for (i = 0; i < sb_len; i++)
-> -			buffer[sb_len - i - 1] = wa->address[dm_offset + i];
-> -		scatterwalk_map_and_copy(buffer, sg, sg_offset, sb_len, 1);
-> -
-> -		sg_offset += sb_len;
-> -		nbytes -= sb_len;
-> +	u8 *p, *q;
-> +
-> +	p = wa->address + wa_offset;
-> +	q = p + len - 1;
-> +	while (p < q) {
-> +		*p = *p ^ *q;
-> +		*q = *p ^ *q;
-> +		*p = *p ^ *q;
-> +		p++;
-> +		q--;
->  	}
-> +
-> +	ccp_get_dm_area(wa, wa_offset, sg, sg_offset, len);
->  }
->  
->  static void ccp_free_data(struct ccp_data *data, struct ccp_cmd_queue *cmd_q)
-> @@ -1294,7 +1278,9 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
->  	struct ccp_data dst;
->  	struct ccp_op op;
->  	unsigned int sb_count, i_len, o_len;
-> -	int ret;
-> +	unsigned int dm_offset;
-> +	int i = 0;
-
-Is "dm_offset" and "i" used anywhere?  I don't see them used in this
-function...
-
-> +	int ret = 0;
-
-No need to change this, is there?
-
-Thanks,
-Tom
