@@ -1,79 +1,53 @@
-From: Markus Heiser <markus.heiser@darmarit.de>
+From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: SPHINX: no structured comments
-Date: Sat, 15 Oct 2016 18:12:36 +0200
-Message-ID: <D10CA7D8-CE8A-4C32-BDA8-1641D166649C@darmarit.de>
-References: <1730886.FCUxIFiraa@positron.chronox.de>
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
+Date: Sun, 16 Oct 2016 00:12:05 +0200
+Message-ID: <16408240.aHQPdhiSNO@positron.chronox.de>
+References: <1730886.FCUxIFiraa@positron.chronox.de> <D10CA7D8-CE8A-4C32-BDA8-1641D166649C@darmarit.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+To: Markus Heiser <markus.heiser@darmarit.de>
 Return-path: <linux-doc-owner@vger.kernel.org>
-In-Reply-To: <1730886.FCUxIFiraa@positron.chronox.de>
+In-Reply-To: <D10CA7D8-CE8A-4C32-BDA8-1641D166649C@darmarit.de>
 Sender: linux-doc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Am Samstag, 15. Oktober 2016, 18:12:36 CEST schrieb Markus Heiser:
 
-Am 15.10.2016 um 17:05 schrieb Stephan Mueller <smueller@chronox.de>:
+Hi Markus,
 
-> Hi,
+> I suppose you have a typo in one of your kernel-doc
+> directives. E.g.::
 > 
-> I am converting the kernel crypto API DocBook into Sphinx. The conversion is 
-> complete, but I am having difficulties finding the cause for the following 
-> notification obtained during the Sphinx compilation:
+>  .. kernel-doc:: include/linux/crypto.h
 > 
-> ./include/linux/crypto.h:1: warning: no structured comments found
+>      :functions: fooTypo
 > 
-> I am unsure what is wrong in line 1 of the mentioned header.
+> will produce those error messages:
 > 
-> Thanks a lot
-> Stephan
+>  $ ./scripts/kernel-doc -function fooTypo  -rst ./include/linux/crypto.h
+>  ./include/linux/crypto.h:1: warning: no structured comments found
+> 
+> hope that helps.
 
-Hi Stephan,
+Thanks for the hint. The issue was a removed API call.
 
-I suppose you have a typo in one of your kernel-doc
-directives. E.g.::
+...
+> 
+> The next hint might be a bit to late for you, but there is a
+> *automatic* DocBook to reST migration of the crypto API:
+> 
+>  https://github.com/return42/sphkerneldoc/tree/master/doc/Documentation/book
+> s_migrated/crypto-API
 
- .. kernel-doc:: include/linux/crypto.h
-     :functions: fooTypo
+Thanks for the hint. You are right, it is a bit late, but the DocBook to 
+Sphinx converter helped me.
 
-will produce those error messages:
+With Sphinx now, I also split up the document into more manageable chunks and 
+fixed some small issues.
 
- $ ./scripts/kernel-doc -function fooTypo  -rst ./include/linux/crypto.h
- ./include/linux/crypto.h:1: warning: no structured comments found
+Thanks for your help.
 
-hope that helps.
-
-FYI:
-
-IMO the kernel-doc parser in the kernel sources is lazy.  In my
-linuxdoc project you will find a more enthusiastic one with a
-lint command.
-
- https://return42.github.io/linuxdoc
-
-Even if this kernel-doc parser is not (yet) a part of the kernel
-source tree, the kernel-lintdoc command might be helpful
-finding (more) issues
-
- https://return42.github.io/linuxdoc/cmd-line.html#kernel-lintdoc
-
-The installation is quite simple:
-
- pip install git+http://github.com/return42/linuxdoc.git
-
-The next hint might be a bit to late for you, but there is a
-*automatic* DocBook to reST migration of the crypto API:
-
- https://github.com/return42/sphkerneldoc/tree/master/doc/Documentation/books_migrated/crypto-API
-
-This migration is done with the my dbxm2rst project:
-
- https://return42.github.io/dbxml2rst/
-
-If you need more help or want to migrate more DocBook
-documentation to reST ... don't hesitate to contact me
-(on the ML or directly / de-de ;-)
-
--- Markus --
-
+Ciao
+Stephan
