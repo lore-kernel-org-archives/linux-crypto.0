@@ -1,160 +1,32 @@
-From: Markus Heiser <markus.heiser@darmarit.de>
+From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: [PATCH 3/7] crypto: doc - fix source comments for Sphinx
-Date: Sun, 16 Oct 2016 14:56:49 +0200
-Message-ID: <0255D43E-2C6A-4630-9F86-9723366188EC@darmarit.de>
-References: <2721226.4nLlHD9uQ6@positron.chronox.de> <2601538.cyVHbpjp9L@positron.chronox.de>
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
+Date: Sun, 16 Oct 2016 15:03:45 +0200
+Message-ID: <2972819.9tl40PCxdP@positron.chronox.de>
+References: <2721226.4nLlHD9uQ6@positron.chronox.de> <2601538.cyVHbpjp9L@positron.chronox.de> <0255D43E-2C6A-4630-9F86-9723366188EC@darmarit.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
         linux-doc@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+To: Markus Heiser <markus.heiser@darmarit.de>
 Return-path: <linux-doc-owner@vger.kernel.org>
-In-Reply-To: <2601538.cyVHbpjp9L@positron.chronox.de>
+In-Reply-To: <0255D43E-2C6A-4630-9F86-9723366188EC@darmarit.de>
 Sender: linux-doc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Am Sonntag, 16. Oktober 2016, 14:56:49 CEST schrieb Markus Heiser:
 
-Am 16.10.2016 um 05:18 schrieb Stephan Mueller <smueller@chronox.de>:
+Hi Markus,
+...
 
-> Update comments to avoid any complaints from Sphinx during compilation.
+> compared to DocBook, with sphinx you can use (have to use) the reST markup
+> in source code comments.
 > 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> ---
-> include/crypto/aead.h     | 14 +++++++-------
-> include/crypto/hash.h     |  2 +-
-> include/crypto/skcipher.h |  4 ++--
-> include/linux/crypto.h    |  4 ++--
-> 4 files changed, 12 insertions(+), 12 deletions(-)
-> 
-> diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-> index 12f8432..1bd3a2f 100644
-> --- a/include/crypto/aead.h
-> +++ b/include/crypto/aead.h
-> @@ -55,14 +55,14 @@
-> * The scatter list pointing to the input data must contain:
-> *
-> * * for RFC4106 ciphers, the concatenation of
-> - * associated authentication data || IV || plaintext or ciphertext. Note, the
-> - * same IV (buffer) is also set with the aead_request_set_crypt call. Note,
-> - * the API call of aead_request_set_ad must provide the length of the AAD and
-> - * the IV. The API call of aead_request_set_crypt only points to the size of
-> - * the input plaintext or ciphertext.
-> + *   associated authentication data || IV || plaintext or ciphertext. Note, the
-> + *   same IV (buffer) is also set with the aead_request_set_crypt call. Note,
-> + *   the API call of aead_request_set_ad must provide the length of the AAD and
-> + *   the IV. The API call of aead_request_set_crypt only points to the size of
-> + *   the input plaintext or ciphertext.
-> *
-> * * for "normal" AEAD ciphers, the concatenation of
-> - * associated authentication data || plaintext or ciphertext.
-> + *   associated authentication data || plaintext or ciphertext.
-> *
-> * It is important to note that if multiple scatter gather list entries form
-> * the input data mentioned above, the first entry must not point to a NULL
-> @@ -454,7 +454,7 @@ static inline void aead_request_free(struct aead_request *req)
-> * The callback function is registered with the aead_request handle and
-> * must comply with the following template
-> *
-> - *	void callback_function(struct crypto_async_request *req, int error)
-> + *	void callback_function(struct crypto_async_request \*req, int error)
+> Here, the code example is just a (indented) float text and this is
+> why you have to quote the asterisk "\*req,".
 
-Hi Stephan,
+Is there any preferred / suggested way whether to use literal or highlighted 
+(or even my approach on) formatting?
 
-compared to DocBook, with sphinx you can use (have to use) the reST markup
-in source code comments.
-
-Here, the code example is just a (indented) float text and this is 
-why you have to quote the asterisk "\*req,". 
-
-If you want a literal (pre-formatted) block, I recommend to use two colon
-and an indented block:
-
-* The callback function is registered with the aead_request handle and
-* must comply with the following template::
-*
-*   void callback_function(struct crypto_async_request *req, int error)
-*
-
-If you want a *highlighted* code block, use the code-block directive, e.g:
-
-* The callback function is registered with the aead_request handle and
-* must comply with the following template:
-*
-* .. code-block: c
-*
-*    void callback_function(struct crypto_async_request *req, int error)
-*
-
--- Markus --
-
-
-> */
-> static inline void aead_request_set_callback(struct aead_request *req,
-> 					     u32 flags,
-> diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-> index 2660588..23f15d0 100644
-> --- a/include/crypto/hash.h
-> +++ b/include/crypto/hash.h
-> @@ -607,7 +607,7 @@ static inline struct ahash_request *ahash_request_cast(
-> * The callback function is registered with the &ahash_request handle and
-> * must comply with the following template
-> *
-> - *	void callback_function(struct crypto_async_request *req, int error)
-> + *	void callback_function(struct crypto_async_request \*req, int error)
-> */
-> static inline void ahash_request_set_callback(struct ahash_request *req,
-> 					      u32 flags,
-> diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-> index cc4d98a..78a1de0 100644
-> --- a/include/crypto/skcipher.h
-> +++ b/include/crypto/skcipher.h
-> @@ -516,7 +516,7 @@ static inline void skcipher_request_zero(struct skcipher_request *req)
-> * skcipher_request_set_callback() - set asynchronous callback function
-> * @req: request handle
-> * @flags: specify zero or an ORing of the flags
-> - *         CRYPTO_TFM_REQ_MAY_BACKLOG the request queue may back log and
-> + *	   CRYPTO_TFM_REQ_MAY_BACKLOG the request queue may back log and
-> *	   increase the wait queue beyond the initial maximum size;
-> *	   CRYPTO_TFM_REQ_MAY_SLEEP the request processing may sleep
-> * @compl: callback function pointer to be registered with the request handle
-> @@ -535,7 +535,7 @@ static inline void skcipher_request_zero(struct skcipher_request *req)
-> * The callback function is registered with the skcipher_request handle and
-> * must comply with the following template
-> *
-> - *	void callback_function(struct crypto_async_request *req, int error)
-> + *	void callback_function(struct crypto_async_request \*req, int error)
-> */
-> static inline void skcipher_request_set_callback(struct skcipher_request *req,
-> 						 u32 flags,
-> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-> index 7cee555..615a326 100644
-> --- a/include/linux/crypto.h
-> +++ b/include/linux/crypto.h
-> @@ -960,7 +960,7 @@ static inline void ablkcipher_request_free(struct ablkcipher_request *req)
-> * ablkcipher_request_set_callback() - set asynchronous callback function
-> * @req: request handle
-> * @flags: specify zero or an ORing of the flags
-> - *         CRYPTO_TFM_REQ_MAY_BACKLOG the request queue may back log and
-> + *	   CRYPTO_TFM_REQ_MAY_BACKLOG the request queue may back log and
-> *	   increase the wait queue beyond the initial maximum size;
-> *	   CRYPTO_TFM_REQ_MAY_SLEEP the request processing may sleep
-> * @compl: callback function pointer to be registered with the request handle
-> @@ -979,7 +979,7 @@ static inline void ablkcipher_request_free(struct ablkcipher_request *req)
-> * The callback function is registered with the ablkcipher_request handle and
-> * must comply with the following template
-> *
-> - *	void callback_function(struct crypto_async_request *req, int error)
-> + *	void callback_function(struct crypto_async_request \*req, int error)
-> */
-> static inline void ablkcipher_request_set_callback(
-> 	struct ablkcipher_request *req,
-> -- 
-> 2.7.4
-> 
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-doc" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+Ciao
+Stephan
