@@ -1,82 +1,120 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 0/7] Conversion crypto API documentation to Sphinx
-Date: Sun, 16 Oct 2016 05:15:16 +0200
-Message-ID: <2721226.4nLlHD9uQ6@positron.chronox.de>
+Subject: [PATCH 3/7] crypto: doc - fix source comments for Sphinx
+Date: Sun, 16 Oct 2016 05:18:00 +0200
+Message-ID: <2601538.cyVHbpjp9L@positron.chronox.de>
+References: <2721226.4nLlHD9uQ6@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
 To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:53532 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752203AbcJPD27 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 15 Oct 2016 23:28:59 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <2721226.4nLlHD9uQ6@positron.chronox.de>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+Update comments to avoid any complaints from Sphinx during compilation.
 
-the attached patch set converts the existing crypto API documentation
-from DocBook to Sphinx.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ include/crypto/aead.h     | 14 +++++++-------
+ include/crypto/hash.h     |  2 +-
+ include/crypto/skcipher.h |  4 ++--
+ include/linux/crypto.h    |  4 ++--
+ 4 files changed, 12 insertions(+), 12 deletions(-)
 
-The first two patch sets perform the conversion without changes to the
-content of the documentation. Starting with patch 3, fixes and
-enhancements are applied.
-
-A full review of the new kernel crypto API documentation is found
-at [1].
-
-[1] http://www.chronox.de/crypto-API/index.html
-
-Stephan Mueller (7):
-  crypto: doc - convert crypto API documentation to Sphinx
-  crypto: doc - remove crypto API DocBook
-  crypto: doc - fix source comments for Sphinx
-  crypto: doc - fix separation of cipher / req API
-  crypto: doc - add KPP documentation
-  crypto: doc - remove crypto_alloc_ablkcipher
-  crypto: doc - clarify AEAD memory structure
-
- Documentation/DocBook/Makefile        |    2 +-
- Documentation/DocBook/crypto-API.tmpl | 2092 ---------------------------------
- Documentation/crypto/api-aead.rst     |   68 ++
- Documentation/crypto/api-akcipher.rst |   57 +
- Documentation/crypto/api-digest.rst   |  122 ++
- Documentation/crypto/api-kpp.rst      |   92 ++
- Documentation/crypto/api-rng.rst      |   32 +
- Documentation/crypto/api-samples.rst  |  224 ++++
- Documentation/crypto/api-skcipher.rst |  200 ++++
- Documentation/crypto/api.rst          |   25 +
- Documentation/crypto/architecture.rst |  441 +++++++
- Documentation/crypto/devel-algos.rst  |  247 ++++
- Documentation/crypto/index.rst        |   24 +
- Documentation/crypto/intro.rst        |   74 ++
- Documentation/crypto/userspace-if.rst |  387 ++++++
- Documentation/index.rst               |    1 +
- crypto/algif_aead.c                   |   14 +-
- include/crypto/aead.h                 |   49 +-
- include/crypto/dh.h                   |   58 +
- include/crypto/ecdh.h                 |   58 +
- include/crypto/hash.h                 |    2 +-
- include/crypto/kpp.h                  |   15 +-
- include/crypto/skcipher.h             |    4 +-
- include/linux/crypto.h                |    4 +-
- 24 files changed, 2148 insertions(+), 2144 deletions(-)
- delete mode 100644 Documentation/DocBook/crypto-API.tmpl
- create mode 100644 Documentation/crypto/api-aead.rst
- create mode 100644 Documentation/crypto/api-akcipher.rst
- create mode 100644 Documentation/crypto/api-digest.rst
- create mode 100644 Documentation/crypto/api-kpp.rst
- create mode 100644 Documentation/crypto/api-rng.rst
- create mode 100644 Documentation/crypto/api-samples.rst
- create mode 100644 Documentation/crypto/api-skcipher.rst
- create mode 100644 Documentation/crypto/api.rst
- create mode 100644 Documentation/crypto/architecture.rst
- create mode 100644 Documentation/crypto/devel-algos.rst
- create mode 100644 Documentation/crypto/index.rst
- create mode 100644 Documentation/crypto/intro.rst
- create mode 100644 Documentation/crypto/userspace-if.rst
-
+diff --git a/include/crypto/aead.h b/include/crypto/aead.h
+index 12f8432..1bd3a2f 100644
+--- a/include/crypto/aead.h
++++ b/include/crypto/aead.h
+@@ -55,14 +55,14 @@
+  * The scatter list pointing to the input data must contain:
+  *
+  * * for RFC4106 ciphers, the concatenation of
+- * associated authentication data || IV || plaintext or ciphertext. Note, the
+- * same IV (buffer) is also set with the aead_request_set_crypt call. Note,
+- * the API call of aead_request_set_ad must provide the length of the AAD and
+- * the IV. The API call of aead_request_set_crypt only points to the size of
+- * the input plaintext or ciphertext.
++ *   associated authentication data || IV || plaintext or ciphertext. Note, the
++ *   same IV (buffer) is also set with the aead_request_set_crypt call. Note,
++ *   the API call of aead_request_set_ad must provide the length of the AAD and
++ *   the IV. The API call of aead_request_set_crypt only points to the size of
++ *   the input plaintext or ciphertext.
+  *
+  * * for "normal" AEAD ciphers, the concatenation of
+- * associated authentication data || plaintext or ciphertext.
++ *   associated authentication data || plaintext or ciphertext.
+  *
+  * It is important to note that if multiple scatter gather list entries form
+  * the input data mentioned above, the first entry must not point to a NULL
+@@ -454,7 +454,7 @@ static inline void aead_request_free(struct aead_request *req)
+  * The callback function is registered with the aead_request handle and
+  * must comply with the following template
+  *
+- *	void callback_function(struct crypto_async_request *req, int error)
++ *	void callback_function(struct crypto_async_request \*req, int error)
+  */
+ static inline void aead_request_set_callback(struct aead_request *req,
+ 					     u32 flags,
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 2660588..23f15d0 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -607,7 +607,7 @@ static inline struct ahash_request *ahash_request_cast(
+  * The callback function is registered with the &ahash_request handle and
+  * must comply with the following template
+  *
+- *	void callback_function(struct crypto_async_request *req, int error)
++ *	void callback_function(struct crypto_async_request \*req, int error)
+  */
+ static inline void ahash_request_set_callback(struct ahash_request *req,
+ 					      u32 flags,
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index cc4d98a..78a1de0 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -516,7 +516,7 @@ static inline void skcipher_request_zero(struct skcipher_request *req)
+  * skcipher_request_set_callback() - set asynchronous callback function
+  * @req: request handle
+  * @flags: specify zero or an ORing of the flags
+- *         CRYPTO_TFM_REQ_MAY_BACKLOG the request queue may back log and
++ *	   CRYPTO_TFM_REQ_MAY_BACKLOG the request queue may back log and
+  *	   increase the wait queue beyond the initial maximum size;
+  *	   CRYPTO_TFM_REQ_MAY_SLEEP the request processing may sleep
+  * @compl: callback function pointer to be registered with the request handle
+@@ -535,7 +535,7 @@ static inline void skcipher_request_zero(struct skcipher_request *req)
+  * The callback function is registered with the skcipher_request handle and
+  * must comply with the following template
+  *
+- *	void callback_function(struct crypto_async_request *req, int error)
++ *	void callback_function(struct crypto_async_request \*req, int error)
+  */
+ static inline void skcipher_request_set_callback(struct skcipher_request *req,
+ 						 u32 flags,
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 7cee555..615a326 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -960,7 +960,7 @@ static inline void ablkcipher_request_free(struct ablkcipher_request *req)
+  * ablkcipher_request_set_callback() - set asynchronous callback function
+  * @req: request handle
+  * @flags: specify zero or an ORing of the flags
+- *         CRYPTO_TFM_REQ_MAY_BACKLOG the request queue may back log and
++ *	   CRYPTO_TFM_REQ_MAY_BACKLOG the request queue may back log and
+  *	   increase the wait queue beyond the initial maximum size;
+  *	   CRYPTO_TFM_REQ_MAY_SLEEP the request processing may sleep
+  * @compl: callback function pointer to be registered with the request handle
+@@ -979,7 +979,7 @@ static inline void ablkcipher_request_free(struct ablkcipher_request *req)
+  * The callback function is registered with the ablkcipher_request handle and
+  * must comply with the following template
+  *
+- *	void callback_function(struct crypto_async_request *req, int error)
++ *	void callback_function(struct crypto_async_request \*req, int error)
+  */
+ static inline void ablkcipher_request_set_callback(
+ 	struct ablkcipher_request *req,
 -- 
 2.7.4
+
+
