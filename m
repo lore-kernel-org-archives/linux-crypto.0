@@ -1,51 +1,116 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH resend 4.9] hw_random: Don't use a stack buffer in add_early_randomness()
-Date: Mon, 17 Oct 2016 23:14:42 +0200
-Message-ID: <4884703.jrSbDN45dS@tauon.atsec.com>
-References: <4169224b6858d1cf149f1a73f8a03603fa19076d.1476638125.git.luto@kernel.org> <1709183.xhj4cRUFK9@tauon.atsec.com> <CALCETrXGRf3z8gGw6fjeMCzb=X_OF6y0Rbhh-wAGjUVad8eaMg@mail.gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 00/28] Reenable maybe-uninitialized warnings
+Date: Tue, 18 Oct 2016 00:03:28 +0200
+Message-ID: <20161017220342.1627073-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rusty Russell <rusty@rustcorp.com.au>,
-        Jens Axboe <axboe@fb.com>, Matt Mullins <mmullins@mmlx.us>
-To: Andy Lutomirski <luto@amacapital.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:53636 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S964894AbcJQVOs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Oct 2016 17:14:48 -0400
-In-Reply-To: <CALCETrXGRf3z8gGw6fjeMCzb=X_OF6y0Rbhh-wAGjUVad8eaMg@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: linux-s390@vger.kernel.org, linux-ext4@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
+ netdev@vger.kernel.org, x86@kernel.org, ceph-devel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-f2fs-devel@lists.sourceforge.net, linux-mtd@lists.infradead.org,
+ linux-crypto@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Martin Schwidefsky <schwidefsky@de.ibm.com>, netfilter-devel@vger.kernel.org,
+ Ilya Dryomov <idryomov@gmail.com>, Mauro Carvalho Chehab <mchehab@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, linux-media@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Return-path: <dri-devel-bounces@lists.freedesktop.org>
+List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
+List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
+List-Post: <mailto:dri-devel@lists.freedesktop.org>
+List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
+List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
+Errors-To: dri-devel-bounces@lists.freedesktop.org
+Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Am Montag, 17. Oktober 2016, 14:03:17 CEST schrieb Andy Lutomirski:
-
-Hi Andy,
-
-> On Mon, Oct 17, 2016 at 11:36 AM, Stephan Mueller <smueller@chronox.de> 
-wrote:
-> > Am Montag, 17. Oktober 2016, 10:30:13 CEST schrieb Andy Lutomirski:
-> > 
-> > Hi Andy,
-> > 
-> >> Sure, but shouldn't that be a separate patch covering the whole hw_crypto
-> >> core?
-> > 
-> > I think that you are right -- there are many more cases where a memset(0)
-> > is warranted.
-> > 
-> > Do you want to make this change or should I send a patch?
-> 
-> Can you do it?  I have my work cut out for me making sure that all the
-> known regressions get stomped quickly...
-
-Sure, will do.
-
-Thanks.
-
-Ciao
-Stephan
+VGhpcyBpcyBhIHNldCBvZiBwYXRjaGVzIHRoYXQgSSBob3BlIHRvIGdldCBpbnRvIHY0LjkgaW4g
+c29tZSBmb3JtCmluIG9yZGVyIHRvIHR1cm4gb24gdGhlIC1XbWF5YmUtdW5pbml0aWFsaXplZCB3
+YXJuaW5ncyBhZ2Fpbi4KCkFmdGVyIHRhbGtpbmcgdG8gTGludXMgaW4gcGVyc29uIGF0IExpbmFy
+byBDb25uZWN0IGFib3V0IHRoaXMsIEkKc3BlbnQgc29tZSB0aW1lIG9uIGZpbmRpbmcgYWxsIHRo
+ZSByZW1haW5pbmcgd2FybmluZ3MsIGFuZCB0aGlzCmlzIHRoZSByZXN1bHRpbmcgcGF0Y2ggc2Vy
+aWVzLiBNb3JlIGRldGFpbHMgYXJlIGluIHRoZSBkZXNjcmlwdGlvbgpvZiB0aGUgbGFzdCBwYXRj
+aCB0aGF0IGFjdHVhbGx5IGVuYWJsZXMgdGhlIHdhcm5pbmcuCgpMZXQgbWUga25vdyBpZiB0aGVy
+ZSBhcmUgb3RoZXIgd2FybmluZ3MgdGhhdCBJIG1pc3NlZCwgYW5kIHdoZXRoZXIKeW91IHRoaW5r
+IHRoZXNlIGFyZSBzdGlsbCBhcHByb3ByaWF0ZSBmb3IgdjQuOSBvciBub3QuCkEgY291cGxlIG9m
+IHBhdGNoZXMgYXJlIG5vbi1vYnZpb3VzLCBhbmQgY291bGQgdXNlIHNvbWUgbW9yZQpkZXRhaWxl
+ZCByZXZpZXcuCgoJQXJuZAoKQXJuZCBCZXJnbWFubiAoMjgpOgogIFt2Ml0gbmV0ZmlsdGVyOiBu
+Zl90YWJsZXM6IGF2b2lkIHVuaW5pdGlhbGl6ZWQgdmFyaWFibGUgd2FybmluZwogIFt2Ml0gbXRk
+OiBtdGs6IGF2b2lkIHdhcm5pbmcgaW4gbXRrX2VjY19lbmNvZGUKICBbdjJdIGluZmluaWJhbmQ6
+IHNodXQgdXAgYSBtYXliZS11bmluaXRpYWxpemVkIHdhcm5pbmcKICBmMmZzOiByZXBsYWNlIGEg
+YnVpbGQtdGltZSB3YXJuaW5nIHdpdGggcnVudGltZSBXQVJOX09OCiAgZXh0MjogYXZvaWQgYm9n
+dXMgLVdtYXliZS11bmluaXRpYWxpemVkIHdhcm5pbmcKICBORlN2NC4xOiB3b3JrIGFyb3VuZCAt
+V21heWJlLXVuaW5pdGlhbGl6ZWQgd2FybmluZwogIGNlcGg6IGF2b2lkIGZhbHNlIHBvc2l0aXZl
+IG1heWJlLXVuaW5pdGlhbGl6ZWQgd2FybmluZwogIHN0YWdpbmc6IGx1c3RyZTogcmVzdG9yZSBp
+bml0aWFsaXphdGlvbiBvZiByZXR1cm4gY29kZQogIHN0YWdpbmc6IGx1c3RyZTogcmVtb3ZlIGJy
+b2tlbiBkZWFkIGNvZGUgaW4KICAgIGNmc19jcHRfdGFibGVfY3JlYXRlX3BhdHRlcm4KICBVQkk6
+IGZpeCB1bmluaXRpYWxpemVkIGFjY2VzcyBvZiB2aWRfaGRyIHBvaW50ZXIKICBibG9jazogcmRi
+OiBmYWxzZS1wb3N0aXZlIGdjYy00LjkgLVdtYXliZS11bmluaXRpYWxpemVkCiAgW21lZGlhXSBy
+YzogcHJpbnQgY29ycmVjdCB2YXJpYWJsZSBmb3IgejhmMDgxMQogIFttZWRpYV0gZGliMDcwMDog
+Zml4IHVuaW5pdGlhbGl6ZWQgZGF0YSBvbiAncmVwZWF0JyBldmVudAogIGlpbzogYWNjZWw6IHNj
+YTMwMDBfY29yZTogYXZvaWQgcG90ZW50aWFsbHkgdW5pbml0aWFsaXplZCB2YXJpYWJsZQogIGNy
+eXB0bzogYWVzbmk6IGF2b2lkIC1XbWF5YmUtdW5pbml0aWFsaXplZCB3YXJuaW5nCiAgcGNtY2lh
+OiBmaXggcmV0dXJuIHZhbHVlIG9mIHNvY19wY21jaWFfcmVndWxhdG9yX3NldAogIHNwaTogZnNs
+LWVzcGk6IGF2b2lkIHByb2Nlc3NpbmcgdW5pbml0YWxpemVkIGRhdGEgb24gZXJyb3IKICBkcm06
+IGF2b2lkIHVuaW5pdGlhbGl6ZWQgdGltZXN0YW1wIHVzZSBpbiB3YWl0X3ZibGFuawogIGJyY21m
+bWFjOiBhdm9pZCBtYXliZS11bmluaXRpYWxpemVkIHdhcm5pbmcgaW4gYnJjbWZfY2ZnODAyMTFf
+c3RhcnRfYXAKICBuZXQ6IGJjbTYzeHg6IGF2b2lkIHJlZmVyZW5jaW5nIHVuaW5pdGlhbGl6ZWQg
+dmFyaWFibGUKICBuZXQvaHlwZXJ2OiBhdm9pZCB1bmluaXRpYWxpemVkIHZhcmlhYmxlCiAgeDg2
+OiBhcG06IGF2b2lkIHVuaW5pdGlhbGl6ZWQgZGF0YQogIHg4NjogbWFyayB0YXJnZXQgYWRkcmVz
+cyBhcyBvdXRwdXQgaW4gJ2luc2InIGFzbQogIHg4NjogbWF0aC1lbXU6IHBvc3NpYmxlIHVuaW5p
+dGlhbGl6ZWQgdmFyaWFibGUgdXNlCiAgczM5MDogcGNpOiBkb24ndCBwcmludCB1bmluaXRpYWxp
+emVkIGRhdGEgZm9yIGRlYnVnZ2luZwogIG5pb3MyOiBmaXggdGltZXIgaW5pdGNhbGwgcmV0dXJu
+IHZhbHVlCiAgcm9ja2VyOiBmaXggbWF5YmUtdW5pbml0aWFsaXplZCB3YXJuaW5nCiAgS2J1aWxk
+OiBicmluZyBiYWNrIC1XbWF5YmUtdW5pbml0aWFsaXplZCB3YXJuaW5nCgogTWFrZWZpbGUgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMTAgKy0KIGFyY2gvYXJj
+L01ha2VmaWxlICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA0ICstCiBhcmNo
+L25pb3MyL2tlcm5lbC90aW1lLmMgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgMSArCiBh
+cmNoL3MzOTAvcGNpL3BjaV9kbWEuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgMiAr
+LQogYXJjaC94ODYvY3J5cHRvL2Flc25pLWludGVsX2dsdWUuYyAgICAgICAgICAgICAgICAgfCAx
+MjEgKysrKysrKysrKysrKy0tLS0tLS0tCiBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9pby5oICAgICAg
+ICAgICAgICAgICAgICAgICAgICB8ICAgNCArLQogYXJjaC94ODYva2VybmVsL2FwbV8zMi5jICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDUgKy0KIGFyY2gveDg2L21hdGgtZW11L01ha2Vm
+aWxlICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA0ICstCiBhcmNoL3g4Ni9tYXRoLWVtdS9y
+ZWdfY29tcGFyZS5jICAgICAgICAgICAgICAgICAgICB8ICAxNiArLS0KIGRyaXZlcnMvYmxvY2sv
+cmJkLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAxICsKIGRyaXZlcnMvZ3B1
+L2RybS9kcm1faXJxLmMgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA0ICstCiBkcml2ZXJz
+L2luZmluaWJhbmQvY29yZS9jbWEuYyAgICAgICAgICAgICAgICAgICAgICB8ICA1NiArKysrKy0t
+LS0tCiBkcml2ZXJzL21lZGlhL2kyYy9pci1rYmQtaTJjLmMgICAgICAgICAgICAgICAgICAgICB8
+ICAgMiArLQogZHJpdmVycy9tZWRpYS91c2IvZHZiLXVzYi9kaWIwNzAwX2NvcmUuYyAgICAgICAg
+ICAgfCAgMTAgKy0KIGRyaXZlcnMvbXRkL25hbmQvbXRrX2VjYy5jICAgICAgICAgICAgICAgICAg
+ICAgICAgIHwgIDE5ICsrLS0KIGRyaXZlcnMvbXRkL3ViaS9lYmEuYyAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIHwgICAyICstCiBkcml2ZXJzL25ldC9ldGhlcm5ldC9icm9hZGNvbS9iY202
+M3h4X2VuZXQuYyAgICAgICB8ICAgMyArLQogZHJpdmVycy9uZXQvZXRoZXJuZXQvcm9ja2VyL3Jv
+Y2tlcl9vZmRwYS5jICAgICAgICAgfCAgIDQgKy0KIGRyaXZlcnMvbmV0L2h5cGVydi9uZXR2c2Nf
+ZHJ2LmMgICAgICAgICAgICAgICAgICAgIHwgICAyICstCiAuLi4vYnJvYWRjb20vYnJjbTgwMjEx
+L2JyY21mbWFjL2NmZzgwMjExLmMgICAgICAgICB8ICAgMiArLQogZHJpdmVycy9wY21jaWEvc29j
+X2NvbW1vbi5jICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDIgKy0KIGRyaXZlcnMvc3BpL3Nw
+aS1mc2wtZXNwaS5jICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAyICstCiBkcml2ZXJzL3N0
+YWdpbmcvaWlvL2FjY2VsL3NjYTMwMDBfY29yZS5jICAgICAgICAgICB8ICAgMiArCiAuLi4vc3Rh
+Z2luZy9sdXN0cmUvbG5ldC9saWJjZnMvbGludXgvbGludXgtY3B1LmMgICB8ICAgNyAtLQogZHJp
+dmVycy9zdGFnaW5nL2x1c3RyZS9sdXN0cmUvbG92L2xvdl9wYWNrLmMgICAgICAgfCAgIDIgKwog
+ZnMvY2VwaC9zdXBlci5jICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDMg
+Ky0KIGZzL2V4dDIvaW5vZGUuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwg
+ICA3ICstCiBmcy9mMmZzL2RhdGEuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICB8ICAgNyArKwogZnMvbmZzL25mczRzZXNzaW9uLmMgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgfCAgMTAgKy0KIG5ldC9uZXRmaWx0ZXIvbmZ0X3JhbmdlLmMgICAgICAgICAgICAgICAg
+ICAgICAgICAgIHwgIDEwICstCiBzY3JpcHRzL01ha2VmaWxlLnVic2FuICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICB8ICAgNCArCiAzMSBmaWxlcyBjaGFuZ2VkLCAxODcgaW5zZXJ0aW9ucygr
+KSwgMTQxIGRlbGV0aW9ucygtKQoKLS0gCkNjOiB4ODZAa2VybmVsLm9yZwpDYzogbGludXgtbWVk
+aWFAdmdlci5rZXJuZWwub3JnCkNjOiBNYXVybyBDYXJ2YWxobyBDaGVoYWIgPG1jaGVoYWJAa2Vy
+bmVsLm9yZz4KQ2M6IE1hcnRpbiBTY2h3aWRlZnNreSA8c2Nod2lkZWZza3lAZGUuaWJtLmNvbT4K
+Q2M6IGxpbnV4LXMzOTBAdmdlci5rZXJuZWwub3JnCkNjOiBJbHlhIERyeW9tb3YgPGlkcnlvbW92
+QGdtYWlsLmNvbT4KQ2M6IGRyaS1kZXZlbEBsaXN0cy5mcmVlZGVza3RvcC5vcmcKQ2M6IGxpbnV4
+LW10ZEBsaXN0cy5pbmZyYWRlYWQub3JnCkNjOiBIZXJiZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5h
+cGFuYS5vcmcuYXU+CkNjOiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnCkNjOiAiRGF2aWQg
+Uy4gTWlsbGVyIiA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD4KQ2M6IG5ldGRldkB2Z2VyLmtlcm5lbC5v
+cmcKQ2M6IEdyZWcgS3JvYWgtSGFydG1hbiA8Z3JlZ2toQGxpbnV4Zm91bmRhdGlvbi5vcmc+CkNj
+OiBjZXBoLWRldmVsQHZnZXIua2VybmVsLm9yZwpDYzogbGludXgtZjJmcy1kZXZlbEBsaXN0cy5z
+b3VyY2Vmb3JnZS5uZXQKQ2M6IGxpbnV4LWV4dDRAdmdlci5rZXJuZWwub3JnCkNjOiBuZXRmaWx0
+ZXItZGV2ZWxAdmdlci5rZXJuZWwub3JnCjIuOS4wCgpfX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fXwpkcmktZGV2ZWwgbWFpbGluZyBsaXN0CmRyaS1kZXZlbEBs
+aXN0cy5mcmVlZGVza3RvcC5vcmcKaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1h
+bi9saXN0aW5mby9kcmktZGV2ZWwK
