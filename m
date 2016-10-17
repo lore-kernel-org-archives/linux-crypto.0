@@ -1,116 +1,248 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 00/28] Reenable maybe-uninitialized warnings
-Date: Tue, 18 Oct 2016 00:03:28 +0200
-Message-ID: <20161017220342.1627073-1-arnd@arndb.de>
+Subject: [PATCH 15/28] crypto: aesni: avoid -Wmaybe-uninitialized warning
+Date: Tue, 18 Oct 2016 00:13:36 +0200
+Message-ID: <20161017221355.1861551-3-arnd@arndb.de>
+References: <20161017220342.1627073-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-s390@vger.kernel.org, linux-ext4@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
- netdev@vger.kernel.org, x86@kernel.org, ceph-devel@vger.kernel.org,
- linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-f2fs-devel@lists.sourceforge.net, linux-mtd@lists.infradead.org,
- linux-crypto@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Martin Schwidefsky <schwidefsky@de.ibm.com>, netfilter-devel@vger.kernel.org,
- Ilya Dryomov <idryomov@gmail.com>, Mauro Carvalho Chehab <mchehab@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, linux-media@vger.kernel.org
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <dri-devel-bounces@lists.freedesktop.org>
-List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
-List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
-List-Post: <mailto:dri-devel@lists.freedesktop.org>
-List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
-List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
-Errors-To: dri-devel-bounces@lists.freedesktop.org
-Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@suse.de>,
+        Stephan Mueller <smueller@chronox.de>,
+        linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>, x86@kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mout.kundenserver.de ([212.227.126.130]:51064 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1759383AbcJQWQt (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Oct 2016 18:16:49 -0400
+In-Reply-To: <20161017220342.1627073-1-arnd@arndb.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-VGhpcyBpcyBhIHNldCBvZiBwYXRjaGVzIHRoYXQgSSBob3BlIHRvIGdldCBpbnRvIHY0LjkgaW4g
-c29tZSBmb3JtCmluIG9yZGVyIHRvIHR1cm4gb24gdGhlIC1XbWF5YmUtdW5pbml0aWFsaXplZCB3
-YXJuaW5ncyBhZ2Fpbi4KCkFmdGVyIHRhbGtpbmcgdG8gTGludXMgaW4gcGVyc29uIGF0IExpbmFy
-byBDb25uZWN0IGFib3V0IHRoaXMsIEkKc3BlbnQgc29tZSB0aW1lIG9uIGZpbmRpbmcgYWxsIHRo
-ZSByZW1haW5pbmcgd2FybmluZ3MsIGFuZCB0aGlzCmlzIHRoZSByZXN1bHRpbmcgcGF0Y2ggc2Vy
-aWVzLiBNb3JlIGRldGFpbHMgYXJlIGluIHRoZSBkZXNjcmlwdGlvbgpvZiB0aGUgbGFzdCBwYXRj
-aCB0aGF0IGFjdHVhbGx5IGVuYWJsZXMgdGhlIHdhcm5pbmcuCgpMZXQgbWUga25vdyBpZiB0aGVy
-ZSBhcmUgb3RoZXIgd2FybmluZ3MgdGhhdCBJIG1pc3NlZCwgYW5kIHdoZXRoZXIKeW91IHRoaW5r
-IHRoZXNlIGFyZSBzdGlsbCBhcHByb3ByaWF0ZSBmb3IgdjQuOSBvciBub3QuCkEgY291cGxlIG9m
-IHBhdGNoZXMgYXJlIG5vbi1vYnZpb3VzLCBhbmQgY291bGQgdXNlIHNvbWUgbW9yZQpkZXRhaWxl
-ZCByZXZpZXcuCgoJQXJuZAoKQXJuZCBCZXJnbWFubiAoMjgpOgogIFt2Ml0gbmV0ZmlsdGVyOiBu
-Zl90YWJsZXM6IGF2b2lkIHVuaW5pdGlhbGl6ZWQgdmFyaWFibGUgd2FybmluZwogIFt2Ml0gbXRk
-OiBtdGs6IGF2b2lkIHdhcm5pbmcgaW4gbXRrX2VjY19lbmNvZGUKICBbdjJdIGluZmluaWJhbmQ6
-IHNodXQgdXAgYSBtYXliZS11bmluaXRpYWxpemVkIHdhcm5pbmcKICBmMmZzOiByZXBsYWNlIGEg
-YnVpbGQtdGltZSB3YXJuaW5nIHdpdGggcnVudGltZSBXQVJOX09OCiAgZXh0MjogYXZvaWQgYm9n
-dXMgLVdtYXliZS11bmluaXRpYWxpemVkIHdhcm5pbmcKICBORlN2NC4xOiB3b3JrIGFyb3VuZCAt
-V21heWJlLXVuaW5pdGlhbGl6ZWQgd2FybmluZwogIGNlcGg6IGF2b2lkIGZhbHNlIHBvc2l0aXZl
-IG1heWJlLXVuaW5pdGlhbGl6ZWQgd2FybmluZwogIHN0YWdpbmc6IGx1c3RyZTogcmVzdG9yZSBp
-bml0aWFsaXphdGlvbiBvZiByZXR1cm4gY29kZQogIHN0YWdpbmc6IGx1c3RyZTogcmVtb3ZlIGJy
-b2tlbiBkZWFkIGNvZGUgaW4KICAgIGNmc19jcHRfdGFibGVfY3JlYXRlX3BhdHRlcm4KICBVQkk6
-IGZpeCB1bmluaXRpYWxpemVkIGFjY2VzcyBvZiB2aWRfaGRyIHBvaW50ZXIKICBibG9jazogcmRi
-OiBmYWxzZS1wb3N0aXZlIGdjYy00LjkgLVdtYXliZS11bmluaXRpYWxpemVkCiAgW21lZGlhXSBy
-YzogcHJpbnQgY29ycmVjdCB2YXJpYWJsZSBmb3IgejhmMDgxMQogIFttZWRpYV0gZGliMDcwMDog
-Zml4IHVuaW5pdGlhbGl6ZWQgZGF0YSBvbiAncmVwZWF0JyBldmVudAogIGlpbzogYWNjZWw6IHNj
-YTMwMDBfY29yZTogYXZvaWQgcG90ZW50aWFsbHkgdW5pbml0aWFsaXplZCB2YXJpYWJsZQogIGNy
-eXB0bzogYWVzbmk6IGF2b2lkIC1XbWF5YmUtdW5pbml0aWFsaXplZCB3YXJuaW5nCiAgcGNtY2lh
-OiBmaXggcmV0dXJuIHZhbHVlIG9mIHNvY19wY21jaWFfcmVndWxhdG9yX3NldAogIHNwaTogZnNs
-LWVzcGk6IGF2b2lkIHByb2Nlc3NpbmcgdW5pbml0YWxpemVkIGRhdGEgb24gZXJyb3IKICBkcm06
-IGF2b2lkIHVuaW5pdGlhbGl6ZWQgdGltZXN0YW1wIHVzZSBpbiB3YWl0X3ZibGFuawogIGJyY21m
-bWFjOiBhdm9pZCBtYXliZS11bmluaXRpYWxpemVkIHdhcm5pbmcgaW4gYnJjbWZfY2ZnODAyMTFf
-c3RhcnRfYXAKICBuZXQ6IGJjbTYzeHg6IGF2b2lkIHJlZmVyZW5jaW5nIHVuaW5pdGlhbGl6ZWQg
-dmFyaWFibGUKICBuZXQvaHlwZXJ2OiBhdm9pZCB1bmluaXRpYWxpemVkIHZhcmlhYmxlCiAgeDg2
-OiBhcG06IGF2b2lkIHVuaW5pdGlhbGl6ZWQgZGF0YQogIHg4NjogbWFyayB0YXJnZXQgYWRkcmVz
-cyBhcyBvdXRwdXQgaW4gJ2luc2InIGFzbQogIHg4NjogbWF0aC1lbXU6IHBvc3NpYmxlIHVuaW5p
-dGlhbGl6ZWQgdmFyaWFibGUgdXNlCiAgczM5MDogcGNpOiBkb24ndCBwcmludCB1bmluaXRpYWxp
-emVkIGRhdGEgZm9yIGRlYnVnZ2luZwogIG5pb3MyOiBmaXggdGltZXIgaW5pdGNhbGwgcmV0dXJu
-IHZhbHVlCiAgcm9ja2VyOiBmaXggbWF5YmUtdW5pbml0aWFsaXplZCB3YXJuaW5nCiAgS2J1aWxk
-OiBicmluZyBiYWNrIC1XbWF5YmUtdW5pbml0aWFsaXplZCB3YXJuaW5nCgogTWFrZWZpbGUgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMTAgKy0KIGFyY2gvYXJj
-L01ha2VmaWxlICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA0ICstCiBhcmNo
-L25pb3MyL2tlcm5lbC90aW1lLmMgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgMSArCiBh
-cmNoL3MzOTAvcGNpL3BjaV9kbWEuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgMiAr
-LQogYXJjaC94ODYvY3J5cHRvL2Flc25pLWludGVsX2dsdWUuYyAgICAgICAgICAgICAgICAgfCAx
-MjEgKysrKysrKysrKysrKy0tLS0tLS0tCiBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9pby5oICAgICAg
-ICAgICAgICAgICAgICAgICAgICB8ICAgNCArLQogYXJjaC94ODYva2VybmVsL2FwbV8zMi5jICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDUgKy0KIGFyY2gveDg2L21hdGgtZW11L01ha2Vm
-aWxlICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA0ICstCiBhcmNoL3g4Ni9tYXRoLWVtdS9y
-ZWdfY29tcGFyZS5jICAgICAgICAgICAgICAgICAgICB8ICAxNiArLS0KIGRyaXZlcnMvYmxvY2sv
-cmJkLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAxICsKIGRyaXZlcnMvZ3B1
-L2RybS9kcm1faXJxLmMgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA0ICstCiBkcml2ZXJz
-L2luZmluaWJhbmQvY29yZS9jbWEuYyAgICAgICAgICAgICAgICAgICAgICB8ICA1NiArKysrKy0t
-LS0tCiBkcml2ZXJzL21lZGlhL2kyYy9pci1rYmQtaTJjLmMgICAgICAgICAgICAgICAgICAgICB8
-ICAgMiArLQogZHJpdmVycy9tZWRpYS91c2IvZHZiLXVzYi9kaWIwNzAwX2NvcmUuYyAgICAgICAg
-ICAgfCAgMTAgKy0KIGRyaXZlcnMvbXRkL25hbmQvbXRrX2VjYy5jICAgICAgICAgICAgICAgICAg
-ICAgICAgIHwgIDE5ICsrLS0KIGRyaXZlcnMvbXRkL3ViaS9lYmEuYyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHwgICAyICstCiBkcml2ZXJzL25ldC9ldGhlcm5ldC9icm9hZGNvbS9iY202
-M3h4X2VuZXQuYyAgICAgICB8ICAgMyArLQogZHJpdmVycy9uZXQvZXRoZXJuZXQvcm9ja2VyL3Jv
-Y2tlcl9vZmRwYS5jICAgICAgICAgfCAgIDQgKy0KIGRyaXZlcnMvbmV0L2h5cGVydi9uZXR2c2Nf
-ZHJ2LmMgICAgICAgICAgICAgICAgICAgIHwgICAyICstCiAuLi4vYnJvYWRjb20vYnJjbTgwMjEx
-L2JyY21mbWFjL2NmZzgwMjExLmMgICAgICAgICB8ICAgMiArLQogZHJpdmVycy9wY21jaWEvc29j
-X2NvbW1vbi5jICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDIgKy0KIGRyaXZlcnMvc3BpL3Nw
-aS1mc2wtZXNwaS5jICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAyICstCiBkcml2ZXJzL3N0
-YWdpbmcvaWlvL2FjY2VsL3NjYTMwMDBfY29yZS5jICAgICAgICAgICB8ICAgMiArCiAuLi4vc3Rh
-Z2luZy9sdXN0cmUvbG5ldC9saWJjZnMvbGludXgvbGludXgtY3B1LmMgICB8ICAgNyAtLQogZHJp
-dmVycy9zdGFnaW5nL2x1c3RyZS9sdXN0cmUvbG92L2xvdl9wYWNrLmMgICAgICAgfCAgIDIgKwog
-ZnMvY2VwaC9zdXBlci5jICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDMg
-Ky0KIGZzL2V4dDIvaW5vZGUuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwg
-ICA3ICstCiBmcy9mMmZzL2RhdGEuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICB8ICAgNyArKwogZnMvbmZzL25mczRzZXNzaW9uLmMgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgfCAgMTAgKy0KIG5ldC9uZXRmaWx0ZXIvbmZ0X3JhbmdlLmMgICAgICAgICAgICAgICAg
-ICAgICAgICAgIHwgIDEwICstCiBzY3JpcHRzL01ha2VmaWxlLnVic2FuICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICB8ICAgNCArCiAzMSBmaWxlcyBjaGFuZ2VkLCAxODcgaW5zZXJ0aW9ucygr
-KSwgMTQxIGRlbGV0aW9ucygtKQoKLS0gCkNjOiB4ODZAa2VybmVsLm9yZwpDYzogbGludXgtbWVk
-aWFAdmdlci5rZXJuZWwub3JnCkNjOiBNYXVybyBDYXJ2YWxobyBDaGVoYWIgPG1jaGVoYWJAa2Vy
-bmVsLm9yZz4KQ2M6IE1hcnRpbiBTY2h3aWRlZnNreSA8c2Nod2lkZWZza3lAZGUuaWJtLmNvbT4K
-Q2M6IGxpbnV4LXMzOTBAdmdlci5rZXJuZWwub3JnCkNjOiBJbHlhIERyeW9tb3YgPGlkcnlvbW92
-QGdtYWlsLmNvbT4KQ2M6IGRyaS1kZXZlbEBsaXN0cy5mcmVlZGVza3RvcC5vcmcKQ2M6IGxpbnV4
-LW10ZEBsaXN0cy5pbmZyYWRlYWQub3JnCkNjOiBIZXJiZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5h
-cGFuYS5vcmcuYXU+CkNjOiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnCkNjOiAiRGF2aWQg
-Uy4gTWlsbGVyIiA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD4KQ2M6IG5ldGRldkB2Z2VyLmtlcm5lbC5v
-cmcKQ2M6IEdyZWcgS3JvYWgtSGFydG1hbiA8Z3JlZ2toQGxpbnV4Zm91bmRhdGlvbi5vcmc+CkNj
-OiBjZXBoLWRldmVsQHZnZXIua2VybmVsLm9yZwpDYzogbGludXgtZjJmcy1kZXZlbEBsaXN0cy5z
-b3VyY2Vmb3JnZS5uZXQKQ2M6IGxpbnV4LWV4dDRAdmdlci5rZXJuZWwub3JnCkNjOiBuZXRmaWx0
-ZXItZGV2ZWxAdmdlci5rZXJuZWwub3JnCjIuOS4wCgpfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwpkcmktZGV2ZWwgbWFpbGluZyBsaXN0CmRyaS1kZXZlbEBs
-aXN0cy5mcmVlZGVza3RvcC5vcmcKaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1h
-bi9saXN0aW5mby9kcmktZGV2ZWwK
+The rfc4106 encrypy/decrypt helper functions cause an annoying
+false-positive warning in allmodconfig if we turn on
+-Wmaybe-uninitialized warnings again:
+
+arch/x86/crypto/aesni-intel_glue.c: In function ‘helper_rfc4106_decrypt’:
+include/linux/scatterlist.h:67:31: warning: ‘dst_sg_walk.sg’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+
+The problem seems to be that the compiler doesn't track the state of the
+'one_entry_in_sg' variable across the kernel_fpu_begin/kernel_fpu_end
+section.
+
+This reorganizes the code to avoid that variable and have the shared
+code in a separate function to avoid some of the conditional branches.
+
+The resulting functions are a bit longer but also slightly less complex,
+leaving no room for speculation on the part of the compiler.
+
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+The conversion is nontrivial, and I have only build-tested it, so this
+could use a careful review and testing.
+---
+ arch/x86/crypto/aesni-intel_glue.c | 121 ++++++++++++++++++++++---------------
+ 1 file changed, 73 insertions(+), 48 deletions(-)
+
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 0ab5ee1..054155b 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -269,6 +269,34 @@ static void (*aesni_gcm_dec_tfm)(void *ctx, u8 *out,
+ 			u8 *hash_subkey, const u8 *aad, unsigned long aad_len,
+ 			u8 *auth_tag, unsigned long auth_tag_len);
+ 
++static inline void aesni_do_gcm_enc_tfm(void *ctx, u8 *out,
++			const u8 *in, unsigned long plaintext_len, u8 *iv,
++			u8 *hash_subkey, const u8 *aad, unsigned long aad_len,
++			u8 *auth_tag, unsigned long auth_tag_len)
++{
++	kernel_fpu_begin();
++	aesni_gcm_enc_tfm(ctx, out, in, plaintext_len, iv, hash_subkey,
++			  aad, aad_len, auth_tag, auth_tag_len);
++	kernel_fpu_end();
++}
++
++static inline int aesni_do_gcm_dec_tfm(void *ctx, u8 *out,
++			const u8 *in, unsigned long ciphertext_len, u8 *iv,
++			u8 *hash_subkey, const u8 *aad, unsigned long aad_len,
++			u8 *auth_tag, unsigned long auth_tag_len)
++{
++	kernel_fpu_begin();
++	aesni_gcm_dec_tfm(ctx, out, in, ciphertext_len, iv, hash_subkey, aad,
++			  aad_len, auth_tag, auth_tag_len);
++	kernel_fpu_end();
++
++	/* Compare generated tag with passed in tag. */
++	if (crypto_memneq(in + ciphertext_len, auth_tag, auth_tag_len))
++		return -EBADMSG;
++
++	return 0;
++}
++
+ static inline struct
+ aesni_rfc4106_gcm_ctx *aesni_rfc4106_gcm_ctx_get(struct crypto_aead *tfm)
+ {
+@@ -879,7 +907,6 @@ static int rfc4106_set_authsize(struct crypto_aead *parent,
+ 
+ static int helper_rfc4106_encrypt(struct aead_request *req)
+ {
+-	u8 one_entry_in_sg = 0;
+ 	u8 *src, *dst, *assoc;
+ 	__be32 counter = cpu_to_be32(1);
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+@@ -908,7 +935,6 @@ static int helper_rfc4106_encrypt(struct aead_request *req)
+ 	    req->src->offset + req->src->length <= PAGE_SIZE &&
+ 	    sg_is_last(req->dst) &&
+ 	    req->dst->offset + req->dst->length <= PAGE_SIZE) {
+-		one_entry_in_sg = 1;
+ 		scatterwalk_start(&src_sg_walk, req->src);
+ 		assoc = scatterwalk_map(&src_sg_walk);
+ 		src = assoc + req->assoclen;
+@@ -916,7 +942,23 @@ static int helper_rfc4106_encrypt(struct aead_request *req)
+ 		if (unlikely(req->src != req->dst)) {
+ 			scatterwalk_start(&dst_sg_walk, req->dst);
+ 			dst = scatterwalk_map(&dst_sg_walk) + req->assoclen;
++
++			aesni_do_gcm_enc_tfm(aes_ctx, dst, src, req->cryptlen, iv,
++					     ctx->hash_subkey, assoc, req->assoclen - 8,
++					     dst + req->cryptlen, auth_tag_len);
++
++			scatterwalk_unmap(dst - req->assoclen);
++			scatterwalk_advance(&dst_sg_walk, req->dst->length);
++			scatterwalk_done(&dst_sg_walk, 1, 0);
++		} else {
++			aesni_do_gcm_enc_tfm(aes_ctx, dst, src, req->cryptlen, iv,
++					     ctx->hash_subkey, assoc, req->assoclen - 8,
++					     dst + req->cryptlen, auth_tag_len);
+ 		}
++
++		scatterwalk_unmap(assoc);
++		scatterwalk_advance(&src_sg_walk, req->src->length);
++		scatterwalk_done(&src_sg_walk, req->src == req->dst, 0);
+ 	} else {
+ 		/* Allocate memory for src, dst, assoc */
+ 		assoc = kmalloc(req->cryptlen + auth_tag_len + req->assoclen,
+@@ -925,28 +967,14 @@ static int helper_rfc4106_encrypt(struct aead_request *req)
+ 			return -ENOMEM;
+ 		scatterwalk_map_and_copy(assoc, req->src, 0,
+ 					 req->assoclen + req->cryptlen, 0);
+-		src = assoc + req->assoclen;
+-		dst = src;
+-	}
++		dst = src = assoc + req->assoclen;
+ 
+-	kernel_fpu_begin();
+-	aesni_gcm_enc_tfm(aes_ctx, dst, src, req->cryptlen, iv,
+-			  ctx->hash_subkey, assoc, req->assoclen - 8,
+-			  dst + req->cryptlen, auth_tag_len);
+-	kernel_fpu_end();
++		aesni_gcm_enc_tfm(aes_ctx, dst, src, req->cryptlen, iv,
++				  ctx->hash_subkey, assoc, req->assoclen - 8,
++				  dst + req->cryptlen, auth_tag_len);
+ 
+-	/* The authTag (aka the Integrity Check Value) needs to be written
+-	 * back to the packet. */
+-	if (one_entry_in_sg) {
+-		if (unlikely(req->src != req->dst)) {
+-			scatterwalk_unmap(dst - req->assoclen);
+-			scatterwalk_advance(&dst_sg_walk, req->dst->length);
+-			scatterwalk_done(&dst_sg_walk, 1, 0);
+-		}
+-		scatterwalk_unmap(assoc);
+-		scatterwalk_advance(&src_sg_walk, req->src->length);
+-		scatterwalk_done(&src_sg_walk, req->src == req->dst, 0);
+-	} else {
++		/* The authTag (aka the Integrity Check Value) needs to be written
++		 * back to the packet. */
+ 		scatterwalk_map_and_copy(dst, req->dst, req->assoclen,
+ 					 req->cryptlen + auth_tag_len, 1);
+ 		kfree(assoc);
+@@ -956,7 +984,6 @@ static int helper_rfc4106_encrypt(struct aead_request *req)
+ 
+ static int helper_rfc4106_decrypt(struct aead_request *req)
+ {
+-	u8 one_entry_in_sg = 0;
+ 	u8 *src, *dst, *assoc;
+ 	unsigned long tempCipherLen = 0;
+ 	__be32 counter = cpu_to_be32(1);
+@@ -990,47 +1017,45 @@ static int helper_rfc4106_decrypt(struct aead_request *req)
+ 	    req->src->offset + req->src->length <= PAGE_SIZE &&
+ 	    sg_is_last(req->dst) &&
+ 	    req->dst->offset + req->dst->length <= PAGE_SIZE) {
+-		one_entry_in_sg = 1;
+ 		scatterwalk_start(&src_sg_walk, req->src);
+ 		assoc = scatterwalk_map(&src_sg_walk);
+ 		src = assoc + req->assoclen;
+-		dst = src;
+ 		if (unlikely(req->src != req->dst)) {
+ 			scatterwalk_start(&dst_sg_walk, req->dst);
+ 			dst = scatterwalk_map(&dst_sg_walk) + req->assoclen;
+-		}
+-
+-	} else {
+-		/* Allocate memory for src, dst, assoc */
+-		assoc = kmalloc(req->cryptlen + req->assoclen, GFP_ATOMIC);
+-		if (!assoc)
+-			return -ENOMEM;
+-		scatterwalk_map_and_copy(assoc, req->src, 0,
+-					 req->assoclen + req->cryptlen, 0);
+-		src = assoc + req->assoclen;
+-		dst = src;
+-	}
+ 
+-	kernel_fpu_begin();
+-	aesni_gcm_dec_tfm(aes_ctx, dst, src, tempCipherLen, iv,
+-			  ctx->hash_subkey, assoc, req->assoclen - 8,
+-			  authTag, auth_tag_len);
+-	kernel_fpu_end();
+-
+-	/* Compare generated tag with passed in tag. */
+-	retval = crypto_memneq(src + tempCipherLen, authTag, auth_tag_len) ?
+-		-EBADMSG : 0;
++			retval = aesni_do_gcm_dec_tfm(aes_ctx, dst, src,
++					tempCipherLen, iv, ctx->hash_subkey,
++					assoc, req->assoclen - 8, authTag,
++					auth_tag_len);
+ 
+-	if (one_entry_in_sg) {
+-		if (unlikely(req->src != req->dst)) {
+ 			scatterwalk_unmap(dst - req->assoclen);
+ 			scatterwalk_advance(&dst_sg_walk, req->dst->length);
+ 			scatterwalk_done(&dst_sg_walk, 1, 0);
++		} else {
++			dst = src;
++			retval = aesni_do_gcm_dec_tfm(aes_ctx, dst, src,
++					tempCipherLen, iv, ctx->hash_subkey,
++					assoc, req->assoclen - 8, authTag,
++					auth_tag_len);
+ 		}
+ 		scatterwalk_unmap(assoc);
+ 		scatterwalk_advance(&src_sg_walk, req->src->length);
+ 		scatterwalk_done(&src_sg_walk, req->src == req->dst, 0);
+ 	} else {
++		/* Allocate memory for src, dst, assoc */
++		assoc = kmalloc(req->cryptlen + req->assoclen, GFP_ATOMIC);
++		if (!assoc)
++			return -ENOMEM;
++		scatterwalk_map_and_copy(assoc, req->src, 0,
++					 req->assoclen + req->cryptlen, 0);
++		dst = src = assoc + req->assoclen;
++
++		retval = aesni_do_gcm_dec_tfm(aes_ctx, dst, src, tempCipherLen,
++					      iv, ctx->hash_subkey, assoc,
++					      req->assoclen - 8, authTag,
++					      auth_tag_len);
++
+ 		scatterwalk_map_and_copy(dst, req->dst, req->assoclen,
+ 					 tempCipherLen, 1);
+ 		kfree(assoc);
+-- 
+2.9.0
