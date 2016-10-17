@@ -1,35 +1,48 @@
-From: Matt Mullins <mmullins+lkml@tuxags.com>
-Subject: Re: [PATCH 4.9] hw_random: Don't use a stack buffer in
- add_early_randomness()
-Date: Sun, 16 Oct 2016 14:19:15 -0700
-Message-ID: <20161016211915.GB18235@hydra.tuxags.com>
-References: <4169224b6858d1cf149f1a73f8a03603fa19076d.1476638125.git.luto@kernel.org>
+From: Tobias Klauser <tklauser@distanz.ch>
+Subject: [PATCH] padata: Remove unused but set variables
+Date: Mon, 17 Oct 2016 12:16:08 +0200
+Message-ID: <20161017101608.18007-1-tklauser@distanz.ch>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jens Axboe <axboe@fb.com>, Matt Mullins <mmullins@mmlx.us>,
-        linux-crypto@vger.kernel.org
-To: Andy Lutomirski <luto@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hydra.tuxags.com ([64.13.172.54]:50874 "EHLO mail.tuxags.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753943AbcJPVhS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 16 Oct 2016 17:37:18 -0400
-Content-Disposition: inline
-In-Reply-To: <4169224b6858d1cf149f1a73f8a03603fa19076d.1476638125.git.luto@kernel.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Oct 16, 2016 at 10:17:15AM -0700, Andy Lutomirski wrote:
-> hw_random carefully avoids using a stack buffer except in
-> add_early_randomness().  This causes a crash in virtio_rng if
-> CONFIG_VMAP_STACK=y.
+Remove the unused but set variable pinst in padata_parallel_worker to
+fix the following warning when building with 'W=1':
 
-I hadn't noticed the existing kmalloc in the __init, for the explicit purpose
-of virt_to_page().
+  kernel/padata.c: In function ‘padata_parallel_worker’:
+  kernel/padata.c:68:26: warning: variable ‘pinst’ set but not used [-Wunused-but-set-variable]
 
-This boots on the VM from which I had grabbed the stack trace yesterday.
+Also remove the now unused variable pd which is only used to set pinst.
 
-Tested-by: Matt Mullins <mmullins@mmlx.us>
+Signed-off-by: Tobias Klauser <tklauser@distanz.ch>
+---
+ kernel/padata.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-Looks like an extra quote snuck in your To: line, so I'm not sure if this was
-distributed as widely as you intended.
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 7848f0566403..05316c9f32da 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -64,15 +64,11 @@ static int padata_cpu_hash(struct parallel_data *pd)
+ static void padata_parallel_worker(struct work_struct *parallel_work)
+ {
+ 	struct padata_parallel_queue *pqueue;
+-	struct parallel_data *pd;
+-	struct padata_instance *pinst;
+ 	LIST_HEAD(local_list);
+ 
+ 	local_bh_disable();
+ 	pqueue = container_of(parallel_work,
+ 			      struct padata_parallel_queue, work);
+-	pd = pqueue->pd;
+-	pinst = pd->pinst;
+ 
+ 	spin_lock(&pqueue->parallel.lock);
+ 	list_replace_init(&pqueue->parallel.list, &local_list);
+-- 
+2.9.0
