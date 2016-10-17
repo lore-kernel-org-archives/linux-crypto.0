@@ -1,46 +1,56 @@
-From: Wei Yongjun <weiyj.lk@gmail.com>
-Subject: [PATCH -next] crypto: gcm - Fix error return code in crypto_gcm_create_common()
-Date: Mon, 17 Oct 2016 15:10:06 +0000
-Message-ID: <1476717006-10086-1-git-send-email-weiyj.lk@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyongjun1@huawei.com>, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f68.google.com ([209.85.220.68]:33284 "EHLO
-        mail-pa0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753104AbcJQPKW (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Oct 2016 11:10:22 -0400
-Received: by mail-pa0-f68.google.com with SMTP id hh10so9340745pac.0
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Oct 2016 08:10:22 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Andy Lutomirski <luto@kernel.org>
+Subject: [PATCH resend 4.9] hw_random: Don't use a stack buffer in add_early_randomness()
+Date: Mon, 17 Oct 2016 10:06:27 -0700
+Message-ID: <4169224b6858d1cf149f1a73f8a03603fa19076d.1476638125.git.luto@kernel.org>
+Cc: Jens Axboe <axboe@fb.com>, Matt Mullins <mmullins@mmlx.us>,
+        Andy Lutomirski <luto@kernel.org>
+To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rusty Russell <rusty@rustcorp.com.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Wei Yongjun <weiyongjun1@huawei.com>
+hw_random carefully avoids using a stack buffer except in
+add_early_randomness().  This causes a crash in virtio_rng if
+CONFIG_VMAP_STACK=y.
 
-Fix to return error code -EINVAL from the invalid alg ivsize error
-handling case instead of 0, as done elsewhere in this function.
-
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+Reported-by: Matt Mullins <mmullins@mmlx.us>
+Tested-by: Matt Mullins <mmullins@mmlx.us>
+Fixes: d3cc7996473a ("hwrng: fetch randomness only after device init")
+Signed-off-by: Andy Lutomirski <luto@kernel.org>
 ---
- crypto/gcm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/gcm.c b/crypto/gcm.c
-index f624ac9..39c261d 100644
---- a/crypto/gcm.c
-+++ b/crypto/gcm.c
-@@ -672,11 +672,11 @@ static int crypto_gcm_create_common(struct crypto_template *tmpl,
- 	ctr = crypto_spawn_skcipher_alg(&ctx->ctr);
+This fixes a crash in 4.9-rc1.
+
+resending because I typoed the git send-email command.  I stealthily added
+Matt's Tested-by, too.
+
+ drivers/char/hw_random/core.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 9203f2d130c0..340f96e44642 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -84,14 +84,14 @@ static size_t rng_buffer_size(void)
  
- 	/* We only support 16-byte blocks. */
-+	err = -EINVAL;
- 	if (crypto_skcipher_alg_ivsize(ctr) != 16)
- 		goto out_put_ctr;
+ static void add_early_randomness(struct hwrng *rng)
+ {
+-	unsigned char bytes[16];
+ 	int bytes_read;
++	size_t size = min_t(size_t, 16, rng_buffer_size());
  
- 	/* Not a stream cipher? */
--	err = -EINVAL;
- 	if (ctr->base.cra_blocksize != 1)
- 		goto out_put_ctr;
+ 	mutex_lock(&reading_mutex);
+-	bytes_read = rng_get_data(rng, bytes, sizeof(bytes), 1);
++	bytes_read = rng_get_data(rng, rng_buffer, size, 1);
+ 	mutex_unlock(&reading_mutex);
+ 	if (bytes_read > 0)
+-		add_device_randomness(bytes, bytes_read);
++		add_device_randomness(rng_buffer, bytes_read);
+ }
+ 
+ static inline void cleanup_rng(struct kref *kref)
+-- 
+2.7.4
