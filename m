@@ -1,48 +1,92 @@
-From: Tobias Klauser <tklauser@distanz.ch>
-Subject: [PATCH] padata: Remove unused but set variables
-Date: Mon, 17 Oct 2016 12:16:08 +0200
-Message-ID: <20161017101608.18007-1-tklauser@distanz.ch>
+From: Jani Nikula <jani.nikula@linux.intel.com>
+Subject: Re: [PATCH 4/7] crypto: doc - fix separation of cipher / req API
+Date: Mon, 17 Oct 2016 14:04:14 +0300
+Message-ID: <87h98btexd.fsf@intel.com>
+References: <2721226.4nLlHD9uQ6@positron.chronox.de> <5908263.2TLWr89bHl@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>, herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:58052 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932761AbcJQLER (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Oct 2016 07:04:17 -0400
+In-Reply-To: <5908263.2TLWr89bHl@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Remove the unused but set variable pinst in padata_parallel_worker to
-fix the following warning when building with 'W=1':
+On Sun, 16 Oct 2016, Stephan Mueller <smueller@chronox.de> wrote:
+> Keep the cipher API and the request API function documentation in
+> separate sections.
+>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> ---
+>  Documentation/crypto/api-akcipher.rst | 25 +++++++++++++------------
+>  1 file changed, 13 insertions(+), 12 deletions(-)
+>
+> diff --git a/Documentation/crypto/api-akcipher.rst b/Documentation/crypto/api-akcipher.rst
+> index 305e616..0d5899f 100644
+> --- a/Documentation/crypto/api-akcipher.rst
+> +++ b/Documentation/crypto/api-akcipher.rst
+> @@ -25,32 +25,32 @@ Asymmetric Cipher API
+>  .. kernel-doc:: include/crypto/akcipher.h
+>     :functions: crypto_akcipher_set_priv_key
+>  
+> -Asymmetric Cipher Request Handle
+> ---------------------------------
+> -
+>  .. kernel-doc:: include/crypto/akcipher.h
+> -   :functions: akcipher_request_alloc
+> +   :functions: crypto_akcipher_maxsize
+>  
+>  .. kernel-doc:: include/crypto/akcipher.h
+> -   :functions: akcipher_request_free
+> +   :functions: crypto_akcipher_encrypt
+>  
+>  .. kernel-doc:: include/crypto/akcipher.h
+> -   :functions: akcipher_request_set_callback
+> +   :functions: crypto_akcipher_decrypt
+>  
+>  .. kernel-doc:: include/crypto/akcipher.h
+> -   :functions: akcipher_request_set_crypt
+> +   :functions: crypto_akcipher_sign
+>  
+>  .. kernel-doc:: include/crypto/akcipher.h
+> -   :functions: crypto_akcipher_maxsize
+> +   :functions: crypto_akcipher_verify
 
-  kernel/padata.c: In function ‘padata_parallel_worker’:
-  kernel/padata.c:68:26: warning: variable ‘pinst’ set but not used [-Wunused-but-set-variable]
+The directive parameter is plural functions for a reason - you can
+specify multiple functions in the same directive. Splitting this to
+multiple directives causes the header file to be parsed again for each
+directive.
 
-Also remove the now unused variable pd which is only used to set pinst.
+IMO this can be fixed in a follow-up patch. Same for other patches in
+this series.
 
-Signed-off-by: Tobias Klauser <tklauser@distanz.ch>
----
- kernel/padata.c | 4 ----
- 1 file changed, 4 deletions(-)
+BR,
+Jani.
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 7848f0566403..05316c9f32da 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -64,15 +64,11 @@ static int padata_cpu_hash(struct parallel_data *pd)
- static void padata_parallel_worker(struct work_struct *parallel_work)
- {
- 	struct padata_parallel_queue *pqueue;
--	struct parallel_data *pd;
--	struct padata_instance *pinst;
- 	LIST_HEAD(local_list);
- 
- 	local_bh_disable();
- 	pqueue = container_of(parallel_work,
- 			      struct padata_parallel_queue, work);
--	pd = pqueue->pd;
--	pinst = pd->pinst;
- 
- 	spin_lock(&pqueue->parallel.lock);
- 	list_replace_init(&pqueue->parallel.list, &local_list);
+
+> +
+> +Asymmetric Cipher Request Handle
+> +--------------------------------
+>  
+>  .. kernel-doc:: include/crypto/akcipher.h
+> -   :functions: crypto_akcipher_encrypt
+> +   :functions: akcipher_request_alloc
+>  
+>  .. kernel-doc:: include/crypto/akcipher.h
+> -   :functions: crypto_akcipher_decrypt
+> +   :functions: akcipher_request_free
+>  
+>  .. kernel-doc:: include/crypto/akcipher.h
+> -   :functions: crypto_akcipher_sign
+> +   :functions: akcipher_request_set_callback
+>  
+>  .. kernel-doc:: include/crypto/akcipher.h
+> -   :functions: crypto_akcipher_verify
+> +   :functions: akcipher_request_set_crypt
+
 -- 
-2.9.0
+Jani Nikula, Intel Open Source Technology Center
