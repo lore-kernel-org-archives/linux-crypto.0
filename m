@@ -1,7 +1,7 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH] crypto: ccp - change bitfield type to unsigned ints
-Date: Tue, 18 Oct 2016 17:28:35 -0500
-Message-ID: <147682971521.8147.5364792807816963275.stgit@taos.amd.com>
+Subject: [PATCH] crypto: ccp - Clean up the LSB slot allocation code
+Date: Tue, 18 Oct 2016 17:33:37 -0500
+Message-ID: <147683001790.8273.9550490485955104780.stgit@taos.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -9,87 +9,112 @@ Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
         <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0080.outbound.protection.outlook.com ([104.47.34.80]:13025
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam03on0059.outbound.protection.outlook.com ([104.47.42.59]:61856
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S933007AbcJRW2o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Oct 2016 18:28:44 -0400
+        id S934261AbcJRWdr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Oct 2016 18:33:47 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Bit fields are not sensitive to endianness, so use
-a transparent standard data type
+Fix a few problems revealed by testing: verify consistent
+units, especially in public slot allocation. Percolate
+some common initialization code up to a common routine.
+Add some comments.
 
 Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/ccp-dev.h |   42 +++++++++++++++++++++---------------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
+ drivers/crypto/ccp/ccp-dev-v3.c |    4 ----
+ drivers/crypto/ccp/ccp-dev-v5.c |   20 ++++++++++++--------
+ drivers/crypto/ccp/ccp-dev.c    |    4 ++++
+ 3 files changed, 16 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index da5f4a6..0d996fe 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -541,23 +541,23 @@ static inline u32 ccp_addr_hi(struct ccp_dma_info *info)
-  * word 7: upper 16 bits of key pointer; key memory type
-  */
- struct dword0 {
--	__le32 soc:1;
--	__le32 ioc:1;
--	__le32 rsvd1:1;
--	__le32 init:1;
--	__le32 eom:1;		/* AES/SHA only */
--	__le32 function:15;
--	__le32 engine:4;
--	__le32 prot:1;
--	__le32 rsvd2:7;
-+	unsigned int soc:1;
-+	unsigned int ioc:1;
-+	unsigned int rsvd1:1;
-+	unsigned int init:1;
-+	unsigned int eom:1;		/* AES/SHA only */
-+	unsigned int function:15;
-+	unsigned int engine:4;
-+	unsigned int prot:1;
-+	unsigned int rsvd2:7;
- };
+diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
+index 8d2dbac..7bc0998 100644
+--- a/drivers/crypto/ccp/ccp-dev-v3.c
++++ b/drivers/crypto/ccp/ccp-dev-v3.c
+@@ -404,10 +404,6 @@ static int ccp_init(struct ccp_device *ccp)
+ 		goto e_pool;
+ 	}
  
- struct dword3 {
--	__le32 src_hi:16;
--	__le32 src_mem:2;
--	__le32 lsb_cxt_id:8;
--	__le32 rsvd1:5;
--	__le32 fixed:1;
-+	unsigned int  src_hi:16;
-+	unsigned int  src_mem:2;
-+	unsigned int  lsb_cxt_id:8;
-+	unsigned int  rsvd1:5;
-+	unsigned int  fixed:1;
- };
+-	/* Initialize the queues used to wait for KSB space and suspend */
+-	init_waitqueue_head(&ccp->sb_queue);
+-	init_waitqueue_head(&ccp->suspend_queue);
+-
+ 	dev_dbg(dev, "Starting threads...\n");
+ 	/* Create a kthread for each queue */
+ 	for (i = 0; i < ccp->cmd_q_count; i++) {
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index faf3cb3..ff7816a 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -21,6 +21,12 @@
  
- union dword4 {
-@@ -567,18 +567,18 @@ union dword4 {
+ #include "ccp-dev.h"
  
- union dword5 {
- 	struct {
--		__le32 dst_hi:16;
--		__le32 dst_mem:2;
--		__le32 rsvd1:13;
--		__le32 fixed:1;
-+		unsigned int  dst_hi:16;
-+		unsigned int  dst_mem:2;
-+		unsigned int  rsvd1:13;
-+		unsigned int  fixed:1;
- 	} fields;
- 	__le32 sha_len_hi;
- };
++/* Allocate the requested number of contiguous LSB slots
++ * from the LSB bitmap. Look in the private range for this
++ * queue first; failing that, check the public area.
++ * If no space is available, wait around.
++ * Return: first slot number
++ */
+ static u32 ccp_lsb_alloc(struct ccp_cmd_queue *cmd_q, unsigned int count)
+ {
+ 	struct ccp_device *ccp;
+@@ -50,7 +56,7 @@ static u32 ccp_lsb_alloc(struct ccp_cmd_queue *cmd_q, unsigned int count)
+ 			bitmap_set(ccp->lsbmap, start, count);
  
- struct dword7 {
--	__le32 key_hi:16;
--	__le32 key_mem:2;
--	__le32 rsvd1:14;
-+	unsigned int  key_hi:16;
-+	unsigned int  key_mem:2;
-+	unsigned int  rsvd1:14;
- };
+ 			mutex_unlock(&ccp->sb_mutex);
+-			return start * LSB_ITEM_SIZE;
++			return start;
+ 		}
  
- struct ccp5_desc {
+ 		ccp->sb_avail = 0;
+@@ -63,17 +69,18 @@ static u32 ccp_lsb_alloc(struct ccp_cmd_queue *cmd_q, unsigned int count)
+ 	}
+ }
+ 
++/* Free a number of LSB slots from the bitmap, starting at
++ * the indicated starting slot number.
++ */
+ static void ccp_lsb_free(struct ccp_cmd_queue *cmd_q, unsigned int start,
+ 			 unsigned int count)
+ {
+-	int lsbno = start / LSB_SIZE;
+-
+ 	if (!start)
+ 		return;
+ 
+-	if (cmd_q->lsb == lsbno) {
++	if (cmd_q->lsb == start) {
+ 		/* An entry from the private LSB */
+-		bitmap_clear(cmd_q->lsbmap, start % LSB_SIZE, count);
++		bitmap_clear(cmd_q->lsbmap, start, count);
+ 	} else {
+ 		/* From the shared LSBs */
+ 		struct ccp_device *ccp = cmd_q->ccp;
+@@ -751,9 +758,6 @@ static int ccp5_init(struct ccp_device *ccp)
+ 		goto e_pool;
+ 	}
+ 
+-	/* Initialize the queue used to suspend */
+-	init_waitqueue_head(&ccp->suspend_queue);
+-
+ 	dev_dbg(dev, "Loading LSB map...\n");
+ 	/* Copy the private LSB mask to the public registers */
+ 	status_lo = ioread32(ccp->io_regs + LSB_PRIVATE_MASK_LO_OFFSET);
+diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+index d9885ce..653b5a5 100644
+--- a/drivers/crypto/ccp/ccp-dev.c
++++ b/drivers/crypto/ccp/ccp-dev.c
+@@ -478,6 +478,10 @@ struct ccp_device *ccp_alloc_struct(struct device *dev)
+ 	ccp->sb_count = KSB_COUNT;
+ 	ccp->sb_start = 0;
+ 
++	/* Initialize the wait queues */
++	init_waitqueue_head(&ccp->sb_queue);
++	init_waitqueue_head(&ccp->suspend_queue);
++
+ 	ccp->ord = ccp_increment_unit_ordinal();
+ 	snprintf(ccp->name, MAX_CCP_NAME_LEN, "ccp-%u", ccp->ord);
+ 	snprintf(ccp->rngname, MAX_CCP_NAME_LEN, "ccp-%u-rng", ccp->ord);
