@@ -1,38 +1,54 @@
-From: Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH 00/28] Reenable maybe-uninitialized warnings
-Date: Mon, 17 Oct 2016 22:08:04 -0700
-Message-ID: <20161018050804.GA9902@infradead.org>
-References: <20161017220342.1627073-1-arnd@arndb.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        linux-media@vger.kernel.org,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        linux-s390@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-        dri-devel@lists.freedesktop.org, linux-mtd@lists.infradead.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        ceph-devel@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-ext4@vger.kernel.org, netfilter-devel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-ext4-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20161017220342.1627073-1-arnd@arndb.de>
-Sender: linux-ext4-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 0/5] ARM: add module autoloading support for crypto modules
+Date: Tue, 18 Oct 2016 11:52:14 +0100
+Message-ID: <1476787939-21889-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: steve.capper@linaro.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux@arm.linux.org.uk, herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-lf0-f50.google.com ([209.85.215.50]:36495 "EHLO
+        mail-lf0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752193AbcJRKwc (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Oct 2016 06:52:32 -0400
+Received: by mail-lf0-f50.google.com with SMTP id b75so340890317lfg.3
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Oct 2016 03:52:31 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Oct 18, 2016 at 12:03:28AM +0200, Arnd Bergmann wrote:
-> This is a set of patches that I hope to get into v4.9 in some form
-> in order to turn on the -Wmaybe-uninitialized warnings again.
+This series wires up the crypto modules that use the ARM 32-bit versions of
+the ARMv8 Crypto Extensions to udev autoloading, by exposing the HWCAP2
+feature bits via the CPU modalias. This is very similar to the arm64
+implementation, with the notable exception that ARM has its CPU feature
+definitions split across HWCAP and HWCAP2.
 
-Hi Arnd,
+Given that the crypto feature bits are all exposed via HWCAP2, and considering
+that there are currently no features exposed via HWCAP that are relevant to
+udev module autoloading, exposing HWCAP2 only should be sufficient, at least
+for now.
 
-I jsut complained to Geert that I was introducing way to many
-bugs or pointless warnings for some compilers lately, but gcc didn't
-warn me about them.  From a little research the lack of
--Wmaybe-uninitialized seems to be the reason for it, so I'm all
-for re-enabling it.
+Note to Herbert: patches #2 - #5 all depend on #1, which requires an ack from
+Russell, so please don't pull anything until #1 has been acked and/or merged.
+
+Ard Biesheuvel (5):
+  ARM: wire up HWCAP2 feature bits to the CPU modalias
+  crypto: arm/aes-ce - enable module autoloading based on CPU feature
+    bits
+  crypto: arm/ghash-ce - enable module autoloading based on CPU feature
+    bits
+  crypto: arm/sha1-ce - enable module autoloading based on CPU feature
+    bits
+  crypto: arm/sha2-ce - enable module autoloading based on CPU feature
+    bits
+
+ arch/arm/Kconfig                  |  1 +
+ arch/arm/crypto/aes-ce-glue.c     |  5 ++-
+ arch/arm/crypto/ghash-ce-glue.c   |  6 ++--
+ arch/arm/crypto/sha1-ce-glue.c    |  5 ++-
+ arch/arm/crypto/sha2-ce-glue.c    |  5 ++-
+ arch/arm/include/asm/cpufeature.h | 32 ++++++++++++++++++++
+ 6 files changed, 41 insertions(+), 13 deletions(-)
+ create mode 100644 arch/arm/include/asm/cpufeature.h
+
+-- 
+2.7.4
