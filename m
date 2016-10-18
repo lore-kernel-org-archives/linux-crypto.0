@@ -1,59 +1,72 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 4/5] crypto: arm/sha1-ce - enable module autoloading based on CPU feature bits
-Date: Tue, 18 Oct 2016 11:52:18 +0100
-Message-ID: <1476787939-21889-5-git-send-email-ard.biesheuvel@linaro.org>
-References: <1476787939-21889-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: steve.capper@linaro.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux@arm.linux.org.uk, herbert@gondor.apana.org.au
+Subject: Re: [PATCH v2 0/8] crypto: ARM/arm64 - big endian fixes
+Date: Tue, 18 Oct 2016 11:55:53 +0100
+Message-ID: <CAKv+Gu8nwLZ_oC4Vx6S8aXyNJKRsVMnk-9hP=oADcyBzMSZv=w@mail.gmail.com>
+References: <1476209720-21114-1-git-send-email-ard.biesheuvel@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Will Deacon <will.deacon@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Russell King - ARM Linux <linux@arm.linux.org.uk>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qt0-f177.google.com ([209.85.216.177]:34556 "EHLO
-        mail-qt0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753905AbcJRKwi (ORCPT
+Received: from mail-it0-f54.google.com ([209.85.214.54]:34993 "EHLO
+        mail-it0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1759834AbcJRKzz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Oct 2016 06:52:38 -0400
-Received: by mail-qt0-f177.google.com with SMTP id q7so150249529qtq.1
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Oct 2016 03:52:38 -0700 (PDT)
-In-Reply-To: <1476787939-21889-1-git-send-email-ard.biesheuvel@linaro.org>
+        Tue, 18 Oct 2016 06:55:55 -0400
+Received: by mail-it0-f54.google.com with SMTP id 4so77373548itv.0
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Oct 2016 03:55:54 -0700 (PDT)
+In-Reply-To: <1476209720-21114-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Make the module autoloadable by tying it to the CPU feature bit that
-describes whether the optional instructions it relies on are implemented
-by the current CPU.
+On 11 October 2016 at 19:15, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> As it turns out, none of the accelerated crypto routines under arch/arm64/crypto
+> currently work, or have ever worked correctly when built for big endian. So this
+> series fixes all of them. This v2 now includes a similar fix for 32-bit ARM as
+> well, and an additional fix for XTS which escaped my attention before.
+>
+> Each of these patches carries a fixes tag, and could be backported to stable.
+> However, for patches #1 and #5, the fixes tag denotes the oldest commit that the
+> fix is compatible with, not the patch that introduced the algorithm. This is due
+> to the fact that the key schedules are incompatible between generic AES and the
+> arm64 Crypto Extensions implementation (but only when building for big endian)
+> This is not a problem in practice, but it does mean that the AES-CCM and AES in
+> EBC/CBC/CTR/XTS mode implementations before v3.19 require a different fix, i.e.,
+> one that is compatible with the generic AES key schedule generation code (which
+> it currently no longer uses)
+>
+> In any case, please apply with cc to stable.
+>
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm/crypto/sha1-ce-glue.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Ping?
 
-diff --git a/arch/arm/crypto/sha1-ce-glue.c b/arch/arm/crypto/sha1-ce-glue.c
-index 80bc2fcd241a..555f72b5e659 100644
---- a/arch/arm/crypto/sha1-ce-glue.c
-+++ b/arch/arm/crypto/sha1-ce-glue.c
-@@ -11,6 +11,7 @@
- #include <crypto/internal/hash.h>
- #include <crypto/sha.h>
- #include <crypto/sha1_base.h>
-+#include <linux/cpufeature.h>
- #include <linux/crypto.h>
- #include <linux/module.h>
- 
-@@ -82,8 +83,6 @@ static struct shash_alg alg = {
- 
- static int __init sha1_ce_mod_init(void)
- {
--	if (!(elf_hwcap2 & HWCAP2_SHA1))
--		return -ENODEV;
- 	return crypto_register_shash(&alg);
- }
- 
-@@ -92,5 +91,5 @@ static void __exit sha1_ce_mod_fini(void)
- 	crypto_unregister_shash(&alg);
- }
- 
--module_init(sha1_ce_mod_init);
-+module_cpu_feature_match(SHA1, sha1_ce_mod_init);
- module_exit(sha1_ce_mod_fini);
--- 
-2.7.4
+> Ard Biesheuvel (8):
+>   crypto: arm64/aes-ce - fix for big endian
+>   crypto: arm64/ghash-ce - fix for big endian
+>   crypto: arm64/sha1-ce - fix for big endian
+>   crypto: arm64/sha2-ce - fix for big endian
+>   crypto: arm64/aes-ccm-ce: fix for big endian
+>   crypto: arm64/aes-neon - fix for big endian
+>   crypto: arm64/aes-xts-ce: fix for big endian
+>   crypto: arm/aes-ce - fix for big endian
+>
+>  arch/arm/crypto/aes-ce-glue.c       |  5 ++
+>  arch/arm64/crypto/aes-ce-ccm-core.S | 53 ++++++++++----------
+>  arch/arm64/crypto/aes-ce-cipher.c   | 25 +++++----
+>  arch/arm64/crypto/aes-ce.S          |  1 +
+>  arch/arm64/crypto/aes-modes.S       |  3 +-
+>  arch/arm64/crypto/aes-neon.S        | 25 +++++----
+>  arch/arm64/crypto/ghash-ce-core.S   |  6 +--
+>  arch/arm64/crypto/sha1-ce-core.S    |  4 +-
+>  arch/arm64/crypto/sha2-ce-core.S    |  4 +-
+>  9 files changed, 72 insertions(+), 54 deletions(-)
+>
+> --
+> 2.7.4
+>
