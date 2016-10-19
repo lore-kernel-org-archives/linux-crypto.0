@@ -1,25 +1,22 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v2 0/8] crypto: ARM/arm64 - big endian fixes
-Date: Wed, 19 Oct 2016 10:15:49 +0100
-Message-ID: <20161019091549.GF9193@arm.com>
-References: <1476209720-21114-1-git-send-email-ard.biesheuvel@linaro.org>
- <20161018114932.GG10115@e104818-lin.cambridge.arm.com>
- <CAKv+Gu9wuXnrq77a3Zk0GnHgnkpURh=EegwgP+vAwMC=rdm3qA@mail.gmail.com>
- <20161019030333.GA1269@gondor.apana.org.au>
- <20161019084607.GB9193@arm.com>
- <CAKv+Gu_A1XOL=yST_isyvMZL=9wUcuiFXdfmOqw7PO5te24Ktw@mail.gmail.com>
+From: Neil Armstrong <narmstrong@baylibre.com>
+Subject: Re: [PATCH v2] hwrng: meson: Fix module autoload for OF registration
+Date: Wed, 19 Oct 2016 11:19:39 +0200
+Message-ID: <e8df64b3-79c3-2d69-97b6-ee99d052d22b@baylibre.com>
+References: <1476733877-20275-1-git-send-email-javier@osg.samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Russell King - ARM Linux <linux@arm.linux.org.uk>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ Kevin Hilman <khilman@baylibre.com>, Matt Mackall <mpm@selenic.com>,
+ Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+ linux-crypto@vger.kernel.org,
+ PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+ Carlo Caione <carlo@caione.org>, linux-amlogic@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org
+To: Javier Martinez Canillas <javier@osg.samsung.com>,
+ linux-kernel@vger.kernel.org
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_A1XOL=yST_isyvMZL=9wUcuiFXdfmOqw7PO5te24Ktw@mail.gmail.com>
+In-Reply-To: <1476733877-20275-1-git-send-email-javier@osg.samsung.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -31,29 +28,47 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Oct 19, 2016 at 09:49:46AM +0100, Ard Biesheuvel wrote:
-> On 19 October 2016 at 09:46, Will Deacon <will.deacon@arm.com> wrote:
-> > On Wed, Oct 19, 2016 at 11:03:33AM +0800, Herbert Xu wrote:
-> >> I was planning merging these for 4.10.  But I'm fine with them
-> >> going through the arm tree.  Let me know what you guys want to
-> >> do.
-> >
-> > I assumed you'd take them through crypto, as per usual, so I didn't
-> > queue anything in the arm64 tree.
-> >
-> > Ard -- were you planning to get these in for 4.9?
-> >
+On 10/17/2016 09:51 PM, Javier Martinez Canillas wrote:
+> If the driver is built as a module, autoload won't work because the module
+> alias information is not filled. So user-space can't match the registered
+> device with the corresponding module.
 > 
-> These are arguably bug fixes, but I spotted them by accident, they
-> weren't reported to me or anything. But it seems strange to add a cc
-> stable and then hold off until the next merge window.
+> Export the module alias information using the MODULE_DEVICE_TABLE() macro.
 > 
-> In any case, I don't care deeply either way, as long as they get
-> merged in the end. I think it makes sense to keep them together (arm64
-> + ARM), so Herbert's tree is a more natural route for them to take. I
-> will leave it up to Herbert whether they are sent onward as fixes or
-> as part of v4.10
+> Before this patch:
+> 
+> $ modinfo drivers/char/hw_random/meson-rng.ko | grep alias
+> alias:          platform:meson-rng
+> 
+> After this patch:
+> 
+> $ modinfo drivers/char/hw_random/meson-rng.ko | grep alias
+> alias:          platform:meson-rng
+> alias:          of:N*T*Camlogic,meson-rngC*
+> alias:          of:N*T*Camlogic,meson-rng
+> 
+> Signed-off-by: Javier Martinez Canillas <javier@osg.samsung.com>
+> 
+> ---
+> 
+> Changes in v2:
+> - Remove unrelated changes added by mistake. Suggested by Jason Gunthorpe.
+> 
+>  drivers/char/hw_random/meson-rng.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_random/meson-rng.c
+> index 58bef39f7286..51864a509be7 100644
+> --- a/drivers/char/hw_random/meson-rng.c
+> +++ b/drivers/char/hw_random/meson-rng.c
+> @@ -110,6 +110,7 @@ static const struct of_device_id meson_rng_of_match[] = {
+>  	{ .compatible = "amlogic,meson-rng", },
+>  	{},
+>  };
+> +MODULE_DEVICE_TABLE(of, meson_rng_of_match);
+>  
+>  static struct platform_driver meson_rng_driver = {
+>  	.probe	= meson_rng_probe,
+> 
 
-Sounds good to me.
-
-Will
+Acked-by: Neil Armstrong <narmstrong@baylibre.com>
