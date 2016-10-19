@@ -1,74 +1,49 @@
-From: Neil Armstrong <narmstrong@baylibre.com>
-Subject: Re: [PATCH v2] hwrng: meson: Fix module autoload for OF registration
-Date: Wed, 19 Oct 2016 11:19:39 +0200
-Message-ID: <e8df64b3-79c3-2d69-97b6-ee99d052d22b@baylibre.com>
-References: <1476733877-20275-1-git-send-email-javier@osg.samsung.com>
+From: Vinod Koul <vinod.koul@intel.com>
+Subject: Re: provide DMA services in drivers/crypto
+Date: Wed, 19 Oct 2016 20:24:23 +0530
+Message-ID: <20161019145423.GQ2467@localhost>
+References: <DB4PR04MB06561BC01F736652940C004FB8D20@DB4PR04MB0656.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- Kevin Hilman <khilman@baylibre.com>, Matt Mackall <mpm@selenic.com>,
- Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
- linux-crypto@vger.kernel.org,
- PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
- Carlo Caione <carlo@caione.org>, linux-amlogic@lists.infradead.org,
- linux-arm-kernel@lists.infradead.org
-To: Javier Martinez Canillas <javier@osg.samsung.com>,
- linux-kernel@vger.kernel.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1476733877-20275-1-git-send-email-javier@osg.samsung.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>
+To: Tudor-Dan Ambarus <tudor-dan.ambarus@nxp.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga07.intel.com ([134.134.136.100]:12537 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S942378AbcJSOp2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Oct 2016 10:45:28 -0400
+Content-Disposition: inline
+In-Reply-To: <DB4PR04MB06561BC01F736652940C004FB8D20@DB4PR04MB0656.eurprd04.prod.outlook.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/17/2016 09:51 PM, Javier Martinez Canillas wrote:
-> If the driver is built as a module, autoload won't work because the module
-> alias information is not filled. So user-space can't match the registered
-> device with the corresponding module.
-> 
-> Export the module alias information using the MODULE_DEVICE_TABLE() macro.
-> 
-> Before this patch:
-> 
-> $ modinfo drivers/char/hw_random/meson-rng.ko | grep alias
-> alias:          platform:meson-rng
-> 
-> After this patch:
-> 
-> $ modinfo drivers/char/hw_random/meson-rng.ko | grep alias
-> alias:          platform:meson-rng
-> alias:          of:N*T*Camlogic,meson-rngC*
-> alias:          of:N*T*Camlogic,meson-rng
-> 
-> Signed-off-by: Javier Martinez Canillas <javier@osg.samsung.com>
-> 
-> ---
-> 
-> Changes in v2:
-> - Remove unrelated changes added by mistake. Suggested by Jason Gunthorpe.
-> 
->  drivers/char/hw_random/meson-rng.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_random/meson-rng.c
-> index 58bef39f7286..51864a509be7 100644
-> --- a/drivers/char/hw_random/meson-rng.c
-> +++ b/drivers/char/hw_random/meson-rng.c
-> @@ -110,6 +110,7 @@ static const struct of_device_id meson_rng_of_match[] = {
->  	{ .compatible = "amlogic,meson-rng", },
->  	{},
->  };
-> +MODULE_DEVICE_TABLE(of, meson_rng_of_match);
->  
->  static struct platform_driver meson_rng_driver = {
->  	.probe	= meson_rng_probe,
-> 
+On Wed, Oct 19, 2016 at 01:57:45PM +0000, Tudor-Dan Ambarus wrote:
 
-Acked-by: Neil Armstrong <narmstrong@baylibre.com>
+Please wrap your mails within 80 chars, I have reflown below for reabability.
+
+> Hi, Herbert,
+> 
+> CAAM has the ability to provide DMA services. This is helpful for
+> platforms that don't have a dedicated DMA hardware block.
+> 
+> In this particular example, caam being a crypto accelerator at its
+> fundamentals, where is recommended to add a caam-dma engine
+> implementation, in drivers/dma or in drivers/crypto? Are the any
+> rules/guidelines?
+
+If the dma controller is internal to crypto, then it might be okay to be
+inside the crypto driver. But if it is shared or common controller then a
+dmaengine implementation would make sense..
+
+> I noticed that CCP already registered DMA services, the driver being held
+> in drivers/crypto.
+
+I think drivers/crypto/ccp/ccp-dmaengine.c is wrong example, it should have
+been in dmaengine directory. Not sure why it was addded in crypto :(
+
+Thanks
+-- 
+~Vinod
