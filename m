@@ -1,39 +1,84 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH resend 4.9] hw_random: Don't use a stack buffer in
- add_early_randomness()
-Date: Wed, 19 Oct 2016 11:50:12 +0800
-Message-ID: <20161019035012.GA2192@gondor.apana.org.au>
-References: <4169224b6858d1cf149f1a73f8a03603fa19076d.1476638125.git.luto@kernel.org>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v2 0/8] crypto: ARM/arm64 - big endian fixes
+Date: Wed, 19 Oct 2016 09:46:07 +0100
+Message-ID: <20161019084607.GB9193@arm.com>
+References: <1476209720-21114-1-git-send-email-ard.biesheuvel@linaro.org>
+ <20161018114932.GG10115@e104818-lin.cambridge.arm.com>
+ <CAKv+Gu9wuXnrq77a3Zk0GnHgnkpURh=EegwgP+vAwMC=rdm3qA@mail.gmail.com>
+ <20161019030333.GA1269@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Matt Mackall <mpm@selenic.com>,
-        Rusty Russell <rusty@rustcorp.com.au>,
-        Jens Axboe <axboe@fb.com>, Matt Mullins <mmullins@mmlx.us>
-To: Andy Lutomirski <luto@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38516 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753547AbcJSDuU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Oct 2016 23:50:20 -0400
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Russell King - ARM Linux <linux@arm.linux.org.uk>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <4169224b6858d1cf149f1a73f8a03603fa19076d.1476638125.git.luto@kernel.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20161019030333.GA1269@gondor.apana.org.au>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Oct 17, 2016 at 10:06:27AM -0700, Andy Lutomirski wrote:
-> hw_random carefully avoids using a stack buffer except in
-> add_early_randomness().  This causes a crash in virtio_rng if
-> CONFIG_VMAP_STACK=y.
+On Wed, Oct 19, 2016 at 11:03:33AM +0800, Herbert Xu wrote:
+> On Tue, Oct 18, 2016 at 01:14:38PM +0100, Ard Biesheuvel wrote:
+> > On 18 October 2016 at 12:49, Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > > On Tue, Oct 11, 2016 at 07:15:12PM +0100, Ard Biesheuvel wrote:
+> > >> As it turns out, none of the accelerated crypto routines under arch/arm64/crypto
+> > >> currently work, or have ever worked correctly when built for big endian. So this
+> > >> series fixes all of them. This v2 now includes a similar fix for 32-bit ARM as
+> > >> well, and an additional fix for XTS which escaped my attention before.
+> > >>
+> > >> Each of these patches carries a fixes tag, and could be backported to stable.
+> > >> However, for patches #1 and #5, the fixes tag denotes the oldest commit that the
+> > >> fix is compatible with, not the patch that introduced the algorithm.
+> > >
+> > > I think for future reference, the Fixes tag should denote the commit
+> > > that introduced the issue. An explicit Cc: stable tag would state how
+> > > far back it should be applied.
+> > >
+> > 
+> > OK, that sounds reasonable.
+> > 
+> > >> Ard Biesheuvel (8):
+> > >>   crypto: arm64/aes-ce - fix for big endian
+> > >>   crypto: arm64/ghash-ce - fix for big endian
+> > >>   crypto: arm64/sha1-ce - fix for big endian
+> > >>   crypto: arm64/sha2-ce - fix for big endian
+> > >>   crypto: arm64/aes-ccm-ce: fix for big endian
+> > >>   crypto: arm64/aes-neon - fix for big endian
+> > >>   crypto: arm64/aes-xts-ce: fix for big endian
+> > >>   crypto: arm/aes-ce - fix for big endian
+> > >
+> > > The changes look fine to me but I can't claim I fully understand these
+> > > algorithms. FWIW:
+> > >
+> > > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> > >
+> > > (Will may pick them up for 4.9-rcX)
+> > 
+> > Thanks, although I was kind of expecting Herbert to pick these up,
+> > given that #8 affects ARM not arm64.
+> > 
+> > But if you (or Will) can pick up #1 to #7, that is also fine, then I
+> > can drop #8 into rmk's patch database.
 > 
-> Reported-by: Matt Mullins <mmullins@mmlx.us>
-> Tested-by: Matt Mullins <mmullins@mmlx.us>
-> Fixes: d3cc7996473a ("hwrng: fetch randomness only after device init")
-> Signed-off-by: Andy Lutomirski <luto@kernel.org>
+> I was planning merging these for 4.10.  But I'm fine with them
+> going through the arm tree.  Let me know what you guys want to
+> do.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I assumed you'd take them through crypto, as per usual, so I didn't
+queue anything in the arm64 tree.
+
+Ard -- were you planning to get these in for 4.9?
+
+Will
