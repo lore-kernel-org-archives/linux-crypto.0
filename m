@@ -1,120 +1,78 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH] crypto: ccp - Clean up the LSB slot allocation code
-Date: Tue, 18 Oct 2016 17:33:37 -0500
-Message-ID: <147683001790.8273.9550490485955104780.stgit@taos.amd.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 0/8] crypto: ARM/arm64 - big endian fixes
+Date: Wed, 19 Oct 2016 11:03:33 +0800
+Message-ID: <20161019030333.GA1269@gondor.apana.org.au>
+References: <1476209720-21114-1-git-send-email-ard.biesheuvel@linaro.org>
+ <20161018114932.GG10115@e104818-lin.cambridge.arm.com>
+ <CAKv+Gu9wuXnrq77a3Zk0GnHgnkpURh=EegwgP+vAwMC=rdm3qA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        Will Deacon <will.deacon@arm.com>,
+        Russell King - ARM Linux <linux@arm.linux.org.uk>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0059.outbound.protection.outlook.com ([104.47.42.59]:61856
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S934261AbcJRWdr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Oct 2016 18:33:47 -0400
+Received: from helcar.hengli.com.au ([209.40.204.226]:34911 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932580AbcJSDDm (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Oct 2016 23:03:42 -0400
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu9wuXnrq77a3Zk0GnHgnkpURh=EegwgP+vAwMC=rdm3qA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix a few problems revealed by testing: verify consistent
-units, especially in public slot allocation. Percolate
-some common initialization code up to a common routine.
-Add some comments.
+On Tue, Oct 18, 2016 at 01:14:38PM +0100, Ard Biesheuvel wrote:
+> On 18 October 2016 at 12:49, Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > On Tue, Oct 11, 2016 at 07:15:12PM +0100, Ard Biesheuvel wrote:
+> >> As it turns out, none of the accelerated crypto routines under arch/arm64/crypto
+> >> currently work, or have ever worked correctly when built for big endian. So this
+> >> series fixes all of them. This v2 now includes a similar fix for 32-bit ARM as
+> >> well, and an additional fix for XTS which escaped my attention before.
+> >>
+> >> Each of these patches carries a fixes tag, and could be backported to stable.
+> >> However, for patches #1 and #5, the fixes tag denotes the oldest commit that the
+> >> fix is compatible with, not the patch that introduced the algorithm.
+> >
+> > I think for future reference, the Fixes tag should denote the commit
+> > that introduced the issue. An explicit Cc: stable tag would state how
+> > far back it should be applied.
+> >
+> 
+> OK, that sounds reasonable.
+> 
+> >> Ard Biesheuvel (8):
+> >>   crypto: arm64/aes-ce - fix for big endian
+> >>   crypto: arm64/ghash-ce - fix for big endian
+> >>   crypto: arm64/sha1-ce - fix for big endian
+> >>   crypto: arm64/sha2-ce - fix for big endian
+> >>   crypto: arm64/aes-ccm-ce: fix for big endian
+> >>   crypto: arm64/aes-neon - fix for big endian
+> >>   crypto: arm64/aes-xts-ce: fix for big endian
+> >>   crypto: arm/aes-ce - fix for big endian
+> >
+> > The changes look fine to me but I can't claim I fully understand these
+> > algorithms. FWIW:
+> >
+> > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> >
+> > (Will may pick them up for 4.9-rcX)
+> 
+> Thanks, although I was kind of expecting Herbert to pick these up,
+> given that #8 affects ARM not arm64.
+> 
+> But if you (or Will) can pick up #1 to #7, that is also fine, then I
+> can drop #8 into rmk's patch database.
 
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
----
- drivers/crypto/ccp/ccp-dev-v3.c |    4 ----
- drivers/crypto/ccp/ccp-dev-v5.c |   20 ++++++++++++--------
- drivers/crypto/ccp/ccp-dev.c    |    4 ++++
- 3 files changed, 16 insertions(+), 12 deletions(-)
+I was planning merging these for 4.10.  But I'm fine with them
+going through the arm tree.  Let me know what you guys want to
+do.
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index 8d2dbac..7bc0998 100644
---- a/drivers/crypto/ccp/ccp-dev-v3.c
-+++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -404,10 +404,6 @@ static int ccp_init(struct ccp_device *ccp)
- 		goto e_pool;
- 	}
- 
--	/* Initialize the queues used to wait for KSB space and suspend */
--	init_waitqueue_head(&ccp->sb_queue);
--	init_waitqueue_head(&ccp->suspend_queue);
--
- 	dev_dbg(dev, "Starting threads...\n");
- 	/* Create a kthread for each queue */
- 	for (i = 0; i < ccp->cmd_q_count; i++) {
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index faf3cb3..ff7816a 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -21,6 +21,12 @@
- 
- #include "ccp-dev.h"
- 
-+/* Allocate the requested number of contiguous LSB slots
-+ * from the LSB bitmap. Look in the private range for this
-+ * queue first; failing that, check the public area.
-+ * If no space is available, wait around.
-+ * Return: first slot number
-+ */
- static u32 ccp_lsb_alloc(struct ccp_cmd_queue *cmd_q, unsigned int count)
- {
- 	struct ccp_device *ccp;
-@@ -50,7 +56,7 @@ static u32 ccp_lsb_alloc(struct ccp_cmd_queue *cmd_q, unsigned int count)
- 			bitmap_set(ccp->lsbmap, start, count);
- 
- 			mutex_unlock(&ccp->sb_mutex);
--			return start * LSB_ITEM_SIZE;
-+			return start;
- 		}
- 
- 		ccp->sb_avail = 0;
-@@ -63,17 +69,18 @@ static u32 ccp_lsb_alloc(struct ccp_cmd_queue *cmd_q, unsigned int count)
- 	}
- }
- 
-+/* Free a number of LSB slots from the bitmap, starting at
-+ * the indicated starting slot number.
-+ */
- static void ccp_lsb_free(struct ccp_cmd_queue *cmd_q, unsigned int start,
- 			 unsigned int count)
- {
--	int lsbno = start / LSB_SIZE;
--
- 	if (!start)
- 		return;
- 
--	if (cmd_q->lsb == lsbno) {
-+	if (cmd_q->lsb == start) {
- 		/* An entry from the private LSB */
--		bitmap_clear(cmd_q->lsbmap, start % LSB_SIZE, count);
-+		bitmap_clear(cmd_q->lsbmap, start, count);
- 	} else {
- 		/* From the shared LSBs */
- 		struct ccp_device *ccp = cmd_q->ccp;
-@@ -751,9 +758,6 @@ static int ccp5_init(struct ccp_device *ccp)
- 		goto e_pool;
- 	}
- 
--	/* Initialize the queue used to suspend */
--	init_waitqueue_head(&ccp->suspend_queue);
--
- 	dev_dbg(dev, "Loading LSB map...\n");
- 	/* Copy the private LSB mask to the public registers */
- 	status_lo = ioread32(ccp->io_regs + LSB_PRIVATE_MASK_LO_OFFSET);
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index d9885ce..653b5a5 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -478,6 +478,10 @@ struct ccp_device *ccp_alloc_struct(struct device *dev)
- 	ccp->sb_count = KSB_COUNT;
- 	ccp->sb_start = 0;
- 
-+	/* Initialize the wait queues */
-+	init_waitqueue_head(&ccp->sb_queue);
-+	init_waitqueue_head(&ccp->suspend_queue);
-+
- 	ccp->ord = ccp_increment_unit_ordinal();
- 	snprintf(ccp->name, MAX_CCP_NAME_LEN, "ccp-%u", ccp->ord);
- 	snprintf(ccp->rngname, MAX_CCP_NAME_LEN, "ccp-%u-rng", ccp->ord);
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
