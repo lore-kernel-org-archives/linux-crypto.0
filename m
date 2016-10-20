@@ -1,52 +1,45 @@
-From: Kevin Hilman <khilman@baylibre.com>
-Subject: Re: [PATCH] hwrng: meson: Remove unneeded platform MODULE_ALIAS
-Date: Thu, 20 Oct 2016 09:24:22 -0700
-Message-ID: <7h4m477zux.fsf@baylibre.com>
-References: <1476906618-14455-1-git-send-email-javier@osg.samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: linux-kernel@vger.kernel.org,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Carlo Caione <carlo@caione.org>,
-        linux-amlogic@lists.infradead.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Matt Mackall <mpm@selenic.com>,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-To: Javier Martinez Canillas <javier@osg.samsung.com>
+From: Paul Bolle <pebolle@tiscali.nl>
+Subject: [PATCH][TRIVIAL] crypto: ccp - fix typo "CPP"
+Date: Thu, 20 Oct 2016 21:20:59 +0200
+Message-ID: <1476991259-4061-1-git-send-email-pebolle@tiscali.nl>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Jiri Kosina <trivial@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1476906618-14455-1-git-send-email-javier@osg.samsung.com>
-        (Javier Martinez Canillas's message of "Wed, 19 Oct 2016 16:50:18
-        -0300")
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Javier Martinez Canillas <javier@osg.samsung.com> writes:
+The abbreviation for Cryptographic Coprocessor is "CCP".
 
-> The Amlogic Meson is a DT-only platform, which means the devices are
-> registered via OF and not using the legacy platform devices support.
->
-> So there's no need to have a MODULE_ALIAS("platform:meson-rng") since
-> the reported uevent MODALIAS to user-space will always be the OF one.
->
-> Signed-off-by: Javier Martinez Canillas <javier@osg.samsung.com>
+Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+---
+ include/linux/ccp.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Acked-by: Kevin Hilman <khilman@baylibre.com>
-
-> ---
->
->  drivers/char/hw_random/meson-rng.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_random/meson-rng.c
-> index 51864a509be7..119d698439ae 100644
-> --- a/drivers/char/hw_random/meson-rng.c
-> +++ b/drivers/char/hw_random/meson-rng.c
-> @@ -122,7 +122,6 @@ static struct platform_driver meson_rng_driver = {
->  
->  module_platform_driver(meson_rng_driver);
->  
-> -MODULE_ALIAS("platform:meson-rng");
->  MODULE_DESCRIPTION("Meson H/W Random Number Generator driver");
->  MODULE_AUTHOR("Lawrence Mok <lawrence.mok@amlogic.com>");
->  MODULE_AUTHOR("Neil Armstrong <narmstrong@baylibre.com>");
+diff --git a/include/linux/ccp.h b/include/linux/ccp.h
+index a7653339fedb..c71dd8fa5764 100644
+--- a/include/linux/ccp.h
++++ b/include/linux/ccp.h
+@@ -11,8 +11,8 @@
+  * published by the Free Software Foundation.
+  */
+ 
+-#ifndef __CPP_H__
+-#define __CPP_H__
++#ifndef __CCP_H__
++#define __CCP_H__
+ 
+ #include <linux/scatterlist.h>
+ #include <linux/workqueue.h>
+@@ -553,7 +553,7 @@ enum ccp_engine {
+ #define CCP_CMD_PASSTHRU_NO_DMA_MAP	0x00000002
+ 
+ /**
+- * struct ccp_cmd - CPP operation request
++ * struct ccp_cmd - CCP operation request
+  * @entry: list element (ccp driver use only)
+  * @work: work element used for callbacks (ccp driver use only)
+  * @ccp: CCP device to be run on (ccp driver use only)
+-- 
+2.7.4
