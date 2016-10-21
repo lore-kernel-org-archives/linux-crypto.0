@@ -1,118 +1,169 @@
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v10 0/8] crypto: asynchronous compression api
-Date: Fri, 21 Oct 2016 13:19:46 +0100
-Message-ID: <1477052394-19826-1-git-send-email-giovanni.cabiddu@intel.com>
+Subject: [PATCH v10 6/8] crypto: acomp - add support for 842 via scomp
+Date: Fri, 21 Oct 2016 13:19:52 +0100
+Message-ID: <1477052394-19826-7-git-send-email-giovanni.cabiddu@intel.com>
+References: <1477052394-19826-1-git-send-email-giovanni.cabiddu@intel.com>
 Cc: linux-crypto@vger.kernel.org,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:27712 "EHLO mga06.intel.com"
+Received: from mga06.intel.com ([134.134.136.31]:37693 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932702AbcJUMUH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Oct 2016 08:20:07 -0400
+        id S932726AbcJUMUO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Oct 2016 08:20:14 -0400
+In-Reply-To: <1477052394-19826-1-git-send-email-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The following patch set introduces acomp, a generic asynchronous
-(de)compression api with support for SG lists.
-We propose a new crypto type called crypto_acomp_type, a new struct acomp_alg
-and struct crypto_acomp, together with number of helper functions to register
-acomp type algorithms and allocate tfm instances.
-This interface will allow the following operations:
+Add scomp backend for 842 compression algorithm.
 
-    int (*compress)(struct acomp_req *req);
-    int (*decompress)(struct acomp_req *req);
-
-Together with acomp we propose a new driver-side interface, scomp, which
-handles compression implementations which use linear buffers. We converted all
-compression algorithms available in LKCF to use this interface so that those
-algorithms will be accessible through the acomp api.
-
-Changes in v10:
-    - fixed build issues for configurations where CONFIG_CRYPTO_USER is defined
-
-Changes in v9:
-    - extended API to allow acomp layer to allocate (and free) output memory
-      if not provided by the user
-    - extended scomp layer to allocate (and free) output sg list if not
-      provided by the user
-
-Changes in v8:
-    - centralized per-cpu scratch buffers handling in scomp layer
-    - changed scomp internal API to use linear buffer (as in v6)
-
-Changes in v7:
-    - removed linearization of SG lists and per-request vmalloc allocations in
-      scomp layer
-    - modified scomp internal API to use SG lists
-    - introduced per-cpu cache of 128K scratch buffers allocated using vmalloc
-      in legacy scomp algorithms
-
-Changes in v6:
-    - changed acomp_request_alloc prototype by removing gfp parameter.
-      acomp_request_alloc will always use GFP_KERNEL
-
-Changes in v5:
-    - removed qdecompress api, no longer needed
-    - removed produced and consumed counters in acomp_req
-    - added crypto_has_acomp function
-
-Changes in v4:
-    - added qdecompress api, a front-end for decompression algorithms which
-      do not need additional vmalloc work space
-
-Changes in v3:
-    - added driver-side scomp interface
-    - provided support for lzo, lz4, lz4hc, 842, deflate compression algorithms
-      via the acomp api (through scomp)
-    - extended testmgr to support acomp
-    - removed extended acomp api for supporting deflate algorithm parameters
-      (will be enhanced and re-proposed in future)
-Note that (2) to (7) are a rework of Joonsoo Kim's scomp patches.
-
-Changes in v2:
-    - added compression and decompression request sizes in acomp_alg
-      in order to enable noctx support
-    - extended api with helpers to allocate compression and
-      decompression requests
-
-Changes from initial submit:
-    - added consumed and produced fields to acomp_req
-    - extended api to support configuration of deflate compressors
-
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
-Giovanni Cabiddu (8):
-  crypto: add asynchronous compression api
-  crypto: add driver-side scomp interface
-  crypto: acomp - add support for lzo via scomp
-  crypto: acomp - add support for lz4 via scomp
-  crypto: acomp - add support for lz4hc via scomp
-  crypto: acomp - add support for 842 via scomp
-  crypto: acomp - add support for deflate via scomp
-  crypto: acomp - update testmgr with support for acomp
+ crypto/842.c   | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ crypto/Kconfig |  1 +
+ 2 files changed, 80 insertions(+), 2 deletions(-)
 
- crypto/842.c                        |  81 +++++++-
- crypto/Kconfig                      |  15 ++
- crypto/Makefile                     |   3 +
- crypto/acompress.c                  | 169 +++++++++++++++++
- crypto/crypto_user.c                |  19 ++
- crypto/deflate.c                    | 111 ++++++++++-
- crypto/lz4.c                        |  91 ++++++++-
- crypto/lz4hc.c                      |  92 +++++++++-
- crypto/lzo.c                        |  97 ++++++++--
- crypto/scompress.c                  | 356 ++++++++++++++++++++++++++++++++++++
- crypto/testmgr.c                    | 158 ++++++++++++++--
- include/crypto/acompress.h          | 269 +++++++++++++++++++++++++++
- include/crypto/internal/acompress.h |  81 ++++++++
- include/crypto/internal/scompress.h | 136 ++++++++++++++
- include/linux/crypto.h              |   3 +
- include/uapi/linux/cryptouser.h     |   5 +
- 16 files changed, 1626 insertions(+), 60 deletions(-)
- create mode 100644 crypto/acompress.c
- create mode 100644 crypto/scompress.c
- create mode 100644 include/crypto/acompress.h
- create mode 100644 include/crypto/internal/acompress.h
- create mode 100644 include/crypto/internal/scompress.h
-
---
+diff --git a/crypto/842.c b/crypto/842.c
+index 98e387e..bc26dc9 100644
+--- a/crypto/842.c
++++ b/crypto/842.c
+@@ -31,11 +31,46 @@
+ #include <linux/module.h>
+ #include <linux/crypto.h>
+ #include <linux/sw842.h>
++#include <crypto/internal/scompress.h>
+ 
+ struct crypto842_ctx {
+-	char wmem[SW842_MEM_COMPRESS];	/* working memory for compress */
++	void *wmem;	/* working memory for compress */
+ };
+ 
++static void *crypto842_alloc_ctx(struct crypto_scomp *tfm)
++{
++	void *ctx;
++
++	ctx = kmalloc(SW842_MEM_COMPRESS, GFP_KERNEL);
++	if (!ctx)
++		return ERR_PTR(-ENOMEM);
++
++	return ctx;
++}
++
++static int crypto842_init(struct crypto_tfm *tfm)
++{
++	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	ctx->wmem = crypto842_alloc_ctx(NULL);
++	if (IS_ERR(ctx->wmem))
++		return -ENOMEM;
++
++	return 0;
++}
++
++static void crypto842_free_ctx(struct crypto_scomp *tfm, void *ctx)
++{
++	kfree(ctx);
++}
++
++static void crypto842_exit(struct crypto_tfm *tfm)
++{
++	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	crypto842_free_ctx(NULL, ctx->wmem);
++}
++
+ static int crypto842_compress(struct crypto_tfm *tfm,
+ 			      const u8 *src, unsigned int slen,
+ 			      u8 *dst, unsigned int *dlen)
+@@ -45,6 +80,13 @@ static int crypto842_compress(struct crypto_tfm *tfm,
+ 	return sw842_compress(src, slen, dst, dlen, ctx->wmem);
+ }
+ 
++static int crypto842_scompress(struct crypto_scomp *tfm,
++			       const u8 *src, unsigned int slen,
++			       u8 *dst, unsigned int *dlen, void *ctx)
++{
++	return sw842_compress(src, slen, dst, dlen, ctx);
++}
++
+ static int crypto842_decompress(struct crypto_tfm *tfm,
+ 				const u8 *src, unsigned int slen,
+ 				u8 *dst, unsigned int *dlen)
+@@ -52,6 +94,13 @@ static int crypto842_decompress(struct crypto_tfm *tfm,
+ 	return sw842_decompress(src, slen, dst, dlen);
+ }
+ 
++static int crypto842_sdecompress(struct crypto_scomp *tfm,
++				 const u8 *src, unsigned int slen,
++				 u8 *dst, unsigned int *dlen, void *ctx)
++{
++	return sw842_decompress(src, slen, dst, dlen);
++}
++
+ static struct crypto_alg alg = {
+ 	.cra_name		= "842",
+ 	.cra_driver_name	= "842-generic",
+@@ -59,20 +108,48 @@ static struct crypto_alg alg = {
+ 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
+ 	.cra_ctxsize		= sizeof(struct crypto842_ctx),
+ 	.cra_module		= THIS_MODULE,
++	.cra_init		= crypto842_init,
++	.cra_exit		= crypto842_exit,
+ 	.cra_u			= { .compress = {
+ 	.coa_compress		= crypto842_compress,
+ 	.coa_decompress		= crypto842_decompress } }
+ };
+ 
++static struct scomp_alg scomp = {
++	.alloc_ctx		= crypto842_alloc_ctx,
++	.free_ctx		= crypto842_free_ctx,
++	.compress		= crypto842_scompress,
++	.decompress		= crypto842_sdecompress,
++	.base			= {
++		.cra_name	= "842",
++		.cra_driver_name = "842-scomp",
++		.cra_priority	 = 100,
++		.cra_module	 = THIS_MODULE,
++	}
++};
++
+ static int __init crypto842_mod_init(void)
+ {
+-	return crypto_register_alg(&alg);
++	int ret;
++
++	ret = crypto_register_alg(&alg);
++	if (ret)
++		return ret;
++
++	ret = crypto_register_scomp(&scomp);
++	if (ret) {
++		crypto_unregister_alg(&alg);
++		return ret;
++	}
++
++	return ret;
+ }
+ module_init(crypto842_mod_init);
+ 
+ static void __exit crypto842_mod_exit(void)
+ {
+ 	crypto_unregister_alg(&alg);
++	crypto_unregister_scomp(&scomp);
+ }
+ module_exit(crypto842_mod_exit);
+ 
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index a1819e7..b0718ce 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1598,6 +1598,7 @@ config CRYPTO_LZO
+ config CRYPTO_842
+ 	tristate "842 compression algorithm"
+ 	select CRYPTO_ALGAPI
++	select CRYPTO_ACOMP2
+ 	select 842_COMPRESS
+ 	select 842_DECOMPRESS
+ 	help
+-- 
 2.4.11
