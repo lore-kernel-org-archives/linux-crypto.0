@@ -1,37 +1,50 @@
-From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Subject: Re: sg_set_buf
-Date: Fri, 21 Oct 2016 05:26:14 -0700
-Message-ID: <20161021122614.GA28059@infradead.org>
-References: <20161018213755.GA10777@fieldses.org>
- <20161020102200.GA6628@infradead.org>
- <20161020132030.GA2868@fieldses.org>
- <20161020133107.GA11993@infradead.org>
- <20161020214219.GC4347@fieldses.org>
+From: Neil Armstrong <narmstrong@baylibre.com>
+Subject: Re: [PATCH] hwrng: meson: Remove unneeded platform MODULE_ALIAS
+Date: Fri, 21 Oct 2016 16:11:28 +0200
+Message-ID: <29086305-c8a7-ba17-5e99-3a779b9dd410@baylibre.com>
+References: <1476906618-14455-1-git-send-email-javier@osg.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Rusty Russell <rusty-8n+1lVoiYb80n/F98K4Iww@public.gmane.org>,
-        linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20161020214219.GC4347-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: Kevin Hilman <khilman@baylibre.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Carlo Caione <carlo@caione.org>,
+        linux-amlogic@lists.infradead.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Matt Mackall <mpm@selenic.com>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
+To: Javier Martinez Canillas <javier@osg.samsung.com>,
+        linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1476906618-14455-1-git-send-email-javier@osg.samsung.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Oct 20, 2016 at 05:42:19PM -0400, J. Bruce Fields wrote:
-> Turns out there are several places in the kerberos code where it just
-> needs to encrypt one small checksum or sequence number, and it's been
-> doing that on the stack.
+On 10/19/2016 09:50 PM, Javier Martinez Canillas wrote:
+> The Amlogic Meson is a DT-only platform, which means the devices are
+> registered via OF and not using the legacy platform devices support.
 > 
-> For now I'll just sprinkle kmalloc()'s all over.  Eventually we'll need
-> to find something better.
+> So there's no need to have a MODULE_ALIAS("platform:meson-rng") since
+> the reported uevent MODALIAS to user-space will always be the OF one.
+> 
+> Signed-off-by: Javier Martinez Canillas <javier@osg.samsung.com>
+> ---
+> 
+>  drivers/char/hw_random/meson-rng.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_random/meson-rng.c
+> index 51864a509be7..119d698439ae 100644
+> --- a/drivers/char/hw_random/meson-rng.c
+> +++ b/drivers/char/hw_random/meson-rng.c
+> @@ -122,7 +122,6 @@ static struct platform_driver meson_rng_driver = {
+>  
+>  module_platform_driver(meson_rng_driver);
+>  
+> -MODULE_ALIAS("platform:meson-rng");
+>  MODULE_DESCRIPTION("Meson H/W Random Number Generator driver");
+>  MODULE_AUTHOR("Lawrence Mok <lawrence.mok@amlogic.com>");
+>  MODULE_AUTHOR("Neil Armstrong <narmstrong@baylibre.com>");
+> 
 
-I agree that it would be nice to be able to hash small objects on the
-stack.  But unless I've missed something there is no way to do that
-without using struct scatterlist.  I've added linux-crypto to the cc
-list to confirm that I really didn't miss anything.
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Acked-by: Neil Armstrong <narmstrong@baylibre.com>
