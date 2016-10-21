@@ -1,63 +1,38 @@
-From: Gary R Hook <ghook@amd.com>
-Subject: Re: [PATCH][TRIVIAL] crypto: ccp - fix typo "CPP"
-Date: Thu, 20 Oct 2016 15:44:13 -0500
-Message-ID: <031f3758-cef1-e237-e155-5e83cde9c304@amd.com>
-References: <1476991259-4061-1-git-send-email-pebolle@tiscali.nl>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/6] chcr: Remove malloc/free
+Date: Fri, 21 Oct 2016 10:20:38 +0800
+Message-ID: <20161021022038.GB22485@gondor.apana.org.au>
+References: <cover.1476263960.git.harsh@chelsio.com>
+ <67f49fab047b0b97bac20493dc4414e27c637ab0.1476263960.git.harsh@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>, Jiri Kosina <trivial@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: dan.carpenter@oracle.com, linux-crypto@vger.kernel.org,
+        jlulla@chelsio.com, atul.gupta@chelsio.com, yeshaswi@chelsio.com,
+        hariprasad@chelsio.com
+To: Harsh Jain <harsh@chelsio.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0041.outbound.protection.outlook.com ([104.47.42.41]:33198
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753398AbcJTUoa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Oct 2016 16:44:30 -0400
-In-Reply-To: <1476991259-4061-1-git-send-email-pebolle@tiscali.nl>
+Received: from helcar.hengli.com.au ([209.40.204.226]:47383 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750974AbcJUCUn (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Oct 2016 22:20:43 -0400
+Content-Disposition: inline
+In-Reply-To: <67f49fab047b0b97bac20493dc4414e27c637ab0.1476263960.git.harsh@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/20/2016 02:20 PM, Paul Bolle wrote:
-> The abbreviation for Cryptographic Coprocessor is "CCP".
->
-> Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+On Thu, Oct 13, 2016 at 04:39:35PM +0530, Harsh Jain wrote:
+> Remove malloc/free in crypto operation and allocate memory via cra_ctxsize.
+> Added new structure chcr_wr to populate Work Request Header.
+> Fixes: 324429d74127 (chcr: Support for Chelsio's Crypto Hardware)
 
-Acked-by: Gary R Hook <gary.hook@amd.com>
+Do you mean the reqsize as opposed to ctxsize since the latter is
+shared by all tfm users?
 
-> ---
->  include/linux/ccp.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/include/linux/ccp.h b/include/linux/ccp.h
-> index a7653339fedb..c71dd8fa5764 100644
-> --- a/include/linux/ccp.h
-> +++ b/include/linux/ccp.h
-> @@ -11,8 +11,8 @@
->   * published by the Free Software Foundation.
->   */
->
-> -#ifndef __CPP_H__
-> -#define __CPP_H__
-> +#ifndef __CCP_H__
-> +#define __CCP_H__
->
->  #include <linux/scatterlist.h>
->  #include <linux/workqueue.h>
-> @@ -553,7 +553,7 @@ enum ccp_engine {
->  #define CCP_CMD_PASSTHRU_NO_DMA_MAP	0x00000002
->
->  /**
-> - * struct ccp_cmd - CPP operation request
-> + * struct ccp_cmd - CCP operation request
->   * @entry: list element (ccp driver use only)
->   * @work: work element used for callbacks (ccp driver use only)
->   * @ccp: CCP device to be run on (ccp driver use only)
->
+In any case, your patch doesn't seem to change the size setting?
 
+Cheers,
 -- 
-This is my day job. Follow me at:
-IG/Twitter/Facebook: @grhookphoto
-IG/Twitter/Facebook: @grhphotographer
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
