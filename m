@@ -1,371 +1,619 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2 5/8] crypto: doc - add KPP documentation
-Date: Fri, 21 Oct 2016 04:58:20 +0200
-Message-ID: <3780020.gKnnXCaCUy@positron.chronox.de>
+Subject: [PATCH v2 8/8] crypto: doc - optimize compilation
+Date: Fri, 21 Oct 2016 05:00:02 +0200
+Message-ID: <1694367.Q0xO3KaO9D@positron.chronox.de>
 References: <2053893.WjF01BJSDF@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        Jani Nikula <jani.nikula@linux.intel.com>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-doc-owner@vger.kernel.org>
 In-Reply-To: <2053893.WjF01BJSDF@positron.chronox.de>
 Sender: linux-doc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add the KPP API documentation to the kernel crypto API Sphinx
-documentation. This addition includes the documentation of the
-ECDH and DH helpers which are needed to create the approrpiate input
-data for the crypto_kpp_set_secret function.
+The :functions: definition allows the specification of multiple
+function references which prevents parsing the header file multiple
+times.
 
+Reported-by: Jani Nikula <jani.nikula@linux.intel.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- Documentation/crypto/api-kpp.rst      | 92 +++++++++++++++++++++++++++++++++++
- Documentation/crypto/api.rst          |  1 +
- Documentation/crypto/architecture.rst |  6 +++
- include/crypto/dh.h                   | 58 ++++++++++++++++++++++
- include/crypto/ecdh.h                 | 58 ++++++++++++++++++++++
- include/crypto/kpp.h                  | 15 ++++--
- 6 files changed, 227 insertions(+), 3 deletions(-)
- create mode 100644 Documentation/crypto/api-kpp.rst
+ Documentation/crypto/api-aead.rst     |  51 +-----------
+ Documentation/crypto/api-akcipher.rst |  42 +---------
+ Documentation/crypto/api-digest.rst   |  95 +--------------------
+ Documentation/crypto/api-kpp.rst      |  64 ++------------
+ Documentation/crypto/api-rng.rst      |  20 +----
+ Documentation/crypto/api-skcipher.rst | 152 ++--------------------------------
+ 6 files changed, 23 insertions(+), 401 deletions(-)
 
+diff --git a/Documentation/crypto/api-aead.rst b/Documentation/crypto/api-aead.rst
+index 78a7ce4..d15256f 100644
+--- a/Documentation/crypto/api-aead.rst
++++ b/Documentation/crypto/api-aead.rst
+@@ -5,40 +5,13 @@ Authenticated Encryption With Associated Data (AEAD) Algorithm Definitions
+    :doc: Authenticated Encryption With Associated Data (AEAD) Cipher API
+ 
+ .. kernel-doc:: include/crypto/aead.h
+-   :functions: aead_request
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: aead_alg
++   :functions: aead_request aead_alg
+ 
+ Authenticated Encryption With Associated Data (AEAD) Cipher API
+ ---------------------------------------------------------------
+ 
+ .. kernel-doc:: include/crypto/aead.h
+-   :functions: crypto_alloc_aead
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: crypto_free_aead
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: crypto_aead_ivsize
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: crypto_aead_authsize
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: crypto_aead_blocksize
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: crypto_aead_setkey
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: crypto_aead_setauthsize
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: crypto_aead_encrypt
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: crypto_aead_decrypt
++   :functions: crypto_alloc_aead crypto_free_aead crypto_aead_ivsize crypto_aead_authsize crypto_aead_blocksize crypto_aead_setkey crypto_aead_setauthsize crypto_aead_encrypt crypto_aead_decrypt
+ 
+ Asynchronous AEAD Request Handle
+ --------------------------------
+@@ -47,22 +20,4 @@ Asynchronous AEAD Request Handle
+    :doc: Asynchronous AEAD Request Handle
+ 
+ .. kernel-doc:: include/crypto/aead.h
+-   :functions: crypto_aead_reqsize
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: aead_request_set_tfm
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: aead_request_alloc
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: aead_request_free
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: aead_request_set_callback
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: aead_request_set_crypt
+-
+-.. kernel-doc:: include/crypto/aead.h
+-   :functions: aead_request_set_ad
++   :functions: crypto_aead_reqsize aead_request_set_tfm aead_request_alloc aead_request_free aead_request_set_callback aead_request_set_crypt aead_request_set_ad
+diff --git a/Documentation/crypto/api-akcipher.rst b/Documentation/crypto/api-akcipher.rst
+index 49e0ab6..40aa874 100644
+--- a/Documentation/crypto/api-akcipher.rst
++++ b/Documentation/crypto/api-akcipher.rst
+@@ -2,10 +2,7 @@ Asymmetric Cipher Algorithm Definitions
+ ---------------------------------------
+ 
+ .. kernel-doc:: include/crypto/akcipher.h
+-   :functions: akcipher_alg
+-
+-.. kernel-doc:: include/crypto/akcipher.h
+-   :functions: akcipher_request
++   :functions: akcipher_alg akcipher_request
+ 
+ Asymmetric Cipher API
+ ---------------------
+@@ -14,43 +11,10 @@ Asymmetric Cipher API
+    :doc: Generic Public Key API
+ 
+ .. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_alloc_akcipher
+-
+-.. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_free_akcipher
+-
+-.. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_akcipher_set_pub_key
+-
+-.. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_akcipher_set_priv_key
+-
+-.. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_akcipher_maxsize
+-
+-.. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_akcipher_encrypt
+-
+-.. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_akcipher_decrypt
+-
+-.. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_akcipher_sign
+-
+-.. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_akcipher_verify
++   :functions: crypto_alloc_akcipher crypto_free_akcipher crypto_akcipher_set_pub_key crypto_akcipher_set_priv_key crypto_akcipher_maxsize crypto_akcipher_encrypt crypto_akcipher_decrypt crypto_akcipher_sign crypto_akcipher_verify
+ 
+ Asymmetric Cipher Request Handle
+ --------------------------------
+ 
+ .. kernel-doc:: include/crypto/akcipher.h
+-   :functions: akcipher_request_alloc
+-
+-.. kernel-doc:: include/crypto/akcipher.h
+-   :functions: akcipher_request_free
+-
+-.. kernel-doc:: include/crypto/akcipher.h
+-   :functions: akcipher_request_set_callback
+-
+-.. kernel-doc:: include/crypto/akcipher.h
+-   :functions: akcipher_request_set_crypt
++   :functions: akcipher_request_alloc akcipher_request_free akcipher_request_set_callback akcipher_request_set_crypt
+diff --git a/Documentation/crypto/api-digest.rst b/Documentation/crypto/api-digest.rst
+index b5eaf0f..07356fa 100644
+--- a/Documentation/crypto/api-digest.rst
++++ b/Documentation/crypto/api-digest.rst
+@@ -5,13 +5,7 @@ Message Digest Algorithm Definitions
+    :doc: Message Digest Algorithm Definitions
+ 
+ .. kernel-doc:: include/crypto/hash.h
+-   :functions: hash_alg_common
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: ahash_alg
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: shash_alg
++   :functions: hash_alg_common ahash_alg shash_alg
+ 
+ Asynchronous Message Digest API
+ -------------------------------
+@@ -20,40 +14,7 @@ Asynchronous Message Digest API
+    :doc: Asynchronous Message Digest API
+ 
+ .. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_alloc_ahash
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_free_ahash
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_ahash_init
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_ahash_digestsize
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_ahash_reqtfm
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_ahash_reqsize
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_ahash_setkey
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_ahash_finup
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_ahash_final
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_ahash_digest
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_ahash_export
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_ahash_import
++   :functions: crypto_alloc_ahash crypto_free_ahash crypto_ahash_init crypto_ahash_digestsize crypto_ahash_reqtfm crypto_ahash_reqsize crypto_ahash_setkey crypto_ahash_finup crypto_ahash_final crypto_ahash_digest crypto_ahash_export crypto_ahash_import
+ 
+ Asynchronous Hash Request Handle
+ --------------------------------
+@@ -62,19 +23,7 @@ Asynchronous Hash Request Handle
+    :doc: Asynchronous Hash Request Handle
+ 
+ .. kernel-doc:: include/crypto/hash.h
+-   :functions: ahash_request_set_tfm
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: ahash_request_alloc
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: ahash_request_free
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: ahash_request_set_callback
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: ahash_request_set_crypt
++   :functions: ahash_request_set_tfm ahash_request_alloc ahash_request_free ahash_request_set_callback ahash_request_set_crypt
+ 
+ Synchronous Message Digest API
+ ------------------------------
+@@ -83,40 +32,4 @@ Synchronous Message Digest API
+    :doc: Synchronous Message Digest API
+ 
+ .. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_alloc_shash
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_free_shash
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_shash_blocksize
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_shash_digestsize
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_shash_descsize
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_shash_setkey
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_shash_digest
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_shash_export
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_shash_import
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_shash_init
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_shash_update
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_shash_final
+-
+-.. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_shash_finup
++   :functions: crypto_alloc_shash crypto_free_shash crypto_shash_blocksize crypto_shash_digestsize crypto_shash_descsize crypto_shash_setkey crypto_shash_digest crypto_shash_export crypto_shash_import crypto_shash_init crypto_shash_update crypto_shash_final crypto_shash_finup
 diff --git a/Documentation/crypto/api-kpp.rst b/Documentation/crypto/api-kpp.rst
-new file mode 100644
-index 0000000..d87be92
---- /dev/null
+index d87be92..7d86ab9 100644
+--- a/Documentation/crypto/api-kpp.rst
 +++ b/Documentation/crypto/api-kpp.rst
-@@ -0,0 +1,92 @@
-+Key-agreement Protocol Primitives (KPP) Cipher Algorithm Definitions
-+--------------------------------------------------------------------
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: kpp_request
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: crypto_kpp
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: kpp_alg
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: kpp_secret
-+
-+Key-agreement Protocol Primitives (KPP) Cipher API
-+--------------------------------------------------
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :doc: Generic Key-agreement Protocol Primitives API
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: crypto_alloc_kpp
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: crypto_free_kpp
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: crypto_kpp_set_secret
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: crypto_kpp_generate_public_key
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: crypto_kpp_compute_shared_secret
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: crypto_kpp_maxsize
-+
-+Key-agreement Protocol Primitives (KPP) Cipher Request Handle
-+-------------------------------------------------------------
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: kpp_request_alloc
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: kpp_request_free
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: kpp_request_set_callback
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: kpp_request_set_input
-+
-+.. kernel-doc:: include/crypto/kpp.h
-+   :functions: kpp_request_set_output
-+
-+ECDH Helper Functions
-+---------------------
-+
-+.. kernel-doc:: include/crypto/ecdh.h
-+   :doc: ECDH Helper Functions
-+
-+.. kernel-doc:: include/crypto/ecdh.h
-+   :functions: ecdh
-+
-+.. kernel-doc:: include/crypto/ecdh.h
-+   :functions: crypto_ecdh_key_len
-+
-+.. kernel-doc:: include/crypto/ecdh.h
-+   :functions: crypto_ecdh_encode_key
-+
-+.. kernel-doc:: include/crypto/ecdh.h
-+   :functions: crypto_ecdh_decode_key
-+
-+DH Helper Functions
-+-------------------
-+
-+.. kernel-doc:: include/crypto/dh.h
-+   :doc: DH Helper Functions
-+
-+.. kernel-doc:: include/crypto/dh.h
-+   :functions: dh
-+
-+.. kernel-doc:: include/crypto/dh.h
-+   :functions: crypto_dh_key_len
-+
-+.. kernel-doc:: include/crypto/dh.h
-+   :functions: crypto_dh_encode_key
-+
-+.. kernel-doc:: include/crypto/dh.h
-+   :functions: crypto_dh_decode_key
-diff --git a/Documentation/crypto/api.rst b/Documentation/crypto/api.rst
-index f2bbeb0..2e51919 100644
---- a/Documentation/crypto/api.rst
-+++ b/Documentation/crypto/api.rst
-@@ -22,3 +22,4 @@ the IV. Different IV generators are available.
-    api-digest
-    api-rng
-    api-akcipher
-+   api-kpp
-diff --git a/Documentation/crypto/architecture.rst b/Documentation/crypto/architecture.rst
-index 34e396b..ca2d09b 100644
---- a/Documentation/crypto/architecture.rst
-+++ b/Documentation/crypto/architecture.rst
-@@ -161,6 +161,9 @@ applicable to a cipher, it is not displayed:
-       entry below for the specification of the IV generator type used by
-       the cipher implementation)
+@@ -2,16 +2,7 @@ Key-agreement Protocol Primitives (KPP) Cipher Algorithm Definitions
+ --------------------------------------------------------------------
  
-+   -  kpp for a Key-agreement Protocol Primitive (KPP) cipher such as
-+      an ECDH or DH implementation
-+
- -  blocksize: blocksize of cipher in bytes
+ .. kernel-doc:: include/crypto/kpp.h
+-   :functions: kpp_request
+-
+-.. kernel-doc:: include/crypto/kpp.h
+-   :functions: crypto_kpp
+-
+-.. kernel-doc:: include/crypto/kpp.h
+-   :functions: kpp_alg
+-
+-.. kernel-doc:: include/crypto/kpp.h
+-   :functions: kpp_secret
++   :functions: kpp_request crypto_kpp kpp_alg kpp_secret
  
- -  keysize: key size in bytes
-@@ -219,6 +222,9 @@ the aforementioned cipher types:
-    together with an IV generator (see geniv field in the /proc/crypto
-    listing for the known IV generators)
+ Key-agreement Protocol Primitives (KPP) Cipher API
+ --------------------------------------------------
+@@ -20,40 +11,13 @@ Key-agreement Protocol Primitives (KPP) Cipher API
+    :doc: Generic Key-agreement Protocol Primitives API
  
-+-  CRYPTO_ALG_TYPE_KPP Key-agreement Protocol Primitive (KPP) such as
-+   an ECDH or DH implementation
-+
- -  CRYPTO_ALG_TYPE_DIGEST Raw message digest
+ .. kernel-doc:: include/crypto/kpp.h
+-   :functions: crypto_alloc_kpp
+-
+-.. kernel-doc:: include/crypto/kpp.h
+-   :functions: crypto_free_kpp
+-
+-.. kernel-doc:: include/crypto/kpp.h
+-   :functions: crypto_kpp_set_secret
+-
+-.. kernel-doc:: include/crypto/kpp.h
+-   :functions: crypto_kpp_generate_public_key
+-
+-.. kernel-doc:: include/crypto/kpp.h
+-   :functions: crypto_kpp_compute_shared_secret
+-
+-.. kernel-doc:: include/crypto/kpp.h
+-   :functions: crypto_kpp_maxsize
++   :functions: crypto_alloc_kpp crypto_free_kpp crypto_kpp_set_secret crypto_kpp_generate_public_key crypto_kpp_compute_shared_secret crypto_kpp_maxsize
  
- -  CRYPTO_ALG_TYPE_HASH Alias for CRYPTO_ALG_TYPE_DIGEST
-diff --git a/include/crypto/dh.h b/include/crypto/dh.h
-index 5102a8f..6b424ad 100644
---- a/include/crypto/dh.h
-+++ b/include/crypto/dh.h
-@@ -13,6 +13,27 @@
- #ifndef _CRYPTO_DH_
- #define _CRYPTO_DH_
+ Key-agreement Protocol Primitives (KPP) Cipher Request Handle
+ -------------------------------------------------------------
  
-+/**
-+ * DOC: DH Helper Functions
-+ *
-+ * To use DH with the KPP cipher API, the following data structure and
-+ * functions should be used.
-+ *
-+ * To use DH with KPP, the following functions should be used to operate on
-+ * a DH private key. The packet private key that can be set with
-+ * the KPP API function call of crypto_kpp_set_secret.
-+ */
-+
-+/**
-+ * struct dh - define a DH private key
-+ *
-+ * @key:	Private DH key
-+ * @p:		Diffie-Hellman parameter P
-+ * @g:		Diffie-Hellman generator G
-+ * @key_size:	Size of the private DH key
-+ * @p_size:	Size of DH parameter P
-+ * @g_size:	Size of DH generator G
-+ */
- struct dh {
- 	void *key;
- 	void *p;
-@@ -22,8 +43,45 @@ struct dh {
- 	unsigned int g_size;
- };
+ .. kernel-doc:: include/crypto/kpp.h
+-   :functions: kpp_request_alloc
+-
+-.. kernel-doc:: include/crypto/kpp.h
+-   :functions: kpp_request_free
+-
+-.. kernel-doc:: include/crypto/kpp.h
+-   :functions: kpp_request_set_callback
+-
+-.. kernel-doc:: include/crypto/kpp.h
+-   :functions: kpp_request_set_input
+-
+-.. kernel-doc:: include/crypto/kpp.h
+-   :functions: kpp_request_set_output
++   :functions: kpp_request_alloc kpp_request_free kpp_request_set_callback kpp_request_set_input kpp_request_set_output
  
-+/**
-+ * crypto_dh_key_len() - Obtain the size of the private DH key
-+ * @params:	private DH key
-+ *
-+ * This function returns the packet DH key size. A caller can use that
-+ * with the provided DH private key reference to obtain the required
-+ * memory size to hold a packet key.
-+ *
-+ * Return: size of the key in bytes
-+ */
- int crypto_dh_key_len(const struct dh *params);
-+
-+/**
-+ * crypto_dh_encode_key() - encode the private key
-+ * @buf:	Buffer allocated by the caller to hold the packet DH
-+ *		private key. The buffer should be at least crypto_dh_key_len
-+ *		bytes in size.
-+ * @len:	Length of the packet private key buffer
-+ * @params:	Buffer with the caller-specified private key
-+ *
-+ * The DH implementations operate on a packet representation of the private
-+ * key.
-+ *
-+ * Return:	-EINVAL if buffer has insufficient size, 0 on success
-+ */
- int crypto_dh_encode_key(char *buf, unsigned int len, const struct dh *params);
-+
-+/**
-+ * crypto_dh_decode_key() - decode a private key
-+ * @buf:	Buffer holding a packet key that should be decoded
-+ * @len:	Lenth of the packet private key buffer
-+ * @params:	Buffer allocated by the caller that is filled with the
-+ *		unpacket DH private key.
-+ *
-+ * The unpacking obtains the private key by pointing @p to the correct location
-+ * in @buf. Thus, both pointers refer to the same memory.
-+ *
-+ * Return:	-EINVAL if buffer has insufficient size, 0 on success
-+ */
- int crypto_dh_decode_key(const char *buf, unsigned int len, struct dh *params);
+ ECDH Helper Functions
+ ---------------------
+@@ -62,16 +26,7 @@ ECDH Helper Functions
+    :doc: ECDH Helper Functions
  
- #endif
-diff --git a/include/crypto/ecdh.h b/include/crypto/ecdh.h
-index 84bad54..03a64f6 100644
---- a/include/crypto/ecdh.h
-+++ b/include/crypto/ecdh.h
-@@ -13,18 +13,76 @@
- #ifndef _CRYPTO_ECDH_
- #define _CRYPTO_ECDH_
+ .. kernel-doc:: include/crypto/ecdh.h
+-   :functions: ecdh
+-
+-.. kernel-doc:: include/crypto/ecdh.h
+-   :functions: crypto_ecdh_key_len
+-
+-.. kernel-doc:: include/crypto/ecdh.h
+-   :functions: crypto_ecdh_encode_key
+-
+-.. kernel-doc:: include/crypto/ecdh.h
+-   :functions: crypto_ecdh_decode_key
++   :functions: ecdh crypto_ecdh_key_len crypto_ecdh_encode_key crypto_ecdh_decode_key
  
-+/**
-+ * DOC: ECDH Helper Functions
-+ *
-+ * To use ECDH with the KPP cipher API, the following data structure and
-+ * functions should be used.
-+ *
-+ * The ECC curves known to the ECDH implementation are specified in this
-+ * header file.
-+ *
-+ * To use ECDH with KPP, the following functions should be used to operate on
-+ * an ECDH private key. The packet private key that can be set with
-+ * the KPP API function call of crypto_kpp_set_secret.
-+ */
-+
- /* Curves IDs */
- #define ECC_CURVE_NIST_P192	0x0001
- #define ECC_CURVE_NIST_P256	0x0002
+ DH Helper Functions
+ -------------------
+@@ -80,13 +35,4 @@ DH Helper Functions
+    :doc: DH Helper Functions
  
-+/**
-+ * struct ecdh - define an ECDH private key
-+ *
-+ * @curve_id:	ECC curve the key is based on.
-+ * @key:	Private ECDH key
-+ * @key_size:	Size of the private ECDH key
-+ */
- struct ecdh {
- 	unsigned short curve_id;
- 	char *key;
- 	unsigned short key_size;
- };
+ .. kernel-doc:: include/crypto/dh.h
+-   :functions: dh
+-
+-.. kernel-doc:: include/crypto/dh.h
+-   :functions: crypto_dh_key_len
+-
+-.. kernel-doc:: include/crypto/dh.h
+-   :functions: crypto_dh_encode_key
+-
+-.. kernel-doc:: include/crypto/dh.h
+-   :functions: crypto_dh_decode_key
++   :functions: dh crypto_dh_key_len crypto_dh_encode_key crypto_dh_decode_key
+diff --git a/Documentation/crypto/api-rng.rst b/Documentation/crypto/api-rng.rst
+index 0d7ee78..10ba743 100644
+--- a/Documentation/crypto/api-rng.rst
++++ b/Documentation/crypto/api-rng.rst
+@@ -11,22 +11,4 @@ Crypto API Random Number API
+    :doc: Random number generator API
  
-+/**
-+ * crypto_ecdh_key_len() - Obtain the size of the private ECDH key
-+ * @params:	private ECDH key
-+ *
-+ * This function returns the packet ECDH key size. A caller can use that
-+ * with the provided ECDH private key reference to obtain the required
-+ * memory size to hold a packet key.
-+ *
-+ * Return: size of the key in bytes
-+ */
- int crypto_ecdh_key_len(const struct ecdh *params);
-+
-+/**
-+ * crypto_ecdh_encode_key() - encode the private key
-+ * @buf:	Buffer allocated by the caller to hold the packet ECDH
-+ *		private key. The buffer should be at least crypto_ecdh_key_len
-+ *		bytes in size.
-+ * @len:	Length of the packet private key buffer
-+ * @p:		Buffer with the caller-specified private key
-+ *
-+ * The ECDH implementations operate on a packet representation of the private
-+ * key.
-+ *
-+ * Return:	-EINVAL if buffer has insufficient size, 0 on success
-+ */
- int crypto_ecdh_encode_key(char *buf, unsigned int len, const struct ecdh *p);
-+
-+/**
-+ * crypto_ecdh_decode_key() - decode a private key
-+ * @buf:	Buffer holding a packet key that should be decoded
-+ * @len:	Lenth of the packet private key buffer
-+ * @p:		Buffer allocated by the caller that is filled with the
-+ *		unpacket ECDH private key.
-+ *
-+ * The unpacking obtains the private key by pointing @p to the correct location
-+ * in @buf. Thus, both pointers refer to the same memory.
-+ *
-+ * Return:	-EINVAL if buffer has insufficient size, 0 on success
-+ */
- int crypto_ecdh_decode_key(const char *buf, unsigned int len, struct ecdh *p);
+ .. kernel-doc:: include/crypto/rng.h
+-   :functions: crypto_alloc_rng
+-
+-.. kernel-doc:: include/crypto/rng.h
+-   :functions: crypto_rng_alg
+-
+-.. kernel-doc:: include/crypto/rng.h
+-   :functions: crypto_free_rng
+-
+-.. kernel-doc:: include/crypto/rng.h
+-   :functions: crypto_rng_generate
+-
+-.. kernel-doc:: include/crypto/rng.h
+-   :functions: crypto_rng_get_bytes
+-
+-.. kernel-doc:: include/crypto/rng.h
+-   :functions: crypto_rng_reset
+-
+-.. kernel-doc:: include/crypto/rng.h
+-   :functions: crypto_rng_seedsize
++   :functions: crypto_alloc_rng crypto_rng_alg crypto_free_rng crypto_rng_generate crypto_rng_get_bytes crypto_rng_reset crypto_rng_seedsize
+diff --git a/Documentation/crypto/api-skcipher.rst b/Documentation/crypto/api-skcipher.rst
+index cd8830b..b20028a 100644
+--- a/Documentation/crypto/api-skcipher.rst
++++ b/Documentation/crypto/api-skcipher.rst
+@@ -5,16 +5,7 @@ Block Cipher Algorithm Definitions
+    :doc: Block Cipher Algorithm Definitions
  
- #endif
-diff --git a/include/crypto/kpp.h b/include/crypto/kpp.h
-index 30791f7..4307a2f 100644
---- a/include/crypto/kpp.h
-+++ b/include/crypto/kpp.h
-@@ -71,7 +71,7 @@ struct crypto_kpp {
-  *
-  * @reqsize:		Request context size required by algorithm
-  *			implementation
-- * @base		Common crypto API algorithm data structure
-+ * @base:		Common crypto API algorithm data structure
-  */
- struct kpp_alg {
- 	int (*set_secret)(struct crypto_kpp *tfm, void *buffer,
-@@ -89,7 +89,7 @@ struct kpp_alg {
- };
+ .. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_alg
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: ablkcipher_alg
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: blkcipher_alg
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: cipher_alg
++   :functions: crypto_alg ablkcipher_alg blkcipher_alg cipher_alg
  
- /**
-- * DOC: Generic Key-agreement Protocol Primitevs API
-+ * DOC: Generic Key-agreement Protocol Primitives API
-  *
-  * The KPP API is used with the algorithm type
-  * CRYPTO_ALG_TYPE_KPP (listed as type "kpp" in /proc/crypto)
-@@ -264,6 +264,12 @@ struct kpp_secret {
-  * Function invokes the specific kpp operation for a given alg.
-  *
-  * @tfm:	tfm handle
-+ * @buffer:	Buffer holding the packet representation of the private
-+ *		key. The structure of the packet key depends on the particular
-+ *		KPP implementation. Packing and unpacking helpers are provided
-+ *		for ECDH and DH (see the respective header files for those
-+ *		implementations).
-+ * @len:	Length of the packet private key buffer.
-  *
-  * Return: zero on success; error code in case of error
-  */
-@@ -279,7 +285,10 @@ static inline int crypto_kpp_set_secret(struct crypto_kpp *tfm, void *buffer,
-  * crypto_kpp_generate_public_key() - Invoke kpp operation
-  *
-  * Function invokes the specific kpp operation for generating the public part
-- * for a given kpp algorithm
-+ * for a given kpp algorithm.
-+ *
-+ * To generate a private key, the caller should use a random number generator.
-+ * The output of the requested length serves as the private key.
-  *
-  * @req:	kpp key request
-  *
+ Symmetric Key Cipher API
+ ------------------------
+@@ -23,31 +14,7 @@ Symmetric Key Cipher API
+    :doc: Symmetric Key Cipher API
+ 
+ .. kernel-doc:: include/crypto/skcipher.h
+-   :functions: crypto_alloc_skcipher
+-
+-.. kernel-doc:: include/crypto/skcipher.h
+-   :functions: crypto_free_skcipher
+-
+-.. kernel-doc:: include/crypto/skcipher.h
+-   :functions: crypto_has_skcipher
+-
+-.. kernel-doc:: include/crypto/skcipher.h
+-   :functions: crypto_skcipher_ivsize
+-
+-.. kernel-doc:: include/crypto/skcipher.h
+-   :functions: crypto_skcipher_blocksize
+-
+-.. kernel-doc:: include/crypto/skcipher.h
+-   :functions: crypto_skcipher_setkey
+-
+-.. kernel-doc:: include/crypto/skcipher.h
+-   :functions: crypto_skcipher_reqtfm
+-
+-.. kernel-doc:: include/crypto/skcipher.h
+-   :functions: crypto_skcipher_encrypt
+-
+-.. kernel-doc:: include/crypto/skcipher.h
+-   :functions: crypto_skcipher_decrypt
++   :functions: crypto_alloc_skcipher crypto_free_skcipher crypto_has_skcipher crypto_skcipher_ivsize crypto_skcipher_blocksize crypto_skcipher_setkey crypto_skcipher_reqtfm crypto_skcipher_encrypt crypto_skcipher_decrypt
+ 
+ Symmetric Key Cipher Request Handle
+ -----------------------------------
+@@ -56,22 +23,7 @@ Symmetric Key Cipher Request Handle
+    :doc: Symmetric Key Cipher Request Handle
+ 
+ .. kernel-doc:: include/crypto/skcipher.h
+-   :functions: crypto_skcipher_reqsize
+-
+-.. kernel-doc:: include/crypto/skcipher.h
+-   :functions: skcipher_request_set_tfm
+-
+-.. kernel-doc:: include/crypto/skcipher.h
+-   :functions: skcipher_request_alloc
+-
+-.. kernel-doc:: include/crypto/skcipher.h
+-   :functions: skcipher_request_free
+-
+-.. kernel-doc:: include/crypto/skcipher.h
+-   :functions: skcipher_request_set_callback
+-
+-.. kernel-doc:: include/crypto/skcipher.h
+-   :functions: skcipher_request_set_crypt
++   :functions: crypto_skcipher_reqsize skcipher_request_set_tfm skcipher_request_alloc skcipher_request_free skcipher_request_set_callback skcipher_request_set_crypt
+ 
+ Single Block Cipher API
+ -----------------------
+@@ -80,25 +32,7 @@ Single Block Cipher API
+    :doc: Single Block Cipher API
+ 
+ .. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_alloc_cipher
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_free_cipher
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_has_cipher
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_cipher_blocksize
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_cipher_setkey
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_cipher_encrypt_one
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_cipher_decrypt_one
++   :functions: crypto_alloc_cipher crypto_free_cipher crypto_has_cipher crypto_cipher_blocksize crypto_cipher_setkey crypto_cipher_encrypt_one crypto_cipher_decrypt_one
+ 
+ Asynchronous Block Cipher API - Deprecated
+ ------------------------------------------
+@@ -107,28 +41,7 @@ Asynchronous Block Cipher API - Deprecated
+    :doc: Asynchronous Block Cipher API
+ 
+ .. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_free_ablkcipher
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_has_ablkcipher
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_ablkcipher_ivsize
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_ablkcipher_blocksize
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_ablkcipher_setkey
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_ablkcipher_reqtfm
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_ablkcipher_encrypt
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_ablkcipher_decrypt
++   :functions: crypto_free_ablkcipher crypto_has_ablkcipher crypto_ablkcipher_ivsize crypto_ablkcipher_blocksize crypto_ablkcipher_setkey crypto_ablkcipher_reqtfm crypto_ablkcipher_encrypt crypto_ablkcipher_decrypt
+ 
+ Asynchronous Cipher Request Handle - Deprecated
+ -----------------------------------------------
+@@ -137,22 +50,7 @@ Asynchronous Cipher Request Handle - Deprecated
+    :doc: Asynchronous Cipher Request Handle
+ 
+ .. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_ablkcipher_reqsize
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: ablkcipher_request_set_tfm
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: ablkcipher_request_alloc
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: ablkcipher_request_free
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: ablkcipher_request_set_callback
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: ablkcipher_request_set_crypt
++   :functions: crypto_ablkcipher_reqsize ablkcipher_request_set_tfm ablkcipher_request_alloc ablkcipher_request_free ablkcipher_request_set_callback ablkcipher_request_set_crypt
+ 
+ Synchronous Block Cipher API - Deprecated
+ -----------------------------------------
+@@ -161,40 +59,4 @@ Synchronous Block Cipher API - Deprecated
+    :doc: Synchronous Block Cipher API
+ 
+ .. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_alloc_blkcipher
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_free_blkcipher
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_has_blkcipher
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_blkcipher_name
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_blkcipher_ivsize
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_blkcipher_blocksize
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_blkcipher_setkey
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_blkcipher_encrypt
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_blkcipher_encrypt_iv
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_blkcipher_decrypt
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_blkcipher_decrypt_iv
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_blkcipher_set_iv
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_blkcipher_get_iv
++   :functions: crypto_alloc_blkcipher rypto_free_blkcipher crypto_has_blkcipher crypto_blkcipher_name crypto_blkcipher_ivsize crypto_blkcipher_blocksize crypto_blkcipher_setkey crypto_blkcipher_encrypt crypto_blkcipher_encrypt_iv crypto_blkcipher_decrypt crypto_blkcipher_decrypt_iv crypto_blkcipher_set_iv crypto_blkcipher_get_iv
 -- 
 2.7.4
 
