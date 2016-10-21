@@ -1,202 +1,118 @@
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v10 3/8] crypto: acomp - add support for lzo via scomp
-Date: Fri, 21 Oct 2016 13:19:49 +0100
-Message-ID: <1477052394-19826-4-git-send-email-giovanni.cabiddu@intel.com>
-References: <1477052394-19826-1-git-send-email-giovanni.cabiddu@intel.com>
+Subject: [PATCH v10 0/8] crypto: asynchronous compression api
+Date: Fri, 21 Oct 2016 13:19:46 +0100
+Message-ID: <1477052394-19826-1-git-send-email-giovanni.cabiddu@intel.com>
 Cc: linux-crypto@vger.kernel.org,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:12348 "EHLO mga06.intel.com"
+Received: from mga06.intel.com ([134.134.136.31]:27712 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932713AbcJUMUL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Oct 2016 08:20:11 -0400
-In-Reply-To: <1477052394-19826-1-git-send-email-giovanni.cabiddu@intel.com>
+        id S932702AbcJUMUH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Oct 2016 08:20:07 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add scomp backend for lzo compression algorithm.
+The following patch set introduces acomp, a generic asynchronous
+(de)compression api with support for SG lists.
+We propose a new crypto type called crypto_acomp_type, a new struct acomp_alg
+and struct crypto_acomp, together with number of helper functions to register
+acomp type algorithms and allocate tfm instances.
+This interface will allow the following operations:
 
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+    int (*compress)(struct acomp_req *req);
+    int (*decompress)(struct acomp_req *req);
+
+Together with acomp we propose a new driver-side interface, scomp, which
+handles compression implementations which use linear buffers. We converted all
+compression algorithms available in LKCF to use this interface so that those
+algorithms will be accessible through the acomp api.
+
+Changes in v10:
+    - fixed build issues for configurations where CONFIG_CRYPTO_USER is defined
+
+Changes in v9:
+    - extended API to allow acomp layer to allocate (and free) output memory
+      if not provided by the user
+    - extended scomp layer to allocate (and free) output sg list if not
+      provided by the user
+
+Changes in v8:
+    - centralized per-cpu scratch buffers handling in scomp layer
+    - changed scomp internal API to use linear buffer (as in v6)
+
+Changes in v7:
+    - removed linearization of SG lists and per-request vmalloc allocations in
+      scomp layer
+    - modified scomp internal API to use SG lists
+    - introduced per-cpu cache of 128K scratch buffers allocated using vmalloc
+      in legacy scomp algorithms
+
+Changes in v6:
+    - changed acomp_request_alloc prototype by removing gfp parameter.
+      acomp_request_alloc will always use GFP_KERNEL
+
+Changes in v5:
+    - removed qdecompress api, no longer needed
+    - removed produced and consumed counters in acomp_req
+    - added crypto_has_acomp function
+
+Changes in v4:
+    - added qdecompress api, a front-end for decompression algorithms which
+      do not need additional vmalloc work space
+
+Changes in v3:
+    - added driver-side scomp interface
+    - provided support for lzo, lz4, lz4hc, 842, deflate compression algorithms
+      via the acomp api (through scomp)
+    - extended testmgr to support acomp
+    - removed extended acomp api for supporting deflate algorithm parameters
+      (will be enhanced and re-proposed in future)
+Note that (2) to (7) are a rework of Joonsoo Kim's scomp patches.
+
+Changes in v2:
+    - added compression and decompression request sizes in acomp_alg
+      in order to enable noctx support
+    - extended api with helpers to allocate compression and
+      decompression requests
+
+Changes from initial submit:
+    - added consumed and produced fields to acomp_req
+    - extended api to support configuration of deflate compressors
+
 ---
- crypto/Kconfig |  1 +
- crypto/lzo.c   | 97 +++++++++++++++++++++++++++++++++++++++++++++++++---------
- 2 files changed, 83 insertions(+), 15 deletions(-)
+Giovanni Cabiddu (8):
+  crypto: add asynchronous compression api
+  crypto: add driver-side scomp interface
+  crypto: acomp - add support for lzo via scomp
+  crypto: acomp - add support for lz4 via scomp
+  crypto: acomp - add support for lz4hc via scomp
+  crypto: acomp - add support for 842 via scomp
+  crypto: acomp - add support for deflate via scomp
+  crypto: acomp - update testmgr with support for acomp
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 9950c47..7ffd418 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1589,6 +1589,7 @@ config CRYPTO_DEFLATE
- config CRYPTO_LZO
- 	tristate "LZO compression algorithm"
- 	select CRYPTO_ALGAPI
-+	select CRYPTO_ACOMP2
- 	select LZO_COMPRESS
- 	select LZO_DECOMPRESS
- 	help
-diff --git a/crypto/lzo.c b/crypto/lzo.c
-index c3f3dd9..168df78 100644
---- a/crypto/lzo.c
-+++ b/crypto/lzo.c
-@@ -22,40 +22,55 @@
- #include <linux/vmalloc.h>
- #include <linux/mm.h>
- #include <linux/lzo.h>
-+#include <crypto/internal/scompress.h>
- 
- struct lzo_ctx {
- 	void *lzo_comp_mem;
- };
- 
-+static void *lzo_alloc_ctx(struct crypto_scomp *tfm)
-+{
-+	void *ctx;
-+
-+	ctx = kmalloc(LZO1X_MEM_COMPRESS, GFP_KERNEL | __GFP_NOWARN);
-+	if (!ctx)
-+		ctx = vmalloc(LZO1X_MEM_COMPRESS);
-+	if (!ctx)
-+		return ERR_PTR(-ENOMEM);
-+
-+	return ctx;
-+}
-+
- static int lzo_init(struct crypto_tfm *tfm)
- {
- 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	ctx->lzo_comp_mem = kmalloc(LZO1X_MEM_COMPRESS,
--				    GFP_KERNEL | __GFP_NOWARN);
--	if (!ctx->lzo_comp_mem)
--		ctx->lzo_comp_mem = vmalloc(LZO1X_MEM_COMPRESS);
--	if (!ctx->lzo_comp_mem)
-+	ctx->lzo_comp_mem = lzo_alloc_ctx(NULL);
-+	if (IS_ERR(ctx->lzo_comp_mem))
- 		return -ENOMEM;
- 
- 	return 0;
- }
- 
-+static void lzo_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+{
-+	kvfree(ctx);
-+}
-+
- static void lzo_exit(struct crypto_tfm *tfm)
- {
- 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	kvfree(ctx->lzo_comp_mem);
-+	lzo_free_ctx(NULL, ctx->lzo_comp_mem);
- }
- 
--static int lzo_compress(struct crypto_tfm *tfm, const u8 *src,
--			    unsigned int slen, u8 *dst, unsigned int *dlen)
-+static int __lzo_compress(const u8 *src, unsigned int slen,
-+			  u8 *dst, unsigned int *dlen, void *ctx)
- {
--	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
- 	size_t tmp_len = *dlen; /* size_t(ulong) <-> uint on 64 bit */
- 	int err;
- 
--	err = lzo1x_1_compress(src, slen, dst, &tmp_len, ctx->lzo_comp_mem);
-+	err = lzo1x_1_compress(src, slen, dst, &tmp_len, ctx);
- 
- 	if (err != LZO_E_OK)
- 		return -EINVAL;
-@@ -64,8 +79,23 @@ static int lzo_compress(struct crypto_tfm *tfm, const u8 *src,
- 	return 0;
- }
- 
--static int lzo_decompress(struct crypto_tfm *tfm, const u8 *src,
--			      unsigned int slen, u8 *dst, unsigned int *dlen)
-+static int lzo_compress(struct crypto_tfm *tfm, const u8 *src,
-+			unsigned int slen, u8 *dst, unsigned int *dlen)
-+{
-+	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	return __lzo_compress(src, slen, dst, dlen, ctx->lzo_comp_mem);
-+}
-+
-+static int lzo_scompress(struct crypto_scomp *tfm, const u8 *src,
-+			 unsigned int slen, u8 *dst, unsigned int *dlen,
-+			 void *ctx)
-+{
-+	return __lzo_compress(src, slen, dst, dlen, ctx);
-+}
-+
-+static int __lzo_decompress(const u8 *src, unsigned int slen,
-+			    u8 *dst, unsigned int *dlen)
- {
- 	int err;
- 	size_t tmp_len = *dlen; /* size_t(ulong) <-> uint on 64 bit */
-@@ -77,7 +107,19 @@ static int lzo_decompress(struct crypto_tfm *tfm, const u8 *src,
- 
- 	*dlen = tmp_len;
- 	return 0;
-+}
- 
-+static int lzo_decompress(struct crypto_tfm *tfm, const u8 *src,
-+			  unsigned int slen, u8 *dst, unsigned int *dlen)
-+{
-+	return __lzo_decompress(src, slen, dst, dlen);
-+}
-+
-+static int lzo_sdecompress(struct crypto_scomp *tfm, const u8 *src,
-+			   unsigned int slen, u8 *dst, unsigned int *dlen,
-+			   void *ctx)
-+{
-+	return __lzo_decompress(src, slen, dst, dlen);
- }
- 
- static struct crypto_alg alg = {
-@@ -88,18 +130,43 @@ static struct crypto_alg alg = {
- 	.cra_init		= lzo_init,
- 	.cra_exit		= lzo_exit,
- 	.cra_u			= { .compress = {
--	.coa_compress 		= lzo_compress,
--	.coa_decompress  	= lzo_decompress } }
-+	.coa_compress		= lzo_compress,
-+	.coa_decompress		= lzo_decompress } }
-+};
-+
-+static struct scomp_alg scomp = {
-+	.alloc_ctx		= lzo_alloc_ctx,
-+	.free_ctx		= lzo_free_ctx,
-+	.compress		= lzo_scompress,
-+	.decompress		= lzo_sdecompress,
-+	.base			= {
-+		.cra_name	= "lzo",
-+		.cra_driver_name = "lzo-scomp",
-+		.cra_module	 = THIS_MODULE,
-+	}
- };
- 
- static int __init lzo_mod_init(void)
- {
--	return crypto_register_alg(&alg);
-+	int ret;
-+
-+	ret = crypto_register_alg(&alg);
-+	if (ret)
-+		return ret;
-+
-+	ret = crypto_register_scomp(&scomp);
-+	if (ret) {
-+		crypto_unregister_alg(&alg);
-+		return ret;
-+	}
-+
-+	return ret;
- }
- 
- static void __exit lzo_mod_fini(void)
- {
- 	crypto_unregister_alg(&alg);
-+	crypto_unregister_scomp(&scomp);
- }
- 
- module_init(lzo_mod_init);
--- 
+ crypto/842.c                        |  81 +++++++-
+ crypto/Kconfig                      |  15 ++
+ crypto/Makefile                     |   3 +
+ crypto/acompress.c                  | 169 +++++++++++++++++
+ crypto/crypto_user.c                |  19 ++
+ crypto/deflate.c                    | 111 ++++++++++-
+ crypto/lz4.c                        |  91 ++++++++-
+ crypto/lz4hc.c                      |  92 +++++++++-
+ crypto/lzo.c                        |  97 ++++++++--
+ crypto/scompress.c                  | 356 ++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.c                    | 158 ++++++++++++++--
+ include/crypto/acompress.h          | 269 +++++++++++++++++++++++++++
+ include/crypto/internal/acompress.h |  81 ++++++++
+ include/crypto/internal/scompress.h | 136 ++++++++++++++
+ include/linux/crypto.h              |   3 +
+ include/uapi/linux/cryptouser.h     |   5 +
+ 16 files changed, 1626 insertions(+), 60 deletions(-)
+ create mode 100644 crypto/acompress.c
+ create mode 100644 crypto/scompress.c
+ create mode 100644 include/crypto/acompress.h
+ create mode 100644 include/crypto/internal/acompress.h
+ create mode 100644 include/crypto/internal/scompress.h
+
+--
 2.4.11
