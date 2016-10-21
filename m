@@ -1,101 +1,122 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2 7/8] crypto: doc - clarify AEAD memory structure
-Date: Fri, 21 Oct 2016 04:59:24 +0200
-Message-ID: <3596198.suv0AJ2MEx@positron.chronox.de>
+Subject: [PATCH v2 3/8] crypto: doc - fix source comments for Sphinx
+Date: Fri, 21 Oct 2016 04:57:27 +0200
+Message-ID: <4451330.b2KBXq9YI6@positron.chronox.de>
 References: <2053893.WjF01BJSDF@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        Harsh Jain <harshjain.prof@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
 To: herbert@gondor.apana.org.au
-Return-path: <linux-doc-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:53682 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752084AbcJUDBC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Oct 2016 23:01:02 -0400
 In-Reply-To: <2053893.WjF01BJSDF@positron.chronox.de>
-Sender: linux-doc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The previous description have been misleading and partially incorrect.
+Update comments to avoid any complaints from Sphinx during compilation.
 
-Reported-by: Harsh Jain <harshjain.prof@gmail.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/algif_aead.c   | 14 ++------------
- include/crypto/aead.h | 36 ++++++++++++------------------------
- 2 files changed, 14 insertions(+), 36 deletions(-)
+ include/crypto/aead.h     | 14 +++++++-------
+ include/crypto/hash.h     |  2 +-
+ include/crypto/skcipher.h |  4 ++--
+ include/linux/crypto.h    |  4 ++--
+ 4 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 80a0f1a..a0d8377 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -551,18 +551,8 @@ static int aead_recvmsg_sync(struct socket *sock, struct msghdr *msg, int flags)
- 	lock_sock(sk);
- 
- 	/*
--	 * AEAD memory structure: For encryption, the tag is appended to the
--	 * ciphertext which implies that the memory allocated for the ciphertext
--	 * must be increased by the tag length. For decryption, the tag
--	 * is expected to be concatenated to the ciphertext. The plaintext
--	 * therefore has a memory size of the ciphertext minus the tag length.
--	 *
--	 * The memory structure for cipher operation has the following
--	 * structure:
--	 *	AEAD encryption input:  assoc data || plaintext
--	 *	AEAD encryption output: cipherntext || auth tag
--	 *	AEAD decryption input:  assoc data || ciphertext || auth tag
--	 *	AEAD decryption output: plaintext
-+	 * Please see documentation of aead_request_set_crypt for the
-+	 * description of the AEAD memory structure expected from the caller.
- 	 */
- 
- 	if (ctx->more) {
 diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-index e725155..03b9762 100644
+index 12f8432..e725155 100644
 --- a/include/crypto/aead.h
 +++ b/include/crypto/aead.h
-@@ -483,30 +483,18 @@ static inline void aead_request_set_callback(struct aead_request *req,
-  * destination is the ciphertext. For a decryption operation, the use is
-  * reversed - the source is the ciphertext and the destination is the plaintext.
+@@ -55,14 +55,14 @@
+  * The scatter list pointing to the input data must contain:
   *
-- * For both src/dst the layout is associated data, plain/cipher text,
-- * authentication tag.
-- *
-- * The content of the AD in the destination buffer after processing
-- * will either be untouched, or it will contain a copy of the AD
-- * from the source buffer.  In order to ensure that it always has
-- * a copy of the AD, the user must copy the AD over either before
-- * or after processing.  Of course this is not relevant if the user
-- * is doing in-place processing where src == dst.
-- *
-- * IMPORTANT NOTE AEAD requires an authentication tag (MAC). For decryption,
-- *		  the caller must concatenate the ciphertext followed by the
-- *		  authentication tag and provide the entire data stream to the
-- *		  decryption operation (i.e. the data length used for the
-- *		  initialization of the scatterlist and the data length for the
-- *		  decryption operation is identical). For encryption, however,
-- *		  the authentication tag is created while encrypting the data.
-- *		  The destination buffer must hold sufficient space for the
-- *		  ciphertext and the authentication tag while the encryption
-- *		  invocation must only point to the plaintext data size. The
-- *		  following code snippet illustrates the memory usage
-- *		  buffer = kmalloc(ptbuflen + (enc ? authsize : 0));
-- *		  sg_init_one(&sg, buffer, ptbuflen + (enc ? authsize : 0));
-- *		  aead_request_set_crypt(req, &sg, &sg, ptbuflen, iv);
-+ * The memory structure for cipher operation has the following structure:
-+ *
-+ * - AEAD encryption input:  assoc data || plaintext
-+ * - AEAD encryption output: assoc data || cipherntext || auth tag
-+ * - AEAD decryption input:  assoc data || ciphertext || auth tag
-+ * - AEAD decryption output: assoc data || plaintext
-+ *
-+ * Albeit the kernel requires the presence of the AAD buffer, however,
-+ * the kernel does not fill the AAD buffer in the output case. If the
-+ * caller wants to have that data buffer filled, the caller must either
-+ * use an in-place cipher operation (i.e. same memory location for
-+ * input/output memory location).
+  * * for RFC4106 ciphers, the concatenation of
+- * associated authentication data || IV || plaintext or ciphertext. Note, the
+- * same IV (buffer) is also set with the aead_request_set_crypt call. Note,
+- * the API call of aead_request_set_ad must provide the length of the AAD and
+- * the IV. The API call of aead_request_set_crypt only points to the size of
+- * the input plaintext or ciphertext.
++ *   associated authentication data || IV || plaintext or ciphertext. Note, the
++ *   same IV (buffer) is also set with the aead_request_set_crypt call. Note,
++ *   the API call of aead_request_set_ad must provide the length of the AAD and
++ *   the IV. The API call of aead_request_set_crypt only points to the size of
++ *   the input plaintext or ciphertext.
+  *
+  * * for "normal" AEAD ciphers, the concatenation of
+- * associated authentication data || plaintext or ciphertext.
++ *   associated authentication data || plaintext or ciphertext.
+  *
+  * It is important to note that if multiple scatter gather list entries form
+  * the input data mentioned above, the first entry must not point to a NULL
+@@ -452,7 +452,7 @@ static inline void aead_request_free(struct aead_request *req)
+  * completes
+  *
+  * The callback function is registered with the aead_request handle and
+- * must comply with the following template
++ * must comply with the following template::
+  *
+  *	void callback_function(struct crypto_async_request *req, int error)
   */
- static inline void aead_request_set_crypt(struct aead_request *req,
- 					  struct scatterlist *src,
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 2660588..216a2b8 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -605,7 +605,7 @@ static inline struct ahash_request *ahash_request_cast(
+  * the cipher operation completes.
+  *
+  * The callback function is registered with the &ahash_request handle and
+- * must comply with the following template
++ * must comply with the following template::
+  *
+  *	void callback_function(struct crypto_async_request *req, int error)
+  */
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index cc4d98a..750b14f 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -516,7 +516,7 @@ static inline void skcipher_request_zero(struct skcipher_request *req)
+  * skcipher_request_set_callback() - set asynchronous callback function
+  * @req: request handle
+  * @flags: specify zero or an ORing of the flags
+- *         CRYPTO_TFM_REQ_MAY_BACKLOG the request queue may back log and
++ *	   CRYPTO_TFM_REQ_MAY_BACKLOG the request queue may back log and
+  *	   increase the wait queue beyond the initial maximum size;
+  *	   CRYPTO_TFM_REQ_MAY_SLEEP the request processing may sleep
+  * @compl: callback function pointer to be registered with the request handle
+@@ -533,7 +533,7 @@ static inline void skcipher_request_zero(struct skcipher_request *req)
+  * cipher operation completes.
+  *
+  * The callback function is registered with the skcipher_request handle and
+- * must comply with the following template
++ * must comply with the following template::
+  *
+  *	void callback_function(struct crypto_async_request *req, int error)
+  */
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 7cee555..faf8127 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -960,7 +960,7 @@ static inline void ablkcipher_request_free(struct ablkcipher_request *req)
+  * ablkcipher_request_set_callback() - set asynchronous callback function
+  * @req: request handle
+  * @flags: specify zero or an ORing of the flags
+- *         CRYPTO_TFM_REQ_MAY_BACKLOG the request queue may back log and
++ *	   CRYPTO_TFM_REQ_MAY_BACKLOG the request queue may back log and
+  *	   increase the wait queue beyond the initial maximum size;
+  *	   CRYPTO_TFM_REQ_MAY_SLEEP the request processing may sleep
+  * @compl: callback function pointer to be registered with the request handle
+@@ -977,7 +977,7 @@ static inline void ablkcipher_request_free(struct ablkcipher_request *req)
+  * cipher operation completes.
+  *
+  * The callback function is registered with the ablkcipher_request handle and
+- * must comply with the following template
++ * must comply with the following template::
+  *
+  *	void callback_function(struct crypto_async_request *req, int error)
+  */
 -- 
 2.7.4
-
-
