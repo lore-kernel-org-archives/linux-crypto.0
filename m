@@ -1,42 +1,76 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v9 1/8] crypto: add asynchronous compression api
-Date: Fri, 21 Oct 2016 10:55:18 +0800
-Message-ID: <20161021025518.GA22979@gondor.apana.org.au>
-References: <1475144342-1157-1-git-send-email-giovanni.cabiddu@intel.com>
- <1475144342-1157-2-git-send-email-giovanni.cabiddu@intel.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v2 4/8] crypto: doc - fix separation of cipher / req API
+Date: Fri, 21 Oct 2016 04:57:57 +0200
+Message-ID: <5095646.nMOEH1Url6@positron.chronox.de>
+References: <2053893.WjF01BJSDF@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:58563 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753532AbcJUCzY (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Oct 2016 22:55:24 -0400
-Content-Disposition: inline
-In-Reply-To: <1475144342-1157-2-git-send-email-giovanni.cabiddu@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <2053893.WjF01BJSDF@positron.chronox.de>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 29, 2016 at 11:18:55AM +0100, Giovanni Cabiddu wrote:
->
-> +	if (nla_put(skb, CRYPTOCFGA_REPORT_COMPRESS,
-> +		    sizeof(struct crypto_report_comp), &racomp))
-> +		goto nla_put_failure;
+Keep the cipher API and the request API function documentation in
+separate sections.
 
-This bit doesn't compile for me.  Please fix up and resubmit.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ Documentation/crypto/api-akcipher.rst | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-../crypto/crypto_user.c: In function ‘crypto_report_acomp’:
-../crypto/crypto_user.c:117:29: error: storage size of ‘racomp’ isn’t known
-../crypto/crypto_user.c:121:19: error: ‘CRYPTOCFGA_REPORT_ACOMPRESS’ undeclared (first use in this function)
-../crypto/crypto_user.c:121:19: note: each undeclared identifier is reported only once for each function it appears in
-../crypto/crypto_user.c:122:14: error: invalid application of ‘sizeof’ to incomplete type ‘struct crypto_report_acomp’
-../crypto/crypto_user.c:117:29: warning: unused variable ‘racomp’ [-Wunused-variable]
-
-Thanks,
+diff --git a/Documentation/crypto/api-akcipher.rst b/Documentation/crypto/api-akcipher.rst
+index 305e616..49e0ab6 100644
+--- a/Documentation/crypto/api-akcipher.rst
++++ b/Documentation/crypto/api-akcipher.rst
+@@ -25,32 +25,32 @@ Asymmetric Cipher API
+ .. kernel-doc:: include/crypto/akcipher.h
+    :functions: crypto_akcipher_set_priv_key
+ 
+-Asymmetric Cipher Request Handle
+---------------------------------
+-
+ .. kernel-doc:: include/crypto/akcipher.h
+-   :functions: akcipher_request_alloc
++   :functions: crypto_akcipher_maxsize
+ 
+ .. kernel-doc:: include/crypto/akcipher.h
+-   :functions: akcipher_request_free
++   :functions: crypto_akcipher_encrypt
+ 
+ .. kernel-doc:: include/crypto/akcipher.h
+-   :functions: akcipher_request_set_callback
++   :functions: crypto_akcipher_decrypt
+ 
+ .. kernel-doc:: include/crypto/akcipher.h
+-   :functions: akcipher_request_set_crypt
++   :functions: crypto_akcipher_sign
+ 
+ .. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_akcipher_maxsize
++   :functions: crypto_akcipher_verify
++
++Asymmetric Cipher Request Handle
++--------------------------------
+ 
+ .. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_akcipher_encrypt
++   :functions: akcipher_request_alloc
+ 
+ .. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_akcipher_decrypt
++   :functions: akcipher_request_free
+ 
+ .. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_akcipher_sign
++   :functions: akcipher_request_set_callback
+ 
+ .. kernel-doc:: include/crypto/akcipher.h
+-   :functions: crypto_akcipher_verify
++   :functions: akcipher_request_set_crypt
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.7.4
+
+
