@@ -1,34 +1,216 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH] padata: Remove unused but set variables
-Date: Fri, 21 Oct 2016 11:00:47 +0200
-Message-ID: <20161021090047.GO19080@gauss.secunet.com>
-References: <20161017101608.18007-1-tklauser@distanz.ch>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-To: Tobias Klauser <tklauser@distanz.ch>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v10 7/8] crypto: acomp - add support for deflate via scomp
+Date: Fri, 21 Oct 2016 13:19:53 +0100
+Message-ID: <1477052394-19826-8-git-send-email-giovanni.cabiddu@intel.com>
+References: <1477052394-19826-1-git-send-email-giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([62.96.220.36]:50961 "EHLO a.mx.secunet.com"
+Received: from mga06.intel.com ([134.134.136.31]:11630 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932090AbcJUJA5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Oct 2016 05:00:57 -0400
-Content-Disposition: inline
-In-Reply-To: <20161017101608.18007-1-tklauser@distanz.ch>
+        id S932739AbcJUMUP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Oct 2016 08:20:15 -0400
+In-Reply-To: <1477052394-19826-1-git-send-email-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Oct 17, 2016 at 12:16:08PM +0200, Tobias Klauser wrote:
-> Remove the unused but set variable pinst in padata_parallel_worker to
-> fix the following warning when building with 'W=1':
-> 
->   kernel/padata.c: In function ‘padata_parallel_worker’:
->   kernel/padata.c:68:26: warning: variable ‘pinst’ set but not used [-Wunused-but-set-variable]
-> 
-> Also remove the now unused variable pd which is only used to set pinst.
-> 
-> Signed-off-by: Tobias Klauser <tklauser@distanz.ch>
+Add scomp backend for deflate compression algorithm.
 
-Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ crypto/Kconfig   |   1 +
+ crypto/deflate.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 102 insertions(+), 10 deletions(-)
 
-Thanks!
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index b0718ce..1db2a19 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1578,6 +1578,7 @@ comment "Compression"
+ config CRYPTO_DEFLATE
+ 	tristate "Deflate compression algorithm"
+ 	select CRYPTO_ALGAPI
++	select CRYPTO_ACOMP2
+ 	select ZLIB_INFLATE
+ 	select ZLIB_DEFLATE
+ 	help
+diff --git a/crypto/deflate.c b/crypto/deflate.c
+index 95d8d37..f942cb3 100644
+--- a/crypto/deflate.c
++++ b/crypto/deflate.c
+@@ -32,6 +32,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/mm.h>
+ #include <linux/net.h>
++#include <crypto/internal/scompress.h>
+ 
+ #define DEFLATE_DEF_LEVEL		Z_DEFAULT_COMPRESSION
+ #define DEFLATE_DEF_WINBITS		11
+@@ -101,9 +102,8 @@ static void deflate_decomp_exit(struct deflate_ctx *ctx)
+ 	vfree(ctx->decomp_stream.workspace);
+ }
+ 
+-static int deflate_init(struct crypto_tfm *tfm)
++static int __deflate_init(void *ctx)
+ {
+-	struct deflate_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	int ret;
+ 
+ 	ret = deflate_comp_init(ctx);
+@@ -116,19 +116,55 @@ static int deflate_init(struct crypto_tfm *tfm)
+ 	return ret;
+ }
+ 
+-static void deflate_exit(struct crypto_tfm *tfm)
++static void *deflate_alloc_ctx(struct crypto_scomp *tfm)
++{
++	struct deflate_ctx *ctx;
++	int ret;
++
++	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
++	if (!ctx)
++		return ERR_PTR(-ENOMEM);
++
++	ret = __deflate_init(ctx);
++	if (ret) {
++		kfree(ctx);
++		return ERR_PTR(ret);
++	}
++
++	return ctx;
++}
++
++static int deflate_init(struct crypto_tfm *tfm)
+ {
+ 	struct deflate_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
++	return __deflate_init(ctx);
++}
++
++static void __deflate_exit(void *ctx)
++{
+ 	deflate_comp_exit(ctx);
+ 	deflate_decomp_exit(ctx);
+ }
+ 
+-static int deflate_compress(struct crypto_tfm *tfm, const u8 *src,
+-			    unsigned int slen, u8 *dst, unsigned int *dlen)
++static void deflate_free_ctx(struct crypto_scomp *tfm, void *ctx)
++{
++	__deflate_exit(ctx);
++	kzfree(ctx);
++}
++
++static void deflate_exit(struct crypto_tfm *tfm)
++{
++	struct deflate_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	__deflate_exit(ctx);
++}
++
++static int __deflate_compress(const u8 *src, unsigned int slen,
++			      u8 *dst, unsigned int *dlen, void *ctx)
+ {
+ 	int ret = 0;
+-	struct deflate_ctx *dctx = crypto_tfm_ctx(tfm);
++	struct deflate_ctx *dctx = ctx;
+ 	struct z_stream_s *stream = &dctx->comp_stream;
+ 
+ 	ret = zlib_deflateReset(stream);
+@@ -153,12 +189,27 @@ static int deflate_compress(struct crypto_tfm *tfm, const u8 *src,
+ 	return ret;
+ }
+ 
+-static int deflate_decompress(struct crypto_tfm *tfm, const u8 *src,
+-			      unsigned int slen, u8 *dst, unsigned int *dlen)
++static int deflate_compress(struct crypto_tfm *tfm, const u8 *src,
++			    unsigned int slen, u8 *dst, unsigned int *dlen)
++{
++	struct deflate_ctx *dctx = crypto_tfm_ctx(tfm);
++
++	return __deflate_compress(src, slen, dst, dlen, dctx);
++}
++
++static int deflate_scompress(struct crypto_scomp *tfm, const u8 *src,
++			     unsigned int slen, u8 *dst, unsigned int *dlen,
++			     void *ctx)
++{
++	return __deflate_compress(src, slen, dst, dlen, ctx);
++}
++
++static int __deflate_decompress(const u8 *src, unsigned int slen,
++				u8 *dst, unsigned int *dlen, void *ctx)
+ {
+ 
+ 	int ret = 0;
+-	struct deflate_ctx *dctx = crypto_tfm_ctx(tfm);
++	struct deflate_ctx *dctx = ctx;
+ 	struct z_stream_s *stream = &dctx->decomp_stream;
+ 
+ 	ret = zlib_inflateReset(stream);
+@@ -194,6 +245,21 @@ static int deflate_decompress(struct crypto_tfm *tfm, const u8 *src,
+ 	return ret;
+ }
+ 
++static int deflate_decompress(struct crypto_tfm *tfm, const u8 *src,
++			      unsigned int slen, u8 *dst, unsigned int *dlen)
++{
++	struct deflate_ctx *dctx = crypto_tfm_ctx(tfm);
++
++	return __deflate_decompress(src, slen, dst, dlen, dctx);
++}
++
++static int deflate_sdecompress(struct crypto_scomp *tfm, const u8 *src,
++			       unsigned int slen, u8 *dst, unsigned int *dlen,
++			       void *ctx)
++{
++	return __deflate_decompress(src, slen, dst, dlen, ctx);
++}
++
+ static struct crypto_alg alg = {
+ 	.cra_name		= "deflate",
+ 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
+@@ -206,14 +272,39 @@ static struct crypto_alg alg = {
+ 	.coa_decompress  	= deflate_decompress } }
+ };
+ 
++static struct scomp_alg scomp = {
++	.alloc_ctx		= deflate_alloc_ctx,
++	.free_ctx		= deflate_free_ctx,
++	.compress		= deflate_scompress,
++	.decompress		= deflate_sdecompress,
++	.base			= {
++		.cra_name	= "deflate",
++		.cra_driver_name = "deflate-scomp",
++		.cra_module	 = THIS_MODULE,
++	}
++};
++
+ static int __init deflate_mod_init(void)
+ {
+-	return crypto_register_alg(&alg);
++	int ret;
++
++	ret = crypto_register_alg(&alg);
++	if (ret)
++		return ret;
++
++	ret = crypto_register_scomp(&scomp);
++	if (ret) {
++		crypto_unregister_alg(&alg);
++		return ret;
++	}
++
++	return ret;
+ }
+ 
+ static void __exit deflate_mod_fini(void)
+ {
+ 	crypto_unregister_alg(&alg);
++	crypto_unregister_scomp(&scomp);
+ }
+ 
+ module_init(deflate_mod_init);
+-- 
+2.4.11
