@@ -1,38 +1,35 @@
-From: Camilia Brunnet <info@bluesky.com>
-Subject: Talent Scout
-Date: Sat, 22 Oct 2016 18:31:25 +0100
-Message-ID: <20161022173143.A2D324042BD6E__27347.3961315633$1477160371$gmane$org@zmx05.ifxnetworks.com>
-Reply-To: blueskystudios@usa.com
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [ANNOUNCE] /dev/random - a new approach code for 4.9-rc1
+Date: Sun, 23 Oct 2016 01:54:23 +0200
+Message-ID: <3165606.PaOa21LjIP@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-To: Recipients <info@bluesky.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zmx05.ifxnetworks.com ([216.241.30.11]:42142 "EHLO
-        zmx05.ifxnetworks.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S964870AbcJVSTO (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Oct 2016 14:19:14 -0400
-Content-Description: Mail message body
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Dear Concern,
+Hi,
 
-I am Talent Scout For BLUE SKY FILM STUDIO, Present Blue sky Studio a
-Film Corporation Located in the United State, is Soliciting for the
-Right to use Your Photo/Face and Personality as One of the Semi -Major
-Role/ Character in our Upcoming ANIMATED Stereoscope 3D Movie-The Story
-of Ferdinand (Ferdinand 2017) The Movie is Currently Filming (In
-Production) Please Note That There Will Be No Auditions, Traveling or
-Any Special / Professional Acting Skills, Since the Production of This
-Movie Will Be Done with our State of Art Computer -Generating Imagery
-Equipment. We Are Prepared to Pay the Total Sum of $620,000.00 USD. For
-More Information/Understanding, Please Write us on the E-Mail Below.
-CONTACT EMAIL: blueskystudios@usa.com
-All Reply to:  blueskystudios@usa.com
-Note: Only the Response send to this mail will be Given a Prior
-Consideration.
+The patch set that can be downloaded at [1] provides a different approach to /
+dev/random which I call Linux Random Number Generator (LRNG) to collect 
+entropy within the Linux kernel. The main improvements compared to the legacy 
+/dev/random is to provide sufficient entropy during boot time as well as in 
+virtual environments and when using SSDs or Device Mapper targets. A secondary 
+design goal is to limit the impact of the entropy collection on massive 
+parallel systems and also allow the use accelerated cryptographic primitives. 
+Also, all steps of the entropic data processing are testable. Finally 
+performance improvements are visible at /dev/urandom and get_random_bytes.
 
-Talent Scout
-Camilia Brunnet
+The design and implementation is driven by a set of goals described in [2]
+that the LRNG completely implements. Furthermore, [2] includes a
+comparison with RNG design suggestions such as SP800-90B, SP800-90C, and
+AIS20/31.
+
+[1] http://www.chronox.de/lrng.html
+
+[2] http://www.chronox.de/lrng/doc/lrng.pdf
+
+Ciao
+Stephan
