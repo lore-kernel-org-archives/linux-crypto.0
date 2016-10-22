@@ -1,17 +1,18 @@
-From: Camilia Brunnet <antonieta.urbina@cnm.gob.pe>
+From: Camilia Brunnet <info@bluesky.com>
 Subject: Talent Scout
-Date: Sat, 22 Oct 2016 18:27:16 +0100
-Message-ID: <20161022172749.70C26E87ED5__36253.4259948463$1477158283$gmane$org@mail.cnm.gob.pe>
+Date: Sat, 22 Oct 2016 18:31:25 +0100
+Message-ID: <20161022173143.A2D324042BD6E__27347.3961315633$1477160371$gmane$org@zmx05.ifxnetworks.com>
 Reply-To: blueskystudios@usa.com
 Mime-Version: 1.0
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: 8BIT
-To: Recipients <antonieta.urbina@cnm.gob.pe>
+To: Recipients <info@bluesky.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.cnm.gob.pe ([191.98.149.88]:44664 "EHLO mail.cnm.gob.pe"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S964798AbcJVRoF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Oct 2016 13:44:05 -0400
+Received: from zmx05.ifxnetworks.com ([216.241.30.11]:42142 "EHLO
+        zmx05.ifxnetworks.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S964870AbcJVSTO (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 22 Oct 2016 14:19:14 -0400
 Content-Description: Mail message body
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
