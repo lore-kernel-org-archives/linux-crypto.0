@@ -1,81 +1,69 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH] nvmem: sunxi-sid: SID content is not a valid source of randomness
-Date: Sat, 22 Oct 2016 15:53:28 +0200
-Message-ID: <1477144408-15896-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        Corentin Labbe <clabbe.montjoie@gmail.com>
-To: srinivas.kandagatla@linaro.org, maxime.ripard@free-electrons.com,
-        wens@csie.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH] hwrng: core - zeroize buffers with random data
+Date: Sat, 22 Oct 2016 15:57:05 +0200
+Message-ID: <5934786.pstHyKoYpf@positron.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:46282 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934258AbcJVN5K (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 22 Oct 2016 09:57:10 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Since SID's content is constant over reboot, it must not be used
-as source of randomness.
+Hi Herbert,
 
-This patch remove the use of SID content as source of randomness.
+As requested by Andy, I have created the following patch. This patch is against the cryptodev-2.6 tree and applies cleanly. However, due to Andy's patch to Linus' tree, the patch will fail to apply to that tree.
 
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+How would you want to proceed? Do you want to pull Andy's patch into your cryptodev-2.6 tree which means I will rework the patch?
+
+Thanks
+Stephan
+
+---8<---
+
+The HWRNG core allocates two buffers during initialization which are
+used to obtain random data. After that data is processed, it is now
+zeroized as it is possible that the HWRNG core will not be asked to
+produce more random data for a long time. This prevents leaving such
+sensitive data in memory.
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/nvmem/sunxi_sid.c | 21 ---------------------
- 1 file changed, 21 deletions(-)
+ drivers/char/hw_random/core.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/nvmem/sunxi_sid.c b/drivers/nvmem/sunxi_sid.c
-index 1567ccc..c82d5d1 100644
---- a/drivers/nvmem/sunxi_sid.c
-+++ b/drivers/nvmem/sunxi_sid.c
-@@ -21,8 +21,6 @@
- #include <linux/nvmem-provider.h>
- #include <linux/of.h>
- #include <linux/platform_device.h>
--#include <linux/slab.h>
--#include <linux/random.h>
- 
- static struct nvmem_config econfig = {
- 	.name = "sunxi-sid",
-@@ -70,8 +68,6 @@ static int sunxi_sid_probe(struct platform_device *pdev)
- 	struct resource *res;
- 	struct nvmem_device *nvmem;
- 	struct sunxi_sid *sid;
--	int ret, i, size;
--	char *randomness;
- 
- 	sid = devm_kzalloc(dev, sizeof(*sid), GFP_KERNEL);
- 	if (!sid)
-@@ -82,7 +78,6 @@ static int sunxi_sid_probe(struct platform_device *pdev)
- 	if (IS_ERR(sid->base))
- 		return PTR_ERR(sid->base);
- 
--	size = resource_size(res) - 1;
- 	econfig.size = resource_size(res);
- 	econfig.dev = dev;
- 	econfig.reg_read = sunxi_sid_read;
-@@ -91,25 +86,9 @@ static int sunxi_sid_probe(struct platform_device *pdev)
- 	if (IS_ERR(nvmem))
- 		return PTR_ERR(nvmem);
- 
--	randomness = kzalloc(sizeof(u8) * (size), GFP_KERNEL);
--	if (!randomness) {
--		ret = -EINVAL;
--		goto err_unreg_nvmem;
--	}
--
--	for (i = 0; i < size; i++)
--		randomness[i] = sunxi_sid_read_byte(sid, i);
--
--	add_device_randomness(randomness, size);
--	kfree(randomness);
--
- 	platform_set_drvdata(pdev, nvmem);
- 
- 	return 0;
--
--err_unreg_nvmem:
--	nvmem_unregister(nvmem);
--	return ret;
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index d2d2c89..f976641 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -92,6 +92,7 @@ static void add_early_randomness(struct hwrng *rng)
+ 	mutex_unlock(&reading_mutex);
+ 	if (bytes_read > 0)
+ 		add_device_randomness(rng_buffer, bytes_read);
++	memset(rng_buffer, 0, size);
  }
  
- static int sunxi_sid_remove(struct platform_device *pdev)
+ static inline void cleanup_rng(struct kref *kref)
+@@ -287,6 +288,7 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
+ 		}
+ 	}
+ out:
++	memset(rng_buffer, 0, rng_buffer_size());
+ 	return ret ? : err;
+ 
+ out_unlock_reading:
+@@ -425,6 +427,7 @@ static int hwrng_fillfn(void *unused)
+ 		/* Outside lock, sure, but y'know: randomness. */
+ 		add_hwgenerator_randomness((void *)rng_fillbuf, rc,
+ 					   rc * current_quality * 8 >> 10);
++		memset(rng_fillbuf, 0, rng_buffer_size());
+ 	}
+ 	hwrng_fill = NULL;
+ 	return 0;
 -- 
-2.7.3
+2.7.4
