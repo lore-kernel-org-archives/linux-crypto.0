@@ -1,35 +1,31 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [ANNOUNCE] /dev/random - a new approach code for 4.9-rc1
-Date: Sun, 23 Oct 2016 01:54:23 +0200
-Message-ID: <3165606.PaOa21LjIP@positron.chronox.de>
+From: Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH v2 0/8] Conversion crypto API documentation to Sphinx
+Date: Sun, 23 Oct 2016 10:32:38 -0600
+Message-ID: <20161023103238.4fceddac@lwn.net>
+References: <2053893.WjF01BJSDF@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <2053893.WjF01BJSDF@positron.chronox.de>
+Sender: linux-doc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+On Fri, 21 Oct 2016 04:53:45 +0200
+Stephan Mueller <smueller@chronox.de> wrote:
 
-The patch set that can be downloaded at [1] provides a different approach to /
-dev/random which I call Linux Random Number Generator (LRNG) to collect 
-entropy within the Linux kernel. The main improvements compared to the legacy 
-/dev/random is to provide sufficient entropy during boot time as well as in 
-virtual environments and when using SSDs or Device Mapper targets. A secondary 
-design goal is to limit the impact of the entropy collection on massive 
-parallel systems and also allow the use accelerated cryptographic primitives. 
-Also, all steps of the entropic data processing are testable. Finally 
-performance improvements are visible at /dev/urandom and get_random_bytes.
+> the attached patch set converts the existing crypto API documentation
+> from DocBook to Sphinx.
 
-The design and implementation is driven by a set of goals described in [2]
-that the LRNG completely implements. Furthermore, [2] includes a
-comparison with RNG design suggestions such as SP800-90B, SP800-90C, and
-AIS20/31.
+This looks generally good to me - thanks for doing it!
 
-[1] http://www.chronox.de/lrng.html
+Is there any chance of running the Documentation/ parts through the docs
+tree?  Documentation/index.rst has become a bit of a conflict point
+otherwise...
 
-[2] http://www.chronox.de/lrng/doc/lrng.pdf
+Thanks,
 
-Ciao
-Stephan
+jon
