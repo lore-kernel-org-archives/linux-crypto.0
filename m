@@ -1,18 +1,18 @@
 From: Fabio Estevam <festevam@gmail.com>
-Subject: [PATCH] crypto: mxs-dcp - Remove hash support
-Date: Mon, 24 Oct 2016 14:40:26 -0200
-Message-ID: <1477327226-2904-1-git-send-email-festevam@gmail.com>
+Subject: [PATCH v2] crypto: mxs-dcp - Remove hash support
+Date: Mon, 24 Oct 2016 14:43:14 -0200
+Message-ID: <1477327394-2976-1-git-send-email-festevam@gmail.com>
 Cc: marex@denx.de, gianfranco.costamagna@abinsula.com,
         linux-crypto@vger.kernel.org, Fabio Estevam <fabio.estevam@nxp.com>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qk0-f196.google.com ([209.85.220.196]:36513 "EHLO
-        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934166AbcJXSlB (ORCPT
+Received: from mail-qt0-f193.google.com ([209.85.216.193]:32942 "EHLO
+        mail-qt0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754187AbcJXSnq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Oct 2016 14:41:01 -0400
-Received: by mail-qk0-f196.google.com with SMTP id z190so13754011qkc.3
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Oct 2016 11:41:00 -0700 (PDT)
+        Mon, 24 Oct 2016 14:43:46 -0400
+Received: by mail-qt0-f193.google.com with SMTP id 12so26964qtm.0
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Oct 2016 11:43:45 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -24,7 +24,7 @@ mxs-dcp 80028000.dcp: Failed to register sha1 hash!
 mxs-dcp: probe of 80028000.dcp failed with error -22
 
 There were some previous attempts to fix this, and the following
-feedback was given by Herbert Xu's [1]:
+feedback was given by Herbert Xu [1]:
 
 "This driver is hopelessly broken as its request context doesn't
 contain the hash state at all.  Unless someone can fix that we
@@ -36,6 +36,9 @@ So remove the hash support for now.
 
 Signed-off-by: Fabio Estevam <fabio.estevam@nxp.com>
 ---
+Changes since v1:
+- Fix typo in commit log
+
  drivers/crypto/mxs-dcp.c | 367 +----------------------------------------------
  1 file changed, 2 insertions(+), 365 deletions(-)
 
