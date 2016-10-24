@@ -1,104 +1,31 @@
-From: Wenyou Yang <wenyou.yang@atmel.com>
-Subject: [PATCH v2] char: hw_random: atmel-rng: disable TRNG during suspend
-Date: Tue, 25 Oct 2016 08:56:33 +0800
-Message-ID: <1477356993-27778-1-git-send-email-wenyou.yang@atmel.com>
+From: Cata Vasile <cata.vasile@nxp.com>
+Subject: ARM-CE aes encryption on uneven blocks
+Date: Mon, 24 Oct 2016 14:41:11 +0000
+Message-ID: <HE1PR04MB13065DBD6C9844835123FAF9EEA90@HE1PR04MB1306.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>,
-        Wenyou Yang <wenyou.yang@microchip.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Nicolas Ferre <nicolas.ferre@atmel.com>,
-        Wenyou Yang <wenyou.yang@atmel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Matt Mackall <mpm@selenic.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from eusmtp01.atmel.com ([212.144.249.242]:28741 "EHLO
-        eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755190AbcJYBAL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Oct 2016 21:00:11 -0400
+Received: from mail-db5eur01on0074.outbound.protection.outlook.com ([104.47.2.74]:33606
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754175AbcJYBQa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Oct 2016 21:16:30 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-To fix the over consumption on the VDDCore due to the TRNG enabled,
-disable the TRNG during suspend, not only disable the user interface
-clock (which is controlled by PMC). Because the user interface clock
-is independent from any clock that may be used in the entropy source
-logic circuitry.
 
-Signed-off-by: Wenyou Yang <wenyou.yang@atmel.com>
----
+Hi,
 
-Changes in v2:
- - Enable the user interface first, then enable the internal clock
-   when resume.
+I'm trying to understand the code for AES encryption from ARM-CE.
+>From the aes-glue.S calls I understand that the encryption primitives recei=
+ve the number of blocks, but have no way of determining the number of bytes=
+ to encrypt, if for example the plaintext does not have a length of a multi=
+ple of AES block size.
+How does, for example, ecb_encrypt() also encrypt the last remaining bytes =
+in the plaintext if it is not a multiple of AES block size if It can never =
+deduce the full plaintext size?
 
- drivers/char/hw_random/atmel-rng.c | 24 +++++++++++++++++++++---
- 1 file changed, 21 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
-index 0fcc9e6..ae7cae5 100644
---- a/drivers/char/hw_random/atmel-rng.c
-+++ b/drivers/char/hw_random/atmel-rng.c
-@@ -48,6 +48,16 @@ static int atmel_trng_read(struct hwrng *rng, void *buf, size_t max,
- 		return 0;
- }
- 
-+static void atmel_trng_enable(struct atmel_trng *trng)
-+{
-+	writel(TRNG_KEY | 1, trng->base + TRNG_CR);
-+}
-+
-+static void atmel_trng_disable(struct atmel_trng *trng)
-+{
-+	writel(TRNG_KEY, trng->base + TRNG_CR);
-+}
-+
- static int atmel_trng_probe(struct platform_device *pdev)
- {
- 	struct atmel_trng *trng;
-@@ -71,7 +81,7 @@ static int atmel_trng_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
- 
--	writel(TRNG_KEY | 1, trng->base + TRNG_CR);
-+	atmel_trng_enable(trng);
- 	trng->rng.name = pdev->name;
- 	trng->rng.read = atmel_trng_read;
- 
-@@ -94,7 +104,7 @@ static int atmel_trng_remove(struct platform_device *pdev)
- 
- 	hwrng_unregister(&trng->rng);
- 
--	writel(TRNG_KEY, trng->base + TRNG_CR);
-+	atmel_trng_disable(trng);
- 	clk_disable_unprepare(trng->clk);
- 
- 	return 0;
-@@ -105,6 +115,7 @@ static int atmel_trng_suspend(struct device *dev)
- {
- 	struct atmel_trng *trng = dev_get_drvdata(dev);
- 
-+	atmel_trng_disable(trng);
- 	clk_disable_unprepare(trng->clk);
- 
- 	return 0;
-@@ -113,8 +124,15 @@ static int atmel_trng_suspend(struct device *dev)
- static int atmel_trng_resume(struct device *dev)
- {
- 	struct atmel_trng *trng = dev_get_drvdata(dev);
-+	int ret;
-+
-+	ret = clk_prepare_enable(trng->clk);
-+	if (ret)
-+		return ret;
- 
--	return clk_prepare_enable(trng->clk);
-+	atmel_trng_enable(trng);
-+
-+	return 0;
- }
- 
- static const struct dev_pm_ops atmel_trng_pm_ops = {
--- 
-2.7.4
+Catalin Vasile=
