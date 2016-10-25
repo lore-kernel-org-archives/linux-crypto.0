@@ -1,36 +1,23 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] hwrng: meson: Remove unneeded platform MODULE_ALIAS
-Date: Tue, 25 Oct 2016 11:43:41 +0800
-Message-ID: <20161025034341.GI18685@gondor.apana.org.au>
-References: <1476906618-14455-1-git-send-email-javier@osg.samsung.com>
+Subject: Re: [PATCH][TRIVIAL] crypto: ccp - fix typo "CPP"
+Date: Tue, 25 Oct 2016 11:46:30 +0800
+Message-ID: <20161025034630.GA18918@gondor.apana.org.au>
+References: <1476991259-4061-1-git-send-email-pebolle@tiscali.nl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, Kevin Hilman <khilman@baylibre.com>,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Carlo Caione <carlo@caione.org>,
-        linux-amlogic@lists.infradead.org, Matt Mackall <mpm@selenic.com>,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-To: Javier Martinez Canillas <javier@osg.samsung.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44204 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752330AbcJYDoS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Oct 2016 23:44:18 -0400
+Cc: trivial@kernel.org, thomas.lendacky@amd.com, gary.hook@amd.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Paul Bolle <pebolle@tiscali.nl>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1476906618-14455-1-git-send-email-javier@osg.samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1476991259-4061-1-git-send-email-pebolle@tiscali.nl>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Oct 19, 2016 at 04:50:18PM -0300, Javier Martinez Canillas wrote:
-> The Amlogic Meson is a DT-only platform, which means the devices are
-> registered via OF and not using the legacy platform devices support.
+Paul Bolle <pebolle@tiscali.nl> wrote:
+> The abbreviation for Cryptographic Coprocessor is "CCP".
 > 
-> So there's no need to have a MODULE_ALIAS("platform:meson-rng") since
-> the reported uevent MODALIAS to user-space will always be the OF one.
-> 
-> Signed-off-by: Javier Martinez Canillas <javier@osg.samsung.com>
+> Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
 
 Patch applied.  Thanks.
 -- 
