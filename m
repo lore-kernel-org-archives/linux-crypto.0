@@ -1,31 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp - Clean up the LSB slot allocation code
-Date: Tue, 25 Oct 2016 11:43:04 +0800
-Message-ID: <20161025034304.GG18685@gondor.apana.org.au>
-References: <147683001790.8273.9550490485955104780.stgit@taos.amd.com>
+Subject: Re: [PATCH] crypto: engine - Handle the kthread worker using the new
+ API
+Date: Tue, 25 Oct 2016 11:43:18 +0800
+Message-ID: <20161025034318.GH18685@gondor.apana.org.au>
+References: <1476878070-12024-1-git-send-email-pmladek@suse.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
-        davem@davemloft.net
-To: Gary R Hook <gary.hook@amd.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:45045 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752169AbcJYDnH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Oct 2016 23:43:07 -0400
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Tejun Heo <tj@kernel.org>,
+        linux-kernel@vger.kernel.org
+To: Petr Mladek <pmladek@suse.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <147683001790.8273.9550490485955104780.stgit@taos.amd.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1476878070-12024-1-git-send-email-pmladek@suse.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 18, 2016 at 05:33:37PM -0500, Gary R Hook wrote:
-> Fix a few problems revealed by testing: verify consistent
-> units, especially in public slot allocation. Percolate
-> some common initialization code up to a common routine.
-> Add some comments.
+On Wed, Oct 19, 2016 at 01:54:30PM +0200, Petr Mladek wrote:
+> Use the new API to create and destroy the crypto engine kthread
+> worker. The API hides some implementation details.
 > 
-> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+> In particular, kthread_create_worker() allocates and initializes
+> struct kthread_worker. It runs the kthread the right way
+> and stores task_struct into the worker structure.
+> 
+> kthread_destroy_worker() flushes all pending works, stops
+> the kthread and frees the structure.
+> 
+> This patch does not change the existing behavior except for
+> dynamically allocating struct kthread_worker and storing
+> only the pointer of this structure.
+> 
+> It is compile tested only because I did not find an easy
+> way how to run the code. Well, it should be pretty safe
+> given the nature of the change.
+> 
+> Signed-off-by: Petr Mladek <pmladek@suse.com>
 
 Patch applied.  Thanks.
 -- 
