@@ -1,83 +1,104 @@
-From: <Wenyou.Yang@microchip.com>
-Subject: RE: [PATCH v1] char: hw_random: atmel-rng: disable TRNG during
- suspend
-Date: Tue, 25 Oct 2016 00:48:42 +0000
-Message-ID: <F9F4555C4E01D7469D37975B62D0EFBB414538@CHN-SV-EXMX07.mchp-main.com>
-References: <1477296208-28335-1-git-send-email-wenyou.yang@atmel.com>
- <b0554c1e-e13a-9fe3-ebf4-5d8b0aa16b15@atmel.com>
+From: Wenyou Yang <wenyou.yang@atmel.com>
+Subject: [PATCH v2] char: hw_random: atmel-rng: disable TRNG during suspend
+Date: Tue, 25 Oct 2016 08:56:33 +0800
+Message-ID: <1477356993-27778-1-git-send-email-wenyou.yang@atmel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-To: <nicolas.ferre@atmel.com>, <herbert@gondor.apana.org.au>,
-        <mpm@selenic.com>
+        Wenyou Yang <wenyou.yang@microchip.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Nicolas Ferre <nicolas.ferre@atmel.com>,
+        Wenyou Yang <wenyou.yang@atmel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Matt Mackall <mpm@selenic.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtpout.microchip.com ([198.175.253.82]:43242 "EHLO
-        email.microchip.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1755257AbcJYAso (ORCPT
+Received: from eusmtp01.atmel.com ([212.144.249.242]:28741 "EHLO
+        eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755190AbcJYBAL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Oct 2016 20:48:44 -0400
-In-Reply-To: <b0554c1e-e13a-9fe3-ebf4-5d8b0aa16b15@atmel.com>
-Content-Language: en-US
+        Mon, 24 Oct 2016 21:00:11 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE5pY29sYXMgRmVycmUgW21h
-aWx0bzpuaWNvbGFzLmZlcnJlQGF0bWVsLmNvbV0NCj4gU2VudDogMjAxNsTqMTDUwjI0yNUgMjA6
-MDcNCj4gVG86IFdlbnlvdSBZYW5nIC0gQTQxNTM1IDxXZW55b3UuWWFuZ0BtaWNyb2NoaXAuY29t
-PjsgSGVyYmVydCBYdQ0KPiA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PjsgTWF0dCBNYWNr
-YWxsIDxtcG1Ac2VsZW5pYy5jb20+DQo+IENjOiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3Jn
-OyBXZW55b3UgWWFuZyAtIEE0MTUzNQ0KPiA8V2VueW91LllhbmdAbWljcm9jaGlwLmNvbT47IGxp
-bnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENI
-IHYxXSBjaGFyOiBod19yYW5kb206IGF0bWVsLXJuZzogZGlzYWJsZSBUUk5HIGR1cmluZw0KPiBz
-dXNwZW5kDQo+IA0KPiBMZSAyNC8xMC8yMDE2IKikIDEwOjAzLCBXZW55b3UgWWFuZyBhIKimY3Jp
-dCA6DQo+ID4gVG8gZml4IHRoZSBvdmVyIGNvbnN1bXB0aW9uIG9uIHRoZSBWRERDb3JlIGR1ZSB0
-byB0aGUgVFJORyBlbmFibGVkLA0KPiA+IGRpc2FibGUgdGhlIFRSTkcgZHVyaW5nIHN1c3BlbmQs
-IG5vdCBvbmx5IGRpc2FibGUgdGhlIHVzZXIgaW50ZXJmYWNlDQo+ID4gY2xvY2sgKHdoaWNoIGlz
-IGNvbnRyb2xsZWQgYnkgUE1DKS4gQmVjYXVzZSB0aGUgdXNlciBpbnRlcmZhY2UgY2xvY2sNCj4g
-PiBpcyBpbmRlcGVuZGVudCBmcm9tIGFueSBjbG9jayB0aGF0IG1heSBiZSB1c2VkIGluIHRoZSBl
-bnRyb3B5IHNvdXJjZQ0KPiA+IGxvZ2ljIGNpcmN1aXRyeS4NCj4gPg0KPiA+IFNpZ25lZC1vZmYt
-Ynk6IFdlbnlvdSBZYW5nIDx3ZW55b3UueWFuZ0BhdG1lbC5jb20+DQo+ID4gLS0tDQo+ID4NCj4g
-PiAgZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9hdG1lbC1ybmcuYyB8IDE2ICsrKysrKysrKysrKysr
-LS0NCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDE0IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0p
-DQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9hdG1lbC1ybmcu
-Yw0KPiA+IGIvZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9hdG1lbC1ybmcuYw0KPiA+IGluZGV4IDBm
-Y2M5ZTYuLjJlMmQwOWEgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9h
-dG1lbC1ybmcuYw0KPiA+ICsrKyBiL2RyaXZlcnMvY2hhci9od19yYW5kb20vYXRtZWwtcm5nLmMN
-Cj4gPiBAQCAtNDgsNiArNDgsMTYgQEAgc3RhdGljIGludCBhdG1lbF90cm5nX3JlYWQoc3RydWN0
-IGh3cm5nICpybmcsIHZvaWQgKmJ1ZiwNCj4gc2l6ZV90IG1heCwNCj4gPiAgCQlyZXR1cm4gMDsN
-Cj4gPiAgfQ0KPiA+DQo+ID4gK3N0YXRpYyB2b2lkIGF0bWVsX3RybmdfZW5hYmxlKHN0cnVjdCBh
-dG1lbF90cm5nICp0cm5nKSB7DQo+ID4gKwl3cml0ZWwoVFJOR19LRVkgfCAxLCB0cm5nLT5iYXNl
-ICsgVFJOR19DUik7IH0NCj4gPiArDQo+ID4gK3N0YXRpYyB2b2lkIGF0bWVsX3RybmdfZGlzYWJs
-ZShzdHJ1Y3QgYXRtZWxfdHJuZyAqdHJuZykgew0KPiA+ICsJd3JpdGVsKFRSTkdfS0VZLCB0cm5n
-LT5iYXNlICsgVFJOR19DUik7IH0NCj4gPiArDQo+ID4gIHN0YXRpYyBpbnQgYXRtZWxfdHJuZ19w
-cm9iZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KSAgew0KPiA+ICAJc3RydWN0IGF0bWVs
-X3RybmcgKnRybmc7DQo+ID4gQEAgLTcxLDcgKzgxLDcgQEAgc3RhdGljIGludCBhdG1lbF90cm5n
-X3Byb2JlKHN0cnVjdCBwbGF0Zm9ybV9kZXZpY2UgKnBkZXYpDQo+ID4gIAlpZiAocmV0KQ0KPiA+
-ICAJCXJldHVybiByZXQ7DQo+ID4NCj4gPiAtCXdyaXRlbChUUk5HX0tFWSB8IDEsIHRybmctPmJh
-c2UgKyBUUk5HX0NSKTsNCj4gPiArCWF0bWVsX3RybmdfZW5hYmxlKHRybmcpOw0KPiA+ICAJdHJu
-Zy0+cm5nLm5hbWUgPSBwZGV2LT5uYW1lOw0KPiA+ICAJdHJuZy0+cm5nLnJlYWQgPSBhdG1lbF90
-cm5nX3JlYWQ7DQo+ID4NCj4gPiBAQCAtOTQsNyArMTA0LDcgQEAgc3RhdGljIGludCBhdG1lbF90
-cm5nX3JlbW92ZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlDQo+ID4gKnBkZXYpDQo+ID4NCj4gPiAg
-CWh3cm5nX3VucmVnaXN0ZXIoJnRybmctPnJuZyk7DQo+ID4NCj4gPiAtCXdyaXRlbChUUk5HX0tF
-WSwgdHJuZy0+YmFzZSArIFRSTkdfQ1IpOw0KPiA+ICsJYXRtZWxfdHJuZ19kaXNhYmxlKHRybmcp
-Ow0KPiA+ICAJY2xrX2Rpc2FibGVfdW5wcmVwYXJlKHRybmctPmNsayk7DQo+ID4NCj4gPiAgCXJl
-dHVybiAwOw0KPiA+IEBAIC0xMDUsNiArMTE1LDcgQEAgc3RhdGljIGludCBhdG1lbF90cm5nX3N1
-c3BlbmQoc3RydWN0IGRldmljZSAqZGV2KQ0KPiA+IHsNCj4gPiAgCXN0cnVjdCBhdG1lbF90cm5n
-ICp0cm5nID0gZGV2X2dldF9kcnZkYXRhKGRldik7DQo+ID4NCj4gPiArCWF0bWVsX3RybmdfZGlz
-YWJsZSh0cm5nKTsNCj4gPiAgCWNsa19kaXNhYmxlX3VucHJlcGFyZSh0cm5nLT5jbGspOw0KPiA+
-DQo+ID4gIAlyZXR1cm4gMDsNCj4gPiBAQCAtMTE0LDYgKzEyNSw3IEBAIHN0YXRpYyBpbnQgYXRt
-ZWxfdHJuZ19yZXN1bWUoc3RydWN0IGRldmljZSAqZGV2KQ0KPiA+IHsNCj4gPiAgCXN0cnVjdCBh
-dG1lbF90cm5nICp0cm5nID0gZGV2X2dldF9kcnZkYXRhKGRldik7DQo+ID4NCj4gPiArCWF0bWVs
-X3RybmdfZW5hYmxlKHRybmcpOw0KPiA+ICAJcmV0dXJuIGNsa19wcmVwYXJlX2VuYWJsZSh0cm5n
-LT5jbGspOw0KPiANCj4gSXNuJ3QgaXQgdGhlIG90aGVyIHdheSBhcm91bmQ6DQo+IGVuYWJsZSB0
-aGUgdXNlciBpbnRlcmZhY2UgZmlyc3QsIHRoZW4gZW5hYmxlIHRoZSBpbnRlcm5hbCBjbG9jaz8g
-bGlrZToNCj4gDQo+IGNsa19wcmVwYXJlX2VuYWJsZSh0cm5nLT5jbGspOw0KPiBhdG1lbF90cm5n
-X2VuYWJsZSh0cm5nKTsNCg0KWWVzLCBJIHRob3VnaHQgc28uDQoNCkJ1dCB0aGUgZGF0YXNoZWV0
-IHNhaWQsICJUaGUgdXNlciBpbnRlcmZhY2UgY2xvY2sgaXMgaW5kZXBlbmRlbnQgZnJvbSBhbnkg
-Y2xvY2sgdGhhdCBtYXkgYmUgdXNlZCBpbiB0aGUgZW50cm9weSBzb3VyY2UgbG9naWMgY2lyY3Vp
-dHJ5Lg0KVGhlIHNvdXJjZSBvZiBlbnRyb3B5IGNhbiBiZSBlbmFibGVkIGJlZm9yZSBlbmFibGlu
-ZyB0aGUgdXNlciBpbnRlcmZhY2UgY2xvY2suIg0KSXQgc2VlbXMgdGhlIFRSTkcgY2FuIGJlIGVu
-YWJsZWQgYmVmb3JlIGVuYWJsaW5nIHRoZSBwZXJpcGhlcmFsIGNsb2NrLg0KDQoNCkJlc3QgUmVn
-YXJkcywNCldlbnlvdSBZYW5nDQo=
+To fix the over consumption on the VDDCore due to the TRNG enabled,
+disable the TRNG during suspend, not only disable the user interface
+clock (which is controlled by PMC). Because the user interface clock
+is independent from any clock that may be used in the entropy source
+logic circuitry.
+
+Signed-off-by: Wenyou Yang <wenyou.yang@atmel.com>
+---
+
+Changes in v2:
+ - Enable the user interface first, then enable the internal clock
+   when resume.
+
+ drivers/char/hw_random/atmel-rng.c | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
+index 0fcc9e6..ae7cae5 100644
+--- a/drivers/char/hw_random/atmel-rng.c
++++ b/drivers/char/hw_random/atmel-rng.c
+@@ -48,6 +48,16 @@ static int atmel_trng_read(struct hwrng *rng, void *buf, size_t max,
+ 		return 0;
+ }
+ 
++static void atmel_trng_enable(struct atmel_trng *trng)
++{
++	writel(TRNG_KEY | 1, trng->base + TRNG_CR);
++}
++
++static void atmel_trng_disable(struct atmel_trng *trng)
++{
++	writel(TRNG_KEY, trng->base + TRNG_CR);
++}
++
+ static int atmel_trng_probe(struct platform_device *pdev)
+ {
+ 	struct atmel_trng *trng;
+@@ -71,7 +81,7 @@ static int atmel_trng_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		return ret;
+ 
+-	writel(TRNG_KEY | 1, trng->base + TRNG_CR);
++	atmel_trng_enable(trng);
+ 	trng->rng.name = pdev->name;
+ 	trng->rng.read = atmel_trng_read;
+ 
+@@ -94,7 +104,7 @@ static int atmel_trng_remove(struct platform_device *pdev)
+ 
+ 	hwrng_unregister(&trng->rng);
+ 
+-	writel(TRNG_KEY, trng->base + TRNG_CR);
++	atmel_trng_disable(trng);
+ 	clk_disable_unprepare(trng->clk);
+ 
+ 	return 0;
+@@ -105,6 +115,7 @@ static int atmel_trng_suspend(struct device *dev)
+ {
+ 	struct atmel_trng *trng = dev_get_drvdata(dev);
+ 
++	atmel_trng_disable(trng);
+ 	clk_disable_unprepare(trng->clk);
+ 
+ 	return 0;
+@@ -113,8 +124,15 @@ static int atmel_trng_suspend(struct device *dev)
+ static int atmel_trng_resume(struct device *dev)
+ {
+ 	struct atmel_trng *trng = dev_get_drvdata(dev);
++	int ret;
++
++	ret = clk_prepare_enable(trng->clk);
++	if (ret)
++		return ret;
+ 
+-	return clk_prepare_enable(trng->clk);
++	atmel_trng_enable(trng);
++
++	return 0;
+ }
+ 
+ static const struct dev_pm_ops atmel_trng_pm_ops = {
+-- 
+2.7.4
