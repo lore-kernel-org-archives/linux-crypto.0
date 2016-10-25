@@ -1,44 +1,60 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v10 0/8] crypto: asynchronous compression api
-Date: Tue, 25 Oct 2016 11:47:01 +0800
-Message-ID: <20161025034701.GJ18685@gondor.apana.org.au>
-References: <1477052394-19826-1-git-send-email-giovanni.cabiddu@intel.com>
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH] nvmem: sunxi-sid: SID content is not a valid source of
+ randomness
+Date: Tue, 25 Oct 2016 07:38:55 +0200
+Message-ID: <20161025053855.GA901@Red>
+References: <1477144408-15896-1-git-send-email-clabbe.montjoie@gmail.com>
+ <20161024201020.h6akyqad2o42xkhq@lukather>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: srinivas.kandagatla@linaro.org, wens@csie.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org
+To: Maxime Ripard <maxime.ripard@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60216 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753131AbcJYDrl (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:34373 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754713AbcJYFjA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Oct 2016 23:47:41 -0400
+        Tue, 25 Oct 2016 01:39:00 -0400
 Content-Disposition: inline
-In-Reply-To: <1477052394-19826-1-git-send-email-giovanni.cabiddu@intel.com>
+In-Reply-To: <20161024201020.h6akyqad2o42xkhq@lukather>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Oct 21, 2016 at 01:19:46PM +0100, Giovanni Cabiddu wrote:
-> The following patch set introduces acomp, a generic asynchronous
-> (de)compression api with support for SG lists.
-> We propose a new crypto type called crypto_acomp_type, a new struct acomp_alg
-> and struct crypto_acomp, together with number of helper functions to register
-> acomp type algorithms and allocate tfm instances.
-> This interface will allow the following operations:
+On Mon, Oct 24, 2016 at 10:10:20PM +0200, Maxime Ripard wrote:
+> On Sat, Oct 22, 2016 at 03:53:28PM +0200, Corentin Labbe wrote:
+> > Since SID's content is constant over reboot,
 > 
->     int (*compress)(struct acomp_req *req);
->     int (*decompress)(struct acomp_req *req);
+> That's not true, at least not across all the Allwinner SoCs, and
+> especially not on the A10 and A20 that this driver supports.
 > 
-> Together with acomp we propose a new driver-side interface, scomp, which
-> handles compression implementations which use linear buffers. We converted all
-> compression algorithms available in LKCF to use this interface so that those
-> algorithms will be accessible through the acomp api.
-> 
-> Changes in v10:
->     - fixed build issues for configurations where CONFIG_CRYPTO_USER is defined
 
-All applied.  Thanks a lot Giovanni!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On my cubieboard2 (A20)
+hexdump -C /sys/devices/platform/soc\@01c00000/1c23800.eeprom/sunxi-sid0/nvmem 
+00000000  16 51 66 83 80 48 50 72  56 54 48 48 03 c2 75 72  |.Qf..HPrVTHH..ur|
+00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+00000100  16 51 66 83 80 48 50 72  56 54 48 48 03 c2 75 72  |.Qf..HPrVTHH..ur|
+00000110  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+00000200
+cubiedev ~ # reboot
+cubiedev ~ # hexdump -C /sys/devices/platform/soc\@01c00000/1c23800.eeprom/sunxi-sid0/nvmem 
+00000000  16 51 66 83 80 48 50 72  56 54 48 48 03 c2 75 72  |.Qf..HPrVTHH..ur|
+00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+00000100  16 51 66 83 80 48 50 72  56 54 48 48 03 c2 75 72  |.Qf..HPrVTHH..ur|
+00000110  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+00000200
+
+So clearly for me its constant.
+
+> > it must not be used as source of randomness.
+> 
+> And I don't think that's true either. A constant entropy provider will
+> not add any entropy, but will not remove any, would it?
+
+I cced linux-crypto at the begining for confirmation on that.
+But the problem is increased as a part of the content is predicatable over same type of device (at least the thirst bytes and all the zeros).
