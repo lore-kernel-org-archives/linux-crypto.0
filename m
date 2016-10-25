@@ -1,31 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH -next] crypto: gcm - Fix error return code in
- crypto_gcm_create_common()
-Date: Tue, 25 Oct 2016 11:39:52 +0800
-Message-ID: <20161025033952.GC18685@gondor.apana.org.au>
-References: <1476717006-10086-1-git-send-email-weiyj.lk@gmail.com>
+Subject: Re: [PATCH] crypto: ccp - change bitfield type to unsigned ints
+Date: Tue, 25 Oct 2016 11:40:47 +0800
+Message-ID: <20161025034047.GE18685@gondor.apana.org.au>
+References: <147682971521.8147.5364792807816963275.stgit@taos.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Wei Yongjun <weiyongjun1@huawei.com>, linux-crypto@vger.kernel.org
-To: Wei Yongjun <weiyj.lk@gmail.com>
+Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
+        davem@davemloft.net
+To: Gary R Hook <gary.hook@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54020 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:33643 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932370AbcJYDjz (ORCPT
+        with ESMTP id S1751519AbcJYDku (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Oct 2016 23:39:55 -0400
+        Mon, 24 Oct 2016 23:40:50 -0400
 Content-Disposition: inline
-In-Reply-To: <1476717006-10086-1-git-send-email-weiyj.lk@gmail.com>
+In-Reply-To: <147682971521.8147.5364792807816963275.stgit@taos.amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Oct 17, 2016 at 03:10:06PM +0000, Wei Yongjun wrote:
-> From: Wei Yongjun <weiyongjun1@huawei.com>
+On Tue, Oct 18, 2016 at 05:28:35PM -0500, Gary R Hook wrote:
+> Bit fields are not sensitive to endianness, so use
+> a transparent standard data type
 > 
-> Fix to return error code -EINVAL from the invalid alg ivsize error
-> handling case instead of 0, as done elsewhere in this function.
-> 
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+> Signed-off-by: Gary R Hook <gary.hook@amd.com>
 
 Patch applied.  Thanks.
 -- 
