@@ -1,45 +1,53 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] crypto: caam: fix type mismatch warning
-Date: Tue, 25 Oct 2016 23:29:10 +0200
-Message-ID: <20161025212923.2452320-1-arnd@arndb.de>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Catalin Vasile <cata.vasile@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Trond Myklebust <trondmy-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Subject: Re: [PATCH] sunrpc: don't pass on-stack memory to sg_set_buf
+Date: Tue, 25 Oct 2016 21:47:16 +0000
+Message-ID: <DB39073B-8C4B-48BC-8D46-7B6173966037@primarydata.com>
+References: <20161025184538.GA4612@fieldses.org>
+ <A4086E5B-B808-4828-A25D-4AAB2504EC57@primarydata.com>
+ <20161025195930.GB5129@fieldses.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Cc: List Linux NFS Mailing <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Rusty Russell <rusty-8n+1lVoiYb80n/F98K4Iww@public.gmane.org>,
+        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Fields Bruce James <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20161025195930.GB5129-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Content-Language: en-US
+Content-ID: <3BC8E4178383B04986CA1EFD8F2E16B0-Hry67jCOGbCcE4WynfumptQqCkab/8FMAL8bYrjMMd8@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Building the caam driver on arm64 produces a harmless warning:
+DQo+IE9uIE9jdCAyNSwgMjAxNiwgYXQgMTU6NTksIEZpZWxkcyBCcnVjZSBKYW1lcyA8YmZpZWxk
+c0BmaWVsZHNlcy5vcmc+IHdyb3RlOg0KPiANCj4gT24gVHVlLCBPY3QgMjUsIDIwMTYgYXQgMDc6
+MzQ6NDNQTSArMDAwMCwgVHJvbmQgTXlrbGVidXN0IHdyb3RlOg0KPj4gDQo+Pj4gT24gT2N0IDI1
+LCAyMDE2LCBhdCAxNDo0NSwgSi4gQnJ1Y2UgRmllbGRzIDxiZmllbGRzQGZpZWxkc2VzLm9yZz4g
+d3JvdGU6DQo+Pj4gDQo+Pj4gRnJvbTogIkouIEJydWNlIEZpZWxkcyIgPGJmaWVsZHNAcmVkaGF0
+LmNvbT4NCj4+PiANCj4+PiBBcyBvZiBhYzRlOTdhYmNlOWIgInNjYXR0ZXJsaXN0OiBzZ19zZXRf
+YnVmKCkgYXJndW1lbnQgbXVzdCBiZSBpbiBsaW5lYXINCj4+PiBtYXBwaW5nIiwgc2dfc2V0X2J1
+ZiBoaXRzIGEgQlVHIHdoZW4gbWFrZV9jaGVja3N1bV92Mi0+eGRyX3Byb2Nlc3NfYnVmLA0KPj4+
+IGFtb25nIG90aGVyIGNhbGxlcnMsIHBhc3NlcyBpdCBtZW1vcnkgb24gdGhlIHN0YWNrLg0KPj4+
+IA0KPj4+IFdlIG9ubHkgbmVlZCBhIHNjYXR0ZXJsaXN0IHRvIHBhc3MgdGhpcyB0byB0aGUgY3J5
+cHRvIGNvZGUsIGFuZCBpdCBzZWVtcw0KPj4+IGxpa2Ugb3ZlcmtpbGwgdG8gcmVxdWlyZSBrbWFs
+bG9jJ2QgbWVtb3J5IGp1c3QgdG8gZW5jcnlwdCBhIGZldyBieXRlcywNCj4+PiBidXQgZm9yIG5v
+dyB0aGlzIHNlZW1zIHRoZSBiZXN0IGZpeC4NCj4+PiANCj4+PiBOb3RlIG1hbnkgb2YgdGhlc2Ug
+Y2FsbGVycyBhcmUgaW4gdGhlIE5GUyB3cml0ZSBwYXRocywgc28gd2Ugc2hvdWxkbid0DQo+Pj4g
+cmVhbGx5IGJlIGFsbG9jYXRpbmcgR0ZQX0tFUk5FTC4gIEJ1dCB3ZSBhbHJlYWR5IGhhdmUgb3Ro
+ZXIgYWxsb2NhdGlvbnMNCj4+PiBpbiB0aGVzZSBjb2RlIHBhdGhzLiAgQSBsYXJnZXIgcmVkZXNp
+Z24gbWF5IGJlIG5lY2Vzc2FyeSB0byBhbGxvdw0KPj4+IGFsbG9jYXRpb25zIHRvIGJlIGRvbmUg
+ZWFybGllci4NCj4+IA0KPj4gTkFDS+KApiAgSSBhZ3JlZSB0aGF0IHRoZXJlIG1heSBhbHJlYWR5
+IGJlIGJvcmthZ2UgaW4gUlBDU0VDX0dTUy1sYW5kLCBidXQgdGhhdOKAmXMgbm90IGEgcmVhc29u
+IHRvIGJlIGFkZGluZyB0byB0aGUgcGlsZSBvZiB0aGluZ3MgdGhhdCBuZWVkIHRvIGJlIGZpeGVk
+4oCmIFRoZSBhbGxvY2F0aW9ucyB0aGF0IGxpZSBpbiB0aGUgUlBDIGNsaWVudOKAmXMgZW5jb2Rl
+L2RlY29kZSBwYXRoIGRvIG5lZWQgdG8gYmUgR0ZQX05PRlPigKYuDQo+IA0KPiBPSy4gIEFueSBk
+aXNhZHZhbnRhZ2UgdG8ga2VlcGluZyB0aGlzIHBhdGNoIHdpdGgganVzdCBHRlBfTk9GUw0KPiBh
+bGxvY2F0aW9ucyBldmVyeXdoZXJlIHRoYXQgbWlnaHQgYmUgaW4gdGhlIHdyaXRlIHBhdGg/DQoN
+Ckl04oCZcyB3aGF0IHdlIGhhdmUgdG8gZG8gZXZlcnl3aGVyZSBlbHNlIGluIHRoZSBSUEMgY2xp
+ZW50LCBzbyBJIGNhbuKAmXQgc2VlIHdoeSBpdCBzaG91bGQgYmUgYSBwcm9ibGVtLg0KDQo=
 
-drivers/crypto/caam/caamalg.c:140:139: warning: comparison of distinct pointer types lacks a cast
-
-We can use min_t to tell the compiler which type we want it to use
-here.
-
-Fixes: 5ecf8ef9103c ("crypto: caam - fix sg dump")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-This is currently the only warning reported by kernelci.org for
-linux-4.9 on arm, arm64 and x86.
----
- drivers/crypto/caam/caamalg.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 156aad167cd6..8de85dfb1b04 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -137,7 +137,7 @@ static void dbg_dump_sg(const char *level, const char *prefix_str,
- 		}
- 
- 		buf = it_page + it->offset;
--		len = min(tlen, it->length);
-+		len = min_t(size_t, tlen, it->length);
- 		print_hex_dump(level, prefix_str, prefix_type, rowsize,
- 			       groupsize, buf, len, ascii);
- 		tlen -= len;
--- 
-2.9.0
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
