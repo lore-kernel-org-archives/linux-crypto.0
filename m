@@ -1,56 +1,116 @@
-From: Jean-Francois Moine <moinejf@free.fr>
-Subject: Re: [PATCH] nvmem: sunxi-sid: SID content is not a valid source of
- randomness
-Date: Tue, 25 Oct 2016 09:06:34 +0200
-Message-ID: <20161025090634.3dae9ad52ae8382dde6af4c8@free.fr>
-References: <1477144408-15896-1-git-send-email-clabbe.montjoie@gmail.com>
-        <20161024201020.h6akyqad2o42xkhq@lukather>
-        <20161025053855.GA901@Red>
+From: Nicolas Ferre <nicolas.ferre@atmel.com>
+Subject: Re: [PATCH v2] char: hw_random: atmel-rng: disable TRNG during
+ suspend
+Date: Tue, 25 Oct 2016 10:49:55 +0200
+Message-ID: <231367f2-03e2-5bf3-2358-135fec438676@atmel.com>
+References: <1477356993-27778-1-git-send-email-wenyou.yang@atmel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
-Cc: Maxime Ripard <maxime.ripard@free-electrons.com>, wens@csie.org,
-        srinivas.kandagatla@linaro.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20161025053855.GA901@Red>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 8bit
+Cc: <linux-crypto@vger.kernel.org>,
+        Wenyou Yang <wenyou.yang@microchip.com>,
+        <linux-arm-kernel@lists.infradead.org>
+To: Wenyou Yang <wenyou.yang@atmel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Matt Mackall <mpm@selenic.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from eusmtp01.atmel.com ([212.144.249.243]:12494 "EHLO
+        eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758525AbcJYIuA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Oct 2016 04:50:00 -0400
+In-Reply-To: <1477356993-27778-1-git-send-email-wenyou.yang@atmel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 25 Oct 2016 07:38:55 +0200
-LABBE Corentin <clabbe.montjoie@gmail.com> wrote:
-
-> > On Sat, Oct 22, 2016 at 03:53:28PM +0200, Corentin Labbe wrote:
-> > > Since SID's content is constant over reboot,
-> > 
-> > That's not true, at least not across all the Allwinner SoCs, and
-> > especially not on the A10 and A20 that this driver supports.
-> > 
+Le 25/10/2016 à 02:56, Wenyou Yang a écrit :
+> To fix the over consumption on the VDDCore due to the TRNG enabled,
+> disable the TRNG during suspend, not only disable the user interface
+> clock (which is controlled by PMC). Because the user interface clock
+> is independent from any clock that may be used in the entropy source
+> logic circuitry.
 > 
-> On my cubieboard2 (A20)
-> hexdump -C /sys/devices/platform/soc\@01c00000/1c23800.eeprom/sunxi-sid0/nvmem 
-> 00000000  16 51 66 83 80 48 50 72  56 54 48 48 03 c2 75 72  |.Qf..HPrVTHH..ur|
-> 00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-> *
-> 00000100  16 51 66 83 80 48 50 72  56 54 48 48 03 c2 75 72  |.Qf..HPrVTHH..ur|
-> 00000110  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-> *
-> 00000200
-> cubiedev ~ # reboot
-> cubiedev ~ # hexdump -C /sys/devices/platform/soc\@01c00000/1c23800.eeprom/sunxi-sid0/nvmem 
-> 00000000  16 51 66 83 80 48 50 72  56 54 48 48 03 c2 75 72  |.Qf..HPrVTHH..ur|
-> 00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-> *
-> 00000100  16 51 66 83 80 48 50 72  56 54 48 48 03 c2 75 72  |.Qf..HPrVTHH..ur|
-> 00000110  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-> *
-> 00000200
-> 
-> So clearly for me its constant.
+> Signed-off-by: Wenyou Yang <wenyou.yang@atmel.com>
 
-Even after power off/power on?
+Acked-by: Nicolas Ferre <nicolas.ferre@atmel.com>
+
+Thanks
+
+> ---
+> 
+> Changes in v2:
+>  - Enable the user interface first, then enable the internal clock
+>    when resume.
+> 
+>  drivers/char/hw_random/atmel-rng.c | 24 +++++++++++++++++++++---
+>  1 file changed, 21 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
+> index 0fcc9e6..ae7cae5 100644
+> --- a/drivers/char/hw_random/atmel-rng.c
+> +++ b/drivers/char/hw_random/atmel-rng.c
+> @@ -48,6 +48,16 @@ static int atmel_trng_read(struct hwrng *rng, void *buf, size_t max,
+>  		return 0;
+>  }
+>  
+> +static void atmel_trng_enable(struct atmel_trng *trng)
+> +{
+> +	writel(TRNG_KEY | 1, trng->base + TRNG_CR);
+> +}
+> +
+> +static void atmel_trng_disable(struct atmel_trng *trng)
+> +{
+> +	writel(TRNG_KEY, trng->base + TRNG_CR);
+> +}
+> +
+>  static int atmel_trng_probe(struct platform_device *pdev)
+>  {
+>  	struct atmel_trng *trng;
+> @@ -71,7 +81,7 @@ static int atmel_trng_probe(struct platform_device *pdev)
+>  	if (ret)
+>  		return ret;
+>  
+> -	writel(TRNG_KEY | 1, trng->base + TRNG_CR);
+> +	atmel_trng_enable(trng);
+>  	trng->rng.name = pdev->name;
+>  	trng->rng.read = atmel_trng_read;
+>  
+> @@ -94,7 +104,7 @@ static int atmel_trng_remove(struct platform_device *pdev)
+>  
+>  	hwrng_unregister(&trng->rng);
+>  
+> -	writel(TRNG_KEY, trng->base + TRNG_CR);
+> +	atmel_trng_disable(trng);
+>  	clk_disable_unprepare(trng->clk);
+>  
+>  	return 0;
+> @@ -105,6 +115,7 @@ static int atmel_trng_suspend(struct device *dev)
+>  {
+>  	struct atmel_trng *trng = dev_get_drvdata(dev);
+>  
+> +	atmel_trng_disable(trng);
+>  	clk_disable_unprepare(trng->clk);
+>  
+>  	return 0;
+> @@ -113,8 +124,15 @@ static int atmel_trng_suspend(struct device *dev)
+>  static int atmel_trng_resume(struct device *dev)
+>  {
+>  	struct atmel_trng *trng = dev_get_drvdata(dev);
+> +	int ret;
+> +
+> +	ret = clk_prepare_enable(trng->clk);
+> +	if (ret)
+> +		return ret;
+>  
+> -	return clk_prepare_enable(trng->clk);
+> +	atmel_trng_enable(trng);
+> +
+> +	return 0;
+>  }
+>  
+>  static const struct dev_pm_ops atmel_trng_pm_ops = {
+> 
+
 
 -- 
-Ken ar c'hentañ	|	      ** Breizh ha Linux atav! **
-Jef		|		http://moinejf.free.fr/
+Nicolas Ferre
