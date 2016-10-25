@@ -1,49 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.9
-Date: Tue, 25 Oct 2016 10:34:57 +0800
-Message-ID: <20161025023457.GA17833@gondor.apana.org.au>
-References: <20141007131826.GA29688@gondor.apana.org.au>
- <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150415033951.GA1406@gondor.apana.org.au>
- <20150622084457.GA7806@gondor.apana.org.au>
- <20150831135655.GA2694@gondor.apana.org.au>
- <20151102080427.GA8465@gondor.apana.org.au>
- <20160111101450.GA24044@gondor.apana.org.au>
- <20160122101828.GA15966@gondor.apana.org.au>
- <20160801095821.GA1260@gondor.apana.org.au>
+Subject: Re: [PATCH v2 0/8] Conversion crypto API documentation to Sphinx
+Date: Tue, 25 Oct 2016 10:35:49 +0800
+Message-ID: <20161025023549.GA17875@gondor.apana.org.au>
+References: <2053893.WjF01BJSDF@positron.chronox.de>
+ <20161023103238.4fceddac@lwn.net>
+ <1645861.DSRXbPG5tl@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41070 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751096AbcJYCfF (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Oct 2016 22:35:05 -0400
+Cc: Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-doc-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20160801095821.GA1260@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1645861.DSRXbPG5tl@positron.chronox.de>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+On Sun, Oct 23, 2016 at 06:46:12PM +0200, Stephan Mueller wrote:
+> Am Sonntag, 23. Oktober 2016, 10:32:38 CEST schrieb Jonathan Corbet:
+> 
+> Hi Jonathan,
+> 
+> > On Fri, 21 Oct 2016 04:53:45 +0200
+> > 
+> > Stephan Mueller <smueller@chronox.de> wrote:
+> > > the attached patch set converts the existing crypto API documentation
+> > > from DocBook to Sphinx.
+> > 
+> > This looks generally good to me - thanks for doing it!
+> > 
+> > Is there any chance of running the Documentation/ parts through the docs
+> > tree?  Documentation/index.rst has become a bit of a conflict point
+> > otherwise...
+> 
+> Unless Herbert objects, I would not see any reason why we should not push it 
+> through the docs tree.
 
-This push fixes a regression caused by the stack vmalloc change.
+No objections from me.
 
+> Yet we should wait for Herbert's ack as I have added also new information in 
+> the patch set (the KPP API documentation and the change in the AEAD 
+> documentation).
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Andrew Lutomirski (1):
-      hwrng: core - Don't use a stack buffer in add_early_randomness()
-
- drivers/char/hw_random/core.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Looks good to me.
 
 Thanks,
 -- 
