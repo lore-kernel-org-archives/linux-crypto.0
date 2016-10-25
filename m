@@ -1,48 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/8] Conversion crypto API documentation to Sphinx
-Date: Tue, 25 Oct 2016 10:35:49 +0800
-Message-ID: <20161025023549.GA17875@gondor.apana.org.au>
-References: <2053893.WjF01BJSDF@positron.chronox.de>
- <20161023103238.4fceddac@lwn.net>
- <1645861.DSRXbPG5tl@positron.chronox.de>
+Subject: Re: [PATCH] crypto: Move RSA+MPI constructs into an #include file
+Date: Tue, 25 Oct 2016 10:48:42 +0800
+Message-ID: <20161025024842.GB17875@gondor.apana.org.au>
+References: <20161014193559.4342.74036.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-doc-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
+        davem@davemloft.net
+To: Gary R Hook <gary.hook@amd.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:41111 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750800AbcJYCsr (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Oct 2016 22:48:47 -0400
 Content-Disposition: inline
-In-Reply-To: <1645861.DSRXbPG5tl@positron.chronox.de>
-Sender: linux-doc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20161014193559.4342.74036.stgit@taos>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Oct 23, 2016 at 06:46:12PM +0200, Stephan Mueller wrote:
-> Am Sonntag, 23. Oktober 2016, 10:32:38 CEST schrieb Jonathan Corbet:
+On Fri, Oct 14, 2016 at 02:36:00PM -0500, Gary R Hook wrote:
+> Move RSA support of general use into internal/rsa.h.
+> This allows reuse of, e.g. RSA MPI keys and support
+> functions.
 > 
-> Hi Jonathan,
-> 
-> > On Fri, 21 Oct 2016 04:53:45 +0200
-> > 
-> > Stephan Mueller <smueller@chronox.de> wrote:
-> > > the attached patch set converts the existing crypto API documentation
-> > > from DocBook to Sphinx.
-> > 
-> > This looks generally good to me - thanks for doing it!
-> > 
-> > Is there any chance of running the Documentation/ parts through the docs
-> > tree?  Documentation/index.rst has become a bit of a conflict point
-> > otherwise...
-> 
-> Unless Herbert objects, I would not see any reason why we should not push it 
-> through the docs tree.
+> Signed-off-by: Gary R Hook <gary.hook@amd.com>
 
-No objections from me.
-
-> Yet we should wait for Herbert's ack as I have added also new information in 
-> the patch set (the KPP API documentation and the change in the AEAD 
-> documentation).
-
-Looks good to me.
+Please fold this patch into the series that makes use of it.
 
 Thanks,
 -- 
