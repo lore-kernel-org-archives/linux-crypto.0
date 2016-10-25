@@ -1,34 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Move RSA+MPI constructs into an #include file
-Date: Tue, 25 Oct 2016 10:48:42 +0800
-Message-ID: <20161025024842.GB17875@gondor.apana.org.au>
-References: <20161014193559.4342.74036.stgit@taos>
+Subject: Re: [PATCH] padata: Remove unused but set variables
+Date: Tue, 25 Oct 2016 11:38:30 +0800
+Message-ID: <20161025033830.GA18666@gondor.apana.org.au>
+References: <20161021090047.GO19080@gauss.secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
-        davem@davemloft.net
-To: Gary R Hook <gary.hook@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: tklauser@distanz.ch, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41111 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:34435 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750800AbcJYCsr (ORCPT
+        with ESMTP id S1756551AbcJYDin (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Oct 2016 22:48:47 -0400
+        Mon, 24 Oct 2016 23:38:43 -0400
 Content-Disposition: inline
-In-Reply-To: <20161014193559.4342.74036.stgit@taos>
+In-Reply-To: <20161021090047.GO19080@gauss.secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Oct 14, 2016 at 02:36:00PM -0500, Gary R Hook wrote:
-> Move RSA support of general use into internal/rsa.h.
-> This allows reuse of, e.g. RSA MPI keys and support
-> functions.
+Steffen Klassert <steffen.klassert@secunet.com> wrote:
+> On Mon, Oct 17, 2016 at 12:16:08PM +0200, Tobias Klauser wrote:
+>> Remove the unused but set variable pinst in padata_parallel_worker to
+>> fix the following warning when building with 'W=1':
+>> 
+>>   kernel/padata.c: In function ‘padata_parallel_worker’:
+>>   kernel/padata.c:68:26: warning: variable ‘pinst’ set but not used [-Wunused-but-set-variable]
+>> 
+>> Also remove the now unused variable pd which is only used to set pinst.
+>> 
+>> Signed-off-by: Tobias Klauser <tklauser@distanz.ch>
 > 
-> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+> Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
 
-Please fold this patch into the series that makes use of it.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
