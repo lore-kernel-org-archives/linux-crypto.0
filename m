@@ -1,39 +1,44 @@
-From: Horia Geanta Neag <horia.geanta@nxp.com>
-Subject: Re: [PATCH] crypto: caam: fix type mismatch warning
-Date: Wed, 26 Oct 2016 06:23:17 +0000
-Message-ID: <DB4PR04MB0847F9AE9886577DA3AD8EBF98AB0@DB4PR04MB0847.eurprd04.prod.outlook.com>
-References: <20161025212923.2452320-1-arnd@arndb.de>
+From: Hamid Nassiby <h.nassiby@gmail.com>
+Subject: Re: ARM-CE aes encryption on uneven blocks
+Date: Wed, 26 Oct 2016 10:46:41 +0330
+Message-ID: <CAFuf8QPCZPaLXh0nNY3Ktm-w6STKGwXpTEQcXGH-HCDvWD-jLQ@mail.gmail.com>
+References: <HE1PR04MB13065DBD6C9844835123FAF9EEA90@HE1PR04MB1306.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Cata Vasile <cata.vasile@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Cata Vasile <cata.vasile@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-db5eur01on0054.outbound.protection.outlook.com ([104.47.2.54]:34448
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751129AbcJZGiw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Oct 2016 02:38:52 -0400
-Content-Language: en-US
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:36855 "EHLO
+        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753696AbcJZHRP (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Oct 2016 03:17:15 -0400
+Received: by mail-wm0-f43.google.com with SMTP id b80so207478198wme.1
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Oct 2016 00:17:14 -0700 (PDT)
+In-Reply-To: <HE1PR04MB13065DBD6C9844835123FAF9EEA90@HE1PR04MB1306.eurprd04.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/26/2016 12:29 AM, Arnd Bergmann wrote:=0A=
-> Building the caam driver on arm64 produces a harmless warning:=0A=
-> =0A=
-> drivers/crypto/caam/caamalg.c:140:139: warning: comparison of distinct po=
-inter types lacks a cast=0A=
-> =0A=
-> We can use min_t to tell the compiler which type we want it to use=0A=
-> here.=0A=
-> =0A=
-> Fixes: 5ecf8ef9103c ("crypto: caam - fix sg dump")=0A=
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+Hi,
+
+Based on my old experience with "struct crypto_alg" based drivers, the
+data you receive there, is padded beforehand(in the upper layers);
+Therefore the plaintext contains integral multiple of AES block size
+of data and based on the number of blocks, the crypto transform can be
+computed.
+
+Regards,
+Hamid
+
+On Mon, Oct 24, 2016 at 6:11 PM, Cata Vasile <cata.vasile@nxp.com> wrote:
+>
+> Hi,
+>
+> I'm trying to understand the code for AES encryption from ARM-CE.
+> From the aes-glue.S calls I understand that the encryption primitives receive the number of blocks, but have no way of determining the number of bytes to encrypt, if for example the plaintext does not have a length of a multiple of AES block size.
+> How does, for example, ecb_encrypt() also encrypt the last remaining bytes in the plaintext if it is not a multiple of AES block size if It can never deduce the full plaintext size?
+>
+> Catalin Vasile--
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
