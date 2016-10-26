@@ -1,59 +1,40 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: AEAD Question
-Date: Wed, 26 Oct 2016 18:32:39 +0200
-Message-ID: <1536924.VKbsE1YqZP@positron.chronox.de>
-References: <CAPSqeoJkTQ72cRaFk+sZGdCELUR6zFBbFdQsZE_B4DF=x374Og@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: linux-crypto@vger.kernel.org
-To: Juan Pablo =?ISO-8859-1?Q?Nari=F1o?= Mendoza <jnarino@gmail.com>
+From: Marcelo Cerri <marcelo.cerri@canonical.com>
+Subject: [PATCH 0/3] crypto: testmgr - Add missing tests for internal sha*-mb implementations
+Date: Wed, 26 Oct 2016 15:04:42 -0200
+Message-ID: <1477501485-18371-1-git-send-email-marcelo.cerri@canonical.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org,
+        Stephan Mueller <smueller@chronox.de>,
+        Marcelo Cerri <marcelo.cerri@canonical.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:46994 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752263AbcJZQcy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Oct 2016 12:32:54 -0400
-In-Reply-To: <CAPSqeoJkTQ72cRaFk+sZGdCELUR6zFBbFdQsZE_B4DF=x374Og@mail.gmail.com>
+Received: from mail-vk0-f43.google.com ([209.85.213.43]:34030 "EHLO
+        mail-vk0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753399AbcJZRFP (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Oct 2016 13:05:15 -0400
+Received: by mail-vk0-f43.google.com with SMTP id p81so7305570vkd.1
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Oct 2016 10:05:15 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 26. Oktober 2016, 18:17:14 CEST schrieb Juan Pablo Nariño 
-Mendoza:
+This series adds null tests for all sha*-mb internal algorithms so they can
+be used in FIPS mode without further problems.
 
-Hi Juan,
+Since they are 3 separated modules I decided to use a separated commit for
+each one.
 
-> Sorry in advance for making what shall be a basic question for this
-> list, but I have really ran out of ideas.
-> 
-> Can someone explain me please, how does the memory layout and sg lists
-> work for the IPSec case, with generated IV case?
-> 
-> As I understand, it is like this (ascii art)
-> 
-> AD | IV Space | Plain Text | Auth Tag
->  ^                   ^
-> 
-> asg              sg
+Marcelo Cerri (3):
+  crypto: testmgr - Add missing tests for internal sha1-mb
+    implementation
+  crypto: testmgr - Add missing tests for internal sha256-mb
+    implementation
+  crypto: testmgr - Add missing tests for internal sha512-mb
+    implementation
 
-The memory layout is correct when using the RFC4106 cipher.
+ crypto/testmgr.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-How you partition your physical memory with the SGL is your choice as long as 
-your data in the SGL is lined up as you mentioned above.
-> 
-> But I am having the AD overwritten, and the AUTH tag and encryption is
-> not correct? Could someone please point me in the right direction?
-> Thank you again
-
-Maybe the src and dst SGL somehow partially overlap?
-> 
-> Regards
-> 
-> Juan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Ciao
-Stephan
+-- 
+2.7.4
