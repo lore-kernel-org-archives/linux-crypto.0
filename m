@@ -1,60 +1,39 @@
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [cryptodev:master 41/47] ERROR: "crypto_acomp_scomp_free_ctx"
- [crypto/acompress.ko] undefined!
-Date: Wed, 26 Oct 2016 10:56:45 +0100
-Message-ID: <20161026095645.GA27004@SILVIXA00369791-F22-1>
-References: <201610260803.GIBxWXo3%fengguang.wu@intel.com>
+From: Harsh Jain <Harsh@chelsio.com>
+Subject: Re: [PATCH 2/6] chcr: Remove malloc/free
+Date: Wed, 26 Oct 2016 16:59:51 +0530
+Message-ID: <365cdce2-9195-474d-1114-60772f3fc6b5@chelsio.com>
+References: <cover.1476263960.git.harsh@chelsio.com>
+ <67f49fab047b0b97bac20493dc4414e27c637ab0.1476263960.git.harsh@chelsio.com>
+ <20161021022038.GB22485@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: kbuild test robot <fengguang.wu@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: dan.carpenter@oracle.com, linux-crypto@vger.kernel.org,
+        jlulla@chelsio.com, atul.gupta@chelsio.com, yeshaswi@chelsio.com,
+        hariprasad@chelsio.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:9426 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754139AbcJZKAT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Oct 2016 06:00:19 -0400
-Content-Disposition: inline
-In-Reply-To: <201610260803.GIBxWXo3%fengguang.wu@intel.com>
+Received: from stargate.chelsio.com ([12.32.117.8]:63550 "EHLO l.chelsio.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754802AbcJZLaN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Oct 2016 07:30:13 -0400
+In-Reply-To: <20161021022038.GB22485@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
 
-On Wed, Oct 26, 2016 at 08:47:16AM +0800, kbuild test robot wrote:
-> >> ERROR: "crypto_acomp_scomp_free_ctx" [crypto/acompress.ko] undefined!
-> >> ERROR: "crypto_acomp_scomp_alloc_ctx" [crypto/acompress.ko] undefined!
-> >> ERROR: "crypto_init_scomp_ops_async" [crypto/acompress.ko] undefined!
 
-Thanks for the report. There is a problem with a dependency between
-acomp and scomp. This patch should fix the issue.
-
-Giovanni
----8<---
-Subject: [PATCH] crypto: acomp - fix dependency in Makefile
-
-Fix dependency between acomp and scomp that appears when acomp is
-built as module
-
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- crypto/Makefile | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 5c83f3d..82ffeee 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -50,8 +50,9 @@ rsa_generic-y += rsa_helper.o
- rsa_generic-y += rsa-pkcs1pad.o
- obj-$(CONFIG_CRYPTO_RSA) += rsa_generic.o
-
--obj-$(CONFIG_CRYPTO_ACOMP2) += acompress.o
--obj-$(CONFIG_CRYPTO_ACOMP2) += scompress.o
-+crypto_acompress-y := acompress.o
-+crypto_acompress-y += scompress.o
-+obj-$(CONFIG_CRYPTO_ACOMP2) += crypto_acompress.o
-
- cryptomgr-y := algboss.o testmgr.o
-
---
+On 21-10-2016 07:50, Herbert Xu wrote:
+> On Thu, Oct 13, 2016 at 04:39:35PM +0530, Harsh Jain wrote:
+>> Remove malloc/free in crypto operation and allocate memory via cra_ctxsize.
+>> Added new structure chcr_wr to populate Work Request Header.
+>> Fixes: 324429d74127 (chcr: Support for Chelsio's Crypto Hardware)
+> Do you mean the reqsize as opposed to ctxsize since the latter is
+> shared by all tfm users?
+It's reqsize for hash algos (chcr_ahash_req_ctx struct ) and ctxsize for Cipher algos(ablk_ctx struct),As rrkey(reverse round key) is also same for all tfm.
+>
+> In any case, your patch doesn't seem to change the size setting?
+Added new variables in old structure. Size setting related code is unchanged.
+In v2  will break the patch to smaller one.
+>
+> Cheers,
