@@ -1,44 +1,60 @@
-From: Hamid Nassiby <h.nassiby@gmail.com>
-Subject: Re: ARM-CE aes encryption on uneven blocks
-Date: Wed, 26 Oct 2016 10:46:41 +0330
-Message-ID: <CAFuf8QPCZPaLXh0nNY3Ktm-w6STKGwXpTEQcXGH-HCDvWD-jLQ@mail.gmail.com>
-References: <HE1PR04MB13065DBD6C9844835123FAF9EEA90@HE1PR04MB1306.eurprd04.prod.outlook.com>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: Re: [cryptodev:master 41/47] ERROR: "crypto_acomp_scomp_free_ctx"
+ [crypto/acompress.ko] undefined!
+Date: Wed, 26 Oct 2016 10:56:45 +0100
+Message-ID: <20161026095645.GA27004@SILVIXA00369791-F22-1>
+References: <201610260803.GIBxWXo3%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Cata Vasile <cata.vasile@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: kbuild test robot <fengguang.wu@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:36855 "EHLO
-        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753696AbcJZHRP (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Oct 2016 03:17:15 -0400
-Received: by mail-wm0-f43.google.com with SMTP id b80so207478198wme.1
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Oct 2016 00:17:14 -0700 (PDT)
-In-Reply-To: <HE1PR04MB13065DBD6C9844835123FAF9EEA90@HE1PR04MB1306.eurprd04.prod.outlook.com>
+Received: from mga09.intel.com ([134.134.136.24]:9426 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754139AbcJZKAT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Oct 2016 06:00:19 -0400
+Content-Disposition: inline
+In-Reply-To: <201610260803.GIBxWXo3%fengguang.wu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Hi,
 
-Based on my old experience with "struct crypto_alg" based drivers, the
-data you receive there, is padded beforehand(in the upper layers);
-Therefore the plaintext contains integral multiple of AES block size
-of data and based on the number of blocks, the crypto transform can be
-computed.
+On Wed, Oct 26, 2016 at 08:47:16AM +0800, kbuild test robot wrote:
+> >> ERROR: "crypto_acomp_scomp_free_ctx" [crypto/acompress.ko] undefined!
+> >> ERROR: "crypto_acomp_scomp_alloc_ctx" [crypto/acompress.ko] undefined!
+> >> ERROR: "crypto_init_scomp_ops_async" [crypto/acompress.ko] undefined!
 
-Regards,
-Hamid
+Thanks for the report. There is a problem with a dependency between
+acomp and scomp. This patch should fix the issue.
 
-On Mon, Oct 24, 2016 at 6:11 PM, Cata Vasile <cata.vasile@nxp.com> wrote:
->
-> Hi,
->
-> I'm trying to understand the code for AES encryption from ARM-CE.
-> From the aes-glue.S calls I understand that the encryption primitives receive the number of blocks, but have no way of determining the number of bytes to encrypt, if for example the plaintext does not have a length of a multiple of AES block size.
-> How does, for example, ecb_encrypt() also encrypt the last remaining bytes in the plaintext if it is not a multiple of AES block size if It can never deduce the full plaintext size?
->
-> Catalin Vasile--
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Giovanni
+---8<---
+Subject: [PATCH] crypto: acomp - fix dependency in Makefile
+
+Fix dependency between acomp and scomp that appears when acomp is
+built as module
+
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ crypto/Makefile | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 5c83f3d..82ffeee 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -50,8 +50,9 @@ rsa_generic-y += rsa_helper.o
+ rsa_generic-y += rsa-pkcs1pad.o
+ obj-$(CONFIG_CRYPTO_RSA) += rsa_generic.o
+
+-obj-$(CONFIG_CRYPTO_ACOMP2) += acompress.o
+-obj-$(CONFIG_CRYPTO_ACOMP2) += scompress.o
++crypto_acompress-y := acompress.o
++crypto_acompress-y += scompress.o
++obj-$(CONFIG_CRYPTO_ACOMP2) += crypto_acompress.o
+
+ cryptomgr-y := algboss.o testmgr.o
+
+--
