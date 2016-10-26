@@ -1,39 +1,67 @@
-From: Harsh Jain <Harsh@chelsio.com>
-Subject: Re: [PATCH 2/6] chcr: Remove malloc/free
-Date: Wed, 26 Oct 2016 16:59:51 +0530
-Message-ID: <365cdce2-9195-474d-1114-60772f3fc6b5@chelsio.com>
-References: <cover.1476263960.git.harsh@chelsio.com>
- <67f49fab047b0b97bac20493dc4414e27c637ab0.1476263960.git.harsh@chelsio.com>
- <20161021022038.GB22485@gondor.apana.org.au>
+From: Cata Vasile <cata.vasile@nxp.com>
+Subject: Re: ARM-CE aes encryption on uneven blocks
+Date: Wed, 26 Oct 2016 07:49:24 +0000
+Message-ID: <DB5PR04MB130295C42CB86046F64E487BEEAB0@DB5PR04MB1302.eurprd04.prod.outlook.com>
+References: <HE1PR04MB13065DBD6C9844835123FAF9EEA90@HE1PR04MB1306.eurprd04.prod.outlook.com>,<CAFuf8QPCZPaLXh0nNY3Ktm-w6STKGwXpTEQcXGH-HCDvWD-jLQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: dan.carpenter@oracle.com, linux-crypto@vger.kernel.org,
-        jlulla@chelsio.com, atul.gupta@chelsio.com, yeshaswi@chelsio.com,
-        hariprasad@chelsio.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Hamid Nassiby <h.nassiby@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:63550 "EHLO l.chelsio.com"
+Received: from mail-db5eur01on0056.outbound.protection.outlook.com ([104.47.2.56]:34829
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754802AbcJZLaN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Oct 2016 07:30:13 -0400
-In-Reply-To: <20161021022038.GB22485@gondor.apana.org.au>
+        id S932124AbcJZOYd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Oct 2016 10:24:33 -0400
+In-Reply-To: <CAFuf8QPCZPaLXh0nNY3Ktm-w6STKGwXpTEQcXGH-HCDvWD-jLQ@mail.gmail.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Then what is the role of the "for" structure? Why not do just a single encr=
+yption/decryption call?
 
+Regards,
+Cata
 
-On 21-10-2016 07:50, Herbert Xu wrote:
-> On Thu, Oct 13, 2016 at 04:39:35PM +0530, Harsh Jain wrote:
->> Remove malloc/free in crypto operation and allocate memory via cra_ctxsize.
->> Added new structure chcr_wr to populate Work Request Header.
->> Fixes: 324429d74127 (chcr: Support for Chelsio's Crypto Hardware)
-> Do you mean the reqsize as opposed to ctxsize since the latter is
-> shared by all tfm users?
-It's reqsize for hash algos (chcr_ahash_req_ctx struct ) and ctxsize for Cipher algos(ablk_ctx struct),As rrkey(reverse round key) is also same for all tfm.
->
-> In any case, your patch doesn't seem to change the size setting?
-Added new variables in old structure. Size setting related code is unchanged.
-In v2  will break the patch to smaller one.
->
-> Cheers,
+>From: Hamid Nassiby <h.nassiby@gmail.com>
+>Sent: Wednesday, October 26, 2016 10:16 AM
+>To: Cata Vasile
+>Cc: linux-crypto@vger.kernel.org
+>Subject: Re: ARM-CE aes encryption on uneven blocks
+>=A0  =20
+>Hi,>
+
+>Based on my old experience with "struct crypto_alg" based drivers, the
+>data you receive there, is padded beforehand(in the upper layers);
+>Therefore the plaintext contains integral multiple of AES block size
+>of data and based on the number of blocks, the crypto transform can be
+>computed.>
+
+>Regards,
+>Hamid>
+
+>On Mon, Oct 24, 2016 at 6:11 PM, Cata Vasile <cata.vasile@nxp.com> wrote:
+>>
+>> Hi,
+>>
+>> I'm trying to understand the code for AES encryption from ARM-CE.
+>> From the aes-glue.S calls I understand that the encryption primitives re=
+ceive the number of blocks, but have no way of determining the number of by=
+tes to encrypt, if for example the plaintext does not have a length of a mu=
+ltiple of AES block size.
+>> How does, for example, ecb_encrypt() also encrypt the last remaining byt=
+es in the plaintext if it is not a multiple of AES block size if It can nev=
+er deduce the full plaintext size?
+>>
+>> Catalin Vasile--
+>> To unsubscribe from this list: send the line "unsubscribe linux-crypto" =
+in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at=A0  https://emea01.safelinks.protection.outlook.c=
+om/?url=3Dhttp%3A%2F%2Fvger.kernel.org%2Fmajordomo-info.html&data=3D01%7C01=
+%7Ccata.vasile%40nxp.com%7C4c5ecc69183f40e96faf08d3fd701bab%7C686ea1d3bc2b4=
+c6fa92cd99c5c301635%7C0&sdata=3DvVYloLYwzQl3keXvz%2FMdV3d2ruHmn26F%2FfY%2FA=
+7GG8wA%3D&reserved=3D0
+>    =
