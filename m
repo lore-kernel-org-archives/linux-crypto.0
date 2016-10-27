@@ -1,82 +1,55 @@
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH stable 3.10.y 12/18] crypto: af_alg - Forbid bind(2) when nokey child sockets are present
-Date: Thu, 27 Oct 2016 17:29:45 +0300
-Message-ID: <1477578591-28924-13-git-send-email-aryabinin@virtuozzo.com>
-References: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [ANNOUNCE] libkcapi v0.12.0 released
+Date: Fri, 28 Oct 2016 01:04:30 +0200
+Message-ID: <2286347.nnOjI5TozX@tauon.atsec.com>
+References: <2974976.xU0nDqBFOZ@positron.chronox.de> <10631833.2nPcTagHHZ@positron.chronox.de> <CAH8yC8kvADeRgjxkBbdA5aMBDnVVKauTyfS-anaHr+bsF-U1iQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        <linux-crypto@vger.kernel.org>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>
-To: Willy Tarreau <w@1wt.eu>, <stable@vger.kernel.org>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: noloader@gmail.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:47044 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933403AbcJ0XEf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Oct 2016 19:04:35 -0400
+In-Reply-To: <CAH8yC8kvADeRgjxkBbdA5aMBDnVVKauTyfS-anaHr+bsF-U1iQ@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
+Am Donnerstag, 27. Oktober 2016, 18:53:45 CEST schrieb Jeffrey Walton:
 
-commit a6a48c565f6f112c6983e2a02b1602189ed6e26e upstream.
+Hi Jeffrey,
 
-This patch forbids the calling of bind(2) when there are child
-sockets created by accept(2) in existence, even if they are created
-on the nokey path.
 
-This is needed as those child sockets have references to the tfm
-object which bind(2) will destroy.
+> >> preprocessor macros we can use to guard it?
+> > 
+> > I am not entirely sure I understand the question.
+> 
+> See, for example,
+> https://github.com/openssl/openssl/blob/master/engines/afalg/e_afalg.c
+> 
+> The versions are kind of arbitrary because there's no easy way to tell
+> when the gear is available. If I recall from researching things, there
+> were two components needed for afalg, and they were supposedly
+> available back to later 2.x kernels.
+> 
+> Things should "just work" for 3.x and 4.x kernels. But if "too early"
+> a kernel is encountered, then users experience the spectrum from
+> compile problems to unexplained runtime errors.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
----
- crypto/af_alg.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+I see. There are guards around zerocopy.
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 2f8fd84..68ec1ac 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -130,19 +130,16 @@ EXPORT_SYMBOL_GPL(af_alg_release);
- void af_alg_release_parent(struct sock *sk)
- {
- 	struct alg_sock *ask = alg_sk(sk);
--	bool last;
-+	unsigned int nokey = ask->nokey_refcnt;
-+	bool last = nokey && !ask->refcnt;
- 
- 	sk = ask->parent;
--
--	if (ask->nokey_refcnt && !ask->refcnt) {
--		sock_put(sk);
--		return;
--	}
--
- 	ask = alg_sk(sk);
- 
- 	lock_sock(sk);
--	last = !--ask->refcnt;
-+	ask->nokey_refcnt -= nokey;
-+	if (!last)
-+		last = !--ask->refcnt;
- 	release_sock(sk);
- 
- 	if (last)
-@@ -185,7 +182,7 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
- 
- 	err = -EBUSY;
- 	lock_sock(sk);
--	if (ask->refcnt)
-+	if (ask->refcnt | ask->nokey_refcnt)
- 		goto unlock;
- 
- 	swap(ask->type, type);
-@@ -296,6 +293,7 @@ int af_alg_accept(struct sock *sk, struct socket *newsock)
- 
- 	if (nokey || !ask->refcnt++)
- 		sock_hold(sk);
-+	ask->nokey_refcnt += nokey;
- 	alg_sk(sk2)->parent = sk;
- 	alg_sk(sk2)->type = type;
- 	alg_sk(sk2)->nokey_refcnt = nokey;
--- 
-2.7.3
+AF_ALG appeared with 2.6.38 / 3.0 which already had zerocopy.
+
+I will try a 3.0 kernel with my current lib to see whether it works out of the 
+box and apply fixes and guards if it does not.
+
+But I am not sure whether I should guard anything for 2.x kernels where we 
+know that some folks simply backported the AF_ALG interface.
+
+
+Thanks a lot for the reminder.
+
+Ciao
+Stephan
