@@ -1,7 +1,7 @@
 From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH stable 3.10.y 14/18] crypto: algif_skcipher - Fix race condition in skcipher_check_key
-Date: Thu, 27 Oct 2016 17:29:47 +0300
-Message-ID: <1477578591-28924-15-git-send-email-aryabinin@virtuozzo.com>
+Subject: [PATCH stable 3.10.y 18/18] crypto: skcipher - Fix blkcipher walk OOM crash
+Date: Thu, 27 Oct 2016 17:29:51 +0300
+Message-ID: <1477578591-28924-19-git-send-email-aryabinin@virtuozzo.com>
 References: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -9,69 +9,54 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         <linux-crypto@vger.kernel.org>,
         Andrey Ryabinin <aryabinin@virtuozzo.com>
 To: Willy Tarreau <w@1wt.eu>, <stable@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ve1eur01on0103.outbound.protection.outlook.com ([104.47.1.103]:14496
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S934208AbcJ0RCY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Oct 2016 13:02:24 -0400
+Return-path: <stable-owner@vger.kernel.org>
 In-Reply-To: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 From: Herbert Xu <herbert@gondor.apana.org.au>
 
-commit 1822793a523e5d5730b19cc21160ff1717421bc8 upstream.
+commit acdb04d0b36769b3e05990c488dc74d8b7ac8060 upstream.
 
-We need to lock the child socket in skcipher_check_key as otherwise
-two simultaneous calls can cause the parent socket to be freed.
+When we need to allocate a temporary blkcipher_walk_next and it
+fails, the code is supposed to take the slow path of processing
+the data block by block.  However, due to an unrelated change
+we instead end up dereferencing the NULL pointer.
 
+This patch fixes it by moving the unrelated bsize setting out
+of the way so that we enter the slow path as inteded.
+
+Fixes: 7607bd8ff03b ("[CRYPTO] blkcipher: Added blkcipher_walk_virt_block")
 Cc: stable@vger.kernel.org
+Reported-by: xiakaixu <xiakaixu@huawei.com>
+Reported-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
 ---
- crypto/algif_skcipher.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ crypto/blkcipher.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index a7800b7..13fd26e 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -551,22 +551,23 @@ static struct proto_ops algif_skcipher_ops = {
+diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
+index 37af08e..39b09f25 100644
+--- a/crypto/blkcipher.c
++++ b/crypto/blkcipher.c
+@@ -238,6 +238,8 @@ static int blkcipher_walk_next(struct blkcipher_desc *desc,
+ 		return blkcipher_walk_done(desc, walk, -EINVAL);
+ 	}
  
- static int skcipher_check_key(struct socket *sock)
- {
--	int err;
-+	int err = 0;
- 	struct sock *psk;
- 	struct alg_sock *pask;
- 	struct skcipher_tfm *tfm;
- 	struct sock *sk = sock->sk;
- 	struct alg_sock *ask = alg_sk(sk);
++	bsize = min(walk->blocksize, n);
++
+ 	walk->flags &= ~(BLKCIPHER_WALK_SLOW | BLKCIPHER_WALK_COPY |
+ 			 BLKCIPHER_WALK_DIFF);
+ 	if (!scatterwalk_aligned(&walk->in, alignmask) ||
+@@ -250,7 +252,6 @@ static int blkcipher_walk_next(struct blkcipher_desc *desc,
+ 		}
+ 	}
  
-+	lock_sock(sk);
- 	if (ask->refcnt)
--		return 0;
-+		goto unlock_child;
+-	bsize = min(walk->blocksize, n);
+ 	n = scatterwalk_clamp(&walk->in, n);
+ 	n = scatterwalk_clamp(&walk->out, n);
  
- 	psk = ask->parent;
- 	pask = alg_sk(ask->parent);
- 	tfm = pask->private;
- 
- 	err = -ENOKEY;
--	lock_sock(psk);
-+	lock_sock_nested(psk, SINGLE_DEPTH_NESTING);
- 	if (!tfm->has_key)
- 		goto unlock;
- 
-@@ -580,6 +581,8 @@ static int skcipher_check_key(struct socket *sock)
- 
- unlock:
- 	release_sock(psk);
-+unlock_child:
-+	release_sock(sk);
- 
- 	return err;
- }
 -- 
 2.7.3
