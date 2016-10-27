@@ -1,45 +1,61 @@
 From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH stable 3.10.y 08/18] crypto: algif_skcipher - Add key check exception for cipher_null
-Date: Thu, 27 Oct 2016 17:29:41 +0300
-Message-ID: <1477578591-28924-9-git-send-email-aryabinin@virtuozzo.com>
+Subject: [PATCH stable 3.10.y 17/18] crypto: cryptd - initialize child shash_desc on import
+Date: Thu, 27 Oct 2016 17:29:50 +0300
+Message-ID: <1477578591-28924-18-git-send-email-aryabinin@virtuozzo.com>
 References: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         <linux-crypto@vger.kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Andrey Ryabinin <aryabinin@virtuozzo.com>
 To: Willy Tarreau <w@1wt.eu>, <stable@vger.kernel.org>
-Return-path: <stable-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-db5eur01on0136.outbound.protection.outlook.com ([104.47.2.136]:21312
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S943175AbcJ1BIb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Oct 2016 21:08:31 -0400
 In-Reply-To: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-commit 6e8d8ecf438792ecf7a3207488fb4eebc4edb040 upstream.
+commit 0bd2223594a4dcddc1e34b15774a3a4776f7749e upstream.
 
-This patch adds an exception to the key check so that cipher_null
-users may continue to use algif_skcipher without setting a key.
+When calling .import() on a cryptd ahash_request, the structure members
+that describe the child transform in the shash_desc need to be initialized
+like they are when calling .init()
 
 Cc: stable@vger.kernel.org
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
 ---
- crypto/algif_skcipher.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/cryptd.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index db5f0f0..4677a45 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -759,7 +759,7 @@ static int skcipher_accept_parent(void *private, struct sock *sk)
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index 75c415d..d85fab9 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -565,9 +565,14 @@ static int cryptd_hash_export(struct ahash_request *req, void *out)
+ 
+ static int cryptd_hash_import(struct ahash_request *req, const void *in)
  {
- 	struct skcipher_tfm *tfm = private;
+-	struct cryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct cryptd_hash_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct shash_desc *desc = cryptd_shash_desc(req);
++
++	desc->tfm = ctx->child;
++	desc->flags = req->base.flags;
  
--	if (!tfm->has_key)
-+	if (!tfm->has_key && crypto_ablkcipher_has_setkey(tfm->skcipher))
- 		return -ENOKEY;
+-	return crypto_shash_import(&rctx->desc, in);
++	return crypto_shash_import(desc, in);
+ }
  
- 	return skcipher_accept_parent_common(private, sk);
+ static int cryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
 -- 
 2.7.3
