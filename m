@@ -1,55 +1,301 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [ANNOUNCE] libkcapi v0.12.0 released
-Date: Fri, 28 Oct 2016 01:04:30 +0200
-Message-ID: <2286347.nnOjI5TozX@tauon.atsec.com>
-References: <2974976.xU0nDqBFOZ@positron.chronox.de> <10631833.2nPcTagHHZ@positron.chronox.de> <CAH8yC8kvADeRgjxkBbdA5aMBDnVVKauTyfS-anaHr+bsF-U1iQ@mail.gmail.com>
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Subject: [PATCH stable 3.10.y 06/18] crypto: algif_hash - Require setkey before accept(2)
+Date: Thu, 27 Oct 2016 17:29:39 +0300
+Message-ID: <1477578591-28924-7-git-send-email-aryabinin@virtuozzo.com>
+References: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: noloader@gmail.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47044 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933403AbcJ0XEf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Oct 2016 19:04:35 -0400
-In-Reply-To: <CAH8yC8kvADeRgjxkBbdA5aMBDnVVKauTyfS-anaHr+bsF-U1iQ@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        <linux-crypto@vger.kernel.org>,
+        Andrey Ryabinin <aryabinin@virtuozzo.com>
+To: Willy Tarreau <w@1wt.eu>, <stable@vger.kernel.org>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 27. Oktober 2016, 18:53:45 CEST schrieb Jeffrey Walton:
+From: Herbert Xu <herbert@gondor.apana.org.au>
 
-Hi Jeffrey,
+commit 6de62f15b581f920ade22d758f4c338311c2f0d4 upstream.
 
+Hash implementations that require a key may crash if you use
+them without setting a key.  This patch adds the necessary checks
+so that if you do attempt to use them without a key that we return
+-ENOKEY instead of proceeding.
 
-> >> preprocessor macros we can use to guard it?
-> > 
-> > I am not entirely sure I understand the question.
-> 
-> See, for example,
-> https://github.com/openssl/openssl/blob/master/engines/afalg/e_afalg.c
-> 
-> The versions are kind of arbitrary because there's no easy way to tell
-> when the gear is available. If I recall from researching things, there
-> were two components needed for afalg, and they were supposedly
-> available back to later 2.x kernels.
-> 
-> Things should "just work" for 3.x and 4.x kernels. But if "too early"
-> a kernel is encountered, then users experience the spectrum from
-> compile problems to unexplained runtime errors.
+This patch also adds a compatibility path to support old applications
+that do acept(2) before setkey.
 
-I see. There are guards around zerocopy.
+Cc: stable@vger.kernel.org
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
+---
+ crypto/algif_hash.c | 201 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 193 insertions(+), 8 deletions(-)
 
-AF_ALG appeared with 2.6.38 / 3.0 which already had zerocopy.
-
-I will try a 3.0 kernel with my current lib to see whether it works out of the 
-box and apply fixes and guards if it does not.
-
-But I am not sure whether I should guard anything for 2.x kernels where we 
-know that some folks simply backported the AF_ALG interface.
-
-
-Thanks a lot for the reminder.
-
-Ciao
-Stephan
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index c542c0d8..7bc3f89 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -34,6 +34,11 @@ struct hash_ctx {
+ 	struct ahash_request req;
+ };
+ 
++struct algif_hash_tfm {
++	struct crypto_ahash *hash;
++	bool has_key;
++};
++
+ static int hash_sendmsg(struct kiocb *unused, struct socket *sock,
+ 			struct msghdr *msg, size_t ignored)
+ {
+@@ -248,22 +253,151 @@ static struct proto_ops algif_hash_ops = {
+ 	.accept		=	hash_accept,
+ };
+ 
++static int hash_check_key(struct socket *sock)
++{
++	int err;
++	struct sock *psk;
++	struct alg_sock *pask;
++	struct algif_hash_tfm *tfm;
++	struct sock *sk = sock->sk;
++	struct alg_sock *ask = alg_sk(sk);
++
++	if (ask->refcnt)
++		return 0;
++
++	psk = ask->parent;
++	pask = alg_sk(ask->parent);
++	tfm = pask->private;
++
++	err = -ENOKEY;
++	lock_sock(psk);
++	if (!tfm->has_key)
++		goto unlock;
++
++	if (!pask->refcnt++)
++		sock_hold(psk);
++
++	ask->refcnt = 1;
++	sock_put(psk);
++
++	err = 0;
++
++unlock:
++	release_sock(psk);
++
++	return err;
++}
++
++static int hash_sendmsg_nokey(struct kiocb *unused, struct socket *sock,
++			      struct msghdr *msg, size_t size)
++{
++	int err;
++
++	err = hash_check_key(sock);
++	if (err)
++		return err;
++
++	return hash_sendmsg(unused, sock, msg, size);
++}
++
++static ssize_t hash_sendpage_nokey(struct socket *sock, struct page *page,
++				   int offset, size_t size, int flags)
++{
++	int err;
++
++	err = hash_check_key(sock);
++	if (err)
++		return err;
++
++	return hash_sendpage(sock, page, offset, size, flags);
++}
++
++static int hash_recvmsg_nokey(struct kiocb *unused, struct socket *sock,
++			      struct msghdr *msg, size_t ignored, int flags)
++{
++	int err;
++
++	err = hash_check_key(sock);
++	if (err)
++		return err;
++
++	return hash_recvmsg(unused, sock, msg, ignored, flags);
++}
++
++static int hash_accept_nokey(struct socket *sock, struct socket *newsock,
++			     int flags)
++{
++	int err;
++
++	err = hash_check_key(sock);
++	if (err)
++		return err;
++
++	return hash_accept(sock, newsock, flags);
++}
++
++static struct proto_ops algif_hash_ops_nokey = {
++	.family		=	PF_ALG,
++
++	.connect	=	sock_no_connect,
++	.socketpair	=	sock_no_socketpair,
++	.getname	=	sock_no_getname,
++	.ioctl		=	sock_no_ioctl,
++	.listen		=	sock_no_listen,
++	.shutdown	=	sock_no_shutdown,
++	.getsockopt	=	sock_no_getsockopt,
++	.mmap		=	sock_no_mmap,
++	.bind		=	sock_no_bind,
++	.setsockopt	=	sock_no_setsockopt,
++	.poll		=	sock_no_poll,
++
++	.release	=	af_alg_release,
++	.sendmsg	=	hash_sendmsg_nokey,
++	.sendpage	=	hash_sendpage_nokey,
++	.recvmsg	=	hash_recvmsg_nokey,
++	.accept		=	hash_accept_nokey,
++};
++
+ static void *hash_bind(const char *name, u32 type, u32 mask)
+ {
+-	return crypto_alloc_ahash(name, type, mask);
++	struct algif_hash_tfm *tfm;
++	struct crypto_ahash *hash;
++
++	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
++	if (!tfm)
++		return ERR_PTR(-ENOMEM);
++
++	hash = crypto_alloc_ahash(name, type, mask);
++	if (IS_ERR(hash)) {
++		kfree(tfm);
++		return ERR_CAST(hash);
++	}
++
++	tfm->hash = hash;
++
++	return tfm;
+ }
+ 
+ static void hash_release(void *private)
+ {
+-	crypto_free_ahash(private);
++	struct algif_hash_tfm *tfm = private;
++
++	crypto_free_ahash(tfm->hash);
++	kfree(tfm);
+ }
+ 
+ static int hash_setkey(void *private, const u8 *key, unsigned int keylen)
+ {
+-	return crypto_ahash_setkey(private, key, keylen);
++	struct algif_hash_tfm *tfm = private;
++	int err;
++
++	err = crypto_ahash_setkey(tfm->hash, key, keylen);
++	tfm->has_key = !err;
++
++	return err;
+ }
+ 
+-static void hash_sock_destruct(struct sock *sk)
++static void hash_sock_destruct_common(struct sock *sk)
+ {
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct hash_ctx *ctx = ask->private;
+@@ -271,15 +405,40 @@ static void hash_sock_destruct(struct sock *sk)
+ 	sock_kfree_s(sk, ctx->result,
+ 		     crypto_ahash_digestsize(crypto_ahash_reqtfm(&ctx->req)));
+ 	sock_kfree_s(sk, ctx, ctx->len);
++}
++
++static void hash_sock_destruct(struct sock *sk)
++{
++	hash_sock_destruct_common(sk);
+ 	af_alg_release_parent(sk);
+ }
+ 
+-static int hash_accept_parent(void *private, struct sock *sk)
++static void hash_release_parent_nokey(struct sock *sk)
++{
++	struct alg_sock *ask = alg_sk(sk);
++
++	if (!ask->refcnt) {
++		sock_put(ask->parent);
++		return;
++	}
++
++	af_alg_release_parent(sk);
++}
++
++static void hash_sock_destruct_nokey(struct sock *sk)
++{
++	hash_sock_destruct_common(sk);
++	hash_release_parent_nokey(sk);
++}
++
++static int hash_accept_parent_common(void *private, struct sock *sk)
+ {
+ 	struct hash_ctx *ctx;
+ 	struct alg_sock *ask = alg_sk(sk);
+-	unsigned len = sizeof(*ctx) + crypto_ahash_reqsize(private);
+-	unsigned ds = crypto_ahash_digestsize(private);
++	struct algif_hash_tfm *tfm = private;
++	struct crypto_ahash *hash = tfm->hash;
++	unsigned len = sizeof(*ctx) + crypto_ahash_reqsize(hash);
++	unsigned ds = crypto_ahash_digestsize(hash);
+ 
+ 	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
+ 	if (!ctx)
+@@ -299,7 +458,7 @@ static int hash_accept_parent(void *private, struct sock *sk)
+ 
+ 	ask->private = ctx;
+ 
+-	ahash_request_set_tfm(&ctx->req, private);
++	ahash_request_set_tfm(&ctx->req, hash);
+ 	ahash_request_set_callback(&ctx->req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+ 				   af_alg_complete, &ctx->completion);
+ 
+@@ -308,12 +467,38 @@ static int hash_accept_parent(void *private, struct sock *sk)
+ 	return 0;
+ }
+ 
++static int hash_accept_parent(void *private, struct sock *sk)
++{
++	struct algif_hash_tfm *tfm = private;
++
++	if (!tfm->has_key && crypto_ahash_has_setkey(tfm->hash))
++		return -ENOKEY;
++
++	return hash_accept_parent_common(private, sk);
++}
++
++static int hash_accept_parent_nokey(void *private, struct sock *sk)
++{
++	int err;
++
++	err = hash_accept_parent_common(private, sk);
++	if (err)
++		goto out;
++
++	sk->sk_destruct = hash_sock_destruct_nokey;
++
++out:
++	return err;
++}
++
+ static const struct af_alg_type algif_type_hash = {
+ 	.bind		=	hash_bind,
+ 	.release	=	hash_release,
+ 	.setkey		=	hash_setkey,
+ 	.accept		=	hash_accept_parent,
++	.accept_nokey	=	hash_accept_parent_nokey,
+ 	.ops		=	&algif_hash_ops,
++	.ops_nokey	=	&algif_hash_ops_nokey,
+ 	.name		=	"hash",
+ 	.owner		=	THIS_MODULE
+ };
+-- 
+2.7.3
