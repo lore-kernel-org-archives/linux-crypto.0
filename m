@@ -1,37 +1,59 @@
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: linux-next: Tree for Oct 26 (crypto/acompress.ko)
-Date: Thu, 27 Oct 2016 06:17:54 +0100
-Message-ID: <20161027051754.GA3715@SILVIXA00369791-F22-1>
-References: <20161026135133.65edfd22@canb.auug.org.au>
- <052d917e-0442-0bbf-5b22-6506f832e30e@infradead.org>
- <CAP=VYLq=Zgaf5uhWVG68Hyha=gJ923ZkW+v7UsfsOJE53YxR0w@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        "linux-next@vger.kernel.org" <linux-next@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: Paul Gortmaker <paul.gortmaker@windriver.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:18659 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750855AbcJ0FSD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Oct 2016 01:18:03 -0400
-Content-Disposition: inline
-In-Reply-To: <CAP=VYLq=Zgaf5uhWVG68Hyha=gJ923ZkW+v7UsfsOJE53YxR0w@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] crypto: acomp: export all scomp interfaces
+Date: Thu, 27 Oct 2016 16:09:49 +0200
+Message-ID: <20161027141029.2566709-1-arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+The newly added scomp/acomp interface has a couple of functions
+that should be exported to allow linking the two drivers
+as loadable modules:
 
-On Wed, Oct 26, 2016 at 07:54:00PM -0400, Paul Gortmaker wrote:
-> So, no EXPORT_SYMBOL, and any .config which has ACOMP2=m will fail.
-I sent a patch for this:
-https://patchwork.kernel.org/patch/9396503/
+ERROR: "crypto_acomp_scomp_free_ctx" [crypto/acompress.ko] undefined!
+ERROR: "crypto_acomp_scomp_alloc_ctx" [crypto/acompress.ko] undefined!
+ERROR: "crypto_init_scomp_ops_async" [crypto/acompress.ko] undefined!
 
-Regards,
+Alternatively, both of them could be combined into one loadable module.
 
---
-Giovanni
+Fixes: 1ab53a77b772 ("crypto: acomp - add driver-side scomp interface")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ crypto/scompress.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/crypto/scompress.c b/crypto/scompress.c
+index 35e396d154b7..1f9cdcddb2ce 100644
+--- a/crypto/scompress.c
++++ b/crypto/scompress.c
+@@ -267,6 +267,7 @@ int crypto_init_scomp_ops_async(struct crypto_tfm *tfm)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(crypto_init_scomp_ops_async);
+ 
+ struct acomp_req *crypto_acomp_scomp_alloc_ctx(struct acomp_req *req)
+ {
+@@ -286,6 +287,7 @@ struct acomp_req *crypto_acomp_scomp_alloc_ctx(struct acomp_req *req)
+ 
+ 	return req;
+ }
++EXPORT_SYMBOL_GPL(crypto_acomp_scomp_alloc_ctx);
+ 
+ void crypto_acomp_scomp_free_ctx(struct acomp_req *req)
+ {
+@@ -298,6 +300,7 @@ void crypto_acomp_scomp_free_ctx(struct acomp_req *req)
+ 	if (ctx)
+ 		crypto_scomp_free_ctx(scomp, ctx);
+ }
++EXPORT_SYMBOL_GPL(crypto_acomp_scomp_free_ctx);
+ 
+ static const struct crypto_type crypto_scomp_type = {
+ 	.extsize = crypto_alg_extsize,
+-- 
+2.9.0
