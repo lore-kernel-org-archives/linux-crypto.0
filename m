@@ -1,7 +1,7 @@
 From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH stable 3.10.y 05/18] crypto: hash - Add crypto_ahash_has_setkey
-Date: Thu, 27 Oct 2016 17:29:38 +0300
-Message-ID: <1477578591-28924-6-git-send-email-aryabinin@virtuozzo.com>
+Subject: [PATCH stable 3.10.y 15/18] crypto: algif_skcipher - Load TX SG list after waiting
+Date: Thu, 27 Oct 2016 17:29:48 +0300
+Message-ID: <1477578591-28924-16-git-send-email-aryabinin@virtuozzo.com>
 References: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,94 +10,62 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         Andrey Ryabinin <aryabinin@virtuozzo.com>
 To: Willy Tarreau <w@1wt.eu>, <stable@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ve1eur01on0105.outbound.protection.outlook.com ([104.47.1.105]:13440
+Received: from mail-ve1eur01on0095.outbound.protection.outlook.com ([104.47.1.95]:14380
         "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S936503AbcJ0SEA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Oct 2016 14:04:00 -0400
+        id S934646AbcJ0SEk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Oct 2016 14:04:40 -0400
 In-Reply-To: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Herbert Xu <herbert@gondor.apana.org.au>
 
-commit a5596d6332787fd383b3b5427b41f94254430827 upstream.
+commit 4f0414e54e4d1893c6f08260693f8ef84c929293 upstream.
 
-This patch adds a way for ahash users to determine whether a key
-is required by a crypto_ahash transform.
+We need to load the TX SG list in sendmsg(2) after waiting for
+incoming data, not before.
 
 Cc: stable@vger.kernel.org
+Reported-by: Dmitry Vyukov <dvyukov@google.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Tested-by: Dmitry Vyukov <dvyukov@google.com>
 Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
 ---
- crypto/ahash.c        | 5 ++++-
- crypto/shash.c        | 4 +++-
- include/crypto/hash.h | 6 ++++++
- 3 files changed, 13 insertions(+), 2 deletions(-)
+ crypto/algif_skcipher.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index bcd5efc..781a8a7 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -370,6 +370,7 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
- 	struct ahash_alg *alg = crypto_ahash_alg(hash);
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 13fd26e..ea05c53 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -446,13 +446,6 @@ static int skcipher_recvmsg(struct kiocb *unused, struct socket *sock,
+ 		char __user *from = iov->iov_base;
  
- 	hash->setkey = ahash_nosetkey;
-+	hash->has_setkey = false;
- 	hash->export = ahash_no_export;
- 	hash->import = ahash_no_import;
+ 		while (seglen) {
+-			sgl = list_first_entry(&ctx->tsgl,
+-					       struct skcipher_sg_list, list);
+-			sg = sgl->sg;
+-
+-			while (!sg->length)
+-				sg++;
+-
+ 			used = ctx->used;
+ 			if (!used) {
+ 				err = skcipher_wait_for_data(sk, flags);
+@@ -474,6 +467,13 @@ static int skcipher_recvmsg(struct kiocb *unused, struct socket *sock,
+ 			if (!used)
+ 				goto free;
  
-@@ -382,8 +383,10 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
- 	hash->finup = alg->finup ?: ahash_def_finup;
- 	hash->digest = alg->digest;
- 
--	if (alg->setkey)
-+	if (alg->setkey) {
- 		hash->setkey = alg->setkey;
-+		hash->has_setkey = true;
-+	}
- 	if (alg->export)
- 		hash->export = alg->export;
- 	if (alg->import)
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 929058a..8e4256a 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -354,8 +354,10 @@ int crypto_init_shash_ops_async(struct crypto_tfm *tfm)
- 	crt->finup = shash_async_finup;
- 	crt->digest = shash_async_digest;
- 
--	if (alg->setkey)
-+	if (alg->setkey) {
- 		crt->setkey = shash_async_setkey;
-+		crt->has_setkey = true;
-+	}
- 	if (alg->export)
- 		crt->export = shash_async_export;
- 	if (alg->import)
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 26cb1eb..c8c7987 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -94,6 +94,7 @@ struct crypto_ahash {
- 		      unsigned int keylen);
- 
- 	unsigned int reqsize;
-+	bool has_setkey;
- 	struct crypto_tfm base;
- };
- 
-@@ -181,6 +182,11 @@ static inline void *ahash_request_ctx(struct ahash_request *req)
- 
- int crypto_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
- 			unsigned int keylen);
-+static inline bool crypto_ahash_has_setkey(struct crypto_ahash *tfm)
-+{
-+	return tfm->has_setkey;
-+}
++			sgl = list_first_entry(&ctx->tsgl,
++					       struct skcipher_sg_list, list);
++			sg = sgl->sg;
 +
- int crypto_ahash_finup(struct ahash_request *req);
- int crypto_ahash_final(struct ahash_request *req);
- int crypto_ahash_digest(struct ahash_request *req);
++			while (!sg->length)
++				sg++;
++
+ 			ablkcipher_request_set_crypt(&ctx->req, sg,
+ 						     ctx->rsgl.sg, used,
+ 						     ctx->iv);
 -- 
 2.7.3
