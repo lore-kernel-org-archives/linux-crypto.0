@@ -1,7 +1,7 @@
 From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH stable 3.10.y 09/18] crypto: af_alg - Allow af_af_alg_release_parent to be called on nokey path
-Date: Thu, 27 Oct 2016 17:29:42 +0300
-Message-ID: <1477578591-28924-10-git-send-email-aryabinin@virtuozzo.com>
+Subject: [PATCH stable 3.10.y 14/18] crypto: algif_skcipher - Fix race condition in skcipher_check_key
+Date: Thu, 27 Oct 2016 17:29:47 +0300
+Message-ID: <1477578591-28924-15-git-send-email-aryabinin@virtuozzo.com>
 References: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,76 +10,68 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         Andrey Ryabinin <aryabinin@virtuozzo.com>
 To: Willy Tarreau <w@1wt.eu>, <stable@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ve1eur01on0102.outbound.protection.outlook.com ([104.47.1.102]:36000
+Received: from mail-ve1eur01on0103.outbound.protection.outlook.com ([104.47.1.103]:14496
         "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S936570AbcJ0QEO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Oct 2016 12:04:14 -0400
+        id S934208AbcJ0RCY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Oct 2016 13:02:24 -0400
 In-Reply-To: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Herbert Xu <herbert@gondor.apana.org.au>
 
-commit 6a935170a980024dd29199e9dbb5c4da4767a1b9 upstream.
+commit 1822793a523e5d5730b19cc21160ff1717421bc8 upstream.
 
-This patch allows af_alg_release_parent to be called even for
-nokey sockets.
+We need to lock the child socket in skcipher_check_key as otherwise
+two simultaneous calls can cause the parent socket to be freed.
 
 Cc: stable@vger.kernel.org
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
 ---
- crypto/af_alg.c         | 9 ++++++++-
- include/crypto/if_alg.h | 1 +
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ crypto/algif_skcipher.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index de130c2..2f8fd84 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -133,6 +133,12 @@ void af_alg_release_parent(struct sock *sk)
- 	bool last;
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index a7800b7..13fd26e 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -551,22 +551,23 @@ static struct proto_ops algif_skcipher_ops = {
  
- 	sk = ask->parent;
-+
-+	if (ask->nokey_refcnt && !ask->refcnt) {
-+		sock_put(sk);
-+		return;
-+	}
-+
- 	ask = alg_sk(sk);
- 
- 	lock_sock(sk);
-@@ -258,8 +264,8 @@ int af_alg_accept(struct sock *sk, struct socket *newsock)
+ static int skcipher_check_key(struct socket *sock)
+ {
+-	int err;
++	int err = 0;
+ 	struct sock *psk;
+ 	struct alg_sock *pask;
+ 	struct skcipher_tfm *tfm;
+ 	struct sock *sk = sock->sk;
  	struct alg_sock *ask = alg_sk(sk);
- 	const struct af_alg_type *type;
- 	struct sock *sk2;
-+	unsigned int nokey;
- 	int err;
--	bool nokey;
  
- 	lock_sock(sk);
- 	type = ask->type;
-@@ -292,6 +298,7 @@ int af_alg_accept(struct sock *sk, struct socket *newsock)
- 		sock_hold(sk);
- 	alg_sk(sk2)->parent = sk;
- 	alg_sk(sk2)->type = type;
-+	alg_sk(sk2)->nokey_refcnt = nokey;
++	lock_sock(sk);
+ 	if (ask->refcnt)
+-		return 0;
++		goto unlock_child;
  
- 	newsock->ops = type->ops;
- 	newsock->state = SS_CONNECTED;
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 9e6a2f3..bfefd81 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -31,6 +31,7 @@ struct alg_sock {
- 	struct sock *parent;
+ 	psk = ask->parent;
+ 	pask = alg_sk(ask->parent);
+ 	tfm = pask->private;
  
- 	unsigned int refcnt;
-+	unsigned int nokey_refcnt;
+ 	err = -ENOKEY;
+-	lock_sock(psk);
++	lock_sock_nested(psk, SINGLE_DEPTH_NESTING);
+ 	if (!tfm->has_key)
+ 		goto unlock;
  
- 	const struct af_alg_type *type;
- 	void *private;
+@@ -580,6 +581,8 @@ static int skcipher_check_key(struct socket *sock)
+ 
+ unlock:
+ 	release_sock(psk);
++unlock_child:
++	release_sock(sk);
+ 
+ 	return err;
+ }
 -- 
 2.7.3
