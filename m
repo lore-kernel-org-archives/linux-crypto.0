@@ -1,8 +1,7 @@
 From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH stable 3.10.y 06/18] crypto: algif_hash - Require setkey before accept(2)
-Date: Thu, 27 Oct 2016 17:29:39 +0300
-Message-ID: <1477578591-28924-7-git-send-email-aryabinin@virtuozzo.com>
-References: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
+Subject: [PATCH stable 3.10.y 00/18] Backport crypto fixes.
+Date: Thu, 27 Oct 2016 17:29:33 +0300
+Message-ID: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -10,292 +9,52 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         Andrey Ryabinin <aryabinin@virtuozzo.com>
 To: Willy Tarreau <w@1wt.eu>, <stable@vger.kernel.org>
 Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
 Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
+While fuzzing our 3.10 based kernel we observed some crashes, e.g:
+      http://lkml.kernel.org/r/<CACT4Y+aE-pNUnCLbDQkFQ9Y7QivN_g6hEuS7t1RpknPHFmHg+g@mail.gmail.com>
 
-commit 6de62f15b581f920ade22d758f4c338311c2f0d4 upstream.
+It appears that 3.10-stable lacks some crypto related fixes. Here is my attempt
+to backport them.
+Many patches didn't apply cleanly, so to make sure that my conflict resolution
+is correct I compared it with other stable trees.
 
-Hash implementations that require a key may crash if you use
-them without setting a key.  This patch adds the necessary checks
-so that if you do attempt to use them without a key that we return
--ENOKEY instead of proceeding.
+Ard Biesheuvel (1):
+  crypto: cryptd - initialize child shash_desc on import
 
-This patch also adds a compatibility path to support old applications
-that do acept(2) before setkey.
+Herbert Xu (17):
+  crypto: algif_skcipher - Require setkey before accept(2)
+  crypto: af_alg - Disallow bind/setkey/... after accept(2)
+  crypto: af_alg - Add nokey compatibility path
+  crypto: algif_skcipher - Add nokey compatibility path
+  crypto: hash - Add crypto_ahash_has_setkey
+  crypto: algif_hash - Require setkey before accept(2)
+  crypto: skcipher - Add crypto_skcipher_has_setkey
+  crypto: algif_skcipher - Add key check exception for cipher_null
+  crypto: af_alg - Allow af_af_alg_release_parent to be called on nokey
+    path
+  crypto: algif_hash - Remove custom release parent function
+  crypto: algif_skcipher - Remove custom release parent function
+  crypto: af_alg - Forbid bind(2) when nokey child sockets are present
+  crypto: algif_hash - Fix race condition in hash_check_key
+  crypto: algif_skcipher - Fix race condition in skcipher_check_key
+  crypto: algif_skcipher - Load TX SG list after waiting
+  crypto: shash - Fix has_key setting
+  crypto: skcipher - Fix blkcipher walk OOM crash
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
----
- crypto/algif_hash.c | 201 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 193 insertions(+), 8 deletions(-)
+ crypto/ablkcipher.c     |   2 +
+ crypto/af_alg.c         |  51 +++++++++++++-
+ crypto/ahash.c          |   5 +-
+ crypto/algif_hash.c     | 165 ++++++++++++++++++++++++++++++++++++++++++++--
+ crypto/algif_skcipher.c | 172 +++++++++++++++++++++++++++++++++++++++++++-----
+ crypto/blkcipher.c      |   4 +-
+ crypto/cryptd.c         |   9 ++-
+ crypto/shash.c          |   5 +-
+ include/crypto/hash.h   |   6 ++
+ include/crypto/if_alg.h |  11 ++--
+ include/linux/crypto.h  |   8 +++
+ 11 files changed, 400 insertions(+), 38 deletions(-)
 
-diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index c542c0d8..7bc3f89 100644
---- a/crypto/algif_hash.c
-+++ b/crypto/algif_hash.c
-@@ -34,6 +34,11 @@ struct hash_ctx {
- 	struct ahash_request req;
- };
- 
-+struct algif_hash_tfm {
-+	struct crypto_ahash *hash;
-+	bool has_key;
-+};
-+
- static int hash_sendmsg(struct kiocb *unused, struct socket *sock,
- 			struct msghdr *msg, size_t ignored)
- {
-@@ -248,22 +253,151 @@ static struct proto_ops algif_hash_ops = {
- 	.accept		=	hash_accept,
- };
- 
-+static int hash_check_key(struct socket *sock)
-+{
-+	int err;
-+	struct sock *psk;
-+	struct alg_sock *pask;
-+	struct algif_hash_tfm *tfm;
-+	struct sock *sk = sock->sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+
-+	if (ask->refcnt)
-+		return 0;
-+
-+	psk = ask->parent;
-+	pask = alg_sk(ask->parent);
-+	tfm = pask->private;
-+
-+	err = -ENOKEY;
-+	lock_sock(psk);
-+	if (!tfm->has_key)
-+		goto unlock;
-+
-+	if (!pask->refcnt++)
-+		sock_hold(psk);
-+
-+	ask->refcnt = 1;
-+	sock_put(psk);
-+
-+	err = 0;
-+
-+unlock:
-+	release_sock(psk);
-+
-+	return err;
-+}
-+
-+static int hash_sendmsg_nokey(struct kiocb *unused, struct socket *sock,
-+			      struct msghdr *msg, size_t size)
-+{
-+	int err;
-+
-+	err = hash_check_key(sock);
-+	if (err)
-+		return err;
-+
-+	return hash_sendmsg(unused, sock, msg, size);
-+}
-+
-+static ssize_t hash_sendpage_nokey(struct socket *sock, struct page *page,
-+				   int offset, size_t size, int flags)
-+{
-+	int err;
-+
-+	err = hash_check_key(sock);
-+	if (err)
-+		return err;
-+
-+	return hash_sendpage(sock, page, offset, size, flags);
-+}
-+
-+static int hash_recvmsg_nokey(struct kiocb *unused, struct socket *sock,
-+			      struct msghdr *msg, size_t ignored, int flags)
-+{
-+	int err;
-+
-+	err = hash_check_key(sock);
-+	if (err)
-+		return err;
-+
-+	return hash_recvmsg(unused, sock, msg, ignored, flags);
-+}
-+
-+static int hash_accept_nokey(struct socket *sock, struct socket *newsock,
-+			     int flags)
-+{
-+	int err;
-+
-+	err = hash_check_key(sock);
-+	if (err)
-+		return err;
-+
-+	return hash_accept(sock, newsock, flags);
-+}
-+
-+static struct proto_ops algif_hash_ops_nokey = {
-+	.family		=	PF_ALG,
-+
-+	.connect	=	sock_no_connect,
-+	.socketpair	=	sock_no_socketpair,
-+	.getname	=	sock_no_getname,
-+	.ioctl		=	sock_no_ioctl,
-+	.listen		=	sock_no_listen,
-+	.shutdown	=	sock_no_shutdown,
-+	.getsockopt	=	sock_no_getsockopt,
-+	.mmap		=	sock_no_mmap,
-+	.bind		=	sock_no_bind,
-+	.setsockopt	=	sock_no_setsockopt,
-+	.poll		=	sock_no_poll,
-+
-+	.release	=	af_alg_release,
-+	.sendmsg	=	hash_sendmsg_nokey,
-+	.sendpage	=	hash_sendpage_nokey,
-+	.recvmsg	=	hash_recvmsg_nokey,
-+	.accept		=	hash_accept_nokey,
-+};
-+
- static void *hash_bind(const char *name, u32 type, u32 mask)
- {
--	return crypto_alloc_ahash(name, type, mask);
-+	struct algif_hash_tfm *tfm;
-+	struct crypto_ahash *hash;
-+
-+	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
-+	if (!tfm)
-+		return ERR_PTR(-ENOMEM);
-+
-+	hash = crypto_alloc_ahash(name, type, mask);
-+	if (IS_ERR(hash)) {
-+		kfree(tfm);
-+		return ERR_CAST(hash);
-+	}
-+
-+	tfm->hash = hash;
-+
-+	return tfm;
- }
- 
- static void hash_release(void *private)
- {
--	crypto_free_ahash(private);
-+	struct algif_hash_tfm *tfm = private;
-+
-+	crypto_free_ahash(tfm->hash);
-+	kfree(tfm);
- }
- 
- static int hash_setkey(void *private, const u8 *key, unsigned int keylen)
- {
--	return crypto_ahash_setkey(private, key, keylen);
-+	struct algif_hash_tfm *tfm = private;
-+	int err;
-+
-+	err = crypto_ahash_setkey(tfm->hash, key, keylen);
-+	tfm->has_key = !err;
-+
-+	return err;
- }
- 
--static void hash_sock_destruct(struct sock *sk)
-+static void hash_sock_destruct_common(struct sock *sk)
- {
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct hash_ctx *ctx = ask->private;
-@@ -271,15 +405,40 @@ static void hash_sock_destruct(struct sock *sk)
- 	sock_kfree_s(sk, ctx->result,
- 		     crypto_ahash_digestsize(crypto_ahash_reqtfm(&ctx->req)));
- 	sock_kfree_s(sk, ctx, ctx->len);
-+}
-+
-+static void hash_sock_destruct(struct sock *sk)
-+{
-+	hash_sock_destruct_common(sk);
- 	af_alg_release_parent(sk);
- }
- 
--static int hash_accept_parent(void *private, struct sock *sk)
-+static void hash_release_parent_nokey(struct sock *sk)
-+{
-+	struct alg_sock *ask = alg_sk(sk);
-+
-+	if (!ask->refcnt) {
-+		sock_put(ask->parent);
-+		return;
-+	}
-+
-+	af_alg_release_parent(sk);
-+}
-+
-+static void hash_sock_destruct_nokey(struct sock *sk)
-+{
-+	hash_sock_destruct_common(sk);
-+	hash_release_parent_nokey(sk);
-+}
-+
-+static int hash_accept_parent_common(void *private, struct sock *sk)
- {
- 	struct hash_ctx *ctx;
- 	struct alg_sock *ask = alg_sk(sk);
--	unsigned len = sizeof(*ctx) + crypto_ahash_reqsize(private);
--	unsigned ds = crypto_ahash_digestsize(private);
-+	struct algif_hash_tfm *tfm = private;
-+	struct crypto_ahash *hash = tfm->hash;
-+	unsigned len = sizeof(*ctx) + crypto_ahash_reqsize(hash);
-+	unsigned ds = crypto_ahash_digestsize(hash);
- 
- 	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
- 	if (!ctx)
-@@ -299,7 +458,7 @@ static int hash_accept_parent(void *private, struct sock *sk)
- 
- 	ask->private = ctx;
- 
--	ahash_request_set_tfm(&ctx->req, private);
-+	ahash_request_set_tfm(&ctx->req, hash);
- 	ahash_request_set_callback(&ctx->req, CRYPTO_TFM_REQ_MAY_BACKLOG,
- 				   af_alg_complete, &ctx->completion);
- 
-@@ -308,12 +467,38 @@ static int hash_accept_parent(void *private, struct sock *sk)
- 	return 0;
- }
- 
-+static int hash_accept_parent(void *private, struct sock *sk)
-+{
-+	struct algif_hash_tfm *tfm = private;
-+
-+	if (!tfm->has_key && crypto_ahash_has_setkey(tfm->hash))
-+		return -ENOKEY;
-+
-+	return hash_accept_parent_common(private, sk);
-+}
-+
-+static int hash_accept_parent_nokey(void *private, struct sock *sk)
-+{
-+	int err;
-+
-+	err = hash_accept_parent_common(private, sk);
-+	if (err)
-+		goto out;
-+
-+	sk->sk_destruct = hash_sock_destruct_nokey;
-+
-+out:
-+	return err;
-+}
-+
- static const struct af_alg_type algif_type_hash = {
- 	.bind		=	hash_bind,
- 	.release	=	hash_release,
- 	.setkey		=	hash_setkey,
- 	.accept		=	hash_accept_parent,
-+	.accept_nokey	=	hash_accept_parent_nokey,
- 	.ops		=	&algif_hash_ops,
-+	.ops_nokey	=	&algif_hash_ops_nokey,
- 	.name		=	"hash",
- 	.owner		=	THIS_MODULE
- };
 -- 
 2.7.3
