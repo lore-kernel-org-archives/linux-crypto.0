@@ -1,7 +1,7 @@
 From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH stable 3.10.y 03/18] crypto: af_alg - Add nokey compatibility path
-Date: Thu, 27 Oct 2016 17:29:36 +0300
-Message-ID: <1477578591-28924-4-git-send-email-aryabinin@virtuozzo.com>
+Subject: [PATCH stable 3.10.y 01/18] crypto: algif_skcipher - Require setkey before accept(2)
+Date: Thu, 27 Oct 2016 17:29:34 +0300
+Message-ID: <1477578591-28924-2-git-send-email-aryabinin@virtuozzo.com>
 References: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,94 +10,134 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         Andrey Ryabinin <aryabinin@virtuozzo.com>
 To: Willy Tarreau <w@1wt.eu>, <stable@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ve1eur01on0122.outbound.protection.outlook.com ([104.47.1.122]:62542
+Received: from mail-ve1eur01on0132.outbound.protection.outlook.com ([104.47.1.132]:32496
         "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S942238AbcJ0QBU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Oct 2016 12:01:20 -0400
+        id S933709AbcJ0QC7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Oct 2016 12:02:59 -0400
 In-Reply-To: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Herbert Xu <herbert@gondor.apana.org.au>
 
-commit 37766586c965d63758ad542325a96d5384f4a8c9 upstream.
+commit dd504589577d8e8e70f51f997ad487a4cb6c026f upstream.
 
-This patch adds a compatibility path to support old applications
-that do acept(2) before setkey.
+Some cipher implementations will crash if you try to use them
+without calling setkey first.  This patch adds a check so that
+the accept(2) call will fail with -ENOKEY if setkey hasn't been
+done on the socket yet.
 
 Cc: stable@vger.kernel.org
+Reported-by: Dmitry Vyukov <dvyukov@google.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Tested-by: Dmitry Vyukov <dvyukov@google.com>
 Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
 ---
- crypto/af_alg.c         | 13 ++++++++++++-
- include/crypto/if_alg.h |  2 ++
- 2 files changed, 14 insertions(+), 1 deletion(-)
+ crypto/algif_skcipher.c | 51 ++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 42 insertions(+), 9 deletions(-)
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 0ca108f..de130c2 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -76,6 +76,8 @@ int af_alg_register_type(const struct af_alg_type *type)
- 		goto unlock;
- 
- 	type->ops->owner = THIS_MODULE;
-+	if (type->ops_nokey)
-+		type->ops_nokey->owner = THIS_MODULE;
- 	node->type = type;
- 	list_add(&node->list, &alg_types);
- 	err = 0;
-@@ -257,6 +259,7 @@ int af_alg_accept(struct sock *sk, struct socket *newsock)
- 	const struct af_alg_type *type;
- 	struct sock *sk2;
- 	int err;
-+	bool nokey;
- 
- 	lock_sock(sk);
- 	type = ask->type;
-@@ -275,12 +278,17 @@ int af_alg_accept(struct sock *sk, struct socket *newsock)
- 	security_sk_clone(sk, sk2);
- 
- 	err = type->accept(ask->private, sk2);
-+
-+	nokey = err == -ENOKEY;
-+	if (nokey && type->accept_nokey)
-+		err = type->accept_nokey(ask->private, sk2);
-+
- 	if (err)
- 		goto unlock;
- 
- 	sk2->sk_family = PF_ALG;
- 
--	if (!ask->refcnt++)
-+	if (nokey || !ask->refcnt++)
- 		sock_hold(sk);
- 	alg_sk(sk2)->parent = sk;
- 	alg_sk(sk2)->type = type;
-@@ -288,6 +296,9 @@ int af_alg_accept(struct sock *sk, struct socket *newsock)
- 	newsock->ops = type->ops;
- 	newsock->state = SS_CONNECTED;
- 
-+	if (nokey)
-+		newsock->ops = type->ops_nokey;
-+
- 	err = 0;
- 
- unlock:
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 2f38daa..9e6a2f3 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -51,8 +51,10 @@ struct af_alg_type {
- 	void (*release)(void *private);
- 	int (*setkey)(void *private, const u8 *key, unsigned int keylen);
- 	int (*accept)(void *private, struct sock *sk);
-+	int (*accept_nokey)(void *private, struct sock *sk);
- 
- 	struct proto_ops *ops;
-+	struct proto_ops *ops_nokey;
- 	struct module *owner;
- 	char name[14];
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 83187f4..c4c121a 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -31,6 +31,11 @@ struct skcipher_sg_list {
+ 	struct scatterlist sg[0];
  };
+ 
++struct skcipher_tfm {
++	struct crypto_ablkcipher *skcipher;
++	bool has_key;
++};
++
+ struct skcipher_ctx {
+ 	struct list_head tsgl;
+ 	struct af_alg_sgl rsgl;
+@@ -546,17 +551,41 @@ static struct proto_ops algif_skcipher_ops = {
+ 
+ static void *skcipher_bind(const char *name, u32 type, u32 mask)
+ {
+-	return crypto_alloc_ablkcipher(name, type, mask);
++	struct skcipher_tfm *tfm;
++	struct crypto_ablkcipher *skcipher;
++
++	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
++	if (!tfm)
++		return ERR_PTR(-ENOMEM);
++
++	skcipher = crypto_alloc_ablkcipher(name, type, mask);
++	if (IS_ERR(skcipher)) {
++		kfree(tfm);
++		return ERR_CAST(skcipher);
++	}
++
++	tfm->skcipher = skcipher;
++
++	return tfm;
+ }
+ 
+ static void skcipher_release(void *private)
+ {
+-	crypto_free_ablkcipher(private);
++	struct skcipher_tfm *tfm = private;
++
++	crypto_free_ablkcipher(tfm->skcipher);
++	kfree(tfm);
+ }
+ 
+ static int skcipher_setkey(void *private, const u8 *key, unsigned int keylen)
+ {
+-	return crypto_ablkcipher_setkey(private, key, keylen);
++	struct skcipher_tfm *tfm = private;
++	int err;
++
++	err = crypto_ablkcipher_setkey(tfm->skcipher, key, keylen);
++	tfm->has_key = !err;
++
++	return err;
+ }
+ 
+ static void skcipher_sock_destruct(struct sock *sk)
+@@ -575,20 +604,24 @@ static int skcipher_accept_parent(void *private, struct sock *sk)
+ {
+ 	struct skcipher_ctx *ctx;
+ 	struct alg_sock *ask = alg_sk(sk);
+-	unsigned int len = sizeof(*ctx) + crypto_ablkcipher_reqsize(private);
++	struct skcipher_tfm *tfm = private;
++	struct crypto_ablkcipher *skcipher = tfm->skcipher;
++	unsigned int len = sizeof(*ctx) + crypto_ablkcipher_reqsize(skcipher);
++
++	if (!tfm->has_key)
++		return -ENOKEY;
+ 
+ 	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
+ 	if (!ctx)
+ 		return -ENOMEM;
+-
+-	ctx->iv = sock_kmalloc(sk, crypto_ablkcipher_ivsize(private),
++	ctx->iv = sock_kmalloc(sk, crypto_ablkcipher_ivsize(skcipher),
+ 			       GFP_KERNEL);
+ 	if (!ctx->iv) {
+ 		sock_kfree_s(sk, ctx, len);
+ 		return -ENOMEM;
+ 	}
+ 
+-	memset(ctx->iv, 0, crypto_ablkcipher_ivsize(private));
++	memset(ctx->iv, 0, crypto_ablkcipher_ivsize(skcipher));
+ 
+ 	INIT_LIST_HEAD(&ctx->tsgl);
+ 	ctx->len = len;
+@@ -600,9 +633,9 @@ static int skcipher_accept_parent(void *private, struct sock *sk)
+ 
+ 	ask->private = ctx;
+ 
+-	ablkcipher_request_set_tfm(&ctx->req, private);
++	ablkcipher_request_set_tfm(&ctx->req, skcipher);
+ 	ablkcipher_request_set_callback(&ctx->req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-					af_alg_complete, &ctx->completion);
++				      af_alg_complete, &ctx->completion);
+ 
+ 	sk->sk_destruct = skcipher_sock_destruct;
+ 
 -- 
 2.7.3
