@@ -1,61 +1,109 @@
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH stable 3.10.y 17/18] crypto: cryptd - initialize child shash_desc on import
-Date: Thu, 27 Oct 2016 17:29:50 +0300
-Message-ID: <1477578591-28924-18-git-send-email-aryabinin@virtuozzo.com>
-References: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
+From: Wenyou Yang <wenyou.yang@atmel.com>
+Subject: [PATCH v3] char: hw_random: atmel-rng: disable TRNG during suspend
+Date: Fri, 28 Oct 2016 16:00:46 +0800
+Message-ID: <1477641646-30796-1-git-send-email-wenyou.yang@atmel.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        <linux-crypto@vger.kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>
-To: Willy Tarreau <w@1wt.eu>, <stable@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-db5eur01on0136.outbound.protection.outlook.com ([104.47.2.136]:21312
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S943175AbcJ1BIb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Oct 2016 21:08:31 -0400
-In-Reply-To: <1477578591-28924-1-git-send-email-aryabinin@virtuozzo.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-arm-kernel@lists.infradead.org,
+ Nicolas Ferre <nicolas.ferre@atmel.com>, linux-crypto@vger.kernel.org,
+ Wenyou Yang <wenyou.yang@microchip.com>, Wenyou Yang <wenyou.yang@atmel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>, Matt Mackall <mpm@selenic.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To fix the over consumption on the VDDCore due to the TRNG enabled,
+disable the TRNG during suspend, not only disable the user interface
+clock (which is controlled by PMC). Because the user interface clock
+is independent from any clock that may be used in the entropy source
+logic circuitry.
 
-commit 0bd2223594a4dcddc1e34b15774a3a4776f7749e upstream.
-
-When calling .import() on a cryptd ahash_request, the structure members
-that describe the child transform in the shash_desc need to be initialized
-like they are when calling .init()
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Signed-off-by: Wenyou Yang <wenyou.yang@atmel.com>
+Acked-by: Nicolas Ferre <nicolas.ferre@atmel.com>
 ---
- crypto/cryptd.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index 75c415d..d85fab9 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -565,9 +565,14 @@ static int cryptd_hash_export(struct ahash_request *req, void *out)
- 
- static int cryptd_hash_import(struct ahash_request *req, const void *in)
- {
--	struct cryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	struct cryptd_hash_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct shash_desc *desc = cryptd_shash_desc(req);
-+
-+	desc->tfm = ctx->child;
-+	desc->flags = req->base.flags;
- 
--	return crypto_shash_import(&rctx->desc, in);
-+	return crypto_shash_import(desc, in);
+Changes in v3:
+ - Add Acked-by tag.
+
+Changes in v2:
+ - Enable the user interface first, then enable the internal clock
+   when resume.
+
+ drivers/char/hw_random/atmel-rng.c | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
+index 0fcc9e6..ae7cae5 100644
+--- a/drivers/char/hw_random/atmel-rng.c
++++ b/drivers/char/hw_random/atmel-rng.c
+@@ -48,6 +48,16 @@ static int atmel_trng_read(struct hwrng *rng, void *buf, size_t max,
+ 		return 0;
  }
  
- static int cryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
++static void atmel_trng_enable(struct atmel_trng *trng)
++{
++	writel(TRNG_KEY | 1, trng->base + TRNG_CR);
++}
++
++static void atmel_trng_disable(struct atmel_trng *trng)
++{
++	writel(TRNG_KEY, trng->base + TRNG_CR);
++}
++
+ static int atmel_trng_probe(struct platform_device *pdev)
+ {
+ 	struct atmel_trng *trng;
+@@ -71,7 +81,7 @@ static int atmel_trng_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		return ret;
+ 
+-	writel(TRNG_KEY | 1, trng->base + TRNG_CR);
++	atmel_trng_enable(trng);
+ 	trng->rng.name = pdev->name;
+ 	trng->rng.read = atmel_trng_read;
+ 
+@@ -94,7 +104,7 @@ static int atmel_trng_remove(struct platform_device *pdev)
+ 
+ 	hwrng_unregister(&trng->rng);
+ 
+-	writel(TRNG_KEY, trng->base + TRNG_CR);
++	atmel_trng_disable(trng);
+ 	clk_disable_unprepare(trng->clk);
+ 
+ 	return 0;
+@@ -105,6 +115,7 @@ static int atmel_trng_suspend(struct device *dev)
+ {
+ 	struct atmel_trng *trng = dev_get_drvdata(dev);
+ 
++	atmel_trng_disable(trng);
+ 	clk_disable_unprepare(trng->clk);
+ 
+ 	return 0;
+@@ -113,8 +124,15 @@ static int atmel_trng_suspend(struct device *dev)
+ static int atmel_trng_resume(struct device *dev)
+ {
+ 	struct atmel_trng *trng = dev_get_drvdata(dev);
++	int ret;
++
++	ret = clk_prepare_enable(trng->clk);
++	if (ret)
++		return ret;
+ 
+-	return clk_prepare_enable(trng->clk);
++	atmel_trng_enable(trng);
++
++	return 0;
+ }
+ 
+ static const struct dev_pm_ops atmel_trng_pm_ops = {
 -- 
-2.7.3
+2.7.4
