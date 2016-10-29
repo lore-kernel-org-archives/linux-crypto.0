@@ -1,131 +1,106 @@
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [PATCH] crypto: fix AEAD tag memory handling
-Date: Fri, 28 Oct 2016 15:21:19 -0700 (PDT)
-Message-ID: <alpine.OSX.2.20.1610281501490.9348@mjmartin-mac01.wa.intel.com>
-References: <4006219.iWaCqWYv1B@positron.chronox.de> <alpine.OSX.2.20.1610271419040.52583@mjmartin-mac01.local> <4087872.10iu4A8UFE@tauon.atsec.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 1/5] ARM: wire up HWCAP2 feature bits to the CPU modalias
+Date: Sat, 29 Oct 2016 11:08:36 +0100
+Message-ID: <CAKv+Gu_y7e=sJT+7FNj846NczgpNOdVx53SDC7dupmN-3ztNwA@mail.gmail.com>
+References: <1476787939-21889-1-git-send-email-ard.biesheuvel@linaro.org> <1476787939-21889-2-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset=UTF-8
+Cc: Steve Capper <steve.capper@linaro.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Russell King - ARM Linux <linux@arm.linux.org.uk>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:61809 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755086AbcJ1WVV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Oct 2016 18:21:21 -0400
-In-Reply-To: <4087872.10iu4A8UFE@tauon.atsec.com>
+Received: from mail-it0-f46.google.com ([209.85.214.46]:36299 "EHLO
+        mail-it0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755237AbcJ2KIh (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 29 Oct 2016 06:08:37 -0400
+Received: by mail-it0-f46.google.com with SMTP id m138so14424806itm.1
+        for <linux-crypto@vger.kernel.org>; Sat, 29 Oct 2016 03:08:37 -0700 (PDT)
+In-Reply-To: <1476787939-21889-2-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
-Stephan,
-
-On Fri, 28 Oct 2016, Stephan Mueller wrote:
-
-> Am Donnerstag, 27. Oktober 2016, 14:42:14 CEST schrieb Mat Martineau:
+On 18 October 2016 at 11:52, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> Wire up the generic support for exposing CPU feature bits via the
+> modalias in /sys/device/system/cpu. This allows udev to automatically
+> load modules for things like crypto algorithms that are implemented
+> using optional instructions.
 >
-> Hi Mat,
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  arch/arm/Kconfig                  |  1 +
+>  arch/arm/include/asm/cpufeature.h | 32 ++++++++++++++++++++
+>  2 files changed, 33 insertions(+)
 >
->> Stephan and Herbert,
->>
->> On Thu, 27 Oct 2016, Stephan Mueller wrote:
->>> Hi Herbert,
->>>
->>> for this patch, I have updated the testing for libkcapi accordingly and
->>> all
->>> tests pass. I will push the libkcapi code 0.12 with that test code change
->>> out shortly. Using the current upstream version of 0.11.1 will show
->>> failures as it expects the correct recv return code. As stated below,
->>> that return code has changed which implies that some of the tests will
->>> fail.
->>>
->>> ---8<---
->>>
->>> For encryption, the AEAD ciphers require AAD || PT as input and generate
->>> AAD || CT || Tag as output and vice versa for decryption. Prior to this
->>> patch, the AF_ALG interface for AEAD ciphers requires the buffer to be
->>> present as input for encryption. Similarly, the output buffer for
->>> decryption required the presence of the tag buffer too. This implies
->>> that the kernel reads / writes data buffers from/to user space
->>> even though this operation is not required.
->>>
->>> This patch changes the AF_ALG AEAD interface to be consistent with the
->>> in-kernel AEAD cipher memory requirements.
->>>
->>> In addition, the code now handles the situation where the provided
->>> output buffer is too small by reducing the size of the processed
->>> input buffer accordingly. Due to this handling, the changes are
->>> transparent to user space with one exception: the return code of recv
->>> indicates the processed of output buffer size. That output buffer has a
->>> different size compared to before the patch which implies that the
->>> return code of recv will also be different. For example, a decryption
->>> operation uses 16 bytes AAD, 16 bytes CT and 16 bytes tag, the AF_ALG
->>> AEAD interface before showed a recv return code of 48 (bytes) whereas
->>> after this patch, the return code is 32 since the tag is not returned
->>> any more.
->>
->> I tested out these changes and found that recv() or read() do not update
->> all of the indicated bytes. In your decrypt example where there are 16
->> bytes AAD, 16 bytes CT, and 16 bytes tag, read(sk, buf, 32) returns 32.
+
+Russell,
+
+do you have any concerns regarding this patch? If not, I will drop it
+into the patch system.
+
+Herbert,
+
+I will resend the followup patches in this series to linux-crypto@
+once this prerequisite is in place
+
+Thanks,
+Ard.
+
+
+> diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+> index b5d529fdffab..1a0c6a486a9c 100644
+> --- a/arch/arm/Kconfig
+> +++ b/arch/arm/Kconfig
+> @@ -21,6 +21,7 @@ config ARM
+>         select GENERIC_ALLOCATOR
+>         select GENERIC_ATOMIC64 if (CPU_V7M || CPU_V6 || !CPU_32v6K || !AEABI)
+>         select GENERIC_CLOCKEVENTS_BROADCAST if SMP
+> +       select GENERIC_CPU_AUTOPROBE
+>         select GENERIC_EARLY_IOREMAP
+>         select GENERIC_IDLE_POLL_SETUP
+>         select GENERIC_IRQ_PROBE
+> diff --git a/arch/arm/include/asm/cpufeature.h b/arch/arm/include/asm/cpufeature.h
+> new file mode 100644
+> index 000000000000..19c3dddd901a
+> --- /dev/null
+> +++ b/arch/arm/include/asm/cpufeature.h
+> @@ -0,0 +1,32 @@
+> +/*
+> + * Copyright (C) 2016 Linaro Ltd. <ard.biesheuvel@linaro.org>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +
+> +#ifndef __ASM_CPUFEATURE_H
+> +#define __ASM_CPUFEATURE_H
+> +
+> +#include <asm/hwcap.h>
+> +
+> +/*
+> + * Due to the fact that ELF_HWCAP is a 32-bit type on ARM, and given the number
+> + * of optional CPU features it defines, ARM's CPU capability bits have been
+> + * divided across separate elf_hwcap and elf_hwcap2 variables, each of which
+> + * covers a subset of the available CPU features.
+> + *
+> + * Currently, only a few of those are suitable for automatic module loading
+> + * (which is the primary use case of this facility) and those happen to be all
+> + * covered by HWCAP2. So let's only expose those via the CPU modalias for now.
+> + */
+> +#define MAX_CPU_FEATURES       (8 * sizeof(elf_hwcap2))
+> +#define cpu_feature(x)         ilog2(HWCAP2_ ## x)
+> +
+> +static inline bool cpu_have_feature(unsigned int num)
+> +{
+> +       return elf_hwcap2 & (1UL << num);
+> +}
+> +
+> +#endif
+> --
+> 2.7.4
 >
-> Please check the current patch (the one I sent to you as a pre-release did not
-> contain the fix for the decryption part -- the patch sent to the list and what
-> we discuss here contains the appropriate handling for the decryption side).
->
-> With your example using 16 bytes AAD, 16 bytes CT and 16 bytes Tag, the read
-> will *only* show the return code of 16 (bytes) now, because only the CT part
-> is converted into PT.
->
-> Yet, you are completely correct that the first 16 bytes of the AAD are skipped
-> by the read call.
->
-> Thus, the read call returns exactly the amount of changed bytes, but it
-> deviates from the POSIX logic by seeking to the end of the AAD buffer to find
-> the offset it shall place the resulting data to.
-
-I re-built my kernel using the patch from this email thread, and I still 
-see the total read() length including the "skipped" AAD byte count. Here's 
-an strace excerpt for a decrypt operation with AAD length of 32 and 
-plaintext length of 32:
-
-sendmsg(5, {msg_name=NULL, msg_namelen=0, 
-msg_iov=[{iov_base="*\200\233\350Zg\306\5ck\240\t\344\177\336 h\321\205\214<P^H~l\243\353w\34\377\316", iov_len=32}, 
-{iov_base="\205\256}\336\27\276\31\333\321&\254w\244\244\323h\221)\254}\345s\227\242>f\266\2020\212\220\322"..., 
-iov_len=48}], msg_iovlen=2, msg_control=[{cmsg_len=20, cmsg_level=SOL_ALG, cmsg_type=0x3},
-{cmsg_len=20, cmsg_level=SOL_ALG, cmsg_type=0x4}, {cmsg_len=36, cmsg_level=SOL_ALG, cmsg_type=0x2}],
-msg_controllen=88, msg_flags=0}, 0) = 80
-read(5, "\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1\1"..., 64) = 64
-
-
-The libkcapi test behaves similarly (AEAD test 11):
-
-sendmsg(6, {msg_name=NULL, msg_namelen=0, 
-msg_iov=[{iov_base="\373{\303\4\243\220\236f\342\340\305\357\225'\22\335\210L\343\3472Aq6\237,]\261\255\304\214}"..., 
-iov_len=68}], msg_iovlen=1, msg_control=[{cmsg_len=20, cmsg_level=SOL_ALG, cmsg_type=0x3},
-{cmsg_len=40, cmsg_level=SOL_ALG, cmsg_type=0x2}, {cmsg_len=20, cmsg_level=SOL_ALG, cmsg_type=0x4}],
-msg_controllen=88, msg_flags=0}, 0) = 68
-read(6, "\373{\303\4\243\220\236f\342\340\305\357\225'\22\335\210L\343\3472Aq6\237,]\261\255\304\214}"..., 68) = 64
-
-
-Even with read() returning only the number of changed bytes, what would 
-you think if there was one filesystem that updated the last bytes of a 
-buffer in a read() call instead of the first? It's important to maintain 
-the standard POSIX semantics and only update the bytes starting at the 
-beginning of the buffer.
-
->
->> However, the first 16 bytes of buf are *unchanged* and the second 16 bytes
->> contain the plaintext. In other words, 16 bytes were skipped over and 16
->> bytes were read.
->
-> Correct. Again, with the current patch we discuss here, the read will return
-> 16 as it processed 16 bytes.
->>
->> I see how this is similar to the documented use of the dst buffer in
->> aead_request_set_crypt(), but it is not consistent with POSIX read()
->> semantics.
-
-Regards,
-
---
-Mat Martineau
-Intel OTC
