@@ -1,106 +1,49 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 1/5] ARM: wire up HWCAP2 feature bits to the CPU modalias
-Date: Sat, 29 Oct 2016 11:08:36 +0100
-Message-ID: <CAKv+Gu_y7e=sJT+7FNj846NczgpNOdVx53SDC7dupmN-3ztNwA@mail.gmail.com>
-References: <1476787939-21889-1-git-send-email-ard.biesheuvel@linaro.org> <1476787939-21889-2-git-send-email-ard.biesheuvel@linaro.org>
+From: Fabio Estevam <festevam@gmail.com>
+Subject: Re: [PATCH v2] crypto: mxs-dcp - Remove hash support
+Date: Sat, 29 Oct 2016 13:25:29 -0200
+Message-ID: <CAOMZO5CwGk-1f0jhXf3f6H01GOGb-Vjc17DZhUJ73Sq=77eA4A@mail.gmail.com>
+References: <1477327394-2976-1-git-send-email-festevam@gmail.com>
+ <423fc7f0-fcab-eee6-6e7b-9ba2261fd0b3@denx.de> <CAOMZO5DEdQzttFqB2rQjW_TtUU+Y29pe7rgGzhyQuZu2jcBEKA@mail.gmail.com>
+ <AMSPR04MB083958F93F3E945D0B57D6EE98AD0@AMSPR04MB0839.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Steve Capper <steve.capper@linaro.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
+Cc: Marek Vasut <marex@denx.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "gianfranco.costamagna@abinsula.com"
+        <gianfranco.costamagna@abinsula.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Russell King - ARM Linux <linux@arm.linux.org.uk>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+        Fabio Estevam <fabio.estevam@nxp.com>,
+        Dan Douglass <dan.douglass@nxp.com>
+To: Horia Geanta Neag <horia.geanta@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f46.google.com ([209.85.214.46]:36299 "EHLO
-        mail-it0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755237AbcJ2KIh (ORCPT
+Received: from mail-vk0-f67.google.com ([209.85.213.67]:33411 "EHLO
+        mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751147AbcJ2PZd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 29 Oct 2016 06:08:37 -0400
-Received: by mail-it0-f46.google.com with SMTP id m138so14424806itm.1
-        for <linux-crypto@vger.kernel.org>; Sat, 29 Oct 2016 03:08:37 -0700 (PDT)
-In-Reply-To: <1476787939-21889-2-git-send-email-ard.biesheuvel@linaro.org>
+        Sat, 29 Oct 2016 11:25:33 -0400
+Received: by mail-vk0-f67.google.com with SMTP id d65so935056vkg.0
+        for <linux-crypto@vger.kernel.org>; Sat, 29 Oct 2016 08:25:33 -0700 (PDT)
+In-Reply-To: <AMSPR04MB083958F93F3E945D0B57D6EE98AD0@AMSPR04MB0839.eurprd04.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 18 October 2016 at 11:52, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> Wire up the generic support for exposing CPU feature bits via the
-> modalias in /sys/device/system/cpu. This allows udev to automatically
-> load modules for things like crypto algorithms that are implemented
-> using optional instructions.
+Hi Horia,
+
+On Fri, Oct 28, 2016 at 5:55 PM, Horia Geanta Neag <horia.geanta@nxp.com> wrote:
+
+> Looking on the i.MX6 Solo Lite security manual, the fix seems to consist
+> in enabling context switching - i.e. setting
+> DCP_CTRL[ENABLE_CONTEXT_SWITCHING] - and saving/restoring (part of) the
+> context buffer.
 >
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  arch/arm/Kconfig                  |  1 +
->  arch/arm/include/asm/cpufeature.h | 32 ++++++++++++++++++++
->  2 files changed, 33 insertions(+)
->
+> However, I am not familiar with DCP crypto engine and don't have HW to test.
 
-Russell,
+I do have access to hardware to test. Could you please propose some
+patches I can try?
 
-do you have any concerns regarding this patch? If not, I will drop it
-into the patch system.
-
-Herbert,
-
-I will resend the followup patches in this series to linux-crypto@
-once this prerequisite is in place
+My previous attempt to fix this issue was this one:
+http://www.spinics.net/lists/linux-crypto/msg18039.html
 
 Thanks,
-Ard.
 
-
-> diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-> index b5d529fdffab..1a0c6a486a9c 100644
-> --- a/arch/arm/Kconfig
-> +++ b/arch/arm/Kconfig
-> @@ -21,6 +21,7 @@ config ARM
->         select GENERIC_ALLOCATOR
->         select GENERIC_ATOMIC64 if (CPU_V7M || CPU_V6 || !CPU_32v6K || !AEABI)
->         select GENERIC_CLOCKEVENTS_BROADCAST if SMP
-> +       select GENERIC_CPU_AUTOPROBE
->         select GENERIC_EARLY_IOREMAP
->         select GENERIC_IDLE_POLL_SETUP
->         select GENERIC_IRQ_PROBE
-> diff --git a/arch/arm/include/asm/cpufeature.h b/arch/arm/include/asm/cpufeature.h
-> new file mode 100644
-> index 000000000000..19c3dddd901a
-> --- /dev/null
-> +++ b/arch/arm/include/asm/cpufeature.h
-> @@ -0,0 +1,32 @@
-> +/*
-> + * Copyright (C) 2016 Linaro Ltd. <ard.biesheuvel@linaro.org>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + */
-> +
-> +#ifndef __ASM_CPUFEATURE_H
-> +#define __ASM_CPUFEATURE_H
-> +
-> +#include <asm/hwcap.h>
-> +
-> +/*
-> + * Due to the fact that ELF_HWCAP is a 32-bit type on ARM, and given the number
-> + * of optional CPU features it defines, ARM's CPU capability bits have been
-> + * divided across separate elf_hwcap and elf_hwcap2 variables, each of which
-> + * covers a subset of the available CPU features.
-> + *
-> + * Currently, only a few of those are suitable for automatic module loading
-> + * (which is the primary use case of this facility) and those happen to be all
-> + * covered by HWCAP2. So let's only expose those via the CPU modalias for now.
-> + */
-> +#define MAX_CPU_FEATURES       (8 * sizeof(elf_hwcap2))
-> +#define cpu_feature(x)         ilog2(HWCAP2_ ## x)
-> +
-> +static inline bool cpu_have_feature(unsigned int num)
-> +{
-> +       return elf_hwcap2 & (1UL << num);
-> +}
-> +
-> +#endif
-> --
-> 2.7.4
->
+Fabio Estevam
