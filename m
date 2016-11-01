@@ -1,36 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam: fix type mismatch warning
-Date: Tue, 1 Nov 2016 08:44:14 +0800
-Message-ID: <20161101004414.GA7465@gondor.apana.org.au>
-References: <20161025212923.2452320-1-arnd@arndb.de>
+Subject: Re: [PATCH v3] char: hw_random: atmel-rng: disable TRNG during
+ suspend
+Date: Tue, 1 Nov 2016 08:44:59 +0800
+Message-ID: <20161101004458.GE7375@gondor.apana.org.au>
+References: <1477641646-30796-1-git-send-email-wenyou.yang@atmel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Catalin Vasile <cata.vasile@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
+Cc: Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org,
+        Wenyou Yang <wenyou.yang@microchip.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Nicolas Ferre <nicolas.ferre@atmel.com>
+To: Wenyou Yang <wenyou.yang@atmel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:34023 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:39404 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S948319AbcKAAo2 (ORCPT
+        with ESMTP id S948308AbcKAApF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Oct 2016 20:44:28 -0400
+        Mon, 31 Oct 2016 20:45:05 -0400
 Content-Disposition: inline
-In-Reply-To: <20161025212923.2452320-1-arnd@arndb.de>
+In-Reply-To: <1477641646-30796-1-git-send-email-wenyou.yang@atmel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Oct 25, 2016 at 11:29:10PM +0200, Arnd Bergmann wrote:
-> Building the caam driver on arm64 produces a harmless warning:
+On Fri, Oct 28, 2016 at 04:00:46PM +0800, Wenyou Yang wrote:
+> To fix the over consumption on the VDDCore due to the TRNG enabled,
+> disable the TRNG during suspend, not only disable the user interface
+> clock (which is controlled by PMC). Because the user interface clock
+> is independent from any clock that may be used in the entropy source
+> logic circuitry.
 > 
-> drivers/crypto/caam/caamalg.c:140:139: warning: comparison of distinct pointer types lacks a cast
-> 
-> We can use min_t to tell the compiler which type we want it to use
-> here.
-> 
-> Fixes: 5ecf8ef9103c ("crypto: caam - fix sg dump")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Wenyou Yang <wenyou.yang@atmel.com>
+> Acked-by: Nicolas Ferre <nicolas.ferre@atmel.com>
 
 Patch applied.  Thanks.
 -- 
