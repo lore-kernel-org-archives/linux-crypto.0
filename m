@@ -1,210 +1,418 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 9/16] crypto: glue_helper - Add skcipher xts helpers
-Date: Wed, 02 Nov 2016 07:19:11 +0800
-Message-ID: <E1c1iKl-0004D9-6m@gondolin.me.apana.org.au>
+Subject: [PATCH 14/16] crypto: cbc - Convert to skcipher
+Date: Wed, 02 Nov 2016 07:19:17 +0800
+Message-ID: <E1c1iKr-0004EW-3k@gondolin.me.apana.org.au>
 References: <20161101231648.GA15967@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60317 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:55390 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752307AbcKAXTO (ORCPT
+        with ESMTP id S1753455AbcKAXTU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Nov 2016 19:19:14 -0400
+        Tue, 1 Nov 2016 19:19:20 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
         by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-        id 1c1iKl-00074U-Cx
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Nov 2016 10:19:11 +1100
+        id 1c1iKr-00077V-85
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Nov 2016 10:19:17 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds xts helpers that use the skcipher interface rather
-than blkcipher.  This will be used by aesni_intel.
+This patch converts cbc over to the skcipher interface.  It also
+rearranges the code to allow it to be reused by drivers.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- arch/x86/crypto/glue_helper.c             |   74 +++++++++++++++++++++++++++++-
- arch/x86/include/asm/crypto/glue_helper.h |   39 +++++++++++++++
- crypto/Kconfig                            |    2 
- 3 files changed, 112 insertions(+), 3 deletions(-)
+ crypto/cbc.c |  242 +++++++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 138 insertions(+), 104 deletions(-)
 
-diff --git a/arch/x86/crypto/glue_helper.c b/arch/x86/crypto/glue_helper.c
-index 6a85598..260a060 100644
---- a/arch/x86/crypto/glue_helper.c
-+++ b/arch/x86/crypto/glue_helper.c
-@@ -27,10 +27,10 @@
+diff --git a/crypto/cbc.c b/crypto/cbc.c
+index 780ee27..6539b38 100644
+--- a/crypto/cbc.c
++++ b/crypto/cbc.c
+@@ -10,42 +10,39 @@
+  *
+  */
  
- #include <linux/module.h>
- #include <crypto/b128ops.h>
+-#include <crypto/algapi.h>
 +#include <crypto/internal/skcipher.h>
- #include <crypto/lrw.h>
- #include <crypto/xts.h>
- #include <asm/crypto/glue_helper.h>
--#include <crypto/scatterwalk.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+ #include <linux/log2.h>
+ #include <linux/module.h>
+-#include <linux/scatterlist.h>
+ #include <linux/slab.h>
  
- static int __glue_ecb_crypt_128bit(const struct common_glue_ctx *gctx,
- 				   struct blkcipher_desc *desc,
-@@ -339,6 +339,41 @@ static unsigned int __glue_xts_crypt_128bit(const struct common_glue_ctx *gctx,
+ struct crypto_cbc_ctx {
+ 	struct crypto_cipher *child;
+ };
+ 
+-static int crypto_cbc_setkey(struct crypto_tfm *parent, const u8 *key,
++static int crypto_cbc_setkey(struct crypto_skcipher *parent, const u8 *key,
+ 			     unsigned int keylen)
+ {
+-	struct crypto_cbc_ctx *ctx = crypto_tfm_ctx(parent);
++	struct crypto_cbc_ctx *ctx = crypto_skcipher_ctx(parent);
+ 	struct crypto_cipher *child = ctx->child;
+ 	int err;
+ 
+ 	crypto_cipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
+-	crypto_cipher_set_flags(child, crypto_tfm_get_flags(parent) &
++	crypto_cipher_set_flags(child, crypto_skcipher_get_flags(parent) &
+ 				       CRYPTO_TFM_REQ_MASK);
+ 	err = crypto_cipher_setkey(child, key, keylen);
+-	crypto_tfm_set_flags(parent, crypto_cipher_get_flags(child) &
+-				     CRYPTO_TFM_RES_MASK);
++	crypto_skcipher_set_flags(parent, crypto_cipher_get_flags(child) &
++					  CRYPTO_TFM_RES_MASK);
+ 	return err;
+ }
+ 
+-static int crypto_cbc_encrypt_segment(struct blkcipher_desc *desc,
+-				      struct blkcipher_walk *walk,
+-				      struct crypto_cipher *tfm)
++static inline int crypto_cbc_encrypt_segment(
++	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
++	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
+ {
+-	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
+-		crypto_cipher_alg(tfm)->cia_encrypt;
+-	int bsize = crypto_cipher_blocksize(tfm);
++	unsigned int bsize = crypto_skcipher_blocksize(tfm);
+ 	unsigned int nbytes = walk->nbytes;
+ 	u8 *src = walk->src.virt.addr;
+ 	u8 *dst = walk->dst.virt.addr;
+@@ -53,7 +50,7 @@ static int crypto_cbc_encrypt_segment(struct blkcipher_desc *desc,
+ 
+ 	do {
+ 		crypto_xor(iv, src, bsize);
+-		fn(crypto_cipher_tfm(tfm), dst, iv);
++		fn(tfm, iv, dst);
+ 		memcpy(iv, dst, bsize);
+ 
+ 		src += bsize;
+@@ -63,20 +60,18 @@ static int crypto_cbc_encrypt_segment(struct blkcipher_desc *desc,
  	return nbytes;
  }
  
-+static unsigned int __glue_xts_req_128bit(const struct common_glue_ctx *gctx,
-+					  void *ctx,
-+					  struct skcipher_walk *walk)
+-static int crypto_cbc_encrypt_inplace(struct blkcipher_desc *desc,
+-				      struct blkcipher_walk *walk,
+-				      struct crypto_cipher *tfm)
++static inline int crypto_cbc_encrypt_inplace(
++	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
++	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
+ {
+-	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
+-		crypto_cipher_alg(tfm)->cia_encrypt;
+-	int bsize = crypto_cipher_blocksize(tfm);
++	unsigned int bsize = crypto_skcipher_blocksize(tfm);
+ 	unsigned int nbytes = walk->nbytes;
+ 	u8 *src = walk->src.virt.addr;
+ 	u8 *iv = walk->iv;
+ 
+ 	do {
+ 		crypto_xor(src, iv, bsize);
+-		fn(crypto_cipher_tfm(tfm), src, src);
++		fn(tfm, src, src);
+ 		iv = src;
+ 
+ 		src += bsize;
+@@ -87,44 +82,52 @@ static int crypto_cbc_encrypt_inplace(struct blkcipher_desc *desc,
+ 	return nbytes;
+ }
+ 
+-static int crypto_cbc_encrypt(struct blkcipher_desc *desc,
+-			      struct scatterlist *dst, struct scatterlist *src,
+-			      unsigned int nbytes)
++static inline int crypto_cbc_encrypt_walk(struct skcipher_request *req,
++					  void (*fn)(struct crypto_skcipher *,
++						     const u8 *, u8 *))
+ {
+-	struct blkcipher_walk walk;
+-	struct crypto_blkcipher *tfm = desc->tfm;
+-	struct crypto_cbc_ctx *ctx = crypto_blkcipher_ctx(tfm);
+-	struct crypto_cipher *child = ctx->child;
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct skcipher_walk walk;
+ 	int err;
+ 
+-	blkcipher_walk_init(&walk, dst, src, nbytes);
+-	err = blkcipher_walk_virt(desc, &walk);
++	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	while ((nbytes = walk.nbytes)) {
++	while (walk.nbytes) {
+ 		if (walk.src.virt.addr == walk.dst.virt.addr)
+-			nbytes = crypto_cbc_encrypt_inplace(desc, &walk, child);
++			err = crypto_cbc_encrypt_inplace(&walk, tfm, fn);
+ 		else
+-			nbytes = crypto_cbc_encrypt_segment(desc, &walk, child);
+-		err = blkcipher_walk_done(desc, &walk, nbytes);
++			err = crypto_cbc_encrypt_segment(&walk, tfm, fn);
++		err = skcipher_walk_done(&walk, err);
+ 	}
+ 
+ 	return err;
+ }
+ 
+-static int crypto_cbc_decrypt_segment(struct blkcipher_desc *desc,
+-				      struct blkcipher_walk *walk,
+-				      struct crypto_cipher *tfm)
++static inline void crypto_cbc_encrypt_one(struct crypto_skcipher *tfm,
++					  const u8 *src, u8 *dst)
 +{
-+	const unsigned int bsize = 128 / 8;
-+	unsigned int nbytes = walk->nbytes;
-+	u128 *src = walk->src.virt.addr;
-+	u128 *dst = walk->dst.virt.addr;
-+	unsigned int num_blocks, func_bytes;
-+	unsigned int i;
++	struct crypto_cbc_ctx *ctx = crypto_skcipher_ctx(tfm);
 +
-+	/* Process multi-block batch */
-+	for (i = 0; i < gctx->num_funcs; i++) {
-+		num_blocks = gctx->funcs[i].num_blocks;
-+		func_bytes = bsize * num_blocks;
-+
-+		if (nbytes >= func_bytes) {
-+			do {
-+				gctx->funcs[i].fn_u.xts(ctx, dst, src,
-+							walk->iv);
-+
-+				src += num_blocks;
-+				dst += num_blocks;
-+				nbytes -= func_bytes;
-+			} while (nbytes >= func_bytes);
-+
-+			if (nbytes < bsize)
-+				goto done;
-+		}
-+	}
-+
-+done:
-+	return nbytes;
++	crypto_cipher_encrypt_one(ctx->child, dst, src);
 +}
 +
- /* for implementations implementing faster XTS IV generator */
- int glue_xts_crypt_128bit(const struct common_glue_ctx *gctx,
- 			  struct blkcipher_desc *desc, struct scatterlist *dst,
-@@ -379,6 +414,43 @@ int glue_xts_crypt_128bit(const struct common_glue_ctx *gctx,
- }
- EXPORT_SYMBOL_GPL(glue_xts_crypt_128bit);
- 
-+int glue_xts_req_128bit(const struct common_glue_ctx *gctx,
-+			struct skcipher_request *req,
-+			common_glue_func_t tweak_fn, void *tweak_ctx,
-+			void *crypt_ctx)
-+{
-+	const unsigned int bsize = 128 / 8;
-+	struct skcipher_walk walk;
-+	bool fpu_enabled = false;
-+	unsigned int nbytes;
-+	int err;
++static int crypto_cbc_encrypt(struct skcipher_request *req)
+ {
+-	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
+-		crypto_cipher_alg(tfm)->cia_decrypt;
+-	int bsize = crypto_cipher_blocksize(tfm);
++	return crypto_cbc_encrypt_walk(req, crypto_cbc_encrypt_one);
++}
 +
++static inline int crypto_cbc_decrypt_segment(
++	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
++	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
++{
++	unsigned int bsize = crypto_skcipher_blocksize(tfm);
+ 	unsigned int nbytes = walk->nbytes;
+ 	u8 *src = walk->src.virt.addr;
+ 	u8 *dst = walk->dst.virt.addr;
+ 	u8 *iv = walk->iv;
+ 
+ 	do {
+-		fn(crypto_cipher_tfm(tfm), dst, src);
++		fn(tfm, src, dst);
+ 		crypto_xor(dst, iv, bsize);
+ 		iv = src;
+ 
+@@ -137,13 +140,11 @@ static int crypto_cbc_decrypt_segment(struct blkcipher_desc *desc,
+ 	return nbytes;
+ }
+ 
+-static int crypto_cbc_decrypt_inplace(struct blkcipher_desc *desc,
+-				      struct blkcipher_walk *walk,
+-				      struct crypto_cipher *tfm)
++static inline int crypto_cbc_decrypt_inplace(
++	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
++	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
+ {
+-	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
+-		crypto_cipher_alg(tfm)->cia_decrypt;
+-	int bsize = crypto_cipher_blocksize(tfm);
++	unsigned int bsize = crypto_skcipher_blocksize(tfm);
+ 	unsigned int nbytes = walk->nbytes;
+ 	u8 *src = walk->src.virt.addr;
+ 	u8 last_iv[bsize];
+@@ -153,7 +154,7 @@ static int crypto_cbc_decrypt_inplace(struct blkcipher_desc *desc,
+ 	memcpy(last_iv, src, bsize);
+ 
+ 	for (;;) {
+-		fn(crypto_cipher_tfm(tfm), src, src);
++		fn(tfm, src, src);
+ 		if ((nbytes -= bsize) < bsize)
+ 			break;
+ 		crypto_xor(src, src - bsize, bsize);
+@@ -166,35 +167,46 @@ static int crypto_cbc_decrypt_inplace(struct blkcipher_desc *desc,
+ 	return nbytes;
+ }
+ 
+-static int crypto_cbc_decrypt(struct blkcipher_desc *desc,
+-			      struct scatterlist *dst, struct scatterlist *src,
+-			      unsigned int nbytes)
++static inline int crypto_cbc_decrypt_blocks(
++	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
++	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
+ {
+-	struct blkcipher_walk walk;
+-	struct crypto_blkcipher *tfm = desc->tfm;
+-	struct crypto_cbc_ctx *ctx = crypto_blkcipher_ctx(tfm);
+-	struct crypto_cipher *child = ctx->child;
++	if (walk->src.virt.addr == walk->dst.virt.addr)
++		return crypto_cbc_decrypt_inplace(walk, tfm, fn);
++	else
++		return crypto_cbc_decrypt_segment(walk, tfm, fn);
++}
++
++static inline void crypto_cbc_decrypt_one(struct crypto_skcipher *tfm,
++					  const u8 *src, u8 *dst)
++{
++	struct crypto_cbc_ctx *ctx = crypto_skcipher_ctx(tfm);
++
++	crypto_cipher_decrypt_one(ctx->child, dst, src);
++}
++
++static int crypto_cbc_decrypt(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct skcipher_walk walk;
+ 	int err;
+ 
+-	blkcipher_walk_init(&walk, dst, src, nbytes);
+-	err = blkcipher_walk_virt(desc, &walk);
 +	err = skcipher_walk_virt(&walk, req, false);
-+	nbytes = walk.nbytes;
-+	if (!nbytes)
+ 
+-	while ((nbytes = walk.nbytes)) {
+-		if (walk.src.virt.addr == walk.dst.virt.addr)
+-			nbytes = crypto_cbc_decrypt_inplace(desc, &walk, child);
+-		else
+-			nbytes = crypto_cbc_decrypt_segment(desc, &walk, child);
+-		err = blkcipher_walk_done(desc, &walk, nbytes);
++	while (walk.nbytes) {
++		err = crypto_cbc_decrypt_blocks(&walk, tfm,
++						crypto_cbc_decrypt_one);
++		err = skcipher_walk_done(&walk, err);
+ 	}
+ 
+ 	return err;
+ }
+ 
+-static int crypto_cbc_init_tfm(struct crypto_tfm *tfm)
++static int crypto_cbc_init_tfm(struct crypto_skcipher *tfm)
+ {
+-	struct crypto_instance *inst = (void *)tfm->__crt_alg;
+-	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
+-	struct crypto_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct skcipher_instance *inst = skcipher_alg_instance(tfm);
++	struct crypto_spawn *spawn = skcipher_instance_ctx(inst);
++	struct crypto_cbc_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	struct crypto_cipher *cipher;
+ 
+ 	cipher = crypto_spawn_cipher(spawn);
+@@ -205,72 +217,94 @@ static int crypto_cbc_init_tfm(struct crypto_tfm *tfm)
+ 	return 0;
+ }
+ 
+-static void crypto_cbc_exit_tfm(struct crypto_tfm *tfm)
++static void crypto_cbc_exit_tfm(struct crypto_skcipher *tfm)
+ {
+-	struct crypto_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct crypto_cbc_ctx *ctx = crypto_skcipher_ctx(tfm);
++
+ 	crypto_free_cipher(ctx->child);
+ }
+ 
+-static struct crypto_instance *crypto_cbc_alloc(struct rtattr **tb)
++static void crypto_cbc_free(struct skcipher_instance *inst)
+ {
+-	struct crypto_instance *inst;
++	crypto_drop_skcipher(skcipher_instance_ctx(inst));
++	kfree(inst);
++}
++
++static int crypto_cbc_create(struct crypto_template *tmpl, struct rtattr **tb)
++{
++	struct skcipher_instance *inst;
++	struct crypto_spawn *spawn;
+ 	struct crypto_alg *alg;
+ 	int err;
+ 
+-	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_BLKCIPHER);
++	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SKCIPHER);
+ 	if (err)
+-		return ERR_PTR(err);
 +		return err;
 +
-+	/* set minimum length to bsize, for tweak_fn */
-+	fpu_enabled = glue_skwalk_fpu_begin(bsize, gctx->fpu_blocks_limit,
-+					    &walk, fpu_enabled,
-+					    nbytes < bsize ? bsize : nbytes);
++	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
++	if (!inst)
++		return -ENOMEM;
+ 
+ 	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
+ 				  CRYPTO_ALG_TYPE_MASK);
++	err = PTR_ERR(alg);
+ 	if (IS_ERR(alg))
+-		return ERR_CAST(alg);
++		goto err_free_inst;
+ 
+-	inst = ERR_PTR(-EINVAL);
+-	if (!is_power_of_2(alg->cra_blocksize))
+-		goto out_put_alg;
++	spawn = skcipher_instance_ctx(inst);
++	err = crypto_init_spawn(spawn, alg, skcipher_crypto_instance(inst),
++				CRYPTO_ALG_TYPE_MASK);
++	crypto_mod_put(alg);
++	if (err)
++		goto err_free_inst;
 +
-+	/* calculate first value of T */
-+	tweak_fn(tweak_ctx, walk.iv, walk.iv);
++	err = crypto_inst_setname(skcipher_crypto_instance(inst), "cbc", alg);
++	if (err)
++		goto err_drop_spawn;
+ 
+-	inst = crypto_alloc_instance("cbc", alg);
+-	if (IS_ERR(inst))
+-		goto out_put_alg;
++	err = -EINVAL;
++	if (!is_power_of_2(alg->cra_blocksize))
++		goto err_drop_spawn;
+ 
+-	inst->alg.cra_flags = CRYPTO_ALG_TYPE_BLKCIPHER;
+-	inst->alg.cra_priority = alg->cra_priority;
+-	inst->alg.cra_blocksize = alg->cra_blocksize;
+-	inst->alg.cra_alignmask = alg->cra_alignmask;
+-	inst->alg.cra_type = &crypto_blkcipher_type;
++	inst->alg.base.cra_priority = alg->cra_priority;
++	inst->alg.base.cra_blocksize = alg->cra_blocksize;
++	inst->alg.base.cra_alignmask = alg->cra_alignmask;
+ 
+ 	/* We access the data as u32s when xoring. */
+-	inst->alg.cra_alignmask |= __alignof__(u32) - 1;
++	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
+ 
+-	inst->alg.cra_blkcipher.ivsize = alg->cra_blocksize;
+-	inst->alg.cra_blkcipher.min_keysize = alg->cra_cipher.cia_min_keysize;
+-	inst->alg.cra_blkcipher.max_keysize = alg->cra_cipher.cia_max_keysize;
++	inst->alg.ivsize = alg->cra_blocksize;
++	inst->alg.min_keysize = alg->cra_cipher.cia_min_keysize;
++	inst->alg.max_keysize = alg->cra_cipher.cia_max_keysize;
+ 
+-	inst->alg.cra_ctxsize = sizeof(struct crypto_cbc_ctx);
++	inst->alg.base.cra_ctxsize = sizeof(struct crypto_cbc_ctx);
+ 
+-	inst->alg.cra_init = crypto_cbc_init_tfm;
+-	inst->alg.cra_exit = crypto_cbc_exit_tfm;
++	inst->alg.init = crypto_cbc_init_tfm;
++	inst->alg.exit = crypto_cbc_exit_tfm;
+ 
+-	inst->alg.cra_blkcipher.setkey = crypto_cbc_setkey;
+-	inst->alg.cra_blkcipher.encrypt = crypto_cbc_encrypt;
+-	inst->alg.cra_blkcipher.decrypt = crypto_cbc_decrypt;
++	inst->alg.setkey = crypto_cbc_setkey;
++	inst->alg.encrypt = crypto_cbc_encrypt;
++	inst->alg.decrypt = crypto_cbc_decrypt;
+ 
+-out_put_alg:
+-	crypto_mod_put(alg);
+-	return inst;
+-}
++	inst->free = crypto_cbc_free;
+ 
+-static void crypto_cbc_free(struct crypto_instance *inst)
+-{
+-	crypto_drop_spawn(crypto_instance_ctx(inst));
++	err = skcipher_register_instance(tmpl, inst);
++	if (err)
++		goto err_drop_spawn;
 +
-+	while (nbytes) {
-+		nbytes = __glue_xts_req_128bit(gctx, crypt_ctx, &walk);
-+
-+		err = skcipher_walk_done(&walk, nbytes);
-+		nbytes = walk.nbytes;
-+	}
-+
-+	glue_fpu_end(fpu_enabled);
-+
++out:
 +	return err;
-+}
-+EXPORT_SYMBOL_GPL(glue_xts_req_128bit);
 +
- void glue_xts_crypt_128bit_one(void *ctx, u128 *dst, const u128 *src, le128 *iv,
- 			       common_glue_func_t fn)
- {
-diff --git a/arch/x86/include/asm/crypto/glue_helper.h b/arch/x86/include/asm/crypto/glue_helper.h
-index 03bb106..29e53ea 100644
---- a/arch/x86/include/asm/crypto/glue_helper.h
-+++ b/arch/x86/include/asm/crypto/glue_helper.h
-@@ -5,8 +5,8 @@
- #ifndef _CRYPTO_GLUE_HELPER_H
- #define _CRYPTO_GLUE_HELPER_H
- 
-+#include <crypto/internal/skcipher.h>
- #include <linux/kernel.h>
--#include <linux/crypto.h>
- #include <asm/fpu/api.h>
- #include <crypto/b128ops.h>
- 
-@@ -69,6 +69,31 @@ static inline bool glue_fpu_begin(unsigned int bsize, int fpu_blocks_limit,
- 	return true;
++err_drop_spawn:
++	crypto_drop_spawn(spawn);
++err_free_inst:
+ 	kfree(inst);
++	goto out;
  }
  
-+static inline bool glue_skwalk_fpu_begin(unsigned int bsize,
-+					 int fpu_blocks_limit,
-+					 struct skcipher_walk *walk,
-+					 bool fpu_enabled, unsigned int nbytes)
-+{
-+	if (likely(fpu_blocks_limit < 0))
-+		return false;
-+
-+	if (fpu_enabled)
-+		return true;
-+
-+	/*
-+	 * Vector-registers are only used when chunk to be processed is large
-+	 * enough, so do not enable FPU until it is necessary.
-+	 */
-+	if (nbytes < bsize * (unsigned int)fpu_blocks_limit)
-+		return false;
-+
-+	/* prevent sleeping if FPU is in use */
-+	skcipher_walk_atomise(walk);
-+
-+	kernel_fpu_begin();
-+	return true;
-+}
-+
- static inline void glue_fpu_end(bool fpu_enabled)
- {
- 	if (fpu_enabled)
-@@ -139,6 +164,18 @@ extern int glue_xts_crypt_128bit(const struct common_glue_ctx *gctx,
- 				 common_glue_func_t tweak_fn, void *tweak_ctx,
- 				 void *crypt_ctx);
+ static struct crypto_template crypto_cbc_tmpl = {
+ 	.name = "cbc",
+-	.alloc = crypto_cbc_alloc,
+-	.free = crypto_cbc_free,
++	.create = crypto_cbc_create,
+ 	.module = THIS_MODULE,
+ };
  
-+extern int glue_xts_crypt_128bit(const struct common_glue_ctx *gctx,
-+				 struct blkcipher_desc *desc,
-+				 struct scatterlist *dst,
-+				 struct scatterlist *src, unsigned int nbytes,
-+				 common_glue_func_t tweak_fn, void *tweak_ctx,
-+				 void *crypt_ctx);
-+
-+extern int glue_xts_req_128bit(const struct common_glue_ctx *gctx,
-+			       struct skcipher_request *req,
-+			       common_glue_func_t tweak_fn, void *tweak_ctx,
-+			       void *crypt_ctx);
-+
- extern void glue_xts_crypt_128bit_one(void *ctx, u128 *dst, const u128 *src,
- 				      le128 *iv, common_glue_func_t fn);
- 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 3d31181..87a09c7 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -253,7 +253,7 @@ config CRYPTO_SIMD
- config CRYPTO_GLUE_HELPER_X86
- 	tristate
- 	depends on X86
--	select CRYPTO_ALGAPI
-+	select CRYPTO_BLKCIPHER
- 
- config CRYPTO_ENGINE
- 	tristate
