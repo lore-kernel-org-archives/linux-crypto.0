@@ -1,394 +1,160 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 6/16] crypto: cryptd - Add support for skcipher
-Date: Wed, 02 Nov 2016 07:19:07 +0800
-Message-ID: <E1c1iKh-0004CK-UK@gondolin.me.apana.org.au>
+Subject: [PATCH 2/16] crypto: aes-ce-ccm - Use skcipher walk interface
+Date: Wed, 02 Nov 2016 07:19:03 +0800
+Message-ID: <E1c1iKd-0004BE-Gq@gondolin.me.apana.org.au>
 References: <20161101231648.GA15967@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:46542 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:56737 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752307AbcKAXTK (ORCPT
+        with ESMTP id S1751980AbcKAXTG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Nov 2016 19:19:10 -0400
+        Tue, 1 Nov 2016 19:19:06 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
         by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-        id 1c1iKi-00073S-3b
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Nov 2016 10:19:08 +1100
+        id 1c1iKd-00072q-Kv
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Nov 2016 10:19:03 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds skcipher support to cryptd alongside ablkcipher.
+This patch makes use of the new skcipher walk interface instead of
+the obsolete blkcipher walk interface.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/cryptd.c         |  284 +++++++++++++++++++++++++++++++++++++++++++++++-
- include/crypto/cryptd.h |   13 ++
- 2 files changed, 294 insertions(+), 3 deletions(-)
+ arch/arm64/crypto/aes-ce-ccm-glue.c |   50 +++++++++---------------------------
+ 1 file changed, 13 insertions(+), 37 deletions(-)
 
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index 3fd2a20..0508c48 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -17,9 +17,9 @@
-  *
-  */
- 
+diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
+index f4bf2f2..d4f3568 100644
+--- a/arch/arm64/crypto/aes-ce-ccm-glue.c
++++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
+@@ -11,9 +11,9 @@
+ #include <asm/neon.h>
+ #include <asm/unaligned.h>
+ #include <crypto/aes.h>
 -#include <crypto/algapi.h>
- #include <crypto/internal/hash.h>
+ #include <crypto/scatterwalk.h>
  #include <crypto/internal/aead.h>
 +#include <crypto/internal/skcipher.h>
- #include <crypto/cryptd.h>
- #include <crypto/crypto_wq.h>
- #include <linux/atomic.h>
-@@ -48,6 +48,11 @@ struct cryptd_instance_ctx {
- 	struct cryptd_queue *queue;
- };
+ #include <linux/module.h>
  
-+struct skcipherd_instance_ctx {
-+	struct crypto_skcipher_spawn spawn;
-+	struct cryptd_queue *queue;
-+};
-+
- struct hashd_instance_ctx {
- 	struct crypto_shash_spawn spawn;
- 	struct cryptd_queue *queue;
-@@ -67,6 +72,15 @@ struct cryptd_blkcipher_request_ctx {
- 	crypto_completion_t complete;
- };
- 
-+struct cryptd_skcipher_ctx {
-+	atomic_t refcnt;
-+	struct crypto_skcipher *child;
-+};
-+
-+struct cryptd_skcipher_request_ctx {
-+	crypto_completion_t complete;
-+};
-+
- struct cryptd_hash_ctx {
- 	atomic_t refcnt;
- 	struct crypto_shash *child;
-@@ -430,6 +444,216 @@ static int cryptd_create_blkcipher(struct crypto_template *tmpl,
- 	return err;
- }
- 
-+static int cryptd_skcipher_setkey(struct crypto_skcipher *parent,
-+				  const u8 *key, unsigned int keylen)
-+{
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(parent);
-+	struct crypto_skcipher *child = ctx->child;
-+	int err;
-+
-+	crypto_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_skcipher_set_flags(child, crypto_skcipher_get_flags(parent) &
-+					 CRYPTO_TFM_REQ_MASK);
-+	err = crypto_skcipher_setkey(child, key, keylen);
-+	crypto_skcipher_set_flags(parent, crypto_skcipher_get_flags(child) &
-+					  CRYPTO_TFM_RES_MASK);
-+	return err;
-+}
-+
-+static void cryptd_skcipher_complete(struct skcipher_request *req, int err)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct cryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
-+	int refcnt = atomic_read(&ctx->refcnt);
-+
-+	local_bh_disable();
-+	rctx->complete(&req->base, err);
-+	local_bh_enable();
-+
-+	if (err != -EINPROGRESS && refcnt && atomic_dec_and_test(&ctx->refcnt))
-+		crypto_free_skcipher(tfm);
-+}
-+
-+static void cryptd_skcipher_encrypt(struct crypto_async_request *base,
-+				    int err)
-+{
-+	struct skcipher_request *req = skcipher_request_cast(base);
-+	struct cryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_skcipher *child = ctx->child;
-+	SKCIPHER_REQUEST_ON_STACK(subreq, child);
-+
-+	if (unlikely(err == -EINPROGRESS))
-+		goto out;
-+
-+	skcipher_request_set_tfm(subreq, child);
-+	skcipher_request_set_callback(subreq, CRYPTO_TFM_REQ_MAY_SLEEP,
-+				      NULL, NULL);
-+	skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
-+				   req->iv);
-+
-+	err = crypto_skcipher_encrypt(subreq);
-+	skcipher_request_zero(subreq);
-+
-+	req->base.complete = rctx->complete;
-+
-+out:
-+	cryptd_skcipher_complete(req, err);
-+}
-+
-+static void cryptd_skcipher_decrypt(struct crypto_async_request *base,
-+				    int err)
-+{
-+	struct skcipher_request *req = skcipher_request_cast(base);
-+	struct cryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_skcipher *child = ctx->child;
-+	SKCIPHER_REQUEST_ON_STACK(subreq, child);
-+
-+	if (unlikely(err == -EINPROGRESS))
-+		goto out;
-+
-+	skcipher_request_set_tfm(subreq, child);
-+	skcipher_request_set_callback(subreq, CRYPTO_TFM_REQ_MAY_SLEEP,
-+				      NULL, NULL);
-+	skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
-+				   req->iv);
-+
-+	err = crypto_skcipher_decrypt(subreq);
-+	skcipher_request_zero(subreq);
-+
-+	req->base.complete = rctx->complete;
-+
-+out:
-+	cryptd_skcipher_complete(req, err);
-+}
-+
-+static int cryptd_skcipher_enqueue(struct skcipher_request *req,
-+				   crypto_completion_t compl)
-+{
-+	struct cryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct cryptd_queue *queue;
-+
-+	queue = cryptd_get_queue(crypto_skcipher_tfm(tfm));
-+	rctx->complete = req->base.complete;
-+	req->base.complete = compl;
-+
-+	return cryptd_enqueue_request(queue, &req->base);
-+}
-+
-+static int cryptd_skcipher_encrypt_enqueue(struct skcipher_request *req)
-+{
-+	return cryptd_skcipher_enqueue(req, cryptd_skcipher_encrypt);
-+}
-+
-+static int cryptd_skcipher_decrypt_enqueue(struct skcipher_request *req)
-+{
-+	return cryptd_skcipher_enqueue(req, cryptd_skcipher_decrypt);
-+}
-+
-+static int cryptd_skcipher_init_tfm(struct crypto_skcipher *tfm)
-+{
-+	struct skcipher_instance *inst = skcipher_alg_instance(tfm);
-+	struct skcipherd_instance_ctx *ictx = skcipher_instance_ctx(inst);
-+	struct crypto_skcipher_spawn *spawn = &ictx->spawn;
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_skcipher *cipher;
-+
-+	cipher = crypto_spawn_skcipher(spawn);
-+	if (IS_ERR(cipher))
-+		return PTR_ERR(cipher);
-+
-+	ctx->child = cipher;
-+	crypto_skcipher_set_reqsize(
-+		tfm, sizeof(struct cryptd_skcipher_request_ctx));
-+	return 0;
-+}
-+
-+static void cryptd_skcipher_exit_tfm(struct crypto_skcipher *tfm)
-+{
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+
-+	crypto_free_skcipher(ctx->child);
-+}
-+
-+static void cryptd_skcipher_free(struct skcipher_instance *inst)
-+{
-+	struct skcipherd_instance_ctx *ctx = skcipher_instance_ctx(inst);
-+
-+	crypto_drop_skcipher(&ctx->spawn);
-+}
-+
-+static int cryptd_create_skcipher(struct crypto_template *tmpl,
-+				  struct rtattr **tb,
-+				  struct cryptd_queue *queue)
-+{
-+	struct skcipherd_instance_ctx *ctx;
-+	struct skcipher_instance *inst;
-+	struct skcipher_alg *alg;
-+	const char *name;
-+	u32 type;
-+	u32 mask;
-+	int err;
-+
-+	type = 0;
-+	mask = CRYPTO_ALG_ASYNC;
-+
-+	cryptd_check_internal(tb, &type, &mask);
-+
-+	name = crypto_attr_alg_name(tb[1]);
-+	if (IS_ERR(name))
-+		return PTR_ERR(name);
-+
-+	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
-+	if (!inst)
-+		return -ENOMEM;
-+
-+	ctx = skcipher_instance_ctx(inst);
-+	ctx->queue = queue;
-+
-+	crypto_set_skcipher_spawn(&ctx->spawn, skcipher_crypto_instance(inst));
-+	err = crypto_grab_skcipher(&ctx->spawn, name, type, mask);
-+	if (err)
-+		goto out_free_inst;
-+
-+	alg = crypto_spawn_skcipher_alg(&ctx->spawn);
-+	err = cryptd_init_instance(skcipher_crypto_instance(inst), &alg->base);
-+	if (err)
-+		goto out_drop_skcipher;
-+
-+	inst->alg.base.cra_flags = CRYPTO_ALG_ASYNC |
-+				   (alg->base.cra_flags & CRYPTO_ALG_INTERNAL);
-+
-+	inst->alg.ivsize = crypto_skcipher_alg_ivsize(alg);
-+	inst->alg.chunksize = crypto_skcipher_alg_chunksize(alg);
-+	inst->alg.min_keysize = crypto_skcipher_alg_min_keysize(alg);
-+	inst->alg.max_keysize = crypto_skcipher_alg_max_keysize(alg);
-+
-+	inst->alg.base.cra_ctxsize = sizeof(struct cryptd_skcipher_ctx);
-+
-+	inst->alg.init = cryptd_skcipher_init_tfm;
-+	inst->alg.exit = cryptd_skcipher_exit_tfm;
-+
-+	inst->alg.setkey = cryptd_skcipher_setkey;
-+	inst->alg.encrypt = cryptd_skcipher_encrypt_enqueue;
-+	inst->alg.decrypt = cryptd_skcipher_decrypt_enqueue;
-+
-+	inst->free = cryptd_skcipher_free;
-+
-+	err = skcipher_register_instance(tmpl, inst);
-+	if (err) {
-+out_drop_skcipher:
-+		crypto_drop_skcipher(&ctx->spawn);
-+out_free_inst:
-+		kfree(inst);
-+	}
-+	return err;
-+}
-+
- static int cryptd_hash_init_tfm(struct crypto_tfm *tfm)
+ #include "aes-ce-setkey.h"
+@@ -149,12 +149,7 @@ static int ccm_encrypt(struct aead_request *req)
  {
- 	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
-@@ -893,7 +1117,11 @@ static int cryptd_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = crypto_aead_ctx(aead);
+-	struct blkcipher_desc desc = { .info = req->iv };
+-	struct blkcipher_walk walk;
+-	struct scatterlist srcbuf[2];
+-	struct scatterlist dstbuf[2];
+-	struct scatterlist *src;
+-	struct scatterlist *dst;
++	struct skcipher_walk walk;
+ 	u8 __aligned(8) mac[AES_BLOCK_SIZE];
+ 	u8 buf[AES_BLOCK_SIZE];
+ 	u32 len = req->cryptlen;
+@@ -172,27 +167,19 @@ static int ccm_encrypt(struct aead_request *req)
+ 	/* preserve the original iv for the final round */
+ 	memcpy(buf, req->iv, AES_BLOCK_SIZE);
  
- 	switch (algt->type & algt->mask & CRYPTO_ALG_TYPE_MASK) {
- 	case CRYPTO_ALG_TYPE_BLKCIPHER:
--		return cryptd_create_blkcipher(tmpl, tb, &queue);
-+		if ((algt->type & CRYPTO_ALG_TYPE_MASK) ==
-+		    CRYPTO_ALG_TYPE_BLKCIPHER)
-+			return cryptd_create_blkcipher(tmpl, tb, &queue);
-+
-+		return cryptd_create_skcipher(tmpl, tb, &queue);
- 	case CRYPTO_ALG_TYPE_DIGEST:
- 		return cryptd_create_hash(tmpl, tb, &queue);
- 	case CRYPTO_ALG_TYPE_AEAD:
-@@ -983,6 +1211,58 @@ void cryptd_free_ablkcipher(struct cryptd_ablkcipher *tfm)
- }
- EXPORT_SYMBOL_GPL(cryptd_free_ablkcipher);
+-	src = scatterwalk_ffwd(srcbuf, req->src, req->assoclen);
+-	dst = src;
+-	if (req->src != req->dst)
+-		dst = scatterwalk_ffwd(dstbuf, req->dst, req->assoclen);
+-
+-	blkcipher_walk_init(&walk, dst, src, len);
+-	err = blkcipher_aead_walk_virt_block(&desc, &walk, aead,
+-					     AES_BLOCK_SIZE);
++	err = skcipher_walk_aead(&walk, req, true);
  
-+struct cryptd_skcipher *cryptd_alloc_skcipher(const char *alg_name,
-+					      u32 type, u32 mask)
-+{
-+	char cryptd_alg_name[CRYPTO_MAX_ALG_NAME];
-+	struct cryptd_skcipher_ctx *ctx;
-+	struct crypto_skcipher *tfm;
-+
-+	if (snprintf(cryptd_alg_name, CRYPTO_MAX_ALG_NAME,
-+		     "cryptd(%s)", alg_name) >= CRYPTO_MAX_ALG_NAME)
-+		return ERR_PTR(-EINVAL);
-+
-+	tfm = crypto_alloc_skcipher(cryptd_alg_name, type, mask);
-+	if (IS_ERR(tfm))
-+		return ERR_CAST(tfm);
-+
-+	if (tfm->base.__crt_alg->cra_module != THIS_MODULE) {
-+		crypto_free_skcipher(tfm);
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	ctx = crypto_skcipher_ctx(tfm);
-+	atomic_set(&ctx->refcnt, 1);
-+
-+	return container_of(tfm, struct cryptd_skcipher, base);
-+}
-+EXPORT_SYMBOL_GPL(cryptd_alloc_skcipher);
-+
-+struct crypto_skcipher *cryptd_skcipher_child(struct cryptd_skcipher *tfm)
-+{
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(&tfm->base);
-+
-+	return ctx->child;
-+}
-+EXPORT_SYMBOL_GPL(cryptd_skcipher_child);
-+
-+bool cryptd_skcipher_queued(struct cryptd_skcipher *tfm)
-+{
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(&tfm->base);
-+
-+	return atomic_read(&ctx->refcnt) - 1;
-+}
-+EXPORT_SYMBOL_GPL(cryptd_skcipher_queued);
-+
-+void cryptd_free_skcipher(struct cryptd_skcipher *tfm)
-+{
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(&tfm->base);
-+
-+	if (atomic_dec_and_test(&ctx->refcnt))
-+		crypto_free_skcipher(&tfm->base);
-+}
-+EXPORT_SYMBOL_GPL(cryptd_free_skcipher);
-+
- struct cryptd_ahash *cryptd_alloc_ahash(const char *alg_name,
- 					u32 type, u32 mask)
- {
-diff --git a/include/crypto/cryptd.h b/include/crypto/cryptd.h
-index bc792d5..94418cb 100644
---- a/include/crypto/cryptd.h
-+++ b/include/crypto/cryptd.h
-@@ -12,10 +12,10 @@
- #ifndef _CRYPTO_CRYPT_H
- #define _CRYPTO_CRYPT_H
+ 	while (walk.nbytes) {
+ 		u32 tail = walk.nbytes % AES_BLOCK_SIZE;
  
--#include <linux/crypto.h>
- #include <linux/kernel.h>
- #include <crypto/aead.h>
- #include <crypto/hash.h>
-+#include <crypto/skcipher.h>
+-		if (walk.nbytes == len)
++		if (walk.nbytes == walk.total)
+ 			tail = 0;
  
- struct cryptd_ablkcipher {
- 	struct crypto_ablkcipher base;
-@@ -34,6 +34,17 @@ struct cryptd_ablkcipher *cryptd_alloc_ablkcipher(const char *alg_name,
- bool cryptd_ablkcipher_queued(struct cryptd_ablkcipher *tfm);
- void cryptd_free_ablkcipher(struct cryptd_ablkcipher *tfm);
+ 		ce_aes_ccm_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				   walk.nbytes - tail, ctx->key_enc,
+ 				   num_rounds(ctx), mac, walk.iv);
  
-+struct cryptd_skcipher {
-+	struct crypto_skcipher base;
-+};
-+
-+struct cryptd_skcipher *cryptd_alloc_skcipher(const char *alg_name,
-+					      u32 type, u32 mask);
-+struct crypto_skcipher *cryptd_skcipher_child(struct cryptd_skcipher *tfm);
-+/* Must be called without moving CPUs. */
-+bool cryptd_skcipher_queued(struct cryptd_skcipher *tfm);
-+void cryptd_free_skcipher(struct cryptd_skcipher *tfm);
-+
- struct cryptd_ahash {
- 	struct crypto_ahash base;
- };
+-		len -= walk.nbytes - tail;
+-		err = blkcipher_walk_done(&desc, &walk, tail);
++		err = skcipher_walk_done(&walk, tail);
+ 	}
+ 	if (!err)
+ 		ce_aes_ccm_final(mac, buf, ctx->key_enc, num_rounds(ctx));
+@@ -203,7 +190,7 @@ static int ccm_encrypt(struct aead_request *req)
+ 		return err;
+ 
+ 	/* copy authtag to end of dst */
+-	scatterwalk_map_and_copy(mac, dst, req->cryptlen,
++	scatterwalk_map_and_copy(mac, req->dst, req->assoclen + req->cryptlen,
+ 				 crypto_aead_authsize(aead), 1);
+ 
+ 	return 0;
+@@ -214,12 +201,7 @@ static int ccm_decrypt(struct aead_request *req)
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = crypto_aead_ctx(aead);
+ 	unsigned int authsize = crypto_aead_authsize(aead);
+-	struct blkcipher_desc desc = { .info = req->iv };
+-	struct blkcipher_walk walk;
+-	struct scatterlist srcbuf[2];
+-	struct scatterlist dstbuf[2];
+-	struct scatterlist *src;
+-	struct scatterlist *dst;
++	struct skcipher_walk walk;
+ 	u8 __aligned(8) mac[AES_BLOCK_SIZE];
+ 	u8 buf[AES_BLOCK_SIZE];
+ 	u32 len = req->cryptlen - authsize;
+@@ -237,27 +219,19 @@ static int ccm_decrypt(struct aead_request *req)
+ 	/* preserve the original iv for the final round */
+ 	memcpy(buf, req->iv, AES_BLOCK_SIZE);
+ 
+-	src = scatterwalk_ffwd(srcbuf, req->src, req->assoclen);
+-	dst = src;
+-	if (req->src != req->dst)
+-		dst = scatterwalk_ffwd(dstbuf, req->dst, req->assoclen);
+-
+-	blkcipher_walk_init(&walk, dst, src, len);
+-	err = blkcipher_aead_walk_virt_block(&desc, &walk, aead,
+-					     AES_BLOCK_SIZE);
++	err = skcipher_walk_aead(&walk, req, true);
+ 
+ 	while (walk.nbytes) {
+ 		u32 tail = walk.nbytes % AES_BLOCK_SIZE;
+ 
+-		if (walk.nbytes == len)
++		if (walk.nbytes == walk.total)
+ 			tail = 0;
+ 
+ 		ce_aes_ccm_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				   walk.nbytes - tail, ctx->key_enc,
+ 				   num_rounds(ctx), mac, walk.iv);
+ 
+-		len -= walk.nbytes - tail;
+-		err = blkcipher_walk_done(&desc, &walk, tail);
++		err = skcipher_walk_done(&walk, tail);
+ 	}
+ 	if (!err)
+ 		ce_aes_ccm_final(mac, buf, ctx->key_enc, num_rounds(ctx));
+@@ -268,7 +242,8 @@ static int ccm_decrypt(struct aead_request *req)
+ 		return err;
+ 
+ 	/* compare calculated auth tag with the stored one */
+-	scatterwalk_map_and_copy(buf, src, req->cryptlen - authsize,
++	scatterwalk_map_and_copy(buf, req->src,
++				 req->assoclen + req->cryptlen - authsize,
+ 				 authsize, 0);
+ 
+ 	if (crypto_memneq(mac, buf, authsize))
+@@ -287,6 +262,7 @@ static int ccm_decrypt(struct aead_request *req)
+ 		.cra_module		= THIS_MODULE,
+ 	},
+ 	.ivsize		= AES_BLOCK_SIZE,
++	.chunksize	= AES_BLOCK_SIZE,
+ 	.maxauthsize	= AES_BLOCK_SIZE,
+ 	.setkey		= ccm_setkey,
+ 	.setauthsize	= ccm_setauthsize,
