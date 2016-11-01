@@ -1,33 +1,61 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: fix AEAD tag memory handling
-Date: Tue, 01 Nov 2016 15:18:53 +0100
-Message-ID: <7741046.u5ygJjeQJs@tauon.atsec.com>
-References: <4006219.iWaCqWYv1B@positron.chronox.de> <2822295.gL4fqFHz8h@positron.chronox.de> <alpine.OSX.2.20.1610311456250.4111@mjmartin-mac01.local>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH] crypto: ccp - Fix handling of RSA exponent on a v5 device
+Date: Tue, 1 Nov 2016 14:05:05 -0500
+Message-ID: <20161101190505.1191.20536.stgit@taos>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47062 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S966205AbcKAOS5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Nov 2016 10:18:57 -0400
-In-Reply-To: <alpine.OSX.2.20.1610311456250.4111@mjmartin-mac01.local>
+Received: from mail-by2nam03on0051.outbound.protection.outlook.com ([104.47.42.51]:45756
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751469AbcKATFN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 1 Nov 2016 15:05:13 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 31. Oktober 2016, 16:18:32 CET schrieb Mat Martineau:
+The exponent size in the ccp_op structure is in bits. A v5
+CCP requires the exponent size to be in bytes, so convert
+the size from bits to bytes when populating the descriptor.
 
-Hi Mat,
+The current code references the exponent in memory, but
+these fields have not been set since the exponent is
+actually store in the LSB. Populate the descriptor with
+the LSB location (address).
 
-> My main concern is getting the semantics correct and consistent in a
-> single patch series. It would be a big problem to explain that AF_ALG AEAD
-> read and write works one way in 4.x, another way in 4.y, and some
-> different way in 4.z.
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
+---
+ drivers/crypto/ccp/ccp-dev-v5.c |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Ok, I will prepare another patch with this one fixed as well.
-
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index ff7816a..e2ce819 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -403,7 +403,7 @@ static int ccp5_perform_rsa(struct ccp_op *op)
+ 	CCP5_CMD_PROT(&desc) = 0;
+ 
+ 	function.raw = 0;
+-	CCP_RSA_SIZE(&function) = op->u.rsa.mod_size;
++	CCP_RSA_SIZE(&function) = op->u.rsa.mod_size >> 3;
+ 	CCP5_CMD_FUNCTION(&desc) = function.raw;
+ 
+ 	CCP5_CMD_LEN(&desc) = op->u.rsa.input_len;
+@@ -418,10 +418,10 @@ static int ccp5_perform_rsa(struct ccp_op *op)
+ 	CCP5_CMD_DST_HI(&desc) = ccp_addr_hi(&op->dst.u.dma);
+ 	CCP5_CMD_DST_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
+ 
+-	/* Key (Exponent) is in external memory */
+-	CCP5_CMD_KEY_LO(&desc) = ccp_addr_lo(&op->exp.u.dma);
+-	CCP5_CMD_KEY_HI(&desc) = ccp_addr_hi(&op->exp.u.dma);
+-	CCP5_CMD_KEY_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++	/* Exponent is in LSB memory */
++	CCP5_CMD_KEY_LO(&desc) = op->sb_key * LSB_ITEM_SIZE;
++	CCP5_CMD_KEY_HI(&desc) = 0;
++	CCP5_CMD_KEY_MEM(&desc) = CCP_MEMTYPE_SB;
+ 
+ 	return ccp5_do_cmd(&desc, op->cmd_q);
+ }
