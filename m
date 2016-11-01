@@ -1,61 +1,33 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH] crypto: ccp - Fix handling of RSA exponent on a v5 device
-Date: Tue, 1 Nov 2016 14:05:05 -0500
-Message-ID: <20161101190505.1191.20536.stgit@taos>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 0/16] crypto: skcipher - skcipher algorithm conversion part 3
+Date: Wed, 2 Nov 2016 07:16:48 +0800
+Message-ID: <20161101231648.GA15967@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0051.outbound.protection.outlook.com ([104.47.42.51]:45756
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751469AbcKATFN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Nov 2016 15:05:13 -0400
+Received: from helcar.hengli.com.au ([209.40.204.226]:43880 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751263AbcKAXQv (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 1 Nov 2016 19:16:51 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The exponent size in the ccp_op structure is in bits. A v5
-CCP requires the exponent size to be in bytes, so convert
-the size from bits to bytes when populating the descriptor.
+Hi:
 
-The current code references the exponent in memory, but
-these fields have not been set since the exponent is
-actually store in the LSB. Populate the descriptor with
-the LSB location (address).
+This patch series is the third instalment of the skcipher conversion.
 
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
----
- drivers/crypto/ccp/ccp-dev-v5.c |   10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+It introduces the skcipher walk interface, and converts a number of
+core algorithms such as CBC and LRW/XTS, as well as the aesni on x86
+and various ARM aes implementations.
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index ff7816a..e2ce819 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -403,7 +403,7 @@ static int ccp5_perform_rsa(struct ccp_op *op)
- 	CCP5_CMD_PROT(&desc) = 0;
- 
- 	function.raw = 0;
--	CCP_RSA_SIZE(&function) = op->u.rsa.mod_size;
-+	CCP_RSA_SIZE(&function) = op->u.rsa.mod_size >> 3;
- 	CCP5_CMD_FUNCTION(&desc) = function.raw;
- 
- 	CCP5_CMD_LEN(&desc) = op->u.rsa.input_len;
-@@ -418,10 +418,10 @@ static int ccp5_perform_rsa(struct ccp_op *op)
- 	CCP5_CMD_DST_HI(&desc) = ccp_addr_hi(&op->dst.u.dma);
- 	CCP5_CMD_DST_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
- 
--	/* Key (Exponent) is in external memory */
--	CCP5_CMD_KEY_LO(&desc) = ccp_addr_lo(&op->exp.u.dma);
--	CCP5_CMD_KEY_HI(&desc) = ccp_addr_hi(&op->exp.u.dma);
--	CCP5_CMD_KEY_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
-+	/* Exponent is in LSB memory */
-+	CCP5_CMD_KEY_LO(&desc) = op->sb_key * LSB_ITEM_SIZE;
-+	CCP5_CMD_KEY_HI(&desc) = 0;
-+	CCP5_CMD_KEY_MEM(&desc) = CCP_MEMTYPE_SB;
- 
- 	return ccp5_do_cmd(&desc, op->cmd_q);
- }
+It also adds an skcipher version of cryptd, as well as making
+testmgr skip all internal algorithms when testing.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
