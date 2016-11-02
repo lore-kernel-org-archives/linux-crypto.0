@@ -1,87 +1,54 @@
-From: Nadim Almas <nadim.902@gmail.com>
-Subject: [PATCH] Crypto: mv_cesa: Switch to using managed resources
-Date: Wed, 2 Nov 2016 17:28:45 +0530
-Message-ID: <20161102115845.GA8386@gmail.com>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH] crypto: ccp - Update the command queue on errors
+Date: Wed, 2 Nov 2016 10:14:03 -0500
+Message-ID: <20161102151403.17167.72785.stgit@taos>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <ghook@amd.com>, <thomas.lendacky@amd.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-cys01nam02on0088.outbound.protection.outlook.com ([104.47.37.88]:42144
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754748AbcKBP3Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Nov 2016 11:29:25 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Switch to resource-managed function devm_kzalloc instead
-of kzalloc and remove unneeded kfree
+Move the command queue tail pointer when an error is
+detected. Always return the error.
 
-Also, remove kfree in probe function and remove
-function, mv_remove as it is now has nothing to do.
-The Coccinelle semantic patch used to make this change is as follows:
-//<smpl>
-@platform@
-identifier p, probefn, removefn;
-@@
-struct platform_driver p = {
-.probe = probefn,
-.remove = removefn,
-};
-
-@prb@
-identifier platform.probefn, pdev;
-expression e, e1, e2;
-@@
-probefn(struct platform_device *pdev, ...) {
-<+...
-- e = kzalloc(e1, e2)
-+ e = devm_kzalloc(&pdev->dev, e1, e2)
-...
-?-kfree(e);
-...+>
-}
-@rem depends on prb@
-identifier platform.removefn;
-expression prb.e;
-@@
-removefn(...) {
-<...
-- kfree(e);
-...>
-}
-//</smpl>
-
-Signed-off-by: Nadim Almas <nadim.902@gmail.com>
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/mv_cesa.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/crypto/ccp/ccp-dev-v5.c |    7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index 104e9ce..451fa18 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -1073,7 +1073,7 @@ static int mv_probe(struct platform_device *pdev)
- 	if (!res)
- 		return -ENXIO;
- 
--	cp = kzalloc(sizeof(*cp), GFP_KERNEL);
-+	cp = devm_kzalloc(&pdev->dev, sizeof(*cp), GFP_KERNEL);
- 	if (!cp)
- 		return -ENOMEM;
- 
-@@ -1163,7 +1163,6 @@ static int mv_probe(struct platform_device *pdev)
- err_thread:
- 	kthread_stop(cp->queue_th);
- err:
--	kfree(cp);
- 	cpg = NULL;
- 	return ret;
- }
-@@ -1187,7 +1186,6 @@ static int mv_remove(struct platform_device *pdev)
- 		clk_put(cp->clk);
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index ff7816a..0baa99e 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -250,17 +250,20 @@ static int ccp5_do_cmd(struct ccp5_desc *desc,
+ 		ret = wait_event_interruptible(cmd_q->int_queue,
+ 					       cmd_q->int_rcvd);
+ 		if (ret || cmd_q->cmd_error) {
++			/* Log the error and flush the queue by
++			 * moving the head pointer
++			 */
+ 			if (cmd_q->cmd_error)
+ 				ccp_log_error(cmd_q->ccp,
+ 					      cmd_q->cmd_error);
+-			/* A version 5 device doesn't use Job IDs... */
++			iowrite32(tail, cmd_q->reg_head_lo);
+ 			if (!ret)
+ 				ret = -EIO;
+ 		}
+ 		cmd_q->int_rcvd = 0;
  	}
  
--	kfree(cp);
- 	cpg = NULL;
- 	return 0;
+-	return 0;
++	return ret;
  }
--- 
-2.7.4
+ 
+ static int ccp5_perform_aes(struct ccp_op *op)
