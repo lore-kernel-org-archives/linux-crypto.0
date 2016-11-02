@@ -1,50 +1,34 @@
-From: Jeffrey Walton <noloader@gmail.com>
-Subject: Fast Code and HAVE_EFFICIENT_UNALIGNED_ACCESS (was: [PATCH] poly1305:
- generic C can be faster on chips with slow unaligned access)
-Date: Wed, 2 Nov 2016 17:35:21 -0400
-Message-ID: <CAH8yC8nuWaWNahj6MxG=3kkEN+M=Qi86o+LagZCbBCLtcCChnQ@mail.gmail.com>
-Reply-To: noloader@gmail.com
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH] poly1305: generic C can be faster on chips with slow
+ unaligned access
+Date: Wed, 2 Nov 2016 23:00:00 +0100
+Message-ID: <CAHmME9ogYTGFaNDt1CD0FxEHxDzVhNX=AN3_PH3t=0zREGgYPA@mail.gmail.com>
+References: <20161102175810.18647-1-Jason@zx2c4.com> <20161102200959.GA23297@gondor.apana.org.au>
+ <CAHmME9ps=tLXvgP7DDzxLC58HxC7UjF35uPu6aVg6+zouPxEhQ@mail.gmail.com>
+ <20161102210802.GA26741@gondor.apana.org.au> <CAHmME9rOM-tE=o_4yFd=N1Bw1ur-QKQ-Wp6pnaJ8d62_Eug9og@mail.gmail.com>
+ <20161102212657.GA26887@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         Martin Willi <martin@strongswan.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:34403 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755930AbcKBWAN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Nov 2016 18:00:13 -0400
+In-Reply-To: <20161102212657.GA26887@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 2, 2016 at 5:25 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> These architectures select HAVE_EFFICIENT_UNALIGNED_ACCESS:
+On Wed, Nov 2, 2016 at 10:26 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> What I'm interested in is whether the new code is sufficiently
+> close in performance to the old code, particularonly on x86.
 >
-> s390 arm arm64 powerpc x86 x86_64
->
-> So, these will use the original old code.
->
-> The architectures that will thus use the new code are:
->
-> alpha arc avr32 blackfin c6x cris frv h7300 hexagon ia64 m32r m68k
-> metag microblaze mips mn10300 nios2 openrisc parisc score sh sparc
-> tile um unicore32 xtensa
+> I'd much rather only have a single set of code for all architectures.
+> After all, this is meant to be a generic implementation.
 
-What I have found in practice from helping maintain a security library
-and running benchmarks until my eyes bled....
-
-UNALIGNED_ACCESS is a kiss of death. It effectively prohibits -O3 and
-above due to undefined behavior in C and problems with GCC
-vectorization. In the bigger picture, it simply slows things down.
-
-Once we moved away from UNALIGNED_ACCESS and started testing at -O3
-and -O5, the benchmarks enjoyed non-trivial speedups on top of any
-speedups we were trying to achieve with hand tuned assembly language
-routines. Effectively, the best speedup was the sum of C-code and ASM;
-they were not disjoint as they appear.
-
-The one wrinkle for UNALIGNED_ACCESS is Bernstein's compressed tables
-(https://cr.yp.to/antiforgery/cachetiming-20050414.pdf).
-UNALIGNED_ACCESS meets some security goals. The techniques from
-Bernstein's paper apply equally well to AES, Camellia and other
-table-driven implementations. Painting with a broad brush (and as far
-as I know), the kernel is not observing the recommendations. My
-apologies if I parsed things incorrectly.
-
-Jeff
+Just tested. I get a 6% slowdown on my Skylake. No good. I think it's
+probably best to have the two paths in there, and not reduce it to
+one.
