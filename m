@@ -1,54 +1,88 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH] crypto: ccp - Update the command queue on errors
-Date: Wed, 2 Nov 2016 10:14:03 -0500
-Message-ID: <20161102151403.17167.72785.stgit@taos>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <ghook@amd.com>, <thomas.lendacky@amd.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0088.outbound.protection.outlook.com ([104.47.37.88]:42144
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754748AbcKBP3Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Nov 2016 11:29:25 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH] poly1305: generic C can be faster on chips with slow unaligned access
+Date: Wed,  2 Nov 2016 18:58:10 +0100
+Message-ID: <20161102175810.18647-1-Jason@zx2c4.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Martin Willi <martin@strongswan.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Move the command queue tail pointer when an error is
-detected. Always return the error.
+On MIPS chips commonly found in inexpensive routers, this makes a big
+difference in performance.
 
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- drivers/crypto/ccp/ccp-dev-v5.c |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ crypto/poly1305_generic.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index ff7816a..0baa99e 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -250,17 +250,20 @@ static int ccp5_do_cmd(struct ccp5_desc *desc,
- 		ret = wait_event_interruptible(cmd_q->int_queue,
- 					       cmd_q->int_rcvd);
- 		if (ret || cmd_q->cmd_error) {
-+			/* Log the error and flush the queue by
-+			 * moving the head pointer
-+			 */
- 			if (cmd_q->cmd_error)
- 				ccp_log_error(cmd_q->ccp,
- 					      cmd_q->cmd_error);
--			/* A version 5 device doesn't use Job IDs... */
-+			iowrite32(tail, cmd_q->reg_head_lo);
- 			if (!ret)
- 				ret = -EIO;
- 		}
- 		cmd_q->int_rcvd = 0;
- 	}
- 
--	return 0;
-+	return ret;
+diff --git a/crypto/poly1305_generic.c b/crypto/poly1305_generic.c
+index 2df9835d..186e33d 100644
+--- a/crypto/poly1305_generic.c
++++ b/crypto/poly1305_generic.c
+@@ -65,11 +65,24 @@ EXPORT_SYMBOL_GPL(crypto_poly1305_setkey);
+ static void poly1305_setrkey(struct poly1305_desc_ctx *dctx, const u8 *key)
+ {
+ 	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
++#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+ 	dctx->r[0] = (le32_to_cpuvp(key +  0) >> 0) & 0x3ffffff;
+ 	dctx->r[1] = (le32_to_cpuvp(key +  3) >> 2) & 0x3ffff03;
+ 	dctx->r[2] = (le32_to_cpuvp(key +  6) >> 4) & 0x3ffc0ff;
+ 	dctx->r[3] = (le32_to_cpuvp(key +  9) >> 6) & 0x3f03fff;
+ 	dctx->r[4] = (le32_to_cpuvp(key + 12) >> 8) & 0x00fffff;
++#else
++	u32 t0, t1, t2, t3;
++	t0 = le32_to_cpuvp(key +  0);
++	t1 = le32_to_cpuvp(key +  4);
++	t2 = le32_to_cpuvp(key +  8);
++	t3 = le32_to_cpuvp(key + 12);
++	dctx->r[0] = t0 & 0x3ffffff; t0 >>= 26; t0 |= t1 << 6;
++	dctx->r[1] = t0 & 0x3ffff03; t1 >>= 20; t1 |= t2 << 12;
++	dctx->r[2] = t1 & 0x3ffc0ff; t2 >>= 14; t2 |= t3 << 18;
++	dctx->r[3] = t2 & 0x3f03fff; t3 >>= 8;
++	dctx->r[4] = t3 & 0x00fffff;
++#endif
  }
  
- static int ccp5_perform_aes(struct ccp_op *op)
+ static void poly1305_setskey(struct poly1305_desc_ctx *dctx, const u8 *key)
+@@ -109,6 +122,9 @@ static unsigned int poly1305_blocks(struct poly1305_desc_ctx *dctx,
+ 	u32 s1, s2, s3, s4;
+ 	u32 h0, h1, h2, h3, h4;
+ 	u64 d0, d1, d2, d3, d4;
++#ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
++	u32 t0, t1, t2, t3;
++#endif
+ 	unsigned int datalen;
+ 
+ 	if (unlikely(!dctx->sset)) {
+@@ -135,13 +151,24 @@ static unsigned int poly1305_blocks(struct poly1305_desc_ctx *dctx,
+ 	h4 = dctx->h[4];
+ 
+ 	while (likely(srclen >= POLY1305_BLOCK_SIZE)) {
+-
+ 		/* h += m[i] */
++#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+ 		h0 += (le32_to_cpuvp(src +  0) >> 0) & 0x3ffffff;
+ 		h1 += (le32_to_cpuvp(src +  3) >> 2) & 0x3ffffff;
+ 		h2 += (le32_to_cpuvp(src +  6) >> 4) & 0x3ffffff;
+ 		h3 += (le32_to_cpuvp(src +  9) >> 6) & 0x3ffffff;
+ 		h4 += (le32_to_cpuvp(src + 12) >> 8) | hibit;
++#else
++		t0 = le32_to_cpuvp(src +  0);
++		t1 = le32_to_cpuvp(src +  4);
++		t2 = le32_to_cpuvp(src +  8);
++		t3 = le32_to_cpuvp(src + 12);
++		h0 += t0 & 0x3ffffff;
++		h1 += sr((((u64)t1 << 32) | t0), 26) & 0x3ffffff;
++		h2 += sr((((u64)t2 << 32) | t1), 20) & 0x3ffffff;
++		h3 += sr((((u64)t3 << 32) | t2), 14) & 0x3ffffff;
++		h4 += (t3 >> 8) | hibit;
++#endif
+ 
+ 		/* h *= r */
+ 		d0 = mlt(h0, r0) + mlt(h1, s4) + mlt(h2, s3) +
+-- 
+2.10.2
