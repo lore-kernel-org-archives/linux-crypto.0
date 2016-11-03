@@ -1,48 +1,55 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH] poly1305: generic C can be faster on chips with slow
- unaligned access
-Date: Thu, 03 Nov 2016 13:08:52 -0400 (EDT)
-Message-ID: <20161103.130852.1456848512897088071.davem@davemloft.net>
-References: <CAHmME9ogYTGFaNDt1CD0FxEHxDzVhNX=AN3_PH3t=0zREGgYPA@mail.gmail.com>
-        <20161103004934.GA30775@gondor.apana.org.au>
-        <CAHmME9oL-pOWWXXFhJz1vSm5ftnSfmYrquGbH0acapgEL=c4Ew@mail.gmail.com>
+From: Eric Biggers <ebiggers@google.com>
+Subject: vmalloced stacks and scatterwalk_map_and_copy()
+Date: Thu, 3 Nov 2016 11:16:24 -0700
+Message-ID: <20161103181624.GA63852@google.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin@strongswan.org
-To: Jason@zx2c4.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([184.105.139.130]:38678 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758278AbcKCRIy (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Nov 2016 13:08:54 -0400
-In-Reply-To: <CAHmME9oL-pOWWXXFhJz1vSm5ftnSfmYrquGbH0acapgEL=c4Ew@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
+        luto@kernel.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Thu, 3 Nov 2016 08:24:57 +0100
+Hello,
 
-> Hi Herbert,
-> 
-> On Thu, Nov 3, 2016 at 1:49 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->> FWIW I'd rather live with a 6% slowdown than having two different
->> code paths in the generic code.  Anyone who cares about 6% would
->> be much better off writing an assembly version of the code.
-> 
-> Please think twice before deciding that the generic C "is allowed to
-> be slow".
+I hit the BUG_ON() in arch/x86/mm/physaddr.c:26 while testing some crypto code
+in an x86_64 kernel with CONFIG_DEBUG_VIRTUAL=y and CONFIG_VMAP_STACK=y:
 
-In any event no piece of code should be doing 32-bit word reads from
-addresses like "x + 3" without, at a very minimum, going through the
-kernel unaligned access handlers.
+	/* carry flag will be set if starting x was >= PAGE_OFFSET */
+	VIRTUAL_BUG_ON((x > y) || !phys_addr_valid(x));
 
-Yet that is what the generic C poly1305 code is doing, all over the
-place.
+The problem is the following code in scatterwalk_map_and_copy() in
+crypto/scatterwalk.c, which tries to determine if the buffer passed in aliases
+the physical memory of the first segment of the scatterlist:
 
-We know explicitly that these offsets will not be 32-bit aligned, so
-it is required that we use the helpers, or alternatively do things to
-avoid these unaligned accesses such as using temporary storage when
-the HAVE_EFFICIENT_UNALIGNED_ACCESS kconfig value is not set.
+        if (sg_page(sg) == virt_to_page(buf) &&
+            sg->offset == offset_in_page(buf))
+                return;
+
+If 'buf' is on the stack with CONFIG_VMAP_STACK=y it will be a vmalloc address.
+And virt_to_page(buf) does not have a meaningful behavior on vmalloc addresses.
+Hence the BUG.
+
+I don't think this should be fixed by forbidding passing a stack address to
+scatterwalk_map_and_copy().  Not only are there a number of callers that
+explicitly use stack addresses (e.g. poly_verify_tag() in
+crypto/chacha20poly1305.c) but it's also possible for a whole skcipher_request
+to be allocated on the stack with the SKCIPHER_REQUEST_ON_STACK() macro.  Note
+that this has nothing to do with DMA per se.
+
+Another solution would be to make scatterwalk_map_and_copy() explicitly check
+for virt_addr_valid().  But this would make the behavior of
+scatterwalk_map_and_copy() confusing because it would detect aliasing but only
+under some circumstances, and it would depend on the kernel config.
+
+Currently I think the best solution would be to require that callers to
+scatterwalk_map_and_copy() do not alias their source and destination.  Then the
+alias check could be removed.  This check has only been there since v4.2 (commit
+74412fd5d71b6), so I'd hope not many callers rely on the behavior.  I'm not sure
+exactly which ones do, though.
+
+Thoughts on this?
+
+Eric
