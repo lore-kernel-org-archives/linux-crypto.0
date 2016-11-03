@@ -1,65 +1,90 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH] poly1305: generic C can be faster on chips
- with slow unaligned access
-Date: Thu, 3 Nov 2016 23:20:08 +0100
-Message-ID: <CAHmME9pm4DHuBsE+hoFxnm1B5OWAZ+OyKXzeKDxHtisZpw4ebg@mail.gmail.com>
-References: <CAHmME9ogYTGFaNDt1CD0FxEHxDzVhNX=AN3_PH3t=0zREGgYPA@mail.gmail.com>
- <20161103004934.GA30775@gondor.apana.org.au>
- <CAHmME9oL-pOWWXXFhJz1vSm5ftnSfmYrquGbH0acapgEL=c4Ew@mail.gmail.com>
- <20161103.130852.1456848512897088071.davem@davemloft.net>
+From: Eric Biggers <ebiggers@google.com>
+Subject: Re: vmalloced stacks and scatterwalk_map_and_copy()
+Date: Thu, 3 Nov 2016 16:10:18 -0700
+Message-ID: <20161103231018.GA85121@google.com>
+References: <20161103181624.GA63852@google.com>
+ <CALCETrUPuunBT1Zo25wyOwqaWJ=rm9R-WMZGN-7u4-dsdokAnQ@mail.gmail.com>
+ <20161103211207.GB63852@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- Martin Willi <martin@strongswan.org>, LKML <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org,
- WireGuard mailing list <wireguard@lists.zx2c4.com>
-To: David Miller <davem@davemloft.net>
-Return-path: <wireguard-bounces@lists.zx2c4.com>
-In-Reply-To: <20161103.130852.1456848512897088071.davem@davemloft.net>
-List-Unsubscribe: <http://lists.zx2c4.com/mailman/options/wireguard>,
- <mailto:wireguard-request@lists.zx2c4.com?subject=unsubscribe>
-List-Archive: <http://lists.zx2c4.com/pipermail/wireguard/>
-List-Post: <mailto:wireguard@lists.zx2c4.com>
-List-Help: <mailto:wireguard-request@lists.zx2c4.com?subject=help>
-List-Subscribe: <http://lists.zx2c4.com/mailman/listinfo/wireguard>,
- <mailto:wireguard-request@lists.zx2c4.com?subject=subscribe>
-Errors-To: wireguard-bounces@lists.zx2c4.com
-Sender: "WireGuard" <wireguard-bounces@lists.zx2c4.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Andrew Lutomirski <luto@kernel.org>, linux-mm@kvack.org
+To: Andy Lutomirski <luto@amacapital.net>
+Return-path: <owner-linux-mm@kvack.org>
+Content-Disposition: inline
+In-Reply-To: <20161103211207.GB63852@google.com>
+Sender: owner-linux-mm@kvack.org
 List-Id: linux-crypto.vger.kernel.org
 
-SGkgRGF2aWQsCgpPbiBUaHUsIE5vdiAzLCAyMDE2IGF0IDY6MDggUE0sIERhdmlkIE1pbGxlciA8
-ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD4gd3JvdGU6Cj4gSW4gYW55IGV2ZW50IG5vIHBpZWNlIG9mIGNv
-ZGUgc2hvdWxkIGJlIGRvaW5nIDMyLWJpdCB3b3JkIHJlYWRzIGZyb20KPiBhZGRyZXNzZXMgbGlr
-ZSAieCArIDMiIHdpdGhvdXQsIGF0IGEgdmVyeSBtaW5pbXVtLCBnb2luZyB0aHJvdWdoIHRoZQo+
-IGtlcm5lbCB1bmFsaWduZWQgYWNjZXNzIGhhbmRsZXJzLgoKRXhjZWxsZW50IHBvaW50LiBJbiBv
-dGhlcndvcmRzLAoKICAgIGN0eC0+clswXSA9IChsZTMyX3RvX2NwdXZwKGtleSArICAwKSA+PiAw
-KSAmIDB4M2ZmZmZmZjsKICAgIGN0eC0+clsxXSA9IChsZTMyX3RvX2NwdXZwKGtleSArICAzKSA+
-PiAyKSAmIDB4M2ZmZmYwMzsKICAgIGN0eC0+clsyXSA9IChsZTMyX3RvX2NwdXZwKGtleSArICA2
-KSA+PiA0KSAmIDB4M2ZmYzBmZjsKICAgIGN0eC0+clszXSA9IChsZTMyX3RvX2NwdXZwKGtleSAr
-ICA5KSA+PiA2KSAmIDB4M2YwM2ZmZjsKICAgIGN0eC0+cls0XSA9IChsZTMyX3RvX2NwdXZwKGtl
-eSArIDEyKSA+PiA4KSAmIDB4MDBmZmZmZjsKCnNob3VsZCBjaGFuZ2UgdG86CgogICAgY3R4LT5y
-WzBdID0gKGxlMzJfdG9fY3B1dnAoa2V5ICsgIDApID4+IDApICYgMHgzZmZmZmZmOwogICAgY3R4
-LT5yWzFdID0gKGdldF91bmFsaWduZWRfbGUzMihrZXkgKyAgMykgPj4gMikgJiAweDNmZmZmMDM7
-CiAgICBjdHgtPnJbMl0gPSAoZ2V0X3VuYWxpZ25lZF9sZTMyKGtleSArICA2KSA+PiA0KSAmIDB4
-M2ZmYzBmZjsKICAgIGN0eC0+clszXSA9IChnZXRfdW5hbGlnbmVkX2xlMzIoa2V5ICsgIDkpID4+
-IDYpICYgMHgzZjAzZmZmOwogICAgY3R4LT5yWzRdID0gKGxlMzJfdG9fY3B1dnAoa2V5ICsgMTIp
-ID4+IDgpICYgMHgwMGZmZmZmOwoKPiBXZSBrbm93IGV4cGxpY2l0bHkgdGhhdCB0aGVzZSBvZmZz
-ZXRzIHdpbGwgbm90IGJlIDMyLWJpdCBhbGlnbmVkLCBzbwo+IGl0IGlzIHJlcXVpcmVkIHRoYXQg
-d2UgdXNlIHRoZSBoZWxwZXJzLCBvciBhbHRlcm5hdGl2ZWx5IGRvIHRoaW5ncyB0bwo+IGF2b2lk
-IHRoZXNlIHVuYWxpZ25lZCBhY2Nlc3NlcyBzdWNoIGFzIHVzaW5nIHRlbXBvcmFyeSBzdG9yYWdl
-IHdoZW4KPiB0aGUgSEFWRV9FRkZJQ0lFTlRfVU5BTElHTkVEX0FDQ0VTUyBrY29uZmlnIHZhbHVl
-IGlzIG5vdCBzZXQuCgpTbyB0aGUgcXVlc3Rpb24gaXM6IGlzIHRoZSBjbGV2ZXIgYXZvaWRhbmNl
-IG9mIHVuYWxpZ25lZCBhY2Nlc3NlcyBvZgp0aGUgb3JpZ2luYWwgcGF0Y2ggZmFzdGVyIG9yIHNs
-b3dlciB0aGFuIGNoYW5naW5nIHRoZSB1bmFsaWduZWQKYWNjZXNzZXMgdG8gdXNlIHRoZSBoZWxw
-ZXIgZnVuY3Rpb24/CgpJJ3ZlIHB1dCBhIGxpdHRsZSB0ZXN0IGhhcm5lc3MgdG9nZXRoZXIgZm9y
-IHBsYXlpbmcgd2l0aCB0aGlzOgoKICAgICQgZ2l0IGNsb25lIGdpdDovL2dpdC56eDJjNC5jb20v
-cG9seWJlbmNoCiAgICAkIGNkIHBvbHliZW5jaAogICAgJCBtYWtlIHJ1bgoKVG8gdGVzdCB3aXRo
-IG9uZSBtZXRob2QsIGRvIGFzIG5vcm1hbC4gVG8gdGVzdCB3aXRoIHRoZSBvdGhlciwgcmVtb3Zl
-CiIjZGVmaW5lIFVTRV9GSVJTVF9NRVRIT0QiIGZyb20gdGhlIHNvdXJjZSBjb2RlLgoKQFJlbsOp
-OiBkbyB5b3UgdGhpbmsgeW91IGNvdWxkIHJldGVzdCBvbiB5b3VyIE1JUFMzMnIyIGhhcmR3YXJl
-IGFuZApyZXBvcnQgYmFjayB3aGljaCBpcyBmYXN0ZXI/CgpBbmQgaWYgYW55Ym9keSBlbHNlIGhh
-cyBvdGhlciBoYXJkd2FyZSBhbmQgd291bGQgbGlrZSB0byB0cnksIHRoaXMKY291bGQgYmUgbmlj
-ZS4KClJlZ2FyZHMsCkphc29uCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fCldpcmVHdWFyZCBtYWlsaW5nIGxpc3QKV2lyZUd1YXJkQGxpc3RzLnp4MmM0LmNv
-bQpodHRwOi8vbGlzdHMuengyYzQuY29tL21haWxtYW4vbGlzdGluZm8vd2lyZWd1YXJkCg==
+On Thu, Nov 03, 2016 at 02:12:07PM -0700, Eric Biggers wrote:
+> On Thu, Nov 03, 2016 at 01:30:49PM -0700, Andy Lutomirski wrote:
+> > 
+> > Also, Herbert, it seems like the considerable majority of the crypto
+> > code is acting on kernel virtual memory addresses and does software
+> > processing.  Would it perhaps make sense to add a kvec-based or
+> > iov_iter-based interface to the crypto code?  I bet it would be quite
+> > a bit faster and it would make crypto on stack buffers work directly.
+> 
+> I'd like to hear Herbert's opinion on this too, but as I understand it, if a
+> symmetric cipher API operating on virtual addresses was added, similar to the
+> existing "shash" API it would only allow software processing.  Whereas with the
+> current API you can request a transform and use it the same way regardless of
+> whether the crypto framework has chosen a software or hardware implementation,
+> or a combination thereof.  If this wasn't a concern then I expect using virtual
+> addresses would indeed simplify things a lot, at least for users not already
+> working with physical memory (struct page).
+> 
+> Either way, in the near term it looks like 4.9 will be released with the new
+> behavior that encryption/decryption is not supported on stack buffers.
+> Separately from the scatterwalk_map_and_copy() issue, today I've found two
+> places in the filesystem-level encryption code that do encryption on stack
+> buffers and therefore hit the 'BUG_ON(!virt_addr_valid(buf));' in sg_set_buf().
+> I will be sending patches to fix these, but I suspect there may be more crypto
+> API users elsewhere that have this same problem.
+> 
+> Eric
+
+[Added linux-mm to Cc]
+
+For what it's worth, grsecurity has a special case to allow a scatterlist entry
+to be created from a stack buffer:
+
+	static inline void sg_set_buf(struct scatterlist *sg, const void *buf,
+				      unsigned int buflen)
+	{
+		const void *realbuf = buf;
+
+	#ifdef CONFIG_GRKERNSEC_KSTACKOVERFLOW
+		if (object_starts_on_stack(buf))
+			realbuf = buf - current->stack + current->lowmem_stack;
+	#endif
+
+	#ifdef CONFIG_DEBUG_SG
+		BUG_ON(!virt_addr_valid(realbuf));
+	#endif
+		sg_set_page(sg, virt_to_page(realbuf), buflen, offset_in_page(realbuf));
+	}
+
+It seems to maintain two virtual mappings for each stack, a physically
+contiguous one (task_struct.lowmem_stack) and a physically non-contiguous one
+(task_struct.stack).  This seems different from upstream CONFIG_VMAP_STACK which
+just maintains a physically non-contiguous one.
+
+I don't know about all the relative merits of the two approaches.  But one of
+the things that will need to be done with the currently upstream approach is
+that all callers of sg_set_buf() will need to be checked to make sure they
+aren't using stack addresses, and any that are will need to be updated to do
+otherwise, e.g. by using heap-allocated memory.  I suppose this is already
+happening, but in the case of the crypto API it will probably take a while for
+all the users to be identified and updated.  (And it's not always clear from the
+local context whether something can be stack memory or not, e.g. the memory for
+crypto request objects may be either.)
+
+Eric
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
