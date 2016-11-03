@@ -1,80 +1,65 @@
-From: Eric Biggers <ebiggers@google.com>
-Subject: [PATCH 2/2] fscrypto: don't use on-stack buffer for key derivation
-Date: Thu,  3 Nov 2016 15:03:02 -0700
-Message-ID: <1478210582-86338-2-git-send-email-ebiggers@google.com>
-References: <1478210582-86338-1-git-send-email-ebiggers@google.com>
-Cc: linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-crypto@vger.kernel.org, tytso@mit.edu, jaegeuk@kernel.org,
-        richard@nod.at, luto@kernel.org, Eric Biggers <ebiggers@google.com>
-To: linux-fsdevel@vger.kernel.org
-Return-path: <linux-ext4-owner@vger.kernel.org>
-In-Reply-To: <1478210582-86338-1-git-send-email-ebiggers@google.com>
-Sender: linux-ext4-owner@vger.kernel.org
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH] poly1305: generic C can be faster on chips
+ with slow unaligned access
+Date: Thu, 3 Nov 2016 23:20:08 +0100
+Message-ID: <CAHmME9pm4DHuBsE+hoFxnm1B5OWAZ+OyKXzeKDxHtisZpw4ebg@mail.gmail.com>
+References: <CAHmME9ogYTGFaNDt1CD0FxEHxDzVhNX=AN3_PH3t=0zREGgYPA@mail.gmail.com>
+ <20161103004934.GA30775@gondor.apana.org.au>
+ <CAHmME9oL-pOWWXXFhJz1vSm5ftnSfmYrquGbH0acapgEL=c4Ew@mail.gmail.com>
+ <20161103.130852.1456848512897088071.davem@davemloft.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ Martin Willi <martin@strongswan.org>, LKML <linux-kernel@vger.kernel.org>,
+ linux-crypto@vger.kernel.org,
+ WireGuard mailing list <wireguard@lists.zx2c4.com>
+To: David Miller <davem@davemloft.net>
+Return-path: <wireguard-bounces@lists.zx2c4.com>
+In-Reply-To: <20161103.130852.1456848512897088071.davem@davemloft.net>
+List-Unsubscribe: <http://lists.zx2c4.com/mailman/options/wireguard>,
+ <mailto:wireguard-request@lists.zx2c4.com?subject=unsubscribe>
+List-Archive: <http://lists.zx2c4.com/pipermail/wireguard/>
+List-Post: <mailto:wireguard@lists.zx2c4.com>
+List-Help: <mailto:wireguard-request@lists.zx2c4.com?subject=help>
+List-Subscribe: <http://lists.zx2c4.com/mailman/listinfo/wireguard>,
+ <mailto:wireguard-request@lists.zx2c4.com?subject=subscribe>
+Errors-To: wireguard-bounces@lists.zx2c4.com
+Sender: "WireGuard" <wireguard-bounces@lists.zx2c4.com>
 List-Id: linux-crypto.vger.kernel.org
 
-With the new (in 4.9) option to use a virtually-mapped stack
-(CONFIG_VMAP_STACK), stack buffers cannot be used as input/output for
-the scatterlist crypto API because they may not be directly mappable to
-struct page.  get_crypt_info() was using a stack buffer to hold the
-output from the encryption operation used to derive the per-file key.
-Fix it by using a heap buffer.
-
-This bug could most easily be observed in a CONFIG_DEBUG_SG kernel
-because this allowed the BUG in sg_set_buf() to be triggered.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- fs/crypto/keyinfo.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
-
-diff --git a/fs/crypto/keyinfo.c b/fs/crypto/keyinfo.c
-index 82f0285..67fb6d8 100644
---- a/fs/crypto/keyinfo.c
-+++ b/fs/crypto/keyinfo.c
-@@ -185,7 +185,7 @@ int get_crypt_info(struct inode *inode)
- 	struct crypto_skcipher *ctfm;
- 	const char *cipher_str;
- 	int keysize;
--	u8 raw_key[FS_MAX_KEY_SIZE];
-+	u8 *raw_key = NULL;
- 	int res;
- 
- 	res = fscrypt_initialize();
-@@ -238,6 +238,15 @@ int get_crypt_info(struct inode *inode)
- 	if (res)
- 		goto out;
- 
-+	/*
-+	 * This cannot be a stack buffer because it is passed to the scatterlist
-+	 * crypto API as part of key derivation.
-+	 */
-+	res = -ENOMEM;
-+	raw_key = kmalloc(FS_MAX_KEY_SIZE, GFP_NOFS);
-+	if (!raw_key)
-+		goto out;
-+
- 	if (fscrypt_dummy_context_enabled(inode)) {
- 		memset(raw_key, 0x42, FS_AES_256_XTS_KEY_SIZE);
- 		goto got_key;
-@@ -276,7 +285,8 @@ int get_crypt_info(struct inode *inode)
- 	if (res)
- 		goto out;
- 
--	memzero_explicit(raw_key, sizeof(raw_key));
-+	kzfree(raw_key);
-+	raw_key = NULL;
- 	if (cmpxchg(&inode->i_crypt_info, NULL, crypt_info) != NULL) {
- 		put_crypt_info(crypt_info);
- 		goto retry;
-@@ -287,7 +297,7 @@ int get_crypt_info(struct inode *inode)
- 	if (res == -ENOKEY)
- 		res = 0;
- 	put_crypt_info(crypt_info);
--	memzero_explicit(raw_key, sizeof(raw_key));
-+	kzfree(raw_key);
- 	return res;
- }
- 
--- 
-2.8.0.rc3.226.g39d4020
-
+SGkgRGF2aWQsCgpPbiBUaHUsIE5vdiAzLCAyMDE2IGF0IDY6MDggUE0sIERhdmlkIE1pbGxlciA8
+ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD4gd3JvdGU6Cj4gSW4gYW55IGV2ZW50IG5vIHBpZWNlIG9mIGNv
+ZGUgc2hvdWxkIGJlIGRvaW5nIDMyLWJpdCB3b3JkIHJlYWRzIGZyb20KPiBhZGRyZXNzZXMgbGlr
+ZSAieCArIDMiIHdpdGhvdXQsIGF0IGEgdmVyeSBtaW5pbXVtLCBnb2luZyB0aHJvdWdoIHRoZQo+
+IGtlcm5lbCB1bmFsaWduZWQgYWNjZXNzIGhhbmRsZXJzLgoKRXhjZWxsZW50IHBvaW50LiBJbiBv
+dGhlcndvcmRzLAoKICAgIGN0eC0+clswXSA9IChsZTMyX3RvX2NwdXZwKGtleSArICAwKSA+PiAw
+KSAmIDB4M2ZmZmZmZjsKICAgIGN0eC0+clsxXSA9IChsZTMyX3RvX2NwdXZwKGtleSArICAzKSA+
+PiAyKSAmIDB4M2ZmZmYwMzsKICAgIGN0eC0+clsyXSA9IChsZTMyX3RvX2NwdXZwKGtleSArICA2
+KSA+PiA0KSAmIDB4M2ZmYzBmZjsKICAgIGN0eC0+clszXSA9IChsZTMyX3RvX2NwdXZwKGtleSAr
+ICA5KSA+PiA2KSAmIDB4M2YwM2ZmZjsKICAgIGN0eC0+cls0XSA9IChsZTMyX3RvX2NwdXZwKGtl
+eSArIDEyKSA+PiA4KSAmIDB4MDBmZmZmZjsKCnNob3VsZCBjaGFuZ2UgdG86CgogICAgY3R4LT5y
+WzBdID0gKGxlMzJfdG9fY3B1dnAoa2V5ICsgIDApID4+IDApICYgMHgzZmZmZmZmOwogICAgY3R4
+LT5yWzFdID0gKGdldF91bmFsaWduZWRfbGUzMihrZXkgKyAgMykgPj4gMikgJiAweDNmZmZmMDM7
+CiAgICBjdHgtPnJbMl0gPSAoZ2V0X3VuYWxpZ25lZF9sZTMyKGtleSArICA2KSA+PiA0KSAmIDB4
+M2ZmYzBmZjsKICAgIGN0eC0+clszXSA9IChnZXRfdW5hbGlnbmVkX2xlMzIoa2V5ICsgIDkpID4+
+IDYpICYgMHgzZjAzZmZmOwogICAgY3R4LT5yWzRdID0gKGxlMzJfdG9fY3B1dnAoa2V5ICsgMTIp
+ID4+IDgpICYgMHgwMGZmZmZmOwoKPiBXZSBrbm93IGV4cGxpY2l0bHkgdGhhdCB0aGVzZSBvZmZz
+ZXRzIHdpbGwgbm90IGJlIDMyLWJpdCBhbGlnbmVkLCBzbwo+IGl0IGlzIHJlcXVpcmVkIHRoYXQg
+d2UgdXNlIHRoZSBoZWxwZXJzLCBvciBhbHRlcm5hdGl2ZWx5IGRvIHRoaW5ncyB0bwo+IGF2b2lk
+IHRoZXNlIHVuYWxpZ25lZCBhY2Nlc3NlcyBzdWNoIGFzIHVzaW5nIHRlbXBvcmFyeSBzdG9yYWdl
+IHdoZW4KPiB0aGUgSEFWRV9FRkZJQ0lFTlRfVU5BTElHTkVEX0FDQ0VTUyBrY29uZmlnIHZhbHVl
+IGlzIG5vdCBzZXQuCgpTbyB0aGUgcXVlc3Rpb24gaXM6IGlzIHRoZSBjbGV2ZXIgYXZvaWRhbmNl
+IG9mIHVuYWxpZ25lZCBhY2Nlc3NlcyBvZgp0aGUgb3JpZ2luYWwgcGF0Y2ggZmFzdGVyIG9yIHNs
+b3dlciB0aGFuIGNoYW5naW5nIHRoZSB1bmFsaWduZWQKYWNjZXNzZXMgdG8gdXNlIHRoZSBoZWxw
+ZXIgZnVuY3Rpb24/CgpJJ3ZlIHB1dCBhIGxpdHRsZSB0ZXN0IGhhcm5lc3MgdG9nZXRoZXIgZm9y
+IHBsYXlpbmcgd2l0aCB0aGlzOgoKICAgICQgZ2l0IGNsb25lIGdpdDovL2dpdC56eDJjNC5jb20v
+cG9seWJlbmNoCiAgICAkIGNkIHBvbHliZW5jaAogICAgJCBtYWtlIHJ1bgoKVG8gdGVzdCB3aXRo
+IG9uZSBtZXRob2QsIGRvIGFzIG5vcm1hbC4gVG8gdGVzdCB3aXRoIHRoZSBvdGhlciwgcmVtb3Zl
+CiIjZGVmaW5lIFVTRV9GSVJTVF9NRVRIT0QiIGZyb20gdGhlIHNvdXJjZSBjb2RlLgoKQFJlbsOp
+OiBkbyB5b3UgdGhpbmsgeW91IGNvdWxkIHJldGVzdCBvbiB5b3VyIE1JUFMzMnIyIGhhcmR3YXJl
+IGFuZApyZXBvcnQgYmFjayB3aGljaCBpcyBmYXN0ZXI/CgpBbmQgaWYgYW55Ym9keSBlbHNlIGhh
+cyBvdGhlciBoYXJkd2FyZSBhbmQgd291bGQgbGlrZSB0byB0cnksIHRoaXMKY291bGQgYmUgbmlj
+ZS4KClJlZ2FyZHMsCkphc29uCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fCldpcmVHdWFyZCBtYWlsaW5nIGxpc3QKV2lyZUd1YXJkQGxpc3RzLnp4MmM0LmNv
+bQpodHRwOi8vbGlzdHMuengyYzQuY29tL21haWxtYW4vbGlzdGluZm8vd2lyZWd1YXJkCg==
