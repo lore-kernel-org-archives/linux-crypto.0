@@ -1,7 +1,8 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH V2 2/9] crypto: ccp - Update the command queue on errors
-Date: Fri, 4 Nov 2016 11:03:44 -0500
-Message-ID: <20161104160343.18155.11509.stgit@taos>
+Subject: [PATCH V2 1/9] crypto: ccp - Fix handling of RSA exponent on a v5
+ device
+Date: Fri, 4 Nov 2016 11:03:34 -0500
+Message-ID: <20161104160334.18155.32509.stgit@taos>
 References: <20161104160140.18155.75618.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,47 +11,54 @@ Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
         <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0066.outbound.protection.outlook.com ([104.47.37.66]:7168
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam01on0079.outbound.protection.outlook.com ([104.47.34.79]:58880
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S935059AbcKDQDw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Nov 2016 12:03:52 -0400
+        id S935059AbcKDQDm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Nov 2016 12:03:42 -0400
 In-Reply-To: <20161104160140.18155.75618.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Move the command queue tail pointer when an error is
-detected. Always return the error.
+The exponent size in the ccp_op structure is in bits. A v5
+CCP requires the exponent size to be in bytes, so convert
+the size from bits to bytes when populating the descriptor.
+
+The current code references the exponent in memory, but
+these fields have not been set since the exponent is
+actually store in the LSB. Populate the descriptor with
+the LSB location (address).
 
 Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/ccp-dev-v5.c |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/crypto/ccp/ccp-dev-v5.c |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index e2ce819..05300a9 100644
+index ff7816a..e2ce819 100644
 --- a/drivers/crypto/ccp/ccp-dev-v5.c
 +++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -250,17 +250,20 @@ static int ccp5_do_cmd(struct ccp5_desc *desc,
- 		ret = wait_event_interruptible(cmd_q->int_queue,
- 					       cmd_q->int_rcvd);
- 		if (ret || cmd_q->cmd_error) {
-+			/* Log the error and flush the queue by
-+			 * moving the head pointer
-+			 */
- 			if (cmd_q->cmd_error)
- 				ccp_log_error(cmd_q->ccp,
- 					      cmd_q->cmd_error);
--			/* A version 5 device doesn't use Job IDs... */
-+			iowrite32(tail, cmd_q->reg_head_lo);
- 			if (!ret)
- 				ret = -EIO;
- 		}
- 		cmd_q->int_rcvd = 0;
- 	}
+@@ -403,7 +403,7 @@ static int ccp5_perform_rsa(struct ccp_op *op)
+ 	CCP5_CMD_PROT(&desc) = 0;
  
--	return 0;
-+	return ret;
+ 	function.raw = 0;
+-	CCP_RSA_SIZE(&function) = op->u.rsa.mod_size;
++	CCP_RSA_SIZE(&function) = op->u.rsa.mod_size >> 3;
+ 	CCP5_CMD_FUNCTION(&desc) = function.raw;
+ 
+ 	CCP5_CMD_LEN(&desc) = op->u.rsa.input_len;
+@@ -418,10 +418,10 @@ static int ccp5_perform_rsa(struct ccp_op *op)
+ 	CCP5_CMD_DST_HI(&desc) = ccp_addr_hi(&op->dst.u.dma);
+ 	CCP5_CMD_DST_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
+ 
+-	/* Key (Exponent) is in external memory */
+-	CCP5_CMD_KEY_LO(&desc) = ccp_addr_lo(&op->exp.u.dma);
+-	CCP5_CMD_KEY_HI(&desc) = ccp_addr_hi(&op->exp.u.dma);
+-	CCP5_CMD_KEY_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
++	/* Exponent is in LSB memory */
++	CCP5_CMD_KEY_LO(&desc) = op->sb_key * LSB_ITEM_SIZE;
++	CCP5_CMD_KEY_HI(&desc) = 0;
++	CCP5_CMD_KEY_MEM(&desc) = CCP_MEMTYPE_SB;
+ 
+ 	return ccp5_do_cmd(&desc, op->cmd_q);
  }
- 
- static int ccp5_perform_aes(struct ccp_op *op)
