@@ -1,49 +1,91 @@
-From: Eric Biggers <ebiggers@google.com>
-Subject: Re: vmalloced stacks and scatterwalk_map_and_copy()
-Date: Fri, 4 Nov 2016 10:05:21 -0700
-Message-ID: <20161104170521.GA34176@google.com>
-References: <20161103181624.GA63852@google.com>
- <CALCETrUPuunBT1Zo25wyOwqaWJ=rm9R-WMZGN-7u4-dsdokAnQ@mail.gmail.com>
- <20161103211207.GB63852@google.com>
- <20161103231018.GA85121@google.com>
- <CALCETrV=9vXDyQ5F5-bFD4YCn5P_j7jmYj2Tv+DXWH43m31NzA@mail.gmail.com>
+From: <archerrp@evms.edu>
+Subject: 20842 linux-crypto
+Date: Fri, 04 Nov 2016 17:19:53 -0000
+Message-ID: <147827999350.3983.5672838266092799500@redewsp.com.br>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Andrew Lutomirski <luto@kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>
-To: Andy Lutomirski <luto@amacapital.net>
-Return-path: <owner-linux-mm@kvack.org>
-Content-Disposition: inline
-In-Reply-To: <CALCETrV=9vXDyQ5F5-bFD4YCn5P_j7jmYj2Tv+DXWH43m31NzA@mail.gmail.com>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="EMAIL_4418701382465_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 247-93-184-177.redewsp.com.br ([177.184.93.247]:48041 "HELO
+        redewsp.com.br" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S932370AbcKDRUD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Nov 2016 13:20:03 -0400
+Content-Disposition: attachment
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Nov 03, 2016 at 08:57:49PM -0700, Andy Lutomirski wrote:
-> 
-> The crypto request objects can live on the stack just fine.  It's the
-> request buffers that need to live elsewhere (or the alternative
-> interfaces can be used, or the crypto core code can start using
-> something other than scatterlists).
-> 
-
-There are cases where a crypto operation is done on a buffer embedded in a
-request object.  The example I'm aware of is in the GCM implementation
-(crypto/gcm.c).  Basically it needs to encrypt 16 zero bytes prepended with the
-actual data, so it fills a buffer in the request object
-(crypto_gcm_req_priv_ctx.auth_tag) with zeroes and builds a new scatterlist
-which covers both this buffer and the original data scatterlist.
-
-Granted, GCM provides the aead interface not the skcipher interface, and
-currently there is no AEAD_REQUEST_ON_STACK() macro like there is a
-SKCIPHER_REQUEST_ON_STACK() macro.  So maybe no one is creating aead requests on
-the stack right now.  But it's something to watch out for.
-
-Eric
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+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
+AAEAAQBaAAAApw8AAAAA
