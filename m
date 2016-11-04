@@ -1,96 +1,40 @@
-From: Andy Lutomirski <luto@amacapital.net>
-Subject: Re: vmalloced stacks and scatterwalk_map_and_copy()
-Date: Thu, 3 Nov 2016 20:57:49 -0700
-Message-ID: <CALCETrV=9vXDyQ5F5-bFD4YCn5P_j7jmYj2Tv+DXWH43m31NzA@mail.gmail.com>
-References: <20161103181624.GA63852@google.com> <CALCETrUPuunBT1Zo25wyOwqaWJ=rm9R-WMZGN-7u4-dsdokAnQ@mail.gmail.com>
- <20161103211207.GB63852@google.com> <20161103231018.GA85121@google.com>
+From: <yanjiang.jin@windriver.com>
+Subject: [PATCH] crypto: rsa: rename two rsa key files
+Date: Fri, 4 Nov 2016 14:13:37 +0800
+Message-ID: <1478240017-23117-1-git-send-email-yanjiang.jin@windriver.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Lutomirski <luto@kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>
-To: Eric Biggers <ebiggers@google.com>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <20161103231018.GA85121@google.com>
-Sender: owner-linux-mm@kvack.org
+Content-Type: text/plain
+Cc: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <jinyanjiang@gmail.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 3, 2016 at 4:10 PM, Eric Biggers <ebiggers@google.com> wrote:
-> On Thu, Nov 03, 2016 at 02:12:07PM -0700, Eric Biggers wrote:
->> On Thu, Nov 03, 2016 at 01:30:49PM -0700, Andy Lutomirski wrote:
->> >
->> > Also, Herbert, it seems like the considerable majority of the crypto
->> > code is acting on kernel virtual memory addresses and does software
->> > processing.  Would it perhaps make sense to add a kvec-based or
->> > iov_iter-based interface to the crypto code?  I bet it would be quite
->> > a bit faster and it would make crypto on stack buffers work directly.
->>
->> I'd like to hear Herbert's opinion on this too, but as I understand it, if a
->> symmetric cipher API operating on virtual addresses was added, similar to the
->> existing "shash" API it would only allow software processing.  Whereas with the
->> current API you can request a transform and use it the same way regardless of
->> whether the crypto framework has chosen a software or hardware implementation,
->> or a combination thereof.  If this wasn't a concern then I expect using virtual
->> addresses would indeed simplify things a lot, at least for users not already
->> working with physical memory (struct page).
->>
->> Either way, in the near term it looks like 4.9 will be released with the new
->> behavior that encryption/decryption is not supported on stack buffers.
->> Separately from the scatterwalk_map_and_copy() issue, today I've found two
->> places in the filesystem-level encryption code that do encryption on stack
->> buffers and therefore hit the 'BUG_ON(!virt_addr_valid(buf));' in sg_set_buf().
->> I will be sending patches to fix these, but I suspect there may be more crypto
->> API users elsewhere that have this same problem.
->>
->> Eric
->
-> [Added linux-mm to Cc]
->
-> For what it's worth, grsecurity has a special case to allow a scatterlist entry
-> to be created from a stack buffer:
->
->         static inline void sg_set_buf(struct scatterlist *sg, const void *buf,
->                                       unsigned int buflen)
->         {
->                 const void *realbuf = buf;
->
->         #ifdef CONFIG_GRKERNSEC_KSTACKOVERFLOW
->                 if (object_starts_on_stack(buf))
->                         realbuf = buf - current->stack + current->lowmem_stack;
->         #endif
->
->         #ifdef CONFIG_DEBUG_SG
->                 BUG_ON(!virt_addr_valid(realbuf));
->         #endif
->                 sg_set_page(sg, virt_to_page(realbuf), buflen, offset_in_page(realbuf));
->         }
+From: Yanjiang Jin <yanjiang.jin@windriver.com>
 
-Yes, that's how grsecurity works.  The upstream version is going to do
-it right instead of hacking around it.
+This is to eliminate the below compile error:
 
-> I don't know about all the relative merits of the two approaches.  But one of
-> the things that will need to be done with the currently upstream approach is
-> that all callers of sg_set_buf() will need to be checked to make sure they
-> aren't using stack addresses, and any that are will need to be updated to do
-> otherwise, e.g. by using heap-allocated memory.
+crypto/rsa_helper.c:19:29: fatal error: rsaprivkey-asn1.h: No such file or directory
+ #include "rsaprivkey-asn1.h"
+                             ^
+compilation terminated.
 
-I tried to do this, but I may have missed a couple example.
+Signed-off-by: Yanjiang Jin <yanjiang.jin@windriver.com>
+---
+ crypto/{rsaprivkey.asn1 => rsaprivkey.asn1.h} | 0
+ crypto/{rsapubkey.asn1 => rsapubkey.asn1.h}   | 0
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+ rename crypto/{rsaprivkey.asn1 => rsaprivkey.asn1.h} (100%)
+ rename crypto/{rsapubkey.asn1 => rsapubkey.asn1.h} (100%)
 
->  I suppose this is already
-> happening, but in the case of the crypto API it will probably take a while for
-> all the users to be identified and updated.  (And it's not always clear from the
-> local context whether something can be stack memory or not, e.g. the memory for
-> crypto request objects may be either.)
-
-The crypto request objects can live on the stack just fine.  It's the
-request buffers that need to live elsewhere (or the alternative
-interfaces can be used, or the crypto core code can start using
-something other than scatterlists).
-
---Andy
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+diff --git a/crypto/rsaprivkey.asn1 b/crypto/rsaprivkey.asn1.h
+similarity index 100%
+rename from crypto/rsaprivkey.asn1
+rename to crypto/rsaprivkey.asn1.h
+diff --git a/crypto/rsapubkey.asn1 b/crypto/rsapubkey.asn1.h
+similarity index 100%
+rename from crypto/rsapubkey.asn1
+rename to crypto/rsapubkey.asn1.h
+-- 
+2.9.3
