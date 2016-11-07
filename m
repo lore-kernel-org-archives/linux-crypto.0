@@ -1,91 +1,74 @@
-From: Richard Weinberger <richard@nod.at>
-Subject: Re: [PATCH 2/2] fscrypto: don't use on-stack buffer for key
- derivation
-Date: Mon, 7 Nov 2016 14:22:16 +0100
-Message-ID: <c6d016e1-2d3d-45cf-b7a6-e10a4434c1ea@nod.at>
-References: <1478210582-86338-1-git-send-email-ebiggers@google.com>
- <1478210582-86338-2-git-send-email-ebiggers@google.com>
+From: Horia Geanta Neag <horia.geanta@nxp.com>
+Subject: Re: [PATCH] crypto: caam: do not register AES-XTS mode on LP units
+Date: Mon, 7 Nov 2016 07:13:38 +0000
+Message-ID: <DB4PR04MB08471753F3A712A732373E0598A70@DB4PR04MB0847.eurprd04.prod.outlook.com>
+References: <1478301447-75861-1-git-send-email-sven.ebenfeld@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Cc: linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-crypto@vger.kernel.org, tytso@mit.edu, jaegeuk@kernel.org,
-        luto@kernel.org
-To: Eric Biggers <ebiggers@google.com>, linux-fsdevel@vger.kernel.org
-Return-path: <linux-ext4-owner@vger.kernel.org>
-In-Reply-To: <1478210582-86338-2-git-send-email-ebiggers@google.com>
-Sender: linux-ext4-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        Cata Vasile <cata.vasile@nxp.com>
+To: Sven Ebenfeld <sven.ebenfeld@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-db5eur01on0076.outbound.protection.outlook.com ([104.47.2.76]:27089
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753008AbcKGOr7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 7 Nov 2016 09:47:59 -0500
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 03.11.2016 23:03, Eric Biggers wrote:
-> With the new (in 4.9) option to use a virtually-mapped stack
-> (CONFIG_VMAP_STACK), stack buffers cannot be used as input/output for
-> the scatterlist crypto API because they may not be directly mappable to
-> struct page.  get_crypt_info() was using a stack buffer to hold the
-
-See 1/2. :-)
-
-> output from the encryption operation used to derive the per-file key.
-> Fix it by using a heap buffer.
-> 
-> This bug could most easily be observed in a CONFIG_DEBUG_SG kernel
-> because this allowed the BUG in sg_set_buf() to be triggered.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  fs/crypto/keyinfo.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
-> 
-> diff --git a/fs/crypto/keyinfo.c b/fs/crypto/keyinfo.c
-> index 82f0285..67fb6d8 100644
-> --- a/fs/crypto/keyinfo.c
-> +++ b/fs/crypto/keyinfo.c
-> @@ -185,7 +185,7 @@ int get_crypt_info(struct inode *inode)
->  	struct crypto_skcipher *ctfm;
->  	const char *cipher_str;
->  	int keysize;
-> -	u8 raw_key[FS_MAX_KEY_SIZE];
-> +	u8 *raw_key = NULL;
->  	int res;
->  
->  	res = fscrypt_initialize();
-> @@ -238,6 +238,15 @@ int get_crypt_info(struct inode *inode)
->  	if (res)
->  		goto out;
->  
-> +	/*
-> +	 * This cannot be a stack buffer because it is passed to the scatterlist
-> +	 * crypto API as part of key derivation.
-> +	 */
-> +	res = -ENOMEM;
-> +	raw_key = kmalloc(FS_MAX_KEY_SIZE, GFP_NOFS);
-> +	if (!raw_key)
-> +		goto out;
-> +
->  	if (fscrypt_dummy_context_enabled(inode)) {
->  		memset(raw_key, 0x42, FS_AES_256_XTS_KEY_SIZE);
->  		goto got_key;
-> @@ -276,7 +285,8 @@ int get_crypt_info(struct inode *inode)
->  	if (res)
->  		goto out;
->  
-> -	memzero_explicit(raw_key, sizeof(raw_key));
-> +	kzfree(raw_key);
-> +	raw_key = NULL;
->  	if (cmpxchg(&inode->i_crypt_info, NULL, crypt_info) != NULL) {
->  		put_crypt_info(crypt_info);
->  		goto retry;
-> @@ -287,7 +297,7 @@ int get_crypt_info(struct inode *inode)
->  	if (res == -ENOKEY)
->  		res = 0;
->  	put_crypt_info(crypt_info);
-> -	memzero_explicit(raw_key, sizeof(raw_key));
-> +	kzfree(raw_key);
->  	return res;
->  }
-
-Reviewed-by: Richard Weinberger <richard@nod.at>
-
-Thanks,
-//richard
-
+On 11/5/2016 1:17 AM, Sven Ebenfeld wrote:=0A=
+> When using AES-XTS on a Wandboard, we receive a Mode error:=0A=
+> caam_jr 2102000.jr1: 20001311: CCB: desc idx 19: AES: Mode error.=0A=
+> =0A=
+> Due to the Security Reference Manual, the Low Power AES units=0A=
+s/Due to/According to=0A=
+=0A=
+> of the i.MX6 do not support the XTS mode. Therefore we should=0A=
+> try to provide them them in the API.=0A=
+> =0A=
+Rephrase: Therefore we mustn't register XTS implementations to Crypto=0A=
+API in this case.=0A=
+=0A=
+> Signed-off-by: Sven Ebenfeld <sven.ebenfeld@gmail.com>=0A=
+Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+=0A=
+Please send the patch to -stable and mention the offending commit:=0A=
+Cc: <stable@vger.kernel.org> # 4.4+=0A=
+Fixes: c6415a6016bf "crypto: caam - add support for acipher xts(aes)"=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
+=0A=
+> ---=0A=
+>  drivers/crypto/caam/caamalg.c | 9 +++++++++=0A=
+>  1 file changed, 9 insertions(+)=0A=
+> =0A=
+> diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.=
+c=0A=
+> index 156aad1..f5a63ba 100644=0A=
+> --- a/drivers/crypto/caam/caamalg.c=0A=
+> +++ b/drivers/crypto/caam/caamalg.c=0A=
+> @@ -4583,6 +4583,15 @@ static int __init caam_algapi_init(void)=0A=
+>  		if (!aes_inst && (alg_sel =3D=3D OP_ALG_ALGSEL_AES))=0A=
+>  				continue;=0A=
+>  =0A=
+> +		/*=0A=
+> +		 * Check support for AES modes not available=0A=
+> +		 * on LP devices.=0A=
+> +		 */=0A=
+> +		if ((cha_vid & CHA_ID_LS_AES_MASK) =3D=3D CHA_ID_LS_AES_LP)=0A=
+> +			if ((alg->class1_alg_type & OP_ALG_AAI_MASK) =3D=3D=0A=
+> +			     OP_ALG_AAI_XTS)=0A=
+> +				continue;=0A=
+> +=0A=
+>  		t_alg =3D caam_alg_alloc(alg);=0A=
+>  		if (IS_ERR(t_alg)) {=0A=
+>  			err =3D PTR_ERR(t_alg);=0A=
+> =0A=
+=0A=
