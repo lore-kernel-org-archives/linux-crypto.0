@@ -1,33 +1,54 @@
-From: Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH 1/2] fscrypto: don't use on-stack buffer for filename
- encryption
-Date: Mon, 7 Nov 2016 07:44:44 -0800
-Message-ID: <20161107154444.GA13796@infradead.org>
-References: <1478210582-86338-1-git-send-email-ebiggers@google.com>
- <20161105151349.e5ap547uno3hfit7@kmo-pixel>
+From: Sven Ebenfeld <sven.ebenfeld@gmail.com>
+Subject: [PATCH v2] crypto: caam: do not register AES-XTS mode on LP units
+Date: Mon,  7 Nov 2016 18:51:34 +0100
+Message-ID: <1478541094-73173-1-git-send-email-sven.ebenfeld@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Eric Biggers <ebiggers@google.com>, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-crypto@vger.kernel.org, tytso@mit.edu, jaegeuk@kernel.org,
-        richard@nod.at, luto@kernel.org
-To: Kent Overstreet <kent.overstreet@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:50071 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752312AbcKGPoq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Nov 2016 10:44:46 -0500
-Content-Disposition: inline
-In-Reply-To: <20161105151349.e5ap547uno3hfit7@kmo-pixel>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        cata.vasile@nxp.com, Sven Ebenfeld <sven.ebenfeld@gmail.com>
+To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, horia.geanta@nxp.com
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Nov 05, 2016 at 07:13:49AM -0800, Kent Overstreet wrote:
-> Vmalloc memory does have struct pages - you just need to use vmalloc_to_page()
-> instead of virt_to_page. Look at drivers/md/bcache/util.c bch_bio_map() if you
-> want an example.
+When using AES-XTS on a Wandboard, we receive a Mode error:
+caam_jr 2102000.jr1: 20001311: CCB: desc idx 19: AES: Mode error.
 
-That example seems to be clearly broken on virtually index caches
-due to the lack of flush_kernel_vmap_range and
-invalidate_kernel_vmap_range calls.
+According to the Security Reference Manual, the Low Power AES units
+of the i.MX6 do not support the XTS mode. Therefore we must not
+register XTS implementations in the Crypto API.
+
+Signed-off-by: Sven Ebenfeld <sven.ebenfeld@gmail.com>
+Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+
+Cc: <stable@vger.kernel.org> # 4.4+
+Fixes: c6415a6016bf "crypto: caam - add support for acipher xts(aes)"
+
+---
+ drivers/crypto/caam/caamalg.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 156aad1..f5a63ba 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -4583,6 +4583,15 @@ static int __init caam_algapi_init(void)
+ 		if (!aes_inst && (alg_sel == OP_ALG_ALGSEL_AES))
+ 				continue;
+ 
++		/*
++		 * Check support for AES modes not available
++		 * on LP devices.
++		 */
++		if ((cha_vid & CHA_ID_LS_AES_MASK) == CHA_ID_LS_AES_LP)
++			if ((alg->class1_alg_type & OP_ALG_AAI_MASK) ==
++			     OP_ALG_AAI_XTS)
++				continue;
++
+ 		t_alg = caam_alg_alloc(alg);
+ 		if (IS_ERR(t_alg)) {
+ 			err = PTR_ERR(t_alg);
+-- 
+2.7.4
