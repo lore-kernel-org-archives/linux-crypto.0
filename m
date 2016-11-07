@@ -1,54 +1,180 @@
-From: Sven Ebenfeld <sven.ebenfeld@gmail.com>
-Subject: [PATCH v2] crypto: caam: do not register AES-XTS mode on LP units
-Date: Mon,  7 Nov 2016 18:51:34 +0100
-Message-ID: <1478541094-73173-1-git-send-email-sven.ebenfeld@gmail.com>
+From: "Sven Ebenfeld" <sven.ebenfeld@gmail.com>
+Subject: AW: [PATCH] crypto: caam: do not register AES-XTS mode on LP units
+Date: Mon, 7 Nov 2016 18:58:15 +0100
+Message-ID: <022f01d23920$83ec3dc0$8bc4b940$@gmail.com>
+References: <1478301447-75861-1-git-send-email-sven.ebenfeld@gmail.com> <DB4PR04MB08471753F3A712A732373E0598A70@DB4PR04MB0847.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        cata.vasile@nxp.com, Sven Ebenfeld <sven.ebenfeld@gmail.com>
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, horia.geanta@nxp.com
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
+Content-Type: multipart/signed;
+        micalg=SHA1;
+        protocol="application/x-pkcs7-signature";
+        boundary="----=_NextPart_000_022B_01D23928.E50DAF00"
+Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        "'Cata Vasile'" <cata.vasile@nxp.com>
+To: "'Horia Geanta Neag'" <horia.geanta@nxp.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <DB4PR04MB08471753F3A712A732373E0598A70@DB4PR04MB0847.eurprd04.prod.outlook.com>
+Content-Language: de
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-When using AES-XTS on a Wandboard, we receive a Mode error:
-caam_jr 2102000.jr1: 20001311: CCB: desc idx 19: AES: Mode error.
+This is a multipart message in MIME format.
 
-According to the Security Reference Manual, the Low Power AES units
-of the i.MX6 do not support the XTS mode. Therefore we must not
-register XTS implementations in the Crypto API.
+------=_NextPart_000_022B_01D23928.E50DAF00
+Content-Type: text/plain;
+	charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Sven Ebenfeld <sven.ebenfeld@gmail.com>
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+> -----Urspr=FCngliche Nachricht-----
+> Von: Horia Geanta Neag [mailto:horia.geanta@nxp.com]
+> Gesendet: Montag, 7. November 2016 08:14
+> An: Sven Ebenfeld <sven.ebenfeld@gmail.com>; linux-
+> crypto@vger.kernel.org; linux-kernel@vger.kernel.org
+> Cc: herbert@gondor.apana.org.au; davem@davemloft.net; Cata Vasile
+> <cata.vasile@nxp.com>
+> Betreff: Re: [PATCH] crypto: caam: do not register AES-XTS mode on LP
+units
+>=20
+> On 11/5/2016 1:17 AM, Sven Ebenfeld wrote:
+> > When using AES-XTS on a Wandboard, we receive a Mode error:
+> > caam_jr 2102000.jr1: 20001311: CCB: desc idx 19: AES: Mode error.
+> >
+> > Due to the Security Reference Manual, the Low Power AES units
+> s/Due to/According to
+>=20
+> > of the i.MX6 do not support the XTS mode. Therefore we should try to
+> > provide them them in the API.
+> >
+> Rephrase: Therefore we mustn't register XTS implementations to Crypto =
+API
+> in this case.
+>=20
+> > Signed-off-by: Sven Ebenfeld <sven.ebenfeld@gmail.com>
+> Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>
+>=20
+> Please send the patch to -stable and mention the offending commit:
+> Cc: <stable@vger.kernel.org> # 4.4+
+> Fixes: c6415a6016bf "crypto: caam - add support for acipher xts(aes)"
+>=20
+> Thanks,
+> Horia
 
-Cc: <stable@vger.kernel.org> # 4.4+
-Fixes: c6415a6016bf "crypto: caam - add support for acipher xts(aes)"
+Thanks, I've sent a v2.
+Sven
 
----
- drivers/crypto/caam/caamalg.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 156aad1..f5a63ba 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -4583,6 +4583,15 @@ static int __init caam_algapi_init(void)
- 		if (!aes_inst && (alg_sel == OP_ALG_ALGSEL_AES))
- 				continue;
- 
-+		/*
-+		 * Check support for AES modes not available
-+		 * on LP devices.
-+		 */
-+		if ((cha_vid & CHA_ID_LS_AES_MASK) == CHA_ID_LS_AES_LP)
-+			if ((alg->class1_alg_type & OP_ALG_AAI_MASK) ==
-+			     OP_ALG_AAI_XTS)
-+				continue;
-+
- 		t_alg = caam_alg_alloc(alg);
- 		if (IS_ERR(t_alg)) {
- 			err = PTR_ERR(t_alg);
--- 
-2.7.4
+------=_NextPart_000_022B_01D23928.E50DAF00
+Content-Type: application/pkcs7-signature;
+	name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="smime.p7s"
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIITXjCCBacw
+ggSPoAMCAQICEFw11py5+rejC/y0XAQSNzUwDQYJKoZIhvcNAQELBQAwdTELMAkGA1UEBhMCSUwx
+FjAUBgNVBAoTDVN0YXJ0Q29tIEx0ZC4xKTAnBgNVBAsTIFN0YXJ0Q29tIENlcnRpZmljYXRpb24g
+QXV0aG9yaXR5MSMwIQYDVQQDExpTdGFydENvbSBDbGFzcyAyIENsaWVudCBDQTAeFw0xNjA4MDcx
+MDA4NTZaFw0xODA4MDcxMDA4NTZaMIGFMQswCQYDVQQGEwJERTEcMBoGA1UECAwTTm9yZHJoZWlu
+LVdlc3RmYWxlbjESMBAGA1UEBwwJSGF0dGluZ2VuMR0wGwYDVQQDDBRTdmVuIERlbm5pcyBFYmVu
+ZmVsZDElMCMGCSqGSIb3DQEJARYWcHVibGljbWFpbEBlYmVuZmVsZC5kZTCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBAL89qk9e9ixwn22ERcIMpUuzx5WKohsnV4H8CP/Gttlv74ArvIOK
+T1Y1pzRPGcqD0bVo00OF5tJgIx8wCZxlHwzcptibMJpDfw7kfYrVEfj78xvB12t9xI+oFMpbcXcE
+VOZ4xtt6jzXf3LYiQ9w1gcQDux4zurP9c30VouPRTdmWvM/dGbj+UAy42OaA7mL/T2EIuGqAUCGx
+jrp47fcpJxd3/iD+kJhI8sWrq/y3aZQRZ2M2CwM8L1VZ52MN7T85HKwI3B9O2VCBhhre5MH6zs1m
+bPGTQY1J9c3+UswBy/JZAQu/4b/zsTROCaC0O2HlAOQ10Ah9d3EuwPQJD5fUNc0CAwEAAaOCAiAw
+ggIcMA4GA1UdDwEB/wQEAwIEsDAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwCQYDVR0T
+BAIwADAdBgNVHQ4EFgQURVUXjBsz85xo6+KFJmmEdYPCtPAwHwYDVR0jBBgwFoAUmZerGDU6i1lF
+Q5iycnHI9PsJzxYwbwYIKwYBBQUHAQEEYzBhMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5zdGFy
+dHNzbC5jb20wOQYIKwYBBQUHMAKGLWh0dHA6Ly9haWEuc3RhcnRzc2wuY29tL2NlcnRzL3NjYS5j
+bGllbnQyLmNydDA4BgNVHR8EMTAvMC2gK6AphidodHRwOi8vY3JsLnN0YXJ0c3NsLmNvbS9zY2Et
+Y2xpZW50Mi5jcmwweQYDVR0RBHIwcIEWcHVibGljbWFpbEBlYmVuZmVsZC5kZYEQc3ZlbkBlYmVu
+ZmVsZC5kZYEVd2VibWFzdGVyQGViZW5mZWxkLmRlgRdzdmVuLmViZW5mZWxkQGdtYWlsLmNvbYEU
+c3Zlbi5lYmVuZmVsZEBydWIuZGUwIwYDVR0SBBwwGoYYaHR0cDovL3d3dy5zdGFydHNzbC5jb20v
+MFUGA1UdIAROMEwwDAYKKwYBBAGBtTcGATA8BgsrBgEEAYG1NwECBTAtMCsGCCsGAQUFBwIBFh9o
+dHRwczovL3d3dy5zdGFydHNzbC5jb20vcG9saWN5MA0GCSqGSIb3DQEBCwUAA4IBAQCU1j8nn1gU
+KZZnqGIqo7JiZ2e4bz+Kr7NbV3jaxo1JMB4g4z6lNOZzJVqWtmZz3f35NneMwt24e/uYQSjHB+W2
+XE4NxTAzlIq/2HvfGO05Jh1CGYhnZaSlxyRi3XCv3QwWx7ODbvDk+/wwvN5PZINgpoS3XH7IxRlN
+ZJjvrPrpwu2peAQyxiiAh0FArYzqMPFZLKy9UvZ8F9u1P2eSdzGBmIX9fYxvqBIWKwI2sYqoI3J9
+Yi232fOFpjJdPmvNwjUdh7Eib7f58G82NQPj0zHOn9or2hgh/8m8HnHv0lLiW3n4qM6enu/X8Uig
+NERB3LE64vKVn1PrNFu1AwFgV0rxMIIF4jCCA8qgAwIBAgIQXLZIbkcMmMZ/9oDbZErijTANBgkq
+hkiG9w0BAQsFADB9MQswCQYDVQQGEwJJTDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjErMCkGA1UE
+CxMiU2VjdXJlIERpZ2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzEpMCcGA1UEAxMgU3RhcnRDb20g
+Q2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMTUxMjE2MDEwMDA1WhcNMzAxMjE2MDEwMDA1WjB1
+MQswCQYDVQQGEwJJTDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjEpMCcGA1UECxMgU3RhcnRDb20g
+Q2VydGlmaWNhdGlvbiBBdXRob3JpdHkxIzAhBgNVBAMTGlN0YXJ0Q29tIENsYXNzIDIgQ2xpZW50
+IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7g9QjJUJI4Ss9VBqj9Y3ok4h/TIJ
+ZUc+rzj61Rv3hNB/yeEEC1fz3i/EU+MXOOGxM7KCbtCIcJxHIW/k8RP6sPPMO4cTg7sNzfBWsYse
+mtY6fN/kVr2R2X+/PjvtxmAaXpGX0znvQPxaE123IMGXy0zEKHZ/nJDZ199TP9TNn9v+1QO0AZb4
+oaJ7ch0DpSJa8kF5xiNFDAg9taKKSrVuPHJL9MFFYPIqwShjHg+uYEzjfxbMP2QWwamnaA9Y7fOR
+SDNapduFlARAcDtXdMpAijiG4HKnrN323I0Ka7lDTAWyLtTDCETKsI8fzOyL0inEu1WEVpdPytm8
+s1rwQB4f9QIDAQABo4IBZDCCAWAwDgYDVR0PAQH/BAQDAgEGMB0GA1UdJQQWMBQGCCsGAQUFBwMC
+BggrBgEFBQcDBDASBgNVHRMBAf8ECDAGAQH/AgEAMDIGA1UdHwQrMCkwJ6AloCOGIWh0dHA6Ly9j
+cmwuc3RhcnRzc2wuY29tL3Nmc2NhLmNybDBmBggrBgEFBQcBAQRaMFgwJAYIKwYBBQUHMAGGGGh0
+dHA6Ly9vY3NwLnN0YXJ0c3NsLmNvbTAwBggrBgEFBQcwAoYkaHR0cDovL2FpYS5zdGFydHNzbC5j
+b20vY2VydHMvY2EuY3J0MB0GA1UdDgQWBBSZl6sYNTqLWUVDmLJyccj0+wnPFjAfBgNVHSMEGDAW
+gBROC+8apEBbpRdphzDKNGhD0EGu8jA/BgNVHSAEODA2MDQGBFUdIAAwLDAqBggrBgEFBQcCARYe
+aHR0cDovL3d3dy5zdGFydHNzbC5jb20vcG9saWN5MA0GCSqGSIb3DQEBCwUAA4ICAQCZQUEEzvYk
+9U4wNHhDu1f9QGwbzAH4m4wIKH8ZidNYwZhyoNKW041iJ002KMW9ywYM95n4770tT45yH29vTMlZ
+tBvz0h44KuxMLNXRCTDwvV07sT39nPjFi5MpwZaLVueNiaa1vok1n2Wn8lLcyCltYZNGAEifM0ko
+/A/vvckftFIZG75RAiZHYtfnrdBGiOxyF+nHI9a33BRX5Vl/3z0+uHZ/Y6YPbNJ7iboOFrFZBCtt
++lp3WaDB62ZoBewiMmd09JrqmMJAEgw3EbfQNtaPzHPg/EOhlZikRgd4BCrzrbIqB2RKib+gnQJt
+2uoJaKOaV90S9Xgs3PC837OE9CEmY6/MTTG0xpbLh2hR/rLQ3sCrH56aODeuDrQBq85lXxRbDCER
+DUR7FZUhHv+i1aQaY59NPu26hDd6nqksSDq2mCddpidPBuGJz9lNX2nRyGkudDuWV6gIr6AZfaYv
++ggTXOcCDJZFzMhWdLC7CPvRKxQ7vTiYV+4lgqOvV9MnZc149PPtitTysq/oOv70zx7q+tyaLTa4
+cqFhCclhIwSwOEJiV3xqQebvmwsDX7BaXGAJZIhbdUbNr3poEgct6uAxw2zyr69WCJmTUUhz/k1/
+TT/eCUZJqnMg/6mje7tiVdaUQJcBtJ6cq5+mUDNUB1fohW8EOFaizFpP/0FaP62ctTCCB8kwggWx
+oAMCAQICAQEwDQYJKoZIhvcNAQEFBQAwfTELMAkGA1UEBhMCSUwxFjAUBgNVBAoTDVN0YXJ0Q29t
+IEx0ZC4xKzApBgNVBAsTIlNlY3VyZSBEaWdpdGFsIENlcnRpZmljYXRlIFNpZ25pbmcxKTAnBgNV
+BAMTIFN0YXJ0Q29tIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MB4XDTA2MDkxNzE5NDYzNloXDTM2
+MDkxNzE5NDYzNlowfTELMAkGA1UEBhMCSUwxFjAUBgNVBAoTDVN0YXJ0Q29tIEx0ZC4xKzApBgNV
+BAsTIlNlY3VyZSBEaWdpdGFsIENlcnRpZmljYXRlIFNpZ25pbmcxKTAnBgNVBAMTIFN0YXJ0Q29t
+IENlcnRpZmljYXRpb24gQXV0aG9yaXR5MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA
+wYjbCbxsRnx4n5V7tTOQ8nJi1sE2ICIkXs7pd/JDCqIGZKTMjjb4OOYj8G5tsTzdcqOFHKHTPbQz
+K9Mvr/7qsEFZZ7bEBn0KnnSF1nlMgDd63zkFUln39BtGQ6TShYXSw3HzdWI0uiyKfx6P7u000BHH
+ls1SPboz1t1N3gs7SkufwiYv+rUWHHI1d8o8XebK4SaLGjZ2XAHbdBQl/u21oIgP3XjKLR8HlzAB
+LXJ5+kbWEyqouaarg0kd5fLv3eQBjhgKj2NTFoViqQ4ZOsy1ZqbCa3QH5Cvhdj60bdj2ROFzYh87
+xL6gU1YlbFEJ96qryr92/W2b853bvz1mvAxWqq+YSJU6S9+nWFDZOHWpW+pDDAL/mevobE1wWyll
+nN2qXcyvATHsDOvSjejqnHvmbvcnZgwaSNduQuM/3iE+e+ENcPtjqqhsGlS0XCV6yaLJixamuyx+
+F14FTVhuEh0B7hIQDcYyfxj//PT6zW6R6DZJvhpIaYvClk0aErJpF8EKkNb6eSJIv7p7afhwx/p6
+N9jYDdJ2T1f/kLfjkdLd78Jgt2c63f6qnPDUi39yIs7Gn5e2+K+KoBCo2fsYxra1XFI8ibYZKnMB
+Cg8DsxJg8novgdujbv8mMJf1i92JV7atPbOvK8W3dgLwpdYrmoYUKnL24zOMXQlLE9+7jHQTUksC
+AwEAAaOCAlIwggJOMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgGuMB0GA1UdDgQWBBROC+8apEBb
+pRdphzDKNGhD0EGu8jBkBgNVHR8EXTBbMCygKqAohiZodHRwOi8vY2VydC5zdGFydGNvbS5vcmcv
+c2ZzY2EtY3JsLmNybDAroCmgJ4YlaHR0cDovL2NybC5zdGFydGNvbS5vcmcvc2ZzY2EtY3JsLmNy
+bDCCAV0GA1UdIASCAVQwggFQMIIBTAYLKwYBBAGBtTcBAQEwggE7MC8GCCsGAQUFBwIBFiNodHRw
+Oi8vY2VydC5zdGFydGNvbS5vcmcvcG9saWN5LnBkZjA1BggrBgEFBQcCARYpaHR0cDovL2NlcnQu
+c3RhcnRjb20ub3JnL2ludGVybWVkaWF0ZS5wZGYwgdAGCCsGAQUFBwICMIHDMCcWIFN0YXJ0IENv
+bW1lcmNpYWwgKFN0YXJ0Q29tKSBMdGQuMAMCAQEagZdMaW1pdGVkIExpYWJpbGl0eSwgcmVhZCB0
+aGUgc2VjdGlvbiAqTGVnYWwgTGltaXRhdGlvbnMqIG9mIHRoZSBTdGFydENvbSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eSBQb2xpY3kgYXZhaWxhYmxlIGF0IGh0dHA6Ly9jZXJ0LnN0YXJ0Y29tLm9y
+Zy9wb2xpY3kucGRmMBEGCWCGSAGG+EIBAQQEAwIABzA4BglghkgBhvhCAQ0EKxYpU3RhcnRDb20g
+RnJlZSBTU0wgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwDQYJKoZIhvcNAQEFBQADggIBABZsmfRm
+DDT10IVefQrs2hBOOBxe36YlBUuRMsHoO/E93UQJWwdJiinLZgK3sZr3JZgJPI4b4d02hytLu2jT
+OWY9oCbH8jmRHVGrgnt+1c5a5OIDV3Bplwj5XlimCt+MBppFFhY4Cl5X9mLHegIF5rwetfKe9Kkp
+g/iyFONuKIdEw5Aa3jipPKxDTWRFzt0oqVzyc3sE+Bfoq7HzLlxkbnMxOhK4vLMR5H2PgVGaO42J
+9E2TZns8A+3Tmh2a82VQ9aDQdZ8vr/DqgkOY+GmciXnEQ45GcuNkNhKv9yUeOImQd37Da2q5w8tE
+S6x4kIvnxyweSxFEyDRSJ80KXZ+FwYnVGnjylRBTMt2AhGZ12bVoKPthLr6EqDjAmRKGpR5nZK0G
+Li+pcIXHlg98iWX1jkNUDqvdpYA5lGDANMmWcCyjEvUfSHu9HH5rt52Q9CI7rvj8Ksr6glKg769L
+VZPrwbXwIousNE4mIgShhyx1SrflfRPXuAxkwDbSyS+GEowjCcEbgjtzSaNqV4eU5dZ4xZlDY+NN
+4Hct4WWZcmkEGkcJ5g8BViT7H78OealYLrnECQF+lbptAAY+supKEDnY0Cv1v+x1v5cCxQkbCNxV
+N+KB+zeEQ2IgyudWS2Xq/mzBJJMkoTTrBf+aIq6bfT/xZVEKpjBqs/SIHIAN/HKK6INeMYID5DCC
+A+ACAQEwgYkwdTELMAkGA1UEBhMCSUwxFjAUBgNVBAoTDVN0YXJ0Q29tIEx0ZC4xKTAnBgNVBAsT
+IFN0YXJ0Q29tIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MSMwIQYDVQQDExpTdGFydENvbSBDbGFz
+cyAyIENsaWVudCBDQQIQXDXWnLn6t6ML/LRcBBI3NTAJBgUrDgMCGgUAoIICLzAYBgkqhkiG9w0B
+CQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0xNjExMDcxNzU4MTVaMCMGCSqGSIb3DQEJ
+BDEWBBQEiXJwDn0fv0ChW+xN2OrETdjGDTCBkwYJKoZIhvcNAQkPMYGFMIGCMAsGCWCGSAFlAwQB
+KjALBglghkgBZQMEARYwCgYIKoZIhvcNAwcwCwYJYIZIAWUDBAECMA4GCCqGSIb3DQMCAgIAgDAN
+BggqhkiG9w0DAgIBQDAHBgUrDgMCGjALBglghkgBZQMEAgMwCwYJYIZIAWUDBAICMAsGCWCGSAFl
+AwQCATCBmgYJKwYBBAGCNxAEMYGMMIGJMHUxCzAJBgNVBAYTAklMMRYwFAYDVQQKEw1TdGFydENv
+bSBMdGQuMSkwJwYDVQQLEyBTdGFydENvbSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTEjMCEGA1UE
+AxMaU3RhcnRDb20gQ2xhc3MgMiBDbGllbnQgQ0ECEFw11py5+rejC/y0XAQSNzUwgZwGCyqGSIb3
+DQEJEAILMYGMoIGJMHUxCzAJBgNVBAYTAklMMRYwFAYDVQQKEw1TdGFydENvbSBMdGQuMSkwJwYD
+VQQLEyBTdGFydENvbSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTEjMCEGA1UEAxMaU3RhcnRDb20g
+Q2xhc3MgMiBDbGllbnQgQ0ECEFw11py5+rejC/y0XAQSNzUwDQYJKoZIhvcNAQEBBQAEggEAdDx2
+akPYc/i+v7823bAsJDLuAZXUfnPjRWPF5O2h7HJFKeXtixCVZv5pIwFQGbm/+tSOwM0wuuS+E3EH
+cD52r7KAnDUq7pGEoL7LBAGEpztNWXpT1pvX9LCIIlDTzi3CWmAWB7rAgzxCi+sVBcNHE/+AAHHL
+LwC2Ep2zzwfCAMcKMYPrV7mBD/pYH5fODUDbNu8CyjNeRF8BFTvVzLUWM8dftN7S+wUrHe4rUTgy
+47i+nbQpkCjiMDhhOtI8S+/VSlGRgu7zfwb505YE08SXnKDFmN3z9qczzVQBDa343RNs6TN7Tw1W
+o4MM4ZTF4uxzYZWWzvD0dZM7sFolIYXraAAAAAAAAA==
+
+------=_NextPart_000_022B_01D23928.E50DAF00--
