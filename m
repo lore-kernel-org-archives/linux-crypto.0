@@ -1,88 +1,52 @@
-From: <agiva@centrum.cz>
-Subject: 44225 linux-crypto
-Date: Sun, 06 Nov 2016 18:30:37 -0000
-Message-ID: <147845703728.27180.3549998399082674331@hinet.net>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: [PATCH 1/2] fscrypto: don't use on-stack buffer for filename encryption
+Date: Sun, 6 Nov 2016 21:00:55 -0800
+Message-ID: <CALCETrVL1pz7UwCoeKm9ZqwqAx5bxy31V=xe_si2r33M2cREiw@mail.gmail.com>
+References: <1478210582-86338-1-git-send-email-ebiggers@google.com> <20161105151349.e5ap547uno3hfit7@kmo-pixel>
 Mime-Version: 1.0
-Content-Type: application/zip; name="EMAIL_4797177399752_linux-crypto.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 114-44-0-139.dynamic.hinet.net ([114.44.0.139]:48961 "HELO
-        hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
-        id S1750935AbcKFSan (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 6 Nov 2016 13:30:43 -0500
-Content-Disposition: attachment
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
+        Richard Weinberger <richard@nod.at>, jaegeuk@kernel.org,
+        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "Ted Ts'o" <tytso@mit.edu>
+To: Kent Overstreet <kent.overstreet@gmail.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20161105151349.e5ap547uno3hfit7@kmo-pixel>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-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
-AAAAAAEAAQBZAAAAOQ8AAAAA
+On Nov 5, 2016 8:13 AM, "Kent Overstreet" <kent.overstreet@gmail.com> wrote:
+>
+> On Thu, Nov 03, 2016 at 03:03:01PM -0700, Eric Biggers wrote:
+> > With the new (in 4.9) option to use a virtually-mapped stack
+> > (CONFIG_VMAP_STACK), stack buffers cannot be used as input/output for
+> > the scatterlist crypto API because they may not be directly mappable to
+> > struct page.  For short filenames, fname_encrypt() was encrypting a
+> > stack buffer holding the padded filename.  Fix it by encrypting the
+> > filename in-place in the output buffer, thereby making the temporary
+> > buffer unnecessary.
+> >
+> > This bug could most easily be observed in a CONFIG_DEBUG_SG kernel
+> > because this allowed the BUG in sg_set_buf() to be triggered.
+> >
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+>
+> > -             alloc_buf = kmalloc(ciphertext_len, GFP_NOFS);
+> > -             if (!alloc_buf)
+> > -                     return -ENOMEM;
+> > -             workbuf = alloc_buf;
+>
+> Vmalloc memory does have struct pages - you just need to use vmalloc_to_page()
+> instead of virt_to_page. Look at drivers/md/bcache/util.c bch_bio_map() if you
+> want an example.
+>
+> It would be better to just fix the sg code to handle vmalloc memory, instead of
+> adding a kmalloc() that can fail (and an error path that inevitably won't be
+> tested).
+
+Probably not, because (a) vmalloc_to_page is slow and (b) stack
+buffers can span physically noncontiguous pages.
+
+I think it's best to either avoid stack buffers or to teach crypto about kiov.
