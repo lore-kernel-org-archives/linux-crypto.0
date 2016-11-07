@@ -1,7 +1,7 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v3] poly1305: generic C can be faster on chips with slow unaligned access
-Date: Mon,  7 Nov 2016 20:43:45 +0100
-Message-ID: <20161107194345.19955-1-Jason@zx2c4.com>
+Subject: [PATCH v4] poly1305: generic C can be faster on chips with slow unaligned access
+Date: Mon,  7 Nov 2016 20:47:09 +0100
+Message-ID: <20161107194709.20457-1-Jason@zx2c4.com>
 References: <20161107191253.17998-1-Jason@zx2c4.com>
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -21,14 +21,22 @@ fix-up handler for these unaligned accesses.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- crypto/poly1305_generic.c | 33 ++++++++++++++-------------------
- 1 file changed, 14 insertions(+), 19 deletions(-)
+ crypto/poly1305_generic.c | 34 +++++++++++++++-------------------
+ 1 file changed, 15 insertions(+), 19 deletions(-)
 
 diff --git a/crypto/poly1305_generic.c b/crypto/poly1305_generic.c
-index 2df9835d..7a77cfc 100644
+index 2df9835d..b1c2d57 100644
 --- a/crypto/poly1305_generic.c
 +++ b/crypto/poly1305_generic.c
-@@ -33,11 +33,6 @@ static inline u32 and(u32 v, u32 mask)
+@@ -17,6 +17,7 @@
+ #include <linux/crypto.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
++#include <asm/unaligned.h>
+ 
+ static inline u64 mlt(u64 a, u64 b)
+ {
+@@ -33,11 +34,6 @@ static inline u32 and(u32 v, u32 mask)
  	return v & mask;
  }
  
@@ -40,7 +48,7 @@ index 2df9835d..7a77cfc 100644
  int crypto_poly1305_init(struct shash_desc *desc)
  {
  	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
-@@ -65,19 +60,19 @@ EXPORT_SYMBOL_GPL(crypto_poly1305_setkey);
+@@ -65,19 +61,19 @@ EXPORT_SYMBOL_GPL(crypto_poly1305_setkey);
  static void poly1305_setrkey(struct poly1305_desc_ctx *dctx, const u8 *key)
  {
  	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
@@ -69,7 +77,7 @@ index 2df9835d..7a77cfc 100644
  }
  
  unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
-@@ -137,11 +132,11 @@ static unsigned int poly1305_blocks(struct poly1305_desc_ctx *dctx,
+@@ -137,11 +133,11 @@ static unsigned int poly1305_blocks(struct poly1305_desc_ctx *dctx,
  	while (likely(srclen >= POLY1305_BLOCK_SIZE)) {
  
  		/* h += m[i] */
