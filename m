@@ -1,8 +1,8 @@
-From: Eric Biggers <ebiggers@google.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Subject: Re: [PATCH] poly1305: generic C can be faster on chips
  with slow unaligned access
-Date: Mon, 7 Nov 2016 10:26:46 -0800
-Message-ID: <20161107182646.GA34388@google.com>
+Date: Mon, 7 Nov 2016 20:02:35 +0100
+Message-ID: <CAHmME9rzBST8Lqapzykwf2rUyxLXuyOF0wX+Sy259Qtx9a4YSg@mail.gmail.com>
 References: <CAHmME9ogYTGFaNDt1CD0FxEHxDzVhNX=AN3_PH3t=0zREGgYPA@mail.gmail.com>
  <20161103004934.GA30775@gondor.apana.org.au>
  <CAHmME9oL-pOWWXXFhJz1vSm5ftnSfmYrquGbH0acapgEL=c4Ew@mail.gmail.com>
@@ -10,6 +10,7 @@ References: <CAHmME9ogYTGFaNDt1CD0FxEHxDzVhNX=AN3_PH3t=0zREGgYPA@mail.gmail.com>
  <CAHmME9pm4DHuBsE+hoFxnm1B5OWAZ+OyKXzeKDxHtisZpw4ebg@mail.gmail.com>
  <20161104173723.GB34176@google.com>
  <CAHmME9oejs+USiGJX2P0TgvnR6XRzV1HYZPrq=c-CjGzq59=NQ@mail.gmail.com>
+ <20161107182646.GA34388@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -17,10 +18,9 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
  Martin Willi <martin@strongswan.org>, LKML <linux-kernel@vger.kernel.org>,
  linux-crypto@vger.kernel.org, David Miller <davem@davemloft.net>,
  WireGuard mailing list <wireguard@lists.zx2c4.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Eric Biggers <ebiggers@google.com>
 Return-path: <wireguard-bounces@lists.zx2c4.com>
-Content-Disposition: inline
-In-Reply-To: <CAHmME9oejs+USiGJX2P0TgvnR6XRzV1HYZPrq=c-CjGzq59=NQ@mail.gmail.com>
+In-Reply-To: <20161107182646.GA34388@google.com>
 List-Unsubscribe: <http://lists.zx2c4.com/mailman/options/wireguard>,
  <mailto:wireguard-request@lists.zx2c4.com?subject=unsubscribe>
 List-Archive: <http://lists.zx2c4.com/pipermail/wireguard/>
@@ -32,37 +32,17 @@ Errors-To: wireguard-bounces@lists.zx2c4.com
 Sender: "WireGuard" <wireguard-bounces@lists.zx2c4.com>
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Nov 07, 2016 at 07:08:22PM +0100, Jason A. Donenfeld wrote:
-> Hmm... The general data flow that strikes me as most pertinent is
-> something like:
-> 
-> struct sk_buff *skb = get_it_from_somewhere();
-> skb = skb_share_check(skb, GFP_ATOMIC);
-> num_frags = skb_cow_data(skb, ..., ...);
-> struct scatterlist sg[num_frags];
-> sg_init_table(sg, num_frags);
-> skb_to_sgvec(skb, sg, ..., ...);
-> blkcipher_walk_init(&walk, sg, sg, len);
-> blkcipher_walk_virt_block(&desc, &walk, BLOCK_SIZE);
-> while (walk.nbytes >= BLOCK_SIZE) {
->     size_t chunk_len = rounddown(walk.nbytes, BLOCK_SIZE);
->     poly1305_update(&poly1305_state, walk.src.virt.addr, chunk_len);
->     blkcipher_walk_done(&desc, &walk, walk.nbytes % BLOCK_SIZE);
-> }
-> if (walk.nbytes) {
->     poly1305_update(&poly1305_state, walk.src.virt.addr, walk.nbytes);
->     blkcipher_walk_done(&desc, &walk, 0);
-> }
-> 
-> Is your suggestion that that in the final if block, walk.src.virt.addr
-> might be unaligned? Like in the case of the last fragment being 67
-> bytes long?
+On Mon, Nov 7, 2016 at 7:26 PM, Eric Biggers <ebiggers@google.com> wrote:
+>
+> I was not referring to any users in particular, only what users could do.  As an
+> example, if you did crypto_shash_update() with 32, 15, then 17 bytes, and the
+> underlying algorithm is poly1305-generic, the last block would end up
+> misaligned.  This doesn't appear possible with your pseudocode because it only
+> passes in multiples of the block size until the very end.  However I don't see
+> it claimed anywhere that shash API users have to do that.
 
-I was not referring to any users in particular, only what users could do.  As an
-example, if you did crypto_shash_update() with 32, 15, then 17 bytes, and the
-underlying algorithm is poly1305-generic, the last block would end up
-misaligned.  This doesn't appear possible with your pseudocode because it only
-passes in multiples of the block size until the very end.  However I don't see
-it claimed anywhere that shash API users have to do that.
+Actually it appears that crypto/poly1305_generic.c already buffers
+incoming blocks to a buffer that definitely looks aligned, to prevent
+this condition!
 
-Eric
+I'll submit a v2 with only the inner unaligned operations changed.
