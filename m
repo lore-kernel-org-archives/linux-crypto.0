@@ -1,32 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: gf128mul - remove dead gf128mul_64k_lle code
-Date: Tue, 8 Nov 2016 20:04:40 +0800
-Message-ID: <20161108120440.GA5222@gondor.apana.org.au>
-References: <CA+cSK10Q4aLK+uXtRwWuUR4_vuZZWaVadPpofNpWf9G=QkGSyg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: rsa: rename two rsa key files
+Date: Tue, 8 Nov 2016 20:09:00 +0800
+Message-ID: <20161108120900.GA5267@gondor.apana.org.au>
+References: <1478240017-23117-1-git-send-email-yanjiang.jin@windriver.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Alex Cope <alexcope@google.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38956 "EHLO
-        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752894AbcKHMEu (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Nov 2016 07:04:50 -0500
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, jinyanjiang@gmail.com
+To: yanjiang.jin@windriver.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CA+cSK10Q4aLK+uXtRwWuUR4_vuZZWaVadPpofNpWf9G=QkGSyg@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1478240017-23117-1-git-send-email-yanjiang.jin@windriver.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Alex Cope <alexcope@google.com> wrote:
-> This code is unlikely to be useful in the future because transforms
-> don't know how often keys will be changed, new algorithms are unlikely
-> to use lle representation, and tables should be replaced with
-> carryless multiplication instructions when available.
+yanjiang.jin@windriver.com wrote:
+> From: Yanjiang Jin <yanjiang.jin@windriver.com>
 > 
-> Signed-off-by: Alex Cope <alexcope@google.com>
+> This is to eliminate the below compile error:
+> 
+> crypto/rsa_helper.c:19:29: fatal error: rsaprivkey-asn1.h: No such file or directory
+> #include "rsaprivkey-asn1.h"
+>                             ^
+> compilation terminated.
+> 
+> Signed-off-by: Yanjiang Jin <yanjiang.jin@windriver.com>
 
-Your patch doesn't apply.  Please fix it and resubmit.
+This patch is bogus.  The header files are meant to be generated.
+Please find out why they are not being generated in your case.
 
 Thanks,
 -- 
