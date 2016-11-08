@@ -1,42 +1,82 @@
-From: Martin Willi <martin@strongswan.org>
-Subject: Re: [PATCH v4] poly1305: generic C can be faster on chips with slow
- unaligned access
-Date: Tue, 08 Nov 2016 08:52:39 +0100
-Message-ID: <1478591559.5216.7.camel@strongswan.org>
-References: <20161107191253.17998-1-Jason@zx2c4.com>
-         <20161107194709.20457-1-Jason@zx2c4.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 6/6] Add support for AEAD algos.
+Date: Tue, 08 Nov 2016 12:15:10 +0100
+Message-ID: <3617075.SV0YkRBZ96@positron.chronox.de>
+References: <cover.1476263960.git.harsh@chelsio.com> <1610250.DL5oKfbMjq@positron.chronox.de> <3420937b-51f3-cc6e-8919-d698ba087170@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Eric Biggers <ebiggers@google.com>,
-        =?ISO-8859-1?Q?Ren=E9?= van Dorst <opensource@vdorst.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: dan.carpenter@oracle.com, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, jlulla@chelsio.com,
+        atul.gupta@chelsio.com, yeshaswi@chelsio.com,
+        hariprasad@chelsio.com
+To: Harsh Jain <Harsh@chelsio.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sitav-80046.hsr.ch ([152.96.80.46]:58063 "EHLO
-        mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752315AbcKHIBg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Nov 2016 03:01:36 -0500
-In-Reply-To: <20161107194709.20457-1-Jason@zx2c4.com>
+Received: from mail.eperm.de ([89.247.134.16]:47090 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932728AbcKHLPU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 8 Nov 2016 06:15:20 -0500
+In-Reply-To: <3420937b-51f3-cc6e-8919-d698ba087170@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Am Donnerstag, 27. Oktober 2016, 15:36:08 CET schrieb Harsh Jain:
 
-> By using the unaligned access helpers, we drastically improve
-> performance on small MIPS routers that have to go through the
-> exception fix-up handler for these unaligned accesses.
+Hi Harsh,
 
-I couldn't measure any slowdown here, so:
+> >> +static void chcr_verify_tag(struct aead_request *req, u8 *input, int
+> >> *err)
+> >> +{
+> >> +	u8 temp[SHA512_DIGEST_SIZE];
+> >> +	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+> >> +	int authsize = crypto_aead_authsize(tfm);
+> >> +	struct cpl_fw6_pld *fw6_pld;
+> >> +	int cmp = 0;
+> >> +
+> >> +	fw6_pld = (struct cpl_fw6_pld *)input;
+> >> +	if ((get_aead_subtype(tfm) == CRYPTO_ALG_SUB_TYPE_AEAD_RFC4106) ||
+> >> +	    (get_aead_subtype(tfm) == CRYPTO_ALG_SUB_TYPE_AEAD_GCM)) {
+> >> +		cmp = memcmp(&fw6_pld->data[2], (fw6_pld + 1), authsize);
+> >> +	} else {
+> >> +
+> >> +		sg_pcopy_to_buffer(req->src, sg_nents(req->src), temp,
+> >> +				authsize, req->assoclen +
+> >> +				req->cryptlen - authsize);
+> > 
+> > I am wondering whether the math is correct here in any case. It is
+> > permissible that we have an AAD size of 0 and even a zero-sized
+> > ciphertext. How is such scenario covered here?
+> 
+> Here we are trying to copy user supplied tag to local buffer(temp) for
+> decrypt operation only. relative index of tag in src sg list will not
+> change when AAD is zero and in decrypt operation cryptlen > authsize.
 
-Acked-by: Martin Willi <martin@strongswan.org>
+I am just wondering where this is checked. Since all of these implementations 
+are directly accessible from unprivileged user space, we should be careful.
 
-> -       dctx->s[0] = le32_to_cpuvp(key +  0);
-> +       dctx->s[0] = get_unaligned_le32(key +  0);
+> >> +		cmp = memcmp(temp, (fw6_pld + 1), authsize);
+> > 
+> > I would guess in both cases memcmp should be replaced with crypto_memneq
+> 
+> Yes can be done
+> 
+> >> +	}
+> >> +	if (cmp)
+> >> +		*err = -EBADMSG;
+> >> +	else
+> >> +		*err = 0;
+> > 
+> > What do you think about memzero_explicit(tmp)?
+> 
+> No Idea why we needs explicitly setting of zero for local variable.  Please
+> share some online resources to understand this.
 
-Not sure what the exact alignment rules for key/iv are, but maybe we
-want to replace the same function in chacha20_generic.c as well?
+In dumps, the stack is also produced. Yet I see that stack memory is very 
+volatile and thus will be overwritten soon. Thus my common approach for 
+sensitive data is that heap variables must be zeroized. Stack variables are 
+suggested to be zeroized. As far as I understand the code, temp will hold a 
+copy of the tag value, i.e. a public piece of information. If this is correct, 
+that I concur that a memset may not be needed after all.
 
-Martin
+Ciao
+Stephan
