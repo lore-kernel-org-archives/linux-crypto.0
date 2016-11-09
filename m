@@ -1,213 +1,62 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 04/14] crypto: caam - fix sparse warnings
-Date: Wed, 9 Nov 2016 10:46:14 +0200
-Message-ID: <1478681184-9442-5-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH 01/14] crypto: caam - fix AEAD givenc descriptors
+Date: Wed, 9 Nov 2016 10:46:11 +0200
+Message-ID: <1478681184-9442-2-git-send-email-horia.geanta@nxp.com>
 References: <1478681184-9442-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 Cc: "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>
+        <linux-crypto@vger.kernel.org>,
+        Alex Porosanu <alexandru.porosanu@nxp.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0068.outbound.protection.outlook.com ([104.47.33.68]:9076
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+Received: from mail-bl2nam02on0049.outbound.protection.outlook.com ([104.47.38.49]:56000
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751934AbcKIIrs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Nov 2016 03:47:48 -0500
+        id S1751934AbcKIIrn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Nov 2016 03:47:43 -0500
 In-Reply-To: <1478681184-9442-1-git-send-email-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix the following sparse warning (note that endianness issues
-are not not addressed in current patch):
+From: Alex Porosanu <alexandru.porosanu@nxp.com>
 
-drivers/crypto/caam/ctrl.c:388:24: warning: incorrect type in argument 1 (different address spaces)
-drivers/crypto/caam/ctrl.c:388:24:    expected void [noderef] <asn:2>*reg
-drivers/crypto/caam/ctrl.c:388:24:    got unsigned int *<noident>
-drivers/crypto/caam/ctrl.c:390:24: warning: incorrect type in argument 1 (different address spaces)
-drivers/crypto/caam/ctrl.c:390:24:    expected void [noderef] <asn:2>*reg
-drivers/crypto/caam/ctrl.c:390:24:    got unsigned int *<noident>
-drivers/crypto/caam/ctrl.c:548:24: warning: incorrect type in assignment (different address spaces)
-drivers/crypto/caam/ctrl.c:548:24:    expected struct caam_ctrl [noderef] <asn:2>*ctrl
-drivers/crypto/caam/ctrl.c:548:24:    got struct caam_ctrl *<noident>
-drivers/crypto/caam/ctrl.c:550:30: warning: cast removes address space of expression
-drivers/crypto/caam/ctrl.c:549:26: warning: incorrect type in assignment (different address spaces)
-drivers/crypto/caam/ctrl.c:549:26:    expected struct caam_assurance [noderef] <asn:2>*assure
-drivers/crypto/caam/ctrl.c:549:26:    got struct caam_assurance *<noident>
-drivers/crypto/caam/ctrl.c:554:28: warning: cast removes address space of expression
-drivers/crypto/caam/ctrl.c:553:24: warning: incorrect type in assignment (different address spaces)
-drivers/crypto/caam/ctrl.c:553:24:    expected struct caam_deco [noderef] <asn:2>*deco
-drivers/crypto/caam/ctrl.c:553:24:    got struct caam_deco *<noident>
-drivers/crypto/caam/ctrl.c:634:48: warning: cast removes address space of expression
-drivers/crypto/caam/ctrl.c:633:44: warning: incorrect type in assignment (different address spaces)
-drivers/crypto/caam/ctrl.c:633:44:    expected struct caam_job_ring [noderef] <asn:2>*<noident>
-drivers/crypto/caam/ctrl.c:633:44:    got struct caam_job_ring *<noident>
-drivers/crypto/caam/ctrl.c:648:34: warning: cast removes address space of expression
-drivers/crypto/caam/ctrl.c:647:30: warning: incorrect type in assignment (different address spaces)
-drivers/crypto/caam/ctrl.c:647:30:    expected struct caam_queue_if [noderef] <asn:2>*qi
-drivers/crypto/caam/ctrl.c:647:30:    got struct caam_queue_if *<noident>
-drivers/crypto/caam/ctrl.c:806:37: warning: incorrect type in assignment (different address spaces)
-drivers/crypto/caam/ctrl.c:806:37:    expected void *data
-drivers/crypto/caam/ctrl.c:806:37:    got unsigned int [noderef] <asn:2>*
-drivers/crypto/caam/ctrl.c:814:38: warning: incorrect type in assignment (different address spaces)
-drivers/crypto/caam/ctrl.c:814:38:    expected void *data
-drivers/crypto/caam/ctrl.c:814:38:    got unsigned int [noderef] <asn:2>*
-drivers/crypto/caam/ctrl.c:822:38: warning: incorrect type in assignment (different address spaces)
-drivers/crypto/caam/ctrl.c:822:38:    expected void *data
-drivers/crypto/caam/ctrl.c:822:38:    got unsigned int [noderef] <asn:2>*
-drivers/crypto/caam/jr.c:492:23: warning: incorrect type in assignment (different address spaces)
-drivers/crypto/caam/jr.c:492:23:    expected struct caam_job_ring [noderef] <asn:2>*rregs
-drivers/crypto/caam/jr.c:492:23:    got struct caam_job_ring *<noident>
-drivers/crypto/caam/caampkc.c:398:35: warning: Using plain integer as NULL pointer
-drivers/crypto/caam/caampkc.c:444:35: warning: Using plain integer as NULL pointer
+The AEAD givenc descriptor relies on moving the IV through the
+output FIFO and then back to the CTX2 for authentication. The
+SEQ FIFO STORE could be scheduled before the data can be
+read from OFIFO, especially since the SEQ FIFO LOAD needs
+to wait for the SEQ FIFO LOAD SKIP to finish first. The
+SKIP takes more time when the input is SG than when it's
+a contiguous buffer. If the SEQ FIFO LOAD is not scheduled
+before the STORE, the DECO will hang waiting for data
+to be available in the OFIFO so it can be transferred to C2.
+In order to overcome this, first force transfer of IV to C2
+by starting the "cryptlen" transfer first and then starting to
+store data from OFIFO to the output buffer.
 
+Fixes: 1acebad3d8db8 ("crypto: caam - faster aead implementation")
+Cc: <stable@vger.kernel.org> # 3.2+
+Signed-off-by: Alex Porosanu <alexandru.porosanu@nxp.com>
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caampkc.c |  4 ++--
- drivers/crypto/caam/ctrl.c    | 40 +++++++++++++++++-----------------------
- drivers/crypto/caam/jr.c      |  2 +-
- 3 files changed, 20 insertions(+), 26 deletions(-)
+ drivers/crypto/caam/caamalg.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
-index 851015e652b8..32100c4851dd 100644
---- a/drivers/crypto/caam/caampkc.c
-+++ b/drivers/crypto/caam/caampkc.c
-@@ -395,7 +395,7 @@ static int caam_rsa_set_pub_key(struct crypto_akcipher *tfm, const void *key,
- 				unsigned int keylen)
- {
- 	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
--	struct rsa_key raw_key = {0};
-+	struct rsa_key raw_key = {NULL};
- 	struct caam_rsa_key *rsa_key = &ctx->key;
- 	int ret;
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 8de85dfb1b04..5317d8cad44d 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -736,7 +736,9 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
  
-@@ -441,7 +441,7 @@ static int caam_rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
- 				 unsigned int keylen)
- {
- 	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
--	struct rsa_key raw_key = {0};
-+	struct rsa_key raw_key = {NULL};
- 	struct caam_rsa_key *rsa_key = &ctx->key;
- 	int ret;
+ 	/* Will read cryptlen */
+ 	append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
+-	aead_append_src_dst(desc, FIFOLD_TYPE_MSG1OUT2);
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_BOTH | KEY_VLF |
++			     FIFOLD_TYPE_MSG1OUT2 | FIFOLD_TYPE_LASTBOTH);
++	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | KEY_VLF);
  
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index a79937d68c26..be62a7f482ac 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -365,11 +365,8 @@ static void kick_trng(struct platform_device *pdev, int ent_delay)
- 	 */
- 	val = (rd_reg32(&r4tst->rtsdctl) & RTSDCTL_ENT_DLY_MASK)
- 	      >> RTSDCTL_ENT_DLY_SHIFT;
--	if (ent_delay <= val) {
--		/* put RNG4 into run mode */
--		clrsetbits_32(&r4tst->rtmctl, RTMCTL_PRGM, 0);
--		return;
--	}
-+	if (ent_delay <= val)
-+		goto start_rng;
- 
- 	val = rd_reg32(&r4tst->rtsdctl);
- 	val = (val & ~RTSDCTL_ENT_DLY_MASK) |
-@@ -381,15 +378,12 @@ static void kick_trng(struct platform_device *pdev, int ent_delay)
- 	wr_reg32(&r4tst->rtfrqmax, RTFRQMAX_DISABLE);
- 	/* read the control register */
- 	val = rd_reg32(&r4tst->rtmctl);
-+start_rng:
- 	/*
- 	 * select raw sampling in both entropy shifter
--	 * and statistical checker
-+	 * and statistical checker; ; put RNG4 into run mode
- 	 */
--	clrsetbits_32(&val, 0, RTMCTL_SAMP_MODE_RAW_ES_SC);
--	/* put RNG4 into run mode */
--	clrsetbits_32(&val, RTMCTL_PRGM, 0);
--	/* write back the control register */
--	wr_reg32(&r4tst->rtmctl, val);
-+	clrsetbits_32(&r4tst->rtmctl, RTMCTL_PRGM, RTMCTL_SAMP_MODE_RAW_ES_SC);
- }
- 
- /**
-@@ -545,13 +539,13 @@ static int caam_probe(struct platform_device *pdev)
- 	else
- 		BLOCK_OFFSET = PG_SIZE_64K;
- 
--	ctrlpriv->ctrl = (struct caam_ctrl __force *)ctrl;
--	ctrlpriv->assure = (struct caam_assurance __force *)
--			   ((uint8_t *)ctrl +
-+	ctrlpriv->ctrl = (struct caam_ctrl __iomem __force *)ctrl;
-+	ctrlpriv->assure = (struct caam_assurance __iomem __force *)
-+			   ((__force uint8_t *)ctrl +
- 			    BLOCK_OFFSET * ASSURE_BLOCK_NUMBER
- 			   );
--	ctrlpriv->deco = (struct caam_deco __force *)
--			 ((uint8_t *)ctrl +
-+	ctrlpriv->deco = (struct caam_deco __iomem __force *)
-+			 ((__force uint8_t *)ctrl +
- 			 BLOCK_OFFSET * DECO_BLOCK_NUMBER
- 			 );
- 
-@@ -630,8 +624,8 @@ static int caam_probe(struct platform_device *pdev)
- 					ring);
- 				continue;
- 			}
--			ctrlpriv->jr[ring] = (struct caam_job_ring __force *)
--					     ((uint8_t *)ctrl +
-+			ctrlpriv->jr[ring] = (struct caam_job_ring __iomem __force *)
-+					     ((__force uint8_t *)ctrl +
- 					     (ring + JR_BLOCK_NUMBER) *
- 					      BLOCK_OFFSET
- 					     );
-@@ -644,8 +638,8 @@ static int caam_probe(struct platform_device *pdev)
- 			!!(rd_reg32(&ctrl->perfmon.comp_parms_ms) &
- 			   CTPR_MS_QI_MASK);
- 	if (ctrlpriv->qi_present) {
--		ctrlpriv->qi = (struct caam_queue_if __force *)
--			       ((uint8_t *)ctrl +
-+		ctrlpriv->qi = (struct caam_queue_if __iomem __force *)
-+			       ((__force uint8_t *)ctrl +
- 				 BLOCK_OFFSET * QI_BLOCK_NUMBER
- 			       );
- 		/* This is all that's required to physically enable QI */
-@@ -803,7 +797,7 @@ static int caam_probe(struct platform_device *pdev)
- 				    &caam_fops_u32_ro);
- 
- 	/* Internal covering keys (useful in non-secure mode only) */
--	ctrlpriv->ctl_kek_wrap.data = &ctrlpriv->ctrl->kek[0];
-+	ctrlpriv->ctl_kek_wrap.data = (__force void *)&ctrlpriv->ctrl->kek[0];
- 	ctrlpriv->ctl_kek_wrap.size = KEK_KEY_SIZE * sizeof(u32);
- 	ctrlpriv->ctl_kek = debugfs_create_blob("kek",
- 						S_IRUSR |
-@@ -811,7 +805,7 @@ static int caam_probe(struct platform_device *pdev)
- 						ctrlpriv->ctl,
- 						&ctrlpriv->ctl_kek_wrap);
- 
--	ctrlpriv->ctl_tkek_wrap.data = &ctrlpriv->ctrl->tkek[0];
-+	ctrlpriv->ctl_tkek_wrap.data = (__force void *)&ctrlpriv->ctrl->tkek[0];
- 	ctrlpriv->ctl_tkek_wrap.size = KEK_KEY_SIZE * sizeof(u32);
- 	ctrlpriv->ctl_tkek = debugfs_create_blob("tkek",
- 						 S_IRUSR |
-@@ -819,7 +813,7 @@ static int caam_probe(struct platform_device *pdev)
- 						 ctrlpriv->ctl,
- 						 &ctrlpriv->ctl_tkek_wrap);
- 
--	ctrlpriv->ctl_tdsk_wrap.data = &ctrlpriv->ctrl->tdsk[0];
-+	ctrlpriv->ctl_tdsk_wrap.data = (__force void *)&ctrlpriv->ctrl->tdsk[0];
- 	ctrlpriv->ctl_tdsk_wrap.size = KEK_KEY_SIZE * sizeof(u32);
- 	ctrlpriv->ctl_tdsk = debugfs_create_blob("tdsk",
- 						 S_IRUSR |
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 757c27f9953d..7331ea734f37 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -489,7 +489,7 @@ static int caam_jr_probe(struct platform_device *pdev)
- 		return -ENOMEM;
- 	}
- 
--	jrpriv->rregs = (struct caam_job_ring __force *)ctrl;
-+	jrpriv->rregs = (struct caam_job_ring __iomem __force *)ctrl;
- 
- 	if (sizeof(dma_addr_t) == sizeof(u64))
- 		if (of_device_is_compatible(nprop, "fsl,sec-v5.0-job-ring"))
+ 	/* Write ICV */
+ 	append_seq_store(desc, ctx->authsize, LDST_CLASS_2_CCB |
 -- 
 2.4.4
