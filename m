@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 08/14] crypto: caam - trivial code clean-up
-Date: Wed, 9 Nov 2016 10:46:18 +0200
-Message-ID: <1478681184-9442-9-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH 09/14] crypto: caam - remove unreachable code in report_ccb_status()
+Date: Wed, 9 Nov 2016 10:46:19 +0200
+Message-ID: <1478681184-9442-10-git-send-email-horia.geanta@nxp.com>
 References: <1478681184-9442-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -10,150 +10,40 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0085.outbound.protection.outlook.com ([104.47.34.85]:56109
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam03on0063.outbound.protection.outlook.com ([104.47.42.63]:7488
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752504AbcKIJVf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Nov 2016 04:21:35 -0500
+        id S1752300AbcKIKTo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Nov 2016 05:19:44 -0500
 In-Reply-To: <1478681184-9442-1-git-send-email-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
--replace offsetof with container_of
--remove unused "assoc_nents", "iv_dma" from aead_edesc
-and fix comments
--remove unused CAAM_MAX_IV_LENGTH #define
+ERRID is a 4-bit field.
+Since err_id values are in [0..15] and err_id_list array size is 16,
+the condition "err_id < ARRAY_SIZE(err_id_list)" is always true.
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamalg.c  | 16 ++++------------
- drivers/crypto/caam/caamhash.c | 12 ++++--------
- drivers/crypto/caam/caamrng.c  |  3 +--
- 3 files changed, 9 insertions(+), 22 deletions(-)
+ drivers/crypto/caam/error.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 1982dacce80e..34dfcdb7ff84 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -62,8 +62,6 @@
- #define CAAM_MAX_KEY_SIZE		(AES_MAX_KEY_SIZE + \
- 					 CTR_RFC3686_NONCE_SIZE + \
- 					 SHA512_DIGEST_SIZE * 2)
--/* max IV is max of AES_BLOCK_SIZE, DES3_EDE_BLOCK_SIZE */
--#define CAAM_MAX_IV_LENGTH		16
+diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
+index 33e41ea83fcc..79a0cc70717f 100644
+--- a/drivers/crypto/caam/error.c
++++ b/drivers/crypto/caam/error.c
+@@ -146,10 +146,9 @@ static void report_ccb_status(struct device *jrdev, const u32 status,
+ 	    strlen(rng_err_id_list[err_id])) {
+ 		/* RNG-only error */
+ 		err_str = rng_err_id_list[err_id];
+-	} else if (err_id < ARRAY_SIZE(err_id_list))
++	} else {
+ 		err_str = err_id_list[err_id];
+-	else
+-		snprintf(err_err_code, sizeof(err_err_code), "%02x", err_id);
++	}
  
- #define AEAD_DESC_JOB_IO_LEN		(DESC_JOB_IO_LEN + CAAM_CMD_SZ * 2)
- #define GCM_DESC_JOB_IO_LEN		(AEAD_DESC_JOB_IO_LEN + \
-@@ -1873,20 +1871,16 @@ static int xts_ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 
- /*
-  * aead_edesc - s/w-extended aead descriptor
-- * @assoc_nents: number of segments in associated data (SPI+Seq) scatterlist
-  * @src_nents: number of segments in input scatterlist
-  * @dst_nents: number of segments in output scatterlist
-- * @iv_dma: dma address of iv for checking continuity and link table
-- * @desc: h/w descriptor (variable length; must not exceed MAX_CAAM_DESCSIZE)
-  * @sec4_sg_bytes: length of dma mapped sec4_sg space
-  * @sec4_sg_dma: bus physical mapped address of h/w link table
-+ * @sec4_sg: pointer to h/w link table
-  * @hw_desc: the h/w job descriptor followed by any referenced link tables
-  */
- struct aead_edesc {
--	int assoc_nents;
- 	int src_nents;
- 	int dst_nents;
--	dma_addr_t iv_dma;
- 	int sec4_sg_bytes;
- 	dma_addr_t sec4_sg_dma;
- 	struct sec4_sg_entry *sec4_sg;
-@@ -1898,9 +1892,9 @@ struct aead_edesc {
-  * @src_nents: number of segments in input scatterlist
-  * @dst_nents: number of segments in output scatterlist
-  * @iv_dma: dma address of iv for checking continuity and link table
-- * @desc: h/w descriptor (variable length; must not exceed MAX_CAAM_DESCSIZE)
-  * @sec4_sg_bytes: length of dma mapped sec4_sg space
-  * @sec4_sg_dma: bus physical mapped address of h/w link table
-+ * @sec4_sg: pointer to h/w link table
-  * @hw_desc: the h/w job descriptor followed by any referenced link tables
-  */
- struct ablkcipher_edesc {
-@@ -2017,8 +2011,7 @@ static void ablkcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
- #endif
- 
--	edesc = (struct ablkcipher_edesc *)((char *)desc -
--		 offsetof(struct ablkcipher_edesc, hw_desc));
-+	edesc = container_of(desc, struct ablkcipher_edesc, hw_desc[0]);
- 
- 	if (err)
- 		caam_jr_strstatus(jrdev, err);
-@@ -2050,8 +2043,7 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
- #endif
- 
--	edesc = (struct ablkcipher_edesc *)((char *)desc -
--		 offsetof(struct ablkcipher_edesc, hw_desc));
-+	edesc = container_of(desc, struct ablkcipher_edesc, hw_desc[0]);
- 	if (err)
- 		caam_jr_strstatus(jrdev, err);
- 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 51990dd56024..d5a06c6923c0 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -636,8 +636,7 @@ static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
- 	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
- #endif
- 
--	edesc = (struct ahash_edesc *)((char *)desc -
--		 offsetof(struct ahash_edesc, hw_desc));
-+	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
- 	if (err)
- 		caam_jr_strstatus(jrdev, err);
- 
-@@ -671,8 +670,7 @@ static void ahash_done_bi(struct device *jrdev, u32 *desc, u32 err,
- 	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
- #endif
- 
--	edesc = (struct ahash_edesc *)((char *)desc -
--		 offsetof(struct ahash_edesc, hw_desc));
-+	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
- 	if (err)
- 		caam_jr_strstatus(jrdev, err);
- 
-@@ -706,8 +704,7 @@ static void ahash_done_ctx_src(struct device *jrdev, u32 *desc, u32 err,
- 	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
- #endif
- 
--	edesc = (struct ahash_edesc *)((char *)desc -
--		 offsetof(struct ahash_edesc, hw_desc));
-+	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
- 	if (err)
- 		caam_jr_strstatus(jrdev, err);
- 
-@@ -741,8 +738,7 @@ static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
- 	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
- #endif
- 
--	edesc = (struct ahash_edesc *)((char *)desc -
--		 offsetof(struct ahash_edesc, hw_desc));
-+	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
- 	if (err)
- 		caam_jr_strstatus(jrdev, err);
- 
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index 38bb2411afcf..41398da3edf4 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -100,8 +100,7 @@ static void rng_done(struct device *jrdev, u32 *desc, u32 err, void *context)
- {
- 	struct buf_data *bd;
- 
--	bd = (struct buf_data *)((char *)desc -
--	      offsetof(struct buf_data, hw_desc));
-+	bd = container_of(desc, struct buf_data, hw_desc[0]);
- 
- 	if (err)
- 		caam_jr_strstatus(jrdev, err);
+ 	/*
+ 	 * CCB ICV check failures are part of normal operation life;
 -- 
 2.4.4
