@@ -1,166 +1,106 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH 11/14] Revert "crypto: caam - get rid of tasklet"
-Date: Wed, 9 Nov 2016 08:53:22 +0000
-Message-ID: <20161109085322.GY1041@n2100.armlinux.org.uk>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH 03/14] crypto: caam - desc.h fixes
+Date: Wed, 9 Nov 2016 10:46:13 +0200
+Message-ID: <1478681184-9442-4-git-send-email-horia.geanta@nxp.com>
 References: <1478681184-9442-1-git-send-email-horia.geanta@nxp.com>
- <1478681184-9442-12-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Thomas Gleixner <tglx@linutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:56522 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751623AbcKIIxi (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Nov 2016 03:53:38 -0500
-Content-Disposition: inline
-In-Reply-To: <1478681184-9442-12-git-send-email-horia.geanta@nxp.com>
+Received: from mail-by2nam01on0053.outbound.protection.outlook.com ([104.47.34.53]:41386
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752922AbcKIJB7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Nov 2016 04:01:59 -0500
+In-Reply-To: <1478681184-9442-1-git-send-email-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Please include Thomas in this.
+1. fix HDR_START_IDX_MASK, HDR_SD_SHARE_MASK, HDR_JD_SHARE_MASK
+Define HDR_START_IDX_MASK consistently with the other masks:
+mask = bitmask << offset
 
-On Wed, Nov 09, 2016 at 10:46:21AM +0200, Horia Geantă wrote:
-> This reverts commit 66d2e2028091a074aa1290d2eeda5ddb1a6c329c.
-> 
-> Quoting from Russell's findings:
-> https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg21136.html
-> 
-> [quote]
-> Okay, I've re-tested, using a different way of measuring, because using
-> openssl speed is impractical for off-loaded engines.  I've decided to
-> use this way to measure the performance:
-> 
-> dd if=/dev/zero bs=1048576 count=128 | /usr/bin/time openssl dgst -md5
-> 
-> For the threaded IRQs case gives:
-> 
-> 0.05user 2.74system 0:05.30elapsed 52%CPU (0avgtext+0avgdata 2400maxresident)k
-> 0.06user 2.52system 0:05.18elapsed 49%CPU (0avgtext+0avgdata 2404maxresident)k
-> 0.12user 2.60system 0:05.61elapsed 48%CPU (0avgtext+0avgdata 2460maxresident)k
-> 	=> 5.36s => 25.0MB/s
-> 
-> and the tasklet case:
-> 
-> 0.08user 2.53system 0:04.83elapsed 54%CPU (0avgtext+0avgdata 2468maxresident)k
-> 0.09user 2.47system 0:05.16elapsed 49%CPU (0avgtext+0avgdata 2368maxresident)k
-> 0.10user 2.51system 0:04.87elapsed 53%CPU (0avgtext+0avgdata 2460maxresident)k
-> 	=> 4.95 => 27.1MB/s
-> 
-> which corresponds to an 8% slowdown for the threaded IRQ case.  So,
-> tasklets are indeed faster than threaded IRQs.
-> 
-> [...]
-> 
-> I think I've proven from the above that this patch needs to be reverted
-> due to the performance regression, and that there _is_ most definitely
-> a deterimental effect of switching from tasklets to threaded IRQs.
-> [/quote]
-> 
-> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
-> ---
->  drivers/crypto/caam/intern.h |  1 +
->  drivers/crypto/caam/jr.c     | 25 ++++++++++++++++---------
->  2 files changed, 17 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-> index 5d4c05074a5c..e2bcacc1a921 100644
-> --- a/drivers/crypto/caam/intern.h
-> +++ b/drivers/crypto/caam/intern.h
-> @@ -41,6 +41,7 @@ struct caam_drv_private_jr {
->  	struct device		*dev;
->  	int ridx;
->  	struct caam_job_ring __iomem *rregs;	/* JobR's register space */
-> +	struct tasklet_struct irqtask;
->  	int irq;			/* One per queue */
->  
->  	/* Number of scatterlist crypt transforms active on the JobR */
-> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-> index 7331ea734f37..c8604dfadbf5 100644
-> --- a/drivers/crypto/caam/jr.c
-> +++ b/drivers/crypto/caam/jr.c
-> @@ -73,6 +73,8 @@ static int caam_jr_shutdown(struct device *dev)
->  
->  	ret = caam_reset_hw_jr(dev);
->  
-> +	tasklet_kill(&jrp->irqtask);
-> +
->  	/* Release interrupt */
->  	free_irq(jrp->irq, dev);
->  
-> @@ -128,7 +130,7 @@ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
->  
->  	/*
->  	 * Check the output ring for ready responses, kick
-> -	 * the threaded irq if jobs done.
-> +	 * tasklet if jobs done.
->  	 */
->  	irqstate = rd_reg32(&jrp->rregs->jrintstatus);
->  	if (!irqstate)
-> @@ -150,13 +152,18 @@ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
->  	/* Have valid interrupt at this point, just ACK and trigger */
->  	wr_reg32(&jrp->rregs->jrintstatus, irqstate);
->  
-> -	return IRQ_WAKE_THREAD;
-> +	preempt_disable();
-> +	tasklet_schedule(&jrp->irqtask);
-> +	preempt_enable();
-> +
-> +	return IRQ_HANDLED;
->  }
->  
-> -static irqreturn_t caam_jr_threadirq(int irq, void *st_dev)
-> +/* Deferred service handler, run as interrupt-fired tasklet */
-> +static void caam_jr_dequeue(unsigned long devarg)
->  {
->  	int hw_idx, sw_idx, i, head, tail;
-> -	struct device *dev = st_dev;
-> +	struct device *dev = (struct device *)devarg;
->  	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
->  	void (*usercall)(struct device *dev, u32 *desc, u32 status, void *arg);
->  	u32 *userdesc, userstatus;
-> @@ -230,8 +237,6 @@ static irqreturn_t caam_jr_threadirq(int irq, void *st_dev)
->  
->  	/* reenable / unmask IRQs */
->  	clrsetbits_32(&jrp->rregs->rconfig_lo, JRCFG_IMSK, 0);
-> -
-> -	return IRQ_HANDLED;
->  }
->  
->  /**
-> @@ -389,10 +394,11 @@ static int caam_jr_init(struct device *dev)
->  
->  	jrp = dev_get_drvdata(dev);
->  
-> +	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);
-> +
->  	/* Connect job ring interrupt handler. */
-> -	error = request_threaded_irq(jrp->irq, caam_jr_interrupt,
-> -				     caam_jr_threadirq, IRQF_SHARED,
-> -				     dev_name(dev), dev);
-> +	error = request_irq(jrp->irq, caam_jr_interrupt, IRQF_SHARED,
-> +			    dev_name(dev), dev);
->  	if (error) {
->  		dev_err(dev, "can't connect JobR %d interrupt (%d)\n",
->  			jrp->ridx, jrp->irq);
-> @@ -454,6 +460,7 @@ static int caam_jr_init(struct device *dev)
->  out_free_irq:
->  	free_irq(jrp->irq, dev);
->  out_kill_deq:
-> +	tasklet_kill(&jrp->irqtask);
->  	return error;
->  }
->  
-> -- 
-> 2.4.4
-> 
+2. OP_ALG_TYPE_CLASS1 and OP_ALG_TYPE_CLASS2 must be shifted.
 
+3. fix FIFO_STORE output data type value for AFHA S-Box
+
+4. fix OPERATION pkha modular arithmetic source mask
+
+5. rename LDST_SRCDST_WORD_CLASS1_ICV_SZ to
+LDST_SRCDST_WORD_CLASS1_IV_SZ (it refers to IV, not ICV).
+
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
+ drivers/crypto/caam/desc.h | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
+index 513b6646bb36..61059abef737 100644
+--- a/drivers/crypto/caam/desc.h
++++ b/drivers/crypto/caam/desc.h
+@@ -90,8 +90,8 @@ struct sec4_sg_entry {
+ #define HDR_ZRO			0x00008000
+ 
+ /* Start Index or SharedDesc Length */
+-#define HDR_START_IDX_MASK	0x3f
+ #define HDR_START_IDX_SHIFT	16
++#define HDR_START_IDX_MASK	(0x3f << HDR_START_IDX_SHIFT)
+ 
+ /* If shared descriptor header, 6-bit length */
+ #define HDR_DESCLEN_SHR_MASK	0x3f
+@@ -121,10 +121,10 @@ struct sec4_sg_entry {
+ #define HDR_PROP_DNR		0x00000800
+ 
+ /* JobDesc/SharedDesc share property */
+-#define HDR_SD_SHARE_MASK	0x03
+ #define HDR_SD_SHARE_SHIFT	8
+-#define HDR_JD_SHARE_MASK	0x07
++#define HDR_SD_SHARE_MASK	(0x03 << HDR_SD_SHARE_SHIFT)
+ #define HDR_JD_SHARE_SHIFT	8
++#define HDR_JD_SHARE_MASK	(0x07 << HDR_JD_SHARE_SHIFT)
+ 
+ #define HDR_SHARE_NEVER		(0x00 << HDR_SD_SHARE_SHIFT)
+ #define HDR_SHARE_WAIT		(0x01 << HDR_SD_SHARE_SHIFT)
+@@ -235,7 +235,7 @@ struct sec4_sg_entry {
+ #define LDST_SRCDST_WORD_DECO_MATH2	(0x0a << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_DECO_AAD_SZ	(0x0b << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_DECO_MATH3	(0x0b << LDST_SRCDST_SHIFT)
+-#define LDST_SRCDST_WORD_CLASS1_ICV_SZ	(0x0c << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_CLASS1_IV_SZ	(0x0c << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_ALTDS_CLASS1	(0x0f << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_PKHA_A_SZ	(0x10 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_PKHA_B_SZ	(0x11 << LDST_SRCDST_SHIFT)
+@@ -400,7 +400,7 @@ struct sec4_sg_entry {
+ #define FIFOST_TYPE_PKHA_N	 (0x08 << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_PKHA_A	 (0x0c << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_PKHA_B	 (0x0d << FIFOST_TYPE_SHIFT)
+-#define FIFOST_TYPE_AF_SBOX_JKEK (0x10 << FIFOST_TYPE_SHIFT)
++#define FIFOST_TYPE_AF_SBOX_JKEK (0x20 << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_AF_SBOX_TKEK (0x21 << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_PKHA_E_JKEK	 (0x22 << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_PKHA_E_TKEK	 (0x23 << FIFOST_TYPE_SHIFT)
+@@ -1107,8 +1107,8 @@ struct sec4_sg_entry {
+ /* For non-protocol/alg-only op commands */
+ #define OP_ALG_TYPE_SHIFT	24
+ #define OP_ALG_TYPE_MASK	(0x7 << OP_ALG_TYPE_SHIFT)
+-#define OP_ALG_TYPE_CLASS1	2
+-#define OP_ALG_TYPE_CLASS2	4
++#define OP_ALG_TYPE_CLASS1	(2 << OP_ALG_TYPE_SHIFT)
++#define OP_ALG_TYPE_CLASS2	(4 << OP_ALG_TYPE_SHIFT)
+ 
+ #define OP_ALG_ALGSEL_SHIFT	16
+ #define OP_ALG_ALGSEL_MASK	(0xff << OP_ALG_ALGSEL_SHIFT)
+@@ -1249,7 +1249,7 @@ struct sec4_sg_entry {
+ #define OP_ALG_PKMODE_MOD_PRIMALITY	0x00f
+ 
+ /* PKHA mode copy-memory functions */
+-#define OP_ALG_PKMODE_SRC_REG_SHIFT	13
++#define OP_ALG_PKMODE_SRC_REG_SHIFT	17
+ #define OP_ALG_PKMODE_SRC_REG_MASK	(7 << OP_ALG_PKMODE_SRC_REG_SHIFT)
+ #define OP_ALG_PKMODE_DST_REG_SHIFT	10
+ #define OP_ALG_PKMODE_DST_REG_MASK	(7 << OP_ALG_PKMODE_DST_REG_SHIFT)
 -- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+2.4.4
