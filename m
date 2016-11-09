@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 06/14] crypto: caam - remove unused may_sleep in dbg_dump_sg()
-Date: Wed, 9 Nov 2016 10:46:16 +0200
-Message-ID: <1478681184-9442-7-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH 14/14] crypto: caam - merge identical ahash_final/finup shared desc
+Date: Wed, 9 Nov 2016 10:46:24 +0200
+Message-ID: <1478681184-9442-15-git-send-email-horia.geanta@nxp.com>
 References: <1478681184-9442-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -10,98 +10,84 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0042.outbound.protection.outlook.com ([104.47.34.42]:53472
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-bn3nam01on0084.outbound.protection.outlook.com ([104.47.33.84]:64495
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752504AbcKIJVX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Nov 2016 04:21:23 -0500
+        id S1752558AbcKIJWE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Nov 2016 04:22:04 -0500
 In-Reply-To: <1478681184-9442-1-git-send-email-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fixes: 5ecf8ef9103cb "crypto: caam - fix sg dump"
+Shared descriptors used by ahash_final() and ahash_finup()
+are identical, thus get rid of one of them (sh_desc_finup).
+
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamalg.c | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
+ drivers/crypto/caam/caamhash.c | 26 +-------------------------
+ 1 file changed, 1 insertion(+), 25 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index bc433edd34c4..cb26a57c5aaf 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -117,8 +117,7 @@
- 
- static void dbg_dump_sg(const char *level, const char *prefix_str,
- 			int prefix_type, int rowsize, int groupsize,
--			struct scatterlist *sg, size_t tlen, bool ascii,
--			bool may_sleep)
-+			struct scatterlist *sg, size_t tlen, bool ascii)
- {
- 	struct scatterlist *it;
- 	void *it_page;
-@@ -2033,7 +2032,7 @@ static void ablkcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 		       edesc->src_nents > 1 ? 100 : ivsize, 1);
- 	dbg_dump_sg(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
- 		    DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
--		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1, true);
-+		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index d5a06c6923c0..86f360853502 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -103,12 +103,10 @@ struct caam_hash_ctx {
+ 	u32 sh_desc_update_first[DESC_HASH_MAX_USED_LEN] ____cacheline_aligned;
+ 	u32 sh_desc_fin[DESC_HASH_MAX_USED_LEN] ____cacheline_aligned;
+ 	u32 sh_desc_digest[DESC_HASH_MAX_USED_LEN] ____cacheline_aligned;
+-	u32 sh_desc_finup[DESC_HASH_MAX_USED_LEN] ____cacheline_aligned;
+ 	dma_addr_t sh_desc_update_dma ____cacheline_aligned;
+ 	dma_addr_t sh_desc_update_first_dma;
+ 	dma_addr_t sh_desc_fin_dma;
+ 	dma_addr_t sh_desc_digest_dma;
+-	dma_addr_t sh_desc_finup_dma;
+ 	struct device *jrdev;
+ 	u32 alg_type;
+ 	u32 alg_op;
+@@ -380,24 +378,6 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+ 		       desc_bytes(desc), 1);
  #endif
  
- 	ablkcipher_unmap(jrdev, edesc, req);
-@@ -2065,7 +2064,7 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 		       ivsize, 1);
- 	dbg_dump_sg(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
- 		    DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
--		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1, true);
-+		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
- #endif
+-	/* ahash_finup shared descriptor */
+-	desc = ctx->sh_desc_finup;
+-
+-	ahash_ctx_data_to_out(desc, have_key | ctx->alg_type,
+-			      OP_ALG_AS_FINALIZE, digestsize, ctx);
+-
+-	ctx->sh_desc_finup_dma = dma_map_single(jrdev, desc, desc_bytes(desc),
+-						DMA_TO_DEVICE);
+-	if (dma_mapping_error(jrdev, ctx->sh_desc_finup_dma)) {
+-		dev_err(jrdev, "unable to map shared descriptor\n");
+-		return -ENOMEM;
+-	}
+-#ifdef DEBUG
+-	print_hex_dump(KERN_ERR, "ahash finup shdesc@"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, desc,
+-		       desc_bytes(desc), 1);
+-#endif
+-
+ 	/* ahash_digest shared descriptor */
+ 	desc = ctx->sh_desc_digest;
  
- 	ablkcipher_unmap(jrdev, edesc, req);
-@@ -2220,15 +2219,13 @@ static void init_ablkcipher_job(u32 *sh_desc, dma_addr_t ptr,
- 	int len, sec4_sg_index = 0;
+@@ -1071,7 +1051,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
  
- #ifdef DEBUG
--	bool may_sleep = ((req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
--					      CRYPTO_TFM_REQ_MAY_SLEEP)) != 0);
- 	print_hex_dump(KERN_ERR, "presciv@"__stringify(__LINE__)": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
- 		       ivsize, 1);
- 	printk(KERN_ERR "asked=%d, nbytes%d\n", (int)edesc->src_nents ? 100 : req->nbytes, req->nbytes);
- 	dbg_dump_sg(KERN_ERR, "src    @"__stringify(__LINE__)": ",
- 		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
--		    edesc->src_nents ? 100 : req->nbytes, 1, may_sleep);
-+		    edesc->src_nents ? 100 : req->nbytes, 1);
- #endif
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+ 	edesc = ahash_edesc_alloc(ctx, sec4_sg_src_index + mapped_nents,
+-				  ctx->sh_desc_finup, ctx->sh_desc_finup_dma,
++				  ctx->sh_desc_fin, ctx->sh_desc_fin_dma,
+ 				  flags);
+ 	if (!edesc) {
+ 		dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
+@@ -1886,10 +1866,6 @@ static void caam_hash_cra_exit(struct crypto_tfm *tfm)
+ 		dma_unmap_single(ctx->jrdev, ctx->sh_desc_digest_dma,
+ 				 desc_bytes(ctx->sh_desc_digest),
+ 				 DMA_TO_DEVICE);
+-	if (ctx->sh_desc_finup_dma &&
+-	    !dma_mapping_error(ctx->jrdev, ctx->sh_desc_finup_dma))
+-		dma_unmap_single(ctx->jrdev, ctx->sh_desc_finup_dma,
+-				 desc_bytes(ctx->sh_desc_finup), DMA_TO_DEVICE);
  
- 	len = desc_len(sh_desc);
-@@ -2280,14 +2277,12 @@ static void init_ablkcipher_giv_job(u32 *sh_desc, dma_addr_t ptr,
- 	int len, sec4_sg_index = 0;
- 
- #ifdef DEBUG
--	bool may_sleep = ((req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
--					      CRYPTO_TFM_REQ_MAY_SLEEP)) != 0);
- 	print_hex_dump(KERN_ERR, "presciv@" __stringify(__LINE__) ": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
- 		       ivsize, 1);
- 	dbg_dump_sg(KERN_ERR, "src    @" __stringify(__LINE__) ": ",
- 		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
--		    edesc->src_nents ? 100 : req->nbytes, 1, may_sleep);
-+		    edesc->src_nents ? 100 : req->nbytes, 1);
- #endif
- 
- 	len = desc_len(sh_desc);
-@@ -2556,11 +2551,9 @@ static int aead_decrypt(struct aead_request *req)
- 	int ret = 0;
- 
- #ifdef DEBUG
--	bool may_sleep = ((req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
--					      CRYPTO_TFM_REQ_MAY_SLEEP)) != 0);
- 	dbg_dump_sg(KERN_ERR, "dec src@"__stringify(__LINE__)": ",
- 		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
--		    req->assoclen + req->cryptlen, 1, may_sleep);
-+		    req->assoclen + req->cryptlen, 1);
- #endif
- 
- 	/* allocate extended descriptor */
+ 	caam_jr_free(ctx->jrdev);
+ }
 -- 
 2.4.4
