@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 05/14] crypto: caam - fix smatch warnings
-Date: Wed, 9 Nov 2016 10:46:15 +0200
-Message-ID: <1478681184-9442-6-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH 06/14] crypto: caam - remove unused may_sleep in dbg_dump_sg()
+Date: Wed, 9 Nov 2016 10:46:16 +0200
+Message-ID: <1478681184-9442-7-git-send-email-horia.geanta@nxp.com>
 References: <1478681184-9442-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -10,54 +10,98 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0072.outbound.protection.outlook.com ([104.47.42.72]:2721
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam01on0042.outbound.protection.outlook.com ([104.47.34.42]:53472
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752730AbcKIJUe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Nov 2016 04:20:34 -0500
+        id S1752504AbcKIJVX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Nov 2016 04:21:23 -0500
 In-Reply-To: <1478681184-9442-1-git-send-email-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix the following smatch warnings:
-
-drivers/crypto/caam/caamalg.c:2350 aead_edesc_alloc() warn: we tested 'src_nents' before and it was 'true'
-drivers/crypto/caam/caamrng.c:351 caam_rng_init() error: no modifiers for allocation.
-
+Fixes: 5ecf8ef9103cb "crypto: caam - fix sg dump"
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamalg.c | 4 +---
- drivers/crypto/caam/caamrng.c | 2 +-
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ drivers/crypto/caam/caamalg.c | 19 ++++++-------------
+ 1 file changed, 6 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 5317d8cad44d..bc433edd34c4 100644
+index bc433edd34c4..cb26a57c5aaf 100644
 --- a/drivers/crypto/caam/caamalg.c
 +++ b/drivers/crypto/caam/caamalg.c
-@@ -2346,10 +2346,8 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+@@ -117,8 +117,7 @@
  
- 	/* Check if data are contiguous. */
- 	all_contig = !src_nents;
--	if (!all_contig) {
--		src_nents = src_nents ? : 1;
-+	if (!all_contig)
- 		sec4_sg_len = src_nents;
--	}
+ static void dbg_dump_sg(const char *level, const char *prefix_str,
+ 			int prefix_type, int rowsize, int groupsize,
+-			struct scatterlist *sg, size_t tlen, bool ascii,
+-			bool may_sleep)
++			struct scatterlist *sg, size_t tlen, bool ascii)
+ {
+ 	struct scatterlist *it;
+ 	void *it_page;
+@@ -2033,7 +2032,7 @@ static void ablkcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 		       edesc->src_nents > 1 ? 100 : ivsize, 1);
+ 	dbg_dump_sg(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
+ 		    DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
+-		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1, true);
++		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
+ #endif
  
- 	sec4_sg_len += dst_nents;
+ 	ablkcipher_unmap(jrdev, edesc, req);
+@@ -2065,7 +2064,7 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 		       ivsize, 1);
+ 	dbg_dump_sg(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
+ 		    DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
+-		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1, true);
++		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
+ #endif
  
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index bb1c118b2d1b..38bb2411afcf 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -348,7 +348,7 @@ static int __init caam_rng_init(void)
- 		pr_err("Job Ring Device allocation for transform failed\n");
- 		return PTR_ERR(dev);
- 	}
--	rng_ctx = kmalloc(sizeof(*rng_ctx), GFP_DMA);
-+	rng_ctx = kmalloc(sizeof(*rng_ctx), GFP_DMA | GFP_KERNEL);
- 	if (!rng_ctx) {
- 		err = -ENOMEM;
- 		goto free_caam_alloc;
+ 	ablkcipher_unmap(jrdev, edesc, req);
+@@ -2220,15 +2219,13 @@ static void init_ablkcipher_job(u32 *sh_desc, dma_addr_t ptr,
+ 	int len, sec4_sg_index = 0;
+ 
+ #ifdef DEBUG
+-	bool may_sleep = ((req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+-					      CRYPTO_TFM_REQ_MAY_SLEEP)) != 0);
+ 	print_hex_dump(KERN_ERR, "presciv@"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       ivsize, 1);
+ 	printk(KERN_ERR "asked=%d, nbytes%d\n", (int)edesc->src_nents ? 100 : req->nbytes, req->nbytes);
+ 	dbg_dump_sg(KERN_ERR, "src    @"__stringify(__LINE__)": ",
+ 		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
+-		    edesc->src_nents ? 100 : req->nbytes, 1, may_sleep);
++		    edesc->src_nents ? 100 : req->nbytes, 1);
+ #endif
+ 
+ 	len = desc_len(sh_desc);
+@@ -2280,14 +2277,12 @@ static void init_ablkcipher_giv_job(u32 *sh_desc, dma_addr_t ptr,
+ 	int len, sec4_sg_index = 0;
+ 
+ #ifdef DEBUG
+-	bool may_sleep = ((req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+-					      CRYPTO_TFM_REQ_MAY_SLEEP)) != 0);
+ 	print_hex_dump(KERN_ERR, "presciv@" __stringify(__LINE__) ": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       ivsize, 1);
+ 	dbg_dump_sg(KERN_ERR, "src    @" __stringify(__LINE__) ": ",
+ 		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
+-		    edesc->src_nents ? 100 : req->nbytes, 1, may_sleep);
++		    edesc->src_nents ? 100 : req->nbytes, 1);
+ #endif
+ 
+ 	len = desc_len(sh_desc);
+@@ -2556,11 +2551,9 @@ static int aead_decrypt(struct aead_request *req)
+ 	int ret = 0;
+ 
+ #ifdef DEBUG
+-	bool may_sleep = ((req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+-					      CRYPTO_TFM_REQ_MAY_SLEEP)) != 0);
+ 	dbg_dump_sg(KERN_ERR, "dec src@"__stringify(__LINE__)": ",
+ 		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
+-		    req->assoclen + req->cryptlen, 1, may_sleep);
++		    req->assoclen + req->cryptlen, 1);
+ #endif
+ 
+ 	/* allocate extended descriptor */
 -- 
 2.4.4
