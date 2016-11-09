@@ -1,301 +1,309 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 13/14] crypto: caam - constify pointer to descriptor buffer
-Date: Wed, 9 Nov 2016 10:46:23 +0200
-Message-ID: <1478681184-9442-14-git-send-email-horia.geanta@nxp.com>
-References: <1478681184-9442-1-git-send-email-horia.geanta@nxp.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] crypto: fix AEAD tag memory handling
+Date: Wed, 09 Nov 2016 14:20:13 +0100
+Message-ID: <13567923.CP2Rp1drvf@positron.chronox.de>
+References: <4006219.iWaCqWYv1B@positron.chronox.de> <2822295.gL4fqFHz8h@positron.chronox.de> <alpine.OSX.2.20.1610311456250.4111@mjmartin-mac01.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: multipart/mixed; boundary="nextPart1892807.hz7V3SvfF6"
+Content-Transfer-Encoding: 7Bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: Mat Martineau <mathew.j.martineau@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0047.outbound.protection.outlook.com ([104.47.36.47]:20669
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752013AbcKIKUI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Nov 2016 05:20:08 -0500
-In-Reply-To: <1478681184-9442-1-git-send-email-horia.geanta@nxp.com>
+Received: from mail.eperm.de ([89.247.134.16]:47106 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932533AbcKINUY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Nov 2016 08:20:24 -0500
+In-Reply-To: <alpine.OSX.2.20.1610311456250.4111@mjmartin-mac01.local>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The pointer to the descriptor buffer is not touched,
-it always points to start of the descriptor buffer.
-Thus, make it const.
+This is a multi-part message in MIME format.
 
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- drivers/crypto/caam/desc_constr.h | 72 +++++++++++++++++++++------------------
- 1 file changed, 38 insertions(+), 34 deletions(-)
+--nextPart1892807.hz7V3SvfF6
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
-diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
-index a8cd8a78ec1f..354da735af62 100644
---- a/drivers/crypto/caam/desc_constr.h
-+++ b/drivers/crypto/caam/desc_constr.h
-@@ -33,38 +33,39 @@
+Am Montag, 31. Oktober 2016, 16:18:32 CET schrieb Mat Martineau:
+
+Hi Mat,
+> 
+> My main concern is getting the semantics correct and consistent in a
+> single patch series. It would be a big problem to explain that AF_ALG AEAD
+> read and write works one way in 4.x, another way in 4.y, and some
+> different way in 4.z.
+
+I do have a patch now available that exactly does what you suggest. See the 
+patch attached. It works with the following exception.
+
+In the case of sendpage and using an in-place cipher operation, the patch 
+breaks as follows. When the caller sends the same buffer for a sendpage 
+operation, the cipher operation now will write the ciphertext to the beginning 
+of the buffer where the AAD used to be. The subsequent tag calculation will 
+now use the data it finds where the AAD is expected. As the cipher operation 
+has already replaced the AAD with the ciphertext, the tag calculation will 
+take the ciphertext as AAD and thus calculate a wrong tag.
+
+Thus, the only way to avoid that would be to duplicate the AAD into an 
+internal buffer. But that would defeat the entire purpose of sendpage.
+
+The patch, however, works with sendmsg as well as sendpage when the src and 
+dst buffers are different.
+
+Ciao
+Stephan
+--nextPart1892807.hz7V3SvfF6
+Content-Disposition: attachment; filename="fix_read_offset.diff"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/x-patch; charset="UTF-8"; name="fix_read_offset.diff"
+
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index c54bcb8..c8efd01 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -32,6 +32,7 @@ struct aead_sg_list {
+ struct aead_async_rsgl {
+ 	struct af_alg_sgl sgl;
+ 	struct list_head list;
++	bool new_page;
+ };
  
- extern bool caam_little_end;
- 
--static inline int desc_len(u32 *desc)
-+static inline int desc_len(u32 * const desc)
- {
- 	return caam32_to_cpu(*desc) & HDR_DESCLEN_MASK;
+ struct aead_async_req {
+@@ -405,6 +406,61 @@ static void aead_async_cb(struct crypto_async_request *_req, int err)
+ 	iocb->ki_complete(iocb, err, err);
  }
  
--static inline int desc_bytes(void *desc)
-+static inline int desc_bytes(void * const desc)
++/**
++ * scatterwalk_get_part() - get subset a scatterlist
++ *
++ * @dst: destination SGL to receive the pointers from source SGL
++ * @src: source SGL
++ * @len: data length in bytes to get from source SGL
++ * @max_sgs: number of SGs present in dst SGL to prevent overstepping boundaries
++ *
++ * @return: number of SG entries in dst
++ */
++static inline int scatterwalk_get_part(struct scatterlist *dst,
++				       struct scatterlist *src,
++				       unsigned int len, unsigned int max_sgs)
++{
++	/* leave one SG entry for chaining */
++	unsigned int j = 1;
++
++	while (len && j < max_sgs) {
++		unsigned int todo = min_t(unsigned int, len, src->length);
++
++		sg_set_page(dst, sg_page(src), todo, src->offset);
++		if (src->length >= len) {
++			sg_mark_end(dst);
++			break;
++		}
++		len -= todo;
++		j++;
++		src = sg_next(src);
++		dst = sg_next(dst);
++	}
++
++	return j;
++}
++
++static inline int aead_alloc_rsgl(struct sock *sk, struct aead_async_rsgl **ret)
++{
++	struct aead_async_rsgl *rsgl =
++				sock_kmalloc(sk, sizeof(*rsgl), GFP_KERNEL);
++	if (unlikely(!rsgl))
++		return -ENOMEM;
++	*ret = rsgl;
++	return 0;
++}
++
++static inline int aead_get_rsgl_areq(struct sock *sk,
++				     struct aead_async_req *areq,
++				     struct aead_async_rsgl **ret)
++{
++	if (list_empty(&areq->list)) {
++		*ret = &areq->first_rsgl;
++		return 0;
++	} else
++		return aead_alloc_rsgl(sk, ret);
++}
++
+ static int aead_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 			      int flags)
  {
- 	return desc_len(desc) * CAAM_CMD_SZ;
+@@ -433,7 +489,7 @@ static int aead_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 	if (!aead_sufficient_data(ctx))
+ 		goto unlock;
+ 
+-	used = ctx->used;
++	used = ctx->used - ctx->aead_assoclen;
+ 	if (ctx->enc)
+ 		outlen = used + as;
+ 	else
+@@ -452,7 +508,6 @@ static int aead_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 	aead_request_set_ad(req, ctx->aead_assoclen);
+ 	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+ 				  aead_async_cb, sk);
+-	used -= ctx->aead_assoclen;
+ 
+ 	/* take over all tx sgls from ctx */
+ 	areq->tsgl = sock_kmalloc(sk, sizeof(*areq->tsgl) * sgl->cur,
+@@ -467,21 +522,26 @@ static int aead_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 
+ 	areq->tsgls = sgl->cur;
+ 
++	/* set AAD buffer */
++	err = aead_get_rsgl_areq(sk, areq, &rsgl);
++	if (err)
++		goto free;
++	list_add_tail(&rsgl->list, &areq->list);
++	sg_init_table(rsgl->sgl.sg, ALG_MAX_PAGES);
++	rsgl->sgl.npages = scatterwalk_get_part(rsgl->sgl.sg, sgl->sg,
++						ctx->aead_assoclen,
++						ALG_MAX_PAGES);
++	rsgl->new_page = false;
++	last_rsgl = rsgl;
++
+ 	/* create rx sgls */
+ 	while (outlen > usedpages && iov_iter_count(&msg->msg_iter)) {
+ 		size_t seglen = min_t(size_t, iov_iter_count(&msg->msg_iter),
+ 				      (outlen - usedpages));
+ 
+-		if (list_empty(&areq->list)) {
+-			rsgl = &areq->first_rsgl;
+-
+-		} else {
+-			rsgl = sock_kmalloc(sk, sizeof(*rsgl), GFP_KERNEL);
+-			if (unlikely(!rsgl)) {
+-				err = -ENOMEM;
+-				goto free;
+-			}
+-		}
++		err = aead_get_rsgl_areq(sk, areq, &rsgl);
++		if (err)
++			goto free;
+ 		rsgl->sgl.npages = 0;
+ 		list_add_tail(&rsgl->list, &areq->list);
+ 
+@@ -491,6 +551,7 @@ static int aead_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 			goto free;
+ 
+ 		usedpages += err;
++		rsgl->new_page = true;
+ 
+ 		/* chain the new scatterlist with previous one */
+ 		if (last_rsgl)
+@@ -531,7 +592,8 @@ static int aead_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 
+ free:
+ 	list_for_each_entry(rsgl, &areq->list, list) {
+-		af_alg_free_sg(&rsgl->sgl);
++		if (rsgl->new_page)
++			af_alg_free_sg(&rsgl->sgl);
+ 		if (rsgl != &areq->first_rsgl)
+ 			sock_kfree_s(sk, rsgl, sizeof(*rsgl));
+ 	}
+@@ -545,6 +607,16 @@ static int aead_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 	return err ? err : outlen;
  }
  
--static inline u32 *desc_end(u32 *desc)
-+static inline u32 *desc_end(u32 * const desc)
++static inline int aead_get_rsgl_ctx(struct sock *sk, struct aead_ctx *ctx,
++				    struct aead_async_rsgl **ret)
++{
++	if (list_empty(&ctx->list)) {
++		*ret = &ctx->first_rsgl;
++		return 0;
++	} else
++		return aead_alloc_rsgl(sk, ret);
++}
++
+ static int aead_recvmsg_sync(struct socket *sock, struct msghdr *msg, int flags)
  {
- 	return desc + desc_len(desc);
- }
+ 	struct sock *sk = sock->sk;
+@@ -582,9 +654,6 @@ static int aead_recvmsg_sync(struct socket *sock, struct msghdr *msg, int flags)
+ 			goto unlock;
+ 	}
  
--static inline void *sh_desc_pdb(u32 *desc)
-+static inline void *sh_desc_pdb(u32 * const desc)
- {
- 	return desc + 1;
- }
+-	/* data length provided by caller via sendmsg/sendpage */
+-	used = ctx->used;
+-
+ 	/*
+ 	 * Make sure sufficient data is present -- note, the same check is
+ 	 * is also present in sendmsg/sendpage. The checks in sendpage/sendmsg
+@@ -598,6 +667,12 @@ static int aead_recvmsg_sync(struct socket *sock, struct msghdr *msg, int flags)
+ 		goto unlock;
  
--static inline void init_desc(u32 *desc, u32 options)
-+static inline void init_desc(u32 * const desc, u32 options)
- {
- 	*desc = cpu_to_caam32((options | HDR_ONE) + 1);
- }
+ 	/*
++	 * The cipher operation input data is reduced by the associated data
++	 * as the destination buffer will not hold the AAD.
++	 */
++	used = ctx->used - ctx->aead_assoclen;
++
++	/*
+ 	 * Calculate the minimum output buffer size holding the result of the
+ 	 * cipher operation. When encrypting data, the receiving buffer is
+ 	 * larger by the tag length compared to the input buffer as the
+@@ -611,25 +686,29 @@ static int aead_recvmsg_sync(struct socket *sock, struct msghdr *msg, int flags)
+ 		outlen = used - as;
  
--static inline void init_sh_desc(u32 *desc, u32 options)
-+static inline void init_sh_desc(u32 * const desc, u32 options)
- {
- 	PRINT_POS;
- 	init_desc(desc, CMD_SHARED_DESC_HDR | options);
- }
+ 	/*
+-	 * The cipher operation input data is reduced by the associated data
+-	 * length as this data is processed separately later on.
++	 * Pre-pend the AAD buffer from the source SGL to the destination SGL.
++	 * As the AAD buffer is not touched by the AEAD operation, the source
++	 * SG buffers remain unchanged.
+ 	 */
+-	used -= ctx->aead_assoclen;
++	err = aead_get_rsgl_ctx(sk, ctx, &rsgl);
++	if (err)
++		goto unlock;
++	list_add_tail(&rsgl->list, &ctx->list);
++	sg_init_table(rsgl->sgl.sg, ALG_MAX_PAGES);
++	rsgl->sgl.npages = scatterwalk_get_part(rsgl->sgl.sg, sgl->sg,
++						ctx->aead_assoclen,
++						ALG_MAX_PAGES);
++	rsgl->new_page = false;
++	last_rsgl = rsgl;
  
--static inline void init_sh_desc_pdb(u32 *desc, u32 options, size_t pdb_bytes)
-+static inline void init_sh_desc_pdb(u32 * const desc, u32 options,
-+				    size_t pdb_bytes)
- {
- 	u32 pdb_len = (pdb_bytes + CAAM_CMD_SZ - 1) / CAAM_CMD_SZ;
+ 	/* convert iovecs of output buffers into scatterlists */
+ 	while (outlen > usedpages && iov_iter_count(&msg->msg_iter)) {
+ 		size_t seglen = min_t(size_t, iov_iter_count(&msg->msg_iter),
+ 				      (outlen - usedpages));
  
-@@ -72,19 +73,20 @@ static inline void init_sh_desc_pdb(u32 *desc, u32 options, size_t pdb_bytes)
- 		     options);
- }
+-		if (list_empty(&ctx->list)) {
+-			rsgl = &ctx->first_rsgl;
+-		} else {
+-			rsgl = sock_kmalloc(sk, sizeof(*rsgl), GFP_KERNEL);
+-			if (unlikely(!rsgl)) {
+-				err = -ENOMEM;
+-				goto unlock;
+-			}
+-		}
++		err = aead_get_rsgl_ctx(sk, ctx, &rsgl);
++		if (err)
++			goto unlock;
+ 		rsgl->sgl.npages = 0;
+ 		list_add_tail(&rsgl->list, &ctx->list);
  
--static inline void init_job_desc(u32 *desc, u32 options)
-+static inline void init_job_desc(u32 * const desc, u32 options)
- {
- 	init_desc(desc, CMD_DESC_HDR | options);
- }
+@@ -637,7 +716,10 @@ static int aead_recvmsg_sync(struct socket *sock, struct msghdr *msg, int flags)
+ 		err = af_alg_make_sg(&rsgl->sgl, &msg->msg_iter, seglen);
+ 		if (err < 0)
+ 			goto unlock;
++
+ 		usedpages += err;
++		rsgl->new_page = true;
++
+ 		/* chain the new scatterlist with previous one */
+ 		if (last_rsgl)
+ 			af_alg_link_sg(&last_rsgl->sgl, &rsgl->sgl);
+@@ -688,7 +770,8 @@ static int aead_recvmsg_sync(struct socket *sock, struct msghdr *msg, int flags)
  
--static inline void init_job_desc_pdb(u32 *desc, u32 options, size_t pdb_bytes)
-+static inline void init_job_desc_pdb(u32 * const desc, u32 options,
-+				     size_t pdb_bytes)
- {
- 	u32 pdb_len = (pdb_bytes + CAAM_CMD_SZ - 1) / CAAM_CMD_SZ;
- 
- 	init_job_desc(desc, (((pdb_len + 1) << HDR_START_IDX_SHIFT)) | options);
- }
- 
--static inline void append_ptr(u32 *desc, dma_addr_t ptr)
-+static inline void append_ptr(u32 * const desc, dma_addr_t ptr)
- {
- 	dma_addr_t *offset = (dma_addr_t *)desc_end(desc);
- 
-@@ -94,8 +96,8 @@ static inline void append_ptr(u32 *desc, dma_addr_t ptr)
- 				CAAM_PTR_SZ / CAAM_CMD_SZ);
- }
- 
--static inline void init_job_desc_shared(u32 *desc, dma_addr_t ptr, int len,
--					u32 options)
-+static inline void init_job_desc_shared(u32 * const desc, dma_addr_t ptr,
-+					int len, u32 options)
- {
- 	PRINT_POS;
- 	init_job_desc(desc, HDR_SHARED | options |
-@@ -103,7 +105,7 @@ static inline void init_job_desc_shared(u32 *desc, dma_addr_t ptr, int len,
- 	append_ptr(desc, ptr);
- }
- 
--static inline void append_data(u32 *desc, void *data, int len)
-+static inline void append_data(u32 * const desc, void *data, int len)
- {
- 	u32 *offset = desc_end(desc);
- 
-@@ -114,7 +116,7 @@ static inline void append_data(u32 *desc, void *data, int len)
- 				(len + CAAM_CMD_SZ - 1) / CAAM_CMD_SZ);
- }
- 
--static inline void append_cmd(u32 *desc, u32 command)
-+static inline void append_cmd(u32 * const desc, u32 command)
- {
- 	u32 *cmd = desc_end(desc);
- 
-@@ -125,7 +127,7 @@ static inline void append_cmd(u32 *desc, u32 command)
- 
- #define append_u32 append_cmd
- 
--static inline void append_u64(u32 *desc, u64 data)
-+static inline void append_u64(u32 * const desc, u64 data)
- {
- 	u32 *offset = desc_end(desc);
- 
-@@ -142,14 +144,14 @@ static inline void append_u64(u32 *desc, u64 data)
- }
- 
- /* Write command without affecting header, and return pointer to next word */
--static inline u32 *write_cmd(u32 *desc, u32 command)
-+static inline u32 *write_cmd(u32 * const desc, u32 command)
- {
- 	*desc = cpu_to_caam32(command);
- 
- 	return desc + 1;
- }
- 
--static inline void append_cmd_ptr(u32 *desc, dma_addr_t ptr, int len,
-+static inline void append_cmd_ptr(u32 * const desc, dma_addr_t ptr, int len,
- 				  u32 command)
- {
- 	append_cmd(desc, command | len);
-@@ -157,7 +159,7 @@ static inline void append_cmd_ptr(u32 *desc, dma_addr_t ptr, int len,
- }
- 
- /* Write length after pointer, rather than inside command */
--static inline void append_cmd_ptr_extlen(u32 *desc, dma_addr_t ptr,
-+static inline void append_cmd_ptr_extlen(u32 * const desc, dma_addr_t ptr,
- 					 unsigned int len, u32 command)
- {
- 	append_cmd(desc, command);
-@@ -166,7 +168,7 @@ static inline void append_cmd_ptr_extlen(u32 *desc, dma_addr_t ptr,
- 	append_cmd(desc, len);
- }
- 
--static inline void append_cmd_data(u32 *desc, void *data, int len,
-+static inline void append_cmd_data(u32 * const desc, void *data, int len,
- 				   u32 command)
- {
- 	append_cmd(desc, command | IMMEDIATE | len);
-@@ -174,7 +176,7 @@ static inline void append_cmd_data(u32 *desc, void *data, int len,
- }
- 
- #define APPEND_CMD_RET(cmd, op) \
--static inline u32 *append_##cmd(u32 *desc, u32 options) \
-+static inline u32 *append_##cmd(u32 * const desc, u32 options) \
- { \
- 	u32 *cmd = desc_end(desc); \
- 	PRINT_POS; \
-@@ -184,13 +186,13 @@ static inline u32 *append_##cmd(u32 *desc, u32 options) \
- APPEND_CMD_RET(jump, JUMP)
- APPEND_CMD_RET(move, MOVE)
- 
--static inline void set_jump_tgt_here(u32 *desc, u32 *jump_cmd)
-+static inline void set_jump_tgt_here(u32 * const desc, u32 *jump_cmd)
- {
- 	*jump_cmd = cpu_to_caam32(caam32_to_cpu(*jump_cmd) |
- 				  (desc_len(desc) - (jump_cmd - desc)));
- }
- 
--static inline void set_move_tgt_here(u32 *desc, u32 *move_cmd)
-+static inline void set_move_tgt_here(u32 * const desc, u32 *move_cmd)
- {
- 	u32 val = caam32_to_cpu(*move_cmd);
- 
-@@ -200,7 +202,7 @@ static inline void set_move_tgt_here(u32 *desc, u32 *move_cmd)
- }
- 
- #define APPEND_CMD(cmd, op) \
--static inline void append_##cmd(u32 *desc, u32 options) \
-+static inline void append_##cmd(u32 * const desc, u32 options) \
- { \
- 	PRINT_POS; \
- 	append_cmd(desc, CMD_##op | options); \
-@@ -208,7 +210,8 @@ static inline void append_##cmd(u32 *desc, u32 options) \
- APPEND_CMD(operation, OPERATION)
- 
- #define APPEND_CMD_LEN(cmd, op) \
--static inline void append_##cmd(u32 *desc, unsigned int len, u32 options) \
-+static inline void append_##cmd(u32 * const desc, unsigned int len, \
-+				u32 options) \
- { \
- 	PRINT_POS; \
- 	append_cmd(desc, CMD_##op | len | options); \
-@@ -220,8 +223,8 @@ APPEND_CMD_LEN(seq_fifo_load, SEQ_FIFO_LOAD)
- APPEND_CMD_LEN(seq_fifo_store, SEQ_FIFO_STORE)
- 
- #define APPEND_CMD_PTR(cmd, op) \
--static inline void append_##cmd(u32 *desc, dma_addr_t ptr, unsigned int len, \
--				u32 options) \
-+static inline void append_##cmd(u32 * const desc, dma_addr_t ptr, \
-+				unsigned int len, u32 options) \
- { \
- 	PRINT_POS; \
- 	append_cmd_ptr(desc, ptr, len, CMD_##op | options); \
-@@ -231,8 +234,8 @@ APPEND_CMD_PTR(load, LOAD)
- APPEND_CMD_PTR(fifo_load, FIFO_LOAD)
- APPEND_CMD_PTR(fifo_store, FIFO_STORE)
- 
--static inline void append_store(u32 *desc, dma_addr_t ptr, unsigned int len,
--				u32 options)
-+static inline void append_store(u32 * const desc, dma_addr_t ptr,
-+				unsigned int len, u32 options)
- {
- 	u32 cmd_src;
- 
-@@ -249,7 +252,8 @@ static inline void append_store(u32 *desc, dma_addr_t ptr, unsigned int len,
- }
- 
- #define APPEND_SEQ_PTR_INTLEN(cmd, op) \
--static inline void append_seq_##cmd##_ptr_intlen(u32 *desc, dma_addr_t ptr, \
-+static inline void append_seq_##cmd##_ptr_intlen(u32 * const desc, \
-+						 dma_addr_t ptr, \
- 						 unsigned int len, \
- 						 u32 options) \
- { \
-@@ -263,7 +267,7 @@ APPEND_SEQ_PTR_INTLEN(in, IN)
- APPEND_SEQ_PTR_INTLEN(out, OUT)
- 
- #define APPEND_CMD_PTR_TO_IMM(cmd, op) \
--static inline void append_##cmd##_as_imm(u32 *desc, void *data, \
-+static inline void append_##cmd##_as_imm(u32 * const desc, void *data, \
- 					 unsigned int len, u32 options) \
- { \
- 	PRINT_POS; \
-@@ -273,7 +277,7 @@ APPEND_CMD_PTR_TO_IMM(load, LOAD);
- APPEND_CMD_PTR_TO_IMM(fifo_load, FIFO_LOAD);
- 
- #define APPEND_CMD_PTR_EXTLEN(cmd, op) \
--static inline void append_##cmd##_extlen(u32 *desc, dma_addr_t ptr, \
-+static inline void append_##cmd##_extlen(u32 * const desc, dma_addr_t ptr, \
- 					 unsigned int len, u32 options) \
- { \
- 	PRINT_POS; \
-@@ -287,7 +291,7 @@ APPEND_CMD_PTR_EXTLEN(seq_out_ptr, SEQ_OUT_PTR)
-  * the size of its type
-  */
- #define APPEND_CMD_PTR_LEN(cmd, op, type) \
--static inline void append_##cmd(u32 *desc, dma_addr_t ptr, \
-+static inline void append_##cmd(u32 * const desc, dma_addr_t ptr, \
- 				type len, u32 options) \
- { \
- 	PRINT_POS; \
-@@ -304,7 +308,7 @@ APPEND_CMD_PTR_LEN(seq_out_ptr, SEQ_OUT_PTR, u32)
-  * from length of immediate data provided, e.g., split keys
-  */
- #define APPEND_CMD_PTR_TO_IMM2(cmd, op) \
--static inline void append_##cmd##_as_imm(u32 *desc, void *data, \
-+static inline void append_##cmd##_as_imm(u32 * const desc, void *data, \
- 					 unsigned int data_len, \
- 					 unsigned int len, u32 options) \
- { \
-@@ -315,7 +319,7 @@ static inline void append_##cmd##_as_imm(u32 *desc, void *data, \
- APPEND_CMD_PTR_TO_IMM2(key, KEY);
- 
- #define APPEND_CMD_RAW_IMM(cmd, op, type) \
--static inline void append_##cmd##_imm_##type(u32 *desc, type immediate, \
-+static inline void append_##cmd##_imm_##type(u32 * const desc, type immediate, \
- 					     u32 options) \
- { \
- 	PRINT_POS; \
--- 
-2.4.4
+ unlock:
+ 	list_for_each_entry_safe(rsgl, tmp, &ctx->list, list) {
+-		af_alg_free_sg(&rsgl->sgl);
++		if (rsgl->new_page)
++			af_alg_free_sg(&rsgl->sgl);
+ 		if (rsgl != &ctx->first_rsgl)
+ 			sock_kfree_s(sk, rsgl, sizeof(*rsgl));
+ 		list_del(&rsgl->list);
+
+--nextPart1892807.hz7V3SvfF6--
