@@ -1,7 +1,7 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 07/11] [media] rc: print correct variable for z8f0811
-Date: Thu, 10 Nov 2016 17:44:50 +0100
-Message-ID: <20161110164454.293477-8-arnd@arndb.de>
+Subject: [PATCH v2 02/11] NFSv4.1: work around -Wmaybe-uninitialized warning
+Date: Thu, 10 Nov 2016 17:44:45 +0100
+Message-ID: <20161110164454.293477-3-arnd@arndb.de>
 References: <20161110164454.293477-1-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -35,36 +35,50 @@ Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
 Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-A recent rework accidentally left a debugging printk untouched
-while changing the meaning of the variables, leading to an
-uninitialized variable being printed:
+A bugfix introduced a harmless gcc warning in nfs4_slot_seqid_in_use
+if we enable -Wmaybe-uninitialized again:
 
-drivers/media/i2c/ir-kbd-i2c.c: In function 'get_key_haup_common':
-drivers/media/i2c/ir-kbd-i2c.c:62:2: error: 'toggle' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+fs/nfs/nfs4session.c:203:54: error: 'cur_seq' may be used uninitialized in this function [-Werror=maybe-uninitialized]
 
-This prints the correct one instead, as we did before the patch.
+gcc is not smart enough to conclude that the IS_ERR/PTR_ERR pair
+results in a nonzero return value here. Using PTR_ERR_OR_ZERO()
+instead makes this clear to the compiler.
 
-Fixes: 00bb820755ed ("[media] rc: Hauppauge z8f0811 can decode RC6")
+Fixes: e09c978aae5b ("NFSv4.1: Fix Oopsable condition in server callback races")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/media/i2c/ir-kbd-i2c.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+First submitted on Aug 31, but ended up not getting applied then
+as the warning was disabled in v4.8-rc
 
-I submitted this repeatedly as it is a v4.9 regression, but
-I never saw a reply for it.
+Anna Schumaker said at the kernel summit that she had applied
+it and would send it for 4.9, but as of 2016-11-09 it has not
+made it into linux-next.
 
-diff --git a/drivers/media/i2c/ir-kbd-i2c.c b/drivers/media/i2c/ir-kbd-i2c.c
-index f95a6bc..cede397 100644
---- a/drivers/media/i2c/ir-kbd-i2c.c
-+++ b/drivers/media/i2c/ir-kbd-i2c.c
-@@ -118,7 +118,7 @@ static int get_key_haup_common(struct IR_i2c *ir, enum rc_type *protocol,
- 			*protocol = RC_TYPE_RC6_MCE;
- 			dev &= 0x7f;
- 			dprintk(1, "ir hauppauge (rc6-mce): t%d vendor=%d dev=%d code=%d\n",
--						toggle, vendor, dev, code);
-+						*ptoggle, vendor, dev, code);
- 		} else {
- 			*ptoggle = 0;
- 			*protocol = RC_TYPE_RC6_6A_32;
+ fs/nfs/nfs4session.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/fs/nfs/nfs4session.c b/fs/nfs/nfs4session.c
+index b629730..150c5a1 100644
+--- a/fs/nfs/nfs4session.c
++++ b/fs/nfs/nfs4session.c
+@@ -178,12 +178,14 @@ static int nfs4_slot_get_seqid(struct nfs4_slot_table  *tbl, u32 slotid,
+ 	__must_hold(&tbl->slot_tbl_lock)
+ {
+ 	struct nfs4_slot *slot;
++	int ret;
+ 
+ 	slot = nfs4_lookup_slot(tbl, slotid);
+-	if (IS_ERR(slot))
+-		return PTR_ERR(slot);
+-	*seq_nr = slot->seq_nr;
+-	return 0;
++	ret = PTR_ERR_OR_ZERO(slot);
++	if (!ret)
++		*seq_nr = slot->seq_nr;
++
++	return ret;
+ }
+ 
+ /*
 -- 
 2.9.0
