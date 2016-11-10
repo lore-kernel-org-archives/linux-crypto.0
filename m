@@ -1,84 +1,347 @@
-From: Harsh Jain <Harsh@chelsio.com>
-Subject: Re: [PATCH 6/6] Add support for AEAD algos.
-Date: Thu, 10 Nov 2016 10:30:36 +0530
-Message-ID: <069a211a-1f35-c6bc-7d5e-f0fd59e258a4@chelsio.com>
-References: <cover.1476263960.git.harsh@chelsio.com>
- <3617075.SV0YkRBZ96@positron.chronox.de>
- <ab295a27-cb83-0ee7-0cf1-03d7c05b20c5@chelsio.com>
- <46208469.tzXHy1sfql@positron.chronox.de>
- <25e12af5-190d-8204-0d5e-bf9a7fd190c9@chelsio.com>
+From: Marcelo Cerri <marcelo.cerri@canonical.com>
+Subject: Re: [PATCH 10/16] crypto: testmgr - Do not test internal algorithms
+Date: Thu, 10 Nov 2016 09:32:33 -0200
+Message-ID: <20161110113233.GE16556@gallifrey>
+References: <20161101231648.GA15967@gondor.apana.org.au>
+ <E1c1iKm-0004DQ-A4@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: dan.carpenter@oracle.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, jlulla@chelsio.com,
-        atul.gupta@chelsio.com, yeshaswi@chelsio.com,
-        hariprasad@chelsio.com
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="maH1Gajj2nflutpK"
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:12939 "EHLO l.chelsio.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750770AbcKJFAw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Nov 2016 00:00:52 -0500
-In-Reply-To: <25e12af5-190d-8204-0d5e-bf9a7fd190c9@chelsio.com>
+Received: from mail-qk0-f178.google.com ([209.85.220.178]:33776 "EHLO
+        mail-qk0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755040AbcKJLcj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Nov 2016 06:32:39 -0500
+Received: by mail-qk0-f178.google.com with SMTP id x190so289857975qkb.0
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Nov 2016 03:32:38 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <E1c1iKm-0004DQ-A4@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
+--maH1Gajj2nflutpK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 08-11-2016 19:51, Harsh Jain wrote:
->
-> On 08-11-2016 18:29, Stephan Mueller wrote:
->> Am Dienstag, 8. November 2016, 17:16:38 CET schrieb Harsh Jain:
->>
->> Hi Harsh,
->>
->>> On 08-11-2016 16:45, Stephan Mueller wrote:
->>>> Am Donnerstag, 27. Oktober 2016, 15:36:08 CET schrieb Harsh Jain:
->>>>
->>>> Hi Harsh,
->>>>
->>>>>>> +static void chcr_verify_tag(struct aead_request *req, u8 *input, int
->>>>>>> *err)
->>>>>>> +{
->>>>>>> +	u8 temp[SHA512_DIGEST_SIZE];
->>>>>>> +	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
->>>>>>> +	int authsize = crypto_aead_authsize(tfm);
->>>>>>> +	struct cpl_fw6_pld *fw6_pld;
->>>>>>> +	int cmp = 0;
->>>>>>> +
->>>>>>> +	fw6_pld = (struct cpl_fw6_pld *)input;
->>>>>>> +	if ((get_aead_subtype(tfm) == CRYPTO_ALG_SUB_TYPE_AEAD_RFC4106) ||
->>>>>>> +	    (get_aead_subtype(tfm) == CRYPTO_ALG_SUB_TYPE_AEAD_GCM)) {
->>>>>>> +		cmp = memcmp(&fw6_pld->data[2], (fw6_pld + 1), authsize);
->>>>>>> +	} else {
->>>>>>> +
->>>>>>> +		sg_pcopy_to_buffer(req->src, sg_nents(req->src), temp,
->>>>>>> +				authsize, req->assoclen +
->>>>>>> +				req->cryptlen - authsize);
->>>>>> I am wondering whether the math is correct here in any case. It is
->>>>>> permissible that we have an AAD size of 0 and even a zero-sized
->>>>>> ciphertext. How is such scenario covered here?
->>>>> Here we are trying to copy user supplied tag to local buffer(temp) for
->>>>> decrypt operation only. relative index of tag in src sg list will not
->>>>> change when AAD is zero and in decrypt operation cryptlen > authsize.
->>>> I am just wondering where this is checked. Since all of these
->>>> implementations are directly accessible from unprivileged user space, we
->>>> should be careful.
->>> chcr_verify_tag() will be called when req->verify is set to "VERIFY_SW", 
->>> same will set in decrypt callback function of Algo(like chcr_aead_decrypt)
->>> only. It will ensure calling of chcr_verify_tag() in de-crypt operation
->>> only.
->> I think that limiting to the decryption path may not be enough. What happens 
->> if a caller sets some assoclen, but when invoking the decryption operation it 
->> provides input data that is smaller than the assoclen? The API allows this 
->> scenario.
-> If I understand correctly, in this case passed sg list will be smaller. We should return with error -EINVAL at entry point only (like create_gcm_wr), control should not reach to chcr_verify_tag().
-I had a look in software implementation for check related to aad len > src sg list.  I doubt same is not handled in software also. See  below
-                In "crypto_authenc_encrypt" if assoclen passed to "scatterwalk_ffwd" is greater than src. It may panic with NULL pointer exception.
+I tested this patch and it's working fine.
 
- I will add  this check in V2 of chcr driver.
+--=20
+Regards,
+Marcelo
 
->
->> Ciao
->> Stephan
+On Wed, Nov 02, 2016 at 07:19:12AM +0800, Herbert Xu wrote:
+> Currently we manually filter out internal algorithms using a list
+> in testmgr.  This is dangerous as internal algorithms cannot be
+> safely used even by testmgr.  This patch ensures that they're never
+> processed by testmgr at all.
+>=20
+> This patch also removes an obsolete bypass for nivciphers which
+> no longer exist.
+>=20
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+>=20
+>  crypto/algboss.c |    8 --
+>  crypto/testmgr.c |  153 +++---------------------------------------------=
+-------
+>  2 files changed, 11 insertions(+), 150 deletions(-)
+>=20
+> diff --git a/crypto/algboss.c b/crypto/algboss.c
+> index 6e39d9c..ccb85e1 100644
+> --- a/crypto/algboss.c
+> +++ b/crypto/algboss.c
+> @@ -247,12 +247,8 @@ static int cryptomgr_schedule_test(struct crypto_alg=
+ *alg)
+>  	memcpy(param->alg, alg->cra_name, sizeof(param->alg));
+>  	type =3D alg->cra_flags;
+> =20
+> -	/* This piece of crap needs to disappear into per-type test hooks. */
+> -	if (!((type ^ CRYPTO_ALG_TYPE_BLKCIPHER) &
+> -	      CRYPTO_ALG_TYPE_BLKCIPHER_MASK) && !(type & CRYPTO_ALG_GENIV) &&
+> -	    ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) =3D=3D
+> -	     CRYPTO_ALG_TYPE_BLKCIPHER ? alg->cra_blkcipher.ivsize :
+> -					 alg->cra_ablkcipher.ivsize))
+> +	/* Do not test internal algorithms. */
+> +	if (type & CRYPTO_ALG_INTERNAL)
+>  		type |=3D CRYPTO_ALG_TESTED;
+> =20
+>  	param->type =3D type;
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index ded50b6..6ac4696 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -1625,7 +1625,7 @@ static int alg_test_aead(const struct alg_test_desc=
+ *desc, const char *driver,
+>  	struct crypto_aead *tfm;
+>  	int err =3D 0;
+> =20
+> -	tfm =3D crypto_alloc_aead(driver, type | CRYPTO_ALG_INTERNAL, mask);
+> +	tfm =3D crypto_alloc_aead(driver, type, mask);
+>  	if (IS_ERR(tfm)) {
+>  		printk(KERN_ERR "alg: aead: Failed to load transform for %s: "
+>  		       "%ld\n", driver, PTR_ERR(tfm));
+> @@ -1654,7 +1654,7 @@ static int alg_test_cipher(const struct alg_test_de=
+sc *desc,
+>  	struct crypto_cipher *tfm;
+>  	int err =3D 0;
+> =20
+> -	tfm =3D crypto_alloc_cipher(driver, type | CRYPTO_ALG_INTERNAL, mask);
+> +	tfm =3D crypto_alloc_cipher(driver, type, mask);
+>  	if (IS_ERR(tfm)) {
+>  		printk(KERN_ERR "alg: cipher: Failed to load transform for "
+>  		       "%s: %ld\n", driver, PTR_ERR(tfm));
+> @@ -1683,7 +1683,7 @@ static int alg_test_skcipher(const struct alg_test_=
+desc *desc,
+>  	struct crypto_skcipher *tfm;
+>  	int err =3D 0;
+> =20
+> -	tfm =3D crypto_alloc_skcipher(driver, type | CRYPTO_ALG_INTERNAL, mask);
+> +	tfm =3D crypto_alloc_skcipher(driver, type, mask);
+>  	if (IS_ERR(tfm)) {
+>  		printk(KERN_ERR "alg: skcipher: Failed to load transform for "
+>  		       "%s: %ld\n", driver, PTR_ERR(tfm));
+> @@ -1750,7 +1750,7 @@ static int alg_test_hash(const struct alg_test_desc=
+ *desc, const char *driver,
+>  	struct crypto_ahash *tfm;
+>  	int err;
+> =20
+> -	tfm =3D crypto_alloc_ahash(driver, type | CRYPTO_ALG_INTERNAL, mask);
+> +	tfm =3D crypto_alloc_ahash(driver, type, mask);
+>  	if (IS_ERR(tfm)) {
+>  		printk(KERN_ERR "alg: hash: Failed to load transform for %s: "
+>  		       "%ld\n", driver, PTR_ERR(tfm));
+> @@ -1778,7 +1778,7 @@ static int alg_test_crc32c(const struct alg_test_de=
+sc *desc,
+>  	if (err)
+>  		goto out;
+> =20
+> -	tfm =3D crypto_alloc_shash(driver, type | CRYPTO_ALG_INTERNAL, mask);
+> +	tfm =3D crypto_alloc_shash(driver, type, mask);
+>  	if (IS_ERR(tfm)) {
+>  		printk(KERN_ERR "alg: crc32c: Failed to load transform for %s: "
+>  		       "%ld\n", driver, PTR_ERR(tfm));
+> @@ -1820,7 +1820,7 @@ static int alg_test_cprng(const struct alg_test_des=
+c *desc, const char *driver,
+>  	struct crypto_rng *rng;
+>  	int err;
+> =20
+> -	rng =3D crypto_alloc_rng(driver, type | CRYPTO_ALG_INTERNAL, mask);
+> +	rng =3D crypto_alloc_rng(driver, type, mask);
+>  	if (IS_ERR(rng)) {
+>  		printk(KERN_ERR "alg: cprng: Failed to load transform for %s: "
+>  		       "%ld\n", driver, PTR_ERR(rng));
+> @@ -1847,7 +1847,7 @@ static int drbg_cavs_test(struct drbg_testvec *test=
+, int pr,
+>  	if (!buf)
+>  		return -ENOMEM;
+> =20
+> -	drng =3D crypto_alloc_rng(driver, type | CRYPTO_ALG_INTERNAL, mask);
+> +	drng =3D crypto_alloc_rng(driver, type, mask);
+>  	if (IS_ERR(drng)) {
+>  		printk(KERN_ERR "alg: drbg: could not allocate DRNG handle for "
+>  		       "%s\n", driver);
+> @@ -2041,7 +2041,7 @@ static int alg_test_kpp(const struct alg_test_desc =
+*desc, const char *driver,
+>  	struct crypto_kpp *tfm;
+>  	int err =3D 0;
+> =20
+> -	tfm =3D crypto_alloc_kpp(driver, type | CRYPTO_ALG_INTERNAL, mask);
+> +	tfm =3D crypto_alloc_kpp(driver, type, mask);
+>  	if (IS_ERR(tfm)) {
+>  		pr_err("alg: kpp: Failed to load tfm for %s: %ld\n",
+>  		       driver, PTR_ERR(tfm));
+> @@ -2200,7 +2200,7 @@ static int alg_test_akcipher(const struct alg_test_=
+desc *desc,
+>  	struct crypto_akcipher *tfm;
+>  	int err =3D 0;
+> =20
+> -	tfm =3D crypto_alloc_akcipher(driver, type | CRYPTO_ALG_INTERNAL, mask);
+> +	tfm =3D crypto_alloc_akcipher(driver, type, mask);
+>  	if (IS_ERR(tfm)) {
+>  		pr_err("alg: akcipher: Failed to load tfm for %s: %ld\n",
+>  		       driver, PTR_ERR(tfm));
+> @@ -2223,88 +2223,6 @@ static int alg_test_null(const struct alg_test_des=
+c *desc,
+>  /* Please keep this list sorted by algorithm name. */
+>  static const struct alg_test_desc alg_test_descs[] =3D {
+>  	{
+> -		.alg =3D "__cbc-cast5-avx",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__cbc-cast6-avx",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__cbc-serpent-avx",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__cbc-serpent-avx2",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__cbc-serpent-sse2",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__cbc-twofish-avx",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-cbc-aes-aesni",
+> -		.test =3D alg_test_null,
+> -		.fips_allowed =3D 1,
+> -	}, {
+> -		.alg =3D "__driver-cbc-camellia-aesni",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-cbc-camellia-aesni-avx2",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-cbc-cast5-avx",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-cbc-cast6-avx",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-cbc-serpent-avx",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-cbc-serpent-avx2",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-cbc-serpent-sse2",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-cbc-twofish-avx",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-ecb-aes-aesni",
+> -		.test =3D alg_test_null,
+> -		.fips_allowed =3D 1,
+> -	}, {
+> -		.alg =3D "__driver-ecb-camellia-aesni",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-ecb-camellia-aesni-avx2",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-ecb-cast5-avx",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-ecb-cast6-avx",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-ecb-serpent-avx",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-ecb-serpent-avx2",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-ecb-serpent-sse2",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-ecb-twofish-avx",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "__driver-gcm-aes-aesni",
+> -		.test =3D alg_test_null,
+> -		.fips_allowed =3D 1,
+> -	}, {
+> -		.alg =3D "__ghash-pclmulqdqni",
+> -		.test =3D alg_test_null,
+> -		.fips_allowed =3D 1,
+> -	}, {
+>  		.alg =3D "ansi_cprng",
+>  		.test =3D alg_test_cprng,
+>  		.suite =3D {
+> @@ -2791,55 +2709,6 @@ static int alg_test_null(const struct alg_test_des=
+c *desc,
+>  			}
+>  		}
+>  	}, {
+> -		.alg =3D "cryptd(__driver-cbc-aes-aesni)",
+> -		.test =3D alg_test_null,
+> -		.fips_allowed =3D 1,
+> -	}, {
+> -		.alg =3D "cryptd(__driver-cbc-camellia-aesni)",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "cryptd(__driver-cbc-camellia-aesni-avx2)",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "cryptd(__driver-cbc-serpent-avx2)",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "cryptd(__driver-ecb-aes-aesni)",
+> -		.test =3D alg_test_null,
+> -		.fips_allowed =3D 1,
+> -	}, {
+> -		.alg =3D "cryptd(__driver-ecb-camellia-aesni)",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "cryptd(__driver-ecb-camellia-aesni-avx2)",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "cryptd(__driver-ecb-cast5-avx)",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "cryptd(__driver-ecb-cast6-avx)",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "cryptd(__driver-ecb-serpent-avx)",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "cryptd(__driver-ecb-serpent-avx2)",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "cryptd(__driver-ecb-serpent-sse2)",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "cryptd(__driver-ecb-twofish-avx)",
+> -		.test =3D alg_test_null,
+> -	}, {
+> -		.alg =3D "cryptd(__driver-gcm-aes-aesni)",
+> -		.test =3D alg_test_null,
+> -		.fips_allowed =3D 1,
+> -	}, {
+> -		.alg =3D "cryptd(__ghash-pclmulqdqni)",
+> -		.test =3D alg_test_null,
+> -		.fips_allowed =3D 1,
+> -	}, {
+>  		.alg =3D "ctr(aes)",
+>  		.test =3D alg_test_skcipher,
+>  		.fips_allowed =3D 1,
+> @@ -3166,10 +3035,6 @@ static int alg_test_null(const struct alg_test_des=
+c *desc,
+>  		.fips_allowed =3D 1,
+>  		.test =3D alg_test_null,
+>  	}, {
+> -		.alg =3D "ecb(__aes-aesni)",
+> -		.test =3D alg_test_null,
+> -		.fips_allowed =3D 1,
+> -	}, {
+>  		.alg =3D "ecb(aes)",
+>  		.test =3D alg_test_skcipher,
+>  		.fips_allowed =3D 1,
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+--maH1Gajj2nflutpK
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAABCAAGBQJYJFrRAAoJEM8aS8c01e1HcrwH+wWpRi3Lmzz9zuIRJBryXJb1
+yXFblPIWr2v35WOSIkoF6gnknfmLt9bdpFyXq8/YkO5lnVTI3GxUvAzxX1sYpwS6
+W/QSzwZL+GnqRMoe1S3QpN1/Q80wkk8mSUrk9YjZ477jGrMDSv7fVsTGnRq7+WUg
+lUMBsVRDjVsBnCDj7I9Zjnu6qyWjfDAxfzvJWPNvJWtb6nLLbMQPLjWTbt8/wjh8
+pN3X2gEvwOkrPwkcB7F4Q7/7Me2xfjQwQvxd5sUHatcl2dmpChnQ62DvcSI04U+k
+ckPEqxjugXFQdTr9dsXuNE9iYh0W+0f/wJJlD998IgretGK+lu7KF7CBtjqXf5U=
+=cNa2
+-----END PGP SIGNATURE-----
+
+--maH1Gajj2nflutpK--
