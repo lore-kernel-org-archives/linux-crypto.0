@@ -1,76 +1,65 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 03/11] x86: apm: avoid uninitialized data
-Date: Thu, 10 Nov 2016 17:44:46 +0100
-Message-ID: <20161110164454.293477-4-arnd@arndb.de>
+Subject: [PATCH v2 04/11] nios2: fix timer initcall return value
+Date: Thu, 10 Nov 2016 17:44:47 +0100
+Message-ID: <20161110164454.293477-5-arnd@arndb.de>
 References: <20161110164454.293477-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Javier Martinez Canillas <javier@osg.samsung.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Ley Foon Tan <lftan@altera.com>,
-        "Luis R . Rodriguez" <mcgrof@kernel.org>,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michal Marek <mmarek@suse.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Sean Young <sean@mess.org>,
-        Sebastian Ott <sebott@linux.vnet.ibm.com>,
-        Trond Myklebust <trond.myklebust@primarydata.com>,
-        x86@kernel.org, linux-kbuild@vger.kernel
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Sean Young <sean@mess.org>,
+ Trond Myklebust <trond.myklebust@primarydata.com>, linux-s390@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, x86@kernel.org,
+ Sebastian Ott <sebott@linux.vnet.ibm.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Javier Martinez Canillas <javier@osg.samsung.com>,
+ Ilya Dryomov <idryomov@gmail.com>, linux-snps-arc@lists.infradead.org,
+ linux-media@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+ linux-kbuild@vger.kernel.org, Jiri Kosina <jikos@kernel.org>,
+ Michal Marek <mmarek@suse.com>, nios2-dev@lists.rocketboards.org,
+ Mauro Carvalho Chehab <mchehab@kernel.org>, linux-nfs@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Anna Schumaker <anna.schumaker@netapp.com>,
+ "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-crypto@vger.kernel.org,
+ Martin Schwidefsky <schwidefsky@de.ibm.com>, Ley Foon Tan <lftan@altera.com>,
+ Andrew Morton <akpm@linux-found
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <linux-kbuild-owner@vger.kernel.org>
+Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20161110164454.293477-1-arnd@arndb.de>
-Sender: linux-kbuild-owner@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
+List-Post: <mailto:linux-snps-arc@lists.infradead.org>
+List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
+Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-apm_bios_call() can fail, and return a status in its argument
-structure. If that status however is zero during a call from
-apm_get_power_status(), we end up using data that may have
-never been set, as reported by "gcc -Wmaybe-uninitialized":
+When called more than twice, the nios2_time_init() function
+return an uninitialized value, as detected by gcc -Wmaybe-uninitialized
 
-arch/x86/kernel/apm_32.c: In function ‘apm’:
-arch/x86/kernel/apm_32.c:1729:17: error: ‘bx’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-arch/x86/kernel/apm_32.c:1835:5: error: ‘cx’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-arch/x86/kernel/apm_32.c:1730:17: note: ‘cx’ was declared here
-arch/x86/kernel/apm_32.c:1842:27: error: ‘dx’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-arch/x86/kernel/apm_32.c:1731:17: note: ‘dx’ was declared here
+arch/nios2/kernel/time.c: warning: 'ret' may be used uninitialized in this function
 
-This changes the function to return "APM_NO_ERROR" here, which
-makes the code more robust to broken BIOS versions, and avoids
-the warning.
+This makes it return '0' here, matching the comment above the
+function.
 
+Acked-by: Ley Foon Tan <lftan@altera.com>
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Reviewed-by: Jiri Kosina <jkosina@suse.cz>
-Reviewed-by: Luis R. Rodriguez <mcgrof@kernel.org>
 ---
- arch/x86/kernel/apm_32.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/nios2/kernel/time.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/kernel/apm_32.c b/arch/x86/kernel/apm_32.c
-index c7364bd..51287cd 100644
---- a/arch/x86/kernel/apm_32.c
-+++ b/arch/x86/kernel/apm_32.c
-@@ -1042,8 +1042,11 @@ static int apm_get_power_status(u_short *status, u_short *bat, u_short *life)
+diff --git a/arch/nios2/kernel/time.c b/arch/nios2/kernel/time.c
+index d9563dd..746bf5c 100644
+--- a/arch/nios2/kernel/time.c
++++ b/arch/nios2/kernel/time.c
+@@ -324,6 +324,7 @@ static int __init nios2_time_init(struct device_node *timer)
+ 		ret = nios2_clocksource_init(timer);
+ 		break;
+ 	default:
++		ret = 0;
+ 		break;
+ 	}
  
- 	if (apm_info.get_power_status_broken)
- 		return APM_32_UNSUPPORTED;
--	if (apm_bios_call(&call))
-+	if (apm_bios_call(&call)) {
-+		if (!call.err)
-+			return APM_NO_ERROR;
- 		return call.err;
-+	}
- 	*status = call.ebx;
- 	*bat = call.ecx;
- 	if (apm_info.get_power_status_swabinminutes) {
 -- 
 2.9.0
-
