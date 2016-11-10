@@ -1,8 +1,8 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 09/11] [v3] infiniband: shut up a maybe-uninitialized
- warning
-Date: Thu, 10 Nov 2016 17:44:52 +0100
-Message-ID: <20161110164454.293477-10-arnd@arndb.de>
+Subject: [PATCH v2 01/11] Kbuild: enable -Wmaybe-uninitialized warning for
+ "make W=1"
+Date: Thu, 10 Nov 2016 17:44:44 +0100
+Message-ID: <20161110164454.293477-2-arnd@arndb.de>
 References: <20161110164454.293477-1-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -36,125 +36,150 @@ Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
 Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Some configurations produce this harmless warning when built with
-gcc -Wmaybe-uninitialized:
+Traditionally, we have always had warnings about uninitialized variables
+enabled, as this is part of -Wall, and generally a good idea [1], but it
+also always produced false positives, mainly because this is a variation
+of the halting problem and provably impossible to get right in all cases
+[2].
 
-infiniband/core/cma.c: In function 'cma_get_net_dev':
-infiniband/core/cma.c:1242:12: warning: 'src_addr_storage.sin_addr.s_addr' may be used uninitialized in this function [-Wmaybe-uninitialized]
+Various people have identified cases that are particularly bad for false
+positives, and in commit e74fc973b6e5 ("Turn off -Wmaybe-uninitialized
+when building with -Os"), I turned off the warning for any build that
+was done with CC_OPTIMIZE_FOR_SIZE.  This drastically reduced the number
+of false positive warnings in the default build but unfortunately had
+the side effect of turning the warning off completely in 'allmodconfig'
+builds, which in turn led to a lot of warnings (both actual bugs, and
+remaining false positives) to go in unnoticed.
 
-I previously reported this for the powerpc64 defconfig, but have now
-reproduced the same thing for x86 as well, using gcc-5 or higher.
+With commit 877417e6ffb9 ("Kbuild: change CC_OPTIMIZE_FOR_SIZE
+definition") enabled the warning again for allmodconfig builds in v4.7
+and in v4.8-rc1, I had finally managed to address all warnings I get in
+an ARM allmodconfig build and most other maybe-uninitialized warnings
+for ARM randconfig builds.
 
-The code looks correct to me, and this change just rearranges it
-by making sure we alway initialize the entire address structure
-to make the warning disappear. My first approach added an
-initialization at the time of the declaration, which Doug commented
-may be too costly, so I hope this version doesn't add overhead.
+However, commit 6e8d666e9253 ("Disable "maybe-uninitialized" warning
+globally") was merged at the same time and disabled it completely for
+all configurations, because of false-positive warnings on x86 that I had
+not addressed until then. This caused a lot of actual bugs to get merged
+into mainline, and I sent several dozen patches for these during the v4.9
+development cycle. Most of these are actual bugs, some are for correct
+code that is safe because it is only called under external constraints
+that make it impossible to run into the case that gcc sees, and in a
+few cases gcc is just stupid and finds something that can obviously
+never happen.
 
-Link: http://arm-soc.lixom.net/buildlogs/mainline/v4.7-rc6/buildall.powerpc.ppc64_defconfig.log.passed
-Link: https://patchwork.kernel.org/patch/9212825/
-Acked-by: Haggai Eran <haggaie@mellanox.com>
+I have now done a few thousand randconfig builds on x86 and collected all
+patches that I needed to address every single warning I got (I can provide
+the combined patch for the other warnings if anyone is interested),
+so I hope we can get the warning back and let people catch the actual
+bugs earlier.
+
+This reverts the change to disable the warning completely and for
+now brings it back at the "make W=1" level, so we can get it merged
+into mainline without introducing false positives. A follow-up
+patch enables it on all levels unless some configuration option
+turns it off because of false-positives.
+
+Link: https://rusty.ozlabs.org/?p=232 [1]
+Link: https://gcc.gnu.org/wiki/Better_Uninitialized_Warnings [2]
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-
 ---
-This is marked v2 as the rest of the series but is actually version
-three of the patch as I had to do some other changes already.
+ Makefile                   | 10 ++++++----
+ arch/arc/Makefile          |  4 +++-
+ scripts/Makefile.extrawarn |  3 +++
+ scripts/Makefile.ubsan     |  4 ++++
+ 4 files changed, 16 insertions(+), 5 deletions(-)
 
-v3: remove accidental leftover change of the original patch
-
- drivers/infiniband/core/cma.c | 54 ++++++++++++++++++++++---------------------
- 1 file changed, 28 insertions(+), 26 deletions(-)
-
-diff --git a/drivers/infiniband/core/cma.c b/drivers/infiniband/core/cma.c
-index 36bf50e..89a6b05 100644
---- a/drivers/infiniband/core/cma.c
-+++ b/drivers/infiniband/core/cma.c
-@@ -1094,47 +1094,47 @@ static void cma_save_ib_info(struct sockaddr *src_addr,
- 	}
- }
+diff --git a/Makefile b/Makefile
+index f97f786..06e2b73 100644
+--- a/Makefile
++++ b/Makefile
+@@ -370,7 +370,7 @@ LDFLAGS_MODULE  =
+ CFLAGS_KERNEL	=
+ AFLAGS_KERNEL	=
+ LDFLAGS_vmlinux =
+-CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im
++CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im -Wno-maybe-uninitialized
+ CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
  
--static void cma_save_ip4_info(struct sockaddr *src_addr,
--			      struct sockaddr *dst_addr,
-+static void cma_save_ip4_info(struct sockaddr_in *src_addr,
-+			      struct sockaddr_in *dst_addr,
- 			      struct cma_hdr *hdr,
- 			      __be16 local_port)
- {
--	struct sockaddr_in *ip4;
--
- 	if (src_addr) {
--		ip4 = (struct sockaddr_in *)src_addr;
--		ip4->sin_family = AF_INET;
--		ip4->sin_addr.s_addr = hdr->dst_addr.ip4.addr;
--		ip4->sin_port = local_port;
-+		*src_addr = (struct sockaddr_in) {
-+			.sin_family = AF_INET,
-+			.sin_addr.s_addr = hdr->dst_addr.ip4.addr,
-+			.sin_port = local_port,
-+		};
- 	}
  
- 	if (dst_addr) {
--		ip4 = (struct sockaddr_in *)dst_addr;
--		ip4->sin_family = AF_INET;
--		ip4->sin_addr.s_addr = hdr->src_addr.ip4.addr;
--		ip4->sin_port = hdr->port;
-+		*dst_addr = (struct sockaddr_in) {
-+			.sin_family = AF_INET,
-+			.sin_addr.s_addr = hdr->src_addr.ip4.addr,
-+			.sin_port = hdr->port,
-+		};
- 	}
- }
+@@ -620,7 +620,6 @@ ARCH_CFLAGS :=
+ include arch/$(SRCARCH)/Makefile
  
--static void cma_save_ip6_info(struct sockaddr *src_addr,
--			      struct sockaddr *dst_addr,
-+static void cma_save_ip6_info(struct sockaddr_in6 *src_addr,
-+			      struct sockaddr_in6 *dst_addr,
- 			      struct cma_hdr *hdr,
- 			      __be16 local_port)
- {
--	struct sockaddr_in6 *ip6;
--
- 	if (src_addr) {
--		ip6 = (struct sockaddr_in6 *)src_addr;
--		ip6->sin6_family = AF_INET6;
--		ip6->sin6_addr = hdr->dst_addr.ip6;
--		ip6->sin6_port = local_port;
-+		*src_addr = (struct sockaddr_in6) {
-+			.sin6_family = AF_INET6,
-+			.sin6_addr = hdr->dst_addr.ip6,
-+			.sin6_port = local_port,
-+		};
- 	}
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
+-KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
  
- 	if (dst_addr) {
--		ip6 = (struct sockaddr_in6 *)dst_addr;
--		ip6->sin6_family = AF_INET6;
--		ip6->sin6_addr = hdr->src_addr.ip6;
--		ip6->sin6_port = hdr->port;
-+		*dst_addr = (struct sockaddr_in6) {
-+			.sin6_family = AF_INET6,
-+			.sin6_addr = hdr->src_addr.ip6,
-+			.sin6_port = hdr->port,
-+		};
- 	}
- }
+ ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
+@@ -629,15 +628,18 @@ KBUILD_CFLAGS	+= $(call cc-option,-fdata-sections,)
+ endif
  
-@@ -1159,10 +1159,12 @@ static int cma_save_ip_info(struct sockaddr *src_addr,
+ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+-KBUILD_CFLAGS	+= -Os
++KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
+ else
+ ifdef CONFIG_PROFILE_ALL_BRANCHES
+-KBUILD_CFLAGS	+= -O2
++KBUILD_CFLAGS	+= -O2 $(call cc-disable-warning,maybe-uninitialized,)
+ else
+ KBUILD_CFLAGS   += -O2
+ endif
+ endif
  
- 	switch (cma_get_ip_ver(hdr)) {
- 	case 4:
--		cma_save_ip4_info(src_addr, dst_addr, hdr, port);
-+		cma_save_ip4_info((struct sockaddr_in *)src_addr,
-+				  (struct sockaddr_in *)dst_addr, hdr, port);
- 		break;
- 	case 6:
--		cma_save_ip6_info(src_addr, dst_addr, hdr, port);
-+		cma_save_ip6_info((struct sockaddr_in6 *)src_addr,
-+				  (struct sockaddr_in6 *)dst_addr, hdr, port);
- 		break;
- 	default:
- 		return -EAFNOSUPPORT;
++KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
++			$(call cc-disable-warning,maybe-uninitialized,))
++
+ # Tell gcc to never replace conditional load with a non-conditional one
+ KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
+ 
+diff --git a/arch/arc/Makefile b/arch/arc/Makefile
+index 864adad..25f81a1 100644
+--- a/arch/arc/Makefile
++++ b/arch/arc/Makefile
+@@ -68,7 +68,9 @@ cflags-$(CONFIG_ARC_DW2_UNWIND)		+= -fasynchronous-unwind-tables $(cfi)
+ ifndef CONFIG_CC_OPTIMIZE_FOR_SIZE
+ # Generic build system uses -O2, we want -O3
+ # Note: No need to add to cflags-y as that happens anyways
+-ARCH_CFLAGS += -O3
++#
++# Disable the false maybe-uninitialized warings gcc spits out at -O3
++ARCH_CFLAGS += -O3 $(call cc-disable-warning,maybe-uninitialized,)
+ endif
+ 
+ # small data is default for elf32 tool-chain. If not usable, disable it
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index 53449a6..7fc2c5a 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -36,6 +36,7 @@ warning-2 += -Wshadow
+ warning-2 += $(call cc-option, -Wlogical-op)
+ warning-2 += $(call cc-option, -Wmissing-field-initializers)
+ warning-2 += $(call cc-option, -Wsign-compare)
++warning-2 += $(call cc-option, -Wmaybe-uninitialized)
+ 
+ warning-3 := -Wbad-function-cast
+ warning-3 += -Wcast-qual
+@@ -59,6 +60,8 @@ endif
+ KBUILD_CFLAGS += $(warning)
+ else
+ 
++KBUILD_CFLAGS += $(call cc-disable-warning, maybe-uninitialized)
++
+ ifeq ($(cc-name),clang)
+ KBUILD_CFLAGS += $(call cc-disable-warning, initializer-overrides)
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-value)
+diff --git a/scripts/Makefile.ubsan b/scripts/Makefile.ubsan
+index dd779c4..3b1b138 100644
+--- a/scripts/Makefile.ubsan
++++ b/scripts/Makefile.ubsan
+@@ -17,4 +17,8 @@ endif
+ ifdef CONFIG_UBSAN_NULL
+       CFLAGS_UBSAN += $(call cc-option, -fsanitize=null)
+ endif
++
++      # -fsanitize=* options makes GCC less smart than usual and
++      # increase number of 'maybe-uninitialized false-positives
++      CFLAGS_UBSAN += $(call cc-option, -Wno-maybe-uninitialized)
+ endif
 -- 
 2.9.0
