@@ -1,77 +1,79 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 11/11] Kbuild: enable -Wmaybe-uninitialized warnings by
- default
-Date: Thu, 10 Nov 2016 17:44:54 +0100
-Message-ID: <20161110164454.293477-12-arnd@arndb.de>
+Subject: [PATCH v2 08/11] crypto: aesni: shut up -Wmaybe-uninitialized warning
+Date: Thu, 10 Nov 2016 17:44:51 +0100
+Message-ID: <20161110164454.293477-9-arnd@arndb.de>
 References: <20161110164454.293477-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Sean Young <sean@mess.org>,
- Trond Myklebust <trond.myklebust@primarydata.com>, linux-s390@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>, x86@kernel.org,
- Sebastian Ott <sebott@linux.vnet.ibm.com>,
- Russell King <linux@armlinux.org.uk>,
- Javier Martinez Canillas <javier@osg.samsung.com>,
- Ilya Dryomov <idryomov@gmail.com>, linux-snps-arc@lists.infradead.org,
- linux-media@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
- linux-kbuild@vger.kernel.org, Jiri Kosina <jikos@kernel.org>,
- Michal Marek <mmarek@suse.com>, nios2-dev@lists.rocketboards.org,
- Mauro Carvalho Chehab <mchehab@kernel.org>, linux-nfs@vger.kernel.org,
- linux-kernel@vger.kernel.org, Anna Schumaker <anna.schumaker@netapp.com>,
- "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-crypto@vger.kernel.org,
- Martin Schwidefsky <schwidefsky@de.ibm.com>, Ley Foon Tan <lftan@altera.com>,
- Andrew Morton <akpm@linux-found
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Javier Martinez Canillas <javier@osg.samsung.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Ley Foon Tan <lftan@altera.com>,
+        "Luis R . Rodriguez" <mcgrof@kernel.org>,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michal Marek <mmarek@suse.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Sean Young <sean@mess.org>,
+        Sebastian Ott <sebott@linux.vnet.ibm.com>,
+        Trond Myklebust <trond.myklebust@primarydata.com>,
+        x86@kernel.org, linux-kbuild@vger.kernel
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20161110164454.293477-1-arnd@arndb.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
-List-Post: <mailto:linux-snps-arc@lists.infradead.org>
-List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
-Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Previously the warnings were added back at the W=1 level and above,
-this now turns them on again by default, assuming that we have addressed
-all warnings and again have a clean build for v4.10.
+The rfc4106 encrypy/decrypt helper functions cause an annoying
+false-positive warning in allmodconfig if we turn on
+-Wmaybe-uninitialized warnings again:
 
-I found a number of new warnings in linux-next already and submitted
-bugfixes for those. Hopefully they are caught by the 0day builder
-in the future as soon as this patch is merged.
+arch/x86/crypto/aesni-intel_glue.c: In function ‘helper_rfc4106_decrypt’:
+include/linux/scatterlist.h:67:31: warning: ‘dst_sg_walk.sg’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+
+The problem seems to be that the compiler doesn't track the state of the
+'one_entry_in_sg' variable across the kernel_fpu_begin/kernel_fpu_end
+section.
+
+This takes the easy way out by adding a bogus initialization, which
+should be harmless enough to get the patch into v4.9 so we can turn
+on this warning again by default without producing useless output.
+A follow-up patch for v4.10 rearranges the code to make the warning
+go away.
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
-Please check if there are any remaining warnings with this
-patch before applying.
+ arch/x86/crypto/aesni-intel_glue.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-The one known issue right now is commit 32cb7d27e65d ("iio:
-maxim_thermocouple: detect invalid storage size in read()"), which
-is currently in linux-next but not yet in mainline.
-
-There are a couple of warnings that I get with randconfig builds,
-and I have submitted patches for all of them at some point and
-will follow up on them to make sure they get addressed eventually.
----
- scripts/Makefile.extrawarn | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index 7fc2c5a..7c321a6 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -60,8 +60,6 @@ endif
- KBUILD_CFLAGS += $(warning)
- else
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 0ab5ee1..aa8b067 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -888,7 +888,7 @@ static int helper_rfc4106_encrypt(struct aead_request *req)
+ 	unsigned long auth_tag_len = crypto_aead_authsize(tfm);
+ 	u8 iv[16] __attribute__ ((__aligned__(AESNI_ALIGN)));
+ 	struct scatter_walk src_sg_walk;
+-	struct scatter_walk dst_sg_walk;
++	struct scatter_walk dst_sg_walk = {};
+ 	unsigned int i;
  
--KBUILD_CFLAGS += $(call cc-disable-warning, maybe-uninitialized)
--
- ifeq ($(cc-name),clang)
- KBUILD_CFLAGS += $(call cc-disable-warning, initializer-overrides)
- KBUILD_CFLAGS += $(call cc-disable-warning, unused-value)
+ 	/* Assuming we are supporting rfc4106 64-bit extended */
+@@ -968,7 +968,7 @@ static int helper_rfc4106_decrypt(struct aead_request *req)
+ 	u8 iv[16] __attribute__ ((__aligned__(AESNI_ALIGN)));
+ 	u8 authTag[16];
+ 	struct scatter_walk src_sg_walk;
+-	struct scatter_walk dst_sg_walk;
++	struct scatter_walk dst_sg_walk = {};
+ 	unsigned int i;
+ 
+ 	if (unlikely(req->assoclen != 16 && req->assoclen != 20))
 -- 
 2.9.0
