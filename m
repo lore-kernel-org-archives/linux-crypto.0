@@ -1,92 +1,67 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v2 00/11] getting back -Wmaybe-uninitialized
-Date: Fri, 11 Nov 2016 20:49:48 +0100
-Message-ID: <2695221.kyRJMsRMjs@wuerfel>
-References: <20161110164454.293477-1-arnd@arndb.de>
- <CA+55aFx_scFVFKU__TBmoffw_iHvrdAU2dj5u1WKfWJXAkS4QA@mail.gmail.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH] crypto: arm64/sha2: integrate OpenSSL implementations of
+ SHA256/SHA512
+Date: Fri, 11 Nov 2016 19:56:07 +0000
+Message-ID: <20161111195607.GB4457@arm.com>
+References: <1478872273-16382-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Sean Young <sean@mess.org>, sayli karnik <karniksayli1995@gmail.com>,
- Trond Myklebust <trond.myklebust@primarydata.com>,
- Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
- linux-s390 <linux-s390@vger.kernel.org>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- the arch/x86 maintainers <x86@kernel.org>,
- Sebastian Ott <sebott@linux.vnet.ibm.com>,
- Russell King <linux@armlinux.org.uk>,
- Javier Martinez Canillas <javier@osg.samsung.com>,
- Ilya Dryomov <idryomov@gmail.com>, arcml <linux-snps-arc@lists.infradead.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>,
- Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
- Jiri Kosina <jikos@kernel.org>, Mark Brown <broonie@kernel.org>,
- nios2-dev@lists.rocketboards.org, Mauro Carvalho Chehab <mchehab@kernel.org>,
- Linux NFS Mailing List <linux-nfs@vger.kernel.org>, gregkh@linuxfoundation.org,
- Linux Kernel Mailing List <linux
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
-In-Reply-To: <CA+55aFx_scFVFKU__TBmoffw_iHvrdAU2dj5u1WKfWJXAkS4QA@mail.gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
-List-Post: <mailto:linux-snps-arc@lists.infradead.org>
-List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
-Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        herbert@gondor.apana.org.au, catalin.marinas@arm.com,
+        appro@openssl.org, victor.chong@linaro.org,
+        daniel.thompson@linaro.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from foss.arm.com ([217.140.101.70]:52118 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934375AbcKKT4R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Nov 2016 14:56:17 -0500
+Content-Disposition: inline
+In-Reply-To: <1478872273-16382-1-git-send-email-ard.biesheuvel@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-T24gRnJpZGF5LCBOb3ZlbWJlciAxMSwgMjAxNiA5OjEzOjAwIEFNIENFVCBMaW51cyBUb3J2YWxk
-cyB3cm90ZToKPiBPbiBUaHUsIE5vdiAxMCwgMjAxNiBhdCA4OjQ0IEFNLCBBcm5kIEJlcmdtYW5u
-IDxhcm5kQGFybmRiLmRlPiB3cm90ZToKPiA+Cj4gPiBQbGVhc2UgbWVyZ2UgdGhlc2UgZGlyZWN0
-bHkgaWYgeW91IGFyZSBoYXBweSB3aXRoIHRoZSByZXN1bHQuCj4gCj4gSSB3aWxsIHRha2UgdGhp
-cy4KClRoYW5rcyBhIGxvdCEKIAo+IEkgZG8gc2VlIHR3byB3YXJuaW5ncywgYnV0IHRoZXkgYm90
-aCBzZWVtIHRvIGJlIHZhbGlkIGFuZCByZWNlbnQsCj4gdGhvdWdoLCBzbyBJIGhhdmUgbm8gaXNz
-dWVzIHdpdGggdGhlIHNwdXJpb3VzIGNhc2VzLgoKT2ssIGJvdGggb2YgdGhlbSBzaG91bGQgaGF2
-ZSBteSBmaXhlcyBjb21pbmcgeW91ciB3YXkgYWxyZWFkeS4KCj4gV2FybmluZyAjMToKPiAKPiAg
-IHNvdW5kL3NvYy9xY29tL2xwYXNzLXBsYXRmb3JtLmM6IEluIGZ1bmN0aW9uIOKAmGxwYXNzX3Bs
-YXRmb3JtX3BjbW9wc19vcGVu4oCZOgo+ICAgc291bmQvc29jL3Fjb20vbHBhc3MtcGxhdGZvcm0u
-Yzo4MzoyOTogd2FybmluZzog4oCYZG1hX2No4oCZIG1heSBiZSB1c2VkCj4gdW5pbml0aWFsaXpl
-ZCBpbiB0aGlzIGZ1bmN0aW9uIFstV21heWJlLXVuaW5pdGlhbGl6ZWRdCj4gICAgIGRydmRhdGEt
-PnN1YnN0cmVhbVtkbWFfY2hdID0gc3Vic3RyZWFtOwo+ICAgICB+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5efn5+fn5+fn5+fgo+IAo+IGFuZCAnZG1hX2NoJyB1c2FnZSB0aGVyZSByZWFsbHkg
-aXMgY3JhenkgYW5kIHdyb25nLiBCcm9rZW4gYnkKPiAwMjJkMDBlZTBiNTUgKCJBU29DOiBscGFz
-cy1wbGF0Zm9ybTogRml4IGJyb2tlbiBwY20gZGF0YSB1c2FnZSIpCgpSaWdodCwgdGhlIHBhdGNo
-ZXMgY3Jvc3NlZCBoZXJlLCB0aGUgYnVnZml4IHBhdGNoIHRoYXQgaW50cm9kdWNlZAp0aGlzIGNh
-bWUgaW50byBsaW51eC1uZXh0IG92ZXIgdGhlIGtlcm5lbCBzdW1taXQsIGFuZCB0aGUgZml4IEkK
-c2VudCBvbiBUdWVzZGF5IG1hZGUgaXQgaW50byBNYXJrIEJyb3duJ3MgdHJlZSBvbiBXZWRuZXNk
-YXkgYnV0IG5vdApiZWZvcmUgeW91IHB1bGxlZCBhbHNhIHRyZWUuIEl0IHNob3VsZCBiZSBmaXhl
-ZCB0aGUgbmV4dCB0aW1lIHlvdQpwdWxsIGZyb20gdGhlIGFsc2EgdHJlZSwgdGhlIGNvbW1pdCBp
-cwoKM2I4OWU0Yjc3ZWY5ICgiQVNvQzogbHBhc3MtcGxhdGZvcm06IGluaXRpYWxpemUgZG1hIGNo
-YW5uZWwgbnVtYmVyIikKIAo+IFdhcm5pbmcgIzIgaXMgbm90IGEgcmVhbCBidWcsIGJ1dCBpdCdz
-IHJlYXNvbmFibGUgdGhhdCBnY2MgZG9lc24ndAo+IGtub3cgdGhhdCBzdG9yYWdlX2J5dGVzIChj
-aGlwLT5yZWFkX3NpemUpIGhhcyB0byBiZSAyLzQuIEFnYWluLAo+IGludHJvZHVjZWQgcmVjZW50
-bHkgYnkgY29tbWl0IDIzMTE0N2VlNzdmMyAoImlpbzogbWF4aW1fdGhlcm1vY291cGxlOgo+IEFs
-aWduIDE2IGJpdCBiaWcgZW5kaWFuIHZhbHVlIG9mIHJhdyByZWFkcyIpLCBzbyB5b3UgZGlkbid0
-IHNlZSBpdC4KClRoaXMgaXMgdGhlIG9uZSBJIG1lbnRpb25lZCBpbiB0aGUgY29tbWl0IG1lc3Nh
-Z2UgYXMgb25lIHRoYXQKaXMgZml4ZWQgaW4gbGludXgtbmV4dCBhbmQgdGhhdCBzaG91bGQgbWFr
-ZSBpdCBpbiBzb29uLgoKPiAgIGRyaXZlcnMvaWlvL3RlbXBlcmF0dXJlL21heGltX3RoZXJtb2Nv
-dXBsZS5jOiBJbiBmdW5jdGlvbgo+IOKAmG1heGltX3RoZXJtb2NvdXBsZV9yZWFkX3Jhd+KAmToK
-PiAgIGRyaXZlcnMvaWlvL3RlbXBlcmF0dXJlL21heGltX3RoZXJtb2NvdXBsZS5jOjE0MTo1OiB3
-YXJuaW5nOiDigJhyZXTigJkKPiBtYXkgYmUgdXNlZCB1bmluaXRpYWxpemVkIGluIHRoaXMgZnVu
-Y3Rpb24gWy1XbWF5YmUtdW5pbml0aWFsaXplZF0KPiAgICAgaWYgKHJldCkKPiAgICAgICAgXgo+
-ICAgZHJpdmVycy9paW8vdGVtcGVyYXR1cmUvbWF4aW1fdGhlcm1vY291cGxlLmM6MTI4OjY6IG5v
-dGU6IOKAmHJldOKAmSB3YXMKPiBkZWNsYXJlZCBoZXJlCj4gICAgIGludCByZXQ7Cj4gICAgICAg
-ICBefn4KPiAKPiBhbmQgSSBndWVzcyB0aGF0IGNvZGUgY2FuIGp1c3QgaW5pdGlhbGl6ZSAncmV0
-JyB0byAnLUVJTlZBTCcgb3IKPiBzb21ldGhpbmcgdG8ganVzdCBtYWtlIHRoZSB0aGVvcmV0aWNh
-bCAic29tZWhvdyB3ZSBoYWQgYSB3cm9uZwo+IGNoaXAtPnJlYWRfc2l6ZSIgY2FzZSBlcnJvciBv
-dXQgY2xlYW5seS4KClJpZ2h0LCB0aGF0IHdhcyBteSBjb25jbHVzaW9uIHRvby4gSSBzZW50IHRo
-ZSBidWdmaXggb24gT2N0IDI1CmZvciBsaW51eC1uZXh0IGJ1dCBpdCBkaWRuJ3QgbWFrZSBpdCBp
-biB1bnRpbCB0aGlzIE1vbmRheSwgYWZ0ZXIKeW91IHB1bGxlZCB0aGUgcGF0Y2ggdGhhdCBpbnRy
-b2R1Y2VkIGl0IG9uIE9jdCAyOS4KClRoZSBjb21taXQgaW4gc3RhZ2luZy10ZXN0aW5nIGlzCjMy
-Y2I3ZDI3ZTY1ZCAoImlpbzogbWF4aW1fdGhlcm1vY291cGxlOiBkZXRlY3QgaW52YWxpZCBzdG9y
-YWdlIHNpemUgaW4gcmVhZCgpIikKCkdyZWcgYW5kIEpvbmF0aGFuLCBJIHNlZSBub3cgdGhhdCB0
-aGlzIGlzIHBhcnQgb2YgdGhlICdpaW8tZm9yLTQuMTBiJwpicmFuY2gsIHNvIEkgc3VzcGVjdCB5
-b3Ugd2VyZSBub3QgcGxhbm5pbmcgdG8gc2VuZCB0aGlzIGJlZm9yZSB0aGUKbWVyZ2Ugd2luZG93
-LiBDb3VsZCB5b3UgbWFrZSBzdXJlIHRoaXMgZW5kcyB1cCBpbiB2NC45IHNvIHdlIGdldAphIGNs
-ZWFuIGJ1aWxkIHdoZW4gLVdtYXliZS11bmluaXRpYWxpemVkIGdldHMgZW5hYmxlZCBhZ2Fpbj8K
-CglBcm5kCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwps
-aW51eC1zbnBzLWFyYyBtYWlsaW5nIGxpc3QKbGludXgtc25wcy1hcmNAbGlzdHMuaW5mcmFkZWFk
-Lm9yZwpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LXNu
-cHMtYXJj
+On Fri, Nov 11, 2016 at 09:51:13PM +0800, Ard Biesheuvel wrote:
+> This integrates both the accelerated scalar and the NEON implementations
+> of SHA-224/256 as well as SHA-384/512 from the OpenSSL project.
+> 
+> Relative performance compared to the respective generic C versions:
+> 
+>                  |  SHA256-scalar  | SHA256-NEON* |  SHA512  |
+>      ------------+-----------------+--------------+----------+
+>      Cortex-A53  |      1.63x      |     1.63x    |   2.34x  |
+>      Cortex-A57  |      1.43x      |     1.59x    |   1.95x  |
+>      Cortex-A73  |      1.26x      |     1.56x    |     ?    |
+> 
+> The core crypto code was authored by Andy Polyakov of the OpenSSL
+> project, in collaboration with whom the upstream code was adapted so
+> that this module can be built from the same version of sha512-armv8.pl.
+> 
+> The version in this patch was taken from OpenSSL commit
+> 
+>    866e505e0d66 sha/asm/sha512-armv8.pl: add NEON version of SHA256.
+> 
+> * The core SHA algorithm is fundamentally sequential, but there is a
+>   secondary transformation involved, called the schedule update, which
+>   can be performed independently. The NEON version of SHA-224/SHA-256
+>   only implements this part of the algorithm using NEON instructions,
+>   the sequential part is always done using scalar instructions.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+> 
+> This supersedes the SHA-256-NEON-only patch I sent out about 6 weeks ago.
+> 
+> Will, Catalin: note that this pulls in a .pl script, and adds a build rule
+> locally in arch/arm64/crypto to generate .S files on the fly from Perl
+> scripts. I will leave it to you to decide whether you are ok with this as
+> is, or whether you prefer .S_shipped files, in which case the Perl script
+> is only included as a reference (this is how we did it for arch/arm in the
+> past, but given that it adds about 3000 lines of generated code to the patch,
+> I think we may want to simply keep it as below)
+
+I think we should include the shipped files too. 3000 lines isn't that much
+in the grand scheme of things, and there will be people who complain about
+the unconditional perl dependency.
+
+Will
