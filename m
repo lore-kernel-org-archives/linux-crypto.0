@@ -1,84 +1,61 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 02/11] NFSv4.1: work around -Wmaybe-uninitialized warning
-Date: Thu, 10 Nov 2016 17:44:45 +0100
-Message-ID: <20161110164454.293477-3-arnd@arndb.de>
-References: <20161110164454.293477-1-arnd@arndb.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/16] crypto: skcipher - Add skcipher walk interface
+Date: Fri, 11 Nov 2016 19:19:59 +0800
+Message-ID: <20161111111959.GA26599@gondor.apana.org.au>
+References: <20161101231648.GA15967@gondor.apana.org.au>
+ <E1c1iKc-0004Av-CW@gondolin.me.apana.org.au>
+ <20161102205420.GA17645@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Sean Young <sean@mess.org>,
- Trond Myklebust <trond.myklebust@primarydata.com>, linux-s390@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>, x86@kernel.org,
- Sebastian Ott <sebott@linux.vnet.ibm.com>,
- Russell King <linux@armlinux.org.uk>,
- Javier Martinez Canillas <javier@osg.samsung.com>,
- Ilya Dryomov <idryomov@gmail.com>, linux-snps-arc@lists.infradead.org,
- linux-media@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
- linux-kbuild@vger.kernel.org, Jiri Kosina <jikos@kernel.org>,
- Michal Marek <mmarek@suse.com>, nios2-dev@lists.rocketboards.org,
- Mauro Carvalho Chehab <mchehab@kernel.org>, linux-nfs@vger.kernel.org,
- linux-kernel@vger.kernel.org, Anna Schumaker <anna.schumaker@netapp.com>,
- "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-crypto@vger.kernel.org,
- Martin Schwidefsky <schwidefsky@de.ibm.com>, Ley Foon Tan <lftan@altera.com>,
- Andrew Morton <akpm@linux-found
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20161110164454.293477-1-arnd@arndb.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
-List-Post: <mailto:linux-snps-arc@lists.infradead.org>
-List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
-Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Eric Biggers <ebiggers@google.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:34643 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755487AbcKKLUG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Nov 2016 06:20:06 -0500
+Content-Disposition: inline
+In-Reply-To: <20161102205420.GA17645@google.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-A bugfix introduced a harmless gcc warning in nfs4_slot_seqid_in_use
-if we enable -Wmaybe-uninitialized again:
+On Wed, Nov 02, 2016 at 01:54:20PM -0700, Eric Biggers wrote:
+>
+> I think the case where skcipher_copy_iv() fails may be handled incorrectly.
+> Wouldn't it need to set walk.nbytes to 0 so as to not confuse callers which
+> expect that behavior?  Or maybe it should be calling skcipher_walk_done().
 
-fs/nfs/nfs4session.c:203:54: error: 'cur_seq' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+Good catch.  I'll fix and repost.
 
-gcc is not smart enough to conclude that the IS_ERR/PTR_ERR pair
-results in a nonzero return value here. Using PTR_ERR_OR_ZERO()
-instead makes this clear to the compiler.
+> Setting walk->in.sg and walk->out.sg is redundant with the scatterwalk_start()
+> calls.
 
-Fixes: e09c978aae5b ("NFSv4.1: Fix Oopsable condition in server callback races")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-First submitted on Aug 31, but ended up not getting applied then
-as the warning was disabled in v4.8-rc
+Will remove.
 
-Anna Schumaker said at the kernel summit that she had applied
-it and would send it for 4.9, but as of 2016-11-09 it has not
-made it into linux-next.
+> This gets called with uninitialized 'walk.flags'.  This was somewhat of a
+> theoretical problem with the old blkcipher_walk code but it looks like now it
+> will interact badly with the new SKCIPHER_WALK_SLEEP flag.  As far as I can see,
+> whether the flag will end up set or not can depend on the uninitialized value.
+> It would be nice if this problem could be avoided entirely be setting flags=0.
 
- fs/nfs/nfs4session.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Right.  I'll fix this as well.
 
-diff --git a/fs/nfs/nfs4session.c b/fs/nfs/nfs4session.c
-index b629730..150c5a1 100644
---- a/fs/nfs/nfs4session.c
-+++ b/fs/nfs/nfs4session.c
-@@ -178,12 +178,14 @@ static int nfs4_slot_get_seqid(struct nfs4_slot_table  *tbl, u32 slotid,
- 	__must_hold(&tbl->slot_tbl_lock)
- {
- 	struct nfs4_slot *slot;
-+	int ret;
- 
- 	slot = nfs4_lookup_slot(tbl, slotid);
--	if (IS_ERR(slot))
--		return PTR_ERR(slot);
--	*seq_nr = slot->seq_nr;
--	return 0;
-+	ret = PTR_ERR_OR_ZERO(slot);
-+	if (!ret)
-+		*seq_nr = slot->seq_nr;
-+
-+	return ret;
- }
- 
- /*
+> I'm also wondering about the choice to not look at 'atomic' until after the call
+> to skcipher_walk_skcipher().  Wouldn't this mean that the choice of 'atomic'
+> would not be respected in e.g. the kmalloc() in skcipher_copy_iv()?
+
+The atomic flag is meant to be used in cases such as aesni where
+you need to do kernel_fpu_begin after the call to start the walk.
+IOW sleeping is fine at the start but not on subsequent walk calls.
+
+> I don't see any users of the "async" walking being introduced; are some planned?
+
+skcipher_walk is meant to unite blkcipher_walk and ablkcipher_walk.
+The latter will use the async case.
+
+Cheers,
 -- 
-2.9.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
