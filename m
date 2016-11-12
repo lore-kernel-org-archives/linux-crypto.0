@@ -1,74 +1,115 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] crypto: arm64/sha2: integrate OpenSSL implementations of SHA256/SHA512
-Date: Sat, 12 Nov 2016 13:26:32 +0100
-Message-ID: <CAKv+Gu_Ni6xOqDLfC4Qf2wzP-3ByhkEGkpt8M91F01kTCmctsQ@mail.gmail.com>
-References: <1478872273-16382-1-git-send-email-ard.biesheuvel@linaro.org> <20161111195607.GB4457@arm.com>
+From: Jonathan Cameron <jic23@kernel.org>
+Subject: Re: [PATCH v2 00/11] getting back -Wmaybe-uninitialized
+Date: Sat, 12 Nov 2016 13:27:12 +0000
+Message-ID: <f6dccd27-09d2-1842-220b-24aa84043674@kernel.org>
+References: <20161110164454.293477-1-arnd@arndb.de>
+ <CA+55aFx_scFVFKU__TBmoffw_iHvrdAU2dj5u1WKfWJXAkS4QA@mail.gmail.com>
+ <2695221.kyRJMsRMjs@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+        sayli karnik <karniksayli1995@gmail.com>,
+        Mark Brown <broonie@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Andy Polyakov <appro@openssl.org>,
-        Victor Chong <victor.chong@linaro.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>
-To: Will Deacon <will.deacon@arm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f41.google.com ([209.85.214.41]:37045 "EHLO
-        mail-it0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936990AbcKLM0d (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 12 Nov 2016 07:26:33 -0500
-Received: by mail-it0-f41.google.com with SMTP id u205so27289280itc.0
-        for <linux-crypto@vger.kernel.org>; Sat, 12 Nov 2016 04:26:33 -0800 (PST)
-In-Reply-To: <20161111195607.GB4457@arm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Ilya Dryomov <idryomov@gmail.com>,
+        Javier Martinez Canillas <javier@osg.samsung.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Ley Foon Tan <lftan@altera.com>,
+        "Luis R . Rodriguez" <mcgrof@kernel.org>,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michal Marek <mmarek@suse.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Sean Young <sean@mess.org>,
+        Sebastian Ott <sebott@linux.vnet.ibm.com>,
+        Trond Myklebust <trond.myklebu
+To: Arnd Bergmann <arnd@arndb.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Return-path: <linux-kbuild-owner@vger.kernel.org>
+In-Reply-To: <2695221.kyRJMsRMjs@wuerfel>
+Sender: linux-kbuild-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 11 November 2016 at 20:56, Will Deacon <will.deacon@arm.com> wrote:
-> On Fri, Nov 11, 2016 at 09:51:13PM +0800, Ard Biesheuvel wrote:
->> This integrates both the accelerated scalar and the NEON implementations
->> of SHA-224/256 as well as SHA-384/512 from the OpenSSL project.
+On 11/11/16 19:49, Arnd Bergmann wrote:
+> On Friday, November 11, 2016 9:13:00 AM CET Linus Torvalds wrote:
+>> On Thu, Nov 10, 2016 at 8:44 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+>>>
+>>> Please merge these directly if you are happy with the result.
 >>
->> Relative performance compared to the respective generic C versions:
+>> I will take this.
+> 
+> Thanks a lot!
+>  
+>> I do see two warnings, but they both seem to be valid and recent,
+>> though, so I have no issues with the spurious cases.
+> 
+> Ok, both of them should have my fixes coming your way already.
+> 
+>> Warning #1:
 >>
->>                  |  SHA256-scalar  | SHA256-NEON* |  SHA512  |
->>      ------------+-----------------+--------------+----------+
->>      Cortex-A53  |      1.63x      |     1.63x    |   2.34x  |
->>      Cortex-A57  |      1.43x      |     1.59x    |   1.95x  |
->>      Cortex-A73  |      1.26x      |     1.56x    |     ?    |
+>>   sound/soc/qcom/lpass-platform.c: In function ‘lpass_platform_pcmops_open’:
+>>   sound/soc/qcom/lpass-platform.c:83:29: warning: ‘dma_ch’ may be used
+>> uninitialized in this function [-Wmaybe-uninitialized]
+>>     drvdata->substream[dma_ch] = substream;
+>>     ~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
 >>
->> The core crypto code was authored by Andy Polyakov of the OpenSSL
->> project, in collaboration with whom the upstream code was adapted so
->> that this module can be built from the same version of sha512-armv8.pl.
+>> and 'dma_ch' usage there really is crazy and wrong. Broken by
+>> 022d00ee0b55 ("ASoC: lpass-platform: Fix broken pcm data usage")
+> 
+> Right, the patches crossed here, the bugfix patch that introduced
+> this came into linux-next over the kernel summit, and the fix I
+> sent on Tuesday made it into Mark Brown's tree on Wednesday but not
+> before you pulled alsa tree. It should be fixed the next time you
+> pull from the alsa tree, the commit is
+> 
+> 3b89e4b77ef9 ("ASoC: lpass-platform: initialize dma channel number")
+>  
+>> Warning #2 is not a real bug, but it's reasonable that gcc doesn't
+>> know that storage_bytes (chip->read_size) has to be 2/4. Again,
+>> introduced recently by commit 231147ee77f3 ("iio: maxim_thermocouple:
+>> Align 16 bit big endian value of raw reads"), so you didn't see it.
+> 
+> This is the one I mentioned in the commit message as one that
+> is fixed in linux-next and that should make it in soon.
+> 
+>>   drivers/iio/temperature/maxim_thermocouple.c: In function
+>> ‘maxim_thermocouple_read_raw’:
+>>   drivers/iio/temperature/maxim_thermocouple.c:141:5: warning: ‘ret’
+>> may be used uninitialized in this function [-Wmaybe-uninitialized]
+>>     if (ret)
+>>        ^
+>>   drivers/iio/temperature/maxim_thermocouple.c:128:6: note: ‘ret’ was
+>> declared here
+>>     int ret;
+>>         ^~~
 >>
->> The version in this patch was taken from OpenSSL commit
->>
->>    866e505e0d66 sha/asm/sha512-armv8.pl: add NEON version of SHA256.
->>
->> * The core SHA algorithm is fundamentally sequential, but there is a
->>   secondary transformation involved, called the schedule update, which
->>   can be performed independently. The NEON version of SHA-224/SHA-256
->>   only implements this part of the algorithm using NEON instructions,
->>   the sequential part is always done using scalar instructions.
->>
->> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->> ---
->>
->> This supersedes the SHA-256-NEON-only patch I sent out about 6 weeks ago.
->>
->> Will, Catalin: note that this pulls in a .pl script, and adds a build rule
->> locally in arch/arm64/crypto to generate .S files on the fly from Perl
->> scripts. I will leave it to you to decide whether you are ok with this as
->> is, or whether you prefer .S_shipped files, in which case the Perl script
->> is only included as a reference (this is how we did it for arch/arm in the
->> past, but given that it adds about 3000 lines of generated code to the patch,
->> I think we may want to simply keep it as below)
->
-> I think we should include the shipped files too. 3000 lines isn't that much
-> in the grand scheme of things, and there will be people who complain about
-> the unconditional perl dependency.
->
+>> and I guess that code can just initialize 'ret' to '-EINVAL' or
+>> something to just make the theoretical "somehow we had a wrong
+>> chip->read_size" case error out cleanly.
+> 
+> Right, that was my conclusion too. I sent the bugfix on Oct 25
+> for linux-next but it didn't make it in until this Monday, after
+> you pulled the patch that introduced it on Oct 29.
+> 
+> The commit in staging-testing is
+> 32cb7d27e65d ("iio: maxim_thermocouple: detect invalid storage size in read()")
+> 
+> Greg and Jonathan, I see now that this is part of the 'iio-for-4.10b'
+> branch, so I suspect you were not planning to send this before the
+> merge window. Could you make sure this ends up in v4.9 so we get
+> a clean build when -Wmaybe-uninitialized gets enabled again?
+I'll queue this up and send a pull to Greg tomorrow.
 
-OK, fair enough. I will repost with the generated files included.
+Was highly doubtful that a false warning suppression (be it an
+understandable one) was worth sending mid cycle, hence it was
+taking the slow route.
+
+Jonathan
+> 
+> 	Arnd
+> 
+
