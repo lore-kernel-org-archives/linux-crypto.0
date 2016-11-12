@@ -1,46 +1,48 @@
 From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: [PATCH 2/3] crypto: AF_ALG - disregard AAD buffer space for output
-Date: Sat, 12 Nov 2016 03:12:20 +0100
-Message-ID: <2741000.3U1U7JnSRh@positron.chronox.de>
-References: <3302668.EORF2jai5r@positron.chronox.de> <3506033.FskOdlTquT@positron.chronox.de> <alpine.OSX.2.20.1611111622500.1815@mjmartin-mac01.sea.intel.com>
+Date: Sat, 12 Nov 2016 03:03:36 +0100
+Message-ID: <11739696.UFOoJjMX73@positron.chronox.de>
+References: <3302668.EORF2jai5r@positron.chronox.de> <3506033.FskOdlTquT@positron.chronox.de> <20161112015519.GA32234@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Cc: mathew.j.martineau@linux.intel.com, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:50892 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:50894 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S935315AbcKLCMZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Nov 2016 21:12:25 -0500
-In-Reply-To: <alpine.OSX.2.20.1611111622500.1815@mjmartin-mac01.sea.intel.com>
+        id S935315AbcKLCMt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Nov 2016 21:12:49 -0500
+In-Reply-To: <20161112015519.GA32234@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 11. November 2016, 16:26:12 CET schrieb Mat Martineau:
+Am Samstag, 12. November 2016, 09:55:19 CET schrieb Herbert Xu:
 
-Hi Mat,
+Hi Herbert,
+
+> On Thu, Nov 10, 2016 at 04:32:03AM +0100, Stephan Mueller wrote:
+> > The kernel crypto API AEAD cipher operation generates output such that
+> > space for the AAD is reserved in the output buffer without being
+> > touched. The processed ciphertext/plaintext is appended to the reserved
+> > AAD buffer.
 > > 
-> > With this solution, the caller must not use sendpage with the exact same
-> > buffers for input and output. The following rationale applies: When
-> > the caller sends the same buffer for input/output to the sendpage
-> > operation, the cipher operation now will write the ciphertext to the
-> > beginning of the buffer where the AAD used to be. The subsequent tag
-> > calculation will now use the data it finds where the AAD is expected.
-> > As the cipher operation has already replaced the AAD with the ciphertext,
-> > the tag calculation will take the ciphertext as AAD and thus calculate
-> > a wrong tag.
+> > The user space interface followed that approach. However, this is a
+> > violation of the POSIX read definition which requires that any read data
+> > is placed at the beginning of the caller-provided buffer. As the kernel
+> > crypto API would leave room for the AAD, the old approach did not fully
+> > comply with the POSIX specification.
 > 
-> If it's not much overhead, I suggest checking for this condition and
-> returning an error.
+> Nack.  The kernel AEAD API will copy the AD as is, it definitely
+> does not leave the output untouched unless of course when it is
+> an in-place operation.  The user-space operation should operate
+> in the same manner.
 
-I can surely look into that. But Herbert's NACK seems to make this patch 
-unlikely.
+When you have separate buffers, the kernel does not seem to copy the AD over 
+to the target buffer.
 > 
-> Other than that, I've done a quick test of the patches using sendmsg() and
-> read() and found that they work as expected.
-> 
-Thanks for testing.
+> Cheers,
+
 
 Ciao
 Stephan
