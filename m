@@ -1,36 +1,75 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v3] poly1305: generic C can be faster on chips with slow
- unaligned access
-Date: Sun, 13 Nov 2016 00:31:32 +0100
-Message-ID: <CAHmME9q5NXj=C1CKah=ongbwJKErozWV2a46unH+k5v157B0_w@mail.gmail.com>
+From: <douille.l@hotmail.fr>
+Subject: 56532 linux-crypto
+Date: Sun, 13 Nov 2016 00:02:09 -0000
+Message-ID: <147899532936.19226.17788032191353791148@vnpt.vn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: kbuild-all@01.org, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Martin Willi <martin@strongswan.org>,
-        Eric Biggers <ebiggers@google.com>,
-        =?UTF-8?Q?Ren=C3=A9_van_Dorst?= <opensource@vdorst.com>
-To: kbuild test robot <lkp@intel.com>
+Content-Type: application/zip; name="MESSAGE_77028149_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:51901 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751506AbcKLXbj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 12 Nov 2016 18:31:39 -0500
+Received: from static.vnpt.vn ([14.184.67.243]:38856 "HELO vnpt.vn"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
+        id S932127AbcKMACw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 12 Nov 2016 19:02:52 -0500
+Content-Disposition: attachment
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello friendly test robot,
-
-On Sun, Nov 13, 2016 at 12:27 AM, kbuild test robot <lkp@intel.com> wrote:
-> Hi Jason,
->
-> [auto build test ERROR on cryptodev/master]
-
-That error was fixed by v4 in this series. The version that should be
-tested and ultimately applied is v4 and can be found here:
-
-https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1265977.html
-
-Regards from a human,
-Jason
+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
+AAAAAQABAFcAAABVDAAAAAA=
