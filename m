@@ -1,342 +1,313 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 15/16] crypto: cbc - Export CBC implementation
-Date: Sun, 13 Nov 2016 19:45:47 +0800
-Message-ID: <E1c5tEJ-0002CQ-Mr@gondolin.me.apana.org.au>
+Subject: [v2 PATCH 7/16] crypto: simd - Add simd skcipher helper
+Date: Sun, 13 Nov 2016 19:45:38 +0800
+Message-ID: <E1c5tEA-0002AE-UP@gondolin.me.apana.org.au>
 References: <20161113114354.GA8169@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48641 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:48383 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933813AbcKMLpy (ORCPT
+        with ESMTP id S933578AbcKMLpt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Nov 2016 06:45:54 -0500
+        Sun, 13 Nov 2016 06:45:49 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
         by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-        id 1c5tEJ-0007CR-Sd
-        for <linux-crypto@vger.kernel.org>; Sun, 13 Nov 2016 22:45:47 +1100
+        id 1c5tEB-0007B2-3S
+        for <linux-crypto@vger.kernel.org>; Sun, 13 Nov 2016 22:45:39 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch moves the core CBC implementation into a header file
-so that it can be reused by drivers implementing CBC.
+This patch adds the simd skcipher helper which is meant to be
+a replacement for ablk helper.  It replaces the underlying blkcipher
+interface with skcipher, and also presents the top-level algorithm
+as an skcipher.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/cbc.c         |  129 ---------------------------------------------
- include/crypto/cbc.h |  146 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 148 insertions(+), 127 deletions(-)
+ crypto/Kconfig                 |    4 
+ crypto/Makefile                |    2 
+ crypto/simd.c                  |  226 +++++++++++++++++++++++++++++++++++++++++
+ include/crypto/internal/simd.h |   17 +++
+ 4 files changed, 249 insertions(+)
 
-diff --git a/crypto/cbc.c b/crypto/cbc.c
-index 6539b38..68f751a 100644
---- a/crypto/cbc.c
-+++ b/crypto/cbc.c
-@@ -1,7 +1,7 @@
- /*
-  * CBC: Cipher Block Chaining mode
-  *
-- * Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
-+ * Copyright (c) 2006-2016 Herbert Xu <herbert@gondor.apana.org.au>
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-@@ -10,6 +10,7 @@
-  *
-  */
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 1db2a19..3d31181 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -246,6 +246,10 @@ config CRYPTO_ABLK_HELPER
+ 	tristate
+ 	select CRYPTO_CRYPTD
  
-+#include <crypto/cbc.h>
- #include <crypto/internal/skcipher.h>
- #include <linux/err.h>
- #include <linux/init.h>
-@@ -38,71 +39,6 @@ static int crypto_cbc_setkey(struct crypto_skcipher *parent, const u8 *key,
- 	return err;
- }
- 
--static inline int crypto_cbc_encrypt_segment(
--	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
--	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
--{
--	unsigned int bsize = crypto_skcipher_blocksize(tfm);
--	unsigned int nbytes = walk->nbytes;
--	u8 *src = walk->src.virt.addr;
--	u8 *dst = walk->dst.virt.addr;
--	u8 *iv = walk->iv;
--
--	do {
--		crypto_xor(iv, src, bsize);
--		fn(tfm, iv, dst);
--		memcpy(iv, dst, bsize);
--
--		src += bsize;
--		dst += bsize;
--	} while ((nbytes -= bsize) >= bsize);
--
--	return nbytes;
--}
--
--static inline int crypto_cbc_encrypt_inplace(
--	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
--	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
--{
--	unsigned int bsize = crypto_skcipher_blocksize(tfm);
--	unsigned int nbytes = walk->nbytes;
--	u8 *src = walk->src.virt.addr;
--	u8 *iv = walk->iv;
--
--	do {
--		crypto_xor(src, iv, bsize);
--		fn(tfm, src, src);
--		iv = src;
--
--		src += bsize;
--	} while ((nbytes -= bsize) >= bsize);
--
--	memcpy(walk->iv, iv, bsize);
--
--	return nbytes;
--}
--
--static inline int crypto_cbc_encrypt_walk(struct skcipher_request *req,
--					  void (*fn)(struct crypto_skcipher *,
--						     const u8 *, u8 *))
--{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct skcipher_walk walk;
--	int err;
--
--	err = skcipher_walk_virt(&walk, req, false);
--
--	while (walk.nbytes) {
--		if (walk.src.virt.addr == walk.dst.virt.addr)
--			err = crypto_cbc_encrypt_inplace(&walk, tfm, fn);
--		else
--			err = crypto_cbc_encrypt_segment(&walk, tfm, fn);
--		err = skcipher_walk_done(&walk, err);
--	}
--
--	return err;
--}
--
- static inline void crypto_cbc_encrypt_one(struct crypto_skcipher *tfm,
- 					  const u8 *src, u8 *dst)
- {
-@@ -116,67 +52,6 @@ static int crypto_cbc_encrypt(struct skcipher_request *req)
- 	return crypto_cbc_encrypt_walk(req, crypto_cbc_encrypt_one);
- }
- 
--static inline int crypto_cbc_decrypt_segment(
--	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
--	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
--{
--	unsigned int bsize = crypto_skcipher_blocksize(tfm);
--	unsigned int nbytes = walk->nbytes;
--	u8 *src = walk->src.virt.addr;
--	u8 *dst = walk->dst.virt.addr;
--	u8 *iv = walk->iv;
--
--	do {
--		fn(tfm, src, dst);
--		crypto_xor(dst, iv, bsize);
--		iv = src;
--
--		src += bsize;
--		dst += bsize;
--	} while ((nbytes -= bsize) >= bsize);
--
--	memcpy(walk->iv, iv, bsize);
--
--	return nbytes;
--}
--
--static inline int crypto_cbc_decrypt_inplace(
--	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
--	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
--{
--	unsigned int bsize = crypto_skcipher_blocksize(tfm);
--	unsigned int nbytes = walk->nbytes;
--	u8 *src = walk->src.virt.addr;
--	u8 last_iv[bsize];
--
--	/* Start of the last block. */
--	src += nbytes - (nbytes & (bsize - 1)) - bsize;
--	memcpy(last_iv, src, bsize);
--
--	for (;;) {
--		fn(tfm, src, src);
--		if ((nbytes -= bsize) < bsize)
--			break;
--		crypto_xor(src, src - bsize, bsize);
--		src -= bsize;
--	}
--
--	crypto_xor(src, walk->iv, bsize);
--	memcpy(walk->iv, last_iv, bsize);
--
--	return nbytes;
--}
--
--static inline int crypto_cbc_decrypt_blocks(
--	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
--	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
--{
--	if (walk->src.virt.addr == walk->dst.virt.addr)
--		return crypto_cbc_decrypt_inplace(walk, tfm, fn);
--	else
--		return crypto_cbc_decrypt_segment(walk, tfm, fn);
--}
--
- static inline void crypto_cbc_decrypt_one(struct crypto_skcipher *tfm,
- 					  const u8 *src, u8 *dst)
- {
-diff --git a/include/crypto/cbc.h b/include/crypto/cbc.h
++config CRYPTO_SIMD
++	tristate
++	select CRYPTO_CRYPTD
++
+ config CRYPTO_GLUE_HELPER_X86
+ 	tristate
+ 	depends on X86
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 82ffeee..a05590e 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -142,3 +142,5 @@ obj-$(CONFIG_ASYNC_CORE) += async_tx/
+ obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += asymmetric_keys/
+ obj-$(CONFIG_CRYPTO_HASH_INFO) += hash_info.o
+ obj-$(CONFIG_CRYPTO_ABLK_HELPER) += ablk_helper.o
++crypto_simd-y := simd.o
++obj-$(CONFIG_CRYPTO_SIMD) += crypto_simd.o
+diff --git a/crypto/simd.c b/crypto/simd.c
 new file mode 100644
-index 0000000..f5b8bfc
+index 0000000..2b10cbe
 --- /dev/null
-+++ b/include/crypto/cbc.h
-@@ -0,0 +1,146 @@
++++ b/crypto/simd.c
+@@ -0,0 +1,226 @@
 +/*
-+ * CBC: Cipher Block Chaining mode
++ * Shared crypto simd helpers
 + *
++ * Copyright (c) 2012 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 + * Copyright (c) 2016 Herbert Xu <herbert@gondor.apana.org.au>
 + *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
++ * Based on aesni-intel_glue.c by:
++ *  Copyright (C) 2008, Intel Corp.
++ *    Author: Huang Ying <ying.huang@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
++ * USA
 + *
 + */
 +
-+#ifndef _CRYPTO_CBC_H
-+#define _CRYPTO_CBC_H
-+
++#include <crypto/cryptd.h>
++#include <crypto/internal/simd.h>
 +#include <crypto/internal/skcipher.h>
-+#include <linux/string.h>
-+#include <linux/types.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/preempt.h>
++#include <asm/simd.h>
 +
-+static inline int crypto_cbc_encrypt_segment(
-+	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
-+	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
++struct simd_skcipher_alg {
++	const char *ialg_name;
++	struct skcipher_alg alg;
++};
++
++struct simd_skcipher_ctx {
++	struct cryptd_skcipher *cryptd_tfm;
++};
++
++static int simd_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
++				unsigned int key_len)
 +{
-+	unsigned int bsize = crypto_skcipher_blocksize(tfm);
-+	unsigned int nbytes = walk->nbytes;
-+	u8 *src = walk->src.virt.addr;
-+	u8 *dst = walk->dst.virt.addr;
-+	u8 *iv = walk->iv;
-+
-+	do {
-+		crypto_xor(iv, src, bsize);
-+		fn(tfm, iv, dst);
-+		memcpy(iv, dst, bsize);
-+
-+		src += bsize;
-+		dst += bsize;
-+	} while ((nbytes -= bsize) >= bsize);
-+
-+	return nbytes;
-+}
-+
-+static inline int crypto_cbc_encrypt_inplace(
-+	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
-+	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
-+{
-+	unsigned int bsize = crypto_skcipher_blocksize(tfm);
-+	unsigned int nbytes = walk->nbytes;
-+	u8 *src = walk->src.virt.addr;
-+	u8 *iv = walk->iv;
-+
-+	do {
-+		crypto_xor(src, iv, bsize);
-+		fn(tfm, src, src);
-+		iv = src;
-+
-+		src += bsize;
-+	} while ((nbytes -= bsize) >= bsize);
-+
-+	memcpy(walk->iv, iv, bsize);
-+
-+	return nbytes;
-+}
-+
-+static inline int crypto_cbc_encrypt_walk(struct skcipher_request *req,
-+					  void (*fn)(struct crypto_skcipher *,
-+						     const u8 *, u8 *))
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct skcipher_walk walk;
++	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct crypto_skcipher *child = &ctx->cryptd_tfm->base;
 +	int err;
 +
-+	err = skcipher_walk_virt(&walk, req, false);
-+
-+	while (walk.nbytes) {
-+		if (walk.src.virt.addr == walk.dst.virt.addr)
-+			err = crypto_cbc_encrypt_inplace(&walk, tfm, fn);
-+		else
-+			err = crypto_cbc_encrypt_segment(&walk, tfm, fn);
-+		err = skcipher_walk_done(&walk, err);
-+	}
-+
++	crypto_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
++	crypto_skcipher_set_flags(child, crypto_skcipher_get_flags(tfm) &
++					 CRYPTO_TFM_REQ_MASK);
++	err = crypto_skcipher_setkey(child, key, key_len);
++	crypto_skcipher_set_flags(tfm, crypto_skcipher_get_flags(child) &
++				       CRYPTO_TFM_RES_MASK);
 +	return err;
 +}
 +
-+static inline int crypto_cbc_decrypt_segment(
-+	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
-+	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
++static int simd_skcipher_encrypt(struct skcipher_request *req)
 +{
-+	unsigned int bsize = crypto_skcipher_blocksize(tfm);
-+	unsigned int nbytes = walk->nbytes;
-+	u8 *src = walk->src.virt.addr;
-+	u8 *dst = walk->dst.virt.addr;
-+	u8 *iv = walk->iv;
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct skcipher_request *subreq;
++	struct crypto_skcipher *child;
 +
-+	do {
-+		fn(tfm, src, dst);
-+		crypto_xor(dst, iv, bsize);
-+		iv = src;
++	subreq = skcipher_request_ctx(req);
++	*subreq = *req;
 +
-+		src += bsize;
-+		dst += bsize;
-+	} while ((nbytes -= bsize) >= bsize);
++	if (!may_use_simd() ||
++	    (in_atomic() && cryptd_skcipher_queued(ctx->cryptd_tfm)))
++		child = &ctx->cryptd_tfm->base;
++	else
++		child = cryptd_skcipher_child(ctx->cryptd_tfm);
 +
-+	memcpy(walk->iv, iv, bsize);
++	skcipher_request_set_tfm(subreq, child);
 +
-+	return nbytes;
++	return crypto_skcipher_encrypt(subreq);
 +}
 +
-+static inline int crypto_cbc_decrypt_inplace(
-+	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
-+	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
++static int simd_skcipher_decrypt(struct skcipher_request *req)
 +{
-+	unsigned int bsize = crypto_skcipher_blocksize(tfm);
-+	unsigned int nbytes = walk->nbytes;
-+	u8 *src = walk->src.virt.addr;
-+	u8 last_iv[bsize];
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct skcipher_request *subreq;
++	struct crypto_skcipher *child;
 +
-+	/* Start of the last block. */
-+	src += nbytes - (nbytes & (bsize - 1)) - bsize;
-+	memcpy(last_iv, src, bsize);
++	subreq = skcipher_request_ctx(req);
++	*subreq = *req;
 +
-+	for (;;) {
-+		fn(tfm, src, src);
-+		if ((nbytes -= bsize) < bsize)
-+			break;
-+		crypto_xor(src, src - bsize, bsize);
-+		src -= bsize;
++	if (!may_use_simd() ||
++	    (in_atomic() && cryptd_skcipher_queued(ctx->cryptd_tfm)))
++		child = &ctx->cryptd_tfm->base;
++	else
++		child = cryptd_skcipher_child(ctx->cryptd_tfm);
++
++	skcipher_request_set_tfm(subreq, child);
++
++	return crypto_skcipher_decrypt(subreq);
++}
++
++static void simd_skcipher_exit(struct crypto_skcipher *tfm)
++{
++	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++
++	cryptd_free_skcipher(ctx->cryptd_tfm);
++}
++
++static int simd_skcipher_init(struct crypto_skcipher *tfm)
++{
++	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct cryptd_skcipher *cryptd_tfm;
++	struct simd_skcipher_alg *salg;
++	struct skcipher_alg *alg;
++	unsigned reqsize;
++
++	alg = crypto_skcipher_alg(tfm);
++	salg = container_of(alg, struct simd_skcipher_alg, alg);
++
++	cryptd_tfm = cryptd_alloc_skcipher(salg->ialg_name,
++					   CRYPTO_ALG_INTERNAL,
++					   CRYPTO_ALG_INTERNAL);
++	if (IS_ERR(cryptd_tfm))
++		return PTR_ERR(cryptd_tfm);
++
++	ctx->cryptd_tfm = cryptd_tfm;
++
++	reqsize = sizeof(struct skcipher_request);
++	reqsize += crypto_skcipher_reqsize(&cryptd_tfm->base);
++
++	crypto_skcipher_set_reqsize(tfm, reqsize);
++
++	return 0;
++}
++
++struct simd_skcipher_alg *simd_skcipher_create_compat(const char *algname,
++						      const char *drvname,
++						      const char *basename)
++{
++	struct simd_skcipher_alg *salg;
++	struct crypto_skcipher *tfm;
++	struct skcipher_alg *ialg;
++	struct skcipher_alg *alg;
++	int err;
++
++	tfm = crypto_alloc_skcipher(basename, CRYPTO_ALG_INTERNAL,
++				    CRYPTO_ALG_INTERNAL | CRYPTO_ALG_ASYNC);
++	if (IS_ERR(tfm))
++		return ERR_CAST(tfm);
++
++	ialg = crypto_skcipher_alg(tfm);
++
++	salg = kzalloc(sizeof(*alg), GFP_KERNEL);
++	if (!salg) {
++		salg = ERR_PTR(-ENOMEM);
++		goto out_put_tfm;
 +	}
 +
-+	crypto_xor(src, walk->iv, bsize);
-+	memcpy(walk->iv, last_iv, bsize);
++	salg->ialg_name = basename;
++	alg = &salg->alg;
 +
-+	return nbytes;
++	err = -ENAMETOOLONG;
++	if (snprintf(alg->base.cra_name, CRYPTO_MAX_ALG_NAME, "%s", algname) >=
++	    CRYPTO_MAX_ALG_NAME)
++		goto out_free_salg;
++
++	if (snprintf(alg->base.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
++		     drvname) >= CRYPTO_MAX_ALG_NAME)
++		goto out_free_salg;
++
++	alg->base.cra_flags = CRYPTO_ALG_ASYNC;
++	alg->base.cra_priority = ialg->base.cra_priority;
++	alg->base.cra_blocksize = ialg->base.cra_blocksize;
++	alg->base.cra_alignmask = ialg->base.cra_alignmask;
++	alg->base.cra_module = ialg->base.cra_module;
++	alg->base.cra_ctxsize = sizeof(struct simd_skcipher_ctx);
++
++	alg->ivsize = ialg->ivsize;
++	alg->chunksize = ialg->chunksize;
++	alg->min_keysize = ialg->min_keysize;
++	alg->max_keysize = ialg->max_keysize;
++
++	alg->init = simd_skcipher_init;
++	alg->exit = simd_skcipher_exit;
++
++	alg->setkey = simd_skcipher_setkey;
++	alg->encrypt = simd_skcipher_encrypt;
++	alg->decrypt = simd_skcipher_decrypt;
++
++	err = crypto_register_skcipher(alg);
++	if (err)
++		goto out_free_salg;
++
++out_put_tfm:
++	crypto_free_skcipher(tfm);
++	return salg;
++
++out_free_salg:
++	kfree(salg);
++	salg = ERR_PTR(err);
++	goto out_put_tfm;
 +}
++EXPORT_SYMBOL_GPL(simd_skcipher_create_compat);
 +
-+static inline int crypto_cbc_decrypt_blocks(
-+	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
-+	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
++struct simd_skcipher_alg *simd_skcipher_create(const char *algname,
++					       const char *basename)
 +{
-+	if (walk->src.virt.addr == walk->dst.virt.addr)
-+		return crypto_cbc_decrypt_inplace(walk, tfm, fn);
-+	else
-+		return crypto_cbc_decrypt_segment(walk, tfm, fn);
-+}
++	char drvname[CRYPTO_MAX_ALG_NAME];
 +
-+#endif	/* _CRYPTO_CBC_H */
++	if (snprintf(drvname, CRYPTO_MAX_ALG_NAME, "simd-%s", basename) >=
++	    CRYPTO_MAX_ALG_NAME)
++		return ERR_PTR(-ENAMETOOLONG);
++
++	return simd_skcipher_create_compat(algname, drvname, basename);
++}
++EXPORT_SYMBOL_GPL(simd_skcipher_create);
++
++void simd_skcipher_free(struct simd_skcipher_alg *salg)
++{
++	crypto_unregister_skcipher(&salg->alg);
++	kfree(salg);
++}
++EXPORT_SYMBOL_GPL(simd_skcipher_free);
++
++MODULE_LICENSE("GPL");
+diff --git a/include/crypto/internal/simd.h b/include/crypto/internal/simd.h
+new file mode 100644
+index 0000000..4295099
+--- /dev/null
++++ b/include/crypto/internal/simd.h
+@@ -0,0 +1,17 @@
++/*
++ * Shared crypto simd helpers
++ */
++
++#ifndef _CRYPTO_INTERNAL_SIMD_H
++#define _CRYPTO_INTERNAL_SIMD_H
++
++struct simd_skcipher_alg;
++
++struct simd_skcipher_alg *simd_skcipher_create_compat(const char *algname,
++						      const char *drvname,
++						      const char *basename);
++struct simd_skcipher_alg *simd_skcipher_create(const char *algname,
++					       const char *basename);
++void simd_skcipher_free(struct simd_skcipher_alg *alg);
++
++#endif /* _CRYPTO_INTERNAL_SIMD_H */
