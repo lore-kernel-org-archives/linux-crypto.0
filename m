@@ -1,570 +1,294 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 12/16] crypto: arm64/aes - Convert to skcipher
-Date: Sun, 13 Nov 2016 19:45:44 +0800
-Message-ID: <E1c5tEG-0002Bb-D1@gondolin.me.apana.org.au>
+Subject: [v2 PATCH 10/16] crypto: testmgr - Do not test internal algorithms
+Date: Sun, 13 Nov 2016 19:45:42 +0800
+Message-ID: <E1c5tEE-0002B3-74@gondolin.me.apana.org.au>
 References: <20161113114354.GA8169@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49564 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:33682 "EHLO
         helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933829AbcKMLpv (ORCPT
+        with ESMTP id S933813AbcKMLpu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Nov 2016 06:45:51 -0500
+        Sun, 13 Nov 2016 06:45:50 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
         by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-        id 1c5tEG-0007Bg-Iq
-        for <linux-crypto@vger.kernel.org>; Sun, 13 Nov 2016 22:45:44 +1100
+        id 1c5tEE-0007BQ-BU
+        for <linux-crypto@vger.kernel.org>; Sun, 13 Nov 2016 22:45:42 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch converts arm64/aes over to the skcipher interface.
+Currently we manually filter out internal algorithms using a list
+in testmgr.  This is dangerous as internal algorithms cannot be
+safely used even by testmgr.  This patch ensures that they're never
+processed by testmgr at all.
+
+This patch also removes an obsolete bypass for nivciphers which
+no longer exist.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- arch/arm64/crypto/aes-glue.c |  382 +++++++++++++++++--------------------------
- 1 file changed, 158 insertions(+), 224 deletions(-)
+ crypto/algboss.c |    8 --
+ crypto/testmgr.c |  153 +++----------------------------------------------------
+ 2 files changed, 11 insertions(+), 150 deletions(-)
 
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index 6b2aa0f..24f6137 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -11,8 +11,8 @@
- #include <asm/neon.h>
- #include <asm/hwcap.h>
- #include <crypto/aes.h>
--#include <crypto/ablk_helper.h>
--#include <crypto/algapi.h>
-+#include <crypto/internal/simd.h>
-+#include <crypto/internal/skcipher.h>
- #include <linux/module.h>
- #include <linux/cpufeature.h>
- #include <crypto/xts.h>
-@@ -80,13 +80,19 @@ struct crypto_aes_xts_ctx {
- 	struct crypto_aes_ctx __aligned(8) key2;
- };
+diff --git a/crypto/algboss.c b/crypto/algboss.c
+index 6e39d9c..ccb85e1 100644
+--- a/crypto/algboss.c
++++ b/crypto/algboss.c
+@@ -247,12 +247,8 @@ static int cryptomgr_schedule_test(struct crypto_alg *alg)
+ 	memcpy(param->alg, alg->cra_name, sizeof(param->alg));
+ 	type = alg->cra_flags;
  
--static int xts_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-+static int skcipher_aes_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
-+			       unsigned int key_len)
-+{
-+	return aes_setkey(crypto_skcipher_tfm(tfm), in_key, key_len);
-+}
-+
-+static int xts_set_key(struct crypto_skcipher *tfm, const u8 *in_key,
- 		       unsigned int key_len)
- {
--	struct crypto_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_aes_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int ret;
+-	/* This piece of crap needs to disappear into per-type test hooks. */
+-	if (!((type ^ CRYPTO_ALG_TYPE_BLKCIPHER) &
+-	      CRYPTO_ALG_TYPE_BLKCIPHER_MASK) && !(type & CRYPTO_ALG_GENIV) &&
+-	    ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+-	     CRYPTO_ALG_TYPE_BLKCIPHER ? alg->cra_blkcipher.ivsize :
+-					 alg->cra_ablkcipher.ivsize))
++	/* Do not test internal algorithms. */
++	if (type & CRYPTO_ALG_INTERNAL)
+ 		type |= CRYPTO_ALG_TESTED;
  
--	ret = xts_check_key(tfm, in_key, key_len);
-+	ret = xts_verify_key(tfm, in_key, key_len);
- 	if (ret)
- 		return ret;
+ 	param->type = type;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index ded50b6..6ac4696 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1625,7 +1625,7 @@ static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
+ 	struct crypto_aead *tfm;
+ 	int err = 0;
  
-@@ -97,111 +103,101 @@ static int xts_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 	if (!ret)
- 		return 0;
+-	tfm = crypto_alloc_aead(driver, type | CRYPTO_ALG_INTERNAL, mask);
++	tfm = crypto_alloc_aead(driver, type, mask);
+ 	if (IS_ERR(tfm)) {
+ 		printk(KERN_ERR "alg: aead: Failed to load transform for %s: "
+ 		       "%ld\n", driver, PTR_ERR(tfm));
+@@ -1654,7 +1654,7 @@ static int alg_test_cipher(const struct alg_test_desc *desc,
+ 	struct crypto_cipher *tfm;
+ 	int err = 0;
  
--	tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-+	crypto_skcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
- 	return -EINVAL;
- }
+-	tfm = crypto_alloc_cipher(driver, type | CRYPTO_ALG_INTERNAL, mask);
++	tfm = crypto_alloc_cipher(driver, type, mask);
+ 	if (IS_ERR(tfm)) {
+ 		printk(KERN_ERR "alg: cipher: Failed to load transform for "
+ 		       "%s: %ld\n", driver, PTR_ERR(tfm));
+@@ -1683,7 +1683,7 @@ static int alg_test_skcipher(const struct alg_test_desc *desc,
+ 	struct crypto_skcipher *tfm;
+ 	int err = 0;
  
--static int ecb_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--		       struct scatterlist *src, unsigned int nbytes)
-+static int ecb_encrypt(struct skcipher_request *req)
- {
--	struct crypto_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int err, first, rounds = 6 + ctx->key_length / 4;
--	struct blkcipher_walk walk;
-+	struct skcipher_walk walk;
- 	unsigned int blocks;
+-	tfm = crypto_alloc_skcipher(driver, type | CRYPTO_ALG_INTERNAL, mask);
++	tfm = crypto_alloc_skcipher(driver, type, mask);
+ 	if (IS_ERR(tfm)) {
+ 		printk(KERN_ERR "alg: skcipher: Failed to load transform for "
+ 		       "%s: %ld\n", driver, PTR_ERR(tfm));
+@@ -1750,7 +1750,7 @@ static int alg_test_hash(const struct alg_test_desc *desc, const char *driver,
+ 	struct crypto_ahash *tfm;
+ 	int err;
  
--	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt(desc, &walk);
-+	err = skcipher_walk_virt(&walk, req, true);
+-	tfm = crypto_alloc_ahash(driver, type | CRYPTO_ALG_INTERNAL, mask);
++	tfm = crypto_alloc_ahash(driver, type, mask);
+ 	if (IS_ERR(tfm)) {
+ 		printk(KERN_ERR "alg: hash: Failed to load transform for %s: "
+ 		       "%ld\n", driver, PTR_ERR(tfm));
+@@ -1778,7 +1778,7 @@ static int alg_test_crc32c(const struct alg_test_desc *desc,
+ 	if (err)
+ 		goto out;
  
- 	kernel_neon_begin();
- 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
- 		aes_ecb_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				(u8 *)ctx->key_enc, rounds, blocks, first);
--		err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
-+		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
- 	kernel_neon_end();
- 	return err;
- }
+-	tfm = crypto_alloc_shash(driver, type | CRYPTO_ALG_INTERNAL, mask);
++	tfm = crypto_alloc_shash(driver, type, mask);
+ 	if (IS_ERR(tfm)) {
+ 		printk(KERN_ERR "alg: crc32c: Failed to load transform for %s: "
+ 		       "%ld\n", driver, PTR_ERR(tfm));
+@@ -1820,7 +1820,7 @@ static int alg_test_cprng(const struct alg_test_desc *desc, const char *driver,
+ 	struct crypto_rng *rng;
+ 	int err;
  
--static int ecb_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--		       struct scatterlist *src, unsigned int nbytes)
-+static int ecb_decrypt(struct skcipher_request *req)
- {
--	struct crypto_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int err, first, rounds = 6 + ctx->key_length / 4;
--	struct blkcipher_walk walk;
-+	struct skcipher_walk walk;
- 	unsigned int blocks;
+-	rng = crypto_alloc_rng(driver, type | CRYPTO_ALG_INTERNAL, mask);
++	rng = crypto_alloc_rng(driver, type, mask);
+ 	if (IS_ERR(rng)) {
+ 		printk(KERN_ERR "alg: cprng: Failed to load transform for %s: "
+ 		       "%ld\n", driver, PTR_ERR(rng));
+@@ -1847,7 +1847,7 @@ static int drbg_cavs_test(struct drbg_testvec *test, int pr,
+ 	if (!buf)
+ 		return -ENOMEM;
  
--	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt(desc, &walk);
-+	err = skcipher_walk_virt(&walk, req, true);
+-	drng = crypto_alloc_rng(driver, type | CRYPTO_ALG_INTERNAL, mask);
++	drng = crypto_alloc_rng(driver, type, mask);
+ 	if (IS_ERR(drng)) {
+ 		printk(KERN_ERR "alg: drbg: could not allocate DRNG handle for "
+ 		       "%s\n", driver);
+@@ -2041,7 +2041,7 @@ static int alg_test_kpp(const struct alg_test_desc *desc, const char *driver,
+ 	struct crypto_kpp *tfm;
+ 	int err = 0;
  
- 	kernel_neon_begin();
- 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
- 		aes_ecb_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				(u8 *)ctx->key_dec, rounds, blocks, first);
--		err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
-+		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
- 	kernel_neon_end();
- 	return err;
- }
+-	tfm = crypto_alloc_kpp(driver, type | CRYPTO_ALG_INTERNAL, mask);
++	tfm = crypto_alloc_kpp(driver, type, mask);
+ 	if (IS_ERR(tfm)) {
+ 		pr_err("alg: kpp: Failed to load tfm for %s: %ld\n",
+ 		       driver, PTR_ERR(tfm));
+@@ -2200,7 +2200,7 @@ static int alg_test_akcipher(const struct alg_test_desc *desc,
+ 	struct crypto_akcipher *tfm;
+ 	int err = 0;
  
--static int cbc_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--		       struct scatterlist *src, unsigned int nbytes)
-+static int cbc_encrypt(struct skcipher_request *req)
- {
--	struct crypto_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int err, first, rounds = 6 + ctx->key_length / 4;
--	struct blkcipher_walk walk;
-+	struct skcipher_walk walk;
- 	unsigned int blocks;
- 
--	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt(desc, &walk);
-+	err = skcipher_walk_virt(&walk, req, true);
- 
- 	kernel_neon_begin();
- 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
- 		aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				(u8 *)ctx->key_enc, rounds, blocks, walk.iv,
- 				first);
--		err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
-+		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
- 	kernel_neon_end();
- 	return err;
- }
- 
--static int cbc_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--		       struct scatterlist *src, unsigned int nbytes)
-+static int cbc_decrypt(struct skcipher_request *req)
- {
--	struct crypto_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int err, first, rounds = 6 + ctx->key_length / 4;
--	struct blkcipher_walk walk;
-+	struct skcipher_walk walk;
- 	unsigned int blocks;
- 
--	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt(desc, &walk);
-+	err = skcipher_walk_virt(&walk, req, true);
- 
- 	kernel_neon_begin();
- 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
- 		aes_cbc_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				(u8 *)ctx->key_dec, rounds, blocks, walk.iv,
- 				first);
--		err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
-+		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
- 	kernel_neon_end();
- 	return err;
- }
- 
--static int ctr_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--		       struct scatterlist *src, unsigned int nbytes)
-+static int ctr_encrypt(struct skcipher_request *req)
- {
--	struct crypto_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int err, first, rounds = 6 + ctx->key_length / 4;
--	struct blkcipher_walk walk;
-+	struct skcipher_walk walk;
- 	int blocks;
- 
--	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt_block(desc, &walk, AES_BLOCK_SIZE);
-+	err = skcipher_walk_virt(&walk, req, true);
- 
- 	first = 1;
- 	kernel_neon_begin();
-@@ -209,17 +205,13 @@ static int ctr_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
- 		aes_ctr_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				(u8 *)ctx->key_enc, rounds, blocks, walk.iv,
- 				first);
--		first = 0;
--		nbytes -= blocks * AES_BLOCK_SIZE;
--		if (nbytes && nbytes == walk.nbytes % AES_BLOCK_SIZE)
--			break;
--		err = blkcipher_walk_done(desc, &walk,
--					  walk.nbytes % AES_BLOCK_SIZE);
-+		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	if (walk.nbytes % AES_BLOCK_SIZE) {
--		u8 *tdst = walk.dst.virt.addr + blocks * AES_BLOCK_SIZE;
--		u8 *tsrc = walk.src.virt.addr + blocks * AES_BLOCK_SIZE;
-+	if (walk.nbytes) {
- 		u8 __aligned(8) tail[AES_BLOCK_SIZE];
-+		unsigned int nbytes = walk.nbytes;
-+		u8 *tdst = walk.dst.virt.addr;
-+		u8 *tsrc = walk.src.virt.addr;
- 
- 		/*
- 		 * Minimum alignment is 8 bytes, so if nbytes is <= 8, we need
-@@ -230,227 +222,169 @@ static int ctr_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
- 		aes_ctr_encrypt(tail, tsrc, (u8 *)ctx->key_enc, rounds,
- 				blocks, walk.iv, first);
- 		memcpy(tdst, tail, nbytes);
--		err = blkcipher_walk_done(desc, &walk, 0);
-+		err = skcipher_walk_done(&walk, 0);
- 	}
- 	kernel_neon_end();
- 
- 	return err;
- }
- 
--static int xts_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--		       struct scatterlist *src, unsigned int nbytes)
-+static int xts_encrypt(struct skcipher_request *req)
- {
--	struct crypto_aes_xts_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_aes_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int err, first, rounds = 6 + ctx->key1.key_length / 4;
--	struct blkcipher_walk walk;
-+	struct skcipher_walk walk;
- 	unsigned int blocks;
- 
--	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt(desc, &walk);
-+	err = skcipher_walk_virt(&walk, req, true);
- 
- 	kernel_neon_begin();
- 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
- 		aes_xts_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				(u8 *)ctx->key1.key_enc, rounds, blocks,
- 				(u8 *)ctx->key2.key_enc, walk.iv, first);
--		err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
-+		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
- 	kernel_neon_end();
- 
- 	return err;
- }
- 
--static int xts_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--		       struct scatterlist *src, unsigned int nbytes)
-+static int xts_decrypt(struct skcipher_request *req)
- {
--	struct crypto_aes_xts_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_aes_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int err, first, rounds = 6 + ctx->key1.key_length / 4;
--	struct blkcipher_walk walk;
-+	struct skcipher_walk walk;
- 	unsigned int blocks;
- 
--	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt(desc, &walk);
-+	err = skcipher_walk_virt(&walk, req, true);
- 
- 	kernel_neon_begin();
- 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
- 		aes_xts_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				(u8 *)ctx->key1.key_dec, rounds, blocks,
- 				(u8 *)ctx->key2.key_enc, walk.iv, first);
--		err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
-+		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
- 	kernel_neon_end();
- 
- 	return err;
- }
- 
--static struct crypto_alg aes_algs[] = { {
--	.cra_name		= "__ecb-aes-" MODE,
--	.cra_driver_name	= "__driver-ecb-aes-" MODE,
--	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
--				  CRYPTO_ALG_INTERNAL,
--	.cra_blocksize		= AES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
--	.cra_alignmask		= 7,
--	.cra_type		= &crypto_blkcipher_type,
--	.cra_module		= THIS_MODULE,
--	.cra_blkcipher = {
--		.min_keysize	= AES_MIN_KEY_SIZE,
--		.max_keysize	= AES_MAX_KEY_SIZE,
--		.ivsize		= 0,
--		.setkey		= aes_setkey,
--		.encrypt	= ecb_encrypt,
--		.decrypt	= ecb_decrypt,
-+static struct skcipher_alg aes_algs[] = { {
-+	.base = {
-+		.cra_name		= "__ecb(aes)",
-+		.cra_driver_name	= "__ecb-aes-" MODE,
-+		.cra_priority		= PRIO,
-+		.cra_flags		= CRYPTO_ALG_INTERNAL,
-+		.cra_blocksize		= AES_BLOCK_SIZE,
-+		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
-+		.cra_alignmask		= 7,
-+		.cra_module		= THIS_MODULE,
- 	},
-+	.min_keysize	= AES_MIN_KEY_SIZE,
-+	.max_keysize	= AES_MAX_KEY_SIZE,
-+	.setkey		= skcipher_aes_setkey,
-+	.encrypt	= ecb_encrypt,
-+	.decrypt	= ecb_decrypt,
- }, {
--	.cra_name		= "__cbc-aes-" MODE,
--	.cra_driver_name	= "__driver-cbc-aes-" MODE,
--	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
--				  CRYPTO_ALG_INTERNAL,
--	.cra_blocksize		= AES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
--	.cra_alignmask		= 7,
--	.cra_type		= &crypto_blkcipher_type,
--	.cra_module		= THIS_MODULE,
--	.cra_blkcipher = {
--		.min_keysize	= AES_MIN_KEY_SIZE,
--		.max_keysize	= AES_MAX_KEY_SIZE,
--		.ivsize		= AES_BLOCK_SIZE,
--		.setkey		= aes_setkey,
--		.encrypt	= cbc_encrypt,
--		.decrypt	= cbc_decrypt,
-+	.base = {
-+		.cra_name		= "__cbc(aes)",
-+		.cra_driver_name	= "__cbc-aes-" MODE,
-+		.cra_priority		= PRIO,
-+		.cra_flags		= CRYPTO_ALG_INTERNAL,
-+		.cra_blocksize		= AES_BLOCK_SIZE,
-+		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
-+		.cra_alignmask		= 7,
-+		.cra_module		= THIS_MODULE,
- 	},
-+	.min_keysize	= AES_MIN_KEY_SIZE,
-+	.max_keysize	= AES_MAX_KEY_SIZE,
-+	.ivsize		= AES_BLOCK_SIZE,
-+	.setkey		= skcipher_aes_setkey,
-+	.encrypt	= cbc_encrypt,
-+	.decrypt	= cbc_decrypt,
- }, {
--	.cra_name		= "__ctr-aes-" MODE,
--	.cra_driver_name	= "__driver-ctr-aes-" MODE,
--	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
--				  CRYPTO_ALG_INTERNAL,
--	.cra_blocksize		= 1,
--	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
--	.cra_alignmask		= 7,
--	.cra_type		= &crypto_blkcipher_type,
--	.cra_module		= THIS_MODULE,
--	.cra_blkcipher = {
--		.min_keysize	= AES_MIN_KEY_SIZE,
--		.max_keysize	= AES_MAX_KEY_SIZE,
--		.ivsize		= AES_BLOCK_SIZE,
--		.setkey		= aes_setkey,
--		.encrypt	= ctr_encrypt,
--		.decrypt	= ctr_encrypt,
-+	.base = {
-+		.cra_name		= "__ctr(aes)",
-+		.cra_driver_name	= "__ctr-aes-" MODE,
-+		.cra_priority		= PRIO,
-+		.cra_flags		= CRYPTO_ALG_INTERNAL,
-+		.cra_blocksize		= 1,
-+		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
-+		.cra_alignmask		= 7,
-+		.cra_module		= THIS_MODULE,
- 	},
-+	.min_keysize	= AES_MIN_KEY_SIZE,
-+	.max_keysize	= AES_MAX_KEY_SIZE,
-+	.ivsize		= AES_BLOCK_SIZE,
-+	.chunksize	= AES_BLOCK_SIZE,
-+	.setkey		= skcipher_aes_setkey,
-+	.encrypt	= ctr_encrypt,
-+	.decrypt	= ctr_encrypt,
- }, {
--	.cra_name		= "__xts-aes-" MODE,
--	.cra_driver_name	= "__driver-xts-aes-" MODE,
--	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
--				  CRYPTO_ALG_INTERNAL,
--	.cra_blocksize		= AES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct crypto_aes_xts_ctx),
--	.cra_alignmask		= 7,
--	.cra_type		= &crypto_blkcipher_type,
--	.cra_module		= THIS_MODULE,
--	.cra_blkcipher = {
--		.min_keysize	= 2 * AES_MIN_KEY_SIZE,
--		.max_keysize	= 2 * AES_MAX_KEY_SIZE,
--		.ivsize		= AES_BLOCK_SIZE,
--		.setkey		= xts_set_key,
--		.encrypt	= xts_encrypt,
--		.decrypt	= xts_decrypt,
-+	.base = {
-+		.cra_name		= "__xts(aes)",
-+		.cra_driver_name	= "__xts-aes-" MODE,
-+		.cra_priority		= PRIO,
-+		.cra_flags		= CRYPTO_ALG_INTERNAL,
-+		.cra_blocksize		= AES_BLOCK_SIZE,
-+		.cra_ctxsize		= sizeof(struct crypto_aes_xts_ctx),
-+		.cra_alignmask		= 7,
-+		.cra_module		= THIS_MODULE,
- 	},
--}, {
--	.cra_name		= "ecb(aes)",
--	.cra_driver_name	= "ecb-aes-" MODE,
--	.cra_priority		= PRIO,
--	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
--	.cra_blocksize		= AES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct async_helper_ctx),
--	.cra_alignmask		= 7,
--	.cra_type		= &crypto_ablkcipher_type,
--	.cra_module		= THIS_MODULE,
--	.cra_init		= ablk_init,
--	.cra_exit		= ablk_exit,
--	.cra_ablkcipher = {
--		.min_keysize	= AES_MIN_KEY_SIZE,
--		.max_keysize	= AES_MAX_KEY_SIZE,
--		.ivsize		= 0,
--		.setkey		= ablk_set_key,
--		.encrypt	= ablk_encrypt,
--		.decrypt	= ablk_decrypt,
--	}
--}, {
--	.cra_name		= "cbc(aes)",
--	.cra_driver_name	= "cbc-aes-" MODE,
--	.cra_priority		= PRIO,
--	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
--	.cra_blocksize		= AES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct async_helper_ctx),
--	.cra_alignmask		= 7,
--	.cra_type		= &crypto_ablkcipher_type,
--	.cra_module		= THIS_MODULE,
--	.cra_init		= ablk_init,
--	.cra_exit		= ablk_exit,
--	.cra_ablkcipher = {
--		.min_keysize	= AES_MIN_KEY_SIZE,
--		.max_keysize	= AES_MAX_KEY_SIZE,
--		.ivsize		= AES_BLOCK_SIZE,
--		.setkey		= ablk_set_key,
--		.encrypt	= ablk_encrypt,
--		.decrypt	= ablk_decrypt,
--	}
--}, {
--	.cra_name		= "ctr(aes)",
--	.cra_driver_name	= "ctr-aes-" MODE,
--	.cra_priority		= PRIO,
--	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
--	.cra_blocksize		= 1,
--	.cra_ctxsize		= sizeof(struct async_helper_ctx),
--	.cra_alignmask		= 7,
--	.cra_type		= &crypto_ablkcipher_type,
--	.cra_module		= THIS_MODULE,
--	.cra_init		= ablk_init,
--	.cra_exit		= ablk_exit,
--	.cra_ablkcipher = {
--		.min_keysize	= AES_MIN_KEY_SIZE,
--		.max_keysize	= AES_MAX_KEY_SIZE,
--		.ivsize		= AES_BLOCK_SIZE,
--		.setkey		= ablk_set_key,
--		.encrypt	= ablk_encrypt,
--		.decrypt	= ablk_decrypt,
--	}
--}, {
--	.cra_name		= "xts(aes)",
--	.cra_driver_name	= "xts-aes-" MODE,
--	.cra_priority		= PRIO,
--	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
--	.cra_blocksize		= AES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct async_helper_ctx),
--	.cra_alignmask		= 7,
--	.cra_type		= &crypto_ablkcipher_type,
--	.cra_module		= THIS_MODULE,
--	.cra_init		= ablk_init,
--	.cra_exit		= ablk_exit,
--	.cra_ablkcipher = {
--		.min_keysize	= 2 * AES_MIN_KEY_SIZE,
--		.max_keysize	= 2 * AES_MAX_KEY_SIZE,
--		.ivsize		= AES_BLOCK_SIZE,
--		.setkey		= ablk_set_key,
--		.encrypt	= ablk_encrypt,
--		.decrypt	= ablk_decrypt,
--	}
-+	.min_keysize	= 2 * AES_MIN_KEY_SIZE,
-+	.max_keysize	= 2 * AES_MAX_KEY_SIZE,
-+	.ivsize		= AES_BLOCK_SIZE,
-+	.setkey		= xts_set_key,
-+	.encrypt	= xts_encrypt,
-+	.decrypt	= xts_decrypt,
- } };
- 
--static int __init aes_init(void)
-+struct simd_skcipher_alg *aes_simd_algs[ARRAY_SIZE(aes_algs)];
-+
-+static void aes_exit(void)
- {
--	return crypto_register_algs(aes_algs, ARRAY_SIZE(aes_algs));
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(aes_simd_algs) && aes_simd_algs[i]; i++)
-+		simd_skcipher_free(aes_simd_algs[i]);
-+
-+	crypto_unregister_skciphers(aes_algs, ARRAY_SIZE(aes_algs));
- }
- 
--static void __exit aes_exit(void)
-+static int __init aes_init(void)
- {
--	crypto_unregister_algs(aes_algs, ARRAY_SIZE(aes_algs));
-+	struct simd_skcipher_alg *simd;
-+	const char *basename;
-+	const char *algname;
-+	const char *drvname;
-+	int err;
-+	int i;
-+
-+	err = crypto_register_skciphers(aes_algs, ARRAY_SIZE(aes_algs));
-+	if (err)
-+		return err;
-+
-+	for (i = 0; i < ARRAY_SIZE(aes_algs); i++) {
-+		algname = aes_algs[i].base.cra_name + 2;
-+		drvname = aes_algs[i].base.cra_driver_name + 2;
-+		basename = aes_algs[i].base.cra_driver_name;
-+		simd = simd_skcipher_create_compat(algname, drvname, basename);
-+		err = PTR_ERR(simd);
-+		if (IS_ERR(simd))
-+			goto unregister_simds;
-+
-+		aes_simd_algs[i] = simd;
-+	}
-+
-+	return 0;
-+
-+unregister_simds:
-+	aes_exit();
-+	return err;
- }
- 
- #ifdef USE_V8_CRYPTO_EXTENSIONS
+-	tfm = crypto_alloc_akcipher(driver, type | CRYPTO_ALG_INTERNAL, mask);
++	tfm = crypto_alloc_akcipher(driver, type, mask);
+ 	if (IS_ERR(tfm)) {
+ 		pr_err("alg: akcipher: Failed to load tfm for %s: %ld\n",
+ 		       driver, PTR_ERR(tfm));
+@@ -2223,88 +2223,6 @@ static int alg_test_null(const struct alg_test_desc *desc,
+ /* Please keep this list sorted by algorithm name. */
+ static const struct alg_test_desc alg_test_descs[] = {
+ 	{
+-		.alg = "__cbc-cast5-avx",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__cbc-cast6-avx",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__cbc-serpent-avx",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__cbc-serpent-avx2",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__cbc-serpent-sse2",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__cbc-twofish-avx",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-cbc-aes-aesni",
+-		.test = alg_test_null,
+-		.fips_allowed = 1,
+-	}, {
+-		.alg = "__driver-cbc-camellia-aesni",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-cbc-camellia-aesni-avx2",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-cbc-cast5-avx",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-cbc-cast6-avx",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-cbc-serpent-avx",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-cbc-serpent-avx2",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-cbc-serpent-sse2",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-cbc-twofish-avx",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-ecb-aes-aesni",
+-		.test = alg_test_null,
+-		.fips_allowed = 1,
+-	}, {
+-		.alg = "__driver-ecb-camellia-aesni",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-ecb-camellia-aesni-avx2",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-ecb-cast5-avx",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-ecb-cast6-avx",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-ecb-serpent-avx",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-ecb-serpent-avx2",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-ecb-serpent-sse2",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-ecb-twofish-avx",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "__driver-gcm-aes-aesni",
+-		.test = alg_test_null,
+-		.fips_allowed = 1,
+-	}, {
+-		.alg = "__ghash-pclmulqdqni",
+-		.test = alg_test_null,
+-		.fips_allowed = 1,
+-	}, {
+ 		.alg = "ansi_cprng",
+ 		.test = alg_test_cprng,
+ 		.suite = {
+@@ -2791,55 +2709,6 @@ static int alg_test_null(const struct alg_test_desc *desc,
+ 			}
+ 		}
+ 	}, {
+-		.alg = "cryptd(__driver-cbc-aes-aesni)",
+-		.test = alg_test_null,
+-		.fips_allowed = 1,
+-	}, {
+-		.alg = "cryptd(__driver-cbc-camellia-aesni)",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "cryptd(__driver-cbc-camellia-aesni-avx2)",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "cryptd(__driver-cbc-serpent-avx2)",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "cryptd(__driver-ecb-aes-aesni)",
+-		.test = alg_test_null,
+-		.fips_allowed = 1,
+-	}, {
+-		.alg = "cryptd(__driver-ecb-camellia-aesni)",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "cryptd(__driver-ecb-camellia-aesni-avx2)",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "cryptd(__driver-ecb-cast5-avx)",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "cryptd(__driver-ecb-cast6-avx)",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "cryptd(__driver-ecb-serpent-avx)",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "cryptd(__driver-ecb-serpent-avx2)",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "cryptd(__driver-ecb-serpent-sse2)",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "cryptd(__driver-ecb-twofish-avx)",
+-		.test = alg_test_null,
+-	}, {
+-		.alg = "cryptd(__driver-gcm-aes-aesni)",
+-		.test = alg_test_null,
+-		.fips_allowed = 1,
+-	}, {
+-		.alg = "cryptd(__ghash-pclmulqdqni)",
+-		.test = alg_test_null,
+-		.fips_allowed = 1,
+-	}, {
+ 		.alg = "ctr(aes)",
+ 		.test = alg_test_skcipher,
+ 		.fips_allowed = 1,
+@@ -3166,10 +3035,6 @@ static int alg_test_null(const struct alg_test_desc *desc,
+ 		.fips_allowed = 1,
+ 		.test = alg_test_null,
+ 	}, {
+-		.alg = "ecb(__aes-aesni)",
+-		.test = alg_test_null,
+-		.fips_allowed = 1,
+-	}, {
+ 		.alg = "ecb(aes)",
+ 		.test = alg_test_skcipher,
+ 		.fips_allowed = 1,
