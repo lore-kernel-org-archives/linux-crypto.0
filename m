@@ -1,75 +1,115 @@
-From: <douille.l@hotmail.fr>
-Subject: 41307 linux-crypto
-Date: Sun, 13 Nov 2016 08:02:34 -0000
-Message-ID: <147902415410.28087.17129153826733232353@hinet.net>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH v2 00/11] getting back -Wmaybe-uninitialized
+Date: Sun, 13 Nov 2016 09:47:41 +0100
+Message-ID: <20161113084741.GA5225@kroah.com>
+References: <20161110164454.293477-1-arnd@arndb.de>
+ <CA+55aFx_scFVFKU__TBmoffw_iHvrdAU2dj5u1WKfWJXAkS4QA@mail.gmail.com>
+ <2695221.kyRJMsRMjs@wuerfel>
+ <f6dccd27-09d2-1842-220b-24aa84043674@kernel.org>
 Mime-Version: 1.0
-Content-Type: application/zip; name="EMAIL_31165189507_linux-crypto.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 114-47-57-107.dynamic.hinet.net ([114.47.57.107]:34807 "HELO
-        hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
-        id S1751388AbcKMICl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Nov 2016 03:02:41 -0500
-Content-Disposition: attachment
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+        sayli karnik <karniksayli1995@gmail.com>,
+        Mark Brown <broonie@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Javier Martinez Canillas <javier@osg.samsung.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Ley Foon Tan <lftan@altera.com>,
+        "Luis R . Rodriguez" <mcgrof@kernel.org>,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michal Marek <mmarek@suse.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Sean Young <sean@mess.
+To: Jonathan Cameron <jic23@kernel.org>
+Return-path: <linux-kbuild-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <f6dccd27-09d2-1842-220b-24aa84043674@kernel.org>
+Sender: linux-kbuild-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-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
-AABQSwUGAAAAAAEAAQBYAAAAWwwAAAAA
+On Sat, Nov 12, 2016 at 01:27:12PM +0000, Jonathan Cameron wrote:
+> On 11/11/16 19:49, Arnd Bergmann wrote:
+> > On Friday, November 11, 2016 9:13:00 AM CET Linus Torvalds wrote:
+> >> On Thu, Nov 10, 2016 at 8:44 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> >>>
+> >>> Please merge these directly if you are happy with the result.
+> >>
+> >> I will take this.
+> > 
+> > Thanks a lot!
+> >  
+> >> I do see two warnings, but they both seem to be valid and recent,
+> >> though, so I have no issues with the spurious cases.
+> > 
+> > Ok, both of them should have my fixes coming your way already.
+> > 
+> >> Warning #1:
+> >>
+> >>   sound/soc/qcom/lpass-platform.c: In function ‘lpass_platform_pcmops_open’:
+> >>   sound/soc/qcom/lpass-platform.c:83:29: warning: ‘dma_ch’ may be used
+> >> uninitialized in this function [-Wmaybe-uninitialized]
+> >>     drvdata->substream[dma_ch] = substream;
+> >>     ~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
+> >>
+> >> and 'dma_ch' usage there really is crazy and wrong. Broken by
+> >> 022d00ee0b55 ("ASoC: lpass-platform: Fix broken pcm data usage")
+> > 
+> > Right, the patches crossed here, the bugfix patch that introduced
+> > this came into linux-next over the kernel summit, and the fix I
+> > sent on Tuesday made it into Mark Brown's tree on Wednesday but not
+> > before you pulled alsa tree. It should be fixed the next time you
+> > pull from the alsa tree, the commit is
+> > 
+> > 3b89e4b77ef9 ("ASoC: lpass-platform: initialize dma channel number")
+> >  
+> >> Warning #2 is not a real bug, but it's reasonable that gcc doesn't
+> >> know that storage_bytes (chip->read_size) has to be 2/4. Again,
+> >> introduced recently by commit 231147ee77f3 ("iio: maxim_thermocouple:
+> >> Align 16 bit big endian value of raw reads"), so you didn't see it.
+> > 
+> > This is the one I mentioned in the commit message as one that
+> > is fixed in linux-next and that should make it in soon.
+> > 
+> >>   drivers/iio/temperature/maxim_thermocouple.c: In function
+> >> ‘maxim_thermocouple_read_raw’:
+> >>   drivers/iio/temperature/maxim_thermocouple.c:141:5: warning: ‘ret’
+> >> may be used uninitialized in this function [-Wmaybe-uninitialized]
+> >>     if (ret)
+> >>        ^
+> >>   drivers/iio/temperature/maxim_thermocouple.c:128:6: note: ‘ret’ was
+> >> declared here
+> >>     int ret;
+> >>         ^~~
+> >>
+> >> and I guess that code can just initialize 'ret' to '-EINVAL' or
+> >> something to just make the theoretical "somehow we had a wrong
+> >> chip->read_size" case error out cleanly.
+> > 
+> > Right, that was my conclusion too. I sent the bugfix on Oct 25
+> > for linux-next but it didn't make it in until this Monday, after
+> > you pulled the patch that introduced it on Oct 29.
+> > 
+> > The commit in staging-testing is
+> > 32cb7d27e65d ("iio: maxim_thermocouple: detect invalid storage size in read()")
+> > 
+> > Greg and Jonathan, I see now that this is part of the 'iio-for-4.10b'
+> > branch, so I suspect you were not planning to send this before the
+> > merge window. Could you make sure this ends up in v4.9 so we get
+> > a clean build when -Wmaybe-uninitialized gets enabled again?
+> I'll queue this up and send a pull to Greg tomorrow.
+> 
+> Was highly doubtful that a false warning suppression (be it an
+> understandable one) was worth sending mid cycle, hence it was
+> taking the slow route.
+
+I can just cherry-pick this, no need to send a separate pull request.
+
+greg k-h
