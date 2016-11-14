@@ -1,119 +1,79 @@
 From: Alex Cope <alexcope@google.com>
-Subject: [RFC][PATCH 1/7] crypto: skcipher adding skciper_walk_virt_init
-Date: Mon, 14 Nov 2016 13:01:12 -0800
-Message-ID: <1479157277-10251-2-git-send-email-alexcope@google.com>
+Subject: [RFC][PATCH 4/7] crypto: shash - Add crypto_grab_shash() and crypto_spawn_shash_alg()
+Date: Mon, 14 Nov 2016 13:01:15 -0800
+Message-ID: <1479157277-10251-5-git-send-email-alexcope@google.com>
 References: <1479157277-10251-1-git-send-email-alexcope@google.com>
 Cc: mhalcrow@google.com, edknapp@google.com,
         Alex Cope <alexcope@google.com>,
         Eric Biggers <ebiggers@google.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f173.google.com ([209.85.192.173]:35303 "EHLO
-        mail-pf0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753274AbcKNVBm (ORCPT
+Received: from mail-pf0-f181.google.com ([209.85.192.181]:35314 "EHLO
+        mail-pf0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753274AbcKNVBv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Nov 2016 16:01:42 -0500
-Received: by mail-pf0-f173.google.com with SMTP id i88so31317933pfk.2
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Nov 2016 13:01:42 -0800 (PST)
+        Mon, 14 Nov 2016 16:01:51 -0500
+Received: by mail-pf0-f181.google.com with SMTP id i88so31318523pfk.2
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Nov 2016 13:01:50 -0800 (PST)
 In-Reply-To: <1479157277-10251-1-git-send-email-alexcope@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Adding skcipher_walk_virt_init to allow a skciper_walk to specify
-length and input/output sg. Provides similar funcationalty to
-blkcipher_walk_init
+Analogous to crypto_grab_skcipher() and crypto_spawn_skcipher_alg(),
+these are useful for algorithms that need to use a shash sub-algorithm,
+possibly in addition to other sub-algorithms.
 
 Signed-off-by: Alex Cope <alexcope@google.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/skcipher.c                  | 32 +++++++++++++++++++++++---------
- include/crypto/internal/skcipher.h |  4 ++++
- 2 files changed, 27 insertions(+), 9 deletions(-)
+ crypto/shash.c                 | 8 ++++++++
+ include/crypto/internal/hash.h | 8 ++++++++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index e1633e6..df4b2de 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -447,16 +447,19 @@ static int skcipher_walk_first(struct skcipher_walk *walk)
+diff --git a/crypto/shash.c b/crypto/shash.c
+index a051541..55a5535 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -536,6 +536,14 @@ void shash_free_instance(struct crypto_instance *inst)
  }
+ EXPORT_SYMBOL_GPL(shash_free_instance);
  
- static int skcipher_walk_skcipher(struct skcipher_walk *walk,
--				 struct skcipher_request *req)
-+				  struct skcipher_request *req,
-+				  struct scatterlist *src,
-+				  struct scatterlist *dst,
-+				  unsigned int len)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 
--	scatterwalk_start(&walk->in, req->src);
--	scatterwalk_start(&walk->out, req->dst);
-+	scatterwalk_start(&walk->in, src);
-+	scatterwalk_start(&walk->out, dst);
- 
--	walk->in.sg = req->src;
--	walk->out.sg = req->dst;
--	walk->total = req->cryptlen;
-+	walk->in.sg = src;
-+	walk->out.sg = dst;
-+	walk->total = len;
- 	walk->iv = req->iv;
- 	walk->oiv = req->iv;
- 
-@@ -474,17 +477,27 @@ static int skcipher_walk_skcipher(struct skcipher_walk *walk,
- int skcipher_walk_virt(struct skcipher_walk *walk,
- 		      struct skcipher_request *req, bool atomic)
- {
-+	return skcipher_walk_virt_init(walk, req, atomic, req->src, req->dst,
-+					req->cryptlen);
-+}
-+EXPORT_SYMBOL_GPL(skcipher_walk_virt);
-+
-+int skcipher_walk_virt_init(struct skcipher_walk *walk,
-+			    struct skcipher_request *req, bool atomic,
-+			    struct scatterlist *src, struct scatterlist *dst,
-+			    unsigned int len)
++int crypto_grab_shash(struct crypto_shash_spawn *spawn,
++		      const char *name, u32 type, u32 mask)
 +{
- 	int err;
++	spawn->base.frontend = &crypto_shash_type;
++	return crypto_grab_spawn(&spawn->base, name, type, mask);
++}
++EXPORT_SYMBOL_GPL(crypto_grab_shash);
++
+ int crypto_init_shash_spawn(struct crypto_shash_spawn *spawn,
+ 			    struct shash_alg *alg,
+ 			    struct crypto_instance *inst)
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index 1d4f365..54e4425 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -99,6 +99,8 @@ int shash_register_instance(struct crypto_template *tmpl,
+ 			    struct shash_instance *inst);
+ void shash_free_instance(struct crypto_instance *inst);
  
- 	walk->flags &= ~SKCIPHER_WALK_PHYS;
- 
--	err = skcipher_walk_skcipher(walk, req);
-+	err = skcipher_walk_skcipher(walk, req, src, dst, len);
- 
- 	walk->flags &= atomic ? ~SKCIPHER_WALK_SLEEP : ~0;
- 
- 	return err;
++int crypto_grab_shash(struct crypto_shash_spawn *spawn,
++		      const char *name, u32 type, u32 mask);
+ int crypto_init_shash_spawn(struct crypto_shash_spawn *spawn,
+ 			    struct shash_alg *alg,
+ 			    struct crypto_instance *inst);
+@@ -108,6 +110,12 @@ static inline void crypto_drop_shash(struct crypto_shash_spawn *spawn)
+ 	crypto_drop_spawn(&spawn->base);
  }
--EXPORT_SYMBOL_GPL(skcipher_walk_virt);
-+EXPORT_SYMBOL_GPL(skcipher_walk_virt_init);
  
- void skcipher_walk_atomise(struct skcipher_walk *walk)
- {
-@@ -499,7 +512,8 @@ int skcipher_walk_async(struct skcipher_walk *walk,
++static inline struct shash_alg *crypto_spawn_shash_alg(
++	struct crypto_shash_spawn *spawn)
++{
++	return container_of(spawn->base.alg, struct shash_alg, base);
++}
++
+ struct shash_alg *shash_attr_alg(struct rtattr *rta, u32 type, u32 mask);
  
- 	INIT_LIST_HEAD(&walk->buffers);
- 
--	return skcipher_walk_skcipher(walk, req);
-+	return skcipher_walk_skcipher(walk, req, req->src, req->dst,
-+					 req->cryptlen);
- }
- EXPORT_SYMBOL_GPL(skcipher_walk_async);
- 
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index 26934a6..1173701 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -144,6 +144,10 @@ int skcipher_walk_done(struct skcipher_walk *walk, int err);
- int skcipher_walk_virt(struct skcipher_walk *walk,
-                       struct skcipher_request *req,
-                       bool atomic);
-+int skcipher_walk_virt_init(struct skcipher_walk *walk,
-+			struct skcipher_request *req,
-+			bool atomic, struct scatterlist *src,
-+			struct scatterlist *dst, unsigned int len);
- void skcipher_walk_atomise(struct skcipher_walk *walk);
- int skcipher_walk_async(struct skcipher_walk *walk,
-                        struct skcipher_request *req);
+ int shash_ahash_update(struct ahash_request *req, struct shash_desc *desc);
 -- 
 2.8.0.rc3.226.g39d4020
