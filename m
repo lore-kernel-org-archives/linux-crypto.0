@@ -1,60 +1,57 @@
-From: Nicolas Ferre <nicolas.ferre@atmel.com>
-Subject: Re: [PATCH -next] hwrng: atmel - use clk_disable_unprepare instead of
- clk_disable
-Date: Mon, 14 Nov 2016 09:02:28 +0100
-Message-ID: <b8d6676b-127b-804e-0d77-e4defcdfdff2@atmel.com>
-References: <1478876207-29820-1-git-send-email-weiyj.lk@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 8bit
-Cc: Wei Yongjun <weiyongjun1@huawei.com>,
-        <linux-crypto@vger.kernel.org>
-To: Wei Yongjun <weiyj.lk@gmail.com>, Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Wenyou Yang <wenyou.yang@atmel.com>
+From: Alex Cope <alexcope@google.com>
+Subject: [PATCH] crypto: gf128mul - Zero memory when freeing multiplication table
+Date: Mon, 14 Nov 2016 11:02:54 -0800
+Message-ID: <1479150174-128347-1-git-send-email-alexcope@google.com>
+Cc: Alex Cope <alexcope@google.com>, Eric Biggers <ebiggers@google.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from eusmtp01.atmel.com ([212.144.249.242]:29131 "EHLO
-        eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752244AbcKNIDL (ORCPT
+Received: from mail-pg0-f52.google.com ([74.125.83.52]:35844 "EHLO
+        mail-pg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933387AbcKNTLA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Nov 2016 03:03:11 -0500
-In-Reply-To: <1478876207-29820-1-git-send-email-weiyj.lk@gmail.com>
+        Mon, 14 Nov 2016 14:11:00 -0500
+Received: by mail-pg0-f52.google.com with SMTP id f188so56957804pgc.3
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Nov 2016 11:11:00 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Le 11/11/2016 à 15:56, Wei Yongjun a écrit :
-> From: Wei Yongjun <weiyongjun1@huawei.com>
-> 
-> Since clk_prepare_enable() is used to get trng->clk, we should
-> use clk_disable_unprepare() to release it for the error path.
-> 
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+GF(2^128) multiplication tables are typically used for secret
+information, so it's a good idea to zero them on free.
 
-Acked-by: Nicolas Ferre <nicolas.ferre@atmel.com>
+Signed-off-by: Alex Cope <alexcope@google.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/gf128mul.c         | 4 ++--
+ include/crypto/gf128mul.h | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-Thank you.
-
-Best regards,
-
-> ---
->  drivers/char/hw_random/atmel-rng.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
-> index ae7cae5..661c82c 100644
-> --- a/drivers/char/hw_random/atmel-rng.c
-> +++ b/drivers/char/hw_random/atmel-rng.c
-> @@ -94,7 +94,7 @@ static int atmel_trng_probe(struct platform_device *pdev)
->  	return 0;
->  
->  err_register:
-> -	clk_disable(trng->clk);
-> +	clk_disable_unprepare(trng->clk);
->  	return ret;
->  }
-> 
-> 
-
-
+diff --git a/crypto/gf128mul.c b/crypto/gf128mul.c
+index 5276607..0594dd6 100644
+--- a/crypto/gf128mul.c
++++ b/crypto/gf128mul.c
+@@ -352,8 +352,8 @@ void gf128mul_free_64k(struct gf128mul_64k *t)
+ 	int i;
+ 
+ 	for (i = 0; i < 16; i++)
+-		kfree(t->t[i]);
+-	kfree(t);
++		kzfree(t->t[i]);
++	kzfree(t);
+ }
+ EXPORT_SYMBOL(gf128mul_free_64k);
+ 
+diff --git a/include/crypto/gf128mul.h b/include/crypto/gf128mul.h
+index da2530e..7217fe6 100644
+--- a/include/crypto/gf128mul.h
++++ b/include/crypto/gf128mul.h
+@@ -177,7 +177,7 @@ void gf128mul_4k_bbe(be128 *a, struct gf128mul_4k *t);
+ 
+ static inline void gf128mul_free_4k(struct gf128mul_4k *t)
+ {
+-	kfree(t);
++	kzfree(t);
+ }
+ 
+ 
 -- 
-Nicolas Ferre
+2.8.0.rc3.226.g39d4020
