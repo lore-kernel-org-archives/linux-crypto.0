@@ -1,151 +1,303 @@
 From: Alex Cope <alexcope@google.com>
-Subject: [RFC][PATCH 2/7] crypto: gf128mul - Refactor gf128 overflow macros
-Date: Mon, 14 Nov 2016 13:01:13 -0800
-Message-ID: <1479157277-10251-3-git-send-email-alexcope@google.com>
+Subject: [RFC][PATCH 6/7] crypto: testmgr - Add test vectors for HEH
+Date: Mon, 14 Nov 2016 13:01:17 -0800
+Message-ID: <1479157277-10251-7-git-send-email-alexcope@google.com>
 References: <1479157277-10251-1-git-send-email-alexcope@google.com>
 Cc: mhalcrow@google.com, edknapp@google.com,
         Alex Cope <alexcope@google.com>,
         Eric Biggers <ebiggers@google.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f49.google.com ([74.125.83.49]:36676 "EHLO
-        mail-pg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753274AbcKNVBp (ORCPT
+Received: from mail-pf0-f178.google.com ([209.85.192.178]:35323 "EHLO
+        mail-pf0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753274AbcKNVB4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Nov 2016 16:01:45 -0500
-Received: by mail-pg0-f49.google.com with SMTP id f188so57852213pgc.3
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Nov 2016 13:01:44 -0800 (PST)
+        Mon, 14 Nov 2016 16:01:56 -0500
+Received: by mail-pf0-f178.google.com with SMTP id i88so31318922pfk.2
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Nov 2016 13:01:56 -0800 (PST)
 In-Reply-To: <1479157277-10251-1-git-send-email-alexcope@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Rename and clean up the overflow macros. Their usage is more general
-than the name suggested.
+Adding test vectors from
+https://tools.ietf.org/html/draft-cope-heh-00
 
 Signed-off-by: Alex Cope <alexcope@google.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/gf128mul.c | 68 +++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 41 insertions(+), 27 deletions(-)
+ crypto/testmgr.c |  15 ++++
+ crypto/testmgr.h | 226 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 241 insertions(+)
 
-diff --git a/crypto/gf128mul.c b/crypto/gf128mul.c
-index 0594dd6..8b65b1e 100644
---- a/crypto/gf128mul.c
-+++ b/crypto/gf128mul.c
-@@ -88,33 +88,47 @@
- 	q(0xf8), q(0xf9), q(0xfa), q(0xfb), q(0xfc), q(0xfd), q(0xfe), q(0xff) \
- }
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index ded50b6..bab027b 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -3481,6 +3481,21 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "heh(aes)",
++		.test = alg_test_skcipher,
++		.suite = {
++			.cipher = {
++				.enc = {
++					.vecs = aes_heh_enc_tv_template,
++					.count = AES_HEH_ENC_TEST_VECTORS
++				},
++				.dec = {
++					.vecs = aes_heh_dec_tv_template,
++					.count = AES_HEH_DEC_TEST_VECTORS
++				}
++			}
++		}
++	}, {
+ 		.alg = "hmac(crc32)",
+ 		.test = alg_test_hash,
+ 		.suite = {
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index e64a4ef..b2daad3 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -15172,6 +15172,8 @@ static struct cipher_testvec cast6_xts_dec_tv_template[] = {
+ #define AES_DEC_TEST_VECTORS 4
+ #define AES_CBC_ENC_TEST_VECTORS 5
+ #define AES_CBC_DEC_TEST_VECTORS 5
++#define AES_HEH_ENC_TEST_VECTORS 4
++#define AES_HEH_DEC_TEST_VECTORS 4
+ #define HMAC_MD5_ECB_CIPHER_NULL_ENC_TEST_VECTORS 2
+ #define HMAC_MD5_ECB_CIPHER_NULL_DEC_TEST_VECTORS 2
+ #define HMAC_SHA1_ECB_CIPHER_NULL_ENC_TEST_VEC 2
+@@ -15544,6 +15546,230 @@ static struct cipher_testvec aes_dec_tv_template[] = {
+ 	},
+ };
  
--/*	Given the value i in 0..255 as the byte overflow when a field element
--    in GHASH is multiplied by x^8, this function will return the values that
--    are generated in the lo 16-bit word of the field value by applying the
--    modular polynomial. The values lo_byte and hi_byte are returned via the
--    macro xp_fun(lo_byte, hi_byte) so that the values can be assembled into
--    memory as required by a suitable definition of this macro operating on
--    the table above
--*/
--
--#define xx(p, q)	0x##p##q
-+/*
-+ * Given a value i in 0..255 as the byte overflow when a field element
-+ * in GF(2^128) is multiplied by x^8, the following macro returns the
-+ * 16-bit value that must be XOR-ed into the low-degree end of the
-+ * product to reduce it modulo the irreducible polynomial x^128 + x^7 +
-+ * x^2 + x + 1.
-+ *
-+ * There are two versions of the macro, and hence two tables: one for
-+ * the "be" convention where the highest-order bit is the coefficient of
-+ * the highest-degree polynomial term, and one for the "le" convention
-+ * where the highest-order bit is the coefficient of the lowest-degree
-+ * polynomial term.  In both cases the values are stored in CPU byte
-+ * endianness such that the coefficients are ordered consistently across
-+ * bytes, i.e. in the "be" table bits 15..0 of the stored value
-+ * correspond to the coefficients of x^15..x^0, and in the "le" table
-+ * bits 15..0 correspond to the coefficients of x^0..x^15.
-+ *
-+ * Therefore, provided that the appropriate byte endianness conversions
-+ * are done by the multiplication functions (and these must be in place
-+ * anyway to support both little endian and big endian CPUs), the "be"
-+ * table can be used for multiplications of both "bbe" and "ble"
-+ * elements, and the "le" table can be used for multiplications of both
-+ * "lle" and "lbe" elements.
-+ */
- 
--#define xda_bbe(i) ( \
--	(i & 0x80 ? xx(43, 80) : 0) ^ (i & 0x40 ? xx(21, c0) : 0) ^ \
--	(i & 0x20 ? xx(10, e0) : 0) ^ (i & 0x10 ? xx(08, 70) : 0) ^ \
--	(i & 0x08 ? xx(04, 38) : 0) ^ (i & 0x04 ? xx(02, 1c) : 0) ^ \
--	(i & 0x02 ? xx(01, 0e) : 0) ^ (i & 0x01 ? xx(00, 87) : 0) \
-+#define xda_be(i) ( \
-+	(i & 0x80 ? 0x4380 : 0) ^ (i & 0x40 ? 0x21c0 : 0) ^ \
-+	(i & 0x20 ? 0x10e0 : 0) ^ (i & 0x10 ? 0x0870 : 0) ^ \
-+	(i & 0x08 ? 0x0438 : 0) ^ (i & 0x04 ? 0x021c : 0) ^ \
-+	(i & 0x02 ? 0x010e : 0) ^ (i & 0x01 ? 0x0087 : 0) \
- )
- 
--#define xda_lle(i) ( \
--	(i & 0x80 ? xx(e1, 00) : 0) ^ (i & 0x40 ? xx(70, 80) : 0) ^ \
--	(i & 0x20 ? xx(38, 40) : 0) ^ (i & 0x10 ? xx(1c, 20) : 0) ^ \
--	(i & 0x08 ? xx(0e, 10) : 0) ^ (i & 0x04 ? xx(07, 08) : 0) ^ \
--	(i & 0x02 ? xx(03, 84) : 0) ^ (i & 0x01 ? xx(01, c2) : 0) \
-+#define xda_le(i) ( \
-+	(i & 0x80 ? 0xe100 : 0) ^ (i & 0x40 ? 0x7080 : 0) ^ \
-+	(i & 0x20 ? 0x3840 : 0) ^ (i & 0x10 ? 0x1c20 : 0) ^ \
-+	(i & 0x08 ? 0x0e10 : 0) ^ (i & 0x04 ? 0x0708 : 0) ^ \
-+	(i & 0x02 ? 0x0384 : 0) ^ (i & 0x01 ? 0x01c2 : 0) \
- )
- 
--static const u16 gf128mul_table_lle[256] = gf128mul_dat(xda_lle);
--static const u16 gf128mul_table_bbe[256] = gf128mul_dat(xda_bbe);
-+static const u16 gf128mul_table_le[256] = gf128mul_dat(xda_le);
-+static const u16 gf128mul_table_be[256] = gf128mul_dat(xda_be);
- 
- /* These functions multiply a field element by x, by x^4 and by x^8
-  * in the polynomial field representation. It uses 32-bit word operations
-@@ -126,7 +140,7 @@ static void gf128mul_x_lle(be128 *r, const be128 *x)
- {
- 	u64 a = be64_to_cpu(x->a);
- 	u64 b = be64_to_cpu(x->b);
--	u64 _tt = gf128mul_table_lle[(b << 7) & 0xff];
-+	u64 _tt = gf128mul_table_le[(b << 7) & 0xff];
- 
- 	r->b = cpu_to_be64((b >> 1) | (a << 63));
- 	r->a = cpu_to_be64((a >> 1) ^ (_tt << 48));
-@@ -136,7 +150,7 @@ static void gf128mul_x_bbe(be128 *r, const be128 *x)
- {
- 	u64 a = be64_to_cpu(x->a);
- 	u64 b = be64_to_cpu(x->b);
--	u64 _tt = gf128mul_table_bbe[a >> 63];
-+	u64 _tt = gf128mul_table_be[a >> 63];
- 
- 	r->a = cpu_to_be64((a << 1) | (b >> 63));
- 	r->b = cpu_to_be64((b << 1) ^ _tt);
-@@ -146,7 +160,7 @@ void gf128mul_x_ble(be128 *r, const be128 *x)
- {
- 	u64 a = le64_to_cpu(x->a);
- 	u64 b = le64_to_cpu(x->b);
--	u64 _tt = gf128mul_table_bbe[b >> 63];
-+	u64 _tt = gf128mul_table_be[b >> 63];
- 
- 	r->a = cpu_to_le64((a << 1) ^ _tt);
- 	r->b = cpu_to_le64((b << 1) | (a >> 63));
-@@ -157,7 +171,7 @@ static void gf128mul_x8_lle(be128 *x)
- {
- 	u64 a = be64_to_cpu(x->a);
- 	u64 b = be64_to_cpu(x->b);
--	u64 _tt = gf128mul_table_lle[b & 0xff];
-+	u64 _tt = gf128mul_table_le[b & 0xff];
- 
- 	x->b = cpu_to_be64((b >> 8) | (a << 56));
- 	x->a = cpu_to_be64((a >> 8) ^ (_tt << 48));
-@@ -167,7 +181,7 @@ static void gf128mul_x8_bbe(be128 *x)
- {
- 	u64 a = be64_to_cpu(x->a);
- 	u64 b = be64_to_cpu(x->b);
--	u64 _tt = gf128mul_table_bbe[a >> 56];
-+	u64 _tt = gf128mul_table_be[a >> 56];
- 
- 	x->a = cpu_to_be64((a << 8) | (b >> 56));
- 	x->b = cpu_to_be64((b << 8) ^ _tt);
++static struct cipher_testvec aes_heh_enc_tv_template[] = {
++	{
++		.key    = "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++			  "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++			  "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
++		.klen   = 48,
++		.iv	= "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.input	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
++		.ilen   = 16,
++		.result = "\x61\x76\x38\xa5\x12\x0b\x6d\x89"
++			  "\x92\x68\x30\x7e\x0d\x6e\x81\xe3",
++		.rlen   = 16,
++		.also_non_np = 1,
++		.np	= 2,
++		.tap	= { 8, 8 },
++	}, {
++		.key    = "\x68\xf8\x27\x87\xdc\x30\x33\xfd"
++			  "\x65\x5b\x8e\x51\x2e\x02\xff\x9d"
++			  "\x21\x28\x1e\x64\xcd\x9c\x33\x88"
++			  "\xf6\x2c\x43\x8f\xf5\x6f\xf5\x8f"
++			  "\xa8\xda\x24\x9b\x5e\xfa\x13\xc2"
++			  "\xc1\x94\xbf\x32\xba\x38\xa3\x77",
++		.klen   = 48,
++		.iv	= "\x4d\x47\x61\x37\x2b\x47\x86\xf0"
++			  "\xd6\x47\xb5\xc2\xe8\xcf\x85\x27",
++		.input	= "\xb8\xee\x29\xe4\xa5\xd1\xe7\x55"
++			  "\xd0\xfd\xe7\x22\x63\x76\x36\xe2"
++			  "\xf8\x0c\xf8\xfe\x65\x76\xe7\xca"
++			  "\xc1\x42\xf5\xca\x5a\xa8\xac\x2a",
++		.ilen   = 32,
++		.result = "\x1f\x4c\x6a\x1e\x1d\x20\x0d\x99"
++			  "\xdf\xbb\x13\xd8\x35\xdc\x1d\xbe"
++			  "\xed\x50\x0a\x9f\xfd\xd6\x94\x85"
++			  "\xd0\x8b\xf7\xb4\x49\x7f\x70\x6d",
++		.rlen   = 32,
++		.also_non_np = 1,
++		.np	= 3,
++		.tap	= { 16, 13, 3 },
++	}, {
++		.key    = "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++			  "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++			  "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
++		.klen   = 48,
++		.iv	= "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.input	= "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00",
++		.ilen   = 63,
++		.result = "\xfb\x30\x90\x47\xc5\x4e\xcc\xfd"
++			  "\xc4\x90\xa2\x9f\x7c\x03\x63\xc3"
++			  "\xcb\xaf\x2e\xee\x62\x18\xeb\x20"
++			  "\x62\x97\xe4\x9b\xf2\x8b\xf3\x3f"
++			  "\x76\x3b\xaa\xab\xf0\x19\x54\xdb"
++			  "\xb4\xaf\x2e\xd9\xa7\xe0\x92\x04"
++			  "\x5a\xe4\x81\xfc\x58\xf2\xda\xbf"
++			  "\x5d\xc9\xb1\x47\xd5\x08\xb1",
++		.rlen   = 63,
++		.also_non_np = 1,
++		.np	= 8,
++		.tap	= { 20, 20, 10, 8, 2, 1, 1, 1 },
++	}, {
++		.key    = "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++			  "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++			  "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
++		.klen   = 48,
++		.iv	= "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.input	= "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x01"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00",
++		.ilen   = 63,
++		.result = "\x9c\xdf\xa5\x50\x83\xe0\xa3\xb5"
++			  "\x0d\x35\x83\x34\x6e\x6e\x40\xd6"
++			  "\x0f\x81\xc8\x1a\x9c\x40\x81\xfb"
++			  "\xb3\x6e\xb4\xbf\xfc\xca\xc9\x50"
++			  "\xcd\x33\xfd\xb3\x43\x11\xe6\x32"
++			  "\x02\x3d\x3e\xc6\x49\x6e\xcf\x58"
++			  "\x3e\x14\x15\x6d\x39\x2a\x58\x99"
++			  "\x83\xaf\xdd\x22\x3e\x7f\x6c",
++		.rlen   = 63,
++		.also_non_np = 1,
++		.np	= 8,
++		.tap	= { 20, 20, 10, 8, 2, 1, 1, 1 },
++	}
++};
++
++static struct cipher_testvec aes_heh_dec_tv_template[] = {
++	{
++		.key    = "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++			  "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++			  "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
++		.klen   = 48,
++		.iv	= "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.input = "\x61\x76\x38\xa5\x12\x0b\x6d\x89"
++			  "\x92\x68\x30\x7e\x0d\x6e\x81\xe3",
++		.ilen   = 16,
++		.result	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
++		.rlen   = 16,
++		.also_non_np = 1,
++		.np	= 2,
++		.tap	= { 8, 8 },
++	}, {
++		.key    = "\x68\xf8\x27\x87\xdc\x30\x33\xfd"
++			  "\x65\x5b\x8e\x51\x2e\x02\xff\x9d"
++			  "\x21\x28\x1e\x64\xcd\x9c\x33\x88"
++			  "\xf6\x2c\x43\x8f\xf5\x6f\xf5\x8f"
++			  "\xa8\xda\x24\x9b\x5e\xfa\x13\xc2"
++			  "\xc1\x94\xbf\x32\xba\x38\xa3\x77",
++		.klen   = 48,
++		.iv	= "\x4d\x47\x61\x37\x2b\x47\x86\xf0"
++			  "\xd6\x47\xb5\xc2\xe8\xcf\x85\x27",
++		.input =  "\x1f\x4c\x6a\x1e\x1d\x20\x0d\x99"
++			  "\xdf\xbb\x13\xd8\x35\xdc\x1d\xbe"
++			  "\xed\x50\x0a\x9f\xfd\xd6\x94\x85"
++			  "\xd0\x8b\xf7\xb4\x49\x7f\x70\x6d",
++		.ilen   = 32,
++		.result	= "\xb8\xee\x29\xe4\xa5\xd1\xe7\x55"
++			  "\xd0\xfd\xe7\x22\x63\x76\x36\xe2"
++			  "\xf8\x0c\xf8\xfe\x65\x76\xe7\xca"
++			  "\xc1\x42\xf5\xca\x5a\xa8\xac\x2a",
++		.rlen   = 32,
++		.also_non_np = 1,
++		.np	= 3,
++		.tap	= { 16, 13, 3 },
++	}, {
++		.key    = "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++			  "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++			  "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
++		.klen   = 48,
++		.iv	= "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.result = "\xfb\x30\x90\x47\xc5\x4e\xcc\xfd"
++			  "\xc4\x90\xa2\x9f\x7c\x03\x63\xc3"
++			  "\xcb\xaf\x2e\xee\x62\x18\xeb\x20"
++			  "\x62\x97\xe4\x9b\xf2\x8b\xf3\x3f"
++			  "\x76\x3b\xaa\xab\xf0\x19\x54\xdb"
++			  "\xb4\xaf\x2e\xd9\xa7\xe0\x92\x04"
++			  "\x5a\xe4\x81\xfc\x58\xf2\xda\xbf"
++			  "\x5d\xc9\xb1\x47\xd5\x08\xb1",
++		.ilen   = 63,
++		.input = "\xfb\x30\x90\x47\xc5\x4e\xcc\xfd"
++			  "\xc4\x90\xa2\x9f\x7c\x03\x63\xc3"
++			  "\xcb\xaf\x2e\xee\x62\x18\xeb\x20"
++			  "\x62\x97\xe4\x9b\xf2\x8b\xf3\x3f"
++			  "\x76\x3b\xaa\xab\xf0\x19\x54\xdb"
++			  "\xb4\xaf\x2e\xd9\xa7\xe0\x92\x04"
++			  "\x5a\xe4\x81\xfc\x58\xf2\xda\xbf"
++			  "\x5d\xc9\xb1\x47\xd5\x08\xb1",
++		.result	= "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00",
++		.rlen   = 63,
++		.also_non_np = 1,
++		.np	= 8,
++		.tap	= { 20, 20, 10, 8, 2, 1, 1, 1 },
++	}, {
++		.key    = "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++			  "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
++			  "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
++		.klen   = 48,
++		.iv	= "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.input =  "\x9c\xdf\xa5\x50\x83\xe0\xa3\xb5"
++			  "\x0d\x35\x83\x34\x6e\x6e\x40\xd6"
++			  "\x0f\x81\xc8\x1a\x9c\x40\x81\xfb"
++			  "\xb3\x6e\xb4\xbf\xfc\xca\xc9\x50"
++			  "\xcd\x33\xfd\xb3\x43\x11\xe6\x32"
++			  "\x02\x3d\x3e\xc6\x49\x6e\xcf\x58"
++			  "\x3e\x14\x15\x6d\x39\x2a\x58\x99"
++			  "\x83\xaf\xdd\x22\x3e\x7f\x6c",
++		.ilen   = 63,
++		.result	= "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x01"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00",
++		.rlen   = 63,
++		.also_non_np = 1,
++		.np	= 8,
++		.tap	= { 20, 20, 10, 8, 2, 1, 1, 1 },
++	}
++};
++
+ static struct cipher_testvec aes_cbc_enc_tv_template[] = {
+ 	{ /* From RFC 3602 */
+ 		.key    = "\x06\xa9\x21\x40\x36\xb8\xa1\x5b"
 -- 
 2.8.0.rc3.226.g39d4020
