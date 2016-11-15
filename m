@@ -1,42 +1,47 @@
-From: Alex Cope <alexcope@google.com>
-Subject: Re: [RFC][PATCH 0/6] crypto: Adding Hash-Encrypt-Hash(HEH)
-Date: Tue, 15 Nov 2016 12:40:07 -0800
-Message-ID: <CA+cSK119vii5u=LF4uN0=LW2Pj8kj1x9+7c1+d860Yvcs3Po-g@mail.gmail.com>
+From: Gary R Hook <ghook@amd.com>
+Subject: Re: [PATCH V2 6/9] crypto: ccp - Add support for RSA on the CCP
+Date: Tue, 15 Nov 2016 15:42:29 -0600
+Message-ID: <3152c3e0-636e-e4b8-1b99-957f590e3a0b@amd.com>
+References: <20161104160140.18155.75618.stgit@taos>
+ <20161104160432.18155.29136.stgit@taos>
+ <20161113093930.GA7299@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Michael Halcrow <mhalcrow@google.com>,
-        Ed Knapp <edknapp@google.com>, Alex Cope <alexcope@google.com>
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>, <thomas.lendacky@amd.com>,
+        <davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary R Hook <gary.hook@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ua0-f172.google.com ([209.85.217.172]:33422 "EHLO
-        mail-ua0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752679AbcKOUkJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Nov 2016 15:40:09 -0500
-Received: by mail-ua0-f172.google.com with SMTP id 20so97647662uak.0
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Nov 2016 12:40:09 -0800 (PST)
+Received: from mail-bn3nam01on0083.outbound.protection.outlook.com ([104.47.33.83]:23147
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752308AbcKOVmm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Nov 2016 16:42:42 -0500
+In-Reply-To: <20161113093930.GA7299@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I accidentally had an off-by-one in this patch set. There is no patch
-7/7. I've edited this subject but don't plan to resend the rest of the
-patches to fix the subject lines.
-
-To clarify, this patchset is on top of "crypto: skcipher - skcipher
-algorithm conversion part 3" that Herbert currently has out for
-review.
-
-Cheers,
--Alex
-
-On Mon, Nov 14, 2016 at 1:01 PM, Alex Cope <alexcope@google.com> wrote:
-> This patchset implements HEH, which is currently specified by the
-> following Internet Draft:
+On 11/13/2016 03:39 AM, Herbert Xu wrote:
+> On Fri, Nov 04, 2016 at 11:04:32AM -0500, Gary R Hook wrote:
+>>
+>> +	ctx->u.rsa.pkey.e = mpi_read_raw_data(raw_key.e, raw_key.e_sz);
+>> +	if (!ctx->u.rsa.pkey.e)
+>> +		goto e_ret;
+>> +	ctx->u.rsa.e_buf = mpi_get_buffer(ctx->u.rsa.pkey.e,
+>> +					  &ctx->u.rsa.e_len, NULL);
 >
->         https://tools.ietf.org/html/draft-cope-heh-00
+> You're converting a raw integer into an MPI and then back again.
+> Why?
 >
-> This patchset is a request for comments, and should not be merged at
-> this time. We would like to wait for further comments on the Internet
-> Draft before merging this patchset.
->
-> Thanks
+> In general drivers shouldn't touch the MPI stuff at all since the
+> hardware generally deals with raw integers.
+
+D'oh! Yes, I see now what I missed before.
+
+I will send out another patch set.
+
+-- 
+This is my day job. Follow me at:
+IG/Twitter/Facebook: @grhookphoto
+IG/Twitter/Facebook: @grhphotographer
