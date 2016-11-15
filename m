@@ -1,61 +1,49 @@
-From: "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>
-Subject: [RFC PATCH] powerpc: crypto/vmx: clean up generated files
-Date: Tue, 15 Nov 2016 22:35:49 +0530
-Message-ID: <20161115170549.10538-1-naveen.n.rao@linux.vnet.ibm.com>
-Cc: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Michael Ellerman <mpe@ellerman.id.au>
-To: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35703 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S932956AbcKORGM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Nov 2016 12:06:12 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uAFH4oAW004856
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Nov 2016 12:06:12 -0500
-Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 26r4c4pmf1-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Nov 2016 12:06:11 -0500
-Received: from localhost
-        by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <naveen.n.rao@linux.vnet.ibm.com>;
-        Wed, 16 Nov 2016 03:06:09 +1000
-Received: from d23relay08.au.ibm.com (d23relay08.au.ibm.com [9.185.71.33])
-        by d23dlp03.au.ibm.com (Postfix) with ESMTP id E8EBB3578052
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2016 04:06:06 +1100 (EST)
-Received: from d23av04.au.ibm.com (d23av04.au.ibm.com [9.190.235.139])
-        by d23relay08.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id uAFH661L44433456
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2016 04:06:06 +1100
-Received: from d23av04.au.ibm.com (localhost [127.0.0.1])
-        by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id uAFH66Nt004671
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2016 04:06:06 +1100
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH 2/2] fscrypto: don't use on-stack buffer for key
+ derivation
+Date: Tue, 15 Nov 2016 10:53:09 -0800
+Message-ID: <20161115185309.GE127180@google.com>
+References: <1478210582-86338-1-git-send-email-ebiggers@google.com>
+ <1478210582-86338-2-git-send-email-ebiggers@google.com>
+ <20161115164704.5tzvm2g2x2fyetyu@thunk.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-crypto@vger.kernel.org, jaegeuk@kernel.org, richard@nod.at,
+        luto@kernel.org
+To: Theodore Ts'o <tytso@mit.edu>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20161115164704.5tzvm2g2x2fyetyu@thunk.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-..as stray .S files result in build errors, especially when using
-cross-compilers.
+On Tue, Nov 15, 2016 at 11:47:04AM -0500, Theodore Ts'o wrote:
+> On Thu, Nov 03, 2016 at 03:03:02PM -0700, Eric Biggers wrote:
+> > With the new (in 4.9) option to use a virtually-mapped stack
+> > (CONFIG_VMAP_STACK), stack buffers cannot be used as input/output for
+> > the scatterlist crypto API because they may not be directly mappable to
+> > struct page.  get_crypt_info() was using a stack buffer to hold the
+> > output from the encryption operation used to derive the per-file key.
+> > Fix it by using a heap buffer.
+> > 
+> > This bug could most easily be observed in a CONFIG_DEBUG_SG kernel
+> > because this allowed the BUG in sg_set_buf() to be triggered.
+> > 
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> 
+> This commit is on the fscrypt and dev branches on ext4.git.
+> 
+>      	       	      	      	  - Ted
 
-More specifically, the generated .S files are endian-specific and will break
-subsequent builds targeting the other endian architecture.
+Hi Ted,
 
-Signed-off-by: Naveen N. Rao <naveen.n.rao@linux.vnet.ibm.com>
----
- drivers/crypto/vmx/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Would it make any sense to send these two patches to Linus for v4.9-rc6, given
+that they fix bugs introduced in 4.9 with the virtually-mapped stack feature?
+Or would you prefer to wait and have them go to 4.9 via stable?
+Note that CONFIG_VMAP_STACK defaults to y on x86_64.
 
-diff --git a/drivers/crypto/vmx/Makefile b/drivers/crypto/vmx/Makefile
-index de6e241..31b25cb 100644
---- a/drivers/crypto/vmx/Makefile
-+++ b/drivers/crypto/vmx/Makefile
-@@ -16,4 +16,4 @@ $(src)/aesp8-ppc.S: $(src)/aesp8-ppc.pl
- $(src)/ghashp8-ppc.S: $(src)/ghashp8-ppc.pl
- 	$(call cmd,perl)
- 
--.PRECIOUS: $(obj)/aesp8-ppc.S $(obj)/ghashp8-ppc.S
-+clean-files := aesp8-ppc.S ghashp8-ppc.S
--- 
-2.10.2
+Thanks,
+
+Eric
