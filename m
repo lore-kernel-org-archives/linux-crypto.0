@@ -1,10 +1,9 @@
 From: Gary R Hook <ghook@amd.com>
-Subject: Re: [PATCH V2 6/9] crypto: ccp - Add support for RSA on the CCP
-Date: Tue, 15 Nov 2016 15:42:29 -0600
-Message-ID: <3152c3e0-636e-e4b8-1b99-957f590e3a0b@amd.com>
-References: <20161104160140.18155.75618.stgit@taos>
- <20161104160432.18155.29136.stgit@taos>
- <20161113093930.GA7299@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: ccp - Fix handling of RSA exponent on a v5 device
+Date: Tue, 15 Nov 2016 15:41:25 -0600
+Message-ID: <60b38fe7-e08e-05c4-8316-e2408bef2f33@amd.com>
+References: <20161101190505.1191.20536.stgit@taos>
+ <20161113094921.GB7399@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
@@ -13,33 +12,35 @@ Cc: <linux-crypto@vger.kernel.org>, <thomas.lendacky@amd.com>,
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         Gary R Hook <gary.hook@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0083.outbound.protection.outlook.com ([104.47.33.83]:23147
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+Received: from mail-cys01nam02on0065.outbound.protection.outlook.com ([104.47.37.65]:56938
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752308AbcKOVmm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Nov 2016 16:42:42 -0500
-In-Reply-To: <20161113093930.GA7299@gondor.apana.org.au>
+        id S1752497AbcKOV4g (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Nov 2016 16:56:36 -0500
+In-Reply-To: <20161113094921.GB7399@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 11/13/2016 03:39 AM, Herbert Xu wrote:
-> On Fri, Nov 04, 2016 at 11:04:32AM -0500, Gary R Hook wrote:
+On 11/13/2016 03:49 AM, Herbert Xu wrote:
+> On Tue, Nov 01, 2016 at 02:05:05PM -0500, Gary R Hook wrote:
+>> The exponent size in the ccp_op structure is in bits. A v5
+>> CCP requires the exponent size to be in bytes, so convert
+>> the size from bits to bytes when populating the descriptor.
 >>
->> +	ctx->u.rsa.pkey.e = mpi_read_raw_data(raw_key.e, raw_key.e_sz);
->> +	if (!ctx->u.rsa.pkey.e)
->> +		goto e_ret;
->> +	ctx->u.rsa.e_buf = mpi_get_buffer(ctx->u.rsa.pkey.e,
->> +					  &ctx->u.rsa.e_len, NULL);
+>> The current code references the exponent in memory, but
+>> these fields have not been set since the exponent is
+>> actually store in the LSB. Populate the descriptor with
+>> the LSB location (address).
+>>
+>> Signed-off-by: Gary R Hook <gary.hook@amd.com>
 >
-> You're converting a raw integer into an MPI and then back again.
-> Why?
+> Patch applied.  Thanks.
 >
-> In general drivers shouldn't touch the MPI stuff at all since the
-> hardware generally deals with raw integers.
 
-D'oh! Yes, I see now what I missed before.
+Thanks, Herbert.
 
-I will send out another patch set.
+Is there a possibility of getting this pushed to 4.9, being
+it's a bug fix?
 
 -- 
 This is my day job. Follow me at:
