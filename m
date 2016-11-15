@@ -1,117 +1,61 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH] crypto: sha*-mb Fix total_len for correct hash when
- larger than 512MB
-Date: Tue, 15 Nov 2016 08:50:12 -0800
-Message-ID: <1479228612.5138.14.camel@linux.intel.com>
-References: <1479165104-24356-1-git-send-email-greg.b.tucker@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: megha.dey@linux.intel.com, xiaodong.liu@intel.com
-To: Greg Tucker <greg.b.tucker@intel.com>, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org
+From: "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>
+Subject: [RFC PATCH] powerpc: crypto/vmx: clean up generated files
+Date: Tue, 15 Nov 2016 22:35:49 +0530
+Message-ID: <20161115170549.10538-1-naveen.n.rao@linux.vnet.ibm.com>
+Cc: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        Michael Ellerman <mpe@ellerman.id.au>
+To: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:34665 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932525AbcKOQuN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Nov 2016 11:50:13 -0500
-In-Reply-To: <1479165104-24356-1-git-send-email-greg.b.tucker@intel.com>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35703 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S932956AbcKORGM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Nov 2016 12:06:12 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uAFH4oAW004856
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Nov 2016 12:06:12 -0500
+Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 26r4c4pmf1-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Nov 2016 12:06:11 -0500
+Received: from localhost
+        by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <naveen.n.rao@linux.vnet.ibm.com>;
+        Wed, 16 Nov 2016 03:06:09 +1000
+Received: from d23relay08.au.ibm.com (d23relay08.au.ibm.com [9.185.71.33])
+        by d23dlp03.au.ibm.com (Postfix) with ESMTP id E8EBB3578052
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2016 04:06:06 +1100 (EST)
+Received: from d23av04.au.ibm.com (d23av04.au.ibm.com [9.190.235.139])
+        by d23relay08.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id uAFH661L44433456
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2016 04:06:06 +1100
+Received: from d23av04.au.ibm.com (localhost [127.0.0.1])
+        by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id uAFH66Nt004671
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2016 04:06:06 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2016-11-14 at 16:11 -0700, Greg Tucker wrote:
-> Current multi-buffer hash implementations have a restriction on the total
-> length of a hash job to 512MB. Hashing larger buffers will result in an
-> incorrect hash. This extends the limit to 2^62 - 1.
-> 
-> Signed-off-by: Greg Tucker <greg.b.tucker@intel.com>
+..as stray .S files result in build errors, especially when using
+cross-compilers.
 
-Acked-by: Tim Chen <tim.c.chen@linux.intel.com>
+More specifically, the generated .S files are endian-specific and will break
+subsequent builds targeting the other endian architecture.
 
-> ---
->  arch/x86/crypto/sha1-mb/sha1_mb.c         | 2 +-
->  arch/x86/crypto/sha1-mb/sha1_mb_ctx.h     | 2 +-
->  arch/x86/crypto/sha256-mb/sha256_mb.c     | 2 +-
->  arch/x86/crypto/sha256-mb/sha256_mb_ctx.h | 2 +-
->  arch/x86/crypto/sha512-mb/sha512_mb.c     | 2 +-
->  arch/x86/crypto/sha512-mb/sha512_mb_ctx.h | 2 +-
->  6 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/crypto/sha1-mb/sha1_mb.c b/arch/x86/crypto/sha1-mb/sha1_mb.c
-> index 9e5b671..acf9fdf 100644
-> --- a/arch/x86/crypto/sha1-mb/sha1_mb.c
-> +++ b/arch/x86/crypto/sha1-mb/sha1_mb.c
-> @@ -114,7 +114,7 @@ static inline void sha1_init_digest(uint32_t *digest)
->  }
->  
->  static inline uint32_t sha1_pad(uint8_t padblock[SHA1_BLOCK_SIZE * 2],
-> -			 uint32_t total_len)
-> +			 uint64_t total_len)
->  {
->  	uint32_t i = total_len & (SHA1_BLOCK_SIZE - 1);
->  
-> diff --git a/arch/x86/crypto/sha1-mb/sha1_mb_ctx.h b/arch/x86/crypto/sha1-mb/sha1_mb_ctx.h
-> index 98a35bc..13590cc 100644
-> --- a/arch/x86/crypto/sha1-mb/sha1_mb_ctx.h
-> +++ b/arch/x86/crypto/sha1-mb/sha1_mb_ctx.h
-> @@ -125,7 +125,7 @@ struct sha1_hash_ctx {
->  	/* error flag */
->  	int error;
->  
-> -	uint32_t	total_length;
-> +	uint64_t	total_length;
->  	const void	*incoming_buffer;
->  	uint32_t	incoming_buffer_length;
->  	uint8_t		partial_block_buffer[SHA1_BLOCK_SIZE * 2];
-> diff --git a/arch/x86/crypto/sha256-mb/sha256_mb.c b/arch/x86/crypto/sha256-mb/sha256_mb.c
-> index 6f97fb3..7926a22 100644
-> --- a/arch/x86/crypto/sha256-mb/sha256_mb.c
-> +++ b/arch/x86/crypto/sha256-mb/sha256_mb.c
-> @@ -115,7 +115,7 @@ inline void sha256_init_digest(uint32_t *digest)
->  }
->  
->  inline uint32_t sha256_pad(uint8_t padblock[SHA256_BLOCK_SIZE * 2],
-> -			 uint32_t total_len)
-> +			 uint64_t total_len)
->  {
->  	uint32_t i = total_len & (SHA256_BLOCK_SIZE - 1);
->  
-> diff --git a/arch/x86/crypto/sha256-mb/sha256_mb_ctx.h b/arch/x86/crypto/sha256-mb/sha256_mb_ctx.h
-> index edd252b..aabb303 100644
-> --- a/arch/x86/crypto/sha256-mb/sha256_mb_ctx.h
-> +++ b/arch/x86/crypto/sha256-mb/sha256_mb_ctx.h
-> @@ -125,7 +125,7 @@ struct sha256_hash_ctx {
->  	/* error flag */
->  	int error;
->  
-> -	uint32_t	total_length;
-> +	uint64_t	total_length;
->  	const void	*incoming_buffer;
->  	uint32_t	incoming_buffer_length;
->  	uint8_t		partial_block_buffer[SHA256_BLOCK_SIZE * 2];
-> diff --git a/arch/x86/crypto/sha512-mb/sha512_mb.c b/arch/x86/crypto/sha512-mb/sha512_mb.c
-> index d210174..9c1bb6d 100644
-> --- a/arch/x86/crypto/sha512-mb/sha512_mb.c
-> +++ b/arch/x86/crypto/sha512-mb/sha512_mb.c
-> @@ -117,7 +117,7 @@ inline void sha512_init_digest(uint64_t *digest)
->  }
->  
->  inline uint32_t sha512_pad(uint8_t padblock[SHA512_BLOCK_SIZE * 2],
-> -			 uint32_t total_len)
-> +			 uint64_t total_len)
->  {
->  	uint32_t i = total_len & (SHA512_BLOCK_SIZE - 1);
->  
-> diff --git a/arch/x86/crypto/sha512-mb/sha512_mb_ctx.h b/arch/x86/crypto/sha512-mb/sha512_mb_ctx.h
-> index 9d4b2c8..e4653f5 100644
-> --- a/arch/x86/crypto/sha512-mb/sha512_mb_ctx.h
-> +++ b/arch/x86/crypto/sha512-mb/sha512_mb_ctx.h
-> @@ -119,7 +119,7 @@ struct sha512_hash_ctx {
->  	/* error flag */
->  	int error;
->  
-> -	uint32_t        total_length;
-> +	uint64_t        total_length;
->  	const void      *incoming_buffer;
->  	uint32_t        incoming_buffer_length;
->  	uint8_t         partial_block_buffer[SHA512_BLOCK_SIZE * 2];
+Signed-off-by: Naveen N. Rao <naveen.n.rao@linux.vnet.ibm.com>
+---
+ drivers/crypto/vmx/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/vmx/Makefile b/drivers/crypto/vmx/Makefile
+index de6e241..31b25cb 100644
+--- a/drivers/crypto/vmx/Makefile
++++ b/drivers/crypto/vmx/Makefile
+@@ -16,4 +16,4 @@ $(src)/aesp8-ppc.S: $(src)/aesp8-ppc.pl
+ $(src)/ghashp8-ppc.S: $(src)/ghashp8-ppc.pl
+ 	$(call cmd,perl)
+ 
+-.PRECIOUS: $(obj)/aesp8-ppc.S $(obj)/ghashp8-ppc.S
++clean-files := aesp8-ppc.S ghashp8-ppc.S
+-- 
+2.10.2
