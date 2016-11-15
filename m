@@ -1,39 +1,42 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 2/3] crypto: AF_ALG - disregard AAD buffer space for output
-Date: Tue, 15 Nov 2016 20:06:47 +0100
-Message-ID: <4916573.RdN3EB8qT2@positron.chronox.de>
-References: <3302668.EORF2jai5r@positron.chronox.de> <11739696.UFOoJjMX73@positron.chronox.de> <20161112021302.GA32425@gondor.apana.org.au>
+From: Alex Cope <alexcope@google.com>
+Subject: Re: [RFC][PATCH 0/6] crypto: Adding Hash-Encrypt-Hash(HEH)
+Date: Tue, 15 Nov 2016 12:40:07 -0800
+Message-ID: <CA+cSK119vii5u=LF4uN0=LW2Pj8kj1x9+7c1+d860Yvcs3Po-g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: mathew.j.martineau@linux.intel.com, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Cc: Michael Halcrow <mhalcrow@google.com>,
+        Ed Knapp <edknapp@google.com>, Alex Cope <alexcope@google.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:50922 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753843AbcKOTGy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Nov 2016 14:06:54 -0500
-In-Reply-To: <20161112021302.GA32425@gondor.apana.org.au>
+Received: from mail-ua0-f172.google.com ([209.85.217.172]:33422 "EHLO
+        mail-ua0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752679AbcKOUkJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Nov 2016 15:40:09 -0500
+Received: by mail-ua0-f172.google.com with SMTP id 20so97647662uak.0
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Nov 2016 12:40:09 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Samstag, 12. November 2016, 10:13:02 CET schrieb Herbert Xu:
+I accidentally had an off-by-one in this patch set. There is no patch
+7/7. I've edited this subject but don't plan to resend the rest of the
+patches to fix the subject lines.
 
-Hi Herbert,
+To clarify, this patchset is on top of "crypto: skcipher - skcipher
+algorithm conversion part 3" that Herbert currently has out for
+review.
 
-> On Sat, Nov 12, 2016 at 03:03:36AM +0100, Stephan Mueller wrote:
-> > When you have separate buffers, the kernel does not seem to copy the AD
-> > over to the target buffer.
-> 
-> OK we should definitely fix that.
+Cheers,
+-Alex
 
-Shall the fix be rolled into the patch together with the fix for the tag value 
-as well as the crash fix? Or can we have a stand-alone patch fixing this.
-
-Btw., how do you suggest that should be fixed? I would assume that this needs 
-to be fixed on a per-implementation basis. I tested authenc and it copies the 
-buffers over. gcm_base(ctr-aes-aesni,ghash-clmulni), rfc4106-gcm-aesni or 
-ccm_base(ctr-aes-aesni,aes-aesni) do not copy the AD over.
-
-Ciao
-Stephan
+On Mon, Nov 14, 2016 at 1:01 PM, Alex Cope <alexcope@google.com> wrote:
+> This patchset implements HEH, which is currently specified by the
+> following Internet Draft:
+>
+>         https://tools.ietf.org/html/draft-cope-heh-00
+>
+> This patchset is a request for comments, and should not be merged at
+> this time. We would like to wait for further comments on the Internet
+> Draft before merging this patchset.
+>
+> Thanks
