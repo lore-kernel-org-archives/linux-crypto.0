@@ -1,109 +1,144 @@
-From: Greg Tucker <greg.b.tucker@intel.com>
-Subject: [PATCH] crypto: sha*-mb Fix total_len for correct hash when larger than 512MB
-Date: Mon, 14 Nov 2016 16:11:44 -0700
-Message-ID: <1479165104-24356-1-git-send-email-greg.b.tucker@intel.com>
-Cc: megha.dey@linux.intel.com, tim.c.chen@linux.intel.com,
-        xiaodong.liu@intel.com, Greg Tucker <greg.b.tucker@intel.com>
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [v2 PATCH 1/16] crypto: skcipher - Add skcipher walk interface
+Date: Tue, 15 Nov 2016 21:58:39 +0800
+Message-ID: <20161115135839.GA20038@gondor.apana.org.au>
+References: <20161113114354.GA8169@gondor.apana.org.au>
+ <E1c5tE4-00028Y-BC@gondolin.me.apana.org.au>
+ <20161114013548.GA4778@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Eric Biggers <ebiggers@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:23990 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934108AbcKNXL7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Nov 2016 18:11:59 -0500
+Received: from helcar.hengli.com.au ([209.40.204.226]:51057 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751091AbcKON7F (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Nov 2016 08:59:05 -0500
+Content-Disposition: inline
+In-Reply-To: <20161114013548.GA4778@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Current multi-buffer hash implementations have a restriction on the total
-length of a hash job to 512MB. Hashing larger buffers will result in an
-incorrect hash. This extends the limit to 2^62 - 1.
+Hi Eric:
 
-Signed-off-by: Greg Tucker <greg.b.tucker@intel.com>
----
- arch/x86/crypto/sha1-mb/sha1_mb.c         | 2 +-
- arch/x86/crypto/sha1-mb/sha1_mb_ctx.h     | 2 +-
- arch/x86/crypto/sha256-mb/sha256_mb.c     | 2 +-
- arch/x86/crypto/sha256-mb/sha256_mb_ctx.h | 2 +-
- arch/x86/crypto/sha512-mb/sha512_mb.c     | 2 +-
- arch/x86/crypto/sha512-mb/sha512_mb_ctx.h | 2 +-
- 6 files changed, 6 insertions(+), 6 deletions(-)
+On Sun, Nov 13, 2016 at 05:35:48PM -0800, Eric Biggers wrote:
+> Hi Herbert,
+> 
+> On Sun, Nov 13, 2016 at 07:45:32PM +0800, Herbert Xu wrote:
+> > +int skcipher_walk_done(struct skcipher_walk *walk, int err)
+> > +{
+> > +	unsigned int nbytes = 0;
+> > +	unsigned int n = 0;
+> > +
+> > +	if (likely(err >= 0)) {
+> > +		n = walk->nbytes - err;
+> > +		nbytes = walk->total - n;
+> > +	}
+> > +
+> > +	if (likely(!(walk->flags & (SKCIPHER_WALK_PHYS |
+> > +				    SKCIPHER_WALK_SLOW |
+> > +				    SKCIPHER_WALK_COPY |
+> > +				    SKCIPHER_WALK_DIFF)))) {
+> > +unmap_src:
+> > +		skcipher_unmap_src(walk);
+> 
+> Isn't it wrong to unmap the buffers when err < 0?  They won't have been mapped
+> yet, e.g. if the 'skcipher_walk_done(walk, -EINVAL)' case is hit.
 
-diff --git a/arch/x86/crypto/sha1-mb/sha1_mb.c b/arch/x86/crypto/sha1-mb/sha1_mb.c
-index 9e5b671..acf9fdf 100644
---- a/arch/x86/crypto/sha1-mb/sha1_mb.c
-+++ b/arch/x86/crypto/sha1-mb/sha1_mb.c
-@@ -114,7 +114,7 @@ static inline void sha1_init_digest(uint32_t *digest)
- }
- 
- static inline uint32_t sha1_pad(uint8_t padblock[SHA1_BLOCK_SIZE * 2],
--			 uint32_t total_len)
-+			 uint64_t total_len)
- {
- 	uint32_t i = total_len & (SHA1_BLOCK_SIZE - 1);
- 
-diff --git a/arch/x86/crypto/sha1-mb/sha1_mb_ctx.h b/arch/x86/crypto/sha1-mb/sha1_mb_ctx.h
-index 98a35bc..13590cc 100644
---- a/arch/x86/crypto/sha1-mb/sha1_mb_ctx.h
-+++ b/arch/x86/crypto/sha1-mb/sha1_mb_ctx.h
-@@ -125,7 +125,7 @@ struct sha1_hash_ctx {
- 	/* error flag */
- 	int error;
- 
--	uint32_t	total_length;
-+	uint64_t	total_length;
- 	const void	*incoming_buffer;
- 	uint32_t	incoming_buffer_length;
- 	uint8_t		partial_block_buffer[SHA1_BLOCK_SIZE * 2];
-diff --git a/arch/x86/crypto/sha256-mb/sha256_mb.c b/arch/x86/crypto/sha256-mb/sha256_mb.c
-index 6f97fb3..7926a22 100644
---- a/arch/x86/crypto/sha256-mb/sha256_mb.c
-+++ b/arch/x86/crypto/sha256-mb/sha256_mb.c
-@@ -115,7 +115,7 @@ inline void sha256_init_digest(uint32_t *digest)
- }
- 
- inline uint32_t sha256_pad(uint8_t padblock[SHA256_BLOCK_SIZE * 2],
--			 uint32_t total_len)
-+			 uint64_t total_len)
- {
- 	uint32_t i = total_len & (SHA256_BLOCK_SIZE - 1);
- 
-diff --git a/arch/x86/crypto/sha256-mb/sha256_mb_ctx.h b/arch/x86/crypto/sha256-mb/sha256_mb_ctx.h
-index edd252b..aabb303 100644
---- a/arch/x86/crypto/sha256-mb/sha256_mb_ctx.h
-+++ b/arch/x86/crypto/sha256-mb/sha256_mb_ctx.h
-@@ -125,7 +125,7 @@ struct sha256_hash_ctx {
- 	/* error flag */
- 	int error;
- 
--	uint32_t	total_length;
-+	uint64_t	total_length;
- 	const void	*incoming_buffer;
- 	uint32_t	incoming_buffer_length;
- 	uint8_t		partial_block_buffer[SHA256_BLOCK_SIZE * 2];
-diff --git a/arch/x86/crypto/sha512-mb/sha512_mb.c b/arch/x86/crypto/sha512-mb/sha512_mb.c
-index d210174..9c1bb6d 100644
---- a/arch/x86/crypto/sha512-mb/sha512_mb.c
-+++ b/arch/x86/crypto/sha512-mb/sha512_mb.c
-@@ -117,7 +117,7 @@ inline void sha512_init_digest(uint64_t *digest)
- }
- 
- inline uint32_t sha512_pad(uint8_t padblock[SHA512_BLOCK_SIZE * 2],
--			 uint32_t total_len)
-+			 uint64_t total_len)
- {
- 	uint32_t i = total_len & (SHA512_BLOCK_SIZE - 1);
- 
-diff --git a/arch/x86/crypto/sha512-mb/sha512_mb_ctx.h b/arch/x86/crypto/sha512-mb/sha512_mb_ctx.h
-index 9d4b2c8..e4653f5 100644
---- a/arch/x86/crypto/sha512-mb/sha512_mb_ctx.h
-+++ b/arch/x86/crypto/sha512-mb/sha512_mb_ctx.h
-@@ -119,7 +119,7 @@ struct sha512_hash_ctx {
- 	/* error flag */
- 	int error;
- 
--	uint32_t        total_length;
-+	uint64_t        total_length;
- 	const void      *incoming_buffer;
- 	uint32_t        incoming_buffer_length;
- 	uint8_t         partial_block_buffer[SHA512_BLOCK_SIZE * 2];
+Indeed.  The unmapping code needs to be inside the first if clause.
+I'll rearrange it.
+
+> > +	/* Short-circuit for the common/fast path. */
+> > +	if (!(((unsigned long)walk->iv ^ (unsigned long)walk->oiv) |
+> > +	     ((unsigned long)walk->buffer ^ (unsigned long)walk->page) |
+> > +	     (unsigned long)walk->page))
+> > +		goto out;
+> 
+> This is really saying that the IV wasn't copied and that walk->buffer and
+> walk->page are both NULL.  But if walk->buffer is NULL then the IV wasn't
+> copied.  So this can be simplified to:
+> 
+> 	if (!((unsigned long)walk->buffer | (unsigned long)walk->page))
+> 		goto out;
+
+Nice, I'll use this.
+
+> > +int skcipher_walk_next(struct skcipher_walk *walk)
+> > +{
+> 
+> Shouldn't this be static?  There's even a static declaration earlier in the
+> file.
+
+Yes, static added.
+
+> > +static int skcipher_next_slow(struct skcipher_walk *walk)
+> > +{
+> > +	bool phys = walk->flags & SKCIPHER_WALK_PHYS;
+> > +	unsigned alignmask = walk->alignmask;
+> > +	unsigned bsize = walk->chunksize;
+> ...
+> > +	walk->nbytes = bsize;
+> 
+> skcipher_next_slow() is always setting up 'chunksize' bytes to be processed.
+> Isn't this wrong in the 'blocksize < chunksize' case because fewer than
+> 'chunksize' bytes may need to be processed?
+
+Good catch.  This is supposed to be the bsize from the caller
+which is capped by walk->total.
+
+> > +static inline void *skcipher_map(struct scatter_walk *walk)
+> > +{
+> > +	struct page *page = scatterwalk_page(walk);
+> > +
+> > +	return (PageHighMem(page) ? kmap_atomic(page) : page_address(page)) +
+> > +	       offset_in_page(walk->offset);
+> > +}
+> 
+> Is the PageHighMem() optimization really worthwhile?  It will skip kmap_atomic()
+> and hence preempt_disable() for non-highmem pages, so it may make it harder to
+> find bugs where users are sleeping when they shouldn't be.  It also seems
+> inconsistent that skcipher_map() will do this optimization but scatterwalk_map()
+> won't.
+
+It did make a big difference on my machine.  Because users such
+as lrw will call the walker a lot more often after the conversion
+to skcipher this is now worthwhile as an optimisation.  With the
+old code the blkcipher walk was not called as often.
+
+> > +		if (!walk->page) {
+> > +			gfp_t gfp = skcipher_walk_gfp(walk);
+> > +
+> > +			walk->page = (void *)__get_free_page(gfp);
+> > +			if (!walk->page)
+> > +				goto slow_path;
+> > +		}
+> > +
+> > +		walk->nbytes = min_t(unsigned, n,
+> > +				     PAGE_SIZE - offset_in_page(walk->page));
+> 
+> walk->page will be page-aligned, so there's no need for offset_in_page().  Also,
+> 'n' has already been clamped to at most one page.  So AFAICS this can simply be
+> 'walk->nbytes = n;'.
+
+This is valid for the sync walk, but not for the async case.  In
+the async case, we will reuse the page if the previous copy did
+not completely consume it.
+
+> > +int skcipher_walk_done(struct skcipher_walk *walk, int err);
+> ...
+> > +void skcipher_walk_complete(struct skcipher_walk *walk, int err);
+> 
+> The naming is confusing: "done" vs. "complete".  They can easily be mixed up.
+> Would it make more sense to have something with "async" in the name for the
+> second one, like skcipher_walk_async_done()?
+
+I see your point.  But I think async_done would also be confusing
+because the async case needs to call both skcipher_walk_done and
+skcipher_walk_async_done.
+
+Thanks,
 -- 
-2.5.5
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
