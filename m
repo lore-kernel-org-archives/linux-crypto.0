@@ -1,49 +1,39 @@
-From: Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH 2/2] fscrypto: don't use on-stack buffer for key
- derivation
-Date: Tue, 15 Nov 2016 10:53:09 -0800
-Message-ID: <20161115185309.GE127180@google.com>
-References: <1478210582-86338-1-git-send-email-ebiggers@google.com>
- <1478210582-86338-2-git-send-email-ebiggers@google.com>
- <20161115164704.5tzvm2g2x2fyetyu@thunk.org>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 2/3] crypto: AF_ALG - disregard AAD buffer space for output
+Date: Tue, 15 Nov 2016 20:06:47 +0100
+Message-ID: <4916573.RdN3EB8qT2@positron.chronox.de>
+References: <3302668.EORF2jai5r@positron.chronox.de> <11739696.UFOoJjMX73@positron.chronox.de> <20161112021302.GA32425@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-crypto@vger.kernel.org, jaegeuk@kernel.org, richard@nod.at,
-        luto@kernel.org
-To: Theodore Ts'o <tytso@mit.edu>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20161115164704.5tzvm2g2x2fyetyu@thunk.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: mathew.j.martineau@linux.intel.com, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:50922 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753843AbcKOTGy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Nov 2016 14:06:54 -0500
+In-Reply-To: <20161112021302.GA32425@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 15, 2016 at 11:47:04AM -0500, Theodore Ts'o wrote:
-> On Thu, Nov 03, 2016 at 03:03:02PM -0700, Eric Biggers wrote:
-> > With the new (in 4.9) option to use a virtually-mapped stack
-> > (CONFIG_VMAP_STACK), stack buffers cannot be used as input/output for
-> > the scatterlist crypto API because they may not be directly mappable to
-> > struct page.  get_crypt_info() was using a stack buffer to hold the
-> > output from the encryption operation used to derive the per-file key.
-> > Fix it by using a heap buffer.
-> > 
-> > This bug could most easily be observed in a CONFIG_DEBUG_SG kernel
-> > because this allowed the BUG in sg_set_buf() to be triggered.
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+Am Samstag, 12. November 2016, 10:13:02 CET schrieb Herbert Xu:
+
+Hi Herbert,
+
+> On Sat, Nov 12, 2016 at 03:03:36AM +0100, Stephan Mueller wrote:
+> > When you have separate buffers, the kernel does not seem to copy the AD
+> > over to the target buffer.
 > 
-> This commit is on the fscrypt and dev branches on ext4.git.
-> 
->      	       	      	      	  - Ted
+> OK we should definitely fix that.
 
-Hi Ted,
+Shall the fix be rolled into the patch together with the fix for the tag value 
+as well as the crash fix? Or can we have a stand-alone patch fixing this.
 
-Would it make any sense to send these two patches to Linus for v4.9-rc6, given
-that they fix bugs introduced in 4.9 with the virtually-mapped stack feature?
-Or would you prefer to wait and have them go to 4.9 via stable?
-Note that CONFIG_VMAP_STACK defaults to y on x86_64.
+Btw., how do you suggest that should be fixed? I would assume that this needs 
+to be fixed on a per-implementation basis. I tested authenc and it copies the 
+buffers over. gcm_base(ctr-aes-aesni,ghash-clmulni), rfc4106-gcm-aesni or 
+ccm_base(ctr-aes-aesni,aes-aesni) do not copy the AD over.
 
-Thanks,
-
-Eric
+Ciao
+Stephan
