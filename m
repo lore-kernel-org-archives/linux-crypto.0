@@ -1,79 +1,60 @@
-From: "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>
-Subject: [PATCH] powerpc: crypto/vmx: various build fixes
-Date: Wed, 16 Nov 2016 20:41:46 +0530
-Message-ID: <20161116151146.15720-1-naveen.n.rao@linux.vnet.ibm.com>
-Cc: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-To: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: crypto: caam warning fix, was: master build: 0 failures 1 warnings (v4.9-rc5-177-g81bcfe5)
+Date: Wed, 16 Nov 2016 17:40:41 +0100
+Message-ID: <5255539.MpGQJX1bep@wuerfel>
+References: <E1c6kSQ-0008UC-DM@optimist>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Build bot for Mark Brown <broonie@kernel.org>,
+        kernel-build-reports@lists.linaro.org,
+        Horia =?utf-8?B?R2VhbnTEgw==?= <horia.geanta@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Michael Ellerman <mpe@ellerman.id.au>
+        linux-crypto@vger.kernel.org
+To: linaro-kernel@lists.linaro.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59247 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752977AbcKPPMG (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.131]:53753 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932201AbcKPQk6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Nov 2016 10:12:06 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uAGF8lwt114253
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2016 10:12:05 -0500
-Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 26rgygf06x-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2016 10:12:05 -0500
-Received: from localhost
-        by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <naveen.n.rao@linux.vnet.ibm.com>;
-        Thu, 17 Nov 2016 01:12:02 +1000
-Received: from d23relay07.au.ibm.com (d23relay07.au.ibm.com [9.190.26.37])
-        by d23dlp03.au.ibm.com (Postfix) with ESMTP id 0606E3578052
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2016 02:12:00 +1100 (EST)
-Received: from d23av06.au.ibm.com (d23av06.au.ibm.com [9.190.235.151])
-        by d23relay07.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id uAGFBxOR32833702
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2016 02:11:59 +1100
-Received: from d23av06.au.ibm.com (localhost [127.0.0.1])
-        by d23av06.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id uAGFBxPN006260
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2016 02:11:59 +1100
+        Wed, 16 Nov 2016 11:40:58 -0500
+In-Reply-To: <E1c6kSQ-0008UC-DM@optimist>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-First up, clean up the generated .S files properly on a 'make clean'.
-Secondly, force re-generation of these files when building for different
-endian-ness than what was built previously. Finally, generate the new
-files in the build tree, rather than the source tree.
+On Tuesday, November 15, 2016 8:35:54 PM CET Build bot for Mark Brown wrote:
+> Tree/Branch: master
+> Git describe: v4.9-rc5-177-g81bcfe5
+> Commit: 81bcfe5e48 Merge tag 'trace-v4.9-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-trace
+> 
+> Build Time: 87 min 40 sec
+> 
+> Passed:   10 / 10   (100.00 %)
+> Failed:    0 / 10   (  0.00 %)
+> 
+> Errors: 0
+> Warnings: 1
+> Section Mismatches: 0
+> 
+> -------------------------------------------------------------------------------
+> defconfigs with issues (other than build errors):
+>       1 warnings    0 mismatches  : arm64-allmodconfig
+> 
+> -------------------------------------------------------------------------------
+> 
+> Warnings Summary: 1
+> 	  1 ../include/linux/kernel.h:739:16: warning: comparison of distinct pointer types lacks a cast
+> 
 
-Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-Signed-off-by: Naveen N. Rao <naveen.n.rao@linux.vnet.ibm.com>
----
-Michael,
-I've added your SOB here though you didn't explicitly include it in your
-previous mail. I hope that's fine from your end.
+Hi Herbert,
 
-- Naveen
+This is currently the only build warning reported for v4.9, and you have merged
+the fix for v4.10 in
 
- drivers/crypto/vmx/Makefile | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+d69985a07692 ("crypto: caam - fix type mismatch warning")
 
-diff --git a/drivers/crypto/vmx/Makefile b/drivers/crypto/vmx/Makefile
-index de6e241..55f7c39 100644
---- a/drivers/crypto/vmx/Makefile
-+++ b/drivers/crypto/vmx/Makefile
-@@ -10,10 +10,12 @@ endif
- quiet_cmd_perl = PERL $@
-       cmd_perl = $(PERL) $(<) $(TARGET) > $(@)
- 
--$(src)/aesp8-ppc.S: $(src)/aesp8-ppc.pl
--	$(call cmd,perl)
-+targets += aesp8-ppc.S ghashp8-ppc.S
-+
-+$(obj)/aesp8-ppc.S: $(src)/aesp8-ppc.pl FORCE
-+	$(call if_changed,perl)
-   
--$(src)/ghashp8-ppc.S: $(src)/ghashp8-ppc.pl
--	$(call cmd,perl)
-+$(obj)/ghashp8-ppc.S: $(src)/ghashp8-ppc.pl FORCE
-+	$(call if_changed,perl)
- 
--.PRECIOUS: $(obj)/aesp8-ppc.S $(obj)/ghashp8-ppc.S
-+clean-files := aesp8-ppc.S ghashp8-ppc.S
--- 
-2.10.2
+Any chance you can send this for v4.9 so we have a clean build?
+
+Thanks,
+
+	Arnd
