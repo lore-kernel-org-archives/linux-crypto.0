@@ -1,48 +1,45 @@
-From: Gary R Hook <ghook@amd.com>
-Subject: Re: [PATCH] crypto: ccp - Fix handling of RSA exponent on a v5 device
-Date: Tue, 15 Nov 2016 15:41:25 -0600
-Message-ID: <60b38fe7-e08e-05c4-8316-e2408bef2f33@amd.com>
-References: <20161101190505.1191.20536.stgit@taos>
- <20161113094921.GB7399@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/3] crypto: AF_ALG - disregard AAD buffer space for
+ output
+Date: Wed, 16 Nov 2016 16:57:42 +0800
+Message-ID: <20161116085742.GA29644@gondor.apana.org.au>
+References: <3302668.EORF2jai5r@positron.chronox.de>
+ <11739696.UFOoJjMX73@positron.chronox.de>
+ <20161112021302.GA32425@gondor.apana.org.au>
+ <4916573.RdN3EB8qT2@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, <thomas.lendacky@amd.com>,
-        <davem@davemloft.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary R Hook <gary.hook@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: mathew.j.martineau@linux.intel.com, linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0065.outbound.protection.outlook.com ([104.47.37.65]:56938
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752497AbcKOV4g (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Nov 2016 16:56:36 -0500
-In-Reply-To: <20161113094921.GB7399@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:54793 "EHLO
+        helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751335AbcKPI6M (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Nov 2016 03:58:12 -0500
+Content-Disposition: inline
+In-Reply-To: <4916573.RdN3EB8qT2@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 11/13/2016 03:49 AM, Herbert Xu wrote:
-> On Tue, Nov 01, 2016 at 02:05:05PM -0500, Gary R Hook wrote:
->> The exponent size in the ccp_op structure is in bits. A v5
->> CCP requires the exponent size to be in bytes, so convert
->> the size from bits to bytes when populating the descriptor.
->>
->> The current code references the exponent in memory, but
->> these fields have not been set since the exponent is
->> actually store in the LSB. Populate the descriptor with
->> the LSB location (address).
->>
->> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+On Tue, Nov 15, 2016 at 08:06:47PM +0100, Stephan Mueller wrote:
 >
-> Patch applied.  Thanks.
->
+> Shall the fix be rolled into the patch together with the fix for the tag value 
+> as well as the crash fix? Or can we have a stand-alone patch fixing this.
 
-Thanks, Herbert.
+I think these are two separate issues and we don't need to fix them
+all in one go.
 
-Is there a possibility of getting this pushed to 4.9, being
-it's a bug fix?
+> Btw., how do you suggest that should be fixed? I would assume that this needs 
+> to be fixed on a per-implementation basis. I tested authenc and it copies the 
+> buffers over. gcm_base(ctr-aes-aesni,ghash-clmulni), rfc4106-gcm-aesni or 
+> ccm_base(ctr-aes-aesni,aes-aesni) do not copy the AD over.
 
+We should fix as much as we can and then add a testmgr test to find
+the rest.
+
+Cheers,
 -- 
-This is my day job. Follow me at:
-IG/Twitter/Facebook: @grhookphoto
-IG/Twitter/Facebook: @grhphotographer
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
