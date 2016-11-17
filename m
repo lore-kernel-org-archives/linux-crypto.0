@@ -1,45 +1,103 @@
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH] powerpc: crypto/vmx: various build fixes
-Date: Thu, 17 Nov 2016 11:51:56 +1100
-Message-ID: <87inrnx70z.fsf@concordia.ellerman.id.au>
-References: <20161116151146.15720-1-naveen.n.rao@linux.vnet.ibm.com>
+From: <isaac@debian.org>
+Subject: 12225 linux-crypto
+Date: Thu, 17 Nov 2016 03:14:33 -0000
+Message-ID: <147935247353.11648.9086694044131276662@servpro.com.br>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-To: "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>,
-        "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: application/zip; name="EMAIL_2200126_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:40941 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750928AbcKQAwB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Nov 2016 19:52:01 -0500
-In-Reply-To: <20161116151146.15720-1-naveen.n.rao@linux.vnet.ibm.com>
+Received: from ip189090211106.servpro.com.br ([189.90.211.106]:4728 "HELO
+        servpro.com.br" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with SMTP id S1753341AbcKQDOo (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Nov 2016 22:14:44 -0500
+Content-Disposition: attachment
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-"Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com> writes:
-
-> First up, clean up the generated .S files properly on a 'make clean'.
-> Secondly, force re-generation of these files when building for different
-> endian-ness than what was built previously. Finally, generate the new
-> files in the build tree, rather than the source tree.
->
-> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-> Signed-off-by: Naveen N. Rao <naveen.n.rao@linux.vnet.ibm.com>
-> ---
-> Michael,
-> I've added your SOB here though you didn't explicitly include it in your
-> previous mail. I hope that's fine from your end.
-
-Yeah that's fine, thanks.
-
-Crypto patches usually have a subject like:
-
-crypto: vmx - Various build fixes
-
-
-But maybe Herbert can fix it up for you when he applies this.
-
-cheers
+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
