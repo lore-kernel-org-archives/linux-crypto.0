@@ -1,19 +1,17 @@
-From: "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] powerpc: crypto/vmx: various build fixes
-Date: Thu, 17 Nov 2016 19:52:58 +0530
-Message-ID: <20161117142258.GD4019@naverao1-tp.localdomain>
+Date: Thu, 17 Nov 2016 23:40:26 +0800
+Message-ID: <20161117154026.GB1687@gondor.apana.org.au>
 References: <20161116151146.15720-1-naveen.n.rao@linux.vnet.ibm.com>
- <87inrnx70z.fsf@concordia.ellerman.id.au>
- <20161117130311.GA1839@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
  linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
  Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>
 Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 Content-Disposition: inline
-In-Reply-To: <20161117130311.GA1839@gondor.apana.org.au>
+In-Reply-To: <20161116151146.15720-1-naveen.n.rao@linux.vnet.ibm.com>
 List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
  <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
 List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
@@ -26,19 +24,17 @@ Sender: "Linuxppc-dev"
  <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On 2016/11/17 09:03PM, Herbert Xu wrote:
-> On Thu, Nov 17, 2016 at 11:51:56AM +1100, Michael Ellerman wrote:
-> > 
-> > Crypto patches usually have a subject like:
-> > 
-> > crypto: vmx - Various build fixes
-
-Ok.
-
-> >
-> > But maybe Herbert can fix it up for you when he applies this.
+On Wed, Nov 16, 2016 at 08:41:46PM +0530, Naveen N. Rao wrote:
+> First up, clean up the generated .S files properly on a 'make clean'.
+> Secondly, force re-generation of these files when building for different
+> endian-ness than what was built previously. Finally, generate the new
+> files in the build tree, rather than the source tree.
 > 
-> Sure I can fix it up.
+> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+> Signed-off-by: Naveen N. Rao <naveen.n.rao@linux.vnet.ibm.com>
 
-Thanks,
-- Naveen
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
