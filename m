@@ -1,46 +1,55 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: CTR DRBG - advance output buffer pointer
-Date: Fri, 18 Nov 2016 12:27:56 +0100
-Message-ID: <18729386.1pHbKfYFYP@positron.chronox.de>
+From: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Subject: Re: [patch] s390/crypto: unlock on error in prng_tdes_read()
+Date: Fri, 18 Nov 2016 13:12:47 +0100
+Message-ID: <20161118131247.44a52270@mschwide>
+References: <20161118105451.GA26523@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:50976 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752295AbcKRLcC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Nov 2016 06:32:02 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+In-Reply-To: <20161118105451.GA26523@mwanda>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The CTR DRBG segments the number of random bytes to be generated into
-128 byte blocks. The current code misses the advancement of the output
-buffer pointer when the requestor asks for more than 128 bytes of data.
-In this case, the next 128 byte block of random numbers is copied to
-the beginning of the output buffer again. This implies that only the
-first 128 bytes of the output buffer would ever be filled.
+On Fri, 18 Nov 2016 14:11:00 +0300
+Dan Carpenter <dan.carpenter@oracle.com> wrote:
 
-The patch adds the advancement of the buffer pointer to fill the entire
-buffer.
+> We added some new locking but forgot to unlock on error.
+> 
+> Fixes: 57127645d79d ("s390/zcrypt: Introduce new SHA-512 based Pseudo Random Generator.")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> 
+> diff --git a/arch/s390/crypto/prng.c b/arch/s390/crypto/prng.c
+> index 9cc050f..1113389 100644
+> --- a/arch/s390/crypto/prng.c
+> +++ b/arch/s390/crypto/prng.c
+> @@ -507,8 +507,10 @@ static ssize_t prng_tdes_read(struct file *file, char __user *ubuf,
+>  		prng_data->prngws.byte_counter += n;
+>  		prng_data->prngws.reseed_counter += n;
+> 
+> -		if (copy_to_user(ubuf, prng_data->buf, chunk))
+> -			return -EFAULT;
+> +		if (copy_to_user(ubuf, prng_data->buf, chunk)) {
+> +			ret = -EFAULT;
+> +			break;
+> +		}
+> 
+>  		nbytes -= chunk;
+>  		ret += chunk;
+> 
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c | 1 +
- 1 file changed, 1 insertion(+)
+Nice spotting, I will add this to my fixes tree. Thank you..
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index fb33f7d..9a95b61 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1766,6 +1766,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
- 		init_completion(&drbg->ctr_completion);
- 
- 		outlen -= cryptlen;
-+		outbuf += cryptlen;
- 	}
- 
- 	return 0;
 -- 
-2.7.4
+blue skies,
+   Martin.
+
+"Reality continues to ruin my life." - Calvin.
+
