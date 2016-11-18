@@ -1,91 +1,23 @@
-From: <membership@instituteofcredit.org>
-Subject: 22773 linux-crypto
-Date: Thu, 17 Nov 2016 04:56:30 -0000
-Message-ID: <147935859067.3183.12264269414393106213@suddenlink.net>
+From: "beer.c@gmx.com" <feltner.buhl@gmx.com>
+Subject: =?windows-1251?Q?=D6=E5=EB=E5=E2=FB=E5_=EA=EB=E8=E5=ED=F2?=
+        =?windows-1251?Q?=F1=EA=E8=E5_=E1=E0=E7=FB_Skype=3A_proda?=
+        =?windows-1251?Q?wez390_Whatsapp=3A_+79139230330_Viber=3A?=
+        =?windows-1251?Q?__+79139230330_Telegram=3A_+79139230330_?=
+        =?windows-1251?Q?Email=3A_prodawez391=40gmail=2Ecom?=
+Date: Fri, 18 Nov 2016 07:55:27 +0700
+Message-ID: <2A2F99CAC1153B88545118A4B0640AEE@gmx.com>
+Reply-To: "beer.c@gmx.com" <prodawez391@gmail.com>
 Mime-Version: 1.0
-Content-Type: application/zip; name="EMAIL_284983759749_linux-crypto.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="windows-1251";
+Content-Transfer-Encoding: 8BIT
+To: "hp627@daum.net" <hp627@daum.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 66-76-53-173.tyrccmta02.com.sta.suddenlink.net ([66.76.53.173]:48696
-        "HELO suddenlink.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with SMTP id S932263AbcKQE4f (ORCPT
+Received: from fr1.newmarket2011.com ([212.56.212.210]:43637 "EHLO
+        newmarket2011.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S938318AbcKQGfT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Nov 2016 23:56:35 -0500
-Content-Disposition: attachment
+        Thu, 17 Nov 2016 01:35:19 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
-AAAA
+Целевые клиентские базы Skype: prodawez390 Whatsapp: +79139230330 Viber:  +79139230330 Telegram: +79139230330 Email: prodawez391@gmail.com
