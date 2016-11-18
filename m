@@ -1,115 +1,42 @@
-From: Laura Abbott <labbott@redhat.com>
-Subject: Re: BUG: algif_hash crash with extra recv() in 4.9-rc5
-Date: Thu, 17 Nov 2016 13:20:04 -0800
-Message-ID: <b4edd214-214c-1d8f-ca1d-d1e26caf55c2@redhat.com>
-References: <alpine.OSX.2.20.1611161027010.67352@mjmartin-mac01.local>
- <20161117140757.GA1149@gondor.apana.org.au>
+From: Sandy Harris <sandyinchina@gmail.com>
+Subject: Re: [PATCH] crypto: sun4i-ss: support the Security System PRNG
+Date: Thu, 17 Nov 2016 20:07:09 -0500
+Message-ID: <CACXcFmmMc7U1Qz6A+mvMXVnfSmOmssydcmSugo21jrX3u-95Qg@mail.gmail.com>
+References: <1476794067-28563-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-        Russell King - ARM Linux <linux@armlinux.org.uk>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        maxime.ripard@free-electrons.com, wens@csie.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f49.google.com ([209.85.214.49]:38637 "EHLO
-        mail-it0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752088AbcKQVUI (ORCPT
+Received: from mail-vk0-f67.google.com ([209.85.213.67]:34611 "EHLO
+        mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750855AbcKRBHK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Nov 2016 16:20:08 -0500
-Received: by mail-it0-f49.google.com with SMTP id j191so79183866ita.1
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2016 13:20:08 -0800 (PST)
-In-Reply-To: <20161117140757.GA1149@gondor.apana.org.au>
+        Thu, 17 Nov 2016 20:07:10 -0500
+In-Reply-To: <1476794067-28563-1-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 11/17/2016 06:07 AM, Herbert Xu wrote:
-> On Wed, Nov 16, 2016 at 11:17:33AM -0800, Mat Martineau wrote:
->>
->> Herbert -
->>
->> Following commit 493b2ed3f7603a15ff738553384d5a4510ffeb95, there is a NULL
->> dereference crash in algif_hash when recv() is called twice like this:
->>
->> send(sk, data, len, MSG_MORE);
->> recv(sk, hash1, len, 0);
->> recv(sk, hash2, len, 0);
->>
->> In 4.8 and earlier, the two recvs return identical data. In 4.9-rc5, the
->> second recv triggers this:
->>
->> [   53.041287] BUG: unable to handle kernel NULL pointer dereference at 0000000000000010
->> [   53.042048] IP: [<ffffffffa73fdfb3>] shash_ahash_digest+0x23/0x130
-> 
-> Ugh.  It looks like the shash wrapper is incorrectly dereferencing
-> the SG list even when the length is zero.  Rather than fixing it
-> I'm just going to make algif_hash do the safe thing of doing an
-> init followed by a final.
-> 
-> Thanks,
-> 
-> ---8<---
-> Subject: crypto: algif_hash - Fix NULL hash crash with shash
-> 
-> Recently algif_hash has been changed to allow null hashes.  This
-> triggers a bug when used with an shash algorithm whereby it will
-> cause a crash during the digest operation.
-> 
-> This patch fixes it by avoiding the digest operation and instead
-> doing an init followed by a final which avoids the buggy code in
-> shash.
-> 
-> This patch also ensures that the result buffer is freed after an
-> error so that it is not returned as a genuine hash result on the
-> next recv call.
-> 
-> The shash/ahash wrapper code will be fixed later to handle this
-> case correctly.
-> 
-> Fixes: 493b2ed3f760 ("crypto: algif_hash - Handle NULL hashes correctly")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-> index 2d8466f..05e21b4 100644
-> --- a/crypto/algif_hash.c
-> +++ b/crypto/algif_hash.c
-> @@ -214,23 +214,26 @@ static int hash_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->  
->  	ahash_request_set_crypt(&ctx->req, NULL, ctx->result, 0);
->  
-> -	if (ctx->more) {
-> +	if (!result) {
-> +		err = af_alg_wait_for_completion(
-> +				crypto_ahash_init(&ctx->req),
-> +				&ctx->completion);
-> +		if (err)
-> +			goto unlock;
-> +	}
-> +
-> +	if (!result || ctx->more) {
->  		ctx->more = 0;
->  		err = af_alg_wait_for_completion(crypto_ahash_final(&ctx->req),
->  						 &ctx->completion);
->  		if (err)
->  			goto unlock;
-> -	} else if (!result) {
-> -		err = af_alg_wait_for_completion(
-> -				crypto_ahash_digest(&ctx->req),
-> -				&ctx->completion);
->  	}
->  
->  	err = memcpy_to_msg(msg, ctx->result, len);
->  
-> -	hash_free_result(sk, ctx);
-> -
->  unlock:
-> +	hash_free_result(sk, ctx);
->  	release_sock(sk);
->  
->  	return err ?: len;
-> 
+Add Ted T'so to cc list. Shouldn't he be included on anything affecting
+the random(4) driver?
 
-Confirmed to work for me. You can take that as a Tested-by.
+On Tue, Oct 18, 2016 at 8:34 AM, Corentin Labbe
+<clabbe.montjoie@gmail.com> wrote:
 
-Thanks,
-Laura
+> From: LABBE Corentin <clabbe.montjoie@gmail.com>
+>
+> The Security System have a PRNG.
+> This patch add support for it as an hwrng.
+
+Which is it? A PRNG & a HW RNG are quite different things.
+It would, in general, be a fairly serious error to treat a PRNG
+as a HWRNG.
+
+If it is just a prng (which it appears to be from a quick look
+at your code) then it is not clear it is useful since the
+random(4) driver already has two PRNGs. It might be
+but I cannot tell.
