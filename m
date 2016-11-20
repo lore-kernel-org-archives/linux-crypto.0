@@ -1,98 +1,71 @@
-From: gong lei <arei.gonglei@hotmail.com>
-Subject: Re: [PATCH] crypto: add virtio-crypto driver
-Date: Sun, 20 Nov 2016 07:11:50 +0000
-Message-ID: <HK2PR0601MB142713AD25BFB4BFC4C228A69FB20@HK2PR0601MB1427.apcprd06.prod.outlook.com>
-References: <1479106074-32036-1-git-send-email-arei.gonglei@huawei.com>
-	<309B30E91F5E2846B79BD9AA9711D031A12767@IRSMSX102.ger.corp.intel.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v4] crypto: arm64/sha2: integrate OpenSSL implementations
+ of SHA256/SHA512
+Date: Sun, 20 Nov 2016 11:43:57 +0000
+Message-ID: <CAKv+Gu9SG5s=zddQaw+444191JGqmXfCh+AKyv3nZNqggmh=Kw@mail.gmail.com>
+References: <1479642121-17912-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
-Cc: "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>,
-	"weidong.huang@huawei.com" <weidong.huang@huawei.com>,
-	"claudio.fontana@huawei.com" <claudio.fontana@huawei.com>,
-	"mst@redhat.com" <mst@redhat.com>,
-	"luonengjun@huawei.com" <luonengjun@huawei.com>,
-	"hanweidong@huawei.com" <hanweidong@huawei.com>, "Zeng,
-	Xin" <xin.zeng@intel.com>,
-	"peter.huangpeng@huawei.com" <peter.huangpeng@huawei.com>,
-	"xuquan8@huawei.com" <xuquan8@huawei.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>,
-	"jianjay.zhou@huawei.com" <jianjay.zhou@huawei.com>,
-	"cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"wu.wubin@huawei.com" <wu.wubin@huawei.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-To: "Benedetto, Salvatore" <salvatore.benedetto@intel.com>, Gonglei
-	<arei.gonglei@huawei.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
-	"virtualization@lists.linux-foundation.org"
-	<virtualization@lists.linux-foundation.org>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>
-Return-path: <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
-In-Reply-To: <309B30E91F5E2846B79BD9AA9711D031A12767@IRSMSX102.ger.corp.intel.com>
-Content-Language: en-US
-Content-ID: <F6479DDEA1F1294CB87BD0ED77498CC6@apcprd06.prod.outlook.com>
-List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
-	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
-List-Archive: <http://lists.nongnu.org/archive/html/qemu-devel/>
-List-Post: <mailto:qemu-devel@nongnu.org>
-List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
-List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
-	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
-Sender: "Qemu-devel" <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: Andy Polyakov <appro@openssl.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Will Deacon <will.deacon@arm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-it0-f41.google.com ([209.85.214.41]:35261 "EHLO
+        mail-it0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753423AbcKTLn7 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 20 Nov 2016 06:43:59 -0500
+Received: by mail-it0-f41.google.com with SMTP id c20so69524224itb.0
+        for <linux-crypto@vger.kernel.org>; Sun, 20 Nov 2016 03:43:58 -0800 (PST)
+In-Reply-To: <1479642121-17912-1-git-send-email-ard.biesheuvel@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-on 2016/11/17 23:55, Benedetto, Salvatore wrote:
-
-> Hi Gonglei,
+On 20 November 2016 at 11:42, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> This integrates both the accelerated scalar and the NEON implementations
+> of SHA-224/256 as well as SHA-384/512 from the OpenSSL project.
 >
-> ...
->> +
->> +static int virtio_crypto_alg_ablkcipher_init_session(
->> +		struct virtio_crypto_ablkcipher_ctx *ctx,
->> +		int alg, const uint8_t *key,
->> +		unsigned int keylen,
->> +		int encrypt)
->> +{
->> +	struct scatterlist outhdr, key_sg, inhdr, *sgs[3];
->> +	unsigned int tmp;
->> +	struct virtio_crypto_session_input input;
->> +	struct virtio_crypto_op_ctrl_req ctrl;
->> +	struct virtio_crypto *vcrypto =3D ctx->vcrypto;
->> +	int op =3D encrypt ? VIRTIO_CRYPTO_OP_ENCRYPT :
->> VIRTIO_CRYPTO_OP_DECRYPT;
->> +	int err;
->> +	unsigned int num_out =3D 0, num_in =3D 0;
->> +
->> +	memset(&ctrl, 0, sizeof(ctrl));
->> +	memset(&input, 0, sizeof(input));
->> +	/* Pad ctrl header */
->> +	ctrl.header.opcode =3D
->> cpu_to_le32(VIRTIO_CRYPTO_CIPHER_CREATE_SESSION);
->> +	ctrl.header.algo =3D cpu_to_le32((uint32_t)alg);
->> +	/* Set the default dataqueue id to 0 */
->> +	ctrl.header.queue_id =3D 0;
->> +
->> +	input.status =3D cpu_to_le32(VIRTIO_CRYPTO_ERR);
->> +	/* Pad cipher's parameters */
->> +	ctrl.u.sym_create_session.op_type =3D
->> +		cpu_to_le32(VIRTIO_CRYPTO_SYM_OP_CIPHER);
->> +	ctrl.u.sym_create_session.u.cipher.para.algo =3D ctrl.header.algo;
->> +	ctrl.u.sym_create_session.u.cipher.para.keylen =3D
->> cpu_to_le32(keylen);
->> +	ctrl.u.sym_create_session.u.cipher.para.op =3D cpu_to_le32(op);
->> +
->> +	sg_init_one(&outhdr, &ctrl, sizeof(ctrl));
-> I believe this won't work when the new virtually-mapped kernel stack (VMA=
-P_STACK)
-> is enabled.
-I see, will fix it in the next version. Thanks for your comments :)
+> Relative performance compared to the respective generic C versions:
 >
-> Regards,
-> Salvatore
+>                  |  SHA256-scalar  | SHA256-NEON* |  SHA512  |
+>      ------------+-----------------+--------------+----------+
+>      Cortex-A53  |      1.63x      |     1.63x    |   2.34x  |
+>      Cortex-A57  |      1.43x      |     1.59x    |   1.95x  |
+>      Cortex-A73  |      1.26x      |     1.56x    |     ?    |
+>
+> The core crypto code was authored by Andy Polyakov of the OpenSSL
+> project, in collaboration with whom the upstream code was adapted so
+> that this module can be built from the same version of sha512-armv8.pl.
+>
+> The version in this patch was taken from OpenSSL commit 32bbb62ea634
+> ("sha/asm/sha512-armv8.pl: fix big-endian support in __KERNEL__ case.")
+>
+> * The core SHA algorithm is fundamentally sequential, but there is a
+>   secondary transformation involved, called the schedule update, which
+>   can be performed independently. The NEON version of SHA-224/SHA-256
+>   only implements this part of the algorithm using NEON instructions,
+>   the sequential part is always done using scalar instructions.
+>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
 
---=20
-Regards,
--Gonglei
+Missing changelog:
+
+v4: fixed the big-endian build; this required an upstream change (even
+    though upstream was not actually broken, since it explicitly defines
+    __ARMEB__ on AArch64 big-endian builds), so this patch is now based
+    on a more recent upstream OpenSSL commit (the __ILP32__ #ifdefs are
+    still present but never active)
+
+v3: at Will's request, the generated assembly files are now included
+    as .S_shipped files, for which generic build rules are defined
+    already.
+
+Note that sizeable patches like this one have caused issues in the past with
+patchwork, so for Herbert's convenience, the patch can be pulled from
+http://git.kernel.org/cgit/linux/kernel/git/ardb/linux.git, branch
+arm64-sha256 (based on today's cryptodev)
