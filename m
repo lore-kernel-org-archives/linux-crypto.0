@@ -1,7 +1,7 @@
 From: Harsh Jain <harsh@chelsio.com>
-Subject: [PATCH v2 8/9] crypto/chcr: Move tfm ctx variable to request context
-Date: Mon, 21 Nov 2016 21:30:54 +0530
-Message-ID: <cac273a4c407afbabcd6ab38483d4d2dbc40cf29.1479740559.git.harsh@chelsio.com>
+Subject: [PATCH v2 6/9] crypto/chcr: Adjust Dest. buffer size
+Date: Mon, 21 Nov 2016 21:30:52 +0530
+Message-ID: <cb417444430c13bef1a2d8ef15c39d29c7f6cde4.1479740559.git.harsh@chelsio.com>
 References: <cover.1479740559.git.harsh@chelsio.com>
 Cc: Harsh Jain <harsh@chelsio.com>
 To: dan.carpenter@oracle.com, herbert@gondor.apana.org.au,
@@ -9,149 +9,117 @@ To: dan.carpenter@oracle.com, herbert@gondor.apana.org.au,
         jlulla@chelsio.com, atul.gupta@chelsio.com, yeshaswi@chelsio.com,
         hariprasad@chelsio.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:17440 "EHLO
+Received: from stargate.chelsio.com ([12.32.117.8]:21273 "EHLO
         stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754480AbcKUQBs (ORCPT
+        with ESMTP id S1754537AbcKUQBm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Nov 2016 11:01:48 -0500
+        Mon, 21 Nov 2016 11:01:42 -0500
 In-Reply-To: <cover.1479740559.git.harsh@chelsio.com>
 In-Reply-To: <cover.1479740559.git.harsh@chelsio.com>
 References: <cover.1479740559.git.harsh@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Move request specific data in request context.
+Destination buffer size passed to hardware should not be greater
+than crypto operation output.
 
 Signed-off-by: Harsh Jain <harsh@chelsio.com>
 ---
- drivers/crypto/chelsio/chcr_algo.c   | 26 +++++++++++++-------------
- drivers/crypto/chelsio/chcr_crypto.h |  9 ++++-----
- 2 files changed, 17 insertions(+), 18 deletions(-)
+ drivers/crypto/chelsio/chcr_algo.c | 50 +++++++++++++++-----------------------
+ 1 file changed, 20 insertions(+), 30 deletions(-)
 
 diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 7262bb3..18385d6 100644
+index d5e0066..17d0c1f 100644
 --- a/drivers/crypto/chelsio/chcr_algo.c
 +++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -119,7 +119,7 @@ int chcr_handle_resp(struct crypto_async_request *req, unsigned char *input,
- 			       AES_BLOCK_SIZE);
- 		}
- 		dma_unmap_sg(&u_ctx->lldi.pdev->dev, ctx_req.req.ablk_req->dst,
--			     ABLK_CTX(ctx)->dst_nents, DMA_FROM_DEVICE);
-+			     ctx_req.ctx.ablk_ctx->dst_nents, DMA_FROM_DEVICE);
- 		if (ctx_req.ctx.ablk_ctx->skb) {
- 			kfree_skb(ctx_req.ctx.ablk_ctx->skb);
- 			ctx_req.ctx.ablk_ctx->skb = NULL;
-@@ -138,8 +138,10 @@ int chcr_handle_resp(struct crypto_async_request *req, unsigned char *input,
- 			updated_digestsize = SHA256_DIGEST_SIZE;
- 		else if (digestsize == SHA384_DIGEST_SIZE)
- 			updated_digestsize = SHA512_DIGEST_SIZE;
--		if (ctx_req.ctx.ahash_ctx->skb)
-+		if (ctx_req.ctx.ahash_ctx->skb) {
-+			kfree_skb(ctx_req.ctx.ahash_ctx->skb);
- 			ctx_req.ctx.ahash_ctx->skb = NULL;
-+		}
- 		if (ctx_req.ctx.ahash_ctx->result == 1) {
- 			ctx_req.ctx.ahash_ctx->result = 0;
- 			memcpy(ctx_req.req.ahash_req->result, input +
-@@ -318,8 +320,7 @@ static inline int is_hmac(struct crypto_tfm *tfm)
- 	struct chcr_alg_template *chcr_crypto_alg =
- 		container_of(__crypto_ahash_alg(alg), struct chcr_alg_template,
- 			     alg.hash);
--	if ((chcr_crypto_alg->type & CRYPTO_ALG_SUB_TYPE_MASK) ==
--	    CRYPTO_ALG_SUB_TYPE_HASH_HMAC)
-+	if (chcr_crypto_alg->type == CRYPTO_ALG_TYPE_HMAC)
- 		return 1;
+@@ -335,25 +335,13 @@ static inline int is_hmac(struct crypto_tfm *tfm)
  	return 0;
  }
-@@ -505,7 +506,7 @@ static inline void create_wreq(struct chcr_context *ctx,
- 	struct sk_buff *skb = NULL;
- 	struct chcr_wr *chcr_req;
+ 
+-static inline unsigned int ch_nents(struct scatterlist *sg,
+-				    unsigned int *total_size)
+-{
+-	unsigned int nents;
+-
+-	for (nents = 0, *total_size = 0; sg; sg = sg_next(sg)) {
+-		nents++;
+-		*total_size += sg->length;
+-	}
+-	return nents;
+-}
+-
+ static void write_phys_cpl(struct cpl_rx_phys_dsgl *phys_cpl,
+ 			   struct scatterlist *sg,
+ 			   struct phys_sge_parm *sg_param)
+ {
+ 	struct phys_sge_pairs *to;
+-	unsigned int out_buf_size = sg_param->obsize;
+-	unsigned int nents = sg_param->nents, i, j, tot_len = 0;
++	int out_buf_size = sg_param->obsize;
++	unsigned int nents = sg_param->nents, i, j = 0;
+ 
+ 	phys_cpl->op_to_tid = htonl(CPL_RX_PHYS_DSGL_OPCODE_V(CPL_RX_PHYS_DSGL)
+ 				    | CPL_RX_PHYS_DSGL_ISRDMA_V(0));
+@@ -371,25 +359,24 @@ static void write_phys_cpl(struct cpl_rx_phys_dsgl *phys_cpl,
+ 				       sizeof(struct cpl_rx_phys_dsgl));
+ 
+ 	for (i = 0; nents; to++) {
+-		for (j = i; (nents && (j < (8 + i))); j++, nents--) {
+-			to->len[j] = htons(sg->length);
++		for (j = 0; j < 8 && nents; j++, nents--) {
++			out_buf_size -= sg_dma_len(sg);
++			to->len[j] = htons(sg_dma_len(sg));
+ 			to->addr[j] = cpu_to_be64(sg_dma_address(sg));
+-			if (out_buf_size) {
+-				if (tot_len + sg_dma_len(sg) >= out_buf_size) {
+-					to->len[j] = htons(out_buf_size -
+-							   tot_len);
+-					return;
+-				}
+-				tot_len += sg_dma_len(sg);
+-			}
+ 			sg = sg_next(sg);
+ 		}
+ 	}
++	if (out_buf_size) {
++		j--;
++		to--;
++		to->len[j] = htons(ntohs(to->len[j]) + (out_buf_size));
++	}
+ }
+ 
+-static inline unsigned
+-int map_writesg_phys_cpl(struct device *dev, struct cpl_rx_phys_dsgl *phys_cpl,
+-			 struct scatterlist *sg, struct phys_sge_parm *sg_param)
++static inline int map_writesg_phys_cpl(struct device *dev,
++					struct cpl_rx_phys_dsgl *phys_cpl,
++					struct scatterlist *sg,
++					struct phys_sge_parm *sg_param)
+ {
+ 	if (!sg || !sg_param->nents)
+ 		return 0;
+@@ -531,16 +518,19 @@ static inline void create_wreq(struct chcr_context *ctx,
  	struct cpl_rx_phys_dsgl *phys_cpl;
--	struct chcr_blkcipher_req_ctx *req_ctx = ablkcipher_request_ctx(req);
-+	struct chcr_blkcipher_req_ctx *reqctx = ablkcipher_request_ctx(req);
+ 	struct chcr_blkcipher_req_ctx *req_ctx = ablkcipher_request_ctx(req);
  	struct phys_sge_parm sg_param;
- 	unsigned int frags = 0, transhdr_len, phys_dsgl;
+-	unsigned int frags = 0, transhdr_len, phys_dsgl, dst_bufsize = 0;
++	unsigned int frags = 0, transhdr_len, phys_dsgl;
  	unsigned int ivsize = crypto_ablkcipher_ivsize(tfm), kctx_len;
-@@ -514,12 +515,11 @@ static inline void create_wreq(struct chcr_context *ctx,
+ 	gfp_t flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL :
+ 			GFP_ATOMIC;
  
  	if (!req->info)
  		return ERR_PTR(-EINVAL);
--	ablkctx->dst_nents = sg_nents_for_len(req->dst, req->nbytes);
--	if (ablkctx->dst_nents <= 0) {
-+	reqctx->dst_nents = sg_nents_for_len(req->dst, req->nbytes);
-+	if (reqctx->dst_nents <= 0) {
- 		pr_err("AES:Invalid Destination sg lists\n");
- 		return ERR_PTR(-EINVAL);
- 	}
--	ablkctx->enc = op_type;
+-	ablkctx->dst_nents = ch_nents(req->dst, &dst_bufsize);
++	ablkctx->dst_nents = sg_nents_for_len(req->dst, req->nbytes);
++	if (ablkctx->dst_nents <= 0) {
++		pr_err("AES:Invalid Destination sg lists\n");
++		return ERR_PTR(-EINVAL);
++	}
+ 	ablkctx->enc = op_type;
+-
  	if ((ablkctx->enckey_len == 0) || (ivsize > AES_BLOCK_SIZE) ||
  	    (req->nbytes <= 0) || (req->nbytes % AES_BLOCK_SIZE)) {
  		pr_err("AES: Invalid value of Key Len %d nbytes %d IV Len %d\n",
-@@ -527,7 +527,7 @@ static inline void create_wreq(struct chcr_context *ctx,
- 		return ERR_PTR(-EINVAL);
- 	}
- 
--	phys_dsgl = get_space_for_phys_dsgl(ablkctx->dst_nents);
-+	phys_dsgl = get_space_for_phys_dsgl(reqctx->dst_nents);
- 
- 	kctx_len = (DIV_ROUND_UP(ablkctx->enckey_len, 16) * 16);
- 	transhdr_len = CIPHER_TRANSHDR_SIZE(kctx_len, phys_dsgl);
-@@ -570,7 +570,7 @@ static inline void create_wreq(struct chcr_context *ctx,
- 		}
- 	}
- 	phys_cpl = (struct cpl_rx_phys_dsgl *)((u8 *)(chcr_req + 1) + kctx_len);
--	sg_param.nents = ablkctx->dst_nents;
-+	sg_param.nents = reqctx->dst_nents;
- 	sg_param.obsize = req->nbytes;
- 	sg_param.qid = qid;
- 	sg_param.align = 1;
-@@ -579,11 +579,11 @@ static inline void create_wreq(struct chcr_context *ctx,
- 		goto map_fail1;
- 
- 	skb_set_transport_header(skb, transhdr_len);
--	memcpy(ablkctx->iv, req->info, ivsize);
--	write_buffer_to_skb(skb, &frags, ablkctx->iv, ivsize);
-+	memcpy(reqctx->iv, req->info, ivsize);
-+	write_buffer_to_skb(skb, &frags, reqctx->iv, ivsize);
- 	write_sg_to_skb(skb, &frags, req->src, req->nbytes);
- 	create_wreq(ctx, chcr_req, req, skb, kctx_len, 0, phys_dsgl);
--	req_ctx->skb = skb;
-+	reqctx->skb = skb;
- 	skb_get(skb);
- 	return skb;
- map_fail1:
-diff --git a/drivers/crypto/chelsio/chcr_crypto.h b/drivers/crypto/chelsio/chcr_crypto.h
-index 977d205..40a5182 100644
---- a/drivers/crypto/chelsio/chcr_crypto.h
-+++ b/drivers/crypto/chelsio/chcr_crypto.h
-@@ -120,17 +120,14 @@
- /* Aligned to 128 bit boundary */
- 
- struct ablk_ctx {
--	u8 enc;
--	unsigned int processed_len;
- 	__be32 key_ctx_hdr;
- 	unsigned int enckey_len;
--	unsigned int dst_nents;
- 	u8 key[CHCR_AES_MAX_KEY_LEN];
--	u8 rrkey[AES_MAX_KEY_SIZE];
--	u8 iv[CHCR_MAX_CRYPTO_IV_LEN];
- 	unsigned char ciph_mode;
-+	u8 rrkey[AES_MAX_KEY_SIZE];
- };
- 
-+
- struct hmac_ctx {
- 	struct crypto_shash *base_hash;
- 	u8 ipad[CHCR_HASH_MAX_BLOCK_SIZE_128];
-@@ -164,6 +161,8 @@ struct chcr_ahash_req_ctx {
- 
- struct chcr_blkcipher_req_ctx {
- 	struct sk_buff *skb;
-+	unsigned int dst_nents;
-+	u8 iv[CHCR_MAX_CRYPTO_IV_LEN];
- };
- 
- struct chcr_alg_template {
 -- 
 1.8.2.3
