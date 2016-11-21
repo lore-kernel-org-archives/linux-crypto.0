@@ -1,71 +1,93 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH v4] crypto: arm64/sha2: integrate OpenSSL implementations
- of SHA256/SHA512
-Date: Sun, 20 Nov 2016 11:43:57 +0000
-Message-ID: <CAKv+Gu9SG5s=zddQaw+444191JGqmXfCh+AKyv3nZNqggmh=Kw@mail.gmail.com>
-References: <1479642121-17912-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: vmalloced stacks and scatterwalk_map_and_copy()
+Date: Sun, 20 Nov 2016 18:19:48 -0800
+Message-ID: <CALCETrXg5ytkLHBpKMJG7fBea+xy2wz6kSm2XK5c8K7_Hr9UuA@mail.gmail.com>
+References: <20161103181624.GA63852@google.com> <CALCETrUPuunBT1Zo25wyOwqaWJ=rm9R-WMZGN-7u4-dsdokAnQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Andy Polyakov <appro@openssl.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
+Cc: linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Will Deacon <will.deacon@arm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f41.google.com ([209.85.214.41]:35261 "EHLO
-        mail-it0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753423AbcKTLn7 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Nov 2016 06:43:59 -0500
-Received: by mail-it0-f41.google.com with SMTP id c20so69524224itb.0
-        for <linux-crypto@vger.kernel.org>; Sun, 20 Nov 2016 03:43:58 -0800 (PST)
-In-Reply-To: <1479642121-17912-1-git-send-email-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Andrew Lutomirski <luto@kernel.org>
+To: Eric Biggers <ebiggers@google.com>, regressions@leemhuis.info
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CALCETrUPuunBT1Zo25wyOwqaWJ=rm9R-WMZGN-7u4-dsdokAnQ@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 20 November 2016 at 11:42, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> This integrates both the accelerated scalar and the NEON implementations
-> of SHA-224/256 as well as SHA-384/512 from the OpenSSL project.
->
-> Relative performance compared to the respective generic C versions:
->
->                  |  SHA256-scalar  | SHA256-NEON* |  SHA512  |
->      ------------+-----------------+--------------+----------+
->      Cortex-A53  |      1.63x      |     1.63x    |   2.34x  |
->      Cortex-A57  |      1.43x      |     1.59x    |   1.95x  |
->      Cortex-A73  |      1.26x      |     1.56x    |     ?    |
->
-> The core crypto code was authored by Andy Polyakov of the OpenSSL
-> project, in collaboration with whom the upstream code was adapted so
-> that this module can be built from the same version of sha512-armv8.pl.
->
-> The version in this patch was taken from OpenSSL commit 32bbb62ea634
-> ("sha/asm/sha512-armv8.pl: fix big-endian support in __KERNEL__ case.")
->
-> * The core SHA algorithm is fundamentally sequential, but there is a
->   secondary transformation involved, called the schedule update, which
->   can be performed independently. The NEON version of SHA-224/SHA-256
->   only implements this part of the algorithm using NEON instructions,
->   the sequential part is always done using scalar instructions.
->
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
+[Adding Thorsten to help keep this from getting lost]
 
-Missing changelog:
+On Thu, Nov 3, 2016 at 1:30 PM, Andy Lutomirski <luto@amacapital.net> wrote:
+> On Thu, Nov 3, 2016 at 11:16 AM, Eric Biggers <ebiggers@google.com> wrote:
+>> Hello,
+>>
+>> I hit the BUG_ON() in arch/x86/mm/physaddr.c:26 while testing some crypto code
+>> in an x86_64 kernel with CONFIG_DEBUG_VIRTUAL=y and CONFIG_VMAP_STACK=y:
+>>
+>>         /* carry flag will be set if starting x was >= PAGE_OFFSET */
+>>         VIRTUAL_BUG_ON((x > y) || !phys_addr_valid(x));
+>>
+>> The problem is the following code in scatterwalk_map_and_copy() in
+>> crypto/scatterwalk.c, which tries to determine if the buffer passed in aliases
+>> the physical memory of the first segment of the scatterlist:
+>>
+>>         if (sg_page(sg) == virt_to_page(buf) &&
+>>             sg->offset == offset_in_page(buf))
+>>                 return;
+>
+> ...
+>
+>>
+>> Currently I think the best solution would be to require that callers to
+>> scatterwalk_map_and_copy() do not alias their source and destination.  Then the
+>> alias check could be removed.  This check has only been there since v4.2 (commit
+>> 74412fd5d71b6), so I'd hope not many callers rely on the behavior.  I'm not sure
+>> exactly which ones do, though.
+>>
+>> Thoughts on this?
+>
+> The relevant commit is:
+>
+> commit 74412fd5d71b6eda0beb302aa467da000f0d530c
+> Author: Herbert Xu <herbert@gondor.apana.org.au>
+> Date:   Thu May 21 15:11:12 2015 +0800
+>
+>     crypto: scatterwalk - Check for same address in map_and_copy
+>
+>     This patch adds a check for in scatterwalk_map_and_copy to avoid
+>     copying from the same address to the same address.  This is going
+>     to be used for IV copying in AEAD IV generators.
+>
+>     There is no provision for partial overlaps.
+>
+>     This patch also uses the new scatterwalk_ffwd instead of doing
+>     it by hand in scatterwalk_map_and_copy.
+>
+>     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
+> Herbert, can you clarify this?  The check seems rather bizarre --
+> you're doing an incomplete check for aliasing and skipping the whole
+> copy if the beginning aliases.  In any event the stack *can't*
+> reasonably alias the scatterlist because a scatterlist can't safely
+> point to the stack.  Is there any code that actually relies on the
+> aliasing-detecting behavior?
+>
+> Also, Herbert, it seems like the considerable majority of the crypto
+> code is acting on kernel virtual memory addresses and does software
+> processing.  Would it perhaps make sense to add a kvec-based or
+> iov_iter-based interface to the crypto code?  I bet it would be quite
+> a bit faster and it would make crypto on stack buffers work directly.
 
-v4: fixed the big-endian build; this required an upstream change (even
-    though upstream was not actually broken, since it explicitly defines
-    __ARMEB__ on AArch64 big-endian builds), so this patch is now based
-    on a more recent upstream OpenSSL commit (the __ILP32__ #ifdefs are
-    still present but never active)
 
-v3: at Will's request, the generated assembly files are now included
-    as .S_shipped files, for which generic build rules are defined
-    already.
+Ping, everyone!
 
-Note that sizeable patches like this one have caused issues in the past with
-patchwork, so for Herbert's convenience, the patch can be pulled from
-http://git.kernel.org/cgit/linux/kernel/git/ardb/linux.git, branch
-arm64-sha256 (based on today's cryptodev)
+It's getting quite close to 4.9 release time.  Is there an actual bug
+here?  Because, if so, we need to fix it.  My preference is to just
+delete the weird aliasing check, but it would be really nice to know
+if that check is needed for some reason.
+
+--Andy
+
+-- 
+Andy Lutomirski
+AMA Capital Management, LLC
