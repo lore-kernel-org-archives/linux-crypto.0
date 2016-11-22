@@ -1,104 +1,60 @@
-From: Gonglei <arei.gonglei@huawei.com>
-Subject: [PATCH v2 0/2] virtio-crypto: add Linux driver
-Date: Tue, 22 Nov 2016 16:10:21 +0800
-Message-ID: <1479802223-121104-1-git-send-email-arei.gonglei@huawei.com>
+From: Jean Delvare <jdelvare@suse.de>
+Subject: [PATCH] crypto: powerpc - Rename CRYPT_CRC32C_VPMSUM option
+Date: Tue, 22 Nov 2016 10:32:44 +0100
+Message-ID: <20161122103244.38d435cd@endymion>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <luonengjun@huawei.com>, <mst@redhat.com>, <stefanha@redhat.com>,
-        <weidong.huang@huawei.com>, <wu.wubin@huawei.com>,
-        <xin.zeng@intel.com>, <claudio.fontana@huawei.com>,
-        <herbert@gondor.apana.org.au>, <pasic@linux.vnet.ibm.com>,
-        <davem@davemloft.net>, <jianjay.zhou@huawei.com>,
-        <hanweidong@huawei.com>, <arei.gonglei@hotmail.com>,
-        <cornelia.huck@de.ibm.com>, <xuquan8@huawei.com>,
-        <longpeng2@huawei.com>, <salvatore.benedetto@intel.com>,
-        Gonglei <arei.gonglei@huawei.com>
-To: <linux-kernel@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        <virtio-dev@lists.oasis-open.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <linux-crypto@vger.kernel.org>
-Return-path: <virtio-dev-return-1716-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
-Sender: <virtio-dev@lists.oasis-open.org>
-List-Post: <mailto:virtio-dev@lists.oasis-open.org>
-List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
-List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
-List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Anton Blanchard <anton@samba.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        "David S. Miller" <davem@davemloft.net>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:33314 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755344AbcKVJcx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Nov 2016 04:32:53 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The virtio crypto device is a virtual cryptography device
-as well as a kind of virtual hardware accelerator for
-virtual machines. The encryption anddecryption requests
-are placed in the data queue and are ultimately handled by
-thebackend crypto accelerators. The second queue is the
-control queue used to create or destroy sessions for
-symmetric algorithms and will control some advanced features
-in the future. The virtio crypto device provides the following
-cryptoservices: CIPHER, MAC, HASH, and AEAD.
+For consistency with the other 246 kernel configuration options,
+rename CRYPT_CRC32C_VPMSUM to CRYPTO_CRC32C_VPMSUM.
 
-For more information about virtio-crypto device, please see:
-  http://qemu-project.org/Features/VirtioCrypto
+Signed-off-by: Jean Delvare <jdelvare@suse.de>
+Cc: Anton Blanchard <anton@samba.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ arch/powerpc/crypto/Makefile |    2 +-
+ crypto/Kconfig               |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-For better reviewing:
+--- linux-4.9-rc5.orig/arch/powerpc/crypto/Makefile	2016-10-03 01:24:33.000000000 +0200
++++ linux-4.9-rc5/arch/powerpc/crypto/Makefile	2016-11-22 10:24:49.902659542 +0100
+@@ -9,7 +9,7 @@ obj-$(CONFIG_CRYPTO_MD5_PPC) += md5-ppc.
+ obj-$(CONFIG_CRYPTO_SHA1_PPC) += sha1-powerpc.o
+ obj-$(CONFIG_CRYPTO_SHA1_PPC_SPE) += sha1-ppc-spe.o
+ obj-$(CONFIG_CRYPTO_SHA256_PPC_SPE) += sha256-ppc-spe.o
+-obj-$(CONFIG_CRYPT_CRC32C_VPMSUM) += crc32c-vpmsum.o
++obj-$(CONFIG_CRYPTO_CRC32C_VPMSUM) += crc32c-vpmsum.o
+ 
+ aes-ppc-spe-y := aes-spe-core.o aes-spe-keys.o aes-tab-4k.o aes-spe-modes.o aes-spe-glue.o
+ md5-ppc-y := md5-asm.o md5-glue.o
+--- linux-4.9-rc5.orig/crypto/Kconfig	2016-10-03 01:24:33.000000000 +0200
++++ linux-4.9-rc5/crypto/Kconfig	2016-11-22 10:25:03.270801004 +0100
+@@ -437,7 +437,7 @@ config CRYPTO_CRC32C_INTEL
+ 	  gain performance compared with software implementation.
+ 	  Module will be crc32c-intel.
+ 
+-config CRYPT_CRC32C_VPMSUM
++config CRYPTO_CRC32C_VPMSUM
+ 	tristate "CRC32c CRC algorithm (powerpc64)"
+ 	depends on PPC64 && ALTIVEC
+ 	select CRYPTO_HASH
 
-Patch 1 introduces the little edian functions for VIRTIO_1 
-devices.
-
-Patch 2 mainly includes five files:
- 1) virtio_crypto.h is the header file for virtio-crypto device,
-which is based on the virtio-crypto specification. 
- 2) virtio_crypto.c is the entry of the driver module,
-which is similar with other virtio devices, such as virtio-net,
-virtio-input etc. 
- 3) virtio_crypto_mgr.c is used to manage the virtio
-crypto devices in the system. We support up to 32 virtio-crypto
-devices currently. I use a global list to store the virtio crypto
-devices which refer to Intel QAT driver. Meanwhile, the file
-includs the functions of add/del/search/start/stop for virtio
-crypto devices.
- 4) virtio_crypto_common.h is a private header file for virtio
-crypto driver, includes structure definations, and function declarations.
- 5) virtio_crypto_algs.c is the realization of algs based on Linux Crypto Framwork,
-which can register different crypto algorithms. Currently it's only support AES-CBC.
-The Crypto guys can mainly focus to this file. 
-
-Actually I have no idea the virtio-crypto driver should be gone in whose
-tree, Michael's or Herbert's?
-
-Would you give me a feedback? Thanks a lot!
-
-
-v2:
- - stop doing DMA from the stack, CONFIG_VMAP_STACK=y [Salvatore]
- - convert __virtio32/64 to __le32/64 in virtio_crypto.h
- - remove VIRTIO_CRYPTO_S_STARTED based on the lastest virtio crypto spec.
- - introduces the little edian functions for VIRTIO_1 devices in patch 1.
-
-Gonglei (2):
-  virtio: introduce little edian functions for virtio_cread/write#
-    family
-  crypto: add virtio-crypto driver
-
- MAINTAINERS                                  |   8 +
- drivers/crypto/Kconfig                       |   2 +
- drivers/crypto/Makefile                      |   1 +
- drivers/crypto/virtio/Kconfig                |  10 +
- drivers/crypto/virtio/Makefile               |   5 +
- drivers/crypto/virtio/virtio_crypto.c        | 444 +++++++++++++++++++++++
- drivers/crypto/virtio/virtio_crypto_algs.c   | 524 +++++++++++++++++++++++++++
- drivers/crypto/virtio/virtio_crypto_common.h | 124 +++++++
- drivers/crypto/virtio/virtio_crypto_mgr.c    | 258 +++++++++++++
- include/linux/virtio_config.h                |  45 +++
- include/uapi/linux/Kbuild                    |   1 +
- include/uapi/linux/virtio_crypto.h           | 435 ++++++++++++++++++++++
- include/uapi/linux/virtio_ids.h              |   1 +
- 13 files changed, 1858 insertions(+)
- create mode 100644 drivers/crypto/virtio/Kconfig
- create mode 100644 drivers/crypto/virtio/Makefile
- create mode 100644 drivers/crypto/virtio/virtio_crypto.c
- create mode 100644 drivers/crypto/virtio/virtio_crypto_algs.c
- create mode 100644 drivers/crypto/virtio/virtio_crypto_common.h
- create mode 100644 drivers/crypto/virtio/virtio_crypto_mgr.c
- create mode 100644 include/uapi/linux/virtio_crypto.h
 
 -- 
-1.8.3.1
+Jean Delvare
+SUSE L3 Support
