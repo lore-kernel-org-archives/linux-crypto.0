@@ -1,394 +1,313 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v3 PATCH 6/16] crypto: cryptd - Add support for skcipher
-Date: Tue, 22 Nov 2016 20:08:23 +0800
-Message-ID: <E1c99s7-000384-Pm@gondobar>
+Subject: [v3 PATCH 7/16] crypto: simd - Add simd skcipher helper
+Date: Tue, 22 Nov 2016 20:08:25 +0800
+Message-ID: <E1c99s9-00038I-LR@gondobar>
 References: <20161122120703.GA11911@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38209 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:45566 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S932717AbcKVMIh (ORCPT
+        with ESMTP id S932704AbcKVMIh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 22 Nov 2016 07:08:37 -0500
 Received: from [192.168.128.4] (helo=gondobar)
         by fornost.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-        id 1c99sD-00060q-JZ
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Nov 2016 23:08:33 +1100
+        id 1c99sF-000618-3e
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Nov 2016 23:08:32 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds skcipher support to cryptd alongside ablkcipher.
+This patch adds the simd skcipher helper which is meant to be
+a replacement for ablk helper.  It replaces the underlying blkcipher
+interface with skcipher, and also presents the top-level algorithm
+as an skcipher.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/cryptd.c         |  284 +++++++++++++++++++++++++++++++++++++++++++++++-
- include/crypto/cryptd.h |   13 ++
- 2 files changed, 294 insertions(+), 3 deletions(-)
+ crypto/Kconfig                 |    4 
+ crypto/Makefile                |    2 
+ crypto/simd.c                  |  226 +++++++++++++++++++++++++++++++++++++++++
+ include/crypto/internal/simd.h |   17 +++
+ 4 files changed, 249 insertions(+)
 
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index 3fd2a20..0508c48 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -17,9 +17,9 @@
-  *
-  */
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 1db2a19..3d31181 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -246,6 +246,10 @@ config CRYPTO_ABLK_HELPER
+ 	tristate
+ 	select CRYPTO_CRYPTD
  
--#include <crypto/algapi.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/aead.h>
++config CRYPTO_SIMD
++	tristate
++	select CRYPTO_CRYPTD
++
+ config CRYPTO_GLUE_HELPER_X86
+ 	tristate
+ 	depends on X86
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 82ffeee..a05590e 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -142,3 +142,5 @@ obj-$(CONFIG_ASYNC_CORE) += async_tx/
+ obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += asymmetric_keys/
+ obj-$(CONFIG_CRYPTO_HASH_INFO) += hash_info.o
+ obj-$(CONFIG_CRYPTO_ABLK_HELPER) += ablk_helper.o
++crypto_simd-y := simd.o
++obj-$(CONFIG_CRYPTO_SIMD) += crypto_simd.o
+diff --git a/crypto/simd.c b/crypto/simd.c
+new file mode 100644
+index 0000000..8820337
+--- /dev/null
++++ b/crypto/simd.c
+@@ -0,0 +1,226 @@
++/*
++ * Shared crypto simd helpers
++ *
++ * Copyright (c) 2012 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
++ * Copyright (c) 2016 Herbert Xu <herbert@gondor.apana.org.au>
++ *
++ * Based on aesni-intel_glue.c by:
++ *  Copyright (C) 2008, Intel Corp.
++ *    Author: Huang Ying <ying.huang@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
++ * USA
++ *
++ */
++
++#include <crypto/cryptd.h>
++#include <crypto/internal/simd.h>
 +#include <crypto/internal/skcipher.h>
- #include <crypto/cryptd.h>
- #include <crypto/crypto_wq.h>
- #include <linux/atomic.h>
-@@ -48,6 +48,11 @@ struct cryptd_instance_ctx {
- 	struct cryptd_queue *queue;
- };
- 
-+struct skcipherd_instance_ctx {
-+	struct crypto_skcipher_spawn spawn;
-+	struct cryptd_queue *queue;
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/preempt.h>
++#include <asm/simd.h>
++
++struct simd_skcipher_alg {
++	const char *ialg_name;
++	struct skcipher_alg alg;
 +};
 +
- struct hashd_instance_ctx {
- 	struct crypto_shash_spawn spawn;
- 	struct cryptd_queue *queue;
-@@ -67,6 +72,15 @@ struct cryptd_blkcipher_request_ctx {
- 	crypto_completion_t complete;
- };
- 
-+struct cryptd_skcipher_ctx {
-+	atomic_t refcnt;
-+	struct crypto_skcipher *child;
++struct simd_skcipher_ctx {
++	struct cryptd_skcipher *cryptd_tfm;
 +};
 +
-+struct cryptd_skcipher_request_ctx {
-+	crypto_completion_t complete;
-+};
-+
- struct cryptd_hash_ctx {
- 	atomic_t refcnt;
- 	struct crypto_shash *child;
-@@ -430,6 +444,216 @@ static int cryptd_create_blkcipher(struct crypto_template *tmpl,
- 	return err;
- }
- 
-+static int cryptd_skcipher_setkey(struct crypto_skcipher *parent,
-+				  const u8 *key, unsigned int keylen)
++static int simd_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
++				unsigned int key_len)
 +{
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(parent);
-+	struct crypto_skcipher *child = ctx->child;
++	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct crypto_skcipher *child = &ctx->cryptd_tfm->base;
 +	int err;
 +
 +	crypto_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_skcipher_set_flags(child, crypto_skcipher_get_flags(parent) &
++	crypto_skcipher_set_flags(child, crypto_skcipher_get_flags(tfm) &
 +					 CRYPTO_TFM_REQ_MASK);
-+	err = crypto_skcipher_setkey(child, key, keylen);
-+	crypto_skcipher_set_flags(parent, crypto_skcipher_get_flags(child) &
-+					  CRYPTO_TFM_RES_MASK);
++	err = crypto_skcipher_setkey(child, key, key_len);
++	crypto_skcipher_set_flags(tfm, crypto_skcipher_get_flags(child) &
++				       CRYPTO_TFM_RES_MASK);
 +	return err;
 +}
 +
-+static void cryptd_skcipher_complete(struct skcipher_request *req, int err)
++static int simd_skcipher_encrypt(struct skcipher_request *req)
 +{
 +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct cryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
-+	int refcnt = atomic_read(&ctx->refcnt);
++	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct skcipher_request *subreq;
++	struct crypto_skcipher *child;
 +
-+	local_bh_disable();
-+	rctx->complete(&req->base, err);
-+	local_bh_enable();
++	subreq = skcipher_request_ctx(req);
++	*subreq = *req;
 +
-+	if (err != -EINPROGRESS && refcnt && atomic_dec_and_test(&ctx->refcnt))
-+		crypto_free_skcipher(tfm);
-+}
-+
-+static void cryptd_skcipher_encrypt(struct crypto_async_request *base,
-+				    int err)
-+{
-+	struct skcipher_request *req = skcipher_request_cast(base);
-+	struct cryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_skcipher *child = ctx->child;
-+	SKCIPHER_REQUEST_ON_STACK(subreq, child);
-+
-+	if (unlikely(err == -EINPROGRESS))
-+		goto out;
++	if (!may_use_simd() ||
++	    (in_atomic() && cryptd_skcipher_queued(ctx->cryptd_tfm)))
++		child = &ctx->cryptd_tfm->base;
++	else
++		child = cryptd_skcipher_child(ctx->cryptd_tfm);
 +
 +	skcipher_request_set_tfm(subreq, child);
-+	skcipher_request_set_callback(subreq, CRYPTO_TFM_REQ_MAY_SLEEP,
-+				      NULL, NULL);
-+	skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
-+				   req->iv);
 +
-+	err = crypto_skcipher_encrypt(subreq);
-+	skcipher_request_zero(subreq);
-+
-+	req->base.complete = rctx->complete;
-+
-+out:
-+	cryptd_skcipher_complete(req, err);
++	return crypto_skcipher_encrypt(subreq);
 +}
 +
-+static void cryptd_skcipher_decrypt(struct crypto_async_request *base,
-+				    int err)
++static int simd_skcipher_decrypt(struct skcipher_request *req)
 +{
-+	struct skcipher_request *req = skcipher_request_cast(base);
-+	struct cryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
 +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_skcipher *child = ctx->child;
-+	SKCIPHER_REQUEST_ON_STACK(subreq, child);
++	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct skcipher_request *subreq;
++	struct crypto_skcipher *child;
 +
-+	if (unlikely(err == -EINPROGRESS))
-+		goto out;
++	subreq = skcipher_request_ctx(req);
++	*subreq = *req;
++
++	if (!may_use_simd() ||
++	    (in_atomic() && cryptd_skcipher_queued(ctx->cryptd_tfm)))
++		child = &ctx->cryptd_tfm->base;
++	else
++		child = cryptd_skcipher_child(ctx->cryptd_tfm);
 +
 +	skcipher_request_set_tfm(subreq, child);
-+	skcipher_request_set_callback(subreq, CRYPTO_TFM_REQ_MAY_SLEEP,
-+				      NULL, NULL);
-+	skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
-+				   req->iv);
 +
-+	err = crypto_skcipher_decrypt(subreq);
-+	skcipher_request_zero(subreq);
-+
-+	req->base.complete = rctx->complete;
-+
-+out:
-+	cryptd_skcipher_complete(req, err);
++	return crypto_skcipher_decrypt(subreq);
 +}
 +
-+static int cryptd_skcipher_enqueue(struct skcipher_request *req,
-+				   crypto_completion_t compl)
++static void simd_skcipher_exit(struct crypto_skcipher *tfm)
 +{
-+	struct cryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct cryptd_queue *queue;
++	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
 +
-+	queue = cryptd_get_queue(crypto_skcipher_tfm(tfm));
-+	rctx->complete = req->base.complete;
-+	req->base.complete = compl;
-+
-+	return cryptd_enqueue_request(queue, &req->base);
++	cryptd_free_skcipher(ctx->cryptd_tfm);
 +}
 +
-+static int cryptd_skcipher_encrypt_enqueue(struct skcipher_request *req)
++static int simd_skcipher_init(struct crypto_skcipher *tfm)
 +{
-+	return cryptd_skcipher_enqueue(req, cryptd_skcipher_encrypt);
-+}
++	struct simd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct cryptd_skcipher *cryptd_tfm;
++	struct simd_skcipher_alg *salg;
++	struct skcipher_alg *alg;
++	unsigned reqsize;
 +
-+static int cryptd_skcipher_decrypt_enqueue(struct skcipher_request *req)
-+{
-+	return cryptd_skcipher_enqueue(req, cryptd_skcipher_decrypt);
-+}
++	alg = crypto_skcipher_alg(tfm);
++	salg = container_of(alg, struct simd_skcipher_alg, alg);
 +
-+static int cryptd_skcipher_init_tfm(struct crypto_skcipher *tfm)
-+{
-+	struct skcipher_instance *inst = skcipher_alg_instance(tfm);
-+	struct skcipherd_instance_ctx *ictx = skcipher_instance_ctx(inst);
-+	struct crypto_skcipher_spawn *spawn = &ictx->spawn;
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_skcipher *cipher;
++	cryptd_tfm = cryptd_alloc_skcipher(salg->ialg_name,
++					   CRYPTO_ALG_INTERNAL,
++					   CRYPTO_ALG_INTERNAL);
++	if (IS_ERR(cryptd_tfm))
++		return PTR_ERR(cryptd_tfm);
 +
-+	cipher = crypto_spawn_skcipher(spawn);
-+	if (IS_ERR(cipher))
-+		return PTR_ERR(cipher);
++	ctx->cryptd_tfm = cryptd_tfm;
 +
-+	ctx->child = cipher;
-+	crypto_skcipher_set_reqsize(
-+		tfm, sizeof(struct cryptd_skcipher_request_ctx));
++	reqsize = sizeof(struct skcipher_request);
++	reqsize += crypto_skcipher_reqsize(&cryptd_tfm->base);
++
++	crypto_skcipher_set_reqsize(tfm, reqsize);
++
 +	return 0;
 +}
 +
-+static void cryptd_skcipher_exit_tfm(struct crypto_skcipher *tfm)
++struct simd_skcipher_alg *simd_skcipher_create_compat(const char *algname,
++						      const char *drvname,
++						      const char *basename)
 +{
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+
-+	crypto_free_skcipher(ctx->child);
-+}
-+
-+static void cryptd_skcipher_free(struct skcipher_instance *inst)
-+{
-+	struct skcipherd_instance_ctx *ctx = skcipher_instance_ctx(inst);
-+
-+	crypto_drop_skcipher(&ctx->spawn);
-+}
-+
-+static int cryptd_create_skcipher(struct crypto_template *tmpl,
-+				  struct rtattr **tb,
-+				  struct cryptd_queue *queue)
-+{
-+	struct skcipherd_instance_ctx *ctx;
-+	struct skcipher_instance *inst;
++	struct simd_skcipher_alg *salg;
++	struct crypto_skcipher *tfm;
++	struct skcipher_alg *ialg;
 +	struct skcipher_alg *alg;
-+	const char *name;
-+	u32 type;
-+	u32 mask;
 +	int err;
 +
-+	type = 0;
-+	mask = CRYPTO_ALG_ASYNC;
-+
-+	cryptd_check_internal(tb, &type, &mask);
-+
-+	name = crypto_attr_alg_name(tb[1]);
-+	if (IS_ERR(name))
-+		return PTR_ERR(name);
-+
-+	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
-+	if (!inst)
-+		return -ENOMEM;
-+
-+	ctx = skcipher_instance_ctx(inst);
-+	ctx->queue = queue;
-+
-+	crypto_set_skcipher_spawn(&ctx->spawn, skcipher_crypto_instance(inst));
-+	err = crypto_grab_skcipher(&ctx->spawn, name, type, mask);
-+	if (err)
-+		goto out_free_inst;
-+
-+	alg = crypto_spawn_skcipher_alg(&ctx->spawn);
-+	err = cryptd_init_instance(skcipher_crypto_instance(inst), &alg->base);
-+	if (err)
-+		goto out_drop_skcipher;
-+
-+	inst->alg.base.cra_flags = CRYPTO_ALG_ASYNC |
-+				   (alg->base.cra_flags & CRYPTO_ALG_INTERNAL);
-+
-+	inst->alg.ivsize = crypto_skcipher_alg_ivsize(alg);
-+	inst->alg.chunksize = crypto_skcipher_alg_chunksize(alg);
-+	inst->alg.min_keysize = crypto_skcipher_alg_min_keysize(alg);
-+	inst->alg.max_keysize = crypto_skcipher_alg_max_keysize(alg);
-+
-+	inst->alg.base.cra_ctxsize = sizeof(struct cryptd_skcipher_ctx);
-+
-+	inst->alg.init = cryptd_skcipher_init_tfm;
-+	inst->alg.exit = cryptd_skcipher_exit_tfm;
-+
-+	inst->alg.setkey = cryptd_skcipher_setkey;
-+	inst->alg.encrypt = cryptd_skcipher_encrypt_enqueue;
-+	inst->alg.decrypt = cryptd_skcipher_decrypt_enqueue;
-+
-+	inst->free = cryptd_skcipher_free;
-+
-+	err = skcipher_register_instance(tmpl, inst);
-+	if (err) {
-+out_drop_skcipher:
-+		crypto_drop_skcipher(&ctx->spawn);
-+out_free_inst:
-+		kfree(inst);
-+	}
-+	return err;
-+}
-+
- static int cryptd_hash_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
-@@ -893,7 +1117,11 @@ static int cryptd_create(struct crypto_template *tmpl, struct rtattr **tb)
- 
- 	switch (algt->type & algt->mask & CRYPTO_ALG_TYPE_MASK) {
- 	case CRYPTO_ALG_TYPE_BLKCIPHER:
--		return cryptd_create_blkcipher(tmpl, tb, &queue);
-+		if ((algt->type & CRYPTO_ALG_TYPE_MASK) ==
-+		    CRYPTO_ALG_TYPE_BLKCIPHER)
-+			return cryptd_create_blkcipher(tmpl, tb, &queue);
-+
-+		return cryptd_create_skcipher(tmpl, tb, &queue);
- 	case CRYPTO_ALG_TYPE_DIGEST:
- 		return cryptd_create_hash(tmpl, tb, &queue);
- 	case CRYPTO_ALG_TYPE_AEAD:
-@@ -983,6 +1211,58 @@ void cryptd_free_ablkcipher(struct cryptd_ablkcipher *tfm)
- }
- EXPORT_SYMBOL_GPL(cryptd_free_ablkcipher);
- 
-+struct cryptd_skcipher *cryptd_alloc_skcipher(const char *alg_name,
-+					      u32 type, u32 mask)
-+{
-+	char cryptd_alg_name[CRYPTO_MAX_ALG_NAME];
-+	struct cryptd_skcipher_ctx *ctx;
-+	struct crypto_skcipher *tfm;
-+
-+	if (snprintf(cryptd_alg_name, CRYPTO_MAX_ALG_NAME,
-+		     "cryptd(%s)", alg_name) >= CRYPTO_MAX_ALG_NAME)
-+		return ERR_PTR(-EINVAL);
-+
-+	tfm = crypto_alloc_skcipher(cryptd_alg_name, type, mask);
++	tfm = crypto_alloc_skcipher(basename, CRYPTO_ALG_INTERNAL,
++				    CRYPTO_ALG_INTERNAL | CRYPTO_ALG_ASYNC);
 +	if (IS_ERR(tfm))
 +		return ERR_CAST(tfm);
 +
-+	if (tfm->base.__crt_alg->cra_module != THIS_MODULE) {
-+		crypto_free_skcipher(tfm);
-+		return ERR_PTR(-EINVAL);
++	ialg = crypto_skcipher_alg(tfm);
++
++	salg = kzalloc(sizeof(*salg), GFP_KERNEL);
++	if (!salg) {
++		salg = ERR_PTR(-ENOMEM);
++		goto out_put_tfm;
 +	}
 +
-+	ctx = crypto_skcipher_ctx(tfm);
-+	atomic_set(&ctx->refcnt, 1);
++	salg->ialg_name = basename;
++	alg = &salg->alg;
 +
-+	return container_of(tfm, struct cryptd_skcipher, base);
++	err = -ENAMETOOLONG;
++	if (snprintf(alg->base.cra_name, CRYPTO_MAX_ALG_NAME, "%s", algname) >=
++	    CRYPTO_MAX_ALG_NAME)
++		goto out_free_salg;
++
++	if (snprintf(alg->base.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
++		     drvname) >= CRYPTO_MAX_ALG_NAME)
++		goto out_free_salg;
++
++	alg->base.cra_flags = CRYPTO_ALG_ASYNC;
++	alg->base.cra_priority = ialg->base.cra_priority;
++	alg->base.cra_blocksize = ialg->base.cra_blocksize;
++	alg->base.cra_alignmask = ialg->base.cra_alignmask;
++	alg->base.cra_module = ialg->base.cra_module;
++	alg->base.cra_ctxsize = sizeof(struct simd_skcipher_ctx);
++
++	alg->ivsize = ialg->ivsize;
++	alg->chunksize = ialg->chunksize;
++	alg->min_keysize = ialg->min_keysize;
++	alg->max_keysize = ialg->max_keysize;
++
++	alg->init = simd_skcipher_init;
++	alg->exit = simd_skcipher_exit;
++
++	alg->setkey = simd_skcipher_setkey;
++	alg->encrypt = simd_skcipher_encrypt;
++	alg->decrypt = simd_skcipher_decrypt;
++
++	err = crypto_register_skcipher(alg);
++	if (err)
++		goto out_free_salg;
++
++out_put_tfm:
++	crypto_free_skcipher(tfm);
++	return salg;
++
++out_free_salg:
++	kfree(salg);
++	salg = ERR_PTR(err);
++	goto out_put_tfm;
 +}
-+EXPORT_SYMBOL_GPL(cryptd_alloc_skcipher);
++EXPORT_SYMBOL_GPL(simd_skcipher_create_compat);
 +
-+struct crypto_skcipher *cryptd_skcipher_child(struct cryptd_skcipher *tfm)
++struct simd_skcipher_alg *simd_skcipher_create(const char *algname,
++					       const char *basename)
 +{
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(&tfm->base);
++	char drvname[CRYPTO_MAX_ALG_NAME];
 +
-+	return ctx->child;
++	if (snprintf(drvname, CRYPTO_MAX_ALG_NAME, "simd-%s", basename) >=
++	    CRYPTO_MAX_ALG_NAME)
++		return ERR_PTR(-ENAMETOOLONG);
++
++	return simd_skcipher_create_compat(algname, drvname, basename);
 +}
-+EXPORT_SYMBOL_GPL(cryptd_skcipher_child);
++EXPORT_SYMBOL_GPL(simd_skcipher_create);
 +
-+bool cryptd_skcipher_queued(struct cryptd_skcipher *tfm)
++void simd_skcipher_free(struct simd_skcipher_alg *salg)
 +{
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(&tfm->base);
-+
-+	return atomic_read(&ctx->refcnt) - 1;
++	crypto_unregister_skcipher(&salg->alg);
++	kfree(salg);
 +}
-+EXPORT_SYMBOL_GPL(cryptd_skcipher_queued);
++EXPORT_SYMBOL_GPL(simd_skcipher_free);
 +
-+void cryptd_free_skcipher(struct cryptd_skcipher *tfm)
-+{
-+	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(&tfm->base);
++MODULE_LICENSE("GPL");
+diff --git a/include/crypto/internal/simd.h b/include/crypto/internal/simd.h
+new file mode 100644
+index 0000000..4295099
+--- /dev/null
++++ b/include/crypto/internal/simd.h
+@@ -0,0 +1,17 @@
++/*
++ * Shared crypto simd helpers
++ */
 +
-+	if (atomic_dec_and_test(&ctx->refcnt))
-+		crypto_free_skcipher(&tfm->base);
-+}
-+EXPORT_SYMBOL_GPL(cryptd_free_skcipher);
++#ifndef _CRYPTO_INTERNAL_SIMD_H
++#define _CRYPTO_INTERNAL_SIMD_H
 +
- struct cryptd_ahash *cryptd_alloc_ahash(const char *alg_name,
- 					u32 type, u32 mask)
- {
-diff --git a/include/crypto/cryptd.h b/include/crypto/cryptd.h
-index bc792d5..94418cb 100644
---- a/include/crypto/cryptd.h
-+++ b/include/crypto/cryptd.h
-@@ -12,10 +12,10 @@
- #ifndef _CRYPTO_CRYPT_H
- #define _CRYPTO_CRYPT_H
- 
--#include <linux/crypto.h>
- #include <linux/kernel.h>
- #include <crypto/aead.h>
- #include <crypto/hash.h>
-+#include <crypto/skcipher.h>
- 
- struct cryptd_ablkcipher {
- 	struct crypto_ablkcipher base;
-@@ -34,6 +34,17 @@ struct cryptd_ablkcipher *cryptd_alloc_ablkcipher(const char *alg_name,
- bool cryptd_ablkcipher_queued(struct cryptd_ablkcipher *tfm);
- void cryptd_free_ablkcipher(struct cryptd_ablkcipher *tfm);
- 
-+struct cryptd_skcipher {
-+	struct crypto_skcipher base;
-+};
++struct simd_skcipher_alg;
 +
-+struct cryptd_skcipher *cryptd_alloc_skcipher(const char *alg_name,
-+					      u32 type, u32 mask);
-+struct crypto_skcipher *cryptd_skcipher_child(struct cryptd_skcipher *tfm);
-+/* Must be called without moving CPUs. */
-+bool cryptd_skcipher_queued(struct cryptd_skcipher *tfm);
-+void cryptd_free_skcipher(struct cryptd_skcipher *tfm);
++struct simd_skcipher_alg *simd_skcipher_create_compat(const char *algname,
++						      const char *drvname,
++						      const char *basename);
++struct simd_skcipher_alg *simd_skcipher_create(const char *algname,
++					       const char *basename);
++void simd_skcipher_free(struct simd_skcipher_alg *alg);
 +
- struct cryptd_ahash {
- 	struct crypto_ahash base;
- };
++#endif /* _CRYPTO_INTERNAL_SIMD_H */
