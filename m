@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 05/10] crypto: caam - rewrite some generic inline append cmds
-Date: Tue, 22 Nov 2016 15:44:07 +0200
-Message-ID: <1479822252-23833-6-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH 09/10] crypto: caam - refactor ahash shared descriptor generation
+Date: Tue, 22 Nov 2016 15:44:11 +0200
+Message-ID: <1479822252-23833-10-git-send-email-horia.geanta@nxp.com>
 References: <1479822252-23833-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -13,102 +13,212 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         Alexandru Porosanu <alexandru.porosanu@nxp.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0085.outbound.protection.outlook.com ([104.47.36.85]:18944
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam01on0087.outbound.protection.outlook.com ([104.47.34.87]:17226
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1755383AbcKVNqH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1755553AbcKVNqH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 22 Nov 2016 08:46:07 -0500
 In-Reply-To: <1479822252-23833-1-git-send-email-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-A few descriptor commands are generated using generic
-inline append "append_cmd" function.
-Rewrite them using specific inline append functions.
+Move ahash shared descriptor generation into a single function.
+Currently there is no plan to support ahash on any other interface
+besides the Job Ring, thus for now the functionality is not exported.
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamalg.c  | 20 ++++++++++----------
- drivers/crypto/caam/caamhash.c |  8 ++++----
- 2 files changed, 14 insertions(+), 14 deletions(-)
+ drivers/crypto/caam/caamhash.c | 130 ++++++++++++-----------------------------
+ 1 file changed, 36 insertions(+), 94 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 5f332df1a8e6..9cb95f5b2eb3 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -1853,9 +1853,9 @@ static int xts_ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 			  ctx->cdata.keylen, CLASS_1 | KEY_DEST_CLASS_REG);
- 
- 	/* Load sector size with index 40 bytes (0x28) */
--	append_cmd(desc, CMD_LOAD | IMMEDIATE | LDST_SRCDST_BYTE_CONTEXT |
--		   LDST_CLASS_1_CCB | (0x28 << LDST_OFFSET_SHIFT) | 8);
--	append_data(desc, (void *)&sector_size, 8);
-+	append_load_as_imm(desc, (void *)&sector_size, 8, LDST_CLASS_1_CCB |
-+			   LDST_SRCDST_BYTE_CONTEXT |
-+			   (0x28 << LDST_OFFSET_SHIFT));
- 
- 	set_jump_tgt_here(desc, key_jump_cmd);
- 
-@@ -1864,8 +1864,8 @@ static int xts_ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 	 * Upper 8B of IV - will be used as sector index
- 	 * Lower 8B of IV - will be discarded
- 	 */
--	append_cmd(desc, CMD_SEQ_LOAD | LDST_SRCDST_BYTE_CONTEXT |
--		   LDST_CLASS_1_CCB | (0x20 << LDST_OFFSET_SHIFT) | 8);
-+	append_seq_load(desc, 8, LDST_SRCDST_BYTE_CONTEXT | LDST_CLASS_1_CCB |
-+			(0x20 << LDST_OFFSET_SHIFT));
- 	append_seq_fifo_load(desc, 8, FIFOLD_CLASS_SKIP);
- 
- 	/* Load operation */
-@@ -1900,9 +1900,9 @@ static int xts_ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 			  ctx->cdata.keylen, CLASS_1 | KEY_DEST_CLASS_REG);
- 
- 	/* Load sector size with index 40 bytes (0x28) */
--	append_cmd(desc, CMD_LOAD | IMMEDIATE | LDST_SRCDST_BYTE_CONTEXT |
--		   LDST_CLASS_1_CCB | (0x28 << LDST_OFFSET_SHIFT) | 8);
--	append_data(desc, (void *)&sector_size, 8);
-+	append_load_as_imm(desc, (void *)&sector_size, 8, LDST_CLASS_1_CCB |
-+			   LDST_SRCDST_BYTE_CONTEXT |
-+			   (0x28 << LDST_OFFSET_SHIFT));
- 
- 	set_jump_tgt_here(desc, key_jump_cmd);
- 
-@@ -1911,8 +1911,8 @@ static int xts_ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 	 * Upper 8B of IV - will be used as sector index
- 	 * Lower 8B of IV - will be discarded
- 	 */
--	append_cmd(desc, CMD_SEQ_LOAD | LDST_SRCDST_BYTE_CONTEXT |
--		   LDST_CLASS_1_CCB | (0x20 << LDST_OFFSET_SHIFT) | 8);
-+	append_seq_load(desc, 8, LDST_SRCDST_BYTE_CONTEXT | LDST_CLASS_1_CCB |
-+			(0x20 << LDST_OFFSET_SHIFT));
- 	append_seq_fifo_load(desc, 8, FIFOLD_CLASS_SKIP);
- 
- 	/* Load operation */
 diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 8e4530d68208..d3f0ae16a73b 100644
+index 505007d0277c..e58639ea53b1 100644
 --- a/drivers/crypto/caam/caamhash.c
 +++ b/drivers/crypto/caam/caamhash.c
-@@ -272,8 +272,8 @@ static inline void ahash_ctx_data_to_out(u32 *desc, u32 op, u32 state,
- 	init_sh_desc_key_ahash(desc, ctx);
+@@ -217,86 +217,54 @@ static inline int ctx_map_to_sec4_sg(u32 *desc, struct device *jrdev,
+ 	return 0;
+ }
  
- 	/* Import context from software */
--	append_cmd(desc, CMD_SEQ_LOAD | LDST_SRCDST_BYTE_CONTEXT |
--		   LDST_CLASS_2_CCB | ctx->ctx_len);
-+	append_seq_load(desc, ctx->ctx_len, LDST_CLASS_2_CCB |
-+			LDST_SRCDST_BYTE_CONTEXT);
+-/* Common shared descriptor commands */
+-static inline void append_key_ahash(u32 *desc, struct caam_hash_ctx *ctx)
+-{
+-	append_key_as_imm(desc, ctx->key, ctx->adata.keylen_pad,
+-			  ctx->adata.keylen, CLASS_2 | KEY_DEST_MDHA_SPLIT |
+-			  KEY_ENC);
+-}
+-
+-/* Append key if it has been set */
+-static inline void init_sh_desc_key_ahash(u32 *desc, struct caam_hash_ctx *ctx)
+-{
+-	u32 *key_jump_cmd;
+-
+-	init_sh_desc(desc, HDR_SHARE_SERIAL);
+-
+-	if (ctx->adata.keylen) {
+-		/* Skip if already shared */
+-		key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
+-					   JUMP_COND_SHRD);
+-
+-		append_key_ahash(desc, ctx);
+-
+-		set_jump_tgt_here(desc, key_jump_cmd);
+-	}
+-}
+-
+ /*
+- * For ahash read data from seqin following state->caam_ctx,
+- * and write resulting class2 context to seqout, which may be state->caam_ctx
+- * or req->result
++ * For ahash update, final and finup (import_ctx = true)
++ *     import context, read and write to seqout
++ * For ahash firsts and digest (import_ctx = false)
++ *     read and write to seqout
+  */
+-static inline void ahash_append_load_str(u32 *desc, int digestsize)
++static inline void ahash_gen_sh_desc(u32 *desc, u32 state, int digestsize,
++				     struct caam_hash_ctx *ctx, bool import_ctx)
+ {
+-	/* Calculate remaining bytes to read */
+-	append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
++	u32 op = ctx->adata.algtype;
++	u32 *skip_key_load;
+ 
+-	/* Read remaining bytes */
+-	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_LAST2 |
+-			     FIFOLD_TYPE_MSG | KEY_VLF);
+-
+-	/* Store class2 context bytes */
+-	append_seq_store(desc, digestsize, LDST_CLASS_2_CCB |
+-			 LDST_SRCDST_BYTE_CONTEXT);
+-}
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
+ 
+-/*
+- * For ahash update, final and finup, import context, read and write to seqout
+- */
+-static inline void ahash_ctx_data_to_out(u32 *desc, u32 op, u32 state,
+-					 int digestsize,
+-					 struct caam_hash_ctx *ctx)
+-{
+-	init_sh_desc_key_ahash(desc, ctx);
++	/* Append key if it has been set; ahash update excluded */
++	if ((state != OP_ALG_AS_UPDATE) && (ctx->adata.keylen)) {
++		/* Skip key loading if already shared */
++		skip_key_load = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
++					    JUMP_COND_SHRD);
+ 
+-	/* Import context from software */
+-	append_seq_load(desc, ctx->ctx_len, LDST_CLASS_2_CCB |
+-			LDST_SRCDST_BYTE_CONTEXT);
++		append_key_as_imm(desc, ctx->key, ctx->adata.keylen_pad,
++				  ctx->adata.keylen, CLASS_2 |
++				  KEY_DEST_MDHA_SPLIT | KEY_ENC);
+ 
+-	/* Class 2 operation */
+-	append_operation(desc, op | state | OP_ALG_ENCRYPT);
++		set_jump_tgt_here(desc, skip_key_load);
+ 
+-	/*
+-	 * Load from buf and/or src and write to req->result or state->context
+-	 */
+-	ahash_append_load_str(desc, digestsize);
+-}
++		op |= OP_ALG_AAI_HMAC_PRECOMP;
++	}
+ 
+-/* For ahash firsts and digest, read and write to seqout */
+-static inline void ahash_data_to_out(u32 *desc, u32 op, u32 state,
+-				     int digestsize, struct caam_hash_ctx *ctx)
+-{
+-	init_sh_desc_key_ahash(desc, ctx);
++	/* If needed, import context from software */
++	if (import_ctx)
++		append_seq_load(desc, ctx->ctx_len, LDST_CLASS_2_CCB |
++				LDST_SRCDST_BYTE_CONTEXT);
  
  	/* Class 2 operation */
  	append_operation(desc, op | state | OP_ALG_ENCRYPT);
-@@ -316,8 +316,8 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
- 	init_sh_desc(desc, HDR_SHARE_SERIAL);
  
- 	/* Import context from software */
--	append_cmd(desc, CMD_SEQ_LOAD | LDST_SRCDST_BYTE_CONTEXT |
--		   LDST_CLASS_2_CCB | ctx->ctx_len);
-+	append_seq_load(desc, ctx->ctx_len, LDST_CLASS_2_CCB |
-+			LDST_SRCDST_BYTE_CONTEXT);
+ 	/*
+ 	 * Load from buf and/or src and write to req->result or state->context
++	 * Calculate remaining bytes to read
+ 	 */
+-	ahash_append_load_str(desc, digestsize);
++	append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
++	/* Read remaining bytes */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_LAST2 |
++			     FIFOLD_TYPE_MSG | KEY_VLF);
++	/* Store class2 context bytes */
++	append_seq_store(desc, digestsize, LDST_CLASS_2_CCB |
++			 LDST_SRCDST_BYTE_CONTEXT);
+ }
  
- 	/* Class 2 operation */
- 	append_operation(desc, ctx->adata.algtype | OP_ALG_AS_UPDATE |
+ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+@@ -304,28 +272,11 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+ 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct device *jrdev = ctx->jrdev;
+-	u32 have_key = 0;
+ 	u32 *desc;
+ 
+-	if (ctx->adata.keylen)
+-		have_key = OP_ALG_AAI_HMAC_PRECOMP;
+-
+ 	/* ahash_update shared descriptor */
+ 	desc = ctx->sh_desc_update;
+-
+-	init_sh_desc(desc, HDR_SHARE_SERIAL);
+-
+-	/* Import context from software */
+-	append_seq_load(desc, ctx->ctx_len, LDST_CLASS_2_CCB |
+-			LDST_SRCDST_BYTE_CONTEXT);
+-
+-	/* Class 2 operation */
+-	append_operation(desc, ctx->adata.algtype | OP_ALG_AS_UPDATE |
+-			 OP_ALG_ENCRYPT);
+-
+-	/* Load data and write to result or context */
+-	ahash_append_load_str(desc, ctx->ctx_len);
+-
++	ahash_gen_sh_desc(desc, OP_ALG_AS_UPDATE, ctx->ctx_len, ctx, true);
+ 	ctx->sh_desc_update_dma = dma_map_single(jrdev, desc, desc_bytes(desc),
+ 						 DMA_TO_DEVICE);
+ 	if (dma_mapping_error(jrdev, ctx->sh_desc_update_dma)) {
+@@ -340,10 +291,7 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+ 
+ 	/* ahash_update_first shared descriptor */
+ 	desc = ctx->sh_desc_update_first;
+-
+-	ahash_data_to_out(desc, have_key | ctx->adata.algtype, OP_ALG_AS_INIT,
+-			  ctx->ctx_len, ctx);
+-
++	ahash_gen_sh_desc(desc, OP_ALG_AS_INIT, ctx->ctx_len, ctx, false);
+ 	ctx->sh_desc_update_first_dma = dma_map_single(jrdev, desc,
+ 						       desc_bytes(desc),
+ 						       DMA_TO_DEVICE);
+@@ -359,10 +307,7 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+ 
+ 	/* ahash_final shared descriptor */
+ 	desc = ctx->sh_desc_fin;
+-
+-	ahash_ctx_data_to_out(desc, have_key | ctx->adata.algtype,
+-			      OP_ALG_AS_FINALIZE, digestsize, ctx);
+-
++	ahash_gen_sh_desc(desc, OP_ALG_AS_FINALIZE, digestsize, ctx, true);
+ 	ctx->sh_desc_fin_dma = dma_map_single(jrdev, desc, desc_bytes(desc),
+ 					      DMA_TO_DEVICE);
+ 	if (dma_mapping_error(jrdev, ctx->sh_desc_fin_dma)) {
+@@ -377,10 +322,7 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+ 
+ 	/* ahash_digest shared descriptor */
+ 	desc = ctx->sh_desc_digest;
+-
+-	ahash_data_to_out(desc, have_key | ctx->adata.algtype,
+-			  OP_ALG_AS_INITFINAL, digestsize, ctx);
+-
++	ahash_gen_sh_desc(desc, OP_ALG_AS_INITFINAL, digestsize, ctx, false);
+ 	ctx->sh_desc_digest_dma = dma_map_single(jrdev, desc,
+ 						 desc_bytes(desc),
+ 						 DMA_TO_DEVICE);
 -- 
 2.4.4
