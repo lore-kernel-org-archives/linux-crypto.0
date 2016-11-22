@@ -1,56 +1,96 @@
-From: Eric Biggers <ebiggers@google.com>
-Subject: Re: vmalloced stacks and scatterwalk_map_and_copy()
-Date: Mon, 21 Nov 2016 10:08:14 -0800
-Message-ID: <20161121180814.GA30672@google.com>
-References: <20161103181624.GA63852@google.com>
- <CALCETrUPuunBT1Zo25wyOwqaWJ=rm9R-WMZGN-7u4-dsdokAnQ@mail.gmail.com>
- <CALCETrXg5ytkLHBpKMJG7fBea+xy2wz6kSm2XK5c8K7_Hr9UuA@mail.gmail.com>
- <20161121082619.GA6462@gondor.apana.org.au>
+From: Gonglei <arei.gonglei@huawei.com>
+Subject: [PATCH v2 1/2] virtio: introduce little edian functions for virtio_cread/write# family
+Date: Tue, 22 Nov 2016 16:10:22 +0800
+Message-ID: <1479802223-121104-2-git-send-email-arei.gonglei@huawei.com>
+References: <1479802223-121104-1-git-send-email-arei.gonglei@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andy Lutomirski <luto@amacapital.net>, regressions@leemhuis.info,
-        linux-crypto@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Andrew Lutomirski <luto@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20161121082619.GA6462@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: <luonengjun@huawei.com>, <mst@redhat.com>, <stefanha@redhat.com>,
+        <weidong.huang@huawei.com>, <wu.wubin@huawei.com>,
+        <xin.zeng@intel.com>, <claudio.fontana@huawei.com>,
+        <herbert@gondor.apana.org.au>, <pasic@linux.vnet.ibm.com>,
+        <davem@davemloft.net>, <jianjay.zhou@huawei.com>,
+        <hanweidong@huawei.com>, <arei.gonglei@hotmail.com>,
+        <cornelia.huck@de.ibm.com>, <xuquan8@huawei.com>,
+        <longpeng2@huawei.com>, <salvatore.benedetto@intel.com>,
+        Gonglei <arei.gonglei@huawei.com>
+To: <linux-kernel@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <virtio-dev@lists.oasis-open.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from szxga02-in.huawei.com ([119.145.14.65]:1484 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752101AbcKVILM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Nov 2016 03:11:12 -0500
+In-Reply-To: <1479802223-121104-1-git-send-email-arei.gonglei@huawei.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Nov 21, 2016 at 04:26:19PM +0800, Herbert Xu wrote:
-> crypto: scatterwalk - Remove unnecessary aliasing check in map_and_copy
-> 
-> The aliasing check in map_and_copy is no longer necessary because
-> the IPsec ESP code no longer provides an IV that points into the
-> actual request data.  As this check is now triggering BUG checks
-> due to the vmalloced stack code, I'm removing it.
-> 
-> Reported-by: Eric Biggers <ebiggers@google.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
-> index 52ce17a..c16c94f8 100644
-> --- a/crypto/scatterwalk.c
-> +++ b/crypto/scatterwalk.c
-> @@ -68,10 +68,6 @@ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
->  
->  	sg = scatterwalk_ffwd(tmp, sg, start);
->  
-> -	if (sg_page(sg) == virt_to_page(buf) &&
-> -	    sg->offset == offset_in_page(buf))
-> -		return;
-> -
->  	scatterwalk_start(&walk, sg);
->  	scatterwalk_copychunks(buf, &walk, nbytes, out);
->  	scatterwalk_done(&walk, out, 0);
+Virtio modern devices are always little edian, let's introduce
+the LE functions for read/write configuration space for
+virtio modern devices, which avoid complaint by Sparse when
+we use the virtio_creaed/virtio_cwrite in VIRTIO_1 devices.
 
-This looks fine to me if you're confident that the aliasing check is indeed no
-longer necessary.
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+---
+ include/linux/virtio_config.h | 45 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-Another idea I had was to replace memcpy() with memmove().  But I don't want to
-be in a situation where we're stuck with memmove() forever because of users who
-probably don't even exist.
-
-Eric
+diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+index 26c155b..de05707 100644
+--- a/include/linux/virtio_config.h
++++ b/include/linux/virtio_config.h
+@@ -414,4 +414,49 @@ static inline void virtio_cwrite64(struct virtio_device *vdev,
+ 		_r;							\
+ 	})
+ 
++static inline __le16 virtio_cread16_le(struct virtio_device *vdev,
++				 unsigned int offset)
++{
++	__le16 ret;
++
++	vdev->config->get(vdev, offset, &ret, sizeof(ret));
++	return ret;
++}
++
++static inline void virtio_cwrite16_le(struct virtio_device *vdev,
++				   unsigned int offset, __le16 val)
++{
++	vdev->config->set(vdev, offset, &val, sizeof(val));
++}
++
++static inline __le32 virtio_cread32_le(struct virtio_device *vdev,
++				 unsigned int offset)
++{
++	__le32 ret;
++
++	vdev->config->get(vdev, offset, &ret, sizeof(ret));
++	return ret;
++}
++
++static inline void virtio_cwrite32_le(struct virtio_device *vdev,
++				   unsigned int offset, __le32 val)
++{
++	vdev->config->set(vdev, offset, &val, sizeof(val));
++}
++
++static inline __le64 virtio_cread64_le(struct virtio_device *vdev,
++				 unsigned int offset)
++{
++	__le64 ret;
++
++	__virtio_cread_many(vdev, offset, &ret, 1, sizeof(ret));
++	return ret;
++}
++
++static inline void virtio_cwrite64_le(struct virtio_device *vdev,
++				   unsigned int offset, __le64 val)
++{
++	vdev->config->set(vdev, offset, &val, sizeof(val));
++}
++
+ #endif /* _LINUX_VIRTIO_CONFIG_H */
+-- 
+1.8.3.1
