@@ -1,294 +1,342 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v3 PATCH 10/16] crypto: testmgr - Do not test internal algorithms
-Date: Tue, 22 Nov 2016 20:08:31 +0800
-Message-ID: <E1c99sF-00038y-4u@gondobar>
+Subject: [v3 PATCH 15/16] crypto: cbc - Export CBC implementation
+Date: Tue, 22 Nov 2016 20:08:42 +0800
+Message-ID: <E1c99sQ-0003A6-QM@gondobar>
 References: <20161122120703.GA11911@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:33649 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:43752 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S932744AbcKVMIu (ORCPT
+        with ESMTP id S932704AbcKVMI7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Nov 2016 07:08:50 -0500
+        Tue, 22 Nov 2016 07:08:59 -0500
 Received: from [192.168.128.4] (helo=gondobar)
         by fornost.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-        id 1c99sS-00064h-Sh
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Nov 2016 23:08:46 +1100
+        id 1c99sb-00065Y-Q0
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Nov 2016 23:08:54 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Currently we manually filter out internal algorithms using a list
-in testmgr.  This is dangerous as internal algorithms cannot be
-safely used even by testmgr.  This patch ensures that they're never
-processed by testmgr at all.
-
-This patch also removes an obsolete bypass for nivciphers which
-no longer exist.
+This patch moves the core CBC implementation into a header file
+so that it can be reused by drivers implementing CBC.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/algboss.c |    8 --
- crypto/testmgr.c |  153 +++----------------------------------------------------
- 2 files changed, 11 insertions(+), 150 deletions(-)
+ crypto/cbc.c         |  129 ---------------------------------------------
+ include/crypto/cbc.h |  146 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 148 insertions(+), 127 deletions(-)
 
-diff --git a/crypto/algboss.c b/crypto/algboss.c
-index 6e39d9c..ccb85e1 100644
---- a/crypto/algboss.c
-+++ b/crypto/algboss.c
-@@ -247,12 +247,8 @@ static int cryptomgr_schedule_test(struct crypto_alg *alg)
- 	memcpy(param->alg, alg->cra_name, sizeof(param->alg));
- 	type = alg->cra_flags;
+diff --git a/crypto/cbc.c b/crypto/cbc.c
+index 6539b38..68f751a 100644
+--- a/crypto/cbc.c
++++ b/crypto/cbc.c
+@@ -1,7 +1,7 @@
+ /*
+  * CBC: Cipher Block Chaining mode
+  *
+- * Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
++ * Copyright (c) 2006-2016 Herbert Xu <herbert@gondor.apana.org.au>
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+@@ -10,6 +10,7 @@
+  *
+  */
  
--	/* This piece of crap needs to disappear into per-type test hooks. */
--	if (!((type ^ CRYPTO_ALG_TYPE_BLKCIPHER) &
--	      CRYPTO_ALG_TYPE_BLKCIPHER_MASK) && !(type & CRYPTO_ALG_GENIV) &&
--	    ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
--	     CRYPTO_ALG_TYPE_BLKCIPHER ? alg->cra_blkcipher.ivsize :
--					 alg->cra_ablkcipher.ivsize))
-+	/* Do not test internal algorithms. */
-+	if (type & CRYPTO_ALG_INTERNAL)
- 		type |= CRYPTO_ALG_TESTED;
++#include <crypto/cbc.h>
+ #include <crypto/internal/skcipher.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+@@ -38,71 +39,6 @@ static int crypto_cbc_setkey(struct crypto_skcipher *parent, const u8 *key,
+ 	return err;
+ }
  
- 	param->type = type;
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index ded50b6..6ac4696 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1625,7 +1625,7 @@ static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
- 	struct crypto_aead *tfm;
- 	int err = 0;
+-static inline int crypto_cbc_encrypt_segment(
+-	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
+-	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
+-{
+-	unsigned int bsize = crypto_skcipher_blocksize(tfm);
+-	unsigned int nbytes = walk->nbytes;
+-	u8 *src = walk->src.virt.addr;
+-	u8 *dst = walk->dst.virt.addr;
+-	u8 *iv = walk->iv;
+-
+-	do {
+-		crypto_xor(iv, src, bsize);
+-		fn(tfm, iv, dst);
+-		memcpy(iv, dst, bsize);
+-
+-		src += bsize;
+-		dst += bsize;
+-	} while ((nbytes -= bsize) >= bsize);
+-
+-	return nbytes;
+-}
+-
+-static inline int crypto_cbc_encrypt_inplace(
+-	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
+-	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
+-{
+-	unsigned int bsize = crypto_skcipher_blocksize(tfm);
+-	unsigned int nbytes = walk->nbytes;
+-	u8 *src = walk->src.virt.addr;
+-	u8 *iv = walk->iv;
+-
+-	do {
+-		crypto_xor(src, iv, bsize);
+-		fn(tfm, src, src);
+-		iv = src;
+-
+-		src += bsize;
+-	} while ((nbytes -= bsize) >= bsize);
+-
+-	memcpy(walk->iv, iv, bsize);
+-
+-	return nbytes;
+-}
+-
+-static inline int crypto_cbc_encrypt_walk(struct skcipher_request *req,
+-					  void (*fn)(struct crypto_skcipher *,
+-						     const u8 *, u8 *))
+-{
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct skcipher_walk walk;
+-	int err;
+-
+-	err = skcipher_walk_virt(&walk, req, false);
+-
+-	while (walk.nbytes) {
+-		if (walk.src.virt.addr == walk.dst.virt.addr)
+-			err = crypto_cbc_encrypt_inplace(&walk, tfm, fn);
+-		else
+-			err = crypto_cbc_encrypt_segment(&walk, tfm, fn);
+-		err = skcipher_walk_done(&walk, err);
+-	}
+-
+-	return err;
+-}
+-
+ static inline void crypto_cbc_encrypt_one(struct crypto_skcipher *tfm,
+ 					  const u8 *src, u8 *dst)
+ {
+@@ -116,67 +52,6 @@ static int crypto_cbc_encrypt(struct skcipher_request *req)
+ 	return crypto_cbc_encrypt_walk(req, crypto_cbc_encrypt_one);
+ }
  
--	tfm = crypto_alloc_aead(driver, type | CRYPTO_ALG_INTERNAL, mask);
-+	tfm = crypto_alloc_aead(driver, type, mask);
- 	if (IS_ERR(tfm)) {
- 		printk(KERN_ERR "alg: aead: Failed to load transform for %s: "
- 		       "%ld\n", driver, PTR_ERR(tfm));
-@@ -1654,7 +1654,7 @@ static int alg_test_cipher(const struct alg_test_desc *desc,
- 	struct crypto_cipher *tfm;
- 	int err = 0;
- 
--	tfm = crypto_alloc_cipher(driver, type | CRYPTO_ALG_INTERNAL, mask);
-+	tfm = crypto_alloc_cipher(driver, type, mask);
- 	if (IS_ERR(tfm)) {
- 		printk(KERN_ERR "alg: cipher: Failed to load transform for "
- 		       "%s: %ld\n", driver, PTR_ERR(tfm));
-@@ -1683,7 +1683,7 @@ static int alg_test_skcipher(const struct alg_test_desc *desc,
- 	struct crypto_skcipher *tfm;
- 	int err = 0;
- 
--	tfm = crypto_alloc_skcipher(driver, type | CRYPTO_ALG_INTERNAL, mask);
-+	tfm = crypto_alloc_skcipher(driver, type, mask);
- 	if (IS_ERR(tfm)) {
- 		printk(KERN_ERR "alg: skcipher: Failed to load transform for "
- 		       "%s: %ld\n", driver, PTR_ERR(tfm));
-@@ -1750,7 +1750,7 @@ static int alg_test_hash(const struct alg_test_desc *desc, const char *driver,
- 	struct crypto_ahash *tfm;
- 	int err;
- 
--	tfm = crypto_alloc_ahash(driver, type | CRYPTO_ALG_INTERNAL, mask);
-+	tfm = crypto_alloc_ahash(driver, type, mask);
- 	if (IS_ERR(tfm)) {
- 		printk(KERN_ERR "alg: hash: Failed to load transform for %s: "
- 		       "%ld\n", driver, PTR_ERR(tfm));
-@@ -1778,7 +1778,7 @@ static int alg_test_crc32c(const struct alg_test_desc *desc,
- 	if (err)
- 		goto out;
- 
--	tfm = crypto_alloc_shash(driver, type | CRYPTO_ALG_INTERNAL, mask);
-+	tfm = crypto_alloc_shash(driver, type, mask);
- 	if (IS_ERR(tfm)) {
- 		printk(KERN_ERR "alg: crc32c: Failed to load transform for %s: "
- 		       "%ld\n", driver, PTR_ERR(tfm));
-@@ -1820,7 +1820,7 @@ static int alg_test_cprng(const struct alg_test_desc *desc, const char *driver,
- 	struct crypto_rng *rng;
- 	int err;
- 
--	rng = crypto_alloc_rng(driver, type | CRYPTO_ALG_INTERNAL, mask);
-+	rng = crypto_alloc_rng(driver, type, mask);
- 	if (IS_ERR(rng)) {
- 		printk(KERN_ERR "alg: cprng: Failed to load transform for %s: "
- 		       "%ld\n", driver, PTR_ERR(rng));
-@@ -1847,7 +1847,7 @@ static int drbg_cavs_test(struct drbg_testvec *test, int pr,
- 	if (!buf)
- 		return -ENOMEM;
- 
--	drng = crypto_alloc_rng(driver, type | CRYPTO_ALG_INTERNAL, mask);
-+	drng = crypto_alloc_rng(driver, type, mask);
- 	if (IS_ERR(drng)) {
- 		printk(KERN_ERR "alg: drbg: could not allocate DRNG handle for "
- 		       "%s\n", driver);
-@@ -2041,7 +2041,7 @@ static int alg_test_kpp(const struct alg_test_desc *desc, const char *driver,
- 	struct crypto_kpp *tfm;
- 	int err = 0;
- 
--	tfm = crypto_alloc_kpp(driver, type | CRYPTO_ALG_INTERNAL, mask);
-+	tfm = crypto_alloc_kpp(driver, type, mask);
- 	if (IS_ERR(tfm)) {
- 		pr_err("alg: kpp: Failed to load tfm for %s: %ld\n",
- 		       driver, PTR_ERR(tfm));
-@@ -2200,7 +2200,7 @@ static int alg_test_akcipher(const struct alg_test_desc *desc,
- 	struct crypto_akcipher *tfm;
- 	int err = 0;
- 
--	tfm = crypto_alloc_akcipher(driver, type | CRYPTO_ALG_INTERNAL, mask);
-+	tfm = crypto_alloc_akcipher(driver, type, mask);
- 	if (IS_ERR(tfm)) {
- 		pr_err("alg: akcipher: Failed to load tfm for %s: %ld\n",
- 		       driver, PTR_ERR(tfm));
-@@ -2223,88 +2223,6 @@ static int alg_test_null(const struct alg_test_desc *desc,
- /* Please keep this list sorted by algorithm name. */
- static const struct alg_test_desc alg_test_descs[] = {
- 	{
--		.alg = "__cbc-cast5-avx",
--		.test = alg_test_null,
--	}, {
--		.alg = "__cbc-cast6-avx",
--		.test = alg_test_null,
--	}, {
--		.alg = "__cbc-serpent-avx",
--		.test = alg_test_null,
--	}, {
--		.alg = "__cbc-serpent-avx2",
--		.test = alg_test_null,
--	}, {
--		.alg = "__cbc-serpent-sse2",
--		.test = alg_test_null,
--	}, {
--		.alg = "__cbc-twofish-avx",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-cbc-aes-aesni",
--		.test = alg_test_null,
--		.fips_allowed = 1,
--	}, {
--		.alg = "__driver-cbc-camellia-aesni",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-cbc-camellia-aesni-avx2",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-cbc-cast5-avx",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-cbc-cast6-avx",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-cbc-serpent-avx",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-cbc-serpent-avx2",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-cbc-serpent-sse2",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-cbc-twofish-avx",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-ecb-aes-aesni",
--		.test = alg_test_null,
--		.fips_allowed = 1,
--	}, {
--		.alg = "__driver-ecb-camellia-aesni",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-ecb-camellia-aesni-avx2",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-ecb-cast5-avx",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-ecb-cast6-avx",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-ecb-serpent-avx",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-ecb-serpent-avx2",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-ecb-serpent-sse2",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-ecb-twofish-avx",
--		.test = alg_test_null,
--	}, {
--		.alg = "__driver-gcm-aes-aesni",
--		.test = alg_test_null,
--		.fips_allowed = 1,
--	}, {
--		.alg = "__ghash-pclmulqdqni",
--		.test = alg_test_null,
--		.fips_allowed = 1,
--	}, {
- 		.alg = "ansi_cprng",
- 		.test = alg_test_cprng,
- 		.suite = {
-@@ -2791,55 +2709,6 @@ static int alg_test_null(const struct alg_test_desc *desc,
- 			}
- 		}
- 	}, {
--		.alg = "cryptd(__driver-cbc-aes-aesni)",
--		.test = alg_test_null,
--		.fips_allowed = 1,
--	}, {
--		.alg = "cryptd(__driver-cbc-camellia-aesni)",
--		.test = alg_test_null,
--	}, {
--		.alg = "cryptd(__driver-cbc-camellia-aesni-avx2)",
--		.test = alg_test_null,
--	}, {
--		.alg = "cryptd(__driver-cbc-serpent-avx2)",
--		.test = alg_test_null,
--	}, {
--		.alg = "cryptd(__driver-ecb-aes-aesni)",
--		.test = alg_test_null,
--		.fips_allowed = 1,
--	}, {
--		.alg = "cryptd(__driver-ecb-camellia-aesni)",
--		.test = alg_test_null,
--	}, {
--		.alg = "cryptd(__driver-ecb-camellia-aesni-avx2)",
--		.test = alg_test_null,
--	}, {
--		.alg = "cryptd(__driver-ecb-cast5-avx)",
--		.test = alg_test_null,
--	}, {
--		.alg = "cryptd(__driver-ecb-cast6-avx)",
--		.test = alg_test_null,
--	}, {
--		.alg = "cryptd(__driver-ecb-serpent-avx)",
--		.test = alg_test_null,
--	}, {
--		.alg = "cryptd(__driver-ecb-serpent-avx2)",
--		.test = alg_test_null,
--	}, {
--		.alg = "cryptd(__driver-ecb-serpent-sse2)",
--		.test = alg_test_null,
--	}, {
--		.alg = "cryptd(__driver-ecb-twofish-avx)",
--		.test = alg_test_null,
--	}, {
--		.alg = "cryptd(__driver-gcm-aes-aesni)",
--		.test = alg_test_null,
--		.fips_allowed = 1,
--	}, {
--		.alg = "cryptd(__ghash-pclmulqdqni)",
--		.test = alg_test_null,
--		.fips_allowed = 1,
--	}, {
- 		.alg = "ctr(aes)",
- 		.test = alg_test_skcipher,
- 		.fips_allowed = 1,
-@@ -3166,10 +3035,6 @@ static int alg_test_null(const struct alg_test_desc *desc,
- 		.fips_allowed = 1,
- 		.test = alg_test_null,
- 	}, {
--		.alg = "ecb(__aes-aesni)",
--		.test = alg_test_null,
--		.fips_allowed = 1,
--	}, {
- 		.alg = "ecb(aes)",
- 		.test = alg_test_skcipher,
- 		.fips_allowed = 1,
+-static inline int crypto_cbc_decrypt_segment(
+-	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
+-	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
+-{
+-	unsigned int bsize = crypto_skcipher_blocksize(tfm);
+-	unsigned int nbytes = walk->nbytes;
+-	u8 *src = walk->src.virt.addr;
+-	u8 *dst = walk->dst.virt.addr;
+-	u8 *iv = walk->iv;
+-
+-	do {
+-		fn(tfm, src, dst);
+-		crypto_xor(dst, iv, bsize);
+-		iv = src;
+-
+-		src += bsize;
+-		dst += bsize;
+-	} while ((nbytes -= bsize) >= bsize);
+-
+-	memcpy(walk->iv, iv, bsize);
+-
+-	return nbytes;
+-}
+-
+-static inline int crypto_cbc_decrypt_inplace(
+-	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
+-	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
+-{
+-	unsigned int bsize = crypto_skcipher_blocksize(tfm);
+-	unsigned int nbytes = walk->nbytes;
+-	u8 *src = walk->src.virt.addr;
+-	u8 last_iv[bsize];
+-
+-	/* Start of the last block. */
+-	src += nbytes - (nbytes & (bsize - 1)) - bsize;
+-	memcpy(last_iv, src, bsize);
+-
+-	for (;;) {
+-		fn(tfm, src, src);
+-		if ((nbytes -= bsize) < bsize)
+-			break;
+-		crypto_xor(src, src - bsize, bsize);
+-		src -= bsize;
+-	}
+-
+-	crypto_xor(src, walk->iv, bsize);
+-	memcpy(walk->iv, last_iv, bsize);
+-
+-	return nbytes;
+-}
+-
+-static inline int crypto_cbc_decrypt_blocks(
+-	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
+-	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
+-{
+-	if (walk->src.virt.addr == walk->dst.virt.addr)
+-		return crypto_cbc_decrypt_inplace(walk, tfm, fn);
+-	else
+-		return crypto_cbc_decrypt_segment(walk, tfm, fn);
+-}
+-
+ static inline void crypto_cbc_decrypt_one(struct crypto_skcipher *tfm,
+ 					  const u8 *src, u8 *dst)
+ {
+diff --git a/include/crypto/cbc.h b/include/crypto/cbc.h
+new file mode 100644
+index 0000000..f5b8bfc
+--- /dev/null
++++ b/include/crypto/cbc.h
+@@ -0,0 +1,146 @@
++/*
++ * CBC: Cipher Block Chaining mode
++ *
++ * Copyright (c) 2016 Herbert Xu <herbert@gondor.apana.org.au>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++
++#ifndef _CRYPTO_CBC_H
++#define _CRYPTO_CBC_H
++
++#include <crypto/internal/skcipher.h>
++#include <linux/string.h>
++#include <linux/types.h>
++
++static inline int crypto_cbc_encrypt_segment(
++	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
++	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
++{
++	unsigned int bsize = crypto_skcipher_blocksize(tfm);
++	unsigned int nbytes = walk->nbytes;
++	u8 *src = walk->src.virt.addr;
++	u8 *dst = walk->dst.virt.addr;
++	u8 *iv = walk->iv;
++
++	do {
++		crypto_xor(iv, src, bsize);
++		fn(tfm, iv, dst);
++		memcpy(iv, dst, bsize);
++
++		src += bsize;
++		dst += bsize;
++	} while ((nbytes -= bsize) >= bsize);
++
++	return nbytes;
++}
++
++static inline int crypto_cbc_encrypt_inplace(
++	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
++	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
++{
++	unsigned int bsize = crypto_skcipher_blocksize(tfm);
++	unsigned int nbytes = walk->nbytes;
++	u8 *src = walk->src.virt.addr;
++	u8 *iv = walk->iv;
++
++	do {
++		crypto_xor(src, iv, bsize);
++		fn(tfm, src, src);
++		iv = src;
++
++		src += bsize;
++	} while ((nbytes -= bsize) >= bsize);
++
++	memcpy(walk->iv, iv, bsize);
++
++	return nbytes;
++}
++
++static inline int crypto_cbc_encrypt_walk(struct skcipher_request *req,
++					  void (*fn)(struct crypto_skcipher *,
++						     const u8 *, u8 *))
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct skcipher_walk walk;
++	int err;
++
++	err = skcipher_walk_virt(&walk, req, false);
++
++	while (walk.nbytes) {
++		if (walk.src.virt.addr == walk.dst.virt.addr)
++			err = crypto_cbc_encrypt_inplace(&walk, tfm, fn);
++		else
++			err = crypto_cbc_encrypt_segment(&walk, tfm, fn);
++		err = skcipher_walk_done(&walk, err);
++	}
++
++	return err;
++}
++
++static inline int crypto_cbc_decrypt_segment(
++	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
++	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
++{
++	unsigned int bsize = crypto_skcipher_blocksize(tfm);
++	unsigned int nbytes = walk->nbytes;
++	u8 *src = walk->src.virt.addr;
++	u8 *dst = walk->dst.virt.addr;
++	u8 *iv = walk->iv;
++
++	do {
++		fn(tfm, src, dst);
++		crypto_xor(dst, iv, bsize);
++		iv = src;
++
++		src += bsize;
++		dst += bsize;
++	} while ((nbytes -= bsize) >= bsize);
++
++	memcpy(walk->iv, iv, bsize);
++
++	return nbytes;
++}
++
++static inline int crypto_cbc_decrypt_inplace(
++	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
++	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
++{
++	unsigned int bsize = crypto_skcipher_blocksize(tfm);
++	unsigned int nbytes = walk->nbytes;
++	u8 *src = walk->src.virt.addr;
++	u8 last_iv[bsize];
++
++	/* Start of the last block. */
++	src += nbytes - (nbytes & (bsize - 1)) - bsize;
++	memcpy(last_iv, src, bsize);
++
++	for (;;) {
++		fn(tfm, src, src);
++		if ((nbytes -= bsize) < bsize)
++			break;
++		crypto_xor(src, src - bsize, bsize);
++		src -= bsize;
++	}
++
++	crypto_xor(src, walk->iv, bsize);
++	memcpy(walk->iv, last_iv, bsize);
++
++	return nbytes;
++}
++
++static inline int crypto_cbc_decrypt_blocks(
++	struct skcipher_walk *walk, struct crypto_skcipher *tfm,
++	void (*fn)(struct crypto_skcipher *, const u8 *, u8 *))
++{
++	if (walk->src.virt.addr == walk->dst.virt.addr)
++		return crypto_cbc_decrypt_inplace(walk, tfm, fn);
++	else
++		return crypto_cbc_decrypt_segment(walk, tfm, fn);
++}
++
++#endif	/* _CRYPTO_CBC_H */
