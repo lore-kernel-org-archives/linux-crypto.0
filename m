@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 01/10] crypto: caam - move append_key_aead() into init_sh_desc_key_aead()
-Date: Tue, 22 Nov 2016 15:44:03 +0200
-Message-ID: <1479822252-23833-2-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH 10/10] MAINTAINERS: add maintainers for caam crypto driver
+Date: Tue, 22 Nov 2016 15:44:12 +0200
+Message-ID: <1479822252-23833-11-git-send-email-horia.geanta@nxp.com>
 References: <1479822252-23833-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -13,79 +13,41 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         Alexandru Porosanu <alexandru.porosanu@nxp.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0071.outbound.protection.outlook.com ([104.47.32.71]:31601
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam01on0073.outbound.protection.outlook.com ([104.47.34.73]:47840
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S933140AbcKVOAP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Nov 2016 09:00:15 -0500
+        id S933252AbcKVOAW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Nov 2016 09:00:22 -0500
 In-Reply-To: <1479822252-23833-1-git-send-email-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-append_key_aead() is used in only one place, thus inline it.
+Add myself and Dan as maintainers of the caam crypto driver.
 
+Cc: Dan Douglass <dan.douglass@nxp.com>
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamalg.c | 30 ++++++++++++------------------
- 1 file changed, 12 insertions(+), 18 deletions(-)
+ MAINTAINERS | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 8db54b090d39..567e234fb49b 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -228,12 +228,19 @@ struct caam_ctx {
- 	unsigned int authsize;
- };
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1cd38a7e0064..e28aab4d525a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4972,6 +4972,14 @@ F:	include/linux/fb.h
+ F:	include/uapi/video/
+ F:	include/uapi/linux/fb.h
  
--static void append_key_aead(u32 *desc, struct caam_ctx *ctx,
--			    int keys_fit_inline, bool is_rfc3686)
-+static void init_sh_desc_key_aead(u32 *desc, struct caam_ctx *ctx,
-+				  int keys_fit_inline, bool is_rfc3686)
- {
--	u32 *nonce;
-+	u32 *key_jump_cmd;
- 	unsigned int enckeylen = ctx->enckeylen;
- 
-+	/* Note: Context registers are saved. */
-+	init_sh_desc(desc, HDR_SHARE_SERIAL | HDR_SAVECTX);
++FREESCALE CAAM (Cryptographic Acceleration and Assurance Module) DRIVER
++M:	Horia Geantă <horia.geanta@nxp.com>
++M:	Dan Douglass <dan.douglass@nxp.com>
++L:	linux-crypto@vger.kernel.org
++S:	Maintained
++F:	drivers/crypto/caam/
++F:	Documentation/devicetree/bindings/crypto/fsl-sec4.txt
 +
-+	/* Skip if already shared */
-+	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
-+				   JUMP_COND_SHRD);
-+
- 	/*
- 	 * RFC3686 specific:
- 	 *	| ctx->key = {AUTH_KEY, ENC_KEY, NONCE}
-@@ -258,6 +265,8 @@ static void append_key_aead(u32 *desc, struct caam_ctx *ctx,
- 
- 	/* Load Counter into CONTEXT1 reg */
- 	if (is_rfc3686) {
-+		u32 *nonce;
-+
- 		nonce = (u32 *)((void *)ctx->key + ctx->split_key_pad_len +
- 			       enckeylen);
- 		append_load_as_imm(desc, nonce, CTR_RFC3686_NONCE_SIZE,
-@@ -269,21 +278,6 @@ static void append_key_aead(u32 *desc, struct caam_ctx *ctx,
- 			    (16 << MOVE_OFFSET_SHIFT) |
- 			    (CTR_RFC3686_NONCE_SIZE << MOVE_LEN_SHIFT));
- 	}
--}
--
--static void init_sh_desc_key_aead(u32 *desc, struct caam_ctx *ctx,
--				  int keys_fit_inline, bool is_rfc3686)
--{
--	u32 *key_jump_cmd;
--
--	/* Note: Context registers are saved. */
--	init_sh_desc(desc, HDR_SHARE_SERIAL | HDR_SAVECTX);
--
--	/* Skip if already shared */
--	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
--				   JUMP_COND_SHRD);
--
--	append_key_aead(desc, ctx, keys_fit_inline, is_rfc3686);
- 
- 	set_jump_tgt_here(desc, key_jump_cmd);
- }
+ FREESCALE DIU FRAMEBUFFER DRIVER
+ M:	Timur Tabi <timur@tabi.org>
+ L:	linux-fbdev@vger.kernel.org
 -- 
 2.4.4
