@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 03/10] crypto: caam - remove superfluous alg_op algorithm param
-Date: Tue, 22 Nov 2016 15:44:05 +0200
-Message-ID: <1479822252-23833-4-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH 08/10] crypto: caam - consolidate split key length computation
+Date: Tue, 22 Nov 2016 15:44:10 +0200
+Message-ID: <1479822252-23833-9-git-send-email-horia.geanta@nxp.com>
 References: <1479822252-23833-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -13,671 +13,209 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         Alexandru Porosanu <alexandru.porosanu@nxp.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0042.outbound.protection.outlook.com ([104.47.32.42]:53570
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-bl2nam02on0069.outbound.protection.outlook.com ([104.47.38.69]:34784
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S933173AbcKVOAt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Nov 2016 09:00:49 -0500
+        id S933252AbcKVOBs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Nov 2016 09:01:48 -0500
 In-Reply-To: <1479822252-23833-1-git-send-email-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Information carried by alg_op can be deduced from adata->algtype
-plus some fixed flags.
+Move split key length and padded length computation from caamalg.c
+and caamhash.c to key_gen.c.
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamalg.c  | 64 ++----------------------------------------
- drivers/crypto/caam/caamhash.c | 20 ++++---------
- drivers/crypto/caam/key_gen.c  |  7 +++--
- drivers/crypto/caam/key_gen.h  |  3 +-
- 4 files changed, 13 insertions(+), 81 deletions(-)
+ drivers/crypto/caam/caamalg.c  | 24 +++------------------
+ drivers/crypto/caam/caamhash.c | 24 ++-------------------
+ drivers/crypto/caam/key_gen.c  | 47 +++++++++++++++++++++++++++++++++++++++++-
+ drivers/crypto/caam/key_gen.h  |  3 ++-
+ 4 files changed, 53 insertions(+), 45 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 4141143cce7d..48fc000d86bf 100644
+index 78b0b7c17205..767ffaea9649 100644
 --- a/drivers/crypto/caam/caamalg.c
 +++ b/drivers/crypto/caam/caamalg.c
-@@ -149,7 +149,6 @@ static struct list_head alg_list;
- struct caam_alg_entry {
- 	int class1_alg_type;
- 	int class2_alg_type;
--	int alg_op;
- 	bool rfc3686;
- 	bool geniv;
- };
-@@ -217,7 +216,6 @@ struct caam_ctx {
- 	dma_addr_t sh_desc_enc_dma;
- 	dma_addr_t sh_desc_dec_dma;
- 	dma_addr_t sh_desc_givenc_dma;
--	u32 alg_op;
- 	u8 key[CAAM_MAX_KEY_SIZE];
- 	dma_addr_t key_dma;
- 	struct alginfo adata;
-@@ -1366,7 +1364,7 @@ static u32 gen_split_aead_key(struct caam_ctx *ctx, const u8 *key_in,
- 			      u32 authkeylen)
- {
- 	return gen_split_key(ctx->jrdev, ctx->key, &ctx->adata, key_in,
--			     authkeylen, ctx->alg_op);
-+			     authkeylen);
- }
- 
- static int aead_setkey(struct crypto_aead *aead,
-@@ -1383,7 +1381,8 @@ static int aead_setkey(struct crypto_aead *aead,
- 		goto badkey;
- 
- 	/* Pick class 2 key length from algorithm submask */
--	ctx->adata.keylen = mdpadlen[(ctx->alg_op & OP_ALG_ALGSEL_SUBMASK) >>
-+	ctx->adata.keylen = mdpadlen[(ctx->adata.algtype &
-+				      OP_ALG_ALGSEL_SUBMASK) >>
- 				     OP_ALG_ALGSEL_SHIFT] * 2;
- 	ctx->adata.keylen_pad = ALIGN(ctx->adata.keylen, 16);
- 
-@@ -2988,7 +2987,6 @@ struct caam_alg_template {
- 	} template_u;
- 	u32 class1_alg_type;
- 	u32 class2_alg_type;
--	u32 alg_op;
- };
- 
- static struct caam_alg_template driver_algs[] = {
-@@ -3173,7 +3171,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 		.caam = {
- 			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3195,7 +3192,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 		.caam = {
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3217,7 +3213,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 		.caam = {
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3239,7 +3234,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 		.caam = {
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3261,7 +3255,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 		.caam = {
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3283,7 +3276,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 		.caam = {
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3305,7 +3297,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3328,7 +3319,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -3351,7 +3341,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3374,7 +3363,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -3397,7 +3385,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3420,7 +3407,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -3443,7 +3429,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3466,7 +3451,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -3489,7 +3473,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3512,7 +3495,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -3535,7 +3517,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3558,7 +3539,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -3581,7 +3561,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
- 		}
- 	},
- 	{
-@@ -3604,7 +3583,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		}
- 	},
-@@ -3628,7 +3606,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3652,7 +3629,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -3676,7 +3652,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3700,7 +3675,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -3724,7 +3698,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3748,7 +3721,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -3772,7 +3744,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3796,7 +3767,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -3820,7 +3790,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3844,7 +3813,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -3867,7 +3835,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3890,7 +3857,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -3913,7 +3879,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3936,7 +3901,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -3959,7 +3923,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -3982,7 +3945,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -4005,7 +3967,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -4028,7 +3989,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -4051,7 +4011,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -4074,7 +4033,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -4097,7 +4055,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
- 		},
- 	},
- 	{
-@@ -4120,7 +4077,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
- 			.geniv = true,
- 		},
- 	},
-@@ -4145,7 +4101,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 					   OP_ALG_AAI_CTR_MOD128,
- 			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
- 			.rfc3686 = true,
- 		},
- 	},
-@@ -4170,7 +4125,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 					   OP_ALG_AAI_CTR_MOD128,
- 			.class2_alg_type = OP_ALG_ALGSEL_MD5 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
- 			.rfc3686 = true,
- 			.geniv = true,
- 		},
-@@ -4196,7 +4150,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 					   OP_ALG_AAI_CTR_MOD128,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 			.rfc3686 = true,
- 		},
- 	},
-@@ -4221,7 +4174,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 					   OP_ALG_AAI_CTR_MOD128,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA1 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 			.rfc3686 = true,
- 			.geniv = true,
- 		},
-@@ -4247,7 +4199,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 					   OP_ALG_AAI_CTR_MOD128,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
- 			.rfc3686 = true,
- 		},
- 	},
-@@ -4272,7 +4223,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 					   OP_ALG_AAI_CTR_MOD128,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
- 			.rfc3686 = true,
- 			.geniv = true,
- 		},
-@@ -4298,7 +4248,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 					   OP_ALG_AAI_CTR_MOD128,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 			.rfc3686 = true,
- 		},
- 	},
-@@ -4323,7 +4272,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 					   OP_ALG_AAI_CTR_MOD128,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 			.rfc3686 = true,
- 			.geniv = true,
- 		},
-@@ -4349,7 +4297,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 					   OP_ALG_AAI_CTR_MOD128,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
- 			.rfc3686 = true,
- 		},
- 	},
-@@ -4374,7 +4321,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 					   OP_ALG_AAI_CTR_MOD128,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
- 			.rfc3686 = true,
- 			.geniv = true,
- 		},
-@@ -4400,7 +4346,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 					   OP_ALG_AAI_CTR_MOD128,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
- 			.rfc3686 = true,
- 		},
- 	},
-@@ -4425,7 +4370,6 @@ static struct caam_aead_alg driver_aeads[] = {
- 					   OP_ALG_AAI_CTR_MOD128,
- 			.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
- 					   OP_ALG_AAI_HMAC_PRECOMP,
--			.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
- 			.rfc3686 = true,
- 			.geniv = true,
- 		},
-@@ -4449,7 +4393,6 @@ static int caam_init_common(struct caam_ctx *ctx, struct caam_alg_entry *caam)
- 	/* copy descriptor header template value */
- 	ctx->cdata.algtype = OP_TYPE_CLASS1_ALG | caam->class1_alg_type;
- 	ctx->adata.algtype = OP_TYPE_CLASS2_ALG | caam->class2_alg_type;
--	ctx->alg_op = OP_TYPE_CLASS2_ALG | caam->alg_op;
- 
+@@ -586,18 +586,9 @@ static int rfc4543_setauthsize(struct crypto_aead *authenc,
  	return 0;
  }
-@@ -4570,7 +4513,6 @@ static struct caam_crypto_alg *caam_alg_alloc(struct caam_alg_template
  
- 	t_alg->caam.class1_alg_type = template->class1_alg_type;
- 	t_alg->caam.class2_alg_type = template->class2_alg_type;
--	t_alg->caam.alg_op = template->alg_op;
+-static u32 gen_split_aead_key(struct caam_ctx *ctx, const u8 *key_in,
+-			      u32 authkeylen)
+-{
+-	return gen_split_key(ctx->jrdev, ctx->key, &ctx->adata, key_in,
+-			     authkeylen);
+-}
+-
+ static int aead_setkey(struct crypto_aead *aead,
+ 			       const u8 *key, unsigned int keylen)
+ {
+-	/* Sizes for MDHA pads (*not* keys): MD5, SHA1, 224, 256, 384, 512 */
+-	static const u8 mdpadlen[] = { 16, 20, 32, 32, 64, 64 };
+ 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+ 	struct device *jrdev = ctx->jrdev;
+ 	struct crypto_authenc_keys keys;
+@@ -606,26 +597,17 @@ static int aead_setkey(struct crypto_aead *aead,
+ 	if (crypto_authenc_extractkeys(&keys, key, keylen) != 0)
+ 		goto badkey;
  
- 	return t_alg;
- }
+-	/* Pick class 2 key length from algorithm submask */
+-	ctx->adata.keylen = mdpadlen[(ctx->adata.algtype &
+-				      OP_ALG_ALGSEL_SUBMASK) >>
+-				     OP_ALG_ALGSEL_SHIFT] * 2;
+-	ctx->adata.keylen_pad = ALIGN(ctx->adata.keylen, 16);
+-
+-	if (ctx->adata.keylen_pad + keys.enckeylen > CAAM_MAX_KEY_SIZE)
+-		goto badkey;
+-
+ #ifdef DEBUG
+ 	printk(KERN_ERR "keylen %d enckeylen %d authkeylen %d\n",
+ 	       keys.authkeylen + keys.enckeylen, keys.enckeylen,
+ 	       keys.authkeylen);
+-	printk(KERN_ERR "split_key_len %d split_key_pad_len %d\n",
+-	       ctx->adata.keylen, ctx->adata.keylen_pad);
+ 	print_hex_dump(KERN_ERR, "key in @"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
+ #endif
+ 
+-	ret = gen_split_aead_key(ctx, keys.authkey, keys.authkeylen);
++	ret = gen_split_key(ctx->jrdev, ctx->key, &ctx->adata, keys.authkey,
++			    keys.authkeylen, CAAM_MAX_KEY_SIZE -
++			    keys.enckeylen);
+ 	if (ret) {
+ 		goto badkey;
+ 	}
 diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 5e569ff06b4b..8e4530d68208 100644
+index d3f0ae16a73b..505007d0277c 100644
 --- a/drivers/crypto/caam/caamhash.c
 +++ b/drivers/crypto/caam/caamhash.c
-@@ -108,7 +108,6 @@ struct caam_hash_ctx {
- 	dma_addr_t sh_desc_fin_dma;
- 	dma_addr_t sh_desc_digest_dma;
- 	struct device *jrdev;
--	u32 alg_op;
- 	u8 key[CAAM_MAX_HASH_KEY_SIZE];
- 	dma_addr_t key_dma;
- 	int ctx_len;
-@@ -402,8 +401,7 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
- static int gen_split_hash_key(struct caam_hash_ctx *ctx, const u8 *key_in,
- 			      u32 keylen)
- {
--	return gen_split_key(ctx->jrdev, ctx->key, &ctx->adata, key_in, keylen,
--			     ctx->alg_op);
-+	return gen_split_key(ctx->jrdev, ctx->key, &ctx->adata, key_in, keylen);
+@@ -398,12 +398,6 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+ 	return 0;
  }
  
+-static int gen_split_hash_key(struct caam_hash_ctx *ctx, const u8 *key_in,
+-			      u32 keylen)
+-{
+-	return gen_split_key(ctx->jrdev, ctx->key, &ctx->adata, key_in, keylen);
+-}
+-
  /* Digest hash size if it is too large */
-@@ -512,7 +510,8 @@ static int ahash_setkey(struct crypto_ahash *ahash,
+ static int hash_digest_key(struct caam_hash_ctx *ctx, const u8 *key_in,
+ 			   u32 *keylen, u8 *key_out, u32 digestsize)
+@@ -483,8 +477,6 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, const u8 *key_in,
+ static int ahash_setkey(struct crypto_ahash *ahash,
+ 			const u8 *key, unsigned int keylen)
+ {
+-	/* Sizes for MDHA pads (*not* keys): MD5, SHA1, 224, 256, 384, 512 */
+-	static const u8 mdpadlen[] = { 16, 20, 32, 32, 64, 64 };
+ 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
+ 	struct device *jrdev = ctx->jrdev;
+ 	int blocksize = crypto_tfm_alg_blocksize(&ahash->base);
+@@ -509,20 +501,8 @@ static int ahash_setkey(struct crypto_ahash *ahash,
+ 		key = hashed_key;
  	}
  
- 	/* Pick class 2 key length from algorithm submask */
--	ctx->adata.keylen = mdpadlen[(ctx->alg_op & OP_ALG_ALGSEL_SUBMASK) >>
-+	ctx->adata.keylen = mdpadlen[(ctx->adata.algtype &
-+				      OP_ALG_ALGSEL_SUBMASK) >>
- 				     OP_ALG_ALGSEL_SHIFT] * 2;
- 	ctx->adata.keylen_pad = ALIGN(ctx->adata.keylen, 16);
+-	/* Pick class 2 key length from algorithm submask */
+-	ctx->adata.keylen = mdpadlen[(ctx->adata.algtype &
+-				      OP_ALG_ALGSEL_SUBMASK) >>
+-				     OP_ALG_ALGSEL_SHIFT] * 2;
+-	ctx->adata.keylen_pad = ALIGN(ctx->adata.keylen, 16);
+-
+-#ifdef DEBUG
+-	printk(KERN_ERR "split_key_len %d split_key_pad_len %d\n",
+-	       ctx->adata.keylen, ctx->adata.keylen_pad);
+-	print_hex_dump(KERN_ERR, "key in @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
+-#endif
+-
+-	ret = gen_split_hash_key(ctx, key, keylen);
++	ret = gen_split_key(ctx->jrdev, ctx->key, &ctx->adata, key, keylen,
++			    CAAM_MAX_HASH_KEY_SIZE);
+ 	if (ret)
+ 		goto bad_free_key;
  
-@@ -1654,7 +1653,6 @@ struct caam_hash_template {
- 	unsigned int blocksize;
- 	struct ahash_alg template_ahash;
- 	u32 alg_type;
--	u32 alg_op;
- };
- 
- /* ahash descriptors */
-@@ -1680,7 +1678,6 @@ static struct caam_hash_template driver_hash[] = {
- 			},
- 		},
- 		.alg_type = OP_ALG_ALGSEL_SHA1,
--		.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 	}, {
- 		.name = "sha224",
- 		.driver_name = "sha224-caam",
-@@ -1702,7 +1699,6 @@ static struct caam_hash_template driver_hash[] = {
- 			},
- 		},
- 		.alg_type = OP_ALG_ALGSEL_SHA224,
--		.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
- 	}, {
- 		.name = "sha256",
- 		.driver_name = "sha256-caam",
-@@ -1724,7 +1720,6 @@ static struct caam_hash_template driver_hash[] = {
- 			},
- 		},
- 		.alg_type = OP_ALG_ALGSEL_SHA256,
--		.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 	}, {
- 		.name = "sha384",
- 		.driver_name = "sha384-caam",
-@@ -1746,7 +1741,6 @@ static struct caam_hash_template driver_hash[] = {
- 			},
- 		},
- 		.alg_type = OP_ALG_ALGSEL_SHA384,
--		.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
- 	}, {
- 		.name = "sha512",
- 		.driver_name = "sha512-caam",
-@@ -1768,7 +1762,6 @@ static struct caam_hash_template driver_hash[] = {
- 			},
- 		},
- 		.alg_type = OP_ALG_ALGSEL_SHA512,
--		.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
- 	}, {
- 		.name = "md5",
- 		.driver_name = "md5-caam",
-@@ -1790,14 +1783,12 @@ static struct caam_hash_template driver_hash[] = {
- 			},
- 		},
- 		.alg_type = OP_ALG_ALGSEL_MD5,
--		.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
- 	},
- };
- 
- struct caam_hash_alg {
- 	struct list_head entry;
- 	int alg_type;
--	int alg_op;
- 	struct ahash_alg ahash_alg;
- };
- 
-@@ -1831,9 +1822,9 @@ static int caam_hash_cra_init(struct crypto_tfm *tfm)
- 	}
- 	/* copy descriptor header template value */
- 	ctx->adata.algtype = OP_TYPE_CLASS2_ALG | caam_hash->alg_type;
--	ctx->alg_op = OP_TYPE_CLASS2_ALG | caam_hash->alg_op;
- 
--	ctx->ctx_len = runninglen[(ctx->alg_op & OP_ALG_ALGSEL_SUBMASK) >>
-+	ctx->ctx_len = runninglen[(ctx->adata.algtype &
-+				   OP_ALG_ALGSEL_SUBMASK) >>
- 				  OP_ALG_ALGSEL_SHIFT];
- 
- 	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
-@@ -1923,7 +1914,6 @@ caam_hash_alloc(struct caam_hash_template *template,
- 	alg->cra_type = &crypto_ahash_type;
- 
- 	t_alg->alg_type = template->alg_type;
--	t_alg->alg_op = template->alg_op;
- 
- 	return t_alg;
- }
 diff --git a/drivers/crypto/caam/key_gen.c b/drivers/crypto/caam/key_gen.c
-index df287e751df1..621199a02f2e 100644
+index 621199a02f2e..1bb2816a9b4d 100644
 --- a/drivers/crypto/caam/key_gen.c
 +++ b/drivers/crypto/caam/key_gen.c
-@@ -42,8 +42,7 @@ Split key generation-----------------------------------------------
+@@ -10,6 +10,36 @@
+ #include "desc_constr.h"
+ #include "key_gen.h"
+ 
++/**
++ * split_key_len - Compute MDHA split key length for a given algorithm
++ * @hash: Hashing algorithm selection, one of OP_ALG_ALGSEL_* - MD5, SHA1,
++ *        SHA224, SHA384, SHA512.
++ *
++ * Return: MDHA split key length
++ */
++static inline u32 split_key_len(u32 hash)
++{
++	/* Sizes for MDHA pads (*not* keys): MD5, SHA1, 224, 256, 384, 512 */
++	static const u8 mdpadlen[] = { 16, 20, 32, 32, 64, 64 };
++	u32 idx;
++
++	idx = (hash & OP_ALG_ALGSEL_SUBMASK) >> OP_ALG_ALGSEL_SHIFT;
++
++	return (u32)(mdpadlen[idx] * 2);
++}
++
++/**
++ * split_key_pad_len - Compute MDHA split key pad length for a given algorithm
++ * @hash: Hashing algorithm selection, one of OP_ALG_ALGSEL_* - MD5, SHA1,
++ *        SHA224, SHA384, SHA512.
++ *
++ * Return: MDHA split key pad length
++ */
++static inline u32 split_key_pad_len(u32 hash)
++{
++	return ALIGN(split_key_len(hash), 16);
++}
++
+ void split_key_done(struct device *dev, u32 *desc, u32 err,
+ 			   void *context)
+ {
+@@ -42,13 +72,28 @@ Split key generation-----------------------------------------------
  			@0xffe04000
  */
  int gen_split_key(struct device *jrdev, u8 *key_out,
--		  struct alginfo * const adata, const u8 *key_in, u32 keylen,
--		  u32 alg_op)
-+		  struct alginfo * const adata, const u8 *key_in, u32 keylen)
+-		  struct alginfo * const adata, const u8 *key_in, u32 keylen)
++		  struct alginfo * const adata, const u8 *key_in, u32 keylen,
++		  int max_keylen)
  {
  	u32 *desc;
  	struct split_key_result result;
-@@ -74,7 +73,9 @@ int gen_split_key(struct device *jrdev, u8 *key_out,
- 	append_key(desc, dma_addr_in, keylen, CLASS_2 | KEY_DEST_CLASS_REG);
+ 	dma_addr_t dma_addr_in, dma_addr_out;
+ 	int ret = -ENOMEM;
  
- 	/* Sets MDHA up into an HMAC-INIT */
--	append_operation(desc, alg_op | OP_ALG_DECRYPT | OP_ALG_AS_INIT);
-+	append_operation(desc, (adata->algtype & OP_ALG_ALGSEL_MASK) |
-+			 OP_ALG_AAI_HMAC | OP_TYPE_CLASS2_ALG | OP_ALG_DECRYPT |
-+			 OP_ALG_AS_INIT);
- 
- 	/*
- 	 * do a FIFO_LOAD of zero, this will trigger the internal key expansion
++	adata->keylen = split_key_len(adata->algtype & OP_ALG_ALGSEL_MASK);
++	adata->keylen_pad = split_key_pad_len(adata->algtype &
++					      OP_ALG_ALGSEL_MASK);
++
++#ifdef DEBUG
++	dev_err(jrdev, "split keylen %d split keylen padded %d\n",
++		adata->keylen, adata->keylen_pad);
++	print_hex_dump(KERN_ERR, "ctx.key@" __stringify(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, key_in, keylen, 1);
++#endif
++
++	if (adata->keylen_pad > max_keylen)
++		return -EINVAL;
++
+ 	desc = kmalloc(CAAM_CMD_SZ * 6 + CAAM_PTR_SZ * 2, GFP_KERNEL | GFP_DMA);
+ 	if (!desc) {
+ 		dev_err(jrdev, "unable to allocate key input memory\n");
 diff --git a/drivers/crypto/caam/key_gen.h b/drivers/crypto/caam/key_gen.h
-index 511882af0596..e87483c6057b 100644
+index e87483c6057b..4628f389eb64 100644
 --- a/drivers/crypto/caam/key_gen.h
 +++ b/drivers/crypto/caam/key_gen.h
-@@ -13,5 +13,4 @@ struct split_key_result {
+@@ -13,4 +13,5 @@ struct split_key_result {
  void split_key_done(struct device *dev, u32 *desc, u32 err, void *context);
  
  int gen_split_key(struct device *jrdev, u8 *key_out,
--		  struct alginfo * const adata, const u8 *key_in, u32 keylen,
--		  u32 alg_op);
-+		  struct alginfo * const adata, const u8 *key_in, u32 keylen);
+-		  struct alginfo * const adata, const u8 *key_in, u32 keylen);
++		  struct alginfo * const adata, const u8 *key_in, u32 keylen,
++		  int max_keylen);
 -- 
 2.4.4
