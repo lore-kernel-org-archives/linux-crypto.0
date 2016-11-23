@@ -1,72 +1,71 @@
 From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH] X.509: Fix double free in x509_cert_parse()
-Date: Wed, 23 Nov 2016 19:16:59 +0300
-Message-ID: <1479917819-31571-1-git-send-email-aryabinin@virtuozzo.com>
+Subject: [PATCH] mpi: Fix NULL ptr dereference in mpi_powm()
+Date: Wed, 23 Nov 2016 19:28:04 +0300
+Message-ID: <1479918484-31952-1-git-send-email-aryabinin@virtuozzo.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Nicolai Stange <nicstange@gmail.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         Andrey Ryabinin <aryabinin@virtuozzo.com>,
         <stable@vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <stable-owner@vger.kernel.org>
 Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-We shouldn't free cert->pub->key in x509_cert_parse() because
-x509_free_certificate() also does this:
-	BUG: Double free or freeing an invalid pointer
+Parsing certain certificates (see [1]) triggers NULL-ptr
+dereference in mpi_powm():
+
+	BUG: unable to handle kernel NULL pointer dereference at (null)
+	IP: [<ffffffff818eb118>] mpi_powm+0xf8/0x10b0
 	...
 	Call Trace:
-	 [<ffffffff81896c20>] dump_stack+0x63/0x83
-	 [<ffffffff81356571>] kasan_object_err+0x21/0x70
-	 [<ffffffff81356ed9>] kasan_report_double_free+0x49/0x60
-	 [<ffffffff813561ad>] kasan_slab_free+0x9d/0xc0
-	 [<ffffffff81350b7a>] kfree+0x8a/0x1a0
-	 [<ffffffff81844fbf>] public_key_free+0x1f/0x30
-	 [<ffffffff818455d4>] x509_free_certificate+0x24/0x90
-	 [<ffffffff818460bc>] x509_cert_parse+0x2bc/0x300
+	 [<ffffffff817e06a6>] _rsa_dec.isra.2+0x66/0x80
+	 [<ffffffff817e07c3>] rsa_verify+0x103/0x1c0
+	 [<ffffffff817e1683>] pkcs1pad_verify+0x1c3/0x220
+	 [<ffffffff8184549a>] public_key_verify_signature+0x3fa/0x4d0
+	 [<ffffffff818473c7>] x509_check_for_self_signed+0x167/0x1e0
+	 [<ffffffff8184607e>] x509_cert_parse+0x27e/0x300
 	 [<ffffffff81846cae>] x509_key_preparse+0x3e/0x330
 	 [<ffffffff818444cf>] asymmetric_key_preparse+0x6f/0x100
 	 [<ffffffff8178bec0>] key_create_or_update+0x260/0x5f0
 	 [<ffffffff8178e6d9>] SyS_add_key+0x199/0x2a0
 	 [<ffffffff821d823b>] entry_SYSCALL_64_fastpath+0x1e/0xad
-	Object at ffff880110bd1900, in cache kmalloc-512 size: 512
-	....
-	Freed:
-	PID = 2579
-	[<ffffffff8104283b>] save_stack_trace+0x1b/0x20
-	[<ffffffff813558f6>] save_stack+0x46/0xd0
-	[<ffffffff81356183>] kasan_slab_free+0x73/0xc0
-	[<ffffffff81350b7a>] kfree+0x8a/0x1a0
-	[<ffffffff818460a3>] x509_cert_parse+0x2a3/0x300
-	[<ffffffff81846cae>] x509_key_preparse+0x3e/0x330
-	[<ffffffff818444cf>] asymmetric_key_preparse+0x6f/0x100
-	[<ffffffff8178bec0>] key_create_or_update+0x260/0x5f0
-	[<ffffffff8178e6d9>] SyS_add_key+0x199/0x2a0
-	[<ffffffff821d823b>] entry_SYSCALL_64_fastpath+0x1e/0xad
 
-Fixes: db6c43bd2132 ("crypto: KEYS: convert public key and digsig asym to the akcipher api")
+This happens because mpi_alloc(0) doesn't allocate the limb space.
+Fix this by allocating the result if needed.
+
+Basically, this is a backport of libgcrypt patch [2].
+
+[1] http://seclists.org/fulldisclosure/2016/Nov/76
+[2] http://git.gnupg.org/cgi-bin/gitweb.cgi?p=libgcrypt.git;a=patch;h=6e1adb05d290aeeb1c230c763970695f4a538526
+
+Fixes: cdec9cb5167a ("crypto: GnuPG based MPI lib - source files (part 1)")
 Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
 Cc: <stable@vger.kernel.org>
 ---
- crypto/asymmetric_keys/x509_cert_parser.c | 1 -
- 1 file changed, 1 deletion(-)
+ lib/mpi/mpi-pow.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index 865f46e..c80765b 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -133,7 +133,6 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
- 	return cert;
- 
- error_decode:
--	kfree(cert->pub->key);
- 	kfree(ctx);
- error_no_ctx:
- 	x509_free_certificate(cert);
+diff --git a/lib/mpi/mpi-pow.c b/lib/mpi/mpi-pow.c
+index 5464c87..9e28d12 100644
+--- a/lib/mpi/mpi-pow.c
++++ b/lib/mpi/mpi-pow.c
+@@ -64,8 +64,13 @@ int mpi_powm(MPI res, MPI base, MPI exp, MPI mod)
+ 	if (!esize) {
+ 		/* Exponent is zero, result is 1 mod MOD, i.e., 1 or 0
+ 		 * depending on if MOD equals 1.  */
+-		rp[0] = 1;
+ 		res->nlimbs = (msize == 1 && mod->d[0] == 1) ? 0 : 1;
++		if (res->nlimbs) {
++			if (RESIZE_IF_NEEDED(res, 1) < 0)
++				goto enomem;
++			rp = res->d;
++			rp[0] = 1;
++		}
+ 		res->sign = 0;
+ 		goto leave;
+ 	}
 -- 
 2.7.3
