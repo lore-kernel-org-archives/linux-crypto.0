@@ -1,71 +1,80 @@
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH] mpi: Fix NULL ptr dereference in mpi_powm()
-Date: Wed, 23 Nov 2016 19:28:04 +0300
-Message-ID: <1479918484-31952-1-git-send-email-aryabinin@virtuozzo.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: "David S . Miller" <davem@davemloft.net>,
-        Nicolai Stange <nicstange@gmail.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        <stable@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Eric Biggers <ebiggers@google.com>
+Subject: [PATCH] crypto: acomp - don't use stack buffer in test_acomp()
+Date: Wed, 23 Nov 2016 10:24:35 -0800
+Message-ID: <1479925475-13732-1-git-send-email-ebiggers@google.com>
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Lutomirski <luto@kernel.org>,
+        Eric Biggers <ebiggers@google.com>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f176.google.com ([209.85.192.176]:34541 "EHLO
+        mail-pf0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752404AbcKWS1I (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Nov 2016 13:27:08 -0500
+Received: by mail-pf0-f176.google.com with SMTP id c4so4729641pfb.1
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Nov 2016 10:27:08 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Parsing certain certificates (see [1]) triggers NULL-ptr
-dereference in mpi_powm():
+With virtually-mapped stacks (CONFIG_VMAP_STACK=y), using the
+scatterlist crypto API with stack buffers is not allowed, and with
+appropriate debugging options will cause the
+'BUG_ON(!virt_addr_valid(buf));' in sg_set_buf() to be triggered.
+Use a heap buffer instead.
 
-	BUG: unable to handle kernel NULL pointer dereference at (null)
-	IP: [<ffffffff818eb118>] mpi_powm+0xf8/0x10b0
-	...
-	Call Trace:
-	 [<ffffffff817e06a6>] _rsa_dec.isra.2+0x66/0x80
-	 [<ffffffff817e07c3>] rsa_verify+0x103/0x1c0
-	 [<ffffffff817e1683>] pkcs1pad_verify+0x1c3/0x220
-	 [<ffffffff8184549a>] public_key_verify_signature+0x3fa/0x4d0
-	 [<ffffffff818473c7>] x509_check_for_self_signed+0x167/0x1e0
-	 [<ffffffff8184607e>] x509_cert_parse+0x27e/0x300
-	 [<ffffffff81846cae>] x509_key_preparse+0x3e/0x330
-	 [<ffffffff818444cf>] asymmetric_key_preparse+0x6f/0x100
-	 [<ffffffff8178bec0>] key_create_or_update+0x260/0x5f0
-	 [<ffffffff8178e6d9>] SyS_add_key+0x199/0x2a0
-	 [<ffffffff821d823b>] entry_SYSCALL_64_fastpath+0x1e/0xad
-
-This happens because mpi_alloc(0) doesn't allocate the limb space.
-Fix this by allocating the result if needed.
-
-Basically, this is a backport of libgcrypt patch [2].
-
-[1] http://seclists.org/fulldisclosure/2016/Nov/76
-[2] http://git.gnupg.org/cgi-bin/gitweb.cgi?p=libgcrypt.git;a=patch;h=6e1adb05d290aeeb1c230c763970695f4a538526
-
-Fixes: cdec9cb5167a ("crypto: GnuPG based MPI lib - source files (part 1)")
-Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Cc: <stable@vger.kernel.org>
+Fixes: d7db7a882deb ("crypto: acomp - update testmgr with support for acomp")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- lib/mpi/mpi-pow.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ crypto/testmgr.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/lib/mpi/mpi-pow.c b/lib/mpi/mpi-pow.c
-index 5464c87..9e28d12 100644
---- a/lib/mpi/mpi-pow.c
-+++ b/lib/mpi/mpi-pow.c
-@@ -64,8 +64,13 @@ int mpi_powm(MPI res, MPI base, MPI exp, MPI mod)
- 	if (!esize) {
- 		/* Exponent is zero, result is 1 mod MOD, i.e., 1 or 0
- 		 * depending on if MOD equals 1.  */
--		rp[0] = 1;
- 		res->nlimbs = (msize == 1 && mod->d[0] == 1) ? 0 : 1;
-+		if (res->nlimbs) {
-+			if (RESIZE_IF_NEEDED(res, 1) < 0)
-+				goto enomem;
-+			rp = res->d;
-+			rp[0] = 1;
-+		}
- 		res->sign = 0;
- 		goto leave;
- 	}
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index ded50b6..aca1b7b 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1448,17 +1448,21 @@ static int test_acomp(struct crypto_acomp *tfm, struct comp_testvec *ctemplate,
+ {
+ 	const char *algo = crypto_tfm_alg_driver_name(crypto_acomp_tfm(tfm));
+ 	unsigned int i;
+-	char output[COMP_BUF_SIZE];
++	char *output;
+ 	int ret;
+ 	struct scatterlist src, dst;
+ 	struct acomp_req *req;
+ 	struct tcrypt_result result;
+ 
++	output = kmalloc(COMP_BUF_SIZE, GFP_KERNEL);
++	if (!output)
++		return -ENOMEM;
++
+ 	for (i = 0; i < ctcount; i++) {
+ 		unsigned int dlen = COMP_BUF_SIZE;
+ 		int ilen = ctemplate[i].inlen;
+ 
+-		memset(output, 0, sizeof(output));
++		memset(output, 0, dlen);
+ 		init_completion(&result.completion);
+ 		sg_init_one(&src, ctemplate[i].input, ilen);
+ 		sg_init_one(&dst, output, dlen);
+@@ -1507,7 +1511,7 @@ static int test_acomp(struct crypto_acomp *tfm, struct comp_testvec *ctemplate,
+ 		unsigned int dlen = COMP_BUF_SIZE;
+ 		int ilen = dtemplate[i].inlen;
+ 
+-		memset(output, 0, sizeof(output));
++		memset(output, 0, dlen);
+ 		init_completion(&result.completion);
+ 		sg_init_one(&src, dtemplate[i].input, ilen);
+ 		sg_init_one(&dst, output, dlen);
+@@ -1555,6 +1559,7 @@ static int test_acomp(struct crypto_acomp *tfm, struct comp_testvec *ctemplate,
+ 	ret = 0;
+ 
+ out:
++	kfree(output);
+ 	return ret;
+ }
+ 
 -- 
-2.7.3
+2.8.0.rc3.226.g39d4020
