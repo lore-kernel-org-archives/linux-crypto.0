@@ -1,74 +1,74 @@
-From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 1/2] X.509: Fix double free in x509_cert_parse() [ver #3]
-Date: Thu, 24 Nov 2016 13:23:03 +0000
-Message-ID: <147999378301.9697.17367850403978012902.stgit@warthog.procyon.org.uk>
-References: <147999377574.9697.16315343355948647181.stgit@warthog.procyon.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        dhowells@redhat.com, linux-security-module@vger.kernel.org,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>
-To: jmorris@namei.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <147999377574.9697.16315343355948647181.stgit@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 0/4] crypto: CRCT10DIF support for ARM and arm64
+Date: Thu, 24 Nov 2016 15:43:17 +0000
+Message-ID: <1480002201-1427-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: steve.capper@linaro.org, dingtianhong@huawei.com,
+        yangshengkai@huawei.com, yuehaibing@huawei.com,
+        hanjun.guo@linaro.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
+        will.deacon@arm.com, linux@arm.linux.org.uk
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:35454 "EHLO
+        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S966610AbcKXPo1 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Nov 2016 10:44:27 -0500
+Received: by mail-wm0-f54.google.com with SMTP id a197so118458796wmd.0
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Nov 2016 07:44:26 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+First of all, apologies to Yue Haibing for stealing his thunder, to some
+extent. But after reviewing (and replying to) his patch, I noticed that his
+code is not original code, but simply a transliteration of the existing Intel
+code that resides in arch/x86/crypto/crct10dif-pcl-asm_64.S, but with the
+license and copyright statement removed. 
 
-We shouldn't free cert->pub->key in x509_cert_parse() because
-x509_free_certificate() also does this:
-	BUG: Double free or freeing an invalid pointer
-	...
-	Call Trace:
-	 [<ffffffff81896c20>] dump_stack+0x63/0x83
-	 [<ffffffff81356571>] kasan_object_err+0x21/0x70
-	 [<ffffffff81356ed9>] kasan_report_double_free+0x49/0x60
-	 [<ffffffff813561ad>] kasan_slab_free+0x9d/0xc0
-	 [<ffffffff81350b7a>] kfree+0x8a/0x1a0
-	 [<ffffffff81844fbf>] public_key_free+0x1f/0x30
-	 [<ffffffff818455d4>] x509_free_certificate+0x24/0x90
-	 [<ffffffff818460bc>] x509_cert_parse+0x2bc/0x300
-	 [<ffffffff81846cae>] x509_key_preparse+0x3e/0x330
-	 [<ffffffff818444cf>] asymmetric_key_preparse+0x6f/0x100
-	 [<ffffffff8178bec0>] key_create_or_update+0x260/0x5f0
-	 [<ffffffff8178e6d9>] SyS_add_key+0x199/0x2a0
-	 [<ffffffff821d823b>] entry_SYSCALL_64_fastpath+0x1e/0xad
-	Object at ffff880110bd1900, in cache kmalloc-512 size: 512
-	....
-	Freed:
-	PID = 2579
-	[<ffffffff8104283b>] save_stack_trace+0x1b/0x20
-	[<ffffffff813558f6>] save_stack+0x46/0xd0
-	[<ffffffff81356183>] kasan_slab_free+0x73/0xc0
-	[<ffffffff81350b7a>] kfree+0x8a/0x1a0
-	[<ffffffff818460a3>] x509_cert_parse+0x2a3/0x300
-	[<ffffffff81846cae>] x509_key_preparse+0x3e/0x330
-	[<ffffffff818444cf>] asymmetric_key_preparse+0x6f/0x100
-	[<ffffffff8178bec0>] key_create_or_update+0x260/0x5f0
-	[<ffffffff8178e6d9>] SyS_add_key+0x199/0x2a0
-	[<ffffffff821d823b>] entry_SYSCALL_64_fastpath+0x1e/0xad
+So, if we are going to transliterate code, let's credit the original authors,
+even if the resulting code does not look like the code you started out with.
 
-Fixes: db6c43bd2132 ("crypto: KEYS: convert public key and digsig asym to the akcipher api")
-Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Cc: <stable@vger.kernel.org>
-Signed-off-by: David Howells <dhowells@redhat.com>
----
+Then, I noticed that we could stay *much* closer to the original, and that
+there is no need for jump tables or computed gotos at all. So I got a bit
+carried away, and ended up reimplementing the whole thing, for both arm and64
+and ARM.
 
- crypto/asymmetric_keys/x509_cert_parser.c |    1 -
- 1 file changed, 1 deletion(-)
+Patch #1 fixes an issue in testmgr that results in spurious false negatives
+in the chunking tests if the third chunk exceeds 31 bytes.
 
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index 865f46ea724f..c80765b211cf 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -133,7 +133,6 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
- 	return cert;
- 
- error_decode:
--	kfree(cert->pub->key);
- 	kfree(ctx);
- error_no_ctx:
- 	x509_free_certificate(cert);
+Patch #2 expands the existing CRCT10DIF test cases, to ensure that all
+code paths are actually covered.
+
+Patch #3 is a straight transliteration of the Intel code to arm64.
+
+Patch #4 is a straight transliteration of the Intel code to ARM. This patch
+is against patch #3 (using --find-copies-harder) so that it is easy to
+see how the ARM code deviates from the arm64 code.
+
+NOTE: this code uses the 64x64->128 bit polynomial multiply instruction,
+which is only available on cores that implement the v8 Crypto Extensions.
+
+Ard Biesheuvel (4):
+  crypto: testmgr - avoid overlap in chunked tests
+  crypto: testmgr - add/enhance test cases for CRC-T10DIF
+  crypto: arm64/crct10dif - port x86 SSE implementation to arm64
+  crypto: arm/crct10dif - port x86 SSE implementation to ARM
+
+ arch/arm/crypto/Kconfig               |   5 +
+ arch/arm/crypto/Makefile              |   2 +
+ arch/arm/crypto/crct10dif-ce-core.S   | 569 ++++++++++++++++++++
+ arch/arm/crypto/crct10dif-ce-glue.c   |  89 +++
+ arch/arm64/crypto/Kconfig             |   5 +
+ arch/arm64/crypto/Makefile            |   3 +
+ arch/arm64/crypto/crct10dif-ce-core.S | 518 ++++++++++++++++++
+ arch/arm64/crypto/crct10dif-ce-glue.c |  80 +++
+ crypto/testmgr.c                      |   2 +-
+ crypto/testmgr.h                      |  70 ++-
+ 10 files changed, 1314 insertions(+), 29 deletions(-)
+ create mode 100644 arch/arm/crypto/crct10dif-ce-core.S
+ create mode 100644 arch/arm/crypto/crct10dif-ce-glue.c
+ create mode 100644 arch/arm64/crypto/crct10dif-ce-core.S
+ create mode 100644 arch/arm64/crypto/crct10dif-ce-glue.c
+
+-- 
+2.7.4
