@@ -1,115 +1,74 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 2/2] mpi: Fix NULL ptr dereference in mpi_powm() [ver #3]
-Date: Thu, 24 Nov 2016 13:23:10 +0000
-Message-ID: <147999379036.9697.1535689325141840742.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 1/2] X.509: Fix double free in x509_cert_parse() [ver #3]
+Date: Thu, 24 Nov 2016 13:23:03 +0000
+Message-ID: <147999378301.9697.17367850403978012902.stgit@warthog.procyon.org.uk>
 References: <147999377574.9697.16315343355948647181.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
         dhowells@redhat.com, linux-security-module@vger.kernel.org,
         keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-ima-devel@lists.sourceforge.net,
         Andrey Ryabinin <aryabinin@virtuozzo.com>
 To: jmorris@namei.org
-Return-path: <linux-security-module-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <147999377574.9697.16315343355948647181.stgit@warthog.procyon.org.uk>
-Sender: owner-linux-security-module@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: Andrey Ryabinin <aryabinin@virtuozzo.com>
 
-This fixes CVE-2016-8650.
+We shouldn't free cert->pub->key in x509_cert_parse() because
+x509_free_certificate() also does this:
+	BUG: Double free or freeing an invalid pointer
+	...
+	Call Trace:
+	 [<ffffffff81896c20>] dump_stack+0x63/0x83
+	 [<ffffffff81356571>] kasan_object_err+0x21/0x70
+	 [<ffffffff81356ed9>] kasan_report_double_free+0x49/0x60
+	 [<ffffffff813561ad>] kasan_slab_free+0x9d/0xc0
+	 [<ffffffff81350b7a>] kfree+0x8a/0x1a0
+	 [<ffffffff81844fbf>] public_key_free+0x1f/0x30
+	 [<ffffffff818455d4>] x509_free_certificate+0x24/0x90
+	 [<ffffffff818460bc>] x509_cert_parse+0x2bc/0x300
+	 [<ffffffff81846cae>] x509_key_preparse+0x3e/0x330
+	 [<ffffffff818444cf>] asymmetric_key_preparse+0x6f/0x100
+	 [<ffffffff8178bec0>] key_create_or_update+0x260/0x5f0
+	 [<ffffffff8178e6d9>] SyS_add_key+0x199/0x2a0
+	 [<ffffffff821d823b>] entry_SYSCALL_64_fastpath+0x1e/0xad
+	Object at ffff880110bd1900, in cache kmalloc-512 size: 512
+	....
+	Freed:
+	PID = 2579
+	[<ffffffff8104283b>] save_stack_trace+0x1b/0x20
+	[<ffffffff813558f6>] save_stack+0x46/0xd0
+	[<ffffffff81356183>] kasan_slab_free+0x73/0xc0
+	[<ffffffff81350b7a>] kfree+0x8a/0x1a0
+	[<ffffffff818460a3>] x509_cert_parse+0x2a3/0x300
+	[<ffffffff81846cae>] x509_key_preparse+0x3e/0x330
+	[<ffffffff818444cf>] asymmetric_key_preparse+0x6f/0x100
+	[<ffffffff8178bec0>] key_create_or_update+0x260/0x5f0
+	[<ffffffff8178e6d9>] SyS_add_key+0x199/0x2a0
+	[<ffffffff821d823b>] entry_SYSCALL_64_fastpath+0x1e/0xad
 
-If mpi_powm() is given a zero exponent, it wants to immediately return
-either 1 or 0, depending on the modulus.  However, if the result was
-initalised with zero limb space, no limbs space is allocated and a
-NULL-pointer exception ensues.
-
-Fix this by allocating a minimal amount of limb space for the result when
-the 0-exponent case when the result is 1 and not touching the limb space
-when the result is 0.
-
-This affects the use of RSA keys and X.509 certificates that carry them.
-
-BUG: unable to handle kernel NULL pointer dereference at           (null)
-IP: [<ffffffff8138ce5d>] mpi_powm+0x32/0x7e6
-PGD 0
-Oops: 0002 [#1] SMP
-Modules linked in:
-CPU: 3 PID: 3014 Comm: keyctl Not tainted 4.9.0-rc6-fscache+ #278
-Hardware name: ASUS All Series/H97-PLUS, BIOS 2306 10/09/2014
-task: ffff8804011944c0 task.stack: ffff880401294000
-RIP: 0010:[<ffffffff8138ce5d>]  [<ffffffff8138ce5d>] mpi_powm+0x32/0x7e6
-RSP: 0018:ffff880401297ad8  EFLAGS: 00010212
-RAX: 0000000000000000 RBX: ffff88040868bec0 RCX: ffff88040868bba0
-RDX: ffff88040868b260 RSI: ffff88040868bec0 RDI: ffff88040868bee0
-RBP: ffff880401297ba8 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000047 R11: ffffffff8183b210 R12: 0000000000000000
-R13: ffff8804087c7600 R14: 000000000000001f R15: ffff880401297c50
-FS:  00007f7a7918c700(0000) GS:ffff88041fb80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000000401250000 CR4: 00000000001406e0
-Stack:
- ffff88040868bec0 0000000000000020 ffff880401297b00 ffffffff81376cd4
- 0000000000000100 ffff880401297b10 ffffffff81376d12 ffff880401297b30
- ffffffff81376f37 0000000000000100 0000000000000000 ffff880401297ba8
-Call Trace:
- [<ffffffff81376cd4>] ? __sg_page_iter_next+0x43/0x66
- [<ffffffff81376d12>] ? sg_miter_get_next_page+0x1b/0x5d
- [<ffffffff81376f37>] ? sg_miter_next+0x17/0xbd
- [<ffffffff8138ba3a>] ? mpi_read_raw_from_sgl+0xf2/0x146
- [<ffffffff8132a95c>] rsa_verify+0x9d/0xee
- [<ffffffff8132acca>] ? pkcs1pad_sg_set_buf+0x2e/0xbb
- [<ffffffff8132af40>] pkcs1pad_verify+0xc0/0xe1
- [<ffffffff8133cb5e>] public_key_verify_signature+0x1b0/0x228
- [<ffffffff8133d974>] x509_check_for_self_signed+0xa1/0xc4
- [<ffffffff8133cdde>] x509_cert_parse+0x167/0x1a1
- [<ffffffff8133d609>] x509_key_preparse+0x21/0x1a1
- [<ffffffff8133c3d7>] asymmetric_key_preparse+0x34/0x61
- [<ffffffff812fc9f3>] key_create_or_update+0x145/0x399
- [<ffffffff812fe227>] SyS_add_key+0x154/0x19e
- [<ffffffff81001c2b>] do_syscall_64+0x80/0x191
- [<ffffffff816825e4>] entry_SYSCALL64_slow_path+0x25/0x25
-Code: 56 41 55 41 54 53 48 81 ec a8 00 00 00 44 8b 71 04 8b 42 04 4c 8b 67 18 45 85 f6 89 45 80 0f 84 b4 06 00 00 85 c0 75 2f 41 ff ce <49> c7 04 24 01 00 00 00 b0 01 75 0b 48 8b 41 18 48 83 38 01 0f
-RIP  [<ffffffff8138ce5d>] mpi_powm+0x32/0x7e6
- RSP <ffff880401297ad8>
-CR2: 0000000000000000
----[ end trace d82015255d4a5d8d ]---
-
-Basically, this is a backport of a libgcrypt patch:
-
-	http://git.gnupg.org/cgi-bin/gitweb.cgi?p=libgcrypt.git;a=patch;h=6e1adb05d290aeeb1c230c763970695f4a538526
-
-Fixes: cdec9cb5167a ("crypto: GnuPG based MPI lib - source files (part 1)")
+Fixes: db6c43bd2132 ("crypto: KEYS: convert public key and digsig asym to the akcipher api")
 Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Cc: <stable@vger.kernel.org>
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
-cc: linux-ima-devel@lists.sourceforge.net
-cc: stable@vger.kernel.org
 ---
 
- lib/mpi/mpi-pow.c |    7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ crypto/asymmetric_keys/x509_cert_parser.c |    1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/lib/mpi/mpi-pow.c b/lib/mpi/mpi-pow.c
-index 5464c8744ea9..e24388a863a7 100644
---- a/lib/mpi/mpi-pow.c
-+++ b/lib/mpi/mpi-pow.c
-@@ -64,8 +64,13 @@ int mpi_powm(MPI res, MPI base, MPI exp, MPI mod)
- 	if (!esize) {
- 		/* Exponent is zero, result is 1 mod MOD, i.e., 1 or 0
- 		 * depending on if MOD equals 1.  */
--		rp[0] = 1;
- 		res->nlimbs = (msize == 1 && mod->d[0] == 1) ? 0 : 1;
-+		if (res->nlimbs) {
-+			if (mpi_resize(res, 1) < 0)
-+				goto enomem;
-+			rp = res->d;
-+			rp[0] = 1;
-+		}
- 		res->sign = 0;
- 		goto leave;
- 	}
-
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index 865f46ea724f..c80765b211cf 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -133,7 +133,6 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
+ 	return cert;
+ 
+ error_decode:
+-	kfree(cert->pub->key);
+ 	kfree(ctx);
+ error_no_ctx:
+ 	x509_free_certificate(cert);
