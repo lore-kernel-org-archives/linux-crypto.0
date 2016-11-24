@@ -1,63 +1,57 @@
-From: <e.camilla.johansson@gmail.com>
-Subject: 53486 linux-crypto
-Date: Thu, 24 Nov 2016 06:32:53 -0000
-Message-ID: <147996917337.19811.1606826759980568057@voxconexao.com.br>
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH 0/2] KEYS: Fixes [ver #3]
+Date: Thu, 24 Nov 2016 13:22:55 +0000
+Message-ID: <147999377574.9697.16315343355948647181.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: application/zip; name="INFO_93352944885680_linux-crypto.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 187-62-203-35.blr.voxconexao.com.br ([187.62.203.35]:38261 "HELO
-        voxconexao.com.br" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1750935AbcKXGdi (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Nov 2016 01:33:38 -0500
-Content-Disposition: attachment
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: dhowells@redhat.com, linux-security-module@vger.kernel.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+To: jmorris@namei.org
+Return-path: <linux-security-module-owner@vger.kernel.org>
+Sender: owner-linux-security-module@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-UEsDBBQAAgAIACVjeElLsuVFOQkAADsJAAATABwARU1BSUxfMTAxNjBfWklQLnppcFVUCQADxoc2
-WMaHNlh1eAsAAQQAAAAABAAAAAB1lnk0FAobxscsmCyDQRqDYmyTxHAZW8hFYsY2gxERSkSWMJOb
-sV/LJE0qa1lGlmEkZYuQfSukIq49S1ySbZRlbn33v3vO95zzPM/7vue8//9sLEFgUQAQwAuQ96RY
-2MH4hZN4AYBZBAAgCEACTHHGFlZu6mrqWmqqvjeIBCgA1Jmg5fTLoRQ+ABcY8FP/i3gS7sZfdcIG
-F5o9fFXljiJJDlrZFCL+fHaKVoLruFhpb0XWEuDecWgMykjoOLRop5kHbCTiCdc4s+RuMMv49mN7
-5SNo0WZCDQ8RS86XHHvnx77kyKCylVac3J3dvuqI3BvRo8/tUPaCmyMjIj8YN9Ekek84QhJqf6TN
-HTqidgLC9gxX3foxI4IfS1AxUHQCm1vMMcmUZYj/VhmfWX5M8+qW1QCDHgXWfsKVXvL2LWP7ZV2A
-kPa6G7WpPmpNM6Td5diunOpAm8anWasDf6BMUYuUlhpTgVkReFFi9KL59om6i869cX3SXdB9mjH7
-AFcDKTRJ6DnO+Jj32J18mBNS8i3vfMzXfttcsH5cnvrallzXj2+HfpVLgWGXX/2daIGyuDblXC2b
-yNLQZ97vlq3+W7ktqNvrPIm7I69feedszYU6cccHnzExhggCjTqpL2du4MUvyV9RC0LkC175pOPQ
-h9RO9rySyUbtLuhmotAzvZPrcuWthdaevXKZ9kf5t0JmBEh89qRZGX4X7xHxc7/dE8B+LXTdpF+P
-3uC9XBVAjG/+Y8be3WJOkBy/DAfdShw7FVMcm3wS0ZMx3YxAwlOD+RL7EN7AICCDzM1btj5pUJzJ
-lA9YHZfO6x7QeHbqEiO3pDYplpSRYBEzGmU3qp69oO0WCfPgww4OdSb5L5Kz+goKSm+/6Uyo2uet
-db+vNtoisuAgQs5+YY7jp/FrPXvRw06KBxXCf9cKN7VcyTZHNpqY6jkVvfPtCOBQm/J8HuBtMsf0
-hr8DpgZVem1O+8u2zxj16dvWo+WcyQ8/33dQS3QAy4eI8LYVRDS9CSRoKlkT7VrPYOo4y5F7lVkC
-/GEhS/7+wkub8ahrIZ/a2nuhzDOQaJPC8GP2H0ex36Y1iCDZU+WeJtWxFUqLJP2zRcyznbt2fj65
-ljFpwuPdVZGFMqouKTdIDwPjHEr4RAOYyBQ+1kxlGOJA5v2fN0yeCFvxIBs0z7Z9hyc6EyuD3nWD
-KwbaiKyO8rxnYo0Jbq2pxg126lcnOvNNQ9fVbWidiHRo+akGeGj+S3mxtfkM5/qzYnsSLs5p+UJY
-hlbfoMr+1EXl6Mt3eKs3cvL4mkoUMaYKbwQ5Kl9OWCEeeZZ+PN7AXvPH2pmetveBm6dX4aRWT3wN
-pJeitK9f4uzr5ExbQQmB2cBge2kdNNrCxlfNe+txi1PQ0YypyAY9mYymYjqTkEPan8ABByIHg5Dz
-wUY1Ic8tg2RklcyUPXxoPenFWGRMzMNSBHwe2V0kc93HqkSIGdKh0m9TsJnlgJFicR95XXOA9Eq8
-vROytFKspBIVj+AtBy+z6OHJ3yE8LkvhRRsZC/jnkQcjN4SsgktZznLD7VkXdmoavSYZYO9jTDPC
-3sKc5Bk2s0suOnbbk2X04TsxqNQ+c2Bh9Xv/Gra1x/3dzdxHZZnxIgZ+V79NGpOk47TGAkoxDwuq
-Txxaja+/HPukcT6ESkJTk5NxnYPPhqWchiUGI5xk+8wuZxDrNG7poC4MvV/QPqFkr5VdKkikGCgQ
-nuzB/lhZNvP70WUsz1KBZ4Xhj7/viGMG5zDRpnPkralk+hq3pUQmr5RHo0/xXSPhN3dTBqMfYjJs
-k97vn7b1OLncsE4rvqvhBNN8XstpDar7gdEtUCp4MO/d3wa7kwwkpjBVxk2dAEN5Idb4cuv6m0fI
-tiVD4D7usvvWbm04Uf/3gPoXqagNPuv3asRgzRcO+S/w05tPUZI5SsZ63oRAssKKTQqfOTroUEK+
-P/gvkZGdg60d/+ZMaYun4NcRd/zQp0mija50hvOHimFf4ujITMmfDM2HnD5RsEJOu9c9+aqKciX8
-Jr0ygYFcpPOvSOJsdYmqkTnA/et8lH3upiSIYoTw+hhumrymmj1stV1U+FYOXnmvlVRlmxvn0z77
-Izq9fNPEUrbkC5fBvajhJthuhJAT8/CvqEReWI8oPU2cJ4dgpu2xTPDd8F3rfu3c+Bot0HItNHqx
-LGqxX2oPXdDZQ62T5dJ35MGHv7u8c9fH9oMMRXdRVnhI+UjTdOxNbs1Nfvk2L4i45ZFb9Meu9syX
-PYrhnscCMZsZE+jX9cw/UrY6oP3gG1Rcn2Tu2RUdshqb1SJDBwxwXgbApZQ3VVeMoOVz2Ok3bVFu
-LxeHEI+vqzcQKsPzTbtwkl9cCvaUOupnPusOAMrOAZ+6ASfzWqWOPgDOp82q+OjCkPbD6jiT/gQL
-moK1Zih2hGYTW30AKIMBaBjAVCigGR9brZy9Wryg1H9fqehj+98R+lk5VJ3JpkaX02LmbePSNOyU
-69NcZKrqaQEKmz0Be0rmNCRfooXFWG4Nfzj5PD4vDlMRHD0VoffI9Qnv7rBp5XmMk5TsuqRhpQRt
-JE38VTI25vPhMuyCU3i3F4qqOV6PAIm7CeI7Fdyl0FFpd15Dc3YWxO4UmVFXZ1t0aZBJNYFyVtrm
-su4SK+f6arbjtAClRfcdaBIJ3tX4LRCTBb7mDcMzeTK8j1XUzSYK/g5d8lgzbNtG5t287dCt4CCV
-W1nmz3MRCioGuU6T1AN1kVyPt4GKNQiKg+iuq+F6w/FK0U97ZfOCXYwH5L7zU6PNJBjnClkv/VQ5
-PF6tMXT7u/FiPrdjYSsYl1Jo2TsXVAG/0vB1c8PLgN0ZXn9z5OdBZKeOdlMs8bdzGl6yaVMZ0U8y
-ITQy8FAIugvyVhxwWXox7WyWxr7QtRGWzZkdWilTvJY1vuGVSmGPnUvXTgVq9Is/mldYkXcNfVbP
-ucR+y5kgXFxwqwP1PbOjZ45SIu25Dj9DKBOG60W3W6QO4mA1+qe6Wr+sje2xWJZrYJkwcm1tGuaV
-Mwx7FNUQxX7CMl5oViSRmgMhnVR3WMiRDN/u4MeOh3vI1CIqdmMM61R1GDRf4HctyVTl/q0ITqSN
-JRdQGvT/kEbiF6sAuH66MPrX9F/AgfwLOP+BGxtLCPe/f1wAws8e4v21/QNQSwECHgMUAAIACAAl
-Y3hJS7LlRTkJAAA7CQAAEwAYAAAAAAAAAAAApIEAAAAARU1BSUxfMTAxNjBfWklQLnppcFVUBQAD
-xoc2WHV4CwABBAAAAAAEAAAAAFBLBQYAAAAAAQABAFkAAACGCQAAAAA=
+
+Hi James,
+
+Can you pull these patches please and pass them on to Linus?  They include
+the following:
+
+ (1) Fix mpi_powm()'s handling of a number with a zero exponent [CVE-2016-8650].
+
+ (2) Fix double free in X.509 error handling.
+
+Ver #3:
+
+ - Integrate my and Andrey's patches for mpi_powm() and use mpi_resize()
+   instead of RESIZE_IF_NEEDED() - the latter adds a duplicate check into
+   the execution path of a trivial case we don't normally expect to be
+   taken.
+
+Ver #2:
+
+ - Use RESIZE_IF_NEEDED() to conditionally resize the result rather than
+   manually doing this.
+
+The patches can be found here also:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-fixes
+
+Tagged thusly:
+
+	git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git
+	keys-fixes-20161124-3
+
+David
+---
+Andrey Ryabinin (2):
+      X.509: Fix double free in x509_cert_parse()
+      mpi: Fix NULL ptr dereference in mpi_powm()
+
+
+ crypto/asymmetric_keys/x509_cert_parser.c |    1 -
+ lib/mpi/mpi-pow.c                         |    7 ++++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
