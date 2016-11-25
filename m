@@ -1,104 +1,153 @@
-From: <service@burdadirect.de>
-Subject: 40147 linux-crypto
-Date: Thu, 24 Nov 2016 19:05:51 -0000
-Message-ID: <148001435141.29748.15606416404683147246@vnpt-hanoi.com.vn>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: bug in blkcipher_walk code
+Date: Fri, 25 Nov 2016 13:43:41 +0100
+Message-ID: <3805767.QuT5G9UC4v@positron.chronox.de>
+References: <1833318.YYJALW9cvC@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: application/zip; name="INFO_628278483951873_linux-crypto.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from static.vnpt-hanoi.com.vn ([113.190.226.159]:52646 "HELO
-        vnpt-hanoi.com.vn" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1755236AbcKXTF5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Nov 2016 14:05:57 -0500
-Content-Disposition: attachment
+Received: from mail.eperm.de ([89.247.134.16]:50998 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753888AbcKYMn5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 25 Nov 2016 07:43:57 -0500
+In-Reply-To: <1833318.YYJALW9cvC@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
-AAEAAQBZAAAAjRIAAAAA
+Am Freitag, 18. November 2016, 12:31:10 CET schrieb Stephan Mueller:
+
+Hi Herbert,
+
+> Hi Herbert,
+> 
+> Once in a while I seem to trigger a bug in the blkcipher_walk code which I
+> cannot track down. This bug happens sporadically where I assume that it has
+> something to do with the memory management in the slow path of
+> blkcipher_walk.
+> 
+> I am using the CTR DRBG code that in turn uses the ctr-aes-aesni
+> implementation. The bug only appears when I want to obtain a random number
+> that is less than the CTR AES block size. In my particular case, I want 4
+> bytes from the DRBG.
+> 
+> The bug happens in arch/x86/crypto/aesni-intel_glue.c:ctr_crypt_final() at
+> the line:
+> 
+> 	memcpy(dst, keystream, nbytes);
+> 
+> The bug looks like the following:
+> 
+> [   12.328676] BUG: unable to handle kernel paging request at
+> ffffa17ae418b988 [   12.328680] IP: [<ffffffff82060eea>]
+> ctr_crypt+0x19a/0x1c0
+> [   12.328681] PGD 66fed067
+> [   12.328681] PUD 0
+> [   12.328681]
+> [   12.328683] Oops: 0002 [#1] SMP
+> [   12.328692] Modules linked in: bridge(+) stp llc ebtable_nat ip6table_raw
+> ip6table_security ip6table_mangle iptable_raw iptable_security
+> iptable_mangle ebtable_filter ebtables ip6table_filter ip6_tables
+> crct10dif_pclmul crc32_pclmul ghash_clmulni_intel pcspkr i2c_piix4
+> virtio_net virtio_balloon acpi_cpufreq sch_fq_codel virtio_console
+> virtio_blk virtio_pci virtio_ring serio_raw crc32c_intel virtio
+> [   12.328693] CPU: 0 PID: 521 Comm: modprobe Not tainted 4.9.0-rc1+ #253
+> [   12.328694] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> 1.9.1-1.fc24 04/01/2014
+> [   12.328694] task: ffffa17ab8453fc0 task.stack: ffffbdafc0744000
+> [   12.328696] RIP: 0010:[<ffffffff82060eea>]  [<ffffffff82060eea>]
+> ctr_crypt +0x19a/0x1c0
+> [   12.328696] RSP: 0018:ffffbdafc0747a60  EFLAGS: 00010002
+> [   12.328697] RAX: 0000000032e455a6 RBX: 0000000000000004 RCX:
+> 0000000000000002
+> [   12.328697] RDX: 0000000000000001 RSI: 0000000000000086 RDI:
+> 0000000000000086
+> [   12.328698] RBP: ffffbdafc0747b28 R08: ffffa17abc16e900 R09:
+> 0000000000000019
+> [   12.328698] R10: ffffa17a764f68b0 R11: 000000000002e918 R12:
+> ffffbdafc0747b38
+> [   12.328698] R13: ffffa17a764f6840 R14: ffffa17ae418b988 R15:
+> ffffbdafc0747a70
+> [   12.328699] FS:  00007f55f57a6700(0000) GS:ffffa17abfc00000(0000) knlGS:
+> 0000000000000000
+> [   12.328700] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [   12.328700] CR2: ffffa17ae418b988 CR3: 0000000079b26000 CR4:
+> 00000000003406f0
+> [   12.328703] Stack:
+> [   12.328705]  ffffa17abc16e900 ffffa17ab845fd80 2ae7e40732e455a6
+> 3a224612a8f9841d
+> [   12.328706]  fffffb4e81e117c0 ffffa17ab845fd80 fffffb4e829062c0
+> ffffa17ae418b988
+> [   12.328707]  ffffbdafc0747ba8 ffffffff00000d80 ffffffff00000004
+> ffffbdafc0747bc8
+> [   12.328708] Call Trace:
+> [   12.328712]  [<ffffffff823e5fd3>] __ablk_encrypt+0x43/0x50
+> [   12.328714]  [<ffffffff823e6012>] ablk_encrypt+0x32/0xc0
+> [   12.328716]  [<ffffffff823c4f2e>] skcipher_encrypt_ablkcipher+0x5e/0x60
+> [   12.328717]  [<ffffffff823dbb80>] drbg_kcapi_sym_ctr+0xb0/0x130
+> [   12.328719]  [<ffffffff823de153>] drbg_ctr_generate+0x53/0x80
+> 
+> 
+> Now, the interesting part is the following: the original memory pointer that
+> shall be processed by the DRBG is in my example ffffffffc018b988 -- this
+> pointer is used until the DRBG invokes crypto_skcipher_encrypt. However,
+> when I print out the buffer pointer that is used as dst in the memcpy of
+> ctr_crypt_final, I see ffffa17ae418b988 -- i.e. the buffer that causes
+> paging failure.
+> 
+> During tracing the blkcipher_walk code I see that the slow code path is used
+> when the request size is smaller than the block size. That slow code path
+> allocates new memory that will be used for the dst pointer in
+> ctr_crypt_final.
+> 
+> May I ask you for checking whether the allocation and the memory pointer
+> logic has an issue that would cause a paging failure?
+
+Following up this issue, I found the location where the wrong memory pointer 
+is produced -- the following call tree is used:
+
+1. set up of SGL with proper pointer
+
+2. skcipher_encrypt_ablkcipher with SGL
+
+3. invocation of ctr_crypt from arch/x86/crypto/aesni-intel_glue.c
+
+4. blkcipher_walk_virt_block
+
+5. blkcipher_walk_first
+
+6. blkcipher_walk_next (this code does not use the code path to allocate a 
+page)
+
+7. blkcipher_next_fast
+
+        walk->dst.virt.addr = walk->src.virt.addr;
+			-> copy src virt address into dst address pointer
+
+		Now, the diff path is used:
+        if (diff) {
+                walk->flags |= BLKCIPHER_WALK_DIFF;
+                blkcipher_map_dst(walk);
+        }
+
+8. blkcipher_map_dst
+
+        walk->dst.virt.addr = scatterwalk_map(&walk->out);
+
+		==> this pointer is wrong
+
+The interesting point is that step 8 gets the low and high bits right, but not 
+the bits in the middle:
+
+The real data pointer for the dst buffer is ffffffffc0332988. The data pointer 
+used by the crypto API is ffff96a995332988 -- as often as I see the issue, 
+this similarity in the pointer values is always there.
+
+
+Please note that the caller uses a static variable that shall be used as dst 
+buffer.
+
+Thanks
+Stephan
