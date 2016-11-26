@@ -1,143 +1,151 @@
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Subject: RE: [PATCH v2 0/2] virtio-crypto: add Linux driver
-Date: Sat, 26 Nov 2016 09:38:16 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020D979FA2E@SZXEMA503-MBS.china.huawei.com>
-References: <1479802223-121104-1-git-send-email-arei.gonglei@huawei.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH] crypto: CTR DRBG - prevent invalid SG mappings
+Date: Sat, 26 Nov 2016 09:54:14 +0100
+Message-ID: <2300597.UdE444b3Re@positron.chronox.de>
+References: <1833318.YYJALW9cvC@positron.chronox.de> <3805767.QuT5G9UC4v@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: Luonengjun <luonengjun@huawei.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>,
-        "Wubin (H)" <wu.wubin@huawei.com>,
-        "xin.zeng@intel.com" <xin.zeng@intel.com>,
-        Claudio Fontana <Claudio.Fontana@huawei.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>,
-        "Hanweidong (Randy)" <hanweidong@huawei.com>,
-        "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>,
-        "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>,
-        "Xuquan (Quan Xu)" <xuquan8@huawei.com>,
-        longpeng <longpeng2@huawei.com>,
-        "salvatore.benedetto@intel.com" <salvat
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
-        "virtualization@lists.linux-foundation.org"
-        <virtualization@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga03-in.huawei.com ([119.145.14.66]:21159 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750791AbcKZJif (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 26 Nov 2016 04:38:35 -0500
-In-Reply-To: <1479802223-121104-1-git-send-email-arei.gonglei@huawei.com>
-Content-Language: zh-CN
+Received: from mail.eperm.de ([89.247.134.16]:51000 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750845AbcKZUBd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 26 Nov 2016 15:01:33 -0500
+In-Reply-To: <3805767.QuT5G9UC4v@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Hi Herbert,
 
-> -----Original Message-----
-> From: Gonglei (Arei)
-> Sent: Tuesday, November 22, 2016 4:10 PM
-> To: linux-kernel@vger.kernel.org; qemu-devel@nongnu.org;
-> virtio-dev@lists.oasis-open.org; virtualization@lists.linux-foundation.org;
-> linux-crypto@vger.kernel.org
-> Subject: [PATCH v2 0/2] virtio-crypto: add Linux driver
-> 
-> The virtio crypto device is a virtual cryptography device
-> as well as a kind of virtual hardware accelerator for
-> virtual machines. The encryption anddecryption requests
-> are placed in the data queue and are ultimately handled by
-> thebackend crypto accelerators. The second queue is the
-> control queue used to create or destroy sessions for
-> symmetric algorithms and will control some advanced features
-> in the future. The virtio crypto device provides the following
-> cryptoservices: CIPHER, MAC, HASH, and AEAD.
-> 
-> For more information about virtio-crypto device, please see:
->   http://qemu-project.org/Features/VirtioCrypto
-> 
-> For better reviewing:
-> 
-> Patch 1 introduces the little edian functions for VIRTIO_1
-> devices.
-> 
-> Patch 2 mainly includes five files:
->  1) virtio_crypto.h is the header file for virtio-crypto device,
-> which is based on the virtio-crypto specification.
->  2) virtio_crypto.c is the entry of the driver module,
-> which is similar with other virtio devices, such as virtio-net,
-> virtio-input etc.
->  3) virtio_crypto_mgr.c is used to manage the virtio
-> crypto devices in the system. We support up to 32 virtio-crypto
-> devices currently. I use a global list to store the virtio crypto
-> devices which refer to Intel QAT driver. Meanwhile, the file
-> includs the functions of add/del/search/start/stop for virtio
-> crypto devices.
->  4) virtio_crypto_common.h is a private header file for virtio
-> crypto driver, includes structure definations, and function declarations.
->  5) virtio_crypto_algs.c is the realization of algs based on Linux Crypto
-> Framwork,
-> which can register different crypto algorithms. Currently it's only support
-> AES-CBC.
-> The Crypto guys can mainly focus to this file.
-> 
-> Actually I have no idea the virtio-crypto driver should be gone in whose
-> tree, Michael's or Herbert's?
-> 
-> Would you give me a feedback? Thanks a lot!
-> 
-Ping?
+as discussed in another thread, SGs must not be used with stack memory 
+pointers. This issue was the culprit to the error I see with the CTR DRBG. The 
+attached patch fixes the issue.
 
-Any ideas? Thanks.
+---8<---
 
-Regards,
--Gonglei
+When using SGs, only heap memory (memory that is valid as per
+virt_addr_valid) is allowed to be referenced. The CTR DRBG used to
+reference the caller-provided memory directly in an SG. In case the
+caller provided stack memory pointers, the SG mapping is not considered
+to be valid. In some cases, this would even cause a paging fault.
 
-> 
-> v2:
->  - stop doing DMA from the stack, CONFIG_VMAP_STACK=y [Salvatore]
->  - convert __virtio32/64 to __le32/64 in virtio_crypto.h
->  - remove VIRTIO_CRYPTO_S_STARTED based on the lastest virtio crypto spec.
->  - introduces the little edian functions for VIRTIO_1 devices in patch 1.
-> 
-> Gonglei (2):
->   virtio: introduce little edian functions for virtio_cread/write#
->     family
->   crypto: add virtio-crypto driver
-> 
->  MAINTAINERS                                  |   8 +
->  drivers/crypto/Kconfig                       |   2 +
->  drivers/crypto/Makefile                      |   1 +
->  drivers/crypto/virtio/Kconfig                |  10 +
->  drivers/crypto/virtio/Makefile               |   5 +
->  drivers/crypto/virtio/virtio_crypto.c        | 444
-> +++++++++++++++++++++++
->  drivers/crypto/virtio/virtio_crypto_algs.c   | 524
-> +++++++++++++++++++++++++++
->  drivers/crypto/virtio/virtio_crypto_common.h | 124 +++++++
->  drivers/crypto/virtio/virtio_crypto_mgr.c    | 258 +++++++++++++
->  include/linux/virtio_config.h                |  45 +++
->  include/uapi/linux/Kbuild                    |   1 +
->  include/uapi/linux/virtio_crypto.h           | 435
-> ++++++++++++++++++++++
->  include/uapi/linux/virtio_ids.h              |   1 +
->  13 files changed, 1858 insertions(+)
->  create mode 100644 drivers/crypto/virtio/Kconfig
->  create mode 100644 drivers/crypto/virtio/Makefile
->  create mode 100644 drivers/crypto/virtio/virtio_crypto.c
->  create mode 100644 drivers/crypto/virtio/virtio_crypto_algs.c
->  create mode 100644 drivers/crypto/virtio/virtio_crypto_common.h
->  create mode 100644 drivers/crypto/virtio/virtio_crypto_mgr.c
->  create mode 100644 include/uapi/linux/virtio_crypto.h
-> 
-> --
-> 1.8.3.1
-> 
+The change adds a new scratch buffer that is used in case the
+caller-provided buffer is deemed not suitable for use in an SG. The
+crypto operation of the CTR DRBG produces its output with that scratch
+buffer.
+
+The scratch buffer is allocated during allocation time of the CTR DRBG
+as its access is protected with the DRBG mutex.
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/drbg.c         | 35 +++++++++++++++++++++++++++++++----
+ include/crypto/drbg.h |  2 ++
+ 2 files changed, 33 insertions(+), 4 deletions(-)
+
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 9a95b61..cbbd19f 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -262,6 +262,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+ 			      u8 *inbuf, u32 inbuflen,
+ 			      u8 *outbuf, u32 outlen);
+ #define DRBG_CTR_NULL_LEN 128
++#define DRBG_OUTSCRATCHLEN DRBG_CTR_NULL_LEN
+ 
+ /* BCC function for CTR DRBG as defined in 10.4.3 */
+ static int drbg_ctr_bcc(struct drbg_state *drbg,
+@@ -1644,6 +1645,9 @@ static int drbg_fini_sym_kernel(struct drbg_state *drbg)
+ 	kfree(drbg->ctr_null_value_buf);
+ 	drbg->ctr_null_value = NULL;
+ 
++	kfree(drbg->outscratchpadbuf);
++	drbg->outscratchpadbuf = NULL;
++
+ 	return 0;
+ }
+ 
+@@ -1708,6 +1712,15 @@ static int drbg_init_sym_kernel(struct drbg_state 
+*drbg)
+ 	drbg->ctr_null_value = (u8 *)PTR_ALIGN(drbg->ctr_null_value_buf,
+ 					       alignmask + 1);
+ 
++	drbg->outscratchpadbuf = kmalloc(DRBG_OUTSCRATCHLEN + alignmask,
++					 GFP_KERNEL);
++	if (!drbg->outscratchpadbuf) {
++		drbg_fini_sym_kernel(drbg);
++		return -ENOMEM;
++	}
++	drbg->outscratchpad = (u8 *)PTR_ALIGN(drbg->outscratchpadbuf,
++					      alignmask + 1);
++
+ 	return alignmask;
+ }
+ 
+@@ -1737,15 +1750,22 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+ 			      u8 *outbuf, u32 outlen)
+ {
+ 	struct scatterlist sg_in;
++	bool virt_addr_valid = virt_addr_valid(outbuf);
++	int ret = 0;
+ 
+ 	sg_init_one(&sg_in, inbuf, inlen);
+ 
+ 	while (outlen) {
+ 		u32 cryptlen = min_t(u32, inlen, outlen);
+ 		struct scatterlist sg_out;
+-		int ret;
+ 
+-		sg_init_one(&sg_out, outbuf, cryptlen);
++		/* If output buffer is not valid for SGL, use scratchpad */
++		if (virt_addr_valid)
++			sg_init_one(&sg_out, outbuf, cryptlen);
++		else {
++			cryptlen = min_t(u32, cryptlen, DRBG_OUTSCRATCHLEN);
++			sg_init_one(&sg_out, drbg->outscratchpad, cryptlen);
++		}
+ 		skcipher_request_set_crypt(drbg->ctr_req, &sg_in, &sg_out,
+ 					   cryptlen, drbg->V);
+ 		ret = crypto_skcipher_encrypt(drbg->ctr_req);
+@@ -1761,15 +1781,22 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+ 				break;
+ 			}
+ 		default:
+-			return ret;
++			goto out;
+ 		}
+ 		init_completion(&drbg->ctr_completion);
+ 
++		if (!virt_addr_valid)
++			memcpy(outbuf, drbg->outscratchpad, cryptlen);
++
+ 		outlen -= cryptlen;
+ 		outbuf += cryptlen;
+ 	}
++	ret = 0;
+ 
+-	return 0;
++out:
++	if (!virt_addr_valid)
++		memzero_explicit(drbg->outscratchpad, DRBG_OUTSCRATCHLEN);
++	return ret;
+ }
+ #endif /* CONFIG_CRYPTO_DRBG_CTR */
+ 
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index 61580b1..22f884c 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -124,6 +124,8 @@ struct drbg_state {
+ 	struct skcipher_request *ctr_req;	/* CTR mode request handle */
+ 	__u8 *ctr_null_value_buf;		/* CTR mode unaligned buffer */
+ 	__u8 *ctr_null_value;			/* CTR mode aligned zero buf */
++	__u8 *outscratchpadbuf;			/* CTR mode output scratchpad */
++        __u8 *outscratchpad;			/* CTR mode aligned outbuf */
+ 	struct completion ctr_completion;	/* CTR mode async handler */
+ 	int ctr_async_err;			/* CTR mode async error */
+ 
+-- 
+2.9.3
