@@ -1,996 +1,2121 @@
-From: kbuild test robot <lkp@intel.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 Subject: Re: [PATCH v3] crypto: add virtio-crypto driver
-Date: Tue, 29 Nov 2016 00:02:18 +0800
-Message-ID: <201611282337.Z6RGmXfk%fengguang.wu@intel.com>
-References: <1480334903-6672-2-git-send-email-arei.gonglei@huawei.com>
+Date: Mon, 28 Nov 2016 16:20:55 +0000
+Message-ID: <20161128162055.GB11196@stefanha-x1.localdomain>
+References: <1480334903-6672-1-git-send-email-arei.gonglei@huawei.com>
+ <1480334903-6672-2-git-send-email-arei.gonglei@huawei.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="PNTmBPCT7hxwcZjr"
-Cc: kbuild-all@01.org, linux-kernel@vger.kernel.org,
-        qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org,
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="IiVenqGWf+H9Y6IX"
+Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org,
+        virtio-dev@lists.oasis-open.org,
         virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, luonengjun@huawei.com,
-        mst@redhat.com, stefanha@redhat.com, weidong.huang@huawei.com,
-        wu.wubin@huawei.com, xin.zeng@intel.com,
+        linux-crypto@vger.kernel.org, luonengjun@huawei.com, mst@redhat.com,
+        weidong.huang@huawei.com, wu.wubin@huawei.com, xin.zeng@intel.com,
         claudio.fontana@huawei.com, herbert@gondor.apana.org.au,
-        pasic@linux.vnet.ibm.com, davem@davemloft.net,
-        jianjay.zhou@huawei.com, hanweidong@huawei.com,
-        arei.gonglei@hotmail.com, cornelia.huck@de.ibm.com,
-        xuquan8@huawei.com, longpeng2@huawei.com,
-        salvatore.benedetto@intel.com, Gonglei <arei.gonglei@huawei.com>
+        pasic@linux.vnet.ibm.com, davem@davemloft.net, jianjay.zhou@huawei.com,
+        hanweidong@huawei.com, arei.gonglei@hotmail.com,
+        cornelia.huck@de.ibm.com, xuquan8@huawei.com, longpeng2@huawei.com,
+        salvatore.benedetto@intel.com
 To: Gonglei <arei.gonglei@huawei.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:1416 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932373AbcK1QDD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Nov 2016 11:03:03 -0500
+Return-path: <virtio-dev-return-1732-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Sender: <virtio-dev@lists.oasis-open.org>
+List-Post: <mailto:virtio-dev@lists.oasis-open.org>
+List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
+List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
+List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
 Content-Disposition: inline
 In-Reply-To: <1480334903-6672-2-git-send-email-arei.gonglei@huawei.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Id: linux-crypto.vger.kernel.org
 
-
---PNTmBPCT7hxwcZjr
+--IiVenqGWf+H9Y6IX
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hi Gonglei,
+On Mon, Nov 28, 2016 at 08:08:23PM +0800, Gonglei wrote:
+> This patch introduces virtio-crypto driver for Linux Kernel.
+>=20
+> The virtio crypto device is a virtual cryptography device
+> as well as a kind of virtual hardware accelerator for
+> virtual machines. The encryption anddecryption requests
+> are placed in the data queue and are ultimately handled by
+> thebackend crypto accelerators. The second queue is the
+> control queue used to create or destroy sessions for
+> symmetric algorithms and will control some advanced features
+> in the future. The virtio crypto device provides the following
+> cryptoservices: CIPHER, MAC, HASH, and AEAD.
+>=20
+> For more information about virtio-crypto device, please see:
+>   http://qemu-project.org/Features/VirtioCrypto
 
-[auto build test ERROR on cryptodev/master]
-[also build test ERROR on v4.9-rc7 next-20161128]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+I've left some comments below.
 
-url:    https://github.com/0day-ci/linux/commits/Gonglei/crypto-add-virtio-crypto-driver/20161128-214706
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: sparc-allmodconfig (attached as .config)
-compiler: sparc64-linux-gnu-gcc (Debian 6.1.1-9) 6.1.1 20160705
-reproduce:
-        wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # save the attached .config to linux build tree
-        make.cross ARCH=sparc 
+>=20
+> CC: Michael S. Tsirkin <mst@redhat.com>
+> CC: Cornelia Huck <cornelia.huck@de.ibm.com>
+> CC: Stefan Hajnoczi <stefanha@redhat.com>
+> CC: Herbert Xu <herbert@gondor.apana.org.au>
+> CC: Halil Pasic <pasic@linux.vnet.ibm.com>
+> CC: David S. Miller <davem@davemloft.net>
+> CC: Zeng Xin <xin.zeng@intel.com>
+> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+> ---
+>  MAINTAINERS                                  |   9 +
+>  drivers/crypto/Kconfig                       |   2 +
+>  drivers/crypto/Makefile                      |   1 +
+>  drivers/crypto/virtio/Kconfig                |  10 +
+>  drivers/crypto/virtio/Makefile               |   5 +
+>  drivers/crypto/virtio/virtio_crypto.c        | 451 +++++++++++++++++++++=
+++
+>  drivers/crypto/virtio/virtio_crypto_algs.c   | 525 +++++++++++++++++++++=
+++++++
+>  drivers/crypto/virtio/virtio_crypto_common.h | 124 +++++++
+>  drivers/crypto/virtio/virtio_crypto_mgr.c    | 258 +++++++++++++
+>  include/uapi/linux/Kbuild                    |   1 +
+>  include/uapi/linux/virtio_crypto.h           | 450 +++++++++++++++++++++=
+++
+>  include/uapi/linux/virtio_ids.h              |   1 +
+>  12 files changed, 1837 insertions(+)
+>  create mode 100644 drivers/crypto/virtio/Kconfig
+>  create mode 100644 drivers/crypto/virtio/Makefile
+>  create mode 100644 drivers/crypto/virtio/virtio_crypto.c
+>  create mode 100644 drivers/crypto/virtio/virtio_crypto_algs.c
+>  create mode 100644 drivers/crypto/virtio/virtio_crypto_common.h
+>  create mode 100644 drivers/crypto/virtio/virtio_crypto_mgr.c
+>  create mode 100644 include/uapi/linux/virtio_crypto.h
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index ad9b965..cccaaf0 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -12810,6 +12810,7 @@ F:	drivers/net/virtio_net.c
+>  F:	drivers/block/virtio_blk.c
+>  F:	include/linux/virtio_*.h
+>  F:	include/uapi/linux/virtio_*.h
+> +F:	drivers/crypto/virtio/
+> =20
+>  VIRTIO DRIVERS FOR S390
+>  M:	Christian Borntraeger <borntraeger@de.ibm.com>
+> @@ -12846,6 +12847,14 @@ S:	Maintained
+>  F:	drivers/virtio/virtio_input.c
+>  F:	include/uapi/linux/virtio_input.h
+> =20
+> +VIRTIO CRYPTO DRIVER
+> +M:  Gonglei <arei.gonglei@huawei.com>
+> +L:  virtualization@lists.linux-foundation.org
+> +L:  linux-crypto@vger.kernel.org
+> +S:  Maintained
+> +F:  drivers/crypto/virtio/
+> +F:  include/uapi/linux/virtio_crypto.h
+> +
+>  VIA RHINE NETWORK DRIVER
+>  S:	Orphan
+>  F:	drivers/net/ethernet/via/via-rhine.c
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 4d2b81f..7956478 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -555,4 +555,6 @@ config CRYPTO_DEV_ROCKCHIP
+> =20
+>  source "drivers/crypto/chelsio/Kconfig"
+> =20
+> +source "drivers/crypto/virtio/Kconfig"
+> +
+>  endif # CRYPTO_HW
+> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+> index ad7250f..bc53cb8 100644
+> --- a/drivers/crypto/Makefile
+> +++ b/drivers/crypto/Makefile
+> @@ -32,3 +32,4 @@ obj-$(CONFIG_CRYPTO_DEV_VMX) +=3D vmx/
+>  obj-$(CONFIG_CRYPTO_DEV_SUN4I_SS) +=3D sunxi-ss/
+>  obj-$(CONFIG_CRYPTO_DEV_ROCKCHIP) +=3D rockchip/
+>  obj-$(CONFIG_CRYPTO_DEV_CHELSIO) +=3D chelsio/
+> +obj-$(CONFIG_CRYPTO_DEV_VIRTIO) +=3D virtio/
+> diff --git a/drivers/crypto/virtio/Kconfig b/drivers/crypto/virtio/Kconfig
+> new file mode 100644
+> index 0000000..ceae88c
+> --- /dev/null
+> +++ b/drivers/crypto/virtio/Kconfig
+> @@ -0,0 +1,10 @@
+> +config CRYPTO_DEV_VIRTIO
+> +	tristate "VirtIO crypto driver"
+> +	depends on VIRTIO
+> +    select CRYPTO_AEAD
+> +    select CRYPTO_AUTHENC
+> +    select CRYPTO_BLKCIPHER
 
-All error/warnings (new ones prefixed by >>):
+Inconsistent tab vs space whitespace usage.
 
-   In file included from arch/sparc/include/asm/topology.h:4:0,
-                    from include/linux/topology.h:35,
-                    from include/linux/gfp.h:8,
-                    from include/linux/kmod.h:22,
-                    from include/linux/module.h:13,
-                    from drivers/crypto/virtio/virtio_crypto_mgr.c:21:
-   drivers/crypto/virtio/virtio_crypto_common.h: In function 'virtio_crypto_get_current_node':
->> arch/sparc/include/asm/topology_64.h:44:44: error: implicit declaration of function 'cpu_data' [-Werror=implicit-function-declaration]
-    #define topology_physical_package_id(cpu) (cpu_data(cpu).proc_id)
-                                               ^
->> drivers/crypto/virtio/virtio_crypto_common.h:118:9: note: in expansion of macro 'topology_physical_package_id'
-     return topology_physical_package_id(smp_processor_id());
-            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> arch/sparc/include/asm/topology_64.h:44:57: error: request for member 'proc_id' in something not a structure or union
-    #define topology_physical_package_id(cpu) (cpu_data(cpu).proc_id)
-                                                            ^
->> drivers/crypto/virtio/virtio_crypto_common.h:118:9: note: in expansion of macro 'topology_physical_package_id'
-     return topology_physical_package_id(smp_processor_id());
-            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
+> +	default m
+> +	help
+> +	  This driver provides support for virtio crypto device. If you
+> +	  choose 'M' here, this module will be called virtio-crypto.
 
-vim +/topology_physical_package_id +118 drivers/crypto/virtio/virtio_crypto_common.h
+All the other virtio drivers use underscore ('_') instead of hyphen
+('-').  I suggest calling it virtio_crypto for consistency.
 
-   102	};
-   103	
-   104	int virtcrypto_devmgr_add_dev(struct virtio_crypto *vcrypto_dev);
-   105	struct list_head *virtcrypto_devmgr_get_head(void);
-   106	void virtcrypto_devmgr_rm_dev(struct virtio_crypto *vcrypto_dev);
-   107	struct virtio_crypto *virtcrypto_devmgr_get_first(void);
-   108	int virtcrypto_dev_in_use(struct virtio_crypto *vcrypto_dev);
-   109	int virtcrypto_dev_get(struct virtio_crypto *vcrypto_dev);
-   110	void virtcrypto_dev_put(struct virtio_crypto *vcrypto_dev);
-   111	int virtcrypto_dev_started(struct virtio_crypto *vcrypto_dev);
-   112	struct virtio_crypto *virtcrypto_get_dev_node(int node);
-   113	int virtcrypto_dev_start(struct virtio_crypto *vcrypto);
-   114	void virtcrypto_dev_stop(struct virtio_crypto *vcrypto);
-   115	
-   116	static inline int virtio_crypto_get_current_node(void)
-   117	{
- > 118		return topology_physical_package_id(smp_processor_id());
-   119	}
-   120	
-   121	int virtio_crypto_algs_register(void);
-   122	void virtio_crypto_algs_unregister(void);
-   123	
-   124	#endif /* _VIRITO_CRYPTO_COMMON_H */
+> diff --git a/drivers/crypto/virtio/Makefile b/drivers/crypto/virtio/Makef=
+ile
+> new file mode 100644
+> index 0000000..a316e92
+> --- /dev/null
+> +++ b/drivers/crypto/virtio/Makefile
+> @@ -0,0 +1,5 @@
+> +obj-$(CONFIG_CRYPTO_DEV_VIRTIO) +=3D virtio-crypto.o
+> +virtio-crypto-objs :=3D \
+> +	virtio_crypto_algs.o \
+> +	virtio_crypto_mgr.o \
+> +	virtio_crypto.o
+> diff --git a/drivers/crypto/virtio/virtio_crypto.c b/drivers/crypto/virti=
+o/virtio_crypto.c
+> new file mode 100644
+> index 0000000..a896f4d
+> --- /dev/null
+> +++ b/drivers/crypto/virtio/virtio_crypto.c
+> @@ -0,0 +1,451 @@
+> + /* Driver for Virtio crypto device.
+> +  *
+> +  * Copyright 2016 HUAWEI TECHNOLOGIES CO., LTD.
+> +  *
+> +  * This program is free software; you can redistribute it and/or modify
+> +  * it under the terms of the GNU General Public License as published by
+> +  * the Free Software Foundation; either version 2 of the License, or
+> +  * (at your option) any later version.
+> +  *
+> +  * This program is distributed in the hope that it will be useful,
+> +  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +  * GNU General Public License for more details.
+> +  *
+> +  * You should have received a copy of the GNU General Public License
+> +  * along with this program; if not, see <http://www.gnu.org/licenses/>.
+> +  */
+> +
+> +#include <linux/err.h>
+> +#include <linux/module.h>
+> +#include <linux/virtio_config.h>
+> +#include <linux/cpu.h>
+> +
+> +#include <uapi/linux/virtio_crypto.h>
+> +#include "virtio_crypto_common.h"
+> +
+> +
+> +static void virtcrypto_dataq_callback(struct virtqueue *vq)
+> +{
+> +	struct virtio_crypto *vcrypto =3D vq->vdev->priv;
+> +	struct virtio_crypto_request *vc_req;
+> +	unsigned long flags;
+> +	unsigned int len;
+> +	struct ablkcipher_request *ablk_req;
+> +	int error;
+> +
+> +	spin_lock_irqsave(&vcrypto->lock, flags);
+> +	do {
+> +		virtqueue_disable_cb(vq);
+> +		while ((vc_req =3D virtqueue_get_buf(vq, &len)) !=3D NULL) {
+> +			if (vc_req->type =3D=3D VIRTIO_CRYPTO_SYM_OP_CIPHER) {
+> +				switch (vc_req->status) {
+> +				case VIRTIO_CRYPTO_OK:
+> +					error =3D 0;
+> +					break;
+> +				case VIRTIO_CRYPTO_INVSESS:
+> +				case VIRTIO_CRYPTO_ERR:
+> +					error =3D -EINVAL;
+> +					break;
+> +				case VIRTIO_CRYPTO_BADMSG:
+> +					error =3D -EBADMSG;
+> +					break;
+> +				default:
+> +					error =3D -EIO;
+> +					break;
+> +				}
+> +				ablk_req =3D vc_req->ablkcipher_req;
+> +				/* Finish the encrypt or decrypt process */
+> +				ablk_req->base.complete(&ablk_req->base, error);
+> +			}
+> +
+> +			kfree(vc_req->req_data);
+> +			kfree(vc_req->sgs);
+> +		}
+> +	} while (!virtqueue_enable_cb(vq));
+> +	spin_unlock_irqrestore(&vcrypto->lock, flags);
+> +}
+> +
+> +static int virtcrypto_find_vqs(struct virtio_crypto *vi)
+> +{
+> +	vq_callback_t **callbacks;
+> +	struct virtqueue **vqs;
+> +	int ret =3D -ENOMEM;
+> +	int i, total_vqs;
+> +	const char **names;
+> +
+> +	/* We expect 1 data virtqueue, followed by
+> +	 * possible N-1 data queues used in multiqueue mode, followed by
+> +	 * control vq.
+> +	 */
+> +	total_vqs =3D vi->max_data_queues + 1;
+> +
+> +	/* Allocate space for find_vqs parameters */
+> +	vqs =3D kcalloc(total_vqs, sizeof(*vqs), GFP_KERNEL);
+> +	if (!vqs)
+> +		goto err_vq;
+> +	callbacks =3D kcalloc(total_vqs, sizeof(*callbacks), GFP_KERNEL);
+> +	if (!callbacks)
+> +		goto err_callback;
+> +	names =3D kcalloc(total_vqs, sizeof(*names), GFP_KERNEL);
+> +	if (!names)
+> +		goto err_names;
+> +
+> +	/* Parameters for control virtqueue */
+> +	callbacks[total_vqs - 1] =3D NULL;
+> +	names[total_vqs - 1] =3D "controlq";
+> +
+> +	/* Allocate/initialize parameters for data virtqueues */
+> +	for (i =3D 0; i < vi->max_data_queues; i++) {
+> +		callbacks[i] =3D virtcrypto_dataq_callback;
+> +		snprintf(vi->data_vq[i].name, sizeof(vi->data_vq[i].name),
+> +				"dataq.%d", i);
+> +		names[i] =3D vi->data_vq[i].name;
+> +	}
+> +
+> +	ret =3D vi->vdev->config->find_vqs(vi->vdev, total_vqs, vqs, callbacks,
+> +					 names);
+> +	if (ret)
+> +		goto err_find;
+> +
+> +	vi->ctrl_vq =3D vqs[total_vqs - 1];
+> +
+> +	for (i =3D 0; i < vi->max_data_queues; i++)
+> +		vi->data_vq[i].vq =3D vqs[i];
+> +
+> +	kfree(names);
+> +	kfree(callbacks);
+> +	kfree(vqs);
+> +
+> +	return 0;
+> +
+> +err_find:
+> +	kfree(names);
+> +err_names:
+> +	kfree(callbacks);
+> +err_callback:
+> +	kfree(vqs);
+> +err_vq:
+> +	return ret;
+> +}
+> +
+> +static int virtcrypto_alloc_queues(struct virtio_crypto *vi)
+> +{
+> +	vi->data_vq =3D kcalloc(vi->max_data_queues, sizeof(*vi->data_vq),
+> +				GFP_KERNEL);
+> +	if (!vi->data_vq)
+> +		return -ENOMEM;
+> +
+> +	return 0;
+> +}
+> +
+> +static void virtcrypto_clean_affinity(struct virtio_crypto *vi, long hcp=
+u)
+> +{
+> +	int i;
+> +
+> +	if (vi->affinity_hint_set) {
+> +		for (i =3D 0; i < vi->max_data_queues; i++)
+> +			virtqueue_set_affinity(vi->data_vq[i].vq, -1);
+> +
+> +		vi->affinity_hint_set =3D false;
+> +	}
+> +}
+> +
+> +static void virtcrypto_set_affinity(struct virtio_crypto *vcrypto)
+> +{
+> +	int i =3D 0;
+> +	int cpu;
+> +
+> +	/*
+> +	 * In single queue mode, we don't set the cpu affinity.
+> +	 */
+> +	if (vcrypto->curr_queue =3D=3D 1 || vcrypto->max_data_queues =3D=3D 1) {
+> +		virtcrypto_clean_affinity(vcrypto, -1);
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * In multiqueue mode, we let the queue to be private to one cpu
+> +	 * by setting the affinity hint to eliminate the contention.
+> +	 *
+> +	 * TODO: adds cpu hotplug support by register cpu notifier.
+> +	 *
+> +	 */
+> +	for_each_online_cpu(cpu) {
+> +		virtqueue_set_affinity(vcrypto->data_vq[i].vq, cpu);
+> +		if (++i >=3D vcrypto->max_data_queues)
+> +			break;
+> +	}
+> +
+> +	vcrypto->affinity_hint_set =3D true;
+> +}
+> +
+> +static void virtcrypto_free_queues(struct virtio_crypto *vi)
+> +{
+> +	kfree(vi->data_vq);
+> +}
+> +
+> +static int virtcrypto_init_vqs(struct virtio_crypto *vi)
+> +{
+> +	int ret;
+> +
+> +	/* Allocate send & receive queues */
+> +	ret =3D virtcrypto_alloc_queues(vi);
+> +	if (ret)
+> +		goto err;
+> +
+> +	ret =3D virtcrypto_find_vqs(vi);
+> +	if (ret)
+> +		goto err_free;
+> +
+> +	get_online_cpus();
+> +	virtcrypto_set_affinity(vi);
+> +	put_online_cpus();
+> +
+> +	return 0;
+> +
+> +err_free:
+> +	virtcrypto_free_queues(vi);
+> +err:
+> +	return ret;
+> +}
+> +
+> +static int virtcrypto_update_status(struct virtio_crypto *vcrypto)
+> +{
+> +	u32 status;
+> +	int err;
+> +
+> +	virtio_cread(vcrypto->vdev,
+> +	    struct virtio_crypto_config, status, &status);
+> +
+> +	/* Ignore unknown (future) status bits */
+> +	status &=3D VIRTIO_CRYPTO_S_HW_READY;
+> +
+> +	if (vcrypto->status =3D=3D status)
+> +		return 0;
+> +
+> +	vcrypto->status =3D status;
+> +
+> +	if (vcrypto->status & VIRTIO_CRYPTO_S_HW_READY) {
+> +		err =3D virtcrypto_dev_start(vcrypto);
+> +		if (err) {
+> +			dev_err(&vcrypto->vdev->dev,
+> +				"Failed to start virtio crypto device.\n");
+> +			virtcrypto_dev_stop(vcrypto);
 
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+This function should not be called on failure.  virtcrypto_restore()
+doesn't call it on virtcrypto_dev_start() failure either.
 
---PNTmBPCT7hxwcZjr
-Content-Type: application/gzip
-Content-Disposition: attachment; filename=".config.gz"
-Content-Transfer-Encoding: base64
+> +			return -EPERM;
+> +		}
+> +		dev_info(&vcrypto->vdev->dev, "Accelerator is ready\n");
+> +	} else {
+> +		virtcrypto_dev_stop(vcrypto);
+> +		dev_info(&vcrypto->vdev->dev, "Accelerator is not ready\n");
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void virtcrypto_del_vqs(struct virtio_crypto *vcrypto)
+> +{
+> +	struct virtio_device *vdev =3D vcrypto->vdev;
+> +
+> +	virtcrypto_clean_affinity(vcrypto, -1);
+> +
+> +	vdev->config->del_vqs(vdev);
+> +
+> +	virtcrypto_free_queues(vcrypto);
+> +}
+> +
+> +static int virtcrypto_probe(struct virtio_device *vdev)
+> +{
+> +	int err =3D -EFAULT;
+> +	struct virtio_crypto *vcrypto;
+> +	u32 max_data_queues =3D 0, max_cipher_key_len =3D 0;
+> +	u32 max_auth_key_len =3D 0;
+> +	u64 max_size =3D 0;
+> +
+> +	if (!virtio_has_feature(vdev, VIRTIO_F_VERSION_1))
+> +		return -ENODEV;
+> +
+> +	if (!vdev->config->get) {
+> +		dev_err(&vdev->dev, "%s failure: config access disabled\n",
+> +			__func__);
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (num_possible_nodes() > 1 && dev_to_node(&vdev->dev) < 0) {
+> +		/*
+> +		 * If the accelerator is connected to a node with no memory
+> +		 * there is no point in using the accelerator since the remote
+> +		 * memory transaction will be very slow.
+> +		 */
+> +		dev_err(&vdev->dev, "Invalid NUMA configuration.\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	vcrypto =3D kzalloc_node(sizeof(*vcrypto), GFP_KERNEL,
+> +					dev_to_node(&vdev->dev));
+> +	if (!vcrypto)
+> +		return -ENOMEM;
+> +
+> +	virtio_cread(vdev, struct virtio_crypto_config,
+> +			max_dataqueues, &max_data_queues);
+> +	if (max_data_queues < 1)
+> +		max_data_queues =3D 1;
+> +
+> +	virtio_cread(vdev, struct virtio_crypto_config,
+> +		max_cipher_key_len, &max_cipher_key_len);
+> +	virtio_cread(vdev, struct virtio_crypto_config,
+> +		max_auth_key_len, &max_auth_key_len);
+> +	virtio_cread(vdev, struct virtio_crypto_config,
+> +		max_size, &max_size);
+> +
+> +	/* Add virtio crypto device to global table */
+> +	err =3D virtcrypto_devmgr_add_dev(vcrypto);
 
-H4sICNhKPFgAAy5jb25maWcAlFxbc9y4jn6fX9GV2YdzqnYm8WV6MrvlB0qiWjwtiYpItS8v
-qo7dmbjGcXu727Mn/34B6gZSlJx9SawP4A0EQACU+ueffl6w19P+2/b0eL99evq++HP3vDts
-T7uHxZfHp91/LyK5yKVe8EjoX4E5fXx+/ff748v2cL+4/PWPXz/8crg/W6x3h+fd0yLcP395
-/PMVmj/un3/6+adQ5rFY1cvLQOir792jKlgZwuPPCwpcnC8ej4vn/Wlx3J0s1uXl0BYekzri
-cfN49Q6m8bWZzft7M/ixeVpe1g+7Lw30zmpclDKs16Esea35DZmWkFlW1QlPC16SyWoWrnXJ
-Ql6rqihkSVqkMlxHvBgTzECJCHiZMy1kXhdSKRGknLBUIFDDOGAJ28AoXFdFDXOow6ICBs4G
-hpzzqCfxLICnWJRK12FS5esJvoKtuJ8N1uu0iTJWZ6zAVWvu0NTKkFOer3TirLWVgIKtCaqV
-GZKlIJ6BrVhpBgKA5hueqqvLDu/3sk6F0lfv3j89fn7/bf/w+rQ7vv+PKmcZr0uecqb4+1+d
-/YT/lC6rUMtSkX0sP9XXssR1ggr+vFgZhX5CtXp9GZRS5CB/nm9gATh2Bhp6cd73XMKGQf9Z
-IWDT3pERDQKao2w9YOmGlwq2mjDD0liV6jqRSuM6rt7943n/vPtnz6CuWUE07VZtRBGOAPw/
-1CkRpVTips4+VbzifnTUpFlPxjNZ3tZMg06THYwTlkdUNyvFUxE4uuqoqdl2Q8CxYLMddj9a
-XzNNh25AXXLe7Rbs3uL4+vn4/XjafRt2a8VzXorQbK5K5LW93UXJ41Re1zFTmksxEGmzMBGF
-3SySGRP5mDtTAuk+5kbBbV+muM3ddROifwB1z7XqVqcfv+0OR98CtQjXtcw5LI6IOpd1coda
-l8mcekwAwbyFjETo8ZpNK9Hsad+mQeMqTaeakC0WqwTMTsG0Ml720wd38l5vj38tTrCOxfb5
-YXE8bU/Hxfb+fv/6fHp8/tNZkHFhYSirXIt8RWezEaV2yCg4z9QCFRmnzUGDgZlIx6XUm4uB
-qJlaoxtTNgQbmLJbpyNDuPFgQtrTN1Iow2qhPDsIWlwDbegCHmp+AxtFDz+Lw0xy3AjmnabD
-thNKzHJZ6avl5RgE18riq7OlTQGv7+xtN8/anGp292udwIGDUhXy6gOl5DIMcL9s/g6FP3JL
-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
+Adding the device to a global list before it has been fully initialized
+seems risky.  What happens if another thread accesses this vcrypto
+instance from the list before probe() has virtcrypto_probe() finishes?
 
---PNTmBPCT7hxwcZjr--
+> +	if (err) {
+> +		dev_err(&vdev->dev, "Failed to add new virtio crypto device.\n");
+> +		goto free;
+> +	}
+> +	vcrypto->owner =3D THIS_MODULE;
+> +	vcrypto =3D vdev->priv =3D vcrypto;
+> +	vcrypto->vdev =3D vdev;
+> +	spin_lock_init(&vcrypto->lock);
+> +	spin_lock_init(&vcrypto->ctrl_lock);
+> +
+> +	/* Use single data queue as default */
+> +	vcrypto->curr_queue =3D 1;
+> +	vcrypto->max_data_queues =3D max_data_queues;
+> +	vcrypto->max_cipher_key_len =3D max_cipher_key_len;
+> +	vcrypto->max_auth_key_len =3D max_auth_key_len;
+> +	vcrypto->max_size =3D max_size;
+> +
+> +	dev_info(&vdev->dev,
+> +		"max_queues: %u, max_cipher_key_len: %u, max_auth_key_len: %u, max_siz=
+e 0x%llx\n",
+> +		vcrypto->max_data_queues,
+> +		vcrypto->max_cipher_key_len,
+> +		vcrypto->max_auth_key_len,
+> +		vcrypto->max_size);
+> +
+> +	err =3D virtcrypto_init_vqs(vcrypto);
+> +	if (err) {
+> +		dev_err(&vdev->dev, "Failed to initialize vqs.\n");
+> +		goto free_dev;
+> +	}
+> +	virtio_device_ready(vdev);
+> +
+> +	err =3D virtcrypto_update_status(vcrypto);
+
+What happens if the config interrupt is raised while we're inside
+virtcrypto_update_status()?  I see no lock to prevent the race condition
+between two virtcrypto_update_status() calls.
+
+> +	if (err)
+> +		goto free_vqs;
+> +
+> +	return 0;
+> +
+> +free_vqs:
+> +	vcrypto->vdev->config->reset(vdev);
+> +	virtcrypto_del_vqs(vcrypto);
+> +free_dev:
+> +	virtcrypto_devmgr_rm_dev(vcrypto);
+> +free:
+> +	kfree(vcrypto);
+> +	return err;
+> +}
+> +
+> +static void virtcrypto_free_unused_reqs(struct virtio_crypto *vcrypto)
+> +{
+> +	struct virtio_crypto_request *vc_req;
+> +	int i;
+> +	struct virtqueue *vq;
+> +
+> +	for (i =3D 0; i < vcrypto->max_data_queues; i++) {
+> +		vq =3D vcrypto->data_vq[i].vq;
+> +		while ((vc_req =3D virtqueue_detach_unused_buf(vq)) !=3D NULL) {
+> +			kfree(vc_req->req_data);
+> +			kfree(vc_req->sgs);
+> +		}
+> +	}
+> +}
+> +
+> +static void virtcrypto_remove(struct virtio_device *vdev)
+> +{
+> +	struct virtio_crypto *vcrypto =3D vdev->priv;
+> +
+> +	dev_info(&vdev->dev, "Start virtcrypto_remove.\n");
+> +
+> +	if (virtcrypto_dev_started(vcrypto))
+> +		virtcrypto_dev_stop(vcrypto);
+> +	vdev->config->reset(vdev);
+> +	virtcrypto_free_unused_reqs(vcrypto);
+> +	virtcrypto_del_vqs(vcrypto);
+> +	virtcrypto_devmgr_rm_dev(vcrypto);
+> +	kfree(vcrypto);
+> +}
+> +
+> +static void virtcrypto_config_changed(struct virtio_device *vdev)
+> +{
+> +	struct virtio_crypto *vcrypto =3D vdev->priv;
+> +
+> +	virtcrypto_update_status(vcrypto);
+> +}
+> +
+> +#ifdef CONFIG_PM_SLEEP
+> +static int virtcrypto_freeze(struct virtio_device *vdev)
+> +{
+> +	struct virtio_crypto *vcrypto =3D vdev->priv;
+> +
+> +	vdev->config->reset(vdev);
+> +	virtcrypto_free_unused_reqs(vcrypto);
+> +	if (virtcrypto_dev_started(vcrypto))
+> +		virtcrypto_dev_stop(vcrypto);
+> +
+> +	virtcrypto_del_vqs(vcrypto);
+> +	return 0;
+> +}
+> +
+> +static int virtcrypto_restore(struct virtio_device *vdev)
+> +{
+> +	struct virtio_crypto *vcrypto =3D vdev->priv;
+> +	int err;
+> +
+> +	err =3D virtcrypto_init_vqs(vcrypto);
+> +	if (err)
+> +		return err;
+> +
+> +	virtio_device_ready(vdev);
+> +	err =3D virtcrypto_dev_start(vcrypto);
+> +	if (err) {
+> +		dev_err(&vdev->dev, "Failed to start virtio crypto device.\n");
+> +		return -EFAULT;
+> +	}
+> +
+> +	return 0;
+> +}
+> +#endif
+> +
+> +
+> +static unsigned int features[] =3D {
+> +	/* none */
+> +};
+> +
+> +static struct virtio_device_id id_table[] =3D {
+> +	{ VIRTIO_ID_CRYPTO, VIRTIO_DEV_ANY_ID },
+> +	{ 0 },
+> +};
+> +
+> +static struct virtio_driver virtio_crypto_driver =3D {
+> +	.driver.name         =3D KBUILD_MODNAME,
+> +	.driver.owner        =3D THIS_MODULE,
+> +	.feature_table       =3D features,
+> +	.feature_table_size  =3D ARRAY_SIZE(features),
+> +	.id_table            =3D id_table,
+> +	.probe               =3D virtcrypto_probe,
+> +	.remove              =3D virtcrypto_remove,
+> +	.config_changed =3D virtcrypto_config_changed,
+> +#ifdef CONFIG_PM_SLEEP
+> +	.freeze =3D virtcrypto_freeze,
+> +	.restore =3D virtcrypto_restore,
+> +#endif
+> +};
+> +
+> +module_virtio_driver(virtio_crypto_driver);
+> +
+> +MODULE_DEVICE_TABLE(virtio, id_table);
+> +MODULE_DESCRIPTION("virtio crypto device driver");
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Gonglei <arei.gonglei@huawei.com>");
+> diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/=
+virtio/virtio_crypto_algs.c
+> new file mode 100644
+> index 0000000..6a989e6
+> --- /dev/null
+> +++ b/drivers/crypto/virtio/virtio_crypto_algs.c
+> @@ -0,0 +1,525 @@
+> + /* Algorithms supported by virtio crypto device
+> +  *
+> +  * Authors: Gonglei <arei.gonglei@huawei.com>
+> +  *
+> +  * Copyright 2016 HUAWEI TECHNOLOGIES CO., LTD.
+> +  *
+> +  * This program is free software; you can redistribute it and/or modify
+> +  * it under the terms of the GNU General Public License as published by
+> +  * the Free Software Foundation; either version 2 of the License, or
+> +  * (at your option) any later version.
+> +  *
+> +  * This program is distributed in the hope that it will be useful,
+> +  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +  * GNU General Public License for more details.
+> +  *
+> +  * You should have received a copy of the GNU General Public License
+> +  * along with this program; if not, see <http://www.gnu.org/licenses/>.
+> +  */
+> +
+> +#include <linux/scatterlist.h>
+> +#include <crypto/algapi.h>
+> +#include <linux/err.h>
+> +#include <crypto/scatterwalk.h>
+> +#include <linux/atomic.h>
+> +
+> +#include <uapi/linux/virtio_crypto.h>
+> +#include "virtio_crypto_common.h"
+> +
+> +static DEFINE_MUTEX(algs_lock);
+> +static unsigned int virtio_crypto_active_devs;
+> +
+> +static u64 virtio_crypto_alg_sg_nents_length(struct scatterlist *sg)
+> +{
+> +	u64 total =3D 0;
+> +
+> +	for (total =3D 0; sg; sg =3D sg_next(sg))
+> +		total +=3D sg->length;
+> +
+> +	return total;
+> +}
+> +
+> +static int
+> +virtio_crypto_alg_validate_key(int key_len, uint32_t *alg)
+> +{
+> +	switch (key_len) {
+> +	case AES_KEYSIZE_128:
+> +	case AES_KEYSIZE_192:
+> +	case AES_KEYSIZE_256:
+> +		*alg =3D VIRTIO_CRYPTO_CIPHER_AES_CBC;
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +	return 0;
+> +}
+> +
+> +static int virtio_crypto_alg_ablkcipher_init_session(
+> +		struct virtio_crypto_ablkcipher_ctx *ctx,
+> +		uint32_t alg, const uint8_t *key,
+> +		unsigned int keylen,
+> +		int encrypt)
+> +{
+> +	struct scatterlist outhdr, key_sg, inhdr, *sgs[3];
+> +	unsigned int tmp;
+> +	struct virtio_crypto *vcrypto =3D ctx->vcrypto;
+> +	int op =3D encrypt ? VIRTIO_CRYPTO_OP_ENCRYPT : VIRTIO_CRYPTO_OP_DECRYP=
+T;
+> +	int err;
+> +	unsigned int num_out =3D 0, num_in =3D 0;
+> +
+> +	/*
+> +	 * Avoid to do DMA from the stack, switch to using
+> +	 * dynamically-allocated for the key
+> +	 */
+> +	uint8_t *cipher_key =3D kmalloc(keylen, GFP_ATOMIC);
+> +
+> +	if (!cipher_key)
+> +		return -ENOMEM;
+> +
+> +	memcpy(cipher_key, key, keylen);
+> +
+> +	spin_lock(&vcrypto->ctrl_lock);
+> +	/* Pad ctrl header */
+> +	vcrypto->ctrl.header.opcode =3D
+> +		cpu_to_le32(VIRTIO_CRYPTO_CIPHER_CREATE_SESSION);
+> +	vcrypto->ctrl.header.algo =3D cpu_to_le32(alg);
+> +	/* Set the default dataqueue id to 0 */
+> +	vcrypto->ctrl.header.queue_id =3D 0;
+> +
+> +	vcrypto->input.status =3D cpu_to_le32(VIRTIO_CRYPTO_ERR);
+> +	/* Pad cipher's parameters */
+> +	vcrypto->ctrl.u.sym_create_session.op_type =3D
+> +		cpu_to_le32(VIRTIO_CRYPTO_SYM_OP_CIPHER);
+> +	vcrypto->ctrl.u.sym_create_session.u.cipher.para.algo =3D
+> +		vcrypto->ctrl.header.algo;
+> +	vcrypto->ctrl.u.sym_create_session.u.cipher.para.keylen =3D
+> +		cpu_to_le32(keylen);
+> +	vcrypto->ctrl.u.sym_create_session.u.cipher.para.op =3D
+> +		cpu_to_le32(op);
+> +
+> +	sg_init_one(&outhdr, &vcrypto->ctrl, sizeof(vcrypto->ctrl));
+> +	sgs[num_out++] =3D &outhdr;
+> +
+> +	/* Set key */
+> +	sg_init_one(&key_sg, cipher_key, keylen);
+> +	sgs[num_out++] =3D &key_sg;
+> +
+> +	/* Return status and session id back */
+> +	sg_init_one(&inhdr, &vcrypto->input, sizeof(vcrypto->input));
+> +	sgs[num_out + num_in++] =3D &inhdr;
+> +
+> +	err =3D virtqueue_add_sgs(vcrypto->ctrl_vq, sgs, num_out,
+> +				num_in, vcrypto, GFP_ATOMIC);
+> +	if (err < 0) {
+> +		spin_unlock(&vcrypto->ctrl_lock);
+> +		kfree(cipher_key);
+> +		return err;
+> +	}
+> +	virtqueue_kick(vcrypto->ctrl_vq);
+> +
+> +	/*
+> +	 * Spin for a response, the kick causes an ioport write, trapping
+> +	 * into the hypervisor, so the request should be handled immediately.
+> +	 */
+> +	while (!virtqueue_get_buf(vcrypto->ctrl_vq, &tmp) &&
+> +	       !virtqueue_is_broken(vcrypto->ctrl_vq))
+> +		cpu_relax();
+> +
+> +	if (le32_to_cpu(vcrypto->input.status) !=3D VIRTIO_CRYPTO_OK) {
+> +		spin_unlock(&vcrypto->ctrl_lock);
+> +		pr_err("virtio_crypto: Create session failed status: %u\n",
+> +			le32_to_cpu(vcrypto->input.status));
+> +		kfree(cipher_key);
+> +		return -EINVAL;
+> +	}
+> +	spin_unlock(&vcrypto->ctrl_lock);
+> +
+> +	spin_lock(&ctx->lock);
+> +	if (encrypt)
+> +		ctx->enc_sess_info.session_id =3D
+> +			le64_to_cpu(vcrypto->input.session_id);
+> +	else
+> +		ctx->dec_sess_info.session_id =3D
+> +			le64_to_cpu(vcrypto->input.session_id);
+> +	spin_unlock(&ctx->lock);
+> +
+> +	kfree(cipher_key);
+> +	return 0;
+> +}
+> +
+> +static int virtio_crypto_alg_ablkcipher_close_session(
+> +		struct virtio_crypto_ablkcipher_ctx *ctx,
+> +		int encrypt)
+> +{
+> +	struct scatterlist outhdr, status_sg, *sgs[2];
+> +	unsigned int tmp;
+> +	struct virtio_crypto_destroy_session_req *destroy_session;
+> +	struct virtio_crypto *vcrypto =3D ctx->vcrypto;
+> +	int err;
+> +	unsigned int num_out =3D 0, num_in =3D 0;
+> +
+> +	spin_lock(&vcrypto->ctrl_lock);
+> +	vcrypto->ctrl_status.status =3D VIRTIO_CRYPTO_ERR;
+> +	/* Pad ctrl header */
+> +	vcrypto->ctrl.header.opcode =3D
+> +		cpu_to_le32(VIRTIO_CRYPTO_CIPHER_DESTROY_SESSION);
+> +	/* Set the default virtqueue id to 0 */
+> +	vcrypto->ctrl.header.queue_id =3D 0;
+> +
+> +	destroy_session =3D &vcrypto->ctrl.u.destroy_session;
+> +
+> +	if (encrypt)
+> +		destroy_session->session_id =3D
+> +			cpu_to_le64(ctx->enc_sess_info.session_id);
+> +	else
+> +		destroy_session->session_id =3D
+> +			cpu_to_le64(ctx->dec_sess_info.session_id);
+> +
+> +	sg_init_one(&outhdr, &vcrypto->ctrl, sizeof(vcrypto->ctrl));
+> +	sgs[num_out++] =3D &outhdr;
+> +
+> +	/* Return status and session id back */
+> +	sg_init_one(&status_sg, &vcrypto->ctrl_status.status,
+> +		sizeof(vcrypto->ctrl_status.status));
+> +	sgs[num_out + num_in++] =3D &status_sg;
+> +
+> +	err =3D virtqueue_add_sgs(vcrypto->ctrl_vq, sgs, num_out,
+> +			num_in, vcrypto, GFP_ATOMIC);
+> +	if (err < 0) {
+> +		spin_unlock(&vcrypto->ctrl_lock);
+> +		return err;
+> +	}
+> +	virtqueue_kick(vcrypto->ctrl_vq);
+> +
+> +	while (!virtqueue_get_buf(vcrypto->ctrl_vq, &tmp) &&
+> +	       !virtqueue_is_broken(vcrypto->ctrl_vq))
+> +		cpu_relax();
+> +
+> +	if (vcrypto->ctrl_status.status !=3D VIRTIO_CRYPTO_OK) {
+> +		spin_unlock(&vcrypto->ctrl_lock);
+> +		pr_err("virtio_crypto: Close session failed status: %u, session_id: 0x=
+%llx\n",
+> +			vcrypto->ctrl_status.status,
+> +			destroy_session->session_id);
+> +
+> +		return -EINVAL;
+> +	}
+> +	spin_unlock(&vcrypto->ctrl_lock);
+> +
+> +	return 0;
+> +}
+> +
+> +static int virtio_crypto_alg_ablkcipher_init_sessions(
+> +		struct virtio_crypto_ablkcipher_ctx *ctx,
+> +		const uint8_t *key, unsigned int keylen)
+> +{
+> +	uint32_t alg;
+> +	int ret;
+> +	struct virtio_crypto *vcrypto =3D ctx->vcrypto;
+> +
+> +	if (keylen > vcrypto->max_cipher_key_len) {
+> +		pr_err("virtio_crypto: the key is too long\n");
+> +		goto bad_key;
+> +	}
+> +
+> +	if (virtio_crypto_alg_validate_key(keylen, &alg))
+> +		goto bad_key;
+> +
+> +	/* Create encryption session */
+> +	ret =3D virtio_crypto_alg_ablkcipher_init_session(ctx,
+> +			alg, key, keylen, 1);
+> +	if (ret)
+> +		return ret;
+> +	/* Create decryption session */
+> +	ret =3D virtio_crypto_alg_ablkcipher_init_session(ctx,
+> +			alg, key, keylen, 0);
+> +	if (ret) {
+> +		virtio_crypto_alg_ablkcipher_close_session(ctx, 1);
+> +		return ret;
+> +	}
+> +	return 0;
+> +
+> +bad_key:
+> +	crypto_tfm_set_flags(ctx->tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+> +	return -EINVAL;
+> +}
+> +
+> +/* Note: kernel crypto API realization */
+> +static int virtio_crypto_ablkcipher_setkey(struct crypto_ablkcipher *tfm,
+> +					 const uint8_t *key,
+> +					 unsigned int keylen)
+> +{
+> +	struct virtio_crypto_ablkcipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
+> +	int ret;
+> +
+> +	spin_lock(&ctx->lock);
+> +
+> +	if (!ctx->vcrypto) {
+> +		/* New key */
+> +		int node =3D virtio_crypto_get_current_node();
+> +		struct virtio_crypto *vcrypto =3D
+> +				      virtcrypto_get_dev_node(node);
+> +		if (!vcrypto) {
+> +			vcrypto =3D virtcrypto_devmgr_get_first();
+> +			if (!vcrypto) {
+> +				pr_err("virtio_crypto: Could not find a virtio device in the system"=
+);
+> +				spin_unlock(&ctx->lock);
+> +				return -ENODEV;
+> +			}
+> +		}
+> +
+> +		ctx->vcrypto =3D vcrypto;
+> +	}
+> +	spin_unlock(&ctx->lock);
+> +
+> +	ret =3D virtio_crypto_alg_ablkcipher_init_sessions(ctx, key, keylen);
+> +	if (ret) {
+> +		virtcrypto_dev_put(ctx->vcrypto);
+> +		ctx->vcrypto =3D NULL;
+> +
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int
+> +__virtio_crypto_ablkcipher_do_req(struct virtio_crypto_request *vc_req,
+> +		struct ablkcipher_request *req,
+> +		struct data_queue *data_vq,
+> +		__u8 op)
+> +{
+> +	struct virtio_crypto_ablkcipher_ctx *ctx =3D vc_req->ablkcipher_ctx;
+> +	struct virtio_crypto *vcrypto =3D ctx->vcrypto;
+> +	struct virtio_crypto_op_data_req *req_data;
+> +	int src_nents, dst_nents;
+> +	int err;
+> +	unsigned long flags;
+> +	struct scatterlist outhdr, iv_sg, status_sg, **sgs;
+> +	int i;
+> +	u64 dst_len;
+> +	unsigned int num_out =3D 0, num_in =3D 0;
+> +	int sg_total;
+> +
+> +	src_nents =3D sg_nents_for_len(req->src, req->nbytes);
+> +	dst_nents =3D sg_nents(req->dst);
+> +
+> +	pr_debug("virtio_crypto: Number of sgs (src_nents: %d, dst_nents: %d)\n=
+",
+> +			src_nents, dst_nents);
+> +
+> +	/* Why 3?  outhdr + iv + inhdr */
+> +	sg_total =3D src_nents + dst_nents + 3;
+> +	sgs =3D kzalloc_node(sg_total * sizeof(*sgs), GFP_ATOMIC,
+> +				dev_to_node(&vcrypto->vdev->dev));
+> +	if (!sgs)
+> +		return -ENOMEM;
+> +
+> +	req_data =3D kzalloc_node(sizeof(*req_data), GFP_ATOMIC,
+> +				dev_to_node(&vcrypto->vdev->dev));
+> +	if (!req_data) {
+> +		kfree(sgs);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	vc_req->req_data =3D req_data;
+> +	vc_req->type =3D VIRTIO_CRYPTO_SYM_OP_CIPHER;
+> +	/* Head of operation */
+> +	if (op) {
+> +		req_data->header.session_id =3D
+> +			cpu_to_le64(ctx->enc_sess_info.session_id);
+> +		req_data->header.opcode =3D
+> +			cpu_to_le32(VIRTIO_CRYPTO_CIPHER_ENCRYPT);
+> +	} else {
+> +		req_data->header.session_id =3D
+> +			cpu_to_le64(ctx->dec_sess_info.session_id);
+> +	    req_data->header.opcode =3D
+> +			cpu_to_le32(VIRTIO_CRYPTO_CIPHER_DECRYPT);
+> +	}
+> +	req_data->u.sym_req.op_type =3D cpu_to_le32(VIRTIO_CRYPTO_SYM_OP_CIPHER=
+);
+> +	req_data->u.sym_req.u.cipher.para.iv_len =3D cpu_to_le32(AES_BLOCK_SIZE=
+);
+> +	req_data->u.sym_req.u.cipher.para.src_data_len =3D
+> +			cpu_to_le32(req->nbytes);
+> +
+> +	dst_len =3D virtio_crypto_alg_sg_nents_length(req->dst);
+> +	if (unlikely(dst_len > U32_MAX)) {
+> +		pr_err("virtio_crypto: The dst_len is beyond U32_MAX\n");
+> +		err =3D -EINVAL;
+> +		goto free;
+> +	}
+> +
+> +	pr_debug("virtio_crypto: src_len: %u, dst_len: %llu\n",
+> +			req->nbytes, dst_len);
+> +
+> +	if (unlikely(req->nbytes + dst_len + AES_BLOCK_SIZE +
+> +		sizeof(vc_req->status) > vcrypto->max_size)) {
+> +		pr_err("virtio_crypto: The length is too big\n");
+> +		err =3D -EINVAL;
+> +		goto free;
+> +	}
+> +
+> +	req_data->u.sym_req.u.cipher.para.dst_data_len =3D
+> +			cpu_to_le32((uint32_t)dst_len);
+> +
+> +	/* Outhdr */
+> +	sg_init_one(&outhdr, req_data, sizeof(*req_data));
+> +	sgs[num_out++] =3D &outhdr;
+> +
+> +	/* IV */
+> +	sg_init_one(&iv_sg, req->info, AES_BLOCK_SIZE);
+> +	sgs[num_out++] =3D &iv_sg;
+> +
+> +	/* Source data */
+> +	for (i =3D 0; i < src_nents; i++)
+> +		sgs[num_out++] =3D &req->src[i];
+> +
+> +	/* Destination data */
+> +	for (i =3D 0; i < dst_nents; i++)
+> +		sgs[num_out + num_in++] =3D &req->dst[i];
+> +
+> +	/* Status */
+> +	sg_init_one(&status_sg, &vc_req->status, sizeof(vc_req->status));
+> +	sgs[num_out + num_in++] =3D &status_sg;
+> +
+> +	vc_req->sgs =3D sgs;
+> +
+> +	spin_lock_irqsave(&vcrypto->lock, flags);
+> +	err =3D virtqueue_add_sgs(data_vq->vq, sgs, num_out,
+> +				num_in, vc_req, GFP_ATOMIC);
+> +	spin_unlock_irqrestore(&vcrypto->lock, flags);
+> +	if (unlikely(err < 0))
+> +		goto free;
+> +
+> +	return 0;
+> +
+> +free:
+> +	kfree(req_data);
+> +	kfree(sgs);
+> +	return err;
+> +}
+> +
+> +static int virtio_crypto_ablkcipher_encrypt(struct ablkcipher_request *r=
+eq)
+> +{
+> +	struct crypto_ablkcipher *atfm =3D crypto_ablkcipher_reqtfm(req);
+> +	struct virtio_crypto_ablkcipher_ctx *ctx =3D crypto_ablkcipher_ctx(atfm=
+);
+> +	struct virtio_crypto_request *vc_req =3D ablkcipher_request_ctx(req);
+> +	struct virtio_crypto *vcrypto =3D ctx->vcrypto;
+> +	int ret;
+> +	/* Use the first data virtqueue as default */
+> +	struct data_queue *data_vq =3D &vcrypto->data_vq[0];
+> +
+> +	vc_req->ablkcipher_ctx =3D ctx;
+> +	vc_req->ablkcipher_req =3D req;
+> +	ret =3D __virtio_crypto_ablkcipher_do_req(vc_req, req, data_vq, 1);
+> +	if (ret < 0) {
+> +		pr_err("virtio_crypto: Encryption failed!\n");
+> +		return ret;
+> +	}
+> +	virtqueue_kick(data_vq->vq);
+> +
+> +	return -EINPROGRESS;
+> +}
+> +
+> +static int virtio_crypto_ablkcipher_decrypt(struct ablkcipher_request *r=
+eq)
+> +{
+> +	struct crypto_ablkcipher *atfm =3D crypto_ablkcipher_reqtfm(req);
+> +	struct virtio_crypto_ablkcipher_ctx *ctx =3D crypto_ablkcipher_ctx(atfm=
+);
+> +	struct virtio_crypto_request *vc_req =3D ablkcipher_request_ctx(req);
+> +	struct virtio_crypto *vcrypto =3D ctx->vcrypto;
+> +	int ret;
+> +	/* Use the first data virtqueue as default */
+> +	struct data_queue *data_vq =3D &vcrypto->data_vq[0];
+> +
+> +	vc_req->ablkcipher_ctx =3D ctx;
+> +	vc_req->ablkcipher_req =3D req;
+> +
+> +	ret =3D __virtio_crypto_ablkcipher_do_req(vc_req, req, data_vq, 0);
+> +	if (ret < 0) {
+> +		pr_err("virtio_crypto: Decryption failed!\n");
+> +		return ret;
+> +	}
+> +	virtqueue_kick(data_vq->vq);
+> +
+> +	return -EINPROGRESS;
+> +}
+> +
+> +static int virtio_crypto_ablkcipher_init(struct crypto_tfm *tfm)
+> +{
+> +	struct virtio_crypto_ablkcipher_ctx *ctx =3D crypto_tfm_ctx(tfm);
+> +
+> +	spin_lock_init(&ctx->lock);
+> +	tfm->crt_ablkcipher.reqsize =3D sizeof(struct virtio_crypto_request);
+> +	ctx->tfm =3D tfm;
+> +
+> +	return 0;
+> +}
+> +
+> +static void virtio_crypto_ablkcipher_exit(struct crypto_tfm *tfm)
+> +{
+> +	struct virtio_crypto_ablkcipher_ctx *ctx =3D crypto_tfm_ctx(tfm);
+> +
+> +	if (!ctx->vcrypto)
+> +		return;
+> +
+> +	virtio_crypto_alg_ablkcipher_close_session(ctx, 1);
+> +	virtio_crypto_alg_ablkcipher_close_session(ctx, 0);
+> +	virtcrypto_dev_put(ctx->vcrypto);
+> +	ctx->vcrypto =3D NULL;
+> +}
+> +
+> +static struct crypto_alg virtio_crypto_algs[] =3D { {
+> +	.cra_name =3D "cbc(aes)",
+> +	.cra_driver_name =3D "virtio_crypto_aes_cbc",
+> +	.cra_priority =3D 4001,
+> +	.cra_flags =3D CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
+> +	.cra_blocksize =3D AES_BLOCK_SIZE,
+> +	.cra_ctxsize  =3D sizeof(struct virtio_crypto_ablkcipher_ctx),
+> +	.cra_alignmask =3D 0,
+> +	.cra_module =3D THIS_MODULE,
+> +	.cra_type =3D &crypto_ablkcipher_type,
+> +	.cra_init =3D virtio_crypto_ablkcipher_init,
+> +	.cra_exit =3D virtio_crypto_ablkcipher_exit,
+> +	.cra_u =3D {
+> +	   .ablkcipher =3D {
+> +			.setkey =3D virtio_crypto_ablkcipher_setkey,
+> +			.decrypt =3D virtio_crypto_ablkcipher_decrypt,
+> +			.encrypt =3D virtio_crypto_ablkcipher_encrypt,
+> +			.min_keysize =3D AES_MIN_KEY_SIZE,
+> +			.max_keysize =3D AES_MAX_KEY_SIZE,
+> +			.ivsize =3D AES_BLOCK_SIZE,
+> +		},
+> +	},
+> +} };
+
+Where are all the other algorithms defined in the virtio-crypto spec?
+
+> +
+> +int virtio_crypto_algs_register(void)
+> +{
+> +	int ret =3D 0, i;
+> +
+> +	mutex_lock(&algs_lock);
+> +	if (++virtio_crypto_active_devs !=3D 1)
+> +		goto unlock;
+> +
+> +	for (i =3D 0; i < ARRAY_SIZE(virtio_crypto_algs); i++) {
+> +		virtio_crypto_algs[i].cra_flags =3D
+> +			     CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC;
+> +	}
+
+Why is this necessary?  The .cra_flags field is already set in the
+virtio_crypto_algs[] definition above.
+
+> +
+> +	ret =3D crypto_register_algs(virtio_crypto_algs,
+> +			ARRAY_SIZE(virtio_crypto_algs));
+
+If crypto_register_algs() fails then the device isn't active.
+virtio_crypto_active_devs should be decremented.
+
+> +
+> +unlock:
+> +	mutex_unlock(&algs_lock);
+> +	return ret;
+> +}
+> +
+> +void virtio_crypto_algs_unregister(void)
+> +{
+> +	mutex_lock(&algs_lock);
+> +	if (--virtio_crypto_active_devs !=3D 0)
+> +		goto unlock;
+> +
+> +	crypto_unregister_algs(virtio_crypto_algs,
+> +			ARRAY_SIZE(virtio_crypto_algs));
+> +
+> +unlock:
+> +	mutex_unlock(&algs_lock);
+> +}
+> diff --git a/drivers/crypto/virtio/virtio_crypto_common.h b/drivers/crypt=
+o/virtio/virtio_crypto_common.h
+> new file mode 100644
+> index 0000000..a599733
+> --- /dev/null
+> +++ b/drivers/crypto/virtio/virtio_crypto_common.h
+> @@ -0,0 +1,124 @@
+> +/* Common header for Virtio crypto device.
+> + *
+> + * Copyright 2016 HUAWEI TECHNOLOGIES CO., LTD.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef _VIRITO_CRYPTO_COMMON_H
+> +#define _VIRITO_CRYPTO_COMMON_H
+
+s/VIRITIO/VIRTIO/g
+
+> +
+> +#include <linux/virtio.h>
+> +#include <linux/crypto.h>
+> +#include <linux/spinlock.h>
+> +#include <crypto/aead.h>
+> +#include <crypto/aes.h>
+> +#include <crypto/authenc.h>
+> +
+> +
+> +/* Internal representation of a data virtqueue */
+> +struct data_queue {
+> +	/* Virtqueue associated with this send _queue */
+> +	struct virtqueue *vq;
+> +
+> +	/* Name of the tx queue: dataq.$index */
+> +	char name[32];
+> +};
+> +
+> +struct virtio_crypto {
+> +	struct virtio_device *vdev;
+> +	struct virtqueue *ctrl_vq;
+> +	struct data_queue *data_vq;
+> +
+> +	/* To protect the vq operations for the dataq */
+> +	spinlock_t lock;
+> +
+> +	/* To protect the vq operations for the controlq */
+> +	spinlock_t ctrl_lock;
+> +
+> +	/* Maximum of data queues supported by the device */
+> +	u32 max_data_queues;
+> +
+> +	/* Number of queue currently used by the driver */
+> +	u32 curr_queue;
+> +
+> +	/* Maximum length of cipher key */
+> +	u32 max_cipher_key_len;
+> +	/* Maximum length of authenticated key */
+> +	u32 max_auth_key_len;
+> +	/* Maximum size of per request */
+> +	u64 max_size;
+> +
+> +	/* Control VQ buffers: protected by the ctrl_lock */
+> +	struct virtio_crypto_op_ctrl_req ctrl;
+> +	struct virtio_crypto_session_input input;
+> +	struct virtio_crypto_inhdr ctrl_status;
+> +
+> +	unsigned long status;
+> +	atomic_t ref_count;
+> +	struct list_head list;
+> +	struct module *owner;
+> +	uint8_t dev_id;
+> +
+> +	/* Does the affinity hint is set for virtqueues? */
+> +	bool affinity_hint_set;
+> +};
+> +
+> +struct virtio_crypto_sym_session_info {
+> +	/* Backend session id, which come from the host side */
+> +	__u64 session_id;
+> +};
+> +
+> +struct virtio_crypto_ablkcipher_ctx {
+> +	struct virtio_crypto *vcrypto;
+> +	struct crypto_tfm *tfm;
+> +
+> +	struct virtio_crypto_sym_session_info enc_sess_info;
+> +	struct virtio_crypto_sym_session_info dec_sess_info;
+> +
+> +	/* Protects virtio_crypto_ablkcipher_ctx struct */
+> +	spinlock_t lock;
+> +};
+> +
+> +struct virtio_crypto_request {
+> +	/* Cipher or aead */
+> +	uint32_t type;
+> +	uint8_t status;
+> +	struct virtio_crypto_ablkcipher_ctx *ablkcipher_ctx;
+> +	struct ablkcipher_request *ablkcipher_req;
+> +	struct virtio_crypto_op_data_req *req_data;
+> +	struct scatterlist **sgs;
+> +};
+> +
+> +int virtcrypto_devmgr_add_dev(struct virtio_crypto *vcrypto_dev);
+> +struct list_head *virtcrypto_devmgr_get_head(void);
+> +void virtcrypto_devmgr_rm_dev(struct virtio_crypto *vcrypto_dev);
+> +struct virtio_crypto *virtcrypto_devmgr_get_first(void);
+> +int virtcrypto_dev_in_use(struct virtio_crypto *vcrypto_dev);
+> +int virtcrypto_dev_get(struct virtio_crypto *vcrypto_dev);
+> +void virtcrypto_dev_put(struct virtio_crypto *vcrypto_dev);
+> +int virtcrypto_dev_started(struct virtio_crypto *vcrypto_dev);
+> +struct virtio_crypto *virtcrypto_get_dev_node(int node);
+> +int virtcrypto_dev_start(struct virtio_crypto *vcrypto);
+> +void virtcrypto_dev_stop(struct virtio_crypto *vcrypto);
+> +
+> +static inline int virtio_crypto_get_current_node(void)
+> +{
+> +	return topology_physical_package_id(smp_processor_id());
+> +}
+> +
+> +int virtio_crypto_algs_register(void);
+> +void virtio_crypto_algs_unregister(void);
+> +
+> +#endif /* _VIRITO_CRYPTO_COMMON_H */
+> diff --git a/drivers/crypto/virtio/virtio_crypto_mgr.c b/drivers/crypto/v=
+irtio/virtio_crypto_mgr.c
+> new file mode 100644
+> index 0000000..5b7260c
+> --- /dev/null
+> +++ b/drivers/crypto/virtio/virtio_crypto_mgr.c
+> @@ -0,0 +1,258 @@
+> + /* Management for virtio crypto devices (refer to adf_dev_mgr.c)
+> +  *
+> +  * Copyright 2016 HUAWEI TECHNOLOGIES CO., LTD.
+> +  *
+> +  * This program is free software; you can redistribute it and/or modify
+> +  * it under the terms of the GNU General Public License as published by
+> +  * the Free Software Foundation; either version 2 of the License, or
+> +  * (at your option) any later version.
+> +  *
+> +  * This program is distributed in the hope that it will be useful,
+> +  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +  * GNU General Public License for more details.
+> +  *
+> +  * You should have received a copy of the GNU General Public License
+> +  * along with this program; if not, see <http://www.gnu.org/licenses/>.
+> +  */
+> +
+> +#include <linux/mutex.h>
+> +#include <linux/list.h>
+> +#include <linux/module.h>
+> +
+> +#include <uapi/linux/virtio_crypto.h>
+> +#include "virtio_crypto_common.h"
+> +
+> +static LIST_HEAD(virtio_crypto_table);
+> +static DEFINE_MUTEX(table_lock);
+> +static uint32_t num_devices;
+> +
+> +#define VIRTIO_CRYPTO_MAX_DEVICES 32
+> +
+> +
+> +/*
+> + * virtcrypto_devmgr_add_dev() - Add vcrypto_dev to the acceleration
+> + * framework.
+> + * @vcrypto_dev:  Pointer to virtio crypto device.
+> + *
+> + * Function adds virtio crypto device to the global list.
+> + * To be used by virtio crypto device specific drivers.
+> + *
+> + * Return: 0 on success, error code othewise.
+> + */
+> +int virtcrypto_devmgr_add_dev(struct virtio_crypto *vcrypto_dev)
+> +{
+> +	struct list_head *itr;
+> +
+> +	if (num_devices =3D=3D VIRTIO_CRYPTO_MAX_DEVICES) {
+
+num_devices must be accessed under table_lock to avoid race conditions.
+
+> +		pr_info("virtio_crypto: only support up to %d devices\n",
+> +			    VIRTIO_CRYPTO_MAX_DEVICES);
+> +		return -EFAULT;
+> +	}
+> +
+> +	mutex_lock(&table_lock);
+> +	list_for_each(itr, &virtio_crypto_table) {
+> +		struct virtio_crypto *ptr =3D
+> +				list_entry(itr, struct virtio_crypto, list);
+> +
+> +		if (ptr =3D=3D vcrypto_dev) {
+> +			mutex_unlock(&table_lock);
+> +			return -EEXIST;
+> +		}
+> +	}
+> +	atomic_set(&vcrypto_dev->ref_count, 0);
+> +	list_add_tail(&vcrypto_dev->list, &virtio_crypto_table);
+> +	vcrypto_dev->dev_id =3D num_devices++;
+> +	mutex_unlock(&table_lock);
+> +	return 0;
+> +}
+> +
+> +struct list_head *virtcrypto_devmgr_get_head(void)
+> +{
+> +	return &virtio_crypto_table;
+> +}
+
+virtio_crypto_table is supposed to be protected by table_lock.  How is
+this safe against races?
+
+> +
+> +/*
+> + * virtcrypto_devmgr_rm_dev() - Remove vcrypto_dev from the acceleration
+> + * framework.
+> + * @vcrypto_dev:  Pointer to virtio crypto device.
+> + *
+> + * Function removes virtio crypto device from the acceleration framework.
+> + * To be used by virtio crypto device specific drivers.
+> + *
+> + * Return: void
+> + */
+> +void virtcrypto_devmgr_rm_dev(struct virtio_crypto *vcrypto_dev)
+> +{
+> +	mutex_lock(&table_lock);
+> +	list_del(&vcrypto_dev->list);
+> +	num_devices--;
+> +	mutex_unlock(&table_lock);
+> +}
+> +
+> +/*
+> + * virtcrypto_devmgr_get_first()
+> + *
+> + * Function returns the first virtio crypto device from the acceleration
+> + * framework.
+> + *
+> + * To be used by virtio crypto device specific drivers.
+> + *
+> + * Return: pointer to vcrypto_dev or NULL if not found.
+> + */
+> +struct virtio_crypto *virtcrypto_devmgr_get_first(void)
+> +{
+> +	struct virtio_crypto *dev =3D NULL;
+> +
+> +	if (!list_empty(&virtio_crypto_table))
+> +		dev =3D list_first_entry(&virtio_crypto_table,
+> +					struct virtio_crypto,
+> +				    list);
+
+Missing table_lock usage.
+
+> +	return dev;
+> +}
+> +
+> +/*
+> + * virtcrypto_dev_in_use() - Check whether vcrypto_dev is currently in u=
+se
+> + * @vcrypto_dev: Pointer to virtio crypto device.
+> + *
+> + * To be used by virtio crypto device specific drivers.
+> + *
+> + * Return: 1 when device is in use, 0 otherwise.
+> + */
+> +int virtcrypto_dev_in_use(struct virtio_crypto *vcrypto_dev)
+> +{
+> +	return atomic_read(&vcrypto_dev->ref_count) !=3D 0;
+> +}
+> +
+> +/*
+> + * virtcrypto_dev_get() - Increment vcrypto_dev reference count
+> + * @vcrypto_dev: Pointer to virtio crypto device.
+> + *
+> + * Increment the vcrypto_dev refcount and if this is the first time
+> + * incrementing it during this period the vcrypto_dev is in use,
+> + * increment the module refcount too.
+> + * To be used by virtio crypto device specific drivers.
+> + *
+> + * Return: 0 when successful, EFAULT when fail to bump module refcount
+> + */
+> +int virtcrypto_dev_get(struct virtio_crypto *vcrypto_dev)
+> +{
+> +	if (atomic_add_return(1, &vcrypto_dev->ref_count) =3D=3D 1)
+> +		if (!try_module_get(vcrypto_dev->owner))
+> +			return -EFAULT;
+> +	return 0;
+> +}
+> +
+> +/*
+> + * virtcrypto_dev_put() - Decrement vcrypto_dev reference count
+> + * @vcrypto_dev: Pointer to virtio crypto device.
+> + *
+> + * Decrement the vcrypto_dev refcount and if this is the last time
+> + * decrementing it during this period the vcrypto_dev is in use,
+> + * decrement the module refcount too.
+> + * To be used by virtio crypto device specific drivers.
+> + *
+> + * Return: void
+> + */
+> +void virtcrypto_dev_put(struct virtio_crypto *vcrypto_dev)
+> +{
+> +	if (atomic_sub_return(1, &vcrypto_dev->ref_count) =3D=3D 0)
+> +		module_put(vcrypto_dev->owner);
+> +}
+> +
+> +/*
+> + * virtcrypto_dev_started() - Check whether device has started
+> + * @vcrypto_dev: Pointer to virtio crypto device.
+> + *
+> + * To be used by virtio crypto device specific drivers.
+> + *
+> + * Return: 1 when the device has started, 0 otherwise
+> + */
+> +int virtcrypto_dev_started(struct virtio_crypto *vcrypto_dev)
+> +{
+> +	return (vcrypto_dev->status & VIRTIO_CRYPTO_S_HW_READY);
+> +}
+> +
+> +/*
+> + * virtcrypto_get_dev_node() - Get vcrypto_dev on the node.
+> + * @node:  Node id the driver works.
+> + *
+> + * Function returns the virtio crypto device used fewest on the node.
+> + *
+> + * To be used by virtio crypto device specific drivers.
+> + *
+> + * Return: pointer to vcrypto_dev or NULL if not found.
+> + */
+> +struct virtio_crypto *virtcrypto_get_dev_node(int node)
+> +{
+> +	struct virtio_crypto *vcrypto_dev =3D NULL, *tmp_dev;
+> +	unsigned long best =3D ~0;
+> +	unsigned long ctr;
+> +
+> +	list_for_each_entry(tmp_dev, virtcrypto_devmgr_get_head(), list) {
+> +
+> +		if ((node =3D=3D dev_to_node(&tmp_dev->vdev->dev) ||
+> +		     dev_to_node(&tmp_dev->vdev->dev) < 0) &&
+> +		    virtcrypto_dev_started(tmp_dev)) {
+> +			ctr =3D atomic_read(&tmp_dev->ref_count);
+> +			if (best > ctr) {
+> +				vcrypto_dev =3D tmp_dev;
+> +				best =3D ctr;
+> +			}
+> +		}
+> +	}
+> +
+> +	if (!vcrypto_dev) {
+> +		pr_info("virtio_crypto: Could not find a device on node %d\n",
+> +				node);
+> +		/* Get any started device */
+> +		list_for_each_entry(tmp_dev,
+> +				virtcrypto_devmgr_get_head(), list) {
+> +			if (virtcrypto_dev_started(tmp_dev)) {
+> +				vcrypto_dev =3D tmp_dev;
+> +				break;
+> +			}
+> +		}
+> +	}
+> +
+> +	if (!vcrypto_dev)
+> +		return NULL;
+> +
+> +	virtcrypto_dev_get(vcrypto_dev);
+> +	return vcrypto_dev;
+> +}
+> +
+> +/*
+> + * virtcrypto_dev_start() - Start virtio crypto device
+> + * @vcrypto:    Pointer to virtio crypto device.
+> + *
+> + * Function notifies all the registered services that the virtio crypto =
+device
+> + * is ready to be used.
+> + * To be used by virtio crypto device specific drivers.
+> + *
+> + * Return: 0 on success, EFAULT when fail to register algorithms
+> + */
+> +int virtcrypto_dev_start(struct virtio_crypto *vcrypto)
+> +{
+> +	if (virtio_crypto_algs_register()) {
+> +		pr_err("virtio_crypto: Failed to register crypto algs\n");
+> +		return -EFAULT;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * virtcrypto_dev_stop() - Stop virtio crypto device
+> + * @vcrypto:    Pointer to virtio crypto device.
+> + *
+> + * Function notifies all the registered services that the virtio crypto =
+device
+> + * is ready to be used.
+> + * To be used by virtio crypto device specific drivers.
+> + *
+> + * Return: void
+> + */
+> +void virtcrypto_dev_stop(struct virtio_crypto *vcrypto)
+> +{
+> +	virtio_crypto_algs_unregister();
+> +}
+> diff --git a/include/uapi/linux/Kbuild b/include/uapi/linux/Kbuild
+> index cd2be1c..4bdb84c 100644
+> --- a/include/uapi/linux/Kbuild
+> +++ b/include/uapi/linux/Kbuild
+> @@ -460,6 +460,7 @@ header-y +=3D virtio_rng.h
+>  header-y +=3D virtio_scsi.h
+>  header-y +=3D virtio_types.h
+>  header-y +=3D virtio_vsock.h
+> +header-y +=3D virtio_crypto.h
+>  header-y +=3D vm_sockets.h
+>  header-y +=3D vt.h
+>  header-y +=3D vtpm_proxy.h
+> diff --git a/include/uapi/linux/virtio_crypto.h b/include/uapi/linux/virt=
+io_crypto.h
+> new file mode 100644
+> index 0000000..e86b378
+> --- /dev/null
+> +++ b/include/uapi/linux/virtio_crypto.h
+> @@ -0,0 +1,450 @@
+> +#ifndef _VIRTIO_CRYPTO_H
+> +#define _VIRTIO_CRYPTO_H
+> +/* This header is BSD licensed so anyone can use the definitions to impl=
+ement
+> + * compatible drivers/servers.
+> + *
+> + * Redistribution and use in source and binary forms, with or without
+> + * modification, are permitted provided that the following conditions
+> + * are met:
+> + * 1. Redistributions of source code must retain the above copyright
+> + *    notice, this list of conditions and the following disclaimer.
+> + * 2. Redistributions in binary form must reproduce the above copyright
+> + *    notice, this list of conditions and the following disclaimer in the
+> + *    documentation and/or other materials provided with the distributio=
+n.
+> + * 3. Neither the name of IBM nor the names of its contributors
+> + *    may be used to endorse or promote products derived from this softw=
+are
+> + *    without specific prior written permission.
+> + * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+> + * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+> + * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+> + * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL IBM OR
+> + * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+> + * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+> + * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+> + * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+> + * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+> + * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+> + * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+> + * SUCH DAMAGE.
+> + */
+> +#include <linux/types.h>
+> +#include <linux/virtio_types.h>
+> +#include <linux/virtio_ids.h>
+> +#include <linux/virtio_config.h>
+> +
+> +
+> +#define VIRTIO_CRYPTO_SERVICE_CIPHER 0
+> +#define VIRTIO_CRYPTO_SERVICE_HASH   1
+> +#define VIRTIO_CRYPTO_SERVICE_MAC    2
+> +#define VIRTIO_CRYPTO_SERVICE_AEAD   3
+> +
+> +#define VIRTIO_CRYPTO_OPCODE(service, op)   (((service) << 8) | (op))
+> +
+> +struct virtio_crypto_ctrl_header {
+> +#define VIRTIO_CRYPTO_CIPHER_CREATE_SESSION \
+> +	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_CIPHER, 0x02)
+> +#define VIRTIO_CRYPTO_CIPHER_DESTROY_SESSION \
+> +	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_CIPHER, 0x03)
+> +#define VIRTIO_CRYPTO_HASH_CREATE_SESSION \
+> +	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_HASH, 0x02)
+> +#define VIRTIO_CRYPTO_HASH_DESTROY_SESSION \
+> +	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_HASH, 0x03)
+> +#define VIRTIO_CRYPTO_MAC_CREATE_SESSION \
+> +	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_MAC, 0x02)
+> +#define VIRTIO_CRYPTO_MAC_DESTROY_SESSION \
+> +	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_MAC, 0x03)
+> +#define VIRTIO_CRYPTO_AEAD_CREATE_SESSION \
+> +	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x02)
+> +#define VIRTIO_CRYPTO_AEAD_DESTROY_SESSION \
+> +	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x03)
+> +	__le32 opcode;
+> +	__le32 algo;
+> +	__le32 flag;
+> +	/* data virtqueue id */
+> +	__le32 queue_id;
+> +};
+> +
+> +struct virtio_crypto_cipher_session_para {
+> +#define VIRTIO_CRYPTO_NO_CIPHER                 0
+> +#define VIRTIO_CRYPTO_CIPHER_ARC4               1
+> +#define VIRTIO_CRYPTO_CIPHER_AES_ECB            2
+> +#define VIRTIO_CRYPTO_CIPHER_AES_CBC            3
+> +#define VIRTIO_CRYPTO_CIPHER_AES_CTR            4
+> +#define VIRTIO_CRYPTO_CIPHER_DES_ECB            5
+> +#define VIRTIO_CRYPTO_CIPHER_DES_CBC            6
+> +#define VIRTIO_CRYPTO_CIPHER_3DES_ECB           7
+> +#define VIRTIO_CRYPTO_CIPHER_3DES_CBC           8
+> +#define VIRTIO_CRYPTO_CIPHER_3DES_CTR           9
+> +#define VIRTIO_CRYPTO_CIPHER_KASUMI_F8          10
+> +#define VIRTIO_CRYPTO_CIPHER_SNOW3G_UEA2        11
+> +#define VIRTIO_CRYPTO_CIPHER_AES_F8             12
+> +#define VIRTIO_CRYPTO_CIPHER_AES_XTS            13
+> +#define VIRTIO_CRYPTO_CIPHER_ZUC_EEA3           14
+> +	__le32 algo;
+> +	/* length of key */
+> +	__le32 keylen;
+> +
+> +#define VIRTIO_CRYPTO_OP_ENCRYPT  1
+> +#define VIRTIO_CRYPTO_OP_DECRYPT  2
+> +	/* encrypt or decrypt */
+> +	__le32 op;
+> +	__le32 padding;
+> +};
+> +
+> +struct virtio_crypto_session_input {
+> +	/* Device-writable part */
+> +	__le64 session_id;
+> +	__le32 status;
+> +	__le32 padding;
+> +};
+> +
+> +struct virtio_crypto_cipher_session_req {
+> +	struct virtio_crypto_cipher_session_para para;
+> +	__u8 padding[32];
+> +};
+> +
+> +struct virtio_crypto_hash_session_para {
+> +#define VIRTIO_CRYPTO_NO_HASH            0
+> +#define VIRTIO_CRYPTO_HASH_MD5           1
+> +#define VIRTIO_CRYPTO_HASH_SHA1          2
+> +#define VIRTIO_CRYPTO_HASH_SHA_224       3
+> +#define VIRTIO_CRYPTO_HASH_SHA_256       4
+> +#define VIRTIO_CRYPTO_HASH_SHA_384       5
+> +#define VIRTIO_CRYPTO_HASH_SHA_512       6
+> +#define VIRTIO_CRYPTO_HASH_SHA3_224      7
+> +#define VIRTIO_CRYPTO_HASH_SHA3_256      8
+> +#define VIRTIO_CRYPTO_HASH_SHA3_384      9
+> +#define VIRTIO_CRYPTO_HASH_SHA3_512      10
+> +#define VIRTIO_CRYPTO_HASH_SHA3_SHAKE128      11
+> +#define VIRTIO_CRYPTO_HASH_SHA3_SHAKE256      12
+> +	__le32 algo;
+> +	/* hash result length */
+> +	__le32 hash_result_len;
+> +	__u8 padding[8];
+> +};
+> +
+> +struct virtio_crypto_hash_create_session_req {
+> +	struct virtio_crypto_hash_session_para para;
+> +	__u8 padding[40];
+> +};
+> +
+> +struct virtio_crypto_mac_session_para {
+> +#define VIRTIO_CRYPTO_NO_MAC                       0
+> +#define VIRTIO_CRYPTO_MAC_HMAC_MD5                 1
+> +#define VIRTIO_CRYPTO_MAC_HMAC_SHA1                2
+> +#define VIRTIO_CRYPTO_MAC_HMAC_SHA_224             3
+> +#define VIRTIO_CRYPTO_MAC_HMAC_SHA_256             4
+> +#define VIRTIO_CRYPTO_MAC_HMAC_SHA_384             5
+> +#define VIRTIO_CRYPTO_MAC_HMAC_SHA_512             6
+> +#define VIRTIO_CRYPTO_MAC_CMAC_3DES                25
+> +#define VIRTIO_CRYPTO_MAC_CMAC_AES                 26
+> +#define VIRTIO_CRYPTO_MAC_KASUMI_F9                27
+> +#define VIRTIO_CRYPTO_MAC_SNOW3G_UIA2              28
+> +#define VIRTIO_CRYPTO_MAC_GMAC_AES                 41
+> +#define VIRTIO_CRYPTO_MAC_GMAC_TWOFISH             42
+> +#define VIRTIO_CRYPTO_MAC_CBCMAC_AES               49
+> +#define VIRTIO_CRYPTO_MAC_CBCMAC_KASUMI_F9         50
+> +#define VIRTIO_CRYPTO_MAC_XCBC_AES                 53
+> +	__le32 algo;
+> +	/* hash result length */
+> +	__le32 hash_result_len;
+> +	/* length of authenticated key */
+> +	__le32 auth_key_len;
+> +	__le32 padding;
+> +};
+> +
+> +struct virtio_crypto_mac_create_session_req {
+> +	struct virtio_crypto_mac_session_para para;
+> +	__u8 padding[40];
+> +};
+> +
+> +struct virtio_crypto_aead_session_para {
+> +#define VIRTIO_CRYPTO_NO_AEAD     0
+> +#define VIRTIO_CRYPTO_AEAD_GCM    1
+> +#define VIRTIO_CRYPTO_AEAD_CCM    2
+> +#define VIRTIO_CRYPTO_AEAD_CHACHA20_POLY1305  3
+> +	__le32 algo;
+> +	/* length of key */
+> +	__le32 key_len;
+> +	/* hash result length */
+> +	__le32 hash_result_len;
+> +	/* length of the additional authenticated data (AAD) in bytes */
+> +	__le32 aad_len;
+> +	/* encrypt or decrypt, See above VIRTIO_CRYPTO_OP_* */
+> +	__le32 op;
+> +	__le32 padding;
+> +};
+> +
+> +struct virtio_crypto_aead_create_session_req {
+> +	struct virtio_crypto_aead_session_para para;
+> +	__u8 padding[32];
+> +};
+> +
+> +struct virtio_crypto_alg_chain_session_para {
+> +#define VIRTIO_CRYPTO_SYM_ALG_CHAIN_ORDER_HASH_THEN_CIPHER  1
+> +#define VIRTIO_CRYPTO_SYM_ALG_CHAIN_ORDER_CIPHER_THEN_HASH  2
+> +	__le32 alg_chain_order;
+> +/* Plain hash */
+> +#define VIRTIO_CRYPTO_SYM_HASH_MODE_PLAIN    1
+> +/* Authenticated hash (mac) */
+> +#define VIRTIO_CRYPTO_SYM_HASH_MODE_AUTH     2
+> +/* Nested hash */
+> +#define VIRTIO_CRYPTO_SYM_HASH_MODE_NESTED   3
+> +	__le32 hash_mode;
+> +	struct virtio_crypto_cipher_session_para cipher_param;
+> +	union {
+> +		struct virtio_crypto_hash_session_para hash_param;
+> +		struct virtio_crypto_mac_session_para mac_param;
+> +		__u8 padding[16];
+> +	} u;
+> +	/* length of the additional authenticated data (AAD) in bytes */
+> +	__le32 aad_len;
+> +	__le32 padding;
+> +};
+> +
+> +struct virtio_crypto_alg_chain_session_req {
+> +	struct virtio_crypto_alg_chain_session_para para;
+> +};
+> +
+> +struct virtio_crypto_sym_create_session_req {
+> +	union {
+> +		struct virtio_crypto_cipher_session_req cipher;
+> +		struct virtio_crypto_alg_chain_session_req chain;
+> +		__u8 padding[48];
+> +	} u;
+> +
+> +	/* Device-readable part */
+> +
+> +/* No operation */
+> +#define VIRTIO_CRYPTO_SYM_OP_NONE  0
+> +/* Cipher only operation on the data */
+> +#define VIRTIO_CRYPTO_SYM_OP_CIPHER  1
+> +/*
+> + * Chain any cipher with any hash or mac operation. The order
+> + * depends on the value of alg_chain_order param
+> + */
+> +#define VIRTIO_CRYPTO_SYM_OP_ALGORITHM_CHAINING  2
+> +	__le32 op_type;
+> +	__le32 padding;
+> +};
+> +
+> +struct virtio_crypto_destroy_session_req {
+> +	/* Device-readable part */
+> +	__le64  session_id;
+> +	__u8 padding[48];
+> +};
+> +
+> +/* The request of the control viritqueue's packet */
+
+s/viritqueue/virtqueue/
+
+> +struct virtio_crypto_op_ctrl_req {
+> +	struct virtio_crypto_ctrl_header header;
+> +
+> +	union {
+> +		struct virtio_crypto_sym_create_session_req
+> +			sym_create_session;
+> +		struct virtio_crypto_hash_create_session_req
+> +			hash_create_session;
+> +		struct virtio_crypto_mac_create_session_req
+> +			mac_create_session;
+> +		struct virtio_crypto_aead_create_session_req
+> +			aead_create_session;
+> +		struct virtio_crypto_destroy_session_req
+> +			destroy_session;
+> +		__u8 padding[56];
+> +	} u;
+> +};
+> +
+> +struct virtio_crypto_op_header {
+> +#define VIRTIO_CRYPTO_CIPHER_ENCRYPT \
+> +	VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_CIPHER, 0x00)
+> +#define VIRTIO_CRYPTO_CIPHER_DECRYPT \
+> +	VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_CIPHER, 0x01)
+> +#define VIRTIO_CRYPTO_HASH \
+> +	VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_HASH, 0x00)
+> +#define VIRTIO_CRYPTO_MAC \
+> +	VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_MAC, 0x00)
+> +#define VIRTIO_CRYPTO_AEAD_ENCRYPT \
+> +	VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x00)
+> +#define VIRTIO_CRYPTO_AEAD_DECRYPT \
+> +	VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x01)
+> +	__le32 opcode;
+> +	/* algo should be service-specific algorithms */
+> +	__le32 algo;
+> +	/* session_id should be service-specific algorithms */
+> +	__le64 session_id;
+> +	/* control flag to control the request */
+> +	__le32 flag;
+> +	__le32 padding;
+> +};
+> +
+> +struct virtio_crypto_cipher_para {
+> +	/*
+> +	 * Byte Length of valid IV/Counter
+> +	 *
+> +	 * For block ciphers in CBC or F8 mode, or for Kasumi in F8 mode, or for
+> +	 *   SNOW3G in UEA2 mode, this is the length of the IV (which
+> +	 *   must be the same as the block length of the cipher).
+> +	 * For block ciphers in CTR mode, this is the length of the counter
+> +	 *   (which must be the same as the block length of the cipher).
+> +	 * For AES-XTS, this is the 128bit tweak, i, from IEEE Std 1619-2007.
+> +	 *
+> +	 * The IV/Counter will be updated after every partial cryptographic
+> +	 * operation.
+> +	 */
+> +	__le32 iv_len;
+> +	/* length of source data */
+> +	__le32 src_data_len;
+> +	/* length of dst data */
+> +	__le32 dst_data_len;
+> +	__le32 padding;
+> +};
+> +
+> +struct virtio_crypto_hash_para {
+> +	/* length of source data */
+> +	__le32 src_data_len;
+> +	/* hash result length */
+> +	__le32 hash_result_len;
+> +};
+> +
+> +struct virtio_crypto_mac_para {
+> +	struct virtio_crypto_hash_para hash;
+> +};
+> +
+> +struct virtio_crypto_aead_para {
+> +	/*
+> +	 * Byte Length of valid IV data pointed to by the below iv_addr
+> +	 * parameter.
+> +	 *
+> +	 * For GCM mode, this is either 12 (for 96-bit IVs) or 16, in which
+> +	 *   case iv_addr points to J0.
+> +	 * For CCM mode, this is the length of the nonce, which can be in the
+> +	 *   range 7 to 13 inclusive.
+> +	 */
+> +	__le32 iv_len;
+> +	/* length of additional auth data */
+> +	__le32 aad_len;
+> +	/* length of source data */
+> +	__le32 src_data_len;
+> +	/* length of dst data */
+> +	__le32 dst_data_len;
+> +};
+> +
+> +struct virtio_crypto_cipher_data_req {
+> +	/* Device-readable part */
+> +	struct virtio_crypto_cipher_para para;
+> +	__u8 padding[24];
+> +};
+> +
+> +struct virtio_crypto_hash_data_req {
+> +	/* Device-readable part */
+> +	struct virtio_crypto_hash_para para;
+> +	__u8 padding[40];
+> +};
+> +
+> +struct virtio_crypto_mac_data_req {
+> +	/* Device-readable part */
+> +	struct virtio_crypto_mac_para para;
+> +	__u8 padding[40];
+> +};
+> +
+> +struct virtio_crypto_alg_chain_data_para {
+> +	__le32 iv_len;
+> +	/* Length of source data */
+> +	__le32 src_data_len;
+> +	/* Length of destination data */
+> +	__le32 dst_data_len;
+> +	/* Starting point for cipher processing in source data */
+> +	__le32 cipher_start_src_offset;
+> +	/* Length of the source data that the cipher will be computed on */
+> +	__le32 len_to_cipher;
+> +	/* Starting point for hash processing in source data */
+> +	__le32 hash_start_src_offset;
+> +	/* Length of the source data that the hash will be computed on */
+> +	__le32 len_to_hash;
+> +	/* Length of the additional auth data */
+> +	__le32 aad_len;
+> +	/* Length of the hash result */
+> +	__le32 hash_result_len;
+> +	__le32 reserved;
+> +};
+> +
+> +struct virtio_crypto_alg_chain_data_req {
+> +	/* Device-readable part */
+> +	struct virtio_crypto_alg_chain_data_para para;
+> +};
+> +
+> +struct virtio_crypto_sym_data_req {
+> +	union {
+> +		struct virtio_crypto_cipher_data_req cipher;
+> +		struct virtio_crypto_alg_chain_data_req chain;
+> +		__u8 padding[40];
+> +	} u;
+> +
+> +	/* See above VIRTIO_CRYPTO_SYM_OP_* */
+> +	__le32 op_type;
+> +	__le32 padding;
+> +};
+> +
+> +struct virtio_crypto_aead_data_req {
+> +	/* Device-readable part */
+> +	struct virtio_crypto_aead_para para;
+> +	__u8 padding[32];
+> +};
+> +
+> +/* The request of the data viritqueue's packet */
+
+s/viritqueue/virtqueue/
+
+> +struct virtio_crypto_op_data_req {
+> +	struct virtio_crypto_op_header header;
+> +
+> +	union {
+> +		struct virtio_crypto_sym_data_req  sym_req;
+> +		struct virtio_crypto_hash_data_req hash_req;
+> +		struct virtio_crypto_mac_data_req mac_req;
+> +		struct virtio_crypto_aead_data_req aead_req;
+> +		__u8 padding[48];
+> +	} u;
+> +};
+> +
+> +#define VIRTIO_CRYPTO_OK        0
+> +#define VIRTIO_CRYPTO_ERR       1
+> +#define VIRTIO_CRYPTO_BADMSG    2
+> +#define VIRTIO_CRYPTO_NOTSUPP   3
+> +#define VIRTIO_CRYPTO_INVSESS   4 /* Invaild session id */
+
+s/Invaild/Invalid/
+
+> +
+> +/* The accelerator hardware is ready */
+> +#define VIRTIO_CRYPTO_S_HW_READY  (1 << 0)
+> +
+> +struct virtio_crypto_config {
+> +	/* See VIRTIO_CRYPTO_OP_* above */
+> +	__u32  status;
+> +
+> +	/*
+> +	 * Maximum number of data queue
+> +	 */
+> +	__u32  max_dataqueues;
+> +
+> +	/*
+> +	 * Specifies the services mask which the devcie support,
+> +	 * see VIRTIO_CRYPTO_SERVICE_* above
+> +	 */
+> +	__u32 crypto_services;
+> +
+> +	/* Detailed algorithms mask */
+> +	__u32 cipher_algo_l;
+> +	__u32 cipher_algo_h;
+> +	__u32 hash_algo;
+> +	__u32 mac_algo_l;
+> +	__u32 mac_algo_h;
+> +	__u32 aead_algo;
+> +	/* Maximum length of cipher key */
+> +	__u32 max_cipher_key_len;
+> +	/* Maximum length of authenticated key */
+> +	__u32 max_auth_key_len;
+> +	__u32 reserve;
+> +	/* Maximum size of each crypto request's content */
+> +	__u64 max_size;
+> +};
+> +
+> +struct virtio_crypto_inhdr {
+> +	/* See VIRTIO_CRYPTO_* above */
+> +	__u8 status;
+> +};
+> +#endif
+> diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_=
+ids.h
+> index 3228d58..6d5c3b2 100644
+> --- a/include/uapi/linux/virtio_ids.h
+> +++ b/include/uapi/linux/virtio_ids.h
+> @@ -42,5 +42,6 @@
+>  #define VIRTIO_ID_GPU          16 /* virtio GPU */
+>  #define VIRTIO_ID_INPUT        18 /* virtio input */
+>  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+> +#define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
+> =20
+>  #endif /* _LINUX_VIRTIO_IDS_H */
+> --=20
+> 1.8.3.1
+>=20
+>=20
+
+--IiVenqGWf+H9Y6IX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYPFlnAAoJEJykq7OBq3PIUToIAIRpk5FJSbYnOgOeCDvyRgGx
+FtPaznAYnq7Q3kukZJgMSoNMDq6l2HqFieVeZxR8OUg9q3SHW+Td/4yF+z1YZQCA
+Yf0OVEp1AbNo5S+S48LX0fscBOJd/zXFZgZHe2W0+DrJ7vD/xxHJ6a9mvwCdw4Eh
+eYqbCAiHFUM6Ttc0EWV0MSwQmYgi+V2z3SZ1pNlIqRQHmwdHPEGFHq//thz7v980
+kkgk1fwXEqFiAhuF2S2/aLFiYdNl+NYH2RdOXcWTHCs0K+ei9HA/ojyaUFzkjHk4
+HpKDBpFRUhF8vRxiK/a90ftuyQ8y3NeRFiWplQFliK0jtRZyVfg/aFCnrWH8YTo=
+=Ecyo
+-----END PGP SIGNATURE-----
+
+--IiVenqGWf+H9Y6IX--
