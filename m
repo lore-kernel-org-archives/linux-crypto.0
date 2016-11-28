@@ -1,62 +1,33 @@
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Subject: RE: [virtio-dev] Re: [PATCH v2 2/2] crypto: add virtio-crypto driver
-Date: Mon, 28 Nov 2016 05:38:58 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020D97A110B@SZXEMA503-MBS.china.huawei.com>
-References: <1479802223-121104-1-git-send-email-arei.gonglei@huawei.com>
- <1479802223-121104-3-git-send-email-arei.gonglei@huawei.com>
- <20161127045532-mutt-send-email-mst@kernel.org>
- <33183CC9F5247A488A2544077AF19020D97A10EC@SZXEMA503-MBS.china.huawei.com>
- <20161128070829-mutt-send-email-mst@kernel.org>
+From: coral@hi-chem.co.nz
+Subject: RE: BALANCE PAYMENT
+Date: Mon, 28 Nov 2016 19:03:29 +1300
+Message-ID: <20161128190329.73523v7tu3895cq8__37936.2286803827$1480316071$gmane$org@webmail.quickstart.net.nz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
-        "virtualization@lists.linux-foundation.org"
-        <virtualization@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Luonengjun <luonengjun@huawei.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>,
-        "Wubin (H)" <wu.wubin@huawei.com>,
-        "xin.zeng@intel.com" <xin.zeng@intel.com>,
-        Claudio Fontana <Claudio.Fontana@huawei.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "Zhoujian (jay, Euler)" <jian
-To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain;
+        charset=ISO-8859-1;
+        DelSp="Yes";
+        format="flowed"
+Content-Transfer-Encoding: 7bit
+To: undisclosed-recipients:;
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga01-in.huawei.com ([58.251.152.64]:29832 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751623AbcK1FlP (ORCPT
+Received: from mbx2.quickstart.net.nz ([202.46.160.132]:47114 "EHLO
+        smtp.quickstart.net.nz" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1754283AbcK1GyC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Nov 2016 00:41:15 -0500
-In-Reply-To: <20161128070829-mutt-send-email-mst@kernel.org>
-Content-Language: zh-CN
+        Mon, 28 Nov 2016 01:54:02 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Dear Sir/s,
 
-> 
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Monday, November 28, 2016 1:09 PM
-> To: Gonglei (Arei)
-> Subject: Re: [virtio-dev] Re: [PATCH v2 2/2] crypto: add virtio-crypto driver
-> 
-> On Mon, Nov 28, 2016 at 04:47:21AM +0000, Gonglei (Arei) wrote:
-> > Michael, I'd like to add virtio-crypto stuff to your maintaining part likes
-> > the virtio-net/blk parts so that the corresponding patches
-> > can be CC'ed to you too because the virtio-crypto doesn't lay in
-> > driver/virtio directory. Will you?
-> >
-> > Thanks!
-> > -Gonglei
-> 
-> Sure, that's fine.
-> 
-Will do in the next version.  :)
+Please see attached.
 
-Thanks,
--Gonglei
+
+Thanks and regards,
+
+Accounts Department
+Al Omraniya Trading Co. LLC
+P.O. Box: 10757, Al Khabaisi Area,
+Deira 2, Dubai, U.A.E.
+Tel: +971 4 268 2730 / Fax: +971 4 268 4117
