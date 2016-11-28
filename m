@@ -1,66 +1,111 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v4] crypto: arm64/sha2: integrate OpenSSL implementations
- of SHA256/SHA512
-Date: Mon, 28 Nov 2016 12:05:04 +0000
-Message-ID: <20161128120503.GC1485@arm.com>
-References: <1479642121-17912-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Gonglei <arei.gonglei@huawei.com>
+Subject: [PATCH v3] virtio-crypto: add Linux driver
+Date: Mon, 28 Nov 2016 20:08:22 +0800
+Message-ID: <1480334903-6672-1-git-send-email-arei.gonglei@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        herbert@gondor.apana.org.au, appro@openssl.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain
+Cc: <luonengjun@huawei.com>, <mst@redhat.com>, <stefanha@redhat.com>,
+        <weidong.huang@huawei.com>, <wu.wubin@huawei.com>,
+        <xin.zeng@intel.com>, <claudio.fontana@huawei.com>,
+        <herbert@gondor.apana.org.au>, <pasic@linux.vnet.ibm.com>,
+        <davem@davemloft.net>, <jianjay.zhou@huawei.com>,
+        <hanweidong@huawei.com>, <arei.gonglei@hotmail.com>,
+        <cornelia.huck@de.ibm.com>, <xuquan8@huawei.com>,
+        <longpeng2@huawei.com>, <salvatore.benedetto@intel.com>,
+        Gonglei <arei.gonglei@huawei.com>
+To: <linux-kernel@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <virtio-dev@lists.oasis-open.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:50544 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754159AbcK1MFF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Nov 2016 07:05:05 -0500
-Content-Disposition: inline
-In-Reply-To: <1479642121-17912-1-git-send-email-ard.biesheuvel@linaro.org>
+Received: from szxga01-in.huawei.com ([58.251.152.64]:8913 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754300AbcK1MLW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 28 Nov 2016 07:11:22 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Nov 20, 2016 at 11:42:01AM +0000, Ard Biesheuvel wrote:
-> This integrates both the accelerated scalar and the NEON implementations
-> of SHA-224/256 as well as SHA-384/512 from the OpenSSL project.
-> 
-> Relative performance compared to the respective generic C versions:
-> 
->                  |  SHA256-scalar  | SHA256-NEON* |  SHA512  |
->      ------------+-----------------+--------------+----------+
->      Cortex-A53  |      1.63x      |     1.63x    |   2.34x  |
->      Cortex-A57  |      1.43x      |     1.59x    |   1.95x  |
->      Cortex-A73  |      1.26x      |     1.56x    |     ?    |
-> 
-> The core crypto code was authored by Andy Polyakov of the OpenSSL
-> project, in collaboration with whom the upstream code was adapted so
-> that this module can be built from the same version of sha512-armv8.pl.
-> 
-> The version in this patch was taken from OpenSSL commit 32bbb62ea634
-> ("sha/asm/sha512-armv8.pl: fix big-endian support in __KERNEL__ case.")
-> 
-> * The core SHA algorithm is fundamentally sequential, but there is a
->   secondary transformation involved, called the schedule update, which
->   can be performed independently. The NEON version of SHA-224/SHA-256
->   only implements this part of the algorithm using NEON instructions,
->   the sequential part is always done using scalar instructions.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  arch/arm64/crypto/Kconfig               |    8 +
->  arch/arm64/crypto/Makefile              |   17 +
->  arch/arm64/crypto/sha256-core.S_shipped | 2061 ++++++++++++++++++++
->  arch/arm64/crypto/sha256-glue.c         |  185 ++
->  arch/arm64/crypto/sha512-armv8.pl       |  778 ++++++++
->  arch/arm64/crypto/sha512-core.S_shipped | 1085 +++++++++++
->  arch/arm64/crypto/sha512-glue.c         |   94 +
->  7 files changed, 4228 insertions(+)
+v3:
+ - set cpu affinity when data queues are not equal to the number of online cpus. [Michael]
+ - add TODO comments for cpu hotplug (changing the relationship of binding virtqueue and cpu)
+ - use __u32/64 in the config space since the virtio->get() doesn't support byte-swap yet. [Michael]
+ - drop the whole patch 1 of v2 because the above reason.
+ - add VERSION_1 check at the beginning of virtcrypto_probe()
+ - s/-1/EPERM/g in virtcrypto_update_status(), don't change err to EFAULT then. [Michael]
+ - add reset operation before delete the virtqueus. [Micheal]
+ - drop an unnecessiry spin_lock calling in virtcrypto_freeze(), avoid possible dead lock. [Micheal]
+ - redefine parameter alg's type in order to use a cast for it. [Michael]
+ - pad all structures to have the same size in one union, and add a member to
+   show the union's size in virtio_crypto.h. [Michael]
+ - update MAINTAINER file to add virtio-crypto stuff to Michael's entry so that
+   the corresponding patches can be CC'ed to you too because the virtio-crypto
+   doesn't lay in driver/virtio directory. 
 
-If I build a kernel with this applied and CRYPTO_SHA{256,512}_ARM64=y,
-then I end up with untracked .S files according to git:
+The virtio crypto device is a virtual cryptography device
+as well as a kind of virtual hardware accelerator for
+virtual machines. The encryption anddecryption requests
+are placed in the data queue and are ultimately handled by
+thebackend crypto accelerators. The second queue is the
+control queue used to create or destroy sessions for
+symmetric algorithms and will control some advanced features
+in the future. The virtio crypto device provides the following
+cryptoservices: CIPHER, MAC, HASH, and AEAD.
 
-$ git status
-Untracked files:
-	arch/arm64/crypto/sha256-core.S
-	arch/arm64/crypto/sha512-core.S
+For more information about virtio-crypto device, please see:
+  http://qemu-project.org/Features/VirtioCrypto
 
-Will
+For better reviewing:
+
+The patch mainly includes five files:
+ 1) virtio_crypto.h is the header file for virtio-crypto device,
+which is based on the virtio-crypto specification. 
+ 2) virtio_crypto.c is the entry of the driver module,
+which is similar with other virtio devices, such as virtio-net,
+virtio-input etc. 
+ 3) virtio_crypto_mgr.c is used to manage the virtio
+crypto devices in the system. We support up to 32 virtio-crypto
+devices currently. I use a global list to store the virtio crypto
+devices which refer to Intel QAT driver. Meanwhile, the file
+includs the functions of add/del/search/start/stop for virtio
+crypto devices.
+ 4) virtio_crypto_common.h is a private header file for virtio
+crypto driver, includes structure definations, and function declarations.
+ 5) virtio_crypto_algs.c is the realization of algs based on Linux Crypto Framwork,
+which can register different crypto algorithms. Currently it's only support AES-CBC.
+The Crypto guys can mainly focus on this file. 
+
+
+v2:
+ - stop doing DMA from the stack, CONFIG_VMAP_STACK=y [Salvatore]
+ - convert __virtio32/64 to __le32/64 in virtio_crypto.h
+ - remove VIRTIO_CRYPTO_S_STARTED based on the lastest virtio crypto spec.
+ - introduces the little edian functions for VIRTIO_1 devices in patch 1.
+
+
+Gonglei (1):
+  crypto: add virtio-crypto driver
+
+ MAINTAINERS                                  |   9 +
+ drivers/crypto/Kconfig                       |   2 +
+ drivers/crypto/Makefile                      |   1 +
+ drivers/crypto/virtio/Kconfig                |  10 +
+ drivers/crypto/virtio/Makefile               |   5 +
+ drivers/crypto/virtio/virtio_crypto.c        | 451 +++++++++++++++++++++++
+ drivers/crypto/virtio/virtio_crypto_algs.c   | 525 +++++++++++++++++++++++++++
+ drivers/crypto/virtio/virtio_crypto_common.h | 124 +++++++
+ drivers/crypto/virtio/virtio_crypto_mgr.c    | 258 +++++++++++++
+ include/uapi/linux/Kbuild                    |   1 +
+ include/uapi/linux/virtio_crypto.h           | 450 +++++++++++++++++++++++
+ include/uapi/linux/virtio_ids.h              |   1 +
+ 12 files changed, 1837 insertions(+)
+ create mode 100644 drivers/crypto/virtio/Kconfig
+ create mode 100644 drivers/crypto/virtio/Makefile
+ create mode 100644 drivers/crypto/virtio/virtio_crypto.c
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_algs.c
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_common.h
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_mgr.c
+ create mode 100644 include/uapi/linux/virtio_crypto.h
+
+-- 
+1.8.3.1
