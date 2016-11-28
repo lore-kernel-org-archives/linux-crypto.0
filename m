@@ -1,35 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/9] crypto/chcr:Fix memory corruption done
-Date: Mon, 28 Nov 2016 20:49:26 +0800
-Message-ID: <20161128124925.GC2257@gondor.apana.org.au>
-References: <cover.1479740559.git.harsh@chelsio.com>
- <0fae54e35bc10476e7e3c836219474c713f3be7e.1479740559.git.harsh@chelsio.com>
+Subject: Re: [PATCH] crypto: CTR DRBG - prevent invalid SG mappings
+Date: Mon, 28 Nov 2016 21:10:27 +0800
+Message-ID: <20161128131027.GA2674@gondor.apana.org.au>
+References: <1833318.YYJALW9cvC@positron.chronox.de>
+ <3805767.QuT5G9UC4v@positron.chronox.de>
+ <2300597.UdE444b3Re@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: dan.carpenter@oracle.com, linux-crypto@vger.kernel.org,
-        smueller@chronox.de, jlulla@chelsio.com, atul.gupta@chelsio.com,
-        yeshaswi@chelsio.com, hariprasad@chelsio.com
-To: Harsh Jain <harsh@chelsio.com>
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51866 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:40212 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S932362AbcK1Mtj (ORCPT
+        with ESMTP id S1753751AbcK1NKk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Nov 2016 07:49:39 -0500
+        Mon, 28 Nov 2016 08:10:40 -0500
 Content-Disposition: inline
-In-Reply-To: <0fae54e35bc10476e7e3c836219474c713f3be7e.1479740559.git.harsh@chelsio.com>
+In-Reply-To: <2300597.UdE444b3Re@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Nov 21, 2016 at 09:30:47PM +0530, Harsh Jain wrote:
-> Fix memory corruption done by  *((u32 *)dec_key + k) operation.
+On Sat, Nov 26, 2016 at 09:54:14AM +0100, Stephan Mueller wrote:
+> Hi Herbert,
 > 
-> Signed-off-by: Jitendra Lulla <JLULLA@chelsio.com>
+> as discussed in another thread, SGs must not be used with stack memory 
+> pointers. This issue was the culprit to the error I see with the CTR DRBG. The 
+> attached patch fixes the issue.
 
-Please don't mix substantial changes with cosmetic ones such as
-moving a function.  This should be split into two patches, the
-first one being the fix and the second one doing the cosmetic
-fixup.
+Sorry but your patch is corrupted.  Please resend.
 
 Thanks,
 -- 
