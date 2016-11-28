@@ -1,53 +1,55 @@
 From: kbuild test robot <fengguang.wu@intel.com>
-Subject: [cryptodev:master 99/113] ERROR: "simd_skcipher_free"
- [arch/arm/crypto/aes-arm-ce.ko] undefined!
-Date: Tue, 29 Nov 2016 04:38:31 +0800
-Message-ID: <201611290417.A1eyal54%fengguang.wu@intel.com>
+Subject: [cryptodev:master 102/113] ERROR: "simd_skcipher_free"
+ [arch/arm/crypto/aes-arm-bs.ko] undefined!
+Date: Tue, 29 Nov 2016 05:27:10 +0800
+Message-ID: <201611290506.r2fAPdDc%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="VbJkn9YxBvnuCH5J"
+Content-Type: multipart/mixed; boundary="5vNYLRcllDrimb99"
 Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:13158 "EHLO mga05.intel.com"
+Received: from mga05.intel.com ([192.55.52.43]:3377 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753005AbcK1UjP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Nov 2016 15:39:15 -0500
+        id S1753352AbcK1V1S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 28 Nov 2016 16:27:18 -0500
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
---VbJkn9YxBvnuCH5J
+--5vNYLRcllDrimb99
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
 head:   eb0955935e2ae3aa1fc9c34ec684ffe086e81da7
-commit: da40e7a4ba4d6391a797f4bdbd6d534067d87087 [99/113] crypto: aes-ce - Convert to skcipher
+commit: 211f41af534ad426199a523e4cfec2034a2bdef7 [102/113] crypto: aesbs - Convert to skcipher
 config: arm-defconfig (attached as .config)
 compiler: arm-linux-gnueabi-gcc (Debian 6.1.1-9) 6.1.1 20160705
 reproduce:
         wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        git checkout da40e7a4ba4d6391a797f4bdbd6d534067d87087
+        git checkout 211f41af534ad426199a523e4cfec2034a2bdef7
         # save the attached .config to linux build tree
         make.cross ARCH=arm 
 
 All errors (new ones prefixed by >>):
 
->> ERROR: "simd_skcipher_free" [arch/arm/crypto/aes-arm-ce.ko] undefined!
->> ERROR: "simd_skcipher_create_compat" [arch/arm/crypto/aes-arm-ce.ko] undefined!
+   ERROR: "simd_skcipher_free" [arch/arm/crypto/aes-arm-ce.ko] undefined!
+   ERROR: "simd_skcipher_create_compat" [arch/arm/crypto/aes-arm-ce.ko] undefined!
+>> ERROR: "simd_skcipher_free" [arch/arm/crypto/aes-arm-bs.ko] undefined!
+>> ERROR: "simd_skcipher_create_compat" [arch/arm/crypto/aes-arm-bs.ko] undefined!
 
 ---
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---VbJkn9YxBvnuCH5J
+--5vNYLRcllDrimb99
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICOiRPFgAAy5jb25maWcAjFxJk+O2kr6/X6Foz2HmYJf2JSbqAJKQRIsk2AAoqerCkKvV
+H4sICGibPFgAAy5jb25maWcAjFxJk+O2kr6/X6Foz2HmYJf2JSbqAJKQRIsk2AAoqerCkKvV
 tuLV0qNS+3X/+8kESBEAQZU7HOHSl4k9kRsA/vKvX3rk++Xt5XA5PR2en3/2/jy+Hs+Hy/FL
 7+vp+fi/vYj1MiZ7NIrlb8CcnF6//7g7nF96498Wv/V/PT8Nepvj+fX43AvfXr+e/vwOhU9v
 r//65V8hy5bxqiQ8vf9p/CjXRJRiVYZrEmcNJaM0QjhKSZnQbCXXdinEC0HLmKVp0SYpuCRJ
@@ -776,4 +778,4 @@ A0RLnF4RivzMJVZVu7Ka4O/Urmsq/8komssj2ziPqOkxNBnczDkTBWzfVWyFtsxHrU5KoJTO
 xAdpDibTn2OKb5veMdAvvWE5+w4d8Y9/HnstHP/cd/azQdeUys2cazC4Suss4WIKAghpnRxc
 azV0R3Ne6n4QVXktfFeK/wDZdNL+lJQCAA==
 
---VbJkn9YxBvnuCH5J--
+--5vNYLRcllDrimb99--
