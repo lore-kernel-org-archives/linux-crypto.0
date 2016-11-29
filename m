@@ -1,57 +1,48 @@
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Subject: Re: [PATCH v3] crypto: add virtio-crypto driver
-Date: Tue, 29 Nov 2016 10:29:35 +0100
-Message-ID: <20161129102935.405892bd.cornelia.huck@de.ibm.com>
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Subject: RE: [PATCH v3] crypto: add virtio-crypto driver
+Date: Tue, 29 Nov 2016 09:31:32 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA14A82C@DGGEMA505-MBX.china.huawei.com>
 References: <1480334903-6672-1-git-send-email-arei.gonglei@huawei.com>
-	<1480334903-6672-2-git-send-email-arei.gonglei@huawei.com>
-	<20161128162055.GB11196@stefanha-x1.localdomain>
-	<20161128185747-mutt-send-email-mst@kernel.org>
-	<33183CC9F5247A488A2544077AF19020DA14A7A9@DGGEMA505-MBX.china.huawei.com>
-	<20161129092549.GC5152@stefanha-x1.localdomain>
+ <1480334903-6672-2-git-send-email-arei.gonglei@huawei.com>
+ <20161128162055.GB11196@stefanha-x1.localdomain>
+ <20161128185747-mutt-send-email-mst@kernel.org>
+ <33183CC9F5247A488A2544077AF19020DA14A7A9@DGGEMA505-MBX.china.huawei.com>
+ <20161129092549.GC5152@stefanha-x1.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        "Michael S. Tsirkin"
- <mst@redhat.com>,
-        "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>,
-        "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>,
-        "virtio-dev@lists.oasis-open.org"
- <virtio-dev@lists.oasis-open.org>,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
         "virtualization@lists.linux-foundation.org"
- <virtualization@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org"
- <linux-crypto@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Luonengjun <luonengjun@huawei.com>,
         "Huangweidong (C)" <weidong.huang@huawei.com>,
-        "Wubin (H)"
- <wu.wubin@huawei.com>,
+        "Wubin (H)" <wu.wubin@huawei.com>,
         "xin.zeng@intel.com" <xin.zeng@intel.com>,
-        Claudio
- Fontana <Claudio.Fontana@huawei.com>,
-        "herbert@gondor.apana.org.au"
- <herbert@gondor.apana.org.au>,
-        "pasic@linux.vnet.ibm.com"
- <pasic@linux.vnet.ibm.com>,
-        "davem@davemloft.net" <davem@daveml
+        "Claudio Fontana" <Claudio.Fontana@huawei.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "Zhoujian (jay, Euler)" <jianjay.
 To: Stefan Hajnoczi <stefanha@redhat.com>
-Return-path: <virtio-dev-return-1736-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
-Sender: <virtio-dev@lists.oasis-open.org>
-List-Post: <mailto:virtio-dev@lists.oasis-open.org>
-List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
-List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
-List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2368 "EHLO
+        dggrg02-dlp.huawei.com" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1754838AbcK2Jb6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 29 Nov 2016 04:31:58 -0500
 In-Reply-To: <20161129092549.GC5152@stefanha-x1.localdomain>
-List-Id: linux-crypto.vger.kernel.org
+Content-Language: zh-CN
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 29 Nov 2016 09:25:49 +0000
-Stefan Hajnoczi <stefanha@redhat.com> wrote:
-
+> 
 > On Tue, Nov 29, 2016 at 08:22:58AM +0000, Gonglei (Arei) wrote:
 > > Hi,
-> > 
+> >
 > > > > > > +source "drivers/crypto/virtio/Kconfig"
 > > > > > > +
 > > > > > >  endif # CRYPTO_HW
@@ -80,7 +71,7 @@ Stefan Hajnoczi <stefanha@redhat.com> wrote:
 > > > > > Inconsistent tab vs space whitespace usage.
 > > > > >
 > > > Will fix.
-> > > 
+> > >
 > > > > > > +	default m
 > > > > > > +	help
 > > > > > > +	  This driver provides support for virtio crypto device. If you
@@ -94,15 +85,21 @@ Stefan Hajnoczi <stefanha@redhat.com> wrote:
 > > > > >  I suggest calling it virtio_crypto for consistency.
 > > > > >
 > > > OK, I will change the Makefile to fix it.
-> > > 
-> > 
+> > >
+> >
 > > I tried to do this, but I failed. Because virtio_crypto.ko
 > > consists of more than one source file which include tree files currently,
 > > and virtio_crypto.ko matchs the name of virtio_crypto.c.
 > > That's different with all other virtio drivers.
 > 
 > Can you rename virtio_crypto.c to virtio_crypto_core.c?
+> 
+I'm fine with virtio_crypto_core.c. What about you? Michael?
 
-+1
+Regards,
+-Gonglei
 
-I think that's the way to go.
+> I'm not very familiar with the kernel Makefile infrastructure so maybe
+> there's a better way of doing it.
+> 
+> Stefan
