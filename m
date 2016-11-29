@@ -1,74 +1,136 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: linux-next: build failure after merge of the crypto tree
-Date: Tue, 29 Nov 2016 16:43:33 +0800
-Message-ID: <20161129084333.GA5705@gondor.apana.org.au>
-References: <20161129115529.41f9f0b5@canb.auug.org.au>
- <20161129070840.GA5113@gondor.apana.org.au>
- <DB4PR04MB084718B8EB90B061EA144C02988D0@DB4PR04MB0847.eurprd04.prod.outlook.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v2] crypto: CTR DRBG - prevent invalid SG mappings
+Date: Tue, 29 Nov 2016 09:45:04 +0100
+Message-ID: <1602385.dkYy1y29re@positron.chronox.de>
+References: <1833318.YYJALW9cvC@positron.chronox.de> <1506389.b84a3PTDCG@positron.chronox.de> <20161129080556.GA5467@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-        "linux-next@vger.kernel.org" <linux-next@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60269 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1753935AbcK2IoR (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Nov 2016 03:44:17 -0500
-Content-Disposition: inline
-In-Reply-To: <DB4PR04MB084718B8EB90B061EA144C02988D0@DB4PR04MB0847.eurprd04.prod.outlook.com>
+Received: from mail.eperm.de ([89.247.134.16]:51022 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753284AbcK2IpT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 29 Nov 2016 03:45:19 -0500
+In-Reply-To: <20161129080556.GA5467@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 29, 2016 at 08:34:08AM +0000, Horia Geantă wrote:
->
-> > Fixes: da40e7a4ba4d ("crypto: aes-ce - Convert to skcipher")
-> > Fixes: 211f41af534a ("crypto: aesbs - Convert to skcipher")
-> The fix for this commit is missing.
-> CRYPTO_AES_ARM_BS also needs to select CRYPTO_SIMD.
+When using SGs, only heap memory (memory that is valid as per
+virt_addr_valid) is allowed to be referenced. The CTR DRBG used to
+reference the caller-provided memory directly in an SG. In case the
+caller provided stack memory pointers, the SG mapping is not considered
+to be valid. In some cases, this would even cause a paging fault.
 
-Thanks.  I'll add this patch on top:
+The change adds a new scratch buffer that is used unconditionally to
+catch the cases where the caller-provided buffer is not suitable for
+use in an SG. The crypto operation of the CTR DRBG produces its output
+with that scratch buffer and finally copies the content of the
+scratch buffer to the caller's buffer.
 
----8<---
-Subject: crypto: arm/aes - Add missing SIMD select for aesbs
+The scratch buffer is allocated during allocation time of the CTR DRBG
+as its access is protected with the DRBG mutex.
 
-This patch adds one more missing SIMD select for AES_ARM_BS.  It
-also changes selects on ALGAPI to BLKCIPHER.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/drbg.c         | 29 ++++++++++++++++++++++++-----
+ include/crypto/drbg.h |  2 ++
+ 2 files changed, 26 insertions(+), 5 deletions(-)
 
-Fixes: 211f41af534a ("crypto: aesbs - Convert to skcipher")
-Reported-by: Horia Geantă <horia.geanta@nxp.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index 8134888..dd90e38 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -88,9 +88,9 @@ config CRYPTO_AES_ARM
- config CRYPTO_AES_ARM_BS
- 	tristate "Bit sliced AES using NEON instructions"
- 	depends on KERNEL_MODE_NEON
--	select CRYPTO_ALGAPI
- 	select CRYPTO_AES_ARM
--	select CRYPTO_ABLK_HELPER
-+	select CRYPTO_BLKCIPHER
-+	select CRYPTO_SIMD
- 	help
- 	  Use a faster and more secure NEON based implementation of AES in CBC,
- 	  CTR and XTS modes
-@@ -104,7 +104,7 @@ config CRYPTO_AES_ARM_BS
- config CRYPTO_AES_ARM_CE
- 	tristate "Accelerated AES using ARMv8 Crypto Extensions"
- 	depends on KERNEL_MODE_NEON
--	select CRYPTO_ALGAPI
-+	select CRYPTO_BLKCIPHER
- 	select CRYPTO_SIMD
- 	help
- 	  Use an implementation of AES in CBC, CTR and XTS modes that uses
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 9a95b61..8ffda67 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -262,6 +262,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+ 			      u8 *inbuf, u32 inbuflen,
+ 			      u8 *outbuf, u32 outlen);
+ #define DRBG_CTR_NULL_LEN 128
++#define DRBG_OUTSCRATCHLEN DRBG_CTR_NULL_LEN
+ 
+ /* BCC function for CTR DRBG as defined in 10.4.3 */
+ static int drbg_ctr_bcc(struct drbg_state *drbg,
+@@ -1644,6 +1645,9 @@ static int drbg_fini_sym_kernel(struct drbg_state *drbg)
+ 	kfree(drbg->ctr_null_value_buf);
+ 	drbg->ctr_null_value = NULL;
+ 
++	kfree(drbg->outscratchpadbuf);
++	drbg->outscratchpadbuf = NULL;
++
+ 	return 0;
+ }
+ 
+@@ -1708,6 +1712,15 @@ static int drbg_init_sym_kernel(struct drbg_state *drbg)
+ 	drbg->ctr_null_value = (u8 *)PTR_ALIGN(drbg->ctr_null_value_buf,
+ 					       alignmask + 1);
+ 
++	drbg->outscratchpadbuf = kmalloc(DRBG_OUTSCRATCHLEN + alignmask,
++					 GFP_KERNEL);
++	if (!drbg->outscratchpadbuf) {
++		drbg_fini_sym_kernel(drbg);
++		return -ENOMEM;
++	}
++	drbg->outscratchpad = (u8 *)PTR_ALIGN(drbg->outscratchpadbuf,
++					      alignmask + 1);
++
+ 	return alignmask;
+ }
+ 
+@@ -1737,15 +1750,16 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+ 			      u8 *outbuf, u32 outlen)
+ {
+ 	struct scatterlist sg_in;
++	int ret;
+ 
+ 	sg_init_one(&sg_in, inbuf, inlen);
+ 
+ 	while (outlen) {
+-		u32 cryptlen = min_t(u32, inlen, outlen);
++		u32 cryptlen = min3(inlen, outlen, (u32)DRBG_OUTSCRATCHLEN);
+ 		struct scatterlist sg_out;
+-		int ret;
+ 
+-		sg_init_one(&sg_out, outbuf, cryptlen);
++		/* Output buffer may not be valid for SGL, use scratchpad */
++		sg_init_one(&sg_out, drbg->outscratchpad, cryptlen);
+ 		skcipher_request_set_crypt(drbg->ctr_req, &sg_in, &sg_out,
+ 					   cryptlen, drbg->V);
+ 		ret = crypto_skcipher_encrypt(drbg->ctr_req);
+@@ -1761,15 +1775,20 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+ 				break;
+ 			}
+ 		default:
+-			return ret;
++			goto out;
+ 		}
+ 		init_completion(&drbg->ctr_completion);
+ 
++		memcpy(outbuf, drbg->outscratchpad, cryptlen);
++
+ 		outlen -= cryptlen;
+ 		outbuf += cryptlen;
+ 	}
++	ret = 0;
+ 
+-	return 0;
++out:
++	memzero_explicit(drbg->outscratchpad, DRBG_OUTSCRATCHLEN);
++	return ret;
+ }
+ #endif /* CONFIG_CRYPTO_DRBG_CTR */
+ 
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index 61580b1..22f884c 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -124,6 +124,8 @@ struct drbg_state {
+ 	struct skcipher_request *ctr_req;	/* CTR mode request handle */
+ 	__u8 *ctr_null_value_buf;		/* CTR mode unaligned buffer */
+ 	__u8 *ctr_null_value;			/* CTR mode aligned zero buf */
++	__u8 *outscratchpadbuf;			/* CTR mode output scratchpad */
++        __u8 *outscratchpad;			/* CTR mode aligned outbuf */
+ 	struct completion ctr_completion;	/* CTR mode async handler */
+ 	int ctr_async_err;			/* CTR mode async error */
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.9.3
