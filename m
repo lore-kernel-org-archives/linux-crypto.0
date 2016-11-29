@@ -1,143 +1,58 @@
 From: Harsh Jain <harsh@chelsio.com>
-Subject: [PATCH v3 06/10] crypto/chcr: Calculate Reverse round key in setkey callback.
-Date: Tue, 29 Nov 2016 19:00:39 +0530
-Message-ID: <0ca55171a2eddebed36f06bd6ade7652de176f42.1480413079.git.harsh@chelsio.com>
-References: <cover.1480413079.git.harsh@chelsio.com>
+Subject: [PATCH v3 00/10] crypto/chcr: AEAD support and bug fixes
+Date: Tue, 29 Nov 2016 19:00:33 +0530
+Message-ID: <cover.1480413079.git.harsh@chelsio.com>
 Cc: Harsh Jain <harsh@chelsio.com>
 To: dan.carpenter@oracle.com, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, smueller@chronox.de,
         hariprasad@chelsio.com, jlulla@chelsio.com, atul.gupta@chelsio.com,
         yeshaswi@chelsio.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:40641 "EHLO
+Received: from stargate.chelsio.com ([12.32.117.8]:6124 "EHLO
         stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932645AbcK2NbQ (ORCPT
+        with ESMTP id S1754909AbcK2NbK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Nov 2016 08:31:16 -0500
-In-Reply-To: <cover.1480413079.git.harsh@chelsio.com>
-In-Reply-To: <cover.1480413079.git.harsh@chelsio.com>
-References: <cover.1480413079.git.harsh@chelsio.com>
+        Tue, 29 Nov 2016 08:31:10 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Move reverse round key calculation logic in setkey operation.
+This patch series includes Bug Fixes, performance improvement and
+support for following AEAD algos.
+GCM,CCM,RFC4106,RFC4303,authenc(hmac(shaXXX),cbc(aes))
 
-Signed-off-by: Harsh Jain <harsh@chelsio.com>
----
- drivers/crypto/chelsio/chcr_algo.c   | 52 ++++++++++++++++--------------------
- drivers/crypto/chelsio/chcr_crypto.h |  2 +-
- 2 files changed, 24 insertions(+), 30 deletions(-)
+v3:
+-Break patch 01 into 2.
+v2:
+-Replace memcmp to crypto_memneq.
+-Handle cryptlen less than authsize.
+-Check assoclen and cryptlen passed should not the greater 
+ than src sg list.
+-Break patch 02 into 3
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 13aaca2..3cf0093 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -455,16 +455,13 @@ static int generate_copy_rrkey(struct ablk_ctx *ablkctx,
- 			       struct _key_ctx *key_ctx)
- {
- 	if (ablkctx->ciph_mode == CHCR_SCMD_CIPHER_MODE_AES_CBC) {
--		get_aes_decrypt_key(key_ctx->key, ablkctx->key,
--				    ablkctx->enckey_len << 3);
--		memset(key_ctx->key + ablkctx->enckey_len, 0,
--		       CHCR_AES_MAX_KEY_LEN - ablkctx->enckey_len);
-+		memcpy(key_ctx->key, ablkctx->rrkey, ablkctx->enckey_len);
- 	} else {
- 		memcpy(key_ctx->key,
- 		       ablkctx->key + (ablkctx->enckey_len >> 1),
- 		       ablkctx->enckey_len >> 1);
--		get_aes_decrypt_key(key_ctx->key + (ablkctx->enckey_len >> 1),
--				    ablkctx->key, ablkctx->enckey_len << 2);
-+		memcpy(key_ctx->key + (ablkctx->enckey_len >> 1),
-+		       ablkctx->rrkey, ablkctx->enckey_len >> 1);
- 	}
- 	return 0;
- }
-@@ -620,15 +617,9 @@ static int chcr_aes_cbc_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
- {
- 	struct chcr_context *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct ablk_ctx *ablkctx = ABLK_CTX(ctx);
--	struct ablkcipher_alg *alg = crypto_ablkcipher_alg(tfm);
- 	unsigned int ck_size, context_size;
- 	u16 alignment = 0;
- 
--	if ((keylen < alg->min_keysize) || (keylen > alg->max_keysize))
--		goto badkey_err;
--
--	memcpy(ablkctx->key, key, keylen);
--	ablkctx->enckey_len = keylen;
- 	if (keylen == AES_KEYSIZE_128) {
- 		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_128;
- 	} else if (keylen == AES_KEYSIZE_192) {
-@@ -639,7 +630,9 @@ static int chcr_aes_cbc_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
- 	} else {
- 		goto badkey_err;
- 	}
--
-+	memcpy(ablkctx->key, key, keylen);
-+	ablkctx->enckey_len = keylen;
-+	get_aes_decrypt_key(ablkctx->rrkey, ablkctx->key, keylen << 3);
- 	context_size = (KEY_CONTEXT_HDR_SALT_AND_PAD +
- 			keylen + alignment) >> 4;
- 
-@@ -1172,28 +1165,29 @@ static int chcr_aes_xts_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
- {
- 	struct chcr_context *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct ablk_ctx *ablkctx = ABLK_CTX(ctx);
--	int status = 0;
- 	unsigned short context_size = 0;
- 
--	if ((key_len == (AES_KEYSIZE_128 << 1)) ||
--	    (key_len == (AES_KEYSIZE_256 << 1))) {
--		memcpy(ablkctx->key, key, key_len);
--		ablkctx->enckey_len = key_len;
--		context_size = (KEY_CONTEXT_HDR_SALT_AND_PAD + key_len) >> 4;
--		ablkctx->key_ctx_hdr =
--			FILL_KEY_CTX_HDR((key_len == AES_KEYSIZE_256) ?
--					 CHCR_KEYCTX_CIPHER_KEY_SIZE_128 :
--					 CHCR_KEYCTX_CIPHER_KEY_SIZE_256,
--					 CHCR_KEYCTX_NO_KEY, 1,
--					 0, context_size);
--		ablkctx->ciph_mode = CHCR_SCMD_CIPHER_MODE_AES_XTS;
--	} else {
-+	if ((key_len != (AES_KEYSIZE_128 << 1)) &&
-+	    (key_len != (AES_KEYSIZE_256 << 1))) {
- 		crypto_tfm_set_flags((struct crypto_tfm *)tfm,
- 				     CRYPTO_TFM_RES_BAD_KEY_LEN);
- 		ablkctx->enckey_len = 0;
--		status = -EINVAL;
-+		return -EINVAL;
-+
- 	}
--	return status;
-+
-+	memcpy(ablkctx->key, key, key_len);
-+	ablkctx->enckey_len = key_len;
-+	get_aes_decrypt_key(ablkctx->rrkey, ablkctx->key, key_len << 2);
-+	context_size = (KEY_CONTEXT_HDR_SALT_AND_PAD + key_len) >> 4;
-+	ablkctx->key_ctx_hdr =
-+		FILL_KEY_CTX_HDR((key_len == AES_KEYSIZE_256) ?
-+				 CHCR_KEYCTX_CIPHER_KEY_SIZE_128 :
-+				 CHCR_KEYCTX_CIPHER_KEY_SIZE_256,
-+				 CHCR_KEYCTX_NO_KEY, 1,
-+				 0, context_size);
-+	ablkctx->ciph_mode = CHCR_SCMD_CIPHER_MODE_AES_XTS;
-+	return 0;
- }
- 
- static int chcr_sha_init(struct ahash_request *areq)
-diff --git a/drivers/crypto/chelsio/chcr_crypto.h b/drivers/crypto/chelsio/chcr_crypto.h
-index 8934ea2..7ed6d2b 100644
---- a/drivers/crypto/chelsio/chcr_crypto.h
-+++ b/drivers/crypto/chelsio/chcr_crypto.h
-@@ -125,8 +125,8 @@ struct ablk_ctx {
- 	__be32 key_ctx_hdr;
- 	unsigned int enckey_len;
- 	unsigned int dst_nents;
--	struct scatterlist iv_sg;
- 	u8 key[CHCR_AES_MAX_KEY_LEN];
-+	u8 rrkey[AES_MAX_KEY_SIZE];
- 	u8 iv[CHCR_MAX_CRYPTO_IV_LEN];
- 	unsigned char ciph_mode;
- };
+
+Jitendra Lulla (5):
+  Fix memory corruption done by  *((u32 *)dec_key + k) operation.
+  Cosmetic change. Moves get_aes_decrypt_key function to .c file and    
+    declare inline "aes_ks_subword"
+  crypto/chcr: Added new structure chcr_wr to populate Work Request
+    Header.
+  crypto/chcr: Fixes Unchecked dereference inside function
+  crypto/chcr: Remove dynamic allocation
+Harsh Jain (5):
+  crypto/chcr: Calculate Reverse round key in setkey callback.
+  crypto/chcr: Adjust Dest. buffer size
+  crypto/chcr: Use SHASH_DESC_ON_STACK
+  crypto/chcr: Move tfm ctx variable to request context
+  Add support for following AEAD algos.     
+    GCM,CCM,RFC4106,RFC4309,authenc(hmac(shaXXX),cbc(aes)).
+
+ drivers/crypto/chelsio/Kconfig       |    1 +
+ drivers/crypto/chelsio/chcr_algo.c   | 2014 +++++++++++++++++++++++++++++-----
+ drivers/crypto/chelsio/chcr_algo.h   |  102 +-
+ drivers/crypto/chelsio/chcr_core.c   |    8 +-
+ drivers/crypto/chelsio/chcr_core.h   |   18 +-
+ drivers/crypto/chelsio/chcr_crypto.h |  115 +-
+ 6 files changed, 1874 insertions(+), 384 deletions(-)
+
 -- 
 1.8.2.3
