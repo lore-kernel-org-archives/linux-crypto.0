@@ -1,47 +1,60 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 1/4] crypto: arm/aes-ce: fix broken monolithic build
-Date: Tue, 29 Nov 2016 13:05:30 +0000
-Message-ID: <1480424733-10797-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH 2/4] crypto: skcipher - fix crash in skcipher_walk_aead()
+Date: Tue, 29 Nov 2016 13:05:31 +0000
+Message-ID: <1480424733-10797-2-git-send-email-ard.biesheuvel@linaro.org>
+References: <1480424733-10797-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:37383 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933366AbcK2NFj (ORCPT
+Received: from mail-wj0-f170.google.com ([209.85.210.170]:36612 "EHLO
+        mail-wj0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933366AbcK2NFm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Nov 2016 08:05:39 -0500
-Received: by mail-wm0-f54.google.com with SMTP id t79so186841253wmt.0
-        for <linux-crypto@vger.kernel.org>; Tue, 29 Nov 2016 05:05:38 -0800 (PST)
+        Tue, 29 Nov 2016 08:05:42 -0500
+Received: by mail-wj0-f170.google.com with SMTP id qp4so144596140wjc.3
+        for <linux-crypto@vger.kernel.org>; Tue, 29 Nov 2016 05:05:41 -0800 (PST)
+In-Reply-To: <1480424733-10797-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When building the arm64 kernel with both CONFIG_CRYPTO_AES_ARM64_CE_BLK=y
-and CONFIG_CRYPTO_AES_ARM64_NEON_BLK=y configured, the build breaks with
-the following error:
+The new skcipher_walk_aead() may crash in the following way due to
+the walk flag SKCIPHER_WALK_PHYS not being cleared at the start of the
+walk:
 
-arch/arm64/crypto/aes-neon-blk.o:(.bss+0x0): multiple definition of `aes_simd_algs'
-arch/arm64/crypto/aes-ce-blk.o:(.bss+0x0): first defined here
+Unable to handle kernel NULL pointer dereference at virtual address 00000001
+[..]
+Internal error: Oops: 96000044 [#1] PREEMPT SMP
+[..]
+PC is at skcipher_walk_next+0x208/0x450
+LR is at skcipher_walk_next+0x1e4/0x450
+pc : [<ffff2b93b7104e20>] lr : [<ffff2b93b7104dfc>] pstate: 40000045
+sp : ffffb925fa517940
+[...]
+[<ffff2b93b7104e20>] skcipher_walk_next+0x208/0x450
+[<ffff2b93b710535c>] skcipher_walk_first+0x54/0x148
+[<ffff2b93b7105664>] skcipher_walk_aead+0xd4/0x108
+[<ffff2b93b6e77928>] ccm_encrypt+0x68/0x158
 
-Fix this by making aes_simd_algs 'static'.
+So clear the flag at the appropriate time.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/aes-glue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/skcipher.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index 24f6137c1a6e..5c43b92b3714 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -343,7 +343,7 @@ static struct skcipher_alg aes_algs[] = { {
- 	.decrypt	= xts_decrypt,
- } };
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index 0f3071991b13..5367f817b40e 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -506,6 +506,8 @@ int skcipher_walk_aead(struct skcipher_walk *walk, struct aead_request *req,
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	int err;
  
--struct simd_skcipher_alg *aes_simd_algs[ARRAY_SIZE(aes_algs)];
-+static struct simd_skcipher_alg *aes_simd_algs[ARRAY_SIZE(aes_algs)];
++	walk->flags &= ~SKCIPHER_WALK_PHYS;
++
+ 	scatterwalk_start(&walk->in, req->src);
+ 	scatterwalk_start(&walk->out, req->dst);
  
- static void aes_exit(void)
- {
 -- 
 2.7.4
