@@ -1,70 +1,434 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 2/2] crypto: caam: make aamalg_desc a proper module
-Date: Wed, 30 Nov 2016 22:02:00 +0100
-Message-ID: <20161130210234.1666417-2-arnd@arndb.de>
-References: <20161130210234.1666417-1-arnd@arndb.de>
+Subject: [PATCH 1/2] crypto: caam: pass key buffers with typesafe pointers
+Date: Wed, 30 Nov 2016 22:01:59 +0100
+Message-ID: <20161130210234.1666417-1-arnd@arndb.de>
 Cc: Arnd Bergmann <arnd@arndb.de>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Dan Douglass <dan.douglass@nxp.com>,
         "David S. Miller" <davem@davemloft.net>,
+        Catalin Vasile <cata.vasile@nxp.com>,
         Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
-        Alex Porosanu <alexandru.porosanu@nxp.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20161130210234.1666417-1-arnd@arndb.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The drivers/crypto/caam/ directory is entered during build only
-for building modules when CONFIG_CRYPTO_DEV_FSL_CAAM=m, but
-CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_DESC is defined as a
-'bool' symbol, meaning that caamalg_desc.c is always compiled
-into built-in code, or not at all, leading to a link failure:
+The 'key' field is defined as a 'u64' and used for two different
+pieces of information: either to store a pointer or a dma_addr_t.
+The former leads to a build error on 32-bit machines:
 
-ERROR: "cnstr_shdsc_xts_ablkcipher_decap" [drivers/crypto/caam/caamalg.ko] undefined!
-ERROR: "cnstr_shdsc_xts_ablkcipher_encap" [drivers/crypto/caam/caamalg.ko] undefined!
-ERROR: "cnstr_shdsc_aead_givencap" [drivers/crypto/caam/caamalg.ko] undefined!
-ERROR: "cnstr_shdsc_aead_decap" [drivers/crypto/caam/caamalg.ko] undefined!
-ERROR: "cnstr_shdsc_aead_encap" [drivers/crypto/caam/caamalg.ko] undefined!
-ERROR: "cnstr_shdsc_aead_null_decap" [drivers/crypto/caam/caamalg.ko] undefined!
-ERROR: "cnstr_shdsc_aead_null_encap" [drivers/crypto/caam/caamalg.ko] undefined!
-ERROR: "cnstr_shdsc_rfc4106_decap" [drivers/crypto/caam/caamalg.ko] undefined!
-ERROR: "cnstr_shdsc_rfc4106_encap" [drivers/crypto/caam/caamalg.ko] undefined!
-...
+drivers/crypto/caam/caamalg_desc.c: In function 'cnstr_shdsc_aead_null_encap':
+drivers/crypto/caam/caamalg_desc.c:67:27: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
+drivers/crypto/caam/caamalg_desc.c: In function 'cnstr_shdsc_aead_null_decap':
+drivers/crypto/caam/caamalg_desc.c:143:27: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
 
-Making caamalg_desc itself a loadable module fixes this configuration
-by ensuring the driver gets built. Aside from making the symbol
-'tristate', I'm adding appropriate module metadata here.
+Using a union to provide correct types gets rid of the warnings
+and as well as a couple of redundant casts.
 
-Fixes: 8cea7b66b821 ("crypto: caam - refactor encryption descriptors generation")
+Fixes: db57656b0072 ("crypto: caam - group algorithm related params")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/crypto/caam/Kconfig        | 2 +-
- drivers/crypto/caam/caamalg_desc.c | 4 ++++
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ drivers/crypto/caam/caamalg.c      | 60 +++++++++++++++++++-------------------
+ drivers/crypto/caam/caamalg_desc.c | 56 +++++++++++++++++------------------
+ drivers/crypto/caam/desc_constr.h  |  5 +++-
+ 3 files changed, 62 insertions(+), 59 deletions(-)
 
-diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index da24c5752c06..bc0d3569f8d9 100644
---- a/drivers/crypto/caam/Kconfig
-+++ b/drivers/crypto/caam/Kconfig
-@@ -136,4 +136,4 @@ config CRYPTO_DEV_FSL_CAAM_DEBUG
- 	  information in the CAAM driver.
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 37f0540d4694..662fe94cb2f8 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -162,10 +162,10 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
+ 	 */
+ 	if (rem_bytes >= DESC_AEAD_NULL_ENC_LEN) {
+ 		ctx->adata.key_inline = true;
+-		ctx->adata.key = (uintptr_t)ctx->key;
++		ctx->adata.key_virt = ctx->key;
+ 	} else {
+ 		ctx->adata.key_inline = false;
+-		ctx->adata.key = ctx->key_dma;
++		ctx->adata.key_dma = ctx->key_dma;
+ 	}
  
- config CRYPTO_DEV_FSL_CAAM_CRYPTO_API_DESC
--	def_bool CRYPTO_DEV_FSL_CAAM_CRYPTO_API
-+	def_tristate CRYPTO_DEV_FSL_CAAM_CRYPTO_API
+ 	/* aead_encrypt shared descriptor */
+@@ -185,10 +185,10 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
+ 	 */
+ 	if (rem_bytes >= DESC_AEAD_NULL_DEC_LEN) {
+ 		ctx->adata.key_inline = true;
+-		ctx->adata.key = (uintptr_t)ctx->key;
++		ctx->adata.key_virt = ctx->key;
+ 	} else {
+ 		ctx->adata.key_inline = false;
+-		ctx->adata.key = ctx->key_dma;
++		ctx->adata.key_dma = ctx->key_dma;
+ 	}
+ 
+ 	/* aead_decrypt shared descriptor */
+@@ -262,14 +262,14 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 		return -EINVAL;
+ 
+ 	if (inl_mask & 1)
+-		ctx->adata.key = (uintptr_t)ctx->key;
++		ctx->adata.key_virt = ctx->key;
+ 	else
+-		ctx->adata.key = ctx->key_dma;
++		ctx->adata.key_dma = ctx->key_dma;
+ 
+ 	if (inl_mask & 2)
+-		ctx->cdata.key = (uintptr_t)(ctx->key + ctx->adata.keylen_pad);
++		ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
+ 	else
+-		ctx->cdata.key = ctx->key_dma + ctx->adata.keylen_pad;
++		ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
+ 
+ 	ctx->adata.key_inline = !!(inl_mask & 1);
+ 	ctx->cdata.key_inline = !!(inl_mask & 2);
+@@ -298,14 +298,14 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 		return -EINVAL;
+ 
+ 	if (inl_mask & 1)
+-		ctx->adata.key = (uintptr_t)ctx->key;
++		ctx->adata.key_virt = ctx->key;
+ 	else
+-		ctx->adata.key = ctx->key_dma;
++		ctx->adata.key_dma = ctx->key_dma;
+ 
+ 	if (inl_mask & 2)
+-		ctx->cdata.key = (uintptr_t)(ctx->key + ctx->adata.keylen_pad);
++		ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
+ 	else
+-		ctx->cdata.key = ctx->key_dma + ctx->adata.keylen_pad;
++		ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
+ 
+ 	ctx->adata.key_inline = !!(inl_mask & 1);
+ 	ctx->cdata.key_inline = !!(inl_mask & 2);
+@@ -337,14 +337,14 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 		return -EINVAL;
+ 
+ 	if (inl_mask & 1)
+-		ctx->adata.key = (uintptr_t)ctx->key;
++		ctx->adata.key_virt = ctx->key;
+ 	else
+-		ctx->adata.key = ctx->key_dma;
++		ctx->adata.key_dma = ctx->key_dma;
+ 
+ 	if (inl_mask & 2)
+-		ctx->cdata.key = (uintptr_t)(ctx->key + ctx->adata.keylen_pad);
++		ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
+ 	else
+-		ctx->cdata.key = ctx->key_dma + ctx->adata.keylen_pad;
++		ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
+ 
+ 	ctx->adata.key_inline = !!(inl_mask & 1);
+ 	ctx->cdata.key_inline = !!(inl_mask & 2);
+@@ -395,10 +395,10 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
+ 	 */
+ 	if (rem_bytes >= DESC_GCM_ENC_LEN) {
+ 		ctx->cdata.key_inline = true;
+-		ctx->cdata.key = (uintptr_t)ctx->key;
++		ctx->cdata.key_virt = ctx->key;
+ 	} else {
+ 		ctx->cdata.key_inline = false;
+-		ctx->cdata.key = ctx->key_dma;
++		ctx->cdata.key_dma = ctx->key_dma;
+ 	}
+ 
+ 	desc = ctx->sh_desc_enc;
+@@ -417,10 +417,10 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
+ 	 */
+ 	if (rem_bytes >= DESC_GCM_DEC_LEN) {
+ 		ctx->cdata.key_inline = true;
+-		ctx->cdata.key = (uintptr_t)ctx->key;
++		ctx->cdata.key_virt = ctx->key;
+ 	} else {
+ 		ctx->cdata.key_inline = false;
+-		ctx->cdata.key = ctx->key_dma;
++		ctx->cdata.key_dma = ctx->key_dma;
+ 	}
+ 
+ 	desc = ctx->sh_desc_dec;
+@@ -464,10 +464,10 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
+ 	 */
+ 	if (rem_bytes >= DESC_RFC4106_ENC_LEN) {
+ 		ctx->cdata.key_inline = true;
+-		ctx->cdata.key = (uintptr_t)ctx->key;
++		ctx->cdata.key_virt = ctx->key;
+ 	} else {
+ 		ctx->cdata.key_inline = false;
+-		ctx->cdata.key = ctx->key_dma;
++		ctx->cdata.key_dma = ctx->key_dma;
+ 	}
+ 
+ 	desc = ctx->sh_desc_enc;
+@@ -486,10 +486,10 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
+ 	 */
+ 	if (rem_bytes >= DESC_RFC4106_DEC_LEN) {
+ 		ctx->cdata.key_inline = true;
+-		ctx->cdata.key = (uintptr_t)ctx->key;
++		ctx->cdata.key_virt = ctx->key;
+ 	} else {
+ 		ctx->cdata.key_inline = false;
+-		ctx->cdata.key = ctx->key_dma;
++		ctx->cdata.key_dma = ctx->key_dma;
+ 	}
+ 
+ 	desc = ctx->sh_desc_dec;
+@@ -534,10 +534,10 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
+ 	 */
+ 	if (rem_bytes >= DESC_RFC4543_ENC_LEN) {
+ 		ctx->cdata.key_inline = true;
+-		ctx->cdata.key = (uintptr_t)ctx->key;
++		ctx->cdata.key_virt = ctx->key;
+ 	} else {
+ 		ctx->cdata.key_inline = false;
+-		ctx->cdata.key = ctx->key_dma;
++		ctx->cdata.key_dma = ctx->key_dma;
+ 	}
+ 
+ 	desc = ctx->sh_desc_enc;
+@@ -556,10 +556,10 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
+ 	 */
+ 	if (rem_bytes >= DESC_RFC4543_DEC_LEN) {
+ 		ctx->cdata.key_inline = true;
+-		ctx->cdata.key = (uintptr_t)ctx->key;
++		ctx->cdata.key_virt = ctx->key;
+ 	} else {
+ 		ctx->cdata.key_inline = false;
+-		ctx->cdata.key = ctx->key_dma;
++		ctx->cdata.key_dma = ctx->key_dma;
+ 	}
+ 
+ 	desc = ctx->sh_desc_dec;
+@@ -794,7 +794,7 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
+ 		return -ENOMEM;
+ 	}
+ 	ctx->cdata.keylen = keylen;
+-	ctx->cdata.key = (uintptr_t)ctx->key;
++	ctx->cdata.key_virt = ctx->key;
+ 	ctx->cdata.key_inline = true;
+ 
+ 	/* ablkcipher_encrypt shared descriptor */
+@@ -857,7 +857,7 @@ static int xts_ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
+ 		return -ENOMEM;
+ 	}
+ 	ctx->cdata.keylen = keylen;
+-	ctx->cdata.key = (uintptr_t)ctx->key;
++	ctx->cdata.key_virt = ctx->key;
+ 	ctx->cdata.key_inline = true;
+ 
+ 	/* xts_ablkcipher_encrypt shared descriptor */
 diff --git a/drivers/crypto/caam/caamalg_desc.c b/drivers/crypto/caam/caamalg_desc.c
-index 7dee952ef432..f3f48c10b9d6 100644
+index fa2479d9da24..7dee952ef432 100644
 --- a/drivers/crypto/caam/caamalg_desc.c
 +++ b/drivers/crypto/caam/caamalg_desc.c
-@@ -1300,3 +1300,7 @@ void cnstr_shdsc_xts_ablkcipher_decap(u32 * const desc, struct alginfo *cdata)
- #endif
- }
- EXPORT_SYMBOL(cnstr_shdsc_xts_ablkcipher_decap);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("FSL CAAM descriptor support");
-+MODULE_AUTHOR("Freescale Semiconductor - NMG/STC");
+@@ -64,11 +64,11 @@ void cnstr_shdsc_aead_null_encap(u32 * const desc, struct alginfo *adata,
+ 	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
+ 				   JUMP_COND_SHRD);
+ 	if (adata->key_inline)
+-		append_key_as_imm(desc, (void *)adata->key, adata->keylen_pad,
++		append_key_as_imm(desc, adata->key_virt, adata->keylen_pad,
+ 				  adata->keylen, CLASS_2 | KEY_DEST_MDHA_SPLIT |
+ 				  KEY_ENC);
+ 	else
+-		append_key(desc, adata->key, adata->keylen, CLASS_2 |
++		append_key(desc, adata->key_dma, adata->keylen, CLASS_2 |
+ 			   KEY_DEST_MDHA_SPLIT | KEY_ENC);
+ 	set_jump_tgt_here(desc, key_jump_cmd);
+ 
+@@ -140,11 +140,11 @@ void cnstr_shdsc_aead_null_decap(u32 * const desc, struct alginfo *adata,
+ 	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
+ 				   JUMP_COND_SHRD);
+ 	if (adata->key_inline)
+-		append_key_as_imm(desc, (void *)adata->key, adata->keylen_pad,
++		append_key_as_imm(desc, adata->key_virt, adata->keylen_pad,
+ 				  adata->keylen, CLASS_2 |
+ 				  KEY_DEST_MDHA_SPLIT | KEY_ENC);
+ 	else
+-		append_key(desc, adata->key, adata->keylen, CLASS_2 |
++		append_key(desc, adata->key_dma, adata->keylen, CLASS_2 |
+ 			   KEY_DEST_MDHA_SPLIT | KEY_ENC);
+ 	set_jump_tgt_here(desc, key_jump_cmd);
+ 
+@@ -225,18 +225,18 @@ static void init_sh_desc_key_aead(u32 * const desc,
+ 		enckeylen -= CTR_RFC3686_NONCE_SIZE;
+ 
+ 	if (adata->key_inline)
+-		append_key_as_imm(desc, (void *)adata->key, adata->keylen_pad,
++		append_key_as_imm(desc, adata->key_virt, adata->keylen_pad,
+ 				  adata->keylen, CLASS_2 |
+ 				  KEY_DEST_MDHA_SPLIT | KEY_ENC);
+ 	else
+-		append_key(desc, adata->key, adata->keylen, CLASS_2 |
++		append_key(desc, adata->key_dma, adata->keylen, CLASS_2 |
+ 			   KEY_DEST_MDHA_SPLIT | KEY_ENC);
+ 
+ 	if (cdata->key_inline)
+-		append_key_as_imm(desc, (void *)cdata->key, enckeylen,
++		append_key_as_imm(desc, cdata->key_virt, enckeylen,
+ 				  enckeylen, CLASS_1 | KEY_DEST_CLASS_REG);
+ 	else
+-		append_key(desc, cdata->key, enckeylen, CLASS_1 |
++		append_key(desc, cdata->key_dma, enckeylen, CLASS_1 |
+ 			   KEY_DEST_CLASS_REG);
+ 
+ 	/* Load Counter into CONTEXT1 reg */
+@@ -536,10 +536,10 @@ void cnstr_shdsc_gcm_encap(u32 * const desc, struct alginfo *cdata,
+ 	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
+ 				   JUMP_COND_SHRD | JUMP_COND_SELF);
+ 	if (cdata->key_inline)
+-		append_key_as_imm(desc, (void *)cdata->key, cdata->keylen,
++		append_key_as_imm(desc, cdata->key_virt, cdata->keylen,
+ 				  cdata->keylen, CLASS_1 | KEY_DEST_CLASS_REG);
+ 	else
+-		append_key(desc, cdata->key, cdata->keylen, CLASS_1 |
++		append_key(desc, cdata->key_dma, cdata->keylen, CLASS_1 |
+ 			   KEY_DEST_CLASS_REG);
+ 	set_jump_tgt_here(desc, key_jump_cmd);
+ 
+@@ -626,10 +626,10 @@ void cnstr_shdsc_gcm_decap(u32 * const desc, struct alginfo *cdata,
+ 				   JUMP_TEST_ALL | JUMP_COND_SHRD |
+ 				   JUMP_COND_SELF);
+ 	if (cdata->key_inline)
+-		append_key_as_imm(desc, (void *)cdata->key, cdata->keylen,
++		append_key_as_imm(desc, cdata->key_virt, cdata->keylen,
+ 				  cdata->keylen, CLASS_1 | KEY_DEST_CLASS_REG);
+ 	else
+-		append_key(desc, cdata->key, cdata->keylen, CLASS_1 |
++		append_key(desc, cdata->key_dma, cdata->keylen, CLASS_1 |
+ 			   KEY_DEST_CLASS_REG);
+ 	set_jump_tgt_here(desc, key_jump_cmd);
+ 
+@@ -702,10 +702,10 @@ void cnstr_shdsc_rfc4106_encap(u32 * const desc, struct alginfo *cdata,
+ 	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
+ 				   JUMP_COND_SHRD);
+ 	if (cdata->key_inline)
+-		append_key_as_imm(desc, (void *)cdata->key, cdata->keylen,
++		append_key_as_imm(desc, cdata->key_virt, cdata->keylen,
+ 				  cdata->keylen, CLASS_1 | KEY_DEST_CLASS_REG);
+ 	else
+-		append_key(desc, cdata->key, cdata->keylen, CLASS_1 |
++		append_key(desc, cdata->key_dma, cdata->keylen, CLASS_1 |
+ 			   KEY_DEST_CLASS_REG);
+ 	set_jump_tgt_here(desc, key_jump_cmd);
+ 
+@@ -773,11 +773,11 @@ void cnstr_shdsc_rfc4106_decap(u32 * const desc, struct alginfo *cdata,
+ 	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
+ 				   JUMP_COND_SHRD);
+ 	if (cdata->key_inline)
+-		append_key_as_imm(desc, (void *)cdata->key, cdata->keylen,
++		append_key_as_imm(desc, cdata->key_virt, cdata->keylen,
+ 				  cdata->keylen, CLASS_1 |
+ 				  KEY_DEST_CLASS_REG);
+ 	else
+-		append_key(desc, cdata->key, cdata->keylen, CLASS_1 |
++		append_key(desc, cdata->key_dma, cdata->keylen, CLASS_1 |
+ 			   KEY_DEST_CLASS_REG);
+ 	set_jump_tgt_here(desc, key_jump_cmd);
+ 
+@@ -845,10 +845,10 @@ void cnstr_shdsc_rfc4543_encap(u32 * const desc, struct alginfo *cdata,
+ 	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
+ 				   JUMP_COND_SHRD);
+ 	if (cdata->key_inline)
+-		append_key_as_imm(desc, (void *)cdata->key, cdata->keylen,
++		append_key_as_imm(desc, cdata->key_virt, cdata->keylen,
+ 				  cdata->keylen, CLASS_1 | KEY_DEST_CLASS_REG);
+ 	else
+-		append_key(desc, cdata->key, cdata->keylen, CLASS_1 |
++		append_key(desc, cdata->key_dma, cdata->keylen, CLASS_1 |
+ 			   KEY_DEST_CLASS_REG);
+ 	set_jump_tgt_here(desc, key_jump_cmd);
+ 
+@@ -915,10 +915,10 @@ void cnstr_shdsc_rfc4543_decap(u32 * const desc, struct alginfo *cdata,
+ 	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
+ 				   JUMP_COND_SHRD);
+ 	if (cdata->key_inline)
+-		append_key_as_imm(desc, (void *)cdata->key, cdata->keylen,
++		append_key_as_imm(desc, cdata->key_virt, cdata->keylen,
+ 				  cdata->keylen, CLASS_1 | KEY_DEST_CLASS_REG);
+ 	else
+-		append_key(desc, cdata->key, cdata->keylen, CLASS_1 |
++		append_key(desc, cdata->key_dma, cdata->keylen, CLASS_1 |
+ 			   KEY_DEST_CLASS_REG);
+ 	set_jump_tgt_here(desc, key_jump_cmd);
+ 
+@@ -1006,12 +1006,12 @@ void cnstr_shdsc_ablkcipher_encap(u32 * const desc, struct alginfo *cdata,
+ 				   JUMP_COND_SHRD);
+ 
+ 	/* Load class1 key only */
+-	append_key_as_imm(desc, (void *)cdata->key, cdata->keylen,
++	append_key_as_imm(desc, cdata->key_virt, cdata->keylen,
+ 			  cdata->keylen, CLASS_1 | KEY_DEST_CLASS_REG);
+ 
+ 	/* Load nonce into CONTEXT1 reg */
+ 	if (is_rfc3686) {
+-		u8 *nonce = (u8 *)cdata->key + cdata->keylen;
++		u8 *nonce = cdata->key_virt + cdata->keylen;
+ 
+ 		append_load_as_imm(desc, nonce, CTR_RFC3686_NONCE_SIZE,
+ 				   LDST_CLASS_IND_CCB |
+@@ -1071,12 +1071,12 @@ void cnstr_shdsc_ablkcipher_decap(u32 * const desc, struct alginfo *cdata,
+ 				   JUMP_COND_SHRD);
+ 
+ 	/* Load class1 key only */
+-	append_key_as_imm(desc, (void *)cdata->key, cdata->keylen,
++	append_key_as_imm(desc, cdata->key_virt, cdata->keylen,
+ 			  cdata->keylen, CLASS_1 | KEY_DEST_CLASS_REG);
+ 
+ 	/* Load nonce into CONTEXT1 reg */
+ 	if (is_rfc3686) {
+-		u8 *nonce = (u8 *)cdata->key + cdata->keylen;
++		u8 *nonce = cdata->key_virt + cdata->keylen;
+ 
+ 		append_load_as_imm(desc, nonce, CTR_RFC3686_NONCE_SIZE,
+ 				   LDST_CLASS_IND_CCB |
+@@ -1140,12 +1140,12 @@ void cnstr_shdsc_ablkcipher_givencap(u32 * const desc, struct alginfo *cdata,
+ 				   JUMP_COND_SHRD);
+ 
+ 	/* Load class1 key only */
+-	append_key_as_imm(desc, (void *)cdata->key, cdata->keylen,
++	append_key_as_imm(desc, cdata->key_virt, cdata->keylen,
+ 			  cdata->keylen, CLASS_1 | KEY_DEST_CLASS_REG);
+ 
+ 	/* Load Nonce into CONTEXT1 reg */
+ 	if (is_rfc3686) {
+-		u8 *nonce = (u8 *)cdata->key + cdata->keylen;
++		u8 *nonce = cdata->key_virt + cdata->keylen;
+ 
+ 		append_load_as_imm(desc, nonce, CTR_RFC3686_NONCE_SIZE,
+ 				   LDST_CLASS_IND_CCB |
+@@ -1216,7 +1216,7 @@ void cnstr_shdsc_xts_ablkcipher_encap(u32 * const desc, struct alginfo *cdata)
+ 				   JUMP_COND_SHRD);
+ 
+ 	/* Load class1 keys only */
+-	append_key_as_imm(desc, (void *)cdata->key, cdata->keylen,
++	append_key_as_imm(desc, cdata->key_virt, cdata->keylen,
+ 			  cdata->keylen, CLASS_1 | KEY_DEST_CLASS_REG);
+ 
+ 	/* Load sector size with index 40 bytes (0x28) */
+@@ -1268,7 +1268,7 @@ void cnstr_shdsc_xts_ablkcipher_decap(u32 * const desc, struct alginfo *cdata)
+ 				   JUMP_COND_SHRD);
+ 
+ 	/* Load class1 key only */
+-	append_key_as_imm(desc, (void *)cdata->key, cdata->keylen,
++	append_key_as_imm(desc, cdata->key_virt, cdata->keylen,
+ 			  cdata->keylen, CLASS_1 | KEY_DEST_CLASS_REG);
+ 
+ 	/* Load sector size with index 40 bytes (0x28) */
+diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
+index fa70c0d79c40..b9c8d98ef826 100644
+--- a/drivers/crypto/caam/desc_constr.h
++++ b/drivers/crypto/caam/desc_constr.h
+@@ -446,7 +446,10 @@ struct alginfo {
+ 	u32 algtype;
+ 	unsigned int keylen;
+ 	unsigned int keylen_pad;
+-	u64 key;
++	union {
++		dma_addr_t key_dma;
++		void *key_virt;
++	};
+ 	bool key_inline;
+ };
+ 
 -- 
 2.9.0
