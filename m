@@ -1,7 +1,7 @@
 From: Rob Rice <rob.rice@broadcom.com>
-Subject: [PATCH 1/3] crypto: brcm: DT documentation for Broadcom SPU driver
-Date: Wed, 30 Nov 2016 15:07:31 -0500
-Message-ID: <1480536453-24781-2-git-send-email-rob.rice@broadcom.com>
+Subject: [PATCH 3/3] crypto: brcm: Add Broadcom SPU driver DT entry.
+Date: Wed, 30 Nov 2016 15:07:33 -0500
+Message-ID: <1480536453-24781-4-git-send-email-rob.rice@broadcom.com>
 References: <1480536453-24781-1-git-send-email-rob.rice@broadcom.com>
 Cc: Steve Lin <steven.lin1@broadcom.com>,
         Rob Rice <rob.rice@broadcom.com>
@@ -17,51 +17,49 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will.deacon@arm.com>,
         linux-arm-kernel@lists.infradead.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f43.google.com ([74.125.83.43]:35485 "EHLO
+        mail-pg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932446AbcK3UIW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 30 Nov 2016 15:08:22 -0500
+Received: by mail-pg0-f43.google.com with SMTP id p66so85550493pga.2
+        for <linux-crypto@vger.kernel.org>; Wed, 30 Nov 2016 12:08:22 -0800 (PST)
 In-Reply-To: <1480536453-24781-1-git-send-email-rob.rice@broadcom.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Device tree documentation for Broadcom Secure Processing Unit
-(SPU) crypto driver.
+Add Northstar2 device tree entry for Broadcom Secure Processing
+Unit (SPU) crypto driver.
 
 Signed-off-by: Steve Lin <steven.lin1@broadcom.com>
 Signed-off-by: Rob Rice <rob.rice@broadcom.com>
 ---
- .../devicetree/bindings/crypto/brcm,spu-crypto.txt | 25 ++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
+ arch/arm64/boot/dts/broadcom/ns2.dtsi | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt b/Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
-new file mode 100644
-index 0000000..e5fe942
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
-@@ -0,0 +1,25 @@
-+The Broadcom Secure Processing Unit (SPU) driver supports symmetric
-+cryptographic offload for Broadcom SoCs with SPU hardware. A SoC may have
-+multiple SPU hardware blocks.
+diff --git a/arch/arm64/boot/dts/broadcom/ns2.dtsi b/arch/arm64/boot/dts/broadcom/ns2.dtsi
+index d95dc40..8b81b0d 100644
+--- a/arch/arm64/boot/dts/broadcom/ns2.dtsi
++++ b/arch/arm64/boot/dts/broadcom/ns2.dtsi
+@@ -191,6 +191,18 @@
+
+ 		#include "ns2-clock.dtsi"
+
++		spu-crypto@612d0000 {
++			compatible = "brcm,spum-crypto";
++			reg = <0x612d0000 0x900>,    /* SPU 0 control regs */
++				<0x612f0000 0x900>,  /* SPU 1 control regs */
++				<0x61310000 0x900>,  /* SPU 2 control regs */
++				<0x61330000 0x900>;  /* SPU 3 control regs */
++			mboxes = <&pdc0 0>,
++				<&pdc1 0>,
++				<&pdc2 0>,
++				<&pdc3 0>;
++		};
 +
-+Required properties:
-+- compatible : Should be "brcm,spum-crypto" for devices with SPU-M hardware
-+  (e.g., Northstar2) or "brcm,spum-nsp-crypto" for the Northstar Plus variant
-+  of the SPU-M hardware.
-+
-+- reg: Should contain SPU registers location and length.
-+- mboxes: A list of mailbox channels to be used by the kernel driver. Mailbox
-+channels correspond to DMA rings on the device.
-+
-+Example:
-+	spu-crypto@612d0000 {
-+		compatible = "brcm,spum-crypto";
-+		reg = <0 0x612d0000 0 0x900>,    /* SPU 0 control regs */
-+			<0 0x612f0000 0 0x900>,  /* SPU 1 control regs */
-+			<0 0x61310000 0 0x900>,  /* SPU 2 control regs */
-+			<0 0x61330000 0 0x900>;  /* SPU 3 control regs */
-+		mboxes = <&pdc0 0>,
-+			<&pdc1 0>,
-+			<&pdc2 0>,
-+			<&pdc3 0>;
-+	};
+ 		dma0: dma@61360000 {
+ 			compatible = "arm,pl330", "arm,primecell";
+ 			reg = <0x61360000 0x1000>;
 --
 2.1.0
