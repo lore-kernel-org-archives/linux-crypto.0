@@ -1,45 +1,74 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] crypto: arm/aesbs - fix brokenness after skcipher conversion
-Date: Wed, 30 Nov 2016 13:36:02 +0000
-Message-ID: <53AA8DFA-2420-40D6-A9C2-90B184344819@linaro.org>
-References: <1480440216-341-1-git-send-email-ard.biesheuvel@linaro.org> <20161130131921.GD4126@gondor.apana.org.au>
-Mime-Version: 1.0 (1.0)
-Content-Type: text/plain;
-        charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wj0-f177.google.com ([209.85.210.177]:35454 "EHLO
-        mail-wj0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756512AbcK3NgH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Nov 2016 08:36:07 -0500
-Received: by mail-wj0-f177.google.com with SMTP id v7so173951570wjy.2
-        for <linux-crypto@vger.kernel.org>; Wed, 30 Nov 2016 05:36:06 -0800 (PST)
-In-Reply-To: <20161130131921.GD4126@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Subject: [PATCH 0/3] Add Broadcom SPU Crypto Driver
+Date: Wed, 30 Nov 2016 15:07:30 -0500
+Message-ID: <1480536453-24781-1-git-send-email-rob.rice@broadcom.com>
+Cc: Steve Lin <steven.lin1-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Jon Mason <jonmason-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org,
+        Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>,
+        Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>,
+        linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
+The Broadcom SPU crypto driver provides access to SPU hardware
+for symmetric crypto offload. The driver supports ablkcipher,
+ahash, and aead operations. The driver supports several
+Broadcom SoCs with different revisions of the SPU hardware.
+The driver supports SPU-M and SPU2 hardware revisions, and
+a couple versions of each hw revision, each version with minor
+differences.
 
+The device tree entries for the SPU depends on device tree entries
+for the Broadcom PDC driver. The PDC DT entries have been accepted
+upstream, but are not yet included in the crypto repo. See commit
+e79249143f468f8d3365dbbd1642c045bdcc98c5.
 
-> On 30 Nov 2016, at 13:19, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> 
->> On Tue, Nov 29, 2016 at 05:23:36PM +0000, Ard Biesheuvel wrote:
->> The CBC encryption routine should use the encryption round keys, not
->> the decryption round keys.
->> 
->> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> 
-> Patch applied.  Thanks.
-> 
->> Another fix for the queued changes, this time for 32-bit ARM.
->> 
->> I must say, I'm not impressed with the level of testing that has been
->> carried out after applying these changes. If you had cc'd me on these
->> patches, I would have been happy to test/review.
-> 
-> Sorry.  I'll make sure you're CCed for ARM patches in future.
+Rob Rice (3):
+  crypto: brcm: DT documentation for Broadcom SPU driver
+  crypto: brcm: Add Broadcom SPU driver
+  crypto: brcm: Add Broadcom SPU driver DT entry.
 
-Cheers,
-Ard.
+ .../devicetree/bindings/crypto/brcm,spu-crypto.txt |   25 +
+ arch/arm64/boot/dts/broadcom/ns2.dtsi              |   12 +
+ drivers/crypto/Kconfig                             |   10 +
+ drivers/crypto/Makefile                            |    1 +
+ drivers/crypto/bcm/Makefile                        |   15 +
+ drivers/crypto/bcm/cipher.c                        | 4943 ++++++++++++++++++++
+ drivers/crypto/bcm/cipher.h                        |  472 ++
+ drivers/crypto/bcm/spu.c                           | 1252 +++++
+ drivers/crypto/bcm/spu.h                           |  288 ++
+ drivers/crypto/bcm/spu2.c                          | 1402 ++++++
+ drivers/crypto/bcm/spu2.h                          |  228 +
+ drivers/crypto/bcm/spum.h                          |  174 +
+ drivers/crypto/bcm/util.c                          |  584 +++
+ drivers/crypto/bcm/util.h                          |  117 +
+ 14 files changed, 9523 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
+ create mode 100644 drivers/crypto/bcm/Makefile
+ create mode 100644 drivers/crypto/bcm/cipher.c
+ create mode 100644 drivers/crypto/bcm/cipher.h
+ create mode 100644 drivers/crypto/bcm/spu.c
+ create mode 100644 drivers/crypto/bcm/spu.h
+ create mode 100644 drivers/crypto/bcm/spu2.c
+ create mode 100644 drivers/crypto/bcm/spu2.h
+ create mode 100644 drivers/crypto/bcm/spum.h
+ create mode 100644 drivers/crypto/bcm/util.c
+ create mode 100644 drivers/crypto/bcm/util.h
+
+--
+2.1.0
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
