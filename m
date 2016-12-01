@@ -1,39 +1,36 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: AF_ALG - fix AEAD AIO handling of zero buffer
-Date: Thu, 1 Dec 2016 21:22:07 +0800
-Message-ID: <20161201132207.GF2249@gondor.apana.org.au>
-References: <3547426.Fep2bfj8cH@positron.chronox.de>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] crypto: arm/aesbs - Select SIMD in Kconfig
+Date: Thu, 01 Dec 2016 14:43:00 +0100
+Message-ID: <3127384.oX3XkmieGV@wuerfel>
+References: <20161130234826.854879-1-arnd@arndb.de> <20161201125616.GB2249@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44313 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1757311AbcLANWm (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Dec 2016 08:22:42 -0500
-Content-Disposition: inline
-In-Reply-To: <3547426.Fep2bfj8cH@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Russell King <linux@armlinux.org.uk>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20161201125616.GB2249@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Dec 01, 2016 at 08:22:37AM +0100, Stephan Mueller wrote:
-> Hi Herbert,
+On Thursday, December 1, 2016 8:56:16 PM CET Herbert Xu wrote:
+> On Thu, Dec 01, 2016 at 12:47:59AM +0100, Arnd Bergmann wrote:
+> > Commit 585b5fa63da9 ("crypto: arm/aes - Select SIMD in Kconfig") added
+> > the dependency for CRYPTO_AES_ARM_CE, but missed the same change
+> > for CRYPTO_AES_ARM_BS:
+> > 
+> > arch/arm/crypto/aes-arm-bs.o: In function `aesbs_mod_init':
+> > aesbs-glue.c:(.init.text+0x38): undefined reference to `simd_skcipher_create_compat'
+> > 
+> > Fixes: 211f41af534a ("crypto: aesbs - Convert to skcipher")
+> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > 
-> I split out the bug fix patch from the AD/tag formatting patch as they most likely will come after the next merge window.
-> 
-> ---8<---
-> 
-> Handle the case when the caller provided a zero buffer to
-> sendmsg/sendpage. Such scenario is legal for AEAD ciphers when no
-> plaintext / ciphertext and no AAD is provided and the caller only
-> requests the generation of the tag value.
-> 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> Thanks Arnd.  This should already be fixed by 6fdf436fd854.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Right. I have discarded my patch on today's linux-next and I
+get no more link errors.
+
+	Arnd
