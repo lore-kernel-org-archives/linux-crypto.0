@@ -1,36 +1,44 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH] crypto: arm/aesbs - Select SIMD in Kconfig
-Date: Thu, 01 Dec 2016 14:43:00 +0100
-Message-ID: <3127384.oX3XkmieGV@wuerfel>
-References: <20161130234826.854879-1-arnd@arndb.de> <20161201125616.GB2249@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Russell King <linux@armlinux.org.uk>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20161201125616.GB2249@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Romain Perier <romain.perier@free-electrons.com>
+Subject: [PATCH] crypto: marvell - Don't copy hash operation twice into the SRAM
+Date: Thu,  1 Dec 2016 17:21:57 +0100
+Message-ID: <20161201162157.14563-1-romain.perier@free-electrons.com>
+Cc: linux-crypto@vger.kernel.org, Jason Cooper <jason@lakedaemon.net>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Gregory Clement <gregory.clement@free-electrons.com>,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+To: Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Arnaud Ebalard <arno@natisbad.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.free-electrons.com ([62.4.15.54]:35710 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752856AbcLAQWG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Dec 2016 11:22:06 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thursday, December 1, 2016 8:56:16 PM CET Herbert Xu wrote:
-> On Thu, Dec 01, 2016 at 12:47:59AM +0100, Arnd Bergmann wrote:
-> > Commit 585b5fa63da9 ("crypto: arm/aes - Select SIMD in Kconfig") added
-> > the dependency for CRYPTO_AES_ARM_CE, but missed the same change
-> > for CRYPTO_AES_ARM_BS:
-> > 
-> > arch/arm/crypto/aes-arm-bs.o: In function `aesbs_mod_init':
-> > aesbs-glue.c:(.init.text+0x38): undefined reference to `simd_skcipher_create_compat'
-> > 
-> > Fixes: 211f41af534a ("crypto: aesbs - Convert to skcipher")
-> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> 
-> Thanks Arnd.  This should already be fixed by 6fdf436fd854.
+No need to copy the template of an hash operation twice into the SRAM
+from the step function.
 
-Right. I have discarded my patch on today's linux-next and I
-get no more link errors.
+Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
+---
+ drivers/crypto/marvell/hash.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-	Arnd
+diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
+index 2a92605..fbbcbf8 100644
+--- a/drivers/crypto/marvell/hash.c
++++ b/drivers/crypto/marvell/hash.c
+@@ -172,9 +172,6 @@ static void mv_cesa_ahash_std_step(struct ahash_request *req)
+ 	for (i = 0; i < digsize / 4; i++)
+ 		writel_relaxed(creq->state[i], engine->regs + CESA_IVDIG(i));
+ 
+-	mv_cesa_adjust_op(engine, &creq->op_tmpl);
+-	memcpy_toio(engine->sram, &creq->op_tmpl, sizeof(creq->op_tmpl));
+-
+ 	if (creq->cache_ptr)
+ 		memcpy_toio(engine->sram + CESA_SA_DATA_SRAM_OFFSET,
+ 			    creq->cache, creq->cache_ptr);
+-- 
+2.9.3
