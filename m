@@ -1,48 +1,79 @@
 From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [bug report] crypto: chcr - Add AEAD algos.
-Date: Thu, 1 Dec 2016 23:48:58 +0300
-Message-ID: <20161201204858.GA10660@mwanda>
+Subject: [patch] crypto: chcr - checking for IS_ERR() instead of NULL
+Date: Thu, 1 Dec 2016 23:49:37 +0300
+Message-ID: <20161201204937.GA10701@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: harsh@chelsio.com
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Harsh Jain <harsh@chelsio.com>,
+        Jitendra Lulla <JLULLA@chelsio.com>,
+        Atul Gupta <atul.gupta@chelsio.com>,
+        Hariprasad Shenai <hariprasad@chelsio.com>,
+        Wei Yongjun <weiyongjun1@huawei.com>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:49734 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752365AbcLAUtV (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:19047 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757877AbcLAUuE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Dec 2016 15:49:21 -0500
+        Thu, 1 Dec 2016 15:50:04 -0500
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello Harsh Jain,
+The create_hash_wr() function never returns error pointers.  It returns
+NULL on error.
 
-This is a semi-automatic email about new static checker warnings.
+Fixes: 358961d1cd1e ("crypto: chcr - Added new structure chcr_wr")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-The patch 2debd3325e55: "crypto: chcr - Add AEAD algos." from Nov 29, 
-2016, leads to the following Smatch complaint:
-
-	drivers/crypto/chelsio/chcr_algo.c:2460 chcr_aead_op()
-	warn: variable dereferenced before check 'ctx' (see line 2457)
-
-	drivers/crypto/chelsio/chcr_algo.c:2460 chcr_aead_op()
-	warn: variable dereferenced before check 'ctx->dev' (see line 2457)
-
-drivers/crypto/chelsio/chcr_algo.c
-  2456		struct chcr_context *ctx = crypto_aead_ctx(tfm);
-  2457		struct uld_ctx *u_ctx = ULD_CTX(ctx);
-                                        ^^^^^^^^^^^^
-Derefences both.
-
-  2458		struct sk_buff *skb;
-  2459	
-  2460		if (ctx && !ctx->dev) {
-                    ^^^^^^^^^^^^^^^^
-Check is too late.
-
-  2461			pr_err("chcr : %s : No crypto device.\n", __func__);
-  2462			return -ENXIO;
-
-regards,
-dan carpenter
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index 32361dd..2ed1e24 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -958,9 +958,8 @@ static int chcr_ahash_update(struct ahash_request *req)
+ 	req_ctx->result = 0;
+ 	req_ctx->data_len += params.sg_len + params.bfr_len;
+ 	skb = create_hash_wr(req, &params);
+-
+-	if (IS_ERR(skb))
+-		return PTR_ERR(skb);
++	if (!skb)
++		return -ENOMEM;
+ 
+ 	if (remainder) {
+ 		u8 *temp;
+@@ -1023,8 +1022,8 @@ static int chcr_ahash_final(struct ahash_request *req)
+ 		params.more = 0;
+ 	}
+ 	skb = create_hash_wr(req, &params);
+-	if (IS_ERR(skb))
+-		return PTR_ERR(skb);
++	if (!skb)
++		return -ENOMEM;
+ 
+ 	skb->dev = u_ctx->lldi.ports[0];
+ 	set_wr_txq(skb, CPL_PRIORITY_DATA, ctx->tx_channel_id);
+@@ -1074,8 +1073,8 @@ static int chcr_ahash_finup(struct ahash_request *req)
+ 	}
+ 
+ 	skb = create_hash_wr(req, &params);
+-	if (IS_ERR(skb))
+-		return PTR_ERR(skb);
++	if (!skb)
++		return -ENOMEM;
+ 
+ 	skb->dev = u_ctx->lldi.ports[0];
+ 	set_wr_txq(skb, CPL_PRIORITY_DATA, ctx->tx_channel_id);
+@@ -1125,8 +1124,8 @@ static int chcr_ahash_digest(struct ahash_request *req)
+ 	}
+ 
+ 	skb = create_hash_wr(req, &params);
+-	if (IS_ERR(skb))
+-		return PTR_ERR(skb);
++	if (!skb)
++		return -ENOMEM;
+ 
+ 	skb->dev = u_ctx->lldi.ports[0];
+ 	set_wr_txq(skb, CPL_PRIORITY_DATA, ctx->tx_channel_id);
