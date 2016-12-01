@@ -1,68 +1,48 @@
-From: Gregory CLEMENT <gregory.clement@free-electrons.com>
-Subject: Re: [PATCH] crypto: marvell - Don't copy hash operation twice into the SRAM
-Date: Thu, 01 Dec 2016 17:27:53 +0100
-Message-ID: <87shq7iph2.fsf@free-electrons.com>
-References: <20161201162157.14563-1-romain.perier@free-electrons.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [bug report] crypto: chcr - Add AEAD algos.
+Date: Thu, 1 Dec 2016 23:48:58 +0300
+Message-ID: <20161201204858.GA10660@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        linux-crypto@vger.kernel.org, Jason Cooper <jason@lakedaemon.net>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-To: Romain Perier <romain.perier@free-electrons.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: harsh@chelsio.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:35757 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932467AbcLAQ1z (ORCPT
+Received: from userp1040.oracle.com ([156.151.31.81]:49734 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752365AbcLAUtV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Dec 2016 11:27:55 -0500
-In-Reply-To: <20161201162157.14563-1-romain.perier@free-electrons.com> (Romain
-        Perier's message of "Thu, 1 Dec 2016 17:21:57 +0100")
+        Thu, 1 Dec 2016 15:49:21 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Romain,
- 
- On jeu., déc. 01 2016, Romain Perier <romain.perier@free-electrons.com> wrote:
+Hello Harsh Jain,
 
-> No need to copy the template of an hash operation twice into the SRAM
-> from the step function.
->
+This is a semi-automatic email about new static checker warnings.
 
-Does this patch fix a bug ot it is jsute a cleanup/improvement?
+The patch 2debd3325e55: "crypto: chcr - Add AEAD algos." from Nov 29, 
+2016, leads to the following Smatch complaint:
 
-If it is a bug you should CC stable and add use the Fixes tag.
+	drivers/crypto/chelsio/chcr_algo.c:2460 chcr_aead_op()
+	warn: variable dereferenced before check 'ctx' (see line 2457)
 
-Gregory
+	drivers/crypto/chelsio/chcr_algo.c:2460 chcr_aead_op()
+	warn: variable dereferenced before check 'ctx->dev' (see line 2457)
 
-> Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
-> ---
->  drivers/crypto/marvell/hash.c | 3 ---
->  1 file changed, 3 deletions(-)
->
-> diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-> index 2a92605..fbbcbf8 100644
-> --- a/drivers/crypto/marvell/hash.c
-> +++ b/drivers/crypto/marvell/hash.c
-> @@ -172,9 +172,6 @@ static void mv_cesa_ahash_std_step(struct ahash_request *req)
->  	for (i = 0; i < digsize / 4; i++)
->  		writel_relaxed(creq->state[i], engine->regs + CESA_IVDIG(i));
->  
-> -	mv_cesa_adjust_op(engine, &creq->op_tmpl);
-> -	memcpy_toio(engine->sram, &creq->op_tmpl, sizeof(creq->op_tmpl));
-> -
->  	if (creq->cache_ptr)
->  		memcpy_toio(engine->sram + CESA_SA_DATA_SRAM_OFFSET,
->  			    creq->cache, creq->cache_ptr);
-> -- 
-> 2.9.3
->
+drivers/crypto/chelsio/chcr_algo.c
+  2456		struct chcr_context *ctx = crypto_aead_ctx(tfm);
+  2457		struct uld_ctx *u_ctx = ULD_CTX(ctx);
+                                        ^^^^^^^^^^^^
+Derefences both.
 
--- 
-Gregory Clement, Free Electrons
-Kernel, drivers, real-time and embedded Linux
-development, consulting, training and support.
-http://free-electrons.com
+  2458		struct sk_buff *skb;
+  2459	
+  2460		if (ctx && !ctx->dev) {
+                    ^^^^^^^^^^^^^^^^
+Check is too late.
+
+  2461			pr_err("chcr : %s : No crypto device.\n", __func__);
+  2462			return -ENXIO;
+
+regards,
+dan carpenter
