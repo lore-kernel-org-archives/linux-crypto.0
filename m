@@ -1,40 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: caam: pass key buffers with typesafe pointers
-Date: Thu, 1 Dec 2016 21:21:44 +0800
-Message-ID: <20161201132144.GD2249@gondor.apana.org.au>
-References: <20161130210234.1666417-1-arnd@arndb.de>
+Subject: Re: [PATCH v2] crypto: AF_ALG - fix AEAD AIO handling of zero buffer
+Date: Thu, 1 Dec 2016 21:22:07 +0800
+Message-ID: <20161201132207.GF2249@gondor.apana.org.au>
+References: <3547426.Fep2bfj8cH@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Catalin Vasile <cata.vasile@nxp.com>,
-        Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:44313 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1757311AbcLANWm (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Dec 2016 08:22:42 -0500
 Content-Disposition: inline
-In-Reply-To: <20161130210234.1666417-1-arnd@arndb.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <3547426.Fep2bfj8cH@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 30, 2016 at 10:01:59PM +0100, Arnd Bergmann wrote:
-> The 'key' field is defined as a 'u64' and used for two different
-> pieces of information: either to store a pointer or a dma_addr_t.
-> The former leads to a build error on 32-bit machines:
+On Thu, Dec 01, 2016 at 08:22:37AM +0100, Stephan Mueller wrote:
+> Hi Herbert,
 > 
-> drivers/crypto/caam/caamalg_desc.c: In function 'cnstr_shdsc_aead_null_encap':
-> drivers/crypto/caam/caamalg_desc.c:67:27: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
-> drivers/crypto/caam/caamalg_desc.c: In function 'cnstr_shdsc_aead_null_decap':
-> drivers/crypto/caam/caamalg_desc.c:143:27: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
+> I split out the bug fix patch from the AD/tag formatting patch as they most likely will come after the next merge window.
 > 
-> Using a union to provide correct types gets rid of the warnings
-> and as well as a couple of redundant casts.
+> ---8<---
 > 
-> Fixes: db57656b0072 ("crypto: caam - group algorithm related params")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Handle the case when the caller provided a zero buffer to
+> sendmsg/sendpage. Such scenario is legal for AEAD ciphers when no
+> plaintext / ciphertext and no AAD is provided and the caller only
+> requests the generation of the tag value.
+> 
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-Both patches applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
