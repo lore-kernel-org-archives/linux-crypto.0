@@ -1,31 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/1] crypto: set error code when kcalloc fails
-Date: Thu, 1 Dec 2016 21:21:56 +0800
-Message-ID: <20161201132155.GE2249@gondor.apana.org.au>
-References: <1480557883-18844-1-git-send-email-bianpan2016@163.com>
+Subject: Re: [PATCH 1/4] crypto: api - fix comment typo
+Date: Thu, 1 Dec 2016 21:21:28 +0800
+Message-ID: <20161201132128.GC2249@gondor.apana.org.au>
+References: <900b42a57c35095988dcad0c1eb366da0fa71c05.1480511771.git.baruch@tkos.co.il>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Pan Bian <bianpan2016@163.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+        linux-crypto@vger.kernel.org
+To: Baruch Siach <baruch@tkos.co.il>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:53695 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1756832AbcLANWl (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Dec 2016 08:22:41 -0500
 Content-Disposition: inline
-In-Reply-To: <1480557883-18844-1-git-send-email-bianpan2016@163.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <900b42a57c35095988dcad0c1eb366da0fa71c05.1480511771.git.baruch@tkos.co.il>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 01, 2016 at 10:04:43AM +0800, Pan Bian wrote:
-> Fix bug https://bugzilla.kernel.org/show_bug.cgi?id=188521. In function
-> skcipher_recvmsg_async(), variable err takes the return value, and its
-> value should be negative on failures. Because variable err may be
-> reassigned and checked before calling kcalloc(), its value may be 0
-> (indicates no error) even if kcalloc() fails. This patch fixes the bug
-> by explicitly assigning -ENOMEM to err when kcalloc() returns a NULL
-> pointer.
-> 
-> Signed-off-by: Pan Bian <bianpan2016@163.com>
+On Wed, Nov 30, 2016 at 03:16:08PM +0200, Baruch Siach wrote:
+> Signed-off-by: Baruch Siach <baruch@tkos.co.il>
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
