@@ -1,66 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [cryptodev:master 98/130]
- arch/arm64/crypto/aes-neon-blk.o:(.bss+0x0): multiple definition of
- `aes_simd_algs'
-Date: Thu, 1 Dec 2016 13:45:05 +0800
-Message-ID: <20161201054505.GA6767@gondor.apana.org.au>
-References: <201612010928.4e79TjrB%fengguang.wu@intel.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v2] crypto: AF_ALG - fix AEAD AIO handling of zero buffer
+Date: Thu, 01 Dec 2016 08:22:37 +0100
+Message-ID: <3547426.Fep2bfj8cH@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org
-To: kbuild test robot <fengguang.wu@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:35067 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751997AbcLAFp0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Dec 2016 00:45:26 -0500
-Content-Disposition: inline
-In-Reply-To: <201612010928.4e79TjrB%fengguang.wu@intel.com>
+Received: from mail.eperm.de ([89.247.134.16]:52012 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754743AbcLAHXJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Dec 2016 02:23:09 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 01, 2016 at 09:45:30AM +0800, kbuild test robot wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> head:   81126d1a8bc23c72a13c05c4308dc6951afc3b45
-> commit: d0ed0db149fce92f4d69490f18be23ddc470bf6f [98/130] crypto: arm64/aes - Convert to skcipher
-> config: arm64-allyesconfig (attached as .config)
-> compiler: aarch64-linux-gnu-gcc (Debian 6.1.1-9) 6.1.1 20160705
-> reproduce:
->         wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         git checkout d0ed0db149fce92f4d69490f18be23ddc470bf6f
->         # save the attached .config to linux build tree
->         make.cross ARCH=arm64 
+Hi Herbert,
 
-Thanks for the report!
+I split out the bug fix patch from the AD/tag formatting patch as they most likely will come after the next merge window.
 
 ---8<---
-Subject: crypto: aes-ce - Make aes_simd_algs static
 
-The variable aes_simd_algs should be static.  In fact if it isn't
-it causes build errors when multiple copies of aes-ce-glue.c are
-built into the kernel.
+Handle the case when the caller provided a zero buffer to
+sendmsg/sendpage. Such scenario is legal for AEAD ciphers when no
+plaintext / ciphertext and no AAD is provided and the caller only
+requests the generation of the tag value.
 
-Fixes: da40e7a4ba4d ("crypto: aes-ce - Convert to skcipher")
-Reported-by: kbuild test robot <fengguang.wu@intel.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/algif_aead.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
-index 4a507c6..8857531 100644
---- a/arch/arm/crypto/aes-ce-glue.c
-+++ b/arch/arm/crypto/aes-ce-glue.c
-@@ -407,7 +407,7 @@ static int xts_decrypt(struct skcipher_request *req)
- 	.decrypt	= xts_decrypt,
- } };
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index 80a0f1a..6e95137 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -448,12 +448,13 @@ static int aead_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 	used -= ctx->aead_assoclen + (ctx->enc ? as : 0);
  
--struct simd_skcipher_alg *aes_simd_algs[ARRAY_SIZE(aes_algs)];
-+static struct simd_skcipher_alg *aes_simd_algs[ARRAY_SIZE(aes_algs)];
+ 	/* take over all tx sgls from ctx */
+-	areq->tsgl = sock_kmalloc(sk, sizeof(*areq->tsgl) * sgl->cur,
++	areq->tsgl = sock_kmalloc(sk,
++				  sizeof(*areq->tsgl) * max_t(u32, sgl->cur, 1),
+ 				  GFP_KERNEL);
+ 	if (unlikely(!areq->tsgl))
+ 		goto free;
  
- static void aes_exit(void)
- {
-
+-	sg_init_table(areq->tsgl, sgl->cur);
++	sg_init_table(areq->tsgl, max_t(u32, sgl->cur, 1));
+ 	for (i = 0; i < sgl->cur; i++)
+ 		sg_set_page(&areq->tsgl[i], sg_page(&sgl->sg[i]),
+ 			    sgl->sg[i].length, sgl->sg[i].offset);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.9.3
