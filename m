@@ -1,8 +1,8 @@
 From: Boris Brezillon <boris.brezillon@free-electrons.com>
 Subject: Re: [PATCH 1/2] crypto: marvell - Don't copy hash operation twice
  into the SRAM
-Date: Fri, 2 Dec 2016 17:30:02 +0100
-Message-ID: <20161202173002.23ee6fdb@bbrezillon>
+Date: Fri, 2 Dec 2016 17:21:49 +0100
+Message-ID: <20161202172149.78bf93b1@bbrezillon>
 References: <20161202160551.9940-1-romain.perier@free-electrons.com>
         <20161202160551.9940-2-romain.perier@free-electrons.com>
 Mime-Version: 1.0
@@ -30,11 +30,7 @@ Romain Perier <romain.perier@free-electrons.com> wrote:
 > Fixes: commit 85030c5168f1 ("crypto: marvell - Add support for chai...")
 > Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
 
-Oh, and please add
-
-Cc: <stable@vger.kernel.org>
-
-to both patches.
+Acked-by: Boris Brezillon <boris.brezillon@free-electron.com>
 
 > ---
 >  drivers/crypto/marvell/hash.c | 3 ---
