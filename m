@@ -1,41 +1,45 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: Crash in crypto mcryptd
-Date: Fri, 02 Dec 2016 16:16:28 -0800
-Message-ID: <1480724188.3064.62.camel@linux.intel.com>
-References: <alpine.LRH.2.02.1612011819540.27565@file01.intranet.prod.int.rdu2.redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org, dm-devel@redhat.com,
-        Milan Broz <mbroz@redhat.com>
-To: Mikulas Patocka <mpatocka@redhat.com>,
+From: Pan Bian <bianpan201602@163.com>
+Subject: [PATCH 1/1] crypto: asymmetric_keys: set error code on failure
+Date: Sat,  3 Dec 2016 22:57:04 +0800
+Message-ID: <1480777024-7410-1-git-send-email-bianpan201602@163.com>
+Cc: linux-kernel@vger.kernel.org, Pan Bian <bianpan2016@163.com>
+To: David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:55229 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751772AbcLCAR7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Dec 2016 19:17:59 -0500
-In-Reply-To: <alpine.LRH.2.02.1612011819540.27565@file01.intranet.prod.int.rdu2.redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, 2016-12-01 at 19:00 -0500, Mikulas Patocka wrote:
-> Hi
-> 
-> There is a bug in mcryptd initialization.
-> 
-> This is a test module that tries various hash algorithms. When you load 
-> the module with "insmod test.ko 'alg=mcryptd(md5)'", the machine crashes.
-> 
-> Mikulas
-> 
-> 
+From: Pan Bian <bianpan2016@163.com>
 
-Mikulas,
+In function public_key_verify_signature(), returns variable ret on
+error paths. When the call to kmalloc() fails, the value of ret is 0,
+and it is not set to an errno before returning. This patch fixes the
+bug.
 
-Can you try out the patch that I've sent out in a separate mail?
+Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=188891
 
-Thanks.
+Signed-off-by: Pan Bian <bianpan2016@163.com>
+---
+ crypto/asymmetric_keys/public_key.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Tim
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index fd76b5f..1dc65ba 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -123,8 +123,10 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 
+ 	outlen = crypto_akcipher_maxsize(tfm);
+ 	output = kmalloc(outlen, GFP_KERNEL);
+-	if (!output)
++	if (!output) {
++		ret = -ENOMEM;
+ 		goto error_free_req;
++	}
+ 
+ 	sg_init_one(&sig_sg, sig->s, sig->s_size);
+ 	sg_init_one(&digest_sg, output, outlen);
+-- 
+1.9.1
