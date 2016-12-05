@@ -1,51 +1,62 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: rsa - fix a potential race condition in build
-Date: Mon, 5 Dec 2016 14:48:00 +0800
-Message-ID: <20161205064800.GA9496@gondor.apana.org.au>
-References: <1480722064-31714-1-git-send-email-yang.shi@windriver.com>
+From: Ryder Lee <ryder.lee@mediatek.com>
+Subject: [PATCH v1 0/2] Add MediaTek crypto acclelrator driver
+Date: Mon, 5 Dec 2016 15:01:22 +0800
+Message-ID: <1480921284-45827-1-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Yang Shi <yang.shi@windriver.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49883 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750841AbcLEGs1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2016 01:48:27 -0500
-Content-Disposition: inline
-In-Reply-To: <1480722064-31714-1-git-send-email-yang.shi@windriver.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: <devicetree@vger.kernel.org>, <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Sean Wang <sean.wang@mediatek.com>,
+        Roy Luo <cheng-hao.luo@mediatek.com>,
+        Ryder Lee <ryder.lee@mediatek.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Matthias Brugger <matthias.bgg@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Dec 02, 2016 at 03:41:04PM -0800, Yang Shi wrote:
-> When building kernel with RSA enabled with multithreaded, the below
-> compile failure might be caught:
-> 
-> | /buildarea/kernel-source/crypto/rsa_helper.c:18:28: fatal error: rsapubkey-asn1.h: No such file or directory
-> | #include "rsapubkey-asn1.h"
-> | ^
-> | compilation terminated.
-> | CC crypto/rsa-pkcs1pad.o
-> | CC crypto/algboss.o
-> | CC crypto/testmgr.o
-> | make[3]: *** [/buildarea/kernel-source/scripts/Makefile.build:289: crypto/rsa_helper.o] Error 1
-> | make[3]: *** Waiting for unfinished jobs....
-> | make[2]: *** [/buildarea/kernel-source/Makefile:969: crypto] Error 2
-> | make[1]: *** [Makefile:150: sub-make] Error 2
-> | make: *** [Makefile:24: __sub-make] Error 2
-> 
-> The header file is not generated before rsa_helper is compiled, so
-> adding dependency to avoid such issue.
-> 
-> Signed-off-by: Yang Shi <yang.shi@windriver.com>
+Hello,
 
-This should already be fixed in the latest crypto tree.  Could
-you please double-check?
+This adds support for the MediaTek hardware accelerator on 
+mt7623 SoC.
 
-Thanks,
+This driver currently implement: 
+- SHA1 and SHA2 family(HMAC) hash alogrithms.
+- AES block cipher in CBC/ECB mode with 128/196/256 bits keys.
+
+Changes since v1:
+- remove EXPORT_SYMBOL
+- remove unused PRNG setting
+- sort headers in alphabetical order
+- add a definition for IRQ unmber
+- replace ambiguous definition
+- add more annotation and function comment
+- add COMPILE_TEST in Kconfig
+
+
+Ryder Lee (2):
+  Add crypto driver support for some MediaTek chips
+  crypto: mediatek - add DT bindings documentation
+
+ .../devicetree/bindings/crypto/mediatek-crypto.txt |   32 +
+ drivers/crypto/Kconfig                             |   17 +
+ drivers/crypto/Makefile                            |    1 +
+ drivers/crypto/mediatek/Makefile                   |    2 +
+ drivers/crypto/mediatek/mtk-aes.c                  |  763 +++++++++++
+ drivers/crypto/mediatek/mtk-platform.c             |  580 ++++++++
+ drivers/crypto/mediatek/mtk-platform.h             |  235 ++++
+ drivers/crypto/mediatek/mtk-regs.h                 |  194 +++
+ drivers/crypto/mediatek/mtk-sha.c                  | 1423 ++++++++++++++++++++
+ 9 files changed, 3247 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+ create mode 100644 drivers/crypto/mediatek/Makefile
+ create mode 100644 drivers/crypto/mediatek/mtk-aes.c
+ create mode 100644 drivers/crypto/mediatek/mtk-platform.c
+ create mode 100644 drivers/crypto/mediatek/mtk-platform.h
+ create mode 100644 drivers/crypto/mediatek/mtk-regs.h
+ create mode 100644 drivers/crypto/mediatek/mtk-sha.c
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
