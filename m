@@ -1,70 +1,60 @@
-From: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v1 1/2] Add crypto driver support for some MediaTek chips
-Date: Mon, 5 Dec 2016 09:52:20 +0100
-Message-ID: <20161205085220.GA333@Red>
-References: <1480921284-45827-1-git-send-email-ryder.lee@mediatek.com>
- <1480921284-45827-2-git-send-email-ryder.lee@mediatek.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
- Sean Wang <sean.wang-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- Roy Luo <cheng-hao.luo-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>, linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
- linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
- "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-To: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
-Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1480921284-45827-2-git-send-email-ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
- <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
-List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
- <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
-Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Romain Perier <romain.perier@free-electrons.com>
+Subject: [PATCH v2 2/2] crypto: marvell - Don't corrupt state of an STD req for re-stepped ahash
+Date: Mon,  5 Dec 2016 09:56:39 +0100
+Message-ID: <20161205085639.21034-3-romain.perier@free-electrons.com>
+References: <20161205085639.21034-1-romain.perier@free-electrons.com>
+Cc: linux-crypto@vger.kernel.org, Jason Cooper <jason@lakedaemon.net>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Gregory Clement <gregory.clement@free-electrons.com>,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        stable@vger.kernel.org, Nadav Haklai <nadavh@marvell.com>,
+        Ofer Heifetz <oferh@marvell.com>
+To: Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Arnaud Ebalard <arno@natisbad.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.free-electrons.com ([62.4.15.54]:42763 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751723AbcLEI5F (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Dec 2016 03:57:05 -0500
+In-Reply-To: <20161205085639.21034-1-romain.perier@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hello
+mv_cesa_hash_std_step() copies the creq->state into the SRAM at each
+step, but this is only required on the first one. By doing that, we
+overwrite the engine state, and get erroneous results when the crypto
+request is split in several chunks to fit in the internal SRAM.
 
-I have two minor comment.
+This commit changes the function to copy the state only on the first
+step.
 
-On Mon, Dec 05, 2016 at 03:01:23PM +0800, Ryder Lee wrote:
-> This adds support for the MediaTek hardware accelerator on
-> mt7623/mt2701/mt8521p SoC.
-> 
-> This driver currently implement:
-> - SHA1 and SHA2 family(HMAC) hash alogrithms.
+Fixes: commit 2786cee8e50b ("crypto: marvell - Move SRAM I/O op...")
+Signed-off-by: Romain Perier <romain.perier@free-electrons.com>
+Cc: <stable@vger.kernel.org>
+---
+ drivers/crypto/marvell/hash.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-There is a typo for algorithms.
-
-[...]
-> +/**
-> + * struct mtk_desc - DMA descriptor
-> + * @hdr:	the descriptor control header
-> + * @buf:	DMA address of input buffer segment
-> + * @ct:		DMA address of command token that control operation flow
-> + * @ct_hdr:	the command token control header
-> + * @tag:	the user-defined field
-> + * @tfm:	DMA address of transform state
-> + * @bound:	align descriptors offset boundary
-> + *
-> + * Structure passed to the crypto engine to describe where source
-> + * data needs to be fetched and how it needs to be processed.
-> + */
-> +struct mtk_desc {
-> +	u32 hdr;
-> +	u32 buf;
-> +	u32 ct;
-> +	u32 ct_hdr;
-> +	u32 tag;
-> +	u32 tfm;
-> +	u32 bound[2];
-> +};
-
-Do you have tested this descriptor with BE/LE kernel ?
-
-Regards
-Corentin Labbe
+diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
+index fbbcbf8..317cf02 100644
+--- a/drivers/crypto/marvell/hash.c
++++ b/drivers/crypto/marvell/hash.c
+@@ -168,9 +168,11 @@ static void mv_cesa_ahash_std_step(struct ahash_request *req)
+ 	mv_cesa_adjust_op(engine, &creq->op_tmpl);
+ 	memcpy_toio(engine->sram, &creq->op_tmpl, sizeof(creq->op_tmpl));
+ 
+-	digsize = crypto_ahash_digestsize(crypto_ahash_reqtfm(req));
+-	for (i = 0; i < digsize / 4; i++)
+-		writel_relaxed(creq->state[i], engine->regs + CESA_IVDIG(i));
++	if (!sreq->offset) {
++		digsize = crypto_ahash_digestsize(crypto_ahash_reqtfm(req));
++		for (i = 0; i < digsize / 4; i++)
++			writel_relaxed(creq->state[i], engine->regs + CESA_IVDIG(i));
++	}
+ 
+ 	if (creq->cache_ptr)
+ 		memcpy_toio(engine->sram + CESA_SA_DATA_SRAM_OFFSET,
+-- 
+2.9.3
