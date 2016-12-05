@@ -1,69 +1,81 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH v2 0/6] crypto: ARM/arm64 CRC-T10DIF/CRC32/CRC32C roundup
-Date: Mon, 5 Dec 2016 09:20:34 +0000
-Message-ID: <CAKv+Gu-k8exM5WuYHZrePUFX_5umUNc1GEZ7y=Gp2MgLJR_8EQ@mail.gmail.com>
-References: <1480852447-25082-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Matthias Brugger <matthias.bgg@gmail.com>
+Subject: Re: [PATCH v1 2/2] crypto: mediatek - add DT bindings documentation
+Date: Mon, 5 Dec 2016 11:18:06 +0100
+Message-ID: <4b0df417-825f-65c6-4c02-85fe1c20ce50@gmail.com>
+References: <1480921284-45827-1-git-send-email-ryder.lee@mediatek.com>
+ <1480921284-45827-3-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f169.google.com ([209.85.223.169]:36387 "EHLO
-        mail-io0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752529AbcLEJ3C (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2016 04:29:02 -0500
-Received: by mail-io0-f169.google.com with SMTP id m5so448530745ioe.3
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Dec 2016 01:29:02 -0800 (PST)
-In-Reply-To: <1480852447-25082-1-git-send-email-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: devicetree@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Sean Wang <sean.wang@mediatek.com>,
+        Roy Luo <cheng-hao.luo@mediatek.com>
+To: Ryder Lee <ryder.lee@mediatek.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1480921284-45827-3-git-send-email-ryder.lee@mediatek.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 4 December 2016 at 11:54, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> This v2 combines the CRC-T10DIF and CRC32 implementations for both ARM and
-> arm64 that I sent out a couple of weeks ago, and adds support to the latter
-> for CRC32C.
+
+
+On 05/12/16 08:01, Ryder Lee wrote:
+> Add DT bindings documentation for the crypto driver
 >
-
-Please don't apply yet. There is an issue in the 32-bit ARM code I
-only spotted just now.
-
-
-> Ard Biesheuvel (6):
->   crypto: testmgr - avoid overlap in chunked tests
->   crypto: testmgr - add/enhance test cases for CRC-T10DIF
->   crypto: arm64/crct10dif - port x86 SSE implementation to arm64
->   crypto: arm/crct10dif - port x86 SSE implementation to ARM
->   crypto: arm64/crc32 - accelerated support based on x86 SSE
->     implementation
->   crypto: arm/crc32 - accelerated support based on x86 SSE
->     implementation
+> Signed-off-by: Ryder Lee <ryder.lee@mediatek.com>
+> ---
+>  .../devicetree/bindings/crypto/mediatek-crypto.txt | 32 ++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
 >
->  arch/arm/crypto/Kconfig               |  10 +
->  arch/arm/crypto/Makefile              |   4 +
->  arch/arm/crypto/crc32-ce-core.S       | 306 +++++++++++++++++
->  arch/arm/crypto/crc32-ce-glue.c       | 195 +++++++++++
->  arch/arm/crypto/crct10dif-ce-core.S   | 349 ++++++++++++++++++++
->  arch/arm/crypto/crct10dif-ce-glue.c   |  95 ++++++
->  arch/arm64/crypto/Kconfig             |  11 +
->  arch/arm64/crypto/Makefile            |   6 +
->  arch/arm64/crypto/crc32-ce-core.S     | 266 +++++++++++++++
->  arch/arm64/crypto/crc32-ce-glue.c     | 188 +++++++++++
->  arch/arm64/crypto/crct10dif-ce-core.S | 317 ++++++++++++++++++
->  arch/arm64/crypto/crct10dif-ce-glue.c |  91 +++++
->  crypto/testmgr.c                      |   2 +-
->  crypto/testmgr.h                      |  70 ++--
->  14 files changed, 1881 insertions(+), 29 deletions(-)
->  create mode 100644 arch/arm/crypto/crc32-ce-core.S
->  create mode 100644 arch/arm/crypto/crc32-ce-glue.c
->  create mode 100644 arch/arm/crypto/crct10dif-ce-core.S
->  create mode 100644 arch/arm/crypto/crct10dif-ce-glue.c
->  create mode 100644 arch/arm64/crypto/crc32-ce-core.S
->  create mode 100644 arch/arm64/crypto/crc32-ce-glue.c
->  create mode 100644 arch/arm64/crypto/crct10dif-ce-core.S
->  create mode 100644 arch/arm64/crypto/crct10dif-ce-glue.c
->
-> --
-> 2.7.4
+> diff --git a/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt b/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+> new file mode 100644
+> index 0000000..8b1db08
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+> @@ -0,0 +1,32 @@
+> +MediaTek cryptographic accelerators
+> +
+> +Required properties:
+> +- compatible: Should be "mediatek,mt7623-crypto"
+
+Do you know how big the difference is between the crypto engine for 
+mt7623/mt2701/mt8521p in comparison, let's say mt8173 or mt6797?
+Do this SoCs have a crypot engine? If so and they are quite similar, we 
+might think of adding a mtk-crypto binding and add soc specific bindings.
+
+Regards,
+Matthias
+
+> +- reg: Address and length of the register set for the device
+> +- interrupts: Should contain the five crypto engines interrupts in numeric
+> +	order. These are global system and four descriptor rings.
+> +- clocks: the clock used by the core
+> +- clock-names: the names of the clock listed in the clocks property. These are
+> +	"ethif", "cryp"
+> +- power-domains: Must contain a reference to the PM domain.
+> +
+> +
+> +Optional properties:
+> +- interrupt-parent: Should be the phandle for the interrupt controller
+> +  that services interrupts for this device
+> +
+> +
+> +Example:
+> +	crypto: crypto@1b240000 {
+> +		compatible = "mediatek,mt7623-crypto";
+> +		reg = <0 0x1b240000 0 0x20000>;
+> +		interrupts = <GIC_SPI 82 IRQ_TYPE_LEVEL_LOW>,
+> +			     <GIC_SPI 83 IRQ_TYPE_LEVEL_LOW>,
+> +			     <GIC_SPI 84 IRQ_TYPE_LEVEL_LOW>,
+> +			     <GIC_SPI 91 IRQ_TYPE_LEVEL_LOW>,
+> +			     <GIC_SPI 97 IRQ_TYPE_LEVEL_LOW>;
+> +		clocks = <&topckgen CLK_TOP_ETHIF_SEL>,
+> +			 <&ethsys CLK_ETHSYS_CRYPTO>;
+> +		clock-names = "ethif","cryp";
+> +		power-domains = <&scpsys MT2701_POWER_DOMAIN_ETH>;
+> +	};
 >
