@@ -1,36 +1,29 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH v2] crypto: sun4i-ss: support the Security System PRNG
-Date: Mon, 5 Dec 2016 13:57:38 +0100
-Message-ID: <20161205125738.GA13525@Red>
-References: <1480934922-20732-1-git-send-email-clabbe.montjoie@gmail.com>
- <20161205123705.GA10732@gondor.apana.org.au>
+From: Quick Loan <mario.ibieta@csbp.com.bo>
+Subject: Loan Offer
+Date: Mon, 05 Dec 2016 11:51:53 +0100
+Message-ID: <20161205105204.5ECDC51B67C__43329.2764974341$1480943960$gmane$org@mail.csbp.com.bo>
+Reply-To: quickloanss@hotmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, maxime.ripard@free-electrons.com,
-        wens@csie.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20161205123705.GA10732@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+To: Recipients <mario.ibieta@csbp.com.bo>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.csbp.com.bo ([200.87.147.67]:46120 "EHLO mail.csbp.com.bo"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751696AbcLENTB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Dec 2016 08:19:01 -0500
+Content-Description: Mail message body
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 05, 2016 at 08:37:05PM +0800, Herbert Xu wrote:
-> On Mon, Dec 05, 2016 at 11:48:42AM +0100, Corentin Labbe wrote:
-> > From: LABBE Corentin <clabbe.montjoie@gmail.com>
-> > 
-> > The Security System have a PRNG.
-> > This patch add support for it as an hwrng.
-> > 
-> > Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> 
-> Please don't add PRNGs to hwrng.  If we have existing PRNGs in
-> there please let me know so that we can remove them.
-> 
+We can help you with a genuine loan to meet your needs.
+Do you need a personal or business loan without stress and
+quick approval? Do you need an urgent loan today? No Credit Checks
 
-So how to expose PRNG to user space ? or more generally how to "use" a PRNG ?
+* LOAN APPROVAL IN 60MINS !!
+* GUARANTEED SAME DAY TRANSFER !!
+* 100% APPROVAL RATE !!
+* LOW INTEREST RATE !!
 
-I found hisi-rng, crypto4xx_ and exynos-rng which seems to be PRNG used as hwrng.
-
-Regards
+Contact US for more information about loan offer and we will solve your
+financial problem. contact us via email: quickloanss@hotmail.com
