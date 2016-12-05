@@ -1,19 +1,19 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 5/6] crypto: arm64/crc32 - accelerated support based on x86 SSE implementation
-Date: Mon,  5 Dec 2016 18:42:27 +0000
-Message-ID: <1480963348-24203-6-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 6/6] crypto: arm/crc32 - accelerated support based on x86 SSE implementation
+Date: Mon,  5 Dec 2016 18:42:28 +0000
+Message-ID: <1480963348-24203-7-git-send-email-ard.biesheuvel@linaro.org>
 References: <1480963348-24203-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:38191 "EHLO
-        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751913AbcLESms (ORCPT
+Received: from mail-wj0-f171.google.com ([209.85.210.171]:34459 "EHLO
+        mail-wj0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751639AbcLESmv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2016 13:42:48 -0500
-Received: by mail-wm0-f52.google.com with SMTP id f82so102806034wmf.1
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Dec 2016 10:42:47 -0800 (PST)
+        Mon, 5 Dec 2016 13:42:51 -0500
+Received: by mail-wj0-f171.google.com with SMTP id tg4so43242586wjb.1
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Dec 2016 10:42:50 -0800 (PST)
 In-Reply-To: <1480963348-24203-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -31,56 +31,54 @@ the CRC32 instructions will be used.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/Kconfig         |   6 +
- arch/arm64/crypto/Makefile        |   3 +
- arch/arm64/crypto/crc32-ce-core.S | 266 ++++++++++++++++++++
- arch/arm64/crypto/crc32-ce-glue.c | 212 ++++++++++++++++
- 4 files changed, 487 insertions(+)
+ arch/arm/crypto/Kconfig         |   5 +
+ arch/arm/crypto/Makefile        |   2 +
+ arch/arm/crypto/crc32-ce-core.S | 306 ++++++++++++++++++++
+ arch/arm/crypto/crc32-ce-glue.c | 242 ++++++++++++++++
+ 4 files changed, 555 insertions(+)
 
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index d773c0659202..21835deb1ab9 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -28,6 +28,11 @@ config CRYPTO_CRCT10DIF_ARM64_CE
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index fce801fa52a1..de7bb20815bf 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -125,4 +125,9 @@ config CRYPTO_CRCT10DIF_ARM_CE
  	depends on KERNEL_MODE_NEON && CRC_T10DIF
  	select CRYPTO_HASH
  
-+config CRYPTO_CRC32_ARM64_CE
-+	tristate "CRC32 and CRC32C digest algorithms using PMULL instructions"
++config CRYPTO_CRC32_ARM_CE
++	tristate "CRC32(C) digest algorithm using CRC and/or PMULL instructions"
 +	depends on KERNEL_MODE_NEON && CRC32
 +	select CRYPTO_HASH
 +
- config CRYPTO_AES_ARM64_CE
- 	tristate "AES core cipher using ARMv8 Crypto Extensions"
- 	depends on ARM64 && KERNEL_MODE_NEON
-@@ -58,4 +63,5 @@ config CRYPTO_CRC32_ARM64
- 	tristate "CRC32 and CRC32C using optional ARMv8 instructions"
- 	depends on ARM64
- 	select CRYPTO_HASH
-+
  endif
-diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
-index 36fd3eb4201b..144387805a46 100644
---- a/arch/arm64/crypto/Makefile
-+++ b/arch/arm64/crypto/Makefile
-@@ -20,6 +20,9 @@ ghash-ce-y := ghash-ce-glue.o ghash-ce-core.o
- obj-$(CONFIG_CRYPTO_CRCT10DIF_ARM64_CE) += crct10dif-ce.o
- crct10dif-ce-y := crct10dif-ce-core.o crct10dif-ce-glue.o
+diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+index fc77265014b7..b578a1820ab1 100644
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -14,6 +14,7 @@ ce-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
+ ce-obj-$(CONFIG_CRYPTO_SHA2_ARM_CE) += sha2-arm-ce.o
+ ce-obj-$(CONFIG_CRYPTO_GHASH_ARM_CE) += ghash-arm-ce.o
+ ce-obj-$(CONFIG_CRYPTO_CRCT10DIF_ARM_CE) += crct10dif-arm-ce.o
++ce-obj-$(CONFIG_CRYPTO_CRC32_ARM_CE) += crc32-arm-ce.o
  
-+obj-$(CONFIG_CRYPTO_CRC32_ARM64_CE) += crc32-ce.o
-+crc32-ce-y:= crc32-ce-core.o crc32-ce-glue.o
-+
- obj-$(CONFIG_CRYPTO_AES_ARM64_CE) += aes-ce-cipher.o
- CFLAGS_aes-ce-cipher.o += -march=armv8-a+crypto
+ ifneq ($(ce-obj-y)$(ce-obj-m),)
+ ifeq ($(call as-instr,.fpu crypto-neon-fp-armv8,y,n),y)
+@@ -38,6 +39,7 @@ sha2-arm-ce-y	:= sha2-ce-core.o sha2-ce-glue.o
+ aes-arm-ce-y	:= aes-ce-core.o aes-ce-glue.o
+ ghash-arm-ce-y	:= ghash-ce-core.o ghash-ce-glue.o
+ crct10dif-arm-ce-y	:= crct10dif-ce-core.o crct10dif-ce-glue.o
++crc32-arm-ce-y:= crc32-ce-core.o crc32-ce-glue.o
  
-diff --git a/arch/arm64/crypto/crc32-ce-core.S b/arch/arm64/crypto/crc32-ce-core.S
+ quiet_cmd_perl = PERL    $@
+       cmd_perl = $(PERL) $(<) > $(@)
+diff --git a/arch/arm/crypto/crc32-ce-core.S b/arch/arm/crypto/crc32-ce-core.S
 new file mode 100644
-index 000000000000..18f5a8442276
+index 000000000000..e63d400dc5c1
 --- /dev/null
-+++ b/arch/arm64/crypto/crc32-ce-core.S
-@@ -0,0 +1,266 @@
++++ b/arch/arm/crypto/crc32-ce-core.S
+@@ -0,0 +1,306 @@
 +/*
-+ * Accelerated CRC32(C) using arm64 CRC, NEON and Crypto Extensions instructions
++ * Accelerated CRC32(C) using ARM CRC, NEON and Crypto Extensions instructions
 + *
 + * Copyright (C) 2016 Linaro Ltd <ard.biesheuvel@linaro.org>
 + *
@@ -133,7 +131,9 @@ index 000000000000..18f5a8442276
 +
 +	.text
 +	.align		6
-+	.cpu		generic+crypto+crc
++	.arch		armv8-a
++	.arch_extension	crc
++	.fpu		crypto-neon-fp-armv8
 +
 +.Lcrc32_constants:
 +	/*
@@ -143,7 +143,8 @@ index 000000000000..18f5a8442276
 +	 * [(x4*128-32 mod P(x) << 32)]' << 1   = 0x1c6e41596
 +	 * #define CONSTANT_R2  0x1c6e41596LL
 +	 */
-+	.octa		0x00000001c6e415960000000154442bd4
++	.quad		0x0000000154442bd4
++	.quad		0x00000001c6e41596
 +
 +	/*
 +	 * [(x128+32 mod P(x) << 32)]'   << 1   = 0x1751997d0
@@ -152,7 +153,8 @@ index 000000000000..18f5a8442276
 +	 * [(x128-32 mod P(x) << 32)]'   << 1   = 0x0ccaa009e
 +	 * #define CONSTANT_R4  0x0ccaa009eLL
 +	 */
-+	.octa		0x00000000ccaa009e00000001751997d0
++	.quad		0x00000001751997d0
++	.quad		0x00000000ccaa009e
 +
 +	/*
 +	 * [(x64 mod P(x) << 32)]'       << 1   = 0x163cd6124
@@ -168,24 +170,28 @@ index 000000000000..18f5a8442276
 +	 *                                                      = 0x1F7011641LL
 +	 * #define CONSTANT_RU  0x1F7011641LL
 +	 */
-+	.octa		0x00000001F701164100000001DB710641
++	.quad		0x00000001DB710641
++	.quad		0x00000001F7011641
 +
 +.Lcrc32c_constants:
-+	.octa		0x000000009e4addf800000000740eef02
-+	.octa		0x000000014cd00bd600000000f20c0dfe
++	.quad		0x00000000740eef02
++	.quad		0x000000009e4addf8
++	.quad		0x00000000f20c0dfe
++	.quad		0x000000014cd00bd6
 +	.quad		0x00000000dd45aab8
 +	.quad		0x00000000FFFFFFFF
-+	.octa		0x00000000dea713f10000000105ec76f0
++	.quad		0x0000000105ec76f0
++	.quad		0x00000000dea713f1
 +
-+	vCONSTANT	.req	v0
-+	dCONSTANT	.req	d0
++	dCONSTANTl	.req	d0
++	dCONSTANTh	.req	d1
 +	qCONSTANT	.req	q0
 +
-+	BUF		.req	x0
-+	LEN		.req	x1
-+	CRC		.req	x2
++	BUF		.req	r0
++	LEN		.req	r1
++	CRC		.req	r2
 +
-+	vzr		.req	v9
++	qzr		.req	q9
 +
 +	/**
 +	 * Calculate crc32
@@ -197,143 +203,175 @@ index 000000000000..18f5a8442276
 +	 *                     size_t len, uint crc32)
 +	 */
 +ENTRY(crc32_pmull_le)
-+	adr		x3, .Lcrc32_constants
++	adr		r3, .Lcrc32_constants
 +	b		0f
 +
 +ENTRY(crc32c_pmull_le)
-+	adr		x3, .Lcrc32c_constants
++	adr		r3, .Lcrc32c_constants
 +
 +0:	bic		LEN, LEN, #15
-+	ld1		{v1.16b-v4.16b}, [BUF], #0x40
-+	movi		vzr.16b, #0
-+	fmov		dCONSTANT, CRC
-+	eor		v1.16b, v1.16b, vCONSTANT.16b
++	vld1.8		{q1-q2}, [BUF, :128]!
++	vld1.8		{q3-q4}, [BUF, :128]!
++	vmov.i8		qzr, #0
++	vmov.i8		qCONSTANT, #0
++	vmov		dCONSTANTl[0], CRC
++	veor.8		d2, d2, dCONSTANTl
 +	sub		LEN, LEN, #0x40
 +	cmp		LEN, #0x40
-+	b.lt		less_64
++	blt		less_64
 +
-+	ldr		qCONSTANT, [x3]
++	vld1.64		{qCONSTANT}, [r3]
 +
 +loop_64:		/* 64 bytes Full cache line folding */
 +	sub		LEN, LEN, #0x40
 +
-+	pmull2		v5.1q, v1.2d, vCONSTANT.2d
-+	pmull2		v6.1q, v2.2d, vCONSTANT.2d
-+	pmull2		v7.1q, v3.2d, vCONSTANT.2d
-+	pmull2		v8.1q, v4.2d, vCONSTANT.2d
++	vmull.p64	q5, d3, dCONSTANTh
++	vmull.p64	q6, d5, dCONSTANTh
++	vmull.p64	q7, d7, dCONSTANTh
++	vmull.p64	q8, d9, dCONSTANTh
 +
-+	pmull		v1.1q, v1.1d, vCONSTANT.1d
-+	pmull		v2.1q, v2.1d, vCONSTANT.1d
-+	pmull		v3.1q, v3.1d, vCONSTANT.1d
-+	pmull		v4.1q, v4.1d, vCONSTANT.1d
++	vmull.p64	q1, d2, dCONSTANTl
++	vmull.p64	q2, d4, dCONSTANTl
++	vmull.p64	q3, d6, dCONSTANTl
++	vmull.p64	q4, d8, dCONSTANTl
 +
-+	eor		v1.16b, v1.16b, v5.16b
-+	ld1		{v5.16b}, [BUF], #0x10
-+	eor		v2.16b, v2.16b, v6.16b
-+	ld1		{v6.16b}, [BUF], #0x10
-+	eor		v3.16b, v3.16b, v7.16b
-+	ld1		{v7.16b}, [BUF], #0x10
-+	eor		v4.16b, v4.16b, v8.16b
-+	ld1		{v8.16b}, [BUF], #0x10
++	veor.8		q1, q1, q5
++	vld1.8		{q5}, [BUF, :128]!
++	veor.8		q2, q2, q6
++	vld1.8		{q6}, [BUF, :128]!
++	veor.8		q3, q3, q7
++	vld1.8		{q7}, [BUF, :128]!
++	veor.8		q4, q4, q8
++	vld1.8		{q8}, [BUF, :128]!
 +
-+	eor		v1.16b, v1.16b, v5.16b
-+	eor		v2.16b, v2.16b, v6.16b
-+	eor		v3.16b, v3.16b, v7.16b
-+	eor		v4.16b, v4.16b, v8.16b
++	veor.8		q1, q1, q5
++	veor.8		q2, q2, q6
++	veor.8		q3, q3, q7
++	veor.8		q4, q4, q8
 +
 +	cmp		LEN, #0x40
-+	b.ge		loop_64
++	bge		loop_64
 +
 +less_64:		/* Folding cache line into 128bit */
-+	ldr		qCONSTANT, [x3, #16]
++	vldr		dCONSTANTl, [r3, #16]
++	vldr		dCONSTANTh, [r3, #24]
 +
-+	pmull2		v5.1q, v1.2d, vCONSTANT.2d
-+	pmull		v1.1q, v1.1d, vCONSTANT.1d
-+	eor		v1.16b, v1.16b, v5.16b
-+	eor		v1.16b, v1.16b, v2.16b
++	vmull.p64	q5, d3, dCONSTANTh
++	vmull.p64	q1, d2, dCONSTANTl
++	veor.8		q1, q1, q5
++	veor.8		q1, q1, q2
 +
-+	pmull2		v5.1q, v1.2d, vCONSTANT.2d
-+	pmull		v1.1q, v1.1d, vCONSTANT.1d
-+	eor		v1.16b, v1.16b, v5.16b
-+	eor		v1.16b, v1.16b, v3.16b
++	vmull.p64	q5, d3, dCONSTANTh
++	vmull.p64	q1, d2, dCONSTANTl
++	veor.8		q1, q1, q5
++	veor.8		q1, q1, q3
 +
-+	pmull2		v5.1q, v1.2d, vCONSTANT.2d
-+	pmull		v1.1q, v1.1d, vCONSTANT.1d
-+	eor		v1.16b, v1.16b, v5.16b
-+	eor		v1.16b, v1.16b, v4.16b
++	vmull.p64	q5, d3, dCONSTANTh
++	vmull.p64	q1, d2, dCONSTANTl
++	veor.8		q1, q1, q5
++	veor.8		q1, q1, q4
 +
-+	cbz		LEN, fold_64
++	teq		LEN, #0
++	beq		fold_64
 +
 +loop_16:		/* Folding rest buffer into 128bit */
 +	subs		LEN, LEN, #0x10
 +
-+	ld1		{v2.16b}, [BUF], #0x10
-+	pmull2		v5.1q, v1.2d, vCONSTANT.2d
-+	pmull		v1.1q, v1.1d, vCONSTANT.1d
-+	eor		v1.16b, v1.16b, v5.16b
-+	eor		v1.16b, v1.16b, v2.16b
++	vld1.8		{q2}, [BUF, :128]!
++	vmull.p64	q5, d3, dCONSTANTh
++	vmull.p64	q1, d2, dCONSTANTl
++	veor.8		q1, q1, q5
++	veor.8		q1, q1, q2
 +
-+	b.ne		loop_16
++	bne		loop_16
 +
 +fold_64:
 +	/* perform the last 64 bit fold, also adds 32 zeroes
 +	 * to the input stream */
-+	ext		v2.16b, v1.16b, v1.16b, #8
-+	pmull2		v2.1q, v2.2d, vCONSTANT.2d
-+	ext		v1.16b, v1.16b, vzr.16b, #8
-+	eor		v1.16b, v1.16b, v2.16b
++	vmull.p64	q2, d2, dCONSTANTh
++	vext.8		q1, q1, qzr, #8
++	veor.8		q1, q1, q2
 +
 +	/* final 32-bit fold */
-+	ldr		dCONSTANT, [x3, #32]
-+	ldr		d3, [x3, #40]
++	vldr		dCONSTANTl, [r3, #32]
++	vldr		d6, [r3, #40]
++	vmov.i8		d7, #0
 +
-+	ext		v2.16b, v1.16b, vzr.16b, #4
-+	and		v1.16b, v1.16b, v3.16b
-+	pmull		v1.1q, v1.1d, vCONSTANT.1d
-+	eor		v1.16b, v1.16b, v2.16b
++	vext.8		q2, q1, qzr, #4
++	vand.8		d2, d2, d6
++	vmull.p64	q1, d2, dCONSTANTl
++	veor.8		q1, q1, q2
 +
 +	/* Finish up with the bit-reversed barrett reduction 64 ==> 32 bits */
-+	ldr		qCONSTANT, [x3, #48]
++	vldr		dCONSTANTl, [r3, #48]
++	vldr		dCONSTANTh, [r3, #56]
 +
-+	and		v2.16b, v1.16b, v3.16b
-+	ext		v2.16b, vzr.16b, v2.16b, #8
-+	pmull2		v2.1q, v2.2d, vCONSTANT.2d
-+	and		v2.16b, v2.16b, v3.16b
-+	pmull		v2.1q, v2.1d, vCONSTANT.1d
-+	eor		v1.16b, v1.16b, v2.16b
-+	mov		w0, v1.s[1]
++	vand.8		q2, q1, q3
++	vext.8		q2, qzr, q2, #8
++	vmull.p64	q2, d5, dCONSTANTh
++	vand.8		q2, q2, q3
++	vmull.p64	q2, d4, dCONSTANTl
++	veor.8		q1, q1, q2
++	vmov		r0, s5
 +
-+	ret
++	bx		lr
 +ENDPROC(crc32_pmull_le)
 +ENDPROC(crc32c_pmull_le)
 +
 +	.macro		__crc32, c
-+0:	subs		x2, x2, #16
-+	b.mi		8f
-+	ldp		x3, x4, [x1], #16
-+CPU_BE(	rev		x3, x3		)
-+CPU_BE(	rev		x4, x4		)
-+	crc32\c\()x	w0, w0, x3
-+	crc32\c\()x	w0, w0, x4
-+	b.ne		0b
-+	ret
++	subs		ip, r2, #8
++	bmi		.Ltail\c
 +
-+8:	tbz		x2, #3, 4f
-+	ldr		x3, [x1], #8
-+CPU_BE(	rev		x3, x3		)
-+	crc32\c\()x	w0, w0, x3
-+4:	tbz		x2, #2, 2f
-+	ldr		w3, [x1], #4
-+CPU_BE(	rev		w3, w3		)
-+	crc32\c\()w	w0, w0, w3
-+2:	tbz		x2, #1, 1f
-+	ldrh		w3, [x1], #2
-+CPU_BE(	rev16		w3, w3		)
-+	crc32\c\()h	w0, w0, w3
-+1:	tbz		x2, #0, 0f
-+	ldrb		w3, [x1]
-+	crc32\c\()b	w0, w0, w3
-+0:	ret
++	tst		r1, #3
++	bne		.Lunaligned\c
++
++	teq		ip, #0
++.Laligned8\c:
++	ldrd		r2, r3, [r1], #8
++ARM_BE8(rev		r2, r2		)
++ARM_BE8(rev		r3, r3		)
++	crc32\c\()w	r0, r0, r2
++	crc32\c\()w	r0, r0, r3
++	bxeq		lr
++	subs		ip, ip, #8
++	bpl		.Laligned8\c
++
++.Ltail\c:
++	tst		ip, #4
++	beq		2f
++	ldr		r3, [r1], #4
++ARM_BE8(rev		r3, r3		)
++	crc32\c\()w	r0, r0, r3
++
++2:	tst		ip, #2
++	beq		1f
++	ldrh		r3, [r1], #2
++ARM_BE8(rev16		r3, r3		)
++	crc32\c\()h	r0, r0, r3
++
++1:	tst		ip, #1
++	bxeq		lr
++	ldrb		r3, [r1]
++	crc32\c\()b	r0, r0, r3
++	bx		lr
++
++.Lunaligned\c:
++	tst		r1, #1
++	beq		2f
++	ldrb		r3, [r1], #1
++	subs		r2, r2, #1
++	crc32\c\()b	r0, r0, r3
++
++	tst		r1, #2
++	beq		0f
++2:	ldrh		r3, [r1], #2
++	subs		r2, r2, #2
++ARM_BE8(rev16		r3, r3		)
++	crc32\c\()h	r0, r0, r3
++
++0:	subs		ip, r2, #8
++	bpl		.Laligned8\c
++	b		.Ltail\c
 +	.endm
 +
 +	.align		5
@@ -345,14 +383,14 @@ index 000000000000..18f5a8442276
 +ENTRY(crc32c_armv8_le)
 +	__crc32		c
 +ENDPROC(crc32c_armv8_le)
-diff --git a/arch/arm64/crypto/crc32-ce-glue.c b/arch/arm64/crypto/crc32-ce-glue.c
+diff --git a/arch/arm/crypto/crc32-ce-glue.c b/arch/arm/crypto/crc32-ce-glue.c
 new file mode 100644
-index 000000000000..8594127d5e01
+index 000000000000..e1566bec1016
 --- /dev/null
-+++ b/arch/arm64/crypto/crc32-ce-glue.c
-@@ -0,0 +1,212 @@
++++ b/arch/arm/crypto/crc32-ce-glue.c
+@@ -0,0 +1,242 @@
 +/*
-+ * Accelerated CRC32(C) using arm64 NEON and Crypto Extensions instructions
++ * Accelerated CRC32(C) using ARM CRC, NEON and Crypto Extensions instructions
 + *
 + * Copyright (C) 2016 Linaro Ltd <ard.biesheuvel@linaro.org>
 + *
@@ -361,7 +399,6 @@ index 000000000000..8594127d5e01
 + * published by the Free Software Foundation.
 + */
 +
-+#include <linux/cpufeature.h>
 +#include <linux/crc32.h>
 +#include <linux/init.h>
 +#include <linux/kernel.h>
@@ -372,22 +409,23 @@ index 000000000000..8594127d5e01
 +
 +#include <asm/hwcap.h>
 +#include <asm/neon.h>
++#include <asm/simd.h>
 +#include <asm/unaligned.h>
 +
 +#define PMULL_MIN_LEN		64L	/* minimum size of buffer
 +					 * for crc32_pmull_le_16 */
 +#define SCALE_F			16L	/* size of NEON register */
 +
-+asmlinkage u32 crc32_pmull_le(const u8 buf[], u64 len, u32 init_crc);
-+asmlinkage u32 crc32_armv8_le(u32 init_crc, const u8 buf[], size_t len);
++asmlinkage u32 crc32_pmull_le(const u8 buf[], u32 len, u32 init_crc);
++asmlinkage u32 crc32_armv8_le(u32 init_crc, const u8 buf[], u32 len);
 +
-+asmlinkage u32 crc32c_pmull_le(const u8 buf[], u64 len, u32 init_crc);
-+asmlinkage u32 crc32c_armv8_le(u32 init_crc, const u8 buf[], size_t len);
++asmlinkage u32 crc32c_pmull_le(const u8 buf[], u32 len, u32 init_crc);
++asmlinkage u32 crc32c_armv8_le(u32 init_crc, const u8 buf[], u32 len);
 +
-+static u32 (*fallback_crc32)(u32 init_crc, const u8 buf[], size_t len);
-+static u32 (*fallback_crc32c)(u32 init_crc, const u8 buf[], size_t len);
++static u32 (*fallback_crc32)(u32 init_crc, const u8 buf[], u32 len);
++static u32 (*fallback_crc32c)(u32 init_crc, const u8 buf[], u32 len);
 +
-+static int crc32_pmull_cra_init(struct crypto_tfm *tfm)
++static int crc32_cra_init(struct crypto_tfm *tfm)
 +{
 +	u32 *key = crypto_tfm_ctx(tfm);
 +
@@ -395,7 +433,7 @@ index 000000000000..8594127d5e01
 +	return 0;
 +}
 +
-+static int crc32c_pmull_cra_init(struct crypto_tfm *tfm)
++static int crc32c_cra_init(struct crypto_tfm *tfm)
 +{
 +	u32 *key = crypto_tfm_ctx(tfm);
 +
@@ -403,8 +441,8 @@ index 000000000000..8594127d5e01
 +	return 0;
 +}
 +
-+static int crc32_pmull_setkey(struct crypto_shash *hash, const u8 *key,
-+			      unsigned int keylen)
++static int crc32_setkey(struct crypto_shash *hash, const u8 *key,
++			unsigned int keylen)
 +{
 +	u32 *mctx = crypto_shash_ctx(hash);
 +
@@ -416,7 +454,7 @@ index 000000000000..8594127d5e01
 +	return 0;
 +}
 +
-+static int crc32_pmull_init(struct shash_desc *desc)
++static int crc32_init(struct shash_desc *desc)
 +{
 +	u32 *mctx = crypto_shash_ctx(desc->tfm);
 +	u32 *crc = shash_desc_ctx(desc);
@@ -425,30 +463,66 @@ index 000000000000..8594127d5e01
 +	return 0;
 +}
 +
-+static int crc32_pmull_update(struct shash_desc *desc, const u8 *data,
++static int crc32_update(struct shash_desc *desc, const u8 *data,
++			unsigned int length)
++{
++	u32 *crc = shash_desc_ctx(desc);
++
++	*crc = crc32_armv8_le(*crc, data, length);
++	return 0;
++}
++
++static int crc32c_update(struct shash_desc *desc, const u8 *data,
 +			 unsigned int length)
++{
++	u32 *crc = shash_desc_ctx(desc);
++
++	*crc = crc32c_armv8_le(*crc, data, length);
++	return 0;
++}
++
++static int crc32_final(struct shash_desc *desc, u8 *out)
++{
++	u32 *crc = shash_desc_ctx(desc);
++
++	put_unaligned_le32(*crc, out);
++	return 0;
++}
++
++static int crc32c_final(struct shash_desc *desc, u8 *out)
++{
++	u32 *crc = shash_desc_ctx(desc);
++
++	put_unaligned_le32(~*crc, out);
++	return 0;
++}
++
++static int crc32_pmull_update(struct shash_desc *desc, const u8 *data,
++			      unsigned int length)
 +{
 +	u32 *crc = shash_desc_ctx(desc);
 +	unsigned int l;
 +
-+	if ((u64)data % SCALE_F) {
-+		l = min_t(u32, length, SCALE_F - ((u64)data % SCALE_F));
++	if (may_use_simd()) {
++		if ((u32)data % SCALE_F) {
++			l = min_t(u32, length, SCALE_F - ((u32)data % SCALE_F));
 +
-+		*crc = fallback_crc32(*crc, data, l);
++			*crc = fallback_crc32(*crc, data, l);
 +
-+		data += l;
-+		length -= l;
-+	}
++			data += l;
++			length -= l;
++		}
 +
-+	if (length >= PMULL_MIN_LEN) {
-+		l = round_down(length, SCALE_F);
++		if (length >= PMULL_MIN_LEN) {
++			l = round_down(length, SCALE_F);
 +
-+		kernel_neon_begin_partial(10);
-+		*crc = crc32_pmull_le(data, l, *crc);
-+		kernel_neon_end();
++			kernel_neon_begin();
++			*crc = crc32_pmull_le(data, l, *crc);
++			kernel_neon_end();
 +
-+		data += l;
-+		length -= l;
++			data += l;
++			length -= l;
++		}
 +	}
 +
 +	if (length > 0)
@@ -458,81 +532,66 @@ index 000000000000..8594127d5e01
 +}
 +
 +static int crc32c_pmull_update(struct shash_desc *desc, const u8 *data,
-+			 unsigned int length)
++			       unsigned int length)
 +{
 +	u32 *crc = shash_desc_ctx(desc);
 +	unsigned int l;
 +
-+	if ((u64)data % SCALE_F) {
-+		l = min_t(u32, length, SCALE_F - ((u64)data % SCALE_F));
++	if (may_use_simd()) {
++		if ((u32)data % SCALE_F) {
++			l = min_t(u32, length, SCALE_F - ((u32)data % SCALE_F));
 +
-+		*crc = fallback_crc32c(*crc, data, l);
++			*crc = fallback_crc32c(*crc, data, l);
 +
-+		data += l;
-+		length -= l;
++			data += l;
++			length -= l;
++		}
++
++		if (length >= PMULL_MIN_LEN) {
++			l = round_down(length, SCALE_F);
++
++			kernel_neon_begin();
++			*crc = crc32c_pmull_le(data, l, *crc);
++			kernel_neon_end();
++
++			data += l;
++			length -= l;
++		}
 +	}
 +
-+	if (length >= PMULL_MIN_LEN) {
-+		l = round_down(length, SCALE_F);
-+
-+		kernel_neon_begin_partial(10);
-+		*crc = crc32c_pmull_le(data, l, *crc);
-+		kernel_neon_end();
-+
-+		data += l;
-+		length -= l;
-+	}
-+
-+	if (length > 0) {
++	if (length > 0)
 +		*crc = fallback_crc32c(*crc, data, length);
-+	}
 +
-+	return 0;
-+}
-+
-+static int crc32_pmull_final(struct shash_desc *desc, u8 *out)
-+{
-+	u32 *crc = shash_desc_ctx(desc);
-+
-+	put_unaligned_le32(*crc, out);
-+	return 0;
-+}
-+
-+static int crc32c_pmull_final(struct shash_desc *desc, u8 *out)
-+{
-+	u32 *crc = shash_desc_ctx(desc);
-+
-+	put_unaligned_le32(~*crc, out);
 +	return 0;
 +}
 +
 +static struct shash_alg crc32_pmull_algs[] = { {
-+	.setkey			= crc32_pmull_setkey,
-+	.init			= crc32_pmull_init,
-+	.update			= crc32_pmull_update,
-+	.final			= crc32_pmull_final,
++	.setkey			= crc32_setkey,
++	.init			= crc32_init,
++	.update			= crc32_update,
++	.final			= crc32_final,
 +	.descsize		= sizeof(u32),
 +	.digestsize		= sizeof(u32),
 +
 +	.base.cra_ctxsize	= sizeof(u32),
-+	.base.cra_init		= crc32_pmull_cra_init,
++	.base.cra_init		= crc32_cra_init,
 +	.base.cra_name		= "crc32",
-+	.base.cra_driver_name	= "crc32-arm64-ce",
++	.base.cra_driver_name	= "crc32-arm-ce",
 +	.base.cra_priority	= 200,
 +	.base.cra_blocksize	= 1,
 +	.base.cra_module	= THIS_MODULE,
 +}, {
-+	.setkey			= crc32_pmull_setkey,
-+	.init			= crc32_pmull_init,
-+	.update			= crc32c_pmull_update,
-+	.final			= crc32c_pmull_final,
++	.setkey			= crc32_setkey,
++	.init			= crc32_init,
++	.update			= crc32c_update,
++	.final			= crc32c_final,
 +	.descsize		= sizeof(u32),
 +	.digestsize		= sizeof(u32),
 +
 +	.base.cra_ctxsize	= sizeof(u32),
-+	.base.cra_init		= crc32c_pmull_cra_init,
++	.base.cra_init		= crc32c_cra_init,
 +	.base.cra_name		= "crc32c",
-+	.base.cra_driver_name	= "crc32c-arm64-ce",
++	.base.cra_driver_name	= "crc32c-arm-ce",
 +	.base.cra_priority	= 200,
 +	.base.cra_blocksize	= 1,
 +	.base.cra_module	= THIS_MODULE,
@@ -540,12 +599,19 @@ index 000000000000..8594127d5e01
 +
 +static int __init crc32_pmull_mod_init(void)
 +{
-+	if (elf_hwcap & HWCAP_CRC32) {
-+		fallback_crc32 = crc32_armv8_le;
-+		fallback_crc32c = crc32c_armv8_le;
-+	} else {
-+		fallback_crc32 = crc32_le;
-+		fallback_crc32c = __crc32c_le;
++	if (elf_hwcap2 & HWCAP2_PMULL) {
++		crc32_pmull_algs[0].update = crc32_pmull_update;
++		crc32_pmull_algs[1].update = crc32c_pmull_update;
++
++		if (elf_hwcap2 & HWCAP2_CRC32) {
++			fallback_crc32 = crc32_armv8_le;
++			fallback_crc32c = crc32c_armv8_le;
++		} else {
++			fallback_crc32 = crc32_le;
++			fallback_crc32c = __crc32c_le;
++		}
++	} else if (!(elf_hwcap2 & HWCAP2_CRC32)) {
++		return -ENODEV;
 +	}
 +
 +	return crypto_register_shashes(crc32_pmull_algs,
@@ -558,10 +624,12 @@ index 000000000000..8594127d5e01
 +				  ARRAY_SIZE(crc32_pmull_algs));
 +}
 +
-+module_cpu_feature_match(PMULL, crc32_pmull_mod_init);
++module_init(crc32_pmull_mod_init);
 +module_exit(crc32_pmull_mod_exit);
 +
 +MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
 +MODULE_LICENSE("GPL v2");
++MODULE_ALIAS_CRYPTO("crc32");
++MODULE_ALIAS_CRYPTO("crc32c");
 -- 
 2.7.4
