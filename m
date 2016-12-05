@@ -1,511 +1,86 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 4/6] crypto: arm/crct10dif - port x86 SSE implementation to ARM
-Date: Mon,  5 Dec 2016 18:42:26 +0000
-Message-ID: <1480963348-24203-5-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 5/6] crypto: arm64/crc32 - accelerated support based on x86 SSE implementation
+Date: Mon,  5 Dec 2016 18:42:27 +0000
+Message-ID: <1480963348-24203-6-git-send-email-ard.biesheuvel@linaro.org>
 References: <1480963348-24203-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:36324 "EHLO
-        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751639AbcLESmp (ORCPT
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:38191 "EHLO
+        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751913AbcLESms (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2016 13:42:45 -0500
-Received: by mail-wm0-f49.google.com with SMTP id g23so106651210wme.1
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Dec 2016 10:42:45 -0800 (PST)
+        Mon, 5 Dec 2016 13:42:48 -0500
+Received: by mail-wm0-f52.google.com with SMTP id f82so102806034wmf.1
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Dec 2016 10:42:47 -0800 (PST)
 In-Reply-To: <1480963348-24203-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is a transliteration of the Intel algorithm implemented
-using SSE and PCLMULQDQ instructions that resides in the file
-arch/x86/crypto/crct10dif-pcl-asm_64.S, but simplified to only
-operate on buffers that are 16 byte aligned (but of any size)
+This is a combination of the the Intel algorithm implemented using SSE
+and PCLMULQDQ instructions from arch/x86/crypto/crc32-pclmul_asm.S, and
+the new CRC32 extensions introduced for both 32-bit and 64-bit ARM in
+version 8 of the architecture. Two versions of the above combo are
+provided, one for CRC32 and one for CRC32C.
+
+The PMULL/NEON algorithm is faster, but operates on blocks of at least
+64 bytes, and on multiples of 16 bytes only. For the remaining input,
+or for all input on systems that lack the PMULL 64x64->128 instructions,
+the CRC32 instructions will be used.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/Kconfig             |   5 +
- arch/arm/crypto/Makefile            |   2 +
- arch/arm/crypto/crct10dif-ce-core.S | 427 ++++++++++++++++++++
- arch/arm/crypto/crct10dif-ce-glue.c | 101 +++++
- 4 files changed, 535 insertions(+)
+ arch/arm64/crypto/Kconfig         |   6 +
+ arch/arm64/crypto/Makefile        |   3 +
+ arch/arm64/crypto/crc32-ce-core.S | 266 ++++++++++++++++++++
+ arch/arm64/crypto/crc32-ce-glue.c | 212 ++++++++++++++++
+ 4 files changed, 487 insertions(+)
 
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index 27ed1b1cd1d7..fce801fa52a1 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -120,4 +120,9 @@ config CRYPTO_GHASH_ARM_CE
- 	  that uses the 64x64 to 128 bit polynomial multiplication (vmull.p64)
- 	  that is part of the ARMv8 Crypto Extensions
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index d773c0659202..21835deb1ab9 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -28,6 +28,11 @@ config CRYPTO_CRCT10DIF_ARM64_CE
+ 	depends on KERNEL_MODE_NEON && CRC_T10DIF
+ 	select CRYPTO_HASH
  
-+config CRYPTO_CRCT10DIF_ARM_CE
-+	tristate "CRCT10DIF digest algorithm using PMULL instructions"
-+	depends on KERNEL_MODE_NEON && CRC_T10DIF
++config CRYPTO_CRC32_ARM64_CE
++	tristate "CRC32 and CRC32C digest algorithms using PMULL instructions"
++	depends on KERNEL_MODE_NEON && CRC32
 +	select CRYPTO_HASH
 +
+ config CRYPTO_AES_ARM64_CE
+ 	tristate "AES core cipher using ARMv8 Crypto Extensions"
+ 	depends on ARM64 && KERNEL_MODE_NEON
+@@ -58,4 +63,5 @@ config CRYPTO_CRC32_ARM64
+ 	tristate "CRC32 and CRC32C using optional ARMv8 instructions"
+ 	depends on ARM64
+ 	select CRYPTO_HASH
++
  endif
-diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
-index fc5150702b64..fc77265014b7 100644
---- a/arch/arm/crypto/Makefile
-+++ b/arch/arm/crypto/Makefile
-@@ -13,6 +13,7 @@ ce-obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
- ce-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
- ce-obj-$(CONFIG_CRYPTO_SHA2_ARM_CE) += sha2-arm-ce.o
- ce-obj-$(CONFIG_CRYPTO_GHASH_ARM_CE) += ghash-arm-ce.o
-+ce-obj-$(CONFIG_CRYPTO_CRCT10DIF_ARM_CE) += crct10dif-arm-ce.o
+diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+index 36fd3eb4201b..144387805a46 100644
+--- a/arch/arm64/crypto/Makefile
++++ b/arch/arm64/crypto/Makefile
+@@ -20,6 +20,9 @@ ghash-ce-y := ghash-ce-glue.o ghash-ce-core.o
+ obj-$(CONFIG_CRYPTO_CRCT10DIF_ARM64_CE) += crct10dif-ce.o
+ crct10dif-ce-y := crct10dif-ce-core.o crct10dif-ce-glue.o
  
- ifneq ($(ce-obj-y)$(ce-obj-m),)
- ifeq ($(call as-instr,.fpu crypto-neon-fp-armv8,y,n),y)
-@@ -36,6 +37,7 @@ sha1-arm-ce-y	:= sha1-ce-core.o sha1-ce-glue.o
- sha2-arm-ce-y	:= sha2-ce-core.o sha2-ce-glue.o
- aes-arm-ce-y	:= aes-ce-core.o aes-ce-glue.o
- ghash-arm-ce-y	:= ghash-ce-core.o ghash-ce-glue.o
-+crct10dif-arm-ce-y	:= crct10dif-ce-core.o crct10dif-ce-glue.o
++obj-$(CONFIG_CRYPTO_CRC32_ARM64_CE) += crc32-ce.o
++crc32-ce-y:= crc32-ce-core.o crc32-ce-glue.o
++
+ obj-$(CONFIG_CRYPTO_AES_ARM64_CE) += aes-ce-cipher.o
+ CFLAGS_aes-ce-cipher.o += -march=armv8-a+crypto
  
- quiet_cmd_perl = PERL    $@
-       cmd_perl = $(PERL) $(<) > $(@)
-diff --git a/arch/arm/crypto/crct10dif-ce-core.S b/arch/arm/crypto/crct10dif-ce-core.S
+diff --git a/arch/arm64/crypto/crc32-ce-core.S b/arch/arm64/crypto/crc32-ce-core.S
 new file mode 100644
-index 000000000000..ce45ba0c0687
+index 000000000000..18f5a8442276
 --- /dev/null
-+++ b/arch/arm/crypto/crct10dif-ce-core.S
-@@ -0,0 +1,427 @@
-+//
-+// Accelerated CRC-T10DIF using ARM NEON and Crypto Extensions instructions
-+//
-+// Copyright (C) 2016 Linaro Ltd <ard.biesheuvel@linaro.org>
-+//
-+// This program is free software; you can redistribute it and/or modify
-+// it under the terms of the GNU General Public License version 2 as
-+// published by the Free Software Foundation.
-+//
-+
-+//
-+// Implement fast CRC-T10DIF computation with SSE and PCLMULQDQ instructions
-+//
-+// Copyright (c) 2013, Intel Corporation
-+//
-+// Authors:
-+//     Erdinc Ozturk <erdinc.ozturk@intel.com>
-+//     Vinodh Gopal <vinodh.gopal@intel.com>
-+//     James Guilford <james.guilford@intel.com>
-+//     Tim Chen <tim.c.chen@linux.intel.com>
-+//
-+// This software is available to you under a choice of one of two
-+// licenses.  You may choose to be licensed under the terms of the GNU
-+// General Public License (GPL) Version 2, available from the file
-+// COPYING in the main directory of this source tree, or the
-+// OpenIB.org BSD license below:
-+//
-+// Redistribution and use in source and binary forms, with or without
-+// modification, are permitted provided that the following conditions are
-+// met:
-+//
-+// * Redistributions of source code must retain the above copyright
-+//   notice, this list of conditions and the following disclaimer.
-+//
-+// * Redistributions in binary form must reproduce the above copyright
-+//   notice, this list of conditions and the following disclaimer in the
-+//   documentation and/or other materials provided with the
-+//   distribution.
-+//
-+// * Neither the name of the Intel Corporation nor the names of its
-+//   contributors may be used to endorse or promote products derived from
-+//   this software without specific prior written permission.
-+//
-+//
-+// THIS SOFTWARE IS PROVIDED BY INTEL CORPORATION ""AS IS"" AND ANY
-+// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-+// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INTEL CORPORATION OR
-+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+//
-+//       Function API:
-+//       UINT16 crc_t10dif_pcl(
-+//               UINT16 init_crc, //initial CRC value, 16 bits
-+//               const unsigned char *buf, //buffer pointer to calculate CRC on
-+//               UINT64 len //buffer length in bytes (64-bit data)
-+//       );
-+//
-+//       Reference paper titled "Fast CRC Computation for Generic
-+//	Polynomials Using PCLMULQDQ Instruction"
-+//       URL: http://www.intel.com/content/dam/www/public/us/en/documents
-+//  /white-papers/fast-crc-computation-generic-polynomials-pclmulqdq-paper.pdf
-+//
-+//
-+
-+#include <linux/linkage.h>
-+#include <asm/assembler.h>
-+
-+#ifdef CONFIG_CPU_ENDIAN_BE8
-+#define CPU_LE(code...)
-+#else
-+#define CPU_LE(code...)		code
-+#endif
-+
-+	.text
-+	.fpu		crypto-neon-fp-armv8
-+
-+	arg1_low32	.req	r0
-+	arg2		.req	r1
-+	arg3		.req	r2
-+
-+	qzr		.req	q13
-+
-+	q0l		.req	d0
-+	q0h		.req	d1
-+	q1l		.req	d2
-+	q1h		.req	d3
-+	q2l		.req	d4
-+	q2h		.req	d5
-+	q3l		.req	d6
-+	q3h		.req	d7
-+	q4l		.req	d8
-+	q4h		.req	d9
-+	q5l		.req	d10
-+	q5h		.req	d11
-+	q6l		.req	d12
-+	q6h		.req	d13
-+	q7l		.req	d14
-+	q7h		.req	d15
-+
-+ENTRY(crc_t10dif_pmull)
-+	vmov.i8		qzr, #0			// init zero register
-+
-+	// adjust the 16-bit initial_crc value, scale it to 32 bits
-+	lsl		arg1_low32, arg1_low32, #16
-+
-+	// check if smaller than 256
-+	cmp		arg3, #256
-+
-+	// for sizes less than 128, we can't fold 64B at a time...
-+	blt		_less_than_128
-+
-+	// load the initial crc value
-+	// crc value does not need to be byte-reflected, but it needs
-+	// to be moved to the high part of the register.
-+	// because data will be byte-reflected and will align with
-+	// initial crc at correct place.
-+	vmov		s0, arg1_low32		// initial crc
-+	vext.8		q10, qzr, q0, #4
-+
-+	// receive the initial 64B data, xor the initial crc value
-+	vld1.64		{q0-q1}, [arg2, :128]!
-+	vld1.64		{q2-q3}, [arg2, :128]!
-+	vld1.64		{q4-q5}, [arg2, :128]!
-+	vld1.64		{q6-q7}, [arg2, :128]!
-+CPU_LE(	vrev64.8	q0, q0			)
-+CPU_LE(	vrev64.8	q1, q1			)
-+CPU_LE(	vrev64.8	q2, q2			)
-+CPU_LE(	vrev64.8	q3, q3			)
-+CPU_LE(	vrev64.8	q4, q4			)
-+CPU_LE(	vrev64.8	q5, q5			)
-+CPU_LE(	vrev64.8	q6, q6			)
-+CPU_LE(	vrev64.8	q7, q7			)
-+
-+	vswp		d0, d1
-+	vswp		d2, d3
-+	vswp		d4, d5
-+	vswp		d6, d7
-+	vswp		d8, d9
-+	vswp		d10, d11
-+	vswp		d12, d13
-+	vswp		d14, d15
-+
-+	// XOR the initial_crc value
-+	veor.8		q0, q0, q10
-+
-+	adr		ip, rk3
-+	vld1.64		{q10}, [ip, :128]	// xmm10 has rk3 and rk4
-+
-+	//
-+	// we subtract 256 instead of 128 to save one instruction from the loop
-+	//
-+	sub		arg3, arg3, #256
-+
-+	// at this section of the code, there is 64*x+y (0<=y<64) bytes of
-+	// buffer. The _fold_64_B_loop will fold 64B at a time
-+	// until we have 64+y Bytes of buffer
-+
-+
-+	// fold 64B at a time. This section of the code folds 4 vector
-+	// registers in parallel
-+_fold_64_B_loop:
-+
-+	.macro		fold64, reg1, reg2
-+	vld1.64		{q11-q12}, [arg2, :128]!
-+
-+	vmull.p64	q8, \reg1\()h, d21
-+	vmull.p64	\reg1, \reg1\()l, d20
-+	vmull.p64	q9, \reg2\()h, d21
-+	vmull.p64	\reg2, \reg2\()l, d20
-+
-+CPU_LE(	vrev64.8	q11, q11		)
-+CPU_LE(	vrev64.8	q12, q12		)
-+	vswp		d22, d23
-+	vswp		d24, d25
-+
-+	veor.8		\reg1, \reg1, q8
-+	veor.8		\reg2, \reg2, q9
-+	veor.8		\reg1, \reg1, q11
-+	veor.8		\reg2, \reg2, q12
-+	.endm
-+
-+	fold64		q0, q1
-+	fold64		q2, q3
-+	fold64		q4, q5
-+	fold64		q6, q7
-+
-+	subs		arg3, arg3, #128
-+
-+	// check if there is another 64B in the buffer to be able to fold
-+	bge		_fold_64_B_loop
-+
-+	// at this point, the buffer pointer is pointing at the last y Bytes
-+	// of the buffer the 64B of folded data is in 4 of the vector
-+	// registers: v0, v1, v2, v3
-+
-+	// fold the 8 vector registers to 1 vector register with different
-+	// constants
-+
-+	adr		ip, rk9
-+	vld1.64		{q10}, [ip, :128]!
-+
-+	.macro		fold16, reg, rk
-+	vmull.p64	q8, \reg\()l, d20
-+	vmull.p64	\reg, \reg\()h, d21
-+	.ifnb		\rk
-+	vld1.64		{q10}, [ip, :128]!
-+	.endif
-+	veor.8		q7, q7, q8
-+	veor.8		q7, q7, \reg
-+	.endm
-+
-+	fold16		q0, rk11
-+	fold16		q1, rk13
-+	fold16		q2, rk15
-+	fold16		q3, rk17
-+	fold16		q4, rk19
-+	fold16		q5, rk1
-+	fold16		q6
-+
-+	// instead of 64, we add 48 to the loop counter to save 1 instruction
-+	// from the loop instead of a cmp instruction, we use the negative
-+	// flag with the jl instruction
-+	adds		arg3, arg3, #(128-16)
-+	blt		_final_reduction_for_128
-+
-+	// now we have 16+y bytes left to reduce. 16 Bytes is in register v7
-+	// and the rest is in memory. We can fold 16 bytes at a time if y>=16
-+	// continue folding 16B at a time
-+
-+_16B_reduction_loop:
-+	vmull.p64	q8, d14, d20
-+	vmull.p64	q7, d15, d21
-+	veor.8		q7, q7, q8
-+
-+	vld1.64		{q0}, [arg2, :128]!
-+CPU_LE(	vrev64.8	q0, q0		)
-+	vswp		d0, d1
-+	veor.8		q7, q7, q0
-+	subs		arg3, arg3, #16
-+
-+	// instead of a cmp instruction, we utilize the flags with the
-+	// jge instruction equivalent of: cmp arg3, 16-16
-+	// check if there is any more 16B in the buffer to be able to fold
-+	bge		_16B_reduction_loop
-+
-+	// now we have 16+z bytes left to reduce, where 0<= z < 16.
-+	// first, we reduce the data in the xmm7 register
-+
-+_final_reduction_for_128:
-+	// check if any more data to fold. If not, compute the CRC of
-+	// the final 128 bits
-+	adds		arg3, arg3, #16
-+	beq		_128_done
-+
-+	// here we are getting data that is less than 16 bytes.
-+	// since we know that there was data before the pointer, we can
-+	// offset the input pointer before the actual point, to receive
-+	// exactly 16 bytes. after that the registers need to be adjusted.
-+_get_last_two_regs:
-+	add		arg2, arg2, arg3
-+	sub		arg2, arg2, #16
-+	vld1.64		{q1}, [arg2]
-+CPU_LE(	vrev64.8	q1, q1			)
-+	vswp		d2, d3
-+
-+	// get rid of the extra data that was loaded before
-+	// load the shift constant
-+	adr		ip, tbl_shf_table + 16
-+	sub		ip, ip, arg3
-+	vld1.8		{q0}, [ip]
-+
-+	// shift v2 to the left by arg3 bytes
-+	vtbl.8		d4, {d14-d15}, d0
-+	vtbl.8		d5, {d14-d15}, d1
-+
-+	// shift v7 to the right by 16-arg3 bytes
-+	vmov.i8		q9, #0x80
-+	veor.8		q0, q0, q9
-+	vtbl.8		d18, {d14-d15}, d0
-+	vtbl.8		d19, {d14-d15}, d1
-+
-+	// blend
-+	vshr.s8		q0, q0, #7		// convert to 8-bit mask
-+	vbsl.8		q0, q2, q1
-+
-+	// fold 16 Bytes
-+	vmull.p64	q8, d18, d20
-+	vmull.p64	q7, d19, d21
-+	veor.8		q7, q7, q8
-+	veor.8		q7, q7, q0
-+
-+_128_done:
-+	// compute crc of a 128-bit value
-+	vldr		d20, rk5
-+	vldr		d21, rk6		// rk5 and rk6 in xmm10
-+
-+	// 64b fold
-+	vext.8		q0, qzr, q7, #8
-+	vmull.p64	q7, d15, d20
-+	veor.8		q7, q7, q0
-+
-+	// 32b fold
-+	vext.8		q0, q7, qzr, #12
-+	vmov		s31, s3
-+	vmull.p64	q0, d0, d21
-+	veor.8		q7, q0, q7
-+
-+	// barrett reduction
-+_barrett:
-+	vldr		d20, rk7
-+	vldr		d21, rk8
-+
-+	vmull.p64	q0, d15, d20
-+	vext.8		q0, qzr, q0, #12
-+	vmull.p64	q0, d1, d21
-+	vext.8		q0, qzr, q0, #12
-+	veor.8		q7, q7, q0
-+	vmov		r0, s29
-+
-+_cleanup:
-+	// scale the result back to 16 bits
-+	lsr		r0, r0, #16
-+	bx		lr
-+
-+_less_than_128:
-+	teq		arg3, #0
-+	beq		_cleanup
-+
-+	vmov.i8		q0, #0
-+	vmov		s3, arg1_low32		// get the initial crc value
-+
-+	vld1.64		{q7}, [arg2, :128]!
-+CPU_LE(	vrev64.8	q7, q7		)
-+	vswp		d14, d15
-+	veor.8		q7, q7, q0
-+
-+	cmp		arg3, #16
-+	beq		_128_done		// exactly 16 left
-+	blt		_less_than_16_left
-+
-+	// now if there is, load the constants
-+	vldr		d20, rk1
-+	vldr		d21, rk2		// rk1 and rk2 in xmm10
-+
-+	// check if there is enough buffer to be able to fold 16B at a time
-+	subs		arg3, arg3, #32
-+	addlt		arg3, arg3, #16
-+	blt		_get_last_two_regs
-+	b		_16B_reduction_loop
-+
-+_less_than_16_left:
-+	// shl r9, 4
-+	adr		ip, tbl_shf_table + 16
-+	sub		ip, ip, arg3
-+	vld1.8		{q0}, [ip]
-+	vmov.i8		q9, #0x80
-+	veor.8		q0, q0, q9
-+	vtbl.8		d18, {d14-d15}, d0
-+	vtbl.8		d15, {d14-d15}, d1
-+	vmov		d14, d18
-+	b		_128_done
-+ENDPROC(crc_t10dif_pmull)
-+
-+// precomputed constants
-+// these constants are precomputed from the poly:
-+// 0x8bb70000 (0x8bb7 scaled to 32 bits)
-+	.align		4
-+// Q = 0x18BB70000
-+// rk1 = 2^(32*3) mod Q << 32
-+// rk2 = 2^(32*5) mod Q << 32
-+// rk3 = 2^(32*15) mod Q << 32
-+// rk4 = 2^(32*17) mod Q << 32
-+// rk5 = 2^(32*3) mod Q << 32
-+// rk6 = 2^(32*2) mod Q << 32
-+// rk7 = floor(2^64/Q)
-+// rk8 = Q
-+
-+rk3:	.quad		0x9d9d000000000000
-+rk4:	.quad		0x7cf5000000000000
-+rk5:	.quad		0x2d56000000000000
-+rk6:	.quad		0x1368000000000000
-+rk7:	.quad		0x00000001f65a57f8
-+rk8:	.quad		0x000000018bb70000
-+rk9:	.quad		0xceae000000000000
-+rk10:	.quad		0xbfd6000000000000
-+rk11:	.quad		0x1e16000000000000
-+rk12:	.quad		0x713c000000000000
-+rk13:	.quad		0xf7f9000000000000
-+rk14:	.quad		0x80a6000000000000
-+rk15:	.quad		0x044c000000000000
-+rk16:	.quad		0xe658000000000000
-+rk17:	.quad		0xad18000000000000
-+rk18:	.quad		0xa497000000000000
-+rk19:	.quad		0x6ee3000000000000
-+rk20:	.quad		0xe7b5000000000000
-+rk1:	.quad		0x2d56000000000000
-+rk2:	.quad		0x06df000000000000
-+
-+tbl_shf_table:
-+// use these values for shift constants for the tbl/tbx instruction
-+// different alignments result in values as shown:
-+//	DDQ 0x008f8e8d8c8b8a898887868584838281 # shl 15 (16-1) / shr1
-+//	DDQ 0x01008f8e8d8c8b8a8988878685848382 # shl 14 (16-3) / shr2
-+//	DDQ 0x0201008f8e8d8c8b8a89888786858483 # shl 13 (16-4) / shr3
-+//	DDQ 0x030201008f8e8d8c8b8a898887868584 # shl 12 (16-4) / shr4
-+//	DDQ 0x04030201008f8e8d8c8b8a8988878685 # shl 11 (16-5) / shr5
-+//	DDQ 0x0504030201008f8e8d8c8b8a89888786 # shl 10 (16-6) / shr6
-+//	DDQ 0x060504030201008f8e8d8c8b8a898887 # shl 9  (16-7) / shr7
-+//	DDQ 0x07060504030201008f8e8d8c8b8a8988 # shl 8  (16-8) / shr8
-+//	DDQ 0x0807060504030201008f8e8d8c8b8a89 # shl 7  (16-9) / shr9
-+//	DDQ 0x090807060504030201008f8e8d8c8b8a # shl 6  (16-10) / shr10
-+//	DDQ 0x0a090807060504030201008f8e8d8c8b # shl 5  (16-11) / shr11
-+//	DDQ 0x0b0a090807060504030201008f8e8d8c # shl 4  (16-12) / shr12
-+//	DDQ 0x0c0b0a090807060504030201008f8e8d # shl 3  (16-13) / shr13
-+//	DDQ 0x0d0c0b0a090807060504030201008f8e # shl 2  (16-14) / shr14
-+//	DDQ 0x0e0d0c0b0a090807060504030201008f # shl 1  (16-15) / shr15
-+
-+	.byte		 0x0, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87
-+	.byte		0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f
-+	.byte		 0x0,  0x1,  0x2,  0x3,  0x4,  0x5,  0x6,  0x7
-+	.byte		 0x8,  0x9,  0xa,  0xb,  0xc,  0xd,  0xe , 0x0
-diff --git a/arch/arm/crypto/crct10dif-ce-glue.c b/arch/arm/crypto/crct10dif-ce-glue.c
-new file mode 100644
-index 000000000000..d428355cf38d
---- /dev/null
-+++ b/arch/arm/crypto/crct10dif-ce-glue.c
-@@ -0,0 +1,101 @@
++++ b/arch/arm64/crypto/crc32-ce-core.S
+@@ -0,0 +1,266 @@
 +/*
-+ * Accelerated CRC-T10DIF using ARM NEON and Crypto Extensions instructions
++ * Accelerated CRC32(C) using arm64 CRC, NEON and Crypto Extensions instructions
 + *
 + * Copyright (C) 2016 Linaro Ltd <ard.biesheuvel@linaro.org>
 + *
@@ -514,7 +89,280 @@ index 000000000000..d428355cf38d
 + * published by the Free Software Foundation.
 + */
 +
-+#include <linux/crc-t10dif.h>
++/* GPL HEADER START
++ *
++ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 only,
++ * as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License version 2 for more details (a copy is included
++ * in the LICENSE file that accompanied this code).
++ *
++ * You should have received a copy of the GNU General Public License
++ * version 2 along with this program; If not, see http://www.gnu.org/licenses
++ *
++ * Please  visit http://www.xyratex.com/contact if you need additional
++ * information or have any questions.
++ *
++ * GPL HEADER END
++ */
++
++/*
++ * Copyright 2012 Xyratex Technology Limited
++ *
++ * Using hardware provided PCLMULQDQ instruction to accelerate the CRC32
++ * calculation.
++ * CRC32 polynomial:0x04c11db7(BE)/0xEDB88320(LE)
++ * PCLMULQDQ is a new instruction in Intel SSE4.2, the reference can be found
++ * at:
++ * http://www.intel.com/products/processor/manuals/
++ * Intel(R) 64 and IA-32 Architectures Software Developer's Manual
++ * Volume 2B: Instruction Set Reference, N-Z
++ *
++ * Authors:   Gregory Prestas <Gregory_Prestas@us.xyratex.com>
++ *	      Alexander Boyko <Alexander_Boyko@xyratex.com>
++ */
++
++#include <linux/linkage.h>
++#include <asm/assembler.h>
++
++	.text
++	.align		6
++	.cpu		generic+crypto+crc
++
++.Lcrc32_constants:
++	/*
++	 * [x4*128+32 mod P(x) << 32)]'  << 1   = 0x154442bd4
++	 * #define CONSTANT_R1  0x154442bd4LL
++	 *
++	 * [(x4*128-32 mod P(x) << 32)]' << 1   = 0x1c6e41596
++	 * #define CONSTANT_R2  0x1c6e41596LL
++	 */
++	.octa		0x00000001c6e415960000000154442bd4
++
++	/*
++	 * [(x128+32 mod P(x) << 32)]'   << 1   = 0x1751997d0
++	 * #define CONSTANT_R3  0x1751997d0LL
++	 *
++	 * [(x128-32 mod P(x) << 32)]'   << 1   = 0x0ccaa009e
++	 * #define CONSTANT_R4  0x0ccaa009eLL
++	 */
++	.octa		0x00000000ccaa009e00000001751997d0
++
++	/*
++	 * [(x64 mod P(x) << 32)]'       << 1   = 0x163cd6124
++	 * #define CONSTANT_R5  0x163cd6124LL
++	 */
++	.quad		0x0000000163cd6124
++	.quad		0x00000000FFFFFFFF
++
++	/*
++	 * #define CRCPOLY_TRUE_LE_FULL 0x1DB710641LL
++	 *
++	 * Barrett Reduction constant (u64`) = u` = (x**64 / P(x))`
++	 *                                                      = 0x1F7011641LL
++	 * #define CONSTANT_RU  0x1F7011641LL
++	 */
++	.octa		0x00000001F701164100000001DB710641
++
++.Lcrc32c_constants:
++	.octa		0x000000009e4addf800000000740eef02
++	.octa		0x000000014cd00bd600000000f20c0dfe
++	.quad		0x00000000dd45aab8
++	.quad		0x00000000FFFFFFFF
++	.octa		0x00000000dea713f10000000105ec76f0
++
++	vCONSTANT	.req	v0
++	dCONSTANT	.req	d0
++	qCONSTANT	.req	q0
++
++	BUF		.req	x0
++	LEN		.req	x1
++	CRC		.req	x2
++
++	vzr		.req	v9
++
++	/**
++	 * Calculate crc32
++	 * BUF - buffer
++	 * LEN - sizeof buffer (multiple of 16 bytes), LEN should be > 63
++	 * CRC - initial crc32
++	 * return %eax crc32
++	 * uint crc32_pmull_le(unsigned char const *buffer,
++	 *                     size_t len, uint crc32)
++	 */
++ENTRY(crc32_pmull_le)
++	adr		x3, .Lcrc32_constants
++	b		0f
++
++ENTRY(crc32c_pmull_le)
++	adr		x3, .Lcrc32c_constants
++
++0:	bic		LEN, LEN, #15
++	ld1		{v1.16b-v4.16b}, [BUF], #0x40
++	movi		vzr.16b, #0
++	fmov		dCONSTANT, CRC
++	eor		v1.16b, v1.16b, vCONSTANT.16b
++	sub		LEN, LEN, #0x40
++	cmp		LEN, #0x40
++	b.lt		less_64
++
++	ldr		qCONSTANT, [x3]
++
++loop_64:		/* 64 bytes Full cache line folding */
++	sub		LEN, LEN, #0x40
++
++	pmull2		v5.1q, v1.2d, vCONSTANT.2d
++	pmull2		v6.1q, v2.2d, vCONSTANT.2d
++	pmull2		v7.1q, v3.2d, vCONSTANT.2d
++	pmull2		v8.1q, v4.2d, vCONSTANT.2d
++
++	pmull		v1.1q, v1.1d, vCONSTANT.1d
++	pmull		v2.1q, v2.1d, vCONSTANT.1d
++	pmull		v3.1q, v3.1d, vCONSTANT.1d
++	pmull		v4.1q, v4.1d, vCONSTANT.1d
++
++	eor		v1.16b, v1.16b, v5.16b
++	ld1		{v5.16b}, [BUF], #0x10
++	eor		v2.16b, v2.16b, v6.16b
++	ld1		{v6.16b}, [BUF], #0x10
++	eor		v3.16b, v3.16b, v7.16b
++	ld1		{v7.16b}, [BUF], #0x10
++	eor		v4.16b, v4.16b, v8.16b
++	ld1		{v8.16b}, [BUF], #0x10
++
++	eor		v1.16b, v1.16b, v5.16b
++	eor		v2.16b, v2.16b, v6.16b
++	eor		v3.16b, v3.16b, v7.16b
++	eor		v4.16b, v4.16b, v8.16b
++
++	cmp		LEN, #0x40
++	b.ge		loop_64
++
++less_64:		/* Folding cache line into 128bit */
++	ldr		qCONSTANT, [x3, #16]
++
++	pmull2		v5.1q, v1.2d, vCONSTANT.2d
++	pmull		v1.1q, v1.1d, vCONSTANT.1d
++	eor		v1.16b, v1.16b, v5.16b
++	eor		v1.16b, v1.16b, v2.16b
++
++	pmull2		v5.1q, v1.2d, vCONSTANT.2d
++	pmull		v1.1q, v1.1d, vCONSTANT.1d
++	eor		v1.16b, v1.16b, v5.16b
++	eor		v1.16b, v1.16b, v3.16b
++
++	pmull2		v5.1q, v1.2d, vCONSTANT.2d
++	pmull		v1.1q, v1.1d, vCONSTANT.1d
++	eor		v1.16b, v1.16b, v5.16b
++	eor		v1.16b, v1.16b, v4.16b
++
++	cbz		LEN, fold_64
++
++loop_16:		/* Folding rest buffer into 128bit */
++	subs		LEN, LEN, #0x10
++
++	ld1		{v2.16b}, [BUF], #0x10
++	pmull2		v5.1q, v1.2d, vCONSTANT.2d
++	pmull		v1.1q, v1.1d, vCONSTANT.1d
++	eor		v1.16b, v1.16b, v5.16b
++	eor		v1.16b, v1.16b, v2.16b
++
++	b.ne		loop_16
++
++fold_64:
++	/* perform the last 64 bit fold, also adds 32 zeroes
++	 * to the input stream */
++	ext		v2.16b, v1.16b, v1.16b, #8
++	pmull2		v2.1q, v2.2d, vCONSTANT.2d
++	ext		v1.16b, v1.16b, vzr.16b, #8
++	eor		v1.16b, v1.16b, v2.16b
++
++	/* final 32-bit fold */
++	ldr		dCONSTANT, [x3, #32]
++	ldr		d3, [x3, #40]
++
++	ext		v2.16b, v1.16b, vzr.16b, #4
++	and		v1.16b, v1.16b, v3.16b
++	pmull		v1.1q, v1.1d, vCONSTANT.1d
++	eor		v1.16b, v1.16b, v2.16b
++
++	/* Finish up with the bit-reversed barrett reduction 64 ==> 32 bits */
++	ldr		qCONSTANT, [x3, #48]
++
++	and		v2.16b, v1.16b, v3.16b
++	ext		v2.16b, vzr.16b, v2.16b, #8
++	pmull2		v2.1q, v2.2d, vCONSTANT.2d
++	and		v2.16b, v2.16b, v3.16b
++	pmull		v2.1q, v2.1d, vCONSTANT.1d
++	eor		v1.16b, v1.16b, v2.16b
++	mov		w0, v1.s[1]
++
++	ret
++ENDPROC(crc32_pmull_le)
++ENDPROC(crc32c_pmull_le)
++
++	.macro		__crc32, c
++0:	subs		x2, x2, #16
++	b.mi		8f
++	ldp		x3, x4, [x1], #16
++CPU_BE(	rev		x3, x3		)
++CPU_BE(	rev		x4, x4		)
++	crc32\c\()x	w0, w0, x3
++	crc32\c\()x	w0, w0, x4
++	b.ne		0b
++	ret
++
++8:	tbz		x2, #3, 4f
++	ldr		x3, [x1], #8
++CPU_BE(	rev		x3, x3		)
++	crc32\c\()x	w0, w0, x3
++4:	tbz		x2, #2, 2f
++	ldr		w3, [x1], #4
++CPU_BE(	rev		w3, w3		)
++	crc32\c\()w	w0, w0, w3
++2:	tbz		x2, #1, 1f
++	ldrh		w3, [x1], #2
++CPU_BE(	rev16		w3, w3		)
++	crc32\c\()h	w0, w0, w3
++1:	tbz		x2, #0, 0f
++	ldrb		w3, [x1]
++	crc32\c\()b	w0, w0, w3
++0:	ret
++	.endm
++
++	.align		5
++ENTRY(crc32_armv8_le)
++	__crc32
++ENDPROC(crc32_armv8_le)
++
++	.align		5
++ENTRY(crc32c_armv8_le)
++	__crc32		c
++ENDPROC(crc32c_armv8_le)
+diff --git a/arch/arm64/crypto/crc32-ce-glue.c b/arch/arm64/crypto/crc32-ce-glue.c
+new file mode 100644
+index 000000000000..8594127d5e01
+--- /dev/null
++++ b/arch/arm64/crypto/crc32-ce-glue.c
+@@ -0,0 +1,212 @@
++/*
++ * Accelerated CRC32(C) using arm64 NEON and Crypto Extensions instructions
++ *
++ * Copyright (C) 2016 Linaro Ltd <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/cpufeature.h>
++#include <linux/crc32.h>
 +#include <linux/init.h>
 +#include <linux/kernel.h>
 +#include <linux/module.h>
@@ -522,88 +370,198 @@ index 000000000000..d428355cf38d
 +
 +#include <crypto/internal/hash.h>
 +
++#include <asm/hwcap.h>
 +#include <asm/neon.h>
-+#include <asm/simd.h>
++#include <asm/unaligned.h>
 +
-+#define CRC_T10DIF_PMULL_CHUNK_SIZE	16U
++#define PMULL_MIN_LEN		64L	/* minimum size of buffer
++					 * for crc32_pmull_le_16 */
++#define SCALE_F			16L	/* size of NEON register */
 +
-+asmlinkage u16 crc_t10dif_pmull(u16 init_crc, const u8 buf[], u32 len);
++asmlinkage u32 crc32_pmull_le(const u8 buf[], u64 len, u32 init_crc);
++asmlinkage u32 crc32_armv8_le(u32 init_crc, const u8 buf[], size_t len);
 +
-+static int crct10dif_init(struct shash_desc *desc)
++asmlinkage u32 crc32c_pmull_le(const u8 buf[], u64 len, u32 init_crc);
++asmlinkage u32 crc32c_armv8_le(u32 init_crc, const u8 buf[], size_t len);
++
++static u32 (*fallback_crc32)(u32 init_crc, const u8 buf[], size_t len);
++static u32 (*fallback_crc32c)(u32 init_crc, const u8 buf[], size_t len);
++
++static int crc32_pmull_cra_init(struct crypto_tfm *tfm)
 +{
-+	u16 *crc = shash_desc_ctx(desc);
++	u32 *key = crypto_tfm_ctx(tfm);
 +
-+	*crc = 0;
++	*key = 0;
 +	return 0;
 +}
 +
-+static int crct10dif_update(struct shash_desc *desc, const u8 *data,
-+			    unsigned int length)
++static int crc32c_pmull_cra_init(struct crypto_tfm *tfm)
 +{
-+	u16 *crc = shash_desc_ctx(desc);
++	u32 *key = crypto_tfm_ctx(tfm);
++
++	*key = ~0;
++	return 0;
++}
++
++static int crc32_pmull_setkey(struct crypto_shash *hash, const u8 *key,
++			      unsigned int keylen)
++{
++	u32 *mctx = crypto_shash_ctx(hash);
++
++	if (keylen != sizeof(u32)) {
++		crypto_shash_set_flags(hash, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		return -EINVAL;
++	}
++	*mctx = le32_to_cpup((__le32 *)key);
++	return 0;
++}
++
++static int crc32_pmull_init(struct shash_desc *desc)
++{
++	u32 *mctx = crypto_shash_ctx(desc->tfm);
++	u32 *crc = shash_desc_ctx(desc);
++
++	*crc = *mctx;
++	return 0;
++}
++
++static int crc32_pmull_update(struct shash_desc *desc, const u8 *data,
++			 unsigned int length)
++{
++	u32 *crc = shash_desc_ctx(desc);
 +	unsigned int l;
 +
-+	if (!may_use_simd()) {
-+		*crc = crc_t10dif_generic(*crc, data, length);
-+	} else {
-+		if (unlikely((u32)data % CRC_T10DIF_PMULL_CHUNK_SIZE)) {
-+			l = min_t(u32, length, CRC_T10DIF_PMULL_CHUNK_SIZE -
-+				  ((u32)data % CRC_T10DIF_PMULL_CHUNK_SIZE));
++	if ((u64)data % SCALE_F) {
++		l = min_t(u32, length, SCALE_F - ((u64)data % SCALE_F));
 +
-+			*crc = crc_t10dif_generic(*crc, data, l);
++		*crc = fallback_crc32(*crc, data, l);
 +
-+			length -= l;
-+			data += l;
-+		}
-+		if (length > 0) {
-+			kernel_neon_begin();
-+			*crc = crc_t10dif_pmull(*crc, data, length);
-+			kernel_neon_end();
-+		}
++		data += l;
++		length -= l;
 +	}
++
++	if (length >= PMULL_MIN_LEN) {
++		l = round_down(length, SCALE_F);
++
++		kernel_neon_begin_partial(10);
++		*crc = crc32_pmull_le(data, l, *crc);
++		kernel_neon_end();
++
++		data += l;
++		length -= l;
++	}
++
++	if (length > 0)
++		*crc = fallback_crc32(*crc, data, length);
++
 +	return 0;
 +}
 +
-+static int crct10dif_final(struct shash_desc *desc, u8 *out)
++static int crc32c_pmull_update(struct shash_desc *desc, const u8 *data,
++			 unsigned int length)
 +{
-+	u16 *crc = shash_desc_ctx(desc);
++	u32 *crc = shash_desc_ctx(desc);
++	unsigned int l;
 +
-+	*(u16 *)out = *crc;
++	if ((u64)data % SCALE_F) {
++		l = min_t(u32, length, SCALE_F - ((u64)data % SCALE_F));
++
++		*crc = fallback_crc32c(*crc, data, l);
++
++		data += l;
++		length -= l;
++	}
++
++	if (length >= PMULL_MIN_LEN) {
++		l = round_down(length, SCALE_F);
++
++		kernel_neon_begin_partial(10);
++		*crc = crc32c_pmull_le(data, l, *crc);
++		kernel_neon_end();
++
++		data += l;
++		length -= l;
++	}
++
++	if (length > 0) {
++		*crc = fallback_crc32c(*crc, data, length);
++	}
++
 +	return 0;
 +}
 +
-+static struct shash_alg crc_t10dif_alg = {
-+	.digestsize		= CRC_T10DIF_DIGEST_SIZE,
-+	.init			= crct10dif_init,
-+	.update			= crct10dif_update,
-+	.final			= crct10dif_final,
-+	.descsize		= CRC_T10DIF_DIGEST_SIZE,
++static int crc32_pmull_final(struct shash_desc *desc, u8 *out)
++{
++	u32 *crc = shash_desc_ctx(desc);
 +
-+	.base.cra_name		= "crct10dif",
-+	.base.cra_driver_name	= "crct10dif-arm-ce",
++	put_unaligned_le32(*crc, out);
++	return 0;
++}
++
++static int crc32c_pmull_final(struct shash_desc *desc, u8 *out)
++{
++	u32 *crc = shash_desc_ctx(desc);
++
++	put_unaligned_le32(~*crc, out);
++	return 0;
++}
++
++static struct shash_alg crc32_pmull_algs[] = { {
++	.setkey			= crc32_pmull_setkey,
++	.init			= crc32_pmull_init,
++	.update			= crc32_pmull_update,
++	.final			= crc32_pmull_final,
++	.descsize		= sizeof(u32),
++	.digestsize		= sizeof(u32),
++
++	.base.cra_ctxsize	= sizeof(u32),
++	.base.cra_init		= crc32_pmull_cra_init,
++	.base.cra_name		= "crc32",
++	.base.cra_driver_name	= "crc32-arm64-ce",
 +	.base.cra_priority	= 200,
-+	.base.cra_blocksize	= CRC_T10DIF_BLOCK_SIZE,
++	.base.cra_blocksize	= 1,
 +	.base.cra_module	= THIS_MODULE,
-+};
++}, {
++	.setkey			= crc32_pmull_setkey,
++	.init			= crc32_pmull_init,
++	.update			= crc32c_pmull_update,
++	.final			= crc32c_pmull_final,
++	.descsize		= sizeof(u32),
++	.digestsize		= sizeof(u32),
 +
-+static int __init crc_t10dif_mod_init(void)
++	.base.cra_ctxsize	= sizeof(u32),
++	.base.cra_init		= crc32c_pmull_cra_init,
++	.base.cra_name		= "crc32c",
++	.base.cra_driver_name	= "crc32c-arm64-ce",
++	.base.cra_priority	= 200,
++	.base.cra_blocksize	= 1,
++	.base.cra_module	= THIS_MODULE,
++} };
++
++static int __init crc32_pmull_mod_init(void)
 +{
-+	if (!(elf_hwcap2 & HWCAP2_PMULL))
-+		return -ENODEV;
++	if (elf_hwcap & HWCAP_CRC32) {
++		fallback_crc32 = crc32_armv8_le;
++		fallback_crc32c = crc32c_armv8_le;
++	} else {
++		fallback_crc32 = crc32_le;
++		fallback_crc32c = __crc32c_le;
++	}
 +
-+	return crypto_register_shash(&crc_t10dif_alg);
++	return crypto_register_shashes(crc32_pmull_algs,
++				       ARRAY_SIZE(crc32_pmull_algs));
 +}
 +
-+static void __exit crc_t10dif_mod_exit(void)
++static void __exit crc32_pmull_mod_exit(void)
 +{
-+	crypto_unregister_shash(&crc_t10dif_alg);
++	crypto_unregister_shashes(crc32_pmull_algs,
++				  ARRAY_SIZE(crc32_pmull_algs));
 +}
 +
-+module_init(crc_t10dif_mod_init);
-+module_exit(crc_t10dif_mod_exit);
++module_cpu_feature_match(PMULL, crc32_pmull_mod_init);
++module_exit(crc32_pmull_mod_exit);
 +
 +MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
 +MODULE_LICENSE("GPL v2");
-+MODULE_ALIAS_CRYPTO("crct10dif");
 -- 
 2.7.4
