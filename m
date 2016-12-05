@@ -1,51 +1,69 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH] crypto: caam - fix pointer size for AArch64 boot loader, AArch32 kernel
-Date: Mon, 5 Dec 2016 11:06:58 +0200
-Message-ID: <1480928818-8166-1-git-send-email-horia.geanta@nxp.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v2 0/6] crypto: ARM/arm64 CRC-T10DIF/CRC32/CRC32C roundup
+Date: Mon, 5 Dec 2016 09:20:34 +0000
+Message-ID: <CAKv+Gu-k8exM5WuYHZrePUFX_5umUNc1GEZ7y=Gp2MgLJR_8EQ@mail.gmail.com>
+References: <1480852447-25082-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Alison Wang <alison.wang@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0045.outbound.protection.outlook.com ([104.47.41.45]:29213
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751704AbcLEJXS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2016 04:23:18 -0500
+Received: from mail-io0-f169.google.com ([209.85.223.169]:36387 "EHLO
+        mail-io0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752529AbcLEJ3C (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Dec 2016 04:29:02 -0500
+Received: by mail-io0-f169.google.com with SMTP id m5so448530745ioe.3
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Dec 2016 01:29:02 -0800 (PST)
+In-Reply-To: <1480852447-25082-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Start with a clean slate before dealing with bit 16 (pointer size)
-of Master Configuration Register.
-This fixes the case of AArch64 boot loader + AArch32 kernel, when
-the boot loader might set MCFGR[PS] and kernel would fail to clear it.
+On 4 December 2016 at 11:54, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> This v2 combines the CRC-T10DIF and CRC32 implementations for both ARM and
+> arm64 that I sent out a couple of weeks ago, and adds support to the latter
+> for CRC32C.
+>
 
-Cc: <stable@vger.kernel.org>
-Reported-by: Alison Wang <alison.wang@nxp.com>
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- drivers/crypto/caam/ctrl.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Please don't apply yet. There is an issue in the 32-bit ARM code I
+only spotted just now.
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index be62a7f482ac..0a6ca3919270 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -556,8 +556,9 @@ static int caam_probe(struct platform_device *pdev)
- 	 * Enable DECO watchdogs and, if this is a PHYS_ADDR_T_64BIT kernel,
- 	 * long pointers in master configuration register
- 	 */
--	clrsetbits_32(&ctrl->mcr, MCFGR_AWCACHE_MASK, MCFGR_AWCACHE_CACH |
--		      MCFGR_AWCACHE_BUFF | MCFGR_WDENABLE | MCFGR_LARGE_BURST |
-+	clrsetbits_32(&ctrl->mcr, MCFGR_AWCACHE_MASK | MCFGR_LONG_PTR,
-+		      MCFGR_AWCACHE_CACH | MCFGR_AWCACHE_BUFF |
-+		      MCFGR_WDENABLE | MCFGR_LARGE_BURST |
- 		      (sizeof(dma_addr_t) == sizeof(u64) ? MCFGR_LONG_PTR : 0));
- 
- 	/*
--- 
-2.4.4
+
+> Ard Biesheuvel (6):
+>   crypto: testmgr - avoid overlap in chunked tests
+>   crypto: testmgr - add/enhance test cases for CRC-T10DIF
+>   crypto: arm64/crct10dif - port x86 SSE implementation to arm64
+>   crypto: arm/crct10dif - port x86 SSE implementation to ARM
+>   crypto: arm64/crc32 - accelerated support based on x86 SSE
+>     implementation
+>   crypto: arm/crc32 - accelerated support based on x86 SSE
+>     implementation
+>
+>  arch/arm/crypto/Kconfig               |  10 +
+>  arch/arm/crypto/Makefile              |   4 +
+>  arch/arm/crypto/crc32-ce-core.S       | 306 +++++++++++++++++
+>  arch/arm/crypto/crc32-ce-glue.c       | 195 +++++++++++
+>  arch/arm/crypto/crct10dif-ce-core.S   | 349 ++++++++++++++++++++
+>  arch/arm/crypto/crct10dif-ce-glue.c   |  95 ++++++
+>  arch/arm64/crypto/Kconfig             |  11 +
+>  arch/arm64/crypto/Makefile            |   6 +
+>  arch/arm64/crypto/crc32-ce-core.S     | 266 +++++++++++++++
+>  arch/arm64/crypto/crc32-ce-glue.c     | 188 +++++++++++
+>  arch/arm64/crypto/crct10dif-ce-core.S | 317 ++++++++++++++++++
+>  arch/arm64/crypto/crct10dif-ce-glue.c |  91 +++++
+>  crypto/testmgr.c                      |   2 +-
+>  crypto/testmgr.h                      |  70 ++--
+>  14 files changed, 1881 insertions(+), 29 deletions(-)
+>  create mode 100644 arch/arm/crypto/crc32-ce-core.S
+>  create mode 100644 arch/arm/crypto/crc32-ce-glue.c
+>  create mode 100644 arch/arm/crypto/crct10dif-ce-core.S
+>  create mode 100644 arch/arm/crypto/crct10dif-ce-glue.c
+>  create mode 100644 arch/arm64/crypto/crc32-ce-core.S
+>  create mode 100644 arch/arm64/crypto/crc32-ce-glue.c
+>  create mode 100644 arch/arm64/crypto/crct10dif-ce-core.S
+>  create mode 100644 arch/arm64/crypto/crct10dif-ce-glue.c
+>
+> --
+> 2.7.4
+>
