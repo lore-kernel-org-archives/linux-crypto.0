@@ -1,38 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3] crypto: AF_ALG - fix AEAD tag memory handling
-Date: Mon, 5 Dec 2016 20:26:52 +0800
-Message-ID: <20161205122652.GA10635@gondor.apana.org.au>
-References: <14103787.a1H06iWQgk@positron.chronox.de>
+Subject: Re: [PATCH] crypto/mcryptd: Check mcryptd algorithm compatability
+Date: Mon, 5 Dec 2016 20:34:03 +0800
+Message-ID: <20161205123403.GB10635@gondor.apana.org.au>
+References: <deb5f529a0ff9b454fcc62b849ac3aff96c3e684.1480724043.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: mathew.j.martineau@linux.intel.com, linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:43531 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751100AbcLEM1g (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2016 07:27:36 -0500
+Cc: Mikulas Patocka <mpatocka@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>, megha.dey@linux.intel.com,
+        linux-crypto@vger.kernel.org, dm-devel@redhat.com,
+        Milan Broz <mbroz@redhat.com>,
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
+Return-path: <stable-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <14103787.a1H06iWQgk@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <deb5f529a0ff9b454fcc62b849ac3aff96c3e684.1480724043.git.tim.c.chen@linux.intel.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Dec 02, 2016 at 03:16:26PM +0100, Stephan Mueller wrote:
->
-> In addition, the code now handles the situation where the provided
-> output buffer is too small by reducing the size of the processed
-> input buffer accordingly. Due to this handling, he changes are
+On Fri, Dec 02, 2016 at 04:15:21PM -0800, Tim Chen wrote:
+> Algorithms not compatible with mcryptd could be spawned by mcryptd
+> with a direct crypto_alloc_tfm invocation using a "mcryptd(alg)"
+> name construct.  This causes mcryptd to crash the kernel if
+> "alg" is incompatible and not intended to be used with mcryptd.
+> 
+> A flag CRYPTO_ALG_MCRYPT is being added to mcryptd compatible
+> algorithms' cra_flags. The compatability is checked when mcryptd spawn
+> off an algorithm.
+> 
+> Link: http://marc.info/?l=linux-crypto-vger&m=148063683310477&w=2
+> Cc: stable@vger.kernel.org
+> Reported-by: Mikulas Patocka <mpatocka@redhat.com>
+> Tested-by: Megha Dey <megha.dey@linux.intel.com>
+> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 
-I think that's dangerous.  The AEAD interface doesn't do chaining
-so it's all or nothing.  If the input doesn't fit within the output
-buffer then you should not truncate the input as that would either
-generate a bogus tag on encryption or accept a bogus tag on
-decryption.
+Tim, I think we should instead make mcryptd refuse to generate
+a non-internal algorithm.  This way the user would not be able
+to access it at all since they can only request for non-internal
+algorithms.
 
-I suggest that you instead return EINVAL in such a case.
+Basically you want to check at the start of mcryptd_create_hash
+that the INTERNAL bit is set on both the type and mask as returned
+by crypto_get_attr_type.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
