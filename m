@@ -1,46 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto/mcryptd: Check mcryptd algorithm compatability
-Date: Mon, 5 Dec 2016 20:34:03 +0800
-Message-ID: <20161205123403.GB10635@gondor.apana.org.au>
-References: <deb5f529a0ff9b454fcc62b849ac3aff96c3e684.1480724043.git.tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v2] crypto: sun4i-ss: support the Security System PRNG
+Date: Mon, 5 Dec 2016 20:37:05 +0800
+Message-ID: <20161205123705.GA10732@gondor.apana.org.au>
+References: <1480934922-20732-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Mikulas Patocka <mpatocka@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>, megha.dey@linux.intel.com,
-        linux-crypto@vger.kernel.org, dm-devel@redhat.com,
-        Milan Broz <mbroz@redhat.com>,
-        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <stable-owner@vger.kernel.org>
+Cc: davem@davemloft.net, maxime.ripard@free-electrons.com,
+        wens@csie.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:55361 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750951AbcLEMhW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Dec 2016 07:37:22 -0500
 Content-Disposition: inline
-In-Reply-To: <deb5f529a0ff9b454fcc62b849ac3aff96c3e684.1480724043.git.tim.c.chen@linux.intel.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1480934922-20732-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 02, 2016 at 04:15:21PM -0800, Tim Chen wrote:
-> Algorithms not compatible with mcryptd could be spawned by mcryptd
-> with a direct crypto_alloc_tfm invocation using a "mcryptd(alg)"
-> name construct.  This causes mcryptd to crash the kernel if
-> "alg" is incompatible and not intended to be used with mcryptd.
+On Mon, Dec 05, 2016 at 11:48:42AM +0100, Corentin Labbe wrote:
+> From: LABBE Corentin <clabbe.montjoie@gmail.com>
 > 
-> A flag CRYPTO_ALG_MCRYPT is being added to mcryptd compatible
-> algorithms' cra_flags. The compatability is checked when mcryptd spawn
-> off an algorithm.
+> The Security System have a PRNG.
+> This patch add support for it as an hwrng.
 > 
-> Link: http://marc.info/?l=linux-crypto-vger&m=148063683310477&w=2
-> Cc: stable@vger.kernel.org
-> Reported-by: Mikulas Patocka <mpatocka@redhat.com>
-> Tested-by: Megha Dey <megha.dey@linux.intel.com>
-> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 
-Tim, I think we should instead make mcryptd refuse to generate
-a non-internal algorithm.  This way the user would not be able
-to access it at all since they can only request for non-internal
-algorithms.
-
-Basically you want to check at the start of mcryptd_create_hash
-that the INTERNAL bit is set on both the type and mask as returned
-by crypto_get_attr_type.
+Please don't add PRNGs to hwrng.  If we have existing PRNGs in
+there please let me know so that we can remove them.
 
 Thanks,
 -- 
