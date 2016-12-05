@@ -1,56 +1,63 @@
-From: Yang Shi <yang.shi@windriver.com>
-Subject: Re: [PATCH] crypto: rsa - fix a potential race condition in build
-Date: Mon, 5 Dec 2016 09:49:29 -0800
-Message-ID: <b4e75c35-1a43-b761-af8f-a25977f7390b@windriver.com>
-References: <1480722064-31714-1-git-send-email-yang.shi@windriver.com>
- <20161205064800.GA9496@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 0/6] crypto: ARM/arm64 CRC-T10DIF/CRC32/CRC32C roundup
+Date: Mon,  5 Dec 2016 18:42:22 +0000
+Message-ID: <1480963348-24203-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail1.windriver.com ([147.11.146.13]:45478 "EHLO
-        mail1.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751913AbcLERtj (ORCPT
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:37625 "EHLO
+        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751320AbcLESmh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2016 12:49:39 -0500
-In-Reply-To: <20161205064800.GA9496@gondor.apana.org.au>
+        Mon, 5 Dec 2016 13:42:37 -0500
+Received: by mail-wm0-f54.google.com with SMTP id t79so102624692wmt.0
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Dec 2016 10:42:36 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 12/4/2016 10:48 PM, Herbert Xu wrote:
-> On Fri, Dec 02, 2016 at 03:41:04PM -0800, Yang Shi wrote:
->> When building kernel with RSA enabled with multithreaded, the below
->> compile failure might be caught:
->>
->> | /buildarea/kernel-source/crypto/rsa_helper.c:18:28: fatal error: rsapubkey-asn1.h: No such file or directory
->> | #include "rsapubkey-asn1.h"
->> | ^
->> | compilation terminated.
->> | CC crypto/rsa-pkcs1pad.o
->> | CC crypto/algboss.o
->> | CC crypto/testmgr.o
->> | make[3]: *** [/buildarea/kernel-source/scripts/Makefile.build:289: crypto/rsa_helper.o] Error 1
->> | make[3]: *** Waiting for unfinished jobs....
->> | make[2]: *** [/buildarea/kernel-source/Makefile:969: crypto] Error 2
->> | make[1]: *** [Makefile:150: sub-make] Error 2
->> | make: *** [Makefile:24: __sub-make] Error 2
->>
->> The header file is not generated before rsa_helper is compiled, so
->> adding dependency to avoid such issue.
->>
->> Signed-off-by: Yang Shi <yang.shi@windriver.com>
-> This should already be fixed in the latest crypto tree.  Could
-> you please double-check?
+This v3 combines the CRC-T10DIF and CRC32 implementations for both ARM and
+arm64 that I sent out a couple of weeks ago, and adds support to the latter
+for CRC32C.
 
-Thanks, Herbert, I just found the commit. Please ignore my patch, sorry 
-for the inconvenience.
+Changes since v2:
+- fix a couple of big-endian bugs in CRC32/CRC32C
+- add back handling to the CRC-T10DIF routines of buffers that are not a
+  multiple of 16 bytes (but they still must be 16 byte aligned)
 
-I will backport that commit to our kernel tree.
+Ard Biesheuvel (6):
+  crypto: testmgr - avoid overlap in chunked tests
+  crypto: testmgr - add/enhance test cases for CRC-T10DIF
+  crypto: arm64/crct10dif - port x86 SSE implementation to arm64
+  crypto: arm/crct10dif - port x86 SSE implementation to ARM
+  crypto: arm64/crc32 - accelerated support based on x86 SSE
+    implementation
+  crypto: arm/crc32 - accelerated support based on x86 SSE
+    implementation
 
-Yang
+ arch/arm/crypto/Kconfig               |  10 +
+ arch/arm/crypto/Makefile              |   4 +
+ arch/arm/crypto/crc32-ce-core.S       | 306 ++++++++++++++
+ arch/arm/crypto/crc32-ce-glue.c       | 242 +++++++++++
+ arch/arm/crypto/crct10dif-ce-core.S   | 427 ++++++++++++++++++++
+ arch/arm/crypto/crct10dif-ce-glue.c   | 101 +++++
+ arch/arm64/crypto/Kconfig             |  11 +
+ arch/arm64/crypto/Makefile            |   6 +
+ arch/arm64/crypto/crc32-ce-core.S     | 266 ++++++++++++
+ arch/arm64/crypto/crc32-ce-glue.c     | 212 ++++++++++
+ arch/arm64/crypto/crct10dif-ce-core.S | 392 ++++++++++++++++++
+ arch/arm64/crypto/crct10dif-ce-glue.c |  95 +++++
+ crypto/testmgr.c                      |   2 +-
+ crypto/testmgr.h                      |  70 ++--
+ 14 files changed, 2115 insertions(+), 29 deletions(-)
+ create mode 100644 arch/arm/crypto/crc32-ce-core.S
+ create mode 100644 arch/arm/crypto/crc32-ce-glue.c
+ create mode 100644 arch/arm/crypto/crct10dif-ce-core.S
+ create mode 100644 arch/arm/crypto/crct10dif-ce-glue.c
+ create mode 100644 arch/arm64/crypto/crc32-ce-core.S
+ create mode 100644 arch/arm64/crypto/crc32-ce-glue.c
+ create mode 100644 arch/arm64/crypto/crct10dif-ce-core.S
+ create mode 100644 arch/arm64/crypto/crct10dif-ce-glue.c
 
->
-> Thanks,
+-- 
+2.7.4
