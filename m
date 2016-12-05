@@ -1,59 +1,82 @@
 From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH] crypto/mcryptd: Check mcryptd algorithm compatability
-Date: Mon, 05 Dec 2016 11:03:20 -0800
-Message-ID: <1480964600.3064.67.camel@linux.intel.com>
-References: <deb5f529a0ff9b454fcc62b849ac3aff96c3e684.1480724043.git.tim.c.chen@linux.intel.com>
-         <20161205123403.GB10635@gondor.apana.org.au>
-         <1480956650.3064.65.camel@linux.intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: Mikulas Patocka <mpatocka@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>, megha.dey@linux.intel.com,
+Subject: [PATCH v2] crypto/mcryptd: Check mcryptd algorithm compatibility
+Date: Mon,  5 Dec 2016 11:46:31 -0800
+Message-ID: <6825659d1f6a96d4ab2327aa0dcf357f6252e915.1480967128.git.tim.c.chen@linux.intel.com>
+Cc: Tim Chen <tim.c.chen@linux.intel.com>, megha.dey@linux.intel.com,
         linux-crypto@vger.kernel.org, dm-devel@redhat.com,
         Milan Broz <mbroz@redhat.com>,
         Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <1480956650.3064.65.camel@linux.intel.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Mikulas Patocka <mpatocka@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:21635 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751373AbcLETqT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Dec 2016 14:46:19 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2016-12-05 at 08:50 -0800, Tim Chen wrote:
-> On Mon, 2016-12-05 at 20:34 +0800, Herbert Xu wrote:
-> > 
-> > On Fri, Dec 02, 2016 at 04:15:21PM -0800, Tim Chen wrote:
-> > > 
-> > > 
-> > > Algorithms not compatible with mcryptd could be spawned by mcryptd
-> > > with a direct crypto_alloc_tfm invocation using a "mcryptd(alg)"
-> > > name construct.  This causes mcryptd to crash the kernel if
-> > > "alg" is incompatible and not intended to be used with mcryptd.
-> > > 
-> > > A flag CRYPTO_ALG_MCRYPT is being added to mcryptd compatible
-> > > algorithms' cra_flags. The compatability is checked when mcryptd spawn
-> > > off an algorithm.
-> > > 
-> > > Link: http://marc.info/?l=linux-crypto-vger&m=148063683310477&w=2
-> > > Cc: stable@vger.kernel.org
-> > > Reported-by: Mikulas Patocka <mpatocka@redhat.com>
-> > > Tested-by: Megha Dey <megha.dey@linux.intel.com>
-> > > Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
-> > Tim, I think we should instead make mcryptd refuse to generate
-> > a non-internal algorithm.  This way the user would not be able
-> > to access it at all since they can only request for non-internal
-> > algorithms.
-> > 
-> > Basically you want to check at the start of mcryptd_create_hash
-> > that the INTERNAL bit is set on both the type and mask as returned
-> > by crypto_get_attr_type.
-> I have thought about that.  However, not all internal algorithms
-> are compatible with mcryptd. We can still have trouble if some
-> random internal algorithm is paired with mcryptd.
+Algorithms not compatible with mcryptd could be spawned by mcryptd
+with a direct crypto_alloc_tfm invocation using a "mcryptd(alg)" name
+construct.  This causes mcryptd to crash the kernel if an arbitrary
+"alg" is incompatible and not intended to be used with mcryptd.  It is
+an issue if AF_ALG tries to spawn mcryptd(alg) to expose it externally.
+But such algorithms must be used internally and not be exposed.
 
-You're right.  The mcryptd(alg) should be an internal algorithm itself.
-So checking on the INTERNAL flag should be sufficient.
+We added a check to enforce that only internal algorithms are allowed
+with mcryptd at the time mcryptd is spawning an algorithm.
 
-I'll generate another patch that uses the INTERNAL flag for checking.
+Link: http://marc.info/?l=linux-crypto-vger&m=148063683310477&w=2
+Cc: stable@vger.kernel.org
+Reported-by: Mikulas Patocka <mpatocka@redhat.com>
+Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+---
+ crypto/mcryptd.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-Tim
+diff --git a/crypto/mcryptd.c b/crypto/mcryptd.c
+index 94ee44a..c207458 100644
+--- a/crypto/mcryptd.c
++++ b/crypto/mcryptd.c
+@@ -254,18 +254,22 @@ static void *mcryptd_alloc_instance(struct crypto_alg *alg, unsigned int head,
+ 	goto out;
+ }
+ 
+-static inline void mcryptd_check_internal(struct rtattr **tb, u32 *type,
++static inline bool mcryptd_check_internal(struct rtattr **tb, u32 *type,
+ 					  u32 *mask)
+ {
+ 	struct crypto_attr_type *algt;
+ 
+ 	algt = crypto_get_attr_type(tb);
+ 	if (IS_ERR(algt))
+-		return;
+-	if ((algt->type & CRYPTO_ALG_INTERNAL))
+-		*type |= CRYPTO_ALG_INTERNAL;
+-	if ((algt->mask & CRYPTO_ALG_INTERNAL))
+-		*mask |= CRYPTO_ALG_INTERNAL;
++		return false;
++
++	*type |= algt->type & CRYPTO_ALG_INTERNAL;
++	*mask |= algt->mask & CRYPTO_ALG_INTERNAL;
++
++	if (*type & *mask & CRYPTO_ALG_INTERNAL)
++		return true;
++	else
++		return false;
+ }
+ 
+ static int mcryptd_hash_init_tfm(struct crypto_tfm *tfm)
+@@ -492,7 +496,8 @@ static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
+ 	u32 mask = 0;
+ 	int err;
+ 
+-	mcryptd_check_internal(tb, &type, &mask);
++	if (!mcryptd_check_internal(tb, &type, &mask))
++		return -EINVAL;
+ 
+ 	halg = ahash_attr_alg(tb[1], type, mask);
+ 	if (IS_ERR(halg))
+-- 
+2.5.5
