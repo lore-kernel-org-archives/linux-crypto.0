@@ -1,105 +1,108 @@
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH 10/10] virtio: enable endian checks for sparse builds
-Date: Wed, 7 Dec 2016 14:09:33 +0000
-Message-ID: <20161207140933.GF32099@stefanha-x1.localdomain>
-References: <1481038106-24899-1-git-send-email-mst@redhat.com>
-	<1481038106-24899-11-git-send-email-mst@redhat.com>
+From: "Rob (William) Rice" <rob.rice@broadcom.com>
+Subject: Re: [PATCH 1/3] crypto: brcm: DT documentation for Broadcom SPU
+ driver
+Date: Wed, 7 Dec 2016 10:46:04 -0500
+Message-ID: <930dc7ae-42fe-8945-5b86-db3a4304aa96@broadcom.com>
+References: <1480536453-24781-1-git-send-email-rob.rice@broadcom.com>
+ <1480536453-24781-2-git-send-email-rob.rice@broadcom.com>
+ <20161206140607.GB24177@leverpostej>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============7466233140133078509=="
-Cc: kvm@vger.kernel.org, Neil Armstrong <narmstrong@baylibre.com>,
-	David Airlie <airlied@linux.ie>, linux-remoteproc@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, virtualization@lists.linux-foundation.org,
-	linux-s390@vger.kernel.org,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-scsi@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-	Asias He <asias@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-	linux-kbuild@vger.kernel.org, Jens Axboe <axboe@fb.com>,
-	Michal Marek <mmarek@suse.com>, Matt Mackall <mpm@selenic.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Return-path: <virtualization-bounces@lists.linux-foundation.org>
-In-Reply-To: <1481038106-24899-11-git-send-email-mst@redhat.com>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
-List-Post: <mailto:virtualization@lists.linux-foundation.org>
-List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
-Sender: virtualization-bounces@lists.linux-foundation.org
-Errors-To: virtualization-bounces@lists.linux-foundation.org
-List-Id: linux-crypto.vger.kernel.org
-
-
---===============7466233140133078509==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="GLp9dJVi+aaipsRk"
-Content-Disposition: inline
-
-
---GLp9dJVi+aaipsRk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Dec 06, 2016 at 05:41:05PM +0200, Michael S. Tsirkin wrote:
-> __CHECK_ENDIAN__ isn't on by default presumably because
-> it triggers too many sparse warnings for correct code.
-> But virtio is now clean of these warnings, and
-> we want to keep it this way - enable this for
-> sparse builds.
->=20
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->=20
-> It seems that there should be a better way to do it,
-> but this works too.
->=20
->  drivers/block/Makefile          | 1 +
->  drivers/char/Makefile           | 1 +
->  drivers/char/hw_random/Makefile | 2 ++
->  drivers/gpu/drm/virtio/Makefile | 1 +
->  drivers/net/Makefile            | 3 +++
->  drivers/net/caif/Makefile       | 1 +
->  drivers/rpmsg/Makefile          | 1 +
->  drivers/s390/virtio/Makefile    | 2 ++
->  drivers/scsi/Makefile           | 1 +
->  drivers/vhost/Makefile          | 1 +
->  drivers/virtio/Makefile         | 3 +++
->  net/9p/Makefile                 | 1 +
->  net/packet/Makefile             | 1 +
->  net/vmw_vsock/Makefile          | 2 ++
->  14 files changed, 21 insertions(+)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---GLp9dJVi+aaipsRk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYSBgdAAoJEJykq7OBq3PIErIIALcfuXKP5HgamgpQoZkN0Uc0
-2n2uVTdzArmnFB44EWnkmW+iYjCl3HfmHgtoWPwsUKoY/RDBuL8x9wNSrOfDzSMf
-ymjii6GPxe3fJ4xlvzAmueh0F4wfFeKl+jrO7jm3B1vIhJh6NzEgQZJgGxmpNYvE
-X0o9IKPe5pr+x3ZAec1LMzsv9CvtJObwO3bVgAtQQlA7hlvewrbZkxgmKAojibGG
-Mdv+oNGtpp8ePXN9c0EdhLFbPF3MY9YHf0DbirN5CXp7KP1GH9FgWaOKx0n0v8IB
-3KqF7wUADa/eIWrIW1FaSy9DeGfihiwwrWaEcg/c0LoweS6OLwGhCJTXfp45GJk=
-=SL7g
------END PGP SIGNATURE-----
-
---GLp9dJVi+aaipsRk--
-
---===============7466233140133078509==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Jon Mason <jonmason@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Steve Lin <steven.lin1@broadcom.com>
+To: Mark Rutland <mark.rutland@arm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f54.google.com ([74.125.83.54]:32907 "EHLO
+        mail-pg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753156AbcLGPqI (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Dec 2016 10:46:08 -0500
+Received: by mail-pg0-f54.google.com with SMTP id 3so163288260pgd.0
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Dec 2016 07:46:07 -0800 (PST)
+In-Reply-To: <20161206140607.GB24177@leverpostej>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-_______________________________________________
-Virtualization mailing list
-Virtualization@lists.linux-foundation.org
-https://lists.linuxfoundation.org/mailman/listinfo/virtualization
---===============7466233140133078509==--
+Mark,
+
+Thanks for your comments. Replies below.
+
+Rob
+
+
+On 12/6/2016 9:06 AM, Mark Rutland wrote:
+> On Wed, Nov 30, 2016 at 03:07:31PM -0500, Rob Rice wrote:
+>> Device tree documentation for Broadcom Secure Processing Unit
+>> (SPU) crypto driver.
+>>
+>> Signed-off-by: Steve Lin <steven.lin1@broadcom.com>
+>> Signed-off-by: Rob Rice <rob.rice@broadcom.com>
+>> ---
+>>   .../devicetree/bindings/crypto/brcm,spu-crypto.txt | 25 ++++++++++++++++++++++
+>>   1 file changed, 25 insertions(+)
+>>   create mode 100644 Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
+>>
+>> diff --git a/Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt b/Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
+>> new file mode 100644
+>> index 0000000..e5fe942
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
+>> @@ -0,0 +1,25 @@
+>> +The Broadcom Secure Processing Unit (SPU) driver supports symmetric
+>> +cryptographic offload for Broadcom SoCs with SPU hardware. A SoC may have
+>> +multiple SPU hardware blocks.
+> Bindings shound describe *hardware*, not *drivers*. Please drop mention
+> of the driver, and just decribe the hardware.
+Makes sense. I'll change it.
+>
+>> +Required properties:
+>> +- compatible : Should be "brcm,spum-crypto" for devices with SPU-M hardware
+>> +  (e.g., Northstar2) or "brcm,spum-nsp-crypto" for the Northstar Plus variant
+>> +  of the SPU-M hardware.
+>> +
+>> +- reg: Should contain SPU registers location and length.
+>> +- mboxes: A list of mailbox channels to be used by the kernel driver. Mailbox
+>> +channels correspond to DMA rings on the device.
+>> +
+>> +Example:
+>> +	spu-crypto@612d0000 {
+>> +		compatible = "brcm,spum-crypto";
+>> +		reg = <0 0x612d0000 0 0x900>,    /* SPU 0 control regs */
+>> +			<0 0x612f0000 0 0x900>,  /* SPU 1 control regs */
+>> +			<0 0x61310000 0 0x900>,  /* SPU 2 control regs */
+>> +			<0 0x61330000 0 0x900>;  /* SPU 3 control regs */
+> The above didn't mention there were several register sets, and the
+> comment beside each makes them sound like they're separate SPU
+> instances, so I don't think it makes sense to group them as one node.
+>
+> What's going on here?
+That's right. For the SoC I used as the example, there are four SPU 
+hardware blocks. The driver round robins crypto requests to the hardware 
+blocks to handle requests in parallel and increase throughput. I want 
+one instance of the SPU driver that registers algos once with the crypto 
+API and manages all the mailbox channels. Maybe I can achieve that with 
+separate device tree entries for each SPU block, I'm not sure. I'll look 
+into it.
+>
+>> +		mboxes = <&pdc0 0>,
+>> +			<&pdc1 0>,
+>> +			<&pdc2 0>,
+>> +			<&pdc3 0>;
+> Does each mbox correspond to one of the SPUs above? Or is there a shared
+> pool?
+Yes, each of these mailbox channels corresponds to a different SPU. PDC 
+is a DMA ring manager for DMAs to the SPUs.
+>
+> Thanks,
+> Mark.
