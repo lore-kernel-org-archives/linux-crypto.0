@@ -1,40 +1,38 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto/mcryptd: Check mcryptd algorithm compatibility
-Date: Wed, 7 Dec 2016 20:09:41 +0800
-Message-ID: <20161207120941.GF20680@gondor.apana.org.au>
-References: <6825659d1f6a96d4ab2327aa0dcf357f6252e915.1480967128.git.tim.c.chen@linux.intel.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH v4] crypto: AF_ALG - fix AEAD tag memory handling
+Date: Wed, 07 Dec 2016 13:22:45 +0100
+Message-ID: <7598372.KIqtLBh5Ex@tauon.atsec.com>
+References: <2319539.qMqmu7oTgO@positron.chronox.de> <20161207120914.GD20680@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Mikulas Patocka <mpatocka@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>, megha.dey@linux.intel.com,
-        linux-crypto@vger.kernel.org, dm-devel@redhat.com,
-        Milan Broz <mbroz@redhat.com>,
-        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <6825659d1f6a96d4ab2327aa0dcf357f6252e915.1480967128.git.tim.c.chen@linux.intel.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:39092 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751710AbcLGMWu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Dec 2016 07:22:50 -0500
+In-Reply-To: <20161207120914.GD20680@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 05, 2016 at 11:46:31AM -0800, Tim Chen wrote:
-> Algorithms not compatible with mcryptd could be spawned by mcryptd
-> with a direct crypto_alloc_tfm invocation using a "mcryptd(alg)" name
-> construct.  This causes mcryptd to crash the kernel if an arbitrary
-> "alg" is incompatible and not intended to be used with mcryptd.  It is
-> an issue if AF_ALG tries to spawn mcryptd(alg) to expose it externally.
-> But such algorithms must be used internally and not be exposed.
-> 
-> We added a check to enforce that only internal algorithms are allowed
-> with mcryptd at the time mcryptd is spawning an algorithm.
-> 
-> Link: http://marc.info/?l=linux-crypto-vger&m=148063683310477&w=2
-> Cc: stable@vger.kernel.org
-> Reported-by: Mikulas Patocka <mpatocka@redhat.com>
-> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+Am Mittwoch, 7. Dezember 2016, 20:09:14 CET schrieb Herbert Xu:
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hi Herbert,
+
+> On Mon, Dec 05, 2016 at 03:26:19PM +0100, Stephan Mueller wrote:
+> > Hi Herbert,
+> > 
+> > Changes v4: restore the old behavior -- if the caller does not provide
+> > sufficient output buffer size, return an error.
+> 
+> Patch applied.  Thanks.
+
+Thank you. I will prepare the release of libkcapi 0.13.0 now which contains a 
+provision for this user interface change. This provision allows a calling 
+application to execute on older or newer kernels without changing its logic. 
+The library transparently takes care of that user space interface difference.
+
+Ciao
+Stephan
