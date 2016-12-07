@@ -1,29 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 0/6] crypto: ARM/arm64 CRC-T10DIF/CRC32/CRC32C roundup
-Date: Wed, 7 Dec 2016 20:09:27 +0800
-Message-ID: <20161207120927.GE20680@gondor.apana.org.au>
-References: <1480963348-24203-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v2] crypto/mcryptd: Check mcryptd algorithm compatibility
+Date: Wed, 7 Dec 2016 20:09:41 +0800
+Message-ID: <20161207120941.GF20680@gondor.apana.org.au>
+References: <6825659d1f6a96d4ab2327aa0dcf357f6252e915.1480967128.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:45693 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752186AbcLGMJi (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Dec 2016 07:09:38 -0500
+Cc: Mikulas Patocka <mpatocka@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>, megha.dey@linux.intel.com,
+        linux-crypto@vger.kernel.org, dm-devel@redhat.com,
+        Milan Broz <mbroz@redhat.com>,
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
+Return-path: <stable-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1480963348-24203-1-git-send-email-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <6825659d1f6a96d4ab2327aa0dcf357f6252e915.1480967128.git.tim.c.chen@linux.intel.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Dec 05, 2016 at 06:42:22PM +0000, Ard Biesheuvel wrote:
-> This v3 combines the CRC-T10DIF and CRC32 implementations for both ARM and
-> arm64 that I sent out a couple of weeks ago, and adds support to the latter
-> for CRC32C.
+On Mon, Dec 05, 2016 at 11:46:31AM -0800, Tim Chen wrote:
+> Algorithms not compatible with mcryptd could be spawned by mcryptd
+> with a direct crypto_alloc_tfm invocation using a "mcryptd(alg)" name
+> construct.  This causes mcryptd to crash the kernel if an arbitrary
+> "alg" is incompatible and not intended to be used with mcryptd.  It is
+> an issue if AF_ALG tries to spawn mcryptd(alg) to expose it externally.
+> But such algorithms must be used internally and not be exposed.
+> 
+> We added a check to enforce that only internal algorithms are allowed
+> with mcryptd at the time mcryptd is spawning an algorithm.
+> 
+> Link: http://marc.info/?l=linux-crypto-vger&m=148063683310477&w=2
+> Cc: stable@vger.kernel.org
+> Reported-by: Mikulas Patocka <mpatocka@redhat.com>
+> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
