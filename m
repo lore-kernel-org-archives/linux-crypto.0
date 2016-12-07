@@ -1,47 +1,43 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH v2] crypto: AF_ALG - fix AEAD AIO handling of zero buffer
-Date: Wed, 07 Dec 2016 13:29:13 +0100
-Message-ID: <2633671.N2joko3Rba@tauon.atsec.com>
-References: <3547426.Fep2bfj8cH@positron.chronox.de> <20161201132207.GF2249@gondor.apana.org.au>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH v2] crypto: sun4i-ss: support the Security System PRNG
+Date: Wed, 7 Dec 2016 13:51:27 +0100
+Message-ID: <20161207125127.GB28218@Red>
+References: <1480934922-20732-1-git-send-email-clabbe.montjoie@gmail.com>
+ <20161205123705.GA10732@gondor.apana.org.au>
+ <20161205125738.GA13525@Red>
+ <20161207120900.GC20680@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, wens@csie.org, linux-crypto@vger.kernel.org,
+ maxime.ripard@free-electrons.com, davem@davemloft.net,
+ linux-arm-kernel@lists.infradead.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:39096 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751064AbcLGM3S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Dec 2016 07:29:18 -0500
-In-Reply-To: <20161201132207.GF2249@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20161207120900.GC20680@gondor.apana.org.au>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 1. Dezember 2016, 21:22:07 CET schrieb Herbert Xu:
-
-Hi Herbert,
-
-> On Thu, Dec 01, 2016 at 08:22:37AM +0100, Stephan Mueller wrote:
-> > Hi Herbert,
-> > 
-> > I split out the bug fix patch from the AD/tag formatting patch as they
-> > most likely will come after the next merge window.
-> > 
-> > ---8<---
-> > 
-> > Handle the case when the caller provided a zero buffer to
-> > sendmsg/sendpage. Such scenario is legal for AEAD ciphers when no
-> > plaintext / ciphertext and no AAD is provided and the caller only
-> > requests the generation of the tag value.
-> > 
-> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
+On Wed, Dec 07, 2016 at 08:09:00PM +0800, Herbert Xu wrote:
+> On Mon, Dec 05, 2016 at 01:57:38PM +0100, Corentin Labbe wrote:
+> >
+> > So how to expose PRNG to user space ? or more generally how to "use" a PRNG ?
 > 
-> Patch applied.  Thanks.
+> We do have the algif_rng interface.
+> 
 
-May I suggest to forward that patch to stable as this patch fixes a kernel 
-crasher that can be triggered by an unprivileged user?
+So I must expose it as a crypto_rng ?
 
-The bug was introduced in 4.7 with the AEAD AIO addition.
+Could you explain why PRNG must not be used as hw_random ?
 
-Ciao
-Stephan
+Regards
+Corentin Labbe
