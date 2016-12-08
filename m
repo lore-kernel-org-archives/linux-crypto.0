@@ -1,77 +1,59 @@
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: [PATCH] linux/types.h: enable endian checks for all sparse builds
-Date: Thu, 8 Dec 2016 04:29:39 +0200
-Message-ID: <1481164052-28036-1-git-send-email-mst@redhat.com>
+From: Gonglei <arei.gonglei@huawei.com>
+Subject: [PATCH v6 1/2] sparc: fix a building error reported by kbuild
+Date: Thu, 8 Dec 2016 12:37:08 +0800
+Message-ID: <1481171829-116496-2-git-send-email-arei.gonglei@huawei.com>
+References: <1481171829-116496-1-git-send-email-arei.gonglei@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: kvm@vger.kernel.org, Neil Armstrong <narmstrong@baylibre.com>,
-	David Airlie <airlied@linux.ie>, linux-remoteproc@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, virtualization@lists.linux-foundation.org,
-	linux-s390@vger.kernel.org,
-	"James E.J.  Bottomley" <jejb@linux.vnet.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-scsi@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-	Asias He <asias@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-	linux-kbuild@vger.kernel.org, Jens Axboe <axboe@fb.com>,
-	Michal Marek <mmarek@suse.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	Matt Mackall <mpm@selenic.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>
-To: linux-kernel@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Christoph Hellwig <hch@infradead.org>
-Return-path: <virtualization-bounces@lists.linux-foundation.org>
-Content-Disposition: inline
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
-List-Post: <mailto:virtualization@lists.linux-foundation.org>
-List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
-Sender: virtualization-bounces@lists.linux-foundation.org
-Errors-To: virtualization-bounces@lists.linux-foundation.org
+Content-Type: text/plain
+Cc: <luonengjun@huawei.com>, <mst@redhat.com>, <stefanha@redhat.com>,
+        <weidong.huang@huawei.com>, <wu.wubin@huawei.com>,
+        <xin.zeng@intel.com>, <claudio.fontana@huawei.com>,
+        <herbert@gondor.apana.org.au>, <pasic@linux.vnet.ibm.com>,
+        <davem@davemloft.net>, <jianjay.zhou@huawei.com>,
+        <hanweidong@huawei.com>, <arei.gonglei@hotmail.com>,
+        <cornelia.huck@de.ibm.com>, <xuquan8@huawei.com>,
+        <longpeng2@huawei.com>, <wanzongshun@huawei.com>,
+        Gonglei <arei.gonglei@huawei.com>,
+        Sam Ravnborg <sam@ravnborg.org>, <sparclinux@vger.kernel.org>
+To: <linux-kernel@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <virtio-dev@lists.oasis-open.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <linux-crypto@vger.kernel.org>
+Return-path: <sparclinux-owner@vger.kernel.org>
+In-Reply-To: <1481171829-116496-1-git-send-email-arei.gonglei@huawei.com>
+Sender: sparclinux-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-By now, linux is mostly endian-clean. Enabling endian-ness
-checks for everyone produces about 200 new sparse warnings for me -
-less than 10% over the 2000 sparse warnings already there.
+>> arch/sparc/include/asm/topology_64.h:44:44:
+error: implicit declaration of function 'cpu_data'
+[-Werror=implicit-function-declaration]
 
-Not a big deal, OTOH enabling this helps people notice
-they are introducing new bugs.
+ #define topology_physical_package_id(cpu) (cpu_data(cpu).proc_id)
+                                               ^
+Let's include cpudata.h in topology_64.h.
 
-So let's just drop __CHECK_ENDIAN__. Follow-up patches
-can drop distinction between __bitwise and __bitwise__.
-
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Suggested-by: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: sparclinux@vger.kernel.org
+Suggested-by: Sam Ravnborg <sam@ravnborg.org>
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
 ---
+ arch/sparc/include/asm/topology_64.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Linus, could you ack this for upstream? If yes I'll
-merge through my tree as a replacement for enabling
-this just for virtio.
-
- include/uapi/linux/types.h | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/include/uapi/linux/types.h b/include/uapi/linux/types.h
-index acf0979..41e5914 100644
---- a/include/uapi/linux/types.h
-+++ b/include/uapi/linux/types.h
-@@ -23,11 +23,7 @@
- #else
- #define __bitwise__
- #endif
--#ifdef __CHECK_ENDIAN__
- #define __bitwise __bitwise__
--#else
--#define __bitwise
--#endif
+diff --git a/arch/sparc/include/asm/topology_64.h b/arch/sparc/include/asm/topology_64.h
+index 7b4898a..2255430 100644
+--- a/arch/sparc/include/asm/topology_64.h
++++ b/arch/sparc/include/asm/topology_64.h
+@@ -4,6 +4,7 @@
+ #ifdef CONFIG_NUMA
  
- typedef __u16 __bitwise __le16;
- typedef __u16 __bitwise __be16;
+ #include <asm/mmzone.h>
++#include <asm/cpudata.h>
+ 
+ static inline int cpu_to_node(int cpu)
+ {
 -- 
-MST
+1.8.3.1
+
+
