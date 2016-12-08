@@ -1,740 +1,161 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 2/2] crypto: arm/chacha20 - implement NEON version based on SSE3 code
-Date: Thu,  8 Dec 2016 14:28:59 +0000
-Message-ID: <1481207339-17332-3-git-send-email-ard.biesheuvel@linaro.org>
-References: <1481207339-17332-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:37979 "EHLO
-        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751577AbcLHO3Q (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Dec 2016 09:29:16 -0500
-Received: by mail-wm0-f53.google.com with SMTP id f82so28147695wmf.1
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Dec 2016 06:29:15 -0800 (PST)
-In-Reply-To: <1481207339-17332-1-git-send-email-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH] linux/types.h: enable endian checks for all sparse builds
+Date: Thu, 8 Dec 2016 18:17:32 +0200
+Message-ID: <20161208163658-mutt-send-email-mst@kernel.org>
+References: <1481164052-28036-1-git-send-email-mst@redhat.com>
+ <BLUPR02MB168374E98A6C86E43DF0BCFE81840@BLUPR02MB1683.namprd02.prod.outlook.com>
+ <20161208075152-mutt-send-email-mst@kernel.org>
+ <BLUPR02MB168304F8FBA50C916A6A4E6081840@BLUPR02MB1683.namprd02.prod.outlook.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jason Wang <jasowang@redhat.com>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        Michal Marek <mmarek@suse.com>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cornelia.huck@de.ibm.com>,
+        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>, Jens Axboe <axboe@fb.com>,
+        Neil Armstrong <narmstron
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <BLUPR02MB168304F8FBA50C916A6A4E6081840@BLUPR02MB1683.namprd02.prod.outlook.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This is a straight port to ARM/NEON of the x86 SSE3 implementation
-of the ChaCha20 stream cipher.
+On Thu, Dec 08, 2016 at 06:38:11AM +0000, Bart Van Assche wrote:
+> On 12/07/16 21:54, Michael S. Tsirkin wrote:
+> > On Thu, Dec 08, 2016 at 05:21:47AM +0000, Bart Van Assche wrote:
+> >> Additionally, there are notable exceptions to the rule that most drivers
+> >> are endian-clean, e.g. drivers/scsi/qla2xxx. I would appreciate it if it
+> >> would remain possible to check such drivers with sparse without enabling
+> >> endianness checks. Have you considered to change #ifdef __CHECK_ENDIAN__
+> >> into e.g. #ifndef __DONT_CHECK_ENDIAN__?
+> >
+> > The right thing is probably just to fix these, isn't it?
+> > Until then, why not just ignore the warnings?
+> 
+> Neither option is realistic. With endian-checking enabled the qla2xxx 
+> driver triggers so many warnings that it becomes a real challenge to 
+> filter the non-endian warnings out manually:
+> 
+> $ for f in "" CF=-D__CHECK_ENDIAN__; do make M=drivers/scsi/qla2xxx C=2\
+>      $f | &grep -c ': warning:'; done
+> 4
+> 752
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm/crypto/Kconfig              |   6 +
- arch/arm/crypto/Makefile             |   2 +
- arch/arm/crypto/chacha20-neon-core.S | 524 ++++++++++++++++++++
- arch/arm/crypto/chacha20-neon-glue.c | 136 +++++
- 4 files changed, 668 insertions(+)
+You can always revert this patch in your tree, or whatever.  It does not
+look like this will get fixed otherwise.
 
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index 13f1b4c289d4..2f3339f015d3 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -130,4 +130,10 @@ config CRYPTO_CRC32_ARM_CE
- 	depends on KERNEL_MODE_NEON && CRC32
- 	select CRYPTO_HASH
- 
-+config CRYPTO_CHACHA20_NEON
-+	tristate "NEON accelerated ChaCha20 symmetric cipher"
-+	depends on KERNEL_MODE_NEON
-+	select CRYPTO_BLKCIPHER
-+	select CRYPTO_CHACHA20
-+
- endif
-diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
-index b578a1820ab1..8d74e55eacd4 100644
---- a/arch/arm/crypto/Makefile
-+++ b/arch/arm/crypto/Makefile
-@@ -8,6 +8,7 @@ obj-$(CONFIG_CRYPTO_SHA1_ARM) += sha1-arm.o
- obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sha1-arm-neon.o
- obj-$(CONFIG_CRYPTO_SHA256_ARM) += sha256-arm.o
- obj-$(CONFIG_CRYPTO_SHA512_ARM) += sha512-arm.o
-+obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha20-neon.o
- 
- ce-obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
- ce-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
-@@ -40,6 +41,7 @@ aes-arm-ce-y	:= aes-ce-core.o aes-ce-glue.o
- ghash-arm-ce-y	:= ghash-ce-core.o ghash-ce-glue.o
- crct10dif-arm-ce-y	:= crct10dif-ce-core.o crct10dif-ce-glue.o
- crc32-arm-ce-y:= crc32-ce-core.o crc32-ce-glue.o
-+chacha20-neon-y := chacha20-neon-core.o chacha20-neon-glue.o
- 
- quiet_cmd_perl = PERL    $@
-       cmd_perl = $(PERL) $(<) > $(@)
-diff --git a/arch/arm/crypto/chacha20-neon-core.S b/arch/arm/crypto/chacha20-neon-core.S
-new file mode 100644
-index 000000000000..9f315041f521
---- /dev/null
-+++ b/arch/arm/crypto/chacha20-neon-core.S
-@@ -0,0 +1,524 @@
-+/*
-+ * ChaCha20 256-bit cipher algorithm, RFC7539, ARM NEON functions
-+ *
-+ * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * Based on:
-+ * ChaCha20 256-bit cipher algorithm, RFC7539, x64 SNEON3 functions
-+ *
-+ * Copyright (C) 2015 Martin Willi
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ */
-+
-+#include <linux/linkage.h>
-+
-+	.text
-+	.fpu		neon
-+	.align		5
-+
-+ENTRY(chacha20_block_xor_neon)
-+	// r0: Input state matrix, s
-+	// r1: 1 data block output, o
-+	// r2: 1 data block input, i
-+
-+	//
-+	// This function encrypts one ChaCha20 block by loading the state matrix
-+	// in four NEON registers. It performs matrix operation on four words in
-+	// parallel, but requireds shuffling to rearrange the words after each
-+	// round.
-+	//
-+
-+	// x0..3 = s0..3
-+	add		ip, r0, #0x20
-+	vld1.32		{q0-q1}, [r0]
-+	vld1.32		{q2-q3}, [ip]
-+
-+	vmov		q8, q0
-+	vmov		q9, q1
-+	vmov		q10, q2
-+	vmov		q11, q3
-+
-+	mov		r3, #10
-+
-+.Ldoubleround:
-+	// x0 += x1, x3 = rotl32(x3 ^ x0, 16)
-+	vadd.i32	q0, q0, q1
-+	veor		q4, q3, q0
-+	vshl.u32	q3, q4, #16
-+	vsri.u32	q3, q4, #16
-+
-+	// x2 += x3, x1 = rotl32(x1 ^ x2, 12)
-+	vadd.i32	q2, q2, q3
-+	veor		q4, q1, q2
-+	vshl.u32	q1, q4, #12
-+	vsri.u32	q1, q4, #20
-+
-+	// x0 += x1, x3 = rotl32(x3 ^ x0, 8)
-+	vadd.i32	q0, q0, q1
-+	veor		q4, q3, q0
-+	vshl.u32	q3, q4, #8
-+	vsri.u32	q3, q4, #24
-+
-+	// x2 += x3, x1 = rotl32(x1 ^ x2, 7)
-+	vadd.i32	q2, q2, q3
-+	veor		q4, q1, q2
-+	vshl.u32	q1, q4, #7
-+	vsri.u32	q1, q4, #25
-+
-+	// x1 = shuffle32(x1, MASK(0, 3, 2, 1))
-+	vext.8		q1, q1, q1, #4
-+	// x2 = shuffle32(x2, MASK(1, 0, 3, 2))
-+	vext.8		q2, q2, q2, #8
-+	// x3 = shuffle32(x3, MASK(2, 1, 0, 3))
-+	vext.8		q3, q3, q3, #12
-+
-+	// x0 += x1, x3 = rotl32(x3 ^ x0, 16)
-+	vadd.i32	q0, q0, q1
-+	veor		q4, q3, q0
-+	vshl.u32	q3, q4, #16
-+	vsri.u32	q3, q4, #16
-+
-+	// x2 += x3, x1 = rotl32(x1 ^ x2, 12)
-+	vadd.i32	q2, q2, q3
-+	veor		q4, q1, q2
-+	vshl.u32	q1, q4, #12
-+	vsri.u32	q1, q4, #20
-+
-+	// x0 += x1, x3 = rotl32(x3 ^ x0, 8)
-+	vadd.i32	q0, q0, q1
-+	veor		q4, q3, q0
-+	vshl.u32	q3, q4, #8
-+	vsri.u32	q3, q4, #24
-+
-+	// x2 += x3, x1 = rotl32(x1 ^ x2, 7)
-+	vadd.i32	q2, q2, q3
-+	veor		q4, q1, q2
-+	vshl.u32	q1, q4, #7
-+	vsri.u32	q1, q4, #25
-+
-+	// x1 = shuffle32(x1, MASK(2, 1, 0, 3))
-+	vext.8		q1, q1, q1, #12
-+	// x2 = shuffle32(x2, MASK(1, 0, 3, 2))
-+	vext.8		q2, q2, q2, #8
-+	// x3 = shuffle32(x3, MASK(0, 3, 2, 1))
-+	vext.8		q3, q3, q3, #4
-+
-+	subs		r3, r3, #1
-+	bne		.Ldoubleround
-+
-+	add		ip, r2, #0x20
-+	vld1.8		{q4-q5}, [r2]
-+	vld1.8		{q6-q7}, [ip]
-+
-+	// o0 = i0 ^ (x0 + s0)
-+	vadd.i32	q0, q0, q8
-+	veor		q0, q0, q4
-+
-+	// o1 = i1 ^ (x1 + s1)
-+	vadd.i32	q1, q1, q9
-+	veor		q1, q1, q5
-+
-+	// o2 = i2 ^ (x2 + s2)
-+	vadd.i32	q2, q2, q10
-+	veor		q2, q2, q6
-+
-+	// o3 = i3 ^ (x3 + s3)
-+	vadd.i32	q3, q3, q11
-+	veor		q3, q3, q7
-+
-+	add		ip, r1, #0x20
-+	vst1.8		{q0-q1}, [r1]
-+	vst1.8		{q2-q3}, [ip]
-+
-+	bx		lr
-+ENDPROC(chacha20_block_xor_neon)
-+
-+	.align		5
-+ENTRY(chacha20_4block_xor_neon)
-+	push		{r4-r6, lr}
-+	mov		ip, sp			// preserve the stack pointer
-+	sub		r3, sp, #0x20		// allocate a 32 byte buffer
-+	bic		r3, r3, #0x1f		// aligned to 32 bytes
-+	mov		sp, r3
-+
-+	// r0: Input state matrix, s
-+	// r1: 4 data blocks output, o
-+	// r2: 4 data blocks input, i
-+
-+	//
-+	// This function encrypts four consecutive ChaCha20 blocks by loading
-+	// the state matrix in NEON registers four times. The algorithm performs
-+	// each operation on the corresponding word of each state matrix, hence
-+	// requires no word shuffling. For final XORing step we transpose the
-+	// matrix by interleaving 32- and then 64-bit words, which allows us to
-+	// do XOR in NEON registers.
-+	//
-+
-+	// x0..15[0-3] = s0..3[0..3]
-+	add		r3, r0, #0x20
-+	vld1.32		{q0-q1}, [r0]
-+	vld1.32		{q2-q3}, [r3]
-+
-+	adr		r3, CTRINC
-+	vdup.32		q15, d7[1]
-+	vdup.32		q14, d7[0]
-+	vld1.32		{q11}, [r3, :128]
-+	vdup.32		q13, d6[1]
-+	vdup.32		q12, d6[0]
-+	vadd.i32	q12, q12, q11		// x12 += counter values 0-3
-+	vdup.32		q11, d5[1]
-+	vdup.32		q10, d5[0]
-+	vdup.32		q9, d4[1]
-+	vdup.32		q8, d4[0]
-+	vdup.32		q7, d3[1]
-+	vdup.32		q6, d3[0]
-+	vdup.32		q5, d2[1]
-+	vdup.32		q4, d2[0]
-+	vdup.32		q3, d1[1]
-+	vdup.32		q2, d1[0]
-+	vdup.32		q1, d0[1]
-+	vdup.32		q0, d0[0]
-+
-+	mov		r3, #10
-+
-+.Ldoubleround4:
-+	// x0 += x4, x12 = rotl32(x12 ^ x0, 16)
-+	// x1 += x5, x13 = rotl32(x13 ^ x1, 16)
-+	// x2 += x6, x14 = rotl32(x14 ^ x2, 16)
-+	// x3 += x7, x15 = rotl32(x15 ^ x3, 16)
-+	vadd.i32	q0, q0, q4
-+	vadd.i32	q1, q1, q5
-+	vadd.i32	q2, q2, q6
-+	vadd.i32	q3, q3, q7
-+
-+	veor		q12, q12, q0
-+	veor		q13, q13, q1
-+	veor		q14, q14, q2
-+	veor		q15, q15, q3
-+
-+	vrev32.16	q12, q12
-+	vrev32.16	q13, q13
-+	vrev32.16	q14, q14
-+	vrev32.16	q15, q15
-+
-+	// x8 += x12, x4 = rotl32(x4 ^ x8, 12)
-+	// x9 += x13, x5 = rotl32(x5 ^ x9, 12)
-+	// x10 += x14, x6 = rotl32(x6 ^ x10, 12)
-+	// x11 += x15, x7 = rotl32(x7 ^ x11, 12)
-+	vadd.i32	q8, q8, q12
-+	vadd.i32	q9, q9, q13
-+	vadd.i32	q10, q10, q14
-+	vadd.i32	q11, q11, q15
-+
-+	vst1.32		{q8-q9}, [sp, :256]
-+
-+	veor		q8, q4, q8
-+	veor		q9, q5, q9
-+	vshl.u32	q4, q8, #12
-+	vshl.u32	q5, q9, #12
-+	vsri.u32	q4, q8, #20
-+	vsri.u32	q5, q9, #20
-+
-+	veor		q8, q6, q10
-+	veor		q9, q7, q11
-+	vshl.u32	q6, q8, #12
-+	vshl.u32	q7, q9, #12
-+	vsri.u32	q6, q8, #20
-+	vsri.u32	q7, q9, #20
-+
-+	// x0 += x4, x12 = rotl32(x12 ^ x0, 8)
-+	// x1 += x5, x13 = rotl32(x13 ^ x1, 8)
-+	// x2 += x6, x14 = rotl32(x14 ^ x2, 8)
-+	// x3 += x7, x15 = rotl32(x15 ^ x3, 8)
-+	vadd.i32	q0, q0, q4
-+	vadd.i32	q1, q1, q5
-+	vadd.i32	q2, q2, q6
-+	vadd.i32	q3, q3, q7
-+
-+	veor		q8, q12, q0
-+	veor		q9, q13, q1
-+	vshl.u32	q12, q8, #8
-+	vshl.u32	q13, q9, #8
-+	vsri.u32	q12, q8, #24
-+	vsri.u32	q13, q9, #24
-+
-+	veor		q8, q14, q2
-+	veor		q9, q15, q3
-+	vshl.u32	q14, q8, #8
-+	vshl.u32	q15, q9, #8
-+	vsri.u32	q14, q8, #24
-+	vsri.u32	q15, q9, #24
-+
-+	vld1.32		{q8-q9}, [sp, :256]
-+
-+	// x8 += x12, x4 = rotl32(x4 ^ x8, 7)
-+	// x9 += x13, x5 = rotl32(x5 ^ x9, 7)
-+	// x10 += x14, x6 = rotl32(x6 ^ x10, 7)
-+	// x11 += x15, x7 = rotl32(x7 ^ x11, 7)
-+	vadd.i32	q8, q8, q12
-+	vadd.i32	q9, q9, q13
-+	vadd.i32	q10, q10, q14
-+	vadd.i32	q11, q11, q15
-+
-+	vst1.32		{q8-q9}, [sp, :256]
-+
-+	veor		q8, q4, q8
-+	veor		q9, q5, q9
-+	vshl.u32	q4, q8, #7
-+	vshl.u32	q5, q9, #7
-+	vsri.u32	q4, q8, #25
-+	vsri.u32	q5, q9, #25
-+
-+	veor		q8, q6, q10
-+	veor		q9, q7, q11
-+	vshl.u32	q6, q8, #7
-+	vshl.u32	q7, q9, #7
-+	vsri.u32	q6, q8, #25
-+	vsri.u32	q7, q9, #25
-+
-+	vld1.32		{q8-q9}, [sp, :256]
-+
-+	// x0 += x5, x15 = rotl32(x15 ^ x0, 16)
-+	// x1 += x6, x12 = rotl32(x12 ^ x1, 16)
-+	// x2 += x7, x13 = rotl32(x13 ^ x2, 16)
-+	// x3 += x4, x14 = rotl32(x14 ^ x3, 16)
-+	vadd.i32	q0, q0, q5
-+	vadd.i32	q1, q1, q6
-+	vadd.i32	q2, q2, q7
-+	vadd.i32	q3, q3, q4
-+
-+	veor		q15, q15, q0
-+	veor		q12, q12, q1
-+	veor		q13, q13, q2
-+	veor		q14, q14, q3
-+
-+	vrev32.16	q15, q15
-+	vrev32.16	q12, q12
-+	vrev32.16	q13, q13
-+	vrev32.16	q14, q14
-+
-+	// x10 += x15, x5 = rotl32(x5 ^ x10, 12)
-+	// x11 += x12, x6 = rotl32(x6 ^ x11, 12)
-+	// x8 += x13, x7 = rotl32(x7 ^ x8, 12)
-+	// x9 += x14, x4 = rotl32(x4 ^ x9, 12)
-+	vadd.i32	q10, q10, q15
-+	vadd.i32	q11, q11, q12
-+	vadd.i32	q8, q8, q13
-+	vadd.i32	q9, q9, q14
-+
-+	vst1.32		{q8-q9}, [sp, :256]
-+
-+	veor		q8, q7, q8
-+	veor		q9, q4, q9
-+	vshl.u32	q7, q8, #12
-+	vshl.u32	q4, q9, #12
-+	vsri.u32	q7, q8, #20
-+	vsri.u32	q4, q9, #20
-+
-+	veor		q8, q5, q10
-+	veor		q9, q6, q11
-+	vshl.u32	q5, q8, #12
-+	vshl.u32	q6, q9, #12
-+	vsri.u32	q5, q8, #20
-+	vsri.u32	q6, q9, #20
-+
-+	// x0 += x5, x15 = rotl32(x15 ^ x0, 8)
-+	// x1 += x6, x12 = rotl32(x12 ^ x1, 8)
-+	// x2 += x7, x13 = rotl32(x13 ^ x2, 8)
-+	// x3 += x4, x14 = rotl32(x14 ^ x3, 8)
-+	vadd.i32	q0, q0, q5
-+	vadd.i32	q1, q1, q6
-+	vadd.i32	q2, q2, q7
-+	vadd.i32	q3, q3, q4
-+
-+	veor		q8, q15, q0
-+	veor		q9, q12, q1
-+	vshl.u32	q15, q8, #8
-+	vshl.u32	q12, q9, #8
-+	vsri.u32	q15, q8, #24
-+	vsri.u32	q12, q9, #24
-+
-+	veor		q8, q13, q2
-+	veor		q9, q14, q3
-+	vshl.u32	q13, q8, #8
-+	vshl.u32	q14, q9, #8
-+	vsri.u32	q13, q8, #24
-+	vsri.u32	q14, q9, #24
-+
-+	vld1.32		{q8-q9}, [sp, :256]
-+
-+	// x10 += x15, x5 = rotl32(x5 ^ x10, 7)
-+	// x11 += x12, x6 = rotl32(x6 ^ x11, 7)
-+	// x8 += x13, x7 = rotl32(x7 ^ x8, 7)
-+	// x9 += x14, x4 = rotl32(x4 ^ x9, 7)
-+	vadd.i32	q10, q10, q15
-+	vadd.i32	q11, q11, q12
-+	vadd.i32	q8, q8, q13
-+	vadd.i32	q9, q9, q14
-+
-+	vst1.32		{q8-q9}, [sp, :256]
-+
-+	veor		q8, q7, q8
-+	veor		q9, q4, q9
-+	vshl.u32	q7, q8, #7
-+	vshl.u32	q4, q9, #7
-+	vsri.u32	q7, q8, #25
-+	vsri.u32	q4, q9, #25
-+
-+	veor		q8, q5, q10
-+	veor		q9, q6, q11
-+	vshl.u32	q5, q8, #7
-+	vshl.u32	q6, q9, #7
-+	vsri.u32	q5, q8, #25
-+	vsri.u32	q6, q9, #25
-+
-+	subs		r3, r3, #1
-+	beq		0f
-+
-+	vld1.32		{q8-q9}, [sp, :256]
-+	b		.Ldoubleround4
-+
-+	// x0[0-3] += s0[0]
-+	// x1[0-3] += s0[1]
-+	// x2[0-3] += s0[2]
-+	// x3[0-3] += s0[3]
-+0:	ldmia		r0!, {r3-r6}
-+	vdup.32		q8, r3
-+	vdup.32		q9, r4
-+	vadd.i32	q0, q0, q8
-+	vadd.i32	q1, q1, q9
-+	vdup.32		q8, r5
-+	vdup.32		q9, r6
-+	vadd.i32	q2, q2, q8
-+	vadd.i32	q3, q3, q9
-+
-+	// x4[0-3] += s1[0]
-+	// x5[0-3] += s1[1]
-+	// x6[0-3] += s1[2]
-+	// x7[0-3] += s1[3]
-+	ldmia		r0!, {r3-r6}
-+	vdup.32		q8, r3
-+	vdup.32		q9, r4
-+	vadd.i32	q4, q4, q8
-+	vadd.i32	q5, q5, q9
-+	vdup.32		q8, r5
-+	vdup.32		q9, r6
-+	vadd.i32	q6, q6, q8
-+	vadd.i32	q7, q7, q9
-+
-+	// interleave 32-bit words in state n, n+1
-+	vzip.32		q0, q1
-+	vzip.32		q2, q3
-+	vzip.32		q4, q5
-+	vzip.32		q6, q7
-+
-+	// interleave 64-bit words in state n, n+2
-+	vswp		d1, d4
-+	vswp		d3, d6
-+	vswp		d9, d12
-+	vswp		d11, d14
-+
-+	// xor with corresponding input, write to output
-+	vld1.8		{q8-q9}, [r2]!
-+	veor		q8, q8, q0
-+	veor		q9, q9, q4
-+	vst1.8		{q8-q9}, [r1]!
-+
-+	vld1.32		{q8-q9}, [sp, :256]
-+
-+	// x8[0-3] += s2[0]
-+	// x9[0-3] += s2[1]
-+	// x10[0-3] += s2[2]
-+	// x11[0-3] += s2[3]
-+	ldmia		r0!, {r3-r6}
-+	vdup.32		q0, r3
-+	vdup.32		q4, r4
-+	vadd.i32	q8, q8, q0
-+	vadd.i32	q9, q9, q4
-+	vdup.32		q0, r5
-+	vdup.32		q4, r6
-+	vadd.i32	q10, q10, q0
-+	vadd.i32	q11, q11, q4
-+
-+	// x12[0-3] += s3[0]
-+	// x13[0-3] += s3[1]
-+	// x14[0-3] += s3[2]
-+	// x15[0-3] += s3[3]
-+	ldmia		r0!, {r3-r6}
-+	vdup.32		q0, r3
-+	vdup.32		q4, r4
-+	adr		r3, CTRINC
-+	vadd.i32	q12, q12, q0
-+	vld1.32		{q0}, [r3, :128]
-+	vadd.i32	q13, q13, q4
-+	vadd.i32	q12, q12, q0		// x12 += counter values 0-3
-+
-+	vdup.32		q0, r5
-+	vdup.32		q4, r6
-+	vadd.i32	q14, q14, q0
-+	vadd.i32	q15, q15, q4
-+
-+	// interleave 32-bit words in state n, n+1
-+	vzip.32		q8, q9
-+	vzip.32		q10, q11
-+	vzip.32		q12, q13
-+	vzip.32		q14, q15
-+
-+	// interleave 64-bit words in state n, n+2
-+	vswp		d17, d20
-+	vswp		d19, d22
-+	vswp		d25, d28
-+	vswp		d27, d30
-+
-+	vmov		q4, q1
-+
-+	vld1.8		{q0-q1}, [r2]!
-+	veor		q0, q0, q8
-+	veor		q1, q1, q12
-+	vst1.8		{q0-q1}, [r1]!
-+
-+	vld1.8		{q0-q1}, [r2]!
-+	veor		q0, q0, q2
-+	veor		q1, q1, q6
-+	vst1.8		{q0-q1}, [r1]!
-+
-+	vld1.8		{q0-q1}, [r2]!
-+	veor		q0, q0, q10
-+	veor		q1, q1, q14
-+	vst1.8		{q0-q1}, [r1]!
-+
-+	vld1.8		{q0-q1}, [r2]!
-+	veor		q0, q0, q4
-+	veor		q1, q1, q5
-+	vst1.8		{q0-q1}, [r1]!
-+
-+	vld1.8		{q0-q1}, [r2]!
-+	veor		q0, q0, q9
-+	veor		q1, q1, q13
-+	vst1.8		{q0-q1}, [r1]!
-+
-+	vld1.8		{q0-q1}, [r2]!
-+	veor		q0, q0, q3
-+	veor		q1, q1, q7
-+	vst1.8		{q0-q1}, [r1]!
-+
-+	vld1.8		{q0-q1}, [r2]
-+	veor		q0, q0, q11
-+	veor		q1, q1, q15
-+	vst1.8		{q0-q1}, [r1]
-+
-+	mov		sp, ip
-+	pop		{r4-r6, pc}
-+ENDPROC(chacha20_4block_xor_neon)
-+
-+	.align		4
-+CTRINC:	.word		0, 1, 2, 3
-+
-diff --git a/arch/arm/crypto/chacha20-neon-glue.c b/arch/arm/crypto/chacha20-neon-glue.c
-new file mode 100644
-index 000000000000..554f7f6069da
---- /dev/null
-+++ b/arch/arm/crypto/chacha20-neon-glue.c
-@@ -0,0 +1,136 @@
-+/*
-+ * ChaCha20 256-bit cipher algorithm, RFC7539, ARM NEON functions
-+ *
-+ * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * Based on:
-+ * ChaCha20 256-bit cipher algorithm, RFC7539, SIMD glue code
-+ *
-+ * Copyright (C) 2015 Martin Willi
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ */
-+
-+#include <crypto/algapi.h>
-+#include <crypto/chacha20.h>
-+#include <linux/crypto.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+
-+#include <asm/hwcap.h>
-+#include <asm/neon.h>
-+#include <asm/simd.h>
-+
-+asmlinkage void chacha20_block_xor_neon(u32 *state, u8 *dst, const u8 *src);
-+asmlinkage void chacha20_4block_xor_neon(u32 *state, u8 *dst, const u8 *src);
-+
-+static void chacha20_dosimd(u32 *state, u8 *dst, const u8 *src,
-+			    unsigned int bytes)
-+{
-+	u8 buf[CHACHA20_BLOCK_SIZE];
-+
-+	while (bytes >= CHACHA20_BLOCK_SIZE * 4) {
-+		chacha20_4block_xor_neon(state, dst, src);
-+		bytes -= CHACHA20_BLOCK_SIZE * 4;
-+		src += CHACHA20_BLOCK_SIZE * 4;
-+		dst += CHACHA20_BLOCK_SIZE * 4;
-+		state[12] += 4;
-+	}
-+	while (bytes >= CHACHA20_BLOCK_SIZE) {
-+		chacha20_block_xor_neon(state, dst, src);
-+		bytes -= CHACHA20_BLOCK_SIZE;
-+		src += CHACHA20_BLOCK_SIZE;
-+		dst += CHACHA20_BLOCK_SIZE;
-+		state[12]++;
-+	}
-+	if (bytes) {
-+		memcpy(buf, src, bytes);
-+		chacha20_block_xor_neon(state, buf, buf);
-+		memcpy(dst, buf, bytes);
-+	}
-+}
-+
-+static int chacha20_simd(struct blkcipher_desc *desc, struct scatterlist *dst,
-+			 struct scatterlist *src, unsigned int nbytes)
-+{
-+	struct blkcipher_walk walk;
-+	u32 state[16];
-+	int err;
-+
-+	if (nbytes <= CHACHA20_BLOCK_SIZE || !may_use_simd())
-+		return crypto_chacha20_crypt(desc, dst, src, nbytes);
-+
-+	blkcipher_walk_init(&walk, dst, src, nbytes);
-+	err = blkcipher_walk_virt_block(desc, &walk, CHACHA20_BLOCK_SIZE);
-+
-+	crypto_chacha20_init(state, crypto_blkcipher_ctx(desc->tfm), walk.iv);
-+
-+	kernel_neon_begin();
-+
-+	while (walk.nbytes >= CHACHA20_BLOCK_SIZE) {
-+		chacha20_dosimd(state, walk.dst.virt.addr, walk.src.virt.addr,
-+				rounddown(walk.nbytes, CHACHA20_BLOCK_SIZE));
-+		err = blkcipher_walk_done(desc, &walk,
-+					  walk.nbytes % CHACHA20_BLOCK_SIZE);
-+	}
-+
-+	if (walk.nbytes) {
-+		chacha20_dosimd(state, walk.dst.virt.addr, walk.src.virt.addr,
-+				walk.nbytes);
-+		err = blkcipher_walk_done(desc, &walk, 0);
-+	}
-+
-+	kernel_neon_end();
-+
-+	return err;
-+}
-+
-+static struct crypto_alg alg = {
-+	.cra_name		= "chacha20",
-+	.cra_driver_name	= "chacha20-neon",
-+	.cra_priority		= 300,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_blocksize		= 1,
-+	.cra_type		= &crypto_blkcipher_type,
-+	.cra_ctxsize		= sizeof(struct chacha20_ctx),
-+	.cra_alignmask		= sizeof(u32) - 1,
-+	.cra_module		= THIS_MODULE,
-+	.cra_u			= {
-+		.blkcipher = {
-+			.min_keysize	= CHACHA20_KEY_SIZE,
-+			.max_keysize	= CHACHA20_KEY_SIZE,
-+			.ivsize		= CHACHA20_IV_SIZE,
-+			.geniv		= "seqiv",
-+			.setkey		= crypto_chacha20_setkey,
-+			.encrypt	= chacha20_simd,
-+			.decrypt	= chacha20_simd,
-+		},
-+	},
-+};
-+
-+static int __init chacha20_simd_mod_init(void)
-+{
-+	if (!(elf_hwcap & HWCAP_NEON))
-+		return -ENODEV;
-+
-+	return crypto_register_alg(&alg);
-+}
-+
-+static void __exit chacha20_simd_mod_fini(void)
-+{
-+	crypto_unregister_alg(&alg);
-+}
-+
-+module_init(chacha20_simd_mod_init);
-+module_exit(chacha20_simd_mod_fini);
-+
-+MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
-+MODULE_LICENSE("GPL v2");
-+MODULE_ALIAS_CRYPTO("chacha20");
+> If you think it would be easy to fix the endian warnings triggered by 
+> the qla2xxx driver, you are welcome to try to fix these.
+> 
+> Bart.
+
+Yea, this hardware was designed by someone who thought mixing
+LE and BE all over the place is a good idea.
+But who said it should be easy?
+
+Maybe this change will be enough to motivate the maintainers.
+
+Here's a minor buglet for you as a motivator:
+
+                        if (ct_rsp->header.response !=
+                            cpu_to_be16(CT_ACCEPT_RESPONSE)) {
+                                ql_dbg(ql_dbg_disc + ql_dbg_buffer, vha, 0x2077,
+                                    "%s failed rejected request on port_id: %02x%02x%02x Compeltion status 0x%x, response 0x%x\n",
+                                    routine, vha->d_id.b.domain,
+                                    vha->d_id.b.area, vha->d_id.b.al_pa, comp_status, ct_rsp->header.response);
+
+
+response is BE and isn't printed correctly.
+
+another:
+
+        eiter->a.max_frame_size = cpu_to_be32(eiter->a.max_frame_size);
+        size += 4 + 4;
+
+        ql_dbg(ql_dbg_disc, vha, 0x20bc,
+            "Max_Frame_Size = %x.\n", eiter->a.max_frame_size);
+
+printed too late, it's be by that time.
+
+Here's another suspicious line
+
+        ctio24->u.status1.flags = (atio->u.isp24.attr << 9) |
+            cpu_to_le16(CTIO7_FLAGS_STATUS_MODE_1 |
+                CTIO7_FLAGS_TERMINATE);
+
+shifting attr by 9 bits gives different results on BE and LE,
+mixing it with le16 looks rather strange.
+
+Another:
+
+                ha->flags.dport_enabled =
+                    (mid_init_cb->init_cb.firmware_options_1 & BIT_7) != 0;
+
+BIT_7 is native endian, firmware_options_1 is LE I think.
+
+
+
+Look at qla27xx_find_valid_image as well.
+
+        if (pri_image_status.signature != QLA27XX_IMG_STATUS_SIGN)
+
+qla27xx_image_status seems to be data coming from flash, but is
+somehow native-endian? Maybe ...
+
+
+        lun = a->u.isp24.fcp_cmnd.lun;
+
+I think lun here is in hardware format (le?), code treats it
+as native.
+
+
+Not to speak about interface abuse all over the place.
+How about this:
+
+uint32_t *
+qla24xx_read_flash_data(scsi_qla_host_t *vha, uint32_t *dwptr, uint32_t
+faddr,
+    uint32_t dwords)                     
+{
+        uint32_t i;                     
+        struct qla_hw_data *ha = vha->hw;
+                                        
+        /* Dword reads to flash. */
+        for (i = 0; i < dwords; i++, faddr++)
+                dwptr[i] = cpu_to_le32(qla24xx_read_flash_dword(ha,
+                    flash_data_addr(ha, faddr)));
+
+        return dwptr;                   
+}
+
+OK so we convert to LE ...
+
+                qla24xx_read_flash_data(vha, dcode, faddr, 4); 
+    
+                risc_addr = be32_to_cpu(dcode[2]);
+                *srisc_addr = *srisc_addr == 0 ? risc_addr : *srisc_addr;
+                risc_size = be32_to_cpu(dcode[3]);
+
+then happily assume it's BE.
+
+And again, coming from flash, it's unlikely to actually be in the native
+endian-ness as callers seem to assume. I'm guessing it's all BE.
+
+I poked at it a bit and was able to cut down # of warnings
+from 1700 to 1400 in an hour. Someone familiar with the code
+should look at it.
+
 -- 
-2.7.4
+MST
