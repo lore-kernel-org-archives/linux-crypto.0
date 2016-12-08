@@ -1,61 +1,53 @@
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH v5 1/1] crypto: add virtio-crypto driver
-Date: Wed, 7 Dec 2016 21:20:39 +0100
-Message-ID: <20161207202039.GA27878@ravnborg.org>
-References: <1480595945-63656-2-git-send-email-arei.gonglei@huawei.com>
-	<201612041032.loAEWLIy%fengguang.wu@intel.com>
-	<33183CC9F5247A488A2544077AF19020DA1528DE@DGGEMA505-MBX.china.huawei.com>
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Subject: RE: [PATCH v5 1/1] crypto: add virtio-crypto driver
+Date: Thu, 8 Dec 2016 02:00:19 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA156A24@DGGEMA505-MBX.china.huawei.com>
+References: <1480595945-63656-1-git-send-email-arei.gonglei@huawei.com>
+ <1480595945-63656-2-git-send-email-arei.gonglei@huawei.com>
+ <33183CC9F5247A488A2544077AF19020DA1546F2@DGGEMA505-MBX.china.huawei.com>
+ <20161207094843.GA19970@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: "Xuquan \(Quan Xu\)" <xuquan8@huawei.com>,
-	"Huangweidong \(C\)" <weidong.huang@huawei.com>,
-	"mst@redhat.com" <mst@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"Wanzongshun \(Vincent\)" <wanzongshun@huawei.com>,
-	"virtualization@lists.linux-foundation.org"
-	<virtualization@lists.linux-foundation.org>, "Zhoujian \(jay,
-	Euler\)" <jianjay.zhou@huawei.com>,
-	"arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>,
-	"virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
-	kbuild test robot <lkp@intel.com>,
-	"Hanweidong \(Randy\)" <hanweidong@huawei.com>,
-	longpeng <longpeng2@huawei.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Luonengjun <luonengjun@huawei.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	Claudio Fontana <Claudio.Fontana@huawei.com>,
-	"linux-kernel@vge
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Return-path: <virtualization-bounces@lists.linux-foundation.org>
-Content-Disposition: inline
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA1528DE@DGGEMA505-MBX.china.huawei.com>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
-List-Post: <mailto:virtualization@lists.linux-foundation.org>
-List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
-Sender: virtualization-bounces@lists.linux-foundation.org
-Errors-To: virtualization-bounces@lists.linux-foundation.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
+        "virtualization@lists.linux-foundation.org"
+        <virtualization@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Luonengjun <luonengjun@huawei.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        "Wubin (H)" <wu.wubin@huawei.com>,
+        "xin.zeng@intel.com" <xin.zeng@intel.com>,
+        Claudio Fontana <Claudio.Fontana@huawei.com>,
+        "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>,
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from dggrg01-dlp ([45.249.212.187]:2306 "EHLO dggrg01-dlp.huawei.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S933027AbcLHCAl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Dec 2016 21:00:41 -0500
+In-Reply-To: <20161207094843.GA19970@gondor.apana.org.au>
+Content-Language: zh-CN
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 05, 2016 at 03:12:52AM +0000, Gonglei (Arei) wrote:
-> I don't think the root cause of those warnings are introduced by virtio-crypto driver.
+>
+> Subject: Re: [PATCH v5 1/1] crypto: add virtio-crypto driver
 > 
-> What's your opinion? Sam and David?
+> On Tue, Dec 06, 2016 at 09:01:49AM +0000, Gonglei (Arei) wrote:
+> >
+> > Would you please review and/or ack the virtio_crypto_algs.c?
+> > It is the realization of specified algs based on Linux Crypto Framework.
+> 
+> I have no issues with it.  If the virtio folks are happy with
+> the interface with the host then I'll take this patch.
+> 
+Cool, thanks!
 
-Root cause here is that arch/sparc/include/asm/topology_64.h
-references cpu_data without including arch/sparc/include/asm/cpudata.h
-
-I think other architectures pull in the dependency from
-either smp.h or they have it topology.h.
-
-The easy fix would be to include cpudata.h in arch/sparc/include/asm/topology_64.h.
-And that should also be a correct fix.
-
-Could you include this in your patch-set and build test it?
-
-	Sam
+Regards,
+-Gonglei
