@@ -1,40 +1,40 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 1/2] crypto: arm64/chacha20 - implement NEON version based on SSE3 code
-Date: Thu,  8 Dec 2016 14:28:58 +0000
-Message-ID: <1481207339-17332-2-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH 2/2] crypto: arm/chacha20 - implement NEON version based on SSE3 code
+Date: Thu,  8 Dec 2016 14:28:59 +0000
+Message-ID: <1481207339-17332-3-git-send-email-ard.biesheuvel@linaro.org>
 References: <1481207339-17332-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:37944 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752249AbcLHO3O (ORCPT
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:37979 "EHLO
+        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751577AbcLHO3Q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Dec 2016 09:29:14 -0500
-Received: by mail-wm0-f54.google.com with SMTP id f82so28146105wmf.1
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Dec 2016 06:29:13 -0800 (PST)
+        Thu, 8 Dec 2016 09:29:16 -0500
+Received: by mail-wm0-f53.google.com with SMTP id f82so28147695wmf.1
+        for <linux-crypto@vger.kernel.org>; Thu, 08 Dec 2016 06:29:15 -0800 (PST)
 In-Reply-To: <1481207339-17332-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is a straight port to arm64/NEON of the x86 SSE3 implementation
+This is a straight port to ARM/NEON of the x86 SSE3 implementation
 of the ChaCha20 stream cipher.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/Kconfig              |   6 +
- arch/arm64/crypto/Makefile             |   3 +
- arch/arm64/crypto/chacha20-neon-core.S | 480 ++++++++++++++++++++
- arch/arm64/crypto/chacha20-neon-glue.c | 131 ++++++
- 4 files changed, 620 insertions(+)
+ arch/arm/crypto/Kconfig              |   6 +
+ arch/arm/crypto/Makefile             |   2 +
+ arch/arm/crypto/chacha20-neon-core.S | 524 ++++++++++++++++++++
+ arch/arm/crypto/chacha20-neon-glue.c | 136 +++++
+ 4 files changed, 668 insertions(+)
 
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index 450a85df041a..0bf0f531f539 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -72,4 +72,10 @@ config CRYPTO_CRC32_ARM64
- 	depends on ARM64
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index 13f1b4c289d4..2f3339f015d3 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -130,4 +130,10 @@ config CRYPTO_CRC32_ARM_CE
+ 	depends on KERNEL_MODE_NEON && CRC32
  	select CRYPTO_HASH
  
 +config CRYPTO_CHACHA20_NEON
@@ -44,28 +44,34 @@ index 450a85df041a..0bf0f531f539 100644
 +	select CRYPTO_CHACHA20
 +
  endif
-diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
-index aa8888d7b744..9d2826c5fccf 100644
---- a/arch/arm64/crypto/Makefile
-+++ b/arch/arm64/crypto/Makefile
-@@ -41,6 +41,9 @@ sha256-arm64-y := sha256-glue.o sha256-core.o
- obj-$(CONFIG_CRYPTO_SHA512_ARM64) += sha512-arm64.o
- sha512-arm64-y := sha512-glue.o sha512-core.o
- 
+diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+index b578a1820ab1..8d74e55eacd4 100644
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -8,6 +8,7 @@ obj-$(CONFIG_CRYPTO_SHA1_ARM) += sha1-arm.o
+ obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sha1-arm-neon.o
+ obj-$(CONFIG_CRYPTO_SHA256_ARM) += sha256-arm.o
+ obj-$(CONFIG_CRYPTO_SHA512_ARM) += sha512-arm.o
 +obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha20-neon.o
-+chacha20-neon-y := chacha20-neon-core.o chacha20-neon-glue.o
-+
- AFLAGS_aes-ce.o		:= -DINTERLEAVE=4
- AFLAGS_aes-neon.o	:= -DINTERLEAVE=4
  
-diff --git a/arch/arm64/crypto/chacha20-neon-core.S b/arch/arm64/crypto/chacha20-neon-core.S
+ ce-obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
+ ce-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
+@@ -40,6 +41,7 @@ aes-arm-ce-y	:= aes-ce-core.o aes-ce-glue.o
+ ghash-arm-ce-y	:= ghash-ce-core.o ghash-ce-glue.o
+ crct10dif-arm-ce-y	:= crct10dif-ce-core.o crct10dif-ce-glue.o
+ crc32-arm-ce-y:= crc32-ce-core.o crc32-ce-glue.o
++chacha20-neon-y := chacha20-neon-core.o chacha20-neon-glue.o
+ 
+ quiet_cmd_perl = PERL    $@
+       cmd_perl = $(PERL) $(<) > $(@)
+diff --git a/arch/arm/crypto/chacha20-neon-core.S b/arch/arm/crypto/chacha20-neon-core.S
 new file mode 100644
-index 000000000000..e2cd65580807
+index 000000000000..9f315041f521
 --- /dev/null
-+++ b/arch/arm64/crypto/chacha20-neon-core.S
-@@ -0,0 +1,480 @@
++++ b/arch/arm/crypto/chacha20-neon-core.S
+@@ -0,0 +1,524 @@
 +/*
-+ * ChaCha20 256-bit cipher algorithm, RFC7539, arm64 NEON functions
++ * ChaCha20 256-bit cipher algorithm, RFC7539, ARM NEON functions
 + *
 + * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
 + *
@@ -74,7 +80,7 @@ index 000000000000..e2cd65580807
 + * published by the Free Software Foundation.
 + *
 + * Based on:
-+ * ChaCha20 256-bit cipher algorithm, RFC7539, x64 SSSE3 functions
++ * ChaCha20 256-bit cipher algorithm, RFC7539, x64 SNEON3 functions
 + *
 + * Copyright (C) 2015 Martin Willi
 + *
@@ -87,118 +93,137 @@ index 000000000000..e2cd65580807
 +#include <linux/linkage.h>
 +
 +	.text
-+	.align		6
++	.fpu		neon
++	.align		5
 +
 +ENTRY(chacha20_block_xor_neon)
-+	// x0: Input state matrix, s
-+	// x1: 1 data block output, o
-+	// x2: 1 data block input, i
++	// r0: Input state matrix, s
++	// r1: 1 data block output, o
++	// r2: 1 data block input, i
 +
 +	//
 +	// This function encrypts one ChaCha20 block by loading the state matrix
 +	// in four NEON registers. It performs matrix operation on four words in
-+	// parallel, but requires shuffling to rearrange the words after each
++	// parallel, but requireds shuffling to rearrange the words after each
 +	// round.
 +	//
 +
 +	// x0..3 = s0..3
-+	ld1		{v0.4s-v3.4s}, [x0]
-+	ld1		{v8.4s-v11.4s}, [x0]
++	add		ip, r0, #0x20
++	vld1.32		{q0-q1}, [r0]
++	vld1.32		{q2-q3}, [ip]
 +
-+	mov		x3, #10
++	vmov		q8, q0
++	vmov		q9, q1
++	vmov		q10, q2
++	vmov		q11, q3
++
++	mov		r3, #10
 +
 +.Ldoubleround:
 +	// x0 += x1, x3 = rotl32(x3 ^ x0, 16)
-+	add		v0.4s, v0.4s, v1.4s
-+	eor		v3.16b, v3.16b, v0.16b
-+	rev32		v3.8h, v3.8h
++	vadd.i32	q0, q0, q1
++	veor		q4, q3, q0
++	vshl.u32	q3, q4, #16
++	vsri.u32	q3, q4, #16
 +
 +	// x2 += x3, x1 = rotl32(x1 ^ x2, 12)
-+	add		v2.4s, v2.4s, v3.4s
-+	eor		v4.16b, v1.16b, v2.16b
-+	shl		v1.4s, v4.4s, #12
-+	sri		v1.4s, v4.4s, #20
++	vadd.i32	q2, q2, q3
++	veor		q4, q1, q2
++	vshl.u32	q1, q4, #12
++	vsri.u32	q1, q4, #20
 +
 +	// x0 += x1, x3 = rotl32(x3 ^ x0, 8)
-+	add		v0.4s, v0.4s, v1.4s
-+	eor		v4.16b, v3.16b, v0.16b
-+	shl		v3.4s, v4.4s, #8
-+	sri		v3.4s, v4.4s, #24
++	vadd.i32	q0, q0, q1
++	veor		q4, q3, q0
++	vshl.u32	q3, q4, #8
++	vsri.u32	q3, q4, #24
 +
 +	// x2 += x3, x1 = rotl32(x1 ^ x2, 7)
-+	add		v2.4s, v2.4s, v3.4s
-+	eor		v4.16b, v1.16b, v2.16b
-+	shl		v1.4s, v4.4s, #7
-+	sri		v1.4s, v4.4s, #25
++	vadd.i32	q2, q2, q3
++	veor		q4, q1, q2
++	vshl.u32	q1, q4, #7
++	vsri.u32	q1, q4, #25
 +
 +	// x1 = shuffle32(x1, MASK(0, 3, 2, 1))
-+	ext		v1.16b, v1.16b, v1.16b, #4
++	vext.8		q1, q1, q1, #4
 +	// x2 = shuffle32(x2, MASK(1, 0, 3, 2))
-+	ext		v2.16b, v2.16b, v2.16b, #8
++	vext.8		q2, q2, q2, #8
 +	// x3 = shuffle32(x3, MASK(2, 1, 0, 3))
-+	ext		v3.16b, v3.16b, v3.16b, #12
++	vext.8		q3, q3, q3, #12
 +
 +	// x0 += x1, x3 = rotl32(x3 ^ x0, 16)
-+	add		v0.4s, v0.4s, v1.4s
-+	eor		v3.16b, v3.16b, v0.16b
-+	rev32		v3.8h, v3.8h
++	vadd.i32	q0, q0, q1
++	veor		q4, q3, q0
++	vshl.u32	q3, q4, #16
++	vsri.u32	q3, q4, #16
 +
 +	// x2 += x3, x1 = rotl32(x1 ^ x2, 12)
-+	add		v2.4s, v2.4s, v3.4s
-+	eor		v4.16b, v1.16b, v2.16b
-+	shl		v1.4s, v4.4s, #12
-+	sri		v1.4s, v4.4s, #20
++	vadd.i32	q2, q2, q3
++	veor		q4, q1, q2
++	vshl.u32	q1, q4, #12
++	vsri.u32	q1, q4, #20
 +
 +	// x0 += x1, x3 = rotl32(x3 ^ x0, 8)
-+	add		v0.4s, v0.4s, v1.4s
-+	eor		v4.16b, v3.16b, v0.16b
-+	shl		v3.4s, v4.4s, #8
-+	sri		v3.4s, v4.4s, #24
++	vadd.i32	q0, q0, q1
++	veor		q4, q3, q0
++	vshl.u32	q3, q4, #8
++	vsri.u32	q3, q4, #24
 +
 +	// x2 += x3, x1 = rotl32(x1 ^ x2, 7)
-+	add		v2.4s, v2.4s, v3.4s
-+	eor		v4.16b, v1.16b, v2.16b
-+	shl		v1.4s, v4.4s, #7
-+	sri		v1.4s, v4.4s, #25
++	vadd.i32	q2, q2, q3
++	veor		q4, q1, q2
++	vshl.u32	q1, q4, #7
++	vsri.u32	q1, q4, #25
 +
 +	// x1 = shuffle32(x1, MASK(2, 1, 0, 3))
-+	ext		v1.16b, v1.16b, v1.16b, #12
++	vext.8		q1, q1, q1, #12
 +	// x2 = shuffle32(x2, MASK(1, 0, 3, 2))
-+	ext		v2.16b, v2.16b, v2.16b, #8
++	vext.8		q2, q2, q2, #8
 +	// x3 = shuffle32(x3, MASK(0, 3, 2, 1))
-+	ext		v3.16b, v3.16b, v3.16b, #4
++	vext.8		q3, q3, q3, #4
 +
-+	subs		x3, x3, #1
-+	b.ne		.Ldoubleround
++	subs		r3, r3, #1
++	bne		.Ldoubleround
 +
-+	ld1		{v4.16b-v7.16b}, [x2]
++	add		ip, r2, #0x20
++	vld1.8		{q4-q5}, [r2]
++	vld1.8		{q6-q7}, [ip]
 +
 +	// o0 = i0 ^ (x0 + s0)
-+	add		v0.4s, v0.4s, v8.4s
-+	eor		v0.16b, v0.16b, v4.16b
++	vadd.i32	q0, q0, q8
++	veor		q0, q0, q4
 +
 +	// o1 = i1 ^ (x1 + s1)
-+	add		v1.4s, v1.4s, v9.4s
-+	eor		v1.16b, v1.16b, v5.16b
++	vadd.i32	q1, q1, q9
++	veor		q1, q1, q5
 +
 +	// o2 = i2 ^ (x2 + s2)
-+	add		v2.4s, v2.4s, v10.4s
-+	eor		v2.16b, v2.16b, v6.16b
++	vadd.i32	q2, q2, q10
++	veor		q2, q2, q6
 +
 +	// o3 = i3 ^ (x3 + s3)
-+	add		v3.4s, v3.4s, v11.4s
-+	eor		v3.16b, v3.16b, v7.16b
++	vadd.i32	q3, q3, q11
++	veor		q3, q3, q7
 +
-+	st1		{v0.16b-v3.16b}, [x1]
++	add		ip, r1, #0x20
++	vst1.8		{q0-q1}, [r1]
++	vst1.8		{q2-q3}, [ip]
 +
-+	ret
++	bx		lr
 +ENDPROC(chacha20_block_xor_neon)
 +
-+	.align		6
++	.align		5
 +ENTRY(chacha20_4block_xor_neon)
-+	// x0: Input state matrix, s
-+	// x1: 4 data blocks output, o
-+	// x2: 4 data blocks input, i
++	push		{r4-r6, lr}
++	mov		ip, sp			// preserve the stack pointer
++	sub		r3, sp, #0x20		// allocate a 32 byte buffer
++	bic		r3, r3, #0x1f		// aligned to 32 bytes
++	mov		sp, r3
++
++	// r0: Input state matrix, s
++	// r1: 4 data blocks output, o
++	// r2: 4 data blocks input, i
 +
 +	//
 +	// This function encrypts four consecutive ChaCha20 blocks by loading
@@ -208,350 +233,375 @@ index 000000000000..e2cd65580807
 +	// matrix by interleaving 32- and then 64-bit words, which allows us to
 +	// do XOR in NEON registers.
 +	//
-+	adr		x3, CTRINC
-+	ld1		{v16.4s}, [x3]
 +
 +	// x0..15[0-3] = s0..3[0..3]
-+	mov		x4, x0
-+	ld4r		{ v0.4s- v3.4s}, [x4], #16
-+	ld4r		{ v4.4s- v7.4s}, [x4], #16
-+	ld4r		{ v8.4s-v11.4s}, [x4], #16
-+	ld4r		{v12.4s-v15.4s}, [x4]
++	add		r3, r0, #0x20
++	vld1.32		{q0-q1}, [r0]
++	vld1.32		{q2-q3}, [r3]
 +
-+	// x12 += counter values 0-3
-+	add		v12.4s, v12.4s, v16.4s
++	adr		r3, CTRINC
++	vdup.32		q15, d7[1]
++	vdup.32		q14, d7[0]
++	vld1.32		{q11}, [r3, :128]
++	vdup.32		q13, d6[1]
++	vdup.32		q12, d6[0]
++	vadd.i32	q12, q12, q11		// x12 += counter values 0-3
++	vdup.32		q11, d5[1]
++	vdup.32		q10, d5[0]
++	vdup.32		q9, d4[1]
++	vdup.32		q8, d4[0]
++	vdup.32		q7, d3[1]
++	vdup.32		q6, d3[0]
++	vdup.32		q5, d2[1]
++	vdup.32		q4, d2[0]
++	vdup.32		q3, d1[1]
++	vdup.32		q2, d1[0]
++	vdup.32		q1, d0[1]
++	vdup.32		q0, d0[0]
 +
-+	mov		x3, #10
++	mov		r3, #10
 +
 +.Ldoubleround4:
 +	// x0 += x4, x12 = rotl32(x12 ^ x0, 16)
 +	// x1 += x5, x13 = rotl32(x13 ^ x1, 16)
 +	// x2 += x6, x14 = rotl32(x14 ^ x2, 16)
 +	// x3 += x7, x15 = rotl32(x15 ^ x3, 16)
-+	add		v0.4s, v0.4s, v4.4s
-+	add		v1.4s, v1.4s, v5.4s
-+	add		v2.4s, v2.4s, v6.4s
-+	add		v3.4s, v3.4s, v7.4s
++	vadd.i32	q0, q0, q4
++	vadd.i32	q1, q1, q5
++	vadd.i32	q2, q2, q6
++	vadd.i32	q3, q3, q7
 +
-+	eor		v12.16b, v12.16b, v0.16b
-+	eor		v13.16b, v13.16b, v1.16b
-+	eor		v14.16b, v14.16b, v2.16b
-+	eor		v15.16b, v15.16b, v3.16b
++	veor		q12, q12, q0
++	veor		q13, q13, q1
++	veor		q14, q14, q2
++	veor		q15, q15, q3
 +
-+	rev32		v12.8h, v12.8h
-+	rev32		v13.8h, v13.8h
-+	rev32		v14.8h, v14.8h
-+	rev32		v15.8h, v15.8h
++	vrev32.16	q12, q12
++	vrev32.16	q13, q13
++	vrev32.16	q14, q14
++	vrev32.16	q15, q15
 +
 +	// x8 += x12, x4 = rotl32(x4 ^ x8, 12)
 +	// x9 += x13, x5 = rotl32(x5 ^ x9, 12)
 +	// x10 += x14, x6 = rotl32(x6 ^ x10, 12)
 +	// x11 += x15, x7 = rotl32(x7 ^ x11, 12)
-+	add		v8.4s, v8.4s, v12.4s
-+	add		v9.4s, v9.4s, v13.4s
-+	add		v10.4s, v10.4s, v14.4s
-+	add		v11.4s, v11.4s, v15.4s
++	vadd.i32	q8, q8, q12
++	vadd.i32	q9, q9, q13
++	vadd.i32	q10, q10, q14
++	vadd.i32	q11, q11, q15
 +
-+	eor		v17.16b, v4.16b, v8.16b
-+	eor		v18.16b, v5.16b, v9.16b
-+	eor		v19.16b, v6.16b, v10.16b
-+	eor		v20.16b, v7.16b, v11.16b
++	vst1.32		{q8-q9}, [sp, :256]
 +
-+	shl		v4.4s, v17.4s, #12
-+	shl		v5.4s, v18.4s, #12
-+	shl		v6.4s, v19.4s, #12
-+	shl		v7.4s, v20.4s, #12
++	veor		q8, q4, q8
++	veor		q9, q5, q9
++	vshl.u32	q4, q8, #12
++	vshl.u32	q5, q9, #12
++	vsri.u32	q4, q8, #20
++	vsri.u32	q5, q9, #20
 +
-+	sri		v4.4s, v17.4s, #20
-+	sri		v5.4s, v18.4s, #20
-+	sri		v6.4s, v19.4s, #20
-+	sri		v7.4s, v20.4s, #20
++	veor		q8, q6, q10
++	veor		q9, q7, q11
++	vshl.u32	q6, q8, #12
++	vshl.u32	q7, q9, #12
++	vsri.u32	q6, q8, #20
++	vsri.u32	q7, q9, #20
 +
 +	// x0 += x4, x12 = rotl32(x12 ^ x0, 8)
 +	// x1 += x5, x13 = rotl32(x13 ^ x1, 8)
 +	// x2 += x6, x14 = rotl32(x14 ^ x2, 8)
 +	// x3 += x7, x15 = rotl32(x15 ^ x3, 8)
-+	add		v0.4s, v0.4s, v4.4s
-+	add		v1.4s, v1.4s, v5.4s
-+	add		v2.4s, v2.4s, v6.4s
-+	add		v3.4s, v3.4s, v7.4s
++	vadd.i32	q0, q0, q4
++	vadd.i32	q1, q1, q5
++	vadd.i32	q2, q2, q6
++	vadd.i32	q3, q3, q7
 +
-+	eor		v17.16b, v12.16b, v0.16b
-+	eor		v18.16b, v13.16b, v1.16b
-+	eor		v19.16b, v14.16b, v2.16b
-+	eor		v20.16b, v15.16b, v3.16b
++	veor		q8, q12, q0
++	veor		q9, q13, q1
++	vshl.u32	q12, q8, #8
++	vshl.u32	q13, q9, #8
++	vsri.u32	q12, q8, #24
++	vsri.u32	q13, q9, #24
 +
-+	shl		v12.4s, v17.4s, #8
-+	shl		v13.4s, v18.4s, #8
-+	shl		v14.4s, v19.4s, #8
-+	shl		v15.4s, v20.4s, #8
++	veor		q8, q14, q2
++	veor		q9, q15, q3
++	vshl.u32	q14, q8, #8
++	vshl.u32	q15, q9, #8
++	vsri.u32	q14, q8, #24
++	vsri.u32	q15, q9, #24
 +
-+	sri		v12.4s, v17.4s, #24
-+	sri		v13.4s, v18.4s, #24
-+	sri		v14.4s, v19.4s, #24
-+	sri		v15.4s, v20.4s, #24
++	vld1.32		{q8-q9}, [sp, :256]
 +
 +	// x8 += x12, x4 = rotl32(x4 ^ x8, 7)
 +	// x9 += x13, x5 = rotl32(x5 ^ x9, 7)
 +	// x10 += x14, x6 = rotl32(x6 ^ x10, 7)
 +	// x11 += x15, x7 = rotl32(x7 ^ x11, 7)
-+	add		v8.4s, v8.4s, v12.4s
-+	add		v9.4s, v9.4s, v13.4s
-+	add		v10.4s, v10.4s, v14.4s
-+	add		v11.4s, v11.4s, v15.4s
++	vadd.i32	q8, q8, q12
++	vadd.i32	q9, q9, q13
++	vadd.i32	q10, q10, q14
++	vadd.i32	q11, q11, q15
 +
-+	eor		v17.16b, v4.16b, v8.16b
-+	eor		v18.16b, v5.16b, v9.16b
-+	eor		v19.16b, v6.16b, v10.16b
-+	eor		v20.16b, v7.16b, v11.16b
++	vst1.32		{q8-q9}, [sp, :256]
 +
-+	shl		v4.4s, v17.4s, #7
-+	shl		v5.4s, v18.4s, #7
-+	shl		v6.4s, v19.4s, #7
-+	shl		v7.4s, v20.4s, #7
++	veor		q8, q4, q8
++	veor		q9, q5, q9
++	vshl.u32	q4, q8, #7
++	vshl.u32	q5, q9, #7
++	vsri.u32	q4, q8, #25
++	vsri.u32	q5, q9, #25
 +
-+	sri		v4.4s, v17.4s, #25
-+	sri		v5.4s, v18.4s, #25
-+	sri		v6.4s, v19.4s, #25
-+	sri		v7.4s, v20.4s, #25
++	veor		q8, q6, q10
++	veor		q9, q7, q11
++	vshl.u32	q6, q8, #7
++	vshl.u32	q7, q9, #7
++	vsri.u32	q6, q8, #25
++	vsri.u32	q7, q9, #25
++
++	vld1.32		{q8-q9}, [sp, :256]
 +
 +	// x0 += x5, x15 = rotl32(x15 ^ x0, 16)
 +	// x1 += x6, x12 = rotl32(x12 ^ x1, 16)
 +	// x2 += x7, x13 = rotl32(x13 ^ x2, 16)
 +	// x3 += x4, x14 = rotl32(x14 ^ x3, 16)
-+	add		v0.4s, v0.4s, v5.4s
-+	add		v1.4s, v1.4s, v6.4s
-+	add		v2.4s, v2.4s, v7.4s
-+	add		v3.4s, v3.4s, v4.4s
++	vadd.i32	q0, q0, q5
++	vadd.i32	q1, q1, q6
++	vadd.i32	q2, q2, q7
++	vadd.i32	q3, q3, q4
 +
-+	eor		v15.16b, v15.16b, v0.16b
-+	eor		v12.16b, v12.16b, v1.16b
-+	eor		v13.16b, v13.16b, v2.16b
-+	eor		v14.16b, v14.16b, v3.16b
++	veor		q15, q15, q0
++	veor		q12, q12, q1
++	veor		q13, q13, q2
++	veor		q14, q14, q3
 +
-+	rev32		v15.8h, v15.8h
-+	rev32		v12.8h, v12.8h
-+	rev32		v13.8h, v13.8h
-+	rev32		v14.8h, v14.8h
++	vrev32.16	q15, q15
++	vrev32.16	q12, q12
++	vrev32.16	q13, q13
++	vrev32.16	q14, q14
 +
 +	// x10 += x15, x5 = rotl32(x5 ^ x10, 12)
 +	// x11 += x12, x6 = rotl32(x6 ^ x11, 12)
 +	// x8 += x13, x7 = rotl32(x7 ^ x8, 12)
 +	// x9 += x14, x4 = rotl32(x4 ^ x9, 12)
-+	add		v10.4s, v10.4s, v15.4s
-+	add		v11.4s, v11.4s, v12.4s
-+	add		v8.4s, v8.4s, v13.4s
-+	add		v9.4s, v9.4s, v14.4s
++	vadd.i32	q10, q10, q15
++	vadd.i32	q11, q11, q12
++	vadd.i32	q8, q8, q13
++	vadd.i32	q9, q9, q14
 +
-+	eor		v17.16b, v5.16b, v10.16b
-+	eor		v18.16b, v6.16b, v11.16b
-+	eor		v19.16b, v7.16b, v8.16b
-+	eor		v20.16b, v4.16b, v9.16b
++	vst1.32		{q8-q9}, [sp, :256]
 +
-+	shl		v5.4s, v17.4s, #12
-+	shl		v6.4s, v18.4s, #12
-+	shl		v7.4s, v19.4s, #12
-+	shl		v4.4s, v20.4s, #12
++	veor		q8, q7, q8
++	veor		q9, q4, q9
++	vshl.u32	q7, q8, #12
++	vshl.u32	q4, q9, #12
++	vsri.u32	q7, q8, #20
++	vsri.u32	q4, q9, #20
 +
-+	sri		v5.4s, v17.4s, #20
-+	sri		v6.4s, v18.4s, #20
-+	sri		v7.4s, v19.4s, #20
-+	sri		v4.4s, v20.4s, #20
++	veor		q8, q5, q10
++	veor		q9, q6, q11
++	vshl.u32	q5, q8, #12
++	vshl.u32	q6, q9, #12
++	vsri.u32	q5, q8, #20
++	vsri.u32	q6, q9, #20
 +
 +	// x0 += x5, x15 = rotl32(x15 ^ x0, 8)
 +	// x1 += x6, x12 = rotl32(x12 ^ x1, 8)
 +	// x2 += x7, x13 = rotl32(x13 ^ x2, 8)
 +	// x3 += x4, x14 = rotl32(x14 ^ x3, 8)
-+	add		v0.4s, v0.4s, v5.4s
-+	add		v1.4s, v1.4s, v6.4s
-+	add		v2.4s, v2.4s, v7.4s
-+	add		v3.4s, v3.4s, v4.4s
++	vadd.i32	q0, q0, q5
++	vadd.i32	q1, q1, q6
++	vadd.i32	q2, q2, q7
++	vadd.i32	q3, q3, q4
 +
-+	eor		v17.16b, v15.16b, v0.16b
-+	eor		v18.16b, v12.16b, v1.16b
-+	eor		v19.16b, v13.16b, v2.16b
-+	eor		v20.16b, v14.16b, v3.16b
++	veor		q8, q15, q0
++	veor		q9, q12, q1
++	vshl.u32	q15, q8, #8
++	vshl.u32	q12, q9, #8
++	vsri.u32	q15, q8, #24
++	vsri.u32	q12, q9, #24
 +
-+	shl		v15.4s, v17.4s, #8
-+	shl		v12.4s, v18.4s, #8
-+	shl		v13.4s, v19.4s, #8
-+	shl		v14.4s, v20.4s, #8
++	veor		q8, q13, q2
++	veor		q9, q14, q3
++	vshl.u32	q13, q8, #8
++	vshl.u32	q14, q9, #8
++	vsri.u32	q13, q8, #24
++	vsri.u32	q14, q9, #24
 +
-+	sri		v15.4s, v17.4s, #24
-+	sri		v12.4s, v18.4s, #24
-+	sri		v13.4s, v19.4s, #24
-+	sri		v14.4s, v20.4s, #24
++	vld1.32		{q8-q9}, [sp, :256]
 +
 +	// x10 += x15, x5 = rotl32(x5 ^ x10, 7)
 +	// x11 += x12, x6 = rotl32(x6 ^ x11, 7)
 +	// x8 += x13, x7 = rotl32(x7 ^ x8, 7)
 +	// x9 += x14, x4 = rotl32(x4 ^ x9, 7)
-+	add		v10.4s, v10.4s, v15.4s
-+	add		v11.4s, v11.4s, v12.4s
-+	add		v8.4s, v8.4s, v13.4s
-+	add		v9.4s, v9.4s, v14.4s
++	vadd.i32	q10, q10, q15
++	vadd.i32	q11, q11, q12
++	vadd.i32	q8, q8, q13
++	vadd.i32	q9, q9, q14
 +
-+	eor		v17.16b, v5.16b, v10.16b
-+	eor		v18.16b, v6.16b, v11.16b
-+	eor		v19.16b, v7.16b, v8.16b
-+	eor		v20.16b, v4.16b, v9.16b
++	vst1.32		{q8-q9}, [sp, :256]
 +
-+	shl		v5.4s, v17.4s, #7
-+	shl		v6.4s, v18.4s, #7
-+	shl		v7.4s, v19.4s, #7
-+	shl		v4.4s, v20.4s, #7
++	veor		q8, q7, q8
++	veor		q9, q4, q9
++	vshl.u32	q7, q8, #7
++	vshl.u32	q4, q9, #7
++	vsri.u32	q7, q8, #25
++	vsri.u32	q4, q9, #25
 +
-+	sri		v5.4s, v17.4s, #25
-+	sri		v6.4s, v18.4s, #25
-+	sri		v7.4s, v19.4s, #25
-+	sri		v4.4s, v20.4s, #25
++	veor		q8, q5, q10
++	veor		q9, q6, q11
++	vshl.u32	q5, q8, #7
++	vshl.u32	q6, q9, #7
++	vsri.u32	q5, q8, #25
++	vsri.u32	q6, q9, #25
 +
-+	subs		x3, x3, #1
-+	b.ne		.Ldoubleround4
++	subs		r3, r3, #1
++	beq		0f
++
++	vld1.32		{q8-q9}, [sp, :256]
++	b		.Ldoubleround4
 +
 +	// x0[0-3] += s0[0]
 +	// x1[0-3] += s0[1]
 +	// x2[0-3] += s0[2]
 +	// x3[0-3] += s0[3]
-+	ld4r		{v17.4s-v20.4s}, [x0], #16
-+	add		v0.4s, v0.4s, v17.4s
-+	add		v1.4s, v1.4s, v18.4s
-+	add		v2.4s, v2.4s, v19.4s
-+	add		v3.4s, v3.4s, v20.4s
++0:	ldmia		r0!, {r3-r6}
++	vdup.32		q8, r3
++	vdup.32		q9, r4
++	vadd.i32	q0, q0, q8
++	vadd.i32	q1, q1, q9
++	vdup.32		q8, r5
++	vdup.32		q9, r6
++	vadd.i32	q2, q2, q8
++	vadd.i32	q3, q3, q9
 +
 +	// x4[0-3] += s1[0]
 +	// x5[0-3] += s1[1]
 +	// x6[0-3] += s1[2]
 +	// x7[0-3] += s1[3]
-+	ld4r		{v21.4s-v24.4s}, [x0], #16
-+	add		v4.4s, v4.4s, v21.4s
-+	add		v5.4s, v5.4s, v22.4s
-+	add		v6.4s, v6.4s, v23.4s
-+	add		v7.4s, v7.4s, v24.4s
++	ldmia		r0!, {r3-r6}
++	vdup.32		q8, r3
++	vdup.32		q9, r4
++	vadd.i32	q4, q4, q8
++	vadd.i32	q5, q5, q9
++	vdup.32		q8, r5
++	vdup.32		q9, r6
++	vadd.i32	q6, q6, q8
++	vadd.i32	q7, q7, q9
++
++	// interleave 32-bit words in state n, n+1
++	vzip.32		q0, q1
++	vzip.32		q2, q3
++	vzip.32		q4, q5
++	vzip.32		q6, q7
++
++	// interleave 64-bit words in state n, n+2
++	vswp		d1, d4
++	vswp		d3, d6
++	vswp		d9, d12
++	vswp		d11, d14
++
++	// xor with corresponding input, write to output
++	vld1.8		{q8-q9}, [r2]!
++	veor		q8, q8, q0
++	veor		q9, q9, q4
++	vst1.8		{q8-q9}, [r1]!
++
++	vld1.32		{q8-q9}, [sp, :256]
 +
 +	// x8[0-3] += s2[0]
 +	// x9[0-3] += s2[1]
 +	// x10[0-3] += s2[2]
 +	// x11[0-3] += s2[3]
-+	ld4r		{v17.4s-v20.4s}, [x0], #16
-+	add		v8.4s, v8.4s, v17.4s
-+	add		v9.4s, v9.4s, v18.4s
-+	add		v10.4s, v10.4s, v19.4s
-+	add		v11.4s, v11.4s, v20.4s
++	ldmia		r0!, {r3-r6}
++	vdup.32		q0, r3
++	vdup.32		q4, r4
++	vadd.i32	q8, q8, q0
++	vadd.i32	q9, q9, q4
++	vdup.32		q0, r5
++	vdup.32		q4, r6
++	vadd.i32	q10, q10, q0
++	vadd.i32	q11, q11, q4
 +
 +	// x12[0-3] += s3[0]
 +	// x13[0-3] += s3[1]
 +	// x14[0-3] += s3[2]
 +	// x15[0-3] += s3[3]
-+	ld4r		{v21.4s-v24.4s}, [x0]
-+	add		v12.4s, v12.4s, v21.4s
-+	add		v13.4s, v13.4s, v22.4s
-+	add		v14.4s, v14.4s, v23.4s
-+	add		v15.4s, v15.4s, v24.4s
++	ldmia		r0!, {r3-r6}
++	vdup.32		q0, r3
++	vdup.32		q4, r4
++	adr		r3, CTRINC
++	vadd.i32	q12, q12, q0
++	vld1.32		{q0}, [r3, :128]
++	vadd.i32	q13, q13, q4
++	vadd.i32	q12, q12, q0		// x12 += counter values 0-3
 +
-+	// x12 += counter values 0-3
-+	add		v12.4s, v12.4s, v16.4s
-+
-+	ld1		{v16.16b-v19.16b}, [x2], #64
-+	ld1		{v20.16b-v23.16b}, [x2], #64
++	vdup.32		q0, r5
++	vdup.32		q4, r6
++	vadd.i32	q14, q14, q0
++	vadd.i32	q15, q15, q4
 +
 +	// interleave 32-bit words in state n, n+1
-+	zip1		v24.4s, v0.4s, v1.4s
-+	zip1		v25.4s, v2.4s, v3.4s
-+	zip1		v26.4s, v4.4s, v5.4s
-+	zip1		v27.4s, v6.4s, v7.4s
-+	zip1		v28.4s, v8.4s, v9.4s
-+	zip1		v29.4s, v10.4s, v11.4s
-+	zip1		v30.4s, v12.4s, v13.4s
-+	zip1		v31.4s, v14.4s, v15.4s
-+
-+	zip2		v1.4s, v0.4s, v1.4s
-+	zip2		v3.4s, v2.4s, v3.4s
-+	zip2		v5.4s, v4.4s, v5.4s
-+	zip2		v7.4s, v6.4s, v7.4s
-+	zip2		v9.4s, v8.4s, v9.4s
-+	zip2		v11.4s, v10.4s, v11.4s
-+	zip2		v13.4s, v12.4s, v13.4s
-+	zip2		v15.4s, v14.4s, v15.4s
-+
-+	mov		v0.16b, v24.16b
-+	mov		v2.16b, v25.16b
-+	mov		v4.16b, v26.16b
-+	mov		v6.16b, v27.16b
-+	mov		v8.16b, v28.16b
-+	mov		v10.16b, v29.16b
-+	mov		v12.16b, v30.16b
-+	mov		v14.16b, v31.16b
++	vzip.32		q8, q9
++	vzip.32		q10, q11
++	vzip.32		q12, q13
++	vzip.32		q14, q15
 +
 +	// interleave 64-bit words in state n, n+2
-+	zip1		v24.2d, v0.2d, v2.2d
-+	zip1		v25.2d, v1.2d, v3.2d
-+	zip1		v26.2d, v4.2d, v6.2d
-+	zip1		v27.2d, v5.2d, v7.2d
-+	zip1		v28.2d, v8.2d, v10.2d
-+	zip1		v29.2d, v9.2d, v11.2d
-+	zip1		v30.2d, v12.2d, v14.2d
-+	zip1		v31.2d, v13.2d, v15.2d
++	vswp		d17, d20
++	vswp		d19, d22
++	vswp		d25, d28
++	vswp		d27, d30
 +
-+	zip2		v2.2d, v0.2d, v2.2d
-+	zip2		v3.2d, v1.2d, v3.2d
-+	zip2		v6.2d, v4.2d, v6.2d
-+	zip2		v7.2d, v5.2d, v7.2d
-+	zip2		v10.2d, v8.2d, v10.2d
-+	zip2		v11.2d, v9.2d, v11.2d
-+	zip2		v14.2d, v12.2d, v14.2d
-+	zip2		v15.2d, v13.2d, v15.2d
++	vmov		q4, q1
 +
-+	mov		v0.16b, v24.16b
-+	mov		v1.16b, v25.16b
-+	mov		v4.16b, v26.16b
-+	mov		v5.16b, v27.16b
++	vld1.8		{q0-q1}, [r2]!
++	veor		q0, q0, q8
++	veor		q1, q1, q12
++	vst1.8		{q0-q1}, [r1]!
 +
-+	mov		v8.16b, v28.16b
-+	mov		v9.16b, v29.16b
-+	mov		v12.16b, v30.16b
-+	mov		v13.16b, v31.16b
++	vld1.8		{q0-q1}, [r2]!
++	veor		q0, q0, q2
++	veor		q1, q1, q6
++	vst1.8		{q0-q1}, [r1]!
 +
-+	ld1		{v24.16b-v27.16b}, [x2], #64
-+	ld1		{v28.16b-v31.16b}, [x2]
++	vld1.8		{q0-q1}, [r2]!
++	veor		q0, q0, q10
++	veor		q1, q1, q14
++	vst1.8		{q0-q1}, [r1]!
 +
-+	// xor with corresponding input, write to output
-+	eor		v16.16b, v16.16b, v0.16b
-+	eor		v17.16b, v17.16b, v4.16b
-+	eor		v18.16b, v18.16b, v8.16b
-+	eor		v19.16b, v19.16b, v12.16b
-+	st1		{v16.16b-v19.16b}, [x1], #64
++	vld1.8		{q0-q1}, [r2]!
++	veor		q0, q0, q4
++	veor		q1, q1, q5
++	vst1.8		{q0-q1}, [r1]!
 +
-+	eor		v20.16b, v20.16b, v2.16b
-+	eor		v21.16b, v21.16b, v6.16b
-+	eor		v22.16b, v22.16b, v10.16b
-+	eor		v23.16b, v23.16b, v14.16b
-+	st1		{v20.16b-v23.16b}, [x1], #64
++	vld1.8		{q0-q1}, [r2]!
++	veor		q0, q0, q9
++	veor		q1, q1, q13
++	vst1.8		{q0-q1}, [r1]!
 +
-+	eor		v24.16b, v24.16b, v1.16b
-+	eor		v25.16b, v25.16b, v5.16b
-+	eor		v26.16b, v26.16b, v9.16b
-+	eor		v27.16b, v27.16b, v13.16b
-+	st1		{v24.16b-v27.16b}, [x1], #64
++	vld1.8		{q0-q1}, [r2]!
++	veor		q0, q0, q3
++	veor		q1, q1, q7
++	vst1.8		{q0-q1}, [r1]!
 +
-+	eor		v28.16b, v28.16b, v3.16b
-+	eor		v29.16b, v29.16b, v7.16b
-+	eor		v30.16b, v30.16b, v11.16b
-+	eor		v31.16b, v31.16b, v15.16b
-+	st1		{v28.16b-v31.16b}, [x1]
++	vld1.8		{q0-q1}, [r2]
++	veor		q0, q0, q11
++	veor		q1, q1, q15
++	vst1.8		{q0-q1}, [r1]
 +
-+	ret
++	mov		sp, ip
++	pop		{r4-r6, pc}
 +ENDPROC(chacha20_4block_xor_neon)
 +
++	.align		4
 +CTRINC:	.word		0, 1, 2, 3
-diff --git a/arch/arm64/crypto/chacha20-neon-glue.c b/arch/arm64/crypto/chacha20-neon-glue.c
++
+diff --git a/arch/arm/crypto/chacha20-neon-glue.c b/arch/arm/crypto/chacha20-neon-glue.c
 new file mode 100644
-index 000000000000..705b42b06d00
+index 000000000000..554f7f6069da
 --- /dev/null
-+++ b/arch/arm64/crypto/chacha20-neon-glue.c
-@@ -0,0 +1,131 @@
++++ b/arch/arm/crypto/chacha20-neon-glue.c
+@@ -0,0 +1,136 @@
 +/*
-+ * ChaCha20 256-bit cipher algorithm, RFC7539, arm64 NEON functions
++ * ChaCha20 256-bit cipher algorithm, RFC7539, ARM NEON functions
 + *
 + * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
 + *
@@ -576,7 +626,9 @@ index 000000000000..705b42b06d00
 +#include <linux/kernel.h>
 +#include <linux/module.h>
 +
++#include <asm/hwcap.h>
 +#include <asm/neon.h>
++#include <asm/simd.h>
 +
 +asmlinkage void chacha20_block_xor_neon(u32 *state, u8 *dst, const u8 *src);
 +asmlinkage void chacha20_4block_xor_neon(u32 *state, u8 *dst, const u8 *src);
@@ -614,7 +666,7 @@ index 000000000000..705b42b06d00
 +	u32 state[16];
 +	int err;
 +
-+	if (nbytes <= CHACHA20_BLOCK_SIZE)
++	if (nbytes <= CHACHA20_BLOCK_SIZE || !may_use_simd())
 +		return crypto_chacha20_crypt(desc, dst, src, nbytes);
 +
 +	blkcipher_walk_init(&walk, dst, src, nbytes);
@@ -667,6 +719,9 @@ index 000000000000..705b42b06d00
 +
 +static int __init chacha20_simd_mod_init(void)
 +{
++	if (!(elf_hwcap & HWCAP_NEON))
++		return -ENODEV;
++
 +	return crypto_register_alg(&alg);
 +}
 +
