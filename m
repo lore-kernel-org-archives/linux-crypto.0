@@ -1,82 +1,39 @@
-From: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
-Subject: Re: [PATCH v1 1/2] Add crypto driver support for some MediaTek chips
-Date: Thu, 8 Dec 2016 17:05:26 +0800
-Message-ID: <1481187926.14860.19.camel@mtkswgap22>
-References: <1480921284-45827-1-git-send-email-ryder.lee@mediatek.com>
-         <1480921284-45827-2-git-send-email-ryder.lee@mediatek.com>
-         <20161205085220.GA333@Red>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: sun4i-ss: support the Security System PRNG
+Date: Thu, 8 Dec 2016 17:06:18 +0800
+Message-ID: <20161208090618.GB22932@gondor.apana.org.au>
+References: <1480934922-20732-1-git-send-email-clabbe.montjoie@gmail.com>
+ <20161205123705.GA10732@gondor.apana.org.au>
+ <20161205125738.GA13525@Red>
+ <20161207120900.GC20680@gondor.apana.org.au>
+ <20161207125127.GB28218@Red>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-        <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-        Sean Wang <sean.wang-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>,
-        Roy Luo <cheng-hao.luo-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
-To: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20161205085220.GA333@Red>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, maxime.ripard@free-electrons.com,
+        wens@csie.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20161207125127.GB28218@Red>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello,
-
-On Mon, 2016-12-05 at 09:52 +0100, Corentin Labbe wrote:
-> Hello
+On Wed, Dec 07, 2016 at 01:51:27PM +0100, Corentin Labbe wrote:
 > 
-> I have two minor comment.
-> 
-> On Mon, Dec 05, 2016 at 03:01:23PM +0800, Ryder Lee wrote:
-> > This adds support for the MediaTek hardware accelerator on
-> > mt7623/mt2701/mt8521p SoC.
-> > 
-> > This driver currently implement:
-> > - SHA1 and SHA2 family(HMAC) hash alogrithms.
-> 
-> There is a typo for algorithms.
-> 
-> [...]
-> > +/**
-> > + * struct mtk_desc - DMA descriptor
-> > + * @hdr:	the descriptor control header
-> > + * @buf:	DMA address of input buffer segment
-> > + * @ct:		DMA address of command token that control operation flow
-> > + * @ct_hdr:	the command token control header
-> > + * @tag:	the user-defined field
-> > + * @tfm:	DMA address of transform state
-> > + * @bound:	align descriptors offset boundary
-> > + *
-> > + * Structure passed to the crypto engine to describe where source
-> > + * data needs to be fetched and how it needs to be processed.
-> > + */
-> > +struct mtk_desc {
-> > +	u32 hdr;
-> > +	u32 buf;
-> > +	u32 ct;
-> > +	u32 ct_hdr;
-> > +	u32 tag;
-> > +	u32 tfm;
-> > +	u32 bound[2];
-> > +};
-> 
-> Do you have tested this descriptor with BE/LE kernel ?
+> So I must expose it as a crypto_rng ?
 
-I did not test it with BE kernel, because both CPU and accelerator in
-our SoC just run on LE system. 
+If it is to be exposed at all then algif_rng would be the best
+place.
 
-Thanks for reminding me, i will use byteorder conversion macros and type
-identifiers.
+> Could you explain why PRNG must not be used as hw_random ?
 
-> Regards
-> Corentin Labbe
+The hwrng interface was always meant to be an interface for real
+hardware random number generators.  People rely on that so we
+should not provide bogus entropy sources through this interface.
 
-
-
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
