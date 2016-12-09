@@ -1,125 +1,106 @@
-From: "Madhani, Himanshu" <Himanshu.Madhani@cavium.com>
-Subject: Re: [PATCH] linux/types.h: enable endian checks for all sparse builds
-Date: Fri, 9 Dec 2016 06:40:53 +0000
-Message-ID: <6199215E-2AA4-4705-9552-5D61FE03F866@cavium.com>
-References: <1481164052-28036-1-git-send-email-mst@redhat.com>
- <BLUPR02MB168374E98A6C86E43DF0BCFE81840@BLUPR02MB1683.namprd02.prod.outlook.com>
- <20161208075152-mutt-send-email-mst@kernel.org>
- <BLUPR02MB168304F8FBA50C916A6A4E6081840@BLUPR02MB1683.namprd02.prod.outlook.com>
- <20161208163658-mutt-send-email-mst@kernel.org>
+From: Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v1 2/2] crypto: mediatek - add DT bindings documentation
+Date: Fri, 9 Dec 2016 10:45:00 +0100
+Message-ID: <826b263f-8963-11c9-0302-8048cd1dea8e@gmail.com>
+References: <1480921284-45827-1-git-send-email-ryder.lee@mediatek.com>
+ <1480921284-45827-3-git-send-email-ryder.lee@mediatek.com>
+ <4b0df417-825f-65c6-4c02-85fe1c20ce50@gmail.com>
+ <1481188776.14860.26.camel@mtkswgap22>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        David Airlie <airlied@linux.ie>,
-        "linux-remoteproc@vger.kernel.org" <linux-remoteproc@vger.kernel.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "virtualization@lists.linux-foundation.org"
-        <virtualization@lists.linux-foundation.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        "v9fs-developer@lists.sourceforge.net"
-        <v9fs-developer@lists.sourceforge.net>,
-        Asias He <asias@redhat.com>, "Arnd Bergmann" <arnd@arndb.de>,
-        "linux-kbuild@vger.kernel.org" <lin
-To: "Michael S. Tsirkin" <mst@redhat.com>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20161208163658-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-Content-ID: <CC052759A2A98246AAADC005BD2ECE5C@namprd07.prod.outlook.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+        Sean Wang <sean.wang-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>,
+        Roy Luo <cheng-hao.luo-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
+To: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1481188776.14860.26.camel@mtkswgap22>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-SGkgTWlrZS9CYXJ0LCANCg0KDQoNCg0KDQoNCg0KT24gMTIvOC8xNiwgODoxNyBBTSwgInZpcnR1
-YWxpemF0aW9uLWJvdW5jZXNAbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmcgb24gYmVoYWxmIG9m
-IE1pY2hhZWwgUy4gVHNpcmtpbiIgPHZpcnR1YWxpemF0aW9uLWJvdW5jZXNAbGlzdHMubGludXgt
-Zm91bmRhdGlvbi5vcmcgb24gYmVoYWxmIG9mIG1zdEByZWRoYXQuY29tPiB3cm90ZToNCg0KPk9u
-IFRodSwgRGVjIDA4LCAyMDE2IGF0IDA2OjM4OjExQU0gKzAwMDAsIEJhcnQgVmFuIEFzc2NoZSB3
-cm90ZToNCj4+IE9uIDEyLzA3LzE2IDIxOjU0LCBNaWNoYWVsIFMuIFRzaXJraW4gd3JvdGU6DQo+
-PiA+IE9uIFRodSwgRGVjIDA4LCAyMDE2IGF0IDA1OjIxOjQ3QU0gKzAwMDAsIEJhcnQgVmFuIEFz
-c2NoZSB3cm90ZToNCj4+ID4+IEFkZGl0aW9uYWxseSwgdGhlcmUgYXJlIG5vdGFibGUgZXhjZXB0
-aW9ucyB0byB0aGUgcnVsZSB0aGF0IG1vc3QgZHJpdmVycw0KPj4gPj4gYXJlIGVuZGlhbi1jbGVh
-biwgZS5nLiBkcml2ZXJzL3Njc2kvcWxhMnh4eC4gSSB3b3VsZCBhcHByZWNpYXRlIGl0IGlmIGl0
-DQo+PiA+PiB3b3VsZCByZW1haW4gcG9zc2libGUgdG8gY2hlY2sgc3VjaCBkcml2ZXJzIHdpdGgg
-c3BhcnNlIHdpdGhvdXQgZW5hYmxpbmcNCj4+ID4+IGVuZGlhbm5lc3MgY2hlY2tzLiBIYXZlIHlv
-dSBjb25zaWRlcmVkIHRvIGNoYW5nZSAjaWZkZWYgX19DSEVDS19FTkRJQU5fXw0KPj4gPj4gaW50
-byBlLmcuICNpZm5kZWYgX19ET05UX0NIRUNLX0VORElBTl9fPw0KPj4gPg0KPj4gPiBUaGUgcmln
-aHQgdGhpbmcgaXMgcHJvYmFibHkganVzdCB0byBmaXggdGhlc2UsIGlzbid0IGl0Pw0KPj4gPiBV
-bnRpbCB0aGVuLCB3aHkgbm90IGp1c3QgaWdub3JlIHRoZSB3YXJuaW5ncz8NCj4+IA0KPj4gTmVp
-dGhlciBvcHRpb24gaXMgcmVhbGlzdGljLiBXaXRoIGVuZGlhbi1jaGVja2luZyBlbmFibGVkIHRo
-ZSBxbGEyeHh4IA0KPj4gZHJpdmVyIHRyaWdnZXJzIHNvIG1hbnkgd2FybmluZ3MgdGhhdCBpdCBi
-ZWNvbWVzIGEgcmVhbCBjaGFsbGVuZ2UgdG8gDQo+PiBmaWx0ZXIgdGhlIG5vbi1lbmRpYW4gd2Fy
-bmluZ3Mgb3V0IG1hbnVhbGx5Og0KPj4gDQo+PiAkIGZvciBmIGluICIiIENGPS1EX19DSEVDS19F
-TkRJQU5fXzsgZG8gbWFrZSBNPWRyaXZlcnMvc2NzaS9xbGEyeHh4IEM9MlwNCj4+ICAgICAgJGYg
-fCAmZ3JlcCAtYyAnOiB3YXJuaW5nOic7IGRvbmUNCj4+IDQNCj4+IDc1Mg0KPg0KPllvdSBjYW4g
-YWx3YXlzIHJldmVydCB0aGlzIHBhdGNoIGluIHlvdXIgdHJlZSwgb3Igd2hhdGV2ZXIuICBJdCBk
-b2VzIG5vdA0KPmxvb2sgbGlrZSB0aGlzIHdpbGwgZ2V0IGZpeGVkIG90aGVyd2lzZS4NCj4NCj4+
-IElmIHlvdSB0aGluayBpdCB3b3VsZCBiZSBlYXN5IHRvIGZpeCB0aGUgZW5kaWFuIHdhcm5pbmdz
-IHRyaWdnZXJlZCBieSANCj4+IHRoZSBxbGEyeHh4IGRyaXZlciwgeW91IGFyZSB3ZWxjb21lIHRv
-IHRyeSB0byBmaXggdGhlc2UuDQo+PiANCj4+IEJhcnQuDQo+DQo+WWVhLCB0aGlzIGhhcmR3YXJl
-IHdhcyBkZXNpZ25lZCBieSBzb21lb25lIHdobyB0aG91Z2h0IG1peGluZw0KPkxFIGFuZCBCRSBh
-bGwgb3ZlciB0aGUgcGxhY2UgaXMgYSBnb29kIGlkZWEuDQo+QnV0IHdobyBzYWlkIGl0IHNob3Vs
-ZCBiZSBlYXN5Pw0KPg0KPk1heWJlIHRoaXMgY2hhbmdlIHdpbGwgYmUgZW5vdWdoIHRvIG1vdGl2
-YXRlIHRoZSBtYWludGFpbmVycy4NCj4NCj5IZXJlJ3MgYSBtaW5vciBidWdsZXQgZm9yIHlvdSBh
-cyBhIG1vdGl2YXRvcjoNCj4NCj4gICAgICAgICAgICAgICAgICAgICAgICBpZiAoY3RfcnNwLT5o
-ZWFkZXIucmVzcG9uc2UgIT0NCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgY3B1X3RvX2Jl
-MTYoQ1RfQUNDRVBUX1JFU1BPTlNFKSkgew0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgcWxfZGJnKHFsX2RiZ19kaXNjICsgcWxfZGJnX2J1ZmZlciwgdmhhLCAweDIwNzcsDQo+ICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIiVzIGZhaWxlZCByZWplY3RlZCByZXF1
-ZXN0IG9uIHBvcnRfaWQ6ICUwMnglMDJ4JTAyeCBDb21wZWx0aW9uIHN0YXR1cyAweCV4LCByZXNw
-b25zZSAweCV4XG4iLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJvdXRp
-bmUsIHZoYS0+ZF9pZC5iLmRvbWFpbiwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICB2aGEtPmRfaWQuYi5hcmVhLCB2aGEtPmRfaWQuYi5hbF9wYSwgY29tcF9zdGF0dXMsIGN0
-X3JzcC0+aGVhZGVyLnJlc3BvbnNlKTsNCj4NCj4NCj5yZXNwb25zZSBpcyBCRSBhbmQgaXNuJ3Qg
-cHJpbnRlZCBjb3JyZWN0bHkuDQo+DQo+YW5vdGhlcjoNCj4NCj4gICAgICAgIGVpdGVyLT5hLm1h
-eF9mcmFtZV9zaXplID0gY3B1X3RvX2JlMzIoZWl0ZXItPmEubWF4X2ZyYW1lX3NpemUpOw0KPiAg
-ICAgICAgc2l6ZSArPSA0ICsgNDsNCj4NCj4gICAgICAgIHFsX2RiZyhxbF9kYmdfZGlzYywgdmhh
-LCAweDIwYmMsDQo+ICAgICAgICAgICAgIk1heF9GcmFtZV9TaXplID0gJXguXG4iLCBlaXRlci0+
-YS5tYXhfZnJhbWVfc2l6ZSk7DQo+DQo+cHJpbnRlZCB0b28gbGF0ZSwgaXQncyBiZSBieSB0aGF0
-IHRpbWUuDQo+DQo+SGVyZSdzIGFub3RoZXIgc3VzcGljaW91cyBsaW5lDQo+DQo+ICAgICAgICBj
-dGlvMjQtPnUuc3RhdHVzMS5mbGFncyA9IChhdGlvLT51LmlzcDI0LmF0dHIgPDwgOSkgfA0KPiAg
-ICAgICAgICAgIGNwdV90b19sZTE2KENUSU83X0ZMQUdTX1NUQVRVU19NT0RFXzEgfA0KPiAgICAg
-ICAgICAgICAgICBDVElPN19GTEFHU19URVJNSU5BVEUpOw0KPg0KPnNoaWZ0aW5nIGF0dHIgYnkg
-OSBiaXRzIGdpdmVzIGRpZmZlcmVudCByZXN1bHRzIG9uIEJFIGFuZCBMRSwNCj5taXhpbmcgaXQg
-d2l0aCBsZTE2IGxvb2tzIHJhdGhlciBzdHJhbmdlLg0KPg0KPkFub3RoZXI6DQo+DQo+ICAgICAg
-ICAgICAgICAgIGhhLT5mbGFncy5kcG9ydF9lbmFibGVkID0NCj4gICAgICAgICAgICAgICAgICAg
-IChtaWRfaW5pdF9jYi0+aW5pdF9jYi5maXJtd2FyZV9vcHRpb25zXzEgJiBCSVRfNykgIT0gMDsN
-Cj4NCj5CSVRfNyBpcyBuYXRpdmUgZW5kaWFuLCBmaXJtd2FyZV9vcHRpb25zXzEgaXMgTEUgSSB0
-aGluay4NCj4NCj4NCj4NCj5Mb29rIGF0IHFsYTI3eHhfZmluZF92YWxpZF9pbWFnZSBhcyB3ZWxs
-Lg0KPg0KPiAgICAgICAgaWYgKHByaV9pbWFnZV9zdGF0dXMuc2lnbmF0dXJlICE9IFFMQTI3WFhf
-SU1HX1NUQVRVU19TSUdOKQ0KPg0KPnFsYTI3eHhfaW1hZ2Vfc3RhdHVzIHNlZW1zIHRvIGJlIGRh
-dGEgY29taW5nIGZyb20gZmxhc2gsIGJ1dCBpcw0KPnNvbWVob3cgbmF0aXZlLWVuZGlhbj8gTWF5
-YmUgLi4uDQo+DQo+DQo+ICAgICAgICBsdW4gPSBhLT51LmlzcDI0LmZjcF9jbW5kLmx1bjsNCj4N
-Cj5JIHRoaW5rIGx1biBoZXJlIGlzIGluIGhhcmR3YXJlIGZvcm1hdCAobGU/KSwgY29kZSB0cmVh
-dHMgaXQNCj5hcyBuYXRpdmUuDQo+DQo+DQo+Tm90IHRvIHNwZWFrIGFib3V0IGludGVyZmFjZSBh
-YnVzZSBhbGwgb3ZlciB0aGUgcGxhY2UuDQo+SG93IGFib3V0IHRoaXM6DQo+DQo+dWludDMyX3Qg
-Kg0KPnFsYTI0eHhfcmVhZF9mbGFzaF9kYXRhKHNjc2lfcWxhX2hvc3RfdCAqdmhhLCB1aW50MzJf
-dCAqZHdwdHIsIHVpbnQzMl90DQo+ZmFkZHIsDQo+ICAgIHVpbnQzMl90IGR3b3JkcykgICAgICAg
-ICAgICAgICAgICAgICANCj57DQo+ICAgICAgICB1aW50MzJfdCBpOyAgICAgICAgICAgICAgICAg
-ICAgIA0KPiAgICAgICAgc3RydWN0IHFsYV9od19kYXRhICpoYSA9IHZoYS0+aHc7DQo+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KPiAgICAgICAgLyogRHdvcmQgcmVh
-ZHMgdG8gZmxhc2guICovDQo+ICAgICAgICBmb3IgKGkgPSAwOyBpIDwgZHdvcmRzOyBpKyssIGZh
-ZGRyKyspDQo+ICAgICAgICAgICAgICAgIGR3cHRyW2ldID0gY3B1X3RvX2xlMzIocWxhMjR4eF9y
-ZWFkX2ZsYXNoX2R3b3JkKGhhLA0KPiAgICAgICAgICAgICAgICAgICAgZmxhc2hfZGF0YV9hZGRy
-KGhhLCBmYWRkcikpKTsNCj4NCj4gICAgICAgIHJldHVybiBkd3B0cjsgICAgICAgICAgICAgICAg
-ICAgDQo+fQ0KPg0KPk9LIHNvIHdlIGNvbnZlcnQgdG8gTEUgLi4uDQo+DQo+ICAgICAgICAgICAg
-ICAgIHFsYTI0eHhfcmVhZF9mbGFzaF9kYXRhKHZoYSwgZGNvZGUsIGZhZGRyLCA0KTsgDQo+ICAg
-IA0KPiAgICAgICAgICAgICAgICByaXNjX2FkZHIgPSBiZTMyX3RvX2NwdShkY29kZVsyXSk7DQo+
-ICAgICAgICAgICAgICAgICpzcmlzY19hZGRyID0gKnNyaXNjX2FkZHIgPT0gMCA/IHJpc2NfYWRk
-ciA6ICpzcmlzY19hZGRyOw0KPiAgICAgICAgICAgICAgICByaXNjX3NpemUgPSBiZTMyX3RvX2Nw
-dShkY29kZVszXSk7DQo+DQo+dGhlbiBoYXBwaWx5IGFzc3VtZSBpdCdzIEJFLg0KPg0KPkFuZCBh
-Z2FpbiwgY29taW5nIGZyb20gZmxhc2gsIGl0J3MgdW5saWtlbHkgdG8gYWN0dWFsbHkgYmUgaW4g
-dGhlIG5hdGl2ZQ0KPmVuZGlhbi1uZXNzIGFzIGNhbGxlcnMgc2VlbSB0byBhc3N1bWUuIEknbSBn
-dWVzc2luZyBpdCdzIGFsbCBCRS4NCj4NCj5JIHBva2VkIGF0IGl0IGEgYml0IGFuZCB3YXMgYWJs
-ZSB0byBjdXQgZG93biAjIG9mIHdhcm5pbmdzDQo+ZnJvbSAxNzAwIHRvIDE0MDAgaW4gYW4gaG91
-ci4gU29tZW9uZSBmYW1pbGlhciB3aXRoIHRoZSBjb2RlDQo+c2hvdWxkIGxvb2sgYXQgaXQuDQoN
-Cldl4oCZbGwgdGFrZSBhIGxvb2sgYW5kIHNlbmQgcGF0Y2hlcyB0byByZXNvbHZlIHRoZXNlIHdh
-cm5pbmdzLiANCg0KPg0KPi0tIA0KPk1TVA0KPl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fDQo+VmlydHVhbGl6YXRpb24gbWFpbGluZyBsaXN0DQo+VmlydHVh
-bGl6YXRpb25AbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmcNCj5odHRwczovL2xpc3RzLmxpbnV4
-Zm91bmRhdGlvbi5vcmcvbWFpbG1hbi9saXN0aW5mby92aXJ0dWFsaXphdGlvbg0K
+
+
+On 08/12/16 10:19, Ryder Lee wrote:
+> Hello,
+>
+> On Mon, 2016-12-05 at 11:18 +0100, Matthias Brugger wrote:
+>>
+>> On 05/12/16 08:01, Ryder Lee wrote:
+>>> Add DT bindings documentation for the crypto driver
+>>>
+>>> Signed-off-by: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
+>>> ---
+>>>  .../devicetree/bindings/crypto/mediatek-crypto.txt | 32 ++++++++++++++++++++++
+>>>  1 file changed, 32 insertions(+)
+>>>  create mode 100644 Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt b/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+>>> new file mode 100644
+>>> index 0000000..8b1db08
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+>>> @@ -0,0 +1,32 @@
+>>> +MediaTek cryptographic accelerators
+>>> +
+>>> +Required properties:
+>>> +- compatible: Should be "mediatek,mt7623-crypto"
+>>
+>> Do you know how big the difference is between the crypto engine for
+>> mt7623/mt2701/mt8521p in comparison, let's say mt8173 or mt6797?
+>> Do this SoCs have a crypot engine? If so and they are quite similar, we
+>> might think of adding a mtk-crypto binding and add soc specific bindings.
+>
+> This engine is just available in mt7623/mt2701/mt8521p series SoCs and
+> they have no difference.
+>
+> But there are still other crypto IPs in MTK, i think maybe we could use
+> "mediatek,{IP name}-crypto” to distinguish them ?
+>
+
+Sounds good, thanks for the clarification.
+
+Matthias
+
+
+>> Regards,
+>> Matthias
+>>
+>>> +- reg: Address and length of the register set for the device
+>>> +- interrupts: Should contain the five crypto engines interrupts in numeric
+>>> +	order. These are global system and four descriptor rings.
+>>> +- clocks: the clock used by the core
+>>> +- clock-names: the names of the clock listed in the clocks property. These are
+>>> +	"ethif", "cryp"
+>>> +- power-domains: Must contain a reference to the PM domain.
+>>> +
+>>> +
+>>> +Optional properties:
+>>> +- interrupt-parent: Should be the phandle for the interrupt controller
+>>> +  that services interrupts for this device
+>>> +
+>>> +
+>>> +Example:
+>>> +	crypto: crypto@1b240000 {
+>>> +		compatible = "mediatek,mt7623-crypto";
+>>> +		reg = <0 0x1b240000 0 0x20000>;
+>>> +		interrupts = <GIC_SPI 82 IRQ_TYPE_LEVEL_LOW>,
+>>> +			     <GIC_SPI 83 IRQ_TYPE_LEVEL_LOW>,
+>>> +			     <GIC_SPI 84 IRQ_TYPE_LEVEL_LOW>,
+>>> +			     <GIC_SPI 91 IRQ_TYPE_LEVEL_LOW>,
+>>> +			     <GIC_SPI 97 IRQ_TYPE_LEVEL_LOW>;
+>>> +		clocks = <&topckgen CLK_TOP_ETHIF_SEL>,
+>>> +			 <&ethsys CLK_ETHSYS_CRYPTO>;
+>>> +		clock-names = "ethif","cryp";
+>>> +		power-domains = <&scpsys MT2701_POWER_DOMAIN_ETH>;
+>>> +	};
+>>>
+>
+>
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
