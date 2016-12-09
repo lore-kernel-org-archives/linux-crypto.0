@@ -1,76 +1,81 @@
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH v6 1/2] sparc: fix a building error reported by kbuild
-Date: Fri, 9 Dec 2016 22:58:51 +0100
-Message-ID: <20161209215851.GA7717@ravnborg.org>
-References: <1481171829-116496-1-git-send-email-arei.gonglei@huawei.com>
- <1481171829-116496-2-git-send-email-arei.gonglei@huawei.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Remaining crypto API regressions with CONFIG_VMAP_STACK
+Date: Fri, 9 Dec 2016 15:08:51 -0800
+Message-ID: <20161209230851.GB64048@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org,
-        virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, luonengjun@huawei.com,
-        mst@redhat.com, stefanha@redhat.com, weidong.huang@huawei.com,
-        wu.wubin@huawei.com, xin.zeng@intel.com,
-        claudio.fontana@huawei.com, herbert@gondor.apana.org.au,
-        pasic@linux.vnet.ibm.com, davem@davemloft.net,
-        jianjay.zhou@huawei.com, hanweidong@huawei.com,
-        arei.gonglei@hotmail.com, cornelia.huck@de.ibm.com,
-        xuquan8@huawei.com, longpeng2@huawei.com, wanzongshun@huawei.com,
-        sparclinux@vger.kernel.org
-To: Gonglei <arei.gonglei@huawei.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:51305 "EHLO
-        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753109AbcLIV7C (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Dec 2016 16:59:02 -0500
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kernel-hardening@lists.openwall.com,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Andrew Lutomirski <luto@kernel.org>,
+	Stephan Mueller <smueller@chronox.de>
+To: linux-crypto@vger.kernel.org
+Return-path: <owner-linux-mm@kvack.org>
 Content-Disposition: inline
-In-Reply-To: <1481171829-116496-2-git-send-email-arei.gonglei@huawei.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Gonglei.
+In the 4.9 kernel, virtually-mapped stacks will be supported and enabled by
+default on x86_64.  This has been exposing a number of problems in which
+on-stack buffers are being passed into the crypto API, which to support crypto
+accelerators operates on 'struct page' rather than on virtual memory.
 
-On Thu, Dec 08, 2016 at 12:37:08PM +0800, Gonglei wrote:
-> >> arch/sparc/include/asm/topology_64.h:44:44:
-> error: implicit declaration of function 'cpu_data'
-> [-Werror=implicit-function-declaration]
-> 
->  #define topology_physical_package_id(cpu) (cpu_data(cpu).proc_id)
->                                                ^
-> Let's include cpudata.h in topology_64.h.
-> 
-> Cc: Sam Ravnborg <sam@ravnborg.org>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: sparclinux@vger.kernel.org
-> Suggested-by: Sam Ravnborg <sam@ravnborg.org>
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
+Some of these problems have already been fixed, but I was wondering how many
+problems remain, so I briefly looked through all the callers of sg_set_buf() and
+sg_init_one().  Overall I found quite a few remaining problems, detailed below.
 
-> ---
->  arch/sparc/include/asm/topology_64.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/sparc/include/asm/topology_64.h b/arch/sparc/include/asm/topology_64.h
-> index 7b4898a..2255430 100644
-> --- a/arch/sparc/include/asm/topology_64.h
-> +++ b/arch/sparc/include/asm/topology_64.h
-> @@ -4,6 +4,7 @@
->  #ifdef CONFIG_NUMA
->  
->  #include <asm/mmzone.h>
-> +#include <asm/cpudata.h>
+The following crypto drivers initialize a scatterlist to point into an
+ahash_request, which may have been allocated on the stack with
+AHASH_REQUEST_ON_STACK():
 
-Nitpick - if you are going to resend this patch, then please
-order the two includes in alphabetic order.
+	drivers/crypto/bfin_crc.c:351
+	drivers/crypto/qce/sha.c:299
+	drivers/crypto/sahara.c:973,988
+	drivers/crypto/talitos.c:1910
+	drivers/crypto/ccp/ccp-crypto-aes-cmac.c:105,119,142
+	drivers/crypto/ccp/ccp-crypto-sha.c:95,109,124
+	drivers/crypto/qce/sha.c:325
 
-For two includes this looks like bikeshedding, but when we add
-more having them in a defined arder prevents merge conflicts.
-And makes it readable too.
+The following crypto drivers initialize a scatterlist to point into an
+ablkcipher_request, which may have been allocated on the stack with
+SKCIPHER_REQUEST_ON_STACK():
 
-We also sometimes order the includes with the longest lines topmost,
-and lines with the ame length are ordered alphabetically.
-But this is not seen so often.
+	drivers/crypto/ccp/ccp-crypto-aes-xts.c:162
+	drivers/crypto/ccp/ccp-crypto-aes.c:94
 
-	Sam
+And these other places do crypto operations on buffers clearly on the stack:
+
+	drivers/net/wireless/intersil/orinoco/mic.c:72
+	drivers/usb/wusbcore/crypto.c:264
+	net/ceph/crypto.c:182
+	net/rxrpc/rxkad.c:737,1000
+	security/keys/encrypted-keys/encrypted.c:500
+	fs/cifs/smbencrypt.c:96
+
+Note: I almost certainly missed some, since I excluded places where the use of a
+stack buffer was not obvious to me.  I also excluded AEAD algorithms since there
+isn't an AEAD_REQUEST_ON_STACK() macro (yet).
+
+The "good" news with these bugs is that on x86_64 without CONFIG_DEBUG_SG=y or
+CONFIG_DEBUG_VIRTUAL=y, you can still do virt_to_page() and then page_address()
+on a vmalloc address and get back the same address, even though you aren't
+*supposed* to be able to do this.  This will make things still work for most
+people.  The bad news is that if you happen to have consumed just about 1 page
+(or N pages) of your stack at the time you call the crypto API, your stack
+buffer may actually span physically non-contiguous pages, so the crypto
+algorithm will scribble over some unrelated page.  Also, hardware crypto drivers
+which actually do operate on physical memory will break too.
+
+So I am wondering: is the best solution really to make all these crypto API
+algorithms and users use heap buffers, as opposed to something like maintaining
+a lowmem alias for the stack, or introducing a more general function to convert
+buffers (possibly in the vmalloc space) into scatterlists?  And if the current
+solution is desired, who is going to fix all of these bugs and when?
+
+Eric
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
