@@ -1,7 +1,7 @@
 From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH 5/7] hwrng: core: Move hwrng miscdev minor number to include/linux/miscdevice.h
-Date: Fri,  9 Dec 2016 15:21:37 +0100
-Message-ID: <1481293299-21697-5-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH 3/7] hwrng: core: Rewrite the header
+Date: Fri,  9 Dec 2016 15:21:35 +0100
+Message-ID: <1481293299-21697-3-git-send-email-clabbe.montjoie@gmail.com>
 References: <1481293299-21697-1-git-send-email-clabbe.montjoie@gmail.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         Corentin Labbe <clabbe.montjoie@gmail.com>
@@ -12,50 +12,62 @@ In-Reply-To: <1481293299-21697-1-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch move the define for hwrng's miscdev minor number to
-include/linux/miscdevice.h.
-It's better that all minor number are in the same place.
-Rename it to HWRNG_MINOR (from RNG_MISCDEV_MINOR) in he process since
-no other miscdev define have MISCDEV in their name.
+checkpatch have lot of complaint about header.
+Furthermore, the header have some offtopic/useless information.
+
+This patch rewrite a proper header.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- drivers/char/hw_random/core.c | 3 +--
- include/linux/miscdevice.h    | 1 +
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/char/hw_random/core.c | 38 +++++++++-----------------------------
+ 1 file changed, 9 insertions(+), 29 deletions(-)
 
 diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 7a2e496..1e1e385 100644
+index 7029246..a8e63ae 100644
 --- a/drivers/char/hw_random/core.c
 +++ b/drivers/char/hw_random/core.c
-@@ -26,7 +26,6 @@
+@@ -1,33 +1,13 @@
+ /*
+-        Added support for the AMD Geode LX RNG
+-	(c) Copyright 2004-2005 Advanced Micro Devices, Inc.
+-
+-	derived from
+-
+- 	Hardware driver for the Intel/AMD/VIA Random Number Generators (RNG)
+-	(c) Copyright 2003 Red Hat Inc <jgarzik@redhat.com>
+-
+- 	derived from
+-
+-        Hardware driver for the AMD 768 Random Number Generator (RNG)
+-        (c) Copyright 2001 Red Hat Inc <alan@redhat.com>
+-
+- 	derived from
+-
+-	Hardware driver for Intel i810 Random Number Generator (RNG)
+-	Copyright 2000,2001 Jeff Garzik <jgarzik@pobox.com>
+-	Copyright 2000,2001 Philipp Rumpf <prumpf@mandrakesoft.com>
+-
+-	Added generic RNG API
+-	Copyright 2006 Michael Buesch <m@bues.ch>
+-	Copyright 2005 (c) MontaVista Software, Inc.
+-
+-	Please read Documentation/hw_random.txt for details on use.
+-
+-	----------------------------------------------------------
+-	This software may be used and distributed according to the terms
+-        of the GNU General Public License, incorporated herein by reference.
+-
++ * hw_random/core.c: HWRNG core API
++ *
++ * Copyright 2006 Michael Buesch <m@bues.ch>
++ * Copyright 2005 (c) MontaVista Software, Inc.
++ *
++ * Please read Documentation/hw_random.txt for details on use.
++ *
++ * This software may be used and distributed according to the terms
++ * of the GNU General Public License, incorporated herein by reference.
+  */
  
- #define RNG_MODULE_NAME		"hw_random"
- #define PFX			RNG_MODULE_NAME ": "
--#define RNG_MISCDEV_MINOR	183 /* official */
- 
- static struct hwrng *current_rng;
- static struct task_struct *hwrng_fill;
-@@ -283,7 +282,7 @@ static const struct file_operations rng_chrdev_ops = {
- static const struct attribute_group *rng_dev_groups[];
- 
- static struct miscdevice rng_miscdev = {
--	.minor		= RNG_MISCDEV_MINOR,
-+	.minor		= HWRNG_MINOR,
- 	.name		= RNG_MODULE_NAME,
- 	.nodename	= "hwrng",
- 	.fops		= &rng_chrdev_ops,
-diff --git a/include/linux/miscdevice.h b/include/linux/miscdevice.h
-index 722698a..659f586 100644
---- a/include/linux/miscdevice.h
-+++ b/include/linux/miscdevice.h
-@@ -31,6 +31,7 @@
- #define SGI_MMTIMER		153
- #define STORE_QUEUE_MINOR	155	/* unused */
- #define I2O_MINOR		166
-+#define HWRNG_MINOR		183
- #define MICROCODE_MINOR		184
- #define VFIO_MINOR		196
- #define TUN_MINOR		200
+ #include <linux/device.h>
 -- 
 2.7.3
