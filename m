@@ -1,79 +1,76 @@
-From: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH v2 1/3] crypto: brcm: DT documentation for Broadcom SPU
- driver
-Date: Fri, 9 Dec 2016 15:26:18 -0600
-Message-ID: <20161209212618.gvjdjhmryobrmwrp@rob-hp-laptop>
-References: <1480714499-1476-1-git-send-email-rob.rice@broadcom.com>
- <1480714499-1476-2-git-send-email-rob.rice@broadcom.com>
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH v6 1/2] sparc: fix a building error reported by kbuild
+Date: Fri, 9 Dec 2016 22:58:51 +0100
+Message-ID: <20161209215851.GA7717@ravnborg.org>
+References: <1481171829-116496-1-git-send-email-arei.gonglei@huawei.com>
+ <1481171829-116496-2-git-send-email-arei.gonglei@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Jon Mason <jonmason-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org,
-        Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>,
-        Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>,
-        linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-        Steve Lin <steven.lin1-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
-To: Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org,
+        virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, luonengjun@huawei.com,
+        mst@redhat.com, stefanha@redhat.com, weidong.huang@huawei.com,
+        wu.wubin@huawei.com, xin.zeng@intel.com,
+        claudio.fontana@huawei.com, herbert@gondor.apana.org.au,
+        pasic@linux.vnet.ibm.com, davem@davemloft.net,
+        jianjay.zhou@huawei.com, hanweidong@huawei.com,
+        arei.gonglei@hotmail.com, cornelia.huck@de.ibm.com,
+        xuquan8@huawei.com, longpeng2@huawei.com, wanzongshun@huawei.com,
+        sparclinux@vger.kernel.org
+To: Gonglei <arei.gonglei@huawei.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from asavdk3.altibox.net ([109.247.116.14]:51305 "EHLO
+        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753109AbcLIV7C (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Dec 2016 16:59:02 -0500
 Content-Disposition: inline
-In-Reply-To: <1480714499-1476-2-git-send-email-rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1481171829-116496-2-git-send-email-arei.gonglei@huawei.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 02, 2016 at 04:34:57PM -0500, Rob Rice wrote:
-> Device tree documentation for Broadcom Secure Processing Unit
-> (SPU) crypto driver.
+Hi Gonglei.
+
+On Thu, Dec 08, 2016 at 12:37:08PM +0800, Gonglei wrote:
+> >> arch/sparc/include/asm/topology_64.h:44:44:
+> error: implicit declaration of function 'cpu_data'
+> [-Werror=implicit-function-declaration]
 > 
-> Signed-off-by: Steve Lin <steven.lin1-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
-> Signed-off-by: Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+>  #define topology_physical_package_id(cpu) (cpu_data(cpu).proc_id)
+>                                                ^
+> Let's include cpudata.h in topology_64.h.
+> 
+> Cc: Sam Ravnborg <sam@ravnborg.org>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: sparclinux@vger.kernel.org
+> Suggested-by: Sam Ravnborg <sam@ravnborg.org>
+> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
+
 > ---
->  .../devicetree/bindings/crypto/brcm,spu-crypto.txt | 25 ++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
+>  arch/sparc/include/asm/topology_64.h | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt b/Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
-> new file mode 100644
-> index 0000000..e5fe942
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
-> @@ -0,0 +1,25 @@
-> +The Broadcom Secure Processing Unit (SPU) driver supports symmetric
+> diff --git a/arch/sparc/include/asm/topology_64.h b/arch/sparc/include/asm/topology_64.h
+> index 7b4898a..2255430 100644
+> --- a/arch/sparc/include/asm/topology_64.h
+> +++ b/arch/sparc/include/asm/topology_64.h
+> @@ -4,6 +4,7 @@
+>  #ifdef CONFIG_NUMA
+>  
+>  #include <asm/mmzone.h>
+> +#include <asm/cpudata.h>
 
-Bindings describe h/w, not drivers.
+Nitpick - if you are going to resend this patch, then please
+order the two includes in alphabetic order.
 
-> +cryptographic offload for Broadcom SoCs with SPU hardware. A SoC may have
-> +multiple SPU hardware blocks.
-> +
-> +Required properties:
-> +- compatible : Should be "brcm,spum-crypto" for devices with SPU-M hardware
+For two includes this looks like bikeshedding, but when we add
+more having them in a defined arder prevents merge conflicts.
+And makes it readable too.
 
-Additionally, you should have SoC specific compatible here.
+We also sometimes order the includes with the longest lines topmost,
+and lines with the ame length are ordered alphabetically.
+But this is not seen so often.
 
-> +  (e.g., Northstar2) or "brcm,spum-nsp-crypto" for the Northstar Plus variant
-> +  of the SPU-M hardware.
-> +
-> +- reg: Should contain SPU registers location and length.
-> +- mboxes: A list of mailbox channels to be used by the kernel driver. Mailbox
-> +channels correspond to DMA rings on the device.
-
-What determines the mbox assignment?
-
-Needs to specify how many.
-
-> +
-> +Example:
-> +	spu-crypto@612d0000 {
-
-Just crypto@...
-
-Rob
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+	Sam
