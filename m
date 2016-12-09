@@ -1,307 +1,731 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 1/3] crypto: chacha20 - convert generic and x86 versions to skcipher
-Date: Fri,  9 Dec 2016 14:33:51 +0000
-Message-ID: <1481294033-23508-2-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 3/3] crypto: arm/chacha20 - implement NEON version based on SSE3 code
+Date: Fri,  9 Dec 2016 14:33:53 +0000
+Message-ID: <1481294033-23508-4-git-send-email-ard.biesheuvel@linaro.org>
 References: <1481294033-23508-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wj0-f172.google.com ([209.85.210.172]:34521 "EHLO
-        mail-wj0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932594AbcLIOeD (ORCPT
+Received: from mail-wj0-f180.google.com ([209.85.210.180]:36390 "EHLO
+        mail-wj0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932712AbcLIOeH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Dec 2016 09:34:03 -0500
-Received: by mail-wj0-f172.google.com with SMTP id tg4so16163076wjb.1
-        for <linux-crypto@vger.kernel.org>; Fri, 09 Dec 2016 06:34:02 -0800 (PST)
+        Fri, 9 Dec 2016 09:34:07 -0500
+Received: by mail-wj0-f180.google.com with SMTP id tk12so16142874wjb.3
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Dec 2016 06:34:06 -0800 (PST)
 In-Reply-To: <1481294033-23508-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This converts the ChaCha20 code from a blkcipher to a skcipher, which
-is now the preferred way to implement symmetric block and stream ciphers.
-
-This ports the generic and x86 versions at the same time because the
-latter reuses routines of the former.
-
-Note that the skcipher_walk() API guarantees that all presented blocks
-except the final one are a multiple of the chunk size, so we can simplify
-the encrypt() routine somewhat.
+This is a straight port to ARM/NEON of the x86 SSE3 implementation
+of the ChaCha20 stream cipher.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/x86/crypto/chacha20_glue.c | 69 +++++++++---------
- crypto/chacha20_generic.c       | 73 ++++++++------------
- include/crypto/chacha20.h       |  6 +-
- 3 files changed, 64 insertions(+), 84 deletions(-)
+ arch/arm/crypto/Kconfig              |   6 +
+ arch/arm/crypto/Makefile             |   2 +
+ arch/arm/crypto/chacha20-neon-core.S | 524 ++++++++++++++++++++
+ arch/arm/crypto/chacha20-neon-glue.c | 127 +++++
+ 4 files changed, 659 insertions(+)
 
-diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha20_glue.c
-index f910d1d449f0..78f75b07dc25 100644
---- a/arch/x86/crypto/chacha20_glue.c
-+++ b/arch/x86/crypto/chacha20_glue.c
-@@ -11,7 +11,7 @@
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index 13f1b4c289d4..2f3339f015d3 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -130,4 +130,10 @@ config CRYPTO_CRC32_ARM_CE
+ 	depends on KERNEL_MODE_NEON && CRC32
+ 	select CRYPTO_HASH
  
- #include <crypto/algapi.h>
- #include <crypto/chacha20.h>
--#include <linux/crypto.h>
++config CRYPTO_CHACHA20_NEON
++	tristate "NEON accelerated ChaCha20 symmetric cipher"
++	depends on KERNEL_MODE_NEON
++	select CRYPTO_BLKCIPHER
++	select CRYPTO_CHACHA20
++
+ endif
+diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+index b578a1820ab1..8d74e55eacd4 100644
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -8,6 +8,7 @@ obj-$(CONFIG_CRYPTO_SHA1_ARM) += sha1-arm.o
+ obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sha1-arm-neon.o
+ obj-$(CONFIG_CRYPTO_SHA256_ARM) += sha256-arm.o
+ obj-$(CONFIG_CRYPTO_SHA512_ARM) += sha512-arm.o
++obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha20-neon.o
+ 
+ ce-obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
+ ce-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
+@@ -40,6 +41,7 @@ aes-arm-ce-y	:= aes-ce-core.o aes-ce-glue.o
+ ghash-arm-ce-y	:= ghash-ce-core.o ghash-ce-glue.o
+ crct10dif-arm-ce-y	:= crct10dif-ce-core.o crct10dif-ce-glue.o
+ crc32-arm-ce-y:= crc32-ce-core.o crc32-ce-glue.o
++chacha20-neon-y := chacha20-neon-core.o chacha20-neon-glue.o
+ 
+ quiet_cmd_perl = PERL    $@
+       cmd_perl = $(PERL) $(<) > $(@)
+diff --git a/arch/arm/crypto/chacha20-neon-core.S b/arch/arm/crypto/chacha20-neon-core.S
+new file mode 100644
+index 000000000000..ff1d337bdb4a
+--- /dev/null
++++ b/arch/arm/crypto/chacha20-neon-core.S
+@@ -0,0 +1,524 @@
++/*
++ * ChaCha20 256-bit cipher algorithm, RFC7539, ARM NEON functions
++ *
++ * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * Based on:
++ * ChaCha20 256-bit cipher algorithm, RFC7539, x64 SSE3 functions
++ *
++ * Copyright (C) 2015 Martin Willi
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ */
++
++#include <linux/linkage.h>
++
++	.text
++	.fpu		neon
++	.align		5
++
++ENTRY(chacha20_block_xor_neon)
++	// r0: Input state matrix, s
++	// r1: 1 data block output, o
++	// r2: 1 data block input, i
++
++	//
++	// This function encrypts one ChaCha20 block by loading the state matrix
++	// in four NEON registers. It performs matrix operation on four words in
++	// parallel, but requireds shuffling to rearrange the words after each
++	// round.
++	//
++
++	// x0..3 = s0..3
++	add		ip, r0, #0x20
++	vld1.32		{q0-q1}, [r0]
++	vld1.32		{q2-q3}, [ip]
++
++	vmov		q8, q0
++	vmov		q9, q1
++	vmov		q10, q2
++	vmov		q11, q3
++
++	mov		r3, #10
++
++.Ldoubleround:
++	// x0 += x1, x3 = rotl32(x3 ^ x0, 16)
++	vadd.i32	q0, q0, q1
++	veor		q4, q3, q0
++	vshl.u32	q3, q4, #16
++	vsri.u32	q3, q4, #16
++
++	// x2 += x3, x1 = rotl32(x1 ^ x2, 12)
++	vadd.i32	q2, q2, q3
++	veor		q4, q1, q2
++	vshl.u32	q1, q4, #12
++	vsri.u32	q1, q4, #20
++
++	// x0 += x1, x3 = rotl32(x3 ^ x0, 8)
++	vadd.i32	q0, q0, q1
++	veor		q4, q3, q0
++	vshl.u32	q3, q4, #8
++	vsri.u32	q3, q4, #24
++
++	// x2 += x3, x1 = rotl32(x1 ^ x2, 7)
++	vadd.i32	q2, q2, q3
++	veor		q4, q1, q2
++	vshl.u32	q1, q4, #7
++	vsri.u32	q1, q4, #25
++
++	// x1 = shuffle32(x1, MASK(0, 3, 2, 1))
++	vext.8		q1, q1, q1, #4
++	// x2 = shuffle32(x2, MASK(1, 0, 3, 2))
++	vext.8		q2, q2, q2, #8
++	// x3 = shuffle32(x3, MASK(2, 1, 0, 3))
++	vext.8		q3, q3, q3, #12
++
++	// x0 += x1, x3 = rotl32(x3 ^ x0, 16)
++	vadd.i32	q0, q0, q1
++	veor		q4, q3, q0
++	vshl.u32	q3, q4, #16
++	vsri.u32	q3, q4, #16
++
++	// x2 += x3, x1 = rotl32(x1 ^ x2, 12)
++	vadd.i32	q2, q2, q3
++	veor		q4, q1, q2
++	vshl.u32	q1, q4, #12
++	vsri.u32	q1, q4, #20
++
++	// x0 += x1, x3 = rotl32(x3 ^ x0, 8)
++	vadd.i32	q0, q0, q1
++	veor		q4, q3, q0
++	vshl.u32	q3, q4, #8
++	vsri.u32	q3, q4, #24
++
++	// x2 += x3, x1 = rotl32(x1 ^ x2, 7)
++	vadd.i32	q2, q2, q3
++	veor		q4, q1, q2
++	vshl.u32	q1, q4, #7
++	vsri.u32	q1, q4, #25
++
++	// x1 = shuffle32(x1, MASK(2, 1, 0, 3))
++	vext.8		q1, q1, q1, #12
++	// x2 = shuffle32(x2, MASK(1, 0, 3, 2))
++	vext.8		q2, q2, q2, #8
++	// x3 = shuffle32(x3, MASK(0, 3, 2, 1))
++	vext.8		q3, q3, q3, #4
++
++	subs		r3, r3, #1
++	bne		.Ldoubleround
++
++	add		ip, r2, #0x20
++	vld1.8		{q4-q5}, [r2]
++	vld1.8		{q6-q7}, [ip]
++
++	// o0 = i0 ^ (x0 + s0)
++	vadd.i32	q0, q0, q8
++	veor		q0, q0, q4
++
++	// o1 = i1 ^ (x1 + s1)
++	vadd.i32	q1, q1, q9
++	veor		q1, q1, q5
++
++	// o2 = i2 ^ (x2 + s2)
++	vadd.i32	q2, q2, q10
++	veor		q2, q2, q6
++
++	// o3 = i3 ^ (x3 + s3)
++	vadd.i32	q3, q3, q11
++	veor		q3, q3, q7
++
++	add		ip, r1, #0x20
++	vst1.8		{q0-q1}, [r1]
++	vst1.8		{q2-q3}, [ip]
++
++	bx		lr
++ENDPROC(chacha20_block_xor_neon)
++
++	.align		5
++ENTRY(chacha20_4block_xor_neon)
++	push		{r4-r6, lr}
++	mov		ip, sp			// preserve the stack pointer
++	sub		r3, sp, #0x20		// allocate a 32 byte buffer
++	bic		r3, r3, #0x1f		// aligned to 32 bytes
++	mov		sp, r3
++
++	// r0: Input state matrix, s
++	// r1: 4 data blocks output, o
++	// r2: 4 data blocks input, i
++
++	//
++	// This function encrypts four consecutive ChaCha20 blocks by loading
++	// the state matrix in NEON registers four times. The algorithm performs
++	// each operation on the corresponding word of each state matrix, hence
++	// requires no word shuffling. For final XORing step we transpose the
++	// matrix by interleaving 32- and then 64-bit words, which allows us to
++	// do XOR in NEON registers.
++	//
++
++	// x0..15[0-3] = s0..3[0..3]
++	add		r3, r0, #0x20
++	vld1.32		{q0-q1}, [r0]
++	vld1.32		{q2-q3}, [r3]
++
++	adr		r3, CTRINC
++	vdup.32		q15, d7[1]
++	vdup.32		q14, d7[0]
++	vld1.32		{q11}, [r3, :128]
++	vdup.32		q13, d6[1]
++	vdup.32		q12, d6[0]
++	vadd.i32	q12, q12, q11		// x12 += counter values 0-3
++	vdup.32		q11, d5[1]
++	vdup.32		q10, d5[0]
++	vdup.32		q9, d4[1]
++	vdup.32		q8, d4[0]
++	vdup.32		q7, d3[1]
++	vdup.32		q6, d3[0]
++	vdup.32		q5, d2[1]
++	vdup.32		q4, d2[0]
++	vdup.32		q3, d1[1]
++	vdup.32		q2, d1[0]
++	vdup.32		q1, d0[1]
++	vdup.32		q0, d0[0]
++
++	mov		r3, #10
++
++.Ldoubleround4:
++	// x0 += x4, x12 = rotl32(x12 ^ x0, 16)
++	// x1 += x5, x13 = rotl32(x13 ^ x1, 16)
++	// x2 += x6, x14 = rotl32(x14 ^ x2, 16)
++	// x3 += x7, x15 = rotl32(x15 ^ x3, 16)
++	vadd.i32	q0, q0, q4
++	vadd.i32	q1, q1, q5
++	vadd.i32	q2, q2, q6
++	vadd.i32	q3, q3, q7
++
++	veor		q12, q12, q0
++	veor		q13, q13, q1
++	veor		q14, q14, q2
++	veor		q15, q15, q3
++
++	vrev32.16	q12, q12
++	vrev32.16	q13, q13
++	vrev32.16	q14, q14
++	vrev32.16	q15, q15
++
++	// x8 += x12, x4 = rotl32(x4 ^ x8, 12)
++	// x9 += x13, x5 = rotl32(x5 ^ x9, 12)
++	// x10 += x14, x6 = rotl32(x6 ^ x10, 12)
++	// x11 += x15, x7 = rotl32(x7 ^ x11, 12)
++	vadd.i32	q8, q8, q12
++	vadd.i32	q9, q9, q13
++	vadd.i32	q10, q10, q14
++	vadd.i32	q11, q11, q15
++
++	vst1.32		{q8-q9}, [sp, :256]
++
++	veor		q8, q4, q8
++	veor		q9, q5, q9
++	vshl.u32	q4, q8, #12
++	vshl.u32	q5, q9, #12
++	vsri.u32	q4, q8, #20
++	vsri.u32	q5, q9, #20
++
++	veor		q8, q6, q10
++	veor		q9, q7, q11
++	vshl.u32	q6, q8, #12
++	vshl.u32	q7, q9, #12
++	vsri.u32	q6, q8, #20
++	vsri.u32	q7, q9, #20
++
++	// x0 += x4, x12 = rotl32(x12 ^ x0, 8)
++	// x1 += x5, x13 = rotl32(x13 ^ x1, 8)
++	// x2 += x6, x14 = rotl32(x14 ^ x2, 8)
++	// x3 += x7, x15 = rotl32(x15 ^ x3, 8)
++	vadd.i32	q0, q0, q4
++	vadd.i32	q1, q1, q5
++	vadd.i32	q2, q2, q6
++	vadd.i32	q3, q3, q7
++
++	veor		q8, q12, q0
++	veor		q9, q13, q1
++	vshl.u32	q12, q8, #8
++	vshl.u32	q13, q9, #8
++	vsri.u32	q12, q8, #24
++	vsri.u32	q13, q9, #24
++
++	veor		q8, q14, q2
++	veor		q9, q15, q3
++	vshl.u32	q14, q8, #8
++	vshl.u32	q15, q9, #8
++	vsri.u32	q14, q8, #24
++	vsri.u32	q15, q9, #24
++
++	vld1.32		{q8-q9}, [sp, :256]
++
++	// x8 += x12, x4 = rotl32(x4 ^ x8, 7)
++	// x9 += x13, x5 = rotl32(x5 ^ x9, 7)
++	// x10 += x14, x6 = rotl32(x6 ^ x10, 7)
++	// x11 += x15, x7 = rotl32(x7 ^ x11, 7)
++	vadd.i32	q8, q8, q12
++	vadd.i32	q9, q9, q13
++	vadd.i32	q10, q10, q14
++	vadd.i32	q11, q11, q15
++
++	vst1.32		{q8-q9}, [sp, :256]
++
++	veor		q8, q4, q8
++	veor		q9, q5, q9
++	vshl.u32	q4, q8, #7
++	vshl.u32	q5, q9, #7
++	vsri.u32	q4, q8, #25
++	vsri.u32	q5, q9, #25
++
++	veor		q8, q6, q10
++	veor		q9, q7, q11
++	vshl.u32	q6, q8, #7
++	vshl.u32	q7, q9, #7
++	vsri.u32	q6, q8, #25
++	vsri.u32	q7, q9, #25
++
++	vld1.32		{q8-q9}, [sp, :256]
++
++	// x0 += x5, x15 = rotl32(x15 ^ x0, 16)
++	// x1 += x6, x12 = rotl32(x12 ^ x1, 16)
++	// x2 += x7, x13 = rotl32(x13 ^ x2, 16)
++	// x3 += x4, x14 = rotl32(x14 ^ x3, 16)
++	vadd.i32	q0, q0, q5
++	vadd.i32	q1, q1, q6
++	vadd.i32	q2, q2, q7
++	vadd.i32	q3, q3, q4
++
++	veor		q15, q15, q0
++	veor		q12, q12, q1
++	veor		q13, q13, q2
++	veor		q14, q14, q3
++
++	vrev32.16	q15, q15
++	vrev32.16	q12, q12
++	vrev32.16	q13, q13
++	vrev32.16	q14, q14
++
++	// x10 += x15, x5 = rotl32(x5 ^ x10, 12)
++	// x11 += x12, x6 = rotl32(x6 ^ x11, 12)
++	// x8 += x13, x7 = rotl32(x7 ^ x8, 12)
++	// x9 += x14, x4 = rotl32(x4 ^ x9, 12)
++	vadd.i32	q10, q10, q15
++	vadd.i32	q11, q11, q12
++	vadd.i32	q8, q8, q13
++	vadd.i32	q9, q9, q14
++
++	vst1.32		{q8-q9}, [sp, :256]
++
++	veor		q8, q7, q8
++	veor		q9, q4, q9
++	vshl.u32	q7, q8, #12
++	vshl.u32	q4, q9, #12
++	vsri.u32	q7, q8, #20
++	vsri.u32	q4, q9, #20
++
++	veor		q8, q5, q10
++	veor		q9, q6, q11
++	vshl.u32	q5, q8, #12
++	vshl.u32	q6, q9, #12
++	vsri.u32	q5, q8, #20
++	vsri.u32	q6, q9, #20
++
++	// x0 += x5, x15 = rotl32(x15 ^ x0, 8)
++	// x1 += x6, x12 = rotl32(x12 ^ x1, 8)
++	// x2 += x7, x13 = rotl32(x13 ^ x2, 8)
++	// x3 += x4, x14 = rotl32(x14 ^ x3, 8)
++	vadd.i32	q0, q0, q5
++	vadd.i32	q1, q1, q6
++	vadd.i32	q2, q2, q7
++	vadd.i32	q3, q3, q4
++
++	veor		q8, q15, q0
++	veor		q9, q12, q1
++	vshl.u32	q15, q8, #8
++	vshl.u32	q12, q9, #8
++	vsri.u32	q15, q8, #24
++	vsri.u32	q12, q9, #24
++
++	veor		q8, q13, q2
++	veor		q9, q14, q3
++	vshl.u32	q13, q8, #8
++	vshl.u32	q14, q9, #8
++	vsri.u32	q13, q8, #24
++	vsri.u32	q14, q9, #24
++
++	vld1.32		{q8-q9}, [sp, :256]
++
++	// x10 += x15, x5 = rotl32(x5 ^ x10, 7)
++	// x11 += x12, x6 = rotl32(x6 ^ x11, 7)
++	// x8 += x13, x7 = rotl32(x7 ^ x8, 7)
++	// x9 += x14, x4 = rotl32(x4 ^ x9, 7)
++	vadd.i32	q10, q10, q15
++	vadd.i32	q11, q11, q12
++	vadd.i32	q8, q8, q13
++	vadd.i32	q9, q9, q14
++
++	vst1.32		{q8-q9}, [sp, :256]
++
++	veor		q8, q7, q8
++	veor		q9, q4, q9
++	vshl.u32	q7, q8, #7
++	vshl.u32	q4, q9, #7
++	vsri.u32	q7, q8, #25
++	vsri.u32	q4, q9, #25
++
++	veor		q8, q5, q10
++	veor		q9, q6, q11
++	vshl.u32	q5, q8, #7
++	vshl.u32	q6, q9, #7
++	vsri.u32	q5, q8, #25
++	vsri.u32	q6, q9, #25
++
++	subs		r3, r3, #1
++	beq		0f
++
++	vld1.32		{q8-q9}, [sp, :256]
++	b		.Ldoubleround4
++
++	// x0[0-3] += s0[0]
++	// x1[0-3] += s0[1]
++	// x2[0-3] += s0[2]
++	// x3[0-3] += s0[3]
++0:	ldmia		r0!, {r3-r6}
++	vdup.32		q8, r3
++	vdup.32		q9, r4
++	vadd.i32	q0, q0, q8
++	vadd.i32	q1, q1, q9
++	vdup.32		q8, r5
++	vdup.32		q9, r6
++	vadd.i32	q2, q2, q8
++	vadd.i32	q3, q3, q9
++
++	// x4[0-3] += s1[0]
++	// x5[0-3] += s1[1]
++	// x6[0-3] += s1[2]
++	// x7[0-3] += s1[3]
++	ldmia		r0!, {r3-r6}
++	vdup.32		q8, r3
++	vdup.32		q9, r4
++	vadd.i32	q4, q4, q8
++	vadd.i32	q5, q5, q9
++	vdup.32		q8, r5
++	vdup.32		q9, r6
++	vadd.i32	q6, q6, q8
++	vadd.i32	q7, q7, q9
++
++	// interleave 32-bit words in state n, n+1
++	vzip.32		q0, q1
++	vzip.32		q2, q3
++	vzip.32		q4, q5
++	vzip.32		q6, q7
++
++	// interleave 64-bit words in state n, n+2
++	vswp		d1, d4
++	vswp		d3, d6
++	vswp		d9, d12
++	vswp		d11, d14
++
++	// xor with corresponding input, write to output
++	vld1.8		{q8-q9}, [r2]!
++	veor		q8, q8, q0
++	veor		q9, q9, q4
++	vst1.8		{q8-q9}, [r1]!
++
++	vld1.32		{q8-q9}, [sp, :256]
++
++	// x8[0-3] += s2[0]
++	// x9[0-3] += s2[1]
++	// x10[0-3] += s2[2]
++	// x11[0-3] += s2[3]
++	ldmia		r0!, {r3-r6}
++	vdup.32		q0, r3
++	vdup.32		q4, r4
++	vadd.i32	q8, q8, q0
++	vadd.i32	q9, q9, q4
++	vdup.32		q0, r5
++	vdup.32		q4, r6
++	vadd.i32	q10, q10, q0
++	vadd.i32	q11, q11, q4
++
++	// x12[0-3] += s3[0]
++	// x13[0-3] += s3[1]
++	// x14[0-3] += s3[2]
++	// x15[0-3] += s3[3]
++	ldmia		r0!, {r3-r6}
++	vdup.32		q0, r3
++	vdup.32		q4, r4
++	adr		r3, CTRINC
++	vadd.i32	q12, q12, q0
++	vld1.32		{q0}, [r3, :128]
++	vadd.i32	q13, q13, q4
++	vadd.i32	q12, q12, q0		// x12 += counter values 0-3
++
++	vdup.32		q0, r5
++	vdup.32		q4, r6
++	vadd.i32	q14, q14, q0
++	vadd.i32	q15, q15, q4
++
++	// interleave 32-bit words in state n, n+1
++	vzip.32		q8, q9
++	vzip.32		q10, q11
++	vzip.32		q12, q13
++	vzip.32		q14, q15
++
++	// interleave 64-bit words in state n, n+2
++	vswp		d17, d20
++	vswp		d19, d22
++	vswp		d25, d28
++	vswp		d27, d30
++
++	vmov		q4, q1
++
++	vld1.8		{q0-q1}, [r2]!
++	veor		q0, q0, q8
++	veor		q1, q1, q12
++	vst1.8		{q0-q1}, [r1]!
++
++	vld1.8		{q0-q1}, [r2]!
++	veor		q0, q0, q2
++	veor		q1, q1, q6
++	vst1.8		{q0-q1}, [r1]!
++
++	vld1.8		{q0-q1}, [r2]!
++	veor		q0, q0, q10
++	veor		q1, q1, q14
++	vst1.8		{q0-q1}, [r1]!
++
++	vld1.8		{q0-q1}, [r2]!
++	veor		q0, q0, q4
++	veor		q1, q1, q5
++	vst1.8		{q0-q1}, [r1]!
++
++	vld1.8		{q0-q1}, [r2]!
++	veor		q0, q0, q9
++	veor		q1, q1, q13
++	vst1.8		{q0-q1}, [r1]!
++
++	vld1.8		{q0-q1}, [r2]!
++	veor		q0, q0, q3
++	veor		q1, q1, q7
++	vst1.8		{q0-q1}, [r1]!
++
++	vld1.8		{q0-q1}, [r2]
++	veor		q0, q0, q11
++	veor		q1, q1, q15
++	vst1.8		{q0-q1}, [r1]
++
++	mov		sp, ip
++	pop		{r4-r6, pc}
++ENDPROC(chacha20_4block_xor_neon)
++
++	.align		4
++CTRINC:	.word		0, 1, 2, 3
++
+diff --git a/arch/arm/crypto/chacha20-neon-glue.c b/arch/arm/crypto/chacha20-neon-glue.c
+new file mode 100644
+index 000000000000..20623237e2bc
+--- /dev/null
++++ b/arch/arm/crypto/chacha20-neon-glue.c
+@@ -0,0 +1,127 @@
++/*
++ * ChaCha20 256-bit cipher algorithm, RFC7539, ARM NEON functions
++ *
++ * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * Based on:
++ * ChaCha20 256-bit cipher algorithm, RFC7539, SIMD glue code
++ *
++ * Copyright (C) 2015 Martin Willi
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ */
++
++#include <crypto/algapi.h>
++#include <crypto/chacha20.h>
 +#include <crypto/internal/skcipher.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <asm/fpu/api.h>
-@@ -63,36 +63,34 @@ static void chacha20_dosimd(u32 *state, u8 *dst, const u8 *src,
- 	}
- }
- 
--static int chacha20_simd(struct blkcipher_desc *desc, struct scatterlist *dst,
--			 struct scatterlist *src, unsigned int nbytes)
-+static int chacha20_simd(struct skcipher_request *req)
- {
--	u32 *state, state_buf[16 + (CHACHA20_STATE_ALIGN / sizeof(u32)) - 1];
--	struct blkcipher_walk walk;
++#include <linux/kernel.h>
++#include <linux/module.h>
++
++#include <asm/hwcap.h>
++#include <asm/neon.h>
++#include <asm/simd.h>
++
++asmlinkage void chacha20_block_xor_neon(u32 *state, u8 *dst, const u8 *src);
++asmlinkage void chacha20_4block_xor_neon(u32 *state, u8 *dst, const u8 *src);
++
++static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
++			    unsigned int bytes)
++{
++	u8 buf[CHACHA20_BLOCK_SIZE];
++
++	while (bytes >= CHACHA20_BLOCK_SIZE * 4) {
++		chacha20_4block_xor_neon(state, dst, src);
++		bytes -= CHACHA20_BLOCK_SIZE * 4;
++		src += CHACHA20_BLOCK_SIZE * 4;
++		dst += CHACHA20_BLOCK_SIZE * 4;
++		state[12] += 4;
++	}
++	while (bytes >= CHACHA20_BLOCK_SIZE) {
++		chacha20_block_xor_neon(state, dst, src);
++		bytes -= CHACHA20_BLOCK_SIZE;
++		src += CHACHA20_BLOCK_SIZE;
++		dst += CHACHA20_BLOCK_SIZE;
++		state[12]++;
++	}
++	if (bytes) {
++		memcpy(buf, src, bytes);
++		chacha20_block_xor_neon(state, buf, buf);
++		memcpy(dst, buf, bytes);
++	}
++}
++
++static int chacha20_neon(struct skcipher_request *req)
++{
 +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
 +	struct chacha20_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	u32 state[16] __aligned(CHACHA20_STATE_ALIGN);
 +	struct skcipher_walk walk;
- 	int err;
- 
--	if (nbytes <= CHACHA20_BLOCK_SIZE || !may_use_simd())
--		return crypto_chacha20_crypt(desc, dst, src, nbytes);
++	u32 state[16];
++	int err;
++
 +	if (req->cryptlen <= CHACHA20_BLOCK_SIZE || !may_use_simd())
 +		return crypto_chacha20_crypt(req);
- 
--	state = (u32 *)roundup((uintptr_t)state_buf, CHACHA20_STATE_ALIGN);
++
 +	err = skcipher_walk_virt(&walk, req, true);
- 
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt_block(desc, &walk, CHACHA20_BLOCK_SIZE);
--
--	crypto_chacha20_init(state, crypto_blkcipher_ctx(desc->tfm), walk.iv);
++
 +	crypto_chacha20_init(state, ctx, walk.iv);
- 
- 	kernel_fpu_begin();
- 
- 	while (walk.nbytes >= CHACHA20_BLOCK_SIZE) {
- 		chacha20_dosimd(state, walk.dst.virt.addr, walk.src.virt.addr,
- 				rounddown(walk.nbytes, CHACHA20_BLOCK_SIZE));
--		err = blkcipher_walk_done(desc, &walk,
--					  walk.nbytes % CHACHA20_BLOCK_SIZE);
-+		err = skcipher_walk_done(&walk,
-+					 walk.nbytes % CHACHA20_BLOCK_SIZE);
- 	}
- 
- 	if (walk.nbytes) {
- 		chacha20_dosimd(state, walk.dst.virt.addr, walk.src.virt.addr,
- 				walk.nbytes);
--		err = blkcipher_walk_done(desc, &walk, 0);
-+		err = skcipher_walk_done(&walk, 0);
- 	}
- 
- 	kernel_fpu_end();
-@@ -100,27 +98,22 @@ static int chacha20_simd(struct blkcipher_desc *desc, struct scatterlist *dst,
- 	return err;
- }
- 
--static struct crypto_alg alg = {
--	.cra_name		= "chacha20",
--	.cra_driver_name	= "chacha20-simd",
--	.cra_priority		= 300,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
--	.cra_blocksize		= 1,
--	.cra_type		= &crypto_blkcipher_type,
--	.cra_ctxsize		= sizeof(struct chacha20_ctx),
--	.cra_alignmask		= sizeof(u32) - 1,
--	.cra_module		= THIS_MODULE,
--	.cra_u			= {
--		.blkcipher = {
--			.min_keysize	= CHACHA20_KEY_SIZE,
--			.max_keysize	= CHACHA20_KEY_SIZE,
--			.ivsize		= CHACHA20_IV_SIZE,
--			.geniv		= "seqiv",
--			.setkey		= crypto_chacha20_setkey,
--			.encrypt	= chacha20_simd,
--			.decrypt	= chacha20_simd,
--		},
--	},
++
++	kernel_neon_begin();
++	while (walk.nbytes > 0) {
++		unsigned int nbytes = walk.nbytes;
++
++		if (nbytes < walk.total)
++			nbytes = round_down(nbytes, walk.chunksize);
++
++		chacha20_doneon(state, walk.dst.virt.addr, walk.src.virt.addr,
++				nbytes);
++		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
++	}
++	kernel_neon_end();
++
++	return err;
++}
++
 +static struct skcipher_alg alg = {
 +	.base.cra_name		= "chacha20",
-+	.base.cra_driver_name	= "chacha20-simd",
++	.base.cra_driver_name	= "chacha20-neon",
 +	.base.cra_priority	= 300,
 +	.base.cra_blocksize	= 1,
 +	.base.cra_ctxsize	= sizeof(struct chacha20_ctx),
-+	.base.cra_alignmask	= sizeof(u32) - 1,
++	.base.cra_alignmask	= 1,
 +	.base.cra_module	= THIS_MODULE,
 +
 +	.min_keysize		= CHACHA20_KEY_SIZE,
 +	.max_keysize		= CHACHA20_KEY_SIZE,
 +	.ivsize			= CHACHA20_IV_SIZE,
-+	.chunksize		= CHACHA20_BLOCK_SIZE,
++	.chunksize		= 4 * CHACHA20_BLOCK_SIZE,
 +	.setkey			= crypto_chacha20_setkey,
-+	.encrypt		= chacha20_simd,
-+	.decrypt		= chacha20_simd,
- };
- 
- static int __init chacha20_simd_mod_init(void)
-@@ -133,12 +126,12 @@ static int __init chacha20_simd_mod_init(void)
- 			    boot_cpu_has(X86_FEATURE_AVX2) &&
- 			    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
- #endif
--	return crypto_register_alg(&alg);
-+	return crypto_register_skcipher(&alg);
- }
- 
- static void __exit chacha20_simd_mod_fini(void)
- {
--	crypto_unregister_alg(&alg);
-+	crypto_unregister_skcipher(&alg);
- }
- 
- module_init(chacha20_simd_mod_init);
-diff --git a/crypto/chacha20_generic.c b/crypto/chacha20_generic.c
-index 1cab83146e33..8b3c04d625c3 100644
---- a/crypto/chacha20_generic.c
-+++ b/crypto/chacha20_generic.c
-@@ -10,10 +10,9 @@
-  */
- 
- #include <crypto/algapi.h>
--#include <linux/crypto.h>
--#include <linux/kernel.h>
--#include <linux/module.h>
- #include <crypto/chacha20.h>
-+#include <crypto/internal/skcipher.h>
-+#include <linux/module.h>
- 
- static inline u32 le32_to_cpuvp(const void *p)
- {
-@@ -63,10 +62,10 @@ void crypto_chacha20_init(u32 *state, struct chacha20_ctx *ctx, u8 *iv)
- }
- EXPORT_SYMBOL_GPL(crypto_chacha20_init);
- 
--int crypto_chacha20_setkey(struct crypto_tfm *tfm, const u8 *key,
-+int crypto_chacha20_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			   unsigned int keysize)
- {
--	struct chacha20_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct chacha20_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int i;
- 
- 	if (keysize != CHACHA20_KEY_SIZE)
-@@ -79,66 +78,54 @@ int crypto_chacha20_setkey(struct crypto_tfm *tfm, const u8 *key,
- }
- EXPORT_SYMBOL_GPL(crypto_chacha20_setkey);
- 
--int crypto_chacha20_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--			  struct scatterlist *src, unsigned int nbytes)
-+int crypto_chacha20_crypt(struct skcipher_request *req)
- {
--	struct blkcipher_walk walk;
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct chacha20_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct skcipher_walk walk;
- 	u32 state[16];
- 	int err;
- 
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt_block(desc, &walk, CHACHA20_BLOCK_SIZE);
--
--	crypto_chacha20_init(state, crypto_blkcipher_ctx(desc->tfm), walk.iv);
-+	err = skcipher_walk_virt(&walk, req, true);
- 
--	while (walk.nbytes >= CHACHA20_BLOCK_SIZE) {
--		chacha20_docrypt(state, walk.dst.virt.addr, walk.src.virt.addr,
--				 rounddown(walk.nbytes, CHACHA20_BLOCK_SIZE));
--		err = blkcipher_walk_done(desc, &walk,
--					  walk.nbytes % CHACHA20_BLOCK_SIZE);
--	}
-+	crypto_chacha20_init(state, ctx, walk.iv);
- 
--	if (walk.nbytes) {
-+	while (walk.nbytes > 0) {
- 		chacha20_docrypt(state, walk.dst.virt.addr, walk.src.virt.addr,
- 				 walk.nbytes);
--		err = blkcipher_walk_done(desc, &walk, 0);
-+		err = skcipher_walk_done(&walk, 0);
- 	}
- 
- 	return err;
- }
- EXPORT_SYMBOL_GPL(crypto_chacha20_crypt);
- 
--static struct crypto_alg alg = {
--	.cra_name		= "chacha20",
--	.cra_driver_name	= "chacha20-generic",
--	.cra_priority		= 100,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
--	.cra_blocksize		= 1,
--	.cra_type		= &crypto_blkcipher_type,
--	.cra_ctxsize		= sizeof(struct chacha20_ctx),
--	.cra_alignmask		= sizeof(u32) - 1,
--	.cra_module		= THIS_MODULE,
--	.cra_u			= {
--		.blkcipher = {
--			.min_keysize	= CHACHA20_KEY_SIZE,
--			.max_keysize	= CHACHA20_KEY_SIZE,
--			.ivsize		= CHACHA20_IV_SIZE,
--			.geniv		= "seqiv",
--			.setkey		= crypto_chacha20_setkey,
--			.encrypt	= crypto_chacha20_crypt,
--			.decrypt	= crypto_chacha20_crypt,
--		},
--	},
-+static struct skcipher_alg alg = {
-+	.base.cra_name		= "chacha20",
-+	.base.cra_driver_name	= "chacha20-generic",
-+	.base.cra_priority	= 100,
-+	.base.cra_blocksize	= 1,
-+	.base.cra_ctxsize	= sizeof(struct chacha20_ctx),
-+	.base.cra_alignmask	= sizeof(u32) - 1,
-+	.base.cra_module	= THIS_MODULE,
++	.encrypt		= chacha20_neon,
++	.decrypt		= chacha20_neon,
++};
 +
-+	.min_keysize		= CHACHA20_KEY_SIZE,
-+	.max_keysize		= CHACHA20_KEY_SIZE,
-+	.ivsize			= CHACHA20_IV_SIZE,
-+	.chunksize		= CHACHA20_BLOCK_SIZE,
-+	.setkey			= crypto_chacha20_setkey,
-+	.encrypt		= crypto_chacha20_crypt,
-+	.decrypt		= crypto_chacha20_crypt,
- };
- 
- static int __init chacha20_generic_mod_init(void)
- {
--	return crypto_register_alg(&alg);
++static int __init chacha20_simd_mod_init(void)
++{
++	if (!(elf_hwcap & HWCAP_NEON))
++		return -ENODEV;
++
 +	return crypto_register_skcipher(&alg);
- }
- 
- static void __exit chacha20_generic_mod_fini(void)
- {
--	crypto_unregister_alg(&alg);
++}
++
++static void __exit chacha20_simd_mod_fini(void)
++{
 +	crypto_unregister_skcipher(&alg);
- }
- 
- module_init(chacha20_generic_mod_init);
-diff --git a/include/crypto/chacha20.h b/include/crypto/chacha20.h
-index 20d20f681a72..445fc45f4b5b 100644
---- a/include/crypto/chacha20.h
-+++ b/include/crypto/chacha20.h
-@@ -5,6 +5,7 @@
- #ifndef _CRYPTO_CHACHA20_H
- #define _CRYPTO_CHACHA20_H
- 
-+#include <crypto/skcipher.h>
- #include <linux/types.h>
- #include <linux/crypto.h>
- 
-@@ -18,9 +19,8 @@ struct chacha20_ctx {
- 
- void chacha20_block(u32 *state, void *stream);
- void crypto_chacha20_init(u32 *state, struct chacha20_ctx *ctx, u8 *iv);
--int crypto_chacha20_setkey(struct crypto_tfm *tfm, const u8 *key,
-+int crypto_chacha20_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			   unsigned int keysize);
--int crypto_chacha20_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--			  struct scatterlist *src, unsigned int nbytes);
-+int crypto_chacha20_crypt(struct skcipher_request *req);
- 
- #endif
++}
++
++module_init(chacha20_simd_mod_init);
++module_exit(chacha20_simd_mod_fini);
++
++MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
++MODULE_LICENSE("GPL v2");
++MODULE_ALIAS_CRYPTO("chacha20");
 -- 
 2.7.4
