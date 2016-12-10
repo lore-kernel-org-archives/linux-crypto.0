@@ -1,51 +1,67 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [kernel-hardening] Re: Remaining crypto API regressions with CONFIG_VMAP_STACK
-Date: Sat, 10 Dec 2016 15:45:56 +0100
-Message-ID: <CAHmME9pzT=bxuEVVGDOJkm2PaEAVjbo=8na7URy=g-1sKvv0yw@mail.gmail.com>
-References: <20161209230851.GB64048@google.com> <CALCETrW=+3u3P8Xva+0ck9=fr-mD6azPtTkOQ3uQO+GoOA6FcQ@mail.gmail.com>
- <20161210053711.GB27951@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Andy Lutomirski <luto@amacapital.net>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        linux-crypto@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Stephan Mueller <smueller@chronox.de>
-To: kernel-hardening@lists.openwall.com
+From: "George Spelvin" <linux@sciencehorizons.net>
+Subject: Re: [PATCH] siphash: add cryptographically secure hashtable function
+Date: 10 Dec 2016 10:35:17 -0500
+Message-ID: <20161210153517.30834.qmail@ns.sciencehorizons.net>
+References: <CAOMGZ=HMTZhBOh0jTBT4cyMuK5s-D51FFUtWUWyMV7VX0U2L0w@mail.gmail.com>
+Cc: djb@cr.yp.to, jeanphilippe.aumasson@gmail.com,
+        kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux@sciencehorizons.net,
+        rusty@rustcorp.com.au, torvalds@linux-foundation.org
+To: Jason@zx2c4.com, vegard.nossum@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:35614 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752323AbcLJOqC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 10 Dec 2016 09:46:02 -0500
-In-Reply-To: <20161210053711.GB27951@gondor.apana.org.au>
+Received: from ns.sciencehorizons.net ([71.41.210.147]:48935 "HELO
+        ns.sciencehorizons.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with SMTP id S1752818AbcLJPl7 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 10 Dec 2016 10:41:59 -0500
+In-Reply-To: <CAOMGZ=HMTZhBOh0jTBT4cyMuK5s-D51FFUtWUWyMV7VX0U2L0w@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+> There's a 32-bit secret random salt (inet_ehash_secret) which means
+> that in practice, inet_ehashfn() will select 1 out of 2^32 different
+> hash functions at random each time you boot the kernel; without
+> knowing which one it selected, how can a local or remote attacker can
+> force IPv4 connections/whatever to go into a single hash bucket?
 
-On Sat, Dec 10, 2016 at 6:37 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> As for AEAD we never had a sync interface to begin with and I
-> don't think I'm going to add one.
+By figuring out the salt.  The thing is, the timing of hash table lookups
+*is externally visible*.  If I create connections to the target, then
+see which ones make responses on previous connections slightly slower,
+I gain information about the salt.
 
-That's too bad to hear. I hope you'll reconsider. Modern cryptographic
-design is heading more and more in the direction of using AEADs for
-interesting things, and having a sync interface would be a lot easier
-for implementing these protocols. In the same way many protocols need
-a hash of some data, now protocols often want some particular data
-encrypted with an AEAD using a particular key and nonce and AD. One
-protocol that comes to mind is Noise [1].
+I dont't know *where* in the hash table the collissions occur, but I
+know *which* inputs collide, and that's enough for me to learn something.
 
-I know that in my own [currently external to the tree] kernel code, I
-just forego the use of the crypto API all together, and one of the
-primary reasons for that is lack of a sync interface for AEADs. When I
-eventually send this upstream, presumably everyone will want me to use
-the crypto API, and having a sync AEAD interface would be personally
-helpful for that. I guess I could always write the sync interface
-myself, but I imagine you'd prefer having the design control etc.
+(I need more connections than the size of the hash table, but even
+with just one IP source I can use 64K ports on my end times however
+many the target has open on its end.)
 
-Jason
+With enough information (google "unicity distance") I can recover the
+entire salt.  It's not like I care about the cryptographic strength of
+the hash; simply trying all 4 billion possible seeds is pretty fast on
+a 4 GHz processor.
+
+Once that happens, I can choose a target connection whose timing I can't
+observe directly and pack its hash chain without being obvious about it.
+
+> I am happy to be proven wrong, but you make it sound very easy to
+> exploit the current situation, so I would just like to ask whether you
+> have a concrete way to do that?
+
+I don't think anyone's implemented an attack on this particular hash
+table yet, and the reason it hasn't been urgent is that it's just a mild
+DoS attack it makes the computer noticeably slower withough disabling
+it completely.
+
+But the general style of attack is well known and has been repeatedly
+demonstrated.  Its practicality is not in question.  The only question is
+whether it's *more* practical that simpler techniques that don't depend
+on any such algorithmic subtlety like brute-force flooding.
+
+But if the history of Internet security has taught us one thing, it's
+that naively hoping something won't be a problem is doomed.
 
 
-[1] http://noiseprotocol.org/
+The main issue is performance.  IPv6 addresses are big, and although
+SipHash is fast by the standard of cryptographic hashes, it's far slower
+than jhash or any other non-cryptographic hash.
