@@ -1,40 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: scatterwalk_map_and_copy incorrect optimization
-Date: Sat, 10 Dec 2016 16:08:32 +0800
-Message-ID: <20161210080832.GA32701@gondor.apana.org.au>
-References: <CAHmME9p24bkNPD2CfGMUOHxgOX+OuFO_rVqfhOQdDexwW53ExA@mail.gmail.com>
+Subject: Re: algif for compression?
+Date: Sat, 10 Dec 2016 16:10:14 +0800
+Message-ID: <20161210081014.GA32746@gondor.apana.org.au>
+References: <CACVarETuTx40WFD5TRUCwiYv5r3SEvhuJHpGjqPsz90qVZsYKA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: abed mohammad kamaluddin <abedamu@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:39578 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1752534AbcLJIKT (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 10 Dec 2016 03:10:19 -0500
 Content-Disposition: inline
-In-Reply-To: <CAHmME9p24bkNPD2CfGMUOHxgOX+OuFO_rVqfhOQdDexwW53ExA@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <CACVarETuTx40WFD5TRUCwiYv5r3SEvhuJHpGjqPsz90qVZsYKA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 09, 2016 at 02:18:01PM +0100, Jason A. Donenfeld wrote:
-> Hi Herbert,
+abed mohammad kamaluddin <abedamu@gmail.com> wrote:
 > 
-> The scatterwalk_map_and_copy function copies ordinary buffers to and
-> from scatterlists. These buffers can, of course, be on the stack, and
-> this remains the most popular use of this function -- getting info
-> between stack buffers and DMA regions. It's mostly used for adding or
-> checking MACs, in the majority of call sites. Its implementation is
-> relatively straightforward. It maps the DMA region(s) to a vaddr, and
-> then just calls vanilla memcpy. Pretty uncontroversial.
+> We are also looking for user-space access to the kernel crypto layer
+> compression algorithms. I have gone through AF_ALG but couldn’t find
+> support for compression ops through it. This is required for our
+> hardware zip engines whose driver hooks up to the crypto layer.
 > 
-> However, around ~4.1 an optimization was added to prevent copying when
-> unnecessary (when the src and dst are the same). The optimization
-> looks like this:
+> I was going through the lists and stumbled across this thread. Has
+> there been  any updates or efforts put up in this direction since this
+> thread is a few years old. If not, are there any alternate
+> implementations that allow user-space access to compression? I have
+> gone through cryptodev and see the same limitation there.
 > 
->         if (sg_page(sg) == virt_to_page(buf) &&
->            sg->offset == offset_in_page(buf))
->                return;
-> 
-> There are two problems with this:
+> Would appreciate any pointers in this regard.
 
-This code no longer exists in the current tree.
+The compression interface is currently in a state of flux.  We
+should make it settle down first before exporting it to user-space.
+
+For a start it would be good to actually switch IPsec/IPcomp over
+to the new compression interface.
 
 Cheers,
 -- 
