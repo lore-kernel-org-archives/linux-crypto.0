@@ -1,113 +1,332 @@
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Subject: RE: [PATCH v6 1/2] sparc: fix a building error reported by kbuild
-Date: Sat, 10 Dec 2016 08:40:02 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA159386@DGGEMA505-MBX.china.huawei.com>
-References: <1481171829-116496-1-git-send-email-arei.gonglei@huawei.com>
- <1481171829-116496-2-git-send-email-arei.gonglei@huawei.com>
- <20161209215851.GA7717@ravnborg.org>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [kernel-hardening] [PATCH] siphash: add cryptographically secure
+ hashtable function
+Date: Sat, 10 Dec 2016 13:37:25 +0100
+Message-ID: <20161210123725.GC21421@kroah.com>
+References: <20161209183659.25727-1-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
-        "virtualization@lists.linux-foundation.org"
-        <virtualization@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Luonengjun <luonengjun@huawei.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>,
-        "Wubin (H)" <wu.wubin@huawei.com>,
-        "xin.zeng@intel.com" <xin.zeng@intel.com>,
-        Claudio Fontana <Claudio.Fontana@huawei.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>,
-        "davem@davemloft.net" <davem@davemloft.
-To: Sam Ravnborg <sam@ravnborg.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        rusty@rustcorp.com.au, torvalds@linux-foundation.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        "Daniel J . Bernstein" <djb@cr.yp.to>
+To: kernel-hardening@lists.openwall.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2431 "EHLO
-        dggrg03-dlp.huawei.com" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752513AbcLJIkq (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:49178 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751388AbcLJMhV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 10 Dec 2016 03:40:46 -0500
-In-Reply-To: <20161209215851.GA7717@ravnborg.org>
-Content-Language: zh-CN
+        Sat, 10 Dec 2016 07:37:21 -0500
+Content-Disposition: inline
+In-Reply-To: <20161209183659.25727-1-Jason@zx2c4.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
-
-
-
-Regards,
--Gonglei
-
-
-> -----Original Message-----
-> From: linux-crypto-owner@vger.kernel.org
-> [mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Sam Ravnborg
-> Sent: Saturday, December 10, 2016 5:59 AM
-> To: Gonglei (Arei)
-> Cc: linux-kernel@vger.kernel.org; qemu-devel@nongnu.org;
-> virtio-dev@lists.oasis-open.org; virtualization@lists.linux-foundation.org;
-> linux-crypto@vger.kernel.org; Luonengjun; mst@redhat.com;
-> stefanha@redhat.com; Huangweidong (C); Wubin (H); xin.zeng@intel.com;
-> Claudio Fontana; herbert@gondor.apana.org.au; pasic@linux.vnet.ibm.com;
-> davem@davemloft.net; Zhoujian (jay, Euler); Hanweidong (Randy);
-> arei.gonglei@hotmail.com; cornelia.huck@de.ibm.com; Xuquan (Quan Xu);
-> longpeng; Wanzongshun (Vincent); sparclinux@vger.kernel.org
-> Subject: Re: [PATCH v6 1/2] sparc: fix a building error reported by kbuild
+On Fri, Dec 09, 2016 at 07:36:59PM +0100, Jason A. Donenfeld wrote:
+> SipHash is a 64-bit keyed hash function that is actually a
+> cryptographically secure PRF, like HMAC. Except SipHash is super fast,
+> and is meant to be used as a hashtable keyed lookup function.
 > 
-> Hi Gonglei.
+> SipHash isn't just some new trendy hash function. It's been around for a
+> while, and there really isn't anything that comes remotely close to
+> being useful in the way SipHash is. With that said, why do we need this?
 > 
-> On Thu, Dec 08, 2016 at 12:37:08PM +0800, Gonglei wrote:
-> > >> arch/sparc/include/asm/topology_64.h:44:44:
-> > error: implicit declaration of function 'cpu_data'
-> > [-Werror=implicit-function-declaration]
-> >
-> >  #define topology_physical_package_id(cpu) (cpu_data(cpu).proc_id)
-> >                                                ^
-> > Let's include cpudata.h in topology_64.h.
-> >
-> > Cc: Sam Ravnborg <sam@ravnborg.org>
-> > Cc: David S. Miller <davem@davemloft.net>
-> > Cc: sparclinux@vger.kernel.org
-> > Suggested-by: Sam Ravnborg <sam@ravnborg.org>
-> > Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> Acked-by: Sam Ravnborg <sam@ravnborg.org>
+> There are a variety of attacks known as "hashtable poisoning" in which an
+> attacker forms some data such that the hash of that data will be the
+> same, and then preceeds to fill up all entries of a hashbucket. This is
+> a realistic and well-known denial-of-service vector.
 > 
-Thanks.
+> Linux developers already seem to be aware that this is an issue, and
+> various places that use hash tables in, say, a network context, use a
+> non-cryptographically secure function (usually jhash) and then try to
+> twiddle with the key on a time basis (or in many cases just do nothing
+> and hope that nobody notices). While this is an admirable attempt at
+> solving the problem, it doesn't actually fix it. SipHash fixes it.
+> 
+> (It fixes it in such a sound way that you could even build a stream
+> cipher out of SipHash that would resist the modern cryptanalysis.)
+> 
+> There are a modicum of places in the kernel that are vulnerable to
+> hashtable poisoning attacks, either via userspace vectors or network
+> vectors, and there's not a reliable mechanism inside the kernel at the
+> moment to fix it. The first step toward fixing these issues is actually
+> getting a secure primitive into the kernel for developers to use. Then
+> we can, bit by bit, port things over to it as deemed appropriate.
+> 
+> Dozens of languages are already using this internally for their hash
+> tables. Some of the BSDs already use this in their kernels. SipHash is
+> a widely known high-speed solution to a widely known problem, and it's
+> time we catch-up.
+> 
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+> Cc: Daniel J. Bernstein <djb@cr.yp.to>
+> ---
+>  include/linux/siphash.h |  18 ++++++
+>  lib/Makefile            |   3 +-
+>  lib/siphash.c           | 163 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 183 insertions(+), 1 deletion(-)
+>  create mode 100644 include/linux/siphash.h
+>  create mode 100644 lib/siphash.c
 
-> > ---
-> >  arch/sparc/include/asm/topology_64.h | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/arch/sparc/include/asm/topology_64.h
-> b/arch/sparc/include/asm/topology_64.h
-> > index 7b4898a..2255430 100644
-> > --- a/arch/sparc/include/asm/topology_64.h
-> > +++ b/arch/sparc/include/asm/topology_64.h
-> > @@ -4,6 +4,7 @@
-> >  #ifdef CONFIG_NUMA
-> >
-> >  #include <asm/mmzone.h>
-> > +#include <asm/cpudata.h>
-> 
-> Nitpick - if you are going to resend this patch, 
+This looks really nice, but we don't usually add stuff into lib/ unless
+there is an actual user of the code :)
 
-It depends on the maintainer's thought. :)
+Have you tried converting any of the existing hash users to use this
+instead?  If you did that, and it shows a solution for the known
+problems with our existing hashes (as you point out above), I doubt
+there would be any objection for this patch at all.
 
-> then please order the two includes in alphabetic order.
-> 
-> For two includes this looks like bikeshedding, but when we add
-> more having them in a defined arder prevents merge conflicts.
-> And makes it readable too.
-> 
-> We also sometimes order the includes with the longest lines topmost,
-> and lines with the ame length are ordered alphabetically.
-> But this is not seen so often.
-> 
+Minor coding style nits below:
 
-Regards,
--Gonglei
+> @@ -0,0 +1,18 @@
+> +/* Copyright (C) 2016 Jason A. Donenfeld <Jason@zx2c4.com>
+> + *
+> + * SipHash: a fast short-input PRF
+> + * https://131002.net/siphash/
+> + */
+> +
+> +#ifndef _LINUX_SIPHASH_H
+> +#define _LINUX_SIPHASH_H
+> +
+> +#include <linux/types.h>
+> +
+> +enum siphash24_lengths {
+> +	SIPHASH24_KEY_LEN = 16
+> +};
+> +
+> +uint64_t siphash24(const uint8_t *data, size_t len, const uint8_t key[SIPHASH24_KEY_LEN]);
+
+Please use u64 and u8 instead of the userspace uint64_t and uint8_t
+types for kernel code.  Yes, the ship has probably sailed for trying to
+strictly enforce it, but it's a good idea to do where ever possible.
+
+> +
+> +#endif /* _LINUX_SIPHASH_H */
+> diff --git a/lib/Makefile b/lib/Makefile
+> index 50144a3aeebd..d224337b0d01 100644
+> --- a/lib/Makefile
+> +++ b/lib/Makefile
+> @@ -22,7 +22,8 @@ lib-y := ctype.o string.o vsprintf.o cmdline.o \
+>  	 sha1.o chacha20.o md5.o irq_regs.o argv_split.o \
+>  	 flex_proportions.o ratelimit.o show_mem.o \
+>  	 is_single_threaded.o plist.o decompress.o kobject_uevent.o \
+> -	 earlycpio.o seq_buf.o nmi_backtrace.o nodemask.o win_minmax.o
+> +	 earlycpio.o seq_buf.o siphash.o \
+> +	 nmi_backtrace.o nodemask.o win_minmax.o
+>  
+>  lib-$(CONFIG_MMU) += ioremap.o
+>  lib-$(CONFIG_SMP) += cpumask.o
+> diff --git a/lib/siphash.c b/lib/siphash.c
+> new file mode 100644
+> index 000000000000..022d86f04b9b
+> --- /dev/null
+> +++ b/lib/siphash.c
+> @@ -0,0 +1,163 @@
+> +/* Copyright (C) 2015-2016 Jason A. Donenfeld <Jason@zx2c4.com>
+> + * Copyright (C) 2012-2014 Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+> + * Copyright (C) 2012-2014 Daniel J. Bernstein <djb@cr.yp.to>
+> + *
+> + * SipHash: a fast short-input PRF
+> + * https://131002.net/siphash/
+> + */
+
+Any specific license for this code?  It's good to at the least say what
+it is.  Yes, we know it will default to GPLv2 only as part of the whole
+kernel tree, but it's good to be explicit for when someone wants to copy
+this code for their own projects...
+
+> +
+> +#include <linux/siphash.h>
+> +#include <linux/kernel.h>
+> +#include <linux/string.h>
+> +
+> +#define ROTL(x,b) (uint64_t)(((x) << (b)) | ((x) >> (64 - (b))))
+
+Don't we have this in kernel.h somewhere?  Ah, yeah, it's rol64() in
+bitops.h, no need to define it again please.
+
+> +#define U8TO64(p) le64_to_cpu(*(__le64 *)(p))
+
+Why the crazy casting behind a macro?
+
+> +
+> +#define SIPROUND \
+> +	do { \
+> +	v0 += v1; v1 = ROTL(v1, 13); v1 ^= v0; v0 = ROTL(v0, 32); \
+> +	v2 += v3; v3 = ROTL(v3, 16); v3 ^= v2; \
+> +	v0 += v3; v3 = ROTL(v3, 21); v3 ^= v0; \
+> +	v2 += v1; v1 = ROTL(v1, 17); v1 ^= v2; v2 = ROTL(v2, 32); \
+> +	} while(0)
+> +
+> +__attribute__((optimize("unroll-loops")))
+
+Care to document why this attribute is needed?  Older versions of gcc
+doesn't know how to handle it properly?  Faster with newer versions?
+Black magic?  :)
+
+> +uint64_t siphash24(const uint8_t *data, size_t len, const uint8_t key[SIPHASH24_KEY_LEN])
+> +{
+> +	uint64_t v0 = 0x736f6d6570736575ULL;
+
+s/uint64_t/u64/g please.
+
+
+> +	uint64_t v1 = 0x646f72616e646f6dULL;
+> +	uint64_t v2 = 0x6c7967656e657261ULL;
+> +	uint64_t v3 = 0x7465646279746573ULL;
+> +	uint64_t b;
+> +	uint64_t k0 = U8TO64(key);
+> +	uint64_t k1 = U8TO64(key + sizeof(uint64_t));
+> +	uint64_t m;
+> +	const uint8_t *end = data + len - (len % sizeof(uint64_t));
+> +	const uint8_t left = len & (sizeof(uint64_t) - 1);
+> +	b = ((uint64_t)len) << 56;
+> +	v3 ^= k1;
+> +	v2 ^= k0;
+> +	v1 ^= k1;
+> +	v0 ^= k0;
+> +	for (; data != end; data += sizeof(uint64_t)) {
+> +		m = U8TO64(data);
+> +		v3 ^= m;
+> +		SIPROUND;
+> +		SIPROUND;
+> +		v0 ^= m;
+> +	}
+> +	switch (left) {
+> +		case 7: b |= ((uint64_t)data[6]) << 48;
+> +		case 6: b |= ((uint64_t)data[5]) << 40;
+> +		case 5: b |= ((uint64_t)data[4]) << 32;
+> +		case 4: b |= ((uint64_t)data[3]) << 24;
+> +		case 3: b |= ((uint64_t)data[2]) << 16;
+> +		case 2: b |= ((uint64_t)data[1]) <<  8;
+> +		case 1: b |= ((uint64_t)data[0]); break;
+> +		case 0: break;
+> +	}
+> +	v3 ^= b;
+> +	SIPROUND;
+> +	SIPROUND;
+> +	v0 ^= b;
+> +	v2 ^= 0xff;
+> +	SIPROUND;
+> +	SIPROUND;
+> +	SIPROUND;
+> +	SIPROUND;
+> +	b = (v0 ^ v1) ^ (v2 ^ v3);
+> +	return (__force uint64_t)cpu_to_le64(b);
+> +}
+> +EXPORT_SYMBOL(siphash24);
+
+EXPORT_SYMBOL_GPL()?  I have to ask, sorry :)
+
+
+> +
+> +#ifdef DEBUG
+> +static const uint8_t test_vectors[64][8] = {
+> +	{ 0x31, 0x0e, 0x0e, 0xdd, 0x47, 0xdb, 0x6f, 0x72 },
+> +	{ 0xfd, 0x67, 0xdc, 0x93, 0xc5, 0x39, 0xf8, 0x74 },
+> +	{ 0x5a, 0x4f, 0xa9, 0xd9, 0x09, 0x80, 0x6c, 0x0d },
+> +	{ 0x2d, 0x7e, 0xfb, 0xd7, 0x96, 0x66, 0x67, 0x85 },
+> +	{ 0xb7, 0x87, 0x71, 0x27, 0xe0, 0x94, 0x27, 0xcf },
+> +	{ 0x8d, 0xa6, 0x99, 0xcd, 0x64, 0x55, 0x76, 0x18 },
+> +	{ 0xce, 0xe3, 0xfe, 0x58, 0x6e, 0x46, 0xc9, 0xcb },
+> +	{ 0x37, 0xd1, 0x01, 0x8b, 0xf5, 0x00, 0x02, 0xab },
+> +	{ 0x62, 0x24, 0x93, 0x9a, 0x79, 0xf5, 0xf5, 0x93 },
+> +	{ 0xb0, 0xe4, 0xa9, 0x0b, 0xdf, 0x82, 0x00, 0x9e },
+> +	{ 0xf3, 0xb9, 0xdd, 0x94, 0xc5, 0xbb, 0x5d, 0x7a },
+> +	{ 0xa7, 0xad, 0x6b, 0x22, 0x46, 0x2f, 0xb3, 0xf4 },
+> +	{ 0xfb, 0xe5, 0x0e, 0x86, 0xbc, 0x8f, 0x1e, 0x75 },
+> +	{ 0x90, 0x3d, 0x84, 0xc0, 0x27, 0x56, 0xea, 0x14 },
+> +	{ 0xee, 0xf2, 0x7a, 0x8e, 0x90, 0xca, 0x23, 0xf7 },
+> +	{ 0xe5, 0x45, 0xbe, 0x49, 0x61, 0xca, 0x29, 0xa1 },
+> +	{ 0xdb, 0x9b, 0xc2, 0x57, 0x7f, 0xcc, 0x2a, 0x3f },
+> +	{ 0x94, 0x47, 0xbe, 0x2c, 0xf5, 0xe9, 0x9a, 0x69 },
+> +	{ 0x9c, 0xd3, 0x8d, 0x96, 0xf0, 0xb3, 0xc1, 0x4b },
+> +	{ 0xbd, 0x61, 0x79, 0xa7, 0x1d, 0xc9, 0x6d, 0xbb },
+> +	{ 0x98, 0xee, 0xa2, 0x1a, 0xf2, 0x5c, 0xd6, 0xbe },
+> +	{ 0xc7, 0x67, 0x3b, 0x2e, 0xb0, 0xcb, 0xf2, 0xd0 },
+> +	{ 0x88, 0x3e, 0xa3, 0xe3, 0x95, 0x67, 0x53, 0x93 },
+> +	{ 0xc8, 0xce, 0x5c, 0xcd, 0x8c, 0x03, 0x0c, 0xa8 },
+> +	{ 0x94, 0xaf, 0x49, 0xf6, 0xc6, 0x50, 0xad, 0xb8 },
+> +	{ 0xea, 0xb8, 0x85, 0x8a, 0xde, 0x92, 0xe1, 0xbc },
+> +	{ 0xf3, 0x15, 0xbb, 0x5b, 0xb8, 0x35, 0xd8, 0x17 },
+> +	{ 0xad, 0xcf, 0x6b, 0x07, 0x63, 0x61, 0x2e, 0x2f },
+> +	{ 0xa5, 0xc9, 0x1d, 0xa7, 0xac, 0xaa, 0x4d, 0xde },
+> +	{ 0x71, 0x65, 0x95, 0x87, 0x66, 0x50, 0xa2, 0xa6 },
+> +	{ 0x28, 0xef, 0x49, 0x5c, 0x53, 0xa3, 0x87, 0xad },
+> +	{ 0x42, 0xc3, 0x41, 0xd8, 0xfa, 0x92, 0xd8, 0x32 },
+> +	{ 0xce, 0x7c, 0xf2, 0x72, 0x2f, 0x51, 0x27, 0x71 },
+> +	{ 0xe3, 0x78, 0x59, 0xf9, 0x46, 0x23, 0xf3, 0xa7 },
+> +	{ 0x38, 0x12, 0x05, 0xbb, 0x1a, 0xb0, 0xe0, 0x12 },
+> +	{ 0xae, 0x97, 0xa1, 0x0f, 0xd4, 0x34, 0xe0, 0x15 },
+> +	{ 0xb4, 0xa3, 0x15, 0x08, 0xbe, 0xff, 0x4d, 0x31 },
+> +	{ 0x81, 0x39, 0x62, 0x29, 0xf0, 0x90, 0x79, 0x02 },
+> +	{ 0x4d, 0x0c, 0xf4, 0x9e, 0xe5, 0xd4, 0xdc, 0xca },
+> +	{ 0x5c, 0x73, 0x33, 0x6a, 0x76, 0xd8, 0xbf, 0x9a },
+> +	{ 0xd0, 0xa7, 0x04, 0x53, 0x6b, 0xa9, 0x3e, 0x0e },
+> +	{ 0x92, 0x59, 0x58, 0xfc, 0xd6, 0x42, 0x0c, 0xad },
+> +	{ 0xa9, 0x15, 0xc2, 0x9b, 0xc8, 0x06, 0x73, 0x18 },
+> +	{ 0x95, 0x2b, 0x79, 0xf3, 0xbc, 0x0a, 0xa6, 0xd4 },
+> +	{ 0xf2, 0x1d, 0xf2, 0xe4, 0x1d, 0x45, 0x35, 0xf9 },
+> +	{ 0x87, 0x57, 0x75, 0x19, 0x04, 0x8f, 0x53, 0xa9 },
+> +	{ 0x10, 0xa5, 0x6c, 0xf5, 0xdf, 0xcd, 0x9a, 0xdb },
+> +	{ 0xeb, 0x75, 0x09, 0x5c, 0xcd, 0x98, 0x6c, 0xd0 },
+> +	{ 0x51, 0xa9, 0xcb, 0x9e, 0xcb, 0xa3, 0x12, 0xe6 },
+> +	{ 0x96, 0xaf, 0xad, 0xfc, 0x2c, 0xe6, 0x66, 0xc7 },
+> +	{ 0x72, 0xfe, 0x52, 0x97, 0x5a, 0x43, 0x64, 0xee },
+> +	{ 0x5a, 0x16, 0x45, 0xb2, 0x76, 0xd5, 0x92, 0xa1 },
+> +	{ 0xb2, 0x74, 0xcb, 0x8e, 0xbf, 0x87, 0x87, 0x0a },
+> +	{ 0x6f, 0x9b, 0xb4, 0x20, 0x3d, 0xe7, 0xb3, 0x81 },
+> +	{ 0xea, 0xec, 0xb2, 0xa3, 0x0b, 0x22, 0xa8, 0x7f },
+> +	{ 0x99, 0x24, 0xa4, 0x3c, 0xc1, 0x31, 0x57, 0x24 },
+> +	{ 0xbd, 0x83, 0x8d, 0x3a, 0xaf, 0xbf, 0x8d, 0xb7 },
+> +	{ 0x0b, 0x1a, 0x2a, 0x32, 0x65, 0xd5, 0x1a, 0xea },
+> +	{ 0x13, 0x50, 0x79, 0xa3, 0x23, 0x1c, 0xe6, 0x60 },
+> +	{ 0x93, 0x2b, 0x28, 0x46, 0xe4, 0xd7, 0x06, 0x66 },
+> +	{ 0xe1, 0x91, 0x5f, 0x5c, 0xb1, 0xec, 0xa4, 0x6c },
+> +	{ 0xf3, 0x25, 0x96, 0x5c, 0xa1, 0x6d, 0x62, 0x9f },
+> +	{ 0x57, 0x5f, 0xf2, 0x8e, 0x60, 0x38, 0x1b, 0xe5 },
+> +	{ 0x72, 0x45, 0x06, 0xeb, 0x4c, 0x32, 0x8a, 0x95 }
+> +};
+> +
+> +static int siphash24_selftest(void)
+> +{
+> +	uint8_t in[64], k[16], i;
+> +	uint64_t out;
+> +	int ret = 0;
+> +
+> +	for (i = 0; i < 16; ++i)
+> +		k[i] = i;
+> +
+> +	for (i = 0; i < 64; ++i) {
+> +		in[i] = i;
+> +		out = siphash24(in, i, k);
+> +		if (memcmp(&out, test_vectors[i], 8)) {
+> +			printk(KERN_INFO "siphash24: self-test %u: FAIL\n", i + 1);
+
+pr_info()?
+
+> +			ret = -1;
+
+Pick a real error number?
+
+> +		}
+> +	}
+> +	if (!ret)
+> +		printk(KERN_INFO "siphash24: self-tests: pass\n");
+
+pr_info()?
+
+> +	return ret;
+> +}
+> +__initcall(siphash24_selftest);
+
+Don't we have a "do crypto/library/whatever selftests at boot" config
+option that this little test could be put under?  It would be great to
+not have to manually add DEBUG to the build to verify this works on a
+specific arch.
+
+thanks,
+
+greg k-h
