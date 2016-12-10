@@ -1,61 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.9
-Date: Sat, 10 Dec 2016 14:01:07 +0800
-Message-ID: <20161210060107.GA28083@gondor.apana.org.au>
-References: <20161119102748.GA4277@gondor.apana.org.au>
- <20161205063754.GA9408@gondor.apana.org.au>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [kernel-hardening] Re: Remaining crypto API regressions with
+ CONFIG_VMAP_STACK
+Date: Fri, 9 Dec 2016 22:03:16 -0800
+Message-ID: <20161210060316.GC6846@zzz>
+References: <20161209230851.GB64048@google.com>
+ <CALCETrW=+3u3P8Xva+0ck9=fr-mD6azPtTkOQ3uQO+GoOA6FcQ@mail.gmail.com>
+ <20161210053208.GA27951@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Andy Lutomirski <luto@amacapital.net>,
+        linux-crypto@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        Andrew Lutomirski <luto@kernel.org>,
+        Stephan Mueller <smueller@chronox.de>
+To: kernel-hardening@lists.openwall.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:35953 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750939AbcLJGDT (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 10 Dec 2016 01:03:19 -0500
 Content-Disposition: inline
-In-Reply-To: <20161205063754.GA9408@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20161210053208.GA27951@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Sat, Dec 10, 2016 at 01:32:08PM +0800, Herbert Xu wrote:
+> On Fri, Dec 09, 2016 at 09:25:38PM -0800, Andy Lutomirski wrote:
+> >
+> > > The following crypto drivers initialize a scatterlist to point into an
+> > > ablkcipher_request, which may have been allocated on the stack with
+> > > SKCIPHER_REQUEST_ON_STACK():
+> > >
+> > >         drivers/crypto/ccp/ccp-crypto-aes-xts.c:162
+> > >         drivers/crypto/ccp/ccp-crypto-aes.c:94
+> > 
+> > These are real, and I wish I'd known about them sooner.
+> 
+> Are you sure? Any instance of *_ON_STACK must only be used with
+> sync algorithms and most drivers under drivers/crypto declare
+> themselves as async.
+> 
 
-This push fixes the following issues:
+Why exactly is that?  Obviously, it wouldn't work if you returned from the stack
+frame before the request completed, but does anything stop someone from using an
+*_ON_STACK() request and then waiting for the request to complete before
+returning from the stack frame?
 
-- Fix pointer size when caam is used with AArch64 boot loader on
-  AArch32 kernel.
-- Fix ahash state corruption in marvell driver.
-- Fix buggy algif_aed tag handling.
-- Prevent mcryptd from being used with incompatible algorithms
-  which can cause crashes.
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Horia Geantă (1):
-      crypto: caam - fix pointer size for AArch64 boot loader, AArch32 kernel
-
-Romain Perier (2):
-      crypto: marvell - Don't copy hash operation twice into the SRAM
-      crypto: marvell - Don't corrupt state of an STD req for re-stepped ahash
-
-Stephan Mueller (2):
-      crypto: algif_aead - fix AEAD tag memory handling
-      crypto: algif_aead - fix uninitialized variable warning
-
-tim (1):
-      crypto: mcryptd - Check mcryptd algorithm compatibility
-
- crypto/algif_aead.c           |   59 ++++++++++++++++++++++++++---------------
- crypto/mcryptd.c              |   19 ++++++++-----
- drivers/crypto/caam/ctrl.c    |    5 ++--
- drivers/crypto/marvell/hash.c |   11 ++++----
- 4 files changed, 57 insertions(+), 37 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Eric
