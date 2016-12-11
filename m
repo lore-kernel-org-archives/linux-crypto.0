@@ -1,75 +1,125 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [ANNOUNCE] libkcapi v0.13.0 released
-Date: Sun, 11 Dec 2016 21:31:54 +0100
-Message-ID: <5613658.GNh6GxY9RR@positron.chronox.de>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [kernel-hardening] [PATCH] siphash: add cryptographically secure
+ hashtable function
+Date: Sun, 11 Dec 2016 21:43:45 +0100
+Message-ID: <20161211204345.GA1558@kroah.com>
+References: <20161209183659.25727-1-Jason@zx2c4.com>
+ <20161210123725.GC21421@kroah.com>
+ <CAHmME9qFjeiSFkXfyQQgpRyQCj7dDV9r+UM7S8W=QBsQX+=McQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: kernel-hardening@lists.openwall.com,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        "Daniel J . Bernstein" <djb@cr.yp.to>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        George Spelvin <linux@horizon.com>,
+        Scott Bauer <sbauer@eng.utah.edu>, ak@linux.intel.com,
+        Andy Lutomirski <luto@amacapital.net>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:39238 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752588AbcLKUcB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Dec 2016 15:32:01 -0500
-Received: from positron.chronox.de (mail.eperm.de [89.247.134.16])
-        by mail.eperm.de (Postfix) with ESMTPA id 7B398181607E
-        for <linux-crypto@vger.kernel.org>; Sun, 11 Dec 2016 21:31:58 +0100 (CET)
+Received: from mail.linuxfoundation.org ([140.211.169.12]:39348 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753620AbcLKUnk (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 11 Dec 2016 15:43:40 -0500
+Content-Disposition: inline
+In-Reply-To: <CAHmME9qFjeiSFkXfyQQgpRyQCj7dDV9r+UM7S8W=QBsQX+=McQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Sun, Dec 11, 2016 at 04:30:31PM +0100, Jason A. Donenfeld wrote:
+> Hi Greg,
+> 
+> Thanks for the review. Responses to your suggestions are inline below:
+> 
+> On Sat, Dec 10, 2016 at 1:37 PM, Greg KH <gregkh@linuxfoundation.org> wrote:
+> > Please use u64 and u8 instead of the userspace uint64_t and uint8_t
+> > types for kernel code.  Yes, the ship has probably sailed for trying to
+> > strictly enforce it, but it's a good idea to do where ever possible.
+> 
+> I didn't know this was a rule. Since I had seen a hodgepodge
+> throughout the kernel I just sort of assumed it was a free for all.
+> I've fixed this up for v2, and I've also gone through all of my other
+> [not yet submitted] code and made this change.
+> 
+> > Any specific license for this code?  It's good to at the least say what
+> > it is.  Yes, we know it will default to GPLv2 only as part of the whole
+> > kernel tree, but it's good to be explicit for when someone wants to copy
+> > this code for their own projects...
+> 
+> Public domain, actually. I'll add notice of this to the header.
 
-The Linux kernel exports a network interface of type AF_ALG to allow user 
-space to utilize the kernel crypto API. libkcapi uses this network interface 
-and exports an easy to use API so that a developer does not need to consider 
-the low-level network interface handling. 
+Hm, there really is no such license as "Public domain" that works in all
+countries, sorry.  You will note it's not one of the "valid module
+license list" we have in module.h because of that.
 
-The library does not implement any low level cipher algorithms. All consumer 
-requests are sent to the kernel for processing. Results from the kernel crypto 
-API are returned to the consumer via the library API.
+So, I don't know where you got the code from, but perhaps "Dual BSD/GPL"
+is the correct one for you?
 
-The kernel interface and therefore this library can be used by unprivileged 
-processes.
+Note, I'm not a lawyer, so this isn't legal advice about the license of
+code, but I do spend way too much time with lawyers dealing with license
+issues...
 
-The library code archive also provides a drop-in replacement for the command 
-line tools of sha*sum, fipscheck/fipshmac and sha512hmac.
+> >> +#define U8TO64(p) le64_to_cpu(*(__le64 *)(p))
+> >
+> > Why the crazy casting behind a macro?
+> 
+> le64_to_cpup doesn't take the right type. But I agree the macro is not
+> the nicest way to do this. Instead, I'll copy what
+> crypto/chacha20_generic.c does and define locally le64_to_cpuvp which
+> takes a void pointer:
+> 
+> static inline u64 le64_to_cpuvp(const void *p)
+> {
+>         return le64_to_cpup(p);
+> }
 
-The source code and the documentation is available at [1].
+Ah much better.
 
-[1] http://www.chronox.de/libkcapi.html
+> >> +__attribute__((optimize("unroll-loops")))
+> >
+> > Care to document why this attribute is needed?  Older versions of gcc
+> > doesn't know how to handle it properly?  Faster with newer versions?
+> > Black magic?  :)
+> 
+> It tells gcc to unroll the loops. Comparing the assembly, it looks
+> like on x86_64, gcc does twice as many rounds per loop iteration when
+> asked to unroll the loops. This allows the code to remain neat and
+> straightforward, while instructing gcc to do the gnarly part.
+> 
+> Is this too much rice? Have I been Gentoo-ing for too long? Or are
+> limited uses of unroll-loops acceptable?
 
-Changes v0.13.0:
+Given that this would be the first use of it in the kernel, it might be
+too much rice :)
 
- * change kcapi_aead_encrypt_aio, kcapi_aead_decrypt_aio,
-   kcapi_cipher_encrypt_aio and kcapi_cipher_decrypt_aio to require the
-   user to provide IOVECs for input and output buffers separately
- * addition of kcapi_aead_inbuflen_enc, kcapi_aead_inbuflen_dec,
-   kcapi_aead_outbuflen_enc, kcapi_aead_outbuflen_dec, 
-kcapi_aead_getdata_input,
-   kcapi_aead_getdata_output to allow apps to be programmed without specific
-   code handling for old and new AEAD AF_ALG interface (AAD and tag handling).
-   See the documentation section "AEAD Memory Structure" for an explanation
-   on how to use the API in a way to make the calling application agnostic
-   of the kernel interface differences.
- * significant addition to library to handle old / new AEAD AF_ALG interface
-   without the caller being aware of that
- * change AEAD tests such to use the new API calls to make code independent
-   of AEAD interface changes
- * split up of the library implementation into individual files to allow
-   a more clear code management and to allow even to selectively disable
-   code to make the library smaller
- * various small fixes suggested by Zbigniew Jędrzejewski-Szmek
- * fix memleak in kcapi_*_destroy suggested by Zbigniew Jędrzejewski-Szmek
- * use hard-links for the kcapi-hasher apps
- * add bi-arch tests
- * add check that AIO interface is only initialized if the kernel supports
-   AIO (library requires kernel 4.1.0 or larger for skcipher AIO and
-   4.7.0 or larger for AEAD AIO support)
- * add transparent fallback in case the caller requests AIO operation but
-   the AIO interface was not or could not be initialized -- the AIO API can be
-   used on systems without AIO support as the library transparently falls back
-   to the non-AIO operation (however, the library complains at the beginning
-   about the use of the AIO API on unsupported systems).
+Unless you can show real numbers that it actually matters, I wouldn't do
+it, it's not worth the hassle.  That's the same rule for when you use
+likely()/unlikely(), if you can not measure it, don't use it as you
+almost always get it wrong, the compiler is smarter, and keeps getting
+better over time.
 
-Ciao
-Stephan
+> > s/uint64_t/u64/g please.
+> 
+> Done.
+> 
+> > EXPORT_SYMBOL_GPL()?  I have to ask, sorry :)
+> 
+> Since it's public domain, EXPORT_SYMBOL() is fine.
+> 
+> If you have some reason for preferring GPL2 over public domain, I'm
+> happy to make the change. Maybe you want to preclude the new&shiny
+> from proprietary modules? That's fine with me, if you desire it being
+> that way.
+
+Nope, I just have to ask :)
+
+If it's dual licensed, a normal EXPORT_SYMBOL() is just fine, I have no
+objection to that at all.
+
+thanks,
+
+greg k-h
