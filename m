@@ -1,56 +1,63 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v2] siphash: add cryptographically secure hashtable function
-Date: Mon, 12 Dec 2016 22:57:14 +0100
-Message-ID: <CAHmME9p=8dz+hjcZsboNo+s8u=38UTQKXN+YcdR0ifwJAbQ_GQ@mail.gmail.com>
-References: <CAHmME9o3otY8oKW1TGDWM23j4yz3PVvZViuwmfJ+szpWbm2BfA@mail.gmail.com>
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v6 2/2] crypto: add virtio-crypto driver
+Date: Tue, 13 Dec 2016 00:05:19 +0200
+Message-ID: <20161212234941-mutt-send-email-mst@kernel.org>
+References: <1481171829-116496-1-git-send-email-arei.gonglei@huawei.com>
+ <1481171829-116496-3-git-send-email-arei.gonglei@huawei.com>
+ <33183CC9F5247A488A2544077AF19020DA15A07C@DGGEMA505-MBX.china.huawei.com>
+ <20161212105407.GA3033@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "kernel-hardening@lists.openwall.com"
-        <kernel-hardening@lists.openwall.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        George Spelvin <linux@horizon.com>,
-        Scott Bauer <sbauer@eng.utah.edu>,
-        Andi Kleen <ak@linux.intel.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        "Daniel J . Bernstein" <djb@cr.yp.to>
-To: Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
+        "virtualization@lists.linux-foundation.org"
+        <virtualization@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Luonengjun <luonengjun@huawei.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        "Wubin (H)" <wu.wubin@huawei.com>,
+        "xin.zeng@intel.com" <xin.zeng@intel.com>,
+        Claudio Fontana <Claudio.Fontana@huawei.com>,
+        "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.c
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:51604 "EHLO frisell.zx2c4.com"
+Received: from mx1.redhat.com ([209.132.183.28]:38256 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753169AbcLLV5U (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Dec 2016 16:57:20 -0500
-In-Reply-To: <CAHmME9o3otY8oKW1TGDWM23j4yz3PVvZViuwmfJ+szpWbm2BfA@mail.gmail.com>
+        id S932273AbcLLWFZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Dec 2016 17:05:25 -0500
+Content-Disposition: inline
+In-Reply-To: <20161212105407.GA3033@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 12, 2016 at 10:44 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> #if defined(CONFIG_DCACHE_WORD_ACCESS) && BITS_PER_LONG == 64
->        switch (left) {
->        case 0: break;
->        case 1: b |= data[0]; break;
->        case 2: b |= get_unaligned_le16(data); break;
->        case 4: b |= get_unaligned_le32(data); break;
->        default:
->                b |= le64_to_cpu(load_unaligned_zeropad(data) &
-> bytemask_from_count(left));
->                break;
->        }
-> #else
->        switch (left) {
->        case 7: b |= ((u64)data[6]) << 48;
->        case 6: b |= ((u64)data[5]) << 40;
->        case 5: b |= ((u64)data[4]) << 32;
->        case 4: b |= get_unaligned_le32(data); break;
->        case 3: b |= ((u64)data[2]) << 16;
->        case 2: b |= get_unaligned_le16(data); break;
->        case 1: b |= data[0];
->        }
-> #endif
+On Mon, Dec 12, 2016 at 06:54:07PM +0800, Herbert Xu wrote:
+> On Mon, Dec 12, 2016 at 06:25:12AM +0000, Gonglei (Arei) wrote:
+> > Hi, Michael & Herbert
+> > 
+> > Because the virtio-crypto device emulation had been in QEMU 2.8,
+> > would you please merge the virtio-crypto driver for 4.10 if no other
+> > comments? If so, Miachel pls ack and/or review the patch, then
+> > Herbert will take it (I asked him last week). Thank you!
+> > 
+> > Ps: Note on 4.10 merge window timing from Linus
+> >  https://lkml.org/lkml/2016/12/7/506
+> > 
+> > Dec 23rd is the deadline for 4.10 merge window.
+> 
+> Sorry but it's too late for 4.10.  It needed to have been in my
+> tree before the merge window opened to make it for this cycle.
+> 
+> Cheers,
 
-As it turns out, perhaps unsurprisingly, the code generation here is
-really not nice, resulting in many branches instead of a computed
-jump. I'll submit v3 with just a branch-less load_unaligned_zeropad
-for the 64-bit/dcache case and the duff's device for the other case.
+
+Objections to me merging this? I'm preparing my tree right now.
+
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
