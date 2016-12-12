@@ -1,34 +1,43 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH] keys/encrypted: Fix two crypto-on-the-stack bugs
-Date: Mon, 12 Dec 2016 22:28:26 +0000
-Message-ID: <5944.1481581706@warthog.procyon.org.uk>
-References: <e958f214e8885968be8045ffde813ac339b81178.1481575835.git.luto@kernel.org> <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
+From: Andi Kleen <ak@linux.intel.com>
+Subject: Re: [PATCH v3] siphash: add cryptographically secure hashtable
+ function
+Date: Mon, 12 Dec 2016 15:01:00 -0800
+Message-ID: <20161212230100.GN8388@tassilo.jf.intel.com>
+References: <CA+55aFymjmEPNx8ZwhxtiE=nPG_5gbkzUQhdRAwTareuNcV=tA@mail.gmail.com>
+ <20161212221832.10653-1-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org,
-        linux-usb@vger.kernel.org, keyrings@vger.kernel.org,
+Content-Type: text/plain; charset=us-ascii
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+        "kernel-hardening@lists.openwall.com"
+        <kernel-hardening@lists.openwall.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        George Spelvin <linux@horizon.com>,
+        Scott Bauer <sbauer@eng.utah.edu>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
         Eric Biggers <ebiggers3@gmail.com>,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Stephan Mueller <smueller@chronox.de>
-To: Andy Lutomirski <luto@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <e958f214e8885968be8045ffde813ac339b81178.1481575835.git.luto@kernel.org>
-Content-ID: <5943.1481581706.1@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        "Daniel J . Bernstein" <djb@cr.yp.to>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:1567 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752189AbcLLXBB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Dec 2016 18:01:01 -0500
+Content-Disposition: inline
+In-Reply-To: <20161212221832.10653-1-Jason@zx2c4.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Andy Lutomirski <luto@kernel.org> wrote:
+> Dozens of languages are already using this internally for their hash
+> tables. Some of the BSDs already use this in their kernels. SipHash is
+> a widely known high-speed solution to a widely known problem, and it's
+> time we catch-up.
 
-> +static const char zero_pad[16] = {0};
+It would be nice if the network code could be converted to use siphash
+for the secure sequence numbers. Right now it pulls in a lot of code
+for bigger secure hashes just for that, which is a problem for tiny
+kernels.
 
-Isn't there a global page of zeros or something that we can share?  Also, you
-shouldn't explicitly initialise it so that it stays in .bss.
-
-> -	sg_set_buf(&sg_out[1], pad, sizeof pad);
-> +	sg_set_buf(&sg_out[1], zero_pad, sizeof zero_pad);
-
-Can you put brackets on the sizeof?
-
-Thanks,
-David
+-Andi
