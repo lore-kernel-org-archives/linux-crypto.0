@@ -1,92 +1,393 @@
 From: Jan Glauber <jglauber@cavium.com>
-Subject: [RFC PATCH 0/3] Cavium ThunderX ZIP driver
-Date: Mon, 12 Dec 2016 16:04:36 +0100
-Message-ID: <20161212150439.18627-1-jglauber@cavium.com>
+Subject: [RFC PATCH 3/3] crypto: zip - Add Compression/decompression statistics
+Date: Mon, 12 Dec 2016 16:04:39 +0100
+Message-ID: <20161212150439.18627-4-jglauber@cavium.com>
+References: <20161212150439.18627-1-jglauber@cavium.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         "David S . Miller" <davem@davemloft.net>,
         Mahipal Challa <Mahipal.Challa@cavium.com>,
         Vishnu Nair <Vishnu.Nair@cavium.com>,
         Jan Glauber <jglauber@cavium.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wj0-f195.google.com ([209.85.210.195]:33319 "EHLO
-        mail-wj0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751025AbcLLPFE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Dec 2016 10:05:04 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20161212150439.18627-1-jglauber@cavium.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+From: Mahipal Challa <Mahipal.Challa@cavium.com>
 
-this series adds support for hardware accelerated compression & decompression
-as found on ThunderX (arm64) SOCs. I've been reviewing this driver internally
-for some time and would like to get feedback on the RFC to see if this goes
-into the right direction and to see if there are any concerns.
+Add statistics for compression/decompression hardware offload
+under debugfs.
 
-We've discussed switching to the new acomp algorithm but for the time being
-decided against acomp because our test cases are not yet supported with it.
+Signed-off-by: Mahipal Challa <Mahipal.Challa@cavium.com>
+Signed-off-by: Vishnu Nair <Vishnu.Nair@cavium.com>
+Signed-off-by: Jan Glauber <jglauber@cavium.com>
+---
+ drivers/crypto/cavium/zip/zip_deflate.c |  10 ++
+ drivers/crypto/cavium/zip/zip_inflate.c |  12 ++
+ drivers/crypto/cavium/zip/zip_main.c    | 227 ++++++++++++++++++++++++++++++++
+ drivers/crypto/cavium/zip/zip_main.h    |  15 +++
+ 4 files changed, 264 insertions(+)
 
-To test the ZIP driver we've used ZSWAP and IPComp.
-
-Performance numbers from ZSWAP look promising.
-The "average time" for compressing a 4KB page:
-
-Compression Software	:  128 usec
-Compression HW deflate	:   16 usec
-Compression HW LZS	:   10 usec
-
-Decompression Software	: 20 usec
-Decompression HW deflate: 7 usec
-Decompression HW LZS	: 5 usec
-
-Patches are on top of 4.9.
-
-Feedback welcome!
-Jan 
-
----------------------
-
-Mahipal Challa (3):
-  crypto: zip - Add ThunderX ZIP driver core
-  crypto: zip - Wire-up Compression / decompression HW offload
-  crypto: zip - Add Compression/decompression statistics
-
- drivers/crypto/Kconfig                  |    7 +
- drivers/crypto/Makefile                 |    1 +
- drivers/crypto/cavium/Makefile          |    4 +
- drivers/crypto/cavium/zip/Makefile      |   11 +
- drivers/crypto/cavium/zip/common.h      |  258 ++++++
- drivers/crypto/cavium/zip/zip_crypto.c  |  243 ++++++
- drivers/crypto/cavium/zip/zip_crypto.h  |   67 ++
- drivers/crypto/cavium/zip/zip_deflate.c |  200 +++++
- drivers/crypto/cavium/zip/zip_deflate.h |   62 ++
- drivers/crypto/cavium/zip/zip_device.c  |  209 +++++
- drivers/crypto/cavium/zip/zip_device.h  |  138 ++++
- drivers/crypto/cavium/zip/zip_inflate.c |  223 ++++++
- drivers/crypto/cavium/zip/zip_inflate.h |   62 ++
- drivers/crypto/cavium/zip/zip_main.c    |  698 ++++++++++++++++
- drivers/crypto/cavium/zip/zip_main.h    |  141 ++++
- drivers/crypto/cavium/zip/zip_mem.c     |  120 +++
- drivers/crypto/cavium/zip/zip_mem.h     |   78 ++
- drivers/crypto/cavium/zip/zip_regs.h    | 1326 +++++++++++++++++++++++++++++++
- 18 files changed, 3848 insertions(+)
- create mode 100644 drivers/crypto/cavium/Makefile
- create mode 100644 drivers/crypto/cavium/zip/Makefile
- create mode 100644 drivers/crypto/cavium/zip/common.h
- create mode 100644 drivers/crypto/cavium/zip/zip_crypto.c
- create mode 100644 drivers/crypto/cavium/zip/zip_crypto.h
- create mode 100644 drivers/crypto/cavium/zip/zip_deflate.c
- create mode 100644 drivers/crypto/cavium/zip/zip_deflate.h
- create mode 100644 drivers/crypto/cavium/zip/zip_device.c
- create mode 100644 drivers/crypto/cavium/zip/zip_device.h
- create mode 100644 drivers/crypto/cavium/zip/zip_inflate.c
- create mode 100644 drivers/crypto/cavium/zip/zip_inflate.h
- create mode 100644 drivers/crypto/cavium/zip/zip_main.c
- create mode 100644 drivers/crypto/cavium/zip/zip_main.h
- create mode 100644 drivers/crypto/cavium/zip/zip_mem.c
- create mode 100644 drivers/crypto/cavium/zip/zip_mem.h
- create mode 100644 drivers/crypto/cavium/zip/zip_regs.h
-
+diff --git a/drivers/crypto/cavium/zip/zip_deflate.c b/drivers/crypto/cavium/zip/zip_deflate.c
+index 913cc25..11052d8 100644
+--- a/drivers/crypto/cavium/zip/zip_deflate.c
++++ b/drivers/crypto/cavium/zip/zip_deflate.c
+@@ -122,12 +122,19 @@ int zip_deflate(struct zip_operation *zip_ops, struct zip_state *s,
+ 	/* Prepares zip command based on the input parameters */
+ 	prepare_zip_command(zip_ops, s, zip_cmd);
+ 
++	atomic64_add(zip_ops->input_len, &zip_dev->stats.comp_in_bytes);
+ 	/* Loads zip command into command queues and rings door bell */
+ 	queue = zip_load_instr(zip_cmd, zip_dev);
+ 
++	/* Stats update for compression requests submitted */
++	atomic64_inc(&zip_dev->stats.comp_req_submit);
++
+ 	while (!result_ptr->s.compcode)
+ 		continue;
+ 
++	/* Stats update for compression requests completed */
++	atomic64_inc(&zip_dev->stats.comp_req_complete);
++
+ 	zip_ops->compcode = result_ptr->s.compcode;
+ 	switch (zip_ops->compcode) {
+ 	case ZIP_NOTDONE:
+@@ -175,6 +182,9 @@ int zip_deflate(struct zip_operation *zip_ops, struct zip_state *s,
+ 		zip_err("Unknown Format:%d\n", zip_ops->format);
+ 	}
+ 
++	atomic64_add(result_ptr->s.totalbyteswritten,
++		     &zip_dev->stats.comp_out_bytes);
++
+ 	/* Update output_len */
+ 	if (zip_ops->output_len < result_ptr->s.totalbyteswritten) {
+ 		/* Dynamic stop && strm->output_len < zipconstants[onfsize] */
+diff --git a/drivers/crypto/cavium/zip/zip_inflate.c b/drivers/crypto/cavium/zip/zip_inflate.c
+index 849c4c85..44503d8 100644
+--- a/drivers/crypto/cavium/zip/zip_inflate.c
++++ b/drivers/crypto/cavium/zip/zip_inflate.c
+@@ -135,12 +135,20 @@ int zip_inflate(struct zip_operation *zip_ops, struct zip_state *s,
+ 	/* Prepare inflate zip command */
+ 	prepare_inflate_zcmd(zip_ops, s, zip_cmd);
+ 
++	atomic64_add(zip_ops->input_len, &zip_dev->stats.decomp_in_bytes);
++
+ 	/* Load inflate command to zip queue and ring the doorbell */
+ 	queue = zip_load_instr(zip_cmd, zip_dev);
+ 
++	/* Decompression requests submitted stats update */
++	atomic64_inc(&zip_dev->stats.decomp_req_submit);
++
+ 	while (!result_ptr->s.compcode)
+ 		continue;
+ 
++	/* Decompression requests completed stats update */
++	atomic64_inc(&zip_dev->stats.decomp_req_complete);
++
+ 	zip_ops->compcode = result_ptr->s.compcode;
+ 	switch (zip_ops->compcode) {
+ 	case ZIP_NOTDONE:
+@@ -157,6 +165,7 @@ int zip_inflate(struct zip_operation *zip_ops, struct zip_state *s,
+ 
+ 	default:
+ 		zip_dbg("Instruction failed. Code = %d\n", zip_ops->compcode);
++		atomic64_inc(&zip_dev->stats.decomp_bad_reqs);
+ 		zip_update_cmd_bufs(zip_dev, queue);
+ 		return ZIP_ERROR;
+ 	}
+@@ -169,6 +178,9 @@ int zip_inflate(struct zip_operation *zip_ops, struct zip_state *s,
+ 
+ 	zip_ops->csum = result_ptr->s.adler32;
+ 
++	atomic64_add(result_ptr->s.totalbyteswritten,
++		     &zip_dev->stats.decomp_out_bytes);
++
+ 	if (zip_ops->output_len < result_ptr->s.totalbyteswritten) {
+ 		zip_err("output_len (%d) < total bytes written (%d)\n",
+ 			zip_ops->output_len, result_ptr->s.totalbyteswritten);
+diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
+index ae3395f..56631bf 100644
+--- a/drivers/crypto/cavium/zip/zip_main.c
++++ b/drivers/crypto/cavium/zip/zip_main.c
+@@ -427,6 +427,228 @@ static void zip_unregister_compression_device(void)
+ 	crypto_unregister_alg(&zip_comp_lzs);
+ }
+ 
++/*
++ * debugfs functions
++ */
++#ifdef CONFIG_DEBUG_FS
++#include <linux/debugfs.h>
++
++/* Displays ZIP device statistics */
++static int zip_show_stats(struct seq_file *s, void *unused)
++{
++	u64 val = 0ull;
++	u64 avg_chunk = 0ull, avg_cr = 0ull;
++	u32 q = 0;
++
++	int index  = 0;
++	struct zip_device *zip;
++	struct zip_stats  *st;
++
++	for (index = 0; index < MAX_ZIP_DEVICES; index++) {
++		if (zip_dev[index]) {
++			zip = zip_dev[index];
++			st  = &zip->stats;
++
++			/* Get all the pending requests */
++			for (q = 0; q < ZIP_NUM_QUEUES; q++) {
++				val = zip_reg_read((zip->reg_base +
++						    ZIP_DBG_COREX_STA(q)));
++				val = (val >> 32);
++				val = val & 0xffffff;
++				atomic64_add(val, &st->pending_req);
++			}
++
++			avg_chunk = (atomic64_read(&st->comp_in_bytes) /
++				     atomic64_read(&st->comp_req_complete));
++			avg_cr = (atomic64_read(&st->comp_in_bytes) /
++				  atomic64_read(&st->comp_out_bytes));
++			seq_printf(s, "        ZIP Device %d Stats\n"
++				      "-----------------------------------\n"
++				      "Comp Req Submitted        : \t%ld\n"
++				      "Comp Req Completed        : \t%ld\n"
++				      "Compress In Bytes         : \t%ld\n"
++				      "Compressed Out Bytes      : \t%ld\n"
++				      "Average Chunk size        : \t%llu\n"
++				      "Average Compression ratio : \t%llu\n"
++				      "Decomp Req Submitted      : \t%ld\n"
++				      "Decomp Req Completed      : \t%ld\n"
++				      "Decompress In Bytes       : \t%ld\n"
++				      "Decompressed Out Bytes    : \t%ld\n"
++				      "Decompress Bad requests   : \t%ld\n"
++				      "Pending Req               : \t%ld\n"
++					"---------------------------------\n",
++				       index,
++				       atomic64_read(&st->comp_req_submit),
++				       atomic64_read(&st->comp_req_complete),
++				       atomic64_read(&st->comp_in_bytes),
++				       atomic64_read(&st->comp_out_bytes),
++				       avg_chunk,
++				       avg_cr,
++				       atomic64_read(&st->decomp_req_submit),
++				       atomic64_read(&st->decomp_req_complete),
++				       atomic64_read(&st->decomp_in_bytes),
++				       atomic64_read(&st->decomp_out_bytes),
++				       atomic64_read(&st->decomp_bad_reqs),
++				       atomic64_read(&st->pending_req));
++
++			/* Reset pending requests  count */
++			atomic64_set(&st->pending_req, 0);
++		}
++	}
++	return 0;
++}
++
++/* Clears stats data */
++static int zip_clear_stats(struct seq_file *s, void *unused)
++{
++	int index = 0;
++
++	for (index = 0; index < MAX_ZIP_DEVICES; index++) {
++		if (zip_dev[index]) {
++			memset(&zip_dev[index]->stats, 0,
++			       sizeof(struct zip_state));
++			seq_printf(s, "Cleared stats for zip %d\n", index);
++		}
++	}
++
++	return 0;
++}
++
++static struct zip_registers zipregs[64] = {
++	{"ZIP_CMD_CTL        ",  0x0000ull},
++	{"ZIP_THROTTLE       ",  0x0010ull},
++	{"ZIP_CONSTANTS      ",  0x00A0ull},
++	{"ZIP_QUE0_MAP       ",  0x1400ull},
++	{"ZIP_QUE1_MAP       ",  0x1408ull},
++	{"ZIP_QUE_ENA        ",  0x0500ull},
++	{"ZIP_QUE_PRI        ",  0x0508ull},
++	{"ZIP_QUE0_DONE      ",  0x2000ull},
++	{"ZIP_QUE1_DONE      ",  0x2008ull},
++	{"ZIP_QUE0_DOORBELL  ",  0x4000ull},
++	{"ZIP_QUE1_DOORBELL  ",  0x4008ull},
++	{"ZIP_QUE0_SBUF_ADDR ",  0x1000ull},
++	{"ZIP_QUE1_SBUF_ADDR ",  0x1008ull},
++	{"ZIP_QUE0_SBUF_CTL  ",  0x1200ull},
++	{"ZIP_QUE1_SBUF_CTL  ",  0x1208ull},
++	{ NULL, 0}
++};
++
++/* Prints registers' contents */
++static int zip_print_regs(struct seq_file *s, void *unused)
++{
++	u64 val = 0;
++	int i = 0, index = 0;
++
++	for (index = 0; index < MAX_ZIP_DEVICES; index++) {
++		if (zip_dev[index]) {
++			seq_printf(s, "--------------------------------\n"
++				      "     ZIP Device %d Registers\n"
++				      "--------------------------------\n",
++				      index);
++
++			i = 0;
++
++			while (zipregs[i].reg_name) {
++				val = zip_reg_read((zip_dev[index]->reg_base +
++						    zipregs[i].reg_offset));
++				seq_printf(s, "%s: 0x%016llx\n",
++					   zipregs[i].reg_name, val);
++				i++;
++			}
++		}
++	}
++	return 0;
++}
++
++static int zip_stats_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, zip_show_stats, NULL);
++}
++
++static const struct file_operations zip_stats_fops = {
++	.owner = THIS_MODULE,
++	.open  = zip_stats_open,
++	.read  = seq_read,
++};
++
++static int zip_clear_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, zip_clear_stats, NULL);
++}
++
++static const struct file_operations zip_clear_fops = {
++	.owner = THIS_MODULE,
++	.open  = zip_clear_open,
++	.read  = seq_read,
++};
++
++static int zip_regs_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, zip_print_regs, NULL);
++}
++
++static const struct file_operations zip_regs_fops = {
++	.owner = THIS_MODULE,
++	.open  = zip_regs_open,
++	.read  = seq_read,
++};
++
++/* Root directory for thunderx_zip debugfs entry */
++static struct dentry *zip_debugfs_root;
++
++static int __init zip_debugfs_init(void)
++{
++	struct dentry *zip_stats, *zip_clear, *zip_regs;
++
++	if (!debugfs_initialized())
++		return -ENODEV;
++
++	zip_debugfs_root = debugfs_create_dir("thunderx_zip", NULL);
++	if (!zip_debugfs_root)
++		return -ENOMEM;
++
++	/* Creating files for entries inside thunderx_zip directory */
++	zip_stats = debugfs_create_file("zip_stats", S_IRUGO,
++					zip_debugfs_root,
++					NULL, &zip_stats_fops);
++	if (!zip_stats)
++		goto failed_to_create;
++
++	zip_clear = debugfs_create_file("zip_clear", S_IRUGO,
++					zip_debugfs_root,
++					NULL, &zip_clear_fops);
++	if (!zip_clear)
++		goto failed_to_create;
++
++	zip_regs = debugfs_create_file("zip_regs", S_IRUGO,
++				       zip_debugfs_root,
++				       NULL, &zip_regs_fops);
++	if (!zip_regs)
++		goto failed_to_create;
++
++	return 0;
++
++failed_to_create:
++	debugfs_remove_recursive(zip_debugfs_root);
++	return -ENOENT;
++}
++
++static void __exit zip_debugfs_exit(void)
++{
++	debugfs_remove_recursive(zip_debugfs_root);
++}
++
++#else
++static int __init zip_debugfs_init(void)
++{
++	return 0;
++}
++
++static void __exit zip_debugfs_exit(void) { }
++
++#endif
++/* debugfs - end */
++
+ static int __init zip_init_module(void)
+ {
+ 	int ret;
+@@ -448,11 +670,16 @@ static int __init zip_init_module(void)
+ 		return 1;
+ 	}
+ 
++	if (zip_debugfs_init())
++		zip_msg("debugfs initialization failed\n");
++
+ 	return ret;
+ }
+ 
+ static void __exit zip_cleanup_module(void)
+ {
++	zip_debugfs_exit();
++
+ 	/* Unregister this driver for pci zip devices */
+ 	pci_unregister_driver(&zip_driver);
+ 
+diff --git a/drivers/crypto/cavium/zip/zip_main.h b/drivers/crypto/cavium/zip/zip_main.h
+index 73b9e6d..cd7963e 100644
+--- a/drivers/crypto/cavium/zip/zip_main.h
++++ b/drivers/crypto/cavium/zip/zip_main.h
+@@ -87,6 +87,20 @@ struct zip_registers {
+ 	u64   reg_offset;
+ };
+ 
++/* ZIP Compression - Decompression stats */
++struct zip_stats {
++	atomic64_t    comp_req_submit;
++	atomic64_t    comp_req_complete;
++	atomic64_t    decomp_req_submit;
++	atomic64_t    decomp_req_complete;
++	atomic64_t    pending_req;
++	atomic64_t    comp_in_bytes;
++	atomic64_t    comp_out_bytes;
++	atomic64_t    decomp_in_bytes;
++	atomic64_t    decomp_out_bytes;
++	atomic64_t    decomp_bad_reqs;
++};
++
+ /* ZIP Instruction Queue */
+ struct zip_iq {
+ 	u64        *sw_head;
+@@ -112,6 +126,7 @@ struct zip_device {
+ 	u64               ctxsize;
+ 
+ 	struct zip_iq     iq[ZIP_MAX_NUM_QUEUES];
++	struct zip_stats  stats;
+ };
+ 
+ /* Prototypes */
 -- 
 2.9.0.rc0.21.g7777322
