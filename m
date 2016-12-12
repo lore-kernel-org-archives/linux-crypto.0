@@ -1,37 +1,59 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v3] siphash: add cryptographically secure hashtable function
-Date: Tue, 13 Dec 2016 00:04:27 +0100
-Message-ID: <CAHmME9qk+Z8CdhTFQnTkwT8S-n56tzi77-uAV3dNigcGMQx7uQ@mail.gmail.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: [PATCH] wusbcore: Fix one more crypto-on-the-stack bug
+Date: Mon, 12 Dec 2016 15:57:52 -0800
+Message-ID: <CALCETrUazFL7h01Ej_TttFJrEMRTivZKDx8nLWkZRkBdfcH=ug@mail.gmail.com>
+References: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
+ <20161212214447.GA12142@kroah.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-        "kernel-hardening@lists.openwall.com"
-        <kernel-hardening@lists.openwall.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        George Spelvin <linux@horizon.com>,
-        Scott Bauer <sbauer@eng.utah.edu>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
+Cc: Andy Lutomirski <luto@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
         Eric Biggers <ebiggers3@gmail.com>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        "Daniel J . Bernstein" <djb@cr.yp.to>
-To: Andi Kleen <ak@linux.intel.com>
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>
+To: Greg KH <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:50109 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751845AbcLLXEd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Dec 2016 18:04:33 -0500
+Received: from mail-ua0-f179.google.com ([209.85.217.179]:34088 "EHLO
+        mail-ua0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932219AbcLLX6O (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Dec 2016 18:58:14 -0500
+Received: by mail-ua0-f179.google.com with SMTP id 51so97315104uai.1
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Dec 2016 15:58:14 -0800 (PST)
+In-Reply-To: <20161212214447.GA12142@kroah.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 13, 2016 at 12:01 AM, Andi Kleen <ak@linux.intel.com> wrote:
-> It would be nice if the network code could be converted to use siphash
-> for the secure sequence numbers. Right now it pulls in a lot of code
-> for bigger secure hashes just for that, which is a problem for tiny
-> kernels.
+On Mon, Dec 12, 2016 at 1:44 PM, Greg KH <gregkh@linuxfoundation.org> wrote:
+> On Mon, Dec 12, 2016 at 12:52:45PM -0800, Andy Lutomirski wrote:
+>> The driver put a constant buffer of all zeros on the stack and
+>> pointed a scatterlist entry at it.  This doesn't work with virtual
+>> stacks.  Make the buffer static to fix it.
+>>
+>> Cc: stable@vger.kernel.org # 4.9 only
+>> Reported-by: Eric Biggers <ebiggers3@gmail.com>
+>> Signed-off-by: Andy Lutomirski <luto@kernel.org>
+>> ---
+>>  drivers/usb/wusbcore/crypto.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/usb/wusbcore/crypto.c b/drivers/usb/wusbcore/crypto.c
+>> index 79451f7ef1b7..a7e007a0cd49 100644
+>> --- a/drivers/usb/wusbcore/crypto.c
+>> +++ b/drivers/usb/wusbcore/crypto.c
+>> @@ -216,7 +216,7 @@ static int wusb_ccm_mac(struct crypto_skcipher *tfm_cbc,
+>>       struct scatterlist sg[4], sg_dst;
+>>       void *dst_buf;
+>>       size_t dst_size;
+>> -     const u8 bzero[16] = { 0 };
+>> +     static const u8 bzero[16] = { 0 };
+>
+> Hm, can static memory handle DMA?  That's a requirement of the USB
+> stack, does this data later end up being sent down to a USB host
+> controller?
 
-Indeed this would be a great first candidate. There are lots of places
-where MD5 (!!) is pulled in for this sort of thing, when SipHash could
-be a faster and leaner replacement (and arguably more secure than
-rusty MD5).
+I think it doesn't, but I'll switch it to use empty_zero_page instead.
+
+--Andy
