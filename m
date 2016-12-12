@@ -1,89 +1,104 @@
 From: Andy Lutomirski <luto@kernel.org>
-Subject: [PATCH] keys/encrypted: Fix two crypto-on-the-stack bugs
-Date: Mon, 12 Dec 2016 12:53:24 -0800
-Message-ID: <e958f214e8885968be8045ffde813ac339b81178.1481575835.git.luto@kernel.org>
+Subject: [PATCH] cifs: Fix smbencrypt() to stop pointing a scatterlist at the stack
+Date: Mon, 12 Dec 2016 12:54:37 -0800
+Message-ID: <308cdb484648f98f6f0ad9feefd8acb2fe003aaf.1481575835.git.luto@kernel.org>
 References: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
 Cc: Eric Biggers <ebiggers3@gmail.com>, linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Stephan Mueller <smueller@chronox.de>,
-        Andy Lutomirski <luto@kernel.org>
+        linux-cifs@vger.kernel.org, Andy Lutomirski <luto@kernel.org>
 To: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-        dhowells@redhat.com, keyrings@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:44828 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753397AbcLLUx3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Dec 2016 15:53:29 -0500
+        sfrench@samba.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The driver put a constant buffer of all zeros on the stack and
-pointed a scatterlist entry at it in two places.  This doesn't work
-with virtual stacks.  Use a static 16-byte buffer of zeros instead.
+smbencrypt() points a scatterlist to the stack, which is breaks if
+CONFIG_VMAP_STACK=y.
+
+Fix it by switching to crypto_cipher_encrypt_one().  The new code
+should be considerably faster as an added benefit.
+
+This code is nearly identical to some code that Eric Biggers
+suggested.
 
 Cc: stable@vger.kernel.org # 4.9 only
 Reported-by: Eric Biggers <ebiggers3@gmail.com>
 Signed-off-by: Andy Lutomirski <luto@kernel.org>
 ---
- security/keys/encrypted-keys/encrypted.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/security/keys/encrypted-keys/encrypted.c b/security/keys/encrypted-keys/encrypted.c
-index 17a06105ccb6..fab2fb864002 100644
---- a/security/keys/encrypted-keys/encrypted.c
-+++ b/security/keys/encrypted-keys/encrypted.c
-@@ -46,6 +46,7 @@ static const char key_format_default[] = "default";
- static const char key_format_ecryptfs[] = "ecryptfs";
- static unsigned int ivsize;
- static int blksize;
-+static const char zero_pad[16] = {0};
+Compile-tested only.
+
+fs/cifs/smbencrypt.c | 40 ++++++++--------------------------------
+ 1 file changed, 8 insertions(+), 32 deletions(-)
+
+diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
+index 699b7868108f..c12bffefa3c9 100644
+--- a/fs/cifs/smbencrypt.c
++++ b/fs/cifs/smbencrypt.c
+@@ -23,7 +23,7 @@
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
  
- #define KEY_TRUSTED_PREFIX_LEN (sizeof (KEY_TRUSTED_PREFIX) - 1)
- #define KEY_USER_PREFIX_LEN (sizeof (KEY_USER_PREFIX) - 1)
-@@ -481,7 +482,6 @@ static int derived_key_encrypt(struct encrypted_key_payload *epayload,
- 	unsigned int encrypted_datalen;
- 	u8 iv[AES_BLOCK_SIZE];
- 	unsigned int padlen;
--	char pad[16];
- 	int ret;
+-#include <crypto/skcipher.h>
++#include <linux/crypto.h>
+ #include <linux/module.h>
+ #include <linux/slab.h>
+ #include <linux/fs.h>
+@@ -69,46 +69,22 @@ str_to_key(unsigned char *str, unsigned char *key)
+ static int
+ smbhash(unsigned char *out, const unsigned char *in, unsigned char *key)
+ {
+-	int rc;
+ 	unsigned char key2[8];
+-	struct crypto_skcipher *tfm_des;
+-	struct scatterlist sgin, sgout;
+-	struct skcipher_request *req;
++	struct crypto_cipher *tfm_des;
  
- 	encrypted_datalen = roundup(epayload->decrypted_datalen, blksize);
-@@ -493,11 +493,10 @@ static int derived_key_encrypt(struct encrypted_key_payload *epayload,
- 		goto out;
- 	dump_decrypted_data(epayload);
+ 	str_to_key(key, key2);
  
--	memset(pad, 0, sizeof pad);
- 	sg_init_table(sg_in, 2);
- 	sg_set_buf(&sg_in[0], epayload->decrypted_data,
- 		   epayload->decrypted_datalen);
--	sg_set_buf(&sg_in[1], pad, padlen);
-+	sg_set_buf(&sg_in[1], zero_pad, padlen);
+-	tfm_des = crypto_alloc_skcipher("ecb(des)", 0, CRYPTO_ALG_ASYNC);
++	tfm_des = crypto_alloc_cipher("des", 0, 0);
+ 	if (IS_ERR(tfm_des)) {
+-		rc = PTR_ERR(tfm_des);
+-		cifs_dbg(VFS, "could not allocate des crypto API\n");
+-		goto smbhash_err;
+-	}
+-
+-	req = skcipher_request_alloc(tfm_des, GFP_KERNEL);
+-	if (!req) {
+-		rc = -ENOMEM;
+ 		cifs_dbg(VFS, "could not allocate des crypto API\n");
+-		goto smbhash_free_skcipher;
++		return PTR_ERR(tfm_des);
+ 	}
  
- 	sg_init_table(sg_out, 1);
- 	sg_set_buf(sg_out, epayload->encrypted_data, encrypted_datalen);
-@@ -584,7 +583,6 @@ static int derived_key_decrypt(struct encrypted_key_payload *epayload,
- 	struct skcipher_request *req;
- 	unsigned int encrypted_datalen;
- 	u8 iv[AES_BLOCK_SIZE];
--	char pad[16];
- 	int ret;
+-	crypto_skcipher_setkey(tfm_des, key2, 8);
+-
+-	sg_init_one(&sgin, in, 8);
+-	sg_init_one(&sgout, out, 8);
++	crypto_cipher_setkey(tfm_des, key2, 8);
++	crypto_cipher_encrypt_one(tfm_des, out, in);
++	crypto_free_cipher(tfm_des);
  
- 	encrypted_datalen = roundup(epayload->decrypted_datalen, blksize);
-@@ -594,13 +592,12 @@ static int derived_key_decrypt(struct encrypted_key_payload *epayload,
- 		goto out;
- 	dump_encrypted_data(epayload, encrypted_datalen);
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
+-	skcipher_request_set_crypt(req, &sgin, &sgout, 8, NULL);
+-
+-	rc = crypto_skcipher_encrypt(req);
+-	if (rc)
+-		cifs_dbg(VFS, "could not encrypt crypt key rc: %d\n", rc);
+-
+-	skcipher_request_free(req);
+-
+-smbhash_free_skcipher:
+-	crypto_free_skcipher(tfm_des);
+-smbhash_err:
+-	return rc;
++	return 0;
+ }
  
--	memset(pad, 0, sizeof pad);
- 	sg_init_table(sg_in, 1);
- 	sg_init_table(sg_out, 2);
- 	sg_set_buf(sg_in, epayload->encrypted_data, encrypted_datalen);
- 	sg_set_buf(&sg_out[0], epayload->decrypted_data,
- 		   epayload->decrypted_datalen);
--	sg_set_buf(&sg_out[1], pad, sizeof pad);
-+	sg_set_buf(&sg_out[1], zero_pad, sizeof zero_pad);
- 
- 	memcpy(iv, epayload->iv, sizeof(iv));
- 	skcipher_request_set_crypt(req, sg_in, sg_out, encrypted_datalen, iv);
+ static int
 -- 
 2.9.3
