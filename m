@@ -1,70 +1,49 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v2] siphash: add cryptographically secure hashtable function
-Date: Mon, 12 Dec 2016 22:44:09 +0100
-Message-ID: <CAHmME9o3otY8oKW1TGDWM23j4yz3PVvZViuwmfJ+szpWbm2BfA@mail.gmail.com>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH] wusbcore: Fix one more crypto-on-the-stack bug
+Date: Mon, 12 Dec 2016 22:44:47 +0100
+Message-ID: <20161212214447.GA12142@kroah.com>
+References: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "kernel-hardening@lists.openwall.com"
-        <kernel-hardening@lists.openwall.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        George Spelvin <linux@horizon.com>,
-        Scott Bauer <sbauer@eng.utah.edu>,
-        Andi Kleen <ak@linux.intel.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        "Daniel J . Bernstein" <djb@cr.yp.to>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:41823 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751028AbcLLVoP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Dec 2016 16:44:15 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        Eric Biggers <ebiggers3@gmail.com>,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>
+To: Andy Lutomirski <luto@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus,
+On Mon, Dec 12, 2016 at 12:52:45PM -0800, Andy Lutomirski wrote:
+> The driver put a constant buffer of all zeros on the stack and
+> pointed a scatterlist entry at it.  This doesn't work with virtual
+> stacks.  Make the buffer static to fix it.
+> 
+> Cc: stable@vger.kernel.org # 4.9 only
+> Reported-by: Eric Biggers <ebiggers3@gmail.com>
+> Signed-off-by: Andy Lutomirski <luto@kernel.org>
+> ---
+>  drivers/usb/wusbcore/crypto.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/usb/wusbcore/crypto.c b/drivers/usb/wusbcore/crypto.c
+> index 79451f7ef1b7..a7e007a0cd49 100644
+> --- a/drivers/usb/wusbcore/crypto.c
+> +++ b/drivers/usb/wusbcore/crypto.c
+> @@ -216,7 +216,7 @@ static int wusb_ccm_mac(struct crypto_skcipher *tfm_cbc,
+>  	struct scatterlist sg[4], sg_dst;
+>  	void *dst_buf;
+>  	size_t dst_size;
+> -	const u8 bzero[16] = { 0 };
+> +	static const u8 bzero[16] = { 0 };
 
-> I guess you could try to just remove the "if (left)" test entirely, if
-> it is at least partly the mispredict. It should do the right thing
-> even with a zero count, and it might schedule the code better. Code
-> size _should_ be better with the byte mask model (which won't matter
-> in the hot loop example, since it will all be cached, possibly even in
-> the uop cache for really tight benchmark loops).
+Hm, can static memory handle DMA?  That's a requirement of the USB
+stack, does this data later end up being sent down to a USB host
+controller?
 
-Originally I had just forgotten the `if (left)`, and had the same
-sub-par benchmarks. In the v3 revision that I'm working on at the
-moment, I'm using your dcache trick for cases 3,5,6,7 and
-short-circuiting cases 1,2,4 to just directly access those bytes as
-integers. For the 32-bit case, I do something similar, but built
-inside of the duff's device. This should give optimal performance for
-the most popular use cases, which involve hashing "some stuff" plus a
-leftover u16 (port number?) or u32 (ipv4 addr?).
+thanks,
 
-#if defined(CONFIG_DCACHE_WORD_ACCESS) && BITS_PER_LONG == 64
-       switch (left) {
-       case 0: break;
-       case 1: b |= data[0]; break;
-       case 2: b |= get_unaligned_le16(data); break;
-       case 4: b |= get_unaligned_le32(data); break;
-       default:
-               b |= le64_to_cpu(load_unaligned_zeropad(data) &
-bytemask_from_count(left));
-               break;
-       }
-#else
-       switch (left) {
-       case 7: b |= ((u64)data[6]) << 48;
-       case 6: b |= ((u64)data[5]) << 40;
-       case 5: b |= ((u64)data[4]) << 32;
-       case 4: b |= get_unaligned_le32(data); break;
-       case 3: b |= ((u64)data[2]) << 16;
-       case 2: b |= get_unaligned_le16(data); break;
-       case 1: b |= data[0];
-       }
-#endif
-
-It seems like this might be best of all worlds?
-
-Jason
+greg k-h
