@@ -1,12 +1,9 @@
-From: Andi Kleen <ak@linux.intel.com>
-Subject: Re: [PATCH v3] siphash: add cryptographically secure hashtable
- function
-Date: Mon, 12 Dec 2016 15:01:00 -0800
-Message-ID: <20161212230100.GN8388@tassilo.jf.intel.com>
-References: <CA+55aFymjmEPNx8ZwhxtiE=nPG_5gbkzUQhdRAwTareuNcV=tA@mail.gmail.com>
- <20161212221832.10653-1-Jason@zx2c4.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v3] siphash: add cryptographically secure hashtable function
+Date: Tue, 13 Dec 2016 00:04:27 +0100
+Message-ID: <CAHmME9qk+Z8CdhTFQnTkwT8S-n56tzi77-uAV3dNigcGMQx7uQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 Cc: Linus Torvalds <torvalds@linux-foundation.org>,
         "kernel-hardening@lists.openwall.com"
         <kernel-hardening@lists.openwall.com>,
@@ -19,25 +16,22 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>,
         Eric Biggers <ebiggers3@gmail.com>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
         "Daniel J . Bernstein" <djb@cr.yp.to>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Andi Kleen <ak@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:1567 "EHLO mga14.intel.com"
+Received: from frisell.zx2c4.com ([192.95.5.64]:50109 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752189AbcLLXBB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Dec 2016 18:01:01 -0500
-Content-Disposition: inline
-In-Reply-To: <20161212221832.10653-1-Jason@zx2c4.com>
+        id S1751845AbcLLXEd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Dec 2016 18:04:33 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> Dozens of languages are already using this internally for their hash
-> tables. Some of the BSDs already use this in their kernels. SipHash is
-> a widely known high-speed solution to a widely known problem, and it's
-> time we catch-up.
+On Tue, Dec 13, 2016 at 12:01 AM, Andi Kleen <ak@linux.intel.com> wrote:
+> It would be nice if the network code could be converted to use siphash
+> for the secure sequence numbers. Right now it pulls in a lot of code
+> for bigger secure hashes just for that, which is a problem for tiny
+> kernels.
 
-It would be nice if the network code could be converted to use siphash
-for the secure sequence numbers. Right now it pulls in a lot of code
-for bigger secure hashes just for that, which is a problem for tiny
-kernels.
-
--Andi
+Indeed this would be a great first candidate. There are lots of places
+where MD5 (!!) is pulled in for this sort of thing, when SipHash could
+be a faster and leaner replacement (and arguably more secure than
+rusty MD5).
