@@ -1,104 +1,70 @@
 From: Andy Lutomirski <luto@kernel.org>
-Subject: [PATCH] cifs: Fix smbencrypt() to stop pointing a scatterlist at the stack
-Date: Mon, 12 Dec 2016 12:54:37 -0800
-Message-ID: <308cdb484648f98f6f0ad9feefd8acb2fe003aaf.1481575835.git.luto@kernel.org>
+Subject: [PATCH] crypto: Make a few drivers depend on !VMAP_STACK
+Date: Mon, 12 Dec 2016 12:55:20 -0800
+Message-ID: <5e4b1fdd48e44acd5f3cfa25639b00f5c5906832.1481575835.git.luto@kernel.org>
 References: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
 Cc: Eric Biggers <ebiggers3@gmail.com>, linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Stephan Mueller <smueller@chronox.de>,
-        linux-cifs@vger.kernel.org, Andy Lutomirski <luto@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-        sfrench@samba.org
+        Andy Lutomirski <luto@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-smbencrypt() points a scatterlist to the stack, which is breaks if
-CONFIG_VMAP_STACK=y.
+Eric Biggers found several crypto drivers that point scatterlists at
+the stack.  These drivers should never load on x86, but, for future
+safety, make them depend on !VMAP_STACK.
 
-Fix it by switching to crypto_cipher_encrypt_one().  The new code
-should be considerably faster as an added benefit.
+No -stable backport should be needed as no released kernel
+configuration should be affected.
 
-This code is nearly identical to some code that Eric Biggers
-suggested.
-
-Cc: stable@vger.kernel.org # 4.9 only
 Reported-by: Eric Biggers <ebiggers3@gmail.com>
 Signed-off-by: Andy Lutomirski <luto@kernel.org>
 ---
+ drivers/crypto/Kconfig | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Compile-tested only.
-
-fs/cifs/smbencrypt.c | 40 ++++++++--------------------------------
- 1 file changed, 8 insertions(+), 32 deletions(-)
-
-diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
-index 699b7868108f..c12bffefa3c9 100644
---- a/fs/cifs/smbencrypt.c
-+++ b/fs/cifs/smbencrypt.c
-@@ -23,7 +23,7 @@
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- */
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 4d2b81f2b223..481e67e54ffd 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -245,7 +245,7 @@ config CRYPTO_DEV_TALITOS
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_HASH
+ 	select HW_RANDOM
+-	depends on FSL_SOC
++	depends on FSL_SOC && !VMAP_STACK
+ 	help
+ 	  Say 'Y' here to use the Freescale Security Engine (SEC)
+ 	  to offload cryptographic algorithm computation.
+@@ -357,7 +357,7 @@ config CRYPTO_DEV_PICOXCELL
  
--#include <crypto/skcipher.h>
-+#include <linux/crypto.h>
- #include <linux/module.h>
- #include <linux/slab.h>
- #include <linux/fs.h>
-@@ -69,46 +69,22 @@ str_to_key(unsigned char *str, unsigned char *key)
- static int
- smbhash(unsigned char *out, const unsigned char *in, unsigned char *key)
- {
--	int rc;
- 	unsigned char key2[8];
--	struct crypto_skcipher *tfm_des;
--	struct scatterlist sgin, sgout;
--	struct skcipher_request *req;
-+	struct crypto_cipher *tfm_des;
+ config CRYPTO_DEV_SAHARA
+ 	tristate "Support for SAHARA crypto accelerator"
+-	depends on ARCH_MXC && OF
++	depends on ARCH_MXC && OF && !VMAP_STACK
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_AES
+ 	select CRYPTO_ECB
+@@ -410,7 +410,7 @@ endif # if CRYPTO_DEV_UX500
  
- 	str_to_key(key, key2);
+ config CRYPTO_DEV_BFIN_CRC
+ 	tristate "Support for Blackfin CRC hardware"
+-	depends on BF60x
++	depends on BF60x && !VMAP_STACK
+ 	help
+ 	  Newer Blackfin processors have CRC hardware. Select this if you
+ 	  want to use the Blackfin CRC module.
+@@ -487,7 +487,7 @@ source "drivers/crypto/qat/Kconfig"
  
--	tfm_des = crypto_alloc_skcipher("ecb(des)", 0, CRYPTO_ALG_ASYNC);
-+	tfm_des = crypto_alloc_cipher("des", 0, 0);
- 	if (IS_ERR(tfm_des)) {
--		rc = PTR_ERR(tfm_des);
--		cifs_dbg(VFS, "could not allocate des crypto API\n");
--		goto smbhash_err;
--	}
--
--	req = skcipher_request_alloc(tfm_des, GFP_KERNEL);
--	if (!req) {
--		rc = -ENOMEM;
- 		cifs_dbg(VFS, "could not allocate des crypto API\n");
--		goto smbhash_free_skcipher;
-+		return PTR_ERR(tfm_des);
- 	}
- 
--	crypto_skcipher_setkey(tfm_des, key2, 8);
--
--	sg_init_one(&sgin, in, 8);
--	sg_init_one(&sgout, out, 8);
-+	crypto_cipher_setkey(tfm_des, key2, 8);
-+	crypto_cipher_encrypt_one(tfm_des, out, in);
-+	crypto_free_cipher(tfm_des);
- 
--	skcipher_request_set_callback(req, 0, NULL, NULL);
--	skcipher_request_set_crypt(req, &sgin, &sgout, 8, NULL);
--
--	rc = crypto_skcipher_encrypt(req);
--	if (rc)
--		cifs_dbg(VFS, "could not encrypt crypt key rc: %d\n", rc);
--
--	skcipher_request_free(req);
--
--smbhash_free_skcipher:
--	crypto_free_skcipher(tfm_des);
--smbhash_err:
--	return rc;
-+	return 0;
- }
- 
- static int
+ config CRYPTO_DEV_QCE
+ 	tristate "Qualcomm crypto engine accelerator"
+-	depends on (ARCH_QCOM || COMPILE_TEST) && HAS_DMA && HAS_IOMEM
++	depends on (ARCH_QCOM || COMPILE_TEST) && HAS_DMA && HAS_IOMEM && !VMAP_STACK
+ 	select CRYPTO_AES
+ 	select CRYPTO_DES
+ 	select CRYPTO_ECB
 -- 
 2.9.3
