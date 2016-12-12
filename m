@@ -1,58 +1,44 @@
-From: Gary R Hook <ghook@amd.com>
-Subject: Re: Remaining crypto API regressions with CONFIG_VMAP_STACK
-Date: Mon, 12 Dec 2016 12:45:18 -0600
-Message-ID: <1747e6e9-35dc-48cc-7345-4f0412ba2521@amd.com>
-References: <20161209230851.GB64048@google.com>
- <CALCETrWfa5VJQNu3XjeFhF0cDFWF+M-dPwsT_7dzO5YSxsneGg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, Andrew Lutomirski
-	<luto@kernel.org>, Stephan Mueller <smueller@chronox.de>
-To: Andy Lutomirski <luto@amacapital.net>, Eric Biggers <ebiggers3@gmail.com>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <CALCETrWfa5VJQNu3XjeFhF0cDFWF+M-dPwsT_7dzO5YSxsneGg@mail.gmail.com>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+From: Andy Lutomirski <luto@kernel.org>
+Subject: [PATCH] wusbcore: Fix one more crypto-on-the-stack bug
+Date: Mon, 12 Dec 2016 12:52:45 -0800
+Message-ID: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
+Cc: Eric Biggers <ebiggers3@gmail.com>, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>,
+        Andy Lutomirski <luto@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        gregkh@linuxfoundation.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.136]:44762 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753247AbcLLUwv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Dec 2016 15:52:51 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 12/12/2016 12:34 PM, Andy Lutomirski wrote:
+The driver put a constant buffer of all zeros on the stack and
+pointed a scatterlist entry at it.  This doesn't work with virtual
+stacks.  Make the buffer static to fix it.
 
-<...snip...>
+Cc: stable@vger.kernel.org # 4.9 only
+Reported-by: Eric Biggers <ebiggers3@gmail.com>
+Signed-off-by: Andy Lutomirski <luto@kernel.org>
+---
+ drivers/usb/wusbcore/crypto.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->
-> I have a patch to make these depend on !VMAP_STACK.
->
->>         drivers/crypto/ccp/ccp-crypto-aes-cmac.c:105,119,142
->>         drivers/crypto/ccp/ccp-crypto-sha.c:95,109,124
->>         drivers/crypto/ccp/ccp-crypto-aes-xts.c:162
->>         drivers/crypto/ccp/ccp-crypto-aes.c:94
->
-> According to Herbert, these are fine.  I'm personally less convinced
-> since I'm very confused as to what "async" means in the crypto code,
-> but I'm going to leave these alone.
-
-I went back through the code, and AFAICT every argument to sg_init_one() in
-the above-cited files is a buffer that is part of the request context. Which
-is allocated by the crypto framework, and therefore will never be on the 
-stack.
-Right?
-
-I don't (as yet) see a need for any patch to these. Someone correct me 
-if I'm
-missing something.
-
-<...snip...>
-
+diff --git a/drivers/usb/wusbcore/crypto.c b/drivers/usb/wusbcore/crypto.c
+index 79451f7ef1b7..a7e007a0cd49 100644
+--- a/drivers/usb/wusbcore/crypto.c
++++ b/drivers/usb/wusbcore/crypto.c
+@@ -216,7 +216,7 @@ static int wusb_ccm_mac(struct crypto_skcipher *tfm_cbc,
+ 	struct scatterlist sg[4], sg_dst;
+ 	void *dst_buf;
+ 	size_t dst_size;
+-	const u8 bzero[16] = { 0 };
++	static const u8 bzero[16] = { 0 };
+ 	u8 iv[crypto_skcipher_ivsize(tfm_cbc)];
+ 	size_t zero_padding;
+ 
 -- 
-This is my day job. Follow me at:
-IG/Twitter/Facebook: @grhookphoto
-IG/Twitter/Facebook: @grhphotographer
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+2.9.3
