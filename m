@@ -1,286 +1,320 @@
-From: "Zhang Zhuoyu" <zhangzhuoyu@cmss.chinamobile.com>
-Subject: kernel crash when using sha1 as csums-alg for drbd
-Date: Mon, 12 Dec 2016 11:31:23 +0800
-Message-ID: <011e01d25428$36df6200$a49e2600$@cmss.chinamobile.com>
-Mime-Version: 1.0
-Content-Type: text/plain;
-        charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: <marex@denx.de>, <hpa@linux.intel.com>,
-        <herbert@gondor.apana.org.au>,
-        "'lixiubo'" <lixiubo@cmss.chinamobile.com>,
-        <linux-crypto@vger.kernel.org>
-To: <mouli@linux.intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cmccmta1.chinamobile.com ([221.176.66.79]:19746 "EHLO
-        cmccmta1.chinamobile.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751680AbcLLDb1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Dec 2016 22:31:27 -0500
-Content-Language: en-us
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH v2] siphash: add cryptographically secure hashtable function
+Date: Mon, 12 Dec 2016 04:48:17 +0100
+Message-ID: <20161212034817.1773-1-Jason@zx2c4.com>
+References: <20161211204345.GA1558@kroah.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        "Daniel J . Bernstein" <djb@cr.yp.to>
+To: kernel-hardening@lists.openwall.com,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        George Spelvin <linux@horizon.com>,
+        Scott Bauer <sbauer@eng.utah.edu>, ak@linux.intel.com,
+        Andy Lutomirski <luto@amacapital.net>,
+        Greg KH <gregkh@linuxfoundation.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20161211204345.GA1558@kroah.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello, Chandramouli
+SipHash is a 64-bit keyed hash function that is actually a
+cryptographically secure PRF, like HMAC. Except SipHash is super fast,
+and is meant to be used as a hashtable keyed lookup function.
 
-Sorry for last email. 
+SipHash isn't just some new trendy hash function. It's been around for a
+while, and there really isn't anything that comes remotely close to
+being useful in the way SipHash is. With that said, why do we need this?
 
-These days we experienced 5 times kernel crash issue when using sha1 as
-csums-alg for drbd on our CentOS7.2  3.10.0-327.el7.x86_64:
+There are a variety of attacks known as "hashtable poisoning" in which an
+attacker forms some data such that the hash of that data will be the
+same, and then preceeds to fill up all entries of a hashbucket. This is
+a realistic and well-known denial-of-service vector.
 
-Kernel log as below:
-[19839335.792807] BUG: unable to handle kernel paging request at
-ffff88007bd4f000
-[19839335.793145] IP: [<ffffffff8106a908>] _begin+0x28/0x187
-[19839335.793326] PGD 1f32067 PUD 607ffff067 PMD 1f35067 PTE 0 
-[19839335.793510] Oops: 0000 [#1] SMP 
-[19839335.793683] Modules linked in: dm_service_time iscsi_tcp libiscsi_tcp
-libiscsi scsi_transport_iscsi nf_conntrack_netlink nf_conntrack_ipv6
-nf_defrag_ipv6 xt_mac xt_set xt_physdev xt_CT ip_set_hash_net ip_set
-nfnetlink vhost_net vhost macvtap macvlan veth iptable_raw iptable_filter
-iptable_nat nf_nat_ipv4 iptable_mangle ip_tables dm_multipath ip6table_raw
-vport_vxlan vxlan ip6_udp_tunnel udp_tunnel openvswitch xt_multiport
-ipmi_devintf xt_comment ext4 mbcache jbd2 xt_CHECKSUM ipt_MASQUERADE
-nf_nat_masquerade_ipv4 nf_nat nf_conntrack_ipv4 nf_defrag_ipv4 xt_conntrack
-nf_conntrack ipt_REJECT tun bridge ebtable_filter ebtables ip6table_filter
-ip6_tables drbd(OE) 8021q garp stp mrp llc bonding dm_mirror dm_region_hash
-dm_log iTCO_wdt iTCO_vendor_support intel_powerclamp coretemp intel_rapl
-kvm_intel kvm
-[19839335.795640]  crc32_pclmul dm_mod ghash_clmulni_intel aesni_intel lrw
-gf128mul glue_helper ablk_helper cryptd pcspkr ses ipmi_ssif enclosure sg
-sb_edac edac_core lpc_ich mei_me i2c_i801 mfd_core mei ioatdma shpchp wmi
-ipmi_si ipmi_msghandler acpi_power_meter acpi_pad nfsd auth_rpcgss nfs_acl
-lockd grace sunrpc xfs libcrc32c sd_mod crc_t10dif crct10dif_generic
-syscopyarea sysfillrect sysimgblt crct10dif_pclmul crct10dif_common
-crc32c_intel drm_kms_helper ttm ixgbe drm igb mdio ptp mpt3sas pps_core
-i2c_algo_bit raid_class dca i2c_core scsi_transport_sas [last unloaded:
-ip_tables][19839335.797216] CPU: 1 PID: 2912 Comm: drbd_w_drbd1 Tainted: G
-OE  ------------   3.10.0-327.el7.x86_64 #1                              
-[19839335.797550] Hardware name: Inspur NF5280M4/YZMB-00326-101, BIOS 4.0.18
-11/09/2015
-[19839335.797877] task: ffff885f749b9700 ti: ffff882f62fc4000 task.ti:
-ffff882f62fc4000
-[19839335.798203] RIP: 0010:[<ffffffff8106a908>]  [<ffffffff8106a908>]
-_begin+0x28/0x187
-[19839335.798532] RSP: 0018:ffff882f62fc75f8  EFLAGS: 00010202
-[19839335.798702] RAX: 000000002fced277 RBX: 00000000e9cee1cc RCX:
-00000000a73b8733
-[19839335.799030] RDX: 00000000b573ac7c RSI: 00000000bb6b5097 RDI:
-00000000da4f4b14
-[19839335.799356] RBP: 0000000058444804 R08: ffffffff81656100 R09:
-ffff882f33147998
-[19839335.799680] R10: ffff88007bd4ef80 R11: ffff88007bd4f040 R12:
-00000000e770e674
-[19839335.800010] R13: ffff88007bd4efc0 R14: ffff882f62fc75f8 R15:
-ffff882f62fc7898
-[19839335.800336] FS:  0000000000000000(0000) GS:ffff882fbf840000(0000)
-knlGS:0000000000000000
-[19839335.800664] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[19839335.800835] CR2: ffff88007bd4f000 CR3: 000000000194a000 CR4:
-00000000001427e0
-[19839335.801160] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
-0000000000000000
-[19839335.801486] DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7:
-0000000000000400
-[19839335.801812] Stack:
-[19839335.801974]  5a8279995a827999 5a8279995a827999 5a8279995a827999
-5a8279995a827999
-[19839335.802317]  5a8279995a827999 5a8279995a827999 5a8279995a827999
-5a8279995a827999
-[19839335.802663]  5a8279995a827999 5a8279995a827999 5a8279995a827999
-5a8279995a827999
-[19839335.803005] Call Trace:
-[19839335.803180]  [<ffffffff81569a41>] ? ip_local_out_sk+0x31/0x40
-[19839335.803355]  [<ffffffff8106a31d>] ?
-sha1_apply_transform_avx2+0x1d/0x30
-[19839335.803530]  [<ffffffff8106a063>] ? __sha1_ssse3_update+0x53/0xd0
-[19839335.803704]  [<ffffffff8106a388>] ? sha1_ssse3_update+0x58/0xf0
-[19839335.803881]  [<ffffffff812b1878>] ? crypto_shash_update+0x38/0x100
-[19839335.804056]  [<ffffffff812b1d6e>] ? shash_compat_update+0x4e/0x80
-[19839335.804242]  [<ffffffffa05245ab>] ? drbd_csum_bio+0x9b/0xe0 [drbd]
-[19839335.804427]  [<ffffffffa0546701>] ? drbd_send_dblock+0x3b1/0x480
-[drbd]
-[19839335.804608]  [<ffffffffa0522a80>] ? dequeue_work_batch+0x20/0x90
-[drbd]
-[19839335.804788]  [<ffffffffa0522d37>] ? wait_for_work+0x67/0x370 [drbd]
-[19839335.804969]  [<ffffffffa052726f>] ? w_send_dblock+0xaf/0x1d0 [drbd]
-[19839335.805168]  [<ffffffffa052867b>] ? drbd_worker+0xfb/0x390 [drbd]
-[19839335.805349]  [<ffffffffa0542430>] ?
-drbd_destroy_connection+0x160/0x160 [drbd]
-[19839335.805684]  [<ffffffffa054244d>] ? drbd_thread_setup+0x1d/0x110
-[drbd]
-[19839335.805864]  [<ffffffffa0542430>] ?
-drbd_destroy_connection+0x160/0x160 [drbd]
-[19839335.806195]  [<ffffffff810a5aef>] ? kthread+0xcf/0xe0
-[19839335.806367]  [<ffffffff810a5a20>] ? kthread_create_on_node+0x140/0x140
-[19839335.806545]  [<ffffffff81645858>] ? ret_from_fork+0x58/0x90
-[19839335.806717]  [<ffffffff810a5a20>] ? kthread_create_on_node+0x140/0x140
-[19839335.806889] Code: 00 00 00 89 f3 c4 e3 7b f0 f6 02 c4 e2 60 f2 e8 21
-fb 31 eb 41 03 17 c4 e2 70 f2 ef 8d 14 1a c4 63 7b f0 e1 1b c4 e3 7b f0 d9
-02 <c4> c1 7a 6f 82 80 00 00 00 21 f1 31 e9 42 8d 14 22 41 03 47 04 
-[19839335.807640] RIP  [<ffffffff8106a908>] _begin+0x28/0x187
-[19839335.807814]  RSP <ffff882f62fc75f8>
-[19839335.807979] CR2: ffff88007bd4f000     
+Linux developers already seem to be aware that this is an issue, and
+various places that use hash tables in, say, a network context, use a
+non-cryptographically secure function (usually jhash) and then try to
+twiddle with the key on a time basis (or in many cases just do nothing
+and hope that nobody notices). While this is an admirable attempt at
+solving the problem, it doesn't actually fix it. SipHash fixes it.
 
-We debug it by using crash:
+(It fixes it in such a sound way that you could even build a stream
+cipher out of SipHash that would resist the modern cryptanalysis.)
 
-crash> bt
-PID: 2912   TASK: ffff885f749b9700  CPU: 1   COMMAND: "drbd_w_drbd1"
-#0 [ffff882f62fc72c0] machine_kexec at ffffffff81051beb
-#1 [ffff882f62fc7320] crash_kexec at ffffffff810f2542
-#2 [ffff882f62fc73f0] oops_end at ffffffff8163e1a8
-#3 [ffff882f62fc7418] no_context at ffffffff8162e2b8
-#4 [ffff882f62fc7468] __bad_area_nosemaphore at ffffffff8162e34e
-#5 [ffff882f62fc74b0] bad_area_nosemaphore at ffffffff8162e4b8
-#6 [ffff882f62fc74c0] __do_page_fault at ffffffff81640fce
-#7 [ffff882f62fc7518] do_page_fault at ffffffff81641113
-#8 [ffff882f62fc7540] page_fault at ffffffff8163d408
-    [exception RIP: _begin+40]
-    RIP: ffffffff8106a908  RSP: ffff882f62fc75f8  RFLAGS: 00010202
-    RAX: 000000002fced277  RBX: 00000000e9cee1cc  RCX: 00000000a73b8733
-    RDX: 00000000b573ac7c  RSI: 00000000bb6b5097  RDI: 00000000da4f4b14
-    RBP: 0000000058444804   R8: ffffffff81656100   R9: ffff882f33147998
-    R10: ffff88007bd4ef80  R11: ffff88007bd4f040  R12: 00000000e770e674
-    R13: ffff88007bd4efc0  R14: ffff882f62fc75f8  R15: ffff882f62fc7898
-    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
-#9 [ffff882f62fc7878] ip_local_out_sk at ffffffff81569a41
-#10 [ffff882f62fc7ba8] sha1_apply_transform_avx2 at ffffffff8106a31d
-#11 [ffff882f62fc7bb8] __sha1_ssse3_update at ffffffff8106a063
-#12 [ffff882f62fc7bf8] sha1_ssse3_update at ffffffff8106a388
-#13 [ffff882f62fc7c28] crypto_shash_update at ffffffff812b1878
-#14 [ffff882f62fc7c78] shash_compat_update at ffffffff812b1d6e
-#15 [ffff882f62fc7cc8] drbd_csum_bio at ffffffffa05245ab [drbd]
-#16 [ffff882f62fc7d28] drbd_send_dblock at ffffffffa0546701 [drbd]
-#17 [ffff882f62fc7de0] w_send_dblock at ffffffffa052726f [drbd]
-#18 [ffff882f62fc7e28] drbd_worker at ffffffffa052867b [drbd]
-#19 [ffff882f62fc7e98] drbd_thread_setup at ffffffffa054244d [drbd]
-#20 [ffff882f62fc7ec8] kthread at ffffffff810a5aef
-#21 [ffff882f62fc7f50] ret_from_fork at ffffffff81645858
+There are a modicum of places in the kernel that are vulnerable to
+hashtable poisoning attacks, either via userspace vectors or network
+vectors, and there's not a reliable mechanism inside the kernel at the
+moment to fix it. The first step toward fixing these issues is actually
+getting a secure primitive into the kernel for developers to use. Then
+we can, bit by bit, port things over to it as deemed appropriate.
 
-crash> dis -l ffffffff8106a908
-/usr/src/debug/kernel-3.10.0-327.el7/linux-3.10.0-327.el7.x86_64/arch/x86/cr
-ypto/sha1_avx2_x86_64_asm.S: 677
-0xffffffff8106a908 <_begin+40>: vmovdqu 0x80(%r10),%xmm0
+Dozens of languages are already using this internally for their hash
+tables. Some of the BSDs already use this in their kernels. SipHash is
+a widely known high-speed solution to a widely known problem, and it's
+time we catch-up.
 
-crash> dis -l _begin
-/usr/src/debug/kernel-3.10.0-327.el7/linux-3.10.0-327.el7.x86_64/arch/x86/cr
-ypto/sha1_avx2_x86_64_asm.S: 677
-0xffffffff8106a8e0 <_begin>:    mov    %esi,%ebx
-0xffffffff8106a8e2 <_begin+2>:  rorx   $0x2,%esi,%esi
-0xffffffff8106a8e8 <_begin+8>:  andn   %eax,%ebx,%ebp
-0xffffffff8106a8ed <_begin+13>: and    %edi,%ebx
-0xffffffff8106a8ef <_begin+15>: xor    %ebp,%ebx
-0xffffffff8106a8f1 <_begin+17>: add    (%r15),%edx
-0xffffffff8106a8f4 <_begin+20>: andn   %edi,%ecx,%ebp
-0xffffffff8106a8f9 <_begin+25>: lea    (%rdx,%rbx,1),%edx
-0xffffffff8106a8fc <_begin+28>: rorx   $0x1b,%ecx,%r12d
-0xffffffff8106a902 <_begin+34>: rorx   $0x2,%ecx,%ebx
-0xffffffff8106a908 <_begin+40>: vmovdqu 0x80(%r10),%xmm0
-<--------------- crash here
-0xffffffff8106a911 <_begin+49>: and    %esi,%ecx
-0xffffffff8106a913 <_begin+51>: xor    %ebp,%ecx
-0xffffffff8106a915 <_begin+53>: lea    (%rdx,%r12,1),%edx
-0xffffffff8106a919 <_begin+57>: add    0x4(%r15),%eax
-0xffffffff8106a91d <_begin+61>: andn   %esi,%edx,%ebp
-0xffffffff8106a922 <_begin+66>: lea    (%rax,%rcx,1),%eax
-0xffffffff8106a925 <_begin+69>: rorx   $0x1b,%edx,%r12d
-0xffffffff8106a92b <_begin+75>: rorx   $0x2,%edx,%ecx
-0xffffffff8106a931 <_begin+81>: vinsertf128 $0x1,0x80(%r13),%ymm0,%ymm0
-0xffffffff8106a93b <_begin+91>: and    %ebx,%edx
-0xffffffff8106a93d <_begin+93>: xor    %ebp,%edx
-0xffffffff8106a93f <_begin+95>: lea    (%rax,%r12,1),%eax
-0xffffffff8106a943 <_begin+99>: add    0x8(%r15),%edi
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Cc: Daniel J. Bernstein <djb@cr.yp.to>
+---
+ include/linux/siphash.h |  20 +++++++++
+ lib/Makefile            |   5 ++-
+ lib/siphash.c           |  72 ++++++++++++++++++++++++++++++
+ lib/test_siphash.c      | 116 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 211 insertions(+), 2 deletions(-)
+ create mode 100644 include/linux/siphash.h
+ create mode 100644 lib/siphash.c
+ create mode 100644 lib/test_siphash.c
 
-It crashed at arch/x86/crypto/sha1_avx2_x86_64_asm.S, and according to the
-stack trace, I deduced some useful information:
-
-crash> struct -x sha1_state 0xffff882f33147990
-struct sha1_state {
-  count = 0x4e000, 
-  state = {0xa73b8733, 0xedad425e, 0xda4f4b14, 0x2fced277, 0x90a160ae}, 
-  buffer =
-"\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\00
-0\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\00
-0\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\00
-0\000\000\000\000\000\000"
-}
-
-
-crash> rd ffff882f62fc7c78 24
-ffff882f62fc7c78:  ffffffff812b1d6e ffff88007bd4e000   n.+........{....
-ffff882f62fc7c88:  0000000000000000 ffffea0001ef5380   .........S......
-ffff882f62fc7c98:  0000000000000000 ffff882f62fc7ce0   .........|.b/...
-ffff882f62fc7ca8:  ffffffff00000000 00000000f6275b17   .........['.....
-ffff882f62fc7cb8:  000000000000004e ffff882f62fc7d20   N....... }.b/...
-ffff882f62fc7cc8:  ffffffffa05245ab ffff885f66044120   .ER..... A.f_...
-ffff882f62fc7cd8:  ffff882f00000000 ffffea0001ef5382   ..../....S......
-ffff882f62fc7ce8:  0000100000000000 0000000000000000   ................
-ffff882f62fc7cf8:  0000000000000000 00000000f6275b17   .........['.....
-ffff882f62fc7d08:  ffff882f73c0a000 ffff880111b94540   ...s/...@E......
-ffff882f62fc7d18:  ffff882f6aff0010 ffff882f62fc7dd8   ...j/....}.b/...
-ffff882f62fc7d28:  ffffffffa0546701 0000000000000000   .gT.............
-crash> 
-crash> struct hash_desc ffff882f62fc7cd0
-struct hash_desc {
-  tfm = 0xffff885f66044120, 
-  flags = 0
-}
-crash> struct scatterlist ffff882f62fc7ce0
-struct scatterlist {
-  page_link = 18446719884486202242, 
-  offset = 0, 
-  length = 4096, 
-  dma_address = 0, 
-  dma_length = 0
-}
-
-crash> rd ffff882f62fc7c28 22
-ffff882f62fc7c28:  ffffffff812b1878 ffff882f33147980   x.+......y.3/...
-ffff882f62fc7c38:  ffff882f6aff0028 ffff882ae84cd500   (..j/.....L.*...
-ffff882f62fc7c48:  ffff882f33147980 ffff882f6aff0028   .y.3/...(..j/...
-ffff882f62fc7c58:  ffff882ae84cd500 ffff882f70846800   ..L.*....h.p/...
-ffff882f62fc7c68:  ffff885f738a12a0 ffff882f62fc7cc0   ...s_....|.b/...
-ffff882f62fc7c78:  ffffffff812b1d6e ffff88007bd4e000   n.+........{....
-ffff882f62fc7c88:  0000000000000000 ffffea0001ef5380   .........S......
-ffff882f62fc7c98:  0000000000000000 ffff882f62fc7ce0   .........|.b/...
-ffff882f62fc7ca8:  ffffffff00000000 00000000f6275b17   .........['.....
-ffff882f62fc7cb8:  000000000000004e ffff882f62fc7d20   N....... }.b/...
-ffff882f62fc7cc8:  ffffffffa05245ab ffff885f66044120   .ER..... A.f_...
-crash> 
-crash> 
-crash> 
-crash> struct crypto_hash_walk ffff882f62fc7c80
-struct crypto_hash_walk {
-  data = 0xffff88007bd4e000 struct: page excluded: kernel virtual address:
-ffff88007bd4e000  type: "gdb_readmem_callback"
-struct: page excluded: kernel virtual address: ffff88007bd4e000  type:
-"gdb_readmem_callback"
-<Address 0xffff88007bd4e000 out of bounds>, 
-  offset = 0, 
-  alignmask = 0, 
-  pg = 0xffffea0001ef5380, 
-  entrylen = 0, 
-  total = 0, 
-  sg = 0xffff882f62fc7ce0, 
-  flags = 0
-}
-
-According to the above information, after call shash_compat_update and, we
-got one page sized 4k after kmap, which started at virtual address
-0xffff88007bd4e000. 
-So, the value pass to void sha1_transform_avx2(int *hash, const char* data,
-size_t num_blocks ); data = 0xffff88007bd4e000, rounds = 64, which means we
-have 64 blocks(4k) to handle.
-But the BUFFER_END we calculated out in sha1_avx2_x86_64_asm.S is rounds <<6
-+ data + 64 = 64 <<6 + 0xffff88007bd4e000 + 64 = 0xffff88007bd4f040 which
-exceed one page.
-I think maybe it is the reason why we got the "BUG: unable to handle kernel
-paging request at ffff88007bd4f000".
-I am not so familiar with the sha1 algorithm, so I email you for your kindly
-help, can you give me some suggestion on this issue?
-
-
-
-Sincerely
-
-Zhuoyu
+diff --git a/include/linux/siphash.h b/include/linux/siphash.h
+new file mode 100644
+index 000000000000..6623b3090645
+--- /dev/null
++++ b/include/linux/siphash.h
+@@ -0,0 +1,20 @@
++/* Copyright (C) 2016 Jason A. Donenfeld <Jason@zx2c4.com>
++ *
++ * This file is provided under a dual BSD/GPLv2 license.
++ *
++ * SipHash: a fast short-input PRF
++ * https://131002.net/siphash/
++ */
++
++#ifndef _LINUX_SIPHASH_H
++#define _LINUX_SIPHASH_H
++
++#include <linux/types.h>
++
++enum siphash_lengths {
++	SIPHASH24_KEY_LEN = 16
++};
++
++u64 siphash24(const u8 *data, size_t len, const u8 key[SIPHASH24_KEY_LEN]);
++
++#endif /* _LINUX_SIPHASH_H */
+diff --git a/lib/Makefile b/lib/Makefile
+index 50144a3aeebd..71d398b04a74 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -22,7 +22,8 @@ lib-y := ctype.o string.o vsprintf.o cmdline.o \
+ 	 sha1.o chacha20.o md5.o irq_regs.o argv_split.o \
+ 	 flex_proportions.o ratelimit.o show_mem.o \
+ 	 is_single_threaded.o plist.o decompress.o kobject_uevent.o \
+-	 earlycpio.o seq_buf.o nmi_backtrace.o nodemask.o win_minmax.o
++	 earlycpio.o seq_buf.o siphash.o \
++	 nmi_backtrace.o nodemask.o win_minmax.o
+ 
+ lib-$(CONFIG_MMU) += ioremap.o
+ lib-$(CONFIG_SMP) += cpumask.o
+@@ -44,7 +45,7 @@ obj-$(CONFIG_TEST_HEXDUMP) += test_hexdump.o
+ obj-y += kstrtox.o
+ obj-$(CONFIG_TEST_BPF) += test_bpf.o
+ obj-$(CONFIG_TEST_FIRMWARE) += test_firmware.o
+-obj-$(CONFIG_TEST_HASH) += test_hash.o
++obj-$(CONFIG_TEST_HASH) += test_hash.o test_siphash.o
+ obj-$(CONFIG_TEST_KASAN) += test_kasan.o
+ obj-$(CONFIG_TEST_KSTRTOX) += test-kstrtox.o
+ obj-$(CONFIG_TEST_LKM) += test_module.o
+diff --git a/lib/siphash.c b/lib/siphash.c
+new file mode 100644
+index 000000000000..e78dc36d19b9
+--- /dev/null
++++ b/lib/siphash.c
+@@ -0,0 +1,72 @@
++/* Copyright (C) 2015-2016 Jason A. Donenfeld <Jason@zx2c4.com>
++ * Copyright (C) 2012-2014 Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
++ * Copyright (C) 2012-2014 Daniel J. Bernstein <djb@cr.yp.to>
++ *
++ * This file is provided under a dual BSD/GPLv2 license.
++ *
++ * SipHash: a fast short-input PRF
++ * https://131002.net/siphash/
++ */
++
++#include <linux/siphash.h>
++#include <linux/kernel.h>
++
++static inline u64 le64_to_cpuvp(const void *p)
++{
++	return le64_to_cpup(p);
++}
++
++#define SIPROUND \
++	do { \
++	v0 += v1; v1 = rol64(v1, 13); v1 ^= v0; v0 = rol64(v0, 32); \
++	v2 += v3; v3 = rol64(v3, 16); v3 ^= v2; \
++	v0 += v3; v3 = rol64(v3, 21); v3 ^= v0; \
++	v2 += v1; v1 = rol64(v1, 17); v1 ^= v2; v2 = rol64(v2, 32); \
++	} while(0)
++
++u64 siphash24(const u8 *data, size_t len, const u8 key[SIPHASH24_KEY_LEN])
++{
++	u64 v0 = 0x736f6d6570736575ULL;
++	u64 v1 = 0x646f72616e646f6dULL;
++	u64 v2 = 0x6c7967656e657261ULL;
++	u64 v3 = 0x7465646279746573ULL;
++	u64 b = ((u64)len) << 56;
++	u64 k0 = le64_to_cpuvp(key);
++	u64 k1 = le64_to_cpuvp(key + sizeof(u64));
++	u64 m;
++	const u8 *end = data + len - (len % sizeof(u64));
++	const u8 left = len & (sizeof(u64) - 1);
++	v3 ^= k1;
++	v2 ^= k0;
++	v1 ^= k1;
++	v0 ^= k0;
++	for (; data != end; data += sizeof(u64)) {
++		m = le64_to_cpuvp(data);
++		v3 ^= m;
++		SIPROUND;
++		SIPROUND;
++		v0 ^= m;
++	}
++	switch (left) {
++		case 7: b |= ((u64)data[6]) << 48;
++		case 6: b |= ((u64)data[5]) << 40;
++		case 5: b |= ((u64)data[4]) << 32;
++		case 4: b |= ((u64)data[3]) << 24;
++		case 3: b |= ((u64)data[2]) << 16;
++		case 2: b |= ((u64)data[1]) <<  8;
++		case 1: b |= ((u64)data[0]); break;
++		case 0: break;
++	}
++	v3 ^= b;
++	SIPROUND;
++	SIPROUND;
++	v0 ^= b;
++	v2 ^= 0xff;
++	SIPROUND;
++	SIPROUND;
++	SIPROUND;
++	SIPROUND;
++	b = (v0 ^ v1) ^ (v2 ^ v3);
++	return (__force u64)cpu_to_le64(b);
++}
++EXPORT_SYMBOL(siphash24);
+diff --git a/lib/test_siphash.c b/lib/test_siphash.c
+new file mode 100644
+index 000000000000..45b5435540e9
+--- /dev/null
++++ b/lib/test_siphash.c
+@@ -0,0 +1,116 @@
++/* Test cases for siphash.c
++ *
++ * Copyright (C) 2015-2016 Jason A. Donenfeld <Jason@zx2c4.com>
++ *
++ * This file is provided under a dual BSD/GPLv2 license.
++ *
++ * SipHash: a fast short-input PRF
++ * https://131002.net/siphash/
++ */
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++#include <linux/siphash.h>
++#include <linux/kernel.h>
++#include <linux/string.h>
++#include <linux/errno.h>
++#include <linux/module.h>
++
++static const u8 test_vectors[64][8] = {
++	{ 0x31, 0x0e, 0x0e, 0xdd, 0x47, 0xdb, 0x6f, 0x72 },
++	{ 0xfd, 0x67, 0xdc, 0x93, 0xc5, 0x39, 0xf8, 0x74 },
++	{ 0x5a, 0x4f, 0xa9, 0xd9, 0x09, 0x80, 0x6c, 0x0d },
++	{ 0x2d, 0x7e, 0xfb, 0xd7, 0x96, 0x66, 0x67, 0x85 },
++	{ 0xb7, 0x87, 0x71, 0x27, 0xe0, 0x94, 0x27, 0xcf },
++	{ 0x8d, 0xa6, 0x99, 0xcd, 0x64, 0x55, 0x76, 0x18 },
++	{ 0xce, 0xe3, 0xfe, 0x58, 0x6e, 0x46, 0xc9, 0xcb },
++	{ 0x37, 0xd1, 0x01, 0x8b, 0xf5, 0x00, 0x02, 0xab },
++	{ 0x62, 0x24, 0x93, 0x9a, 0x79, 0xf5, 0xf5, 0x93 },
++	{ 0xb0, 0xe4, 0xa9, 0x0b, 0xdf, 0x82, 0x00, 0x9e },
++	{ 0xf3, 0xb9, 0xdd, 0x94, 0xc5, 0xbb, 0x5d, 0x7a },
++	{ 0xa7, 0xad, 0x6b, 0x22, 0x46, 0x2f, 0xb3, 0xf4 },
++	{ 0xfb, 0xe5, 0x0e, 0x86, 0xbc, 0x8f, 0x1e, 0x75 },
++	{ 0x90, 0x3d, 0x84, 0xc0, 0x27, 0x56, 0xea, 0x14 },
++	{ 0xee, 0xf2, 0x7a, 0x8e, 0x90, 0xca, 0x23, 0xf7 },
++	{ 0xe5, 0x45, 0xbe, 0x49, 0x61, 0xca, 0x29, 0xa1 },
++	{ 0xdb, 0x9b, 0xc2, 0x57, 0x7f, 0xcc, 0x2a, 0x3f },
++	{ 0x94, 0x47, 0xbe, 0x2c, 0xf5, 0xe9, 0x9a, 0x69 },
++	{ 0x9c, 0xd3, 0x8d, 0x96, 0xf0, 0xb3, 0xc1, 0x4b },
++	{ 0xbd, 0x61, 0x79, 0xa7, 0x1d, 0xc9, 0x6d, 0xbb },
++	{ 0x98, 0xee, 0xa2, 0x1a, 0xf2, 0x5c, 0xd6, 0xbe },
++	{ 0xc7, 0x67, 0x3b, 0x2e, 0xb0, 0xcb, 0xf2, 0xd0 },
++	{ 0x88, 0x3e, 0xa3, 0xe3, 0x95, 0x67, 0x53, 0x93 },
++	{ 0xc8, 0xce, 0x5c, 0xcd, 0x8c, 0x03, 0x0c, 0xa8 },
++	{ 0x94, 0xaf, 0x49, 0xf6, 0xc6, 0x50, 0xad, 0xb8 },
++	{ 0xea, 0xb8, 0x85, 0x8a, 0xde, 0x92, 0xe1, 0xbc },
++	{ 0xf3, 0x15, 0xbb, 0x5b, 0xb8, 0x35, 0xd8, 0x17 },
++	{ 0xad, 0xcf, 0x6b, 0x07, 0x63, 0x61, 0x2e, 0x2f },
++	{ 0xa5, 0xc9, 0x1d, 0xa7, 0xac, 0xaa, 0x4d, 0xde },
++	{ 0x71, 0x65, 0x95, 0x87, 0x66, 0x50, 0xa2, 0xa6 },
++	{ 0x28, 0xef, 0x49, 0x5c, 0x53, 0xa3, 0x87, 0xad },
++	{ 0x42, 0xc3, 0x41, 0xd8, 0xfa, 0x92, 0xd8, 0x32 },
++	{ 0xce, 0x7c, 0xf2, 0x72, 0x2f, 0x51, 0x27, 0x71 },
++	{ 0xe3, 0x78, 0x59, 0xf9, 0x46, 0x23, 0xf3, 0xa7 },
++	{ 0x38, 0x12, 0x05, 0xbb, 0x1a, 0xb0, 0xe0, 0x12 },
++	{ 0xae, 0x97, 0xa1, 0x0f, 0xd4, 0x34, 0xe0, 0x15 },
++	{ 0xb4, 0xa3, 0x15, 0x08, 0xbe, 0xff, 0x4d, 0x31 },
++	{ 0x81, 0x39, 0x62, 0x29, 0xf0, 0x90, 0x79, 0x02 },
++	{ 0x4d, 0x0c, 0xf4, 0x9e, 0xe5, 0xd4, 0xdc, 0xca },
++	{ 0x5c, 0x73, 0x33, 0x6a, 0x76, 0xd8, 0xbf, 0x9a },
++	{ 0xd0, 0xa7, 0x04, 0x53, 0x6b, 0xa9, 0x3e, 0x0e },
++	{ 0x92, 0x59, 0x58, 0xfc, 0xd6, 0x42, 0x0c, 0xad },
++	{ 0xa9, 0x15, 0xc2, 0x9b, 0xc8, 0x06, 0x73, 0x18 },
++	{ 0x95, 0x2b, 0x79, 0xf3, 0xbc, 0x0a, 0xa6, 0xd4 },
++	{ 0xf2, 0x1d, 0xf2, 0xe4, 0x1d, 0x45, 0x35, 0xf9 },
++	{ 0x87, 0x57, 0x75, 0x19, 0x04, 0x8f, 0x53, 0xa9 },
++	{ 0x10, 0xa5, 0x6c, 0xf5, 0xdf, 0xcd, 0x9a, 0xdb },
++	{ 0xeb, 0x75, 0x09, 0x5c, 0xcd, 0x98, 0x6c, 0xd0 },
++	{ 0x51, 0xa9, 0xcb, 0x9e, 0xcb, 0xa3, 0x12, 0xe6 },
++	{ 0x96, 0xaf, 0xad, 0xfc, 0x2c, 0xe6, 0x66, 0xc7 },
++	{ 0x72, 0xfe, 0x52, 0x97, 0x5a, 0x43, 0x64, 0xee },
++	{ 0x5a, 0x16, 0x45, 0xb2, 0x76, 0xd5, 0x92, 0xa1 },
++	{ 0xb2, 0x74, 0xcb, 0x8e, 0xbf, 0x87, 0x87, 0x0a },
++	{ 0x6f, 0x9b, 0xb4, 0x20, 0x3d, 0xe7, 0xb3, 0x81 },
++	{ 0xea, 0xec, 0xb2, 0xa3, 0x0b, 0x22, 0xa8, 0x7f },
++	{ 0x99, 0x24, 0xa4, 0x3c, 0xc1, 0x31, 0x57, 0x24 },
++	{ 0xbd, 0x83, 0x8d, 0x3a, 0xaf, 0xbf, 0x8d, 0xb7 },
++	{ 0x0b, 0x1a, 0x2a, 0x32, 0x65, 0xd5, 0x1a, 0xea },
++	{ 0x13, 0x50, 0x79, 0xa3, 0x23, 0x1c, 0xe6, 0x60 },
++	{ 0x93, 0x2b, 0x28, 0x46, 0xe4, 0xd7, 0x06, 0x66 },
++	{ 0xe1, 0x91, 0x5f, 0x5c, 0xb1, 0xec, 0xa4, 0x6c },
++	{ 0xf3, 0x25, 0x96, 0x5c, 0xa1, 0x6d, 0x62, 0x9f },
++	{ 0x57, 0x5f, 0xf2, 0x8e, 0x60, 0x38, 0x1b, 0xe5 },
++	{ 0x72, 0x45, 0x06, 0xeb, 0x4c, 0x32, 0x8a, 0x95 }
++};
++
++static int __init siphash_test_init(void)
++{
++	u8 in[64], k[16], i;
++	u64 out;
++	int ret = 0;
++
++	for (i = 0; i < 16; ++i)
++		k[i] = i;
++
++	for (i = 0; i < 64; ++i) {
++		in[i] = i;
++		out = siphash24(in, i, k);
++		if (memcmp(&out, test_vectors[i], 8)) {
++			pr_info("self-test %u: FAIL\n", i + 1);
++			ret = -EINVAL;
++		}
++	}
++	if (!ret)
++		pr_info("self-tests: pass\n");
++	return ret;
++}
++
++static void __exit siphash_test_exit(void)
++{
++}
++
++module_init(siphash_test_init);
++module_exit(siphash_test_exit);
++
++MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
++MODULE_LICENSE("Dual BSD/GPL");
+-- 
+2.11.0
