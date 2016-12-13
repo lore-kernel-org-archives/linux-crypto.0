@@ -1,7 +1,7 @@
 From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH v2 4/7] hwrng: core: Replace asm/uaccess.h by linux/uaccess.h
-Date: Tue, 13 Dec 2016 15:51:12 +0100
-Message-ID: <20161213145115.30082-4-clabbe.montjoie@gmail.com>
+Subject: [PATCH v2 6/7] hwrng: core: remove unused PFX macro
+Date: Tue, 13 Dec 2016 15:51:14 +0100
+Message-ID: <20161213145115.30082-6-clabbe.montjoie@gmail.com>
 References: <20161213145115.30082-1-clabbe.montjoie@gmail.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         Corentin Labbe <clabbe.montjoie@gmail.com>
@@ -12,45 +12,24 @@ In-Reply-To: <20161213145115.30082-1-clabbe.montjoie@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch fix the checkpatch warning about asm/uaccess.h.
-In the same time, we sort the headers in alphabetical order.
+This patch remove the unused PFX macro.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- drivers/char/hw_random/core.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ drivers/char/hw_random/core.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index a8e63ae..7a2e496 100644
+index 1e1e385..5c654b5 100644
 --- a/drivers/char/hw_random/core.c
 +++ b/drivers/char/hw_random/core.c
-@@ -10,19 +10,19 @@
-  * of the GNU General Public License, incorporated herein by reference.
-  */
- 
-+#include <linux/delay.h>
- #include <linux/device.h>
-+#include <linux/err.h>
-+#include <linux/fs.h>
- #include <linux/hw_random.h>
--#include <linux/module.h>
- #include <linux/kernel.h>
--#include <linux/fs.h>
--#include <linux/sched.h>
--#include <linux/miscdevice.h>
- #include <linux/kthread.h>
--#include <linux/delay.h>
--#include <linux/slab.h>
-+#include <linux/miscdevice.h>
-+#include <linux/module.h>
- #include <linux/random.h>
--#include <linux/err.h>
--#include <asm/uaccess.h>
-+#include <linux/sched.h>
-+#include <linux/slab.h>
-+#include <linux/uaccess.h>
+@@ -25,7 +25,6 @@
+ #include <linux/uaccess.h>
  
  #define RNG_MODULE_NAME		"hw_random"
- #define PFX			RNG_MODULE_NAME ": "
+-#define PFX			RNG_MODULE_NAME ": "
+ 
+ static struct hwrng *current_rng;
+ static struct task_struct *hwrng_fill;
 -- 
 2.10.2
