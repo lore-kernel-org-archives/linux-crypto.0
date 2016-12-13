@@ -1,61 +1,51 @@
-From: Andy Lutomirski <luto@amacapital.net>
-Subject: Re: Remaining crypto API regressions with CONFIG_VMAP_STACK
-Date: Tue, 13 Dec 2016 09:06:31 -0800
-Message-ID: <CALCETrVz4B2rthaKPJAOpiHm1kCh-mD2C5kKti0q8iBQ0QEzuA@mail.gmail.com>
-References: <20161209230851.GB64048@google.com> <CALCETrWfa5VJQNu3XjeFhF0cDFWF+M-dPwsT_7dzO5YSxsneGg@mail.gmail.com>
- <20161213033928.GB5601@gondor.apana.org.au>
+From: Dave Watson <davejwatson@fb.com>
+Subject: Re: [PATCH] crypto: aesni-intel - RFC4106 can zero copy when
+ !PageHighMem
+Date: Tue, 13 Dec 2016 11:07:32 -0800
+Message-ID: <20161213190732.GB68289@davejwatson-mba.local>
+References: <1481639526-71743-1-git-send-email-ilyal@mellanox.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Eric Biggers <ebiggers3@gmail.com>, linux-crypto@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Andrew Lutomirski <luto@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <20161213033928.GB5601@gondor.apana.org.au>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Cc: <linux-crypto@vger.kernel.org>, <tadeusz.struk@intel.com>,
+        <herbert@gondor.apana.org.au>, <tls-fpga-sw-dev@mellanox.com>
+To: Ilya Lesokhin <ilyal@mellanox.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:37159 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1753120AbcLMTH6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Dec 2016 14:07:58 -0500
+Content-Disposition: inline
+In-Reply-To: <1481639526-71743-1-git-send-email-ilyal@mellanox.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 12, 2016 at 7:39 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Mon, Dec 12, 2016 at 10:34:10AM -0800, Andy Lutomirski wrote:
->>
->> Here's my status.
->>
->> >         drivers/crypto/bfin_crc.c:351
->> >         drivers/crypto/qce/sha.c:299
->> >         drivers/crypto/sahara.c:973,988
->> >         drivers/crypto/talitos.c:1910
->> >         drivers/crypto/qce/sha.c:325
->>
->> I have a patch to make these depend on !VMAP_STACK.
->
-> Why? They're all marked as ASYNC AFAIK.
->
->> I have a patch to convert this to, drumroll please:
->>
->>     priv->tx_tfm_mic = crypto_alloc_shash("michael_mic", 0,
->>                           CRYPTO_ALG_ASYNC);
->>
->> Herbert, I'm at a loss as what a "shash" that's "ASYNC" even means.
->
-> Having 0 as type and CRYPTO_ALG_ASYNC as mask in general means
-> that we're requesting a sync algorithm (i.e., ASYNC bit off).
->
-> However, it is completely unnecessary for shash as they can never
-> be async.  So this could be changed to just ("michael_mic", 0, 0).
+On 12/13/16 04:32 PM, Ilya Lesokhin wrote:
+> --- a/arch/x86/crypto/aesni-intel_glue.c
+> +++ b/arch/x86/crypto/aesni-intel_glue.c
+> @@ -903,9 +903,11 @@ static int helper_rfc4106_encrypt(struct aead_request *req)
+>  	*((__be32 *)(iv+12)) = counter;
+>  
+>  	if (sg_is_last(req->src) &&
+> -	    req->src->offset + req->src->length <= PAGE_SIZE &&
+> +	    (!PageHighMem(sg_page(req->src)) ||
+> +	    req->src->offset + req->src->length <= PAGE_SIZE) &&
+>  	    sg_is_last(req->dst) &&
+> -	    req->dst->offset + req->dst->length <= PAGE_SIZE) {
+> +	    (!PageHighMem(sg_page(req->dst)) ||
+> +	    req->dst->offset + req->dst->length <= PAGE_SIZE)) {
+>  		one_entry_in_sg = 1;
+>  		scatterwalk_start(&src_sg_walk, req->src);
+>  		assoc = scatterwalk_map(&src_sg_walk);
 
-I'm confused by a bunch of this.
+I was also experimenting with a similar patch that loosened up the
+restrictions here, checking for highmem.  Note that you can go even
+further and check the AAD, data, and TAG all separately, the current
+aesni crypto routines take them as separate buffers.  (This might fix
+the RFC5288 patch AAD size issue?)
 
-1. Is it really the case that crypto_alloc_xyz(..., CRYPTO_ALG_ASYNC)
-means to allocate a *synchronous* transform?  That's not what I
-expected.
+Long term it would be nice to improve the asm routines instead to
+support scatter / gather IO and any AAD len, as the newer intel
+routines do:
 
-2. What guarantees that an async request is never allocated on the
-stack?  If it's just convention, could an assertion be added
-somewhere?
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+https://github.com/01org/isa-l_crypto/tree/master/aes
