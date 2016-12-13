@@ -1,37 +1,59 @@
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH v3] siphash: add cryptographically secure hashtable function
-Date: Tue, 13 Dec 2016 11:26:44 -0800
-Message-ID: <CA+55aFyOD4EhD1v7JNTHxvGSqMi7UKgybWH+PZE1KjXeZTT8BA@mail.gmail.com>
-References: <CA+55aFymjmEPNx8ZwhxtiE=nPG_5gbkzUQhdRAwTareuNcV=tA@mail.gmail.com>
- <20161212221832.10653-1-Jason@zx2c4.com> <20161213083948.GA8994@zzz>
-Reply-To: kernel-hardening@lists.openwall.com
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v2 2/2] crypto: mediatek - add DT bindings documentation
+Date: Tue, 13 Dec 2016 14:06:20 -0600
+Message-ID: <20161213200620.kh34dptxpdcbhkhl@rob-hp-laptop>
+References: <1481592676-2248-1-git-send-email-ryder.lee@mediatek.com>
+ <1481592676-2248-3-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, LKML <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, George Spelvin <linux@horizon.com>,
-	Scott Bauer <sbauer@eng.utah.edu>, Andi Kleen <ak@linux.intel.com>,
-	Andy Lutomirski <luto@amacapital.net>, Greg KH <gregkh@linuxfoundation.org>,
-	Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>, "Daniel J . Bernstein" <djb@cr.yp.to>
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <kernel-hardening-return-5496-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-Sender: linus971@gmail.com
-In-Reply-To: <20161213083948.GA8994@zzz>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        devicetree@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Sean Wang <sean.wang@mediatek.com>,
+        Roy Luo <cheng-hao.luo@mediatek.com>
+To: Ryder Lee <ryder.lee@mediatek.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1481592676-2248-3-git-send-email-ryder.lee@mediatek.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Dec 13, 2016 at 12:39 AM, Eric Biggers <ebiggers3@gmail.com> wrote:
->
-> Hmm, I don't think you can really do load_unaligned_zeropad() without first
-> checking for 'left != 0'.
+On Tue, Dec 13, 2016 at 09:31:16AM +0800, Ryder Lee wrote:
+> Add DT bindings documentation for the crypto driver
+> 
+> Signed-off-by: Ryder Lee <ryder.lee@mediatek.com>
+> ---
+>  .../devicetree/bindings/crypto/mediatek-crypto.txt | 32 ++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt b/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+> new file mode 100644
+> index 0000000..47a786e
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+> @@ -0,0 +1,32 @@
+> +MediaTek cryptographic accelerators
+> +
+> +Required properties:
+> +- compatible: Should be "mediatek,eip97-crypto"
+> +- reg: Address and length of the register set for the device
+> +- interrupts: Should contain the five crypto engines interrupts in numeric
+> +	order. These are global system and four descriptor rings.
+> +- clocks: the clock used by the core
+> +- clock-names: the names of the clock listed in the clocks property. These are
+> +	"ethif", "cryp"
+> +- power-domains: Must contain a reference to the PM domain.
+> +
+> +
+> +Optional properties:
+> +- interrupt-parent: Should be the phandle for the interrupt controller
+> +  that services interrupts for this device
 
-Right you are. If the allocation is at the end of a page, the 0-size
-case would be entirely outside the page and there's no fixup.
+This is not optional. It's perhaps inherited from the parent. You can 
+drop it as it's implied by interrupts property.
 
-Of course, that never happens in normal code, but DEBUG_PAGE_ALLOC can
-trigger it.
-
-              Linus
+Rob
