@@ -1,62 +1,66 @@
 From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH v2 1/7] hwrng: core: do not use multiple blank lines
-Date: Tue, 13 Dec 2016 15:51:09 +0100
-Message-ID: <20161213145115.30082-1-clabbe.montjoie@gmail.com>
+Subject: [PATCH v2 5/7] hwrng: core: Move hwrng miscdev minor number to include/linux/miscdevice.h
+Date: Tue, 13 Dec 2016 15:51:13 +0100
+Message-ID: <20161213145115.30082-5-clabbe.montjoie@gmail.com>
+References: <20161213145115.30082-1-clabbe.montjoie@gmail.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         Corentin Labbe <clabbe.montjoie@gmail.com>
 To: mpm@selenic.com, herbert@gondor.apana.org.au, arnd@arndb.de,
         gregkh@linuxfoundation.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:36492 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932184AbcLMOvr (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Dec 2016 09:51:47 -0500
+In-Reply-To: <20161213145115.30082-1-clabbe.montjoie@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch fix the checkpatch warning "Please don't use multiple blank lines"
+This patch move the define for hwrng's miscdev minor number to
+include/linux/miscdevice.h.
+It's better that all minor number are in the same place.
+Rename it to HWRNG_MINOR (from RNG_MISCDEV_MINOR) in he process since
+no other miscdev define have MISCDEV in their name.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- drivers/char/hw_random/core.c | 5 -----
- 1 file changed, 5 deletions(-)
+ drivers/char/hw_random/core.c | 3 +--
+ include/linux/miscdevice.h    | 1 +
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index d2d2c89..00cbb81 100644
+index 7a2e496..1e1e385 100644
 --- a/drivers/char/hw_random/core.c
 +++ b/drivers/char/hw_random/core.c
-@@ -30,7 +30,6 @@
+@@ -26,7 +26,6 @@
  
-  */
- 
--
- #include <linux/device.h>
- #include <linux/hw_random.h>
- #include <linux/module.h>
-@@ -45,12 +44,10 @@
- #include <linux/err.h>
- #include <asm/uaccess.h>
- 
--
  #define RNG_MODULE_NAME		"hw_random"
  #define PFX			RNG_MODULE_NAME ": "
- #define RNG_MISCDEV_MINOR	183 /* official */
+-#define RNG_MISCDEV_MINOR	183 /* official */
  
--
  static struct hwrng *current_rng;
  static struct task_struct *hwrng_fill;
- static LIST_HEAD(rng_list);
-@@ -296,7 +293,6 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
- 	goto out;
- }
+@@ -283,7 +282,7 @@ static const struct file_operations rng_chrdev_ops = {
+ static const struct attribute_group *rng_dev_groups[];
  
--
- static const struct file_operations rng_chrdev_ops = {
- 	.owner		= THIS_MODULE,
- 	.open		= rng_dev_open,
-@@ -314,7 +310,6 @@ static struct miscdevice rng_miscdev = {
- 	.groups		= rng_dev_groups,
- };
- 
--
- static ssize_t hwrng_attr_current_store(struct device *dev,
- 					struct device_attribute *attr,
- 					const char *buf, size_t len)
+ static struct miscdevice rng_miscdev = {
+-	.minor		= RNG_MISCDEV_MINOR,
++	.minor		= HWRNG_MINOR,
+ 	.name		= RNG_MODULE_NAME,
+ 	.nodename	= "hwrng",
+ 	.fops		= &rng_chrdev_ops,
+diff --git a/include/linux/miscdevice.h b/include/linux/miscdevice.h
+index 722698a..659f586 100644
+--- a/include/linux/miscdevice.h
++++ b/include/linux/miscdevice.h
+@@ -31,6 +31,7 @@
+ #define SGI_MMTIMER		153
+ #define STORE_QUEUE_MINOR	155	/* unused */
+ #define I2O_MINOR		166
++#define HWRNG_MINOR		183
+ #define MICROCODE_MINOR		184
+ #define VFIO_MINOR		196
+ #define TUN_MINOR		200
 -- 
 2.10.2
