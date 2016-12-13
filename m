@@ -1,58 +1,62 @@
-From: Ilya Lesokhin <ilyal@mellanox.com>
-Subject: [PATCH] crypto: aesni-intel - RFC4106 can zero copy when !PageHighMem
-Date: Tue, 13 Dec 2016 16:32:06 +0200
-Message-ID: <1481639526-71743-1-git-send-email-ilyal@mellanox.com>
-Cc: tls-fpga-sw-dev@mellanox.com, Ilya Lesokhin <ilyal@mellanox.com>
-To: linux-crypto@vger.kernel.org, tadeusz.struk@intel.com,
-        herbert@gondor.apana.org.au, davejwatson@fb.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:34541 "EHLO
-        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S932452AbcLMOcU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Dec 2016 09:32:20 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH v2 1/7] hwrng: core: do not use multiple blank lines
+Date: Tue, 13 Dec 2016 15:51:09 +0100
+Message-ID: <20161213145115.30082-1-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+To: mpm@selenic.com, herbert@gondor.apana.org.au, arnd@arndb.de,
+        gregkh@linuxfoundation.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-In the common case of !PageHighMem we can do zero copy crypto
-even if sg crosses a pages boundary.
+This patch fix the checkpatch warning "Please don't use multiple blank lines"
 
-Signed-off-by: Ilya Lesokhin <ilyal@mellanox.com>
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- arch/x86/crypto/aesni-intel_glue.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ drivers/char/hw_random/core.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index b1ab0cb..b494ad7 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -903,9 +903,11 @@ static int helper_rfc4106_encrypt(struct aead_request *req)
- 	*((__be32 *)(iv+12)) = counter;
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index d2d2c89..00cbb81 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -30,7 +30,6 @@
  
- 	if (sg_is_last(req->src) &&
--	    req->src->offset + req->src->length <= PAGE_SIZE &&
-+	    (!PageHighMem(sg_page(req->src)) ||
-+	    req->src->offset + req->src->length <= PAGE_SIZE) &&
- 	    sg_is_last(req->dst) &&
--	    req->dst->offset + req->dst->length <= PAGE_SIZE) {
-+	    (!PageHighMem(sg_page(req->dst)) ||
-+	    req->dst->offset + req->dst->length <= PAGE_SIZE)) {
- 		one_entry_in_sg = 1;
- 		scatterwalk_start(&src_sg_walk, req->src);
- 		assoc = scatterwalk_map(&src_sg_walk);
-@@ -990,9 +992,11 @@ static int helper_rfc4106_decrypt(struct aead_request *req)
- 	*((__be32 *)(iv+12)) = counter;
+  */
  
- 	if (sg_is_last(req->src) &&
--	    req->src->offset + req->src->length <= PAGE_SIZE &&
-+	    (!PageHighMem(sg_page(req->src)) ||
-+	    req->src->offset + req->src->length <= PAGE_SIZE) &&
- 	    sg_is_last(req->dst) &&
--	    req->dst->offset + req->dst->length <= PAGE_SIZE) {
-+	    (!PageHighMem(sg_page(req->dst)) ||
-+	    req->dst->offset + req->dst->length <= PAGE_SIZE)) {
- 		one_entry_in_sg = 1;
- 		scatterwalk_start(&src_sg_walk, req->src);
- 		assoc = scatterwalk_map(&src_sg_walk);
+-
+ #include <linux/device.h>
+ #include <linux/hw_random.h>
+ #include <linux/module.h>
+@@ -45,12 +44,10 @@
+ #include <linux/err.h>
+ #include <asm/uaccess.h>
+ 
+-
+ #define RNG_MODULE_NAME		"hw_random"
+ #define PFX			RNG_MODULE_NAME ": "
+ #define RNG_MISCDEV_MINOR	183 /* official */
+ 
+-
+ static struct hwrng *current_rng;
+ static struct task_struct *hwrng_fill;
+ static LIST_HEAD(rng_list);
+@@ -296,7 +293,6 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
+ 	goto out;
+ }
+ 
+-
+ static const struct file_operations rng_chrdev_ops = {
+ 	.owner		= THIS_MODULE,
+ 	.open		= rng_dev_open,
+@@ -314,7 +310,6 @@ static struct miscdevice rng_miscdev = {
+ 	.groups		= rng_dev_groups,
+ };
+ 
+-
+ static ssize_t hwrng_attr_current_store(struct device *dev,
+ 					struct device_attribute *attr,
+ 					const char *buf, size_t len)
 -- 
-1.8.3.1
+2.10.2
