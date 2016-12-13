@@ -1,302 +1,470 @@
 From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: Re: [RFC PATCH 1/3] crypto: zip - Add ThunderX ZIP driver core
-Date: Tue, 13 Dec 2016 14:39:00 +0100
-Message-ID: <20161213133900.GA10647@Red>
-References: <20161212150439.18627-1-jglauber@cavium.com>
- <20161212150439.18627-2-jglauber@cavium.com>
+Subject: Re: [PATCH v2] crypto: sun4i-ss: support the Security System PRNG
+Date: Tue, 13 Dec 2016 15:10:59 +0100
+Message-ID: <20161213141059.GB10647@Red>
+References: <1480934922-20732-1-git-send-email-clabbe.montjoie@gmail.com>
+ <20161205123705.GA10732@gondor.apana.org.au>
+ <20161205125738.GA13525@Red>
+ <20161207120900.GC20680@gondor.apana.org.au>
+ <20161207125127.GB28218@Red>
+ <20161208090618.GB22932@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>,
-        Mahipal Challa <Mahipal.Challa@cavium.com>,
-        Vishnu Nair <Vishnu.Nair@cavium.com>
-To: Jan Glauber <jglauber@cavium.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: davem@davemloft.net, maxime.ripard@free-electrons.com,
+        wens@csie.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wj0-f194.google.com ([209.85.210.194]:35625 "EHLO
+        mail-wj0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932254AbcLMOLE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Dec 2016 09:11:04 -0500
 Content-Disposition: inline
-In-Reply-To: <20161212150439.18627-2-jglauber@cavium.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20161208090618.GB22932@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hello
-
-I have some comment below
-
-On Mon, Dec 12, 2016 at 04:04:37PM +0100, Jan Glauber wrote:
-> From: Mahipal Challa <Mahipal.Challa@cavium.com>
+On Thu, Dec 08, 2016 at 05:06:18PM +0800, Herbert Xu wrote:
+> On Wed, Dec 07, 2016 at 01:51:27PM +0100, Corentin Labbe wrote:
+> > 
+> > So I must expose it as a crypto_rng ?
 > 
-[...]
-> --- a/drivers/crypto/Makefile
-> +++ b/drivers/crypto/Makefile
-> @@ -27,6 +27,7 @@ obj-$(CONFIG_CRYPTO_DEV_MXC_SCC) += mxc-scc.o
->  obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
->  obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
->  obj-$(CONFIG_CRYPTO_DEV_QAT) += qat/
-> +obj-$(CONFIG_CRYPTO_DEV_CAVIUM_ZIP) += cavium/
->  obj-$(CONFIG_CRYPTO_DEV_QCE) += qce/
->  obj-$(CONFIG_CRYPTO_DEV_VMX) += vmx/
->  obj-$(CONFIG_CRYPTO_DEV_SUN4I_SS) += sunxi-ss/
+> If it is to be exposed at all then algif_rng would be the best
+> place.
+> 
+> > Could you explain why PRNG must not be used as hw_random ?
+> 
+> The hwrng interface was always meant to be an interface for real
+> hardware random number generators.  People rely on that so we
+> should not provide bogus entropy sources through this interface.
+> 
+> Cheers,
 
-Try to keep some alphabetical order
+I have found two solutions:
 
-[...]
-> +/* ZIP invocation result completion status codes */
-> +#define ZIP_NOTDONE		0x0
-> +
-> +/* Successful completion. */
-> +#define ZIP_SUCCESS		0x1
-> +
-> +/* Output truncated */
-> +#define ZIP_DTRUNC		0x2
-> +
-> +/* Dynamic Stop */
-> +#define ZIP_DYNAMIC_STOP	0x3
-> +
-> +/* Uncompress ran out of input data when IWORD0[EF] was set */
-> +#define ZIP_ITRUNC		0x4
-> +
-> +/* Uncompress found the reserved block type 3 */
-> +#define ZIP_RBLOCK		0x5
-> +
-> +/* Uncompress found LEN != ZIP_NLEN in an uncompressed block in the input */
-> +#define ZIP_NLEN		0x6
-> +
-> +/* Uncompress found a bad code in the main Huffman codes. */
-> +#define ZIP_BADCODE		0x7
-> +
-> +/* Uncompress found a bad code in the 19 Huffman codes encoding lengths. */
-> +#define ZIP_BADCODE2	        0x8
-> +
-> +/* Compress found a zero-length input. */
-> +#define ZIP_ZERO_LEN	        0x9
-> +
-> +/* The compress or decompress encountered an internal parity error. */
-> +#define ZIP_PARITY		0xA
+The simplier is to add an attribute isprng to hwrng like that:
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -150,7 +150,8 @@ static int hwrng_init(struct hwrng *rng)
+        reinit_completion(&rng->cleanup_done);
+ 
+ skip_init:
+-       add_early_randomness(rng);
++       if (!rng->isprng)
++               add_early_randomness(rng);
+ 
+        current_quality = rng->quality ? : default_quality;
+        if (current_quality > 1024)
+@@ -158,7 +159,7 @@ static int hwrng_init(struct hwrng *rng)
+ 
+        if (current_quality == 0 && hwrng_fill)
+                kthread_stop(hwrng_fill);
+-       if (current_quality > 0 && !hwrng_fill)
++       if (current_quality > 0 && !hwrng_fill && !rng->isprng)
+                start_khwrngd();
+ 
+        return 0;
+@@ -439,7 +440,7 @@ int hwrng_register(struct hwrng *rng)
+        }
+        list_add_tail(&rng->list, &rng_list);
+ 
+-       if (old_rng && !rng->init) {
++       if (old_rng && !rng->init && !rng->isprng) {
+                /*
+                 * Use a new device's input to add some randomness to
+                 * the system.  If this rng device isn't going to be
+diff --git a/include/linux/hw_random.h b/include/linux/hw_random.h
+index 34a0dc1..5a5b8dc 100644
+--- a/include/linux/hw_random.h
++++ b/include/linux/hw_random.h
+@@ -50,6 +50,7 @@ struct hwrng {
+        struct list_head list;
+        struct kref ref;
+        struct completion cleanup_done;
++       bool isprng;
+ };
 
-Perhaps all errors could begin with ZIP_ERR_xxx ?
 
-[...]
-> +static inline u64 zip_depth(void)
-> +{
-> +	struct zip_device *zip_dev = zip_get_device(zip_get_node_id());
-> +
-> +	if (!zip_dev)
-> +		return -ENODEV;
-> +
-> +	return zip_dev->depth;
-> +}
+With that, we still could register prng, but they dont provide any entropy.
+An optional Kconfig/"module parameter" could still be added for people still wanting this old behavour.
 
-This function is not used.
 
-> +
-> +static inline u64 zip_onfsize(void)
-> +{
-> +	struct zip_device *zip_dev = zip_get_device(zip_get_node_id());
-> +
-> +	if (!zip_dev)
-> +		return -ENODEV;
-> +
-> +	return zip_dev->onfsize;
-> +}
+The other solution is to "duplicate" /dev/hwrng to /dev/hwprng like that:
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -24,8 +24,11 @@
+ #include <linux/uaccess.h>
+ 
+ #define RNG_MODULE_NAME		"hw_random"
++#define PRNG_MODULE_NAME	"hw_prng"
++#define HWPRNG_MINOR	185 /* not official */
+ 
+ static struct hwrng *current_rng;
++static struct hwrng *current_prng;
+ static struct task_struct *hwrng_fill;
+ static LIST_HEAD(rng_list);
+ /* Protects rng_list and current_rng */
+@@ -44,7 +47,7 @@ module_param(default_quality, ushort, 0644);
+ MODULE_PARM_DESC(default_quality,
+ 		 "default entropy content of hwrng per mill");
+ 
+-static void drop_current_rng(void);
++static void drop_current_rng(bool prng);
+ static int hwrng_init(struct hwrng *rng);
+ static void start_khwrngd(void);
+ 
+@@ -56,6 +59,14 @@ static size_t rng_buffer_size(void)
+ 	return SMP_CACHE_BYTES < 32 ? 32 : SMP_CACHE_BYTES;
+ }
+ 
++static bool is_current_xrng(struct hwrng *rng)
++{
++	if (rng->isprng)
++		return (rng == current_prng);
++	else
++		return (rng == current_rng);
++}
++
+ static void add_early_randomness(struct hwrng *rng)
+ {
+ 	int bytes_read;
+@@ -88,32 +99,46 @@ static int set_current_rng(struct hwrng *rng)
+ 	if (err)
+ 		return err;
+ 
+-	drop_current_rng();
+-	current_rng = rng;
++	drop_current_rng(rng->isprng);
++	if (rng->isprng)
++		current_prng = rng;
++	else
++		current_rng = rng;
+ 
+ 	return 0;
+ }
+ 
+-static void drop_current_rng(void)
++static void drop_current_rng(bool prng)
+ {
+ 	BUG_ON(!mutex_is_locked(&rng_mutex));
+-	if (!current_rng)
+-		return;
+-
+-	/* decrease last reference for triggering the cleanup */
+-	kref_put(&current_rng->ref, cleanup_rng);
+-	current_rng = NULL;
++	if (prng) {
++		if (!current_prng)
++			return;
++		/* decrease last reference for triggering the cleanup */
++		kref_put(&current_prng->ref, cleanup_rng);
++		current_prng = NULL;
++	} else {
++		if (!current_rng)
++			return;
++		/* decrease last reference for triggering the cleanup */
++		kref_put(&current_rng->ref, cleanup_rng);
++		current_rng = NULL;
++	}
+ }
+ 
+ /* Returns ERR_PTR(), NULL or refcounted hwrng */
+-static struct hwrng *get_current_rng(void)
++static struct hwrng *get_current_rng(bool prng)
+ {
+ 	struct hwrng *rng;
+ 
+ 	if (mutex_lock_interruptible(&rng_mutex))
+ 		return ERR_PTR(-ERESTARTSYS);
+ 
+-	rng = current_rng;
++	if (prng)
++		rng = current_prng;
++	else
++		rng = current_rng;
++
+ 	if (rng)
+ 		kref_get(&rng->ref);
+ 
+@@ -193,8 +218,8 @@ static inline int rng_get_data(struct hwrng *rng, u8 *buffer, size_t size,
+ 	return 0;
+ }
+ 
+-static ssize_t rng_dev_read(struct file *filp, char __user *buf,
+-			    size_t size, loff_t *offp)
++static ssize_t genrng_dev_read(struct file *filp, char __user *buf,
++			    size_t size, loff_t *offp, bool prng)
+ {
+ 	ssize_t ret = 0;
+ 	int err = 0;
+@@ -202,7 +227,7 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
+ 	struct hwrng *rng;
+ 
+ 	while (size) {
+-		rng = get_current_rng();
++		rng = get_current_rng(prng);
+ 		if (IS_ERR(rng)) {
+ 			err = PTR_ERR(rng);
+ 			goto out;
+@@ -270,6 +295,18 @@ static ssize_t rng_dev_read(struct file *filp, char __user *buf,
+ 	goto out;
+ }
+ 
++static ssize_t rng_dev_read(struct file *filp, char __user *buf,
++			    size_t size, loff_t *offp)
++{
++	return genrng_dev_read(filp, buf, size, offp, false);
++}
++
++static ssize_t prng_dev_read(struct file *filp, char __user *buf,
++			    size_t size, loff_t *offp)
++{
++	return genrng_dev_read(filp, buf, size, offp, true);
++}
++
+ static const struct file_operations rng_chrdev_ops = {
+ 	.owner		= THIS_MODULE,
+ 	.open		= rng_dev_open,
+@@ -278,6 +315,7 @@ static const struct file_operations rng_chrdev_ops = {
+ };
+ 
+ static const struct attribute_group *rng_dev_groups[];
++static const struct attribute_group *prng_dev_groups[];
+ 
+ static struct miscdevice rng_miscdev = {
+ 	.minor		= HWRNG_MINOR,
+@@ -287,9 +325,24 @@ static struct miscdevice rng_miscdev = {
+ 	.groups		= rng_dev_groups,
+ };
+ 
+-static ssize_t hwrng_attr_current_store(struct device *dev,
+-					struct device_attribute *attr,
+-					const char *buf, size_t len)
++static const struct file_operations prng_chrdev_ops = {
++	.owner		= THIS_MODULE,
++	.open		= rng_dev_open,
++	.read		= prng_dev_read,
++	.llseek		= noop_llseek,
++};
++
++static struct miscdevice prng_miscdev = {
++	.minor		= HWPRNG_MINOR,
++	.name		= PRNG_MODULE_NAME,
++	.nodename	= "hwprng",
++	.fops		= &prng_chrdev_ops,
++	.groups		= prng_dev_groups,
++};
++
++static ssize_t genrng_attr_current_store(struct device *dev,
++					 struct device_attribute *attr,
++					 const char *buf, size_t len, bool prng)
+ {
+ 	int err;
+ 	struct hwrng *rng;
+@@ -301,8 +354,13 @@ static ssize_t hwrng_attr_current_store(struct device *dev,
+ 	list_for_each_entry(rng, &rng_list, list) {
+ 		if (sysfs_streq(rng->name, buf)) {
+ 			err = 0;
+-			if (rng != current_rng)
+-				err = set_current_rng(rng);
++			if (prng) {
++				if (rng != current_prng)
++					err = set_current_rng(rng);
++			} else {
++				if (rng != current_rng)
++					err = set_current_rng(rng);
++			}
+ 			break;
+ 		}
+ 	}
+@@ -311,14 +369,28 @@ static ssize_t hwrng_attr_current_store(struct device *dev,
+ 	return err ? : len;
+ }
+ 
+-static ssize_t hwrng_attr_current_show(struct device *dev,
+-				       struct device_attribute *attr,
+-				       char *buf)
++static ssize_t hwrng_attr_current_store(struct device *dev,
++					struct device_attribute *attr,
++					const char *buf, size_t len)
++{
++	return genrng_attr_current_store(dev, attr, buf, len, false);
++}
++
++static ssize_t hwprng_attr_current_store(struct device *dev,
++					 struct device_attribute *attr,
++					 const char *buf, size_t len)
++{
++	return genrng_attr_current_store(dev, attr, buf, len, true);
++}
++
++static ssize_t genrng_attr_current_show(struct device *dev,
++					struct device_attribute *attr,
++					char *buf, bool prng)
+ {
+ 	ssize_t ret;
+ 	struct hwrng *rng;
+ 
+-	rng = get_current_rng();
++	rng = get_current_rng(prng);
+ 	if (IS_ERR(rng))
+ 		return PTR_ERR(rng);
+ 
+@@ -328,9 +400,24 @@ static ssize_t hwrng_attr_current_show(struct device *dev,
+ 	return ret;
+ }
+ 
+-static ssize_t hwrng_attr_available_show(struct device *dev,
++static ssize_t hwrng_attr_current_show(struct device *dev,
++				       struct device_attribute *attr,
++				       char *buf)
++{
++	return genrng_attr_current_show(dev, attr, buf, false);
++}
++
++static ssize_t hwprng_attr_current_show(struct device *dev,
++					struct device_attribute *attr,
++					char *buf)
++{
++	return genrng_attr_current_show(dev, attr, buf, true);
++}
++
++
++static ssize_t hwgenrng_attr_available_show(struct device *dev,
+ 					 struct device_attribute *attr,
+-					 char *buf)
++					 char *buf, bool prng)
+ {
+ 	int err;
+ 	struct hwrng *rng;
+@@ -340,8 +427,10 @@ static ssize_t hwrng_attr_available_show(struct device *dev,
+ 		return -ERESTARTSYS;
+ 	buf[0] = '\0';
+ 	list_for_each_entry(rng, &rng_list, list) {
+-		strlcat(buf, rng->name, PAGE_SIZE);
+-		strlcat(buf, " ", PAGE_SIZE);
++		if (rng->isprng == prng) {
++			strlcat(buf, rng->name, PAGE_SIZE);
++			strlcat(buf, " ", PAGE_SIZE);
++		}
+ 	}
+ 	strlcat(buf, "\n", PAGE_SIZE);
+ 	mutex_unlock(&rng_mutex);
+@@ -349,6 +438,20 @@ static ssize_t hwrng_attr_available_show(struct device *dev,
+ 	return strlen(buf);
+ }
+ 
++static ssize_t hwrng_attr_available_show(struct device *dev,
++					 struct device_attribute *attr,
++					 char *buf)
++{
++	return hwgenrng_attr_available_show(dev, attr, buf, false);
++}
++
++static ssize_t hwprng_attr_available_show(struct device *dev,
++					  struct device_attribute *attr,
++					  char *buf)
++{
++	return hwgenrng_attr_available_show(dev, attr, buf, true);
++}
++
+ static DEVICE_ATTR(rng_current, S_IRUGO | S_IWUSR,
+ 		   hwrng_attr_current_show,
+ 		   hwrng_attr_current_store);
+@@ -356,6 +459,13 @@ static DEVICE_ATTR(rng_available, S_IRUGO,
+ 		   hwrng_attr_available_show,
+ 		   NULL);
+ 
++static DEVICE_ATTR(prng_current, S_IRUGO | S_IWUSR,
++		   hwprng_attr_current_show,
++		   hwprng_attr_current_store);
++static DEVICE_ATTR(prng_available, S_IRUGO,
++		   hwprng_attr_available_show,
++		   NULL);
++
+ static struct attribute *rng_dev_attrs[] = {
+ 	&dev_attr_rng_current.attr,
+ 	&dev_attr_rng_available.attr,
+@@ -364,14 +474,35 @@ static struct attribute *rng_dev_attrs[] = {
+ 
+ ATTRIBUTE_GROUPS(rng_dev);
+ 
++static struct attribute *prng_dev_attrs[] = {
++	&dev_attr_prng_current.attr,
++	&dev_attr_prng_available.attr,
++	NULL
++};
++
++ATTRIBUTE_GROUPS(prng_dev);
++
+ static void __exit unregister_miscdev(void)
+ {
+ 	misc_deregister(&rng_miscdev);
++	misc_deregister(&prng_miscdev);
+ }
+ 
+ static int __init register_miscdev(void)
+ {
+-	return misc_register(&rng_miscdev);
++	int err;
++
++	err = misc_register(&rng_miscdev);
++	if (err)
++		return err;
++	err = misc_register(&prng_miscdev);
++	if (err)
++		goto reg_error;
++	else
++		return 0;
++reg_error:
++	misc_deregister(&rng_miscdev);
++	return err;
+ }
+ 
+ static int hwrng_fillfn(void *unused)
+@@ -381,7 +512,7 @@ static int hwrng_fillfn(void *unused)
+ 	while (!kthread_should_stop()) {
+ 		struct hwrng *rng;
+ 
+-		rng = get_current_rng();
++		rng = get_current_rng(false);
+ 		if (IS_ERR(rng) || !rng)
+ 			break;
+ 		mutex_lock(&reading_mutex);
+@@ -462,8 +593,8 @@ void hwrng_unregister(struct hwrng *rng)
+ 	mutex_lock(&rng_mutex);
+ 
+ 	list_del(&rng->list);
+-	if (current_rng == rng) {
+-		drop_current_rng();
++	if (is_current_xrng(rng)) {
++		drop_current_rng(rng->isprng);
+ 		if (!list_empty(&rng_list)) {
+ 			struct hwrng *tail;
+ 
+@@ -553,7 +684,8 @@ static int __init hwrng_modinit(void)
+ static void __exit hwrng_modexit(void)
+ {
+ 	mutex_lock(&rng_mutex);
+-	BUG_ON(current_rng);
++	WARN_ON(current_rng);
++	WARN_ON(current_prng);
+ 	kfree(rng_buffer);
+ 	kfree(rng_fillbuf);
+ 	mutex_unlock(&rng_mutex);
+diff --git a/include/linux/hw_random.h b/include/linux/hw_random.h
+index 34a0dc1..5a5b8dc 100644
+--- a/include/linux/hw_random.h
++++ b/include/linux/hw_random.h
+@@ -50,6 +50,7 @@ struct hwrng {
+ 	struct list_head list;
+ 	struct kref ref;
+ 	struct completion cleanup_done;
++	bool isprng;
+ };
 
-Same for this
-
-> +
-> +static inline u64 zip_ctxsize(void)
-> +{
-> +	struct zip_device *zip_dev = zip_get_device(zip_get_node_id());
-> +
-> +	if (!zip_dev)
-> +		return -ENODEV;
-> +
-> +	return zip_dev->ctxsize;
-> +}
-
-Again
-
-[...]
-> +
-> +/*
-> + * Allocates new ZIP device structure
-> + * Returns zip_device pointer or NULL if cannot allocate memory for zip_device
-> + */
-> +static struct zip_device *zip_alloc_device(struct pci_dev *pdev)
-
-pdev is not used, so you can remove it from arglist.
-Or keep it and use devm_kzalloc for allocating zip
-
-> +{
-> +	struct zip_device *zip = NULL;
-> +	int idx = 0;
-> +
-> +	for (idx = 0; idx < MAX_ZIP_DEVICES; idx++) {
-> +		if (!zip_dev[idx])
-> +			break;
-> +	}
-> +
-> +	zip = kzalloc(sizeof(*zip), GFP_KERNEL);
-> +
-> +	if (!zip)
-> +		return NULL;
-> +
-> +	zip_dev[idx] = zip;
-> +	zip->index = idx;
-> +	return zip;
-> +}
-
-[...]
-> +static int zip_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct zip_device *zip = NULL;
-> +	int    err;
-> +
-> +	zip_dbg_enter();
-> +
-> +	zip = zip_alloc_device(pdev);
-> +
-> +	if (!zip)
-> +		return -ENOMEM;
-> +
-> +	pr_info("Found ZIP device %d %x:%x on Node %d\n", zip->index,
-> +		pdev->vendor, pdev->device, dev_to_node(dev));
-
-You use lots of pr_info, why not using more dev_info/dev_err ?
-
-> +
-> +	zip->pdev = pdev;
-> +
-> +	pci_set_drvdata(pdev, zip);
-> +
-> +	err = pci_enable_device(pdev);
-> +	if (err) {
-> +		zip_err("Failed to enable PCI device");
-> +		goto err_free_device;
-> +	}
-> +
-> +	err = pci_request_regions(pdev, DRV_NAME);
-> +	if (err) {
-> +		zip_err("PCI request regions failed 0x%x", err);
-> +		goto err_disable_device;
-> +	}
-> +
-> +	err = pci_set_dma_mask(pdev, DMA_BIT_MASK(48));
-> +	if (err) {
-> +		dev_err(dev, "Unable to get usable DMA configuration\n");
-> +		goto err_release_regions;
-> +	}
-> +
-> +	err = pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(48));
-> +	if (err) {
-> +		dev_err(dev, "Unable to get 48-bit DMA for allocations\n");
-> +		goto err_release_regions;
-> +	}
-> +
-> +	/* MAP configuration registers */
-> +	zip->reg_base = pci_ioremap_bar(pdev, PCI_CFG_ZIP_PF_BAR0);
-> +	if (!zip->reg_base) {
-> +		zip_err("ZIP: Cannot map BAR0 CSR memory space, aborting");
-> +		err = -ENOMEM;
-> +		goto err_release_regions;
-> +	}
-> +
-> +	/* Initialize ZIP Hardware */
-> +	err = zip_init_hw(zip);
-> +	if (err)
-> +		goto err_release_regions;
-> +
-> +	return 0;
-> +
-> +err_release_regions:
-> +	if (zip->reg_base)
-> +		iounmap(zip->reg_base);
-> +	pci_release_regions(pdev);
-> +
-> +err_disable_device:
-> +	pci_disable_device(pdev);
-> +
-> +err_free_device:
-> +	pci_set_drvdata(pdev, NULL);
-> +
-> +	/* remove zip_dev from zip_device list, free the zip_device memory */
-> +	zip_dev[zip->index] = NULL;
-> +	kfree(zip);
-> +
-> +	zip_dbg_exit();
-> +	return err;
-> +}
-
-[...]
-> +static int __init zip_init_module(void)
-> +{
-> +	int ret;
-> +
-> +	memset(&zip_dev, 0, sizeof(zip_dev));
-
-A static variable is already zeroed
-
-> +
-> +	zip_msg("%s\n", DRV_NAME);
-> +
-> +	ret = pci_register_driver(&zip_driver);
-> +	if (ret < 0) {
-> +		zip_err("ZIP: pci_register_driver() returned %d\n", ret);
-> +		return ret;
-> +	}
-> +
-> +	/* Register with the Kernel Crypto Interface */
-> +	ret = zip_register_compression_device();
-> +	if (ret < 0) {
-> +		zip_err("ZIP: Kernel Crypto Registration failed\n");
-> +		return 1;
-
-1 is not a good error code. And you quit without unregistering.
-
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +static void __exit zip_cleanup_module(void)
-> +{
-> +	/* Unregister this driver for pci zip devices */
-> +	pci_unregister_driver(&zip_driver);
-> +
-> +	/* Unregister from the kernel crypto interface */
-> +	zip_unregister_compression_device();
-
-I think you must do the opposite. (unregister crypto first)
-
-> +
-> +	pr_info("ThunderX-ZIP driver is removed successfully\n");
-> +}
-> +
-> +module_init(zip_init_module);
-> +module_exit(zip_cleanup_module);
-
-Why not using module_pci_driver ?
-
-[...]
-> +/**
-> + * enum zip_comp_e - ZIP Completion Enumeration, enumerates the values of
-> + * ZIP_ZRES_S[COMPCODE].
-> + */
-> +enum zip_comp_e {
-> +	ZIP_COMP_E_BADCODE = 0x7,
-> +	ZIP_COMP_E_BADCODE2 = 0x8,
-> +	ZIP_COMP_E_DTRUNC = 0x2,
-> +	ZIP_COMP_E_FATAL = 0xb,
-> +	ZIP_COMP_E_ITRUNC = 0x4,
-> +	ZIP_COMP_E_NLEN = 0x6,
-> +	ZIP_COMP_E_NOTDONE = 0x0,
-> +	ZIP_COMP_E_PARITY = 0xa,
-> +	ZIP_COMP_E_RBLOCK = 0x5,
-> +	ZIP_COMP_E_STOP = 0x3,
-> +	ZIP_COMP_E_SUCCESS = 0x1,
-> +	ZIP_COMP_E_ZERO_LEN = 0x9,
-> +	ZIP_COMP_E_ENUM_LAST = 0xc,
-
-Why not using already declared define ? ZIP_COMP_E_BADCODE = ZIP_BADCODE 
+What do you think about those two solutions ?
 
 Regards
 Corentin Labbe
