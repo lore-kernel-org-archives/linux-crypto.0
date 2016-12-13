@@ -1,111 +1,46 @@
-From: Milan Broz <gmazyland@gmail.com>
-Subject: Re: [RFC PATCH v2] crypto: Add IV generation algorithms
-Date: Tue, 13 Dec 2016 11:01:08 +0100
-Message-ID: <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com>
-References: <1481618949-20086-1-git-send-email-binoy.jayan@linaro.org>
- <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
+From: Kalle Valo <kvalo@codeaurora.org>
+Subject: Re: [PATCH] orinoco: Use shash instead of ahash for MIC calculations
+Date: Tue, 13 Dec 2016 13:35:39 +0200
+Message-ID: <87mvg0kqno.fsf@purkki.adurom.net>
+References: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
+        <8818c45b9ec6a04d85fabf9bb437cf119fd23659.1481575835.git.luto@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-        Rajendra <rnayak@codeaurora.org>
-To: Binoy Jayan <binoy.jayan@linaro.org>, Oded <oded.golombek@arm.com>,
-        Ofir <Ofir.Drang@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org, Eric Biggers <ebiggers3@gmail.com>,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>
+To: Andy Lutomirski <luto@kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp.codeaurora.org ([198.145.29.96]:59536 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932979AbcLMLft (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Dec 2016 06:35:49 -0500
+In-Reply-To: <8818c45b9ec6a04d85fabf9bb437cf119fd23659.1481575835.git.luto@kernel.org>
+        (Andy Lutomirski's message of "Mon, 12 Dec 2016 12:55:55 -0800")
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 12/13/2016 09:49 AM, Binoy Jayan wrote:
-> Currently, the iv generation algorithms are implemented in dm-crypt.c.
-> The goal is to move these algorithms from the dm layer to the kernel
-> crypto layer by implementing them as template ciphers so they can be
-> implemented in hardware for performance. As part of this patchset, the
-> iv-generation code is moved from the dm layer to the crypto layer and
-> adapt the dm-layer to send a whole 'bio' (as defined in the block layer)
-> at a time. Each bio contains the in memory representation of physically
-> contiguous disk blocks. The dm layer sets up a chained scatterlist of
-> these blocks split into physically contiguous segments in memory so that
-> DMA can be performed. The iv generation algorithms implemented in geniv.c
-> include plain, plain64, essiv, benbi, null, lmk and tcw.
-...
+Andy Lutomirski <luto@kernel.org> writes:
 
-Just few notes...
+> Eric Biggers pointed out that the orinoco driver pointed scatterlists
+> at the stack.
+>
+> Fix it by switching from ahash to shash.  The result should be
+> simpler, faster, and more correct.
+>
+> Cc: stable@vger.kernel.org # 4.9 only
+> Reported-by: Eric Biggers <ebiggers3@gmail.com>
+> Signed-off-by: Andy Lutomirski <luto@kernel.org>
 
-The lmk (loopAES) and tcw (old TrueCrypt mode) IVs are in fact hacks,
-it is combination of IV and modification of CBC mode (in post calls).
+"more correct"? Does this fix a real user visible bug or what? And why
+just stable 4.9, does this maybe have something to do with
+CONFIG_VMAP_STACK?
 
-It is used only in these disk-encryption systems, it does not make sense
-to use it elsewhere (moreover tcw IV is not safe, it is here only
-for compatibility reasons).
+I'm just wondering should I push this to 4.10 or -next. This is a driver
+for ancient hardware so I'm starting to lean for -next.
 
-I think that IV generators should not modify or read encrypted data directly,
-it should only generate IV.
-
-By the move everything to cryptoAPI we are basically introducing some strange mix
-of IV and modes there, I wonder how this is going to be maintained.
-Anyway, Herbert should say if it is ok...
-
-But I would imagine that cryptoAPI should implement only "real" IV generators
-and these disk-encryption add-ons keep inside dmcrypt.
-(and dmcrypt should probably use normal IVs through crypto API and
-build some wrapper around for hacks...)
-
-...
-
-> 
-> When using multiple keys with the original dm-crypt, the key selection is
-> made based on the sector number as:
-> 
-> key_index = sector & (key_count - 1)
-> 
-> This restricts the usage of the same key for encrypting/decrypting a
-> single bio. One way to solve this is to move the key management code from
-> dm-crypt to cryto layer. But this seems tricky when using template ciphers
-> because, when multiple ciphers are instantiated from dm layer, each cipher
-> instance set with a unique subkey (part of the bigger master key) and
-> these instances themselves do not have access to each other's instances
-> or contexts. This way, a single instance cannot encryt/decrypt a whole bio.
-> This has to be fixed.
-
-I really do not think the disk encryption key management should be moved
-outside of dm-crypt. We cannot then change key structure later easily.
-
-But it is not only key management, you are basically moving much more internals
-outside of dm-crypt:
-
-> +struct geniv_ctx {
-> +	struct crypto_skcipher *child;
-> +	unsigned int tfms_count;
-> +	char *ivmode;
-> +	unsigned int iv_size;
-> +	char *ivopts;
-> +	char *cipher;
-> +	struct geniv_operations *iv_gen_ops;
-> +	union {
-> +		struct geniv_essiv_private essiv;
-> +		struct geniv_benbi_private benbi;
-> +		struct geniv_lmk_private lmk;
-> +		struct geniv_tcw_private tcw;
-> +	} iv_gen_private;
-> +	void *iv_private;
-> +	struct crypto_skcipher *tfm;
-> +	unsigned int key_size;
-> +	unsigned int key_extra_size;
-> +	unsigned int key_parts;      /* independent parts in key buffer */
-
-^^^ these key sizes you probably mean by key management.
-It is based on way how the key is currently sent into kernel
-(one hexa string in ioctl that needs to be split) and have to be changed in future.
-
-> +	enum setkey_op keyop;
-> +	char *msg;
-> +	u8 *key;
-
-Milan
+-- 
+Kalle Valo
