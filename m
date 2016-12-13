@@ -1,59 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Remaining crypto API regressions with CONFIG_VMAP_STACK
-Date: Tue, 13 Dec 2016 11:39:42 +0800
-Message-ID: <20161213033942.GC5601@gondor.apana.org.au>
-References: <20161209230851.GB64048@google.com>
- <CALCETrWfa5VJQNu3XjeFhF0cDFWF+M-dPwsT_7dzO5YSxsneGg@mail.gmail.com>
- <1747e6e9-35dc-48cc-7345-4f0412ba2521@amd.com>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH] crypto: Make a few drivers depend on !VMAP_STACK
+Date: Tue, 13 Dec 2016 11:42:32 +0800
+Message-ID: <20161213034232.GD5601@gondor.apana.org.au>
+References: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
+ <5e4b1fdd48e44acd5f3cfa25639b00f5c5906832.1481575835.git.luto@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Andy Lutomirski <luto@amacapital.net>,
-	Eric Biggers <ebiggers3@gmail.com>, linux-crypto@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>,
-	Andrew Lutomirski <luto@kernel.org>,
-	Stephan Mueller <smueller@chronox.de>
-To: Gary R Hook <ghook@amd.com>
-Return-path: <owner-linux-mm@kvack.org>
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+To: Andy Lutomirski <luto-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1747e6e9-35dc-48cc-7345-4f0412ba2521@amd.com>
-Sender: owner-linux-mm@kvack.org
+In-Reply-To: <5e4b1fdd48e44acd5f3cfa25639b00f5c5906832.1481575835.git.luto-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Dec 12, 2016 at 12:45:18PM -0600, Gary R Hook wrote:
-> On 12/12/2016 12:34 PM, Andy Lutomirski wrote:
+On Mon, Dec 12, 2016 at 12:55:20PM -0800, Andy Lutomirski wrote:
+> Eric Biggers found several crypto drivers that point scatterlists at
+> the stack.  These drivers should never load on x86, but, for future
+> safety, make them depend on !VMAP_STACK.
 > 
-> <...snip...>
+> No -stable backport should be needed as no released kernel
+> configuration should be affected.
 > 
-> >
-> >I have a patch to make these depend on !VMAP_STACK.
-> >
-> >>        drivers/crypto/ccp/ccp-crypto-aes-cmac.c:105,119,142
-> >>        drivers/crypto/ccp/ccp-crypto-sha.c:95,109,124
-> >>        drivers/crypto/ccp/ccp-crypto-aes-xts.c:162
-> >>        drivers/crypto/ccp/ccp-crypto-aes.c:94
-> >
-> >According to Herbert, these are fine.  I'm personally less convinced
-> >since I'm very confused as to what "async" means in the crypto code,
-> >but I'm going to leave these alone.
-> 
-> I went back through the code, and AFAICT every argument to sg_init_one() in
-> the above-cited files is a buffer that is part of the request context. Which
-> is allocated by the crypto framework, and therefore will never be on the
-> stack.
-> Right?
+> Reported-by: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Andy Lutomirski <luto-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 
-Right.
+Nack.  These drivers are all async and are never used with a
+stack request.
 
 Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-
 --
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+To unsubscribe from this list: send the line "unsubscribe linux-usb" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
