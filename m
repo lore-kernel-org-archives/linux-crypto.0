@@ -1,44 +1,61 @@
 From: Andy Lutomirski <luto@amacapital.net>
-Subject: Re: [PATCH] keys/encrypted: Fix two crypto-on-the-stack bugs
-Date: Tue, 13 Dec 2016 09:02:07 -0800
-Message-ID: <CALCETrVbEhxRWFmgrePeLriQU5J6ZZaN15tTAYja1hJwYFrRpg@mail.gmail.com>
-References: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
- <e958f214e8885968be8045ffde813ac339b81178.1481575835.git.luto@kernel.org>
- <063D6719AE5E284EB5DD2968C1650D6DB023CA99@AcuExch.aculab.com>
- <CALCETrWsTKq0NOpwiJtB50OU7w99-m82NhPG_Uxs2Fqbpz0LLA@mail.gmail.com> <2661.1481647538@warthog.procyon.org.uk>
+Subject: Re: Remaining crypto API regressions with CONFIG_VMAP_STACK
+Date: Tue, 13 Dec 2016 09:06:31 -0800
+Message-ID: <CALCETrVz4B2rthaKPJAOpiHm1kCh-mD2C5kKti0q8iBQ0QEzuA@mail.gmail.com>
+References: <20161209230851.GB64048@google.com> <CALCETrWfa5VJQNu3XjeFhF0cDFWF+M-dPwsT_7dzO5YSxsneGg@mail.gmail.com>
+ <20161213033928.GB5601@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: David Laight <David.Laight@aculab.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Stephan Mueller <smueller@chronox.de>
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <2661.1481647538@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: Eric Biggers <ebiggers3@gmail.com>, linux-crypto@vger.kernel.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Andrew Lutomirski <luto@kernel.org>,
+	Stephan Mueller <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <20161213033928.GB5601@gondor.apana.org.au>
+Sender: owner-linux-mm@kvack.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Dec 13, 2016 at 8:45 AM, David Howells <dhowells@redhat.com> wrote:
-> Andy Lutomirski <luto@amacapital.net> wrote:
+On Mon, Dec 12, 2016 at 7:39 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Mon, Dec 12, 2016 at 10:34:10AM -0800, Andy Lutomirski wrote:
+>>
+>> Here's my status.
+>>
+>> >         drivers/crypto/bfin_crc.c:351
+>> >         drivers/crypto/qce/sha.c:299
+>> >         drivers/crypto/sahara.c:973,988
+>> >         drivers/crypto/talitos.c:1910
+>> >         drivers/crypto/qce/sha.c:325
+>>
+>> I have a patch to make these depend on !VMAP_STACK.
 >
->> After all, rodata is ordinary memory, is backed by struct page, etc.
+> Why? They're all marked as ASYNC AFAIK.
 >
-> Is that actually true?  I thought some arches excluded the kernel image from
-> the page struct array to make the array consume less memory.
+>> I have a patch to convert this to, drumroll please:
+>>
+>>     priv->tx_tfm_mic = crypto_alloc_shash("michael_mic", 0,
+>>                           CRYPTO_ALG_ASYNC);
+>>
+>> Herbert, I'm at a loss as what a "shash" that's "ASYNC" even means.
+>
+> Having 0 as type and CRYPTO_ALG_ASYNC as mask in general means
+> that we're requesting a sync algorithm (i.e., ASYNC bit off).
+>
+> However, it is completely unnecessary for shash as they can never
+> be async.  So this could be changed to just ("michael_mic", 0, 0).
 
-I don't know whether you're right, but that sounds a bit silly to me.
-This is a *tiny* amount of memory.
+I'm confused by a bunch of this.
 
-But there's yet another snag.  Alpha doesn't have empty_zero_page --
-it only has ZERO_PAGE.  I could do page_address(ZERO_PAGE(0))...
+1. Is it really the case that crypto_alloc_xyz(..., CRYPTO_ALG_ASYNC)
+means to allocate a *synchronous* transform?  That's not what I
+expected.
 
---Andy
+2. What guarantees that an async request is never allocated on the
+stack?  If it's just convention, could an assertion be added
+somewhere?
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
