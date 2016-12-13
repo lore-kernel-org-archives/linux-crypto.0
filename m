@@ -1,73 +1,53 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH] orinoco: Use shash instead of ahash for MIC calculations
-Date: Mon, 12 Dec 2016 23:54:25 -0800
-Message-ID: <20161213075425.GA5948@zzz>
-References: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
- <8818c45b9ec6a04d85fabf9bb437cf119fd23659.1481575835.git.luto@kernel.org>
+Subject: Re: [PATCH v3] siphash: add cryptographically secure hashtable
+ function
+Date: Tue, 13 Dec 2016 00:39:48 -0800
+Message-ID: <20161213083948.GA8994@zzz>
+References: <CA+55aFymjmEPNx8ZwhxtiE=nPG_5gbkzUQhdRAwTareuNcV=tA@mail.gmail.com>
+ <20161212221832.10653-1-Jason@zx2c4.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Stephan Mueller <smueller@chronox.de>
-To: Andy Lutomirski <luto@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+        "kernel-hardening@lists.openwall.com"
+        <kernel-hardening@lists.openwall.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        George Spelvin <linux@horizon.com>,
+        Scott Bauer <sbauer@eng.utah.edu>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        "Daniel J . Bernstein" <djb@cr.yp.to>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:36021 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753032AbcLMIkA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Dec 2016 03:40:00 -0500
 Content-Disposition: inline
-In-Reply-To: <8818c45b9ec6a04d85fabf9bb437cf119fd23659.1481575835.git.luto@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20161212221832.10653-1-Jason@zx2c4.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 12, 2016 at 12:55:55PM -0800, Andy Lutomirski wrote:
-> +int orinoco_mic(struct crypto_shash *tfm_michael, u8 *key,
->  		u8 *da, u8 *sa, u8 priority,
->  		u8 *data, size_t data_len, u8 *mic)
->  {
-> -	AHASH_REQUEST_ON_STACK(req, tfm_michael);
-> -	struct scatterlist sg[2];
-> +	SHASH_DESC_ON_STACK(desc, tfm_michael);
->  	u8 hdr[ETH_HLEN + 2]; /* size of header + padding */
->  	int err;
->  
-> @@ -67,18 +66,27 @@ int orinoco_mic(struct crypto_ahash *tfm_michael, u8 *key,
->  	hdr[ETH_ALEN * 2 + 2] = 0;
->  	hdr[ETH_ALEN * 2 + 3] = 0;
->  
-> -	/* Use scatter gather to MIC header and data in one go */
-> -	sg_init_table(sg, 2);
-> -	sg_set_buf(&sg[0], hdr, sizeof(hdr));
-> -	sg_set_buf(&sg[1], data, data_len);
-> +	desc->tfm = tfm_michael;
-> +	desc->flags = 0;
->  
-> -	if (crypto_ahash_setkey(tfm_michael, key, MIC_KEYLEN))
-> -		return -1;
-> +	err = crypto_shash_setkey(tfm_michael, key, MIC_KEYLEN);
-> +	if (err)
-> +		return err;
-> +
-> +	err = crypto_shash_init(desc);
-> +	if (err)
-> +		return err;
-> +
-> +	err = crypto_shash_update(desc, hdr, sizeof(hdr));
-> +	if (err)
-> +		return err;
-> +
-> +	err = crypto_shash_update(desc, data, data_len);
-> +	if (err)
-> +		return err;
-> +
-> +	err = crypto_shash_final(desc, mic);
-> +	shash_desc_zero(desc);
->  
-> -	ahash_request_set_tfm(req, tfm_michael);
-> -	ahash_request_set_callback(req, 0, NULL, NULL);
-> -	ahash_request_set_crypt(req, sg, mic, data_len + sizeof(hdr));
-> -	err = crypto_ahash_digest(req);
-> -	ahash_request_zero(req);
->  	return err;
+On Mon, Dec 12, 2016 at 11:18:32PM +0100, Jason A. Donenfeld wrote:
+> +	for (; data != end; data += sizeof(u64)) {
+> +		m = get_unaligned_le64(data);
+> +		v3 ^= m;
+> +		SIPROUND;
+> +		SIPROUND;
+> +		v0 ^= m;
+> +	}
+> +#if defined(CONFIG_DCACHE_WORD_ACCESS) && BITS_PER_LONG == 64
+> +	b |= le64_to_cpu(load_unaligned_zeropad(data) & bytemask_from_count(left));
+> +#else
 
-It's probably a good idea to always do shash_desc_zero(), even when something
-above it fails.  Otherwise this looks fine.  Thanks for sending these patches!
+Hmm, I don't think you can really do load_unaligned_zeropad() without first
+checking for 'left != 0'.  The fixup section for load_unaligned_zeropad()
+assumes that rounding the pointer down to a word boundary will produce an
+address from which an 'unsigned long' can be loaded.  But if 'left = 0' and we
+happen to be on a page boundary with the next page unmapped, then this will not
+be true and the second load will still fault.
 
 Eric
