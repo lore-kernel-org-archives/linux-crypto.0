@@ -1,51 +1,44 @@
-From: Dave Watson <davejwatson@fb.com>
-Subject: Re: [PATCH] crypto: aesni-intel - RFC4106 can zero copy when
- !PageHighMem
-Date: Tue, 13 Dec 2016 11:07:32 -0800
-Message-ID: <20161213190732.GB68289@davejwatson-mba.local>
-References: <1481639526-71743-1-git-send-email-ilyal@mellanox.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH v3] siphash: add cryptographically secure hashtable function
+Date: Tue, 13 Dec 2016 11:25:45 -0800
+Message-ID: <CA+55aFyBsU_sxUuuNBMFUQonWOtfoW9AMk=vn=KLTKrkXVv+MA@mail.gmail.com>
+References: <CAHmME9qk+Z8CdhTFQnTkwT8S-n56tzi77-uAV3dNigcGMQx7uQ@mail.gmail.com>
+Reply-To: kernel-hardening@lists.openwall.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: <linux-crypto@vger.kernel.org>, <tadeusz.struk@intel.com>,
-        <herbert@gondor.apana.org.au>, <tls-fpga-sw-dev@mellanox.com>
-To: Ilya Lesokhin <ilyal@mellanox.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:37159 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753120AbcLMTH6 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Dec 2016 14:07:58 -0500
-Content-Disposition: inline
-In-Reply-To: <1481639526-71743-1-git-send-email-ilyal@mellanox.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Andi Kleen <ak@linux.intel.com>,
+	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, LKML <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, George Spelvin <linux@horizon.com>,
+	Scott Bauer <sbauer@eng.utah.edu>, Andy Lutomirski <luto@amacapital.net>,
+	Greg KH <gregkh@linuxfoundation.org>, Eric Biggers <ebiggers3@gmail.com>,
+	Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>, "Daniel J . Bernstein" <djb@cr.yp.to>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <kernel-hardening-return-5495-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+Sender: linus971@gmail.com
+In-Reply-To: <CAHmME9qk+Z8CdhTFQnTkwT8S-n56tzi77-uAV3dNigcGMQx7uQ@mail.gmail.com>
+List-Id: linux-crypto.vger.kernel.org
 
-On 12/13/16 04:32 PM, Ilya Lesokhin wrote:
-> --- a/arch/x86/crypto/aesni-intel_glue.c
-> +++ b/arch/x86/crypto/aesni-intel_glue.c
-> @@ -903,9 +903,11 @@ static int helper_rfc4106_encrypt(struct aead_request *req)
->  	*((__be32 *)(iv+12)) = counter;
->  
->  	if (sg_is_last(req->src) &&
-> -	    req->src->offset + req->src->length <= PAGE_SIZE &&
-> +	    (!PageHighMem(sg_page(req->src)) ||
-> +	    req->src->offset + req->src->length <= PAGE_SIZE) &&
->  	    sg_is_last(req->dst) &&
-> -	    req->dst->offset + req->dst->length <= PAGE_SIZE) {
-> +	    (!PageHighMem(sg_page(req->dst)) ||
-> +	    req->dst->offset + req->dst->length <= PAGE_SIZE)) {
->  		one_entry_in_sg = 1;
->  		scatterwalk_start(&src_sg_walk, req->src);
->  		assoc = scatterwalk_map(&src_sg_walk);
+On Mon, Dec 12, 2016 at 3:04 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> Indeed this would be a great first candidate. There are lots of places
+> where MD5 (!!) is pulled in for this sort of thing, when SipHash could
+> be a faster and leaner replacement (and arguably more secure than
+> rusty MD5).
 
-I was also experimenting with a similar patch that loosened up the
-restrictions here, checking for highmem.  Note that you can go even
-further and check the AAD, data, and TAG all separately, the current
-aesni crypto routines take them as separate buffers.  (This might fix
-the RFC5288 patch AAD size issue?)
+Yeah,. the TCP sequence number md5_transform() cases are likely the
+best example of something where siphash might be good. That tends to
+be really just a couple words of data (the address and port info) plus
+the net_secret[] hash. I think they currently simply just fill in the
+fixed-sized 64-byte md5-round area.
 
-Long term it would be nice to improve the asm routines instead to
-support scatter / gather IO and any AAD len, as the newer intel
-routines do:
+I wonder it's worth it to have a special spihash version that does
+that same "fixed 64-byte area" thing.
 
-https://github.com/01org/isa-l_crypto/tree/master/aes
+But please talk to the netwotrking people. Maybe that's the proper way
+to get this merged?
+
+            Linus
