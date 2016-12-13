@@ -1,70 +1,51 @@
-From: George Cherian <george.cherian@cavium.com>
-Subject: [PATCH v2 0/3] Add Support for Cavium Cryptographic Accelerarion Unit
-Date: Tue, 13 Dec 2016 14:03:18 +0000
-Message-ID: <1481637801-1076-1-git-send-email-george.cherian@cavium.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: [PATCH] keys/encrypted: Fix two crypto-on-the-stack bugs
+Date: Tue, 13 Dec 2016 08:40:00 -0800
+Message-ID: <CALCETrWsTKq0NOpwiJtB50OU7w99-m82NhPG_Uxs2Fqbpz0LLA@mail.gmail.com>
+References: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
+ <e958f214e8885968be8045ffde813ac339b81178.1481575835.git.luto@kernel.org> <063D6719AE5E284EB5DD2968C1650D6DB023CA99@AcuExch.aculab.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        "George Cherian" <george.cherian@cavium.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+Content-Type: text/plain; charset=UTF-8
+Cc: Andy Lutomirski <luto@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "dhowells@redhat.com" <dhowells@redhat.com>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>
+To: David Laight <David.Laight@aculab.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Ingo Molnar <mingo@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <063D6719AE5E284EB5DD2968C1650D6DB023CA99@AcuExch.aculab.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+[add some people who might know]
 
-This series adds the support for Cavium Cryptographic Accelerarion Unit (CPT) 
-CPT is available in Cavium's Octeon-Tx SoC series.                            
-                                                                              
-The series was tested with ecryptfs and dm-crypt for in kernel cryptographic  
-offload operations.                                                           
+On Tue, Dec 13, 2016 at 4:20 AM, David Laight <David.Laight@aculab.com> wrote:
+> From: Andy Lutomirski
+>> Sent: 12 December 2016 20:53
+>> The driver put a constant buffer of all zeros on the stack and
+>> pointed a scatterlist entry at it in two places.  This doesn't work
+>> with virtual stacks.  Use a static 16-byte buffer of zeros instead.
+> ...
+>
+> I didn't think you could dma from static data either.
 
-Changes v1 -> v2                                                              
-	-- Addressed a crash issue when more gather components are passed.
-        -- Redo the cptvf request manager.                                    
-   	     - Get rid of the un necessary buffer copies.                  
-        -- s/uint*_t/u*                                                
-        -- Remove unwanted Macro definitions                           
-        -- Remove the redundant ROUNDUP* macros and use kernel function
-        -- Select proper config option in Kconfig file.                
-        -- Removed some of the unwanted header file inclusions                
-        -- Miscellaneous Cleanup 
+According to lib/dma-debug.c, you can't dma to or from kernel text or
+rodata, but you can dma to or from kernel bss or data.  So
+empty_zero_page should be okay, because it's not rodata right now.
 
-George Cherian (3):
-  drivers: crypto: Add Support for Octeon-tx CPT Engine
-  drivers: crypto: Add the Virtual Function driver for CPT
-  drivers: crypto: Enable CPT options crypto for build
+But I think this is rather silly.  Joerg, Linus, etc: would it be okay
+to change lib/dma-debug.c to allow DMA *from* rodata?  After all,
+rodata is ordinary memory, is backed by struct page, etc.  And DMA
+from the zero page had better be okay because I think it happens if
+you mmap some zeros, don't write to them, and then direct I/O them to
+a device.  Then I could also move empty_zero_page to rodata.
 
- drivers/crypto/Kconfig                       |   1 +
- drivers/crypto/Makefile                      |   1 +
- drivers/crypto/cavium/cpt/Kconfig            |  16 +
- drivers/crypto/cavium/cpt/Makefile           |   3 +
- drivers/crypto/cavium/cpt/cpt_common.h       | 166 +++++
- drivers/crypto/cavium/cpt/cpt_hw_types.h     | 736 ++++++++++++++++++++
- drivers/crypto/cavium/cpt/cptpf.h            |  69 ++
- drivers/crypto/cavium/cpt/cptpf_main.c       | 733 ++++++++++++++++++++
- drivers/crypto/cavium/cpt/cptpf_mbox.c       | 163 +++++
- drivers/crypto/cavium/cpt/cptvf.h            | 145 ++++
- drivers/crypto/cavium/cpt/cptvf_algs.c       | 424 ++++++++++++
- drivers/crypto/cavium/cpt/cptvf_algs.h       | 110 +++
- drivers/crypto/cavium/cpt/cptvf_main.c       | 971 +++++++++++++++++++++++++++
- drivers/crypto/cavium/cpt/cptvf_mbox.c       | 205 ++++++
- drivers/crypto/cavium/cpt/cptvf_reqmanager.c | 581 ++++++++++++++++
- drivers/crypto/cavium/cpt/request_manager.h  | 147 ++++
- 16 files changed, 4471 insertions(+)
- create mode 100644 drivers/crypto/cavium/cpt/Kconfig
- create mode 100644 drivers/crypto/cavium/cpt/Makefile
- create mode 100644 drivers/crypto/cavium/cpt/cpt_common.h
- create mode 100644 drivers/crypto/cavium/cpt/cpt_hw_types.h
- create mode 100644 drivers/crypto/cavium/cpt/cptpf.h
- create mode 100644 drivers/crypto/cavium/cpt/cptpf_main.c
- create mode 100644 drivers/crypto/cavium/cpt/cptpf_mbox.c
- create mode 100644 drivers/crypto/cavium/cpt/cptvf.h
- create mode 100644 drivers/crypto/cavium/cpt/cptvf_algs.c
- create mode 100644 drivers/crypto/cavium/cpt/cptvf_algs.h
- create mode 100644 drivers/crypto/cavium/cpt/cptvf_main.c
- create mode 100644 drivers/crypto/cavium/cpt/cptvf_mbox.c
- create mode 100644 drivers/crypto/cavium/cpt/cptvf_reqmanager.c
- create mode 100644 drivers/crypto/cavium/cpt/request_manager.h
-
--- 
-2.1.4
+--Andy
