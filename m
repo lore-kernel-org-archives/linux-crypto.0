@@ -1,7 +1,7 @@
 From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH v2 6/7] hwrng: core: remove unused PFX macro
-Date: Tue, 13 Dec 2016 15:51:14 +0100
-Message-ID: <20161213145115.30082-6-clabbe.montjoie@gmail.com>
+Subject: [PATCH v2 7/7] hwrng: core: Remove linux/sched.h from includes
+Date: Tue, 13 Dec 2016 15:51:15 +0100
+Message-ID: <20161213145115.30082-7-clabbe.montjoie@gmail.com>
 References: <20161213145115.30082-1-clabbe.montjoie@gmail.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         Corentin Labbe <clabbe.montjoie@gmail.com>
@@ -12,24 +12,29 @@ In-Reply-To: <20161213145115.30082-1-clabbe.montjoie@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch remove the unused PFX macro.
+linux/sched.h is useless for hw_random/core.c.
+This patch remove it.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
+
+Change since v1:
+- linux/fs.h was needed, keep it
+
  drivers/char/hw_random/core.c | 1 -
  1 file changed, 1 deletion(-)
 
 diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 1e1e385..5c654b5 100644
+index 5c654b5..1c5949b 100644
 --- a/drivers/char/hw_random/core.c
 +++ b/drivers/char/hw_random/core.c
-@@ -25,7 +25,6 @@
+@@ -20,7 +20,6 @@
+ #include <linux/miscdevice.h>
+ #include <linux/module.h>
+ #include <linux/random.h>
+-#include <linux/sched.h>
+ #include <linux/slab.h>
  #include <linux/uaccess.h>
  
- #define RNG_MODULE_NAME		"hw_random"
--#define PFX			RNG_MODULE_NAME ": "
- 
- static struct hwrng *current_rng;
- static struct task_struct *hwrng_fill;
 -- 
 2.10.2
