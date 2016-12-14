@@ -1,62 +1,73 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v2 3/4] secure_seq: use siphash24 instead of md5_transform
-Date: Wed, 14 Dec 2016 19:06:57 +0100
-Message-ID: <CAHmME9pz4XudfeqhKBwFNDmp7AYuNwbnevMqB3e6ScPDnUnq9g@mail.gmail.com>
-References: <20161214035927.30004-1-Jason@zx2c4.com> <20161214035927.30004-3-Jason@zx2c4.com>
- <CAHmME9pEM=cDC5S=j1BU2oCF8-WdnbRfiVojcet4rXcRLcpJRw@mail.gmail.com> <20161214.125612.1361254098267633173.davem@davemloft.net>
+From: <witt.kohl@kabelmail.de>
+Subject: (unknown)
+Date: Wed, 14 Dec 2016 18:22:18 -0000
+Message-ID: <148173973844.593.7462546672195506594@hinet.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: David Laight <David.Laight@aculab.com>,
-        Netdev <netdev@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Andi Kleen <ak@linux.intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: David Miller <davem@davemloft.net>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20161214.125612.1361254098267633173.davem@davemloft.net>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="MICROSOFT_4388381_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 36-234-84-127.dynamic-ip.hinet.net ([36.234.84.127]:48794 "HELO
+        hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+        id S1751674AbcLNSXa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 14 Dec 2016 13:23:30 -0500
+Subject: 
+Content-Disposition: attachment
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi David,
-
-On Wed, Dec 14, 2016 at 6:56 PM, David Miller <davem@davemloft.net> wrote:
-> Just marking the structure __packed, whether necessary or not, makes
-> the compiler assume that the members are not aligned and causes
-> byte-by-byte accesses to be performed for words.
-> Never, _ever_, use __packed unless absolutely necessary, it pessimizes
-> the code on cpus that require proper alignment of types.
-
-Oh, jimminy cricket, I did not realize that it made assignments
-byte-by-byte *always*. So what options am I left with? What
-immediately comes to mind are:
-
-1)
-
-struct {
-    u64 a;
-    u32 b;
-    u32 c;
-    u16 d;
-    u8 end[];
-} a = {
-    .a = a,
-    .b = b,
-    .c = c,
-    .d = d
-};
-siphash24(&a, offsetof(typeof(a), end), key);
-
-2)
-
-u8 bytes[sizeof(u64) + sizeof(u32) * 2 + sizeof(u16)];
-*(u64 *)&bytes[0] = a;
-*(u32 *)&bytes[sizeof(u64)] = b;
-*(u32 *)&bytes[sizeof(u64) + sizeof(u32)] = c;
-*(u16 *)&bytes[sizeof(u64) + sizeof(u32) * 2] = d;
-siphash24(bytes, sizeof(bytes), key);
-
-
-Personally I find (1) a bit neater than (2). What's your opinion?
-
-Jason
+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
+AAAAAAEAAQBTAAAArwsAAAAA
