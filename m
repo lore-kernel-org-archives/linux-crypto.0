@@ -1,52 +1,64 @@
-From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [PATCH v2 3/4] secure_seq: use siphash24 instead of
- md5_transform
-Date: Wed, 14 Dec 2016 14:47:11 +0000
-Message-ID: <063D6719AE5E284EB5DD2968C1650D6DB023F7BD@AcuExch.aculab.com>
-References: <20161214035927.30004-1-Jason@zx2c4.com>
- <20161214035927.30004-3-Jason@zx2c4.com>
- <CAHmME9pEM=cDC5S=j1BU2oCF8-WdnbRfiVojcet4rXcRLcpJRw@mail.gmail.com>
- <1e502c6b-cda3-c46d-2535-fcfb58f443a9@stressinduktion.org>
- <CAHmME9o4NVi-MPeURio1Ga58rnW6JAGQdTg6scd+K3EZEf3RNA@mail.gmail.com>
+From: "Rob (William) Rice" <rob.rice@broadcom.com>
+Subject: Re: [PATCH 3/3] crypto: brcm: Add Broadcom SPU driver DT entry.
+Date: Wed, 14 Dec 2016 10:00:22 -0500
+Message-ID: <52897a59-f8e6-8df6-348d-c208f1b65575@broadcom.com>
+References: <201612110810.BEVbRp0B%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Netdev <netdev@vger.kernel.org>,
-        "kernel-hardening@lists.openwall.com"
-        <kernel-hardening@lists.openwall.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: "'Jason A. Donenfeld'" <Jason@zx2c4.com>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9o4NVi-MPeURio1Ga58rnW6JAGQdTg6scd+K3EZEf3RNA@mail.gmail.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: kbuild-all@01.org, Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Jon Mason <jonmason@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Steve Lin <steven.lin1@broadcom.com>
+To: kbuild test robot <lkp@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f174.google.com ([209.85.192.174]:35695 "EHLO
+        mail-pf0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755490AbcLNPA3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 14 Dec 2016 10:00:29 -0500
+Received: by mail-pf0-f174.google.com with SMTP id i88so4252836pfk.2
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Dec 2016 07:00:29 -0800 (PST)
+In-Reply-To: <201612110810.BEVbRp0B%fengguang.wu@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-RnJvbTogSmFzb24gQS4gRG9uZW5mZWxkDQo+IFNlbnQ6IDE0IERlY2VtYmVyIDIwMTYgMTM6NDQN
-Cj4gVG86IEhhbm5lcyBGcmVkZXJpYyBTb3dhDQo+ID4gX19wYWNrZWQgbm90IG9ubHkgcmVtb3Zl
-cyBhbGwgcGFkZGluZyBvZiB0aGUgc3RydWN0IGJ1dCBhbHNvIGNoYW5nZXMgdGhlDQo+ID4gYWxp
-Z25tZW50IGFzc3VtcHRpb25zIGZvciB0aGUgd2hvbGUgc3RydWN0IGl0c2VsZi4gVGhlIHJ1bGUs
-IHRoZSBzdHJ1Y3QNCj4gPiBpcyBhbGlnbmVkIGJ5IGl0cyBtYXhpbXVtIGFsaWdubWVudCBvZiBh
-IG1lbWJlciBpcyBubyBsb25nZXIgdHJ1ZS4gVGhhdA0KPiA+IHNhaWQsIHRoZSBjb2RlIGFjY2Vz
-c2luZyB0aGlzIHN0cnVjdCB3aWxsIGNoYW5nZSAobm90IG9uIGFyY2hzIHRoYXQgY2FuDQo+ID4g
-ZGVhbCBlZmZpY2llbnRseSB3aXRoIHVuYWxpZ25lZCBhY2Nlc3MsIGJ1dCBvbiBvdGhlcnMpLg0K
-PiANCj4gVGhhdCdzIGludGVyZXN0aW5nLiBUaGVyZSBjdXJyZW50bHkgYXJlbid0IGFueSBhbGln
-bm1lbnQgcmVxdWlyZW1lbnRzDQo+IGluIHNpcGhhc2ggYmVjYXVzZSB3ZSB1c2UgdGhlIHVuYWxp
-Z25lZCBoZWxwZXIgZnVuY3Rpb25zLCBidXQgYXMgRGF2aWQNCj4gcG9pbnRlZCBvdXQgaW4gYW5v
-dGhlciB0aHJlYWQsIG1heWJlIHRoYXQgdG9vIHNob3VsZCBjaGFuZ2UuIEluIHRoYXQNCj4gY2Fz
-ZSwgd2UnZCBoYXZlIGFuIGFsaWduZWQtb25seSB2ZXJzaW9uIG9mIHRoZSBmdW5jdGlvbiB0aGF0
-IHJlcXVpcmVzDQo+IDgtYnl0ZSBhbGlnbmVkIGlucHV0LiBQZXJoYXBzIHRoZSBiZXN0IHdheSB0
-byBnbyBhYm91dCB0aGF0IHdvdWxkIGJlDQo+IHRvIGp1c3QgbWFyayB0aGUgc3RydWN0IGFzIF9f
-cGFja2VkIF9fYWxpZ25lZCg4KS4gT3IsIEkgZ3Vlc3MsIHNpbmNlDQo+IDY0LWJpdCBhY2Nlc3Nl
-cyBnZXRzIHNwbGl0IGludG8gdHdvIG9uIDMyLWJpdCwgdGhhdCdkIGJlIGJlc3QgZGVzY3JpZWQN
-Cj4gYXMgX19wYWNrZWQgX19hbGlnbmVkKHNpemVvZihsb25nKSkuIFdvdWxkIHRoYXQgYmUgYW4g
-YWNjZXB0YWJsZQ0KPiBzb2x1dGlvbj8NCg0KSnVzdCByZW1vdmUgdGhlIF9fcGFja2VkIGFuZCBl
-bnN1cmUgdGhhdCB0aGUgc3RydWN0dXJlIGlzICduaWNlJy4NClRoaXMgaW5jbHVkZXMgZW5zdXJp
-bmcgdGhlcmUgaXMgbm8gJ3RhaWwgcGFkZGluZycuDQpJbiBzb21lIGNhc2VzIHlvdSdsbCBuZWVk
-IHRvIHB1dCB0aGUgcG9ydCBudW1iZXIgaW50byBhIDMyYml0IGZpZWxkLg0KDQpJJ2QgYWxzbyBy
-ZXF1aXJlIHRoYXQgdGhlIGtleSBiZSBhbGlnbmVkLg0KSXQgcHJvYmFibHkgb3VnaHQgdG8gYmUg
-YSBuYW1lZCBzdHJ1Y3R1cmUgdHlwZSB3aXRoIHR3byA2NGJpdCBtZW1iZXJzDQoob3Igd2l0aCBh
-biBhcnJheSBtZW1iZXIgdGhhdCBoYXMgdHdvIGVsZW1lbnRzKS4NCg0KCURhdmlkDQoNCg==
+I will rebase to Herbert's latest when I submit v3 to address Mark 
+Rutland's DT comments (and any others that come in).
+
+Rob
+
+
+On 12/10/2016 7:14 PM, kbuild test robot wrote:
+> Hi Rob,
+>
+> [auto build test ERROR on cryptodev/master]
+> [also build test ERROR on v4.9-rc8]
+> [cannot apply to next-20161209]
+> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+>
+> url:    https://github.com/0day-ci/linux/commits/Rob-Rice/crypto-brcm-DT-documentation-for-Broadcom-SPU-driver/20161202-010038
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> config: arm64-defconfig (attached as .config)
+> compiler: aarch64-linux-gnu-gcc (Debian 6.1.1-9) 6.1.1 20160705
+> reproduce:
+>          wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
+>          chmod +x ~/bin/make.cross
+>          # save the attached .config to linux build tree
+>          make.cross ARCH=arm64
+>
+> All errors (new ones prefixed by >>):
+>
+>>> ERROR: Input tree has errors, aborting (use -f to force output)
+> ---
+> 0-DAY kernel test infrastructure                Open Source Technology Center
+> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
