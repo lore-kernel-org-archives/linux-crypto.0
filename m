@@ -1,62 +1,126 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH v2] keys/encrypted: Fix two crypto-on-the-stack bugs
-Date: Wed, 14 Dec 2016 00:10:24 -0800
-Message-ID: <20161214081024.GA22765@zzz>
-References: <627e948e37314c13a67c90917386c814c56b8e20.1481683609.git.luto@kernel.org>
- <CALCETrX-YYp5iXPLKOpiT9+3DXYxGTVRXVyPN0oiYpQQC8kH3w@mail.gmail.com>
- <20161214050404.GC9592@gondor.apana.org.au>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: Fix smbencrypt() to stop pointing a scatterlist at
+ the stack
+Date: Wed, 14 Dec 2016 02:19:03 -0600
+Message-ID: <CAH2r5muqOnVQSm2br+aOURinLMJ9bqax5RCL_TYK2FXMSj-cZw@mail.gmail.com>
+References: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
+ <308cdb484648f98f6f0ad9feefd8acb2fe003aaf.1481575835.git.luto@kernel.org> <1481634464.2630.17.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andy Lutomirski <luto@amacapital.net>,
-        Andy Lutomirski <luto@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        USB list <linux-usb@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Stephan Mueller <smueller@chronox.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:36581 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752752AbcLNIK3 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Dec 2016 03:10:29 -0500
-Content-Disposition: inline
-In-Reply-To: <20161214050404.GC9592@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Andy Lutomirski <luto-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1481634464.2630.17.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Dec 14, 2016 at 01:04:04PM +0800, Herbert Xu wrote:
-> On Tue, Dec 13, 2016 at 06:53:03PM -0800, Andy Lutomirski wrote:
-> > On Tue, Dec 13, 2016 at 6:48 PM, Andy Lutomirski <luto@kernel.org> wrote:
-> > > The driver put a constant buffer of all zeros on the stack and
-> > > pointed a scatterlist entry at it in two places.  This doesn't work
-> > > with virtual stacks.  Use ZERO_PAGE instead.
-> > 
-> > Wait a second...
-> > 
-> > > -       sg_set_buf(&sg_out[1], pad, sizeof pad);
-> > > +       sg_set_buf(&sg_out[1], empty_zero_page, 16);
-> > 
-> > My fix here is obviously bogus (I meant to use ZERO_PAGE(0)), but what
-> > exactly is the code trying to do?  The old code makes no sense.  It's
-> > setting the *output* buffer to zeroed padding.
-> 
-> It's decrypting so I presume it just needs to the extra space for
-> the padding and the result will be thrown away.
-> 
+merged into cifs-2.6.git for-next
 
-It looks like the data is zero-padded to a 16-byte AES block boundary before
-being encrypted with CBC, so the encrypted data may be longer than the original
-data.  (I don't know why it doesn't use CTS mode instead, which would make the
-lengths the same.)
+On Tue, Dec 13, 2016 at 7:07 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> On Mon, 2016-12-12 at 12:54 -0800, Andy Lutomirski wrote:
+>> smbencrypt() points a scatterlist to the stack, which is breaks if
+>> CONFIG_VMAP_STACK=y.
+>>
+>> Fix it by switching to crypto_cipher_encrypt_one().  The new code
+>> should be considerably faster as an added benefit.
+>>
+>> This code is nearly identical to some code that Eric Biggers
+>> suggested.
+>>
+>> Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org # 4.9 only
+>> Reported-by: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> Signed-off-by: Andy Lutomirski <luto-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+>> ---
+>>
+>> Compile-tested only.
+>>
+>> fs/cifs/smbencrypt.c | 40 ++++++++--------------------------------
+>>  1 file changed, 8 insertions(+), 32 deletions(-)
+>>
+>> diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
+>> index 699b7868108f..c12bffefa3c9 100644
+>> --- a/fs/cifs/smbencrypt.c
+>> +++ b/fs/cifs/smbencrypt.c
+>> @@ -23,7 +23,7 @@
+>>     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+>>  */
+>>
+>> -#include <crypto/skcipher.h>
+>> +#include <linux/crypto.h>
+>>  #include <linux/module.h>
+>>  #include <linux/slab.h>
+>>  #include <linux/fs.h>
+>> @@ -69,46 +69,22 @@ str_to_key(unsigned char *str, unsigned char *key)
+>>  static int
+>>  smbhash(unsigned char *out, const unsigned char *in, unsigned char *key)
+>>  {
+>> -     int rc;
+>>       unsigned char key2[8];
+>> -     struct crypto_skcipher *tfm_des;
+>> -     struct scatterlist sgin, sgout;
+>> -     struct skcipher_request *req;
+>> +     struct crypto_cipher *tfm_des;
+>>
+>>       str_to_key(key, key2);
+>>
+>> -     tfm_des = crypto_alloc_skcipher("ecb(des)", 0, CRYPTO_ALG_ASYNC);
+>> +     tfm_des = crypto_alloc_cipher("des", 0, 0);
+>>       if (IS_ERR(tfm_des)) {
+>> -             rc = PTR_ERR(tfm_des);
+>> -             cifs_dbg(VFS, "could not allocate des crypto API\n");
+>> -             goto smbhash_err;
+>> -     }
+>> -
+>> -     req = skcipher_request_alloc(tfm_des, GFP_KERNEL);
+>> -     if (!req) {
+>> -             rc = -ENOMEM;
+>>               cifs_dbg(VFS, "could not allocate des crypto API\n");
+>> -             goto smbhash_free_skcipher;
+>> +             return PTR_ERR(tfm_des);
+>>       }
+>>
+>> -     crypto_skcipher_setkey(tfm_des, key2, 8);
+>> -
+>> -     sg_init_one(&sgin, in, 8);
+>> -     sg_init_one(&sgout, out, 8);
+>> +     crypto_cipher_setkey(tfm_des, key2, 8);
+>> +     crypto_cipher_encrypt_one(tfm_des, out, in);
+>> +     crypto_free_cipher(tfm_des);
+>>
+>> -     skcipher_request_set_callback(req, 0, NULL, NULL);
+>> -     skcipher_request_set_crypt(req, &sgin, &sgout, 8, NULL);
+>> -
+>> -     rc = crypto_skcipher_encrypt(req);
+>> -     if (rc)
+>> -             cifs_dbg(VFS, "could not encrypt crypt key rc: %d\n", rc);
+>> -
+>> -     skcipher_request_free(req);
+>> -
+>> -smbhash_free_skcipher:
+>> -     crypto_free_skcipher(tfm_des);
+>> -smbhash_err:
+>> -     return rc;
+>> +     return 0;
+>>  }
+>>
+>>  static int
+>
+> Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Since the crypto API can do in-place operations, when *encrypting* I suggest
-copying the decrypted data to the output buffer, padding it with 0's, and
-encrypting it in-place.  This eliminates the need for the stack buffer.
 
-But when *decrypting* there will be up to 15 extra throwaway bytes of output
-produced by the decryption.  There must be space made for these, and since it's
-output it can't be empty_zero_page.  I guess either check whether space can be
-made for it in-place, or allocate a temporary buffer...
 
-Eric
+-- 
+Thanks,
+
+Steve
