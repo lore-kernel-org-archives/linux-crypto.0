@@ -1,43 +1,54 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v2 3/4] secure_seq: use siphash24 instead of md5_transform
-Date: Wed, 14 Dec 2016 14:44:12 +0100
-Message-ID: <CAHmME9o4NVi-MPeURio1Ga58rnW6JAGQdTg6scd+K3EZEf3RNA@mail.gmail.com>
-References: <20161214035927.30004-1-Jason@zx2c4.com> <20161214035927.30004-3-Jason@zx2c4.com>
- <CAHmME9pEM=cDC5S=j1BU2oCF8-WdnbRfiVojcet4rXcRLcpJRw@mail.gmail.com> <1e502c6b-cda3-c46d-2535-fcfb58f443a9@stressinduktion.org>
-Reply-To: kernel-hardening@lists.openwall.com
+From: Romain Perier <romain.perier@free-electrons.com>
+Subject: Re: [PATCH] crypto: marvell - Copy IVDIG before launching partial DMA
+ ahash requests
+Date: Wed, 14 Dec 2016 14:59:17 +0100
+Message-ID: <e23dc7fb-8096-b729-118e-1b7d79b0fa52@free-electrons.com>
+References: <20161214131737.3884-1-romain.perier@free-electrons.com>
+ <20161214143943.1dd5508b@bbrezillon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: David Laight <David.Laight@aculab.com>, Netdev <netdev@vger.kernel.org>,
-	kernel-hardening@lists.openwall.com, Andi Kleen <ak@linux.intel.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Return-path: <kernel-hardening-return-5516-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <1e502c6b-cda3-c46d-2535-fcfb58f443a9@stressinduktion.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: Arnaud Ebalard <arno@natisbad.org>, linux-crypto@vger.kernel.org,
+        Jason Cooper <jason@lakedaemon.net>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Gregory Clement <gregory.clement@free-electrons.com>,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        Nadav Haklai <nadavh@marvell.com>,
+        Ofer Heifetz <oferh@marvell.com>, radioconfusion@gmail.com,
+        stable@vger.kernel.org
+To: Boris Brezillon <boris.brezillon@free-electrons.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.free-electrons.com ([62.4.15.54]:52800 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753463AbcLNOAW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 14 Dec 2016 09:00:22 -0500
+In-Reply-To: <20161214143943.1dd5508b@bbrezillon>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Hannes,
+Hi,
 
-Thanks for the feedback.
+Le 14/12/2016 à 14:39, Boris Brezillon a écrit :
 
-> __packed not only removes all padding of the struct but also changes the
-> alignment assumptions for the whole struct itself. The rule, the struct
-> is aligned by its maximum alignment of a member is no longer true. That
-> said, the code accessing this struct will change (not on archs that can
-> deal efficiently with unaligned access, but on others).
 
-That's interesting. There currently aren't any alignment requirements
-in siphash because we use the unaligned helper functions, but as David
-pointed out in another thread, maybe that too should change. In that
-case, we'd have an aligned-only version of the function that requires
-8-byte aligned input. Perhaps the best way to go about that would be
-to just mark the struct as __packed __aligned(8). Or, I guess, since
-64-bit accesses gets split into two on 32-bit, that'd be best descried
-as __packed __aligned(sizeof(long)). Would that be an acceptable
-solution?
+> Nit: can you move the above code in a function called
+> mv_cesa_ahash_dma_step()?
 
-Jason
+Sure
+
+>
+>> +	}
+>>  	else
+>>  		mv_cesa_ahash_std_step(ahashreq);
+>
+> I'm pretty sure checkpatch complains here ;-).
+
+Probably :P
+
+
+I will fix these points,
+
+Thanks,
+Romain
