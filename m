@@ -1,141 +1,151 @@
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Subject: RE: [PATCH v6 2/2] crypto: add virtio-crypto driver
-Date: Wed, 14 Dec 2016 11:32:12 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA15FB3F@DGGEMA505-MBX.china.huawei.com>
-References: <1481171829-116496-1-git-send-email-arei.gonglei@huawei.com>
- <1481171829-116496-3-git-send-email-arei.gonglei@huawei.com>
- <33183CC9F5247A488A2544077AF19020DA15A07C@DGGEMA505-MBX.china.huawei.com>
- <20161212105407.GA3033@gondor.apana.org.au>
- <20161212234941-mutt-send-email-mst@kernel.org>
- <b55a4666-d71a-352c-8be3-286eef6c5bc0@linux.vnet.ibm.com>
+From: Gonglei <arei.gonglei@huawei.com>
+Subject: [PATCH v7 0/1] virtio-crypto: add Linux driver
+Date: Wed, 14 Dec 2016 19:50:48 +0800
+Message-ID: <1481716249-185392-1-git-send-email-arei.gonglei@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
-        "virtualization@lists.linux-foundation.org"
+Content-Type: text/plain
+Cc: <luonengjun@huawei.com>, <mst@redhat.com>, <stefanha@redhat.com>,
+        <weidong.huang@huawei.com>, <wu.wubin@huawei.com>,
+        <xin.zeng@intel.com>, <claudio.fontana@huawei.com>,
+        <herbert@gondor.apana.org.au>, <pasic@linux.vnet.ibm.com>,
+        <davem@davemloft.net>, <jianjay.zhou@huawei.com>,
+        <hanweidong@huawei.com>, <arei.gonglei@hotmail.com>,
+        <cornelia.huck@de.ibm.com>, <xuquan8@huawei.com>,
+        <longpeng2@huawei.com>, <wanzongshun@huawei.com>,
+        Gonglei <arei.gonglei@huawei.com>
+To: <linux-kernel@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <virtio-dev@lists.oasis-open.org>,
         <virtualization@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Luonengjun <luonengjun@huawei.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>,
-        "Wubin (H)" <wu.wubin@huawei.com>,
-        "xin.zeng@intel.com" <xin.zeng@intel.com>,
-        Claudio Fontana <Claudio.Fontana@huawei.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>,
-        "Hanw
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
+        <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from dggrg01-dlp ([45.249.212.187]:2320 "EHLO dggrg01-dlp.huawei.com"
-        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932531AbcLNLc7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Dec 2016 06:32:59 -0500
-In-Reply-To: <b55a4666-d71a-352c-8be3-286eef6c5bc0@linux.vnet.ibm.com>
-Content-Language: zh-CN
+Received: from szxga02-in.huawei.com ([119.145.14.65]:23329 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753100AbcLNLwz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 14 Dec 2016 06:52:55 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+v7:
+ - fix "BUG: smp_processor_id() in preemptible [00000000] code" reported by Halil,
+   using get_cpu/put_cpu instead of calling smp_processor_id() directly.
+ - fix a possible spinlock recursion in virtcrypto_dataq_callback(), we should
+   release the spinlock before invoking the callback.
+ - rebase on the latest kernel master tree.
 
->
-> Subject: Re: [PATCH v6 2/2] crypto: add virtio-crypto driver
-> 
-> 
-> 
-> On 12/12/2016 11:05 PM, Michael S. Tsirkin wrote:
-> > On Mon, Dec 12, 2016 at 06:54:07PM +0800, Herbert Xu wrote:
-> >> On Mon, Dec 12, 2016 at 06:25:12AM +0000, Gonglei (Arei) wrote:
-> >>> Hi, Michael & Herbert
-> >>>
-> >>> Because the virtio-crypto device emulation had been in QEMU 2.8,
-> >>> would you please merge the virtio-crypto driver for 4.10 if no other
-> >>> comments? If so, Miachel pls ack and/or review the patch, then
-> >>> Herbert will take it (I asked him last week). Thank you!
-> >>>
-> >>> Ps: Note on 4.10 merge window timing from Linus
-> >>>  https://lkml.org/lkml/2016/12/7/506
-> >>>
-> >>> Dec 23rd is the deadline for 4.10 merge window.
-> >>
-> >> Sorry but it's too late for 4.10.  It needed to have been in my
-> >> tree before the merge window opened to make it for this cycle.
-> >>
-> >> Cheers,
-> >
-> >
-> > Objections to me merging this? I'm preparing my tree right now.
-> 
-> Got this when testing the most recent version on s390x
-> 
-> [   20.391074] test 0 (128 bit key, 16 byte blocks): [   20.391078] BUG: using
-> smp_processor_id() in preemptible [00000000] code: insmod/97
-> [   20.391082] caller is virtio_crypto_ablkcipher_setkey+0x44/0x198
-> [   20.391085] CPU: 0 PID: 97 Comm: insmod Not tainted
-> 4.9.0-02683-gb62a1ab #46
-> [   20.391088] Hardware name: IBM              2964 NC9
-> 704              (KVM)
-> [   20.391405] Stack:
-> [   20.391407]        000000000c0eb6d0 000000000c0eb760
-> 0000000000000003 0000000000000000
-> [   20.391414]        000000000c0eb800 000000000c0eb778
-> 000000000c0eb778 0000000000000020
-> [   20.391420]        0000000000000000 000000000000000a
-> 0000000000000020 000003ff0000000a
-> [   20.391426]        000003ff0000000c 000000000c0eb7c8
-> 0000000000000000 0000000000000000
-> [   20.391432]        0700000000c173c8 00000000001126ba
-> 000000000c0eb760 000000000c0eb7b8
-> [   20.391439] Call Trace:
-> [   20.391442] ([<000000000011259e>] show_trace+0x8e/0xe0)
-> [   20.391446]  [<0000000000112670>] show_stack+0x80/0xd8
-> [   20.391449]  [<0000000000753ab6>] dump_stack+0x96/0xd8
-> [   20.391453]  [<00000000007872e6>]
-> check_preemption_disabled+0xfe/0x128
-> [   20.391456]  [<0000000000839cc4>]
-> virtio_crypto_ablkcipher_setkey+0x44/0x198
-> [   20.391459]  [<0000000000705a40>]
-> skcipher_setkey_ablkcipher+0x50/0x70
-> [   20.391476]  [<000003ff80002a48>] test_skcipher_speed+0x328/0xb98
-> [tcrypt]
-> [   20.391492]  [<000003ff800063dc>] do_test+0x1c24/0x28e0 [tcrypt]
-> [   20.391509]  [<000003ff8001006a>] tcrypt_mod_init+0x6a/0x1000
-> [tcrypt]
-> [   20.391512]  [<00000000001002cc>] do_one_initcall+0xb4/0x148
-> [   20.391515]  [<0000000000298632>] do_init_module+0x7a/0x228
-> [   20.391519]  [<00000000001fd380>] load_module+0x2428/0x2de0
-> [   20.391522]  [<00000000001fde8a>] SyS_init_module+0x152/0x160
-> [   20.391526]  [<00000000009f1306>] system_call+0xd6/0x270
-> [   20.391528] no locks held by insmod/97.
-> 
-> Gonglei, any idea? Did not look into it myself yet.
-> 
-Thanks for report. You must open CONFIG_DEBUG_PREEMPT,
-but I didn't do that before. I open some kernel hacking debug switches to test it as well today,
-and the following patch can fix it.
+v6:
+ - add patch 1/2 to make sparc architecture happy. [Sam]
+ - close created sessions previousely when rekeying.
+ - convert the priority of virtio crypto algs from 4001 to 501
+   which is enough.
 
-diff --git a/drivers/crypto/virtio/virtio_crypto_common.h b/drivers/crypto/virtio/virtio_crypto_common.h
-index 975404b..518dc7ad 100644
---- a/drivers/crypto/virtio/virtio_crypto_common.h
-+++ b/drivers/crypto/virtio/virtio_crypto_common.h
-@@ -113,7 +113,13 @@ struct virtio_crypto_request {
+v5:
+ - add comments for algs_lock and table_lock. [Stefan]
+ - use kzfree instead of kfree for key material security. [Stefan]
+ - drop unnecessary spin_lock for struct virtio_crypto_ablkcipher_ctx.
+ - dynamically allocated memory for iv in order to avoid to do DMA from
+   the stack memory in __virtio_crypto_ablkcipher_do_req().
+ - add logs for error path in virtio_crypto_alg_validate_key().
+ - add lock before calling virtio_break_device() in virtcrypto_update_status()
 
- static inline int virtio_crypto_get_current_node(void)
- {
--   return topology_physical_package_id(smp_processor_id());
-+   int cpu, node;
-+
-+   cpu = get_cpu();
-+   node = topology_physical_package_id(cpu);
-+   put_cpu();
-+
-+   return node;
- }
+v4:
+ - rework unknow status bit handler by calling virtio_break_device(). [Cornelia]
+ - convert space to tab in Kconfig. [Stefan]
+ - rename virtio_crypto.c to virtio_crypto_core.c and then make the
+   moudle named virtio_crypto.ko for consistency. [Stefan]
+ - don't call virtcrypto_dev_stop() on failure path. [Stefan]
+ - don't add two empty lines. [Michael]
+ - fix possible race by add spin_lock in virtio_crypto_alg_ablkcipher_init_session() [Michael and Halil]
+ - drop virtcrypto_devmgr_get_first() calling in virtio_crypto_ablkcipher_setkey. [Michael]
+ - drop superfluous assigned value for virtio_crypto_algs[i].cra_flags
+   in virtio_crypto_algs_register(). [Stefan]
+ - decrease virtio_crypto_active_devs if calling crypto_register_algs() failed. [Stefan]
+ - fix some typos here and there. [Stefan]
+ - fix missing table_lock usage in virtio_crypto_mgr.c. [Stefan]
+ - drop confused comments in virtio_crypto_alg_ablkcipher_init_session()
+   for virtqueue_kick(). [Halil]
 
-Meanwhile I find aother problem, will fix it in the following V7.
+v3:
+ - set cpu affinity when data queues are not equal to the number of online cpus. [Michael]
+ - add TODO comments for cpu hotplug (changing the relationship of binding virtqueue and cpu)
+ - use __u32/64 in the config space since the virtio->get() doesn't support byte-swap yet. [Michael]
+ - drop the whole patch 1 of v2 because the above reason.
+ - add VERSION_1 check at the beginning of virtcrypto_probe()
+ - s/-1/EPERM/g in virtcrypto_update_status(), don't change err to EFAULT then. [Michael]
+ - add reset operation before delete the virtqueus. [Micheal]
+ - drop an unnecessiry spin_lock calling in virtcrypto_freeze(), avoid possible dead lock. [Micheal]
+ - redefine parameter alg's type in order to use a cast for it. [Michael]
+ - pad all structures to have the same size in one union, and add a member to
+   show the union's size in virtio_crypto.h. [Michael]
+ - update MAINTAINER file to add virtio-crypto stuff to Michael's entry so that
+   the corresponding patches can be CC'ed to Michael as well because the virtio-crypto
+   doesn't lay in driver/virtio directory. 
 
-Regards,
--Gonglei
+The virtio crypto device is a virtual cryptography device
+as well as a kind of virtual hardware accelerator for
+virtual machines. The encryption anddecryption requests
+are placed in the data queue and are ultimately handled by
+thebackend crypto accelerators. The second queue is the
+control queue used to create or destroy sessions for
+symmetric algorithms and will control some advanced features
+in the future. The virtio crypto device provides the following
+cryptoservices: CIPHER, MAC, HASH, and AEAD.
+
+For more information about virtio-crypto device, please see:
+  http://qemu-project.org/Features/VirtioCrypto
+
+For better reviewing, pls see below explaination.
+
+The patch mainly includes five files:
+
+ 1) virtio_crypto.h is the header file for virtio-crypto device,
+which is based on the virtio-crypto specification. 
+ 2) virtio_crypto_core.c is the entry of the driver module,
+which is similar with other virtio devices, such as virtio-net,
+virtio-input etc. 
+ 3) virtio_crypto_mgr.c is used to manage the virtio
+crypto devices in the system. We support up to 32 virtio-crypto
+devices currently. I use a global list to store the virtio crypto
+devices which refer to Intel QAT driver. Meanwhile, the file
+includs the functions of add/del/search/start/stop for virtio
+crypto devices.
+ 4) virtio_crypto_common.h is a private header file for virtio
+crypto driver, includes structure definations, and function declarations.
+ 5) virtio_crypto_algs.c is the realization of algs based on Linux Crypto Framwork,
+which can register different crypto algorithms. Currently it's only support AES-CBC.
+The Crypto guys can mainly focus on this file. 
+
+
+v2:
+ - stop doing DMA from the stack, CONFIG_VMAP_STACK=y [Salvatore]
+ - convert __virtio32/64 to __le32/64 in virtio_crypto.h
+ - remove VIRTIO_CRYPTO_S_STARTED based on the lastest virtio crypto spec.
+ - introduces the little edian functions for VIRTIO_1 devices in patch 1.
+
+
+Gonglei (1):
+  crypto: add virtio-crypto driver
+
+ MAINTAINERS                                  |   9 +
+ drivers/crypto/Kconfig                       |   2 +
+ drivers/crypto/Makefile                      |   1 +
+ drivers/crypto/virtio/Kconfig                |  10 +
+ drivers/crypto/virtio/Makefile               |   5 +
+ drivers/crypto/virtio/virtio_crypto_algs.c   | 541 +++++++++++++++++++++++++++
+ drivers/crypto/virtio/virtio_crypto_common.h | 128 +++++++
+ drivers/crypto/virtio/virtio_crypto_core.c   | 474 +++++++++++++++++++++++
+ drivers/crypto/virtio/virtio_crypto_mgr.c    | 264 +++++++++++++
+ include/uapi/linux/Kbuild                    |   1 +
+ include/uapi/linux/virtio_crypto.h           | 450 ++++++++++++++++++++++
+ include/uapi/linux/virtio_ids.h              |   1 +
+ 12 files changed, 1886 insertions(+)
+ create mode 100644 drivers/crypto/virtio/Kconfig
+ create mode 100644 drivers/crypto/virtio/Makefile
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_algs.c
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_common.h
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_core.c
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_mgr.c
+ create mode 100644 include/uapi/linux/virtio_crypto.h
+
+-- 
+1.8.3.1
