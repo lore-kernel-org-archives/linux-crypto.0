@@ -1,48 +1,75 @@
-From: Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH v2 0/8] Conversion crypto API documentation to Sphinx
-Date: Tue, 13 Dec 2016 16:40:01 -0700
-Message-ID: <20161213164001.63fd5645@lwn.net>
-References: <2053893.WjF01BJSDF@positron.chronox.de>
-        <2168354.PkToFvufzV@positron.chronox.de>
-        <20161213145059.5204d498@lwn.net>
-        <3555336.Wm4L5bpP9y@positron.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
-To: Stephan =?UTF-8?B?TcO8bGxlcg==?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ms.lwn.net ([45.79.88.28]:46534 "EHLO ms.lwn.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751041AbcLMXkG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Dec 2016 18:40:06 -0500
-In-Reply-To: <3555336.Wm4L5bpP9y@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Andy Lutomirski <luto@kernel.org>
+Subject: [PATCH v2] keys/encrypted: Fix two crypto-on-the-stack bugs
+Date: Tue, 13 Dec 2016 18:48:07 -0800
+Message-ID: <627e948e37314c13a67c90917386c814c56b8e20.1481683609.git.luto@kernel.org>
+Cc: Eric Biggers <ebiggers3@gmail.com>, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>,
+        Andy Lutomirski <luto@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        dhowells@redhat.com, keyrings@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, 13 Dec 2016 23:06:14 +0100
-Stephan Müller <smueller@chronox.de> wrote:
+The driver put a constant buffer of all zeros on the stack and
+pointed a scatterlist entry at it in two places.  This doesn't work
+with virtual stacks.  Use ZERO_PAGE instead.
 
-> I am sorry, then I may have misunderstood you.
-> 
-> I would think that Herbert agreed that you push the entire patch set through 
-> your tree, including the documentation changes to the crypto header files.
-> 
-> I just did a patch on the parts that touch the crypto header files. All apply 
-> cleanly except patch 07/08 which has a 5 line hunk due to other changes, Is 
-> that hunk ok for you, it would be great if you could take it. If you do not 
-> like that hunk, we could push it through the cryptodev tree once rc-1 is out.
+Cc: stable@vger.kernel.org # 4.9 only
+Reported-by: Eric Biggers <ebiggers3@gmail.com>
+Signed-off-by: Andy Lutomirski <luto@kernel.org>
+---
+ security/keys/encrypted-keys/encrypted.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-Clearly there was a bit of misunderstanding going around :)
-
-I've applied the patch set to docs-next.  Oddly I had no trouble with #7,
-but #2 was badly mailer-mangled and took some work.  
-
-Anyway, it should make its way into linux-next; if there's no fireworks,
-I'll endeavor to send it Linusward in time to avoid interfering with his
-kitchen duties.
-
-Sorry for the confusion,
-
-jon
+diff --git a/security/keys/encrypted-keys/encrypted.c b/security/keys/encrypted-keys/encrypted.c
+index 17a06105ccb6..e963160ed26a 100644
+--- a/security/keys/encrypted-keys/encrypted.c
++++ b/security/keys/encrypted-keys/encrypted.c
+@@ -481,7 +481,6 @@ static int derived_key_encrypt(struct encrypted_key_payload *epayload,
+ 	unsigned int encrypted_datalen;
+ 	u8 iv[AES_BLOCK_SIZE];
+ 	unsigned int padlen;
+-	char pad[16];
+ 	int ret;
+ 
+ 	encrypted_datalen = roundup(epayload->decrypted_datalen, blksize);
+@@ -493,11 +492,10 @@ static int derived_key_encrypt(struct encrypted_key_payload *epayload,
+ 		goto out;
+ 	dump_decrypted_data(epayload);
+ 
+-	memset(pad, 0, sizeof pad);
+ 	sg_init_table(sg_in, 2);
+ 	sg_set_buf(&sg_in[0], epayload->decrypted_data,
+ 		   epayload->decrypted_datalen);
+-	sg_set_buf(&sg_in[1], pad, padlen);
++	sg_set_page(&sg_in[1], ZERO_PAGE(0), padlen, 0);
+ 
+ 	sg_init_table(sg_out, 1);
+ 	sg_set_buf(sg_out, epayload->encrypted_data, encrypted_datalen);
+@@ -584,7 +582,6 @@ static int derived_key_decrypt(struct encrypted_key_payload *epayload,
+ 	struct skcipher_request *req;
+ 	unsigned int encrypted_datalen;
+ 	u8 iv[AES_BLOCK_SIZE];
+-	char pad[16];
+ 	int ret;
+ 
+ 	encrypted_datalen = roundup(epayload->decrypted_datalen, blksize);
+@@ -594,13 +591,12 @@ static int derived_key_decrypt(struct encrypted_key_payload *epayload,
+ 		goto out;
+ 	dump_encrypted_data(epayload, encrypted_datalen);
+ 
+-	memset(pad, 0, sizeof pad);
+ 	sg_init_table(sg_in, 1);
+ 	sg_init_table(sg_out, 2);
+ 	sg_set_buf(sg_in, epayload->encrypted_data, encrypted_datalen);
+ 	sg_set_buf(&sg_out[0], epayload->decrypted_data,
+ 		   epayload->decrypted_datalen);
+-	sg_set_buf(&sg_out[1], pad, sizeof pad);
++	sg_set_buf(&sg_out[1], empty_zero_page, 16);
+ 
+ 	memcpy(iv, epayload->iv, sizeof(iv));
+ 	skcipher_request_set_crypt(req, sg_in, sg_out, encrypted_datalen, iv);
+-- 
+2.9.3
