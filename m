@@ -1,45 +1,52 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH v2] crypto: sun4i-ss: support the Security System PRNG
-Date: Wed, 14 Dec 2016 07:03:40 +0100
-Message-ID: <20161214060340.GA24050@Red>
-References: <1480934922-20732-1-git-send-email-clabbe.montjoie@gmail.com>
- <20161205123705.GA10732@gondor.apana.org.au>
- <20161205125738.GA13525@Red>
- <20161207120900.GC20680@gondor.apana.org.au>
- <20161207125127.GB28218@Red>
- <20161208090618.GB22932@gondor.apana.org.au>
- <20161213141059.GB10647@Red>
- <20161214050551.GD9592@gondor.apana.org.au>
+From: Binoy Jayan <binoy.jayan@linaro.org>
+Subject: Re: [RFC PATCH v2] crypto: Add IV generation algorithms
+Date: Wed, 14 Dec 2016 11:39:52 +0530
+Message-ID: <CAHv-k_8_pxWNkypY8uqLG-dsZfHjTdhbSEQNsjqNnStYq4xKTQ@mail.gmail.com>
+References: <1481618949-20086-1-git-send-email-binoy.jayan@linaro.org>
+ <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org> <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, maxime.ripard@free-electrons.com,
-        wens@csie.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wj0-f194.google.com ([209.85.210.194]:35459 "EHLO
-        mail-wj0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752973AbcLNGEP (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Dec 2016 01:04:15 -0500
-Content-Disposition: inline
-In-Reply-To: <20161214050551.GD9592@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>
+To: Milan Broz <gmazyland@gmail.com>
+Return-path: <linux-raid-owner@vger.kernel.org>
+In-Reply-To: <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com>
+Sender: linux-raid-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Dec 14, 2016 at 01:05:51PM +0800, Herbert Xu wrote:
-> On Tue, Dec 13, 2016 at 03:10:59PM +0100, Corentin Labbe wrote:
-> >
-> > I have found two solutions:
-> 
-> No we already have algif_rng so let's not confuse things even
-> further by making hwrng take PRNGs.
-> 
+Hi Milan,
 
-But algif_rng is not accessible from user space without any coding.
-So no easy "random" data with some cat /dev/xxxx.
+Thank you for the reply.
 
-Clearly users of the 3 already intree hw_random PRNG will see that like a regresion.
+On 13 December 2016 at 15:31, Milan Broz <gmazyland@gmail.com> wrote:
 
-Regards
-Corentin Labbe
+> I really do not think the disk encryption key management should be moved
+> outside of dm-crypt. We cannot then change key structure later easily.
+
+Yes, I agree. but the key selection based on sector number restricts the
+option of having a larger block size used for encryption.
+
+>> +     unsigned int key_size;
+>> +     unsigned int key_extra_size;
+>> +     unsigned int key_parts;      /* independent parts in key buffer */
+>
+> ^^^ these key sizes you probably mean by key management.
+
+Yes, I mean splitting the keys into subkeys based on the keycount
+parameter (as mentioned below) to the dm-crypt.
+
+cipher[:keycount]-mode-iv:ivopts
+aes:2-cbc-essiv:sha256
+
+> It is based on way how the key is currently sent into kernel
+> (one hexa string in ioctl that needs to be split) and have to be changed in future.
+
+-Binoy
