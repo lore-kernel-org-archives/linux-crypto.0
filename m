@@ -1,47 +1,29 @@
-From: Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] keys/encrypted: Fix two crypto-on-the-stack bugs
-Date: Wed, 14 Dec 2016 17:58:56 +0100
-Message-ID: <20161214165856.GD17255@8bytes.org>
-References: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
- <e958f214e8885968be8045ffde813ac339b81178.1481575835.git.luto@kernel.org>
- <063D6719AE5E284EB5DD2968C1650D6DB023CA99@AcuExch.aculab.com>
- <CALCETrWsTKq0NOpwiJtB50OU7w99-m82NhPG_Uxs2Fqbpz0LLA@mail.gmail.com>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v2] keys/encrypted: Fix two crypto-on-the-stack bugs
+Date: Wed, 14 Dec 2016 17:00:53 +0000
+Message-ID: <3738.1481734853@warthog.procyon.org.uk>
+References: <CALCETrWWt33=03gbBs73NkBOunZU+req1BLgUNcEMfh3T1AXUA@mail.gmail.com> <627e948e37314c13a67c90917386c814c56b8e20.1481683609.git.luto@kernel.org> <CALCETrX-YYp5iXPLKOpiT9+3DXYxGTVRXVyPN0oiYpQQC8kH3w@mail.gmail.com> <18039.1481704679@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Laight <David.Laight@aculab.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, Andy Lutomirski <luto@kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>, keyrings@vger.kernel.org,
         Eric Biggers <ebiggers3@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Stephan Mueller <smueller@chronox.de>
 To: Andy Lutomirski <luto@amacapital.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 8bytes.org ([81.169.241.247]:44566 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753645AbcLNQ7J (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Dec 2016 11:59:09 -0500
-Content-Disposition: inline
-In-Reply-To: <CALCETrWsTKq0NOpwiJtB50OU7w99-m82NhPG_Uxs2Fqbpz0LLA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CALCETrWWt33=03gbBs73NkBOunZU+req1BLgUNcEMfh3T1AXUA@mail.gmail.com>
+Content-ID: <3737.1481734853.1@warthog.procyon.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Dec 13, 2016 at 08:40:00AM -0800, Andy Lutomirski wrote:
-> But I think this is rather silly.  Joerg, Linus, etc: would it be okay
-> to change lib/dma-debug.c to allow DMA *from* rodata?
+Andy Lutomirski <luto@amacapital.net> wrote:
 
-Yeah, this would be fine for DMA_TO_DEVICE mappings. At least I can't
-think of a reason right now to not allow it, in the end its also
-read-only memory for the CPU, so it can be readable by devices too.
-There is no danger of race conditions like on stacks or data leaks, as
-there is only compile-time data in rodata.
+> David, are these encrypted keys ever exported anywhere?  If not, could
+> the code use a mode that doesn't need padding?
 
+ecryptfs uses them, I think.
 
-
-	Joerg
+David
