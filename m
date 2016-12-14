@@ -1,59 +1,48 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Remaining crypto API regressions with CONFIG_VMAP_STACK
-Date: Wed, 14 Dec 2016 12:56:14 +0800
-Message-ID: <20161214045614.GB9592@gondor.apana.org.au>
-References: <20161209230851.GB64048@google.com>
- <CALCETrWfa5VJQNu3XjeFhF0cDFWF+M-dPwsT_7dzO5YSxsneGg@mail.gmail.com>
- <20161213033928.GB5601@gondor.apana.org.au>
- <CALCETrVz4B2rthaKPJAOpiHm1kCh-mD2C5kKti0q8iBQ0QEzuA@mail.gmail.com>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v2] keys/encrypted: Fix two crypto-on-the-stack bugs
+Date: Wed, 14 Dec 2016 13:04:04 +0800
+Message-ID: <20161214050404.GC9592@gondor.apana.org.au>
+References: <627e948e37314c13a67c90917386c814c56b8e20.1481683609.git.luto@kernel.org>
+ <CALCETrX-YYp5iXPLKOpiT9+3DXYxGTVRXVyPN0oiYpQQC8kH3w@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Eric Biggers <ebiggers3@gmail.com>, linux-crypto@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "kernel-hardening@lists.openwall.com"
-        <kernel-hardening@lists.openwall.com>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Stephan Mueller <smueller@chronox.de>
-To: Andy Lutomirski <luto@amacapital.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:39608 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1754684AbcLNE41 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Dec 2016 23:56:27 -0500
+Cc: Andy Lutomirski <luto-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        USB list <linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+To: Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org>
+Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <CALCETrVz4B2rthaKPJAOpiHm1kCh-mD2C5kKti0q8iBQ0QEzuA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <CALCETrX-YYp5iXPLKOpiT9+3DXYxGTVRXVyPN0oiYpQQC8kH3w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Dec 13, 2016 at 09:06:31AM -0800, Andy Lutomirski wrote:
->
-> > Having 0 as type and CRYPTO_ALG_ASYNC as mask in general means
-> > that we're requesting a sync algorithm (i.e., ASYNC bit off).
-> >
-> > However, it is completely unnecessary for shash as they can never
-> > be async.  So this could be changed to just ("michael_mic", 0, 0).
+On Tue, Dec 13, 2016 at 06:53:03PM -0800, Andy Lutomirski wrote:
+> On Tue, Dec 13, 2016 at 6:48 PM, Andy Lutomirski <luto-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
+> > The driver put a constant buffer of all zeros on the stack and
+> > pointed a scatterlist entry at it in two places.  This doesn't work
+> > with virtual stacks.  Use ZERO_PAGE instead.
 > 
-> I'm confused by a bunch of this.
+> Wait a second...
 > 
-> 1. Is it really the case that crypto_alloc_xyz(..., CRYPTO_ALG_ASYNC)
-> means to allocate a *synchronous* transform?  That's not what I
-> expected.
+> > -       sg_set_buf(&sg_out[1], pad, sizeof pad);
+> > +       sg_set_buf(&sg_out[1], empty_zero_page, 16);
+> 
+> My fix here is obviously bogus (I meant to use ZERO_PAGE(0)), but what
+> exactly is the code trying to do?  The old code makes no sense.  It's
+> setting the *output* buffer to zeroed padding.
 
-crypto_alloc_xyz(name, 0, CRYPTO_ALG_ASYNC) allocates a sync tfm
-and crypto_alloc_xyz(name, CRYPTO_ALG_ASYNC, CRYPTO_ALG_ASYNC)
-allocates an async tfm while crypto_alloc_xyz(name, 0, 0) does
-not care whether the allocated tfm is sync or asnc.
-
-> 2. What guarantees that an async request is never allocated on the
-> stack?  If it's just convention, could an assertion be added
-> somewhere?
-
-Sure we can add an assertion.
+It's decrypting so I presume it just needs to the extra space for
+the padding and the result will be thrown away.
 
 Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe linux-usb" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
