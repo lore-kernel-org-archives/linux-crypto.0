@@ -1,59 +1,48 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: Re: [PATCH 4/3] random: use siphash24 instead
- of md5 for get_random_int/long
-Date: Wed, 14 Dec 2016 20:12:14 +0100
-Message-ID: <CAHmME9o3uQoi5h=YTKB=5yN1yzz=d3=GFjGiXv_Sf12kAsjx3A@mail.gmail.com>
-References: <20161214001656.19388-1-Jason@zx2c4.com> <20161214031037.25498-1-Jason@zx2c4.com>
- <20161214163731.luj2dzmnihcuhn5p@thunk.org>
-Reply-To: kernel-hardening@lists.openwall.com
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH v2] crypto: sun4i-ss: support the Security System PRNG
+Date: Thu, 15 Dec 2016 00:47:16 +0530
+Message-ID: <CANc+2y7C-=S_5MZuqP0Q+y2FwHqS2_p9-iYuAu1A1tXqzxp_oA@mail.gmail.com>
+References: <1480934922-20732-1-git-send-email-clabbe.montjoie@gmail.com>
+ <20161205123705.GA10732@gondor.apana.org.au> <20161205125738.GA13525@Red>
+ <20161207120900.GC20680@gondor.apana.org.au> <20161207125127.GB28218@Red>
+ <20161208090618.GB22932@gondor.apana.org.au> <20161213141059.GB10647@Red>
+ <20161214050551.GD9592@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: kernel-hardening@lists.openwall.com, "Theodore Ts'o" <tytso@mit.edu>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, Netdev <netdev@vger.kernel.org>,
-	David Miller <davem@davemloft.net>, Linus Torvalds <torvalds@linux-foundation.org>,
-	LKML <linux-kernel@vger.kernel.org>, George Spelvin <linux@horizon.com>,
-	Scott Bauer <sbauer@eng.utah.edu>, Andi Kleen <ak@linux.intel.com>,
-	Andy Lutomirski <luto@amacapital.net>, Greg KH <gregkh@linuxfoundation.org>,
-	Eric Biggers <ebiggers3@gmail.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-Return-path: <kernel-hardening-return-5533-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <20161214163731.luj2dzmnihcuhn5p@thunk.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, Chen-Yu Tsai <wens@csie.org>,
+ Corentin Labbe <clabbe.montjoie@gmail.com>, linux-crypto@vger.kernel.org,
+ maxime.ripard@free-electrons.com, davem@davemloft.net,
+ linux-arm-kernel@lists.infradead.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20161214050551.GD9592@gondor.apana.org.au>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi again,
+>> I have found two solutions:
+>
+> No we already have algif_rng so let's not confuse things even
+> further by making hwrng take PRNGs.
 
-On Wed, Dec 14, 2016 at 5:37 PM, Theodore Ts'o <tytso@mit.edu> wrote:
-> [    3.606139] random benchmark!!
-> [    3.606276] get_random_int # cycles: 326578
-> [    3.606317] get_random_int_new # cycles: 95438
-> [    3.607423] get_random_bytes # cycles: 2653388
+Even if both the solutions could not be adopted I think there must be
+a way for applications to use similar API to get true rng or prng.
+Given the case that no user complained about prng data when using
+/dev/hwrng is it safe to assume that the random data generated is
+acceptable for users? If so, the drivers can be left without any
+modification.
 
-Looks to me like my siphash implementation is much faster for
-get_random_long, and more or less tied for get_random_int:
+Should there be a mandate that driver will be accepted only when it
+passes 'rngtest'. This will make sure that prng drivers won't get
+added in future.
 
-[    1.729370] random benchmark!!
-[    1.729710] get_random_long # cycles: 349771
-[    1.730128] get_random_long_chacha # cycles: 359660
-[    1.730457] get_random_long_siphash # cycles: 94255
-[    1.731307] get_random_bytes # cycles: 1354894
-[    1.731707] get_random_int # cycles: 305640
-[    1.732095] get_random_int_chacha # cycles: 80726
-[    1.732425] get_random_int_siphash # cycles: 94265
-[    1.733278] get_random_bytes # cycles: 1315873
-
-Given the increasing usage of get_random_long for ASLR and related, I
-think this makes the siphash approach worth pursuing. The chacha
-approach is also not significantly different from the md5 approach in
-terms of speed for get_rand_long. Additionally, since siphash is a
-PRF, I think this opens up a big window for optimizing it even
-further.
-
-Benchmark here:
-    https://git.zx2c4.com/linux-dev/commit/?h=rng-bench
-
-Jason
+Regards,
+PrasannaKumar
