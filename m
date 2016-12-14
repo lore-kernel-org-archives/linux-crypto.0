@@ -1,150 +1,59 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v3 3/3] random: use siphash24 instead of md5 for get_random_int/long
-Date: Wed, 14 Dec 2016 19:46:05 +0100
-Message-ID: <20161214184605.24006-3-Jason@zx2c4.com>
-References: <20161214035927.30004-1-Jason@zx2c4.com>
- <20161214184605.24006-1-Jason@zx2c4.com>
+Subject: Re: Re: [PATCH 4/3] random: use siphash24 instead
+ of md5 for get_random_int/long
+Date: Wed, 14 Dec 2016 20:12:14 +0100
+Message-ID: <CAHmME9o3uQoi5h=YTKB=5yN1yzz=d3=GFjGiXv_Sf12kAsjx3A@mail.gmail.com>
+References: <20161214001656.19388-1-Jason@zx2c4.com> <20161214031037.25498-1-Jason@zx2c4.com>
+ <20161214163731.luj2dzmnihcuhn5p@thunk.org>
 Reply-To: kernel-hardening@lists.openwall.com
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-	Ted Tso <tytso@mit.edu>
-To: Netdev <netdev@vger.kernel.org>,
-	kernel-hardening@lists.openwall.com,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org
-Return-path: <kernel-hardening-return-5526-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+To: kernel-hardening@lists.openwall.com, "Theodore Ts'o" <tytso@mit.edu>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>, Netdev <netdev@vger.kernel.org>,
+	David Miller <davem@davemloft.net>, Linus Torvalds <torvalds@linux-foundation.org>,
+	LKML <linux-kernel@vger.kernel.org>, George Spelvin <linux@horizon.com>,
+	Scott Bauer <sbauer@eng.utah.edu>, Andi Kleen <ak@linux.intel.com>,
+	Andy Lutomirski <luto@amacapital.net>, Greg KH <gregkh@linuxfoundation.org>,
+	Eric Biggers <ebiggers3@gmail.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Return-path: <kernel-hardening-return-5533-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
 List-Post: <mailto:kernel-hardening@lists.openwall.com>
 List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
 List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
 List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <20161214184605.24006-1-Jason@zx2c4.com>
+In-Reply-To: <20161214163731.luj2dzmnihcuhn5p@thunk.org>
 List-Id: linux-crypto.vger.kernel.org
 
-This duplicates the current algorithm for get_random_int/long, but uses
-siphash24 instead. This comes with several benefits. It's certainly
-faster and more cryptographically secure than MD5. This patch also
-hashes the pid, entropy, and timestamp as fixed width fields, in order
-to increase diffusion.
+Hi again,
 
-The previous md5 algorithm used a per-cpu md5 state, which caused
-successive calls to the function to chain upon each other. While it's
-not entirely clear that this kind of chaining is absolutely necessary
-when using a secure PRF like siphash24, it can't hurt, and the timing of
-the call chain does add a degree of natural entropy. So, in keeping with
-this design, instead of the massive per-cpu 64-byte md5 state, there is
-instead a per-cpu previously returned value for chaining.
+On Wed, Dec 14, 2016 at 5:37 PM, Theodore Ts'o <tytso@mit.edu> wrote:
+> [    3.606139] random benchmark!!
+> [    3.606276] get_random_int # cycles: 326578
+> [    3.606317] get_random_int_new # cycles: 95438
+> [    3.607423] get_random_bytes # cycles: 2653388
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-Cc: Ted Tso <tytso@mit.edu>
----
-Changes from v2->v3:
+Looks to me like my siphash implementation is much faster for
+get_random_long, and more or less tied for get_random_int:
 
-  - Structs are no longer packed, to mitigate slow byte-by-byte assignment.
+[    1.729370] random benchmark!!
+[    1.729710] get_random_long # cycles: 349771
+[    1.730128] get_random_long_chacha # cycles: 359660
+[    1.730457] get_random_long_siphash # cycles: 94255
+[    1.731307] get_random_bytes # cycles: 1354894
+[    1.731707] get_random_int # cycles: 305640
+[    1.732095] get_random_int_chacha # cycles: 80726
+[    1.732425] get_random_int_siphash # cycles: 94265
+[    1.733278] get_random_bytes # cycles: 1315873
 
- drivers/char/random.c | 52 ++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 33 insertions(+), 19 deletions(-)
+Given the increasing usage of get_random_long for ASLR and related, I
+think this makes the siphash approach worth pursuing. The chacha
+approach is also not significantly different from the md5 approach in
+terms of speed for get_rand_long. Additionally, since siphash is a
+PRF, I think this opens up a big window for optimizing it even
+further.
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index d6876d506220..b1c2e3b26430 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -262,6 +262,7 @@
- #include <linux/syscalls.h>
- #include <linux/completion.h>
- #include <linux/uuid.h>
-+#include <linux/siphash.h>
- #include <crypto/chacha20.h>
- 
- #include <asm/processor.h>
-@@ -2042,7 +2043,7 @@ struct ctl_table random_table[] = {
- };
- #endif 	/* CONFIG_SYSCTL */
- 
--static u32 random_int_secret[MD5_MESSAGE_BYTES / 4] ____cacheline_aligned;
-+static u8 random_int_secret[SIPHASH24_KEY_LEN] __aligned(SIPHASH24_ALIGNMENT);
- 
- int random_int_secret_init(void)
- {
-@@ -2050,8 +2051,7 @@ int random_int_secret_init(void)
- 	return 0;
- }
- 
--static DEFINE_PER_CPU(__u32 [MD5_DIGEST_WORDS], get_random_int_hash)
--		__aligned(sizeof(unsigned long));
-+static DEFINE_PER_CPU(u64, get_random_int_chaining);
- 
- /*
-  * Get a random word for internal kernel use only. Similar to urandom but
-@@ -2061,19 +2061,26 @@ static DEFINE_PER_CPU(__u32 [MD5_DIGEST_WORDS], get_random_int_hash)
-  */
- unsigned int get_random_int(void)
- {
--	__u32 *hash;
- 	unsigned int ret;
-+	struct {
-+		u64 chaining;
-+		unsigned long ts;
-+		unsigned long entropy;
-+		pid_t pid;
-+		char end[];
-+	} __aligned(SIPHASH24_ALIGNMENT) combined;
-+	u64 *chaining;
- 
- 	if (arch_get_random_int(&ret))
- 		return ret;
- 
--	hash = get_cpu_var(get_random_int_hash);
--
--	hash[0] += current->pid + jiffies + random_get_entropy();
--	md5_transform(hash, random_int_secret);
--	ret = hash[0];
--	put_cpu_var(get_random_int_hash);
--
-+	chaining = get_cpu_ptr(&get_random_int_chaining);
-+	combined.chaining = *chaining;
-+	combined.ts = jiffies;
-+	combined.entropy = random_get_entropy();
-+	combined.pid = current->pid;
-+	ret = *chaining = siphash24((u8 *)&combined, offsetof(typeof(combined), end), random_int_secret);
-+	put_cpu_ptr(chaining);
- 	return ret;
- }
- EXPORT_SYMBOL(get_random_int);
-@@ -2083,19 +2090,26 @@ EXPORT_SYMBOL(get_random_int);
-  */
- unsigned long get_random_long(void)
- {
--	__u32 *hash;
- 	unsigned long ret;
-+	struct {
-+		u64 chaining;
-+		unsigned long ts;
-+		unsigned long entropy;
-+		pid_t pid;
-+		char end[];
-+	} __aligned(SIPHASH24_ALIGNMENT) combined;
-+	u64 *chaining;
- 
- 	if (arch_get_random_long(&ret))
- 		return ret;
- 
--	hash = get_cpu_var(get_random_int_hash);
--
--	hash[0] += current->pid + jiffies + random_get_entropy();
--	md5_transform(hash, random_int_secret);
--	ret = *(unsigned long *)hash;
--	put_cpu_var(get_random_int_hash);
--
-+	chaining = get_cpu_ptr(&get_random_int_chaining);
-+	combined.chaining = *chaining;
-+	combined.ts = jiffies;
-+	combined.entropy = random_get_entropy();
-+	combined.pid = current->pid;
-+	ret = *chaining = siphash24((u8 *)&combined, offsetof(typeof(combined), end), random_int_secret);
-+	put_cpu_ptr(chaining);
- 	return ret;
- }
- EXPORT_SYMBOL(get_random_long);
--- 
-2.11.0
+Benchmark here:
+    https://git.zx2c4.com/linux-dev/commit/?h=rng-bench
+
+Jason
