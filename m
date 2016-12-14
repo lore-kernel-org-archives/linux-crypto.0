@@ -1,34 +1,62 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH v2 0/8] Conversion crypto API documentation to Sphinx
-Date: Wed, 14 Dec 2016 08:01:55 +0100
-Message-ID: <3725903.jjqLa9t7VJ@tauon.atsec.com>
-References: <2053893.WjF01BJSDF@positron.chronox.de> <3555336.Wm4L5bpP9y@positron.chronox.de> <20161213164001.63fd5645@lwn.net>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH v2] keys/encrypted: Fix two crypto-on-the-stack bugs
+Date: Wed, 14 Dec 2016 00:10:24 -0800
+Message-ID: <20161214081024.GA22765@zzz>
+References: <627e948e37314c13a67c90917386c814c56b8e20.1481683609.git.luto@kernel.org>
+ <CALCETrX-YYp5iXPLKOpiT9+3DXYxGTVRXVyPN0oiYpQQC8kH3w@mail.gmail.com>
+ <20161214050404.GC9592@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org
-To: Jonathan Corbet <corbet@lwn.net>
-Return-path: <linux-doc-owner@vger.kernel.org>
-In-Reply-To: <20161213164001.63fd5645@lwn.net>
-Sender: linux-doc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Andy Lutomirski <luto@amacapital.net>,
+        Andy Lutomirski <luto@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Stephan Mueller <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:36581 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752752AbcLNIK3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 14 Dec 2016 03:10:29 -0500
+Content-Disposition: inline
+In-Reply-To: <20161214050404.GC9592@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 13. Dezember 2016, 16:40:01 CET schrieb Jonathan Corbet:
-
-Hi Jonathan,
-
-> Clearly there was a bit of misunderstanding going around :)
-
-Yep, it seems like it :-)
+On Wed, Dec 14, 2016 at 01:04:04PM +0800, Herbert Xu wrote:
+> On Tue, Dec 13, 2016 at 06:53:03PM -0800, Andy Lutomirski wrote:
+> > On Tue, Dec 13, 2016 at 6:48 PM, Andy Lutomirski <luto@kernel.org> wrote:
+> > > The driver put a constant buffer of all zeros on the stack and
+> > > pointed a scatterlist entry at it in two places.  This doesn't work
+> > > with virtual stacks.  Use ZERO_PAGE instead.
+> > 
+> > Wait a second...
+> > 
+> > > -       sg_set_buf(&sg_out[1], pad, sizeof pad);
+> > > +       sg_set_buf(&sg_out[1], empty_zero_page, 16);
+> > 
+> > My fix here is obviously bogus (I meant to use ZERO_PAGE(0)), but what
+> > exactly is the code trying to do?  The old code makes no sense.  It's
+> > setting the *output* buffer to zeroed padding.
 > 
-> I've applied the patch set to docs-next.  Oddly I had no trouble with #7,
-> but #2 was badly mailer-mangled and took some work.
+> It's decrypting so I presume it just needs to the extra space for
+> the padding and the result will be thrown away.
+> 
 
-Thank you very much for taking it. In this case Linus will have the hunk with 
-#7 as David Howells added a patch here that went into the current Linus tree.
+It looks like the data is zero-padded to a 16-byte AES block boundary before
+being encrypted with CBC, so the encrypted data may be longer than the original
+data.  (I don't know why it doesn't use CTS mode instead, which would make the
+lengths the same.)
 
-I apologize for the mangled #2 -- thanks for processing it though.
+Since the crypto API can do in-place operations, when *encrypting* I suggest
+copying the decrypted data to the output buffer, padding it with 0's, and
+encrypting it in-place.  This eliminates the need for the stack buffer.
 
-Ciao
-Stephan
+But when *decrypting* there will be up to 15 extra throwaway bytes of output
+produced by the decryption.  There must be space made for these, and since it's
+output it can't be empty_zero_page.  I guess either check whether space can be
+made for it in-place, or allocate a temporary buffer...
+
+Eric
