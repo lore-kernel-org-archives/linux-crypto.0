@@ -1,48 +1,40 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v2] keys/encrypted: Fix two crypto-on-the-stack bugs
-Date: Wed, 14 Dec 2016 13:04:04 +0800
-Message-ID: <20161214050404.GC9592@gondor.apana.org.au>
-References: <627e948e37314c13a67c90917386c814c56b8e20.1481683609.git.luto@kernel.org>
- <CALCETrX-YYp5iXPLKOpiT9+3DXYxGTVRXVyPN0oiYpQQC8kH3w@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: sun4i-ss: support the Security System PRNG
+Date: Wed, 14 Dec 2016 13:05:51 +0800
+Message-ID: <20161214050551.GD9592@gondor.apana.org.au>
+References: <1480934922-20732-1-git-send-email-clabbe.montjoie@gmail.com>
+ <20161205123705.GA10732@gondor.apana.org.au>
+ <20161205125738.GA13525@Red>
+ <20161207120900.GC20680@gondor.apana.org.au>
+ <20161207125127.GB28218@Red>
+ <20161208090618.GB22932@gondor.apana.org.au>
+ <20161213141059.GB10647@Red>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Andy Lutomirski <luto-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        USB list <linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-To: Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org>
-Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: davem@davemloft.net, maxime.ripard@free-electrons.com,
+        wens@csie.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:60254 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1754837AbcLNFGU (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 14 Dec 2016 00:06:20 -0500
 Content-Disposition: inline
-In-Reply-To: <CALCETrX-YYp5iXPLKOpiT9+3DXYxGTVRXVyPN0oiYpQQC8kH3w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20161213141059.GB10647@Red>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 13, 2016 at 06:53:03PM -0800, Andy Lutomirski wrote:
-> On Tue, Dec 13, 2016 at 6:48 PM, Andy Lutomirski <luto-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
-> > The driver put a constant buffer of all zeros on the stack and
-> > pointed a scatterlist entry at it in two places.  This doesn't work
-> > with virtual stacks.  Use ZERO_PAGE instead.
-> 
-> Wait a second...
-> 
-> > -       sg_set_buf(&sg_out[1], pad, sizeof pad);
-> > +       sg_set_buf(&sg_out[1], empty_zero_page, 16);
-> 
-> My fix here is obviously bogus (I meant to use ZERO_PAGE(0)), but what
-> exactly is the code trying to do?  The old code makes no sense.  It's
-> setting the *output* buffer to zeroed padding.
+On Tue, Dec 13, 2016 at 03:10:59PM +0100, Corentin Labbe wrote:
+>
+> I have found two solutions:
 
-It's decrypting so I presume it just needs to the extra space for
-the padding and the result will be thrown away.
+No we already have algif_rng so let's not confuse things even
+further by making hwrng take PRNGs.
 
 Cheers,
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe linux-usb" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
