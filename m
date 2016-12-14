@@ -1,110 +1,86 @@
-From: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Subject: Re: [PATCH v2 1/4] siphash: add cryptographically secure hashtable
- function
-Date: Wed, 14 Dec 2016 16:09:48 +0100
-Message-ID: <9fea41e0-fd55-7328-e2f4-73eb2e7f7a98@stressinduktion.org>
-References: <20161214035927.30004-1-Jason@zx2c4.com>
- <516c5633-14c2-ee18-90e4-84d73870ba2c@stressinduktion.org>
- <CAHmME9qA6qKdp+qoih2Je4fxU+4E6=Gp7CVfhYU7VbOr6HJ=0Q@mail.gmail.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v7 1/1] crypto: add virtio-crypto driver
+Date: Wed, 14 Dec 2016 16:38:33 +0100
+Message-ID: <bcf62fa0-8fc9-daaf-ea7b-e09eb83b593a@linux.vnet.ibm.com>
+References: <1481716249-185392-1-git-send-email-arei.gonglei@huawei.com>
+ <1481716249-185392-2-git-send-email-arei.gonglei@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Netdev <netdev@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        "Daniel J . Bernstein" <djb@cr.yp.to>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Eric Biggers <ebiggers3@gmail.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9qA6qKdp+qoih2Je4fxU+4E6=Gp7CVfhYU7VbOr6HJ=0Q@mail.gmail.com>
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: weidong.huang@huawei.com, claudio.fontana@huawei.com, mst@redhat.com,
+        luonengjun@huawei.com, hanweidong@huawei.com, xin.zeng@intel.com,
+        xuquan8@huawei.com, wanzongshun@huawei.com, stefanha@redhat.com,
+        jianjay.zhou@huawei.com, cornelia.huck@de.ibm.com,
+        longpeng2@huawei.com, arei.gonglei@hotmail.com, davem@davemloft.net,
+        wu.wubin@huawei.com, herbert@gondor.apana.org.au
+To: Gonglei <arei.gonglei@huawei.com>, linux-kernel@vger.kernel.org,
+        qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org
+Return-path: <virtio-dev-return-1766-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Sender: <virtio-dev@lists.oasis-open.org>
+List-Post: <mailto:virtio-dev@lists.oasis-open.org>
+List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
+List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
+List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
+In-Reply-To: <1481716249-185392-2-git-send-email-arei.gonglei@huawei.com>
 List-Id: linux-crypto.vger.kernel.org
 
-Hello,
 
-On 14.12.2016 14:10, Jason A. Donenfeld wrote:
-> On Wed, Dec 14, 2016 at 12:21 PM, Hannes Frederic Sowa
-> <hannes@stressinduktion.org> wrote:
->> Can you show or cite benchmarks in comparison with jhash? Last time I
->> looked, especially for short inputs, siphash didn't beat jhash (also on
->> all the 32 bit devices etc.).
-> 
-> I assume that jhash is likely faster than siphash, but I wouldn't be
-> surprised if with optimization we can make siphash at least pretty
-> close on 64-bit platforms. (I'll do some tests though; maybe I'm wrong
-> and jhash is already slower.)
 
-Yes, numbers would be very usable here. I am mostly concerned about
-small plastic router cases. E.g. assume you double packet processing
-time with a change of the hashing function at what point is the actual
-packet processing more of an attack vector than the hashtable?
+On 12/14/2016 12:50 PM, Gonglei wrote:
+> diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
+> new file mode 100644
+> index 0000000..c0854a1
+> --- /dev/null
+> +++ b/drivers/crypto/virtio/virtio_crypto_core.c
+> @@ -0,0 +1,474 @@
+[..]
+> +
+> +static void virtcrypto_dataq_callback(struct virtqueue *vq)
+> +{
+> +	struct virtio_crypto *vcrypto = vq->vdev->priv;
+> +	struct virtio_crypto_request *vc_req;
+> +	unsigned long flags;
+> +	unsigned int len;
+> +	struct ablkcipher_request *ablk_req;
+> +	int error;
+> +
+> +	spin_lock_irqsave(&vcrypto->lock, flags);
 
-> With that said, siphash is here to replace uses of jhash where
-> hashtable poisoning vulnerabilities make it necessary. Where there's
-> no significant security improvement, if there's no speed improvement
-> either, then of course nothing's going to change.
+Would it make sense to use a per virtqueue lock
+like in virtio_blk for example instead of locking on the whole
+device? OK, it seems you use only one dataqueue, so it
+may not be that relevant.
 
-It still changes currently well working source. ;-)
-
-> I should have mentioned md5_transform in this first message too, as
-> two other patches in this series actually replace md5_transform usage
-> with siphash. I think in this case, siphash is a clear performance
-> winner (and security winner) over md5_transform. So if the push back
-> against replacing jhash usages is just too high, at the very least it
-> remains useful already for the md5_transform usage.
-
-MD5 is considered broken because its collision resistance is broken?
-SipHash doesn't even claim to have collision resistance (which we don't
-need here)?
-
-But I agree, certainly it could be a nice speed-up!
-
->> This pretty much depends on the linearity of the hash function? I don't
->> think a crypto secure hash function is needed for a hash table. Albeit I
->> agree that siphash certainly looks good to be used here.
-> 
-> In order to prevent the aforementioned poisoning attacks, a PRF with
-> perfect linearity is required, which is what's achieved when it's a
-> cryptographically secure one. Check out section 7 of
-> https://131002.net/siphash/siphash.pdf .
-
-I think you mean non-linearity. Otherwise I agree that siphash is
-certainly a better suited hashing algorithm as far as I know. But it
-would be really interesting to compare some performance numbers. Hard to
-say anything without them.
-
->> I am pretty sure that SipHash still needs a random key per hash table
->> also. So far it was only the choice of hash function you are questioning.
-> 
-> Siphash needs a random secret key, yes. The point is that the hash
-> function remains secure so long as the secret key is kept secret.
-> Other functions can't make the same guarantee, and so nervous periodic
-> key rotation is necessary, but in most cases nothing is done, and so
-> things just leak over time.
-> 
-> 
->> Hmm, I tried to follow up with all the HashDoS work and so far didn't
->> see any HashDoS attacks against the Jenkins/SpookyHash family.
->>
->> If this is an issue we might need to also put those changes into stable.
-> 
-> jhash just isn't secure; it's not a cryptographically secure PRF. If
-> there hasn't already been an academic paper put out there about it
-> this year, let's make this thread 1000 messages long to garner
-> attention, and next year perhaps we'll see one. No doubt that
-> motivated government organizations, defense contractors, criminals,
-> and other netizens have already done research in private. Replacing
-> insecure functions with secure functions is usually a good thing.
-
-I think this is a weak argument.
-
-In general I am in favor to switch to siphash, but it would be nice to
-see some benchmarks with the specific kernel implementation also on some
-smaller 32 bit CPUs and especially without using any SIMD instructions
-(which might have been used in paper comparison).
-
-Bye,
-Hannes
+> +	do {
+> +		virtqueue_disable_cb(vq);
+> +		while ((vc_req = virtqueue_get_buf(vq, &len)) != NULL) {
+> +			if (vc_req->type == VIRTIO_CRYPTO_SYM_OP_CIPHER) {
+> +				switch (vc_req->status) {
+> +				case VIRTIO_CRYPTO_OK:
+> +					error = 0;
+> +					break;
+> +				case VIRTIO_CRYPTO_INVSESS:
+> +				case VIRTIO_CRYPTO_ERR:
+> +					error = -EINVAL;
+> +					break;
+> +				case VIRTIO_CRYPTO_BADMSG:
+> +					error = -EBADMSG;
+> +					break;
+> +				default:
+> +					error = -EIO;
+> +					break;
+> +				}
+> +				ablk_req = vc_req->ablkcipher_req;
+> +				virtcrypto_clear_request(vc_req);
+> +
+> +				spin_unlock_irqrestore(&vcrypto->lock, flags);
+> +				/* Finish the encrypt or decrypt process */
+> +				ablk_req->base.complete(&ablk_req->base, error);
+> +				spin_lock_irqsave(&vcrypto->lock, flags);
+> +			}
+> +		}
+> +	} while (!virtqueue_enable_cb(vq));
+> +	spin_unlock_irqrestore(&vcrypto->lock, flags);
+> +}
