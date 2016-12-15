@@ -1,106 +1,50 @@
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Subject: RE: [Qemu-devel] [PATCH v7 1/1] crypto: add virtio-crypto driver
-Date: Thu, 15 Dec 2016 01:08:51 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA16320F@DGGEMA505-MBX.china.huawei.com>
-References: <1481716249-185392-1-git-send-email-arei.gonglei@huawei.com>
- <1481716249-185392-2-git-send-email-arei.gonglei@huawei.com>
- <bcf62fa0-8fc9-daaf-ea7b-e09eb83b593a@linux.vnet.ibm.com>
- <33183CC9F5247A488A2544077AF19020DA163033@DGGEMA505-MBX.china.huawei.com>
- <82063967A54EF84C8AFCD6BD7F6AD93310C14374@SHSMSX103.ccr.corp.intel.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: Re: [PATCH 4/3] random: use siphash24 instead
+ of md5 for get_random_int/long
+Date: Thu, 15 Dec 2016 02:19:08 +0100
+Message-ID: <CAHmME9qZqEWDOcqPggZW7KBrTz3tPnWz+gyjaj=rO0O_69BtyQ@mail.gmail.com>
+References: <20161214001656.19388-1-Jason@zx2c4.com> <20161214031037.25498-1-Jason@zx2c4.com>
+ <20161214163731.luj2dzmnihcuhn5p@thunk.org> <CAHmME9o3uQoi5h=YTKB=5yN1yzz=d3=GFjGiXv_Sf12kAsjx3A@mail.gmail.com>
+Reply-To: kernel-hardening@lists.openwall.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>,
-        Claudio Fontana <Claudio.Fontana@huawei.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        Luonengjun <luonengjun@huawei.com>,
-        "Hanweidong (Randy)" <hanweidong@huawei.com>,
-        "Xuquan (Quan Xu)" <xuquan8@huawei.com>,
-        "Wanzongshun (Vincent)" <wanzongshun@huawei.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>,
-        "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>,
-        longpeng <longpeng2@huawei.com>,
-        "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "Wubin (H)" <wu.wubin@huawei.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-To: "Zeng, Xin" <xin.zeng@intel.com>,
-        Halil Pasic <pasic@linux.vnet.ibm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
-        "virtualization@lists.linux-foundation.org"
-        <virtualization@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2321 "EHLO
-        dggrg01-dlp.huawei.com" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752944AbcLOBJT (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Dec 2016 20:09:19 -0500
-In-Reply-To: <82063967A54EF84C8AFCD6BD7F6AD93310C14374@SHSMSX103.ccr.corp.intel.com>
-Content-Language: zh-CN
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+To: kernel-hardening@lists.openwall.com, "Theodore Ts'o" <tytso@mit.edu>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>, Netdev <netdev@vger.kernel.org>,
+	David Miller <davem@davemloft.net>, Linus Torvalds <torvalds@linux-foundation.org>,
+	LKML <linux-kernel@vger.kernel.org>, George Spelvin <linux@horizon.com>,
+	Scott Bauer <sbauer@eng.utah.edu>, Andi Kleen <ak@linux.intel.com>,
+	Andy Lutomirski <luto@amacapital.net>, Greg KH <gregkh@linuxfoundation.org>,
+	Eric Biggers <ebiggers3@gmail.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Return-path: <kernel-hardening-return-5565-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <CAHmME9o3uQoi5h=YTKB=5yN1yzz=d3=GFjGiXv_Sf12kAsjx3A@mail.gmail.com>
+List-Id: linux-crypto.vger.kernel.org
 
+Hey Ted,
 
+On Wed, Dec 14, 2016 at 8:12 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> I think this opens up a big window for optimizing it even
+> further.
 
+I optimized it a bit further and siphash is now the clear winner over chacha:
 
+[    1.784801] random benchmark!!
+[    1.785161] get_random_long # cycles: 415983
+[    1.785595] get_random_long_chacha # cycles: 242047
+[    1.785997] get_random_long_siphash # cycles: 137130
+[    1.787450] get_random_bytes # cycles: 1452985
+[    1.787947] get_random_int # cycles: 343323
+[    1.788282] get_random_int_chacha # cycles: 170767
+[    1.788656] get_random_int_siphash # cycles: 86384
+[    1.789764] get_random_bytes # cycles: 2279519
 
-Regards,
--Gonglei
+And even still, there is more that could be optimized. Therefore, I'll
+continue to keep this patch in the series and will CC you on the next
+patch set that goes out.
 
-
-> -----Original Message-----
-> From: Zeng, Xin [mailto:xin.zeng@intel.com]
-> Sent: Thursday, December 15, 2016 8:59 AM
-> To: Gonglei (Arei); Halil Pasic; linux-kernel@vger.kernel.org;
-> qemu-devel@nongnu.org; virtio-dev@lists.oasis-open.org;
-> virtualization@lists.linux-foundation.org; linux-crypto@vger.kernel.org
-> Cc: Huangweidong (C); Claudio Fontana; mst@redhat.com; Luonengjun;
-> Hanweidong (Randy); Xuquan (Quan Xu); Wanzongshun (Vincent);
-> stefanha@redhat.com; Zhoujian (jay, Euler); cornelia.huck@de.ibm.com;
-> longpeng; arei.gonglei@hotmail.com; davem@davemloft.net; Wubin (H);
-> herbert@gondor.apana.org.au
-> Subject: RE: [Qemu-devel] [PATCH v7 1/1] crypto: add virtio-crypto driver
-> 
-> On Thursday, December 15, 2016 8:45 AM, Gonglei (Arei) Wrote:
-> < > > diff --git a/drivers/crypto/virtio/virtio_crypto_core.c
-> < > b/drivers/crypto/virtio/virtio_crypto_core.c
-> < > > new file mode 100644
-> < > > index 0000000..c0854a1
-> < > > --- /dev/null
-> < > > +++ b/drivers/crypto/virtio/virtio_crypto_core.c
-> < > > @@ -0,0 +1,474 @@
-> < > [..]
-> < > > +
-> < > > +static void virtcrypto_dataq_callback(struct virtqueue *vq)
-> < > > +{
-> < > > +	struct virtio_crypto *vcrypto = vq->vdev->priv;
-> < > > +	struct virtio_crypto_request *vc_req;
-> < > > +	unsigned long flags;
-> < > > +	unsigned int len;
-> < > > +	struct ablkcipher_request *ablk_req;
-> < > > +	int error;
-> < > > +
-> < > > +	spin_lock_irqsave(&vcrypto->lock, flags);
-> < >
-> < > Would it make sense to use a per virtqueue lock
-> < > like in virtio_blk for example instead of locking on the whole
-> < > device? OK, it seems you use only one dataqueue, so it
-> < > may not be that relevant.
-> < >
-> < Currently yes, both the backend device (cryptodev-backend-builtin)
-> < and the frontend driver use one dataqueue.
-> <
-> 
-> I think it makes sense to use per virtqueue lock here though it only uses one
-> queue so far,
-> but in the spec we already have multi queues support.
-> 
-Yes, I agree. Will do that in V8 soon. 
-Hope to catch up with Michael's pull request for 4.10.
-
-Regards,
--Gonglei
+Jason
