@@ -1,25 +1,9 @@
-From: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Subject: Re: [PATCH v2 1/4] siphash: add cryptographically secure hashtable
- function
-Date: Thu, 15 Dec 2016 22:17:44 +0100
-Message-ID: <7861e8ca-69fe-30d1-3d79-27ee33a510d0@stressinduktion.org>
-References: <20161214035927.30004-1-Jason@zx2c4.com>
- <CAHmME9q9ffdtWRbzyMO1ktTdtEFdfumTfojTTNLXFhoa+R+MWQ@mail.gmail.com>
- <8ea3fdff-23c4-b81d-2588-44549bd2d8c1@stressinduktion.org>
- <063D6719AE5E284EB5DD2968C1650D6DB02401ED@AcuExch.aculab.com>
- <707472e1-b385-836d-c4c6-791c1dcc0776@stressinduktion.org>
- <063D6719AE5E284EB5DD2968C1650D6DB02402C0@AcuExch.aculab.com>
- <0f3c3694-c00b-aae2-5b08-25bc64bf6372@stressinduktion.org>
- <063D6719AE5E284EB5DD2968C1650D6DB0240437@AcuExch.aculab.com>
- <f6813084-6f46-0b22-e9c3-97b2e266f8f6@stressinduktion.org>
- <063D6719AE5E284EB5DD2968C1650D6DB0240529@AcuExch.aculab.com>
- <924ef794-eae0-2a6b-508b-069718339edc@stressinduktion.org>
- <CAHmME9pTLFu3-4n6m_OMj5jVWGE-+yC-4CnkynD--H4Nt8_cpA@mail.gmail.com>
- <18d1e9d1-1e52-b9a6-de26-2f33859ec052@stressinduktion.org>
- <CAHmME9rDCb=2rojJba13Uew9V9qAbxv1qcJGHwEAKoahxyE9QA@mail.gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v2 1/4] siphash: add cryptographically secure hashtable function
+Date: Thu, 15 Dec 2016 22:25:57 +0100
+Message-ID: <CAHmME9p9cf1W3vhbu=YTRY1Xt=fmE1sVqY1XPt5iQwxfCfQUOA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
 Cc: David Laight <David.Laight@aculab.com>,
         Netdev <netdev@vger.kernel.org>,
         "kernel-hardening@lists.openwall.com"
@@ -30,78 +14,67 @@ Cc: David Laight <David.Laight@aculab.com>,
         "Daniel J . Bernstein" <djb@cr.yp.to>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Eric Biggers <ebiggers3@gmail.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Hannes Frederic Sowa <hannes@stressinduktion.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:49261 "EHLO
-        out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752067AbcLOVRy (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Dec 2016 16:17:54 -0500
-In-Reply-To: <CAHmME9rDCb=2rojJba13Uew9V9qAbxv1qcJGHwEAKoahxyE9QA@mail.gmail.com>
+Received: from frisell.zx2c4.com ([192.95.5.64]:34337 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752131AbcLOV0F (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Dec 2016 16:26:05 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 15.12.2016 21:43, Jason A. Donenfeld wrote:
-> On Thu, Dec 15, 2016 at 9:31 PM, Hannes Frederic Sowa
-> <hannes@stressinduktion.org> wrote:
->> ARM64 and x86-64 have memory operations that are not vector operations
->> that operate on 128 bit memory.
-> 
-> Fair enough. imull I guess.
-> 
->> How do you know that the compiler for some architecture will not chose a
->> more optimized instruction to load a 64 bit memory value into two 32 bit
->> registers if you tell the compiler it is 8 byte aligned but it actually
->> isn't? I don't know the answer but telling the compiler some data is 8
->> byte aligned while it isn't really pretty much seems like a call for
->> trouble.
-> 
-> If a compiler is in the business of using special 64-bit instructions
-> on 64-bit aligned data, then it is also the job of the compiler to
-> align structs to 64-bits when passed __aligned(8), which is what we've
-> done in this code. If the compiler were to hypothetically choose to
-> ignore that and internally convert it to a __aligned(4), then it would
-> only be able to do so with the knowledge that it will never use 64-bit
-> aligned data instructions. But so far as I can tell, gcc always
-> respects __aligned(8), which is why I use it in this patchset.
-> 
-> I think there might have been confusion here, because perhaps someone
-> was hoping that since in6_addr is 128-bits, that the __aligned
-> attribute would not be required and that the struct would just
-> automatically be aligned to at least 8 bytes. But in fact, as I
-> mentioned, in6_addr is actually composed of u32[4] and not u64[2], so
-> it will only be aligned to 4 bytes, making the __aligned(8) necessary.
-> 
-> I think for the purposes of this patchset, this is a solved problem.
-> There's the unaligned version of the function if you don't know about
-> the data, and there's the aligned version if you're using
-> __aligned(SIPHASH_ALIGNMENT) on your data. Plain and simple.
+On Thu, Dec 15, 2016 at 10:17 PM, Hannes Frederic Sowa
+<hannes@stressinduktion.org> wrote:
+> And I was exactly questioning this.
+>
+> static unsigned int inet6_hash_frag(__be32 id, const struct in6_addr *saddr,
+>                                     const struct in6_addr *daddr)
+> {
+>         net_get_random_once(&ip6_frags.rnd, sizeof(ip6_frags.rnd));
+>         return jhash_3words(ipv6_addr_hash(saddr), ipv6_addr_hash(daddr),
+>                             (__force u32)id, ip6_frags.rnd);
+> }
 
-And I was exactly questioning this.
+For this example, the replacement is the function entitled siphash_4u32:
 
-static unsigned int inet6_hash_frag(__be32 id, const struct in6_addr *saddr,
-				    const struct in6_addr *daddr)
-{
-	net_get_random_once(&ip6_frags.rnd, sizeof(ip6_frags.rnd));
-	return jhash_3words(ipv6_addr_hash(saddr), ipv6_addr_hash(daddr),
-			    (__force u32)id, ip6_frags.rnd);
-}
+ static unsigned int inet6_hash_frag(__be32 id, const struct in6_addr *saddr,
+                                     const struct in6_addr *daddr)
+ {
+         net_get_random_once(&ip6_frags.rnd, sizeof(ip6_frags.rnd));
+         return siphash_4u32(ipv6_addr_hash(saddr), ipv6_addr_hash(daddr),
+                 (__force u32)id, 0, ip6_frags.rnd);
+ }
 
-This function had a hash DoS (and kind of still has), but it has been
-mitigated by explicit checks, I hope.
+And then you make ip6_frags.rnd be of type siphash_key_t. Then
+everything is taken care of and works beautifully. Please see v5 of
+this patchset.
 
-So you start looking for all the pointers where ipv6 addresses could
-come from and find some globally defined struct where I would need to
-put the aligned(SIPHASH_ALIGNMENT) into to make this work on 32 bit
-code? Otherwise just the unaligned version is safe on 32 bit code.
+> I would be interested if the compiler can actually constant-fold the
+> address of the stack allocation with an simple if () or some
+> __builtin_constant_p fiddeling, so we don't have this constant review
+> overhead to which function we pass which data. This would also make
+> this whole discussion moot.
 
-Who knows this? It isn't even obvious by looking at the header!
+I'll play with it to see if the compiler is capable of doing that.
+Does anybody know off hand if it is or if there are other examples of
+the compiler doing that?
 
-I would be interested if the compiler can actually constant-fold the
-address of the stack allocation with an simple if () or some
-__builtin_constant_p fiddeling, so we don't have this constant review
-overhead to which function we pass which data. This would also make
-this whole discussion mood.
+In any case, for all current replacement of jhash_1word, jhash_2words,
+jhash_3words, there's the siphash_2u32 or siphash_4u32 functions. This
+covers the majority of cases.
 
-Bye,
-Hannes
+For replacements of md5_transform, either the data is small and can
+fit in siphash_Nu{32,64}, or it can be put into a struct explicitly
+aligned on the stack.
+
+For the remaining use of jhash_nwords, either siphash() can be used or
+siphash_unaligned() can be used if the source is of unknown alignment.
+Both functions have their alignment requirements (or lack thereof)
+documented in a docbook comment.
+
+I'll look into the constant folding to see if it actually works. If it
+does, I'll use it. If not, I believe the current solution works.
+
+How's that sound?
+
+Jason
