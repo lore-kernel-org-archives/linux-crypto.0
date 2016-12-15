@@ -1,74 +1,52 @@
-From: Jiri Slaby <jslaby@suse.cz>
-Subject: [PATCH -resend with CC] crypto: algif_hash, avoid zero-sized array
-Date: Thu, 15 Dec 2016 14:31:01 +0100
-Message-ID: <20161215133101.6129-1-jslaby@suse.cz>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jiri Slaby <jslaby@suse.cz>,
-        "David S. Miller" <davem@davemloft.net>
-To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: David Laight <David.Laight@ACULAB.COM>
+Subject: RE: [PATCH v2 1/4] siphash: add cryptographically secure hashtable
+ function
+Date: Thu, 15 Dec 2016 13:56:30 +0000
+Message-ID: <063D6719AE5E284EB5DD2968C1650D6DB0240437@AcuExch.aculab.com>
+References: <20161214035927.30004-1-Jason@zx2c4.com>
+ <CAHmME9q9ffdtWRbzyMO1ktTdtEFdfumTfojTTNLXFhoa+R+MWQ@mail.gmail.com>
+ <8ea3fdff-23c4-b81d-2588-44549bd2d8c1@stressinduktion.org>
+ <063D6719AE5E284EB5DD2968C1650D6DB02401ED@AcuExch.aculab.com>
+ <707472e1-b385-836d-c4c6-791c1dcc0776@stressinduktion.org>
+ <063D6719AE5E284EB5DD2968C1650D6DB02402C0@AcuExch.aculab.com>
+ <0f3c3694-c00b-aae2-5b08-25bc64bf6372@stressinduktion.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Netdev <netdev@vger.kernel.org>,
+        "kernel-hardening@lists.openwall.com"
+        <kernel-hardening@lists.openwall.com>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>,
+        "Daniel J . Bernstein" <djb@cr.yp.to>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Eric Biggers <ebiggers3@gmail.com>
+To: 'Hannes Frederic Sowa' <hannes@stressinduktion.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp-out6.electric.net ([192.162.217.182]:59569 "EHLO
+        smtp-out6.electric.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752673AbcLON4k (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Dec 2016 08:56:40 -0500
+In-Reply-To: <0f3c3694-c00b-aae2-5b08-25bc64bf6372@stressinduktion.org>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-With this reproducer:
-  struct sockaddr_alg alg = {
-          .salg_family = 0x26,
-          .salg_type = "hash",
-          .salg_feat = 0xf,
-          .salg_mask = 0x5,
-          .salg_name = "digest_null",
-  };
-  int sock, sock2;
-
-  sock = socket(AF_ALG, SOCK_SEQPACKET, 0);
-  bind(sock, (struct sockaddr *)&alg, sizeof(alg));
-  sock2 = accept(sock, NULL, NULL);
-  setsockopt(sock, SOL_ALG, ALG_SET_KEY, "\x9b\xca", 2);
-  accept(sock2, NULL, NULL);
-
-==== 8< ======== 8< ======== 8< ======== 8< ====
-
-one can immediatelly see an UBSAN warning:
-UBSAN: Undefined behaviour in crypto/algif_hash.c:187:7
-variable length array bound value 0 <= 0
-CPU: 0 PID: 15949 Comm: syz-executor Tainted: G            E      4.4.30-0-default #1
-...
-Call Trace:
-...
- [<ffffffff81d598fd>] ? __ubsan_handle_vla_bound_not_positive+0x13d/0x188
- [<ffffffff81d597c0>] ? __ubsan_handle_out_of_bounds+0x1bc/0x1bc
- [<ffffffffa0e2204d>] ? hash_accept+0x5bd/0x7d0 [algif_hash]
- [<ffffffffa0e2293f>] ? hash_accept_nokey+0x3f/0x51 [algif_hash]
- [<ffffffffa0e206b0>] ? hash_accept_parent_nokey+0x4a0/0x4a0 [algif_hash]
- [<ffffffff8235c42b>] ? SyS_accept+0x2b/0x40
-
-It is a correct warning, as hash state is propagated to accept as zero,
-but creating a zero-length variable array is not allowed in C.
-
-Fix this as proposed by Herbert -- do "?: 1" on that site. No sizeof or
-similar happens in the code there, so we just allocate one byte even
-though we do not use the array.
-
-Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net> (maintainer:CRYPTO API)
-Reported-by: Sasha Levin <sasha.levin@oracle.com>
----
- crypto/algif_hash.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index d19b09cdf284..54fc90e8339c 100644
---- a/crypto/algif_hash.c
-+++ b/crypto/algif_hash.c
-@@ -245,7 +245,7 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags)
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct hash_ctx *ctx = ask->private;
- 	struct ahash_request *req = &ctx->req;
--	char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req))];
-+	char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req)) ? : 1];
- 	struct sock *sk2;
- 	struct alg_sock *ask2;
- 	struct hash_ctx *ctx2;
--- 
-2.11.0
+RnJvbTogSGFubmVzIEZyZWRlcmljIFNvd2ENCj4gU2VudDogMTUgRGVjZW1iZXIgMjAxNiAxMjo1
+MA0KPiBPbiAxNS4xMi4yMDE2IDEzOjI4LCBEYXZpZCBMYWlnaHQgd3JvdGU6DQo+ID4gRnJvbTog
+SGFubmVzIEZyZWRlcmljIFNvd2ENCj4gPj4gU2VudDogMTUgRGVjZW1iZXIgMjAxNiAxMjoyMw0K
+PiA+IC4uLg0KPiA+PiBIbW0/IEV2ZW4gdGhlIEludGVsIEFCSSBleHBlY3RzIGFsaWdubWVudCBv
+ZiB1bnNpZ25lZCBsb25nIGxvbmcgdG8gYmUgOA0KPiA+PiBieXRlcyBvbiAzMiBiaXQuIERvIHlv
+dSBxdWVzdGlvbiB0aGF0Pw0KPiA+DQo+ID4gWWVzLg0KPiA+DQo+ID4gVGhlIGxpbnV4IEFCSSBm
+b3IgeDg2ICgzMiBiaXQpIG9ubHkgcmVxdWlyZXMgMzJiaXQgYWxpZ25tZW50IGZvciB1NjQgKGV0
+YykuDQo+IA0KPiBIbW0sIHU2NCBvbiAzMiBiaXQgaXMgdW5zaWduZWQgbG9uZyBsb25nIGFuZCBu
+b3QgdW5zaWduZWQgbG9uZy4gVGh1cyBJDQo+IGFtIGFjdHVhbGx5IG5vdCBzdXJlIGlmIHRoZSBB
+Qkkgd291bGQgc2F5IGFueXRoaW5nIGFib3V0IHRoYXQgKHNvcnJ5DQo+IGFsc28gZm9yIG15IHdy
+b25nIHN0YXRlbWVudCBhYm92ZSkuDQo+IA0KPiBBbGlnbm1lbnQgcmVxdWlyZW1lbnQgb2YgdW5z
+aWduZWQgbG9uZyBsb25nIG9uIGdjYyB3aXRoIC1tMzIgYWN0dWFsbHkNCj4gc2VlbSB0byBiZSA4
+Lg0KDQpJdCBkZXBlbmRzIG9uIHRoZSBhcmNoaXRlY3R1cmUuDQpGb3IgeDg2IGl0IGlzIGRlZmlu
+aXRlbHkgNC4NCkl0IG1pZ2h0IGJlIDggZm9yIHNwYXJjLCBwcGMgYW5kL29yIGFscGhhLg0KDQoJ
+RGF2aWQNCg0K
