@@ -1,47 +1,83 @@
-From: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Subject: Re: [PATCH v2 1/4] siphash: add cryptographically secure hashtable
- function
-Date: Thu, 15 Dec 2016 13:50:02 +0100
-Message-ID: <0f3c3694-c00b-aae2-5b08-25bc64bf6372@stressinduktion.org>
-References: <20161214035927.30004-1-Jason@zx2c4.com>
- <CAHmME9q9ffdtWRbzyMO1ktTdtEFdfumTfojTTNLXFhoa+R+MWQ@mail.gmail.com>
- <8ea3fdff-23c4-b81d-2588-44549bd2d8c1@stressinduktion.org>
- <063D6719AE5E284EB5DD2968C1650D6DB02401ED@AcuExch.aculab.com>
- <707472e1-b385-836d-c4c6-791c1dcc0776@stressinduktion.org>
- <063D6719AE5E284EB5DD2968C1650D6DB02402C0@AcuExch.aculab.com>
+From: George Cherian <gcherian@caviumnetworks.com>
+Subject: Re: [PATCH v2 0/3] Add Support for Cavium Cryptographic Accelerarion
+ Unit
+Date: Thu, 15 Dec 2016 18:12:35 +0530
+Message-ID: <58528FBB.1070001@caviumnetworks.com>
+References: <1481637801-1076-1-git-send-email-george.cherian@cavium.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Netdev <netdev@vger.kernel.org>,
-        "kernel-hardening@lists.openwall.com"
-        <kernel-hardening@lists.openwall.com>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Daniel J . Bernstein" <djb@cr.yp.to>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Eric Biggers <ebiggers3@gmail.com>
-To: David Laight <David.Laight@ACULAB.COM>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <063D6719AE5E284EB5DD2968C1650D6DB02402C0@AcuExch.aculab.com>
-Sender: netdev-owner@vger.kernel.org
+Cc: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+To: George Cherian <george.cherian@cavium.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1481637801-1076-1-git-send-email-george.cherian@cavium.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 15.12.2016 13:28, David Laight wrote:
-> From: Hannes Frederic Sowa
->> Sent: 15 December 2016 12:23
-> ...
->> Hmm? Even the Intel ABI expects alignment of unsigned long long to be 8
->> bytes on 32 bit. Do you question that?
-> 
-> Yes.
-> 
-> The linux ABI for x86 (32 bit) only requires 32bit alignment for u64 (etc).
+Hi,
 
-Hmm, u64 on 32 bit is unsigned long long and not unsigned long. Thus I
-am actually not sure if the ABI would say anything about that (sorry
-also for my wrong statement above).
+I got few review comments for this series from David Daney.
+I am reworking on this series and will sent v3 once it is done.
 
-Alignment requirement of unsigned long long on gcc with -m32 actually
-seem to be 8.
+So,kindly ignore this series
+
+Regards,
+-George
+
+On 12/13/2016 07:33 PM, George Cherian wrote:
+>
+> This series adds the support for Cavium Cryptographic Accelerarion Unit (CPT)
+> CPT is available in Cavium's Octeon-Tx SoC series.
+>
+> The series was tested with ecryptfs and dm-crypt for in kernel cryptographic
+> offload operations.
+>
+> Changes v1 -> v2
+> 	-- Addressed a crash issue when more gather components are passed.
+>          -- Redo the cptvf request manager.
+>     	     - Get rid of the un necessary buffer copies.
+>          -- s/uint*_t/u*
+>          -- Remove unwanted Macro definitions
+>          -- Remove the redundant ROUNDUP* macros and use kernel function
+>          -- Select proper config option in Kconfig file.
+>          -- Removed some of the unwanted header file inclusions
+>          -- Miscellaneous Cleanup
+>
+> George Cherian (3):
+>    drivers: crypto: Add Support for Octeon-tx CPT Engine
+>    drivers: crypto: Add the Virtual Function driver for CPT
+>    drivers: crypto: Enable CPT options crypto for build
+>
+>   drivers/crypto/Kconfig                       |   1 +
+>   drivers/crypto/Makefile                      |   1 +
+>   drivers/crypto/cavium/cpt/Kconfig            |  16 +
+>   drivers/crypto/cavium/cpt/Makefile           |   3 +
+>   drivers/crypto/cavium/cpt/cpt_common.h       | 166 +++++
+>   drivers/crypto/cavium/cpt/cpt_hw_types.h     | 736 ++++++++++++++++++++
+>   drivers/crypto/cavium/cpt/cptpf.h            |  69 ++
+>   drivers/crypto/cavium/cpt/cptpf_main.c       | 733 ++++++++++++++++++++
+>   drivers/crypto/cavium/cpt/cptpf_mbox.c       | 163 +++++
+>   drivers/crypto/cavium/cpt/cptvf.h            | 145 ++++
+>   drivers/crypto/cavium/cpt/cptvf_algs.c       | 424 ++++++++++++
+>   drivers/crypto/cavium/cpt/cptvf_algs.h       | 110 +++
+>   drivers/crypto/cavium/cpt/cptvf_main.c       | 971 +++++++++++++++++++++++++++
+>   drivers/crypto/cavium/cpt/cptvf_mbox.c       | 205 ++++++
+>   drivers/crypto/cavium/cpt/cptvf_reqmanager.c | 581 ++++++++++++++++
+>   drivers/crypto/cavium/cpt/request_manager.h  | 147 ++++
+>   16 files changed, 4471 insertions(+)
+>   create mode 100644 drivers/crypto/cavium/cpt/Kconfig
+>   create mode 100644 drivers/crypto/cavium/cpt/Makefile
+>   create mode 100644 drivers/crypto/cavium/cpt/cpt_common.h
+>   create mode 100644 drivers/crypto/cavium/cpt/cpt_hw_types.h
+>   create mode 100644 drivers/crypto/cavium/cpt/cptpf.h
+>   create mode 100644 drivers/crypto/cavium/cpt/cptpf_main.c
+>   create mode 100644 drivers/crypto/cavium/cpt/cptpf_mbox.c
+>   create mode 100644 drivers/crypto/cavium/cpt/cptvf.h
+>   create mode 100644 drivers/crypto/cavium/cpt/cptvf_algs.c
+>   create mode 100644 drivers/crypto/cavium/cpt/cptvf_algs.h
+>   create mode 100644 drivers/crypto/cavium/cpt/cptvf_main.c
+>   create mode 100644 drivers/crypto/cavium/cpt/cptvf_mbox.c
+>   create mode 100644 drivers/crypto/cavium/cpt/cptvf_reqmanager.c
+>   create mode 100644 drivers/crypto/cavium/cpt/request_manager.h
+>
