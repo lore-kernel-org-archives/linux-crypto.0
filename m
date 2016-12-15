@@ -1,76 +1,58 @@
-From: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Subject: Re: [PATCH v2 1/4] siphash: add cryptographically secure hashtable
- function
-Date: Thu, 15 Dec 2016 09:31:25 +0100
-Message-ID: <f1ab5685-f8af-5f58-a217-fe53262ecf45@stressinduktion.org>
-References: <20161214035927.30004-1-Jason@zx2c4.com>
- <CAHmME9q9ffdtWRbzyMO1ktTdtEFdfumTfojTTNLXFhoa+R+MWQ@mail.gmail.com>
- <8ea3fdff-23c4-b81d-2588-44549bd2d8c1@stressinduktion.org>
- <CAHmME9r8-JMqkOdz4PLgF13qYGk8XAmEjGep40k3GVYfUS_sPw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: David Laight <David.Laight@aculab.com>,
-        Netdev <netdev@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Daniel J . Bernstein" <djb@cr.yp.to>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Eric Biggers <ebiggers3@gmail.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH 1/2] crypto: bfin_crc: Fix format printing warning
+Date: Thu, 15 Dec 2016 10:59:42 +0100
+Message-ID: <20161215095943.10015-1-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:33486 "EHLO
-        out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1755408AbcLOIba (ORCPT
+Received: from mail-wj0-f194.google.com ([209.85.210.194]:35206 "EHLO
+        mail-wj0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751610AbcLOKBx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Dec 2016 03:31:30 -0500
-In-Reply-To: <CAHmME9r8-JMqkOdz4PLgF13qYGk8XAmEjGep40k3GVYfUS_sPw@mail.gmail.com>
+        Thu, 15 Dec 2016 05:01:53 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 15.12.2016 00:29, Jason A. Donenfeld wrote:
-> Hi Hannes,
-> 
-> On Wed, Dec 14, 2016 at 11:03 PM, Hannes Frederic Sowa
-> <hannes@stressinduktion.org> wrote:
->> I fear that the alignment requirement will be a source of bugs on 32 bit
->> machines, where you cannot even simply take a well aligned struct on a
->> stack and put it into the normal siphash(aligned) function without
->> adding alignment annotations everywhere. Even blocks returned from
->> kmalloc on 32 bit are not aligned to 64 bit.
-> 
-> That's what the "__aligned(SIPHASH24_ALIGNMENT)" attribute is for. The
-> aligned siphash function will be for structs explicitly made for
-> siphash consumption. For everything else there's siphash_unaligned.
+bfin_crc.c print some u32 as unsigned long ans so gcc complains
+about it.
+This patch remove the long print qualifier.
 
-So in case you have a pointer from somewhere on 32 bit you can
-essentially only guarantee it has natural alignment or max. native
-alignment (based on the arch). gcc only fulfills your request for
-alignment when you allocate on the stack (minus gcc bugs).
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+---
+ drivers/crypto/bfin_crc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Let's say you get a pointer from somewhere, maybe embedded in a struct,
-which came from kmalloc. kmalloc doesn't care about aligned attribute,
-it will align according to architecture description. That said, if you
-want to hash that, you would need manually align the memory returned
-from kmalloc or make sure the the data is more than naturally aligned on
-that architecture.
-
->> Can we do this a runtime check and just have one function (siphash)
->> dealing with that?
-> 
-> Seems like the runtime branching on the aligned function would be bad
-> for performance, when we likely know at compile time if it's going to
-> be aligned or not. I suppose we could add that check just to the
-> unaligned version, and rename it to "maybe_unaligned"? Is this what
-> you have in mind?
-
-I argue that you mostly don't know at compile time if it is correctly
-aligned if the alignment requirements are larger than the natural ones.
-
-Also, we don't even have that for memcpy, even we use it probably much
-more than hashing, so I think this is overkill.
-
-Bye,
-Hannes
+diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
+index 10db7df..a118b9b 100644
+--- a/drivers/crypto/bfin_crc.c
++++ b/drivers/crypto/bfin_crc.c
+@@ -203,7 +203,7 @@ static void bfin_crypto_crc_config_dma(struct bfin_crypto_crc *crc)
+ 			crc->sg_cpu[i].x_count = 1;
+ 			crc->sg_cpu[i].x_modify = CHKSUM_DIGEST_SIZE;
+ 			dev_dbg(crc->dev, "%d: crc_dma: start_addr:0x%lx, "
+-				"cfg:0x%lx, x_count:0x%lx, x_modify:0x%lx\n",
++				"cfg:0x%x, x_count:0x%x, x_modify:0x%x\n",
+ 				i, crc->sg_cpu[i].start_addr,
+ 				crc->sg_cpu[i].cfg, crc->sg_cpu[i].x_count,
+ 				crc->sg_cpu[i].x_modify);
+@@ -233,7 +233,7 @@ static void bfin_crypto_crc_config_dma(struct bfin_crypto_crc *crc)
+ 		crc->sg_cpu[i].x_count = dma_count;
+ 		crc->sg_cpu[i].x_modify = dma_mod;
+ 		dev_dbg(crc->dev, "%d: crc_dma: start_addr:0x%lx, "
+-			"cfg:0x%lx, x_count:0x%lx, x_modify:0x%lx\n",
++			"cfg:0x%x, x_count:0x%x, x_modify:0x%x\n",
+ 			i, crc->sg_cpu[i].start_addr,
+ 			crc->sg_cpu[i].cfg, crc->sg_cpu[i].x_count,
+ 			crc->sg_cpu[i].x_modify);
+@@ -257,7 +257,7 @@ static void bfin_crypto_crc_config_dma(struct bfin_crypto_crc *crc)
+ 		crc->sg_cpu[i].x_count = 1;
+ 		crc->sg_cpu[i].x_modify = CHKSUM_DIGEST_SIZE;
+ 		dev_dbg(crc->dev, "%d: crc_dma: start_addr:0x%lx, "
+-			"cfg:0x%lx, x_count:0x%lx, x_modify:0x%lx\n",
++			"cfg:0x%x, x_count:0x%x, x_modify:0x%x\n",
+ 			i, crc->sg_cpu[i].start_addr,
+ 			crc->sg_cpu[i].cfg, crc->sg_cpu[i].x_count,
+ 			crc->sg_cpu[i].x_modify);
+-- 
+2.10.2
