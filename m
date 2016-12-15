@@ -1,52 +1,77 @@
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH v3 1/3] siphash: add cryptographically secure hashtable function
-Date: Wed, 14 Dec 2016 16:10:57 -0800
-Message-ID: <CA+55aFw4QLuwkxq4VzLMPTJTec-hOu1Fi8e076TNnW0Yq9yp8A@mail.gmail.com>
-References: <20161214035927.30004-1-Jason@zx2c4.com> <20161214184605.24006-1-Jason@zx2c4.com>
- <CALx6S35UgTyqkYUjS5gYFH4HnjW974WQ_JiDXxgb9rZ7gnY52Q@mail.gmail.com>
- <CAHmME9oMaQOhzJbNKh8GN759iJngeRdXt3naOnFhY9mD6t5Kxg@mail.gmail.com>
- <CAHmME9pR3tD2zknKsYaFaTJm_3aBBOA6c174hypm6S-q9wp5nw@mail.gmail.com>
- <CALx6S35VBjw42G6rHPrNfVaBfLMz3YZVjs3D3hBG=4gp5+g5tA@mail.gmail.com>
- <CAHmME9rpvf4tyDjZcJAJxMAW1LcqNm7DiquiYX0uQhRzDLbwqw@mail.gmail.com>
- <CA+55aFyBGQpEKiAcs0w58ZEie+L8OrWvf_2hvGx4E=L56p5hMg@mail.gmail.com> <CAHmME9pu6No0wqPzPpaBwQR_b+5CXvh0kke7J8ouN=rx4pxMGg@mail.gmail.com>
-Reply-To: kernel-hardening@lists.openwall.com
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Subject: RE: [Qemu-devel] [PATCH v7 1/1] crypto: add virtio-crypto driver
+Date: Thu, 15 Dec 2016 00:45:27 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA163033@DGGEMA505-MBX.china.huawei.com>
+References: <1481716249-185392-1-git-send-email-arei.gonglei@huawei.com>
+	<1481716249-185392-2-git-send-email-arei.gonglei@huawei.com>
+	<bcf62fa0-8fc9-daaf-ea7b-e09eb83b593a@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Tom Herbert <tom@herbertland.com>, Netdev <netdev@vger.kernel.org>,
-	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, LKML <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>, "Daniel J . Bernstein" <djb@cr.yp.to>,
-	Eric Biggers <ebiggers3@gmail.com>, David Laight <David.Laight@aculab.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <kernel-hardening-return-5564-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-Sender: linus971@gmail.com
-In-Reply-To: <CAHmME9pu6No0wqPzPpaBwQR_b+5CXvh0kke7J8ouN=rx4pxMGg@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "Xuquan \(Quan Xu\)" <xuquan8@huawei.com>,
+	"Huangweidong \(C\)" <weidong.huang@huawei.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"Hanweidong \(Randy\)" <hanweidong@huawei.com>,
+	Claudio Fontana <Claudio.Fontana@huawei.com>,
+	"mst@redhat.com" <mst@redhat.com>, Luonengjun <luonengjun@huawei.com>,
+	"Wanzongshun \(Vincent\)" <wanzongshun@huawei.com>,
+	"stefanha@redhat.com" <stefanha@redhat.com>, "Zhoujian \(jay,
+	Euler\)" <jianjay.zhou@huawei.com>, longpeng <longpeng2@huawei.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"Wubin \(H\)" <wu.wubin@huawei.com>,
+	"arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org"
+	<qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org"
+	<virtio-dev@lists.oasis-open.org>,
+	"virtualization@lists.linux-foundation.org"
+	<virtualization@lists.linux-foundation.org>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>
+Return-path: <virtualization-bounces@lists.linux-foundation.org>
+In-Reply-To: <bcf62fa0-8fc9-daaf-ea7b-e09eb83b593a@linux.vnet.ibm.com>
+Content-Language: zh-CN
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
+List-Post: <mailto:virtualization@lists.linux-foundation.org>
+List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
+Sender: virtualization-bounces@lists.linux-foundation.org
+Errors-To: virtualization-bounces@lists.linux-foundation.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Dec 14, 2016 at 3:34 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> Or does your reasonable dislike of "word" still allow for the use of
-> dword and qword, so that the current function names of:
 
-dword really is confusing to people.
+> 
+> 
+> On 12/14/2016 12:50 PM, Gonglei wrote:
+> > diff --git a/drivers/crypto/virtio/virtio_crypto_core.c
+> b/drivers/crypto/virtio/virtio_crypto_core.c
+> > new file mode 100644
+> > index 0000000..c0854a1
+> > --- /dev/null
+> > +++ b/drivers/crypto/virtio/virtio_crypto_core.c
+> > @@ -0,0 +1,474 @@
+> [..]
+> > +
+> > +static void virtcrypto_dataq_callback(struct virtqueue *vq)
+> > +{
+> > +	struct virtio_crypto *vcrypto = vq->vdev->priv;
+> > +	struct virtio_crypto_request *vc_req;
+> > +	unsigned long flags;
+> > +	unsigned int len;
+> > +	struct ablkcipher_request *ablk_req;
+> > +	int error;
+> > +
+> > +	spin_lock_irqsave(&vcrypto->lock, flags);
+> 
+> Would it make sense to use a per virtqueue lock
+> like in virtio_blk for example instead of locking on the whole
+> device? OK, it seems you use only one dataqueue, so it
+> may not be that relevant.
+> 
+Currently yes, both the backend device (cryptodev-backend-builtin)
+and the frontend driver use one dataqueue.
 
-If you have a MIPS background, it means 64 bits. While to people with
-Windows programming backgrounds it means 32 bits.
-
-Please try to avoid using it.
-
-As mentioned, I think almost everybody agrees on the "q" part being 64
-bits, but that may just be me not having seen it in any other context.
-
-And before anybody points it out - yes, we already have lots of uses
-of "dword" in various places. But they tend to be mostly
-hardware-specific - either architectures or drivers.
-
-So I'd _prefer_ to try to keep "word" and "dword" away from generic
-helper routines. But it's not like anything is really black and white.
-
-           Linus
+Regards,
+-Gonglei
