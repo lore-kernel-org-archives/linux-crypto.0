@@ -1,41 +1,55 @@
-From: =?utf-8?B?0YHQuNGB0YLQtdC80Ysg0LDQtNC80LjQvdC40YHRgtGA0LDRgtC+0YA=?=
-        <roberto.bovo@sanita.padova.it>
-Subject: (unknown)
-Date: Fri, 16 Dec 2016 11:46:37 +0100 (CET)
-Message-ID: <1498680887.6028054.1481885197571.JavaMail.zimbra@sanita.padova.it>
-Reply-To: Sistemass_Adminss@mail2world.com
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: AF_ALG - fix memory management of aio with
+ multiple iocbs
+Date: Fri, 16 Dec 2016 19:54:36 +0800
+Message-ID: <20161216115436.GA19917@gondor.apana.org.au>
+References: <4632372.rm33NXUfDp@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: base64
-To: undisclosed-recipients:;
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.sanita.padova.it ([217.148.121.43]:51757 "EHLO
-        smtp.sanita.padova.it" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756851AbcLPLSO (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:40439 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1755003AbcLPLyv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Dec 2016 06:18:14 -0500
-Subject: 
+        Fri, 16 Dec 2016 06:54:51 -0500
+Content-Disposition: inline
+In-Reply-To: <4632372.rm33NXUfDp@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-0LLQvdC40LzQsNC90LjRjzsKCtCw0YjQuCDRgdC+0L7QsdGJ0LXQvdC40Y8g0L/RgNC10LLRi9GB
-0LjQuyDQu9C40LzQuNGCINC/0LDQvNGP0YLQuCwg0LrQvtGC0L7RgNGL0Lkg0YHQvtGB0YLQsNCy
-0LvRj9C10YIgNSDQk9CxLCDQvtC/0YDQtdC00LXQu9C10L3QvdGL0YUg0LDQtNC80LjQvdC40YHR
-gtGA0LDRgtC+0YDQvtC8LCDQutC+0YLQvtGA0YvQuSDQsiDQvdCw0YHRgtC+0Y/RidC10LUg0LLR
-gNC10LzRjyDRgNCw0LHQvtGC0LDQtdGCINC90LAgMTAuOUdCLCDQktGLINC90LUg0YHQvNC+0LbQ
-tdGC0LUg0L7RgtC/0YDQsNCy0LjRgtGMINC40LvQuCDQv9C+0LvRg9GH0LjRgtGMINC90L7QstGD
-0Y4g0L/QvtGH0YLRgywg0L/QvtC60LAg0LLRiyDQv9C+0LLRgtC+0YDQvdC+INC90LUg0L/RgNC+
-0LLQtdGA0LjRgtGMINCy0LDRiCDQv9C+0YfRgtC+0LLRi9C5INGP0YnQuNC6INC/0L7Rh9GC0Ysu
-INCn0YLQvtCx0Ysg0LLQvtGB0YHRgtCw0L3QvtCy0LjRgtGMINGA0LDQsdC+0YLQvtGB0L/QvtGB
-0L7QsdC90L7RgdGC0Ywg0JLQsNGI0LXQs9C+INC/0L7Rh9GC0L7QstC+0LPQviDRj9GJ0LjQutCw
-LCDQvtGC0L/RgNCw0LLRjNGC0LUg0YHQu9C10LTRg9GO0YnRg9GOINC40L3RhNC+0YDQvNCw0YbQ
-uNGOINC90LjQttC1OgoK0LjQvNGPOgrQmNC80Y8g0L/QvtC70YzQt9C+0LLQsNGC0LXQu9GPOgrQ
-v9Cw0YDQvtC70Yw6CtCf0L7QtNGC0LLQtdGA0LbQtNC10L3QuNC1INC/0LDRgNC+0LvRjzoK0JDQ
-tNGA0LXRgSDRjdC70LXQutGC0YDQvtC90L3QvtC5INC/0L7Rh9GC0Ys6CtGC0LXQu9C10YTQvtC9
-OgoK0JXRgdC70Lgg0LLRiyDQvdC1INCyINGB0L7RgdGC0L7Rj9C90LjQuCDQv9C10YDQtdC/0YDQ
-vtCy0LXRgNC40YLRjCDRgdC+0L7QsdGJ0LXQvdC40Y8sINCy0LDRiCDQv9C+0YfRgtC+0LLRi9C5
-INGP0YnQuNC6INCx0YPQtNC10YIg0L7RgtC60LvRjtGH0LXQvSEKCtCf0YDQuNC90L7RgdC40Lwg
-0LjQt9Cy0LjQvdC10L3QuNGPINC30LAg0L3QtdGD0LTQvtCx0YHRgtCy0LAuCtCf0YDQvtCy0LXR
-gNC+0YfQvdGL0Lkg0LrQvtC0OiBFTjogUnUuLi43NzY3NzQ5OTAuLjIwMTYK0J/QvtGH0YLRiyDR
-gtC10YXQvdC40YfQtdGB0LrQvtC5INC/0L7QtNC00LXRgNC20LrQuCDCqTIwMTYKCtGB0L/QsNGB
-0LjQsdC+CtGB0LjRgdGC0LXQvNGLINCw0LTQvNC40L3QuNGB0YLRgNCw0YLQvtGACg==
+On Tue, Dec 13, 2016 at 09:42:45PM +0100, Stephan Müller wrote:
+>
+> +		/*
+> +		 * The async operation may have processed only a subset of
+> +		 * the data that was initially received from the caller.
+> +		 * Thus, we only can release the data that a cipher operation
+> +		 * processed.
+> +		 */
+> +		if (len < sg->length) {
+> +			/* ensure that empty SGLs are not referenced any more */
+> +			sreq->tsg = sg;
+
+Hmm if you change sreq->tsg how is the original tsg ever going to
+get freed?
+
+> +
+> +			/* advance the buffers to the unprocessed data */
+> +			sg->length -= len;
+> +			sg->offset += len;
+> +			return;
+> +		}
+> +
+> +		len -= sg->length;
+> +		put_page(page);
+> +	}
+>  
+>  	kfree(sreq->tsg);
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
