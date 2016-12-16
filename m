@@ -1,68 +1,94 @@
 From: "George Spelvin" <linux@sciencehorizons.net>
-Subject: Re: [kernel-hardening] Re: [PATCH v5 1/4] siphash: add cryptographically secure PRF
-Date: 16 Dec 2016 17:41:33 -0500
-Message-ID: <20161216224133.27460.qmail@ns.sciencehorizons.net>
-References: <CAHmME9qPx3WUHF3__3wNOXr-AUti4WPO1qDiFus3Zr133FyV1g@mail.gmail.com>
+Subject: Re: [PATCH v5 1/4] siphash: add cryptographically secure PRF
+Date: 16 Dec 2016 18:44:08 -0500
+Message-ID: <20161216234408.30174.qmail@ns.sciencehorizons.net>
+References: <CAHmME9oEhmqW3320Ch+Rczu_=CxQyUQXCGLnYjDm-CYbWugnSw@mail.gmail.com>
 Cc: ak@linux.intel.com, davem@davemloft.net, David.Laight@aculab.com,
         djb@cr.yp.to, ebiggers3@gmail.com, hannes@stressinduktion.org,
-        jeanphilippe.aumasson@gmail.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux@sciencehorizons.net,
-        luto@amacapital.net, netdev@vger.kernel.org, tom@herbertland.com,
+        jeanphilippe.aumasson@gmail.com,
+        kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luto@amacapital.net,
+        netdev@vger.kernel.org, tom@herbertland.com,
         torvalds@linux-foundation.org, tytso@mit.edu,
         vegard.nossum@gmail.com
-To: Jason@zx2c4.com, kernel-hardening@lists.openwall.com
+To: Jason@zx2c4.com, linux@sciencehorizons.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.sciencehorizons.net ([71.41.210.147]:16075 "HELO
+Received: from ns.sciencehorizons.net ([71.41.210.147]:12818 "HELO
         ns.sciencehorizons.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1755836AbcLPWle (ORCPT
+        with SMTP id S1755396AbcLPXoJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Dec 2016 17:41:34 -0500
-In-Reply-To: <CAHmME9qPx3WUHF3__3wNOXr-AUti4WPO1qDiFus3Zr133FyV1g@mail.gmail.com>
+        Fri, 16 Dec 2016 18:44:09 -0500
+In-Reply-To: <CAHmME9oEhmqW3320Ch+Rczu_=CxQyUQXCGLnYjDm-CYbWugnSw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-An idea I had which mght be useful:
+> 64-bit security for an RNG is not reasonable even with rekeying. No no
+> no. Considering we already have a massive speed-up here with the
+> secure version, there's zero reason to start weakening the security
+> because we're trigger happy with our benchmarks. No no no.
 
-You could perhaps save two rounds in siphash_*u64.
+Just to clarify, I was discussing the idea with Ted (who's in charge of
+the whole thing, not me), not trying to make any sort of final decision
+on the subject.  I need to look at the various users (46 non-trivial ones
+for get_random_int, 15 for get_random_long) and see what their security
+requirements actually are.
 
-The final word with the length (called "b" in your implementation)
-only needs to be there if the input is variable-sized.
+I'm also trying to see if HalfSipHash can be used in a way that gives
+slightly more than 64 bits of effective security.
 
-If every use of a given key is of a fixed-size input, you don't need
-a length suffix.  When the input is an even number of words, that can
-save you two rounds.
+The problem is that the old MD5-based transform had unclear, but
+obviously ample, security.  There were 64 bytes of global secret and
+16 chaining bytes per CPU.  Adapting SipHash (even the full version)
+takes more thinking.
 
-This requires an audit of callers (e.g. you have to use different
-keys for IPv4 and IPv6 ISNs), but can save time.
+An actual HalfSipHash-based equivalent to the existing code would be:
 
-(This is crypto 101; search "MD-strengthening" or see the remark on
-p. 101 on Damgaard's 1989 paper "A design principle for hash functions" at
-http://saluc.engr.uconn.edu/refs/algorithms/hashalg/damgard89adesign.pdf
-but I'm sure that Ted, Jean-Philippe, and/or DJB will confirm if you'd
-like.)
+#define RANDOM_INT_WORDS (64 / sizeof(long))	/* 16 or 8 */
 
-Jason A. Donenfeld wrote:
-> Oh, okay, that is exactly what I thought was going on. I just thought
-> you were implying that jiffies could be moved inside the hash, which
-> then confused my understanding of how things should be. In any case,
-> thanks for the explanation.
+static u32 random_int_secret[RANDOM_INT_WORDS]
+	____cacheline_aligned __read_mostly;
+static DEFINE_PER_CPU(unsigned long[4], get_random_int_hash)
+		__aligned(sizeof(unsigned long));
 
-No, the rekeying procedure is cleverer.
+unsigned long get_random_long(void)
+{
+	unsigned long *hash = get_cpu_var(get_random_int_hash);
+	unsigned long v0 = hash[0], v1 = hash[1], v2 = hash[2], v3 = hash[3];
+	int i;
 
-The thing is, all that matters is that the ISN increments fast enough,
-but not wrap too soon.
+	/* This could be improved, but it's equivalent */
+	v0 += current->pid + jiffies + random_get_entropy();
 
-It *is* permitted to change the random base, as long as it only
-increases, and slower than the timestamp does.
+	for (i = 0; i < RANDOM_INT_WORDS; i++) {
+		v3 ^= random_int_secret[i];
+		HSIPROUND;
+		HSIPROUND;
+		v0 ^= random_int_secret[i];
+	}
+	/* To be equivalent, we *don't* finalize the transform */
 
-So what you do is every few minutes, you increment the high 4 bits of the
-random base and change the key used to generate the low 28 bits.
+	hash[0] = v0; hash[1] = v1; hash[2] = v2; hash[3] = v3;
+	put_cpu_var(get_random_int_hash);
 
-The base used for any particular host might change from 0x10000000
-to 0x2fffffff, or from 0x1fffffff to 0x20000000, but either way, it's
-increasing, and not too fast.
+	return v0 ^ v1 ^ v2 ^ v3;
+}
 
-This has the downside that an attacker can see 4 bits of the base,
-so only needs to send send 2^28 = 256 MB to flood the connection,
-but the upside that the key used to generate the low bits changes
-faster than it can be broken.
+I don't think there's a 2^64 attack on that.
+
+But 64 bytes of global secret is ridiculous if the hash function
+doesn't require that minimum block size.  It'll take some thinking.
+
+
+Ths advice I'd give now is:
+- Implement
+unsigned long hsiphash(const void *data, size_t len, const unsigned long key[2])
+  .. as SipHash on 64-bit (maybe SipHash-1-3, still being discussed) and
+  HalfSipHash on 32-bit.
+- Document when it may or may not be used carefully.
+- #define get_random_int (unsigned)get_random_long
+- Ted, Andy Lutorminski and I will try to figure out a construction of
+  get_random_long() that we all like.
+
+
+('scuse me for a few hours, I have some unrelated things I really *should*
+be working on...)
