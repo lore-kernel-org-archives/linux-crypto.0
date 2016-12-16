@@ -1,59 +1,97 @@
-From: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Subject: Re: [PATCH v2 1/4] siphash: add cryptographically secure hashtable
- function
-Date: Fri, 16 Dec 2016 01:03:12 +0100
-Message-ID: <0397a465-62f9-c956-82e2-a874fd56ffe8@stressinduktion.org>
-References: <CAHmME9p9cf1W3vhbu=YTRY1Xt=fmE1sVqY1XPt5iQwxfCfQUOA@mail.gmail.com>
- <e574d97f-e0b4-f5e2-6d60-88d3ce185249@stressinduktion.org>
- <CAHmME9rF0pKxfc3p9ThD3LZU2+ZNPeR-4=9MVEE3AJQKBMNA+w@mail.gmail.com>
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Subject: RE: [virtio-dev] Re: [Qemu-devel] [PATCH v7 1/1] crypto: add
+ virtio-crypto driver
+Date: Fri, 16 Dec 2016 00:40:14 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA166351@DGGEMA505-MBX.china.huawei.com>
+References: <1481716249-185392-1-git-send-email-arei.gonglei@huawei.com>
+ <1481716249-185392-2-git-send-email-arei.gonglei@huawei.com>
+ <bcf62fa0-8fc9-daaf-ea7b-e09eb83b593a@linux.vnet.ibm.com>
+ <33183CC9F5247A488A2544077AF19020DA163033@DGGEMA505-MBX.china.huawei.com>
+ <82063967A54EF84C8AFCD6BD7F6AD93310C14374@SHSMSX103.ccr.corp.intel.com>
+ <33183CC9F5247A488A2544077AF19020DA16320F@DGGEMA505-MBX.china.huawei.com>
+ <20161215184153-mutt-send-email-mst@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: David Laight <David.Laight@aculab.com>,
-        Netdev <netdev@vger.kernel.org>,
-        "kernel-hardening@lists.openwall.com"
-        <kernel-hardening@lists.openwall.com>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Daniel J . Bernstein" <djb@cr.yp.to>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Eric Biggers <ebiggers3@gmail.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9rF0pKxfc3p9ThD3LZU2+ZNPeR-4=9MVEE3AJQKBMNA+w@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "Zeng, Xin" <xin.zeng@intel.com>,
+        Halil Pasic <pasic@linux.vnet.ibm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
+        "virtualization@lists.linux-foundation.org"
+        <virtualization@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        Claudio Fontana <Claudio.Fontana@huawei.com>,
+        Luonengjun <luonengjun@huawei.com>,
+        "Hanweidong (Randy)" <hanweidong@huawei.com>,
+        "Xuquan (Quan Xu)" <xuquan8@huawei.com>,
+        "Wanzongshun (Vincent)" <wanzongshun@huawei.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>,
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from dggrg03-dlp ([45.249.212.189]:2438 "EHLO dggrg03-dlp.huawei.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752342AbcLPAlY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Dec 2016 19:41:24 -0500
+In-Reply-To: <20161215184153-mutt-send-email-mst@kernel.org>
+Content-Language: zh-CN
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 16.12.2016 00:43, Jason A. Donenfeld wrote:
-> Hi Hannes,
-> 
-> Good news.
-> 
-> On Thu, Dec 15, 2016 at 10:45 PM, Hannes Frederic Sowa
-> <hannes@stressinduktion.org> wrote:
->>> How's that sound?
->>
->> I am still very much concerned about the API.
-> 
-> Thanks for pushing me and putting up with my daftness... the constant
-> folding works absolutely perfectly. I've run several tests. When gcc
-> knows that a struct is aligned (say, via __aligned(8)), then it erases
-> the branch and makes a direct jump to the aligned code. When it's
-> uncertain, it evaluates at runtime. So, now there is a single
-> siphash() function that chooses the best one automatically. Behind the
-> scene there's siphash_aligned and siphash_unaligned, but nobody needs
-> to call these directly. (Should I rename these to have a double
-> underscore prefix?) On platforms that have
-> CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS, of course all of this
-> disappears and everything goes directly to the aligned version.
-> 
-> So, I think this assuages your concerns entirely. A single API entry
-> point that does the right thing.
-> 
-> Whew! Good thinking, and thanks again for the suggestion.
+Hi Michael,
 
-Awesome, thanks for trying this out. This basically resolves my concern
-API-wise so far.
+>
+> >
+> >
+> > > Subject: RE: [Qemu-devel] [PATCH v7 1/1] crypto: add virtio-crypto driver
+> > >
+> > > On Thursday, December 15, 2016 8:45 AM, Gonglei (Arei) Wrote:
+> > > < > > diff --git a/drivers/crypto/virtio/virtio_crypto_core.c
+> > > < > b/drivers/crypto/virtio/virtio_crypto_core.c
+> > > < > > new file mode 100644
+> > > < > > index 0000000..c0854a1
+> > > < > > --- /dev/null
+> > > < > > +++ b/drivers/crypto/virtio/virtio_crypto_core.c
+> > > < > > @@ -0,0 +1,474 @@
+> > > < > [..]
+> > > < > > +
+> > > < > > +static void virtcrypto_dataq_callback(struct virtqueue *vq)
+> > > < > > +{
+> > > < > > +	struct virtio_crypto *vcrypto = vq->vdev->priv;
+> > > < > > +	struct virtio_crypto_request *vc_req;
+> > > < > > +	unsigned long flags;
+> > > < > > +	unsigned int len;
+> > > < > > +	struct ablkcipher_request *ablk_req;
+> > > < > > +	int error;
+> > > < > > +
+> > > < > > +	spin_lock_irqsave(&vcrypto->lock, flags);
+> > > < >
+> > > < > Would it make sense to use a per virtqueue lock
+> > > < > like in virtio_blk for example instead of locking on the whole
+> > > < > device? OK, it seems you use only one dataqueue, so it
+> > > < > may not be that relevant.
+> > > < >
+> > > < Currently yes, both the backend device (cryptodev-backend-builtin)
+> > > < and the frontend driver use one dataqueue.
+> > > <
+> > >
+> > > I think it makes sense to use per virtqueue lock here though it only uses one
+> > > queue so far,
+> > > but in the spec we already have multi queues support.
+> > >
+> > Yes, I agree. Will do that in V8 soon.
+> > Hope to catch up with Michael's pull request for 4.10.
+> >
+> > Regards,
+> > -Gonglei
+> 
+> I merged v7, this change will have to wait. Sorry.
+> 
+That's OK. Thanks!
 
-Hannes out. ;)
+I can post a separate patch after this pull request. 
+
+Regards,
+-Gonglei
