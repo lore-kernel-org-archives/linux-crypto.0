@@ -1,111 +1,50 @@
-From: "George Spelvin" <linux@sciencehorizons.net>
-Subject: Re: [PATCH v5 1/4] siphash: add cryptographically secure PRF
-Date: 15 Dec 2016 22:46:18 -0500
-Message-ID: <20161216034618.28276.qmail@ns.sciencehorizons.net>
-References: <CAGiyFdfmiCMyHvAg=5sGh8KjBBrF0Wb4Qf=JLzJqUAx4yFSS3Q@mail.gmail.com>
-Cc: djb@cr.yp.to
-To: ak@linux.intel.com, davem@davemloft.net, David.Laight@aculab.com,
-        ebiggers3@gmail.com, hannes@stressinduktion.org, Jason@zx2c4.com,
-        jeanphilippe.aumasson@gmail.com,
-        kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux@sciencehorizons.net,
-        luto@amacapital.net, netdev@vger.kernel.org, tom@herbertland.com,
-        torvalds@linux-foundation.org, tytso@mit.edu,
-        vegard.nossum@gmail.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.sciencehorizons.net ([71.41.210.147]:28632 "HELO
-        ns.sciencehorizons.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1756779AbcLPDqT (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Dec 2016 22:46:19 -0500
-In-Reply-To: <CAGiyFdfmiCMyHvAg=5sGh8KjBBrF0Wb4Qf=JLzJqUAx4yFSS3Q@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Binoy Jayan <binoy.jayan@linaro.org>
+Subject: Re: [RFC PATCH v2] crypto: Add IV generation algorithms
+Date: Fri, 16 Dec 2016 11:25:16 +0530
+Message-ID: <CAHv-k_997mzCDih46psH_m4URLFYJzE0mtk8ciLSAHFeZyVtZg@mail.gmail.com>
+References: <1481618949-20086-1-git-send-email-binoy.jayan@linaro.org>
+ <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org> <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>
+To: Milan Broz <gmazyland@gmail.com>
+Return-path: <linux-raid-owner@vger.kernel.org>
+In-Reply-To: <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com>
+Sender: linux-raid-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Jean-Philippe Aumasson wrote:
-> If a halved version of SipHash can bring significant performance boost
-> (with 32b words instead of 64b words) with an acceptable security level
-> (64-bit enough?) then we may design such a version.
+Hi Milan,
 
-It would be fairly significant, a 2x speed benefit on a lot of 32-bit
-machines.
+On 13 December 2016 at 15:31, Milan Broz <gmazyland@gmail.com> wrote:
 
-First is the fact that a 64-bit SipHash round on a generic 32-bit machine
-requires not twice as many instructions, but more than three.
+> I think that IV generators should not modify or read encrypted data directly,
+> it should only generate IV.
 
-Consider the core SipHash quarter-round operation:
-	a += b;
-	b = rotate_left(b, k)
-	b ^= a
+I was trying to find more information about what you said and how a
+iv generator should be written. I saw two examples of IV generators
+too used with AEAD ciphers (crypto/seqiv.c and crypto/echainiv.c)
 
-The add and xor are equivalent between 32- and 64-bit rounds; twice the
-instructions do twice the work.  (There's a dependency via the carry
-bit between the two halves of the add, but it ends up not being on the
-critical path even in a superscalar implementation.)
+Excerpt from crypto api doc:
+http://www.chronox.de/crypto-API/crypto/architecture.html#crypto-api-cipher-references-and-priority
 
-The problem is the rotates.  Although some particularly nice code is
-possible on 32-bit ARM due to its support for shift-and-xor operations,
-on a generic 32-bit CPU the rotate grows to 6 instructions with a 2-cycle
-dependency chain (more in practice because barrel shifters are large and
-even quad-issue CPUs can't do 4 shifts per cycle):
+2. Now, SEQIV uses the AEAD API function calls to invoke the associated
+AEAD cipher. In our case, during the instantiation of SEQIV, the cipher
+handle for GCM is provided to SEQIV. This means that SEQIV invokes
+AEAD cipher operations with the GCM cipher handle.
 
-	temp_lo = b_lo >> (32-k)
-	temp_hi = b_hi >> (32-k)
-	b_lo <<= k
-	b_hi <<= k
-	b_lo ^= temp_hi
-	b_hi ^= temp_lo
+Here, it says seqiv invokes cipher operations. However the code crypto/seqiv.c
+does not look similar to how the modes are implemented which is confusing. I
+was looking for an example of an IV generator used with a regular block cipher
+and not a AEAD cipher. Could you point me out to some?
 
-The resultant instruction counts and (assuming wide issue)
-latencies are:
-
-	64-bit SipHash	"Half" SipHash
-	Inst.	Latency	Inst.	Latency
-	 10	 3	  3	 2	Quarter round
-	 40	 6	 12	 4	Full round
-	 80	12	 24	 8	Two rounds
-	 82	13	 26	 9	Mix in one word
-	 82	13	 52	18	Mix in 64 bits
-	166	26	 61	18	Four round finalization + final XOR
-	248	39	113	36	Hash 64 bits
-	330	52	165	54	Hash 128 bits
-	412	65	217	72	Hash 192 bits
-
-While the ideal latencies are actually better for the 64-bit algorithm,
-that requires an unrealistic 6+-wide superscalar implementation that's
-more than twice as wide as the 64-bit code requires (which is already
-optimized for quad-issue).  For a 1- or 2-wide processor, the instruction
-counts dominate, and not only does the 64-bit algorithm take 60% more
-time to mix in the same number of bytes, but the finalization rounds
-bring the ratio to 2:1 for small inputs.
-
-(And I haven't included the possible savings if the input size is an odd
-number of 32-bit words, such as networking applications which include
-the source/dest port numbers.)
-
-
-Notes on particular processors:
-- x86 can do a 64-bit rotate in 3 instructions and 2 cycles using
-  the SHLD/SHRD instructions instead:
-	movl	%b_hi, %temp
-	shldl	$k, %b_lo, %b_hi
-	shldl	$k, %temp, %b_lo
-  ... but as I mentioned the problem is registers.  SipHash needs 8 32-bit
-  words plus at least one temporary, and 32-bit x86 has only 7 available.
-  (And compilers can rarely manage to keep more than 6 of them busy.)
-- 64-bit SipHash is particularly efficient on 32-bit ARM due to its
-  support for shift-and-op instructions.  The 64-bit shift and following
-  xor can be done in 4 instructions.  So the only benefit is from the
-  reduced finalization.
-- Double-width adds cost a little more on CPUs like MIPS and RISC-V without
-  condition codes.
-- Certain particularly crappy uClinux processors with slow shifts
-  (68000, anyone?) really suffer from extra shifts.
-
-One *weakly* requested feature: It might simplify some programming
-interfaces if we could use the same key for multiple hash tables with a
-1-word "tweak" (e.g. pointer to the hash table, so it could be assumed
-non-zero if that helped) to make distinct functions.  That would let us
-more safely use a global key for multiple small hash tables without the
-need to add code to generate and store key material for each place that
-an unkeyed hash is replaced.
+Thanks,
+Binoy
