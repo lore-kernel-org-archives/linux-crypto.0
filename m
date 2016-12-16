@@ -1,55 +1,41 @@
-From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [PATCH v5 2/4] siphash: add Nu{32,64} helpers
-Date: Fri, 16 Dec 2016 10:39:35 +0000
-Message-ID: <063D6719AE5E284EB5DD2968C1650D6DB0240EFA@AcuExch.aculab.com>
-References: <20161215203003.31989-1-Jason@zx2c4.com>
- <20161215203003.31989-3-Jason@zx2c4.com>
-Reply-To: kernel-hardening@lists.openwall.com
+From: =?utf-8?B?0YHQuNGB0YLQtdC80Ysg0LDQtNC80LjQvdC40YHRgtGA0LDRgtC+0YA=?=
+        <roberto.bovo@sanita.padova.it>
+Subject: (unknown)
+Date: Fri, 16 Dec 2016 11:46:37 +0100 (CET)
+Message-ID: <1498680887.6028054.1481885197571.JavaMail.zimbra@sanita.padova.it>
+Reply-To: Sistemass_Adminss@mail2world.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
-To: "'Jason A. Donenfeld'" <Jason@zx2c4.com>, Netdev <netdev@vger.kernel.org>,
-	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>,
-	LKML <linux-kernel@vger.kernel.org>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, Ted Tso <tytso@mit.edu>, Hannes Frederic Sowa
-	<hannes@stressinduktion.org>, Linus Torvalds <torvalds@linux-foundation.org>,
-	Eric Biggers <ebiggers3@gmail.com>, Tom Herbert <tom@herbertland.com>,
-	"George Spelvin" <linux@sciencehorizons.net>, Vegard Nossum
-	<vegard.nossum@gmail.com>, "ak@linux.intel.com" <ak@linux.intel.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "luto@amacapital.net"
-	<luto@amacapital.net>
-Return-path: <kernel-hardening-return-5630-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <20161215203003.31989-3-Jason@zx2c4.com>
-Content-Language: en-US
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
+To: undisclosed-recipients:;
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp.sanita.padova.it ([217.148.121.43]:51757 "EHLO
+        smtp.sanita.padova.it" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756851AbcLPLSO (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Dec 2016 06:18:14 -0500
+Subject: 
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Jason A. Donenfeld
-> Sent: 15 December 2016 20:30
-> These restore parity with the jhash interface by providing high
-> performance helpers for common input sizes.
-...
-> +#define PREAMBLE(len) \
-> +	u64 v0 =3D 0x736f6d6570736575ULL; \
-> +	u64 v1 =3D 0x646f72616e646f6dULL; \
-> +	u64 v2 =3D 0x6c7967656e657261ULL; \
-> +	u64 v3 =3D 0x7465646279746573ULL; \
-> +	u64 b =3D ((u64)len) << 56; \
-> +	v3 ^=3D key[1]; \
-> +	v2 ^=3D key[0]; \
-> +	v1 ^=3D key[1]; \
-> +	v0 ^=3D key[0];
-
-Isn't that equivalent to:
-	v0 =3D key[0];
-	v1 =3D key[1];
-	v2 =3D key[0] ^ (0x736f6d6570736575ULL ^ 0x646f72616e646f6dULL);
-	v3 =3D key[1] ^ (0x646f72616e646f6dULL ^ 0x7465646279746573ULL);
-
-Those constants also look like ASCII strings.
-What cryptographic analysis has been done on the values?
-
-	David
+0LLQvdC40LzQsNC90LjRjzsKCtCw0YjQuCDRgdC+0L7QsdGJ0LXQvdC40Y8g0L/RgNC10LLRi9GB
+0LjQuyDQu9C40LzQuNGCINC/0LDQvNGP0YLQuCwg0LrQvtGC0L7RgNGL0Lkg0YHQvtGB0YLQsNCy
+0LvRj9C10YIgNSDQk9CxLCDQvtC/0YDQtdC00LXQu9C10L3QvdGL0YUg0LDQtNC80LjQvdC40YHR
+gtGA0LDRgtC+0YDQvtC8LCDQutC+0YLQvtGA0YvQuSDQsiDQvdCw0YHRgtC+0Y/RidC10LUg0LLR
+gNC10LzRjyDRgNCw0LHQvtGC0LDQtdGCINC90LAgMTAuOUdCLCDQktGLINC90LUg0YHQvNC+0LbQ
+tdGC0LUg0L7RgtC/0YDQsNCy0LjRgtGMINC40LvQuCDQv9C+0LvRg9GH0LjRgtGMINC90L7QstGD
+0Y4g0L/QvtGH0YLRgywg0L/QvtC60LAg0LLRiyDQv9C+0LLRgtC+0YDQvdC+INC90LUg0L/RgNC+
+0LLQtdGA0LjRgtGMINCy0LDRiCDQv9C+0YfRgtC+0LLRi9C5INGP0YnQuNC6INC/0L7Rh9GC0Ysu
+INCn0YLQvtCx0Ysg0LLQvtGB0YHRgtCw0L3QvtCy0LjRgtGMINGA0LDQsdC+0YLQvtGB0L/QvtGB
+0L7QsdC90L7RgdGC0Ywg0JLQsNGI0LXQs9C+INC/0L7Rh9GC0L7QstC+0LPQviDRj9GJ0LjQutCw
+LCDQvtGC0L/RgNCw0LLRjNGC0LUg0YHQu9C10LTRg9GO0YnRg9GOINC40L3RhNC+0YDQvNCw0YbQ
+uNGOINC90LjQttC1OgoK0LjQvNGPOgrQmNC80Y8g0L/QvtC70YzQt9C+0LLQsNGC0LXQu9GPOgrQ
+v9Cw0YDQvtC70Yw6CtCf0L7QtNGC0LLQtdGA0LbQtNC10L3QuNC1INC/0LDRgNC+0LvRjzoK0JDQ
+tNGA0LXRgSDRjdC70LXQutGC0YDQvtC90L3QvtC5INC/0L7Rh9GC0Ys6CtGC0LXQu9C10YTQvtC9
+OgoK0JXRgdC70Lgg0LLRiyDQvdC1INCyINGB0L7RgdGC0L7Rj9C90LjQuCDQv9C10YDQtdC/0YDQ
+vtCy0LXRgNC40YLRjCDRgdC+0L7QsdGJ0LXQvdC40Y8sINCy0LDRiCDQv9C+0YfRgtC+0LLRi9C5
+INGP0YnQuNC6INCx0YPQtNC10YIg0L7RgtC60LvRjtGH0LXQvSEKCtCf0YDQuNC90L7RgdC40Lwg
+0LjQt9Cy0LjQvdC10L3QuNGPINC30LAg0L3QtdGD0LTQvtCx0YHRgtCy0LAuCtCf0YDQvtCy0LXR
+gNC+0YfQvdGL0Lkg0LrQvtC0OiBFTjogUnUuLi43NzY3NzQ5OTAuLjIwMTYK0J/QvtGH0YLRiyDR
+gtC10YXQvdC40YfQtdGB0LrQvtC5INC/0L7QtNC00LXRgNC20LrQuCDCqTIwMTYKCtGB0L/QsNGB
+0LjQsdC+CtGB0LjRgdGC0LXQvNGLINCw0LTQvNC40L3QuNGB0YLRgNCw0YLQvtGACg==
