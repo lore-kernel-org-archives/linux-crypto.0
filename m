@@ -1,162 +1,141 @@
-From: "George Spelvin" <linux@sciencehorizons.net>
+From: Jeffrey Walton <noloader@gmail.com>
 Subject: Re: [PATCH v5 1/4] siphash: add cryptographically secure PRF
-Date: 17 Dec 2016 07:42:43 -0500
-Message-ID: <20161217124243.16746.qmail@ns.sciencehorizons.net>
-References: <CAHmME9rxCYfwyF6EADWqpAEt+yqCPgCLUVH0FPdAy7r-oPnrRg@mail.gmail.com>
-Cc: ak@linux.intel.com, davem@davemloft.net, David.Laight@aculab.com,
-        djb@cr.yp.to, ebiggers3@gmail.com, hannes@stressinduktion.org,
-        jeanphilippe.aumasson@gmail.com,
-        kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux@sciencehorizons.net,
-        luto@amacapital.net, netdev@vger.kernel.org, tom@herbertland.com,
-        torvalds@linux-foundation.org, tytso@mit.edu,
-        vegard.nossum@gmail.com
-To: Jason@zx2c4.com
+Date: Sat, 17 Dec 2016 09:55:31 -0500
+Message-ID: <CAH8yC8nE5CLfbv8gCRCeiNW3JLCAB3062-6pNO8mEXJYcsFUsw@mail.gmail.com>
+References: <20161215203003.31989-1-Jason@zx2c4.com> <20161215203003.31989-2-Jason@zx2c4.com>
+Reply-To: noloader@gmail.com
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Netdev <netdev@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        David Laight <David.Laight@aculab.com>,
+        Ted Tso <tytso@mit.edu>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Tom Herbert <tom@herbertland.com>,
+        George Spelvin <linux@sciencehorizons.net>,
+        Vegard Nossum <vegard.nossum@gmail.com>, ak@linux.intel.com,
+        davem@davemloft.net, luto@amacapital.net,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        "Daniel J . Bernstein" <djb@cr.yp.to>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9rxCYfwyF6EADWqpAEt+yqCPgCLUVH0FPdAy7r-oPnrRg@mail.gmail.com>
+In-Reply-To: <20161215203003.31989-2-Jason@zx2c4.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-BTW, here's some SipHash code I wrote for Linux a while ago.
+> diff --git a/lib/test_siphash.c b/lib/test_siphash.c
+> new file mode 100644
+> index 000000000000..93549e4e22c5
+> --- /dev/null
+> +++ b/lib/test_siphash.c
+> @@ -0,0 +1,83 @@
+> +/* Test cases for siphash.c
+> + *
+> + * Copyright (C) 2016 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+> + *
+> + * This file is provided under a dual BSD/GPLv2 license.
+> + *
+> + * SipHash: a fast short-input PRF
+> + * https://131002.net/siphash/
+> + *
+> + * This implementation is specifically for SipHash2-4.
+> + */
+> +
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+> +#include <linux/siphash.h>
+> +#include <linux/kernel.h>
+> +#include <linux/string.h>
+> +#include <linux/errno.h>
+> +#include <linux/module.h>
+> +
+> +/* Test vectors taken from official reference source available at:
+> + *     https://131002.net/siphash/siphash24.c
+> + */
+> +static const u64 test_vectors[64] = {
+> +       0x726fdb47dd0e0e31ULL, 0x74f839c593dc67fdULL, 0x0d6c8009d9a94f5aULL,
+> +       0x85676696d7fb7e2dULL, 0xcf2794e0277187b7ULL, 0x18765564cd99a68dULL,
+> +       0xcbc9466e58fee3ceULL, 0xab0200f58b01d137ULL, 0x93f5f5799a932462ULL,
+> +       0x9e0082df0ba9e4b0ULL, 0x7a5dbbc594ddb9f3ULL, 0xf4b32f46226bada7ULL,
+> +       0x751e8fbc860ee5fbULL, 0x14ea5627c0843d90ULL, 0xf723ca908e7af2eeULL,
+> +       0xa129ca6149be45e5ULL, 0x3f2acc7f57c29bdbULL, 0x699ae9f52cbe4794ULL,
+> +       0x4bc1b3f0968dd39cULL, 0xbb6dc91da77961bdULL, 0xbed65cf21aa2ee98ULL,
+> +       0xd0f2cbb02e3b67c7ULL, 0x93536795e3a33e88ULL, 0xa80c038ccd5ccec8ULL,
+> +       0xb8ad50c6f649af94ULL, 0xbce192de8a85b8eaULL, 0x17d835b85bbb15f3ULL,
+> +       0x2f2e6163076bcfadULL, 0xde4daaaca71dc9a5ULL, 0xa6a2506687956571ULL,
+> +       0xad87a3535c49ef28ULL, 0x32d892fad841c342ULL, 0x7127512f72f27cceULL,
+> +       0xa7f32346f95978e3ULL, 0x12e0b01abb051238ULL, 0x15e034d40fa197aeULL,
+> +       0x314dffbe0815a3b4ULL, 0x027990f029623981ULL, 0xcadcd4e59ef40c4dULL,
+> +       0x9abfd8766a33735cULL, 0x0e3ea96b5304a7d0ULL, 0xad0c42d6fc585992ULL,
+> +       0x187306c89bc215a9ULL, 0xd4a60abcf3792b95ULL, 0xf935451de4f21df2ULL,
+> +       0xa9538f0419755787ULL, 0xdb9acddff56ca510ULL, 0xd06c98cd5c0975ebULL,
+> +       0xe612a3cb9ecba951ULL, 0xc766e62cfcadaf96ULL, 0xee64435a9752fe72ULL,
+> +       0xa192d576b245165aULL, 0x0a8787bf8ecb74b2ULL, 0x81b3e73d20b49b6fULL,
+> +       0x7fa8220ba3b2eceaULL, 0x245731c13ca42499ULL, 0xb78dbfaf3a8d83bdULL,
+> +       0xea1ad565322a1a0bULL, 0x60e61c23a3795013ULL, 0x6606d7e446282b93ULL,
+> +       0x6ca4ecb15c5f91e1ULL, 0x9f626da15c9625f3ULL, 0xe51b38608ef25f57ULL,
+> +       0x958a324ceb064572ULL
+> +};
+> +static const siphash_key_t test_key =
+> +       { 0x0706050403020100ULL , 0x0f0e0d0c0b0a0908ULL };
+> +
+> +static int __init siphash_test_init(void)
+> +{
+> +       u8 in[64] __aligned(SIPHASH_ALIGNMENT);
+> +       u8 in_unaligned[65];
+> +       u8 i;
+> +       int ret = 0;
+> +
+> +       for (i = 0; i < 64; ++i) {
+> +               in[i] = i;
+> +               in_unaligned[i + 1] = i;
+> +               if (siphash(in, i, test_key) != test_vectors[i]) {
+> +                       pr_info("self-test aligned %u: FAIL\n", i + 1);
+> +                       ret = -EINVAL;
+> +               }
+> +               if (siphash_unaligned(in_unaligned + 1, i, test_key) != test_vectors[i]) {
+> +                       pr_info("self-test unaligned %u: FAIL\n", i + 1);
+> +                       ret = -EINVAL;
+> +               }
+> +       }
+> +       if (!ret)
+> +               pr_info("self-tests: pass\n");
+> +       return ret;
+> +}
+> +
+> +static void __exit siphash_test_exit(void)
+> +{
+> +}
+> +
+> +module_init(siphash_test_init);
+> +module_exit(siphash_test_exit);
+> +
+> +MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
+> +MODULE_LICENSE("Dual BSD/GPL");
+> --
+> 2.11.0
+>
 
-My target application was ext4 directory hashing, resulting in different
-implementation choices, although I still think that a rolled-up
-implementation like this is reasonable.  Reducing I-cache impact speeds
-up the calling code.
+I believe the output of SipHash depends upon endianness. Folks who
+request a digest through the af_alg interface will likely expect a
+byte array.
 
-One thing I'd like to suggest you steal is the way it handles the
-fetch of the final partial word.  It's a lot smaller and faster than
-an 8-way case statement.
+I think that means on little endian machines, values like element 0
+must be reversed byte reversed:
 
+    0x726fdb47dd0e0e31ULL => 31,0e,0e,dd,47,db,6f,72
 
-#include <linux/bitops.h>	/* For rol64 */
-#include <linux/cryptohash.h>
-#include <asm/byteorder.h>
-#include <asm/unaligned.h>
+If I am not mistaken, that value (and other tv's) are returned here:
 
-/* The basic ARX mixing function, taken from Skein */
-#define SIP_MIX(a, b, s) ((a) += (b), (b) = rol64(b, s), (b) ^= (a))
+    return (v0 ^ v1) ^ (v2 ^ v3);
 
-/*
- * The complete SipRound.  Note that, when unrolled twice like below,
- * the 32-bit rotates drop out on 32-bit machines.
- */
-#define SIP_ROUND(a, b, c, d) \
-	(SIP_MIX(a, b, 13), SIP_MIX(c, d, 16), (a) = rol64(a, 32), \
-	 SIP_MIX(c, b, 17), SIP_MIX(a, d, 21), (c) = rol64(c, 32))
+It may be prudent to include the endian reversal in the test to ensure
+big endian machines produce expected results. Some closely related
+testing on an old Apple PowerMac G5 revealed that result needed to be
+reversed before returning it to a caller.
 
-/*
- * This is rolled up more than most implementations, resulting in about
- * 55% the code size.  Speed is a few precent slower.  A crude benchmark
- * (for (i=1; i <= max; i++) for (j = 0; j < 4096-i; j++) hash(buf+j, i);)
- * produces the following timings (in usec):
- *
- *		i386	i386	i386	x86_64	x86_64	x86_64	x86_64
- * Length	small	unroll  halfmd4 small	unroll	halfmd4 teahash
- * 1..4		   1069	   1029	   1608	    195	    160	    399	    690
- * 1..8		   2483	   2381	   3851	    410	    360	    988	   1659
- * 1..12           4303	   4152	   6207	    690	    618	   1642	   2690
- * 1..16           6122	   5931	   8668	    968	    876	   2363	   3786
- * 1..20           8348	   8137	  11245	   1323	   1185	   3162	   5567
- * 1..24          10580	  10327	  13935	   1657	   1504	   4066	   7635
- * 1..28          13211	  12956	  16803	   2069	   1871	   5028	   9759
- * 1..32          15843	  15572	  19725	   2470	   2260	   6084	  11932
- * 1..36          18864	  18609	  24259	   2934	   2678	   7566	  14794
- * 1..1024      5890194	6130242	10264816 881933	 881244	3617392	7589036
- *
- * The performance penalty is quite minor, decreasing for long strings,
- * and it's significantly faster than half_md4, so I'm going for the
- * I-cache win.
- */
-uint64_t
-siphash24(char const *in, size_t len, uint32_t const seed[4])
-{
-	uint64_t a = 0x736f6d6570736575;	/* somepseu */
-	uint64_t b = 0x646f72616e646f6d;	/* dorandom */
-	uint64_t c = 0x6c7967656e657261;	/* lygenera */
-	uint64_t d = 0x7465646279746573;	/* tedbytes */
-	uint64_t m = 0;
-	uint8_t padbyte = len;
-
-	/*
-	 * Mix in the 128-bit hash seed.  This is in a format convenient
-	 * to the ext3/ext4 code.  Please feel free to adapt the
-	 * */
-	if (seed) {
-		m = seed[2] | (uint64_t)seed[3] << 32;
-		b ^= m;
-		d ^= m;
-		m = seed[0] | (uint64_t)seed[1] << 32;
-		/* a ^= m; is done in loop below */
-		c ^= m;
-	}
-
-	/*
-	 * By using the same SipRound code for all iterations, we
-	 * save space, at the expense of some branch prediction.  But
-	 * branch prediction is hard because of variable length anyway.
-	 */
-	len = len/8 + 3;	/* Now number of rounds to perform */
-	do {
-		a ^= m;
-
-		switch (--len) {
-			unsigned bytes;
-
-		default:	/* Full words */
-			d ^= m = get_unaligned_le64(in);
-			in += 8;
-			break;
-		case 2:		/* Final partial word */
-			/*
-			 * We'd like to do one 64-bit fetch rather than
-			 * mess around with bytes, but reading past the end
-			 * might hit a protection boundary.  Fortunately,
-			 * we know that protection boundaries are aligned,
-			 * so we can consider only three cases:
-			 * - The remainder occupies zero words
-			 * - The remainder fits into one word
-			 * - The remainder straddles two words
-			 */
-			bytes = padbyte & 7;
-
-			if (bytes == 0) {
-				m = 0;
-			} else {
-				unsigned offset = (unsigned)(uintptr_t)in & 7;
-
-				if (offset + bytes <= 8) {
-					m = le64_to_cpup((uint64_t const *)
-								(in - offset));
-					m >>= 8*offset;
-				} else {
-					m = get_unaligned_le64(in);
-				}
-				m &= ((uint64_t)1 << 8*bytes) - 1;
-			}
-			/* Could use | or +, but ^ allows associativity */
-			d ^= m ^= (uint64_t)padbyte << 56;
-			break;
-		case 1:		/* Beginning of finalization */
-			m = 0;
-			c ^= 0xff;
-			/*FALLTHROUGH*/
-		case 0:		/* Second half of finalization */
-			break;
-		}
-
-		SIP_ROUND(a, b, c, d);
-		SIP_ROUND(a, b, c, d);
-	} while (len);
-
-	return a ^ b ^ c ^ d;
-}
-
-#undef SIP_ROUND
-#undef SIP_MIX
-
-/*
- * No objection to EXPORT_SYMBOL, but we should probably figure out
- * how the seed[] array should work first.  Homework for the first
- * person to want to call it from a module!
- */
+Jeff
