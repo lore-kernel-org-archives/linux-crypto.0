@@ -1,91 +1,85 @@
-From: "George Spelvin" <linux@sciencehorizons.net>
-Subject: Re: HalfSipHash Acceptable Usage
-Date: 21 Dec 2016 01:34:12 -0500
-Message-ID: <20161221063412.6425.qmail@ns.sciencehorizons.net>
-References: <1482298164.8944.8.camel@edumazet-glaptop3.roam.corp.google.com>
-Cc: ak@linux.intel.com, davem@davemloft.net, David.Laight@aculab.com,
-        djb@cr.yp.to, ebiggers3@gmail.com, hannes@stressinduktion.org,
-        Jason@zx2c4.com, jeanphilippe.aumasson@gmail.com,
-        kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luto@amacapital.net,
-        netdev@vger.kernel.org, tom@herbertland.com,
-        torvalds@linux-foundation.org, tytso@mit.edu,
-        vegard.nossum@gmail.com
-To: eric.dumazet@gmail.com, linux@sciencehorizons.net
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1482298164.8944.8.camel@edumazet-glaptop3.roam.corp.google.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: <george.cherian@cavium.com>
+Subject: [PATCH v3 0/3] Add Support for Cavium Cryptographic Acceleration Unit
+Date: Wed, 21 Dec 2016 11:56:10 +0000
+Message-ID: <1482321373-407-1-git-send-email-george.cherian@cavium.com>
+Mime-Version: 1.0
+Content-Type: text/plain
+Cc: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <david.daney@cavium.com>,
+        George Cherian <george.cherian@cavium.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-by2nam01on0069.outbound.protection.outlook.com ([104.47.34.69]:26048
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753154AbcLUL4l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 21 Dec 2016 06:56:41 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Eric Dumazet wrote:
-> On Tue, 2016-12-20 at 22:28 -0500, George Spelvin wrote:
->> Cycles per byte on 1024 bytes of data:
->> 			Pentium	Core 2	Ivy
->> 			4	Duo	Bridge
->> SipHash-2-4		38.9	 8.3	 5.8
->> HalfSipHash-2-4	12.7	 4.5	 3.2
->> MD5			 8.3	 5.7	 4.7
->
-> So definitely not faster.
-> 
-> 38 cycles per byte is a problem, considering IPV6 is ramping up.
+From: George Cherian <george.cherian@cavium.com>
 
-As I said earlier, SipHash performance on 32-bit x86 really sucks,
-because it wants an absolute minimum of 9 32-bit registers (8 for the
-state plus one temporary for the rotates), and x86 has 7.
+This series adds the support for Cavium Cryptographic Accelerarion Unit (CPT) 
+CPT is available in Cavium's Octeon-Tx SoC series.                            
+                                                                              
+The series was tested with ecryptfs and dm-crypt for in kernel cryptographic
+offload operations. This driver needs a firmware to work, I will be sending the
+firmware to linux-firmware once the driver is accepted.
 
-> What about SHA performance (syncookies) on P4 ?
+Changes v2 -> v3
+	-- Addressed David Daney's comments
+		- There is not much difference in performance readq/writeq vs 
+	readq_relaxed/writeq_relaxed, so switching to readq/writeq variant.
+		- Removed the useless bitfield definitions.
+		- Use GENMASK,dev_to_node() instead of custome functions.
+		- Use module_pci_driver instead of module_init/exit.
+Changes v1 -> v2                                                              
+	-- Addressed a crash issue when more gather components are passed.
+        -- Redo the cptvf request manager.                                    
+   	     - Get rid of the un necessary buffer copies.                  
+        -- s/uint*_t/u*                                                
+        -- Remove unwanted Macro definitions                           
+        -- Remove the redundant ROUNDUP* macros and use kernel function
+        -- Select proper config option in Kconfig file.                
+        -- Removed some of the unwanted header file inclusions                
+        -- Miscellaneous Cleanup 
 
-I recompiled with -mtune=pentium4 and re-ran.  MD5 time went *up* by
-0.3 cycles/byte, HalfSipHash went down by 1 cycle, and SipHash didn't
-change:
+George Cherian (3):
+  drivers: crypto: Add Support for Octeon-tx CPT Engine
+  drivers: crypto: Add the Virtual Function driver for CPT
+  drivers: crypto: Enable CPT options crypto for build
 
-Cycles per byte on 1024 bytes of data:
-		Pentium	Core 2	Ivy
-		4	Duo	Bridge
-SipHash-2-4	38.9	 8.3	 5.8
-HalfSipHash-2-4	11.5	 4.5	 3.2
-MD5		 8.6	 5.7	 4.7
-SHA-1		19.0	 8.0	 6.8
+ drivers/crypto/Kconfig                       |   1 +
+ drivers/crypto/Makefile                      |   1 +
+ drivers/crypto/cavium/cpt/Kconfig            |  16 +
+ drivers/crypto/cavium/cpt/Makefile           |   3 +
+ drivers/crypto/cavium/cpt/cpt_common.h       | 158 +++++
+ drivers/crypto/cavium/cpt/cpt_hw_types.h     | 658 +++++++++++++++++++
+ drivers/crypto/cavium/cpt/cptpf.h            |  69 ++
+ drivers/crypto/cavium/cpt/cptpf_main.c       | 703 ++++++++++++++++++++
+ drivers/crypto/cavium/cpt/cptpf_mbox.c       | 163 +++++
+ drivers/crypto/cavium/cpt/cptvf.h            | 135 ++++
+ drivers/crypto/cavium/cpt/cptvf_algs.c       | 424 ++++++++++++
+ drivers/crypto/cavium/cpt/cptvf_algs.h       | 110 ++++
+ drivers/crypto/cavium/cpt/cptvf_main.c       | 945 +++++++++++++++++++++++++++
+ drivers/crypto/cavium/cpt/cptvf_mbox.c       | 205 ++++++
+ drivers/crypto/cavium/cpt/cptvf_reqmanager.c | 581 ++++++++++++++++
+ drivers/crypto/cavium/cpt/request_manager.h  | 147 +++++
+ 16 files changed, 4319 insertions(+)
+ create mode 100644 drivers/crypto/cavium/cpt/Kconfig
+ create mode 100644 drivers/crypto/cavium/cpt/Makefile
+ create mode 100644 drivers/crypto/cavium/cpt/cpt_common.h
+ create mode 100644 drivers/crypto/cavium/cpt/cpt_hw_types.h
+ create mode 100644 drivers/crypto/cavium/cpt/cptpf.h
+ create mode 100644 drivers/crypto/cavium/cpt/cptpf_main.c
+ create mode 100644 drivers/crypto/cavium/cpt/cptpf_mbox.c
+ create mode 100644 drivers/crypto/cavium/cpt/cptvf.h
+ create mode 100644 drivers/crypto/cavium/cpt/cptvf_algs.c
+ create mode 100644 drivers/crypto/cavium/cpt/cptvf_algs.h
+ create mode 100644 drivers/crypto/cavium/cpt/cptvf_main.c
+ create mode 100644 drivers/crypto/cavium/cpt/cptvf_mbox.c
+ create mode 100644 drivers/crypto/cavium/cpt/cptvf_reqmanager.c
+ create mode 100644 drivers/crypto/cavium/cpt/request_manager.h
 
-(This is with a verbatim copy of the lib/sha1.c code; I might be
-able to optimize it with some asm hackery.)
-
-Anyway, you see why we were looking longingly at HalfSipHash.
-
-
-In fact, I have an idea.  Allow me to make the following concrete
-suggestion for using HalfSipHash with 128 bits of key material:
-
-- 64 bits are used as the key.
-- The other 64 bits are used as an IV which is prepended to
-  the message to be hashed.
-
-As a matter of practical implementation, we precompute the effect
-of hashing the IV and store the 128-bit HalfSipHash state, which
-is used just like a 128-bit key.
-
-Because of the way it is constructed, it is obviously no weaker than
-standard HalfSipHash's 64-bit security claim.
-
-I don't know the security of this, and it's almost certainly weaker than
-128 bits, but I *hope* it's at least a few bits stronger than 64 bits.
-80 would be enough to dissuade any attacker without a six-figure budget
-(that's per attack, not a one-time capital investment).  96 would be
-ample for our purposes.
-
-What I do know is that it makes a brute-force attack without
-significant cryptanalytic effort impossible.
-
-To match the spec exactly, we'd need to add the 8-byte IV length to
-the length byte which pads the final block, but from a security point
-of view, it does not matter.  As long as we are consistent within any
-single key, any unique mapping between padding byte and message length
-(mod 256) is equally good.
-
-We may choose based on implementation convenience.
-
-(Also note my earlier comments about when it is okay to omit the padding
-length byte entirely: any time all the data to be hashed with a given
-key is fixed in format or self-delimiting (e.g. null-terminated).
-This applies to many of the networking uses.)
+-- 
+2.1.4
