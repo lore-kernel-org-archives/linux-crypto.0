@@ -1,71 +1,40 @@
-From: Rik van Riel <riel@redhat.com>
-Subject: Re: [kernel-hardening] Re: HalfSipHash Acceptable Usage
-Date: Wed, 21 Dec 2016 11:41:28 -0500
-Message-ID: <1482338488.11006.70.camel@redhat.com>
-References: <20161221155540.29529.qmail@ns.sciencehorizons.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Test AEAD/authenc algorithms from userspace
+Date: Wed, 21 Dec 2016 16:54:29 +0800
+Message-ID: <20161221085429.GB29501@gondor.apana.org.au>
+References: <CAFXBA=kStufh3TDe=+qQYmd2tNCj9hgXLUKBeoZHBs2VxRBRbQ@mail.gmail.com>
+ <2943969.IiWKeGvEyD@tauon.atsec.com>
+ <CAFXBA=ma8ZKeFfu-_DS1Nm=k0pwUatSabCmhwwwBMg45epOo_g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-0zGKtKxh0W2ZQTwz4HDa"
-Cc: ak@linux.intel.com, davem@davemloft.net, David.Laight@aculab.com,
-        djb@cr.yp.to, ebiggers3@gmail.com, eric.dumazet@gmail.com,
-        hannes@stressinduktion.org, jeanphilippe.aumasson@gmail.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luto@amacapital.net, netdev@vger.kernel.org, tom@herbertland.com,
-        torvalds@linux-foundation.org, tytso@mit.edu,
-        vegard.nossum@gmail.com
-To: kernel-hardening@lists.openwall.com, Jason@zx2c4.com,
-        linux@sciencehorizons.net
+Content-Type: text/plain; charset=us-ascii
+Cc: Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org
+To: Harsh Jain <harshjain.prof@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33950 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751651AbcLUQqK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Dec 2016 11:46:10 -0500
-In-Reply-To: <20161221155540.29529.qmail@ns.sciencehorizons.net>
+Received: from helcar.hengli.com.au ([209.40.204.226]:45071 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1755985AbcLURAE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 21 Dec 2016 12:00:04 -0500
+Content-Disposition: inline
+In-Reply-To: <CAFXBA=ma8ZKeFfu-_DS1Nm=k0pwUatSabCmhwwwBMg45epOo_g@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Mon, Dec 19, 2016 at 04:08:11PM +0530, Harsh Jain wrote:
+> Hi Herbert,
+> 
+> TLS default mode of operation is MAC-then-Encrypt for Authenc algos.
+> Currently framework only supports EtM used in IPSec. User space
+> programs like openssl cannot use af-alg interface to encrypt/decrypt
+> in TLS mode.
+> Are we going to support Mac-then-Encrypt mode in future kernel releases?
 
---=-0zGKtKxh0W2ZQTwz4HDa
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+If someone finally adds TLS to the kernel then we'll likely do
+something about it.  Otherwise you can just separate it out into
+two operations via af-alg.
 
-On Wed, 2016-12-21 at 10:55 -0500, George Spelvin wrote:
-> Actually, DJB just made a very relevant suggestion.
->=20
-> As I've mentioned, the 32-bit performance problems are an x86-
-> specific
-> problem.=C2=A0=C2=A0ARM does very well, and other processors aren't bad a=
-t all.
->=20
-> SipHash fits very nicely (and runs very fast) in the MMX registers.
->=20
-> They're 64 bits, and there are 8 of them, so the integer registers
-> can
-> be reserved for pointers and loop counters and all that.=C2=A0=C2=A0And t=
-here's
-> reference code available.
->=20
-> How much does kernel_fpu_begin()/kernel_fpu_end() cost?
-
-Those can be very expensive. Almost certainly not
-worth it for small amounts of data.
-
---=20
-All Rights Reversed.
---=-0zGKtKxh0W2ZQTwz4HDa
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEcBAABCAAGBQJYWrC4AAoJEM553pKExN6DtjoH+gORlWNB2YRtjw6x57PfVui5
-yiPwJ3TxC1y8tbLl+g7Jh7ogmtq3HDO2rss+8yYxdMtYDc2NsDhwG29+sZ+i7Jnh
-jWmgNgufUZ0mC/GI2jkCKL19r4lelXQCLb7RIf1JfVBA6ba65CZ6L7+1FFb4okPy
-QxcyBh4hHuA/VDF5ypiC9gXY5RgJFjLr/LkeUpyogXJ9Kl+8kzMQ80UXoPi3W/go
-8JB7NgXHHTA3Dxo/pjcy0Y//DfBJVRol+p1AE34s8JIQD1hioLR5/YvA4MPn7RLh
-gjGlehVNsqEOirnoDY8LyAPMOy13Su0PAGyHeYVUSIk4fyRs2+hw3JN2t3QtVf0=
-=R3Y6
------END PGP SIGNATURE-----
-
---=-0zGKtKxh0W2ZQTwz4HDa--
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
