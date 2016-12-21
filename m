@@ -1,66 +1,57 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: testmgr: Use linear alias for test input
-Date: Wed, 21 Dec 2016 16:55:56 +0800
-Message-ID: <20161221085556.GC29501@gondor.apana.org.au>
-References: <1482190646-7720-1-git-send-email-labbott@redhat.com>
+From: Eric Dumazet <eric.dumazet@gmail.com>
+Subject: Re: [kernel-hardening] Re: HalfSipHash Acceptable Usage
+Date: Wed, 21 Dec 2016 09:08:21 -0800
+Message-ID: <1482340101.8944.53.camel@edumazet-glaptop3.roam.corp.google.com>
+References: <20161221032829.3031.qmail@ns.sciencehorizons.net>
+         <1482298164.8944.8.camel@edumazet-glaptop3.roam.corp.google.com>
+         <CAHmME9oCfCwAq1qP09uAN6vvakh4wXDMHunsL9D7W_LDeN_OQQ@mail.gmail.com>
+         <1482335804.8944.44.camel@edumazet-glaptop3.roam.corp.google.com>
+         <1482338385.11006.67.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Christopher Covington <cov@codeaurora.org>
-To: Laura Abbott <labbott@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1482190646-7720-1-git-send-email-labbott@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: kernel-hardening@lists.openwall.com,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        George Spelvin <linux@sciencehorizons.net>,
+        Theodore Ts'o <tytso@mit.edu>, Andi Kleen <ak@linux.intel.com>,
+        David Miller <davem@davemloft.net>,
+        David Laight <David.Laight@aculab.com>,
+        "Daniel J . Bernstein" <djb@cr.yp.to>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Netdev <netdev@vger.kernel.org>,
+        Tom Herbert <tom@herbertland.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Vegard Nossum <vegard.nossum@gmail.com>
+To: Rik van Riel <riel@redhat.com>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <1482338385.11006.67.camel@redhat.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Dec 19, 2016 at 03:37:26PM -0800, Laura Abbott wrote:
-> Christopher Covington reported a crash on aarch64 on recent Fedora
-> kernels:
-> 
-> kernel BUG at ./include/linux/scatterlist.h:140!
-> Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
-> Modules linked in:
-> CPU: 2 PID: 752 Comm: cryptomgr_test Not tainted 4.9.0-11815-ge93b1cc #162
-> Hardware name: linux,dummy-virt (DT)
-> task: ffff80007c650080 task.stack: ffff800008910000
-> PC is at sg_init_one+0xa0/0xb8
-> LR is at sg_init_one+0x24/0xb8
-> ...
-> [<ffff000008398db8>] sg_init_one+0xa0/0xb8
-> [<ffff000008350a44>] test_acomp+0x10c/0x438
-> [<ffff000008350e20>] alg_test_comp+0xb0/0x118
-> [<ffff00000834f28c>] alg_test+0x17c/0x2f0
-> [<ffff00000834c6a4>] cryptomgr_test+0x44/0x50
-> [<ffff0000080dac70>] kthread+0xf8/0x128
-> [<ffff000008082ec0>] ret_from_fork+0x10/0x50
-> 
-> The test vectors used for input are part of the kernel image. These
-> inputs are passed as a buffer to sg_init_one which eventually blows up
-> with BUG_ON(!virt_addr_valid(buf)). On arm64, virt_addr_valid returns
-> false for the kernel image since virt_to_page will not return the
-> correct page. The kernel image is also aliased to the linear map so get
-> the linear alias and pass that to the scatterlist instead.
-> 
-> Reported-by: Christopher Covington <cov@codeaurora.org>
-> Fixes: d7db7a882deb ("crypto: acomp - update testmgr with support for acomp")
-> Signed-off-by: Laura Abbott <labbott@redhat.com>
-> ---
-> x86 supports virt_addr_valid working on kernel image addresses but arm64 is
-> more strict. This is the direction things have been moving with my
-> CONFIG_DEBUG_VIRTUAL series for arm64 which is tightening the definition of
-> __pa/__pa_symbol.
+On Wed, 2016-12-21 at 11:39 -0500, Rik van Riel wrote:
 
-Please fix this by copying the templates to kmalloced memory like
-the other test_* functions.
+> Does anybody still have a P4?
+> 
+> If they do, they're probably better off replacing
+> it with an Atom. The reduced power bills will pay
+> for replacing that P4 within a year or two.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Well, maybe they have millions of units to replace.
+
+> 
+> In short, I am not sure how important the P4
+> performance numbers are, especially if we can
+> improve security for everybody else...
+
+Worth adding that the ISN or syncookie generation are less than 10% of
+the actual cost of handling a problematic (having to generate ISN or
+syncookie) TCP packet anyway.
+
+So we are talking of minors potential impact for '2000-era' cpus.
+
+Definitely I vote for using SipHash in TCP ASAP.
