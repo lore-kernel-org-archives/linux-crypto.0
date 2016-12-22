@@ -1,40 +1,49 @@
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - initialize cra_flags before register into kpp
-Date: Thu, 22 Dec 2016 15:00:51 +0000
-Message-ID: <20161222150051.6284-1-giovanni.cabiddu@intel.com>
-Cc: linux-crypto@vger.kernel.org, giovanni.cabiddu@gmail.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Sushil Kumar <sushilx.kumar@intel.com>
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:15580 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934269AbcLVPA5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Dec 2016 10:00:57 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Subject: Re: [kernel-hardening] Re: [PATCH v7 3/6] random: use SipHash in
+ place of MD5
+Date: Thu, 22 Dec 2016 16:05:53 +0100
+Message-ID: <5c306c80-3499-8b92-21d0-c197f30ce326@stressinduktion.org>
+References: <20161216030328.11602-1-Jason@zx2c4.com>
+ <20161221230216.25341-1-Jason@zx2c4.com>
+ <20161221230216.25341-4-Jason@zx2c4.com>
+ <CALCETrVttVoZMvCYZcrAqM1c=YQP_nCfdfO1MsrSHjvjTFxH+A@mail.gmail.com>
+ <17bd0c70-d2c1-165b-f5b2-252dfca404e8@stressinduktion.org>
+ <CAHmME9phg=GuhEUaMxxv_=RexffPDqrOEhmaKffy_ZSt7bfC7g@mail.gmail.com>
+ <20161222054125.lzxhd6ctovm3wk4p@thunk.org>
+ <1482410840.2472.2.camel@stressinduktion.org>
+ <CAHmME9r_zTHo=dxRRK6UrjJ_dKV14yYsZsxCc362z4CPoVkddw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Theodore Ts'o <tytso@mit.edu>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        David Laight <David.Laight@aculab.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Tom Herbert <tom@herbertland.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        kernel-hardening@lists.openwall.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAHmME9r_zTHo=dxRRK6UrjJ_dKV14yYsZsxCc362z4CPoVkddw@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Initialize dh.base.cra_flags before registering the dh algorithm.
-Without this fix, the registration of the dh algorithm might fail
-if the qat driver is restarted.
+On 22.12.2016 14:10, Jason A. Donenfeld wrote:
+> On Thu, Dec 22, 2016 at 1:47 PM, Hannes Frederic Sowa
+> <hannes@stressinduktion.org> wrote:
+>> following up on what appears to be a random subject: ;)
+>>
+>> IIRC, ext4 code by default still uses half_md4 for hashing of filenames
+>> in the htree. siphash seems to fit this use case pretty good.
+> 
+> I saw this too. I'll try to address it in v8 of this series.
 
-Signed-off-by: Sushil Kumar <sushilx.kumar@intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_common/qat_asym_algs.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-index 0d35dca..d3518e6 100644
---- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-@@ -1343,6 +1343,7 @@ int qat_asym_algs_register(void)
- 		ret = crypto_register_akcipher(&rsa);
- 		if (ret)
- 			goto unlock;
-+		dh.base.cra_flags = 0;
- 		ret = crypto_register_kpp(&dh);
- 	}
- unlock:
--- 
-2.9.3
+This change would need a new version of the ext4 super block, because
+you should not change existing file systems.
