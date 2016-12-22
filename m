@@ -1,20 +1,26 @@
 From: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Subject: Re: BPF hash algo (Re: [kernel-hardening] Re: [PATCH v7 3/6]
- random: use SipHash in place of MD5)
-Date: Thu, 22 Dec 2016 18:49:56 +0100
-Message-ID: <1482428996.2673.7.camel@stressinduktion.org>
-References: <CALCETrUATPeaCJTQZN2h=ct6HH-xLt4V8T0PfPHNFGFN2HWtTA@mail.gmail.com>
-         <1482425969.2673.5.camel@stressinduktion.org>
-         <CALCETrW_T1v4qKPJDs5dXwAnAit3M52AWMH-K+GJLb1WoLMuRQ@mail.gmail.com>
+Subject: Re: [kernel-hardening] Re: [PATCH v7 3/6] random: use SipHash in
+ place of MD5
+Date: Thu, 22 Dec 2016 19:08:37 +0100
+Message-ID: <32db19ab-0c19-628c-3475-2ccb8050563a@stressinduktion.org>
+References: <20161216030328.11602-1-Jason@zx2c4.com>
+ <20161221230216.25341-1-Jason@zx2c4.com>
+ <20161221230216.25341-4-Jason@zx2c4.com>
+ <CALCETrVttVoZMvCYZcrAqM1c=YQP_nCfdfO1MsrSHjvjTFxH+A@mail.gmail.com>
+ <17bd0c70-d2c1-165b-f5b2-252dfca404e8@stressinduktion.org>
+ <CAHmME9phg=GuhEUaMxxv_=RexffPDqrOEhmaKffy_ZSt7bfC7g@mail.gmail.com>
+ <20161222054125.lzxhd6ctovm3wk4p@thunk.org>
+ <1482410840.2472.2.camel@stressinduktion.org>
+ <CAHmME9r_zTHo=dxRRK6UrjJ_dKV14yYsZsxCc362z4CPoVkddw@mail.gmail.com>
+ <20161222155447.u3ayvw4gmorhswjv@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: Daniel Borkmann <daniel@iogearbox.net>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+To: Theodore Ts'o <tytso@mit.edu>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "kernel-hardening@lists.openwall.com"
-        <kernel-hardening@lists.openwall.com>,
-        Theodore Ts'o <tytso@mit.edu>, Netdev <netdev@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        Andy Lutomirski <luto@amacapital.net>,
+        Netdev <netdev@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         David Laight <David.Laight@aculab.com>,
@@ -25,123 +31,46 @@ Cc: Daniel Borkmann <daniel@iogearbox.net>,
         Andi Kleen <ak@linux.intel.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-To: Andy Lutomirski <luto@amacapital.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:41111 "EHLO
-        out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S941110AbcLVRuF (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Dec 2016 12:50:05 -0500
-In-Reply-To: <CALCETrW_T1v4qKPJDs5dXwAnAit3M52AWMH-K+GJLb1WoLMuRQ@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20161222155447.u3ayvw4gmorhswjv@thunk.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, 2016-12-22 at 09:25 -0800, Andy Lutomirski wrote:
-> On Thu, Dec 22, 2016 at 8:59 AM, Hannes Frederic Sowa
-> <hannes@stressinduktion.org> wrote:
-> > On Thu, 2016-12-22 at 08:07 -0800, Andy Lutomirski wrote:
-> > > 
-> > > You mean:
-> > > 
-> > > commit 7bd509e311f408f7a5132fcdde2069af65fa05ae
-> > > Author: Daniel Borkmann <daniel@iogearbox.net>
-> > > Date:   Sun Dec 4 23:19:41 2016 +0100
-> > > 
-> > >     bpf: add prog_digest and expose it via fdinfo/netlink
-> > > 
-> > > 
-> > > Yes, please!  This actually matters for security -- imagine a
-> > > malicious program brute-forcing a collision so that it gets loaded
-> > > wrong.  And this is IMO a use case for SHA-256 or SHA-512/256
-> > > (preferably the latter).  Speed basically doesn't matter here and
-> > > Blake2 is both less stable (didn't they slightly change it recently?)
-> > > and much less well studied.
-> > 
-> > We don't prevent ebpf programs being loaded based on the digest but
-> > just to uniquely identify loaded programs from user space and match up
-> > with their source.
+On 22.12.2016 16:54, Theodore Ts'o wrote:
+> On Thu, Dec 22, 2016 at 02:10:33PM +0100, Jason A. Donenfeld wrote:
+>> On Thu, Dec 22, 2016 at 1:47 PM, Hannes Frederic Sowa
+>> <hannes@stressinduktion.org> wrote:
+>>> following up on what appears to be a random subject: ;)
+>>>
+>>> IIRC, ext4 code by default still uses half_md4 for hashing of filenames
+>>> in the htree. siphash seems to fit this use case pretty good.
+>>
+>> I saw this too. I'll try to address it in v8 of this series.
 > 
-> The commit log talks about using the hash to see if the program has
-> already been compiled and JITted.  If that's done, then a collision
-> will directly cause the kernel to malfunction.
-
-Yeah, it still shouldn't crash the kernel but it could cause
-malfunctions because assumptions are not met from user space thus it
-could act in a strange way:
-
-My personal biggest concern is that users of this API will at some
-point in time assume this digist is unique (as a key itself for a
-hashtables f.e.), while it is actually not (and not enforced so by the
-kernel). If you can get an unpriv ebpf program inserted to the kernel
-with the same weak hash, a controller daemon could pick it up and bind
-it to another ebpf hook, probably outside of the unpriv realm the user
-was in before. Only the sorting matters, which might be unstable and is
-not guaranteed by anything in most hash table based data structures.
-
-The API seems flawed to me.
-
-> > > My inclination would have been to seed them with something that isn't
-> > > exposed to userspace for the precise reason that it would prevent user
-> > > code from making assumptions about what's in the hash.  But if there's
-> > > a use case for why user code needs to be able to calculate the hash on
-> > > its own, then that's fine.  But perhaps the actual fdinfo string
-> > > should be "sha256:abcd1234..." to give some flexibility down the road.
-
-To add to this, I am very much in favor of that. Right now it doesn't
-have a name because it is a custom algorithm. ;)
-
-> > > 
-> > > Also:
-> > > 
-> > > +       result = (__force __be32 *)fp->digest;
-> > > +       for (i = 0; i < SHA_DIGEST_WORDS; i++)
-> > > +               result[i] = cpu_to_be32(fp->digest[i]);
-> > > 
-> > > Everyone, please, please, please don't open-code crypto primitives.
-> > > Is this and the code above it even correct?  It might be but on a very
-> > > brief glance it looks wrong to me.  If you're doing this to avoid
-> > > depending on crypto, then fix crypto so you can pull in the algorithm
-> > > without pulling in the whole crypto core.
-> > 
-> > The hashing is not a proper sha1 neither, unfortunately. I think that
-> > is why it will have a custom implementation in iproute2?
+> This is a separate issue, and this series is getting a bit too
+> complex.  So I'd suggest pushing this off to a separate change.
 > 
-> Putting on crypto hat:
-> 
-> NAK NAK NAK NAK NAK.  "The Linux kernel invented a new primitive in
-> 2016 when people know better and is going to handle it by porting that
-> new primitive to userspace" is not a particularly good argument.
-> 
-> Okay, crypto hack back off.
-> 
-> > 
-> > I wondered if bpf program loading should have used the module loading
-> > infrastructure from the beginning...
-> 
-> That would be way too complicated and would be nasty for the unprivileged cases.
+> Changing the htree hash algorithm is an on-disk format change, and so
+> we couldn't roll it out until e2fsprogs gets updated and rolled out
+> pretty broadley.  In fact George sent me patches to add siphash as a
+> hash algorithm for htree a while back (for both the kernel and
+> e2fsprogs), but I never got around to testing and applying them,
+> mainly because while it's technically faster, I had other higher
+> priority issues to work on --- and see previous comments regarding
+> pixel peeping.  Improving the hash algorithm by tens or even hundreds
+> of nanoseconds isn't really going to matter since we only do a htree
+> lookup on a file creation or cold cache lookup, and the SSD or HDD I/O
+> times will dominate.  And from the power perspective, saving
+> microwatts of CPU power isn't going to matter if you're going to be
+> spinning up the storage device....
 
-I was more or less just thinking about using the syscalls and user
-space representation not the generic infrastructure, as it is anyway
-too much concerned with real kernel modules (would probably also solve
-your cgroup-ebpf thread, as it can be passed by unique name or name and
-hash ;) ). Anyway...
+I wasn't concerned about performance but more about DoS resilience. I
+wonder how safe half md4 actually is in terms of allowing users to
+generate long hash chains in the filesystem (in terms of length
+extension attacks against half_md4).
 
-> > > At the very least, there should be a separate function that calculates
-> > > the hash of a buffer and that function should explicitly run itself
-> > > against test vectors of various lengths to make sure that it's
-> > > calculating what it claims to be calculating.  And it doesn't look
-> > > like the userspace code has landed, so, if this thing isn't
-> > > calculating SHA1 correctly, it's plausible that no one has noticed.
-> > 
-> > I hope this was known from the beginning, this is not sha1 unfortunately.
-> > 
-> > But ebpf elf programs also need preprocessing to get rid of some
-> > embedded load-depending data, so maybe it was considered to be just
-> > enough?
-> 
-> I suspect it was actually an accident.
+In ext4, is it actually possible that a "disrupter" learns about the
+hashing secret in the way how the inodes are returned during getdents?
 
-Maybe, I don't know.
-
-Bye,
+Thanks,
 Hannes
