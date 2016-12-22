@@ -1,7 +1,7 @@
 From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH 08/12] crypto: atmel-sha: add simple DMA transfers
-Date: Thu, 22 Dec 2016 17:15:13 +0100
-Message-ID: <4c438dc06f85e151dea4a42078d5e1d32d4829c1.1482422983.git.cyrille.pitchen@atmel.com>
+Subject: [PATCH 07/12] crypto: atmel-sha: add atmel_sha_cpu_start()
+Date: Thu, 22 Dec 2016 17:15:12 +0100
+Message-ID: <39e69aee6fcce63e8c9aa083ac8c28171ac5f3b9.1482422983.git.cyrille.pitchen@atmel.com>
 References: <cover.1482422983.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -15,147 +15,128 @@ In-Reply-To: <cover.1482422983.git.cyrille.pitchen@atmel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds a simple function to perform data transfer with the DMA
-controller.
+This patch adds a simple function to perform data transfer with PIO, hence
+handled by the CPU.
 
 Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
 ---
- drivers/crypto/atmel-sha.c | 116 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 116 insertions(+)
+ drivers/crypto/atmel-sha.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)
 
 diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 58d9ca8ac0f2..a4fc60b67099 100644
+index be0d72cf4352..58d9ca8ac0f2 100644
 --- a/drivers/crypto/atmel-sha.c
 +++ b/drivers/crypto/atmel-sha.c
-@@ -123,6 +123,9 @@ struct atmel_sha_ctx {
- struct atmel_sha_dma {
- 	struct dma_chan			*chan;
- 	struct dma_slave_config dma_conf;
-+	struct scatterlist	*sg;
-+	int			nents;
-+	unsigned int		last_sg_length;
- };
+@@ -64,6 +64,8 @@
+ #define SHA_FLAGS_ERROR		BIT(23)
+ #define SHA_FLAGS_PAD		BIT(24)
+ #define SHA_FLAGS_RESTORE	BIT(25)
++#define SHA_FLAGS_IDATAR0	BIT(26)
++#define SHA_FLAGS_WAIT_DATARDY	BIT(27)
  
- struct atmel_sha_dev {
-@@ -1321,6 +1324,119 @@ static irqreturn_t atmel_sha_irq(int irq, void *dev_id)
+ #define SHA_OP_UPDATE	1
+ #define SHA_OP_FINAL	2
+@@ -141,6 +143,7 @@ struct atmel_sha_dev {
+ 	struct ahash_request	*req;
+ 	bool			is_async;
+ 	atmel_sha_fn_t		resume;
++	atmel_sha_fn_t		cpu_transfer_complete;
+ 
+ 	struct atmel_sha_dma	dma_lch_in;
+ 
+@@ -1317,6 +1320,93 @@ static irqreturn_t atmel_sha_irq(int irq, void *dev_id)
+ 	return IRQ_NONE;
  }
  
- 
-+/* DMA transfer functions */
 +
-+static bool atmel_sha_dma_check_aligned(struct atmel_sha_dev *dd,
-+					struct scatterlist *sg,
-+					size_t len)
++/* CPU transfer functions */
++
++static int atmel_sha_cpu_transfer(struct atmel_sha_dev *dd)
 +{
-+	struct atmel_sha_dma *dma = &dd->dma_lch_in;
 +	struct ahash_request *req = dd->req;
 +	struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
-+	size_t bs = ctx->block_size;
-+	int nents;
++	const u32 *words = (const u32 *)ctx->buffer;
++	size_t i, num_words;
++	u32 isr, din, din_inc;
 +
-+	for (nents = 0; sg; sg = sg_next(sg), ++nents) {
-+		if (!IS_ALIGNED(sg->offset, sizeof(u32)))
-+			return false;
++	din_inc = (ctx->flags & SHA_FLAGS_IDATAR0) ? 0 : 1;
++	for (;;) {
++		/* Write data into the Input Data Registers. */
++		num_words = DIV_ROUND_UP(ctx->bufcnt, sizeof(u32));
++		for (i = 0, din = 0; i < num_words; ++i, din += din_inc)
++			atmel_sha_write(dd, SHA_REG_DIN(din), words[i]);
++
++		ctx->offset += ctx->bufcnt;
++		ctx->total -= ctx->bufcnt;
++
++		if (!ctx->total)
++			break;
 +
 +		/*
-+		 * This is the last sg, the only one that is allowed to
-+		 * have an unaligned length.
++		 * Prepare next block:
++		 * Fill ctx->buffer now with the next data to be written into
++		 * IDATARx: it gives time for the SHA hardware to process
++		 * the current data so the SHA_INT_DATARDY flag might be set
++		 * in SHA_ISR when polling this register at the beginning of
++		 * the next loop.
 +		 */
-+		if (len <= sg->length) {
-+			dma->nents = nents + 1;
-+			dma->last_sg_length = sg->length;
-+			sg->length = ALIGN(len, sizeof(u32));
-+			return true;
++		ctx->bufcnt = min_t(size_t, ctx->block_size, ctx->total);
++		scatterwalk_map_and_copy(ctx->buffer, ctx->sg,
++					 ctx->offset, ctx->bufcnt, 0);
++
++		/* Wait for hardware to be ready again. */
++		isr = atmel_sha_read(dd, SHA_ISR);
++		if (!(isr & SHA_INT_DATARDY)) {
++			/* Not ready yet. */
++			dd->resume = atmel_sha_cpu_transfer;
++			atmel_sha_write(dd, SHA_IER, SHA_INT_DATARDY);
++			return -EINPROGRESS;
 +		}
-+
-+		/* All other sg lengths MUST be aligned to the block size. */
-+		if (!IS_ALIGNED(sg->length, bs))
-+			return false;
-+
-+		len -= sg->length;
 +	}
 +
-+	return false;
++	if (unlikely(!(ctx->flags & SHA_FLAGS_WAIT_DATARDY)))
++		return dd->cpu_transfer_complete(dd);
++
++	return atmel_sha_wait_for_data_ready(dd, dd->cpu_transfer_complete);
 +}
 +
-+static void atmel_sha_dma_callback2(void *data)
-+{
-+	struct atmel_sha_dev *dd = data;
-+	struct atmel_sha_dma *dma = &dd->dma_lch_in;
-+	struct scatterlist *sg;
-+	int nents;
-+
-+	dmaengine_terminate_all(dma->chan);
-+	dma_unmap_sg(dd->dev, dma->sg, dma->nents, DMA_TO_DEVICE);
-+
-+	sg = dma->sg;
-+	for (nents = 0; nents < dma->nents - 1; ++nents)
-+		sg = sg_next(sg);
-+	sg->length = dma->last_sg_length;
-+
-+	dd->is_async = true;
-+	(void)atmel_sha_wait_for_data_ready(dd, dd->resume);
-+}
-+
-+static int atmel_sha_dma_start(struct atmel_sha_dev *dd,
-+			       struct scatterlist *src,
-+			       size_t len,
++static int atmel_sha_cpu_start(struct atmel_sha_dev *dd,
++			       struct scatterlist *sg,
++			       unsigned int len,
++			       bool idatar0_only,
++			       bool wait_data_ready,
 +			       atmel_sha_fn_t resume)
 +{
-+	struct atmel_sha_dma *dma = &dd->dma_lch_in;
-+	struct dma_slave_config *config = &dma->dma_conf;
-+	struct dma_chan *chan = dma->chan;
-+	struct dma_async_tx_descriptor *desc;
-+	dma_cookie_t cookie;
-+	unsigned int sg_len;
-+	int err;
++	struct ahash_request *req = dd->req;
++	struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
 +
-+	dd->resume = resume;
++	if (!len)
++		return resume(dd);
 +
-+	/*
-+	 * dma->nents has already been initialized by
-+	 * atmel_sha_dma_check_aligned().
-+	 */
-+	dma->sg = src;
-+	sg_len = dma_map_sg(dd->dev, dma->sg, dma->nents, DMA_TO_DEVICE);
-+	if (!sg_len) {
-+		err = -ENOMEM;
-+		goto exit;
-+	}
++	ctx->flags &= ~(SHA_FLAGS_IDATAR0 | SHA_FLAGS_WAIT_DATARDY);
 +
-+	config->src_maxburst = 16;
-+	config->dst_maxburst = 16;
-+	err = dmaengine_slave_config(chan, config);
-+	if (err)
-+		goto unmap_sg;
++	if (idatar0_only)
++		ctx->flags |= SHA_FLAGS_IDATAR0;
 +
-+	desc = dmaengine_prep_slave_sg(chan, dma->sg, sg_len, DMA_MEM_TO_DEV,
-+				       DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
-+	if (!desc) {
-+		err = -ENOMEM;
-+		goto unmap_sg;
-+	}
++	if (wait_data_ready)
++		ctx->flags |= SHA_FLAGS_WAIT_DATARDY;
 +
-+	desc->callback = atmel_sha_dma_callback2;
-+	desc->callback_param = dd;
-+	cookie = dmaengine_submit(desc);
-+	err = dma_submit_error(cookie);
-+	if (err)
-+		goto unmap_sg;
++	ctx->sg = sg;
++	ctx->total = len;
++	ctx->offset = 0;
 +
-+	dma_async_issue_pending(chan);
++	/* Prepare the first block to be written. */
++	ctx->bufcnt = min_t(size_t, ctx->block_size, ctx->total);
++	scatterwalk_map_and_copy(ctx->buffer, ctx->sg,
++				 ctx->offset, ctx->bufcnt, 0);
 +
-+	return -EINPROGRESS;
-+
-+unmap_sg:
-+	dma_unmap_sg(dd->dev, dma->sg, dma->nents, DMA_TO_DEVICE);
-+exit:
-+	return atmel_sha_complete(dd, err);
++	dd->cpu_transfer_complete = resume;
++	return atmel_sha_cpu_transfer(dd);
 +}
 +
 +
- /* CPU transfer functions */
- 
- static int atmel_sha_cpu_transfer(struct atmel_sha_dev *dd)
+ static void atmel_sha_unregister_algs(struct atmel_sha_dev *dd)
+ {
+ 	int i;
 -- 
 2.7.4
