@@ -1,7 +1,7 @@
 From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH v2 03/12] crypto: atmel-sha: make atmel_sha_done_task more generic
-Date: Thu, 22 Dec 2016 17:37:52 +0100
-Message-ID: <ab60d2a275a0ee7c544325c63e8d51444e887804.1482424395.git.cyrille.pitchen@atmel.com>
+Subject: [PATCH v2 07/12] crypto: atmel-sha: add atmel_sha_cpu_start()
+Date: Thu, 22 Dec 2016 17:37:56 +0100
+Message-ID: <39e69aee6fcce63e8c9aa083ac8c28171ac5f3b9.1482424395.git.cyrille.pitchen@atmel.com>
 References: <cover.1482424395.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -15,82 +15,128 @@ In-Reply-To: <cover.1482424395.git.cyrille.pitchen@atmel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch is a transitional patch. It updates atmel_sha_done_task() to
-make it more generic. Indeed, it adds a new .resume() member in the
-atmel_sha_dev structure. This hook is called from atmel_sha_done_task()
-to resume processing an asynchronous request.
+This patch adds a simple function to perform data transfer with PIO, hence
+handled by the CPU.
 
 Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
 ---
- drivers/crypto/atmel-sha.c | 21 ++++++++++++++++-----
- 1 file changed, 16 insertions(+), 5 deletions(-)
+ drivers/crypto/atmel-sha.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)
 
 diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 2dbed8bb8d26..643d79a05dda 100644
+index be0d72cf4352..58d9ca8ac0f2 100644
 --- a/drivers/crypto/atmel-sha.c
 +++ b/drivers/crypto/atmel-sha.c
-@@ -138,6 +138,7 @@ struct atmel_sha_dev {
- 	struct crypto_queue	queue;
+@@ -64,6 +64,8 @@
+ #define SHA_FLAGS_ERROR		BIT(23)
+ #define SHA_FLAGS_PAD		BIT(24)
+ #define SHA_FLAGS_RESTORE	BIT(25)
++#define SHA_FLAGS_IDATAR0	BIT(26)
++#define SHA_FLAGS_WAIT_DATARDY	BIT(27)
+ 
+ #define SHA_OP_UPDATE	1
+ #define SHA_OP_FINAL	2
+@@ -141,6 +143,7 @@ struct atmel_sha_dev {
  	struct ahash_request	*req;
  	bool			is_async;
-+	atmel_sha_fn_t		resume;
+ 	atmel_sha_fn_t		resume;
++	atmel_sha_fn_t		cpu_transfer_complete;
  
  	struct atmel_sha_dma	dma_lch_in;
  
-@@ -946,6 +947,8 @@ static int atmel_sha_handle_queue(struct atmel_sha_dev *dd,
- 	return (start_async) ? ret : err;
+@@ -1317,6 +1320,93 @@ static irqreturn_t atmel_sha_irq(int irq, void *dev_id)
+ 	return IRQ_NONE;
  }
  
-+static int atmel_sha_done(struct atmel_sha_dev *dd);
 +
- static int atmel_sha_start(struct atmel_sha_dev *dd)
- {
- 	struct ahash_request *req = dd->req;
-@@ -960,6 +963,7 @@ static int atmel_sha_start(struct atmel_sha_dev *dd)
- 	if (err)
- 		goto err1;
- 
-+	dd->resume = atmel_sha_done;
- 	if (ctx->op == SHA_OP_UPDATE) {
- 		err = atmel_sha_update_req(dd);
- 		if (err != -EINPROGRESS && (ctx->flags & SHA_FLAGS_FINUP))
-@@ -1215,13 +1219,10 @@ static void atmel_sha_queue_task(unsigned long data)
- 	atmel_sha_handle_queue(dd, NULL);
- }
- 
--static void atmel_sha_done_task(unsigned long data)
-+static int atmel_sha_done(struct atmel_sha_dev *dd)
- {
--	struct atmel_sha_dev *dd = (struct atmel_sha_dev *)data;
- 	int err = 0;
- 
--	dd->is_async = true;
--
- 	if (SHA_FLAGS_CPU & dd->flags) {
- 		if (SHA_FLAGS_OUTPUT_READY & dd->flags) {
- 			dd->flags &= ~SHA_FLAGS_OUTPUT_READY;
-@@ -1245,11 +1246,21 @@ static void atmel_sha_done_task(unsigned long data)
- 				goto finish;
- 		}
- 	}
--	return;
-+	return err;
- 
- finish:
- 	/* finish curent request */
- 	atmel_sha_finish_req(dd->req, err);
++/* CPU transfer functions */
 +
-+	return err;
++static int atmel_sha_cpu_transfer(struct atmel_sha_dev *dd)
++{
++	struct ahash_request *req = dd->req;
++	struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
++	const u32 *words = (const u32 *)ctx->buffer;
++	size_t i, num_words;
++	u32 isr, din, din_inc;
++
++	din_inc = (ctx->flags & SHA_FLAGS_IDATAR0) ? 0 : 1;
++	for (;;) {
++		/* Write data into the Input Data Registers. */
++		num_words = DIV_ROUND_UP(ctx->bufcnt, sizeof(u32));
++		for (i = 0, din = 0; i < num_words; ++i, din += din_inc)
++			atmel_sha_write(dd, SHA_REG_DIN(din), words[i]);
++
++		ctx->offset += ctx->bufcnt;
++		ctx->total -= ctx->bufcnt;
++
++		if (!ctx->total)
++			break;
++
++		/*
++		 * Prepare next block:
++		 * Fill ctx->buffer now with the next data to be written into
++		 * IDATARx: it gives time for the SHA hardware to process
++		 * the current data so the SHA_INT_DATARDY flag might be set
++		 * in SHA_ISR when polling this register at the beginning of
++		 * the next loop.
++		 */
++		ctx->bufcnt = min_t(size_t, ctx->block_size, ctx->total);
++		scatterwalk_map_and_copy(ctx->buffer, ctx->sg,
++					 ctx->offset, ctx->bufcnt, 0);
++
++		/* Wait for hardware to be ready again. */
++		isr = atmel_sha_read(dd, SHA_ISR);
++		if (!(isr & SHA_INT_DATARDY)) {
++			/* Not ready yet. */
++			dd->resume = atmel_sha_cpu_transfer;
++			atmel_sha_write(dd, SHA_IER, SHA_INT_DATARDY);
++			return -EINPROGRESS;
++		}
++	}
++
++	if (unlikely(!(ctx->flags & SHA_FLAGS_WAIT_DATARDY)))
++		return dd->cpu_transfer_complete(dd);
++
++	return atmel_sha_wait_for_data_ready(dd, dd->cpu_transfer_complete);
 +}
 +
-+static void atmel_sha_done_task(unsigned long data)
++static int atmel_sha_cpu_start(struct atmel_sha_dev *dd,
++			       struct scatterlist *sg,
++			       unsigned int len,
++			       bool idatar0_only,
++			       bool wait_data_ready,
++			       atmel_sha_fn_t resume)
 +{
-+	struct atmel_sha_dev *dd = (struct atmel_sha_dev *)data;
++	struct ahash_request *req = dd->req;
++	struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
 +
-+	dd->is_async = true;
-+	(void)dd->resume(dd);
- }
- 
- static irqreturn_t atmel_sha_irq(int irq, void *dev_id)
++	if (!len)
++		return resume(dd);
++
++	ctx->flags &= ~(SHA_FLAGS_IDATAR0 | SHA_FLAGS_WAIT_DATARDY);
++
++	if (idatar0_only)
++		ctx->flags |= SHA_FLAGS_IDATAR0;
++
++	if (wait_data_ready)
++		ctx->flags |= SHA_FLAGS_WAIT_DATARDY;
++
++	ctx->sg = sg;
++	ctx->total = len;
++	ctx->offset = 0;
++
++	/* Prepare the first block to be written. */
++	ctx->bufcnt = min_t(size_t, ctx->block_size, ctx->total);
++	scatterwalk_map_and_copy(ctx->buffer, ctx->sg,
++				 ctx->offset, ctx->bufcnt, 0);
++
++	dd->cpu_transfer_complete = resume;
++	return atmel_sha_cpu_transfer(dd);
++}
++
++
+ static void atmel_sha_unregister_algs(struct atmel_sha_dev *dd)
+ {
+ 	int i;
 -- 
 2.7.4
