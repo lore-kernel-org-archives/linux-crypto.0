@@ -1,92 +1,71 @@
-From: Andy Lutomirski <luto@amacapital.net>
-Subject: Re: George's crazy full state idea (Re: HalfSipHash Acceptable Usage)
-Date: Thu, 22 Dec 2016 08:09:54 -0800
-Message-ID: <CALCETrUSM7KDNuVqh169241PNumJVOF5hrNQUq=k5Fnet6nSgA@mail.gmail.com>
-References: <CALCETrVn1tWBQx-RCSqCQ2ZcB6hPdioaV52q8vY+Mz1fRKsUXA@mail.gmail.com>
+From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
+Subject: [PATCH 00/12] crypto: atmel-authenc: add support to authenc(hmac(shaX),Y(aes)) modes
+Date: Thu, 22 Dec 2016 17:15:05 +0100
+Message-ID: <cover.1482422983.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: George Spelvin <linux@sciencehorizons.net>,
-        "Ted Ts'o" <tytso@mit.edu>, Andi Kleen <ak@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Laight <David.Laight@aculab.com>,
-        "D. J. Bernstein" <djb@cr.yp.to>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        "kernel-hardening@lists.openwall.com"
-        <kernel-hardening@lists.openwall.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        Tom Herbert <tom@herbertland.com>,
-        Linus Torvalds <torvalds@linux-foundation.or
-To: Andy Lutomirski <luto@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ua0-f169.google.com ([209.85.217.169]:34255 "EHLO
-        mail-ua0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755269AbcLVQKQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Dec 2016 11:10:16 -0500
-Received: by mail-ua0-f169.google.com with SMTP id 34so49786438uac.1
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Dec 2016 08:10:15 -0800 (PST)
-In-Reply-To: <CALCETrVn1tWBQx-RCSqCQ2ZcB6hPdioaV52q8vY+Mz1fRKsUXA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Cyrille Pitchen <cyrille.pitchen@atmel.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <nicolas.ferre@atmel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Dec 21, 2016 at 6:07 PM, Andy Lutomirski <luto@kernel.org> wrote:
-> On Wed, Dec 21, 2016 at 5:13 PM, George Spelvin
-> <linux@sciencehorizons.net> wrote:
->> As a separate message, to disentangle the threads, I'd like to
->> talk about get_random_long().
->>
->> After some thinking, I still like the "state-preserving" construct
->> that's equivalent to the current MD5 code.  Yes, we could just do
->> siphash(current_cpu || per_cpu_counter, global_key), but it's nice to
->> preserve a bit more.
->>
->> It requires library support from the SipHash code to return the full
->> SipHash state, but I hope that's a fair thing to ask for.
->
-> I don't even think it needs that.  This is just adding a
-> non-destructive final operation, right?
->
->>
->> Here's my current straw man design for comment.  It's very similar to
->> the current MD5-based design, but feeds all the seed material in the
->> "correct" way, as opposed to Xring directly into the MD5 state.
->>
->> * Each CPU has a (Half)SipHash state vector,
->>   "unsigned long get_random_int_hash[4]".  Unlike the current
->>   MD5 code, we take care to initialize it to an asymmetric state.
->>
->> * There's a global 256-bit random_int_secret (which we could
->>   reseed periodically).
->>
->> To generate a random number:
->> * If get_random_int_hash is all-zero, seed it with fresh a half-sized
->>   SipHash key and the appropriate XOR constants.
->> * Generate three words of random_get_entropy(), jiffies, and current->pid.
->>   (This is arbitary seed material, copied from the current code.)
->> * Crank through that with (Half)SipHash-1-0.
->> * Crank through the random_int_secret with (Half)SipHash-1-0.
->> * Return v1 ^ v3.
->
-> Just to clarify, if we replace SipHash with a black box, I think this
-> effectively means, where "entropy" is random_get_entropy() || jiffies
-> || current->pid:
->
-> The first call returns H(random seed || entropy_0 || secret).  The
-> second call returns H(random seed || entropy_0 || secret || entropy_1
-> || secret).  Etc.
+Hi all,
 
-Having slept on this, I like it less.  The problem is that a
-backtracking attacker doesn't just learn H(random seed || entropy_0 ||
-secret || ...) -- they learn the internal state of the hash function
-that generates that value.  This probably breaks any attempt to apply
-security properties of the hash function.  For example, the internal
-state could easily contain a whole bunch of prior outputs it in
-verbatim.
+this series of patches has been based and tested on next-20161222 with
+CRYPTO_MANAGER_DISABLED_TESTS not set.
 
---Andy
+The series adds support to the hmac(shaX) algorithms first, then combines
+both the Atmel SHA and AES hardware accelerators to implement
+authenc(hmac(shaX),Y(aes)) algorithms as used by IPSEC/SSL connections.
+
+It has also been tested with strongswan + xl2tpd to create an IPSEC+L2TP
+(transport mode) VPN and strongswan only (tunnel mode) for an IPSEC VPN.
+
+Then iperf was used to measure the bandwidth improvement in tunnel mode:
+
+drivers                                    AES SHA SPLIP iperf half-duplex
+                                                         Mbit/s
+authenc(hmac(sha1-generic),cbc(aes))        SW   SW  N/A 27.7
+authenc(hmac(sha1-generic),atmel-cbc-aes)   HW   SW  N/A 30.2 (mainline)
+authenc(atmel-hmac-sha1,atmel-cbc-aes)      HW   HW   no 29.1
+atmel-authenc-hmac-sha1-cbc-aes             HW   hW  yes 38.8
+
+SPLIP: Secure Protocol Layers Improved Performances (AES+SHA combined).
+
+Some patches of this series are purely transitional: I've split the
+modifications into many patches to ease the review.
+
+Best regards,
+
+Cyrille
+
+Cyrille Pitchen (12):
+  crypto: atmel-sha: create function to get an Atmel SHA device
+  crypto: atmel-sha: update request queue management to make it more
+    generic
+  crypto: atmel-sha: make atmel_sha_done_task more generic
+  crypto: atmel-sha: redefine SHA_FLAGS_SHA* flags to match
+    SHA_MR_ALGO_SHA*
+  crypto: atmel-sha: add atmel_sha_wait_for_data_ready()
+  crypto: atmel-sha: add SHA_MR_MODE_IDATAR0
+  crypto: atmel-sha: add atmel_sha_cpu_start()
+  crypto: atmel-sha: add simple DMA transfers
+  crypto: atmel-sha: add support to hmac(shaX)
+  crypto: atmel-aes: fix atmel_aes_handle_queue()
+  crypto: atmel-authenc: add support to authenc(hmac(shaX),Y(aes)) modes
+  crypto: atmel-sha: add verbose debug facilities to print hw register
+    names
+
+ drivers/crypto/Kconfig          |   12 +
+ drivers/crypto/atmel-aes-regs.h |   16 +
+ drivers/crypto/atmel-aes.c      |  478 ++++++++++++-
+ drivers/crypto/atmel-sha-regs.h |   20 +
+ drivers/crypto/atmel-sha.c      | 1438 +++++++++++++++++++++++++++++++++++++--
+ 5 files changed, 1896 insertions(+), 68 deletions(-)
+
+-- 
+2.7.4
