@@ -1,21 +1,18 @@
-From: Hannes Frederic Sowa <hannes@stressinduktion.org>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Subject: Re: [kernel-hardening] Re: [PATCH v7 3/6] random: use SipHash in
  place of MD5
-Date: Thu, 22 Dec 2016 16:05:53 +0100
-Message-ID: <5c306c80-3499-8b92-21d0-c197f30ce326@stressinduktion.org>
-References: <20161216030328.11602-1-Jason@zx2c4.com>
- <20161221230216.25341-1-Jason@zx2c4.com>
- <20161221230216.25341-4-Jason@zx2c4.com>
- <CALCETrVttVoZMvCYZcrAqM1c=YQP_nCfdfO1MsrSHjvjTFxH+A@mail.gmail.com>
+Date: Thu, 22 Dec 2016 16:12:24 +0100
+Message-ID: <CAHmME9qZviooxOW+e=khazG0phSEWwZyKj=eayre_7hs8d+cQw@mail.gmail.com>
+References: <20161216030328.11602-1-Jason@zx2c4.com> <20161221230216.25341-1-Jason@zx2c4.com>
+ <20161221230216.25341-4-Jason@zx2c4.com> <CALCETrVttVoZMvCYZcrAqM1c=YQP_nCfdfO1MsrSHjvjTFxH+A@mail.gmail.com>
  <17bd0c70-d2c1-165b-f5b2-252dfca404e8@stressinduktion.org>
  <CAHmME9phg=GuhEUaMxxv_=RexffPDqrOEhmaKffy_ZSt7bfC7g@mail.gmail.com>
- <20161222054125.lzxhd6ctovm3wk4p@thunk.org>
- <1482410840.2472.2.camel@stressinduktion.org>
- <CAHmME9r_zTHo=dxRRK6UrjJ_dKV14yYsZsxCc362z4CPoVkddw@mail.gmail.com>
+ <20161222054125.lzxhd6ctovm3wk4p@thunk.org> <1482410840.2472.2.camel@stressinduktion.org>
+ <CAHmME9r_zTHo=dxRRK6UrjJ_dKV14yYsZsxCc362z4CPoVkddw@mail.gmail.com> <5c306c80-3499-8b92-21d0-c197f30ce326@stressinduktion.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Theodore Ts'o <tytso@mit.edu>,
+Content-Type: text/plain; charset=UTF-8
+Cc: kernel-hardening@lists.openwall.com,
+        "Theodore Ts'o" <tytso@mit.edu>,
         Andy Lutomirski <luto@amacapital.net>,
         Netdev <netdev@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -28,22 +25,24 @@ Cc: Theodore Ts'o <tytso@mit.edu>,
         Andi Kleen <ak@linux.intel.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        kernel-hardening@lists.openwall.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9r_zTHo=dxRRK6UrjJ_dKV14yYsZsxCc362z4CPoVkddw@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:38922 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S935154AbcLVPND (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Dec 2016 10:13:03 -0500
+In-Reply-To: <5c306c80-3499-8b92-21d0-c197f30ce326@stressinduktion.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 22.12.2016 14:10, Jason A. Donenfeld wrote:
-> On Thu, Dec 22, 2016 at 1:47 PM, Hannes Frederic Sowa
-> <hannes@stressinduktion.org> wrote:
->> following up on what appears to be a random subject: ;)
->>
->> IIRC, ext4 code by default still uses half_md4 for hashing of filenames
->> in the htree. siphash seems to fit this use case pretty good.
-> 
-> I saw this too. I'll try to address it in v8 of this series.
+On Thu, Dec 22, 2016 at 4:05 PM, Hannes Frederic Sowa
+<hannes@stressinduktion.org> wrote:
+> This change would need a new version of the ext4 super block, because
+> you should not change existing file systems.
 
-This change would need a new version of the ext4 super block, because
-you should not change existing file systems.
+Right.
+
+As a first step, I'm considering adding a patch to move halfmd4.c
+inside the ext4 domain, or at the very least, simply remove it from
+linux/cryptohash.h. That'll then leave the handful of bizarre sha1
+usages to consider.
