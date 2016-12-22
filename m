@@ -1,59 +1,54 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH v2] crypto: Add IV generation algorithms
-Date: Thu, 22 Dec 2016 16:55:09 +0800
-Message-ID: <20161222085509.GA2160@gondor.apana.org.au>
-References: <1481618949-20086-1-git-send-email-binoy.jayan@linaro.org>
- <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
- <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com>
+Subject: Re: dm-crypt optimization
+Date: Thu, 22 Dec 2016 16:59:27 +0800
+Message-ID: <20161222085927.GB2160@gondor.apana.org.au>
+References: <CAHv-k_98w-9whFiCLAnTGL2QAirExsix_S8ZWc8tM7wj=gzD6Q@mail.gmail.com>
+ <bf5e7237-2f5c-3fc6-c7d6-38c3b13ac2c3@gmail.com>
+ <CAHv-k_-K9dOiM+Pm_wqVJrvmNYhjtS82-emKVZ8OjsoMHf+7hg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Binoy Jayan <binoy.jayan@linaro.org>, Oded <oded.golombek@arm.com>,
-        Ofir <Ofir.Drang@arm.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+Cc: Milan Broz <gmazyland@gmail.com>, Oded <oded.golombek@arm.com>,
+        Ofir <Ofir.Drang@arm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Mark Brown <broonie@kernel.org>,
         Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-        Rajendra <rnayak@codeaurora.org>
-To: Milan Broz <gmazyland@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52027 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750727AbcLVI5F (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Dec 2016 03:57:05 -0500
+        "David S. Miller" <davem@davemloft.net>, private-kwg@linaro.org,
+        dm-devel@redhat.com, linux-crypto@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        linux-raid@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        Mike Snitzer <snitzer@redhat.com>
+To: Binoy Jayan <binoy.jayan@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <CAHv-k_-K9dOiM+Pm_wqVJrvmNYhjtS82-emKVZ8OjsoMHf+7hg@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Dec 13, 2016 at 11:01:08AM +0100, Milan Broz wrote:
+On Thu, Dec 22, 2016 at 01:55:59PM +0530, Binoy Jayan wrote:
 >
-> By the move everything to cryptoAPI we are basically introducing some strange mix
-> of IV and modes there, I wonder how this is going to be maintained.
-> Anyway, Herbert should say if it is ok...
+> > Support of bigger block sizes would be unsafe without additional mechanism that provides
+> > atomic writes of multiple sectors. Maybe it applies to 4k as well on some devices though...)
+> 
+> Did you mean write to the crypto output buffers or the actual disk write?
+> I didn't quite understand how the block size for encryption affects atomic
+> writes as it is the block layer which handles them. As far as dm-crypt is,
+> concerned it just encrypts/decrypts a 'struct bio' instance and submits the IO
+> operation to the block layer.
 
-Well there is precedent in how do the IPsec IV generation.  In
-that case the IV generators too are completely specific to that
-application, i.e., IPsec.  However, the way structured it allowed
-us to have one single entry path from the IPsec stack into the
-crypto layer regardless of whether you are using AEAD or traditional
-encryption/hashing algorithms.
+I think Milan's talking about increasing the real block size, which
+would obviously require the hardware to be able to write that out
+atomically, as otherwise it breaks the crypto.
 
-For IPsec we make the IV generators behave like normal AEAD
-algorithms, except that they take the sequence number as the IV.
+But if we can instead do the IV generation within the crypto API,
+then the block size won't be an issue at all.  Because you can
+supply as many blocks as you want and they would be processed
+block-by-block.
 
-The goal here are obviously different.  However, by employing
-the same method as we do in IPsec, it appears to me that you
-can effectively process multiple blocks at once instead of having
-to supply one block at a time due to the IV generation issue.
- 
-> I really do not think the disk encryption key management should be moved
-> outside of dm-crypt. We cannot then change key structure later easily.
-
-It doesn't have to live outside of dm-crypt.  You can register
-these IV generators from there if you really want.
+Now there is a disadvantage to this approach, and that is you
+have to wait for the whole thing to be encrypted before you can 
+start doing the IO.  I'm not sure how big a problem that is but
+if it is bad enough to affect performance, we can look into adding
+some form of partial completion to the crypto API.
 
 Cheers,
 -- 
