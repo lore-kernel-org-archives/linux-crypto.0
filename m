@@ -1,86 +1,62 @@
-From: Binoy Jayan <binoy.jayan@linaro.org>
-Subject: Re: dm-crypt optimization
-Date: Thu, 22 Dec 2016 13:55:59 +0530
-Message-ID: <CAHv-k_-K9dOiM+Pm_wqVJrvmNYhjtS82-emKVZ8OjsoMHf+7hg@mail.gmail.com>
-References: <CAHv-k_98w-9whFiCLAnTGL2QAirExsix_S8ZWc8tM7wj=gzD6Q@mail.gmail.com>
- <bf5e7237-2f5c-3fc6-c7d6-38c3b13ac2c3@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC PATCH v2] crypto: Add IV generation algorithms
+Date: Thu, 22 Dec 2016 16:55:09 +0800
+Message-ID: <20161222085509.GA2160@gondor.apana.org.au>
+References: <1481618949-20086-1-git-send-email-binoy.jayan@linaro.org>
+ <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
+ <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>, Mark Brown <broonie@kernel.org>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Binoy Jayan <binoy.jayan@linaro.org>, Oded <oded.golombek@arm.com>,
+        Ofir <Ofir.Drang@arm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
         Alasdair Kergon <agk@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>, private-kwg@linaro.org,
-        dm-devel@redhat.com, linux-crypto@vger.kernel.org,
-        Rajendra <rnayak@codeaurora.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        linux-raid@vger.kernel.org, Shaohua Li <shli@kernel.org>,
-        Mike Snitzer <snitzer@redhat.com>
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>
 To: Milan Broz <gmazyland@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ua0-f182.google.com ([209.85.217.182]:35262 "EHLO
-        mail-ua0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1761600AbcLVI0B (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:52027 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750727AbcLVI5F (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Dec 2016 03:26:01 -0500
-Received: by mail-ua0-f182.google.com with SMTP id 2so100928953uax.2
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Dec 2016 00:26:00 -0800 (PST)
-In-Reply-To: <bf5e7237-2f5c-3fc6-c7d6-38c3b13ac2c3@gmail.com>
+        Thu, 22 Dec 2016 03:57:05 -0500
+Content-Disposition: inline
+In-Reply-To: <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Milan,
-
-On 21 December 2016 at 18:17, Milan Broz <gmazyland@gmail.com> wrote:
-
-> So the core problem is that your crypto accelerator can operate efficiently only
-> with bigger batch sizes.
-
-Thank you for the reply. Yes, that would be rather an improvement when having
-bigger block sizes.
-
-> How big blocks your crypto hw need to be able to operate more efficiently?
-> What about 4k blocks (no batches), could it be usable trade-off?
-
-The benchmark results for Qualcomm Snapdragon SoC's (mentioned below) show
-significant improvement with 4K blocks but in batches of all such contiguous
-segments in the block layer's request queue in the form of a chained
-scatterlist.
-However, it uses the algorithm 'aes-xts' instead of the conventional
-'essiv-cbc-aes'
-used in dm-crypt. Also, it uses the device mapper dm-req-crypt instead
-of dm-cypt.
-
-http://nelenkov.blogspot.in/2015/05/hardware-accelerated-disk-encryption-in.html
-Section : 'Performance'
-
-Its reports and IO rate of 46.3MB/s compared to an IO rate of 25.1MB/s while
-using a software-based FDE (based on dm-crypt).  But I am not sure how genuine
-this data is or how it was tested.
-
-Since qualcomm SoC's use hardware backed keystore for managing keys and since
-there is no easy way to make dm-crypt work with qualcomm's engines, I do not
-have solid benchmark data to show an improved performance when using 4k blocks.
-
-> With some (backward incompatible) changes in LUKS format I would like to see support
-> for encryption blocks equivalent to sectors size, so it basically means for 4k drive 4k
-> encryption block.
-> (This should decrease overhead, now is everything processed on 512 blocks only.)
+On Tue, Dec 13, 2016 at 11:01:08AM +0100, Milan Broz wrote:
 >
-> Support of bigger block sizes would be unsafe without additional mechanism that provides
-> atomic writes of multiple sectors. Maybe it applies to 4k as well on some devices though...)
+> By the move everything to cryptoAPI we are basically introducing some strange mix
+> of IV and modes there, I wonder how this is going to be maintained.
+> Anyway, Herbert should say if it is ok...
 
-Did you mean write to the crypto output buffers or the actual disk write?
-I didn't quite understand how the block size for encryption affects atomic
-writes as it is the block layer which handles them. As far as dm-crypt is,
-concerned it just encrypts/decrypts a 'struct bio' instance and submits the IO
-operation to the block layer.
+Well there is precedent in how do the IPsec IV generation.  In
+that case the IV generators too are completely specific to that
+application, i.e., IPsec.  However, the way structured it allowed
+us to have one single entry path from the IPsec stack into the
+crypto layer regardless of whether you are using AEAD or traditional
+encryption/hashing algorithms.
 
-> The above is not going against your proposal, I am just curious if this is enough
-> to provide better performance on your hw accelerator or not.
+For IPsec we make the IV generators behave like normal AEAD
+algorithms, except that they take the sequence number as the IV.
 
-May be I should be able to procure an open crypto board and get back to you with
-some results. Or may be show even a marginal improvement while using software
-algorithm by avoiding the crypto overhead for every 512 bytes.
+The goal here are obviously different.  However, by employing
+the same method as we do in IPsec, it appears to me that you
+can effectively process multiple blocks at once instead of having
+to supply one block at a time due to the IV generation issue.
+ 
+> I really do not think the disk encryption key management should be moved
+> outside of dm-crypt. We cannot then change key structure later easily.
 
--Binoy
+It doesn't have to live outside of dm-crypt.  You can register
+these IV generators from there if you really want.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
