@@ -1,134 +1,86 @@
-From: "George Spelvin" <linux@sciencehorizons.net>
-Subject: Re: George's crazy full state idea (Re: HalfSipHash Acceptable Usage)
-Date: 22 Dec 2016 03:02:16 -0500
-Message-ID: <20161222080216.15157.qmail@ns.sciencehorizons.net>
-References: <CALCETrU84-EeU91AkoAZLWrhK=FSrBgV139oSSM-Vw5Mc0mdAg@mail.gmail.com>
-Reply-To: kernel-hardening@lists.openwall.com
-Cc: ak@linux.intel.com, davem@davemloft.net, David.Laight@aculab.com,
-  djb@cr.yp.to, ebiggers3@gmail.com, eric.dumazet@gmail.com,
-  hannes@stressinduktion.org, Jason@zx2c4.com,
-  jeanphilippe.aumasson@gmail.com, kernel-hardening@lists.openwall.com,
-  linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, luto@kernel.org,
-  netdev@vger.kernel.org, tom@herbertland.com, torvalds@linux-foundation.org,
-  tytso@mit.edu, vegard.nossum@gmail.com
-To: linux@sciencehorizons.net, luto@amacapital.net
-Return-path: <kernel-hardening-return-5775-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <CALCETrU84-EeU91AkoAZLWrhK=FSrBgV139oSSM-Vw5Mc0mdAg@mail.gmail.com>
-List-Id: linux-crypto.vger.kernel.org
+From: Binoy Jayan <binoy.jayan@linaro.org>
+Subject: Re: dm-crypt optimization
+Date: Thu, 22 Dec 2016 13:55:59 +0530
+Message-ID: <CAHv-k_-K9dOiM+Pm_wqVJrvmNYhjtS82-emKVZ8OjsoMHf+7hg@mail.gmail.com>
+References: <CAHv-k_98w-9whFiCLAnTGL2QAirExsix_S8ZWc8tM7wj=gzD6Q@mail.gmail.com>
+ <bf5e7237-2f5c-3fc6-c7d6-38c3b13ac2c3@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>, Mark Brown <broonie@kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>, private-kwg@linaro.org,
+        dm-devel@redhat.com, linux-crypto@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        linux-raid@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        Mike Snitzer <snitzer@redhat.com>
+To: Milan Broz <gmazyland@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ua0-f182.google.com ([209.85.217.182]:35262 "EHLO
+        mail-ua0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1761600AbcLVI0B (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Dec 2016 03:26:01 -0500
+Received: by mail-ua0-f182.google.com with SMTP id 2so100928953uax.2
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Dec 2016 00:26:00 -0800 (PST)
+In-Reply-To: <bf5e7237-2f5c-3fc6-c7d6-38c3b13ac2c3@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-> True, but it's called get_random_int(), and it seems like making it
-> stronger, especially if the performance cost is low to zero, is a good
-> thing.
+Hi Milan,
 
-If it's cheap enough, I don't mind.  But it's documented as being
-marginal-quality, used where speed is more important.
+On 21 December 2016 at 18:17, Milan Broz <gmazyland@gmail.com> wrote:
 
-In particular, it's *not* used for key material; only values that matter
-only as long as they are in use.  Whule they're in use, they can't be
-concealed from an attacker with kernel access, and when they're dne
-being used, they're worthless.
+> So the core problem is that your crypto accelerator can operate efficiently only
+> with bigger batch sizes.
 
->> If you want anti-backtracking, though, it's easy to add.  What we
->> hash is:
->>
->> entropy_0 || secret || output_0 || entropy_1 || secret || output_1 || ...
->>
->> You mix the output word right back in to the (unfinalized) state after
->> generating it.  This is still equivalent to unmodified back-box SipHash,
->> you're just using a (conceptually independent) SipHash invocation to
->> produce some of its input.
+Thank you for the reply. Yes, that would be rather an improvement when having
+bigger block sizes.
 
-> Ah, cute.  This could probably be sped up by doing something like:
+> How big blocks your crypto hw need to be able to operate more efficiently?
+> What about 4k blocks (no batches), could it be usable trade-off?
+
+The benchmark results for Qualcomm Snapdragon SoC's (mentioned below) show
+significant improvement with 4K blocks but in batches of all such contiguous
+segments in the block layer's request queue in the form of a chained
+scatterlist.
+However, it uses the algorithm 'aes-xts' instead of the conventional
+'essiv-cbc-aes'
+used in dm-crypt. Also, it uses the device mapper dm-req-crypt instead
+of dm-cypt.
+
+http://nelenkov.blogspot.in/2015/05/hardware-accelerated-disk-encryption-in.html
+Section : 'Performance'
+
+Its reports and IO rate of 46.3MB/s compared to an IO rate of 25.1MB/s while
+using a software-based FDE (based on dm-crypt).  But I am not sure how genuine
+this data is or how it was tested.
+
+Since qualcomm SoC's use hardware backed keystore for managing keys and since
+there is no easy way to make dm-crypt work with qualcomm's engines, I do not
+have solid benchmark data to show an improved performance when using 4k blocks.
+
+> With some (backward incompatible) changes in LUKS format I would like to see support
+> for encryption blocks equivalent to sectors size, so it basically means for 4k drive 4k
+> encryption block.
+> (This should decrease overhead, now is everything processed on 512 blocks only.)
 >
-> entropy_0 || secret || output_0 ^ entropy_1 || secret || ...
+> Support of bigger block sizes would be unsafe without additional mechanism that provides
+> atomic writes of multiple sectors. Maybe it applies to 4k as well on some devices though...)
 
-I'm disinclined to do that because that requires deferring the mixing
-until the *next* time you generate something.  Storing the value you
-don't want revealed by a state capture defeats the purpose.
+Did you mean write to the crypto output buffers or the actual disk write?
+I didn't quite understand how the block size for encryption affects atomic
+writes as it is the block layer which handles them. As far as dm-crypt is,
+concerned it just encrypts/decrypts a 'struct bio' instance and submits the IO
+operation to the block layer.
 
-I'd rather mix it in immediately, so you have anti-backtracking from
-the moment of creation.
+> The above is not going against your proposal, I am just curious if this is enough
+> to provide better performance on your hw accelerator or not.
 
-Also, I don't think it's particularly "cute" or clever; mixing output back
-in is the standard way all antibacktracking is accomplished.  It's how
-the Davies-Meyer hash construction makes a reversible function one-way.
+May be I should be able to procure an open crypto board and get back to you with
+some results. Or may be show even a marginal improvement while using software
+algorithm by avoiding the crypto overhead for every 512 bytes.
 
-(There is a second way to do it by throwing away state, but that's
-expensive in seed entropy.)
-
-> It's a little weak because the output is only 64 bits, so you could
-> plausibly backtrack it on a GPU or FPGA cluster or on an ASIC if the
-> old entropy is guessable.  I suspect there are sneaky ways around it
-> like using output_n-1 ^ output_n-2 or similar.  I'll sleep on it.
-
-Ah, yes, I see.  Given the final state, you guess the output word, go
-back one round, then forward the finalization rounds.   Is the output
-equal to the guessed output?  You'll find the true value, plus
-Poisson(1 - 2^-64) additional.  (Since you have 2^64-1 chances at
-something with probability 1 in 2^64.)
-
-And this can be iterated as often as you like to get earlier output words,
-as long as you can guess the entropy.  *That's* the part that hurts;
-you'd like something that peters out.
-
-You could use the double-length-output SipHash variant (which requires
-a second set of finalization rounds) and mix more output back, but
-that's expensive.
-
-The challenge is coming up with more unpredictable data to mix in than one
-invocation of SipHash returns.  And without storing previous output
-anywhere, because that is exactly wrong.
-
-A running sum or xor or whatever of the outputs doesn't help, because
-once you've guessed the last output, you can backtrack that for no
-additional effort.
-
-State capture is incredibly difficult, our application doesn't require
-resistance anyway... unless you can think of something cheap, I think
-we can just live with this.
-
->> I'd *like* to persuade you that skipping the padding byte wouldn't
->> invalidate any security proofs, because it's true and would simplify
->> the code.  But if you want 100% stock, I'm willing to cater to that.
-
-> I lean toward stock in the absence of a particularly good reason.  At
-> the very least I'd want to read that paper carefully.
-
-Er... adding the length is standard Merkle-Damgaard strengthening.
-Why you do this is described in the original papers by Merkle and Damgaard.
-
-The lay summary is at
-https://en.wikipedia.org/wiki/Merkle-Damgard_construction
-
-The original sources are:
-http://www.merkle.com/papers/Thesis1979.pdf
-http://saluc.engr.uconn.edu/refs/algorithms/hashalg/damgard89adesign.pdf
-
-Merkle describes the construction; Damgaard proves it secure.  Basically,
-appending the length is required to handle variable-length input if the
-input is not itself self-delimiting.
-
-The proof of security is theorem 3.1 in the latter.  (The first, more
-detailed explanation involves the use of an extra bit, which the second
-then explains how todo without.)
-
-In particular, see the top of page 420, which notes that the security
-proof only requires encoding *how much padding is added* in the final
-block, not the overall length of the message, and the second remark on
-p. 421 which notes that no such suffix is required if it's not necessary
-to distinguish messages with different numbers of trailing null bytes.
-
-The rules are alluded to in the "Choice of padding rule" part of the
-"Rationale" section of the SipHash paper (p. 7), but the description is
-very brief because it assumes the reader has the background.
-
-That's why they say "We could have chosen a slightly simpler padding rule,
-such as appending a <tt>80</tt> byte followed by zeroes."
-
-The thing is, if the amount of the last block that is used is fixed
-(within the domain of a particular key), you don't need to encode this
-information at all.
+-Binoy
