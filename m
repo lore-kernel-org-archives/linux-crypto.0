@@ -1,93 +1,39 @@
-From: Anatoly Pugachev <matorola@gmail.com>
-Subject: Re: [PATCH v6 1/2] sparc: fix a building error reported by kbuild
-Date: Thu, 22 Dec 2016 17:58:18 +0300
-Message-ID: <CADxRZqwVBXksG=ChgvPe9sJAw45v48u4k0VYV=VLmeporujYDg@mail.gmail.com>
-References: <1481171829-116496-1-git-send-email-arei.gonglei@huawei.com>
- <1481171829-116496-2-git-send-email-arei.gonglei@huawei.com>
- <20161209215851.GA7717@ravnborg.org> <33183CC9F5247A488A2544077AF19020DA159386@DGGEMA505-MBX.china.huawei.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Cc: Sam Ravnborg <sam@ravnborg.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        virtio-dev@lists.oasis-open.org
-To: "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>
-Return-path: <sparclinux-owner@vger.kernel.org>
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA159386@DGGEMA505-MBX.china.huawei.com>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - fix indentation
+Date: Thu, 22 Dec 2016 14:58:23 +0000
+Message-ID: <20161222145823.5782-1-giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org, giovanni.cabiddu@gmail.com,
+        Ahsan Atta <ahsan.atta@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga05.intel.com ([192.55.52.43]:5528 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756592AbcLVO64 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Dec 2016 09:58:56 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Guys,
+From: Ahsan Atta <ahsan.atta@intel.com>
 
-so was it fixed or not?
+Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ drivers/crypto/qat/qat_common/adf_dev_mgr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I can not compile current git kernel:
-
-linux-2.6$ git desc
-v4.9-11937-g52bce91165e5
-
-linux-2.6$ git status
-On branch master
-Your branch is up-to-date with 'origin/master'.
-nothing to commit, working tree clean
-
-linux-2.6$ git log --oneline arch/sparc/include/asm/topology_64.h | head -1
-541cc39433a8 sparc: fix a building error reported by kbuild
-
-linux-2.6$ make
-  CHK     include/config/kernel.release
-  CHK     include/generated/uapi/linux/version.h
-  CHK     include/generated/utsrelease.h
-  CHK     include/generated/bounds.h
-  CHK     include/generated/timeconst.h
-  CHK     include/generated/asm-offsets.h
-  CALL    scripts/checksyscalls.sh
-<stdin>:1316:2: warning: #warning syscall pkey_mprotect not implemented [-W=
-cpp]
-<stdin>:1319:2: warning: #warning syscall pkey_alloc not implemented [-Wcpp=
-]
-<stdin>:1322:2: warning: #warning syscall pkey_free not implemented [-Wcpp]
-  CHK     include/generated/compile.h
-  GEN     usr/initramfs_data.cpio".gz"
-  AS      usr/initramfs_data.o
-  LD      usr/built-in.o
-  CHK     kernel/config_data.h
-  CC [M]  drivers/crypto/virtio/virtio_crypto_mgr.o
-In file included from ./arch/sparc/include/asm/topology.h:4:0,
-                 from ./include/linux/topology.h:35,
-                 from ./include/linux/gfp.h:8,
-                 from ./include/linux/kmod.h:22,
-                 from ./include/linux/module.h:13,
-                 from drivers/crypto/virtio/virtio_crypto_mgr.c:21:
-drivers/crypto/virtio/virtio_crypto_common.h: In function
-=E2=80=98virtio_crypto_get_current_node=E2=80=99:
-./arch/sparc/include/asm/topology_64.h:45:44: error: implicit
-declaration of function =E2=80=98cpu_data=E2=80=99
-[-Werror=3Dimplicit-function-declaration]
- #define topology_physical_package_id(cpu) (cpu_data(cpu).proc_id)
-                                            ^
-drivers/crypto/virtio/virtio_crypto_common.h:119:9: note: in expansion
-of macro =E2=80=98topology_physical_package_id=E2=80=99
-  node =3D topology_physical_package_id(cpu);
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-./arch/sparc/include/asm/topology_64.h:45:57: error: request for
-member =E2=80=98proc_id=E2=80=99 in something not a structure or union
- #define topology_physical_package_id(cpu) (cpu_data(cpu).proc_id)
-                                                         ^
-drivers/crypto/virtio/virtio_crypto_common.h:119:9: note: in expansion
-of macro =E2=80=98topology_physical_package_id=E2=80=99
-  node =3D topology_physical_package_id(cpu);
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: some warnings being treated as errors
-scripts/Makefile.build:293: recipe for target
-'drivers/crypto/virtio/virtio_crypto_mgr.o' failed
-make[3]: *** [drivers/crypto/virtio/virtio_crypto_mgr.o] Error 1
-scripts/Makefile.build:551: recipe for target 'drivers/crypto/virtio' faile=
-d
-make[2]: *** [drivers/crypto/virtio] Error 2
-scripts/Makefile.build:551: recipe for target 'drivers/crypto' failed
-make[1]: *** [drivers/crypto] Error 2
-Makefile:988: recipe for target 'drivers' failed
-make: *** [drivers] Error 2
-linux-2.6$
+diff --git a/drivers/crypto/qat/qat_common/adf_dev_mgr.c b/drivers/crypto/qat/qat_common/adf_dev_mgr.c
+index b3ebb25..8afac52 100644
+--- a/drivers/crypto/qat/qat_common/adf_dev_mgr.c
++++ b/drivers/crypto/qat/qat_common/adf_dev_mgr.c
+@@ -152,7 +152,7 @@ void adf_devmgr_update_class_index(struct adf_hw_device_data *hw_data)
+ 			ptr->hw_device->instance_id = i++;
+ 
+ 		if (i == class->instances)
+-				break;
++			break;
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(adf_devmgr_update_class_index);
+-- 
+2.9.3
