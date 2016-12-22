@@ -1,7 +1,7 @@
 From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH 01/12] crypto: atmel-sha: create function to get an Atmel SHA device
-Date: Thu, 22 Dec 2016 17:15:06 +0100
-Message-ID: <2557968ceb904a9a73dc83a3639e9f11f54a643b.1482422983.git.cyrille.pitchen@atmel.com>
+Subject: [PATCH 05/12] crypto: atmel-sha: add atmel_sha_wait_for_data_ready()
+Date: Thu, 22 Dec 2016 17:15:10 +0100
+Message-ID: <4acd571517ee8919b65765de30da2b8e8a73bbed.1482422983.git.cyrille.pitchen@atmel.com>
 References: <cover.1482422983.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -15,48 +15,44 @@ In-Reply-To: <cover.1482422983.git.cyrille.pitchen@atmel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This is a transitional patch: it creates the atmel_sha_find_dev() function,
-which will be used in further patches to share the source code responsible
-for finding a Atmel SHA device.
+This patch simply defines a helper function to test the 'Data Ready' flag
+of the Status Register. It also gives a chance for the crypto request to
+be processed synchronously if this 'Data Ready' flag is already set when
+polling the Status Register. Indeed, running synchronously avoid the
+latency of the 'Data Ready' interrupt.
+
+When the 'Data Ready' flag has not been set yet, we enable the associated
+interrupt and resume processing the crypto request asynchronously from the
+'done' task just as before.
 
 Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
 ---
- drivers/crypto/atmel-sha.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ drivers/crypto/atmel-sha.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 97e34799e077..33a36e667547 100644
+index b29a4e5bc404..be0d72cf4352 100644
 --- a/drivers/crypto/atmel-sha.c
 +++ b/drivers/crypto/atmel-sha.c
-@@ -260,11 +260,8 @@ static void atmel_sha_fill_padding(struct atmel_sha_reqctx *ctx, int length)
- 	}
+@@ -434,6 +434,19 @@ static void atmel_sha_write_ctrl(struct atmel_sha_dev *dd, int dma)
+ 	atmel_sha_write(dd, SHA_MR, valmr);
  }
  
--static int atmel_sha_init(struct ahash_request *req)
-+static struct atmel_sha_dev *atmel_sha_find_dev(struct atmel_sha_ctx *tctx)
- {
--	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
--	struct atmel_sha_ctx *tctx = crypto_ahash_ctx(tfm);
--	struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
- 	struct atmel_sha_dev *dd = NULL;
- 	struct atmel_sha_dev *tmp;
- 
-@@ -281,6 +278,16 @@ static int atmel_sha_init(struct ahash_request *req)
- 
- 	spin_unlock_bh(&atmel_sha.lock);
- 
-+	return dd;
++static inline int atmel_sha_wait_for_data_ready(struct atmel_sha_dev *dd,
++						atmel_sha_fn_t resume)
++{
++	u32 isr = atmel_sha_read(dd, SHA_ISR);
++
++	if (unlikely(isr & SHA_INT_DATARDY))
++		return resume(dd);
++
++	dd->resume = resume;
++	atmel_sha_write(dd, SHA_IER, SHA_INT_DATARDY);
++	return -EINPROGRESS;
 +}
 +
-+static int atmel_sha_init(struct ahash_request *req)
-+{
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	struct atmel_sha_ctx *tctx = crypto_ahash_ctx(tfm);
-+	struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
-+	struct atmel_sha_dev *dd = atmel_sha_find_dev(tctx);
-+
- 	ctx->dd = dd;
- 
- 	ctx->flags = 0;
+ static int atmel_sha_xmit_cpu(struct atmel_sha_dev *dd, const u8 *buf,
+ 			      size_t length, int final)
+ {
 -- 
 2.7.4
