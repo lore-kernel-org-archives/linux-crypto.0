@@ -1,105 +1,47 @@
-From: "George Spelvin" <linux@sciencehorizons.net>
-Subject: Re: George's crazy full state idea (Re: HalfSipHash Acceptable Usage)
-Date: 22 Dec 2016 19:07:16 -0500
-Message-ID: <20161223000716.5768.qmail@ns.sciencehorizons.net>
-References: <30d9513a-129b-d246-1461-2326130e118f@stressinduktion.org>
-Reply-To: kernel-hardening@lists.openwall.com
-Cc: ak@linux.intel.com, davem@davemloft.net, David.Laight@aculab.com,
-  djb@cr.yp.to, ebiggers3@gmail.com, eric.dumazet@gmail.com, Jason@zx2c4.com,
-  jeanphilippe.aumasson@gmail.com, kernel-hardening@lists.openwall.com,
-  linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-  netdev@vger.kernel.org, tom@herbertland.com, torvalds@linux-foundation.org,
-  tytso@mit.edu, vegard.nossum@gmail.com
-To: hannes@stressinduktion.org, linux@sciencehorizons.net, luto@kernel.org
-Return-path: <kernel-hardening-return-5810-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <30d9513a-129b-d246-1461-2326130e118f@stressinduktion.org>
-List-Id: linux-crypto.vger.kernel.org
+From: Harsh Jain <harshjain.prof@gmail.com>
+Subject: Re: Test AEAD/authenc algorithms from userspace
+Date: Fri, 23 Dec 2016 11:16:50 +0530
+Message-ID: <1b6fefca-d174-cd73-434b-7417d857f013@gmail.com>
+References: <CAFXBA=kStufh3TDe=+qQYmd2tNCj9hgXLUKBeoZHBs2VxRBRbQ@mail.gmail.com>
+ <2943969.IiWKeGvEyD@tauon.atsec.com>
+ <CAFXBA=ma8ZKeFfu-_DS1Nm=k0pwUatSabCmhwwwBMg45epOo_g@mail.gmail.com>
+ <20161221085429.GB29501@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: Stephan Mueller <smueller@chronox.de>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:35051 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751634AbcLWFq4 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Dec 2016 00:46:56 -0500
+Received: by mail-pf0-f194.google.com with SMTP id i88so13359582pfk.2
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Dec 2016 21:46:56 -0800 (PST)
+In-Reply-To: <20161221085429.GB29501@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hannes Frederic Sowa wrote:
-> A lockdep test should still be done. ;)
 
-Adding might_lock() annotations will improve coverage a lot.
 
-> Yes, that does look nice indeed. Accounting for bits instead of bytes
-> shouldn't be a huge problem either. Maybe it gets a bit more verbose in
-> case you can't satisfy a request with one batched entropy block and have
-> to consume randomness from two.
+On 21-12-2016 14:24, Herbert Xu wrote:
+> On Mon, Dec 19, 2016 at 04:08:11PM +0530, Harsh Jain wrote:
+>> Hi Herbert,
+>>
+>> TLS default mode of operation is MAC-then-Encrypt for Authenc algos.
+>> Currently framework only supports EtM used in IPSec. User space
+>> programs like openssl cannot use af-alg interface to encrypt/decrypt
+>> in TLS mode.
+>> Are we going to support Mac-then-Encrypt mode in future kernel releases?
+> If someone finally adds TLS to the kernel then we'll likely do
+> something about it.  
+Till that time we cannot use crypto authenc type algos with AF-ALG socket interface for TLS or MtE( separation into 2 operation always not possible).  TLS RFC7366 allow users to decide weather to use EtM or MtE in TLS. We can solve this, If we have some way to communicate drivers  to operate in TLS mode like in setsockopt or msghdr of sendmsg.
 
-The bit granularity is also for the callers' convenience, so they don't
-have to mask again.  Whether get_random_bits rounds up to byte boundaries
-internally or not is something else.
+> Otherwise you can just separate it out into
+> two operations via af-alg.
+ Always not possible. If openssl has software implementation of Authec( Cipher and hash with 1 algo) it expects same from af-alg engine only then he will override. Its like if Openssl has super set(AES+ SHA256) available it expect same super set in engine(af-alg) for comparison.
+The machines with instruction set extensions has authenc implemented in user space like intel aes-ni.
 
-When the current batch runs low, I was actually thinking of throwing
-away the remaining bits and computing a new batch of 512.  But it's
-whatever works best at implementation time.
-
->>> It could only mix the output back in every two calls, in which case
->>> you can backtrack up to one call but you need to do 2^128 work to
->>> backtrack farther.  But yes, this is getting excessively complicated.
-> 
->> No, if you're willing to accept limited backtrack, this is a perfectly
->> acceptable solution, and not too complicated.  You could do it phase-less
->> if you like; store the previous output, then after generating the new
->> one, mix in both.  Then overwrite the previous output.  (But doing two
->> rounds of a crypto primtive to avoid one conditional jump is stupid,
->> so forget that.)
-
-> Can you quickly explain why we lose the backtracking capability?
-
-Sure.  An RNG is (state[i], output[i]) = f(state[i-1]).  The goal of
-backtracking is to compute output[i], or better yet state[i-1], given
-state[i].
-
-For example, consider an OFB or CTR mode generator.  The state is a key
-and and IV, and you encrypt the IV with the key to produce output, then
-either replace the IV with the output, or increment it.  Either way,
-since you still have the key, you can invert the transformation and
-recover the previous IV.
-
-The standard way around this is to use the Davies-Meyer construction:
-
-IV[i] = IV[i-1] + E(IV[i-1], key)
-
-This is the standard way to make a non-invertible random function
-out of an invertible random permutation.
-
->From the sum, there's no easy way to find the ciphertext *or* the
-plaintext that was encrypted.  Assuming the encryption is secure,
-the only way to reverse it is brute force: guess IV[i-1] and run the
-operation forward to see if the resultant IV[i] matches.
-
-There are a variety of ways to organize this computation, since the
-guess gives toy both IV[i-1] and E(IV[i-1], key) = IV[i] - IV[i-1], including
-running E forward, backward, or starting from both ends to see if you
-meet in the middle.
-
-The way you add the encryption output to the IV is not very important.
-It can be addition, xor, or some more complex invertible transformation.
-In the case of SipHash, the "encryption" output is smaller than the
-input, so we have to get a bit more creative, but it's still basically
-the same thing.
-
-The problem is that the output which is combined with the IV is too small.
-With only 64 bits, trying all possible values is practical.  (The world's
-Bitcoin miners are collectively computing SHA-256(SHA-256(input)) 1.7 * 2^64
-times per second.)
-
-By basically doing two iterations at once and mixing in 128 bits of
-output, the guessing attack is rendered impractical.  The only downside
-is that you need to remember and store one result between when it's
-computed and last used.  This is part of the state, so an attack can
-find output[i-1], but not anything farther back.
-
-> ChaCha as a block cipher gives a "perfect" permutation from the output
-> of either the CRNG or the CPRNG, which actually itself has backtracking
-> protection.
-
-I'm not quite understanding.  The /dev/random implementation uses some
-of the ChaCha output as a new ChaCha key (that's another way to mix output
-back into the state) to prevent backtracking.  But this slows it down, and
-again if you want to be efficient, you're generating and storing large batches
-of entropy and storing it in the RNG state.
+>
+> Cheers,
