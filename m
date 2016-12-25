@@ -1,55 +1,67 @@
-From: Daniel Borkmann <daniel@iogearbox.net>
-Subject: Re: [RFC PATCH 4.10 3/6] bpf: Use SHA256 instead of SHA1 for bpf
- digests
-Date: Sat, 24 Dec 2016 20:59:53 +0100
-Message-ID: <585ED3B9.6020407@iogearbox.net>
-References: <cover.1482545792.git.luto@kernel.org> <bbfd69226fd74391045bafc695bba9a46cacca85.1482545792.git.luto@kernel.org>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH 0/2] crypto: AF_ALG memory management fix
+Date: Sun, 25 Dec 2016 18:13:49 +0100
+Message-ID: <1486189.x0AQ4O6r2j@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Tom Herbert <tom@herbertland.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alexei Starovoitov <ast@kernel.org>
-To: Andy Lutomirski <luto@kernel.org>, Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <bbfd69226fd74391045bafc695bba9a46cacca85.1482545792.git.luto@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:54984 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751516AbcLYRQa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 25 Dec 2016 12:16:30 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 12/24/2016 03:22 AM, Andy Lutomirski wrote:
-> BPF digests are intended to be used to avoid reloading programs that
-> are already loaded.  For use cases (CRIU?) where untrusted programs
-> are involved, intentional hash collisions could cause the wrong BPF
-> program to execute.  Additionally, if BPF digests are ever used
-> in-kernel to skip verification, a hash collision could give privilege
-> escalation directly.
+Hi Herbert,
 
-Just for the record, digests will never ever be used to skip the
-verification step, so I don't know why this idea even comes up
-here (?) or is part of the changelog? As this will never be done
-anyway, rather drop that part so we can avoid confusion on this?
+please find attached memory management updates to
 
-Wrt untrusted programs, I don't see much of a use on this facility
-in general for them. Something like a tail call map would quite
-likely only be private to the application. And again, I really doubt
-we'll have something like user namespace support in the foreseeable
-future. Anyway, that said, I don't really have a big issue if you
-want to switch to sha256, though.
+- simplify the code: the old AIO memory management is very
+  complex and seemingly very fragile -- the update now
+  eliminates all reported bugs in the skcipher and AEAD
+  interfaces which allowed the kernel to be crashed by
+  an unprivileged user
 
-> SHA1 is no longer considered adequately collision-resistant (see, for
-> example, all the major browsers dropping support for SHA1
-> certificates).  Use SHA256 instead.
->
-> I moved the digest field to keep all of the bpf program metadata in
-> the same cache line.
->
-> Cc: Daniel Borkmann <daniel@iogearbox.net>
-> Cc: Alexei Starovoitov <ast@kernel.org>
-> Signed-off-by: Andy Lutomirski <luto@kernel.org>
+- streamline the code: there is one code path for AIO and sync
+  operation; the code between algif_skcipher and algif_aead
+  is very similar (if that patch set is accepted, I volunteer
+  to reduce code duplication by moving service operations
+  into af_alg.c and to further unify the TX SGL handling)
+
+- unify the AIO and sync operation which only differ in the
+  kernel crypto API callback and whether to wait for the
+  crypto operation or not
+
+- fix all reported bugs regarding the handling of multiple
+  IOCBs.
+
+The following testing was performed:
+
+- stress testing to verify that no memleaks exist
+
+- testing using Tadeusz Struck AIO test tool (see
+  https://github.com/tstruk/afalg_async_test) -- the AEAD test
+  is not applicable any more due to the changed user space
+  interface; the skcipher test works once the user space
+  interface change is honored in the test code
+
+- using the libkcapi test suite, all tests including the
+  originally failing ones (AIO with multiple IOCBs) work now --
+  the current libkcapi code artificially limits the AEAD
+  operation to one IOCB. After altering the libkcapi code
+  to allow multiple IOCBs, the testing works flawless.
+
+Stephan Mueller (2):
+  crypto: aead AF_ALG - overhaul memory management
+  crypto: skcipher AF_ALG - overhaul memory management
+
+ crypto/algif_aead.c     | 439 ++++++++++++++++++++
++---------------------------
+ crypto/algif_skcipher.c | 438 +++++++++++++++++++----------------------------
+ 2 files changed, 369 insertions(+), 508 deletions(-)
+
+-- 
+2.9.3
