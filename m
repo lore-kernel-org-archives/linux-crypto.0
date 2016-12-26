@@ -1,45 +1,50 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH 4.10 0/6] Switch BPF's digest to SHA256
-Date: Mon, 26 Dec 2016 16:20:58 +0800
-Message-ID: <20161226082058.GA9013@gondor.apana.org.au>
-References: <cover.1482545792.git.luto@kernel.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [RFC PATCH 4.10 1/6] crypto/sha256: Refactor the API so it can be
+ used without shash
+Date: Mon, 26 Dec 2016 17:51:14 +0000
+Message-ID: <CAKv+Gu-NMNCEs61f4k7JSf9iSJ1A_Gy1r=kZRGqtbDsEDz7--Q@mail.gmail.com>
+References: <cover.1482545792.git.luto@kernel.org> <942b91f25a63b22ec4946378a1fffe78d655cf18.1482545792.git.luto@kernel.org>
+ <CAKv+Gu-UCqwchgbhg8VN4s=Yxk=PkjXG46NZo=8P4wAQtJ2TXw@mail.gmail.com>
+ <CALCETrVbT_1=cdU1+a-+KbhoFqeT3XvbHjY0s_U7C5JVgiPx_Q@mail.gmail.com> <20161226075757.GA8916@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: daniel@iogearbox.net, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Jason@zx2c4.com, hannes@stressinduktion.org,
-        alexei.starovoitov@gmail.com, edumazet@google.com,
-        ebiggers3@gmail.com, tom@herbertland.com, davem@davemloft.net,
-        luto@kernel.org
-To: Andy Lutomirski <luto@kernel.org>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <cover.1482545792.git.luto@kernel.org>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: Andy Lutomirski <luto@amacapital.net>,
+        Andy Lutomirski <luto@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Tom Herbert <tom@herbertland.com>,
+        "David S. Miller" <davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-io0-f181.google.com ([209.85.223.181]:34562 "EHLO
+        mail-io0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753418AbcLZRwN (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 26 Dec 2016 12:52:13 -0500
+Received: by mail-io0-f181.google.com with SMTP id p42so300104322ioo.1
+        for <linux-crypto@vger.kernel.org>; Mon, 26 Dec 2016 09:51:15 -0800 (PST)
+In-Reply-To: <20161226075757.GA8916@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Andy Lutomirski <luto@kernel.org> wrote:
-> Since there are plenty of uses for the new-in-4.10 BPF digest feature
-> that would be problematic if malicious users could produce collisions,
-> the BPF digest should be collision-resistant.  SHA-1 is no longer
-> considered collision-resistant, so switch it to SHA-256.
-> 
-> The actual switchover is trivial.  Most of this series consists of
-> cleanups to the SHA256 code to make it usable as a standalone library
-> (since BPF should not depend on crypto).
-> 
-> The cleaned up library is much more user-friendly than the SHA-1 code,
-> so this also significantly tidies up the BPF digest code.
-> 
-> This is intended for 4.10.  If this series misses 4.10 and nothing
-> takes its place, then we'll have an unpleasant ABI stability
-> situation.
+On 26 December 2016 at 07:57, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Sat, Dec 24, 2016 at 09:57:53AM -0800, Andy Lutomirski wrote:
+>>
+>> I actually do use incremental hashing later on.   BPF currently
+>> vmallocs() a big temporary buffer just so it can fill it and hash it.
+>> I change it to hash as it goes.
+>
+> How much data is this supposed to hash on average? If it's a large
+> amount then perhaps using the existing crypto API would be a better
+> option than adding this.
+>
 
-Can you please explain why BPF needs to be able to use SHA directly
-rather than through the crypto API?
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+This is a good point actually: you didn't explain *why* BPF shouldn't
+depend on the crypto API.
