@@ -1,66 +1,59 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] crypto: arm/aes-neonbs - process 8 blocks in parallel if
- we can
-Date: Tue, 27 Dec 2016 18:35:46 +0000
-Message-ID: <CAKv+Gu8OkOR3Xzx=XEOWyFpo6sLiq=WQrq0SauaY0V57uYetCQ@mail.gmail.com>
-References: <1481291246-20216-1-git-send-email-ard.biesheuvel@linaro.org> <20161227085745.GA10121@gondor.apana.org.au>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: [RFC PATCH 4.10 1/6] crypto/sha256: Refactor the API so it can be
+ used without shash
+Date: Tue, 27 Dec 2016 11:00:17 -0800
+Message-ID: <CALCETrXy6QXLKTih9e=ceMZes=SjHEMGg+vW1sXdiRg5Qaxt7g@mail.gmail.com>
+References: <cover.1482545792.git.luto@kernel.org> <942b91f25a63b22ec4946378a1fffe78d655cf18.1482545792.git.luto@kernel.org>
+ <CAKv+Gu-UCqwchgbhg8VN4s=Yxk=PkjXG46NZo=8P4wAQtJ2TXw@mail.gmail.com>
+ <CALCETrVbT_1=cdU1+a-+KbhoFqeT3XvbHjY0s_U7C5JVgiPx_Q@mail.gmail.com>
+ <20161226075757.GA8916@gondor.apana.org.au> <CAKv+Gu-NMNCEs61f4k7JSf9iSJ1A_Gy1r=kZRGqtbDsEDz7--Q@mail.gmail.com>
+ <CALCETrXFTQ2AXgbQzPnRcDRHK81=FS1R0zqfoTqGjUsqZy2PvQ@mail.gmail.com>
+ <20161227095853.GA10588@gondor.apana.org.au> <586277AE.80401@iogearbox.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f45.google.com ([209.85.214.45]:35047 "EHLO
-        mail-it0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754973AbcL0Sfs (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Dec 2016 13:35:48 -0500
-Received: by mail-it0-f45.google.com with SMTP id c20so194053316itb.0
-        for <linux-crypto@vger.kernel.org>; Tue, 27 Dec 2016 10:35:47 -0800 (PST)
-In-Reply-To: <20161227085745.GA10121@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Tom Herbert <tom@herbertland.com>,
+        "David S. Miller" <davem@davemloft.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <586277AE.80401@iogearbox.net>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 27 December 2016 at 08:57, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Fri, Dec 09, 2016 at 01:47:26PM +0000, Ard Biesheuvel wrote:
->> The bit-sliced NEON implementation of AES only performs optimally if
->> it can process 8 blocks of input in parallel. This is due to the nature
->> of bit slicing, where the n-th bit of each byte of AES state of each input
->> block is collected into NEON register 'n', for registers q0 - q7.
+On Tue, Dec 27, 2016 at 6:16 AM, Daniel Borkmann <daniel@iogearbox.net> wrote:
+> On 12/27/2016 10:58 AM, Herbert Xu wrote:
 >>
->> This implies that the amount of work for the transform is fixed,
->> regardless of whether we are handling just one block or 8 in parallel.
+>> On Mon, Dec 26, 2016 at 10:08:48AM -0800, Andy Lutomirski wrote:
+>>>
+>>>
+>>> According to Daniel, the networking folks want to let embedded systems
+>>> include BPF without requiring the crypto core.
 >>
->> So let's try a bit harder to iterate over the input in suitably sized
->> chunks, by increasing the chunksize to 8 * AES_BLOCK_SIZE, and tweaking
->> the loops to only process multiples of the chunk size, unless we are
->> handling the last chunk in the input stream.
 >>
->> Note that the skcipher walk API guarantees that a step in the walk never
->> returns less that 'chunksize' bytes if there are at least that many bytes
->> of input still available. However, it does *not* guarantee that those steps
->> produce an exact multiple of the chunk size.
->>
->> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>> Last I checked the IPv4 stack depended on the crypto API so this
+>> sounds bogus.
 >
-> I like this patch.  However, I had different plans for the chunksize
-> attribute.  It's primarily meant to be a hint to the upper layer
-> in case it does partial updates.  It's meant to provide the minimum
-> number of bytes a partial update can carry without screwing up
-> subsequent updates.
 >
-> It just happens to be the same value that we were using during
-> an skcipher walk.
->
-> So I think for your case we should add a new attribute, perhaps
-> walk_chunksize or walksize, which doesn't need to be exported to
-> the outside at all and can then be used by the walk interface.
->
+> I think there's a bit of a mixup here with what I said. To clarify,
+> requirement back then from tracing folks was that bpf engine and
+> therefore bpf syscall can be build w/o networking enabled for small
+> devices, so dependencies preferably need to be kept on a absolute
+> minimum, same counts for either making it suddenly a depend on
+> CRYPTO or a select CRYPTO for just those few lines that can be
+> pulled in from lib/ code instead.
 
-OK, I will try to hack something up.
+Somehow I had that in my head as "networking" not "tracing", probably
+because of the TCA stuff.  Whoops.
 
-One thing to keep in mind though is that stacked chaining modes should
-present the data with the same granularity for optimal performance.
-E.g., xts(ecb(aes)) should pass 8 blocks at a time. How should this
-requirement be incorporated according to you?
+Anyway, I'm rewriting the crypto part of the patch completely based on
+Ard's feedback.
