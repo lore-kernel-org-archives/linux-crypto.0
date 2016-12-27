@@ -1,43 +1,42 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 0/2] crypto: arm64/ARM: NEON accelerated ChaCha20
-Date: Tue, 27 Dec 2016 19:17:54 +0000
-Message-ID: <CAKv+Gu8WphgNzb-2cBUgyh58goW0a0LOnfBgWsVu-J74Cd=_zQ@mail.gmail.com>
-References: <1481207339-17332-1-git-send-email-ard.biesheuvel@linaro.org> <CAH8yC8kJiKc4Oz8RAob_5oRoQeACqvqXyj2UAsfv4bQ_TmKG-w@mail.gmail.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH 6/8] random: fix comment for unused random_min_urandom_seed
+Date: Tue, 27 Dec 2016 23:41:22 +0100
+Message-ID: <8287186.H5QhrauTgY@positron.chronox.de>
+References: <3254875.f5A5oHPdxF@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: noloader@gmail.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f41.google.com ([209.85.214.41]:33610 "EHLO
-        mail-it0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753749AbcL0TRz (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Dec 2016 14:17:55 -0500
-Received: by mail-it0-f41.google.com with SMTP id c20so58266571itb.0
-        for <linux-crypto@vger.kernel.org>; Tue, 27 Dec 2016 11:17:55 -0800 (PST)
-In-Reply-To: <CAH8yC8kJiKc4Oz8RAob_5oRoQeACqvqXyj2UAsfv4bQ_TmKG-w@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Ted Tso <tytso@mit.edu>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <3254875.f5A5oHPdxF@positron.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 27 December 2016 at 15:36, Jeffrey Walton <noloader@gmail.com> wrote:
->> ChaCha20 is a stream cipher described in RFC 7539, and is intended to be
->> an efficient software implementable 'standby cipher', in case AES cannot
->> be used.
->
-> That's not quite correct.
->
-> The IETF changed the algorithm a bit, and its not compatible with
-> Bernstein's ChaCha. They probably should have differentiated the name
-> to avoid this sort of confusion.
->
-> You can find Bernstein's specification for ChaCha at
-> https://cr.yp.to/chacha.html, and the test vectors for Bernstein's
-> specification at
-> http://tools.ietf.org/html/draft-strombergson-chacha-test-vectors.
->
+The variable random_min_urandom_seed is not needed any more as it
+defined the reseeding behavior of the nonblocking pool. Though it is not
+needed any more, it is left in the code for user space interface
+compatibility.
 
-Thanks for the clarification. However, this should not affect the
-content of the patches: they simply reimplement in ARM SIMD what the
-kernel already knows as "chacha20", which is the IETF derivative
-rather than djb's original. I will mention this in the cover letter of
-the next respin (given that I need to respin these anyway)
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ drivers/char/random.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index d19108c..89d67c0 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -313,9 +313,7 @@ static int random_read_wakeup_bits = 64;
+ static int random_write_wakeup_bits = 28 * OUTPUT_POOL_WORDS;
+ 
+ /*
+- * The minimum number of seconds between urandom pool reseeding.  We
+- * do this to limit the amount of entropy that can be drained from the
+- * input pool even if there are heavy demands on /dev/urandom.
++ * Variable is currently unused by left for user space compatibility.
+  */
+ static int random_min_urandom_seed = 60;
+ 
+-- 
+2.9.3
