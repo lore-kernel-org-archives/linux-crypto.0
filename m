@@ -1,46 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH 4.10 1/6] crypto/sha256: Refactor the API so it can
- be used without shash
-Date: Tue, 27 Dec 2016 17:58:53 +0800
-Message-ID: <20161227095853.GA10588@gondor.apana.org.au>
-References: <cover.1482545792.git.luto@kernel.org>
- <942b91f25a63b22ec4946378a1fffe78d655cf18.1482545792.git.luto@kernel.org>
- <CAKv+Gu-UCqwchgbhg8VN4s=Yxk=PkjXG46NZo=8P4wAQtJ2TXw@mail.gmail.com>
- <CALCETrVbT_1=cdU1+a-+KbhoFqeT3XvbHjY0s_U7C5JVgiPx_Q@mail.gmail.com>
- <20161226075757.GA8916@gondor.apana.org.au>
- <CAKv+Gu-NMNCEs61f4k7JSf9iSJ1A_Gy1r=kZRGqtbDsEDz7--Q@mail.gmail.com>
- <CALCETrXFTQ2AXgbQzPnRcDRHK81=FS1R0zqfoTqGjUsqZy2PvQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] crypto: arm64/ARM: NEON accelerated ChaCha20
+Date: Tue, 27 Dec 2016 18:04:00 +0800
+Message-ID: <20161227100400.GA10629@gondor.apana.org.au>
+References: <1481207339-17332-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Tom Herbert <tom@herbertland.com>,
-        "David S. Miller" <davem@davemloft.net>
-To: Andy Lutomirski <luto@amacapital.net>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:41733 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1752502AbcL0KEJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 27 Dec 2016 05:04:09 -0500
 Content-Disposition: inline
-In-Reply-To: <CALCETrXFTQ2AXgbQzPnRcDRHK81=FS1R0zqfoTqGjUsqZy2PvQ@mail.gmail.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1481207339-17332-1-git-send-email-ard.biesheuvel@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 26, 2016 at 10:08:48AM -0800, Andy Lutomirski wrote:
->
-> According to Daniel, the networking folks want to let embedded systems
-> include BPF without requiring the crypto core.
+On Thu, Dec 08, 2016 at 02:28:57PM +0000, Ard Biesheuvel wrote:
+> Another port of existing x86 SSE code to NEON, again both for arm64 and ARM.
+> 
+> ChaCha20 is a stream cipher described in RFC 7539, and is intended to be
+> an efficient software implementable 'standby cipher', in case AES cannot
+> be used.
+> 
+> This NEON implementation is almost 2x as fast as the generic C code
+> (measured on Cortex-A57 using the arm64 version)
+> 
+> I'm aware that blkciphers are deprecated in favor of skciphers, but this
+> code (like the x86 version) uses the init and setkey routines of the generic
+> version, so it is probably better to port all implementations at once.
+> 
+> Ard Biesheuvel (2):
+>   crypto: arm64/chacha20 - implement NEON version based on SSE3 code
+>   crypto: arm/chacha20 - implement NEON version based on SSE3 code
 
-Last I checked the IPv4 stack depended on the crypto API so this
-sounds bogus.
-
-Cheers,
+Both patches applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
