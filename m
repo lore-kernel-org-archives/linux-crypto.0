@@ -1,89 +1,44 @@
-From: "Challa, Mahipal" <Mahipal.Challa@cavium.com>
-Subject: Re: [RFC PATCH 0/3] Cavium ThunderX ZIP driver
-Date: Tue, 27 Dec 2016 11:39:21 +0000
-Message-ID: <DM5PR07MB3148D87C62159523B750CD20E5690@DM5PR07MB3148.namprd07.prod.outlook.com>
-References: <20161212150439.18627-1-jglauber@cavium.com>,<20161227090227.GC10121@gondor.apana.org.au>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Subject: Re: [RFC PATCH 4.10 1/6] crypto/sha256: Refactor the API so it can
+ be used without shash
+Date: Tue, 27 Dec 2016 15:16:14 +0100
+Message-ID: <586277AE.80401@iogearbox.net>
+References: <cover.1482545792.git.luto@kernel.org> <942b91f25a63b22ec4946378a1fffe78d655cf18.1482545792.git.luto@kernel.org> <CAKv+Gu-UCqwchgbhg8VN4s=Yxk=PkjXG46NZo=8P4wAQtJ2TXw@mail.gmail.com> <CALCETrVbT_1=cdU1+a-+KbhoFqeT3XvbHjY0s_U7C5JVgiPx_Q@mail.gmail.com> <20161226075757.GA8916@gondor.apana.org.au> <CAKv+Gu-NMNCEs61f4k7JSf9iSJ1A_Gy1r=kZRGqtbDsEDz7--Q@mail.gmail.com> <CALCETrXFTQ2AXgbQzPnRcDRHK81=FS1R0zqfoTqGjUsqZy2PvQ@mail.gmail.com> <20161227095853.GA10588@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Nair, Vishnu" <Vishnu.Nair@cavium.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Tom Herbert <tom@herbertland.com>,
+        "David S. Miller" <davem@davemloft.net>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Jan Glauber <Jan.Glauber@cavium.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0068.outbound.protection.outlook.com ([104.47.38.68]:48192
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754447AbcL0NOK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Dec 2016 08:14:10 -0500
-In-Reply-To: <20161227090227.GC10121@gondor.apana.org.au>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Andy Lutomirski <luto@amacapital.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20161227095853.GA10588@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+On 12/27/2016 10:58 AM, Herbert Xu wrote:
+> On Mon, Dec 26, 2016 at 10:08:48AM -0800, Andy Lutomirski wrote:
+>>
+>> According to Daniel, the networking folks want to let embedded systems
+>> include BPF without requiring the crypto core.
+>
+> Last I checked the IPv4 stack depended on the crypto API so this
+> sounds bogus.
 
-Hi Herbert,
-
-Thanks for your response
-
->Hi Jan:
-
-On Mon, Dec 12, 2016 at 04:04:36PM +0100, Jan Glauber wrote:
-> >
-> >this series adds support for hardware accelerated compression & decompre=
-ssion
-> >as found on ThunderX (arm64) SOCs. I've been reviewing this driver inter=
-nally
-> >for some time and would like to get feedback on the RFC to see if this g=
-oes
-> >into the right direction and to see if there are any concerns.
-> >
-> >We've discussed switching to the new acomp algorithm but for the time be=
-ing
-> >decided against acomp because our test cases are not yet supported with =
-it.
-
-> OK.=A0 Do you see any major problems in converting this over to acomp?
-Mahipal: One major issue is, the kernel use cases to validate the Cavium Th=
-underX ZIP driver are "ZSWAP" and "IPComp" which are not yet supported with=
- scomp-acomp framework.=20
-
-Regards,
--Mahipal
-
-
-
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Sent: Tuesday, December 27, 2016 2:32 PM
-To: Jan Glauber
-Cc: linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org; David S . M=
-iller; Challa, Mahipal; Nair, Vishnu
-Subject: Re: [RFC PATCH 0/3] Cavium ThunderX ZIP driver
-=A0  =20
-Hi Jan:
-
-On Mon, Dec 12, 2016 at 04:04:36PM +0100, Jan Glauber wrote:
->=20
-> this series adds support for hardware accelerated compression & decompres=
-sion
-> as found on ThunderX (arm64) SOCs. I've been reviewing this driver intern=
-ally
-> for some time and would like to get feedback on the RFC to see if this go=
-es
-> into the right direction and to see if there are any concerns.
->=20
-> We've discussed switching to the new acomp algorithm but for the time bei=
-ng
-> decided against acomp because our test cases are not yet supported with i=
-t.
-
-OK.=A0 Do you see any major problems in converting this over to acomp?
-
-Thanks,
---=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-    =
+I think there's a bit of a mixup here with what I said. To clarify,
+requirement back then from tracing folks was that bpf engine and
+therefore bpf syscall can be build w/o networking enabled for small
+devices, so dependencies preferably need to be kept on a absolute
+minimum, same counts for either making it suddenly a depend on
+CRYPTO or a select CRYPTO for just those few lines that can be
+pulled in from lib/ code instead.
