@@ -1,103 +1,93 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [sparc64] cryptomgr_test OOPS kernel 4.9.0+
-Date: Mon, 26 Dec 2016 17:26:19 -0500 (EST)
-Message-ID: <20161226.172619.1321397093716823099.davem@davemloft.net>
-References: <CADxRZqwxU+XjTe+jwfrDdsp7Vs47YsJHww3=bsENhrUsYgHvkg@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Subject: Re: [RFC PATCH 4.10 3/6] bpf: Use SHA256 instead of SHA1 for bpf
+ digests
+Date: Mon, 26 Dec 2016 17:36:46 -0800
+Message-ID: <20161227013644.GA96815@ast-mbp.thefacebook.com>
+References: <cover.1482545792.git.luto@kernel.org>
+ <bbfd69226fd74391045bafc695bba9a46cacca85.1482545792.git.luto@kernel.org>
+ <585ED3B9.6020407@iogearbox.net>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
-        herbert@gondor.apana.org.au, giovanni.cabiddu@intel.com
-To: matorola@gmail.com
-Return-path: <sparclinux-owner@vger.kernel.org>
-In-Reply-To: <CADxRZqwxU+XjTe+jwfrDdsp7Vs47YsJHww3=bsENhrUsYgHvkg@mail.gmail.com>
-Sender: sparclinux-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Andy Lutomirski <luto@kernel.org>, Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Tom Herbert <tom@herbertland.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alexei Starovoitov <ast@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <585ED3B9.6020407@iogearbox.net>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Anatoly Pugachev <matorola@gmail.com>
-Date: Sun, 25 Dec 2016 20:56:08 +0300
-
-> Disabling kernel config option
-> CRYPTO_MANAGER_DISABLE_TESTS
-> i.e. enable run-time self tests, makes kernel unbootable:
+On Sat, Dec 24, 2016 at 08:59:53PM +0100, Daniel Borkmann wrote:
+> On 12/24/2016 03:22 AM, Andy Lutomirski wrote:
+> >BPF digests are intended to be used to avoid reloading programs that
+> >are already loaded.  For use cases (CRIU?) where untrusted programs
+> >are involved, intentional hash collisions could cause the wrong BPF
+> >program to execute.  Additionally, if BPF digests are ever used
+> >in-kernel to skip verification, a hash collision could give privilege
+> >escalation directly.
 > 
-> tested with git kernels v4.9-8648-g5cc60aeedf31 and v4.9-12259-g7c0f6ba682b9
+> Just for the record, digests will never ever be used to skip the
+> verification step, so I don't know why this idea even comes up
+> here (?) or is part of the changelog? As this will never be done
+> anyway, rather drop that part so we can avoid confusion on this?
 
-I think the testing code for the new synchronous compression module is
-putting kernel image pointers into scatterlists, which in turn we
-attempt to transform to and from page structs.
++1 to what Daniel said above.
 
-That doesn't work.
+For the others let me explain what this patch set is actually
+trying to accomplish.
+Andy had an idea that sha256 of the program can somehow be used
+to bypass kernel verifier during program loading. Furthemore
+he thinks that such 'bypass' would be useful for criu of bpf programs,
+hence see vigorously attacking existing prog_digest (sha1) because
+it's not as secure as sha256 and hence cannot be used for such 'bypass'.
 
-It's coming from the test input buffers:
+The problem with criu of bpf programs is same as criu of kernel modules.
+For the main tracing and networking use cases, we cannot stop the kernel,
+so criu is out of question already.
+Even if we could stop all the events that trigger bpf program execution,
+the sha256 or memcmp() of the full program is not enough to guarantee
+that two programs are the same.
+Ex. bpf_map_lookup() may be safe for one program and not for another
+depending on how map was created. Two programs of different types
+are not comparable either. Etc, etc.
+Therefore the idea of using sha256 for such purpose is bogus,
+and I have an obvious NACK for bpf related patches 3,4,5,6.
 
-static int test_acomp(struct crypto_acomp *tfm, struct comp_testvec *ctemplate,
-		      struct comp_testvec *dtemplate, int ctcount, int dtcount)
-{
- ...
-		sg_init_one(&src, ctemplate[i].input, ilen);
+For the questions raised in other threads:
+I'm not ok with making BPF depend on CRYPTO, since it's the same as
+requiring CRYPTO to select BPF for no good reason.
 
-These have to be copied into kmalloc() buffers or similar, just like
-the skchiper tests do.
+And 0/6 commit log:
+> Since there are plenty of uses for the new-in-4.10 BPF digest feature
+> that would be problematic if malicious users could produce collisions,
+> the BPF digest should be collision-resistant. 
 
-The crash on sparc64 shows that we try to dereference a page struct at
-a bogus vmemmap address for a page that doesn't exist.
+This statement is also bogus. The only reason we added prog_digest is
+to improve debuggability and introspection of bpf programs.
+As I said in the previous thread "collisions are ok" and we could have
+used jhash here to avoid patches like this ever appearing
+and wasting everyones time.
 
-I hacked up the following and this makes the crashes go away:
+sha1 is 20 bytes which is already a bit long to print and copy paste by humans.
+whereas 4 byte jhash is a bit too short, since collisions are not that rare
+and may lead to incorrect assumptions from the users that develop the programs.
+I would prefer something in 6-10 byte range that prevents collisions most of
+the time and short to print as hex, but I don't know of anything like this
+in the existing kernel and inventing bpf specific hash is not great.
+Another requirement for debugging (and prog_digest) that user space
+should be able to produce the same hash without asking kernel, so
+sha1 fits that as well, since it's well known and easy to put into library.
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index f616ad7..117bb33 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1449,22 +1449,31 @@ static int test_acomp(struct crypto_acomp *tfm, struct comp_testvec *ctemplate,
- 	const char *algo = crypto_tfm_alg_driver_name(crypto_acomp_tfm(tfm));
- 	unsigned int i;
- 	char *output;
-+	char *input;
- 	int ret;
- 	struct scatterlist src, dst;
- 	struct acomp_req *req;
- 	struct tcrypt_result result;
- 
-+	pr_info("test_acomp: COMP_BUF_SIZE %d\n", (int) COMP_BUF_SIZE);
-+
- 	output = kmalloc(COMP_BUF_SIZE, GFP_KERNEL);
- 	if (!output)
- 		return -ENOMEM;
-+	input = kmalloc(COMP_BUF_SIZE, GFP_KERNEL);
-+	if (!input) {
-+		kfree(output);
-+		return -ENOMEM;
-+	}
- 
- 	for (i = 0; i < ctcount; i++) {
- 		unsigned int dlen = COMP_BUF_SIZE;
- 		int ilen = ctemplate[i].inlen;
- 
- 		memset(output, 0, dlen);
-+		memcpy(input, ctemplate[i].input, ilen);
- 		init_completion(&result.completion);
--		sg_init_one(&src, ctemplate[i].input, ilen);
-+		sg_init_one(&src, input, ilen);
- 		sg_init_one(&dst, output, dlen);
- 
- 		req = acomp_request_alloc(tfm);
-@@ -1512,8 +1521,9 @@ static int test_acomp(struct crypto_acomp *tfm, struct comp_testvec *ctemplate,
- 		int ilen = dtemplate[i].inlen;
- 
- 		memset(output, 0, dlen);
-+		memcpy(input, dtemplate[i].input, ilen);
- 		init_completion(&result.completion);
--		sg_init_one(&src, dtemplate[i].input, ilen);
-+		sg_init_one(&src, input, ilen);
- 		sg_init_one(&dst, output, dlen);
- 
- 		req = acomp_request_alloc(tfm);
-@@ -1559,6 +1569,7 @@ static int test_acomp(struct crypto_acomp *tfm, struct comp_testvec *ctemplate,
- 	ret = 0;
- 
- out:
-+	kfree(input);
- 	kfree(output);
- 	return ret;
- }
+sha256 doesn't fit either of these requirements. 32-bytes are too long to print
+and when we use it as a substitue for the prog name for jited ksym, looking
+at long function names will screw up all tools like perf, which we don't
+want. sha256 is equally not easy for user space app like iproute2,
+so not an acceptable choice from that pov either.
