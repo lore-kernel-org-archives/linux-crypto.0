@@ -1,48 +1,50 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH 0/8] random: cleanup of code after removal of nonblocking pool
-Date: Tue, 27 Dec 2016 23:38:42 +0100
-Message-ID: <3254875.f5A5oHPdxF@positron.chronox.de>
+Subject: [PATCH 1/8] random: remove stale maybe_reseed_primary_crng
+Date: Tue, 27 Dec 2016 23:39:04 +0100
+Message-ID: <3312945.6Q4mfWFxoU@positron.chronox.de>
+References: <3254875.f5A5oHPdxF@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: Ted Tso <tytso@mit.edu>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55170 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933084AbcL0Wnr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Dec 2016 17:43:47 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <3254875.f5A5oHPdxF@positron.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Ted,
+>From 5e84a71d4c4b3c7f015878c0907102634603d270 Mon Sep 17 00:00:00 2001
+From: Stephan Mueller <stephan.mueller@atsec.com>
+Date: Thu, 15 Dec 2016 12:42:33 +0100
+Subject: 
 
-with the removal of the nonblocking_pool, several code paths are now unused
-which were only applicable to the nonblocking pool. This patch set removes
-these unused code paths.
+The function maybe_reseed_primary_crng is not used anywhere and thus can
+be removed. Besides, it contains the check crng_init > 2 which will
+never become true and thus would never trigger a reseed of the ChaCha20
+primary DRNG.
 
-Also, a code path in the add_interrupt_randomness function that is never used
-is removed.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ drivers/char/random.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-In addition, the FIPS 140-2 continuous self tests are required to process
-the output data of the RNG given to a caller. A patch is added to cover this
-requirement.
-
-Ciao
-Stephan
-
-Stephan Mueller (8):
-  random: remove stale maybe_reseed_primary_crng
-  random: remove stale urandom_init_wait
-  random: trigger random_ready callback upon crng_init == 1
-  random: remove unused branch in hot code path
-  random: remove variable limit
-  random: fix comment for unused random_min_urandom_seed
-  random: remove noop function call to xfer_secondary_pool
-  random: move FIPS continuous test to output functions
-
- drivers/char/random.c | 118 +++++++++++++++++++++++---------------------------
- 1 file changed, 53 insertions(+), 65 deletions(-)
-
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 1ef2640..8e5ab20 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -855,13 +855,6 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
+ 	spin_unlock_irqrestore(&primary_crng.lock, flags);
+ }
+ 
+-static inline void maybe_reseed_primary_crng(void)
+-{
+-	if (crng_init > 2 &&
+-	    time_after(jiffies, primary_crng.init_time + CRNG_RESEED_INTERVAL))
+-		crng_reseed(&primary_crng, &input_pool);
+-}
+-
+ static inline void crng_wait_ready(void)
+ {
+ 	wait_event_interruptible(crng_init_wait, crng_ready());
 -- 
 2.9.3
