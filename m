@@ -1,62 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [sparc64] cryptomgr_test OOPS kernel 4.9.0+
-Date: Tue, 27 Dec 2016 17:52:41 +0800
-Message-ID: <20161227095241.GA10547@gondor.apana.org.au>
-References: <CADxRZqwxU+XjTe+jwfrDdsp7Vs47YsJHww3=bsENhrUsYgHvkg@mail.gmail.com>
- <20161226.172619.1321397093716823099.davem@davemloft.net>
+Subject: Re: [RFC PATCH 4.10 1/6] crypto/sha256: Refactor the API so it can
+ be used without shash
+Date: Tue, 27 Dec 2016 17:58:53 +0800
+Message-ID: <20161227095853.GA10588@gondor.apana.org.au>
+References: <cover.1482545792.git.luto@kernel.org>
+ <942b91f25a63b22ec4946378a1fffe78d655cf18.1482545792.git.luto@kernel.org>
+ <CAKv+Gu-UCqwchgbhg8VN4s=Yxk=PkjXG46NZo=8P4wAQtJ2TXw@mail.gmail.com>
+ <CALCETrVbT_1=cdU1+a-+KbhoFqeT3XvbHjY0s_U7C5JVgiPx_Q@mail.gmail.com>
+ <20161226075757.GA8916@gondor.apana.org.au>
+ <CAKv+Gu-NMNCEs61f4k7JSf9iSJ1A_Gy1r=kZRGqtbDsEDz7--Q@mail.gmail.com>
+ <CALCETrXFTQ2AXgbQzPnRcDRHK81=FS1R0zqfoTqGjUsqZy2PvQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: matorola@gmail.com, linux-crypto@vger.kernel.org,
-        sparclinux@vger.kernel.org, giovanni.cabiddu@intel.com
-To: David Miller <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:59061 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751083AbcL0Jxd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Dec 2016 04:53:33 -0500
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Tom Herbert <tom@herbertland.com>,
+        "David S. Miller" <davem@davemloft.net>
+To: Andy Lutomirski <luto@amacapital.net>
+Return-path: <netdev-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20161226.172619.1321397093716823099.davem@davemloft.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <CALCETrXFTQ2AXgbQzPnRcDRHK81=FS1R0zqfoTqGjUsqZy2PvQ@mail.gmail.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Dec 26, 2016 at 05:26:19PM -0500, David Miller wrote:
-> From: Anatoly Pugachev <matorola@gmail.com>
-> Date: Sun, 25 Dec 2016 20:56:08 +0300
-> 
-> > Disabling kernel config option
-> > CRYPTO_MANAGER_DISABLE_TESTS
-> > i.e. enable run-time self tests, makes kernel unbootable:
-> > 
-> > tested with git kernels v4.9-8648-g5cc60aeedf31 and v4.9-12259-g7c0f6ba682b9
-> 
-> I think the testing code for the new synchronous compression module is
-> putting kernel image pointers into scatterlists, which in turn we
-> attempt to transform to and from page structs.
-> 
-> That doesn't work.
-> 
-> It's coming from the test input buffers:
-> 
-> static int test_acomp(struct crypto_acomp *tfm, struct comp_testvec *ctemplate,
-> 		      struct comp_testvec *dtemplate, int ctcount, int dtcount)
-> {
->  ...
-> 		sg_init_one(&src, ctemplate[i].input, ilen);
-> 
-> These have to be copied into kmalloc() buffers or similar, just like
-> the skchiper tests do.
-> 
-> The crash on sparc64 shows that we try to dereference a page struct at
-> a bogus vmemmap address for a page that doesn't exist.
-> 
-> I hacked up the following and this makes the crashes go away:
+On Mon, Dec 26, 2016 at 10:08:48AM -0800, Andy Lutomirski wrote:
+>
+> According to Daniel, the networking folks want to let embedded systems
+> include BPF without requiring the crypto core.
 
-Thanks Dave.  I've just applied the patch
-
-	https://patchwork.kernel.org/patch/9483763/
-
-which should fix this.
+Last I checked the IPv4 stack depended on the crypto API so this
+sounds bogus.
 
 Cheers,
 -- 
