@@ -1,50 +1,58 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/3] crypto: chacha20 - convert generic and x86
- versions to skcipher
-Date: Wed, 28 Dec 2016 17:18:01 +0800
-Message-ID: <20161228091801.GA12318@gondor.apana.org.au>
-References: <1481294033-23508-1-git-send-email-ard.biesheuvel@linaro.org>
- <1481294033-23508-2-git-send-email-ard.biesheuvel@linaro.org>
- <20161227100452.GB10629@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: arm/aes-neonbs - process 8 blocks in parallel if we can
+Date: Wed, 28 Dec 2016 09:19:32 +0000
+Message-ID: <B32240B5-953F-42A2-A010-6FF64AC45859@linaro.org>
+References: <1481291246-20216-1-git-send-email-ard.biesheuvel@linaro.org> <20161227085745.GA10121@gondor.apana.org.au> <CAKv+Gu8OkOR3Xzx=XEOWyFpo6sLiq=WQrq0SauaY0V57uYetCQ@mail.gmail.com> <20161228091020.GE11904@gondor.apana.org.au>
+Mime-Version: 1.0 (1.0)
+Content-Type: text/plain;
+        charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38071 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751103AbcL1JSK (ORCPT
+Received: from mail-wj0-f176.google.com ([209.85.210.176]:32919 "EHLO
+        mail-wj0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750758AbcL1JUR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Dec 2016 04:18:10 -0500
-Content-Disposition: inline
-In-Reply-To: <20161227100452.GB10629@gondor.apana.org.au>
+        Wed, 28 Dec 2016 04:20:17 -0500
+Received: by mail-wj0-f176.google.com with SMTP id tq7so96104412wjb.0
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Dec 2016 01:19:45 -0800 (PST)
+In-Reply-To: <20161228091020.GE11904@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 27, 2016 at 06:04:52PM +0800, Herbert Xu wrote:
-> On Fri, Dec 09, 2016 at 02:33:51PM +0000, Ard Biesheuvel wrote:
-> > This converts the ChaCha20 code from a blkcipher to a skcipher, which
-> > is now the preferred way to implement symmetric block and stream ciphers.
-> > 
-> > This ports the generic and x86 versions at the same time because the
-> > latter reuses routines of the former.
-> > 
-> > Note that the skcipher_walk() API guarantees that all presented blocks
-> > except the final one are a multiple of the chunk size, so we can simplify
-> > the encrypt() routine somewhat.
-> > 
-> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> 
-> Patch applied.  Thanks.
 
-I'm reverting this patch because it breaks the build on ARM without
-the two subsequent patches.
+> On 28 Dec 2016, at 09:10, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>=20
+>> On Tue, Dec 27, 2016 at 06:35:46PM +0000, Ard Biesheuvel wrote:
+>>=20
+>> OK, I will try to hack something up.
+>>=20
+>> One thing to keep in mind though is that stacked chaining modes should
+>> present the data with the same granularity for optimal performance.
+>> E.g., xts(ecb(aes)) should pass 8 blocks at a time. How should this
+>> requirement be incorporated according to you?
+>=20
+> xts tries to do a page at a time, which should be good enough, no?
+>=20
 
-When resubmitting please make sure that the kernel can build and
-work after each patch.  Otherwise git bisections will fail.
+Yes, if the xts chaining mode driver invokes the ecb transform with that gra=
+nularity, it should be fine. Note that this is a theoretical
+concern for this mode in particular, given that the bit sliced aes code impl=
+ements the xts bits as well
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> In general this parameter should be visible to internal API users
+> such as xts so they could use it to determine how it wants to
+> structure its walks.
+>=20
+
+Ok, so that implies a field in the skcipher algo struct then, rather than so=
+me definition internal to the driver?
+
+> Cheers,
+> --=20
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
