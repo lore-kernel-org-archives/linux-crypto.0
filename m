@@ -1,64 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: simd ciphers
-Date: Wed, 28 Dec 2016 18:28:26 +0800
-Message-ID: <20161228102826.GB12607@gondor.apana.org.au>
-References: <3279008.xAQAe6ukNz@positron.chronox.de>
- <1497014.RmdRyQUAOo@positron.chronox.de>
- <20161228085938.GA11904@gondor.apana.org.au>
- <3170771.4e7c0aHuJX@positron.chronox.de>
+Subject: Re: [PATCH] crypto: qat - initialize cra_flags before register into
+ kpp
+Date: Wed, 28 Dec 2016 18:12:12 +0800
+Message-ID: <20161228101212.GA12607@gondor.apana.org.au>
+References: <20161222150051.6284-1-giovanni.cabiddu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, giovanni.cabiddu@gmail.com,
+        Sushil Kumar <sushilx.kumar@intel.com>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:59639 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:59363 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751219AbcL1K2f (ORCPT
+        with ESMTP id S1751268AbcL1Kad (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Dec 2016 05:28:35 -0500
+        Wed, 28 Dec 2016 05:30:33 -0500
 Content-Disposition: inline
-In-Reply-To: <3170771.4e7c0aHuJX@positron.chronox.de>
+In-Reply-To: <20161222150051.6284-1-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 28, 2016 at 11:00:51AM +0100, Stephan Müller wrote:
->
-> When I configure AES-NI as module, it works. When compiling it statically, the 
-> allocation returns an -ENOENT. 
+On Thu, Dec 22, 2016 at 03:00:51PM +0000, Giovanni Cabiddu wrote:
+> Initialize dh.base.cra_flags before registering the dh algorithm.
+> Without this fix, the registration of the dh algorithm might fail
+> if the qat driver is restarted.
 > 
-> Now, when I diff both config files after a simple toggle from AES-NI=y to =m I 
-> see (linux-4.10.config contains the static config, .config contains the module 
-> configuration):
+> Signed-off-by: Sushil Kumar <sushilx.kumar@intel.com>
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
-Thanks Stephan! Does this patch help?
+Please patch the crypto API instead.  I think unsetting the bit
+CRYPTO_ALG_DEAD at the top of crypto_register_alg should do the
+trick.
 
----8<---
-Subject: crypto: pcbc - Move pcbc registration up to subsys_initcall
-
-The pcbc template is required by aesni.  As aesni registers itself
-at late_initcall, we have to make sure pcbc is registered before
-that.
-
-This patch moves it to subsys_initcall like cryptd.
-
-Fixes: 85671860caac ("crypto: aesni - Convert to skcipher")
-Reported-by: Stephan Müller <smueller@chronox.de>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/pcbc.c b/crypto/pcbc.c
-index e4538e0..0855c61 100644
---- a/crypto/pcbc.c
-+++ b/crypto/pcbc.c
-@@ -307,7 +307,7 @@ static void __exit crypto_pcbc_module_exit(void)
- 	crypto_unregister_template(&crypto_pcbc_tmpl);
- }
- 
--module_init(crypto_pcbc_module_init);
-+subsys_initcall(crypto_pcbc_module_init);
- module_exit(crypto_pcbc_module_exit);
- 
- MODULE_LICENSE("GPL");
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
