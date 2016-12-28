@@ -1,41 +1,38 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: simd ciphers
-Date: Wed, 28 Dec 2016 09:37:04 +0100
-Message-ID: <1497014.RmdRyQUAOo@positron.chronox.de>
-References: <3279008.xAQAe6ukNz@positron.chronox.de> <10079298.uODr7IfrOJ@tauon.atsec.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: xts(ecb(aes-asm))
+Date: Wed, 28 Dec 2016 17:01:08 +0800
+Message-ID: <20161228090108.GB11904@gondor.apana.org.au>
+References: <4308953.jQs16UQPE9@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55176 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750958AbcL1IhL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Dec 2016 03:37:11 -0500
-In-Reply-To: <10079298.uODr7IfrOJ@tauon.atsec.com>
+Received: from helcar.hengli.com.au ([209.40.204.226]:34671 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751108AbcL1JBP (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Dec 2016 04:01:15 -0500
+Content-Disposition: inline
+In-Reply-To: <4308953.jQs16UQPE9@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 8. Dezember 2016, 19:40:38 CET schrieb Stephan Müller:
-
-Hi Herbert,
-
-> Am Donnerstag, 8. Dezember 2016, 19:32:03 CET schrieb Stephan Müller:
-> 
+On Fri, Dec 09, 2016 at 07:02:25AM +0100, Stephan Müller wrote:
 > Hi Herbert,
 > 
-> > Hi Herbert,
-> > 
-> > with the addition of the simd cipher change I seem to be unable to use the
-> > AESNI ciphers. My .config contains CONFIG_CRYPTO_SIMD=y and
-> > CONFIG_CRYPTO_AES_NI_INTEL=y. Those options always worked to load the
-> > AES-NI
-> (with "always worked" I meant the CONFIG_CRYPTO_AES_NI_INTEL=y option of
-> course, that always ensured AES-NI to be present and usable)
+> while testing the current cryptodev-2.6 tree, I noticed that instead of the 
+> driver name of xts(aes-asm) (which used to be there), I now see xts(ecb(aes-
+> asm)).
+> 
+> Is that intentional?
 
-With 4.10-rc1, I also do not get the AES-NI implementations to work. do you 
-have any ideas what may be the issue?
+Yes this is a result of the xts template switching over to skciphers
+instead of simple ciphers as its base.
 
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
