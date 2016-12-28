@@ -1,39 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: qat - initialize cra_flags before register into
- kpp
-Date: Wed, 28 Dec 2016 18:12:12 +0800
-Message-ID: <20161228101212.GA12607@gondor.apana.org.au>
-References: <20161222150051.6284-1-giovanni.cabiddu@intel.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: simd ciphers
+Date: Wed, 28 Dec 2016 12:21:52 +0100
+Message-ID: <2449210.sSYcIB5U3R@positron.chronox.de>
+References: <3279008.xAQAe6ukNz@positron.chronox.de> <3170771.4e7c0aHuJX@positron.chronox.de> <20161228102826.GB12607@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, giovanni.cabiddu@gmail.com,
-        Sushil Kumar <sushilx.kumar@intel.com>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:59363 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751268AbcL1Kad (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Dec 2016 05:30:33 -0500
-Content-Disposition: inline
-In-Reply-To: <20161222150051.6284-1-giovanni.cabiddu@intel.com>
+Received: from mail.eperm.de ([89.247.134.16]:55184 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751078AbcL1LV6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Dec 2016 06:21:58 -0500
+In-Reply-To: <20161228102826.GB12607@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 22, 2016 at 03:00:51PM +0000, Giovanni Cabiddu wrote:
-> Initialize dh.base.cra_flags before registering the dh algorithm.
-> Without this fix, the registration of the dh algorithm might fail
-> if the qat driver is restarted.
-> 
-> Signed-off-by: Sushil Kumar <sushilx.kumar@intel.com>
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Am Mittwoch, 28. Dezember 2016, 18:28:26 CET schrieb Herbert Xu:
 
-Please patch the crypto API instead.  I think unsetting the bit
-CRYPTO_ALG_DEAD at the top of crypto_register_alg should do the
-trick.
+Hi Herbert,
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> On Wed, Dec 28, 2016 at 11:00:51AM +0100, Stephan Müller wrote:
+> > When I configure AES-NI as module, it works. When compiling it statically,
+> > the allocation returns an -ENOENT.
+> > 
+> > Now, when I diff both config files after a simple toggle from AES-NI=y to
+> > =m I see (linux-4.10.config contains the static config, .config contains
+> > the module
+> > configuration):
+> Thanks Stephan! Does this patch help?
+
+This patch does not help. But I now found the issue: we need some Kconfig 
+wizardry to mandate pcbc to be compiled statically when AES-NI is static. 
+Currently I had pcbc always as a module even when selecting AES-NI as static 
+compilation.
+
+Ciao
+Stephan
