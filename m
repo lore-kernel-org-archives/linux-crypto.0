@@ -1,63 +1,76 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: simd ciphers
-Date: Wed, 28 Dec 2016 11:00:51 +0100
-Message-ID: <3170771.4e7c0aHuJX@positron.chronox.de>
-References: <3279008.xAQAe6ukNz@positron.chronox.de> <1497014.RmdRyQUAOo@positron.chronox.de> <20161228085938.GA11904@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: "George Spelvin" <linux@sciencehorizons.net>
+Subject: Re: George's crazy full state idea (Re: HalfSipHash Acceptable Usage)
+Date: 28 Dec 2016 05:04:43 -0500
+Message-ID: <20161228100443.18935.qmail@ns.sciencehorizons.net>
+References: <1482902602.2234.1.camel@stressinduktion.org>
+Cc: ak@linux.intel.com, davem@davemloft.net, David.Laight@aculab.com,
+        ebiggers3@gmail.com, eric.dumazet@gmail.com, Jason@zx2c4.com,
+        kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luto@kernel.org,
+        netdev@vger.kernel.org, tom@herbertland.com, tytso@mit.edu,
+        vegard.nossum@gmail.com
+To: daniel@iogearbox.net, hannes@stressinduktion.org,
+        linux@sciencehorizons.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55180 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751193AbcL1KA6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Dec 2016 05:00:58 -0500
-In-Reply-To: <20161228085938.GA11904@gondor.apana.org.au>
+Received: from ns.sciencehorizons.net ([71.41.210.147]:15691 "HELO
+        ns.sciencehorizons.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with SMTP id S1751268AbcL1KEp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Dec 2016 05:04:45 -0500
+In-Reply-To: <1482902602.2234.1.camel@stressinduktion.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 28. Dezember 2016, 16:59:38 CET schrieb Herbert Xu:
-
-Hi Herbert,
-
-> > With 4.10-rc1, I also do not get the AES-NI implementations to work. do
-> > you
-> > have any ideas what may be the issue?
+Hannes Frederic Sowa wrote:
+> We call extract_crng when we run out of batched entropy and reseed. How
+> often we call down to extract_crng depends on how much entropy we
+> extracted by calls to get_random_int/long, so the number of calls into
+> those functions matter.
 > 
-> I'm having problems reproducing this.  Does it work for you if you
-> build them as modules?
+> In extract_crng we have a timer which reseeds every 300s the CPRNG and
+> either uses completely new entropy from the CRNG or calls down into the
+> CPRNG while also doing backtracing protection (which feeds chacha's
+> block size / 2 back into chacha, if I read the code correctly, thus
+> 1024 bits, which should be enough).
 
-When I configure AES-NI as module, it works. When compiling it statically, the 
-allocation returns an -ENOENT. 
+In the current code, _extract_crng checks to see if more than 300 s
+have elapsed since last time it was reseeded, and if so, reseeds with
+fresh entropy.
 
-Now, when I diff both config files after a simple toggle from AES-NI=y to =m I 
-see (linux-4.10.config contains the static config, .config contains the module 
-configuration):
+In addition, on every read (or get_random_bytes), if the request leaves
+enough ranfom bits in the last ChaCha block, it feeds back 256 bits
+(the ChaCha block size is 16*32 = 512 bits) for anti-backtracking.
 
-$ diff -urN ../linux-4.10.config .config
---- ../linux-4.10.config        2016-12-28 10:56:51.805526584 +0100
-+++ .config     2016-12-28 11:00:17.959608195 +0100
-@@ -4062,8 +4062,8 @@
- CONFIG_CRYPTO_AUTHENC=m
- CONFIG_CRYPTO_TEST=m
- CONFIG_CRYPTO_ABLK_HELPER=m
--CONFIG_CRYPTO_SIMD=y
--CONFIG_CRYPTO_GLUE_HELPER_X86=y
-+CONFIG_CRYPTO_SIMD=m
-+CONFIG_CRYPTO_GLUE_HELPER_X86=m
- 
- #
- # Authenticated Encryption with Associated Data
-@@ -4132,7 +4132,7 @@
- #
- CONFIG_CRYPTO_AES=y
- CONFIG_CRYPTO_AES_X86_64=y
--CONFIG_CRYPTO_AES_NI_INTEL=y
-+CONFIG_CRYPTO_AES_NI_INTEL=m
- CONFIG_CRYPTO_ANUBIS=m
- CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_BLOWFISH=m
+If the last read happened to not fit under that limit (size % 512 >
+256), *and* there are no calls for RNG output for a long time, there is
+no  upper limit to how long the old ChaCha key can hang around.
 
-Ciao
-Stephan
+> On Fri, 2016-12-23 at 20:17 -0500, George Spelvin wrote:
+>> For example, two mix-backs of 64 bits gives you 65 bit security, not 128.
+>> (Because each mixback can be guessed and verified separately.)
+
+> Exactly, but the full reseed after running out of entropy is strong
+> enough to not be defeated by your argumentation. Neither the reseed
+> from the CRNG.
+
+Yes, I was just reacting to your original statement:
+
+>>>>> couldn't we simply use 8 bytes of the 64 byte
+>>>>> return block to feed it directly back into the state chacha?
+
+It's not the idea that's bad, just the proposed quantity.
+
+
+>> If you want that, I have a pile of patches to prandom I really
+>> should push upstream.  Shall I refresh them and send them to you?
+
+> I would like to have a look at them in the new year, certainly! I can
+> also take care about the core prandom patches, but don't know if I have
+> time to submit the others to the different subsystems.
+>
+> Maybe, if David would be okay with that, we can submit all patches
+> through his tree, as he is also the dedicated maintainer for prandom.
+
+Amazing, thank you very much!  They're just minor cleanups, nothing
+too exciting.  I'll put it in the queue to make sure they're up to
+date.
