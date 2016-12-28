@@ -1,76 +1,65 @@
-From: "George Spelvin" <linux@sciencehorizons.net>
-Subject: Re: George's crazy full state idea (Re: HalfSipHash Acceptable Usage)
-Date: 28 Dec 2016 05:04:43 -0500
-Message-ID: <20161228100443.18935.qmail@ns.sciencehorizons.net>
-References: <1482902602.2234.1.camel@stressinduktion.org>
-Cc: ak@linux.intel.com, davem@davemloft.net, David.Laight@aculab.com,
-        ebiggers3@gmail.com, eric.dumazet@gmail.com, Jason@zx2c4.com,
-        kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luto@kernel.org,
-        netdev@vger.kernel.org, tom@herbertland.com, tytso@mit.edu,
-        vegard.nossum@gmail.com
-To: daniel@iogearbox.net, hannes@stressinduktion.org,
-        linux@sciencehorizons.net
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: simd ciphers
+Date: Wed, 28 Dec 2016 18:28:26 +0800
+Message-ID: <20161228102826.GB12607@gondor.apana.org.au>
+References: <3279008.xAQAe6ukNz@positron.chronox.de>
+ <1497014.RmdRyQUAOo@positron.chronox.de>
+ <20161228085938.GA11904@gondor.apana.org.au>
+ <3170771.4e7c0aHuJX@positron.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.sciencehorizons.net ([71.41.210.147]:15691 "HELO
-        ns.sciencehorizons.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1751268AbcL1KEp (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:59639 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751219AbcL1K2f (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Dec 2016 05:04:45 -0500
-In-Reply-To: <1482902602.2234.1.camel@stressinduktion.org>
+        Wed, 28 Dec 2016 05:28:35 -0500
+Content-Disposition: inline
+In-Reply-To: <3170771.4e7c0aHuJX@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hannes Frederic Sowa wrote:
-> We call extract_crng when we run out of batched entropy and reseed. How
-> often we call down to extract_crng depends on how much entropy we
-> extracted by calls to get_random_int/long, so the number of calls into
-> those functions matter.
-> 
-> In extract_crng we have a timer which reseeds every 300s the CPRNG and
-> either uses completely new entropy from the CRNG or calls down into the
-> CPRNG while also doing backtracing protection (which feeds chacha's
-> block size / 2 back into chacha, if I read the code correctly, thus
-> 1024 bits, which should be enough).
-
-In the current code, _extract_crng checks to see if more than 300 s
-have elapsed since last time it was reseeded, and if so, reseeds with
-fresh entropy.
-
-In addition, on every read (or get_random_bytes), if the request leaves
-enough ranfom bits in the last ChaCha block, it feeds back 256 bits
-(the ChaCha block size is 16*32 = 512 bits) for anti-backtracking.
-
-If the last read happened to not fit under that limit (size % 512 >
-256), *and* there are no calls for RNG output for a long time, there is
-no  upper limit to how long the old ChaCha key can hang around.
-
-> On Fri, 2016-12-23 at 20:17 -0500, George Spelvin wrote:
->> For example, two mix-backs of 64 bits gives you 65 bit security, not 128.
->> (Because each mixback can be guessed and verified separately.)
-
-> Exactly, but the full reseed after running out of entropy is strong
-> enough to not be defeated by your argumentation. Neither the reseed
-> from the CRNG.
-
-Yes, I was just reacting to your original statement:
-
->>>>> couldn't we simply use 8 bytes of the 64 byte
->>>>> return block to feed it directly back into the state chacha?
-
-It's not the idea that's bad, just the proposed quantity.
-
-
->> If you want that, I have a pile of patches to prandom I really
->> should push upstream.  Shall I refresh them and send them to you?
-
-> I would like to have a look at them in the new year, certainly! I can
-> also take care about the core prandom patches, but don't know if I have
-> time to submit the others to the different subsystems.
+On Wed, Dec 28, 2016 at 11:00:51AM +0100, Stephan Müller wrote:
 >
-> Maybe, if David would be okay with that, we can submit all patches
-> through his tree, as he is also the dedicated maintainer for prandom.
+> When I configure AES-NI as module, it works. When compiling it statically, the 
+> allocation returns an -ENOENT. 
+> 
+> Now, when I diff both config files after a simple toggle from AES-NI=y to =m I 
+> see (linux-4.10.config contains the static config, .config contains the module 
+> configuration):
 
-Amazing, thank you very much!  They're just minor cleanups, nothing
-too exciting.  I'll put it in the queue to make sure they're up to
-date.
+Thanks Stephan! Does this patch help?
+
+---8<---
+Subject: crypto: pcbc - Move pcbc registration up to subsys_initcall
+
+The pcbc template is required by aesni.  As aesni registers itself
+at late_initcall, we have to make sure pcbc is registered before
+that.
+
+This patch moves it to subsys_initcall like cryptd.
+
+Fixes: 85671860caac ("crypto: aesni - Convert to skcipher")
+Reported-by: Stephan Müller <smueller@chronox.de>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/pcbc.c b/crypto/pcbc.c
+index e4538e0..0855c61 100644
+--- a/crypto/pcbc.c
++++ b/crypto/pcbc.c
+@@ -307,7 +307,7 @@ static void __exit crypto_pcbc_module_exit(void)
+ 	crypto_unregister_template(&crypto_pcbc_tmpl);
+ }
+ 
+-module_init(crypto_pcbc_module_init);
++subsys_initcall(crypto_pcbc_module_init);
+ module_exit(crypto_pcbc_module_exit);
+ 
+ MODULE_LICENSE("GPL");
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
