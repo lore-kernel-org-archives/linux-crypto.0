@@ -1,77 +1,69 @@
-From: Binoy Jayan <binoy.jayan@linaro.org>
-Subject: Re: [RFC PATCH v2] crypto: Add IV generation algorithms
-Date: Thu, 29 Dec 2016 14:53:25 +0530
-Message-ID: <CAHv-k_9SynECq7qDbrW59=LsV_WNj+9Ffa=6tATyNKOt36he6Q@mail.gmail.com>
-References: <1481618949-20086-1-git-send-email-binoy.jayan@linaro.org>
- <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
- <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com> <20161222085509.GA2160@gondor.apana.org.au>
- <CAHv-k_-EKq2g=Wb+YkPVp9gCXTDEyrxZhQpT5JMSw=WtZ1OC9w@mail.gmail.com> <20161223075114.GA3580@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: simd ciphers
+Date: Thu, 29 Dec 2016 17:44:15 +0800
+Message-ID: <20161229094415.GA14453@gondor.apana.org.au>
+References: <3279008.xAQAe6ukNz@positron.chronox.de>
+ <3170771.4e7c0aHuJX@positron.chronox.de>
+ <20161228102826.GB12607@gondor.apana.org.au>
+ <2449210.sSYcIB5U3R@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Milan Broz <gmazyland@gmail.com>, Oded <oded.golombek@arm.com>,
-        Ofir <Ofir.Drang@arm.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-        Rajendra <rnayak@codeaurora.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20161223075114.GA3580@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:58181 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1752518AbcL2JoX (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Dec 2016 04:44:23 -0500
+Content-Disposition: inline
+In-Reply-To: <2449210.sSYcIB5U3R@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+On Wed, Dec 28, 2016 at 12:21:52PM +0100, Stephan Müller wrote:
+> 
+> This patch does not help. But I now found the issue: we need some Kconfig 
+> wizardry to mandate pcbc to be compiled statically when AES-NI is static. 
+> Currently I had pcbc always as a module even when selecting AES-NI as static 
+> compilation.
 
-Sorry for the delayed response, I was busy with testing dm-crypt
-with bonnie++ for regressions. I tried to find some alternative
-way to keep the IV algorithms' registration in the dm-crypt.
-Also there were some changes done in dm-crypt keys structure too
-recently.
-
-c538f6e dm crypt: add ability to use keys from the kernel key retention service
-
-On Thu, Dec 22, 2016 at 04:25:12PM +0530, Binoy Jayan wrote:
->
-> > It doesn't have to live outside of dm-crypt.  You can register
-> > these IV generators from there if you really want.
->
-> Sorry, but I didn't understand this part.
-
-What I mean is that moving the IV generators into the crypto API
-does not mean the dm-crypt team giving up control over them.  You
-could continue to keep them within the dm-crypt code base and
-still register them through the normal crypto API mechanism
-
-When we keep these in dm-crypt and if more than one key is used
-(it is actually more than one parts of the original key),
-there are more than one cipher instance created - one for each
-unique part of the key. Since the crypto requests are modelled
-to go through the template ciphers in the order:
-
-"essiv -> cbc -> aes"
-
-a particular cipher instance of the IV (essiv in this example) is
-responsible to encrypt an entire bigger block. If this bigger block
-is to be later split into 512 bytes blocks and then encrypted using
-the other cipher instance depending on the following formula:
-
-key_index = sector & (key_count - 1)
-
-it is not possible as the cipher instances do not have access to
-each other's instances. So, number of keys used is crucial while
-performing encryption.
-
-If there was only a single key, it should not have been a problem.
-But if there are more than one key, then encrypting a bigger block
-with a single key would cause backward incompatibility.
-I was wondering if this is acceptable.
-
-bigger block: What I mean by bigger block here is the set of 512-byte
-blocks that dm-crypt can be optimized to process at once.
+OK, please test this patch and see if it cures the problem with
+aesni built-in and pcbc built as a module.
 
 Thanks,
-Binoy
+
+---8<---
+Subject: crypto: aesni - Fix failure when built-in with modular pcbc
+
+If aesni is built-in but pcbc is built as a module, then aesni
+will fail completely because when it tries to register the pcbc
+variant of aes the pcbc template is not available.
+
+This patch fixes this by modifying the pcbc presence test so that
+if aesni is built-in then pcbc must also be built-in for it to be
+used by aesni.
+
+Fixes: 85671860caac ("crypto: aesni - Convert to skcipher")
+Reported-by: Stephan Müller <smueller@chronox.de>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 36ca150..7ad0ed7 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -1024,7 +1024,8 @@ struct {
+ 	const char *basename;
+ 	struct simd_skcipher_alg *simd;
+ } aesni_simd_skciphers2[] = {
+-#if IS_ENABLED(CONFIG_CRYPTO_PCBC)
++#if (defined(MODULE) && IS_ENABLED(CONFIG_CRYPTO_PCBC)) || \
++    IS_BUILTIN(CONFIG_CRYPTO_PCBC)
+ 	{
+ 		.algname	= "pcbc(aes)",
+ 		.drvname	= "pcbc-aes-aesni",
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
