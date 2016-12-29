@@ -1,50 +1,77 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: arm/aes-neonbs - process 8 blocks in parallel if
- we can
-Date: Thu, 29 Dec 2016 10:23:48 +0800
-Message-ID: <20161229022348.GA13402@gondor.apana.org.au>
-References: <1481291246-20216-1-git-send-email-ard.biesheuvel@linaro.org>
- <20161227085745.GA10121@gondor.apana.org.au>
- <CAKv+Gu8OkOR3Xzx=XEOWyFpo6sLiq=WQrq0SauaY0V57uYetCQ@mail.gmail.com>
- <20161228091020.GE11904@gondor.apana.org.au>
- <B32240B5-953F-42A2-A010-6FF64AC45859@linaro.org>
- <20161228092328.GA12494@gondor.apana.org.au>
- <CAKv+Gu__722s0JkpTzqDu7MmrzSMQ9jJQn=RYnxgSyV+P6MZRQ@mail.gmail.com>
+From: Binoy Jayan <binoy.jayan@linaro.org>
+Subject: Re: [RFC PATCH v2] crypto: Add IV generation algorithms
+Date: Thu, 29 Dec 2016 14:53:25 +0530
+Message-ID: <CAHv-k_9SynECq7qDbrW59=LsV_WNj+9Ffa=6tATyNKOt36he6Q@mail.gmail.com>
+References: <1481618949-20086-1-git-send-email-binoy.jayan@linaro.org>
+ <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
+ <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com> <20161222085509.GA2160@gondor.apana.org.au>
+ <CAHv-k_-EKq2g=Wb+YkPVp9gCXTDEyrxZhQpT5JMSw=WtZ1OC9w@mail.gmail.com> <20161223075114.GA3580@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:39483 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752104AbcL2CYB (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Dec 2016 21:24:01 -0500
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu__722s0JkpTzqDu7MmrzSMQ9jJQn=RYnxgSyV+P6MZRQ@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Milan Broz <gmazyland@gmail.com>, Oded <oded.golombek@arm.com>,
+        Ofir <Ofir.Drang@arm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20161223075114.GA3580@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Dec 28, 2016 at 07:50:44PM +0000, Ard Biesheuvel wrote:
-> 
-> So about this chunksize, is it ever expected to assume other values
-> than 1 (for stream ciphers) or the block size (for block ciphers)?
-> Having block size, IV size *and* chunk size fields may be confusing to
-> some already, so if the purpose of chunk size can be fulfilled by a
-> single 'stream cipher' flag, perhaps we should change that first.
+Hi Herbert,
 
-For users (such as algif) it's much more convenient to have a size
-rather than a flag because that's what they need to determine the
-minimum size for partial updates.
+Sorry for the delayed response, I was busy with testing dm-crypt
+with bonnie++ for regressions. I tried to find some alternative
+way to keep the IV algorithms' registration in the dm-crypt.
+Also there were some changes done in dm-crypt keys structure too
+recently.
 
-For implementors you don't need to specify the chunksize at all
-unless you're a stream cipher (or some other case in future where
-the minimum partial update size is not equal to your block size).
+c538f6e dm crypt: add ability to use keys from the kernel key retention service
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On Thu, Dec 22, 2016 at 04:25:12PM +0530, Binoy Jayan wrote:
+>
+> > It doesn't have to live outside of dm-crypt.  You can register
+> > these IV generators from there if you really want.
+>
+> Sorry, but I didn't understand this part.
+
+What I mean is that moving the IV generators into the crypto API
+does not mean the dm-crypt team giving up control over them.  You
+could continue to keep them within the dm-crypt code base and
+still register them through the normal crypto API mechanism
+
+When we keep these in dm-crypt and if more than one key is used
+(it is actually more than one parts of the original key),
+there are more than one cipher instance created - one for each
+unique part of the key. Since the crypto requests are modelled
+to go through the template ciphers in the order:
+
+"essiv -> cbc -> aes"
+
+a particular cipher instance of the IV (essiv in this example) is
+responsible to encrypt an entire bigger block. If this bigger block
+is to be later split into 512 bytes blocks and then encrypted using
+the other cipher instance depending on the following formula:
+
+key_index = sector & (key_count - 1)
+
+it is not possible as the cipher instances do not have access to
+each other's instances. So, number of keys used is crucial while
+performing encryption.
+
+If there was only a single key, it should not have been a problem.
+But if there are more than one key, then encrypting a bigger block
+with a single key would cause backward incompatibility.
+I was wondering if this is acceptable.
+
+bigger block: What I mean by bigger block here is the set of 512-byte
+blocks that dm-crypt can be optimized to process at once.
+
+Thanks,
+Binoy
