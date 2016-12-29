@@ -1,54 +1,207 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] crypto: arm/aes-neonbs - process 8 blocks in parallel if
- we can
-Date: Thu, 29 Dec 2016 12:13:25 +0000
-Message-ID: <CAKv+Gu_jUfq2j1oYhHBZsM2NZrCK4VS-WmwEK9ozy8bZGJxszw@mail.gmail.com>
-References: <1481291246-20216-1-git-send-email-ard.biesheuvel@linaro.org>
- <20161227085745.GA10121@gondor.apana.org.au> <CAKv+Gu8OkOR3Xzx=XEOWyFpo6sLiq=WQrq0SauaY0V57uYetCQ@mail.gmail.com>
- <20161228091020.GE11904@gondor.apana.org.au> <B32240B5-953F-42A2-A010-6FF64AC45859@linaro.org>
- <20161228092328.GA12494@gondor.apana.org.au> <CAKv+Gu__722s0JkpTzqDu7MmrzSMQ9jJQn=RYnxgSyV+P6MZRQ@mail.gmail.com>
- <20161229022348.GA13402@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [RFC PATCH] crypto: skcipher - introduce walksize attribute for SIMD algos
+Date: Thu, 29 Dec 2016 14:09:08 +0000
+Message-ID: <1483020548-19233-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: herbert@gondor.apana.org.au,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f181.google.com ([209.85.223.181]:33812 "EHLO
-        mail-io0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752654AbcL2MNc (ORCPT
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:38128 "EHLO
+        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752311AbcL2OJQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Dec 2016 07:13:32 -0500
-Received: by mail-io0-f181.google.com with SMTP id p42so351837608ioo.1
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Dec 2016 04:13:32 -0800 (PST)
-In-Reply-To: <20161229022348.GA13402@gondor.apana.org.au>
+        Thu, 29 Dec 2016 09:09:16 -0500
+Received: by mail-wm0-f43.google.com with SMTP id k184so138032433wme.1
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Dec 2016 06:09:15 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 29 December 2016 at 02:23, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Wed, Dec 28, 2016 at 07:50:44PM +0000, Ard Biesheuvel wrote:
->>
->> So about this chunksize, is it ever expected to assume other values
->> than 1 (for stream ciphers) or the block size (for block ciphers)?
->> Having block size, IV size *and* chunk size fields may be confusing to
->> some already, so if the purpose of chunk size can be fulfilled by a
->> single 'stream cipher' flag, perhaps we should change that first.
->
-> For users (such as algif) it's much more convenient to have a size
-> rather than a flag because that's what they need to determine the
-> minimum size for partial updates.
->
-> For implementors you don't need to specify the chunksize at all
-> unless you're a stream cipher (or some other case in future where
-> the minimum partial update size is not equal to your block size).
->
+In some cases, SIMD algorithms can only perform optimally when
+allowed to operate on multiple input blocks in parallel. This is
+especially true for bit slicing algorithms, which typically take
+the same amount of time processing a single block or 8 blocks in
+parallel. However, other SIMD algorithms may benefit as well from
+bigger strides.
 
-OK, fair enough. So I will add a field 'walksize' to the skcipher_alg
-struct in my proposal. I think the walk logic itself needs to change
-very little, though: we can simply set the walk's chunksize to the
-skcipher's walksize if it exceeds its chunksize (and walksize %
-chunksize should be 0 in any case, and walksize should default to the
-chunksize if not supplied)
+So add a walksize attribute to the skcipher algorithm definition, and
+wire it up to the skcipher walk API. To avoid confusion between the
+skcipher and AEAD attributes, rename the skcipher_walk chunksize
+attribute to 'stride', and set it from the walksize (in the skcipher
+case) or from the chunksize (in the AEAD case).
 
-If this sounds reasonable to you, I will hack something up next week.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ crypto/skcipher.c                  | 20 +++++++-----
+ include/crypto/internal/skcipher.h |  2 +-
+ include/crypto/skcipher.h          | 34 ++++++++++++++++++++
+ 3 files changed, 47 insertions(+), 9 deletions(-)
+
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index aca07c643d41..7570d7c958e8 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -185,12 +185,12 @@ void skcipher_walk_complete(struct skcipher_walk *walk, int err)
+ 		data = p->data;
+ 		if (!data) {
+ 			data = PTR_ALIGN(&p->buffer[0], walk->alignmask + 1);
+-			data = skcipher_get_spot(data, walk->chunksize);
++			data = skcipher_get_spot(data, walk->stride);
+ 		}
+ 
+ 		scatterwalk_copychunks(data, &p->dst, p->len, 1);
+ 
+-		if (offset_in_page(p->data) + p->len + walk->chunksize >
++		if (offset_in_page(p->data) + p->len + walk->stride >
+ 		    PAGE_SIZE)
+ 			free_page((unsigned long)p->data);
+ 
+@@ -297,7 +297,7 @@ static int skcipher_next_copy(struct skcipher_walk *walk)
+ 	p->len = walk->nbytes;
+ 	skcipher_queue_write(walk, p);
+ 
+-	if (offset_in_page(walk->page) + walk->nbytes + walk->chunksize >
++	if (offset_in_page(walk->page) + walk->nbytes + walk->stride >
+ 	    PAGE_SIZE)
+ 		walk->page = NULL;
+ 	else
+@@ -342,7 +342,7 @@ static int skcipher_walk_next(struct skcipher_walk *walk)
+ 			 SKCIPHER_WALK_DIFF);
+ 
+ 	n = walk->total;
+-	bsize = min(walk->chunksize, max(n, walk->blocksize));
++	bsize = min(walk->stride, max(n, walk->blocksize));
+ 	n = scatterwalk_clamp(&walk->in, n);
+ 	n = scatterwalk_clamp(&walk->out, n);
+ 
+@@ -391,7 +391,7 @@ static int skcipher_copy_iv(struct skcipher_walk *walk)
+ 	unsigned a = crypto_tfm_ctx_alignment() - 1;
+ 	unsigned alignmask = walk->alignmask;
+ 	unsigned ivsize = walk->ivsize;
+-	unsigned bs = walk->chunksize;
++	unsigned bs = walk->stride;
+ 	unsigned aligned_bs;
+ 	unsigned size;
+ 	u8 *iv;
+@@ -461,7 +461,7 @@ static int skcipher_walk_skcipher(struct skcipher_walk *walk,
+ 		       SKCIPHER_WALK_SLEEP : 0;
+ 
+ 	walk->blocksize = crypto_skcipher_blocksize(tfm);
+-	walk->chunksize = crypto_skcipher_chunksize(tfm);
++	walk->stride = crypto_skcipher_walksize(tfm);
+ 	walk->ivsize = crypto_skcipher_ivsize(tfm);
+ 	walk->alignmask = crypto_skcipher_alignmask(tfm);
+ 
+@@ -523,7 +523,7 @@ static int skcipher_walk_aead_common(struct skcipher_walk *walk,
+ 		walk->flags &= ~SKCIPHER_WALK_SLEEP;
+ 
+ 	walk->blocksize = crypto_aead_blocksize(tfm);
+-	walk->chunksize = crypto_aead_chunksize(tfm);
++	walk->stride = crypto_aead_chunksize(tfm);
+ 	walk->ivsize = crypto_aead_ivsize(tfm);
+ 	walk->alignmask = crypto_aead_alignmask(tfm);
+ 
+@@ -819,6 +819,7 @@ static void crypto_skcipher_show(struct seq_file *m, struct crypto_alg *alg)
+ 	seq_printf(m, "max keysize  : %u\n", skcipher->max_keysize);
+ 	seq_printf(m, "ivsize       : %u\n", skcipher->ivsize);
+ 	seq_printf(m, "chunksize    : %u\n", skcipher->chunksize);
++	seq_printf(m, "walksize     : %u\n", skcipher->walksize);
+ }
+ 
+ #ifdef CONFIG_NET
+@@ -891,11 +892,14 @@ static int skcipher_prepare_alg(struct skcipher_alg *alg)
+ {
+ 	struct crypto_alg *base = &alg->base;
+ 
+-	if (alg->ivsize > PAGE_SIZE / 8 || alg->chunksize > PAGE_SIZE / 8)
++	if (alg->ivsize > PAGE_SIZE / 8 || alg->chunksize > PAGE_SIZE / 8 ||
++	    alg->walksize > PAGE_SIZE / 8)
+ 		return -EINVAL;
+ 
+ 	if (!alg->chunksize)
+ 		alg->chunksize = base->cra_blocksize;
++	if (!alg->walksize)
++		alg->walksize = alg->chunksize;
+ 
+ 	base->cra_type = &crypto_skcipher_type2;
+ 	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
+diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+index 8735979ed341..e42f7063f245 100644
+--- a/include/crypto/internal/skcipher.h
++++ b/include/crypto/internal/skcipher.h
+@@ -66,7 +66,7 @@ struct skcipher_walk {
+ 
+ 	int flags;
+ 	unsigned int blocksize;
+-	unsigned int chunksize;
++	unsigned int stride;
+ 	unsigned int alignmask;
+ };
+ 
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index cc4d98a7892e..3c17a33255b0 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -115,6 +115,9 @@ struct crypto_skcipher {
+  *	    IV of exactly that size to perform the encrypt or decrypt operation.
+  * @chunksize: Equal to the block size except for stream ciphers such as
+  *	       CTR where it is set to the underlying block size.
++ * @walksize: Equal to the chunk size except in cases where the algorithm is
++ * 	      considerably more efficient if it can operate on multiple chunks
++ * 	      in parallel. Should be a multiple of chunksize.
+  * @base: Definition of a generic crypto algorithm.
+  *
+  * All fields except @ivsize are mandatory and must be filled.
+@@ -131,6 +134,7 @@ struct skcipher_alg {
+ 	unsigned int max_keysize;
+ 	unsigned int ivsize;
+ 	unsigned int chunksize;
++	unsigned int walksize;
+ 
+ 	struct crypto_alg base;
+ };
+@@ -289,6 +293,19 @@ static inline unsigned int crypto_skcipher_alg_chunksize(
+ 	return alg->chunksize;
+ }
+ 
++static inline unsigned int crypto_skcipher_alg_walksize(
++	struct skcipher_alg *alg)
++{
++	if ((alg->base.cra_flags & CRYPTO_ALG_TYPE_MASK) ==
++	    CRYPTO_ALG_TYPE_BLKCIPHER)
++		return alg->base.cra_blocksize;
++
++	if (alg->base.cra_ablkcipher.encrypt)
++		return alg->base.cra_blocksize;
++
++	return alg->walksize;
++}
++
+ /**
+  * crypto_skcipher_chunksize() - obtain chunk size
+  * @tfm: cipher handle
+@@ -307,6 +324,23 @@ static inline unsigned int crypto_skcipher_chunksize(
+ }
+ 
+ /**
++ * crypto_skcipher_walksize() - obtain walk size
++ * @tfm: cipher handle
++ *
++ * In some cases, algorithms can only perform optimally when operating on
++ * multiple blocks in parallel. This is reflected by the walksize, which
++ * must be a multiple of the chunksize (or equal if the concern does not
++ * apply)
++ *
++ * Return: walk size in bytes
++ */
++static inline unsigned int crypto_skcipher_walksize(
++	struct crypto_skcipher *tfm)
++{
++	return crypto_skcipher_alg_walksize(crypto_skcipher_alg(tfm));
++}
++
++/**
+  * crypto_skcipher_blocksize() - obtain block size of cipher
+  * @tfm: cipher handle
+  *
+-- 
+2.7.4
