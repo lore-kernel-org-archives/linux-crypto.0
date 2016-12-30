@@ -1,58 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH v2] crypto: Add IV generation algorithms
-Date: Fri, 30 Dec 2016 18:27:23 +0800
-Message-ID: <20161230102723.GA15713@gondor.apana.org.au>
-References: <1481618949-20086-1-git-send-email-binoy.jayan@linaro.org>
- <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
- <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com>
- <20161222085509.GA2160@gondor.apana.org.au>
- <CAHv-k_-EKq2g=Wb+YkPVp9gCXTDEyrxZhQpT5JMSw=WtZ1OC9w@mail.gmail.com>
- <20161223075114.GA3580@gondor.apana.org.au>
- <CAHv-k_9SynECq7qDbrW59=LsV_WNj+9Ffa=6tATyNKOt36he6Q@mail.gmail.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: simd ciphers
+Date: Fri, 30 Dec 2016 11:51:14 +0100
+Message-ID: <2669432.vkvfdvCWnZ@positron.chronox.de>
+References: <3279008.xAQAe6ukNz@positron.chronox.de> <2449210.sSYcIB5U3R@positron.chronox.de> <20161229094415.GA14453@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Milan Broz <gmazyland@gmail.com>, Oded <oded.golombek@arm.com>,
-        Ofir <Ofir.Drang@arm.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-        Rajendra <rnayak@codeaurora.org>
-To: Binoy Jayan <binoy.jayan@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAHv-k_9SynECq7qDbrW59=LsV_WNj+9Ffa=6tATyNKOt36he6Q@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:55210 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752595AbcL3KvS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 30 Dec 2016 05:51:18 -0500
+In-Reply-To: <20161229094415.GA14453@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 29, 2016 at 02:53:25PM +0530, Binoy Jayan wrote:
->
-> When we keep these in dm-crypt and if more than one key is used
-> (it is actually more than one parts of the original key),
-> there are more than one cipher instance created - one for each
-> unique part of the key. Since the crypto requests are modelled
-> to go through the template ciphers in the order:
-> 
-> "essiv -> cbc -> aes"
-> 
-> a particular cipher instance of the IV (essiv in this example) is
-> responsible to encrypt an entire bigger block. If this bigger block
-> is to be later split into 512 bytes blocks and then encrypted using
-> the other cipher instance depending on the following formula:
-> 
-> key_index = sector & (key_count - 1)
+Am Donnerstag, 29. Dezember 2016, 17:44:15 CET schrieb Herbert Xu:
 
-This is just a matter of structuring the key for the IV generator.
-The IV generator's key in this case should be a combination of the
-key to the underlying CBC plus the set of all keys for the IV
-generator itself.  It should then allocate the required number of
-tfms as is currently done by crypt_alloc_tfms in dm-crypt.
+Hi Herbert,
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> On Wed, Dec 28, 2016 at 12:21:52PM +0100, Stephan Müller wrote:
+> > This patch does not help. But I now found the issue: we need some Kconfig
+> > wizardry to mandate pcbc to be compiled statically when AES-NI is static.
+> > Currently I had pcbc always as a module even when selecting AES-NI as
+> > static compilation.
+> 
+> OK, please test this patch and see if it cures the problem with
+> aesni built-in and pcbc built as a module.
+
+This patch works -- PCBC can be compiled as a module whereas AES-NI is 
+compiled statically and yet AES-NI can be loaded.
+
+Thanks.
+
+Tested-by: Stephan Müller <smueller@chronox.de>
+
+Ciao
+Stephan
