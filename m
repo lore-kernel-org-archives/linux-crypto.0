@@ -1,50 +1,44 @@
 From: Javier Martinez Canillas <javier@osg.samsung.com>
-Subject: [PATCH 0/3] crypto: picoxcell - Cleanups removing non-DT code
-Date: Mon,  2 Jan 2017 14:06:56 -0300
-Message-ID: <1483376819-26726-1-git-send-email-javier@osg.samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
- Javier Martinez Canillas <javier@osg.samsung.com>,
- linux-crypto@vger.kernel.org, Jamie Iles <jamie@jamieiles.com>,
- "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 1/3] crypto: picoxcell - Allow driver to build COMPILE_TEST is enabled
+Date: Mon,  2 Jan 2017 14:06:57 -0300
+Message-ID: <1483376819-26726-2-git-send-email-javier@osg.samsung.com>
+References: <1483376819-26726-1-git-send-email-javier@osg.samsung.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Javier Martinez Canillas <javier@osg.samsung.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1483376819-26726-1-git-send-email-javier@osg.samsung.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello,
+Driver only has runtime but no build time dependency with ARCH_PICOXCELL.
+So it can be built for testing purposes if COMPILE_TEST option is enabled.
 
-This small series contains a couple of cleanups that removes some driver's code
-that isn't needed due the driver being for a DT-only platform.
+This is useful to have more build coverage and make sure that the driver
+is not affected by changes that could cause build regressions.
 
-The changes were suggested by Arnd Bergmann as a response to a previous patch:
-https://lkml.org/lkml/2017/1/2/342
+Suggested-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Javier Martinez Canillas <javier@osg.samsung.com>
+---
 
-Patch #1 allows the driver to be built when the COMPILE_TEST option is enabled.
-Patch #2 removes the platform ID table since isn't needed for DT-only drivers.
-Patch #3 removes a wrapper function that's also not needed if driver is DT-only.
+ drivers/crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Best regards,
-
-
-Javier Martinez Canillas (3):
-  crypto: picoxcell - Allow driver to build COMPILE_TEST is enabled
-  crypto: picoxcell - Remove platform device ID table
-  crypto: picoxcell - Remove spacc_is_compatible() wrapper function
-
- drivers/crypto/Kconfig            |  2 +-
- drivers/crypto/picoxcell_crypto.c | 28 +++-------------------------
- 2 files changed, 4 insertions(+), 26 deletions(-)
-
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 79564785ae30..35b1c4829696 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -339,7 +339,7 @@ config CRYPTO_DEV_OMAP_DES
+ 
+ config CRYPTO_DEV_PICOXCELL
+ 	tristate "Support for picoXcell IPSEC and Layer2 crypto engines"
+-	depends on ARCH_PICOXCELL && HAVE_CLK
++	depends on (ARCH_PICOXCELL || COMPILE_TEST) && HAVE_CLK
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_AES
+ 	select CRYPTO_AUTHENC
 -- 
 2.7.4
