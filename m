@@ -1,37 +1,64 @@
-From: Salvatore Benedetto <salvatore.benedetto@intel.com>
-Subject: [PATCH] crypto: kpp - clear CRYPTO_ALG_DEAD bit in prepare_alg
-Date: Mon,  2 Jan 2017 13:33:41 +0000
-Message-ID: <1483364021-103771-1-git-send-email-salvatore.benedetto@intel.com>
-Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+From: Javier Martinez Canillas <javier@osg.samsung.com>
+Subject: [PATCH] crypto: picoxcell - Fix module autoload for non-OF registration
+Date: Mon,  2 Jan 2017 12:38:02 -0300
+Message-ID: <1483371482-4956-1-git-send-email-javier@osg.samsung.com>
+Cc: Javier Martinez Canillas <javier@osg.samsung.com>,
+        Jamie Iles <jamie@jamieiles.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-arm-kernel@lists.infradead.org
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:65224 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751353AbdABNca (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Jan 2017 08:32:30 -0500
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:57006
+        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S932966AbdABPiQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 2 Jan 2017 10:38:16 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Make sure CRYPTO_ALG_DEAD is not set when preparing for
-alg registration. This fixes qat-dh registration that occurs
-when reloading qat_c62x module.
+If the driver is built as a module, autoload won't work because the module
+alias information is not filled. So user-space can't match the registered
+device with the corresponding module if the device isn't registered via OF.
 
-Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Export the module alias information using the MODULE_DEVICE_TABLE() macro.
+
+Before this patch:
+
+$ modinfo drivers/crypto/picoxcell_crypto.ko | grep alias
+alias:          of:N*T*Cpicochip,spacc-l2C*
+alias:          of:N*T*Cpicochip,spacc-l2
+alias:          of:N*T*Cpicochip,spacc-ipsecC*
+alias:          of:N*T*Cpicochip,spacc-ipsec
+
+After this patch:
+
+$ modinfo drivers/crypto/picoxcell_crypto.ko | grep alias
+alias:          of:N*T*Cpicochip,spacc-l2C*
+alias:          of:N*T*Cpicochip,spacc-l2
+alias:          of:N*T*Cpicochip,spacc-ipsecC*
+alias:          of:N*T*Cpicochip,spacc-ipsec
+alias:          platform:picochip,spacc-l2
+alias:          platform:picochip,spacc-ipsec
+
+Signed-off-by: Javier Martinez Canillas <javier@osg.samsung.com>
 ---
- crypto/kpp.c | 1 +
+
+ drivers/crypto/picoxcell_crypto.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/crypto/kpp.c b/crypto/kpp.c
-index d36ce05..d1adef8e 100644
---- a/crypto/kpp.c
-+++ b/crypto/kpp.c
-@@ -101,6 +101,7 @@ static void kpp_prepare_alg(struct kpp_alg *alg)
+diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
+index 47576098831f..64449b7c00af 100644
+--- a/drivers/crypto/picoxcell_crypto.c
++++ b/drivers/crypto/picoxcell_crypto.c
+@@ -1808,6 +1808,7 @@ static const struct platform_device_id spacc_id_table[] = {
+ 	{ "picochip,spacc-l2", },
+ 	{ }
+ };
++MODULE_DEVICE_TABLE(platform, spacc_id_table);
  
- 	base->cra_type = &crypto_kpp_type;
- 	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
-+	base->cra_flags &= ~CRYPTO_ALG_DEAD;
- 	base->cra_flags |= CRYPTO_ALG_TYPE_KPP;
- }
- 
+ static struct platform_driver spacc_driver = {
+ 	.probe		= spacc_probe,
 -- 
-2.4.11
+2.7.4
