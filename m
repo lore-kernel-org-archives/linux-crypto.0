@@ -1,52 +1,58 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: George's crazy full state idea (Re: HalfSipHash Acceptable Usage)
-Date: Thu, 22 Dec 2016 03:40:00 +0100
-Message-ID: <CAHmME9qWXQ_SA6f5m9Aa0J5otNqesoCF=p+RAW53fv0K+bMH7A@mail.gmail.com>
-Reply-To: kernel-hardening@lists.openwall.com
+From: Binoy Jayan <binoy.jayan@linaro.org>
+Subject: Re: [RFC PATCH v2] crypto: Add IV generation algorithms
+Date: Mon, 2 Jan 2017 12:16:45 +0530
+Message-ID: <CAHv-k_8FmeKk_3zUAVCqHp82nHmiWsyfZ_BW+z=SC5VVOrFsAA@mail.gmail.com>
+References: <1481618949-20086-1-git-send-email-binoy.jayan@linaro.org>
+ <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
+ <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com> <20161222085509.GA2160@gondor.apana.org.au>
+ <CAHv-k_-EKq2g=Wb+YkPVp9gCXTDEyrxZhQpT5JMSw=WtZ1OC9w@mail.gmail.com>
+ <20161223075114.GA3580@gondor.apana.org.au> <CAHv-k_9SynECq7qDbrW59=LsV_WNj+9Ffa=6tATyNKOt36he6Q@mail.gmail.com>
+ <20161230102723.GA15713@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: George Spelvin <linux@sciencehorizons.net>, "Ted Ts'o" <tytso@mit.edu>,
-	Andi Kleen <ak@linux.intel.com>, "David S. Miller" <davem@davemloft.net>,
-	David Laight <David.Laight@aculab.com>, "D. J. Bernstein" <djb@cr.yp.to>,
-	Eric Biggers <ebiggers3@gmail.com>, Eric Dumazet <eric.dumazet@gmail.com>,
-	Hannes Frederic Sowa <hannes@stressinduktion.org>,
-	Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
-	Tom Herbert <tom@herbertland.com>, Linus Torvalds <torvalds@linux-foundation.org>,
-	Vegard Nossum <vegard.nossum@gmail.com>
-To: Andy Lutomirski <luto@kernel.org>
-Return-path: <kernel-hardening-return-5766-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-List-Id: linux-crypto.vger.kernel.org
+Cc: Milan Broz <gmazyland@gmail.com>, Oded <oded.golombek@arm.com>,
+        Ofir <Ofir.Drang@arm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ua0-f175.google.com ([209.85.217.175]:34394 "EHLO
+        mail-ua0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754760AbdABGqr (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 2 Jan 2017 01:46:47 -0500
+Received: by mail-ua0-f175.google.com with SMTP id 34so256073530uac.1
+        for <linux-crypto@vger.kernel.org>; Sun, 01 Jan 2017 22:46:46 -0800 (PST)
+In-Reply-To: <20161230102723.GA15713@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-> On Wed, Dec 21, 2016 at 5:13 PM, George Spelvin
->> After some thinking, I still like the "state-preserving" construct
->> that's equivalent to the current MD5 code.  Yes, we could just do
->> siphash(current_cpu || per_cpu_counter, global_key), but it's nice to
->> preserve a bit more.
->>
->> It requires library support from the SipHash code to return the full
->> SipHash state, but I hope that's a fair thing to ask for.
+Hi Herbert,
 
-This is not a good idea. If I understand correctly, the idea here is
-to just keep around SipHash's internal state variables, and chain them
-over to the next call, sort of like how md5_transform with the current
-code works on the same scratch space. There has been no security
-analysis in the literature on this use of the primitive, and I have no
-confidence that this is a secure use of the function. Unless somebody
-can point me toward a paper I missed or a comment from a real
-cryptographer about the specifics of SipHash, I think I'm right to
-admonish against this dangerous road.
+On 30 December 2016 at 15:57, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-Let's talk about constructions. And let's only decide on a
-construction that we're actually equipped to analyze. Let's definitely
-not talk about making our own primitives, or retrofitting nice
-primitive's internals into our own Frankenstein.
+> This is just a matter of structuring the key for the IV generator.
+> The IV generator's key in this case should be a combination of the
+> key to the underlying CBC plus the set of all keys for the IV
+> generator itself.  It should then allocate the required number of
+> tfms as is currently done by crypt_alloc_tfms in dm-crypt.
 
-Alternatively, if I'm wrong, please send me an eprint/arXiv link to a
-paper that discusses this use of SipHash.
+Since I used template ciphers for the iv algorithms, I use
+crypto_spawn_skcipher_alg and skcipher_register_instance
+for creating the underlying cbc algorithm. I guess you suggest
+to change that to make use of crypto_alloc_skcipher.
+
+Even if ciphers are allocated this way, all the encryption requests
+for cbc should still go through IV generators? So that should mean,
+create one instance of IV generator using 'crypto_alloc_skcipher'
+and create tfms_count instances of the generator depending on the
+number of keys.
+
+Thanks,
+Binoy
