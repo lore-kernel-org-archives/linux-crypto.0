@@ -1,53 +1,54 @@
-From: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
-Subject: [PATCH] crypto: mediatek: don't return garbage err on successful
- return
-Date: Tue,  3 Jan 2017 13:21:22 +0000
-Message-ID: <20170103132122.26900-1-colin.king@canonical.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [RFC PATCH v2] crypto: Add IV generation algorithms
+Date: Tue, 3 Jan 2017 16:23:10 +0200
+Message-ID: <CAOtvUMc_X1DUuR8NTvOLjW7h-p=X14tFHFqe_dB8t08-nYBPcw@mail.gmail.com>
+References: <1481618949-20086-1-git-send-email-binoy.jayan@linaro.org> <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
- "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
- Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
- Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
- <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
-List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
- <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
-Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>, gilad.benyossef@arm.com
+To: Binoy Jayan <binoy.jayan@linaro.org>
+Return-path: <linux-raid-owner@vger.kernel.org>
+In-Reply-To: <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
+Sender: linux-raid-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Hi Binoy,
 
-In the case where keylen <= bs mtk_sha_setkey returns an uninitialized
-return value in err.  Fix this by returning 0 instead of err.
+On Tue, Dec 13, 2016 at 02:19:09PM +0530, Binoy Jayan wrote:
+> Currently, the iv generation algorithms are implemented in dm-crypt.c.
+> The goal is to move these algorithms from the dm layer to the kernel
+> crypto layer by implementing them as template ciphers so they can be
+> implemented in hardware for performance. As part of this patchset, the
+> iv-generation code is moved from the dm layer to the crypto layer and
+> adapt the dm-layer to send a whole 'bio' (as defined in the block layer)
+> at a time. Each bio contains the in memory representation of physically
+> contiguous disk blocks. The dm layer sets up a chained scatterlist of
+> these blocks split into physically contiguous segments in memory so that
+> DMA can be performed. The iv generation algorithms implemented in geniv.c
+> include plain, plain64, essiv, benbi, null, lmk and tcw.
+>
 
-Issue detected by static analysis with cppcheck.
+Good idea. I wanted to test the patch but alas it does not apply cleanly.
+You seem to have a blank line at the end of files and other small
+transgressions that makes checkpatch grumpy.
 
-Signed-off-by: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
----
- drivers/crypto/mediatek/mtk-sha.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+<snip>
 
-diff --git a/drivers/crypto/mediatek/mtk-sha.c b/drivers/crypto/mediatek/mtk-sha.c
-index 8951363..8e1b440 100644
---- a/drivers/crypto/mediatek/mtk-sha.c
-+++ b/drivers/crypto/mediatek/mtk-sha.c
-@@ -878,7 +878,7 @@ static int mtk_sha_setkey(struct crypto_ahash *tfm,
- 		bctx->opad[i] ^= 0x5c;
- 	}
- 
--	return err;
-+	return 0;
- }
- 
- static int mtk_sha_export(struct ahash_request *req, void *out)
--- 
-2.10.2
+Also...
+
+>
+> Not-signed-off-by: Binoy Jayan <binoy.jayan@linaro.org>
+
+
+What is Not-signed-off-by ? :-)
+
+Thanks,
+Gilad Ben-Yossef
