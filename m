@@ -1,54 +1,43 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [RFC PATCH v2] crypto: Add IV generation algorithms
-Date: Tue, 3 Jan 2017 16:23:10 +0200
-Message-ID: <CAOtvUMc_X1DUuR8NTvOLjW7h-p=X14tFHFqe_dB8t08-nYBPcw@mail.gmail.com>
-References: <1481618949-20086-1-git-send-email-binoy.jayan@linaro.org> <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
+From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+Subject: Re: Geode LX AES/RNG driver triggers warning
+Date: Tue, 3 Jan 2017 14:52:03 +0000
+Message-ID: <20170103145203.780d3c58@lxorguk.ukuu.org.uk>
+References: <A0185338-47A4-42BE-B2D4-F1EB082593E3@sigma-star.at>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-        Rajendra <rnayak@codeaurora.org>, gilad.benyossef@arm.com
-To: Binoy Jayan <binoy.jayan@linaro.org>
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-geode@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, teheo@suse.de,
+        prasannatsmkumar@gmail.com, Richard Weinberger <richard@nod.at>
+To: David Gstir <david@sigma-star.at>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from lxorguk.ukuu.org.uk ([81.2.110.251]:38986 "EHLO
+        lxorguk.ukuu.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757212AbdACOws (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Jan 2017 09:52:48 -0500
+In-Reply-To: <A0185338-47A4-42BE-B2D4-F1EB082593E3@sigma-star.at>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Binoy,
+On Sat, 31 Dec 2016 00:58:54 +0100
+David Gstir <david@sigma-star.at> wrote:
 
-On Tue, Dec 13, 2016 at 02:19:09PM +0530, Binoy Jayan wrote:
-> Currently, the iv generation algorithms are implemented in dm-crypt.c.
-> The goal is to move these algorithms from the dm layer to the kernel
-> crypto layer by implementing them as template ciphers so they can be
-> implemented in hardware for performance. As part of this patchset, the
-> iv-generation code is moved from the dm layer to the crypto layer and
-> adapt the dm-layer to send a whole 'bio' (as defined in the block layer)
-> at a time. Each bio contains the in memory representation of physically
-> contiguous disk blocks. The dm layer sets up a chained scatterlist of
-> these blocks split into physically contiguous segments in memory so that
-> DMA can be performed. The iv generation algorithms implemented in geniv.c
-> include plain, plain64, essiv, benbi, null, lmk and tcw.
->
+> Hi!
+> 
+> I recently tested kernel v4.9 on my AMD Geode platform and noticed that its AES hardware driver triggers this warning on initialization:
 
-Good idea. I wanted to test the patch but alas it does not apply cleanly.
-You seem to have a blank line at the end of files and other small
-transgressions that makes checkpatch grumpy.
+...
 
-<snip>
+> I narrowed it down to commit 6e9b5e76882c ("hwrng: geode - Migrate to managed API") which seems to introduce this. It looks to me like some issue between devres, the Geode hwrng and AES drivers which both use the same PCI device.
 
-Also...
+It does
 
->
-> Not-signed-off-by: Binoy Jayan <binoy.jayan@linaro.org>
+> I'm no expert here, but I curious if this will cause any issues when using the hardware crypto drivers and also what's the best way to get rid of this?
 
+Probably to create an mfd device that turns the PCI device into two MFD
+devices and bind AES and hwrng one to each MFD device. Take a look in
+drivers/mfd. That would also fix the uglies in mod_init for the rng
+driver.
 
-What is Not-signed-off-by ? :-)
-
-Thanks,
-Gilad Ben-Yossef
+Alan
