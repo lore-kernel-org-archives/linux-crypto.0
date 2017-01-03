@@ -1,78 +1,53 @@
-From: =?utf-8?B?0YHQuNGB0YLQtdC80Ysg0LDQtNC80LjQvdC40YHRgtGA0LDRgtC+0YA=?=
-        <fg@surabaya.go.id>
-Subject: (unknown)
-Date: Tue, 3 Jan 2017 13:57:22 +0700 (WIB)
-Message-ID: <1989372367.662343.1483426642043.JavaMail.zimbra__48641.7751679712$1483430351$gmane$org@surabaya.go.id>
-Reply-To: Sistemass_Adminss@mail2world.com
+From: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Subject: [PATCH] crypto: mediatek: don't return garbage err on successful
+ return
+Date: Tue,  3 Jan 2017 13:21:22 +0000
+Message-ID: <20170103132122.26900-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-To: unlisted-recipients:; (no To-header on input)
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.surabaya.go.id ([222.124.212.34]:40822 "EHLO
-        mail.surabaya.go.id.local" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S933109AbdACH6X (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2017 02:58:23 -0500
-Subject: 
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+ "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+ Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+ Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
+List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
+Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
+From: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 
+In the case where keylen <= bs mtk_sha_setkey returns an uninitialized
+return value in err.  Fix this by returning 0 instead of err.
 
-=D0=B2=D0=BD=D0=B8=D0=BC=D0=B0=D0=BD=D0=B8=D1=8F;
+Issue detected by static analysis with cppcheck.
 
-=D0=92=D0=B0=D1=88=D0=B8 =D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5=D0=BD=D0=B8=
-=D1=8F =D0=BF=D1=80=D0=B5=D0=B2=D1=8B=D1=81=D0=B8=D0=BB =D0=BB=D0=B8=D0=BC=
-=D0=B8=D1=82 =D0=BF=D0=B0=D0=BC=D1=8F=D1=82=D0=B8, =D0=BA=D0=BE=D1=82=D0=BE=
-=D1=80=D1=8B=D0=B9 =D1=81=D0=BE=D1=81=D1=82=D0=B0=D0=B2=D0=BB=D1=8F=D0=B5=
-=D1=82 5 =D0=93=D0=B1, =D0=BE=D0=BF=D1=80=D0=B5=D0=B4=D0=B5=D0=BB=D0=B5=D0=
-=BD=D0=BD=D1=8B=D1=85 =D0=B0=D0=B4=D0=BC=D0=B8=D0=BD=D0=B8=D1=81=D1=82=D1=
-=80=D0=B0=D1=82=D0=BE=D1=80=D0=BE=D0=BC, =D0=BA=D0=BE=D1=82=D0=BE=D1=80=D1=
-=8B=D0=B9 =D0=B2 =D0=BD=D0=B0=D1=81=D1=82=D0=BE=D1=8F=D1=89=D0=B5=D0=B5 =D0=
-=B2=D1=80=D0=B5=D0=BC=D1=8F =D1=80=D0=B0=D0=B1=D0=BE=D1=82=D0=B0=D0=B5=D1=
-=82 =D0=BD=D0=B0 10.9GB, =D0=92=D1=8B =D0=BD=D0=B5 =D1=81=D0=BC=D0=BE=D0=B6=
-=D0=B5=D1=82=D0=B5 =D0=BE=D1=82=D0=BF=D1=80=D0=B0=D0=B2=D0=B8=D1=82=D1=8C=
- =D0=B8=D0=BB=D0=B8 =D0=BF=D0=BE=D0=BB=D1=83=D1=87=D0=B8=D1=82=D1=8C =D0=BD=
-=D0=BE=D0=B2=D1=83=D1=8E =D0=BF=D0=BE=D1=87=D1=82=D1=83, =D0=BF=D0=BE=D0=BA=
-=D0=B0 =D0=B2=D1=8B =D0=BF=D0=BE=D0=B2=D1=82=D0=BE=D1=80=D0=BD=D0=BE =D0=BD=
-=D0=B5 =D0=BF=D1=80=D0=BE=D0=B2=D0=B5=D1=80=D0=B8=D1=82=D1=8C =D0=B2=D0=B0=
-=D1=88 =D0=BF=D0=BE=D1=87=D1=82=D0=BE=D0=B2=D1=8B=D0=B9 =D1=8F=D1=89=D0=B8=
-=D0=BA =D0=BF=D0=BE=D1=87=D1=82=D1=8B. =D0=A7=D1=82=D0=BE=D0=B1=D1=8B =D0=
-=B2=D0=BE=D1=81=D1=81=D1=82=D0=B0=D0=BD=D0=BE=D0=B2=D0=B8=D1=82=D1=8C =D1=
-=80=D0=B0=D0=B1=D0=BE=D1=82=D0=BE=D1=81=D0=BF=D0=BE=D1=81=D0=BE=D0=B1=D0=BD=
-=D0=BE=D1=81=D1=82=D1=8C =D0=92=D0=B0=D1=88=D0=B5=D0=B3=D0=BE =D0=BF=D0=BE=
-=D1=87=D1=82=D0=BE=D0=B2=D0=BE=D0=B3=D0=BE =D1=8F=D1=89=D0=B8=D0=BA=D0=B0=
-, =D0=BE=D1=82=D0=BF=D1=80=D0=B0=D0=B2=D1=8C=D1=82=D0=B5 =D1=81=D0=BB=D0=B5=
-=D0=B4=D1=83=D1=8E=D1=89=D1=83=D1=8E =D0=B8=D0=BD=D1=84=D0=BE=D1=80=D0=BC=
-=D0=B0=D1=86=D0=B8=D1=8E =D0=BD=D0=B8=D0=B6=D0=B5:
+Signed-off-by: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+---
+ drivers/crypto/mediatek/mtk-sha.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-=D0=B8=D0=BC=D1=8F:
-=D0=98=D0=BC=D1=8F =D0=BF=D0=BE=D0=BB=D1=8C=D0=B7=D0=BE=D0=B2=D0=B0=D1=82=
-=D0=B5=D0=BB=D1=8F:
-=D0=BF=D0=B0=D1=80=D0=BE=D0=BB=D1=8C:
-=D0=9F=D0=BE=D0=B4=D1=82=D0=B2=D0=B5=D1=80=D0=B6=D0=B4=D0=B5=D0=BD=D0=B8=D0=
-=B5 =D0=BF=D0=B0=D1=80=D0=BE=D0=BB=D1=8F:
-=D0=90=D0=B4=D1=80=D0=B5=D1=81 =D1=8D=D0=BB=D0=B5=D0=BA=D1=82=D1=80=D0=BE=
-=D0=BD=D0=BD=D0=BE=D0=B9 =D0=BF=D0=BE=D1=87=D1=82=D1=8B:
-=D1=82=D0=B5=D0=BB=D0=B5=D1=84=D0=BE=D0=BD:
-
-=D0=95=D1=81=D0=BB=D0=B8 =D0=B2=D1=8B =D0=BD=D0=B5 =D0=B2 =D1=81=D0=BE=D1=
-=81=D1=82=D0=BE=D1=8F=D0=BD=D0=B8=D0=B8 =D0=BF=D0=B5=D1=80=D0=B5=D0=BF=D1=
-=80=D0=BE=D0=B2=D0=B5=D1=80=D0=B8=D1=82=D1=8C =D1=81=D0=BE=D0=BE=D0=B1=D1=
-=89=D0=B5=D0=BD=D0=B8=D1=8F, =D0=B2=D0=B0=D1=88 =D0=BF=D0=BE=D1=87=D1=82=D0=
-=BE=D0=B2=D1=8B=D0=B9 =D1=8F=D1=89=D0=B8=D0=BA =D0=B1=D1=83=D0=B4=D0=B5=D1=
-=82 =D0=BE=D1=82=D0=BA=D0=BB=D1=8E=D1=87=D0=B5=D0=BD!
-
-=D0=9F=D1=80=D0=B8=D0=BD=D0=BE=D1=81=D0=B8=D0=BC =D0=B8=D0=B7=D0=B2=D0=B8=
-=D0=BD=D0=B5=D0=BD=D0=B8=D1=8F =D0=B7=D0=B0 =D0=BD=D0=B5=D1=83=D0=B4=D0=BE=
-=D0=B1=D1=81=D1=82=D0=B2=D0=B0.
-=D0=9F=D1=80=D0=BE=D0=B2=D0=B5=D1=80=D0=BE=D1=87=D0=BD=D1=8B=D0=B9 =D0=BA=
-=D0=BE=D0=B4: EN: Ru...776774990..2017
-=D0=9F=D0=BE=D1=87=D1=82=D1=8B =D1=82=D0=B5=D1=85=D0=BD=D0=B8=D1=87=D0=B5=
-=D1=81=D0=BA=D0=BE=D0=B9 =D0=BF=D0=BE=D0=B4=D0=B4=D0=B5=D1=80=D0=B6=D0=BA=
-=D0=B8 =C2=A92017
-
-=D1=81=D0=BF=D0=B0=D1=81=D0=B8=D0=B1=D0=BE
-=D1=81=D0=B8=D1=81=D1=82=D0=B5=D0=BC=D1=8B =D0=B0=D0=B4=D0=BC=D0=B8=D0=BD=
-=D0=B8=D1=81=D1=82=D1=80=D0=B0=D1=82=D0=BE=D1=80
+diff --git a/drivers/crypto/mediatek/mtk-sha.c b/drivers/crypto/mediatek/mtk-sha.c
+index 8951363..8e1b440 100644
+--- a/drivers/crypto/mediatek/mtk-sha.c
++++ b/drivers/crypto/mediatek/mtk-sha.c
+@@ -878,7 +878,7 @@ static int mtk_sha_setkey(struct crypto_ahash *tfm,
+ 		bctx->opad[i] ^= 0x5c;
+ 	}
+ 
+-	return err;
++	return 0;
+ }
+ 
+ static int mtk_sha_export(struct ahash_request *req, void *out)
+-- 
+2.10.2
