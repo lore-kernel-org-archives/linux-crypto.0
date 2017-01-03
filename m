@@ -1,19 +1,19 @@
 From: =?utf-8?B?0YHQuNGB0YLQtdC80Ysg0LDQtNC80LjQvdC40YHRgtGA0LDRgtC+0YA=?=
         <fg@surabaya.go.id>
 Subject: (unknown)
-Date: Tue, 3 Jan 2017 13:48:48 +0700 (WIB)
-Message-ID: <2112843978.662090.1483426128628.JavaMail.zimbra@surabaya.go.id>
+Date: Tue, 3 Jan 2017 13:57:22 +0700 (WIB)
+Message-ID: <1989372367.662343.1483426642043.JavaMail.zimbra__48641.7751679712$1483430351$gmane$org@surabaya.go.id>
 Reply-To: Sistemass_Adminss@mail2world.com
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.surabaya.go.id ([222.124.212.34]:58877 "EHLO
+Received: from mail.surabaya.go.id ([222.124.212.34]:40822 "EHLO
         mail.surabaya.go.id.local" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751380AbdACHhK (ORCPT
+        by vger.kernel.org with ESMTP id S933109AbdACH6X (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2017 02:37:10 -0500
+        Tue, 3 Jan 2017 02:58:23 -0500
 Subject: 
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
