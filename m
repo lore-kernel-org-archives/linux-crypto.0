@@ -1,411 +1,312 @@
-From: "Gideon D'souza" <gidisrael@gmail.com>
-Subject: Re: [PATCH] crypto: Replaced gcc specific attributes with macros from compiler.h
-Date: Wed, 4 Jan 2017 20:45:31 +0530
-Message-ID: <CAPNrq4yMpcqhL=ydadtFZTW0YXCmQq_ZeUYPGrqUABhbbsG9+w@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        davem@davemloft.net, nhorman@tuxdriver.com,
-        Joe Perches <joe@perches.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-crypto@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] crypto: arm64/aes - add scalar implementation
+Date: Wed,  4 Jan 2017 16:19:15 +0000
+Message-ID: <1483546755-13429-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: herbert@gondor.apana.org.au,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:33218 "EHLO
+        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754418AbdADQ2b (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 4 Jan 2017 11:28:31 -0500
+Received: by mail-wm0-f53.google.com with SMTP id v3so4360481wme.0
+        for <linux-crypto@vger.kernel.org>; Wed, 04 Jan 2017 08:28:30 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Any update on this patch, should I base it on another tree, this was
-based off of linus's tree right when he released 4.10-rc2
+This adds a scalar implementation of AES, based on the precomputed tables
+that are exposed by the generic AES code. Since rotates are cheap on arm64,
+this implementation only uses the 4 core tables (of 1 KB each), and avoids
+the prerotated ones, reducing the D-cache footprint by 75%.
 
-Should I send it close to the next merge window?
+On Cortex-A57, this code manages 13.0 cycles per byte, which is ~34% faster
+than the generic C code. (Note that this is still >13x slower than the code
+that uses the optional ARMv8 Crypto Extensions, which manages <1 cycles per
+byte.)
 
-On Sat, Dec 31, 2016 at 9:26 PM,  <gidisrael@gmail.com> wrote:
-> From: Gideon Israel Dsouza <gidisrael@gmail.com>
->
-> Continuing from this commit: 52f5684c8e1e
-> ("kernel: use macros from compiler.h instead of __attribute__((...))")
->
-> I submitted 4 total patches. They are part of task I've taken up to
-> increase compiler portability in the kernel. I've cleaned up the
-> subsystems under /kernel /mm /block and /security, this patch targets
-> /crypto.
->
-> There is <linux/compiler.h> which provides macros for various gcc specific
-> constructs. Eg: __weak for __attribute__((weak)). I've cleaned all
-> instances of gcc specific attributes with the right macros for the crypto
-> subsystem.
->
-> I had to make one additional change into compiler-gcc.h for the case when
-> one wants to use this: __attribute__((aligned) and not specify an alignment
-> factor. From the gcc docs, this will result in the largest alignment for
-> that data type on the target machine so I've named the macro
-> __aligned_largest. Please advise if another name is more appropriate.
->
-> Signed-off-by: Gideon Israel Dsouza <gidisrael@gmail.com>
-> ---
->  crypto/ablkcipher.c          | 5 +++--
->  crypto/acompress.c           | 3 ++-
->  crypto/aead.c                | 3 ++-
->  crypto/ahash.c               | 3 ++-
->  crypto/akcipher.c            | 3 ++-
->  crypto/blkcipher.c           | 7 ++++---
->  crypto/cts.c                 | 5 +++--
->  crypto/kpp.c                 | 3 ++-
->  crypto/pcbc.c                | 3 ++-
->  crypto/rng.c                 | 3 ++-
->  crypto/scompress.c           | 3 ++-
->  crypto/shash.c               | 9 +++++----
->  crypto/skcipher.c            | 3 ++-
->  include/linux/compiler-gcc.h | 1 +
->  14 files changed, 34 insertions(+), 20 deletions(-)
->
-> diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
-> index d676fc5..d880a48 100644
-> --- a/crypto/ablkcipher.c
-> +++ b/crypto/ablkcipher.c
-> @@ -19,6 +19,7 @@
->  #include <linux/slab.h>
->  #include <linux/seq_file.h>
->  #include <linux/cryptouser.h>
-> +#include <linux/compiler.h>
->  #include <net/netlink.h>
->
->  #include <crypto/scatterwalk.h>
-> @@ -394,7 +395,7 @@ static int crypto_ablkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
->  #endif
->
->  static void crypto_ablkcipher_show(struct seq_file *m, struct crypto_alg *alg)
-> -       __attribute__ ((unused));
-> +       __maybe_unused;
->  static void crypto_ablkcipher_show(struct seq_file *m, struct crypto_alg *alg)
->  {
->         struct ablkcipher_alg *ablkcipher = &alg->cra_ablkcipher;
-> @@ -468,7 +469,7 @@ static int crypto_givcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
->  #endif
->
->  static void crypto_givcipher_show(struct seq_file *m, struct crypto_alg *alg)
-> -       __attribute__ ((unused));
-> +       __maybe_unused;
->  static void crypto_givcipher_show(struct seq_file *m, struct crypto_alg *alg)
->  {
->         struct ablkcipher_alg *ablkcipher = &alg->cra_ablkcipher;
-> diff --git a/crypto/acompress.c b/crypto/acompress.c
-> index 887783d..47d1162 100644
-> --- a/crypto/acompress.c
-> +++ b/crypto/acompress.c
-> @@ -20,6 +20,7 @@
->  #include <linux/crypto.h>
->  #include <crypto/algapi.h>
->  #include <linux/cryptouser.h>
-> +#include <linux/compiler.h>
->  #include <net/netlink.h>
->  #include <crypto/internal/acompress.h>
->  #include <crypto/internal/scompress.h>
-> @@ -50,7 +51,7 @@ static int crypto_acomp_report(struct sk_buff *skb, struct crypto_alg *alg)
->  #endif
->
->  static void crypto_acomp_show(struct seq_file *m, struct crypto_alg *alg)
-> -       __attribute__ ((unused));
-> +       __maybe_unused;
->
->  static void crypto_acomp_show(struct seq_file *m, struct crypto_alg *alg)
->  {
-> diff --git a/crypto/aead.c b/crypto/aead.c
-> index 3f5c5ff..f794b30 100644
-> --- a/crypto/aead.c
-> +++ b/crypto/aead.c
-> @@ -24,6 +24,7 @@
->  #include <linux/slab.h>
->  #include <linux/seq_file.h>
->  #include <linux/cryptouser.h>
-> +#include <linux/compiler.h>
->  #include <net/netlink.h>
->
->  #include "internal.h"
-> @@ -132,7 +133,7 @@ static int crypto_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
->  #endif
->
->  static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
-> -       __attribute__ ((unused));
-> +       __maybe_unused;
->  static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
->  {
->         struct aead_alg *aead = container_of(alg, struct aead_alg, base);
-> diff --git a/crypto/ahash.c b/crypto/ahash.c
-> index 2ce8bcb..e58c497 100644
-> --- a/crypto/ahash.c
-> +++ b/crypto/ahash.c
-> @@ -23,6 +23,7 @@
->  #include <linux/slab.h>
->  #include <linux/seq_file.h>
->  #include <linux/cryptouser.h>
-> +#include <linux/compiler.h>
->  #include <net/netlink.h>
->
->  #include "internal.h"
-> @@ -493,7 +494,7 @@ static int crypto_ahash_report(struct sk_buff *skb, struct crypto_alg *alg)
->  #endif
->
->  static void crypto_ahash_show(struct seq_file *m, struct crypto_alg *alg)
-> -       __attribute__ ((unused));
-> +       __maybe_unused;
->  static void crypto_ahash_show(struct seq_file *m, struct crypto_alg *alg)
->  {
->         seq_printf(m, "type         : ahash\n");
-> diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-> index def301e..cfbdb06 100644
-> --- a/crypto/akcipher.c
-> +++ b/crypto/akcipher.c
-> @@ -17,6 +17,7 @@
->  #include <linux/slab.h>
->  #include <linux/string.h>
->  #include <linux/crypto.h>
-> +#include <linux/compiler.h>
->  #include <crypto/algapi.h>
->  #include <linux/cryptouser.h>
->  #include <net/netlink.h>
-> @@ -47,7 +48,7 @@ static int crypto_akcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
->  #endif
->
->  static void crypto_akcipher_show(struct seq_file *m, struct crypto_alg *alg)
-> -       __attribute__ ((unused));
-> +       __maybe_unused;
->
->  static void crypto_akcipher_show(struct seq_file *m, struct crypto_alg *alg)
->  {
-> diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
-> index a832426..6c43a0a 100644
-> --- a/crypto/blkcipher.c
-> +++ b/crypto/blkcipher.c
-> @@ -1,6 +1,6 @@
->  /*
->   * Block chaining cipher operations.
-> - *
-> + *
->   * Generic encrypt/decrypt wrapper for ciphers, handles operations across
->   * multiple page boundaries by using temporary blocks.  In user context,
->   * the kernel is given a chance to schedule us once per page.
-> @@ -9,7 +9,7 @@
->   *
->   * This program is free software; you can redistribute it and/or modify it
->   * under the terms of the GNU General Public License as published by the Free
-> - * Software Foundation; either version 2 of the License, or (at your option)
-> + * Software Foundation; either version 2 of the License, or (at your option)
->   * any later version.
->   *
->   */
-> @@ -25,6 +25,7 @@
->  #include <linux/slab.h>
->  #include <linux/string.h>
->  #include <linux/cryptouser.h>
-> +#include <linux/compiler.h>
->  #include <net/netlink.h>
->
->  #include "internal.h"
-> @@ -534,7 +535,7 @@ static int crypto_blkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
->  #endif
->
->  static void crypto_blkcipher_show(struct seq_file *m, struct crypto_alg *alg)
-> -       __attribute__ ((unused));
-> +       __maybe_unused;
->  static void crypto_blkcipher_show(struct seq_file *m, struct crypto_alg *alg)
->  {
->         seq_printf(m, "type         : blkcipher\n");
-> diff --git a/crypto/cts.c b/crypto/cts.c
-> index 00254d7..a1335d6 100644
-> --- a/crypto/cts.c
-> +++ b/crypto/cts.c
-> @@ -49,6 +49,7 @@
->  #include <linux/scatterlist.h>
->  #include <crypto/scatterwalk.h>
->  #include <linux/slab.h>
-> +#include <linux/compiler.h>
->
->  struct crypto_cts_ctx {
->         struct crypto_skcipher *child;
-> @@ -103,7 +104,7 @@ static int cts_cbc_encrypt(struct skcipher_request *req)
->         struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
->         struct skcipher_request *subreq = &rctx->subreq;
->         int bsize = crypto_skcipher_blocksize(tfm);
-> -       u8 d[bsize * 2] __attribute__ ((aligned(__alignof__(u32))));
-> +       u8 d[bsize * 2] __aligned(__alignof__(u32));
->         struct scatterlist *sg;
->         unsigned int offset;
->         int lastn;
-> @@ -183,7 +184,7 @@ static int cts_cbc_decrypt(struct skcipher_request *req)
->         struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
->         struct skcipher_request *subreq = &rctx->subreq;
->         int bsize = crypto_skcipher_blocksize(tfm);
-> -       u8 d[bsize * 2] __attribute__ ((aligned(__alignof__(u32))));
-> +       u8 d[bsize * 2] __aligned(__alignof__(u32));
->         struct scatterlist *sg;
->         unsigned int offset;
->         u8 *space;
-> diff --git a/crypto/kpp.c b/crypto/kpp.c
-> index d36ce05..a90edc2 100644
-> --- a/crypto/kpp.c
-> +++ b/crypto/kpp.c
-> @@ -19,6 +19,7 @@
->  #include <linux/crypto.h>
->  #include <crypto/algapi.h>
->  #include <linux/cryptouser.h>
-> +#include <linux/compiler.h>
->  #include <net/netlink.h>
->  #include <crypto/kpp.h>
->  #include <crypto/internal/kpp.h>
-> @@ -47,7 +48,7 @@ static int crypto_kpp_report(struct sk_buff *skb, struct crypto_alg *alg)
->  #endif
->
->  static void crypto_kpp_show(struct seq_file *m, struct crypto_alg *alg)
-> -       __attribute__ ((unused));
-> +       __maybe_unused;
->
->  static void crypto_kpp_show(struct seq_file *m, struct crypto_alg *alg)
->  {
-> diff --git a/crypto/pcbc.c b/crypto/pcbc.c
-> index e4538e0..11d2486 100644
-> --- a/crypto/pcbc.c
-> +++ b/crypto/pcbc.c
-> @@ -20,6 +20,7 @@
->  #include <linux/kernel.h>
->  #include <linux/module.h>
->  #include <linux/slab.h>
-> +#include <linux/compiler.h>
->
->  struct crypto_pcbc_ctx {
->         struct crypto_cipher *child;
-> @@ -146,7 +147,7 @@ static int crypto_pcbc_decrypt_inplace(struct skcipher_request *req,
->         unsigned int nbytes = walk->nbytes;
->         u8 *src = walk->src.virt.addr;
->         u8 *iv = walk->iv;
-> -       u8 tmpbuf[bsize] __attribute__ ((aligned(__alignof__(u32))));
-> +       u8 tmpbuf[bsize] __aligned(__alignof__(u32));
->
->         do {
->                 memcpy(tmpbuf, src, bsize);
-> diff --git a/crypto/rng.c b/crypto/rng.c
-> index b81cffb..f46dac5 100644
-> --- a/crypto/rng.c
-> +++ b/crypto/rng.c
-> @@ -23,6 +23,7 @@
->  #include <linux/slab.h>
->  #include <linux/string.h>
->  #include <linux/cryptouser.h>
-> +#include <linux/compiler.h>
->  #include <net/netlink.h>
->
->  #include "internal.h"
-> @@ -95,7 +96,7 @@ static int crypto_rng_report(struct sk_buff *skb, struct crypto_alg *alg)
->  #endif
->
->  static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
-> -       __attribute__ ((unused));
-> +       __maybe_unused;
->  static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
->  {
->         seq_printf(m, "type         : rng\n");
-> diff --git a/crypto/scompress.c b/crypto/scompress.c
-> index 35e396d..6b048b3 100644
-> --- a/crypto/scompress.c
-> +++ b/crypto/scompress.c
-> @@ -18,6 +18,7 @@
->  #include <linux/slab.h>
->  #include <linux/string.h>
->  #include <linux/crypto.h>
-> +#include <linux/compiler.h>
->  #include <linux/vmalloc.h>
->  #include <crypto/algapi.h>
->  #include <linux/cryptouser.h>
-> @@ -57,7 +58,7 @@ static int crypto_scomp_report(struct sk_buff *skb, struct crypto_alg *alg)
->  #endif
->
->  static void crypto_scomp_show(struct seq_file *m, struct crypto_alg *alg)
-> -       __attribute__ ((unused));
-> +       __maybe_unused;
->
->  static void crypto_scomp_show(struct seq_file *m, struct crypto_alg *alg)
->  {
-> diff --git a/crypto/shash.c b/crypto/shash.c
-> index a051541..5e31c8d 100644
-> --- a/crypto/shash.c
-> +++ b/crypto/shash.c
-> @@ -19,6 +19,7 @@
->  #include <linux/seq_file.h>
->  #include <linux/cryptouser.h>
->  #include <net/netlink.h>
-> +#include <linux/compiler.h>
->
->  #include "internal.h"
->
-> @@ -67,7 +68,7 @@ EXPORT_SYMBOL_GPL(crypto_shash_setkey);
->  static inline unsigned int shash_align_buffer_size(unsigned len,
->                                                    unsigned long mask)
->  {
-> -       typedef u8 __attribute__ ((aligned)) u8_aligned;
-> +       typedef u8 __aligned_largest u8_aligned;
->         return len + (mask & ~(__alignof__(u8_aligned) - 1));
->  }
->
-> @@ -80,7 +81,7 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
->         unsigned int unaligned_len = alignmask + 1 -
->                                      ((unsigned long)data & alignmask);
->         u8 ubuf[shash_align_buffer_size(unaligned_len, alignmask)]
-> -               __attribute__ ((aligned));
-> +               __aligned_largest;
->         u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
->         int err;
->
-> @@ -116,7 +117,7 @@ static int shash_final_unaligned(struct shash_desc *desc, u8 *out)
->         struct shash_alg *shash = crypto_shash_alg(tfm);
->         unsigned int ds = crypto_shash_digestsize(tfm);
->         u8 ubuf[shash_align_buffer_size(ds, alignmask)]
-> -               __attribute__ ((aligned));
-> +               __aligned_largest;
->         u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
->         int err;
->
-> @@ -403,7 +404,7 @@ static int crypto_shash_report(struct sk_buff *skb, struct crypto_alg *alg)
->  #endif
->
->  static void crypto_shash_show(struct seq_file *m, struct crypto_alg *alg)
-> -       __attribute__ ((unused));
-> +       __maybe_unused;
->  static void crypto_shash_show(struct seq_file *m, struct crypto_alg *alg)
->  {
->         struct shash_alg *salg = __crypto_shash_alg(alg);
-> diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-> index 0e1e6c3..1a0bd92 100644
-> --- a/crypto/skcipher.c
-> +++ b/crypto/skcipher.c
-> @@ -19,6 +19,7 @@
->  #include <crypto/scatterwalk.h>
->  #include <linux/bug.h>
->  #include <linux/cryptouser.h>
-> +#include <linux/compiler.h>
->  #include <linux/list.h>
->  #include <linux/module.h>
->  #include <linux/rtnetlink.h>
-> @@ -807,7 +808,7 @@ static void crypto_skcipher_free_instance(struct crypto_instance *inst)
->  }
->
->  static void crypto_skcipher_show(struct seq_file *m, struct crypto_alg *alg)
-> -       __attribute__ ((unused));
-> +       __maybe_unused;
->  static void crypto_skcipher_show(struct seq_file *m, struct crypto_alg *alg)
->  {
->         struct skcipher_alg *skcipher = container_of(alg, struct skcipher_alg,
-> diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-> index 0444b13..fddd1a5 100644
-> --- a/include/linux/compiler-gcc.h
-> +++ b/include/linux/compiler-gcc.h
-> @@ -116,6 +116,7 @@
->   */
->  #define __pure                 __attribute__((pure))
->  #define __aligned(x)           __attribute__((aligned(x)))
-> +#define __aligned_largest      __attribute__((aligned))
->  #define __printf(a, b)         __attribute__((format(printf, a, b)))
->  #define __scanf(a, b)          __attribute__((format(scanf, a, b)))
->  #define __attribute_const__    __attribute__((__const__))
-> --
-> 2.7.4
->
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+
+Raw performance data after the patch, which was generated on a 2 GHz
+Cortex-A57 (AMD Seattle B1).
+
+ arch/arm64/crypto/Kconfig           |   4 +
+ arch/arm64/crypto/Makefile          |   3 +
+ arch/arm64/crypto/aes-cipher-core.S | 126 ++++++++++++++++++++
+ arch/arm64/crypto/aes-cipher-glue.c |  69 +++++++++++
+ 4 files changed, 202 insertions(+)
+
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index 0bf0f531f539..0826f8e599a6 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -41,6 +41,10 @@ config CRYPTO_CRC32_ARM64_CE
+ 	depends on KERNEL_MODE_NEON && CRC32
+ 	select CRYPTO_HASH
+ 
++config CRYPTO_AES_ARM64
++	tristate "AES core cipher using scalar instructions"
++	select CRYPTO_AES
++
+ config CRYPTO_AES_ARM64_CE
+ 	tristate "AES core cipher using ARMv8 Crypto Extensions"
+ 	depends on ARM64 && KERNEL_MODE_NEON
+diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+index 9d2826c5fccf..a893507629eb 100644
+--- a/arch/arm64/crypto/Makefile
++++ b/arch/arm64/crypto/Makefile
+@@ -44,6 +44,9 @@ sha512-arm64-y := sha512-glue.o sha512-core.o
+ obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha20-neon.o
+ chacha20-neon-y := chacha20-neon-core.o chacha20-neon-glue.o
+ 
++obj-$(CONFIG_CRYPTO_AES_ARM64) += aes-arm64.o
++aes-arm64-y := aes-cipher-core.o aes-cipher-glue.o
++
+ AFLAGS_aes-ce.o		:= -DINTERLEAVE=4
+ AFLAGS_aes-neon.o	:= -DINTERLEAVE=4
+ 
+diff --git a/arch/arm64/crypto/aes-cipher-core.S b/arch/arm64/crypto/aes-cipher-core.S
+new file mode 100644
+index 000000000000..22d1bc46feba
+--- /dev/null
++++ b/arch/arm64/crypto/aes-cipher-core.S
+@@ -0,0 +1,126 @@
++/*
++ * Scalar AES core transform
++ *
++ * Copyright (C) 2017 Linaro Ltd <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/linkage.h>
++#include <asm/assembler.h>
++
++	.text
++	.align		5
++
++	rk		.req	x0
++	out		.req	x1
++	in		.req	x2
++	rounds		.req	x3
++	tt		.req	x4
++	lt		.req	x2
++
++	.macro		__hround, out0, out1, in0, in1, in2, in3, t0, t1, enc
++	ldp		\out0, \out1, [rk], #8
++
++	ubfx		w13, \in0, #0, #8
++	ubfx		w14, \in1, #8, #8
++	ldr		w13, [tt, w13, uxtw #2]
++	ldr		w14, [tt, w14, uxtw #2]
++
++	ubfx		w15, \in2, #16, #8
++	ubfx		w16, \in3, #24, #8
++	ldr		w15, [tt, w15, uxtw #2]
++	ldr		w16, [tt, w16, uxtw #2]
++
++	.if		\enc
++	ubfx		w17, \in1, #0, #8
++	ubfx		w18, \in2, #8, #8
++	.else
++	ubfx		w17, \in3, #0, #8
++	ubfx		w18, \in0, #8, #8
++	.endif
++	ldr		w17, [tt, w17, uxtw #2]
++	ldr		w18, [tt, w18, uxtw #2]
++
++	.if		\enc
++	ubfx		\t0, \in3, #16, #8
++	ubfx		\t1, \in0, #24, #8
++	.else
++	ubfx		\t0, \in1, #16, #8
++	ubfx		\t1, \in2, #24, #8
++	.endif
++	ldr		\t0, [tt, \t0, uxtw #2]
++	ldr		\t1, [tt, \t1, uxtw #2]
++
++	eor		\out0, \out0, w13
++	eor		\out1, \out1, w17
++	eor		\out0, \out0, w14, ror #24
++	eor		\out1, \out1, w18, ror #24
++	eor		\out0, \out0, w15, ror #16
++	eor		\out1, \out1, \t0, ror #16
++	eor		\out0, \out0, w16, ror #8
++	eor		\out1, \out1, \t1, ror #8
++	.endm
++
++	.macro		fround, out0, out1, out2, out3, in0, in1, in2, in3
++	__hround	\out0, \out1, \in0, \in1, \in2, \in3, \out2, \out3, 1
++	__hround	\out2, \out3, \in2, \in3, \in0, \in1, \in1, \in2, 1
++	.endm
++
++	.macro		iround, out0, out1, out2, out3, in0, in1, in2, in3
++	__hround	\out0, \out1, \in0, \in3, \in2, \in1, \out2, \out3, 0
++	__hround	\out2, \out3, \in2, \in1, \in0, \in3, \in1, \in0, 0
++	.endm
++
++	.macro		do_crypt, round, ttab, ltab
++	ldp		w5, w6, [in]
++	ldp		w7, w8, [in, #8]
++	ldp		w9, w10, [rk], #16
++	ldp		w11, w12, [rk, #-8]
++
++CPU_BE(	rev		w5, w5		)
++CPU_BE(	rev		w6, w6		)
++CPU_BE(	rev		w7, w7		)
++CPU_BE(	rev		w8, w8		)
++
++	eor		w5, w5, w9
++	eor		w6, w6, w10
++	eor		w7, w7, w11
++	eor		w8, w8, w12
++
++	ldr		tt, =\ttab
++	ldr		lt, =\ltab
++
++	tbnz		rounds, #1, 1f
++
++0:	\round		w9, w10, w11, w12, w5, w6, w7, w8
++	\round		w5, w6, w7, w8, w9, w10, w11, w12
++
++1:	subs		rounds, rounds, #4
++	\round		w9, w10, w11, w12, w5, w6, w7, w8
++	csel		tt, tt, lt, hi
++	\round		w5, w6, w7, w8, w9, w10, w11, w12
++	b.hi		0b
++
++CPU_BE(	rev		w5, w5		)
++CPU_BE(	rev		w6, w6		)
++CPU_BE(	rev		w7, w7		)
++CPU_BE(	rev		w8, w8		)
++
++	stp		w5, w6, [out]
++	stp		w7, w8, [out, #8]
++	ret
++
++	.align		4
++	.ltorg
++	.endm
++
++ENTRY(__aes_arm64_encrypt)
++	do_crypt	fround, crypto_ft_tab, crypto_fl_tab
++ENDPROC(__aes_arm64_encrypt)
++
++ENTRY(__aes_arm64_decrypt)
++	do_crypt	iround, crypto_it_tab, crypto_il_tab
++ENDPROC(__aes_arm64_decrypt)
+diff --git a/arch/arm64/crypto/aes-cipher-glue.c b/arch/arm64/crypto/aes-cipher-glue.c
+new file mode 100644
+index 000000000000..7288e7cbebff
+--- /dev/null
++++ b/arch/arm64/crypto/aes-cipher-glue.c
+@@ -0,0 +1,69 @@
++/*
++ * Scalar AES core transform
++ *
++ * Copyright (C) 2017 Linaro Ltd <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <crypto/aes.h>
++#include <linux/crypto.h>
++#include <linux/module.h>
++
++asmlinkage void __aes_arm64_encrypt(u32 *rk, u8 *out, const u8 *in, int rounds);
++EXPORT_SYMBOL(__aes_arm64_encrypt);
++
++asmlinkage void __aes_arm64_decrypt(u32 *rk, u8 *out, const u8 *in, int rounds);
++EXPORT_SYMBOL(__aes_arm64_decrypt);
++
++static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++{
++	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++	int rounds = 6 + ctx->key_length / 4;
++
++	__aes_arm64_encrypt(ctx->key_enc, out, in, rounds);
++}
++
++static void aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++{
++	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++	int rounds = 6 + ctx->key_length / 4;
++
++	__aes_arm64_decrypt(ctx->key_dec, out, in, rounds);
++}
++
++static struct crypto_alg aes_alg = {
++	.cra_name			= "aes",
++	.cra_driver_name		= "aes-arm64",
++	.cra_priority			= 200,
++	.cra_flags			= CRYPTO_ALG_TYPE_CIPHER,
++	.cra_blocksize			= AES_BLOCK_SIZE,
++	.cra_ctxsize			= sizeof(struct crypto_aes_ctx),
++	.cra_module			= THIS_MODULE,
++
++	.cra_cipher.cia_min_keysize	= AES_MIN_KEY_SIZE,
++	.cra_cipher.cia_max_keysize	= AES_MAX_KEY_SIZE,
++	.cra_cipher.cia_setkey		= crypto_aes_set_key,
++	.cra_cipher.cia_encrypt		= aes_encrypt,
++	.cra_cipher.cia_decrypt		= aes_decrypt
++};
++
++static int __init aes_init(void)
++{
++	return crypto_register_alg(&aes_alg);
++}
++
++static void __exit aes_fini(void)
++{
++	crypto_unregister_alg(&aes_alg);
++}
++
++module_init(aes_init);
++module_exit(aes_fini);
++
++MODULE_DESCRIPTION("Scalar AES cipher for arm64");
++MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
++MODULE_LICENSE("GPL v2");
++MODULE_ALIAS_CRYPTO("aes");
+-- 
+2.7.4
+
+testing speed of async ecb(aes) (ecb(aes-generic)) encryption
+test 0 (128 bit key, 16 byte blocks): 4594689 operations in 1 seconds (73515024 bytes)
+test 1 (128 bit key, 64 byte blocks): 1585137 operations in 1 seconds (101448768 bytes)
+test 2 (128 bit key, 256 byte blocks): 435173 operations in 1 seconds (111404288 bytes)
+test 3 (128 bit key, 1024 byte blocks): 111505 operations in 1 seconds (114181120 bytes)
+test 4 (128 bit key, 8192 byte blocks): 14093 operations in 1 seconds (115449856 bytes)
+test 5 (192 bit key, 16 byte blocks): 4078345 operations in 1 seconds (65253520 bytes)
+test 6 (192 bit key, 64 byte blocks): 1349425 operations in 1 seconds (86363200 bytes)
+test 7 (192 bit key, 256 byte blocks): 365631 operations in 1 seconds (93601536 bytes)
+test 8 (192 bit key, 1024 byte blocks): 93362 operations in 1 seconds (95602688 bytes)
+test 9 (192 bit key, 8192 byte blocks): 11729 operations in 1 seconds (96083968 bytes)
+test 10 (256 bit key, 16 byte blocks): 3692945 operations in 1 seconds (59087120 bytes)
+test 11 (256 bit key, 64 byte blocks): 1182522 operations in 1 seconds (75681408 bytes)
+test 12 (256 bit key, 256 byte blocks): 317285 operations in 1 seconds (81224960 bytes)
+test 13 (256 bit key, 1024 byte blocks): 80459 operations in 1 seconds (82390016 bytes)
+test 14 (256 bit key, 8192 byte blocks): 10138 operations in 1 seconds (83050496 bytes)
+
+testing speed of async ecb(aes) (ecb(aes-arm64)) encryption
+test 0 (128 bit key, 16 byte blocks): 5455304 operations in 1 seconds (87284864 bytes)
+test 1 (128 bit key, 64 byte blocks): 2000321 operations in 1 seconds (128020544 bytes)
+test 2 (128 bit key, 256 byte blocks): 574174 operations in 1 seconds (146988544 bytes)
+test 3 (128 bit key, 1024 byte blocks): 148497 operations in 1 seconds (152060928 bytes)
+test 4 (128 bit key, 8192 byte blocks): 18836 operations in 1 seconds (154304512 bytes)
+test 5 (192 bit key, 16 byte blocks): 4962478 operations in 1 seconds (79399648 bytes)
+test 6 (192 bit key, 64 byte blocks): 1740157 operations in 1 seconds (111370048 bytes)
+test 7 (192 bit key, 256 byte blocks): 490443 operations in 1 seconds (125553408 bytes)
+test 8 (192 bit key, 1024 byte blocks): 126165 operations in 1 seconds (129192960 bytes)
+test 9 (192 bit key, 8192 byte blocks): 15897 operations in 1 seconds (130228224 bytes)
+test 10 (256 bit key, 16 byte blocks): 4527784 operations in 1 seconds (72444544 bytes)
+test 11 (256 bit key, 64 byte blocks): 1527235 operations in 1 seconds (97743040 bytes)
+test 12 (256 bit key, 256 byte blocks): 425302 operations in 1 seconds (108877312 bytes)
+test 13 (256 bit key, 1024 byte blocks): 109013 operations in 1 seconds (111629312 bytes)
+test 14 (256 bit key, 8192 byte blocks): 13778 operations in 1 seconds (112869376 bytes)
