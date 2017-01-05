@@ -1,109 +1,68 @@
-From: Shannon Nelson <shannon.nelson@oracle.com>
-Subject: Re: console noise after commit c1e9b3b0eea
-Date: Wed, 4 Jan 2017 16:44:43 -0800
-Message-ID: <32704d75-cff2-c3b5-9133-5d3f8749ba09@oracle.com>
-References: <a0a9e8ae-38a8-9bb8-d3b7-2f4b50809096@oracle.com>
+From: Binoy Jayan <binoy.jayan@linaro.org>
+Subject: Re: [RFC PATCH v2] crypto: Add IV generation algorithms
+Date: Thu, 5 Jan 2017 11:36:52 +0530
+Message-ID: <CAHv-k_9G=iWe_CWNEcKxq0Q1=XhUAPDE88NvvkCOu5q=pNSgrA@mail.gmail.com>
+References: <1481618949-20086-1-git-send-email-binoy.jayan@linaro.org>
+ <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
+ <d6d92865-98fa-4d02-035f-9080bc265c35@gmail.com> <20161222085509.GA2160@gondor.apana.org.au>
+ <CAHv-k_-EKq2g=Wb+YkPVp9gCXTDEyrxZhQpT5JMSw=WtZ1OC9w@mail.gmail.com>
+ <20161223075114.GA3580@gondor.apana.org.au> <CAHv-k_9SynECq7qDbrW59=LsV_WNj+9Ffa=6tATyNKOt36he6Q@mail.gmail.com>
+ <20161230102723.GA15713@gondor.apana.org.au> <CAHv-k_8FmeKk_3zUAVCqHp82nHmiWsyfZ_BW+z=SC5VVOrFsAA@mail.gmail.com>
+ <20170102065325.GA19553@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "SOWMINI.VARADHAN" <sowmini.varadhan@oracle.com>,
-        sparclinux@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Anatoly Pugachev <matorola@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: Milan Broz <gmazyland@gmail.com>, Oded <oded.golombek@arm.com>,
+        Ofir <Ofir.Drang@arm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:36094 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751177AbdAEAo2 (ORCPT
+Received: from mail-vk0-f53.google.com ([209.85.213.53]:36539 "EHLO
+        mail-vk0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S967208AbdAEGGz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Jan 2017 19:44:28 -0500
-In-Reply-To: <a0a9e8ae-38a8-9bb8-d3b7-2f4b50809096@oracle.com>
+        Thu, 5 Jan 2017 01:06:55 -0500
+Received: by mail-vk0-f53.google.com with SMTP id p9so296452683vkd.3
+        for <linux-crypto@vger.kernel.org>; Wed, 04 Jan 2017 22:06:55 -0800 (PST)
+In-Reply-To: <20170102065325.GA19553@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Resurrecting an old thread, pulled out of
-http://www.spinics.net/lists/linux-crypto/msg19192.html
+Hi Herbert,
 
+On 2 January 2017 at 12:23, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Mon, Jan 02, 2017 at 12:16:45PM +0530, Binoy Jayan wrote:
+>
+> Right.  The actual number of underlying tfms that do the work
+> won't change compared to the status quo.  We're just structuring
+> it such that if the overall scheme is supported by the hardware
+> then we can feed more than one sector at a time to it.
 
-On Wed, Apr 20, 2016 at 9:18 AM, Anatoly Pugachev <matorola@xxxxxxxxx> 
-wrote:
-> On Wed, Apr 20, 2016 at 1:33 AM, Sowmini Varadhan
-> <sowmini.varadhan@xxxxxxxxxx> wrote:
->>
->> Hi Anatoly,
->>
->> after commit c1e9b3b0eea1 ("hwrng: n2 - Attach on T5/M5, T7/M7 SPARC
-> CPUs")
->> I get a *lot* of console noise on my T5-2, of the form:
->>
->> n2rng f028f21c: Selftest failed on unit 0
->> n2rng f028f21c: Test buffer slot 0 [0x0000000000000000]
->> n2rng f028f21c: Test buffer slot 1 [0xe63f56d6a22eb116]
->> n2rng f028f21c: Test buffer slot 2 [0xe63f56d6a22eb116]
->> n2rng f028f21c: Test buffer slot 3 [0xe63f56d6a22eb116]
->> n2rng f028f21c: Test buffer slot 4 [0xe63f56d6a22eb116]
->> n2rng f028f21c: Test buffer slot 5 [0xe63f56d6a22eb116]
->> n2rng f028f21c: Test buffer slot 6 [0xe63f56d6a22eb116]
->> n2rng f028f21c: Test buffer slot 7 [0xe63f56d6a22eb116]
->>
->> Why/when is your commit needed on my T5-2?
->>
->> I'm not sure how this was tested, but if you need to revise it and test
->> on sparc, please let me know- I think it needs more work on sparc.
->
-> Sowmini,
->
-> the patch/commit is actually quite trivial, it just adds device_id
-> matches for newer T5/M7 CPUs to n2rng_match structure. Without this
-> patch, n2rng does not work on this newer CPUs. Works well on my T5-2
-> LDOM (tested with rng-tools and gpg --gen-key). I don't have M7
+I was thinking of continuing to have the iv generation algorithms as template
+ciphers instead of regular 'skcipher' as it is easier to inherit the parameters
+from the underlying cipher (e.g. aes) like cra_blocksize, cra_alignmask,
+ivsize, chunksize etc.
 
-   ^^^^
+Usually, the underlying cipher for the template ciphers are instantiated
+in the following function:
 
-Anatoly, I think your LDOM is why you don't see the problem.  Yes, your 
-patch works just fine when running in a client LDOM, but we see a 
-problem when running this on sparc "bare metal".  Did you test this on 
-the bare metal so that the self-test would run?
+skcipher_instance:skcipher_alg:init()
 
-It seems there's an issue with the self-test in the newer hardware and 
-the driver will never stop trying to retest the hardware.  I'm 
-contemplating a patch to limit the self-test attempts, at least until we 
-can figure out what is the root of the issue.
+Since the number of such cipher instances depend on the key count, which is
+not known at the time of creation of the cipher (it's passed to as an argument
+to the setkey api), the creation of those have to be delayed until the setkey
+operation of the template cipher. But as Mark pointed out, the users of this
+cipher may get confused if the creation of the underlying cipher fails while
+trying to do a 'setkey' on the template cipher. I was wondering if I can create
+a single instance of the cipher and assign it to tfms[0] and allocate the
+remaining instances when the setkey operation is called later with the encoded
+key_count so that errors during cipher creation are uncovered earlier.
 
-sln
-
-> machine to test it with.
->
-> Why the n2rng selftest fails on your machine - I've no idea... Just to
-> silence it, you can blacklist this module, since it does not work your
-> hardware anyway.
->
-> Can you please send me "prtconf -pv" output from your machine, as well
-> information on how do you run linux as LDOM container or baremetal
-> T5-2 ?
->
-> Mine T5-2 is one of the last firmware releases (run from solaris 11.3
-> control domain):
->
-> root@deimos:/home/sysadmin# prtdiag -v
-> ============================ FW Version ============================
-> Sun System Firmware 9.5.3 2015/11/25 09:50
->
-> sysadmin@deimos:~$ ldm -V
->
-> Logical Domains Manager (v 3.3.0.0.17)
->         Hypervisor control protocol v 1.12
->         Using Hypervisor MD v 1.4
->
-> System PROM:
->         Hostconfig      v. 1.6.3        @(#)Hostconfig 1.6.3 2015/11/25
-> 08:57
->         Hypervisor      v. 1.15.3       @(#)Hypervisor 1.15.3 2015/11/11
-> 17:15
->         OpenBoot        v. 4.38.3       @(#)OpenBoot 4.38.3 2015/11/11
-> 10:38
->
->
-> Can you please check what firmware release if yours T5-2 server and
-> probably update? I'm not sure it would help, but anyway.
->
->
->
+Thanks,
+Binoy
