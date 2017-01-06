@@ -1,55 +1,36 @@
 From: Harsh Jain <harsh@chelsio.com>
-Subject: [PATCH v1 5/8] crypto:chcr: Change cra_flags for cipher algos
-Date: Fri,  6 Jan 2017 14:01:36 +0530
-Message-ID: <49d449c46db820bbffad65ad630c471339fc00fd.1483599449.git.harsh@chelsio.com>
-References: <cover.1483599449.git.harsh@chelsio.com>
+Subject: [PATCH v1 0/8] crypto:chcr- Bug fixes
+Date: Fri,  6 Jan 2017 14:01:31 +0530
+Message-ID: <cover.1483599449.git.harsh@chelsio.com>
 Cc: Harsh Jain <harsh@chelsio.com>
 To: hariprasad@chelsio.com, netdev@vger.kernel.org,
         herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
 Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <cover.1483599449.git.harsh@chelsio.com>
-In-Reply-To: <cover.1483599449.git.harsh@chelsio.com>
-References: <cover.1483599449.git.harsh@chelsio.com>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Change cipher algos flags to CRYPTO_ALG_TYPE_ABLKCIPHER.
+The patch series is based on Herbert's cryptodev-2.6 tree.
+It include bug fixes.
 
-Signed-off-by: Harsh Jain <harsh@chelsio.com>
----
- drivers/crypto/chelsio/chcr_algo.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Atul Gupta (4):
+  crypto:chcr-Change flow IDs
+  crypto:chcr- Fix panic on dma_unmap_sg
+  crypto:chcr- Check device is allocated before use
+  crypto:chcr- Fix wrong typecasting
+Harsh Jain (4):
+  crypto:chcr- Fix key length for RFC4106
+  crypto:chcr- Use cipher instead of Block Cipher in gcm setkey
+  crypto:chcr: Change cra_flags for cipher algos
+  crypto:chcr- Change algo priority
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index d335943..21fc04c 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -171,7 +171,7 @@ int chcr_handle_resp(struct crypto_async_request *req, unsigned char *input,
- 		}
- 		break;
- 
--	case CRYPTO_ALG_TYPE_BLKCIPHER:
-+	case CRYPTO_ALG_TYPE_ABLKCIPHER:
- 		ctx_req.req.ablk_req = (struct ablkcipher_request *)req;
- 		ctx_req.ctx.ablk_ctx =
- 			ablkcipher_request_ctx(ctx_req.req.ablk_req);
-@@ -2492,7 +2492,7 @@ static int chcr_aead_op(struct aead_request *req,
- 			.cra_name		= "cbc(aes)",
- 			.cra_driver_name	= "cbc-aes-chcr",
- 			.cra_priority		= CHCR_CRA_PRIORITY,
--			.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+			.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
- 				CRYPTO_ALG_ASYNC,
- 			.cra_blocksize		= AES_BLOCK_SIZE,
- 			.cra_ctxsize		= sizeof(struct chcr_context)
-@@ -2519,7 +2519,7 @@ static int chcr_aead_op(struct aead_request *req,
- 			.cra_name		= "xts(aes)",
- 			.cra_driver_name	= "xts-aes-chcr",
- 			.cra_priority		= CHCR_CRA_PRIORITY,
--			.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+			.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
- 				CRYPTO_ALG_ASYNC,
- 			.cra_blocksize		= AES_BLOCK_SIZE,
- 			.cra_ctxsize		= sizeof(struct chcr_context) +
+
+ drivers/crypto/chelsio/chcr_algo.c            | 97 ++++++++++++++-------------
+ drivers/crypto/chelsio/chcr_algo.h            |  9 +--
+ drivers/crypto/chelsio/chcr_core.c            | 27 ++++----
+ drivers/crypto/chelsio/chcr_core.h            |  1 +
+ drivers/crypto/chelsio/chcr_crypto.h          |  5 +-
+ drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h |  8 +++
+ 6 files changed, 80 insertions(+), 67 deletions(-)
+
 -- 
 1.8.2.3
