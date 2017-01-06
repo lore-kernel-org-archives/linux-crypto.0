@@ -1,51 +1,35 @@
-From: Harsh Jain <harsh@chelsio.com>
-Subject: [PATCH v1 8/8] crypto:chcr- Fix wrong typecasting
-Date: Fri,  6 Jan 2017 14:01:39 +0530
-Message-ID: <cbbe6ac7440e36e42d2464c66cc8c14aa079e9f6.1483599449.git.harsh@chelsio.com>
-References: <cover.1483599449.git.harsh@chelsio.com>
-Cc: Harsh Jain <harsh@chelsio.com>, Atul Gupta <atul.gupta@chelsio.com>
-To: hariprasad@chelsio.com, netdev@vger.kernel.org,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <cover.1483599449.git.harsh@chelsio.com>
-In-Reply-To: <cover.1483599449.git.harsh@chelsio.com>
-References: <cover.1483599449.git.harsh@chelsio.com>
-Sender: netdev-owner@vger.kernel.org
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: Geode LX AES/RNG driver triggers warning
+Date: Fri, 6 Jan 2017 15:10:19 +0530
+Message-ID: <CANc+2y7vh2U_Qrvwof8UZvJqVUL1hc3bQ5qgV-NJQnvQrmQn3Q@mail.gmail.com>
+References: <A0185338-47A4-42BE-B2D4-F1EB082593E3@sigma-star.at> <20170103145203.780d3c58@lxorguk.ukuu.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: David Gstir <david@sigma-star.at>, linux-geode@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        teheo@suse.de, Richard Weinberger <richard@nod.at>
+To: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170103145203.780d3c58@lxorguk.ukuu.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Typecast the pointer with correct structure.
+>> I narrowed it down to commit 6e9b5e76882c ("hwrng: geode - Migrate to managed API") which seems to introduce this. It looks to me like some issue between devres, the Geode hwrng and AES drivers which both use the same PCI device.
+>
+> It does
+>
+>> I'm no expert here, but I curious if this will cause any issues when using the hardware crypto drivers and also what's the best way to get rid of this?
+>
+> Probably to create an mfd device that turns the PCI device into two MFD
+> devices and bind AES and hwrng one to each MFD device. Take a look in
+> drivers/mfd. That would also fix the uglies in mod_init for the rng
+> driver.
 
-Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
----
- drivers/crypto/chelsio/chcr_core.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+I am the author of that commit. Code before commit 6e9b5e76882c had
+ioremap, wondering why there was no warning message before. Just want
+to know if that commit uncovered existing issue or introduced a new
+issue? As far as I understand the commit did not change the
+functionality. Please feel free to correct if I have missed something.
 
-diff --git a/drivers/crypto/chelsio/chcr_core.c b/drivers/crypto/chelsio/chcr_core.c
-index 1c65f07..aec3562 100644
---- a/drivers/crypto/chelsio/chcr_core.c
-+++ b/drivers/crypto/chelsio/chcr_core.c
-@@ -151,18 +151,17 @@ int chcr_uld_rx_handler(void *handle, const __be64 *rsp,
- {
- 	struct uld_ctx *u_ctx = (struct uld_ctx *)handle;
- 	struct chcr_dev *dev = u_ctx->dev;
--	const struct cpl_act_establish *rpl = (struct cpl_act_establish
--					       *)rsp;
-+	const struct cpl_fw6_pld *rpl = (struct cpl_fw6_pld *)rsp;
- 
--	if (rpl->ot.opcode != CPL_FW6_PLD) {
-+	if (rpl->opcode != CPL_FW6_PLD) {
- 		pr_err("Unsupported opcode\n");
- 		return 0;
- 	}
- 
- 	if (!pgl)
--		work_handlers[rpl->ot.opcode](dev, (unsigned char *)&rsp[1]);
-+		work_handlers[rpl->opcode](dev, (unsigned char *)&rsp[1]);
- 	else
--		work_handlers[rpl->ot.opcode](dev, pgl->va);
-+		work_handlers[rpl->opcode](dev, pgl->va);
- 	return 0;
- }
- 
--- 
-1.8.2.3
+Regards,
+PrasannaKumar
