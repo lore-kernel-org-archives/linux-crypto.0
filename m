@@ -1,7 +1,7 @@
 From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: [PATCH v2 2/4] lib/decompress_unlz4: Change module to work with new LZ4 module version
-Date: Sat,  7 Jan 2017 17:55:43 +0100
-Message-ID: <1483808145-18417-3-git-send-email-4sschmid@informatik.uni-hamburg.de>
+Subject: [PATCH v2 3/4] crypto: Change LZ4 modules to work with new LZ4 module version
+Date: Sat,  7 Jan 2017 17:55:44 +0100
+Message-ID: <1483808145-18417-4-git-send-email-4sschmid@informatik.uni-hamburg.de>
 References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
  <1483808145-18417-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
 Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
@@ -17,52 +17,115 @@ In-Reply-To: <1483808145-18417-1-git-send-email-4sschmid@informatik.uni-hamburg.
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch updates the unlz4 wrapper to work with the new LZ4 kernel module version.
+This patch updates the crypto modules using LZ4 compression to work with the
+new LZ4 module version.
 
 Signed-off-by: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
 ---
- lib/decompress_unlz4.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ crypto/lz4.c   | 27 ++++++++++++++-------------
+ crypto/lz4hc.c | 25 +++++++++++++------------
+ 2 files changed, 27 insertions(+), 25 deletions(-)
 
-diff --git a/lib/decompress_unlz4.c b/lib/decompress_unlz4.c
-index 036fc88..1b0baf3 100644
---- a/lib/decompress_unlz4.c
-+++ b/lib/decompress_unlz4.c
-@@ -72,7 +72,7 @@ STATIC inline int INIT unlz4(u8 *input, long in_len,
- 		error("NULL input pointer and missing fill function");
- 		goto exit_1;
- 	} else {
--		inp = large_malloc(lz4_compressbound(uncomp_chunksize));
-+		inp = large_malloc(LZ4_compressBound(uncomp_chunksize));
- 		if (!inp) {
- 			error("Could not allocate input buffer");
- 			goto exit_1;
-@@ -136,7 +136,7 @@ STATIC inline int INIT unlz4(u8 *input, long in_len,
- 			inp += 4;
- 			size -= 4;
- 		} else {
--			if (chunksize > lz4_compressbound(uncomp_chunksize)) {
-+			if (chunksize > LZ4_compressBound(uncomp_chunksize)) {
- 				error("chunk length is longer than allocated");
- 				goto exit_2;
- 			}
-@@ -152,11 +152,14 @@ STATIC inline int INIT unlz4(u8 *input, long in_len,
- 			out_len -= dest_len;
- 		} else
- 			dest_len = out_len;
--		ret = lz4_decompress(inp, &chunksize, outp, dest_len);
-+
-+		ret = LZ4_decompress_fast(inp, outp, dest_len);
-+		chunksize = ret;
- #else
- 		dest_len = uncomp_chunksize;
--		ret = lz4_decompress_unknownoutputsize(inp, chunksize, outp,
--				&dest_len);
-+
-+		ret = LZ4_decompress_safe(inp, outp, chunksize, dest_len);
-+		dest_len = ret;
- #endif
- 		if (ret < 0) {
- 			error("Decoding failed");
+diff --git a/crypto/lz4.c b/crypto/lz4.c
+index 99c1b2c..b969e5f 100644
+--- a/crypto/lz4.c
++++ b/crypto/lz4.c
+@@ -66,15 +66,16 @@ static void lz4_exit(struct crypto_tfm *tfm)
+ static int __lz4_compress_crypto(const u8 *src, unsigned int slen,
+ 				 u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	size_t tmp_len = *dlen;
+-	int err;
++	int out_len;
+ 
+-	err = lz4_compress(src, slen, dst, &tmp_len, ctx);
++	out_len = LZ4_compress_default(src, dst, slen, (int)((size_t)dlen), ctx);
+ 
+-	if (err < 0)
+-		return -EINVAL;
++	if (out_len == 0) {
++		// out_len is 0 means an error occured
++			return -EINVAL;
++	}
+ 
+-	*dlen = tmp_len;
++	*dlen = out_len;
+ 	return 0;
+ }
+ 
+@@ -96,16 +97,16 @@ static int lz4_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ static int __lz4_decompress_crypto(const u8 *src, unsigned int slen,
+ 				   u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	int err;
+-	size_t tmp_len = *dlen;
+-	size_t __slen = slen;
++	int out_len;
+ 
+-	err = lz4_decompress_unknownoutputsize(src, __slen, dst, &tmp_len);
+-	if (err < 0)
++	out_len = LZ4_decompress_safe(src, dst, slen, (int)((size_t)dlen));
++	if (out_len < 0) {
++		// out_len of less than 0 means an error occured
+ 		return -EINVAL;
++	}
+ 
+-	*dlen = tmp_len;
+-	return err;
++	*dlen = out_len;
++	return out_len;
+ }
+ 
+ static int lz4_sdecompress(struct crypto_scomp *tfm, const u8 *src,
+diff --git a/crypto/lz4hc.c b/crypto/lz4hc.c
+index 75ffc4a..bf2ceb7 100644
+--- a/crypto/lz4hc.c
++++ b/crypto/lz4hc.c
+@@ -65,15 +65,16 @@ static void lz4hc_exit(struct crypto_tfm *tfm)
+ static int __lz4hc_compress_crypto(const u8 *src, unsigned int slen,
+ 				   u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	size_t tmp_len = *dlen;
+-	int err;
++	int out_len;
+ 
+-	err = lz4hc_compress(src, slen, dst, &tmp_len, ctx);
++	out_len = LZ4_compress_HC(src, dst, slen, (int)((size_t)dlen), LZ4HC_DEFAULT_CLEVEL, ctx);
+ 
+-	if (err < 0)
++	if (out_len == 0) {
++		// out_len of 0 -> error
+ 		return -EINVAL;
++	}
+ 
+-	*dlen = tmp_len;
++	*dlen = out_len;
+ 	return 0;
+ }
+ 
+@@ -97,16 +98,16 @@ static int lz4hc_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ static int __lz4hc_decompress_crypto(const u8 *src, unsigned int slen,
+ 				     u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	int err;
+-	size_t tmp_len = *dlen;
+-	size_t __slen = slen;
++	int out_len;
+ 
+-	err = lz4_decompress_unknownoutputsize(src, __slen, dst, &tmp_len);
+-	if (err < 0)
++	out_len = LZ4_decompress_safe(src, dst, slen, (int)((size_t)dlen));
++  if (out_len < 0) {
++		// out_len of less than 0 means an error occured
+ 		return -EINVAL;
++	}
+ 
+-	*dlen = tmp_len;
+-	return err;
++	*dlen = out_len;
++	return out_len;
+ }
+ 
+ static int lz4hc_sdecompress(struct crypto_scomp *tfm, const u8 *src,
 -- 
 2.1.4
