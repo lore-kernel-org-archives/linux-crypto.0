@@ -1,77 +1,42 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH 00/13] crypto: copy AAD during encrypt for AEAD ciphers
-Date: Tue, 10 Jan 2017 02:36:21 +0100
-Message-ID: <10526995.lyZ7Je1KMx@positron.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55410 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S941456AbdAJBmV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Jan 2017 20:42:21 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
+Subject: Re: [PATCH v2 1/4] lib: Update LZ4 compressor module based on LZ4 v1.7.2.
+Date: Tue, 10 Jan 2017 10:21:16 +0100
+Message-ID: <1484040076-5004-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
+References: <20170108112542.GC12798@kroah.com>
+Cc: akpm@linux-foundation.org, bongkyu.kim@lge.com,
+        rsalvaterra@gmail.com, sergey.senozhatsky@gmail.com,
+        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        anton@enomsg.org, ccross@android.com, keescook@chromium.org,
+        tony.luck@intel.com, phillip@squashfs.org.uk,
+        Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
+To: gregkh@linuxfoundation.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170108112542.GC12798@kroah.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+On 01/08/2017 12:25 PM, Greg KH wrote:
+>On Sat, Jan 07, 2017 at 05:55:42PM +0100, Sven Schmidt wrote:
+>> This patch updates LZ4 kernel module to LZ4 v1.7.2 by Yann Collet.
+>> The kernel module is inspired by the previous work by Chanho Min.
+>> The updated LZ4 module will not break existing code since there were alias
+>> methods added to ensure backwards compatibility.
+>
+> Meta-comment.  Does this update include all of the security fixes that
+> we have made over the past few years to the lz4 code?  I don't want to
+> be adding back insecure functions that will cause us problems.
+>
+> Specifically look at the changes I made in 2014 in this directory for an
+> example of what I am talking about here.
+>
 
-to all driver maintainers: the patches I added are compile tested, but
-I do not have the hardware to verify the code. May I ask the respective
-hardware maintainers to verify that the code is appropriate and works
-as intended? Thanks a lot.
+Hi Greg,
 
-Herbert, this is my proprosal for our discussion around copying the
-AAD for algif_aead. Instead of adding the code to algif_aead and wait
-until it transpires to all cipher implementations, I thought it would
-be more helpful to fix all cipher implementations.
+it doesn't. I didn't have that in mind until now.
+But I had a look at the related commits after I received your E-Mail and will review what I have to change
+(and, obviously, do the changes :)).
 
-To do so, the AAD copy function found in authenc is extracted to a global
-service function. Furthermore, the generic AEAD TFM initialization code
-now allocates the null cipher too. This allows us now to only invoke
-the AAD copy function in the various implementations without any additional
-allocation logic.
+Thanks,
 
-The code for x86 and the generic code was tested with libkcapi.
-
-The code for the drivers is compile tested for drivers applicable to
-x86 only. All others are neither compile tested nor functionally tested.
-
-Stephan Mueller (13):
-  crypto: service function to copy AAD from src to dst
-  crypto: gcm_generic - copy AAD during encryption
-  crypto: ccm_generic - copy AAD during encryption
-  crypto: rfc4106-gcm-aesni - copy AAD during encryption
-  crypto: ccm-aes-ce - copy AAD during encryption
-  crypto: talitos - copy AAD during encryption
-  crypto: picoxcell - copy AAD during encryption
-  crypto: ixp4xx - copy AAD during encryption
-  crypto: atmel - copy AAD during encryption
-  crypto: caam - copy AAD during encryption
-  crypto: chelsio - copy AAD during encryption
-  crypto: nx - copy AAD during encryption
-  crypto: qat - copy AAD during encryption
-
- arch/arm64/crypto/aes-ce-ccm-glue.c      |  4 ++++
- arch/x86/crypto/aesni-intel_glue.c       |  5 +++++
- crypto/Kconfig                           |  4 ++--
- crypto/aead.c                            | 36 ++++++++++++++++++++++++++++++--
- crypto/authenc.c                         | 36 ++++----------------------------
- crypto/ccm.c                             | 10 +++++++++
- crypto/gcm.c                             | 17 +++++++++++++++
- drivers/crypto/atmel-aes.c               |  6 ++++++
- drivers/crypto/caam/caamalg.c            |  8 +++++++
- drivers/crypto/chelsio/chcr_algo.c       |  5 +++++
- drivers/crypto/ixp4xx_crypto.c           |  6 ++++++
- drivers/crypto/nx/nx-aes-ccm.c           |  4 ++++
- drivers/crypto/nx/nx-aes-gcm.c           | 10 +++++++++
- drivers/crypto/picoxcell_crypto.c        |  5 +++++
- drivers/crypto/qat/qat_common/qat_algs.c |  4 ++++
- drivers/crypto/talitos.c                 |  5 +++++
- include/crypto/aead.h                    |  2 ++
- include/crypto/internal/aead.h           | 12 +++++++++++
- 18 files changed, 143 insertions(+), 36 deletions(-)
-
--- 
-2.9.3
+Sven
