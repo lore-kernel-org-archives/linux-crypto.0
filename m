@@ -1,61 +1,52 @@
-From: Willy Tarreau <w@1wt.eu>
-Subject: Re: [PATCH v2 1/4] lib: Update LZ4 compressor module based on LZ4
- v1.7.2.
-Date: Tue, 10 Jan 2017 11:50:25 +0100
-Message-ID: <20170110105025.GA4733@1wt.eu>
-References: <20170108112542.GC12798@kroah.com>
- <1484040076-5004-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <20170110100032.GC32419@kroah.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: Re: [PATCH v8 1/1] crypto: add virtio-crypto driver
+Date: Tue, 10 Jan 2017 13:27:04 +0100
+Message-ID: <e235caf4-f51c-dccf-4eb7-548d3fa71644@de.ibm.com>
+References: <1481767396-187748-1-git-send-email-arei.gonglei@huawei.com>
+	<1481767396-187748-2-git-send-email-arei.gonglei@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>,
-        akpm@linux-foundation.org, bongkyu.kim@lge.com,
-        rsalvaterra@gmail.com, sergey.senozhatsky@gmail.com,
-        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        anton@enomsg.org, ccross@android.com, keescook@chromium.org,
-        tony.luck@intel.com, phillip@squashfs.org.uk
-To: Greg KH <gregkh@linuxfoundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170110100032.GC32419@kroah.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: xuquan8@huawei.com, weidong.huang@huawei.com, herbert@gondor.apana.org.au,
+	hanweidong@huawei.com, claudio.fontana@huawei.com,
+	mst@redhat.com, luonengjun@huawei.com, wanzongshun@huawei.com,
+	stefanha@redhat.com, jianjay.zhou@huawei.com,
+	longpeng2@huawei.com, davem@davemloft.net, wu.wubin@huawei.com,
+	arei.gonglei@hotmail.com
+To: Gonglei <arei.gonglei@huawei.com>, linux-kernel@vger.kernel.org,
+	qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org,
+	virtualization@lists.linux-foundation.org, linux-crypto@vger.kernel.org
+Return-path: <virtualization-bounces@lists.linux-foundation.org>
+In-Reply-To: <1481767396-187748-2-git-send-email-arei.gonglei@huawei.com>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
+List-Post: <mailto:virtualization@lists.linux-foundation.org>
+List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
+Sender: virtualization-bounces@lists.linux-foundation.org
+Errors-To: virtualization-bounces@lists.linux-foundation.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jan 10, 2017 at 11:00:32AM +0100, Greg KH wrote:
-> On Tue, Jan 10, 2017 at 10:21:16AM +0100, Sven Schmidt wrote:
-> > On 01/08/2017 12:25 PM, Greg KH wrote:
-> > >On Sat, Jan 07, 2017 at 05:55:42PM +0100, Sven Schmidt wrote:
-> > >> This patch updates LZ4 kernel module to LZ4 v1.7.2 by Yann Collet.
-> > >> The kernel module is inspired by the previous work by Chanho Min.
-> > >> The updated LZ4 module will not break existing code since there were alias
-> > >> methods added to ensure backwards compatibility.
-> > >
-> > > Meta-comment.  Does this update include all of the security fixes that
-> > > we have made over the past few years to the lz4 code?  I don't want to
-> > > be adding back insecure functions that will cause us problems.
-> > >
-> > > Specifically look at the changes I made in 2014 in this directory for an
-> > > example of what I am talking about here.
-> > >
-> > 
-> > Hi Greg,
-> > 
-> > it doesn't. I didn't have that in mind until now.
-> 
-> Ick, those changes never got made "upstream"?  Not good, but makes sense
-> as we couldn't really find an "upstream" when we made them :(
+On 12/15/2016 03:03 AM, Gonglei wrote:
+[...]
+> +
+> +static struct crypto_alg virtio_crypto_algs[] = { {
+> +	.cra_name = "cbc(aes)",
+> +	.cra_driver_name = "virtio_crypto_aes_cbc",
+> +	.cra_priority = 501,
 
-I *seem* to remember that some of these changes were specific to our
-implementation, and were discovered during a review after we worked on
-the the LZO implementation bugs, though I could be wrong.
 
-If this is the case, it is one more reason for being extra careful.
+This is still higher than the hardware-accelerators (like intel aesni or the
+s390 cpacf functions or the arm hw). aesni and s390/cpacf are supported by the
+hardware virtualization and available to the guests. I do not see a way how virtio
+crypto can be faster than that (in the end it might be cpacf/aesni + overhead)
+instead it will very likely be slower.
+So we should use a number that is higher than software implementations but
+lower than the hw ones.
 
-> As you took this code from somewhere, you might want to also push your
-> changes for these issues there as well, so that others don't run into
-> them in the future.
+Just grepping around, the software ones seem be be around 100 and the hardware 
+ones around 200-400. So why was 150 not enough?
 
-Agreed!
-
-Willy
+Christian
