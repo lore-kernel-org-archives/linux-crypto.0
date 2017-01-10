@@ -1,68 +1,65 @@
 From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: Re: [PATCH v2 1/4] lib: Update LZ4 compressor module based on LZ4 v1.7.2.
-Date: Tue, 10 Jan 2017 10:32:17 +0100
-Message-ID: <1484040737-5400-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
-References: <20170108112223.GA12798@kroah.com>
-Cc: akpm@linux-foundation.org, bongkyu.kim@lge.com,
-        rsalvaterra@gmail.com, sergey.senozhatsky@gmail.com,
-        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        anton@enomsg.org, ccross@android.com, keescook@chromium.org,
+Subject: Re: [PATCH v2 4/4] fs/pstore: fs/squashfs: Change usage of LZ4 to comply with new LZ4 module version
+Date: Tue, 10 Jan 2017 10:45:00 +0100
+Message-ID: <1484041500-6405-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
+References: <CAGXu5jKqMUMU8DbnE=AamrCp_-JN7sGRCpaGMps16X_TshfK+Q@mail.gmail.com>
+Cc: gregkh@linuxfoundation.org, akpm@linux-foundation.org,
+        bongkyu.kim@lge.com, rsalvaterra@gmail.com,
+        sergey.senozhatsky@gmail.com, linux-kernel@vger.kernel.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, anton@enomsg.org, ccross@android.com,
         tony.luck@intel.com, phillip@squashfs.org.uk,
         Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-To: gregkh@linuxfoundation.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailhost.informatik.uni-hamburg.de ([134.100.9.70]:41693 "EHLO
-        mailhost.informatik.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1765271AbdAJJcc (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Jan 2017 04:32:32 -0500
-In-Reply-To: <20170108112223.GA12798@kroah.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: keescook@chromium.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAGXu5jKqMUMU8DbnE=AamrCp_-JN7sGRCpaGMps16X_TshfK+Q@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 01/08/2017 12:23 PM, Greg KH wrote:
-> On Sat, Jan 07, 2017 at 05:55:43PM +0100, Sven Schmidt wrote:
->> This patch updates the unlz4 wrapper to work with the new LZ4 kernel module version.
->>
->> Signed-off-by: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
->> ---
->>  lib/decompress_unlz4.c | 13 ++++++++-----
->>  1 file changed, 8 insertions(+), 5 deletions(-)
->>
->> diff --git a/lib/decompress_unlz4.c b/lib/decompress_unlz4.c
->> index 036fc88..1b0baf3 100644
->> --- a/lib/decompress_unlz4.c
->> +++ b/lib/decompress_unlz4.c
->> @@ -72,7 +72,7 @@ STATIC inline int INIT unlz4(u8 *input, long in_len,
->>  		error("NULL input pointer and missing fill function");
->>  		goto exit_1;
->>  	} else {
->> -		inp = large_malloc(lz4_compressbound(uncomp_chunksize));
->> +		inp = large_malloc(LZ4_compressBound(uncomp_chunksize));
->
-> Having functions differ by different cases of the characters is ripe for
-> abuse and confusion.  Please never do that, especially as these "new"
-> functions you created don't follow the correct kernel coding style rules
-> :(
->
-> thanks,
->
-> greg k-h
+Hi Kees,
 
-Hi Greg,
+On 01/07/2017 10:33 PM, Kees Cook wrote:
+ >On Sat, Jan 7, 2017 at 8:55 AM, Sven Schmidt
+ ><4sschmid@informatik.uni-hamburg.de> wrote:
+ >> This patch updates fs/pstore and fs/squashfs to use the updated functions from
+ >> the new LZ4 module.
+ >>
+ >> Signed-off-by: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
+ >> ---
+ >>  fs/pstore/platform.c      | 14 ++++++++------
+ >>  fs/squashfs/lz4_wrapper.c | 12 ++++++------
+ >>  2 files changed, 14 insertions(+), 12 deletions(-)
+ >>
+ >> diff --git a/fs/pstore/platform.c b/fs/pstore/platform.c
+ >> index 729677e..a0d8ca8 100644
+ >> --- a/fs/pstore/platform.c
+ >> +++ b/fs/pstore/platform.c
+ >> @@ -342,31 +342,33 @@ static int compress_lz4(const void *in, void *out, size_t inlen, size_t outlen)
+ >>  {
+ >>         int ret;
+ >>
+ >> -       ret = lz4_compress(in, inlen, out, &outlen, workspace);
+ >> +       ret = LZ4_compress_default(in, out, inlen, outlen, workspace);
+ >>         if (ret) {
+ >> +               // ret is 0 means an error occured
+ >
+ >If that's true, then shouldn't the "if" logic be changed? Also, here
+ >and in all following comments are C++ style instead of kernel C-style.
+ >This should be "/* ret == 0 means an error occured */", though really,
+ >that should be obvious from the code and the comment isn't really
+ >needed.
 
-you're right about that. I think I put a little too much effort in keeping old function names here.
-I will get rid of that.
+indeed, it should. I fixed that one.
 
-I also want to quote your previous E-Mail here:
+ >>                 pr_err("lz4_compress error, ret = %d!\n", ret);
+ >If it's always going to be zero here, is there a better place to get
+ >details on why it failed?
 
-> And follow the proper kernel coding style rules, putting your patches
-> through scripts/checkpatch.pl should help you out here.
+ It is always going to be zero. Honestly, after looking at the current LZ4 in kernel again
+ I don't get why there actually was a need to print the return value since lz4_compress
+ will (as far as I see) always return -1 in case of an error while the new lz4_compress_fast/default
+ will return 0 in such case. Maybe I should just stick with the error?
 
-Sorry, I didn't know about that particular script. I already put Patches 2, 3 and 4 through checkpatch.pl;
-patch 1 is a little more to rework but I will, of course, do that.
+ Thanks,
 
-Thanks,
-
-Sven
+ Sven
