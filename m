@@ -1,58 +1,110 @@
-From: Andy Lutomirski <luto@kernel.org>
-Subject: [PATCH v2 6/8] bpf: Rename fdinfo's prog_digest to prog_sha256
-Date: Tue, 10 Jan 2017 15:24:44 -0800
-Message-ID: <1bdf42122bb49855ab21ede91b25423dad635d01.1484090585.git.luto@kernel.org>
-References: <cover.1484090585.git.luto@kernel.org>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Tom Herbert <tom@herbertland.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andy Lutomirski <luto@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>,
-        Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:50748 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756917AbdAJXZC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Jan 2017 18:25:02 -0500
-In-Reply-To: <cover.1484090585.git.luto@kernel.org>
-In-Reply-To: <cover.1484090585.git.luto@kernel.org>
-References: <cover.1484090585.git.luto@kernel.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: x86-64: Maintain 16-byte stack alignment
+Date: Tue, 10 Jan 2017 15:25:47 -0800
+Message-ID: <CALCETrW4DZeq=tcEnEyPc=H3Z35J-o6BGPwxEfcdKjg2tDqBGg@mail.gmail.com>
+References: <20170110143340.GA3787@gondor.apana.org.au> <CAKv+Gu8xVrfR=J5b2pGK7R5Tv-M3xZhL_dnTvvM7nTZLLtC-EQ@mail.gmail.com>
+ <CALCETrWGihhtbdkKcSD0kBrx-fWxM_TyUOUafvhsKMYXq5yEEQ@mail.gmail.com>
+ <CAKv+Gu8XVUXQrWCzgL6WRA=zY=5iTbbJ3Jp2kegCm0R7d6LwGA@mail.gmail.com>
+ <CALCETrW7mXxntZBTTHOgvaRLV4=9hcsNoTKM3o2O5Jod_6RR6Q@mail.gmail.com> <CAKv+Gu_Te-D5V3eG-GHtpP2hdpb+aTCgxBhmvf1DVK-pKPT54g@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAKv+Gu_Te-D5V3eG-GHtpP2hdpb+aTCgxBhmvf1DVK-pKPT54g@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This makes it easier to add another digest algorithm down the road
-if needed.  It also serves to force any programs that might have
-been written against a kernel that had 'prog_digest' to be updated.
+On Tue, Jan 10, 2017 at 12:00 PM, Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> On 10 January 2017 at 19:22, Andy Lutomirski <luto@amacapital.net> wrote:
+>> On Tue, Jan 10, 2017 at 11:16 AM, Ard Biesheuvel
+>> <ard.biesheuvel@linaro.org> wrote:
+>>> On 10 January 2017 at 19:00, Andy Lutomirski <luto@amacapital.net> wrote:
+>>>> On Tue, Jan 10, 2017 at 9:30 AM, Ard Biesheuvel
+>>>> <ard.biesheuvel@linaro.org> wrote:
+>>>>> On 10 January 2017 at 14:33, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>>>>>> I recently applied the patch
+>>>>>>
+>>>>>>         https://patchwork.kernel.org/patch/9468391/
+>>>>>>
+>>>>>> and ended up with a boot crash when it tried to run the x86 chacha20
+>>>>>> code.  It turned out that the patch changed a manually aligned
+>>>>>> stack buffer to one that is aligned by gcc.  What was happening was
+>>>>>> that gcc can stack align to any value on x86-64 except 16.  The
+>>>>>> reason is that gcc assumes that the stack is always 16-byte aligned,
+>>>>>> which is not actually the case in the kernel.
+>>>>>>
+>>>>>
+>>>>> Apologies for introducing this breakage. It seemed like an obvious and
+>>>>> simple cleanup, so I didn't even bother to mention it in the commit
+>>>>> log, but if the kernel does not guarantee 16 byte alignment, I guess
+>>>>> we should revert to the old method. If SSE instructions are the only
+>>>>> ones that require this alignment, then I suppose not having a ABI
+>>>>> conforming stack pointer should not be an issue in general.
+>>>>
+>>>> Here's what I think is really going on.  This is partially from
+>>>> memory, so I could be off base.  The kernel is up against
+>>>> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53383, which means that,
+>>>> on some GCC versions (like the bad one and maybe even current ones),
+>>>> things compiled without -mno-sse can't have the stack alignment set
+>>>> properly.  IMO we should fix this in the affected code, not the entry
+>>>> code.  In fact, I think that fixing it in the entry code won't even
+>>>> fully fix it because modern GCC will compile the rest of the kernel
+>>>> with 8-byte alignment and the stack will get randomly unaligned (GCC
+>>>> 4.8 and newer).
+>>>>
+>>>> Can we just add __attribute__((force_align_arg_pointer)) to the
+>>>> affected functions?  Maybe have:
+>>>>
+>>>> #define __USES_SSE __attribute__((force_align_arg_pointer))
+>>>>
+>>>> on affected gcc versions?
+>>>>
+>>>> ***HOWEVER***
+>>>>
+>>>> I think this is missing the tree for the supposed forest.  The actual
+>>>> affected code appears to be:
+>>>>
+>>>> static int chacha20_simd(struct blkcipher_desc *desc, struct scatterlist *dst,
+>>>>                          struct scatterlist *src, unsigned int nbytes)
+>>>> {
+>>>>         u32 *state, state_buf[16 + (CHACHA20_STATE_ALIGN / sizeof(u32)) - 1];
+>>>>
+>>>> ...
+>>>>
+>>>>         state = (u32 *)roundup((uintptr_t)state_buf, CHACHA20_STATE_ALIGN);
+>>>>
+>>>> gcc presumably infers (incorrectly) that state_buf is 16-byte aligned
+>>>> and optimizes out the roundup.  How about just declaring an actual
+>>>> __aligned(16) buffer, marking the function
+>>>> __attribute__((force_align_arg_pointer)), and being done with it?
+>>>> After all, we need that forcible alignment on *all* gcc versions.
+>>>>
+>>>
+>>> Actually, the breakage is introduced by the patch Herbert refers to
+>>>
+>>> https://patchwork.kernel.org/patch/9468391/
+>>>
+>>> where the state is replaced by a simple
+>>>
+>>> u32 state[16] __aligned(CHACHA20_STATE_ALIGN);
+>>>
+>>> which seemed harmless enough to me. So the code above works fine.
+>>
+>> So how about just the one-line patch of adding the
+>> force_align_arg_pointer?  Would that solve the problem?
+>
+> If it does what it says on the tin, it should fix the issue, but after
+> adding the attribute, I get the exact same object output, so there's
+> something dodgy going on here.
 
-This shouldn't violate any stable API policies, as no released
-kernel has ever had 'prog_digest'.
+Ugh, that's annoying.  Maybe it needs noinline too?
 
-Cc: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Alexei Starovoitov <ast@kernel.org>
-Signed-off-by: Andy Lutomirski <luto@kernel.org>
----
- kernel/bpf/syscall.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
-index e89acea22ecf..956370b80296 100644
---- a/kernel/bpf/syscall.c
-+++ b/kernel/bpf/syscall.c
-@@ -694,7 +694,7 @@ static void bpf_prog_show_fdinfo(struct seq_file *m, struct file *filp)
- 	seq_printf(m,
- 		   "prog_type:\t%u\n"
- 		   "prog_jited:\t%u\n"
--		   "prog_digest:\t%s\n"
-+		   "prog_sha256:\t%s\n"
- 		   "memlock:\t%llu\n",
- 		   prog->type,
- 		   prog->jited,
--- 
-2.9.3
+--Andy
