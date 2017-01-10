@@ -1,110 +1,104 @@
-From: Andy Lutomirski <luto@amacapital.net>
-Subject: Re: x86-64: Maintain 16-byte stack alignment
-Date: Tue, 10 Jan 2017 15:25:47 -0800
-Message-ID: <CALCETrW4DZeq=tcEnEyPc=H3Z35J-o6BGPwxEfcdKjg2tDqBGg@mail.gmail.com>
-References: <20170110143340.GA3787@gondor.apana.org.au> <CAKv+Gu8xVrfR=J5b2pGK7R5Tv-M3xZhL_dnTvvM7nTZLLtC-EQ@mail.gmail.com>
- <CALCETrWGihhtbdkKcSD0kBrx-fWxM_TyUOUafvhsKMYXq5yEEQ@mail.gmail.com>
- <CAKv+Gu8XVUXQrWCzgL6WRA=zY=5iTbbJ3Jp2kegCm0R7d6LwGA@mail.gmail.com>
- <CALCETrW7mXxntZBTTHOgvaRLV4=9hcsNoTKM3o2O5Jod_6RR6Q@mail.gmail.com> <CAKv+Gu_Te-D5V3eG-GHtpP2hdpb+aTCgxBhmvf1DVK-pKPT54g@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu_Te-D5V3eG-GHtpP2hdpb+aTCgxBhmvf1DVK-pKPT54g@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Andy Lutomirski <luto@kernel.org>
+Subject: [PATCH v2 5/8] bpf: Avoid copying the entire BPF program when hashing it
+Date: Tue, 10 Jan 2017 15:24:43 -0800
+Message-ID: <7d95d2483eb648960a9f33e38a01fcc678da545e.1484090585.git.luto@kernel.org>
+References: <cover.1484090585.git.luto@kernel.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Tom Herbert <tom@herbertland.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Lutomirski <luto@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>,
+        Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <cover.1484090585.git.luto@kernel.org>
+In-Reply-To: <cover.1484090585.git.luto@kernel.org>
+References: <cover.1484090585.git.luto@kernel.org>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jan 10, 2017 at 12:00 PM, Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> On 10 January 2017 at 19:22, Andy Lutomirski <luto@amacapital.net> wrote:
->> On Tue, Jan 10, 2017 at 11:16 AM, Ard Biesheuvel
->> <ard.biesheuvel@linaro.org> wrote:
->>> On 10 January 2017 at 19:00, Andy Lutomirski <luto@amacapital.net> wrote:
->>>> On Tue, Jan 10, 2017 at 9:30 AM, Ard Biesheuvel
->>>> <ard.biesheuvel@linaro.org> wrote:
->>>>> On 10 January 2017 at 14:33, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->>>>>> I recently applied the patch
->>>>>>
->>>>>>         https://patchwork.kernel.org/patch/9468391/
->>>>>>
->>>>>> and ended up with a boot crash when it tried to run the x86 chacha20
->>>>>> code.  It turned out that the patch changed a manually aligned
->>>>>> stack buffer to one that is aligned by gcc.  What was happening was
->>>>>> that gcc can stack align to any value on x86-64 except 16.  The
->>>>>> reason is that gcc assumes that the stack is always 16-byte aligned,
->>>>>> which is not actually the case in the kernel.
->>>>>>
->>>>>
->>>>> Apologies for introducing this breakage. It seemed like an obvious and
->>>>> simple cleanup, so I didn't even bother to mention it in the commit
->>>>> log, but if the kernel does not guarantee 16 byte alignment, I guess
->>>>> we should revert to the old method. If SSE instructions are the only
->>>>> ones that require this alignment, then I suppose not having a ABI
->>>>> conforming stack pointer should not be an issue in general.
->>>>
->>>> Here's what I think is really going on.  This is partially from
->>>> memory, so I could be off base.  The kernel is up against
->>>> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53383, which means that,
->>>> on some GCC versions (like the bad one and maybe even current ones),
->>>> things compiled without -mno-sse can't have the stack alignment set
->>>> properly.  IMO we should fix this in the affected code, not the entry
->>>> code.  In fact, I think that fixing it in the entry code won't even
->>>> fully fix it because modern GCC will compile the rest of the kernel
->>>> with 8-byte alignment and the stack will get randomly unaligned (GCC
->>>> 4.8 and newer).
->>>>
->>>> Can we just add __attribute__((force_align_arg_pointer)) to the
->>>> affected functions?  Maybe have:
->>>>
->>>> #define __USES_SSE __attribute__((force_align_arg_pointer))
->>>>
->>>> on affected gcc versions?
->>>>
->>>> ***HOWEVER***
->>>>
->>>> I think this is missing the tree for the supposed forest.  The actual
->>>> affected code appears to be:
->>>>
->>>> static int chacha20_simd(struct blkcipher_desc *desc, struct scatterlist *dst,
->>>>                          struct scatterlist *src, unsigned int nbytes)
->>>> {
->>>>         u32 *state, state_buf[16 + (CHACHA20_STATE_ALIGN / sizeof(u32)) - 1];
->>>>
->>>> ...
->>>>
->>>>         state = (u32 *)roundup((uintptr_t)state_buf, CHACHA20_STATE_ALIGN);
->>>>
->>>> gcc presumably infers (incorrectly) that state_buf is 16-byte aligned
->>>> and optimizes out the roundup.  How about just declaring an actual
->>>> __aligned(16) buffer, marking the function
->>>> __attribute__((force_align_arg_pointer)), and being done with it?
->>>> After all, we need that forcible alignment on *all* gcc versions.
->>>>
->>>
->>> Actually, the breakage is introduced by the patch Herbert refers to
->>>
->>> https://patchwork.kernel.org/patch/9468391/
->>>
->>> where the state is replaced by a simple
->>>
->>> u32 state[16] __aligned(CHACHA20_STATE_ALIGN);
->>>
->>> which seemed harmless enough to me. So the code above works fine.
->>
->> So how about just the one-line patch of adding the
->> force_align_arg_pointer?  Would that solve the problem?
->
-> If it does what it says on the tin, it should fix the issue, but after
-> adding the attribute, I get the exact same object output, so there's
-> something dodgy going on here.
+The sha256 helpers can consume a message incrementally, so there's no need
+to allocate a buffer to store the whole blob to be hashed.
 
-Ugh, that's annoying.  Maybe it needs noinline too?
+This may be a slight slowdown for very long messages because gcc can't
+inline the sha256_update() calls.  For reasonably-sized programs,
+however, this should be a considerable speedup as vmalloc() is quite
+slow.
 
---Andy
+Cc: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Alexei Starovoitov <ast@kernel.org>
+Signed-off-by: Andy Lutomirski <luto@kernel.org>
+---
+ kernel/bpf/core.c | 33 +++++++++++++--------------------
+ 1 file changed, 13 insertions(+), 20 deletions(-)
+
+diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+index 668b92f6ab58..106162a1bc54 100644
+--- a/kernel/bpf/core.c
++++ b/kernel/bpf/core.c
+@@ -149,44 +149,37 @@ void __bpf_prog_free(struct bpf_prog *fp)
+ int bpf_prog_calc_digest(struct bpf_prog *fp)
+ {
+ 	struct sha256_state sha;
+-	u32 i, psize;
+-	struct bpf_insn *dst;
++	u32 i;
+ 	bool was_ld_map;
+-	u8 *raw;
+-
+-	psize = bpf_prog_insn_size(fp);
+-	raw = vmalloc(psize);
+-	if (!raw)
+-		return -ENOMEM;
+ 
+ 	sha256_init_direct(&sha);
+ 
+ 	/* We need to take out the map fd for the digest calculation
+ 	 * since they are unstable from user space side.
+ 	 */
+-	dst = (void *)raw;
+ 	for (i = 0, was_ld_map = false; i < fp->len; i++) {
+-		dst[i] = fp->insnsi[i];
++		struct bpf_insn insn = fp->insnsi[i];
++
+ 		if (!was_ld_map &&
+-		    dst[i].code == (BPF_LD | BPF_IMM | BPF_DW) &&
+-		    dst[i].src_reg == BPF_PSEUDO_MAP_FD) {
++		    insn.code == (BPF_LD | BPF_IMM | BPF_DW) &&
++		    insn.src_reg == BPF_PSEUDO_MAP_FD) {
+ 			was_ld_map = true;
+-			dst[i].imm = 0;
++			insn.imm = 0;
+ 		} else if (was_ld_map &&
+-			   dst[i].code == 0 &&
+-			   dst[i].dst_reg == 0 &&
+-			   dst[i].src_reg == 0 &&
+-			   dst[i].off == 0) {
++			   insn.code == 0 &&
++			   insn.dst_reg == 0 &&
++			   insn.src_reg == 0 &&
++			   insn.off == 0) {
+ 			was_ld_map = false;
+-			dst[i].imm = 0;
++			insn.imm = 0;
+ 		} else {
+ 			was_ld_map = false;
+ 		}
++
++		sha256_update_direct(&sha, (const u8 *)&insn, sizeof(insn));
+ 	}
+ 
+-	sha256_update_direct(&sha, raw, psize);
+ 	sha256_final_direct(&sha, fp->digest);
+-	vfree(raw);
+ 	return 0;
+ }
+ 
+-- 
+2.9.3
