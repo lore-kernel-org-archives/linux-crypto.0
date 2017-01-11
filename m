@@ -1,61 +1,63 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH v4 2/3] drivers: crypto: Add the Virtual Function driver for CPT
-Date: Wed, 11 Jan 2017 13:39:33 +0100
-Message-ID: <1522639.tMShRcNLPc@positron.chronox.de>
-References: <1484132211-917-1-git-send-email-george.cherian@cavium.com> <2395769.pOGQxxvRjM@positron.chronox.de> <587616D1.6050503@caviumnetworks.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: George Cherian <george.cherian@cavium.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        david.daney@cavium.com, clabbe.montjoie@gmail.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: George Cherian <gcherian@caviumnetworks.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55440 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751802AbdAKMjn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Jan 2017 07:39:43 -0500
-In-Reply-To: <587616D1.6050503@caviumnetworks.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 1/2] crypto: mediatek - remove ARM dependencies
+Date: Wed, 11 Jan 2017 14:50:19 +0100
+Message-ID: <20170111135104.3961730-1-arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Ryder Lee <ryder.lee@mediatek.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 11. Januar 2017, 16:58:17 CET schrieb George Cherian:
+Building the mediatek driver on an older ARM architecture results in a
+harmless warning:
 
-Hi George,
+warning: (ARCH_OMAP2PLUS_TYPICAL && CRYPTO_DEV_MEDIATEK) selects NEON which has unmet direct dependencies (VFPv3 && CPU_V7)
 
-> I will add a seperate function for xts setkey and make changes as following.
-> > ...
-> > 
-> >> +
-> >> +struct crypto_alg algs[] = { {
-> >> +	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
-> >> +	.cra_blocksize = AES_BLOCK_SIZE,
-> >> +	.cra_ctxsize = sizeof(struct cvm_enc_ctx),
-> >> +	.cra_alignmask = 7,
-> >> +	.cra_priority = 4001,
-> >> +	.cra_name = "xts(aes)",
-> >> +	.cra_driver_name = "cavium-xts-aes",
-> >> +	.cra_type = &crypto_ablkcipher_type,
-> >> +	.cra_u = {
-> >> +		.ablkcipher = {
-> >> +			.ivsize = AES_BLOCK_SIZE,
-> >> +			.min_keysize = AES_MIN_KEY_SIZE,
-> >> +			.max_keysize = AES_MAX_KEY_SIZE,
-> >> +			.setkey = cvm_enc_dec_setkey,
-> > 
-> > May I ask how the setkey for XTS is intended to work? The XTS keys are
-> > double in size than "normal" keys.
-> 
-> 		.ablkcipher = {
-> 			.ivsize = AES_BLOCK_SIZE,
-> 			.min_keysize = 2 * AES_MIN_KEY_SIZE,
-> 			.max_keysize = 2 * AES_MAX_KEY_SIZE,
-> 			.setkey = cvm_xts_setkey,
-> 
-> Hope this is fine?
-> 
-Sure, please do not forget to invoke xts_verify_key.
+We could add an explicit dependency on CPU_V7, but it seems nicer to
+open up the build to additional configurations. This replaces the ARM
+optimized algorithm selection with the normal one that all other drivers
+use, and that in turn lets us relax the dependency on ARM and drop
+a number of the unrelated 'select' statements.
 
-Ciao
-Stephan
+Obviously a real user would still select those other optimized drivers
+as a fallback, but as there is no strict dependency, we can leave that
+up to the user.
+
+Fixes: 785e5c616c84 ("crypto: mediatek - Add crypto driver support for some MediaTek chips")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/crypto/Kconfig | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 8ded3af88b16..9d37ae07b4ce 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -555,15 +555,12 @@ config CRYPTO_DEV_ROCKCHIP
+ 
+ config CRYPTO_DEV_MEDIATEK
+ 	tristate "MediaTek's EIP97 Cryptographic Engine driver"
+-	depends on ARM && (ARCH_MEDIATEK || COMPILE_TEST)
+-	select NEON
+-	select KERNEL_MODE_NEON
+-	select ARM_CRYPTO
++	depends on (ARM && ARCH_MEDIATEK) || COMPILE_TEST
+ 	select CRYPTO_AES
+ 	select CRYPTO_BLKCIPHER
+-	select CRYPTO_SHA1_ARM_NEON
+-	select CRYPTO_SHA256_ARM
+-	select CRYPTO_SHA512_ARM
++	select CRYPTO_SHA1
++	select CRYPTO_SHA256
++	select CRYPTO_SHA512
+ 	select CRYPTO_HMAC
+ 	help
+ 	  This driver allows you to utilize the hardware crypto accelerator
+-- 
+2.9.0
