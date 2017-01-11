@@ -1,55 +1,39 @@
-From: Andy Lutomirski <luto@amacapital.net>
-Subject: Re: [PATCH v2 7/8] net: Rename TCA*BPF_DIGEST to ..._SHA256
-Date: Tue, 10 Jan 2017 19:11:49 -0800
-Message-ID: <CALCETrUHenMS1iomFr7+YEy_M3zaotrWbfMe93=BmzCbzJ0fLw@mail.gmail.com>
-References: <cover.1484090585.git.luto@kernel.org> <f284a4d87cde103cd78de64b8607e3c80a17e2e5.1484090585.git.luto@kernel.org>
- <58758169.2020408@iogearbox.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: x86-64: Maintain 16-byte stack alignment
+Date: Wed, 11 Jan 2017 11:15:26 +0800
+Message-ID: <20170111031526.GB4515@gondor.apana.org.au>
+References: <20170110143340.GA3787@gondor.apana.org.au>
+ <CAKv+Gu8xVrfR=J5b2pGK7R5Tv-M3xZhL_dnTvvM7nTZLLtC-EQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Andy Lutomirski <luto@kernel.org>, Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Tom Herbert <tom@herbertland.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alexei Starovoitov <ast@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f41.google.com ([209.85.213.41]:34423 "EHLO
-        mail-vk0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752773AbdAKDML (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Jan 2017 22:12:11 -0500
-Received: by mail-vk0-f41.google.com with SMTP id r136so34938306vke.1
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Jan 2017 19:12:10 -0800 (PST)
-In-Reply-To: <58758169.2020408@iogearbox.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu8xVrfR=J5b2pGK7R5Tv-M3xZhL_dnTvvM7nTZLLtC-EQ@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jan 10, 2017 at 4:50 PM, Daniel Borkmann <daniel@iogearbox.net> wrote:
-> On 01/11/2017 12:24 AM, Andy Lutomirski wrote:
->>
->> This makes it easier to add another digest algorithm down the road if
->> needed.  It also serves to force any programs that might have been
->> written against a kernel that had the old field name to notice the
->> change and make any necessary changes.
->>
->> This shouldn't violate any stable API policies, as no released kernel
->> has ever had TCA*BPF_DIGEST.
->
->
-> Imho, this and patch 6/8 is not really needed. Should there ever
-> another digest alg be used (doubt it), then you'd need a new nl
-> attribute and fdinfo line anyway to keep existing stuff intact.
-> Nobody made the claim that you can just change this underneath
-> and not respecting abi for existing applications when I read from
-> above that such apps now will get "forced" to notice a change.
+On Tue, Jan 10, 2017 at 05:30:48PM +0000, Ard Biesheuvel wrote:
+> 
+> Apologies for introducing this breakage. It seemed like an obvious and
+> simple cleanup, so I didn't even bother to mention it in the commit
+> log, but if the kernel does not guarantee 16 byte alignment, I guess
+> we should revert to the old method. If SSE instructions are the only
+> ones that require this alignment, then I suppose not having a ABI
+> conforming stack pointer should not be an issue in general.
 
-Fair enough.  I was more concerned about prerelease iproute2 versions,
-but maybe that's a nonissue.  I'll drop these two patches.
+I think we need to address this regardless of your patch.  You
+won't be the last person to use __attribute__ to get 16-byte
+alignment on the stack.
 
---Andy
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
