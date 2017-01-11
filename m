@@ -1,82 +1,110 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 2/2] crypto: mediatek - fix format string for 64-bit builds
-Date: Wed, 11 Jan 2017 14:55:20 +0100
-Message-ID: <20170111135601.4047225-1-arnd@arndb.de>
-References: <20170111135104.3961730-1-arnd@arndb.de>
+From: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?=
+        <omosnacek+linux-crypto@gmail.com>
+Subject: Re: [RFC PATCH v2] crypto: Add IV generation algorithms
+Date: Wed, 11 Jan 2017 15:55:11 +0100
+Message-ID: <CAAUqJDvA9Qwci7DFF4j4_D_=zYz81Rn1cgEnmQhhOS-JWrpXGA@mail.gmail.com>
+References: <1481618949-20086-1-git-send-email-binoy.jayan@linaro.org> <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Ryder Lee <ryder.lee@mediatek.com>, Arnd Bergmann <arnd@arndb.de>,
- linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-crypto@vger.kernel.org, Matthias Brugger <matthias.bgg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20170111135104.3961730-1-arnd@arndb.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>
+To: Binoy Jayan <binoy.jayan@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:36697 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S938055AbdAKOze (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Jan 2017 09:55:34 -0500
+In-Reply-To: <1481618949-20086-2-git-send-email-binoy.jayan@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-After I enabled COMPILE_TEST for non-ARM targets, I ran into these
-warnings:
+Hi Binoy,
 
-crypto/mediatek/mtk-aes.c: In function 'mtk_aes_info_map':
-crypto/mediatek/mtk-aes.c:224:28: error: format '%d' expects argument of type 'int', but argument 3 has type 'long unsigned int' [-Werror=format=]
-   dev_err(cryp->dev, "dma %d bytes error\n", sizeof(*info));
-crypto/mediatek/mtk-sha.c:344:28: error: format '%d' expects argument of type 'int', but argument 3 has type 'long unsigned int' [-Werror=format=]
-crypto/mediatek/mtk-sha.c:550:21: error: format '%u' expects argument of type 'unsigned int', but argument 4 has type 'size_t {aka long unsigned int}' [-Werror=format=]
+2016-12-13 9:49 GMT+01:00 Binoy Jayan <binoy.jayan@linaro.org>:
+> Currently, the iv generation algorithms are implemented in dm-crypt.c.
+> The goal is to move these algorithms from the dm layer to the kernel
+> crypto layer by implementing them as template ciphers so they can be
+> implemented in hardware for performance. As part of this patchset, the
+> iv-generation code is moved from the dm layer to the crypto layer and
+> adapt the dm-layer to send a whole 'bio' (as defined in the block layer)
+> at a time. Each bio contains the in memory representation of physically
+> contiguous disk blocks. The dm layer sets up a chained scatterlist of
+> these blocks split into physically contiguous segments in memory so that
+> DMA can be performed. The iv generation algorithms implemented in geniv.c
+> include plain, plain64, essiv, benbi, null, lmk and tcw.
 
-The correct format for size_t is %zu, so use that in all three
-cases.
+I like what you are trying to achieve, however I don't think the
+solution you are heading towards (passing sector number to a special
+crypto template) would be the best approach here. Milan is currently
+trying to add authenticated encryption support to dm-crypt (see [1])
+and as part of this change, a new random IV mode would be introduced.
+This mode generates a random IV for each sector write, includes it in
+the authenticated data and stores it in the sector's metadata (in a
+separate part of the disk). In this case dm-crypt will need to have
+control over the IV generation (or at least be able to somehow
+retrieve it after the crypto operation).
 
-Fixes: 785e5c616c84 ("crypto: mediatek - Add crypto driver support for some MediaTek chips")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/mediatek/mtk-aes.c | 2 +-
- drivers/crypto/mediatek/mtk-sha.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+That said, I believe a different approach would be preferable here. I
+would suggest, instead of moving the IV generation to the crypto
+layer, to add a new type of request to skcipher API (let's call it
+'skcipher_bulk_request'), which could be used to submit several
+messages at once (together in a single sg list), each with their own
+IV, to a skcipher. This would allow drivers to optimize handling of
+such requests (e.g. the SIMD ciphers could call kernel_fpu_begin/end
+just once for the whole request). It could be done in such a way, that
+implementing this type of requests would be optional and a fallback
+implementation, which would just split the request into regular
+skcipher_requests, would be automatically set for the ciphers that do
+not set it themselves. That way this would require no changes to
+crypto drivers in the beginning and optimizations could be added
+incrementally.
 
-diff --git a/drivers/crypto/mediatek/mtk-aes.c b/drivers/crypto/mediatek/mtk-aes.c
-index 3271471060d9..1370cabeeb5b 100644
---- a/drivers/crypto/mediatek/mtk-aes.c
-+++ b/drivers/crypto/mediatek/mtk-aes.c
-@@ -221,7 +221,7 @@ static int mtk_aes_info_map(struct mtk_cryp *cryp,
- 	aes->ct_dma = dma_map_single(cryp->dev, info, sizeof(*info),
- 					DMA_TO_DEVICE);
- 	if (unlikely(dma_mapping_error(cryp->dev, aes->ct_dma))) {
--		dev_err(cryp->dev, "dma %d bytes error\n", sizeof(*info));
-+		dev_err(cryp->dev, "dma %zu bytes error\n", sizeof(*info));
- 		return -EINVAL;
- 	}
- 	aes->tfm_dma = aes->ct_dma + sizeof(*ct);
-diff --git a/drivers/crypto/mediatek/mtk-sha.c b/drivers/crypto/mediatek/mtk-sha.c
-index 89513632c8ed..98b3d74ae23d 100644
---- a/drivers/crypto/mediatek/mtk-sha.c
-+++ b/drivers/crypto/mediatek/mtk-sha.c
-@@ -341,7 +341,7 @@ static int mtk_sha_info_map(struct mtk_cryp *cryp,
- 	sha->ct_dma = dma_map_single(cryp->dev, info, sizeof(*info),
- 				      DMA_BIDIRECTIONAL);
- 	if (unlikely(dma_mapping_error(cryp->dev, sha->ct_dma))) {
--		dev_err(cryp->dev, "dma %d bytes error\n", sizeof(*info));
-+		dev_err(cryp->dev, "dma %zu bytes error\n", sizeof(*info));
- 		return -EINVAL;
- 	}
- 	sha->tfm_dma = sha->ct_dma + sizeof(*ct);
-@@ -547,7 +547,7 @@ static int mtk_sha_update_slow(struct mtk_cryp *cryp,
- 
- 	final = (ctx->flags & SHA_FLAGS_FINUP) && !ctx->total;
- 
--	dev_dbg(cryp->dev, "slow: bufcnt: %u\n", ctx->bufcnt);
-+	dev_dbg(cryp->dev, "slow: bufcnt: %zu\n", ctx->bufcnt);
- 
- 	if (final) {
- 		sha->flags |= SHA_FLAGS_FINAL;
--- 
-2.9.0
+The advantage of this approach to handling such "bulk" requests is
+that crypto drivers could just optimize regular algorithms (xts(aes),
+cbc(aes), etc.) and wouldn't need to mess with dm-crypt-specific IV
+generation. This also means that other users that could potentially
+benefit from bulking requests (perhaps network stack?) could use the
+same functionality.
+
+I have been playing with this idea for some time now and I should have
+an RFC patchset ready soon...
+
+Binoy, Herbert, what do you think about such approach?
+
+[1] https://www.redhat.com/archives/dm-devel/2017-January/msg00028.html
+
+> When using multiple keys with the original dm-crypt, the key selection is
+> made based on the sector number as:
+>
+> key_index = sector & (key_count - 1)
+>
+> This restricts the usage of the same key for encrypting/decrypting a
+> single bio. One way to solve this is to move the key management code from
+> dm-crypt to cryto layer. But this seems tricky when using template ciphers
+> because, when multiple ciphers are instantiated from dm layer, each cipher
+> instance set with a unique subkey (part of the bigger master key) and
+> these instances themselves do not have access to each other's instances
+> or contexts. This way, a single instance cannot encryt/decrypt a whole bio.
+> This has to be fixed.
+
+Please note that the "keycount" parameter was added to dm-crypt solely
+for the purpose of implementing the loop-AES partition format. In
+general, the security benefit gained by using keycount > 1 is
+debatable, so it does not really make sense to use it for anything
+else than accessing legacy loopAES partitions. Since Milan decided to
+add it as a generic parameter, instead of hard-coding the
+functionality for the LMK mode, it can be technically used also in
+other combinations, but IMHO it is perfectly reasonable to just give
+up on optimizing the cases when keycount > 1. I believe the loop-AES
+partition support is just not that important :)
+
+Thanks,
+Ondrej
