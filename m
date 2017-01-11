@@ -1,57 +1,84 @@
-From: Daniel Borkmann <daniel@iogearbox.net>
-Subject: Re: [PATCH v2 7/8] net: Rename TCA*BPF_DIGEST to ..._SHA256
-Date: Wed, 11 Jan 2017 10:09:46 +0100
-Message-ID: <5875F65A.4010904@iogearbox.net>
-References: <cover.1484090585.git.luto@kernel.org> <f284a4d87cde103cd78de64b8607e3c80a17e2e5.1484090585.git.luto@kernel.org> <58758169.2020408@iogearbox.net> <CALCETrUHenMS1iomFr7+YEy_M3zaotrWbfMe93=BmzCbzJ0fLw@mail.gmail.com>
+From: George Cherian <george.cherian@cavium.com>
+Subject: [PATCH v4 0/3] Add Support for Cavium Cryptographic Acceleration Unit
+Date: Wed, 11 Jan 2017 10:56:48 +0000
+Message-ID: <1484132211-917-1-git-send-email-george.cherian@cavium.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Andy Lutomirski <luto@kernel.org>, Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Tom Herbert <tom@herbertland.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alexei Starovoitov <ast@kernel.org>
-To: Andy Lutomirski <luto@amacapital.net>
+Content-Type: text/plain
+Cc: <david.daney@cavium.com>, <clabbe.montjoie@gmail.com>,
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        George Cherian <george.cherian@cavium.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CALCETrUHenMS1iomFr7+YEy_M3zaotrWbfMe93=BmzCbzJ0fLw@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Andy,
+This series adds the support for Cavium Cryptographic Accelerarion Unit (CPT) 
+CPT is available in Cavium's Octeon-Tx SoC series.                            
+                                                                              
+The series was tested with ecryptfs and dm-crypt for in kernel cryptographic
+offload operations. This driver needs a firmware to work, I will be sending the
+firmware to linux-firmware once the driver is accepted.
 
-On 01/11/2017 04:11 AM, Andy Lutomirski wrote:
-> On Tue, Jan 10, 2017 at 4:50 PM, Daniel Borkmann <daniel@iogearbox.net> wrote:
->> On 01/11/2017 12:24 AM, Andy Lutomirski wrote:
->>>
->>> This makes it easier to add another digest algorithm down the road if
->>> needed.  It also serves to force any programs that might have been
->>> written against a kernel that had the old field name to notice the
->>> change and make any necessary changes.
->>>
->>> This shouldn't violate any stable API policies, as no released kernel
->>> has ever had TCA*BPF_DIGEST.
->>
->> Imho, this and patch 6/8 is not really needed. Should there ever
->> another digest alg be used (doubt it), then you'd need a new nl
->> attribute and fdinfo line anyway to keep existing stuff intact.
->> Nobody made the claim that you can just change this underneath
->> and not respecting abi for existing applications when I read from
->> above that such apps now will get "forced" to notice a change.
->
-> Fair enough.  I was more concerned about prerelease iproute2 versions,
-> but maybe that's a nonissue.  I'll drop these two patches.
+Changes v3 -> v4
+	--Addressed Corentin Labbe's coments
+		- Convert all pr_x to dev_x.
+		- Fix Typo errors.
+		- Fix the Double unlock.
+		- Use sg_virt.
+Changes v2 -> v3
+	-- Addressed David Daney's comments
+		- There is not much difference in performance readq/writeq vs 
+	readq_relaxed/writeq_relaxed, so switching to readq/writeq variant.
+		- Removed the useless bitfield definitions.
+		- Use GENMASK,dev_to_node() instead of custome functions.
+		- Use module_pci_driver instead of module_init/exit.
+Changes v1 -> v2                                                              
+	-- Addressed a crash issue when more gather components are passed.
+        -- Redo the cptvf request manager.                                    
+   	     - Get rid of the un necessary buffer copies.                  
+        -- s/uint*_t/u*                                                
+        -- Remove unwanted Macro definitions                           
+        -- Remove the redundant ROUNDUP* macros and use kernel function
+        -- Select proper config option in Kconfig file.                
+        -- Removed some of the unwanted header file inclusions                
+        -- Miscellaneous Cleanup 
 
-Ok. Sleeping over this a bit, how about a general rename into
-"prog_tag" for fdinfo and TCA_BPF_TAG resp. TCA_ACT_BPF_TAG for
-the netlink attributes, fwiw, it might reduce any assumptions on
-this being made? If this would be preferable, I could cook that
-patch against -net for renaming it?
+George Cherian (3):
+  drivers: crypto: Add Support for Octeon-tx CPT Engine
+  drivers: crypto: Add the Virtual Function driver for CPT
+  drivers: crypto: Enable CPT options crypto for build
 
-Thanks,
-Daniel
+ drivers/crypto/Kconfig                       |   1 +
+ drivers/crypto/Makefile                      |   1 +
+ drivers/crypto/cavium/cpt/Kconfig            |  16 +
+ drivers/crypto/cavium/cpt/Makefile           |   3 +
+ drivers/crypto/cavium/cpt/cpt_common.h       | 158 +++++
+ drivers/crypto/cavium/cpt/cpt_hw_types.h     | 658 +++++++++++++++++++
+ drivers/crypto/cavium/cpt/cptpf.h            |  69 ++
+ drivers/crypto/cavium/cpt/cptpf_main.c       | 708 ++++++++++++++++++++
+ drivers/crypto/cavium/cpt/cptpf_mbox.c       | 163 +++++
+ drivers/crypto/cavium/cpt/cptvf.h            | 135 ++++
+ drivers/crypto/cavium/cpt/cptvf_algs.c       | 415 ++++++++++++
+ drivers/crypto/cavium/cpt/cptvf_algs.h       | 110 ++++
+ drivers/crypto/cavium/cpt/cptvf_main.c       | 945 +++++++++++++++++++++++++++
+ drivers/crypto/cavium/cpt/cptvf_mbox.c       | 205 ++++++
+ drivers/crypto/cavium/cpt/cptvf_reqmanager.c | 586 +++++++++++++++++
+ drivers/crypto/cavium/cpt/request_manager.h  | 147 +++++
+ 16 files changed, 4320 insertions(+)
+ create mode 100644 drivers/crypto/cavium/cpt/Kconfig
+ create mode 100644 drivers/crypto/cavium/cpt/Makefile
+ create mode 100644 drivers/crypto/cavium/cpt/cpt_common.h
+ create mode 100644 drivers/crypto/cavium/cpt/cpt_hw_types.h
+ create mode 100644 drivers/crypto/cavium/cpt/cptpf.h
+ create mode 100644 drivers/crypto/cavium/cpt/cptpf_main.c
+ create mode 100644 drivers/crypto/cavium/cpt/cptpf_mbox.c
+ create mode 100644 drivers/crypto/cavium/cpt/cptvf.h
+ create mode 100644 drivers/crypto/cavium/cpt/cptvf_algs.c
+ create mode 100644 drivers/crypto/cavium/cpt/cptvf_algs.h
+ create mode 100644 drivers/crypto/cavium/cpt/cptvf_main.c
+ create mode 100644 drivers/crypto/cavium/cpt/cptvf_mbox.c
+ create mode 100644 drivers/crypto/cavium/cpt/cptvf_reqmanager.c
+ create mode 100644 drivers/crypto/cavium/cpt/request_manager.h
+
+-- 
+2.1.4
