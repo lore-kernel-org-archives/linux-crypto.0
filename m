@@ -1,36 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: x86-64: Maintain 16-byte stack alignment
-Date: Wed, 11 Jan 2017 11:15:26 +0800
-Message-ID: <20170111031526.GB4515@gondor.apana.org.au>
+Date: Wed, 11 Jan 2017 11:16:58 +0800
+Message-ID: <20170111031658.GC4515@gondor.apana.org.au>
 References: <20170110143340.GA3787@gondor.apana.org.au>
  <CAKv+Gu8xVrfR=J5b2pGK7R5Tv-M3xZhL_dnTvvM7nTZLLtC-EQ@mail.gmail.com>
+ <CALCETrWGihhtbdkKcSD0kBrx-fWxM_TyUOUafvhsKMYXq5yEEQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Ingo Molnar <mingo@kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Andy Lutomirski <luto@kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+To: Andy Lutomirski <luto@amacapital.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:53097 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1753343AbdAKDRa (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Jan 2017 22:17:30 -0500
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu8xVrfR=J5b2pGK7R5Tv-M3xZhL_dnTvvM7nTZLLtC-EQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <CALCETrWGihhtbdkKcSD0kBrx-fWxM_TyUOUafvhsKMYXq5yEEQ@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 10, 2017 at 05:30:48PM +0000, Ard Biesheuvel wrote:
+On Tue, Jan 10, 2017 at 11:00:31AM -0800, Andy Lutomirski wrote:
 > 
-> Apologies for introducing this breakage. It seemed like an obvious and
-> simple cleanup, so I didn't even bother to mention it in the commit
-> log, but if the kernel does not guarantee 16 byte alignment, I guess
-> we should revert to the old method. If SSE instructions are the only
-> ones that require this alignment, then I suppose not having a ABI
-> conforming stack pointer should not be an issue in general.
+> Here's what I think is really going on.  This is partially from
+> memory, so I could be off base.  The kernel is up against
+> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53383, which means that,
+> on some GCC versions (like the bad one and maybe even current ones),
+> things compiled without -mno-sse can't have the stack alignment set
+> properly.  IMO we should fix this in the affected code, not the entry
 
-I think we need to address this regardless of your patch.  You
-won't be the last person to use __attribute__ to get 16-byte
-alignment on the stack.
+No that's not it.  My compiler (gcc 4.7.2) doesn't support it period:
+
+$ gcc -S -O2 -mno-sse -mpreferred-stack-boundary=3 a.c
+a.c:1:0: error: -mpreferred-stack-boundary=3 is not between 4 and 12
+$ 
+
+So you either have to ban all compilers older than whatever version
+that started supporting 8-byte stack alignment, or fix the kernel.
 
 Cheers,
 -- 
