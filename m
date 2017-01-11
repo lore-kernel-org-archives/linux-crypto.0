@@ -1,68 +1,61 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH v2] crypto: x86/chacha20 - Manually align stack buffer
-Date: Wed, 11 Jan 2017 12:31:02 +0000
-Message-ID: <CAKv+Gu_W3K6k5d--PZ4v0i4u1xcbL2O_ZDBjNgcmUA3-PgfLgQ@mail.gmail.com>
-References: <20170111120816.GA9004@gondor.apana.org.au> <CAKv+Gu9tQu_Tq6LR+ie-qFdEmh2We3ZxAMbX7rVHmsa4K+rqUA@mail.gmail.com>
- <20170111122806.GA9056@gondor.apana.org.au>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH v4 2/3] drivers: crypto: Add the Virtual Function driver for CPT
+Date: Wed, 11 Jan 2017 13:39:33 +0100
+Message-ID: <1522639.tMShRcNLPc@positron.chronox.de>
+References: <1484132211-917-1-git-send-email-george.cherian@cavium.com> <2395769.pOGQxxvRjM@positron.chronox.de> <587616D1.6050503@caviumnetworks.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: George Cherian <george.cherian@cavium.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        david.daney@cavium.com, clabbe.montjoie@gmail.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: George Cherian <gcherian@caviumnetworks.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f176.google.com ([209.85.223.176]:36748 "EHLO
-        mail-io0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750924AbdAKMbE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Jan 2017 07:31:04 -0500
-Received: by mail-io0-f176.google.com with SMTP id j13so73826270iod.3
-        for <linux-crypto@vger.kernel.org>; Wed, 11 Jan 2017 04:31:04 -0800 (PST)
-In-Reply-To: <20170111122806.GA9056@gondor.apana.org.au>
+Received: from mail.eperm.de ([89.247.134.16]:55440 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751802AbdAKMjn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Jan 2017 07:39:43 -0500
+In-Reply-To: <587616D1.6050503@caviumnetworks.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 11 January 2017 at 12:28, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Wed, Jan 11, 2017 at 12:14:24PM +0000, Ard Biesheuvel wrote:
->>
->> I think the old code was fine, actually:
->>
->> u32 *state, state_buf[16 + (CHACHA20_STATE_ALIGN / sizeof(u32)) - 1];
->>
->> ends up allocating 16 + 3 *words* == 64 + 12 bytes , which given the
->> guaranteed 4 byte alignment is sufficient for ensuring the pointer can
->> be 16 byte aligned.
->
-> Ah yes you're right, it's a u32.
->
->> So [16 + 2] should be sufficient here
->
-> Here's an updated version.
->
-> ---8<---
-> The kernel on x86-64 cannot use gcc attribute align to align to
-> a 16-byte boundary.  This patch reverts to the old way of aligning
-> it by hand.
->
-> Fixes: 9ae433bc79f9 ("crypto: chacha20 - convert generic and...")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha20_glue.c
-> index 78f75b0..1e6af1b 100644
-> --- a/arch/x86/crypto/chacha20_glue.c
-> +++ b/arch/x86/crypto/chacha20_glue.c
-> @@ -67,10 +67,13 @@ static int chacha20_simd(struct skcipher_request *req)
->  {
->         struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
->         struct chacha20_ctx *ctx = crypto_skcipher_ctx(tfm);
-> -       u32 state[16] __aligned(CHACHA20_STATE_ALIGN);
-> +       u32 *state, state_buf[16 + 2] __aligned(8);
->         struct skcipher_walk walk;
->         int err;
->
-> +       BUILD_BUG_ON(CHACHA20_STATE_ALIGN != 16);
-> +       state = PTR_ALIGN(state_buf + 0, CHACHA20_STATE_ALIGN);
-> +
->         if (req->cryptlen <= CHACHA20_BLOCK_SIZE || !may_use_simd())
->                 return crypto_chacha20_crypt(req);
->
+Am Mittwoch, 11. Januar 2017, 16:58:17 CET schrieb George Cherian:
 
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Hi George,
+
+> I will add a seperate function for xts setkey and make changes as following.
+> > ...
+> > 
+> >> +
+> >> +struct crypto_alg algs[] = { {
+> >> +	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
+> >> +	.cra_blocksize = AES_BLOCK_SIZE,
+> >> +	.cra_ctxsize = sizeof(struct cvm_enc_ctx),
+> >> +	.cra_alignmask = 7,
+> >> +	.cra_priority = 4001,
+> >> +	.cra_name = "xts(aes)",
+> >> +	.cra_driver_name = "cavium-xts-aes",
+> >> +	.cra_type = &crypto_ablkcipher_type,
+> >> +	.cra_u = {
+> >> +		.ablkcipher = {
+> >> +			.ivsize = AES_BLOCK_SIZE,
+> >> +			.min_keysize = AES_MIN_KEY_SIZE,
+> >> +			.max_keysize = AES_MAX_KEY_SIZE,
+> >> +			.setkey = cvm_enc_dec_setkey,
+> > 
+> > May I ask how the setkey for XTS is intended to work? The XTS keys are
+> > double in size than "normal" keys.
+> 
+> 		.ablkcipher = {
+> 			.ivsize = AES_BLOCK_SIZE,
+> 			.min_keysize = 2 * AES_MIN_KEY_SIZE,
+> 			.max_keysize = 2 * AES_MAX_KEY_SIZE,
+> 			.setkey = cvm_xts_setkey,
+> 
+> Hope this is fine?
+> 
+Sure, please do not forget to invoke xts_verify_key.
+
+Ciao
+Stephan
