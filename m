@@ -1,41 +1,57 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: x86-64: Maintain 16-byte stack alignment
-Date: Wed, 11 Jan 2017 16:09:25 +0800
-Message-ID: <20170111080925.GA5341@gondor.apana.org.au>
-References: <20170110143340.GA3787@gondor.apana.org.au>
- <20170110143913.GA3822@gondor.apana.org.au>
- <CA+55aFyuUCr3aUBhFt6T3vKyZOskLyH8Kd_2jeFkPYxxvEaXEg@mail.gmail.com>
- <20170111031124.GA4515@gondor.apana.org.au>
- <CA+55aFxJOzMim_d-O2E2yip8JWo0NdYs_72sNwFKSkTjy8q0Sw@mail.gmail.com>
- <CA+55aFzypqpMog8aTczWYok0MqOcMi4gGzCor6k-NdJzBoLWyQ@mail.gmail.com>
- <20170111043541.GA4944@gondor.apana.org.au>
- <CA+55aFw+Z_ieo6DzTVB6_-TvQ0jj60s=T0mvXfqkBVFdKFPw_Q@mail.gmail.com>
- <CAKv+Gu9yAxLHM4anS0m+gyeNio=RLcG=VvtRDeO5YNnJBvW95A@mail.gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Subject: Re: [PATCH v2 7/8] net: Rename TCA*BPF_DIGEST to ..._SHA256
+Date: Wed, 11 Jan 2017 10:09:46 +0100
+Message-ID: <5875F65A.4010904@iogearbox.net>
+References: <cover.1484090585.git.luto@kernel.org> <f284a4d87cde103cd78de64b8607e3c80a17e2e5.1484090585.git.luto@kernel.org> <58758169.2020408@iogearbox.net> <CALCETrUHenMS1iomFr7+YEy_M3zaotrWbfMe93=BmzCbzJ0fLw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-        Andrew Lutomirski <luto@kernel.org>,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Andy Lutomirski <luto@kernel.org>, Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Tom Herbert <tom@herbertland.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alexei Starovoitov <ast@kernel.org>
+To: Andy Lutomirski <luto@amacapital.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu9yAxLHM4anS0m+gyeNio=RLcG=VvtRDeO5YNnJBvW95A@mail.gmail.com>
+In-Reply-To: <CALCETrUHenMS1iomFr7+YEy_M3zaotrWbfMe93=BmzCbzJ0fLw@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 11, 2017 at 08:06:54AM +0000, Ard Biesheuvel wrote:
+Hi Andy,
+
+On 01/11/2017 04:11 AM, Andy Lutomirski wrote:
+> On Tue, Jan 10, 2017 at 4:50 PM, Daniel Borkmann <daniel@iogearbox.net> wrote:
+>> On 01/11/2017 12:24 AM, Andy Lutomirski wrote:
+>>>
+>>> This makes it easier to add another digest algorithm down the road if
+>>> needed.  It also serves to force any programs that might have been
+>>> written against a kernel that had the old field name to notice the
+>>> change and make any necessary changes.
+>>>
+>>> This shouldn't violate any stable API policies, as no released kernel
+>>> has ever had TCA*BPF_DIGEST.
+>>
+>> Imho, this and patch 6/8 is not really needed. Should there ever
+>> another digest alg be used (doubt it), then you'd need a new nl
+>> attribute and fdinfo line anyway to keep existing stuff intact.
+>> Nobody made the claim that you can just change this underneath
+>> and not respecting abi for existing applications when I read from
+>> above that such apps now will get "forced" to notice a change.
 >
-> Couldn't we update the __aligned(x) macro to emit 32 if arch == x86
-> and x == 16? All other cases should work just fine afaict
+> Fair enough.  I was more concerned about prerelease iproute2 versions,
+> but maybe that's a nonissue.  I'll drop these two patches.
 
-Not everyone uses that macro.  You'd also need to add some checks
-to stop people from using the gcc __attribute__ directly.
+Ok. Sleeping over this a bit, how about a general rename into
+"prog_tag" for fdinfo and TCA_BPF_TAG resp. TCA_ACT_BPF_TAG for
+the netlink attributes, fwiw, it might reduce any assumptions on
+this being made? If this would be preferable, I could cook that
+patch against -net for renaming it?
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks,
+Daniel
