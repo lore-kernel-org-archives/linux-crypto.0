@@ -1,66 +1,43 @@
-From: Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH v6 1/5] lib: Update LZ4 compressor module
-Date: Tue, 31 Jan 2017 15:27:44 -0700
-Message-ID: <20170131152744.5bd2f3ba@lwn.net>
-References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
-        <1485554524-4844-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
-        <1485554524-4844-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH 1/2] crypto: aead AF_ALG - overhaul memory management
+Date: Thu, 12 Jan 2017 17:19:57 +0100
+Message-ID: <5211147.RjDSfvrhhz@tauon.atsec.com>
+References: <1486189.x0AQ4O6r2j@positron.chronox.de> <1946014.7KfpB7DN4Q@tauon.atsec.com> <20170112161759.GC19732@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Cc: akpm@linux-foundation.org, bongkyu.kim@lge.com,
-        rsalvaterra@gmail.com, sergey.senozhatsky@gmail.com,
-        gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, anton@enomsg.org, ccross@android.com,
-        keescook@chromium.org, tony.luck@intel.com
-To: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ms.lwn.net ([45.79.88.28]:57248 "EHLO ms.lwn.net"
+Received: from mail.eperm.de ([89.247.134.16]:55506 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750830AbdAaW1w (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Jan 2017 17:27:52 -0500
-In-Reply-To: <1485554524-4844-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
+        id S1750780AbdALQUE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 11:20:04 -0500
+In-Reply-To: <20170112161759.GC19732@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 27 Jan 2017 23:02:00 +0100
-Sven Schmidt <4sschmid@informatik.uni-hamburg.de> wrote:
+Am Freitag, 13. Januar 2017, 00:17:59 CET schrieb Herbert Xu:
 
-I have one quick question...
+Hi Herbert,
 
->  /*
-> + * LZ4_compress_default()
-> + *	Compresses 'sourceSize' bytes from buffer 'source'
-> + *	into already allocated 'dest' buffer of size 'maxOutputSize'.
-> + *	Compression is guaranteed to succeed if
-> + *	'maxOutputSize' >= LZ4_compressBound(inputSize).
-> + *	It also runs faster, so it's a recommended setting.
-> + *	If the function cannot compress 'source'
-> + *	into a more limited 'dest' budget,
-> + *	compression stops *immediately*,
-> + *	and the function result is zero.
-> + *	As a consequence, 'dest' content is not valid.
-> + *
-> + *	source       : source address of the original data
-> + *	dest         : output buffer address
-> + *                 of the compressed data
-> + *	inputSize    : Max supported value is
-> + *                 LZ4_MAX_INPUT_SIZE
-> + *	maxOutputSize: full or partial size of buffer 'dest'
-> + *                 (which must be already allocated)
-> + *	workmem      : address of the working memory.
-> + *                 This requires 'workmem' of size LZ4_MEM_COMPRESS.
-> + *	return       : the number of bytes written into buffer 'dest'
-> + *   (necessarily <= maxOutputSize) or 0 if compression fails
-> + */
-> +int LZ4_compress_default(const char *source, char *dest, int inputSize,
-> +	int maxOutputSize, void *wrkmem);
+> On Thu, Jan 12, 2017 at 05:10:14PM +0100, Stephan Müller wrote:
+> > Each IOCB would transpire into an independent, separate recvmsg invocation
+> > without an additional sendmsg/sendpage operation. Thus, in order to
+> > support
+> > multiple IOCBs, all data the multiple recvmsg invocations will operate on
+> > must be injected into the kernel beforehand.
+> 
+> I don't understand, what's wrong with:
+> 
+> sendmsg(fd, ...)
+> aio_read(iocb1)
+> sendmsg(fd, ...)
+> aio_read(iocb2)
 
-Is there any chance you could format these as kerneldoc comments?  You're
-not too far from it now, and that would allow the LZ4 interface to be
-pulled into the documentation.
+Sure, that works. But here you limit yourself to one IOCB per aio_read. But 
+aio_read supports multiple IOCBs in one invocation. And this is the issue I am 
+considering.
 
-Thanks,
-
-jon
+Ciao
+Stephan
