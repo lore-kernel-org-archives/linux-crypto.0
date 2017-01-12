@@ -1,53 +1,77 @@
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: x86-64: Maintain 16-byte stack alignment
-Date: Thu, 12 Jan 2017 09:18:06 -0600
-Message-ID: <20170112151806.2btvh64k44eud4fr@treble>
-References: <20170110143340.GA3787@gondor.apana.org.au>
- <20170110143913.GA3822@gondor.apana.org.au>
- <CA+55aFyuUCr3aUBhFt6T3vKyZOskLyH8Kd_2jeFkPYxxvEaXEg@mail.gmail.com>
- <20170112070534.GA14016@gondor.apana.org.au>
- <CALCETrV78gNs5ZqunaSPZ4AATapb1+ESKd6Wv+5rdMpZe9TSJQ@mail.gmail.com>
- <20170112150318.eq4lmfitxvitpix4@treble>
- <20170112150650.GA16000@gondor.apana.org.au>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH 00/13] crypto: copy AAD during encrypt for AEAD ciphers
+Date: Thu, 12 Jan 2017 16:23:50 +0100
+Message-ID: <6428553.skGSKSKcYl@tauon.atsec.com>
+References: <10526995.lyZ7Je1KMx@positron.chronox.de> <31581301.kpbcu3havF@positron.chronox.de> <20170112145728.GA15595@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Andy Lutomirski <luto@amacapital.net>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49204 "EHLO mx1.redhat.com"
+Received: from mail.eperm.de ([89.247.134.16]:55476 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750733AbdALPSI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2017 10:18:08 -0500
-Content-Disposition: inline
-In-Reply-To: <20170112150650.GA16000@gondor.apana.org.au>
+        id S1750920AbdALPX6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 10:23:58 -0500
+In-Reply-To: <20170112145728.GA15595@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 12, 2017 at 11:06:50PM +0800, Herbert Xu wrote:
-> On Thu, Jan 12, 2017 at 09:03:18AM -0600, Josh Poimboeuf wrote:
-> > 
-> > For the entry code, could we just replace all calls with CALL_ALIGNED?
-> > That might be less intrusive than trying to adjust all the pt_regs
-> > accesses.
-> > 
-> > Then to ensure that nobody ever uses 'call' directly:
-> > 
-> >   '#define call please-use-CALL-ALIGNED-instead-of-call'
-> > 
-> > I think that would be possible if CALL_ALIGNED were a ".macro".
+Am Donnerstag, 12. Januar 2017, 22:57:28 CET schrieb Herbert Xu:
+
+Hi Herbert,
+
+> On Thu, Jan 12, 2017 at 12:22:09PM +0100, Stephan Müller wrote:
+> > When addressing the issue in the algif_aead code, and expect that over
+> > time
+> > the AEAD implementations will gain the copy operation, eventually we will
+> > copy the AAD twice. Of course, this could be prevented, if the algif_aead
+> > code somehow uses the same SGL for the src and dst AAD.
 > 
-> The trouble with that is that you have got things like TRACE_IRQS_OFF
-> which are also used outside of the entry code.
+> Why would you copy it twice? You copy everything before you start
+> and then just do in-place crypto.
+> 
 
-Where?  As far as I can tell, TRACE_IRQS_OFF is used exclusively by entry
-code.
+As far as I understand, we have the following AAD copy operations that we 
+discuss:
 
--- 
-Josh
+- algif_aead: you suggested to add the AAD copy operation here
+
+- AEAD implementations: over time, the AEAD implementations shall receive the 
+AAD copy operation. The AAD copy operation shall only take place if the src 
+SGL != dst SGL
+
+The algif_aead code *always* will have the src SGL being different from the 
+dst SGL. Thus, any existing AEAD implementation copy will always be performed 
+which would be in addition to the algif_aead AAD copy operation. We can only 
+avoid the AEAD implementation copy operation, if we add some code to 
+algif_aead to make sure that the AAD data is pointed to by src/dst SGL that is 
+identical. However, such logic to make src/dst SGL identical is quite complex 
+compared to simply use one callback as suggested in the current patch set.
+
+In the followup email, I suggested to add the AAD copy function invocation 
+into crypto_aead_encrypt. This way, we can drop the numerous patches to the 
+AEAD implementations and yet we can avoid adding such copy operation and src/
+dst SGL unification logic to algif_aead.
+
+> > > BTW, why are you only doing the copy for encryption?
+> > 
+> > I was looking at the only AEAD implementation that does the copy
+> > operation:
+> > authenc. There, the copy operation is only performed for encryption. I was
+> > thinking a bit about why decryption was not covered. I think the answer is
+> > the following: for encryption, the AAD is definitely needed in the dst
+> > buffer as the dst buffer with the AAD must be sent to the recipient for
+> > decryption. The decryption and the associated authentication only works
+> > with the AAD. However, after decrypting, all the caller wants is the
+> > decrypted plaintext only. There is no further use of the AAD after the
+> > decryption step. Hence, copying the AAD to the dst buffer in the
+> > decryption step would not serve the caller.
+> That's just the current implementation.  If we're going to make
+> this an API then we should do it for both directions.
+
+Considering the suggestion above to add the AAD copy call to 
+crypto_aead_encrypt, we can add such copy call also to crypto_aead_decrypt.
+
+Ciao
+Stephan
