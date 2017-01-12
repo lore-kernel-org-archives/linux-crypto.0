@@ -1,32 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: testmgr - use kmemdup instead of kmalloc+memcpy
-Date: Fri, 13 Jan 2017 00:39:22 +0800
-Message-ID: <20170112163922.GA20085@gondor.apana.org.au>
-References: <20161230201200.31467-1-ebiggers3@gmail.com>
+Subject: Re: [PATCH] crypto: Replaced gcc specific attributes with macros
+ from compiler.h
+Date: Fri, 13 Jan 2017 00:39:31 +0800
+Message-ID: <20170112163931.GB20085@gondor.apana.org.au>
+References: <1483199783-31588-1-git-send-email-gidisrael@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Laura Abbott <labbott@redhat.com>,
-        Eric Biggers <ebiggers@google.com>
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54691 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750768AbdALQje (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2017 11:39:34 -0500
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, nhorman@tuxdriver.com, joe@perches.com,
+        akpm@linux-foundation.org
+To: gidisrael@gmail.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20161230201200.31467-1-ebiggers3@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1483199783-31588-1-git-send-email-gidisrael@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Dec 30, 2016 at 02:12:00PM -0600, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Sat, Dec 31, 2016 at 09:26:23PM +0530, gidisrael@gmail.com wrote:
+> From: Gideon Israel Dsouza <gidisrael@gmail.com>
 > 
-> It's recommended to use kmemdup instead of kmalloc followed by memcpy.
+> Continuing from this commit: 52f5684c8e1e
+> ("kernel: use macros from compiler.h instead of __attribute__((...))")
 > 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> I submitted 4 total patches. They are part of task I've taken up to
+> increase compiler portability in the kernel. I've cleaned up the
+> subsystems under /kernel /mm /block and /security, this patch targets
+> /crypto.
+> 
+> There is <linux/compiler.h> which provides macros for various gcc specific
+> constructs. Eg: __weak for __attribute__((weak)). I've cleaned all
+> instances of gcc specific attributes with the right macros for the crypto
+> subsystem.
+> 
+> I had to make one additional change into compiler-gcc.h for the case when
+> one wants to use this: __attribute__((aligned) and not specify an alignment
+> factor. From the gcc docs, this will result in the largest alignment for
+> that data type on the target machine so I've named the macro
+> __aligned_largest. Please advise if another name is more appropriate.
+> 
+> Signed-off-by: Gideon Israel Dsouza <gidisrael@gmail.com>
 
 Patch applied.  Thanks.
 -- 
