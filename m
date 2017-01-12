@@ -1,43 +1,32 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH 00/13] crypto: copy AAD during encrypt for AEAD ciphers
-Date: Thu, 12 Jan 2017 17:01:13 +0100
-Message-ID: <1604413.m50iU9qQPD@tauon.atsec.com>
-References: <10526995.lyZ7Je1KMx@positron.chronox.de> <19793111.SdtrLVTG75@tauon.atsec.com> <20170112155344.GB19252@gondor.apana.org.au>
+Subject: Re: [PATCH 1/2] crypto: aead AF_ALG - overhaul memory management
+Date: Thu, 12 Jan 2017 17:05:03 +0100
+Message-ID: <2701907.5SyJthQSdc@tauon.atsec.com>
+References: <1486189.x0AQ4O6r2j@positron.chronox.de> <20170112155127.GA19252@gondor.apana.org.au> <3051008.MbfH4VO98W@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
 Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55494 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:55498 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750753AbdALQBT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2017 11:01:19 -0500
-In-Reply-To: <20170112155344.GB19252@gondor.apana.org.au>
+        id S1751194AbdALQFI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 11:05:08 -0500
+In-Reply-To: <3051008.MbfH4VO98W@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 12. Januar 2017, 23:53:44 CET schrieb Herbert Xu:
+Am Donnerstag, 12. Januar 2017, 16:56:04 CET schrieb Stephan Müller:
 
 Hi Herbert,
 
 > 
-> > If we only want to solve that for algif_aead, wouldn't it make more sense
-> > if the user space caller takes care of that (such as libkcapi)? By
-> > tinkering with the SGLs and copying the data to the dst buffer before the
-> > cipher operation takes place, I guess we will add performance degradation
-> > and more complexity in the kernel.
-> > 
-> > Having such logic in user space would keep the algif_aead cleaner IMHO.
-> 
-> We need to have a sane kernel API that respects POSIX.
+> That would mean that we would only support one IOCB.
 
-I fully agree. Therefore, I was under the impression that disregarding the AAD 
-in recvmsg entirely would be most appropriate as offered with the patch 
-"crypto: AF_ALG - disregard AAD buffer space for output". In this case we 
-would be fully POSIX compliant, the kernel would not copy the AAD (and thus 
-perform multiple memcpy operations due to copy_from_user and copy_to_user 
-round trips) and leave the AAD copy operation entirely to user space.
+As we also need to be standards compliant, would it be appropriate to only 
+support one IOCB? I think this is a significant difference to other AIO 
+operations like for networking.
 
 Ciao
 Stephan
