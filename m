@@ -1,56 +1,51 @@
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: x86-64: Maintain 16-byte stack alignment
-Date: Thu, 12 Jan 2017 08:46:01 +0100
-Message-ID: <20170112074601.GB30151@gmail.com>
-References: <20170110143340.GA3787@gondor.apana.org.au>
- <20170110143913.GA3822@gondor.apana.org.au>
- <CA+55aFyuUCr3aUBhFt6T3vKyZOskLyH8Kd_2jeFkPYxxvEaXEg@mail.gmail.com>
- <20170112070534.GA14016@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 8/8] crypto/testmgr: Allocate only the required output
+ size for hash tests
+Date: Thu, 12 Jan 2017 15:47:52 +0800
+Message-ID: <20170112074752.GA14230@gondor.apana.org.au>
+References: <890f4bdb28a1cf72f6b802b220b35ebaf0f76bb9.1484090585.git.luto@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Josh Poimboeuf <jpoimboe@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: daniel@iogearbox.net, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Jason@zx2c4.com, hannes@stressinduktion.org,
+        alexei.starovoitov@gmail.com, edumazet@google.com,
+        ebiggers3@gmail.com, tom@herbertland.com, davem@davemloft.net,
+        luto@kernel.org, ard.biesheuvel@linaro.org
+To: Andy Lutomirski <luto@kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:45059 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750782AbdALHsK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 02:48:10 -0500
 Content-Disposition: inline
-In-Reply-To: <20170112070534.GA14016@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <890f4bdb28a1cf72f6b802b220b35ebaf0f76bb9.1484090585.git.luto@kernel.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-
-* Herbert Xu <herbert@gondor.apana.org.au> wrote:
-
-> On Tue, Jan 10, 2017 at 09:05:28AM -0800, Linus Torvalds wrote:
-> >
-> > I'm pretty sure we have random asm code that may not maintain a
-> > 16-byte stack alignment when it calls other code (including, in some
-> > cases, calling C code).
-> > 
-> > So I'm not at all convinced that this is a good idea. We shouldn't
-> > expect 16-byte alignment to be something trustworthy.
+Andy Lutomirski <luto@kernel.org> wrote:
+> There are some hashes (e.g. sha224) that have some internal trickery
+> to make sure that only the correct number of output bytes are
+> generated.  If something goes wrong, they could potentially overrun
+> the output buffer.
 > 
-> So what if we audited all the x86 assembly code to fix this? Would
-> it then be acceptable to do a 16-byte aligned stack?
+> Make the test more robust by allocating only enough space for the
+> correct output size so that memory debugging will catch the error if
+> the output is overrun.
+> 
+> Tested by intentionally breaking sha224 to output all 256
+> internally-generated bits while running on KASAN.
+> 
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Andy Lutomirski <luto@kernel.org>
 
-Audits for small but deadly details that isn't checked automatically by tooling 
-would inevitably bitrot again - and in this particular case there's a 50% chance 
-that a new, buggy change would test out to be 'fine' on a kernel developer's own 
-box - and break on different configs, different hw or with unrelated (and 
-innocent) kernel changes, sometime later - spreading the pain unnecessarily.
+This patch doesn't seem to depend on anything else in the series.
+Do you want me to take it separately?
 
-So my feeling is that we really need improved tooling for this (and yes, the GCC 
-toolchain should have handled this correctly).
-
-But fortunately we have related tooling in the kernel: could objtool handle this? 
-My secret hope was always that objtool would grow into a kind of life insurance 
-against toolchain bogosities (which is a must for things like livepatching or a 
-DWARF unwinder - but I digress).
-
-Thanks,
-
-	Ingo
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
