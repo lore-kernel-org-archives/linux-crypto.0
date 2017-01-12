@@ -1,32 +1,45 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH 1/2] crypto: aead AF_ALG - overhaul memory management
-Date: Thu, 12 Jan 2017 17:05:03 +0100
-Message-ID: <2701907.5SyJthQSdc@tauon.atsec.com>
-References: <1486189.x0AQ4O6r2j@positron.chronox.de> <20170112155127.GA19252@gondor.apana.org.au> <3051008.MbfH4VO98W@tauon.atsec.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 00/13] crypto: copy AAD during encrypt for AEAD ciphers
+Date: Fri, 13 Jan 2017 00:06:29 +0800
+Message-ID: <20170112160629.GA19577@gondor.apana.org.au>
+References: <10526995.lyZ7Je1KMx@positron.chronox.de>
+ <19793111.SdtrLVTG75@tauon.atsec.com>
+ <20170112155344.GB19252@gondor.apana.org.au>
+ <1604413.m50iU9qQPD@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55498 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751194AbdALQFI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2017 11:05:08 -0500
-In-Reply-To: <3051008.MbfH4VO98W@tauon.atsec.com>
+Received: from helcar.hengli.com.au ([209.40.204.226]:34873 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751012AbdALQGf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 11:06:35 -0500
+Content-Disposition: inline
+In-Reply-To: <1604413.m50iU9qQPD@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 12. Januar 2017, 16:56:04 CET schrieb Stephan Müller:
+On Thu, Jan 12, 2017 at 05:01:13PM +0100, Stephan Müller wrote:
+>
+> I fully agree. Therefore, I was under the impression that disregarding the AAD 
+> in recvmsg entirely would be most appropriate as offered with the patch 
+> "crypto: AF_ALG - disregard AAD buffer space for output". In this case we 
+> would be fully POSIX compliant, the kernel would not copy the AAD (and thus 
+> perform multiple memcpy operations due to copy_from_user and copy_to_user 
+> round trips) and leave the AAD copy operation entirely to user space.
 
-Hi Herbert,
+Yes but then you'd have to play nasty games to fit this through
+the kernel API.  Besides, we could still do in-place crypto even
+though you suggested that it's complicated.  It's not really.
+All we have to do is walk through the SG list and compare each
+page/offset.  For the common case it's going to be a single-entry
+list.
 
-> 
-> That would mean that we would only support one IOCB.
-
-As we also need to be standards compliant, would it be appropriate to only 
-support one IOCB? I think this is a significant difference to other AIO 
-operations like for networking.
-
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
