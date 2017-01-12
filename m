@@ -1,62 +1,71 @@
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: x86-64: Maintain 16-byte stack alignment
-Date: Thu, 12 Jan 2017 09:18:40 +0100
-Message-ID: <20170112081840.GA32596@gmail.com>
-References: <20170110143340.GA3787@gondor.apana.org.au>
- <20170110143913.GA3822@gondor.apana.org.au>
- <CA+55aFyuUCr3aUBhFt6T3vKyZOskLyH8Kd_2jeFkPYxxvEaXEg@mail.gmail.com>
- <20170112070534.GA14016@gondor.apana.org.au>
- <CALCETrV78gNs5ZqunaSPZ4AATapb1+ESKd6Wv+5rdMpZe9TSJQ@mail.gmail.com>
- <20170112080422.GA14355@gondor.apana.org.au>
+From: George Cherian <gcherian@caviumnetworks.com>
+Subject: Re: [PATCH v4 2/3] drivers: crypto: Add the Virtual Function driver
+ for CPT
+Date: Thu, 12 Jan 2017 16:40:32 +0530
+Message-ID: <58776428.1060308@caviumnetworks.com>
+References: <1484132211-917-1-git-send-email-george.cherian@cavium.com>
+ <2395769.pOGQxxvRjM@positron.chronox.de>
+ <587616D1.6050503@caviumnetworks.com>
+ <1522639.tMShRcNLPc@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andy Lutomirski <luto@amacapital.net>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:34724 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750892AbdALISp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2017 03:18:45 -0500
-Content-Disposition: inline
-In-Reply-To: <20170112080422.GA14355@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: George Cherian <george.cherian@cavium.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <david.daney@cavium.com>, <clabbe.montjoie@gmail.com>,
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+To: =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1522639.tMShRcNLPc@positron.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+Hi Stephan,
 
-* Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On 01/11/2017 06:09 PM, Stephan Müller wrote:
+> Am Mittwoch, 11. Januar 2017, 16:58:17 CET schrieb George Cherian:
+>
+> Hi George,
+>
+>> I will add a seperate function for xts setkey and make changes as following.
+>>> ...
+>>>
+>>>> +
+>>>> +struct crypto_alg algs[] = { {
+>>>> +	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
+>>>> +	.cra_blocksize = AES_BLOCK_SIZE,
+>>>> +	.cra_ctxsize = sizeof(struct cvm_enc_ctx),
+>>>> +	.cra_alignmask = 7,
+>>>> +	.cra_priority = 4001,
+>>>> +	.cra_name = "xts(aes)",
+>>>> +	.cra_driver_name = "cavium-xts-aes",
+>>>> +	.cra_type = &crypto_ablkcipher_type,
+>>>> +	.cra_u = {
+>>>> +		.ablkcipher = {
+>>>> +			.ivsize = AES_BLOCK_SIZE,
+>>>> +			.min_keysize = AES_MIN_KEY_SIZE,
+>>>> +			.max_keysize = AES_MAX_KEY_SIZE,
+>>>> +			.setkey = cvm_enc_dec_setkey,
+>>>
+>>> May I ask how the setkey for XTS is intended to work? The XTS keys are
+>>> double in size than "normal" keys.
+>>
+>> 		.ablkcipher = {
+>> 			.ivsize = AES_BLOCK_SIZE,
+>> 			.min_keysize = 2 * AES_MIN_KEY_SIZE,
+>> 			.max_keysize = 2 * AES_MAX_KEY_SIZE,
+>> 			.setkey = cvm_xts_setkey,
+>>
+>> Hope this is fine?
+>>
+> Sure, please do not forget to invoke xts_verify_key.
 
-> > But if we can't do this with automatic verification, then I'm not sure
-> > I want to do it at all.  The asm is already more precarious than I'd
-> > like, and having a code path that is misaligned is asking for obscure
-> > bugs down the road.
-> 
-> I understand the need for automated checks at this point in time.
->  But longer term this is just part of the calling ABI.  After all,
-> we don't add checks everywhere to ensure people preserve rbx.
+Should I be using xts_check_key or xts_verify_key?
 
-The intelligent and responsible way to introduce such post facto ABI changes is 
-via a smarter assembler: which would detect the obvious cases where assembly code 
-generates a misaligned stack, at build time.
+>
+> Ciao
+> Stephan
+>
 
-Assembly code can obviously still mess up in a hard to detect fashion if it tries 
-- but that's OK, as most assembly code doesn't try to go outside regular stack 
-allocation patterns.
-
-Such a static check is relatively straightforward to do in assembly tooling - and 
-perhaps objtool could do this too, as it already tracks the instructions that 
-change the stack offset.
-
-( And yes, this is what the GCC guys should have done, instead of sloppily 
-  introducing such silent breakages and making the whole application landscape 
-  less robust ... )
-
-Thanks,
-
-	Ingo
+Regards,
+-George
