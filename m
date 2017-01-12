@@ -1,34 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: x86-64: Maintain 16-byte stack alignment
-Date: Thu, 12 Jan 2017 14:12:11 +0800
-Message-ID: <20170112061211.GA10247@gondor.apana.org.au>
-References: <20170110143340.GA3787@gondor.apana.org.au>
- <CAKv+Gu8xVrfR=J5b2pGK7R5Tv-M3xZhL_dnTvvM7nTZLLtC-EQ@mail.gmail.com>
+Subject: Re: [PATCH 00/13] crypto: copy AAD during encrypt for AEAD ciphers
+Date: Thu, 12 Jan 2017 14:19:36 +0800
+Message-ID: <20170112061936.GA10325@gondor.apana.org.au>
+References: <10526995.lyZ7Je1KMx@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:59551 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750698AbdALGTq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 01:19:46 -0500
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu8xVrfR=J5b2pGK7R5Tv-M3xZhL_dnTvvM7nTZLLtC-EQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <10526995.lyZ7Je1KMx@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 10, 2017 at 05:30:48PM +0000, Ard Biesheuvel wrote:
->
-> Apologies for introducing this breakage. It seemed like an obvious and
-> simple cleanup, so I didn't even bother to mention it in the commit
-> log, but if the kernel does not guarantee 16 byte alignment, I guess
-> we should revert to the old method. If SSE instructions are the only
-> ones that require this alignment, then I suppose not having a ABI
-> conforming stack pointer should not be an issue in general.
+On Tue, Jan 10, 2017 at 02:36:21AM +0100, Stephan Müller wrote:
+> 
+> to all driver maintainers: the patches I added are compile tested, but
+> I do not have the hardware to verify the code. May I ask the respective
+> hardware maintainers to verify that the code is appropriate and works
+> as intended? Thanks a lot.
+> 
+> Herbert, this is my proprosal for our discussion around copying the
+> AAD for algif_aead. Instead of adding the code to algif_aead and wait
+> until it transpires to all cipher implementations, I thought it would
+> be more helpful to fix all cipher implementations.
 
-BTW Ard, what is the stack alignment on ARM64?
+I think it's too much churn.  Let's get the algif_aead code fixed
+up first, and then pursue this later.
+
+BTW, why are you only doing the copy for encryption?
 
 Cheers,
 -- 
