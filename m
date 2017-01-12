@@ -1,54 +1,53 @@
-From: Andy Lutomirski <luto@amacapital.net>
-Subject: Re: [PATCH v2 8/8] crypto/testmgr: Allocate only the required output
- size for hash tests
-Date: Wed, 11 Jan 2017 23:52:03 -0800
-Message-ID: <CALCETrWZuHmZHzOUVp4J9cw9ajfS2JVr0fLyV0tyoyybGkCBqA@mail.gmail.com>
-References: <890f4bdb28a1cf72f6b802b220b35ebaf0f76bb9.1484090585.git.luto@kernel.org>
- <20170112074752.GA14230@gondor.apana.org.au>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: x86-64: Maintain 16-byte stack alignment
+Date: Thu, 12 Jan 2017 08:01:51 +0000
+Message-ID: <CAKv+Gu8=zhpZF_Y39L+DtxHysnAEATGP1ZzY1tSMdd+pG=k+jA@mail.gmail.com>
+References: <20170110143340.GA3787@gondor.apana.org.au> <CAKv+Gu8xVrfR=J5b2pGK7R5Tv-M3xZhL_dnTvvM7nTZLLtC-EQ@mail.gmail.com>
+ <20170112061211.GA10247@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Andy Lutomirski <luto@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Network Development <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Tom Herbert <tom@herbertland.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170112074752.GA14230@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-io0-f172.google.com ([209.85.223.172]:32800 "EHLO
+        mail-io0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750802AbdALICA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 03:02:00 -0500
+Received: by mail-io0-f172.google.com with SMTP id v96so12682029ioi.0
+        for <linux-crypto@vger.kernel.org>; Thu, 12 Jan 2017 00:01:53 -0800 (PST)
+In-Reply-To: <20170112061211.GA10247@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 11, 2017 at 11:47 PM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> Andy Lutomirski <luto@kernel.org> wrote:
->> There are some hashes (e.g. sha224) that have some internal trickery
->> to make sure that only the correct number of output bytes are
->> generated.  If something goes wrong, they could potentially overrun
->> the output buffer.
+On 12 January 2017 at 06:12, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Tue, Jan 10, 2017 at 05:30:48PM +0000, Ard Biesheuvel wrote:
 >>
->> Make the test more robust by allocating only enough space for the
->> correct output size so that memory debugging will catch the error if
->> the output is overrun.
->>
->> Tested by intentionally breaking sha224 to output all 256
->> internally-generated bits while running on KASAN.
->>
->> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->> Cc: Herbert Xu <herbert@gondor.apana.org.au>
->> Signed-off-by: Andy Lutomirski <luto@kernel.org>
+>> Apologies for introducing this breakage. It seemed like an obvious and
+>> simple cleanup, so I didn't even bother to mention it in the commit
+>> log, but if the kernel does not guarantee 16 byte alignment, I guess
+>> we should revert to the old method. If SSE instructions are the only
+>> ones that require this alignment, then I suppose not having a ABI
+>> conforming stack pointer should not be an issue in general.
 >
-> This patch doesn't seem to depend on anything else in the series.
-> Do you want me to take it separately?
+> BTW Ard, what is the stack alignment on ARM64?
+>
 
-Yes, please.  Its only relation to the rest of the series is that I
-wanted to make sure that I didn't mess up sha224's finalization code.
+[From memory] the arm64 ELF psABI mandates a 16 byte stack alignment
+at function entry, and 8 byte alignment at all other times. This means
+compiled code will typically preserve 16 byte alignment, and
+__aligned(16) on a stack variable will likely not result in an
+explicit alignment of the stack pointer *. But the arm64 ISA does not
+have any load/store instructions that would trigger a misalignment
+fault on an address that is 8 byte aligned but not 16 byte aligned, so
+the situation is very different from x86 (assuming I am correct in
+asserting that there are no failure modes resulting from a misaligned
+stack other than this one and a potential performance hit)
 
---Andy
+* I didn't check whether the exception handling realigns the stack
+pointer on nested exceptions (arm64 has separate IRQ stacks)
