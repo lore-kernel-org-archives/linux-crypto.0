@@ -1,41 +1,63 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] crypto: mediatek - fix format string for 64-bit
- builds
-Date: Fri, 13 Jan 2017 00:44:44 +0800
-Message-ID: <20170112164444.GC20313@gondor.apana.org.au>
-References: <20170111135104.3961730-1-arnd@arndb.de>
- <20170111135601.4047225-1-arnd@arndb.de>
+Subject: Re: [PATCH v2 0/7] crypto: ARM/arm64 - AES and ChaCha20 updates for
+ v4.11
+Date: Fri, 13 Jan 2017 00:45:04 +0800
+Message-ID: <20170112164504.GD20313@gondor.apana.org.au>
+References: <1484152915-26517-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Ryder Lee <ryder.lee@mediatek.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20170111135601.4047225-1-arnd@arndb.de>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1484152915-26517-1-git-send-email-ard.biesheuvel@linaro.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 11, 2017 at 02:55:20PM +0100, Arnd Bergmann wrote:
-> After I enabled COMPILE_TEST for non-ARM targets, I ran into these
-> warnings:
+On Wed, Jan 11, 2017 at 04:41:48PM +0000, Ard Biesheuvel wrote:
+> This adds ARM and arm64 implementations of ChaCha20, scalar AES and SIMD
+> AES (using bit slicing). The SIMD algorithms in this series take advantage
+> of the new skcipher walksize attribute to iterate over the input in the most
+> efficient manner possible.
 > 
-> crypto/mediatek/mtk-aes.c: In function 'mtk_aes_info_map':
-> crypto/mediatek/mtk-aes.c:224:28: error: format '%d' expects argument of type 'int', but argument 3 has type 'long unsigned int' [-Werror=format=]
->    dev_err(cryp->dev, "dma %d bytes error\n", sizeof(*info));
-> crypto/mediatek/mtk-sha.c:344:28: error: format '%d' expects argument of type 'int', but argument 3 has type 'long unsigned int' [-Werror=format=]
-> crypto/mediatek/mtk-sha.c:550:21: error: format '%u' expects argument of type 'unsigned int', but argument 4 has type 'size_t {aka long unsigned int}' [-Werror=format=]
+> Patch #1 adds a NEON implementation of ChaCha20 for ARM.
 > 
-> The correct format for size_t is %zu, so use that in all three
-> cases.
+> Patch #2 adds a NEON implementation of ChaCha20 for arm64.
 > 
-> Fixes: 785e5c616c84 ("crypto: mediatek - Add crypto driver support for some MediaTek chips")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Patch #3 modifies the existing NEON and ARMv8 Crypto Extensions implementations
+> of AES-CTR to be available as a synchronous skcipher as well. This is intended
+> for the mac80211 code, which uses synchronous encapsulations of ctr(aes)
+> [ccm, gcm] in softirq context, during which arm64 supports use of SIMD code.
+> 
+> Patch #4 adds a scalar implementation of AES for arm64, using the key schedule
+> generation routines and lookup tables of the generic code in crypto/aes_generic.
+> 
+> Patch #5 does the same for ARM, replacing existing scalar code that originated
+> in the OpenSSL project, and contains redundant key schedule generation routines
+> and lookup tables (and is slightly slower on modern cores)
+> 
+> Patch #6 replaces the ARM bit sliced NEON code with a new implementation that
+> has a number of advantages over the original code (which also originated in the
+> OpenSSL project.) The performance should be identical.
+> 
+> Patch #7 adds a port of the ARM bit-sliced AES code to arm64, in ECB, CBC, CTR
+> and XTS modes.
+> 
+> Due to the size of patch #7, it may be difficult to apply these patches from
+> patchwork, so I pushed them here as well:
 
-Patch applied.  Thanks.
+It seems to have made it.
+
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
