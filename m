@@ -1,43 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: mediatek - remove ARM dependencies
-Date: Fri, 13 Jan 2017 00:44:36 +0800
-Message-ID: <20170112164435.GB20313@gondor.apana.org.au>
+Subject: Re: [PATCH 2/2] crypto: mediatek - fix format string for 64-bit
+ builds
+Date: Fri, 13 Jan 2017 00:44:44 +0800
+Message-ID: <20170112164444.GC20313@gondor.apana.org.au>
 References: <20170111135104.3961730-1-arnd@arndb.de>
+ <20170111135601.4047225-1-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
         Matthias Brugger <matthias.bgg@gmail.com>,
         Ryder Lee <ryder.lee@mediatek.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
 To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:42465 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750803AbdALQpF (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2017 11:45:05 -0500
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170111135104.3961730-1-arnd@arndb.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20170111135601.4047225-1-arnd@arndb.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 11, 2017 at 02:50:19PM +0100, Arnd Bergmann wrote:
-> Building the mediatek driver on an older ARM architecture results in a
-> harmless warning:
+On Wed, Jan 11, 2017 at 02:55:20PM +0100, Arnd Bergmann wrote:
+> After I enabled COMPILE_TEST for non-ARM targets, I ran into these
+> warnings:
 > 
-> warning: (ARCH_OMAP2PLUS_TYPICAL && CRYPTO_DEV_MEDIATEK) selects NEON which has unmet direct dependencies (VFPv3 && CPU_V7)
+> crypto/mediatek/mtk-aes.c: In function 'mtk_aes_info_map':
+> crypto/mediatek/mtk-aes.c:224:28: error: format '%d' expects argument of type 'int', but argument 3 has type 'long unsigned int' [-Werror=format=]
+>    dev_err(cryp->dev, "dma %d bytes error\n", sizeof(*info));
+> crypto/mediatek/mtk-sha.c:344:28: error: format '%d' expects argument of type 'int', but argument 3 has type 'long unsigned int' [-Werror=format=]
+> crypto/mediatek/mtk-sha.c:550:21: error: format '%u' expects argument of type 'unsigned int', but argument 4 has type 'size_t {aka long unsigned int}' [-Werror=format=]
 > 
-> We could add an explicit dependency on CPU_V7, but it seems nicer to
-> open up the build to additional configurations. This replaces the ARM
-> optimized algorithm selection with the normal one that all other drivers
-> use, and that in turn lets us relax the dependency on ARM and drop
-> a number of the unrelated 'select' statements.
-> 
-> Obviously a real user would still select those other optimized drivers
-> as a fallback, but as there is no strict dependency, we can leave that
-> up to the user.
+> The correct format for size_t is %zu, so use that in all three
+> cases.
 > 
 > Fixes: 785e5c616c84 ("crypto: mediatek - Add crypto driver support for some MediaTek chips")
 > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
