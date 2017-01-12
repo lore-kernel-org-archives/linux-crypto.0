@@ -1,56 +1,56 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH 00/13] crypto: copy AAD during encrypt for AEAD ciphers
-Date: Thu, 12 Jan 2017 16:50:46 +0100
-Message-ID: <19793111.SdtrLVTG75@tauon.atsec.com>
-References: <10526995.lyZ7Je1KMx@positron.chronox.de> <2819680.QEYfZCVF62@tauon.atsec.com> <20170112153924.GA16347@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/2] crypto: aead AF_ALG - overhaul memory management
+Date: Thu, 12 Jan 2017 23:51:28 +0800
+Message-ID: <20170112155127.GA19252@gondor.apana.org.au>
+References: <1486189.x0AQ4O6r2j@positron.chronox.de>
+ <2789022.qIBfP2h8Cy@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55486 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750980AbdALPux (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2017 10:50:53 -0500
-In-Reply-To: <20170112153924.GA16347@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:36723 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750791AbdALPvn (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 10:51:43 -0500
+Content-Disposition: inline
+In-Reply-To: <2789022.qIBfP2h8Cy@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 12. Januar 2017, 23:39:24 CET schrieb Herbert Xu:
+On Sun, Dec 25, 2016 at 06:15:06PM +0100, Stephan Müller wrote:
+>
+> + * The following concept of the memory management is used:
+> + *
+> + * The kernel maintains two SGLs, the TX SGL and the RX SGL. The TX SGL is
+> + * filled by user space with the data submitted via sendpage/sendmsg. Filling
+> + * up the TX SGL does not cause a crypto operation -- the data will only be
+> + * tracked by the kernel. Upon receipt of one recvmsg call, the caller must
+> + * provide a buffer which is tracked with the RX SGL.
+> + *
+> + * During the processing of the recvmsg operation, the cipher request is
+> + * allocated and prepared. To support multiple recvmsg operations operating
+> + * on one TX SGL, an offset pointer into the TX SGL is maintained. The TX SGL
+> + * that is used for the crypto request is scatterwalk_ffwd by the offset
+> + * pointer to obtain the start address the crypto operation shall use for
+> + * the input data.
 
-Hi Herbert,
+I think this is overcomplicating things.  The async interface
+should be really simple.  It should be exactly the same as the
+sync interface, except that completion is out-of-line.
 
-> On Thu, Jan 12, 2017 at 04:34:39PM +0100, Stephan Müller wrote:
-> > We would only be able to remove it if all AEAD implementations are
-> > converted. But for the conversion time, we do face that issue.
-> 
-> It doesn't matter.  Nobody in the kernel uses that.  In fact I
-> wonder whether we should even do it for the kernel API.  We only
-> need it for the user-space API because it goes through read/write.
+So there should be no mixing of SGLs from different requests.
+ Just start with a clean slate after each recvmsg regardless of
+whether it's sync or async.
 
-So you say that we could remove it from authenc() entirely (this is currently 
-the only location where such copy operation is found for the encryption 
-direction)?
+The only difference in the async case is that you need to keep a
+reference to the old pages and free them upon completion.  But this
+should in no way interfere with subsequent requests.
 
-I would concur that the kernel does not need that.
-> 
-> > Are you suggesting that the entire data in the src SGL is first copied to
-> > the dst SGL by algif_aead? If yes, that still requires significant
-> > src/dst SGL tinkering as we have the tag -- the src SGL for encrypt does
-> > not have the tag space where the dst SGL for encrypt is required to have
-> > the tag size. This is vice versa for the decryption operation.
-> 
-> It's really only a problem for decryption.  In that case you can
-> extend the dst SG list to include the tag.
-
-If we only want to solve that for algif_aead, wouldn't it make more sense if 
-the user space caller takes care of that (such as libkcapi)? By tinkering with 
-the SGLs and copying the data to the dst buffer before the cipher operation 
-takes place, I guess we will add performance degradation and more complexity 
-in the kernel.
-
-Having such logic in user space would keep the algif_aead cleaner IMHO.
-
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
