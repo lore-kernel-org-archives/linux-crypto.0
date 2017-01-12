@@ -1,54 +1,47 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 00/13] crypto: copy AAD during encrypt for AEAD ciphers
-Date: Thu, 12 Jan 2017 16:34:39 +0100
-Message-ID: <2819680.QEYfZCVF62@tauon.atsec.com>
-References: <10526995.lyZ7Je1KMx@positron.chronox.de> <6428553.skGSKSKcYl@tauon.atsec.com> <20170112152710.GA16222@gondor.apana.org.au>
+Date: Thu, 12 Jan 2017 23:39:24 +0800
+Message-ID: <20170112153924.GA16347@gondor.apana.org.au>
+References: <10526995.lyZ7Je1KMx@positron.chronox.de>
+ <6428553.skGSKSKcYl@tauon.atsec.com>
+ <20170112152710.GA16222@gondor.apana.org.au>
+ <2819680.QEYfZCVF62@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55480 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750768AbdALPeq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2017 10:34:46 -0500
-In-Reply-To: <20170112152710.GA16222@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:52863 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750933AbdALPjd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 10:39:33 -0500
+Content-Disposition: inline
+In-Reply-To: <2819680.QEYfZCVF62@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 12. Januar 2017, 23:27:10 CET schrieb Herbert Xu:
+On Thu, Jan 12, 2017 at 04:34:39PM +0100, Stephan Müller wrote:
+>
+> We would only be able to remove it if all AEAD implementations are converted. 
+> But for the conversion time, we do face that issue.
 
-Hi Herbert,
+It doesn't matter.  Nobody in the kernel uses that.  In fact I
+wonder whether we should even do it for the kernel API.  We only
+need it for the user-space API because it goes through read/write.
 
-> On Thu, Jan 12, 2017 at 04:23:50PM +0100, Stephan Müller wrote:
-> > As far as I understand, we have the following AAD copy operations that we
-> > discuss:
-> > 
-> > - algif_aead: you suggested to add the AAD copy operation here
-> > 
-> > - AEAD implementations: over time, the AEAD implementations shall receive
-> > the AAD copy operation. The AAD copy operation shall only take place if
-> > the src SGL != dst SGL
-> 
-> If and when that happens we'd simply need to remove the copy from
-> algif_aead code. 
+> Are you suggesting that the entire data in the src SGL is first copied to the 
+> dst SGL by algif_aead? If yes, that still requires significant src/dst SGL 
+> tinkering as we have the tag -- the src SGL for encrypt does not have the tag 
+> space where the dst SGL for encrypt is required to have the tag size. This is 
+> vice versa for the decryption operation.
 
-We would only be able to remove it if all AEAD implementations are converted. 
-But for the conversion time, we do face that issue.
+It's really only a problem for decryption.  In that case you can
+extend the dst SG list to include the tag.
 
-> But even if we didn't you wouldn't have two copies
-> because algif_aead should invoke the in-place code-path after doing
-> a full copy of src to dst.
-
-Are you suggesting that the entire data in the src SGL is first copied to the 
-dst SGL by algif_aead? If yes, that still requires significant src/dst SGL 
-tinkering as we have the tag -- the src SGL for encrypt does not have the tag 
-space where the dst SGL for encrypt is required to have the tag size. This is 
-vice versa for the decryption operation.
-
-And to me the most elegant solution seems adding the copy operation to 
-crypto_aead_[en|de]crypt.
-
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
