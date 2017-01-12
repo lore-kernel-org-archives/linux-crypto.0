@@ -1,33 +1,50 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v1 3/8] crypto:chcr- Fix key length for RFC4106
-Date: Fri, 13 Jan 2017 00:42:55 +0800
-Message-ID: <20170112164255.GF20085@gondor.apana.org.au>
-References: <cover.1483599449.git.harsh@chelsio.com>
- <6d8e61299e051d51dacdb6bfd6c5e582b230027c.1483599449.git.harsh@chelsio.com>
- <20170112160959.GA19732@gondor.apana.org.au>
- <648404c5-4234-7895-d478-858433b0d093@chelsio.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: hariprasad@chelsio.com, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-To: Harsh Jain <Harsh@chelsio.com>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <648404c5-4234-7895-d478-858433b0d093@chelsio.com>
-Sender: netdev-owner@vger.kernel.org
+From: Shannon Nelson <shannon.nelson@oracle.com>
+Subject: [PATCH 1/4] n2rng: limit error spewage when self-test fails
+Date: Thu, 12 Jan 2017 10:52:46 -0800
+Message-ID: <1484247169-245086-2-git-send-email-shannon.nelson@oracle.com>
+References: <1484247169-245086-1-git-send-email-shannon.nelson@oracle.com>
+Cc: sparclinux@vger.kernel.org, herbert@gondor.apana.org.au,
+        linux-kernel@vger.kernel.org,
+        Shannon Nelson <shannon.nelson@oracle.com>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1484247169-245086-1-git-send-email-shannon.nelson@oracle.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jan 12, 2017 at 10:08:46PM +0530, Harsh Jain wrote:
->
-> That case is already handled in next if condition.It will error out with -EINVAL in next condition.
-> 
-> if (keylen == AES_KEYSIZE_128) {
+If the self-test fails, it probably won't actually suddenly
+start working.  Currently, this causes an endless spew of
+error messages on the console and in the logs, so this patch
+adds a limiter to the test.
 
-Good point.  Please split the patches according to whether they
-should go into 4.10/4.11 and then resubmit.
+Reported-by: Sowmini Varadhan <sowmini.varadhan@oracle.com>
+Signed-off-by: Shannon Nelson <shannon.nelson@oracle.com>
+---
+ drivers/char/hw_random/n2-drv.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
 
-Thanks,
+diff --git a/drivers/char/hw_random/n2-drv.c b/drivers/char/hw_random/n2-drv.c
+index 3b06c1d..102560f 100644
+--- a/drivers/char/hw_random/n2-drv.c
++++ b/drivers/char/hw_random/n2-drv.c
+@@ -589,6 +589,7 @@ static void n2rng_work(struct work_struct *work)
+ {
+ 	struct n2rng *np = container_of(work, struct n2rng, work.work);
+ 	int err = 0;
++	static int retries = 4;
+ 
+ 	if (!(np->flags & N2RNG_FLAG_CONTROL)) {
+ 		err = n2rng_guest_check(np);
+@@ -606,7 +607,9 @@ static void n2rng_work(struct work_struct *work)
+ 		dev_info(&np->op->dev, "RNG ready\n");
+ 	}
+ 
+-	if (err && !(np->flags & N2RNG_FLAG_SHUTDOWN))
++	if (--retries == 0)
++		dev_err(&np->op->dev, "Self-test retries failed, RNG not ready\n");
++	else if (err && !(np->flags & N2RNG_FLAG_SHUTDOWN))
+ 		schedule_delayed_work(&np->work, HZ * 2);
+ }
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.1
