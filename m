@@ -1,52 +1,80 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Subject: Re: [PATCH 00/13] crypto: copy AAD during encrypt for AEAD ciphers
-Date: Thu, 12 Jan 2017 23:53:44 +0800
-Message-ID: <20170112155344.GB19252@gondor.apana.org.au>
-References: <10526995.lyZ7Je1KMx@positron.chronox.de>
- <2819680.QEYfZCVF62@tauon.atsec.com>
- <20170112153924.GA16347@gondor.apana.org.au>
- <19793111.SdtrLVTG75@tauon.atsec.com>
+Date: Thu, 12 Jan 2017 17:37:33 +0100
+Message-ID: <3463059.TVfkfLOfNf@tauon.atsec.com>
+References: <10526995.lyZ7Je1KMx@positron.chronox.de> <1604413.m50iU9qQPD@tauon.atsec.com> <20170112160629.GA19577@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
 Cc: linux-crypto@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:34491 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750730AbdALQaN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2017 11:30:13 -0500
-Content-Disposition: inline
-In-Reply-To: <19793111.SdtrLVTG75@tauon.atsec.com>
+Received: from mail.eperm.de ([89.247.134.16]:55510 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751014AbdALQhj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 11:37:39 -0500
+In-Reply-To: <20170112160629.GA19577@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 12, 2017 at 04:50:46PM +0100, Stephan Müller wrote:
->
-> So you say that we could remove it from authenc() entirely (this is currently 
-> the only location where such copy operation is found for the encryption 
-> direction)?
+Am Freitag, 13. Januar 2017, 00:06:29 CET schrieb Herbert Xu:
+
+Hi Herbert,
+
+> On Thu, Jan 12, 2017 at 05:01:13PM +0100, Stephan Müller wrote:
+> > I fully agree. Therefore, I was under the impression that disregarding the
+> > AAD in recvmsg entirely would be most appropriate as offered with the
+> > patch "crypto: AF_ALG - disregard AAD buffer space for output". In this
+> > case we would be fully POSIX compliant, the kernel would not copy the AAD
+> > (and thus perform multiple memcpy operations due to copy_from_user and
+> > copy_to_user round trips) and leave the AAD copy operation entirely to
+> > user space.
+> Yes but then you'd have to play nasty games to fit this through
+> the kernel API. 
+
+I would not understand that statement.
+
+With the patch mentioned above that I provided some weeks ago, we have the 
+following scenario for an encryption (in case of decryption, it is almost 
+identical, just the tag location is reversed):
+
+user calls sendmsg with data buffer/IOVEC: AAD || PT
+	-> algif_aead turns this into the src SGL
+
+user calls recvmsg with data buffer/IOVEC: CT || Tag
+	-> algif_aead creates the first SG entry in the dst SGL pointing to the 
+AAD from the src SGL
+	-> algif_aead appends the user buffers to the dst SGL
+
+	-> algif_aead performs its operation and during that operation, only the 
+CT and Tag parts are changed
+
+I.e. with the pre-pending of the SG pointing to the AAD from the src SGL to 
+the dst SGL we have a clean invocation of the kernel API.
+
+Yet, we avoid copy round trips of the AAD from src to dst in the kernel.
+
+> Besides, we could still do in-place crypto even
+> though you suggested that it's complicated.
+
+Is that crypto-in-place operation really a goal we want to achieve if we "buy" 
+it with a memcpy of the data from the src SGL to the dst SGL before the crypto 
+operation?
+
+Can we really call such implementation a crypto-in-place operation?
+
+> It's not really.
+
+I concur, for encryption the suggested memcpy is not difficult. Only for 
+decryption, the memcpy is more challenging.
+
+> All we have to do is walk through the SG list and compare each
+> page/offset.  For the common case it's going to be a single-entry
+> list.
 > 
-> I would concur that the kernel does not need that.
+> Cheers,
 
-authenc needs it for performance reasons.  The kernel API as it
-stands basically says that it may or may not copy the AAD.  If
-you choose to have a distinct AAD in the dst SG list then either
-you throw away the result or you copy it yourself.
 
-> If we only want to solve that for algif_aead, wouldn't it make more sense if 
-> the user space caller takes care of that (such as libkcapi)? By tinkering with 
-> the SGLs and copying the data to the dst buffer before the cipher operation 
-> takes place, I guess we will add performance degradation and more complexity 
-> in the kernel.
-> 
-> Having such logic in user space would keep the algif_aead cleaner IMHO.
 
-We need to have a sane kernel API that respects POSIX.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
