@@ -1,40 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v1 0/8] crypto:chcr- Bug fixes
-Date: Fri, 13 Jan 2017 00:14:34 +0800
-Message-ID: <20170112161434.GB19732@gondor.apana.org.au>
-References: <cover.1483599449.git.harsh@chelsio.com>
+Subject: Re: [PATCH 1/2] crypto: aead AF_ALG - overhaul memory management
+Date: Fri, 13 Jan 2017 00:17:59 +0800
+Message-ID: <20170112161759.GC19732@gondor.apana.org.au>
+References: <1486189.x0AQ4O6r2j@positron.chronox.de>
+ <2701907.5SyJthQSdc@tauon.atsec.com>
+ <20170112160739.GB19577@gondor.apana.org.au>
+ <1946014.7KfpB7DN4Q@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: hariprasad@chelsio.com, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-To: Harsh Jain <harsh@chelsio.com>
-Return-path: <netdev-owner@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:47047 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750832AbdALQSR (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 11:18:17 -0500
 Content-Disposition: inline
-In-Reply-To: <cover.1483599449.git.harsh@chelsio.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1946014.7KfpB7DN4Q@tauon.atsec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 06, 2017 at 02:01:31PM +0530, Harsh Jain wrote:
-> The patch series is based on Herbert's cryptodev-2.6 tree.
-> It include bug fixes.
-> 
-> Atul Gupta (4):
->   crypto:chcr-Change flow IDs
->   crypto:chcr- Fix panic on dma_unmap_sg
->   crypto:chcr- Check device is allocated before use
->   crypto:chcr- Fix wrong typecasting
-> Harsh Jain (4):
->   crypto:chcr- Fix key length for RFC4106
->   crypto:chcr- Use cipher instead of Block Cipher in gcm setkey
->   crypto:chcr: Change cra_flags for cipher algos
->   crypto:chcr- Change algo priority
+On Thu, Jan 12, 2017 at 05:10:14PM +0100, Stephan Müller wrote:
+>
+> Each IOCB would transpire into an independent, separate recvmsg invocation 
+> without an additional sendmsg/sendpage operation. Thus, in order to support 
+> multiple IOCBs, all data the multiple recvmsg invocations will operate on must 
+> be injected into the kernel beforehand.
 
-When you resubmit this please split it into two series.  Please
-send the critical bug fixes (panic + key length + alloc check)
-in one series separate from the others.  This way I can push
-them easily to the 4.10 tree.
+I don't understand, what's wrong with:
 
-Thanks,
+sendmsg(fd, ...)
+aio_read(iocb1)
+sendmsg(fd, ...)
+aio_read(iocb2)
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
