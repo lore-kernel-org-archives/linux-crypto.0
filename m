@@ -1,47 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 8/8] crypto/testmgr: Allocate only the required output
- size for hash tests
-Date: Fri, 13 Jan 2017 00:44:11 +0800
-Message-ID: <20170112164411.GA20313@gondor.apana.org.au>
-References: <cover.1484090585.git.luto@kernel.org>
- <890f4bdb28a1cf72f6b802b220b35ebaf0f76bb9.1484090585.git.luto@kernel.org>
+Subject: Re: [PATCH 1/2] crypto: mediatek - remove ARM dependencies
+Date: Fri, 13 Jan 2017 00:44:36 +0800
+Message-ID: <20170112164435.GB20313@gondor.apana.org.au>
+References: <20170111135104.3961730-1-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Daniel Borkmann <daniel@iogearbox.net>,
-        Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Tom Herbert <tom@herbertland.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: Andy Lutomirski <luto@kernel.org>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Ryder Lee <ryder.lee@mediatek.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:42465 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750803AbdALQpF (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 11:45:05 -0500
 Content-Disposition: inline
-In-Reply-To: <890f4bdb28a1cf72f6b802b220b35ebaf0f76bb9.1484090585.git.luto@kernel.org>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170111135104.3961730-1-arnd@arndb.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 10, 2017 at 03:24:46PM -0800, Andy Lutomirski wrote:
-> There are some hashes (e.g. sha224) that have some internal trickery
-> to make sure that only the correct number of output bytes are
-> generated.  If something goes wrong, they could potentially overrun
-> the output buffer.
+On Wed, Jan 11, 2017 at 02:50:19PM +0100, Arnd Bergmann wrote:
+> Building the mediatek driver on an older ARM architecture results in a
+> harmless warning:
 > 
-> Make the test more robust by allocating only enough space for the
-> correct output size so that memory debugging will catch the error if
-> the output is overrun.
+> warning: (ARCH_OMAP2PLUS_TYPICAL && CRYPTO_DEV_MEDIATEK) selects NEON which has unmet direct dependencies (VFPv3 && CPU_V7)
 > 
-> Tested by intentionally breaking sha224 to output all 256
-> internally-generated bits while running on KASAN.
+> We could add an explicit dependency on CPU_V7, but it seems nicer to
+> open up the build to additional configurations. This replaces the ARM
+> optimized algorithm selection with the normal one that all other drivers
+> use, and that in turn lets us relax the dependency on ARM and drop
+> a number of the unrelated 'select' statements.
 > 
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Andy Lutomirski <luto@kernel.org>
+> Obviously a real user would still select those other optimized drivers
+> as a fallback, but as there is no strict dependency, we can leave that
+> up to the user.
+> 
+> Fixes: 785e5c616c84 ("crypto: mediatek - Add crypto driver support for some MediaTek chips")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
 Patch applied.  Thanks.
 -- 
