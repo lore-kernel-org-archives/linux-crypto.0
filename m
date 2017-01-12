@@ -1,48 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v1 3/8] crypto:chcr- Fix key length for RFC4106
-Date: Fri, 13 Jan 2017 00:09:59 +0800
-Message-ID: <20170112160959.GA19732@gondor.apana.org.au>
-References: <cover.1483599449.git.harsh@chelsio.com>
- <6d8e61299e051d51dacdb6bfd6c5e582b230027c.1483599449.git.harsh@chelsio.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH 1/2] crypto: aead AF_ALG - overhaul memory management
+Date: Thu, 12 Jan 2017 17:10:14 +0100
+Message-ID: <1946014.7KfpB7DN4Q@tauon.atsec.com>
+References: <1486189.x0AQ4O6r2j@positron.chronox.de> <2701907.5SyJthQSdc@tauon.atsec.com> <20170112160739.GB19577@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: hariprasad@chelsio.com, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-To: Harsh Jain <harsh@chelsio.com>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <6d8e61299e051d51dacdb6bfd6c5e582b230027c.1483599449.git.harsh@chelsio.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:55502 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751113AbdALQKT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 11:10:19 -0500
+In-Reply-To: <20170112160739.GB19577@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 06, 2017 at 02:01:34PM +0530, Harsh Jain wrote:
-> Check keylen before copying salt to avoid wrap around of Integer.
+Am Freitag, 13. Januar 2017, 00:07:39 CET schrieb Herbert Xu:
+
+Hi Herbert,
+
+> On Thu, Jan 12, 2017 at 05:05:03PM +0100, Stephan Müller wrote:
+> > Am Donnerstag, 12. Januar 2017, 16:56:04 CET schrieb Stephan Müller:
+> > 
+> > Hi Herbert,
+> > 
+> > > That would mean that we would only support one IOCB.
+> > 
+> > As we also need to be standards compliant, would it be appropriate to only
+> > support one IOCB? I think this is a significant difference to other AIO
+> > operations like for networking.
 > 
-> Signed-off-by: Harsh Jain <harsh@chelsio.com>
-> ---
->  drivers/crypto/chelsio/chcr_algo.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-> index deec7c0..6c2dea3 100644
-> --- a/drivers/crypto/chelsio/chcr_algo.c
-> +++ b/drivers/crypto/chelsio/chcr_algo.c
-> @@ -2194,8 +2194,8 @@ static int chcr_gcm_setkey(struct crypto_aead *aead, const u8 *key,
->  	unsigned int ck_size;
->  	int ret = 0, key_ctx_size = 0;
->  
-> -	if (get_aead_subtype(aead) ==
-> -	    CRYPTO_ALG_SUB_TYPE_AEAD_RFC4106) {
-> +	if (get_aead_subtype(aead) == CRYPTO_ALG_SUB_TYPE_AEAD_RFC4106 &&
-> +	    keylen > 3) {
->  		keylen -= 4;  /* nonce/salt is present in the last 4 bytes */
->  		memcpy(aeadctx->salt, key + keylen, 4);
->  	}
+> Why would we be limited to one IOCB?
 
-We should return an error in this case.
+Each IOCB would transpire into an independent, separate recvmsg invocation 
+without an additional sendmsg/sendpage operation. Thus, in order to support 
+multiple IOCBs, all data the multiple recvmsg invocations will operate on must 
+be injected into the kernel beforehand.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
