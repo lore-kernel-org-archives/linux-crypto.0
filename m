@@ -1,70 +1,37 @@
-From: Rob Rice <rob.rice@broadcom.com>
-Subject: arm64 broken
-Date: Wed, 11 Jan 2017 13:37:19 -0500
-Message-ID: <0795D328-B031-4EFA-AA0B-603B66F9F035@broadcom.com>
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f42.google.com ([74.125.83.42]:34173 "EHLO
-        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752479AbdAKSh0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Jan 2017 13:37:26 -0500
-Received: by mail-pg0-f42.google.com with SMTP id 14so38908947pgg.1
-        for <linux-crypto@vger.kernel.org>; Wed, 11 Jan 2017 10:37:26 -0800 (PST)
-Received: from dhcp-10-27-64-110.rtp.broadcom.com ([192.19.218.250])
-        by smtp.gmail.com with ESMTPSA id c15sm15533471pfd.36.2017.01.11.10.37.24
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 11 Jan 2017 10:37:25 -0800 (PST)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: x86-64: Maintain 16-byte stack alignment
+Date: Thu, 12 Jan 2017 14:12:11 +0800
+Message-ID: <20170112061211.GA10247@gondor.apana.org.au>
+References: <20170110143340.GA3787@gondor.apana.org.au>
+ <CAKv+Gu8xVrfR=J5b2pGK7R5Tv-M3xZhL_dnTvvM7nTZLLtC-EQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu8xVrfR=J5b2pGK7R5Tv-M3xZhL_dnTvvM7nTZLLtC-EQ@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-I=E2=80=99m working on updating a patchset. The master branch in =
-crypto-2.6 doesn=E2=80=99t compile for ARM64. The first couple errors =
-are listed below. A colleague believes that the following commit in rc2 =
-fixes the problem.
+On Tue, Jan 10, 2017 at 05:30:48PM +0000, Ard Biesheuvel wrote:
+>
+> Apologies for introducing this breakage. It seemed like an obvious and
+> simple cleanup, so I didn't even bother to mention it in the commit
+> log, but if the kernel does not guarantee 16 byte alignment, I guess
+> we should revert to the old method. If SSE instructions are the only
+> ones that require this alignment, then I suppose not having a ABI
+> conforming stack pointer should not be an issue in general.
 
-commit b4b8664d291ac1998e0f0bcdc96b6397f0fe68b3
-Author: Al Viro <viro@zeniv.linux.org.uk =
-<mailto:viro@zeniv.linux.org.uk>>
-Date:   Mon Dec 26 04:10:19 2016 -0500
+BTW Ard, what is the stack alignment on ARM64?
 
-    arm64: don't pull uaccess.h into *.S
-   =20
-    Split asm-only parts of arm64 uaccess.h into a new header and use =
-that
-    from *.S.
-   =20
-    Signed-off-by: Al Viro <viro@zeniv.linux.org.uk =
-<mailto:viro@zeniv.linux.org.uk>>
-
-Any chance we could either pull in the fix or move to rc2?
-
-Thanks,
-
-Rob
-=20
-
-  AS      arch/arm64/kernel/entry.o
-In file included from ./include/linux/sched.h:17:0,
-                 from ./include/linux/uaccess.h:4,
-                 from arch/arm64/kernel/entry.S:34:
-./include/linux/kernel.h:49:0: warning: "ALIGN" redefined
- #define ALIGN(x, a)  __ALIGN_KERNEL((x), (a))
- ^
-In file included from arch/arm64/kernel/entry.S:22:0:
-./include/linux/linkage.h:78:0: note: this is the location of the =
-previous definition
- #define ALIGN __ALIGN
- ^
-In file included from ./include/linux/time.h:7:0,
-                 from ./include/uapi/linux/timex.h:56,
-                 from ./include/linux/timex.h:56,
-                 from ./include/linux/sched.h:19,
-                 from ./include/linux/uaccess.h:4,
-                 from arch/arm64/kernel/entry.S:34:
-./include/linux/time64.h:36:0: warning: "NSEC_PER_SEC" redefined
- #define NSEC_PER_SEC 1000000000L=
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
