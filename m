@@ -1,90 +1,53 @@
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: x86-64: Maintain 16-byte stack alignment
-Date: Thu, 12 Jan 2017 08:49:14 -0600
-Message-ID: <20170112144914.qmc5lgocp6vfq3b6@treble>
-References: <20170110143340.GA3787@gondor.apana.org.au>
- <20170110143913.GA3822@gondor.apana.org.au>
- <CA+55aFyuUCr3aUBhFt6T3vKyZOskLyH8Kd_2jeFkPYxxvEaXEg@mail.gmail.com>
- <20170112070534.GA14016@gondor.apana.org.au>
- <20170112074601.GB30151@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 00/13] crypto: copy AAD during encrypt for AEAD ciphers
+Date: Thu, 12 Jan 2017 22:57:28 +0800
+Message-ID: <20170112145728.GA15595@gondor.apana.org.au>
+References: <10526995.lyZ7Je1KMx@positron.chronox.de>
+ <20170112061936.GA10325@gondor.apana.org.au>
+ <31581301.kpbcu3havF@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: Ingo Molnar <mingo@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:34689 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750933AbdALO5s (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Jan 2017 09:57:48 -0500
 Content-Disposition: inline
-In-Reply-To: <20170112074601.GB30151@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <31581301.kpbcu3havF@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 12, 2017 at 08:46:01AM +0100, Ingo Molnar wrote:
+On Thu, Jan 12, 2017 at 12:22:09PM +0100, Stephan Müller wrote:
 > 
-> * Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> When addressing the issue in the algif_aead code, and expect that over time 
+> the AEAD implementations will gain the copy operation, eventually we will copy 
+> the AAD twice. Of course, this could be prevented, if the algif_aead code 
+> somehow uses the same SGL for the src and dst AAD.
+
+Why would you copy it twice? You copy everything before you start
+and then just do in-place crypto.
+
+> > BTW, why are you only doing the copy for encryption?
 > 
-> > On Tue, Jan 10, 2017 at 09:05:28AM -0800, Linus Torvalds wrote:
-> > >
-> > > I'm pretty sure we have random asm code that may not maintain a
-> > > 16-byte stack alignment when it calls other code (including, in some
-> > > cases, calling C code).
-> > > 
-> > > So I'm not at all convinced that this is a good idea. We shouldn't
-> > > expect 16-byte alignment to be something trustworthy.
-> > 
-> > So what if we audited all the x86 assembly code to fix this? Would
-> > it then be acceptable to do a 16-byte aligned stack?
-> 
-> Audits for small but deadly details that isn't checked automatically by tooling 
-> would inevitably bitrot again - and in this particular case there's a 50% chance 
-> that a new, buggy change would test out to be 'fine' on a kernel developer's own 
-> box - and break on different configs, different hw or with unrelated (and 
-> innocent) kernel changes, sometime later - spreading the pain unnecessarily.
-> 
-> So my feeling is that we really need improved tooling for this (and yes, the GCC 
-> toolchain should have handled this correctly).
-> 
-> But fortunately we have related tooling in the kernel: could objtool handle this? 
-> My secret hope was always that objtool would grow into a kind of life insurance 
-> against toolchain bogosities (which is a must for things like livepatching or a 
-> DWARF unwinder - but I digress).
+> I was looking at the only AEAD implementation that does the copy operation: 
+> authenc. There, the copy operation is only performed for encryption. I was 
+> thinking a bit about why decryption was not covered. I think the answer is the 
+> following: for encryption, the AAD is definitely needed in the dst buffer as 
+> the dst buffer with the AAD must be sent to the recipient for decryption. The 
+> decryption and the associated authentication only works with the AAD. However, 
+> after decrypting, all the caller wants is the decrypted plaintext only. There 
+> is no further use of the AAD after the decryption step. Hence, copying the AAD 
+> to the dst buffer in the decryption step would not serve the caller.
 
-Are we talking about entry code, or other asm code?  Because objtool
-audits *most* asm code, but entry code is way too specialized for
-objtool to understand.
+That's just the current implementation.  If we're going to make
+this an API then we should do it for both directions.
 
-(I do have a pending objtool rewrite which would make it very easy to
-ensure 16-byte stack alignment.  But again, objtool can only understand
-callable C or asm functions, not entry code.)
-
-Another approach would be to solve this problem with unwinder warnings,
-*if* there's enough test coverage.
-
-I recently made some changes to try to standardize the "end" of the
-stack, so that the stack pointer is always a certain value before
-calling into C code.  I also added some warnings to the unwinder to
-ensure that it always reaches that point on the stack.  So if the "end"
-of the stack were adjusted by a word by adding padding to pt_regs, the
-unwinder warnings could help preserve that.
-
-We could take that a step further by adding an unwinder check to ensure
-that *every* frame is 16-byte aligned if -mpreferred-stack-boundary=3
-isn't used.
-
-Yet another step would be to add a debug feature which does stack sanity
-checking from a periodic NMI, to flush out these unwinder warnings.
-
-(Though I've found that current 0-day and fuzzing efforts, combined with
-lockdep and perf's frequent unwinder usage, are already doing a great
-job at flushing out unwinder warnings.)
-
-The only question is if there would be enough test coverage,
-particularly with those versions of gcc which don't have
--mpreferred-stack-boundary=3.
-
+Cheers,
 -- 
-Josh
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
